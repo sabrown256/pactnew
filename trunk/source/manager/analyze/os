@@ -23,7 +23,6 @@ NoteD $ALog -n "   Operating System: "
 Note $ALog ""
 
 dbini OSX_Version    ""
-dbini OS_Release     `uname -r`
 
 envini OS_Name       `uname -s`
 
@@ -32,7 +31,7 @@ if ($?Arch == 0) then
 endif
 
 # remove parens - they confuse shells later on
-fexvar $ALog OS_Release vr:OS_Release @o sed 's/(/,/g' @o sed 's/)/,/g'
+fexvar $ALog OS_Release uname -r @b sed 's/(/,/g' @o sed 's/)/,/g'
 
 Note $ALog "RootInc   = $RootInc"
 if ($CROSS_COMPILE == MINGW32) then

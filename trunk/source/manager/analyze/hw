@@ -25,7 +25,6 @@ Note $ALog ""
 dbini CPU           "unknown"
 dbini FPU           "unknown"
 
-set OS_Name = `uname -s`
 set HostHW  = `uname -m`
 
 if ($CPU == "unknown") then

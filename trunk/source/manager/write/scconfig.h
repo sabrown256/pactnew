@@ -139,10 +139,6 @@ source $MngDir/write/import-db
        Note $STDOUT "#define LONG64"
     endif
 
-    if ("$FC_INT_PTR_DIFFER" != "") then
-       Note $STDOUT "#define $FC_INT_PTR_DIFFER"
-    endif
-
     if (-e $IncDir/Finteger.bytes) then
        Note $STDOUT `cat $IncDir/Finteger.bytes`
        $RM $IncDir/Finteger.bytes
@@ -155,6 +151,7 @@ source $MngDir/write/import-db
     set lhave = ( $lhave BUILD_DEBUG              none )
     set lhave = ( $lhave BUILD_OPTIMIZE           none )
     set lhave = ( $lhave BUILD_PROFILE            none )
+    set lhave = ( $lhave FC_INT_PTR_DIFFER        none )
     set lhave = ( $lhave HAVE_ANSI_FLOAT16        none )
     set lhave = ( $lhave HAVE_ANSI_C9X_COMPLEX    none )
     set lhave = ( $lhave HAVE_ANSI_C9X_FENV       none )
@@ -163,7 +160,6 @@ source $MngDir/write/import-db
     set lhave = ( $lhave HAVE_PYTHON              none )
     set lhave = ( $lhave HAVE_PY_NUMERIC          none )
     set lhave = ( $lhave HAVE_PY_NUMPY            none )
-    set lhave = ( $lhave HAVE_READLINE            none )
     set lhave = ( $lhave HAVE_HDF5                none )
     set lhave = ( $lhave HAVE_SQL                 none )
     set lhave = ( $lhave HAVE_MYSQL               none )
@@ -190,6 +186,7 @@ source $MngDir/write/import-db
     set lhave = ( $lhave HAVE_BFD                 none )
     set lhave = ( $lhave HAVE_DEMANGLE            none )
     set lhave = ( $lhave USE_FULL_MM              none )
+#    set lhave = ( $lhave HAVE_READLINE            none )
 
 # these involve the HAVE/USE dichotomy
     set lhave = ( $lhave HAVE_FLEX_SCANNER        USE_FLEX )

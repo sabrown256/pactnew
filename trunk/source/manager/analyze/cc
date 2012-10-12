@@ -235,22 +235,24 @@ if ($Cfg_CC_Exe != "") then
 
    Note $ALog "Determine whether a FORTRAN integer can hold a pointer"
 
-   setenv FC_INT_PTR_DIFFER ""
+   setenv FC_INT_PTR_DIFFER FALSE
 
    cat << EOF >! $Tmp.c
 #include <stdio.h>
 int main(int c, char **v)
 {if (sizeof(int) != sizeof(char *))
-    printf("FF_INT_SIZE_PTR_DIFFER");
+    printf("TRUE");
+ else
+    printf("FALSE");
  return(0);}
 EOF
 
    flog $ALog cat $Tmp.c
    flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
-#      flog $ALog $CFE -v ./$Tmp $BE
-      setenv FC_INT_PTR_DIFFER `$CFE ./$Tmp $BE`
-      if ("$FC_INT_PTR_DIFFER" != "") then
+
+      fexvar $ALog FC_INT_PTR_DIFFER $CFE ./$Tmp $BE
+      if ("$FC_INT_PTR_DIFFER" == TRUE) then
          NoteD $ALog "      pointer size differs from Fortran INTEGER size"
       endif
 

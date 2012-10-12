@@ -573,7 +573,26 @@ flog $Log cd $mngdir
       setenv DAS_ROOT DAS_ROOT
    endif
 
+# settle SITE signature
+   Note $Log ""
+   set lok = FALSE
+   if ($?SITE_SIGNATURE_DB == 1) then
+      if (-f "$SITE_SIGNATURE_DB") then
+         Note $Log "Setting up site signature using '$SITE_SIGNATURE_DB'"
+         set lok = TRUE
+      endif
+   endif
+   if ($lok == FALSE) then
+      Note $Log "No site signature found"
+   endif
    eval `../scripts/sys-site -du`
+   Note $Log "Site signature:"
+   Note $Log "   SYS_SITE = $SYS_SITE"
+   Note $Log "   SYS_TYPE = $SYS_TYPE"
+   Note $Log "   DAI_ROOT = $DAI_ROOT"
+   Note $Log "   DAS_ROOT = $DAS_ROOT"
+   Note $Log ""
+   unset lok
 
 # settle RUN signature
 # NOTE: essential for cross compiling
@@ -582,6 +601,7 @@ flog $Log cd $mngdir
    else
       Note $Log "No run signature found"
    endif
+   Note $Log ""
 
 # settle environment of build
    flog $Log set base = $cwd:h
