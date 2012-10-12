@@ -31,8 +31,7 @@ envini LibM_RPath   ""
 if (-d "$IMF_Path") then
    set nbits = `nbit -d`
 
-   fexec $ALog ls -rt $IMF_Path/ic*/lib/libimf.a @b grep -v beta @o tail -n 1 @o vw:t
-   dbget t
+   fexvars $ALog t ls -rt $IMF_Path/ic*/lib/libimf.a @b grep -v beta @o tail -n 1
 else
    set t = ""
 endif

@@ -144,8 +144,7 @@ EOF
       flog $ALog ldd $Tmp
 
       flog $ALog $PFE -dr -v -p 2 $Tmp $BE
-      fexec $ALog echo a @o $PFE -v -p 2 $Tmp $BE @b grep Proc @o wc -l @o vw:t
-      dbgets t
+      fexvars $ALog t echo a @o $PFE -v -p 2 $Tmp $BE @b grep Proc @o wc -l
       if (($gstatus[2] == 0) && ($t > 1)) then
          flog $ALog setenv HAVE_MPI_STDIN_ALL TRUE
          flog $ALog set MPIStdIO = "all processes"

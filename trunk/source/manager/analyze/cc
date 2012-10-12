@@ -200,17 +200,15 @@ if ($Cfg_CC_Exe != "") then
       flog $ALog set CmpVers = $PACT_CC_VERSION
       set xstatus = $status
    else
-      fexec $ALog $Cfg_CC_Exe $CC_Version @b grep version @o vw:t
-      dbgets t
+      fexvars $ALog t $Cfg_CC_Exe $CC_Version @b grep version
       Note $ALog "Compiler version = $t"
 
-      fexec $ALog echo $t @o sed 's/gcc version//' @o vw:t
-      dbgets t
+      fexvars $ALog t echo $t @o sed 's/gcc version//'
       Note $ALog "GCC version      = $t"
       if ("$t" =~ 3.*) then
-         fexec $ALog echo "$Cfg_CC_Flags" @o sed "s| -fsignaling-nans||" @o vw:Cfg_CC_Flags
-         fexec $ALog echo "$Save_CFLAGS" @o sed "s| -fsignaling-nans||" @o vw:Save_CFLAGS
-         fexec $ALog echo "$CC_Flags" @o sed "s| -fsignaling-nans||" @o vw:CC_Flags
+         fexvars $ALog Cfg_CC_Flags echo "$Cfg_CC_Flags" @o sed "s| -fsignaling-nans||"
+         fexvars $ALog Save_CFLAGS  echo "$Save_CFLAGS" @o sed "s| -fsignaling-nans||"
+         fexvars $ALog CC_Flags     echo "$CC_Flags" @o sed "s| -fsignaling-nans||"
       endif
       flog $ALog $Cfg_CC_Exe $CC_Version
       flog $ALog set CmpVers = any

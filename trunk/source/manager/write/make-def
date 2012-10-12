@@ -628,27 +628,7 @@ PrintRule:
 
     echo '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }' >> $STDOUT
 
-# NOTE: some csh's print them literally instead of the C way
-# as of 2012 csh's for Linux, Darwin, FreeBSD, and Solaris
-# handle them "properly"
-# older systems such as IRIX, OSF1 (aka TRU64), old Unicos,
-# and HP-UX are virtually gone so there is no practical need for this
-#    fexec $Log vr:$Val @o grep "\\t" @b fa:/dev/null
-#    if ($gstatus[2] == 0) then
-#       Note $Log "Process formatting characters the hard way"
-#       set STDAUX = tmp-$System
-#
-#       printenv $Val >! $STDAUX
-#       (echo '1,$s/[\]t/	/g' ; echo '1,$s/[\]n//g' ; echo '1,$p') |&  \
-#       ed - $STDAUX                                                        |&  \
-#       tr "\015" "\012"                                                    |&  \
-#       awk '($1 != "?") {print}' >>& $STDOUT
-#
-#       $RM $STDAUX
-#    else
-#       Note $Log "Process formatting characters the easy way"
-       printenv $Val | sed 's/\\n/\n/g' | sed 's/\\t/\t/g' >> $STDOUT
-#    endif
+    fexec $Log printenv $Val @o sed 's/\\n/\n/g' @o sed 's/\\t/\t/g' @o fa:$STDOUT
 
     return
 

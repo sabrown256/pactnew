@@ -36,9 +36,7 @@ EOF
    if (-x $Tmp) then
       set lvers = `$Tmp`
 
-      fexec $ALog echo "$lvers" @o sed 's/\./ /g' @o vw:t
-      dbgets t
-
+      fexvars $ALog t echo "$lvers" @o sed 's/\./ /g'
       if ($#t > 1) then
          @ MajorV = $t[1]
          @ MinorV = $t[2]

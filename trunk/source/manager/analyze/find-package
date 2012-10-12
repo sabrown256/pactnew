@@ -232,13 +232,12 @@ flog $ALog set PckInc  = ""
 GotIt:
 
 # check for static vs dynamic linking
-fexec $ALog ldd $lFile @b grep $lLib @o vw:t
-dbgets t
-#set t = ( `ldd $lFile |& grep $lLib` )
+fexvars $ALog t ldd $lFile @b grep $lLib
 if ($#t > 2) then
    set lSO = $t[3];
    Note $ALog "Shared library for ${lLib}: |$lSO|"
 endif
+unset t
 
 if ("$lFile" != "none") then
    flog $ALog $RM $lFile $lFile.c
