@@ -14,12 +14,16 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: site"
 
-dbini SYS_SITE     ""
-dbini SYS_TYPE     ""
-dbini DAI_ROOT     ""
-#dbini DAS_ROOT     ""
-
+envini SYS_SITE     ""
+envini SYS_TYPE     ""
+envini DAI_ROOT     ""
 envini DAS_ROOT     ""
+
+if ($?SITE_SIGNATURE_DB == 1) then
+   Note $Log "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
+else
+   Note $Log "SITE_SIGNATURE_DB not defined"
+endif
 
 if (-f $MngDir/extensions/sys-site) then
    eval `$MngDir/extensions/sys-site`
@@ -28,11 +32,9 @@ else
 endif
 
 # export the results
-dbexp SYS_TYPE
-dbexp SYS_SITE
-dbexp DAI_ROOT
-#dbexp DAS_ROOT
-
+envexp SYS_TYPE
+envexp SYS_SITE
+envexp DAI_ROOT
 envexp DAS_ROOT
 
 exit(0)

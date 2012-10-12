@@ -10,7 +10,7 @@
 
 #include "fpact.h"
 
-#ifndef FF_INT_SIZE_PTR_DIFFER
+#ifndef FC_INT_PTR_DIFFER
 
 # define _PD_append_aux(file, name, type, space, nd, dims)                   \
     ((FIXNUM) PD_append_as_alt(file, name, type, space, nd, (long *) dims))
@@ -22,7 +22,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef FF_INT_SIZE_PTR_DIFFER
+#ifdef FC_INT_PTR_DIFFER
 
 /*--------------------------------------------------------------------------*/
 

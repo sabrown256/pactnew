@@ -29,7 +29,7 @@ int64_t SC_stash_pointer(void *p)
 
     i = -1;
 
-#ifdef FF_INT_SIZE_PTR_DIFFER
+#ifdef FC_INT_PTR_DIFFER
     int np;
     void *pl;
 
@@ -70,7 +70,7 @@ void *SC_get_pointer(int64_t n)
    {void *p;
 
 
-#ifdef FF_INT_SIZE_PTR_DIFFER
+#ifdef FC_INT_PTR_DIFFER
     int np;
 
     SC_LOCKON(SC_ptr_lock);
@@ -103,7 +103,7 @@ void *SC_get_pointer(int64_t n)
 int64_t SC_pointer_index(void *p)
    {int64_t i;
 
-#ifdef FF_INT_SIZE_PTR_DIFFER
+#ifdef FC_INT_PTR_DIFFER
     int np;
     void **pl;
 
@@ -140,7 +140,7 @@ int64_t SC_pointer_index(void *p)
 void *SC_del_pointer(int n)
    {void *p;
     
-#ifdef FF_INT_SIZE_PTR_DIFFER
+#ifdef FC_INT_PTR_DIFFER
     int np;
 
     p = NULL;
