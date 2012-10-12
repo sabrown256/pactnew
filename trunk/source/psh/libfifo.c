@@ -86,7 +86,7 @@ static int open_fifo(char *root)
     for (ch = 0; ch < 2; ch++)
         {fifo = name_fifo(root, ch);
 
-	 unlink(fifo);
+	 unlink_safe(fifo);
 	 st  = mkfifo(fifo, 0600);
 	 rv &= (st == 0);};
 
@@ -112,7 +112,7 @@ static int close_fifo(char *root)
 
     for (ch = 0; ch < 2; ch++)
         {fifo = name_fifo(root, ch);
-	 st   = unlink(fifo);
+	 st   = unlink_safe(fifo);
 	 rv  &= (st == 0);};
 
     wh = WHICH_PROC();

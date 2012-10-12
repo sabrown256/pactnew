@@ -8,7 +8,7 @@
 ; #include <cpyright.h>
 ;
 
-(system "rm -f ulaxs.log")
+(unlink "ulaxs.log")
 
 (transcript-on "ulaxs.log")
 

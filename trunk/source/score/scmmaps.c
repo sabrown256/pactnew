@@ -1805,10 +1805,10 @@ FILE *SC_mf_copy(char *name, FILE *fp, int bckup)
     if (strcmp(name, mf->name) == 0)
        {if (bckup)
 	   {onm = SC_dsnprintf(FALSE, "%s~", name);
-	    unlink(onm);
+	    SC_remove(onm);
 	    rename(name, onm);}
 	else
-	   unlink(name);};
+	   SC_remove(name);};
 
     rename(nnm, name);
 

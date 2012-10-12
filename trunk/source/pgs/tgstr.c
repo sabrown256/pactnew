@@ -1241,7 +1241,7 @@ int main(int c, char **v)
 			 return(1);
 			 break;};};};
 
-    unlink(lgf);
+    SC_remove(lgf);
 
     rv = TRUE;
     for (i = 0; i < nd; i++)

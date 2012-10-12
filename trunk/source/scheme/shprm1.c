@@ -1080,23 +1080,27 @@ static object *_SSI_etime(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 
 /* _SSI_UNLINK - unlink the specified file
- *             - Usage: (unlink <file-name>)
+ *             - Usage: (unlink <file-name>*)
  *             - return #t iff successful
  */
 
 static object *_SSI_unlink(SS_psides *si, object *argl)
    {int ok;
     char *path;
-    object *rv;
+    object *o, *rv;
 
-    path = NULL;
-    SS_args(si, argl,
-	    SC_STRING_I, &path,
-	    0);
+    ok = 0;
 
-    ok = -1;
-    if ((path != NULL) && (strcmp(path, "nil") != 0))
-       ok = unlink(path);
+    for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
+        {o = SS_car(si, argl);
+    
+	 path = NULL;
+	 SS_args(si, o,
+		 SC_STRING_I, &path,
+		 0);
+
+	 if ((path != NULL) && (strcmp(path, "nil") != 0))
+	    ok |= SC_remove(path);};
 
     rv = (ok == 0) ? SS_t : SS_f;
 

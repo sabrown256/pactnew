@@ -35,7 +35,7 @@ int CC_preprocess(char *s, char *cmp, char **v)
 
     snprintf(inm, MAXLINE, "%s.i", fl->fname);
 
-    unlink(inm);
+    SC_remove(inm);
 
 /* prepare CPP command and execute it */
     snprintf(cmd, MAXLINE, "%s", cmp);

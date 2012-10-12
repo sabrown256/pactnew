@@ -7,7 +7,8 @@
 ; #include <cpyright.h>
 ;
 
-(system "rm -f ultest.pdb ultest.asc ultest.err ultest.log ultest.pdb.chk ultest.ps.diff")
+(unlink "ultest.pdb" "ultest.asc" "ultest.err" "ultest.log"
+	"ultest.pdb.chk" "ultest.ps.diff")
 
 (transcript-on "ultest.log")
 
@@ -515,14 +516,14 @@
 (scatter b on)
 (marker-scale 0.005)
 (marker b plus)
-(system "rm -f table1.tmp")
+(unlink "table1.tmp")
 (save ascii table1.tmp a b)
 (read-table table1.tmp 1)
 (table-curve 10 1 2 0 2)
 (read-table* "table1.tmp" 2)
 (table-curve 10 1 2 0 2)
 (table-attributes)
-(system "rm table1.tmp")
+(unlink "table1.tmp")
 (xindex c)
 (xmm b 1 9)
 
@@ -707,7 +708,7 @@
 (printf nil " Test of 'print-menu' command:\n")
 (print-menu temp2.tmp)
 (system "cat temp2.tmp")
-(system "rm ultest1.ps ultest2.ps temp2.tmp")
+(unlink "ultest1.ps" "ultest2.ps" "temp2.tmp")
 
 ;--------------------------------------------------------------------------
 
@@ -741,11 +742,11 @@
 
 ; Test "ld*". Creates a file that, when loaded, deletes itself.
 
-(system "echo '(system \"rm temp3.tmp temp4.tmp\")'>temp4.tmp")
+(system "echo '(unlink \"temp3.tmp\" \"temp4.tmp\")'>temp4.tmp")
 
 ; NOTE: for platforms lacking 'system'
 (define fp (fopen "temp4.tmp" "w"))
-(printf fp "(system \"rm temp3.tmp temp4.tmp\")\n")
+(printf fp "(unlink \"temp3.tmp\" \"temp4.tmp\")\n")
 (fclose fp)
 
 (ld* "temp4.tmp")

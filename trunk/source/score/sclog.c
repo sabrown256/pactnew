@@ -112,7 +112,7 @@ SC_logfile SC_open_log(void)
 /* this just makes the link counter on the inode zero
  * the file will not actually be deleted until it is closed
  */
-        unlink(uf);};
+        SC_remove(uf);};
 
     SC_LOCKOFF(_SC_log_lock);
 
