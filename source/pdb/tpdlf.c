@@ -425,7 +425,7 @@ int main(int c, char **v)
     err += run_test(&st, test_rpdb, "read-pdb");
 
     snprintf(fname, MAXLINE, "%s-pdb.dat", DATFILE);
-    unlink(fname);
+    SC_remove(fname);
 
     PRINT(STDOUT, "\n");
 

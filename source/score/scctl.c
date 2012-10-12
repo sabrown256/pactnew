@@ -849,12 +849,44 @@ int SC_isfile_text(char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_REMOVE - ANSI standard remove function */
+/* SC_REMOVE - ANSI standard remove function
+ *           - wrapped to overcome file system delays
+ */
 
 int SC_remove(char *s)
-   {int rv;
+   {int i, ev, rv, na;
+    struct stat sb;
 
-    rv = unlink(s);
+/* maximum number of attempts */
+    na = 100;
+
+    for (i = 0, rv = -2; (i < na) && (rv != 0); i++)
+
+/* try to unlink the file */
+        {rv = unlink(s);
+	 ev = errno;
+	 switch (ev)
+
+/* worth a retry */
+	    {case EBUSY :
+	     case EIO :
+	          break;
+
+/* path or permissions problems will never work so bail */
+	     default :
+                  i = na;
+                  continue;
+	          break;};
+
+/* check the for the continued existence of the file */
+	 rv = stat(s, &sb);
+	 ev = errno;
+         if (rv == 0)
+	    {rv = -1;
+             i  = na;
+	     sched_yield();}
+	 else
+	    rv = 0;};
 
     return(rv);}
  

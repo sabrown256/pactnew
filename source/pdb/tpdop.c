@@ -281,7 +281,7 @@ int main(int c, char **v)
 
     PD_close(file);
 
-    unlink(DATA_FILE);
+    SC_remove(DATA_FILE);
 
     exit(0);}
 

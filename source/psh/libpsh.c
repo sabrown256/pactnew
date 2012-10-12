@@ -2317,6 +2317,51 @@ size_t fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* UNLINK_SAFE - make unlink ensure that the file is really removed
+ *             - if at all possible
+ *             - return 0 iff successful
+ */
+
+int unlink_safe(char *s)
+   {int i, ev, rv, na;
+    struct stat sb;
+
+/* maximum number of attempts */
+    na = 100;
+
+    for (i = 0, rv = -2; (i < na) && (rv != 0); i++)
+
+/* try to unlink the file */
+        {rv = unlink(s);
+	 ev = errno;
+	 switch (ev)
+
+/* worth a retry */
+	    {case EBUSY :
+	     case EIO :
+	          break;
+
+/* path or permissions problems will never work so bail */
+	     default :
+                  i = na;
+                  continue;
+	          break;};
+
+/* check the for the continued existence of the file */
+	 rv = stat(s, &sb);
+	 ev = errno;
+         if (rv == 0)
+	    {rv = -1;
+             i  = na;
+	     sched_yield();}
+	 else
+	    rv = 0;};
+
+    return(rv);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* LOG_ACTIVITY - log messages to FLOG */
 
 void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)

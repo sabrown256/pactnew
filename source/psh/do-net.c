@@ -2452,7 +2452,7 @@ static int sendscript(donetdes *st, char *host)
     getcwd(t, MAXLINE);
     if (strcmp(t, cgetenv(FALSE, "HOME")) != 0)
        {FOREACH(s, st->scripts, " ")
-	   unlink(s);
+	   unlink_safe(s);
 	ENDFOR;};
 
     return(ok);}
@@ -2513,7 +2513,7 @@ static void report(donetdes *st)
     fclose(fout);
     fclose(frpt);
     fclose(fin);
-    unlink(tlog);
+    unlink_safe(tlog);
 
 /* reopen the log for remaining activities */
     Log = open_file("a", st->lnetfn);
@@ -3050,7 +3050,7 @@ static void fin_sect(donetdes *st, hfspec *sp, int nsp,
 
 	     fclose(elog);
 	     fclose(fin);
-	     unlink(file);};};
+	     unlink_safe(file);};};
 
     if ((nl > 0) && (bld == FALSE))
        {note(Log, TRUE, "Done with %s (%s)", sect, etm);
@@ -3140,7 +3140,7 @@ static void finish(donetdes *st, double gti)
          snprintf(lock, MAXLINE, "%s/%s.%s.lock",
 		  path_head(wdir), st->system, path_tail(wdir));
 
-	 unlink(lock);};
+	 unlink_safe(lock);};
 
 /* notify the people on the mailing list */
     report(st);

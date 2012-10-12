@@ -26,14 +26,15 @@
   (noisy noise "Theta + small noise")
   (noisy 1.0e-6 "Theta + big noise"))
 
-(system "rm -f pdbda.dat pdbdb.dat")
+(unlink "pdbda.dat")
+(unlink "pdbdb.dat")
 
 (make-data)
 (save "pdbda.dat" (thru a z))
-;(save "pdbda.dat" a)
+
 (era)
 (make-data)
 (save "pdbdb.dat" (thru a z))
-;(save "pdbdb.dat" a)
+
 (end)
 

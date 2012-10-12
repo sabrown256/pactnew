@@ -495,7 +495,7 @@ static int use_dbx(atdbgdes *st, char *fname, atproc *al)
         awk '$1 ~ /[0-9]+/ { print }';
 #endif
 
-	    unlink(fname);};}
+	    unlink_safe(fname);};}
 
     else
        run(FALSE, "xterm -sb -e %s %s -pid %d", st->dbg, al->name, al->pid);

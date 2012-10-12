@@ -69,7 +69,7 @@ static int text_file(void)
     fd[n++] = fileno(fp);
     fclose(fp);
 
-    unlink("fd.dat");
+    SC_remove("fd.dat");
 
     ok = check_fd(n, fd);
 
@@ -113,7 +113,7 @@ static int pdb_file(void)
     fd[n++] = fileno(fp);
     fclose(fp);
 
-    unlink("fd.dat");
+    SC_remove("fd.dat");
 
     ok = check_fd(n, fd);
 

@@ -16,6 +16,37 @@ set err = 0
 set d   = $cwd
 set d   = $d:t
 
+set tgt  = premk
+set vrb  = FALSE
+set flst = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: bproto [-f] [-h] [-m] [-v]"
+           echo "   h   this help message"
+           echo "   f   generate prototypes for specified files"
+           echo "   m   generate prototypes from pre-Make files (default)"
+           echo "   v   verbose operation"
+           echo ""
+           exit(1)
+      case -f:
+           set tgt = files
+           breaksw
+      case -m:
+           set tgt = premk
+           breaksw
+      case -v:
+           set vrb = TRUE
+           breaksw
+      default:
+           set flst = ( $flst $1 )
+           breaksw
+   endsw
+   shift
+end
+
 # GOTCHA: intel compilers need the -l option to blang
 # to be technically correct - things are working without
 # it at the moment
@@ -52,9 +83,27 @@ Note $Log ""
 
 # PARSE - parse the pre-Make file and make a file list
 
-   set Lst = ( `grep '${TGTLib}(' pre-Make | sed 's/TGTLib//g' | sed 's/[=()$\]//g'` )
    set Cfiles = ""
    set Ffiles = ""
+   set Hfiles = ""
+
+   switch ($tgt)
+      case files:
+           set Lst = ( $flst )
+           breaksw
+
+      case premk:
+      default:
+           set Lst = ( `grep '${TGTLib}(' pre-Make | sed 's/TGTLib//g' | sed 's/[=()$\]//g'` )
+           breaksw
+   endsw
+
+   if ($vrb == TRUE) then
+      NoteD $Log ""
+      NoteD $Log "Generating prototypes for:"
+      NoteD $Log "   $flst"
+   endif
+
    foreach i ($Lst)
       set j = $i:r.c
       if (-f $j) then
@@ -64,18 +113,29 @@ Note $Log ""
       if (-f $j) then
          set Ffiles = ( $Ffiles $j )
       endif
+      if ($tgt == files) then
+         set j = $i:r.h
+         if (-f $j) then
+            set Hfiles = ( $Hfiles $j )
+         endif
+      endif
    end
 
    if (-f $d.h) then
       set Hfiles = ( ../*/*.h )
-   else
-      set Hfiles = ""
    endif
 
-   Note $Log "Hfiles = $Hfiles"
-   Note $Log "Cfiles = $Cfiles"
-   Note $Log "Ffiles = $Ffiles"
-   Note $Log ""
+   if ($vrb == TRUE) then
+      NoteD $Log "Hfiles = $Hfiles"
+      NoteD $Log "Cfiles = $Cfiles"
+      NoteD $Log "Ffiles = $Ffiles"
+      NoteD $Log ""
+   else
+      Note $Log "Hfiles = $Hfiles"
+      Note $Log "Cfiles = $Cfiles"
+      Note $Log "Ffiles = $Ffiles"
+      Note $Log ""
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -98,6 +158,10 @@ Note $Log ""
    else
       flog $Log rm -f $cbind
       flog $Log touch $cbind
+   endif
+
+   if ($vrb == TRUE) then
+      NoteD $Log "   binding file: $cbind"
    endif
 
 #--------------------------------------------------------------------------
@@ -125,28 +189,55 @@ Note $Log ""
    flog $Log set cproto = z-$arch/obj/$d.protoc
 
    if ("$Cfiles" != "") then
-      elide '/*' '*/' $Cfiles                         | \
-      elide '{' '}' -                                 | \
-      awk '$NF ~ /\\/ { printf("%s ", $0); }            \
-           $NF !~ /\\/ { printf("%s\n", $0); }'       | \
-      sed 's/\\/ /g'                                  | \
-      elide '#if' '#endif' -                          | \
-      grep -v '#'                                     | \
-      tr "\t" " "                                     | \
-      sed 's/  */ /g'                                 | \
-      awk '$0 ~ /, *$/   { printf("%s", $0) }           \
-           $0 !~ /, *$/  { printf("%s\n", $0) }'      | \
-      sed '/^ *$/d'                                   | \
-      sed '/; *$/d'                                   | \
-      grep -v '='                                     | \
-      grep -v 'FIXNUM'                                | \
-      grep -v 'static'                                | \
-      grep '('                                        | \
-      sort                                            | \
-      cat >&! $cproto
+      if ($tgt == files) then
+         elide '/*' '*/' $Cfiles                         | \
+         elide '{' '}' -                                 | \
+         awk '$NF ~ /\\/ { printf("%s ", $0); }            \
+              $NF !~ /\\/ { printf("%s\n", $0); }'       | \
+         sed 's/\\/ /g'                                  | \
+         grep -v '#'                                     | \
+         tr "\t" " "                                     | \
+         sed 's/^enum .*$//'                             | \
+         sed 's/^struct .*$//'                           | \
+         sed 's/  */ /g'                                 | \
+         awk '$0 ~ /, *$/   { printf("%s", $0) }           \
+              $0 !~ /, *$/  { printf("%s\n", $0) }'      | \
+         sed '/^ *$/d'                                   | \
+         sed '/; *$/d'                                   | \
+         grep -v 'static'                                | \
+         grep '('                                        | \
+         sort                                            | \
+         cat >&! $cproto
+#         cat
+#exit(1)
+      else
+         elide '/*' '*/' $Cfiles                         | \
+         elide '{' '}' -                                 | \
+         awk '$NF ~ /\\/ { printf("%s ", $0); }            \
+              $NF !~ /\\/ { printf("%s\n", $0); }'       | \
+         sed 's/\\/ /g'                                  | \
+         elide '#if' '#endif' -                          | \
+         grep -v '#'                                     | \
+         tr "\t" " "                                     | \
+         sed 's/  */ /g'                                 | \
+         awk '$0 ~ /, *$/   { printf("%s", $0) }           \
+              $0 !~ /, *$/  { printf("%s\n", $0) }'      | \
+         sed '/^ *$/d'                                   | \
+         sed '/; *$/d'                                   | \
+         grep -v '='                                     | \
+         grep -v 'FIXNUM'                                | \
+         grep -v 'static'                                | \
+         grep '('                                        | \
+         sort                                            | \
+         cat >&! $cproto
+      endif
    else
       flog $Log rm -f $cproto
       flog $Log touch $cproto
+   endif
+
+   if ($vrb == TRUE) then
+      NoteD $Log "   C prototype file: $cproto"
    endif
 
 #--------------------------------------------------------------------------
@@ -170,6 +261,10 @@ Note $Log ""
            md == 0 && $0 ~ /::/ && fn == 1 { print ; nv++; }                               \
            $0 == "" && nv > 0 { fn = 0; }' >>& $fproto
    end
+
+   if ($vrb == TRUE) then
+      NoteD $Log "   Fortran prototype file: $fproto"
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -249,6 +344,10 @@ Note $Log ""
       flog $Log touch $fwrap
    endif
 
+   if ($vrb == TRUE) then
+      NoteD $Log "   Fortran wrapper file: $fwrap"
+   endif
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -262,6 +361,10 @@ Note $Log ""
    else
       flog $Log rm -f $cdoc
       flog $Log touch $cdoc
+   endif
+
+   if ($vrb == TRUE) then
+      NoteD $Log "   C documentation file: $cdoc"
    endif
 
 #--------------------------------------------------------------------------

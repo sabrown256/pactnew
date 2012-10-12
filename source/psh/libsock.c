@@ -553,7 +553,7 @@ static int close_sock(char *root)
 
     sema = find_sema(root, -1);
     if (sema != NULL)
-       {st  = unlink(sema);
+       {st  = unlink_safe(sema);
 	rv &= (st == 0);
 
 	srv.server = connect_close(srv.server, NULL, root);

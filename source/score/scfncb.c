@@ -1043,7 +1043,7 @@ static void _SC_time_file_open(char *s)
 
     fd = open(s, O_CREAT, 0600);
     close(fd);
-    unlink(s);
+    SC_remove(s);
 
     return;}
 

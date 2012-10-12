@@ -10,7 +10,7 @@
 ; #include <cpyright.h>
 ;
 
-(system "rm -f ulfnc.log")
+(unlink "ulfnc.log")
 
 (transcript-on "ulfnc.log")
 

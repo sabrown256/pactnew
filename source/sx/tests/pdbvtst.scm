@@ -8,12 +8,12 @@
 ;
 
 ; note: pdbview.log will be empty because loaded commands are not logged
-(system "rm -f pdbview.log pdbvtst.log")
+(unlink "pdbview.log" "pdbvtst.log")
 (command-log on)
 (command-log pdbvtst.log)
 (command-log off)
 (system "ls pdbview.log pdbvtst.log")
-(system "rm pdbview.log pdbvtst.log")
+(unlink "pdbview.log" "pdbvtst.log")
 (help)
 (help menu)
 (help log)

@@ -81,9 +81,7 @@
 (proc-tab 3)
 (proc-tab 4)
 
-; remove existing file and wait for it to happen
-(system "rm -f intp-df.u")
-(sleep 100)
+(unlink "intp-df.u")
 
 (save intp-df.u (thru a @100))
 (end)

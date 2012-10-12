@@ -150,7 +150,7 @@ static PROCESS *ps_diff_open(char *f, int off, int side)
         rv = system(s);
 	SC_ASSERT(rv == 0);};
 
-    unlink(rn);
+    SC_remove(rn);
 
     CFREE(rn);
 
@@ -629,7 +629,7 @@ static int ps_diff_a(char *f1, char *f2, pixdes *pd, int verbose)
        {s = SC_dgets(s, &n, fd);
 	if (s == NULL)
            {io_close(fd);
-	    unlink("__tmp__");
+	    SC_remove("__tmp__");
 	    break;};
 
 /* copy the A file difference */

@@ -28,7 +28,7 @@ static void sigdone(int sig)
 		     "SERVER", "signalled %d - done", sig);
 	close_sock(db->root);
 	db_srv_save(-1, db);
-	unlink(db->fpid);};
+	unlink_safe(db->fpid);};
 
     exit(sig);
 

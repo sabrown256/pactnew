@@ -7,7 +7,8 @@
 ; #include <cpyright.h>
 ;
 
-(system "rm -f pdbvtest.pdb pdbvtest.asc pdbvtest.err pdbvtest.log pdbvtest.pdb.chk pdbvtest.ps.diff")
+(unlink "pdbvtest.pdb" "pdbvtest.asc" "pdbvtest.err"
+	"pdbvtest.log" "pdbvtest.pdb.chk" "pdbvtest.ps.diff")
 
 (transcript-on "pdbvtest.log")
 
@@ -479,7 +480,7 @@
 	    (marker-scale 0.005)
 
 	    (scatter plus 2)
-	    (system "rm -f table1.tmp")
+	    (unlink "table1.tmp")
 
 ;(save ascii table1.tmp 1 2)
 ;(read-table table1.tmp 1)
@@ -487,7 +488,7 @@
 ;(read-table* "table1.tmp" 2)
 ;(table-curve 10 1 2 0 2)
 ;(table-attributes)
-;(system "rm table1.tmp")
+;(unlink "table1.tmp")
 ;(xindex 3)
 ;(xmm 2 1 9)
 
@@ -757,7 +758,7 @@
 	    (printf nil " Test of 'print-menu' command:\n")
 	    (print-menu temp2.tmp)
 	    (system "cat temp2.tmp")
-	    (system "rm pdbvtest1.ps pdbvtest2.ps temp2.tmp")
+	    (unlink "pdbvtest1.ps" "pdbvtest2.ps" "temp2.tmp")
 
 ; test "interactive" and "ld" -- if "interactive on" is commented out,
 ; no menu info should be printed
@@ -778,11 +779,11 @@
 
 ; test "ld*"
 ; creates a file that, when loaded, deletes itself
-	    (system "echo '(system \"rm temp3.tmp temp4.tmp\")'>temp4.tmp")
+	    (system "echo '(unlink \"temp3.tmp\" \"temp4.tmp\")' > temp4.tmp")
 
 ; NOTE: for platforms lacking 'system'
             (define fp (fopen "temp4.tmp" "w"))
-            (printf fp "(system \"rm temp3.tmp temp4.tmp\")\n")
+            (printf fp "(unlink \"temp3.tmp\" \"temp4.tmp\")\n")
             (fclose fp)
 
 	    (ld* "temp4.tmp")

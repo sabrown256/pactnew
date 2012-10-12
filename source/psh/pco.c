@@ -717,42 +717,10 @@ static void add_spec_env_vars(client *cl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* ADD_SPECIAL_VARS - add special groups variables SPCG
- *                  - if BLANK is TRUE emit non-NULL variables
- *                  - otherwise skip them
- */
-
-static void add_special_vars(client *cl,
-			     FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd,
-			     int ns, char **spcg,
-			     int ms, char **spcv,
-			     int n, char **sa, int blank)
-   {int i, is, js, ok;
-    char s[MAXLINE];
-    char *p;
-
-    for (is = 0; is < ns; is++)
-        {for (js = 0; js < ms; js++)
-	     {snprintf(s, MAXLINE, "%s_%s", spcg[is], spcv[js]);
-
-/* see if S is also in the list SA */
-	      ok = TRUE;
-	      for (i = 0; (i < n) && (ok == TRUE); i++)
-		  ok &= (strncmp(s, sa[i], strlen(s)) != 0);
-
-	      if (ok == TRUE)
-		 {p = dbget(cl, TRUE, s);
-		  if ((IS_NULL(p) == FALSE) || (blank == TRUE))
-		     env_out(fsh, fcsh, fdk, fmd, s, p);};};};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* ADD_SET_CFG - add variables set in config files */
 
-static void add_set_cfg(client *cl, FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
+static void add_set_cfg(client *cl,
+			FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
    {int i, j, n, nc, ok;
     char *var, *val, *p, **sa;
 
@@ -761,33 +729,6 @@ static void add_set_cfg(client *cl, FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
     n  = (sa != NULL) ? lst_length(sa) : 0;
 
     add_spec_env_vars(cl, fcsh, fsh, fdk, fmd, n, sa, TRUE);
-
-#if 0
-    int ns, ms;
-    char *spcgn[] = { "DP" };
-    char *spcgb[] = { "MDG", "PY", "TRACKER" };
-    char *spcv[] = { "Inc", "Lib", "RPath", "Path", "Exe" };
-    char *spcgh[] = { "HAVE" };
-    char *spcvh[] = { "PYTHON" };
-
-    ms = sizeof(spcv)/sizeof(char *);
-
-/* add special group variables if non-blank */
-    ns = sizeof(spcgn)/sizeof(char *);
-    add_special_vars(cl, fcsh, fsh, fdk, fmd, 
-		     ns, spcgn, ms, spcv, n, sa, FALSE);
-
-/* add special group variables even if blank */
-    ns = sizeof(spcgb)/sizeof(char *);
-    add_special_vars(cl, fcsh, fsh, fdk, fmd, 
-		     ns, spcgb, ms, spcv, n, sa, TRUE);
-
-/* add select HAVE_ variables even if blank */
-    ms = sizeof(spcvh)/sizeof(char *);
-    ns = sizeof(spcgh)/sizeof(char *);
-    add_special_vars(cl, fcsh, fsh, fdk, fmd, 
-		     ns, spcgh, ms, spcvh, n, sa, TRUE);
-#endif
 
 /* add all the setenv'd variables */
     if (sa != NULL)
@@ -1707,7 +1648,7 @@ static void default_files(int append)
 
     snprintf(st.logf, MAXLINE, "%s/log/config", st.dir.root);
     if (append == FALSE)
-       unlink(st.logf);
+       unlink_safe(st.logf);
     LOG_ON;
 
     st.aux.SEF = open_file("w+", "%s/log/file.se", st.dir.root);
@@ -2759,7 +2700,7 @@ int launch_perdb(int c, char **v)
 
 		 for (l = 0; l < n; l++)
 		     {snprintf(t, MAXLINE, "%s.%s", db, sfx[l]);
-		      unlink(t);};
+		      unlink_safe(t);};
 
 		 rv = execute(FALSE, "perdb -f %s -l -c -s", db);
 		 ok = ((rv & 0xff) == 0);

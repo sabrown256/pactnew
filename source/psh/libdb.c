@@ -593,7 +593,7 @@ database *db_srv_create(char *root)
 
     db = make_db(root);
     if ((db != NULL) && (db->file != NULL))
-       unlink(db->file);
+       unlink_safe(db->file);
 
     return(db);}
 
@@ -666,7 +666,7 @@ void db_srv_close(database *db)
     if (db != NULL)
        {close_sock(db->root);
 
-	unlink(db->fpid);
+	unlink_safe(db->fpid);
 
 	free_db(db);};
 

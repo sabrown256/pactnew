@@ -45,7 +45,7 @@
         (set! first #f)))
 
 (begin
-    (system "rm -f _tmp.dat")
+    (unlink "_tmp.dat")
     (erase)
     (wrt "_tmp.dat" (line 1 0 0 1))
     (del a))
@@ -76,7 +76,7 @@
 (measure (begin (rd _tmp.dat)
 		(kill 0)))
 
-(system "rm -f _tmp.dat")
+(unlink "_tmp.dat")
 
 (printf nil "\nNet memory loss: %d bytes\n\n" loss)
 (end loss)

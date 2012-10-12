@@ -12,7 +12,7 @@
 ; #include <cpyright.h>
 ;
 
-(system "rm -f ulann.log ulann.ps.diff")
+(unlink "ulann.log" "ulann.ps.diff")
 
 (transcript-on "ulann.log")
 

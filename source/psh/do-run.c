@@ -62,7 +62,7 @@ static void terminate(int st)
    {
 
     if (cdefenv("TVDirs") == TRUE)
-       unlink(cgetenv(TRUE, "TVDirs"));
+       unlink_safe(cgetenv(TRUE, "TVDirs"));
 
     exit(st);
 
@@ -1107,7 +1107,7 @@ static int finish(rundes *st, int rv)
 /* this is the right place to remove the AIX MPI hostfile */
     if (strcmp(st->os, "AIX") == 0)
        {mp_hostfile(s, MAXLINE, st);
-	unlink(s);};
+	unlink_safe(s);};
 
     if (WIFEXITED(rv))
        {sts = WEXITSTATUS(rv);
