@@ -12,6 +12,7 @@ unalias *
 
 set sys = `cfgman use`
 
+source ../dev/$sys/etc/functions-pact.csh
 set inf = "../dev/$sys/etc/env-pact.csh"
 
 if (-f $inf) then
@@ -19,7 +20,7 @@ if (-f $inf) then
    @ il = 0
    while ($il < $nl)
       @ il = $il + 1
-      set line = ( `head -n $il $inf | tail -n 1` )
+      get_line line $inf $il
       if ($#line > 2) then
          if ("$line[1]" == setenv) then
             set var = $line[2]

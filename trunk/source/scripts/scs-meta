@@ -10,6 +10,8 @@
 
 unalias *
 
+alias get_line  'set \!\!:1 = `awk "NR == \!\!:3 { print ; exit }" \!\!:2`'
+
 set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
@@ -190,7 +192,7 @@ else if (-d .svn) then
            set res = svn
            breaksw
       case machine:
-           set dir  = ( `head -n 5 .svn/entries | tail -n 1` )
+           get_line dir .svn/entries 5
            set repo = $dir:h
 
 # expect svn+ssh://<host><path>
@@ -209,8 +211,8 @@ else if (-d .svn) then
            set res = .svn
            breaksw
       case repo:
-           set base = ( `head -n 6 .svn/entries | tail -n 1` )
-           set dir  = ( `head -n 5 .svn/entries | tail -n 1` )
+           get_line dir  .svn/entries 5
+           get_line base .svn/entries 6
            set res = $dir:h
            breaksw
    endsw

@@ -219,6 +219,18 @@ sub fexvar {
     open(pp, "gexec $cmd @b vw:$var|");
     while (<pp>)
        {print(lf $_);};
+    $ENV{$var} = `$PERDB -g $var`;
+    $gstatus   = `$PERDB -e gstatus`;
+}
+
+sub fexvars {
+    local *lf = shift;
+    my $var = shift;
+    my $cmd = shift;
+    print(lf "Command: gexec $cmd @b vw:$var\n");
+    open(pp, "gexec $cmd @b vw:$var|");
+    while (<pp>)
+       {print(lf $_);};
     ${$var}  = `$PERDB -g $var`;
     $gstatus = `$PERDB -e gstatus`;
 }

@@ -274,7 +274,7 @@ set vok = FALSE
 @ il = 0
 while ($il < $nl)
    @ il = $il + 1
-   set line = ( `head -n $il $def | tail -n 1` )
+   get_line line $def $il
    if ("$line" == "") continue
    if ("$line" =~ \#*) continue
    if ("$line" =~ *functions\ \{) then
@@ -319,7 +319,7 @@ if ("$fncl" == "") then
    @ il = 0
    while ($il < $nl)
       @ il = $il + 1
-      set line = ( `head -n $il $ppf | tail -n 1` )
+      get_line line $ppf $il
       if ("$line" == "") continue
       if ("$line" =~ \#*) continue
       if ("$line" =~ *\(*) then

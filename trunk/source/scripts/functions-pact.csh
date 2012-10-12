@@ -136,5 +136,7 @@ alias fexec     'echo "Command: $GEXEC \!\!:2-$" >>& \!\!:1 ; $GEXEC \!\!:2-$ >>
 # gets gstatus out as a shell variable
 # usage: fexvar $log <var> <gexec-specs>
 
-alias fexvar    'echo "Command: $GEXEC \!\!:3-$ @b vw:\!\!:2" >>& \!\!:1 ; $GEXEC \!\!:3-$ @b vw:\!\!:2 >>& \!\!:1 ; set \!\!:2 = (`$PERDB -e \!\!:2`) ; set gstatus = (`$PERDB -e gstatus`)'
+alias fexvar    'echo "Command: $GEXEC \!\!:3-$ @b vw:\!\!:2" >>& \!\!:1 ; $GEXEC \!\!:3-$ @b vw:\!\!:2 >>& \!\!:1 ; setenv \!\!:2 "`$PERDB -e \!\!:2`" ; set gstatus = (`$PERDB -e gstatus`)'
+
+alias fexvars    'echo "Command: $GEXEC \!\!:3-$ @b vw:\!\!:2" >>& \!\!:1 ; $GEXEC \!\!:3-$ @b vw:\!\!:2 >>& \!\!:1 ; set \!\!:2 = (`$PERDB -e \!\!:2`) ; set gstatus = (`$PERDB -e gstatus`)'
 
