@@ -19,21 +19,27 @@ set d   = $d:t
 set tgt  = premk
 set vrb  = FALSE
 set flst = ""
+set dst  = z-$arch/obj
 
 while ($#argv > 0)
    switch ($1)
+      case -d:
+           shift
+           set dst = $1
+           breaksw
+      case -f:
+           set tgt = files
+           breaksw
       case -h:
            echo ""
-           echo "Usage: bproto [-f] [-h] [-m] [-v]"
-           echo "   h   this help message"
+           echo "Usage: bproto [-d <dir>] [-f] [-h] [-m] [-v]"
+           echo "   d   put files in <dir> (default z-$arch/obj)"
            echo "   f   generate prototypes for specified files"
+           echo "   h   this help message"
            echo "   m   generate prototypes from pre-Make files (default)"
            echo "   v   verbose operation"
            echo ""
            exit(1)
-      case -f:
-           set tgt = files
-           breaksw
       case -m:
            set tgt = premk
            breaksw
@@ -56,7 +62,7 @@ set opt = ""
 source ../dev/$arch/etc/env-pact.csh
 source ../scripts/functions-pact.csh
 
-InitLog Log $cwd/z-$arch/obj/bproto
+InitLog Log $cwd/$dst/bproto
 
 Note $Log ""
 Note $Log "Generating C bindings for Fortran, SX, and Python"
@@ -148,7 +154,7 @@ Note $Log ""
 #   sed 's/^.*#bind *//'                remove the #bind token, anything
 #                                       preceeding it, and whitespace after
 
-   flog $Log set cbind = z-$arch/obj/$d.bind
+   flog $Log set cbind = $dst/$d.bind
 
    if ("$Cfiles" != "") then
       grep '#bind' $Hfiles $Cfiles  | \
@@ -186,7 +192,7 @@ Note $Log ""
 #   grep -v '='                                    remove lines with assignments
 #
 
-   flog $Log set cproto = z-$arch/obj/$d.protoc
+   flog $Log set cproto = $dst/$d.protoc
 
    if ("$Cfiles" != "") then
       if ($tgt == files) then
@@ -245,7 +251,7 @@ Note $Log ""
 
 # FIND_FC_DECL - process the Fortran declarations
 
-   flog $Log set fproto = z-$arch/obj/$d.protof
+   flog $Log set fproto = $dst/$d.protof
 
    flog $Log rm -f $fproto
    flog $Log touch $fproto
@@ -305,7 +311,7 @@ Note $Log ""
 #   sed 's/PF[^ ]* /external /g'          function pointer -> external
 #
 
-   flog $Log set fwrap = z-$arch/obj/$d.wrapper
+   flog $Log set fwrap = $dst/$d.wrapper
 
    if ("$Cfiles" != "") then
       cat $Cfiles                                    | \
@@ -353,7 +359,7 @@ Note $Log ""
 
 # FIND_DOC - process the C files for comments with #bind directives
 
-   flog $Log set cdoc = z-$arch/obj/$d.doc
+   flog $Log set cdoc = $dst/$d.doc
 
    if ("$Cfiles" != "") then
       find-comments -t '#bind' $Hfiles $Cfiles | \
@@ -372,58 +378,62 @@ Note $Log ""
 
    NoteD $Log "done"
 
+# only move generated files if DST equals ZDIR
    set zdir = z-$arch/obj
-   flog $Log pushd $zdir
+   if ($dst == $zdir) then
+      flog $Log pushd $zdir
 
-   flog $Log blang $opt -b $cbind:t -c $cproto:t -d $cdoc:t -f $fproto:t -w $fwrap:t
-   set xstatus = $status
+      flog $Log blang $opt -b $cbind:t -c $cproto:t -d $cdoc:t -f $fproto:t -w $fwrap:t
+      set xstatus = $status
 
 # move all fortran stuff to the fortran package
-   if ($d != fortran) then
-      if (-f gf-$d.c) then
-         set ldst =  ../../../fortran/$zdir
-         if (!(-d $ldst)) then
-            flog $Log mkdir -p $ldst
+      if ($d != fortran) then
+         if (-f gf-$d.c) then
+            set ldst =  ../../../fortran/$zdir
+            if (!(-d $ldst)) then
+               flog $Log mkdir -p $ldst
+            endif
+            flog $Log mv gf-$d.c $ldst
          endif
-         flog $Log mv gf-$d.c $ldst
-      endif
-      if (-f gm-$d.f) then
-         set ldst =  ../../../fortran/$zdir
-         if (!(-d $ldst)) then
-            flog $Log mkdir -p $ldst
+         if (-f gm-$d.f) then
+            set ldst =  ../../../fortran/$zdir
+            if (!(-d $ldst)) then
+               flog $Log mkdir -p $ldst
+            endif
+            flog $Log mv gm-$d.f $ldst
          endif
-         flog $Log mv gm-$d.f $ldst
       endif
-   endif
 
 # move all scheme stuff to the sx package
-   if ($d != sx) then
-      if (-f gs-$d.c) then
-         set ldst =  ../../../sx/$zdir
-         if (!(-d $ldst)) then
-            flog $Log mkdir -p $ldst
+      if ($d != sx) then
+         if (-f gs-$d.c) then
+            set ldst =  ../../../sx/$zdir
+            if (!(-d $ldst)) then
+               flog $Log mkdir -p $ldst
+            endif
+            flog $Log mv gs-$d.c $ldst
          endif
-         flog $Log mv gs-$d.c $ldst
       endif
-   endif
 
 # move all python stuff to the python package
-   if ($d != python) then
-      if (-f gp-$d.c) then
-         set ldst =  ../../../python/$zdir
-         if (!(-d $ldst)) then
-            flog $Log mkdir -p $ldst
+      if ($d != python) then
+         if (-f gp-$d.c) then
+            set ldst =  ../../../python/$zdir
+            if (!(-d $ldst)) then
+               flog $Log mkdir -p $ldst
+            endif
+            flog $Log mv gp-$d.c py-$d.h $ldst
          endif
-         flog $Log mv gp-$d.c py-$d.h $ldst
       endif
-   endif
 
 # move all documentation to the doc package
-   if (-f gh-$d.html) then
-      flog $Log mv gh-$d.html ../../../doc
-   endif
+      if (-f gh-$d.html) then
+         flog $Log mv gh-$d.html ../../../doc
+      endif
 
-   flog $Log popd
+      flog $Log popd
+
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
