@@ -27,7 +27,7 @@ dbini SQLITE3_SO  ""
 dbini HAVE_SQL    FALSE
 
 set vl = ""
-set vl = ( $vl Linking RPATH )
+set vl = ( $vl Linking LibM_Lib RPATH )
 source $MngDir/write/import-db
 
 # if we have explicitly said we do not want SQL
