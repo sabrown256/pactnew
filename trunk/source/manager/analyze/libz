@@ -24,7 +24,7 @@ dbini Z_RPath   $RootLib
 dbini Z_Path    /usr
 
 set vl = ""
-set vl = ( $vl RPATH )
+set vl = ( $vl LibM_Lib RPATH )
 source $MngDir/write/import-db
 
 # if we have explicitly said we do not want libZ do NOT detect it

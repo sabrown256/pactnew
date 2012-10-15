@@ -16,11 +16,11 @@ Note $Log "Analyze: math"
 
 dbini IMF_Lib      "-limf"
 dbini IMF_Path     ""
+dbini LibM_Lib     "-lm"
+dbini LibM_RPath   ""
 dbini MD_Pck       ""
 
 envini Cfg_RPATH    ""
-envini LibM_Lib     "-lm"
-envini LibM_RPath   ""
 
 set vl = ""
 set vl = ( $vl RPATH )
@@ -73,10 +73,10 @@ NoteD $ALog "   Math library: $LibM_Lib"
 dbexp MD_Pck
 dbexp IMF_Path
 dbexp RPATH
+dbexp LibM_Lib
+dbexp LibM_RPath
 
 envexp Cfg_RPATH
-envexp LibM_Lib
-envexp LibM_RPath
 
 exit(0)
 

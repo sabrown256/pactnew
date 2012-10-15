@@ -36,6 +36,7 @@ setenv ENV_VARS ${ENV_VARS}:Cfg_CC_Exe:Cfg_CC_Flags:Cfg_CC_Inc
 setenv ENV_VARS ${ENV_VARS}:CC_Debug_Default:CC_Optimize_Default
 setenv ENV_VARS ${ENV_VARS}:FC_Debug_Default:FC_Optimize_Default
 setenv ENV_VARS ${ENV_VARS}:DP_Inc:DP_Lib:DP_RPath:DP_Path
+setenv ENV_VARS ${ENV_VARS}:LibM_Lib:LibM_RPath
 setenv ENV_VARS ${ENV_VARS}:MDG_Inc:MDG_Lib:MDG_RPath:MDG_Path
 setenv ENV_VARS ${ENV_VARS}:PY_Inc:PY_Lib:PY_RPath:PY_Path
 setenv ENV_VARS ${ENV_VARS}:TRACKER_Exe:HAVE_PYTHON
