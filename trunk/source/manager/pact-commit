@@ -288,18 +288,24 @@ Note $Lock $Message
 # run the test suite
 #
 if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then
+
    Note $Lock -n "Testing ................... "
+
    ftee $Log ./dsys test $Args
-   grep "All tests passed" $Log >& /dev/null
-   flog $Log set xstatus = $status
+   set xstatus = $status
    flog $Log @ err = $err + $xstatus
-   if ($xstatus != 0) then
+
+   grep "All tests passed" $Log >& /dev/null
+   set xstatus = $status
+   flog $Log @ err = $err + $xstatus
+
+   if ($err != 0) then
       $ScrDir/scs-lock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed the test suite"
       NoteD $Log "All tests must pass before the commit will be allowed"
       NoteD $Log ""
-      exit($xstatus)
+      exit($err)
    endif
    Note $Lock "done"
 endif
