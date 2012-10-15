@@ -32,6 +32,10 @@ envini OS_Name           `uname -s`
 envini Cfe_CC_Exe       "cc"
 envini Cfe_CC_Flags     "-g"
 
+set vl = ""
+set vl = ( $vl RPATH )
+source $MngDir/write/import-db
+
 # if we have explicitly said we do not want X11
 # do NOT detect it
 if ("$X11_Path" == none) then
@@ -169,6 +173,7 @@ EOF
    dbexp X11_Lib
    dbexp X11_RPath
    dbexp X11_Path
+   dbexp RPATH
    dbexp GRAPHICS_Windows
    dbexp GRAPHICS_Devices
    dbexp GRAPHICS_Flags

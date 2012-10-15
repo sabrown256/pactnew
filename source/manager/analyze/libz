@@ -23,6 +23,10 @@ dbini Z_Lib     ""
 dbini Z_RPath   $RootLib
 dbini Z_Path    /usr
 
+set vl = ""
+set vl = ( $vl RPATH )
+source $MngDir/write/import-db
+
 # if we have explicitly said we do not want libZ do NOT detect it
 if ("$Z_Path" == none) then
    NoteD $ALog "      no libz (by request)"
@@ -103,6 +107,7 @@ EOF
    dbexp Z_Lib
    dbexp Z_RPath
    dbexp Z_Path
+   dbexp RPATH
 
    envexp RPATH
 

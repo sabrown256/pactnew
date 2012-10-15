@@ -25,7 +25,9 @@ dbini HDF_Path   /usr
 dbini HDF5_SO    ""
 dbini Z_Lib      "-lz"
 
-dbget Linking
+set vl = ""
+set vl = ( $vl Linking RPATH )
+source $MngDir/write/import-db
 
 # if we have explicitly said we do not want HDF5
 # do NOT detect it
@@ -105,6 +107,7 @@ EOF
 
 # export the results
    dbexp HDF5_SO
+   dbexp RPATH
    dbexp MDI_Inc
    dbexp MDI_Lib
    dbexp MDI_Pck

@@ -24,6 +24,10 @@ dbini JPEG_RPath    $RootLib
 dbini JPEG_Path     /usr
 dbini HAVE_JPEGLIB  FALSE
 
+set vl = ""
+set vl = ( $vl RPATH )
+source $MngDir/write/import-db
+
 # if we have explicitly said we do not want JPEG
 # do NOT detect it
 if ("$JPEG_Path" == none) then
@@ -106,6 +110,7 @@ EOF
    dbexp JPEG_Lib
    dbexp JPEG_RPath
    dbexp JPEG_Path
+   dbexp RPATH
 
    envexp RPATH
 
