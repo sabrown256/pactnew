@@ -107,8 +107,6 @@ EOF
    dbexp RL_RPath
    dbexp RL_Path
 
-   envexp RPATH
-
 endif
 
 exit(0)

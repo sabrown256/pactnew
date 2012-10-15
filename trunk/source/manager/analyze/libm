@@ -18,10 +18,13 @@ dbini IMF_Lib      "-limf"
 dbini IMF_Path     ""
 dbini MD_Pck       ""
 
-envini RPATH        ""
 envini Cfg_RPATH    ""
 envini LibM_Lib     "-lm"
 envini LibM_RPath   ""
+
+set vl = ""
+set vl = ( $vl RPATH )
+source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -69,6 +72,7 @@ NoteD $ALog "   Math library: $LibM_Lib"
 
 dbexp MD_Pck
 dbexp IMF_Path
+dbexp RPATH
 
 envexp RPATH
 envexp Cfg_RPATH

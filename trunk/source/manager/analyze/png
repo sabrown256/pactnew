@@ -26,6 +26,10 @@ dbini Z_Lib        ""
 dbini Z_Path       /usr
 dbini HAVE_PNGLIB  FALSE
 
+set vl = ""
+set vl = ( $vl RPATH )
+source $MngDir/write/import-db
+
 # if we have explicitly said we do not want PNG
 # do NOT detect it
 if ("$PNG_Path" == none) then
@@ -118,6 +122,7 @@ EOF
    dbexp PNG_Lib
    dbexp PNG_RPath
    dbexp PNG_Path
+   dbexp RPATH
 
    envexp RPATH
 
