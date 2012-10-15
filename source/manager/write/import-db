@@ -14,6 +14,10 @@
 
 set mode = 1
 
+if ($?Log == 0) then
+   set Log = /dev/null
+endif
+
 # prune and import en masse
 if ($mode == 1) then
    set lt = `timer -r`

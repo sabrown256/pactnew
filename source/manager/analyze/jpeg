@@ -112,8 +112,6 @@ EOF
    dbexp JPEG_Path
    dbexp RPATH
 
-   envexp RPATH
-
 endif
 
 dbexp HAVE_JPEGLIB
