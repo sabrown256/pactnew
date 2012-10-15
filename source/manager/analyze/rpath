@@ -81,13 +81,10 @@ while ($#argv > 0)
    shift
 end
 
-if ($?RPATH == 0) then
-   setenv RPATH ""
-endif
+set vl = ""
+set vl = ( $vl RPATH Cfg_RPATH)
 
-if ($?Cfg_RPATH == 0) then
-   setenv Cfg_RPATH ""
-endif
+source $MngDir/write/import-db
 
 switch ($Tgt)
 

@@ -26,6 +26,10 @@ source $AnaDir/jpeg
 
 Separator $Log
 
+set vl = ""
+set vl = ( $vl RPATH MDG_Inc MDG_Lib MDG_Pck )
+source $MngDir/write/import-db
+
 Note $Log "Graphics summary variables:"
 Note $Log "   RPATH   = $RPATH"
 Note $Log "   MDG_Inc = $MDG_Inc"

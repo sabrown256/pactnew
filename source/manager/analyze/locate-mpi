@@ -52,6 +52,10 @@ while ($#argv > 0)
    shift
 end
 
+set vl = ""
+set vl = ( $vl RPATH )
+source $MngDir/write/import-db
+
 setenv HAVE_OPENMPI FALSE
 unsetenv DP_Inc
 unsetenv DP_Lib
@@ -248,6 +252,7 @@ if ($?DP_Path == 1) then
    dbexp DP_Lib
    dbexp DP_RPath
    dbexp DP_Path
+   dbexp RPATH
 
    envexp RPATH
 

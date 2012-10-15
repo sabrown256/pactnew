@@ -10,9 +10,6 @@
 # figure out libm first to minimize variable reset tangle
 run ../analyze/libm
 
-# fix rpath for analysis scripts that need the final value
-#run ../analyze/fix-rpath
-
 # greater context
 run ../analyze/site
 
