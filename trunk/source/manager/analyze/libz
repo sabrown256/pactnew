@@ -109,8 +109,6 @@ EOF
    dbexp Z_Path
    dbexp RPATH
 
-   envexp RPATH
-
 endif
 
 dbexp HAVE_ZLIB

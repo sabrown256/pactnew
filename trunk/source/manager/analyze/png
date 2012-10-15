@@ -124,8 +124,6 @@ EOF
    dbexp PNG_Path
    dbexp RPATH
 
-   envexp RPATH
-
 endif
 
 dbexp HAVE_PNGLIB

@@ -74,7 +74,6 @@ dbexp MD_Pck
 dbexp IMF_Path
 dbexp RPATH
 
-envexp RPATH
 envexp Cfg_RPATH
 envexp LibM_Lib
 envexp LibM_RPath

@@ -116,8 +116,6 @@ EOF
    dbexp HDF_RPath
    dbexp HDF_Path
 
-   envexp RPATH
-
 endif
 
 dbexp HAVE_HDF5

@@ -178,8 +178,6 @@ EOF
    dbexp GRAPHICS_Devices
    dbexp GRAPHICS_Flags
 
-   envexp RPATH
-
 endif
 
 dbexp Std_UseX

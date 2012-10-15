@@ -269,8 +269,6 @@ EOF
    dbexp HAVE_SQLITE
    dbexp HAVE_SQLITE_V2
 
-   envexp RPATH
-
 endif
 
 dbexp HAVE_SQL

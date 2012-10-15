@@ -280,11 +280,6 @@ source $MngDir/write/import-db
     Note $FOUT "}"
     Note $FOUT ""
 
-#    set llibs = ""
-#    set llibs = ( $llibs $cmplib )
-#    set llibs = ( $llibs `echo $RPATH | sed 's/:/ /g'` )
-#    set llibs = ( `../scripts/simplify-list $llibs` )
-
     if ($CCBin != none) then
        Note $FOUT "Tool/cc_pact {"
        Note $FOUT "  ToolClass    = CGroup"
