@@ -31,7 +31,7 @@ set io  = flog
       if ($?TEST_MAX_THREADS == 1) then
          @ nc = $TEST_MAX_THREADS
       else
-         @ nc = `ncpu`
+         @ nc = `$CFE ncpu`
       endif
 
       set NThrds = ""

@@ -30,6 +30,7 @@ static void script_env(FILE *fo, char *pact)
 
     fprintf(fo, "source %s/etc/env-pact.csh\n", pact);
     fprintf(fo, "source %s/etc/functions-pact.csh\n", pact);
+    fprintf(fo, "unsetenv CROSS\n");
 
 /* check for a pcshrc file to include after PACT environment */
     if (haverc == TRUE)
@@ -230,6 +231,8 @@ static void invoke_command(char **vo, char *shell, char *pact,
     snprintf(u, MAXLINE, "source %s/etc/env-pact.csh ; ", pact);
     nstrcat(s, LRG, u);
     snprintf(u, MAXLINE, "source %s/etc/functions-pact.csh ; ", pact);
+    nstrcat(s, LRG, u);
+    snprintf(u, MAXLINE, "unsetenv CROSS ; ");
     nstrcat(s, LRG, u);
 
 /* check for a pcshrc file to include before PACT environment */

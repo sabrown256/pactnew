@@ -284,13 +284,11 @@ int _SC_tar_checkname(tarhdr *thdr)
     ret = TRUE;
     pch = (char *) &thdr->name;
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; (i < 100) && (ret == TRUE); i++)
         {if ((*pch == '\0') || (SC_is_print_char(*pch, 0)))
-            {pch++;
-             continue;}
+            pch++;
          else
-            {ret = FALSE;
-             break;};};
+            ret = FALSE;};
 
     return(ret);}
 

@@ -12,7 +12,7 @@ set Me = $0
 source $Me:h/common
 
 Separator $Log
-Note $Log "Analyze: math"
+Note $Log "Analyze: libm"
 
 dbini IMF_Lib      "-limf"
 dbini IMF_Path     ""

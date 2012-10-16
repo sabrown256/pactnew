@@ -91,7 +91,6 @@ int main(int c, char **v)
                 {case 'h':
                       help();
                       return(1);
-                      break;
 
                  case 'n':
                       nt = atoi(v[++i]);

@@ -685,7 +685,7 @@ static int64_t _SC_get_cmd_resp(PROCESS *pp, char *msg)
  *                - the command codes are defined in the SC_file_oper enum
  */
 
-int SC_file_access(int log)
+NORETURN void SC_file_access(int log)
    {int code, cfd, indx, ret;
     char s[MAXLINE], *bf, *t;
     FILE *file[MAX_FILES], *fp;
@@ -695,9 +695,7 @@ int SC_file_access(int log)
     _SC_ps.debug = log;
 
     if (_SC_ps.debug)
-       {_SC_ps.diag = fopen("SC_fs.log", "w");
-	if (_SC_ps.diag == NULL)
-	   return(-1);};
+       _SC_ps.diag = fopen("SC_fs.log", "w");
 
     cfd = -1;
     while (TRUE)
@@ -745,7 +743,7 @@ int SC_file_access(int log)
 		  END_SAFE;
 
 		  if (ok == FALSE)
-		     return(-1);
+		     return;
 
                   name = SC_strtok(s+2, ",\n", t);
                   mode = SC_strtok(NULL, ",\n", t);
