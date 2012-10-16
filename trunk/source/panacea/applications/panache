@@ -9,19 +9,17 @@
 #
 
 pushd `dirname $0` >& /dev/null
-set BinDir = $cwd
+set BinDir  = $cwd
+set RootDir = $BinDir:h
 popd >& /dev/null
 
-set ScmDir = $BinDir:h/scheme
-setenv SCHEME ${SCHEME}:$ScmDir
+source $RootDir/etc/env-pact.csh
 
-set CFE = ""
-if ($?CROSS_COMPILE == 1) then
-   if ($CROSS_COMPILE == TRUE) then
-      set CFE = $BinDir/do-run
-   endif
-endif
+# save us from double do-run situation
+# one do-run for panache script which sets CROSS
+# followed by the do-run on sx below
+unsetenv CROSS
 
-$CFE $BinDir/sx -q -l panache.scm \(ld $1\)
+$CFE sx -q -l panache.scm \(ld $1\)
 
 exit($status)

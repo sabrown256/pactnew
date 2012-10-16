@@ -341,10 +341,10 @@ source $MngDir/write/import-db
 # determine which bindings we have
 # this cannot be done at config time because nothing will have been built
           Note $STDOUT '   pushd $PY_DirSrc >& /dev/null'
-          Note $STDOUT '   set PyBind = ( `ls` )'
+          Note $STDOUT '   set lpy_bind = ( `ls` )'
           Note $STDOUT '   popd >& /dev/null'
 
-          Note $STDOUT '   foreach bnd ($PyBind)'
+          Note $STDOUT '   foreach bnd ($lpy_bind)'
           Note $STDOUT '      foreach d ($PY_DirDst)'
           Note $STDOUT '         set dst = $d/$bnd'
           Note $STDOUT '         set src = $PY_DirSrc/$bnd'

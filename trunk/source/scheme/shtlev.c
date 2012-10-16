@@ -184,7 +184,7 @@ static int _SS_repl(SS_psides *si)
 
 /* SS_REPL - run a READ-EVAL-PRINT Loop */
 
-void SS_repl(SS_psides *si)
+NORETURN void SS_repl(SS_psides *si)
    {int i;
     char *t;
 

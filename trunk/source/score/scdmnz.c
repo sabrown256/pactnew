@@ -282,7 +282,6 @@ int main(int c, char **v)
 		 case 'h':
                       show_help();
                       return(1);
-                      break;
 		 case 'i':
                       tc = SC_stoi(v[++i]);
                       break;
@@ -296,8 +295,7 @@ int main(int c, char **v)
                       break;
 		 default:
 		      io_printf(stdout, "Unknown option: %s\n", v[i]);
-		      return(1);
-                      break;};}
+		      return(1);};}
          else
 	    break;};
 

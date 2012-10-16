@@ -44,7 +44,8 @@ set vl = ( $vl MYSQL_SO SQLITE3_SO HDF5_SO )
 set vl = ( $vl HAVE_BAD_LINE_DIRECTIVES )
 dbexp vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
 #set vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
-set vl = ( $vl HAVE_INLINE HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS )
+set vl = ( $vl HAVE_INLINE HAVE_NORETURN )
+set vl = ( $vl HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS )
 set vl = ( $vl HAVE_TRACKER )
 set vl = ( $vl HAVE_ANSI_FLOAT16 HAVE_ANSI_C9X_COMPLEX )
 set vl = ( $vl HAVE_ANSI_C9X_FENV HAVE_GNU_FENV )
@@ -129,6 +130,13 @@ source $MngDir/write/import-db
        Note $STDOUT "#define INLINE inline"
     else
        Note $STDOUT "#define INLINE"
+    endif
+
+    Note $STDOUT "#undef NORETURN"
+    if ($HAVE_NORETURN == TRUE) then
+       Note $STDOUT "#define NORETURN _Noreturn"
+    else
+       Note $STDOUT "#define NORETURN"
     endif
 
     if ($NO_LONG_LONG == TRUE) then

@@ -90,7 +90,7 @@ end
 
 # others
 foreach t (MD MDE MDI MDG DP LibM)
-   foreach f (Inc Lib)
+   foreach f (Inc Lib RPath Path)
       set vl = ( $vl ${t}_${f} )
    end
 end

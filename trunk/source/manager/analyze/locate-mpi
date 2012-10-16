@@ -242,7 +242,7 @@ if ($?DP_Path == 1) then
    end
 
    foreach i ( $rlib )
-      setenv RPATH `analyze/rpath -a $i -o echo`
+      fexvar /dev/null RPATH analyze/rpath -a $i -o echo
    end
 
    unset rlib
@@ -252,7 +252,6 @@ if ($?DP_Path == 1) then
    dbexp DP_Lib
    dbexp DP_RPath
    dbexp DP_Path
-   dbexp RPATH
 
 else if ($Verbose == TRUE) then
    echo "No MPI found matching: $SW $HW $Comp"

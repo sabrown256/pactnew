@@ -875,8 +875,7 @@ int SC_remove(char *s)
 /* path or permissions problems will never work so bail */
 	     default :
                   i = na;
-                  continue;
-	          break;};
+                  continue;};
 
 /* check the for the continued existence of the file */
 	 rv = stat(s, &sb);

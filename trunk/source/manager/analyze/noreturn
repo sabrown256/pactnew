@@ -1,0 +1,35 @@
+#!/bin/csh -f
+#
+# NORETURN - analyze _Noreturn for C11 compiler
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+
+set Me = $0
+source $Me:h/common
+
+cat << EOF >! $Tmp.c
+_Noreturn void b(void) {while (1) sleep(1);}
+int main(int c, char **v)
+   {b();
+    return(0);}
+EOF
+
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+if ($status == 0) then
+   setenv HAVE_NORETURN TRUE
+   NoteD $ALog "      has _Noreturn support"
+else
+   setenv HAVE_NORETURN FALSE
+   NoteD $ALog "      no _Noreturn support"
+endif
+
+rm -f $Tmp $Tmp.c $Tmp.o
+
+# export the result
+dbexp HAVE_NORETURN
+

@@ -13,7 +13,14 @@
 # determine the bin directory path
 set BinDir = $PACT/bin
 
-set CFE = ""
+# determine if sx is available
+if (!(-x $BinDir/sx)) then
+   echo ""
+   echo "No SX executable found in '$BinDir' derived from '$0'"
+   echo "Your path is: $PATH"
+   echo ""
+   exit(1)
+endif
 
 set digits = 4
 set files  =

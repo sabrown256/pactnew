@@ -71,7 +71,9 @@
  * these macros emulate a degree of C99 complex support
  */
 
+#ifndef CYGWIN
 typedef struct s_complex complex;
+#endif
 
 struct s_complex
    {double real;

@@ -464,13 +464,13 @@ extern FILE
 extern void
  io_error(int err, char *fmt, ...),
  SC_get_io_info(FILE *fp, int **pnhits, double **pnsec),
+ SC_file_access(int log),
  SC_setbuf(FILE *fp, char *bf);
 
 extern int
  SC_collect_io_info(int wh),
  SC_gather_io_info(FILE *fp, int wh),
  SC_io_connect(int flag),
- SC_file_access(int log),
  SC_exit_all(void),
  io_seek(FILE *fp, long offs, int whence),
  io_setvbuf(FILE *fp, char *bf, int type, size_t sz),

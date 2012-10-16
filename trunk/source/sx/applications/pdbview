@@ -26,8 +26,6 @@ if (!(-x $BinDir/sx)) then
    exit(1)
 endif
 
-set CFE = ""
-
 # setup default values
 set track  = 1
 set Mode   = 0

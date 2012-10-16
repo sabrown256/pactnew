@@ -4,16 +4,19 @@
 #      - this is a portability hack mainly because of AIX
 #
 
-set PyPACTVers = 1
-set PyPACTLib  = libpy
+set lpy_pact_vers = 1
+set lpy_pact_lib  = libpy
 
 source ../scripts/functions-pact.csh
 
-set Python = `which python`
-if (!(-x "$Python")) then
+set lpy_exe = `which python`
+if (!(-x "$lpy_exe")) then
    echo "No executable python can be found on your path:"
    echo "   $PATH"
    exit(1)
+else
+   echo ""
+   echo "Using $lpy_exe"
 endif
 
 set Test = FALSE
@@ -34,7 +37,7 @@ while ($#argv > 0)
    shift
 end
 
-@ Err    = 0
+@ err    = 0
 set Arch = `../scripts/cfgman use`
 
 InitLog Log $cwd/z-$Arch/obj/log.load
@@ -48,19 +51,19 @@ flog $Log set DevLib = $Root/lib
 
 flog $Log set Def = $DevInc/make-def
 
-flog $Log set AR       = ( `pact +l -info AR | uniq` `pact +l -info ARXOpt | uniq` )
-flog $Log set CCmp     = ( `pact +l -info PY_CC` )
+flog $Log set AR        = ( `pact +l -info AR | uniq` `pact +l -info ARXOpt | uniq` )
+flog $Log set CCmp      = ( `pact +l -info PY_CC` )
 flog $Log set PY_Vers   = ( `pact +l -info PY_Vers` )
 flog $Log set PY_CfgDir = ( `pact +l -info PY_CfgDir` )
-flog $Log set SFLAGS   = ( `pact +l -info Shared_LD_Flags | uniq` )
-flog $Log set Link     = ( `pact +l -info Shared_LD_Exe | uniq` )
-flog $Log set ShLibs   = ( `pact +l -info Shared_LD_Lib | uniq` )
-flog $Log set LDPath   = ( `pact +l -info LDPath | uniq` )
-flog $Log set LDRPath  = ( `pact +l -info LDRPath | uniq` )
-flog $Log set MDLibs   = ( `pact +l -info MDLib | uniq` )
-flog $Log set MDILibs  = ( `pact +l -info MDI_Lib | uniq` )
-flog $Log set MDGLibs  = ( `pact +l -info MDGLib | uniq` )
-flog $Log set GCCLib   = ( `pact +l -info GCCLib | uniq` )
+flog $Log set SFLAGS    = ( `pact +l -info Shared_LD_Flags | uniq` )
+flog $Log set Link      = ( `pact +l -info Shared_LD_Exe | uniq` )
+flog $Log set ShLibs    = ( `pact +l -info Shared_LD_Lib | uniq` )
+flog $Log set LDPath    = ( `pact +l -info LDPath | uniq` )
+flog $Log set LDRPath   = ( `pact +l -info LDRPath | uniq` )
+flog $Log set MDLibs    = ( `pact +l -info MDLib | uniq` )
+flog $Log set MDILibs   = ( `pact +l -info MDI_Lib | uniq` )
+flog $Log set MDGLibs   = ( `pact +l -info MDGLib | uniq` )
+flog $Log set GCCLib    = ( `pact +l -info GCCLib | uniq` )
 
 # get only libraries in DPLibs - no flags (AIX)
 set lst = ""
@@ -70,10 +73,9 @@ foreach i ( `pact +l -info DPLib | uniq` )
    endif
 end
 flog $Log set DPLibs   = ( $lst )
-
-flog $Log set LD     = ( $Link $SFLAGS )
-flog $Log set PyPath = $DevLib/python${PY_Vers}
-flog $Log set PyPact = $PyPath/pact
+flog $Log set LD       = ( $Link $SFLAGS )
+flog $Log set lpy_path = $DevLib/python${PY_Vers}
+flog $Log set lpy_pact = $lpy_path/pact
 
 flog $Log set Libs   = ( $LDRPath -L$DevLib $LDPath $MDGLibs $MDILibs -lc -lm $ShLibs $DPLibs $MDLibs )
 if ("$GCCLib" != "") then
@@ -89,17 +91,17 @@ if ($OS == AIX) then
    flog $Log set CFPGS = ( -bE:${SrcDir}/pypgs.exp -bI:${PY_CfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypgs.map )
 endif
 
-if (!(-d $PyPact)) then
-   flog $Log mkdir -p $PyPact
+if (!(-d $lpy_pact)) then
+   flog $Log mkdir -p $lpy_pact
 endif
-flog $Log pushd $PyPact
+flog $Log pushd $lpy_pact
 
 NoteD $Log ""
 NoteD $Log "Linking PyPact bindings in:"
-NoteD $Log "   $PyPact"
+NoteD $Log "   $lpy_pact"
 NoteD $Log ""
-flog $Log $RM $PyPact/*.so _*.so
-flog $Log $RM $PyPact/*.o
+flog $Log $RM $lpy_pact/*.so _*.so
+flog $Log $RM $lpy_pact/*.o
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -109,9 +111,9 @@ flog $Log $RM $PyPact/*.o
 NoteD $Log -n "   Linking pdb ..... "
 Note $Log ""
 
-flog $Log $RM $PyPact/libpypdb.so $PyPact/libpypdb.so.1 _pdb.so
+flog $Log $RM $lpy_pact/libpypdb.so $lpy_pact/libpypdb.so.1 _pdb.so
 
-set pyl = ( ${PyPACTLib}.a libscore.a libpml.a libpdb.a )
+set pyl = ( ${lpy_pact_lib}.a libscore.a libpml.a libpdb.a )
 @ lerr = 0
 foreach l ($pyl)
    flog $Log px $AR ../../$l
@@ -120,7 +122,7 @@ end
 
 if ($lerr != 0) then
    NoteD $Log "ng ($lerr)"
-   @ Err = $Err + $lerr
+   @ err = $err + $lerr
 else
 
 # remove PGS function - they do not belong with PDB module
@@ -132,17 +134,17 @@ else
    flog $Log $RM $lrmf
    unset lrmf
 
-   flog $Log $LD ${CFPDB} -o $PyPact/libpypdb.so.1 *.o $Libs
-   set LStat = $status
-   if ($LStat == 0) then
+   flog $Log $LD ${CFPDB} -o $lpy_pact/libpypdb.so.1 *.o $Libs
+   set xstatus = $status
+   if ($xstatus == 0) then
       NoteD $Log "ok"
-      flog $Log ln -s $PyPact/libpypdb.so.1 $PyPact/libpypdb.so
-      flog $Log ln -s $PyPact/libpypdb.so.1 _pdb.so
+      flog $Log ln -s $lpy_pact/libpypdb.so.1 $lpy_pact/libpypdb.so
+      flog $Log ln -s $lpy_pact/libpypdb.so.1 _pdb.so
       flog $Log $RM *.o _____* __.SYMDEF*
-      flog $Log ls -l $PyPact/*pdb*
+      flog $Log ls -l $lpy_pact/*pdb*
    else
-      NoteD $Log "ng ($LStat)"
-      @ Err = $Err + 1
+      NoteD $Log "ng ($xstatus)"
+      @ err = $err + 1
    endif
 endif
 
@@ -154,9 +156,9 @@ endif
 NoteD $Log -n "   Linking pgs ..... "
 Note $Log ""
 
-flog $Log $RM $PyPact/libpypgs.so $PyPact/libpypgs.so.1 _pgs.so
+flog $Log $RM $lpy_pact/libpypgs.so $lpy_pact/libpypgs.so.1 _pgs.so
 
-set pyl = ( ${PyPACTLib}.a libscore.a libpml.a libpdb.a libppc.a libpgs.a )
+set pyl = ( ${lpy_pact_lib}.a libscore.a libpml.a libpdb.a libppc.a libpgs.a )
 @ lerr = 0
 foreach l ($pyl)
    flog $Log px $AR ../../$l
@@ -165,7 +167,7 @@ end
 
 if ($lerr != 0) then
    NoteD $Log "ng ($lerr)"
-   @ Err = $Err + $lerr
+   @ err = $err + $lerr
 else
 
 # remove unneeded/unwanted objects
@@ -175,17 +177,17 @@ else
    flog $Log $RM $lrmf
    unset lrmf
 
-   flog $Log $LD ${CFPGS} -o $PyPact/libpypgs.so.1 *.o $Libs
-   set LStat = $status
-   if ($LStat == 0) then
+   flog $Log $LD ${CFPGS} -o $lpy_pact/libpypgs.so.1 *.o $Libs
+   set xstatus = $status
+   if ($xstatus == 0) then
       NoteD $Log "ok"
-      flog $Log ln -s $PyPact/libpypgs.so.1 $PyPact/libpypgs.so
-      flog $Log ln -s $PyPact/libpypgs.so.1 _pgs.so
+      flog $Log ln -s $lpy_pact/libpypgs.so.1 $lpy_pact/libpypgs.so
+      flog $Log ln -s $lpy_pact/libpypgs.so.1 _pgs.so
       flog $Log $RM *.o _____* __.SYMDEF*
-      flog $Log ls -l $PyPact/*pgs*
+      flog $Log ls -l $lpy_pact/*pgs*
    else
-      NoteD $Log "ng ($LStat)"
-      @ Err = $Err + 1
+      NoteD $Log "ng ($xstatus)"
+      @ err = $err + 1
    endif
 endif
 
@@ -199,16 +201,16 @@ NoteD $Log -n "   Python import ... "
 Note $Log ""
 
 # finish up
-flog $Log cp pact/pgs.py pact/pdb.py $PyPact
-flog $Log touch $PyPact/__init__.py
+flog $Log cp pact/pgs.py pact/pdb.py $lpy_pact
+flog $Log touch $lpy_pact/__init__.py
 
-flog $Log $Python -c 'import compileall;compileall.main()' $PyPact
-set LStat = $status
-if ($LStat == 0) then
+flog $Log $lpy_exe -c 'import compileall;compileall.main()' $lpy_pact
+set xstatus = $status
+if ($xstatus == 0) then
    NoteD $Log "ok"
 else
-   NoteD $Log "ng ($LStat)"
-   @ Err = $Err + 1
+   NoteD $Log "ng ($xstatus)"
+   @ err = $err + 1
 endif
 
 #--------------------------------------------------------------------------
@@ -217,19 +219,19 @@ endif
 if ($Test == TRUE) then
    NoteD $Log -n "   Testing ......... "
    Note $Log ""
-   flog $Log setenv PYTHONPATH $PyPath
+   flog $Log setenv PYTHONPATH $lpy_path
    flog $Log cd tests
-   flog $Log python unittests.py
-   set LStat = $status
-   if ($LStat == 0) then
+   flog $Log $lpy_exe unittests.py
+   set xstatus = $status
+   if ($xstatus == 0) then
       NoteD $Log "ok"
    else
-      NoteD $Log "ng ($LStat)"
-      @ Err = $Err + 1
+      NoteD $Log "ng ($xstatus)"
+      @ err = $err + 1
    endif
 endif
 
 NoteD $Log ""
 
-exit($Err)
+exit($err)
 

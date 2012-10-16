@@ -440,6 +440,7 @@ envexp Cfe_CC_Inc
 source $AnaDir/line
 source $AnaDir/pragma
 source $AnaDir/inline
+source $AnaDir/noreturn
 source $AnaDir/valist
 source $AnaDir/float16
 source $AnaDir/complex

@@ -2443,7 +2443,7 @@ static char *do_run_spec(char *lst, char *s)
 /* WRITE_DO_RUN_DB - write the do-run database */
 
 static void write_do_run_db(client *cl, state *st)
-   {int i, l, nm, ns;
+   {int i, l, nm, ns, ok;
     char ldbg[MAXLINE], lmpi[MAXLINE], lcrs[MAXLINE];
     char cfg[MAXLINE], db[MAXLINE];
     char s[MAXLINE];
@@ -2469,97 +2469,113 @@ static void write_do_run_db(client *cl, state *st)
     note(Log, TRUE, "   Do-run signature database - do-run-db");
 
     snprintf(db, MAXLINE, "%s/do-run-db", st->dir.etc);
-    fp = fopen(db, "w");
 
-    fprintf(fp, "#\n");
-    fprintf(fp, "# DO-RUN-DB - execution signatures for do-run\n");
-    fprintf(fp, "#\n");
+/* see if file is properly specified via environment variable */
+    p   = cgetenv(TRUE, "RUN_SIGNATURE_DB");
+    ok  = TRUE;
+    ok &= (file_exists(p) == TRUE);
+    ok &= (strcmp(p, db) != 0);
 
-    cnd = NULL;
+/* copy the do-run database */
+    if (ok == TRUE)
+       {note(Log, TRUE, "      copying %s", p);
+        copy(db, p);}
+
+/* write the do-run database */
+    else
+       {note(Log, TRUE, "      generating %s", db);
+
+	fp = fopen(db, "w");
+
+	fprintf(fp, "#\n");
+	fprintf(fp, "# DO-RUN-DB - execution signatures for do-run\n");
+	fprintf(fp, "#\n");
+
+	cnd = NULL;
 
 /* check for debug specs */
-    if ((IS_NULL(ldbg) == FALSE) && (strcmp(ldbg, "none") != 0))
-       {cnd = lst_push(cnd, ldbg);
-	fprintf(fp, "default DBG %s\n", path_base(ldbg));}
-    else
-       {cnd = lst_push(cnd, "gdb");
-        cnd = lst_push(cnd, "tv");
-        cnd = lst_push(cnd, "vg");
-        cnd = lst_push(cnd, "vgd");
-        cnd = lst_push(cnd, "prf");
-        cnd = lst_push(cnd, "zf");};
+	if ((IS_NULL(ldbg) == FALSE) && (strcmp(ldbg, "none") != 0))
+	   {cnd = lst_push(cnd, ldbg);
+	    fprintf(fp, "default DBG %s\n", path_base(ldbg));}
+	else
+	   {cnd = lst_push(cnd, "gdb");
+	    cnd = lst_push(cnd, "tv");
+	    cnd = lst_push(cnd, "vg");
+	    cnd = lst_push(cnd, "vgd");
+	    cnd = lst_push(cnd, "prf");
+	    cnd = lst_push(cnd, "zf");};
 
 /* check for MPI specs */
-    if ((IS_NULL(lmpi) == FALSE) && (strcmp(lmpi, "none") != 0))
-       {cnd = lst_push(cnd, lmpi);
-	fprintf(fp, "default MPI %s\n", path_base(lmpi));}
-    else
-       {cnd = lst_push(cnd, "poe");
-        cnd = lst_push(cnd, "srun");
-        cnd = lst_push(cnd, "dmpirun");
-        cnd = lst_push(cnd, "mpirun");};
+	if ((IS_NULL(lmpi) == FALSE) && (strcmp(lmpi, "none") != 0))
+	   {cnd = lst_push(cnd, lmpi);
+	    fprintf(fp, "default MPI %s\n", path_base(lmpi));}
+	else
+	   {cnd = lst_push(cnd, "poe");
+	    cnd = lst_push(cnd, "srun");
+	    cnd = lst_push(cnd, "dmpirun");
+	    cnd = lst_push(cnd, "mpirun");};
 
 /* check for cross compile specs */
-    if ((IS_NULL(lcrs) == FALSE) && (strcmp(lcrs, "none") != 0))
-       {cnd = lst_push(cnd, lcrs);
-	fprintf(fp, "default CROSS %s\n", path_base(lcrs));}
-    else
-       cnd = lst_push(cnd, "submit");
+	if ((IS_NULL(lcrs) == FALSE) && (strcmp(lcrs, "none") != 0))
+	   {cnd = lst_push(cnd, lcrs);
+	    fprintf(fp, "default CROSS %s\n", path_base(lcrs));}
+	else
+	   cnd = lst_push(cnd, "submit");
 
-    ns = 0;
+	ns = 0;
 
 /* find the prolog */
-    FOREACH(d, cfg, " \t\n")
-       snprintf(s, MAXLINE, "%s/do-run-prolog", d);
-       if (file_exists(s) == TRUE)
-          {add_do_run(fp, s);
-	   ns++;
-	   break;};
-    ENDFOR;
+	FOREACH(d, cfg, " \t\n")
+	   snprintf(s, MAXLINE, "%s/do-run-prolog", d);
+	   if (file_exists(s) == TRUE)
+              {add_do_run(fp, s);
+	       ns++;
+	       break;};
+        ENDFOR;
 
 /* process the specs in CND */
-    nm = 0;
-    for (i = 0; cnd[i] != NULL; i++)
-        {note(Log, TRUE, "Checking %s", cnd[i]);
+	nm = 0;
+	for (i = 0; cnd[i] != NULL; i++)
+	    {note(Log, TRUE, "Checking %s", cnd[i]);
 
-	 file = do_run_spec(cfg, cnd[i]);
-	 if (IS_NULL(file) == TRUE)
-	    {nm++;
-	     note(Log, TRUE, "   missing do-run config = |%s|", file);}
+	     file = do_run_spec(cfg, cnd[i]);
+	     if (IS_NULL(file) == TRUE)
+	        {nm++;
+		 note(Log, TRUE, "   missing do-run config = |%s|", file);}
 
-	 else
-	    {note(Log, TRUE, "   using do-run config = |%s|", file);
-
-	     exe = cwhich(path_base(cnd[i]));
-	     note(Log, TRUE, "   candidate for %s name = |%s|",
-		  cnd[i], exe);
-	     if (file_executable(exe) == TRUE)
-	        {add_do_run(fp, file);
-		 ns++;}
 	     else
-	        {sa = file_text(FALSE, file);
+	        {note(Log, TRUE, "   using do-run config = |%s|", file);
 
-		 for (l = 0; sa[l] != NULL; l++)
-		     {if (strstr(sa[l], "Exe") != NULL)
-			 {p   = strchr(sa[l], '=');
-			  exe = trim(p+1, BOTH, " \t\n\r");
-			  if (exe[0] != '/')
-			     exe = cwhich(exe);
+		 exe = cwhich(path_base(cnd[i]));
+		 note(Log, TRUE, "   candidate for %s name = |%s|",
+		      cnd[i], exe);
+		 if (file_executable(exe) == TRUE)
+		    {add_do_run(fp, file);
+		     ns++;}
+		 else
+		    {sa = file_text(FALSE, file);
 
-			  note(Log, TRUE, "   candidate for %s file = |%s|",
-			       cnd[i], exe);
-			  if (file_executable(exe) == TRUE)
-			     {add_do_run(fp, file);
-			      ns++;};
-			  break;};};
+		     for (l = 0; sa[l] != NULL; l++)
+		         {if (strstr(sa[l], "Exe") != NULL)
+			     {p   = strchr(sa[l], '=');
+			      exe = trim(p+1, BOTH, " \t\n\r");
+			      if (exe[0] != '/')
+				 exe = cwhich(exe);
+			      
+			      note(Log, TRUE, "   candidate for %s file = |%s|",
+				   cnd[i], exe);
+			      if (file_executable(exe) == TRUE)
+				 {add_do_run(fp, file);
+				  ns++;};
+			      break;};};
 
-		 free_strings(sa);};};};
+		     free_strings(sa);};};};
 
-    lst_free(cnd);
+	lst_free(cnd);
 
-    fprintf(fp, "\n");
+	fprintf(fp, "\n");
 
-    fclose(fp);
+	fclose(fp);};
 
 /* add the signature variable to the databases iff
  * there were specification - ns > 0 

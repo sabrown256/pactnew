@@ -407,7 +407,6 @@ int main(int c, char **v)
                  case 'h':
                       show_help();
                       return(1);
-                      break;
                  case 'i':
 		      if (strcmp(v[i], "-ia") == 0)
 			 mode = DISP_ALL;
@@ -423,8 +422,7 @@ int main(int c, char **v)
                       break;
 		 default:
 		      io_printf(stdout, "Unknown option: %s\n", v[i]);
-		      return(1);
-                      break;};}
+		      return(1);};}
          else
 	    {patrn = v[i];
 	     break;};};

@@ -20,11 +20,11 @@ cat << EOF >! $Tmp.c
 #include <stdio.h>
 int main(int c, char **v)
    {int rv;
-    rv = system("date");
+    rv = system("date > /dev/null");
     if (rv == 0)
-       fprintf(stderr, "TRUE\n");
+       fprintf(stdout, "TRUE\n");
     else
-       fprintf(stderr, "FALSE\n");
+       fprintf(stdout, "FALSE\n");
     return(rv);}
 EOF
 
@@ -34,7 +34,7 @@ set opt = ""
 set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   fexec $ALog $CFE $Tmp @o2 @e3 fw:/dev/null @ vw:HAVE_FORK_EXEC
+   fexvar $ALog HAVE_FORK_EXEC $CFE $Tmp
    if ($gstatus[1] == 0) then
       set ok = TRUE
    endif

@@ -14,15 +14,6 @@ set VERSION = "2.2"
 # determine the bin directory path
 set BinDir = $PACT/bin
 
-# determine the scheme directory path
-set ScmDir = $PACT/scheme
-
-# only extend SCHEME env var if it is already set!
-# allow SCHEME env var to trump scheme dir relative to sx binary
-if ($?SCHEME) then
-  setenv SCHEME ${SCHEME}:$ScmDir
-endif
-
 # determine if sx is available
 if (!(-x $BinDir/sx)) then
    echo ""
@@ -31,11 +22,13 @@ if (!(-x $BinDir/sx)) then
    exit(1)
 endif
 
-set CFE = ""
-if ($?CROSS_COMPILE == 1) then
-   if ($CROSS_COMPILE != FALSE) then
-      set CFE = $BinDir/do-run
-   endif
+# determine the scheme directory path
+set ScmDir = $PACT/scheme
+
+# only extend SCHEME env var if it is already set!
+# allow SCHEME env var to trump scheme dir relative to sx binary
+if ($?SCHEME == 1) then
+  setenv SCHEME ${SCHEME}:$ScmDir
 endif
 
 # setup default values

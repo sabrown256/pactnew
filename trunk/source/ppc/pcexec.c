@@ -343,8 +343,10 @@ int main(int argc, char **argv)
     SC_signal_n(SIGINT, error_handler, NULL);
 #endif
 
+    ret = 0;
+
     if (access_file)
-       ret = PC_file_access(log);
+       SC_file_access(log);
 
     else if (parallel)
        ret = PC_process_access(argv, "rsb+");
