@@ -14,6 +14,10 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: termio"
 
+set vl = ""
+set vl = ( $vl OS_Name )
+source $MngDir/write/import-db
+
 set termio = ""
 
 set NO_TERMINAL = TRUE

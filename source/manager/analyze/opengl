@@ -29,7 +29,7 @@ dbini Std_UseOGL        FALSE
 envini OS_Name           `uname -s`
 
 set vl = ""
-set vl = ( $vl RPATH )
+set vl = ( $vl OS_Name RPATH )
 source $MngDir/write/import-db
 
 # if we have explicitly said we do not want OGL
