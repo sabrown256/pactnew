@@ -14,7 +14,10 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: readline"
 
-# vanilla place to look if previously undefined
+set vl = ""
+set vl = ( $vl LIB )
+source $MngDir/write/import-db
+
 dbini MD_Inc     ""
 dbini MD_Lib     ""
 dbini MD_Pck     ""

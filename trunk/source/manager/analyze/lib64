@@ -29,6 +29,10 @@ if ($lQuiet == FALSE) then
    Note $ALog ""
 endif
 
+set vl = ""
+set vl = ( $vl Bits )
+source $MngDir/write/import-db
+
 set lroot = /usr
 source $lbase/common-lib64
 unset lroot
@@ -39,7 +43,7 @@ if ($lQuiet == FALSE) then
 endif
 
 # export the results
-envexp LIB
+dbexp LIB
 
 exit(0)
 

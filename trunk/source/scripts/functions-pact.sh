@@ -8,10 +8,15 @@
 # include "cpyright.h"
 #
 
-export PERDB=perdb
-export MV="mv -f"
-export RM="rm -f"
-export RMDir="rm -rf"
+PERDB=perdb
+MV="mv -f"
+RM="rm -f"
+RMDir="rm -rf"
+
+export PERDB
+export MV
+export RM
+export RMDir
 
 # Function Usage:
 #
@@ -45,60 +50,61 @@ export RMDir="rm -rf"
 #
 
 flog () {
-   log=$1
+   log_=$1
    shift
    cmd=$*
-   echo "Command: $cmd" >> $log 2>&1
-   $cmd >> $log 2>&1
+   echo "Command: $cmd" >> $log_ 2>&1
+   $cmd >> $log_ 2>&1
 }
 
 ftee () {
-   log=$1
+   log_=$1
    shift
    cmd=$*
-   echo "Command: $cmd" >> $log 2>&1
-   $cmd 2>&1 | tee -ai $log
+   echo "Command: $cmd" >> $log_ 2>&1
+   $cmd 2>&1 | tee -ai $log_
 }
 
 ftty () {
-   log=$1
+   log_=$1
    shift
    cmd=$*
-   echo "Command: $cmd" >> $log 2>&1
+   echo "Command: $cmd" >> $log_ 2>&1
    echo "$cmd"
-   $cmd >> $log 2>&1
+   $cmd >> $log_ 2>&1
 }
 
 Note () {
-   log=$1
+   log_=$1
    shift
    msg=$*
-   echo $msg >> $log 2>&1
+   echo $msg >> $log_ 2>&1
 }
 
 NoteD () {
-   log=$1
+   log_=$1
    shift
    msg=$*
-   echo $msg >> $log 2>&1
+   echo $msg >> $log_ 2>&1
    echo $msg
 }
 
 Separator () {
-   log=$1
-   echo "--------------------------------------------------------------------------" >> $log 2>&1
-   echo "" >> $log 2>&1
+   log_=$1
+   echo "--------------------------------------------------------------------------" >> $log_ 2>&1
+   echo "" >> $log_ 2>&1
 }
 
 InitLog () {
-   log=$1
+   log_=$1
    file=$2
    rm -f $file
    echo $USER > $file 2>&1
    date >> $file
    pwd >> $file
    echo "" >> $file
-   export $log=$file
+   eval "$log_=$file"
+   export $log_
 }
 
 # dbset sets a variable in the database and the current environment
@@ -110,14 +116,15 @@ dbset () {
    var=$1
    shift
    val=$*
-   export $var="`$PERDB $var = $val`"
+   eval "$var='`$PERDB $var = $val`'"
+   export $var
 }
 
 dbsets () {
    var=$1
    shift
    val=$*
-   export -n $var="`$PERDB -e $var = $val`"
+   eval "$var='`$PERDB -e $var = $val`'"
 }
 
 # dbget imports a database variable into the current environment
@@ -128,12 +135,13 @@ dbsets () {
 
 dbget () {
    var=$1
-   export $var="`$PERDB -e $var`"
+   eval "$var='`$PERDB -e $var`'"
+   export $var
 }
 
 dbgets () {
    var=$1
-   export -n $var="`$PERDB -e $var`"
+   eval "$var='`$PERDB -e $var`'"
 }
 
 # dbdef queries database for existence of a variable
@@ -160,14 +168,16 @@ dbini () {
    var=$1
    shift
    val=$*
-   export $var="`$PERDB $var =\? $val`"
+   eval "$var='`$PERDB $var =\? $val`'"
+   export $var
 }
 
 envini () {
    var=$1
    val=$2
    if [ $var ] ; then
-      export $var="$val"
+      eval "$var='$val'"
+      export $var
    fi
 }
 
@@ -193,11 +203,11 @@ envexp () {
 # usage: fexec $log <gexec-specs>
 
 fexec () {
-   log=$1
+   log_=$1
    shift
    cmd=$*
-   echo "Command: gexec $cmd" >> $log 2>&1
-   gexec $cmd >> $log 2>&1
+   echo "Command: gexec $cmd" >> $log_ 2>&1
+   gexec $cmd >> $log_ 2>&1
    gstatus=`$PERDB -e gstatus`
 }
 
@@ -207,26 +217,27 @@ fexec () {
 # usage: fexvar $log <var> <gexec-specs>
 
 fexvar () {
-   log=$1
+   log_=$1
    shift
    var=$1
    shift
    cmd=$*
-   echo "Command: gexec $cmd @b vw:$var" >> $log 2>&1
-   gexec $cmd @b vw:$var >> $log 2>&1
-   export $var="`$PERDB -e $var`"
+   echo "Command: gexec $cmd @b vw:$var" >> $log_ 2>&1
+   gexec $cmd @b vw:$var >> $log_ 2>&1
    gstatus=`$PERDB -e gstatus`
+   eval "$var='`$PERDB -e $var`'"
+   export $var
 }
 
 fexvars () {
-   log=$1
+   log_=$1
    shift
    var=$1
    shift
    cmd=$*
-   echo "Command: gexec $cmd @b vw:$var" >> $log 2>&1
-   gexec $cmd @b vw:$var >> $log 2>&1
-   export -n $var="`$PERDB -e $var`"
+   echo "Command: gexec $cmd @b vw:$var" >> $log_ 2>&1
+   gexec $cmd @b vw:$var >> $log_ 2>&1
    gstatus=`$PERDB -e gstatus`
+   eval "$var='`$PERDB -e $var`'"
 }
 

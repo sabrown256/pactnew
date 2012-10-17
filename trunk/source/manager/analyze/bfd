@@ -15,6 +15,10 @@ source $Me:h/common
 Separator $ALog
 Note $ALog "Analyze: exe access support"
 
+set vl = ""
+set vl = ( $vl LIB Linking )
+source $MngDir/write/import-db
+
 dbini MDE_Lib        ""
 dbini BFD_Lib        -lbfd
 dbini BFD_Path       /usr/$LIB
@@ -22,8 +26,6 @@ dbini BFD_Version    0.0.0
 dbini HAVE_BFD       FALSE
 dbini HAVE_DEMANGLE  FALSE
 dbini BFD_SO         ""
-
-dbget Linking
 
 # if we have explicitly said we do not want BFD
 # do NOT detect it

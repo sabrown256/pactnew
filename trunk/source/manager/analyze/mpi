@@ -30,6 +30,10 @@ dbini DP_RPath           ""
 
 envini REQUEST_MPI     FALSE
 
+set vl = ""
+set vl = ( $vl Bits )
+source $MngDir/write/import-db
+
 # NOTE: because locate-mpi ends up getting DP_RPath on your RPATH
 # before feature/mpi is invoked you can end up with MPI
 # libary paths in your link line for non-MPI builds

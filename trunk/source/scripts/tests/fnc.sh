@@ -13,7 +13,8 @@
 err=0
 cwd=`pwd`
 
-export PERDB_PATH=$cwd/fnc-sh
+PERDB_PATH=$cwd/fnc-sh
+export PERDB_PATH
 
 InitLog log $cwd/log.fnc.sh
 
@@ -62,7 +63,7 @@ flog $log echo $bar
 flog $log unset bar
 
 dbdef foo
-if [ $? == 0 ] ; then
+if [ $? = 0 ] ; then
    Note $log "foo defined"
 fi
 

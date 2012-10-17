@@ -27,7 +27,7 @@ dbini Z_Path       /usr
 dbini HAVE_PNGLIB  FALSE
 
 set vl = ""
-set vl = ( $vl LibM_Lib RPATH )
+set vl = ( $vl LIB LibM_Lib RPATH )
 source $MngDir/write/import-db
 
 # if we have explicitly said we do not want PNG
