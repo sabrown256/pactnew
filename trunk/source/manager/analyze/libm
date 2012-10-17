@@ -19,8 +19,7 @@ dbini IMF_Path     ""
 dbini LibM_Lib     "-lm"
 dbini LibM_RPath   ""
 dbini MD_Pck       ""
-
-envini Cfg_RPATH    ""
+dbini Cfg_RPATH    ""
 
 set vl = ""
 set vl = ( $vl RPATH )
@@ -75,8 +74,7 @@ dbexp IMF_Path
 dbexp RPATH
 dbexp LibM_Lib
 dbexp LibM_RPath
-
-envexp Cfg_RPATH
+dbexp Cfg_RPATH
 
 exit(0)
 

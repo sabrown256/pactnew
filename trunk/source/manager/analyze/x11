@@ -28,11 +28,11 @@ dbini Std_UseX          TRUE
 
 envini AnaDir           analyze
 envini ALog             $cwd/cfg-$System/log.analyze
-envini OS_Name           `uname -s`
 envini Cfe_CC_Exe       "cc"
 envini Cfe_CC_Flags     "-g"
 
 set vl = ""
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
 set vl = ( $vl LIB OS_Name RPATH )
 source $MngDir/write/import-db
 

@@ -21,6 +21,10 @@ dbini HAVE_STREAMS  FALSE
 dbget HAVE_SELECT
 dbget HAVE_STREAMS
 
+set vl = ""
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_RPath )
+source $MngDir/write/import-db
+
 set poll = ""
 
 set IOHandling = ""

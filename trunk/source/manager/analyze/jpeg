@@ -25,6 +25,7 @@ dbini JPEG_Path     /usr
 dbini HAVE_JPEGLIB  FALSE
 
 set vl = ""
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
 set vl = ( $vl LIB RPATH )
 source $MngDir/write/import-db
 

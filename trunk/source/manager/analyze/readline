@@ -16,6 +16,7 @@ Note $Log "Analyze: readline"
 
 set vl = ""
 set vl = ( $vl LIB )
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
 source $MngDir/write/import-db
 
 dbini MD_Inc     ""
@@ -56,7 +57,7 @@ int main(int c, char **v)
  rv = (f == NULL);
  rl_restore_prompt();
  rl_clear_message();
-# printf("%s 0x%04x\n", rl_library_version, rl_readline_version);
+/* printf("%s 0x%04x\n", rl_library_version, rl_readline_version); */
  fprintf(stdout, "%s\n", rl_library_version);
  if (rv == 0)
     fprintf(stderr, "TRUE\n");

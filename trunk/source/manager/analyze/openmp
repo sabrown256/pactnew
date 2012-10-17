@@ -16,6 +16,10 @@ Note $Log "Analyze: openmp"
 
 envini PTHREAD_OMP    FALSE
 
+set vl = ""
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
+source $MngDir/write/import-db
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 

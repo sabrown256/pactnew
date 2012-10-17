@@ -219,8 +219,6 @@ call CLEAN_PATH(RPATH)
 switch ($Out)
    case parent:
         call CLEAN_PATH(Cfg_RPATH)
-        envexp Cfg_RPATH
-        envexp RPATH
         dbexp Cfg_RPATH
         dbexp RPATH
         breaksw
