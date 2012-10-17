@@ -33,7 +33,7 @@ envini Cfe_CC_Exe       "cc"
 envini Cfe_CC_Flags     "-g"
 
 set vl = ""
-set vl = ( $vl RPATH )
+set vl = ( $vl LIB RPATH )
 source $MngDir/write/import-db
 
 # if we have explicitly said we do not want X11

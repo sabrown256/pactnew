@@ -17,11 +17,13 @@ set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
 source $ldir/functions-pact.csh
 
-if ($?Bits == 0) then
-   setenv Bits `nbit -d`
-endif
+dbini Bits `nbit -d`
 
-envexp Bits
+#if ($?Bits == 0) then
+#   setenv Bits `nbit -d`
+#endif
+
+dbexp Bits
 
 exit($status)
 

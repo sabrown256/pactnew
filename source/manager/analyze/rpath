@@ -82,7 +82,7 @@ while ($#argv > 0)
 end
 
 set vl = ""
-set vl = ( $vl RPATH Cfg_RPATH)
+set vl = ( $vl LIB RPATH Cfg_RPATH)
 
 source $MngDir/write/import-db
 

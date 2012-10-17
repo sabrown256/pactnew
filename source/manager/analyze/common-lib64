@@ -12,28 +12,28 @@
 # initial guess is that we will have $lroot/lib as the answer
 set LibT  = lib
 
-set lBits = ""
-set lDir  = ""
+set lbits = ""
+set ldir  = ""
 foreach dir ($lroot/lib64 $lroot/lib)
    ls $dir/*.o >& /dev/null
    if ($status == 0) then
-      set Objs = ( `ls $dir/*.o` )
-      foreach o ($Objs)
+      set objs = ( `ls $dir/*.o` )
+      foreach o ($objs)
          if (-f $o) then
-            set lBits = `file $o`
-            set lDir  = $dir:t
+            set lbits = `file $o`
+            set ldir  = $dir:t
             break
          endif
       end
-      unset Objs
+      unset objs
    endif
-   if ("$lDir" != "") then
+   if ("$ldir" != "") then
       break
    endif
 end
 
 # find out whether we have 64 bit objects or not
-gexec echo "$lBits" @o awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bit/) {print $i};};}' @o sed 's/-bit//' @o vw:t
+gexec echo "$lbits" @o awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bit/) {print $i};};}' @o sed 's/-bit//' @o vw:t
 dbgets t
 if ($#t > 1) then
    set t = $t[1]
@@ -42,21 +42,21 @@ endif
 if ($t == 64) then
 
 # determine whether we want to use 64 bit objects or not (default is yes)
-   set lUSE_64 = TRUE
+   set luse_64 = TRUE
    if ($?Bits == 1) then
       if ($Bits == 32) then
-         set lUSE_64 = FALSE
+         set luse_64 = FALSE
       endif
    endif
 
 # if everything agrees use <path>/lib64
-   if ($lUSE_64 == TRUE) then
-      set LibT = $lDir
+   if ($luse_64 == TRUE) then
+      set LibT = $ldir
    endif
 endif
 
 unset t
-unset lDir
-unset lBits
-unset lUSE_64
+unset ldir
+unset lbits
+unset luse_64
 
