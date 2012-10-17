@@ -33,6 +33,10 @@ dbini F_STD            "F90"
 envini FC_Exe      "f90"
 envini FC_Flags    ""
 
+set vl = ""
+set vl = ( $vl OS_Name )
+source $MngDir/write/import-db
+
 set UTime = `timer -r`
 
 cat << EOF >! $Tmp.f

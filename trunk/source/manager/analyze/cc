@@ -42,6 +42,10 @@ envini CC_Exe       "cc"
 envini CC_Flags     ""
 envini CC_Inc       ""
 
+set vl = ""
+set vl = ( $vl OS_Name )
+source $MngDir/write/import-db
+
 set UTime = `timer -r`
 
 setenv AnsiCC     ""

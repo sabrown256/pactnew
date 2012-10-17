@@ -28,6 +28,10 @@ envini Cfe_LD_Flags   ""
 envini Cfe_LD_Lib     ""
 envini Cfe_LD_RPath   ""
 
+set vl = ""
+set vl = ( $vl OS_Name )
+source $MngDir/write/import-db
+
 if (!(-x "$LD_Exe")) then
    if (-x `$Which ld`) then
       flog $ALog setenv LD_Exe `$Which ld`

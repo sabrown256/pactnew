@@ -28,6 +28,10 @@ envini OS_Name           `uname -s`
 envini AnaDir           analyze
 envini ALog             $cwd/cfg-$System/log.analyze
 
+set vl = ""
+set vl = ( $vl OS_Name )
+source $MngDir/write/import-db
+
 if ($OS_Name == Darwin) then
 
    Separator $Log
