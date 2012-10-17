@@ -36,6 +36,7 @@ setenv ENV_VARS ${ENV_VARS}:SYS_SITE:SYS_TYPE:DAI_ROOT:DAS_ROOT
 setenv ENV_VARS ${ENV_VARS}:Bits:OS_Name
 setenv ENV_VARS ${ENV_VARS}:CXX_Exe:CXX_Flags:CXX_Linker
 setenv ENV_VARS ${ENV_VARS}:Cfg_CC_Exe:Cfg_CC_Flags:Cfg_CC_Inc
+setenv ENV_VARS ${ENV_VARS}:FC_Exe:FC_Flags
 setenv ENV_VARS ${ENV_VARS}:CC_Debug_Default:CC_Optimize_Default
 setenv ENV_VARS ${ENV_VARS}:FC_Debug_Default:FC_Optimize_Default
 setenv ENV_VARS ${ENV_VARS}:DP_Inc:DP_Lib:DP_RPath:DP_Path

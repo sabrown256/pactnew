@@ -17,7 +17,7 @@
 (define tag "BATCH")
 (define look "original")
 
-(system "rm -f demo.d*")
+(system "rm -f demo.d* > /dev/null 2>&1")
 
 (ld pdbvxmpl.scm)
 

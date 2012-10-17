@@ -16,6 +16,10 @@ Note $Log "Analyze: signal"
 
 dbini HAVE_POSIX_SIGNALS    FALSE
 
+set vl = ""
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
+source $MngDir/write/import-db
+
 set sig = ""
 
 #--------------------------------------------------------------------------

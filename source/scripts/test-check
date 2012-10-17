@@ -136,6 +136,7 @@ switch ($tgt)
 
         if ($?rm_cache == 1) then
            if (-f $rm_cache) then
+              flog $Log cat $rm_cache
               foreach i (`cat $rm_cache`)
                  flog $Log $RM $i
               end
@@ -368,10 +369,13 @@ switch ($tgt)
                 endif
 
                 if ($?rm_cache == 1) then
-                   Note $log "Marking test executables for removal"
+                   Note $log "Marking test executables for removal:"
                    touch $rm_cache
                    foreach i ($exe)
-                      echo $i >>& $rm_cache
+                      if ($i !~ */dev/*/bin/do-run) then
+                         Note $log "   $i"
+                         echo $i >>& $rm_cache
+                      endif
                    end
                 endif
                 Note $log ""

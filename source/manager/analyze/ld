@@ -17,19 +17,18 @@ Note $Log "Analyze: ld"
 NoteD $ALog -n "   Ld: "
 Note $ALog ""
 
-dbini DP_Lib         ""
+dbini LD_Exe         ""
+dbini LD_Flags       ""
+dbini LD_Lib         ""
+dbini Cfe_LD_Flags   ""
+dbini Cfe_LD_Lib     ""
+dbini Cfe_LD_RPath   ""
 dbini Cfg_LD_Flags   ""
 dbini Cfg_LD_RPath   ""
-
-envini LD_Exe         ""
-envini LD_Flags       ""
-envini LD_Lib         ""
-envini Cfe_LD_Flags   ""
-envini Cfe_LD_Lib     ""
-envini Cfe_LD_RPath   ""
+dbini DP_Lib         ""
 
 set vl = ""
-set vl = ( $vl OS_Name )
+set vl = ( $vl Cfg_RPATH OS_Name )
 source $MngDir/write/import-db
 
 if (!(-x "$LD_Exe")) then
@@ -96,15 +95,15 @@ endif
 dbexp HAVE_RPATH
 dbexp Shared_LD_Exe
 dbexp DP_Lib
+
+dbexp LD_Exe
+dbexp LD_Flags
+dbexp LD_Lib
 dbexp Cfg_LD_Flags
 dbexp Cfg_LD_RPath
-
-envexp LD_Exe
-envexp LD_Flags
-envexp LD_Lib
-envexp Cfe_LD_Flags
-envexp Cfe_LD_Lib
-envexp Cfe_LD_RPath
+dbexp Cfe_LD_Flags
+dbexp Cfe_LD_Lib
+dbexp Cfe_LD_RPath
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

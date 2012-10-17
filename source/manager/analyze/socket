@@ -19,6 +19,10 @@ Note $ALog ""
 
 dbini HAVE_SOCKETS    TRUE
 
+set vl = ""
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
+source $MngDir/write/import-db
+
 cat << EOF >! $Tmp.c
 #include <sys/socket.h>
 int main(int c, char **v)

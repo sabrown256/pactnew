@@ -14,6 +14,10 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: mmap"
 
+set vl = ""
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_RPath )
+source $MngDir/write/import-db
+
 cat << EOF >! $Tmp.c
 #include <unistd.h>
 #include <stdio.h>

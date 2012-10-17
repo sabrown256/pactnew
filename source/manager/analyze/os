@@ -72,7 +72,5 @@ dbexp OS_Type
 dbexp OS_Release
 dbexp OS_Name
 
-#envexp OS_Name
-
 exit(0)
 

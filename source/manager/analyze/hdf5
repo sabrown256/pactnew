@@ -26,7 +26,8 @@ dbini HDF5_SO    ""
 dbini Z_Lib      "-lz"
 
 set vl = ""
-set vl = ( $vl LIB LibM_Lib Linking RPATH )
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
+set vl = ( $vl LD_Lib LIB LibM_Lib Linking RPATH )
 source $MngDir/write/import-db
 
 # if we have explicitly said we do not want HDF5

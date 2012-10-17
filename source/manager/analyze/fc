@@ -23,15 +23,14 @@ else
    setenv HAVE_FORTRAN   TRUE
 endif
 
+dbini F_STD            "F90"
+dbini FC_Exe           "f90"
+dbini FC_Flags         ""
 dbini FC_Debug         "-g"
 dbini FC_Optimize      "-O"
 dbini FC_Linker        ""
 dbini FC_ID_UNDERSCORE "_"
 dbini FC_ID_CASE       "lower"
-dbini F_STD            "F90"
-
-envini FC_Exe      "f90"
-envini FC_Flags    ""
 
 set vl = ""
 set vl = ( $vl OS_Name )
@@ -260,21 +259,19 @@ DONE:
 dbexp HAVE_FORTRAN
 dbexp F_STD
 
+dbexp FC_Exe
+dbexp FC_Flags
 dbexp FC_Debug
 dbexp FC_Optimize
 dbexp FC_Linker
 
 dbexp Cfg_FC_Exe
 dbexp Cfg_FC_Flags
+dbexp Cfe_FC_Exe
+dbexp Cfe_FC_Flags
 
 dbexp FC_ID_UNDERSCORE
 dbexp FC_ID_CASE
-
-envexp FC_Exe
-envexp FC_Flags
-
-envexp Cfe_FC_Exe
-envexp Cfe_FC_Flags
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

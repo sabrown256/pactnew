@@ -15,6 +15,10 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: gethostbyname"
 
+set vl = ""
+set vl = ( $vl Cfe_LD_Flags Cfe_LD_RPath )
+source $MngDir/write/import-db
+
 cat << EOF >! $Tmp.c
 #include <stdlib.h>
 #include <stdio.h>
