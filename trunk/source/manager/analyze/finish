@@ -18,7 +18,7 @@ set vl = ""
 set vl = ( $vl GRAPHICS_Windows )
 set vl = ( $vl Std_UseX Std_UseOGL Std_UseQD )
 set vl = ( $vl AbsoluteDeb MDG_Inc )
-set vl = ( $vl CC_Optimize CC_Debug )
+set vl = ( $vl CC_Exe CC_Flags CC_Optimize CC_Debug )
 set vl = ( $vl FC_Optimize FC_Debug )
 set vl = ( $vl Save_CC Save_CFLAGS )
 set vl = ( $vl Cfe_CC_Inc )
@@ -98,9 +98,9 @@ dbexp CC_Optimize_Default
 dbexp FC_Debug_Default
 dbexp FC_Optimize_Default
 
+dbexp CC_Exe
+dbexp CC_Flags
 envexp Cfe_CC_Inc
-envexp CC_Exe
-envexp CC_Flags
 
 exit(0)
 

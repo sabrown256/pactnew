@@ -31,7 +31,7 @@ dbini DP_RPath           ""
 envini REQUEST_MPI     FALSE
 
 set vl = ""
-set vl = ( $vl Bits LD_Flags )
+set vl = ( $vl Bits CC_Flags LD_Flags )
 source $MngDir/write/import-db
 
 # NOTE: because locate-mpi ends up getting DP_RPath on your RPATH

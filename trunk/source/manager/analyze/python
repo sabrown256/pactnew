@@ -36,7 +36,7 @@ dbini PY_Inc          ""
 dbini PY_Path         ""
 
 set vl = ""
-set vl = ( $vl OS_Name )
+set vl = ( $vl CC_Exe OS_Name )
 source $MngDir/write/import-db
 
 # if there is no python directory no need to look further

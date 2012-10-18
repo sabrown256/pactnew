@@ -29,7 +29,7 @@ envini AnaDir           analyze
 envini ALog             $cwd/cfg-$System/log.analyze
 
 set vl = ""
-set vl = ( $vl LD_Flags OS_Name )
+set vl = ( $vl CC_Exe LD_Flags OS_Name )
 source $MngDir/write/import-db
 
 if ($OS_Name == Darwin) then

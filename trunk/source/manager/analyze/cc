@@ -23,6 +23,11 @@ else
    Note $ALog "Cross compiling C compiler analysis"
 endif
 
+# NOTE: we cannot have nothing for CC_Exec
+# if nothing is specified try cc
+dbini CC_Exe        "cc"
+dbini CC_Flags      ""
+dbini CC_Inc        ""
 dbini CC_Debug      "-g"
 dbini CC_Optimize   "-O"
 dbini CC_Linker     ""
@@ -34,13 +39,6 @@ dbini CXX_Inc       ""
 dbini DP_Inc       ""
 
 envini UseLDLibPath ""
-
-# NOTE: we cannot have nothing for CC_Exec
-# if nothing is specified try cc
-envini CC_Exe       "cc"
-
-envini CC_Flags     ""
-envini CC_Inc       ""
 
 set vl = ""
 set vl = ( $vl OS_Name )
@@ -407,6 +405,9 @@ endif
 #--------------------------------------------------------------------------
 
 # export the results
+dbexp CC_Exe
+dbexp CC_Flags
+dbexp CC_Inc
 dbexp CC_Debug
 dbexp CC_Optimize
 dbexp CC_Linker
@@ -414,6 +415,10 @@ dbexp CC_Linker
 dbexp Cfg_CC_Exe
 dbexp Cfg_CC_Flags
 dbexp Cfg_CC_Inc
+
+envexp Cfe_CC_Exe
+envexp Cfe_CC_Flags
+envexp Cfe_CC_Inc
 
 dbexp CXX_Exe
 dbexp CXX_Flags
@@ -429,14 +434,6 @@ dbexp LONG64
 dbexp FC_INT_PTR_DIFFER
 dbexp NEED_ALT_LARGE_FILE
 dbexp DP_Inc
-
-envexp CC_Exe
-envexp CC_Flags
-envexp CC_Inc
-
-envexp Cfe_CC_Exe
-envexp Cfe_CC_Flags
-envexp Cfe_CC_Inc
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
