@@ -19,6 +19,10 @@ dbini MDE_Lib                ""
 dbini HAVE_DYNAMIC_LINKER    FALSE
 dbini PACT_SO_CACHE          ""
 
+set vl = ""
+set vl = ( $vl CC_Exe CC_Flags )
+source $MngDir/write/import-db
+
 Note $ALog "MDE_Lib             = |$MDE_Lib|"
 Note $ALog "HAVE_DYNAMIC_LINKER = |$HAVE_DYNAMIC_LINKER|"
 

@@ -16,7 +16,7 @@ Separator $Log
 Note $Log "Analyze: gethostbyname"
 
 set vl = ""
-set vl = ( $vl Cfe_LD_Flags Cfe_LD_RPath )
+set vl = ( $vl CC_Exe CC_Flags Cfe_LD_Flags Cfe_LD_RPath )
 source $MngDir/write/import-db
 
 cat << EOF >! $Tmp.c

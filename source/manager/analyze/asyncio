@@ -17,6 +17,10 @@ Note $Log "Analyze: asynchronous I/O in STREAMS"
 
 dbini HAVE_ASYNC_STREAMS FALSE
 
+set vl = ""
+set vl = ( $vl CC_Exe CC_Flags )
+source $MngDir/write/import-db
+
 if (-f /usr/include/stropts.h) then
 
    cat << EOF >! $Tmp.c

@@ -16,6 +16,7 @@ Separator $ALog
 Note $ALog "Analyze: exe access support"
 
 set vl = ""
+set vl = ( $vl CC_Exe CC_Flags )
 set vl = ( $vl LIB Linking )
 source $MngDir/write/import-db
 

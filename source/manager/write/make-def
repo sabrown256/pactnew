@@ -349,15 +349,8 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "Lex_Exe   = $Lex_Exe"
     Note $STDOUT "Lex_Flags = $Lex_Flags"
 #    foreach v (Exe Flags)
-#        set val = `$PERDB -e Lex_${v}`
-#        Note $STDOUT "Lex_${v} = $val"
-##       DEFD_VAR Lex_${v}
-##       if ("$ok" == "") then
-##          Note $STDOUT "Lex_${v} = `printenv ${v}`"
-##       else
-##          VAR_VALUE Lex ${v}
-##          Note $STDOUT "Lex_${v} = $value"
-##       endif
+#        dbgets Lex_${v}
+#        Note $STDOUT "Lex_${v} = $Lex_${v}"
 #    end
     Note $STDOUT ""
 
