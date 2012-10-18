@@ -17,7 +17,7 @@ dbini INT4  int
 dbini INT8  long
 
 set vl = ""
-set vl = ( $vl Cfe_CC_Exe )
+set vl = ( $vl CFE Cfe_CC_Exe )
 source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------

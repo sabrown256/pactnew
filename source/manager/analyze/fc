@@ -31,9 +31,11 @@ dbini FC_Optimize      "-O"
 dbini FC_Linker        ""
 dbini FC_ID_UNDERSCORE "_"
 dbini FC_ID_CASE       "lower"
+dbini Cfg_FC_Flags     "$FC_Flags"
 
 set vl = ""
-set vl = ( $vl OS_Name )
+set vl = ( $vl PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH PACT_FC_EXE )
+set vl = ( $vl NM OS_Name )
 source $MngDir/write/import-db
 
 set UTime = `timer -r`
@@ -87,10 +89,10 @@ else
 endif
 
 # make sure that we have the main Fortran compiler
-envini FC_Exe "$F90C[1]"
-if ($FC_Exe == "") then
-   flog $ALog setenv FC_Exe "$F90C[1]"
-endif
+#dbini FC_Exe "$F90C[1]"
+#if ($FC_Exe == "") then
+#   flog $ALog setenv FC_Exe "$F90C[1]"
+#endif
 
 # make sure we have a configuration compiler defined
 if ($?Cfg_FC_Exe == 0) then
@@ -101,8 +103,6 @@ endif
 #--------------------------------------------------------------------------
 
 set Save_FFLAGS = ( $FC_Flags )
-
-envini Cfg_FC_Flags "$FC_Flags"
 
 if ("$FC_Linker" == "") then
    flog $ALog setenv FC_Linker "$FC_Exe"
@@ -163,7 +163,7 @@ if ($FC_Exe != "") then
    else if (("$CmpVers" != any) && ($STRICT > 0)) then
       NoteD $ALog "      requested version $CmpVers (not found)"
       setenv STOP ""
-      envexp STOP
+      dbexp STOP
       exit(0)
    else
       NoteD $ALog "      requested version $CmpVers (not found)"

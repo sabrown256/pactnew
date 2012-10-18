@@ -16,7 +16,7 @@ Note $Log "Analyze: readline"
 
 set vl = ""
 set vl = ( $vl LIB )
-set vl = ( $vl CC_Flags Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
+set vl = ( $vl CC_Flags CFE Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
 source $MngDir/write/import-db
 
 dbini MD_Inc     ""

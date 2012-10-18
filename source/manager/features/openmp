@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-setenv PTHREAD_OMP    TRUE
+PTHREAD_OMP = TRUE
 
 ThreadLibExt = _s
 

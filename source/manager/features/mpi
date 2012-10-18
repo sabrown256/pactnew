@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-setenv REQUEST_MPI   TRUE
+REQUEST_MPI = TRUE
 
 # NOTE: on BG/P DP_Path has to come after path to compiler
 setenv PATH   ${PATH}:${DP_Path}

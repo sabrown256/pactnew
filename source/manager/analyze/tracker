@@ -16,7 +16,10 @@ Note $Log "Analyze: tracker"
 
 dbini HAVE_TRACKER ""
 dbini TRACKER_Exe  ""
-dbini DAS_ROOT     "/usr/local"
+
+set vl = ""
+set vl = ( $vl DAS_ROOT )
+source $MngDir/write/import-db
 
 foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
    if (-d $d) then

@@ -41,7 +41,9 @@ dbini DP_Inc       ""
 envini UseLDLibPath ""
 
 set vl = ""
-set vl = ( $vl OS_Name )
+set vl = ( $vl Cfg_CC_Inc Cfg_CC_Flags )
+set vl = ( $vl PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH PACT_CC_EXE )
+set vl = ( $vl CFE BE OS_Name )
 source $MngDir/write/import-db
 
 set UTime = `timer -r`
@@ -83,7 +85,7 @@ else
    NoteD $ALog " none"
    NoteD $ALog "      No ANSI C compiler found, PACT cannot be built without one"
    setenv STOP ""
-   envexp STOP
+   dbexp STOP
    exit(0)
 endif
 
@@ -122,7 +124,6 @@ if ($?Cfg_CC_Flags == 0) then
 endif
 
 # remember the requested flags and setup for configuration purposes
-envini Cfg_CC_Inc ""
 flog $ALog setenv Save_CFLAGS "$CC_Flags"
 Note $ALog ""
 
@@ -131,8 +132,6 @@ if ("$Cfg_CC_Inc" != "") then
    flog $ALog setenv CC_Flags "$CC_Flags $Cfg_CC_Inc"
    Note $ALog ""
 endif
-
-envini Cfg_CC_Flags "$CC_Flags"
 
 # temporarily add debug flags to compiler flags for config
 if ($?Cfg_CC_Debug == 1) then
@@ -223,7 +222,7 @@ if ($Cfg_CC_Exe != "") then
    else if (("$CmpVers" != any) && ($STRICT > 0)) then
       NoteD $ALog "      requested version $CmpVers (not found)"
       setenv STOP ""
-      envexp STOP
+      dbexp STOP
       exit(0)
    else
       NoteD $ALog "      requested version $CmpVers (not found)"
@@ -265,7 +264,7 @@ EOF
       NoteD $ALog "   $Cfe_CC_Flags"
       NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
       setenv STOP ""
-      envexp STOP
+      dbexp STOP
       exit(0)
    endif
    Note $ALog ""
@@ -295,7 +294,7 @@ EOF
       NoteD $ALog "   $Cfe_CC_Flags"
       NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
       setenv STOP ""
-      envexp STOP
+      dbexp STOP
       exit(0)
    endif
    Note $ALog ""
@@ -327,7 +326,7 @@ EOF
       NoteD $ALog "   $Cfe_CC_Flags"
       NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
       setenv STOP ""
-      envexp STOP
+      dbexp STOP
       exit(0)
    endif
    Note $ALog ""
