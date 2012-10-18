@@ -20,7 +20,7 @@ dbini HAVE_DYNAMIC_LINKER    FALSE
 dbini PACT_SO_CACHE          ""
 
 set vl = ""
-set vl = ( $vl CC_Exe CC_Flags )
+set vl = ( $vl CC_Exe CC_Flags CFE )
 source $MngDir/write/import-db
 
 Note $ALog "MDE_Lib             = |$MDE_Lib|"

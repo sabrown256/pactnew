@@ -14,10 +14,10 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: site"
 
-envini SYS_SITE     ""
-envini SYS_TYPE     ""
-envini DAI_ROOT     ""
-envini DAS_ROOT     ""
+dbini SYS_SITE     ""
+dbini SYS_TYPE     ""
+dbini DAI_ROOT     ""
+dbini DAS_ROOT     ""
 
 if ($?SITE_SIGNATURE_DB == 1) then
    Note $Log "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
@@ -32,10 +32,10 @@ else
 endif
 
 # export the results
-envexp SYS_TYPE
-envexp SYS_SITE
-envexp DAI_ROOT
-envexp DAS_ROOT
+dbexp SYS_SITE
+dbexp SYS_TYPE
+dbexp DAI_ROOT
+dbexp DAS_ROOT
 
 exit(0)
 

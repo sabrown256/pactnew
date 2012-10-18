@@ -82,8 +82,7 @@ while ($#argv > 0)
 end
 
 set vl = ""
-set vl = ( $vl LIB RPATH Cfg_RPATH)
-
+set vl = ( $vl LIB RPATH Cfg_RPATH PACT_CC_PATH )
 source $MngDir/write/import-db
 
 switch ($Tgt)

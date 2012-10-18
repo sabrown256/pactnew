@@ -14,7 +14,7 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: openmp"
 
-envini PTHREAD_OMP    FALSE
+dbini PTHREAD_OMP    FALSE
 
 set vl = ""
 set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )

@@ -308,15 +308,6 @@ if ("$lbits" == 32) then
    set froot = `echo $froot | $Sed 's/-64//'`
 endif
 
-if ($#dirl == 1) then
-   setenv PATH  $dirl[1]':$PATH'
-else
-   if ($dirl[1] == $dirl[2]) then
-      setenv PATH  $dirl[1]':$PATH'
-   else
-      setenv PATH  ${dirl[1]}:${dirl[2]}':$PATH'
-   endif
-endif
 setenv PACT_CC_VERSION  $lcvers
 setenv PACT_CC_PATH     $croot
 setenv PACT_CC_EXE      $cc
@@ -330,17 +321,28 @@ if ($PACT_CC_FAMILY == PATHSCALE) then
    setenv PACT_FC_PATH  $PACT_FC_PATH/lib/$lfvers
 endif
 
-envexp PATH
-envexp PACT_CC_FAMILY
-envexp PACT_CC_VERSION
-envexp PACT_CC_PATH
-envexp PACT_CC_EXE
-envexp PACT_FC_FAMILY
-envexp PACT_FC_VERSION
-envexp PACT_FC_PATH
-envexp PACT_FC_EXE
+dbexp PACT_CC_FAMILY
+dbexp PACT_CC_VERSION
+dbexp PACT_CC_PATH
+dbexp PACT_CC_EXE
+dbexp PACT_FC_FAMILY
+dbexp PACT_FC_VERSION
+dbexp PACT_FC_PATH
+dbexp PACT_FC_EXE
 
 source analyze/numa
+
+# adjust the PATH to find the compiler
+if ($#dirl == 1) then
+   setenv PATH  $dirl[1]':$PATH'
+else
+   if ($dirl[1] == $dirl[2]) then
+      setenv PATH  $dirl[1]':$PATH'
+   else
+      setenv PATH  ${dirl[1]}:${dirl[2]}':$PATH'
+   endif
+endif
+envexp PATH
 
 exit(0)
 

@@ -64,11 +64,10 @@ Note $ALog "Temporary file base: $Tmp"
 Note $ALog "Manager directory: $MngDir"
 Note $ALog ""
 
+dbini BE         ""
 dbini CList      ""
+dbini PFE        "do-run -m"
+dbini CFE        ""
 
 envini MngDir     $cwd
-envini CFE        ""
-envini PFE        "do-run -m"
-envini BE         ""
-envini NM         nm
 

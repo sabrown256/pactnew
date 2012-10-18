@@ -17,6 +17,7 @@ if ($?Log == 1) then
    Note $Log "Analyze: mpi"
 endif
 
+dbini REQUEST_MPI        FALSE
 dbini MD_Pck             ""
 dbini HAVE_OPENMPI       FALSE
 dbini HAVE_MPI_2         FALSE
@@ -28,10 +29,8 @@ dbini DP_Inc             ""
 dbini DP_Lib             ""
 dbini DP_RPath           ""
 
-envini REQUEST_MPI     FALSE
-
 set vl = ""
-set vl = ( $vl Bits CC_Flags LD_Flags )
+set vl = ( $vl BE Bits CC_Flags LD_Flags PFE )
 source $MngDir/write/import-db
 
 # NOTE: because locate-mpi ends up getting DP_RPath on your RPATH

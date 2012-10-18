@@ -10,6 +10,10 @@
 
 dbini NUMA ""
 
+set vl = ""
+set vl = ( $vl PACT_CC_FAMILY )
+source $MngDir/write/import-db
+
 if ($PACT_CC_FAMILY == PGI) then
    /bin/ls /usr/lib*/libnuma*.so >& /dev/null
    if ($status == 0) then

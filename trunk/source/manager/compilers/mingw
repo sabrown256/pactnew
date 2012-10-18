@@ -6,7 +6,7 @@
 
 run analyze/rpath gnu
 
-setenv NM /usr/bin/i686-w64-mingw32-nm
+NM = /usr/bin/i686-w64-mingw32-nm
 
 #CPU          = [ _env_ = Bits ;                 # target CPU
 #                 x86 ;

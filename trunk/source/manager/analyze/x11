@@ -26,9 +26,6 @@ dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
 dbini Std_UseX          TRUE
 
-envini AnaDir           analyze
-envini ALog             $cwd/cfg-$System/log.analyze
-
 set vl = ""
 set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
 set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )

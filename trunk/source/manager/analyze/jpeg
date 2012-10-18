@@ -27,7 +27,7 @@ dbini HAVE_JPEGLIB  FALSE
 set vl = ""
 set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
 set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
-set vl = ( $vl LIB RPATH )
+set vl = ( $vl DAS_ROOT LIB RPATH )
 source $MngDir/write/import-db
 
 # if we have explicitly said we do not want JPEG

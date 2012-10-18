@@ -15,16 +15,6 @@ run analyze/rpath -i init
 # dynamically link dependent libraries by default
 include features/dld
 
-# PACT_CC_ refers to the Compiler Collection used to build PACT
-# rather than COMPILER_ which is overloaded to the extreme
-setenv PACT_CC_FAMILY    generic
-setenv PACT_CC_EXE       `which cc`
-setenv PACT_CC_VERSION   ""
-
-setenv PACT_FC_FAMILY    generic
-setenv PACT_FC_VERSION   ""
-
-C_STD = X99
 setenv TEST_ADVISORY     ""
 
 # GOTCHA: temporarily pass the spec test
@@ -43,12 +33,12 @@ setenv ENV_VARS ${ENV_VARS}:FC_Debug_Default:FC_Optimize_Default
 setenv ENV_VARS ${ENV_VARS}:DP_Inc:DP_Lib:DP_RPath:DP_Path
 setenv ENV_VARS ${ENV_VARS}:LIB:LibM_Lib:LibM_RPath
 setenv ENV_VARS ${ENV_VARS}:MDG_Inc:MDG_Lib:MDG_RPath:MDG_Path
+setenv ENV_VARS ${ENV_VARS}:PACT_CC_FAMILY:PACT_CC_VERSION:PACT_CC_PATH:PACT_CC_EXE
+setenv ENV_VARS ${ENV_VARS}:PACT_FC_FAMILY:PACT_FC_VERSION:PACT_FC_PATH:PACT_FC_EXE
 setenv ENV_VARS ${ENV_VARS}:PY_Inc:PY_Lib:PY_RPath:PY_Path
 setenv ENV_VARS ${ENV_VARS}:TRACKER_Exe:HAVE_PYTHON:HAVE_OPENMP
 setenv ENV_VARS ${ENV_VARS}:CFE:PFE:CROSS_COMPILE
 
-setenv PTHREAD_POSIX     FALSE
-setenv PTHREAD_OMP       FALSE
 setenv DO_RUN_DBG        none
 setenv DO_RUN_MPI        none
 setenv DO_RUN_CROSS      none
@@ -58,18 +48,26 @@ setenv DO_RUN_CROSS      none
 setenv RootInc  /usr/include
 setenv RootLib  /usr/lib
 
-setenv LIB       lib
-
 setenv SUFFIXES  '.i'
 
+# PACT_CC_ refers to the Compiler Collection used to build PACT
+# rather than COMPILER_ which is overloaded to the extreme
+PACT_CC_FAMILY   = generic
+PACT_CC_EXE      = `which cc`
+PACT_CC_VERSION  = ""
+PACT_FC_FAMILY   = generic
+PACT_FC_VERSION  = ""
+C_STD            = X99
+LIB              = lib
 MAKE_Shared_Libs = FALSE
-FilterDir       =
-WARN_PATTERN    =
-ERR_PATTERN     =
-SchemeSpokes    = netcdf
-CSpokes         =
-ThreadLibExt    =
-F90_MOD_FLAG    = -I
+FilterDir        =
+WARN_PATTERN     =
+ERR_PATTERN      =
+SchemeSpokes     = netcdf
+CSpokes          =
+ThreadLibExt     =
+F90_MOD_FLAG     = -I
+PTHREAD_POSIX    = FALSE
 
 Tool LD {
    SpokeDepLib =

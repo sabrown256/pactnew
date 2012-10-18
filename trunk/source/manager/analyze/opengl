@@ -26,8 +26,6 @@ dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
 dbini Std_UseOGL        FALSE
 
-envini OS_Name           `uname -s`
-
 set vl = ""
 set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
 set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )

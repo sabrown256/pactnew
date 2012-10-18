@@ -12,7 +12,7 @@ set Me = $0
 source $Me:h/common
 
 set vl = ""
-set vl = ( $vl Cfe_CC_Exe )
+set vl = ( $vl CFE Cfe_CC_Exe )
 source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------
