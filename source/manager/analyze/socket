@@ -20,6 +20,7 @@ Note $ALog ""
 dbini HAVE_SOCKETS    TRUE
 
 set vl = ""
+set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
 set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
 source $MngDir/write/import-db
 

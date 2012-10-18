@@ -93,14 +93,15 @@ endif
 #--------------------------------------------------------------------------
 
 # export the results
+dbexp CC_Exe
+dbexp CC_Flags
 dbexp CC_Debug_Default
 dbexp CC_Optimize_Default
+
 dbexp FC_Debug_Default
 dbexp FC_Optimize_Default
 
-dbexp CC_Exe
-dbexp CC_Flags
-envexp Cfe_CC_Inc
+dbexp Cfe_CC_Inc
 
 exit(0)
 

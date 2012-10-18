@@ -28,7 +28,7 @@ dbini Cfg_LD_RPath   ""
 dbini DP_Lib         ""
 
 set vl = ""
-set vl = ( $vl Cfg_RPATH OS_Name )
+set vl = ( $vl Cfe_CC_Exe Cfg_RPATH OS_Name )
 source $MngDir/write/import-db
 
 if (!(-x "$LD_Exe")) then

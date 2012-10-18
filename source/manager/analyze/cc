@@ -416,9 +416,9 @@ dbexp Cfg_CC_Exe
 dbexp Cfg_CC_Flags
 dbexp Cfg_CC_Inc
 
-envexp Cfe_CC_Exe
-envexp Cfe_CC_Flags
-envexp Cfe_CC_Inc
+dbexp Cfe_CC_Exe
+dbexp Cfe_CC_Flags
+dbexp Cfe_CC_Inc
 
 dbexp CXX_Exe
 dbexp CXX_Flags

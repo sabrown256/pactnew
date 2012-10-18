@@ -13,6 +13,10 @@ source $Me:h/common
 
 dbini HAVE_ANSI_C9X_COMPLEX TRUE
 
+set vl = ""
+set vl = ( $vl Cfe_CC_Exe )
+source $MngDir/write/import-db
+
 Note $ALog "HAVE_ANSI_C9X_COMPLEX = $HAVE_ANSI_C9X_COMPLEX"
 
 if ($HAVE_ANSI_C9X_COMPLEX == TRUE) then

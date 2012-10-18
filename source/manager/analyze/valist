@@ -14,6 +14,10 @@ source $Me:h/common
 setenv HAVE_VA_COPY FALSE
 setenv HAVE_VA_LIST TRUE
 
+set vl = ""
+set vl = ( $vl Cfe_CC_Exe )
+source $MngDir/write/import-db
+
 cat << EOF >! $Tmp.c
 #include <stdarg.h>
 int foo(va_list lst)
