@@ -24,6 +24,7 @@ dbini Z_RPath   $RootLib
 dbini Z_Path    /usr
 
 set vl = ""
+set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
 set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
 set vl = ( $vl LD_Lib LIB LibM_Lib RPATH )
 source $MngDir/write/import-db

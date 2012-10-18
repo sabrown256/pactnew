@@ -18,10 +18,8 @@ Note $Log "Analyze: poll"
 dbini HAVE_SELECT   FALSE
 dbini HAVE_STREAMS  FALSE
 
-dbget HAVE_SELECT
-dbget HAVE_STREAMS
-
 set vl = ""
+set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
 set vl = ( $vl Cfe_LD_Flags Cfe_LD_RPath )
 source $MngDir/write/import-db
 

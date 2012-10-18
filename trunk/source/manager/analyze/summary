@@ -15,7 +15,7 @@ set vl = ""
 set vl = ( $vl HAVE_FORTRAN )
 set vl = ( $vl HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY )
 set vl = ( $vl MAKE_Shared_Libs PY_Exe PY_DirPy PY_DirSrc PY_DirDst )
-set vl = ( $vl CC_Exe )
+set vl = ( $vl CC_Exe Cfe_CC_Exe )
 set vl = ( $vl FC_Exe FC_Flags Cfe_FC_Exe Cfe_FC_Flags )
 set vl = ( $vl Yacc_Exe )
 

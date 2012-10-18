@@ -8,9 +8,12 @@
 # include "cpyright.h"
 #
 
-
 set Me = $0
 source $Me:h/common
+
+set vl = ""
+set vl = ( $vl Cfe_CC_Exe )
+source $MngDir/write/import-db
 
 cat << EOF >! $Tmp.c
 inline int b(int y)
