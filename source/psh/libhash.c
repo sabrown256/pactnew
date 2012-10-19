@@ -1,0 +1,355 @@
+/*
+ * LIBHASH.C - quick and dirty hash tables
+ *
+ * #include "cpyright.h"
+ *
+ */
+
+#ifndef LIBHASH
+
+#define LIBHASH
+
+#include "common.h"
+
+#define HSZLARGE  521             /* large table size */
+
+typedef int (*PFIntUn)(void *a);
+typedef int (*PFIntBin)(void *a, void *b);
+typedef long (*PFKeyHash)(void *s, int size);         /* hash */
+typedef struct s_hashel hashel;
+typedef struct s_hashtab hashtab;
+
+struct s_hashel                 
+   {char *name;
+    char *type;
+    void *def;
+    int free;
+    hashel *next;};
+
+struct s_hashtab
+   {int size;
+    int nelements;
+    PFKeyHash hash;
+    PFIntBin comp;
+    hashel **table;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _HASH_NAME - compute hash value for string KEY in a table of SIZE */
+
+static long _hash_name(void *key, int size)
+   {long v;
+    char *s;
+
+    s = (char *) key;
+
+    for (v = 0L; *s != '\0'; s++)
+        v = (v << 1) ^ (*s);
+
+    v = ((long) abs(v)) % (long) size;
+
+    return(v);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAKE_HASH_TABLE - make an undifferentiated hash table */
+
+hashtab *make_hash_table(int sz)
+   {hashtab *tab;
+    hashel **tb;
+    int i;
+
+    if (sz < 0)
+       sz = HSZLARGE;
+
+/* allocate a new hash table */
+    tab = MAKE(hashtab);
+
+    if (tab != NULL)
+       {tb = MAKE_N(hashel *, sz);
+
+        if (tb != NULL)
+           {tab->size      = sz;
+            tab->nelements = 0;
+            tab->table     = tb;
+            tab->hash      = _hash_name;
+            tab->comp      = (PFIntBin) strcmp;
+
+/* explicitly NULL the pointers */
+            for (i = 0; i < sz; i++)
+	        tb[i] = NULL;}
+
+	else
+           FREE(tab);};
+
+    return(tab);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _FREE_HASHEL - free the hashel HP */
+
+static void _free_hashel(hashel *hp, PFIntUn rel)
+   {
+
+    if (rel != NULL)
+       rel(hp->def);
+
+    FREE(hp->name);
+    FREE(hp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SPLICE_OUT_HASHEL - if THS matches KEY splice it out of TAB */
+
+static int _splice_out_hashel(hashtab *tab, void *key,
+			      hashel **prv, hashel *ths)
+   {int ok;
+    PFIntBin comp;
+
+    comp = tab->comp;
+
+    ok = comp(key, ths->name);
+    if (ok == 0)
+       {*prv = ths->next;
+
+	_free_hashel(ths, NULL);
+
+	tab->nelements--;};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* HASH_REMOVE - remove the entry corresponding to the specified KEY 
+ *             - return TRUE iff successfully removed 
+ */
+
+int hash_remove(hashtab *tab, void *key)
+   {int sz, ok, rv;
+    long i;
+    hashel *hp, *curr, **tb;
+    PFKeyHash hash;
+
+    rv = FALSE;
+
+    sz   = tab->size;
+    tb   = tab->table;
+    hash = tab->hash;
+
+    i  = hash(key, sz);
+    hp = tb[i];
+
+    if (hp != NULL)
+
+/* check for match in first hash element */
+       {if (_splice_out_hashel(tab, key, &tb[i], hp) == 0)
+	   rv = TRUE;
+
+/* otherwise search for the matching hash element */
+        else
+           for (i = 0;
+		(hp != NULL) && (hp->next != NULL) && (rv == FALSE);
+		hp = hp->next, i++)
+               {curr = hp->next;
+		ok   = _splice_out_hashel(tab, key, &hp->next, curr);
+		if (ok == 0)
+		   rv = TRUE;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* HASH_CLEAR - remove all entries in the given hash table TAB
+ *            - does not free the table
+ */
+
+void hash_clear(hashtab *tab)
+   {int i, sz;
+    hashel **tb, *hp, *next;
+
+    sz = tab->size;
+    tb = tab->table;
+
+    for (i = 0; i < sz; i++)
+        {for (hp = tb[i]; hp != NULL; hp = next)
+             {next = hp->next;
+	      _free_hashel(hp, NULL);};
+         tb[i] = NULL;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* HASH_FREE - release a hash table */
+
+void hash_free(hashtab *tab)
+   {
+
+    hash_clear(tab);
+
+    FREE(tab->table);
+    FREE(tab);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* HASH_LOOKUP - lookup the hashel for the given KEY */
+
+hashel *hash_lookup(hashtab *tab, void *key)
+   {int sz;
+    long hv;
+    hashel *rv, *hp, **tb;
+    PFKeyHash hash;
+    PFIntBin comp;
+
+    rv = NULL;
+
+/* sanity checks */
+    if ((key != NULL) && (tab != NULL))
+       {hash = tab->hash;
+	comp = tab->comp;
+
+	sz = tab->size;
+	tb = tab->table;
+	hv = hash(key, sz);
+
+	for (hp = tb[hv]; hp != NULL; hp = hp->next)
+	    {if (comp(key, hp->name) == 0)
+	        {rv = hp;
+		 break;};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* HASH_DEF_LOOKUP - lookup the actual object for the given KEY */
+
+void *hash_def_lookup(hashtab *tab, void *key)
+   {hashel *hp;
+    void *obj;
+  
+    obj = NULL;
+
+    if (tab != NULL)
+       {hp  = hash_lookup(tab, key);
+	obj = (hp != NULL) ? hp->def : NULL;};
+
+    return(obj);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* HASH_INSTALL - install an object in the hash table
+ *              - WARNING: do NOT use literals or volatiles for the type;
+ *              - for efficiency they are not strsave'd
+ */
+
+hashel *hash_install(hashtab *tab, void *key, void *obj, char *type,
+		     int lookup)
+   {hashel *hp;
+    long hv;
+
+/* sanity checks */
+    if ((tab == NULL) || (key == NULL))
+       return(NULL);
+
+/* is it already in the hash table? */
+    if (lookup)
+       hp = hash_lookup(key, tab);
+    else
+       hp = NULL;
+
+/* if not found, then insert it */
+    if (hp == NULL)
+       {hp = MAKE(hashel);
+        if (hp != NULL)
+
+/* setup the key */
+	   {hp->name = STRSAVE(key);
+	    if (hp->name == NULL)
+	       FREE(hp);
+
+	    if (hp != NULL)
+
+/* add to the head of the bucket */
+	       {hv = tab->hash(hp->name, tab->size);
+
+	        hp->next = tab->table[hv];
+		tab->table[hv] = hp;
+
+		(tab->nelements)++;};};};
+
+/* update valid hash elements inserted or looked-up */
+    if (hp != NULL)
+       {hp->type = type;
+        hp->def  = obj;};
+
+    return(hp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* HASH_DUMP - return an array of pointers whose values point to the
+ *           - keys of the elements in the given hash table
+ */
+
+char **hash_dump(hashtab *tab, char *patt, char *type, int sort)
+   {int i, sz, ns;
+    char **sa;
+    hashel *hp, **tb;
+
+    if (tab == NULL)
+       return(NULL);
+
+/* allocate a list of pointers to the keys in the hash table */
+    sa = MAKE_N(char *, tab->nelements);
+
+    if (sa == NULL)
+       return(NULL);
+
+/* fill in the list of pointers to keys in the hash table */
+    sz = tab->size;
+    tb = tab->table;
+
+    ns = 0;
+
+    for (i = 0; i < sz; i++)
+        {for (hp = tb[i]; hp != NULL; hp = hp->next)
+             {if ((type == NULL) || (strcmp(type, hp->type) == 0))
+                 {if (patt == NULL)
+                     sa[ns++] = hp->name;
+                  else if (match(hp->name, patt))
+                     sa[ns++] = hp->name;};};};
+
+/* check that the number of names found is what is expected */
+    if (ns > tab->nelements)
+       {FREE(sa);}
+
+    else
+       {REMAKE(sa, char *, ns + 1);
+	sa[ns] = NULL;
+
+/* sort the names
+ * GOTCHA: hashtab should maintain a sort function pointer
+ */
+	if (sort)
+	   string_sort(sa, ns);};
+
+    return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#endif
