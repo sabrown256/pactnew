@@ -1,0 +1,23 @@
+#!/bin/csh -f
+#
+# LOCO - log command before running it
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set cmd  = $0
+set args = ( $argv )
+set log  = $HOME/.log.loco
+
+touch $log
+
+set date = ( "["`date`"]:" )
+
+echo "---------------------------------------------------------------" >>& $log
+echo "${date} $cmd $args" >>& $log
+
+$cmd $args
+
+exit($status)

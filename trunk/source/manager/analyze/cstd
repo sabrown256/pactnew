@@ -149,7 +149,7 @@ echo "Standard mandatory features:"
 
 # ALIGNMENT - specifications:
 #           -   _Alignas specifier
-#           -   alignof
+#           -   _Alignof
 #           -   aligned_alloc
 #           - see <stdalign.h>
 
