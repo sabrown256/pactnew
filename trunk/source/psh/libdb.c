@@ -12,8 +12,7 @@
 
 #define LIBDB
 
-extern char
- *name_log(char *root);
+#include "libhash.c"
 
 #define EOM     "++ok++"
 
@@ -32,13 +31,39 @@ struct s_database
     char *file;                 /* name of the file image of the database */
     char *flog;                 /* name of the log file */
     char *fpid;                 /* name of the pid file */
-    char **entries;};
+    char **entries;
+    hashtab *tab;};
 
 static int
  ioc_server = CLIENT,
  dbg_db     = FALSE;
 
+extern char
+ *name_log(char *root);
+
 #include "libsock.c"
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* NAME_LOG - make conventional LOG name from ROOT
+ *          - .../foo -> .../foo.log
+ */
+
+char *name_log(char *root)
+   {char *p;
+    static char log[MAXLINE];
+
+    p = NULL;
+
+    if (root == NULL)
+       root = cgetenv(TRUE, "PERDB_PATH");
+
+    if (root != NULL)
+       {snprintf(log, MAXLINE, "%s.log", root);
+	p = log;};
+
+    return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -161,28 +186,6 @@ void free_client(client *cl)
     return;}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NAME_LOG - make conventional LOG name from ROOT
- *          - .../foo -> .../foo.log
- */
-
-char *name_log(char *root)
-   {char *p;
-    static char log[MAXLINE];
-
-    p = NULL;
-
-    if (root == NULL)
-       root = cgetenv(TRUE, "PERDB_PATH");
-
-    if (root != NULL)
-       {snprintf(log, MAXLINE, "%s.log", root);
-	p = log;};
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
 
 /*                             SERVER SIDE ROUTINES                         */
 
@@ -216,13 +219,17 @@ char *name_pid(char *root)
 
 void reset_db(database *db)
    {int i, nv;
-    char **vars;
+    char *v, **vars;
+    hashtab *tab;
 
     nv   = db->ne;
     vars = db->entries;
+    tab  = db->tab;
     for (i = 0; i < nv; i++)
-        {cunsetenv(vars[i]);
-	 FREE(vars[i]);
+        {v = vars[i];
+	 cunsetenv(v);
+	 hash_remove(tab, v);
+	 FREE(v);
 	 vars[i] = NULL;};
 
     db->ne = 0;
@@ -239,10 +246,12 @@ void reset_db(database *db)
 char *put_db(database *db, char *var, char *val)
    {int i, nv;
     char **vars;
+    hashtab *tab;
 
     if (var != NULL)
        {nv   = db->ne;
 	vars = db->entries;
+	tab  = db->tab;
 	for (i = 0; i < nv; i++)
 	    {if (strcmp(var, vars[i]) == 0)
 	        break;};
@@ -254,6 +263,7 @@ char *put_db(database *db, char *var, char *val)
 	if (val == NULL)
 	   val = "";
 
+	hash_install(tab, var, val, "char *", TRUE);
 	csetenv(var, val);
 
 	log_activity(db->flog, dbg_db, 1,
@@ -400,6 +410,7 @@ int save_db(int fd, database *db, char **var, FILE *fp, const char *fmt)
    {int i, l, rv, nv;
     char s[LRG], t[LRG];
     char *vl, *vr, **vrs;
+    hashtab *tab;
     client *cl;
 
     rv = FALSE;
@@ -408,8 +419,9 @@ int save_db(int fd, database *db, char **var, FILE *fp, const char *fmt)
        {cl = make_client(db->root, SERVER);
 	cl->fd = fd;
 
-        vrs = db->entries;
 	nv  = db->ne;
+        vrs = db->entries;
+	tab = db->tab;
 	for (i = 0; i < nv; i++)
 	    {vr = vrs[i];
 	     if (var == NULL)
@@ -418,7 +430,8 @@ int save_db(int fd, database *db, char **var, FILE *fp, const char *fmt)
 	        {vl = NULL;
 		 for (l = 0; var[l] != NULL; l++)
 		     {if (strcmp(var[l], vr) == 0)
-		         {vl = cgetenv(TRUE, vr);
+		         {vl = hash_def_lookup(tab, vr);
+			  vl = cgetenv(TRUE, vr);
 			  break;};};
 		 if (vl == NULL)
 		    continue;};
@@ -557,7 +570,8 @@ static database *make_db(char *root)
 	db->file    = fname;
 	db->flog    = flog;
 	db->fpid    = fpid;
-	db->entries = NULL;}
+	db->entries = NULL;
+	db->tab     = make_hash_table(-1);}
     else
        {FREE(flog);
 	FREE(fname);
@@ -574,7 +588,8 @@ void free_db(database *db)
    {
 
     if (db != NULL)
-       {free_strings(db->entries);
+       {hash_free(db->tab);
+	free_strings(db->entries);
 	FREE(db->root);
 	FREE(db->file);
 	FREE(db->flog);
