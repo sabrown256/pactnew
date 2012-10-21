@@ -267,7 +267,7 @@ hashel *hash_install(hashtab *tab, void *key, void *obj, char *type,
 
 /* is it already in the hash table? */
     if (lookup)
-       hp = hash_lookup(key, tab);
+       hp = hash_lookup(tab, key);
     else
        hp = NULL;
 
