@@ -175,17 +175,17 @@ extern char
 typedef void (*PFSort)(void **list, int n);
 
 typedef struct s_hashel hashel;
-typedef struct s_hashtab HASHTAB;
+typedef struct s_HASHTAB HASHTAB;
 typedef struct s_hashiter hashiter;
 
-struct s_hashel                 
+struct s_hashel
    {char *name;
     char *type;
     void *def;
     int free;
     struct s_hashel *next;};
 
-struct s_hashtab
+struct s_HASHTAB
    {int size;
     int nelements;
     int docp;

@@ -24,14 +24,13 @@ enum e_ckind
 typedef enum e_ckind ckind;
 
 typedef struct s_database database;
+typedef struct s_vardes vardes;
 
 struct s_database
-   {int ne;
-    char *root;                 /* root path name of database */
+   {char *root;                 /* root path name of database */
     char *file;                 /* name of the file image of the database */
     char *flog;                 /* name of the log file */
     char *fpid;                 /* name of the pid file */
-    char **entries;
     hashtab *tab;};
 
 static int
@@ -42,6 +41,13 @@ extern char
  *name_log(char *root);
 
 #include "libsock.c"
+
+struct s_vardes
+   {char *fmt;
+    client *cl;
+    database *db;
+    char **vars;
+    FILE *fp;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -215,24 +221,41 @@ char *name_pid(char *root)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _GET_VAR - return the value of variable VAR */
+
+static char *_get_var(database *db, char *var)
+   {char *val;
+    hashtab *tab;
+
+    tab = db->tab;
+    val = hash_def_lookup(tab, var);
+    if (val == NULL)
+       val = cnoval();
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SET_VAR - return the value of variable VAR */
+
+static void _set_var(database *db, char *var, char *val)
+   {hashtab *tab;
+
+    tab = db->tab;
+    hash_install(tab, var, STRSAVE(val), "char *", TRUE);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* RESET_DB - reset DB */
 
 void reset_db(database *db)
-   {int i, nv;
-    char *v, **vars;
-    hashtab *tab;
+   {
 
-    nv   = db->ne;
-    vars = db->entries;
-    tab  = db->tab;
-    for (i = 0; i < nv; i++)
-        {v = vars[i];
-	 cunsetenv(v);
-	 hash_remove(tab, v);
-	 FREE(v);
-	 vars[i] = NULL;};
-
-    db->ne = 0;
+    hash_clear(db->tab);
 
     log_activity(db->flog, dbg_db, 1, "SERVER", "reset");
 
@@ -244,27 +267,13 @@ void reset_db(database *db)
 /* PUT_DB - add VAR to DB */
 
 char *put_db(database *db, char *var, char *val)
-   {int i, nv;
-    char **vars;
-    hashtab *tab;
+   {
 
     if (var != NULL)
-       {nv   = db->ne;
-	vars = db->entries;
-	tab  = db->tab;
-	for (i = 0; i < nv; i++)
-	    {if (strcmp(var, vars[i]) == 0)
-	        break;};
-
-	if (i >= nv)
-	   {db->entries = lst_push(vars, var);
-	    db->ne++;};
-
-	if (val == NULL)
+       {if (val == NULL)
 	   val = "";
 
-	hash_install(tab, var, val, "char *", TRUE);
-	csetenv(var, val);
+	_set_var(db, var, val);
 
 	log_activity(db->flog, dbg_db, 1,
 		     "SERVER", "put |%s|=|%s|", var, val);};
@@ -366,7 +375,7 @@ char *get_db(database *db, char *var)
 
 /* get the entire structure */
 	 else if (val == NULL)
-	    val = cgetenv(TRUE, pm);
+            val = _get_var(db, pm);
 
 /* find the member named by pt */
 	 else if (_is_struct(&pk, val) == TRUE)
@@ -404,14 +413,80 @@ char *get_db(database *db, char *var)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SHOW_VAR - show variable VR value */
+
+static int _show_var(database *db, client *cl, FILE *fp, const char *fmt,
+		     char *vr, char **vars)
+   {int l, rv;
+    char s[LRG], t[LRG];
+    char *vl;
+
+    rv = FALSE;
+
+    if (vars == NULL)
+       vl = _get_var(db, vr);
+    else
+       {vl = NULL;
+	for (l = 0; vars[l] != NULL; l++)
+	    {if (strcmp(vars[l], vr) == 0)
+	        {vl = _get_var(db, vr);
+		 break;};};};
+
+    if (vl != NULL)
+       {if ((vl[0] != '"') && (strpbrk(vl, " \t") != NULL))
+	   {snprintf(t, MAXLINE, "\"%s\"", vl);
+	    vl = t;};
+
+	if (fmt == NULL)
+	   snprintf(s, LRG, "%s=%s", vr, vl);
+	else
+	   snprintf(s, LRG, fmt, vr, vl);
+
+/* write to the communicator if FP is NULL */
+	if (fp == NULL)
+	   comm_write(cl, s, 0, 10);
+	else
+	   fprintf(fp, "%s\n", s);
+
+	rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SAVE_VAR - save variable VR from HP to FP */
+
+static int _save_var(hashen *hp, void *a)
+   {int rv;
+    char *fmt, *vr, **vars;
+    FILE *fp;
+    client *cl;
+    database *db;
+    vardes *pv;
+
+    pv = (vardes *) a;
+
+    cl   = pv->cl;
+    db   = pv->db;
+    fmt  = pv->fmt;
+    fp   = pv->fp;
+    vars = pv->vars;
+
+    vr = hp->name;
+    rv = _show_var(db, cl, fp, fmt, vr, vars);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SAVE_DB - save variable VAR to FP */
 
-int save_db(int fd, database *db, char **var, FILE *fp, const char *fmt)
-   {int i, l, rv, nv;
-    char s[LRG], t[LRG];
-    char *vl, *vr, **vrs;
-    hashtab *tab;
+int save_db(int fd, database *db, char **vars, FILE *fp, const char *fmt)
+   {int rv;
     client *cl;
+    vardes pv;
 
     rv = FALSE;
 
@@ -419,37 +494,13 @@ int save_db(int fd, database *db, char **var, FILE *fp, const char *fmt)
        {cl = make_client(db->root, SERVER);
 	cl->fd = fd;
 
-	nv  = db->ne;
-        vrs = db->entries;
-	tab = db->tab;
-	for (i = 0; i < nv; i++)
-	    {vr = vrs[i];
-	     if (var == NULL)
-	        vl = cgetenv(TRUE, vr);
-	     else
-	        {vl = NULL;
-		 for (l = 0; var[l] != NULL; l++)
-		     {if (strcmp(var[l], vr) == 0)
-		         {vl = hash_def_lookup(tab, vr);
-			  vl = cgetenv(TRUE, vr);
-			  break;};};
-		 if (vl == NULL)
-		    continue;};
+	pv.cl   = cl;
+	pv.fmt  = (char *) fmt;
+	pv.db   = db;
+	pv.fp   = fp;
+	pv.vars = vars;
 
-	     if ((vl[0] != '"') && (strpbrk(vl, " \t") != NULL))
-	        {snprintf(t, MAXLINE, "\"%s\"", vl);
-		 vl = t;};
-
-	     if (fmt == NULL)
-	        snprintf(s, LRG, "%s=%s", vr, vl);
-	     else
-	        snprintf(s, LRG, fmt, vr, vl);
-
-/* write to the communicator if FP is NULL */
-	     if (fp == NULL)
-	        comm_write(cl, s, 0, 10);
-	     else
-	        fprintf(fp, "%s\n", s);};
+        hash_foreach(db->tab, _save_var, &pv);
 
 	cl->fd = -1;
 	free_client(cl);
@@ -565,12 +616,10 @@ static database *make_db(char *root)
 
     db = MAKE(database);
     if (db != NULL)
-       {db->ne      = 0;
-	db->root    = STRSAVE(root);
+       {db->root    = STRSAVE(root);
 	db->file    = fname;
 	db->flog    = flog;
 	db->fpid    = fpid;
-	db->entries = NULL;
 	db->tab     = make_hash_table(-1);}
     else
        {FREE(flog);
@@ -589,7 +638,7 @@ void free_db(database *db)
 
     if (db != NULL)
        {hash_free(db->tab);
-	free_strings(db->entries);
+
 	FREE(db->root);
 	FREE(db->file);
 	FREE(db->flog);
@@ -629,7 +678,7 @@ database *db_srv_load(char *root)
 	    fclose(fp);};
 
 	log_activity(db->flog, dbg_db, 1, "SERVER", "load %d |%s|",
-		     db->ne, db->file);};
+		     db->tab->ne, db->file);};
 
     return(db);}
 
@@ -700,7 +749,7 @@ int db_srv_save(int fd, database *db)
 
     if (db != NULL)
        {log_activity(db->flog, dbg_db, 1, "SERVER", "save %d |%s|",
-		     db->ne, db->file);
+		     db->tab->ne, db->file);
 
 	fp = fopen(db->file, "w");
 	if (fp != NULL)

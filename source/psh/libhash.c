@@ -16,22 +16,22 @@
 typedef int (*PFIntUn)(void *a);
 typedef int (*PFIntBin)(void *a, void *b);
 typedef long (*PFKeyHash)(void *s, int size);         /* hash */
-typedef struct s_hashel hashel;
+typedef struct s_hashen hashen;
 typedef struct s_hashtab hashtab;
 
-struct s_hashel                 
+struct s_hashen                 
    {char *name;
     char *type;
     void *def;
     int free;
-    hashel *next;};
+    hashen *next;};
 
 struct s_hashtab
-   {int size;
-    int nelements;
+   {int size;              /* number of bins in hash table */
+    int ne;                /* number of entries in hash table */
     PFKeyHash hash;
     PFIntBin comp;
-    hashel **table;};
+    hashen **table;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -58,7 +58,7 @@ static long _hash_name(void *key, int size)
 
 hashtab *make_hash_table(int sz)
    {hashtab *tab;
-    hashel **tb;
+    hashen **tb;
     int i;
 
     if (sz < 0)
@@ -68,11 +68,11 @@ hashtab *make_hash_table(int sz)
     tab = MAKE(hashtab);
 
     if (tab != NULL)
-       {tb = MAKE_N(hashel *, sz);
+       {tb = MAKE_N(hashen *, sz);
 
         if (tb != NULL)
            {tab->size      = sz;
-            tab->nelements = 0;
+            tab->ne = 0;
             tab->table     = tb;
             tab->hash      = _hash_name;
             tab->comp      = (PFIntBin) strcmp;
@@ -89,9 +89,9 @@ hashtab *make_hash_table(int sz)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _FREE_HASHEL - free the hashel HP */
+/* _FREE_HASHEN - free the hashen HP */
 
-static void _free_hashel(hashel *hp, PFIntUn rel)
+static void _free_hashen(hashen *hp, PFIntUn rel)
    {
 
     if (rel != NULL)
@@ -105,10 +105,10 @@ static void _free_hashel(hashel *hp, PFIntUn rel)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SPLICE_OUT_HASHEL - if THS matches KEY splice it out of TAB */
+/* _SPLICE_OUT_HASHEN - if THS matches KEY splice it out of TAB */
 
-static int _splice_out_hashel(hashtab *tab, void *key,
-			      hashel **prv, hashel *ths)
+static int _splice_out_hashen(hashtab *tab, void *key,
+			      hashen **prv, hashen *ths)
    {int ok;
     PFIntBin comp;
 
@@ -118,9 +118,9 @@ static int _splice_out_hashel(hashtab *tab, void *key,
     if (ok == 0)
        {*prv = ths->next;
 
-	_free_hashel(ths, NULL);
+	_free_hashen(ths, NULL);
 
-	tab->nelements--;};
+	tab->ne--;};
 
     return(ok);}
 
@@ -134,7 +134,7 @@ static int _splice_out_hashel(hashtab *tab, void *key,
 int hash_remove(hashtab *tab, void *key)
    {int sz, ok, rv;
     long i;
-    hashel *hp, *curr, **tb;
+    hashen *hp, *curr, **tb;
     PFKeyHash hash;
 
     rv = FALSE;
@@ -149,7 +149,7 @@ int hash_remove(hashtab *tab, void *key)
     if (hp != NULL)
 
 /* check for match in first hash element */
-       {if (_splice_out_hashel(tab, key, &tb[i], hp) == 0)
+       {if (_splice_out_hashen(tab, key, &tb[i], hp) == 0)
 	   rv = TRUE;
 
 /* otherwise search for the matching hash element */
@@ -158,7 +158,7 @@ int hash_remove(hashtab *tab, void *key)
 		(hp != NULL) && (hp->next != NULL) && (rv == FALSE);
 		hp = hp->next, i++)
                {curr = hp->next;
-		ok   = _splice_out_hashel(tab, key, &hp->next, curr);
+		ok   = _splice_out_hashen(tab, key, &hp->next, curr);
 		if (ok == 0)
 		   rv = TRUE;};};
 
@@ -173,7 +173,7 @@ int hash_remove(hashtab *tab, void *key)
 
 void hash_clear(hashtab *tab)
    {int i, sz;
-    hashel **tb, *hp, *next;
+    hashen **tb, *hp, *next;
 
     sz = tab->size;
     tb = tab->table;
@@ -181,7 +181,7 @@ void hash_clear(hashtab *tab)
     for (i = 0; i < sz; i++)
         {for (hp = tb[i]; hp != NULL; hp = next)
              {next = hp->next;
-	      _free_hashel(hp, NULL);};
+	      _free_hashen(hp, NULL);};
          tb[i] = NULL;};
 
     return;}
@@ -204,12 +204,12 @@ void hash_free(hashtab *tab)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* HASH_LOOKUP - lookup the hashel for the given KEY */
+/* HASH_LOOKUP - lookup the hashen for the given KEY */
 
-hashel *hash_lookup(hashtab *tab, void *key)
+hashen *hash_lookup(hashtab *tab, void *key)
    {int sz;
     long hv;
-    hashel *rv, *hp, **tb;
+    hashen *rv, *hp, **tb;
     PFKeyHash hash;
     PFIntBin comp;
 
@@ -237,7 +237,7 @@ hashel *hash_lookup(hashtab *tab, void *key)
 /* HASH_DEF_LOOKUP - lookup the actual object for the given KEY */
 
 void *hash_def_lookup(hashtab *tab, void *key)
-   {hashel *hp;
+   {hashen *hp;
     void *obj;
   
     obj = NULL;
@@ -256,9 +256,9 @@ void *hash_def_lookup(hashtab *tab, void *key)
  *              - for efficiency they are not strsave'd
  */
 
-hashel *hash_install(hashtab *tab, void *key, void *obj, char *type,
+hashen *hash_install(hashtab *tab, void *key, void *obj, char *type,
 		     int lookup)
-   {hashel *hp;
+   {hashen *hp;
     long hv;
 
 /* sanity checks */
@@ -273,7 +273,7 @@ hashel *hash_install(hashtab *tab, void *key, void *obj, char *type,
 
 /* if not found, then insert it */
     if (hp == NULL)
-       {hp = MAKE(hashel);
+       {hp = MAKE(hashen);
         if (hp != NULL)
 
 /* setup the key */
@@ -289,7 +289,7 @@ hashel *hash_install(hashtab *tab, void *key, void *obj, char *type,
 	        hp->next = tab->table[hv];
 		tab->table[hv] = hp;
 
-		(tab->nelements)++;};};};
+		(tab->ne)++;};};};
 
 /* update valid hash elements inserted or looked-up */
     if (hp != NULL)
@@ -301,6 +301,30 @@ hashel *hash_install(hashtab *tab, void *key, void *obj, char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* HASH_FOREACH - return an array of pointers whose values point to the
+ *              - keys of the elements in the given hash table
+ */
+
+int hash_foreach(hashtab *tab, int (*fnc)(hashen *hp, void *a), void *a)
+   {int i, rv, sz;
+    hashen *hp, **tb;
+
+    rv = TRUE;
+
+    if (tab != NULL)
+       {sz = tab->size;
+	tb = tab->table;
+
+	for (i = 0; i < sz; i++)
+	    {for (hp = tb[i]; hp != NULL; hp = hp->next)
+		 {if (hp != NULL)
+		     rv &= fnc(hp, a);};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* HASH_DUMP - return an array of pointers whose values point to the
  *           - keys of the elements in the given hash table
  */
@@ -308,13 +332,13 @@ hashel *hash_install(hashtab *tab, void *key, void *obj, char *type,
 char **hash_dump(hashtab *tab, char *patt, char *type, int sort)
    {int i, sz, ns;
     char **sa;
-    hashel *hp, **tb;
+    hashen *hp, **tb;
 
     if (tab == NULL)
        return(NULL);
 
 /* allocate a list of pointers to the keys in the hash table */
-    sa = MAKE_N(char *, tab->nelements);
+    sa = MAKE_N(char *, tab->ne);
 
     if (sa == NULL)
        return(NULL);
@@ -334,7 +358,7 @@ char **hash_dump(hashtab *tab, char *patt, char *type, int sort)
                      sa[ns++] = hp->name;};};};
 
 /* check that the number of names found is what is expected */
-    if (ns > tab->nelements)
+    if (ns > tab->ne)
        {FREE(sa);}
 
     else
