@@ -258,23 +258,28 @@ static void term_connection(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO_SAVE - save the database variables
- *         - syntax is
- *         -    save:[<name>] <var>*
- *         - where
- *         -   <name> is a database name
- *         -          if <name> is stdout dumps to stdout
- *         -          else if <name> is full path use it
- *         -          otherwise database will be named <root>.<name>.db
- *         -          default is <root>.db
- *         -   <var>  variable name to be saved
- *         -          if no variables specified all are saved
+/* DO_SAVE - save the database variables specified by S
+ *         - syntax of S is
+ *         -    [<opt>] <var>*
+ *         -    <opt>    := [<syntax>:]<inf>:
+ *         -    <syntax> := db | csh | sh
+ *         -    <inf>    := stdin | stdout | stderr | <db> | <file>
+ *         -    <db>     := <identifier>
+ *         -    <file>   := <full-path>
+ *         -     <var>   := variable name to be saved
+ *         - if <inf> is stdout or stderr dumps to that device
+ *         - else if <inf> is full path saves to specified file
+ *         - otherwise database will be named <root>.<db>.db
+ *         - the default is <root>.db
+ *         - if no variables are specified all are saved
  */
 
 static char *do_save(client *cl, char *s, const char *fmt)
-   {char **var, *val, *fname, *p;
+   {char **var, **opt, *val, *fname, *p;
 
+#if 0
     p = s;
+
     if ((*p == '\0') || (strchr(" \t\n\f", *p) != NULL))
        fname = NULL;
     else
@@ -292,6 +297,49 @@ static char *do_save(client *cl, char *s, const char *fmt)
     val = srv_save_db(cl, fname, var, fmt);
 
     free_strings(var);
+#else
+    int lo, no;
+
+    p     = s;
+    fname = NULL;
+    fmt   = "%s=%s";
+    opt   = NULL;
+    var   = NULL;
+
+    if (strchr(p, ':') != NULL)
+       {opt = tokenize(p, ":");
+	no  = lst_length(opt);
+	lo  = 0;
+
+/* determine format */
+	if ((no - lo > 0) && (opt[lo] != NULL))
+	   {if (strcmp(opt[lo], "csh") == 0)
+	       {fmt = "setenv %s %s ;";
+		lo++;}
+	    else if (strcmp(opt[lo], "sh") == 0)
+	       {fmt = "export %s=%s ;";
+		lo++;}
+	    else if (strcmp(opt[lo], "db") == 0)
+	       lo++;};
+
+/* determine file */
+	if ((no - lo > 0) && (opt[lo] != NULL))
+	   fname = opt[lo++];
+
+/* variable list */
+        p = opt[lo];};
+
+    var = tokenize(p, " \t\n\f");
+    if ((var != NULL) && (var[0] == NULL))
+       {free_strings(var);
+        var = NULL;};
+
+    val = srv_save_db(cl, fname, var, fmt);
+
+    free_strings(opt);
+    free_strings(var);
+
+#endif
 
     return(val);}
 
