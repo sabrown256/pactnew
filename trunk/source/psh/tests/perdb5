@@ -26,7 +26,7 @@ dbset v3 c
 echo "v3 = `printenv 'v3'`"
 
 echo ""
-perdb $opt save:dba
+perdb $opt save:dba:
 
 echo "-----------------------------------"
 
@@ -43,7 +43,7 @@ dbset v5 z
 echo "v5 = `printenv 'v5'`"
 
 echo ""
-perdb $opt save:dbb
+perdb $opt save:dbb:
 
 echo "-----------------------------------"
 
@@ -61,19 +61,19 @@ echo "v4 : |$v4|"
 
 echo "-----------------------------------"
 
-perdb $opt csh:stdout
+perdb $opt save:csh:stdout:
 
 echo "-----------------------------------"
 
-perdb $opt csh:stdout v1 v3 v5
+perdb $opt save:csh:stdout: v1 v3 v5
 
 echo "-----------------------------------"
 
-perdb $opt sh:stdout
+perdb $opt save:sh:stdout:
 
 echo "-----------------------------------"
 
-perdb $opt sh:stdout v1
+perdb $opt save:sh:stdout: v1
 
 echo "-----------------------------------"
 

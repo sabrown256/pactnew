@@ -13,9 +13,9 @@
 
 #define HSZLARGE  521             /* large table size */
 
-typedef int (*PFIntUn)(void *a);
-typedef int (*PFIntBin)(void *a, void *b);
-typedef long (*PFKeyHash)(void *s, int size);         /* hash */
+typedef int (*PFintu)(void *a);
+typedef int (*PFintb)(void *a, void *b);
+typedef long (*PFhashkey)(void *s, int size);
 typedef struct s_hashen hashen;
 typedef struct s_hashtab hashtab;
 
@@ -29,8 +29,8 @@ struct s_hashen
 struct s_hashtab
    {int size;              /* number of bins in hash table */
     int ne;                /* number of entries in hash table */
-    PFKeyHash hash;
-    PFIntBin comp;
+    PFhashkey hash;
+    PFintb comp;
     hashen **table;};
 
 /*--------------------------------------------------------------------------*/
@@ -75,7 +75,7 @@ hashtab *make_hash_table(int sz)
             tab->ne = 0;
             tab->table     = tb;
             tab->hash      = _hash_name;
-            tab->comp      = (PFIntBin) strcmp;
+            tab->comp      = (PFintb) strcmp;
 
 /* explicitly NULL the pointers */
             for (i = 0; i < sz; i++)
@@ -91,7 +91,7 @@ hashtab *make_hash_table(int sz)
 
 /* _FREE_HASHEN - free the hashen HP */
 
-static void _free_hashen(hashen *hp, PFIntUn rel)
+static void _free_hashen(hashen *hp, PFintu rel)
    {
 
     if (rel != NULL)
@@ -110,7 +110,7 @@ static void _free_hashen(hashen *hp, PFIntUn rel)
 static int _splice_out_hashen(hashtab *tab, void *key,
 			      hashen **prv, hashen *ths)
    {int ok;
-    PFIntBin comp;
+    PFintb comp;
 
     comp = tab->comp;
 
@@ -135,7 +135,7 @@ int hash_remove(hashtab *tab, void *key)
    {int sz, ok, rv;
     long i;
     hashen *hp, *curr, **tb;
-    PFKeyHash hash;
+    PFhashkey hash;
 
     rv = FALSE;
 
@@ -210,8 +210,8 @@ hashen *hash_lookup(hashtab *tab, void *key)
    {int sz;
     long hv;
     hashen *rv, *hp, **tb;
-    PFKeyHash hash;
-    PFIntBin comp;
+    PFhashkey hash;
+    PFintb comp;
 
     rv = NULL;
 

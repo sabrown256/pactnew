@@ -21,7 +21,7 @@ endif
 # prune and import en masse
 if ($mode == 1) then
    set lt = `timer -r`
-   eval `perdb csh:stdout $vl`
+   eval `perdb save:csh:stdout: $vl`
    set lt = `timer -b $lt`
    Note $Log "Import variables en masse in $lt seconds:"
 
