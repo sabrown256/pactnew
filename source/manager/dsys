@@ -2164,6 +2164,9 @@ CFG_DONE:
 
         while ($#argv > 0)
            switch ($1)
+              case -c:
+                   dsys remove -cfg
+                   breaksw
               case -cfg:
                    set meth = file
                    breaksw
@@ -2173,8 +2176,9 @@ CFG_DONE:
               case -h:
               case help:
                    echo ""
-                   echo "Usage: dsys reconfig [-cfg] [-db] [-i] [-h]"
+                   echo "Usage: dsys reconfig [-c] [-cfg] [-db] [-i] [-h]"
                    echo ""
+                   echo "   c     do remove before config to be completely clean"
                    echo "   cfg   reconfigure from the config file (default)"
                    echo "   db    reconfigure from the database"
                    echo "   i     reconfigure installable (default is non-installable)"

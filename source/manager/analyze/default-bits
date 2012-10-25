@@ -19,12 +19,6 @@ source $ldir/functions-pact.csh
 
 dbini Bits `nbit -d`
 
-#if ($?Bits == 0) then
-#   setenv Bits `nbit -d`
-#endif
-
-dbexp Bits
-
 exit($status)
 
 

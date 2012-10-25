@@ -47,9 +47,6 @@ if ($?FirstCommon == 0) then
    setenv FirstCommon FALSE
 endif
 
-alias DSET  'perdb \!\!:1=\!\!:2-$'
-alias DGET  'perdb \!\!1'
-
 source $ldir/functions-pact.csh
 source $ldir/csh-subroutines
 

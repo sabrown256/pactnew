@@ -525,16 +525,16 @@ syment *_H5_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
  */
 
 static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp) 
-   {int i;
+   {int i, cnv;
     short precision;
     char *typ;
+    PD_type_kind knd;
     PD_byte_order order;
     defstr *dp;
     hdf_state *hst;
 
     hst = file->meta;
     typ = NULL;
-    dp  = CMAKE(defstr);
 
     precision = (short) H5Tget_precision(htyp);
 
@@ -549,30 +549,42 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
  */
     if (H5Tget_sign(htyp)) 
        {if (precision == 8)
-           typ = CSTRSAVE(SC_CHAR_S);
+           {typ = CSTRSAVE(SC_CHAR_S);
+	    knd = CHAR_KIND;}
         else if (precision == 16)
-           typ = CSTRSAVE(SC_SHORT_S);
+	   {typ = CSTRSAVE(SC_SHORT_S);
+	    knd = INT_KIND;}
         else if (precision == 32)
-           typ = CSTRSAVE(SC_INT_S);
+	   {typ = CSTRSAVE(SC_INT_S);
+	    knd = INT_KIND;}
         else if (precision == 64)
-           typ = CSTRSAVE(SC_LONG_S);
+           {typ = CSTRSAVE(SC_LONG_S);
+	    knd = INT_KIND;}
         else if (precision >  64)
-           typ = CSTRSAVE(SC_LONG_LONG_S);
+           {typ = CSTRSAVE(SC_LONG_LONG_S);
+	    knd = INT_KIND;}
         else
-           typ = CSTRSAVE("UNKNOWN");}
+	   {typ = CSTRSAVE("UNKNOWN");
+	    knd = NON_CONVERT_KIND;};}
     else
        {if (precision == 8)
-           typ = CSTRSAVE("u_char");
+	   {typ = CSTRSAVE("u_char");
+	    knd = CHAR_KIND;}
         else if (precision == 16)
-           typ = CSTRSAVE("u_short");
+           {typ = CSTRSAVE("u_short");
+	    knd = INT_KIND;}
         else if (precision == 32)
-           typ = CSTRSAVE("u_int");
+           {typ = CSTRSAVE("u_int");
+	    knd = INT_KIND;}
         else if (precision == 64)
-           typ = CSTRSAVE("u_long");
+           {typ = CSTRSAVE("u_long");
+	    knd = INT_KIND;}
         else if (precision >  64)
-           typ = CSTRSAVE("u_long_long");
+           {typ = CSTRSAVE("u_long_long");
+	    knd = INT_KIND;}
         else
-           typ = CSTRSAVE("UNKNOWN");};
+           {typ = CSTRSAVE("UNKNOWN");
+	    knd = NON_CONVERT_KIND;};};
 
 /* decode byte ordering */ 
     if (H5Tget_order(htyp) == H5T_ORDER_BE) 
@@ -586,43 +598,56 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
         hst->pf->std->fx[i].order = order; 
 
-/* create a defstr with this information
- * NOTE: as far as we know -- HDF5 does not support 1's comp
- */
-    dp->onescmp   = FALSE;
-    dp->type      = CSTRSAVE(typ);
-    dp->size_bits = 0;
-    dp->size      = precision / 8;
-
-/* GOTCHA: we have no alignment info from the file; so we guess */
-    dp->alignment   = _H5_get_alignment(file, typ);
-
-/* HDF5 files do not currently support indirection */
-    dp->n_indirects = 0;
-    dp->unsgned     = !(H5Tget_sign(htyp)); 
-    dp->fix.order   = order;
-    dp->fp.order    = NULL;
-    dp->fp.format   = NULL;
-    dp->members     = NULL; 
-
     DEBUG1("      type name: %s\n", typ);
     DEBUG1("      size: %d\n", (precision / 8));
     DEBUG1("      alignment: %d\n", _H5_get_alignment(typ));
 
 /* does not matter which one */
+    cnv = FALSE;
     if (order != hst->pf->host_std->fx[1].order)
 /*      || precision != XYZ   Not feasible since C type is unspecified */
 /*      || alignment != XYZ   Not feasible since C type is unspecified */  
-       {dp->convert = TRUE;
+       {cnv = TRUE;
         DEBUG1("%s", "      conversions WILL be done\n");}
     else
-       {dp->convert = FALSE;
+       {cnv = FALSE;
         DEBUG1("%s", "      conversions will NOT be done\n");};
 
-/* insert into the file charts */
-    _PD_d_install(hst->pf, typ, dp, PD_CHART_FILE);
+/* fill the defstr with this information */
+    dp = CMAKE(defstr);
+    if (dp != NULL)
+       {dp->type        = CSTRSAVE(typ);
+	dp->kind        = knd;
 
-    DEBUG1("  Inserted definition for %s\n", typ);
+	dp->size_bits   = 0;
+	dp->size        = precision / 8;
+
+/* GOTCHA: we have no alignment info from the file; so we guess */
+	dp->alignment   = _H5_get_alignment(file, typ);
+
+/* HDF5 files do not currently support indirection */
+	dp->n_indirects = 0;
+	dp->is_indirect = FALSE;
+
+	dp->convert     = cnv;
+
+/* NOTE: as far as we know -- HDF5 does not support 1's comp */
+	dp->onescmp     = FALSE;
+
+	dp->unsgned     = !(H5Tget_sign(htyp));
+
+	dp->fix.order   = order;
+
+	dp->fp.order    = NULL;
+	dp->fp.format   = NULL;
+
+	dp->members     = NULL;
+	dp->tuple       = NULL;
+
+/* insert into the file charts */
+	_PD_d_install(hst->pf, typ, dp, PD_CHART_FILE);
+
+	DEBUG1("  Inserted definition for %s\n", typ);};
 
     return(typ);}
 
@@ -634,11 +659,12 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
  */
 
 static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp) 
-   {int i;
+   {int i, cnv;
     intb bpif, bpid;
     short precision;
     size_t spos, epos, esize, mpos, msize;
-    long *format;
+    int *fpo;
+    long *fpf, *format;
     char *typ;
     defstr *dp;
     data_standard *fstd, *hstd;
@@ -649,8 +675,6 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
     hstd = hst->pf->host_std;
     fstd = hst->pf->std;
     typ  = NULL;
-
-    dp = CMAKE(defstr);
 
     bpif              = sizeof(float);
     fstd->fp[0].bpi   = bpif;
@@ -692,20 +716,20 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
  * this is required because HDF5 does not maintain type names
  */
     if (precision <= 32) 
-       {format       = fstd->fp[0].format;
-        typ          = CSTRSAVE(SC_FLOAT_S);
-        dp->fp.order = CMAKE_N(int, bpif);
+       {format = fstd->fp[0].format;
+        typ    = CSTRSAVE(SC_FLOAT_S);
+        fpo    = CMAKE_N(int, bpif);
 
         for (i = 0; i < bpif; i++) 
-            dp->fp.order[i] = fstd->fp[0].order[i];}
+            fpo[i] = fstd->fp[0].order[i];}
 
     else 
-       {format       = fstd->fp[1].format;
-        typ          = CSTRSAVE(SC_DOUBLE_S);
-        dp->fp.order = CMAKE_N(int, bpid);
+       {format = fstd->fp[1].format;
+        typ    = CSTRSAVE(SC_DOUBLE_S);
+        fpo    = CMAKE_N(int, bpid);
 
         for (i = 0; i < bpid; i++) 
-            dp->fp.order[i] = fstd->fp[1].order[i];};
+            fpo[i] = fstd->fp[1].order[i];};
 
 /* pdbconv.c contains information on how this is laid out
  *
@@ -741,10 +765,10 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
     format[3] = 0;   /* Calculate this? */      
     format[6] = 0;   /* Calculate this? */      
 
-    dp->fp.format = CMAKE_N(long, 8);
+    fpf = CMAKE_N(long, 8);
 
     for (i = 0; i < 8; i++)
-        dp->fp.format[i] = format[i];
+        fpf[i] = format[i];
 
 #if DEBUG
     DEBUG1("%s", "      format is {");
@@ -765,52 +789,69 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
     DEBUG1("%s", "}\n");
 #endif
 
-/* determine if conversion is necessary due to format or ordering
- * hard-coded mapping of precision to C type name
- * this is required because HDF5 does not maintain type names
- */
-    bpif = hstd->fp[0].bpi;
-    bpid = hstd->fp[1].bpi;
-    if (precision <= 32) 
-       {for (i = 0; i < 8; i++)
-            {if (dp->fp.format[i] != hstd->fp[0].format[i])
-                dp->convert = TRUE;};
-
-        for (i = 0; i < bpif; i++)
-            {if (dp->fp.order[i] != hstd->fp[0].order[i])
-                dp->convert = TRUE;};}
-    else 
-       {for (i = 0; i < 8; i++)
-            {if (dp->fp.format[i] != hstd->fp[1].format[i])
-                dp->convert = TRUE;};
-
-        for (i = 0; i < bpid; i++)
-            {if (dp->fp.order[i] != hstd->fp[1].order[i])
-                dp->convert = TRUE;};};
-
-/* NOTE: as far as we know -- HDF5 does not support 1's comp */
-    dp->onescmp   = FALSE;
-    dp->fix.order = NO_ORDER;
-    dp->type      = CSTRSAVE(typ);
-    dp->size_bits = 0;  /* format[0]; */
-    dp->size      = format[0] / 8;
-
-/* GOTCHA: we have no alignment info from the file; so we guess */
-    dp->alignment  = _H5_get_alignment(file, typ);
-
-/* HDF5 files do not currently support indirection */
-    dp->n_indirects = 0;
-    dp->unsgned     = FALSE;
-    dp->members     = NULL;
-
     DEBUG1("      type name: %s\n", typ);
     DEBUG1("      size: %d\n", (format[0] / 8));
     DEBUG1("      alignment: %d\n", _H5_get_alignment(typ));
 
+/* determine if conversion is necessary due to format or ordering
+ * hard-coded mapping of precision to C type name
+ * this is required because HDF5 does not maintain type names
+ */
+    cnv  = FALSE;
+    bpif = hstd->fp[0].bpi;
+    bpid = hstd->fp[1].bpi;
+    if (precision <= 32) 
+       {for (i = 0; i < 8; i++)
+            {if (fpf[i] != hstd->fp[0].format[i])
+                cnv = TRUE;};
+
+        for (i = 0; i < bpif; i++)
+            {if (fpo[i] != hstd->fp[0].order[i])
+                cnv = TRUE;};}
+    else 
+       {for (i = 0; i < 8; i++)
+            {if (fpf[i] != hstd->fp[1].format[i])
+                cnv = TRUE;};
+
+        for (i = 0; i < bpid; i++)
+            {if (fpo[i] != hstd->fp[1].order[i])
+                cnv = TRUE;};};
+
+/* fill the defstr with this information */
+    dp = CMAKE(defstr);
+    if (dp != NULL)
+       {dp->type        = CSTRSAVE(typ);
+	dp->kind        = FLOAT_KIND;
+
+	dp->size_bits   = 0;  /* format[0]; */
+	dp->size        = format[0] / 8;
+
+/* GOTCHA: we have no alignment info from the file; so we guess */
+	dp->alignment   = _H5_get_alignment(file, typ);
+
+/* HDF5 files do not currently support indirection */
+	dp->n_indirects = 0;
+	dp->is_indirect = FALSE;
+
+	dp->convert     = cnv;
+
+/* NOTE: as far as we know -- HDF5 does not support 1's comp */
+	dp->onescmp     = FALSE;
+
+	dp->unsgned     = FALSE;
+
+	dp->fix.order   = NO_ORDER;
+
+	dp->fp.order    = fpo;
+	dp->fp.format   = fpf;
+
+	dp->members     = NULL;
+	dp->tuple       = NULL;
+
 /* insert into the file charts */
-    _PD_d_install(hst->pf, typ, dp, PD_CHART_FILE);
+	_PD_d_install(hst->pf, typ, dp, PD_CHART_FILE);
  
-    DEBUG1("  Inserted definition for %s\n", typ);
+	DEBUG1("  Inserted definition for %s\n", typ);};
  
     return(typ);}
 

@@ -114,7 +114,7 @@ alias dbdef     '$PERDB \!\!:1 \?'
 # matches C call dbinitv
 # usage: dbini <var> <val>
 
-alias dbini     'set t_ = ( `$PERDB \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbini     'set u_ = \!\!:2-$ ; set t_ = ( `$PERDB \!\!:1 =\? "$u_"` ) ; setenv \!\!:1 "$t_" ; unset t_ ; unset u_'
 alias envini    'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
 
 # dbexp export the current value of environment variable <var>

@@ -349,7 +349,23 @@ int main(int c, char **v)
     setbuf(stdout, NULL);
 
     nstrncpy(shell, MAXLINE, "/bin/csh", -1);
-    nstrncpy(pact, MAXLINE, path_head(path_head(cwhich(v[0]))), -1);
+
+/* if v[1] indicates a different PACT version than
+ * v[0] it could end up with an incompatible environment
+ * for example: /usr/local/bin/pdbview and ~/pact/dev/bin/pcsh
+ * so for consistency iff v[1] indicates a different PACT
+ * than v[0] derive the base from v[1] instead of V[0]
+ *
+ * first cut see if there is a pcsh in the same directory as
+ * the one V[1] is in
+ * might need to check also for ../etc directory as well to
+ * guard against a local utility named pcsh without the supporting
+ * files
+ */
+    if (file_exists("%s/pcsh", path_head(cwhich(v[1]))))
+       nstrncpy(pact, MAXLINE, path_head(path_head(cwhich(v[1]))), -1);
+    else
+       nstrncpy(pact, MAXLINE, path_head(path_head(cwhich(v[0]))), -1);
 
 /* locate the tools needed for subshells */
     build_path(NULL,

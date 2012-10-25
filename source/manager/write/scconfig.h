@@ -299,7 +299,7 @@ source $MngDir/write/import-db
     endif
 
     if (("$DP_Lib" != "") || ("$DP_Inc" != "")) then
-       Note $STDOUT "#define HAVE_MPI"
+       Note $STDOUT "#define HAVE_MPI   TRUE"
        if ($HAVE_MPI_GOOD_IO == FALSE) then
           Note $STDOUT "#define HAVE_BAD_MPI_IO"
        endif
