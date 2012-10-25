@@ -481,11 +481,17 @@ defstr *_PD_defstr(PDBfile *file, PD_chart_kind chk,
    {defstr *dp;
     hasharr *ch;
 
-    ch = (chk == PD_CHART_HOST) ? file->host_chart : file->chart;
+    dp = NULL;
 
-    dp = _PD_defstr_in(ch, name, kind,
-		       desc, tuple, sz, align, ord, conv,
-		       ordr, formt, unsgned, onescmp, chk);
+/* do not permit '*' in type names except for "*" to define
+ * the pointer
+ */
+    if ((strchr(name, '*') == NULL) || (strlen(name) < 2))
+       {ch = (chk == PD_CHART_HOST) ? file->host_chart : file->chart;
+
+	dp = _PD_defstr_in(ch, name, kind,
+			   desc, tuple, sz, align, ord, conv,
+			   ordr, formt, unsgned, onescmp, chk);};
 
     return(dp);}
 

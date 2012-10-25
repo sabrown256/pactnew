@@ -389,9 +389,35 @@ static char *do_load(client *cl, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* RENDER_VAL - render database value, VAL, according to FMT */
+
+static char *render_val(char *var, char *val, char *fmt)
+   {char *s;
+    static char t[LRG];
+
+    s = val;
+    if (fmt != NULL)
+       {if (strcmp(fmt, "csh") == 0)
+	   {snprintf(t, LRG, "set %s = \"%s\" ; ", var, val);
+	    s = t;}
+	else if (strcmp(fmt, "sh") == 0)
+	   {snprintf(t, LRG, "%s=\"%s\" ; ", var, val);
+	    s = t;}
+	else if (strcmp(fmt, "pl") == 0)
+	   {snprintf(t, LRG, "$%s = \"%s\"; ", var, val);
+	    s = t;}
+	else if (strcmp(fmt, "db") == 0)
+	   {snprintf(t, LRG, "%s=%s", var, val);
+	    s = t;};};
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DO_COND_INIT - handle conditional initialization */
 
-static char *do_cond_init(database *db, char *s)
+static char *do_cond_init(database *db, char *s, char *fmt)
    {int st;
     char *var, *val, *nvl;
 
@@ -403,6 +429,8 @@ static char *do_cond_init(database *db, char *s)
     if (st == FALSE)
        val = put_db(db, var, nvl);
 
+    val = render_val(var, val, fmt);
+
     return(val);}
 
 /*--------------------------------------------------------------------------*/
@@ -410,7 +438,7 @@ static char *do_cond_init(database *db, char *s)
 
 /* DO_DEFD - handle defined query */
 
-static char *do_defd(database *db, char *s)
+static char *do_defd(database *db, char *s, char *fmt)
    {int st;
     char *var, *val, *nvl;
 
@@ -428,6 +456,8 @@ static char *do_defd(database *db, char *s)
     else if (st == FALSE)
        val = put_db(db, var, nvl);
 
+    val = render_val(var, val, fmt);
+
     return(val);}
 
 /*--------------------------------------------------------------------------*/
@@ -435,7 +465,7 @@ static char *do_defd(database *db, char *s)
 
 /* DO_SET_GET - handle variable set or get operations */
 
-static char *do_set_get(database *db, char *s)
+static char *do_set_get(database *db, char *s, char *fmt)
    {char *var, *val;
     static char t[MAXLINE];
 
@@ -454,6 +484,52 @@ static char *do_set_get(database *db, char *s)
        {snprintf(t, MAXLINE, "\"%s\"", val);
 	val = t;};
 
+    val = render_val(var, val, fmt);
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DO_VAR_ACC - handle variable access: set, get, condi, defd */
+
+static char **do_var_acc(database *db, char *s)
+   {int is, ns;
+    char *t, *fmt, **val, **sa;
+
+#if 1
+    sa = tokenize(s, ",");
+#else
+    sa = NULL;
+    sa = lst_push(sa, s);
+#endif
+
+    val = NULL;
+    fmt = NULL;
+
+    ns = lst_length(sa);
+    for (is = 0; is < ns; is++)
+        {t = sa[is];
+
+	 if (strncmp(t, "fmt:", 4) == 0)
+	    {fmt = STRSAVE(t+4);
+	     continue;}
+
+/* variable conditional init */
+	 if (strstr(t, "=\?") != NULL)
+	    val = lst_push(val, do_cond_init(db, t, fmt));
+
+/* variable defined? */
+	 else if (strchr(t, '?') != NULL)
+	    val = lst_push(val, do_defd(db, t, fmt));
+
+/* variable set/get */
+	 else
+	    val = lst_push(val, do_set_get(db, t, fmt));};
+
+    FREE(fmt);
+    free_strings(sa);
+
     return(val);}
 
 /*--------------------------------------------------------------------------*/
@@ -468,7 +544,7 @@ static char *do_set_get(database *db, char *s)
 static int proc_connection(client *cl)
    {int rv, nb, to;
     char s[MAXLINE];
-    char *val;
+    char **val;
     database *db;
 
     db = cl->db;
@@ -485,45 +561,42 @@ static int proc_connection(client *cl)
        rv = -1;
 
     else
-
-/* quit session */
-       {if (strncmp(s, "quit:", 5) == 0)
-	   {rv  = 0;
-	    val = "done";}
+       {val = NULL;
 
 /* client is exiting */
-	else if (strncmp(s, "fin:", 4) == 0)
-	   {term_connection(cl);
-	    val = NULL;}
+	if (strncmp(s, "fin:", 4) == 0)
+	   term_connection(cl);
+
+/* load database */
+	else if (strncmp(s, "load:", 5) == 0)
+           val = lst_push(val, do_load(cl, s+5));
+
+/* quit session */
+	else if (strncmp(s, "quit:", 5) == 0)
+	   {rv  = 0;
+	    val = lst_push(val, "done");}
 
 /* reset database */
         else if (strncmp(s, "reset:", 6) == 0)
 	   {reset_db(db);
-	    val = "reset";}
+	    val = lst_push(val, "reset");}
 
 /* save database */
 	else if (strncmp(s, "save:", 5) == 0)
-	   val = do_save(cl, s+5);
+	   val = lst_push(val, do_save(cl, s+5));
 
-/* load database */
-	else if (strncmp(s, "load:", 5) == 0)
-           val = do_load(cl, s+5);
-
-/* variable conditional init */
-	else if (strstr(s, "=\?") != NULL)
-	   val = do_cond_init(db, s);
-
-/* variable defined? */
-	else if (strchr(s, '?') != NULL)
-           val = do_defd(db, s);
-
-/* variable set/get */
 	else
-	   val = do_set_get(db, s);
+	   val = do_var_acc(db, s);
 
 	if (val != NULL)
-	   {nb = comm_write(cl, val, 0, 10);
-	    nb = comm_write(cl, EOM, 0, 10);};};
+	   {int i, nv;
+
+	    nv = lst_length(val);
+	    for (i = 0; i < nv; i++)
+	        nb = comm_write(cl, val[i], 0, 10);
+	    nb = comm_write(cl, EOM, 0, 10);
+
+	    free_strings(val);};};
 
     return(rv);}
 

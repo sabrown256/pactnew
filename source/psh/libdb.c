@@ -271,7 +271,7 @@ char *put_db(database *db, char *var, char *val)
 
     if (var != NULL)
        {if (val == NULL)
-	   val = "";
+	   val = cnoval();
 
 	_set_var(db, var, val);
 

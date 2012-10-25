@@ -362,9 +362,9 @@ int main(int c, char **v)
  * guard against a local utility named pcsh without the supporting
  * files
  */
-    if (file_exists("%s/pcsh", path_head(cwhich(v[1]))))
-       nstrncpy(pact, MAXLINE, path_head(path_head(cwhich(v[1]))), -1);
-    else
+    nstrncpy(pact, MAXLINE, path_head(path_head(cwhich(v[1]))), -1);
+    if ((file_exists("%s/bin/pcsh", pact) == FALSE) ||
+	(dir_exists("%s/etc", pact) == FALSE))
        nstrncpy(pact, MAXLINE, path_head(path_head(cwhich(v[0]))), -1);
 
 /* locate the tools needed for subshells */

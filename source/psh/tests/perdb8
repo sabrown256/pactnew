@@ -1,8 +1,7 @@
 #!/bin/csh -f
 #
-# PERDB8 - test list set and get
-#        - use environment variable specification of DB
-#        - test suitability for environment variable
+# PERDB8 - test adding members
+#        - GOTCHA: does not work as desired - some redesign required
 #        - no FIFO
 #
 
@@ -11,80 +10,113 @@ set db  = ./db8
 
 alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
+alias dbdef     'perdb $opt \!\!:1 \?'
+alias dbini     'set t_ = ( `perdb $opt \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+
+set res = ( "defined" "undefined" )
+
+rm -f db8* >& /dev/null
 
 setenv PERDB_PATH $db
 
-dbset v1 1
-dbset v2 "(m1 m2)"
-dbset v3 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
-dbset v4 "(m1=(m1=1 m2=2) m2='m1=1 m2=2')"
+echo "-----------------------------------"
+
+dbset v1 "(m1 m2)"
+echo "v1 = `printenv 'v1'`"
+
+dbset v1.m3 new
+echo "v1 = `printenv 'v1'`"
+
+dbget v1.m3
+echo "v1.m3 = `printenv 'v1.m3'`"
+
+echo ""
+perdb $opt save: v1
 
 echo "-----------------------------------"
-dbget v1
-echo "v1 : |$v1|"
+
+dbset v2 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
+echo "v2 = `printenv 'v2'`"
+
+dbset v2.m7 new
+echo "v2 = `printenv 'v2'`"
+
+dbget v2.m7
+echo "v2 = `printenv 'v2'`"
+
+dbset v2.m1 2
+echo "v2 = `printenv 'v2'`"
+
+dbget v2.m1
+echo "v2 = `printenv 'v2'`"
+
+echo ""
+perdb $opt save: v2
 
 echo "-----------------------------------"
-dbget v3
-echo "v3 : |$v3|"
 
-echo "-----------------------------------"
-dbget v4
-echo "v4 : |$v4|"
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
 
-echo "-----------------------------------"
-dbget v2
-echo "v2 : |$v2|"
+dbset v3 "(m1 m2)"
+echo "v3 = `printenv 'v3'`"
 
-echo "-----------------------------------"
-dbget v3.m1
-echo "v3.m1 : |`printenv v3.m1`|"
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
 
-echo "-----------------------------------"
-dbget v3.m2
-echo "v3.m2 : |`printenv v3.m2`|"
+dbset v3.m3 new
+echo "v3 = `printenv 'v3'`"
 
-echo "-----------------------------------"
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
+
 dbget v3.m3
-echo "v3.m3 : |`printenv v3.m3`|"
+echo "v3.m3 = `printenv 'v3.m3'`"
+
+echo ""
+perdb $opt save: v3
 
 echo "-----------------------------------"
-dbget v3.m4
-echo "v3.m4 : |`printenv v3.m4`|"
 
-echo "-----------------------------------"
-dbget v3.m5
-echo "v3.m5 : |`printenv v3.m5`|"
+dbdef v4.m7
+@ xstat = $status + 1 ; echo "v4.m7 ? $res[$xstat]"
 
-echo "-----------------------------------"
-dbget v3.m6
-echo "v3.m6 : |`printenv v3.m6`|"
+dbset v4 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
+echo "v4 = `printenv 'v4'`"
 
-echo "-----------------------------------"
+dbini v4.m7 new
+echo "v4 = `printenv 'v4'`"
+
+dbget v4.m7
+echo "v4 = `printenv 'v4'`"
+
+dbini v4.m7 old
+echo "v4 = `printenv 'v4'`"
+
+dbget v4.m7
+echo "v4 = `printenv 'v4'`"
+
+dbini v4.m1 2
+echo "v4 = `printenv 'v4'`"
+
 dbget v4.m1
-echo "v4.m1 : |`printenv v4.m1`|"
+echo "v4 = `printenv 'v4'`"
+
+dbset v4.m1 2
+echo "v4 = `printenv 'v4'`"
+
+dbget v4.m1
+echo "v4 = `printenv 'v4'`"
+
+echo ""
+perdb $opt save: v4
 
 echo "-----------------------------------"
-dbget v4.m1.m1
-echo "v4.m1.m1 : |`printenv v4.m1.m1`|"
 
-echo "-----------------------------------"
-dbget v4.m1.m2
-echo "v4.m1.m2 : |`printenv v4.m1.m2`|"
-
-echo "-----------------------------------"
-dbget v4.m2
-echo "v4.m2 : |`printenv v4.m2`|"
-
-echo "-----------------------------------"
-dbget v4.m2.m1
-echo "v4.m2.m1 : |`printenv v4.m2.m1`|"
-
-foreach i (v1 v2 v3 v4)
-   echo "-----------------------------------"
-   perdb $opt save: $i
-end
-
-echo "-----------------------------------"
 perdb $opt quit:
 
 exit($status)
