@@ -100,7 +100,7 @@ if ($xstatus == 0) then
 #--------------------------------------------------------------------------
 
 # distribute parallel test
-      if ($MPI == HAVE_MPI) then
+      if ($MPI == TRUE) then
          flog $Log pushd $SrcDir
          flog $Log $MAKE +na 2 fdp
          set xstatus = $status

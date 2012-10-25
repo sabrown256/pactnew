@@ -48,7 +48,7 @@ perdb $opt save:dbb:
 echo "-----------------------------------"
 
 perdb $opt reset:
-perdb $opt load:dba
+perdb $opt load:dba:
 
 dbget v2
 echo "v2 : |$v2|"

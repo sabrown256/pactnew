@@ -136,6 +136,15 @@
 #define gexec_var 		PS_gexec_var
 #define gpoll 			PS_gpoll
 #define grep 			PS_grep
+#define make_hash_table		PS_make_hash_table
+#define hash_remove		PS_hash_remove
+#define hash_clear		PS_hash_clear
+#define hash_free		PS_hash_free
+#define hash_lookup		PS_hash_lookup
+#define hash_def_lookup		PS_hash_def_lookup
+#define hash_install		PS_hash_install
+#define hash_foreach		PS_hash_foreach
+#define hash_dump		PS_hash_dump
 #define init_session 		PS_init_session
 #define is_running 		PS_is_running
 #define job_background 		PS_job_background

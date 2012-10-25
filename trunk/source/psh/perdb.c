@@ -258,47 +258,21 @@ static void term_connection(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO_SAVE - save the database variables specified by S
- *         - syntax of S is
- *         -    [<opt>] <var>*
- *         -    <opt>    := [<syntax>:]<inf>:
- *         -    <syntax> := db | csh | sh
- *         -    <inf>    := stdin | stdout | stderr | <db> | <file>
- *         -    <db>     := <identifier>
- *         -    <file>   := <full-path>
- *         -     <var>   := variable name to be saved
- *         - if <inf> is stdout or stderr dumps to that device
- *         - else if <inf> is full path saves to specified file
- *         - otherwise database will be named <root>.<db>.db
- *         - the default is <root>.db
- *         - if no variables are specified all are saved
+/* _PARSE_DB_SPEC - parse a database specifier
+ *                - syntax of S is
+ *                -    [<opt>] <var>*
+ *                -    <opt>    := [<syntax>:]<inf>:
+ *                -    <syntax> := db | csh | sh
+ *                -    <inf>    := stdin | stdout | stderr | <db> | <file>
+ *                -    <db>     := <identifier>
+ *                -    <file>   := <full-path>
+ *                -     <var>   := variable name to be saved
  */
 
-static char *do_save(client *cl, char *s, const char *fmt)
-   {char **var, **opt, *val, *fname, *p;
-
-#if 0
-    p = s;
-
-    if ((*p == '\0') || (strchr(" \t\n\f", *p) != NULL))
-       fname = NULL;
-    else
-       {fname = p;
-
-	p = strpbrk(fname, " \t\n\f");
-        if (p != NULL)
-	   *p++ = '\0';};
-
-    var = tokenize(p, " \t\n\f");
-    if ((var != NULL) && (var[0] == NULL))
-       {free_strings(var);
-        var = NULL;};
-
-    val = srv_save_db(cl, fname, var, fmt);
-
-    free_strings(var);
-#else
-    int lo, no;
+static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
+			   char ***popt, char ***pvar)
+   {int lo, no;
+    char *p, *fname, *fmt, **opt, **var;
 
     p     = s;
     fname = NULL;
@@ -329,6 +303,44 @@ static char *do_save(client *cl, char *s, const char *fmt)
 /* variable list */
         p = opt[lo];};
 
+    if (pp != NULL)
+       *pp = p;
+    if (pfname != NULL)
+       *pfname = fname;
+    if (pfmt != NULL)
+       *pfmt = fmt;
+    if (popt != NULL)
+       *popt = opt;
+    if (pvar != NULL)
+       *pvar = var;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DO_SAVE - save the database variables specified by S
+ *         - syntax of S is
+ *         -    [<opt>] <var>*
+ *         -    <opt>    := [<syntax>:]<inf>:
+ *         -    <syntax> := db | csh | sh
+ *         -    <inf>    := stdin | stdout | stderr | <db> | <file>
+ *         -    <db>     := <identifier>
+ *         -    <file>   := <full-path>
+ *         -     <var>   := variable name to be saved
+ *         - if <inf> is stdout or stderr dumps to that device
+ *         - else if <inf> is full path saves to specified file
+ *         - otherwise database will be named <root>.<db>.db
+ *         - the default is <root>.db
+ *         - if no variables are specified all are saved
+ */
+
+static char *do_save(client *cl, char *s)
+   {char *fmt, *val, *fname, *p;
+    char **var, **opt;
+
+    _parse_db_spec(s, &p, &fname, &fmt, &opt, &var);
+
     var = tokenize(p, " \t\n\f");
     if ((var != NULL) && (var[0] == NULL))
        {free_strings(var);
@@ -339,42 +351,38 @@ static char *do_save(client *cl, char *s, const char *fmt)
     free_strings(opt);
     free_strings(var);
 
-#endif
-
     return(val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* DO_LOAD - load the database variables
- *         - syntax is
- *         -    load:[<name>] <var>*
- *         - where
- *         -   <name> is a database name
- *         -          if <name> is stdout dumps to stdout
- *         -          else if <name> is full path use it
- *         -          otherwise database will be named <root>.<name>.db
- *         -          default is <root>.db
- *         -   <var>  variable name to be loaded
- *         -          if no variables specified all are loaded
+ *         - syntax of S is
+ *         -    [<opt>] <var>*
+ *         -    <opt>    := [<syntax>:]<inf>:
+ *         -    <syntax> := db | csh | sh
+ *         -    <inf>    := stdin | stdout | stderr | <db> | <file>
+ *         -    <db>     := <identifier>
+ *         -    <file>   := <full-path>
+ *         -     <var>   := variable name to be saved
+ *         - if <inf> is stdin load from that device
+ *         - else if <inf> is full path load from specified file
+ *         - otherwise database will be named <root>.<db>.db
+ *         - the default is <root>.db
+ *         - if no variables are specified all are loaded
  */
 
 static char *do_load(client *cl, char *s)
    {char *var, *val, *fname, *p;
+    char **opt;
 
-    p = s + 5;
-    if ((*p == '\0') || (strchr(" \t\n\f", *p) != NULL))
-       fname = NULL;
-    else
-       {fname = p;
-
-	p = strpbrk(fname, " \t\n\f");
-	if (p != NULL)
-	   *p++ = '\0';};
+    _parse_db_spec(s, &p, &fname, NULL, &opt, NULL);
 
     key_val(&var, NULL, p, " \t\n");
 
     val = srv_load_db(cl, fname, var);
+
+    free_strings(opt);
 
     return(val);}
 
@@ -460,7 +468,7 @@ static char *do_set_get(database *db, char *s)
 static int proc_connection(client *cl)
    {int rv, nb, to;
     char s[MAXLINE];
-    char *val, *fmt;
+    char *val;
     database *db;
 
     db = cl->db;
@@ -493,23 +501,13 @@ static int proc_connection(client *cl)
 	   {reset_db(db);
 	    val = "reset";}
 
-/* import variables to CSH environment */
-	else if (strncmp(s, "csh:", 4) == 0)
-	   {fmt = "setenv %s %s ;";
-	    val = do_save(cl, s+4, fmt);}
-
-/* import variables to SH environment */
-	else if (strncmp(s, "sh:", 3) == 0)
-	   {fmt = "export %s=%s ;";
-	    val = do_save(cl, s+3, fmt);}
-
 /* save database */
 	else if (strncmp(s, "save:", 5) == 0)
-	   val = do_save(cl, s+5, "%s=%s");
+	   val = do_save(cl, s+5);
 
 /* load database */
 	else if (strncmp(s, "load:", 5) == 0)
-           val = do_load(cl, s);
+           val = do_load(cl, s+5);
 
 /* variable conditional init */
 	else if (strstr(s, "=\?") != NULL)

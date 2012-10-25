@@ -45,7 +45,7 @@ static int report_var(infodes *st, char *dir, char *fname,
    {int i, nc, ok, doit, tst;
     int compl, litrl, quote;
     char file[MAXLINE];
-    char *dlm, *p, *tok, *txt, *ps, **sa;
+    char *dlm, *p, *var, *val, *ps, **sa;
 
     ok = FALSE;
 
@@ -62,55 +62,63 @@ static int report_var(infodes *st, char *dir, char *fname,
        {for (i = 0; sa[i] != NULL; i++)
 	    {p = sa[i];
 	     if (key != NULL)
-	        {tok  = strtok(p, " \t\r");
-		 doit = ((tok != NULL) && (strcmp(tok, key) == 0));
+	        {var  = strtok(p, " \t\r");
+		 doit = ((var != NULL) && (strcmp(var, key) == 0));
 		 ps   = NULL;}
 	     else
 	        {doit = TRUE;
 		 ps   = p;};
 
 	     if (doit)
-	        {tok = strtok(ps, dlm);
-		 if (tok == NULL)
+	        {var = strtok(ps, dlm);
+		 if (var == NULL)
 		    continue;
 
-		 tst = (litrl) ? (strcmp(tok, q) == 0) :
-		                 (strncmp(tok, q, strlen(q)) == 0);
+		 tst = (litrl) ? (strcmp(var, q) == 0) :
+		                 (strncmp(var, q, strlen(q)) == 0);
 
 		 if (tst)
-		    {txt = strtok(NULL, "\n");
+		    {val = strtok(NULL, "\n");
 
-/* with env-pact.sh you WILL get here with txt NULL and tok <var>=<val>
- * or in scconfig.h with txt NULL and tok <var>
+/* with env-pact.sh you WILL get here with val NULL and var <var>=<val>
+ * or in scconfig.h with val NULL and var <var>
  */
-		     if (txt == NULL)
-		        {p = strchr(tok, '=');
+		     if (val == NULL)
+		        {p = strchr(var, '=');
 			 if (p != NULL)
 			    {*p++ = '\0';
-			     txt  = p;}
+			     val  = p;}
 			 else
+#if 0
 			    {if (litrl && !compl)
 			        continue;
 			     else
-			        txt = tok;};}
+			        val = var;};
+#else
+			    {if (!compl)
+			        continue;
+			     else
+			        val = "";};
+#endif
+		         }
 
-/* with env-pact.csh you WILL get here with txt <val> and tok <var> */
+/* with env-pact.csh you WILL get here with val <val> and var <var> */
 		     else
-		        {while (*txt != '\0')
-			    {if (strchr("= \t", *txt) == NULL)
+		        {while (*val != '\0')
+			    {if (strchr("= \t", *val) == NULL)
 			        break;
 			     else
-			        txt++;};};
+			        val++;};};
 
 		     if (quote == FALSE)
-		        {nc = strlen(txt);
+		        {nc = strlen(val);
 			 if (nc >= 2)
-			    txt = subst(txt, "\"", "", -1);};
+			    val = subst(val, "\"", "", -1);};
 
 		     if (compl)
-		        printf("%s = %s", tok, txt);
+		        printf("%s = %s", var, val);
 		     else
-		        printf("%s", txt);
+		        printf("%s", val);
 
 		     ok = TRUE;
 

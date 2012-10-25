@@ -7,17 +7,35 @@
 
 unalias *
 
-set cmd  = $0
-set args = ( $argv )
-set log  = $HOME/.log.loco
+@ err = 0
 
+set log = $HOME/.log.command
 touch $log
 
-set date = ( "["`date`"]:" )
+set cmd  = $0
+set args = ( $argv )
 
-echo "---------------------------------------------------------------" >>& $log
-echo "${date} $cmd $args" >>& $log
+set rcmd = ( `where $cmd:t` )
+foreach c ($rcmd)
+   if ($c != $cmd) then
+      set cmd = $c
+      break
+   endif
+end
+
+set ppid   = ( `ps -ef | awk '$2 == '$$' { print $3 }'` )
+set parent = ( `ps -ef | awk '$2 == '$ppid' { print }'` )
+set date   = ( "["`date '+%Y/%m/%d %H:%M:%S.%N'`"]" )
+
+echo "------------------------------------------------------------------" >>& $log
+# info = user pid ppid time command
+echo "$date info  = $parent[1] $$ $parent[2] $parent[7-]" >>& $log
+echo "$date where = `uname -n`:$cwd" >>& $log
+echo "$date $cmd $args" >>& $log
 
 $cmd $args
+set err = $status
 
-exit($status)
+echo "$date status = $err" >>& $log
+
+exit($err)
