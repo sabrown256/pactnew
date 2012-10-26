@@ -16,14 +16,11 @@ Note $Log "Analyze: util"
 
 NoteD $ALog "   System Utilities: "
 
-# get the AR options sorted out if they were not pre-defined
-dbini AR_Exe    ar
-dbini AR_Flags  ""
-dbini INSTALL "cp"
-
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
-source $MngDir/write/import-db
+dbmget $ALog AR_Exe   =\? ar^    \
+             AR_Flags =\? ""^    \
+             INSTALL  =\? cp^    \
+             Cfe_CC_Exe^         \
+             Cfe_CC_Flags
 
 rm -f foo.c foo.o bar.c bar.o main.c libfoo.a $Tmp
 
@@ -153,13 +150,13 @@ else
 endif
 
 # export the results
-dbexp AR_Exe
-dbexp AR_Flags
-dbexp AR_IFlag
-dbexp AR_XFlag
-dbexp Ranlib_Exe
-dbexp UPDATE
-dbexp INSTALL
+dbmget $ALog AR_Exe     = $AR_Exe^       \
+             AR_Flags   = $AR_Flags^     \
+             AR_IFlag   = $AR_IFlag^     \
+             AR_XFlag   = $AR_XFlag^     \
+             Ranlib_Exe = $Ranlib_Exe^   \
+             UPDATE     = $UPDATE^       \
+             INSTALL    = $INSTALL
 
 exit(0)
 

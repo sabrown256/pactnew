@@ -17,19 +17,18 @@ Note $Log "Analyze: ld"
 NoteD $ALog -n "   Ld: "
 Note $ALog ""
 
-dbini LD_Exe         ""
-dbini LD_Flags       ""
-dbini LD_Lib         ""
-dbini Cfe_LD_Flags   ""
-dbini Cfe_LD_Lib     ""
-dbini Cfe_LD_RPath   ""
-dbini Cfg_LD_Flags   ""
-dbini Cfg_LD_RPath   ""
-dbini DP_Lib         ""
-
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe Cfg_RPATH OS_Name )
-source $MngDir/write/import-db
+dbmget $ALog LD_Exe        =\? ""^   \
+             LD_Flags      =\? ""^   \
+             LD_Lib        =\? ""^   \
+             Cfe_LD_Flags  =\? ""^   \
+             Cfe_LD_Lib    =\? ""^   \
+             Cfe_LD_RPath  =\? ""^   \
+             Cfg_LD_Flags  =\? ""^   \
+             Cfg_LD_RPath  =\? ""^   \
+             DP_Lib        =\? ""^   \
+             Cfe_CC_Exe^             \
+             Cfg_RPATH^              \
+             OS_Name
 
 if (!(-x "$LD_Exe")) then
    if (-x `$Which ld`) then
@@ -92,18 +91,17 @@ endif
 #--------------------------------------------------------------------------
 
 # export the results
-dbexp HAVE_RPATH
-dbexp Shared_LD_Exe
-dbexp DP_Lib
-
-dbexp LD_Exe
-dbexp LD_Flags
-dbexp LD_Lib
-dbexp Cfg_LD_Flags
-dbexp Cfg_LD_RPath
-dbexp Cfe_LD_Flags
-dbexp Cfe_LD_Lib
-dbexp Cfe_LD_RPath
+dbmset $ALog LD_Exe        = $LD_Exe^              \
+             LD_Flags      = $LD_Flags^            \
+             LD_Lib        = $LD_Lib^              \
+             Cfg_LD_Flags  = $Cfg_LD_Flags^        \
+             Cfg_LD_RPath  = $Cfg_LD_RPath^        \
+             Cfe_LD_Flags  = $Cfe_LD_Flags^        \
+             Cfe_LD_Lib    = $Cfe_LD_Lib^          \
+             Cfe_LD_RPath  = $Cfe_LD_RPath^        \
+             HAVE_RPATH    = $HAVE_RPATH^          \
+             Shared_LD_Exe = $Shared_LD_Exe^       \
+             DP_Lib        = $DP_Lib
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
