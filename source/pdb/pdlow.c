@@ -491,7 +491,9 @@ defstr *_PD_defstr(PDBfile *file, PD_chart_kind chk,
 
 	dp = _PD_defstr_in(ch, name, kind,
 			   desc, tuple, sz, align, ord, conv,
-			   ordr, formt, unsgned, onescmp, chk);};
+			   ordr, formt, unsgned, onescmp, chk);}
+    else
+       PD_error("ILLEGAL '*' IN TYPE NAME - _PD_DEFSTR", PD_GENERIC);
 
     return(dp);}
 

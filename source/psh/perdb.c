@@ -398,13 +398,16 @@ static char *render_val(char *var, char *val, char *fmt)
     s = val;
     if (fmt != NULL)
        {if (strcmp(fmt, "csh") == 0)
-	   {snprintf(t, LRG, "set %s = ( %s ) ; ", var, val);
+	   {snprintf(t, LRG, "setenv %s \"%s\" ; ",
+		     var, strip_quote(val));
 	    s = t;}
 	else if (strcmp(fmt, "sh") == 0)
-	   {snprintf(t, LRG, "%s=\"%s\" ; ", var, val);
+	   {snprintf(t, LRG, "%s=\"%s\" ; export %s ; ",
+		     var, strip_quote(val), var);
 	    s = t;}
 	else if (strcmp(fmt, "pl") == 0)
-	   {snprintf(t, LRG, "$%s = \"%s\"; ", var, val);
+	   {snprintf(t, LRG, "$%s = \"%s\"; ",
+		     var, strip_quote(val));
 	    s = t;}
 	else if (strcmp(fmt, "db") == 0)
 	   {snprintf(t, LRG, "%s=%s", var, val);

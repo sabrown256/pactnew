@@ -25,33 +25,30 @@ endif
 
 envini UseLDLibPath ""
 
-if (0) then
-set echo
-set verbose
-eval `$PERDB +fmt:csh+           \
-       CC_Exe       =\? cc+      \
-       CC_Flags     =\? \"\"+    \
-       CC_Inc       =\? \"\"+    \
-       CC_Debug     =\? -g+      \
-       CC_Optimize  =\? -O+      \
-       CC_Linker    =\? \"\"+    \
-       CXX_Linker   =\? \"\"+    \
-       CXX_Flags    =\? \"\"+    \
-       CXX_Debug    =\? -g+      \
-       CXX_Optimize =\? -O+      \
-       CXX_Inc      =\? \"\"+    \
-       DP_Inc       =\? \"\"+    \
-       Cfg_CC_Inc+               \
-       Cfg_CC_Flags+             \
-       PACT_CC_FAMILY+           \
-       PACT_CC_VERSION+          \
-       PACT_CC_PATH+             \
-       PACT_CC_EXE+              \
-       CFE+                      \
-       BE+                       \
+if (1) then
+
+eval `$PERDB ^fmt:csh^           \
+       CC_Exe       =\? cc^      \
+       CC_Flags     =\? ""^      \
+       CC_Inc       =\? ""^      \
+       CC_Debug     =\? -g^      \
+       CC_Optimize  =\? -O^      \
+       CC_Linker    =\? ""^      \
+       CXX_Flags    =\? ""^      \
+       CXX_Inc      =\? ""^      \
+       CXX_Debug    =\? -g^      \
+       CXX_Optimize =\? -O^      \
+       CXX_Linker   =\? ""^      \
+       DP_Inc       =\? ""^      \
+       Cfg_CC_Inc^               \
+       Cfg_CC_Flags^             \
+       PACT_CC_FAMILY^           \
+       PACT_CC_VERSION^          \
+       PACT_CC_PATH^             \
+       PACT_CC_EXE^              \
+       CFE^                      \
+       BE^                       \
        OS_Name`
-unset echo
-unset verbose
 
 else
 
@@ -63,12 +60,12 @@ dbini CC_Inc        ""
 dbini CC_Debug      "-g"
 dbini CC_Optimize   "-O"
 dbini CC_Linker     ""
-dbini CXX_Linker    ""
 dbini CXX_Flags     ""
+dbini CXX_Inc       ""
 dbini CXX_Debug     "-g"
 dbini CXX_Optimize  "-O"
-dbini CXX_Inc       ""
-dbini DP_Inc       ""
+dbini CXX_Linker    ""
+dbini DP_Inc        ""
 
 set vl = ""
 set vl = ( $vl Cfg_CC_Inc Cfg_CC_Flags )
@@ -144,9 +141,9 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ($CC_Linker != "") then
-   flog $ALog setenv CC_Exe "$CC_Linker"
-endif
+#if ($CC_Linker != "") then
+#   flog $ALog setenv CC_Exe "$CC_Linker"
+#endif
 
 # make sure we have flags for configuration compiler
 if ($?Cfg_CC_Flags == 0) then
@@ -425,23 +422,60 @@ EOF
 endif
 
 if ("$CC_Linker" == "") then
-   setenv CC_Linker "$CC_Exe"
+   flog $ALog setenv CC_Linker "$CC_Exe"
 endif
 
 if ("$CXX_Linker" == "") then
-   setenv CXX_Linker "$CXX_Exe"
+   flog $ALog setenv CXX_Linker "$CXX_Exe"
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # export the results
+if (1) then
+
+flog $ALog $PERDB ^fmt:db^                     \
+   CC_Exe              = $CC_Exe^              \
+   CC_Flags            = $CC_Flags^            \
+   CC_Inc              = $CC_Inc^              \
+   CC_Debug            = $CC_Debug^            \
+   CC_Optimize         = $CC_Optimize^         \
+   CC_Linker           = $CC_Linker^           \
+   CXX_Exe             = $CXX_Exe^             \
+   CXX_Flags           = $CXX_Flags^           \
+   CXX_Inc             = $CXX_Inc^             \
+   CXX_Debug           = $CXX_Debug^           \
+   CXX_Optimize        = $CXX_Optimize^        \
+   CXX_Linker          = $CXX_Linker^          \
+   Cfg_CC_Exe          = $Cfg_CC_Exe^          \
+   Cfg_CC_Flags        = $Cfg_CC_Flags^        \
+   Cfg_CC_Inc          = $Cfg_CC_Inc^          \
+   Cfe_CC_Exe          = $Cfe_CC_Exe^          \
+   Cfe_CC_Flags        = $Cfe_CC_Flags^        \
+   Cfe_CC_Inc          = $Cfe_CC_Inc^          \
+   Save_CC             = $Save_CC^             \
+   Save_CFLAGS         = $Save_CFLAGS^         \
+   CList               = $CList^               \
+   LONG64              = $LONG64^              \
+   FC_INT_PTR_DIFFER   = $FC_INT_PTR_DIFFER^   \
+   NEED_ALT_LARGE_FILE = $NEED_ALT_LARGE_FILE^ \
+   DP_Inc              = $DP_Inc
+
+else
 dbexp CC_Exe
 dbexp CC_Flags
 dbexp CC_Inc
 dbexp CC_Debug
 dbexp CC_Optimize
 dbexp CC_Linker
+
+dbexp CXX_Exe
+dbexp CXX_Flags
+dbexp CXX_Inc
+dbexp CXX_Debug
+dbexp CXX_Optimize
+dbexp CXX_Linker
 
 dbexp Cfg_CC_Exe
 dbexp Cfg_CC_Flags
@@ -451,12 +485,6 @@ dbexp Cfe_CC_Exe
 dbexp Cfe_CC_Flags
 dbexp Cfe_CC_Inc
 
-dbexp CXX_Exe
-dbexp CXX_Flags
-dbexp CXX_Debug
-dbexp CXX_Optimize
-dbexp CXX_Linker
-
 dbexp Save_CC
 dbexp Save_CFLAGS
 dbexp CList
@@ -465,6 +493,7 @@ dbexp LONG64
 dbexp FC_INT_PTR_DIFFER
 dbexp NEED_ALT_LARGE_FILE
 dbexp DP_Inc
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
