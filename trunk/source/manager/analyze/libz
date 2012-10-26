@@ -14,20 +14,23 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: libz"
 
-# vanilla place to look if previously undefined
-dbini MD_Inc    ""
-dbini MD_Lib    ""
-dbini MD_Pck    ""
-dbini Z_Inc     ""
-dbini Z_Lib     ""
-dbini Z_RPath   $RootLib
-dbini Z_Path    /usr
-
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
-set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
-set vl = ( $vl DAS_ROOT LD_Lib LIB LibM_Lib RPATH )
-source $MngDir/write/import-db
+dbmget $ALog MD_Inc    =\? ""^        \
+             MD_Lib    =\? ""^        \
+             MD_Pck    =\? ""^        \
+             Z_Inc     =\? ""^        \
+             Z_Lib     =\? ""^        \
+             Z_RPath   =\? $RootLib^  \
+             Z_Path    =\? /usr^      \
+             Cfe_CC_Exe^              \
+             Cfe_CC_Flags^            \
+             Cfe_LD_Flags^            \
+             Cfe_LD_Lib^              \
+             Cfe_LD_RPath^            \
+             DAS_ROOT^                \
+             LD_Lib^                  \
+             LIB^                     \
+             LibM_Lib^                \
+             RPATH
 
 # if we have explicitly said we do not want libZ do NOT detect it
 if ("$Z_Path" == none) then
@@ -102,14 +105,14 @@ EOF
    set ETime = `timer -b $UTime`
 
 # export the results
-   dbexp MD_Inc
-   dbexp MD_Lib
-   dbexp MD_Pck
-   dbexp Z_Inc
-   dbexp Z_Lib
-   dbexp Z_RPath
-   dbexp Z_Path
-   dbexp RPATH
+   dbmset $ALog MD_Inc  = $MD_Inc^   \
+                MD_Lib  = $MD_Lib^   \
+                MD_Pck  = $MD_Pck^   \
+                Z_Inc   = $Z_Inc^    \
+                Z_Lib   = $Z_Lib^    \
+                Z_RPath = $Z_RPath^  \
+                Z_Path  = $Z_Path^   \
+                RPATH   = $RPATH
 
 endif
 

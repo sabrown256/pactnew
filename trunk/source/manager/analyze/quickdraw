@@ -11,22 +11,21 @@
 set Me = $0
 source $Me:h/common
 
-dbini MDG_Inc           ""
-dbini MDG_Lib           ""
-dbini MDG_Pck           ""
-dbini QD_Inc            ""
-dbini QD_Lib            ""
-dbini QD_RPath          $RootLib
-dbini QD_Path           /usr
-dbini GRAPHICS_Windows  ""
-dbini GRAPHICS_Devices  ""
-dbini GRAPHICS_Flags    ""
-dbini Std_UseQD         FALSE
-dbini Cfg_CC_Exe        "cc"
-
-set vl = ""
-set vl = ( $vl CC_Exe LD_Flags OS_Name )
-source $MngDir/write/import-db
+dbmget $ALog MDG_Inc          =\? ""^        \
+             MDG_Lib          =\? ""^        \
+             MDG_Pck          =\? ""^        \
+             QD_Inc           =\? ""^        \
+             QD_Lib           =\? ""^        \
+             QD_RPath         =\? $RootLib^  \
+             QD_Path          =\? /usr^      \
+             GRAPHICS_Windows =\? ""^        \
+             GRAPHICS_Devices =\? ""^        \
+             GRAPHICS_Flags   =\? ""^        \
+             Std_UseQD        =\? FALSE^     \
+             Cfg_CC_Exe       =\? cc^        \
+             CC_Exe^                         \
+             LD_Flags^                       \
+             OS_Name
 
 if ($OS_Name == Darwin) then
 
@@ -89,16 +88,16 @@ EOF
    endif
 
 # export the results
-   dbexp MDG_Inc
-   dbexp MDG_Lib
-   dbexp MDG_Pck
-   dbexp QD_Inc
-   dbexp QD_Lib
-   dbexp QD_RPath
-   dbexp QD_Path
-   dbexp GRAPHICS_Windows
-   dbexp GRAPHICS_Devices
-   dbexp GRAPHICS_Flags
+   dbmset $ALog MDG_Inc          = $MDG_Inc^           \
+                MDG_Lib          = $MDG_Lib^           \
+                MDG_Pck          = $MDG_Pck^           \
+                QD_Inc           = $QD_Inc^            \
+                QD_Lib           = $QD_Lib^            \
+                QD_RPath         = $QD_RPath^          \
+                QD_Path          = $QD_Path^           \
+                GRAPHICS_Windows = $GRAPHICS_Windows^  \
+                GRAPHICS_Devices = $GRAPHICS_Devices^  \
+                GRAPHICS_Flags   = $GRAPHICS_Flags
 
 endif
 

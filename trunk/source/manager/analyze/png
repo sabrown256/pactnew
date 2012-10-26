@@ -14,23 +14,26 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: png"
 
-# vanilla place to look if previously undefined
-dbini MDG_Inc      ""
-dbini MDG_Lib      ""
-dbini MDG_Pck      ""
-dbini PNG_Inc      ""
-dbini PNG_Lib      ""
-dbini PNG_RPath    $RootLib
-dbini PNG_Path     /usr
-dbini Z_Lib        ""
-dbini Z_Path       /usr
-dbini HAVE_PNGLIB  FALSE
-
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
-set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
-set vl = ( $vl DAS_ROOT LD_Lib LIB LibM_Lib RPATH )
-source $MngDir/write/import-db
+dbmget $ALog MDG_Inc     =\? ""^        \
+             MDG_Lib     =\? ""^        \
+             MDG_Pck     =\? ""^        \
+             PNG_Inc     =\? ""^        \
+             PNG_Lib     =\? ""^        \
+             PNG_RPath   =\? $RootLib^  \
+             PNG_Path    =\? /usr^      \
+             Z_Lib       =\? ""^        \
+             Z_Path      =\? /usr^      \
+             HAVE_PNGLIB =\? FALSE^     \
+             Cfe_CC_Exe^                \
+             Cfe_CC_Flags^              \
+             Cfe_LD_Flags^              \
+             Cfe_LD_Lib^                \
+             Cfe_LD_RPath^              \
+             DAS_ROOT^                  \
+             LD_Lib^                    \
+             LIB^                       \
+             LibM_Lib^                  \
+             RPATH
 
 # if we have explicitly said we do not want PNG
 # do NOT detect it
@@ -117,15 +120,14 @@ EOF
    setenv PNG_Path  ""
 
 # export the results
-   dbexp MDG_Inc
-   dbexp MDG_Lib
-   dbexp MDG_Pck
-   dbexp PNG_Inc
-   dbexp PNG_Lib
-   dbexp PNG_RPath
-   dbexp PNG_Path
-   dbexp RPATH
-
+   dbmset $ALog MDG_Inc   = $MDG_Inc^    \
+                MDG_Lib   = $MDG_Lib^    \
+                MDG_Pck   = $MDG_Pck^    \
+                PNG_Inc   = $PNG_Inc^    \
+                PNG_Lib   = $PNG_Lib^    \
+                PNG_RPath = $PNG_RPath^  \
+                PNG_Path  = $PNG_Path^   \
+                RPATH     = $RPATH
 endif
 
 dbexp HAVE_PNGLIB
