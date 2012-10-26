@@ -61,10 +61,10 @@ Note $ALog "Temporary file base: $Tmp"
 Note $ALog "Manager directory: $MngDir"
 Note $ALog ""
 
-dbini BE         ""
-dbini CList      ""
-dbini PFE        "do-run -m"
-dbini CFE        ""
+dbmget $ALog BE    =\? ""^           \
+             CList =\? ""^           \
+             PFE   =\? "do-run -m"^  \
+             CFE   =\? ""
 
 envini MngDir     $cwd
 

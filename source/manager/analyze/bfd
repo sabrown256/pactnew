@@ -15,18 +15,18 @@ source $Me:h/common
 Separator $ALog
 Note $ALog "Analyze: exe access support"
 
-set vl = ""
-set vl = ( $vl CC_Exe CC_Flags )
-set vl = ( $vl LIB Linking )
-source $MngDir/write/import-db
+dbget LIB
 
-dbini MDE_Lib        ""
-dbini BFD_Lib        -lbfd
-dbini BFD_Path       /usr/$LIB
-dbini BFD_Version    0.0.0
-dbini HAVE_BFD       FALSE
-dbini HAVE_DEMANGLE  FALSE
-dbini BFD_SO         ""
+dbmget $ALog CC_Exe         =\? cc^         \
+             CC_Flags       =\? ""^         \
+             MDE_Lib        =\? ""^         \
+             BFD_Lib        =\? -lbfd^      \
+             BFD_Path       =\? /usr/$LIB^  \
+             BFD_Version    =\? 0.0.0^      \
+             HAVE_BFD       =\? FALSE^      \
+             HAVE_DEMANGLE  =\? FALSE^      \
+             BFD_SO         =\? ""^         \
+             Linking
 
 # if we have explicitly said we do not want BFD
 # do NOT detect it
@@ -192,13 +192,14 @@ EOF
 
 endif
 
-dbexp BFD_Version
-dbexp BFD_Lib
-dbexp BFD_Path
-dbexp MDE_Lib
-dbexp HAVE_BFD
-dbexp HAVE_DEMANGLE
-dbexp BFD_SO
+dbmset $ALog CC_Exe        = $CC_Exe^           \
+             BFD_Version   = $BFD_Version^      \
+             BFD_Lib       = $BFD_Lib^          \
+             BFD_Path      = $BFD_Path^         \
+             MDE_Lib       = $MDE_Lib^          \
+             HAVE_BFD      = $HAVE_BFD^         \
+             HAVE_DEMANGLE = $HAVE_DEMANGLE^    \
+             BFD_SO        = $BFD_SO
 
 Separator $ALog
 

@@ -15,11 +15,9 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: asynchronous I/O in STREAMS"
 
-dbini HAVE_ASYNC_STREAMS FALSE
-
-set vl = ""
-set vl = ( $vl CC_Exe CC_Flags )
-source $MngDir/write/import-db
+dbmget $ALog HAVE_ASYNC_STREAMS =\? FALSE^   \
+             CC_Exe^                         \
+             CC_Flags
 
 if (-f /usr/include/stropts.h) then
 
