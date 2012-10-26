@@ -11,11 +11,8 @@
 set Me = $0
 source $Me:h/common
 
-dbini HAVE_ANSI_C9X_COMPLEX TRUE
-
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe )
-source $MngDir/write/import-db
+dbmget $ALog HAVE_ANSI_C9X_COMPLEX =\?  TRUE^  \
+             Cfe_CC_Exe
 
 Note $ALog "HAVE_ANSI_C9X_COMPLEX = $HAVE_ANSI_C9X_COMPLEX"
 
