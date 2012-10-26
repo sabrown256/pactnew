@@ -14,21 +14,22 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: jpeg"
 
-# vanilla place to look if previously undefined
-dbini MDG_Inc       ""
-dbini MDG_Lib       ""
-dbini MDG_Pck       ""
-dbini JPEG_Inc      ""
-dbini JPEG_Lib      ""
-dbini JPEG_RPath    $RootLib
-dbini JPEG_Path     /usr
-dbini HAVE_JPEGLIB  FALSE
-
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
-set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
-set vl = ( $vl DAS_ROOT LIB RPATH )
-source $MngDir/write/import-db
+dbmget $ALog MDG_Inc      =\? ""^        \
+             MDG_Lib      =\? ""^        \
+             MDG_Pck      =\? ""^        \
+             JPEG_Inc     =\? ""^        \
+             JPEG_Lib     =\? ""^        \
+             JPEG_RPath   =\? $RootLib^  \
+             JPEG_Path    =\? /usr^      \
+             HAVE_JPEGLIB =\? FALSE^     \
+             Cfe_CC_Exe^                 \
+             Cfe_CC_Flags^               \
+             Cfe_LD_Flags^               \
+             Cfe_LD_Lib^                 \
+             Cfe_LD_RPath^               \
+             DAS_ROOT^                   \
+             LIB^                        \
+             RPATH
 
 # if we have explicitly said we do not want JPEG
 # do NOT detect it
@@ -105,14 +106,14 @@ EOF
    setenv JPEG_Path ""
 
 # export the results
-   dbexp MDG_Inc
-   dbexp MDG_Lib
-   dbexp MDG_Pck
-   dbexp JPEG_Inc
-   dbexp JPEG_Lib
-   dbexp JPEG_RPath
-   dbexp JPEG_Path
-   dbexp RPATH
+   dbmset $ALog MDG_Inc    = $MDG_Inc^     \
+                MDG_Lib    = $MDG_Lib^     \
+                MDG_Pck    = $MDG_Pck^     \
+                JPEG_Inc   = $JPEG_Inc^    \
+                JPEG_Lib   = $JPEG_Lib^    \
+                JPEG_RPath = $JPEG_RPath^  \
+                JPEG_Path  = $JPEG_Path^   \
+                RPATH      = $RPATH
 
 endif
 

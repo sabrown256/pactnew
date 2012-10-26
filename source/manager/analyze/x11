@@ -14,23 +14,25 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: x11"
 
-dbini MDG_Inc           ""
-dbini MDG_Lib           ""
-dbini MDG_Pck           ""
-dbini X11_Inc           $RootInc
-dbini X11_Lib           ""
-dbini X11_RPath         $RootLib
-dbini X11_Path          /usr
-dbini GRAPHICS_Windows  ""
-dbini GRAPHICS_Devices  ""
-dbini GRAPHICS_Flags    ""
-dbini Std_UseX          TRUE
-
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
-set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
-set vl = ( $vl LIB OS_Name RPATH )
-source $MngDir/write/import-db
+dbmget $ALog MDG_Inc          =\? ""^        \
+             MDG_Lib          =\? ""^        \
+             MDG_Pck          =\? ""^        \
+             X11_Inc          =\? $RootInc^  \
+             X11_Lib          =\? ""^        \
+             X11_RPath        =\? $RootLib^  \
+             X11_Path         =\? /usr^      \
+             GRAPHICS_Windows =\? ""^        \
+             GRAPHICS_Devices =\? ""^        \
+             GRAPHICS_Flags   =\? ""^        \
+             Std_UseX         =\? FALSE^     \
+             Cfe_CC_Exe^                     \
+             Cfe_CC_Flags^                   \
+             Cfe_LD_Flags^                   \
+             Cfe_LD_Lib^                     \
+             Cfe_LD_RPath^                   \
+             LIB^                            \
+             OS_Name^                        \
+             RPATH
 
 # if we have explicitly said we do not want X11
 # do NOT detect it
@@ -162,18 +164,17 @@ EOF
    endif
 
 # export the results
-   dbexp MDG_Inc
-   dbexp MDG_Lib
-   dbexp MDG_Pck
-   dbexp X11_Inc
-   dbexp X11_Lib
-   dbexp X11_RPath
-   dbexp X11_Path
-   dbexp RPATH
-   dbexp GRAPHICS_Windows
-   dbexp GRAPHICS_Devices
-   dbexp GRAPHICS_Flags
-
+   dbmset $ALog MDG_Inc          = $MDG_Inc^            \
+                MDG_Lib          = $MDG_Lib^            \
+                MDG_Pck          = $MDG_Pck^            \
+                X11_Inc          = $X11_Inc^            \
+                X11_Lib          = $X11_Lib^            \
+                X11_RPath        = $X11_RPath^          \
+                X11_Path         = $X11_Path^           \
+                GRAPHICS_Windows = $GRAPHICS_Windows^   \
+                GRAPHICS_Devices = $GRAPHICS_Devices^   \
+                GRAPHICS_Flags   = $GRAPHICS_Flags^     \
+                RPATH            = $RPATH
 endif
 
 dbexp Std_UseX

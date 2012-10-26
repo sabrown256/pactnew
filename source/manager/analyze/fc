@@ -23,20 +23,21 @@ else
    setenv HAVE_FORTRAN   TRUE
 endif
 
-dbini F_STD            "F90"
-dbini FC_Exe           "f90"
-dbini FC_Flags         ""
-dbini FC_Debug         "-g"
-dbini FC_Optimize      "-O"
-dbini FC_Linker        ""
-dbini FC_ID_UNDERSCORE "_"
-dbini FC_ID_CASE       "lower"
-dbini Cfg_FC_Flags     "$FC_Flags"
-
-set vl = ""
-set vl = ( $vl PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH PACT_FC_EXE )
-set vl = ( $vl NM OS_Name )
-source $MngDir/write/import-db
+dbmget $ALog F_STD            =\? "F90"^        \
+             FC_Exe           =\? "f90"^        \
+             FC_Flags         =\? ""^           \
+             FC_Debug         =\? "-g"^         \
+             FC_Optimize      =\? "-O"^         \
+             FC_Linker        =\? ""^           \
+             FC_ID_UNDERSCORE =\? "_"^          \
+             FC_ID_CASE       =\? "lower"^      \
+             Cfg_FC_Flags     =\? "$FC_Flags"^  \
+             PACT_FC_FAMILY^                    \
+             PACT_FC_VERSION^                   \
+             PACT_FC_PATH^                      \
+             PACT_FC_EXE^                       \
+             NM^                                \
+             OS_Name
 
 set UTime = `timer -r`
 
@@ -256,22 +257,22 @@ setenv FC_Flags "$Save_FFLAGS"
 DONE:
 
 # export the results
-dbexp HAVE_FORTRAN
-dbexp F_STD
 
-dbexp FC_Exe
-dbexp FC_Flags
-dbexp FC_Debug
-dbexp FC_Optimize
-dbexp FC_Linker
-
-dbexp Cfg_FC_Exe
-dbexp Cfg_FC_Flags
-dbexp Cfe_FC_Exe
-dbexp Cfe_FC_Flags
-
-dbexp FC_ID_UNDERSCORE
-dbexp FC_ID_CASE
+dbmset $ALog CC_Exe           = $CC_Exe^           \
+             CC_Flags         = $CC_Flags^         \
+             HAVE_FORTRAN     = $HAVE_FORTRAN^     \
+             F_STD            = $F_STD^            \
+             FC_Exe           = $FC_Exe^           \
+             FC_Flags         = $FC_Flags^         \
+             FC_Debug         = $FC_Debug^         \
+             FC_Optimize      = $FC_Optimize^      \
+             FC_Linker        = $FC_Linker^        \
+             Cfg_FC_Exe       = $Cfg_FC_Exe^       \
+             Cfg_FC_Flags     = $Cfg_FC_Flags^     \
+             Cfe_FC_Exe       = $Cfe_FC_Exe^       \
+             Cfe_FC_Flags     = $Cfe_FC_Flags^     \
+             FC_ID_UNDERSCORE = $FC_ID_UNDERSCORE^ \
+             FC_ID_CASE       = $FC_ID_CASE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
