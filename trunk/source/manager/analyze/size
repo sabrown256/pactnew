@@ -13,12 +13,10 @@ source $Me:h/common
 
 Note $ALog "      Find Integer Sizes"
 
-dbini INT4  int
-dbini INT8  long
-
-set vl = ""
-set vl = ( $vl CFE Cfe_CC_Exe )
-source $MngDir/write/import-db
+dbmget $ALog INT4    =\? int^   \
+             INT8    =\? long^  \
+             CFE^               \
+             Cfe_CC_Exe
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -137,9 +135,8 @@ flog $ALog rm -f $Tmp.c $Tmp
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set vl = ( INT4 INT8 )
-
-source $MngDir/write/import-db
+dbmget $ALog INT4^   \
+             INT8
 
 Note $ALog ""
 Note $ALog "Integer size info:"

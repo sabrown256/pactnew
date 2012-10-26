@@ -15,13 +15,12 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: poll"
 
-dbini HAVE_SELECT   FALSE
-dbini HAVE_STREAMS  FALSE
-
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
-set vl = ( $vl Cfe_LD_Flags Cfe_LD_RPath )
-source $MngDir/write/import-db
+dbmget $ALog HAVE_SELECT  =\? FALSE^  \
+             HAVE_STREAMS =\? FALSE^  \
+             Cfe_CC_Exe^              \
+             Cfe_CC_Flags^            \
+             Cfe_LD_Flags^            \
+             Cfe_LD_RPath
 
 set poll = ""
 
@@ -130,8 +129,8 @@ endif
 NoteD $ALog ""
 
 # export the results
-dbexp HAVE_STREAMS
-dbexp HAVE_SELECT
+dbmset $ALog HAVE_STREAMS = $HAVE_STREAMS^   \
+             HAVE_SELECT  = $HAVE_SELECT
 
 exit(0)
 

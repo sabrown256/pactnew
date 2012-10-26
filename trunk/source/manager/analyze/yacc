@@ -18,8 +18,8 @@ Note $Log "Analyze: yacc"
 NoteD $ALog -n "   Yacc: "
 Note $ALog ""
 
-dbmget $ALog Yacc_Exe       =\? yacc^    \
-             Yacc_Flags     =\? ""
+dbmget $ALog Yacc_Exe   =\? yacc^    \
+             Yacc_Flags =\? ""
 
 # find an executable
 if (!(-x "$Yacc_Exe")) then

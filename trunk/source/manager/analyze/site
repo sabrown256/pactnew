@@ -14,10 +14,10 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: site"
 
-dbini SYS_SITE     ""
-dbini SYS_TYPE     ""
-dbini DAI_ROOT     ""
-dbini DAS_ROOT     ""
+dbmget $ALog SYS_SITE =\? ""^  \
+             SYS_TYPE =\? ""^  \
+             DAI_ROOT =\? ""^  \
+             DAS_ROOT =\? ""
 
 if ($?SITE_SIGNATURE_DB == 1) then
    Note $Log "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
@@ -32,10 +32,10 @@ else
 endif
 
 # export the results
-dbexp SYS_SITE
-dbexp SYS_TYPE
-dbexp DAI_ROOT
-dbexp DAS_ROOT
+dbmset $ALog SYS_SITE = $SYS_SITE^  \
+             SYS_TYPE = $SYS_TYPE^  \
+             DAI_ROOT = $DAI_ROOT^  \
+             DAS_ROOT = $DAS_ROOT
 
 exit(0)
 

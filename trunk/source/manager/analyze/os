@@ -24,8 +24,8 @@ Note $ALog ""
 
 set los = ( `uname -s` )
 
-dbini OSX_Version   ""
-dbini OS_Name       "$los"
+dbmget $ALog OSX_Version  =\? ""^  \
+             OS_Name      =\? "$los"
 
 unset los
 
@@ -71,9 +71,9 @@ NoteD $ALog " ($OS_Type)"
 setenv OS_Type USE_$OS_Type
 
 # export results
-dbexp OS_Type
-dbexp OS_Release
-dbexp OS_Name
+dbmset $ALog OS_Type     = $OS_Type^      \
+             OS_Release  = $OS_Release^   \
+             OS_Name     = $OS_Name
 
 exit(0)
 

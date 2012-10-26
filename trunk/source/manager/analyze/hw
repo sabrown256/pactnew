@@ -22,8 +22,8 @@ endif
 NoteD $ALog -n "   Hardware: "
 Note $ALog ""
 
-dbini CPU           "unknown"
-dbini FPU           "unknown"
+dbmget $ALog CPU =\? "unknown"^  \
+             FPU =\? "unknown"
 
 set HostHW  = `uname -m`
 
@@ -63,8 +63,8 @@ if ("$FPU" != "unknown") then
 endif
 NoteD $ALog ""
 
-dbexp CPU
-dbexp FPU
+dbmset $ALog CPU = $CPU^  \
+             FPU = $FPU
 
 exit(0)
 
