@@ -14,16 +14,21 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: finish"
 
-set vl = ""
-set vl = ( $vl GRAPHICS_Windows )
-set vl = ( $vl Std_UseX Std_UseOGL Std_UseQD )
-set vl = ( $vl AbsoluteDeb MDG_Inc )
-set vl = ( $vl CC_Exe CC_Flags CC_Optimize CC_Debug )
-set vl = ( $vl FC_Optimize FC_Debug )
-set vl = ( $vl Save_CC Save_CFLAGS )
-set vl = ( $vl Cfe_CC_Inc )
-
-source $MngDir/write/import-db
+dbmget $ALog MDG_Inc =\? ""^    \
+             GRAPHICS_Windows^  \
+             Std_UseX^          \
+             Std_UseOGL^        \
+             Std_UseQD^         \
+             AbsoluteDeb^       \
+             CC_Exe^            \
+             CC_Flags^          \
+             CC_Optimize^       \
+             CC_Debug^          \
+             FC_Optimize^       \
+             FC_Debug^          \
+             Save_CC^           \
+             Save_CFLAGS^       \
+             Cfe_CC_Inc
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -45,9 +50,9 @@ if ($Std_UseX == FALSE) then
       flog $ALog setenv Std_UseOGL FALSE
       flog $ALog setenv Std_UseQD  FALSE
 
-      dbexp Std_UseX
-      dbexp Std_UseOGL
-      dbexp Std_UseQD
+      dbmset $ALog Std_UseX   = $Std_UseX^    \
+                   Std_UseOGL = $Std_UseOGL^  \
+                   Std_UseQD  = $Std_UseQD
    endif
 
    dbexp GRAPHICS_Windows
@@ -63,11 +68,9 @@ endif
 
 # NOTE: compilers look at /usr/include by default not
 # necessarily $RootInc
-dbini MDG_Inc ""
 if ("$MDG_Inc" == "-I/usr/include") then
    flog $ALog setenv MDG_Inc ""
 endif
-dbexp MDG_Inc
 
 if ($?Save_CC == 1) then
    flog $ALog setenv CC_Exe "$Save_CC"
@@ -93,15 +96,14 @@ endif
 #--------------------------------------------------------------------------
 
 # export the results
-dbexp CC_Exe
-dbexp CC_Flags
-dbexp CC_Debug_Default
-dbexp CC_Optimize_Default
-
-dbexp FC_Debug_Default
-dbexp FC_Optimize_Default
-
-dbexp Cfe_CC_Inc
+dbmset $ALog CC_Exe              = $CC_Exe^               \
+             CC_Flags            = $CC_Flags^             \
+             CC_Debug_Default    = $CC_Debug_Default^     \
+             CC_Optimize_Default = $CC_Optimize_Default^  \
+             FC_Debug_Default    = $FC_Debug_Default^     \
+             FC_Optimize_Default = $FC_Optimize_Default^  \
+             Cfe_CC_Inc          = $Cfe_CC_Inc^           \
+             MDG_Inc             = $MDG_Inc
 
 exit(0)
 

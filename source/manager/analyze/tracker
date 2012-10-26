@@ -14,12 +14,9 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: tracker"
 
-dbini HAVE_TRACKER ""
-dbini TRACKER_Exe  ""
-
-set vl = ""
-set vl = ( $vl DAS_ROOT )
-source $MngDir/write/import-db
+dbmget $ALog HAVE_TRACKER =\? ""^  \
+             TRACKER_Exe  =\? ""^  \
+             DAS_ROOT
 
 foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
    if (-d $d) then
@@ -39,8 +36,8 @@ foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
 end
 
 # export the results
-dbexp HAVE_TRACKER
-dbexp TRACKER_Exe
+dbmset $ALog HAVE_TRACKER = $HAVE_TRACKER^   \
+             TRACKER_Exe  = $TRACKER_Exe
 
 exit(0)
 

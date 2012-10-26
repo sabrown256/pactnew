@@ -63,8 +63,8 @@ else
    NoteD $ALog "      no GCC found on this system"
 endif
 
-dbexp HAVE_GNU_LIBC_6
-dbexp GLIBC_VERSION
+dbmset $ALog HAVE_GNU_LIBC_6 = $HAVE_GNU_LIBC_6^  \
+             GLIBC_VERSION   = $GLIBC_VERSION
 
 
 

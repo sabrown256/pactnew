@@ -17,12 +17,12 @@ Note $Log "Analyze: socket"
 NoteD $ALog -n "      getsockopt type: "
 Note $ALog ""
 
-dbini HAVE_SOCKETS    TRUE
-
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags )
-set vl = ( $vl Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
-source $MngDir/write/import-db
+dbmget $ALog HAVE_SOCKETS =\? TRUE^ \
+             Cfe_CC_Exe^            \
+             Cfe_CC_Flags^          \
+             Cfe_LD_Flags^          \
+             Cfe_LD_Lib^            \
+             Cfe_LD_RPath
 
 cat << EOF >! $Tmp.c
 #include <sys/socket.h>
@@ -48,8 +48,8 @@ unset t
 flog $ALog rm -f $Tmp.c $Tmp
 
 # export the results
-dbexp HAVE_SOCKETS
-dbexp GETSOCKOPT_TYPE
+dbmset $ALog HAVE_SOCKETS    = $HAVE_SOCKETS^    \
+             GETSOCKOPT_TYPE = $GETSOCKOPT_TYPE
 
 exit(0)
 

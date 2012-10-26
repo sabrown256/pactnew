@@ -89,12 +89,6 @@ else
    goto DONE
 endif
 
-# make sure that we have the main Fortran compiler
-#dbini FC_Exe "$F90C[1]"
-#if ($FC_Exe == "") then
-#   flog $ALog setenv FC_Exe "$F90C[1]"
-#endif
-
 # make sure we have a configuration compiler defined
 if ($?Cfg_FC_Exe == 0) then
    flog $ALog setenv Cfg_FC_Exe "$FC_Exe"
