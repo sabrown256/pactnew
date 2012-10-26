@@ -22,22 +22,20 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: python"
 
-dbini HAVE_PYTHON     FALSE
-dbini HAVE_PY_NUMERIC FALSE
-dbini HAVE_PY_NUMPY   FALSE
-dbini PY_Exe          ""
-dbini PY_Vers         ""
-dbini PY_DirPy        ""
-dbini PY_DirDst       ""
-dbini PY_DirSrc       ""
-dbini PY_CC           ""
-dbini PY_Cfg          ""
-dbini PY_Inc          ""
-dbini PY_Path         ""
-
-set vl = ""
-set vl = ( $vl CC_Exe OS_Name )
-source $MngDir/write/import-db
+dbmget $ALog HAVE_PYTHON     =\? ""^  \
+             HAVE_PY_NUMERIC =\? ""^  \
+             HAVE_PY_NUMPY   =\? ""^  \
+             PY_Exe          =\? ""^  \
+             PY_Vers         =\? ""^  \
+             PY_DirPy        =\? ""^  \
+             PY_DirDst       =\? ""^  \
+             PY_DirSrc       =\? ""^  \
+             PY_CC           =\? ""^  \
+             PY_Cfg          =\? ""^  \
+             PY_Inc          =\? ""^  \
+             PY_Path         =\? ""^  \
+             CC_Exe^                  \
+             OS_Name
 
 # if there is no python directory no need to look further
 if (-d ../../python) then
@@ -192,22 +190,21 @@ if (-d ../../python) then
 # install source (local build destination)
       setenv PY_DirSrc $SysDir/lib/python${PY_Vers}
 
-      dbexp PY_DirSrc
-      dbexp PY_DirDst
-      dbexp PY_DirPy
+      dbmset $ALog PY_DirSrc = $PY_DirSrc^       \
+                   PY_DirDst = $PY_DirDst^       \
+                   PY_DirPy  = $PY_DirPy
    endif
 
 # export the results
-   dbexp HAVE_PYTHON
-   dbexp HAVE_PY_NUMERIC
-   dbexp HAVE_PY_NUMPY
-   dbexp PY_Path
-   dbexp PY_Exe
-   dbexp PY_CC
-   dbexp PY_Cfg
-   dbexp PY_Inc
-   dbexp PY_Vers
-
+dbmset $ALog HAVE_PYTHON     = $HAVE_PYTHON^       \
+             HAVE_PY_NUMERIC = $HAVE_PY_NUMERIC^   \
+             HAVE_PY_NUMPY   = $HAVE_PY_NUMPY^     \
+             PY_Path         = $PY_Path^           \
+             PY_Exe          = $PY_Exe^            \
+             PY_CC           = $PY_CC^             \
+             PY_Cfg          = $PY_Cfg^            \
+             PY_Inc          = $PY_Inc^            \
+             PY_Vers         = $PY_Vers
 endif
 
 exit(0)

@@ -14,19 +14,21 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: readline"
 
-set vl = ""
-set vl = ( $vl LIB )
-set vl = ( $vl CC_Flags CFE Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
-source $MngDir/write/import-db
+dbget LIB
 
-dbini MD_Inc     ""
-dbini MD_Lib     ""
-dbini MD_Pck     ""
-dbini RL_Inc    ""
-dbini RL_Lib    ""
-dbini RL_RPath  /usr/${LIB}
-dbini RL_Path   /usr
-dbini HAVE_READLINE   FALSE
+dbmget $ALog MD_Inc        =\? ""^           \
+             MD_Lib        =\? ""^           \
+             MD_Pck        =\? ""^           \
+             RL_Inc        =\? ""^           \
+             RL_Lib        =\? ""^           \
+             RL_RPath      =\? /usr/${LIB}^  \
+             RL_Path       =\? /usr^         \
+             HAVE_READLINE =\? FALSE^        \
+             CC_Flags^                       \
+             CFE^                            \
+             Cfe_LD_Flags^                   \
+             Cfe_LD_Lib^                     \
+             Cfe_LD_RPath
 
 # if we have explicitly said we do not want READLINE
 # do NOT detect it
@@ -104,13 +106,13 @@ EOF
    setenv RL_Path  ""
 
 # export the results
-   dbexp MD_Lib
-   dbexp MD_Pck
-   dbexp RL_Inc
-   dbexp RL_Lib
-   dbexp RL_RPath
-   dbexp RL_Path
-
+   dbmset $ALog MD_Inc   = $MD_Inc^    \
+                MD_Lib   = $MD_Lib^    \
+                MD_Pck   = $MD_Pck^    \
+                RL_Inc   = $RL_Inc^    \
+                RL_Lib   = $RL_Lib^    \
+                RL_RPath = $RL_RPath^  \
+                RL_Path  = $RL_Path
 endif
 
 exit(0)

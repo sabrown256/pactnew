@@ -18,8 +18,8 @@ Note $Log "Analyze: yacc"
 NoteD $ALog -n "   Yacc: "
 Note $ALog ""
 
-dbini Yacc_Exe    yacc
-dbini Yacc_Flags  ""
+dbmget $ALog Yacc_Exe       =\? yacc^    \
+             Yacc_Flags     =\? ""
 
 # find an executable
 if (!(-x "$Yacc_Exe")) then
@@ -63,8 +63,8 @@ else
 endif
 
 # export the results
-dbexp Yacc_Exe
-dbexp Yacc_Flags
+dbmset $ALog Yacc_Exe   = $Yacc_Exe^    \
+             Yacc_Flags = $Yacc_Flags
 
 exit(0)
 

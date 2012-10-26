@@ -14,16 +14,13 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: libm"
 
-dbini IMF_Lib      "-limf"
-dbini IMF_Path     ""
-dbini LibM_Lib     "-lm"
-dbini LibM_RPath   ""
-dbini MD_Pck       ""
-dbini Cfg_RPATH    ""
-
-set vl = ""
-set vl = ( $vl RPATH )
-source $MngDir/write/import-db
+dbmget $ALog IMF_Lib     =\? -limf^  \
+             IMF_Path    =\? ""^     \
+             LibM_Lib    =\? "-lm"^  \
+             LibM_RPath  =\? ""^     \
+             MD_Pck      =\? FALSE^  \
+             Cfg_RPATH   =\? ""^     \
+             RPATH
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -69,12 +66,12 @@ NoteD $ALog "   Math library: $LibM_Lib"
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-dbexp MD_Pck
-dbexp IMF_Path
-dbexp RPATH
-dbexp LibM_Lib
-dbexp LibM_RPath
-dbexp Cfg_RPATH
+dbmset $ALog MD_Pck     = $MD_Pck^     \
+             IMF_Path   = $IMF_Path^   \
+             LibM_Lib   = $LibM_Lib^   \
+             LibM_RPath = $LibM_RPath^ \
+             Cfg_RPATH  = $Cfg_RPATH^  \
+             RPATH      = $RPATH
 
 exit(0)
 

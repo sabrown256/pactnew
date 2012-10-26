@@ -14,14 +14,16 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: math"
 
+dbmget $ALog GSL_Path    =\? ""^     \
+             BLAS_Path   =\? ""^     \
+             LAPACK_Path =\? ""
+
 set MathLib = ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # look for GNU Scientific library
-
-dbini GSL_Path ""
 
 if (-d $RootInc/gsl) then
    set rinc = $RootInc
@@ -37,14 +39,10 @@ endif
 
 # look for BLAS
 
-dbini BLAS_Path ""
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # look for LAPACK
-
-dbini LAPACK_Path ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -60,9 +58,9 @@ if ("$MathLib" != "") then
    NoteD $ALog "      math packages: $MathLib"
 endif
 
-dbexp GSL_Path
-dbexp BLAS_Path
-dbexp LAPACK_Path
+dbmset $ALog GSL_Path    = $GSL_Path^       \
+             BLAS_Path   = $BLAS_Path^      \
+             LAPACK_Path = $LAPACK_Path
 
 exit(0)
 
