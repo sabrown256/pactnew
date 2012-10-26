@@ -398,7 +398,7 @@ static char *render_val(char *var, char *val, char *fmt)
     s = val;
     if (fmt != NULL)
        {if (strcmp(fmt, "csh") == 0)
-	   {snprintf(t, LRG, "set %s = \"%s\" ; ", var, val);
+	   {snprintf(t, LRG, "set %s = ( %s ) ; ", var, val);
 	    s = t;}
 	else if (strcmp(fmt, "sh") == 0)
 	   {snprintf(t, LRG, "%s=\"%s\" ; ", var, val);
@@ -498,7 +498,15 @@ static char **do_var_acc(database *db, char *s)
     char *t, *fmt, **val, **sa;
 
 #if 1
-    sa = tokenize(s, ",");
+    char c, dl[2];
+
+    c = s[0];
+    if (strchr(",.:;-_+~^@/|<>", c) != NULL)
+       dl[0] = c;
+    else
+       dl[0] = '^';
+    dl[1] = '\0';
+    sa = tokenize(s, dl);
 #else
     sa = NULL;
     sa = lst_push(sa, s);

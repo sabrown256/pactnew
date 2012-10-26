@@ -13,34 +13,34 @@ setenv PERDB_PATH $db
 
 echo "-----------------------------------"
 
-perdb v1=1, v2=2
+perdb ,v1=1, v2=2
 
 echo "----------------"
-perdb v1=\?a,v2=\?"",v3=\?c
+perdb ,v1=\?a,v2=\?"",v3=\?c
 
 echo "----------------"
-echo "perdb fmt:csh,v1,v2,v3"
-perdb fmt:csh,v1,v2,v3
+echo "perdb ,fmt:csh,v1,v2,v3"
+perdb ,fmt:csh,v1,v2,v3
 
 echo "----------------"
-echo "perdb fmt:sh,v1,v2,v3"
-perdb fmt:sh,v1,v2,v3
+echo "perdb ,fmt:sh,v1,v2,v3"
+perdb ,fmt:sh,v1,v2,v3
 
 echo "----------------"
-echo "perdb fmt:pl,v1,v2,v3"
-perdb fmt:pl,v1,v2,v3
+echo "perdb ,fmt:pl,v1,v2,v3"
+perdb ,fmt:pl,v1,v2,v3
 
 echo "----------------"
-echo "perdb fmt:db,v1,v2,v3"
-perdb fmt:db,v1,v2,v3
+echo "perdb ,fmt:db,v1,v2,v3"
+perdb ,fmt:db,v1,v2,v3
 
 echo "----------------"
-echo "perdb v1,v2,v3"
-perdb v1,v2,v3
+echo "perdb ,v1,v2,v3"
+perdb ,v1,v2,v3
 
 echo "----------------"
-echo "eval perdb fmt:csh,v1,v2,v3"
-eval `perdb fmt:csh,v1,v2,v3`
+echo "eval perdb ,fmt:csh,v1,v2,v3"
+eval `perdb ,fmt:csh,v1,v2,v3`
 echo "v1 = $v1"
 echo "v2 = $v2"
 echo "v3 = $v3"

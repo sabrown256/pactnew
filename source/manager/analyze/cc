@@ -23,6 +23,38 @@ else
    Note $ALog "Cross compiling C compiler analysis"
 endif
 
+envini UseLDLibPath ""
+
+if (0) then
+set echo
+set verbose
+eval `$PERDB +fmt:csh+           \
+       CC_Exe       =\? cc+      \
+       CC_Flags     =\? \"\"+    \
+       CC_Inc       =\? \"\"+    \
+       CC_Debug     =\? -g+      \
+       CC_Optimize  =\? -O+      \
+       CC_Linker    =\? \"\"+    \
+       CXX_Linker   =\? \"\"+    \
+       CXX_Flags    =\? \"\"+    \
+       CXX_Debug    =\? -g+      \
+       CXX_Optimize =\? -O+      \
+       CXX_Inc      =\? \"\"+    \
+       DP_Inc       =\? \"\"+    \
+       Cfg_CC_Inc+               \
+       Cfg_CC_Flags+             \
+       PACT_CC_FAMILY+           \
+       PACT_CC_VERSION+          \
+       PACT_CC_PATH+             \
+       PACT_CC_EXE+              \
+       CFE+                      \
+       BE+                       \
+       OS_Name`
+unset echo
+unset verbose
+
+else
+
 # NOTE: we cannot have nothing for CC_Exec
 # if nothing is specified try cc
 dbini CC_Exe        "cc"
@@ -38,13 +70,13 @@ dbini CXX_Optimize  "-O"
 dbini CXX_Inc       ""
 dbini DP_Inc       ""
 
-envini UseLDLibPath ""
-
 set vl = ""
 set vl = ( $vl Cfg_CC_Inc Cfg_CC_Flags )
 set vl = ( $vl PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH PACT_CC_EXE )
 set vl = ( $vl CFE BE OS_Name )
 source $MngDir/write/import-db
+
+endif
 
 set UTime = `timer -r`
 
