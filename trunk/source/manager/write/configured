@@ -27,15 +27,16 @@ Separator $Log
 NoteD $Log "   Configuration record - configured"
 Note $Log ""
 
-set vl = ""
-set vl = ( $vl EtcDir UseTmpDir FilterDir )
-set vl = ( $vl Host OS_Name HAVE_JPEGLIB HAVE_PNGLIB )
-set vl = ( $vl WARN_PATTERN ERR_PATTERN USER )
-
-source $MngDir/write/import-db
-
-# NOTE: must dbset this in dsys first
-#dbget DbgOpt
+dbmget $Log EtcDir^        \
+            UseTmpDir^     \
+            FilterDir^     \
+            Host^          \
+            OS_Name^       \
+            HAVE_JPEGLIB^  \
+            HAVE_PNGLIB^   \
+            WARN_PATTERN^  \
+            ERR_PATTERN^   \
+            USER
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

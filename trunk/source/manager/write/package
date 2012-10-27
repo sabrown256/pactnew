@@ -26,11 +26,11 @@ Separator $Log
 NoteD $Log "   Package List - package"
 Note $Log ""
 
-set vl = ""
-set vl = ( $vl EtcDir HAVE_FORTRAN )
-set vl = ( $vl HAVE_PYTHON HAVE_PY_NUMPY HAVE_PY_NUMERIC )
-
-source $MngDir/write/import-db
+dbmget $Log EtcDir^           \
+            HAVE_FORTRAN^     \
+            HAVE_PYTHON^      \
+            HAVE_PY_NUMPY^    \
+            HAVE_PY_NUMERIC
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

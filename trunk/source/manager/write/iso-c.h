@@ -27,10 +27,11 @@ Separator $Log
 NoteD $Log "   C Standards Configuration - iso-c.h"
 Note $Log ""
 
-set vl = ""
-set vl = ( $vl C_STD GLIBC_VERSION OS_Name IncDir Sys )
-
-source $MngDir/write/import-db
+dbmget $Log C_STD^          \
+            GLIBC_VERSION^  \
+            OS_Name^        \
+            IncDir^         \
+            Sys
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -27,12 +27,11 @@ Separator $Log
 NoteD $Log "   Interpeter Syntax Mode Configuration - syntax.h"
 Note $Log ""
 
-set vl = ""
-set vl = ( $vl BaseDir IncDir Sys Yacc_Exe )
-
-source $MngDir/write/import-db
-
-dbget BackSlash
+dbmget $Log BaseDir^    \
+            IncDir^     \
+            Sys^        \
+            Yacc_Exe^   \
+            BackSlash
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
