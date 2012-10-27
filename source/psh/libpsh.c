@@ -417,12 +417,13 @@ char *delimited(char *s, char *bgn, char *end)
 /*--------------------------------------------------------------------------*/
 
 /* TOKENIZE - return an array of strings obtained by
- *          - tokenizing the string S according to the delimiters DELIM
+ *          - tokenizing the string S according to the
+ *          - single-character delimiters DLM
  *          - the array is terminated by a NULL string
  *          - it can be released by free_strings
  */
 
-char **tokenize(char *s, char *delim)
+char **tokenize(char *s, char *dlm)
    {int i, n, c, ns;
     char *p, *t, *ps, **sa;
 
@@ -438,7 +439,7 @@ char **tokenize(char *s, char *delim)
 	            sa = MAKE_N(char *, 1000);
 
 		 if (sa != NULL)
-		    {ns  = strspn(ps, delim);
+		    {ns  = strspn(ps, dlm);
 		     ps += ns;
 
 /* find the next unescaped delimiter
@@ -464,7 +465,7 @@ char **tokenize(char *s, char *delim)
 
 			      FREE(u);}
 
-			  else if (strchr(delim, c) != NULL)
+			  else if (strchr(dlm, c) != NULL)
 			     break;};
 
 		     if (*p != '\0')
@@ -473,6 +474,80 @@ char **tokenize(char *s, char *delim)
 			 sa[i++] = STRSAVE(ps);
 			 *p = c;
 			 ps = p + 1;}
+		     else
+		        {if (IS_NULL(ps) == FALSE)
+			    sa[i++] = STRSAVE(ps);
+			 break;};};};
+
+	    if (sa != NULL)
+	       sa[i++] = NULL;
+
+	    FREE(t);};};
+
+    return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TOKENIZED - return an array of strings obtained by
+ *           - tokenizing the string S according to the
+ *           - multi-character delimiter DLM
+ *           - the array is terminated by a NULL string
+ *           - it can be released by free_strings
+ */
+
+char **tokenized(char *s, char *dlm)
+   {int i, n, c, nd;
+    char *p, *t, *ps, **sa;
+
+    sa = NULL;
+    if ((s != NULL) && (dlm != NULL))
+       {nd = strlen(dlm);
+	n  = strlen(s);
+	t  = MAKE_N(char, n+100);
+	if (t != NULL)
+	   {nstrncpy(t, n+100, s, -1);
+
+	    for (i = 0, ps = t; ps != NULL; )
+	        {if (sa == NULL)
+	            sa = MAKE_N(char *, 1000);
+
+		 if (sa != NULL)
+
+/* find the next unescaped delimiter
+ * we could use strpbrk except for escapes
+ */
+		    {for (p = ps; *p != '\0'; p++)
+		         {c = *p;
+			  if (c == '\\')
+			     p++;
+
+/* skip to matching quotes when we find one */
+			  else if ((c == '\"') || (c == '\''))
+			     {char dl[2];
+			      char *sb, *u;
+
+			      u = MAKE_N(char, n);
+			      nstrncpy(u, n, p, -1);
+
+			      dl[0] = c;
+			      dl[1] = '\0';
+			      sb = delimited(u, dl, dl);
+			      p += (strlen(sb) + 1);
+
+			      FREE(u);}
+
+			  else if ((c == dlm[0]) &&
+				   (strncmp(p, dlm, nd) == 0))
+			     break;};
+
+		     if (*p != '\0')
+		        {c  = *p;
+			 *p = '\0';
+			 if (IS_NULL(ps) == FALSE)
+			    sa[i++] = STRSAVE(ps);
+			 *p = c;
+			 ps = p + nd;}
 		     else
 		        {if (IS_NULL(ps) == FALSE)
 			    sa[i++] = STRSAVE(ps);
@@ -892,7 +967,7 @@ int full_path(char *path, int nc, char *dir, char *name)
 
 /* PATH_SIMPLIFY - remove redundant entries from path type string S */
 
-char *path_simplify(char *s, int delim)
+char *path_simplify(char *s, int dlm)
    {int i, j, ok;
     char *t, **sa;
     static char d[LRG];
@@ -911,7 +986,7 @@ char *path_simplify(char *s, int delim)
 	         ok = (strcmp(sa[j], t) == 0);
 
 	     if (ok == FALSE)
-	        vstrcat(d, LRG, "%c%s", delim, t);};
+	        vstrcat(d, LRG, "%c%s", dlm, t);};
 
 	free_strings(sa);};
 

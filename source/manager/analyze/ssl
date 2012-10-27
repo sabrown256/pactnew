@@ -1,0 +1,156 @@
+#!/bin/csh -f
+#
+# SSL - analyze platform OpenSSL
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: ssl"
+
+dbmget $ALog MDI_Inc      =\? ""^        \
+             MDI_Lib      =\? ""^        \
+             MDI_Pck      =\? ""^        \
+             SSL_Inc      =\? ""^        \
+             SSL_Lib      =\? ""^        \
+             SSL_RPath    =\? $RootLib^  \
+             SSL_Path     =\? /usr^      \
+             SSL_SO       =\? ""^        \
+             HAVE_OPENSSL =\? FALSE^     \
+             Cfe_CC_Exe^                 \
+             Cfe_CC_Flags^               \
+             Cfe_LD_Flags^               \
+             Cfe_LD_Lib^                 \
+             Cfe_LD_RPath^               \
+             LD_Lib^                     \
+             LIB^                        \
+             Linking^                    \
+             LibM_Lib^                   \
+             RPATH
+
+# if we have explicitly said we do not want OPENSSL
+# do NOT detect it
+if ("$SSL_Path" == none) then
+   NoteD $ALog "      no openssl (by request)"
+
+else
+
+   set incl = ""
+   set pthl = ""
+   set libl = ""
+   set spkl = ""
+   set essl = FALSE
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# OPENSSL
+
+   set UTime = `timer -r`
+
+# write a little OPENSSL test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <openssl.h>
+int main(int c, char **v)
+{int ok;
+ SSL_CTX *ctx;
+ conn = SSL_new(NULL);
+ ok   = SSL_connect(conn);
+ ok   = SSL_clear(conn);
+ SSL_free(conn);
+ return(0);}
+EOF
+
+   set lIncDirs = ""
+   set lLibDirs = ""
+   foreach i ($SSL_Path)
+      set lIncDirs = ( $lIncDirs $i/include )
+      set lLibDirs = ( $lLibDirs $i/$LIB )
+   end
+   set lIncDirs = ( $lIncDirs /usr/local/include $RootInc/openssl $RootInc )
+#   set lLibDirs = ( $lLibDirs /usr/local/lib /usr/$LIB/openssl /usr/lib/openssl /usr/$LIB /sw/lib/openssl )
+   set lLibDirs = ( $lLibDirs /usr/local/lib /usr/lib/openssl /usr/$LIB /sw/lib/openssl )
+
+   set Implicit = FALSE
+   set lHdrs    = ( openssl.h )
+   set ASList   = ( a so )
+   set lLib     = opensslclient
+   set lFile    = $Tmp
+
+   set lALibs = ""
+   foreach i ( `var-list -l $RPATH` )
+       set lALibs = ( $lALibs -L$i )
+   end
+   set lALibs = ( $lALibs $LD_Lib $LibM_Lib -lz )
+
+   source $AnaDir/find-package
+
+   if (("$PckLib" != "") && ("$PckInc" != "")) then
+      set essl = TRUE
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+         set incl = ( $incl $PckInc )
+      endif
+      if ("$PckPath" != "") then
+         set pthl = ( $pthl $PckPath )
+      endif
+      if (($Linking == dynamic) && ($?lSO == 1)) then
+         setenv OPENSSL_SO    $lSO
+      else
+         set libl = ( $libl $PckLib )
+      endif
+      set spkl = ( $spkl openssl )
+
+      setenv HAVE_OPENSSL  TRUE
+   else
+      setenv HAVE_OPENSSL  ""
+   endif
+
+   set ETime = `timer -b $UTime`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   setenv SSL_Inc   "$incl"
+   setenv SSL_Lib   "$libl"
+   setenv SSL_RPath "$pthl"
+
+# NOTE: used SSL_Path to find libs, incs - there are no executables
+   if ("$SSL_Path" == /usr) then
+      setenv SSL_Path  ""
+   endif
+
+   foreach p ($pthl)
+      setenv RPATH   ${RPATH}:$p
+   end
+
+   if ($essl == TRUE) then
+      flog $ALog setenv MDI_Inc      "$MDI_Inc $incl"
+      flog $ALog setenv MDI_Lib      "$libl $MDI_Lib"
+      flog $ALog setenv MDI_Pck      "SSL $MDI_Pck"
+      flog $ALog setenv HAVE_OPENSSL TRUE
+      NoteD $ALog "      has openssl ($spkl)"
+   else
+      NoteD $ALog "      no openssl"
+   endif
+
+# export the results
+   dbmset $ALog MDI_Inc        = $MDI_Inc^        \
+                MDI_Lib        = $MDI_Lib^        \
+                MDI_Pck        = $MDI_Pck^        \
+                SSL_Inc        = $SSL_Inc^        \
+                SSL_Lib        = $SSL_Lib^        \
+                SSL_RPath      = $SSL_RPath^      \
+                SSL_Path       = $SSL_Path^       \
+                OPENSSL_SO     = $OPENSSL_SO^     \
+                RPATH          = $RPATH
+endif
+
+dbexp HAVE_OPENSSL
+
+exit(0)
+

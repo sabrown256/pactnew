@@ -19,6 +19,7 @@ NoteD $ALog "   I/O Features:"
 source $AnaDir/readline
 source $AnaDir/hdf5
 source $AnaDir/sql
+source $AnaDir/ssl
 
 exit(0)
 

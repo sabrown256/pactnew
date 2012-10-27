@@ -45,6 +45,10 @@ echo "v1 = $v1"
 echo "v2 = $v2"
 echo "v3 = $v3"
 
+echo "----------------"
+echo "perdb dlm:xya v1=axyav2=bxyav3=c"
+perdb dlm:xya v1=axyav2=bxyav3=c
+
 echo "-----------------------------------"
 
 perdb $opt quit:
