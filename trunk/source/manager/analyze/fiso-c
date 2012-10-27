@@ -14,10 +14,12 @@
 set Me = $0
 source $Me:h/common
 
-set vl = ""
-set vl = ( $vl FC_Exe FC_Flags Cfg_FC_Exe Cfg_FC_Flags Cfe_FC_Exe Cfe_FC_Flags )
-
-source $MngDir/write/import-db
+dbmget $ALog FC_Exe^         \
+             FC_Flags^       \
+             Cfg_FC_Exe^     \
+             Cfg_FC_Flags^   \
+             Cfe_FC_Exe^     \
+             Cfe_FC_Flags
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -13,9 +13,8 @@ source $Me:h/common
 
 set noglob
 
-set vl = ""
-set vl = ( $vl RPATH Cfg_RPATH)
-source $MngDir/write/import-db
+dbmget /dev/null RPATH^     \
+                 Cfg_RPATH
 
 # for Cfg group
 set varl = ( `env | grep _RPath | grep Cfg_ | sed 's|=.*$| |'` )

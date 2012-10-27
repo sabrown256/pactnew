@@ -14,9 +14,10 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: strerror_r"
 
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe Cfe_LD_Flags Cfe_LD_Lib Cfe_LD_RPath )
-source $MngDir/write/import-db
+dbmget $ALog Cfe_CC_Exe^     \
+             Cfe_LD_Flags^   \
+             Cfe_LD_Lib^     \
+             Cfe_LD_RPath
 
 set str = ""
 

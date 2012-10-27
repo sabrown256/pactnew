@@ -29,9 +29,7 @@ if ($lQuiet == FALSE) then
    Note $ALog ""
 endif
 
-set vl = ""
-set vl = ( $vl Bits )
-source $MngDir/write/import-db
+dbmget $ALog Bits
 
 set lroot = /usr
 source $lbase/common-lib64

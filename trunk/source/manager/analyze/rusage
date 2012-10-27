@@ -15,9 +15,8 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: resource usage"
 
-set vl = ""
-set vl = ( $vl CC_Exe CC_Flags )
-source $MngDir/write/import-db
+dbmget $ALog CC_Exe^      \
+             CC_Flags
 
 cat << EOF >! $Tmp.c
 #include <sys/resource.h>
