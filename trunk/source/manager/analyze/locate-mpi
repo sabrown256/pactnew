@@ -247,11 +247,11 @@ if ($?DP_Path == 1) then
 
    unset rlib
 
-   dbexp HAVE_OPENMPI
-   dbexp DP_Inc
-   dbexp DP_Lib
-   dbexp DP_RPath
-   dbexp DP_Path
+   dbmset /dev/null HAVE_OPENMPI = $HAVE_OPENMPI^  \
+                    DP_Inc       = $DP_Inc^        \
+                    DP_Lib       = $DP_Lib^        \
+                    DP_RPath     = $DP_RPath^      \
+                    DP_Path      = $DP_Path
 
 else if ($Verbose == TRUE) then
    echo "No MPI found matching: $SW $HW $Comp"

@@ -65,8 +65,8 @@ endif
 
 # export the results
 
-dbexp HAVE_ANSI_C9X_FENV
-dbexp HAVE_GNU_FENV
+dbmset $ALog HAVE_ANSI_C9X_FENV = $HAVE_ANSI_C9X_FENV^ \
+             HAVE_GNU_FENV      = $HAVE_GNU_FENV
 
 exit(0)
 

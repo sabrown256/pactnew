@@ -49,11 +49,11 @@ endif
 flog $ALog rm -f ${Tmp}_iso*
 
 # export the result
-dbexp HAVE_ISO_C_BINDING
-dbexp FC_Exe
-dbexp FC_Flags
-dbexp Cfg_FC_Exe
-dbexp Cfg_FC_Flags
-dbexp Cfe_FC_Exe
-dbexp Cfe_FC_Flags
+dbmset $ALog HAVE_ISO_C_BINDING = $HAVE_ISO_C_BINDING^  \
+             FC_Exe             = $FC_Exe^              \
+             FC_Flags           = $FC_Flags^            \
+             Cfg_FC_Exe         = $Cfg_FC_Exe^          \
+             Cfg_FC_Flags       = $Cfg_FC_Flags^        \
+             Cfe_FC_Exe         = $Cfe_FC_Exe^          \
+             Cfe_FC_Flags       = $Cfe_FC_Flags
 

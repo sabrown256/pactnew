@@ -26,6 +26,98 @@ Separator $Log
 NoteD $Log "   C Environment Configuration - scconfig.h"
 Note $Log ""
 
+if (1) then
+
+dbmget $Log Arch^                     \
+            BFD_Version^              \
+            BUILD_DEBUG^              \
+            BUILD_OPTIMIZE^           \
+            BUILD_PROFILE^            \
+            CC_Exe^                   \
+            CEFile^                   \
+            CPU^                      \
+            DEFAULT_SHELL^            \
+            DP_Lib^                   \
+            DP_Inc^                   \
+            FC_ID_CASE^               \
+            FC_ID_UNDERSCORE^         \
+            FC_INT_PTR_DIFFER^        \
+            FilterDir^                \
+            FPU^                      \
+            GETSOCKOPT_TYPE^          \
+            OS_Name^                  \
+            OS_Release^               \
+            IncDir^                   \
+            IPC_STD^                  \
+            Linking^                  \
+            LONG64^                   \
+            HAVE_MPI_STDIN_ALL^       \
+            HAVE_MPI_GOOD_IO^         \
+            NO_LONG_LONG^             \
+            NEED_ALT_LARGE_FILE^      \
+            PACT_CC_FAMILY^           \
+            PACT_CC_VERSION^          \
+            PACT_SO_CACHE^            \
+            PTHREAD_POSIX^            \
+            OS_Type^                  \
+            OSX_Version^              \
+            Sys^                      \
+            TRACKER_Exe^              \
+            MYSQL_SO^                 \
+            SQLITE3_SO^               \
+            HDF5_SO^                  \
+            HAVE_BAD_LINE_DIRECTIVES^ \
+            BUILD_DEBUG^              \
+            BUILD_OPTIMIZE^           \
+            BUILD_PROFILE^            \
+            HAVE_INLINE^              \
+            HAVE_NORETURN^            \
+            HAVE_OPENMP^              \
+            HAVE_OPENMPI^             \
+            HAVE_SOCKETS^             \
+            HAVE_TRACKER^             \
+            HAVE_ANSI_FLOAT16^        \
+            HAVE_ANSI_C9X_COMPLEX^    \
+            HAVE_ANSI_C9X_FENV^       \
+            HAVE_GNU_FENV^            \
+            HAVE_VA_COPY^             \
+            HAVE_VA_LIST^             \
+            HAVE_PYTHON^              \
+            HAVE_PY_NUMERIC^          \
+            HAVE_PY_NUMPY^            \
+            HAVE_FLEX_SCANNER^        \
+            HAVE_READLINE^            \
+            HAVE_HDF5^                \
+            HAVE_SQL^                 \
+            HAVE_MYSQL^               \
+            HAVE_SQLITE^              \
+            HAVE_SQLITE_V2^           \
+            HAVE_JPEGLIB^             \
+            HAVE_PNGLIB^              \
+            HAVE_FORK_EXEC^           \
+            HAVE_GETHOSTBYNAME^       \
+            HAVE_RESOURCE_USAGE^      \
+            HAVE_GETPWUID^            \
+            HAVE_MMAP^                \
+            HAVE_VSNPRINTF^           \
+            HAVE_ASYNC_STREAMS^       \
+            HAVE_POSIX_SIGNALS^       \
+            HAVE_STREAMS^             \
+            HAVE_SELECT^              \
+            HAVE_UNIX98_PTY^          \
+            HAVE_POSIX_STRERROR^      \
+            HAVE_GNU_STRERROR^        \
+            HAVE_GNU_LIBC_6^          \
+            HAVE_DYNAMIC_LINKER^      \
+            HAVE_BFD^                 \
+            HAVE_DEMANGLE^            \
+            USE_FULL_MM^              \
+            Std_UseX^                 \
+            Std_UseOGL^               \
+            Std_UseQD
+
+
+else
 set vl = ""
 set vl = ( $vl Arch BFD_Version BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
 set vl = ( $vl CC_Exe CEFile CPU )
@@ -42,7 +134,7 @@ set vl = ( $vl OS_Type OSX_Version )
 set vl = ( $vl Sys TRACKER_Exe )
 set vl = ( $vl MYSQL_SO SQLITE3_SO HDF5_SO )
 set vl = ( $vl HAVE_BAD_LINE_DIRECTIVES )
-dbexp vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
+set vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
 #set vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
 set vl = ( $vl HAVE_INLINE HAVE_NORETURN )
 set vl = ( $vl HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS )
@@ -66,6 +158,7 @@ set vl = ( $vl USE_FULL_MM )
 set vl = ( $vl Std_UseX Std_UseOGL Std_UseQD )
 
 source $MngDir/write/import-db
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
