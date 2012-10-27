@@ -42,8 +42,8 @@ switch ($OS)
         breaksw
 endsw
 
-dbexp OSX_REV
-dbexp OSX_SHARED_LIBS
+dbmset $ALog OSX_REV         = $OSX_REV^         \
+             OSX_SHARED_LIBS = $OSX_SHARED_LIBS
 
 exit(0)
 

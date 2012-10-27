@@ -100,8 +100,8 @@ else
 endif
 
 # export the results
-dbexp HAVE_GNU_STRERROR
-dbexp HAVE_POSIX_STRERROR
+dbmset $ALog HAVE_GNU_STRERROR   = $HAVE_GNU_STRERROR^   \
+             HAVE_POSIX_STRERROR = $HAVE_POSIX_STRERROR
 
 exit(0)
 

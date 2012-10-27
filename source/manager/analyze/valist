@@ -69,6 +69,6 @@ endif
 rm -f $Tmp $Tmp.c $Tmp.o
 
 # export the result
-dbexp HAVE_VA_LIST
-dbexp HAVE_VA_COPY
+dbmset $ALog HAVE_VA_LIST = $HAVE_VA_LIST^  \
+             HAVE_VA_COPY = $HAVE_VA_COPY
 
