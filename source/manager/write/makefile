@@ -27,10 +27,9 @@ Separator $Log
 NoteD $Log "   Distribution Makefile - Makefile"
 Note $Log ""
 
-set vl = ""
-set vl = ( $vl BinDir EtcDir Pck )
-
-source $MngDir/write/import-db
+dbmget $Log BinDir^   \
+            EtcDir^   \
+            Pck
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

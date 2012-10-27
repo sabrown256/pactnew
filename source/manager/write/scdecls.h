@@ -27,12 +27,14 @@ Separator $Log
 NoteD $Log "   C Environment Configuration - scdecls.h"
 Note $Log ""
 
-set vl = ""
-set vl = ( $vl BaseDir CFE )
-set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags Cfe_LD_Flags Cfe_LD_RPath )
-set vl = ( $vl CfgDir IncDir )
-
-source $MngDir/write/import-db
+dbmget $Log BaseDir^       \
+            CFE^           \
+            Cfe_CC_Exe^    \
+            Cfe_CC_Flags^  \
+            Cfe_LD_Flags^  \
+            Cfe_LD_RPath^  \
+            CfgDir^        \
+            IncDir
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

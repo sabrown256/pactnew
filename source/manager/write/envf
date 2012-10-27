@@ -20,12 +20,15 @@ set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
 source $ldir/functions-pact.csh
 
-set vl = ""
-set vl = ( $vl HAVE_OPENMP HAVE_READLINE )
-set vl = ( $vl HAVE_PYTHON PY_Vers )
-set vl = ( $vl SYS_SITE SYS_TYPE DAS_ROOT DAI_ROOT )
-
-source $MngDir/write/import-db
+dbmget $Log MDG_Pck^         \
+             HAVE_OPENMP^    \
+             HAVE_READLINE^  \
+             HAVE_PYTHON^    \
+             PY_Vers^        \
+             SYS_SITE^       \
+             SYS_TYPE^       \
+             DAS_ROOT^       \
+             DAI_ROOT
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

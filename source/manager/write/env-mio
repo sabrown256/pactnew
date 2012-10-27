@@ -34,24 +34,49 @@ Separator $Log
 NoteD $Log "   MIO specifications - env-mio"
 Note $Log ""
 
-dbget MDG_Pck
-dbget MDI_Pck
-dbget MD_Pck
+dbmget $Log MDG_Pck^            \
+            MDI_Pck^            \
+            MD_Pck^             \
+            AR_Flags^           \
+            AR_IFlag^           \
+            Bits^               \
+            CFE^                \
+            Cfe_CC_Exe^         \
+            Cfe_CC_Flags^       \
+            Cfe_FC_Exe^         \
+            Cfe_FC_Flags^       \
+            CPU^                \
+            CROSS_COMPILE^      \
+            DAI_ROOT^           \
+            DAS_ROOT^           \
+            EtcDir^             \
+            HAVE_READLINE^      \
+            HOST_SERVER_DB^     \
+            InstBase^           \
+            LD_Lib^             \
+            LIB^                \
+            LibM_Lib^           \
+            MDE_Lib^            \
+            MDG_Lib^            \
+            NUMA^               \
+            OpenMP_SharedFnc^   \
+            PACT_CC_FAMILY^     \
+            PACT_CC_VERSION^    \
+            PACT_CC_PATH^       \
+            PACT_FC_FAMILY^     \
+            PACT_FC_VERSION^    \
+            PACT_FC_PATH^       \
+            PFE^                \
+            RPATH^              \
+            RUN_SIGNATURE_DB^   \
+            SITE_SIGNATURE_DB^  \
+            Sys^                \
+            SysDir^             \
+            SYS_SITE^           \
+            SYS_TYPE^           \
+            UPDATE_SYS_DB
 
 set vl = ""
-set vl = ( $vl AR_Flags AR_IFlag Bits )
-set vl = ( $vl CFE Cfe_CC_Exe Cfe_CC_Flags Cfe_FC_Exe Cfe_FC_Flags )
-set vl = ( $vl CPU CROSS_COMPILE )
-set vl = ( $vl DAI_ROOT DAS_ROOT EtcDir )
-set vl = ( $vl HAVE_READLINE HOST_SERVER_DB InstBase )
-set vl = ( $vl LD_Lib LIB LibM_Lib )
-set vl = ( $vl MDE_Lib MDG_Lib )
-set vl = ( $vl NUMA OpenMP_SharedFnc )
-set vl = ( $vl PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH )
-set vl = ( $vl PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH )
-set vl = ( $vl PFE RPATH RUN_SIGNATURE_DB SITE_SIGNATURE_DB )
-set vl = ( $vl Sys SysDir SYS_SITE SYS_TYPE UPDATE_SYS_DB )
-
 set plst = ( `echo $MDG_Pck $MDI_Pck $MD_Pck | sed 's|\"||g'` )
 foreach p ( $plst )
    set plib = ${p}_Lib
@@ -118,16 +143,16 @@ source $MngDir/write/import-db
     Note $FOUT ""
 
 # database variables
-    if ($?HOST_SERVER_DB == 1) then
+    if ("$HOST_SERVER_DB" != "") then
        Note $FOUT "HOST_SERVER_DB    = $HOST_SERVER_DB"
     endif
-    if ($?RUN_SIGNATURE_DB == 1) then
+    if ("$RUN_SIGNATURE_DB" != "") then
        Note $FOUT "RUN_SIGNATURE_DB  = $RUN_SIGNATURE_DB"
     endif
-    if ($?SITE_SIGNATURE_DB == 1) then
+    if ("$SITE_SIGNATURE_DB" != "") then
        Note $FOUT "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
     endif
-    if ($?UPDATE_SYS_DB == 1) then
+    if ("$UPDATE_SYS_DB" != "") then
        Note $FOUT "UPDATE_SYS_DB     = $UPDATE_SYS_DB"
     endif
     Note $FOUT ""

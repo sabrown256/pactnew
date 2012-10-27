@@ -27,13 +27,12 @@ Separator $Log
 NoteD $Log "   Binary File Translation Spokes Loader - spokes.scm"
 Note $Log ""
 
-set vl = ""
-set vl = ( $vl BaseDir SchDir Sys )
-set vl = ( $vl SchemeSpokes CSpokes )
-
-source $MngDir/write/import-db
-
-dbget BackSlash
+dbmget $Log BaseDir^         \
+            SchDir^          \
+            Sys^             \
+            SchemeSpokes^    \
+            CSpokes^         \
+            BackSlash
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

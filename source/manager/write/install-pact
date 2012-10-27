@@ -27,12 +27,19 @@ Separator $Log
 NoteD $Log "   PACT Installer Script - install-pact"
 Note $Log ""
 
-set vl = ""
-set vl = ( $vl InstBase UPDATE BinDir CfgMan Arch )
-set vl = ( $vl ScmDir Man1Dir Man3Dir )
-set vl = ( $vl HAVE_PYTHON PY_Vers PY_DirPy PY_DirDst PY_DirSrc )
-
-source $MngDir/write/import-db
+dbmget $Log InstBase^     \
+            UPDATE^       \
+            BinDir^       \
+            CfgMan^       \
+            Arch^         \
+            ScmDir^       \
+            Man1Dir^      \
+            Man3Dir^      \
+            HAVE_PYTHON^  \
+            PY_Vers^      \
+            PY_DirPy^     \
+            PY_DirDst^    \
+            PY_DirSrc
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
