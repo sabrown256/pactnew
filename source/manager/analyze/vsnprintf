@@ -14,9 +14,7 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: vsnprinft"
 
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe )
-source $MngDir/write/import-db
+dbmget $ALog Cfe_CC_Exe
 
 cat << EOF >! $Tmp.c
 #include <stdarg.h>

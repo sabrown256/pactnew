@@ -8,11 +8,8 @@
 # include "cpyright.h"
 #
 
-dbini NUMA ""
-
-set vl = ""
-set vl = ( $vl PACT_CC_FAMILY )
-source $MngDir/write/import-db
+dbmget /dev/null NUMA =\? ""^     \
+                 PACT_CC_FAMILY
 
 if ($PACT_CC_FAMILY == PGI) then
    /bin/ls /usr/lib*/libnuma*.so >& /dev/null

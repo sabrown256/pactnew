@@ -12,9 +12,7 @@
 set Me = $0
 source $Me:h/common
 
-set vl = ""
-set vl = ( $vl Cfe_CC_Exe )
-source $MngDir/write/import-db
+dbmget $ALog Cfe_CC_Exe
 
 cat << EOF >! $Tmp.c
 _Noreturn void b(void) {while (1) sleep(1);}

@@ -14,9 +14,8 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: pty"
 
-set vl = ""
-set vl = ( $vl CC_Exe CC_Flags )
-source $MngDir/write/import-db
+dbmget $ALog CC_Exe^      \
+             CC_Flags
 
 # check for PTY functions grantpt, unlockpt, and ptsname
 

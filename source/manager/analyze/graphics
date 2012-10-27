@@ -26,9 +26,11 @@ source $AnaDir/jpeg
 
 Separator $Log
 
-set vl = ""
-set vl = ( $vl RPATH MDG_Inc MDG_Lib MDG_Pck )
-source $MngDir/write/import-db
+dbmget $ALog CC_Exe^       \
+             MDG_Inc^      \
+             MDG_Lib^      \
+             MDG_Pck^      \
+             RPATH
 
 Note $Log "Graphics summary variables:"
 Note $Log "   RPATH   = $RPATH"
