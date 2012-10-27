@@ -63,7 +63,7 @@ endif
 
 flog $ALog $RM $Tmp $Tmp.c $Tmp.o
 
-dbini Shared_LD_Exe "$LD_Exe"
+dbmget $ALog Shared_LD_Exe =\? $LD_Exe
 
 # capture current notion of rpath
 if ($?Cfg_RPATH == 1) then

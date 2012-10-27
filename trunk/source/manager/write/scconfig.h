@@ -26,8 +26,6 @@ Separator $Log
 NoteD $Log "   C Environment Configuration - scconfig.h"
 Note $Log ""
 
-if (1) then
-
 dbmget $Log Arch^                     \
             BFD_Version^              \
             BUILD_DEBUG^              \
@@ -115,50 +113,6 @@ dbmget $Log Arch^                     \
             Std_UseX^                 \
             Std_UseOGL^               \
             Std_UseQD
-
-
-else
-set vl = ""
-set vl = ( $vl Arch BFD_Version BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
-set vl = ( $vl CC_Exe CEFile CPU )
-set vl = ( $vl DEFAULT_SHELL DP_Lib DP_Inc )
-set vl = ( $vl FC_ID_CASE FC_ID_UNDERSCORE FC_INT_PTR_DIFFER FilterDir FPU )
-set vl = ( $vl GETSOCKOPT_TYPE )
-set vl = ( $vl OS_Name OS_Release )
-set vl = ( $vl IncDir IPC_STD )
-set vl = ( $vl Linking LONG64 )
-set vl = ( $vl HAVE_MPI_STDIN_ALL HAVE_MPI_GOOD_IO )
-set vl = ( $vl NO_LONG_LONG NEED_ALT_LARGE_FILE )
-set vl = ( $vl PACT_CC_FAMILY PACT_CC_VERSION PACT_SO_CACHE PTHREAD_POSIX )
-set vl = ( $vl OS_Type OSX_Version )
-set vl = ( $vl Sys TRACKER_Exe )
-set vl = ( $vl MYSQL_SO SQLITE3_SO HDF5_SO )
-set vl = ( $vl HAVE_BAD_LINE_DIRECTIVES )
-set vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
-#set vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
-set vl = ( $vl HAVE_INLINE HAVE_NORETURN )
-set vl = ( $vl HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS )
-set vl = ( $vl HAVE_TRACKER )
-set vl = ( $vl HAVE_ANSI_FLOAT16 HAVE_ANSI_C9X_COMPLEX )
-set vl = ( $vl HAVE_ANSI_C9X_FENV HAVE_GNU_FENV )
-set vl = ( $vl HAVE_VA_COPY HAVE_VA_LIST )
-set vl = ( $vl HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY )
-set vl = ( $vl HAVE_FLEX_SCANNER )
-set vl = ( $vl HAVE_READLINE )
-set vl = ( $vl HAVE_HDF5 HAVE_SQL HAVE_MYSQL HAVE_SQLITE HAVE_SQLITE_V2 )
-set vl = ( $vl HAVE_JPEGLIB HAVE_PNGLIB )
-set vl = ( $vl HAVE_FORK_EXEC HAVE_GETHOSTBYNAME HAVE_RESOURCE_USAGE )
-set vl = ( $vl HAVE_GETPWUID HAVE_MMAP HAVE_VSNPRINTF )
-set vl = ( $vl HAVE_ASYNC_STREAMS HAVE_POSIX_SIGNALS )
-set vl = ( $vl HAVE_STREAMS HAVE_SELECT HAVE_UNIX98_PTY )
-set vl = ( $vl HAVE_POSIX_STRERROR HAVE_GNU_STRERROR )
-set vl = ( $vl HAVE_GNU_LIBC_6 )
-set vl = ( $vl HAVE_DYNAMIC_LINKER HAVE_BFD HAVE_DEMANGLE )
-set vl = ( $vl USE_FULL_MM )
-set vl = ( $vl Std_UseX Std_UseOGL Std_UseQD )
-
-source $MngDir/write/import-db
-endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
