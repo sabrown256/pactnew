@@ -14,7 +14,7 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: make"
 
-dbini GMAKE_Flag ""
+dbmget $ALog GMAKE_Flag =\? ""
 
 if ("$GMAKE_Flag" == TRUE) then
    setenv GMAKE_Flag "-DUSE_GNU_MAKE"
