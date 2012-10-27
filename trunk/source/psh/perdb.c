@@ -500,21 +500,31 @@ static char **do_var_acc(database *db, char *s)
    {int is, ns;
     char *t, *fmt, **val, **sa;
 
-#if 1
-    char c, dl[2];
+/* multi-character delimiter */
+    if (strncmp(s, "dlm:", 4) == 0)
+       {char *dlm, *u;
 
-    c = s[0];
-    if (strchr(",.:;-_+~^@/|<>", c) != NULL)
-       dl[0] = c;
+	t  = s + 4;
+	ns = strcspn(t, " \t\f\n");
+	u  = t + ns;
+	*u++ = '\0';
+	dlm = STRSAVE(t);
+	sa = tokenized(u, dlm);
+	FREE(dlm);}
+
+/* single-character delimiter */
     else
-       dl[0] = '^';
-    dl[1] = '\0';
-    sa = tokenize(s, dl);
-#else
-    sa = NULL;
-    sa = lst_push(sa, s);
-#endif
+       {char c, dl[2];
 
+        c = s[0];
+	if (strchr(",.:;-_+~^@/|<>", c) != NULL)
+	   dl[0] = c;
+	else
+	   dl[0] = '^';
+	dl[1] = '\0';
+	sa = tokenize(s, dl);};
+
+/* process list of accesses */
     val = NULL;
     fmt = NULL;
 

@@ -214,6 +214,7 @@
 #define subst_syntax 		PS_subst_syntax
 #define time_string 		PS_time_string
 #define tokenize 		PS_tokenize
+#define tokenized 		PS_tokenized
 #define touch 			PS_touch
 #define transfer_ff 		PS_transfer_ff
 #define transfer_fnc_child 	PS_transfer_fnc_child
