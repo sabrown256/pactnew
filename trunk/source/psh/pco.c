@@ -695,7 +695,7 @@ static void add_spec_env_vars(client *cl,
     char *p, *v, *var, **va;
 
     var = cgetenv(TRUE, "ENV_VARS");
-    va  = tokenize(var, ":");
+    va  = tokenize(var, " :");
     nv  = (va != NULL) ? lst_length(va) : 0;
     for (iv = 0; iv < nv; iv++)
 
@@ -1046,6 +1046,7 @@ static void check_dir(client *cl)
 
 static void read_line(char *s, int nc)
    {int n;
+    char t[LRG];
     char *p, *pc;
     file_entry *se;
 
@@ -1055,16 +1056,25 @@ static void read_line(char *s, int nc)
     if (p != NULL)
        {se->iline++;
 
+	n = strlen(s);
+
+/* handle continued lines */
+        while ((s[n-2] == '\\') && (s[n-1] == '\n'))
+           {p = fgets(t, LRG, se->fp);
+	    if (p != NULL)
+	       {nstrncpy(s+n-2, nc-n-2, trim(t, BOTH, " \t"), -1);
+		n = strlen(s);};
+	    se->iline++;};
+
 /* make sure the line ends in '\n'
  * if last line in file does not end in '\n' this
  * can happen with bad consequences
  */
-	n = strlen(p);
-	if (p[n-1] != '\n')
-	   p[n++] = '\n';
+	if (s[n-1] != '\n')
+	   s[n++] = '\n';
 
 /* now end the line - stripping off trailing comment or '\n' */
-	pc = strchr(p, '#');
+	pc = strchr(s, '#');
 	if (pc != NULL)
 	   *pc = '\0';
 	else

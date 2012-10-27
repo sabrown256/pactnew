@@ -140,7 +140,8 @@ alias fexvar    'echo "Command: $GEXEC \!\!:3-$ @b vw:\!\!:2" >>& \!\!:1 ; $GEXE
 
 alias fexvars    'echo "Command: $GEXEC \!\!:3-$ @b vw:\!\!:2" >>& \!\!:1 ; $GEXEC \!\!:3-$ @b vw:\!\!:2 >>& \!\!:1 ; set \!\!:2 = (`$PERDB -e \!\!:2`) ; set gstatus = (`$PERDB -e gstatus`)'
 
-alias dbmget 'echo "Command: $PERDB ^fmt:csh^ \!\!:2-$" >>& \!\!:1 ; eval `$PERDB ^fmt:csh^ \!\!:2-$`'
+alias dbmget 'echo "Command: dbmget $PERDB ^fmt:csh^ \!\!:2-$" >>& \!\!:1 ; set t_ = ( `$PERDB ^fmt:csh^ \!\!:2-$` ) ; echo "$t_" >>& \!\!:1 ; eval $t_ ; unset t_'
+#alias dbmget 'echo "Command: dbmget $PERDB ^fmt:csh^ \!\!:2-$" >>& \!\!:1 ; eval `$PERDB ^fmt:csh^ \!\!:2-$`'
 
-alias dbmset 'echo "Command: $PERDB ^fmt:db^ \!\!:2-$" >>& \!\!:1 ; $PERDB ^fmt:db^ \!\!:2-$ >>& \!\!:1'
+alias dbmset 'echo "Command: dbmset $PERDB ^fmt:db^ \!\!:2-$" >>& \!\!:1 ; $PERDB ^fmt:db^ \!\!:2-$ >>& \!\!:1'
 
