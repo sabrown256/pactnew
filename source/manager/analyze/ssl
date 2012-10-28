@@ -18,7 +18,7 @@ dbmget $ALog MDI_Inc      =\? ""^        \
              SSL_Lib      =\? ""^        \
              SSL_RPath    =\? $RootLib^  \
              SSL_Path     =\? /usr^      \
-             SSL_SO       =\? ""^        \
+             OPENSSL_SO   =\? ""^        \
              HAVE_OPENSSL =\? FALSE^     \
              Cfe_CC_Exe^                 \
              Cfe_CC_Flags^               \
@@ -55,13 +55,17 @@ else
 # existence - mere existence doesn't work with 32/64 bit machines
    cat << EOF >! $Tmp.c
 #include <stdlib.h>
-#include <openssl.h>
+#include <openssl/ssl.h>
 int main(int c, char **v)
 {int ok;
  SSL_CTX *ctx;
- conn = SSL_new(NULL);
+ SSL *conn;
+ ctx  = NULL;
+ conn = SSL_new(ctx);
+/*
  ok   = SSL_connect(conn);
  ok   = SSL_clear(conn);
+*/
  SSL_free(conn);
  return(0);}
 EOF
@@ -77,9 +81,9 @@ EOF
    set lLibDirs = ( $lLibDirs /usr/local/lib /usr/lib/openssl /usr/$LIB /sw/lib/openssl )
 
    set Implicit = FALSE
-   set lHdrs    = ( openssl.h )
+   set lHdrs    = ( ssl.h )
    set ASList   = ( a so )
-   set lLib     = opensslclient
+   set lLib     = ssl
    set lFile    = $Tmp
 
    set lALibs = ""
