@@ -464,7 +464,7 @@ int main(int argc, char **argv)
 /* make Klocworks happy */
     nm = min(nm, INT_MAX);
 
-    fp = fopen("logfile", "w");
+    fp = SC_fopen_safe("logfile", "w");
 
     fp = NULL;
 

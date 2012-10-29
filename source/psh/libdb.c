@@ -25,6 +25,7 @@ typedef enum e_ckind ckind;
 
 typedef struct s_database database;
 typedef struct s_vardes vardes;
+typedef struct s_db_session db_session;
 
 struct s_database
    {char *root;                 /* root path name of database */
@@ -32,6 +33,18 @@ struct s_database
     char *flog;                 /* name of the log file */
     char *fpid;                 /* name of the pid file */
     hashtab *tab;};
+
+struct s_db_session
+   {int ioc_server;
+    int debug;
+    int init;
+    int auth;
+    int daemon;
+    int literal;
+    char root[MAXLINE];};
+
+static db_session
+  dbs = { CLIENT, FALSE, FALSE, FALSE, FALSE, FALSE, };
 
 static int
  ioc_server = CLIENT,
@@ -93,8 +106,100 @@ static void sigtimeout(int sig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WHOAMI - return the tokenized list of pw entries for UID
+ *        - if UID is -1 take the current user
+ */
+
+char **whoami(int id)
+   {uid_t uid;
+    char bf[MAXLINE];
+    char **sa;
+    extern int getpw(uid_t uid, char *bf);
+
+    uid = (id < 0) ? getuid() : id;
+
+    getpw(uid, bf);
+    sa = tokenize(bf, ":");
+
+    return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* VERIFYX - verify the transaction request
+ *         - return TRUE if ANS is correct
+ */
+
+#define PUBLIC_KEY  "47fcb593c5399d7c182944589a1bafb4"
+#define N_VFY       16
+
+int verifyx(char *root, int nc, char *ans, char *res)
+   {int ik, li, ni, nk, rv;
+    long long r;
+    char lres[N_VFY];
+    static char *key = PUBLIC_KEY;
+    static char *info = NULL;
+
+    rv = TRUE;
+
+    if (info == NULL)
+       {char **sa;
+
+	info = MAKE_N(char, LRG);
+	info[0] = '\0';
+
+/* get user info */
+	sa = whoami(-1);
+	vstrcat(info, LRG, "%s ", sa[0]);
+	vstrcat(info, LRG, "%s ", sa[2]);
+	vstrcat(info, LRG, "%s ", sa[3]);
+	free_strings(sa);
+
+/* get connection info */
+	sa = parse_sema(root);
+	vstrcat(info, LRG, "%s ", sa[1]);
+	vstrcat(info, LRG, "%s ", sa[2]);
+	free_strings(sa);};
+
+/* compute the result by folding info with public key */
+    r  = 0;
+    nk = strlen(key);
+    ni = strlen(info);
+    for (ik = 0; ik < nk; ik++)
+        {li = ik % ni;
+	 r  = (r << 1LL) ^ ((long long) (key[ik] ^ info[li]));};
+
+/* client wants the answer */
+    if (res != NULL)
+       {snprintf(res, nc, "%0*llx", nc-1, r);
+	rv = TRUE;}
+
+/* server matches the answer */
+    else
+       {res = lres;
+	snprintf(res, nc, "%0*llx", nc-1, r);
+	rv = (strncmp(res, ans, nc-1) == 0);};
+
+    if (rv == FALSE)
+       {char *flog;
+	char **sa;
+
+	sa = whoami(-1);
+
+	flog = name_log(root);
+	log_activity(flog, dbs.debug, 1, "SERVER", "access denied |%s|",
+		     sa[0]);
+
+	free_strings(sa);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* COMM_READ - read from CL into S
  *           - quit if it hasn't heard anything in TO seconds
+ *           - return -2 if authentication is denied
  */
 
 int comm_read(client *cl, char *s, int nc, int to)
@@ -122,6 +227,7 @@ int comm_read(client *cl, char *s, int nc, int to)
 
 /* COMM_WRITE - write S to CL
  *            - quit if it hasn't heard anything in TO seconds
+ *            - return -2 if authentication is denied
  */
 
 int comm_write(client *cl, char *s, int nc, int to)

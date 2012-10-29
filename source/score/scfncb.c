@@ -345,7 +345,7 @@ int SC_get_ncpu(void)
      char *ps;
      FILE *fp;
 
-     fp = fopen("/proc/cpuinfo", "r");
+     fp = SC_fopen_safe("/proc/cpuinfo", "r");
      if (fp != NULL)
         {np     = 0;
          method = 0;
