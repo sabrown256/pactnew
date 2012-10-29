@@ -24,11 +24,11 @@ static void sigdone(int sig)
    {
 
     if (db != NULL)
-       {log_activity(db->flog, dbg_db, 4,
+       {log_activity(db->flog, dbs.debug, 4,
 		     "SERVER", "signalled %d - done", sig);
 	close_sock(db->root);
 	db_srv_save(-1, db);
-	unlink_safe(db->fpid);};
+	unlink_safe(db->fcon);};
 
     exit(sig);
 
@@ -175,7 +175,7 @@ static void check_fd(connection *srv, char *flog)
         {if (FD_ISSET(fd, &rfs))
             vstrcat(s, MAXLINE, " %d", fd);};
 
-    log_activity(flog, dbg_db, 4, "SERVER", "monitoring: %s", s);
+    log_activity(flog, dbs.debug, 4, "SERVER", "monitoring: %s", s);
 
     return;}
 
@@ -188,7 +188,7 @@ static void add_fd(connection *srv, char *flog, int fd)
    {
 
     FD_SET(fd, &srv->afs);
-    log_activity(flog, dbg_db, 1, "SERVER", "add fd %d", fd);
+    log_activity(flog, dbs.debug, 1, "SERVER", "add fd %d", fd);
 
     check_fd(srv, flog);
 
@@ -203,7 +203,7 @@ static void remove_fd(connection *srv, char *flog, int fd)
    {
 
     FD_CLR(fd, &srv->afs);
-    log_activity(flog, dbg_db, 1, "SERVER", "remove fd %d", fd);
+    log_activity(flog, dbs.debug, 1, "SERVER", "remove fd %d", fd);
 
     check_fd(srv, flog);
 
@@ -228,7 +228,7 @@ static void new_connection(char *root, connection *srv)
        add_fd(srv, flog, fd);
     else
        {close(fd);
-	log_activity(flog, dbg_db, 1, "SERVER",
+	log_activity(flog, dbs.debug, 1, "SERVER",
 		     "accept error - %s (%d)",
 		     strerror(errno), errno);};
 
@@ -651,7 +651,7 @@ static void async_server(client *cl)
 	   tmax = 60;
 	else
 	   {tmax = atoi(s);
-	    log_activity(flog, dbg_db, 4, "SERVER",
+	    log_activity(flog, dbs.debug, 4, "SERVER",
 			 "PERDB_IDLE_TIMEOUT = %d", tmax);};
 
         s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
@@ -659,7 +659,7 @@ static void async_server(client *cl)
 	   dt = tmax >> 1;
 	else
 	   {dt = atoi(s);
-	    log_activity(flog, dbg_db, 4, "SERVER",
+	    log_activity(flog, dbs.debug, 4, "SERVER",
 			 "PERDB_IDLE_INTERVAL = %d", dt);};
 
 /* maximum number of consecutive 0 length reads
@@ -681,7 +681,7 @@ static void async_server(client *cl)
 	     if (nr > 0)
 	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
 		     {if (FD_ISSET(fd, &rfs))
-			 {log_activity(flog, dbg_db, 4, "SERVER",
+			 {log_activity(flog, dbs.debug, 4, "SERVER",
 				       "data available on %d (server %d)",
 				       fd, srv->server);
 
@@ -707,16 +707,16 @@ static void async_server(client *cl)
 	        ng += dt;};
 
 	if (ok != TRUE)
-	   log_activity(flog, dbg_db, 4, "SERVER", "done by command");
+	   log_activity(flog, dbs.debug, 4, "SERVER", "done by command");
 	else if (ng >= tmax)
-	   log_activity(flog, dbg_db, 4, "SERVER",
+	   log_activity(flog, dbs.debug, 4, "SERVER",
 			"done by time: %d >= %d", ng, tmax);
 	else if (nb >= nbmax)
-	   log_activity(flog, dbg_db, 4, "SERVER",
+	   log_activity(flog, dbs.debug, 4, "SERVER",
 			"done by failed reads: %d >= %d", nb, nbmax);}
 
     else
-       log_activity(flog, dbg_db, 1, "SERVER",
+       log_activity(flog, dbs.debug, 1, "SERVER",
 		    "async_server error (%s - %d)",
 		    strerror(errno), errno);
 
@@ -738,22 +738,19 @@ static int server(char *root, int init, int dmn)
 
 	flog = name_log(root);
 
-	log_activity(flog, dbg_db, 1, "SERVER", "start server");
+	log_activity(flog, dbs.debug, 1, "SERVER", "start server");
 
 	cl = make_client(root, SERVER);
 
-	cl->db = db_srv_open(root, init);
-	if (cl->db != NULL)
-	   {db = cl->db;
-
-	    async_server(cl);
+	if (db_srv_open(cl, root, init) == TRUE)
+	   {async_server(cl);
 
 	    db_srv_save(-1, cl->db);
 	    db_srv_close(cl->db);};
 
 	free_client(cl);
 
-	log_activity(flog, dbg_db, 1, "SERVER", "end server");};
+	log_activity(flog, dbs.debug, 1, "SERVER", "end server");};
 
     return(0);}
 
@@ -799,7 +796,8 @@ static int exchange(char *root, int ltr, char *req)
 static void help(void)
    {
     printf("\n");
-    printf("Usage: perdb [-c] [-d] [-e] [-f <db>] [-h] [-l] [-s] [<req>]\n");
+    printf("Usage: perdb [-a] [-c] [-d] [-e] [-f <db>] [-h] [-l] [-s] [<req>]\n");
+    printf("   a   authenticate transactions\n");
     printf("   c   create the database, removing any existing\n");
     printf("   d   do not run server as daemon\n");
     printf("   e   exact - do not strip off quotes\n");
@@ -831,7 +829,10 @@ int main(int c, char **v)
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
 	    {switch (v[i][1])
-                {case 'c' :
+                {case 'a' :
+                      dbs.auth = TRUE;
+		      break;
+                 case 'c' :
                       init = TRUE;
 		      break;
                  case 'd' :
@@ -848,7 +849,7 @@ int main(int c, char **v)
                       return(1);
 		 case 'l' :
                       dbg_sock = TRUE;
-                      dbg_db   = TRUE;
+                      dbs.debug   = TRUE;
                       break;
 		 case 's' :
                       srv = TRUE;
