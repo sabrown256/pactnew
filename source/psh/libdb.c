@@ -205,6 +205,45 @@ int verifyx(char *root, int nc, char *ans, char *res)
 int comm_read(client *cl, char *s, int nc, int to)
    {int nb;
 
+#if 0
+    int nt, ok;
+    char *t;
+
+    nt = nc + N_VFY + 1;
+    t  = MAKE_N(char, nt);
+
+#ifdef IO_ALARM
+    signal(SIGALRM, sigtimeout);
+
+    alarm(to);
+
+    if (setjmp(cpu) == 0)
+       nb = read_sock(cl, t, nt);
+    else
+       nb = -1;
+
+    alarm(0);
+#else
+    nb = read_sock(cl, t, nt);
+#endif
+
+    if (strncmp(t, "auth:", 5) == 0)
+       ok = verifyx(cl->root, N_VFY, t+5, NULL);
+    else
+       ok = TRUE;
+
+    if (ok == FALSE)
+       nb = -2;
+
+    else
+       nstrncpy(s, nc, t + N_VFY + 5, -1);
+
+    nb -= (N_VFY + 5);
+
+    FREE(t);
+
+#else
+
 #ifdef IO_ALARM
     signal(SIGALRM, sigtimeout);
 
@@ -220,6 +259,8 @@ int comm_read(client *cl, char *s, int nc, int to)
     nb = read_sock(cl, s, nc);
 #endif
 
+#endif
+
     return(nb);}
 
 /*--------------------------------------------------------------------------*/
@@ -232,6 +273,49 @@ int comm_read(client *cl, char *s, int nc, int to)
 
 int comm_write(client *cl, char *s, int nc, int to)
    {int nb;
+
+#if 0
+
+    int nt, ok;
+    char ans[N_VFY];
+    char *t;
+
+    ok = verifyx(cl->root, N_VFY, NULL, ans);
+    if (ok == FALSE)
+       nb = -2;
+
+    else
+       {if (nc <= 0)
+	   nc = strlen(s);
+
+	nt = nc + N_VFY + 6;
+	t  = MAKE_N(char, nt);
+	if (cl->auth == TRUE)
+	   snprintf(t, nt, "auth:%s %s", ans, s);
+	else
+	   nstrncpy(t, nt, s, -1);
+	nt = strlen(t) + 1;
+
+#ifdef IO_ALARM
+	signal(SIGALRM, sigtimeout);
+
+	alarm(to);
+
+	if (setjmp(cpu) == 0)
+	   nb = write_sock(cl, t, nt);
+	else
+	   nb = -1;
+
+	alarm(0);
+#else
+	nb = write_sock(cl, t, nt);
+#endif
+
+	nb -= N_VFY;
+
+	FREE(t);};
+
+#else
 
 #ifdef IO_ALARM
     signal(SIGALRM, sigtimeout);
@@ -246,6 +330,8 @@ int comm_write(client *cl, char *s, int nc, int to)
     alarm(0);
 #else
     nb = write_sock(cl, s, nc);
+#endif
+
 #endif
 
     return(nb);}
