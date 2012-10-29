@@ -615,7 +615,7 @@ FILE *SC_fopen(char *name, char *mode)
     ret = NULL;
 
     if (name != NULL)
-       {fp  = fopen(name, mode);
+       {fp  = SC_fopen_safe(name, mode);
 	ret = SC_fwrap(fp);};
 
     return(ret);}
@@ -695,7 +695,7 @@ NORETURN void SC_file_access(int log)
     _SC_ps.debug = log;
 
     if (_SC_ps.debug)
-       _SC_ps.diag = fopen("SC_fs.log", "w");
+       _SC_ps.diag = SC_fopen_safe("SC_fs.log", "w");
 
     cfd = -1;
     while (TRUE)
@@ -752,7 +752,7 @@ NORETURN void SC_file_access(int log)
 			 {fprintf(_SC_ps.diag, "   Open: %s, %s ... ", name, mode);
 			  fflush(_SC_ps.diag);};
 
-		      fp = fopen(name, mode);}
+		      fp = SC_fopen_safe(name, mode);}
 		  else
 		     fp = NULL;
 
@@ -1712,7 +1712,7 @@ FILE *SC_lfopen(char *name, char *mode)
     ret = NULL;
 
     if (name != NULL)
-       {fp  = fopen(name, mode);
+       {fp  = SC_fopen_safe(name, mode);
 	ret = SC_lfwrap(fp);};
 
     return(ret);}
@@ -2742,6 +2742,71 @@ int64_t SC_filelen(FILE *fp)
 
 /*                            SAFE I/O ROUTINES                             */
 
+/*--------------------------------------------------------------------------*/
+
+/* SC_FOPEN_SAFE - make fopen safe for bad file systems
+ *               - necessitated by networks that cannot keep up with CPUs
+ */
+
+FILE *SC_fopen_safe(const char *path, const char *mode)
+   {int ok, ev;
+    FILE *rv;
+
+    for (ok = TRUE; ok == TRUE; )
+        {rv = fopen(path, mode);
+	 ev = errno;
+	 if (rv != NULL)
+	    ok = FALSE;
+	 else
+	    {switch (ev)
+	        {
+
+/* these errors have a chance of being temporary */
+		 case EINTR :
+		 case EWOULDBLOCK :
+		 case ENOSPC :
+		 case ETXTBSY :
+		      ok = TRUE;
+		      break;
+		 default :
+		      ok = FALSE;
+		      break;};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_OPEN_SAFE - make open safe for bad file systems
+ *              - necessitated by networks that cannot keep up with CPUs
+ */
+
+int SC_open_safe(const char *path, int flags, mode_t mode)
+   {int ok, ev, rv;
+
+    for (ok = TRUE; ok == TRUE; )
+        {rv = open(path, flags, mode);
+	 ev = errno;
+	 if (rv != -1)
+	    ok = FALSE;
+	 else
+	    {switch (ev)
+	        {
+
+/* these errors have a chance of being temporary */
+		 case EINTR :
+		 case EWOULDBLOCK :
+		 case ENOSPC :
+		 case ETXTBSY :
+		      ok = TRUE;
+		      break;
+		 default :
+		      ok = FALSE;
+		      break;};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SC_READ_SIGSAFE - make read safe for signals

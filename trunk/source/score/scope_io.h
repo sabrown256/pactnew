@@ -455,6 +455,7 @@ extern file_io_desc
  *SC_make_io_desc(void *fp);
 
 extern FILE
+ *SC_fopen_safe(const char *path, const char *mode),
  *SC_fwrap(FILE *fp),
  *SC_fopen(char *name, char *mode),
  *SC_lfwrap(FILE *fp),
@@ -468,6 +469,7 @@ extern void
  SC_setbuf(FILE *fp, char *bf);
 
 extern int
+ SC_open_safe(const char *path, int flags, mode_t mode),
  SC_collect_io_info(int wh),
  SC_gather_io_info(FILE *fp, int wh),
  SC_io_connect(int flag),
