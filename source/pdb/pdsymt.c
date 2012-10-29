@@ -175,7 +175,7 @@ int _PD_add_sym_desp(PDBfile *file, int ad, char *name, char *type,
 	    if (ad == FALSE)
 	       ok &= (SC_LAST_CHAR(s) != '/');
 
-	    SFREE(s);};};
+	    CFREE(s);};};
 
     return(ok);}
 

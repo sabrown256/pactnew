@@ -14,11 +14,12 @@
 
 #include "network.h"
 
-#define NEWWAY
-
 #define NATTEMPTS   3
+#define N_AKEY      32
 
 #define C_OR_S(_p)    ((_p) ? "CLIENT" : "SERVER")
+
+enum {CONN_NAME = 0, CONN_PORT, CONN_IP, CONN_KEY, CONN_PID};
 
 typedef struct s_connection connection;
 typedef struct s_client client;
@@ -32,6 +33,8 @@ struct s_connection
 
 struct s_client
    {int fd;                      /* client side descriptor */
+    int nkey;
+    char *key;
     char *root;
     ckind type;
     connection *server;
@@ -46,13 +49,13 @@ static int
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* FIND_SEMA - find conventionally named semaphore from ROOT
+/* FIND_CONN - find conventionally named connection from ROOT
  *           - look in the head directory of ROOT
  *           - .../foo -> .../foo.host@port
  *           - return the unique file name
  */
 
-static char *find_sema(char *root, int ch)
+static char *find_conn(char *root, int ch)
    {char *rv;
     static char s[MAXLINE];
 
@@ -61,58 +64,21 @@ static char *find_sema(char *root, int ch)
     if (root == NULL)
        root = cgetenv(TRUE, "PERDB_PATH");
 
-#ifdef NEWWAY
-
     snprintf(s, MAXLINE, "%s.conn", root);
     if (file_exists(s) == TRUE)
        rv = s;
-
-#else
-
-    int ia, na;
-    char *hd, *tl, *h, *p;
-    DIR *dir;
-    struct dirent *dp;
-
-    if (IS_NULL(root) == TRUE)
-       {hd = ".";
-	tl = "defdb";}
-    else
-       {hd = path_head(root);
-	tl = path_tail(root);};
-
-    na = NATTEMPTS;
-    for (ia = 0; (ia < na) && (rv == NULL); ia++)
-        {sleep(ia);
-	 dir = opendir(hd);
-	 if (dir != NULL)
-	    {while (TRUE)
-	        {dp = (struct dirent *) readdir(dir);
-		 if (dp == NULL)
-		    break;
-		 else
-		    {strncpy(s, dp->d_name, MAXLINE);
-		     h = strstr(s, tl);
-		     p = strchr(s, '@');
-		     if ((h != NULL) && (p != NULL))
-		        {snprintf(s, MAXLINE, "%s/%s", hd, dp->d_name);
-			 rv = s;
-			 break;};};};
-	     closedir(dir);};};
-
-#endif
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SEMA_EXISTS - return TRUE iff the semaphore specified exists */
+/* CONN_EXISTS - return TRUE iff the connection specified exists */
 
-static int sema_exists(char *fmt, ...)
+static int conn_exists(char *fmt, ...)
    {int rv;
     char s[MAXLINE];
-    char *sema;
+    char *conn;
 
     rv = FALSE;
 
@@ -121,8 +87,8 @@ static int sema_exists(char *fmt, ...)
 	VSNPRINTF(s, MAXLINE, fmt);
 	VA_END;
 
-	sema = find_sema(s, -1);
-	rv   = (sema != NULL);
+	conn = find_conn(s, -1);
+	rv   = (conn != NULL);
 
 #ifdef VERBOSE
 	{char *flog, *wh;
@@ -140,20 +106,18 @@ static int sema_exists(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MAKE_SERVER_SEMA - create a descriptive semaphore for the server
+/* MAKE_SERVER_CONN - create a descriptive connection for the server
  *                  - on HOST at PORT at the ROOT collection/location
  *                  - return TRUE iff successful
  */
 
-static int make_server_sema(char *root, char *host, int port)
-   {int rv;
-    char s[MAXLINE];
+static int make_server_conn(client *cl, char *root, int auth, char *host, int port)
+   {int i, c, rv;
+    unsigned int rs;
+    char key[N_AKEY+1], s[MAXLINE];
+    FILE *fp;
 
     rv = FALSE;
-
-#ifdef NEWWAY
-    
-    FILE *fp;
 
     snprintf(s, MAXLINE, "%s.conn", root);
     fp = fopen(s, "w");
@@ -175,78 +139,64 @@ static int make_server_sema(char *root, char *host, int port)
 
 	fprintf(fp, "%ld\n", (long) haddr);
 
+/* key */
+        rs = ((unsigned int) time(NULL)) % 10091;
+	srandom(rs);
+        for (i = 0; i < N_AKEY; )
+	    {c = '!' + (random() % 93);
+	     if (c == ':')
+	        continue;
+	     else
+	        key[i++] = c;};
+	key[i] = '\0';
+	fprintf(fp, "%s\n", key);
+
+/* server PID */
+	fprintf(fp, "%ld\n", (long) getpid());
+
 	fclose(fp);
 
-        rv = TRUE;};
+/* set the file permission */
+	if (auth == TRUE)
+	   chmod(s, S_IRUSR);
+	else
+	   chmod(s, S_IRUSR | S_IRGRP | S_IROTH);
 
-#else
+#if 0
+/* reopen the file */
+        fp = fopen(s, "r");
 
-    int i, fd;
-
-    snprintf(s, MAXLINE, "%s.%s@%d", root, host, port);
-
-/* try NATTEMPTS times to make the semaphore */
-    for (i = 0; i < NATTEMPTS; i++)
-        {fd = open(s, O_WRONLY | O_CREAT, 0600);
-	 if (fd >= 0)
-	    {rv = fsync(fd);
-	     if (rv != 0)
-	        continue;
-	     rv = close(fd);
-	     if (rv == 0)
-	        break;};};
-
-/* change the sense of the return value */
-    rv = (rv == 0);
-
+/* unlink the file so that it goes away no matter how the server exits */
+	unlink(s);
 #endif
+
+	if (cl != NULL)
+	   {cl->nkey = N_AKEY;
+	    cl->key  = STRSAVE(key);};
+
+        rv = TRUE;};
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PARSE_SEMA - parse out the connection info associated with ROOT
+/* PARSE_CONN - parse out the connection info associated with ROOT
  *            - return a string array with the entries:
  *            -    0 host name
  *            -    1 port number
  *            -    2 IP address
+ *            -    3 authentication key
  */
 
-char **parse_sema(char *root)
+char **parse_conn(char *root)
    {char *res, **rv;
 
     rv = NULL;
 
-    res = find_sema(root, -1);
+    res = find_conn(root, -1);
     if (res != NULL)
-
-#ifdef NEWWAY
-
-      rv = file_text(FALSE, res);
-
-#else
-
-       {char s[MAXLINE];
-	char *host, *prt;
-
-        nstrncpy(s, MAXLINE, path_tail(res), -1);
-	res = strrchr(s, '.') + 1;
-	key_val(&host, &prt, res, "@");
-
-	rv = lst_add(rv, host);
-
-/* port */
-	if (prt != NULL)
-	   rv = lst_add(rv, prt);
-	else
-	   rv = lst_add(rv, "0");
-
-/* address */
-        snprintf(s, MAXLINE, "%ld", (long) INADDR_NONE);
-	rv = lst_add(rv, s);};
-
-#endif
+       rv = file_text(FALSE, res);
 
     return(rv);}
 
@@ -276,12 +226,12 @@ static int connect_close(int fd, client *cl, char *root)
 
 /* INIT_SERVER - setup the server side of communications
  *             - the server scans for a port it can bind
- *             - and writes the semaphore which clients
+ *             - and writes the connection which clients
  *             - then parse to obtain the host and port
  *             - for connections to the server
  */
 
-static int init_server(char *root)
+static int init_server(client *cl, char *root, int auth)
    {int iprt, port, sasz, rv;
     char host[MAXLINE];
     char *hst;
@@ -314,10 +264,10 @@ static int init_server(char *root)
 
 /* try to keep connections local by converting
  * complete host names 'abc.xyz.foo' to partial ones 'abc'
- * also simplifies semaphore file processing
+ * also simplifies connection file processing
  */
 	    hst = strtok(host, ".\n");
-	    rv = make_server_sema(root, hst, srv.port);};
+	    rv = make_server_conn(cl, root, auth, hst, srv.port);};
 
 /* initialize the set of active sockets */
 	FD_ZERO(&srv.afs);
@@ -382,7 +332,7 @@ static int connect_server(client *cl)
 /*--------------------------------------------------------------------------*/
 
 /* GET_CONNECT_SOCKET - fill PS with required info for connect call
- *                    - return the semaphore string array iff successful
+ *                    - return the connection string array iff successful
  *                    - useful for later logging
  */
 
@@ -391,11 +341,11 @@ char **get_connect_socket(struct sockaddr_in *ps, char *root)
     in_addr_t haddr;
     char *host, **sa;
 
-    sa = parse_sema(root);
+    sa = parse_conn(root);
     if ((sa != NULL) && (ps != NULL))
-       {host  = sa[0];
-	port  = atoi(sa[1]);
-	haddr = atol(sa[2]);
+       {host  = sa[CONN_NAME];
+	port  = atoi(sa[CONN_PORT]);
+	haddr = atol(sa[CONN_IP]);
 
 	sasz = sizeof(struct sockaddr_in);
 
@@ -425,13 +375,14 @@ char **get_connect_socket(struct sockaddr_in *ps, char *root)
 
 static int connect_client(client *cl)
    {int sasz, fd, err;
-    char *root, **ta;
+    char *key, *root, **ta;
     connection *srv;
 
     root = cl->root;
     srv  = cl->server;
 
-    fd = -1;
+    fd  = -1;
+    key = NULL;
 
     ta = get_connect_socket(&srv->sck, root);
     if (ta != NULL)
@@ -470,9 +421,14 @@ static int connect_client(client *cl)
 	    srv->server = fd;
 	    srv->port   = atoi(ta[1]);};
 
+/* get the shared key */
+	key = STRSAVE(ta[CONN_KEY]);
+
 	free_strings(ta);};
 
     cl->fd   = fd;
+    cl->nkey = N_AKEY;
+    cl->key  = key;
     cl->type = CLIENT;
 
     return(fd);}
@@ -526,13 +482,16 @@ static int client_fd(client *cl)
 
 /* OPEN_SERVER - initialize the server socket connection speficied by ROOT */
 
-static int open_server(char *root)
+static int open_server(client *cl, char *root, int auth)
    {int rv;
     char *flog, *wh;
 
+    if ((root == NULL) && (cl != NULL))
+       root = cl->root;
+
     rv  = TRUE;
-    rv &= init_server(root);
-    rv &= sema_exists(root);
+    rv &= init_server(cl, root, auth);
+    rv &= conn_exists(root);
 
     wh   = C_OR_S(srv.server == 0);
     flog = name_log(root);
@@ -543,17 +502,17 @@ static int open_server(char *root)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CLOSE_SOCK - close the socket specified by ROOT and remove the semaphore */
+/* CLOSE_SOCK - close the socket specified by ROOT and remove the connection */
 
 static int close_sock(char *root)
    {int st, rv;
-    char *sema, *flog, *wh;
+    char *conn, *flog, *wh;
 
     rv = TRUE;
 
-    sema = find_sema(root, -1);
-    if (sema != NULL)
-       {st  = unlink_safe(sema);
+    conn = find_conn(root, -1);
+    if (conn != NULL)
+       {st  = unlink_safe(conn);
 	rv &= (st == 0);
 
 	srv.server = connect_close(srv.server, NULL, root);

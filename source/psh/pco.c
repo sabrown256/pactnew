@@ -2924,9 +2924,9 @@ int main(int c, char **v, char **env)
                       break;
  
                  case 'l':
-                      append   = TRUE;
-                      dbg_sock = TRUE;
-                      dbg_db   = TRUE;
+                      append    = TRUE;
+                      dbg_sock  = TRUE;
+                      dbs.debug = TRUE;
                       break;
  
                  case 'o':
