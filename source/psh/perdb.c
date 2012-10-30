@@ -280,8 +280,14 @@ static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
     opt   = NULL;
     var   = NULL;
 
-    if (strchr(p, ':') != NULL)
-       {opt = tokenize(p, ":");
+/* variable list */
+    p = strpbrk(s, " \t\f");
+    if (p != NULL)
+       *p++ = '\0';
+
+/* options */
+    if (strchr(s, ':') != NULL)
+       {opt = tokenize(s, ":");
 	no  = lst_length(opt);
 	lo  = 0;
 
@@ -298,13 +304,10 @@ static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
 
 /* determine file */
 	if ((no - lo > 0) && (opt[lo] != NULL))
-	   fname = opt[lo++];
-
-/* variable list */
-        p = opt[lo];};
+	   fname = trim(opt[lo++], FRONT, " \t");};
 
     if (pp != NULL)
-       *pp = p;
+       *pp = trim(p, FRONT, " \t");
     if (pfname != NULL)
        *pfname = fname;
     if (pfmt != NULL)
@@ -584,8 +587,13 @@ static int proc_connection(client *cl)
     else
        {val = NULL;
 
+/* request is not properly authenticated */
+	if (strncmp(s, "reject:", 7) == 0)
+	   {/* rv = -1; */
+	    val = lst_push(val, "rejected");}
+
 /* client is exiting */
-	if (strncmp(s, "fin:", 4) == 0)
+	else if (strncmp(s, "fin:", 4) == 0)
 	   term_connection(cl);
 
 /* load database */
@@ -851,8 +859,8 @@ int main(int c, char **v)
                       help();
                       return(1);
 		 case 'l' :
-                      dbg_sock = TRUE;
-                      dbs.debug   = TRUE;
+                      dbg_sock  = TRUE;
+                      dbs.debug = TRUE;
                       break;
 		 case 's' :
                       srv = TRUE;

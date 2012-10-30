@@ -202,38 +202,51 @@ static int _comm_write_wrk(client *cl, char *t, int nt, int to)
  */
 
 int comm_read(client *cl, char *s, int nc, int to)
-   {int nb;
-
-#ifdef NEWWAY
-    int nk, no, nt, ok;
+   {int nb, nk, no, nt, ok;
     char *t;
-
-    ok = TRUE;
-    nk = cl->nkey;
-    no = nk + 6;
-    nt = nc + nk + 2;
-    t  = MAKE_N(char, nt);
-
-    nb = _comm_read_wrk(cl, t, nt, to);
-
-    if (strncmp(t, "auth:", 5) == 0)
-       ok = verifyx(cl, t+5, NULL);
-
-    if (ok == FALSE)
-       {nb = -2;
-	memset(s, 0, nc);}
-
-    else
-       {nstrncpy(s, nc, t + no, -1);
-	nb -= no;};
-
-    FREE(t);
-
-#else
 
     nb = _comm_read_wrk(cl, s, nc, to);
 
+    no = 0;
+    nk = cl->nkey;
+    nt = nc + nk + 2;
+    t  = MAKE_N(char, nt);
+
+    nstrncpy(t, nt, s, -1);
+
+    ok = FALSE;
+    if (strncmp(t, "auth:", 5) == 0)
+       {if (dbs.auth == TRUE)
+	   {no = nk + 6;
+	    ok = verifyx(cl, t+5, NULL);};}
+	   
+    else if (dbs.auth != TRUE)
+       ok = TRUE;
+
+    if (ok == FALSE)
+       {char *p;
+	p = t + strlen(t) - 4;
+	if (strcmp(p, "fin:") == 0)
+	   nstrncpy(s, nc, p, -1);
+	else
+	   nstrncpy(s, nc, "reject:", -1);
+
+	nb = strlen(s);}
+    else
+       {if ((strcmp(s, t+no) != 0) || (nc < strlen(t+no)))
+	   {char *flog;
+
+	    flog = name_log(cl->root);
+	    log_activity(flog, dbs.debug, 1,
+			 (cl->type == CLIENT) ? "CLIENT" : "SERVER",
+			 "error: %d |%s| != |%s|\n", no, s, t+no);};
+
+#if 0
+        nstrncpy(s, nc, t + no, -1);
 #endif
+	nb -= no;};
+
+    FREE(t);
 
     return(nb);}
 
@@ -246,11 +259,7 @@ int comm_read(client *cl, char *s, int nc, int to)
  */
 
 int comm_write(client *cl, char *s, int nc, int to)
-   {int nb;
-
-#ifdef NEWWAY
-
-    int nk, nt, ok;
+   {int nb, nk, nt, ok;
     char ans[N_AKEY+1];
     char *t;
 
@@ -262,7 +271,7 @@ int comm_write(client *cl, char *s, int nc, int to)
        {if (nc <= 0)
 	   nc = strlen(s);
 
-	nk = cl->nkey;
+	nk = (dbs.auth == TRUE) ? cl->nkey : 0;
 	nt = nc + nk + 7;
 	t  = MAKE_N(char, nt);
 	if (dbs.auth == TRUE)
@@ -275,12 +284,6 @@ int comm_write(client *cl, char *s, int nc, int to)
 	nb -= nk;
 
 	FREE(t);};
-
-#else
-
-    nb  = _comm_write_wrk(cl, s, nc, to);
-
-#endif
 
     return(nb);}
 
@@ -1036,6 +1039,10 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 	        {for (t = s; nb > 0; t += nc, nb -= nc)
 		     {if (strcmp(t, EOM) == 0)
 			 {ok = FALSE;
+			  break;}
+		      else if (strcmp(t, "reject:") == 0)
+			 {p  = lst_push(p, "rejected");
+			  ok = FALSE;
 			  break;}
 		      else
 			 p = lst_push(p, t);

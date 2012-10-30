@@ -8,6 +8,77 @@ set db  = ./db8
 
 setenv PERDB_PATH $db
 
+@ err = 0
+
+set lst = ( 1 2 3 4 )
+#set lst = ( 1 )
+foreach i ($lst)
+
+# NOTE: the current model is that the server and client must
+# both be authenticating or neither be authenticating
+# a mixed mode is rejected
+
+   switch ($i)
+      case 1:
+           set msg = "no authentication"
+           set ac  = ""
+           set as  = ""
+           set est = 0
+           breaksw
+      case 2:
+           set msg = "with authentication"
+           set ac  = "-a"
+           set as  = "-a"
+           set est = 0
+           breaksw
+      case 3:
+           set msg = "with authentication on server"
+           set ac  = ""
+           set as  = "-a"
+           set est = 0
+           breaksw
+      case 4:
+           set msg = "with authentication on client"
+           set ac  = "-a"
+           set as  = ""
+           set est = 0
+           breaksw
+   endsw
+
+   echo "-----------------------------------"
+   echo "   $msg"
+
+   rm -f db8* >& /dev/null
+   sign -q db8. >& /dev/null
+#   ls-jobs -q | grep bin/perdb
+
+   perdb $opt $as v1=$i
+   ls -l $db.conn | awk '{printf("   %s  %8d  %s\n", $1, $5, $NF);}'
+
+   set v1 = ( `perdb $opt $ac v1` )
+   set xstatus = $status
+
+   if ($xstatus == $est) then
+      echo "-> v1 = |$v1| ok"
+   else
+      echo "-> v1 = |$v1| ng"
+      @ err = $err + 1
+   endif
+
+   perdb $opt $as quit:
+   sleep 1
+   ls -l $db.[cd]* | awk '{printf("   %s  %8d  %s\n", $1, $5, $NF);}'
+
+end
+
+sign -q db8. >& /dev/null
+rm -f db8* >& /dev/null
+
+exit($err)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 echo "-----------------------------------"
 echo "   no authentication"
 
