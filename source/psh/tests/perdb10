@@ -1,0 +1,90 @@
+#!/bin/csh -f
+#
+# PERDB9 - test list set and get
+#        - use environment variable specification of DB
+#        - test suitability for environment variable
+#        - no FIFO
+#
+
+set opt = "-l"
+set db  = ./db9
+
+alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
+
+setenv PERDB_PATH $db
+
+dbset v1 1
+dbset v2 "(m1 m2)"
+dbset v3 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
+dbset v4 "(m1=(m1=1 m2=2) m2='m1=1 m2=2')"
+
+echo "-----------------------------------"
+dbget v1
+echo "v1 : |$v1|"
+
+echo "-----------------------------------"
+dbget v3
+echo "v3 : |$v3|"
+
+echo "-----------------------------------"
+dbget v4
+echo "v4 : |$v4|"
+
+echo "-----------------------------------"
+dbget v2
+echo "v2 : |$v2|"
+
+echo "-----------------------------------"
+dbget v3.m1
+echo "v3.m1 : |`printenv v3.m1`|"
+
+echo "-----------------------------------"
+dbget v3.m2
+echo "v3.m2 : |`printenv v3.m2`|"
+
+echo "-----------------------------------"
+dbget v3.m3
+echo "v3.m3 : |`printenv v3.m3`|"
+
+echo "-----------------------------------"
+dbget v3.m4
+echo "v3.m4 : |`printenv v3.m4`|"
+
+echo "-----------------------------------"
+dbget v3.m5
+echo "v3.m5 : |`printenv v3.m5`|"
+
+echo "-----------------------------------"
+dbget v3.m6
+echo "v3.m6 : |`printenv v3.m6`|"
+
+echo "-----------------------------------"
+dbget v4.m1
+echo "v4.m1 : |`printenv v4.m1`|"
+
+echo "-----------------------------------"
+dbget v4.m1.m1
+echo "v4.m1.m1 : |`printenv v4.m1.m1`|"
+
+echo "-----------------------------------"
+dbget v4.m1.m2
+echo "v4.m1.m2 : |`printenv v4.m1.m2`|"
+
+echo "-----------------------------------"
+dbget v4.m2
+echo "v4.m2 : |`printenv v4.m2`|"
+
+echo "-----------------------------------"
+dbget v4.m2.m1
+echo "v4.m2.m1 : |`printenv v4.m2.m1`|"
+
+foreach i (v1 v2 v3 v4)
+   echo "-----------------------------------"
+   perdb $opt save: $i
+end
+
+echo "-----------------------------------"
+perdb $opt quit:
+
+exit($status)

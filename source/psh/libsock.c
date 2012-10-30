@@ -553,9 +553,21 @@ static int read_sock(client *cl, char *s, int nc)
 	   {if (s[nb] != '\0')
 	       s[nb] = '\0';
 
-	    log_activity(flog, dbg_sock, 1, wh,
-			 "read %d |%s| (%d)",
-			 fd, s, nb);}
+	    if (strncmp(s, "auth: ", 5) == 0)
+	       {int nk, nt;
+		char *t;
+
+		nk = cl->nkey + 6;
+		t  = s + nk;
+		nt = nb - nk;
+		log_activity(flog, dbg_sock, 1, wh,
+			     "read %d auth|%s| (%d)",
+			     fd, t, nt);}
+	    else
+	       log_activity(flog, dbg_sock, 1, wh,
+			    "read %d |%s| (%d)",
+			    fd, s, nb);}
+
 	else
 	   {s[0] = '\0';
 
@@ -594,8 +606,19 @@ static int write_sock(client *cl, char *s, int nc)
 	   log_activity(flog, dbg_sock, 1, wh, "write - no connection");
 
 	else
-	   {log_activity(flog, dbg_sock, 1, wh, "write %d |%s| ... ",
-			 fd, s);
+	   {if (strncmp(s, "auth:", 5) == 0)
+	       {int nk;
+		char *t;
+
+		nk = cl->nkey + 6;
+		t  = s + nk;
+		log_activity(flog, dbg_sock, 1, wh,
+			     "write %d auth|%s| ... ",
+			     fd, t);}
+	    else
+	       log_activity(flog, dbg_sock, 1, wh,
+			    "write %d |%s| ... ",
+			    fd, s);
 
 	    if (nc <= 0)
 	       nc = strlen(s) + 1;

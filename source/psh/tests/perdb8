@@ -1,122 +1,86 @@
 #!/bin/csh -f
 #
-# PERDB8 - test adding members
-#        - GOTCHA: does not work as desired - some redesign required
-#        - no FIFO
+# PERDB8 - test authentication
 #
 
 set opt = "-l"
 set db  = ./db8
 
-alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
-alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
-alias dbdef     'perdb $opt \!\!:1 \?'
-alias dbini     'set t_ = ( `perdb $opt \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
-
-set res = ( "defined" "undefined" )
-
-rm -f db8* >& /dev/null
-
 setenv PERDB_PATH $db
 
 echo "-----------------------------------"
+echo "   no authentication"
 
-dbset v1 "(m1 m2)"
-echo "v1 = `printenv 'v1'`"
+rm -f db8* >& /dev/null
+sign -q db8
+ls-jobs
 
-dbset v1.m3 new
-echo "v1 = `printenv 'v1'`"
+perdb $opt v1=1
+ls -l $db.conn
 
-dbget v1.m3
-echo "v1.m3 = `printenv 'v1.m3'`"
-
-echo ""
-perdb $opt save: v1
-
-echo "-----------------------------------"
-
-dbset v2 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
-echo "v2 = `printenv 'v2'`"
-
-dbset v2.m7 new
-echo "v2 = `printenv 'v2'`"
-
-dbget v2.m7
-echo "v2 = `printenv 'v2'`"
-
-dbset v2.m1 2
-echo "v2 = `printenv 'v2'`"
-
-dbget v2.m1
-echo "v2 = `printenv 'v2'`"
-
-echo ""
-perdb $opt save: v2
-
-echo "-----------------------------------"
-
-dbdef v3.m3
-@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
-dbdef v3.m3
-@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
-
-dbset v3 "(m1 m2)"
-echo "v3 = `printenv 'v3'`"
-
-dbdef v3.m3
-@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
-dbdef v3.m3
-@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
-
-dbset v3.m3 new
-echo "v3 = `printenv 'v3'`"
-
-dbdef v3.m3
-@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
-
-dbget v3.m3
-echo "v3.m3 = `printenv 'v3.m3'`"
-
-echo ""
-perdb $opt save: v3
-
-echo "-----------------------------------"
-
-dbdef v4.m7
-@ xstat = $status + 1 ; echo "v4.m7 ? $res[$xstat]"
-
-dbset v4 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
-echo "v4 = `printenv 'v4'`"
-
-dbini v4.m7 new
-echo "v4 = `printenv 'v4'`"
-
-dbget v4.m7
-echo "v4 = `printenv 'v4'`"
-
-dbini v4.m7 old
-echo "v4 = `printenv 'v4'`"
-
-dbget v4.m7
-echo "v4 = `printenv 'v4'`"
-
-dbini v4.m1 2
-echo "v4 = `printenv 'v4'`"
-
-dbget v4.m1
-echo "v4 = `printenv 'v4'`"
-
-dbset v4.m1 2
-echo "v4 = `printenv 'v4'`"
-
-dbget v4.m1
-echo "v4 = `printenv 'v4'`"
-
-echo ""
-perdb $opt save: v4
-
-echo "-----------------------------------"
+perdb $opt v1
+set v1 = ( `perdb $opt v1` )
+echo "-> v1 = |$v1| ($status)"
 
 perdb $opt quit:
+sleep 1
+ls -l $db*
+
+echo "----------------"
+echo "   with authentication"
+
+rm -f db8* >& /dev/null
+sign -q db8
+ls-jobs
+
+perdb $opt -a v1=2
+ls -l $db.conn
+
+set v1 = ( `perdb $opt -a v1` )
+echo "-> v1 = |$v1| ($status)"
+
+perdb $opt -a quit:
+sleep 1
+ls -l $db*
+
+echo "----------------"
+echo "   with authentication on server"
+
+rm -f db8* >& /dev/null
+sign -q db8
+ls-jobs
+
+perdb $opt -a v1=3
+ls -l $db.conn
+
+set v1 = ( `perdb $opt v1` )
+echo "-> v1 = |$v1| ($status)"
+
+perdb $opt quit:
+sleep 1
+ls -l $db*
+
+echo "----------------"
+echo "   with authentication on client"
+
+rm -f db8* >& /dev/null
+sign -q db8
+ls-jobs
+
+perdb $opt v1=4
+ls -l $db.conn
+
+#perdb $opt -a v1
+set v1 = ( `perdb $opt -a v1` )
+echo "-> v1 = |$v1| ($status)"
+
+perdb $opt -a quit:
+sleep 1
+ls -l $db*
+rm -f db8* >& /dev/null
+
+echo "-----------------------------------"
+
+sign -q db8
 
 exit($status)
