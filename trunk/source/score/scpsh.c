@@ -173,7 +173,7 @@
 #define match 			PS_match
 #define name_db 		PS_name_db
 #define name_log 		PS_name_log
-#define name_pid 		PS_name_pid
+#define name_conn 		PS_name_conn
 #define nchar 			PS_nchar
 #define note 			PS_note
 #define noted 			PS_noted
@@ -182,7 +182,7 @@
 #define nstrncpy 		PS_nstrncpy
 #define nstrsave 		PS_nstrsave
 #define open_file 		PS_open_file
-#define parse_sema 		PS_parse_sema
+#define parse_conn 		PS_parse_conn
 #define parse_statement 	PS_parse_statement
 #define path_base 		PS_path_base
 #define path_head 		PS_path_head
@@ -224,6 +224,7 @@
 #define unique 			PS_unique
 #define unlink_safe 		PS_unlink_safe
 #define upcase 			PS_upcase
+#define verifyx 		PS_verifyx
 #define vstrcat 		PS_vstrcat
 #define wall_clock_time 	PS_wall_clock_time
 

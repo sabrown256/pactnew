@@ -11,15 +11,18 @@ v1=1
 v2="baz blat"
 saved database
 -----------------------------------
-saved database to db3. v1.db
+v1=1
+saved variables
 -----------------------------------
 setenv v1 1 ;
 setenv v2 "baz blat" ;
 -----------------------------------
+setenv v1 1 ;
 -----------------------------------
 export v1=1 ;
 export v2="baz blat" ;
 -----------------------------------
+export v1=1 ;
 -----------------------------------
 -----------------------------------
 saved database to db3.dba.db

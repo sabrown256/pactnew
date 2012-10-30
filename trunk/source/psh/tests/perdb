@@ -49,10 +49,9 @@ if ($status != 0) then
    set too_strict = TRUE
 endif
 
-if ($too_strict == TRUE) then
-   set List = (perdb1 perdb2 perdb3 perdb4 perdb5 perdb6 perdb7)
-else
-   set List = (perdb1 perdb2 perdb3 perdb4 perdb5 perdb6 perdb7 perdb8 perdb9)
+set List = (perdb1 perdb2 perdb3 perdb4 perdb5 perdb6 perdb7)
+if ($too_strict == FALSE) then
+   set List = ($List perdb8 perdb9 perdb10)
 endif
 
 Note $Log "Using $PERDB"
