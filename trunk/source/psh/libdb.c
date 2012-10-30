@@ -14,6 +14,8 @@
 
 #include "libhash.c"
 
+/* #define NEWWAY */
+
 #define EOM     "++ok++"
 
 #define WHICH_PROC()       ((dbs.ioc_server == CLIENT) ? "CLIENT" : "SERVER")
@@ -144,21 +146,10 @@ int verifyx(client *cl, char *ans, char *res)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* COMM_READ - read from CL into S
- *           - quit if it hasn't heard anything in TO seconds
- *           - return -2 if authentication is denied
- */
+/* _COMM_READ_WRK - read worker routine */
 
-int comm_read(client *cl, char *s, int nc, int to)
+static int _comm_read_wrk(client *cl, char *t, int nt, int to)
    {int nb;
-
-#ifdef NEWWAY
-    int nk, nt, ok;
-    char *t;
-
-    nk = cl->nkey;
-    nt = nc + nk + 1;
-    t  = MAKE_N(char, nt);
 
 #ifdef IO_ALARM
     signal(SIGALRM, sigtimeout);
@@ -175,22 +166,15 @@ int comm_read(client *cl, char *s, int nc, int to)
     nb = read_sock(cl, t, nt);
 #endif
 
-    if (strncmp(t, "auth:", 5) == 0)
-       ok = verifyx(cl, t+5, NULL);
-    else
-       ok = TRUE;
+    return(nb);}
 
-    if (ok == FALSE)
-       nb = -2;
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-    else
-       nstrncpy(s, nc, t + nk + 6, -1);
+/* _COMM_WRITE_WRK - write worker routine */
 
-    nb -= (nk + 6);
-
-    FREE(t);
-
-#else
+static int _comm_write_wrk(client *cl, char *t, int nt, int to)
+   {int nb;
 
 #ifdef IO_ALARM
     signal(SIGALRM, sigtimeout);
@@ -198,14 +182,56 @@ int comm_read(client *cl, char *s, int nc, int to)
     alarm(to);
 
     if (setjmp(cpu) == 0)
-       nb = read_sock(cl, s, nc);
+       nb = write_sock(cl, t, nt);
     else
        nb = -1;
 
     alarm(0);
 #else
-    nb = read_sock(cl, s, nc);
+    nb = write_sock(cl, t, nt);
 #endif
+
+    return(nb);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* COMM_READ - read from CL into S
+ *           - quit if it hasn't heard anything in TO seconds
+ *           - return -2 if authentication is denied
+ */
+
+int comm_read(client *cl, char *s, int nc, int to)
+   {int nb;
+
+#ifdef NEWWAY
+    int nk, no, nt, ok;
+    char *t;
+
+    ok = TRUE;
+    nk = cl->nkey;
+    no = nk + 6;
+    nt = nc + nk + 2;
+    t  = MAKE_N(char, nt);
+
+    nb = _comm_read_wrk(cl, t, nt, to);
+
+    if (strncmp(t, "auth:", 5) == 0)
+       ok = verifyx(cl, t+5, NULL);
+
+    if (ok == FALSE)
+       {nb = -2;
+	memset(s, 0, nc);}
+
+    else
+       {nstrncpy(s, nc, t + no, -1);
+	nb -= no;};
+
+    FREE(t);
+
+#else
+
+    nb = _comm_read_wrk(cl, s, nc, to);
 
 #endif
 
@@ -245,41 +271,14 @@ int comm_write(client *cl, char *s, int nc, int to)
 	   nstrncpy(t, nt, s, -1);
 	nt = strlen(t) + 1;
 
-#ifdef IO_ALARM
-	signal(SIGALRM, sigtimeout);
-
-	alarm(to);
-
-	if (setjmp(cpu) == 0)
-	   nb = write_sock(cl, t, nt);
-	else
-	   nb = -1;
-
-	alarm(0);
-#else
-	nb = write_sock(cl, t, nt);
-#endif
-
+	nb  = _comm_write_wrk(cl, t, nt, to);
 	nb -= nk;
 
 	FREE(t);};
 
 #else
 
-#ifdef IO_ALARM
-    signal(SIGALRM, sigtimeout);
-
-    alarm(to);
-
-    if (setjmp(cpu) == 0)
-       nb = write_sock(cl, s, nc);
-    else
-       nb = -1;
-
-    alarm(0);
-#else
-    nb = write_sock(cl, s, nc);
-#endif
+    nb  = _comm_write_wrk(cl, s, nc, to);
 
 #endif
 

@@ -617,7 +617,10 @@ static int proc_connection(client *cl)
 	        nb = comm_write(cl, val[i], 0, 10);
 	    nb = comm_write(cl, EOM, 0, 10);
 
-	    free_strings(val);};};
+	    free_strings(val);
+
+	    if (rv < 1)
+	       unlink(db->fcon);};};
 
     return(rv);}
 
