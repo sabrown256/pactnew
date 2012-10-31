@@ -8,7 +8,6 @@
  *
  */
 
-#include "libsrv.c"
 #include "libdb.c"
 
 /*--------------------------------------------------------------------------*/
@@ -63,7 +62,7 @@ static char *srv_save_db(database *db, char *fname,
        {if (fname[0] == '/')
 	   nstrncpy(s, MAXLINE, fname, -1);
         else
-	   snprintf(s, MAXLINE, "%s.%s.db", db->root, fname);
+	   snprintf(s, MAXLINE, "%s.%s.db", db->cl->root, fname);
 
 	fp = fopen(s, "w");
 	if (fp == NULL)
