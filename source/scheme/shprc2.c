@@ -173,7 +173,7 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
     char t[MAXLINE];
     char *s, *db, **al;
     object *o;
-    client *cl;
+    static client *cl = NULL;
 
     db = getenv("PERDB_PATH");
     if (db == NULL)
@@ -181,7 +181,12 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
 	SC_putenv(t);
 	db = getenv("PERDB_PATH");};
 
-    cl = make_client(db, CLIENT);
+    if (cl == NULL)
+       {int auth;
+
+	auth = FALSE;
+	cl = make_client(CLIENT, auth, db, cl_logger);};
+
     dbset(cl, "gstatus", "");
 
     n  = SS_length(si, argl);

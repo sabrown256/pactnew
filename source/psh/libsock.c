@@ -17,9 +17,17 @@
 #define NATTEMPTS   3
 #define N_AKEY      32
 
-#define C_OR_S(_p)    ((_p) ? "CLIENT" : "SERVER")
+#define C_OR_S(_p)      ((_p) ? "CLIENT" : "SERVER")
+#define CLOG(_c, ...)                                                    \
+    {if ((_c)->clog != NULL)                                             \
+        (_c)->clog((_c), __VA_ARGS__);}  
 
 enum {CONN_NAME = 0, CONN_PORT, CONN_IP, CONN_KEY, CONN_PID};
+
+enum e_ckind
+ {SERVER, CLIENT};
+
+typedef enum e_ckind ckind;
 
 typedef struct s_connection connection;
 typedef struct s_client client;
@@ -33,18 +41,17 @@ struct s_connection
 
 struct s_client
    {int fd;                      /* client side descriptor */
+    int auth;
     int nkey;
     char *key;
     char *root;
     ckind type;
+    void *a;
     connection *server;
-    database *db;};
+    void (*clog)(client *cl, int lvl, char *fmt, ...);};
 
 static connection
  srv;
-
-static int
- dbg_sock = FALSE;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -92,6 +99,7 @@ static int conn_exists(char *fmt, ...)
 
 #ifdef VERBOSE
 	{char *flog, *wh;
+	 static int dbg_sock = FALSE;
 
 	 flog = name_log(s);
 	 wh   = C_OR_S(srv.server == 0);
@@ -107,11 +115,12 @@ static int conn_exists(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 
 /* MAKE_SERVER_CONN - create a descriptive connection for the server
- *                  - on HOST at PORT at the ROOT collection/location
+ *                  - on HOST at PORT at the root collection/location
+ *                  - of CL
  *                  - return TRUE iff successful
  */
 
-static int make_server_conn(client *cl, char *root, int auth, char *host, int port)
+static int make_server_conn(client *cl, int auth, char *host, int port)
    {int i, c, rv;
     unsigned int rs;
     char key[N_AKEY+1], s[MAXLINE];
@@ -119,7 +128,7 @@ static int make_server_conn(client *cl, char *root, int auth, char *host, int po
 
     rv = FALSE;
 
-    snprintf(s, MAXLINE, "%s.conn", root);
+    snprintf(s, MAXLINE, "%s.conn", cl->root);
     fp = fopen(s, "w");
     if (fp != NULL)
        {in_addr_t haddr;
@@ -205,19 +214,12 @@ char **parse_conn(char *root)
 
 /* CONNECT_CLOSE - close the socket connection */
 
-static int connect_close(int fd, client *cl, char *root)
-   {char *wh, *flog;
-
-    wh = "SERVER";
-    if (cl != NULL)
-       {root = cl->root;
-	wh   = C_OR_S(cl->type == CLIENT);};
+static int connect_close(int fd, client *cl)
+   {
 
     close(fd);
 
-    flog = name_log(root);
-    log_activity(flog, dbg_sock, 2, wh,
-		 "close socket %d", fd);
+    CLOG(cl, 1, "close socket %d", fd);
 
     return(-1);}
 
@@ -231,7 +233,7 @@ static int connect_close(int fd, client *cl, char *root)
  *             - for connections to the server
  */
 
-static int init_server(client *cl, char *root, int auth)
+static int init_server(client *cl, int auth)
    {int iprt, port, sasz, rv;
     char host[MAXLINE];
     char *hst;
@@ -267,7 +269,7 @@ static int init_server(client *cl, char *root, int auth)
  * also simplifies connection file processing
  */
 	    hst = strtok(host, ".\n");
-	    rv = make_server_conn(cl, root, auth, hst, srv.port);};
+	    rv = make_server_conn(cl, auth, hst, srv.port);};
 
 /* initialize the set of active sockets */
 	FD_ZERO(&srv.afs);
@@ -282,15 +284,11 @@ static int init_server(client *cl, char *root, int auth)
 
 static int connect_server(client *cl)
    {int fdc, fds, err, sasz;
-    char *root, *flog;
     socklen_t len;
     struct sockaddr *sa;
     connection *srv;
 
-    root = cl->root;
     srv  = cl->server;
-
-    flog = name_log(root);
 
     fdc  = -1;
     sasz = sizeof(struct sockaddr_in);
@@ -304,24 +302,19 @@ static int connect_server(client *cl)
 	if (err >= 0)
 	   {err = getsockname(fds, sa, &len);
 	    if (err == -1)
-	       log_activity(flog, dbg_sock, 1, "SERVER",
-			    "getsockname error %d - %s (%d)",
-			    fds, strerror(errno), errno);
+	       CLOG(cl, 1, "getsockname error %d - %s (%d)",
+		    fds, strerror(errno), errno);
 
-	    log_activity(flog, dbg_sock, 2, "SERVER",
-			 "accept on %d ...", fds);
+	    CLOG(cl, 2, "accept on %d ...", fds);
 	    fdc = accept(fds, sa, &len);
 	    if (fdc >= 0)
-	       log_activity(flog, dbg_sock, 2, "SERVER",
-			    "accept ok %d", fdc);
+	       {CLOG(cl, 2, "accept ok %d", fdc);}
 	    else
-	       log_activity(flog, dbg_sock, 1, "SERVER",
-			    "accept ng (%s - %d)",
-			    strerror(errno), errno);}
+	       CLOG(cl, 1, "accept ng (%s - %d)",
+		    strerror(errno), errno);}
 	else
-	   log_activity(flog, dbg_sock, 1, "SERVER",
-			"listen error on %d - (%s - %d)",
-			fds, strerror(errno), errno);};
+	   CLOG(cl, 1, "listen error on %d - (%s - %d)",
+		fds, strerror(errno), errno);};
 
     cl->fd   = fdc;
     cl->type = SERVER;
@@ -389,10 +382,7 @@ static int connect_client(client *cl)
        {fd = socket(PF_INET, SOCK_STREAM, 0);
 	if (fd >= 0)
 	   {int ia, na;
-	    char *flog;
 	    struct sockaddr *sa;
-
-	    flog = name_log(root);
 
 	    sasz = sizeof(struct sockaddr_in);
 
@@ -408,15 +398,13 @@ static int connect_client(client *cl)
 
 /* report the connection status */
 	    if (err >= 0)
-	       log_activity(flog, dbg_sock, 2, "CLIENT",
-			    "connect %s@%s on %d (attempt %d)",
-			    ta[0], ta[1], fd, ia);
+	       {CLOG(cl, 2, "connect %s@%s on %d (attempt %d)",
+		     ta[0], ta[1], fd, ia);}
 	    else
-	       {fd = connect_close(fd, cl, NULL);
-		log_activity(flog, dbg_sock, 1, "CLIENT",
-			     "connect error %s@%s  %d - %s (%d)",
-			     ta[0], ta[1], fd,
-			     strerror(errno), errno);};
+	       {fd = connect_close(fd, cl);
+		CLOG(cl, 1, "connect error %s@%s  %d - %s (%d)",
+		     ta[0], ta[1], fd,
+		     strerror(errno), errno);};
 
 	    srv->server = fd;
 	    srv->port   = atoi(ta[1]);};
@@ -440,17 +428,12 @@ static int connect_client(client *cl)
 
 static int connect_error(client *cl)
    {int fds;
-    char *root, *flog;
     connection *srv;
-
-    root = cl->root;
-    flog = name_log(root);
 
     srv = cl->server;
     fds = srv->server;
     if (fds < 0)
-       log_activity(flog, dbg_sock, 1, "CLIENT",
-		    "no server connection available");
+       CLOG(cl, 1, "no server connection available");
 
     return(-1);}
 
@@ -480,22 +463,18 @@ static int client_fd(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* OPEN_SERVER - initialize the server socket connection speficied by ROOT */
+/* OPEN_SERVER - initialize the server socket connection speficied by ROOT
+ *           - analog of open_fifo in libfifo.c
+ */
 
-static int open_server(client *cl, char *root, int auth)
+static int open_server(client *cl, ckind ioc, int auth)
    {int rv;
-    char *flog, *wh;
-
-    if ((root == NULL) && (cl != NULL))
-       root = cl->root;
 
     rv  = TRUE;
-    rv &= init_server(cl, root, auth);
-    rv &= conn_exists(root);
+    rv &= init_server(cl, auth);
+    rv &= conn_exists(cl->root);
 
-    wh   = C_OR_S(srv.server == 0);
-    flog = name_log(root);
-    log_activity(flog, dbg_sock, 2, wh, "open %d", rv);
+    CLOG(cl, 2, "open %d", rv);
 
     return(rv);}
 
@@ -504,23 +483,21 @@ static int open_server(client *cl, char *root, int auth)
 
 /* CLOSE_SOCK - close the socket specified by ROOT and remove the connection */
 
-static int close_sock(char *root)
+static int close_sock(client *cl)
    {int st, rv;
-    char *conn, *flog, *wh;
+    char *conn, *root;
 
     rv = TRUE;
 
+    root = cl->root;
     conn = find_conn(root, -1);
     if (conn != NULL)
        {st  = unlink_safe(conn);
 	rv &= (st == 0);
 
-	srv.server = connect_close(srv.server, NULL, root);
+	srv.server = connect_close(srv.server, cl);
 
-	wh = C_OR_S(srv.server == 0);
-
-	flog = name_log(root);
-	log_activity(flog, dbg_sock, 2, wh, "close %d", st);};
+	CLOG(cl, 2, "close %d", st);};
 
     return(rv);}
 
@@ -531,16 +508,12 @@ static int close_sock(char *root)
 
 static int read_sock(client *cl, char *s, int nc)
    {int nb, fd, ev;
-    char *flog, *wh, *root;
 
-    wh   = C_OR_S(cl->type == CLIENT);
-    root = cl->root;
-    flog = name_log(root);
-    fd   = client_fd(cl);
+    fd = client_fd(cl);
 
     if (fd < 0)
        {nb = -1;
-	log_activity(flog, dbg_sock, 1, wh, "read - no connection");}
+	CLOG(cl, 1, "read - no connection");}
 
     else
        {nb = read(fd, s, nc);
@@ -560,27 +533,21 @@ static int read_sock(client *cl, char *s, int nc)
 		nk = cl->nkey + 6;
 		t  = s + nk;
 		nt = nb - nk;
-		log_activity(flog, dbg_sock, 1, wh,
-			     "read %d auth|%s| (%d)",
-			     fd, t, nt);}
+		CLOG(cl, 1, "read %d auth|%s| (%d)", fd, t, nt);}
 	    else
-	       log_activity(flog, dbg_sock, 1, wh,
-			    "read %d |%s| (%d)",
-			    fd, s, nb);}
+	       CLOG(cl, 1, "read %d |%s| (%d)", fd, s, nb);}
 
 	else
 	   {s[0] = '\0';
 
 	    if (nb == 0)
-	       {log_activity(flog, dbg_sock, 2, wh,
-			     "read %d - zero byte", fd);
+	       {CLOG(cl, 2, "read %d - zero byte", fd);
 /* GOCTHA: should probably be moved to async_server in perdb.c */
-		cl->fd = connect_close(fd, cl, NULL);
+		cl->fd = connect_close(fd, cl);
 		nb = -1;}
 	    else
-	       {log_activity(flog, dbg_sock, 1, wh,
-			     "read %d error - %s (%d)",
-			     fd, strerror(ev), ev);
+	       {CLOG(cl, 1, "read %d error - %s (%d)",
+		     fd, strerror(ev), ev);
 		nb = -2;};};};
 
     return(nb);}
@@ -592,18 +559,14 @@ static int read_sock(client *cl, char *s, int nc)
 
 static int write_sock(client *cl, char *s, int nc)
    {int nb, fd;
-    char *flog, *wh, *root;
 
     nb = -1;
 
     if ((cl != NULL) && (s != NULL))
-       {wh   = C_OR_S(cl->type == CLIENT);
-	root = cl->root;
-	flog = name_log(root);
-	fd   = client_fd(cl);
+       {fd = client_fd(cl);
 
 	if (fd < 0)
-	   log_activity(flog, dbg_sock, 1, wh, "write - no connection");
+	   {CLOG(cl, 1, "write - no connection");}
 
 	else
 	   {if (strncmp(s, "auth:", 5) == 0)
@@ -612,13 +575,9 @@ static int write_sock(client *cl, char *s, int nc)
 
 		nk = cl->nkey + 6;
 		t  = s + nk;
-		log_activity(flog, dbg_sock, 1, wh,
-			     "write %d auth|%s| ... ",
-			     fd, t);}
+		CLOG(cl, 1, "write %d auth|%s| ... ", fd, t);}
 	    else
-	       log_activity(flog, dbg_sock, 1, wh,
-			    "write %d |%s| ... ",
-			    fd, s);
+	       CLOG(cl, 1, "write %d |%s| ... ", fd, s);
 
 	    if (nc <= 0)
 	       nc = strlen(s) + 1;
@@ -626,13 +585,10 @@ static int write_sock(client *cl, char *s, int nc)
 	    nb = write(fd, s, nc);
 
 	    if ((nb >= 0) && (nb == nc))
-	       log_activity(flog, dbg_sock, 2, wh,
-			    "write %d ok (%d bytes sent)",
-			    fd, nb);
+	       {CLOG(cl, 2, "write %d ok (%d bytes sent)", fd, nb);}
 	    else
-	       log_activity(flog, dbg_sock, 1, wh,
-			    "write %d ng (%s - %d)",
-			    fd, strerror(errno), errno);};};
+	       CLOG(cl, 1, "write %d ng (%s - %d)",
+		    fd, strerror(errno), errno);};};
 
     return(nb);}
 

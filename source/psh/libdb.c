@@ -12,46 +12,35 @@
 
 #define LIBDB
 
+#include "libsrv.c"
 #include "libhash.c"
 
 /* #define NEWWAY */
 
 #define EOM     "++ok++"
 
-#define WHICH_PROC()       ((dbs.ioc_server == CLIENT) ? "CLIENT" : "SERVER")
-
-enum e_ckind
- {SERVER, CLIENT};
-
-typedef enum e_ckind ckind;
-
 typedef struct s_database database;
 typedef struct s_vardes vardes;
 typedef struct s_db_session db_session;
 
 struct s_database
-   {char *root;                 /* root path name of database */
+   {int debug;
+    int auth;
+    int ioc;                    /* CLIENT or SERVER */
+    char *root;                 /* root path name of database */
     char *file;                 /* name of the file image of the database */
     char *flog;                 /* name of the log file */
     char *fcon;                 /* name of the connection file */
-    hashtab *tab;};
+    hashtab *tab;
+    client *cl;};
 
 struct s_db_session
-   {int ioc_server;
-    int debug;
-    int init;
-    int auth;
-    int daemon;
+   {svr_session svr;
     int literal;
     char root[MAXLINE];};
 
-static db_session
-  dbs = { CLIENT, FALSE, FALSE, FALSE, FALSE, FALSE, };
-
 extern char
  *name_log(char *root);
-
-#include "libsock.c"
 
 struct s_vardes
    {char *fmt;
@@ -85,247 +74,21 @@ char *name_log(char *root)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SIGTIMEOUT - handle signals meant to timeout session */
+/* CL_LOGGER - log messages for the client CL */
 
-#ifdef IO_ALARM
+static void cl_logger(client *cl, int lvl, char *fmt, ...)
+   {char s[MAXLINE];
+    char *root, *wh, *flog;
 
-static jmp_buf
- cpu;
+    VA_START(fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
+    VA_END;
 
-static void sigtimeout(int sig)
-   {
-
-    longjmp(cpu, 1);
-
-    return;}
-
-#endif
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* VERIFYX - verify the transaction request
- *         - return TRUE if ANS is correct
- */
-
-int verifyx(client *cl, char *ans, char *res)
-   {int nk, rv;
-    char lres[MAXLINE];
-    char *root, *key;
-
-    rv = TRUE;
-
+    wh   = C_OR_S(cl->type == CLIENT);
     root = cl->root;
-    nk   = cl->nkey;
-    key  = cl->key;
+    flog = name_log(root);
 
-/* without authentication */
-    if ((nk == 0) && (key == NULL))
-       rv = TRUE;
-
-/* client wants the answer */
-    else if (res != NULL)
-       {snprintf(res, nk+1, "%s", key);
-	rv = TRUE;}
-
-/* server matches the answer */
-    else
-       {res = lres;
-	snprintf(res, nk+1, "%s", key);
-	rv = (strncmp(res, ans, nk) == 0);};
-
-    if (rv == FALSE)
-       {char *flog;
-
-	flog = name_log(root);
-	log_activity(flog, dbs.debug, 1, "SERVER",
-		     "access denied - bad key");};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _COMM_READ_WRK - read worker routine */
-
-static int _comm_read_wrk(client *cl, char *t, int nt, int to)
-   {int nb;
-
-#ifdef IO_ALARM
-    signal(SIGALRM, sigtimeout);
-
-    alarm(to);
-
-    if (setjmp(cpu) == 0)
-       nb = read_sock(cl, t, nt);
-    else
-       nb = -1;
-
-    alarm(0);
-#else
-    nb = read_sock(cl, t, nt);
-#endif
-
-    return(nb);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _COMM_WRITE_WRK - write worker routine */
-
-static int _comm_write_wrk(client *cl, char *t, int nt, int to)
-   {int nb;
-
-#ifdef IO_ALARM
-    signal(SIGALRM, sigtimeout);
-
-    alarm(to);
-
-    if (setjmp(cpu) == 0)
-       nb = write_sock(cl, t, nt);
-    else
-       nb = -1;
-
-    alarm(0);
-#else
-    nb = write_sock(cl, t, nt);
-#endif
-
-    return(nb);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* COMM_READ - read from CL into S
- *           - quit if it hasn't heard anything in TO seconds
- *           - return -2 if authentication is denied
- */
-
-int comm_read(client *cl, char *s, int nc, int to)
-   {int nb, nk, no, nt, ok;
-    char *p, *t;
-
-    nb = _comm_read_wrk(cl, s, nc, to);
-
-    no = 0;
-    nk = cl->nkey;
-    nt = nc + nk + 2;
-    t  = MAKE_N(char, nt);
-    p  = t;
-
-    nstrncpy(t, nt, s, -1);
-
-    ok = FALSE;
-    if (strncmp(t, "auth:", 5) == 0)
-       {if (dbs.auth == TRUE)
-	   {no  = nk + 6;
-	    nb -= no;
-	    p   = t + no;
-            ok  = verifyx(cl, t+5, NULL);};}
-	   
-    else if (dbs.auth != TRUE)
-       ok = TRUE;
-
-    if (ok == FALSE)
-       {p = t + strlen(t) - 4;
-	if (strcmp(p, "fin:") == 0)
-	   nstrncpy(s, nc, p, -1);
-	else
-	   nstrncpy(s, nc, "reject:", -1);
-
-	nb = strlen(s);}
-
-    else if (strcmp(s, p) != 0)
-       nstrncpy(s, nc, p, -1);
-
-    FREE(t);
-
-    return(nb);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* COMM_WRITE - write S to CL
- *            - quit if it hasn't heard anything in TO seconds
- *            - return -2 if authentication is denied
- */
-
-int comm_write(client *cl, char *s, int nc, int to)
-   {int nb, nk, nt, ok;
-    char ans[N_AKEY+1];
-    char *t;
-
-    ok = verifyx(cl, NULL, ans);
-    if (ok == FALSE)
-       nb = -2;
-
-    else
-       {if (nc <= 0)
-	   nc = strlen(s);
-
-	nk = (dbs.auth == TRUE) ? cl->nkey : 0;
-	nt = nc + nk + 7;
-	t  = MAKE_N(char, nt);
-	if (dbs.auth == TRUE)
-	   snprintf(t, nt, "auth:%s %s", ans, s);
-	else
-	   nstrncpy(t, nt, s, -1);
-	nt = strlen(t) + 1;
-
-	nb  = _comm_write_wrk(cl, t, nt, to);
-	nb -= nk;
-
-	FREE(t);};
-
-    return(nb);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* MAKE_CLIENT - initialize and return a client connection instance */
-
-client *make_client(char *root, ckind type)
-   {char *flog;
-    client *cl;
-
-    cl = MAKE(client);
-    if (cl != NULL)
-       {cl->fd     = -1;
-	cl->nkey   = 0;
-	cl->key    = NULL;
-	cl->root   = root;
-	cl->type   = type;
-	cl->server = &srv;
-
-	flog = name_log(root);
-	log_activity(flog, dbs.debug, 1,
-		     (type == CLIENT) ? "CLIENT" : "SERVER",
-		     "----- start client -----");};
-
-    return(cl);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* FREE_CLIENT - release a client connection instance */
-
-void free_client(client *cl)
-   {char *flog;
-
-    if (cl != NULL)
-       {if (cl->type == CLIENT)
-	   comm_write(cl, "fin:", 0, 10);
-
-	if (cl->fd >= 0)
-	   cl->fd = connect_close(cl->fd, cl, NULL);
-
-	flog = name_log(cl->root);
-	log_activity(flog, dbs.debug, 1,
-		     (cl->type == CLIENT) ? "CLIENT" : "SERVER",
-		     "----- end client -----");
-
-	FREE(cl->key);
-	FREE(cl);};
+    log_activity(flog, svs.debug, lvl, wh, s);
 
     return;}
 
@@ -391,11 +154,13 @@ static void _set_var(database *db, char *var, char *val)
 /* RESET_DB - reset DB */
 
 void reset_db(database *db)
-   {
+   {client *cl;
+
+    cl = db->cl;
 
     hash_clear(db->tab);
 
-    log_activity(db->flog, dbs.debug, 1, "SERVER", "reset");
+    CLOG(cl, 1, "reset");
 
     return;}
 
@@ -405,16 +170,16 @@ void reset_db(database *db)
 /* PUT_DB - add VAR to DB */
 
 char *put_db(database *db, char *var, char *val)
-   {
+   {client *cl;
 
-    if (var != NULL)
-       {if (val == NULL)
+    if ((db != NULL) && (var != NULL))
+       {cl = db->cl;
+	if (val == NULL)
 	   val = cnoval();
 
 	_set_var(db, var, val);
 
-	log_activity(db->flog, dbs.debug, 1,
-		     "SERVER", "put |%s|=|%s|", var, val);};
+	CLOG(cl, 1, "put |%s|=|%s|", var, val);};
 
     return(val);}
 
@@ -498,53 +263,57 @@ char *get_db(database *db, char *var)
    {int c, st, ok;
     char s[MAXLINE];
     char *val, *pk, *pm, *ps, *pt;
+    client *cl;
     static char t[LRG];
 
     val = NULL;
 
+    if (db != NULL)
+       {cl = db->cl;
+
 /* resolve var of form 'a.b.c' */
-    nstrncpy(s, MAXLINE, var, -1);
-    for (ps = s; TRUE; ps = NULL)
-        {pm = strtok(ps, ".");
+	nstrncpy(s, MAXLINE, var, -1);
+	for (ps = s; TRUE; ps = NULL)
+	    {pm = strtok(ps, ".");
 
 /* we are at the end and val has the answer */
-         if (pm == NULL)
-	    break;
+	     if (pm == NULL)
+	        break;
 
 /* get the entire structure */
-	 else if (val == NULL)
-            val = _get_var(db, pm);
+	     else if (val == NULL)
+	        val = _get_var(db, pm);
 
 /* find the member named by pt */
-	 else if (_is_struct(&pk, val) == TRUE)
-	    {st = FALSE;
-	     pt = t;
-	     ok = TRUE;
-	     for (c = *pk++; (c != ')') && (ok == TRUE); c = *pk++)
-	         {switch (c)
-                     {case '"' :
-                      case '\'' :
-                           _push_col(&pt, &pk, c, c);
-                           break;
-                      case '(' :
-                           _push_col(&pt, &pk, c, ')');
-                           break;
-                      case '=' :
-			   *pt++ = '\0';
-			   if (st == TRUE)
-                              {_mem_name(t, pm);
-			       ok = FALSE;
-			       break;}
-                           else if (_mem_name(t, pm) == 0)
-			      {st = TRUE;
-			       val = t;};
-			   pt = t;
-                           break;
-		      default :
-                           *pt++ = c;
-                           break;};};};};
+	     else if (_is_struct(&pk, val) == TRUE)
+	        {st = FALSE;
+		 pt = t;
+		 ok = TRUE;
+		 for (c = *pk++; (c != ')') && (ok == TRUE); c = *pk++)
+		     {switch (c)
+			 {case '"' :
+			  case '\'' :
+			       _push_col(&pt, &pk, c, c);
+			       break;
+			 case '(' :
+                              _push_col(&pt, &pk, c, ')');
+			      break;
+			 case '=' :
+			      *pt++ = '\0';
+			      if (st == TRUE)
+				 {_mem_name(t, pm);
+				  ok = FALSE;
+				  break;}
+			      else if (_mem_name(t, pm) == 0)
+				 {st = TRUE;
+				  val = t;};
+			      pt = t;
+			      break;
+			 default :
+                              *pt++ = c;
+			      break;};};};};
 
-    log_activity(db->flog, dbs.debug, 1, "SERVER", "get |%s|=|%s|", var, val);
+	CLOG(cl, 1, "get |%s|=|%s|", var, val);};
 
     return(val);}
 
@@ -621,27 +390,22 @@ static int _save_var(hashen *hp, void *a)
 
 /* SAVE_DB - save variable VAR to FP */
 
-int save_db(int fd, database *db, char **vars, FILE *fp, const char *fmt)
+int save_db(database *db, char **vars, FILE *fp, const char *fmt)
    {int rv;
     client *cl;
     vardes pv;
 
     rv = FALSE;
+    cl = db->cl;
 
     if (db != NULL)
-       {cl = make_client(db->root, SERVER);
-	cl->fd = fd;
-
-	pv.cl   = cl;
+       {pv.cl   = cl;
 	pv.fmt  = (char *) fmt;
 	pv.db   = db;
 	pv.fp   = fp;
 	pv.vars = vars;
 
         hash_foreach(db->tab, _save_var, &pv);
-
-	cl->fd = -1;
-	free_client(cl);
 
 	rv = TRUE;};
 
@@ -739,30 +503,38 @@ void load_db(database *db, char *vr, FILE *fp)
 
 /* MAKE_DB - initialize the DB */
 
-static database *make_db(char *root)
-   {char *fname, *flog, *fcon, *t;
+static database *make_db(client *cl, int dbg, int auth)
+   {char *fname, *flog, *fcon, *root, *t;
     database *db;
 
-    t = name_log(root);
-    flog = (t == NULL) ? NULL : STRSAVE(t);
+    db = NULL;
 
-    t = name_db(root);
-    fname = (t == NULL) ? NULL : STRSAVE(t);
+    if (cl != NULL)
+       {root = cl->root;
 
-    t = name_conn(root);
-    fcon = (t == NULL) ? NULL : STRSAVE(t);
+	t = name_log(root);
+	flog = (t == NULL) ? NULL : STRSAVE(t);
 
-    db = MAKE(database);
-    if (db != NULL)
-       {db->root    = STRSAVE(root);
-	db->file    = fname;
-	db->flog    = flog;
-	db->fcon    = fcon;
-	db->tab     = make_hash_table(-1);}
-    else
-       {FREE(flog);
-	FREE(fname);
-	FREE(fcon);};
+	t = name_db(root);
+	fname = (t == NULL) ? NULL : STRSAVE(t);
+
+	t = name_conn(root);
+	fcon = (t == NULL) ? NULL : STRSAVE(t);
+
+	db = MAKE(database);
+	if (db != NULL)
+	   {db->debug = dbg;
+	    db->auth  = auth;
+	    db->root  = STRSAVE(root);
+	    db->file  = fname;
+	    db->flog  = flog;
+	    db->fcon  = fcon;
+	    db->tab   = make_hash_table(-1);
+	    db->cl    = cl;}
+	else
+	   {FREE(flog);
+	    FREE(fname);
+	    FREE(fcon);};};
 
     return(db);}
 
@@ -790,10 +562,10 @@ void free_db(database *db)
 
 /* DB_SRV_CREATE - initialize the DB */
 
-database *db_srv_create(char *root)
+database *db_srv_create(client *cl, int dbg, int auth)
    {database *db;
 
-    db = make_db(root);
+    db = make_db(cl, dbg, auth);
     if ((db != NULL) && (db->file != NULL))
        unlink_safe(db->file);
 
@@ -804,19 +576,18 @@ database *db_srv_create(char *root)
 
 /* DB_SRV_LOAD - load the DB into memory */
 
-database *db_srv_load(char *root)
+database *db_srv_load(client *cl, int dbg, int auth)
    {database *db;
     FILE *fp;
 
-    db = make_db(root);
+    db = make_db(cl, dbg, auth);
     if ((db != NULL) && (db->file != NULL))
        {fp = fopen(db->file, "r");
 	if (fp != NULL)
 	   {load_db(db, NULL, fp);
 	    fclose(fp);};
 
-	log_activity(db->flog, dbs.debug, 1, "SERVER", "load %d |%s|",
-		     db->tab->ne, db->file);};
+	CLOG(cl, 1, "load %d |%s|", db->tab->ne, db->file);};
 
     return(db);}
 
@@ -825,32 +596,22 @@ database *db_srv_load(char *root)
 
 /* DB_SRV_OPEN - open the database */
 
-int db_srv_open(client *cl, char *root, int init)
+int db_srv_open(client *cl, int init, int dbg, int auth)
    {int rv, pid;
     database *db;
 
     if (init == TRUE)
-       db = db_srv_create(root);
+       db = db_srv_create(cl, dbg, auth);
     else
-       db = db_srv_load(root);
+       db = db_srv_load(cl, dbg, auth);
 
     if (db != NULL)
-       {pid    = getpid();
-	cl->db = db;
+       {pid   = getpid();
+	cl->a = db;
 
 /* if a server is already running there will be a PID file */
 	if ((db->fcon != NULL) && (file_exists(db->fcon) == FALSE))
-	   {dbs.ioc_server = SERVER;
-	    rv = open_server(cl, NULL, dbs.auth);
-	    ASSERT(rv == 0);
-#if 0
-	    FILE *fp;
-	    fp = fopen(db->fpid, "w");
-	    if (fp != NULL)
-	       {fprintf(fp, "%d", pid);
-		fclose(fp);};
-#endif
-	   }
+	   rv = open_server(cl, SERVER, db->auth);
 
 	else
 	   {free_db(db);
@@ -868,10 +629,12 @@ int db_srv_open(client *cl, char *root, int init)
 /* DB_SRV_CLOSE - close the database */
 
 void db_srv_close(database *db)
-   {
+   {client *cl;
 
     if (db != NULL)
-       {close_sock(db->root);
+       {cl = db->cl;
+
+	close_sock(cl);
 
 	unlink_safe(db->fcon);
 
@@ -886,17 +649,30 @@ void db_srv_close(database *db)
 
 int db_srv_save(int fd, database *db)
    {int rv;
+    client *cl;
     FILE *fp;
 
     rv = FALSE;
 
     if (db != NULL)
-       {log_activity(db->flog, dbs.debug, 1, "SERVER", "save %d |%s|",
-		     db->tab->ne, db->file);
+       {cl = db->cl;
+
+	CLOG(cl, 1, "save %d |%s|", db->tab->ne, db->file);
 
 	fp = fopen(db->file, "w");
 	if (fp != NULL)
-	   {save_db(fd, db, NULL, fp, NULL);
+	   {client *tcl;
+
+/* GOTCHA: why do we need this? */
+	    tcl = make_client(SERVER, cl->auth, db->root, NULL);
+	    tcl->fd = fd;
+	    tcl->a  = db;
+
+	    save_db(db, NULL, fp, NULL);
+
+	    tcl->fd = -1;
+	    free_client(tcl);
+
 	    fclose(fp);
 	    rv = TRUE;};};
 
@@ -907,16 +683,16 @@ int db_srv_save(int fd, database *db)
 
 /* DB_SRV_LAUNCH - launch a DB server */
 
-int db_srv_launch(client *cl, char *root)
+int db_srv_launch(client *cl)
    {int i, st, pid, rv;
     char s[MAXLINE];
-    char *flog, *fcon, **sa;
+    char *root, *fcon, **sa;
 
     rv = FALSE;
 
-    if (root != NULL)
-       {fcon = name_conn(root);
-	flog = name_log(root);
+    if (cl != NULL)
+       {root = cl->root;
+	fcon = name_conn(root);
 
 	st   = 0;
 	s[0] = '\0';
@@ -924,14 +700,13 @@ int db_srv_launch(client *cl, char *root)
 /* wait until we have a server going */
 	for (i = 0; file_exists(fcon) == FALSE; i++)
 	    {if (i == 1)
-		{if (dbs.auth == TRUE)
+		{if (cl->auth == TRUE)
 		    snprintf(s, MAXLINE, "perdb -a -f %s -s -l", root);
 		 else
 		    snprintf(s, MAXLINE, "perdb -f %s -s -l", root);
 		 st = system(s);
 		 st = WEXITSTATUS(st);
-		 log_activity(flog, dbs.debug, 1, "CLIENT", "launch |%s| (%d)",
-			      s, st);}
+		 CLOG(cl, 1, "launch |%s| (%d)", s, st);}
 	     else
 	        nsleep(100);};
 
@@ -954,8 +729,7 @@ int db_srv_launch(client *cl, char *root)
 
 	srv.pid = pid;
 
-        log_activity(flog, dbs.debug, 1, "CLIENT", "server pid %d (%d)",
-		     pid, i);};
+        CLOG(cl, 1, "server pid %d (%d)", pid, i);};
 
     return(rv);}
 
@@ -964,20 +738,23 @@ int db_srv_launch(client *cl, char *root)
 
 /* DB_SRV_RESTART - restart the server */
 
-void db_srv_restart(database *db)
+int db_srv_restart(database *db)
    {int rv;
+    client *cl;
+
+    rv = TRUE;
 
     if (db != NULL)
-       {close_sock(db->root);
+       {cl = db->cl;
+
+	close_sock(cl);
 	db_srv_save(-1, db);
 
-	log_activity(db->flog, dbs.debug, 1, "SERVER", "restart");
+	CLOG(cl, 1, "restart");
 
-	dbs.ioc_server = SERVER;
-	rv = open_server(NULL, db->root, dbs.auth);
-	ASSERT(rv == 0);};
+	rv = open_server(cl, SERVER, db->auth);};
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -989,23 +766,22 @@ void db_srv_restart(database *db)
 
 char **_db_clnt_ex(client *cl, int init, char *req)
    {int nb, ne, nx;
-    char **p, *flog, *root;
+    char **p;
     static char s[MAXLINE];
 
     if (cl == NULL)
-       {root = cgetenv(TRUE, "PERDB_PATH");
-	cl   = make_client(root, CLIENT);};
+       {char *root;
 
-    p    = NULL;
-    root = cl->root;
+        root = cgetenv(TRUE, "PERDB_PATH");
+	cl   = make_client(CLIENT, FALSE, root, cl_logger);};
 
-    flog = name_log(root);
+    p = NULL;
 
-    log_activity(flog, dbs.debug, 1, "CLIENT", "begin request |%s|", req);
+    CLOG(cl, 1, "begin request |%s|", req);
 
 /* make sure that there is a server running */
     if (init == TRUE)
-       db_srv_launch(cl, root);
+       db_srv_launch(cl);
 
 /* send the request */
     nb = comm_write(cl, req, 0, 10);
@@ -1044,7 +820,7 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 		 if (ok == TRUE)
 		    nsleep(0);};};};
 
-    log_activity(flog, dbs.debug, 1, "CLIENT", "end request");
+    CLOG(cl, 1, "end request");
 
     return(p);}
 
@@ -1219,7 +995,7 @@ int dbinitv(client *cl, char *var, char *fmt, ...)
  *            - of the current process
  */
 
-int db_restore(client *cl, char *db)
+int db_restore(client *cl, char *dname)
    {int i, rv, ok;
     char t[MAXLINE];
     char **ta, *s, *vl;
@@ -1227,10 +1003,10 @@ int db_restore(client *cl, char *db)
     rv = TRUE;
 
 /* load the database */
-    if (db == NULL)
+    if (dname == NULL)
        nstrncpy(t, MAXLINE, "load:", -1);
     else
-       snprintf(t, MAXLINE, "load:%s", db);
+       snprintf(t, MAXLINE, "load:%s", dname);
 
     ok = dbcmd(cl, t);
     ASSERT(ok == 0);

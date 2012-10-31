@@ -9,9 +9,7 @@
  */
 
 #include "libsrv.c"
-
-static database
- *db = NULL;
+#include "libdb.c"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -19,12 +17,12 @@ static database
 /* SIGDONE - handle signals meant to end session */
 
 static void sigdone(int sig)
-   {
+   {database *db;
 
+    db = (database *) svs.cl->a;
     if (db != NULL)
-       {log_activity(db->flog, dbs.debug, 4,
-		     "SERVER", "signalled %d - done", sig);
-	close_sock(db->root);
+       {CLOG(svs.cl, 4, "signalled %d - done", sig);
+	close_sock(svs.cl);
 	db_srv_save(-1, db);
 	unlink_safe(db->fcon);};
 
@@ -38,7 +36,9 @@ static void sigdone(int sig)
 /* SIGRESTART - handle signals meant to restart session */
 
 static void sigrestart(int sig)
-   {
+   {database *db;
+
+    db = (database *) svs.cl->a;
 
     db_srv_restart(db);
 
@@ -49,15 +49,12 @@ static void sigrestart(int sig)
 
 /* SRV_SAVE_DB - save the database */
 
-static char *srv_save_db(client *cl, char *fname, char **var, const char *fmt)
-   {int fd, ok;
+static char *srv_save_db(database *db, char *fname,
+			 char **var, const char *fmt)
+   {int ok;
     char s[MAXLINE];
     FILE *fp;
-    database *db;
     static char t[MAXLINE];
-
-    fd = cl->fd;
-    db = cl->db;
 
 /* figure out where results go */
     if ((fname == NULL) || (strcmp(fname, "stdout") == 0))
@@ -76,7 +73,7 @@ static char *srv_save_db(client *cl, char *fname, char **var, const char *fmt)
         fname = path_tail(s);};
 	   
 /* do the work */
-    ok = save_db(fd, db, var, fp, fmt);
+    ok = save_db(db, var, fp, fmt);
     ASSERT(ok == 0);
 
     if (fp != NULL)
@@ -116,7 +113,7 @@ static char *srv_load_db(client *cl, char *fname, char *var)
     database *db;
     static char t[MAXLINE];
 
-    db   = cl->db;
+    db   = (database *) cl->a;
     root = cl->root;
 
     if (fname == NULL)
@@ -164,7 +161,7 @@ static char *srv_load_db(client *cl, char *fname, char *var)
 
 /* SRV_LOGGER - log messages in the server SV */
 
-static void srv_logger(srvdes *sv, char *fmt, ...)
+static void srv_logger(srvdes *sv, int lvl, char *fmt, ...)
    {char s[MAXLINE];
     char *root, *flog;
     client *cl;
@@ -177,7 +174,7 @@ static void srv_logger(srvdes *sv, char *fmt, ...)
     root = cl->root;
     flog = name_log(root);
 
-    log_activity(flog, dbs.debug, 4, "SERVER", s);
+    log_activity(flog, svs.debug, lvl, "SERVER", s);
 
     return;}
 
@@ -189,9 +186,6 @@ static void srv_logger(srvdes *sv, char *fmt, ...)
 static void srv_setup(srvdes *sv, int *ptmax, int *pdt)
    {int dt, tmax;
     char *s;
-    void (*slog)(srvdes *sv, char *fmt, ...);
-
-    slog = sv->slog;
 
 /* set idle timeout and idle interval
  * if no input comes in within the idle timeout window stop and return
@@ -202,14 +196,14 @@ static void srv_setup(srvdes *sv, int *ptmax, int *pdt)
        tmax = 60;
     else
        {tmax = atoi(s);
-	slog(sv, "PERDB_IDLE_TIMEOUT = %d", tmax);};
+	SLOG(sv, 4, "PERDB_IDLE_TIMEOUT = %d", tmax);};
 
     s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
     if (IS_NULL(s) == TRUE)
        dt = tmax >> 1;
     else
        {dt = atoi(s);
-	slog(sv, "PERDB_IDLE_INTERVAL = %d", dt);};
+	SLOG(sv, 4, "PERDB_IDLE_INTERVAL = %d", dt);};
 
     if (ptmax != NULL)
        *ptmax = tmax;
@@ -233,7 +227,7 @@ static void term_connection(srvdes *sv)
 
     remove_fd(sv, fd);
 
-    cl->fd = connect_close(fd, cl, NULL);
+    cl->fd = connect_close(fd, cl);
 
     return;}
 
@@ -320,7 +314,7 @@ static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
  *         - if no variables are specified all are saved
  */
 
-static char *do_save(client *cl, char *s)
+static char *do_save(database *db, char *s)
    {char *fmt, *val, *fname, *p;
     char **var, **opt;
 
@@ -331,7 +325,7 @@ static char *do_save(client *cl, char *s)
        {free_strings(var);
         var = NULL;};
 
-    val = srv_save_db(cl, fname, var, fmt);
+    val = srv_save_db(db, fname, var, fmt);
 
     free_strings(opt);
     free_strings(var);
@@ -558,7 +552,7 @@ static int srv_process(srvdes *sv, int fd)
     cl = (client *) sv->a;
     cl->fd = fd;
 
-    db = cl->db;
+    db = (database *) cl->a;
 
     to = 60;
     rv = 1;
@@ -576,8 +570,7 @@ static int srv_process(srvdes *sv, int fd)
 
 /* request is not properly authenticated */
 	if (strncmp(s, "reject:", 7) == 0)
-	   {/* rv = -1; */
-	    val = lst_push(val, "rejected");}
+	   val = lst_push(val, "rejected");
 
 /* client is exiting */
 	else if (strncmp(s, "fin:", 4) == 0)
@@ -599,7 +592,7 @@ static int srv_process(srvdes *sv, int fd)
 
 /* save database */
 	else if (strncmp(s, "save:", 5) == 0)
-	   val = lst_push(val, do_save(cl, s+5));
+	   val = lst_push(val, do_save(db, s+5));
 
 	else
 	   val = do_var_acc(db, s);
@@ -625,8 +618,7 @@ static int srv_process(srvdes *sv, int fd)
 /* SERVER - run the server side of the database */
 
 static int server(char *root, int init, int dmn)
-   {char *flog;
-    client *cl;
+   {client *cl;
     srvdes sv;
 
     if ((dmn == FALSE) || (demonize() == TRUE))
@@ -634,14 +626,17 @@ static int server(char *root, int init, int dmn)
 	signal(SIGINT, sigdone);
 	signal(SIGHUP, sigrestart);
 
-	flog = name_log(root);
+	cl     = make_client(SERVER, svs.auth, root, cl_logger);
+	svs.cl = cl;
 
-	log_activity(flog, dbs.debug, 1, "SERVER", "start server");
+	CLOG(cl, 1, "start server");
 
-	cl = make_client(root, SERVER);
+	if (db_srv_open(svs.cl, init, svs.debug, svs.auth) == TRUE)
+	   {database *db;
 
-	if (db_srv_open(cl, root, init) == TRUE)
-	   {sv.a       = cl;
+	    db = (database *) cl->a;
+
+	    sv.a       = cl;
 	    sv.server  = cl->server;
 	    sv.slog    = srv_logger;
             sv.setup   = srv_setup;
@@ -649,12 +644,12 @@ static int server(char *root, int init, int dmn)
 
 	    async_server(&sv);
 
-	    db_srv_save(-1, cl->db);
-	    db_srv_close(cl->db);};
+	    db_srv_save(-1, db);
+	    db_srv_close(db);};
 
-	free_client(cl);
+	CLOG(cl, 1, "end server");
 
-	log_activity(flog, dbs.debug, 1, "SERVER", "end server");};
+	free_client(cl);};
 
     return(0);}
 
@@ -670,7 +665,7 @@ static int exchange(char *root, int ltr, char *req)
     char **ta;
     client *cl;
 
-    cl = make_client(root, CLIENT);
+    cl = make_client(CLIENT, svs.auth, root, cl_logger);
     ta = _db_clnt_ex(cl, TRUE, req);
     free_client(cl);
 
@@ -734,7 +729,7 @@ int main(int c, char **v)
         {if (v[i][0] == '-')
 	    {switch (v[i][1])
                 {case 'a' :
-                      dbs.auth = TRUE;
+                      svs.auth = TRUE;
 		      break;
                  case 'c' :
                       init = TRUE;
@@ -752,8 +747,7 @@ int main(int c, char **v)
                       help();
                       return(1);
 		 case 'l' :
-                      dbg_sock  = TRUE;
-                      dbs.debug = TRUE;
+                      svs.debug = TRUE;
                       break;
 		 case 's' :
                       srv = TRUE;
