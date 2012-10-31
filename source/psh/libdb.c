@@ -15,39 +15,26 @@
 #include "libsrv.c"
 #include "libhash.c"
 
-/* #define NEWWAY */
-
 #define EOM     "++ok++"
 
 typedef struct s_database database;
 typedef struct s_vardes vardes;
-typedef struct s_db_session db_session;
 
 struct s_database
-   {int debug;
-    int auth;
-    int ioc;                    /* CLIENT or SERVER */
-    char *root;                 /* root path name of database */
-    char *file;                 /* name of the file image of the database */
+   {char *file;                 /* name of the file image of the database */
     char *flog;                 /* name of the log file */
     char *fcon;                 /* name of the connection file */
     hashtab *tab;
     client *cl;};
 
-struct s_db_session
-   {svr_session svr;
-    int literal;
-    char root[MAXLINE];};
-
-extern char
- *name_log(char *root);
-
 struct s_vardes
    {char *fmt;
-    client *cl;
     database *db;
     char **vars;
     FILE *fp;};
+
+extern char
+ *name_log(char *root);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -322,7 +309,7 @@ char *get_db(database *db, char *var)
 
 /* _SHOW_VAR - show variable VR value */
 
-static int _show_var(database *db, client *cl, FILE *fp, const char *fmt,
+static int _show_var(database *db, FILE *fp, const char *fmt,
 		     char *vr, char **vars)
    {int l, rv;
     char s[LRG], t[LRG];
@@ -351,7 +338,7 @@ static int _show_var(database *db, client *cl, FILE *fp, const char *fmt,
 
 /* write to the communicator if FP is NULL */
 	if (fp == NULL)
-	   comm_write(cl, s, 0, 10);
+	   comm_write(db->cl, s, 0, 10);
 	else
 	   fprintf(fp, "%s\n", s);
 
@@ -368,20 +355,18 @@ static int _save_var(hashen *hp, void *a)
    {int rv;
     char *fmt, *vr, **vars;
     FILE *fp;
-    client *cl;
     database *db;
     vardes *pv;
 
     pv = (vardes *) a;
 
-    cl   = pv->cl;
     db   = pv->db;
     fmt  = pv->fmt;
     fp   = pv->fp;
     vars = pv->vars;
 
     vr = hp->name;
-    rv = _show_var(db, cl, fp, fmt, vr, vars);
+    rv = _show_var(db, fp, fmt, vr, vars);
 
     return(rv);}
 
@@ -392,15 +377,12 @@ static int _save_var(hashen *hp, void *a)
 
 int save_db(database *db, char **vars, FILE *fp, const char *fmt)
    {int rv;
-    client *cl;
     vardes pv;
 
     rv = FALSE;
-    cl = db->cl;
 
     if (db != NULL)
-       {pv.cl   = cl;
-	pv.fmt  = (char *) fmt;
+       {pv.fmt  = (char *) fmt;
 	pv.db   = db;
 	pv.fp   = fp;
 	pv.vars = vars;
@@ -523,10 +505,7 @@ static database *make_db(client *cl, int dbg, int auth)
 
 	db = MAKE(database);
 	if (db != NULL)
-	   {db->debug = dbg;
-	    db->auth  = auth;
-	    db->root  = STRSAVE(root);
-	    db->file  = fname;
+	   {db->file  = fname;
 	    db->flog  = flog;
 	    db->fcon  = fcon;
 	    db->tab   = make_hash_table(-1);
@@ -549,7 +528,6 @@ void free_db(database *db)
     if (db != NULL)
        {hash_free(db->tab);
 
-	FREE(db->root);
 	FREE(db->file);
 	FREE(db->flog);
 	FREE(db->fcon);
@@ -611,7 +589,7 @@ int db_srv_open(client *cl, int init, int dbg, int auth)
 
 /* if a server is already running there will be a PID file */
 	if ((db->fcon != NULL) && (file_exists(db->fcon) == FALSE))
-	   rv = open_server(cl, SERVER, db->auth);
+	   rv = open_server(cl, SERVER, cl->auth);
 
 	else
 	   {free_db(db);
@@ -629,12 +607,10 @@ int db_srv_open(client *cl, int init, int dbg, int auth)
 /* DB_SRV_CLOSE - close the database */
 
 void db_srv_close(database *db)
-   {client *cl;
+   {
 
     if (db != NULL)
-       {cl = db->cl;
-
-	close_sock(cl);
+       {close_sock(db->cl);
 
 	unlink_safe(db->fcon);
 
@@ -661,19 +637,10 @@ int db_srv_save(int fd, database *db)
 
 	fp = fopen(db->file, "w");
 	if (fp != NULL)
-	   {client *tcl;
-
-/* GOTCHA: why do we need this? */
-	    tcl = make_client(SERVER, cl->auth, db->root, NULL);
-	    tcl->fd = fd;
-	    tcl->a  = db;
-
-	    save_db(db, NULL, fp, NULL);
-
-	    tcl->fd = -1;
-	    free_client(tcl);
+	   {save_db(db, NULL, fp, NULL);
 
 	    fclose(fp);
+
 	    rv = TRUE;};};
 
     return(rv);}
@@ -752,7 +719,7 @@ int db_srv_restart(database *db)
 
 	CLOG(cl, 1, "restart");
 
-	rv = open_server(cl, SERVER, db->auth);};
+	rv = open_server(cl, SERVER, cl->auth);};
 
     return(rv);}
 
