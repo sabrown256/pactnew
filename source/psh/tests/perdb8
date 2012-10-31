@@ -53,7 +53,7 @@ foreach i ($lst)
 #   ls-jobs -q | grep bin/perdb
 
    perdb $opt $as v1=$i
-   ls -l $db.conn | awk '{printf("   %s  %8d  %s\n", $1, $5, $NF);}'
+   ls -l $db.conn | awk '{printf("   %s  %s\n", $1, $NF);}'
 
    set v1 = ( `perdb $opt $ac v1` )
    set xstatus = $status
@@ -66,10 +66,12 @@ foreach i ($lst)
    endif
 
    perdb $opt $as quit:
-   sleep 1
-   ls -l $db.[cd]* | awk '{printf("   %s  %8d  %s\n", $1, $5, $NF);}'
+#   sleep 1
+   ls -l $db.[cd]* | awk '{printf("   %s  %s\n", $1, $NF);}'
 
 end
+
+echo "-----------------------------------"
 
 sign -q db8. >& /dev/null
 rm -f db8* >& /dev/null

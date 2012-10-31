@@ -1,28 +1,29 @@
 -----------------------------------
    no authentication
 1
-   -r--r--r--        65  ./db8.conn
+   -r--r--r--  ./db8.conn
 -> v1 = |1| ok
 done
-   -rw-rw-rw-         5  ./db8.db
+   -rw-rw-rw-  ./db8.db
 -----------------------------------
    with authentication
 2
-   -r--------        65  ./db8.conn
+   -r--------  ./db8.conn
 -> v1 = |2| ok
 done
-   -rw-rw-rw-         5  ./db8.db
+   -rw-rw-rw-  ./db8.db
 -----------------------------------
    with authentication on server
 3
-   -r--------        65  ./db8.conn
+   -r--------  ./db8.conn
 -> v1 = |rejected| ok
 done
-   -rw-rw-rw-         5  ./db8.db
+   -rw-rw-rw-  ./db8.db
 -----------------------------------
    with authentication on client
 4
-   -r--r--r--        65  ./db8.conn
+   -r--r--r--  ./db8.conn
 -> v1 = |rejected| ok
 done
-   -rw-rw-rw-         5  ./db8.db
+   -rw-rw-rw-  ./db8.db
+-----------------------------------

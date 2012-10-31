@@ -232,18 +232,9 @@ int comm_read(client *cl, char *s, int nc, int to)
 	   nstrncpy(s, nc, "reject:", -1);
 
 	nb = strlen(s);}
-    else
-       {if ((strcmp(s, t+no) != 0) || (nc < strlen(t+no)))
-	   {char *flog;
 
-	    flog = name_log(cl->root);
-	    log_activity(flog, dbs.debug, 1,
-			 (cl->type == CLIENT) ? "CLIENT" : "SERVER",
-			 "error: %d |%s| != |%s|\n", no, s, t+no);};
-
-#if 0
-        nstrncpy(s, nc, t + no, -1);
-#endif
+    else if (strcmp(s, t+no) != 0)
+       {nstrncpy(s, nc, t + no, -1);
 	nb -= no;};
 
     FREE(t);
