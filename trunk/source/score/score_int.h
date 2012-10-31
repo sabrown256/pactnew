@@ -65,7 +65,7 @@
 /* helpers for bindings */
 
 /* variadic macro example:
- * #define eprintf(...) fprintf (stderr, __VA_ARGS__)
+ * #define eprintf(...) fprintf(stderr, __VA_ARGS__)
  */
 
 /* ARG - specify default value, in/out, etc

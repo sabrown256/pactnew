@@ -8,9 +8,7 @@
  *
  */
 
-#include "common.h"
-#include "libpsh.c"
-#include "libdb.c"
+#include "libsrv.c"
 
 static database
  *db = NULL;
@@ -159,78 +157,65 @@ static char *srv_load_db(client *cl, char *fname, char *var)
     return(t);}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
-/* CHECK_FD - verify/log fd set in SRV */
-
-static void check_fd(connection *srv, char *flog)
-   {int fd;
-    char s[MAXLINE];
-    fd_set rfs;
-
-    rfs = srv->afs;
-
-    s[0] = '\0';
-    for (fd = 0; fd < FD_SETSIZE; ++fd)
-        {if (FD_ISSET(fd, &rfs))
-            vstrcat(s, MAXLINE, " %d", fd);};
-
-    log_activity(flog, dbs.debug, 4, "SERVER", "monitoring: %s", s);
-
-    return;}
+/*                               SERVER METHODS                             */
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
-/* ADD_FD - add FD to the set in SRV */
+/* SRV_LOGGER - log messages in the server SV */
 
-static void add_fd(connection *srv, char *flog, int fd)
-   {
+static void srv_logger(srvdes *sv, char *fmt, ...)
+   {char s[MAXLINE];
+    char *root, *flog;
+    client *cl;
 
-    FD_SET(fd, &srv->afs);
-    log_activity(flog, dbs.debug, 1, "SERVER", "add fd %d", fd);
+    VA_START(fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
+    VA_END;
 
-    check_fd(srv, flog);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REMOVE_FD - add FD to the set in SRV */
-
-static void remove_fd(connection *srv, char *flog, int fd)
-   {
-
-    FD_CLR(fd, &srv->afs);
-    log_activity(flog, dbs.debug, 1, "SERVER", "remove fd %d", fd);
-
-    check_fd(srv, flog);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NEW_CONNECTION - make a new connection on SFD and add it to AFS */
-
-static void new_connection(char *root, connection *srv)
-   {int fd;
-    char *flog;
-    socklen_t sz;
-
+    cl   = (client *) sv->a;
+    root = cl->root;
     flog = name_log(root);
 
-    sz = sizeof(srv->sck);
+    log_activity(flog, dbs.debug, 4, "SERVER", s);
 
-    fd = accept(srv->server, (struct sockaddr *) &srv->sck, &sz);
-    if (fd > 0)
-       add_fd(srv, flog, fd);
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SRV_SETUP - setup the server SV */
+
+static void srv_setup(srvdes *sv, int *ptmax, int *pdt)
+   {int dt, tmax;
+    char *s;
+    void (*slog)(srvdes *sv, char *fmt, ...);
+
+    slog = sv->slog;
+
+/* set idle timeout and idle interval
+ * if no input comes in within the idle timeout window stop and return
+ * have the select timeout at the idle interval
+ */
+    s = cgetenv(FALSE, "PERDB_IDLE_TIMEOUT");
+    if (IS_NULL(s) == TRUE)
+       tmax = 60;
     else
-       {close(fd);
-	log_activity(flog, dbs.debug, 1, "SERVER",
-		     "accept error - %s (%d)",
-		     strerror(errno), errno);};
+       {tmax = atoi(s);
+	slog(sv, "PERDB_IDLE_TIMEOUT = %d", tmax);};
+
+    s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
+    if (IS_NULL(s) == TRUE)
+       dt = tmax >> 1;
+    else
+       {dt = atoi(s);
+	slog(sv, "PERDB_IDLE_INTERVAL = %d", dt);};
+
+    if (ptmax != NULL)
+       *ptmax = tmax;
+
+    if (pdt != NULL)
+       *pdt = dt;
 
     return;}
 
@@ -239,17 +224,14 @@ static void new_connection(char *root, connection *srv)
 
 /* TERM_CONNECTION - finish off client connection CL */
 
-static void term_connection(client *cl)
+static void term_connection(srvdes *sv)
    {int fd;
-    char *root, *flog;
-    connection *srv;
+    client *cl;
 
-    fd   = cl->fd;
-    root = cl->root;
-    srv  = cl->server;
-    flog = name_log(root);
+    cl = (client *) sv->a;
+    fd = cl->fd;
 
-    remove_fd(srv, flog, fd);
+    remove_fd(sv, fd);
 
     cl->fd = connect_close(fd, cl, NULL);
 
@@ -559,17 +541,22 @@ static char **do_var_acc(database *db, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PROC_CONNECTION - process input on client connection CL
- *                 - return -1 on error
- *                 -         0 on end of connection
- *                 -         1 if otherwise successful
+/* SRV_PROCCESS - process transactions in the server SV
+ *              - process input on client connection CL
+ *              - return -1 on error
+ *              -         0 on end of connection
+ *              -         1 if otherwise successful
  */
 
-static int proc_connection(client *cl)
+static int srv_process(srvdes *sv, int fd)
    {int rv, nb, to;
     char s[MAXLINE];
     char **val;
     database *db;
+    client *cl;
+
+    cl = (client *) sv->a;
+    cl->fd = fd;
 
     db = cl->db;
 
@@ -594,7 +581,7 @@ static int proc_connection(client *cl)
 
 /* client is exiting */
 	else if (strncmp(s, "fin:", 4) == 0)
-	   term_connection(cl);
+	   term_connection(sv);
 
 /* load database */
 	else if (strncmp(s, "load:", 5) == 0)
@@ -635,112 +622,12 @@ static int proc_connection(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* ASYNC_SERVER - run a fully asynchronous server */
-
-static void async_server(client *cl)
-   {int fd, nr, ok;
-    char *root, *flog;
-    fd_set rfs;
-    connection *srv;
-
-    root = cl->root;
-    srv  = cl->server;
-
-    flog = name_log(root);
-
-    if (listen(srv->server, 5) >= 0)
-       {int ng, nb, nbmax, dt, tmax;
-	char *s;
-        struct timeval t;
-
-/* set idle timeout and idle interval
- * if no input comes in within the idle timeout window stop and return
- * have the select timeout at the idle interval
- */
-        s = cgetenv(FALSE, "PERDB_IDLE_TIMEOUT");
-	if (IS_NULL(s) == TRUE)
-	   tmax = 60;
-	else
-	   {tmax = atoi(s);
-	    log_activity(flog, dbs.debug, 4, "SERVER",
-			 "PERDB_IDLE_TIMEOUT = %d", tmax);};
-
-        s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
-	if (IS_NULL(s) == TRUE)
-	   dt = tmax >> 1;
-	else
-	   {dt = atoi(s);
-	    log_activity(flog, dbs.debug, 4, "SERVER",
-			 "PERDB_IDLE_INTERVAL = %d", dt);};
-
-/* maximum number of consecutive 0 length reads
- * indicating dropped connection
- */
-	nb    = 0;
-	nbmax = 10;
-
-	ng = 0;
-	for (ok = TRUE; (ok == TRUE) && (ng < tmax) && (nb < nbmax); )
-	    {check_fd(srv, flog);
-
-/* timeout the select every DT seconds */
-	     t.tv_sec  = dt;
-	     t.tv_usec = 0;
-
-	     rfs = srv->afs;
-	     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, &t);
-	     if (nr > 0)
-	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
-		     {if (FD_ISSET(fd, &rfs))
-			 {log_activity(flog, dbs.debug, 4, "SERVER",
-				       "data available on %d (server %d)",
-				       fd, srv->server);
-
-/* new connection request */
-			  if (fd == srv->server)
-			     new_connection(root, srv);
-
-/* data arriving on an existing connection */
-			  else
-			     {cl->fd = fd;
-
-			      ok = proc_connection(cl);
-                              if (ok == -1)
-				 {ok = TRUE;
-				  remove_fd(srv, flog, fd);
-				  nb++;}
-			      else
-				 nb = 0;
-
-			      sched_yield();};};};
-		  ng = 0;}
-	     else
-	        ng += dt;};
-
-	if (ok != TRUE)
-	   log_activity(flog, dbs.debug, 4, "SERVER", "done by command");
-	else if (ng >= tmax)
-	   log_activity(flog, dbs.debug, 4, "SERVER",
-			"done by time: %d >= %d", ng, tmax);
-	else if (nb >= nbmax)
-	   log_activity(flog, dbs.debug, 4, "SERVER",
-			"done by failed reads: %d >= %d", nb, nbmax);}
-
-    else
-       log_activity(flog, dbs.debug, 1, "SERVER",
-		    "async_server error (%s - %d)",
-		    strerror(errno), errno);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SERVER - run the server side of the database */
 
 static int server(char *root, int init, int dmn)
    {char *flog;
     client *cl;
+    srvdes sv;
 
     if ((dmn == FALSE) || (demonize() == TRUE))
        {signal(SIGTERM, sigdone);
@@ -754,7 +641,13 @@ static int server(char *root, int init, int dmn)
 	cl = make_client(root, SERVER);
 
 	if (db_srv_open(cl, root, init) == TRUE)
-	   {async_server(cl);
+	   {sv.a       = cl;
+	    sv.server  = cl->server;
+	    sv.slog    = srv_logger;
+            sv.setup   = srv_setup;
+            sv.process = srv_process;
+
+	    async_server(&sv);
 
 	    db_srv_save(-1, cl->db);
 	    db_srv_close(cl->db);};
