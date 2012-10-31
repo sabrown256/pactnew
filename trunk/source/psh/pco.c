@@ -2828,7 +2828,7 @@ static void help(void)
 int main(int c, char **v, char **env)
    {int i, append, ok;
     char base[MAXLINE], ib[MAXLINE], d[LRG];
-    char *strct;
+    char *root, *strct;
     client *cl;
 
     if (c <= 1)
@@ -2841,7 +2841,8 @@ int main(int c, char **v, char **env)
     signal(SIGTERM, sigdone);
     signal(SIGINT,  sigdone);
 
-    cl = make_client(NULL, CLIENT);
+    root = cgetenv(TRUE, "PERDB_PATH");
+    cl   = make_client(CLIENT, FALSE, root, cl_logger);
 
     ok = reset_env(c, v);
     if (ok == -1)
@@ -2925,8 +2926,7 @@ int main(int c, char **v, char **env)
  
                  case 'l':
                       append    = TRUE;
-                      dbg_sock  = TRUE;
-                      dbs.debug = TRUE;
+                      svs.debug = TRUE;
                       break;
  
                  case 'o':

@@ -12,8 +12,16 @@
 
 #define LIBFIFO
 
-static int
- dbg_fifo = FALSE;
+#define WHICH_PROC()       ((fifost.ioc == CLIENT) ? "CLIENT" : "SERVER")
+
+typedef struct s_fifo_connection fifo_connection;
+
+struct s_fifo_connection
+   {int debug;
+    ckind ioc;};
+
+static fifo_connection
+ fifost = { FALSE, CLIENT };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -68,20 +76,24 @@ static int fifo_exists(char *fmt, ...)
 	wh = WHICH_PROC();
 
 	flog = name_log(s);
-	log_activity(flog, dbg_fifo, 1, wh, "exist |%s| (%s)", fifo, st);};
+	log_activity(flog, fifost.debug, 1, wh, "exist |%s| (%s)", fifo, st);};
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* OPEN_FIFO - initialize the FIFO */
+/* OPEN_FIFO - initialize the FIFO
+ *           - analog of open_server in libsock.c
+ */
 
-static int open_fifo(char *root)
+static int open_fifo(char *root, ckind ioc, int auth)
    {int ch, st, rv;
     char *fifo, *flog, *wh;
 
     rv = TRUE;
+
+    fifost.ioc = ioc;
 
     for (ch = 0; ch < 2; ch++)
         {fifo = name_fifo(root, ch);
@@ -95,7 +107,7 @@ static int open_fifo(char *root)
     wh = WHICH_PROC();
 
     flog = name_log(root);
-    log_activity(flog, dbg_fifo, 1, wh, "open %d", rv);
+    log_activity(flog, fifost.debug, 1, wh, "open %d", rv);
 
     return(rv);}
 
@@ -118,7 +130,7 @@ static int close_fifo(char *root)
     wh = WHICH_PROC();
 
     flog = name_log(root);
-    log_activity(flog, dbg_fifo, 1, wh, "close %d", st);
+    log_activity(flog, fifost.debug, 1, wh, "close %d", st);
 
     return(rv);}
 
@@ -139,7 +151,7 @@ static int read_fifo(char *root, int ch, char *s, int nc)
 
     if (fd < 0)
        {nb = -1;
-	log_activity(flog, dbg_fifo, 1, wh, "read - no db");}
+	log_activity(flog, fifost.debug, 1, wh, "read - no db");}
 
     else
        {nb = read(fd, s, nc);
@@ -152,10 +164,10 @@ static int read_fifo(char *root, int ch, char *s, int nc)
 	   s[nb] = '\0';
 
 	if (nb < 0)
-	   log_activity(flog, dbg_fifo, 1, wh, "read |%s| (%s)",
+	   log_activity(flog, fifost.debug, 1, wh, "read |%s| (%s)",
 			s, strerror(errno));
 	else
-	   log_activity(flog, dbg_fifo, 1, wh, "read |%s| (%d)", s, nb);};
+	   log_activity(flog, fifost.debug, 1, wh, "read |%s| (%d)", s, nb);};
 
     return(nb);}
 
@@ -180,17 +192,17 @@ static int write_fifo(char *root, int ch, char *s, int nc)
 	wh = WHICH_PROC();
 
 	if (fd < 0)
-	   log_activity(flog, dbg_fifo, 1, wh, "write no db");
+	   log_activity(flog, fifost.debug, 1, wh, "write no db");
 
 	else
 	   {nb = write(fd, s, nc);
 	    close(fd);
 
 	    if (nb < 0)
-	       log_activity(flog, dbg_fifo, 1, wh, "write |%s| (%s)",
+	       log_activity(flog, fifost.debug, 1, wh, "write |%s| (%s)",
 			    s, strerror(errno));
 	    else
-	       log_activity(flog, dbg_fifo, 1, wh, "write |%s| (%d)",
+	       log_activity(flog, fifost.debug, 1, wh, "write |%s| (%d)",
 			    s, nb);};};
 
     return(nb);}

@@ -65,6 +65,7 @@
 #define append_tok 		PS_append_tok
 #define arelaunch 		PS_arelaunch
 #define asetup 			PS_asetup
+#define async_server 		PS_async_server
 #define await 			PS_await
 #define blank_line 		PS_blank_line
 #define block_fd 		PS_block_fd
