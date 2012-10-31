@@ -203,7 +203,7 @@ static int _comm_write_wrk(client *cl, char *t, int nt, int to)
 
 int comm_read(client *cl, char *s, int nc, int to)
    {int nb, nk, no, nt, ok;
-    char *t;
+    char *p, *t;
 
     nb = _comm_read_wrk(cl, s, nc, to);
 
@@ -211,21 +211,23 @@ int comm_read(client *cl, char *s, int nc, int to)
     nk = cl->nkey;
     nt = nc + nk + 2;
     t  = MAKE_N(char, nt);
+    p  = t;
 
     nstrncpy(t, nt, s, -1);
 
     ok = FALSE;
     if (strncmp(t, "auth:", 5) == 0)
        {if (dbs.auth == TRUE)
-	   {no = nk + 6;
-	    ok = verifyx(cl, t+5, NULL);};}
+	   {no  = nk + 6;
+	    nb -= no;
+	    p   = t + no;
+            ok  = verifyx(cl, t+5, NULL);};}
 	   
     else if (dbs.auth != TRUE)
        ok = TRUE;
 
     if (ok == FALSE)
-       {char *p;
-	p = t + strlen(t) - 4;
+       {p = t + strlen(t) - 4;
 	if (strcmp(p, "fin:") == 0)
 	   nstrncpy(s, nc, p, -1);
 	else
@@ -233,9 +235,8 @@ int comm_read(client *cl, char *s, int nc, int to)
 
 	nb = strlen(s);}
 
-    else if (strcmp(s, t+no) != 0)
-       {nstrncpy(s, nc, t + no, -1);
-	nb -= no;};
+    else if (strcmp(s, p) != 0)
+       nstrncpy(s, nc, p, -1);
 
     FREE(t);
 
