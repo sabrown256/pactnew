@@ -61,30 +61,6 @@ char *name_log(char *root)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CL_LOGGER - log messages for the client CL */
-
-static void cl_logger(client *cl, int lvl, char *fmt, ...)
-   {char s[MAXLINE];
-    char *root, *wh, *flog;
-
-    VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
-    VA_END;
-
-    wh   = C_OR_S(cl->type == CLIENT);
-    root = cl->root;
-    flog = name_log(root);
-
-    log_activity(flog, svs.debug, lvl, wh, s);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
-/*                             SERVER SIDE ROUTINES                         */
-
-/*--------------------------------------------------------------------------*/
-
 /* NAME_DB - derive the name of the database from ROOT */
 
 char *name_db(char *root)
@@ -107,6 +83,360 @@ char *name_conn(char *root)
     return(fname);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CL_LOGGER - log messages for the client CL */
+
+static void cl_logger(client *cl, int lvl, char *fmt, ...)
+   {char s[MAXLINE];
+    char *root, *wh, *flog;
+
+    VA_START(fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
+    VA_END;
+
+    wh   = C_OR_S(cl->type == CLIENT);
+    root = cl->root;
+    flog = name_log(root);
+
+    log_activity(flog, svs.debug, lvl, wh, s);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                             CLIENT SIDE ROUTINES                         */
+
+/*--------------------------------------------------------------------------*/
+
+/* _DB_SRV_LAUNCH - launch a DB server */
+
+static int _db_srv_launch(client *cl)
+   {int i, st, pid, rv;
+    char s[MAXLINE];
+    char *root, *fcon, **sa;
+
+    rv = FALSE;
+
+    if (cl != NULL)
+       {root = cl->root;
+	fcon = name_conn(root);
+
+	st   = 0;
+	s[0] = '\0';
+
+/* wait until we have a server going */
+	for (i = 0; file_exists(fcon) == FALSE; i++)
+	    {if (i == 1)
+		{if (cl->auth == TRUE)
+		    snprintf(s, MAXLINE, "perdb -a -f %s -s -l", root);
+		 else
+		    snprintf(s, MAXLINE, "perdb -f %s -s -l", root);
+		 st = system(s);
+		 st = WEXITSTATUS(st);
+		 CLOG(cl, 1, "launch |%s| (%d)", s, st);}
+	     else
+	        nsleep(100);};
+
+/* check the pid */
+        sa = file_text(FALSE, fcon);
+
+	if ((sa != NULL) && (sa[CONN_PID] != NULL))
+	   pid = atoi(sa[CONN_PID]);
+	else
+	   pid = -1;
+
+	if (cl != NULL)
+	   {cl->nkey = N_AKEY;
+	    cl->key  = STRSAVE(sa[CONN_KEY]);};
+
+	free_strings(sa);
+
+/* GOTCHA: if it is not running - clean up and restart */
+	st = is_running(pid);
+
+	cl->scon->pid = pid;
+
+        CLOG(cl, 1, "server pid %d (%d)", pid, i);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _DB_CLNT_EX - do a transaction from the client side of the database */
+
+char **_db_clnt_ex(client *cl, int init, char *req)
+   {int nb, ne, nx;
+    char **p;
+    static char s[MAXLINE];
+
+    if (cl == NULL)
+       {char *root;
+
+        root = cgetenv(TRUE, "PERDB_PATH");
+	cl   = make_client(CLIENT, FALSE, root, cl_logger);};
+
+    p = NULL;
+
+    CLOG(cl, 1, "begin request |%s|", req);
+
+/* make sure that there is a server running */
+    if (init == TRUE)
+       _db_srv_launch(cl);
+
+/* send the request */
+    nb = comm_write(cl, req, 0, 10);
+
+/* get the reply */
+    if (nb > 0)
+       {int nc, to, ok;
+	char *t;
+
+	ne = 0;
+	nx = 100;
+	to = 4;
+	for (ok = TRUE; ok == TRUE; )
+	    {nb = comm_read(cl, s, MAXLINE, to);
+	     ne = (nb < 0) ? ne+1 : 0;
+
+/* if more than NX consecutive read failures bail */
+	     if (ne >= nx)
+	        {p  = NULL;
+		 ok = FALSE;}
+
+	     else
+	        {for (t = s; nb > 0; t += nc, nb -= nc)
+		     {if (strcmp(t, EOM) == 0)
+			 {ok = FALSE;
+			  break;}
+		      else if (strcmp(t, "reject:") == 0)
+			 {p  = lst_push(p, "rejected");
+			  ok = FALSE;
+			  break;}
+		      else
+			 p = lst_push(p, t);
+
+		      nc = strlen(t) + 1;};
+
+		 if (ok == TRUE)
+		    nsleep(0);};};};
+
+    CLOG(cl, 1, "end request");
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DBSET - set the database variable VAR to VAL (counterpart to csetenv) */
+
+int dbset(client *cl, char *var, char *fmt, ...)
+   {int i, err, nc, nr, ok;
+    char s[LRG];
+    char *t, **ta;
+    static char *rej[] = { "PWD", "PERDB_PATH" };
+
+    err = 0;
+
+/* variables in REJ should never be in the database itself */
+    ok = TRUE;
+    nr = sizeof(rej)/sizeof(char *);
+    for (i = 0; (i < nr) && (ok == TRUE); i++)
+        ok = (strcmp(var, rej[i]) != 0);
+
+    if (ok == TRUE)
+       {VA_START(fmt);
+	VSNPRINTF(s, LRG, fmt);
+	VA_END;
+
+	nc  = strlen(var) + strlen(s) + 2;
+	t   = malloc(nc);
+	if (t != NULL)
+	   {snprintf(t, nc, "%s=%s", var, s);
+
+	    ta  = _db_clnt_ex(cl, TRUE, t);
+	    err = (ta != NULL);
+
+/* GOTCHA: temporarily also add it to the environment
+ * this can go when utilities using this are completely converted
+ * away from using the environment
+ */
+	    err = putenv(t);
+
+	    note(Log, TRUE, "setenv %s %s", var, s);
+
+	    lst_free(ta);};};
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DBGET - get the value of database variable VAR
+ *       - if LIT is TRUE return as is otherwise strip off
+ *       - surrounding quotes
+ *       - (counterpart to cgetenv)
+ */
+
+char *dbget(client *cl, int lit, char *fmt, ...)
+   {char var[MAXLINE];
+    char *t, **ta;
+
+    VA_START(fmt);
+    VSNPRINTF(var, MAXLINE, fmt);
+    VA_END;
+
+    ta = _db_clnt_ex(cl, TRUE, var);
+    if (ta == NULL)
+       t = cnoval();
+
+    else
+       {if (lit == FALSE)
+	   t = strip_quote(ta[0]);
+
+        else
+	   t = ta[0];
+
+	ta[0] = NULL;};
+
+    lst_free(ta);
+
+    return(t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DBDEF - return TRUE iff the database variable VAR is defined
+ *       - (counterpart to cdefenv)
+ */
+
+int dbdef(client *cl, char *fmt, ...)
+   {int rv;
+    char var[MAXLINE];
+    char **ta;
+
+    VA_START(fmt);
+    VSNPRINTF(var, MAXLINE, fmt);
+    VA_END;
+
+    ta = _db_clnt_ex(cl, TRUE, var);
+    rv = ((ta != NULL) && (IS_NULL(ta[0]) == FALSE));
+
+    lst_free(ta);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DBCMP - return a strcmp style value for the
+ *       - comparison of the database variable VAR value and VAL
+ *       - (counterpart to cmpenv)
+ */
+
+int dbcmp(client *cl, char *var, char *val)
+   {int rv;
+    char **ta;
+
+    ta = _db_clnt_ex(cl, TRUE, var);
+    if (ta != NULL)
+       rv = strcmp(ta[0], val);
+    else
+       rv = -2;
+
+    lst_free(ta);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DBCMD - send a command to the database daemon
+ *       - one of: quit, save, load, reset
+ */
+
+int dbcmd(client *cl, char *cmd)
+   {int rv;
+    char **ta;
+
+    ta = _db_clnt_ex(cl, TRUE, cmd);
+    rv = (ta != NULL);
+
+    lst_free(ta);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DBINITV - set the database variable VAR to VAL
+ *         - only if it is undefined
+ *         - (counterpart to cinitenv)
+ */
+
+int dbinitv(client *cl, char *var, char *fmt, ...)
+   {int err;
+    char s[LRG];
+
+    VA_START(fmt);
+    VSNPRINTF(s, LRG, fmt);
+    VA_END;
+
+    err = 0;
+    if (dbdef(cl, var) == FALSE)
+       err = dbset(cl, var, s);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DBRESTORE - have the server load the specified database DNAME
+ *           - and set all the variables in the environment
+ *           - of the current process
+ */
+
+int dbrestore(client *cl, char *dname)
+   {int i, rv, ok;
+    char t[MAXLINE];
+    char **ta, *s, *vl;
+
+    rv = TRUE;
+
+/* load the database */
+    if (dname == NULL)
+       nstrncpy(t, MAXLINE, "load:", -1);
+    else
+       snprintf(t, MAXLINE, "load:%s", dname);
+
+    ok = dbcmd(cl, t);
+    ASSERT(ok == 0);
+
+/* the server has the database - now we need it
+ * GOTCHA: this can go when utilities using this are
+ * completely converted away from using the environment
+ */
+    ta = _db_clnt_ex(cl, FALSE, "save:");
+    if (ta != NULL)
+       {for (i = 0; ta[i] != NULL; i++)
+	    {s = ta[i];
+	     if (strncmp(s, "saved", 5) == 0)
+	        break;
+	     else
+	        {vl = strchr(s, '=');
+		 if (vl != NULL)
+		    {*vl++ = '\0';
+		     vl = strip_quote(vl);
+		     csetenv(s, vl);};};};
+	lst_free(ta);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                             SERVER SIDE ROUTINES                         */
+
 /*--------------------------------------------------------------------------*/
 
 /* _GET_VAR - return the value of variable VAR */
@@ -595,7 +925,7 @@ int db_srv_open(client *cl, int init, int dbg, int auth)
 	   {free_db(db);
 	    db = NULL;};
 
-	srv.pid = pid;};
+	cl->scon->pid = pid;};
 
     rv = (db != NULL);
 
@@ -648,61 +978,6 @@ int db_srv_save(int fd, database *db)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DB_SRV_LAUNCH - launch a DB server */
-
-int db_srv_launch(client *cl)
-   {int i, st, pid, rv;
-    char s[MAXLINE];
-    char *root, *fcon, **sa;
-
-    rv = FALSE;
-
-    if (cl != NULL)
-       {root = cl->root;
-	fcon = name_conn(root);
-
-	st   = 0;
-	s[0] = '\0';
-
-/* wait until we have a server going */
-	for (i = 0; file_exists(fcon) == FALSE; i++)
-	    {if (i == 1)
-		{if (cl->auth == TRUE)
-		    snprintf(s, MAXLINE, "perdb -a -f %s -s -l", root);
-		 else
-		    snprintf(s, MAXLINE, "perdb -f %s -s -l", root);
-		 st = system(s);
-		 st = WEXITSTATUS(st);
-		 CLOG(cl, 1, "launch |%s| (%d)", s, st);}
-	     else
-	        nsleep(100);};
-
-/* check the pid */
-        sa = file_text(FALSE, fcon);
-
-	if ((sa != NULL) && (sa[CONN_PID] != NULL))
-	   pid = atoi(sa[CONN_PID]);
-	else
-	   pid = -1;
-
-	if (cl != NULL)
-	   {cl->nkey = N_AKEY;
-	    cl->key  = STRSAVE(sa[CONN_KEY]);};
-
-	free_strings(sa);
-
-/* GOTCHA: if it is not running - clean up and restart */
-	st = is_running(pid);
-
-	srv.pid = pid;
-
-        CLOG(cl, 1, "server pid %d (%d)", pid, i);};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* DB_SRV_RESTART - restart the server */
 
 int db_srv_restart(database *db)
@@ -720,281 +995,6 @@ int db_srv_restart(database *db)
 	CLOG(cl, 1, "restart");
 
 	rv = open_server(cl, SERVER, cl->auth);};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-
-/*                             CLIENT SIDE ROUTINES                         */
-
-/*--------------------------------------------------------------------------*/
-
-/* _DB_CLNT_EX - do a transaction from the client side of the database */
-
-char **_db_clnt_ex(client *cl, int init, char *req)
-   {int nb, ne, nx;
-    char **p;
-    static char s[MAXLINE];
-
-    if (cl == NULL)
-       {char *root;
-
-        root = cgetenv(TRUE, "PERDB_PATH");
-	cl   = make_client(CLIENT, FALSE, root, cl_logger);};
-
-    p = NULL;
-
-    CLOG(cl, 1, "begin request |%s|", req);
-
-/* make sure that there is a server running */
-    if (init == TRUE)
-       db_srv_launch(cl);
-
-/* send the request */
-    nb = comm_write(cl, req, 0, 10);
-
-/* get the reply */
-    if (nb > 0)
-       {int nc, to, ok;
-	char *t;
-
-	ne = 0;
-	nx = 100;
-	to = 4;
-	for (ok = TRUE; ok == TRUE; )
-	    {nb = comm_read(cl, s, MAXLINE, to);
-	     ne = (nb < 0) ? ne+1 : 0;
-
-/* if more than NX consecutive read failures bail */
-	     if (ne >= nx)
-	        {p  = NULL;
-		 ok = FALSE;}
-
-	     else
-	        {for (t = s; nb > 0; t += nc, nb -= nc)
-		     {if (strcmp(t, EOM) == 0)
-			 {ok = FALSE;
-			  break;}
-		      else if (strcmp(t, "reject:") == 0)
-			 {p  = lst_push(p, "rejected");
-			  ok = FALSE;
-			  break;}
-		      else
-			 p = lst_push(p, t);
-
-		      nc = strlen(t) + 1;};
-
-		 if (ok == TRUE)
-		    nsleep(0);};};};
-
-    CLOG(cl, 1, "end request");
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DBSET - set the database variable VAR to VAL (counterpart to csetenv) */
-
-int dbset(client *cl, char *var, char *fmt, ...)
-   {int i, err, nc, nr, ok;
-    char s[LRG];
-    char *t, **ta;
-    static char *rej[] = { "PWD", "PERDB_PATH" };
-
-    err = 0;
-
-/* variables in REJ should never be in the database itself */
-    ok = TRUE;
-    nr = sizeof(rej)/sizeof(char *);
-    for (i = 0; (i < nr) && (ok == TRUE); i++)
-        ok = (strcmp(var, rej[i]) != 0);
-
-    if (ok == TRUE)
-       {VA_START(fmt);
-	VSNPRINTF(s, LRG, fmt);
-	VA_END;
-
-	nc  = strlen(var) + strlen(s) + 2;
-	t   = malloc(nc);
-	if (t != NULL)
-	   {snprintf(t, nc, "%s=%s", var, s);
-
-	    ta  = _db_clnt_ex(cl, TRUE, t);
-	    err = (ta != NULL);
-
-/* GOTCHA: temporarily also add it to the environment
- * this can go when utilities using this are completely converted
- * away from using the environment
- */
-	    err = putenv(t);
-
-	    note(Log, TRUE, "setenv %s %s", var, s);
-
-	    lst_free(ta);};};
-
-    return(err);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DBGET - get the value of database variable VAR
- *       - if LIT is TRUE return as is otherwise strip off
- *       - surrounding quotes
- *       - (counterpart to cgetenv)
- */
-
-char *dbget(client *cl, int lit, char *fmt, ...)
-   {char var[MAXLINE];
-    char *t, **ta;
-
-    VA_START(fmt);
-    VSNPRINTF(var, MAXLINE, fmt);
-    VA_END;
-
-    ta = _db_clnt_ex(cl, TRUE, var);
-    if (ta == NULL)
-       t = cnoval();
-
-    else
-       {if (lit == FALSE)
-	   t = strip_quote(ta[0]);
-
-        else
-	   t = ta[0];
-
-	ta[0] = NULL;};
-
-    lst_free(ta);
-
-    return(t);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DBDEF - return TRUE iff the database variable VAR is defined
- *       - (counterpart to cdefenv)
- */
-
-int dbdef(client *cl, char *fmt, ...)
-   {int rv;
-    char var[MAXLINE];
-    char **ta;
-
-    VA_START(fmt);
-    VSNPRINTF(var, MAXLINE, fmt);
-    VA_END;
-
-    ta = _db_clnt_ex(cl, TRUE, var);
-    rv = ((ta != NULL) && (IS_NULL(ta[0]) == FALSE));
-
-    lst_free(ta);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DBCMP - return a strcmp style value for the
- *       - comparison of the database variable VAR value and VAL
- *       - (counterpart to cmpenv)
- */
-
-int dbcmp(client *cl, char *var, char *val)
-   {int rv;
-    char **ta;
-
-    ta = _db_clnt_ex(cl, TRUE, var);
-    if (ta != NULL)
-       rv = strcmp(ta[0], val);
-    else
-       rv = -2;
-
-    lst_free(ta);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DBCMD - send a command to the database daemon
- *       - one of: quit, save, load, reset
- */
-
-int dbcmd(client *cl, char *cmd)
-   {int rv;
-    char **ta;
-
-    ta = _db_clnt_ex(cl, TRUE, cmd);
-    rv = (ta != NULL);
-
-    lst_free(ta);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DBINITV - set the database variable VAR to VAL
- *         - only if it is undefined
- *         - (counterpart to cinitenv)
- */
-
-int dbinitv(client *cl, char *var, char *fmt, ...)
-   {int err;
-    char s[LRG];
-
-    VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
-    VA_END;
-
-    err = 0;
-    if (dbdef(cl, var) == FALSE)
-       err = dbset(cl, var, s);
-
-    return(err);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DB_RESTORE - have the server load the specified database
- *            - and set all the variables in the environment
- *            - of the current process
- */
-
-int db_restore(client *cl, char *dname)
-   {int i, rv, ok;
-    char t[MAXLINE];
-    char **ta, *s, *vl;
-
-    rv = TRUE;
-
-/* load the database */
-    if (dname == NULL)
-       nstrncpy(t, MAXLINE, "load:", -1);
-    else
-       snprintf(t, MAXLINE, "load:%s", dname);
-
-    ok = dbcmd(cl, t);
-    ASSERT(ok == 0);
-
-/* the server has the database - now we need it
- * GOTCHA: this can go when utilities using this are
- * completely converted away from using the environment
- */
-    ta = _db_clnt_ex(cl, FALSE, "save:");
-    if (ta != NULL)
-       {for (i = 0; ta[i] != NULL; i++)
-	    {s = ta[i];
-	     if (strncmp(s, "saved", 5) == 0)
-	        break;
-	     else
-	        {vl = strchr(s, '=');
-		 if (vl != NULL)
-		    {*vl++ = '\0';
-		     vl = strip_quote(vl);
-		     csetenv(s, vl);};};};
-	lst_free(ta);};
 
     return(rv);}
 

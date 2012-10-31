@@ -22,6 +22,7 @@
 /* non-API functions */
 #define _block_all_sig 		_PS_block_all_sig
 #define _db_clnt_ex 		_PS_db_clnt_ex
+#define _db_srv_launch 		_PS_db_srv_launch
 #define _dbg 			_PS_dbg
 #define _default_iodes 		_PS_default_iodes
 #define _deref_close 		_PS_deref_close
@@ -92,10 +93,8 @@
 #define csetenv 		PS_csetenv
 #define cunsetenv 		PS_cunsetenv
 #define cwhich 			PS_cwhich
-#define db_restore 		PS_db_restore
 #define db_srv_close 		PS_db_srv_close
 #define db_srv_create 		PS_db_srv_create
-#define db_srv_launch 		PS_db_srv_launch
 #define db_srv_load 		PS_db_srv_load
 #define db_srv_open 		PS_db_srv_open
 #define db_srv_restart 		PS_db_srv_restart
@@ -105,6 +104,7 @@
 #define dbdef 			PS_dbdef
 #define dbget 			PS_dbget
 #define dbinitv 		PS_dbinitv
+#define dbrestore 		PS_dbrestore
 #define dbset 			PS_dbset
 #define delimited 		PS_delimited
 #define demonize 		PS_demonize
