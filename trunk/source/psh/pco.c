@@ -639,7 +639,7 @@ static int pco_load_db(client *cl, char *dbname)
    {int rv, i, nv;
     char **ta;
 
-    rv = db_restore(cl, dbname);
+    rv = dbrestore(cl, dbname);
 
     separator(Log);
 

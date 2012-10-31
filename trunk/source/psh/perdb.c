@@ -222,11 +222,11 @@ static void term_connection(srvdes *sv)
     client *cl;
 
     cl = (client *) sv->a;
-    fd = cl->fd;
+    fd = cl->cfd;
 
     remove_fd(sv, fd);
 
-    cl->fd = connect_close(fd, cl);
+    cl->cfd = connect_close(fd, cl);
 
     return;}
 
@@ -549,7 +549,7 @@ static int srv_process(srvdes *sv, int fd)
     client *cl;
 
     cl = (client *) sv->a;
-    cl->fd = fd;
+    cl->cfd = fd;
 
     db = (database *) cl->a;
 
@@ -636,7 +636,6 @@ static int server(char *root, int init, int dmn)
 	    db = (database *) cl->a;
 
 	    sv.a       = cl;
-	    sv.server  = cl->server;
 	    sv.slog    = srv_logger;
             sv.setup   = srv_setup;
             sv.process = srv_process;

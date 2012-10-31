@@ -33,25 +33,22 @@ typedef struct s_connection connection;
 typedef struct s_client client;
 
 struct s_connection
-   {int server;                  /* server side descriptor */
+   {int sfd;                     /* server side descriptor */
     int port;
     int pid;
     struct sockaddr_in sck;
     fd_set afs;};
 
 struct s_client
-   {int fd;                      /* client side descriptor */
+   {int cfd;                     /* client side descriptor */
     int auth;
     int nkey;
     char *key;
     char *root;
     ckind type;
     void *a;
-    connection *server;
+    connection *scon;
     void (*clog)(client *cl, int lvl, char *fmt, ...);};
-
-static connection
- srv;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -95,19 +92,7 @@ static int conn_exists(char *fmt, ...)
 	VA_END;
 
 	conn = find_conn(s, -1);
-	rv   = (conn != NULL);
-
-#ifdef VERBOSE
-	{char *flog, *wh;
-	 static int dbg_sock = FALSE;
-
-	 flog = name_log(s);
-	 wh   = C_OR_S(srv.server == 0);
-	 log_activity(flog, dbg_sock, 2, wh, "exist |%s| (%s)",
-		      sock,
-		      (rv == TRUE) ? "yes" : "no");};
-#endif
-       };
+	rv   = (conn != NULL);};
 
     return(rv);}
 
@@ -237,9 +222,12 @@ static int init_server(client *cl, int auth)
    {int iprt, port, sasz, rv;
     char host[MAXLINE];
     char *hst;
+    connection *srv;
+
+    srv = cl->scon;
 
 /* check for server being setup already */
-    if ((srv.server != 0) && (srv.port != 0))
+    if ((srv->sfd != 0) && (srv->port != 0))
        rv = TRUE;
 
     else
@@ -247,21 +235,21 @@ static int init_server(client *cl, int auth)
 	port = -1;
 	sasz = sizeof(struct sockaddr_in);
 
-	srv.server = socket(PF_INET, SOCK_STREAM, 0);
-	if (srv.server > 0)
-	   {srv.sck.sin_family      = PF_INET;
-	    srv.sck.sin_addr.s_addr = htonl(INADDR_ANY);
+	srv->sfd = socket(PF_INET, SOCK_STREAM, 0);
+	if (srv->sfd > 0)
+	   {srv->sck.sin_family      = PF_INET;
+	    srv->sck.sin_addr.s_addr = htonl(INADDR_ANY);
 
 /* scan for a port that we can use */
 	    for (iprt = 15000; iprt < 65000; iprt++)
-	        {srv.sck.sin_port = htons(iprt);
+	        {srv->sck.sin_port = htons(iprt);
 
-		 if (bind(srv.server, (struct sockaddr *) &srv.sck, sasz) >= 0)
+		 if (bind(srv->sfd, (struct sockaddr *) &srv->sck, sasz) >= 0)
 		    {port = iprt;
 		     break;};};};
 
-	srv.port = port;
-	if (srv.port >= 0)
+	srv->port = port;
+	if (srv->port >= 0)
 	   {gethostname(host, MAXLINE);
 
 /* try to keep connections local by converting
@@ -269,11 +257,11 @@ static int init_server(client *cl, int auth)
  * also simplifies connection file processing
  */
 	    hst = strtok(host, ".\n");
-	    rv = make_server_conn(cl, auth, hst, srv.port);};
+	    rv = make_server_conn(cl, auth, hst, srv->port);};
 
 /* initialize the set of active sockets */
-	FD_ZERO(&srv.afs);
-	FD_SET(srv.server, &srv.afs);};
+	FD_ZERO(&srv->afs);
+	FD_SET(srv->sfd, &srv->afs);};
 
     return(rv);}
 
@@ -288,7 +276,7 @@ static int connect_server(client *cl)
     struct sockaddr *sa;
     connection *srv;
 
-    srv  = cl->server;
+    srv  = cl->scon;
 
     fdc  = -1;
     sasz = sizeof(struct sockaddr_in);
@@ -296,7 +284,7 @@ static int connect_server(client *cl)
 
     sa = (struct sockaddr *) &srv->sck;
 
-    fds = srv->server;
+    fds = srv->sfd;
     if (srv->port >= 0)
        {err = listen(fds, 5);
 	if (err >= 0)
@@ -316,7 +304,7 @@ static int connect_server(client *cl)
 	   CLOG(cl, 1, "listen error on %d - (%s - %d)",
 		fds, strerror(errno), errno);};
 
-    cl->fd   = fdc;
+    cl->cfd  = fdc;
     cl->type = SERVER;
 
     return(fdc);}
@@ -372,7 +360,7 @@ static int connect_client(client *cl)
     connection *srv;
 
     root = cl->root;
-    srv  = cl->server;
+    srv  = cl->scon;
 
     fd  = -1;
     key = NULL;
@@ -406,15 +394,15 @@ static int connect_client(client *cl)
 		     ta[0], ta[1], fd,
 		     strerror(errno), errno);};
 
-	    srv->server = fd;
-	    srv->port   = atoi(ta[1]);};
+	    srv->sfd  = fd;
+	    srv->port = atoi(ta[1]);};
 
 /* get the shared key */
 	key = STRSAVE(ta[CONN_KEY]);
 
 	free_strings(ta);};
 
-    cl->fd   = fd;
+    cl->cfd  = fd;
     cl->nkey = N_AKEY;
     cl->key  = key;
     cl->type = CLIENT;
@@ -430,8 +418,8 @@ static int connect_error(client *cl)
    {int fds;
     connection *srv;
 
-    srv = cl->server;
-    fds = srv->server;
+    srv = cl->scon;
+    fds = srv->sfd;
     if (fds < 0)
        CLOG(cl, 1, "no server connection available");
 
@@ -446,11 +434,11 @@ static int client_fd(client *cl)
    {int fd, fds;
     connection *srv;
 
-    fd = cl->fd;
+    fd = cl->cfd;
 
     if (fd == -1)
-       {srv = cl->server;
-	fds = srv->server;
+       {srv = cl->scon;
+	fds = srv->sfd;
 	if (fds < 0)
 	   fd = connect_error(cl);
         else if ((fds == 0) || (cl->type == CLIENT))
@@ -486,16 +474,18 @@ static int open_server(client *cl, ckind ioc, int auth)
 static int close_sock(client *cl)
    {int st, rv;
     char *conn, *root;
+    connection *srv;
 
     rv = TRUE;
 
     root = cl->root;
+    srv  = cl->scon;
     conn = find_conn(root, -1);
     if (conn != NULL)
        {st  = unlink_safe(conn);
 	rv &= (st == 0);
 
-	srv.server = connect_close(srv.server, cl);
+	srv->sfd = connect_close(srv->sfd, cl);
 
 	CLOG(cl, 2, "close %d", st);};
 
@@ -543,7 +533,7 @@ static int read_sock(client *cl, char *s, int nc)
 	    if (nb == 0)
 	       {CLOG(cl, 2, "read %d - zero byte", fd);
 /* GOCTHA: should probably be moved to async_server in perdb.c */
-		cl->fd = connect_close(fd, cl);
+		cl->cfd = connect_close(fd, cl);
 		nb = -1;}
 	    else
 	       {CLOG(cl, 1, "read %d error - %s (%d)",

@@ -25,7 +25,6 @@ typedef struct s_svr_session svr_session;
 
 struct s_srvdes
    {void *a;
-    connection *server;
     void (*setup)(srvdes *sv, int *ptmax, int *pdt);
     int (*process)(srvdes *sv, int fd);
     void (*slog)(srvdes *sv, int lvl, char *fmt, ...);};
@@ -52,9 +51,11 @@ static void _check_fd(srvdes *sv)
    {int fd;
     char s[MAXLINE];
     fd_set rfs;
+    client *cl;
     connection *srv;
 
-    srv = sv->server;
+    cl  = (client *) sv->a;
+    srv = cl->scon;
     rfs = srv->afs;
 
     s[0] = '\0';
@@ -72,9 +73,11 @@ static void _check_fd(srvdes *sv)
 /* ADD_FD - add FD to the set in SV */
 
 static void add_fd(srvdes *sv, int fd)
-   {connection *srv;
+   {client *cl;
+    connection *srv;
 
-    srv = sv->server;
+    cl  = (client *) sv->a;
+    srv = cl->scon;
 
     FD_SET(fd, &srv->afs);
     SLOG(sv, 1, "add fd %d", fd);
@@ -89,9 +92,11 @@ static void add_fd(srvdes *sv, int fd)
 /* REMOVE_FD - add FD to the set in SV */
 
 static void remove_fd(srvdes *sv, int fd)
-   {connection *srv;
+   {client *cl;
+    connection *srv;
 
-    srv  = sv->server;
+    cl  = (client *) sv->a;
+    srv = cl->scon;
 
     FD_CLR(fd, &srv->afs);
     SLOG(sv, 1, "remove fd %d", fd);
@@ -108,12 +113,14 @@ static void remove_fd(srvdes *sv, int fd)
 static void _new_connection(srvdes *sv)
    {int fd;
     socklen_t sz;
+    client *cl;
     connection *srv;
 
-    srv = sv->server;
+    cl  = (client *) sv->a;
+    srv = cl->scon;
     sz  = sizeof(srv->sck);
 
-    fd = accept(srv->server, (struct sockaddr *) &srv->sck, &sz);
+    fd = accept(srv->sfd, (struct sockaddr *) &srv->sck, &sz);
     if (fd > 0)
        add_fd(sv, fd);
     else
@@ -130,11 +137,13 @@ static void _new_connection(srvdes *sv)
 void async_server(srvdes *sv)
    {int fd, nr, ok;
     fd_set rfs;
+    client *cl;
     connection *srv;
 
-    srv = sv->server;
+    cl  = (client *) sv->a;
+    srv = cl->scon;
 
-    if (listen(srv->server, 5) >= 0)
+    if (listen(srv->sfd, 5) >= 0)
        {int ng, nb, nbmax, dt, tmax;
         struct timeval t;
 
@@ -164,10 +173,10 @@ void async_server(srvdes *sv)
 	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
 		     {if (FD_ISSET(fd, &rfs))
 			 {SLOG(sv, 4, "data available on %d (server %d)",
-			       fd, srv->server);
+			       fd, srv->sfd);
 
 /* new connection request */
-			  if (fd == srv->server)
+			  if (fd == srv->sfd)
 			     _new_connection(sv);
 
 /* data arriving on an existing connection */
@@ -400,17 +409,18 @@ int comm_write(client *cl, char *s, int nc, int to)
 client *make_client(ckind type, int auth, char *root, 
 		    void (*clog)(client *cl, int lvl, char *fmt, ...))
    {client *cl;
+    static connection global_srv;
 
     cl = MAKE(client);
     if (cl != NULL)
-       {cl->fd     = -1;
+       {cl->cfd    = -1;
         cl->auth   = auth;
 	cl->nkey   = 0;
 	cl->key    = NULL;
 	cl->root   = root;
 	cl->type   = type;
         cl->a      = NULL;
-	cl->server = &srv;
+	cl->scon   = &global_srv;
         cl->clog   = clog;
 
 	CLOG(cl, 1, "----- start client -----");};
@@ -429,8 +439,8 @@ void free_client(client *cl)
        {if (cl->type == CLIENT)
 	   comm_write(cl, "fin:", 0, 10);
 
-	if (cl->fd >= 0)
-	   cl->fd = connect_close(cl->fd, cl);
+	if (cl->cfd >= 0)
+	   cl->cfd = connect_close(cl->cfd, cl);
 
 	CLOG(cl, 1, "----- end client -----");
 
