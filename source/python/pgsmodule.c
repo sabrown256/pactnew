@@ -155,14 +155,14 @@ PP_realloc(
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_sfree - */
+/* PP_cfree - */
 
-static char PP_sfree__doc__[] = 
+static char PP_cfree__doc__[] = 
 ""
 ;
 
 static PyObject *
-PP_sfree(
+PP_cfree(
   PyObject *self,    /* not used */
   PyObject *args,
   PyObject *kwds)
@@ -171,11 +171,11 @@ PP_sfree(
     void *p;
     char *kw_list[] = {"p", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:sfree", kw_list,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:cfree", kw_list,
                                      &PyCObject_Type, &pobj))
         return NULL;
     p = (void *) PyCObject_AsVoidPtr(pobj);
-    PP_free(p);   /*  SC_sfree(p); */
+    PP_free(p);   /*  SC_free_n(p); */
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -1265,7 +1265,8 @@ static PyMethodDef PP_methods[] = {
 {"zero_space", (PyCFunction)PP_zero_space, METH_KEYWORDS, PP_zero_space__doc__},
 {"alloc", (PyCFunction)PP_alloc, METH_KEYWORDS, PP_alloc__doc__},
 {"realloc", (PyCFunction)PP_realloc, METH_KEYWORDS, PP_realloc__doc__},
-{"sfree", (PyCFunction)PP_sfree, METH_KEYWORDS, PP_sfree__doc__},
+{"cfree", (PyCFunction)PP_cfree, METH_KEYWORDS, PP_cfree__doc__},
+{"sfree", (PyCFunction)PP_cfree, METH_KEYWORDS, PP_cfree__doc__},
 {"mem_print", (PyCFunction)PP_mem_print, METH_KEYWORDS, PP_mem_print__doc__},
 {"mem_trace", (PyCFunction)PP_mem_trace, METH_NOARGS, PP_mem_trace__doc__},
 {"reg_mem", (PyCFunction)PP_reg_mem, METH_KEYWORDS, PP_reg_mem__doc__},

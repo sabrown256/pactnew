@@ -16,9 +16,11 @@
 #include "libpsh.c"
 #include "libsock.c"
 
+#ifndef S_SPLINT_S
 #define SLOG(_s, ...)                                                       \
     {if ((_s)->slog != NULL)                                                \
         (_s)->slog((_s), __VA_ARGS__);}  
+#endif
 
 typedef struct s_srvdes srvdes;
 typedef struct s_svr_session svr_session;

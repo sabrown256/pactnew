@@ -672,6 +672,8 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
     iodes *pio, *cio;
     FILE *fp;
 
+    fd = -1;
+
     pio = pn->io + pk;
     cio = cn->io + ck;
 
@@ -1284,6 +1286,7 @@ static void parse_pgrp(statement *s)
 
     shell = s->shell;
     env   = s->env;
+    ios   = NULL;
 
     ta = NULL;
     sa = tokenize(s->text, " \t\n\r\f");
@@ -1359,10 +1362,11 @@ static void parse_pgrp(statement *s)
     if ((i >= nc) && (lst_length(ta) > 0))
        ta = setup_pgrp(pg, it++, ta, dosh, ios);
 
-    pg->np       = it;
-    pg->terminal = pa[it - 1];
+    if ((pg != NULL) && (pa != NULL) && (it > 0))
+       {pg->np       = it;
+	pg->terminal = pa[it - 1];
 
-    reconnect_pgrp(pg);
+	reconnect_pgrp(pg);};
 
     _dbg(1, "process group: %s", s->text);
 
@@ -1395,35 +1399,36 @@ int gpoll(int to)
     apollfd *fds;
     process_group_state *ps;
 
+    ok = FALSE;
     ps = get_process_group_state();
+    if (ps != NULL)
+       {np  = ps->stck.np;
+	nfd = ps->stck.ifd;
+	fds = ps->stck.fd;
+	map = ps->stck.map;
+	io  = ps->stck.io;
 
-    np  = ps->stck.np;
-    nfd = ps->stck.ifd;
-    fds = ps->stck.fd;
-    map = ps->stck.map;
-    io  = ps->stck.io;
-
-    n = 0;
+	n = 0;
 
 /* add stdin */
-    fds[n].fd      = 0;
-    fds[n].events  = ps->stck.mask_acc;
-    fds[n].revents = 0;
-    n++;
+	fds[n].fd      = 0;
+	fds[n].events  = ps->stck.mask_acc;
+	fds[n].revents = 0;
+	n++;
 
 /* find the descriptors of running jobs only */
-    for (ip = 0; ip < np; ip++)
-        {pp = ps->stck.proc[ip];
-	 if (job_running(pp))
-	    {for (ifd = 0; ifd < nfd; ifd++)
-	         {if (map[ifd] == ip)
-		     {fds[n].fd      = io[ifd];
-		      fds[n].events  = ps->stck.mask_acc;
-		      fds[n].revents = 0;
-		      n++;};};};};
+	for (ip = 0; ip < np; ip++)
+	    {pp = ps->stck.proc[ip];
+	     if (job_running(pp))
+	        {for (ifd = 0; ifd < nfd; ifd++)
+		     {if (map[ifd] == ip)
+			 {fds[n].fd      = io[ifd];
+			  fds[n].events  = ps->stck.mask_acc;
+			  fds[n].revents = 0;
+			  n++;};};};};
 
 /* now poll the active descriptors */
-    ok = poll(fds, n, to);
+	ok = poll(fds, n, to);};
 
     return(ok);}
 
@@ -1663,13 +1668,15 @@ int _pgrp_reject(int fd, process *pp, char *s)
     process_group_state *ps;
 
     ps = get_process_group_state();
+    if (ps != NULL)
+       {rv = TRUE;
 
-    rv = TRUE;
+	_dbg(1, "reject: fd(%d) cmd(%s) txt(%s)", fd, pp->cmd, s);
 
-    _dbg(1, "reject: fd(%d) cmd(%s) txt(%s)", fd, pp->cmd, s);
-
-    if (ps->dbg_level & 2)
-       fputs(s, stderr);
+	if (ps->dbg_level & 2)
+	   fputs(s, stderr);}
+    else
+       rv = FALSE;
 
     return(rv);}
 
@@ -1723,7 +1730,7 @@ void _post_info(process *pp)
     for (i = IO_STD_STATUS; i <= IO_STD_RESOURCE; i++)
         {pio = pp->io + i;
 	 fd  = (pio == NULL) ? -1 : pio->fd;
-	 if (fd != -1)
+	 if ((fd != -1) && (pio != NULL))
 	    {switch (pio->knd)
 	        {case IO_STD_STATUS :
 		      snprintf(t, MAXLINE, "Exit status: %d\n", pp->reason);
@@ -1765,46 +1772,46 @@ void _pgrp_wait(process *pp)
     process_group_state *ps;
 
     ps = get_process_group_state();
+    if (ps != NULL)
+       {if (ps->dbg_level & 2)
+	   {char *st;
 
-    if (ps->dbg_level & 2)
-       {char *st;
-
-	switch (pp->status)
-	   {case JOB_RUNNING :
-	         st = "run";
-		 break;
-	    case JOB_STOPPED :
-		 st = "stop";
-		 break;
-	    case JOB_CHANGED :
-		 st = "chng";
-		 break;
-	    case JOB_EXITED :
-		 st = "exit";
-		 break;
-	    case JOB_COREDUMPED :
-		 st = "core";
-		 break;
-	    case JOB_SIGNALED :
-		 st = "sgnl";
-		 break;
-	    case JOB_KILLED :
-		 st = "kill";
-		 break;
-	    case JOB_DEAD :
-		 st = "dead";
-		 break;
-	    default :
-		   st = "unk";
-		 break;};
-
-	if (pp->isfunc == TRUE)
-	   _dbg(2, "wait function %d: %s", pp->ip, pp->cmd);
-	else
-	   _dbg(2, "wait process %d: (%d) %s", pp->ip, pp->id, pp->cmd);
-
-	_dbg(2, "   status %s (%d) (alive %d)",
-	     st, pp->reason, job_alive(pp));};
+	    switch (pp->status)
+	       {case JOB_RUNNING :
+		     st = "run";
+		     break;
+		case JOB_STOPPED :
+		     st = "stop";
+		     break;
+		case JOB_CHANGED :
+		     st = "chng";
+		     break;
+		case JOB_EXITED :
+		     st = "exit";
+		     break;
+		case JOB_COREDUMPED :
+		     st = "core";
+		     break;
+		case JOB_SIGNALED :
+		     st = "sgnl";
+		     break;
+		case JOB_KILLED :
+		     st = "kill";
+		     break;
+		case JOB_DEAD :
+		     st = "dead";
+		     break;
+	        default :
+		    st = "unk";
+		    break;};
+	    
+	    if (pp->isfunc == TRUE)
+	       _dbg(2, "wait function %d: %s", pp->ip, pp->cmd);
+	    else
+	       _dbg(2, "wait process %d: (%d) %s", pp->ip, pp->id, pp->cmd);
+	    
+	    _dbg(2, "   status %s (%d) (alive %d)",
+		 st, pp->reason, job_alive(pp));};};
 
     _deref_io(pp);
 
@@ -1829,10 +1836,9 @@ int _pgrp_tty(char *tag)
    {int nf, np, rv;
     process_group_state *ps;
 
-    ps = get_process_group_state();
-
     rv = FALSE;
-    np = ps->stck.np;
+    ps = get_process_group_state();
+    np = (ps != NULL) ? ps->stck.np : -1;
 
     nf = acheck();
     rv = (nf == np);
@@ -1858,7 +1864,10 @@ int _fnc_wait(process_group *pg, int ip, int st)
     pp = pg->parents[ip];
 
     if (job_alive(pp) == TRUE)
-       {if (st == 0)
+       {cnd = -1000;
+	sts = -1000;
+
+        if (st == 0)
 	   pp->status = JOB_RUNNING;
 
 /* negative status means error exit */
@@ -1936,6 +1945,9 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 /* if the current process is a function execute it */
 	     for (io = 0; io < N_IO_CHANNELS; io++)
 	         {pio = pp->io + io;
+		  if (pio == NULL)
+		     continue;
+
 		  md  = pio->mode;
 		  dv  = pio->dev;
 		  hnd = pio->hnd;
@@ -2034,11 +2046,11 @@ static int run_pgrp(statement *s)
     process_group *pg;
     process_group_state *ps;
 
-    ps = get_process_group_state();
-
     rv = -1;
 
-    if (s != NULL)
+    ps = get_process_group_state();
+
+    if ((s != NULL) && (ps != NULL))
        {pg = s->pg;
 	ne = s->ne;
 
@@ -2398,7 +2410,7 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
     shell = "/bin/csh";
 
 /* diagnostic for leaked descriptors */
-    if (ps->dbg_level & 4)
+    if ((ps != NULL) && (ps->dbg_level & 4))
        {fb = fcntl(0, F_DUPFD, 2);
 	close(fb);};
 
@@ -2437,7 +2449,7 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
     FREE(s);
 
 /* diagnostic for leaked descriptors */
-    if (ps->dbg_level & 4)
+    if ((ps != NULL) && (ps->dbg_level & 4))
        {fa = fcntl(0, F_DUPFD, fb);
 	close(fa);
         if (fa == fb)

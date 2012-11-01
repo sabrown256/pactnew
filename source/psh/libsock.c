@@ -18,9 +18,12 @@
 #define N_AKEY      32
 
 #define C_OR_S(_p)      ((_p) ? "CLIENT" : "SERVER")
+
+#ifndef S_SPLINT_S
 #define CLOG(_c, ...)                                                    \
     {if ((_c)->clog != NULL)                                             \
         (_c)->clog((_c), __VA_ARGS__);}  
+#endif
 
 enum {CONN_NAME = 0, CONN_PORT, CONN_IP, CONN_KEY, CONN_PID};
 
@@ -113,62 +116,56 @@ static int make_server_conn(client *cl, int auth, char *host, int port)
 
     rv = FALSE;
 
-    snprintf(s, MAXLINE, "%s.conn", cl->root);
-    fp = fopen(s, "w");
-    if (fp != NULL)
-       {in_addr_t haddr;
+    if ((cl != NULL) && (host != NULL))
+       {snprintf(s, MAXLINE, "%s.conn", cl->root);
+	fp = fopen(s, "w");
+	if (fp != NULL)
+	   {in_addr_t haddr;
 
-        fprintf(fp, "%s\n", host);
-	fprintf(fp, "%d\n", port);
+	    fprintf(fp, "%s\n", host);
+	    fprintf(fp, "%d\n", port);
 
 /* address */
-	haddr = inet_addr(host);
+	    haddr = inet_addr(host);
 
-	if (haddr == INADDR_NONE)
-	   {struct hostent *hp;
+	    if (haddr == INADDR_NONE)
+	       {struct hostent *hp;
 
-	    hp = gethostbyname(host);
-	    if (hp != NULL)
-	       haddr = *(in_addr_t *) hp->h_addr_list[0];};
+		hp = gethostbyname(host);
+		if (hp != NULL)
+		   haddr = *(in_addr_t *) hp->h_addr_list[0];};
 
-	fprintf(fp, "%ld\n", (long) haddr);
+	    fprintf(fp, "%ld\n", (long) haddr);
 
 /* key */
-        rs = ((unsigned int) time(NULL)) % 10091;
-	srandom(rs);
-        for (i = 0; i < N_AKEY; )
-	    {c = '!' + (random() % 93);
-	     if (c == ':')
-	        continue;
-	     else
-	        key[i++] = c;};
-	key[i] = '\0';
-	fprintf(fp, "%s\n", key);
+	    rs = ((unsigned int) time(NULL)) % 10091;
+	    srandom(rs);
+	    for (i = 0; i < N_AKEY; )
+	        {c = '!' + (random() % 93);
+		 if (c == ':')
+		    continue;
+		 else
+		    key[i++] = c;};
+	    key[i] = '\0';
+	    fprintf(fp, "%s\n", key);
 
 /* server PID */
-	fprintf(fp, "%ld\n", (long) getpid());
+	    fprintf(fp, "%ld\n", (long) getpid());
 
-	fclose(fp);
+	    fclose(fp);
 
 /* set the file permission */
-	if (auth == TRUE)
-	   chmod(s, S_IRUSR);
-	else
-	   chmod(s, S_IRUSR | S_IRGRP | S_IROTH);
+	    if (auth == TRUE)
+	       chmod(s, S_IRUSR);
+	    else
+	       chmod(s, S_IRUSR | S_IRGRP | S_IROTH);
 
-#if 0
-/* reopen the file */
-        fp = fopen(s, "r");
+	    if (cl != NULL)
+	       {FREE(cl->key);
+		cl->key  = STRSAVE(key);
+		cl->nkey = N_AKEY;};
 
-/* unlink the file so that it goes away no matter how the server exits */
-	unlink(s);
-#endif
-
-	if (cl != NULL)
-	   {cl->nkey = N_AKEY;
-	    cl->key  = STRSAVE(key);};
-
-        rv = TRUE;};
+	    rv = TRUE;};};
 
     return(rv);}
 
@@ -219,7 +216,8 @@ static int connect_close(int fd, client *cl)
  */
 
 static int init_server(client *cl, int auth)
-   {int iprt, port, sasz, rv;
+   {int iprt, port, rv;
+    socklen_t sasz;
     char host[MAXLINE];
     char *hst;
     connection *srv;
@@ -271,8 +269,8 @@ static int init_server(client *cl, int auth)
 /* CONNECT_SERVER - make a connection with the server */
 
 static int connect_server(client *cl)
-   {int fdc, fds, err, sasz;
-    socklen_t len;
+   {int fdc, fds, err;
+    socklen_t len, sasz;
     struct sockaddr *sa;
     connection *srv;
 
@@ -355,57 +353,61 @@ char **get_connect_socket(struct sockaddr_in *ps, char *root)
 /* CONNECT_CLIENT - client initiates connection with the server */
 
 static int connect_client(client *cl)
-   {int sasz, fd, err;
+   {int fd, err;
+    socklen_t sasz;
     char *key, *root, **ta;
     connection *srv;
 
-    root = cl->root;
-    srv  = cl->scon;
-
     fd  = -1;
-    key = NULL;
+    if (cl != NULL)
+       {root = cl->root;
+	srv  = cl->scon;
 
-    ta = get_connect_socket(&srv->sck, root);
-    if (ta != NULL)
-       {fd = socket(PF_INET, SOCK_STREAM, 0);
-	if (fd >= 0)
-	   {int ia, na;
-	    struct sockaddr *sa;
+	key = NULL;
 
-	    sasz = sizeof(struct sockaddr_in);
+	ta = get_connect_socket(&srv->sck, root);
+	if (ta != NULL)
+	   {fd = socket(PF_INET, SOCK_STREAM, 0);
+	    if (fd >= 0)
+	       {int ia, na;
+		struct sockaddr *sa;
+
+		sasz = sizeof(struct sockaddr_in);
 
 /* try NATTEMPTS times to connect to the server */
-	    na = NATTEMPTS;
-	    for (ia = 0; ia < na; ia++)
-	        {sleep(ia);
+		err = 0;
+		na  = NATTEMPTS;
+		for (ia = 0; ia < na; ia++)
+		    {sleep(ia);
 
-		 sa  = (struct sockaddr *) &srv->sck;
-		 err = connect(fd, sa, sasz);
-		 if (err >= 0)
-		    break;};
+		     sa  = (struct sockaddr *) &srv->sck;
+		     err = connect(fd, sa, sasz);
+		     if (err >= 0)
+		        break;};
 
 /* report the connection status */
-	    if (err >= 0)
-	       {CLOG(cl, 2, "connect %s@%s on %d (attempt %d)",
-		     ta[0], ta[1], fd, ia);}
-	    else
-	       {fd = connect_close(fd, cl);
-		CLOG(cl, 1, "connect error %s@%s  %d - %s (%d)",
-		     ta[0], ta[1], fd,
-		     strerror(errno), errno);};
+		if (err >= 0)
+		   {CLOG(cl, 2, "connect %s@%s on %d (attempt %d)",
+			 ta[0], ta[1], fd, ia);}
+		else
+		   {fd = connect_close(fd, cl);
+		    CLOG(cl, 1, "connect error %s@%s  %d - %s (%d)",
+			 ta[0], ta[1], fd,
+			 strerror(errno), errno);};
 
-	    srv->sfd  = fd;
-	    srv->port = atoi(ta[1]);};
+		srv->sfd  = fd;
+		srv->port = atoi(ta[1]);};
 
 /* get the shared key */
-	key = STRSAVE(ta[CONN_KEY]);
+	    key = STRSAVE(ta[CONN_KEY]);
 
-	free_strings(ta);};
+	    free_strings(ta);};
 
-    cl->cfd  = fd;
-    cl->nkey = N_AKEY;
-    cl->key  = key;
-    cl->type = CLIENT;
+	FREE(cl->key);
+	cl->key  = key;
+	cl->nkey = N_AKEY;
+	cl->type = CLIENT;
+	cl->cfd  = fd;};
 
     return(fd);}
 
@@ -455,7 +457,7 @@ static int client_fd(client *cl)
  *           - analog of open_fifo in libfifo.c
  */
 
-static int open_server(client *cl, ckind ioc, int auth)
+int open_server(client *cl, ckind ioc, int auth)
    {int rv;
 
     rv  = TRUE;
@@ -471,7 +473,7 @@ static int open_server(client *cl, ckind ioc, int auth)
 
 /* CLOSE_SOCK - close the socket specified by ROOT and remove the connection */
 
-static int close_sock(client *cl)
+int close_sock(client *cl)
    {int st, rv;
     char *conn, *root;
     connection *srv;
@@ -496,7 +498,7 @@ static int close_sock(client *cl)
 
 /* READ_SOCK - read from the socket ROOT into S */
 
-static int read_sock(client *cl, char *s, int nc)
+int read_sock(client *cl, char *s, int nc)
    {int nb, fd, ev;
 
     fd = client_fd(cl);
@@ -547,7 +549,7 @@ static int read_sock(client *cl, char *s, int nc)
 
 /* WRITE_SOCK - write to the socket ROOT from S */
 
-static int write_sock(client *cl, char *s, int nc)
+int write_sock(client *cl, char *s, int nc)
    {int nb, fd;
 
     nb = -1;

@@ -1059,7 +1059,7 @@ static void read_line(char *s, int nc)
 	n = strlen(s);
 
 /* handle continued lines */
-        while ((s[n-2] == '\\') && (s[n-1] == '\n'))
+        while ((n > 1) && (s[n-2] == '\\') && (s[n-1] == '\n'))
            {p = fgets(t, LRG, se->fp);
 	    if (p != NULL)
 	       {nstrncpy(s+n-2, nc-n-2, trim(t, BOTH, " \t"), -1);

@@ -1,5 +1,5 @@
 TXT: PACT Python Bindings
-MOD: 03/03/2007
+MOD: 11/01/2012
 
 <CENTER>
 <P>
@@ -885,7 +885,7 @@ None
 <dt><tt>zero_space(flag)</tt>
 <dt><tt>alloc(nitems, bytepitem, name)</tt>
 <dt><tt>realloc(p, nitems, bytepitem)</tt>
-<dt><tt>sfree(p)</tt>
+<dt><tt>cfree(p)</tt>
 <dt><tt>mem_print(p)</tt>
 <dt><tt>mem_trace()</tt>
 <dt><tt>reg_mem(p, length, name)</tt>

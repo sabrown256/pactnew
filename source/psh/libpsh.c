@@ -361,55 +361,54 @@ char *delimited(char *s, char *bgn, char *end)
    {int nc, ncb, nce;
     char *tb, *te, *val, *ps, *wh;
 
-    tb    = s + strcspn(s, bgn);
-    *tb++ = '\0';
+    val = NULL;
 
-    val   = tb;
-/*
-    tb    = val + strcspn(val, end);
-    *tb++ = '\0';
-*/
-    nc  = 1;
-    ncb = strlen(bgn);
-    nce = strlen(end);
+    if ((s != NULL) && (bgn != NULL) && (end != NULL))
+       {tb    = s + strcspn(s, bgn);
+	*tb++ = '\0';
 
-    for (ps = tb; IS_NULL(ps) == FALSE; )
-        {tb = strstr(ps, bgn);
-	 te = strstr(ps, end);
-	 if ((tb != NULL) && (tb[ncb] != '\'') &&
-	     (te != NULL) && (te[nce] != '\''))
-	    wh = (tb < te) ? tb : te;
-	 else if ((tb != NULL) && (tb[ncb] != '\''))
-	    wh = tb;
-	 else if ((te != NULL) && (te[nce] != '\''))
-	    wh = te;
-	 else
-	    wh = NULL;
+	val = tb;
+	nc  = 1;
+	ncb = strlen(bgn);
+	nce = strlen(end);
+
+	for (ps = tb; IS_NULL(ps) == FALSE; )
+	    {tb = strstr(ps, bgn);
+	     te = strstr(ps, end);
+	     if ((tb != NULL) && (tb[ncb] != '\'') &&
+		 (te != NULL) && (te[nce] != '\''))
+	        wh = (tb < te) ? tb : te;
+	     else if ((tb != NULL) && (tb[ncb] != '\''))
+	        wh = tb;
+	     else if ((te != NULL) && (te[nce] != '\''))
+	        wh = te;
+	     else
+	        wh = NULL;
 
 /* no instance of BGN or END */
-	 if (wh == NULL)
-	    {if (nc == 0)
-	        nstrcat(s, LRG, ps);
-	     ps = NULL;}
+	     if (wh == NULL)
+	        {if (nc == 0)
+		    nstrcat(s, LRG, ps);
+		 ps = NULL;}
 
 /* if an instance of END came first
  * check end first to handle case where BGN and END are the same
  * as it is for quotes
  */
-	 else if (wh == te)
-	    {nc--;
-	     if (nc == 0)
-	        {*te = '\0';
-		 ps  = NULL;}
-	     else
-	        ps = te + nce;}
+	     else if (wh == te)
+	        {nc--;
+		 if (nc == 0)
+		    {*te = '\0';
+		     ps  = NULL;}
+		 else
+		    ps = te + nce;}
 
 /* if an instance of BGN came first */
-	 else if (wh == tb)
-	    {nc++;
-	     if (nc == 1)
-	        val = tb;
-	     ps = tb + ncb;};};
+	     else if (wh == tb)
+	        {nc++;
+		 if (nc == 1)
+		    val = tb;
+		 ps = tb + ncb;};};};
 
     return(val);}
 
@@ -642,19 +641,8 @@ char *fill_string(char *s, int n)
     nc = strlen(fill);
     nd = n - nc;
 
-#if 0
-    int i;
-
-    nstrcat(fill, MAXLINE, " ");
-    for (i = 0; i < nd; i++)
-        nstrcat(fill, MAXLINE, ".");
-
-#else
-
     memset(fill+nc, '.', nd);
     fill[nd] = '\0';
-
-#endif
 
     return(fill);}
 
@@ -719,10 +707,11 @@ char *strclean(char *d, size_t nd, char *s, size_t ns)
  */
 
 char *strstri(char *string1, char *string2)
-   {char *s1, *s2, *s3;
+   {char *s1, *s2, *s3, *rv;
         
+    rv = NULL;
     s1 = string1;
-    while (*s1 != '\0')
+    while ((*s1 != '\0') && (rv == NULL))
        {for ((s2 = string2, s3 = s1);
              (toupper((int) *s2) == toupper((int) *s3)) &&
 	     (*s3 != '\0') && (*s2 != '\0');
@@ -730,11 +719,11 @@ char *strstri(char *string1, char *string2)
 
 /* if s2 makes it to the end the string is found */
         if (*s2 == '\0')
-           return(s1);
+           rv = s1;
         else
            s1++;};
 
-    return(NULL);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1008,6 +997,8 @@ int dir_exists(char *fmt, ...)
 
     rv = TRUE;
 
+    memset(&sb, 0, sizeof(sb));
+
     if (stat(s, &sb) != 0)
        rv = FALSE;
 
@@ -1031,6 +1022,8 @@ int file_exists(char *fmt, ...)
     VA_END;
 
     rv = FALSE;
+
+    memset(&sb, 0, sizeof(sb));
 
     if (stat(s, &sb) == 0)
 

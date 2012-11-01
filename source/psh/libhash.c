@@ -47,7 +47,7 @@ static long _hash_name(void *key, int size)
     for (v = 0L; *s != '\0'; s++)
         v = (v << 1) ^ (*s);
 
-    v = ((long) abs(v)) % (long) size;
+    v = labs(v) % (long) size;
 
     return(v);}
 
@@ -71,11 +71,11 @@ hashtab *make_hash_table(int sz)
        {tb = MAKE_N(hashen *, sz);
 
         if (tb != NULL)
-           {tab->size      = sz;
-            tab->ne = 0;
-            tab->table     = tb;
-            tab->hash      = _hash_name;
-            tab->comp      = (PFintb) strcmp;
+           {tab->size  = sz;
+            tab->ne    = 0;
+            tab->table = tb;
+            tab->hash  = _hash_name;
+            tab->comp  = (PFintb) strcmp;
 
 /* explicitly NULL the pointers */
             for (i = 0; i < sz; i++)
@@ -363,13 +363,14 @@ char **hash_dump(hashtab *tab, char *patt, char *type, int sort)
 
     else
        {REMAKE(sa, char *, ns + 1);
-	sa[ns] = NULL;
+	if (sa != NULL)
+	   {sa[ns] = NULL;
 
 /* sort the names
  * GOTCHA: hashtab should maintain a sort function pointer
  */
-	if (sort)
-	   string_sort(sa, ns);};
+	    if (sort)
+	       string_sort(sa, ns);};};
 
     return(sa);}
 

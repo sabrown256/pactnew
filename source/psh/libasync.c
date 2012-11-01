@@ -240,12 +240,14 @@ struct s_process_stack
     apollfd *fd;
     process **proc;};
 
+#ifndef S_SPLINT_S
 struct process_group_state
    {int n_sig_block;
     int dbg_level;
     io_device medium;
     process_stack stck;
     sigjmp_buf cpu;};
+#endif
 
 /*--------------------------------------------------------------------------*/
 

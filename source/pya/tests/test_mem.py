@@ -63,7 +63,7 @@ class SCmem(unittest.TestCase):
 
     def teste(self):
         """memory - test allocation non-pointer"""
-        self.failUnlessRaises(TypeError, pdb.sfree, 1)
+        self.failUnlessRaises(TypeError, pdb.cfree, 1)
 
 #--------------------------------------------------------------------------
 

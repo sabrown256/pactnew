@@ -67,7 +67,7 @@ module pdb
     int zero_space(in int flag);
     address alloc(in long nitems, in long bytepitem, in string name);
     address realloc(in address p, in long nitems, in long bytepitem);
-    void sfree(in address p);
+    void cfree(in address p);
     void mem_print(in address p);
     int mem_trace();
     int reg_mem(in address p, in long length, in string name);

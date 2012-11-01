@@ -127,6 +127,8 @@ int gexec_conv(char *db, io_mode md, FILE **fio,
 static PFPCAL maps(char *s)
    {PFPCAL f;
 
+    f = NULL;
+
     if (strcmp(s, "var") == 0)
        f = gexec_var;
     else if (strcmp(s, "file") == 0)
@@ -160,34 +162,35 @@ int main(int c, char **v, char **env)
     char *db, *s;
     process_group_state *ps;
 
+    rv = 0;
     ps = get_process_group_state();
+    if (ps != NULL)
+       {db = getenv("PERDB_PATH");
+	s  = getenv("GEXEC_DEBUG_LEVEL");
 
-    db = getenv("PERDB_PATH");
-    s  = getenv("GEXEC_DEBUG_LEVEL");
+	ps->dbg_level = (s == NULL) ? 0 : atol(s);
 
-    ps->dbg_level = (s == NULL) ? 0 : atol(s);
+	for (i = 1; i < c; i++)
+	    {if (strcmp(v[i], "-h") == 0)
+	        {rv = help();
+		 break;}
 
-    for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-h") == 0)
-            {rv = help();
-	     break;}
+	     else if (strcmp(v[i], "-d") == 0)
+	        {ps->dbg_level = atol(v[++i]);
+		 csetenv("GEXEC_DEBUG_LEVEL", "%d", ps->dbg_level);}
 
-	 else if (strcmp(v[i], "-d") == 0)
-            {ps->dbg_level = atol(v[++i]);
-             csetenv("GEXEC_DEBUG_LEVEL", "%d", ps->dbg_level);}
+	     else if (strcmp(v[i], "-p") == 0)
+	        ps->medium = IO_DEV_PIPE;
 
-	 else if (strcmp(v[i], "-p") == 0)
-            ps->medium = IO_DEV_PIPE;
+	     else if (strcmp(v[i], "-s") == 0)
+	        ps->medium = IO_DEV_SOCKET;
 
-	 else if (strcmp(v[i], "-s") == 0)
-            ps->medium = IO_DEV_SOCKET;
+	     else if (strcmp(v[i], "-t") == 0)
+	        ps->medium = IO_DEV_PTY;
 
-	 else if (strcmp(v[i], "-t") == 0)
-            ps->medium = IO_DEV_PTY;
-
-	 else
-	    {rv = gexec(db, c-i, v+i, env, maps);
-	     break;};};
+	     else
+	        {rv = gexec(db, c-i, v+i, env, maps);
+		 break;};};};
 
     return(rv);}
 
