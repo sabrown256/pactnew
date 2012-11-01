@@ -80,6 +80,7 @@
 #define cinitenv 		PS_cinitenv
 #define clean_space 		PS_clean_space
 #define close_parent_child 	PS_close_parent_child
+#define close_sock 		PS_close_sock
 #define cmpenv 			PS_cmpenv
 #define cnoval 			PS_cnoval
 #define comm_read 		PS_comm_read
@@ -183,6 +184,7 @@
 #define nstrncpy 		PS_nstrncpy
 #define nstrsave 		PS_nstrsave
 #define open_file 		PS_open_file
+#define open_server 		PS_open_server
 #define parse_conn 		PS_parse_conn
 #define parse_statement 	PS_parse_statement
 #define path_base 		PS_path_base
@@ -199,6 +201,7 @@
 #define push_tok 		PS_push_tok
 #define push_tok_beg 		PS_push_tok_beg
 #define put_db 			PS_put_db
+#define read_sock 		PS_read_sock
 #define redirect_io 		PS_redirect_io
 #define register_io_pgrp 	PS_register_io_pgrp
 #define report_info 		PS_report_info
@@ -228,6 +231,7 @@
 #define verifyx 		PS_verifyx
 #define vstrcat 		PS_vstrcat
 #define wall_clock_time 	PS_wall_clock_time
+#define write_sock 		PS_write_sock
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

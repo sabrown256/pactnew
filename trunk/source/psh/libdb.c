@@ -138,17 +138,18 @@ static int _db_srv_launch(client *cl)
 	     else
 	        nsleep(100);};
 
-/* check the pid */
+	pid = -1;
+
+/* check the connection file info */
         sa = file_text(FALSE, fcon);
+	if (sa != NULL)
+	   {if (sa[CONN_PID] != NULL)
+	       pid = atoi(sa[CONN_PID]);
 
-	if ((sa != NULL) && (sa[CONN_PID] != NULL))
-	   pid = atoi(sa[CONN_PID]);
-	else
-	   pid = -1;
-
-	if (cl != NULL)
-	   {cl->nkey = N_AKEY;
-	    cl->key  = STRSAVE(sa[CONN_KEY]);};
+	    if ((sa[CONN_KEY] != NULL) && (cl != NULL))
+	       {FREE(cl->key);
+		cl->key  = STRSAVE(sa[CONN_KEY]);
+		cl->nkey = N_AKEY;};};
 
 	free_strings(sa);
 
