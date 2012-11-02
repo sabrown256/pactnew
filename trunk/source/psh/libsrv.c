@@ -16,6 +16,8 @@
 #include "libpsh.c"
 #include "libsock.c"
 
+#define EOM     "++ok++"
+
 #ifndef S_SPLINT_S
 #define SLOG(_s, ...)                                                       \
     {if ((_s)->slog != NULL)                                                \
@@ -28,7 +30,7 @@ typedef struct s_svr_session svr_session;
 struct s_srvdes
    {void *a;
     void (*setup)(srvdes *sv, int *ptmax, int *pdt);
-    int (*process)(srvdes *sv, int fd);
+    char **(*process)(srvdes *sv, char *s);
     void (*slog)(srvdes *sv, int lvl, char *fmt, ...);};
 
 struct s_svr_session
@@ -42,193 +44,62 @@ static svr_session
   svs = { FALSE, FALSE, FALSE, FALSE, NULL };
 
 /*--------------------------------------------------------------------------*/
-
-/*                            SERVER SIDE ROUTINES                          */
-
 /*--------------------------------------------------------------------------*/
 
-/* _CHECK_FD - verify/log fd set in SV */
+/* NAME_CONN - derive the name of the connection file from ROOT */
 
-static void _check_fd(srvdes *sv)
-   {int fd;
-    char s[MAXLINE];
-    fd_set rfs;
-    client *cl;
-    connection *srv;
+char *name_conn(char *root)
+   {static char fname[MAXLINE];
 
-    cl  = (client *) sv->a;
-    srv = cl->scon;
-    rfs = srv->afs;
+    snprintf(fname, MAXLINE, "%s.conn", root);
 
-    s[0] = '\0';
-    for (fd = 0; fd < FD_SETSIZE; ++fd)
-        {if (FD_ISSET(fd, &rfs))
-            vstrcat(s, MAXLINE, " %d", fd);};
-
-    SLOG(sv, 4, "monitoring: %s", s);
-
-    return;}
+    return(fname);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* ADD_FD - add FD to the set in SV */
-
-static void add_fd(srvdes *sv, int fd)
-   {client *cl;
-    connection *srv;
-
-    cl  = (client *) sv->a;
-    srv = cl->scon;
-
-    FD_SET(fd, &srv->afs);
-    SLOG(sv, 1, "add fd %d", fd);
-
-    _check_fd(sv);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REMOVE_FD - add FD to the set in SV */
-
-static void remove_fd(srvdes *sv, int fd)
-   {client *cl;
-    connection *srv;
-
-    cl  = (client *) sv->a;
-    srv = cl->scon;
-
-    FD_CLR(fd, &srv->afs);
-    SLOG(sv, 1, "remove fd %d", fd);
-
-    _check_fd(sv);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _NEW_CONNECTION - make a new connection on SFD and add it to AFS */
-
-static void _new_connection(srvdes *sv)
-   {int fd;
-    socklen_t sz;
-    client *cl;
-    connection *srv;
-
-    cl  = (client *) sv->a;
-    srv = cl->scon;
-    sz  = sizeof(srv->sck);
-
-    fd = accept(srv->sfd, (struct sockaddr *) &srv->sck, &sz);
-    if (fd > 0)
-       add_fd(sv, fd);
-    else
-       {close(fd);
-	SLOG(sv, 1, "accept error - %s (%d)", strerror(errno), errno);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* ASYNC_SERVER - run a fully asynchronous server */
-
-void async_server(srvdes *sv)
-   {int fd, nr, ok;
-    fd_set rfs;
-    client *cl;
-    connection *srv;
-
-    cl  = (client *) sv->a;
-    srv = cl->scon;
-
-    if (listen(srv->sfd, 5) >= 0)
-       {int ng, nb, nbmax, dt, tmax;
-        struct timeval t;
-
-/* set idle timeout and idle interval
- * if no input comes in within the idle timeout window stop and return
- * have the select timeout at the idle interval
+/* NAME_LOG - make conventional LOG name from ROOT
+ *          - .../foo -> .../foo.log
  */
-	sv->setup(sv, &tmax, &dt);
 
-/* maximum number of consecutive 0 length reads
- * indicating dropped connection
- */
-	nb    = 0;
-	nbmax = 10;
+char *name_log(char *root)
+   {char *p;
+    static char log[MAXLINE];
 
-	ng = 0;
-	for (ok = TRUE; (ok == TRUE) && (ng < tmax) && (nb < nbmax); )
-	    {_check_fd(sv);
+    p = NULL;
 
-/* timeout the select every DT seconds */
-	     t.tv_sec  = dt;
-	     t.tv_usec = 0;
+    if (root == NULL)
+       root = cgetenv(TRUE, "PERDB_PATH");
 
-	     rfs = srv->afs;
-	     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, &t);
-	     if (nr > 0)
-	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
-		     {if (FD_ISSET(fd, &rfs))
-			 {SLOG(sv, 4, "data available on %d (server %d)",
-			       fd, srv->sfd);
+    if (root != NULL)
+       {snprintf(log, MAXLINE, "%s.log", root);
+	p = log;};
 
-/* new connection request */
-			  if (fd == srv->sfd)
-			     _new_connection(sv);
-
-/* data arriving on an existing connection */
-			  else
-			     {ok = sv->process(sv, fd);
-                              if (ok == -1)
-				 {ok = TRUE;
-				  remove_fd(sv, fd);
-				  nb++;}
-			      else
-				 nb = 0;
-
-			      sched_yield();};};};
-		  ng = 0;}
-	     else
-	        ng += dt;};
-
-	if (ok != TRUE)
-	   {SLOG(sv, 4, "done by command");}
-	else if (ng >= tmax)
-	   {SLOG(sv, 4, "done by time: %d >= %d", ng, tmax);}
-	else if (nb >= nbmax)
-	   {SLOG(sv, 4, "done by failed reads: %d >= %d", nb, nbmax);};}
-
-    else
-       SLOG(sv, 1, "async_server error (%s - %d)", strerror(errno), errno);
-
-    return;}
+    return(p);}
 
 /*--------------------------------------------------------------------------*/
 
-/*                            CLIENT SIDE ROUTINES                          */
+/*                           I/O CONNECTION ROUTINES                        */
 
 /*--------------------------------------------------------------------------*/
 
-/* SIGTIMEOUT - handle signals meant to timeout session */
+/* CL_LOGGER - log messages for the client CL */
 
-#ifdef IO_ALARM
+static void cl_logger(client *cl, int lvl, char *fmt, ...)
+   {char s[MAXLINE];
+    char *root, *wh, *flog;
 
-static jmp_buf
- cpu;
+    VA_START(fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
+    VA_END;
 
-static void sigtimeout(int sig)
-   {
+    wh   = C_OR_S(cl->type == CLIENT);
+    root = cl->root;
+    flog = name_log(root);
 
-    longjmp(cpu, 1);
+    log_activity(flog, svs.debug, lvl, wh, s);
 
     return;}
-
-#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -404,22 +275,298 @@ int comm_write(client *cl, char *s, int nc, int to)
     return(nb);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                            SERVER SIDE ROUTINES                          */
+
+/*--------------------------------------------------------------------------*/
+
+/* _CHECK_FD - verify/log fd set in SV */
+
+static void _check_fd(srvdes *sv)
+   {int fd;
+    char s[MAXLINE];
+    fd_set rfs;
+    client *cl;
+    connection *srv;
+
+    cl  = (client *) sv->a;
+    srv = cl->scon;
+    rfs = srv->afs;
+
+    s[0] = '\0';
+    for (fd = 0; fd < FD_SETSIZE; ++fd)
+        {if (FD_ISSET(fd, &rfs))
+            vstrcat(s, MAXLINE, " %d", fd);};
+
+    SLOG(sv, 4, "monitoring: %s", s);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ADD_FD - add FD to the set in SV */
+
+static void add_fd(srvdes *sv, int fd)
+   {client *cl;
+    connection *srv;
+
+    cl  = (client *) sv->a;
+    srv = cl->scon;
+
+    FD_SET(fd, &srv->afs);
+    SLOG(sv, 1, "add fd %d", fd);
+
+    _check_fd(sv);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* REMOVE_FD - add FD to the set in SV */
+
+static void remove_fd(srvdes *sv, int fd)
+   {client *cl;
+    connection *srv;
+
+    cl  = (client *) sv->a;
+    srv = cl->scon;
+
+    FD_CLR(fd, &srv->afs);
+    SLOG(sv, 1, "remove fd %d", fd);
+
+    _check_fd(sv);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _NEW_CONNECTION - make a new connection on SFD and add it to AFS */
+
+static void _new_connection(srvdes *sv)
+   {int fd;
+    socklen_t sz;
+    client *cl;
+    connection *srv;
+
+    cl  = (client *) sv->a;
+    srv = cl->scon;
+    sz  = sizeof(srv->sck);
+
+    fd = accept(srv->sfd, (struct sockaddr *) &srv->sck, &sz);
+    if (fd > 0)
+       add_fd(sv, fd);
+    else
+       {close(fd);
+	SLOG(sv, 1, "accept error - %s (%d)", strerror(errno), errno);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _TERM_CONNECTION - finish off client connection CL */
+
+static void _term_connection(srvdes *sv)
+   {int fd;
+    client *cl;
+
+    cl = (client *) sv->a;
+    fd = cl->cfd;
+
+    remove_fd(sv, fd);
+
+    cl->cfd = connect_close(fd, cl);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PROCCESS_ACT - process transactions in the server SV
+ *               - process input on client connection CL
+ *               - return -1 on error
+ *               -         0 on end of connection
+ *               -         1 if otherwise successful
+ */
+
+static int _process_act(srvdes *sv, int fd)
+   {int rv, nb, to;
+    char s[MAXLINE];
+    char **val;
+    client *cl;
+
+    cl = (client *) sv->a;
+    cl->cfd = fd;
+
+    to = 60;
+    rv = 1;
+
+    memset(s, 0, MAXLINE);
+
+    nb = comm_read(cl, s, MAXLINE, to);
+
+/* decide on the action to take */
+    if (nb <= 0)
+       rv = -1;
+
+    else
+       {val = NULL;
+
+/* request is not properly authenticated */
+	if (strncmp(s, "reject:", 7) == 0)
+	   val = lst_push(val, "rejected");
+
+/* client is exiting */
+	else if (strncmp(s, "fin:", 4) == 0)
+	   _term_connection(sv);
+
+/* quit session */
+	else if (strncmp(s, "quit:", 5) == 0)
+	   {rv  = 0;
+	    val = lst_push(val, "done");}
+
+	else
+	   val = sv->process(sv, s);
+
+	if (val != NULL)
+	   {int i, nv;
+
+	    nv = lst_length(val);
+	    for (i = 0; i < nv; i++)
+	        nb = comm_write(cl, val[i], 0, 10);
+	    nb = comm_write(cl, EOM, 0, 10);
+
+	    free_strings(val);
+
+	    if (rv < 1)
+	       unlink(cl->fcon);};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ASYNC_SERVER - run a fully asynchronous server */
+
+void async_server(srvdes *sv)
+   {int fd, nr, ok;
+    fd_set rfs;
+    client *cl;
+    connection *srv;
+
+    cl  = (client *) sv->a;
+    srv = cl->scon;
+
+    if (listen(srv->sfd, 5) >= 0)
+       {int ng, nb, nbmax, dt, tmax;
+        struct timeval t;
+
+/* set idle timeout and idle interval
+ * if no input comes in within the idle timeout window stop and return
+ * have the select timeout at the idle interval
+ */
+	sv->setup(sv, &tmax, &dt);
+
+/* maximum number of consecutive 0 length reads
+ * indicating dropped connection
+ */
+	nb    = 0;
+	nbmax = 10;
+
+	ng = 0;
+	for (ok = TRUE; (ok == TRUE) && (ng < tmax) && (nb < nbmax); )
+	    {_check_fd(sv);
+
+/* timeout the select every DT seconds */
+	     t.tv_sec  = dt;
+	     t.tv_usec = 0;
+
+	     rfs = srv->afs;
+	     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, &t);
+	     if (nr > 0)
+	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
+		     {if (FD_ISSET(fd, &rfs))
+			 {SLOG(sv, 4, "data available on %d (server %d)",
+			       fd, srv->sfd);
+
+/* new connection request */
+			  if (fd == srv->sfd)
+			     _new_connection(sv);
+
+/* data arriving on an existing connection */
+			  else
+			     {ok = _process_act(sv, fd);
+                              if (ok == -1)
+				 {ok = TRUE;
+				  remove_fd(sv, fd);
+				  nb++;}
+			      else
+				 nb = 0;
+
+			      sched_yield();};};};
+		  ng = 0;}
+	     else
+	        ng += dt;};
+
+	if (ok != TRUE)
+	   {SLOG(sv, 4, "done by command");}
+	else if (ng >= tmax)
+	   {SLOG(sv, 4, "done by time: %d >= %d", ng, tmax);}
+	else if (nb >= nbmax)
+	   {SLOG(sv, 4, "done by failed reads: %d >= %d", nb, nbmax);};}
+
+    else
+       SLOG(sv, 1, "async_server error (%s - %d)", strerror(errno), errno);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            CLIENT SIDE ROUTINES                          */
+
+/*--------------------------------------------------------------------------*/
+
+/* SIGTIMEOUT - handle signals meant to timeout session */
+
+#ifdef IO_ALARM
+
+static jmp_buf
+ cpu;
+
+static void sigtimeout(int sig)
+   {
+
+    longjmp(cpu, 1);
+
+    return;}
+
+#endif
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* MAKE_CLIENT - initialize and return a client connection instance */
 
 client *make_client(ckind type, int auth, char *root, 
 		    void (*clog)(client *cl, int lvl, char *fmt, ...))
-   {client *cl;
+   {char *fcon, *t;
+    client *cl;
     static connection global_srv;
 
     cl = MAKE(client);
     if (cl != NULL)
-       {cl->cfd    = -1;
+       {t = name_conn(root);
+	fcon = (t == NULL) ? NULL : STRSAVE(t);
+
+	cl->cfd    = -1;
         cl->auth   = auth;
 	cl->nkey   = 0;
 	cl->key    = NULL;
 	cl->root   = root;
+	cl->fcon   = fcon;
 	cl->type   = type;
         cl->a      = NULL;
 	cl->scon   = &global_srv;
@@ -446,10 +593,66 @@ void free_client(client *cl)
 
 	CLOG(cl, 1, "----- end client -----");
 
+	FREE(cl->fcon);
 	FREE(cl->key);
 	FREE(cl);};
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CLIENT_EX - do a transaction request REQ from the client side */
+
+char **client_ex(client *cl, char *req)
+   {int nb, ne, nx;
+    char **p;
+    static char s[MAXLINE];
+
+    p = NULL;
+
+    CLOG(cl, 1, "begin request |%s|", req);
+
+/* send the request */
+    nb = comm_write(cl, req, 0, 10);
+
+/* get the reply */
+    if (nb > 0)
+       {int nc, to, ok;
+	char *t;
+
+	ne = 0;
+	nx = 100;
+	to = 4;
+	for (ok = TRUE; ok == TRUE; )
+	    {nb = comm_read(cl, s, MAXLINE, to);
+	     ne = (nb < 0) ? ne+1 : 0;
+
+/* if more than NX consecutive read failures bail */
+	     if (ne >= nx)
+	        {p  = NULL;
+		 ok = FALSE;}
+
+	     else
+	        {for (t = s; nb > 0; t += nc, nb -= nc)
+		     {if (strcmp(t, EOM) == 0)
+			 {ok = FALSE;
+			  break;}
+		      else if (strcmp(t, "reject:") == 0)
+			 {p  = lst_push(p, "rejected");
+			  ok = FALSE;
+			  break;}
+		      else
+			 p = lst_push(p, t);
+
+		      nc = strlen(t) + 1;};
+
+		 if (ok == TRUE)
+		    nsleep(0);};};};
+
+    CLOG(cl, 1, "end request");
+
+    return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

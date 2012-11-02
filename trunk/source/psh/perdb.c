@@ -16,14 +16,16 @@
 /* SIGDONE - handle signals meant to end session */
 
 static void sigdone(int sig)
-   {database *db;
+   {client *cl;
+    database *db;
 
-    db = (database *) svs.cl->a;
+    cl = svs.cl;
+    db = (database *) cl->a;
     if (db != NULL)
-       {CLOG(svs.cl, 4, "signalled %d - done", sig);
-	close_sock(svs.cl);
+       {CLOG(cl, 4, "signalled %d - done", sig);
+	close_sock(cl);
 	db_srv_save(-1, db);
-	unlink_safe(db->fcon);};
+	unlink_safe(cl->fcon);};
 
     exit(sig);
 
@@ -209,24 +211,6 @@ static void srv_setup(srvdes *sv, int *ptmax, int *pdt)
 
     if (pdt != NULL)
        *pdt = dt;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* TERM_CONNECTION - finish off client connection CL */
-
-static void term_connection(srvdes *sv)
-   {int fd;
-    client *cl;
-
-    cl = (client *) sv->a;
-    fd = cl->cfd;
-
-    remove_fd(sv, fd);
-
-    cl->cfd = connect_close(fd, cl);
 
     return;}
 
@@ -534,58 +518,27 @@ static char **do_var_acc(database *db, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SRV_PROCCESS - process transactions in the server SV
- *              - process input on client connection CL
- *              - return -1 on error
- *              -         0 on end of connection
- *              -         1 if otherwise successful
+/* SRV_PROCCESS - process transaction request S in the server SV
+ *              - on client connection CL
+ *              - return the response strings in VAL
  */
 
-static int srv_process(srvdes *sv, int fd)
-   {int rv, nb, to;
-    char s[MAXLINE];
-    char **val;
+static char **srv_process(srvdes *sv, char *s)
+   {char **val;
     database *db;
     client *cl;
 
-    cl = (client *) sv->a;
-    cl->cfd = fd;
+    val = NULL;
 
-    db = (database *) cl->a;
+    if ((sv != NULL) && (s != NULL))
+       {cl = (client *) sv->a;
+	db = (database *) cl->a;
 
-    to = 60;
-    rv = 1;
-
-    memset(s, 0, MAXLINE);
-
-    nb = comm_read(cl, s, MAXLINE, to);
-
-/* decide on the action to take */
-    if (nb <= 0)
-       rv = -1;
-
-    else
-       {val = NULL;
-
-/* request is not properly authenticated */
-	if (strncmp(s, "reject:", 7) == 0)
-	   val = lst_push(val, "rejected");
-
-/* client is exiting */
-	else if (strncmp(s, "fin:", 4) == 0)
-	   term_connection(sv);
-
-/* load database */
-	else if (strncmp(s, "load:", 5) == 0)
-           val = lst_push(val, do_load(cl, s+5));
-
-/* quit session */
-	else if (strncmp(s, "quit:", 5) == 0)
-	   {rv  = 0;
-	    val = lst_push(val, "done");}
+	if (strncmp(s, "load:", 5) == 0)
+	   val = lst_push(val, do_load(cl, s+5));
 
 /* reset database */
-        else if (strncmp(s, "reset:", 6) == 0)
+	else if (strncmp(s, "reset:", 6) == 0)
 	   {reset_db(db);
 	    val = lst_push(val, "reset");}
 
@@ -594,22 +547,9 @@ static int srv_process(srvdes *sv, int fd)
 	   val = lst_push(val, do_save(db, s+5));
 
 	else
-	   val = do_var_acc(db, s);
+	   val = do_var_acc(db, s);};
 
-	if (val != NULL)
-	   {int i, nv;
-
-	    nv = lst_length(val);
-	    for (i = 0; i < nv; i++)
-	        nb = comm_write(cl, val[i], 0, 10);
-	    nb = comm_write(cl, EOM, 0, 10);
-
-	    free_strings(val);
-
-	    if (rv < 1)
-	       unlink(db->fcon);};};
-
-    return(rv);}
+    return(val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
