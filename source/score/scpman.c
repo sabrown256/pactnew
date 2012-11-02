@@ -378,7 +378,21 @@ static void _SC_rl_process(PROCESS *pp)
 	CFREE(pp->start_time);
 	CFREE(pp->stop_time);
 	CFREE(pp->spty);
+
+#if 1
+        io_ring *ring;
+
+	ring = &pp->ior;
+	CFREE(ring->in_ring);
+        ring->nb_ring = 0L;
+        ring->ib_in   = 0L;
+        ring->ob_in   = 0L;
+#else
 	CFREE(pp->in_ring);
+        pp->nb_ring = 0L;
+        pp->ib_in   = 0L;
+        pp->ob_in   = 0L;
+#endif
 
         pp->status    = -1;
         pp->reason    = -1;
@@ -389,9 +403,6 @@ static void _SC_rl_process(PROCESS *pp)
         pp->io[1]     = -1;
         pp->io[2]     = -1;
         pp->data      = -1;
-        pp->nb_ring   = 0L;
-        pp->ib_in     = 0L;
-        pp->ob_in     = 0L;
         pp->ischild   = -1;
         pp->flags     = -1;
         pp->data_type = SC_UNKNOWN;

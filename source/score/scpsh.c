@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "score_int.h" 
+#define SC_INCLUDE_PSH
 
 /* variables */
 #define _assert_fail            _PS_assert_fail
@@ -79,6 +79,7 @@
 #define cgetenv 		PS_cgetenv
 #define cinitenv 		PS_cinitenv
 #define clean_space 		PS_clean_space
+#define client_ex 		PS_client_ex
 #define close_parent_child 	PS_close_parent_child
 #define close_sock 		PS_close_sock
 #define cmpenv 			PS_cmpenv
@@ -206,6 +207,9 @@
 #define register_io_pgrp 	PS_register_io_pgrp
 #define report_info 		PS_report_info
 #define reset_db 		PS_reset_db
+#define ring_pop 		PS_ring_pop
+#define ring_push 		PS_ring_push
+#define ring_ready 		PS_ring_ready
 #define run 			PS_run
 #define save_db 		PS_save_db
 #define separator 		PS_separator
@@ -236,14 +240,33 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#include "score_int.h" 
+
+#define IO_RING_DEFINED
+
 #include "../psh/common.h"
+
+#undef MAKE
+#undef MAKE_N
+#undef REMAKE
+#undef FREE
+#undef STRSAVE
+
+#define MAKE(_t)             CMAKE(_t)
+#define MAKE_N(_t, _n)       CMAKE_N(_t, _n)
+#define REMAKE(_p, _t, _n)   CREMAKE(_p, _t, _n)
+#define FREE(_p)             CFREE(_p)
+#define STRSAVE(_s)          CSTRSAVE(_s)
+
 #include "../psh/network.h"
+#include "../psh/libio.c"
 #include "../psh/libpsh.c"
 #include "../psh/libtime.c"
 #include "../psh/libasync.c"
 #include "../psh/libeval.c"
-#include "../psh/libdb.c"
 #include "../psh/libsock.c"
+#include "../psh/libsrv.c"
+#include "../psh/libdb.c"
 #include "../psh/libpgrp.c"
 #include "../psh/libinfo.c"
 
