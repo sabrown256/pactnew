@@ -31,11 +31,11 @@
 #undef FREE
 #undef STRSAVE
 
-#define MAKE(_t)          ((_t *) malloc(sizeof(_t)))
-#define MAKE_N(_t, _n)    ((_t *) calloc(_n, sizeof(_t)))
-#define REMAKE(p, _t, n)  (p = (_t *) realloc((void *) p, (n)*sizeof(_t)))
-#define FREE(_p)          {if (_p != NULL) free(_p); _p = NULL;}
-#define STRSAVE(_s)       nstrsave(_s)
+#define MAKE(_t)            ((_t *) malloc(sizeof(_t)))
+#define MAKE_N(_t, _n)      ((_t *) calloc(_n, sizeof(_t)))
+#define REMAKE(_p, _t, _n)  (_p = (_t *) realloc((void *) _p, (_n)*sizeof(_t)))
+#define FREE(_p)            {if (_p != NULL) free(_p); _p = NULL;}
+#define STRSAVE(_s)         nstrsave(_s)
 
 #undef ASSERT
 #define ASSERT(_t)        {if (_t) _assert_fail++;}

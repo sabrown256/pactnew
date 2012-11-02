@@ -118,8 +118,16 @@ void _SC_exec_test(char **argv, char **envp, char *mode)
 #ifdef HAVE_PROCESS_CONTROL
 
 static int _SC_complete_messagep(PROCESS *pp)
-   {unsigned int nb, ob, ls;
+   {int rv;
+
+#if 1
+    rv = PS_ring_ready(&pp->ior, pp->line_sep);
+#else
+
+    unsigned int nb, ob, ls;
     unsigned char *ring, c;
+
+    rv = FALSE;
 
     ob   = pp->ob_in;
     nb   = pp->nb_ring;
@@ -130,8 +138,9 @@ static int _SC_complete_messagep(PROCESS *pp)
        {ob = (ob + 1) % nb;
         if ((c == ls) || (c == (unsigned char) EOF))
            return(TRUE);};
+#endif
 
-    return(FALSE);}
+    return(rv);}
 
 #endif
 
@@ -296,12 +305,25 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
     pp->gone        = -1;
     pp->data_type   = SC_UNKNOWN;
 
-    pp->nb_ring     = nb;
-    pp->in_ring     = CMAKE_N(unsigned char, nb);
-    pp->ib_in       = 0;
-    pp->ob_in       = 0;
+#if 1
+    io_ring *ring;
+
+    ring = &pp->ior;
+
+    ring->nb_ring = nb;
+    ring->in_ring = CMAKE_N(unsigned char, nb);
+    ring->ib_in   = 0;
+    ring->ob_in   = 0;
+
+    memset(ring->in_ring, 0, nb);
+#else
+    pp->nb_ring = nb;
+    pp->in_ring = CMAKE_N(unsigned char, nb);
+    pp->ib_in   = 0;
+    pp->ob_in   = 0;
 
     memset(pp->in_ring, 0, nb);
+#endif
 
     pp->type        = SC_LOCAL;
     pp->rcpu        = -1;
@@ -1520,7 +1542,13 @@ PROCESS *SC_open_remote(char *host, char *cmnd,
  */
 
 int SC_buffer_in(char *bf, int n, PROCESS *pp)
-   {int i;
+   {int rv;
+
+#if 1
+    rv = PS_ring_push(&pp->ior, bf, n);
+#else
+
+    int i;
     unsigned int ib, ob, ab, db, mb, nb, nnb;
     unsigned char *ring, *po, *pn;
 
@@ -1568,7 +1596,10 @@ int SC_buffer_in(char *bf, int n, PROCESS *pp)
 
         pp->ib_in = ib;};
 
-    return(TRUE);}
+    rv = TRUE;
+#endif
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1576,7 +1607,13 @@ int SC_buffer_in(char *bf, int n, PROCESS *pp)
 /* SC_BUFFER_OUT - return the oldest message from the ring in BF */
 
 int SC_buffer_out(char *bf, PROCESS *pp, int n, int binf)
-   {int i, ok;
+   {int i;
+
+#if 1
+    i = PS_ring_pop(&pp->ior, bf, n, pp->line_sep);
+
+#else
+    int ok;
     unsigned int ib, nb, ob, ls;
     unsigned char *ring, c;
     char *pbf;
@@ -1604,6 +1641,7 @@ int SC_buffer_out(char *bf, PROCESS *pp, int n, int binf)
        *pbf++ = '\0';
 
     pp->ob_in = ob;
+#endif
 
     return(i);}
 
