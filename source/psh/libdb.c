@@ -15,15 +15,12 @@
 #include "libsrv.c"
 #include "libhash.c"
 
-#define EOM     "++ok++"
-
 typedef struct s_database database;
 typedef struct s_vardes vardes;
 
 struct s_database
    {char *file;                 /* name of the file image of the database */
     char *flog;                 /* name of the log file */
-    char *fcon;                 /* name of the connection file */
     hashtab *tab;
     client *cl;};
 
@@ -32,31 +29,6 @@ struct s_vardes
     database *db;
     char **vars;
     FILE *fp;};
-
-extern char
- *name_log(char *root);
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NAME_LOG - make conventional LOG name from ROOT
- *          - .../foo -> .../foo.log
- */
-
-char *name_log(char *root)
-   {char *p;
-    static char log[MAXLINE];
-
-    p = NULL;
-
-    if (root == NULL)
-       root = cgetenv(TRUE, "PERDB_PATH");
-
-    if (root != NULL)
-       {snprintf(log, MAXLINE, "%s.log", root);
-	p = log;};
-
-    return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -69,39 +41,6 @@ char *name_db(char *root)
     snprintf(fname, MAXLINE, "%s.db", root);
 
     return(fname);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NAME_CONN - derive the name of the connection file from ROOT */
-
-char *name_conn(char *root)
-   {static char fname[MAXLINE];
-
-    snprintf(fname, MAXLINE, "%s.conn", root);
-
-    return(fname);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* CL_LOGGER - log messages for the client CL */
-
-static void cl_logger(client *cl, int lvl, char *fmt, ...)
-   {char s[MAXLINE];
-    char *root, *wh, *flog;
-
-    VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
-    VA_END;
-
-    wh   = C_OR_S(cl->type == CLIENT);
-    root = cl->root;
-    flog = name_log(root);
-
-    log_activity(flog, svs.debug, lvl, wh, s);
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -120,7 +59,7 @@ static int _db_srv_launch(client *cl)
 
     if (cl != NULL)
        {root = cl->root;
-	fcon = name_conn(root);
+	fcon = cl->fcon;
 
 	st   = 0;
 	s[0] = '\0';
@@ -168,62 +107,17 @@ static int _db_srv_launch(client *cl)
 /* _DB_CLNT_EX - do a transaction from the client side of the database */
 
 char **_db_clnt_ex(client *cl, int init, char *req)
-   {int nb, ne, nx;
-    char **p;
-    static char s[MAXLINE];
+   {char **p, *root;
 
     if (cl == NULL)
-       {char *root;
-
-        root = cgetenv(TRUE, "PERDB_PATH");
+       {root = cgetenv(TRUE, "PERDB_PATH");
 	cl   = make_client(CLIENT, FALSE, root, cl_logger);};
-
-    p = NULL;
-
-    CLOG(cl, 1, "begin request |%s|", req);
 
 /* make sure that there is a server running */
     if (init == TRUE)
        _db_srv_launch(cl);
 
-/* send the request */
-    nb = comm_write(cl, req, 0, 10);
-
-/* get the reply */
-    if (nb > 0)
-       {int nc, to, ok;
-	char *t;
-
-	ne = 0;
-	nx = 100;
-	to = 4;
-	for (ok = TRUE; ok == TRUE; )
-	    {nb = comm_read(cl, s, MAXLINE, to);
-	     ne = (nb < 0) ? ne+1 : 0;
-
-/* if more than NX consecutive read failures bail */
-	     if (ne >= nx)
-	        {p  = NULL;
-		 ok = FALSE;}
-
-	     else
-	        {for (t = s; nb > 0; t += nc, nb -= nc)
-		     {if (strcmp(t, EOM) == 0)
-			 {ok = FALSE;
-			  break;}
-		      else if (strcmp(t, "reject:") == 0)
-			 {p  = lst_push(p, "rejected");
-			  ok = FALSE;
-			  break;}
-		      else
-			 p = lst_push(p, t);
-
-		      nc = strlen(t) + 1;};
-
-		 if (ok == TRUE)
-		    nsleep(0);};};};
-
-    CLOG(cl, 1, "end request");
+    p = client_ex(cl, req);
 
     return(p);}
 
@@ -817,7 +711,7 @@ void load_db(database *db, char *vr, FILE *fp)
 /* MAKE_DB - initialize the DB */
 
 static database *make_db(client *cl, int dbg, int auth)
-   {char *fname, *flog, *fcon, *root, *t;
+   {char *fname, *flog, *root, *t;
     database *db;
 
     db = NULL;
@@ -831,20 +725,15 @@ static database *make_db(client *cl, int dbg, int auth)
 	t = name_db(root);
 	fname = (t == NULL) ? NULL : STRSAVE(t);
 
-	t = name_conn(root);
-	fcon = (t == NULL) ? NULL : STRSAVE(t);
-
 	db = MAKE(database);
 	if (db != NULL)
 	   {db->file  = fname;
 	    db->flog  = flog;
-	    db->fcon  = fcon;
 	    db->tab   = make_hash_table(-1);
 	    db->cl    = cl;}
 	else
 	   {FREE(flog);
-	    FREE(fname);
-	    FREE(fcon);};};
+	    FREE(fname);};};
 
     return(db);}
 
@@ -858,10 +747,9 @@ void free_db(database *db)
 
     if (db != NULL)
        {hash_free(db->tab);
-
+	free_client(db->cl);
 	FREE(db->file);
 	FREE(db->flog);
-	FREE(db->fcon);
 	FREE(db);};
 
     return;}
@@ -919,7 +807,7 @@ int db_srv_open(client *cl, int init, int dbg, int auth)
 	cl->a = db;
 
 /* if a server is already running there will be a PID file */
-	if ((db->fcon != NULL) && (file_exists(db->fcon) == FALSE))
+	if ((cl->fcon != NULL) && (file_exists(cl->fcon) == FALSE))
 	   rv = open_server(cl, SERVER, cl->auth);
 
 	else
@@ -943,7 +831,7 @@ void db_srv_close(database *db)
     if (db != NULL)
        {close_sock(db->cl);
 
-	unlink_safe(db->fcon);
+	unlink_safe(db->cl->fcon);
 
 	free_db(db);};
 

@@ -48,6 +48,7 @@ struct s_client
     int nkey;
     char *key;
     char *root;
+    char *fcon;                 /* name of the connection file */
     ckind type;
     void *a;
     connection *scon;
