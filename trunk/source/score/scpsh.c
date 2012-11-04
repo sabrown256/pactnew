@@ -208,6 +208,8 @@
 #define register_io_pgrp 	PS_register_io_pgrp
 #define report_info 		PS_report_info
 #define reset_db 		PS_reset_db
+#define ring_clear 		PS_ring_clear
+#define ring_init 		PS_ring_init
 #define ring_pop 		PS_ring_pop
 #define ring_push 		PS_ring_push
 #define ring_ready 		PS_ring_ready
