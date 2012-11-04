@@ -47,11 +47,13 @@
 
 #ifndef LIBPGRP
 
-#define LIBPGRP
+# define LIBPGRP
 
-#include "common.h"
-#include "libtime.c"
-#include "libasync.c"
+# include "common.h"
+# include "libtime.c"
+# include "libasync.c"
+
+# ifndef SCOPE_SCORE_COMPILE
 
 #define PROCESS_DELIM   '@'
 #define PIPE_DELIM      "|"
@@ -92,6 +94,9 @@ struct s_process_session
     int interactive;                /* TRUE iff interactive session */
     int foreground;                 /* TRUE iff current job is foreground */
     struct termios attr;};          /* terminal attributes */
+
+# endif
+# ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2676,4 +2681,5 @@ int gexec_file(char *db, io_mode md, FILE **fio,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif

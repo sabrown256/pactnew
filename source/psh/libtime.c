@@ -9,12 +9,17 @@
 
 #ifndef LIBTIME
 
-#define LIBTIME
+# define LIBTIME
 
-#include "common.h"
+# include "common.h"
+
+# ifndef SCOPE_SCORE_COMPILE
 
 #define TIME_SEC     500
 #define TIME_HMS     501
+
+# endif
+# ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -69,4 +74,5 @@ char *time_string(char *ts, int nc, int fmt, double t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif
