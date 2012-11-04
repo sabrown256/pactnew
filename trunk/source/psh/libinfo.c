@@ -22,10 +22,14 @@
 #undef REGEX
 #undef VERS
 
+# ifndef PCK_SCOPE_PSH
+
 enum e_itarget
    {INCL, LINK, REGEX, VERS};
 
 typedef enum e_itarget itarget;
+
+# endif
 
 typedef struct s_infodes infodes;
 

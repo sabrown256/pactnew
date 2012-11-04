@@ -306,16 +306,7 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
     pp->data_type   = SC_UNKNOWN;
 
 #if 1
-    io_ring *ring;
-
-    ring = &pp->ior;
-
-    ring->nb_ring = nb;
-    ring->in_ring = CMAKE_N(unsigned char, nb);
-    ring->ib_in   = 0;
-    ring->ob_in   = 0;
-
-    memset(ring->in_ring, 0, nb);
+    PS_ring_init(&pp->ior, nb);
 #else
     pp->nb_ring = nb;
     pp->in_ring = CMAKE_N(unsigned char, nb);

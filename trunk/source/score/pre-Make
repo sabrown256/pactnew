@@ -198,7 +198,8 @@ ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h
 ${Objs}  : ${Hdrs} ${hdrf}
 
-${LibDep} : ${hdrf} ${Hdrs}
+#${LibDep} : ${hdrf} ${HDrs}
+${LibDep} : ${hdrf} ${TGTInc}
 ${MMDep}  : ${Hdrs}
 
 #

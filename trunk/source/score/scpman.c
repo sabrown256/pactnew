@@ -380,13 +380,7 @@ static void _SC_rl_process(PROCESS *pp)
 	CFREE(pp->spty);
 
 #if 1
-        io_ring *ring;
-
-	ring = &pp->ior;
-	CFREE(ring->in_ring);
-        ring->nb_ring = 0L;
-        ring->ib_in   = 0L;
-        ring->ob_in   = 0L;
+	PS_ring_clear(&pp->ior);
 #else
 	CFREE(pp->in_ring);
         pp->nb_ring = 0L;

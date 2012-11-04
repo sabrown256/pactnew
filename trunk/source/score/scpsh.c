@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#if !defined(PSH_NEWWAY)
+#if !defined(PSH_OLDWAY)
 #define SC_INCLUDE_PSH
 #endif
 
@@ -247,7 +247,7 @@
 
 #include "score_int.h" 
 
-#if defined(PSH_NEWWAY)
+#if defined(PSH_OLDWAY)
 #define IO_RING_DEFINED
 
 #include "../psh/common.h"
@@ -280,7 +280,6 @@
 #define FREE(_p)             CFREE(_p)
 #define STRSAVE(_s)          CSTRSAVE(_s)
 
-#if defined(PSH_NEWWAY)
 #include <network.h>
 #include <shell/libio.c>
 #include <shell/libpsh.c>
@@ -293,19 +292,6 @@
 #include <shell/libdb.c>
 #include <shell/libpgrp.c>
 #include <shell/libinfo.c>
-#else
-#include "../psh/network.h"
-#include "../psh/libio.c"
-#include "../psh/libpsh.c"
-#include "../psh/libtime.c"
-#include "../psh/libasync.c"
-#include "../psh/libeval.c"
-#include "../psh/libsock.c"
-#include "../psh/libsrv.c"
-#include "../psh/libdb.c"
-#include "../psh/libpgrp.c"
-#include "../psh/libinfo.c"
-#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
