@@ -8,7 +8,9 @@
 
 #include "cpyright.h"
 
+#if !defined(PSH_NEWWAY)
 #define SC_INCLUDE_PSH
+#endif
 
 /* variables */
 #define _assert_fail            _PS_assert_fail
@@ -245,9 +247,26 @@
 
 #include "score_int.h" 
 
+#if defined(PSH_NEWWAY)
 #define IO_RING_DEFINED
 
 #include "../psh/common.h"
+#else
+#undef SCOPE_SCORE_PREPROC
+#undef LIBIO
+#undef LIBPSH
+#undef LIBHASH
+#undef LIBTIME
+#undef LIBASYNC
+#undef LIBEVAL
+#undef LIBSOCK
+#undef LIBSRV
+#undef LIBDB
+#undef LIBPGRP
+#undef LIBINFO
+
+#define SCOPE_SCORE_COMPILE
+#endif
 
 #undef MAKE
 #undef MAKE_N
@@ -261,6 +280,20 @@
 #define FREE(_p)             CFREE(_p)
 #define STRSAVE(_s)          CSTRSAVE(_s)
 
+#if defined(PSH_NEWWAY)
+#include <network.h>
+#include <shell/libio.c>
+#include <shell/libpsh.c>
+#include <shell/libhash.c>
+#include <shell/libtime.c>
+#include <shell/libasync.c>
+#include <shell/libeval.c>
+#include <shell/libsock.c>
+#include <shell/libsrv.c>
+#include <shell/libdb.c>
+#include <shell/libpgrp.c>
+#include <shell/libinfo.c>
+#else
 #include "../psh/network.h"
 #include "../psh/libio.c"
 #include "../psh/libpsh.c"
@@ -272,6 +305,7 @@
 #include "../psh/libdb.c"
 #include "../psh/libpgrp.c"
 #include "../psh/libinfo.c"
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
