@@ -10,7 +10,9 @@
 
 #ifndef LIBINFO
 
-#define LIBINFO
+# define LIBINFO
+
+# ifndef SCOPE_SCORE_COMPILE
 
 #undef MAXLINE
 #define MAXLINE 4096
@@ -31,6 +33,9 @@ struct s_infodes
    {int complete;
     int literal;
     char root[MAXLINE];};
+
+# endif
+# ifndef SCOPE_SCORE_PREPROC
 
 int system();
 char *getenv();
@@ -273,4 +278,5 @@ int build_makefile(char *root, char *arch, char *mkfile, int vrb)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif

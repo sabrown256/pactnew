@@ -10,9 +10,11 @@
 
 #ifndef LIBSOCK
 
-#define LIBSOCK
+# define LIBSOCK
 
-#include "network.h"
+# include "network.h"
+
+# ifndef SCOPE_SCORE_COMPILE
 
 #define NATTEMPTS   3
 #define N_AKEY      32
@@ -53,6 +55,9 @@ struct s_client
     void *a;
     connection *scon;
     void (*clog)(client *cl, int lvl, char *fmt, ...);};
+
+# endif
+# ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -588,4 +593,5 @@ int write_sock(client *cl, char *s, int nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif

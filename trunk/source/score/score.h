@@ -417,6 +417,7 @@ union u_SC_address
     char *memaddr;};
 
 /* NOTE: this is duplicate of struct in psh/libio.c */
+#define IO_RING_DEFINED
 
 typedef struct s_io_ring io_ring;
 

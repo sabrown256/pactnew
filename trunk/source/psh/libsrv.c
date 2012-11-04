@@ -10,11 +10,14 @@
 
 #ifndef LIBSRV
 
-#define LIBSRV
+# define LIBSRV
 
-#include "common.h"
-#include "libpsh.c"
-#include "libsock.c"
+# include "common.h"
+# include "libpsh.c"
+# include "libio.c"
+# include "libsock.c"
+
+# ifndef SCOPE_SCORE_COMPILE
 
 #define EOM     "++ok++"
 
@@ -39,6 +42,9 @@ struct s_svr_session
     int auth;
     int daemon;
     client *cl;};
+
+# endif
+# ifndef SCOPE_SCORE_PREPROC
 
 static svr_session
   svs = { FALSE, FALSE, FALSE, FALSE, NULL };
@@ -85,7 +91,7 @@ char *name_log(char *root)
 
 /* CL_LOGGER - log messages for the client CL */
 
-static void cl_logger(client *cl, int lvl, char *fmt, ...)
+void cl_logger(client *cl, int lvl, char *fmt, ...)
    {char s[MAXLINE];
     char *root, *wh, *flog;
 
@@ -200,7 +206,20 @@ int comm_read(client *cl, char *s, int nc, int to)
    {int nb, nk, no, nt, ok;
     char *p, *t;
 
+#if 0
+    if (cl->type == CLIENT)
+       {char u[LRG];
+
+	for (nb = 0; nb == 0; )
+	    {nb = ring_pop(&cl->ior, s, nc, '\0');
+	     if (nb == 0)
+	        {nt = _comm_read_wrk(cl, u, LRG, to);
+		 ok = ring_push(&cl->ior, u, nt);};};}
+    else
+       nb = _comm_read_wrk(cl, s, nc, to);
+#else
     nb = _comm_read_wrk(cl, s, nc, to);
+#endif
 
     no = 0;
     nk = cl->nkey;
@@ -657,4 +676,5 @@ char **client_ex(client *cl, char *req)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif

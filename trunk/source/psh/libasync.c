@@ -94,10 +94,12 @@
 
 #ifndef LIBASYNC
 
-#define LIBASYNC
+# define LIBASYNC
 
-#include "common.h"
-#include "network.h"
+# include "common.h"
+# include "network.h"
+
+# ifndef SCOPE_SCORE_COMPILE
 
 #define JOB_NOT_FINISHED    -1000
 #define N_IO_CHANNELS       3
@@ -248,6 +250,9 @@ struct process_group_state
     process_stack stck;
     sigjmp_buf cpu;};
 #endif
+
+# endif
+# ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
 
@@ -2113,4 +2118,5 @@ void afin(void (*f)(process *pp, void *a))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif
