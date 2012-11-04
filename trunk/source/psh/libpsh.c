@@ -60,6 +60,9 @@ static dir_stack
 static int
  db_log_level = 1;
 
+int
+ _assert_fail = 0;
+
 extern void
  unamef(char *s, int nc, char *wh);
 
