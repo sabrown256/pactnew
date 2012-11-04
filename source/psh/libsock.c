@@ -54,6 +54,7 @@ struct s_client
     ckind type;
     void *a;
     connection *scon;
+    io_ring ior;
     void (*clog)(client *cl, int lvl, char *fmt, ...);};
 
 # endif

@@ -7,12 +7,13 @@
 
 #ifndef LIBIO
 
-#define LIBIO
+# define LIBIO
 
-#include "common.h"
-#include "libpsh.c"
+# include "common.h"
+# include "libpsh.c"
 
-#ifndef IO_RING_DEFINED
+# ifndef SCOPE_SCORE_COMPILE
+#  ifndef IO_RING_DEFINED
 
 typedef struct s_io_ring io_ring;
 
@@ -22,7 +23,43 @@ struct s_io_ring
     unsigned int nb_ring;
     unsigned char *in_ring;};
 
-#endif
+#  endif
+# endif
+# ifndef SCOPE_SCORE_PREPROC
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* RING_INIT - initialize the io_ring RING with an NB bytes long buffer */
+
+int ring_init(io_ring *ring, unsigned int nb)
+   {
+
+    if (ring != NULL)
+       {ring->nb_ring = nb;
+	ring->in_ring = MAKE_N(unsigned char, nb);
+	ring->ib_in   = 0;
+	ring->ob_in   = 0;
+
+	memset(ring->in_ring, 0, nb);};
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* RING_CLEAR - clear out the io_ring RING */
+
+int ring_clear(io_ring *ring)
+   {
+
+    if (ring != NULL)
+       {FREE(ring->in_ring);
+	ring->nb_ring = 0;
+	ring->ib_in   = 0;
+	ring->ob_in   = 0;};
+
+    return(TRUE);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -155,4 +192,5 @@ int ring_pop(io_ring *ring, char *s, int nc, unsigned int ls)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif
