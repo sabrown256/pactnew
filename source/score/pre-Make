@@ -13,7 +13,7 @@ LibName=score
 
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTInc = ${Hdrs} sclexan.h scope_mem.h scope_proc.h \
-         scope_term.h scope_mpi.h scope_make.h \
+         scope_term.h scope_mpi.h scope_make.h scope_psh.h \
          scope_exe.h scope_lex.h scope_thread.h
 
 MMLib = ${LibDir}/libpsmm.a

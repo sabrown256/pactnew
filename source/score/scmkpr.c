@@ -15,9 +15,9 @@
 
 #define DEFAULT_BARRIER   "@sync"
 
-typedef struct s_vardes vardes;
+typedef struct s_mkvdes mkvdes;
 
-struct s_vardes
+struct s_mkvdes
    {int line;
     char *text;};
 
@@ -30,15 +30,15 @@ struct s_vardes
 /* _SC_VAR_INSTALL - install variable NAME with value VAL in STATE */
 
 void _SC_var_install(anadep *state, char *name, char *val, int line)
-   {vardes *vd;
+   {mkvdes *vd;
 
     vd = SC_hasharr_def_lookup(state->variables, name);
     if ((vd == NULL) || (vd->line != -2))
-       {vd = CMAKE(vardes);
+       {vd = CMAKE(mkvdes);
 	vd->line = line;
 	vd->text = CSTRSAVE(val);
 
-	SC_hasharr_install(state->variables, name, vd, "vardes", 3, -1);};
+	SC_hasharr_install(state->variables, name, vd, "mkvdes", 3, -1);};
 
     if (state->show_vars)
        {switch (line)
@@ -64,7 +64,7 @@ void _SC_var_install(anadep *state, char *name, char *val, int line)
 
 char *_SC_var_lookup(anadep *state, char *name)
    {char *vl;
-    vardes *vd;
+    mkvdes *vd;
 
     vd = SC_hasharr_def_lookup(state->variables, name);
     vl = (vd != NULL) ? vd->text : NULL;
@@ -74,10 +74,10 @@ char *_SC_var_lookup(anadep *state, char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_FREE_VARDES - free a variable table entry */
+/* _SC_FREE_MKVDES - free a variable table entry */
 
-static int _SC_free_vardes(haelem *hp, void *a)
-   {vardes *vd;
+static int _SC_free_mkvdes(haelem *hp, void *a)
+   {mkvdes *vd;
 
     vd = hp->def;
 
@@ -97,7 +97,7 @@ static void _SC_free_variables(anadep *state)
    {
 
     if (state->variables != NULL)
-       {SC_free_hasharr(state->variables, _SC_free_vardes, NULL);
+       {SC_free_hasharr(state->variables, _SC_free_mkvdes, NULL);
 
 	state->variables = NULL;};
 
