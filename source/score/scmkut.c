@@ -15,14 +15,6 @@
 #include "score_int.h"
 #include "scope_make.h"
 
-/* get report_info from psh routines which supply
- * smake, dmake, and pact-info
- */
-#define NO_STD_INCLUDES
-#include <../psh/common.h>
-#include <../psh/libpsh.c>
-#include <../psh/libinfo.c>
-
 static int
  debug = FALSE,
  phase = 0;
@@ -420,7 +412,7 @@ int main(int c, char **v, char **env)
              na = 1;}
 	 else if (strcmp(v[i], "-B") == 0)
 	    {snprintf(mkfile, MAXLINE, "%s/Makefile", state->arch);
-	     st = build_makefile(state->root, state->arch, mkfile, TRUE);
+	     st = PS_build_makefile(state->root, state->arch, mkfile, TRUE);
 	     return(st);}
 	 else if (strcmp(v[i], "-cmd") == 0)
 	    {mkname = ".command";
@@ -445,25 +437,25 @@ int main(int c, char **v, char **env)
          else if (strcmp(v[i], "-i") == 0)
 	    ignore = TRUE;
 	 else if (strcmp(v[i], "-incpath") == 0)
-	    {report_info(state->root, state->complete, state->literal,
-			 INCL, NULL);
+	    {PS_report_info(state->root, state->complete, state->literal,
+			    INCL, NULL);
 	     return(0);}
 	 else if (strcmp(v[i], "-info") == 0)
 	    {if (++i < c)
-	        report_info(state->root, state->complete, state->literal,
-			    REGEX, v[i]);
+	        PS_report_info(state->root, state->complete, state->literal,
+			       REGEX, v[i]);
 	     return(0);}
 	 else if (strcmp(v[i], "+info") == 0)
 	    {if (++i < c)
 	        {state->complete = TRUE;
-		 report_info(state->root, state->complete, state->literal,
-			     REGEX, v[i]);};
+		 PS_report_info(state->root, state->complete, state->literal,
+				REGEX, v[i]);};
 	     return(0);}
          else if (strcmp(v[i], "+l") == 0)
 	    state->literal = TRUE;
 	 else if (strcmp(v[i], "-link") == 0)
-	    {report_info(state->root, state->complete, state->literal,
-			 LINK, NULL);
+	    {PS_report_info(state->root, state->complete, state->literal,
+			    LINK, NULL);
 	     return(0);}
          else if (strcmp(v[i], "-log") == 0)
 	    log = v[++i];
@@ -510,8 +502,8 @@ int main(int c, char **v, char **env)
 	 else if (strcmp(v[i], "-sys") == 0)
 	    snprintf(state->arch, MAXLINE, "%s", v[++i]);
 	 else if (strcmp(v[i], "-v") == 0)
-	    {report_info(state->root, state->complete, state->literal,
-			 VERS, NULL);
+	    {PS_report_info(state->root, state->complete, state->literal,
+			    VERS, NULL);
 	     return(0);}
          else if (strcmp(v[i], "-vrb") == 0)
 	    {show = 2;
