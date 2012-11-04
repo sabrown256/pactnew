@@ -747,7 +747,7 @@ static void add_set_cfg(client *cl,
  * not $PATH or ${PATH}
  */
 	         else if (strcmp(var, "PATH") == 0)
-		    push_path(APPEND, epath, val);
+		    push_path(P_APPEND, epath, val);
 
 /* weed out duplicates - taking only the last setting */
 		else
@@ -796,7 +796,7 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 
 /* handle PATH specially - just gather everything that is not $PATH or ${PATH} */
 	         if (strcmp(var, "PATH") == 0)
-		    push_path(APPEND, epath, val);
+		    push_path(P_APPEND, epath, val);
 
 		else
 		   {snprintf(s, LRG, "\"%s\"", val);
@@ -2271,7 +2271,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	    {char *s;
 	     note(st.aux.SEF, TRUE, "%s %s", oper, value);
 	     if (strcmp(oper, "PATH") == 0)
-                push_path(APPEND, epath, value);
+                push_path(P_APPEND, epath, value);
 	     s = echo(FALSE, value);
 	     dbset(cl, oper, s);}
 
@@ -2283,7 +2283,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     val = delimited(var, "(", ")");
 
 	     if (strcmp(var, "PATH") == 0)
-	        {push_path(APPEND, epath, val);
+	        {push_path(P_APPEND, epath, val);
 		 s = echo(FALSE, val);
 		 dbset(cl, var, s);}
 	     else

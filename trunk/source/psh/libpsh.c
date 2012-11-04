@@ -2195,9 +2195,9 @@ void push_path(int end, char *dpath, char *path)
 	   nstrncpy(tp, LRG, lpth, -1);
 
 	else
-	   {if (end == APPEND)
+	   {if (end == P_APPEND)
 	       snprintf(tp, LRG, "%s:%s", dpath, lpth);
-	    else if (end == PREPEND)
+	    else if (end == P_PREPEND)
 	       snprintf(tp, LRG, "%s:%s", lpth, dpath);};
 
 	nstrncpy(dpath, LRG, path_simplify(tp, ':'), -1);};
@@ -2243,7 +2243,7 @@ void build_path(char *base, ...)
 	   snprintf(exe, MAXLINE, "%s/%s", dir, s);
 	   if (file_executable(exe) == TRUE)
 	      {t = STRSAVE(exe);
-	       push_path(PREPEND, lpath, dir);
+	       push_path(P_PREPEND, lpath, dir);
 	       break;};
 	ENDFOR;
 

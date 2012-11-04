@@ -10,20 +10,26 @@
  */
 
 #ifndef PCK_COMMON
-#define PCK_COMMON
 
-#include "posix.h"
-#include "ansic.h"
-#include "nonstd.h"
+# define PCK_COMMON
+
+# include "posix.h"
+# include "ansic.h"
+# include "nonstd.h"
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+# ifndef SCOPE_SCORE_COMPILE
 
 #undef MAXLINE
 
-#define MAXLINE    4096
-#define LRG        4096
-#define MEGA       1048576
-#define N_STACK    32
-#define APPEND     100
-#define PREPEND    101
+#define MAXLINE      4096
+#define LRG          4096
+#define MEGA         1048576
+#define N_STACK      32
+#define P_APPEND     100
+#define P_PREPEND    101
 
 #undef MAKE
 #undef MAKE_N
@@ -81,5 +87,17 @@
 int
  _assert_fail = 0;
 
+# endif
 #endif
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* keep these out of PACT proper - only in PSH */
+
+#ifndef SCOPE_SCORE
+
+#endif
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
