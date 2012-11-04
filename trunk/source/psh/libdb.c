@@ -10,10 +10,12 @@
 
 #ifndef LIBDB
 
-#define LIBDB
+# define LIBDB
 
-#include "libsrv.c"
-#include "libhash.c"
+# include "libsrv.c"
+# include "libhash.c"
+
+# ifndef SCOPE_SCORE_COMPILE
 
 typedef struct s_database database;
 typedef struct s_vardes vardes;
@@ -29,6 +31,9 @@ struct s_vardes
     database *db;
     char **vars;
     FILE *fp;};
+
+# endif
+# ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -890,4 +895,5 @@ int db_srv_restart(database *db)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif

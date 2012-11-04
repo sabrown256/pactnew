@@ -7,9 +7,11 @@
 
 #ifndef LIBHASH
 
-#define LIBHASH
+# define LIBHASH
 
-#include "common.h"
+# include "common.h"
+
+# ifndef SCOPE_SCORE_COMPILE
 
 #define HSZLARGE  521             /* large table size */
 
@@ -32,6 +34,9 @@ struct s_hashtab
     PFhashkey hash;
     PFintb comp;
     hashen **table;};
+
+# endif
+# ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -377,4 +382,5 @@ char **hash_dump(hashtab *tab, char *patt, char *type, int sort)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif
