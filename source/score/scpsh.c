@@ -78,6 +78,7 @@
 #define cenv 			PS_cenv
 #define cgetenv 		PS_cgetenv
 #define cinitenv 		PS_cinitenv
+#define cl_logger 		PS_cl_logger
 #define clean_space 		PS_clean_space
 #define client_ex 		PS_client_ex
 #define close_parent_child 	PS_close_parent_child

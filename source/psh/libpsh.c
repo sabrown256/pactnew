@@ -11,7 +11,9 @@
 
 #ifndef LIBPSH
 
-#define LIBPSH
+# define LIBPSH
+
+# ifndef SCOPE_SCORE_COMPILE
 
 #undef TEXT
 #define TEXT       10
@@ -41,6 +43,9 @@ typedef struct s_dir_stack dir_stack;
 struct s_dir_stack
    {int n;
     char *dir[N_STACK];};
+
+# endif
+# ifndef SCOPE_SCORE_PREPROC
 
 static char
  epath[LRG],
@@ -2664,4 +2669,5 @@ int is_running(int pid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+# endif
 #endif
