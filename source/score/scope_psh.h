@@ -9,6 +9,31 @@
 
 #include "cpyright.h"
 
+#define PSH_NEWWAY
+
+#if defined(PSH_NEWWAY)
+
+/* NOTE: this is duplicate of struct in psh/libio.c */
+#define IO_RING_DEFINED
+
+typedef struct s_io_ring io_ring;
+
+struct s_io_ring
+   {unsigned int ib_in;
+    unsigned int ob_in;
+    unsigned int nb_ring;
+    unsigned char *in_ring;};
+
+/* SCPSH.C declarations */
+
+extern int
+ PS_ring_ready(io_ring *ring, unsigned char ls),
+ PS_ring_push(io_ring *ring, char *s, int nc),
+ PS_ring_pop(io_ring *ring, char *s, int nc, unsigned int ls);
+
+
+#else
+
 #define SCOPE_SCORE
 #define SCOPE_SCORE_PREPROC
 
@@ -371,4 +396,5 @@ extern char
  *PS_time_string(char *ts, int nc, int fmt, double t);
 
 
+#endif
 #endif

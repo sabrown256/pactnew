@@ -19,6 +19,7 @@
 #include "scope_array.h"
 #include "scope_lex.h"
 #include "scope_exe.h"
+#include "scope_psh.h"
 
 /* version designation of CODE */
 #ifndef VERSION
@@ -416,17 +417,6 @@ union u_SC_address
     PFInt funcaddr;
     char *memaddr;};
 
-/* NOTE: this is duplicate of struct in psh/libio.c */
-#define IO_RING_DEFINED
-
-typedef struct s_io_ring io_ring;
-
-struct s_io_ring
-   {unsigned int ib_in;
-    unsigned int ob_in;
-    unsigned int nb_ring;
-    unsigned char *in_ring;};
-
 struct s_SC_process_rusedes
    {double since;            /* time since last resources used */
     double wcr;              /* wall clock time reference */
@@ -464,12 +454,6 @@ struct s_PROCESS
     char *spty;
     SC_ttydes *tty;
     io_ring ior;
-#if 0
-    unsigned int nb_ring;
-    unsigned char *in_ring;
-    unsigned int ib_in;
-    unsigned int ob_in;
-#endif
     char *data_buffer;
     unsigned long nb_data;
     unsigned long nx_data;
@@ -1104,14 +1088,6 @@ extern int
 
 extern PFTid
  SC_thread_set_tid(PFTid f);
-
-
-/* SCPSH.C declarations */
-
-extern int
- PS_ring_ready(io_ring *ring, unsigned char ls),
- PS_ring_push(io_ring *ring, char *s, int nc),
- PS_ring_pop(io_ring *ring, char *s, int nc, unsigned int ls);
 
 
 /* SCRSCA.C declarations */
