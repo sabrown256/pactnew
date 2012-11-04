@@ -17,13 +17,13 @@
 #undef MAXLINE
 #define MAXLINE 4096
 
-#undef INC
+#undef INCL
 #undef LINK
 #undef REGEX
-#undef VERSION
+#undef VERS
 
 enum e_itarget
-   {INC, LINK, REGEX, VERSION};
+   {INCL, LINK, REGEX, VERS};
 
 typedef enum e_itarget itarget;
 
@@ -223,10 +223,10 @@ int report_info(char *root, int cmpl, int ltrl, itarget tgt, char *ptrn)
        {case LINK :
 	     report_cl(&st, "-link");
              break;
-	case INC :
+	case INCL :
 	     report_cl(&st, "-incpath");
              break;
-	case VERSION :
+	case VERS :
 	     printf("%s\n", PACT_VERSION);
              break;
 	case REGEX :

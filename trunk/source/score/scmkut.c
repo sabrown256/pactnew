@@ -446,7 +446,7 @@ int main(int c, char **v, char **env)
 	    ignore = TRUE;
 	 else if (strcmp(v[i], "-incpath") == 0)
 	    {report_info(state->root, state->complete, state->literal,
-			 INC, NULL);
+			 INCL, NULL);
 	     return(0);}
 	 else if (strcmp(v[i], "-info") == 0)
 	    {if (++i < c)
@@ -511,7 +511,7 @@ int main(int c, char **v, char **env)
 	    snprintf(state->arch, MAXLINE, "%s", v[++i]);
 	 else if (strcmp(v[i], "-v") == 0)
 	    {report_info(state->root, state->complete, state->literal,
-			 VERSION, NULL);
+			 VERS, NULL);
 	     return(0);}
          else if (strcmp(v[i], "-vrb") == 0)
 	    {show = 2;

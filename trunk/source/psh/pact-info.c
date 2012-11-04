@@ -60,7 +60,7 @@ int main(int c, char **v)
             cmpl = TRUE;
 
 	 else if (strcmp(v[i], "-incpath") == 0)
-	    {tgt = INC;
+	    {tgt = INCL;
 	     break;}
 
 	 else if (strcmp(v[i], "-link") == 0)
@@ -76,7 +76,7 @@ int main(int c, char **v)
 	    ltrl = TRUE;
 
 	 else if (strcmp(v[i], "-v") == 0)
-	    {tgt = VERSION;
+	    {tgt = VERS;
 	     break;}
 
 	 else
