@@ -742,7 +742,7 @@ int main(int c, char **v)
 	       "sh", "xterm", "ls-jobs", "rpath",
 	       NULL);
 
-    push_path(PREPEND, lpath, bindir);
+    push_path(P_PREPEND, lpath, bindir);
 
     rv = init(&state);
     if (rv == TRUE)

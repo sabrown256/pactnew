@@ -228,7 +228,7 @@ static void init_mpi(rundes *st)
         if (p >= t)
 	   *p = '\0';
 
-	push_path(PREPEND, lpath, t);};
+	push_path(P_PREPEND, lpath, t);};
 
 /* find the corresponding lib */
     if (cdefenv("MPILib") == 0)
@@ -295,7 +295,7 @@ static void init_cross(rundes *st)
         if (p >= t)
 	   *p = '\0';
 
-	push_path(PREPEND, lpath, t);};
+	push_path(P_PREPEND, lpath, t);};
 
     if (st->trace > 3)
        {printf("CROSS = %s\n", cgetenv(TRUE, "CROSS"));
@@ -606,7 +606,7 @@ static void assgn_action(rundes *st, int asgn, char *var,
 
 /* add to path so that xxx_Exe will be on the ultimate execution path */
                 if (strcmp(effvar + strlen(effvar) - 4, "_Exe") == 0)
-                   push_path(PREPEND, lpath, path_head(cwhich(vl)));};};
+                   push_path(P_PREPEND, lpath, path_head(cwhich(vl)));};};
 
 	if (st->trace > 0)
 	   {if (asgn == TRUE)
@@ -1398,7 +1398,7 @@ int main(int c, char **v)
 		  "swhich", "mpi-info", "nm", "ls", "file",
 		  NULL);
 
-    push_path(PREPEND, lpath, state.bindir);
+    push_path(P_PREPEND, lpath, state.bindir);
 
     rv = init(&state, os, host);
     if (rv == TRUE)

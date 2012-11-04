@@ -3490,11 +3490,11 @@ int main(int c, char **v)
     snprintf(state.incdir, MAXLINE, "%s/include", path_head(state.bindir));
     snprintf(state.etcdir, MAXLINE, "%s/etc", path_head(state.bindir));
 
-    push_path(PREPEND, lpath, "/sbin");
-    push_path(PREPEND, lpath, "/bin");
-    push_path(PREPEND, lpath, "/usr/sbin");
-    push_path(PREPEND, lpath, "/usr/bin");
-    push_path(PREPEND, lpath, "/usr/local/bin");
+    push_path(P_PREPEND, lpath, "/sbin");
+    push_path(P_PREPEND, lpath, "/bin");
+    push_path(P_PREPEND, lpath, "/usr/sbin");
+    push_path(P_PREPEND, lpath, "/usr/bin");
+    push_path(P_PREPEND, lpath, "/usr/local/bin");
 
 /* locate the tools needed for subshells */
     build_path(NULL,
@@ -3505,7 +3505,7 @@ int main(int c, char **v)
 	       NULL);
 
 /* add the directory with do-net (and pact executables) to the path */
-    push_path(PREPEND, lpath, state.bindir);
+    push_path(P_PREPEND, lpath, state.bindir);
 
     INIT_PHASE(state.phases+PH_SETUP,       BY_NET,  "setup");
     INIT_PHASE(state.phases+PH_BUILD,       BY_HOST, "build");
