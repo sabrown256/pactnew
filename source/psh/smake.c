@@ -448,7 +448,7 @@ int main(int c, char **v)
 	     i++;}
 
 	 else if (strcmp(v[i], "-incpath") == 0)
-	    {report_info(st.root, st.complete, st.literal, INC, NULL);
+	    {report_info(st.root, st.complete, st.literal, INCL, NULL);
 	     return(0);}
 
 	 else if (strcmp(v[i], "-link") == 0)
@@ -491,7 +491,7 @@ int main(int c, char **v)
 		      break;
 	         case 'v' :
 		      report_info(st.root, st.complete, st.literal,
-				  VERSION, NULL);
+				  VERS, NULL);
 		      return(0);};}
 
 	 else if (v[i][0] == '+')
