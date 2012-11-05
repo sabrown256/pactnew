@@ -13,7 +13,6 @@
 # include "libpsh.c"
 
 # ifndef SCOPE_SCORE_COMPILE
-#  ifndef IO_RING_DEFINED
 
 typedef struct s_io_ring io_ring;
 
@@ -23,7 +22,6 @@ struct s_io_ring
     unsigned int nb_ring;
     unsigned char *in_ring;};
 
-#  endif
 # endif
 # ifndef SCOPE_SCORE_PREPROC
 

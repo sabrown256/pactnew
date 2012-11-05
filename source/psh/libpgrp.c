@@ -2255,7 +2255,9 @@ statement *parse_statement(char *s, char **env, char *shell,
 			  break;};};};
 
 	     if (sa == NULL)
-	        sa = MAKE_N(statement, 1000);
+	        {sa = MAKE_N(statement, 1000);
+		 if (sa != NULL)
+		    memset(sa, 0, 1000*sizeof(statement));};
 
 	     if (sa != NULL)
 	        {sa[i].np         = 0;

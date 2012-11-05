@@ -8,10 +8,6 @@
 
 #include "cpyright.h"
 
-#if !defined(PSH_OLDWAY)
-#define SC_INCLUDE_PSH
-#endif
-
 /* variables */
 #define _assert_fail            _PS_assert_fail
 
@@ -247,11 +243,6 @@
 
 #include "score_int.h" 
 
-#if defined(PSH_OLDWAY)
-#define IO_RING_DEFINED
-
-#include "../psh/common.h"
-#else
 #undef SCOPE_SCORE_PREPROC
 #undef LIBIO
 #undef LIBPSH
@@ -266,7 +257,6 @@
 #undef LIBINFO
 
 #define SCOPE_SCORE_COMPILE
-#endif
 
 #undef MAKE
 #undef MAKE_N
