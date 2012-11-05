@@ -10,16 +10,22 @@
 
 #include "scheme_int.h"
 
-#if 0
-#include "shell/common.h"
-#include "shell/libpsh.c"
-#include "shell/libdb.c"
-#include "shell/libpgrp.c"
-#else
-#include "../psh/common.h"
-#include "../psh/libpsh.c"
-#include "../psh/libdb.c"
-#include "../psh/libpgrp.c"
+#if defined(PSH_OLDWAY)
+
+#include <shell/common.h>
+#include <shell/libpsh.c>
+#include <shell/libdb.c>
+#include <shell/libpgrp.c>
+
+#define PS_gexec 			gexec
+#define PS_gexec_file 			gexec_file
+#define PS_gexec_var 			gexec_var
+#define PS_dbset 			dbset
+#define PS_dbget 			dbget
+#define PS_make_client 			make_client
+#define PS_cl_logger 			cl_logger
+#define PS_get_process_group_state   	get_process_group_state
+
 #endif
 
 /*--------------------------------------------------------------------------*/
@@ -155,9 +161,9 @@ static PFPCAL _SS_maps(char *s)
    {PFPCAL f;
 
     if (strcmp(s, "var") == 0)
-       f = gexec_var;
+       f = PS_gexec_var;
     else if (strcmp(s, "file") == 0)
-       f = gexec_file;
+       f = PS_gexec_file;
     else
        f = _SS_proc_exec;
 
@@ -185,16 +191,16 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
        {int auth;
 
 	auth = FALSE;
-	cl = make_client(CLIENT, auth, db, cl_logger);};
+	cl = PS_make_client(CLIENT, auth, db, PS_cl_logger);};
 
-    dbset(cl, "gstatus", "");
+    PS_dbset(cl, "gstatus", "");
 
     n  = SS_length(si, argl);
     al = _SS_list_strings(si, argl);
 
-    gexec(db, n, al, NULL, _SS_maps);
+    PS_gexec(db, n, al, NULL, _SS_maps);
 
-    s = dbget(cl, FALSE, "gstatus");
+    s = PS_dbget(cl, FALSE, "gstatus");
     o = _SS_string_list(si, s);
 
     return(o);}
@@ -207,7 +213,7 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
 void _SS_inst_pgrp(SS_psides *si)
    {process_group_state *ps;
 
-    ps = get_process_group_state();
+    ps = PS_get_process_group_state();
 
     SS_install_cf(si, "process-group-debug",
 		  "Variable: Flag controlling level of diagnostic output for gexec",
