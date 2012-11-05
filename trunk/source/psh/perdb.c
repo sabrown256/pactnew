@@ -53,22 +53,22 @@ static void sigrestart(int sig)
 static char *srv_save_db(database *db, char *fname,
 			 char **var, const char *fmt)
    {int ok;
-    char s[MAXLINE];
+    char s[BFLRG];
     FILE *fp;
-    static char t[MAXLINE];
+    static char t[BFLRG];
 
 /* figure out where results go */
     if ((fname == NULL) || (strcmp(fname, "stdout") == 0))
        fp = NULL;
     else
        {if (fname[0] == '/')
-	   nstrncpy(s, MAXLINE, fname, -1);
+	   nstrncpy(s, BFLRG, fname, -1);
         else
-	   snprintf(s, MAXLINE, "%s.%s.db", db->cl->root, fname);
+	   snprintf(s, BFLRG, "%s.%s.db", db->cl->root, fname);
 
 	fp = fopen(s, "w");
 	if (fp == NULL)
-	   {snprintf(t, MAXLINE, "could not open %s - save %s",
+	   {snprintf(t, BFLRG, "could not open %s - save %s",
 		     s, strerror(errno));
 	    return(t);};
         fname = path_tail(s);};
@@ -84,20 +84,20 @@ static char *srv_save_db(database *db, char *fname,
     if ((IS_NULL(fmt) == FALSE) &&
 	((strncmp(fmt, "setenv ", 7) == 0) ||
 	 (strncmp(fmt, "export ", 7) == 0)))
-       snprintf(t, MAXLINE, "%s", cwhich("true"));
+       snprintf(t, BFLRG, "%s", cwhich("true"));
 
      else if (fname == NULL)
        {if (var == NULL)
-	   snprintf(t, MAXLINE, "saved database");
+	   snprintf(t, BFLRG, "saved database");
         else
-	   snprintf(t, MAXLINE, "saved variables");}
+	   snprintf(t, BFLRG, "saved variables");}
 
     else
        {if (var == NULL)
-	   snprintf(t, MAXLINE, "saved database to %s",
+	   snprintf(t, BFLRG, "saved database to %s",
 		    fname);
 	else
-	   snprintf(t, MAXLINE, "saved variables to %s",
+	   snprintf(t, BFLRG, "saved variables to %s",
 		    fname);};
 
     return(t);}
@@ -108,11 +108,11 @@ static char *srv_save_db(database *db, char *fname,
 /* SRV_LOAD_DB - load the database */
 
 static char *srv_load_db(client *cl, char *fname, char *var)
-   {char s[MAXLINE];
+   {char s[BFLRG];
     char *root;
     FILE *fp;
     database *db;
-    static char t[MAXLINE];
+    static char t[BFLRG];
 
     db   = (database *) cl->a;
     root = cl->root;
@@ -122,13 +122,13 @@ static char *srv_load_db(client *cl, char *fname, char *var)
 
     else
        {if (file_exists(fname) == TRUE)
-	   nstrncpy(s, MAXLINE, fname, -1);
+	   nstrncpy(s, BFLRG, fname, -1);
         else
-	   snprintf(s, MAXLINE, "%s.%s.db", root, fname);
+	   snprintf(s, BFLRG, "%s.%s.db", root, fname);
 
 	fp = fopen(s, "r");
         if (fp == NULL)
-	   {snprintf(t, MAXLINE, "could not open %s - load %s",
+	   {snprintf(t, BFLRG, "could not open %s - load %s",
 		     s, strerror(errno));
 	    return(t);};
         fname = path_tail(s);};
@@ -137,16 +137,16 @@ static char *srv_load_db(client *cl, char *fname, char *var)
 
     if (fname == NULL)
        {if (var == NULL)
-	   snprintf(t, MAXLINE, "loaded database");
+	   snprintf(t, BFLRG, "loaded database");
         else
-	   snprintf(t, MAXLINE, "loaded %s", var);}
+	   snprintf(t, BFLRG, "loaded %s", var);}
 
     else
        {if (var == NULL)
-	   snprintf(t, MAXLINE, "loaded database from %s",
+	   snprintf(t, BFLRG, "loaded database from %s",
 		    fname);
 	else
-	   snprintf(t, MAXLINE, "loaded %s from %s",
+	   snprintf(t, BFLRG, "loaded %s from %s",
 		    var, fname);};
 
     if (fp != NULL)
@@ -163,12 +163,12 @@ static char *srv_load_db(client *cl, char *fname, char *var)
 /* SRV_LOGGER - log messages in the server SV */
 
 static void srv_logger(srvdes *sv, int lvl, char *fmt, ...)
-   {char s[MAXLINE];
+   {char s[BFLRG];
     char *root, *flog;
     client *cl;
 
     VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     cl   = (client *) sv->a;
@@ -355,24 +355,24 @@ static char *do_load(client *cl, char *s)
 
 static char *render_val(char *var, char *val, char *fmt)
    {char *s;
-    static char t[LRG];
+    static char t[BFLRG];
 
     s = val;
     if (fmt != NULL)
        {if (strcmp(fmt, "csh") == 0)
-	   {snprintf(t, LRG, "setenv %s \"%s\" ; ",
+	   {snprintf(t, BFLRG, "setenv %s \"%s\" ; ",
 		     var, strip_quote(val));
 	    s = t;}
 	else if (strcmp(fmt, "sh") == 0)
-	   {snprintf(t, LRG, "%s=\"%s\" ; export %s ; ",
+	   {snprintf(t, BFLRG, "%s=\"%s\" ; export %s ; ",
 		     var, strip_quote(val), var);
 	    s = t;}
 	else if (strcmp(fmt, "pl") == 0)
-	   {snprintf(t, LRG, "$%s = \"%s\"; ",
+	   {snprintf(t, BFLRG, "$%s = \"%s\"; ",
 		     var, strip_quote(val));
 	    s = t;}
 	else if (strcmp(fmt, "db") == 0)
-	   {snprintf(t, LRG, "%s=%s", var, val);
+	   {snprintf(t, BFLRG, "%s=%s", var, val);
 	    s = t;};};
 
     return(s);}
@@ -432,7 +432,7 @@ static char *do_defd(database *db, char *s, char *fmt)
 
 static char *do_set_get(database *db, char *s, char *fmt)
    {char *var, *val;
-    static char t[MAXLINE];
+    static char t[BFLRG];
 
     key_val(&var, &val, s, "= \t\n");
 
@@ -446,7 +446,7 @@ static char *do_set_get(database *db, char *s, char *fmt)
     if ((val != NULL) &&
 	(strchr("'\"(", val[0]) == NULL) && 
 	(strpbrk(val, " \t") != NULL))
-       {snprintf(t, MAXLINE, "\"%s\"", val);
+       {snprintf(t, BFLRG, "\"%s\"", val);
 	val = t;};
 
     val = render_val(var, val, fmt);
@@ -649,7 +649,7 @@ static void help(void)
 
 int main(int c, char **v)
    {int i, rv, srv, dmn, init, ltr;
-    char root[MAXLINE], r[MAXLINE], req[MAXLINE];
+    char root[BFLRG], r[BFLRG], req[BFLRG];
     char *except[] = {"PATH", "PERDB_IDLE_TIMEOUT",
 		      "PERDB_IDLE_INTERVAL", "PERDB_PATH",
 		      NULL};
@@ -677,7 +677,7 @@ int main(int c, char **v)
                       ltr = TRUE;
 		      break;
                  case 'f' :
-                      nstrncpy(r, MAXLINE, v[++i], -1);
+                      nstrncpy(r, BFLRG, v[++i], -1);
 		      break;
 		 case 'h' :
                       help();
@@ -694,17 +694,17 @@ int main(int c, char **v)
 /* everything from here is the request */
     req[0] = '\0';
     for (; i < c; i++)
-        {nstrcat(req, MAXLINE, v[i]);
-	 nstrcat(req, MAXLINE, " ");};
+        {nstrcat(req, BFLRG, v[i]);
+	 nstrcat(req, BFLRG, " ");};
 
     if (IS_NULL(r) == TRUE)
        {if (cdefenv("PERDB_PATH") == TRUE)
-           nstrncpy(r, MAXLINE, cgetenv(TRUE, "PERDB_PATH"), -1);};
+           nstrncpy(r, BFLRG, cgetenv(TRUE, "PERDB_PATH"), -1);};
 
     if (IS_NULL(r) == TRUE)
-       snprintf(r, MAXLINE, "%s/.perdb", cgetenv(TRUE, "HOME"));
+       snprintf(r, BFLRG, "%s/.perdb", cgetenv(TRUE, "HOME"));
 
-    full_path(root, MAXLINE, NULL, r);
+    full_path(root, BFLRG, NULL, r);
 
     rv = cclearenv(except);
 

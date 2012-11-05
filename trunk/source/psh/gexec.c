@@ -17,7 +17,7 @@
 
 static int do_test(FILE **fio, char *tag)
    {int i, rv, ev;
-    char t[MAXLINE];
+    char t[BFLRG];
     char *p;
     static int count = 0;
 
@@ -27,7 +27,7 @@ static int do_test(FILE **fio, char *tag)
         {if (feof(fio[0]) == TRUE)
 	    rv = 1;
 	 else
-	    {p  = fgets(t, MAXLINE, fio[0]);
+	    {p  = fgets(t, BFLRG, fio[0]);
              ev = errno;
 	     if (p != NULL)
 	        {count = 0;
@@ -74,7 +74,7 @@ static int str_test(char *db, io_mode md, FILE **fio,
 int gexec_conv(char *db, io_mode md, FILE **fio,
 	       char *name, int c, char **v)
    {int rv, nx;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *p, *side;
 
     nx = 5;
@@ -90,7 +90,7 @@ int gexec_conv(char *db, io_mode md, FILE **fio,
 		   {fprintf(stderr, "A sent: %d\n", ia);
 		    fprintf(fio[1], "%d\n", ia);
 		    ia++;};
-		p = fgets(s, MAXLINE, fio[0]);
+		p = fgets(s, BFLRG, fio[0]);
 		if (p == NULL)
 		   break;
 		else
@@ -103,7 +103,7 @@ int gexec_conv(char *db, io_mode md, FILE **fio,
 	   {static int ib = 0;
 
 	    for (; (ib < 2*nx) && (rv == 0); )
-	        {p = fgets(s, MAXLINE, fio[0]);
+	        {p = fgets(s, BFLRG, fio[0]);
 		 if (p == NULL)
 		    break;
 		 else

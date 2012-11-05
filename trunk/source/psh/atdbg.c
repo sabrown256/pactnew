@@ -26,11 +26,11 @@ typedef struct s_atproc atproc;
 typedef struct s_dbgrsp dbgrsp;
 
 struct s_atdbgdes
-   {char os[MAXLINE];
-    char pname[MAXLINE];
-    char opt[MAXLINE];
-    char exe[MAXLINE];
-    char dbg[MAXLINE];
+   {char os[BFLRG];
+    char pname[BFLRG];
+    char opt[BFLRG];
+    char exe[BFLRG];
+    char dbg[BFLRG];
     int qpid;                    /* PID from query */
     int spid;                    /* PID from command line */
     int mode;
@@ -39,17 +39,17 @@ struct s_atdbgdes
     int whdbg;
     char **msgs;
     int nmsg;
-    char logname[MAXLINE];
+    char logname[BFLRG];
     FILE *log;};
 
 struct s_atproc
-   {char name[MAXLINE];
+   {char name[BFLRG];
     int pid;};
 
 struct s_dbgrsp
    {int action;
     char *prompt;
-    char result[MAXLINE];
+    char result[BFLRG];
     atdbgdes *st;};
 
 /*--------------------------------------------------------------------------*/
@@ -61,7 +61,7 @@ struct s_dbgrsp
 
 static atproc *candidate_proc(atdbgdes *st, char *name)
    {int i, n;
-    char pids[MAXLINE];
+    char pids[BFLRG];
     char *pl, *t;
     atproc *al;
 
@@ -73,10 +73,10 @@ static atproc *candidate_proc(atdbgdes *st, char *name)
 /* find the candidate process ids */
        {if ((IS_NULL(st->exe) == FALSE) && (st->spid > 0))
 	   {al[i].pid = st->spid;
-	    nstrncpy(al[i].name, MAXLINE, st->exe, -1);
+	    nstrncpy(al[i].name, BFLRG, st->exe, -1);
 	    i++;}
 	else
-	   {nstrncpy(pids, MAXLINE,
+	   {nstrncpy(pids, BFLRG,
 		     run(FALSE, "ls-jobs %s \"%s\" | sed '/atdbg /d' | sed '/sign /d' | awk '{print $2 \" \" $6}'",
 			 st->opt, name), -1);
 	    if (st->verbose == TRUE)
@@ -91,7 +91,7 @@ static atproc *candidate_proc(atdbgdes *st, char *name)
 		 pl = NULL;
 		 t = strtok(pl, " \n");
 		 if (t != NULL)
-		    nstrncpy(al[i].name, MAXLINE,
+		    nstrncpy(al[i].name, BFLRG,
 			     run(FALSE, "rpath %s", t), -1);
 		 else
 		    break;
@@ -114,7 +114,7 @@ static atproc *candidate_proc(atdbgdes *st, char *name)
 
 static atproc *select_pid(atdbgdes *st, atproc *al)
    {int i, ok;
-    char resp[MAXLINE];
+    char resp[BFLRG];
     atproc *pal;
 
     ok = FALSE;
@@ -129,7 +129,7 @@ static atproc *select_pid(atdbgdes *st, atproc *al)
 		    (st->mode == ATTACH) ? "attach" : "trace",
 		    pal->name, pal->pid);
 
-	     fgets(resp, MAXLINE, stdin);
+	     fgets(resp, BFLRG, stdin);
 	     ok = (resp[0] == 'y');};
 
 	 if (ok == TRUE)
@@ -152,7 +152,7 @@ static atproc *select_pid(atdbgdes *st, atproc *al)
 
 static int send_msg(process *pp, int act, char *fmt, ...)
    {int nl;
-    char msg[MAXLINE];
+    char msg[BFLRG];
     char *p;
     dbgrsp *gr;
     atdbgdes *st;
@@ -162,7 +162,7 @@ static int send_msg(process *pp, int act, char *fmt, ...)
     if (fmt == NULL)
        p = NULL;
     else
-       {VSNPRINTF(msg, MAXLINE, fmt);
+       {VSNPRINTF(msg, BFLRG, fmt);
 	p  = msg;};
 
     VA_END;
@@ -203,7 +203,7 @@ static void cache_rsp(atdbgdes *st, char *s)
 
 static void send_cached(atdbgdes *st)
    {int i, n;
-    char r[MAXLINE];
+    char r[BFLRG];
     char *s, **sa;
 
     n  = st->nmsg;
@@ -213,7 +213,7 @@ static void send_cached(atdbgdes *st)
     for (i = 0; i < n; i++)
         {s = sa[i];
 
-	 strclean(r, MAXLINE, s, -1);
+	 strclean(r, BFLRG, s, -1);
 
 	 puts(r);
 
@@ -255,7 +255,7 @@ static int rsp_error(int fd, process *pp, char *t)
 
 static int rsp_totalview(int fd, process *pp, char *t)
    {int ok, nc;
-    char p[MAXLINE];
+    char p[BFLRG];
     char *s, *pa, *pb, *pr;
     dbgrsp *gr;
     atdbgdes *st;
@@ -280,12 +280,12 @@ static int rsp_totalview(int fd, process *pp, char *t)
 	   {switch (gr->action)
 	       {case QTHREAD:
 		     if (IS_NULL(t) == FALSE)
-		        nstrncpy(gr->result, MAXLINE, t, -1);
+		        nstrncpy(gr->result, BFLRG, t, -1);
 		     break;
 
 		case BTRACE:
 		     if (strstr(t, "PC=") != NULL)
-		        {nstrncpy(p, MAXLINE, t, -1);
+		        {nstrncpy(p, BFLRG, t, -1);
 			 pa = strstr(p, "PC=");
 			 pb = strchr(p, '[');
 			 if ((pa != NULL) && (pb != NULL))
@@ -313,7 +313,7 @@ static int rsp_totalview(int fd, process *pp, char *t)
 
 static int use_totalview(atdbgdes *st, atproc *al)
    {int nl, rv, sig;
-    char cmd[MAXLINE], s[MAXLINE];
+    char cmd[BFLRG], s[BFLRG];
     process *pp;
     dbgrsp gr;
 
@@ -323,7 +323,7 @@ static int use_totalview(atdbgdes *st, atproc *al)
        {gr.prompt = "d1.<> ";
 	gr.st     = st;
 
-	snprintf(cmd, MAXLINE, "%scli", st->dbg);
+	snprintf(cmd, BFLRG, "%scli", st->dbg);
 	pp = job_launch(cmd, "a", NULL);
 	if (pp != NULL)
 	   {pp->accept = rsp_totalview;
@@ -342,7 +342,7 @@ static int use_totalview(atdbgdes *st, atproc *al)
 	    send_msg(pp, QTHREAD, "f p1 TV::thread get -all id");
 
 	    FOREACH(thr, gr.result, " \n");
-	       snprintf(s, MAXLINE,
+	       snprintf(s, BFLRG,
 			"\n   ---------------- Thread %s ----------------\n", thr);
 	       cache_rsp(st, s);
 	       send_msg(pp, BTRACE, "dfocus %s {dwhere -a}", thr);
@@ -367,7 +367,7 @@ static int use_totalview(atdbgdes *st, atproc *al)
 
 static int rsp_gdb(int fd, process *pp, char *t)
    {int ok, nc;
-    char p[MAXLINE];
+    char p[BFLRG];
     char *s, *pr, *u;
     dbgrsp *gr;
     atdbgdes *st;
@@ -391,12 +391,12 @@ static int rsp_gdb(int fd, process *pp, char *t)
 	         u = strtok(t, " \t\n");
 		 if ((u != NULL) && (*u == '*'))
 		    u = strtok(NULL, " \t\n");
-                 push_tok(gr->result, MAXLINE, ' ', u);
+                 push_tok(gr->result, BFLRG, ' ', u);
 	         break;
 
 	    case BTRACE:
 		 if (t[0] == '#')
-		    {snprintf(p, MAXLINE, "%s]", t+1);
+		    {snprintf(p, BFLRG, "%s]", t+1);
 		     s = subst(p, " (", "(", 1);
 		     s = subst(s, " )", ")", 1);
 		     s = subst(s, ") from ", ") [", 1);
@@ -419,7 +419,7 @@ static int rsp_gdb(int fd, process *pp, char *t)
 
 static int use_gdb(atdbgdes *st, char *fname, atproc *al)
    {int rv, nl, sig;
-    char cmd[MAXLINE], s[MAXLINE];
+    char cmd[BFLRG], s[BFLRG];
     process *pp;
     dbgrsp gr;
 
@@ -430,7 +430,7 @@ static int use_gdb(atdbgdes *st, char *fname, atproc *al)
 	gr.result[0] = '\0';
 	gr.st        = st;
 
-	snprintf(cmd, MAXLINE, "%s %s", st->dbg, al->name);
+	snprintf(cmd, BFLRG, "%s %s", st->dbg, al->name);
 	pp = job_launch(cmd, "a", NULL);
 	if (pp != NULL)
 	   {pp->accept = rsp_gdb;
@@ -445,7 +445,7 @@ static int use_gdb(atdbgdes *st, char *fname, atproc *al)
 	    send_msg(pp, QTHREAD, "info threads");
 
 	    FOREACH(thr, gr.result, " \n")
-	       snprintf(s, MAXLINE,
+	       snprintf(s, BFLRG,
 			"\n   ---------------- Thread %s ----------------\n", thr);
 	       cache_rsp(st, s);
 	       send_msg(pp, 0, "thread %s", thr);
@@ -509,7 +509,7 @@ static int use_dbx(atdbgdes *st, char *fname, atproc *al)
 
 static int session(atdbgdes *st)
    {int i, n, rv, zip;
-    char fname[MAXLINE], names[MAXLINE];
+    char fname[BFLRG], names[BFLRG];
     char *name, *pl, *lst[33];
     atproc *al, *pal;
     FILE *log;
@@ -522,7 +522,7 @@ static int session(atdbgdes *st)
 
 /* open the log file if requested */
     if (IS_NULL(st->logname) == FALSE)
-       {snprintf(fname, MAXLINE, "%s.%d", st->logname, (int) getpid());
+       {snprintf(fname, BFLRG, "%s.%d", st->logname, (int) getpid());
 	log = fopen(fname, "w");
 	if (log != NULL)
 	   setbuf(log, NULL);
@@ -532,14 +532,14 @@ static int session(atdbgdes *st)
        printf("\n");
 
     if (st->mode == TRACE)
-       snprintf(fname, MAXLINE, "/tmp/dbg.%d", (int) getpid());
+       snprintf(fname, BFLRG, "/tmp/dbg.%d", (int) getpid());
 
     if ((IS_NULL(st->pname) == TRUE) &&
         ((IS_NULL(st->exe) == FALSE) || (st->spid >= 0)))
-       snprintf(st->pname, MAXLINE, "%d", st->spid);
+       snprintf(st->pname, BFLRG, "%d", st->spid);
 
 /* make an array of process names */
-    nstrncpy(names, MAXLINE, st->pname, -1);
+    nstrncpy(names, BFLRG, st->pname, -1);
     for (n = 0, pl = names; n < 32; n++, pl = NULL)
         {name = strtok(pl, " \n");
 	 if (name == NULL)
@@ -594,11 +594,11 @@ static int session(atdbgdes *st)
 
 static int init(atdbgdes *st)
    {int rv;
-    char lst[MAXLINE], t[MAXLINE];
+    char lst[BFLRG], t[BFLRG];
 
     rv = TRUE;
 
-    unamef(st->os, MAXLINE, "s");
+    unamef(st->os, BFLRG, "s");
     strcpy(st->opt, "-q");
     st->pname[0] = '\0';
     st->exe[0]   = '\0';
@@ -614,21 +614,21 @@ static int init(atdbgdes *st)
 /* init logging */
     st->log = NULL;
     if (cdefenv("ATDBG_LOG") == TRUE)
-       nstrncpy(st->logname, MAXLINE, cgetenv(TRUE, "ATDBG_LOG"), -1);
+       nstrncpy(st->logname, BFLRG, cgetenv(TRUE, "ATDBG_LOG"), -1);
     else
        st->logname[0] = '\0';
 
 /* determine which debugger to use */
     if (cdefenv("SC_DEBUGGER") == TRUE)
-       {nstrncpy(t, MAXLINE, cgetenv(TRUE, "SC_DEBUGGER"), -1);
-        nstrncpy(lst, MAXLINE, subst(t, ":", " ", MAXLINE), -1);}
+       {nstrncpy(t, BFLRG, cgetenv(TRUE, "SC_DEBUGGER"), -1);
+        nstrncpy(lst, BFLRG, subst(t, ":", " ", BFLRG), -1);}
     else
-       nstrncpy(lst, MAXLINE, "totalview gdb dbx", -1);
+       nstrncpy(lst, BFLRG, "totalview gdb dbx", -1);
 
     FOREACH(i, lst, " \n")
-       nstrncpy(t, MAXLINE, cwhich(i), -1);
+       nstrncpy(t, BFLRG, cwhich(i), -1);
        if (file_executable(t) == TRUE)
-          {nstrncpy(st->dbg, MAXLINE, t, -1);
+          {nstrncpy(st->dbg, BFLRG, t, -1);
            break;};
     ENDFOR;
 
@@ -681,17 +681,17 @@ static int process_args(atdbgdes *st, int c, char **v)
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-a") == 0)
-            {push_tok(st->opt, MAXLINE, ' ', "-r");
-	     push_tok(st->opt, MAXLINE, ' ', "none-");}
+            {push_tok(st->opt, BFLRG, ' ', "-r");
+	     push_tok(st->opt, BFLRG, ' ', "none-");}
 
 	 else if (strcmp(v[i], "-e") == 0)
-            nstrncpy(st->exe, MAXLINE, v[++i], -1);
+            nstrncpy(st->exe, BFLRG, v[++i], -1);
 
 	 else if (strcmp(v[i], "-h") == 0)
             help();
 
 	 else if (strcmp(v[i], "-l") == 0)
-            nstrncpy(st->logname, MAXLINE, v[++i], -1);
+            nstrncpy(st->logname, BFLRG, v[++i], -1);
 
 	 else if (strcmp(v[i], "-p") == 0)
             st->spid = atoi(v[++i]);
@@ -715,7 +715,7 @@ static int process_args(atdbgdes *st, int c, char **v)
 	    continue;
 
 	 else
-	    push_tok(st->pname, MAXLINE, ' ', v[i]);};
+	    push_tok(st->pname, BFLRG, ' ', v[i]);};
 
     return(i);}
 
@@ -726,7 +726,7 @@ static int process_args(atdbgdes *st, int c, char **v)
 
 int main(int c, char **v)
    {int rv;
-    char exe[MAXLINE], bindir[MAXLINE];
+    char exe[BFLRG], bindir[BFLRG];
     atdbgdes state;
 
 #if 0

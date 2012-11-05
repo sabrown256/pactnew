@@ -32,7 +32,7 @@ static fifo_connection
 
 static char *name_fifo(char *root, int ch)
    {char *p;
-    static char fifo[MAXLINE];
+    static char fifo[BFLRG];
 
     p = NULL;
 
@@ -40,7 +40,7 @@ static char *name_fifo(char *root, int ch)
        root = cgetenv(TRUE, "PERDB_PATH");
 
     if (root != NULL)
-       {snprintf(fifo, MAXLINE, "%s.%d.=", root, ch);
+       {snprintf(fifo, BFLRG, "%s.%d.=", root, ch);
 	p = fifo;};
 
     return(p);}
@@ -52,7 +52,7 @@ static char *name_fifo(char *root, int ch)
 
 static int fifo_exists(char *fmt, ...)
    {int ch, rv, ok;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *fifo, *flog, *st, *wh;
     struct stat sb;
 
@@ -62,7 +62,7 @@ static int fifo_exists(char *fmt, ...)
        {st = "no file";
 
 	VA_START(fmt);
-	VSNPRINTF(s, MAXLINE, fmt);
+	VSNPRINTF(s, BFLRG, fmt);
 	VA_END;
 
 	rv = TRUE;

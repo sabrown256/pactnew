@@ -24,8 +24,8 @@
 #include "libasync.c"
 #include "libeval.c"
 
-#undef MAXLINE
-#define MAXLINE 512
+#undef BFMED
+#define BFMED 512
 
 #define NO_STAT  0xffffff
 #define OMITTED  255
@@ -42,16 +42,16 @@ struct s_rundes
     int errio;           /* (un)suppress stderr iff (TRUE)FALSE */
     int trace;
     int verbose;
-    char bargs[MAXLINE];
-    char dargs[MAXLINE];
-    char bindir[MAXLINE];
-    char os[MAXLINE];
-    char host[MAXLINE];
-    char dbgtgt[MAXLINE];
-    char crosstgt[MAXLINE];
-    char mpitgt[MAXLINE];
-    char sgn[MAXLINE];
-    char mpife[MAXLINE];};
+    char bargs[BFMED];
+    char dargs[BFMED];
+    char bindir[BFMED];
+    char os[BFMED];
+    char host[BFMED];
+    char dbgtgt[BFMED];
+    char crosstgt[BFMED];
+    char mpitgt[BFMED];
+    char sgn[BFMED];
+    char mpife[BFMED];};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -101,17 +101,17 @@ static void load_target(char *tgt, int nc, char *lst)
 /* INIT_DBG_TARGET - initialize DBG default target */
 
 static void init_dbg_target(rundes *st)
-   {char clst[MAXLINE];
+   {char clst[BFMED];
 
     if (IS_NULL(st->dbgtgt) == TRUE)
        {if (cdefenv("DO_RUN_DBG") == TRUE)
-	   nstrncpy(clst, MAXLINE, cgetenv(TRUE, "DO_RUN_DBG"), -1);
+	   nstrncpy(clst, BFMED, cgetenv(TRUE, "DO_RUN_DBG"), -1);
         else if (cdefenv("SC_DEBUGGER") == TRUE)
-	   nstrncpy(clst, MAXLINE, cgetenv(TRUE, "SC_DEBUGGER"), -1);
+	   nstrncpy(clst, BFMED, cgetenv(TRUE, "SC_DEBUGGER"), -1);
 	else
-	   nstrncpy(clst, MAXLINE, "totalview gdb dbx", -1);
+	   nstrncpy(clst, BFMED, "totalview gdb dbx", -1);
 
-	load_target(st->dbgtgt, MAXLINE, clst);};
+	load_target(st->dbgtgt, BFMED, clst);};
 
     return;}
 
@@ -137,15 +137,15 @@ static void init_dbg(rundes *st)
 /* INIT_MPI_TARGET - initialize MPI default target */
 
 static void init_mpi_target(rundes *st)
-   {char clst[MAXLINE];
+   {char clst[BFMED];
 
     if (IS_NULL(st->mpitgt) == TRUE)
        {if (cdefenv("DO_RUN_MPI") == TRUE)
-	   nstrncpy(clst, MAXLINE, cgetenv(TRUE, "DO_RUN_MPI"), -1);
+	   nstrncpy(clst, BFMED, cgetenv(TRUE, "DO_RUN_MPI"), -1);
         else
-	   nstrncpy(clst, MAXLINE, "poe srun mpirun dmpirun", -1);
+	   nstrncpy(clst, BFMED, "poe srun mpirun dmpirun", -1);
 
-	load_target(st->mpitgt, MAXLINE, clst);};
+	load_target(st->mpitgt, BFMED, clst);};
 
     return;}
 
@@ -172,7 +172,7 @@ static void mp_hostfile(char *s, int nc, rundes *st)
 
 static void init_mpi(rundes *st)
    {int ok;
-    char t[MAXLINE];
+    char t[BFMED];
     char *s, *c, *p;
     FILE *fp;
 
@@ -207,7 +207,7 @@ static void init_mpi(rundes *st)
        csetenv("Wrap", "");
 
     else if (strcmp(st->os, "AIX") == 0)
-       {mp_hostfile(t, MAXLINE, st);
+       {mp_hostfile(t, BFMED, st);
 	fp = open_file("w", t);
 
 	fprintf(fp, "%s\n", st->host);
@@ -223,7 +223,7 @@ static void init_mpi(rundes *st)
        {s = run(FALSE, "mpi-info -b %s", c);
 	p = strtok(s, " \t\n");
 	csetenv("MPIFE", s);
-	nstrncpy(t, MAXLINE, s, -1);
+	nstrncpy(t, BFMED, s, -1);
 	for (p = t + strlen(t) - 1; (p >= t) && (*p != '/'); p--);
         if (p >= t)
 	   *p = '\0';
@@ -252,15 +252,15 @@ static void init_mpi(rundes *st)
 /* INIT_CROSS_TARGET - initialize CROSS default target */
 
 static void init_cross_target(rundes *st)
-   {char clst[MAXLINE];
+   {char clst[BFMED];
 
     if (IS_NULL(st->crosstgt) == TRUE)
        {if (cdefenv("DO_RUN_CROSS") == TRUE)
-	   nstrncpy(clst, MAXLINE, cgetenv(TRUE, "DO_RUN_CROSS"), -1);
+	   nstrncpy(clst, BFMED, cgetenv(TRUE, "DO_RUN_CROSS"), -1);
         else
 	   clst[0] = '\0';
 
-	load_target(st->crosstgt, MAXLINE, clst);};
+	load_target(st->crosstgt, BFMED, clst);};
 
     return;}
 
@@ -270,7 +270,7 @@ static void init_cross_target(rundes *st)
 /* INIT_CROSS - setup for CROSS */
 
 static void init_cross(rundes *st)
-   {char t[MAXLINE];
+   {char t[BFMED];
     char *s, *c, *p;
 
     c = cgetenv(TRUE, "Code");
@@ -281,7 +281,7 @@ static void init_cross(rundes *st)
 
     if (cdefenv("CROSS") == 0)
        {s = run(FALSE, "cross-info -x %s", c);
-	nstrncpy(st->crosstgt, MAXLINE, s, -1);
+	nstrncpy(st->crosstgt, BFMED, s, -1);
 	if (strcmp(st->crosstgt, "local") != 0)
 	   csetenv("CROSS", st->crosstgt);};
 
@@ -290,7 +290,7 @@ static void init_cross(rundes *st)
        {s = run(FALSE, "cross-info -b %s", c);
 	p = strtok(s, " \t\n");
 	csetenv("CFE", s);
-	nstrncpy(t, MAXLINE, s, -1);
+	nstrncpy(t, BFMED, s, -1);
 	for (p = t + strlen(t) - 1; (p >= t) && (*p != '/'); p--);
         if (p >= t)
 	   *p = '\0';
@@ -316,8 +316,8 @@ static int init(rundes *st, char *os, char *host)
     cunsetenv("MPI");
     cunsetenv("DBG");
 
-    nstrncpy(st->os,   MAXLINE, os, -1);
-    nstrncpy(st->host, MAXLINE, host, -1);
+    nstrncpy(st->os,   BFMED, os, -1);
+    nstrncpy(st->host, BFMED, host, -1);
 
     csetenv("Host", st->host);
 
@@ -415,14 +415,14 @@ static int check(rundes *st)
 #if 1
 
     if (IS_NULL(st->sgn) == TRUE)
-       snprintf(st->sgn, MAXLINE, "%s/etc/do-run-db",
+       snprintf(st->sgn, BFMED, "%s/etc/do-run-db",
                 path_head(st->bindir));
 
     if (file_exists(st->sgn) == FALSE)
        {if (cdefenv("RUN_SIGNATURE_DB") == TRUE)
-           nstrncpy(st->sgn, MAXLINE, cgetenv(TRUE, "RUN_SIGNATURE_DB"), -1);
+           nstrncpy(st->sgn, BFMED, cgetenv(TRUE, "RUN_SIGNATURE_DB"), -1);
         else
-	   nstrncpy(st->sgn, MAXLINE, "run.sgn", -1);};
+	   nstrncpy(st->sgn, BFMED, "run.sgn", -1);};
 
 #else
 
@@ -430,9 +430,9 @@ static int check(rundes *st)
 
     s = cgetenv(TRUE, "RUN_SIGNATURE_DB");
     if (file_exists(s) == TRUE)
-       nstrncpy(st->sgn, MAXLINE, s, -1);
+       nstrncpy(st->sgn, BFMED, s, -1);
     else
-       snprintf(st->sgn, MAXLINE, "%s/etc/do-run-db",
+       snprintf(st->sgn, BFMED, "%s/etc/do-run-db",
                 path_head(st->bindir));
 
 #endif
@@ -456,32 +456,32 @@ static int check(rundes *st)
 /* PARSE_COLON - parse the ':' syntax element */
 
 static void parse_colon(rundes *st, char *sect, char *var, char *val)
-   {char vl[MAXLINE];
+   {char vl[BFMED];
     char *p;
 
-    nstrncpy(vl, MAXLINE, val, -1);
+    nstrncpy(vl, BFMED, val, -1);
     p = strpbrk(vl, " \t");
     if (p != NULL)
        *p = '\0';
 
     if ((strcmp(var, "CROSS") == 0) && (cmpenv("CROSS", vl) == 0))
-       {nstrncpy(sect, MAXLINE, var, -1);
+       {nstrncpy(sect, BFMED, var, -1);
 	if (st->trace > 1)
 	   printf("Entering %s section %s\n", var, vl);}
 
     else if ((strcmp(var, "MPI") == 0) && (cmpenv("MPI", vl) == 0))
-       {nstrncpy(sect, MAXLINE, var, -1);
+       {nstrncpy(sect, BFMED, var, -1);
 	if (st->trace > 1)
 	   printf("Entering %s section %s\n", var, vl);}
 
     else if ((strcmp(var, "DBG") == 0) && (cmpenv("DBG", vl) == 0) &&
 	     (st->debug == TRUE))
-       {nstrncpy(sect, MAXLINE, var, -1);
+       {nstrncpy(sect, BFMED, var, -1);
 	if (st->trace > 1)
 	   printf("Entering %s section %s\n", var, vl);}
 
     else
-       {nstrncpy(sect, MAXLINE, "skip", -1);
+       {nstrncpy(sect, BFMED, "skip", -1);
 	if (st->trace > 1)
 	   printf("Skipping %s section %s\n", var, vl);};
 
@@ -497,20 +497,20 @@ static void parse_colon(rundes *st, char *sect, char *var, char *val)
 
 static int eval_expr(rundes *st, char *expr)
    {int rv;
-    char s[MAXLINE];
+    char s[BFMED];
 
     if (expr == NULL)
        rv = -1;
 
     else
        {if ((expr[0] == '(') && (LAST_CHAR(expr) == ')'))
-	   {nstrncpy(s, MAXLINE, expr+1, -1);
+	   {nstrncpy(s, BFMED, expr+1, -1);
 	    LAST_CHAR(s) = '\0';}
 	else
-	   nstrncpy(s, MAXLINE, expr, -1);
+	   nstrncpy(s, BFMED, expr, -1);
 
-	nstrncpy(s, MAXLINE, subst(expr, "(", "\\(", -1), -1);
-	nstrncpy(s, MAXLINE, subst(s, ")", "\\)", -1), -1);
+	nstrncpy(s, BFMED, subst(expr, "(", "\\(", -1), -1);
+	nstrncpy(s, BFMED, subst(s, ")", "\\)", -1), -1);
 
 	rv = execute(st->errio, "test %s > /dev/null 2>&1", s);
 
@@ -527,7 +527,7 @@ static int eval_expr(rundes *st, char *expr)
  */
 
 static char *eval_cond(rundes *st, int ok, char *expr, char *cons, char *alt)
-   {static char val[MAXLINE];
+   {static char val[BFMED];
 
 /* with a conditional expression */
     if (IS_NULL(expr) == FALSE)
@@ -538,13 +538,13 @@ static char *eval_cond(rundes *st, int ok, char *expr, char *cons, char *alt)
 
 /* true result */
 	if (ok == TRUE)
-	   {nstrncpy(val, MAXLINE, cons, -1);
+	   {nstrncpy(val, BFMED, cons, -1);
 	    if (st->trace > 2)
 	       printf(">    Consequent: %s\n", val);}
 
 /* false result */
 	else if (ok == FALSE)
-	   {nstrncpy(val, MAXLINE, alt, -1);
+	   {nstrncpy(val, BFMED, alt, -1);
 	    if (st->trace > 2)
 	       printf(">    Alternate: %s\n", val);}
 
@@ -554,7 +554,7 @@ static char *eval_cond(rundes *st, int ok, char *expr, char *cons, char *alt)
 
 /* without a conditional expression */
     else
-       nstrncpy(val, MAXLINE, cons, -1);
+       nstrncpy(val, BFMED, cons, -1);
 
     trim(val, FRONT, " \n");
     trim(val, BACK, " \n");
@@ -601,7 +601,7 @@ static void assgn_action(rundes *st, int asgn, char *var,
 /* sane C shells do this (tcsh defines sane) */
 	else
 	   {if (asgn == TRUE)
-	       {vl = eval(lval, MAXLINE, effvar);
+	       {vl = eval(lval, BFMED, effvar);
 		csetenv(effvar, vl);
 
 /* add to path so that xxx_Exe will be on the ultimate execution path */
@@ -628,8 +628,8 @@ static void parse_assgn(rundes *st, char *sect,
 			char *var, char *oper, char *val,
 			char *effvar)
    {int enverr, synerr, asgn, ok, kind;
-    char expr[MAXLINE], cons[MAXLINE], alt[MAXLINE];
-    char clause[MAXLINE], unev[MAXLINE], vex[MAXLINE];
+    char expr[BFMED], cons[BFMED], alt[BFMED];
+    char clause[BFMED], unev[BFMED], vex[BFMED];
     char *lval, *ldef, *valv, *rv;
 
     expr[0] = '\0';
@@ -654,20 +654,20 @@ static void parse_assgn(rundes *st, char *sect,
     ok     = -1;
     kind   = 0;
 
-    nstrncpy(vex, MAXLINE, subst(val, "(", " ( ", -1), -1);
-    nstrncpy(vex, MAXLINE, subst(vex, ")", " ) ", -1), -1);
+    nstrncpy(vex, BFMED, subst(val, "(", " ( ", -1), -1);
+    nstrncpy(vex, BFMED, subst(vex, ")", " ) ", -1), -1);
     FOREACH(tok, vex, " \t")
 
 /* handle '?' token */
        if (tok[0] == '?')
-	  {nstrncpy(expr, MAXLINE, subst(clause, ">=", "-ge", -1), -1);
-	   nstrncpy(expr, MAXLINE, subst(expr, ">", "-gt", -1), -1);
-	   nstrncpy(expr, MAXLINE, subst(expr, "<=", "-le", -1), -1);
-	   nstrncpy(expr, MAXLINE, subst(expr, "<", "-lt", -1), -1);
-	   nstrncpy(expr, MAXLINE, subst(expr, "!=", "-ne", -1), -1);
-	   nstrncpy(expr, MAXLINE, subst(expr, "==", "-eq", -1), -1);
+	  {nstrncpy(expr, BFMED, subst(clause, ">=", "-ge", -1), -1);
+	   nstrncpy(expr, BFMED, subst(expr, ">", "-gt", -1), -1);
+	   nstrncpy(expr, BFMED, subst(expr, "<=", "-le", -1), -1);
+	   nstrncpy(expr, BFMED, subst(expr, "<", "-lt", -1), -1);
+	   nstrncpy(expr, BFMED, subst(expr, "!=", "-ne", -1), -1);
+	   nstrncpy(expr, BFMED, subst(expr, "==", "-eq", -1), -1);
 
-	   ok = eval_expr(st, eval(expr, MAXLINE, NULL));
+	   ok = eval_expr(st, eval(expr, BFMED, NULL));
 
            clause[0] = '\0';
            unev[0]   = '\0';
@@ -687,7 +687,7 @@ static void parse_assgn(rundes *st, char *sect,
 	      {synerr = TRUE;
                break;}
 	   else
-	      {nstrncpy(cons, MAXLINE, clause, -1);
+	      {nstrncpy(cons, BFMED, clause, -1);
 	       clause[0] = '\0';
                unev[0]   = '\0';};
 
@@ -698,36 +698,36 @@ static void parse_assgn(rundes *st, char *sect,
        else if ((strchr(tok, '$') != NULL) && (kind == TRUE))
 	  {if (strstr(tok, "$@") != NULL)
 	      {valv = cgetenv(TRUE, effvar);
-               push_tok(clause, MAXLINE, ' ', valv);
-               push_tok(unev, MAXLINE, ' ', valv);}
+               push_tok(clause, BFMED, ' ', valv);
+               push_tok(unev, BFMED, ' ', valv);}
 	   else
-	      {rv = eval(tok, MAXLINE, NULL);
+	      {rv = eval(tok, BFMED, NULL);
                if (rv != NULL)
-		  {push_tok(clause, MAXLINE, ' ', rv);
-                   push_tok(unev, MAXLINE, ' ', tok);}
+		  {push_tok(clause, BFMED, ' ', rv);
+                   push_tok(unev, BFMED, ' ', tok);}
 	       else
 		  {enverr = TRUE;
                    break;};};}
 
 /* convert C logical operators into a form suitable for /bin/test */
        else if (strcmp(tok, "||") == 0)
-	  {push_tok(clause, MAXLINE, ' ', "-o");
-           push_tok(unev, MAXLINE, ' ', "-o");}
+	  {push_tok(clause, BFMED, ' ', "-o");
+           push_tok(unev, BFMED, ' ', "-o");}
        else if (strcmp(tok, "&&") == 0)
-	  {push_tok(clause, MAXLINE, ' ', "-a");
-           push_tok(unev, MAXLINE, ' ', "-a");}
+	  {push_tok(clause, BFMED, ' ', "-a");
+           push_tok(unev, BFMED, ' ', "-a");}
        else if (strcmp(tok, "==") == 0)
-	  {push_tok(clause, MAXLINE, ' ', "=");
-           push_tok(unev, MAXLINE, ' ', "=");}
+	  {push_tok(clause, BFMED, ' ', "=");
+           push_tok(unev, BFMED, ' ', "=");}
 
 /* accumlate everything else into clause and unev as is */
        else
 	  {if (IS_NULL(clause) == TRUE)
-	      {nstrncpy(clause, MAXLINE, tok, -1);
-	       nstrncpy(unev, MAXLINE, tok, -1);}
+	      {nstrncpy(clause, BFMED, tok, -1);
+	       nstrncpy(unev, BFMED, tok, -1);}
 	   else
-	      {push_tok(clause, MAXLINE, ' ', tok);
-               push_tok(unev, MAXLINE, ' ', tok);};};
+	      {push_tok(clause, BFMED, ' ', tok);
+               push_tok(unev, BFMED, ' ', tok);};};
     ENDFOR;
 
     if (enverr == TRUE)
@@ -740,13 +740,13 @@ static void parse_assgn(rundes *st, char *sect,
 
 /* use any left over tokens to fill an empty consequent */
     if ((IS_NULL(unev) == FALSE) && (IS_NULL(cons) == TRUE))
-       {nstrncpy(cons, MAXLINE, unev, -1);
+       {nstrncpy(cons, BFMED, unev, -1);
 	clause[0] = '\0';
 	unev[0]   = '\0';};
 
 /* use any left over tokens to fill an empty alternate */
     if ((IS_NULL(unev) == FALSE) && (IS_NULL(alt) == TRUE))
-       {nstrncpy(alt, MAXLINE, unev, -1);
+       {nstrncpy(alt, BFMED, unev, -1);
 	clause[0] = '\0';
 	unev[0]   = '\0';};
 
@@ -798,13 +798,13 @@ static int set_target(rundes *st)
 		 lst = strtok(NULL, "\n");
 
 		 if ((strcmp(cat, "DBG") == 0) && (IS_NULL(st->dbgtgt) == TRUE))
-		    load_target(st->dbgtgt, MAXLINE, lst);
+		    load_target(st->dbgtgt, BFMED, lst);
 
 		 else if ((strcmp(cat, "MPI") == 0) && (IS_NULL(st->mpitgt) == TRUE))
-		    load_target(st->mpitgt, MAXLINE, lst);
+		    load_target(st->mpitgt, BFMED, lst);
 
 		 else if ((strcmp(cat, "CROSS") == 0) && (IS_NULL(st->crosstgt) == TRUE))
-		    load_target(st->crosstgt, MAXLINE, lst);};};
+		    load_target(st->crosstgt, BFMED, lst);};};
 
 	free_strings(sa);};
 
@@ -829,7 +829,7 @@ static int set_target(rundes *st)
 
 static void parse_db(rundes *st)
    {int i;
-    char effvar[MAXLINE], sect[MAXLINE];
+    char effvar[BFMED], sect[BFMED];
     char *p, *var, *oper, *val, *exe, **sa;
 
     if (IS_NULL(st->sgn) == FALSE)
@@ -879,11 +879,11 @@ static void parse_db(rundes *st)
 /* set the effective variable name */
 	     if (strcmp(var, "Env") == 0)
 	        {var    = strtok(NULL, " \t");
-		 nstrncpy(effvar, MAXLINE, var, -1);}
+		 nstrncpy(effvar, BFMED, var, -1);}
 	     else if ((strcmp(sect, "") == 0) || (strcmp(var, "Cmd") == 0))
-	        nstrncpy(effvar, MAXLINE, var, -1);
+	        nstrncpy(effvar, BFMED, var, -1);
 	     else
-	        snprintf(effvar, MAXLINE, "%s_%s", sect, var);
+	        snprintf(effvar, BFMED, "%s_%s", sect, var);
 
 	     oper = strtok(NULL, " \t");
 	     val  = strtok(NULL, "\n");
@@ -920,7 +920,7 @@ static void parse_db(rundes *st)
 
 static int setup_dbg_path(rundes *st)
    {int i, rv;
-    char s[MAXLINE], ent[MAXLINE];
+    char s[BFMED], ent[BFMED];
     char *c, *fn, **lst;
     FILE *fp;
 
@@ -936,28 +936,28 @@ static int setup_dbg_path(rundes *st)
 	   {fn = cgetenv(TRUE, "TVDirs");
 	    fp = open_file("a", fn);}
 	else
-	   {getcwd(s, MAXLINE);
+	   {getcwd(s, BFMED);
 	    csetenv("TVDirs", "%s/.tv.%d", s, getpid());
 	    fn = cgetenv(TRUE, "TVDirs");
 	    fp = open_file("w", fn);};
 
 /* add the PACT directories to TVDirs */
         if (fp != NULL)
-	   {nstrncpy(s, MAXLINE, st->bindir, -1);
-	    nstrncpy(s, MAXLINE, path_head(s), -1);
-	    nstrncpy(s, MAXLINE, path_head(s), -1);
+	   {nstrncpy(s, BFMED, st->bindir, -1);
+	    nstrncpy(s, BFMED, path_head(s), -1);
+	    nstrncpy(s, BFMED, path_head(s), -1);
 	    if (dir_exists("%s/sources", s) == TRUE)
 	       lst = ls("", "%s/sources/", s);
 
 	    else
-	       {nstrncpy(s, MAXLINE, path_head(s), -1);
+	       {nstrncpy(s, BFMED, path_head(s), -1);
 		if (dir_exists(s) == TRUE)
 		   lst = ls("", "%s", s);
 		else
 		   lst = NULL;};
 
 	    for (i = 0; lst[i] != NULL; i++)
-	        {nstrncpy(ent, MAXLINE, path_tail(lst[i]), -1);
+	        {nstrncpy(ent, BFMED, path_tail(lst[i]), -1);
 		 if ((dir_exists("%s/%s", s, ent) == TRUE) &&
 		     (strcmp(ent, "CVS") != 0) &&
 		     (strncmp(ent, "z-", 2) != 0) &&
@@ -971,7 +971,7 @@ static int setup_dbg_path(rundes *st)
 	    if (st->verbose > 0)
 	       printf("Running under %s\n", cgetenv(TRUE, "DBG_Exe"));
 
-	    push_tok(st->dargs, MAXLINE, ' ', "-l");};};
+	    push_tok(st->dargs, BFMED, ' ', "-l");};};
 
    return(rv);}
 
@@ -1013,7 +1013,7 @@ static char *cleanup_env(rundes *st)
     if (st->direct == FALSE)
        {cmd = shell_clean(cmd);
 
-	snprintf(st->mpife, MAXLINE, "%s", cgetenv(TRUE, "MPI"));
+	snprintf(st->mpife, BFMED, "%s", cgetenv(TRUE, "MPI"));
 
 	st->errio = (cmpenv("STDERR", "TRUE") == 0);
 
@@ -1116,12 +1116,12 @@ static int run_interactive(rundes *st)
 
 static int finish(rundes *st, int rv)
    {int rsn, sts, iee, iei;
-    char s[MAXLINE];
+    char s[BFMED];
     char *see, *sei;
 
 /* this is the right place to remove the AIX MPI hostfile */
     if (strcmp(st->os, "AIX") == 0)
-       {mp_hostfile(s, MAXLINE, st);
+       {mp_hostfile(s, BFMED, st);
 	unlink_safe(s);};
 
     if (WIFEXITED(rv))
@@ -1227,7 +1227,7 @@ static void help(void)
 
 static int process_args(rundes *st, int c, char **v)
    {int i, nt;
-    char s[MAXLINE];
+    char s[BFMED];
     char *ky, *vl;
 
     if (c == 0)
@@ -1238,8 +1238,8 @@ static int process_args(rundes *st, int c, char **v)
             csetenv("Batch", "TRUE");
 
 	 else if (strcmp(v[i], "-bf") == 0)
-            {push_tok(st->bargs, MAXLINE, ' ', "-f");
-	     push_tok(st->bargs, MAXLINE, ' ', v[++i]);
+            {push_tok(st->bargs, BFMED, ' ', "-f");
+	     push_tok(st->bargs, BFMED, ' ', v[++i]);
 	     csetenv("Batch", "TRUE");}
 
 	 else if (strcmp(v[i], "-c") == 0)
@@ -1247,15 +1247,15 @@ static int process_args(rundes *st, int c, char **v)
 	     csetenv("MPICnd", "TRUE");}
 
 	 else if (strcmp(v[i], "-cross") == 0)
-	    nstrncpy(st->crosstgt, MAXLINE, v[++i], -1);
+	    nstrncpy(st->crosstgt, BFMED, v[++i], -1);
 
 	 else if (strcmp(v[i], "-d") == 0)
             {st->debug = TRUE;
-	     nstrncpy(st->dbgtgt, MAXLINE, "tv", -1);}
+	     nstrncpy(st->dbgtgt, BFMED, "tv", -1);}
 
 	 else if (strcmp(v[i], "-dbg") == 0)
             {st->debug = TRUE;
-	     nstrncpy(st->dbgtgt, MAXLINE, v[++i], -1);}
+	     nstrncpy(st->dbgtgt, BFMED, v[++i], -1);}
 
 	 else if (strcmp(v[i], "-dr") == 0)
             {st->verbose++;
@@ -1279,41 +1279,41 @@ static int process_args(rundes *st, int c, char **v)
 	    csetenv("Wrap", "");
 
 	 else if (strcmp(v[i], "-mpi") == 0)
-	    nstrncpy(st->mpitgt, MAXLINE, v[++i], -1);
+	    nstrncpy(st->mpitgt, BFMED, v[++i], -1);
 
 	 else if (strcmp(v[i], "-o") == 0)
-	    {push_tok(st->dargs, MAXLINE, ' ', "-o");
-	     push_tok(st->dargs, MAXLINE, ' ', v[++i]);}
+	    {push_tok(st->dargs, BFMED, ' ', "-o");
+	     push_tok(st->dargs, BFMED, ' ', v[++i]);}
 
 	 else if (strcmp(v[i], "-n") == 0)
 	    {csetenv("NNode", v[++i]);
-	     push_tok(st->dargs, MAXLINE, ' ', "-n");
-	     push_tok(st->dargs, MAXLINE, ' ', v[i]);}
+	     push_tok(st->dargs, BFMED, ' ', "-n");
+	     push_tok(st->dargs, BFMED, ' ', v[i]);}
 
 	 else if (strcmp(v[i], "-p") == 0)
-	    {nstrncpy(s, MAXLINE, v[++i], -1);
+	    {nstrncpy(s, BFMED, v[++i], -1);
 	     key_val(&ky, &vl, s, ",\n");
 	     csetenv("NProc", ky);
 	     if (vl != NULL)
 		csetenv("NNode", vl);
-	     push_tok(st->dargs, MAXLINE, ' ', "-p");
-	     push_tok(st->dargs, MAXLINE, ' ', v[i]);}
+	     push_tok(st->dargs, BFMED, ' ', "-p");
+	     push_tok(st->dargs, BFMED, ' ', v[i]);}
 
 	 else if (strcmp(v[i], "-prf") == 0)
             {st->debug = TRUE;
-	     nstrncpy(st->dbgtgt, MAXLINE, "prf", -1);}
+	     nstrncpy(st->dbgtgt, BFMED, "prf", -1);}
 
 	 else if (strcmp(v[i], "-prt") == 0)
 	    csetenv("Pool", v[++i]);
 
 	 else if (strcmp(v[i], "-q") == 0)
-	    push_tok(st->dargs, MAXLINE, ' ', v[++i]);
+	    push_tok(st->dargs, BFMED, ' ', v[++i]);
 
 	 else if (strcmp(v[i], "-r") == 0)
 	    st->direct = TRUE;
 
 	 else if (strcmp(v[i], "-s") == 0)
-	    nstrncpy(st->sgn, MAXLINE, v[++i], -1);
+	    nstrncpy(st->sgn, BFMED, v[++i], -1);
 
 	 else if (strcmp(v[i], "-t") == 0)
 	    {nt = atoi(v[++i]);
@@ -1326,18 +1326,18 @@ static int process_args(rundes *st, int c, char **v)
 
 	 else if (strcmp(v[i], "-vg") == 0)
             {st->debug = TRUE;
-	     nstrncpy(st->dbgtgt, MAXLINE, "vg", -1);}
+	     nstrncpy(st->dbgtgt, BFMED, "vg", -1);}
 
 	 else if (strcmp(v[i], "-vgd") == 0)
             {st->debug = TRUE;
-	     nstrncpy(st->dbgtgt, MAXLINE, "vgd", -1);}
+	     nstrncpy(st->dbgtgt, BFMED, "vgd", -1);}
 
 	 else if (strcmp(v[i], "-x") == 0)
             st->usempi = FALSE;
 
 	 else if (strcmp(v[i], "-z") == 0)
             {st->debug = TRUE;
-	     nstrncpy(st->dbgtgt, MAXLINE, "zf", -1);}
+	     nstrncpy(st->dbgtgt, BFMED, "zf", -1);}
 
 	 else
             {char *p;
@@ -1353,9 +1353,9 @@ static int process_args(rundes *st, int c, char **v)
  * passed properly to the ultimate execute line
  */
 		  if (strpbrk(p, " \t") != NULL)
-		     push_tok(s, MAXLINE, ' ', "\"%s\"", v[i]);
+		     push_tok(s, BFMED, ' ', "\"%s\"", v[i]);
 		  else
-		     push_tok(s, MAXLINE, ' ', v[i]);};
+		     push_tok(s, BFMED, ' ', v[i]);};
 
 	     p = shell_clean(s);
 
@@ -1370,7 +1370,7 @@ static int process_args(rundes *st, int c, char **v)
 
 int main(int c, char **v)
    {int ok, rv;
-    char exe[MAXLINE], os[MAXLINE], host[MAXLINE];
+    char exe[BFMED], os[BFMED], host[BFMED];
     rundes state;
 
     setbuf(stdout, NULL);
@@ -1382,11 +1382,11 @@ int main(int c, char **v)
     memset(&state, 0, sizeof(rundes));
 
 /* find the directory with do-run */
-    nstrncpy(exe, MAXLINE, cwhich(v[0]), -1);
-    nstrncpy(state.bindir, MAXLINE, path_head(exe), -1);
+    nstrncpy(exe, BFMED, cwhich(v[0]), -1);
+    nstrncpy(state.bindir, BFMED, path_head(exe), -1);
 
-    unamef(os,   MAXLINE, "s");
-    unamef(host, MAXLINE, "n");
+    unamef(os,   BFMED, "s");
+    unamef(host, BFMED, "n");
 
 /* locate the tools needed for subshells */
     if (strcmp(os, "AIX") == 0)
@@ -1422,7 +1422,7 @@ int main(int c, char **v)
 	    rv = 2;};
 
 	if (ok == TRUE)
-	   {csetenv("Cmd", eval(cgetenv(TRUE, "Cmd"), LRG, "Cmd"));
+	   {csetenv("Cmd", eval(cgetenv(TRUE, "Cmd"), BFLRG, "Cmd"));
 
 	    if (state.verbose > 1)
 	       {printf("NCPU        = |%d|\n", state.ncpu);

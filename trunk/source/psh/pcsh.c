@@ -48,7 +48,7 @@ static int make_shell_script(FILE *fi, char *fname, char *shell, char *pact,
 			     char *args, int henv,
 			     char **vo, char **v, int k)
    {int i, co;
-    char s[LRG];
+    char s[BFLRG];
     FILE *fo;
 
 /* initialize the repackaged version */
@@ -64,7 +64,7 @@ static int make_shell_script(FILE *fi, char *fname, char *shell, char *pact,
 	fprintf(fo, "\n");
 
 /* add the remainder of the shell script */
-	for (i = 0; fgets(s, MAXLINE, fi) != NULL; i++)
+	for (i = 0; fgets(s, BFLRG, fi) != NULL; i++)
 	    fputs(s, fo);
 
 /* finish up the file */
@@ -98,22 +98,22 @@ static int make_shell_script(FILE *fi, char *fname, char *shell, char *pact,
 
 static int make_c_script(FILE *fi, char *fname, char **v)
    {int i, co;
-    char s[LRG], cname[MAXLINE], exe[MAXLINE];
-    char bindir[MAXLINE], incdir[MAXLINE];
+    char s[BFLRG], cname[BFLRG], exe[BFLRG];
+    char bindir[BFLRG], incdir[BFLRG];
     FILE *fo;
 
-    nstrncpy(exe, MAXLINE, cwhich(v[0]), -1);
-    nstrncpy(bindir, MAXLINE, path_head(exe), -1);
-    nstrncpy(s, LRG, bindir, -1);
-    snprintf(incdir, MAXLINE, "%s/include", path_head(s));
-    snprintf(cname, MAXLINE, "%s.c", fname);
+    nstrncpy(exe, BFLRG, cwhich(v[0]), -1);
+    nstrncpy(bindir, BFLRG, path_head(exe), -1);
+    nstrncpy(s, BFLRG, bindir, -1);
+    snprintf(incdir, BFLRG, "%s/include", path_head(s));
+    snprintf(cname, BFLRG, "%s.c", fname);
 
 /* initialize the repackaged version */
     fo = fopen(cname, "w");
 
 /* copy the remainder as the C program */
     if (fo != NULL)
-       {for (i = 0; fgets(s, MAXLINE, fi) != NULL; i++)
+       {for (i = 0; fgets(s, BFLRG, fi) != NULL; i++)
 	    fputs(s, fo);
 
 /* finish up the file */
@@ -138,13 +138,13 @@ static void invoke_script(char **vo, char *shell, char *pact,
 			  char **v, int k, int c)
    {int i, co, henv;
     off_t ad;
-    char fname[MAXLINE], s[LRG], args[MAXLINE];
+    char fname[BFLRG], s[BFLRG], args[BFLRG];
     char *sname, *p;
     FILE *fi;
 
     sname = v[k];
 
-    snprintf(fname, MAXLINE, "/tmp/%s.%d",
+    snprintf(fname, BFLRG, "/tmp/%s.%d",
 	     path_tail(sname), (int) getpid());
 
     co = 0;
@@ -152,7 +152,7 @@ static void invoke_script(char **vo, char *shell, char *pact,
 /* read the first line of the shell script */
     fi = fopen(sname, "r");
     if (fi != NULL)
-       {fgets(s, MAXLINE, fi);
+       {fgets(s, BFLRG, fi);
 
 	p = strtok(s, " ");
 
@@ -160,7 +160,7 @@ static void invoke_script(char **vo, char *shell, char *pact,
 	if ((p != NULL) && (strstr(p, "bin/env") != NULL))
 	   {henv = TRUE;
 	    ad   = ftell(fi);
-	    fgets(s, MAXLINE, fi);
+	    fgets(s, BFLRG, fi);
 	    if (strncmp(s, "#OPT", 4) == 0)
 	       p = strtok(s + 4, "\n");
 	    else
@@ -170,7 +170,7 @@ static void invoke_script(char **vo, char *shell, char *pact,
 	   {henv = FALSE;
 	    p    = strtok(NULL, "\n");};
 
-	nstrncpy(args, MAXLINE, p, -1);
+	nstrncpy(args, BFLRG, p, -1);
 
 	p = strstr(args, "-lang");
 	if (p == NULL)
@@ -200,7 +200,7 @@ static void invoke_script(char **vo, char *shell, char *pact,
 static void invoke_command(char **vo, char *shell, char *pact,
 			   char **v, int k, int c)
    {int i, co, haverc;
-    char s[LRG], t[MAXLINE], u[MAXLINE];
+    char s[BFLRG], t[BFLRG], u[BFLRG];
     char *p;
 
     haverc = cdefenv("PCSHRC");
@@ -214,35 +214,35 @@ static void invoke_command(char **vo, char *shell, char *pact,
 
     s[0] = '\0';
 
-    nstrcat(s, LRG, "( ");
+    nstrcat(s, BFLRG, "( ");
 
     if (cdefenv("PCSHRC") == TRUE)
-       {snprintf(t, MAXLINE, "source %s ", cgetenv(TRUE, "PCSHRC"));
-	nstrcat(s, LRG, t);
-	nstrcat(s, LRG, "; ");};
+       {snprintf(t, BFLRG, "source %s ", cgetenv(TRUE, "PCSHRC"));
+	nstrcat(s, BFLRG, t);
+	nstrcat(s, BFLRG, "; ");};
 
 /* check for a pcshrc file to include before PACT environment */
     if (haverc == TRUE)
        {p = cgetenv(TRUE, "PCSHRC");
 	if (file_exists(p) == TRUE)
-	   {snprintf(t, MAXLINE, "source %s ; ", p);
-	    nstrcat(s, LRG, t);};};
+	   {snprintf(t, BFLRG, "source %s ; ", p);
+	    nstrcat(s, BFLRG, t);};};
 
-    snprintf(u, MAXLINE, "source %s/etc/env-pact.csh ; ", pact);
-    nstrcat(s, LRG, u);
-    snprintf(u, MAXLINE, "source %s/etc/functions-pact.csh ; ", pact);
-    nstrcat(s, LRG, u);
-    snprintf(u, MAXLINE, "unsetenv CROSS ; ");
-    nstrcat(s, LRG, u);
+    snprintf(u, BFLRG, "source %s/etc/env-pact.csh ; ", pact);
+    nstrcat(s, BFLRG, u);
+    snprintf(u, BFLRG, "source %s/etc/functions-pact.csh ; ", pact);
+    nstrcat(s, BFLRG, u);
+    snprintf(u, BFLRG, "unsetenv CROSS ; ");
+    nstrcat(s, BFLRG, u);
 
 /* check for a pcshrc file to include before PACT environment */
     if (haverc == TRUE)
        {if (file_exists("%s.post", p) == TRUE)
-	   {snprintf(t, MAXLINE, "source %s.post ; ", p);
-	    nstrcat(s, LRG, t);};};
+	   {snprintf(t, BFLRG, "source %s.post ; ", p);
+	    nstrcat(s, BFLRG, t);};};
 
-    nstrcat(s, LRG, v[k]);
-    nstrcat(s, LRG, " )");
+    nstrcat(s, BFLRG, v[k]);
+    nstrcat(s, BFLRG, " )");
 
     vo[co++] = STRSAVE(s);
     vo[co]   = NULL;
@@ -259,8 +259,8 @@ static void invoke_command(char **vo, char *shell, char *pact,
 static void invoke_session(char **vo, char *shell, char *pact,
 			   char **v, int c)
    {int i, co, nodot;
-    char home[MAXLINE], user[MAXLINE], cshrc[MAXLINE];
-    char dname[MAXLINE], fname[MAXLINE];
+    char home[BFLRG], user[BFLRG], cshrc[BFLRG];
+    char dname[BFLRG], fname[BFLRG];
     char *p;
     FILE *fo;
 
@@ -276,16 +276,16 @@ static void invoke_session(char **vo, char *shell, char *pact,
 	 else
 	    vo[co++] = p;};
 
-    nstrncpy(home,  MAXLINE, cgetenv(TRUE, "HOME"), -1);
-    nstrncpy(user,  MAXLINE, cgetenv(FALSE, "USER"), -1);
-    snprintf(cshrc, MAXLINE, "%s/.cshrc", home);
+    nstrncpy(home,  BFLRG, cgetenv(TRUE, "HOME"), -1);
+    nstrncpy(user,  BFLRG, cgetenv(FALSE, "USER"), -1);
+    snprintf(cshrc, BFLRG, "%s/.cshrc", home);
 
 /* make a temporary home directory */
-    snprintf(dname, MAXLINE, "/tmp/%s.%d", user, (int) getpid());
+    snprintf(dname, BFLRG, "/tmp/%s.%d", user, (int) getpid());
     run(FALSE, "mkdir -p %s", dname);
 
 /* write a temporary .cshrc */
-    snprintf(fname, MAXLINE, "%s/.cshrc", dname);
+    snprintf(fname, BFLRG, "%s/.cshrc", dname);
     fo = fopen(fname, "w");
     if (fo != NULL)
        {fprintf(fo, "setenv HOME %s\n", home);
@@ -319,16 +319,16 @@ static void invoke_session(char **vo, char *shell, char *pact,
  */
 
 static void fix_env(char *prog)
-   {char exe[LRG], s[LRG];
+   {char exe[BFLRG], s[BFLRG];
 
 /* add the path to here iff you are able to verify it */
-    full_path(exe, LRG, NULL, path_head(prog));
+    full_path(exe, BFLRG, NULL, path_head(prog));
     csetenv("PATH", "%s:%s", exe, cgetenv(TRUE, "PATH"));
 
-    full_path(exe, LRG, NULL, cwhich("pact"));
+    full_path(exe, BFLRG, NULL, cwhich("pact"));
     if (file_executable(exe) == TRUE)
-       {nstrncpy(s, LRG, path_head(exe), -1);
-        nstrncpy(s, LRG, path_head(s), -1);
+       {nstrncpy(s, BFLRG, path_head(exe), -1);
+        nstrncpy(s, BFLRG, path_head(s), -1);
 
 	csetenv("PACT", s);
         csetenv("PATH", "%s/bin:%s", s, cgetenv(TRUE, "PATH"));};
@@ -342,13 +342,13 @@ static void fix_env(char *prog)
 
 int main(int c, char **v)
    {int i, j, k, ok, done;
-    char shell[MAXLINE], pact[MAXLINE], s[MAXLINE];
+    char shell[BFLRG], pact[BFLRG], s[BFLRG];
     char *scr, *vo[1024];
     static int verbose = FALSE;
 
     setbuf(stdout, NULL);
 
-    nstrncpy(shell, MAXLINE, "/bin/csh", -1);
+    nstrncpy(shell, BFLRG, "/bin/csh", -1);
 
 /* if v[1] indicates a different PACT version than
  * v[0] it could end up with an incompatible environment
@@ -362,10 +362,10 @@ int main(int c, char **v)
  * guard against a local utility named pcsh without the supporting
  * files
  */
-    nstrncpy(pact, MAXLINE, path_head(path_head(cwhich(v[1]))), -1);
+    nstrncpy(pact, BFLRG, path_head(path_head(cwhich(v[1]))), -1);
     if ((file_exists("%s/bin/pcsh", pact) == FALSE) ||
 	(dir_exists("%s/etc", pact) == FALSE))
-       nstrncpy(pact, MAXLINE, path_head(path_head(cwhich(v[0]))), -1);
+       nstrncpy(pact, BFLRG, path_head(path_head(cwhich(v[0]))), -1);
 
 /* locate the tools needed for subshells */
     build_path(NULL,
@@ -419,7 +419,7 @@ int main(int c, char **v)
 
 /* rework shell script invocation */
     if (k > 0)
-       {full_path(s, MAXLINE, NULL, v[k]);
+       {full_path(s, BFLRG, NULL, v[k]);
 	scr = s;
 	invoke_script(vo, shell, pact, v, k, c);}
 

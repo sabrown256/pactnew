@@ -30,9 +30,6 @@
 
 #undef SCOPE_SCORE
 
-#undef MAXLINE
-#define MAXLINE 255
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -19,11 +19,11 @@
 
 static int cat(char *tag, int nc, int ne, int no)
    {int i, rv;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *p;
 
     for (i = 0; TRUE; i++)
-        {p = fgets(s, MAXLINE, stdin);
+        {p = fgets(s, BFLRG, stdin);
 	 if (p != NULL)
 	    fprintf(stdout, "%s> %s", tag, s);
 	 else
@@ -43,10 +43,10 @@ static int cat(char *tag, int nc, int ne, int no)
 
 static int conv(char *side)
    {int rv, nx;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *p;
 
-    memset(s, 0, MAXLINE);
+    memset(s, 0, BFLRG);
     setbuf(stdout, NULL);
     setbuf(stderr, NULL);
 
@@ -60,7 +60,7 @@ static int conv(char *side)
 	       {fprintf(stderr, "A sent: %d\n", ia);
 		fprintf(stdout, "%d\n", ia);
 		ia++;};
-	    p = fgets(s, MAXLINE, stdin);
+	    p = fgets(s, BFLRG, stdin);
 	    if (p != NULL)
 	       {fprintf(stderr, "A recv: %s", s);
 		if (strcmp(s, "end\n") == 0)
@@ -71,7 +71,7 @@ static int conv(char *side)
        {static int ib = 0;
 
 	while ((ib < 2*nx) && (rv == 0))
-	   {p = fgets(s, MAXLINE, stdin);
+	   {p = fgets(s, BFLRG, stdin);
 	    if (p != NULL)
 	       {fprintf(stderr, "B recv: %s", s);
 		if (ib >= nx)

@@ -43,13 +43,13 @@ void usage(void)
 
 int main(int c, char **v)
    {int i, ok, cmpl, ltrl;
-    char root[MAXLINE];
+    char root[BFLRG];
     char *ptrn;
     itarget tgt;
 
     cmpl = FALSE;
     ltrl = FALSE;
-    file_path(v[0], root, MAXLINE);
+    file_path(v[0], root, BFLRG);
     pop_path(root);
     pop_path(root);
 

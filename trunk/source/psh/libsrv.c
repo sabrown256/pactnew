@@ -55,9 +55,9 @@ static svr_session
 /* NAME_CONN - derive the name of the connection file from ROOT */
 
 char *name_conn(char *root)
-   {static char fname[MAXLINE];
+   {static char fname[BFLRG];
 
-    snprintf(fname, MAXLINE, "%s.conn", root);
+    snprintf(fname, BFLRG, "%s.conn", root);
 
     return(fname);}
 
@@ -70,7 +70,7 @@ char *name_conn(char *root)
 
 char *name_log(char *root)
    {char *p;
-    static char log[MAXLINE];
+    static char log[BFLRG];
 
     p = NULL;
 
@@ -78,7 +78,7 @@ char *name_log(char *root)
        root = cgetenv(TRUE, "PERDB_PATH");
 
     if (root != NULL)
-       {snprintf(log, MAXLINE, "%s.log", root);
+       {snprintf(log, BFLRG, "%s.log", root);
 	p = log;};
 
     return(p);}
@@ -92,11 +92,11 @@ char *name_log(char *root)
 /* CL_LOGGER - log messages for the client CL */
 
 void cl_logger(client *cl, int lvl, char *fmt, ...)
-   {char s[MAXLINE];
+   {char s[BFLRG];
     char *root, *wh, *flog;
 
     VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     wh   = C_OR_S(cl->type == CLIENT);
@@ -116,7 +116,7 @@ void cl_logger(client *cl, int lvl, char *fmt, ...)
 
 int verifyx(client *cl, char *ans, char *res)
    {int nk, rv;
-    char lres[MAXLINE];
+    char lres[BFLRG];
     char *key;
 
     rv = TRUE;
@@ -209,13 +209,13 @@ int comm_read(client *cl, char *s, int nc, int to)
     if (cl->type == SERVER)
        nb = _comm_read_wrk(cl, s, nc, to);
     else
-       {char u[LRG];
+       {char u[BFLRG];
 
 	for (nb = 0; nb == 0; )
 	    {nb = ring_pop(&cl->ior, s, nc, '\0');
 	     if (nb == 0)
-	        {memset(u, 0, LRG);
-		 nt = _comm_read_wrk(cl, u, LRG, to);
+	        {memset(u, 0, BFLRG);
+		 nt = _comm_read_wrk(cl, u, BFLRG, to);
 		 ok = ring_push(&cl->ior, u, nt);};};};
 
     no = 0;
@@ -300,7 +300,7 @@ int comm_write(client *cl, char *s, int nc, int to)
 
 static void _check_fd(srvdes *sv)
    {int fd;
-    char s[MAXLINE];
+    char s[BFLRG];
     fd_set rfs;
     client *cl;
     connection *srv;
@@ -312,7 +312,7 @@ static void _check_fd(srvdes *sv)
     s[0] = '\0';
     for (fd = 0; fd < FD_SETSIZE; ++fd)
         {if (FD_ISSET(fd, &rfs))
-            vstrcat(s, MAXLINE, " %d", fd);};
+            vstrcat(s, BFLRG, " %d", fd);};
 
     SLOG(sv, 4, "monitoring: %s", s);
 
@@ -410,7 +410,7 @@ static void _term_connection(srvdes *sv)
 
 static int _process_act(srvdes *sv, int fd)
    {int rv, nb, to;
-    char s[MAXLINE];
+    char s[BFLRG];
     char **val;
     client *cl;
 
@@ -420,9 +420,9 @@ static int _process_act(srvdes *sv, int fd)
     to = 60;
     rv = 1;
 
-    memset(s, 0, MAXLINE);
+    memset(s, 0, BFLRG);
 
-    nb = comm_read(cl, s, MAXLINE, to);
+    nb = comm_read(cl, s, BFLRG, to);
 
 /* decide on the action to take */
     if (nb <= 0)
@@ -588,7 +588,7 @@ client *make_client(ckind type, int auth, char *root,
 	cl->scon   = &global_srv;
         cl->clog   = clog;
 
-	ring_init(&cl->ior, LRG);
+	ring_init(&cl->ior, BFLRG);
 
 	CLOG(cl, 1, "----- start client -----");};
 
@@ -625,7 +625,7 @@ void free_client(client *cl)
 char **client_ex(client *cl, char *req)
    {int nb, ne, nx;
     char **p;
-    static char s[MAXLINE];
+    static char s[BFLRG];
 
     p = NULL;
 
@@ -643,7 +643,7 @@ char **client_ex(client *cl, char *req)
 	nx = 100;
 	to = 4;
 	for (ok = TRUE; ok == TRUE; )
-	    {nb = comm_read(cl, s, MAXLINE, to);
+	    {nb = comm_read(cl, s, BFLRG, to);
 	     ne = (nb < 0) ? ne+1 : 0;
 
 /* if more than NX consecutive read failures bail */

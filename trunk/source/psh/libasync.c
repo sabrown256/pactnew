@@ -283,13 +283,13 @@ process_group_state *get_process_group_state(void)
 
 void _dbg(unsigned int lvl, char *fmt, ...)
    {int pid;
-    char s[LRG];
+    char s[BFLRG];
     process_group_state *ps;
 
     ps = get_process_group_state();
     if (lvl & ps->dbg_level)
        {VA_START(fmt);
-	VSNPRINTF(s, LRG, fmt);
+	VSNPRINTF(s, BFLRG, fmt);
 	VA_END;
 
 	pid = getpid();
@@ -515,7 +515,7 @@ void _init_process(process *pp)
 
 static process *_job_mk_process(int child, char **arg,
 				char **env, char *shell)
-   {char s[MAXLINE];
+   {char s[BFLRG];
     char *sc;
     process *pp;
 
@@ -524,7 +524,7 @@ static process *_job_mk_process(int child, char **arg,
        {if (arg == NULL)
 	   sc = NULL;
 	else
-	   {sc = concatenate(s, MAXLINE, arg, " ");
+	   {sc = concatenate(s, BFLRG, arg, " ");
 	    sc = STRSAVE(sc);};
 
 	_init_process(pp);
@@ -845,7 +845,7 @@ static int _job_init_ipc(process *pp, process *cp)
 
 void dprdio(char *tag, iodes *pio)
    {int nc, fd, gid, dst, src;
-    char sdst[MAXLINE], ssrc[MAXLINE], snc[MAXLINE];
+    char sdst[BFLRG], ssrc[BFLRG], snc[BFLRG];
     char *hnd, *knd, *dev;
     static char *hn[]  = {"none", "clos", "pipe", "fnc", "poll"};
     static char *kn[]  = {"none", "in", "out", "err",
@@ -871,17 +871,17 @@ void dprdio(char *tag, iodes *pio)
 	if (dst == -1)
 	   strcpy(sdst, "   ");
 	else
-	   snprintf(sdst, MAXLINE, "%3d", dst);
+	   snprintf(sdst, BFLRG, "%3d", dst);
 
 	if (src == -1)
 	   strcpy(ssrc, "   ");
 	else
-	   snprintf(ssrc, MAXLINE, "%3d", src);
+	   snprintf(ssrc, BFLRG, "%3d", src);
 
 	if (nc == -1)
 	   strcpy(snc, "    ");
 	else
-	   snprintf(snc, MAXLINE, "(%2d)", nc);
+	   snprintf(snc, BFLRG, "(%2d)", nc);
 
 	if (gid != -1)
 	   _dbg(-1, "%8s %3d%4s %4s %4s %4s %3d %3s %3s",
@@ -1019,7 +1019,7 @@ int _do_rlimit(char *vr)
 
 	if (op != -1)
 	   {int st;
-	    char bf[MAXLINE];
+	    char bf[BFLRG];
 	    struct rlimit ol;
 
 	    st = getrlimit(op, &ol);
@@ -1028,7 +1028,7 @@ int _do_rlimit(char *vr)
 	       _dbg(2, "setlimit %s = %ld (ok)",
 		    vr, (long) rl.rlim_cur);
 	    else
-	       {strerror_r(errno, bf, MAXLINE);
+	       {strerror_r(errno, bf, BFLRG);
 		_dbg(2, "setlimit %s = %ld (%ld/%s)",
 		     vr,
 		     (long) rl.rlim_cur, (long) ol.rlim_max,
@@ -1196,14 +1196,14 @@ static void _job_error_fork(process *pp, process *cp, int *fds)
 
 static char *_job_command_str(char **al)
    {int i;
-    char cmd[MAXLINE];
+    char cmd[BFLRG];
     char *s;
 
-    nstrncpy(cmd, MAXLINE, al[0], -1);
+    nstrncpy(cmd, BFLRG, al[0], -1);
 
     for (i = 1; al[i] != NULL; i++)
-        {nstrcat(cmd, MAXLINE, " ");
-	 nstrcat(cmd, MAXLINE, al[i]);};
+        {nstrcat(cmd, BFLRG, " ");
+	 nstrcat(cmd, BFLRG, al[i]);};
 
     s = STRSAVE(cmd);
 
@@ -1464,15 +1464,15 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
 
 int job_write(process *pp, char *fmt, ...)
    {int nc, ns;
-    char s[LRG];
+    char s[BFLRG];
     FILE *fo;
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     if (LAST_CHAR(s) != '\n')
-       nstrcat(s, LRG, "\n");
+       nstrcat(s, BFLRG, "\n");
 
     nc = 0;
 
@@ -1524,7 +1524,7 @@ int job_poll(process *pp, int to)
 
 int job_response(process *pp, int to, char *fmt, ...)
    {volatile int i, nl, nc, ns, ok, dt, fd;
-    char s[LRG], t[LRG];
+    char s[BFLRG], t[BFLRG];
     char *p;
     FILE *fi, *fo;
     int (*rsp)(int fd, process *pp, char *s);
@@ -1535,9 +1535,9 @@ int job_response(process *pp, int to, char *fmt, ...)
     VA_START(fmt);
 
     if (fmt != NULL)
-       {VSNPRINTF(s, LRG, fmt);
+       {VSNPRINTF(s, BFLRG, fmt);
 	if (LAST_CHAR(s) != '\n')
-	   nstrcat(s, LRG, "\n");}
+	   nstrcat(s, BFLRG, "\n");}
     else
        s[0] = '\0';
 
@@ -1570,7 +1570,7 @@ int job_response(process *pp, int to, char *fmt, ...)
 
 		for (i = 0; ok == FALSE; i++)
 		    {if (job_poll(pp, to) == TRUE)
-		        {p = fgets(t, LRG, fi);
+		        {p = fgets(t, BFLRG, fi);
 			 if (p == NULL)
 			    {ok = TRUE;
 			     break;};
