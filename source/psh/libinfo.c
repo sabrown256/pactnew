@@ -22,7 +22,7 @@
 #undef REGEX
 #undef VERS
 
-# ifndef PCK_SCOPE_PSH
+# if !defined(PSH_OLDWAY)
 
 enum e_itarget
    {INCL, LINK, REGEX, VERS};
