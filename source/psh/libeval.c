@@ -21,11 +21,11 @@
 
 char *expand(char *expr, int nc, char *varn, int rnull)
    {int i, n;
-    char var[MAXLINE], t[MAXLINE];
+    char var[BFLRG], t[BFLRG];
     char *rv, *p, *val;
-    static char s[LRG];
+    static char s[BFLRG];
 
-    nstrncpy(s, LRG, expr, nc);
+    nstrncpy(s, BFLRG, expr, nc);
 
     for (i = 0; TRUE; i++)
         {p = strchr(s, '$');
@@ -35,13 +35,13 @@ char *expand(char *expr, int nc, char *varn, int rnull)
 	    {n = strspn(p, "{abcdefghijklmnopqrstuvwxyz"
 		 	   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			   "0123456789_$?@}");
-	     nstrncpy(var, MAXLINE, p, n);
+	     nstrncpy(var, BFLRG, p, n);
 
 	     if (var[1] == '$')
-	        {snprintf(t, MAXLINE, "%d", (int) getpid());
+	        {snprintf(t, BFLRG, "%d", (int) getpid());
 		 val = t;}
 	     else if (var[1] == '{')
-	        {nstrncpy(t, MAXLINE, var, -1);
+	        {nstrncpy(t, BFLRG, var, -1);
 		 LAST_CHAR(t) = '\0';
 		 val = cgetenv(TRUE, t+2);}
 	     else if (var[1] == '?')
@@ -56,7 +56,7 @@ char *expand(char *expr, int nc, char *varn, int rnull)
 	        {if (rnull == TRUE)
 		    return(NULL);
 		 else
-		    {snprintf(s, LRG, "'%s'", trim(expr, FRONT | BACK, "\""));
+		    {snprintf(s, BFLRG, "'%s'", trim(expr, FRONT | BACK, "\""));
 		     break;};};
 
 	     nstrncpy(s, nc, subst(s, var, val, -1), -1);};};
@@ -131,18 +131,18 @@ void prune_env(char *tgt, char *info)
 /* remove PACT config variables */
         else if (strcmp(tgt, "pact") == 0)
 	   {int i;
-	    char s[MAXLINE], env[MAXLINE];
+	    char s[BFLRG], env[BFLRG];
 	    char **sa, *p;
 
-	    nstrncpy(s, MAXLINE, path_head(cwhich(info)), -1);
-	    snprintf(env, MAXLINE, "%s/etc/env-pact.csh", path_head(s));
+	    nstrncpy(s, BFLRG, path_head(cwhich(info)), -1);
+	    snprintf(env, BFLRG, "%s/etc/env-pact.csh", path_head(s));
 	    if (file_exists(env) == TRUE)
 	       {sa = file_text(FALSE, env);
 
 		if (sa != NULL)
 		   {for (i = 0; sa[i] != NULL; i++)
 		        {if (strncmp(sa[i], "setenv ", 7) == 0)
-			    {nstrncpy(s, MAXLINE, sa[i], -1);
+			    {nstrncpy(s, BFLRG, sa[i], -1);
 			     p = strchr(s+7, ' ');
 			     if (p != NULL)
 			        *p = '\0';

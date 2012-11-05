@@ -14,9 +14,6 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#undef MAXLINE
-#define MAXLINE 4096
-
 #undef INCL
 #undef LINK
 #undef REGEX
@@ -32,7 +29,7 @@ typedef struct s_infodes infodes;
 struct s_infodes
    {int complete;
     int literal;
-    char root[MAXLINE];};
+    char root[BFLRG];};
 
 # endif
 # ifndef SCOPE_SCORE_PREPROC
@@ -49,7 +46,7 @@ static int report_var(infodes *st, char *dir, char *fname,
 		      char *q, char *key, int newl, int db)
    {int i, nc, ok, doit, tst;
     int compl, litrl, quote;
-    char file[MAXLINE];
+    char file[BFLRG];
     char *dlm, *p, *var, *val, *ps, **sa;
 
     ok = FALSE;
@@ -58,7 +55,7 @@ static int report_var(infodes *st, char *dir, char *fname,
     litrl = st->literal;
     quote = FALSE;
 
-    snprintf(file, MAXLINE, "%s/%s/%s", st->root, dir, fname);
+    snprintf(file, BFLRG, "%s/%s/%s", st->root, dir, fname);
 
     dlm = (db == TRUE) ? "=\n" : " \t\n";
 
@@ -147,7 +144,7 @@ static void report(infodes *st, char *q, int newl)
 
     ok = FALSE;
 
-    if (strcmp(q, "make") == 0)
+     if (strcmp(q, "make") == 0)
        ok = report_var(st, "etc", "make-def", "UMake",
 		       NULL, newl, FALSE);
 
@@ -216,7 +213,7 @@ int report_info(char *root, int cmpl, int ltrl, itarget tgt, char *ptrn)
 
     st.complete = cmpl;
     st.literal  = ltrl;
-    nstrncpy(st.root, MAXLINE, root, -1);
+    nstrncpy(st.root, BFLRG, root, -1);
 
     ok = 0;
     switch (tgt)
@@ -245,32 +242,32 @@ int report_info(char *root, int cmpl, int ltrl, itarget tgt, char *ptrn)
 
 int build_makefile(char *root, char *arch, char *mkfile, int vrb)
    {int err;
-    char cmd[MAXLINE], makef[MAXLINE], etc[MAXLINE];
+    char cmd[BFLRG], makef[BFLRG], etc[BFLRG];
 
     err = 0;
 
-    snprintf(etc, MAXLINE, "%s/etc", root);
-    snprintf(makef, MAXLINE, "%s", mkfile);
+    snprintf(etc, BFLRG, "%s/etc", root);
+    snprintf(makef, BFLRG, "%s", mkfile);
 
-    snprintf(cmd, MAXLINE, "csh -cf \"mkdir -p %s/obj >& /dev/null\"", arch);
+    snprintf(cmd, BFLRG, "csh -cf \"mkdir -p %s/obj >& /dev/null\"", arch);
     system(cmd);
 
     if (vrb == TRUE)
        printf("\nMaking %s from pre-Make\n\n", makef);
 
-    snprintf(cmd, MAXLINE, "cp %s/make-def %s", etc, makef);
+    snprintf(cmd, BFLRG, "cp %s/make-def %s", etc, makef);
     err |= system(cmd);
 
-    snprintf(cmd, MAXLINE, "echo PACTTmpDir = %s/obj >> %s", arch, makef);
+    snprintf(cmd, BFLRG, "echo PACTTmpDir = %s/obj >> %s", arch, makef);
     err |= system(cmd);
 
-    snprintf(cmd, MAXLINE, "echo PACTSrcDir = ../.. >> %s", makef);
+    snprintf(cmd, BFLRG, "echo PACTSrcDir = ../.. >> %s", makef);
     err |= system(cmd);
 
-    snprintf(cmd, MAXLINE, "cat pre-Make >> %s", makef);
+    snprintf(cmd, BFLRG, "cat pre-Make >> %s", makef);
     err |= system(cmd);
 
-    snprintf(cmd, MAXLINE, "cat %s/make-macros >> %s", etc, makef);
+    snprintf(cmd, BFLRG, "cat %s/make-macros >> %s", etc, makef);
     err |= system(cmd);
 
     return(err);}

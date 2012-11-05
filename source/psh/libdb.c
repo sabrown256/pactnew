@@ -41,9 +41,9 @@ struct s_vardes
 /* NAME_DB - derive the name of the database from ROOT */
 
 char *name_db(char *root)
-   {static char fname[MAXLINE];
+   {static char fname[BFLRG];
 
-    snprintf(fname, MAXLINE, "%s.db", root);
+    snprintf(fname, BFLRG, "%s.db", root);
 
     return(fname);}
 
@@ -57,7 +57,7 @@ char *name_db(char *root)
 
 static int _db_srv_launch(client *cl)
    {int i, st, pid, rv;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *root, *fcon, **sa;
 
     rv = FALSE;
@@ -73,9 +73,9 @@ static int _db_srv_launch(client *cl)
 	for (i = 0; file_exists(fcon) == FALSE; i++)
 	    {if (i == 1)
 		{if (cl->auth == TRUE)
-		    snprintf(s, MAXLINE, "perdb -a -f %s -s -l", root);
+		    snprintf(s, BFLRG, "perdb -a -f %s -s -l", root);
 		 else
-		    snprintf(s, MAXLINE, "perdb -f %s -s -l", root);
+		    snprintf(s, BFLRG, "perdb -f %s -s -l", root);
 		 st = system(s);
 		 st = WEXITSTATUS(st);
 		 CLOG(cl, 1, "launch |%s| (%d)", s, st);}
@@ -133,7 +133,7 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 
 int dbset(client *cl, char *var, char *fmt, ...)
    {int i, err, nc, nr, ok;
-    char s[LRG];
+    char s[BFLRG];
     char *t, **ta;
     static char *rej[] = { "PWD", "PERDB_PATH" };
 
@@ -147,7 +147,7 @@ int dbset(client *cl, char *var, char *fmt, ...)
 
     if (ok == TRUE)
        {VA_START(fmt);
-	VSNPRINTF(s, LRG, fmt);
+	VSNPRINTF(s, BFLRG, fmt);
 	VA_END;
 
 	nc  = strlen(var) + strlen(s) + 2;
@@ -180,11 +180,11 @@ int dbset(client *cl, char *var, char *fmt, ...)
  */
 
 char *dbget(client *cl, int lit, char *fmt, ...)
-   {char var[MAXLINE];
+   {char var[BFLRG];
     char *t, **ta;
 
     VA_START(fmt);
-    VSNPRINTF(var, MAXLINE, fmt);
+    VSNPRINTF(var, BFLRG, fmt);
     VA_END;
 
     ta = _db_clnt_ex(cl, TRUE, var);
@@ -213,11 +213,11 @@ char *dbget(client *cl, int lit, char *fmt, ...)
 
 int dbdef(client *cl, char *fmt, ...)
    {int rv;
-    char var[MAXLINE];
+    char var[BFLRG];
     char **ta;
 
     VA_START(fmt);
-    VSNPRINTF(var, MAXLINE, fmt);
+    VSNPRINTF(var, BFLRG, fmt);
     VA_END;
 
     ta = _db_clnt_ex(cl, TRUE, var);
@@ -277,10 +277,10 @@ int dbcmd(client *cl, char *cmd)
 
 int dbinitv(client *cl, char *var, char *fmt, ...)
    {int err;
-    char s[LRG];
+    char s[BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     err = 0;
@@ -299,16 +299,16 @@ int dbinitv(client *cl, char *var, char *fmt, ...)
 
 int dbrestore(client *cl, char *dname)
    {int i, rv, ok;
-    char t[MAXLINE];
+    char t[BFLRG];
     char **ta, *s, *vl;
 
     rv = TRUE;
 
 /* load the database */
     if (dname == NULL)
-       nstrncpy(t, MAXLINE, "load:", -1);
+       nstrncpy(t, BFLRG, "load:", -1);
     else
-       snprintf(t, MAXLINE, "load:%s", dname);
+       snprintf(t, BFLRG, "load:%s", dname);
 
     ok = dbcmd(cl, t);
     ASSERT(ok == 0);
@@ -478,10 +478,10 @@ static int _is_struct(char **ps, char *s)
 
 char *get_db(database *db, char *var)
    {int c, st, ok;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *val, *pk, *pm, *ps, *pt;
     client *cl;
-    static char t[LRG];
+    static char t[BFLRG];
 
     val = NULL;
 
@@ -489,7 +489,7 @@ char *get_db(database *db, char *var)
        {cl = db->cl;
 
 /* resolve var of form 'a.b.c' */
-	nstrncpy(s, MAXLINE, var, -1);
+	nstrncpy(s, BFLRG, var, -1);
 	for (ps = s; TRUE; ps = NULL)
 	    {pm = strtok(ps, ".");
 
@@ -542,7 +542,7 @@ char *get_db(database *db, char *var)
 static int _show_var(database *db, FILE *fp, const char *fmt,
 		     char *vr, char **vars)
    {int l, rv;
-    char s[LRG], t[LRG];
+    char s[BFLRG], t[BFLRG];
     char *vl;
 
     rv = FALSE;
@@ -558,13 +558,13 @@ static int _show_var(database *db, FILE *fp, const char *fmt,
 
     if (vl != NULL)
        {if ((vl[0] != '"') && (strpbrk(vl, " \t") != NULL))
-	   {snprintf(t, MAXLINE, "\"%s\"", vl);
+	   {snprintf(t, BFLRG, "\"%s\"", vl);
 	    vl = t;};
 
 	if (fmt == NULL)
-	   snprintf(s, LRG, "%s=%s", vr, vl);
+	   snprintf(s, BFLRG, "%s=%s", vr, vl);
 	else
-	   snprintf(s, LRG, fmt, vr, vl);
+	   snprintf(s, BFLRG, fmt, vr, vl);
 
 /* write to the communicator if FP is NULL */
 	if (fp == NULL)
@@ -644,7 +644,7 @@ char *get_multi_line(char **sa, int ni, int *pi, char *dlm, int qu)
    {int i, c;
     item_state st;
     char *p, *s, *t, *rv;
-    static char v[LRG];
+    static char v[BFLRG];
 
     rv = NULL;
     if ((sa != NULL) && (pi != NULL))
@@ -674,7 +674,7 @@ char *get_multi_line(char **sa, int ni, int *pi, char *dlm, int qu)
 			    st = TOKEN;};};
 
 		 if (st != DONE)
-		    vstrcat(v, LRG, "%s\n", s);
+		    vstrcat(v, BFLRG, "%s\n", s);
 
 	         if (i >= ni)
 		    {rv = v;

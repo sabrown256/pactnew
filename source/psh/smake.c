@@ -19,12 +19,12 @@ struct s_statedes
     int complete;
     int literal;
     int quote;
-    char sys[MAXLINE];
-    char arch[MAXLINE];
-    char root[MAXLINE];
-    char cwd[MAXLINE];
-    char srcdir[MAXLINE];
-    char tmpdir[MAXLINE];};
+    char sys[BFLRG];
+    char arch[BFLRG];
+    char root[BFLRG];
+    char cwd[BFLRG];
+    char srcdir[BFLRG];
+    char tmpdir[BFLRG];};
 
 int system();
 int atoi();
@@ -44,7 +44,7 @@ void exit(int status);
 
 void manage_tmp_dir(statedes *st, int start)
    {int ss;
-    char cmd[MAXLINE];
+    char cmd[BFLRG];
     static int dir_was_there = FALSE;
 
 /* do this at the beginning */
@@ -60,7 +60,7 @@ void manage_tmp_dir(statedes *st, int start)
 	sprintf(st->tmpdir, "%s/z-%s/obj", st->cwd, st->sys);
 #endif
 
-	snprintf(cmd, MAXLINE, "test -d %s/", st->tmpdir);
+	snprintf(cmd, BFLRG, "test -d %s/", st->tmpdir);
 	ss = system(cmd);
 	if (ss != 0)
 	   dir_was_there = FALSE;
@@ -68,13 +68,13 @@ void manage_tmp_dir(statedes *st, int start)
 	   dir_was_there = TRUE;
 
         if (!dir_was_there)
-	   {snprintf(cmd, MAXLINE, "mkdir -p %s/", st->tmpdir);
+	   {snprintf(cmd, BFLRG, "mkdir -p %s/", st->tmpdir);
 	    ss = system(cmd);};}
 
 /* do this at the end */
     else
        {if (!dir_was_there)
-	   {snprintf(cmd, MAXLINE, "rm -rf %s/", st->tmpdir);
+	   {snprintf(cmd, BFLRG, "rm -rf %s/", st->tmpdir);
 	    ss = system(cmd);};};
 
     return;}
@@ -98,17 +98,17 @@ static void handler(int sig)
 
 static int invoke_make(statedes *st, char *cmd, int nc, char *mkf, int c, char **v)
    {int i, rv, na, ns;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *log, *p;
     
 #if defined(USE_GNU_MAKE)
     p = cwhich("gmake");
     if ((IS_NULL(p) == TRUE) || (strcmp(p, "none") == 0))
-       snprintf(s, MAXLINE, "make --no-print-directory -f -");
+       snprintf(s, BFLRG, "make --no-print-directory -f -");
     else
-       snprintf(s, MAXLINE, "gmake --no-print-directory -f -");
+       snprintf(s, BFLRG, "gmake --no-print-directory -f -");
 #else
-    snprintf(s, MAXLINE, "make -f -");
+    snprintf(s, BFLRG, "make -f -");
 #endif
 
     nstrcat(cmd, nc, s);
@@ -139,7 +139,7 @@ static int invoke_make(statedes *st, char *cmd, int nc, char *mkf, int c, char *
 	    {
 
 #ifdef USE_GNU_MAKE
-	     snprintf(s, MAXLINE, " -j %d", atoi(v[++i]));
+	     snprintf(s, BFLRG, " -j %d", atoi(v[++i]));
 	     nstrcat(cmd, nc, s);
 #endif
 	    }
@@ -149,7 +149,7 @@ static int invoke_make(statedes *st, char *cmd, int nc, char *mkf, int c, char *
 	     nstrcat(cmd, nc, v[i]);};};
 
     if (log != NULL)
-       {snprintf(s, MAXLINE, " | tee -a %s", log);
+       {snprintf(s, BFLRG, " | tee -a %s", log);
 	nstrcat(cmd, nc, s);};
 
 /* do the make */
@@ -183,10 +183,10 @@ static int invoke_make(statedes *st, char *cmd, int nc, char *mkf, int c, char *
 
 static int method_1(statedes *st, int c, char **v, char *pmname)
    {int i, status;
-    char cmd[MAXLINE], s[MAXLINE];
+    char cmd[BFLRG], s[BFLRG];
 
 /* find the current directory */
-    if (getcwd(st->cwd, MAXLINE) == NULL)
+    if (getcwd(st->cwd, BFLRG) == NULL)
        {fprintf(stderr, "ERROR: CAN'T GET CURRENT DIRECTORY\n");
         fprintf(stderr, "   %d - %s\n", errno, strerror(errno));
         return(1);};
@@ -200,24 +200,24 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
     i = strlen(st->cwd) - 7;
     i = max(i, 0);
     if (strcmp(st->cwd+i, "manager") == 0)
-       {snprintf(s, MAXLINE, "echo \"System = %s\" ; ", st->sys);
+       {snprintf(s, BFLRG, "echo \"System = %s\" ; ", st->sys);
 
-        snprintf(s, MAXLINE, "cat %s", pmname);
-	nstrcat(cmd, MAXLINE, s);}
+        snprintf(s, BFLRG, "cat %s", pmname);
+	nstrcat(cmd, BFLRG, s);}
 
     else if (strcmp(pmname, "Makefile") == 0)
-       {snprintf(s, MAXLINE, "cat %s ; ", pmname);
-	nstrcat(cmd, MAXLINE, s);}
+       {snprintf(s, BFLRG, "cat %s ; ", pmname);
+	nstrcat(cmd, BFLRG, s);}
 
     else
-       {snprintf(s, MAXLINE, "echo \"include %s/etc/make-def\" ; ", st->root);
-	nstrcat(cmd, MAXLINE, s);
+       {snprintf(s, BFLRG, "echo \"include %s/etc/make-def\" ; ", st->root);
+	nstrcat(cmd, BFLRG, s);
 
-        snprintf(s, MAXLINE, "echo \"PACTTmpDir = %s\" ; ", st->tmpdir);
-	nstrcat(cmd, MAXLINE, s);
+        snprintf(s, BFLRG, "echo \"PACTTmpDir = %s\" ; ", st->tmpdir);
+	nstrcat(cmd, BFLRG, s);
 
-        snprintf(s, MAXLINE, "echo \"PACTSrcDir = %s\" ; ", st->srcdir);
-	nstrcat(cmd, MAXLINE, s);
+        snprintf(s, BFLRG, "echo \"PACTSrcDir = %s\" ; ", st->srcdir);
+	nstrcat(cmd, BFLRG, s);
 
 	for (i = 1; i < c; i++)
 	    {if ((strcmp(v[i], "-f") == 0) &&
@@ -225,16 +225,16 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
 	        {pmname = v[i+1];
 		 break;};};
 
-        snprintf(s, MAXLINE, "cat %s ; ", pmname);
-	nstrcat(cmd, MAXLINE, s);
+        snprintf(s, BFLRG, "cat %s ; ", pmname);
+	nstrcat(cmd, BFLRG, s);
 
-	snprintf(s, MAXLINE, "echo \"include %s/etc/make-macros\"", st->root);
-	nstrcat(cmd, MAXLINE, s);};
+	snprintf(s, BFLRG, "echo \"include %s/etc/make-macros\"", st->root);
+	nstrcat(cmd, BFLRG, s);};
 
-    nstrcat(cmd, MAXLINE, ") | ");
+    nstrcat(cmd, BFLRG, ") | ");
 
 /* make the command to invoke make */
-    status = invoke_make(st, cmd, MAXLINE, "-", c, v);
+    status = invoke_make(st, cmd, BFLRG, "-", c, v);
 
 /* remove the hidden directory for the temporary files */
     manage_tmp_dir(st, FALSE);
@@ -249,7 +249,7 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
 static int method_2(statedes *st, int c, char **v, char *mkfile, long tmm)
    {int status;
     long tmp;
-    char cmd[MAXLINE];
+    char cmd[BFLRG];
     struct stat sbf;
 
 /* check to see if the pre-Make is newer than the Makefile */
@@ -261,7 +261,7 @@ static int method_2(statedes *st, int c, char **v, char *mkfile, long tmm)
 
 /* make the command to invoke make */
     cmd[0] = '\0';
-    status = invoke_make(st, cmd, MAXLINE, mkfile, c, v);
+    status = invoke_make(st, cmd, BFLRG, mkfile, c, v);
 
     return(status);}
 
@@ -276,7 +276,7 @@ static int method_2(statedes *st, int c, char **v, char *mkfile, long tmm)
 
 static int command_makefile(statedes *st, char *fname, int c, char **v, char **a)
    {int i, err;
-    char s[MAXLINE], u[MAXLINE], cmd[MAXLINE];
+    char s[BFLRG], u[BFLRG], cmd[BFLRG];
     char *p, *tok, *dir, **sa;
 
     err = 1;
@@ -287,27 +287,27 @@ static int command_makefile(statedes *st, char *fname, int c, char **v, char **a
         {tok = a[i];
 	 if (tok == NULL)
 	    break;
-	 nstrcat(s, MAXLINE, tok);
-	 nstrcat(s, MAXLINE, " ");};
+	 nstrcat(s, BFLRG, tok);
+	 nstrcat(s, BFLRG, " ");};
 
     sa = file_text(FALSE, fname);
     if (sa != NULL)
-       {snprintf(cmd, MAXLINE, "(echo \"go :\"");
+       {snprintf(cmd, BFLRG, "(echo \"go :\"");
 
 	for (i = 0; sa[i] != NULL; i++)
 	    {p   = sa[i];
 	     dir = strtok(p, "\n");
 	     if (dir == NULL)
 	        break;
-	     snprintf(u, MAXLINE,
+	     snprintf(u, BFLRG,
 		      " ; echo \"\t@(cd %s ; echo \"\" ; echo \"In %s doing %s\" ; %s)\"",
 		      dir, dir, s, s);
-	     nstrcat(cmd, MAXLINE, u);};
+	     nstrcat(cmd, BFLRG, u);};
 
 	free_strings(sa);
 
-	nstrcat(cmd, MAXLINE, ") | ");
-	err = invoke_make(st, cmd, MAXLINE, "-", c, v);};
+	nstrcat(cmd, BFLRG, ") | ");
+	err = invoke_make(st, cmd, BFLRG, "-", c, v);};
 
     return(err);}
 
@@ -319,16 +319,16 @@ static int command_makefile(statedes *st, char *fname, int c, char **v, char **a
  */
 
 static int setup_env(statedes *st, char *src)
-   {char s[MAXLINE];
+   {char s[BFLRG];
     char *p, *ps;
 
     st->show     = 0;
     st->complete = FALSE;
     st->literal  = FALSE;
 
-    memset(st->cwd, 0, MAXLINE);
+    memset(st->cwd, 0, BFLRG);
 
-    file_path(src, st->root, MAXLINE);
+    file_path(src, st->root, BFLRG);
 
     st->sys[0] = '\0';
 
@@ -341,8 +341,8 @@ static int setup_env(statedes *st, char *src)
 /* setup the architecture string */
     p = getenv("SESSION_CONFIG");
     if (p != NULL)
-       {strncpy(st->sys, p, MAXLINE);
-	st->sys[MAXLINE-1] = '\0';}
+       {strncpy(st->sys, p, BFLRG);
+	st->sys[BFLRG-1] = '\0';}
 
     else
        {strcpy(s, st->root);
@@ -405,7 +405,7 @@ void usage(void)
 int main(int c, char **v)
    {int i, status, ok, mc;
     long tmm;
-    char mkfile[MAXLINE];
+    char mkfile[BFLRG];
     char *pmname, *mv[100];
     statedes st;
     static char *default_pmname = "pre-Make";
@@ -466,7 +466,7 @@ int main(int c, char **v)
          else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'B' :
-                      snprintf(mkfile, MAXLINE, "%s/Makefile", st.arch);
+                      snprintf(mkfile, BFLRG, "%s/Makefile", st.arch);
                       status = build_makefile(st.root, st.arch, mkfile, TRUE);
 		      return(status);
 		      break;
@@ -517,7 +517,7 @@ int main(int c, char **v)
     mv[mc] = NULL;
     mv[0]  = v[0];
 
-    snprintf(mkfile, MAXLINE, "%s/Makefile", st.arch);
+    snprintf(mkfile, BFLRG, "%s/Makefile", st.arch);
     if (stat(mkfile, &sbf) == 0)
        {if (S_ISREG(sbf.st_mode))
 	   {tmm    = (long) sbf.st_mtime;

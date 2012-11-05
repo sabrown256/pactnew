@@ -60,44 +60,44 @@ struct s_gt_stack
     gt_entry st[N_STACK];};
 
 struct s_dirdes
-   {char root[MAXLINE];
-    char bin[MAXLINE];
-    char cfg[MAXLINE];
-    char inc[MAXLINE];
-    char etc[MAXLINE];
-    char lib[MAXLINE];
-    char mng[MAXLINE];
-    char sch[MAXLINE];
-    char scr[MAXLINE];};
+   {char root[BFLRG];
+    char bin[BFLRG];
+    char cfg[BFLRG];
+    char inc[BFLRG];
+    char etc[BFLRG];
+    char lib[BFLRG];
+    char mng[BFLRG];
+    char sch[BFLRG];
+    char scr[BFLRG];};
 
 struct s_ruledes
-   {char ccp[LRG];            /* .c -> .i */
-    char co[LRG];             /* .c -> .o */
-    char ca[LRG];             /* .c -> .a */
-    char fo[LRG];             /* .f -> .o */
-    char fa[LRG];             /* .f -> .a */
-    char lo[LRG];             /* .l -> .o */
-    char la[LRG];             /* .l -> .a */
-    char lc[LRG];             /* .l -> .c */
-    char yo[LRG];             /* .y -> .o */
-    char ya[LRG];             /* .y -> .a */
-    char yc[LRG];             /* .y -> .c */
-    char th[LRG];             /* .t -> .h */
-    char co_bp[LRG];          /* bad pragma versions */
-    char ca_bp[LRG];
-    char lo_bp[LRG];
-    char la_bp[LRG];
-    char yo_bp[LRG];
-    char ya_bp[LRG];};
+   {char ccp[BFLRG];            /* .c -> .i */
+    char co[BFLRG];             /* .c -> .o */
+    char ca[BFLRG];             /* .c -> .a */
+    char fo[BFLRG];             /* .f -> .o */
+    char fa[BFLRG];             /* .f -> .a */
+    char lo[BFLRG];             /* .l -> .o */
+    char la[BFLRG];             /* .l -> .a */
+    char lc[BFLRG];             /* .l -> .c */
+    char yo[BFLRG];             /* .y -> .o */
+    char ya[BFLRG];             /* .y -> .a */
+    char yc[BFLRG];             /* .y -> .c */
+    char th[BFLRG];             /* .t -> .h */
+    char co_bp[BFLRG];          /* bad pragma versions */
+    char ca_bp[BFLRG];
+    char lo_bp[BFLRG];
+    char la_bp[BFLRG];
+    char yo_bp[BFLRG];
+    char ya_bp[BFLRG];};
 
 struct s_auxfdes
-   {char cefn[MAXLINE];       /* config defines for C */
+   {char cefn[BFLRG];       /* config defines for C */
     FILE *CEF;
-    char dpfn[MAXLINE];       /* config variable for distributed parallel */
+    char dpfn[BFLRG];       /* config variable for distributed parallel */
     FILE *DPF;
-    char mvfn[MAXLINE];       /* config variables for make */
+    char mvfn[BFLRG];       /* config variables for make */
     FILE *MVF;
-    char urfn[MAXLINE];       /* config rules for make */
+    char urfn[BFLRG];       /* config rules for make */
     FILE *URF;
     FILE *SEF;};
 
@@ -130,26 +130,26 @@ struct s_state
     ruledes rules;
     auxfdes aux;
 
-    char cfgf[MAXLINE];          /* config file name */
-    char logf[MAXLINE];          /* log file name */
+    char cfgf[BFLRG];          /* config file name */
+    char logf[BFLRG];          /* log file name */
 
-    char cfgv[MAXLINE];          /* config variables */
-    char def_tools[MAXLINE];     /* default tools */
-    char def_groups[MAXLINE];    /* defaults groups */
-    char toolv[MAXLINE];         /* tool variables */
+    char cfgv[BFLRG];          /* config variables */
+    char def_tools[BFLRG];     /* default tools */
+    char def_groups[BFLRG];    /* defaults groups */
+    char toolv[BFLRG];         /* tool variables */
 
-    char env_csh[MAXLINE];
-    char env_sh[MAXLINE];
-    char env_dk[MAXLINE];
-    char env_mdl[MAXLINE];
+    char env_csh[BFLRG];
+    char env_sh[BFLRG];
+    char env_dk[BFLRG];
+    char env_mdl[BFLRG];
 
-    char arch[MAXLINE];
-    char host[MAXLINE];
-    char os[MAXLINE];
-    char osrel[MAXLINE];
-    char hw[MAXLINE];
-    char sys[MAXLINE];
-    char system[MAXLINE];};
+    char arch[BFLRG];
+    char host[BFLRG];
+    char os[BFLRG];
+    char osrel[BFLRG];
+    char hw[BFLRG];
+    char sys[BFLRG];
+    char system[BFLRG];};
 
 static state
  st = { FALSE, FALSE, FALSE, FALSE, FALSE,
@@ -167,11 +167,11 @@ static void
  */
 
 static char *echo(int log, char *fmt, ...)
-   {char s[LRG];
+   {char s[BFLRG];
     char *rv;
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     if (strpbrk(s, "$*|{}[]\"'") == NULL)
@@ -189,7 +189,7 @@ static char *echo(int log, char *fmt, ...)
 static char *push_file(char *s, int itype)
    {int id, n, nd, ok;
     file_entry *se;
-    static char lfile[MAXLINE], t[MAXLINE];
+    static char lfile[BFLRG], t[BFLRG];
     static char *places[] = { NULL, "local", "std", "features",
 			      "compilers", "analyze", "." };
 
@@ -205,7 +205,7 @@ static char *push_file(char *s, int itype)
 	        {strcpy(lfile, s);
 		 ok = file_exists(lfile);}
 	     else
-	        {snprintf(lfile, MAXLINE, "%s/%s", places[id], s);
+	        {snprintf(lfile, BFLRG, "%s/%s", places[id], s);
 		 ok = file_exists("%s/%s", st.dir.mng, lfile);};};
 
 	if (ok == FALSE)
@@ -218,10 +218,10 @@ static char *push_file(char *s, int itype)
 
 	    p = echo(BOTH, "\"%s\"", s);
 	    if (p != NULL)
-	       {nstrncpy(lfile, MAXLINE, p, -1);
+	       {nstrncpy(lfile, BFLRG, p, -1);
 		FREE(p);};}
 	else
-	   nstrncpy(lfile, MAXLINE, s, -1);};
+	   nstrncpy(lfile, BFLRG, s, -1);};
 
     if ((ok == TRUE) && (se != NULL))
        {se->itype = itype;
@@ -230,9 +230,9 @@ static char *push_file(char *s, int itype)
 
 	if (itype == STACK_FILE)
 	   {if (lfile[0] != '/')
-               snprintf(t, MAXLINE, "%s/%s", st.dir.mng, lfile);
+               snprintf(t, BFLRG, "%s/%s", st.dir.mng, lfile);
 	    else
-	       nstrncpy(t, MAXLINE, lfile, -1);
+	       nstrncpy(t, BFLRG, lfile, -1);
 	    se->fp = fopen(t, "r");}
 
 	else if (itype == STACK_PROCESS)
@@ -272,7 +272,7 @@ static void pop_file(void)
 
 static void push_struct(char *item, char *collection, int itype)
    {int n;
-    char t[MAXLINE], lst[MAXLINE];
+    char t[BFLRG], lst[BFLRG];
     char *p, *ps;
     gt_entry *ge;
 
@@ -285,8 +285,8 @@ static void push_struct(char *item, char *collection, int itype)
 	if (p == NULL)
 	   break;
 	else if (strcmp(p, item) != 0)
-	   {nstrcat(t, MAXLINE, " ");
-	    nstrcat(t, MAXLINE, p);};
+	   {nstrcat(t, BFLRG, " ");
+	    nstrcat(t, BFLRG, p);};
 	ps = NULL;};
 
     strcpy(collection, t);
@@ -375,11 +375,11 @@ static int reset_env(int c, char **v)
 static int write_class_pco(client *cl, FILE *out, char *clss, char *ctype,
 			   char *sub, char *stype, char *ind)
    {int i, n, ic, nc, global;
-    char cln[MAXLINE], fmt[MAXLINE];
+    char cln[BFLRG], fmt[BFLRG];
     char *c, *pc, *t, *var, *val, *entry;
     char **vars, **vals, **sa;
 
-    nstrncpy(cln, MAXLINE, clss, -1);
+    nstrncpy(cln, BFLRG, clss, -1);
     for (c = cln; c != NULL; c = pc)
         {pc = strchr(c, ' ');
          if (pc == NULL)
@@ -431,9 +431,9 @@ static int write_class_pco(client *cl, FILE *out, char *clss, char *ctype,
 		 vals[n] = NULL;
 
 		 if (global == TRUE)
-		    snprintf(fmt, MAXLINE, "%%s%%-%ds = %%s\n", nc);
+		    snprintf(fmt, BFLRG, "%%s%%-%ds = %%s\n", nc);
 		 else
-		    snprintf(fmt, MAXLINE, "%%s   %%-%ds = %%s\n", nc);
+		    snprintf(fmt, BFLRG, "%%s   %%-%ds = %%s\n", nc);
 
 		 for (i = 0; i < n; i++)
 		     {if ((vars[i] != NULL) && (vals[i] != NULL))
@@ -459,13 +459,13 @@ static int write_class_pco(client *cl, FILE *out, char *clss, char *ctype,
 
 static void write_pco(client *cl, state *st, char *dbname)
    {int rv;
-    char t[MAXLINE];
+    char t[BFLRG];
     FILE *out;
 
     if (dbname != NULL)
-       snprintf(t, MAXLINE, "%s.%s.pco", cgetenv(FALSE, "PERDB_PATH"), dbname);
+       snprintf(t, BFLRG, "%s.%s.pco", cgetenv(FALSE, "PERDB_PATH"), dbname);
     else
-       snprintf(t, MAXLINE, "%s.pco", cgetenv(FALSE, "PERDB_PATH"));
+       snprintf(t, BFLRG, "%s.pco", cgetenv(FALSE, "PERDB_PATH"));
 
     out = open_file("w", t);
 
@@ -492,11 +492,11 @@ static void write_pco(client *cl, state *st, char *dbname)
 static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
 			    char *sub, char *stype, char *ind)
    {int i, n, ic, nc, global;
-    char cln[MAXLINE], fmt[MAXLINE];
+    char cln[BFLRG], fmt[BFLRG];
     char *c, *pc, *t, *var, *val, *entry;
     char **vars, **vals, **sa;
 
-    nstrncpy(cln, MAXLINE, clss, -1);
+    nstrncpy(cln, BFLRG, clss, -1);
     for (c = cln; c != NULL; c = pc)
         {pc = strchr(c, ' ');
          if (pc == NULL)
@@ -548,9 +548,9 @@ static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
 		 vals[n] = NULL;
 
 		 if (global == TRUE)
-		    snprintf(fmt, MAXLINE, "%%s%%-%ds => '%%s',\n", nc);
+		    snprintf(fmt, BFLRG, "%%s%%-%ds => '%%s',\n", nc);
 		 else
-		    snprintf(fmt, MAXLINE, "%%s   %%-%ds => '%%s',\n", nc);
+		    snprintf(fmt, BFLRG, "%%s   %%-%ds => '%%s',\n", nc);
 
 		 for (i = 0; i < n; i++)
 		     {if ((vars[i] != NULL) && (vals[i] != NULL))
@@ -576,13 +576,13 @@ static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
 
 static void write_perl(client *cl, state *st, char *dbname)
    {int rv;
-    char t[MAXLINE];
+    char t[BFLRG];
     FILE *out;
 
     if (dbname != NULL)
-       snprintf(t, MAXLINE, "%s.%s.pl", cgetenv(FALSE, "PERDB_PATH"), dbname);
+       snprintf(t, BFLRG, "%s.%s.pl", cgetenv(FALSE, "PERDB_PATH"), dbname);
     else
-       snprintf(t, MAXLINE, "%s.pl", cgetenv(FALSE, "PERDB_PATH"));
+       snprintf(t, BFLRG, "%s.pl", cgetenv(FALSE, "PERDB_PATH"));
     out = open_file("w", t);
 
     fprintf(out, "{\n");
@@ -608,7 +608,7 @@ static void write_perl(client *cl, state *st, char *dbname)
 
 static int pco_save_db(client *cl, char *dbname)
    {int rv;
-    char t[MAXLINE];
+    char t[BFLRG];
 
     rv = TRUE;
 
@@ -617,9 +617,9 @@ static int pco_save_db(client *cl, char *dbname)
 
 /* save the persistent database */
     if (dbname == NULL)
-       nstrncpy(t, MAXLINE, "save:", -1);
+       nstrncpy(t, BFLRG, "save:", -1);
     else
-       snprintf(t, MAXLINE, "save:%s:", dbname);
+       snprintf(t, BFLRG, "save:%s:", dbname);
     dbcmd(cl, t);
 
 /* write the input form of the database - to be read back in by pco */
@@ -665,14 +665,14 @@ static int pco_load_db(client *cl, char *dbname)
 
 static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
 		    char *var, char *val)
-   {char s[LRG];
+   {char s[BFLRG];
     char *vl;
 
     if (val == NULL)
        val = "\"\"";
 
-    nstrncpy(s, LRG, val, -1);
-    vl = trim(expand(s, LRG, NULL, FALSE), BOTH, " \t");
+    nstrncpy(s, BFLRG, val, -1);
+    vl = trim(expand(s, BFLRG, NULL, FALSE), BOTH, " \t");
 
     note(fsh,  TRUE, "export %s=%s",    var, vl);
     note(fcsh, TRUE, "setenv %s %s",    var, vl);
@@ -770,7 +770,7 @@ static void add_set_cfg(client *cl,
 
 static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
    {int i, n, nc;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *var, *val, **sa;
     static char *rej[] = { "Log", "ALog",
 			   "CCP", "CCObj", "CCArc",
@@ -799,7 +799,7 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 		    push_path(P_APPEND, epath, val);
 
 		else
-		   {snprintf(s, LRG, "\"%s\"", val);
+		   {snprintf(s, BFLRG, "\"%s\"", val);
 		    env_out(fsh, fcsh, fdk, fmd, var, s);};};};
 
 	free_strings(sa);};
@@ -886,10 +886,10 @@ static void write_envf(client *cl, int lnotice)
     note(fdk, TRUE, "dk_alter MANPATH %s/man", st.dir.root);
     note(fmd, TRUE, "prepend-path MANPATH %s/man;", echo(FALSE, st.dir.root));
 
-    {char lPython[MAXLINE];
+    {char lPython[BFLRG];
 
      if (st.have_python == TRUE)
-        {snprintf(lPython, MAXLINE, "%s/python%s",
+        {snprintf(lPython, BFLRG, "%s/python%s",
 		  st.dir.lib, dbget(cl, TRUE, "PY_Vers"));
 	 t = dbget(cl, TRUE, "PYTHONPATH");
 	 if (t != NULL)
@@ -989,7 +989,7 @@ static int check_cross(client *cl)
 
 static void check_dir(client *cl)
    {int i, n;
-    char Created[LRG], Missing[LRG];
+    char Created[BFLRG], Missing[BFLRG];
     char *sib, *dir;
     static char *dlst[] = {"bin", "lib", "include", "include/shell",
 			   "etc", "scheme", "man", "man/man1", "man/man3"};
@@ -1004,7 +1004,7 @@ static void check_dir(client *cl)
                 {dir = dlst[i];
                  if (dir_exists("%s/%s", sib, dir) == FALSE)
                     {run(BOTH, "mkdir -p %s/%s", sib, dir);
-                     push_tok(Created, LRG, ' ', "%s/%s", sib, dir);};};};
+                     push_tok(Created, BFLRG, ' ', "%s/%s", sib, dir);};};};
 
         if (IS_NULL(Created) == FALSE)
            {noted(Log, "");
@@ -1021,7 +1021,7 @@ static void check_dir(client *cl)
            {for (i = 0; i < n; i++)
                 {dir = dlst[i];
                  if (dir_exists("%s/%s", sib, dir) == FALSE)
-                    {push_tok(Missing, LRG, ' ', "%s/%s", sib, dir);};};};
+                    {push_tok(Missing, BFLRG, ' ', "%s/%s", sib, dir);};};};
 
         if (IS_NULL(Missing) == FALSE)
            {noted(Log, "");
@@ -1046,7 +1046,7 @@ static void check_dir(client *cl)
 
 static void read_line(char *s, int nc)
    {int n;
-    char t[LRG];
+    char t[BFLRG];
     char *p, *pc;
     file_entry *se;
 
@@ -1060,7 +1060,7 @@ static void read_line(char *s, int nc)
 
 /* handle continued lines */
         while ((n > 1) && (s[n-2] == '\\') && (s[n-1] == '\n'))
-           {p = fgets(t, LRG, se->fp);
+           {p = fgets(t, BFLRG, se->fp);
 	    if (p != NULL)
 	       {nstrncpy(s+n-2, nc-n-2, trim(t, BOTH, " \t"), -1);
 		n = strlen(s);};
@@ -1104,7 +1104,7 @@ static void read_line(char *s, int nc)
 static void parse_opt(client *cl, char *s, int nc)
    {int i, l, n, ok, mt;
     exoper oper;
-    char vr[MAXLINE], op[MAXLINE], vl[MAXLINE];
+    char vr[BFLRG], op[BFLRG], vl[BFLRG];
     char *t, *avl, *arg, *opt, **sa;
 
     sa = tokenize(s, "[;]\n\r");
@@ -1225,7 +1225,7 @@ static void parse_opt(client *cl, char *s, int nc)
 
 static void parse_line(client *cl, char *s,
 		       char *key, char *oper, char *value, int nc)
-   {char t[LRG];
+   {char t[BFLRG];
     char *p;
 
     strcpy(t, s);
@@ -1245,7 +1245,7 @@ static void parse_line(client *cl, char *s,
        {nstrncpy(value, nc, p, -1);
 	if ((strchr(oper, '=') != NULL) && (p[0] == '['))
 	   {while (strchr(value, ']') == NULL)
-	       {read_line(t, LRG);
+	       {read_line(t, BFLRG);
 		nstrcat(value, nc, " ");
 		nstrcat(value, nc, trim(t, FRONT, " \t"));};
 	    parse_opt(cl, value, nc);};}
@@ -1261,18 +1261,18 @@ static void parse_line(client *cl, char *s,
 
 static void parse_rule(char *var, int nc)
    {int n;
-    char line[MAXLINE], val[MAXLINE];
+    char line[BFLRG], val[BFLRG];
 
     val[0] = '\0';
 
     while (TRUE)
-       {read_line(line, MAXLINE);
+       {read_line(line, BFLRG);
 
         if ((IS_NULL(line) == TRUE) || (strcmp(line, "++end++") == 0))
            break;
 
-	nstrcat(val, MAXLINE, line);
-        nstrcat(val, MAXLINE, "\n");};
+	nstrcat(val, BFLRG, line);
+        nstrcat(val, BFLRG, "\n");};
 
     n = strlen(val);
     n = min(n, nc-1);
@@ -1286,13 +1286,13 @@ static void parse_rule(char *var, int nc)
 /* DP_DEFINE - gather DP defines */
 
 static void dp_define(void)
-   {char line[MAXLINE];
+   {char line[BFLRG];
 
     if (st.aux.DPF == NULL)
        st.aux.DPF = open_file("w", st.aux.dpfn);
 
     while (TRUE)
-       {read_line(line, MAXLINE);
+       {read_line(line, BFLRG);
 
 	if ((strcmp(line, "end") == 0) || (IS_NULL(line) == TRUE))
 	   {note(st.aux.DPF, TRUE, "");
@@ -1310,11 +1310,11 @@ static void dp_define(void)
  */
 
 static void setup_analyze_env(client *cl, char *base)
-   {char alog[MAXLINE];
+   {char alog[BFLRG];
     FILE *out;
 
 /* setup the analyze log file */
-    snprintf(alog, MAXLINE, "%s/log/analyze",  st.dir.root);
+    snprintf(alog, BFLRG, "%s/log/analyze",  st.dir.root);
     out = open_file("w", alog);
     note(out, TRUE, "%s", get_date());
     fclose(out);
@@ -1498,7 +1498,7 @@ static void setup_output_env(client *cl, char *base)
 
 static void default_var(client *cl, char *base)
    {int i, n;
-    char cmd[MAXLINE];
+    char cmd[BFLRG];
     char **sa;
 
     if (cdefenv("USER") == FALSE)
@@ -1518,54 +1518,54 @@ static void default_var(client *cl, char *base)
 
 /* define the set of specifications which define a tool */
     st.toolv[0] = '\0';
-    push_tok(st.toolv, MAXLINE, ' ', "Exe");
-    push_tok(st.toolv, MAXLINE, ' ', "Flags");
-    push_tok(st.toolv, MAXLINE, ' ', "Version");
-    push_tok(st.toolv, MAXLINE, ' ', "Debug");
-    push_tok(st.toolv, MAXLINE, ' ', "Optimize");
-    push_tok(st.toolv, MAXLINE, ' ', "Inc");
-    push_tok(st.toolv, MAXLINE, ' ', "Lib");
-    push_tok(st.toolv, MAXLINE, ' ', "RPath");
-    push_tok(st.toolv, MAXLINE, ' ', "IFlag");
-    push_tok(st.toolv, MAXLINE, ' ', "XFlag");
+    push_tok(st.toolv, BFLRG, ' ', "Exe");
+    push_tok(st.toolv, BFLRG, ' ', "Flags");
+    push_tok(st.toolv, BFLRG, ' ', "Version");
+    push_tok(st.toolv, BFLRG, ' ', "Debug");
+    push_tok(st.toolv, BFLRG, ' ', "Optimize");
+    push_tok(st.toolv, BFLRG, ' ', "Inc");
+    push_tok(st.toolv, BFLRG, ' ', "Lib");
+    push_tok(st.toolv, BFLRG, ' ', "RPath");
+    push_tok(st.toolv, BFLRG, ' ', "IFlag");
+    push_tok(st.toolv, BFLRG, ' ', "XFlag");
 
 /* define and initialize the (special) config variables */
     st.cfgv[0] = '\0';
-    push_tok(st.cfgv, MAXLINE, ' ', "CC_Exe");
-    push_tok(st.cfgv, MAXLINE, ' ', "CC_Linker");
-    push_tok(st.cfgv, MAXLINE, ' ', "CC_Flags");
-    push_tok(st.cfgv, MAXLINE, ' ', "CC_Debug");
-    push_tok(st.cfgv, MAXLINE, ' ', "CC_Optimize");
-    push_tok(st.cfgv, MAXLINE, ' ', "CC_Inc");
-    push_tok(st.cfgv, MAXLINE, ' ', "FC_Exe");
-    push_tok(st.cfgv, MAXLINE, ' ', "FC_Linker");
-    push_tok(st.cfgv, MAXLINE, ' ', "FC_Flags");
-    push_tok(st.cfgv, MAXLINE, ' ', "FC_Debug");
-    push_tok(st.cfgv, MAXLINE, ' ', "FC_Optimize");
-    push_tok(st.cfgv, MAXLINE, ' ', "LD_Exe");
-    push_tok(st.cfgv, MAXLINE, ' ', "LD_RPath");
-    push_tok(st.cfgv, MAXLINE, ' ', "LD_Flags");
-    push_tok(st.cfgv, MAXLINE, ' ', "LD_Lib");
+    push_tok(st.cfgv, BFLRG, ' ', "CC_Exe");
+    push_tok(st.cfgv, BFLRG, ' ', "CC_Linker");
+    push_tok(st.cfgv, BFLRG, ' ', "CC_Flags");
+    push_tok(st.cfgv, BFLRG, ' ', "CC_Debug");
+    push_tok(st.cfgv, BFLRG, ' ', "CC_Optimize");
+    push_tok(st.cfgv, BFLRG, ' ', "CC_Inc");
+    push_tok(st.cfgv, BFLRG, ' ', "FC_Exe");
+    push_tok(st.cfgv, BFLRG, ' ', "FC_Linker");
+    push_tok(st.cfgv, BFLRG, ' ', "FC_Flags");
+    push_tok(st.cfgv, BFLRG, ' ', "FC_Debug");
+    push_tok(st.cfgv, BFLRG, ' ', "FC_Optimize");
+    push_tok(st.cfgv, BFLRG, ' ', "LD_Exe");
+    push_tok(st.cfgv, BFLRG, ' ', "LD_RPath");
+    push_tok(st.cfgv, BFLRG, ' ', "LD_Flags");
+    push_tok(st.cfgv, BFLRG, ' ', "LD_Lib");
 
     strcpy(st.sys, path_tail(st.cfgf));
 
-    unamef(st.host,  MAXLINE, "n");
-    unamef(st.os,    MAXLINE, "s");
-    unamef(st.osrel, MAXLINE, "r");
-    unamef(st.hw,    MAXLINE, "m");
+    unamef(st.host,  BFLRG, "n");
+    unamef(st.os,    BFLRG, "s");
+    unamef(st.osrel, BFLRG, "r");
+    unamef(st.hw,    BFLRG, "m");
 
 /* remove parens from osrel - it is bad for the shells later on */
     sa = tokenize(st.osrel, "()");
-    concatenate(st.osrel, MAXLINE, sa, ",");
+    concatenate(st.osrel, BFLRG, sa, ",");
     free_strings(sa);
 
-    snprintf(st.dir.scr, MAXLINE, "%s/scripts", base);
-    snprintf(cmd, MAXLINE, "%s/system-id", st.dir.scr);
-    nstrncpy(st.arch, MAXLINE, run(BOTH, cmd), -1);
+    snprintf(st.dir.scr, BFLRG, "%s/scripts", base);
+    snprintf(cmd, BFLRG, "%s/system-id", st.dir.scr);
+    nstrncpy(st.arch, BFLRG, run(BOTH, cmd), -1);
 
 /* check variables which may have been initialized from the command line */
     if (IS_NULL(st.system) == TRUE)
-       nstrncpy(st.system, MAXLINE, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
+       nstrncpy(st.system, BFLRG, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
     cinitenv("System", st.system);
 
     dbinitv(cl, "CfgMan",        "%s/cfgman", st.dir.scr);
@@ -1580,17 +1580,17 @@ static void default_var(client *cl, char *base)
     dbinitv(cl, "CROSS_COMPILE", "FALSE");
 
 /* global variables */
-    snprintf(st.dir.root, MAXLINE, "%s/dev/%s",  base, st.system);
-    snprintf(st.dir.inc,  MAXLINE, "%s/include", st.dir.root);
-    snprintf(st.dir.etc,  MAXLINE, "%s/etc",     st.dir.root);
-    snprintf(st.dir.lib,  MAXLINE, "%s/lib",     st.dir.root);
-    snprintf(st.dir.bin,  MAXLINE, "%s/bin",     st.dir.root);
-    snprintf(st.dir.sch,  MAXLINE, "%s/scheme",  st.dir.root);
+    snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.system);
+    snprintf(st.dir.inc,  BFLRG, "%s/include", st.dir.root);
+    snprintf(st.dir.etc,  BFLRG, "%s/etc",     st.dir.root);
+    snprintf(st.dir.lib,  BFLRG, "%s/lib",     st.dir.root);
+    snprintf(st.dir.bin,  BFLRG, "%s/bin",     st.dir.root);
+    snprintf(st.dir.sch,  BFLRG, "%s/scheme",  st.dir.root);
 
-    snprintf(st.env_csh,  MAXLINE, "%s/env-pact.csh", st.dir.etc);
-    snprintf(st.env_sh,   MAXLINE, "%s/env-pact.sh",  st.dir.etc);
-    snprintf(st.env_dk,   MAXLINE, "%s/env-pact.dk",  st.dir.etc);
-    snprintf(st.env_mdl,  MAXLINE, "%s/env-pact.mdl", st.dir.etc);
+    snprintf(st.env_csh,  BFLRG, "%s/env-pact.csh", st.dir.etc);
+    snprintf(st.env_sh,   BFLRG, "%s/env-pact.sh",  st.dir.etc);
+    snprintf(st.env_dk,   BFLRG, "%s/env-pact.dk",  st.dir.etc);
+    snprintf(st.env_mdl,  BFLRG, "%s/env-pact.mdl", st.dir.etc);
 
 /* variable defaults */
     strcpy(st.def_tools, "");
@@ -1610,19 +1610,19 @@ static void default_var(client *cl, char *base)
 
 static void reset_make_vars(void)
    {int i, nc;
-    char vr[LRG];
+    char vr[BFLRG];
     char *vl, **ta;
 
     if (st.aux.MVF == NULL)
        st.aux.MVF = open_file("w", st.aux.mvfn);
 
-    nstrncpy(st.def_tools, MAXLINE, cgetenv(FALSE, "Tools"), -1);
-    nstrncpy(st.def_groups, MAXLINE, cgetenv(FALSE, "Groups"), -1);
+    nstrncpy(st.def_tools, BFLRG, cgetenv(FALSE, "Tools"), -1);
+    nstrncpy(st.def_groups, BFLRG, cgetenv(FALSE, "Groups"), -1);
 
     ta = cenv(FALSE, NULL);
     if (ta != NULL)
        {for (i = 0; ta[i] != NULL; i++)
-	    {nstrncpy(vr, LRG, ta[i], -1);
+	    {nstrncpy(vr, BFLRG, ta[i], -1);
 	     vl = strchr(vr, '=');
 	     if (vl != NULL)
 	        {*vl++ = '\0';
@@ -1656,23 +1656,23 @@ static void reset_make_vars(void)
 static void default_files(int append)
    {
 
-    snprintf(st.logf, MAXLINE, "%s/log/config", st.dir.root);
+    snprintf(st.logf, BFLRG, "%s/log/config", st.dir.root);
     if (append == FALSE)
        unlink_safe(st.logf);
     LOG_ON;
 
     st.aux.SEF = open_file("w+", "%s/log/file.se", st.dir.root);
 
-    snprintf(st.aux.mvfn, MAXLINE, "%s/log/file.mv", st.dir.root);
+    snprintf(st.aux.mvfn, BFLRG, "%s/log/file.mv", st.dir.root);
     st.aux.MVF = NULL;
 
-    snprintf(st.aux.cefn, MAXLINE, "%s/log/file.ce", st.dir.root);
+    snprintf(st.aux.cefn, BFLRG, "%s/log/file.ce", st.dir.root);
     st.aux.CEF = NULL;
 
-    snprintf(st.aux.urfn, MAXLINE, "%s/log/file.ur", st.dir.root);
+    snprintf(st.aux.urfn, BFLRG, "%s/log/file.ur", st.dir.root);
     st.aux.URF = NULL;
 
-    snprintf(st.aux.dpfn, MAXLINE, "%s/log/file.dpe", st.dir.root);
+    snprintf(st.aux.dpfn, BFLRG, "%s/log/file.dpe", st.dir.root);
     st.aux.DPF = NULL;
 
     return;}
@@ -1693,16 +1693,16 @@ static void default_rules(void)
     tc  = "touch errlog";
 
 /* C rules */
-    snprintf(st.rules.ccp,   LRG,
+    snprintf(st.rules.ccp,   BFLRG,
              "\t%s\n",
 	     "${CC} -E $<");
 
-    snprintf(st.rules.co, LRG,
+    snprintf(st.rules.co, BFLRG,
              "\t@(%s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     "${CC} -c $< -o $@");
 
-    snprintf(st.rules.ca, LRG,
+    snprintf(st.rules.ca, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     cd, rm, tc,
@@ -1711,7 +1711,7 @@ static void default_rules(void)
 	     "${RM} $*.o 2>> errlog");
 
 /* lex rules */
-    snprintf(st.rules.lo, LRG,
+    snprintf(st.rules.lo, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
              "echo \"lex $<\"",
 	     rm, tc,
@@ -1720,7 +1720,7 @@ static void default_rules(void)
 	     "${LX} -c $*.c",
 	     "${RM} lex.yy.c $*.c");
 
-    snprintf(st.rules.la, LRG,
+    snprintf(st.rules.la, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"lex $<\"",
 	     cd, rm, tc,
@@ -1731,7 +1731,7 @@ static void default_rules(void)
 	     ar,
 	     "${RM} lex.yy.c $*.c");
 
-    snprintf(st.rules.lc, LRG,
+    snprintf(st.rules.lc, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"lex $<\"",
 	     cd, rm, tc,
@@ -1740,7 +1740,7 @@ static void default_rules(void)
 	     "${RM} lex.yy.c");
 
 /* yacc rules */
-    snprintf(st.rules.yo, LRG,
+    snprintf(st.rules.yo, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1749,7 +1749,7 @@ static void default_rules(void)
 	     "${YC} -c $*.c -o $*.o",
 	     "${RM} $*.c");
 
-    snprintf(st.rules.ya, LRG,
+    snprintf(st.rules.ya, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1760,7 +1760,7 @@ static void default_rules(void)
 	     ar,
 	     "${RM} $*.c $*.o");
 
-    snprintf(st.rules.yc, LRG,
+    snprintf(st.rules.yc, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1769,7 +1769,7 @@ static void default_rules(void)
 	     "mv $*.c ${PACTSrcDir}");
       
 /* Fortran rules */
-    snprintf(st.rules.fo, LRG,
+    snprintf(st.rules.fo, BFLRG,
 	     "\t%s \\\n\t%s \\\n\t%s \\\n\t%s \\\n\t%s \\\n\t%s\n",
 	     "@if [ ${FC_Exe} == none ]; then",
 	     "   echo \"No Fortran compiler for $<\" ;",
@@ -1778,7 +1778,7 @@ static void default_rules(void)
 	     "   ${FC} -c $< -o $@ ;",
 	     "fi");
 
-    snprintf(st.rules.fa, LRG,
+    snprintf(st.rules.fa, BFLRG,
 	     "\t%s \\\n\t%s \\\n\t%s \\\n\t%s \\\n\t     %s ; \\\n\t     %s ; \\\n\t     %s ; \\\n\t%s \\\n\t     %s ; \\\n\t%s \\\n\t%s\n",
 	     "@if [ ${FC_Exe} == none ]; then",
 	     "   echo \"No Fortran compiler for $<\" ;",
@@ -1791,7 +1791,7 @@ static void default_rules(void)
 	     "fi");
 
 /* template rules */
-    snprintf(st.rules.th, LRG,
+    snprintf(st.rules.th, BFLRG,
 	     "\t@(%s ; \\\n          %s)\n",
 	     "echo \"${Template} $< -o ${IncDir}/$*.h\"",
 	     "${BinDir}/${Template} $< -o ${IncDir}/$*.h");
@@ -1816,7 +1816,7 @@ static void bad_pragma_rules(void)
     tc  = "touch errlog";
 
 /* C rules */
-    snprintf(st.rules.co_bp, LRG,
+    snprintf(st.rules.co_bp, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     "${RM} $*.int.c",
@@ -1824,7 +1824,7 @@ static void bad_pragma_rules(void)
 	     "${CC} -c $*.int.c -o $@",
 	     "${RM} $*.int.c");
 
-    snprintf(st.rules.ca_bp, LRG,
+    snprintf(st.rules.ca_bp, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     cd, rm, tc,
@@ -1835,7 +1835,7 @@ static void bad_pragma_rules(void)
 	     "${RM} $*.int.c $*.o 2>> errlog");
 
 /* lex rules */
-    snprintf(st.rules.lo_bp, LRG,
+    snprintf(st.rules.lo_bp, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
              "echo \"lex $<\"",
 	     rm, tc,
@@ -1845,7 +1845,7 @@ static void bad_pragma_rules(void)
 	     "${LX} -c $*.int.c",
 	     "${RM} lex.yy.c $*.int.c $*.c");
 
-    snprintf(st.rules.la_bp, LRG,
+    snprintf(st.rules.la_bp, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"lex $<\"",
 	     cd, rm, tc,
@@ -1858,7 +1858,7 @@ static void bad_pragma_rules(void)
 	     "${RM} lex.yy.c $*.int.c $*.c");
 
 /* yacc rules */
-    snprintf(st.rules.yo_bp, LRG,
+    snprintf(st.rules.yo_bp, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1868,7 +1868,7 @@ static void bad_pragma_rules(void)
 	     "${YC} -c $*.int.c -o $*.o",
 	     "${RM} $*.int.c $*.c");
 
-    snprintf(st.rules.ya_bp, LRG,
+    snprintf(st.rules.ya_bp, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1966,8 +1966,8 @@ static void env_subst(client *cl, char *refvar, char *nt)
 /* SET_VAR - set a variable as directed */
 
 static void set_var(client *cl, int rep, char *var, char *oper, char *val)
-   {char fvar[MAXLINE], nval[MAXLINE], mval[MAXLINE], lval[MAXLINE];
-    char s[LRG+1];
+   {char fvar[BFLRG], nval[BFLRG], mval[BFLRG], lval[BFLRG];
+    char s[BFLRG+1];
     char *prfx, *t, *p;
     gt_entry *ge;
 
@@ -1977,11 +1977,11 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 /* attach the current group suffix */
     if (strcmp(prfx, "Glb") == 0)
        {t = dbget(cl, FALSE, "Globals");
-	snprintf(s, LRG, "%s %s", t, var);
+	snprintf(s, BFLRG, "%s %s", t, var);
 	dbset(cl, "Globals", unique(s, FALSE, ' '));
-	nstrncpy(fvar, MAXLINE, var, -1);}
+	nstrncpy(fvar, BFLRG, var, -1);}
     else
-       snprintf(fvar, MAXLINE, "%s_%s", prfx, var);
+       snprintf(fvar, BFLRG, "%s_%s", prfx, var);
 
     clean_space(val);
 
@@ -1995,7 +1995,7 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
     if (strcmp(oper, "=") == 0)
        {t = echo(FALSE, val);
         if (IS_NULL(t) == FALSE)
-           {nstrncpy(nval, MAXLINE, t, -1);
+           {nstrncpy(nval, BFLRG, t, -1);
             if (rep == TRUE)
 	       {if (st.aux.MVF == NULL)
 		   st.aux.MVF = open_file("w", st.aux.mvfn);
@@ -2019,16 +2019,16 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
  */
        {t = echo(FALSE, val);
         if (IS_NULL(t) == FALSE)
-           {nstrncpy(lval, MAXLINE, t, -1);
+           {nstrncpy(lval, BFLRG, t, -1);
 	    p = echo(FALSE, "$%s", fvar);
 	    if (p != NULL)
-	       {nstrncpy(nval, MAXLINE, p, -1);
+	       {nstrncpy(nval, BFLRG, p, -1);
 		FREE(p);};
             note(Log, TRUE, "Change    |%s|", fvar);
             note(Log, TRUE, "Prepend   |%s|", lval);
             note(Log, TRUE, "Old value |%s|", nval);
 
-            snprintf(mval, MAXLINE, "%s %s", lval, nval);
+            snprintf(mval, BFLRG, "%s %s", lval, nval);
             note(Log, TRUE, "New value |%s|", mval);
 
             note(Log, TRUE, "Change expression |setenv %s %s|", fvar, mval);
@@ -2048,16 +2048,16 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
  */
        {t = echo(FALSE, val);
         if (IS_NULL(t) == FALSE)
-           {nstrncpy(lval, MAXLINE, t, -1);
+           {nstrncpy(lval, BFLRG, t, -1);
 	    p = echo(FALSE, "$%s", fvar);
 	    if (p != NULL)
-	       {nstrncpy(nval, MAXLINE, p, -1);
+	       {nstrncpy(nval, BFLRG, p, -1);
 		FREE(p);};
             note(Log, TRUE, "Change    |%s|", fvar);
             note(Log, TRUE, "Append    |%s|", lval);
             note(Log, TRUE, "Old value |%s|", nval);
 
-            snprintf(mval, MAXLINE, "%s %s", nval, lval);
+            snprintf(mval, BFLRG, "%s %s", nval, lval);
             note(Log, TRUE, "New value |%s|", mval);
 
             note(Log, TRUE, "Change expression |setenv %s %s|", fvar, mval);
@@ -2072,14 +2072,14 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
     else if (strcmp(oper, "-=") == 0)
        {t = echo(FALSE, "$%s", fvar);
 	if (IS_NULL(t) == FALSE)
-	   {nstrncpy(nval, MAXLINE, t, -1);
+	   {nstrncpy(nval, BFLRG, t, -1);
 	    note(Log, TRUE, "Change    |%s|", fvar);
 	    note(Log, TRUE, "Remove    |%s|", val);
 	    note(Log, TRUE, "Old value |%s|", nval);
 
 	    p = echo(FALSE, "%s | sed 's|%s||'", nval, val);
 	    if (p != NULL)
-	       {nstrncpy(nval, MAXLINE, p, -1);
+	       {nstrncpy(nval, BFLRG, p, -1);
 		FREE(p);};
 
 	    note(Log, TRUE, "New value |%s|", nval);
@@ -2120,7 +2120,7 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 
 static void process_use(client *cl, char *sg, char *oper)
    {int whch;
-    char nvr[MAXLINE];
+    char nvr[BFLRG];
     char *val;
 
     whch = -1;
@@ -2146,7 +2146,7 @@ static void process_use(client *cl, char *sg, char *oper)
              note(Log, TRUE, "Use group %s to fill group %s",
 		  sg, dbget(cl, FALSE, "CurrGrp"));
              FOREACH(var, st.cfgv, " ")
-                snprintf(nvr, MAXLINE, "%s_%s", sg, var);
+                snprintf(nvr, BFLRG, "%s_%s", sg, var);
                 if (dbdef(cl, nvr) == TRUE)
                    {val = dbget(cl, TRUE, nvr);
                     if (strcmp(var, "Exe") == 0)
@@ -2162,7 +2162,7 @@ static void process_use(client *cl, char *sg, char *oper)
                 {note(Log, TRUE, "Use tool %s to fill group %s",
 		      sg, dbget(cl, FALSE, "CurrGrp"));
                  FOREACH(var, st.toolv, " ")
-                    snprintf(nvr, MAXLINE, "%s_%s", sg, var);
+                    snprintf(nvr, BFLRG, "%s_%s", sg, var);
                     if (dbdef(cl, nvr) == TRUE)
                        {val = dbget(cl, TRUE, nvr);
                         set_var(cl, FALSE, nvr, oper, val);};
@@ -2171,7 +2171,7 @@ static void process_use(client *cl, char *sg, char *oper)
                 {note(Log, TRUE, "Use tool %s to fill tool %s",
 		      sg, dbget(cl, FALSE, "CurrTool"));
                  FOREACH(var, st.toolv, " ")
-                    snprintf(nvr, MAXLINE, "%s_%s", sg, var);
+                    snprintf(nvr, BFLRG, "%s_%s", sg, var);
                     if (dbdef(cl, nvr) == TRUE)
                        {val = dbget(cl, TRUE, nvr);
                         set_var(cl, FALSE, var, oper, val);};
@@ -2187,7 +2187,7 @@ static void process_use(client *cl, char *sg, char *oper)
 
 static void read_config(client *cl, char *cfg, int quiet)
    {int il;
-    char line[LRG], key[LRG], oper[LRG], value[LRG];
+    char line[BFLRG], key[BFLRG], oper[BFLRG], value[BFLRG];
     char *path;
 
     separator(Log);
@@ -2212,19 +2212,19 @@ static void read_config(client *cl, char *cfg, int quiet)
 	    {noted(Log, " ");
 	     exit(1);};
 
-	 read_line(line, LRG);
+	 read_line(line, BFLRG);
 
 	 if (IS_NULL(line) == TRUE)
             continue;
 	 else if (strcmp(line, "++end++") == 0)
             break;
 
-	 parse_line(cl, line, key, oper, value, LRG);
+	 parse_line(cl, line, key, oper, value, BFLRG);
 
 /* handle include directives */
 	 if (strcmp(key, "include") == 0)
 	    {int n;
-	     char ldepth[MAXLINE];
+	     char ldepth[BFLRG];
 
 	     n = st.fstck.n;
 	     memset(ldepth, ' ', 3*n);
@@ -2237,7 +2237,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 /* handle run directives */
 	 else if (strcmp(key, "run") == 0)
 	    {int n;
-	     char ldepth[MAXLINE];
+	     char ldepth[BFLRG];
 
 	     n = st.fstck.n;
 	     memset(ldepth, ' ', 3*n);
@@ -2323,67 +2323,67 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 /* .c.i rule handler */
 	 else if (strcmp(key, ".c.i:") == 0)
-	    {parse_rule(st.rules.ccp, MAXLINE);
+	    {parse_rule(st.rules.ccp, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .c.i rule:\n%s\n", st.rules.ccp);}
 
 /* .c.o rule handler */
 	 else if (strcmp(key, ".c.o:") == 0)
-	    {parse_rule(st.rules.co, MAXLINE);
+	    {parse_rule(st.rules.co, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .c.o rule:\n%s\n", st.rules.co);}
 
 /* .c.a rule handler */
 	 else if (strcmp(key, ".c.a:") == 0)
-	    {parse_rule(st.rules.ca, MAXLINE);
+	    {parse_rule(st.rules.ca, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .c.a rule:\n%s\n", st.rules.ca);}
 
 /* .f.o rule handler */
 	 else if (strcmp(key, ".f.o:") == 0)
-	    {parse_rule(st.rules.fo, MAXLINE);
+	    {parse_rule(st.rules.fo, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .f.o rule:\n%s\n", st.rules.fo);}
 
 /* .f.a rule handler */
 	 else if (strcmp(key, ".f.a:") == 0)
-	    {parse_rule(st.rules.fa, MAXLINE);
+	    {parse_rule(st.rules.fa, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .f.a rule:\n%s\n", st.rules.fa);}
 
 /* .l.o rule handler */
 	 else if (strcmp(key, ".l.o:") == 0)
-	    {parse_rule(st.rules.lo, MAXLINE);
+	    {parse_rule(st.rules.lo, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .l.o rule:\n%s\n", st.rules.lo);}
 
 /* .l.a rule handler */
 	 else if (strcmp(key, ".l.a:") == 0)
-	    {parse_rule(st.rules.la, MAXLINE);
+	    {parse_rule(st.rules.la, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .l.a rule:\n%s\n", st.rules.la);}
 
 /* .l.c rule handler */
 	 else if (strcmp(key, ".l.c:") == 0)
-	    {parse_rule(st.rules.lc, MAXLINE);
+	    {parse_rule(st.rules.lc, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .l.c rule:\n%s\n", st.rules.lc);}
 
 /* .y.o rule handler */
 	 else if (strcmp(key, ".y.c:") == 0)
-	    {parse_rule(st.rules.yo, MAXLINE);
+	    {parse_rule(st.rules.yo, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .y.o rule:\n%s\n", st.rules.yo);}
 
 /* .y.a rule handler */
 	 else if (strcmp(key, ".y.a:") == 0)
-	    {parse_rule(st.rules.ya, MAXLINE);
+	    {parse_rule(st.rules.ya, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .y.a rule:\n%s\n", st.rules.ya);}
 
 /* .y.c rule handler */
 	 else if (strcmp(key, ".y.c:") == 0)
-	    {parse_rule(st.rules.yc, MAXLINE);
+	    {parse_rule(st.rules.yc, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(Log, "Redefining .y.c rule:\n%s\n", st.rules.yc);}
 
@@ -2431,7 +2431,7 @@ static void add_do_run(FILE *fp, char *lf)
 
 static char *do_run_spec(char *lst, char *s)
    {char *file;
-    static char t[MAXLINE];
+    static char t[BFLRG];
 
     file = NULL;
     if (file_exists(s) == TRUE)
@@ -2439,7 +2439,7 @@ static char *do_run_spec(char *lst, char *s)
 
     else
        {FOREACH(d, lst, " \t\n")
-	   snprintf(t, MAXLINE, "%s/do-run-%s", d, s);
+	   snprintf(t, BFLRG, "%s/do-run-%s", d, s);
 	   if (file_exists(t) == TRUE)
 	      {file = t;
 	       break;};
@@ -2454,20 +2454,20 @@ static char *do_run_spec(char *lst, char *s)
 
 static void write_do_run_db(client *cl, state *st)
    {int i, l, nm, ns, ok;
-    char ldbg[MAXLINE], lmpi[MAXLINE], lcrs[MAXLINE];
-    char cfg[MAXLINE], db[MAXLINE];
-    char s[MAXLINE];
+    char ldbg[BFLRG], lmpi[BFLRG], lcrs[BFLRG];
+    char cfg[BFLRG], db[BFLRG];
+    char s[BFLRG];
     char **cnd, **sa, *file, *exe, *p;
     FILE *fp;
 
     p = cgetenv(TRUE, "ConfigDir");
     if (IS_NULL(p) == TRUE)
        p = "local std";
-    nstrncpy(cfg,  MAXLINE, p, -1);
+    nstrncpy(cfg,  BFLRG, p, -1);
 
-    nstrncpy(ldbg, MAXLINE, dbget(cl, TRUE, "DO_RUN_DBG"), -1);
-    nstrncpy(lmpi, MAXLINE, dbget(cl, TRUE, "DO_RUN_MPI"), -1);
-    nstrncpy(lcrs, MAXLINE, dbget(cl, TRUE, "DO_RUN_CROSS"), -1);
+    nstrncpy(ldbg, BFLRG, dbget(cl, TRUE, "DO_RUN_DBG"), -1);
+    nstrncpy(lmpi, BFLRG, dbget(cl, TRUE, "DO_RUN_MPI"), -1);
+    nstrncpy(lcrs, BFLRG, dbget(cl, TRUE, "DO_RUN_CROSS"), -1);
 
     separator(Log);
     note(Log, TRUE, "   ConfigDir     = %s", cfg);
@@ -2478,7 +2478,7 @@ static void write_do_run_db(client *cl, state *st)
 /* initialize the database file */
     note(Log, TRUE, "   Do-run signature database - do-run-db");
 
-    snprintf(db, MAXLINE, "%s/do-run-db", st->dir.etc);
+    snprintf(db, BFLRG, "%s/do-run-db", st->dir.etc);
 
 /* see if file is properly specified via environment variable */
     p   = cgetenv(TRUE, "RUN_SIGNATURE_DB");
@@ -2536,7 +2536,7 @@ static void write_do_run_db(client *cl, state *st)
 
 /* find the prolog */
 	FOREACH(d, cfg, " \t\n")
-	   snprintf(s, MAXLINE, "%s/do-run-prolog", d);
+	   snprintf(s, BFLRG, "%s/do-run-prolog", d);
 	   if (file_exists(s) == TRUE)
               {add_do_run(fp, s);
 	       ns++;
@@ -2658,11 +2658,11 @@ static void finish_config(client *cl, char *base)
     st.phase = PHASE_WRITE;
 
 /* these are finally determined by now and it is safe to define them */
-    snprintf(st.dir.inc, MAXLINE, "%s/include", st.dir.root);
-    snprintf(st.dir.etc, MAXLINE, "%s/etc",     st.dir.root);
-    snprintf(st.dir.lib, MAXLINE, "%s/lib",     st.dir.root);
-    snprintf(st.dir.bin, MAXLINE, "%s/bin",     st.dir.root);
-    snprintf(st.dir.sch, MAXLINE, "%s/scheme",  st.dir.root);
+    snprintf(st.dir.inc, BFLRG, "%s/include", st.dir.root);
+    snprintf(st.dir.etc, BFLRG, "%s/etc",     st.dir.root);
+    snprintf(st.dir.lib, BFLRG, "%s/lib",     st.dir.root);
+    snprintf(st.dir.bin, BFLRG, "%s/bin",     st.dir.root);
+    snprintf(st.dir.sch, BFLRG, "%s/scheme",  st.dir.root);
 
     separator(Log);
     noted(Log, "Writing system dependent files");
@@ -2670,9 +2670,9 @@ static void finish_config(client *cl, char *base)
 
 /* if T3D, fiddle pdb fortran interface regression test source */
     if (dbcmp(cl, "PFE", "mppexec") == 0)
-       {char tmpf[MAXLINE];
+       {char tmpf[BFLRG];
 
-	snprintf(tmpf, MAXLINE, "tmp-%s", st.system);
+	snprintf(tmpf, BFLRG, "tmp-%s", st.system);
 
 	push_dir("%s/pdb", base);
 
@@ -2708,7 +2708,7 @@ static void finish_config(client *cl, char *base)
 
 int launch_perdb(int c, char **v)
    {int i, l, n, ok, rv;
-    char t[MAXLINE];
+    char t[BFLRG];
     char *db;
     static char *sfx[] = { "db", "log", "pid" };
 
@@ -2725,7 +2725,7 @@ int launch_perdb(int c, char **v)
 		 csetenv("PERDB_PATH", db);
 
 		 for (l = 0; l < n; l++)
-		     {snprintf(t, MAXLINE, "%s.%s", db, sfx[l]);
+		     {snprintf(t, BFLRG, "%s.%s", db, sfx[l]);
 		      unlink_safe(t);};
 
 		 rv = execute(FALSE, "perdb -f %s -l -c -s", db);
@@ -2827,7 +2827,7 @@ static void help(void)
 
 int main(int c, char **v, char **env)
    {int i, append, ok;
-    char base[MAXLINE], ib[MAXLINE], d[LRG];
+    char base[BFLRG], ib[BFLRG], d[BFLRG];
     char *root, *strct;
     client *cl;
 
@@ -2867,12 +2867,12 @@ int main(int c, char **v, char **env)
  * we get the same value that shell scripts get in other parts of the
  * config process - and consistency is essential
  */
-    nstrncpy(st.dir.mng, MAXLINE, run(BOTH, "pwd"), -1);
+    nstrncpy(st.dir.mng, BFLRG, run(BOTH, "pwd"), -1);
 
-    nstrncpy(base, MAXLINE, path_head(st.dir.mng), -1);
+    nstrncpy(base, BFLRG, path_head(st.dir.mng), -1);
     strcpy(st.cfgf, "DEFAULT");
 
-    nstrncpy(ib, MAXLINE, "none", -1);
+    nstrncpy(ib, BFLRG, "none", -1);
     strct  = "0";
     append = FALSE;
 
@@ -2884,7 +2884,7 @@ int main(int c, char **v, char **env)
 	    strct = v[++i];
 
          else if (strcmp(v[i], "-db") == 0)
-	    {full_path(d, LRG, NULL, v[++i]);
+	    {full_path(d, BFLRG, NULL, v[++i]);
              if (file_exists(d) == FALSE)
 	        {noted(Log, "No such database '%s' - exiting\n", d);
 		 if (st.have_db == TRUE)
@@ -2921,7 +2921,7 @@ int main(int c, char **v, char **env)
                       break;
  
                  case 'i':
-		      nstrncpy(ib, MAXLINE, v[++i], -1);
+		      nstrncpy(ib, BFLRG, v[++i], -1);
                       break;
  
                  case 'l':
@@ -2938,7 +2938,7 @@ int main(int c, char **v, char **env)
                       break;
  
                  case 's':
-                      nstrncpy(st.system, MAXLINE, v[++i], -1);
+                      nstrncpy(st.system, BFLRG, v[++i], -1);
                       break;
  
                  case 'v':
@@ -2951,7 +2951,7 @@ int main(int c, char **v, char **env)
                       break;};}
 
          else
-	    {nstrncpy(st.cfgf, MAXLINE, v[i], -1);
+	    {nstrncpy(st.cfgf, BFLRG, v[i], -1);
 	     dbset(cl, "CONFIG_METHOD", "file");};};
 
     set_inst_base(cl, ib);
@@ -2959,7 +2959,7 @@ int main(int c, char **v, char **env)
     init_session(cl, base, append);
 
 /* make config directory */
-    snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
+    snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.system);
     run(BOTH, "rm -rf %s", st.dir.cfg);
     run(BOTH, "mkdir %s", st.dir.cfg);
 
@@ -3007,29 +3007,29 @@ int main(int c, char **v, char **env)
         env_subst(cl, "System",        st.system);
         env_subst(cl, "CONFIG_METHOD", "database");
 
-	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
-	nstrncpy(st.cfgf,    MAXLINE, cgetenv(FALSE, "CONFIG_FILE"), -1);
+	snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.system);
+	nstrncpy(st.cfgf,    BFLRG, cgetenv(FALSE, "CONFIG_FILE"), -1);
 
 /* reset the rules */
-	snprintf(st.rules.ccp, MAXLINE, "\t%s\n", cgetenv(FALSE, "CCP"));
-	snprintf(st.rules.co,  MAXLINE, "\t%s\n", cgetenv(FALSE, "CCObj"));
-	snprintf(st.rules.ca,  MAXLINE, "\t%s\n", cgetenv(FALSE, "CCArc"));
-	snprintf(st.rules.lo,  MAXLINE, "\t%s\n", cgetenv(FALSE, "LexObj"));
-	snprintf(st.rules.la,  MAXLINE, "\t%s\n", cgetenv(FALSE, "LexArc"));
-	snprintf(st.rules.lc,  MAXLINE, "\t%s\n", cgetenv(FALSE, "LexC"));
-	snprintf(st.rules.yo,  MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccObj"));
-	snprintf(st.rules.ya,  MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccArc"));
-	snprintf(st.rules.yc,  MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccC"));
-	snprintf(st.rules.fo,  MAXLINE, "\t%s\n", cgetenv(FALSE, "FCObj"));
-	snprintf(st.rules.fa,  MAXLINE, "\t%s\n", cgetenv(FALSE, "FCArc"));
-	snprintf(st.rules.th,  MAXLINE, "\t%s\n", cgetenv(FALSE, "TemplH"));
+	snprintf(st.rules.ccp, BFLRG, "\t%s\n", cgetenv(FALSE, "CCP"));
+	snprintf(st.rules.co,  BFLRG, "\t%s\n", cgetenv(FALSE, "CCObj"));
+	snprintf(st.rules.ca,  BFLRG, "\t%s\n", cgetenv(FALSE, "CCArc"));
+	snprintf(st.rules.lo,  BFLRG, "\t%s\n", cgetenv(FALSE, "LexObj"));
+	snprintf(st.rules.la,  BFLRG, "\t%s\n", cgetenv(FALSE, "LexArc"));
+	snprintf(st.rules.lc,  BFLRG, "\t%s\n", cgetenv(FALSE, "LexC"));
+	snprintf(st.rules.yo,  BFLRG, "\t%s\n", cgetenv(FALSE, "YaccObj"));
+	snprintf(st.rules.ya,  BFLRG, "\t%s\n", cgetenv(FALSE, "YaccArc"));
+	snprintf(st.rules.yc,  BFLRG, "\t%s\n", cgetenv(FALSE, "YaccC"));
+	snprintf(st.rules.fo,  BFLRG, "\t%s\n", cgetenv(FALSE, "FCObj"));
+	snprintf(st.rules.fa,  BFLRG, "\t%s\n", cgetenv(FALSE, "FCArc"));
+	snprintf(st.rules.th,  BFLRG, "\t%s\n", cgetenv(FALSE, "TemplH"));
 
-	snprintf(st.rules.co_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "CCObj_BP"));
-	snprintf(st.rules.ca_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "CCArc_BP"));
-	snprintf(st.rules.lo_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "LexObj_BP"));
-	snprintf(st.rules.la_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "LexArc_BP"));
-	snprintf(st.rules.yo_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccObj_BP"));
-	snprintf(st.rules.ya_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccArc_BP"));
+	snprintf(st.rules.co_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "CCObj_BP"));
+	snprintf(st.rules.ca_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "CCArc_BP"));
+	snprintf(st.rules.lo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "LexObj_BP"));
+	snprintf(st.rules.la_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "LexArc_BP"));
+	snprintf(st.rules.yo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "YaccObj_BP"));
+	snprintf(st.rules.ya_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "YaccArc_BP"));
 
 /* place the make variables */
         reset_make_vars();

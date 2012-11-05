@@ -40,7 +40,7 @@ void del_quotation(char *t)
 
 int elide(char *pa, char *pb, char *fname)
    {int nc, nca, ncb, rv;
-    char s[LRG], t[LRG];
+    char s[BFLRG], t[BFLRG];
     char *p, *ta, *tb, *wh, *ps;
     FILE *fp;
 
@@ -60,7 +60,7 @@ int elide(char *pa, char *pb, char *fname)
 
 	nc = 0;
 	while (TRUE)
-	    {p = fgets(t, LRG, fp);
+	    {p = fgets(t, BFLRG, fp);
 	     if (p == NULL)
 	        break;
 
@@ -86,7 +86,7 @@ int elide(char *pa, char *pb, char *fname)
 /* no instance of PA or PB */
 		  if (wh == NULL)
 		     {if (nc == 0)
-			 nstrcat(s, LRG, ps);
+			 nstrcat(s, BFLRG, ps);
 		      ps = NULL;}
 
 /* if an instance of PA came first */
@@ -94,7 +94,7 @@ int elide(char *pa, char *pb, char *fname)
 		     {nc++;
 		      if (nc == 1)
 			 {*ta = '\0';
-			  nstrcat(s, LRG, ps);};
+			  nstrcat(s, BFLRG, ps);};
 		      ps = ta + nca;}
 
 /* if an instance of PB came first */

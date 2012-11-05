@@ -64,19 +64,19 @@ struct s_hfspec
    {char *delim;
     char *host;
     char *rawh;
-    char rawwork[MAXLINE];
-    char workdir[MAXLINE];
-    char config[MAXLINE];
+    char rawwork[BFLRG];
+    char workdir[BFLRG];
+    char config[BFLRG];
     char *args[80];
-    char logn[MAXLINE];
+    char logn[BFLRG];
     FILE *log;
     process *proc;
     int running;
     int exit;};
 
 struct s_auxdes
-   {char proper[MAXLINE];
-    char work[MAXLINE];
+   {char proper[BFLRG];
+    char work[BFLRG];
     char perms[10];
     int permi;};
 
@@ -117,18 +117,18 @@ struct s_donetdes
     hfspec *nets;
     phasedes phases[PH_N_PHASES];
     auxdes aux[N_AUX];
-    char bindir[MAXLINE];
-    char incdir[MAXLINE];
-    char etcdir[MAXLINE];
-    char logdir[MAXLINE];
-    char lnetfn[MAXLINE];
-    char ssh[MAXLINE];
-    char dist[MAXLINE];
-    char hostfile[MAXLINE];
-    char do_code[MAXLINE];
-    char stamp[MAXLINE];
-    char uplog[MAXLINE];
-    char handtout[MAXLINE];
+    char bindir[BFLRG];
+    char incdir[BFLRG];
+    char etcdir[BFLRG];
+    char logdir[BFLRG];
+    char lnetfn[BFLRG];
+    char ssh[BFLRG];
+    char dist[BFLRG];
+    char hostfile[BFLRG];
+    char do_code[BFLRG];
+    char stamp[BFLRG];
+    char uplog[BFLRG];
+    char handtout[BFLRG];
     char *cargs;
     char *clargs;
     char *debug;
@@ -184,12 +184,12 @@ void separatorv(FILE *fp)
  */
 
 void notet(FILE *fp, char *tag, char *fmt, ...)
-   {char bf[LRG];
+   {char bf[BFLRG];
 
     if (state.verbose == TRUE)
        {if (fp != NULL)
 	   {VA_START(fmt);
-	    VSNPRINTF(bf, LRG, fmt);
+	    VSNPRINTF(bf, BFLRG, fmt);
 	    VA_END;
 
 	    fprintf(fp, "DO-NET: (%s) %s\n", tag, bf);};};
@@ -204,12 +204,12 @@ void notet(FILE *fp, char *tag, char *fmt, ...)
  */
 
 void noten(FILE *fp, int vrb, char *fmt, ...)
-   {char bf[LRG];
+   {char bf[BFLRG];
 
     if (vrb == TRUE)
        {if (fp != NULL)
 	   {VA_START(fmt);
-	    VSNPRINTF(bf, LRG, fmt);
+	    VSNPRINTF(bf, BFLRG, fmt);
 	    VA_END;
 
 	    fprintf(fp, "DO-NET: %s\n", bf);};};
@@ -224,11 +224,11 @@ void noten(FILE *fp, int vrb, char *fmt, ...)
 static void notej(process *pp, char *fmt, ...)
    {int hr, mn, ti;
     double tc, sc;
-    char bf[LRG];
+    char bf[BFLRG];
     hfspec *sp;
 
     VA_START(fmt);
-    VSNPRINTF(bf, LRG, fmt);
+    VSNPRINTF(bf, BFLRG, fmt);
     VA_END;
 
     if (pp != NULL)
@@ -368,13 +368,13 @@ static int count_specs(hfspec *specs, size_t nsp)
  */
 
 static char *lrun(FILE *f1, int tag, char *fmt, ...)
-   {char s[LRG], cmd[LRG];
+   {char s[BFLRG], cmd[BFLRG];
     char *p;
     FILE *fp;
-    static char bf[100*LRG];
+    static char bf[100*BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     if (tag == FLOG)
@@ -382,17 +382,17 @@ static char *lrun(FILE *f1, int tag, char *fmt, ...)
     else if ((state.verbose == TRUE) || (tag != VLOG))
        fprintf(f1, "DO-NET: %s\n", s);
 
-    snprintf(cmd, LRG, "PATH=.:%s ; %s", lpath, s);
+    snprintf(cmd, BFLRG, "PATH=.:%s ; %s", lpath, s);
 
     bf[0] = '\0';
 
     fp = popen(cmd, "r");
     if (fp != NULL)
        {while (TRUE)
-	   {p = fgets(s, MAXLINE, fp);
+	   {p = fgets(s, BFLRG, fp);
 	    if (p == NULL)
 	       break;
-	    nstrcat(bf, 100*LRG, s);};
+	    nstrcat(bf, 100*BFLRG, s);};
 
 	pclose(fp);};
 
@@ -513,7 +513,7 @@ static void finup(process *pp, void *a)
 /* BAD_BUILD - forge a build log for a bad build */
 
 static void bad_build(hfspec *sp)
-   {char fields[MAXLINE];
+   {char fields[BFLRG];
     char *ltmp, *lcfg, *lopt, *file, *host;
     FILE *fp;
 
@@ -522,7 +522,7 @@ static void bad_build(hfspec *sp)
     ltmp = sp->args[2];
     lcfg = sp->args[4];
     lopt = sp->args[5];
-    get_fields(fields, MAXLINE, sp);
+    get_fields(fields, BFLRG, sp);
 
     fp = open_file("w", file);
 
@@ -603,7 +603,7 @@ static int log_in(process *pp, char *ar, char *s)
 	   sp->running = transition(pp, RUNNING);
 
 	else if (strncmp(s, "DO-NET: configure", 17) == 0)
-	   {nstrncpy(sp->config, MAXLINE, s+18, -1);
+	   {nstrncpy(sp->config, BFLRG, s+18, -1);
 	    p = strchr(sp->config, ' ');
 	    if (p != NULL)
 	       *p = '\0';}
@@ -629,8 +629,8 @@ static int log_in(process *pp, char *ar, char *s)
 	    notej(pp, "text(%s)", s);
 	    if (sp->running < RUNNING)
 	       sp->running = transition(pp, RUNNING);
-	    nstrncpy(sp->logn, MAXLINE, s, -1);
-	    sp->logn[MAXLINE-1] = '\0';};};
+	    nstrncpy(sp->logn, BFLRG, s, -1);
+	    sp->logn[BFLRG-1] = '\0';};};
 
     return(rv);}
 
@@ -664,17 +664,17 @@ static int acc_in(int fd, process *pp, char *s)
 /* ARUN - execute a command asynchronously */
 
 static process *arun(hfspec *sp, char *fnm, void *a, char *fmt, ...)
-   {char s[LRG], cmd[LRG];
+   {char s[BFLRG], cmd[BFLRG];
     process *pp;
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     if ((state.verbose == TRUE) && (Log != NULL))
        fprintf(Log, "DO-NET: %s\n", s);
 
-    snprintf(cmd, LRG, "%s", s);
+    snprintf(cmd, BFLRG, "%s", s);
 
     pp = alaunch(-1, cmd, "r", sp, acc_in, rej_in, aexit);
 
@@ -684,7 +684,7 @@ static process *arun(hfspec *sp, char *fnm, void *a, char *fmt, ...)
     sp->config[0] = '\0';
 
     if (fnm != NULL)
-       {nstrncpy(sp->logn, MAXLINE, fnm, -1);
+       {nstrncpy(sp->logn, BFLRG, fnm, -1);
         sp->log = open_file("w+", fnm);
 	if (sp->log != NULL)
 	   {setbuf(sp->log,  NULL);
@@ -708,16 +708,16 @@ static process *arun(hfspec *sp, char *fnm, void *a, char *fmt, ...)
  */
 
 static void brun(FILE *fo, char *fmt, ...)
-   {char s[LRG], cmd[LRG];
+   {char s[BFLRG], cmd[BFLRG];
     FILE *fp;
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     fprintf(fo, "DO-NET: %s\n", s);
 
-    snprintf(cmd, LRG, "PATH=.:%s ; %s", lpath, s);
+    snprintf(cmd, BFLRG, "PATH=.:%s ; %s", lpath, s);
 
     fp = popen(cmd, "r");
     ASSERT(fp != NULL);
@@ -768,7 +768,7 @@ int is_background(void)
 
 static int check_tty(char *sect)
    {int rv;
-    char in[MAXLINE];
+    char in[BFLRG];
     char *p;
 
     rv = FALSE;
@@ -778,7 +778,7 @@ static int check_tty(char *sect)
 
 /* do a non-blocking read to see if a message is waiting */
 	   {block_fd(fileno(stdin), FALSE);
-            p = fgets(in, MAXLINE, stdin);
+            p = fgets(in, BFLRG, stdin);
 	    block_fd(fileno(stdin), TRUE);
 
             if (p != NULL)
@@ -963,7 +963,7 @@ static void waitup(int cyc, char *sect, void *a,
 
 static void cwait(donetdes *st, hfspec *sp, int nsp, char *sect, int tf)
    {int tc;
-    char t[MAXLINE];
+    char t[BFLRG];
 
     if (st->silent == FALSE)
        printf("   %s .", sect);
@@ -985,7 +985,7 @@ static void cwait(donetdes *st, hfspec *sp, int nsp, char *sect, int tf)
 	  "Waiting done on %s: %5d sec", sect, tc);
 
     if (st->silent == FALSE)
-       printf(" done (%s)\n", time_string(t, MAXLINE, TIME_HMS, tc));
+       printf(" done (%s)\n", time_string(t, BFLRG, TIME_HMS, tc));
 
     return;}
 
@@ -1012,7 +1012,7 @@ static void charset(char *s, int nc, int chr, int n)
 /* FINDRUN - setup st->do_code and st->run */
 
 static void findrun(donetdes *st)
-   {char exed[MAXLINE], locd[MAXLINE];
+   {char exed[BFLRG], locd[BFLRG];
     auxdes *pa;
 
     pa = st->aux;
@@ -1026,12 +1026,12 @@ static void findrun(donetdes *st)
 	exit(4);};
 
     if (strcmp(st->shared, cgetenv(FALSE, "HOME")) == 0)
-       {snprintf(locd, MAXLINE, "./%s", pa[0].work);
-	nstrncpy(exed, MAXLINE, pa[1].work, -1);}
+       {snprintf(locd, BFLRG, "./%s", pa[0].work);
+	nstrncpy(exed, BFLRG, pa[1].work, -1);}
 
     else
-       {snprintf(locd, MAXLINE, "%s/%s", st->shared, pa[0].work);
-	snprintf(exed, MAXLINE, "%s/%s", st->shared, pa[1].work);};
+       {snprintf(locd, BFLRG, "%s/%s", st->shared, pa[0].work);
+	snprintf(exed, BFLRG, "%s/%s", st->shared, pa[1].work);};
 
     st->run = NULL;
     st->run = append_tok(st->run, ' ', locd);
@@ -1087,10 +1087,10 @@ static char *pop_tok(char *s, int n, char *delim)
 static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 		       char *wrk, char *skip)
    {int cfgfail, running;
-    char s[LRG], hst[MAXLINE], rmh[MAXLINE];
-    char cfg[MAXLINE], dbop[MAXLINE], usetmp[MAXLINE];
-    char tss[MAXLINE], fns[MAXLINE], fnt[MAXLINE];
-    char blt[MAXLINE], tst[MAXLINE], rms[MAXLINE], bls[MAXLINE];
+    char s[BFLRG], hst[BFLRG], rmh[BFLRG];
+    char cfg[BFLRG], dbop[BFLRG], usetmp[BFLRG];
+    char tss[BFLRG], fns[BFLRG], fnt[BFLRG];
+    char blt[BFLRG], tst[BFLRG], rms[BFLRG], bls[BFLRG];
     char *p, *o;
     FILE *fp;
 
@@ -1116,7 +1116,7 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 
 /* read the phase log file */
     while (TRUE)
-      {p = fgets(s, LRG, fp);
+      {p = fgets(s, BFLRG, fp);
        if (p == NULL)
 	  break;
        else if (strstr(s, "Failed to configure") != NULL)
@@ -1128,38 +1128,38 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 	   else if (strcmp(p, "Removing") == 0)
 	      {p = pop_tok(NULL, 2, " \t\n");
 	       if (p != NULL)
-		  {nstrncpy(rmh, MAXLINE, "have", -1);
-		   nstrncpy(rms, MAXLINE, p, -1);};}
+		  {nstrncpy(rmh, BFLRG, "have", -1);
+		   nstrncpy(rms, BFLRG, p, -1);};}
 	   else if (strcmp(p, "Building") == 0)
 	      {p = pop_tok(NULL, 2, " \t\n");
 	       if (p != NULL)
-		  nstrncpy(bls, MAXLINE, p, -1);
+		  nstrncpy(bls, BFLRG, p, -1);
 	       p = pop_tok(NULL, 1, " \t\n");
 	       if (p != NULL)
-		  nstrncpy(blt, MAXLINE, p, -1);}
+		  nstrncpy(blt, BFLRG, p, -1);}
 	   else if (strcmp(p, "Testing") == 0)
 	      {p = pop_tok(NULL, 2, " \t\n");
 	       if (p != NULL)
-		  nstrncpy(tss, MAXLINE, p, -1);
+		  nstrncpy(tss, BFLRG, p, -1);
 	       p = pop_tok(NULL, 1, " \t\n");
 	       if (p != NULL)
-		  nstrncpy(tst, MAXLINE, p, -1);}
+		  nstrncpy(tst, BFLRG, p, -1);}
 	   else if (strcmp(p, "Starting") == 0)
 	      {p = pop_tok(NULL, 3, " \t\n");
 	       if (p != NULL)
-		  nstrncpy(hst, MAXLINE, p, -1);}
+		  nstrncpy(hst, BFLRG, p, -1);}
 	   else if (strcmp(p, "Succeeded") == 0)
 	      {running = FALSE;
 	       p = pop_tok(NULL, 3, " \t\n");
 	       if (p != NULL)
-		  {nstrncpy(fns, MAXLINE, "Pass", -1);
-		   nstrncpy(fnt, MAXLINE, p, -1);};}
+		  {nstrncpy(fns, BFLRG, "Pass", -1);
+		   nstrncpy(fnt, BFLRG, p, -1);};}
 	   else if (strcmp(p, "Failed") == 0)
 	      {running = FALSE;
 	       p = pop_tok(NULL, 3, " \t\n");
 	       if (p != NULL)
-		  {nstrncpy(fns, MAXLINE, "Fail", -1);
-		   nstrncpy(fnt, MAXLINE, p, -1);};}
+		  {nstrncpy(fns, BFLRG, "Fail", -1);
+		   nstrncpy(fnt, BFLRG, p, -1);};}
 	   else if (strcmp(p, "DO-NET:") == 0)
 	      {p = pop_tok(NULL, 1, " \t\n");
                if ((p != NULL) && (strcmp(p, "Exec") == 0))
@@ -1169,20 +1169,20 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 		   p = pop_tok(NULL, 1, " \t\n");
 		   if ((p != NULL) && (strcmp(p, "option") == 0))
 		      {if (o != NULL)
-			  nstrncpy(cfg, MAXLINE, o, -1);
+			  nstrncpy(cfg, BFLRG, o, -1);
 		       p = pop_tok(NULL, 1, " \t\n");
 		       if (p != NULL)
-			  nstrncpy(dbop, MAXLINE, p, -1);
+			  nstrncpy(dbop, BFLRG, p, -1);
 		       p = pop_tok(NULL, 1, " \t\n");
 		       if (p != NULL)
-			  nstrncpy(usetmp, MAXLINE, p, -1);};};};};};
+			  nstrncpy(usetmp, BFLRG, p, -1);};};};};};
 
     fclose(fp);
 
 /* if the log file indicates the job is pending or has only started */
     if ((strcmp(hst, "--- pending ---") == 0) ||
 	(strcmp(hst, "--- started ---") == 0))
-       {nstrncpy(s, LRG, plog, -1);
+       {nstrncpy(s, BFLRG, plog, -1);
 	p = pop_tok(s, 2, ".");
 	fprintf(repf,
 		" %-12s %s       ---   ---  ---      ---\n",
@@ -1191,57 +1191,57 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 /* if the log file indicates a running or complete job */
     else
        {if (strcmp(usetmp, "yes") == 0)
-	   nstrcat(cfg, MAXLINE, "*");
+	   nstrcat(cfg, BFLRG, "*");
 
 /* handle simple case of config failure */
 	if (cfgfail == TRUE)
-	   {nstrncpy(rms, MAXLINE, skip, -1);
-	    nstrncpy(bls, MAXLINE, skip, -1);
-	    nstrncpy(blt, MAXLINE, skip, -1);
-	    nstrncpy(tss, MAXLINE, skip, -1);
-	    nstrncpy(tst, MAXLINE, skip, -1);}
+	   {nstrncpy(rms, BFLRG, skip, -1);
+	    nstrncpy(bls, BFLRG, skip, -1);
+	    nstrncpy(blt, BFLRG, skip, -1);
+	    nstrncpy(tss, BFLRG, skip, -1);
+	    nstrncpy(tst, BFLRG, skip, -1);}
 
 	else
 
 /* handle remove entry */
 	   {if (strcmp(rmh, "have") == 0)
 	       {if (strcasecmp(rms, "ok") == 0)
-		   nstrncpy(rms, MAXLINE, pass, -1);
+		   nstrncpy(rms, BFLRG, pass, -1);
 	        else if (strcasecmp(rms, "failed") == 0)
-		   nstrncpy(rms, MAXLINE, fail, -1);
+		   nstrncpy(rms, BFLRG, fail, -1);
 		else
-		   nstrncpy(rms, MAXLINE, wrk, -1);}
+		   nstrncpy(rms, BFLRG, wrk, -1);}
 	    else
-	       nstrncpy(rms, MAXLINE, skip, -1);
+	       nstrncpy(rms, BFLRG, skip, -1);
    
 /* handle build entry */
 	    if (strcasecmp(bls, "ok") == 0)
-	       nstrncpy(bls, MAXLINE, pass, -1);
+	       nstrncpy(bls, BFLRG, pass, -1);
 	    else if (strcasecmp(bls, "failed") == 0)
-	       nstrncpy(bls, MAXLINE, fail, -1);
+	       nstrncpy(bls, BFLRG, fail, -1);
 	    else if ((strcmp(rms, pass) == 0) || (strcmp(rms, skip) == 0))
-	       {nstrncpy(bls, MAXLINE, wrk, -1);
-		nstrncpy(blt, MAXLINE, wrk, -1);};
+	       {nstrncpy(bls, BFLRG, wrk, -1);
+		nstrncpy(blt, BFLRG, wrk, -1);};
    
 /* handle test entry */
 	    if (strcasecmp(tss, "ok") == 0)
-	       nstrncpy(tss, MAXLINE, pass, -1);
+	       nstrncpy(tss, BFLRG, pass, -1);
 	    else if (strcasecmp(tss, "failed") == 0)
-	       nstrncpy(tss, MAXLINE, fail, -1);
+	       nstrncpy(tss, BFLRG, fail, -1);
 
 /* allow the do-<specific> script to override test failure via PassTests
  * and denote it with the '*'
  */
 	    else if (strcasecmp(tss, "failed*") == 0)
-	       snprintf(tss, MAXLINE, "%s*", fail);
+	       snprintf(tss, BFLRG, "%s*", fail);
 
 	    else if (strcmp(bls, pass) == 0)
-	       {nstrncpy(tss, MAXLINE, wrk, -1);
-		nstrncpy(tst, MAXLINE, wrk, -1);}
+	       {nstrncpy(tss, BFLRG, wrk, -1);
+		nstrncpy(tst, BFLRG, wrk, -1);}
 
 	    else if (strcmp(bls, fail) == 0)
-	       {nstrncpy(tss, MAXLINE, skip, -1);
-		nstrncpy(tst, MAXLINE, skip, -1);};
+	       {nstrncpy(tss, BFLRG, skip, -1);
+		nstrncpy(tst, BFLRG, skip, -1);};
    
 	    if ((IS_NULL(tss) == TRUE) || (strcmp(tss, wrk) == 0))
 	       {fns[0] = '\0';
@@ -1262,14 +1262,14 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 static int watch_sect(char *plog, FILE *repf, char *sect,
 		      char *pass, char *fail, char *wrk, char *skip)
    {int i, running;
-    char s[LRG], hst[MAXLINE], sts[MAXLINE], tim[MAXLINE], fmt[MAXLINE];
+    char s[BFLRG], hst[BFLRG], sts[BFLRG], tim[BFLRG], fmt[BFLRG];
     char *p, *pf;
     FILE *fp;
 
     running = TRUE;
 
-    nstrncpy(sts, MAXLINE, skip, -1);
-    nstrncpy(tim, MAXLINE, skip, -1);
+    nstrncpy(sts, BFLRG, skip, -1);
+    nstrncpy(tim, BFLRG, skip, -1);
 
 /* open the phase log file */
     fp = fopen(plog, "r");
@@ -1278,19 +1278,19 @@ static int watch_sect(char *plog, FILE *repf, char *sect,
 
 /* host derives from phase log name */
     p = strchr(plog, '.');
-    nstrncpy(hst, MAXLINE, p+1, -1);
+    nstrncpy(hst, BFLRG, p+1, -1);
     p = strchr(hst, '.');
     if (p != NULL)
        *p = '\0';
 
 /* read the phase log file */
     while (TRUE)
-      {p = fgets(s, LRG, fp);
+      {p = fgets(s, BFLRG, fp);
        if (p == NULL)
 	  break;
        else if (strncmp(s, "DO-NET: Exec do-local", 21) == 0)
-	  {nstrncpy(sts, MAXLINE, wrk, -1);
-	   nstrncpy(tim, MAXLINE, wrk, -1);}
+	  {nstrncpy(sts, BFLRG, wrk, -1);
+	   nstrncpy(tim, BFLRG, wrk, -1);}
        else if ((strncmp(s, "Succeeded", 9) == 0) ||
 		(strncmp(s, "Failed", 6) == 0))
 	  running = FALSE;
@@ -1301,28 +1301,28 @@ static int watch_sect(char *plog, FILE *repf, char *sect,
 
 	   else if ((strcmp(p, "DO-NET:") != 0) &&
 		    (strcmp(p, "Look") != 0))
-	      {nstrncpy(hst, MAXLINE, p, -1);
+	      {nstrncpy(hst, BFLRG, p, -1);
 	       p = strtok(NULL, " \t\n");
 	       p = strtok(NULL, " \t\n");
 	       if (p != NULL)
-		  nstrncpy(sts, MAXLINE, p, -1);
+		  nstrncpy(sts, BFLRG, p, -1);
 	       p = strtok(NULL, " \t\n");
 	       if (p != NULL)
-		  nstrncpy(tim, MAXLINE, trim(p, BOTH, " ()"), -1);};};};
+		  nstrncpy(tim, BFLRG, trim(p, BOTH, " ()"), -1);};};};
     fclose(fp);
 
 /* figure out the status and timing */
     if (strcasecmp(sts, "ok") == 0)
-       nstrncpy(sts, MAXLINE, pass, -1);
+       nstrncpy(sts, BFLRG, pass, -1);
     else if (strcasecmp(sts, "failed") == 0)
-       nstrncpy(sts, MAXLINE, fail, -1);
+       nstrncpy(sts, BFLRG, fail, -1);
 
 /* figure out the format for printing */
-    nstrncpy(fmt, MAXLINE, " %-16s %-4s", -1);
+    nstrncpy(fmt, BFLRG, " %-16s %-4s", -1);
     pf = fmt + strlen(fmt);
     for (i = strlen(sect) - 3; i >= 0; i--, *pf++ = ' ');
     *pf = '\0';
-    nstrcat(fmt, MAXLINE, "%7s\n");
+    nstrcat(fmt, BFLRG, "%7s\n");
 
     fprintf(repf, fmt, hst, sts, tim);
 
@@ -1360,7 +1360,7 @@ static int watch_phase(donetdes *st, FILE *repf,
 static void watch_header(donetdes *st, int ip, FILE *repf, char *file,
 			 int tr, char *shm, char *ehm, char *clr)
    {int nsp, visual;
-    char hyphens[MAXLINE], blanks[MAXLINE], tm[MAXLINE];
+    char hyphens[BFLRG], blanks[BFLRG], tm[BFLRG];
     char *tlft, *sect;
 
     sect = st->phases[ip].name;
@@ -1381,7 +1381,7 @@ static void watch_header(donetdes *st, int ip, FILE *repf, char *file,
 	nstrncpy(ehm, 80, "", -1);};
 
     if (tr >= 0)
-       tlft = time_string(tm, MAXLINE, TIME_HMS, tr);
+       tlft = time_string(tm, BFLRG, TIME_HMS, tr);
     else
        tlft = "00:00";
 
@@ -1406,8 +1406,8 @@ static void watch_header(donetdes *st, int ip, FILE *repf, char *file,
     else
        {note(repf, TRUE, "%s Host             %s     Time%s", shm, sect, ehm);
 
-	charset(blanks,  MAXLINE, ' ', strlen(sect)-3);
-	charset(hyphens, MAXLINE, '-', strlen(sect)-7);
+	charset(blanks,  BFLRG, ' ', strlen(sect)-3);
+	charset(hyphens, BFLRG, '-', strlen(sect)-7);
 
 	if (visual != TRUE)
 	  note(repf, TRUE, " ----       %s", hyphens);};
@@ -1421,7 +1421,7 @@ static void watch_header(donetdes *st, int ip, FILE *repf, char *file,
 
 static void watch_emit(donetdes *st, char *repfn, char *file,
 		       char *shm, char *ehm, char *clr)
-   {char s[MAXLINE];
+   {char s[BFLRG];
     char *p, *pe, *ps, *pc;
     FILE *htmlf, *fp;
 
@@ -1444,7 +1444,7 @@ static void watch_emit(donetdes *st, char *repfn, char *file,
 	    return;};
 
 	while (TRUE)
-	   {p = fgets(s, MAXLINE, fp);
+	   {p = fgets(s, BFLRG, fp);
 	    if (p == NULL)
 	       break;
 	    else
@@ -1476,23 +1476,23 @@ static void watch_emit(donetdes *st, char *repfn, char *file,
 
 static int watch(donetdes *st, int c, char **v)
    {int i, ip, tr, nr, ok;
-    char file[MAXLINE], upf[MAXLINE], repfn[MAXLINE], dir[MAXLINE];
+    char file[BFLRG], upf[BFLRG], repfn[BFLRG], dir[BFLRG];
     char shm[80], ehm[80], clr[80];
     char *f, *rv, *phase;
     char *wrk, *skip, *pass, *fail;
     char **plog, **files;
     FILE *repf;
 
-    full_path(file, MAXLINE, NULL, v[1]);
+    full_path(file, BFLRG, NULL, v[1]);
 
 /* find out the time stamp */
     if (c > 2)
-       nstrncpy(st->stamp, MAXLINE, v[2], -1);
+       nstrncpy(st->stamp, BFLRG, v[2], -1);
     else
-       {char lnm[MAXLINE];
+       {char lnm[BFLRG];
 
         st->stamp[0] = '\0';
-        nstrncpy(lnm, MAXLINE, path_tail(file), -1);
+        nstrncpy(lnm, BFLRG, path_tail(file), -1);
 	files = ls("-t", "%s/*/update", st->logdir);
 	if (files != NULL)
 	   {for (i = 0; files[i] != NULL; i++)
@@ -1500,7 +1500,7 @@ static int watch(donetdes *st, int c, char **v)
 		 rv = run(FALSE, "grep \"Updating\" %s | awk '$2 == \"%s\" && $7 ~ /'%s'/ {print \"yes\"}'",
 			  f, st->system, lnm);
 		 if (strcmp(rv, "yes") == 0)
-		    {nstrncpy(st->stamp, MAXLINE, path_tail(path_head(f)), -1);
+		    {nstrncpy(st->stamp, BFLRG, path_tail(path_head(f)), -1);
 		     break;};};
 	    free_strings(files);};
 
@@ -1517,7 +1517,7 @@ static int watch(donetdes *st, int c, char **v)
     fail  = "fail";
 
 /* GOTCHA: st->uplog */
-    snprintf(dir, MAXLINE, "%s/%s", st->logdir, st->stamp);
+    snprintf(dir, BFLRG, "%s/%s", st->logdir, st->stamp);
     chdir(dir);
 
     Log = open_file("w", "watch");
@@ -1536,7 +1536,7 @@ static int watch(donetdes *st, int c, char **v)
     phase = st->phases[ip].name;
     tr    = st->phases[ip].tlimit;
 
-    snprintf(upf, MAXLINE, "update");
+    snprintf(upf, BFLRG, "update");
     while (IS_NULL(phase) == FALSE)
 
 /* wait for the update log to appear */
@@ -1551,7 +1551,7 @@ static int watch(donetdes *st, int c, char **v)
 		     free_strings(files);};};
 	     sleep(2);};
     
-	snprintf(repfn, MAXLINE, "%s.%s", cgetenv(FALSE, "USER"), phase);
+	snprintf(repfn, BFLRG, "%s.%s", cgetenv(FALSE, "USER"), phase);
 	repf = open_file("w", repfn);
 
 	watch_header(st, ip, repf, file, tr, shm, ehm, clr);
@@ -1622,7 +1622,7 @@ static int watch(donetdes *st, int c, char **v)
 /* START_WATCH - launch a watch window process */
 
 static void start_watch(donetdes *st, char *exe)
-   {char fn[MAXLINE], wargs[MAXLINE];
+   {char fn[BFLRG], wargs[BFLRG];
     char *title, *geometry;
     FILE *fp;
 
@@ -1637,20 +1637,20 @@ static void start_watch(donetdes *st, char *exe)
     wargs[0] = '\0';
 
     if (st->send == FALSE)
-       push_tok(wargs, MAXLINE, ' ', "-s");
+       push_tok(wargs, BFLRG, ' ', "-s");
 
     if (st->build == FALSE)
-       push_tok(wargs, MAXLINE, ' ', "-b");
+       push_tok(wargs, BFLRG, ' ', "-b");
 
     if (st->install == FALSE)
-       push_tok(wargs, MAXLINE, ' ', "-i");
+       push_tok(wargs, BFLRG, ' ', "-i");
 
     if (st->watchout == TEXT)
-       push_tok(wargs, MAXLINE, ' ', "+watch");
+       push_tok(wargs, BFLRG, ' ', "+watch");
     else if (st->watchout == HTML)
-       push_tok(wargs, MAXLINE, ' ', "+hwatch");
+       push_tok(wargs, BFLRG, ' ', "+hwatch");
 
-    snprintf(fn, MAXLINE, "%s/.do-watch-%s", st->shared, st->stamp);
+    snprintf(fn, BFLRG, "%s/.do-watch-%s", st->shared, st->stamp);
     fp = open_file("w", fn);
 
     note(fp, TRUE, "#!/bin/csh -f");
@@ -1682,8 +1682,8 @@ static void start_watch(donetdes *st, char *exe)
 
 static int progress(donetdes *st)
    {int i, ip, np;
-    char host[MAXLINE], file[MAXLINE], dir[MAXLINE];
-    char base[MAXLINE], update[MAXLINE];
+    char host[BFLRG], file[BFLRG], dir[BFLRG];
+    char base[BFLRG], update[BFLRG];
     char *f, *s, **files;
     static char *phase[] = {"setup", "build", "netinstall",
 			    "hostinstall", "interrupt"};
@@ -1695,7 +1695,7 @@ static int progress(donetdes *st)
 
     else
 /* GOTCHA: st->uplog */
-       {snprintf(dir, MAXLINE, "%s/%s", st->logdir, st->stamp);
+       {snprintf(dir, BFLRG, "%s/%s", st->logdir, st->stamp);
 	chdir(dir);
 
 	printf("\n");
@@ -1704,8 +1704,8 @@ static int progress(donetdes *st)
 
 	np = sizeof(phase)/sizeof(char *);
 	for (ip = 0; ip < np; ip++)
-	    {snprintf(base, MAXLINE, "%s", phase[ip]);
-	     snprintf(update, MAXLINE, "update");
+	    {snprintf(base, BFLRG, "%s", phase[ip]);
+	     snprintf(update, BFLRG, "update");
 	     touch("%s.t", base);
 
 	     files = ls("", "%s.*", base);
@@ -1740,11 +1740,11 @@ static int progress(donetdes *st)
 static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
    {int i, j, tc;
     double tdi;
-    char ahst[MAXLINE], hserve[MAXLINE], dt[16];
+    char ahst[BFLRG], hserve[BFLRG], dt[16];
     char *hst;
     hfspec *lsp;
 
-    nstrncpy(hserve, MAXLINE, cwhich("hserve"), -1);
+    nstrncpy(hserve, BFLRG, cwhich("hserve"), -1);
 
     tdi = start_time();
 
@@ -1774,7 +1774,7 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
 	   
 /* convert host or system type to host */
         {FREE(sp[i].host);
-	 nstrncpy(ahst, MAXLINE, sp[i].logn, -1);
+	 nstrncpy(ahst, BFLRG, sp[i].logn, -1);
 
 /* check for accessibility of real host */
 	 if (strcmp(ahst, "-none-") != 0)
@@ -1827,7 +1827,7 @@ static hfspec *checklist(donetdes *st, char *delim, hfspec *sp, int nsp)
 
 static void checkhosts(donetdes *st)
    {double ti;
-    char tm[MAXLINE];
+    char tm[BFLRG];
 
     ti = start_time();
 
@@ -1851,7 +1851,7 @@ static void checkhosts(donetdes *st)
        st->install = st->installwdh;
 
     if (st->silent == FALSE)
-       printf("done (%s)\n", stop_time(tm, MAXLINE, ti));
+       printf("done (%s)\n", stop_time(tm, BFLRG, ti));
 
     if (st->inacc != NULL)
        {if (st->silent == FALSE)
@@ -1892,7 +1892,7 @@ static int uniquehost(hfspec *dsp, int nds, hfspec *ssp, int nss)
 
 static int testhosts(donetdes *st, int c, char **v)
    {int i, nh, ns, downonly;
-    char args[MAXLINE], host[MAXLINE], file[MAXLINE];
+    char args[BFLRG], host[BFLRG], file[BFLRG];
     char *hfile, *uhst, *rhst, *fill;
     hfspec *hs;
 
@@ -1901,8 +1901,8 @@ static int testhosts(donetdes *st, int c, char **v)
 
     hfile = "";
     for (i = 0; i < c; i++)
-        {nstrcat(args, MAXLINE, v[i]);
-	 nstrcat(args, MAXLINE, " ");
+        {nstrcat(args, BFLRG, v[i]);
+	 nstrcat(args, BFLRG, " ");
 	 if (strcmp(v[i], "-d") == 0)
 	    downonly = TRUE;
          else
@@ -1961,7 +1961,7 @@ static int testhosts(donetdes *st, int c, char **v)
 
 static hfspec *speclist(char *delim, char *specs)
    {int i, j, nx;
-    char t[MAXLINE];
+    char t[BFLRG];
     char *host;
     hfspec *hs;
 
@@ -1987,9 +1987,9 @@ static hfspec *speclist(char *delim, char *specs)
 
 	   NEXT(s, " \n");
 	   if (s != NULL)
-	      {nstrncpy(hs[i].rawwork, MAXLINE, s, -1);
-	       full_path(t, MAXLINE, cgetenv(FALSE, "HOME"), s);
-	       nstrncpy(hs[i].workdir, MAXLINE, t, -1);};
+	      {nstrncpy(hs[i].rawwork, BFLRG, s, -1);
+	       full_path(t, BFLRG, cgetenv(FALSE, "HOME"), s);
+	       nstrncpy(hs[i].workdir, BFLRG, t, -1);};
 
 	   for (j = 0; TRUE; j++)
 	       {NEXT(s, " \n");
@@ -2023,7 +2023,7 @@ static hfspec *speclist(char *delim, char *specs)
 
 static void process_var(donetdes *st, char *s)
    {int iv, nv;
-    char val[MAXLINE];
+    char val[BFLRG];
     char *var, *pv;
     static char *varl[] = { "HOST_SERVER_DB", "SC_EXEC_TIME_VERIFY" };
 
@@ -2036,7 +2036,7 @@ static void process_var(donetdes *st, char *s)
     for (iv = 0; iv < nv; iv++)
         {var = varl[iv];
 	 if (strstr(s, var) != NULL)
-	    {nstrncpy(val, MAXLINE, s, -1);
+	    {nstrncpy(val, BFLRG, s, -1);
 	     pv = strtok(val, " \t");
 	     pv = strtok(NULL, "\n");
 	     if (IS_NULL(pv) == FALSE)
@@ -2052,8 +2052,8 @@ static void process_var(donetdes *st, char *s)
 
 static void readhost(donetdes *st, int log)
    {int tl;
-    char linst[MAXLINE], lssh[MAXLINE], t[LRG], code[MAXLINE];
-    char hlst[MEGA], nlst[LRG];
+    char linst[BFLRG], lssh[BFLRG], t[BFLRG], code[BFLRG];
+    char hlst[BFMG], nlst[BFLRG];
     char *hf, *p, *pt;
     FILE *fp;
 
@@ -2070,13 +2070,13 @@ static void readhost(donetdes *st, int log)
     fp = fopen(hf, "r");
     if (fp != NULL)
        {while (TRUE)
-	   {p = fgets(t, LRG, fp);
+	   {p = fgets(t, BFLRG, fp);
 	    if (p == NULL)
 	       break;
 	    else if (strncmp(p, "script", 6) == 0)
-	       nstrncpy(code, MAXLINE, trim(p+6, BOTH, " \t\n"), -1);
+	       nstrncpy(code, BFLRG, trim(p+6, BOTH, " \t\n"), -1);
 	    else if (strncmp(p, "localinstall", 12) == 0)
-	       nstrncpy(linst, MAXLINE, trim(p+12, BOTH, " \t\n"), -1);
+	       nstrncpy(linst, BFLRG, trim(p+12, BOTH, " \t\n"), -1);
 	    else if (strncmp(p, "mailprogram", 11) == 0)
 	       {pt = trim(p+11, BOTH, " \t\n");
 		FREE(st->mailer);
@@ -2099,25 +2099,25 @@ static void readhost(donetdes *st, int log)
 	       {tl = atoi(trim(p+9, BOTH, " \t\n"));
 		st->phases[PH_CLEAN].tlimit = tl;}
 	    else if (strncmp(p, "timeout", 7) == 0)
-	       nstrncpy(st->handtout, MAXLINE, trim(p+7, BOTH, " \t\n"), -1);
+	       nstrncpy(st->handtout, BFLRG, trim(p+7, BOTH, " \t\n"), -1);
 	    else if (strncmp(p, "system", 6) == 0)
 	       {pt = trim(p+6, BOTH, " \t\n");
 		FREE(st->system);
 		st->system = STRSAVE(pt);}
 	    else if (strncmp(p, "logdir", 6) == 0)
-	       nstrncpy(st->logdir, MAXLINE, trim(p+6, BOTH, " \t\n"), -1);
+	       nstrncpy(st->logdir, BFLRG, trim(p+6, BOTH, " \t\n"), -1);
 	    else if (strncmp(p, "mail", 4) == 0)
 	       {pt = trim(p+4, BOTH, " \t\n");
 		FREE(st->maillist);
 		st->maillist = STRSAVE(pt);}
 	    else if (strncmp(p, "host", 4) == 0)
-	       push_tok(hlst, MEGA, ' ', p);
+	       push_tok(hlst, BFMG, ' ', p);
 	    else if (strncmp(p, "var", 3) == 0)
 	       process_var(st, p+3);
 	    else if (strncmp(p, "ssh", 3) == 0)
-	       push_tok(lssh, LRG, ' ', p+3);
+	       push_tok(lssh, BFLRG, ' ', p+3);
 	    else if (strncmp(p, "net", 3) == 0)
-	       push_tok(nlst, LRG, ' ', p);};
+	       push_tok(nlst, BFLRG, ' ', p);};
 
 	fclose(fp);};
 
@@ -2130,7 +2130,7 @@ static void readhost(donetdes *st, int log)
  * it on the path or giving a full path here
  */
     if (IS_NULL(lssh) == FALSE)
-       snprintf(st->ssh, MAXLINE,
+       snprintf(st->ssh, BFLRG,
 		"%s -q %s -o BatchMode=yes -o StrictHostKeyChecking=no",
 		lssh, st->usex);
 
@@ -2144,13 +2144,13 @@ static void readhost(donetdes *st, int log)
    if (st->hostonly != NULL)
       {hlst[0] = '\0';
        FOREACH(s, st->hostonly, " ")
-	  nstrncpy(t, LRG,
+	  nstrncpy(t, BFLRG,
 		   run(FALSE, "cat %s | awk '$1 == \"host\" && $0 ~ /%s / { print $0 }'", hf, s),
 		   -1);
           if ((IS_NULL(t) == FALSE) && (strstr(t, s) != NULL))
-	     {nstrcat(hlst, MEGA,
+	     {nstrcat(hlst, BFMG,
 		      run(FALSE, "echo %s | awk '$1 == \"host\" { for (i = 1; i <= NF; i++) print $i }'", t));
-	      nstrcat(hlst, MEGA, " ");};
+	      nstrcat(hlst, BFMG, " ");};
        ENDFOR;};
 
     st->hosts   = speclist("host", hlst);
@@ -2175,7 +2175,7 @@ static void readhost(donetdes *st, int log)
        st->phases[PH_CLEAN].tlimit = 60;
 
     if (IS_NULL(st->do_code) == TRUE)
-       nstrncpy(st->do_code, MAXLINE, code, -1);
+       nstrncpy(st->do_code, BFLRG, code, -1);
 
 /* check the script name and the version to be transmitted */
     if (IS_NULL(st->do_code) == TRUE)
@@ -2194,8 +2194,8 @@ static void readhost(donetdes *st, int log)
        st->localinstall = TRUE;
 
     if (IS_NULL(st->logdir) == TRUE)
-       nstrncpy(st->logdir, MAXLINE, cgetenv(TRUE, "HOME"), -1);
-    full_path(st->logdir, MAXLINE, cgetenv(FALSE, "HOME"), st->logdir);
+       nstrncpy(st->logdir, BFLRG, cgetenv(TRUE, "HOME"), -1);
+    full_path(st->logdir, BFLRG, cgetenv(FALSE, "HOME"), st->logdir);
 
     if (dir_exists(st->logdir) == FALSE)
        {printf("\n");
@@ -2208,11 +2208,11 @@ static void readhost(donetdes *st, int log)
        st->cargs = append_tok(st->cargs, ' ', st->logdir);};
 
    if (st->mailer == NULL)
-      {char ml[MAXLINE];
+      {char ml[BFLRG];
 
-       nstrncpy(ml, MAXLINE, cwhich("mailx"), -1);
+       nstrncpy(ml, BFLRG, cwhich("mailx"), -1);
        if (strcmp(ml, "none") == 0)
-          {nstrncpy(ml, MAXLINE, cwhich("mail"), -1);
+          {nstrncpy(ml, BFLRG, cwhich("mail"), -1);
 	   if (strcmp(ml, "none") == 0)
 	      {printf("\n");
 	       printf("No mail program found - no mail sent\n");
@@ -2223,15 +2223,15 @@ static void readhost(donetdes *st, int log)
 	  st->mailer = STRSAVE(ml);};
 
 /* setup the log files names */
-    snprintf(st->uplog, MAXLINE, "%s/%s", st->logdir, st->stamp);
-    full_path(st->uplog, MAXLINE, NULL, st->uplog);
+    snprintf(st->uplog, BFLRG, "%s/%s", st->logdir, st->stamp);
+    full_path(st->uplog, BFLRG, NULL, st->uplog);
 
     if (log == TRUE)
        {mkdir(st->uplog, 0770);
-	snprintf(st->lnetfn, MAXLINE, "%s/update", st->uplog);}
+	snprintf(st->lnetfn, BFLRG, "%s/update", st->uplog);}
     else
-       {getcwd(t, MAXLINE);
-	snprintf(st->lnetfn, MAXLINE, "%s/.log.do-net", t);};
+       {getcwd(t, BFLRG);
+	snprintf(st->lnetfn, BFLRG, "%s/.log.do-net", t);};
 
     Log = open_file("w+", st->lnetfn);
     if (Log == NULL)
@@ -2395,14 +2395,14 @@ static int transmit_script(donetdes *st, char *host, char *csm)
 
 static int sendscript(donetdes *st, char *host)
    {int i, is, ok;
-    char bin[MAXLINE], csm[MAXLINE], t[MAXLINE];
+    char bin[BFLRG], csm[BFLRG], t[BFLRG];
     char *dst, *rv;
     auxdes *pa;
 
     separatorv(Log);
     noten(Log, TRUE, "Sendscript");
 
-    nstrncpy(bin, MAXLINE, path_head(cwhich("do-net")), -1);
+    nstrncpy(bin, BFLRG, path_head(cwhich("do-net")), -1);
 
     ok = TRUE;
     pa = st->aux;
@@ -2435,7 +2435,7 @@ static int sendscript(donetdes *st, char *host)
 	FOREACH(s, rv, "\n")
 	   noten(Log, TRUE, "   %s", s);
 	ENDFOR;};   
-    nstrncpy(csm, MAXLINE, rv, -1);
+    nstrncpy(csm, BFLRG, rv, -1);
 
 /* copy the prepared files/scripts to one specified host */
     if (host != NULL)
@@ -2449,7 +2449,7 @@ static int sendscript(donetdes *st, char *host)
 	     ok   = transmit_script(st, host, csm);};};
 
 /* remove the local copies if we are not in the home directory */
-    getcwd(t, MAXLINE);
+    getcwd(t, BFLRG);
     if (strcmp(t, cgetenv(FALSE, "HOME")) != 0)
        {FOREACH(s, st->scripts, " ")
 	   unlink_safe(s);
@@ -2463,15 +2463,15 @@ static int sendscript(donetdes *st, char *host)
 /* REPORT - send the cleaned up report */
 
 static void report(donetdes *st)
-   {char rpt[MAXLINE], s[LRG], tlog[MAXLINE];
+   {char rpt[BFLRG], s[BFLRG], tlog[BFLRG];
     char *p;
     FILE *fin, *fout, *frpt;
 
     separatorv(Log);
     noten(Log, TRUE, "Report");
 
-    snprintf(rpt,  MAXLINE, "%s/report", st->uplog);
-    snprintf(tlog, MAXLINE, "%s.tmp",    st->lnetfn);
+    snprintf(rpt,  BFLRG, "%s/report", st->uplog);
+    snprintf(tlog, BFLRG, "%s.tmp",    st->lnetfn);
 
     run(FALSE, "mv -f %s %s", st->lnetfn, tlog);
 
@@ -2483,7 +2483,7 @@ static void report(donetdes *st)
     fout = open_file("w", st->lnetfn);
     frpt = open_file("w", rpt);
     while (TRUE)
-       {p = fgets(s, LRG, fin);
+       {p = fgets(s, BFLRG, fin);
 	if (p == NULL)
 	   break;
 
@@ -2534,7 +2534,7 @@ static void report(donetdes *st)
 
 static void lockout(donetdes *st, char *host, char *uhost)
    {int i;
-    char tdir[MAXLINE], lock[MAXLINE];
+    char tdir[BFLRG], lock[BFLRG];
     char *nhst, *wdir;
     FILE *lf;
 
@@ -2543,8 +2543,8 @@ static void lockout(donetdes *st, char *host, char *uhost)
 	 wdir = st->nets[i].workdir;
 
 	 if ((strcmp(nhst, host) == 0) || (strcmp(nhst, uhost) == 0))
-	    {nstrncpy(tdir, MAXLINE, path_tail(wdir), -1);
-	     snprintf(lock, MAXLINE, "%s/%s.%s.lock",
+	    {nstrncpy(tdir, BFLRG, path_tail(wdir), -1);
+	     snprintf(lock, BFLRG, "%s/%s.%s.lock",
 		      path_head(wdir), st->system, tdir);
 
 	     if (file_exists(lock) == TRUE)
@@ -2575,7 +2575,7 @@ static void lockout(donetdes *st, char *host, char *uhost)
 
 static void recommend(donetdes *st)
    {int nc;
-    char rs[MAXLINE], cmd[MAXLINE];
+    char rs[BFLRG], cmd[BFLRG];
     char **v;
 
     note(Log, TRUE, "");
@@ -2583,16 +2583,16 @@ static void recommend(donetdes *st)
     note(Log, TRUE, "");
 
 /* look for retry hints */
-    nstrncpy(rs, MAXLINE,
+    nstrncpy(rs, BFLRG,
 	     run(FALSE, "awk '$1 == \"DO-NET:\" && $2 == \"(RETRY)\" { print $3 }' %s | sort | uniq",
 		 st->lnetfn), -1);
-    nstrncpy(rs, MAXLINE, subst(rs, " ", ",", -1), -1);
-    nstrncpy(rs, MAXLINE, subst(rs, "\n", ",", -1), -1);
+    nstrncpy(rs, BFLRG, subst(rs, " ", ",", -1), -1);
+    nstrncpy(rs, BFLRG, subst(rs, "\n", ",", -1), -1);
 
-    nstrncpy(cmd, MAXLINE, "do-net", -1);
+    nstrncpy(cmd, BFLRG, "do-net", -1);
     for (v = st->argvcp + 1; *v != NULL; v++)
         {nc = strlen(cmd);
-	 snprintf(cmd+nc, MAXLINE-nc, " %s", *v);};
+	 snprintf(cmd+nc, BFLRG-nc, " %s", *v);};
 
    if (IS_NULL(rs) == FALSE)
       {if (st->silent == FALSE)
@@ -2621,7 +2621,7 @@ static void recommend(donetdes *st)
 static int work(donetdes *st, hfspec *sp, int nsp, int ip, int rpt)
    {int i, ok, nsec;
     double ti;
-    char fields[MAXLINE], fnm[MAXLINE];
+    char fields[BFLRG], fnm[BFLRG];
     char *host, *phase;
     hfspec *lsp;
     phasedes *ph;
@@ -2648,9 +2648,9 @@ static int work(donetdes *st, hfspec *sp, int nsp, int ip, int rpt)
 		 printf("\n");
 		 exit(9);};
 
-	     get_fields(fields, MAXLINE, lsp);
+	     get_fields(fields, BFLRG, lsp);
 
-	     snprintf(fnm, MAXLINE, "%s/%s.%s.%d", st->uplog, phase, host, i+1);
+	     snprintf(fnm, BFLRG, "%s/%s.%s.%d", st->uplog, phase, host, i+1);
 
 	     separatorv(Log);
 
@@ -2680,7 +2680,7 @@ static int work(donetdes *st, hfspec *sp, int nsp, int ip, int rpt)
 
 static void setup(donetdes *st, int ip, int urepo)
    {int i, ok, nsp;
-    char t[LRG];
+    char t[BFLRG];
     char *host;
     hfspec *sp, *lsp;
 
@@ -2706,7 +2706,7 @@ static void setup(donetdes *st, int ip, int urepo)
 	if (urepo == FALSE)
 	   {if (file_exists(st->dist) == TRUE)
 	       {chmod(st->dist, 0770);
-		getcwd(t, LRG);
+		getcwd(t, BFLRG);
 		noten(Log, st->verbose, "Current directory: %s", t);
 
 		for (i = 0, lsp = sp; i < nsp; i++, lsp++)
@@ -2830,7 +2830,7 @@ static void clean(donetdes *st, hfspec *sp, int nsp, int ip, double *gti)
  */
 
 static int clearout(donetdes *st)
-   {char host[MAXLINE], file[MAXLINE];
+   {char host[BFLRG], file[BFLRG];
 
     get_host_file(host, file, st->hostfile);
 
@@ -2929,8 +2929,8 @@ static int session(donetdes *st, char *exe, char *host, char *uhost)
 
 static int debug(donetdes *st)
    {int ip, is, nsec, nsp, rv, ok;
-    char fields[MAXLINE], s[MAXLINE], phase[MAXLINE], cfg[MAXLINE];
-    char host[MAXLINE];
+    char fields[BFLRG], s[BFLRG], phase[BFLRG], cfg[BFLRG];
+    char host[BFLRG];
     char *t, **al;
     hfspec *sp, *lsp;
     phasedes *ph;
@@ -2938,14 +2938,14 @@ static int debug(donetdes *st)
     phase[0] = '\0';
     cfg[0]   = '\0';
 
-    nstrncpy(s, MAXLINE, st->debug, -1);
+    nstrncpy(s, BFLRG, st->debug, -1);
     t = strtok(s, ",");
     if (t != NULL)
-       nstrncpy(phase, MAXLINE, t, -1);
+       nstrncpy(phase, BFLRG, t, -1);
 
     t = strtok(NULL, ",");
     if (t != NULL)
-       nstrncpy(cfg, MAXLINE, t, -1);
+       nstrncpy(cfg, BFLRG, t, -1);
 
     for (ip = 0; ip < PH_N_PHASES; ip++)
         {ph = st->phases + ip;
@@ -2975,7 +2975,7 @@ static int debug(donetdes *st)
 	rv = FALSE;}
 
     else
-       {nstrncpy(host, MAXLINE,
+       {nstrncpy(host, BFLRG,
 		 run(FALSE, "%s -m %s", cwhich("hserve"), lsp->rawh), -1);
 
 	if (IS_NULL(host) == TRUE)
@@ -2987,7 +2987,7 @@ static int debug(donetdes *st)
 /* send the scripts where they need to be */
 	rv = sendscript(st, host);
 	if (rv == TRUE)
-	   {get_fields(fields, MAXLINE, lsp);
+	   {get_fields(fields, BFLRG, lsp);
 
 	    noted(Log, "Dispatching %s on %s", phase, host);
 
@@ -3012,7 +3012,7 @@ static int debug(donetdes *st)
 static void fin_sect(donetdes *st, hfspec *sp, int nsp,
 		     FILE *slog, char *sect, char *etm)
    {int i, l, bld, nl;
-    char file[MAXLINE], s[LRG];
+    char file[BFLRG], s[BFLRG];
     char *host, *p;
     FILE *elog, *fin;
 
@@ -3022,13 +3022,13 @@ static void fin_sect(donetdes *st, hfspec *sp, int nsp,
     for (i = 0; i < nsp; i++)
         {host = sp[i].host;
 
-	 snprintf(file, MAXLINE, "%s/%s.%s.%d", st->uplog, sect, host, i+1);
+	 snprintf(file, BFLRG, "%s/%s.%s.%d", st->uplog, sect, host, i+1);
 	 fin = open_file("r", file);
 	 if (fin != NULL)
 	    {elog = open_file("a", "%s/log.%s", st->logdir, host);
 
 	     for (l = 0; TRUE; l++)
-	         {p = fgets(s, LRG, fin);
+	         {p = fgets(s, BFLRG, fin);
 		  if (p == NULL)
 		     break;
 		  else if (strncmp(s, "DO-NET: (LOG) ", 14) == 0)
@@ -3071,12 +3071,12 @@ static void fin_sect(donetdes *st, hfspec *sp, int nsp,
 
 static void finish(donetdes *st, double gti)
    {int i, ip, np, nsp;
-    char etm[MAXLINE], lock[MAXLINE], ptime[MAXLINE];
+    char etm[BFLRG], lock[BFLRG], ptime[BFLRG];
     char *host, *wdir, *sect, *time;
     hfspec *sp;
     FILE *slog;
 
-    nstrncpy(ptime, MAXLINE, cwhich("ptime"), -1);
+    nstrncpy(ptime, BFLRG, cwhich("ptime"), -1);
     st->finishing = TRUE;
 
 /* cleanup if there were timeouts */
@@ -3095,7 +3095,7 @@ static void finish(donetdes *st, double gti)
  * technically this doesn't include the report and cleanup time
  * which is hopefully very small
  */
-    stop_time(etm, MAXLINE, gti);
+    stop_time(etm, BFLRG, gti);
 
     note(Log, TRUE, "Total time to completion %s", etm);
 
@@ -3137,7 +3137,7 @@ static void finish(donetdes *st, double gti)
         {host = st->nets[i].host;
 	 wdir = st->nets[i].workdir;
 
-         snprintf(lock, MAXLINE, "%s/%s.%s.lock",
+         snprintf(lock, BFLRG, "%s/%s.%s.lock",
 		  path_head(wdir), st->system, path_tail(wdir));
 
 	 unlink_safe(lock);};
@@ -3196,49 +3196,49 @@ static void interrupt(int sig)
 /* INIT_AUX - initialize the auxilliary script info */
 
 static void init_aux(donetdes *st)
-   {char bin[MAXLINE];
+   {char bin[BFLRG];
     auxdes *pa;
 
-    nstrncpy(bin, MAXLINE, path_head(cwhich("do-net")), -1);
+    nstrncpy(bin, BFLRG, path_head(cwhich("do-net")), -1);
 
 /* make sure do_code is henceforth a full, absolute path */
-    full_path(st->do_code, MAXLINE, st->shared, st->do_code);
+    full_path(st->do_code, BFLRG, st->shared, st->do_code);
 
     pa = st->aux;
 
 /* prepare the do-local script */
-    snprintf(pa[0].proper, MAXLINE, "%s/do-local", bin);
-    snprintf(pa[0].work,   MAXLINE, ".do-local.%s", st->stamp);
+    snprintf(pa[0].proper, BFLRG, "%s/do-local", bin);
+    snprintf(pa[0].work,   BFLRG, ".do-local.%s", st->stamp);
     nstrncpy(pa[0].perms, 10, "-rwx------", -1);
     pa[0].permi = 0700;
 
 /* prepare the do-<code> file */
-    nstrncpy(pa[1].proper, MAXLINE, st->do_code, -1);
-    snprintf(pa[1].work, MAXLINE, ".%s.%s", path_tail(st->do_code), st->stamp);
+    nstrncpy(pa[1].proper, BFLRG, st->do_code, -1);
+    snprintf(pa[1].work, BFLRG, ".%s.%s", path_tail(st->do_code), st->stamp);
     nstrncpy(pa[1].perms, 10, "-rw-------", -1);
     pa[1].permi = 0600;
 
 /* prepare the timer script */
-    nstrncpy(pa[2].proper, MAXLINE, cwhich("timer"), -1);
-    snprintf(pa[2].work, MAXLINE, ".do-timer.%s", st->stamp);
+    nstrncpy(pa[2].proper, BFLRG, cwhich("timer"), -1);
+    snprintf(pa[2].work, BFLRG, ".do-timer.%s", st->stamp);
     nstrncpy(pa[2].perms, 10, "-rwx------", -1);
     pa[2].permi = 0700;
 
 /* prepare the nfsmon script */
-    nstrncpy(pa[3].proper, MAXLINE, cwhich("nfsmon"), -1);
-    snprintf(pa[3].work, MAXLINE, ".do-nfsmon.%s", st->stamp);
+    nstrncpy(pa[3].proper, BFLRG, cwhich("nfsmon"), -1);
+    snprintf(pa[3].work, BFLRG, ".do-nfsmon.%s", st->stamp);
     nstrncpy(pa[3].perms, 10, "-rwx------", -1);
     pa[3].permi = 0700;
 
 /* prepare the iopr script */
-    nstrncpy(pa[4].proper, MAXLINE, cwhich("iopr"), -1);
-    snprintf(pa[4].work, MAXLINE, ".do-iopr.%s", st->stamp);
+    nstrncpy(pa[4].proper, BFLRG, cwhich("iopr"), -1);
+    snprintf(pa[4].work, BFLRG, ".do-iopr.%s", st->stamp);
     nstrncpy(pa[4].perms, 10, "-rwx------", -1);
     pa[4].permi = 0700;
 
 /* prepare the csh-subr script */
-    snprintf(pa[5].proper, MAXLINE, "%s/csh-subroutines", st->etcdir);
-    snprintf(pa[5].work, MAXLINE, ".do-csh-subr.%s", st->stamp);
+    snprintf(pa[5].proper, BFLRG, "%s/csh-subroutines", st->etcdir);
+    snprintf(pa[5].work, BFLRG, ".do-csh-subr.%s", st->stamp);
     nstrncpy(pa[5].perms, 10, "-rw-------", -1);
     pa[5].permi = 0600;
 
@@ -3369,15 +3369,15 @@ static int process_args(donetdes *st, int c, char **v)
                       st->build = FALSE;
                       break;
                  case 'c':
-		      nstrncpy(st->stamp, MAXLINE, v[++i], -1);
+		      nstrncpy(st->stamp, BFLRG, v[++i], -1);
 		      st->clearout = TRUE;
 		      break;
 
 		 case 'd':
-		      full_path(st->dist, MAXLINE, NULL, v[++i]);
+		      full_path(st->dist, BFLRG, NULL, v[++i]);
 		      break;
 		 case 'e':
-		      nstrncpy(st->do_code, MAXLINE, v[++i], -1);
+		      nstrncpy(st->do_code, BFLRG, v[++i], -1);
 		      break;
 		 case 'g':
                       l = i;
@@ -3400,7 +3400,7 @@ static int process_args(donetdes *st, int c, char **v)
 		      st->hostonly = STRSAVE(subst(v[++i], ",", " ", -1));
 		      break;
 		 case 'p':
-		      nstrncpy(st->stamp, MAXLINE, v[++i], -1);
+		      nstrncpy(st->stamp, BFLRG, v[++i], -1);
 		      st->reportprogress = TRUE;
 		      break;
 		 case 'q':
@@ -3446,10 +3446,10 @@ static int process_args(donetdes *st, int c, char **v)
 		      break;};}
 
 	 else if (IS_NULL(st->hostfile) == TRUE)
-            full_path(st->hostfile, MAXLINE, NULL, v[i]);
+            full_path(st->hostfile, BFLRG, NULL, v[i]);
 
 	 else
-	    nstrncpy(st->stamp, MAXLINE, v[i], -1);};
+	    nstrncpy(st->stamp, BFLRG, v[i], -1);};
 
     return(l);}
 
@@ -3477,7 +3477,7 @@ static void cleanup(donetdes *st)
 
 int main(int c, char **v)
    {int l, logf, rv;
-    char host[MAXLINE], uhost[MAXLINE], exe[MAXLINE];
+    char host[BFLRG], uhost[BFLRG], exe[BFLRG];
     char *p;
 
     signal(SIGINT, interrupt);
@@ -3485,10 +3485,10 @@ int main(int c, char **v)
     umask(002);
 
 /* find the directory with do-net */
-    nstrncpy(exe, MAXLINE, cwhich(v[0]), -1);
-    nstrncpy(state.bindir, MAXLINE, path_head(exe), -1);
-    snprintf(state.incdir, MAXLINE, "%s/include", path_head(state.bindir));
-    snprintf(state.etcdir, MAXLINE, "%s/etc", path_head(state.bindir));
+    nstrncpy(exe, BFLRG, cwhich(v[0]), -1);
+    nstrncpy(state.bindir, BFLRG, path_head(exe), -1);
+    snprintf(state.incdir, BFLRG, "%s/include", path_head(state.bindir));
+    snprintf(state.etcdir, BFLRG, "%s/etc", path_head(state.bindir));
 
     push_path(P_PREPEND, lpath, "/sbin");
     push_path(P_PREPEND, lpath, "/bin");
@@ -3553,7 +3553,7 @@ int main(int c, char **v)
     state.separator      = "-----------------------------------------------------------------";
 
     strcpy(state.stamp, run(FALSE, "date +%%m_%%d_%%H_%%M"));
-    unamef(host, MAXLINE, "n");
+    unamef(host, BFLRG, "n");
 
     strcpy(uhost, host);
     p = strchr(uhost, '.');
@@ -3583,7 +3583,7 @@ int main(int c, char **v)
 
     init_aux(&state);
 
-    snprintf(state.ssh, MAXLINE,
+    snprintf(state.ssh, BFLRG,
 	     "%s -q %s -o BatchMode=yes -o StrictHostKeyChecking=no",
 	     cwhich("ssh"), state.usex);
 

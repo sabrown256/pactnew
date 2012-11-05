@@ -48,8 +48,8 @@ struct s_dir_stack
 # ifndef SCOPE_SCORE_PREPROC
 
 static char
- epath[LRG],
- lpath[LRG];
+ epath[BFLRG],
+ lpath[BFLRG];
 
 static FILE
  *Log;
@@ -125,10 +125,10 @@ char *nstrcat(char *d, int nc, char *s)
 /* VSTRCAT - safe strcat function */
 
 char *vstrcat(char *d, int nc, char *fmt, ...)
-   {char s[LRG];
+   {char s[BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     d = nstrcat(d, nc, s);
@@ -177,7 +177,7 @@ int lst_length(char **lst)
 
 char **lst_push(char **lst, char *fmt, ...)
    {int n, m;
-    char s[MAXLINE];
+    char s[BFLRG];
 
     if (lst == NULL)
        {lst = MAKE_N(char *, 100);
@@ -197,7 +197,7 @@ char **lst_push(char **lst, char *fmt, ...)
 	       lst[n] = NULL;
 	    else
 	       {VA_START(fmt);
-		VSNPRINTF(s, MAXLINE, fmt);
+		VSNPRINTF(s, BFLRG, fmt);
 		VA_END;
 
 		lst[n] = STRSAVE(s);};};};
@@ -332,7 +332,7 @@ char *concatenate(char *s, int nc, char **sa, char *dlm)
 
 int unsetenv(char *var)
    {int i, nc, ne, err;
-    char s[MAXLINE];
+    char s[BFLRG];
     extern char **environ;
 
     err = 0;
@@ -340,7 +340,7 @@ int unsetenv(char *var)
 /* count the environment variables */
     for (ne = 0; environ[ne] != NULL; ne++);
 
-    snprintf(s, MAXLINE, "%s=", var);
+    snprintf(s, BFLRG, "%s=", var);
     nc = strlen(s);
 
     for (i = 0; i < ne; i++)
@@ -396,7 +396,7 @@ char *delimited(char *s, char *bgn, char *end)
 /* no instance of BGN or END */
 	     if (wh == NULL)
 	        {if (nc == 0)
-		    nstrcat(s, LRG, ps);
+		    nstrcat(s, BFLRG, ps);
 		 ps = NULL;}
 
 /* if an instance of END came first
@@ -643,9 +643,9 @@ char *downcase(char *s)
 
 char *fill_string(char *s, int n)
    {int nc, nd;
-    static char fill[MAXLINE];
+    static char fill[BFLRG];
 
-    nstrncpy(fill, MAXLINE, s, -1);
+    nstrncpy(fill, BFLRG, s, -1);
     nc = strlen(fill);
     nd = n - nc;
 
@@ -744,7 +744,7 @@ char *strstri(char *string1, char *string2)
 char *subst(char *s, char *a, char *b, size_t n)
    {int i, o;
     char *p, *pr, *ps, *pa, *pb, *r;
-    static char bfa[1024*LRG], bfb[1024*LRG];
+    static char bfa[1024*BFLRG], bfb[1024*BFLRG];
 
     if (s == bfa)
        {pa = bfb;
@@ -787,16 +787,16 @@ char *subst(char *s, char *a, char *b, size_t n)
 
 void cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...)
    {int i;
-    char fname[MAXLINE], s[MAXLINE];
+    char fname[BFLRG], s[BFLRG];
     FILE *in;
 
     VA_START(fmt);
-    VSNPRINTF(fname, MAXLINE, fmt);
+    VSNPRINTF(fname, BFLRG, fmt);
     VA_END;
 
     in = fopen(fname, "r");
     if (in != NULL)
-       {for (i = 0; fgets(s, MAXLINE, in) != NULL; i++)
+       {for (i = 0; fgets(s, BFLRG, in) != NULL; i++)
             {if ((nskip <= i) && (i < ncat))
 	        fputs(s, out);};
 
@@ -810,11 +810,11 @@ void cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...)
 /* COPY - copy the file IN to OUT */
 
 void copy(char *out, char *fmt, ...)
-   {char in[MAXLINE];
+   {char in[BFLRG];
     FILE *fp;
 
     VA_START(fmt);
-    VSNPRINTF(in, MAXLINE, fmt);
+    VSNPRINTF(in, BFLRG, fmt);
     VA_END;
 
     fp = fopen(out, "w");
@@ -832,12 +832,12 @@ void copy(char *out, char *fmt, ...)
 char *path_tail(char *s)
    {int nc;
     char *pd;
-    static char d[LRG];
+    static char d[BFLRG];
 
-    nstrncpy(d, LRG, s, -1);
+    nstrncpy(d, BFLRG, s, -1);
     nc = strlen(d);
-    if (nc >= LRG)
-       nc = LRG;
+    if (nc >= BFLRG)
+       nc = BFLRG;
     if (nc < 1)
        nc = 1;
 
@@ -857,12 +857,12 @@ char *path_tail(char *s)
 char *path_head(char *s)
    {int nc;
     char *pd;
-    static char d[LRG];
+    static char d[BFLRG];
 
-    nstrncpy(d, LRG, s, -1);
+    nstrncpy(d, BFLRG, s, -1);
     nc = strlen(d);
-    if (nc >= LRG)
-       nc = LRG;
+    if (nc >= BFLRG)
+       nc = BFLRG;
     if (nc < 1)
        nc = 1;
 
@@ -881,12 +881,12 @@ char *path_head(char *s)
 char *path_base(char *s)
    {int nc;
     char *pd;
-    static char d[LRG];
+    static char d[BFLRG];
 
-    nstrncpy(d, LRG, s, -1);
+    nstrncpy(d, BFLRG, s, -1);
     nc = strlen(d);
-    if (nc >= LRG)
-       nc = LRG;
+    if (nc >= BFLRG)
+       nc = BFLRG;
     if (nc < 1)
        nc = 1;
 
@@ -905,12 +905,12 @@ char *path_base(char *s)
 char *path_suffix(char *s)
    {int nc;
     char *pd;
-    static char d[LRG];
+    static char d[BFLRG];
 
-    nstrncpy(d, LRG, s, -1);
+    nstrncpy(d, BFLRG, s, -1);
     nc = strlen(d);
-    if (nc >= LRG)
-       nc = LRG;
+    if (nc >= BFLRG)
+       nc = BFLRG;
     if (nc < 1)
        nc = 1;
 
@@ -931,7 +931,7 @@ char *path_suffix(char *s)
 
 int full_path(char *path, int nc, char *dir, char *name)
    {int rv;
-    char d[LRG], s[LRG];
+    char d[BFLRG], s[BFLRG];
     char *pn;
 
     rv = TRUE;
@@ -943,11 +943,11 @@ int full_path(char *path, int nc, char *dir, char *name)
        snprintf(s, nc, "%s/%s", dir, name);
       
     else
-       {getcwd(d, LRG);
+       {getcwd(d, BFLRG);
         for (pn = name; TRUE; )
 	    {if (strncmp(pn, "../", 3) == 0)
 	        {pn += 3;
-		 nstrncpy(d, LRG, path_head(d), -1);}
+		 nstrncpy(d, BFLRG, path_head(d), -1);}
 	     else if (strncmp(pn, "./", 2) == 0)
 	        pn += 2;
 	     else
@@ -967,14 +967,14 @@ int full_path(char *path, int nc, char *dir, char *name)
 char *path_simplify(char *s, int dlm)
    {int i, j, ok;
     char *t, **sa;
-    static char d[LRG];
+    static char d[BFLRG];
 
     d[0] = '\0';
 
     sa = tokenize(s, " :");
     
     if (sa != NULL)
-       {nstrncpy(d, LRG, sa[0], -1);
+       {nstrncpy(d, BFLRG, sa[0], -1);
 	for (i = 1; sa[i] != NULL; i++)
 	    {t = sa[i];
 
@@ -983,7 +983,7 @@ char *path_simplify(char *s, int dlm)
 	         ok = (strcmp(sa[j], t) == 0);
 
 	     if (ok == FALSE)
-	        vstrcat(d, LRG, "%c%s", dlm, t);};
+	        vstrcat(d, BFLRG, "%c%s", dlm, t);};
 
 	free_strings(sa);};
 
@@ -996,11 +996,11 @@ char *path_simplify(char *s, int dlm)
 
 int dir_exists(char *fmt, ...)
    {int rv;
-    char s[MAXLINE];
+    char s[BFLRG];
     struct stat sb;
 
     VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     rv = TRUE;
@@ -1022,11 +1022,11 @@ int dir_exists(char *fmt, ...)
 
 int file_exists(char *fmt, ...)
    {int rv;
-    char s[MAXLINE];
+    char s[BFLRG];
     struct stat sb;
 
     VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     rv = FALSE;
@@ -1060,11 +1060,11 @@ int file_exists(char *fmt, ...)
 int file_executable(char *fmt, ...)
    {int rv, st, muid, mgid, fuid, fgid, only;
     int usrx, grpx, othx, isusr, isgrp, isoth, file;
-    char s[MAXLINE], err[MAXLINE];
+    char s[BFLRG], err[BFLRG];
     struct stat bf;
 
     VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     only = FALSE;
@@ -1076,7 +1076,7 @@ int file_executable(char *fmt, ...)
     rv = FALSE;
     st = stat(s, &bf);
     if (st != 0)
-       nstrncpy(err, MAXLINE, strerror(errno), -1);
+       nstrncpy(err, BFLRG, strerror(errno), -1);
     else
        {int ig, ng;
 	gid_t gl[NGROUPX+1];
@@ -1117,18 +1117,18 @@ int file_executable(char *fmt, ...)
 
 int file_script(char *fmt, ...)
    {int rv;
-    char s[MAXLINE], t[MAXLINE];
+    char s[BFLRG], t[BFLRG];
     FILE *fp;
 
     VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     rv = file_executable(s);
     if (rv == TRUE)
        {fp = fopen(s, "r");
 	if (fp != NULL)
-	   {if (fgets(t, MAXLINE, fp) != NULL)
+	   {if (fgets(t, BFLRG, fp) != NULL)
 	       rv = (strncmp(t, "#!", 2) == 0);
 	    fclose(fp);};};
 
@@ -1141,17 +1141,17 @@ int file_script(char *fmt, ...)
 
 int execute(int err, char *fmt, ...)
    {int rv;
-    char s[LRG], cmd[LRG];
+    char s[BFLRG], cmd[BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     if (err == TRUE)
-       snprintf(cmd, LRG, "PATH=.:%s:%s ; %s",
+       snprintf(cmd, BFLRG, "PATH=.:%s:%s ; %s",
 		epath, lpath, s);
     else
-       snprintf(cmd, LRG, "PATH=.:%s:%s ; %s 2> /dev/null",
+       snprintf(cmd, BFLRG, "PATH=.:%s:%s ; %s 2> /dev/null",
 		epath, lpath, s);
 
     rv = system(cmd);
@@ -1166,29 +1166,29 @@ int execute(int err, char *fmt, ...)
  */
 
 char *run(int echo, char *fmt, ...)
-   {char s[LRG], cmd[LRG];
+   {char s[BFLRG], cmd[BFLRG];
     char *p;
     FILE *fp;
-    static char bf[100*LRG];
+    static char bf[100*BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     if ((Log != NULL) && (echo & CMD_LINE))
        fprintf(Log, "Command: %s\n", s);
 
-    snprintf(cmd, LRG, "PATH=.:%s:%s ; %s", epath, lpath, s);
+    snprintf(cmd, BFLRG, "PATH=.:%s:%s ; %s", epath, lpath, s);
 
     bf[0] = '\0';
 
     fp = popen(cmd, "r");
     if (fp != NULL)
        {while (TRUE)
-	   {p = fgets(s, MAXLINE, fp);
+	   {p = fgets(s, BFLRG, fp);
 	    if (p == NULL)
 	       break;
-	    nstrcat(bf, 100*LRG, s);};
+	    nstrcat(bf, 100*BFLRG, s);};
 
 	pclose(fp);};
 
@@ -1211,14 +1211,14 @@ char *run(int echo, char *fmt, ...)
 
 char *grep(FILE *fp, char *name, char *fmt, ...)
    {int i, clf, err;
-    char t[MAXLINE], s[MAXLINE];
+    char t[BFLRG], s[BFLRG];
     char *p;
-    static char r[1024*LRG];
+    static char r[1024*BFLRG];
 
     r[0] = '\0';
 
     VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     if (fp == NULL)
@@ -1231,7 +1231,7 @@ char *grep(FILE *fp, char *name, char *fmt, ...)
        {fseek(fp, 0, SEEK_SET);
 
 	for (i = 0; TRUE; i++)
-	    {p = fgets(t, MAXLINE, fp);
+	    {p = fgets(t, BFLRG, fp);
 	     if (p == NULL)
 	        break;
 
@@ -1256,7 +1256,7 @@ char *grep(FILE *fp, char *name, char *fmt, ...)
 char *get_date(void)
    {time_t t;
     char *p;
-    static char s[MAXLINE];
+    static char s[BFLRG];
 
     p = NULL;
     t = time(NULL);
@@ -1301,11 +1301,11 @@ void separator(FILE *fp)
 /* NOTE - write to FP only */
 
 void note(FILE *fp, int nl, char *fmt, ...)
-   {char bf[MEGA];
+   {char bf[BFMG];
 
     if (fp != NULL)
        {VA_START(fmt);
-	VSNPRINTF(bf, MEGA, fmt);
+	VSNPRINTF(bf, BFMG, fmt);
 	VA_END;
 
 	fputs(bf, fp);
@@ -1320,10 +1320,10 @@ void note(FILE *fp, int nl, char *fmt, ...)
 /* NOTED - write to FP and to TTY */
 
 void noted(FILE *fp, char *fmt, ...)
-   {char bf[MEGA];
+   {char bf[BFMG];
 
     VA_START(fmt);
-    VSNPRINTF(bf, MEGA, fmt);
+    VSNPRINTF(bf, BFMG, fmt);
     VA_END;
 
     if (fp != NULL)
@@ -1343,10 +1343,10 @@ void noted(FILE *fp, char *fmt, ...)
  */
 
 void print_text(FILE *fp, char *fmt, ...)
-   {char bf[LRG];
+   {char bf[BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(bf, LRG, fmt);
+    VSNPRINTF(bf, BFLRG, fmt);
     VA_END;
 
     fprintf(fp, "%s\n", bf);
@@ -1361,7 +1361,7 @@ void print_text(FILE *fp, char *fmt, ...)
  */
 
 void clean_space(char *s)
-   {char t[LRG];
+   {char t[BFLRG];
     char *p, *ps;
 
     t[0] = '\0';
@@ -1370,10 +1370,10 @@ void clean_space(char *s)
         {p = strstr(ps, "+sp+");
 	 if (p != NULL)
 	    {*p = '\0';
-	     vstrcat(t, LRG, "%s ", ps);
+	     vstrcat(t, BFLRG, "%s ", ps);
 	     ps = p + 4;}
 	 else
-	    {nstrcat(t, LRG, ps);
+	    {nstrcat(t, BFLRG, ps);
 	     ps += strlen(ps);};};
 
     strcpy(s, t);
@@ -1389,10 +1389,10 @@ void clean_space(char *s)
 
 char *strip_quote(char *t)
    {int n;
-    static char bf[LRG];
+    static char bf[BFLRG];
 
     n = strspn(t, " \t");
-    nstrncpy(bf, LRG, t+n, -1);
+    nstrncpy(bf, BFLRG, t+n, -1);
     if (bf[0] == '"')
        {for (t = &LAST_CHAR(bf); (*t =='"') && (t != bf); *t-- = '\0');
 	t = bf + strspn(bf, "\"");};
@@ -1406,11 +1406,11 @@ char *strip_quote(char *t)
 
 int csetenv(char *var, char *fmt, ...)
    {int err, nc;
-    char s[LRG];
+    char s[BFLRG];
     char *t;
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     err = 0;
@@ -1471,11 +1471,11 @@ char *cnoval(void)
  */
 
 char *cgetenv(int lit, char *fmt, ...)
-   {char var[MAXLINE];
+   {char var[BFLRG];
     char *t;
 
     VA_START(fmt);
-    VSNPRINTF(var, MAXLINE, fmt);
+    VSNPRINTF(var, BFLRG, fmt);
     VA_END;
 
     t = getenv(var);
@@ -1494,11 +1494,11 @@ char *cgetenv(int lit, char *fmt, ...)
 
 int cdefenv(char *fmt, ...)
    {int rv;
-    char var[MAXLINE];
+    char var[BFLRG];
     char *t;
 
     VA_START(fmt);
-    VSNPRINTF(var, MAXLINE, fmt);
+    VSNPRINTF(var, BFLRG, fmt);
     VA_END;
 
     t  = getenv(var);
@@ -1515,7 +1515,7 @@ int cdefenv(char *fmt, ...)
 
 char **cenv(int sort, char **rej)
    {int i, n;
-    char t[LRG];
+    char t[BFLRG];
     char *p, *s, *bf, **ta;
 
     bf = run(FALSE, "env");
@@ -1558,7 +1558,7 @@ char **cenv(int sort, char **rej)
 /* fix PATH because RUN must change the PATH to work */
 	for (i = 0; i < n; i++)
 	    {if (strncmp(ta[i], "PATH=", 5) == 0)
-	        {snprintf(t, LRG, "PATH=%s", cgetenv(FALSE, "PATH"));
+	        {snprintf(t, BFLRG, "PATH=%s", cgetenv(FALSE, "PATH"));
 		 FREE(ta[i]);
 		 ta[i] = STRSAVE(t);
 		 break;};};
@@ -1596,10 +1596,10 @@ int cmpenv(char *var, char *val)
 
 int cinitenv(char *var, char *fmt, ...)
    {int err;
-    char s[LRG];
+    char s[BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     err = 0;
@@ -1617,7 +1617,7 @@ int cinitenv(char *var, char *fmt, ...)
 
 int cclearenv(char **except)
    {int i, j, ne, ok, err;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *t, **pe, **env;
     extern char **environ;
 
@@ -1633,7 +1633,7 @@ int cclearenv(char **except)
 
 /* traverse env to find names of variables to remove */
     for (i = 0; i < ne; i++)
-        {nstrncpy(s, MAXLINE, env[i], -1);
+        {nstrncpy(s, BFLRG, env[i], -1);
 	 t = strchr(s, '=');
 	 if (t != NULL)
 	    *t = '\0';
@@ -1661,37 +1661,37 @@ int cclearenv(char **except)
 
 char *cwhich(char *fmt, ...)
    {int ok;
-    char prg[MAXLINE], d[LRG];
+    char prg[BFLRG], d[BFLRG];
     char *path;
-    static char exe[MAXLINE];
+    static char exe[BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(prg, MAXLINE, fmt);
+    VSNPRINTF(prg, BFLRG, fmt);
     VA_END;
 
     if (prg[0] == '/')
-       snprintf(exe, MAXLINE, "%s", prg);
+       snprintf(exe, BFLRG, "%s", prg);
        
     else if (strncmp(prg, "./", 2) == 0)
-       {getcwd(d, LRG);
-	snprintf(exe, MAXLINE, "%s/%s", d, prg+2);}
+       {getcwd(d, BFLRG);
+	snprintf(exe, BFLRG, "%s/%s", d, prg+2);}
        
     else if (strncmp(prg, "../", 3) == 0)
-       {getcwd(d, LRG);
-	snprintf(exe, MAXLINE, "%s/%s", path_head(d), prg+3);}
+       {getcwd(d, BFLRG);
+	snprintf(exe, BFLRG, "%s/%s", path_head(d), prg+3);}
        
     else
        {ok   = FALSE;
 	path = cgetenv(TRUE, "PATH");
 	FOREACH(dir, path, " :\n")
-	   snprintf(exe, MAXLINE, "%s/%s", dir, prg);
+	   snprintf(exe, BFLRG, "%s/%s", dir, prg);
 	   if (file_executable(exe) == TRUE)
 	      {ok = TRUE;
 	       break;};
 	ENDFOR;
 
 	if (ok == FALSE)
-	   nstrncpy(exe, MAXLINE, "none", -1);};
+	   nstrncpy(exe, BFLRG, "none", -1);};
 
     return(exe);}
 
@@ -1701,11 +1701,11 @@ char *cwhich(char *fmt, ...)
 /* OPEN_FILE - open the specified file */
 
 FILE *open_file(char *mode, char *fmt, ...)
-   {char bf[LRG];
+   {char bf[BFLRG];
     FILE *fp;
 
     VA_START(fmt);
-    VSNPRINTF(bf, LRG, fmt);
+    VSNPRINTF(bf, BFLRG, fmt);
     VA_END;
 
     fp = fopen(bf, mode);
@@ -1731,10 +1731,10 @@ int blank_line(char *s)
 
 int push_tok(char *s, int nc, int dlm, char *fmt, ...)
    {int rv;
-    char t[MAXLINE], delim[2];
+    char t[BFLRG], delim[2];
 
     VA_START(fmt);
-    VSNPRINTF(t, MAXLINE, fmt);
+    VSNPRINTF(t, BFLRG, fmt);
     VA_END;
 
     rv = TRUE;
@@ -1758,11 +1758,11 @@ int push_tok(char *s, int nc, int dlm, char *fmt, ...)
 
 char *append_tok(char *s, int dlm, char *fmt, ...)
    {int nc;
-    char t[MAXLINE], delim[2];
+    char t[BFLRG], delim[2];
     char *p;
 
     VA_START(fmt);
-    VSNPRINTF(t, MAXLINE, fmt);
+    VSNPRINTF(t, BFLRG, fmt);
     VA_END;
 
     if (s != NULL)
@@ -1789,18 +1789,18 @@ char *append_tok(char *s, int dlm, char *fmt, ...)
 
 int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
    {int rv;
-    char t[MAXLINE], bf[LRG];
+    char t[BFLRG], bf[BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(t, MAXLINE, fmt);
+    VSNPRINTF(t, BFLRG, fmt);
     VA_END;
 
     rv = TRUE;
 
 /* fill the local buffer BF with the result */
-    nstrncpy(bf, LRG, t, -1);
+    nstrncpy(bf, BFLRG, t, -1);
     if (IS_NULL(s) == FALSE)
-       vstrcat(bf, LRG, "%c%s", dlm, s);
+       vstrcat(bf, BFLRG, "%c%s", dlm, s);
 
 /* copy BF back to S */
     if (s != NULL)
@@ -1815,15 +1815,15 @@ int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
 
 int push_dir(char *fmt, ...)
    {int n, rv;
-    char d[LRG];
+    char d[BFLRG];
 
-    getcwd(d, LRG);
+    getcwd(d, BFLRG);
 
     n  = dstck.n++;
     dstck.dir[n] = STRSAVE(d);
 
     VA_START(fmt);
-    VSNPRINTF(d, LRG, fmt);
+    VSNPRINTF(d, BFLRG, fmt);
     VA_END;
 
     rv = chdir(d);
@@ -1947,11 +1947,11 @@ static void handle_path_dot(char *path, char *dir, char *name)
 int file_path(char *name, char *path, int nc)
    {int n;
     size_t nb;
-    char pathvar[MAXLINE], fp[MAXLINE];
+    char pathvar[BFLRG], fp[BFLRG];
     char *t, *p;
 
     n  = -1;
-    nb = MAXLINE - 1;
+    nb = BFLRG - 1;
     switch (name[0])
        {case '/' :
 	     n = is_executable_file(path, name, nc);
@@ -1966,8 +1966,8 @@ int file_path(char *name, char *path, int nc)
         default:
 	     p = getenv("PATH");
 	     if (p != NULL)
-	        {strncpy(pathvar, p, MAXLINE);
-		 pathvar[MAXLINE-1] = '\0';
+	        {strncpy(pathvar, p, BFLRG);
+		 pathvar[BFLRG-1] = '\0';
 
 		 for (t = strtok(pathvar, ":");
 		      t != NULL;
@@ -1988,11 +1988,11 @@ int file_path(char *name, char *path, int nc)
  */
 
 char **ls(char *opt, char *fmt, ...)
-   {char s[MAXLINE];
+   {char s[BFLRG];
     static char **lst;
 
     VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
+    VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
     if (opt == NULL)
@@ -2100,14 +2100,14 @@ int match(char *s, char *patt)
 
 char *unique(char *lst, int beg, int dlm)
    {int ok;
-    char olst[LRG], delim[10];
+    char olst[BFLRG], delim[10];
     char *item, *p;
-    static char nlst[LRG];
+    static char nlst[BFLRG];
 
     nlst[0] = '\0';
 
     if (lst != NULL)
-       {nstrncpy(olst, LRG, lst, -1);
+       {nstrncpy(olst, BFLRG, lst, -1);
 
 	delim[0] = dlm;
 	delim[1] = '\0';
@@ -2128,9 +2128,9 @@ char *unique(char *lst, int beg, int dlm)
 	     ENDFOR
 	     if (ok == TRUE)
 	        {if (beg == TRUE)
-		    push_tok_beg(nlst, LRG, dlm, item);
+		    push_tok_beg(nlst, BFLRG, dlm, item);
 		 else
-		    push_tok(nlst, LRG, dlm, item);};};};
+		    push_tok(nlst, BFLRG, dlm, item);};};};
 
     return(nlst);}
 
@@ -2144,10 +2144,10 @@ char *unique(char *lst, int beg, int dlm)
  */
 
 void splice_out_path(char *path)
-   {char bf[MAXLINE], lpth[MAXLINE];
+   {char bf[BFLRG], lpth[BFLRG];
     char *ps, *t, *ts, *te;
 
-    nstrncpy(lpth, MAXLINE, path, -1);
+    nstrncpy(lpth, BFLRG, path, -1);
 
 /* check for $PATH */
     ps = lpth + strspn(lpth, " \t");
@@ -2166,13 +2166,13 @@ void splice_out_path(char *path)
 
 	if (ts != ps)
 	   {*(ts-1) = '\0';
-	    nstrncpy(bf, MAXLINE, ps, -1);}
+	    nstrncpy(bf, BFLRG, ps, -1);}
 
 	else if (*te == ':')
 	   te++;
 
 	if (*te != '\0')
-	   nstrcat(bf, MAXLINE, te);
+	   nstrcat(bf, BFLRG, te);
 
 	ps = bf;};
 
@@ -2186,24 +2186,24 @@ void splice_out_path(char *path)
 /* PUSH_PATH - look thru PATH for things to add to destination DPATH */
 
 void push_path(int end, char *dpath, char *path)
-   {char lpth[LRG], tp[LRG];
+   {char lpth[BFLRG], tp[BFLRG];
 
     if (IS_NULL(path) == FALSE)
-       {nstrncpy(lpth, LRG, strip_quote(path), -1);
+       {nstrncpy(lpth, BFLRG, strip_quote(path), -1);
 
 	splice_out_path(lpth);
 
 /* add the new item */
 	if (IS_NULL(dpath) == TRUE)
-	   nstrncpy(tp, LRG, lpth, -1);
+	   nstrncpy(tp, BFLRG, lpth, -1);
 
 	else
 	   {if (end == P_APPEND)
-	       snprintf(tp, LRG, "%s:%s", dpath, lpth);
+	       snprintf(tp, BFLRG, "%s:%s", dpath, lpth);
 	    else if (end == P_PREPEND)
-	       snprintf(tp, LRG, "%s:%s", lpth, dpath);};
+	       snprintf(tp, BFLRG, "%s:%s", lpth, dpath);};
 
-	nstrncpy(dpath, LRG, path_simplify(tp, ':'), -1);};
+	nstrncpy(dpath, BFLRG, path_simplify(tp, ':'), -1);};
 
     return;}
 
@@ -2216,22 +2216,22 @@ void push_path(int end, char *dpath, char *path)
  */
 
 void build_path(char *base, ...)
-   {char exe[MAXLINE], pth[LRG], os[MAXLINE];
+   {char exe[BFLRG], pth[BFLRG], os[BFLRG];
     char *s, *t;
 
-    unamef(os, MAXLINE, "s");
+    unamef(os, BFLRG, "s");
 
     if (strcmp(os, "AIX") == 0)
-       snprintf(pth, LRG,
+       snprintf(pth, BFLRG,
 		"/bin:/usr/bin:/sw/bin:/sbin:/usr/sbin:/usr/local/bin:");
     else
-       snprintf(pth, LRG,
+       snprintf(pth, BFLRG,
 		"/bin:/usr/bin:/sw/bin:/sbin:/usr/sbin:/usr/xpg4/bin:");
 
     if (base == NULL)
-       nstrcat(pth, LRG, cgetenv(TRUE, "PATH"));
+       nstrcat(pth, BFLRG, cgetenv(TRUE, "PATH"));
     else
-       nstrcat(pth, LRG, base);
+       nstrcat(pth, BFLRG, base);
 
     VA_START(base);
 
@@ -2243,7 +2243,7 @@ void build_path(char *base, ...)
 	t = NULL;
 
 	FOREACH(dir, pth, ":")
-	   snprintf(exe, MAXLINE, "%s/%s", dir, s);
+	   snprintf(exe, BFLRG, "%s/%s", dir, s);
 	   if (file_executable(exe) == TRUE)
 	      {t = STRSAVE(exe);
 	       push_path(P_PREPEND, lpath, dir);
@@ -2267,10 +2267,10 @@ void build_path(char *base, ...)
 
 int touch(char *fmt, ...)
    {int fd;
-    char path[LRG];
+    char path[BFLRG];
 
     VA_START(fmt);
-    VSNPRINTF(path, LRG, fmt);
+    VSNPRINTF(path, BFLRG, fmt);
     VA_END;
 
     fd = creat(path, 0660);
@@ -2440,14 +2440,14 @@ int unlink_safe(char *s)
 /* LOG_ACTIVITY - log messages to FLOG */
 
 void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
-   {char msg[MAXLINE];
+   {char msg[BFLRG];
     FILE *log;
 
     if ((ilog == TRUE) && (flog != NULL) && (ilev <= db_log_level))
        {log = fopen(flog, "a");
 	if (log != NULL)
 	   {VA_START(fmt);
-	    VSNPRINTF(msg, MAXLINE, fmt);
+	    VSNPRINTF(msg, BFLRG, fmt);
 	    VA_END;
 	    fprintf(log, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
 	    fclose(log);};};
@@ -2561,7 +2561,7 @@ int demonize(void)
 int file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr)
    {int ne, nx, ev, fd, ost, rv;
     unsigned int i;
-    char t[LRG];
+    char t[BFLRG];
     char *p;
 
     rv = FALSE;
@@ -2580,7 +2580,7 @@ int file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr)
 	     else
 	        {ne++;
 		 block_fd(fd, i < nbr);
-		 p  = fgets(t, LRG, fp);
+		 p  = fgets(t, BFLRG, fp);
 		 ev = errno;
 		 if (p != NULL)
 		    {ne = 0;
@@ -2625,17 +2625,17 @@ char **file_strings(FILE *fp)
  */
 
 char **file_text(int sort, char *fname, ...)
-   {char file[MAXLINE];
+   {char file[BFLRG];
     char **sa;
     FILE *in;
 
     VA_START(fname);
-    VSNPRINTF(file, MAXLINE, fname);
+    VSNPRINTF(file, BFLRG, fname);
     VA_END;
 
     if (sort == TRUE)
        {run(FALSE, "rm -f %s.srt ; sort %s > %s.srt", file, file, file);
-	nstrcat(file, MAXLINE, ".srt");};
+	nstrcat(file, BFLRG, ".srt");};
 
     sa = NULL;
 	

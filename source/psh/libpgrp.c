@@ -1152,11 +1152,11 @@ static char **setup_pgrp(process_group *pg, int it,
  */
 
 static char **expand_shorthand(char **ta, char *t)
-   {char s[MAXLINE];
+   {char s[BFLRG];
     char *p, *md, *nm;
 
     if (t != NULL)
-       {nstrncpy(s, MAXLINE, t + 1, -1);
+       {nstrncpy(s, BFLRG, t + 1, -1);
 	p = strchr(s, ':');
 	*p++ = '\0';
 	md = s;
@@ -1728,7 +1728,7 @@ int _deref_io(process *pp)
 
 void _post_info(process *pp)
    {int i, nw, nc, fd;
-    char t[MAXLINE];
+    char t[BFLRG];
     iodes *pio;
     process *pd;
 
@@ -1738,12 +1738,12 @@ void _post_info(process *pp)
 	 if ((fd != -1) && (pio != NULL))
 	    {switch (pio->knd)
 	        {case IO_STD_STATUS :
-		      snprintf(t, MAXLINE, "Exit status: %d\n", pp->reason);
+		      snprintf(t, BFLRG, "Exit status: %d\n", pp->reason);
 		      nc = strlen(t);
 		      break;
 
 		 case IO_STD_RESOURCE :
-		      snprintf(t, MAXLINE, "Resource usage: %.2g %.2g %d\n",
+		      snprintf(t, BFLRG, "Resource usage: %.2g %.2g %d\n",
 			       RTIME(pp->ru.ru_utime),
 			       RTIME(pp->ru.ru_stime),
 			       0);
@@ -2045,7 +2045,7 @@ void register_io_pgrp(process_group *pg)
 
 static int run_pgrp(statement *s)
    {int i, io, ne, np, rv, tc, fd;
-    char vl[MAXLINE];
+    char vl[BFLRG];
     char *db;
     process *pp, *cp;
     process_group *pg;
@@ -2129,7 +2129,7 @@ static int run_pgrp(statement *s)
 	vl[0] = '\0';
 	for (i = 0; i < ne; i++)
 	    {rv |= s->st[i];
-	     vstrcat(vl, MAXLINE, "%d ", s->st[i]);};
+	     vstrcat(vl, BFLRG, "%d ", s->st[i]);};
 	LAST_CHAR(vl) = '\0';
 
 	db = getenv("PERDB_PATH");
@@ -2484,7 +2484,7 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 int transfer_ff(FILE *fi, FILE *fo)
    {int i, ne, nx, rv, ev;
     size_t nr, nw, ni;
-    char t[LRG];
+    char t[BFLRG];
 
     rv = 0;
     ne = 0;
@@ -2495,7 +2495,7 @@ int transfer_ff(FILE *fi, FILE *fo)
 	    rv = 1;
 
 	 else
-	    {nr = fread(t, 1, LRG, fi);
+	    {nr = fread(t, 1, BFLRG, fi);
 	     ev = errno;
              ne++;
 	     if (nr > 0)
@@ -2533,7 +2533,7 @@ int transfer_ff(FILE *fi, FILE *fo)
 int gexec_var(char *db, io_mode md, FILE **fio,
 	      char *name, int c, char **v)
    {int i, nc, ns, nw, rv;
-    char t[MAXLINE];
+    char t[BFLRG];
     char *vr, *vl, **sa;
     static int ic = 0;
 
@@ -2572,7 +2572,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 	    case IO_MODE_WO :
 	    case IO_MODE_WD :
 	         rv = file_strings_push(fio[0], &sa, TRUE, -1);
-		 vl = concatenate(t, MAXLINE, sa, " ");
+		 vl = concatenate(t, BFLRG, sa, " ");
 
 		 if (IS_NULL(db) == FALSE)
 		    dbset(NULL, vr, vl);
@@ -2588,7 +2588,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 		    sa = lst_add(sa, vl);
 
 	         rv = file_strings_push(fio[0], &sa, TRUE, -1);
-		 vl = concatenate(t, MAXLINE, sa, " ");
+		 vl = concatenate(t, BFLRG, sa, " ");
 
 		 fprintf(fio[1], "%s\n", vl);
 

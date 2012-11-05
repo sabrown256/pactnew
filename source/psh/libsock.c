@@ -71,14 +71,14 @@ struct s_client
 
 static char *find_conn(char *root, int ch)
    {char *rv;
-    static char s[MAXLINE];
+    static char s[BFLRG];
 
     rv = NULL;
 
     if (root == NULL)
        root = cgetenv(TRUE, "PERDB_PATH");
 
-    snprintf(s, MAXLINE, "%s.conn", root);
+    snprintf(s, BFLRG, "%s.conn", root);
     if (file_exists(s) == TRUE)
        rv = s;
 
@@ -91,14 +91,14 @@ static char *find_conn(char *root, int ch)
 
 static int conn_exists(char *fmt, ...)
    {int rv;
-    char s[MAXLINE];
+    char s[BFLRG];
     char *conn;
 
     rv = FALSE;
 
     if (fmt != NULL)
        {VA_START(fmt);
-	VSNPRINTF(s, MAXLINE, fmt);
+	VSNPRINTF(s, BFLRG, fmt);
 	VA_END;
 
 	conn = find_conn(s, -1);
@@ -118,13 +118,13 @@ static int conn_exists(char *fmt, ...)
 static int make_server_conn(client *cl, int auth, char *host, int port)
    {int i, c, rv;
     unsigned int rs;
-    char key[N_AKEY+1], s[MAXLINE];
+    char key[N_AKEY+1], s[BFLRG];
     FILE *fp;
 
     rv = FALSE;
 
     if ((cl != NULL) && (host != NULL))
-       {snprintf(s, MAXLINE, "%s.conn", cl->root);
+       {snprintf(s, BFLRG, "%s.conn", cl->root);
 	fp = fopen(s, "w");
 	if (fp != NULL)
 	   {in_addr_t haddr;
@@ -225,7 +225,7 @@ static int connect_close(int fd, client *cl)
 static int init_server(client *cl, int auth)
    {int iprt, port, rv;
     socklen_t sasz;
-    char host[MAXLINE];
+    char host[BFLRG];
     char *hst;
     connection *srv;
 
@@ -255,7 +255,7 @@ static int init_server(client *cl, int auth)
 
 	srv->port = port;
 	if (srv->port >= 0)
-	   {gethostname(host, MAXLINE);
+	   {gethostname(host, BFLRG);
 
 /* try to keep connections local by converting
  * complete host names 'abc.xyz.foo' to partial ones 'abc'

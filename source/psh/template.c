@@ -102,7 +102,7 @@ static char
 template *make_template(char *proto, int nl, char **body,
 			char *tmn, char *tmx, int ln)
    {int i, n;
-    char rtype[MAXLINE];
+    char rtype[BFLRG];
     char *p, *args, *fname, **sa;
     template *t;
 
@@ -133,10 +133,10 @@ template *make_template(char *proto, int nl, char **body,
     fname = sa[--n];
 
 /* get the qualifiers */
-    memset(rtype, 0, MAXLINE);
+    memset(rtype, 0, BFLRG);
     for (i = 0; i < n; i++)
-        {nstrcat(rtype, MAXLINE, sa[i]);
-	 nstrcat(rtype, MAXLINE, " ");};
+        {nstrcat(rtype, BFLRG, sa[i]);
+	 nstrcat(rtype, BFLRG, " ");};
     LAST_CHAR(rtype) = '\0';
         
     t->nl    = nl;
@@ -172,10 +172,10 @@ void free_template(template *t)
 /* WRITE_HEADER - write the beginning of the file */
 
 static void write_header(FILE *fp, char *inf)
-   {char s[MAXLINE];
+   {char s[BFLRG];
     char *p;
 
-    nstrncpy(s, MAXLINE, inf, -1);
+    nstrncpy(s, BFLRG, inf, -1);
     p = path_tail(upcase(strtok(s, ".\n")));
 
     fprintf(fp, "/*\n");
@@ -222,7 +222,7 @@ static void write_trailer(FILE *fp, char *inf)
 
 static void write_fnc_instance(FILE *fp, int id, template *t)
    {int i, nl;
-    char s[MAXLINE];
+    char s[BFLRG];
     char **body, *rtype, *fname, *args, *p;
 
     Separator(fp);
@@ -235,7 +235,7 @@ static void write_fnc_instance(FILE *fp, int id, template *t)
 
     fprintf(fp, "static %s %s_%s(%s)\n", rtype, fname, names[id], args);
     for (i = 0; i < nl; i++)
-        {nstrncpy(s, MAXLINE, body[i], -1);
+        {nstrncpy(s, BFLRG, body[i], -1);
 	 p = subst(s, "<TYPE>",     types[id],  -1);
 	 p = subst(p, "<SIGNED>",   stypes[id], -1);
 	 p = subst(p, "<UNSIGNED>", utypes[id], -1);
@@ -356,7 +356,7 @@ static void write_fnc_decls(FILE *fp, template **tl, int it, int nt)
 
 static void write_switch_clause(FILE *fp, int id, template *t)
    {int i, nl;
-    char s[MAXLINE], u[MAXLINE];
+    char s[BFLRG], u[BFLRG];
     char **body, *rtype, *fname, *args, *p;
 
     nl    = t->nl;
@@ -368,14 +368,14 @@ static void write_switch_clause(FILE *fp, int id, template *t)
     fprintf(fp, "        case %d :\n", id);
 
     for (i = 0; i < nl; i++)
-        {nstrncpy(s, MAXLINE, body[i], -1);
+        {nstrncpy(s, BFLRG, body[i], -1);
 	 p = subst(s, "<TYPE>", types[id], -1);
 	 p = subst(p, "<CTYPE>", comp[id], -1);
 	 p = subst(p, "<MIN>", mn[id], -1);
 	 p = subst(p, "<MAX>", mx[id], -1);
 
-	 nstrncpy(u, MAXLINE, "          ", -1);
-	 nstrcat(u, MAXLINE, p);
+	 nstrncpy(u, BFLRG, "          ", -1);
+	 nstrcat(u, BFLRG, p);
 
 	 fputs(u, fp);};
 
@@ -523,11 +523,11 @@ static void write_va_arg(FILE *fp)
 static template *parse_tmpl(FILE *fp, int *flo)
    {int i, lo, nt, nl, npo, npc, fpr, st;
     off_t ad;
-    char s[MAXLINE], proto[MAXLINE];
+    char s[BFLRG], proto[BFLRG];
     char *tmn, *tmx, *p, **sa;
     template *t;
 
-    memset(proto, 0, MAXLINE);
+    memset(proto, 0, BFLRG);
 
     fpr = FALSE;
     nl  = 0;
@@ -539,7 +539,7 @@ static template *parse_tmpl(FILE *fp, int *flo)
     for (i = 0; TRUE; i++)
         {ad = ftell(fp);
 
-	 p = fgets(s, MAXLINE, fp);
+	 p = fgets(s, BFLRG, fp);
 	 if (p == NULL)
 	    break;
 
@@ -560,7 +560,7 @@ static template *parse_tmpl(FILE *fp, int *flo)
 	    {if (fpr == FALSE)
 	        {npo += nchar(s, '(');
 	         npc += nchar(s, ')');
-		 nstrcat(proto, MAXLINE, s);
+		 nstrcat(proto, BFLRG, s);
 		 if ((npo == npc) && (npo > 0))
 		    fpr = TRUE;}
 	     else
