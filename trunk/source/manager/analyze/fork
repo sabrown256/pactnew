@@ -26,7 +26,7 @@ cat << EOF >! $Tmp.c
 #include <stdio.h>
 int main(int c, char **v)
    {int rv;
-    rv = system("date > /dev/null");
+    rv = system("echo 'foo bar baz' > /dev/null 2>&1");
     if (rv == 0)
        fprintf(stdout, "TRUE\n");
     else

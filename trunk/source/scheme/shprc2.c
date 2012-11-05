@@ -10,24 +10,6 @@
 
 #include "scheme_int.h"
 
-#if defined(PSH_OLDWAY)
-
-#include <shell/common.h>
-#include <shell/libpsh.c>
-#include <shell/libdb.c>
-#include <shell/libpgrp.c>
-
-#define PS_gexec 			gexec
-#define PS_gexec_file 			gexec_file
-#define PS_gexec_var 			gexec_var
-#define PS_dbset 			dbset
-#define PS_dbget 			dbget
-#define PS_make_client 			make_client
-#define PS_cl_logger 			cl_logger
-#define PS_get_process_group_state   	get_process_group_state
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

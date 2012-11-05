@@ -206,20 +206,17 @@ int comm_read(client *cl, char *s, int nc, int to)
    {int nb, nk, no, nt, ok;
     char *p, *t;
 
-#if 0
-    if (cl->type == CLIENT)
+    if (cl->type == SERVER)
+       nb = _comm_read_wrk(cl, s, nc, to);
+    else
        {char u[LRG];
 
 	for (nb = 0; nb == 0; )
 	    {nb = ring_pop(&cl->ior, s, nc, '\0');
 	     if (nb == 0)
-	        {nt = _comm_read_wrk(cl, u, LRG, to);
-		 ok = ring_push(&cl->ior, u, nt);};};}
-    else
-       nb = _comm_read_wrk(cl, s, nc, to);
-#else
-    nb = _comm_read_wrk(cl, s, nc, to);
-#endif
+	        {memset(u, 0, LRG);
+		 nt = _comm_read_wrk(cl, u, LRG, to);
+		 ok = ring_push(&cl->ior, u, nt);};};};
 
     no = 0;
     nk = cl->nkey;
@@ -590,6 +587,8 @@ client *make_client(ckind type, int auth, char *root,
         cl->a      = NULL;
 	cl->scon   = &global_srv;
         cl->clog   = clog;
+
+	ring_init(&cl->ior, LRG);
 
 	CLOG(cl, 1, "----- start client -----");};
 

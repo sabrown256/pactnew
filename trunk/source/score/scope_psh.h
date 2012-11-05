@@ -9,45 +9,7 @@
 
 #include "cpyright.h"
 
-#define PSH_OLDWAY
-
 /*--------------------------------------------------------------------------*/
-
-#if defined(PSH_OLDWAY)
-
-/*--------------------------------------------------------------------------*/
-
-enum e_itarget
-   {INCL, LINK, REGEX, VERS};
-
-typedef enum e_itarget itarget;
-
-/* NOTE: this is duplicate of struct in psh/libio.c */
-#define IO_RING_DEFINED
-
-typedef struct s_io_ring io_ring;
-
-struct s_io_ring
-   {unsigned int ib_in;
-    unsigned int ob_in;
-    unsigned int nb_ring;
-    unsigned char *in_ring;};
-
-extern int
- PS_ring_clear(io_ring *ring),
- PS_ring_init(io_ring *ring, unsigned int nb),
- PS_ring_ready(io_ring *ring, unsigned char ls),
- PS_ring_push(io_ring *ring, char *s, int nc),
- PS_ring_pop(io_ring *ring, char *s, int nc, unsigned int ls);
-
-extern int
- PS_report_info(char *root, int cmpl, int ltrl, itarget tgt, char *ptrn),
- PS_build_makefile(char *root, char *arch, char *mkfile, int vrb);
-
-/*--------------------------------------------------------------------------*/
-
-#else
-
 /*--------------------------------------------------------------------------*/
 
 #define SCOPE_SCORE
@@ -67,6 +29,13 @@ extern int
 #include <shell/libinfo.c>
 
 #undef SCOPE_SCORE
+
+#undef MAXLINE
+#define MAXLINE 255
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -411,10 +380,9 @@ extern double
 extern char
  *PS_time_string(char *ts, int nc, int fmt, double t);
 
-/*--------------------------------------------------------------------------*/
 
+#ifdef __cplusplus
+}
 #endif
-
-/*--------------------------------------------------------------------------*/
 
 #endif

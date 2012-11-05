@@ -585,9 +585,7 @@ static int server(char *root, int init, int dmn)
 	    db_srv_save(-1, db);
 	    db_srv_close(db);};
 
-	CLOG(cl, 1, "end server");
-
-	free_client(cl);};
+	CLOG(cl, 1, "end server");};
 
     return(0);}
 
