@@ -11,6 +11,8 @@
 #include "score_int.h"
 #include "scope_proc.h"
 
+#define SOCKADDR_SIZE(_x)     ((_x) = sizeof(struct sockaddr_in))
+
 typedef struct s_tcp_loop tcp_loop;
 
 struct s_tcp_loop
@@ -169,6 +171,9 @@ void dsocket(int s)
 struct sockaddr_in *_SC_tcp_address(char *host, int port)
    {struct sockaddr_in *ad;
 
+#if defined(NEWWAY)
+    ad = PS_tcp_get_address(host, port, INADDR_NONE);
+#else
     ad = NULL;
 
 #if defined(HAVE_POSIX_SYS)
@@ -187,17 +192,6 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
 
 	    nad = *(in_addr_t *) hen->h_addr_list[0];
 
-#if 0
-/* diagnostic print host name and IP address */
-	    {char *sad;
-	     struct in_addr iad;
-
-	     iad.s_addr = nad;
-	     sad = inet_ntoa(iad);
-
-             printf("%s -> %s\n", host, sad);};
-#endif
-
 /* verify that host associated with the address matches the specified host
  * things like OpenDNS give you a special address for unknown hosts
  * which will not match your original host
@@ -214,10 +208,11 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
     if (haddr != INADDR_NONE)
        {ad = CMAKE(struct sockaddr_in);
 	ad->sin_family = PF_INET;
-	ad->sin_port   = htons(port);
+	PS_tcp_set_port(ad, port);
 
 	memcpy(&ad->sin_addr, &haddr, sizeof(in_addr_t));};
 
+#endif
 #endif
 
     return(ad);}
@@ -237,34 +232,17 @@ struct sockaddr_in *_SC_tcp_bind(int fd, int port)
 
 #if defined(HAVE_POSIX_SYS)
 
-    int ok, sasz;
+    int ok;
 
-    ad = CMAKE(struct sockaddr_in);
+    ad = PS_tcp_get_address(NULL, 0, INADDR_ANY);
     if (ad != NULL)
-       {ad->sin_family      = PF_INET;
-	ad->sin_addr.s_addr = htonl(INADDR_ANY);
-
-	ok = -1;
-
-	sasz = sizeof(struct sockaddr_in);
-
-	if (port > 0)
-	   {ad->sin_port = htons(port);
-	    ok = bind(_SC.sfd, (struct sockaddr *) ad, sasz);}
-
-	else
-	   {for (port = 5000; port < 65000; port++)
-	        {ad->sin_port = htons(port);
-		 ok = bind(_SC.sfd, (struct sockaddr *) ad, sasz);
-		 if (ok >= 0)
-		    break;};};
-
+       {ok = PS_tcp_bind_port(_SC.sfd, ad, port, 5000);
 	if (ok >= 0)
 	   {if (_SC_ps.debug)
 	       {fprintf(_SC_ps.diag, "      Bind succeeded: %d\n", port);
 		fflush(_SC_ps.diag);};}
 	else
-	   {CFREE(ad);};};
+	   CFREE(ad);};
 
 #endif
 
@@ -281,7 +259,6 @@ static void _SC_tcp_acceptor(int fd, int mask, void *a)
 #if defined(HAVE_POSIX_SYS)
 
     int nfd, pi;
-    socklen_t sasz;
     struct sockaddr_in *ad;
     PFFileCallback acc;
     PFFileCallback rej;
@@ -294,9 +271,7 @@ static void _SC_tcp_acceptor(int fd, int mask, void *a)
     acc = lp->acc;
     rej = lp->rej;
 
-    sasz = sizeof(struct sockaddr_in);
-
-    nfd = accept(fd, (struct sockaddr *) ad, &sasz);
+    nfd = PS_tcp_accept_connection(fd, ad, TRUE);
     if (nfd > 0)
        {pi = SC_register_event_loop_callback(pe, SC_INT_I, &nfd,
 					     acc, rej, -1);
@@ -372,18 +347,7 @@ int _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad)
 
 #if defined(HAVE_POSIX_SYS)
 
-    int err;
-    socklen_t sasz;
-    struct sockaddr *sa;
-
-    sa   = (struct sockaddr *) ad;
-    sasz = sizeof(struct sockaddr_in);
-
-    getsockname(fd, sa, &sasz);
-
-    err = listen(fd, 5);
-    if (err >= 0)
-       nfd = accept(fd, sa, &sasz);
+    nfd = PS_tcp_accept_connection(fd, ad, FALSE);
 
 #endif
 
@@ -403,8 +367,7 @@ int _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad)
  *                - some anonymous implementer somewhere
  */
 
-static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln,
-			  int to, int fm)
+static int _SC_connect_to(int fd, struct sockaddr *addr, int to, int fm)
    {int ok;
 
     ok = -1;
@@ -412,11 +375,14 @@ static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln,
 #if defined(HAVE_POSIX_SYS)
 
     int blck, nrdy, dt, ta, sz, rv;
+    socklen_t ln;
     SC_poll_desc pd;
+
+    SOCKADDR_SIZE(ln);
 
 /* do a blocking connect if an infinite timeout has been requested */
     if (to < 0)
-       ok = connect(fd, (struct sockaddr *) addr, ln);
+       ok = PS_tcp_initiate_connection(fd, (struct sockaddr_in *) addr);
 
     else
 
@@ -483,19 +449,16 @@ int _SC_tcp_connect(char *host, int port, int to, int fm)
     ok = SC_ERR_TRAP();
     if (ok == 0)
        {if ((host != NULL) && (port >= 0))
-	   {int sasz, err;
+	   {int err;
 	    struct sockaddr_in *srvr;
 
-	    sasz = sizeof(in_addr_t);
 	    srvr = _SC_tcp_address(host, port);
 	    if (srvr != NULL)
 	       {fd = socket(PF_INET, SOCK_STREAM, 0);
 		if (fd < 0)
 		   SC_error(-1, "CAN'T OPEN SOCKET - _SC_TCP_CONNECT");
 
-		sasz = sizeof(struct sockaddr_in);
-		err  = _SC_connect_to(fd, (struct sockaddr *) srvr, sasz,
-				      to, fm);
+		err = _SC_connect_to(fd, (struct sockaddr *) srvr, to, fm);
 		if (err < 0)
 		   {close(fd);
 		    fd = -1;

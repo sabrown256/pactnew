@@ -223,6 +223,11 @@
 #define subst 			PS_subst
 #define subst_syntax 		PS_subst_syntax
 #define time_string 		PS_time_string
+#define tcp_accept_connection	PS_tcp_accept_connection
+#define tcp_bind_port 		PS_tcp_bind_port
+#define tcp_get_address 	PS_tcp_get_address
+#define tcp_set_port 		PS_tcp_set_port
+#define tcp_initiate_connection	PS_tcp_initiate_connection
 #define tokenize 		PS_tokenize
 #define tokenized 		PS_tokenized
 #define touch 			PS_touch

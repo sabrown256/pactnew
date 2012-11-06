@@ -338,6 +338,10 @@ extern FILE
 /* LIBSOCK.C declarations */
 
 extern int
+ PS_tcp_set_port(struct sockaddr_in *ps, int port),
+ PS_tcp_bind_port(int fd, struct sockaddr_in *ps, int port, int pmin),
+ PS_tcp_accept_connection(int fd, struct sockaddr_in *ps, int ao),
+ PS_tcp_initiate_connection(int fd, struct sockaddr_in *ps),
  PS_open_server(client *cl, ckind ioc, int auth),
  PS_close_sock(client *cl),
  PS_read_sock(client *cl, char *s, int nc),
@@ -345,7 +349,10 @@ extern int
 
 extern char
  **PS_parse_conn(char *root),
- **PS_get_connect_socket(struct sockaddr_in *ps, char *root);
+ **PS_get_connect_socket(client *cl);
+
+extern struct sockaddr_in
+ *PS_tcp_get_address(char *host, int port, in_addr_t haddr);
 
 
 /* LIBSRV.C declarations */
