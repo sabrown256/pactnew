@@ -11,6 +11,8 @@
 #include "score_int.h" 
 #include "scope_mem.h" 
 
+#define NEWWAY
+
 #ifndef EDOM
 # define EDOM 16
 #endif
@@ -164,8 +166,12 @@ unsigned int SC_char_index(char *s, int n)
  */
 
 char *SC_strcat(char *dst, size_t lnd, char *src)
-   {size_t ld, ls, lc;
-    char *s;
+   {char *s;
+
+#if defined(NEWWAY)
+    s = PS_nstrcat(dst, lnd, src);
+#else
+    size_t ld, ls, lc;
         
     s = NULL;
     if ((dst != NULL) && (src != NULL))
@@ -177,6 +183,7 @@ char *SC_strcat(char *dst, size_t lnd, char *src)
 	   {lc = lnd - ld - 1;
 	    lc = min(lc, ls);
 	    s  = strncat(dst, src, lc);};};
+#endif
 
     return(s);}
 
@@ -188,8 +195,7 @@ char *SC_strcat(char *dst, size_t lnd, char *src)
  */
 
 char *SC_vstrcat(char *dst, size_t lnd, char *fmt, ...)
-   {size_t ld, ls;
-    char *s, *t;
+   {char *s, *t;
         
     t = CMAKE_N(char, lnd);
 
@@ -197,12 +203,18 @@ char *SC_vstrcat(char *dst, size_t lnd, char *fmt, ...)
     SC_VSNPRINTF(t, lnd, fmt);
     SC_VA_END;
 
+#if defined(NEWWAY)
+    s = PS_nstrcat(dst, lnd, t);
+#else
+    size_t ld, ls;
+
     ld = strlen(dst);
     ls = strlen(t);
     if (ls + ld < lnd)
        s = strcat(dst, t);
     else
        s = strncat(dst, t, lnd - ld - 1);
+#endif
 
     CFREE(t);
 
@@ -246,7 +258,12 @@ char *SC_dstrcat(char *dst, char *src)
  */
 
 char *SC_strncpy(char *d, size_t nd, char *s, size_t ns)
-   {size_t nc;
+   {
+
+#if defined(NEWWAY)
+    s = PS_nstrncpy(d, nd, s, ns);
+#else
+    size_t nc;
         
     if (s == NULL)
        nc = 0;
@@ -256,6 +273,7 @@ char *SC_strncpy(char *d, size_t nd, char *s, size_t ns)
 
     if (d != NULL)
        d[nc] = '\0';
+#endif
 
     return(d);}
 
@@ -1044,8 +1062,13 @@ char *SC_ntok(char *d, int nc, char *s, int n, char *delim)
  */
 
 char **SC_tokenize(char *s, char *delim)
-   {int n;
-    char *tok, *t, *ps, *u, **sa;
+   {char **sa;
+
+#if defined(NEWWAY)
+    sa = PS_tokenize(s, delim);
+#else
+    int n;
+    char *tok, *t, *ps, *u;
     SC_array *arr;
 
     sa = NULL;
@@ -1070,6 +1093,7 @@ char **SC_tokenize(char *s, char *delim)
 	CFREE(t);
 
 	sa = SC_array_done(arr);};
+#endif
 
     return(sa);}
 
@@ -1282,8 +1306,12 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
  */
 
 char **SC_file_strings(char *fname)
-   {char s[MAX_BFSZ+1];
-    char **sa;
+   {char **sa;
+
+#if defined(NEWWAY)
+    sa = PS_file_text(FALSE, fname);
+#else
+    char s[MAX_BFSZ+1];
     SC_array *a;
     FILE *fp;
 
@@ -1298,6 +1326,7 @@ char **SC_file_strings(char *fname)
 	fclose(fp);};
 
     sa = SC_array_done(a);
+#endif
 
     return(sa);}
 
@@ -1307,7 +1336,12 @@ char **SC_file_strings(char *fname)
 /* SC_STRINGS_FILE - write the arrray of strings SA to the file FNAME */
 
 int SC_strings_file(char **sa, char *fname, char *mode)
-   {int i, rv;
+   {int rv;
+
+#if defined(NEWWAY)
+    rv = PS_strings_file(sa, fname, mode);
+#else
+    int i;
     FILE *fp;
 
     rv = FALSE;
@@ -1318,6 +1352,7 @@ int SC_strings_file(char **sa, char *fname, char *mode)
 	    fputs(sa[i], fp);
 	fclose(fp);
 	rv = TRUE;};
+#endif
 
     return(rv);}
 
@@ -1351,7 +1386,12 @@ int SC_strings_print(FILE *fp, char **sa, char *pre)
  */
 
 void SC_free_strings(char **sa)
-   {int i;
+   {
+
+#if defined(NEWWAY)
+    PS_free_strings(sa);
+#else
+    int i;
     char *s;
 
     if (sa != NULL)
@@ -1362,6 +1402,7 @@ void SC_free_strings(char **sa)
 	     CFREE(s);};
 
 	CFREE(sa);};
+#endif
 
     return;}
 
@@ -1395,8 +1436,12 @@ void SC_remove_string(char **sa, int n)
  */
 
 char *SC_concatenate(char *s, int nc, int n, char **a, char *delim, int add)
-   {int i;
-    char *rv;
+   {char *rv;
+
+#if defined(NEWWAY)
+    rv = PS_concatenate(s, nc, a, delim);
+#else
+    int i;
 
     rv = NULL;
 
@@ -1409,6 +1454,7 @@ char *SC_concatenate(char *s, int nc, int n, char **a, char *delim, int add)
 	SC_LAST_CHAR(s) = '\0';
 
         rv = s;};
+#endif
 
     return(rv);}
 

@@ -2606,6 +2606,29 @@ int file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* STRINGS_FILE - write the strings SA to a file FNAME */
+
+int strings_file(char **sa, char *fname, char *mode)
+   {int i, n, rv;
+    FILE *fp;
+
+    rv = FALSE;
+    if ((fname != NULL) && (sa != NULL))
+       {n  = lst_length(sa);
+	fp = fopen(fname, mode);
+
+	for (i = 0; i < n; i++)
+	    fputs(sa[i], fp);
+
+	fclose(fp);
+
+        rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* FILE_STRINGS - return the text of FP as a NULL terminated list of strings */
 
 char **file_strings(FILE *fp)
