@@ -363,15 +363,13 @@ static void remove_fd(srvdes *sv, int fd)
 
 static void _new_connection(srvdes *sv)
    {int fd;
-    socklen_t sz;
     client *cl;
     connection *srv;
 
     cl  = (client *) sv->a;
     srv = cl->scon;
-    sz  = sizeof(srv->sck);
 
-    fd = accept(srv->sfd, (struct sockaddr *) &srv->sck, &sz);
+    fd = tcp_accept_connection(srv->sfd, srv->sck, TRUE);
     if (fd > 0)
        add_fd(sv, fd);
     else

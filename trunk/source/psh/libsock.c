@@ -19,7 +19,8 @@
 #define NATTEMPTS   3
 #define N_AKEY      32
 
-#define C_OR_S(_p)      ((_p) ? "CLIENT" : "SERVER")
+#define SOCKADDR_SIZE(_x)     ((_x) = sizeof(struct sockaddr_in))
+#define C_OR_S(_p)            ((_p) ? "CLIENT" : "SERVER")
 
 #ifndef S_SPLINT_S
 #define CLOG(_c, ...)                                                    \
@@ -41,7 +42,7 @@ struct s_connection
    {int sfd;                     /* server side descriptor */
     int port;
     int pid;
-    struct sockaddr_in sck;
+    struct sockaddr_in *sck;
     fd_set afs;};
 
 struct s_client
@@ -61,6 +62,165 @@ struct s_client
 # ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
+
+/*                            TCP LEVEL ROUTINES                            */
+
+/*--------------------------------------------------------------------------*/
+
+/* TCP_SET_PORT - set the port of PS to PORT
+ *              - return the old value
+ */
+
+int tcp_set_port(struct sockaddr_in *ps, int port)
+   {int rv;
+
+    rv = -1;
+
+    if (ps != NULL)
+       {rv = ps->sin_port;
+	ps->sin_port = htons(port);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TCP_GET_ADDRESS - initialize and return a socket address
+ *                 - for a connection to HOST/HADDR and PORT
+ */
+
+struct sockaddr_in *tcp_get_address(char *host, int port, in_addr_t haddr)
+   {socklen_t sasz;
+    in_addr_t nad;
+    struct sockaddr_in *ps;
+
+    ps = NULL;
+    SOCKADDR_SIZE(sasz);
+
+/* work out a valid host address */
+    if (haddr == INADDR_NONE)
+       {haddr = inet_addr(host);
+
+	if (haddr == INADDR_NONE)
+	   {struct hostent *hn, *ha;
+
+	    hn = gethostbyname(host);
+	    if (hn != NULL)
+	       {nad = *(in_addr_t *) hn->h_addr_list[0];
+
+/* verify that host associated with the address matches the specified host
+ * things like OpenDNS give you a special address for unknown hosts
+ * which will not match your original host
+ */
+		ha = gethostbyaddr(&nad, sizeof(nad), AF_INET);
+		if ((ha != NULL) && (strcmp(ha->h_name, hn->h_name) == 0))
+		   haddr = nad;};};};
+
+/* initialize the socket address */
+    if (haddr != INADDR_NONE)
+       {ps = MAKE(struct sockaddr_in);
+	if (ps != NULL)
+	   {memset(ps, 0, sasz);
+	    ps->sin_family = PF_INET;
+	    if (haddr == INADDR_ANY)
+	       ps->sin_addr.s_addr = htonl(haddr);
+	    else
+	       {tcp_set_port(ps, port);
+		memcpy(&ps->sin_addr, &haddr, sizeof(in_addr_t));};};};
+
+    return(ps);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TCP_BIND_PORT - bind FD to PS and PORT
+ *               - if successful return the PORT
+ *               - otherwise return -1
+ */
+
+int tcp_bind_port(int fd, struct sockaddr_in *ps, int port, int pmin)
+   {int rv;
+    socklen_t sasz;
+
+    rv = -1;
+
+    if (ps != NULL)
+       {SOCKADDR_SIZE(sasz);
+
+	if (port > 0)
+	   {tcp_set_port(ps, port);
+	    rv = bind(fd, (struct sockaddr *) ps, sasz);
+	    rv = (rv >= 0) ? port : -1;}
+
+	else
+	   {for (port = pmin; port < 65000; port++)
+	        {tcp_set_port(ps, port);
+		 rv = bind(fd, (struct sockaddr *) ps, sasz);
+		 if (rv >= 0)
+		    {rv = port;
+		     break;};};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TCP_ACCEPT_CONNECTION - listen on bound socket FD, PS
+ *                       - and return the descriptor of an accepted
+ *                       - connection
+ */
+
+int tcp_accept_connection(int fd, struct sockaddr_in *ps, int ao)
+   {int nfd, st;
+    socklen_t sasz;
+    struct sockaddr *sa;
+    
+    nfd = -1;
+
+    sa = (struct sockaddr *) ps;
+    SOCKADDR_SIZE(sasz);
+
+    if (ao == FALSE)
+       {getsockname(fd, sa, &sasz);
+
+	st = listen(fd, 5);}
+    else
+       st = 0;
+
+    if (st >= 0)
+       nfd = accept(fd, sa, &sasz);
+
+    return(nfd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TCP_INITIATE_CONNECTION - initiate a connection with FD and PS */
+
+int tcp_initiate_connection(int fd, struct sockaddr_in *ps)
+   {int ia, na, rv;
+    socklen_t sasz;
+    struct sockaddr *sa;
+
+    SOCKADDR_SIZE(sasz);
+
+    sa = (struct sockaddr *) ps;
+
+/* try NATTEMPTS times to connect to the server */
+    rv = 0;
+    na  = NATTEMPTS;
+    for (ia = 0; ia < na; ia++)
+        {sleep(ia);
+	 rv = connect(fd, sa, sasz);
+	 if (rv >= 0)
+	    break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                             MID-LEVEL ROUTINES                           */
+
 /*--------------------------------------------------------------------------*/
 
 /* FIND_CONN - find conventionally named connection from ROOT
@@ -240,8 +400,7 @@ static int connect_close(int fd, client *cl)
  */
 
 static int init_server(client *cl, int auth)
-   {int iprt, port, rv;
-    socklen_t sasz;
+   {int port, rv;
     char host[BFLRG];
     char *hst;
     connection *srv;
@@ -255,20 +414,11 @@ static int init_server(client *cl, int auth)
     else
        {rv   = FALSE;
 	port = -1;
-	sasz = sizeof(struct sockaddr_in);
 
 	srv->sfd = socket(PF_INET, SOCK_STREAM, 0);
 	if (srv->sfd > 0)
-	   {srv->sck.sin_family      = PF_INET;
-	    srv->sck.sin_addr.s_addr = htonl(INADDR_ANY);
-
-/* scan for a port that we can use */
-	    for (iprt = 15000; iprt < 65000; iprt++)
-	        {srv->sck.sin_port = htons(iprt);
-
-		 if (bind(srv->sfd, (struct sockaddr *) &srv->sck, sasz) >= 0)
-		    {port = iprt;
-		     break;};};};
+	   {srv->sck = tcp_get_address(NULL, 0, INADDR_ANY);
+	    port     = tcp_bind_port(srv->sfd, srv->sck, -1, 15000);};
 
 	srv->port = port;
 	if (srv->port >= 0)
@@ -293,38 +443,21 @@ static int init_server(client *cl, int auth)
 /* CONNECT_SERVER - make a connection with the server */
 
 static int connect_server(client *cl)
-   {int fdc, fds, err;
-    socklen_t len, sasz;
-    struct sockaddr *sa;
+   {int fdc, fds;
     connection *srv;
 
-    srv  = cl->scon;
-
-    fdc  = -1;
-    sasz = sizeof(struct sockaddr_in);
-    len  = sasz;
-
-    sa = (struct sockaddr *) &srv->sck;
+    srv = cl->scon;
+    fdc = -1;
 
     fds = srv->sfd;
     if (srv->port >= 0)
-       {err = listen(fds, 5);
-	if (err >= 0)
-	   {err = getsockname(fds, sa, &len);
-	    if (err == -1)
-	       CLOG(cl, 1, "getsockname error %d - %s (%d)",
-		    fds, strerror(errno), errno);
-
-	    CLOG(cl, 2, "accept on %d ...", fds);
-	    fdc = accept(fds, sa, &len);
-	    if (fdc >= 0)
-	       {CLOG(cl, 2, "accept ok %d", fdc);}
-	    else
-	       CLOG(cl, 1, "accept ng (%s - %d)",
-		    strerror(errno), errno);}
+       {CLOG(cl, 2, "accept on %d ...", fds);
+	fdc = tcp_accept_connection(fds, srv->sck, FALSE);
+	if (fdc >= 0)
+	   {CLOG(cl, 2, "accept ok %d", fdc);}
 	else
-	   CLOG(cl, 1, "listen error on %d - (%s - %d)",
-		fds, strerror(errno), errno);};
+	   CLOG(cl, 1, "accept ng (%s - %d)",
+		strerror(errno), errno);};
 
     cl->cfd  = fdc;
     cl->type = SERVER;
@@ -334,40 +467,31 @@ static int connect_server(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* GET_CONNECT_SOCKET - fill PS with required info for connect call
+/* GET_CONNECT_SOCKET - fill the connection socket address of CL
+ *                    - with required info for subsequent connect call
  *                    - return the connection string array iff successful
  *                    - useful for later logging
  */
 
-char **get_connect_socket(struct sockaddr_in *ps, char *root)
-   {int sasz, port;
+char **get_connect_socket(client *cl)
+   {int port;
     in_addr_t haddr;
-    char *host, **sa;
+    char *root, *host, **sa;
+    connection *srv;
 
-    sa = parse_conn(root);
-    if ((sa != NULL) && (ps != NULL))
-       {host  = sa[CONN_NAME];
-	port  = atoi(sa[CONN_PORT]);
-	haddr = atol(sa[CONN_IP]);
+    sa = NULL;
 
-	sasz = sizeof(struct sockaddr_in);
+    if (cl != NULL)
+       {root = cl->root;
+	srv  = cl->scon;
 
-	memset(ps, 0, sasz);
-	ps->sin_family = PF_INET;
-	ps->sin_port   = htons(port);
+	sa = parse_conn(root);
+	if ((sa != NULL) && (srv->sck == NULL))
+	   {host  = sa[CONN_NAME];
+	    port  = atoi(sa[CONN_PORT]);
+	    haddr = atol(sa[CONN_IP]);
 
-	if (haddr == INADDR_NONE)
-	   {haddr = inet_addr(host);
-
-	    if (haddr == INADDR_NONE)
-	       {struct hostent *hp;
-
-		hp = gethostbyname(host);
-		if (hp != NULL)
-		   haddr = *(in_addr_t *) hp->h_addr_list[0];};};
-
-	if (haddr != INADDR_NONE)
-	   memcpy(&ps->sin_addr, &haddr, sizeof(long));};
+	    srv->sck = tcp_get_address(host, port, haddr);};};
 
     return(sa);}
 
@@ -377,42 +501,26 @@ char **get_connect_socket(struct sockaddr_in *ps, char *root)
 /* CONNECT_CLIENT - client initiates connection with the server */
 
 static int connect_client(client *cl)
-   {int fd, err;
-    socklen_t sasz;
-    char *key, *root, **ta;
+   {int fd, ok;
+    char *key, **ta;
     connection *srv;
 
     fd  = -1;
     if (cl != NULL)
-       {root = cl->root;
-	srv  = cl->scon;
+       {srv = cl->scon;
 
 	key = NULL;
 
-	ta = get_connect_socket(&srv->sck, root);
+	ta = get_connect_socket(cl);
 	if (ta != NULL)
 	   {fd = socket(PF_INET, SOCK_STREAM, 0);
 	    if (fd >= 0)
-	       {int ia, na;
-		struct sockaddr *sa;
-
-		sasz = sizeof(struct sockaddr_in);
-
-/* try NATTEMPTS times to connect to the server */
-		err = 0;
-		na  = NATTEMPTS;
-		for (ia = 0; ia < na; ia++)
-		    {sleep(ia);
-
-		     sa  = (struct sockaddr *) &srv->sck;
-		     err = connect(fd, sa, sasz);
-		     if (err >= 0)
-		        break;};
+	       {ok = tcp_initiate_connection(fd, srv->sck);
 
 /* report the connection status */
-		if (err >= 0)
-		   {CLOG(cl, 2, "connect %s@%s on %d (attempt %d)",
-			 ta[0], ta[1], fd, ia);}
+		if (ok >= 0)
+		   {CLOG(cl, 2, "connect %s@%s on %d",
+			 ta[0], ta[1], fd);}
 		else
 		   {fd = connect_close(fd, cl);
 		    CLOG(cl, 1, "connect error %s@%s  %d - %s (%d)",
