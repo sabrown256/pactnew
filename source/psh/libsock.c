@@ -109,6 +109,29 @@ static int conn_exists(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _GET_HOST_ADDR - return the IP address of HOST as a long */
+
+long _get_host_addr(char *host)
+   {long rv;
+    in_addr_t haddr;
+
+    rv = -1;
+    if (host != NULL)
+
+/* address */
+       {haddr = inet_addr(host);
+	if (haddr == INADDR_NONE)
+	   {struct hostent *hp;
+
+	    hp = gethostbyname(host);
+	    if (hp != NULL)
+	       rv = *(in_addr_t *) hp->h_addr_list[0];};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MAKE_SERVER_CONN - create a descriptive connection for the server
  *                  - on HOST at PORT at the root collection/location
  *                  - of CL
@@ -127,22 +150,10 @@ static int make_server_conn(client *cl, int auth, char *host, int port)
        {snprintf(s, BFLRG, "%s.conn", cl->root);
 	fp = fopen(s, "w");
 	if (fp != NULL)
-	   {in_addr_t haddr;
-
-	    fprintf(fp, "%s\n", host);
-	    fprintf(fp, "%d\n", port);
+	   {long pid, haddr;
 
 /* address */
-	    haddr = inet_addr(host);
-
-	    if (haddr == INADDR_NONE)
-	       {struct hostent *hp;
-
-		hp = gethostbyname(host);
-		if (hp != NULL)
-		   haddr = *(in_addr_t *) hp->h_addr_list[0];};
-
-	    fprintf(fp, "%ld\n", (long) haddr);
+	    haddr = _get_host_addr(host);
 
 /* key */
 	    rs = ((unsigned int) time(NULL)) % 10091;
@@ -154,10 +165,16 @@ static int make_server_conn(client *cl, int auth, char *host, int port)
 		 else
 		    key[i++] = c;};
 	    key[i] = '\0';
-	    fprintf(fp, "%s\n", key);
 
 /* server PID */
-	    fprintf(fp, "%ld\n", (long) getpid());
+	    pid = getpid();
+
+/* write fcon info */
+	    fprintf(fp, "%s\n", host);
+	    fprintf(fp, "%d\n", port);
+	    fprintf(fp, "%ld\n", haddr);
+	    fprintf(fp, "%s\n", key);
+	    fprintf(fp, "%ld\n", pid);
 
 	    fclose(fp);
 
