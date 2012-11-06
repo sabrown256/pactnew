@@ -285,6 +285,7 @@ extern int
  PS_unlink_safe(char *s),
  PS_demonize(void),
  PS_file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr),
+ PS_strings_file(char **sa, char *fname, char *mode),
  PS_is_running(int pid);
 
 extern size_t

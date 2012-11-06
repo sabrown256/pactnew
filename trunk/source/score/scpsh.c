@@ -217,6 +217,7 @@
 #define splice_out_path 	PS_splice_out_path
 #define strclean 		PS_strclean
 #define string_sort 		PS_string_sort
+#define strings_file 		PS_strings_file
 #define strip_quote 		PS_strip_quote
 #define strstri 		PS_strstri
 #define subst 			PS_subst
