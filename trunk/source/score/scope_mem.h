@@ -286,6 +286,7 @@ extern void
 		    void *addr),
  _SC_unassign_block(SC_heap_des *ph, mem_header *space),
  _SC_init_heap(SC_heap_des *ph, int id),
+ _SC_mem_exhausted(int cnd),
  *SC_alloc_n(long ni, long bpi, ...),
  *SC_realloc_n(void *p, long ni, long bpi, ...);
 

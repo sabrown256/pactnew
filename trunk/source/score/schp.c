@@ -69,6 +69,26 @@ void _SC_dethread(void)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_DIAGNOSTIC - log a diagnostic message */
+
+void _SC_diagnostic(char *fmt, ...)
+   {
+
+    if (_SC_ps.debug == TRUE)
+       {char *s;
+
+	SC_VDSNPRINTF(TRUE, s, fmt);
+
+	fputs(s, _SC_ps.diag);
+	fflush(_SC_ps.diag);
+
+	CFREE(s);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                           EXEC TESTER ROUTINES                           */
 
@@ -1997,11 +2017,7 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
 	    case SC_IO_STD_BOND :
 		 fd[2].file = nm;
 		 fd[1].flag = fl;
-#ifdef NEWWAY
-		 fd[2].flag = -1;
-#else
 		 fd[2].flag = fl;
-#endif
 	         break;
 	    default :
 	         break;};};
@@ -2225,9 +2241,7 @@ int SC_init_server(int step, int closep)
 
     int ok;
     
-    if (_SC_ps.debug)
-       {fprintf(_SC_ps.diag, "   SC_init_server: %d\n", step);
-        fflush(_SC_ps.diag);};
+    _SC_diagnostic("   SC_init_server: %d\n", step);
 
     rv = -1;
     ok = SC_ERR_TRAP();
@@ -2246,15 +2260,13 @@ int SC_init_server(int step, int closep)
 		 if (_SC.sfd < 0)
 		    SC_error(-1, "COULDN'T OPEN SOCKET - SC_INIT_SERVER");
 
-		 if (_SC_ps.debug)
-		    {fprintf(_SC_ps.diag, "      Socket opened: %d\n", _SC.sfd);
-		     fflush(_SC_ps.diag);};
+		 _SC_diagnostic("      Socket opened: %d\n", _SC.sfd);
 
 		 _SC.srvr = _SC_tcp_bind(_SC.sfd, -1);
-		 if (_SC.srvr == NULL)
+		 if (_SC.srvr.in == NULL)
 		    SC_error(-1, "BIND FAILED - SC_INIT_SERVER");
 		 else
-		    rv = ntohs(_SC.srvr->sin_port);
+		    rv = ntohs(_SC.srvr.in->sin_port);
 
 		 break;
 
@@ -2266,12 +2278,10 @@ int SC_init_server(int step, int closep)
 		 if (closep)
 		    {close(_SC.sfd);
 
-		     if (_SC_ps.debug)
-		        {fprintf(_SC_ps.diag, "      Socket closed: %d\n", _SC.sfd);
-			 fflush(_SC_ps.diag);};
+		     _SC_diagnostic("      Socket closed: %d\n", _SC.sfd);
 
 		     _SC.sfd = -1;
-		     CFREE(_SC.srvr);};
+		     CFREE(_SC.srvr.in);};
 
 		 rv = _SC.nfd;
 

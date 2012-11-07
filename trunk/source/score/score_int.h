@@ -219,7 +219,7 @@ struct s_SC_scope_private
 /* SCHP.C */
    int nfd;
    void *orig_tty;
-   struct sockaddr_in *srvr;
+   sckades srvr;
 
 /* SCHSRV.C */
    char *hsdb;                                     /* host server variables */

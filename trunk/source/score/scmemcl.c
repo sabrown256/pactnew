@@ -79,7 +79,7 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
     ns = nu*us;
     pn = _SC_ALLOC((size_t) ns);
 
-    assert(pn != NULL);
+    _SC_mem_exhausted(pn == NULL);
 
 /* setup the new major block */
     mbl.index  = j;
@@ -98,7 +98,7 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
 	pm  = (major_block_des *) malloc(tnb);
         SC_mem_over_mark(-1);
 
-	assert(pm != NULL);
+	_SC_mem_exhausted(pm == NULL);
 
 	ph->major_block_list = pm;};
 
@@ -116,7 +116,7 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
 	pm = (major_block_des *) realloc(pm, tnb);
         SC_mem_over_mark(-1);
 
-	assert(pm != NULL);
+	_SC_mem_exhausted(pm == NULL);
 
 	ph->major_block_list = pm;};
 
@@ -184,7 +184,7 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
        {if (zsp == 5)
            {p = calloc((size_t) 1, (size_t) (nbp + sizeof(double)));
 
-	    assert(p != NULL);
+	    _SC_mem_exhausted(p == NULL);
 
 	    md = (mem_descriptor *) p;
 
@@ -193,7 +193,7 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
         else
            {p = _SC_ALLOC((size_t) (nbp + sizeof(double)));
 
-	    assert(p != NULL);
+	    _SC_mem_exhausted(p == NULL);
 
 	    md = (mem_descriptor *) p;
 

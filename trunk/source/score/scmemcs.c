@@ -80,7 +80,7 @@ void *_SC_alloc_ns(long ni, long bpi, void *arg)
 	   {if (zsp == 5)
 	       {p = calloc((size_t) 1, (size_t) (nbp + sizeof(double)));
 
-		assert(p != NULL);
+		_SC_mem_exhausted(p == NULL);
 
 		desc = (mem_descriptor *) p;
 		info = &desc->desc.info;
@@ -88,7 +88,7 @@ void *_SC_alloc_ns(long ni, long bpi, void *arg)
 	    else
 	       {p = _SC_ALLOC((size_t) (nbp + sizeof(double)));
 
-		assert(p != NULL);
+		_SC_mem_exhausted(p == NULL);
 
 		desc = (mem_descriptor *) p;
 		info = &desc->desc.info;

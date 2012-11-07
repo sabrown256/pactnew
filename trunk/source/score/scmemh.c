@@ -21,7 +21,7 @@ static void _SC_mem_hst_init(SC_heap_des *ph)
 
     rng = (SC_mem_hst *) calloc(_SC.mem_hst_sz, sizeof(SC_mem_hst));
 
-    assert(rng != NULL);
+    _SC_mem_exhausted(rng == NULL);
 
     ph->ring = rng;
     ph->ih   = 0L;
