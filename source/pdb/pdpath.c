@@ -77,6 +77,9 @@ typedef enum e_PD_expr_syntax PD_expr_syntax;
 
 #define CURRENT(x) FRAME(stack)[FRAME(n)].x
 
+#undef MSG
+#undef TEXT
+
 #define FRAME_FRAME     pa->frames
 #define FRAME_N         pa->frame_n
 #define FRAME_NX        pa->frame_nx

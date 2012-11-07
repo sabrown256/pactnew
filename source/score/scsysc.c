@@ -850,37 +850,6 @@ static int _SC_redirect_fd(subtask *ps, int i, char *p)
     rv = _SC_parse_redirect(&io, ps, i, p, src);
 
 /* add the redirect specifications to the filedes */
-#if 0
-    switch (io.knd)
-       {case SC_IO_STD_IN :
-	     ps->fd[0] = io;
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io);
-	     break;
-        case SC_IO_STD_OUT :
-	     ps->fd[1] = io;
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io);
-	     break;
-        case SC_IO_STD_ERR :
-	     ps->fd[2] = io;
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
-	     break;
-        case SC_IO_STD_BOND :
-	     ps->fd[1] = io;
-#ifdef NEWWAY
-
-/* since 2>&1 syntax does not specify a file name this is split up */
-	     if ((io.file != NULL) && (io.fid != -1))
-	        _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io);
-	     else
-	        {io.file = ps->fd[1].name;
-		 io.raw  = CSTRSAVE(p);};
-#else
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io);
-#endif
-	     ps->fd[2] = io;
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
-	     break;};
-#else
     switch (io.knd)
        {case SC_IO_STD_IN :
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io);
@@ -907,7 +876,6 @@ static int _SC_redirect_fd(subtask *ps, int i, char *p)
 
 	default :
 	     break;};
-#endif
 
     return(rv);}
 

@@ -11,8 +11,6 @@
 #include "score_int.h" 
 #include "scope_mem.h" 
 
-#define NEWWAY
-
 #ifndef EDOM
 # define EDOM 16
 #endif
@@ -168,22 +166,7 @@ unsigned int SC_char_index(char *s, int n)
 char *SC_strcat(char *dst, size_t lnd, char *src)
    {char *s;
 
-#if defined(NEWWAY)
     s = PS_nstrcat(dst, lnd, src);
-#else
-    size_t ld, ls, lc;
-        
-    s = NULL;
-    if ((dst != NULL) && (src != NULL))
-       {ld = strlen(dst);
-	ls = strlen(src);
-	if (ls + ld < lnd)
-	   s = strcat(dst, src);
-	else
-	   {lc = lnd - ld - 1;
-	    lc = min(lc, ls);
-	    s  = strncat(dst, src, lc);};};
-#endif
 
     return(s);}
 
@@ -203,18 +186,7 @@ char *SC_vstrcat(char *dst, size_t lnd, char *fmt, ...)
     SC_VSNPRINTF(t, lnd, fmt);
     SC_VA_END;
 
-#if defined(NEWWAY)
     s = PS_nstrcat(dst, lnd, t);
-#else
-    size_t ld, ls;
-
-    ld = strlen(dst);
-    ls = strlen(t);
-    if (ls + ld < lnd)
-       s = strcat(dst, t);
-    else
-       s = strncat(dst, t, lnd - ld - 1);
-#endif
 
     CFREE(t);
 
@@ -260,20 +232,7 @@ char *SC_dstrcat(char *dst, char *src)
 char *SC_strncpy(char *d, size_t nd, char *s, size_t ns)
    {
 
-#if defined(NEWWAY)
     s = PS_nstrncpy(d, nd, s, ns);
-#else
-    size_t nc;
-        
-    if (s == NULL)
-       nc = 0;
-    else
-       {nc = min(ns, nd-1);
-	strncpy(d, s, nc);};
-
-    if (d != NULL)
-       d[nc] = '\0';
-#endif
 
     return(d);}
 
@@ -508,13 +467,9 @@ char *SC_strsubst(char *d, int nc, char *s, char *a, char *b, size_t n)
 /* SC_STR_UPPER - upper casify the given string (in place) */
 
 char *SC_str_upper(char *s)
-   {int c;
-    char *ps;
+   {
 
-    if (s != NULL)
-       {ps = s;
-	while ((c = *ps) != '\0')
-	   *ps++ = toupper(c);};
+    PS_upcase(s);
 
     return(s);}
 
@@ -524,13 +479,9 @@ char *SC_str_upper(char *s)
 /* SC_STR_LOWER - lower casify the given string (in place) */
 
 char *SC_str_lower(char *s)
-   {int c;
-    char *ps;
+   {
 
-    if (s != NULL)
-       {ps = s;
-	while ((c = *ps) != '\0')
-	   *ps++ = tolower(c);};
+    PS_downcase(s);
 
     return(s);}
 
@@ -685,8 +636,7 @@ int SC_strerror(int err, char *msg, size_t nc)
 char *SC_trim_left(char *s, char *delim)
    {
 
-    if ((s != NULL) && (delim != NULL))
-       for (; (*s != '\0') && (strchr(delim, *s) != NULL); s++);
+    s = PS_trim(s, FRONT, delim);
 
     return(s);}
 
@@ -698,16 +648,9 @@ char *SC_trim_left(char *s, char *delim)
  */
 
 char *SC_trim_right(char *s, char *delim)
-   {int ic, nc, c;
+   {
 
-/* do nothing with zero length strings */
-    if ((s != NULL) && (delim != NULL))
-       {nc = strlen(s);
-	for (ic = nc - 1; ic >= 0; ic--)
-	    {c = s[ic];
-	     if (strchr(delim, c) == NULL)
-	        break;
-	     s[ic] = '\0';};};
+    s = PS_trim(s, BACK, delim);
 
     return(s);}
 
@@ -1064,36 +1007,7 @@ char *SC_ntok(char *d, int nc, char *s, int n, char *delim)
 char **SC_tokenize(char *s, char *delim)
    {char **sa;
 
-#if defined(NEWWAY)
     sa = PS_tokenize(s, delim);
-#else
-    int n;
-    char *tok, *t, *ps, *u;
-    SC_array *arr;
-
-    sa = NULL;
-
-    n = strlen(s);
-    t = CMAKE_N(char, n+100);
-    if (t != NULL)
-       {strcpy(t, s);
-
-	arr = SC_STRING_ARRAY();
-	SC_array_resize(arr, n/2, -1.0);
-
-	for (ps = t; TRUE; ps = NULL)
-	    {tok = SC_strtok(ps, delim, u);
-	     if (tok == NULL)
-	        break;
-
-	     SC_array_string_add_copy(arr, tok);};
-
-	SC_array_string_add(arr, NULL);
-
-	CFREE(t);
-
-	sa = SC_array_done(arr);};
-#endif
 
     return(sa);}
 
@@ -1308,25 +1222,7 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
 char **SC_file_strings(char *fname)
    {char **sa;
 
-#if defined(NEWWAY)
     sa = PS_file_text(FALSE, fname);
-#else
-    char s[MAX_BFSZ+1];
-    SC_array *a;
-    FILE *fp;
-
-    a = SC_STRING_ARRAY();
-
-    fp = fopen(fname, "r");
-    if (fp != NULL)
-       {while (fgets(s, MAX_BFSZ, fp) != NULL)
-	   {s[MAX_BFSZ] = '\0';
-	    SC_array_string_add_copy(a, s);};
-
-	fclose(fp);};
-
-    sa = SC_array_done(a);
-#endif
 
     return(sa);}
 
@@ -1338,21 +1234,7 @@ char **SC_file_strings(char *fname)
 int SC_strings_file(char **sa, char *fname, char *mode)
    {int rv;
 
-#if defined(NEWWAY)
     rv = PS_strings_file(sa, fname, mode);
-#else
-    int i;
-    FILE *fp;
-
-    rv = FALSE;
-
-    fp = fopen(fname, mode);
-    if (fp != NULL)
-       {for (i = 0; sa[i] != NULL; i++)
-	    fputs(sa[i], fp);
-	fclose(fp);
-	rv = TRUE;};
-#endif
 
     return(rv);}
 
@@ -1388,21 +1270,7 @@ int SC_strings_print(FILE *fp, char **sa, char *pre)
 void SC_free_strings(char **sa)
    {
 
-#if defined(NEWWAY)
     PS_free_strings(sa);
-#else
-    int i;
-    char *s;
-
-    if (sa != NULL)
-       {for (i = 0; TRUE; i++)
-	    {s = sa[i];
-	     if (s == NULL)
-	        break;
-	     CFREE(s);};
-
-	CFREE(sa);};
-#endif
 
     return;}
 
@@ -1438,23 +1306,7 @@ void SC_remove_string(char **sa, int n)
 char *SC_concatenate(char *s, int nc, int n, char **a, char *delim, int add)
    {char *rv;
 
-#if defined(NEWWAY)
     rv = PS_concatenate(s, nc, a, delim);
-#else
-    int i;
-
-    rv = NULL;
-
-    if ((s != NULL) && (nc > 0))
-       {if (add == FALSE)
-	   s[0] = '\0';
-	for (i = 0; i < n; i++)
-	    SC_vstrcat(s, nc, "%s%s", a[i], delim);
-
-	SC_LAST_CHAR(s) = '\0';
-
-        rv = s;};
-#endif
 
     return(rv);}
 
@@ -2223,19 +2075,10 @@ int SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list __a__)
 
     nd = 0;
     while (TRUE)
-#if 0
-       {char *pt;
-
-	for (pt = local; (((c = *fmt++) != '%') && (c != '\0')); pt++)
-	    *pt = c;
-
-        *pt = '\0';
-#else
        {for (i = 0; (((c = *fmt++) != '%') && (c != '\0') && (i < MAXLINE)); i++)
 	    local[i] = c;
 
         local[i] = '\0';
-#endif
 
 /* don't exceed the return buffer size */
 	CAT(dst, nc, nd, local);

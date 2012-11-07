@@ -30,9 +30,7 @@
 #define REPLY(msg, val)                                                      \
    {printf("%s:%ld\n", msg, (long) (val));                                   \
     fflush(stdout);                                                          \
-    if (_SC_ps.debug)                                                        \
-       {fprintf(_SC_ps.diag, "%s:%ld\n", msg, (long) (val));                 \
-        fflush(_SC_ps.diag);};}
+    _SC_diagnostic("%s:%ld\n", msg, (long) (val));}
 
 #define IO_OPER_START_TIME(_f)                                               \
    {double _to;                                                              \
@@ -699,16 +697,12 @@ NORETURN void SC_file_access(int log)
 
     cfd = -1;
     while (TRUE)
-       {if (_SC_ps.debug)
-           {fprintf(_SC_ps.diag, "\nWaiting for command ... ");
-            fflush(_SC_ps.diag);};
+       {_SC_diagnostic("\nWaiting for command ... ");
 
         if (SC_fgets(s, MAXLINE, stdin) == NULL)
            continue;
 
-        if (_SC_ps.debug)
-           {fprintf(_SC_ps.diag, "received: %s", s);
-            fflush(_SC_ps.diag);};
+	_SC_diagnostic("received: %s", s);
 
         code = s[0];
         indx = s[1];
@@ -719,9 +713,7 @@ NORETURN void SC_file_access(int log)
 	indx  = max(indx, 0);
         fp    = file[indx];
 
-        if (_SC_ps.debug)
-           {fprintf(_SC_ps.diag, "Doing: %c on file %d(%p)\n", code, indx, fp);
-            fflush(_SC_ps.diag);};
+	_SC_diagnostic("Doing: %c on file %d(%p)\n", code, indx, fp);
 
         switch (code)
            {case SC_FOPEN :
@@ -748,10 +740,7 @@ NORETURN void SC_file_access(int log)
                   name = SC_strtok(s+2, ",\n", t);
                   mode = SC_strtok(NULL, ",\n", t);
 		  if ((name != NULL) && (mode != NULL))
-		     {if (_SC_ps.debug)
-			 {fprintf(_SC_ps.diag, "   Open: %s, %s ... ", name, mode);
-			  fflush(_SC_ps.diag);};
-
+		     {_SC_diagnostic("   Open: %s, %s ... ", name, mode);
 		      fp = SC_fopen_safe(name, mode);}
 		  else
 		     fp = NULL;
@@ -765,9 +754,7 @@ NORETURN void SC_file_access(int log)
 
                       status = (i < MAX_FILES) ? i : -1;};
 
-                  if (_SC_ps.debug)
-                     {fprintf(_SC_ps.diag, "status(%d)\n", status);
-                      fflush(_SC_ps.diag);};
+		  _SC_diagnostic("status(%d)\n", status);
 
                   REPLY(OPEN_MSG, status);
 
@@ -810,9 +797,7 @@ NORETURN void SC_file_access(int log)
 
             case SC_FCLOSE :
                  file[indx] = NULL;
-                 if (_SC_ps.debug)
-                    {fprintf(_SC_ps.diag, "   Close: %d(%p) ... ", indx, fp);
-                     fflush(_SC_ps.diag);};
+		  _SC_diagnostic("   Close: %d(%p) ... ", indx, fp);
 
                  REPLY(CLOSE_MSG, fclose(fp));
                  break;

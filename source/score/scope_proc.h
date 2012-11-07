@@ -31,7 +31,8 @@
  *   signo    - range   1 <= 63
  *   internal - range  64 <= 71    (defined in score_int.h)
  *   exec     - range  72 <= 79    (some in scsysd.c)
- *   future   - range  80 <= 127
+ *   memory   - range  80          (memory exhausted abort)
+ *   future   - range  81 <= 127
  *   errno    - range 128 <= 255
  */
 
@@ -485,6 +486,7 @@ extern int
 
 extern void
  SC_reset_terminal(void),
+ _SC_diagnostic(char *fmt, ...),
  _SC_dethread(void),
  _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio),
  _SC_set_filedes(SC_iodes *fd, int ifd, char *name, int fl),
@@ -504,23 +506,17 @@ extern int
  _SC_ping_host(char *host, int to, int fm);
 
 
-/* SCHTTP.C declarations */
-
-extern int
- SC_connect(int fd, struct sockaddr *addr, socklen_t ln, int to);
-
-
 /* SCINET.C declarations */
 
-extern struct sockaddr_in
- *_SC_tcp_address(char *host, int port),
- *_SC_tcp_bind(int fd, int port);
+extern sckades
+ _SC_tcp_address(char *host, int port),
+ _SC_tcp_bind(int fd, int port);
 
 extern int
- _SC_tcp_serve(int fd, struct sockaddr_in *ad, void *a,
+ _SC_tcp_serve(int fd, sckades ad, void *a,
 	       int (*ex)(int *rv, void *a),
 	       PFFileCallback acc, PFFileCallback rej),
- _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad),
+ _SC_tcp_accept_connection(int fd, sckades ad),
  _SC_tcp_connect(char *host, int port, int to, int fm);
 
 

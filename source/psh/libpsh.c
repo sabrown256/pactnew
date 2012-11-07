@@ -616,9 +616,10 @@ int nchar(char *s, int c)
 char *upcase(char *s)
    {size_t i, nc;
         
-    nc = strlen(s);
-    for (i = 0; i < nc; i++)
-        s[i] = toupper((int) s[i]);
+    if (s != NULL)
+       {nc = strlen(s);
+	for (i = 0; i < nc; i++)
+	    s[i] = toupper((int) s[i]);};
 
     return(s);}
 
@@ -630,9 +631,10 @@ char *upcase(char *s)
 char *downcase(char *s)
    {size_t i, nc;
         
-    nc = strlen(s);
-    for (i = 0; i < nc; i++)
-        s[i] = tolower((int) s[i]);
+    if (s != NULL)
+       {nc = strlen(s);
+	for (i = 0; i < nc; i++)
+	    s[i] = tolower((int) s[i]);};
 
     return(s);}
 

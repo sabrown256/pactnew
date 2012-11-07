@@ -33,7 +33,7 @@ void *calloc(size_t ni, size_t bpi)
     nb = ni*bpi;
     p  = _SC_alloc_guarded(nb);
 
-    assert(p != NULL);
+    _SC_mem_exhausted(p == NULL);
 
     memset(p, 0, nb);
 

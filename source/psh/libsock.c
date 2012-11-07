@@ -35,14 +35,19 @@ enum e_ckind
 
 typedef enum e_ckind ckind;
 
+typedef union u_sckades sckades;
 typedef struct s_connection connection;
 typedef struct s_client client;
+
+union u_sckades
+   {struct sockaddr *uq;
+    struct sockaddr_in *in;};
 
 struct s_connection
    {int sfd;                     /* server side descriptor */
     int port;
     int pid;
-    struct sockaddr_in *sck;
+    sckades sck;
     fd_set afs;};
 
 struct s_client
@@ -67,18 +72,18 @@ struct s_client
 
 /*--------------------------------------------------------------------------*/
 
-/* TCP_SET_PORT - set the port of PS to PORT
+/* TCP_SET_PORT - set the port of AD to PORT
  *              - return the old value
  */
 
-int tcp_set_port(struct sockaddr_in *ps, int port)
+int tcp_set_port(sckades ad, int port)
    {int rv;
 
     rv = -1;
 
-    if (ps != NULL)
-       {rv = ps->sin_port;
-	ps->sin_port = htons(port);};
+    if (ad.in != NULL)
+       {rv = ad.in->sin_port;
+	ad.in->sin_port = htons(port);};
 
     return(rv);}
 
@@ -89,12 +94,12 @@ int tcp_set_port(struct sockaddr_in *ps, int port)
  *                 - for a connection to HOST/HADDR and PORT
  */
 
-struct sockaddr_in *tcp_get_address(char *host, int port, in_addr_t haddr)
+sckades tcp_get_address(char *host, int port, in_addr_t haddr)
    {socklen_t sasz;
     in_addr_t nad;
-    struct sockaddr_in *ps;
+    sckades ad;
 
-    ps = NULL;
+    ad.in = NULL;
     SOCKADDR_SIZE(sasz);
 
 /* work out a valid host address */
@@ -118,44 +123,44 @@ struct sockaddr_in *tcp_get_address(char *host, int port, in_addr_t haddr)
 
 /* initialize the socket address */
     if (haddr != INADDR_NONE)
-       {ps = MAKE(struct sockaddr_in);
-	if (ps != NULL)
-	   {memset(ps, 0, sasz);
-	    ps->sin_family = PF_INET;
+       {ad.in = MAKE(struct sockaddr_in);
+	if (ad.in != NULL)
+	   {memset(ad.in, 0, sasz);
+	    ad.in->sin_family = PF_INET;
 	    if (haddr == INADDR_ANY)
-	       ps->sin_addr.s_addr = htonl(haddr);
+	       ad.in->sin_addr.s_addr = htonl(haddr);
 	    else
-	       {tcp_set_port(ps, port);
-		memcpy(&ps->sin_addr, &haddr, sizeof(in_addr_t));};};};
+	       {tcp_set_port(ad, port);
+		memcpy(&ad.in->sin_addr, &haddr, sizeof(in_addr_t));};};};
 
-    return(ps);}
+    return(ad);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TCP_BIND_PORT - bind FD to PS and PORT
+/* TCP_BIND_PORT - bind FD to AD and PORT
  *               - if successful return the PORT
  *               - otherwise return -1
  */
 
-int tcp_bind_port(int fd, struct sockaddr_in *ps, int port, int pmin)
+int tcp_bind_port(int fd, sckades ad, int port, int pmin)
    {int rv;
     socklen_t sasz;
 
     rv = -1;
 
-    if (ps != NULL)
+    if (ad.uq != NULL)
        {SOCKADDR_SIZE(sasz);
 
 	if (port > 0)
-	   {tcp_set_port(ps, port);
-	    rv = bind(fd, (struct sockaddr *) ps, sasz);
+	   {tcp_set_port(ad, port);
+	    rv = bind(fd, ad.uq, sasz);
 	    rv = (rv >= 0) ? port : -1;}
 
 	else
 	   {for (port = pmin; port < 65000; port++)
-	        {tcp_set_port(ps, port);
-		 rv = bind(fd, (struct sockaddr *) ps, sasz);
+	        {tcp_set_port(ad, port);
+		 rv = bind(fd, ad.uq, sasz);
 		 if (rv >= 0)
 		    {rv = port;
 		     break;};};};};
@@ -165,53 +170,48 @@ int tcp_bind_port(int fd, struct sockaddr_in *ps, int port, int pmin)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TCP_ACCEPT_CONNECTION - listen on bound socket FD, PS
+/* TCP_ACCEPT_CONNECTION - listen on bound socket FD, AD
  *                       - and return the descriptor of an accepted
  *                       - connection
  */
 
-int tcp_accept_connection(int fd, struct sockaddr_in *ps, int ao)
+int tcp_accept_connection(int fd, sckades ad, int ao)
    {int nfd, st;
     socklen_t sasz;
-    struct sockaddr *sa;
     
     nfd = -1;
 
-    sa = (struct sockaddr *) ps;
     SOCKADDR_SIZE(sasz);
 
     if (ao == FALSE)
-       {getsockname(fd, sa, &sasz);
+       {getsockname(fd, ad.uq, &sasz);
 
 	st = listen(fd, 5);}
     else
        st = 0;
 
     if (st >= 0)
-       nfd = accept(fd, sa, &sasz);
+       nfd = accept(fd, ad.uq, &sasz);
 
     return(nfd);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TCP_INITIATE_CONNECTION - initiate a connection with FD and PS */
+/* TCP_INITIATE_CONNECTION - initiate a connection with FD and AD */
 
-int tcp_initiate_connection(int fd, struct sockaddr_in *ps)
+int tcp_initiate_connection(int fd, sckades ad)
    {int ia, na, rv;
     socklen_t sasz;
-    struct sockaddr *sa;
 
     SOCKADDR_SIZE(sasz);
-
-    sa = (struct sockaddr *) ps;
 
 /* try NATTEMPTS times to connect to the server */
     rv = 0;
     na  = NATTEMPTS;
     for (ia = 0; ia < na; ia++)
         {sleep(ia);
-	 rv = connect(fd, sa, sasz);
+	 rv = connect(fd, ad.uq, sasz);
 	 if (rv >= 0)
 	    break;};
 
@@ -486,7 +486,7 @@ char **get_connect_socket(client *cl)
 	srv  = cl->scon;
 
 	sa = parse_conn(root);
-	if ((sa != NULL) && (srv->sck == NULL))
+	if ((sa != NULL) && (srv->sck.in == NULL))
 	   {host  = sa[CONN_NAME];
 	    port  = atoi(sa[CONN_PORT]);
 	    haddr = atol(sa[CONN_IP]);

@@ -159,6 +159,27 @@ void SC_mem_stats(int64_t *al ARG([*],out), int64_t *fr ARG([*],out),
 
 /*--------------------------------------------------------------------------*/
 
+/* _SC_MEM_EXHAUSTED - if CND is TRUE then system memory is exhausted
+ *                   - and we must break the cardinal rules:
+ *                   -    1) print an error message
+ *                   -    2) exit the application
+ *                   - attempts at graceful shutdown will likely
+ *                   - fail because printf will not work if there
+ *                   - is no memory available
+ */
+
+void _SC_mem_exhausted(int cnd)
+   {char *msg = "\nFATAL - MEMORY EXHAUSTED, NO RECOVERY POSSIBLE - EXITING\n\n";
+
+    if (cnd == TRUE)
+       {write(2, msg, strlen(msg));
+	exit(80);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_CONFIGURE_MM - configure the memory manager bin structure
  *                 - bin sizes increase linearly up to MXL and
  *                 - exponentially up to the maximum managed size MXM
@@ -211,7 +232,7 @@ void SC_configure_mm(long mxl, long mxm, long bsz, double r)
        nb = sizeof(long)*_SC_ms.n_bins;
        _SC_ms.bins = (long *) malloc(nb);
 
-       assert(_SC_ms.bins != NULL);
+       _SC_mem_exhausted(_SC_ms.bins == NULL);
 
        _SC_ms.bins[0] = 8;
 
@@ -356,7 +377,7 @@ void _SC_init_heap(SC_heap_des *ph, int id)
     nb  = _SC_ms.n_bins*sizeof(mem_descriptor *);
     lst = (mem_descriptor **) malloc(nb);
 
-    assert(lst != NULL);
+    _SC_mem_exhausted(lst == NULL);
 
     for (i = 0; i < _SC_ms.n_bins; i++)
         lst[i] = NULL;

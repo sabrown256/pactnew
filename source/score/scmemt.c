@@ -185,7 +185,7 @@ static void _SC_grow_thread_data(int nt, int ne)
        {nbn = (st.ntx * st.nex)*sizeof(void *);
         t   = malloc(nbn);
 
-	assert(t != NULL);
+        _SC_mem_exhausted(t == NULL);
 
         memset(t, 0, nbn);
 
@@ -215,7 +215,7 @@ static void _SC_grow_thread_data(int nt, int ne)
 
 		      d = malloc(nb);
 
-		      assert(d != NULL);
+		      _SC_mem_exhausted(d == NULL);
 
 		      memset(d, 0, nb);
 
