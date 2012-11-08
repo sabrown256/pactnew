@@ -9,7 +9,7 @@
 # include "cpyright.h"
 #
 
-PyPACTVers = 2.numeric
+PyPACTVers = 3.numpy
 LibName=py_${PyPACTVers}
 PyDir  = ${LibDir}/python${PY_Vers}/pact
 TGTLib = ${LibDir}/lib${LibName}.a
