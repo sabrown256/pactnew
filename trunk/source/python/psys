@@ -1,0 +1,61 @@
+#!/bin/csh -f
+#
+# PSYS - Python build script
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+@ err = 0
+
+source ../scripts/functions-pact.csh
+
+set tgt = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: psys [-h] <tgt>"
+           echo "   h     this help message"
+           echo "   <tgt> one of incinstall, devlib, link"
+           echo ""
+           exit(1)
+      default:
+           set tgt = $1
+           breaksw
+   endsw
+   shift
+end
+
+InitLog log $cwd/z-${System}/log.psys
+
+set vlst = ""
+if (($PY_Vers =~ 2*) && ($HAVE_PY_NUMERIC == TRUE)) then
+   flog $log set vlst = ( $vlst 2.numeric )
+endif
+if (($PY_Vers =~ 2*) && ($HAVE_PY_NUMPY == TRUE)) then
+   flog $log set vlst = ( $vlst 2.numpy )
+endif
+if (($PY_Vers =~ 3*) && ($HAVE_PY_NUMPY == TRUE)) then
+   flog $log set vlst = ( $vlst 3.numpy )
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+foreach v ( $vlst)
+
+   flog $log pushd $v
+
+   ftee $log pact $tgt
+
+   flog $log popd
+
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)

@@ -4,7 +4,7 @@
 #      - this is a portability hack mainly because of AIX
 #
 
-set lpy_pact_vers = 2
+set lpy_pact_vers = 2.numpy
 set lpy_pact_lib  = libpy_$lpy_pact_vers
 
 source ../scripts/functions-pact.csh
