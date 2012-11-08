@@ -7,7 +7,7 @@
 set lpy_pact_vers = 2.numpy
 set lpy_pact_lib  = libpy_$lpy_pact_vers
 
-source ../scripts/functions-pact.csh
+source ../../scripts/functions-pact.csh
 
 set lpy_exe = `which python`
 if (!(-x "$lpy_exe")) then
@@ -38,14 +38,14 @@ while ($#argv > 0)
 end
 
 @ err    = 0
-set Arch = `../scripts/cfgman use`
+set Arch = `../../scripts/cfgman use`
 
 InitLog Log $cwd/z-$Arch/obj/log.load
 
 flog $Log (env | sort)
 flog $Log set SrcDir = $cwd
 flog $Log set OS     = `uname -s`
-flog $Log set Root   = $cwd:h/dev/$Arch
+flog $Log set Root   = $cwd:h:h/dev/$Arch
 flog $Log set DevInc = $Root/include
 flog $Log set DevLib = $Root/lib
 
@@ -201,7 +201,7 @@ NoteD $Log -n "   Python import ... "
 Note $Log ""
 
 # finish up
-flog $Log cp pact/pgs.py pact/pdb.py $lpy_pact
+flog $Log cp ../pact/{pgs.py,pdb.py} $lpy_pact
 flog $Log touch $lpy_pact/__init__.py
 
 flog $Log $lpy_exe -c 'import compileall;compileall.main()' $lpy_pact

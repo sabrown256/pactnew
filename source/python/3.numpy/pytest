@@ -11,7 +11,7 @@
 setenv Package python
 setenv Test    ""
 set vgdirs = ( . )
-source ../scripts/test-env
+source ../../scripts/test-env
 
 set Tests = ""
 
@@ -35,6 +35,8 @@ end
 
 cd $TestDir
 
+set lpydir = $LPYTHON/pact_3.numpy
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -49,7 +51,7 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-f $LPYTHON/pact_2/pdb.py) then
+else if (-f $lpydir/pdb.py) then
 
 # clean up the test dir
    rm -f $Log

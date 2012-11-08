@@ -19,7 +19,7 @@ while ($#argv > 0)
            echo ""
            echo "Usage: psys [-h] <tgt>"
            echo "   h     this help message"
-           echo "   <tgt> one of incinstall, devlib, link"
+           echo "   <tgt> one of generate, incinstall, devlib, link"
            echo ""
            exit(1)
       default:
