@@ -117,7 +117,7 @@ ${LibDep} : ${Hdrs} ${hdrf}
 
 hdrf = 
 
-IncAction = cp ../${PACTTmpDir}/py-*.h ${PACTTmpDir}
+IncAction = cp ../${PACTTmpDir}/{gp-*.c,py-*.h} ${PACTTmpDir}
 
 # language bindings
 

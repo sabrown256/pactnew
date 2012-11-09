@@ -11,4 +11,4 @@ ignoring any patch version number
 """
 import sys
 ver = sys.version_info
-print "%d.%d" % (ver[0], ver[1])
+print("%d.%d" % (ver[0], ver[1]))
