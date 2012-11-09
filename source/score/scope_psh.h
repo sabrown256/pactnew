@@ -373,7 +373,7 @@ extern char
  **PS_client_ex(client *cl, char *req);
 
 extern client
- *PS_make_client(ckind type, int auth, char *root, 
+ *PS_make_client(ckind type, int port, int auth, char *root, 
 		 void (*clog)(client *cl, int lvl, char *fmt, ...));
 
 

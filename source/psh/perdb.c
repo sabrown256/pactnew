@@ -565,7 +565,7 @@ static int server(char *root, int init, int dmn)
 	signal(SIGINT, sigdone);
 	signal(SIGHUP, sigrestart);
 
-	cl     = make_client(SERVER, svs.auth, root, cl_logger);
+	cl     = make_client(SERVER, DB_PORT, svs.auth, root, cl_logger);
 	svs.cl = cl;
 
 	CLOG(cl, 1, "start server");
@@ -601,7 +601,7 @@ static int exchange(char *root, int ltr, char *req)
     char **ta;
     client *cl;
 
-    cl = make_client(CLIENT, svs.auth, root, cl_logger);
+    cl = make_client(CLIENT, DB_PORT, svs.auth, root, cl_logger);
     ta = _db_clnt_ex(cl, TRUE, req);
     free_client(cl);
 

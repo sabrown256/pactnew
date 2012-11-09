@@ -52,6 +52,7 @@ struct s_connection
 
 struct s_client
    {int cfd;                     /* client side descriptor */
+    int port;
     int auth;
     int nkey;
     char *key;
@@ -418,7 +419,7 @@ static int init_server(client *cl, int auth)
 	srv->sfd = socket(PF_INET, SOCK_STREAM, 0);
 	if (srv->sfd > 0)
 	   {srv->sck = tcp_get_address(NULL, 0, INADDR_ANY);
-	    port     = tcp_bind_port(srv->sfd, srv->sck, -1, 15000);};
+	    port     = tcp_bind_port(srv->sfd, srv->sck, -1, cl->port);};
 
 	srv->port = port;
 	if (srv->port >= 0)

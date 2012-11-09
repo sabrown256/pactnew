@@ -2842,7 +2842,7 @@ int main(int c, char **v, char **env)
     signal(SIGINT,  sigdone);
 
     root = cgetenv(TRUE, "PERDB_PATH");
-    cl   = make_client(CLIENT, FALSE, root, cl_logger);
+    cl   = make_client(CLIENT, DB_PORT, FALSE, root, cl_logger);
 
     ok = reset_env(c, v);
     if (ok == -1)
