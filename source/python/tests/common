@@ -11,3 +11,5 @@
 setenv Package  python
 setenv Test     $0:t
 source ../../../scripts/test-env
+
+setenv PYTHONPATH $cwd

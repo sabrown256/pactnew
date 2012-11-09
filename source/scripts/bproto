@@ -10,7 +10,9 @@
 
 unalias *
 
-set arch = `../scripts/cfgman use`
+set ldir = `dirname $0`
+set arch = `$ldir/cfgman use`
+set root = $ldir:h/dev/$arch
 
 set err = 0
 set d   = $cwd
@@ -59,8 +61,8 @@ end
 set opt = "-l"
 set opt = ""
 
-source ../dev/$arch/etc/env-pact.csh
-source ../scripts/functions-pact.csh
+source $root/etc/env-pact.csh
+source $ldir/functions-pact.csh
 
 InitLog Log $cwd/$dst/bproto
 

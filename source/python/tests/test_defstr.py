@@ -10,7 +10,7 @@ Test defstr
 
 """
 
-import pact_2.pdb as pdb
+import pact_test.pdb as pdb
 import unittest
 import struct
 import test_leak

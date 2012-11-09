@@ -8,7 +8,7 @@
 
 """
 
-import pact_2.pdb as pdb
+import pact_test.pdb as pdb
 import unittest
 
 class SCmem(unittest.TestCase):

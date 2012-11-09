@@ -35,7 +35,15 @@ end
 
 cd $TestDir
 
-set lpydir = $LPYTHON/pact_2.numeric
+rm -f $Log
+touch $Log
+
+flog $Log set lpydir = $LPYTHON/pact_2.numeric
+flog $Log set lpylnk = pact_test
+flog $Log rm -f $lpylnk
+flog $Log ln -s $lpydir $lpylnk
+flog $Log setenv PYTHONPATH $cwd
+flog $Log ls -l $PYTHONPATH/
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -52,10 +60,6 @@ if ($RUN_TESTS == FALSE) then
 # run the tests
 
 else if (-f $lpydir/pdb.py) then
-
-# clean up the test dir
-   rm -f $Log
-   touch $Log
 
    NoteD $Log ""
    NoteD $Log "PYTHON TEST ......"
@@ -94,6 +98,8 @@ else if (-f $lpydir/pdb.py) then
 endif
 
 $TEST_CHECK fin -e $xstatus
+
+flog $Log rm -f $lpylnk
 
 exit($status)
 

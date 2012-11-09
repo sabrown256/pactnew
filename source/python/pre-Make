@@ -9,15 +9,17 @@
 # include "cpyright.h"
 #
 
+# dummy target lib just to get to LibAction
+TGTLib = ${LibDir}/libpy.a
+
+RemoveAction = @./psys remove
+LibAction    = @./psys devlib
+IncAction    = @./psys incinstall
+
+#--------------------------------------------------------------------------
 
 generate:
 	@./psys generate
-
-incinstall:
-	@./psys incinstall
-
-devlib:
-	@./psys devlib
 
 link:
 	@./psys link
@@ -32,6 +34,6 @@ inform :
 	@./psys inform
 
 test :
-	@./psys pytest
+	@./psys test
 
 

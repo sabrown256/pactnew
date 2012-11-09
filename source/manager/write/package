@@ -45,11 +45,7 @@ dbmget $Log EtcDir^           \
 # must have one package per line because dmake needs it that way
     foreach i ($Pkgs)
        if ($i == python) then
-          if (($HAVE_PYTHON == TRUE) && ($HAVE_PY_NUMPY == TRUE)) then
-             echo "$i" >>& $STDOUT
-          endif
-       else if ($i == pya) then
-          if (($HAVE_PYTHON == TRUE) && ($HAVE_PY_NUMERIC == TRUE)) then
+          if ($HAVE_PYTHON == TRUE) then
              echo "$i" >>& $STDOUT
           endif
        else if ($i == fortran) then
