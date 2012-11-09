@@ -31,7 +31,7 @@ while (line):
   line = fd.readline()
 
 if compiler != None:
-  print compiler
+  print(compiler)
 else:
-  print ''
+  print('')
   sys.exit(1)

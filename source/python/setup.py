@@ -25,7 +25,7 @@ def log(string):
   global debug
 
   if debug:
-    print str(string) 
+    print(str(string))
     
 # Default assumption: dsys built PACT    
 autotool = False 
@@ -64,8 +64,8 @@ if dsys:
     PACTHOME = os.environ.get('PACT') # , '/usr/gapps/pactnew')
   
   if not os.path.exists(PACTHOME):
-    print "%s does not exist" % PACTHOME
-    print "Set environmental variable PACT"
+    print("%s does not exist" % PACTHOME)
+    print("Set environmental variable PACT")
     sys.exit(1)
   
 # GTK_HOME 

@@ -9,4 +9,4 @@
 Print path to Python's include directory
 """
 from distutils.sysconfig import *
-print get_python_inc()
+print(get_python_inc())
