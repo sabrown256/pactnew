@@ -17,6 +17,8 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
+# define DB_PORT  15000
+
 typedef struct s_database database;
 typedef struct s_vardes vardes;
 
@@ -116,7 +118,7 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 
     if (cl == NULL)
        {root = cgetenv(TRUE, "PERDB_PATH");
-	cl   = make_client(CLIENT, FALSE, root, cl_logger);};
+	cl   = make_client(CLIENT, DB_PORT, FALSE, root, cl_logger);};
 
 /* make sure that there is a server running */
     if (init == TRUE)

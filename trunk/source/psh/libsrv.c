@@ -564,7 +564,7 @@ static void sigtimeout(int sig)
 
 /* MAKE_CLIENT - initialize and return a client connection instance */
 
-client *make_client(ckind type, int auth, char *root, 
+client *make_client(ckind type, int port, int auth, char *root, 
 		    void (*clog)(client *cl, int lvl, char *fmt, ...))
    {char *fcon, *t;
     client *cl;
@@ -576,6 +576,7 @@ client *make_client(ckind type, int auth, char *root,
 	fcon = (t == NULL) ? NULL : STRSAVE(t);
 
 	cl->cfd    = -1;
+        cl->port   = port;
         cl->auth   = auth;
 	cl->nkey   = 0;
 	cl->key    = NULL;

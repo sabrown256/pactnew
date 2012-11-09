@@ -173,7 +173,7 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
        {int auth;
 
 	auth = FALSE;
-	cl = PS_make_client(CLIENT, auth, db, PS_cl_logger);};
+	cl = PS_make_client(CLIENT, DB_PORT, auth, db, PS_cl_logger);};
 
     PS_dbset(cl, "gstatus", "");
 
