@@ -214,12 +214,12 @@ set LibVers = 1
     Note $STDOUT '#'
     Note $STDOUT 'man1install :'
     Note $STDOUT '	@[ ! -f ${IncDir}/.lock ] || { echo "${IncDir} is locked" ; exit 1 ; }'
-    Note $STDOUT '	../scripts/maninstall -s 1'
+    Note $STDOUT '	${ScrDir}/maninstall -s 1'
 #    Note $STDOUT '	@(echo "sinstall ${archo}/*.1 ${Man1Dir}" ; sinstall ${archo}/*.1 ${Man1Dir})'
     Note $STDOUT ""
     Note $STDOUT 'man3install :'
     Note $STDOUT '	@[ ! -f ${IncDir}/.lock ] || { echo "${IncDir} is locked" ; exit 1 ; }'
-    Note $STDOUT '	../scripts/maninstall -s 3'
+    Note $STDOUT '	${ScrDir}/maninstall -s 3'
 #    Note $STDOUT '	@(echo "sinstall ${archo}/*.3 ${Man3Dir}" ; sinstall ${archo}/*.3 ${Man3Dir})'
     Note $STDOUT ""
 
@@ -316,7 +316,7 @@ set LibVers = 1
 # NOTE: technically this should be all of them but that results in
 # bproto being run 3 times - at least by dmake
     Note $STDOUT '${gfb} :'
-    Note $STDOUT '	@../scripts/bproto'
+    Note $STDOUT '	@${ScrDir}/bproto'
     Note $STDOUT ''
 
     Note $STDOUT 'generate : ${gfb} ${hdrf}'

@@ -185,6 +185,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     endif
 
     Note $STDOUT "BaseDir = $BaseDir"
+    Note $STDOUT "ScrDir  = $BaseDir/scripts"
     Note $STDOUT "SysDir  = $SysDir"
     Note $STDOUT 'ScmDir  = ${SysDir}/scheme'
     Note $STDOUT 'BinDir  = ${SysDir}/bin'

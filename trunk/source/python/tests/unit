@@ -16,6 +16,8 @@ set msg = "Unit Test ......................"
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
+   Note $Log "PYTHONPATH = $PYTHONPATH"
+
    flog $Log $CFE $PYTHON $FilesDir/unittests.py
    set xstatus = $status
 

@@ -11,19 +11,23 @@ unalias *
 
 source ../scripts/functions-pact.csh
 
-set tgt = ""
+@ n = $#argv
+set tgt = $argv[$n]
+@ n = $n - 1
+set arg = ( $argv[1-$n] )
+unset n
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: psys [-h] <tgt>"
+           echo "Usage: psys [-h] [<arg>*] <tgt>"
            echo "   h     this help message"
-           echo "   <tgt> one of generate, incinstall, devlib, link"
+           echo "   <arg> argument to pact executable"
+           echo "   <tgt> make target"
            echo ""
            exit(1)
       default:
-           set tgt = $1
            breaksw
    endsw
    shift
@@ -49,7 +53,7 @@ foreach v ( $vlst)
 
    flog $log pushd $v
 
-   ftee $log pact $tgt
+   ftee $log pact $arg $tgt
 
    flog $log popd
 

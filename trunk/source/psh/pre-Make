@@ -128,7 +128,6 @@ ${BinDir}/template : template.c ${LibFiles}
 
 
 link : ${InstallDep}
-	sinstall ${IncFiles} ${IncDir}/shell
 
 install :
 	pact link

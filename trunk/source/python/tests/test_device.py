@@ -9,7 +9,7 @@
 #
 
 
-import pact_2.pgs as pgs
+import pact_test.pgs as pgs
 import unittest
 #import test_leak
 import work_gsatst

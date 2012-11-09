@@ -11,7 +11,7 @@
 
 PyPACTVers = 2.numeric
 LibName=py_${PyPACTVers}
-PyDir  = ${LibDir}/python${PY_Vers}/pact
+PyDir  = ${LibDir}/python${PY_Vers}/pact_${PyPACTVers}
 TGTLib = ${LibDir}/lib${LibName}.a
 
 OD = DefaultG
@@ -73,18 +73,6 @@ OPDB = ${OPDBO} ${OPMLO} ${OPPO}
 OPGS = ${OPDBO} ${OPMLO} ${OPPO} ${OPGSO}
 Objs = ${OPGS}
 
-gps = gp-score.c gp-pml.c gp-pdb.c   \
-      gp-ppc.c gp-pgs.c gp-panacea.c \
-      gp-scheme.c
-
-gpo = gp-score.o gp-pml.o gp-pdb.o   \
-      gp-ppc.o gp-pgs.o gp-panacea.o \
-      gp-scheme.o
-
-gpa = ${TGTLib}(gp-score.o) ${TGTLib}(gp-pml.o) ${TGTLib}(gp-pdb.o)   \
-      ${TGTLib}(gp-ppc.o) ${TGTLib}(gp-pgs.o) ${TGTLib}(gp-panacea.o) \
-      ${TGTLib}(gp-scheme.o)
-
 ArPDBO = ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbPDBfile.o) ${TGTLib}(pdbmemdes.o) \
          ${TGTLib}(pdbdefstr.o) ${TGTLib}(pdbpdbdata.o) \
          ${TGTLib}(pdbhashtab.o) ${TGTLib}(pdbhasharr.o) \
@@ -102,7 +90,7 @@ ArPPO  = ${TGTLib}(pputil.o) ${TGTLib}(pptypes.o) ${TGTLib}(pparrays.o) \
 ArPGSO = ${TGTLib}(pgsmodule.o) ${TGTLib}(pgsdevice.o) ${TGTLib}(pgsgraph.o) \
          ${TGTLib}(pgsimage.o) ${TGTLib}(pgspalette.o) ${TGTLib}(utilpgs.o)
 
-ArObjs = ${ArPDBO} ${ArPMLO} ${ArPPO} ${ArPGSO} ${gpa}
+ArObjs = ${ArPDBO} ${ArPMLO} ${ArPPO} ${ArPGSO}
 
 ${Objs} : ${Hdrs}
 ${ArObjs} : ${Hdrs}
@@ -120,10 +108,6 @@ hdrf =
 IncAction = 
 
 # language bindings
-
-SDir = ${PACTSrcDir}
-
-LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${PACTTmpDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" -f ../../pre-Make devlib)
 
 TGTSPDB  = ${PyDir}/libpypdb.so
 TGTShPDB = ${TGTSPDB}.1

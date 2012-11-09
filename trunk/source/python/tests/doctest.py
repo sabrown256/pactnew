@@ -3,7 +3,7 @@
 #
 
 
-import pact_2.pdb as pdb
+import pact_test.pdb as pdb
 
 d = pdb.pdbdata(4)
 print d

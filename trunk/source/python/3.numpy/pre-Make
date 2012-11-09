@@ -11,7 +11,7 @@
 
 PyPACTVers = 3.numpy
 LibName=py_${PyPACTVers}
-PyDir  = ${LibDir}/python${PY_Vers}/pact
+PyDir  = ${LibDir}/python${PY_Vers}/pact_${PyPACTVers}
 TGTLib = ${LibDir}/lib${LibName}.a
 
 OD = DefaultG
