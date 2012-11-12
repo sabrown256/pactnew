@@ -360,7 +360,7 @@ PP_defstr_tp_dealloc(PP_defstrObject *self)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.as_type.dealloc) */
     _PP_rl_defstr(self);
-    self->ob_type->tp_free((PyObject*)self);
+    PY_TYPE(self)->tp_free((PyObject*)self);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.as_type.dealloc) */
 }
 
@@ -383,7 +383,7 @@ PP_defstr_tp_call(PP_defstrObject *self, PyObject *args, PyObject *kwds)
         PyErr_Format(
             PyExc_TypeError,
             "'%s' object is not callable",
-            self->ob_type->tp_name);
+            PY_TYPE(self)->tp_name);
         rv = NULL;
     } else {
         rv = PyObject_Call((PyObject *) self->ctor, args, kwds);
@@ -424,7 +424,7 @@ PP_defstr_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_defstr_Type; */
+/*  return PY_TYPE(op) == &PP_defstr_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -524,7 +524,7 @@ static char PP_defstr_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_defstr_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "defstr",                       /* tp_name */
         sizeof(PP_defstrObject),         /* tp_basicsize */

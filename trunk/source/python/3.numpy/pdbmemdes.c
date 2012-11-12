@@ -176,7 +176,7 @@ PP_memdes_tp_dealloc(PP_memdesObject *self)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.memdes.as_type.dealloc) */
     _PD_rl_descriptor(self->desc);
-    self->ob_type->tp_free((PyObject*)self);
+    PY_TYPE(self)->tp_free((PyObject*)self);
 /* DO-NOT-DELETE splicer.end(pdb.memdes.as_type.dealloc) */
 }
 
@@ -198,7 +198,7 @@ PP_memdes_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_memdes_Type; */
+/*  return PY_TYPE(op) == &PP_memdes_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -210,7 +210,7 @@ static char PP_memdes_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_memdes_Type = {
-        PyVarObject_HEAD_INIT(&PyType_Type, 0)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "memdes",                       /* tp_name */
         sizeof(PP_memdesObject),         /* tp_basicsize */

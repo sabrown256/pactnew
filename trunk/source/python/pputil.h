@@ -8,6 +8,8 @@
 
 #include "cpyright.h"
 
+#include "ppcommon.h"
+
 /*--------------------------------------------------------------------------*/
 
 /*                           DEFINED CONSTANTS                              */
@@ -127,7 +129,7 @@ struct s_PP_type_entry {
     PP_types        typecode;
     int             sequence;  /* TRUE if type knows how to create a sequence (PyString) */
     PP_descr       *descr;
-    PyTypeObject   *ob_type;
+    PyTypeObject   *obtyp;
     PP_pack_func    pack;
     PP_unpack_func  unpack;
     PP_get_descr    get_descr;
@@ -334,7 +336,7 @@ PP_type_entry
  *PP_inquire_type(PP_file *fileinfo, char *ctype),
  *PP_inquire_object(PP_file *fileinfo, PyObject *obj),
  *PP_make_type_entry(PP_types typecode, int sequence, PP_descr *descr,
-                     PyTypeObject *ob_type, PP_pack_func pack,
+                     PyTypeObject *otype, PP_pack_func pack,
                      PP_unpack_func unpack, PP_get_descr get_descr);
 
 PP_class_descr

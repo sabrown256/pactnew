@@ -158,7 +158,7 @@ PP_graph_tp_dealloc(PP_graphObject *self)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.graph.as_type.dealloc) */
     PG_rl_graph(self->data, TRUE, TRUE);
-    self->ob_type->tp_free((PyObject*)self);
+    PY_TYPE(self)->tp_free((PyObject*)self);
 /* DO-NOT-DELETE splicer.end(pgs.graph.as_type.dealloc) */
 }
 
@@ -180,7 +180,7 @@ PP_graph_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_graph_Type; */
+/*  return PY_TYPE(op) == &PP_graph_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -192,7 +192,7 @@ static char PP_graph_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_graph_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "graph",                       /* tp_name */
         sizeof(PP_graphObject),         /* tp_basicsize */

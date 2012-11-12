@@ -41,7 +41,7 @@ typedef int Py_ssize_t;
 /*                               OBJECT field                               */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_field_Check(op)    ((op)->ob_type == &PP_field_Type) */
+/* #define PP_field_Check(op)    (PY_TYPE(op) == &PP_field_Type) */
 
 typedef struct s_PP_fieldObject *PP_fieldObjectp;
 
@@ -65,7 +65,7 @@ extern PyTypeObject PP_field_Type;
 /*                           OBJECT mesh_topology                           */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_mesh_topology_Check(op)    ((op)->ob_type == &PP_mesh_topology_Type) */
+/* #define PP_mesh_topology_Check(op)    (PY_TYPE(op) == &PP_mesh_topology_Type) */
 
 typedef struct s_PP_mesh_topologyObject *PP_mesh_topologyObjectp;
 
@@ -89,7 +89,7 @@ extern PyTypeObject PP_mesh_topology_Type;
 /*                                OBJECT set                                */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_set_Check(op)    ((op)->ob_type == &PP_set_Type) */
+/* #define PP_set_Check(op)    (PY_TYPE(op) == &PP_set_Type) */
 
 typedef struct s_PP_setObject *PP_setObjectp;
 
@@ -113,7 +113,7 @@ extern PyTypeObject PP_set_Type;
 /*                              OBJECT mapping                              */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_mapping_Check(op)    ((op)->ob_type == &PP_mapping_Type) */
+/* #define PP_mapping_Check(op)    (PY_TYPE(op) == &PP_mapping_Type) */
 
 typedef struct s_PP_mappingObject *PP_mappingObjectp;
 
@@ -137,7 +137,7 @@ extern PyTypeObject PP_mapping_Type;
 /*                              OBJECT defstr                               */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_defstr_Check(op)    ((op)->ob_type == &PP_defstr_Type) */
+/* #define PP_defstr_Check(op)    (PY_TYPE(op) == &PP_defstr_Type) */
 
 typedef struct s_PP_defstrObject *PP_defstrObjectp;
 
@@ -164,7 +164,7 @@ extern PyTypeObject PP_defstr_Type;
 /*                              OBJECT pdbdata                              */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_pdbdata_Check(op)    ((op)->ob_type == &PP_pdbdata_Type) */
+/* #define PP_pdbdata_Check(op)    (PY_TYPE(op) == &PP_pdbdata_Type) */
 
 typedef struct s_PP_pdbdataObject *PP_pdbdataObjectp;
 
@@ -188,7 +188,7 @@ extern PyTypeObject PP_pdbdata_Type;
 /*                              OBJECT hashtab                              */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_hashtab_Check(op)    ((op)->ob_type == &PP_hashtab_Type) */
+/* #define PP_hashtab_Check(op)    (PY_TYPE(op) == &PP_hashtab_Type) */
 
 typedef struct s_PP_hashtabObject *PP_hashtabObjectp;
 
@@ -212,7 +212,7 @@ extern PyTypeObject PP_hashtab_Type;
 /*                              OBJECT hasharr                              */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_hasharr_Check(op)    ((op)->ob_type == &PP_hasharr_Type) */
+/* #define PP_hasharr_Check(op)    (PY_TYPE(op) == &PP_hasharr_Type) */
 
 typedef struct s_PP_hasharrObject *PP_hasharrObjectp;
 
@@ -236,7 +236,7 @@ extern PyTypeObject PP_hasharr_Type;
 /*                               OBJECT assoc                               */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_assoc_Check(op)    ((op)->ob_type == &PP_assoc_Type) */
+/* #define PP_assoc_Check(op)    (PY_TYPE(op) == &PP_assoc_Type) */
 
 typedef struct s_PP_assocObject *PP_assocObjectp;
 
@@ -260,7 +260,7 @@ extern PyTypeObject PP_assoc_Type;
 /*                              OBJECT memdes                               */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_memdes_Check(op)    ((op)->ob_type == &PP_memdes_Type) */
+/* #define PP_memdes_Check(op)    (PY_TYPE(op) == &PP_memdes_Type) */
 
 typedef struct s_PP_memdesObject *PP_memdesObjectp;
 
@@ -284,7 +284,7 @@ extern PyTypeObject PP_memdes_Type;
 /*                              OBJECT PDBfile                              */
 /*--------------------------------------------------------------------------*/
 
-/* #define PP_PDBfile_Check(op)    ((op)->ob_type == &PP_PDBfile_Type) */
+/* #define PP_PDBfile_Check(op)    (PY_TYPE(op) == &PP_PDBfile_Type) */
 
 typedef struct s_PP_PDBfileObject *PP_PDBfileObjectp;
 

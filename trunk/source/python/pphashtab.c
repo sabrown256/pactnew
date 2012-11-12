@@ -140,7 +140,7 @@ void _PP_hashtab_entry(PP_file *fileinfo)
         PP_UNKNOWN_I,                    /* typecode */
         FALSE,                           /* sequence */
         descr,                           /* descr */
-        &PP_hashtab_Type,                /* ob_type */
+        &PP_hashtab_Type,                /* otype */
         _PP_pack_hashtab,                /* pack */
         _PP_unpack_hashtab,              /* unpack */
         _PP_get_hashtab_descr            /* get_descr */

@@ -200,7 +200,7 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
 
         if (entry != NULL) {
             as_obj = AS_OBJECT;
-        } else if (PyObject_IsSubclass((PyObject *) obj->ob_type, (PyObject *) &PP_pdbdata_Type)) {
+        } else if (PyObject_IsSubclass((PyObject *) PY_TYPE(obj), (PyObject *) &PP_pdbdata_Type)) {
             PP_type_entry *entry2;
             PP_descr *descr;
             entry2 = PP_inquire_object(fileinfo, obj);

@@ -96,7 +96,7 @@ void _PP_defstr_entry(PP_file *fileinfo)
         PP_UNKNOWN_I,                    /* typecode */
         FALSE,                           /* sequence */
         descr,                           /* descr */
-        &PP_defstr_Type,                 /* ob_type */
+        &PP_defstr_Type,                 /* otype */
         _PP_pack_defstr,                 /* pack */
         _PP_unpack_defstr,               /* unpack */
         _PP_get_defstr_descr             /* get_descr */
@@ -221,16 +221,16 @@ PP_defstr_ctor_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     DEBUG1("%s", "In PP_defstr_ctor_tp_init\n");
     
     dpobj = (PP_defstrObject *)
-        SC_hasharr_def_lookup(_PP_defstr_tab, self->ob_type);
+        SC_hasharr_def_lookup(_PP_defstr_tab, PY_TYPE(self));
     if (dpobj == NULL) {
         PP_error_set(PP_error_internal, (PyObject *) self,
                      "Unable to locate constructor for %s",
-                     self->ob_type->tp_name);
+                     PY_TYPE(self)->tp_name);
         return -1;
     }
 
     /* A sanity check */
-    if (self->ob_type != dpobj->ctor) {
+    if (PY_TYPE(self) != dpobj->ctor) {
         PP_error_set(PP_error_internal, (PyObject *) self,
                      "Unable to find constructor");
         return -1;

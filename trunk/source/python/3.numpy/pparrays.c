@@ -274,7 +274,7 @@ void _PP_init_numpy_types(PP_file *fileinfo)
         PP_NONE_I,                      /* typecode */
         TRUE,                           /* sequence */
         NULL,                           /* descr */
-        (PyTypeObject *) &PyArray_Type, /* ob_type */
+        (PyTypeObject *) &PyArray_Type, /* otype */
         array_pack,                     /* pack */
         NULL,                           /* unpack */
         NULL                            /* get_descr */

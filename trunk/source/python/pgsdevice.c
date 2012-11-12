@@ -1211,7 +1211,7 @@ PP_device_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_device_Type; */
+/*  return PY_TYPE(op) == &PP_device_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1223,7 +1223,7 @@ static char PP_device_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_device_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "device",                       /* tp_name */
         sizeof(PP_deviceObject),         /* tp_basicsize */
