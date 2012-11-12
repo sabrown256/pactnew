@@ -64,7 +64,7 @@ class DataMixin:
             x = pdb.pdbdata(input)
         else:
             x = pdb.pdbdata(input, outtype)
-#        print x
+#        print(x)
 
         self.failUnlessEqual(pdb.gettype(x), gettype)
 
@@ -84,10 +84,10 @@ class DataMixin:
                 ref_list = input
 
         obj = pdb.unpack(x, array=pdb.AS_LIST)
-#        print "XXX", obj
+#        print("XXX", obj)
         self.failUnlessEqual(obj, ref_list)
         obj = pdb.unpack(x, array=pdb.AS_TUPLE)
-#        print "YYY", obj
+#        print("YYY", obj)
         self.failUnlessEqual(obj, ref_tuple)
 
         if s is not None:
@@ -437,7 +437,7 @@ class ClassObject(test_leak.LeakVif, DataMixin):
         self.fp.register_class(UserClass, 'user')
 
         desc = self.fp.get_obj_descr(input)
-        print desc
+        print(desc)
         self.failUnlessEqual(desc[2], 'user')
         self.failUnlessEqual(desc[3], ((0, 2),))
 

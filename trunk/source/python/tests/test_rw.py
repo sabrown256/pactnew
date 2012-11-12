@@ -36,7 +36,7 @@ class PPUseCases(unittest.TestCase):
 
     if debug: 
       os.system('sleep 3') 
-      print ''    
+      print('')
 
   # Miscellaneous tests (found by experimentation)
 
