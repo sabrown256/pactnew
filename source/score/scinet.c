@@ -318,10 +318,10 @@ int _SC_tcp_accept_connection(int fd, sckades ad)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_CONNECT_TO - initiate connection to AD over socket FD
+/* _SC_CONNECT_TO - initiate connection to AD
  *                - timeout after TO milliseconds
  *                - if TO is -1 let connect finish or timeout on its own
- *                - return the usual connect result
+ *                - return the socket iff successful
  *                - if FM is TRUE timeout is non-fatal and
  *                - ETIMEDOUT is returned
  *                - NOTE: this should be simply the connect system call
@@ -329,10 +329,10 @@ int _SC_tcp_accept_connection(int fd, sckades ad)
  *                - some anonymous implementer somewhere
  */
 
-static int _SC_connect_to(int fd, sckades ad, int to, int fm)
-   {int ok;
+static int _SC_connect_to(sckades ad, int to, int fm)
+   {int fd, ok;
 
-    ok = -1;
+    fd = -1;
 
 #if defined(HAVE_POSIX_SYS)
 
@@ -342,7 +342,7 @@ static int _SC_connect_to(int fd, sckades ad, int to, int fm)
 
 /* do a blocking connect if an infinite timeout has been requested */
     if (to < 0)
-       ok = PS_tcp_initiate_connection(fd, ad);
+       fd = PS_tcp_initiate_connection(ad);
 
     else
 
@@ -356,6 +356,10 @@ static int _SC_connect_to(int fd, sckades ad, int to, int fm)
 
 	dt = max(dt, 1);
 
+	fd = socket(PF_INET, SOCK_STREAM, 0);
+	if (fd < 0)
+	   SC_error(-1, "CAN'T OPEN SOCKET - _SC_CONNECT_TO");
+		
 /* find out whether the socket is already blocked */
 	blck = SC_isblocked_fd(fd);
         SC_unblock_fd(fd);
@@ -378,7 +382,7 @@ static int _SC_connect_to(int fd, sckades ad, int to, int fm)
 		     break;};};
 
 	    if (fm == FALSE)
-	       ok = (ok != 0) ? -1 : 0;};
+	       fd = (ok != 0) ? -1 : fd;};
 
 /* restore the socket status wrt blocking */
 	if (blck == TRUE)
@@ -386,7 +390,7 @@ static int _SC_connect_to(int fd, sckades ad, int to, int fm)
 
 #endif
 
-    return(ok);}
+    return(fd);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -409,21 +413,14 @@ int _SC_tcp_connect(char *host, int port, int to, int fm)
     ok = SC_ERR_TRAP();
     if (ok == 0)
        {if ((host != NULL) && (port >= 0))
-	   {int err;
-            sckades srva;
+	   {sckades srva;
 
 	    srva = _SC_tcp_address(host, port);
 	    if (srva.in != NULL)
-	       {fd = socket(PF_INET, SOCK_STREAM, 0);
+	       {fd = _SC_connect_to(srva, to, fm);
 		if (fd < 0)
-		   SC_error(-1, "CAN'T OPEN SOCKET - _SC_TCP_CONNECT");
-
-		err = _SC_connect_to(fd, srva, to, fm);
-		if (err < 0)
-		   {close(fd);
-		    fd = -1;
-		    SC_error(-1, "CAN'T CONNECT TO SERVER (%d) - _SC_TCP_CONNECT",
-			     errno);};};
+		   SC_error(-1, "CAN'T CONNECT TO SERVER (%d) - _SC_TCP_CONNECT",
+			    errno);};
 
 	    CFREE(srva.in);};};
 

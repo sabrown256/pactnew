@@ -199,24 +199,31 @@ int tcp_accept_connection(int fd, sckades ad, int ao)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TCP_INITIATE_CONNECTION - initiate a connection with FD and AD */
+/* TCP_INITIATE_CONNECTION - initiate a connection with FD and AD
+ *                         - return 0 iff successful
+ */
 
-int tcp_initiate_connection(int fd, sckades ad)
-   {int ia, na, rv;
+int tcp_initiate_connection(sckades ad)
+   {int ia, na, fd, rv;
     socklen_t sasz;
 
     SOCKADDR_SIZE(sasz);
 
-/* try NATTEMPTS times to connect to the server */
-    rv = 0;
-    na  = NATTEMPTS;
-    for (ia = 0; ia < na; ia++)
-        {sleep(ia);
-	 rv = connect(fd, ad.uq, sasz);
-	 if (rv >= 0)
-	    break;};
+    fd = socket(PF_INET, SOCK_STREAM, 0);
+    if (fd >= 0)
 
-    return(rv);}
+/* try NATTEMPTS times to connect to the server */
+       {rv = 0;
+	na  = NATTEMPTS;
+	for (ia = 0; ia < na; ia++)
+	    {sleep(ia);
+	     rv = connect(fd, ad.uq, sasz);
+	     if (rv >= 0)
+	        break;};
+
+	fd = (rv == 0) ? fd : -1;};
+
+    return(fd);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -502,7 +509,7 @@ char **get_connect_socket(client *cl)
 /* CONNECT_CLIENT - client initiates connection with the server */
 
 static int connect_client(client *cl)
-   {int fd, ok;
+   {int fd;
     char *key, **ta;
     connection *srv;
 
@@ -514,25 +521,22 @@ static int connect_client(client *cl)
 
 	ta = get_connect_socket(cl);
 	if (ta != NULL)
-	   {fd = socket(PF_INET, SOCK_STREAM, 0);
+	   {fd = tcp_initiate_connection(srv->sck);
 	    if (fd >= 0)
-	       {ok = tcp_initiate_connection(fd, srv->sck);
-
-/* report the connection status */
-		if (ok >= 0)
-		   {CLOG(cl, 2, "connect %s@%s on %d",
-			 ta[0], ta[1], fd);}
-		else
-		   {fd = connect_close(fd, cl);
-		    CLOG(cl, 1, "connect error %s@%s  %d - %s (%d)",
-			 ta[0], ta[1], fd,
-			 strerror(errno), errno);};
+	       {CLOG(cl, 2, "connect %s@%s on %d",
+		     ta[0], ta[1], fd);
 
 		srv->sfd  = fd;
-		srv->port = atoi(ta[1]);};
+		srv->port = atoi(ta[1]);
 
 /* get the shared key */
-	    key = STRSAVE(ta[CONN_KEY]);
+		key = STRSAVE(ta[CONN_KEY]);}
+
+	    else
+	       {fd = connect_close(fd, cl);
+		CLOG(cl, 1, "connect error %s@%s  %d - %s (%d)",
+		     ta[0], ta[1], fd,
+		     strerror(errno), errno);};
 
 	    free_strings(ta);};
 
