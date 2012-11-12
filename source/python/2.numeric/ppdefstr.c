@@ -446,8 +446,8 @@ PP_defstrObject *_PP_defstr_find_singleton(
         rv = PP_defstr_newobj(NULL, dp, fileinfo);
         if (rv != NULL) {
             /* This will use the new reference to install the item */
-	   SC_hasharr_install(fileinfo->deftypes, dp->type, rv,
-			      "PP_defstrObject", 2, -1);
+	   SC_hasharr_install(fileinfo->deftypes,
+			      dp->type, rv, "PP_defstrObject", 2, -1);
         }
     }
 

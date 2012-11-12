@@ -133,7 +133,7 @@ void _PP_hashtab_entry(PP_file *fileinfo)
     descr = PP_make_descr(
         PP_UNKNOWN_I,                   /* typecode */
         "hasharr",                      /* type */
-        sizeof(hasharr)                     /* bpi */
+        sizeof(hasharr)                 /* bpi */
         );
 
     entry = PP_make_type_entry(

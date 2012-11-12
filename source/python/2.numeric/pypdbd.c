@@ -297,7 +297,7 @@ long _PP_mark_syment(char *outtype, long nitems, void *vr, int recursive)
     but we can delete pointer within leaves if (dst == LEAF)
             return 0;
 
-    nitems = _PD_number_refd(NULL, NULL, NULL, pv,
+    nitems = _PD_number_refd(mem_lst, svr, desc, pv,
 			     litype, PP_vif->host_chart);
     if (nitems < 0) {
         PP_error_set_user(NULL,
