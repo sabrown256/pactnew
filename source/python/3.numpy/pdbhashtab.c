@@ -335,7 +335,7 @@ PP_hashtab_tp_dealloc(PP_hashtabObject *self)
     } else {
         SC_mark(self->data, -1);
     }
-    self->ob_type->tp_free((PyObject*)self);
+    PY_TYPE(self)->tp_free((PyObject*)self);
 /* DO-NOT-DELETE splicer.end(pdb.hashtab.as_type.dealloc) */
 }
 
@@ -392,7 +392,7 @@ PP_hashtab_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_hashtab_Type; */
+/*  return PY_TYPE(op) == &PP_hashtab_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -527,7 +527,7 @@ static char PP_hashtab_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_hashtab_Type = {
-        PyVarObject_HEAD_INIT(&PyType_Type, 0)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "hashtab",                       /* tp_name */
         sizeof(PP_hashtabObject),         /* tp_basicsize */

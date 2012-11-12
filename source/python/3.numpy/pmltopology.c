@@ -135,7 +135,7 @@ PP_mesh_topology_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_mesh_topology_Type; */
+/*  return PY_TYPE(op) == &PP_mesh_topology_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -147,7 +147,7 @@ static char PP_mesh_topology_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_mesh_topology_Type = {
-        PyVarObject_HEAD_INIT(&PyType_Type, 0)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "mesh_topology",                       /* tp_name */
         sizeof(PP_mesh_topologyObject),         /* tp_basicsize */

@@ -185,7 +185,7 @@ PP_palette_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_palette_Type; */
+/*  return PY_TYPE(op) == &PP_palette_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -197,7 +197,7 @@ static char PP_palette_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_palette_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "palette",                       /* tp_name */
         sizeof(PP_paletteObject),         /* tp_basicsize */

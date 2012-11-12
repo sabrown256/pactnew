@@ -293,7 +293,7 @@ PP_image_tp_dealloc(PP_imageObject *self)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.image.as_type.dealloc) */
     PG_rl_image(self->im);
-    self->ob_type->tp_free((PyObject*)self);
+    PY_TYPE(self)->tp_free((PyObject*)self);
 /* DO-NOT-DELETE splicer.end(pgs.image.as_type.dealloc) */
 }
 
@@ -315,7 +315,7 @@ PP_image_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_image_Type; */
+/*  return PY_TYPE(op) == &PP_image_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -327,7 +327,7 @@ static char PP_image_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_image_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "image",                       /* tp_name */
         sizeof(PP_imageObject),         /* tp_basicsize */

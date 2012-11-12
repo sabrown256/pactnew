@@ -61,7 +61,7 @@ PP_pdbdata_tp_dealloc(PP_pdbdataObject *self)
     _PD_rl_dimensions(self->dims);
     _PD_rl_defstr(self->dp);
     Py_XDECREF(self->dpobj);
-    self->ob_type->tp_free((PyObject*)self);
+    PY_TYPE(self)->tp_free((PyObject*)self);
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.dealloc) */
 }
 
@@ -210,7 +210,7 @@ PP_pdbdata_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_pdbdata_Type; */
+/*  return PY_TYPE(op) == &PP_pdbdata_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -548,7 +548,7 @@ static char PP_pdbdata_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_pdbdata_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "pdbdata",                       /* tp_name */
         sizeof(PP_pdbdataObject),         /* tp_basicsize */

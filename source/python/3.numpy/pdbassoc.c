@@ -306,7 +306,7 @@ PP_assoc_tp_dealloc(PP_assocObject *self)
 /* DO-NOT-DELETE splicer.begin(pdb.assoc.as_type.dealloc) */
     if (SC_safe_to_free(self->alist))
         SC_free_alist(self->alist, 3);
-    self->ob_type->tp_free((PyObject*)self);
+    PY_TYPE(self)->tp_free((PyObject*)self);
 /* DO-NOT-DELETE splicer.end(pdb.assoc.as_type.dealloc) */
 }
 
@@ -344,7 +344,7 @@ PP_assoc_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_assoc_Type; */
+/*  return PY_TYPE(op) == &PP_assoc_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -486,7 +486,7 @@ static char PP_assoc_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_assoc_Type = {
-        PyVarObject_HEAD_INIT(&PyType_Type, 0)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "assoc",                       /* tp_name */
         sizeof(PP_assocObject),         /* tp_basicsize */

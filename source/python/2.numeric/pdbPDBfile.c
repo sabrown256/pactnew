@@ -1152,7 +1152,7 @@ PP_PDBfile_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_PDBfile_Type; */
+/*  return PY_TYPE(op) == &PP_PDBfile_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1164,7 +1164,7 @@ static char PP_PDBfile_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_PDBfile_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "PDBfile",                       /* tp_name */
         sizeof(PP_PDBfileObject),         /* tp_basicsize */

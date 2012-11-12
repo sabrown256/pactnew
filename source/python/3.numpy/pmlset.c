@@ -395,7 +395,7 @@ PP_set_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_set_Type; */
+/*  return PY_TYPE(op) == &PP_set_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -407,7 +407,7 @@ static char PP_set_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_set_Type = {
-        PyVarObject_HEAD_INIT(&PyType_Type, 0)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "set",                       /* tp_name */
         sizeof(PP_setObject),         /* tp_basicsize */

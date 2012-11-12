@@ -596,14 +596,14 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
 -
 -        /* special case string for efficiency */
 -        if (PyString_Check(obj1)) {
--            PyTypeObject *ob_type = obj1->ob_type;
+-            PyTypeObject *otype = PY_TYPE(obj1);
 -
 -            for (i = istart; i < nitems; i++) {
 -                obj1 = PySequence_GetItem(obj, i);
 -                if (obj1 == Py_None)
 -                    continue;
 -                DEBUG_OBJ("string", "obj1", i, obj1);
--                if (obj1->ob_type != ob_type) {
+-                if (PY_TYPE(obj1) != otype) {
 -                    PP_error_set(PP_error_internal, obj,
 -                                 "Sequence members are not all strings");
 -                    return(NULL);
@@ -884,7 +884,7 @@ PP_type_entry *PP_make_type_entry(
     PP_types       typecode,
     int            sequence,
     PP_descr      *descr,
-    PyTypeObject  *ob_type,
+    PyTypeObject  *otype,
     PP_pack_func   pack,
     PP_unpack_func unpack,
     PP_get_descr   get_descr
@@ -897,7 +897,7 @@ PP_type_entry *PP_make_type_entry(
     entry->typecode  = typecode;
     entry->sequence  = sequence;
     entry->descr     = descr;
-    entry->ob_type   = ob_type;
+    entry->obtyp     = otype;
     entry->pack      = pack;
     entry->unpack    = unpack;
     entry->get_descr = get_descr;
@@ -906,7 +906,7 @@ PP_type_entry *PP_make_type_entry(
     entry->cdescr    = NULL;
 
     SC_mark(descr, 1);
-    /* XXX refcount ob_type ? */
+    /* XXX refcount otype ? */
     
     return(entry);
 }
@@ -972,7 +972,7 @@ PP_type_entry *PP_inquire_type(PP_file *fileinfo, char *ctype)
 
 void PP_register_object(PP_file *fileinfo, PP_type_entry *entry)
 {
-    SC_hasharr_install(fileinfo->object_map, entry->ob_type, entry,
+    SC_hasharr_install(fileinfo->object_map, entry->obtyp, entry,
 		       XX_OBJECT_MAP_S, 3, -1);
 }
 
@@ -1059,10 +1059,10 @@ PP_type_entry *PP_inquire_object(PP_file *fileinfo, PyObject *obj)
     PyTypeObject *tp;
 
 #if 0
-    entry = (PP_type_entry *) SC_hasharr_def_lookup(fileinfo->object_map, obj->ob_type);
+    entry = (PP_type_entry *) SC_hasharr_def_lookup(fileinfo->object_map, PY_TYPE(obj));
 #else
     entry = NULL;
-    for (tp = obj->ob_type; tp != NULL; tp = tp->tp_base) {
+    for (tp = PY_TYPE(obj); tp != NULL; tp = tp->tp_base) {
         entry = (PP_type_entry *) SC_hasharr_def_lookup(fileinfo->object_map, tp);
         if (entry != NULL)
             break;
@@ -1096,7 +1096,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_CHAR_I,                      /* typecode */
         TRUE,                           /* sequence */
         descr,                          /* descr */
-        &PyString_Type,                 /* ob_type */
+        &PyString_Type,                 /* otype */
         _PP_get_pack_func(PP_CHAR_I),   /* pack */
         _PP_get_unpack_func(PP_CHAR_I), /* unpack */
         _PP_get_string_descr            /* get_descr */
@@ -1115,7 +1115,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_INT_I,                       /* typecode */
         FALSE,                          /* sequence */
         descr,
-        &PyInt_Type,                    /* ob_type */
+        &PyInt_Type,                    /* otype */
         _PP_get_pack_func(PP_INT_I),    /* pack */
         _PP_get_unpack_func(PP_INT_I),  /* unpack */
         NULL                            /* get_descr */
@@ -1135,7 +1135,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_INT_I,                       /* typecode */
         FALSE,                          /* sequence */
         descr,
-        &PyInt_Type,                    /* ob_type */
+        &PyInt_Type,                    /* otype */
         _PP_get_pack_func(PP_INT_I),    /* pack */
         _PP_get_unpack_func(PP_INT_I),  /* unpack */
         NULL                            /* get_descr */
@@ -1169,7 +1169,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_LONG_I,                      /* typecode */
         FALSE,                          /* sequence */
         descr,                          /* descr */
-        &PyInt_Type,                    /* ob_type */
+        &PyInt_Type,                    /* otype */
         _PP_get_pack_func(PP_LONG_I),   /* pack */
         _PP_get_unpack_func(PP_LONG_I), /* unpack */
         NULL                            /* get_descr */
@@ -1182,7 +1182,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_LONG_I,                      /* typecode */
         FALSE,                          /* sequence */
         descr,                          /* descr */
-        &PyLong_Type,                    /* ob_type */
+        &PyLong_Type,                    /* otype */
         _PP_get_pack_func(PP_LONG_I),   /* pack */
         _PP_get_unpack_func(PP_LONG_I), /* unpack */
         NULL                            /* get_descr */
@@ -1201,7 +1201,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_FLOAT_I,                     /* typecode */
         FALSE,                          /* sequence */
         descr,                          /* descr */
-        &PyFloat_Type,                  /* ob_type */
+        &PyFloat_Type,                  /* otype */
         _PP_get_pack_func(PP_FLOAT_I),  /* unpack */
         _PP_get_unpack_func(PP_FLOAT_I), /* unpack */
         NULL                            /* get_descr */
@@ -1220,7 +1220,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_DOUBLE_I,                     /* typecode */
         FALSE,                           /* sequence */
         descr,                           /* descr */
-        &PyFloat_Type,                   /* ob_type */
+        &PyFloat_Type,                   /* otype */
         _PP_get_pack_func(PP_DOUBLE_I),  /* pack */
         _PP_get_unpack_func(PP_DOUBLE_I),/* unpack */
         NULL                             /* get_descr */
@@ -1233,7 +1233,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_PDBDATA_I,                    /* typecode */
         FALSE,                           /* sequence */
         NULL,                            /* descr */
-        &PP_pdbdata_Type,                /* ob_type */
+        &PP_pdbdata_Type,                /* otype */
         _PP_pack_pdbdata,                /* pack */
         _PP_unpack_pdbdata,              /* unpack */
         _PP_get_pdbdata_descr            /* get_descr */
@@ -1248,7 +1248,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_INSTANCE_I,                   /* typecode */
         FALSE,                           /* sequence */
         NULL,                            /* descr */
-        &PyInstance_Type,                /* ob_type */
+        &PyInstance_Type,                /* otype */
         NULL, /*_PP_pack_instance, */              /* pack */
         NULL, /* _PP_unpack_instance, */            /* unpack */
         _PP_get_instance_descr           /* get_descr */
@@ -1274,7 +1274,7 @@ void PP_init_type_map_instance(PP_file *fileinfo, PP_class_descr *cdescr)
         PP_INSTANCE_I,                   /* typecode */
         FALSE,                           /* sequence */
         cdescr->descr,                   /* descr */
-        NULL, /* &PyInstance_Type,      *//* ob_type */
+        NULL, /* &PyInstance_Type,      *//* otype */
         NULL, /* _PP_pack_instance,     *//* pack */
         NULL, /* _PP_unpack_instance,   *//* unpack */
         NULL  /* _PP_get_instance_descr *//* get_descr */
@@ -1367,7 +1367,7 @@ void PP_init_type_map(void)
 
 #if 0
 -    /* Py_None */
--    entry = PP_make_type_entry(SC_STRING_S, NULL, 0L, Py_None->ob_type,
+-    entry = PP_make_type_entry(SC_STRING_S, NULL, 0L, PY_TYPE(Py_None),
 -                                   NULL, NULL, 0, FALSE,
 -                                   NULL,
 -                                   -1,
@@ -1549,7 +1549,7 @@ int PP_copy_obj_to_mem(PyObject *obj, PP_file *fileinfo, PP_type_entry *entry, l
     if (err == -1) {
         if (PyErr_Occurred() == NULL) {
             PP_error_set_user(obj, "No way to pack object data: %s",
-                              obj->ob_type->tp_name);
+                              PY_TYPE(obj)->tp_name);
         }
         mitems = -1;
     }
@@ -1719,7 +1719,7 @@ PyObject *PP_copy_mem_to_obj(PDBfile *file,
 -            err = 0;
 -        } else if (entry->get_data != NULL) {
 -            err = entry->get_data(obj, vr, nitems, entry->typecode, gc);
--        } else if (obj->ob_type == entry->ob_type) {
+-        } else if (PY_TYPE(obj) == entry->obtyp) {
 -            if (entry->poffset != -1) {
 -#if 1
 -                DEREF(vr) = DEREF((char *) obj + entry->poffset);
@@ -1747,7 +1747,7 @@ PyObject *PP_copy_mem_to_obj(PDBfile *file,
 -    if (err == -1) {
 -        if (PyErr_Occurred() == NULL) {
 -            PP_error_set_user(obj, "No way to get object data: %s",
--                              obj->ob_type->tp_name);
+-                              PY_TYPE(obj)->tp_name);
 -        }
 -    }
 -
@@ -1826,7 +1826,7 @@ PP_descr *_PP_get_object_descr(PP_file *fileinfo, PyObject *obj, PP_type_entry *
         SC_mark(descr, 1);
     } else {
         PP_error_set_user(obj, "No way to get object descriptor: %s",
-                          obj->ob_type->tp_name);
+                          PY_TYPE(obj)->tp_name);
         return(NULL);
     }
 
@@ -1898,7 +1898,7 @@ static int _PP_get_sequence_descr_work(PP_file *fileinfo, PyObject *obj, int nd,
         if (descr->dims != NULL) {
             /* the object itself is a sequence */
 #if 0
-            PP_error_set_user(NULL, "_PP_get_sequence_descr_work does not accept sequences: %s", obj->ob_type->tp_name);
+            PP_error_set_user(NULL, "_PP_get_sequence_descr_work does not accept sequences: %s", PY_TYPE(obj)->tp_name);
             rv = -1;
 #else
             if (nd >= MAXDIM) {
@@ -2007,7 +2007,7 @@ PP_descr *PP_get_object_descr(PP_file *fileinfo, PyObject *obj)
     } else if (PySequence_Check(obj) == 0) {
         /* unregistered type and not a sequence (tuple or list) */
         PP_error_set_user(obj, "cannot get PACT type for %s",
-                          obj->ob_type->tp_name);
+                          PY_TYPE(obj)->tp_name);
         descr = NULL;
     } else {
         for (i = 0; i < MAXDIM; i++) {
@@ -2058,7 +2058,7 @@ PP_descr *PP_get_object_descr(PP_file *fileinfo, PyObject *obj)
             CFREE(seqinfo.type);
         } else {
             PP_error_set_user(obj, "cannot get PACT type for %s",
-                              obj->ob_type->tp_name);
+                              PY_TYPE(obj)->tp_name);
             descr = NULL;
         }
     }
@@ -2186,14 +2186,14 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type)
 -
 -        /* special case string for efficiency */
 -        if (PyString_Check(obj1)) {
--            PyTypeObject *ob_type = obj1->ob_type;
+-            PyTypeObject *otype = PY_TYPE(obj1);
 -
 -            for (i = istart; i < nitems; i++) {
 -                obj1 = PySequence_GetItem(obj, i);
 -                if (obj1 == Py_None)
 -                    continue;
 -                DEBUG_OBJ("string", "obj1", i, obj1);
--                if (obj1->ob_type != ob_type) {
+-                if (PY_TYPE(obj1) != otype) {
 -                    PP_error_set(PP_error_internal, obj,
 -                                 "Sequence members are not all strings");
 -                    return(NULL);

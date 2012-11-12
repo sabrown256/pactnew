@@ -231,7 +231,7 @@ PP_mapping_Check(PyObject *op)
         return 1;
     else
         return 0;
-/*  return op->ob_type == &PP_mapping_Type; */
+/*  return PY_TYPE(op) == &PP_mapping_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -243,7 +243,7 @@ static char PP_mapping_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_mapping_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PY_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "mapping",                       /* tp_name */
         sizeof(PP_mappingObject),         /* tp_basicsize */

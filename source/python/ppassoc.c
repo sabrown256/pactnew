@@ -45,7 +45,7 @@ int PP_assoc_extractor(PyObject *obj, void *ptr)
     
     if (obj == Py_None) {
         *(void **) ptr = NULL;
-    } else if (obj->ob_type == &PP_assoc_Type) {
+    } else if (PY_TYPE(obj) == &PP_assoc_Type) {
         PP_assocObject *work;
         work = (PP_assocObject *) obj;
         *(pcons **) ptr = work->alist;
