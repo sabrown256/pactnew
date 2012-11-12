@@ -192,7 +192,7 @@ static char PP_graph_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_graph_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PyVarObject_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "graph",                       /* tp_name */
         sizeof(PP_graphObject),         /* tp_basicsize */

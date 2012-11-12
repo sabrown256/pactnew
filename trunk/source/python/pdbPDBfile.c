@@ -498,7 +498,7 @@ PP_PDBfile_register_class(PP_PDBfileObject *self,
      *   cls  = Python class object
      *   type = defstr type
      */
-    PyClassObject *cls;
+    PyTypeObject *cls;
     PyFunctionObject *ctor;
     char *type;
     char *kw_list[] = {"cls", "type", "ctor", NULL};

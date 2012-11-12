@@ -135,7 +135,7 @@ struct s_PP_type_entry {
 };
 
 struct s_PP_class_descr {
-    PyClassObject    *cls;
+    PyTypeObject    *cls;
     PyFunctionObject *ctor;
     char             *type;
     PP_descr         *descr;
@@ -338,8 +338,8 @@ PP_type_entry
                      PP_unpack_func unpack, PP_get_descr get_descr);
 
 PP_class_descr
- *PP_make_class_descr(PyClassObject *cls, char *type, PyFunctionObject *ctor),
- *PP_inquire_class(PP_file *fileinfo, PyClassObject *cls);
+ *PP_make_class_descr(PyTypeObject *cls, char *type, PyFunctionObject *ctor),
+ *PP_inquire_class(PP_file *fileinfo, PyTypeObject *cls);
 
 extern PyObject
  *PP_copy_mem_to_obj(PDBfile *file, void *vr, dimdes *dims, long nitems,

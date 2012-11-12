@@ -800,7 +800,7 @@ static PyObject *_PP_unpack_instance(void *p, long nitems)
 static PP_descr *_PP_get_instance_descr(PP_file *fileinfo, PyObject *obj)
 {
     PyInstanceObject *inst = (PyInstanceObject *) obj;
-    PyClassObject *cls = inst->in_class;
+    PyTypeObject *cls = (PyTypeObject *) inst->in_class;
     PP_class_descr *cdescr;
 
     cdescr = PP_inquire_class(fileinfo, cls);
@@ -984,7 +984,7 @@ void PP_register_object(PP_file *fileinfo, PP_type_entry *entry)
  */
 
 PP_class_descr *PP_make_class_descr(
-    PyClassObject *cls,
+    PyTypeObject *cls,
     char *type,
     PyFunctionObject *ctor
     )
@@ -1036,7 +1036,7 @@ int _PP_rl_class_descr(haelem *hp, void *a)
 /* PP_inquire_class -
  */
 
-PP_class_descr *PP_inquire_class(PP_file *fileinfo, PyClassObject *cls)
+PP_class_descr *PP_inquire_class(PP_file *fileinfo, PyTypeObject *cls)
 {
     PP_class_descr *cdescr;
 

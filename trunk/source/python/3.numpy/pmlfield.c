@@ -77,7 +77,7 @@ static char PP_field_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_field_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PyVarObject_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "field",                       /* tp_name */
         sizeof(PP_fieldObject),         /* tp_basicsize */
