@@ -77,16 +77,16 @@ if (-d ../../python) then
          Note $ALog "Checking $i/$Python_Exe"
          setenv PY_Exe $i/$Python_Exe
 
-         setenv PY_Ver ""
-         setenv PY_Inc ""
-         setenv PY_Lib ""
-         setenv PY_Cfg ""
-         setenv PY_CC  ""
+         setenv PY_Vers ""
+         setenv PY_Inc  ""
+         setenv PY_Lib  ""
+         setenv PY_Cfg  ""
+         setenv PY_CC   ""
 
          @ ok = 0
          set inf = ( `$PY_Exe ../../python/python-info.py` )
          if ($inf[1] == "Version:") then
-            flog $ALog setenv PY_Ver $inf[2]
+            flog $ALog setenv PY_Vers $inf[2]
             @ ok = $ok + 1
          endif
          if ($inf[3] == "IncDir:") then
@@ -180,15 +180,15 @@ if (-d ../../python) then
       flog $ALog setenv HAVE_PYTHON     FALSE
       flog $ALog setenv HAVE_PY_NUMERIC FALSE
       flog $ALog setenv HAVE_PY_NUMPY   FALSE
-      flog $ALog setenv PY_Path ""
-      flog $ALog setenv PY_Exe ""
-      flog $ALog setenv PY_CC ""
-      flog $ALog setenv PY_Cfg""
-      flog $ALog setenv PY_DirSrc ""
-      flog $ALog setenv PY_DirDst ""
-      flog $ALog setenv PY_DirPy ""
-      flog $ALog setenv PY_Inc ""
-      flog $ALog setenv PY_Vers ""
+      flog $ALog setenv PY_Path         ""
+      flog $ALog setenv PY_Exe          ""
+      flog $ALog setenv PY_CC           ""
+      flog $ALog setenv PY_Cfg          ""
+      flog $ALog setenv PY_DirSrc       ""
+      flog $ALog setenv PY_DirDst       ""
+      flog $ALog setenv PY_DirPy        ""
+      flog $ALog setenv PY_Inc          ""
+      flog $ALog setenv PY_Vers         ""
    endif
 
    if ($MAKE_Shared_Libs == FALSE) then

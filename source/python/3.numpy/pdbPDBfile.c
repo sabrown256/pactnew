@@ -498,7 +498,7 @@ PP_PDBfile_register_class(PP_PDBfileObject *self,
      *   cls  = Python class object
      *   type = defstr type
      */
-    PyClassObject *cls;
+    PyTypeObject *cls;
     PyFunctionObject *ctor;
     char *type;
     char *kw_list[] = {"cls", "type", "ctor", NULL};
@@ -1200,7 +1200,7 @@ static char PP_PDBfile_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_PDBfile_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PyVarObject_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "PDBfile",                       /* tp_name */
         sizeof(PP_PDBfileObject),         /* tp_basicsize */

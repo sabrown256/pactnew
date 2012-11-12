@@ -524,7 +524,7 @@ static char PP_defstr_Type__doc__[] =
 
 /* static */
 PyTypeObject PP_defstr_Type = {
-        PyObject_HEAD_INIT(&PyType_Type)
+        PyVarObject_HEAD_INIT(&PyType_Type, 0)
         0,                              /* ob_size */
         "defstr",                       /* tp_name */
         sizeof(PP_defstrObject),         /* tp_basicsize */
