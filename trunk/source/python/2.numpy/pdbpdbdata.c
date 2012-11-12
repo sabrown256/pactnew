@@ -87,7 +87,7 @@ static PyObject *
 PP_pdbdata_tp_str(PP_pdbdataObject *self)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_type.str) */
-    int bpi;
+    intb bpi;
     char *str;
     Py_ssize_t size;
 

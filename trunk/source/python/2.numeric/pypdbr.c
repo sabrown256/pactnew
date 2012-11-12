@@ -1,5 +1,5 @@
 /*
- * pypdbr.c - PDB read functionality in Python
+ * PYPDBR.C - PDB read functionality in Python
  *          - convert python objects into 'C' memory
  *
  * Source Version: 9.0
@@ -50,9 +50,9 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
 {
     int dst, size, as_obj, ierr;
     long ii;                    /* index of current structure member */
+    intb bpi;
     Py_ssize_t nmembers;        /* number of members in struct */
     Py_ssize_t i;
-    intb bpi;
     char *pv, *litype, *ttype, *svr, **lvr;
     defstr *dp;
     memdes *desc, *mem_lst;

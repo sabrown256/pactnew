@@ -75,7 +75,7 @@ PyObject *_PP_unpack_hashtab(void *p, long nitems)
 PyObject *PP_unpack_hashtab_haelem(char *type, void *vr)
 {
     intb bpi;
-    long nitems;
+    inti nitems;
     dimdes *dims;
     PyObject *rv;
     PP_form form;
