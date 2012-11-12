@@ -33,12 +33,12 @@ class Meta(unittest.TestCase):
 #        d2 = struct.pack('id', 3, 4.0)
         
         ctor = pdb.vif.defstr("two", ('int i', 'float j'))
-        print ctor
-        print type(ctor)
-        print dir(ctor)
-        print ctor.__class__
+        print(ctor)
+        print(type(ctor))
+        print(dir(ctor))
+        print(ctor.__class__)
         d = ctor((3, 4.0))
-        print d
+        print(d)
         self.failUnlessEqual(d.i, 3)
         self.failUnlessEqual(d.j, 4.0)
 

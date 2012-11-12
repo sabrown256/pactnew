@@ -6,44 +6,44 @@
 import pact_test.pdb as pdb
 
 d = pdb.pdbdata(4)
-print d
+print(d)
 
 d = pdb.pdbdata(4, 'double')
-print d
+print(d)
 
 r = pdb.unpack(d)
-print type(r)
+print(type(r))
 
 d = pdb.pdbdata((4,5.))
-print d
+print(d)
 
 r = pdb.unpack(d)
-print type(r)
+print(type(r))
 
 pdb.setform(array=pdb.AS_TUPLE)
 
 r = pdb.unpack(d)
-print type(r)
-print r
+print(type(r))
+print(r)
 
 v = [None, [4., 5.]]
-print pdb.vif.get_obj_descr(v)
+print(pdb.vif.get_obj_descr(v))
 #d = pdb.pdbdata([None, [4., 5.]])
 d = pdb.pdbdata([None, [4., 5.]], 'double **')
-print d
+print(d)
 
 r = pdb.unpack(d)
-print r
+print(r)
 
-print r[0]
-print r[1]
+print(r[0])
+print(r[1])
 
 
 
 ######################################
 
 fp = pdb.open("xxx", "w")
-print type(fp)
+print(type(fp))
 pdb.files
 
 ref = [2.0, 3.0, 4.0, 5.0]
@@ -51,7 +51,7 @@ fp.write("d2", ref, ind=[2,2])
 fp.write("d3", ref, "float")
 fp.close()
 
-print "######################################"
+print("######################################")
 
 class User:
     def __init__(self, a, b, c):
@@ -71,7 +71,7 @@ fp.register_class(User, "user", makeUser)
 v1 = User(1,2,3)
 fp.write("var1", v1)
 v2 = fp.read("var1")
-print "v1 =", v1
-print "v2 =", v2
+print("v1 =", v1)
+print("v2 =", v2)
 fp.close()
 

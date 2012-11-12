@@ -38,13 +38,13 @@ def read_ast(input):
 
 # create pdb module
 if verbose > 0:
-    print "Generating PDB"
+    print("Generating PDB")
 ast = read_ast('pdb.idl')
 ppregen.gen(ast)
 
 # create pgs module
 if verbose > 0:
-    print "Generating PGS"
+    print("Generating PGS")
 pdb_ast = read_ast('pdb.idl')
 # read existing pdb attributes
 pdb_file_attrs = ppregen.read_old_files(pdb_ast, verbose)
@@ -53,10 +53,10 @@ pdb_file_attrs = ppregen.read_old_files(pdb_ast, verbose)
 pdb_ast = parse.create_ast('pdb.idl')
 # mark all module methods and classes as 'modify=0'
 for method in pdb_ast.method_nodes:
-#    print method.name
+#    print(method.name)
     method.add_lang(parse.Lang('python', {'modify':0}))
 for cls in pdb_ast.class_nodes:
-#    print cls.name
+#    print(cls.name)
     cls.add_lang(parse.Lang('python', {'modify':0,
                                        'file_name':''}))
 
@@ -73,7 +73,7 @@ cpregen.pregen(ast)
 # generate python
 ppregen.pregen(ast)
 #parse.printast(ast)
-#print ppregen.print_type_map()
+#print(ppregen.print_type_map())
 #raise SystemExit
 
 # Take the method templates from pdb.idl

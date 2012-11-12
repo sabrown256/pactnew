@@ -58,51 +58,51 @@ inputPow     = fp.read('mesh/pows')
 
 # INT
 if inputAnswer != outputAnswer:
-  print 'Integer test failed'
-  print inputAnswer, '!=', outputAnswer
+  print('Integer test failed')
+  print(inputAnswer, '!=', outputAnswer)
   fp.close()
   sys.exit(1)
 
 if debug:
-  print str(inputAnswer)
+  print(str(inputAnswer))
 
 # FLOAT
 if inputPi != outputPi:
-  print 'Floating pt test failed'
-  print inputPi, '!=', outputPi
+  print('Floating pt test failed')
+  print(inputPi, '!=', outputPi)
   fp.close()
   sys.exit(1)
 
 if debug:
-  print str(inputPi)
+  print(str(inputPi))
 
 # STRING
 if inputString != outputString:
-  print 'String test failed'
-  print inputString, '!=', outputString
+  print('String test failed')
+  print(inputString, '!=', outputString)
   fp.close()
   sys.exit(1)
 
 if debug:
-  print str(inputString)
+  print(str(inputString))
 
 if inputPowers != outputPowers:
-  print 'Integer array test failed'
-  print inputPowers
+  print('Integer array test failed')
+  print(inputPowers)
   fp.close()
   sys.exit(1)
 
 if debug:
-  print str(inputPowers)
+  print(str(inputPowers))
 
 if inputPow != outputPow:
-  print 'Floating pt array test failed'
-  print inputPow
+  print('Floating pt array test failed')
+  print(inputPow)
   fp.close()
   sys.exit(1)
 
 if debug:
-  print str(inputPow)
+  print(str(inputPow))
  
 # Go there
 fp.cd('/mesh/face')
@@ -130,51 +130,51 @@ fp.write('outputArrayStruct', outputArrayStruct)
 #      inputArrayStruct[i].time != outputArrayStruct[i].time or \
 #      inputArrayStruct[i].coords != outputArrayStruct[i].coords or \
 #      inputArrayStruct[i].twoD != outputArrayStruct[i].twoD:
-#     print 'Array of structs test failed'
-#     print str(inputArrayStruct[i])
-#     print str(outputArrayStruct[i])
+#     print('Array of structs test failed')
+#     print(str(inputArrayStruct[i]))
+#     print(str(outputArrayStruct[i]))
 #     fp.close()
 #     sys.exit(1)
 # 
 #   if debug:
-#     print str(inputArrayStruct[i])
+#     print(str(inputArrayStruct[i]))
 # 
 fp.cd('../..')
 
 if fp.ls() != ('answer', 'mesh/', 'pi', 'string'):
-  print 'ls / test failed'
-  print str(fp.ls())
+  print('ls / test failed')
+  print(str(fp.ls()))
   fp.close()
   sys.exit(1)
 
 if debug:
-  print str(fp.ls())
+  print(str(fp.ls()))
 
 fp.cd('mesh')
 
 if fp.ls() != ('face/', 'powers', 'pows'):
-  print 'ls /mesh test failed'
-  print str(fp.ls())
+  print('ls /mesh test failed')
+  print(str(fp.ls()))
   fp.close()
   sys.exit(1)
 
 if debug:
-  print str(fp.ls())
+  print(str(fp.ls()))
 
 fp.cd('face')
 
 if fp.ls() != ('outputArrayStruct',):
-  print 'ls /mesh/face test failed'
-  print str(fp.ls())
+  print('ls /mesh/face test failed')
+  print(str(fp.ls()))
   fp.close()
   sys.exit(1)
 
 if debug:
-  print str(fp.ls())
+  print(str(fp.ls()))
 
 fp.close()
 
-print 'tests passed'
+print('tests passed')
  
 if not(debug):
   os.system('rm foobar.pdb')

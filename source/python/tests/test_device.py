@@ -672,7 +672,7 @@ class Gsatst(unittest.TestCase):
 
         # pgs.plot_labels = FALSE
 
-        print f
+        print(f)
         dev.draw_picture(f, pgs.PLOT_CONTOUR,
 		    pdb.TRUE, dev.BLUE, pgs.LINE_SOLID,  0.4,
 		    pdb.TRUE, dev.RED,  pgs.LINE_DOTTED, 0.1)

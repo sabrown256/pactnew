@@ -84,7 +84,7 @@ def compute_2d_ac_mapping_2(kmax, lmax):
                 edge[ord*(4*i + j) + 1] = io + jo[j+1]
            
     mt = pdb.mesh_topology(nd, bnp, bnc, bnd)
-    print mt
+    print(mt)
 
     # fill the points
     for k in range(kmax):
@@ -121,4 +121,4 @@ def compute_2d_ac_mapping_2(kmax, lmax):
 
 
 if __name__ == '__main__':
-    print compute_2d_ac_mapping_2(10,10)
+    print(compute_2d_ac_mapping_2(10,10))
