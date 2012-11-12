@@ -341,7 +341,7 @@ extern int
  PS_tcp_set_port(sckades ad, int port),
  PS_tcp_bind_port(int fd, sckades ad, int port, int pmin),
  PS_tcp_accept_connection(int fd, sckades ad, int ao),
- PS_tcp_initiate_connection(int fd, sckades ad),
+ PS_tcp_initiate_connection(sckades ad),
  PS_open_server(client *cl, ckind ioc, int auth),
  PS_close_sock(client *cl),
  PS_read_sock(client *cl, char *s, int nc),
