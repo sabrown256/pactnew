@@ -616,6 +616,7 @@ switch ($Cmnd)
         set openmp        = FALSE
         set pthread       = FALSE
         set pydir         = ""
+        set pyexe         = "python"
         set sid           = ""
         set flst          = ""
         set dbcfg         = ""
@@ -666,6 +667,12 @@ switch ($Cmnd)
                       set dbcfg = $cwd/$dbcfg:t
                       popd >& /dev/null
                    endif
+                   breaksw
+              case -epy:
+                   shift
+                   set pyexe  = $1:t
+                   set pydir  = $1:h
+                   set python = TRUE
                    breaksw
               case -f:
                    shift
@@ -747,9 +754,9 @@ switch ($Cmnd)
                    echo "                      xlc-bgl    XL compilers for IBM BG/L backend"
                    echo "                      xlc-bgp    XL compilers for IBM BG/P backend"
                    echo "                      xlc-bgq    XL compilers for IBM BG/Q backend"
+                   echo "        -epy       full path python executable, implies -py"
                    echo "        -feature   <feature>[,<feature>]*"
                    echo "                   look in pact/manager/features for available features"
-                   echo "        -ipy       path to python, implies -py"
                    echo "        -mpi       build MPI version (equivalent to -feature mpi)"
                    echo "        -py        build python bindings (equivalent to -feature python)"
                    echo "        -s         build OpenMP version (equivalent to -feature openmp)"
@@ -779,6 +786,7 @@ switch ($Cmnd)
                       set PArgs = ( $PArgs "-i" $cwd/$1 )
                    endif
                    breaksw
+# NOTE: use -epy instead (kept for backward compatibility)
               case -ipy:
                    shift
                    set pydir  = $1

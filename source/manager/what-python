@@ -16,16 +16,16 @@
 # include "cpyright.h"
 #
 
-set HostOS = ( `uname -s` )
-set HAVE_PYTHON     = FALSE
-set HAVE_PY_NUMERIC = FALSE
-set HAVE_PY_NUMPY   = FALSE
-set PY_Exe          = ""
-set PY_Vers         = ""
-set PY_CC           = ""
-set PY_Cfg          = ""
-set PY_Inc          = ""
-set PY_Path         = ""
+setenv OS_Name          `uname -s`
+setenv HAVE_PYTHON      FALSE
+setenv HAVE_PY_NUMERIC  FALSE
+setenv HAVE_PY_NUMPY    FALSE
+setenv PY_Exe           ""
+setenv PY_Vers          ""
+setenv PY_CC            ""
+setenv PY_Cfg           ""
+setenv PY_Inc           ""
+setenv PY_Path          ""
 
 while ($#argv > 0)
    switch ($1)
@@ -36,85 +36,119 @@ while ($#argv > 0)
            echo ""
            exit(1)
       default:
-           set PY_Exe = $1
+           setenv PY_Exe  $1
            breaksw
    endsw
    shift
 end
 
-   echo -n "   Python: "
-
-   set found = FALSE
-   set PY_Path = $PY_Exe:h
+   setenv found  FALSE
+   setenv PY_Path  $PY_Exe:h
 
       if (-x "$PY_Exe") then
-         $PY_Exe ../python/python-cc.py >& /dev/null
-         set LStat1 = $status
-         set lpyinc = ( `$PY_Exe ../python/python-inc-dir.py |& cat` )
-         if (($LStat1 != 0) || !(-f "$lpyinc/Python.h")) then
-            set PY_Exe =  ""
-         else
-            set pyv = `$PY_Exe -V |& awk '{ print $2 }'`
-            if ($#pyv > 2) continue
+         setenv PY_Ver ""
+         setenv PY_Inc ""
+         setenv PY_Lib ""
+         setenv PY_Cfg ""
+         setenv PY_CC  ""
 
-            set HAVE_PYTHON = TRUE
-            set PY_CC  = `$PY_Exe ../python/python-cc.py |& awk '{ print $1 }'`
-            set PY_Inc = `$PY_Exe ../python/python-inc-dir.py`
-            set PY_Cfg = `$PY_Exe ../python/python-cfg-dir.py`
+         @ ok = 0
+         set inf = ( `$PY_Exe ../python/python-info.py` )
+         if ($inf[1] == "Version:") then
+            setenv PY_Vers $inf[2]
+            @ ok = $ok + 1
+         endif
+         if ($inf[3] == "IncDir:") then
+            setenv PY_Inc $inf[4]
+            @ ok = $ok + 1
+         endif
+         if ($inf[5] == "LibDir:") then
+            setenv PY_Lib $inf[6]
+            @ ok = $ok + 1
+         endif
+         if ($inf[7] == "CfgDir:") then
+            setenv PY_Cfg $inf[8]
+            @ ok = $ok + 1
+         endif
+         if ($inf[9] == "Compiler:") then
+            setenv PY_CC  $inf[10]
+            @ ok = $ok + 1
 
-            echo "$PY_Exe ($pyv)"
+# get the compiler python was built with
+            if ((($OS_Name == "Linux")    || \
+                 ($OS_Name == "Darwin")   || \
+                 ($OS_Name == "FreeBSD")) && \
+                ($PY_CC == cc)) then
+               setenv PY_CC Python_CC_Exe
+            endif
+         endif
+
+# if we have all 5 pieces of info then we have a usable python
+         if ($ok == 5) then
+            setenv HAVE_PYTHON TRUE
+
+            echo "Python summary:"
+            echo "      executable $PY_Exe"
             echo "      compiled with $PY_CC"
             echo "      has include directory $PY_Inc"
-            set lPyVers = `$PY_Exe ../python/python-version.py`
+            echo "      has lib directory $PY_Lib"
 
-            set PY_Lib = `echo $PY_Inc | sed 's/include/lib/'`
+# check for Numeric
             if (-d $PY_Inc/Numeric) then
                echo "      has numeric extensions"
-               set HAVE_PY_NUMERIC = TRUE
-            endif
-            if ((-d $PY_Lib/site-packages/NumPy) || (-d $PY_Lib/site-packages/numpy) || \
-                (-d $PY_Lib/dist-packages/NumPy) || (-d $PY_Lib/dist-packages/numpy)) then
-               echo "      has numpy extensions"
-               set HAVE_PY_NUMPY = TRUE
-            endif
-            if (($HAVE_PY_NUMERIC == FALSE) && ($HAVE_PY_NUMPY == FALSE)) then
-               echo "      does not have numeric extensions"
+               setenv HAVE_PY_NUMERIC TRUE
+            else
+               setenv HAVE_PY_NUMERIC FALSE
             endif
 
-            if ((($HostOS == "Linux") || ($HostOS == "Darwin") || ($HostOS == "FreeBSD")) && ($PY_CC == cc)) then
-               set PY_CC =  gcc
+# check for NumPy
+            if ((-d $PY_Lib/NumPy) || \
+                (-d $PY_Lib/numpy) || \
+                (-d $PY_Lib/site-packages/NumPy) || \
+                (-d $PY_Lib/site-packages/numpy) || \
+                (-d $PY_Lib/dist-packages/NumPy) || \
+                (-d $PY_Lib/dist-packages/numpy) || \
+                (-d $PY_Inc/numpy)) then
+               echo "      has numpy extensions"
+               setenv HAVE_PY_NUMPY TRUE
+            else
+               setenv HAVE_PY_NUMPY FALSE
             endif
+
+            if (($HAVE_PY_NUMERIC == FALSE) && ($HAVE_PY_NUMPY == FALSE)) then
+               echo "      does not have numeric extensions"
+# NOTE: if we can build sensibly without any numeric extensions delete these
+               setenv PY_Exe "no-numeric"
+               setenv HAVE_PYTHON FALSE
+            endif
+
             set found = TRUE
          endif
       endif
 
    if ($found == FALSE) then
       echo "none recognizable"
-      set HAVE_PYTHON     = FALSE
-      set HAVE_PY_NUMERIC = FALSE
-      set HAVE_PY_NUMPY   = FALSE
-      set PY_Path         = ""
-      set PY_Exe          = ""
-      set PY_CC           = ""
-      set PY_Cfg          = ""
-      set PY_Inc          = ""
-      set PY_Vers         = ""
+      setenv HAVE_PYTHON      FALSE
+      setenv HAVE_PY_NUMERIC  FALSE
+      setenv HAVE_PY_NUMPY    FALSE
+      setenv PY_Path          ""
+      setenv PY_Exe           ""
+      setenv PY_CC            ""
+      setenv PY_Cfg           ""
+      setenv PY_Inc           ""
+      setenv PY_Vers          ""
    endif
 
    set lbase = /usr/local/apps/pact
 
    if ($HAVE_PYTHON == TRUE) then
-      if (`expr "$lPyVers" : '.*\..*\..*'` > 0) then
-         set lPyVers = $lPyVers:r
-      endif
-      set PY_Vers = $lPyVers
-      set PY_Root = $lbase
-      set PY_Head = python${PY_Vers}/pact
+      setenv PY_Root  $lbase
+      setenv PY_Head  python${PY_Vers}/pact
       if ("$PY_Path" != "") then
-         set PY_Root = $PY_Exe
-         set PY_Root = $PY_Root:h
-         set PY_Root = $PY_Root:h
-         set PY_Head = python${PY_Vers}/site-packages/pact
+         set lRoot = $PY_Exe
+         set lRoot = $lRoot:h
+         setenv PY_Root  $lRoot:h
+         setenv PY_Head  python${PY_Vers}/site-packages/pact
       endif
    endif
 
