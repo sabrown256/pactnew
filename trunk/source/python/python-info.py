@@ -1,12 +1,47 @@
-#!/usr/bin/env python2.2
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
+#
+# include cpyright.h
 #
 
 from distutils.sysconfig import *
 from re import search, sub
 import sys 
+
+# version number
+
+"""
+Print Python's version number as major.minor
+ignoring any patch version number
+"""
+ver = sys.version_info
+print("Version: %d.%d" % (ver[0], ver[1]))
+
+# include
+
+"""
+Print path to Python's include directory
+"""
+print("IncDir: %s" % get_python_inc())
+
+# lib
+
+"""
+Print path to Python's lib directory
+"""
+print("LibDir: %s" % get_python_lib())
+
+# config
+
+"""
+Print path to Python's config directory
+"""
+import os.path as path
+dir = get_python_lib()
+print("CfgDir: %s" % path.join(path.split(dir)[0], 'config'))
+
+# compiler
 
 compiler = None
 
@@ -31,7 +66,7 @@ while (line):
   line = fd.readline()
 
 if compiler != None:
-  print(compiler)
+  print("Compiler: %s" % compiler)
 else:
-  print('')
-  sys.exit(1)
+  print("Compiler: unknown")
+

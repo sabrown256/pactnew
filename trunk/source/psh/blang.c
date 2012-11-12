@@ -1771,7 +1771,7 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 		      break;
 		 case FP_ARRAY :
 		      if (strcmp(ty, "char *") == 0)
-			 vstrcat(t, BFLRG, "char _l%s[BFLRG];\n", nm);
+			 vstrcat(t, BFLRG, "char _l%s[MAXLINE];\n", nm);
 		      else
 			 vstrcat(t, BFLRG, "%s_l%s;\n", ty, nm);
 		      break;

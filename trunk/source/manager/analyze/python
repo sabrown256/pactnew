@@ -22,20 +22,38 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: python"
 
-dbmget $ALog HAVE_PYTHON     =\? ""^  \
-             HAVE_PY_NUMERIC =\? ""^  \
-             HAVE_PY_NUMPY   =\? ""^  \
-             PY_Exe          =\? ""^  \
-             PY_Vers         =\? ""^  \
-             PY_DirPy        =\? ""^  \
-             PY_DirDst       =\? ""^  \
-             PY_DirSrc       =\? ""^  \
-             PY_CC           =\? ""^  \
-             PY_Cfg          =\? ""^  \
-             PY_Inc          =\? ""^  \
-             PY_Path         =\? ""^  \
-             CC_Exe^                  \
+dbmget $ALog HAVE_PYTHON     =\? ""^        \
+             HAVE_PY_NUMERIC =\? ""^        \
+             HAVE_PY_NUMPY   =\? ""^        \
+             Python_Exe      =\? "python"^  \
+             Python_Path     =\? ""^        \
+             Python_CC_Exe   =\? "gcc"^     \
+             PY_Exe          =\? ""^        \
+             PY_Vers         =\? ""^        \
+             PY_DirPy        =\? ""^        \
+             PY_DirDst       =\? ""^        \
+             PY_DirSrc       =\? ""^        \
+             PY_CC           =\? ""^        \
+             PY_Cfg          =\? ""^        \
+             PY_Inc          =\? ""^        \
+             PY_Path         =\? ""^        \
+             CC_Exe^                        \
              OS_Name
+
+Note $ALog ""
+Note $ALog "Python_Exe    = $Python_Exe"
+Note $ALog "Python_Path   = $Python_Path"
+Note $ALog "Python_CC_Exe = $Python_CC_Exe"
+Note $ALog ""
+
+# load up PY variables from Group Python specifications
+if ("$Python_Exe" =~ /*) then
+   flog $ALog setenv PY_Path    $Python_Exe:h:h
+   flog $ALog setenv Python_Exe $Python_Exe:t
+endif
+if ("$Python_Path" != "") then
+   flog $ALog setenv PY_Path $Python_Path
+endif
 
 # if there is no python directory no need to look further
 if (-d ../../python) then
@@ -54,41 +72,51 @@ if (-d ../../python) then
    Note $ALog "Search Dirs = |$lDirs|"
    flog $ALog set found = FALSE
    foreach i ($lDirs)
-      if (-x $i/python) then
+      if (-x $i/$Python_Exe) then
          Note $ALog ""
-         Note $ALog "Checking $i/python"
-         setenv PY_Exe $i/python
+         Note $ALog "Checking $i/$Python_Exe"
+         setenv PY_Exe $i/$Python_Exe
 
-# NOTE: get it into the log what is going on here
-         flog $ALog $PY_Exe ../../python/python-cc.py
-         set xstatus = $status
+         setenv PY_Ver ""
+         setenv PY_Inc ""
+         setenv PY_Lib ""
+         setenv PY_Cfg ""
+         setenv PY_CC  ""
 
-# find the python include directory
-         fexvar $ALog PY_Inc $PY_Exe ../../python/python-inc-dir.py
-         if (($gstatus[1] != 0) || !(-f "$PY_Inc/Python.h")) then
-            flog $ALog setenv PY_Exe ""
-         else
-
-# get the python version
-            fexvars $ALog t $PY_Exe -V
-            if ($#t > 2) continue
-
-            flog $ALog setenv HAVE_PYTHON TRUE
-
-# get the python lib directory
-            fexvar $ALog PY_Lib echo $PY_Inc @b sed 's/include/lib/'
+         @ ok = 0
+         set inf = ( `$PY_Exe ../../python/python-info.py` )
+         if ($inf[1] == "Version:") then
+            flog $ALog setenv PY_Ver $inf[2]
+            @ ok = $ok + 1
+         endif
+         if ($inf[3] == "IncDir:") then
+            flog $ALog setenv PY_Inc $inf[4]
+            @ ok = $ok + 1
+         endif
+         if ($inf[5] == "LibDir:") then
+            flog $ALog setenv PY_Lib $inf[6]
+            @ ok = $ok + 1
+         endif
+         if ($inf[7] == "CfgDir:") then
+            flog $ALog setenv PY_Cfg $inf[8]
+            @ ok = $ok + 1
+         endif
+         if ($inf[9] == "Compiler:") then
+            flog $ALog setenv PY_CC  $inf[10]
+            @ ok = $ok + 1
 
 # get the compiler python was built with
-            fexvar $ALog PY_CC $PY_Exe ../../python/python-cc.py @b sed 's| .*||'
             if ((($OS_Name == "Linux")    || \
                  ($OS_Name == "Darwin")   || \
                  ($OS_Name == "FreeBSD")) && \
                 ($PY_CC == cc)) then
-               flog $ALog setenv PY_CC gcc
+               flog $ALog setenv PY_CC Python_CC_Exe
             endif
+         endif
 
-# get the python configuration
-            fexvar $ALog PY_Cfg $PY_Exe ../../python/python-cfg-dir.py
+# if we have all 5 pieces of info then we have a usable python
+         if ($ok == 5) then
+            flog $ALog setenv HAVE_PYTHON TRUE
 
             NoteD $ALog "Python summary:"
             NoteD $ALog "      executable $PY_Exe"
@@ -105,7 +133,9 @@ if (-d ../../python) then
             endif
 
 # check for NumPy
-            if ((-d $PY_Lib/site-packages/NumPy) || \
+            if ((-d $PY_Lib/NumPy) || \
+                (-d $PY_Lib/numpy) || \
+                (-d $PY_Lib/site-packages/NumPy) || \
                 (-d $PY_Lib/site-packages/numpy) || \
                 (-d $PY_Lib/dist-packages/NumPy) || \
                 (-d $PY_Lib/dist-packages/numpy) || \
@@ -166,12 +196,6 @@ if (-d ../../python) then
    endif
 
    if ($HAVE_PYTHON == TRUE) then
-      set lPY_Vers = `$PY_Exe ../../python/python-version.py`
-      if (`expr "$lPY_Vers" : '.*\..*\..*'` > 0) then
-         set lPY_Vers = $lPY_Vers:r
-      endif
-      flog $ALog setenv PY_Vers     $lPY_Vers
-
       set PyRoot = $SysDir
       set PyHead = python${PY_Vers}/pact
       if ("$PY_Path" != "") then

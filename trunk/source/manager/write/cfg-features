@@ -18,6 +18,32 @@ foreach f ($flst)
    endif
 end
 
+if ($mpi == TRUE) then
+   echo "include mpi" >> $Tmp
+   set cfg = "$cfg-mpi"
+   if ($vrb == TRUE) then
+      echo "   add mpi"
+   endif
+endif
+
+if ($python == TRUE) then
+   if (("$pyexe" != "") || ("$pydir" != "")) then
+      echo "Group Python {" >> $Tmp
+      if ("$pyexe" != "") then
+         echo "   Exe  = $pyexe" >> $Tmp
+      endif
+      if ("$pydir" != "") then
+         echo "   Path = $pydir" >> $Tmp
+      endif
+      echo "}" >> $Tmp
+   endif
+   echo "include python" >> $Tmp
+   set cfg = "$cfg-py"
+   if ($vrb == TRUE) then
+      echo "   add python"
+   endif
+endif
+
 if (($shared == TRUE) && ($python == FALSE)) then
    echo "include shared" >> $Tmp
    set cfg = "$cfg-sl"
@@ -39,27 +65,6 @@ if (($openmp == TRUE) && ($pthread == FALSE)) then
    set cfg = "$cfg-s"
    if ($vrb == TRUE) then
       echo "   add openmp"
-   endif
-endif
-
-if ($python == TRUE) then
-   echo "include python" >> $Tmp
-   if ("$pydir" != "") then
-      echo "Group Python {" >> $Tmp
-      echo "   Path = $pydir" >> $Tmp
-      echo "}" >> $Tmp
-   endif
-   set cfg = "$cfg-py"
-   if ($vrb == TRUE) then
-      echo "   add python"
-   endif
-endif
-
-if ($mpi == TRUE) then
-   echo "include mpi" >> $Tmp
-   set cfg = "$cfg-mpi"
-   if ($vrb == TRUE) then
-      echo "   add mpi"
    endif
 endif
 
