@@ -196,7 +196,7 @@ PP_hasharr_keys(PP_hasharrObject *self,
         return NULL;
     names = SC_hasharr_dump(ha, NULL, NULL, FALSE);
     for (i = 0; i < ne; i++) {
-        err = PyTuple_SetItem(rv, i, PyString_FromString(names[i]));
+        err = PyTuple_SetItem(rv, i, PY_STRING_STRING(names[i]));
         if (err < 0) {
             Py_DECREF(rv);
             rv = NULL;
@@ -500,7 +500,7 @@ int PP_update_hasharr(hasharr *tab, PyObject *dict)
     nkeys = PyList_GET_SIZE(keys);
     for (i = 0; i < nkeys; i++) {
         keyitem = PyList_GET_ITEM(keys, i);
-        keyname = PyString_AS_STRING(keyitem);
+        keyname = PY_STRING_AS_STRING(keyitem);
         value = PyMapping_GetItemString(dict, keyname);
 
         descr = PP_get_object_descr(PP_vif_info, value);
@@ -574,11 +574,11 @@ PP_hasharr_mp_subscript(PyObject *_self, PyObject *key)
     PyObject *rv;
     PP_hasharrObject *self = (PP_hasharrObject *) _self;
 
-    if (!PyString_Check(key)) {
+    if (!PY_STRING_CHECK(key)) {
         PP_error_set_user(key, "key must be string");
         return NULL;
     }
-    name = PyString_AsString(key);
+    name = PY_STRING_AS_STRING(key);
 
     hasharr = self->data;
     if (hasharr == NULL) {
@@ -608,11 +608,11 @@ PP_hasharr_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
     hasharr *hasharr;
     PP_hasharrObject *self = (PP_hasharrObject *) _self;
     
-    if (!PyString_Check(key)) {
+    if (!PY_STRING_CHECK(key)) {
         PP_error_set_user(key, "key must be string");
         return -1;
     }
-    name = PyString_AsString(key);
+    name = PY_STRING_AS_STRING(key);
 
     hasharr = self->data;
     if (hasharr == NULL) {

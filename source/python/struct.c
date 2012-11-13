@@ -35,8 +35,8 @@ STATIC PyObject *get_pylong(PyObject *v)
    {PyNumberMethods *m;
 
     assert(v != NULL);
-    if (PyInt_Check(v))
-       return(PY_INT_LONG(PyInt_AS_LONG(v)));
+    if (PY_INT_CHECK(v))
+       return(PY_INT_LONG(PY_INT_AS_LONG(v)));
 
     if (PyLong_Check(v))
        {Py_INCREF(v);
@@ -65,7 +65,7 @@ STATIC PyObject *get_pylong(PyObject *v)
 
 static int get_long(PyObject *v, long *p)
    {
-        long x = PyInt_AsLong(v);
+        long x = PY_INT_AS_LONG(v);
         if (x == -1 && PyErr_Occurred()) {
                 if (PyErr_ExceptionMatches(PyExc_TypeError))
                     PP_error_set_user(v, "required argument is not an integer");
@@ -191,7 +191,7 @@ static PyObject *unpack_double(const char *p, int le)
 static PyObject *nu_char(void *p, long nitems)
    {
 
-    return(PyString_FromStringAndSize(p, nitems));}
+    return(PY_STRING_STRING_SIZE(p, nitems));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -373,18 +373,18 @@ static int np_ubyte(void *p, PyObject *v, long nitems, PP_types tc)
 static int np_char(void *p, PyObject *v, long nitems, PP_types tc)
    {Py_ssize_t nc;
 
-    if (!PyString_Check(v) || PyString_Size(v) > nitems)
+    if (!PY_STRING_CHECK(v) || PY_STRING_SIZE(v) > nitems)
        {PP_error_set_user(v, 
 			  "char format require string of length %d", nitems);
 	return(-1);};
 
-    nc = PyString_Size(v);
+    nc = PY_STRING_SIZE(v);
     if (nc >= nitems)
-       memcpy(p, PyString_AsString(v), nitems);
+       memcpy(p, PY_STRING_AS_STRING(v), nitems);
 
     else
        {memset(p, ' ', nitems);
-	memcpy(p, PyString_AsString(v), nc);};
+	memcpy(p, PY_STRING_AS_STRING(v), nc);};
 
     return(0);}
 
@@ -393,12 +393,12 @@ static int np_char(void *p, PyObject *v, long nitems, PP_types tc)
 static int np_char(void *p, PyObject *v, long nitems, PP_types tc)
    {
 
-    if (!PyString_Check(v) || PyString_Size(v) != 1)
+    if (!PY_STRING_CHECK(v) || PY_STRING_SIZE(v) != 1)
        {PP_error_set_user(v, 
 			  "char format require string of length 1");
 	return(-1);};
 
-    *((char *) p) = *PyString_AsString(v);
+    *((char *) p) = *PY_STRING_AS_STRING(v);
 
     return(0);}
 

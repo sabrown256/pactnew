@@ -106,7 +106,7 @@ PP_pdbdata_tp_str(PP_pdbdataObject *self)
     size = bpi * self->nitems;
 #endif
     
-    return PyString_FromStringAndSize(str, size);
+    return PY_STRING_STRING_SIZE(str, size);
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.str) */
 }
 
@@ -278,7 +278,7 @@ PP_pdbdata_sq_item(PyObject *_self, Py_ssize_t i)
 
     if (i < 0 || i >= nitems) {
         if (indexerr == NULL)
-            indexerr = PyString_FromString(
+            indexerr = PY_STRING_STRING(
                 "pdbdata index out of range");
         PyErr_SetObject(PyExc_IndexError, indexerr);
         return NULL;
@@ -336,7 +336,7 @@ PP_pdbdata_sq_slice(PyObject *_self, Py_ssize_t ilow, Py_ssize_t ihigh)
 #if 0
     if (ilow < 0 || ilow >= nitems) {
         if (indexerr == NULL)
-            indexerr = PyString_FromString(
+            indexerr = PY_STRING_STRING(
                 "pdbdata index out of range");
         PyErr_SetObject(PyExc_IndexError, indexerr);
         return NULL;
@@ -344,7 +344,7 @@ PP_pdbdata_sq_slice(PyObject *_self, Py_ssize_t ilow, Py_ssize_t ihigh)
 
     if (ihigh < 0 || ihigh >= nitems) {
         if (indexerr == NULL)
-            indexerr = PyString_FromString(
+            indexerr = PY_STRING_STRING(
                 "pdbdata index out of range");
         PyErr_SetObject(PyExc_IndexError, indexerr);
         return NULL;
@@ -386,7 +386,7 @@ PP_pdbdata_sq_ass_item(PyObject *_self, Py_ssize_t i, PyObject *v)
 
     if (i < 0 || i >= nitems) {
         if (indexerr == NULL)
-            indexerr = PyString_FromString(
+            indexerr = PY_STRING_STRING(
                 "pdbdata index out of range");
         PyErr_SetObject(PyExc_IndexError, indexerr);
         return -1;
