@@ -82,7 +82,7 @@ PP_zero_space(
 
     result = SC_zero_space_n(flag, -2);
 
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.zero_space) */
 }
 
@@ -119,7 +119,7 @@ PP_alloc(
                         0);
     if (result != NULL) {
         SC_mark(result, 1);
-        rv = PyCObject_FromVoidPtr(result, PP_free);
+        rv = PY_COBJ_VOID_PTR(result, PP_free);
     } else {
         PyErr_NoMemory();
         rv = NULL;
@@ -152,11 +152,11 @@ PP_realloc(
     void *result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!ll:realloc", kw_list,
-                                     &PyCObject_Type, &pobj, &nitems, &bpi))
+                                     &PY_COBJ_TYPE, &pobj, &nitems, &bpi))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = CREMAKE(p, char, nitems*bpi);
-    return PyCObject_FromVoidPtr((void *) result, NULL);
+    return PY_COBJ_VOID_PTR((void *) result, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.method.realloc) */
 }
 
@@ -181,9 +181,9 @@ PP_cfree(
     char *kw_list[] = {"p", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:cfree", kw_list,
-                                     &PyCObject_Type, &pobj))
+                                     &PY_COBJ_TYPE, &pobj))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     PP_free(p);   /*  SC_free_n(p); */
     Py_INCREF(Py_None);
     return Py_None;
@@ -211,9 +211,9 @@ PP_mem_print(
     char *kw_list[] = {"p", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:mem_print", kw_list,
-                                     &PyCObject_Type, &pobj))
+                                     &PY_COBJ_TYPE, &pobj))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     SC_mem_print(p);
     Py_INCREF(Py_None);
     return Py_None;
@@ -239,7 +239,7 @@ PP_mem_trace(
     int result;
 
     result = SC_mem_trace();
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.mem_trace) */
 }
 
@@ -267,11 +267,11 @@ PP_reg_mem(
     int result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!ls:reg_mem", kw_list,
-                                     &PyCObject_Type, &pobj, &length, &name))
+                                     &PY_COBJ_TYPE, &pobj, &length, &name))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = SC_reg_mem(p, length, name);
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.reg_mem) */
 }
 
@@ -297,11 +297,11 @@ PP_dereg_mem(
     int result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:dereg_mem", kw_list,
-                                     &PyCObject_Type, &pobj))
+                                     &PY_COBJ_TYPE, &pobj))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = SC_dereg_mem(p);
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.dereg_mem) */
 }
 
@@ -327,9 +327,9 @@ PP_mem_lookup(
     char *result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:mem_lookup", kw_list,
-                                     &PyCObject_Type, &pobj))
+                                     &PY_COBJ_TYPE, &pobj))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = SC_mem_lookup(p);
     return Py_BuildValue("s", result);
 /* DO-NOT-DELETE splicer.end(pdb.method.mem_lookup) */
@@ -400,7 +400,7 @@ PP_mem_chk(
                      "SC_mem_chk: %d", result);
         rv = NULL;
     } else {
-        rv = PyInt_FromLong(result);
+        rv = PY_INT_LONG(result);
     }
     return rv;
 /* DO-NOT-DELETE splicer.end(pdb.method.mem_chk) */
@@ -428,11 +428,11 @@ PP_is_score_ptr(
     int result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:is_score_ptr", kw_list,
-                                     &PyCObject_Type, &pobj))
+                                     &PY_COBJ_TYPE, &pobj))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = SC_is_score_ptr(p);
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.is_score_ptr) */
 }
 
@@ -458,11 +458,11 @@ PP_arrlen(
     long result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:arrlen", kw_list,
-                                     &PyCObject_Type, &pobj))
+                                     &PY_COBJ_TYPE, &pobj))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = SC_arrlen(p);
-    return PyInt_FromLong(result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.arrlen) */
 }
 
@@ -489,11 +489,11 @@ PP_mark(
     int result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i:mark", kw_list,
-                                     &PyCObject_Type, &pobj, &n))
+                                     &PY_COBJ_TYPE, &pobj, &n))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = SC_mark(p, n);
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.mark) */
 }
 
@@ -519,11 +519,11 @@ PP_ref_count(
     int result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:ref_count", kw_list,
-                                     &PyCObject_Type, &pobj))
+                                     &PY_COBJ_TYPE, &pobj))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = SC_ref_count(p);
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.ref_count) */
 }
 
@@ -550,11 +550,11 @@ PP_set_count(
     int result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i:set_count", kw_list,
-                                     &PyCObject_Type, &pobj, &n))
+                                     &PY_COBJ_TYPE, &pobj, &n))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = SC_set_count(p, n);
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.set_count) */
 }
 
@@ -579,9 +579,9 @@ PP_permanent(
     char *kw_list[] = {"p", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:permanent", kw_list,
-                                     &PyCObject_Type, &pobj))
+                                     &PY_COBJ_TYPE, &pobj))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     SC_permanent(p);
     Py_INCREF(Py_None);
     return Py_None;
@@ -611,11 +611,11 @@ PP_arrtype(
     int result;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i:arrtype", kw_list,
-                                     &PyCObject_Type, &pobj, &type))
+                                     &PY_COBJ_TYPE, &pobj, &type))
         return NULL;
-    p = (void *) PyCObject_AsVoidPtr(pobj);
+    p = (void *) PY_GET_PTR(pobj);
     result = SC_arrtype(p, type);
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.arrtype) */
 }
 
@@ -866,7 +866,7 @@ PP_gettype(
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:gettype", kw_list,
                                      &PP_pdbdata_Type, &obj))
         return NULL;
-    return PyString_FromString(obj->type);
+    return PyBytes_FromString(obj->type);
 /* DO-NOT-DELETE splicer.end(pdb.method.gettype) */
 }
 
@@ -926,7 +926,7 @@ PP_getdata(
                                      &PP_pdbdata_Type, &obj))
         return NULL;
     /* XXX add deallocator */
-    return PyCObject_FromVoidPtr(obj->data, NULL);
+    return PY_COBJ_VOID_PTR(obj->data, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.method.getdata) */
 }
 

@@ -42,7 +42,7 @@ static PyObject *
 PP_image_im_version_id_get(PP_imageObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.image.descriptor.im.version_id_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->im->version_id);
+    return PY_INT_LONG(self->im->version_id);
 /* DO-NOT-DELETE splicer.end(pgs.image.descriptor.im.version_id_get) */
 }
 
@@ -198,7 +198,7 @@ static PyObject *
 PP_image_im_kmax_get(PP_imageObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.image.descriptor.im.kmax_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->im->kmax);
+    return PY_INT_LONG(self->im->kmax);
 /* DO-NOT-DELETE splicer.end(pgs.image.descriptor.im.kmax_get) */
 }
 
@@ -212,7 +212,7 @@ static PyObject *
 PP_image_im_lmax_get(PP_imageObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.image.descriptor.im.lmax_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->im->lmax);
+    return PY_INT_LONG(self->im->lmax);
 /* DO-NOT-DELETE splicer.end(pgs.image.descriptor.im.lmax_get) */
 }
 
@@ -226,7 +226,7 @@ static PyObject *
 PP_image_im_size_get(PP_imageObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.image.descriptor.im.size_get) UNMODIFIED */
-    return PyInt_FromLong(self->im->size);
+    return PY_INT_LONG(self->im->size);
 /* DO-NOT-DELETE splicer.end(pgs.image.descriptor.im.size_get) */
 }
 
@@ -240,7 +240,7 @@ static PyObject *
 PP_image_im_bits_pixel_get(PP_imageObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.image.descriptor.im.bits_pixel_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->im->bits_pixel);
+    return PY_INT_LONG(self->im->bits_pixel);
 /* DO-NOT-DELETE splicer.end(pgs.image.descriptor.im.bits_pixel_get) */
 }
 

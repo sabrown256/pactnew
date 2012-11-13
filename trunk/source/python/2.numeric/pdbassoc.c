@@ -76,7 +76,7 @@ PP_assoc_has_key(PP_assocObject *self,
     }
 
 #if PYTHON_API_VERSION < 1012
-    return PyInt_FromLong(ok);
+    return PY_INT_LONG(ok);
 #else
     return PyBool_FromLong(ok);
 #endif
@@ -280,7 +280,7 @@ static PyObject *
 PP_assoc_alist_get(PP_assocObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.assoc.descriptor.alist_get) */
-    return PyCObject_FromVoidPtr((void *) self->alist, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->alist, NULL);
    /* return PP_assoc_from_ptr(self->alist); */
 /* DO-NOT-DELETE splicer.end(pdb.assoc.descriptor.alist_get) */
 }

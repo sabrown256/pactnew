@@ -42,7 +42,7 @@ static PyObject *
 PP_graph_data_rendering_get(PP_graphObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.graph.descriptor.data.rendering_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->data->rendering);
+    return PY_INT_LONG(self->data->rendering);
 /* DO-NOT-DELETE splicer.end(pgs.graph.descriptor.data.rendering_get) */
 }
 
@@ -56,7 +56,7 @@ static PyObject *
 PP_graph_data_mesh_get(PP_graphObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.graph.descriptor.data.mesh_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->data->mesh);
+    return PY_INT_LONG(self->data->mesh);
 /* DO-NOT-DELETE splicer.end(pgs.graph.descriptor.data.mesh_get) */
 }
 
@@ -114,7 +114,7 @@ static PyObject *
 PP_graph_data_identifier_get(PP_graphObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.graph.descriptor.data.identifier_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->data->identifier);
+    return PY_INT_LONG(self->data->identifier);
 /* DO-NOT-DELETE splicer.end(pgs.graph.descriptor.data.identifier_get) */
 }
 

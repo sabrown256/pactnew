@@ -44,7 +44,7 @@ PP_device_set_font(PP_deviceObject *self,
 #if 0
     int result;
     result = PG_fset_font(self->dev, face, style, size);
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 #else
     if ((self->dev) != NULL)                                                         \
        {if ((self->dev)->set_font != NULL)                                           \
@@ -228,7 +228,7 @@ PP_device_write_WC(PP_deviceObject *self,
     p[1] = y;
     result = PG_write_n(self->dev, 2, WORLDC, p, fmt, arg);
 
-    return PyInt_FromLong((long) result);
+    return PY_INT_LONG(result);
 /* DO-NOT-DELETE splicer.end(pgs.device.method.write_WC) */
 }
 
@@ -880,7 +880,7 @@ static PyObject *
 PP_device_dev_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->dev, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->dev, NULL);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev_get) */
 }
 
@@ -936,7 +936,7 @@ static PyObject *
 PP_device_dev_BLACK_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.BLACK_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->BLACK);
+    return PY_INT_LONG(self->dev->BLACK);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.BLACK_get) */
 }
 
@@ -950,7 +950,7 @@ static PyObject *
 PP_device_dev_WHITE_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.WHITE_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->WHITE);
+    return PY_INT_LONG(self->dev->WHITE);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.WHITE_get) */
 }
 
@@ -964,7 +964,7 @@ static PyObject *
 PP_device_dev_GRAY_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.GRAY_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->GRAY);
+    return PY_INT_LONG(self->dev->GRAY);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.GRAY_get) */
 }
 
@@ -978,7 +978,7 @@ static PyObject *
 PP_device_dev_DARK_GRAY_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.DARK_GRAY_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->DARK_GRAY);
+    return PY_INT_LONG(self->dev->DARK_GRAY);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.DARK_GRAY_get) */
 }
 
@@ -992,7 +992,7 @@ static PyObject *
 PP_device_dev_BLUE_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.BLUE_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->BLUE);
+    return PY_INT_LONG(self->dev->BLUE);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.BLUE_get) */
 }
 
@@ -1006,7 +1006,7 @@ static PyObject *
 PP_device_dev_GREEN_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.GREEN_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->GREEN);
+    return PY_INT_LONG(self->dev->GREEN);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.GREEN_get) */
 }
 
@@ -1020,7 +1020,7 @@ static PyObject *
 PP_device_dev_CYAN_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.CYAN_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->CYAN);
+    return PY_INT_LONG(self->dev->CYAN);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.CYAN_get) */
 }
 
@@ -1034,7 +1034,7 @@ static PyObject *
 PP_device_dev_RED_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.RED_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->RED);
+    return PY_INT_LONG(self->dev->RED);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.RED_get) */
 }
 
@@ -1048,7 +1048,7 @@ static PyObject *
 PP_device_dev_MAGENTA_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.MAGENTA_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->MAGENTA);
+    return PY_INT_LONG(self->dev->MAGENTA);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.MAGENTA_get) */
 }
 
@@ -1062,7 +1062,7 @@ static PyObject *
 PP_device_dev_BROWN_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.BROWN_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->BROWN);
+    return PY_INT_LONG(self->dev->BROWN);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.BROWN_get) */
 }
 
@@ -1076,7 +1076,7 @@ static PyObject *
 PP_device_dev_DARK_BLUE_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.DARK_BLUE_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->DARK_BLUE);
+    return PY_INT_LONG(self->dev->DARK_BLUE);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.DARK_BLUE_get) */
 }
 
@@ -1090,7 +1090,7 @@ static PyObject *
 PP_device_dev_DARK_GREEN_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.DARK_GREEN_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->DARK_GREEN);
+    return PY_INT_LONG(self->dev->DARK_GREEN);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.DARK_GREEN_get) */
 }
 
@@ -1104,7 +1104,7 @@ static PyObject *
 PP_device_dev_DARK_CYAN_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.DARK_CYAN_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->DARK_CYAN);
+    return PY_INT_LONG(self->dev->DARK_CYAN);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.DARK_CYAN_get) */
 }
 
@@ -1118,7 +1118,7 @@ static PyObject *
 PP_device_dev_DARK_RED_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.DARK_RED_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->DARK_RED);
+    return PY_INT_LONG(self->dev->DARK_RED);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.DARK_RED_get) */
 }
 
@@ -1132,7 +1132,7 @@ static PyObject *
 PP_device_dev_YELLOW_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.YELLOW_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->YELLOW);
+    return PY_INT_LONG(self->dev->YELLOW);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.YELLOW_get) */
 }
 
@@ -1146,7 +1146,7 @@ static PyObject *
 PP_device_dev_DARK_MAGENTA_get(PP_deviceObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.descriptor.dev.DARK_MAGENTA_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dev->DARK_MAGENTA);
+    return PY_INT_LONG(self->dev->DARK_MAGENTA);
 /* DO-NOT-DELETE splicer.end(pgs.device.descriptor.dev.DARK_MAGENTA_get) */
 }
 

@@ -28,7 +28,7 @@ static PyObject *
 PP_memdes_desc_get(PP_memdesObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->desc, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->desc, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc_get) */
 }
 
@@ -70,7 +70,7 @@ static PyObject *
 PP_memdes_desc_cast_offs_get(PP_memdesObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.cast_offs_get) UNMODIFIED */
-    return PyInt_FromLong(self->desc->cast_offs);
+    return PY_INT_LONG(self->desc->cast_offs);
 /* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.cast_offs_get) */
 }
 
@@ -85,7 +85,7 @@ PP_memdes_desc_is_indirect_get(PP_memdesObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.is_indirect_get) */
 #if PYTHON_API_VERSION < 1012
-    return PyInt_FromLong((long) self->desc->is_indirect);
+    return PY_INT_LONG(self->desc->is_indirect);
 #else
     return PyBool_FromLong((long) self->desc->is_indirect);
 #endif
@@ -144,7 +144,7 @@ static PyObject *
 PP_memdes_desc_number_get(PP_memdesObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.number_get) UNMODIFIED */
-    return PyInt_FromLong(self->desc->number);
+    return PY_INT_LONG(self->desc->number);
 /* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.number_get) */
 }
 

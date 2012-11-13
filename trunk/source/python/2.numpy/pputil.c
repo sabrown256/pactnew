@@ -292,7 +292,7 @@ PyObject *PP_dimdes_to_obj(dimdes *dims)
     PyObject *rv, *dimobj;
 
     if (dims == NULL) {
-        rv = PyInt_FromLong(1);
+        rv = PY_INT_LONG(1);
     } else {
         nd = 0;
         for (next = dims; next != NULL; next = next->next) {

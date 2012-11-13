@@ -338,10 +338,10 @@ STATIC PyObject *new_int_object(void *value, long nitems, dimdes * dims,
     if (nitems == 1) {
         switch (type) {
         case PP_INT_I:
-            obj = PyInt_FromLong((long) (*(int *) value));
+            obj = PY_INT_LONG((*(int *) value));
             break;
         case PP_LONG_I:
-            obj = PyInt_FromLong(*(long *) value);
+            obj = PY_INT_LONG(*(long *) value);
             break;
         default:
             PP_error_set(PP_error_internal, NULL, "can not convert to int");

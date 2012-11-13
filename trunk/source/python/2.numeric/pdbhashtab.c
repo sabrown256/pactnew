@@ -119,7 +119,7 @@ PP_hashtab_has_key(PP_hashtabObject *self,
     ok = np != NULL;
 
 #if PYTHON_API_VERSION < 1012
-    return PyInt_FromLong(ok);
+    return PY_INT_LONG(ok);
 #else
     return PyBool_FromLong(ok);
 #endif
