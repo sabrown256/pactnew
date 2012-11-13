@@ -1557,7 +1557,7 @@ PY_MOD_INIT(_pgs)
 
     PP_init_type_map();
     
-#ifdef HAVE_NUMPY
+#ifdef HAVE_PY_NUMPY
     _PP_init_numpy();
 #endif
 

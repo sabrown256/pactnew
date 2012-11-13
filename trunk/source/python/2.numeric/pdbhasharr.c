@@ -682,7 +682,6 @@ static char PP_hasharr_Type__doc__[] =
 /* static */
 PyTypeObject PP_hasharr_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
         "hasharr",                       /* tp_name */
         sizeof(PP_hasharrObject),         /* tp_basicsize */
         0,                              /* tp_itemsize */

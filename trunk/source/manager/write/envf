@@ -111,8 +111,8 @@ dbmget $Log MDG_Pck^         \
     Note $EnvDk 'dk_alter MANPATH '$SysDir'/man'
     Note $EnvDk ""
 
-    if ($?HAVE_PYTHON) then
-       if ($HAVE_PYTHON == TRUE) then
+    if ($?HAVE_PYTHON == 1) then
+       if ("$HAVE_PYTHON" =~ *TRUE*) then
           set lPython = $LibDir/python$PY_Vers
           if ($?PYTHONPATH) then
              if (`expr "$PYTHONPATH" : '.*'$lPython'.*'` == 0) then

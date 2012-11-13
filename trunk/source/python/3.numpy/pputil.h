@@ -47,8 +47,6 @@ enum e_PP_types {
     PP_NUM_TYPES
 };
 
-#define HAVE_NUMPY
-
 enum e_PP_object_kind
    {AS_NONE    = 0,
     AS_PDBDATA = 1,

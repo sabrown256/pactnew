@@ -46,24 +46,42 @@ end
 InitLog log $cwd/z-${System}/log.psys
 
 set vlst = ""
-if (($PY_Vers =~ 2*) && ($HAVE_PY_NUMERIC == TRUE)) then
-   flog $log set vlst = ( $vlst 2.numeric )
-endif
-if (($PY_Vers =~ 2*) && ($HAVE_PY_NUMPY == TRUE)) then
-   flog $log set vlst = ( $vlst 2.numpy )
-endif
-if (($PY_Vers =~ 3*) && ($HAVE_PY_NUMPY == TRUE)) then
-   flog $log set vlst = ( $vlst 3.numpy )
-endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+set lhave_py    = ( $HAVE_PYTHON )
+set lpy_vers    = ( $PY_Vers )
+set lpy_inc     = ( $PY_Inc )
+set lpy_numeric = ( $HAVE_PY_NUMERIC )
+set lpy_numpy   = ( $HAVE_PY_NUMPY )
 
-foreach v ( $vlst)
+@ n = $#lhave_py
+@ i = 1
+while ( $i < $n)
+   @ i = $i + 1
+
+   set dev = ( lpycfg=$i )
+   set dev = ( $dev lpyver=$lpy_vers[$i] lpyinc=$lpy_inc[$i] )
+   if (($lpy_vers[$i] =~ 2*) && ($lpy_numeric[$i] == TRUE)) then
+      flog $log set v = 2.numeric
+      set dev = ( $dev lpynum=-DHAVE_NUMERIC )
+   else if (($lpy_vers[$i] =~ 2*) && ($lpy_numpy[$i] == TRUE)) then
+      flog $log set v = 2.numpy
+      set dev = ( $dev lpynum=-DHAVE_NUMPY )
+   else if (($lpy_vers[$i] =~ 3*) && ($lpy_numpy[$i] == TRUE)) then
+      flog $log set v = 3.numpy
+      set dev = ( $dev lpynum=-DHAVE_NUMPY )
+   else
+      continue
+   endif
+
+   NoteD $log "----------------------------------------------------------"
+   NoteD $log ""
+   NoteD $log "   in $v pact $arg $tgt"
+   NoteD $log ""
 
    flog $log pushd $v
 
-   ftee $log pact $arg $tgt
+   ftee $log pact $dev $arg $tgt
+   @ err = $err + $status
 
    flog $log popd
 

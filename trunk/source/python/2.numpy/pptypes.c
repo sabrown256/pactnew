@@ -1432,7 +1432,7 @@ PP_file *_PP_open_vif(char *name)
 
     PP_init_type_map_basic(fileinfo);
 
-#ifdef HAVE_NUMPY
+#ifdef HAVE_PY_NUMPY
     _PP_init_numpy_types(fileinfo);
 #endif
 

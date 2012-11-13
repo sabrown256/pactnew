@@ -528,7 +528,6 @@ static char PP_hashtab_Type__doc__[] =
 /* static */
 PyTypeObject PP_hashtab_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
         "hashtab",                       /* tp_name */
         sizeof(PP_hashtabObject),         /* tp_basicsize */
         0,                              /* tp_itemsize */

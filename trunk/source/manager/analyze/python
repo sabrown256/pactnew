@@ -22,213 +22,253 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: python"
 
-dbmget $ALog HAVE_PYTHON     =\? ""^        \
-             HAVE_PY_NUMERIC =\? ""^        \
-             HAVE_PY_NUMPY   =\? ""^        \
-             Python_Exe      =\? "python"^  \
-             Python_Path     =\? ""^        \
-             Python_CC_Exe   =\? "gcc"^     \
-             PY_Exe          =\? ""^        \
-             PY_Vers         =\? ""^        \
-             PY_DirPy        =\? ""^        \
-             PY_DirDst       =\? ""^        \
-             PY_DirSrc       =\? ""^        \
-             PY_CC           =\? ""^        \
-             PY_Cfg          =\? ""^        \
-             PY_Inc          =\? ""^        \
-             PY_Path         =\? ""^        \
-             CC_Exe^                        \
-             OS_Name
-
-Note $ALog ""
-Note $ALog "Python_Exe    = $Python_Exe"
-Note $ALog "Python_Path   = $Python_Path"
-Note $ALog "Python_CC_Exe = $Python_CC_Exe"
-Note $ALog ""
-
-# load up PY variables from Group Python specifications
-if ("$Python_Exe" =~ /*) then
-   flog $ALog setenv PY_Path    $Python_Exe:h:h
-   flog $ALog setenv Python_Exe $Python_Exe:t
-endif
-if ("$Python_Path" != "") then
-   flog $ALog setenv PY_Path $Python_Path
-endif
-
 # if there is no python directory no need to look further
 if (-d ../../python) then
 
-   NoteD $ALog -n "   Python: "
+   NoteD $ALog "   Python: "
    Note $ALog ""
 
-   set lDirs = ( $path /usr/bin /bin )
-   if (-d "$PY_Path") then
-      set lDirs = ( $PY_Path/bin $lDirs )
-      Note $ALog "Specified python path: $PY_Path"
-   else
-      setenv PY_Path ""
-   endif
+   dbmget $ALog Python_Exe      =\? "python"^  \
+                Python_Path     =\? ""^        \
+                Python_CC_Exe   =\? "gcc"^     \
+                CC_Exe^                        \
+                OS_Name
 
-   Note $ALog "Search Dirs = |$lDirs|"
-   flog $ALog set found = FALSE
-   foreach i ($lDirs)
-      if (-x $i/$Python_Exe) then
-         Note $ALog ""
-         Note $ALog "Checking $i/$Python_Exe"
-         setenv PY_Exe $i/$Python_Exe
+   Note $ALog ""
+   Note $ALog "Python_Exe    = $Python_Exe"
+   Note $ALog "Python_Path   = $Python_Path"
+   Note $ALog "Python_CC_Exe = $Python_CC_Exe"
+   Note $ALog ""
 
-         setenv PY_Vers ""
-         setenv PY_Inc  ""
-         setenv PY_Lib  ""
-         setenv PY_Cfg  ""
-         setenv PY_CC   ""
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-         @ ok = 0
-         set inf = ( `$PY_Exe ../../python/python-info.py` )
-         if ($inf[1] == "Version:") then
-            flog $ALog setenv PY_Vers $inf[2]
-            @ ok = $ok + 1
-         endif
-         if ($inf[3] == "IncDir:") then
-            flog $ALog setenv PY_Inc $inf[4]
-            @ ok = $ok + 1
-         endif
-         if ($inf[5] == "LibDir:") then
-            flog $ALog setenv PY_Lib $inf[6]
-            @ ok = $ok + 1
-         endif
-         if ($inf[7] == "CfgDir:") then
-            flog $ALog setenv PY_Cfg $inf[8]
-            @ ok = $ok + 1
-         endif
-         if ($inf[9] == "Compiler:") then
-            flog $ALog setenv PY_CC  $inf[10]
-            @ ok = $ok + 1
+   set have_python     = ""
+   set have_py_numeric = ""
+   set have_py_numpy   = ""
+   set py_exe          = ""
+   set py_vers         = ""
+   set py_dirpy        = ""
+   set py_dirdst       = ""
+   set py_dirsrc       = ""
+   set py_cc           = ""
+   set py_cfg          = ""
+   set py_inc          = ""
+   set py_path         = ""
+
+   foreach py ( `echo $Python_Exe | sed 's/,/ /g'` )
+
+      set lhave_python     = ""
+      set lhave_py_numeric = ""
+      set lhave_py_numpy   = ""
+      set lpy_path         = ""
+      set lpy_exe          = ""
+      set lpy_vers         = ""
+      set lpy_cc           = ""
+      set lpy_cfg          = ""
+      set lpy_inc          = ""
+      set lpy_lib          = ""
+      set lpy_dirpy        = ""
+      set lpy_dirdst       = ""
+      set lpy_dirsrc       = ""
+
+# load up PY variables from Group Python specifications
+      if ("$py" =~ /*) then
+         flog $ALog set lpy_path = $py:h:h
+         flog $ALog set py       = $py:t
+      endif
+      if ("$Python_Path" != "") then
+         flog $ALog set lpy_path = $Python_Path
+      endif
+
+      set lDirs = ( $path /usr/bin /bin )
+      if (-d "$lpy_path") then
+         set lDirs = ( $lpy_path/bin $lDirs )
+         Note $ALog "Specified python path: $lpy_path"
+      else
+         set lpy_path = ""
+      endif
+
+      Note $ALog "Search Dirs = |$lDirs|"
+      flog $ALog set found = FALSE
+      foreach i ($lDirs)
+         if (-x $i/$py) then
+            Note $ALog ""
+            Note $ALog "Checking $i/$py"
+            set lpy_exe = $i/$py
+
+            set lpy_vers = ""
+            set lpy_inc  = ""
+            set lpy_lib  = ""
+            set lpy_cfg  = ""
+            set lpy_cc   = ""
+
+            @ ok = 0
+            set inf = ( `$lpy_exe ../../python/python-info.py` )
+            if ($inf[1] == "Version:") then
+               flog $ALog set lpy_vers = $inf[2]
+               @ ok = $ok + 1
+            endif
+            if ($inf[3] == "IncDir:") then
+               flog $ALog set lpy_inc = $inf[4]
+               @ ok = $ok + 1
+            endif
+            if ($inf[5] == "LibDir:") then
+               flog $ALog set lpy_lib = $inf[6]
+               @ ok = $ok + 1
+            endif
+            if ($inf[7] == "CfgDir:") then
+               flog $ALog set lpy_cfg = $inf[8]
+               @ ok = $ok + 1
+            endif
+            if ($inf[9] == "Compiler:") then
+               flog $ALog set lpy_cc =  $inf[10]
+               @ ok = $ok + 1
 
 # get the compiler python was built with
-            if ((($OS_Name == "Linux")    || \
-                 ($OS_Name == "Darwin")   || \
-                 ($OS_Name == "FreeBSD")) && \
-                ($PY_CC == cc)) then
-               flog $ALog setenv PY_CC Python_CC_Exe
+               if ((($OS_Name == "Linux")    || \
+                    ($OS_Name == "Darwin")   || \
+                    ($OS_Name == "FreeBSD")) && \
+                   ($lpy_cc == cc)) then
+                  flog $ALog set lpy_cc = Python_CC_Exe
+               endif
             endif
-         endif
 
 # if we have all 5 pieces of info then we have a usable python
-         if ($ok == 5) then
-            flog $ALog setenv HAVE_PYTHON TRUE
+            if ($ok == 5) then
+               flog $ALog set lhave_python = TRUE
 
-            NoteD $ALog "Python summary:"
-            NoteD $ALog "      executable $PY_Exe"
-            NoteD $ALog "      compiled with $PY_CC"
-            NoteD $ALog "      has include directory $PY_Inc"
-            NoteD $ALog "      has lib directory $PY_Lib"
+               Note $ALog "Python summary:"
+               NoteD $ALog "      $lpy_exe"
+               NoteD $ALog "         compiled with $lpy_cc"
+               NoteD $ALog "         has include directory $lpy_inc"
+               NoteD $ALog "         has lib directory $lpy_lib"
 
 # check for Numeric
-            if (-d $PY_Inc/Numeric) then
-               NoteD $ALog "      has numeric extensions"
-               flog $ALog setenv HAVE_PY_NUMERIC TRUE
-            else
-               flog $ALog setenv HAVE_PY_NUMERIC FALSE
-            endif
+               if (-d $lpy_inc/Numeric) then
+                  NoteD $ALog "         has numeric extensions"
+                  flog $ALog set lhave_py_numeric = TRUE
+               else
+                  flog $ALog set lhave_py_numeric = FALSE
+               endif
 
 # check for NumPy
-            if ((-d $PY_Lib/NumPy) || \
-                (-d $PY_Lib/numpy) || \
-                (-d $PY_Lib/site-packages/NumPy) || \
-                (-d $PY_Lib/site-packages/numpy) || \
-                (-d $PY_Lib/dist-packages/NumPy) || \
-                (-d $PY_Lib/dist-packages/numpy) || \
-                (-d $PY_Inc/numpy)) then
-               NoteD $ALog "      has numpy extensions"
-               flog $ALog setenv HAVE_PY_NUMPY TRUE
-            else
-               flog $ALog setenv HAVE_PY_NUMPY FALSE
-            endif
+               if ((-d $lpy_lib/NumPy) || \
+                   (-d $lpy_lib/numpy) || \
+                   (-d $lpy_lib/site-packages/NumPy) || \
+                   (-d $lpy_lib/site-packages/numpy) || \
+                   (-d $lpy_lib/dist-packages/NumPy) || \
+                   (-d $lpy_lib/dist-packages/numpy) || \
+                   (-d $lpy_inc/numpy)) then
+                  NoteD $ALog "         has numpy extensions"
+                  flog $ALog set lhave_py_numpy = TRUE
+               else
+                  flog $ALog set lhave_py_numpy = FALSE
+               endif
 
-            if (($HAVE_PY_NUMERIC == FALSE) && ($HAVE_PY_NUMPY == FALSE)) then
-               NoteD $ALog "      does not have numeric extensions"
+               if (($lhave_py_numeric == FALSE) && ($lhave_py_numpy == FALSE)) then
+                  NoteD $ALog "         does not have numeric extensions"
 # NOTE: if we can build sensibly without any numeric extensions delete these
-               flog $ALog setenv PY_Exe "no-numeric"
-               flog $ALog setenv HAVE_PYTHON FALSE
-            endif
+                  flog $ALog set lpy_exe      = "no-numeric"
+                  flog $ALog set lhave_python = FALSE
+               endif
 
-            if ($OS_Name == "AIX") then
-               set CCVer = `$CC_Exe -qversion`
-               set PCVer = `$PY_CC -qversion`
-               Note $ALog "CCVer = |$CCVer|"
-               Note $ALog "PCVer = |$PCVer|"
-               if ("$CCVer" != "$PCVer") then
-                  flog $ALog setenv PY_Exe "wrong-cc"
-                  flog $ALog setenv HAVE_PYTHON FALSE
-               endif      
-            else if ($PY_CC != $CC_Exe) then
-               Note $ALog "PY_CC   = |$PY_CC|"
-               Note $ALog "CC_Exe = |$CC_Exe|"
-               flog $ALog setenv PY_Exe "wrong-cc"
-               flog $ALog setenv HAVE_PYTHON FALSE
+               if ($OS_Name == "AIX") then
+                  set CCVer = `$CC_Exe -qversion`
+                  set PCVer = `$lpy_cc -qversion`
+                  Note $ALog "CCVer = |$CCVer|"
+                  Note $ALog "PCVer = |$PCVer|"
+                  if ("$CCVer" != "$PCVer") then
+                     flog $ALog set lpy_exe      = "wrong-cc"
+                     flog $ALog set lhave_python = FALSE
+                  endif      
+               else if ($lpy_cc != $CC_Exe) then
+                  Note $ALog "lpy_cc = |$lpy_cc|"
+                  Note $ALog "CC_Exe = |$CC_Exe|"
+                  flog $ALog set lpy_exe      = "wrong-cc"
+                  flog $ALog set lhave_python = FALSE
+               endif
+               flog $ALog set lpy_path = $i
+               flog $ALog set found    = TRUE
+               break
             endif
-            flog $ALog setenv PY_Path $i
-            flog $ALog set found = TRUE
-            break
          endif
+      end
+
+      if ($found == FALSE) then
+         NoteD $ALog "none recognizable"
+         flog $ALog set lhave_python     = FALSE
+         flog $ALog set lhave_py_numeric = FALSE
+         flog $ALog set lhave_py_numpy   = FALSE
+         flog $ALog set lpy_path         = "none"
+         flog $ALog set lpy_exe          = "none"
+         flog $ALog set lpy_vers         = "none"
+         flog $ALog set lpy_cc           = "none"
+         flog $ALog set lpy_cfg          = "none"
+         flog $ALog set lpy_inc          = "none"
+         flog $ALog set lpy_dirsrc       = "none"
+         flog $ALog set lpy_dirdst       = "none"
+         flog $ALog set lpy_dirpy        = "none"
       endif
-   end
 
-   if ($found == FALSE) then
-      NoteD $ALog "none recognizable"
-      flog $ALog setenv HAVE_PYTHON     FALSE
-      flog $ALog setenv HAVE_PY_NUMERIC FALSE
-      flog $ALog setenv HAVE_PY_NUMPY   FALSE
-      flog $ALog setenv PY_Path         ""
-      flog $ALog setenv PY_Exe          ""
-      flog $ALog setenv PY_CC           ""
-      flog $ALog setenv PY_Cfg          ""
-      flog $ALog setenv PY_DirSrc       ""
-      flog $ALog setenv PY_DirDst       ""
-      flog $ALog setenv PY_DirPy        ""
-      flog $ALog setenv PY_Inc          ""
-      flog $ALog setenv PY_Vers         ""
-   endif
-
-   if ($MAKE_Shared_Libs == FALSE) then
-      flog $ALog setenv HAVE_PYTHON FALSE
-   endif
-
-   if ($HAVE_PYTHON == TRUE) then
-      set PyRoot = $SysDir
-      set PyHead = python${PY_Vers}/pact
-      if ("$PY_Path" != "") then
-         set PyRoot = $PY_Exe
-         set PyRoot = $PyRoot:h
-         set PyRoot = $PyRoot:h
-         set PyHead = python${PY_Vers}
+      if ($MAKE_Shared_Libs == FALSE) then
+         flog $ALog set lhave_python = FALSE
       endif
+
+      if ($lhave_python == TRUE) then
+         set lpr = $SysDir
+         set lph = python${lpy_vers}/pact
+         if ("$lpy_path" != "") then
+            set lpr = $lpy_exe
+            set lpr = $lpr:h
+            set lpr = $lpr:h
+            set lph = python${lpy_vers}
+         endif
 
 # install destination in python tree
-      setenv PY_DirPy  $PyRoot/lib/$PyHead/site-packages
+         set lpy_dirpy = $lpr/lib/$lph/site-packages
 
 # install destination in PACT tree
-      setenv PY_DirDst $InstBase/lib/$PyHead
+         set lpy_dirdst = $InstBase/lib/$lph
 
 # install source (local build destination)
-      setenv PY_DirSrc $SysDir/lib/python${PY_Vers}
+         set lpy_dirsrc = $SysDir/lib/python${lpy_vers}
 
-      dbmset $ALog PY_DirSrc = $PY_DirSrc^       \
-                   PY_DirDst = $PY_DirDst^       \
-                   PY_DirPy  = $PY_DirPy
-   endif
+         unset lpr
+         unset lph
+      endif
+
+      set have_python     = ( $have_python     $lhave_python)
+      set have_py_numeric = ( $have_py_numeric $lhave_py_numeric )
+      set have_py_numpy   = ( $have_py_numpy   $lhave_py_numpy )
+      set py_path         = ( $py_path         $lpy_path )
+      set py_exe          = ( $py_exe          $lpy_exe )
+      set py_vers         = ( $py_vers         $lpy_vers )
+      set py_cc           = ( $py_cc           $lpy_cc )
+      set py_cfg          = ( $py_cfg          $lpy_cfg )
+      set py_inc          = ( $py_inc          $lpy_inc )
+      set py_dirpy        = ( $py_dirpy        $lpy_dirpy )
+      set py_dirdst       = ( $py_dirdst       $lpy_dirdst )
+      set py_dirsrc       = ( $py_dirsrc       $lpy_dirsrc )
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 # export the results
-dbmset $ALog HAVE_PYTHON     = $HAVE_PYTHON^       \
-             HAVE_PY_NUMERIC = $HAVE_PY_NUMERIC^   \
-             HAVE_PY_NUMPY   = $HAVE_PY_NUMPY^     \
-             PY_Path         = $PY_Path^           \
-             PY_Exe          = $PY_Exe^            \
-             PY_CC           = $PY_CC^             \
-             PY_Cfg          = $PY_Cfg^            \
-             PY_Inc          = $PY_Inc^            \
-             PY_Vers         = $PY_Vers
+
+   dbmset $ALog HAVE_PYTHON     = "$have_python"^       \
+                HAVE_PY_NUMERIC = "$have_py_numeric"^   \
+                HAVE_PY_NUMPY   = "$have_py_numpy"^     \
+                PY_Path         = "$py_path"^           \
+                PY_Exe          = "$py_exe"^            \
+                PY_Vers         = "$py_vers"^           \
+                PY_CC           = "$py_cc"^             \
+                PY_Cfg          = "$py_cfg"^            \
+                PY_Inc          = "$py_inc"^            \
+                PY_DirSrc       = "$py_dirsrc"^         \
+                PY_DirDst       = "$py_dirdst"^         \
+                PY_DirPy        = "$py_dirpy"
 endif
 
 exit(0)

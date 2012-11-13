@@ -94,7 +94,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT 'set Man3Dir   = $InstDir/'$Man3Dir
        Note $STDOUT ""
 
-       if ($HAVE_PYTHON == TRUE) then
+       if ("$HAVE_PYTHON" =~ *TRUE*) then
           Note $STDOUT "set PY_Vers    = $PY_Vers"
           Note $STDOUT "set PY_DirPy   = $PY_DirPy"       # python destination
           Note $STDOUT "set PY_DirDst  = $PY_DirDst"      # pact destination
@@ -341,7 +341,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT '   endif'
        Note $STDOUT 'end'
 
-       if ($HAVE_PYTHON == TRUE) then
+       if ("$HAVE_PYTHON" =~ *TRUE*) then
 
           Note $STDOUT 'if (-d $PY_DirSrc) then'
 

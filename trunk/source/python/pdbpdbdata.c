@@ -549,7 +549,6 @@ static char PP_pdbdata_Type__doc__[] =
 /* static */
 PyTypeObject PP_pdbdata_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
         "pdbdata",                       /* tp_name */
         sizeof(PP_pdbdataObject),         /* tp_basicsize */
         0,                              /* tp_itemsize */

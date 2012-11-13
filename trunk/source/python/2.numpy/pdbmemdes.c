@@ -211,7 +211,6 @@ static char PP_memdes_Type__doc__[] =
 /* static */
 PyTypeObject PP_memdes_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
         "memdes",                       /* tp_name */
         sizeof(PP_memdesObject),         /* tp_basicsize */
         0,                              /* tp_itemsize */

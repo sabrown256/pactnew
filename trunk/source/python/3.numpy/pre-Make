@@ -10,8 +10,14 @@
 #
 
 PyPACTVers = 3.numpy
+
+lpycfg = none
+lpyver = none
+lpyinc = none
+lpynum = -DHAVE_PY_NUMPY
+
 LibName=py_${PyPACTVers}
-PyDir  = ${LibDir}/python${PY_Vers}/pact_${PyPACTVers}
+PyDir  = ${LibDir}/python${lpyver}/pact_${PyPACTVers}
 TGTLib = ${LibDir}/lib${LibName}.a
 
 OD = DefaultG
@@ -20,10 +26,10 @@ OD = DefaultG
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${ODC} -I. -I../.. -I${PY_IncDir} -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags = ${ODC} ${lpynum} -I. -I../.. -I${lpyinc} -I${IncDir} ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${lpynum} ${Shared_CC_Flags} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)
@@ -123,7 +129,7 @@ IncAction = cp ../${PACTTmpDir}/{gp-*.c,py-*.h} ${PACTTmpDir}
 
 SDir = ${PACTSrcDir}
 
-LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${PACTTmpDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" -f ../../pre-Make devlib)
+LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${PACTTmpDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" lpyver=${lpyver} lpyinc=${lpyinc} -f ../../pre-Make devlib)
 
 TGTSPDB  = ${PyDir}/libpypdb.so
 TGTShPDB = ${TGTSPDB}.1
@@ -166,7 +172,7 @@ ${TGTShPGS} : ${TGTLib}
 # link 
 #
 link: ${TGTLib} ${PySrc}
-	./link
+	./link -c ${lpycfg}
 
 #
 # install 
@@ -192,6 +198,6 @@ inform :
 # Run the PDB test suite
 #
 test :
-	@./pytest
+	@./pytest -c ${lpycfg}
 
 
