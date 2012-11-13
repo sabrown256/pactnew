@@ -183,7 +183,7 @@ PP_hashtab_keys(PP_hashtabObject *self,
         return NULL;
     names = SC_hasharr_dump(tab, NULL, NULL, FALSE);
     for (i = 0; i < ne; i++) {
-        err = PyTuple_SetItem(rv, i, PyString_FromString(names[i]));
+        err = PyTuple_SetItem(rv, i, PY_STRING_STRING(names[i]));
         if (err < 0) {
             Py_DECREF(rv);
             rv = NULL;
@@ -420,11 +420,11 @@ PP_hashtab_mp_subscript(PyObject *_self, PyObject *key)
     PyObject *rv;
     PP_hashtabObject *self = (PP_hashtabObject *) _self;
 
-    if (!PyString_Check(key)) {
+    if (!PY_STRING_CHECK(key)) {
         PP_error_set_user(key, "key must be string");
         return NULL;
     }
-    name = PyString_AsString(key);
+    name = PY_STRING_AS_STRING(key);
 
     hashtab = self->data;
     if (hashtab == NULL) {
@@ -454,11 +454,11 @@ PP_hashtab_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
     hasharr *hashtab;
     PP_hashtabObject *self = (PP_hashtabObject *) _self;
     
-    if (!PyString_Check(key)) {
+    if (!PY_STRING_CHECK(key)) {
         PP_error_set_user(key, "key must be string");
         return -1;
     }
-    name = PyString_AsString(key);
+    name = PY_STRING_AS_STRING(key);
 
     hashtab = self->data;
     if (hashtab == NULL) {

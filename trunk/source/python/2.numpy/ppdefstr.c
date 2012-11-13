@@ -139,11 +139,11 @@ defstr *PP_defstr_alt(PDBfile *file, char *name, PyObject *members)
     /* create list of names */
     for (i = 0; i < nmemb; i++) {
         item = PySequence_GetItem(members, i);
-        if (! PyString_Check(item)) {
+        if (! PY_STRING_CHECK(item)) {
             PP_error_set_user(item, "members must be strings");
             return NULL;  /* XXX cleanup */
         }
-        list[i] = PyString_AS_STRING(item);
+        list[i] = PY_STRING_AS_STRING(item);
     }
 
     dp = PD_defstr_alt(file, name, nmemb, list);
@@ -314,9 +314,9 @@ PyTypeObject *PP_defstr_mk_ctor(PP_defstrObject *dpobj)
     /* Set name in the extended type object */
     et = (PyHeapTypeObject *)ctor;
 #if PYTHON_API_VERSION >= 1013
-    et->ht_name = PyString_FromString(ctor->tp_name);
+    et->ht_name = PY_STRING_STRING(ctor->tp_name);
 #else
-    et->name = PyString_FromString(ctor->tp_name);
+    et->name = PY_STRING_STRING(ctor->tp_name);
 #endif
 
     if (PyType_Ready(ctor) < 0)

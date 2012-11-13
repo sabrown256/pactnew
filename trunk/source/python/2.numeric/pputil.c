@@ -338,7 +338,7 @@ int PP_obj_to_ind(PyObject *indobj, long *ind)
         if (num == NULL)
             goto err;
         ind[0] = 0;
-        ind[1] = PyInt_AsLong(num) - 1;
+        ind[1] = PY_INT_AS_LONG(num) - 1;
         ind[2] = 1;
         nd = 1;
     } else {
@@ -357,7 +357,7 @@ int PP_obj_to_ind(PyObject *indobj, long *ind)
                 if (num == NULL)
                     goto err;
                 ind[i * 3 + 0] = 0;
-                ind[i * 3 + 1] = PyInt_AsLong(num) - 1;
+                ind[i * 3 + 1] = PY_INT_AS_LONG(num) - 1;
                 ind[i * 3 + 2] = 1;
                 Py_DECREF(num);
             } else {
@@ -387,14 +387,14 @@ int PP_obj_to_ind(PyObject *indobj, long *ind)
                     num = PyNumber_Int(lower);
                     if (num == NULL)
                         goto err;
-                    ind[i * 3 + 0] = PyInt_AsLong(num);
+                    ind[i * 3 + 0] = PY_INT_AS_LONG(num);
                     Py_DECREF(num);
                 }
                 
                 num = PyNumber_Int(upper);
                 if (num == NULL)
                     goto err;
-                ind[i * 3 + 1] = PyInt_AsLong(num);
+                ind[i * 3 + 1] = PY_INT_AS_LONG(num);
                 Py_DECREF(num);
                 num = NULL;
                 
@@ -404,7 +404,7 @@ int PP_obj_to_ind(PyObject *indobj, long *ind)
                     num = PyNumber_Int(stride);
                     if (num == NULL)
                         goto err;
-                    ind[i * 3 + 2] = PyInt_AsLong(num);
+                    ind[i * 3 + 2] = PY_INT_AS_LONG(num);
                     Py_DECREF(num);
                 }
             }

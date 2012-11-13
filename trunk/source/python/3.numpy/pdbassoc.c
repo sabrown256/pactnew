@@ -120,7 +120,7 @@ PP_assoc_items(PP_assocObject *self,
             item = NULL;
             break;
         }
-        obj = PyString_FromString(s);
+        obj = PY_STRING_STRING(s);
         PyTuple_SET_ITEM(item, 0, obj);
         obj = PP_unpack_hashtab_haelem(c->cdr_type, c->cdr);
         PyTuple_SET_ITEM(item, 1, obj);
@@ -165,7 +165,7 @@ PP_assoc_keys(PP_assocObject *self,
          pa = (pcons *) pa->cdr, i++) {
         c = (pcons *) pa->car;
         s = (char *) c->car;
-        err = PyTuple_SetItem(rv, i, PyString_FromString(s));
+        err = PyTuple_SetItem(rv, i, PY_STRING_STRING(s));
         if (err < 0) {
             Py_DECREF(rv);
             rv = NULL;
@@ -379,11 +379,11 @@ PP_assoc_mp_subscript(PyObject *_self, PyObject *key)
     PyObject *rv;
     PP_assocObject *self = (PP_assocObject *) _self;
 
-    if (!PyString_Check(key)) {
+    if (!PY_STRING_CHECK(key)) {
         PP_error_set_user(key, "key must be string");
         return NULL;
     }
-    name = PyString_AsString(key);
+    name = PY_STRING_AS_STRING(key);
 
     alist = self->alist;
     if (alist == NULL) {
@@ -412,12 +412,12 @@ PP_assoc_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
     PP_assocObject *self = (PP_assocObject *) _self;
     
 #if 0
-    if (!PyString_Check(key)) {
+    if (!PY_STRING_CHECK(key)) {
         PP_user_error(PP_score_errorObject, key, "key must be string");
         return -1;
     }
 #endif
-    name = PyString_AsString(key);
+    name = PY_STRING_AS_STRING(key);
     
     alist = self->alist;
 

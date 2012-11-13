@@ -107,7 +107,7 @@ PP_defstr_keys(PP_defstrObject *self,
     for (i = 0, desc = self->dp->members;
          desc != NULL;
          i++, desc = desc->next) {
-        err = PyTuple_SetItem(rv, i, PyString_FromString(desc->name));
+        err = PyTuple_SetItem(rv, i, PY_STRING_STRING(desc->name));
         if (err < 0) {
             Py_DECREF(rv);
             rv = NULL;
@@ -468,11 +468,11 @@ PP_defstr_mp_subscript(PyObject *_self, PyObject *key)
     PyObject *rv;
     PP_defstrObject *self = (PP_defstrObject *) _self;
  
-    if (!PyString_Check(key)) {
+    if (!PY_STRING_CHECK(key)) {
         PP_error_set_user(key, "key must be string");
         return NULL;
     }
-    name = PyString_AsString(key);
+    name = PY_STRING_AS_STRING(key);
 
     dp = self->dp;
     if (dp == NULL) {

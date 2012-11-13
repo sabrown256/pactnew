@@ -142,7 +142,7 @@ int PP_update_assoc(pcons **in, PyObject *dict)
     nkeys = PyList_GET_SIZE(keys);
     for (i = 0; i < nkeys; i++) {
         keyitem = PyList_GET_ITEM(keys, i);
-        keyname = PyString_AS_STRING(keyitem);
+        keyname = PY_STRING_AS_STRING(keyitem);
         value = PyMapping_GetItemString(dict, keyname);
 
         descr = PP_get_object_descr(PP_vif_info, value);

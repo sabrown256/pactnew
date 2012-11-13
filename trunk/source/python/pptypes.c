@@ -86,7 +86,7 @@ static PP_descr *_PP_get_string_descr(PP_file *fileinfo, PyObject *obj)
     PP_descr *descr;
     Py_ssize_t nitems;
 
-    nitems = PyString_Size(obj);
+    nitems = PY_STRING_SIZE(obj);
     dims   = _PD_mk_dimensions(0, nitems);
 
     descr = _PP_mk_descr(SC_CHAR_I, sizeof(char), SC_CHAR_S,
@@ -118,10 +118,10 @@ STATIC PyObject *new_string_object(void *value, long nitems,
     PyObject *obj;
 
     if (!need_array && nitems == 1)
-       obj = PyString_FromStringAndSize((char *) value, nitems);
+       obj = PY_STRING_STRING_SIZE((char *) value, nitems);
 
     else
-       obj = PyString_FromString((char *) value);
+       obj = PY_STRING_STRING((char *) value);
 
     return(obj);}
 
@@ -137,12 +137,12 @@ STATIC int copy_string_object_data(PyObject *obj, void *vr, long nitems,
                                    int type)
    {
 
-    if (!PyString_Check(obj)) {
+    if (!PY_STRING_CHECK(obj)) {
         PP_error_set(PP_error_internal, obj, "Expected a string");
         return(-1);
     }
 
-    strncpy((char *) vr, PyString_AS_STRING(obj), nitems);
+    strncpy((char *) vr, PY_STRING_AS_STRING(obj), nitems);
 
     return(0);}
 
@@ -158,15 +158,15 @@ STATIC int get_string_object_data(PyObject *obj, void *vr, long nitems,
                                   int type, int gc)
    {
 
-    if (!PyString_Check(obj)) {
+    if (!PY_STRING_CHECK(obj)) {
         PP_error_set(PP_error_internal, obj, "Expected a string");
         return(-1);
     }
 
     if (gc == PP_GC_YES) {
-        DEREF(vr) = CSTRSAVE(PyString_AS_STRING(obj));
+        DEREF(vr) = CSTRSAVE(PY_STRING_AS_STRING(obj));
     } else {
-        DEREF(vr) = PyString_AS_STRING(obj);
+        DEREF(vr) = PY_STRING_AS_STRING(obj);
     }
 
     return(0);}
@@ -182,12 +182,12 @@ STATIC int get_string_object_data(PyObject *obj, void *vr, long nitems,
 STATIC dimdes *get_string_object_dims(PyObject *obj)
    {dimdes *dims;
 
-    if (!PyString_Check(obj)) {
+    if (!PY_STRING_CHECK(obj)) {
         PP_error_set(PP_error_user, obj, "Expected a string");
         return(NULL);
     }
 
-    dims = _PD_mk_dimensions(0L, PyString_Size(obj));
+    dims = _PD_mk_dimensions(0L, PY_STRING_SIZE(obj));
 
     return(dims);}
 
@@ -377,14 +377,14 @@ STATIC int copy_int_object_data(PyObject *obj, void *vr, long nitems,
                                 int type)
    {int ierr;
 
-    if (PyInt_Check(obj)) {
+    if (PY_INT_CHECK(obj)) {
         switch (type) {
         case PP_INT_I:
-            *(int *) vr = (int) PyInt_AS_LONG(obj);
+            *(int *) vr = (int) PY_INT_AS_LONG(obj);
             ierr = 0;
             break;
         case PP_LONG_I:
-            *(long *) vr = PyInt_AS_LONG(obj);
+            *(long *) vr = PY_INT_AS_LONG(obj);
             ierr = 0;
             break;
         default:
@@ -411,13 +411,13 @@ STATIC int get_int_object_data(PyObject *obj, void *vr, long nitems,
                                int type, int gc)
    {int ierr;
 
-    if (PyInt_Check(obj)) {
+    if (PY_INT_CHECK(obj)) {
         switch (type) {
         case PP_INT_I:
             if (gc == PP_GC_YES) {
                 *(int **) vr = CMAKE(int);
 
-                **(int **) vr = (int) PyInt_AS_LONG(obj);
+                **(int **) vr = (int) PY_INT_AS_LONG(obj);
             } else {
                 ierr = -1;
                 PP_error_set(PP_error_internal, obj, "can not process gc == PP_GC_NO");
@@ -429,7 +429,7 @@ STATIC int get_int_object_data(PyObject *obj, void *vr, long nitems,
             if (gc == PP_GC_YES) {
                 *(long **) vr = CMAKE(long);
 
-                **(long **) vr = PyInt_AS_LONG(obj);
+                **(long **) vr = PY_INT_AS_LONG(obj);
             } else {
                 PP_error_set(PP_error_internal, obj, "can not process gc == PP_GC_NO");
                 /* WARNING - this is accessing a python structure outside of the API */
@@ -595,7 +595,7 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
 -        DEBUG_OBJ("FIRST", descr->type, 0, obj1);
 -
 -        /* special case string for efficiency */
--        if (PyString_Check(obj1)) {
+-        if (PY_STRING_CHECK(obj1)) {
 -            PyTypeObject *otype = PY_TYPE(obj1);
 -
 -            for (i = istart; i < nitems; i++) {
@@ -2185,7 +2185,7 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type)
 -        DEBUG_OBJ("FIRST", descr->type, 0, obj1);
 -
 -        /* special case string for efficiency */
--        if (PyString_Check(obj1)) {
+-        if (PY_STRING_CHECK(obj1)) {
 -            PyTypeObject *otype = PY_TYPE(obj1);
 -
 -            for (i = istart; i < nitems; i++) {
@@ -2352,11 +2352,11 @@ int PP_get_object_length(PyObject *obj)
 #if 0
 -        if (PyArray_Check(obj)) {
 -        return(PyArray_Size(obj));
--    } else if (PyString_Check(obj)) {
--        return(PyString_Size(obj));
+-    } else if (PY_STRING_CHECK(obj)) {
+-        return(PY_STRING_SIZE(obj));
 -    } else if (PyFloat_Check(obj)) {
 -        return(1);
--    } else if (PyInt_Check(obj)) {
+-    } else if (PY_INT_CHECK(obj)) {
 -        return(1);
 -    } else if (PySequence_Check(obj)) {
 -        return(PySequence_Length(obj));

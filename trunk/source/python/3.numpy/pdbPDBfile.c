@@ -412,7 +412,7 @@ PP_PDBfile_ls(PP_PDBfileObject *self,
 
     rv = PyTuple_New(num);
     for (i = 0; i < num; i++) {
-        item = PyString_FromString(out[i]);
+        item = PY_STRING_STRING(out[i]);
         if (item == NULL) {
             ierr = -1;
             break;
@@ -508,7 +508,7 @@ PP_PDBfile_register_class(PP_PDBfileObject *self,
 
     ctor = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!s|O!:register_class", kw_list,
-                                     &PyClass_Type, &cls,
+                                     &PY_TYPE_TYPE, &cls,
                                      &type,
                                      &PyFunction_Type, &ctor))
         return NULL;
@@ -842,7 +842,7 @@ PP_PDBfile_pwd(PP_PDBfileObject *self,
 
     pwd = PD_pwd(fp);
 
-    rv = PyString_FromString(pwd);
+    rv = PY_STRING_STRING(pwd);
 
     return rv;
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.pwd) */
@@ -1015,28 +1015,28 @@ PP_PDBfile_object_mode_get(PP_PDBfileObject *self, void *context)
     PyObject *rv;
     switch (PD_get_mode(self->object)) {
     case PD_READ:
-        rv = PyString_FromString("PD_READ");
+        rv = PY_STRING_STRING("PD_READ");
         break;
     case PD_WRITE:
-        rv = PyString_FromString("PD_WRITE");
+        rv = PY_STRING_STRING("PD_WRITE");
         break;
     case PD_APPEND:
-        rv = PyString_FromString("a");
+        rv = PY_STRING_STRING("a");
         break;
     case PD_OPEN:
-        rv = PyString_FromString("r");
+        rv = PY_STRING_STRING("r");
         break;
     case PD_CREATE:
-        rv = PyString_FromString("w");
+        rv = PY_STRING_STRING("w");
         break;
     case PD_CLOSE:
-        rv = PyString_FromString("PD_CLOSE");
+        rv = PY_STRING_STRING("PD_CLOSE");
         break;
     case PD_TRACE:
-        rv = PyString_FromString("PD_TRACE");
+        rv = PY_STRING_STRING("PD_TRACE");
         break;
     case PD_PRINT:
-        rv = PyString_FromString("PD_PRINT");
+        rv = PY_STRING_STRING("PD_PRINT");
         break;
     default:
         rv = PY_INT_LONG(PD_get_mode(self->object));
@@ -1103,10 +1103,10 @@ PP_PDBfile_object_major_order_get(PP_PDBfileObject *self, void *context)
     
     switch (PD_get_major_order(self->object)) {
     case ROW_MAJOR_ORDER:
-        rv = PyString_FromString("ROW MAJOR");
+        rv = PY_STRING_STRING("ROW MAJOR");
         break;
     case COLUMN_MAJOR_ORDER:
-        rv = PyString_FromString("COLUMN MAJOR");
+        rv = PY_STRING_STRING("COLUMN MAJOR");
         break;
     default:
         PP_error_set(PP_error_internal, NULL,
@@ -1209,9 +1209,8 @@ static char PP_PDBfile_Type__doc__[] =
 /* static */
 PyTypeObject PP_PDBfile_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
-        "PDBfile",                       /* tp_name */
-        sizeof(PP_PDBfileObject),         /* tp_basicsize */
+        "PDBfile",                      /* tp_name */
+        sizeof(PP_PDBfileObject),       /* tp_basicsize */
         0,                              /* tp_itemsize */
         /* Methods to implement standard operations */
         (destructor)0,                  /* tp_dealloc */
