@@ -1076,150 +1076,144 @@ static int _PP_extra_defstr_mark(haelem *hp, void *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* init_pdb - Initialization function for the module
- * (*must* be called init_pdb) */
+/* INIT_PDB - initialization function for the module
+ *          - NOTE: MUST be called init_pdb
+ */
 
 static char pdb_module_documentation[] = 
 ""
 ;
 
-DL_EXPORT(void)
-init_pdb(void)
-{
-    PyObject *m, *d;
-/* DO-NOT-DELETE splicer.begin(pdb._init_locals) */
+PY_MOD_INIT(_pdb)
+   {PyObject *m, *d;
 
-    /* subtype pdbdata */
+/* subtype pdbdata */
     PP_hashtab_Type.tp_base = &PP_pdbdata_Type;
 
-/* DO-NOT-DELETE splicer.end(pdb._init_locals) */
+/* create the module and add the functions */
+    PY_MOD_DEF(m, "_pdb", pdb_module_documentation, PP_methods);
 
-    /* Create the module and add the functions */
-    m = Py_InitModule4("_pdb", PP_methods,
-                       pdb_module_documentation,
-                       (PyObject*)NULL,PYTHON_API_VERSION);
     if (m == NULL)
-        return;
+       PY_MOD_RETURN_ERR;
 
     if (PyModule_AddIntConstant(m, "TRUE", (long) TRUE) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "FALSE", (long) FALSE) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "ON", (long) ON) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "OFF", (long) OFF) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddObject(m, "SMALL", PyFloat_FromDouble((double) SMALL)) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddObject(m, "HUGE", PyFloat_FromDouble((double) HUGE)) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "Z_CENT", (long) Z_CENT) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "N_CENT", (long) N_CENT) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "F_CENT", (long) F_CENT) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "E_CENT", (long) E_CENT) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "U_CENT", (long) U_CENT) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddObject(m, "TOLERANCE", PyFloat_FromDouble((double) TOLERANCE)) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "AC_S", PM_AC_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "LR_S", PM_LR_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "MAP_INFO_P_S", PM_MAP_INFO_P_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "MAPPING_P_S", PM_MAPPING_P_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "SET_P_S", PM_SET_P_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "MAP_INFO_S", PM_MAP_INFO_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "MAPPING_S", PM_MAPPING_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "MESH_TOPOLOGY_S", PM_MESH_TOPOLOGY_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "MESH_TOPOLOGY_P_S", PM_MESH_TOPOLOGY_P_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddStringConstant(m, "SET_S", PM_SET_S) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
 
     PP_field_Type.tp_new = PyType_GenericNew;
     PP_field_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_field_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     PP_mesh_topology_Type.tp_new = PyType_GenericNew;
     PP_mesh_topology_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_mesh_topology_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     PP_set_Type.tp_new = PyType_GenericNew;
     PP_set_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_set_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     PP_mapping_Type.tp_new = PyType_GenericNew;
     PP_mapping_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_mapping_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     PP_defstr_Type.tp_new = PyType_GenericNew;
     PP_defstr_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_defstr_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     PP_pdbdata_Type.tp_new = PyType_GenericNew;
     PP_pdbdata_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_pdbdata_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     PP_hashtab_Type.tp_new = PyType_GenericNew;
     PP_hashtab_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_hashtab_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     PP_assoc_Type.tp_new = PyType_GenericNew;
     PP_assoc_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_assoc_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     PP_memdes_Type.tp_new = PyType_GenericNew;
     PP_memdes_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_memdes_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     PP_PDBfile_Type.tp_new = PyType_GenericNew;
     PP_PDBfile_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_PDBfile_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
 
-  /* Add some symbolic constants to the module */
+/* add some symbolic constants to the module */
     d = PyModule_GetDict(m);
     if (d == NULL)
-        return;
+       PY_MOD_RETURN_ERR;
 
     if (PyDict_SetItemString(d, "field", (PyObject *) &PP_field_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "mesh_topology", (PyObject *) &PP_mesh_topology_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "set", (PyObject *) &PP_set_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "mapping", (PyObject *) &PP_mapping_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "defstr", (PyObject *) &PP_defstr_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "pdbdata", (PyObject *) &PP_pdbdata_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "hashtab", (PyObject *) &PP_hashtab_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "assoc", (PyObject *) &PP_assoc_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "memdes", (PyObject *) &PP_memdes_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "PDBfile", (PyObject *) &PP_PDBfile_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
 
-/* DO-NOT-DELETE splicer.begin(pdb._init_body) */
-    /* remove sequence behavior from hashtab that is inherited from pdbdata */
+/* remove sequence behavior from hashtab that is inherited from pdbdata */
     PP_hashtab_Type.tp_as_sequence = NULL;
     
-    /* make 'open' a synonym for 'PDBfile' */
+/* make 'open' a synonym for 'PDBfile' */
     if (PyDict_SetItemString(d, "open", (PyObject *) &PP_PDBfile_Type) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
 
     PP_init_type_map();
 
@@ -1228,53 +1222,51 @@ init_pdb(void)
 #endif
   
     if (PyModule_AddIntConstant(m, "AS_NONE", AS_NONE) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "AS_PDBDATA", AS_PDBDATA) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "AS_OBJECT", AS_OBJECT) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "AS_TUPLE", AS_TUPLE) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "AS_LIST", AS_LIST) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "AS_DICT", AS_DICT) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     if (PyModule_AddIntConstant(m, "AS_ARRAY", AS_ARRAY) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
     
     PP_open_file_dict = PyDict_New();
     if (PyModule_AddObject(m, "files", PP_open_file_dict) < 0)
-        return;
+       PY_MOD_RETURN_ERR;
 
     PP_vif_info = _PP_open_vif("PP_vif");
-    if (PP_vif_info != NULL) {
-        int err;
+    if (PP_vif_info != NULL)
+       {int err;
 
         PP_vif_obj = _PP_PDBfile_newobj(NULL, PP_vif_info);
         PP_vif      = PP_vif_info->file;
 
-        /* mark every currently existing defstr in the host_chart */
+/* mark every currently existing defstr in the host_chart */
 	err = SC_hasharr_foreach(PP_vif->host_chart, _PP_extra_defstr_mark, NULL);
 	SC_ASSERT(err == TRUE);
 
-        /* XXX - test err */
+/* XXX - test err */
         if (PyModule_AddObject(m, "vif", (PyObject *) PP_vif_obj) < 0)
-            return;
-    }
+           PY_MOD_RETURN_ERR;};
 
-    /* add Error Exceptions */
+/* add Error Exceptions */
     PP_error_internal = PyErr_NewException("pdb.internal", NULL, NULL);
     PyDict_SetItemString(d, "internal", PP_error_internal);
     
     PP_error_user = PyErr_NewException("pdb.error", NULL, NULL);
     PyDict_SetItemString(d, "error", PP_error_user);
     
-/* DO-NOT-DELETE splicer.end(pdb._init_body) */
-
-    /* Check for errors */
+/* check for errors */
     if (PyErr_Occurred())
         Py_FatalError("can't initialize module _pdb");
-}
+
+    PY_MOD_RETURN_OK(m);}
 
 /*--------------------------------------------------------------------------*/
 /*                               MODULE_TAIL                                */
