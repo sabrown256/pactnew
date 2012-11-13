@@ -85,7 +85,7 @@ static PyObject *
 PP_set_set_dimension_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.dimension_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->set->dimension);
+    return PY_INT_LONG(self->set->dimension);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.dimension_get) */
 }
 
@@ -99,7 +99,7 @@ static PyObject *
 PP_set_set_max_index_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.max_index_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->set->max_index, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->set->max_index, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.max_index_get) */
 }
 
@@ -113,7 +113,7 @@ static PyObject *
 PP_set_set_dimension_elem_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.dimension_elem_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->set->dimension_elem);
+    return PY_INT_LONG(self->set->dimension_elem);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.dimension_elem_get) */
 }
 
@@ -127,7 +127,7 @@ static PyObject *
 PP_set_set_n_elements_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.n_elements_get) UNMODIFIED */
-    return PyInt_FromLong(self->set->n_elements);
+    return PY_INT_LONG(self->set->n_elements);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.n_elements_get) */
 }
 
@@ -141,7 +141,7 @@ static PyObject *
 PP_set_set_elements_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.elements_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->set->elements, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->set->elements, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.elements_get) */
 }
 
@@ -211,7 +211,7 @@ static PyObject *
 PP_set_set_metric_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.metric_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->set->metric, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->set->metric, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.metric_get) */
 }
 
@@ -239,7 +239,7 @@ static PyObject *
 PP_set_set_symmetry_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.symmetry_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->set->symmetry, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->set->symmetry, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.symmetry_get) */
 }
 
@@ -267,7 +267,7 @@ static PyObject *
 PP_set_set_topology_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.topology_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->set->topology, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->set->topology, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.topology_get) */
 }
 
@@ -295,7 +295,7 @@ static PyObject *
 PP_set_set_info_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.info_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->set->info, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->set->info, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.info_get) */
 }
 

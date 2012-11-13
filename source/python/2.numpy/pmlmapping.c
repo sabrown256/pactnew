@@ -112,7 +112,7 @@ static PyObject *
 PP_mapping_map_map_get(PP_mappingObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mapping.descriptor.map.map_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->map->map, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->map->map, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.mapping.descriptor.map.map_get) */
 }
 
@@ -126,7 +126,7 @@ static PyObject *
 PP_mapping_map_file_type_get(PP_mappingObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mapping.descriptor.map.file_type_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->map->file_type);
+    return PY_INT_LONG(self->map->file_type);
 /* DO-NOT-DELETE splicer.end(pdb.mapping.descriptor.map.file_type_get) */
 }
 
@@ -140,7 +140,7 @@ static PyObject *
 PP_mapping_map_file_info_get(PP_mappingObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mapping.descriptor.map.file_info_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->map->file_info, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->map->file_info, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.mapping.descriptor.map.file_info_get) */
 }
 

@@ -36,7 +36,7 @@ STATIC PyObject *get_pylong(PyObject *v)
 
     assert(v != NULL);
     if (PyInt_Check(v))
-       return(PyLong_FromLong(PyInt_AS_LONG(v)));
+       return(PY_INT_LONG(PyInt_AS_LONG(v)));
 
     if (PyLong_Check(v))
        {Py_INCREF(v);
@@ -199,7 +199,7 @@ static PyObject *nu_char(void *p, long nitems)
 static PyObject *nu_byte(void *p, long nitems)
    {
 
-    return(PyInt_FromLong((long) *(signed char *)p));}
+    return(PY_INT_LONG(*(signed char *)p));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -207,7 +207,7 @@ static PyObject *nu_byte(void *p, long nitems)
 static PyObject *nu_ubyte(void *p, long nitems)
    {
 
-    return(PyInt_FromLong((long) *(unsigned char *)p));}
+    return(PY_INT_LONG(*(unsigned char *)p));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -217,7 +217,7 @@ static PyObject *nu_short(void *p, long nitems)
 
     memcpy((char *) &x, p, sizeof x);
 
-    return(PyInt_FromLong((long)x));}
+    return(PY_INT_LONG((long)x));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -227,7 +227,7 @@ STATIC PyObject *nu_ushort(void *p, long nitems)
 
     memcpy((char *) &x, p, sizeof x);
 
-    return(PyInt_FromLong((long)x));}
+    return(PY_INT_LONG((long)x));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -237,7 +237,7 @@ static PyObject *nu_int(void *p, long nitems)
 
     memcpy((char *) &x, p, sizeof x);
 
-    return(PyInt_FromLong((long)x));}
+    return(PY_INT_LONG((long)x));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -257,7 +257,7 @@ static PyObject *nu_long(void *p, long nitems)
 
     memcpy((char *) &x, p, sizeof x);
 
-    return(PyInt_FromLong(x));}
+    return(PY_INT_LONG(x));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

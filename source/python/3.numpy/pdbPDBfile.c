@@ -761,7 +761,7 @@ PP_PDBfile_isdir(PP_PDBfileObject *self,
 
     ierr = PD_isdir(fp, dirname);
 
-    rv = PyInt_FromLong((long) ierr);
+    rv = PY_INT_LONG(ierr);
 
     return rv;
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.isdir) */
@@ -878,7 +878,7 @@ static PyObject *
 PP_PDBfile_object_get(PP_PDBfileObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object_get) */
-  return PyCObject_FromVoidPtr(self->object, NULL);
+  return PY_COBJ_VOID_PTR(self->object, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object_get) */
 }
 
@@ -1031,7 +1031,7 @@ PP_PDBfile_object_mode_get(PP_PDBfileObject *self, void *context)
         rv = PyString_FromString("PD_PRINT");
         break;
     default:
-        rv = PyInt_FromLong((long) PD_get_mode(self->object));
+        rv = PY_INT_LONG(PD_get_mode(self->object));
         break;
     }
         
@@ -1049,7 +1049,7 @@ static PyObject *
 PP_PDBfile_object_default_offset_get(PP_PDBfileObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.default_offset_get) */
-    return PyInt_FromLong((long) PD_get_offset(self->object));
+    return PY_INT_LONG(PD_get_offset(self->object));
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.default_offset_get) */
 }
 
@@ -1063,7 +1063,7 @@ static PyObject *
 PP_PDBfile_object_virtual_internal_get(PP_PDBfileObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.virtual_internal_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->object->virtual_internal);
+    return PY_INT_LONG(self->object->virtual_internal);
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.virtual_internal_get) */
 }
 
@@ -1077,7 +1077,7 @@ static PyObject *
 PP_PDBfile_object_system_version_get(PP_PDBfileObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.system_version_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->object->system_version);
+    return PY_INT_LONG(self->object->system_version);
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.system_version_get) */
 }
 

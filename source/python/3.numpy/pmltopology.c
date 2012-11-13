@@ -42,7 +42,7 @@ static PyObject *
 PP_mesh_topology_mt_n_dimensions_get(PP_mesh_topologyObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.descriptor.mt.n_dimensions_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->mt->n_dimensions);
+    return PY_INT_LONG(self->mt->n_dimensions);
 /* DO-NOT-DELETE splicer.end(pdb.mesh_topology.descriptor.mt.n_dimensions_get) */
 }
 
@@ -56,7 +56,7 @@ static PyObject *
 PP_mesh_topology_mt_n_bound_params_get(PP_mesh_topologyObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.descriptor.mt.n_bound_params_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->mt->n_bound_params, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->mt->n_bound_params, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.mesh_topology.descriptor.mt.n_bound_params_get) */
 }
 
@@ -70,7 +70,7 @@ static PyObject *
 PP_mesh_topology_mt_n_cells_get(PP_mesh_topologyObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.descriptor.mt.n_cells_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->mt->n_cells, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->mt->n_cells, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.mesh_topology.descriptor.mt.n_cells_get) */
 }
 
@@ -84,7 +84,7 @@ static PyObject *
 PP_mesh_topology_mt_boundaries_get(PP_mesh_topologyObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.descriptor.mt.boundaries_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->mt->boundaries, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->mt->boundaries, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.mesh_topology.descriptor.mt.boundaries_get) */
 }
 

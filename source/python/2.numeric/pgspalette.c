@@ -56,7 +56,7 @@ static PyObject *
 PP_palette_pal_max_pal_dims_get(PP_paletteObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.palette.descriptor.pal.max_pal_dims_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->pal->max_pal_dims);
+    return PY_INT_LONG(self->pal->max_pal_dims);
 /* DO-NOT-DELETE splicer.end(pgs.palette.descriptor.pal.max_pal_dims_get) */
 }
 
@@ -70,7 +70,7 @@ static PyObject *
 PP_palette_pal_n_pal_colors_get(PP_paletteObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.palette.descriptor.pal.n_pal_colors_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->pal->n_pal_colors);
+    return PY_INT_LONG(self->pal->n_pal_colors);
 /* DO-NOT-DELETE splicer.end(pgs.palette.descriptor.pal.n_pal_colors_get) */
 }
 
@@ -84,7 +84,7 @@ static PyObject *
 PP_palette_pal_n_dev_colors_get(PP_paletteObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.palette.descriptor.pal.n_dev_colors_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->pal->n_dev_colors);
+    return PY_INT_LONG(self->pal->n_dev_colors);
 /* DO-NOT-DELETE splicer.end(pgs.palette.descriptor.pal.n_dev_colors_get) */
 }
 

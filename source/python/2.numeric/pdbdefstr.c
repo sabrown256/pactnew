@@ -186,7 +186,7 @@ static PyObject *
 PP_defstr_dp_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp_get) UNMODIFIED */
-    return PyCObject_FromVoidPtr((void *) self->dp, NULL);
+    return PY_COBJ_VOID_PTR((void *) self->dp, NULL);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp_get) */
 }
 
@@ -214,7 +214,7 @@ static PyObject *
 PP_defstr_dp_size_bits_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.size_bits_get) UNMODIFIED */
-    return PyInt_FromLong(self->dp->size_bits);
+    return PY_INT_LONG(self->dp->size_bits);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.size_bits_get) */
 }
 
@@ -228,7 +228,7 @@ static PyObject *
 PP_defstr_dp_size_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.size_get) UNMODIFIED */
-    return PyInt_FromLong(self->dp->size);
+    return PY_INT_LONG(self->dp->size);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.size_get) */
 }
 
@@ -242,7 +242,7 @@ static PyObject *
 PP_defstr_dp_alignment_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.alignment_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dp->alignment);
+    return PY_INT_LONG(self->dp->alignment);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.alignment_get) */
 }
 
@@ -256,7 +256,7 @@ static PyObject *
 PP_defstr_dp_n_indirects_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.n_indirects_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dp->n_indirects);
+    return PY_INT_LONG(self->dp->n_indirects);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.n_indirects_get) */
 }
 
@@ -270,7 +270,7 @@ static PyObject *
 PP_defstr_dp_is_indirect_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.is_indirect_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dp->is_indirect);
+    return PY_INT_LONG(self->dp->is_indirect);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.is_indirect_get) */
 }
 
@@ -284,7 +284,7 @@ static PyObject *
 PP_defstr_dp_convert_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.convert_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dp->convert);
+    return PY_INT_LONG(self->dp->convert);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.convert_get) */
 }
 
@@ -298,7 +298,7 @@ static PyObject *
 PP_defstr_dp_onescmp_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.onescmp_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dp->onescmp);
+    return PY_INT_LONG(self->dp->onescmp);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.onescmp_get) */
 }
 
@@ -312,7 +312,7 @@ static PyObject *
 PP_defstr_dp_unsgned_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.unsgned_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dp->unsgned);
+    return PY_INT_LONG(self->dp->unsgned);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.unsgned_get) */
 }
 
@@ -326,7 +326,7 @@ static PyObject *
 PP_defstr_dp_order_flag_get(PP_defstrObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.fix.order_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dp->fix.order);
+    return PY_INT_LONG(self->dp->fix.order);
 /* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.fix.order_get) */
 }
 
