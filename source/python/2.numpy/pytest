@@ -8,20 +8,28 @@
 # include "cpyright.h"
 #
 
+set lpy_pact_vers = 2.numpy
+
 setenv Package python
 setenv Test    ""
 set vgdirs = ( . )
 source ../../scripts/test-env
 
+@ iv = 1
 set Tests = ""
 
 while ($#argv > 0)
    switch ($1)
+      case -c:
+           shift
+           set iv = $1
+           breaksw
       case -h:
-           echo "Usage: pytest [-h] [-vg] [<test>]*"
-           echo "  h       this help message"
-           echo "  vg      run tests under valgrind"
-           echo "  <test>  one of: basic unit"
+           echo "Usage: pytest [-c <n>] [-h] [-vg] [<test>]*"
+           echo "   c  use <n> of configured python versions"
+           echo "   h       this help message"
+           echo "   vg      run tests under valgrind"
+           echo "   <test>  one of: basic unit"
            echo ""
            exit(1)
       case -*:
@@ -33,15 +41,21 @@ while ($#argv > 0)
    shift
 end
 
+set lpy_vers = ( `pact +l -info PY_Vers` )
+set lpy_exes = ( `pact +l -info PY_Exe` )
+set lpy_ver = $lpy_vers[$iv]
+set lpy_exe = $lpy_exes[$iv]
+
 cd $TestDir
 
 rm -f $Log
 touch $Log
 
-flog $Log set lpydir = $LPYTHON/pact_2.numpy
+flog $Log set lpydir = $LibDir/python${lpy_ver}/pact_${lpy_pact_vers}
 flog $Log set lpylnk = pact_test
 flog $Log rm -f $lpylnk
 flog $Log ln -s $lpydir $lpylnk
+flog $Log setenv PYTHON $lpy_exe
 flog $Log setenv PYTHONPATH $cwd
 flog $Log ls -l $PYTHONPATH/
 
@@ -70,14 +84,10 @@ else if (-f $lpydir/pdb.py) then
    Note $Log "SrcDir     = $SrcDir"
    Note $Log "PYTHONPATH = $PYTHONPATH"
    Note $Log "python     = $PYTHON"
-      
-   Note $Log "PYVER       = |$PYVER|"
-   Note $Log "PYTHONBIN   = |$PYTHONBIN|"
-   Note $Log "LPYTHON     = |$LPYTHON|"
-   Note $Log "PYTHON      = |$PYTHON|"
-   Note $Log "PACT_Exe    = |$PACT_Exe|"
-   Note $Log "Parallel    = |$Parallel|"
-   Note $Log "MPI         = |$MPI|"
+   Note $Log "PYVER      = |$lpy_ver|"
+   Note $Log "PACT_Exe   = |$PACT_Exe|"
+   Note $Log "Parallel   = |$Parallel|"
+   Note $Log "MPI        = |$MPI|"
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
 

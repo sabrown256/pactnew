@@ -148,7 +148,6 @@ static char PP_mesh_topology_Type__doc__[] =
 /* static */
 PyTypeObject PP_mesh_topology_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
         "mesh_topology",                       /* tp_name */
         sizeof(PP_mesh_topologyObject),         /* tp_basicsize */
         0,                              /* tp_itemsize */

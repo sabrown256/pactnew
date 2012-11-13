@@ -10,8 +10,14 @@
 #
 
 PyPACTVers = 2.numeric
+
+lpycfg = none
+lpyver = none
+lpyinc = none
+lpynum = -DHAVE_PY_NUMERIC
+
 LibName=py_${PyPACTVers}
-PyDir  = ${LibDir}/python${PY_Vers}/pact_${PyPACTVers}
+PyDir  = ${LibDir}/python${lpyver}/pact_${PyPACTVers}
 TGTLib = ${LibDir}/lib${LibName}.a
 
 OD = DefaultG
@@ -20,10 +26,10 @@ OD = DefaultG
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${ODC} -I. -I../.. -I${PY_IncDir} -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags = ${ODC} ${lpynum} -I. -I../.. -I${lpyinc} -I${IncDir} ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${lpynum} ${Shared_CC_Flags} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)
@@ -73,6 +79,18 @@ OPDB = ${OPDBO} ${OPMLO} ${OPPO}
 OPGS = ${OPDBO} ${OPMLO} ${OPPO} ${OPGSO}
 Objs = ${OPGS}
 
+gps = gp-score.c gp-pml.c gp-pdb.c   \
+      gp-ppc.c gp-pgs.c gp-panacea.c \
+      gp-scheme.c
+
+gpo = gp-score.o gp-pml.o gp-pdb.o   \
+      gp-ppc.o gp-pgs.o gp-panacea.o \
+      gp-scheme.o
+
+gpa = ${TGTLib}(gp-score.o) ${TGTLib}(gp-pml.o) ${TGTLib}(gp-pdb.o)   \
+      ${TGTLib}(gp-ppc.o) ${TGTLib}(gp-pgs.o) ${TGTLib}(gp-panacea.o) \
+      ${TGTLib}(gp-scheme.o)
+
 ArPDBO = ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbPDBfile.o) ${TGTLib}(pdbmemdes.o) \
          ${TGTLib}(pdbdefstr.o) ${TGTLib}(pdbpdbdata.o) \
          ${TGTLib}(pdbhashtab.o) ${TGTLib}(pdbhasharr.o) \
@@ -90,7 +108,7 @@ ArPPO  = ${TGTLib}(pputil.o) ${TGTLib}(pptypes.o) ${TGTLib}(pparrays.o) \
 ArPGSO = ${TGTLib}(pgsmodule.o) ${TGTLib}(pgsdevice.o) ${TGTLib}(pgsgraph.o) \
          ${TGTLib}(pgsimage.o) ${TGTLib}(pgspalette.o) ${TGTLib}(utilpgs.o)
 
-ArObjs = ${ArPDBO} ${ArPMLO} ${ArPPO} ${ArPGSO}
+ArObjs = ${ArPDBO} ${ArPMLO} ${ArPPO} ${ArPGSO} ${gpa}
 
 ${Objs} : ${Hdrs}
 ${ArObjs} : ${Hdrs}
@@ -105,9 +123,13 @@ ${LibDep} : ${Hdrs} ${hdrf}
 
 hdrf = 
 
-IncAction = 
+IncAction = cp ../${PACTTmpDir}/{gp-*.c,py-*.h} ${PACTTmpDir}
 
 # language bindings
+
+SDir = ${PACTSrcDir}
+
+LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${PACTTmpDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" lpyver=${lpyver} lpyinc=${lpyinc} -f ../../pre-Make devlib)
 
 TGTSPDB  = ${PyDir}/libpypdb.so
 TGTShPDB = ${TGTSPDB}.1
@@ -150,7 +172,7 @@ ${TGTShPGS} : ${TGTLib}
 # link 
 #
 link: ${TGTLib} ${PySrc}
-	./link
+	./link -c ${lpycfg}
 
 #
 # install 
@@ -176,6 +198,6 @@ inform :
 # Run the PDB test suite
 #
 test :
-	@./pytest
+	@./pytest -c ${lpycfg}
 
 

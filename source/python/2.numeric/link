@@ -5,25 +5,20 @@
 #
 
 set lpy_pact_vers = 2.numeric
-set lpy_pact_lib  = libpy_$lpy_pact_vers
 
 source ../../scripts/functions-pact.csh
 
-set lpy_exe = `which python`
-if (!(-x "$lpy_exe")) then
-   echo "No executable python can be found on your path:"
-   echo "   $PATH"
-   exit(1)
-else
-   echo ""
-   echo "Using $lpy_exe"
-endif
-
+@ iv = 1
 set Test = FALSE
 while ($#argv > 0)
    switch ($1)
+      case -c:
+           shift
+           set iv = $1
+           breaksw
       case -h:
-           echo "Usage: link [-h] [-t]"
+           echo "Usage: link [-c <n>] [-h] [-t]"
+           echo "   c  use <n> of configured python versions"
            echo "   h  this help message"
            echo "   t  run tests in addtion to linking the shared libraries"
            exit(1)
@@ -36,6 +31,26 @@ while ($#argv > 0)
    endsw
    shift
 end
+
+set lpy_pact_lib  = libpy_$lpy_pact_vers
+
+set lpy_ccs  = ( `pact +l -info PY_CC` )
+set lpy_vers = ( `pact +l -info PY_Vers` )
+set lpy_cfgs = ( `pact +l -info PY_CfgDir` )
+set lpy_exes = ( `pact +l -info PY_Exe` )
+
+set lpy_cc  = $lpy_ccs[$iv]
+set lpy_ver = $lpy_vers[$iv]
+set lpy_cfg = $lpy_cfgs[$iv]
+set lpy_exe = $lpy_exes[$iv]
+
+if (!(-x "$lpy_exe")) then
+   echo "No such executable '$lpy_exe'"
+   exit(1)
+else
+   echo ""
+   echo "Using $lpy_exe"
+endif
 
 @ err    = 0
 set Arch = `../../scripts/cfgman use`
@@ -52,9 +67,6 @@ flog $Log set DevLib = $Root/lib
 flog $Log set Def = $DevInc/make-def
 
 flog $Log set AR        = ( `pact +l -info AR | uniq` `pact +l -info ARXOpt | uniq` )
-flog $Log set CCmp      = ( `pact +l -info PY_CC` )
-flog $Log set PY_Vers   = ( `pact +l -info PY_Vers` )
-flog $Log set PY_CfgDir = ( `pact +l -info PY_CfgDir` )
 flog $Log set SFLAGS    = ( `pact +l -info Shared_LD_Flags | uniq` )
 flog $Log set Link      = ( `pact +l -info Shared_LD_Exe | uniq` )
 flog $Log set ShLibs    = ( `pact +l -info Shared_LD_Lib | uniq` )
@@ -74,7 +86,7 @@ foreach i ( `pact +l -info DPLib | uniq` )
 end
 flog $Log set DPLibs   = ( $lst )
 flog $Log set LD       = ( $Link $SFLAGS )
-flog $Log set lpy_path = $DevLib/python${PY_Vers}
+flog $Log set lpy_path = $DevLib/python${lpy_ver}
 flog $Log set lpy_pact = $lpy_path/pact_${lpy_pact_vers}
 
 flog $Log set Libs   = ( $LDRPath -L$DevLib $LDPath $MDGLibs $MDILibs -lc -lm $ShLibs $DPLibs $MDLibs )
@@ -87,8 +99,8 @@ flog $Log set CFPGS = ""
 
 # NOTE: IBM model is difficult - grrrrrrrrrrr
 if ($OS == AIX) then
-   flog $Log set CFPDB = ( -bE:${SrcDir}/pypdb.exp -bI:${PY_CfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypdb.map )
-   flog $Log set CFPGS = ( -bE:${SrcDir}/pypgs.exp -bI:${PY_CfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypgs.map )
+   flog $Log set CFPDB = ( -bE:${SrcDir}/pypdb.exp -bI:${lpy_cfg}/python.exp -bM:SRE -bnoentry -bloadmap:pypdb.map )
+   flog $Log set CFPGS = ( -bE:${SrcDir}/pypgs.exp -bI:${lpy_cfg}/python.exp -bM:SRE -bnoentry -bloadmap:pypgs.map )
 endif
 
 if (!(-d $lpy_pact)) then

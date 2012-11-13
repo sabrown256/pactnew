@@ -100,21 +100,43 @@ dbmget $ALog HAVE_FORTRAN^     \
 # PY_DirDst    pact    lib/pythond.d                (install into)
 # PY_DirPy     python  lib/pythond.d/site-packages  (install into)
 
-    if (("$PY_Exe" != "") && ("$PY_Exe" != "wrong-cc") && \
-        ("$PY_Exe" != "no-numeric") && ($MAKE_Shared_Libs == TRUE)) then
-       flog $ALog mkdir -p $PY_DirPy
-
+    if (("$HAVE_PYTHON" =~ *TRUE*) && ($MAKE_Shared_Libs == TRUE)) then
        NoteD $Log "   Python bindings will be built in:"
-       NoteD $Log "      $PY_DirSrc"
-       if ("$InstBase" != none) then
-          NoteD $Log "   Python bindings will be installed in:"
-          NoteD $Log "      $PY_DirDst"
-          if (-d $PY_DirPy) then
-             NoteD $Log "      $PY_DirPy"
-          else
-             NoteD $Log "      $PY_DirPy (no permissions)"
-          endif
-       endif
+       set lhave_python = ( $HAVE_PYTHON )
+       set lpy_dirpy    = ( $PY_DirPy )
+       set lpy_dirsrc   = ( $PY_DirSrc )
+       set lpy_dirdst   = ( $PY_DirDst )
+  
+       @ n = $#lhave_python
+       @ i = 0
+       while ($i < $n)
+          @ i = $i + 1
+          if ($lhave_python[$i] == TRUE) then
+             set ldp = $lpy_dirpy[$i]
+             set ldd = $lpy_dirdst[$i]
+             set lds = $lpy_dirsrc[$i]
+
+             flog $ALog mkdir -p $ldp
+
+             NoteD $Log "      $lds"
+             if ("$InstBase" != none) then
+                NoteD $Log "   Python bindings will be installed in:"
+                NoteD $Log "      $ldd"
+                if (-d $ldp) then
+                   NoteD $Log "      $ldp"
+                else
+                   NoteD $Log "      $ldp (no permissions)"
+                endif
+             endif
+       end
+       unset ldp
+       unset ldd
+       unset lds
+       unset lpy_dirpy
+       unset lpy_dirsrc
+       unset lpy_dirdst
+       unset lhave_python
+
     else if ($MAKE_Shared_Libs == FALSE) then
        NoteD $Log "   Python bindings will not be built (need shared library option)"
     else if ("$PY_Exe" == "wrong-cc") then

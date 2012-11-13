@@ -148,13 +148,13 @@ else
 # compile Python wrapper
       Note $Log ""
       flog $Log set file = gp-$i.c
-      if ($HAVE_PYTHON == FALSE) then
-         Note $Log "Not compiling python wrapper"
-         @ xstatus = 0
-      else
+      if ("$HAVE_PYTHON" =~ TRUE) then
          Note $Log "Compile python wrapper"
          flog $Log ${cc} -I$PY_Inc -c $file
          @ xstatus = $status
+      else
+         Note $Log "Not compiling python wrapper"
+         @ xstatus = 0
       endif
       if (-f $RefDir/$file) then
          flog $Log diff $file $RefDir/$file

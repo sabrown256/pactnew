@@ -487,7 +487,6 @@ static char PP_assoc_Type__doc__[] =
 /* static */
 PyTypeObject PP_assoc_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
         "assoc",                       /* tp_name */
         sizeof(PP_assocObject),         /* tp_basicsize */
         0,                              /* tp_itemsize */

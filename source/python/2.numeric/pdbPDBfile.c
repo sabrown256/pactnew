@@ -14,6 +14,7 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "pdbmodule.h"
+#include "py-pdb.h"
 
 /* DO-NOT-DELETE splicer.begin(pdb.PDBfile.C_definition) UNMODIFIED */
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.C_definition) */
@@ -332,42 +333,6 @@ PP_PDBfile_read(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_defent__doc__[] = 
-""
-;
-
-static PyObject *
-PP_PDBfile_defent(PP_PDBfileObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.defent) */
-    char *name;
-    char *type;
-    char *kw_list[] = {"name", "type", NULL};
-    PDBfile *fp;
-
-    fp = self->object;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss:defent", kw_list,
-                                     &name, &type))
-        return NULL;
-
-    if (fp == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return NULL;
-    }
-
-    PD_defent(fp, name, type);
-
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.defent) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
 static char PP_PDBfile_defstr__doc__[] = 
 ""
 ;
@@ -406,6 +371,288 @@ PP_PDBfile_defstr(PP_PDBfileObject *self,
     
     return (PyObject *) rv;
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.defstr) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_PDBfile_ls__doc__[] = 
+""
+;
+
+static PyObject *
+PP_PDBfile_ls(PP_PDBfileObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.ls) */
+    int ierr, num;
+    char *path, *type;
+    char **out;
+    char *kw_list[] = {"path", "type", NULL};
+    Py_ssize_t i;
+    PyObject *rv, *item;
+    PDBfile *fp;
+
+    fp = self->object;
+    path = NULL;
+    type = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|zz:ls", kw_list,
+                                     &path, &type))
+        return NULL;
+
+    if (fp == NULL) {
+        PP_error_set_user(NULL, "file is not open");
+        return NULL;
+    }
+
+    out = PD_ls(fp, path, type, &num);
+    ierr = 0;
+
+    rv = PyTuple_New(num);
+    for (i = 0; i < num; i++) {
+        item = PY_STRING_STRING(out[i]);
+        if (item == NULL) {
+            ierr = -1;
+            break;
+        }
+        ierr = PyTuple_SetItem(rv, i, item);
+        if (ierr < 0)
+            break;
+    }
+
+    if (ierr < 0) {
+        Py_DECREF(rv);
+        rv = NULL;
+    }
+    CFREE(out);
+
+    return rv;
+/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.ls) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_PDBfile_get_obj_descr__doc__[] = 
+""
+;
+
+static PyObject *
+PP_PDBfile_get_obj_descr(PP_PDBfileObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.get_obj_descr) */
+    void *obj, *dim, *rv;
+    char *kw_list[] = {"obj", NULL};
+    PP_descr *descr;
+
+    if (self->object == NULL) {
+        PP_error_set_user(NULL, "file is not open");
+        return NULL;
+    }
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O:get_obj_descr", kw_list,
+                                     &obj))
+        return NULL;
+
+    descr = PP_get_object_descr(self->fileinfo, obj);
+
+    if (descr == NULL) {
+        PP_error_set_user(obj, "Unable to find PDB type");
+        return NULL;
+    } else if (descr->dims == NULL) {
+        dim = Py_None;
+        Py_INCREF(Py_None);
+    } else {
+        dim = PP_dimdes_to_obj(descr->dims);
+    }
+    rv = Py_BuildValue("iisO", (int) descr->typecode, descr->bpi,
+                       descr->type, dim);
+    _PP_rl_descr(descr);
+    return rv;
+
+/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.get_obj_descr) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_PDBfile_register_class__doc__[] = 
+""
+;
+
+static PyObject *
+PP_PDBfile_register_class(PP_PDBfileObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.register_class) */
+    /* This function is used to register a type.
+     * It allows pypact to take an object with type and
+     * extract it's information.
+     *   cls  = Python class object
+     *   type = defstr type
+     */
+    PyTypeObject *cls;
+    PyFunctionObject *ctor;
+    char *type;
+    char *kw_list[] = {"cls", "type", "ctor", NULL};
+    PP_class_descr *cdescr;
+    PDBfile *fp;
+    defstr *dp;
+
+    ctor = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!s|O!:register_class", kw_list,
+                                     &PY_TYPE_TYPE, &cls,
+                                     &type,
+                                     &PyFunction_Type, &ctor))
+        return NULL;
+
+    fp = self->fileinfo->file;
+    dp = PD_inquire_table_type(fp->host_chart, type);
+    if (dp == NULL) {
+        PP_error_set_user(NULL, "No such type %s in file %s",
+                          type, fp->name);
+        return NULL;
+    }
+
+    cdescr = PP_make_class_descr(cls, type, ctor);
+    if (cdescr == NULL)
+        return NULL;
+    PP_init_type_map_instance(self->fileinfo, cdescr);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.register_class) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_PDBfile_reset_vif__doc__[] = 
+""
+;
+
+static PyObject *
+PP_PDBfile_reset_vif(PP_PDBfileObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.reset_vif) */
+    /* Clear out type info and reset with just native types
+     * sort of like closing and reopening
+     * Useful for testing with leak detection
+     */
+    PP_file *fileinfo;
+
+    if (self->object->virtual_internal == FALSE) {
+        PP_error_set_user(NULL, "file is not virtual internal");
+        return NULL;
+    }
+    
+    /* clear old */
+    fileinfo = self->fileinfo;
+
+    SC_free_hasharr(fileinfo->type_map, PP_rl_type_entry, NULL);
+    SC_free_hasharr(fileinfo->object_map, PP_rl_type_entry, NULL);
+    SC_free_hasharr(fileinfo->class_map, _PP_rl_class_descr, NULL);
+    SC_free_hasharr(fileinfo->deftypes,  _PP_decref_object, NULL);
+
+    _PP_cleanup_defstrs(fileinfo->file);
+
+    /* reset */
+    PP_init_type_map_basic(fileinfo);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.reset_vif) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.extra_methods) */
+/* DO-NOT-DELETE splicer.end(pdb.PDBfile.extra_methods) */
+
+/*--------------------------------------------------------------------------*/
+
+/*                         BLANG GENERATED WRAPPERS                         */
+
+/*--------------------------------------------------------------------------*/
+
+#if defined(HAVE_PY_NUMPY)
+
+/*--------------------------------------------------------------------------*/
+
+static PyMethodDef PP_PDBfile_methods[] = {
+{"flush", (PyCFunction)PP_PDBfile_flush, METH_NOARGS, PP_PDBfile_flush__doc__},
+{"close", (PyCFunction)PP_PDBfile_close, METH_NOARGS, PP_PDBfile_close__doc__},
+{"write", (PyCFunction)PP_PDBfile_write, METH_KEYWORDS, PP_PDBfile_write__doc__},
+{"write_raw", (PyCFunction)PP_PDBfile_write_raw, METH_KEYWORDS, PP_PDBfile_write_raw__doc__},
+{"read", (PyCFunction)PP_PDBfile_read, METH_KEYWORDS, PP_PDBfile_read__doc__},
+ _PYD_PD_defent,
+{"defstr", (PyCFunction)PP_PDBfile_defstr, METH_KEYWORDS, PP_PDBfile_defstr__doc__},
+ _PYD_PD_cd,
+ _PYD_PD_mkdir,
+ _PYD_PD_isdir,
+ _PYD_PD_ln,
+{"ls", (PyCFunction)PP_PDBfile_ls, METH_KEYWORDS, PP_PDBfile_ls__doc__},
+ _PYD_PD_pwd,
+{"get_obj_descr", (PyCFunction)PP_PDBfile_get_obj_descr, METH_KEYWORDS, PP_PDBfile_get_obj_descr__doc__},
+{"register_class", (PyCFunction)PP_PDBfile_register_class, METH_KEYWORDS, PP_PDBfile_register_class__doc__},
+{"reset_vif", (PyCFunction)PP_PDBfile_reset_vif, METH_NOARGS, PP_PDBfile_reset_vif__doc__},
+/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.extra_mlist) */
+/* DO-NOT-DELETE splicer.end(pdb.PDBfile.extra_mlist) */
+{NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
+};
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
+/*--------------------------------------------------------------------------*/
+
+/*                             MANUAL WRAPPERS                              */
+
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_PDBfile_defent__doc__[] = 
+""
+;
+
+static PyObject *
+PP_PDBfile_defent(PP_PDBfileObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.defent) */
+    char *name;
+    char *type;
+    char *kw_list[] = {"name", "type", NULL};
+    PDBfile *fp;
+
+    fp = self->object;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss:defent", kw_list,
+                                     &name, &type))
+        return NULL;
+
+    if (fp == NULL) {
+        PP_error_set_user(NULL, "file is not open");
+        return NULL;
+    }
+
+    PD_defent(fp, name, type);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.defent) */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -522,7 +769,7 @@ PP_PDBfile_isdir(PP_PDBfileObject *self,
 
     ierr = PD_isdir(fp, dirname);
 
-    rv = PyInt_FromLong((long) ierr);
+    rv = PY_INT_LONG(ierr);
 
     return rv;
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.isdir) */
@@ -572,65 +819,6 @@ PP_PDBfile_ln(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_ls__doc__[] = 
-""
-;
-
-static PyObject *
-PP_PDBfile_ls(PP_PDBfileObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.ls) */
-    int ierr, num;
-    char *path, *type;
-    char **out;
-    char *kw_list[] = {"path", "type", NULL};
-    Py_ssize_t i;
-    PyObject *rv, *item;
-    PDBfile *fp;
-
-    fp = self->object;
-    path = NULL;
-    type = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|zz:ls", kw_list,
-                                     &path, &type))
-        return NULL;
-
-    if (fp == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return NULL;
-    }
-
-    out = PD_ls(fp, path, type, &num);
-    ierr = 0;
-
-    rv = PyTuple_New(num);
-    for (i = 0; i < num; i++) {
-        item = PyString_FromString(out[i]);
-        if (item == NULL) {
-            ierr = -1;
-            break;
-        }
-        ierr = PyTuple_SetItem(rv, i, item);
-        if (ierr < 0)
-            break;
-    }
-
-    if (ierr < 0) {
-        Py_DECREF(rv);
-        rv = NULL;
-    }
-    CFREE(out);
-
-    return rv;
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.ls) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
 static char PP_PDBfile_pwd__doc__[] = 
 ""
 ;
@@ -654,159 +842,11 @@ PP_PDBfile_pwd(PP_PDBfileObject *self,
 
     pwd = PD_pwd(fp);
 
-    rv = PyString_FromString(pwd);
+    rv = PY_STRING_STRING(pwd);
 
     return rv;
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.pwd) */
 }
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_PDBfile_get_obj_descr__doc__[] = 
-""
-;
-
-static PyObject *
-PP_PDBfile_get_obj_descr(PP_PDBfileObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.get_obj_descr) */
-    void *obj, *dim, *rv;
-    char *kw_list[] = {"obj", NULL};
-    PP_descr *descr;
-
-    if (self->object == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return NULL;
-    }
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O:get_obj_descr", kw_list,
-                                     &obj))
-        return NULL;
-
-    descr = PP_get_object_descr(self->fileinfo, obj);
-
-    if (descr == NULL) {
-        PP_error_set_user(obj, "Unable to find PDB type");
-        return NULL;
-    } else if (descr->dims == NULL) {
-        dim = Py_None;
-        Py_INCREF(Py_None);
-    } else {
-        dim = PP_dimdes_to_obj(descr->dims);
-    }
-    rv = Py_BuildValue("iisO", (int) descr->typecode, descr->bpi,
-                       descr->type, dim);
-    _PP_rl_descr(descr);
-    return rv;
-
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.get_obj_descr) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_PDBfile_register_class__doc__[] = 
-""
-;
-
-static PyObject *
-PP_PDBfile_register_class(PP_PDBfileObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.register_class) */
-    /* This function is used to register a type.
-     * It allows pypact to take an object with type and
-     * extract it's information.
-     *   cls  = Python class object
-     *   type = defstr type
-     */
-    PyTypeObject *cls;
-    PyFunctionObject *ctor;
-    char *type;
-    char *kw_list[] = {"cls", "type", "ctor", NULL};
-    PP_class_descr *cdescr;
-    PDBfile *fp;
-    defstr *dp;
-
-    ctor = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!s|O!:register_class", kw_list,
-                                     &PyClass_Type, &cls,
-                                     &type,
-                                     &PyFunction_Type, &ctor))
-        return NULL;
-
-    fp = self->fileinfo->file;
-    dp = PD_inquire_table_type(fp->host_chart, type);
-    if (dp == NULL) {
-        PP_error_set_user(NULL, "No such type %s in file %s",
-                          type, fp->name);
-        return NULL;
-    }
-
-    cdescr = PP_make_class_descr(cls, type, ctor);
-    if (cdescr == NULL)
-        return NULL;
-    PP_init_type_map_instance(self->fileinfo, cdescr);
-
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.register_class) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_PDBfile_reset_vif__doc__[] = 
-""
-;
-
-static PyObject *
-PP_PDBfile_reset_vif(PP_PDBfileObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.reset_vif) */
-    /* Clear out type info and reset with just native types
-     * sort of like closing and reopening
-     * Useful for testing with leak detection
-     */
-    PP_file *fileinfo;
-
-    if (self->object->virtual_internal == FALSE) {
-        PP_error_set_user(NULL, "file is not virtual internal");
-        return NULL;
-    }
-    
-    /* clear old */
-    fileinfo = self->fileinfo;
-
-    SC_free_hasharr(fileinfo->type_map, PP_rl_type_entry, NULL);
-    SC_free_hasharr(fileinfo->object_map, PP_rl_type_entry, NULL);
-    SC_free_hasharr(fileinfo->class_map, _PP_rl_class_descr, NULL);
-    SC_free_hasharr(fileinfo->deftypes,  _PP_decref_object, NULL);
-
-    _PP_cleanup_defstrs(fileinfo->file);
-
-    /* reset */
-    PP_init_type_map_basic(fileinfo);
-
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.reset_vif) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.extra_methods) */
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.extra_methods) */
 
 /*--------------------------------------------------------------------------*/
 
@@ -831,6 +871,10 @@ static PyMethodDef PP_PDBfile_methods[] = {
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.extra_mlist) */
 {NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
 };
+
+/*--------------------------------------------------------------------------*/
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -971,28 +1015,28 @@ PP_PDBfile_object_mode_get(PP_PDBfileObject *self, void *context)
     PyObject *rv;
     switch (PD_get_mode(self->object)) {
     case PD_READ:
-        rv = PyString_FromString("PD_READ");
+        rv = PY_STRING_STRING("PD_READ");
         break;
     case PD_WRITE:
-        rv = PyString_FromString("PD_WRITE");
+        rv = PY_STRING_STRING("PD_WRITE");
         break;
     case PD_APPEND:
-        rv = PyString_FromString("a");
+        rv = PY_STRING_STRING("a");
         break;
     case PD_OPEN:
-        rv = PyString_FromString("r");
+        rv = PY_STRING_STRING("r");
         break;
     case PD_CREATE:
-        rv = PyString_FromString("w");
+        rv = PY_STRING_STRING("w");
         break;
     case PD_CLOSE:
-        rv = PyString_FromString("PD_CLOSE");
+        rv = PY_STRING_STRING("PD_CLOSE");
         break;
     case PD_TRACE:
-        rv = PyString_FromString("PD_TRACE");
+        rv = PY_STRING_STRING("PD_TRACE");
         break;
     case PD_PRINT:
-        rv = PyString_FromString("PD_PRINT");
+        rv = PY_STRING_STRING("PD_PRINT");
         break;
     default:
         rv = PY_INT_LONG(PD_get_mode(self->object));
@@ -1059,10 +1103,10 @@ PP_PDBfile_object_major_order_get(PP_PDBfileObject *self, void *context)
     
     switch (PD_get_major_order(self->object)) {
     case ROW_MAJOR_ORDER:
-        rv = PyString_FromString("ROW MAJOR");
+        rv = PY_STRING_STRING("ROW MAJOR");
         break;
     case COLUMN_MAJOR_ORDER:
-        rv = PyString_FromString("COLUMN MAJOR");
+        rv = PY_STRING_STRING("COLUMN MAJOR");
         break;
     default:
         PP_error_set(PP_error_internal, NULL,
@@ -1165,9 +1209,8 @@ static char PP_PDBfile_Type__doc__[] =
 /* static */
 PyTypeObject PP_PDBfile_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
-        "PDBfile",                       /* tp_name */
-        sizeof(PP_PDBfileObject),         /* tp_basicsize */
+        "PDBfile",                      /* tp_name */
+        sizeof(PP_PDBfileObject),       /* tp_basicsize */
         0,                              /* tp_itemsize */
         /* Methods to implement standard operations */
         (destructor)0,                  /* tp_dealloc */

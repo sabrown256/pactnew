@@ -244,7 +244,6 @@ static char PP_mapping_Type__doc__[] =
 /* static */
 PyTypeObject PP_mapping_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
         "mapping",                       /* tp_name */
         sizeof(PP_mappingObject),         /* tp_basicsize */
         0,                              /* tp_itemsize */

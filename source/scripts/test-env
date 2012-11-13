@@ -149,11 +149,6 @@ setenv ZeroSpace  "-z 2"
    setenv HaveDevZero  `$PACT_Exe +l -info HAVE_DEV_ZERO`
    setenv LARGE_FILES  `$PACT_Exe -info _LARGE_FILES`
 
-   setenv PYVER      `$PACT_Exe -info PY_Vers`
-   setenv PYTHONBIN  `$PACT_Exe -info PythonPath`
-   setenv PYTHON     $PYTHONBIN/python
-   setenv LPYTHON    $LibDir/python$PYVER
-
    if (-e $IncDir/noipc) then
       setenv HaveIPC  NO
    else
@@ -182,12 +177,6 @@ endif
 
 setenv SCHEME $SysDir/scheme:${SCHEME}
 
-if ($?PYTHONPATH == 1) then
-   setenv PYTHONPATH ${LPYTHON}:$PYTHONPATH
-else
-   setenv PYTHONPATH ${LPYTHON}
-endif
- 
 # test inside a subdirectory
 if (!(-d $TestDir)) then
   mkdir -p $TestDir
@@ -292,14 +281,6 @@ endif
 if ($?RUN_SIGNATURE_DB == 1) then
    Note $Log "RUN_SIGNATURE_DB  = $RUN_SIGNATURE_DB"
 endif
-
-Note $Log ""
-Note $Log "Python:"
-Note $Log "PYVER      = |$PYVER|"
-Note $Log "PYTHONBIN  = |$PYTHONBIN|"
-Note $Log "PYTHON     = |$PYTHON|"
-Note $Log "LPYTHON    = |$LPYTHON|"
-Note $Log "PYTHONPATH = |$PYTHONPATH|"
 
 flog $Log ( where pact | head -n 1 )
 flog $Log ( where cc   | head -n 1 )

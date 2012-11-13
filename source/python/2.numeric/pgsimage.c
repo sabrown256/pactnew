@@ -328,7 +328,6 @@ static char PP_image_Type__doc__[] =
 /* static */
 PyTypeObject PP_image_Type = {
         PY_HEAD_INIT(&PyType_Type, 0)
-        0,                              /* ob_size */
         "image",                       /* tp_name */
         sizeof(PP_imageObject),         /* tp_basicsize */
         0,                              /* tp_itemsize */

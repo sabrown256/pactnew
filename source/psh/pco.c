@@ -886,6 +886,7 @@ static void write_envf(client *cl, int lnotice)
     note(fdk, TRUE, "dk_alter MANPATH %s/man", st.dir.root);
     note(fmd, TRUE, "prepend-path MANPATH %s/man;", echo(FALSE, st.dir.root));
 
+#if 0
     {char lPython[BFLRG];
 
      if (st.have_python == TRUE)
@@ -903,6 +904,7 @@ static void write_envf(client *cl, int lnotice)
 	 note(fsh, TRUE,  "export PYTHONPATH=%s", t);
 	 note(fdk, TRUE,  "dk_setenv PYTHONPATH %s", t);
 	 note(fmd, TRUE,  "setenv PYTHONPATH %s;", t);};};
+#endif
 
 /* emit PATH settings */
     if (IS_NULL(epath) == FALSE)
@@ -1412,7 +1414,7 @@ static void setup_analyze_env(client *cl, char *base)
  */
 
 static void setup_output_env(client *cl, char *base)
-   {char *rv;
+   {
 
 /* close any open intermediate files and export their names */
     dbset(cl, "DPFile", st.aux.dpfn);
@@ -1455,13 +1457,6 @@ static void setup_output_env(client *cl, char *base)
     dbset(cl, "ScrDir",  st.dir.scr);
     dbset(cl, "SchDir",  st.dir.sch);
     dbset(cl, "CfgDir",  st.dir.cfg);
-
-    rv = dbget(cl, TRUE, "HAVE_PYTHON");
-    if (IS_NULL(rv) == FALSE)
-       {if (strcmp(rv, "FALSE") == 0)
-	   dbset(cl, "HAVE_PYTHON", "FALSE");
-	else
-	   dbset(cl, "HAVE_PYTHON",  "TRUE");};
 
     dbset(cl, "Load",        st.loadp ? "TRUE" : "FALSE");
     dbset(cl, "NoExe",       st.exep ? "TRUE" : "FALSE");
