@@ -27,15 +27,13 @@
 # define PY_GET_PTR(_o)             PyCapsule_GetPointer(_o, 0)
 # define PY_COBJ_TYPE               PyCapsule_Type
 
-/*
-# define MOD_ERROR_VAL NULL
-# define MOD_SUCCESS_VAL(val) val
-# define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
-# define MOD_DEF(ob, name, doc, methods)                         \
-    static struct PyModuleDef moduledef =                        \
-           { PyModuleDef_HEAD_INIT, name, doc, -1, methods, };   \
-    ob = PyModule_Create(&moduledef);
-*/
+# define PY_MOD_INIT(_nm)           PyMODINIT_FUNC PyInit##_nm(void)
+# define PY_MOD_DEF(_o, _nm, _doc, _mth)                                    \
+    static struct PyModuleDef moduledef =                                   \
+           { PyModuleDef_HEAD_INIT, _nm, _doc, -1, _mth, };                 \
+    _o = PyModule_Create(&moduledef)
+# define PY_MOD_RETURN_ERR          return(NULL)
+# define PY_MOD_RETURN_OK(_x)       return(_x)
 
 #else
 
@@ -48,13 +46,12 @@
 # define PY_GET_PTR(_o)             PyCObject_AsVoidPtr(_o)
 # define PY_COBJ_TYPE               PyCObject_Type
 
-/*
-# define MOD_ERROR_VAL
-# define MOD_SUCCESS_VAL(val)
-# define MOD_INIT(name) void init##name(void)
-# define MOD_DEF(ob, name, doc, methods)                         \
-    ob = Py_InitModule3(name, methods, doc);
-*/
+# define PY_MOD_INIT(_nm)           void init##_nm(void)
+# define PY_MOD_DEF(_o, _nm, _doc, _mth)                                    \
+    _o = Py_InitModule4(_nm, _mth, _doc, NULL, PYTHON_API_VERSION)
+# define PY_MOD_RETURN_ERR          return
+# define PY_MOD_RETURN_OK(_x)       return
+
 #endif
 
 /*--------------------------------------------------------------------------*/

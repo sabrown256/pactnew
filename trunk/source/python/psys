@@ -9,6 +9,16 @@ unalias *
 
 @ err = 0
 
+set exe = `which pact`
+set bindir = $exe:h
+set lroot  = $bindir:h
+set etcdir = $lroot/etc
+source $etcdir/env-pact.csh
+unset etcdir
+unset lroot
+unset bindir
+unset exe
+
 source ../scripts/functions-pact.csh
 
 @ n = $#argv
