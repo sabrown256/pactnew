@@ -8,14 +8,13 @@
 # include "cpyright.h"
 #
 
-set lpy_pact_vers = 2.numeric
-
 setenv Package python
 setenv Test    ""
 set vgdirs = ( . )
 source ../../scripts/test-env
 
 @ iv = 1
+set xv = none
 set Tests = ""
 
 while ($#argv > 0)
@@ -25,13 +24,18 @@ while ($#argv > 0)
            set iv = $1
            breaksw
       case -h:
-           echo "Usage: pytest [-c <n>] [-h] [-vg] [<test>]*"
+           echo "Usage: pytest [-c <n>] [-h] [-vg] [-x <tag>] [<test>]*"
            echo "   c  use <n> of configured python versions"
            echo "   h       this help message"
            echo "   vg      run tests under valgrind"
+           echo "   x  python version tag"
            echo "   <test>  one of: basic unit"
            echo ""
            exit(1)
+      case -x:
+           shift
+           set xv = $1
+           breaksw
       case -*:
            breaksw
       default:
@@ -41,6 +45,7 @@ while ($#argv > 0)
    shift
 end
 
+set lpy_pact_vers = $xv
 set lpy_vers = ( `pact +l -info PY_Vers` )
 set lpy_exes = ( `pact +l -info PY_Exe` )
 set lpy_ver = $lpy_vers[$iv]

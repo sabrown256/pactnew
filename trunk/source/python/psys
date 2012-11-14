@@ -62,13 +62,13 @@ while ( $i < $n)
    set dev = ( $dev lpyver=$lpy_vers[$i] lpyinc=$lpy_inc[$i] )
    if (($lpy_vers[$i] =~ 2*) && ($lpy_numeric[$i] == TRUE)) then
       flog $log set v = 2.numeric
-      set dev = ( $dev lpynum=-DHAVE_NUMERIC )
+      set dev = ( $dev lpynum=-DHAVE_NUMERIC lpyext=$v )
    else if (($lpy_vers[$i] =~ 2*) && ($lpy_numpy[$i] == TRUE)) then
       flog $log set v = 2.numpy
-      set dev = ( $dev lpynum=-DHAVE_NUMPY )
+      set dev = ( $dev lpynum=-DHAVE_NUMPY lpyext=$v )
    else if (($lpy_vers[$i] =~ 3*) && ($lpy_numpy[$i] == TRUE)) then
       flog $log set v = 3.numpy
-      set dev = ( $dev lpynum=-DHAVE_NUMPY )
+      set dev = ( $dev lpynum=-DHAVE_NUMPY lpyext=$v )
    else
       continue
    endif
