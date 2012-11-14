@@ -4,11 +4,10 @@
 #      - this is a portability hack mainly because of AIX
 #
 
-set lpy_pact_vers = 2.numeric
-
 source ../../scripts/functions-pact.csh
 
 @ iv = 1
+set xv = none
 set Test = FALSE
 while ($#argv > 0)
    switch ($1)
@@ -17,14 +16,19 @@ while ($#argv > 0)
            set iv = $1
            breaksw
       case -h:
-           echo "Usage: link [-c <n>] [-h] [-t]"
+           echo "Usage: link [-c <n>] [-h] [-t] [-x <tag>]"
            echo "   c  use <n> of configured python versions"
            echo "   h  this help message"
            echo "   t  run tests in addtion to linking the shared libraries"
+           echo "   x  python version tag"
            exit(1)
            breaksw
       case -t:
            set Test = TRUE
+           breaksw
+      case -x:
+           shift
+           set xv = $1
            breaksw
       default:
            breaksw
@@ -32,6 +36,7 @@ while ($#argv > 0)
    shift
 end
 
+set lpy_pact_vers = $xv
 set lpy_pact_lib  = libpy_$lpy_pact_vers
 
 set lpy_ccs  = ( `pact +l -info PY_CC` )

@@ -9,13 +9,13 @@
 # include "cpyright.h"
 #
 
-PyPACTVers = 2.numpy
-
+lpyext = none
 lpycfg = none
 lpyver = none
 lpyinc = none
-lpynum = -DHAVE_PY_NUMPY
+lpynum = none
 
+PyPACTVers = ${lpyext}
 LibName=py_${PyPACTVers}
 PyDir  = ${LibDir}/python${lpyver}/pact_${PyPACTVers}
 TGTLib = ${LibDir}/lib${LibName}.a
@@ -129,7 +129,7 @@ IncAction = cp ../${PACTTmpDir}/{gp-*.c,py-*.h} ${PACTTmpDir}
 
 SDir = ${PACTSrcDir}
 
-LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${PACTTmpDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" lpyver=${lpyver} lpyinc=${lpyinc} -f ../../pre-Make devlib)
+LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${PACTTmpDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" lpyext=${lpyext} lpycfg=${lpycfg} lpyver=${lpyver} lpyinc=${lpyinc} lpynum=${lpynum} -f ../../pre-Make devlib)
 
 TGTSPDB  = ${PyDir}/libpypdb.so
 TGTShPDB = ${TGTSPDB}.1
@@ -172,7 +172,7 @@ ${TGTShPGS} : ${TGTLib}
 # link 
 #
 link: ${TGTLib} ${PySrc}
-	./link -c ${lpycfg}
+	./link -c ${lpycfg} -x ${lpyext}
 
 #
 # install 
@@ -198,6 +198,6 @@ inform :
 # Run the PDB test suite
 #
 test :
-	@./pytest -c ${lpycfg}
+	@./pytest -c ${lpycfg} -x ${lpyext}
 
 
