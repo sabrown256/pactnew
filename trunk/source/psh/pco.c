@@ -815,7 +815,6 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 
 static void write_envf(client *cl, int lnotice)
    {int i, n;
-    char *t;
     char *site[] = { "CONFIG_METHOD" };
     char *sfx[]  = { "csh", "sh", "dk", "mdl" };
     FILE *fcsh, *fsh, *fdk, *fmd;
@@ -885,26 +884,6 @@ static void write_envf(client *cl, int lnotice)
 
     note(fdk, TRUE, "dk_alter MANPATH %s/man", st.dir.root);
     note(fmd, TRUE, "prepend-path MANPATH %s/man;", echo(FALSE, st.dir.root));
-
-#if 0
-    {char lPython[BFLRG];
-
-     if (st.have_python == TRUE)
-        {snprintf(lPython, BFLRG, "%s/python%s",
-		  st.dir.lib, dbget(cl, TRUE, "PY_Vers"));
-	 t = dbget(cl, TRUE, "PYTHONPATH");
-	 if (t != NULL)
-	    {if (strstr(t, lPython) == NULL)
-	        dbset(cl, "PYTHONPATH", "%s:$PYTHONPATH", lPython);}
-	 else
-	    dbset(cl, "PYTHONPATH", lPython);
-
-	 t = dbget(cl, TRUE, "PYTHONPATH");
-	 note(fcsh, TRUE, "setenv PYTHONPATH %s", t);
-	 note(fsh, TRUE,  "export PYTHONPATH=%s", t);
-	 note(fdk, TRUE,  "dk_setenv PYTHONPATH %s", t);
-	 note(fmd, TRUE,  "setenv PYTHONPATH %s;", t);};};
-#endif
 
 /* emit PATH settings */
     if (IS_NULL(epath) == FALSE)
