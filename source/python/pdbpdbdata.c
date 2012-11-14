@@ -462,6 +462,8 @@ static PySequenceMethods PP_pdbdata_as_sequence = {
 /*                           OBJECT_TP_AS_BUFFER                            */
 /*--------------------------------------------------------------------------*/
 
+#if PY_MAJOR_VERSION < 3
+
 /* Code to access pdbdata objects as buffer */
 
 static Py_ssize_t
@@ -530,6 +532,8 @@ PP_pdbdata_bf_getcharbuffer(PyObject *_self, Py_ssize_t segment, char **ptrptr)
     return n;
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_buffer.getcharbuffer) */
 }
+
+#endif
 
 static PyBufferProcs
  PP_pdbdata_as_buffer = PY_INIT_BUFFER_PROCS(PP_pdbdata_bf_getreadbuffer,

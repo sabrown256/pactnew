@@ -42,13 +42,23 @@
 # define PY_COBJ_TYPE               PyCapsule_Type
 # define PY_NUM_INT(_m)             ((_m)->nb_int)
 
-# define PY_MOD_INIT(_nm)           PyMODINIT_FUNC PyInit##_nm(void)
-# define PY_MOD_DEF(_o, _nm, _doc, _mth)                                    \
+# define PY_MOD_BEGIN(_nm, _doc, _mth)                                      \
+PyMODINIT_FUNC PyInit_##_nm(void)                                           \
+   {PyObject *m;                                                            \
     static struct PyModuleDef moduledef =                                   \
-           { PyModuleDef_HEAD_INIT, _nm, _doc, -1, _mth, };                 \
-    _o = PyModule_Create(&moduledef)
+           { PyModuleDef_HEAD_INIT, #_nm, _doc, -1, _mth, };                \
+    m = PyModule_Create(&moduledef);                                        \
+    if (m == NULL)                                                          \
+       return(NULL);
+
+# define PY_MOD_END(_nm)                                                    \
+    if (PyErr_Occurred())                                                   \
+       {char msg[MAXLINE];                                                  \
+	snprintf(msg, MAXLINE, "can't initialize module %s", #_nm);         \
+        Py_FatalError(msg);};                                               \
+    return(m);}
+
 # define PY_MOD_RETURN_ERR          return(NULL)
-# define PY_MOD_RETURN_OK(_x)       return(_x)
 
 # define PY_INIT_BUFFER_PROCS(_rd, _wr, _sc, _gc, _gb, _rb)                 \
     {_gb, _rb}
@@ -78,11 +88,21 @@
 # define PY_COBJ_TYPE               PyCObject_Type
 # define PY_NUM_INT(_m)             ((_m)->nb_long)
 
-# define PY_MOD_INIT(_nm)           void init##_nm(void)
-# define PY_MOD_DEF(_o, _nm, _doc, _mth)                                    \
-    _o = Py_InitModule4(_nm, _mth, _doc, NULL, PYTHON_API_VERSION)
+# define PY_MOD_BEGIN(_nm, _doc, _mth)                                      \
+void init##_nm(void)                                                        \
+   {PyObject *m;                                                            \
+    m = Py_InitModule4(#_nm, _mth, _doc, NULL, PYTHON_API_VERSION);         \
+    if (m == NULL)                                                          \
+       return;
+
+# define PY_MOD_END(_nm)                                                    \
+    if (PyErr_Occurred())                                                   \
+       {char msg[MAXLINE];                                                  \
+	snprintf(msg, MAXLINE, "can't initialize module %s", #_nm);         \
+        Py_FatalError(msg);};                                               \
+    return;}
+
 # define PY_MOD_RETURN_ERR          return
-# define PY_MOD_RETURN_OK(_x)       return
 
 # define PY_INIT_BUFFER_PROCS(_rd, _wr, _sc, _gc, _gb, _rb)                 \
     {_rd, _wr, _sc, _gc}

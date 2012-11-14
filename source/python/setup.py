@@ -204,6 +204,8 @@ log('gtk_library_dirs   = ' + str(gtk_library_dirs))
 log('gtk_libraries      = ' + str(gtk_libraries))
 
 
+PDB_MOD_NAME = '_pdb'
+
 setup(name = 'pypact',
        version = '2.0a6',
        description = 'PACT Extension to Python',
@@ -221,7 +223,7 @@ setup(name = 'pypact',
                   },
 
        ext_modules = [
-                      Extension('_pdb',
+                      Extension(PDB_MOD_NAME,
                                 ['pdbmodule.c',
                                  'pdbPDBfile.c',
                                  'pdbmemdes.c',
