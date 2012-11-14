@@ -183,7 +183,7 @@ ${TGTShPGS} : ${TGTLib}
 # link 
 #
 link: ${TGTLib} ${PySrc}
-	./link -c ${lpycfg} -x ${lpyext}
+	@../py-link -c ${lpycfg} -x ${lpyext}
 
 #
 # install 
@@ -209,7 +209,7 @@ inform :
 # Run the PDB test suite
 #
 test :
-	@./pytest -c ${lpycfg} -x ${lpyext}
+	@../py-test -c ${lpycfg} -x ${lpyext}
 
 
 include /gapps/codes/pact/wrk/dev/ognu/etc/make-macros
