@@ -1084,17 +1084,11 @@ static char pdb_module_documentation[] =
 ""
 ;
 
-PY_MOD_INIT(_pdb)
-   {PyObject *m, *d;
+PY_MOD_BEGIN(_pdb, pdb_module_documentation, PP_methods)
+   {PyObject *d;
 
 /* subtype pdbdata */
     PP_hashtab_Type.tp_base = &PP_pdbdata_Type;
-
-/* create the module and add the functions */
-    PY_MOD_DEF(m, "_pdb", pdb_module_documentation, PP_methods);
-
-    if (m == NULL)
-       PY_MOD_RETURN_ERR;
 
     if (PyModule_AddIntConstant(m, "TRUE", (long) TRUE) < 0)
        PY_MOD_RETURN_ERR;
@@ -1262,11 +1256,7 @@ PY_MOD_INIT(_pdb)
     PP_error_user = PyErr_NewException("pdb.error", NULL, NULL);
     PyDict_SetItemString(d, "error", PP_error_user);
     
-/* check for errors */
-    if (PyErr_Occurred())
-        Py_FatalError("can't initialize module _pdb");
-
-    PY_MOD_RETURN_OK(m);}
+    PY_MOD_END(_pdb);}
 
 /*--------------------------------------------------------------------------*/
 /*                               MODULE_TAIL                                */

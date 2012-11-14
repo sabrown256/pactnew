@@ -1318,14 +1318,8 @@ static char pgs_module_documentation[] =
 ""
 ;
 
-PY_MOD_INIT(_pgs)
-   {PyObject *m, *d;
-
-/* create the module and add the functions */
-    PY_MOD_DEF(m, "_pgs", pgs_module_documentation, PP_methods);
-
-    if (m == NULL)
-       PY_MOD_RETURN_ERR;
+PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
+   {PyObject *d;
 
     if (PyModule_AddIntConstant(m, "TRUE", (long) TRUE) < 0)
        PY_MOD_RETURN_ERR;
@@ -1568,11 +1562,7 @@ PY_MOD_INIT(_pgs)
     PP_error_user = PyErr_NewException("pdb.error", NULL, NULL);
     PyDict_SetItemString(d, "error", PP_error_user);
 
-/* check for errors */
-    if (PyErr_Occurred())
-        Py_FatalError("can't initialize module _pgs");
-
-    PY_MOD_RETURN_OK(m);}
+    PY_MOD_END(_pgs);}
 
 /*--------------------------------------------------------------------------*/
 /*                               MODULE_TAIL                                */

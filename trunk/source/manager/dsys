@@ -755,6 +755,7 @@ switch ($Cmnd)
                    echo "                      xlc-bgp    XL compilers for IBM BG/P backend"
                    echo "                      xlc-bgq    XL compilers for IBM BG/Q backend"
                    echo "        -epy       full path python executable, implies -py"
+                   echo "                   may be comma delimited list of executables"
                    echo "        -feature   <feature>[,<feature>]*"
                    echo "                   look in pact/manager/features for available features"
                    echo "        -mpi       build MPI version (equivalent to -feature mpi)"

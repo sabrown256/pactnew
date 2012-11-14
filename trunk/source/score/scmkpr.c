@@ -1052,7 +1052,7 @@ void SC_free_state(anadep *state)
  */
 
 int SC_parse_makefile(anadep *state, char *fname)
-   {int i, nb, rv, ok;
+   {int i, nb, rv, ok, st;
     char *s, *peq, *pcl, *t, *pt;
     FILE *fp;
     ruledef a;
@@ -1077,8 +1077,9 @@ int SC_parse_makefile(anadep *state, char *fname)
 
 	    s  = NULL;
 	    nb = 0;
+	    st = TRUE;
 
-	    for (i = 1; TRUE; i++)
+	    for (i = 1; (st == TRUE); i++)
 	        {s = SC_dgets(s, &nb, fp);
 		 if (s == NULL)
 		    break;
@@ -1100,7 +1101,11 @@ int SC_parse_makefile(anadep *state, char *fname)
 		     _SC_end_rule(&a, state);
 		     _SC_end_var(&v, state);
 		     _SC_subst_strings(state, NULL, &pt);
-		     SC_parse_makefile(state, pt);}
+		     st = SC_parse_makefile(state, pt);
+		     if (st == FALSE)
+		        io_printf(stdout,
+				  "Cannot open include file '%s' at %s:%d\n",
+				  pt, fname, i);}
 
 		 else
 		    {peq = strchr(s, '=');
@@ -1131,7 +1136,7 @@ int SC_parse_makefile(anadep *state, char *fname)
 
 	    io_close(fp);
 
-	    rv = TRUE;};
+	    rv = st;};
 
 	t = _SC_var_lookup(state, "BARRIER");
 	if (t != NULL)

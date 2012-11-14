@@ -15,6 +15,8 @@ PACTGenDir = ${BaseDir}/python/${archo}
 PACTTmpDir = ${BaseDir}/python/${lpyext}/${archo}
 PACTSrcDir = ${BaseDir}/python
 
+PDB_MOD_NAME = _pdb
+
 lpyext = none
 lpycfg = none
 lpyver = none
@@ -32,7 +34,7 @@ OD = DefaultG
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${ODC} ${lpynum} -I../.. -I../../.. -I${PACTGenDir} -I${lpyinc} -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags = ${ODC} ${lpynum} -I. -I../.. -I../../.. -I${PACTGenDir} -I${lpyinc} -I${IncDir} ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 CCAnnounce = ${CCompiler} ${ODC} ${lpynum} ${Shared_CC_Flags} ${CFLAGS}
@@ -152,7 +154,7 @@ Libs =  ${MDGLib} -lc ${DPLib} ${MDLib}
 
 ${TGTShPDB} : ${TGTLib}
 	@(cd ${PyDir} ; \
-	  rm -f ${TGTSPDB} $@ _pdb.so ; \
+	  rm -f ${TGTSPDB} $@ ${PDB_MOD_NAME}.so ; \
 	  ${AR} -x ${TGTLib} ; \
 	  ${AR} -x ../../libscore.a ; \
 	  ${AR} -x ../../libpml.a ; \
@@ -161,7 +163,7 @@ ${TGTShPDB} : ${TGTLib}
 	  echo "${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ *.o -L${LibDir} ${Libs}" ; \
 	  ${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ *.o -L${LibDir} ${Libs} ; \
 	  ln -s ${TGTShPDB} ${TGTSPDB} ; \
-	  ln -s ${TGTShPDB} _pdb.so ; \
+	  ln -s ${TGTShPDB} ${PDB_MOD_NAME}.so ; \
 	  rm -f *.o _____* )
 
 ${TGTShPGS} : ${TGTLib}
@@ -212,4 +214,4 @@ test :
 	@../py-test -c ${lpycfg} -x ${lpyext}
 
 
-include /gapps/codes/pact/wrk/dev/ognu/etc/make-macros
+include ${sysdir}/etc/make-macros

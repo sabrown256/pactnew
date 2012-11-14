@@ -77,13 +77,15 @@ while ( $i < $n)
    NoteD $log "   in $v pact $arg $tgt"
    NoteD $log ""
 
-   if ($tgt == devlib) then
+   if (($tgt == devlib) || ("$tgt" =~ *.i) || ("$tgt" =~ *.i)) then
       pact -f pre-Make.bind sysdir=$sysdir $dev $arg $tgt
       @ err = $err + $status
+      if ($tgt != devlib) then
+         mv $tgt $v
+      endif
    else
       flog $log pushd $v
 
-#      pact $dev $arg $tgt
       pact -f ../pre-Make.bind sysdir=$sysdir $dev $arg $tgt
       @ err = $err + $status
 
