@@ -11,11 +11,10 @@ unalias *
 
 set exe = `which pact`
 set bindir = $exe:h
-set lroot  = $bindir:h
-set etcdir = $lroot/etc
+set sysdir  = $bindir:h
+set etcdir = $sysdir/etc
 source $etcdir/env-pact.csh
 unset etcdir
-unset lroot
 unset bindir
 unset exe
 
@@ -78,12 +77,18 @@ while ( $i < $n)
    NoteD $log "   in $v pact $arg $tgt"
    NoteD $log ""
 
-   flog $log pushd $v
+   if ($tgt == devlib) then
+      pact -f pre-Make.bind sysdir=$sysdir $dev $arg $tgt
+      @ err = $err + $status
+   else
+      flog $log pushd $v
 
-   pact $dev $arg $tgt
-   @ err = $err + $status
+#      pact $dev $arg $tgt
+      pact -f ../pre-Make.bind sysdir=$sysdir $dev $arg $tgt
+      @ err = $err + $status
 
-   flog $log popd
+      flog $log popd
+   endif   
 
 end
 
