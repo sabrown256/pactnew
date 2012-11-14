@@ -334,7 +334,7 @@ int PP_obj_to_ind(PyObject *indobj, long *ind)
     stride = NULL;
     
     if (! PySequence_Check(indobj)) {
-        num = PyNumber_Int(indobj);
+        num = PY_NUMBER_INT(indobj);
         if (num == NULL)
             goto err;
         ind[0] = 0;
@@ -353,7 +353,7 @@ int PP_obj_to_ind(PyObject *indobj, long *ind)
             upper = NULL;
             stride = NULL;
             if (! PySequence_Check(dim)) {
-                num = PyNumber_Int(dim);
+                num = PY_NUMBER_INT(dim);
                 if (num == NULL)
                     goto err;
                 ind[i * 3 + 0] = 0;
@@ -384,14 +384,14 @@ int PP_obj_to_ind(PyObject *indobj, long *ind)
                 if (lower == NULL) {
                     ind[i * 3 + 0] = 0;
                 } else {
-                    num = PyNumber_Int(lower);
+                    num = PY_NUMBER_INT(lower);
                     if (num == NULL)
                         goto err;
                     ind[i * 3 + 0] = PY_INT_AS_LONG(num);
                     Py_DECREF(num);
                 }
                 
-                num = PyNumber_Int(upper);
+                num = PY_NUMBER_INT(upper);
                 if (num == NULL)
                     goto err;
                 ind[i * 3 + 1] = PY_INT_AS_LONG(num);
@@ -401,7 +401,7 @@ int PP_obj_to_ind(PyObject *indobj, long *ind)
                 if (stride == NULL) {
                     ind[i * 3 + 2] = 1;
                 } else {
-                    num = PyNumber_Int(stride);
+                    num = PY_NUMBER_INT(stride);
                     if (num == NULL)
                         goto err;
                     ind[i * 3 + 2] = PY_INT_AS_LONG(num);
