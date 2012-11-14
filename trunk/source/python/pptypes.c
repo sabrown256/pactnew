@@ -20,6 +20,10 @@
 #define DEBUG_OBJ(s1, s, nitems, obj)
 #endif
 
+#if PY_MAJOR_VERSION >= 3
+PyAPI_DATA(PyTypeObject) PyInstance_Type;
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                         TYPEDEFS AND STRUCTS                             */
@@ -411,42 +415,59 @@ STATIC int get_int_object_data(PyObject *obj, void *vr, long nitems,
                                int type, int gc)
    {int ierr;
 
-    if (PY_INT_CHECK(obj)) {
-        switch (type) {
-        case PP_INT_I:
-            if (gc == PP_GC_YES) {
-                *(int **) vr = CMAKE(int);
+    if (PY_INT_CHECK(obj))
+       {switch (type)
+	   {case PP_INT_I :
+	         {int *ip, **ipp;
+		  ip  = NULL;
+		  ipp = (int **) vr;
+		  if (gc == PP_GC_YES)
+		     {ip  = CMAKE(int);
+		      *ip = PY_INT_AS_LONG(obj);}
 
-                **(int **) vr = (int) PY_INT_AS_LONG(obj);
-            } else {
-                ierr = -1;
-                PP_error_set(PP_error_internal, obj, "can not process gc == PP_GC_NO");
-                /* WARNING - this is accessing a python structure outside of the API */
-                *(int **) vr = (int *) &(((PyIntObject *) obj)->ob_ival);
-            }
-            break;
-        case PP_LONG_I:
-            if (gc == PP_GC_YES) {
-                *(long **) vr = CMAKE(long);
+		  else
+		     {ierr = -1;
+		      PP_error_set(PP_error_internal, obj,
+				   "can not process gc == PP_GC_NO");
+#if PY_MAJOR_VERSION < 3
+/* WARNING - this is accessing a python structure outside of the API */
+		      ip = (int *) &(((PY_INT_OBJECT *) obj)->ob_ival);
+#endif
+		     };
 
-                **(long **) vr = PY_INT_AS_LONG(obj);
-            } else {
-                PP_error_set(PP_error_internal, obj, "can not process gc == PP_GC_NO");
-                /* WARNING - this is accessing a python structure outside of the API */
-                *(long **) vr = &(((PyIntObject *) obj)->ob_ival);
-            }
-            ierr = 0;
-            break;
-        default:
-            PP_error_set(PP_error_internal, obj, "can not convert to int");
-            ierr = -1;
-            break;
-        }
+		  *ipp = ip;};
+		 break;
+
+	    case PP_LONG_I :
+	         {long *lp, **lpp;
+		  lp  = NULL;
+		  lpp = (long **) vr;
+		  if (gc == PP_GC_YES)
+		     {lp  = CMAKE(long);
+		      *lp = PY_INT_AS_LONG(obj);}
+		  else
+		     {PP_error_set(PP_error_internal, obj,
+				   "can not process gc == PP_GC_NO");
+/* WARNING - this is accessing a python structure outside of the API */
+#if PY_MAJOR_VERSION < 3
+	              lp = &(((PY_INT_OBJECT *) obj)->ob_ival);
+#endif
+		     };
+
+		  *lpp = lp;
+		  ierr = 0;};
+		 break;
+
+	    default :
+	         PP_error_set(PP_error_internal, obj,
+			      "can not convert to int");
+		 ierr = -1;
+		 break;};}
+
 #if 0
--    } else {
+-    else
 -        ierr = get_array_object_data(obj, vr, nitems, type, gc);
 #endif
-    }
 
     return(ierr);}
 
@@ -798,17 +819,26 @@ static PyObject *_PP_unpack_instance(void *p, long nitems)
  */
 
 static PP_descr *_PP_get_instance_descr(PP_file *fileinfo, PyObject *obj)
-{
-    PyInstanceObject *inst = (PyInstanceObject *) obj;
-    PyTypeObject *cls = (PyTypeObject *) inst->in_class;
+   {
+
+#if PY_MAJOR_VERSION < 3
+    PyInstanceObject *inst;
+    PyTypeObject *cls;
     PP_class_descr *cdescr;
+
+    inst = (PyInstanceObject *) obj;
+    cls  = (PyTypeObject *) inst->in_class;
 
     cdescr = PP_inquire_class(fileinfo, cls);
     if (cdescr == NULL)
-        return NULL;
+        return(NULL);
 
-    return cdescr->descr;
-}
+    return(cdescr->descr);
+#else
+    return(NULL);
+#endif
+
+    }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1096,14 +1126,14 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_CHAR_I,                      /* typecode */
         TRUE,                           /* sequence */
         descr,                          /* descr */
-        &PyString_Type,                 /* otype */
+        &PY_STRING_TYPE,                 /* otype */
         _PP_get_pack_func(PP_CHAR_I),   /* pack */
         _PP_get_unpack_func(PP_CHAR_I), /* unpack */
         _PP_get_string_descr            /* get_descr */
         );
 
     PP_register_type(fileinfo, entry);   /* char */
-    PP_register_object(fileinfo, entry); /* PyString_Type */
+    PP_register_object(fileinfo, entry); /* PY_STRING_TYPE */
 
     descr = PP_make_descr(
         PP_INT_I,                       /* typecode */
@@ -1115,7 +1145,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_INT_I,                       /* typecode */
         FALSE,                          /* sequence */
         descr,
-        &PyInt_Type,                    /* otype */
+        &PY_INT_TYPE,                    /* otype */
         _PP_get_pack_func(PP_INT_I),    /* pack */
         _PP_get_unpack_func(PP_INT_I),  /* unpack */
         NULL                            /* get_descr */
@@ -1135,7 +1165,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_INT_I,                       /* typecode */
         FALSE,                          /* sequence */
         descr,
-        &PyInt_Type,                    /* otype */
+        &PY_INT_TYPE,                    /* otype */
         _PP_get_pack_func(PP_INT_I),    /* pack */
         _PP_get_unpack_func(PP_INT_I),  /* unpack */
         NULL                            /* get_descr */
@@ -1146,7 +1176,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
 #if 0
 -    entry =
 -        PP_make_type_entry(SC_INT_S, SC_INT_P_S, sizeof(int),
--                               &PyInt_Type,
+-                               &PY_INT_TYPE,
 -                               NULL, NULL, PP_INT_I, FALSE,
 -                               new_int_object,
 -                               -1,
@@ -1169,14 +1199,14 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_LONG_I,                      /* typecode */
         FALSE,                          /* sequence */
         descr,                          /* descr */
-        &PyInt_Type,                    /* otype */
+        &PY_INT_TYPE,                    /* otype */
         _PP_get_pack_func(PP_LONG_I),   /* pack */
         _PP_get_unpack_func(PP_LONG_I), /* unpack */
         NULL                            /* get_descr */
         );
 
     PP_register_type(fileinfo, entry);   /* int */
-    PP_register_object(fileinfo, entry); /* PyInt_Type */
+    PP_register_object(fileinfo, entry); /* PY_INT_TYPE */
     
     entry = PP_make_type_entry(
         PP_LONG_I,                      /* typecode */
@@ -1188,7 +1218,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         NULL                            /* get_descr */
         );
 
-    /* Only register PyLong_Type, 'long' type maps to PyInt_Type */
+    /* Only register PyLong_Type, 'long' type maps to PY_INT_TYPE */
     PP_register_object(fileinfo, entry);  /* PyLong_Type */
     
     descr = PP_make_descr(
@@ -1432,7 +1462,7 @@ PP_file *_PP_open_vif(char *name)
 
     PP_init_type_map_basic(fileinfo);
 
-#ifdef HAVE_NUMPY
+#ifdef HAVE_PY_NUMPY
     _PP_init_numpy_types(fileinfo);
 #endif
 

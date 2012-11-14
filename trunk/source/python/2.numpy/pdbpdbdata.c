@@ -531,13 +531,13 @@ PP_pdbdata_bf_getcharbuffer(PyObject *_self, Py_ssize_t segment, char **ptrptr)
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_buffer.getcharbuffer) */
 }
 
-
-static PyBufferProcs PP_pdbdata_as_buffer = {
-        PP_pdbdata_bf_getreadbuffer,    /* bf_getreadbuffer */
-        PP_pdbdata_bf_getwritebuffer,   /* bf_getwritebuffer */
-        PP_pdbdata_bf_getsegcount,      /* bf_getsegcount */
-        PP_pdbdata_bf_getcharbuffer,    /* bf_getcharbuffer */
-};
+static PyBufferProcs
+ PP_pdbdata_as_buffer = PY_INIT_BUFFER_PROCS(PP_pdbdata_bf_getreadbuffer,
+                                             PP_pdbdata_bf_getwritebuffer,
+                                             PP_pdbdata_bf_getsegcount,
+                                             PP_pdbdata_bf_getcharbuffer,
+                                             NULL,
+                                             NULL);
 
 /*--------------------------------------------------------------------------*/
 

@@ -107,9 +107,9 @@ else if (-f $lpydir/pdb.py) then
 
 endif
 
-$TEST_CHECK fin -e $xstatus
-
 flog $Log rm -f $lpylnk
+
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

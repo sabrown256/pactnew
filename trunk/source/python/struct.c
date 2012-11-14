@@ -43,8 +43,8 @@ STATIC PyObject *get_pylong(PyObject *v)
 	return(v);};
 
     m = PY_TYPE(v)->tp_as_number;
-    if (m != NULL && m->nb_long != NULL)
-       {v = m->nb_long(v);
+    if ((m != NULL) && (PY_NUM_INT(m) != NULL))
+       {v = PY_NUM_INT(m)(v);
 	if (v == NULL)
 	   return(NULL);
 
