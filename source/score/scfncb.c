@@ -195,6 +195,8 @@ int SC_load_ave(double *av)
  *             - least 2 long to received the total memory, MEM[0],
  *             - and free memory, MEM[1], values
  *             - return TRUE iff successful
+ *
+ * #bind SC_free_mem fortran() python()
  */
 
 int SC_free_mem(double *mem)

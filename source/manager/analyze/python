@@ -48,6 +48,7 @@ if (-d ../../python) then
    set have_py_numpy   = ""
    set py_exe          = ""
    set py_vers         = ""
+   set py_ext          = ""
    set py_dirpy        = ""
    set py_dirdst       = ""
    set py_dirsrc       = ""
@@ -64,6 +65,7 @@ if (-d ../../python) then
       set lpy_path         = ""
       set lpy_exe          = ""
       set lpy_vers         = ""
+      set lpy_ext          = ""
       set lpy_cc           = ""
       set lpy_cfg          = ""
       set lpy_inc          = ""
@@ -138,15 +140,8 @@ if (-d ../../python) then
             if ($ok == 5) then
                flog $ALog set lhave_python = TRUE
 
-               Note $ALog "Python summary:"
-               NoteD $ALog "      $lpy_exe"
-               NoteD $ALog "         compiled with $lpy_cc"
-               NoteD $ALog "         has include directory $lpy_inc"
-               NoteD $ALog "         has lib directory $lpy_lib"
-
 # check for Numeric
                if (-d $lpy_inc/Numeric) then
-                  NoteD $ALog "         has numeric extensions"
                   flog $ALog set lhave_py_numeric = TRUE
                else
                   flog $ALog set lhave_py_numeric = FALSE
@@ -160,10 +155,33 @@ if (-d ../../python) then
                    (-d $lpy_lib/dist-packages/NumPy) || \
                    (-d $lpy_lib/dist-packages/numpy) || \
                    (-d $lpy_inc/numpy)) then
-                  NoteD $ALog "         has numpy extensions"
                   flog $ALog set lhave_py_numpy = TRUE
                else
                   flog $ALog set lhave_py_numpy = FALSE
+               endif
+
+               if (($lpy_vers =~ 2*) && ($lhave_py_numeric == TRUE)) then
+                  flog $ALog set lpy_ext = 2.numeric
+               else if (($lpy_vers =~ 2*) && ($lhave_py_numpy == TRUE)) then
+                  flog $ALog set lpy_ext = 2.numpy
+               else if (($lpy_vers =~ 3*) && ($lhave_py_numpy == TRUE)) then
+                  flog $ALog set lpy_ext = 3.numpy
+               else
+                  flog $ALog set lpy_ext = none
+               endif
+
+               Note $ALog "Python summary:"
+               NoteD $ALog "      $lpy_ext"
+               NoteD $ALog "         $lpy_exe"
+               NoteD $ALog "         compiled with $lpy_cc"
+               NoteD $ALog "         has include directory $lpy_inc"
+               NoteD $ALog "         has lib directory $lpy_lib"
+
+               if ($lhave_py_numpy == TRUE) then
+                  NoteD $ALog "         has numpy extensions"
+               endif
+               if ($lhave_py_numeric == TRUE) then
+                  NoteD $ALog "         has numeric extensions"
                endif
 
                if (($lhave_py_numeric == FALSE) && ($lhave_py_numpy == FALSE)) then
@@ -203,6 +221,7 @@ if (-d ../../python) then
          flog $ALog set lpy_path         = "none"
          flog $ALog set lpy_exe          = "none"
          flog $ALog set lpy_vers         = "none"
+         flog $ALog set lpy_ext          = "none"
          flog $ALog set lpy_cc           = "none"
          flog $ALog set lpy_cfg          = "none"
          flog $ALog set lpy_inc          = "none"
@@ -244,6 +263,7 @@ if (-d ../../python) then
       set py_path         = ( $py_path         $lpy_path )
       set py_exe          = ( $py_exe          $lpy_exe )
       set py_vers         = ( $py_vers         $lpy_vers )
+      set py_ext          = ( $py_ext          $lpy_ext )
       set py_cc           = ( $py_cc           $lpy_cc )
       set py_cfg          = ( $py_cfg          $lpy_cfg )
       set py_inc          = ( $py_inc          $lpy_inc )
@@ -263,6 +283,7 @@ if (-d ../../python) then
                 PY_Path         = "$py_path"^           \
                 PY_Exe          = "$py_exe"^            \
                 PY_Vers         = "$py_vers"^           \
+                PY_Ext          = "$py_ext"^            \
                 PY_CC           = "$py_cc"^             \
                 PY_Cfg          = "$py_cfg"^            \
                 PY_Inc          = "$py_inc"^            \

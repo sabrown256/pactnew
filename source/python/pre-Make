@@ -23,6 +23,7 @@ generate:
 
 link:
 	@./psys link
+	cp py-install ${BinDir}
 
 install:
 	@./psys link
