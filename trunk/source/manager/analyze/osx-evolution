@@ -42,8 +42,8 @@ switch ($OS)
         breaksw
 endsw
 
-dbmset $ALog OSX_REV         = $OSX_REV^         \
-             OSX_SHARED_LIBS = $OSX_SHARED_LIBS
+dbmset /dev/null OSX_REV         = $OSX_REV^         \
+                 OSX_SHARED_LIBS = $OSX_SHARED_LIBS
 
 exit(0)
 

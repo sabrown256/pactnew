@@ -42,59 +42,62 @@ while ($#argv > 0)
    shift
 end
 
-InitLog log $cwd/z-${System}/log.psys.$tgt
+if ($tgt != generate) then
 
-set vlst = ""
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-set lhave_py    = ( $HAVE_PYTHON )
-set lpy_vers    = ( $PY_Vers )
-set lpy_inc     = ( $PY_Inc )
-set lpy_numeric = ( $HAVE_PY_NUMERIC )
-set lpy_numpy   = ( $HAVE_PY_NUMPY )
+   set archo = z-${System}
+   InitLog log $cwd/$archo/log.psys.$tgt
 
-@ n = $#lhave_py
-@ i = 0
-while ( $i < $n)
-   @ i = $i + 1
+   set lhave_py    = ( $HAVE_PYTHON )
+   set lpy_vers    = ( $PY_Vers )
+   set lpy_ext     = ( $PY_Ext )
+   set lpy_inc     = ( $PY_Inc )
+   set lpy_numeric = ( $HAVE_PY_NUMERIC )
+   set lpy_numpy   = ( $HAVE_PY_NUMPY )
 
-   set dev = ( lpycfg=$i )
-   set dev = ( $dev lpyver=$lpy_vers[$i] lpyinc=$lpy_inc[$i] )
-   if (($lpy_vers[$i] =~ 2*) && ($lpy_numeric[$i] == TRUE)) then
-      flog $log set v = 2.numeric
-      set dev = ( $dev lpynum=-DHAVE_NUMERIC lpyext=$v )
-   else if (($lpy_vers[$i] =~ 2*) && ($lpy_numpy[$i] == TRUE)) then
-      flog $log set v = 2.numpy
-      set dev = ( $dev lpynum=-DHAVE_NUMPY lpyext=$v )
-   else if (($lpy_vers[$i] =~ 3*) && ($lpy_numpy[$i] == TRUE)) then
-      flog $log set v = 3.numpy
-      set dev = ( $dev lpynum=-DHAVE_NUMPY lpyext=$v )
-   else
-      continue
-   endif
+   @ n = $#lhave_py
+   @ i = 0
+   while ( $i < $n)
+      @ i = $i + 1
 
-   NoteD $log "----------------------------------------------------------"
-   NoteD $log ""
-   NoteD $log "   in $v pact $arg $tgt"
-   NoteD $log ""
-
-   if (($tgt == devlib) || ("$tgt" =~ *.i) || ("$tgt" =~ *.i)) then
-      pact -f pre-Make.bind sysdir=$sysdir $dev $arg $tgt
-      @ err = $err + $status
-      if ($tgt != devlib) then
-         mv $tgt $v
+      set v   = $lpy_ext[$i]
+      set dev = ( lpycfg=$i )
+      set dev = ( $dev lpyver=$lpy_vers[$i] lpyinc=$lpy_inc[$i] lpyext=$v )
+      if ("$v" =~ *numeric) then
+         set dev = ( $dev lpynum=-DHAVE_NUMERIC )
+      else if ("$v" =~ *numpy) then
+         set dev = ( $dev lpynum=-DHAVE_NUMPY )
       endif
-   else
-      flog $log pushd $v
 
-      pact -f ../pre-Make.bind sysdir=$sysdir $dev $arg $tgt
-      @ err = $err + $status
+      NoteD $log "----------------------------------------------------------"
+      NoteD $log ""
+      NoteD $log "   in $v pact $arg $tgt"
+      NoteD $log ""
 
-      flog $log popd
-   endif   
+      flog $log mkdir -p $v/$archo/obj
 
-end
+      if (($tgt == devlib) || ("$tgt" =~ *.i) || ("$tgt" =~ *.i)) then
+         pact -f pre-Make.bind sysdir=$sysdir $dev $arg $tgt
+         @ err = $err + $status
+         if ($tgt != devlib) then
+            mv $tgt $v
+         endif
+      else
+         flog $log pushd $v
+
+         pact -f ../pre-Make.bind sysdir=$sysdir $dev $arg $tgt
+         @ err = $err + $status
+
+         flog $log popd
+      endif   
+
+   end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+endif
 
 exit($err)

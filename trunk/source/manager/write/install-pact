@@ -94,14 +94,6 @@ dbmget $Log InstBase^     \
        Note $STDOUT 'set Man3Dir   = $InstDir/'$Man3Dir
        Note $STDOUT ""
 
-       if ("$HAVE_PYTHON" =~ *TRUE*) then
-          Note $STDOUT "set PY_Vers    = $PY_Vers"
-          Note $STDOUT "set PY_DirPy   = $PY_DirPy"       # python destination
-          Note $STDOUT "set PY_DirDst  = $PY_DirDst"      # pact destination
-          Note $STDOUT "set PY_DirSrc  = $PY_DirSrc"      # install source
-          Note $STDOUT ""
-       endif
-
        Note $STDOUT 'set Bins = ( '`awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
        Note $STDOUT 'set Libs = ( '`awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
        Note $STDOUT 'set Incs = ( '`awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
@@ -342,65 +334,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT 'end'
 
        if ("$HAVE_PYTHON" =~ *TRUE*) then
-
-          Note $STDOUT 'if (-d $PY_DirSrc) then'
-
-# determine which bindings we have
-# this cannot be done at config time because nothing will have been built
-          Note $STDOUT '   pushd $PY_DirSrc >& /dev/null'
-          Note $STDOUT '   set lpy_bind = ( `ls` )'
-          Note $STDOUT '   popd >& /dev/null'
-
-          Note $STDOUT '   foreach bnd ($lpy_bind)'
-          Note $STDOUT '      foreach d ($PY_DirDst)'
-          Note $STDOUT '         set dst = $d/$bnd'
-          Note $STDOUT '         set src = $PY_DirSrc/$bnd'
-          Note $STDOUT '         mkdir -p $dst >& /dev/null'
-          Note $STDOUT '         if (-d $dst) then'
-          Note $STDOUT '            pushd $src >& /dev/null'
-          Note $STDOUT '            if (-f __init__.py) then'
-          Note $STDOUT '               echo ""'
-          Note $STDOUT '               echo "Installing python shared objects"'
-          Note $STDOUT '               echo "   from $src"'
-          Note $STDOUT '               echo "   to   $dst"'
-          Note $STDOUT '               foreach f (libpy*.so.1 *.py *.pyc)'
-          Note $STDOUT '                  set file = $f'
-          Note $STDOUT '                  if (-f $file) then'
-          Note $STDOUT '                     touch $DestDir/.lock'
-          Note $STDOUT '                     sinstall -p 664 $file $dst'
-          Note $STDOUT '                     if ($status != 0) then'
-          Note $STDOUT '                        echo "   FAILED ($status) $file"'
-          Note $STDOUT '                     else'
-          Note $STDOUT '                        echo "   $file"'
-          Note $STDOUT '                     endif'
-          Note $STDOUT '                  endif'
-          Note $STDOUT '               end'
-          Note $STDOUT '               popd >& /dev/null'
-          Note $STDOUT '               pushd $dst >& /dev/null'
-          Note $STDOUT '               foreach f (libpy*.so.1)'
-          Note $STDOUT '                  if (-f $f) then'
-          Note $STDOUT '                     set nstatus = 0'
-          Note $STDOUT '                     set fb = `expr "$f" : '"'libpy\(.*\)\.so.1'"'`'
-          Note $STDOUT '                     set fo = $f:r'
-          Note $STDOUT '                     $RM $fo _$fb.so'
-          Note $STDOUT '                     ln -s $f $fo'
-          Note $STDOUT '                     ln -s $f _$fb.so'
-          Note $STDOUT '                     set nstatus = $status'
-          Note $STDOUT '                     if ($nstatus != 0) then'
-          Note $STDOUT '                        echo "   $f LINK FAILED ($status)"'
-          Note $STDOUT '                     else'
-          Note $STDOUT '                        chmod 664 $fo _$fb.so >& /dev/null'
-          Note $STDOUT '                        echo "   $fo -> $f"'
-          Note $STDOUT '                        echo "   _$fb.so -> $f"'
-          Note $STDOUT '                     endif'
-          Note $STDOUT '                  endif'
-          Note $STDOUT '               end'
-          Note $STDOUT '            endif'
-          Note $STDOUT '            popd >& /dev/null'
-          Note $STDOUT '         endif'
-          Note $STDOUT '      end'
-          Note $STDOUT '   end'
-          Note $STDOUT 'endif'
+          Note $STDOUT 'py-install $InstDir'
        endif
 
        Note $STDOUT 'popd >& /dev/null'

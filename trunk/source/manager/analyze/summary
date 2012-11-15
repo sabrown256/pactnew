@@ -17,6 +17,7 @@ dbmget $ALog HAVE_FORTRAN^     \
              HAVE_PY_NUMPY^    \
              MAKE_Shared_Libs^ \
              PY_Exe^           \
+             PY_Ext^           \
              PY_DirPy^         \
              PY_DirSrc^        \
              PY_DirDst^        \
@@ -92,17 +93,19 @@ dbmget $ALog HAVE_FORTRAN^     \
        dbset BUILD_PROFILE TRUE
     endif
        
-# PY_Exe       the full path to the python executable
-# PY_Vers      the version of the python executable
-# PY_Path addition to path in order to find python executable
-#             this comes from config files only
-# PY_DirSrc    pact/dev/$arch/lib/pythond.d         (install to PY_DirDst and PY_DirPy)
-# PY_DirDst    pact    lib/pythond.d                (install into)
-# PY_DirPy     python  lib/pythond.d/site-packages  (install into)
+# PY_Exe     the full path to the python executable
+# PY_Ext     the extension/wrapper set name (e.g. 2.numpy)
+# PY_Vers    the version of the python executable
+# PY_Path    addition to path in order to find python executable
+#            this comes from config files only
+# PY_DirSrc  pact/dev/$arch/lib/pythond.d         (install to PY_DirDst and PY_DirPy)
+# PY_DirDst  pact    lib/pythond.d                (install into)
+# PY_DirPy   python  lib/pythond.d/site-packages  (install into)
 
     if (("$HAVE_PYTHON" =~ *TRUE*) && ($MAKE_Shared_Libs == TRUE)) then
        NoteD $Log "   Python bindings will be built in:"
        set lhave_python = ( $HAVE_PYTHON )
+       set lpy_ext      = ( $PY_Ext )
        set lpy_dirpy    = ( $PY_DirPy )
        set lpy_dirsrc   = ( $PY_DirSrc )
        set lpy_dirdst   = ( $PY_DirDst )
@@ -112,13 +115,14 @@ dbmget $ALog HAVE_FORTRAN^     \
        while ($i < $n)
           @ i = $i + 1
           if ($lhave_python[$i] == TRUE) then
+             set lex = $lpy_ext[$i]
              set ldp = $lpy_dirpy[$i]
              set ldd = $lpy_dirdst[$i]
              set lds = $lpy_dirsrc[$i]
 
              flog $ALog mkdir -p $ldp
 
-             NoteD $Log "      $lds"
+             NoteD $Log "      $lex -> $lds"
              if ("$InstBase" != none) then
                 NoteD $Log "   Python bindings will be installed in:"
                 NoteD $Log "      $ldd"
@@ -128,6 +132,7 @@ dbmget $ALog HAVE_FORTRAN^     \
                    NoteD $Log "      $ldp (no permissions)"
                 endif
              endif
+          endif
        end
        unset ldp
        unset ldd

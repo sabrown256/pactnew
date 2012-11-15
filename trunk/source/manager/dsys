@@ -670,8 +670,7 @@ switch ($Cmnd)
                    breaksw
               case -epy:
                    shift
-                   set pyexe  = $1:t
-                   set pydir  = $1:h
+                   set pyexe  = $1
                    set python = TRUE
                    breaksw
               case -f:
