@@ -970,6 +970,7 @@ char *SC_lasttok(char *s, char *delim)
 /*--------------------------------------------------------------------------*/
 
 /* SC_NTOK - find the Nth token in a string S according to DELIM
+ *         - the first token is N=1 not N=0
  *         - return it in the array D which is NC long
  *         - this does not destroy S
  */

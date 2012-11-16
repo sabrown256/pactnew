@@ -352,7 +352,7 @@ static void _SC_send_heartbeat(parstate *state, int nr, int nc)
        {_SC_kill_runaways();
 
 	SC_load_ave(av);
-	SC_free_mem(mem);
+	SC_free_mem(2, mem);
 
 	r = mem[1]/mem[0];
 

@@ -492,13 +492,16 @@ static object *_SSI_load_ave(SS_psides *si)
 
 static object *_SSI_free_mem(SS_psides *si)
    {int rv;
-    double mem[2];
+    double mem[4];
     object *s;
 
-    rv = SC_free_mem(mem);
+    rv = SC_free_mem(4, mem);
     if (rv == TRUE)
-       s = SS_make_list(si, SC_DOUBLE_I, mem,
+       s = SS_make_list(si,
+			SC_DOUBLE_I, mem,
 			SC_DOUBLE_I, mem+1,
+			SC_DOUBLE_I, mem+2,
+			SC_DOUBLE_I, mem+3,
 			0);
     else
        s = SS_null;
