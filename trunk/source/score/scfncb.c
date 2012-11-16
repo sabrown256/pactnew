@@ -191,15 +191,18 @@ int SC_load_ave(double *av)
 /*--------------------------------------------------------------------------*/
  
 /* SC_FREE_MEM - return the free memory on the current host
- *             - the results are returned in MEM which must be at
- *             - least 2 long to received the total memory, MEM[0],
- *             - and free memory, MEM[1], values
+ *             - the results are returned in MEM which is NI long
+ *             - depending on NI
+ *             -    MEM[0] = the total system memory
+ *             -    MEM[1] = the free memory
+ *             -    MEM[2] = the total swap memory
+ *             -    MEM[3] = the free swap memory
  *             - return TRUE iff successful
  *
- * #bind SC_free_mem fortran() python()
+ * #bind SC_free_mem fortran() scheme() python()
  */
 
-int SC_free_mem(double *mem)
+int SC_free_mem(int ni, double *mem ARG([*,*,*,*],out))
    {int i, rv;
 
 #if defined(HAVE_POSIX_SYS)
@@ -210,64 +213,79 @@ int SC_free_mem(double *mem)
     st  = 1;
     res = NULL;
 
-    mem[0] = mem[1] = 0.0;
+    for (i = 0; i < ni; i++)
+        mem[i] = 1.0;
 
 #if defined(LINUX) || defined(CYGWIN)
-    {char s[MAXLINE];
-     char *t, *v, *p;
-     FILE *fp;
+    {int l;
+     char *t, *v, *p, **sa;
 
      st = 0;
-     fp = io_open("/proc/meminfo", "r");
+     sa = SC_file_strings("/proc/meminfo");
 
-     while (io_gets(s, MAXLINE, fp) != NULL)
-        {t = SC_strtok(s, ": \t\n", p);
-	 if (t == NULL)
-	    break;
-	 if (strcmp(t, "Mem") == 0)
-	    {v      = SC_strtok(NULL, " \t\n", p);
-	     mem[0] = SC_stol(v);
-	     SC_strtok(NULL, " \t\n", p);
-	     v      = SC_strtok(NULL, " \t\n", p);
-	     mem[1] = SC_stol(v);
-	     break;}
-	 else if (strcmp(t, "MemTotal") == 0)
-	    {v      = SC_strtok(NULL, " \t\n", p);
-	     mem[0] = SC_stol(v);}
-	 else if (strcmp(t, "MemFree") == 0)
-	    {v      = SC_strtok(NULL, " \t\n", p);
-	     mem[1] = SC_stol(v);
-	     break;};};
+     for (i = 0, l = 0; (sa[i] != NULL) && (l < ni); i++)
+         {t = SC_strtok(sa[i], ": \t\n", p);
+	  if (t == NULL)
+	     continue;
+	  if (strcmp(t, "Mem") == 0)
+	     {v      = SC_strtok(NULL, " \t\n", p);
+	      mem[0] = SC_stol(v);
+	      l++;
+	      SC_strtok(NULL, " \t\n", p);
+	      if (ni > 1)
+	         {v      = SC_strtok(NULL, " \t\n", p);
+		  mem[1] = SC_stol(v);
+		  l++;};}
+	  else if (strcmp(t, "MemTotal") == 0)
+	     {v      = SC_strtok(NULL, " \t\n", p);
+	      mem[0] = SC_stol(v);
+	      l++;}
+	  else if ((ni > 1) && (strcmp(t, "SwapTotal") == 0))
+	     {v      = SC_strtok(NULL, " \t\n", p);
+	      mem[2] = SC_stol(v);
+	      l++;}
+	  else if ((ni > 1) && (strcmp(t, "SwapFree") == 0))
+	     {v      = SC_strtok(NULL, " \t\n", p);
+	      mem[3] = SC_stol(v);
+	      l++;};};
 
-     io_close(fp);}
+     SC_free_strings(sa);}
 
 #elif defined(MACOSX)
-    {int ok;
-     char path[PATH_MAX];
-     char *cmd;
+    int ok;
+    char path[PATH_MAX];
+    char *cmd;
 
-     ok = SC_full_path("pcexec", path, PATH_MAX);
-     if (ok == 0)
-        {cmd = "(pcexec -c 1 top | head -n 10 | awk '($1 ~ /PhysMem/) { print }')";
-	 st  = SC_exec(&res, cmd, NULL, -1);
-	 if (st == 0)
-	    {mem[0] = _SC_mem_real(res[0], 8,  " \t\n\r");
-	     mem[1] = _SC_mem_real(res[0], 10, " \t\n\r");
-
-	     mem[0] += mem[1];};}
-     else
-        {mem[0] = 1.0;
-	 mem[1] = 1.0;};}
+    ok = SC_full_path("pcexec", path, PATH_MAX);
+    if (ok == 0)
+       {cmd = "(pcexec -c 1 top | head -n 10 | awk '($1 ~ /PhysMem/) { print }')";
+        st  = SC_exec(&res, cmd, NULL, -1);
+        if (st == 0)
+	   {double act, fr;
+	    act = _SC_mem_real(res[0], 8, " \t\n\r");    /* active */
+	    fr  = _SC_mem_real(res[0], 10, " \t\n\r");   /* free */
+	    if (ni > 0)
+	       mem[0]  = act + fr;
+	    if (ni > 1)
+	       mem[1]  = fr;};};
 
 #elif defined(FREEBSD)
     char *cmd;
 
-    cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Mem/) { print }')";
+    cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Mem/) { print } ($1 ~ /Swap/) { print }')";
     st  = SC_exec(&res, cmd, NULL, -1);
     if (st == 0)
-       {mem[0]  = _SC_mem_real(res[0], 2, " \t\n\r");    /* active */
-	mem[1]  = _SC_mem_real(res[0], 12, " \t\n\r");   /* free */
-	mem[0] += mem[1];};
+       {double act, fr;
+	act = _SC_mem_real(res[0], 2, " \t\n\r");    /* active */
+	fr  = _SC_mem_real(res[0], 12, " \t\n\r");   /* free */
+	if (ni > 0)
+	   mem[0]  = act + fr;
+        if (ni > 1)
+	   mem[1]  = fr;
+        if (ni > 2)
+	   mem[2]  = _SC_mem_real(res[0], 15, " \t\n\r");
+        if (ni > 3)
+	   mem[3]  = _SC_mem_real(res[0], 17, " \t\n\r");};
 
 #elif defined(SOLARIS)
     char *cmd;
@@ -275,8 +293,14 @@ int SC_free_mem(double *mem)
     cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Memory/) { print }')";
     st  = SC_exec(&res, cmd, NULL, -1);
     if (st == 0)
-       {mem[0] = _SC_mem_real(res[0], 2, " \t\n\r");
-	mem[1] = _SC_mem_real(res[0], 4, " \t\n\r");};
+       {if (ni > 0)
+	   mem[0] = _SC_mem_real(res[0], 2, " \t\n\r");
+        if (ni > 1)
+	   mem[1] = _SC_mem_real(res[0], 5, " \t\n\r");
+        if (ni > 2)
+	   mem[2] = _SC_mem_real(res[0], 8, " \t\n\r");
+        if (ni > 3)
+	   mem[3] = _SC_mem_real(res[0], 11, " \t\n\r");};
 
 #elif defined(AIX)
     char *cmd;
@@ -284,31 +308,21 @@ int SC_free_mem(double *mem)
     cmd = "(vmstat -vs | awk '/free pages/ {print $1} /memory pages/ {print $1}')";
     st  = SC_exec(&res, cmd, NULL, -1);
     if (st == 0)
-       {mem[0] = 4096.0*SC_stof(res[0]);
-	mem[1] = 4096.0*SC_stof(res[1]);};
+       {if (ni > 0)
+	   mem[0] = 4096.0*SC_stof(res[0]);
+        if (ni > 1)
+	   mem[1] = 4096.0*SC_stof(res[1]);};
 
-#elif defined(OSF)
-    char *cmd;
-
-/* NOTE: on OSF the result from top can take at least two forms:
- *  Memory: Real: #/# act/tot  Virtual: #/# use/tot  Free: #
- *  Memory: Real: #/# act/tot  Virtual: # use/tot  Free: #
- * so for the freem memory do not tokenize on '/'
- */
-    cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Memory/) { print }')";
-    st  = SC_exec(&res, cmd, NULL, -1);
-    if (st == 0)
-       {mem[0] = _SC_mem_real(res[0], 4,  " /\t\n\r");
-	mem[1] = _SC_mem_real(res[0], 9, " \t\n\r");};
-
-#elif defined(SGI)
+#else
     char *cmd;
 
     cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Memory/) { print }')";
     st  = SC_exec(&res, cmd, NULL, -1);
     if (st == 0)
-       {mem[0] = _SC_mem_real(res[0], 2, " \t\n\r");
-	mem[1] = _SC_mem_real(res[0], 6, " \t\n\r");};
+       {if (ni > 0)
+	   mem[0] = _SC_mem_real(res[0], 2, " \t\n\r");
+        if (ni > 1)
+	   mem[1] = _SC_mem_real(res[0], 6, " \t\n\r");};
 
 #endif
 
@@ -327,6 +341,10 @@ int SC_free_mem(double *mem)
         mem[i] = 1.0;
 
 #endif
+
+/* convert to bytes */
+     for (i = 0; i < ni; i++)
+         mem[i] *= 1024.0;
 
     return(rv);}
 

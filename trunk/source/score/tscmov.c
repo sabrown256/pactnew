@@ -44,7 +44,7 @@ static int measure(statedes *st, long n)
 	    {x[i]  = CMAKE(double);
 	     *x[i] = 0.0;};};
 
-    SC_free_mem(mem);
+    SC_free_mem(2, mem);
 
     SC_resource_usage(&ru, -1);
     sz = ru.maxrss;

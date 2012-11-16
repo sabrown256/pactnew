@@ -797,7 +797,7 @@ extern SC_proc_info
 
 extern int
  SC_load_ave(double *av),
- SC_free_mem(double *mem),
+ SC_free_mem(int ni, double *mem),
  SC_get_ncpu(void),
  SC_get_pname(char *path, int nc, int pid),
  SC_attach_dbg(int pid),

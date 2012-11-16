@@ -69,10 +69,11 @@ a diadic macro with an empty body).  It has the following form:
 
   ARG(<defaults>[,<direction>[,<method>]])
 
-  <defaults>  := <sspec> := "*" | <val>
-  <spec>      := "" | <sspec>
-  <list>      := <sspec> | <list> ',' <sspec>
+  <defaults>  := <specs>
   <specs>     := <spec> | '[' <list> ']'
+  <spec>      := "" | <sspec>
+  <sspec>     := "*" | <val>
+  <list>      := <sspec> | <list> ',' <sspec>
   ""             no value specification
   "*"            any single value
   <val>          single value <val> 
