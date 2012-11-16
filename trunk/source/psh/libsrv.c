@@ -110,43 +110,6 @@ void cl_logger(client *cl, int lvl, char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* VERIFYX - verify the transaction request
- *         - return TRUE if ANS is correct
- */
-
-int verifyx(client *cl, char *ans, char *res)
-   {int nk, rv;
-    char lres[BFLRG];
-    char *key;
-
-    rv = TRUE;
-
-    nk  = cl->nkey;
-    key = cl->key;
-
-/* without authentication */
-    if ((nk == 0) && (key == NULL))
-       rv = TRUE;
-
-/* client wants the answer */
-    else if (res != NULL)
-       {snprintf(res, nk+1, "%s", key);
-	rv = TRUE;}
-
-/* server matches the answer */
-    else
-       {res = lres;
-	snprintf(res, nk+1, "%s", key);
-	rv = (strncmp(res, ans, nk) == 0);};
-
-    if (rv == FALSE)
-       CLOG(cl, 1, "access denied - bad key");
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _COMM_READ_WRK - read worker routine */
 
 static int _comm_read_wrk(client *cl, char *t, int nt, int to)
@@ -203,8 +166,8 @@ static int _comm_write_wrk(client *cl, char *t, int nt, int to)
  */
 
 int comm_read(client *cl, char *s, int nc, int to)
-   {int nb, nk, no, nt, ok;
-    char *p, *t;
+   {int nb, nt, ok;
+    char *p;
 
     if (cl->type == SERVER)
        nb = _comm_read_wrk(cl, s, nc, to);
@@ -218,38 +181,19 @@ int comm_read(client *cl, char *s, int nc, int to)
 		 nt = _comm_read_wrk(cl, u, BFLRG, to);
 		 ok = ring_push(&cl->ior, u, nt);};};};
 
-    no = 0;
-    nk = cl->nkey;
-    nt = nc + nk + 2;
-    t  = MAKE_N(char, nt);
-    p  = t;
-
-    nstrncpy(t, nt, s, -1);
-
-    ok = FALSE;
-    if (strncmp(t, "auth:", 5) == 0)
-       {if (svs.auth == TRUE)
-	   {no  = nk + 6;
-	    nb -= no;
-	    p   = t + no;
-            ok  = verifyx(cl, t+5, NULL);};}
-	   
-    else if (svs.auth != TRUE)
+    if (cl->cauth != NULL)
+       ok = cl->cauth(cl, nb, s, NULL);
+    else
        ok = TRUE;
 
+    nb = strlen(s);
+
     if (ok == FALSE)
-       {p = t + strlen(t) - 4;
+       {p = s + nb - 4;
 	if (strcmp(p, "fin:") == 0)
 	   nstrncpy(s, nc, p, -1);
 	else
-	   nstrncpy(s, nc, "reject:", -1);
-
-	nb = strlen(s);}
-
-    else if (strcmp(s, p) != 0)
-       nstrncpy(s, nc, p, -1);
-
-    FREE(t);
+	   nstrncpy(s, nc, "reject:", -1);}
 
     return(nb);}
 
@@ -266,7 +210,11 @@ int comm_write(client *cl, char *s, int nc, int to)
     char ans[N_AKEY+1];
     char *t;
 
-    ok = verifyx(cl, NULL, ans);
+    if (cl->cauth != NULL)
+       ok = cl->cauth(cl, 0, NULL, ans);
+    else
+       ok = TRUE;
+
     if (ok == FALSE)
        nb = -2;
 
@@ -565,7 +513,8 @@ static void sigtimeout(int sig)
 /* MAKE_CLIENT - initialize and return a client connection instance */
 
 client *make_client(ckind type, int port, int auth, char *root, 
-		    void (*clog)(client *cl, int lvl, char *fmt, ...))
+		    void (*clog)(client *cl, int lvl, char *fmt, ...),
+                    int (*cauth)(client *cl, int nc, char *ans, char *res))
    {char *fcon, *t;
     client *cl;
     static connection global_srv;
@@ -586,6 +535,7 @@ client *make_client(ckind type, int port, int auth, char *root,
         cl->a      = NULL;
 	cl->scon   = &global_srv;
         cl->clog   = clog;
+        cl->cauth  = cauth;
 
 	ring_init(&cl->ior, BFLRG);
 

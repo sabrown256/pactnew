@@ -374,7 +374,8 @@ extern char
 
 extern client
  *PS_make_client(ckind type, int port, int auth, char *root, 
-		 void (*clog)(client *cl, int lvl, char *fmt, ...));
+		 void (*clog)(client *cl, int lvl, char *fmt, ...),
+		 int (*cauth)(client *cl, int nc, char *ans, char *res));
 
 
 /* LIBTIME.C declarations */

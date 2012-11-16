@@ -48,6 +48,60 @@ static void sigrestart(int sig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* VERIFYX - verify the transaction request
+ *         - return TRUE if ANS is correct
+ */
+
+int verifyx(client *cl, int nc, char *ans, char *res)
+   {int nk, no, nt, rv;
+    char lres[BFLRG];
+    char *key, *t;
+
+    rv = TRUE;
+
+    nk  = cl->nkey;
+    key = cl->key;
+
+/* without authentication */
+    if ((nk == 0) && (key == NULL))
+       rv = TRUE;
+
+/* client wants the answer */
+    else if (res != NULL)
+       {snprintf(res, nk+1, "%s", key);
+	rv = TRUE;}
+
+/* server matches the answer */
+    else
+       {snprintf(lres, nk+1, "%s", key);
+
+	no = 0;
+	nt = nc + nk + 2;
+	t  = MAKE_N(char, nt);
+
+	nstrncpy(t, nt, ans, -1);
+
+	rv = (svs.auth == FALSE);
+	if (strncmp(t, "auth:", 5) == 0)
+	   {rv = FALSE;
+	    if (svs.auth == TRUE)
+	       {no = nk + 6;
+		rv = (strncmp(lres, ans+5, nk) == 0);
+		memmove(t, t+no, nc-no);};};
+
+	if ((t != NULL) && (strcmp(ans, t) != 0))
+	   nstrncpy(ans, nc, t, -1);
+
+	FREE(t);};
+
+    if (rv == FALSE)
+       CLOG(cl, 1, "access denied - bad key");
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SRV_SAVE_DB - save the database */
 
 static char *srv_save_db(database *db, char *fname,
@@ -565,7 +619,8 @@ static int server(char *root, int init, int dmn)
 	signal(SIGINT, sigdone);
 	signal(SIGHUP, sigrestart);
 
-	cl     = make_client(SERVER, DB_PORT, svs.auth, root, cl_logger);
+	cl     = make_client(SERVER, DB_PORT, svs.auth,
+			     root, cl_logger, verifyx);
 	svs.cl = cl;
 
 	CLOG(cl, 1, "start server");
@@ -601,7 +656,8 @@ static int exchange(char *root, int ltr, char *req)
     char **ta;
     client *cl;
 
-    cl = make_client(CLIENT, DB_PORT, svs.auth, root, cl_logger);
+    cl = make_client(CLIENT, DB_PORT, svs.auth,
+		     root, cl_logger, verifyx);
     ta = _db_clnt_ex(cl, TRUE, req);
     free_client(cl);
 
