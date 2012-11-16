@@ -488,29 +488,6 @@ static object *_SSI_load_ave(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SSI_FREE_MEM - return free memory info */
-
-static object *_SSI_free_mem(SS_psides *si)
-   {int rv;
-    double mem[4];
-    object *s;
-
-    rv = SC_free_mem(4, mem);
-    if (rv == TRUE)
-       s = SS_make_list(si,
-			SC_DOUBLE_I, mem,
-			SC_DOUBLE_I, mem+1,
-			SC_DOUBLE_I, mem+2,
-			SC_DOUBLE_I, mem+3,
-			0);
-    else
-       s = SS_null;
-
-    return(s);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SSI_GET_NCPU - return the number of cpus */
 
 static object *_SSI_get_ncpu(SS_psides *si)
@@ -836,11 +813,6 @@ void _SS_inst_lrg(SS_psides *si)
                "Procedure: C style file close",
                SS_sargs,
                _SSI_fclose, SS_PR_PROC);
-
-    SS_install(si, "free-mem",
-               "Procedure: return the memory and free memory of the current host",
-               SS_zargs,
-               _SSI_free_mem, SS_PR_PROC);
 
     SS_install(si, "getcwd",
                "Procedure: return the current working directory",
