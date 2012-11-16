@@ -62,7 +62,8 @@ struct s_client
     void *a;
     connection *scon;
     io_ring ior;
-    void (*clog)(client *cl, int lvl, char *fmt, ...);};
+    void (*clog)(client *cl, int lvl, char *fmt, ...);
+    int (*cauth)(client *cl, int nc, char *ans, char *res);};
 
 # endif
 # ifndef SCOPE_SCORE_PREPROC
