@@ -17,9 +17,9 @@
 typedef struct s_io_ring io_ring;
 
 struct s_io_ring
-   {unsigned int ib_in;
-    unsigned int ob_in;
-    unsigned int nb_ring;
+   {unsigned int ib_in;                /* input pointer */
+    unsigned int ob_in;                /* output pointer */
+    unsigned int nb_ring;              /* ring buffer size */
     unsigned char *in_ring;};
 
 # endif

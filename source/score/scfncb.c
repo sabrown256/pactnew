@@ -199,10 +199,10 @@ int SC_load_ave(double *av)
  *             -    MEM[3] = the free swap memory
  *             - return TRUE iff successful
  *
- * #bind SC_free_mem fortran() scheme() python()
+ * #bind SC_free_mem fortran() scheme(free-mem) python()
  */
 
-int SC_free_mem(int ni, double *mem ARG([*,*,*,*],out))
+int SC_free_mem(int ni ARG(4,in), double *mem ARG([*,*,*,*],out))
    {int i, rv;
 
 #if defined(HAVE_POSIX_SYS)
