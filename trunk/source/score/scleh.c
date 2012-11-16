@@ -56,8 +56,8 @@ struct s_lehdes
    {int fd;
     int raw;
     int exr;
-    int nhx;
-    int nh;
+    int nhx;             /* maximum number of history items */
+    int nh;              /* current number of history items */
     char **hist;
     PFread read;
     PFlehact *map;
@@ -65,13 +65,13 @@ struct s_lehdes
 
 struct s_lehloc
    {int fd;
-    int hind;
+    int hind;             /* index of current history item */
     int np;               /* size of prompt text */
     int have_prompt;      /* flag for presence of prompt */
     size_t nb;            /* size of current line buffer */
-    size_t pos;
-    size_t len;
-    size_t cols;
+    size_t pos;           /* position in current line */
+    size_t len;           /* current line length (<= cols) */
+    size_t cols;          /* screen line width */
     int c;
     char *bf;             /* current line buffer */
     char *prompt;};       /* prompt text */
@@ -79,6 +79,12 @@ struct s_lehloc
 static lehdes
  _SC_leh = { -1, FALSE, 0, MAX_HIST_N, 0, NULL,
 	     read, NULL, NULL, };
+
+static int
+ trace = FALSE;
+
+static FILE
+ *fdbg = NULL;
 
 void
  SC_leh_cmp_set_cb_cmp_cb(PFlehcb *f), 
@@ -262,25 +268,27 @@ static int _SC_leh_put_prompt(lehloc *lp)
 /* _SC_LEH_REFRESH - redraw the current line */
 
 static void _SC_leh_refresh(lehloc *lp)
-   {int fd, err;
+   {int fd, dp, err;
     size_t nw, len, np, pos, cols;
     char seq[64];
     char *bf;
 
-    fd     = lp->fd;
-    bf     = lp->bf;
-    len    = lp->len;
-    pos    = lp->pos;
-    cols   = lp->cols;
-    np     = lp->np;
+    fd   = lp->fd;
+    bf   = lp->bf;
+    len  = lp->len;
+    pos  = lp->pos;
+    cols = lp->cols;
+    np   = lp->np;
 
-    while (np+pos >= cols)
-       {bf++;
-        len--;
-        pos--;};
+    dp = np + pos - cols + 1;
+    if (dp > 0)
+       {bf  += dp;
+	len -= dp;
+	pos -= dp;};
 
-    while (np+len > cols)
-       len--;
+    dp = np + len - cols;
+    if (dp > 0)
+       len -= dp;
 
     err = FALSE;
 
@@ -479,37 +487,45 @@ static int _SC_leh_right(lehloc *lp)
 /* _SC_LEH_UP_DOWN - move up/down through history */
 
 static int _SC_leh_up_down(lehloc *lp, int wh)
-   {int rv;
+   {int ih, nh, rv;
     size_t ie;
 
     rv = TRUE;
 
     if (_SC_leh.nh > 1)
+       {ih = lp->hind;
+	nh = _SC_leh.nh;
 
 /* update the current history entry before
  * overwriting it with the next one
  */
-       {ie = _SC_leh.nh - 1 - lp->hind;
+	ie = nh - 1 - ih;
 	CFREE(_SC_leh.hist[ie]);
 	_SC_leh.hist[ie] = CSTRSAVE(lp->bf);
 
 /* display the new entry */
-	lp->hind += (wh == 'A') ? 1 : -1;
-	if (lp->hind < 0)
-	   {lp->hind = 0;
-	    rv       = FALSE;}
+	ih += (wh == 'A') ? 1 : -1;
 
-	else if (lp->hind >= _SC_leh.nh)
-	   {lp->hind = _SC_leh.nh-1;
-	    rv       = FALSE;}
+	if (ih < 0)
+	   ih = 0;
+
+	else if (ih >= nh)
+	   ih = nh - 1;
 
 	else
-	   {ie = _SC_leh.nh - 1 - lp->hind;
+	   {ie = nh - 1 - ih;
 	    SC_strncpy(lp->bf, lp->nb, _SC_leh.hist[ie], -1);
 
-	    lp->pos = strlen(lp->bf);
-	    lp->len = lp->pos;
-	    _SC_leh_refresh(lp);};};
+	    lp->pos  = strlen(lp->bf);
+	    lp->len  = lp->pos;
+	    lp->hind = ih;
+	    _SC_leh_refresh(lp);
+
+	    if (fdbg != NULL)
+	       {fprintf(fdbg, ": <up/down> %d %d", ih, nh);
+		fflush(fdbg);};};
+
+	lp->hind = ih;};
 
     return(rv);}
 
@@ -949,6 +965,9 @@ static char *_SC_leh_gets(lehloc *lp)
     char *rv;
     PFlehact *map;
 
+    if ((trace == TRUE) && (fdbg == NULL))
+       fdbg = fopen("log.keys", "w");
+
     if (_SC_leh.map == NULL)
        SC_leh_emacs_mode();
 
@@ -971,6 +990,12 @@ static char *_SC_leh_gets(lehloc *lp)
         if (nr <= 0)
 	   break;
 
+        if (fdbg != NULL)
+	   {fprintf(fdbg, "> '%c'  %d %d  (%ld %ld)  ",
+		    lp->c, lp->hind, _SC_leh.nh,
+		    lp->pos, lp->len);
+	    fflush(fdbg);};
+
 /* autocomplete when the callback is set
  * completion returns -1 on error
  * otherwise returns the next character to be handled
@@ -987,6 +1012,13 @@ static char *_SC_leh_gets(lehloc *lp)
 	       continue;};
 
 	nc = map[lp->c](lp);
+
+        if (fdbg != NULL)
+	   {fprintf(fdbg, ": %d %p (%ld %d)\n",
+		    nc, map[lp->c],
+		    lp->pos, _SC_leh.nh);
+	    fflush(fdbg);};
+
 	if (lp->c == CTRL_M)
 	   {rv = lp->bf;
 	    ok = FALSE;}
