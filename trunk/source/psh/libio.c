@@ -88,14 +88,11 @@ int ring_ready(io_ring *ring, unsigned char ls)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* RING_PUSH - push NC bytes from S into the io_ring RING
- *           - everything must go into the buffer
- *           - the routine that extracts from the buffer will
- *           - decide whether ASCII or BINARY information is expected
- *           - return TRUE iff there is enough room to hold the bytes
+/* _RING_ADJUST - adjust the RING to be ready to
+ *              - receive NC bytes
  */
 
-int ring_push(io_ring *ring, char *s, int nc)
+static void _ring_adjust(io_ring *ring, int nc)
    {int i;
     unsigned int ib, ob, ab, db, mb, nb, nnb;
     unsigned char *bf, *po, *pn;
@@ -105,8 +102,9 @@ int ring_push(io_ring *ring, char *s, int nc)
     nb = ring->nb_ring;
     bf = ring->in_ring;    
 
-/* compute available space remaining in the ring */
     while (TRUE)
+
+/* compute available space remaining in the ring */
        {if (ib >= ob)
 	   ab = nb - ib + ob;
         else
@@ -138,13 +136,38 @@ int ring_push(io_ring *ring, char *s, int nc)
 	ring->nb_ring = nb;
 	ring->ob_in   = ob;};
 
-    if (s != NULL)
-       {for (i = 0; i < nc; i++, ib = (ib + 1) % nb)
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* RING_PUSH - push NC bytes from S into the io_ring RING
+ *           - everything must go into the buffer
+ *           - the routine that extracts from the buffer will
+ *           - decide whether ASCII or BINARY information is expected
+ *           - return TRUE iff there is enough room to hold the bytes
+ */
+
+int ring_push(io_ring *ring, char *s, int nc)
+   {int i, rv;
+    unsigned int ib, nb;
+    unsigned char *bf;
+
+    rv = TRUE;
+    if ((s != NULL) && (nc > 0))
+       {_ring_adjust(ring, nc);
+
+	ib = ring->ib_in;
+	nb = ring->nb_ring;
+	bf = ring->in_ring;    
+
+/* insert the text in the ring */
+	for (i = 0; i < nc; i++, ib = (ib + 1) % nb)
             bf[ib] = *s++;
 
         ring->ib_in = ib;};
 
-    return(TRUE);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

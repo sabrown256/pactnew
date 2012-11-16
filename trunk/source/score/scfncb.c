@@ -249,7 +249,11 @@ int SC_free_mem(int ni ARG(4,in), double *mem ARG([*,*,*,*],out))
 	      mem[3] = SC_stol(v);
 	      l++;};};
 
-     SC_free_strings(sa);}
+     SC_free_strings(sa);
+
+/* convert to bytes */
+     for (i = 0; i < ni; i++)
+         mem[i] *= 1024.0;}
 
 #elif defined(MACOSX)
     int ok;
@@ -283,9 +287,9 @@ int SC_free_mem(int ni ARG(4,in), double *mem ARG([*,*,*,*],out))
         if (ni > 1)
 	   mem[1]  = fr;
         if (ni > 2)
-	   mem[2]  = _SC_mem_real(res[0], 15, " \t\n\r");
+	   mem[2]  = _SC_mem_real(res[1], 2, " \t\n\r");
         if (ni > 3)
-	   mem[3]  = _SC_mem_real(res[0], 17, " \t\n\r");};
+	   mem[3]  = _SC_mem_real(res[1], 4, " \t\n\r");};
 
 #elif defined(SOLARIS)
     char *cmd;
@@ -341,10 +345,6 @@ int SC_free_mem(int ni ARG(4,in), double *mem ARG([*,*,*,*],out))
         mem[i] = 1.0;
 
 #endif
-
-/* convert to bytes */
-     for (i = 0; i < ni; i++)
-         mem[i] *= 1024.0;
 
     return(rv);}
 
