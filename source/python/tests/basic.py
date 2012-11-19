@@ -14,5 +14,5 @@ import test_defstr
 import test_file
 import test_hash
 import test_assoc
-import test_numpy
+#import test_numpy
 

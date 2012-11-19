@@ -391,4 +391,120 @@ extern char
 }
 #endif
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#if 0
+
+/* defined by PSH but used by PACT proper - never undefine */
+#undef FRONT
+#undef BACK
+#undef N_IO_CHANNELS
+#undef DB_PORT
+
+#endif
+
+#ifdef PCK_SCPSH
+
+/* undefine these when compiling score/scpsh.c */
+#undef TRUE
+#undef FALSE
+#undef max
+#undef min
+#undef HSZLARGE
+
+#else
+
+/* undefine these when compiling anything but score/scpsh.c */
+#undef PCK_ANSIC
+#undef PCK_COMMON
+#undef BFSML
+#undef BFMDM
+#undef BFLRG
+#undef BFMG
+#undef N_STACK
+#undef P_APPEND
+#undef P_PREPEND
+#undef MAKE
+#undef MAKE_N
+#undef REMAKE
+#undef FREE
+#undef STRSAVE
+#undef ASSERT
+#undef LST_FREE
+#undef LAST_CHAR
+#undef VA_START
+#undef VA_ARG
+#undef VSNPRINTF
+#undef VA_END
+#undef IS_NULL
+#undef FOREACH
+#undef NEXT
+#undef ENDFOR
+#undef LIBASYNC
+#undef JOB_NOT_FINISHED
+#undef N_CHANNELS
+#undef JOB_RUNNING
+#undef JOB_STOPPED
+#undef JOB_CHANGED
+#undef JOB_EXITED
+#undef JOB_COREDUMPED
+#undef JOB_SIGNALED
+#undef JOB_KILLED
+#undef JOB_DEAD
+#undef JOB_RESTART
+#undef JOB_NO_SETSID
+#undef JOB_NO_TTY
+#undef JOB_NO_CLOSE
+#undef JOB_NO_FMT
+#undef JOB_NO_EXEC
+#undef job_alive
+#undef job_running
+#undef LIBDB
+#undef LIBEVAL
+#undef LIBFIFO
+#undef WHICH_PROC
+#undef LIBHASH
+#undef LIBINFO
+#undef LIBIO
+#undef LIBPGRP
+#undef PROCESS_DELIM
+#undef PIPE_DELIM
+#undef CHECK_FAN
+#undef INC_FAN
+#undef RTIME
+#undef LIBPSH
+#undef TEXT
+#undef HTML
+#undef CMD_LINE
+#undef CMD_OUT
+#undef BOTH
+#undef STACK_FILE
+#undef STACK_PROCESS
+#undef STACK_TOOL
+#undef STACK_GROUP
+#undef PHASE_READ
+#undef PHASE_ANALYZE
+#undef PHASE_WRITE
+#undef UNUNDEFD
+#undef NGROUPX
+#undef NGROUPX
+#undef END_CHECK
+#undef LIBSOCK
+#undef NATTEMPTS
+#undef N_AKEY
+#undef SOCKADDR_SIZE
+#undef C_OR_S
+#undef CLOG
+#undef LIBSRV
+#undef EOM
+#undef SLOG
+#undef LIBTIME
+#undef TIME_SEC
+#undef TIME_HMS
+#endif
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 #endif

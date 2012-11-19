@@ -13,6 +13,11 @@ source ../../tests/common
 set msg = "SCHEME GEXEC Test ............"
 set exe = $BinDir/scheme
 
+# NOTE: define PERDB_PATH to avoid it defaulting to
+# your home directory and allowing collisions with
+# tests on other platforms
+setenv PERDB_PATH $cwd/tgexec
+
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
       NoteD $Log ""
       NoteD $Log "                    $msg"
