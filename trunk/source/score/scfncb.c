@@ -240,11 +240,15 @@ int SC_free_mem(int ni ARG(4,in), double *mem ARG([*,*,*,*],out))
 	     {v      = SC_strtok(NULL, " \t\n", p);
 	      mem[0] = SC_stol(v);
 	      l++;}
-	  else if ((ni > 1) && (strcmp(t, "SwapTotal") == 0))
+	  else if ((ni > 1) && (strcmp(t, "MemFree") == 0))
+	     {v      = SC_strtok(NULL, " \t\n", p);
+	      mem[1] = SC_stol(v);
+	      l++;}
+	  else if ((ni > 2) && (strcmp(t, "SwapTotal") == 0))
 	     {v      = SC_strtok(NULL, " \t\n", p);
 	      mem[2] = SC_stol(v);
 	      l++;}
-	  else if ((ni > 1) && (strcmp(t, "SwapFree") == 0))
+	  else if ((ni > 3) && (strcmp(t, "SwapFree") == 0))
 	     {v      = SC_strtok(NULL, " \t\n", p);
 	      mem[3] = SC_stol(v);
 	      l++;};};

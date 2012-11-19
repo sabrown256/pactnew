@@ -1,0 +1,29 @@
+#!/bin/csh -f
+#
+# UNUMPY - PYTHON NumPY unit tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "Numpy Test ....................."
+
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
+
+   Note $Log "PYTHONPATH = $PYTHONPATH"
+
+   flog $Log $CFE $PYTHON $FilesDir/unumpy.py
+   set xstatus = $status
+
+   flog $Log touch foo.pyc
+   set rpf = ( *.pyc )
+
+$TEST_CHECK part -a numpy -e $xstatus -rpf "$rpf" none
+
+exit($status)

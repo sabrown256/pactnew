@@ -19,7 +19,6 @@
 #include "scope_array.h"
 #include "scope_lex.h"
 #include "scope_exe.h"
-#include "scope_psh.h"
 
 /* version designation of CODE */
 #ifndef VERSION

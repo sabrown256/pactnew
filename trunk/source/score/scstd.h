@@ -31,6 +31,8 @@
 #include <network.h>
 #include <ansic.h>
 
+#include <scope_psh.h>
+
 #include <scdecls.h>
 
 #include <scgnu.h>

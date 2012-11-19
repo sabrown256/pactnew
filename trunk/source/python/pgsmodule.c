@@ -813,7 +813,7 @@ PP_gettype(
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:gettype", kw_list,
                                      &PP_pdbdata_Type, &obj))
         return NULL;
-    return PyBytes_FromString(obj->type);
+    return PY_STRING_STRING(obj->type);
 }
 
 /*--------------------------------------------------------------------------*/

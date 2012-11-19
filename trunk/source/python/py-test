@@ -98,7 +98,11 @@ else if (-f $lpydir/pdb.py) then
 
    if ("$Tests" == "") then
       set Tests = ""
-      set Tests = ( $Tests basic unit )
+      if ($xv =~ *numeric) then
+         set Tests = ( $Tests basic unit )
+      else
+         set Tests = ( $Tests unumpy basic unit )
+      endif
    endif
 
    foreach i ($Tests)

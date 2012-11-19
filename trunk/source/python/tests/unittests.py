@@ -14,7 +14,6 @@ import test_defstr
 import test_file
 import test_hash
 import test_assoc
-import test_numpy
 
 suite = unittest.TestSuite()
 for cls in (test_mod.Mod,
@@ -40,8 +39,6 @@ for cls in (test_mod.Mod,
             test_hash.HashIO,
             test_assoc.Assoc,
 #            test_assoc.AssocIO,
-            test_numpy.ArrayVif,
-            test_numpy.ArrayFile,
             ):
     suite.addTest(unittest.makeSuite(cls))
 unittest.TextTestRunner(verbosity=2).run(suite)
