@@ -11,23 +11,26 @@
 set Me = $0
 source $Me:h/common
 
-dbmget $ALog HAVE_FORTRAN^     \
-             HAVE_PYTHON^      \
-             HAVE_PY_NUMERIC^  \
-             HAVE_PY_NUMPY^    \
-             MAKE_Shared_Libs^ \
-             PY_Exe^           \
-             PY_Ext^           \
-             PY_DirPy^         \
-             PY_DirSrc^        \
-             PY_DirDst^        \
-             CC_Exe^           \
-             Cfe_CC_Exe^       \
-             FC_Exe^           \
-             FC_Flags^         \
-             Cfe_FC_Exe^       \
-             Cfe_FC_Flags^     \
-             Yacc_Exe
+dbmget $Log HAVE_FORTRAN^     \
+            HAVE_PYTHON^      \
+            HAVE_PY_NUMERIC^  \
+            HAVE_PY_NUMPY^    \
+            MAKE_Exe^         \
+            MAKE_Shared_Libs^ \
+            BaseDir^          \
+            SysDir^           \
+            PY_Exe^           \
+            PY_Ext^           \
+            PY_DirPy^         \
+            PY_DirSrc^        \
+            PY_DirDst^        \
+            CC_Exe^           \
+            Cfe_CC_Exe^       \
+            FC_Exe^           \
+            FC_Flags^         \
+            Cfe_FC_Exe^       \
+            Cfe_FC_Flags^     \
+            Yacc_Exe
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -163,6 +166,22 @@ dbmget $ALog HAVE_FORTRAN^     \
     NoteD $Log "   Building into $cwd:h/dev/$System"
 
     NoteD $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PRE-INSTALL - do any installations that need to be done before
+#             - writing generated files
+
+# ensure that the PSH files are installed in $IncDir/shell
+# before the write scripts are invoked
+# some of them include these files
+
+Note $Log "Install shell includes from psh"
+
+flog $Log pushd $BaseDir/psh
+flog $Log $MAKE_Exe IncDir=$SysDir/include -f pre-Make mkinstall
+flog $Log popd
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

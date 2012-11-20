@@ -36,11 +36,6 @@ dbmget $Log BaseDir^       \
             CfgDir^        \
             IncDir
 
-# ensure that the PSH files are installed in $IncDir/shell
-flog $Log pushd $BaseDir/psh
-flog $Log make IncDir=$IncDir} -f pre-Make mkinstall
-flog $Log popd
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 

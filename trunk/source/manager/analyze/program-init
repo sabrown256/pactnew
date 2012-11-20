@@ -27,6 +27,7 @@ setenv ENV_VARS "RUN_SIGNATURE_DB SITE_SIGNATURE_DB \
                  DP_Inc DP_Lib DP_RPath DP_Path \
                  LIB LibM_Lib LibM_RPath \
                  MDG_Inc MDG_Lib MDG_RPath MDG_Path \
+                 MAKE_Exe \
                  PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH PACT_CC_EXE \
                  PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH PACT_FC_EXE \
                  PY_Inc PY_Lib PY_RPath PY_Path PY_Vers PY_Ext \

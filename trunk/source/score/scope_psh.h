@@ -394,26 +394,7 @@ extern char
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#if 0
-
-/* defined by PSH but used by PACT proper - never undefine */
-#undef FRONT
-#undef BACK
-#undef N_IO_CHANNELS
-#undef DB_PORT
-
-#endif
-
-#ifdef PCK_SCPSH
-
-/* undefine these when compiling score/scpsh.c */
-#undef TRUE
-#undef FALSE
-#undef max
-#undef min
-#undef HSZLARGE
-
-#else
+#ifndef PCK_SCPSH
 
 /* undefine these when compiling anything but score/scpsh.c */
 #undef PCK_ANSIC
@@ -502,6 +483,7 @@ extern char
 #undef LIBTIME
 #undef TIME_SEC
 #undef TIME_HMS
+
 #endif
 
 /*--------------------------------------------------------------------------*/
