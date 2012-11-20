@@ -132,6 +132,9 @@ link : ${InstallDep}
 install :
 	pact link
 
+mkinstall :
+	${IncAction}
+
 #
 # Run the PSH test suite
 #

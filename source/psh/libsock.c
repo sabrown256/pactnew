@@ -496,11 +496,14 @@ char **get_connect_socket(client *cl)
 
 	sa = parse_conn(root);
 	if ((sa != NULL) && (srv->sck.in == NULL))
-	   {host  = sa[CONN_NAME];
-	    port  = atoi(sa[CONN_PORT]);
-	    haddr = atol(sa[CONN_IP]);
+	   {if ((IS_NULL(sa[CONN_NAME]) == FALSE) &&
+		(IS_NULL(sa[CONN_PORT]) == FALSE) &&
+		(IS_NULL(sa[CONN_IP]) == FALSE))
+	       {host  = sa[CONN_NAME];
+		port  = atoi(sa[CONN_PORT]);
+		haddr = atol(sa[CONN_IP]);
 
-	    srv->sck = tcp_get_address(host, port, haddr);};};
+		srv->sck = tcp_get_address(host, port, haddr);};};}
 
     return(sa);}
 

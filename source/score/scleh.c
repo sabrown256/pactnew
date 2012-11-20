@@ -993,7 +993,7 @@ static char *_SC_leh_gets(lehloc *lp)
         if (fdbg != NULL)
 	   {fprintf(fdbg, "> '%c'  %d %d  (%ld %ld)  ",
 		    lp->c, lp->hind, _SC_leh.nh,
-		    lp->pos, lp->len);
+		    (long) lp->pos, (long) lp->len);
 	    fflush(fdbg);};
 
 /* autocomplete when the callback is set
@@ -1016,7 +1016,7 @@ static char *_SC_leh_gets(lehloc *lp)
         if (fdbg != NULL)
 	   {fprintf(fdbg, ": %d %p (%ld %d)\n",
 		    nc, map[lp->c],
-		    lp->pos, _SC_leh.nh);
+		    (long) lp->pos, _SC_leh.nh);
 	    fflush(fdbg);};
 
 	if (lp->c == CTRL_M)
