@@ -132,6 +132,9 @@ int SC_so_release(void)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+
+#ifdef HAVE_DYNAMIC_LINKER
+
 /*--------------------------------------------------------------------------*/
 
 /* _SC_SO_PARSE_FLAGS - parse the flags for dlsym from SE */
@@ -140,8 +143,6 @@ static int _SC_so_parse_flags(sodes *se)
    {int flag;
 
     flag = -1;
-
-#ifdef HAVE_DYNAMIC_LINKER
 
     int is, ns;
     char s[MAXLINE];
@@ -177,11 +178,12 @@ static int _SC_so_parse_flags(sodes *se)
 
 	SC_free_strings(sa);};
 
-#endif
-
     return(flag);}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* _SC_SO_OPEN - open shared object TAG
