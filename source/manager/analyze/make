@@ -37,6 +37,7 @@ Note $Tmp.make ""
 Note $ALog "Path = $PATH"
 flog $ALog gmake --version
 if ($status == 0) then
+   flog $ALog setenv MAKE_Exe gmake
    NoteD $ALog -n "`$Which gmake`"
    NoteD $ALog -n " (GNU) "
    setenv GMAKE_Flag "-DUSE_GNU_MAKE"
@@ -44,23 +45,31 @@ if ($status == 0) then
    NoteD $ALog " library aware"
 
 else
-   NoteD $ALog -n "`$Which make`"
-   touch $Tmp.c
-   flog $ALog make -f $Tmp.make $Tmp.a
-   if (($status != 0) || !(-e $Tmp.a)) then
-      setenv MAKE_Strategy "none"
-      NoteD $ALog " minimal"
+   set lmake = ( `$Which make` )
+   if (-x "$lmake") then
+      NoteD $ALog -n "$lmake"
+      flog $ALog setenv MAKE_Exe make
+      touch $Tmp.c
+      flog $ALog make -f $Tmp.make $Tmp.a
+      if (($status != 0) || !(-e $Tmp.a)) then
+         setenv MAKE_Strategy "none"
+         NoteD $ALog " minimal"
+      else
+         setenv MAKE_Strategy "SpaceSaving"
+         NoteD $ALog " library aware"
+      endif
+      flog $ALog rm -f $Tmp.c $Tmp.a
    else
-      setenv MAKE_Strategy "SpaceSaving"
-      NoteD $ALog " library aware"
+      NoteD $ALog -n "none"
+      flog $ALog setenv MAKE_Exe none
    endif
-   flog $ALog rm -f $Tmp.c $Tmp.a
 endif
 
 flog $ALog rm -f $Tmp.make
 
 # export the results
-dbmset $ALog MAKE_Strategy = $MAKE_Strategy^  \
+dbmset $ALog MAKE_Exe      = $MAKE_Exe^          \
+             MAKE_Strategy = $MAKE_Strategy^     \
              GMAKE_Flag    = $GMAKE_Flag
 
 exit(0)

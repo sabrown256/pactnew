@@ -75,13 +75,6 @@
 # define LLONG_MIN    (-LLONG_MAX - 1LL)
 #endif
 
-#ifndef TRUE
-# define TRUE 1
-#endif
-#ifndef FALSE
-# define FALSE 0
-#endif
- 
 #ifndef ON
 # undef OFF
 # define ON  1
@@ -385,28 +378,6 @@ struct s_quaternion
    {SC_mem_stats_acc(0L, (long) sizeof(*x));                                 \
     free(x);                                                                 \
     x = NULL;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* MAX - the oft wanted maximum */
-
-#ifndef __cplusplus
-# ifndef max
-#  define max(a, b) ((a) > (b) ? (a) : (b))
-# endif
-#endif
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* MIN - companion to max */
-
-#ifndef __cplusplus
-# ifndef min
-#  define min(a, b) ((a) < (b) ? (a) : (b))
-# endif
-#endif
 
 /*--------------------------------------------------------------------------*/
 

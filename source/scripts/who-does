@@ -1,0 +1,117 @@
+#!/bin/csh -f
+#
+# WHO-DOES - report where define, include, typedef comes from
+#
+# include "cpyright.h"
+#
+
+unalias *
+@ err = 0
+
+set files  = ""
+set incdir = "/usr/include"
+set tgt    = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -d:
+           shift
+           set var = $1
+           set tgt = define
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: who-does [-d <name>] [-h] [-i <file>] [-I<dir>]* [-t <name>] file*"
+           echo "   d   report where <name> is #define'd"
+           echo "   h   this help message"
+           echo "   i   report where <file> is #include'd"
+           echo "   I   C style include specification"
+           echo "   t   report where <name> is typedef'd"
+           echo ""
+           exit(1)
+      case -i:
+           shift
+           set var = $1
+           set tgt = include
+           breaksw
+      case -I*:
+
+# handle -I <dir>
+           if ("$1" == "-I") then
+              shift
+              set incdir = ( $incdir $1 )
+# handle -I<dir>
+           else
+              set incdir = ( $incdir `echo $1 | sed 's|^\-I||'` )
+           endif
+           breaksw
+      case -t:
+           shift
+           set var = $1
+           set tgt = typedef
+           breaksw
+      default:
+           set files = ( $files $1 )
+           breaksw
+   endsw
+   shift 
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set incl = ""
+
+@ nf = $#files
+@ lf = 0
+while ($lf < $nf)
+   @ lf = $lf + 1
+   set f = $files[$lf]
+
+   set cur = ( `grep -nw $var $f | grep -w $tgt | head -n 1` )
+
+   set inc = ( `grep -w include $f | grep '#' | grep -v '\*'` )
+   @ n = $#inc
+
+   @ i = 0
+   while ($i < $n)
+      @ i = $i + 1
+      set fi = $inc[$i]
+      if ("$fi" == include) continue
+
+      set inf = ( `echo $fi | sed 's|[<>\"]||g'` )
+
+# see if include files are on the file list
+      set ok = TRUE
+      foreach j ($files)
+         if ($j =~ *$inf) then
+            set ok = FALSE
+            break
+         endif
+      end
+
+# if not see if the file exists in INCDIR and add it to the list
+      if ($ok == TRUE) then
+         foreach d ($incdir)
+            if (-f $d/$inf) then
+               set files = ( $files $d/$inf )
+               break
+            endif
+         end
+      endif
+   end
+
+   @ nf = $#files
+
+   if ("$cur" != "") then
+      set inf = ( `echo "$cur" | sed 's|:| |'` )
+      echo "in ${f}:$inf[1]"
+      echo "   $inf[2-]"
+   endif
+
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)
