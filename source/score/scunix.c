@@ -141,9 +141,14 @@ syscall_api
   _SC_osapi = { getpwuid, getuid, getgid, 
 		getpid, getppid, getpgrp, tcgetpgrp, 
 		setsid, fork, waitpid, kill, sched_yield,
-		fsync, ioctl, fcntl, 
+		fsync,
+		ioctl,         /* Solaris differs in protoype */
+		fcntl, 
 		poll, nanosleep, 
 		setenv, unsetenv, 
-		gethostname, ttyname, srandom, random };
+		gethostname,   /* Solaris differs in protoype */
+		ttyname,
+		srandom,       /* FreeBSD differs in protoype */
+		random };
 
 #endif

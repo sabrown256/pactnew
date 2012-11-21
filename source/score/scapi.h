@@ -127,7 +127,7 @@ struct s_syscall_api
     int (*funsetenv)(const char *name);
     int (*fgethostname)(char *name, size_t len);
     char *(*fttyname)(int fd);
-    void (*fsrandom)(unsigned int seed);
+    void (*fsrandom)(uint32_t seed);
     long (*frandom)(void);};
 
 

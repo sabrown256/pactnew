@@ -125,7 +125,7 @@ static int _PD_set_eod_s(PDBfile *file, int64_t addr, long nb)
  */
 
 static int64_t _PD_next_address_s(PDBfile *file, char *type, long number,
-				void *vr, int seekf, int tellf, int colf)
+				  void *vr, int seekf, int tellf, int colf)
    {int64_t addr;
     FILE *fp;
 

@@ -804,6 +804,8 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
     
     file->req.oper = PD_WRITE;
 
+    number = _PD_comp_num(dims);
+
 /* append a new block to an existing entry if TRUE */
     if (appnd)
        {strcpy(bf, name);
@@ -830,9 +832,8 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 	if ((PD_entry_dimensions(ep) != NULL) && (PD_entry_number(ep) > 0))
 	   {_PD_adj_dimensions(file, bf, ep);
 
-	    number = _PD_comp_num(dims);
-	    addr   = _PD_get_next_address(file, PD_entry_type(ep), number, vr,
-					  FALSE, FALSE, FALSE);
+	    addr = _PD_get_next_address(file, PD_entry_type(ep), number, vr,
+					FALSE, FALSE, FALSE);
         
 /* extend the syment */
 	    _PD_block_add(file, ep, dims, addr);}
@@ -860,9 +861,8 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 
 /* handle the zero space defent case */
        {if (ep->blocks == NULL)
-	   {number = _PD_comp_num(dims);
-	    addr   = _PD_get_next_address(file, PD_entry_type(ep), number, vr,
-					  FALSE, FALSE, TRUE);
+	   {addr = _PD_get_next_address(file, PD_entry_type(ep), number, vr,
+					FALSE, FALSE, TRUE);
 
 	    _PD_block_init(ep, TRUE);
 	    ep->number     = number;
@@ -891,46 +891,48 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 	else
 	   lname = _PD_var_namef(NULL, fullpath, bf, MAXLINE);
 
-	number = _PD_comp_num(dims);
-	addr   = _PD_get_next_address(file, outtype, number, vr,
-				      FALSE, FALSE, FALSE);
+	addr = _PD_get_next_address(file, outtype, number, vr,
+				    FALSE, FALSE, FALSE);
 
 	ep = _PD_mk_syment(outtype, number, addr, NULL, dims);
 	_PD_e_install(file, lname, ep, TRUE);
 
-	addr = _PD_annotate_text(file, ep, lname, addr, vr);
+	addr = _PD_annotate_text(file, ep, lname, addr);
 
 	new = TRUE;};
 
+/* if the number of items is zero do not attempt to do the actual write */
+    if (number > 0)
+
 /* now write the data to the file */
-    if (file->virtual_internal)
-       {if (new)
-	   {ad.memaddr = vr;
-	    _PD_entry_set_address(ep, 0, ad.diskaddr);
-	    SC_mark(vr, 1);}
+       {if (file->virtual_internal)
+	   {if (new)
+	       {ad.memaddr = vr;
+		_PD_entry_set_address(ep, 0, ad.diskaddr);
+		SC_mark(vr, 1);}
 
-	else
-	   {if (!_PD_hyper_write(file, lname, ep, vr, intype))
-	       PD_error("CANNOT WRITE VIRTUAL VARIABLE - _PD_WRITE",
-			PD_WRITE);};}
+	    else
+	       {if (!_PD_hyper_write(file, lname, ep, vr, intype))
+		   PD_error("CANNOT WRITE VIRTUAL VARIABLE - _PD_WRITE",
+			    PD_WRITE);};}
 
-    else
-       {if (outtype == NULL)
-	   outtype = PD_entry_type(ep);
+        else
+	   {if (outtype == NULL)
+	       outtype = PD_entry_type(ep);
 
-	if (intype == NULL)
-	   intype = outtype;
+	    if (intype == NULL)
+	       intype = outtype;
 
 /* go to the correct address */
-	_PD_set_current_address(file, addr, SEEK_SET, PD_WRITE);
+	    _PD_set_current_address(file, addr, SEEK_SET, PD_WRITE);
 
 /* do the low level write */
-	if (!_PD_hyper_write(file, lname, ep, vr, intype))
-	   PD_error("CANNOT WRITE VARIABLE - _PD_WRITE", PD_WRITE);
+	    if (!_PD_hyper_write(file, lname, ep, vr, intype))
+	       PD_error("CANNOT WRITE VARIABLE - _PD_WRITE", PD_WRITE);
 
 /* if the variable didn't previously exist we're at the end of the file */
-	if (new)
-	   file->chrtaddr = _PD_get_current_address(file, PD_WRITE);};
+	    if (new)
+	       file->chrtaddr = _PD_get_current_address(file, PD_WRITE);};};
 
     _PD_request_unset(file);
 

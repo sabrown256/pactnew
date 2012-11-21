@@ -864,7 +864,7 @@ void _PD_fin_stacks(void)
 /* _PD_ANNOTATE_TEXT - for text files annotate the output */
 
 int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
-			  int64_t addr, void *vr)
+			  int64_t addr)
    {long nc;
     inti ni;
     int64_t na, pa;
