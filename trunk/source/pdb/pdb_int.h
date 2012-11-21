@@ -732,7 +732,7 @@ extern int64_t
 
 extern int64_t
  _PD_annotate_text(PDBfile *file, syment *ep, char *name,
-		   int64_t addr, void *vr);
+		   int64_t addr);
 
 extern dimdes
  *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims);
