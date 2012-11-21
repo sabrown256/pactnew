@@ -355,14 +355,18 @@ int _PD_remove_type(PDBfile *file, char *name)
 
 void _PD_e_install(PDBfile *file, char *name, syment *ep, int lookup)
    {hasharr *tab;
+    dimdes *dms;
 
-    tab = file->symtab;
+/* do not add zero length variables to the symbol table */
+    dms = PD_entry_dimensions(ep);
+    if ((dms == NULL) || (dms->number != 0))
+       {tab = file->symtab;
 
 /* we can leak a lot of memory if we don't check this!! */
-    if (lookup)
-       PD_remove_entry(file, name);
+	if (lookup)
+	   PD_remove_entry(file, name);
 
-    SC_hasharr_install(tab, name, ep, SYMENT_P_S, 1, -1);
+	SC_hasharr_install(tab, name, ep, SYMENT_P_S, 1, -1);};
 
     return;}
 

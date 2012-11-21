@@ -13,12 +13,6 @@
 
 # include "common.h"
 
-# ifndef SCOPE_SCORE_COMPILE
-
-#define TIME_SEC     500
-#define TIME_HMS     501
-
-# endif
 # ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/

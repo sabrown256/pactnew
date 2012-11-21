@@ -15,17 +15,20 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
+#ifndef NEWWAY
+
+#define FRONT      1
+#define BACK       2
+#define BOTH       3
+
+#else
+
 #undef TEXT
 #define TEXT       10
 #define HTML       11
 
-#define FRONT      1
-#define BACK       2
-
 #define CMD_LINE   1
 #define CMD_OUT    2
-
-#define BOTH       3
 
 #define STACK_FILE      1
 #define STACK_PROCESS   2
@@ -36,7 +39,22 @@
 #define PHASE_ANALYZE   11
 #define PHASE_WRITE     12
 
+#endif
+
 #define UNDEFINED  "--undefd--"
+
+#undef NGROUPX
+#ifdef NGROUPS_MAX
+# define NGROUPX NGROUPS_MAX
+#else
+# define NGROUPX 16
+#endif
+
+#define END_CHECK(ps, pp)                                                    \
+   {if ((*ps == '\0') && (*pp != '\0') && (*pp != '*'))                      \
+       return(-1);                                                           \
+    else if ((*ps != '\0') && (*pp == '\0'))                                 \
+       return(1);}
 
 typedef struct s_dir_stack dir_stack;
 
@@ -1052,13 +1070,6 @@ int file_exists(char *fmt, ...)
 
 /* FILE_EXECUTABLE - return TRUE iff the named file is executable */
 
-#undef NGROUPX
-#ifdef NGROUPS_MAX
-# define NGROUPX NGROUPS_MAX
-#else
-# define NGROUPX 16
-#endif
-
 int file_executable(char *fmt, ...)
    {int rv, st, muid, mgid, fuid, fgid, only;
     int usrx, grpx, othx, isusr, isgrp, isoth, file;
@@ -2028,12 +2039,6 @@ char **ls(char *opt, char *fmt, ...)
  *       -    4.2 = 4.*      =>   0
  *       -    5.2 > 4.*      =>   1
  */
-
-#define END_CHECK(ps, pp)                                                    \
-   {if ((*ps == '\0') && (*pp != '\0') && (*pp != '*'))                      \
-       return(-1);                                                           \
-    else if ((*ps != '\0') && (*pp == '\0'))                                 \
-       return(1);}
 
 int match(char *s, char *patt)
    {int b, c, rv;

@@ -212,6 +212,28 @@ static void cleanup_test_1(void)
 
 static void write_test_1_data(PDBfile *strm)
    {long ind[6];
+    char *bad;
+
+/* test writing zero length or NULL variables into the file */
+    bad = (char *) -1;
+    ind[0] = 0L;
+    ind[1] = -1L;
+    ind[2] = 0L;
+
+/* NULL pointer and zero length */
+    if (PD_write_alt(strm, "za", "char", NULL, 1, ind) == 0)
+       error(1, STDOUT, "ZA WRITE FAILED - WRITE_TEST_1_DATA\n");
+
+/* bad pointer but zero length */
+    if (PD_write_alt(strm, "zb", "char", bad, 1, ind) == 0)
+       error(1, STDOUT, "ZB WRITE FAILED - WRITE_TEST_1_DATA\n");
+
+/* NULL pointer and but non-zero length */
+    ind[0] = 0L;
+    ind[1] = 1L;
+    ind[2] = 1L;
+    if (PD_write_alt(strm, "zc", "char", NULL, 1, ind) == 0)
+       error(1, STDOUT, "ZC WRITE FAILED - WRITE_TEST_1_DATA\n");
 
 /* write scalars into the file */
     if (PD_write(strm, "cs", "char",    &cs_w) == 0)

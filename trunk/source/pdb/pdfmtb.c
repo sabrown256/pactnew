@@ -764,7 +764,7 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
     char t[2][MAXLINE];
     char *ty, *nm;
     syment *ep;
-    dimdes *lst;
+    dimdes *dms;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
@@ -804,21 +804,19 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
 
 /* adjust the slowest varying dimension to reflect only the first block */
 	 flag = PD_get_major_order(file);
-	 for (lst = PD_entry_dimensions(ep);
-	      lst != NULL;
-	      lst = lst->next)
+	 for (dms = PD_entry_dimensions(ep); dms != NULL; dms = dms->next)
 	     {if ((flag == ROW_MAJOR_ORDER) ||
-		  ((flag == COLUMN_MAJOR_ORDER) && (lst->next == NULL)))
-		 {stride = nt/(lst->number);
+		  ((flag == COLUMN_MAJOR_ORDER) && (dms->next == NULL)))
+		 {stride = nt/(dms->number);
 		  stride = (stride == 0) ? 1 : stride;
 		  ni     = nb/stride;
 		  flag   = FALSE;}
 	      else
-		 ni = lst->number;
+		 ni = dms->number;
 
 	      SC_itos(t[0], MAXLINE, ni, NULL);
 	      _PD_put_string(n++, "%ld\001%s\001",
-			     lst->index_min, t[0]);};
+			     dms->index_min, t[0]);};
 
 	 _PD_put_string(n++, "\n");};
 

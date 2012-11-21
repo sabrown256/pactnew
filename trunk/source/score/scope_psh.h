@@ -396,16 +396,81 @@ extern char
 
 #ifndef PCK_SCPSH
 
-/* undefine these when compiling anything but score/scpsh.c */
 #undef PCK_ANSIC
 #undef PCK_COMMON
+
+#undef LIBASYNC
+#undef LIBDB
+#undef LIBEVAL
+#undef LIBFIFO
+#undef LIBHASH
+#undef LIBINFO
+#undef LIBIO
+#undef LIBPGRP
+#undef LIBPSH
+#undef LIBSOCK
+#undef LIBSRV
+#undef LIBTIME
+
+/*--------------------------------------------------------------------------*/
+
+/*                                CONSTANT MACROS                           */
+
+/*--------------------------------------------------------------------------*/
+
+/* COMMON.H macros */
+
 #undef BFSML
 #undef BFMDM
 #undef BFLRG
 #undef BFMG
 #undef N_STACK
-#undef P_APPEND
-#undef P_PREPEND
+
+
+/* LIBASYNC.C macros */
+
+#undef JOB_NOT_FINISHED
+#undef N_CHANNELS
+#undef JOB_RUNNING
+#undef JOB_STOPPED
+#undef JOB_CHANGED
+#undef JOB_EXITED
+#undef JOB_COREDUMPED
+#undef JOB_SIGNALED
+#undef JOB_KILLED
+#undef JOB_DEAD
+#undef JOB_RESTART
+
+
+/* LIBPGRP.C macros */
+
+#undef PROCESS_DELIM
+#undef PIPE_DELIM
+
+
+/* LIBPSH.C macros */
+
+#undef NGROUPX
+
+
+/* LIBSOCK.C macros */
+
+#undef NATTEMPTS
+#undef N_AKEY
+
+
+/* LIBSRV.C macros */
+
+#undef EOM
+
+/*--------------------------------------------------------------------------*/
+
+/*                              FUNCTIONAL MACROS                           */
+
+/*--------------------------------------------------------------------------*/
+
+/* COMMON.H macros */
+
 #undef MAKE
 #undef MAKE_N
 #undef REMAKE
@@ -422,67 +487,41 @@ extern char
 #undef FOREACH
 #undef NEXT
 #undef ENDFOR
-#undef LIBASYNC
-#undef JOB_NOT_FINISHED
-#undef N_CHANNELS
-#undef JOB_RUNNING
-#undef JOB_STOPPED
-#undef JOB_CHANGED
-#undef JOB_EXITED
-#undef JOB_COREDUMPED
-#undef JOB_SIGNALED
-#undef JOB_KILLED
-#undef JOB_DEAD
-#undef JOB_RESTART
-#undef JOB_NO_SETSID
-#undef JOB_NO_TTY
-#undef JOB_NO_CLOSE
-#undef JOB_NO_FMT
-#undef JOB_NO_EXEC
+
+
+/* LIBASYNC.H macros */
+
 #undef job_alive
 #undef job_running
-#undef LIBDB
-#undef LIBEVAL
-#undef LIBFIFO
+
+
+/* LIBFIFO.C macros */
+
 #undef WHICH_PROC
-#undef LIBHASH
-#undef LIBINFO
-#undef LIBIO
-#undef LIBPGRP
-#undef PROCESS_DELIM
-#undef PIPE_DELIM
+
+
+/* LIBPGRP.C macros */
+
 #undef CHECK_FAN
 #undef INC_FAN
 #undef RTIME
-#undef LIBPSH
-#undef TEXT
-#undef HTML
-#undef CMD_LINE
-#undef CMD_OUT
-#undef BOTH
-#undef STACK_FILE
-#undef STACK_PROCESS
-#undef STACK_TOOL
-#undef STACK_GROUP
-#undef PHASE_READ
-#undef PHASE_ANALYZE
-#undef PHASE_WRITE
-#undef UNUNDEFD
-#undef NGROUPX
-#undef NGROUPX
+
+
+/* LIBPSH.C macros */
+
 #undef END_CHECK
-#undef LIBSOCK
-#undef NATTEMPTS
-#undef N_AKEY
+
+
+/* LIBSOCK.C macros */
+
 #undef SOCKADDR_SIZE
 #undef C_OR_S
 #undef CLOG
-#undef LIBSRV
-#undef EOM
+
+
+/* LIBSRV.C macros */
+
 #undef SLOG
-#undef LIBTIME
-#undef TIME_SEC
-#undef TIME_HMS
 
 #endif
 

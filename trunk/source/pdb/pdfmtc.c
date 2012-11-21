@@ -650,7 +650,7 @@ static void _PD_rd_blocks_iii(PDBfile *file)
     int64_t addr;
     char *name, *token, *s, *local;
     syment *ep;
-    dimdes *dim;
+    dimdes *dms;
     SC_array *bl;
     PD_smp_state *pa;
 
@@ -672,29 +672,29 @@ static void _PD_rd_blocks_iii(PDBfile *file)
 	bl = ep->blocks;
 	nt = 0L;
 	for (j = 0L; j < n; j++)
-	  {token = SC_strtok(NULL, " \n", s);
-	   if (token == NULL)
-	      {_PD_get_token(NULL, local, bsz, '\n');
-	       token = SC_strtok(local, " \n", s);};
+	    {token = SC_strtok(NULL, " \n", s);
+	     if (token == NULL)
+	        {_PD_get_token(NULL, local, bsz, '\n');
+		 token = SC_strtok(local, " \n", s);};
 		     
-	   addr = SC_stol(token);
-	   numb = SC_stol(SC_strtok(NULL, " \n", s));
+	     addr = SC_stol(token);
+	     numb = SC_stol(SC_strtok(NULL, " \n", s));
                          
-	   _PD_block_set_desc(addr, numb, bl, j);
+	     _PD_block_set_desc(addr, numb, bl, j);
 
-	   nt += numb;};
+	     nt += numb;};
 
 /* adjust the slowest varying dimension to reflect the entire entry */
-	dim = PD_entry_dimensions(ep);
-	if (dim != NULL)
+	dms = PD_entry_dimensions(ep);
+	if (dms != NULL)
 	   {if (PD_get_major_order(file) == COLUMN_MAJOR_ORDER)
-	       for (; dim->next != NULL; dim = dim->next);
+	       for ( ; dms->next != NULL; dms = dms->next);
 
-	    stride = PD_entry_number(ep)/dim->number;
+	    stride = PD_entry_number(ep)/dms->number;
 	    stride = nt/stride;
 
-	    dim->number    = stride;
-	    dim->index_max = dim->index_min + stride - 1L;};
+	    dms->number    = stride;
+	    dms->index_max = dms->index_min + stride - 1L;};
 
 /* adjust the number to reflect the entire entry */
 	ep->number = nt;};
@@ -1103,7 +1103,7 @@ static int64_t _PD_wr_symt_iii(PDBfile *file)
     char t[2][MAXLINE];
     char *ty, *nm;
     syment *ep;
-    dimdes *lst;
+    dimdes *dms;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
@@ -1144,19 +1144,19 @@ static int64_t _PD_wr_symt_iii(PDBfile *file)
 
 /* adjust the slowest varying dimension to reflect only the first block */
 	 flag = PD_get_major_order(file);
-	 for (nd = 0, lst = PD_entry_dimensions(ep);
-	      lst != NULL;
-	      nd++, lst = lst->next)
+	 for (nd = 0, dms = PD_entry_dimensions(ep);
+	      dms != NULL;
+	      nd++, dms = dms->next)
 	     {if ((flag == ROW_MAJOR_ORDER) ||
-		  ((flag == COLUMN_MAJOR_ORDER) && (lst->next == NULL)))
-		 {stride = nt/(lst->number);
+		  ((flag == COLUMN_MAJOR_ORDER) && (dms->next == NULL)))
+		 {stride = nt/(dms->number);
 		  stride = (stride == 0) ? 1 : stride;
 		  ni     = nb/stride;
 		  flag   = FALSE;}
 	      else
-		 ni = lst->number;
+		 ni = dms->number;
 
-	      mn = lst->index_min;
+	      mn = dms->index_min;
 	      mx = mn + ni - 1;
 	      SC_itos(t[0], MAXLINE, mn, NULL);
 	      SC_itos(t[1], MAXLINE, mx, NULL);

@@ -901,8 +901,10 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 
 	new = TRUE;};
 
-/* if the number of items is zero do not attempt to do the actual write */
-    if (number > 0)
+/* if the number of items is zero or the pointer NULL
+ * do not attempt to do the actual write
+ */
+    if ((number > 0) && (vr != NULL))
 
 /* now write the data to the file */
        {if (file->virtual_internal)
