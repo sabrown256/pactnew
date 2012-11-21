@@ -18,17 +18,16 @@
 # include "nonstd.h"
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
 # ifndef SCOPE_SCORE_COMPILE
+
+/*--------------------------------------------------------------------------*/
 
 #define BFSML        256
 #define BFMDM        512
 #define BFLRG        4096
 #define BFMG         1048576
 #define N_STACK      32
-#define P_APPEND     100
-#define P_PREPEND    101
 
 #undef MAKE
 #undef MAKE_N
@@ -68,10 +67,56 @@
 extern int
  _assert_fail;
 
+/*--------------------------------------------------------------------------*/
+
 # endif
-#endif
 
 /*--------------------------------------------------------------------------*/
+
+/* anonymous enumerated constants for PSH
+ * rather than define'd constants which can collide
+ * with applications */
+
+#undef TEXT
+
+enum {
+
+/* COMMON.H */
+       P_APPEND = 100,
+       P_PREPEND,
+
+/* LIBPSH.C */
+
+       TEXT,
+       HTML,
+
+#ifdef NEWWAY
+       FRONT,
+       BACK,
+       BOTH,
+#endif
+
+       CMD_LINE,
+       CMD_OUT,
+       STACK_FILE,
+       STACK_PROCESS,
+       STACK_TOOL,
+       STACK_GROUP,
+       PHASE_READ,
+       PHASE_ANALYZE,
+       PHASE_WRITE,
+
+
+/* LIBTIME.C */
+       TIME_SEC,
+       TIME_HMS,
+
+     };
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* keep these out of PACT proper - only in PSH */
@@ -100,5 +145,3 @@ extern int
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-

@@ -116,12 +116,6 @@
 #define JOB_DEAD         0x40
 #define JOB_RESTART      0x80
 
-#define JOB_NO_SETSID  72
-#define JOB_NO_TTY     73
-#define JOB_NO_CLOSE   74
-#define JOB_NO_FMT     75
-#define JOB_NO_EXEC    76
-
 #define job_alive(pp)                                                         \
    ((pp != NULL) && ((pp->io[0].fd != -1) || (pp->io[2].fd != -1)))
 
