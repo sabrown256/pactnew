@@ -11,8 +11,6 @@
 #include "score_int.h"
 #include "scope_proc.h"
 
-#define SOCKADDR_SIZE(_x)     ((_x) = sizeof(struct sockaddr_in))
-
 typedef struct s_tcp_loop tcp_loop;
 
 struct s_tcp_loop

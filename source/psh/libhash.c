@@ -11,6 +11,8 @@
 
 # include "common.h"
 
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_COMPILE
 
 enum { HSZSMALL = 31,             /* small table size */
@@ -40,9 +42,11 @@ struct s_hashtab
     hashen **table;};
 
 # endif
-# ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
+
+# ifndef SCOPE_SCORE_PREPROC
+
 /*--------------------------------------------------------------------------*/
 
 /* _HASH_NAME - compute hash value for string KEY in a table of SIZE */

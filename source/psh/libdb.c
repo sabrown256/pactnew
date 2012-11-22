@@ -15,6 +15,8 @@
 # include "libsrv.c"
 # include "libhash.c"
 
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_COMPILE
 
 enum e_db_constants
@@ -38,9 +40,11 @@ struct s_vardes
     FILE *fp;};
 
 # endif
-# ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
+
+# ifndef SCOPE_SCORE_PREPROC
+
 /*--------------------------------------------------------------------------*/
 
 /* NAME_DB - derive the name of the database from ROOT */
