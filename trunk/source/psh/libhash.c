@@ -13,15 +13,6 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#if 0
-
-#define HSZSMALL   31             /* small table size */
-#define HSZSMINT   67             /* small intermediate table size */
-#define HSZLRINT  127             /* table size for variables*/
-#define HSZLARGE  521             /* large table size */
-#define HSZHUGE  4483             /* huge table size */
-#endif
-
 enum { HSZSMALL = 31,             /* small table size */
        HSZSMINT = 67,             /* small intermediate table size */
        HSZLRINT = 127,            /* table size for variables*/

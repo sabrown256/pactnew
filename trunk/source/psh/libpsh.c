@@ -19,15 +19,6 @@
 #define BACK       2
 #define BOTH       3
 
-#define UNDEFINED  "--undefd--"
-
-#undef NGROUPX
-#ifdef NGROUPS_MAX
-# define NGROUPX NGROUPS_MAX
-#else
-# define NGROUPX 16
-#endif
-
 #define END_CHECK(ps, pp)                                                    \
    {if ((*ps == '\0') && (*pp != '\0') && (*pp != '*'))                      \
        return(-1);                                                           \
@@ -41,7 +32,12 @@ struct s_dir_stack
     char *dir[N_STACK];};
 
 # endif
+
 # ifndef SCOPE_SCORE_PREPROC
+
+/* define only for SCOPE_SCORE_COMPILE */
+
+#define UNDEFINED  "--undefd--"
 
 static char
  epath[BFLRG],
@@ -1048,6 +1044,13 @@ int file_exists(char *fmt, ...)
 
 /* FILE_EXECUTABLE - return TRUE iff the named file is executable */
 
+#undef NGROUPX
+#ifdef NGROUPS_MAX
+# define NGROUPX NGROUPS_MAX
+#else
+# define NGROUPX 16
+#endif
+
 int file_executable(char *fmt, ...)
    {int rv, st, muid, mgid, fuid, fgid, only;
     int usrx, grpx, othx, isusr, isgrp, isoth, file;
@@ -1100,6 +1103,8 @@ int file_executable(char *fmt, ...)
            rv = TRUE;};
 
     return(rv);}
+
+#undef NGROUPX
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2679,6 +2684,10 @@ int is_running(int pid)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* undefine when passing out of SCOPE_SCORE_COMPILE */
+
+#undef UNDEFINED
 
 # endif
 #endif
