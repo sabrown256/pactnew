@@ -19,8 +19,6 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#define EOM     "++ok++"
-
 #ifndef S_SPLINT_S
 #define SLOG(_s, ...)                                                       \
     {if ((_s)->slog != NULL)                                                \
@@ -45,6 +43,8 @@ struct s_svr_session
 
 # endif
 # ifndef SCOPE_SCORE_PREPROC
+
+#define EOM     "++ok++"
 
 static svr_session
   svs = { FALSE, FALSE, FALSE, FALSE, NULL };
@@ -623,6 +623,8 @@ char **client_ex(client *cl, char *req)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#undef EOM
 
 # endif
 #endif

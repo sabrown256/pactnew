@@ -15,16 +15,6 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#define FRONT      1
-#define BACK       2
-#define BOTH       3
-
-#define END_CHECK(ps, pp)                                                    \
-   {if ((*ps == '\0') && (*pp != '\0') && (*pp != '*'))                      \
-       return(-1);                                                           \
-    else if ((*ps != '\0') && (*pp == '\0'))                                 \
-       return(1);}
-
 typedef struct s_dir_stack dir_stack;
 
 struct s_dir_stack
@@ -2022,6 +2012,12 @@ char **ls(char *opt, char *fmt, ...)
  *       -    4.2 = 4.*      =>   0
  *       -    5.2 > 4.*      =>   1
  */
+
+#define END_CHECK(ps, pp)                                                    \
+   {if ((*ps == '\0') && (*pp != '\0') && (*pp != '*'))                      \
+       return(-1);                                                           \
+    else if ((*ps != '\0') && (*pp == '\0'))                                 \
+       return(1);}
 
 int match(char *s, char *patt)
    {int b, c, rv;

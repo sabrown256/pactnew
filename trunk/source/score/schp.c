@@ -1076,7 +1076,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 	if ((dev == SC_IO_DEV_PIPE) &&
 	    (0 <= gid) && (gid < n))
 	   {pgd = pg + gid;
-	    if ((0 <= iod.knd) && (iod.knd < SC_N_IO_CH))
+	    if ((0 <= iod.knd) && (iod.knd < (int) SC_N_IO_CH))
 	       {ipd = pgd->fd + iod.knd;
 		if (ipd != NULL)
 		   {ipd->knd = iod.knd;
@@ -1085,7 +1085,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 		    ipd->gid = id;};};};
 
 /* set the source io spec */
-	if ((0 <= ios.knd) && (ios.knd < SC_N_IO_CH))
+	if ((0 <= ios.knd) && (ios.knd < (int) SC_N_IO_CH))
 	   {ips = pgs->fd + ios.knd;
 	    if (ips != NULL)
 	       {ips->knd = ios.knd;

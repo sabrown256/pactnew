@@ -101,9 +101,6 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#define N_IO_CHANNELS       3
-#define N_CHANNELS          7
-
 /* job status values */
 #define JOB_RUNNING      0x0
 #define JOB_STOPPED      0x1
@@ -123,6 +120,12 @@
 
 typedef void (*PFSIGHand)(int sig);
 typedef void (*PFIOHand)(int fd, int mask, void *a);
+
+enum e_async_size_constants
+   {N_IO_CHANNELS = 3,
+    N_CHANNELS    = 7};
+
+typedef enum e_async_size_constants async_size_constants;
 
 enum e_io_hand
    {IO_HND_NONE, IO_HND_CLOSE, IO_HND_PIPE, IO_HND_FNC, IO_HND_POLL};

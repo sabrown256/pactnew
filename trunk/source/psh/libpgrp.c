@@ -55,9 +55,6 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#define PROCESS_DELIM   '@'
-#define PIPE_DELIM      "|"
-
 #define CHECK_FAN(_x, _n)                                                    \
    {_n = _x;                                                                 \
     if (_n < 2)                                                              \
@@ -95,8 +92,34 @@ struct s_process_session
     int foreground;                 /* TRUE iff current job is foreground */
     struct termios attr;};          /* terminal attributes */
 
+typedef struct s_process_constants process_constants;
+
+struct s_process_constants
+   {char process_delim;
+    char *pipe_delim;};
+
+/* declare _PGRP once only */
+
+#ifndef DECLARED_PGRP
+# define DECLARED_PGRP
+
+extern const process_constants
+ _PGRP;
+
+#endif
+
 # endif
+
+
 # ifndef SCOPE_SCORE_PREPROC
+
+/* define _PGRP once only */
+
+#ifndef DEFINED_PGRP
+# define DEFINED_PGRP
+const process_constants
+ _PGRP = {'@', "|"};
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -452,7 +475,7 @@ static int redirect_fd(process_group *pg, int ip, int i)
     aknd = IO_STD_NONE;
     bknd = IO_STD_NONE;
 
-    if (t[0] == PROCESS_DELIM)
+    if (t[0] == _PGRP.process_delim)
        t++;
 
     ni = strlen(t);
@@ -1321,9 +1344,9 @@ static void parse_pgrp(statement *s)
 	 if (t == NULL)
 	    continue;
 
-	 else if (t[0] == PROCESS_DELIM)
+	 else if (t[0] == _PGRP.process_delim)
 	    {for (j = i; j < nc; j++)
-	         {if (strchr(sa[j], PROCESS_DELIM) != NULL)
+	         {if (strchr(sa[j], _PGRP.process_delim) != NULL)
 		     {ios = lst_add(ios, sa[j]);
 		      sa[j] = NULL;}
 		  else
