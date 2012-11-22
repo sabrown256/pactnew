@@ -101,7 +101,6 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#define JOB_NOT_FINISHED    -1000
 #define N_IO_CHANNELS       3
 #define N_CHANNELS          7
 
@@ -472,6 +471,8 @@ void _default_iodes(iodes *pio)
 
 /* _INIT_PROCESS - set process state to defaults */
 
+#define JOB_NOT_FINISHED    -1000
+
 void _init_process(process *pp)
    {
 
@@ -501,6 +502,8 @@ void _init_process(process *pp)
     memset(&pp->ru, 0, sizeof(struct rusage));
 
     return;}
+
+#undef JOB_NOT_FINISHED
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -429,7 +429,6 @@ extern char
 
 /* LIBASYNC.C macros */
 
-#undef JOB_NOT_FINISHED
 #undef N_CHANNELS
 #undef JOB_RUNNING
 #undef JOB_STOPPED
@@ -446,11 +445,6 @@ extern char
 
 #undef PROCESS_DELIM
 #undef PIPE_DELIM
-
-
-/* LIBPSH.C macros */
-
-#undef NGROUPX
 
 
 /* LIBSOCK.C macros */
