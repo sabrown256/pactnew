@@ -56,7 +56,7 @@ char *expand(char *expr, int nc, char *varn, int rnull)
 	        {if (rnull == TRUE)
 		    return(NULL);
 		 else
-		    {snprintf(s, BFLRG, "'%s'", trim(expr, FRONT | BACK, "\""));
+		    {snprintf(s, BFLRG, "'%s'", trim(expr, BOTH, "\""));
 		     break;};};
 
 	     nstrncpy(s, nc, subst(s, var, val, -1), -1);};};

@@ -17,9 +17,9 @@
 #define DEFAULT_TIMEOUT    30000
 #define DEFAULT_HEARTBEAT  30
 
-#define SC_PROCESS_DELIM   '@'
-#define SC_PIPE_DELIM      "|"
-#define SC_N_IO_CH         3
+#define SC_N_IO_CH         N_IO_CHANNELS
+#define SC_PROCESS_DELIM   _PGRP.process_delim
+#define SC_PIPE_DELIM      _PGRP.pipe_delim
 
 /*--------------------------------------------------------------------------*/
 

@@ -17,7 +17,10 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-# define DB_PORT  15000
+enum e_db_constants
+  {DB_PORT = 15000};
+
+typedef enum e_db_constants db_constants;
 
 typedef struct s_database database;
 typedef struct s_vardes vardes;
@@ -60,7 +63,7 @@ char *name_db(char *root)
 static int _db_srv_launch(client *cl)
    {int i, st, pid, rv;
     char s[BFLRG];
-    char *root, *fcon, **sa;
+    char *root, *fcon;
 
     rv = FALSE;
 
@@ -87,17 +90,7 @@ static int _db_srv_launch(client *cl)
 	pid = -1;
 
 /* check the connection file info */
-        sa = file_text(FALSE, fcon);
-	if (sa != NULL)
-	   {if (sa[CONN_PID] != NULL)
-	       pid = atoi(sa[CONN_PID]);
-
-	    if ((sa[CONN_KEY] != NULL) && (cl != NULL))
-	       {FREE(cl->key);
-		cl->key  = STRSAVE(sa[CONN_KEY]);
-		cl->nkey = N_AKEY;};};
-
-	free_strings(sa);
+	pid = get_conn_client(cl);
 
 /* GOTCHA: if it is not running - clean up and restart */
 	st = is_running(pid);

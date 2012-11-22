@@ -1,6 +1,14 @@
 /*
  * COMMON.H - header for simply portable C programs
  *          - which do the same kind of work as shell scripts
+ *          - PSH is designed to be used in two very different ways:
+ *          -   1) source files directly included:
+ *          -      #include <libpsh.c>
+ *          -   2) source files built into SCORE library
+ *          - the first way allows cc -g foo.c -o foo type builds
+ *          - without extra libraries or flags
+ *          - the second way allows the routines in PSH to be
+ *          - used in the rest of PACT - avoiding duplication
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -22,12 +30,6 @@
 # ifndef SCOPE_SCORE_COMPILE
 
 /*--------------------------------------------------------------------------*/
-
-#define BFSML        256
-#define BFMDM        512
-#define BFLRG        4096
-#define BFMG         1048576
-#define N_STACK      32
 
 #undef MAKE
 #undef MAKE_N
@@ -81,30 +83,41 @@ extern int
 
 enum {
 
+      FRONT = 1,
+      BACK  = 2,
+      BOTH  = 3,
+
 /* COMMON.H */
-       P_APPEND = 100,
-       P_PREPEND,
+      P_APPEND = 100,
+      P_PREPEND,
 
 
 /* LIBPSH.C */
-       TEXT,
-       HTML,
-       CMD_LINE,
-       CMD_OUT,
-       STACK_FILE,
-       STACK_PROCESS,
-       STACK_TOOL,
-       STACK_GROUP,
-       PHASE_READ,
-       PHASE_ANALYZE,
-       PHASE_WRITE,
+      TEXT,
+      HTML,
+      CMD_LINE,
+      CMD_OUT,
+      STACK_FILE,
+      STACK_PROCESS,
+      STACK_TOOL,
+      STACK_GROUP,
+      PHASE_READ,
+      PHASE_ANALYZE,
+      PHASE_WRITE,
 
 
 /* LIBTIME.C */
-       TIME_SEC,
-       TIME_HMS,
+      TIME_SEC,
+      TIME_HMS};
 
-     };
+enum e_array_size_constants
+   {BFSML   = 256,
+    BFMDM   = 512,
+    BFLRG   = 4096,
+    BFMG    = 1048576,
+    N_STACK = 32};
+
+typedef enum e_array_size_constants array_size_constants;
 
 /*--------------------------------------------------------------------------*/
 

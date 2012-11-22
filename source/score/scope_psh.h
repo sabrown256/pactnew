@@ -418,18 +418,8 @@ extern char
 
 /*--------------------------------------------------------------------------*/
 
-/* COMMON.H macros */
-
-#undef BFSML
-#undef BFMDM
-#undef BFLRG
-#undef BFMG
-#undef N_STACK
-
-
 /* LIBASYNC.C macros */
 
-#undef N_CHANNELS
 #undef JOB_RUNNING
 #undef JOB_STOPPED
 #undef JOB_CHANGED
@@ -440,22 +430,6 @@ extern char
 #undef JOB_DEAD
 #undef JOB_RESTART
 
-
-/* LIBPGRP.C macros */
-
-#undef PROCESS_DELIM
-#undef PIPE_DELIM
-
-
-/* LIBSOCK.C macros */
-
-#undef NATTEMPTS
-#undef N_AKEY
-
-
-/* LIBSRV.C macros */
-
-#undef EOM
 
 /*--------------------------------------------------------------------------*/
 

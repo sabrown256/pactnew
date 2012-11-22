@@ -16,9 +16,6 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#define NATTEMPTS   3
-#define N_AKEY      32
-
 #define SOCKADDR_SIZE(_x)     ((_x) = sizeof(struct sockaddr_in))
 #define C_OR_S(_p)            ((_p) ? "CLIENT" : "SERVER")
 
@@ -28,7 +25,11 @@
         (_c)->clog((_c), __VA_ARGS__);}  
 #endif
 
-enum {CONN_NAME = 0, CONN_PORT, CONN_IP, CONN_KEY, CONN_PID};
+enum e_sock_size_constants
+   {NATTEMPTS = 3,
+    N_AKEY    = 32};
+
+typedef enum e_sock_size_constants sock_size_constants;
 
 enum e_ckind
  {SERVER, CLIENT};
@@ -67,6 +68,8 @@ struct s_client
 
 # endif
 # ifndef SCOPE_SCORE_PREPROC
+
+enum {CONN_NAME = 0, CONN_PORT, CONN_IP, CONN_KEY, CONN_PID};
 
 /*--------------------------------------------------------------------------*/
 
@@ -506,6 +509,36 @@ char **get_connect_socket(client *cl)
 		srv->sck = tcp_get_address(host, port, haddr);};};}
 
     return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GET_CONN_CLIENT - set the server connection info in CL
+ *                 - return the PID of the server
+ */
+
+int get_conn_client(client *cl)
+   {int pid;
+    char *fcon, **sa;
+
+    pid = -1;
+
+    if (cl != NULL)
+       {fcon = cl->fcon;
+
+	sa = file_text(FALSE, fcon);
+	if (sa != NULL)
+	   {if (sa[CONN_PID] != NULL)
+	       pid = atoi(sa[CONN_PID]);
+
+	    if ((sa[CONN_KEY] != NULL) && (cl != NULL))
+	       {FREE(cl->key);
+		cl->key  = STRSAVE(sa[CONN_KEY]);
+		cl->nkey = N_AKEY;};};
+
+	free_strings(sa);};
+
+    return(pid);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
