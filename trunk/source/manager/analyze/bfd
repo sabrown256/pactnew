@@ -137,9 +137,11 @@ EOF
       if ($status == 0) then
          foreach i ($BFD_Path/libbfd*.so)
             set l = $i:t
-            fexvars $ALog t echo $l:r @o sed "'s/-/\ /g'"
+            set t = ( `echo $l:r | sed 's/-/ /g'` )
             if ($#t > 1) then
-               setenv BFD_Version  $t[2]
+               Note $ALog "t = ($#t) |$t|"
+               flog $ALog setenv BFD_Version  $t[2]
+               break
             endif
          end      
          unset t

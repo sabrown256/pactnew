@@ -85,17 +85,10 @@ enum {
        P_APPEND = 100,
        P_PREPEND,
 
-/* LIBPSH.C */
 
+/* LIBPSH.C */
        TEXT,
        HTML,
-
-#ifdef NEWWAY
-       FRONT,
-       BACK,
-       BOTH,
-#endif
-
        CMD_LINE,
        CMD_OUT,
        STACK_FILE,

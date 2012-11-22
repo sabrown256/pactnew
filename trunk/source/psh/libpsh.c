@@ -15,31 +15,9 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#ifndef NEWWAY
-
 #define FRONT      1
 #define BACK       2
 #define BOTH       3
-
-#else
-
-#undef TEXT
-#define TEXT       10
-#define HTML       11
-
-#define CMD_LINE   1
-#define CMD_OUT    2
-
-#define STACK_FILE      1
-#define STACK_PROCESS   2
-#define STACK_TOOL      3
-#define STACK_GROUP     4
-
-#define PHASE_READ      10
-#define PHASE_ANALYZE   11
-#define PHASE_WRITE     12
-
-#endif
 
 #define UNDEFINED  "--undefd--"
 
