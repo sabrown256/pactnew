@@ -12,6 +12,8 @@
 
 # define LIBINFO
 
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_COMPILE
 
 #undef INCL
@@ -32,6 +34,9 @@ struct s_infodes
     char root[BFLRG];};
 
 # endif
+
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_PREPROC
 
 int system();

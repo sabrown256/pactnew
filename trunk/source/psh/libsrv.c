@@ -17,6 +17,8 @@
 # include "libio.c"
 # include "libsock.c"
 
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_COMPILE
 
 #ifndef S_SPLINT_S
@@ -42,6 +44,9 @@ struct s_svr_session
     client *cl;};
 
 # endif
+
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_PREPROC
 
 #define EOM     "++ok++"

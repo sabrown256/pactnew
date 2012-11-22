@@ -13,6 +13,8 @@
 
 # define LIBPSH
 
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_COMPILE
 
 typedef struct s_dir_stack dir_stack;
@@ -22,6 +24,8 @@ struct s_dir_stack
     char *dir[N_STACK];};
 
 # endif
+
+/*--------------------------------------------------------------------------*/
 
 # ifndef SCOPE_SCORE_PREPROC
 

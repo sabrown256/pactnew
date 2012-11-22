@@ -463,26 +463,8 @@ extern char
 #undef job_running
 
 
-/* LIBFIFO.C macros */
-
-#undef WHICH_PROC
-
-
-/* LIBPGRP.C macros */
-
-#undef CHECK_FAN
-#undef INC_FAN
-#undef RTIME
-
-
-/* LIBPSH.C macros */
-
-#undef END_CHECK
-
-
 /* LIBSOCK.C macros */
 
-#undef SOCKADDR_SIZE
 #undef C_OR_S
 #undef CLOG
 

@@ -12,6 +12,8 @@
 # include "common.h"
 # include "libpsh.c"
 
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_COMPILE
 
 typedef struct s_io_ring io_ring;
@@ -23,9 +25,11 @@ struct s_io_ring
     unsigned char *in_ring;};
 
 # endif
-# ifndef SCOPE_SCORE_PREPROC
 
 /*--------------------------------------------------------------------------*/
+
+# ifndef SCOPE_SCORE_PREPROC
+
 /*--------------------------------------------------------------------------*/
 
 /* RING_INIT - initialize the io_ring RING with an NB bytes long buffer */

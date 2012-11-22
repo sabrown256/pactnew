@@ -14,10 +14,11 @@
 
 # include "network.h"
 
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_COMPILE
 
 #define SOCKADDR_SIZE(_x)     ((_x) = sizeof(struct sockaddr_in))
-#define C_OR_S(_p)            ((_p) ? "CLIENT" : "SERVER")
 
 #ifndef S_SPLINT_S
 #define CLOG(_c, ...)                                                    \
@@ -67,7 +68,12 @@ struct s_client
     int (*cauth)(client *cl, int nc, char *ans, char *res);};
 
 # endif
+
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_PREPROC
+
+#define C_OR_S(_p)            ((_p) ? "CLIENT" : "SERVER")
 
 enum {CONN_NAME = 0, CONN_PORT, CONN_IP, CONN_KEY, CONN_PID};
 

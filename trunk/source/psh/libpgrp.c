@@ -53,6 +53,8 @@
 # include "libtime.c"
 # include "libasync.c"
 
+/*--------------------------------------------------------------------------*/
+
 # ifndef SCOPE_SCORE_COMPILE
 
 #define CHECK_FAN(_x, _n)                                                    \
@@ -60,13 +62,6 @@
     if (_n < 2)                                                              \
        _n = -1;                                                              \
     _x = _n;}
-
-#define INC_FAN(_x, _n)                                                      \
-   {_n = _x;                                                                 \
-    _n = max(_n, 0) + 1;                                                     \
-    _x = _n;}
-
-#define RTIME(_r)     (_r.tv_sec + 1.0e-6*_r.tv_usec)
 
 typedef struct s_statement statement;
 typedef struct s_process_session process_session;
@@ -110,8 +105,16 @@ extern const process_constants
 
 # endif
 
+/*--------------------------------------------------------------------------*/
 
 # ifndef SCOPE_SCORE_PREPROC
+
+#define INC_FAN(_x, _n)                                                      \
+   {_n = _x;                                                                 \
+    _n = max(_n, 0) + 1;                                                     \
+    _x = _n;}
+
+#define RTIME(_r)     (_r.tv_sec + 1.0e-6*_r.tv_usec)
 
 /* define _PGRP once only */
 
@@ -2705,6 +2708,10 @@ int gexec_file(char *db, io_mode md, FILE **fio,
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#undef CHECK_FAN
+#undef INC_FAN
+#undef RTIME
 
 # endif
 #endif
