@@ -962,6 +962,7 @@ void SC_leh_vi_mode(void)
 
 static char *_SC_leh_gets(lehloc *lp)
    {int nr, nc, fd, ok;
+    char bf[2];
     char *rv;
     PFlehact *map;
 
@@ -986,9 +987,11 @@ static char *_SC_leh_gets(lehloc *lp)
     ok &= _SC_leh_put_prompt(lp);
 
     while (ok == TRUE)
-       {nr = _SC_leh.read(fd, &lp->c, 1);
+       {nr = _SC_leh.read(fd, bf, 1);
         if (nr <= 0)
 	   break;
+
+	lp->c = bf[0];
 
         if (fdbg != NULL)
 	   {fprintf(fdbg, "> '%c'  %d %d  (%ld %ld)  ",

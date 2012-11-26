@@ -13,8 +13,8 @@ source ../../tests/common
 set msg = "PDBView Shell Test ..........."
 set exe = $BinDir/sx
 
+   NoteD $Log ""
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
-      NoteD $Log ""
       NoteD $Log "                    $msg"
 
 # env test

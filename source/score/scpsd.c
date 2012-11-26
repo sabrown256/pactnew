@@ -734,7 +734,7 @@ static int ps_diff_b(char *f1, char *f2, pixdes *pd, int verbose)
 
 /*--------------------------------------------------------------------------*/
 
-/*                          FRACTIONAL COMpaRISONS                          */
+/*                          FRACTIONAL COMPARISONS                          */
 
 /*--------------------------------------------------------------------------*/
 

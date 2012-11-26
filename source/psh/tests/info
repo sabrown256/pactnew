@@ -66,55 +66,58 @@ endif
 
 # PACT/PACT-INFO comparison
 
-   set lmsg = "util ........................"
-   NoteD $Log -n "                       $lmsg"
-   Note $Log ""
+   if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
+      set lmsg = "util ........................"
+      NoteD $Log -n "                       $lmsg"
+      Note $Log ""
 
-   set lt = `timer -r`
+      set lt = `timer -r`
 
-   set dp = $cwd/info-diff
+      set dp = $cwd/info-diff
 
-   @ lerr = 0
-   foreach t (make $lst)
-      Separator $Log
+      @ lerr = 0
+      foreach t (make $lst)
+         Separator $Log
 
-      set pa = $cwd/info-apa.$t
-      set pi = $cwd/info-api.$t
-      $RM $pa $pi
-      touch $pa $pi
+         set pa = $cwd/info-apa.$t
+         set pi = $cwd/info-api.$t
+         $RM $pa $pi
+         touch $pa $pi
 
-      flog $pa pact -info $t
-      flog $pa pact +info $t
-      flog $pa pact +l -info $t
-      flog $pa pact +l +info $t
+         flog $pa pact -info $t
+         flog $pa pact +info $t
+         flog $pa pact +l -info $t
+         flog $pa pact +l +info $t
 
-      flog $pi pact-info $t
-      flog $pi pact-info -f $t
-      flog $pi pact-info -l $t
-      flog $pi pact-info -l -f $t
+         flog $pi pact-info $t
+         flog $pi pact-info -f $t
+         flog $pi pact-info -l $t
+         flog $pi pact-info -l -f $t
 
-      flog $Log cat $pi
+         flog $Log cat $pi
 
-      grep -v Command: $pa >&! $pa.1
-      grep -v Command: $pi >&! $pi.1
+         grep -v Command: $pa >&! $pa.1
+         grep -v Command: $pi >&! $pi.1
 
-      flog $Log ( diff -w -B $pa.1 $pi.1 >&! $dp )
-      if ($status == 0) then
-         flog $Log $RM $pa $pi
-      else
-         Note $Log "$t differed"
-         flog $Log cat $dp
-         @ lerr = $lerr + 1
-      endif
-      $RM $pa.1 $pi.1
+         flog $Log ( diff -w -B $pa.1 $pi.1 >&! $dp )
+         if ($status == 0) then
+            flog $Log $RM $pa $pi
+         else
+            Note $Log "$t differed"
+            flog $Log cat $dp
+            @ lerr = $lerr + 1
+         endif
+         $RM $pa.1 $pi.1
 
-   end
+      end
 
-   @ nerr = $nerr + $lerr
+      @ nerr = $nerr + $lerr
 
-   set lt = `timer -b $lt`
+      set lt = `timer -b $lt`
 
-   $TEST_CHECK part -a info_util -e $lerr -l -dt $lt -rpf "$rpf" none
+      $TEST_CHECK part -a info_util -e $lerr -l -dt $lt -rpf "$rpf" none
+
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

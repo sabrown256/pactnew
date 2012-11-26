@@ -585,7 +585,7 @@ static void write_perl(client *cl, state *st, char *dbname)
        snprintf(t, BFLRG, "%s.pl", cgetenv(FALSE, "PERDB_PATH"));
     out = open_file("w", t);
 
-    fprintf(out, "{\n");
+    fprintf(out, "$PACT = {\n");
 
     rv = write_class_perl(cl, out, st->def_tools, "Tool",
 			  NULL, NULL, "   ");
@@ -595,7 +595,7 @@ static void write_perl(client *cl, state *st, char *dbname)
 			  st->def_tools, "Tool", "   ");
     ASSERT(rv == 0);
 
-    fprintf(out, "}\n");
+    fprintf(out, "};\n");
 
     fclose(out);
 

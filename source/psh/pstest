@@ -80,8 +80,7 @@ else
    
    $TEST_CHECK clean -n PSH -e $nerr
 
-   Note $Log set xstatus = $status
-
+   set xstatus = $status
 endif
 
 $TEST_CHECK fin -e $xstatus

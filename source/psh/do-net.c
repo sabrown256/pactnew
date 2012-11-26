@@ -1760,12 +1760,20 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
 
     separatorv(Log);
 
+/* log the start */
+    noten(Log, st->verbose, "Waiting on verify: Jobs %d  and  time %d sec",
+	  nsp, st->vfyt);
+
 /* wait for the work to complete */
     tc = await(st->vfyt, 1000, "verify", check_tty, NULL, NULL);
     ASSERT(tc == TRUE);
 
 /* close out the jobs */
     afin(finup);
+
+/* log the end */
+    noten(Log, st->verbose,
+	  "Waiting done on verify: %5d sec", tc);
 
     stop_time(dt, 16, tdi);
 
@@ -3538,7 +3546,7 @@ int main(int c, char **v)
     state.watch          = FALSE;
     state.usescp         = TRUE;
     state.interact       = TRUE;
-    state.vfyt           = 30;
+    state.vfyt           = 300;
     state.cargs          = NULL;
     state.clargs         = NULL;
     state.debug          = NULL;
