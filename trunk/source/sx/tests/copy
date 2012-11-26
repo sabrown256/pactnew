@@ -13,7 +13,8 @@ source ../../tests/common
 set msg = "PDBCP Test ..................."
 set exe = $BinDir/pdbcp
 
-   NoteD $Log ""
+NoteD $Log ""
+if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
    NoteD $Log "                    $msg"
 
    @ nerr = 0
@@ -94,6 +95,8 @@ endif
       @ nerr = $nerr + $status
 
    end
+
+endif
 
 $TEST_CHECK part -a pdb -e $nerr -dt $dt -rpf "$rpf" $msg
 

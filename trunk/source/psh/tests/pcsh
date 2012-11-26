@@ -36,49 +36,52 @@ end
 InitLog Log $TestDir/log.pcsh.$LogSfx
 
 NoteD $Log ""
-NoteD $Log "                    $msg"
+if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
+   NoteD $Log "                    $msg"
 
-set List = (psh1 psh2 psh3 psh4)
+   set List = (psh1 psh2 psh3 psh4)
 
-Note $Log "Using $PCSH"
+   Note $Log "Using $PCSH"
 
-foreach t ($List)
-   Separator $Log
+   foreach t ($List)
+      Separator $Log
 
-   set f = ( `fill-string -n 28 $t` )
-   NoteD $Log -n "                        $f "
-   Note $Log ""
+      set f = ( `fill-string -n 28 $t` )
+      NoteD $Log -n "                        $f "
+      Note $Log ""
 
-   flog $Log set Res = $t.res
-   flog $Log set Ref = $RefDir/$t
+      flog $Log set Res = $t.res
+      flog $Log set Ref = $RefDir/$t
 
-   flog $Log $RM ${t}*
+      flog $Log $RM ${t}*
 
-   set noglob
-   $PCSH $FilesDir/$t |& sed 's|/tmp/psh.*$|xxx|' | grep -v "open display" >&! $Res
-   set xstatus = $status
-   unset noglob
-
-   if (-f $Ref) then
-      flog $Log ( diff -w -b $Res $Ref >! $Res.diff )
+      set noglob
+      $PCSH $FilesDir/$t |& sed 's|/tmp/psh.*$|xxx|' | grep -v "open display" >&! $Res
       set xstatus = $status
-   else
-      flog $Log cp $Res $Ref
-      set xstatus = $status
-   endif
+      unset noglob
 
-   if ($xstatus == 0) then
-      NoteD $Log "ok"
-      flog $Log rm -f $Res $Res.diff
-   else
-      flog $Log cat $Res.diff
-      flog $Log set nerr = 1
-      NoteD $Log "ng"
-   endif
-end
+      if (-f $Ref) then
+         flog $Log ( diff -w -b $Res $Ref >! $Res.diff )
+         set xstatus = $status
+      else
+         flog $Log cp $Res $Ref
+         set xstatus = $status
+      endif
 
-flog $Log touch run.foo
-set rpf = ( $rpf run.* s* )
+      if ($xstatus == 0) then
+         NoteD $Log "ok"
+         flog $Log rm -f $Res $Res.diff
+      else
+         flog $Log cat $Res.diff
+         flog $Log set nerr = 1
+         NoteD $Log "ng"
+      endif
+   end
+
+   flog $Log touch run.foo
+   set rpf = ( $rpf run.* s* )
+
+endif
 
 $TEST_CHECK part -a pcsh -e $nerr -rpf "$rpf" "$msg"
 

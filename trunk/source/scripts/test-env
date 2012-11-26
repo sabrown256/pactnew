@@ -292,6 +292,7 @@ Separator $Log
 
 # state for test-check
 
+unsetenv xstatus
 set xstatus = 0
 set rpf     = none
 @ nerr      = 0
