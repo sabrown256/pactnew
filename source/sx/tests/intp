@@ -10,32 +10,47 @@
 
 source ../../tests/common
 
+@ err = 0
+
 set msg = "PDBView Mesh Intp Test ......."
 set exe = $BinDir/sx
-set opt = ( $pvopt -l $FilesDir/intp.scm )
-set io  = intp.res
 
    NoteD $Log ""
-   NoteD $Log -n "                    $msg"
-   Note $Log ""
+   NoteD $Log "                    $msg"
 
-   flog $Log rm -f intp*.diff intp*.ps
+   set lst = (intp1 intp2 intp3)
+   foreach p ($lst)
 
-   source ../../../scripts/test-run
+      NoteD $Log -n "                       ${p} ....................."
+      Note $Log ""
 
-   if ($xstatus == 0) then
-      set i = intp.ps
-      if (-f $FilesDir/ref/$i) then
-         flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
-         @ xstatus = $status
-         Note $Log "Test $i:r status $xstatus"
+      set opt = ( $pvopt -l $FilesDir/${p}.scm )
+      set io  = ${p}.res
+      flog $Log rm -f ${p}*.diff ${p}*.ps
+
+      source ../../../scripts/test-run
+
+      if ($xstatus == 0) then
+         set i = ${p}.ps
+         if (-f $FilesDir/ref/$i) then
+            flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
+            @ xstatus = $status
+            Note $Log "Test $i:r status $xstatus"
+         else
+            flog $Log cp $i $FilesDir/ref/$i
+         endif
       endif
-   endif
 
-   touch intp_foo_.diff
-   set rpf = ( $rpf intp.res.diff intp.res intp.ps intp*.diff )
-   rm intp_foo_.diff
+      if ($xstatus == 0) then
+         touch ${p}_foo_.diff
+         set rpf = ( $rpf ${p}.res.diff ${p}.res ${p}.ps ${p}*.diff )
+         rm ${p}_foo_.diff
+      endif
 
-$TEST_CHECK part -a intp -e $xstatus -dt $dt -rpf "$rpf" none
+      $TEST_CHECK part -a ${p} -e $xstatus -dt $dt -rpf "$rpf" none
+      @ err = $err + $status
+   end
+
+$TEST_CHECK part -a intp -e $err -dt $dt -rpf "$rpf" $msg
 
 exit($status)

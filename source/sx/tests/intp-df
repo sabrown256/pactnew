@@ -94,6 +94,7 @@ else
    endif
 
    $TEST_CHECK part -a intp-df -e $err -dt $dt -rpf "$rpf" $msg
+   @ err = $status
 endif
 
-exit($status)
+exit($err)

@@ -76,6 +76,10 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
     char label[MAXLINE], bf[MAXLINE], *face, *style, *s;
     PG_palette *pl;
     PG_dev_geometry *g;
+    static double tol = HUGE;
+
+    if (tol == HUGE)
+       tol = 10.0*PM_machine_precision();
 
     if (dev == NULL)
        return;
@@ -287,16 +291,35 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 	 PG_write_n(dev, 2, WORLDC, p, " %s", label);
 
 	 if (((llf < 40) || slf) && (extr != NULL))
+	    {double mn, mx, dm;
 
-/* print the extrema */
-	    {p[0] = xo[0];
-	     PG_write_n(dev, 2, WORLDC, p, "%10.2e", extr[ne++]);
+/* print the X extrema */
+	     mn = extr[ne++];
+	     mx = extr[ne++];
+             dm = mx - mn;
+             if (ABS(mn) < tol*ABS(dm))
+	        mn = 0.0;
+             if (ABS(mx) < tol*ABS(dm))
+	        mx = 0.0;
+
+	     p[0] = xo[0];
+	     PG_write_n(dev, 2, WORLDC, p, "%10.2e", mn);
 	     p[0] = xo[1];
-	     PG_write_n(dev, 2, WORLDC, p, "%10.2e", extr[ne++]);
+	     PG_write_n(dev, 2, WORLDC, p, "%10.2e", mx);
+
+/* print the Y extrema */
+	     mn = extr[ne++];
+	     mx = extr[ne++];
+             dm = mx - mn;
+             if (ABS(mn) < tol*ABS(dm))
+	        mn = 0.0;
+             if (ABS(mx) < tol*ABS(dm))
+	        mx = 0.0;
+
 	     p[0] = xo[2];
-	     PG_write_n(dev, 2, WORLDC, p, "%10.2e", extr[ne++]);
+	     PG_write_n(dev, 2, WORLDC, p, "%10.2e", mn);
 	     p[0] = xo[3];
-	     PG_write_n(dev, 2, WORLDC, p, "%10.2e", extr[ne++]);
+	     PG_write_n(dev, 2, WORLDC, p, "%10.2e", mx);
 
 /* print the file name */
 	     if (files[i] != NULL)
