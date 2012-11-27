@@ -1738,7 +1738,7 @@ static int progress(donetdes *st)
  */
 
 static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
-   {int i, j, tc;
+   {int i, j, no, ng, tc;
     double tdi;
     char ahst[BFLRG], hserve[BFLRG], dt[16];
     char *hst;
@@ -1778,15 +1778,27 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
     stop_time(dt, 16, tdi);
 
 /* now check the results */
+    no = 0;
+    ng = 0;
     for (i = 0; i < nsp; i++)
+        {noten(Log, st->verbose, "   %3d  |%s|\t\t|%s|",
+	       i+1,
+	       (sp[i].host == NULL) ? "no-host" : sp[i].host,
+	       (sp[i].logn == NULL) ? "no-name" : sp[i].logn);
 	   
 /* convert host or system type to host */
-        {FREE(sp[i].host);
+         FREE(sp[i].host);
 	 nstrncpy(ahst, BFLRG, sp[i].logn, -1);
 
 /* check for accessibility of real host */
 	 if (strcmp(ahst, "-none-") != 0)
-	    sp[i].host = STRSAVE(ahst);};
+	    {sp[i].host = STRSAVE(ahst);
+	     no++;}
+	 else
+	    ng++;};
+
+    noten(Log, st->verbose, "Verify found: ok(%d) ng(%d) out of %d",
+	  no, ng, nsp);
 
 /* now squeeze out missing hosts */
     for (i = 0; i < nsp; i++)
@@ -1795,6 +1807,8 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
 	         sp[j-1] = sp[j];
              nsp--;
 	     i--;};};
+
+    noten(Log, st->verbose, "Verify final: %d hosts", nsp);
 
     return(nsp);}
 

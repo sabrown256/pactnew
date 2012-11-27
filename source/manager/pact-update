@@ -702,7 +702,8 @@ if ($doupd == TRUE) then
    endif
 
    ftee $Log ./dsys update $upopt
-   set xstatus = $status
+#   eval gexec -vs ./dsys update $upopt @b fa:$Log
+#   set xstatus = $gstatus[0]
 
 endif
 
