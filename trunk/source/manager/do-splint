@@ -56,9 +56,9 @@ foreach i ($lst)
    NoteD $log ""
    NoteD $log "File: $i"
    NoteD $log ""
-   ftee $log splint $opt -I../dev/$arch/include -I. $i
-   set xstatus = $status
-   @ err = $err + $xstatus
+#   ftee $log splint $opt -I../dev/$arch/include -I. $i
+   gtee $Log splint $opt -I../dev/$arch/include -I. $i
+   @ err = $err + $gstatus[1]
 end
 
 exit($err)

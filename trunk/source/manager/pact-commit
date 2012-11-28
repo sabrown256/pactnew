@@ -291,9 +291,9 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
 
    Note $Lock -n "Testing ................... "
 
-   ftee $Log ./dsys test $Args
-   set xstatus = $status
-   flog $Log @ err = $err + $xstatus
+#   ftee $Log ./dsys test $Args
+   gtee $Log ./dsys test $Args
+   flog $Log @ err = $err + $gstatus[1]
 
    grep "All tests passed" $Log >& /dev/null
    set xstatus = $status

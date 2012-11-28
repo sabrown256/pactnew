@@ -2162,7 +2162,19 @@ static int run_pgrp(statement *s)
 	if (IS_NULL(db) == FALSE)
 	   dbset(NULL, "gstatus", vl);
 	else
-	   {printf("setenv gstatus \"%s\"\n", vl);
+	   {switch (ps->ofmt)
+               {case GEX_CSH_EV :
+                     printf("setenv gstatus \"%s\"\n", vl);
+		     break;
+                case GEX_CSH_SV :
+                     printf("set gstatus = ( %s )\n", vl);
+		     break;
+                case GEX_SH_EV :
+                     printf("gstatus=\"%s\" ; export %s\n", vl, vl);
+		     break;
+                case GEX_SH_SV :
+                     printf("gstatus=\"%s\"\n", vl);
+		     break;};
 	    fflush(stdout);};
 
         FREE(s->st);};

@@ -188,6 +188,18 @@ int main(int c, char **v, char **env)
 	     else if (strcmp(v[i], "-t") == 0)
 	        ps->medium = IO_DEV_PTY;
 
+	     else if (strcmp(v[i], "-cev") == 0)
+	        ps->ofmt = GEX_CSH_EV;
+
+	     else if (strcmp(v[i], "-csv") == 0)
+	        ps->ofmt = GEX_CSH_SV;
+
+	     else if (strcmp(v[i], "-sev") == 0)
+	        ps->ofmt = GEX_SH_EV;
+
+	     else if (strcmp(v[i], "-ssv") == 0)
+	        ps->ofmt = GEX_SH_SV;
+
 	     else
 	        {rv = gexec(db, c-i, v+i, env, maps);
 		 break;};};};

@@ -129,6 +129,8 @@ alias envexp    'echo "parent \!\!:1($\!\!:1)"'
 # gets gstatus out as a shell variable
 # usage: fexec $log <gexec-specs>
 
+alias gtee      'echo "Command: $GEXEC \!\!:2-$" >>& \!\!:1 ; $GEXEC \!\!:2-$ @b tee -ai \!\!:1 ; set gstatus = $status'
+
 alias fexec     'echo "Command: $GEXEC \!\!:2-$" >>& \!\!:1 ; $GEXEC \!\!:2-$ >>& \!\!:1 ; set gstatus = (`$PERDB -e gstatus`)'
 
 # fexvar logs the gexec command, runs it,
