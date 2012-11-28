@@ -844,8 +844,9 @@ SYNC:
    NoteD $Log "Sync ................ "
    NoteD $Log ""
 
-   ftee $Log scs-sync $excl $cwd/pact.tar $RepoDir,pact
-   set xstatus = $status
+#   ftee $Log scs-sync $excl $cwd/pact.tar $RepoDir,pact
+   gtee $Log scs-sync $excl $cwd/pact.tar $RepoDir,pact
+   set xstatus = $gstatus[1]
    if ($xstatus == 0) then
       NoteD $Log "Sync ................ ok"
    else

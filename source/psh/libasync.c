@@ -164,6 +164,11 @@ enum e_st_sep
 
 typedef enum e_st_sep st_sep;
 
+enum e_shell_option
+   {GEX_CSH_SV, GEX_CSH_EV, GEX_SH_SV, GEX_SH_EV};
+
+typedef enum e_shell_option shell_option;
+
 typedef struct pollfd apollfd;
 typedef struct s_process process;
 typedef struct s_process_group process_group;
@@ -244,6 +249,7 @@ struct s_process_stack
 struct process_group_state
    {int n_sig_block;
     int dbg_level;
+    shell_option ofmt;
     io_device medium;
     process_stack stck;
     sigjmp_buf cpu;};
@@ -267,7 +273,7 @@ struct process_group_state
 
 process_group_state *get_process_group_state(void)
    {process_group_state *ps;
-    static process_group_state st = { 0, 0, IO_DEV_PIPE,
+    static process_group_state st = { 0, 0, GEX_CSH_EV, IO_DEV_PIPE,
 				      { 0, 0, 0, 0, 3,
 					(POLLIN | POLLPRI),
 					(POLLERR | POLLHUP | POLLNVAL),
