@@ -2833,8 +2833,8 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 	while ((nbo > 0) && (nbr != 0))
 	   {nbr = read(fd, pbf, nbo);
 	    if (nbr < 0)
-	      {io_error(errno, "read of %s on %d failed",
-			SC_itos(NULL, 0, nbo, NULL), fd);
+	       {io_error(errno, "read of %s on %d failed",
+			 SC_itos(NULL, 0, nbo, NULL), fd);
                 rv = nbr;
 		break;};
 	    pbf += nbr;

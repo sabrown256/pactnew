@@ -1902,9 +1902,7 @@ CFG_DONE:
 #--------------------------------------------------------------------------
 
    case install:
-#        $Time install-pact | tee -ai $LogFile
-#        ftee $LogFile install-pact
-        gtee $LogFile install-pact
+        ftee $LogFile install-pact
         set RStatus = $gstatus[1]
 
         breaksw
@@ -2720,15 +2718,7 @@ CFG_DONE:
         flog $Log $RM Confl
 
 # report changed files
-        ftee $Log (awk '/^ *[PUMARD] +.*/ {print $1 " " $2}' $Log | grep -v manager/.pact-version)
-#        flog $Log (awk '/^ *[PUMARD] +.*/ {print $1 " " $2}' $Log | grep -v manager/.pact-version > Files.OK)
-#        flog $Log set Files = `cat Files.OK`
-#        while ($#Files > 1)
-#           NoteD $Log "   $Files[1] $Files[2]"
-#           shift Files
-#           shift Files
-#        end
-#        flog $Log $RM Files.OK
+        ftee $Log awk '/^ *[PUMARD] +.*/ {printf("   %s  %s\n", $1, $2);}' $Log @b grep -v manager/.pact-version
 
         Separator $Log
 
@@ -2831,8 +2821,7 @@ CFG_DONE:
         flog $Log pushd $tmp
 
         Separator $Log
-#        ftee $Log scs-sync $excl $rsrc,tmp $rdst,tmp
-        gtee $Log scs-sync $excl $rsrc,tmp $rdst,tmp
+        ftee $Log scs-sync $excl $rsrc,tmp $rdst,tmp
         set ErrStat = $gstatus[1]
 
         Separator $Log
@@ -2962,8 +2951,7 @@ CFG_DONE:
            NoteD $Log " --------------------------------------------------------"
            foreach d ($PCKS)
               flog $Log pushd $d
-#              ftee $Log pact $NA test
-              gtee $Log pact $NA test
+              ftee $Log pact $NA test
               if ($gstatus[1] != 0) then
                  set RStatus = 1
               endif
@@ -3328,8 +3316,7 @@ CFG_DONE:
            NoteD $Log -n "   remove ............ "
            if ($vrb == TRUE) then
               Note $Log ""
-#              ftee $Log $DSYS remove
-              gtee $Log $DSYS remove
+              ftee $Log $DSYS remove
               set xstatus = $gstatus[1]
            else
               flog $Log $DSYS remove
@@ -3350,8 +3337,7 @@ CFG_DONE:
            NoteD $Log -n "   compile ........... "
            if ($vrb == TRUE) then
               Note $Log ""
-#              ftee $Log $DSYS build
-              gtee $Log $DSYS build
+              ftee $Log $DSYS build
               set xstatus = $gstatus[1]
            else
               flog $Log $DSYS build
@@ -3372,8 +3358,7 @@ CFG_DONE:
            NoteD $Log -n "   test .............. "
            if ($vrb == TRUE) then
               Note $Log ""
-#              ftee $Log $DSYS test
-              gtee $Log $DSYS test
+              ftee $Log $DSYS test
               set xstatus = $gstatus[1]
            else
               flog $Log $DSYS test
@@ -3399,8 +3384,7 @@ CFG_DONE:
            NoteD $Log -n "   install ........... "
            if ($vrb == TRUE) then
               Note $Log ""
-#              ftee $Log $BinDir/install-pact
-              gtee $Log $BinDir/install-pact
+              ftee $Log $BinDir/install-pact
               set xstatus = $gstatus[1]
            else
               flog $Log $BinDir/install-pact

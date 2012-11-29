@@ -119,8 +119,16 @@ switch ($Phase)
 # platforms like cygwin - so do a source update first
               flog $LogHost set path = ( $path ../scripts )
               flog $LogHost scs-update
+
+              Separator $LogHost
               flog $LogHost ./dsys sync
               setenv Err $status
+              if ($Err != 0) then
+                 NoteD $LogHost ""
+                 NoteD $LogHost "ERROR: dsys sync failed on `uname -n`"
+                 NoteD $LogHost ""
+              endif
+              Separator $LogHost
 
 # send sync log to update file
               tlog "(LOG)" cat $WrkDir/dev/$Arch/log/sync

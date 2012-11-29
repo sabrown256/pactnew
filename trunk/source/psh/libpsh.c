@@ -2353,6 +2353,165 @@ int block_fd(int fd, int on)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* READ_SAFE - make read more reliable
+ *           - retry on recoverable errors
+ *           - if REQ == TRUE ensure that the requested number of bytes
+ *           - are read if at all possible
+ *           - if REQ == FALSE read the bytes that are
+ *           - available without error
+ *           - return number of bytes read or -1
+ */
+
+ssize_t read_safe(int fd, void *s, size_t nb, int req)
+   {int ev, blk, zc;
+    size_t n, ns;
+    ssize_t nr;
+    char *ps;
+
+    blk = block_fd(fd, -1);
+    zc  = 0;
+
+/* non-blocking read or terminal - take what you get */
+    if ((blk == FALSE) || (isatty(fd) == TRUE))
+       {while (zc < 10)
+	   {nr = read(fd, s, nb);
+	    ev = errno;
+	    if (nr < 0)
+
+/* if the error is recoverable, sleep and try again */
+	       {if ((ev == EAGAIN) ||
+		    (ev == EWOULDBLOCK) ||
+		    (ev == EINTR))
+		   {zc++;
+		    sleep(1);}
+
+/* if the error is unrecoverable, stop now */
+	        else
+		   {nr = -1;
+		    zc = 10;};};};}
+
+/* blocking read - insist on the specified number of bytes or an error */
+    else
+       {ns = nb;
+	nr = 0;
+	ps = s;
+
+	while ((ns > 0) && (zc < 10))
+	   {n  = read(fd, ps, ns);
+	    ev = errno;
+	    if (n < 0)
+
+/* if the error is recoverable, sleep and try again */
+	       {if ((ev == EAGAIN) ||
+		    (ev == EWOULDBLOCK) ||
+		    (ev == EINTR))
+		   {zc++;
+		    sleep(1);}
+
+/* if the error is unrecoverable, stop now */
+	        else
+		   {nr = -1;
+		    zc = 10;};}
+
+	    else if (n == 0)
+	       zc++;
+
+	    else
+	       {zc  = (req == TRUE) ? 0 : 10;
+		ps += n;
+		ns -= n;
+		nr += n;};};};
+
+    return(nr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FREAD_SAFE - make fread more reliable
+ *            - retry on recoverable errors
+ *            - if REQ == TRUE ensure that the requested number of bytes
+ *            - are read if at all possible
+ *            - if REQ == FALSE read the bytes that are
+ *            - available without error
+ *            - return number of bytes read or -1
+ */
+
+size_t fread_safe(void *s, size_t bpi, size_t ni, FILE *fp, int req)
+   {size_t zc, n, ns, nr;
+    char *ps;
+
+    zc = 0;
+    ns = ni;
+    nr = 0;
+    ps = (char *) s;
+    while ((ns > 0) && (zc < 10))
+       {n = fread(ps, bpi, ns, fp);
+	if (ferror(fp) != 0)
+	   {zc++;
+	    sleep(1);}
+
+	else if (n == 0)
+	   zc++;
+
+	else if (n > 0)
+	   {zc = (req == TRUE) ? 0 : 10;
+	    ps += bpi*n;
+	    ns -= n;
+	    nr += n;};};
+
+    return(nr);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_SAFE - make write ensure that the requested number of bytes
+ *            - is written if at all possible
+ *            - return number of bytes written or -1
+ */
+
+ssize_t write_safe(int fd, const void *s, size_t nb)
+   {int ev, zc;
+    size_t n, ns;
+    ssize_t nw;
+    char *ps;
+
+    zc = 0;
+    ns = nb;
+    nw = 0;
+    ps = (char *) s;
+    while ((ns > 0) && (zc < 10))
+       {n  = write(fd, ps, ns);
+        ev = errno;
+	if (n < 0)
+
+/* if the error is recoverable, sleep and try again */
+	   {if ((ev == EAGAIN) ||
+		(ev == EWOULDBLOCK) ||
+		(ev == EINTR))
+	       {zc++;
+		sleep(10);}
+
+/* if the error is unrecoverable, stop now */
+	    else
+	       {nw = -1;
+                zc = 10;};}
+
+/* no error but no bytes either */
+	else if (n == 0)
+	   zc++;
+
+/* finally something read */
+	else
+	   {zc  = 0;
+	    ps += n;
+	    ns -= n;
+	    nw += n;};};
+
+    return(nw);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* FWRITE_SAFE - make fwrite ensure that the requested number of bytes
  *             - is written if at all possible
  *             - return number of bytes written or -1
@@ -2368,6 +2527,9 @@ size_t fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
     ps = (char *) s;
     while ((ns > 0) && (zc < 10))
        {n = fwrite(ps, bpi, ns, fp);
+	if (ferror(fp) != 0)
+	   {clearerr(fp);
+	    sleep(10);};
 
 	zc = (n == 0) ? zc + 1 : 0;
 

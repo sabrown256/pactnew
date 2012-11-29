@@ -38,10 +38,6 @@ if (($CROSS_COMPILE == FALSE) && ($PACT_CC_FAMILY != INTEL)) then
       Note $Log "Full path to libosmm.so is $lom"
 
       if (("$Valgrind" == "") && (-f "$lom")) then
-#         ftee $Log ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" |& grep -iwv error )
-#         ftee $Log ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" )
-#         ftee $Log ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe )
-
          source ../../../scripts/test-run
       endif
    else

@@ -505,7 +505,7 @@ ADJUST_OLD_TREE:
    unset scsd
 
    NoteD $Log "   The following directories do not exist for import:"
-   ftee $Log (cat ../$TmpFile.lst | $ltmp)
+   ftee $Log cat ../$TmpFile.lst @o $ltmp
    Note $Log ""
 
    flog $Log cd ..

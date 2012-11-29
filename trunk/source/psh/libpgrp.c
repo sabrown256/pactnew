@@ -1565,7 +1565,7 @@ int _pgrp_fan_in(int fd, process *pp, char *s)
     for (io = 0; io < N_IO_CHANNELS; io++)
         {fdi = pp->io[io].fanto[IO_FAN_IN];
 	 if ((pp->io[io].fd == fd) && (fdi >= 0))
-	    {nw = write(fdi, s, nc);
+	    {nw = write_safe(fdi, s, nc);
 	     rv = (nw == nc);
 	     _dbg(2, "accept %d bytes from %d send to %d", nw, fd, fdi);
 	     break;};};
@@ -1596,7 +1596,7 @@ int _pgrp_fan_out(int fd, process *pp, char *s)
 	         {fdi = pd->io[io].fanto[IO_FAN_OUT];
 		  if ((fdi == fd) && (io != IO_STD_ERR))
 		     {fdo = pd->io[io].fd;
-		      nw  = write(fdo, s, nc);
+		      nw  = write_safe(fdo, s, nc);
 		      rv |= (nw == nc);
 		      _dbg(2, "accept %d bytes from %d send to %d",
                            nw, fd, fdo);};};};};
@@ -1629,7 +1629,7 @@ int _pgrp_data_child(int fd, process *pp, char *s)
 	     if (fdo != -1)
 	        {fdi = pd->io[IO_STD_IN].fd;
 		 if (fd == fdi)
-		    {nw  = write(fdo, s, nc);
+		    {nw  = write_safe(fdo, s, nc);
 		     rv |= (nw == nc);
 		     _dbg(2, "accept %d bytes from %d send to %d (%s)",
 			  nw, fd, fdo, s);};};
@@ -1639,7 +1639,7 @@ int _pgrp_data_child(int fd, process *pp, char *s)
 	     if (fdo != -1)
 	        {fdi = pd->io[IO_STD_IN].fd;
 		 if (fd == fdi)
-		    {nw  = write(fdo, s, nc);
+		    {nw  = write_safe(fdo, s, nc);
 		     rv |= (nw == nc);
 		     _dbg(2, "accept %d bytes from %d send to %d (%s)",
 			  nw, fd, fdo, s);};};};};
@@ -1660,7 +1660,7 @@ int _pgrp_send(int fd, process *pp, char *s)
 
     _dbg(2, "accept %d bytes from %d send to %d", nc, fd, fdo);
 
-    nw = write(fdo, s, nc);
+    nw = write_safe(fdo, s, nc);
     rv = (nw == nc);
 
     return(rv);}
@@ -1782,7 +1782,7 @@ void _post_info(process *pp)
 		      break;};
 
 	     if (nc > 0)
-	        {nw = write(fd, t, nc);
+	        {nw = write_safe(fd, t, nc);
 
 		 _dbg(2, "   send status %d to %d: %d (%d)",
 		      pio->gid, fd, pp->reason, nw);
@@ -2154,7 +2154,7 @@ static int run_pgrp(statement *s)
 	rv    = 0;
 	vl[0] = '\0';
 	for (i = 0; i < ne; i++)
-	    {rv |= s->st[i];
+	    {rv += (((1 << i) & ps->status_mask) && (s->st[i] != 0));
 	     vstrcat(vl, BFLRG, "%d ", s->st[i]);};
 	LAST_CHAR(vl) = '\0';
 
@@ -2174,6 +2174,8 @@ static int run_pgrp(statement *s)
 		     break;
                 case GEX_SH_SV :
                      printf("gstatus=\"%s\"\n", vl);
+		     break;
+                case GEX_NONE :
 		     break;};
 	    fflush(stdout);};
 
@@ -2464,6 +2466,8 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
     for (i = 0; i < c; i++)
         {if (strpbrk(v[i], " \t") == NULL)
 	    s = append_tok(s, ' ', "%s", v[i]);
+	 else if (strpbrk(v[i], "\"") != NULL)
+	    s = append_tok(s, ' ', "'%s'", v[i]);
 	 else
 	    s = append_tok(s, ' ', "\"%s\"", v[i]);};
 
@@ -2521,7 +2525,7 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 
 int transfer_ff(FILE *fi, FILE *fo)
    {int i, ne, nx, rv, ev;
-    size_t nr, nw, ni;
+    size_t nr, nw;
     char t[BFLRG];
 
     rv = 0;
@@ -2537,11 +2541,14 @@ int transfer_ff(FILE *fi, FILE *fo)
 	     ev = errno;
              ne++;
 	     if (nr > 0)
-	        {for (nw = 0; nw < nr; )
+	        {nw = fwrite_safe(t, 1, nr, fo);
+#if 0
+		 size_t ni;
+		 for (nw = 0; nw < nr; )
                      {ni  = fwrite(t, 1, nr-nw, fo);
                       ev  = errno;
                       nw += ni;};
-
+#endif
 		 _dbg(-2, "sent %d chars from file to %d (%d)",
 		      nw, fileno(fo), rv);
 

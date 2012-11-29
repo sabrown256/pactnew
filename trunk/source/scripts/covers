@@ -205,7 +205,7 @@ else
 
    set BTime = `$TIMER -r`
    NoteD $Log "Uncalled functions:"
-   ftee $Log ( cat $SUBR | $0 -p UnCalled | awk '{printf("   %s\n", $1);}')
+   ftee $Log cat $SUBR @o $0 -p UnCalled @o awk '{printf("   %s\n", $1);}'
    set ETime = `$TIMER -b $BTime`
    NoteD $Log "done ($ETime)"
    NoteD $Log ""

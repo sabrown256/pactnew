@@ -9,7 +9,8 @@
 .SH NAME
 gexec \- generalization of process pipelines
 .SH SYNOPSIS
-.B gexec [-d #] [-h] [-p] [-s] [-t] <command>*
+.B gexec [-cev] [-csv] [-d #] [-h] [-nv] [-p] [-s]
+         [-sev] [-ssv] [-st #] [-t] <command>*
 
 .SH DESCRIPTION
 
@@ -89,17 +90,43 @@ See the perdb man pages for more details of its operation.
 .SH OPTIONS
 
 .TP
+.B \-cev
+Print setting gstatus as an environment variable in CSH
+form - setenv gstatus "..."
+.TP
+.B \-csv
+Print setting gstatus as a shell variable in CSH form.
+form - set gstatus = ( ... )
+.TP
 .B \-d
 Set the debugging level to see information on I/O connections.
 .TP
 .B \-h
 This help message.
 .TP
+.B \-nv
+Do not print expression setting gstatus.
+.TP
 .B \-p
 Use pipes to communcate between processes.
 .TP
 .B \-s
 Use sockets to communcate between processes.
+.TP
+.B \-sev
+Print setting gstatus as an environment variable in SH
+form - gstatus="...";export gstatus
+.TP
+.B \-ssv
+Print setting gstatus as a shell variable in SH
+form - gstatus="..."
+.TP
+.B \-st
+Set the exit status bit mask.  The exit status of gexec
+will be the sum of all non-zero exit status group members
+covered by the mask.  For example, -st 3 would look for
+non-zero exit statuses from the 1rst and 2nd processes in
+the group.  The default is to use all members of the group.
 .TP
 .B \-t
 Use PTYs to communcate between processes (not complete).

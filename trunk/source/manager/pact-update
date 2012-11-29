@@ -21,11 +21,15 @@ umask 002
 unalias *
 
 alias flog      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
-alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
 alias Note      'echo \!\!:2-$ >>& \!\!:1'
 alias NoteD     'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
 alias Separator '(echo "--------------------------------------------------------------------------" ; echo "") >>& \!\!:1'
 alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
+
+# NOTE: need ftee until gexec gets built during config
+# then we can use gtee with gexec for safety
+alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
+alias gtee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; gexec -nv \!\!:2-$ @b tee -ai \!\!:1 ; set gstatus = $status'
 
 if ($?USER == 0) then
    if ($?LOGNAME == 0) then
@@ -701,7 +705,6 @@ if ($doupd == TRUE) then
       exit(1)
    endif
 
-#   ftee $Log ./dsys update $upopt
    gtee $Log ./dsys update $upopt
    set xstatus = $gstatus[1]
 

@@ -89,7 +89,7 @@ Note $Log ""
          flog $Log ( echo 2 | $CFE $exe )
          set xstatus = $status
       else
-         ftee $Log ( echo 2 | $Valgrind $exe )           |& \
+         ftee $Log echo 2 @o $Valgrind $exe              |& \
          grep "ERROR SUMMARY:"                           |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`

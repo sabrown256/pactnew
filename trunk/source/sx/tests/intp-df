@@ -19,11 +19,11 @@ set io  = intp-df.res
 
 @ err = 0
 
+NoteD $Log ""
 if ($?OMIT_INTERP == 1) then
    NoteD $Log "                    $msg omitted"
 else
 
-   NoteD $Log ""
    NoteD $Log "                    $msg"
    Note $Log ""
 

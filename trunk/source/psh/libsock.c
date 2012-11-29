@@ -688,7 +688,7 @@ int read_sock(client *cl, char *s, int nc)
 	CLOG(cl, 1, "read - no connection");}
 
     else
-       {nb = read(fd, s, nc);
+       {nb = read_safe(fd, s, nc, FALSE);
 	ev = errno;
 
 /* guarantee NULL termination */
@@ -754,7 +754,7 @@ int write_sock(client *cl, char *s, int nc)
 	    if (nc <= 0)
 	       nc = strlen(s) + 1;
 
-	    nb = write(fd, s, nc);
+	    nb = write_safe(fd, s, nc);
 
 	    if ((nb >= 0) && (nb == nc))
 	       {CLOG(cl, 2, "write %d ok (%d bytes sent)", fd, nb);}
