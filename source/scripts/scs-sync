@@ -90,6 +90,8 @@ Note $log "Exclude directories: $excd"
 # get a working copy of the source
 flog $log mkdir syncs
 flog $log pushd syncs
+
+set lt = `timer -r`
 if (("$repos" =~ *.gz) || ("$repos" =~ *.tgz)) then
    NoteD $log -n "Untarring compressed tarfile $repos ... "
    flog $log tar xvzf $repos
@@ -131,11 +133,12 @@ else
    flog $log scs-co -k $sknd -d $repos $pkgs
    set xstatus = $status
 endif
+set lt = `timer -b $lt`
 
 if ($xstatus == 0) then
-   NoteD $log "ok"
+   NoteD $log "ok ($lt)"
 else
-   NoteD $log "ng"
+   NoteD $log "ng ($lt)"
 endif
 
 flog $log popd
@@ -148,6 +151,8 @@ flog $log popd
 # get a working copy of the destination repo
 flog $log mkdir syncd
 flog $log pushd syncd
+
+set lt = `timer -r`
 
 # remote repo case - the repo path must identify the SCS kind
 # we do not want to have to authenticate and do remote queries
@@ -176,10 +181,13 @@ endif
 Note $log ""
 
 flog $log scs-co -k $dknd -d $repod $pkgd
-if ($status == 0) then
-   NoteD $log "ok"
+set xstatus = $status
+
+set lt = `timer -b $lt`
+if ($xstatus == 0) then
+   NoteD $log "ok ($lt)"
 else
-   NoteD $log "ng"
+   NoteD $log "ng ($lt)"
 endif
 
 flog $log popd
@@ -222,11 +230,16 @@ flog $log cat $excf
 # rsync in the source tree files
 NoteD $log -n "Running rsync ... "
 Note $log ""
+
+set lt = `timer -r`
 flog $log rsync -av --delete --exclude-from=$excf $rel/ .
-if ($status == 0) then
-   NoteD $log "ok"
+set xstatus = $status
+
+set lt = `timer -b $lt`
+if ($xstatus == 0) then
+   NoteD $log "ok ($lt)"
 else
-   NoteD $log "ng"
+   NoteD $log "ng ($lt)"
 endif
 
 #--------------------------------------------------------------------------
@@ -248,6 +261,8 @@ Note $log "   Kind = $knd"
 
 NoteD $log -n "Reconciling contents ... "
 Note $log ""
+
+set lt = `timer -r`
 
 if (-d $gitd[1]) then
 
@@ -327,7 +342,8 @@ else if (-d .svn) then
 
 endif
 
-NoteD $log "done"
+set lt = `timer -b $lt`
+NoteD $log "ok ($lt)"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
