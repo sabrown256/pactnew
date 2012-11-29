@@ -1175,6 +1175,7 @@ static char **setup_pgrp(process_group *pg, int it,
  *                  -  variable   => v<x>:<name> -> gexec -p var -<x> <name>
  *                  -  procedure  => p<x>:<name> -> gexec -p <name> -<x>
  *                  -  executable => x<x>:<name> -> <name>
+ *                  -  <x> := r | w | a
  */
 
 static char **expand_shorthand(char **ta, char *t)
@@ -1385,7 +1386,9 @@ static void parse_pgrp(statement *s)
 
 /* build up an entry from non-terminal tokens */
 	 else
-	    {if ((strchr(t, ':') != NULL) && (strchr("fvpx", t[0]) != NULL))
+	    {if ((strchr("fvpx", t[0]) != NULL) &&
+	         (strchr("rwa", t[1]) != NULL) &&
+	         (t[2] == ':'))
 	        ta = expand_shorthand(ta, t);
 	     else
 	        ta = lst_add(ta, t);};};
