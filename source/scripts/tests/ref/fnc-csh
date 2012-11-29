@@ -12,8 +12,8 @@ Test NoteD
 
 Command: echo Test flog
 Test flog
-Command: echo Test ftee
-Test ftee
+Command: gexec echo Test ftee
+"Test ftee"
 Command: echo Test ftty
 Test ftty
 --------------------------------------------------------------------------

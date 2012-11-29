@@ -148,7 +148,24 @@ static PFPCAL maps(char *s)
 static int help(void)
    {int rv;
 
-    rv = 0;
+    printf("\n");
+    printf("Usage: gexec [-cev] [-csv] [-d #] [-h] [-nv] [-p] [-s]\n");
+    printf("             [-sev] [-ssv] [-st #] [-t] <cmd>\n");
+    printf("   cev    output status as environment variable in CSH form\n");
+    printf("   csv    output status as shell variable in CSH form\n");
+    printf("   d      debug level\n");
+    printf("   h      this help message\n");
+    printf("   nv     do not print output status\n");
+    printf("   p      use pipes between processes (default)\n");
+    printf("   s      use sockets between processes\n");
+    printf("   sev    output status as environment variable in SH form\n");
+    printf("   ssv    output status as shell variable in SH form\n");
+    printf("   st     set exit status bit mask\n");
+    printf("   t      use PTY's between processes (not available yet)\n");
+    printf("   <cmd>  see gexec man page for details\n");
+    printf("\n");
+
+    rv = 1;
 
     return(rv);}
 
@@ -168,16 +185,26 @@ int main(int c, char **v, char **env)
        {db = getenv("PERDB_PATH");
 	s  = getenv("GEXEC_DEBUG_LEVEL");
 
-	ps->dbg_level = (s == NULL) ? 0 : atol(s);
+	ps->dbg_level   = (s == NULL) ? 0 : atol(s);
+	ps->status_mask = -1;
 
 	for (i = 1; i < c; i++)
-	    {if (strcmp(v[i], "-h") == 0)
-	        {rv = help();
-		 break;}
+	    {if (strcmp(v[i], "-cev") == 0)
+	        ps->ofmt = GEX_CSH_EV;
+
+	     else if (strcmp(v[i], "-csv") == 0)
+	        ps->ofmt = GEX_CSH_SV;
 
 	     else if (strcmp(v[i], "-d") == 0)
 	        {ps->dbg_level = atol(v[++i]);
 		 csetenv("GEXEC_DEBUG_LEVEL", "%d", ps->dbg_level);}
+
+	     else if (strcmp(v[i], "-h") == 0)
+	        {rv = help();
+		 break;}
+
+	     else if (strcmp(v[i], "-nv") == 0)
+	        ps->ofmt = GEX_NONE;
 
 	     else if (strcmp(v[i], "-p") == 0)
 	        ps->medium = IO_DEV_PIPE;
@@ -185,20 +212,17 @@ int main(int c, char **v, char **env)
 	     else if (strcmp(v[i], "-s") == 0)
 	        ps->medium = IO_DEV_SOCKET;
 
-	     else if (strcmp(v[i], "-t") == 0)
-	        ps->medium = IO_DEV_PTY;
-
-	     else if (strcmp(v[i], "-cev") == 0)
-	        ps->ofmt = GEX_CSH_EV;
-
-	     else if (strcmp(v[i], "-csv") == 0)
-	        ps->ofmt = GEX_CSH_SV;
-
 	     else if (strcmp(v[i], "-sev") == 0)
 	        ps->ofmt = GEX_SH_EV;
 
 	     else if (strcmp(v[i], "-ssv") == 0)
 	        ps->ofmt = GEX_SH_SV;
+
+	     else if (strcmp(v[i], "-st") == 0)
+	        ps->status_mask = atoll(v[++i]);
+
+	     else if (strcmp(v[i], "-t") == 0)
+	        ps->medium = IO_DEV_PTY;
 
 	     else
 	        {rv = gexec(db, c-i, v+i, env, maps);

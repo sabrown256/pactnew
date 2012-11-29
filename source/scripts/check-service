@@ -72,21 +72,21 @@ foreach i ($FSys)
    Note $Log "Checking directory $i"
    flog $Log pushd $i
    if ($status != 0) then
-      ftee $Log (echo "$i not mounted" | awk '{printf("   %-24s down    %s %s\n", $1, $2, $3);}')
+      ftee $Log echo "$i not mounted" @o awk '{printf("   %-24s down    %s %s\n", $1, $2, $3);}'
       @ Err = $Err + 1
    else
-      set SrvInf = `$IOPR -v |& sed 's/(.*)//' | awk '$1 == "NFS" && NF == 4 { printf("%s %s", $3, $4);}'`
+      set SrvInf = ( `$IOPR -v |& sed 's/(.*)//' | awk '$1 == "NFS" && NF == 4 { printf("%s %s", $3, $4);}'` )
       if ($#SrvInf != 2) then
-         ftee $Log (echo "$i server unresponsive" | awk '{printf("   %-24s down    %s %s\n", $1, $2, $3);}')
+         ftee $Log echo "$i server unresponsive" @o awk '{printf("   %-24s down    %s %s\n", $1, $2, $3);}'
          @ Err = $Err + 2
       else
          set Srv   = `echo "$SrvInf[1]" | sed 's/\./ /g' | awk '{ print $1 }'`
          set SrvdT = ( `echo $SrvInf[2] | sed 's/\./ /'` )
          if ($SrvdT[1] > 10) then
-            ftee $Log (echo "$i $Srv $SrvInf[2]" | awk '{printf("   %-24s bad     %-16s %s (too long)\n", $1, $2, $3);}')
+            ftee $Log echo "$i $Srv $SrvInf[2]" @o awk '{printf("   %-24s bad     %-16s %s (too long)\n", $1, $2, $3);}'
             @ Err = $Err + 4
          else
-            ftee $Log (echo "$i $Srv $SrvInf[2]" | awk '{printf("   %-24s good    %-16s %s\n", $1, $2, $3);}')
+            ftee $Log echo "$i $Srv $SrvInf[2]" @o awk '{printf("   %-24s good    %-16s %s\n", $1, $2, $3);}'
          endif
       endif
       flog $Log popd
@@ -102,9 +102,9 @@ foreach s ($Services)
    Note $Log "Checking service $s"
    flog $Log ls-jobs -a $s
    if ($status != 0) then
-      ftee $Log (echo $s | awk '{printf("   %-24s down\n", $1);}')
+      ftee $Log echo $s @o awk '{printf("   %-24s down\n", $1);}'
    else
-      ftee $Log (echo $s | awk '{printf("   %-24s good\n", $1);}')
+      ftee $Log echo $s @o awk '{printf("   %-24s good\n", $1);}'
    endif
 end
 

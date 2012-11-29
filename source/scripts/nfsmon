@@ -140,7 +140,7 @@ endif
 # WORK - do the work of the session
 
    if ($Quiet == FALSE) then
-      echo "   # RPC  Retrans    # Ops     Read    Write   Lookup  Getattr  Setattr"
+      echo "   # RPC   Retrans     # Ops     Read    Write   Lookup  Getattr  Setattr"
    endif
 
    while (1)

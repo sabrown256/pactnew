@@ -165,7 +165,7 @@ enum e_st_sep
 typedef enum e_st_sep st_sep;
 
 enum e_shell_option
-   {GEX_CSH_SV, GEX_CSH_EV, GEX_SH_SV, GEX_SH_EV};
+   {GEX_NONE, GEX_CSH_SV, GEX_CSH_EV, GEX_SH_SV, GEX_SH_EV};
 
 typedef enum e_shell_option shell_option;
 
@@ -249,6 +249,7 @@ struct s_process_stack
 struct process_group_state
    {int n_sig_block;
     int dbg_level;
+    uint64_t status_mask;
     shell_option ofmt;
     io_device medium;
     process_stack stck;
@@ -273,7 +274,7 @@ struct process_group_state
 
 process_group_state *get_process_group_state(void)
    {process_group_state *ps;
-    static process_group_state st = { 0, 0, GEX_CSH_EV, IO_DEV_PIPE,
+    static process_group_state st = { 0, 0, -1, GEX_CSH_EV, IO_DEV_PIPE,
 				      { 0, 0, 0, 0, 3,
 					(POLLIN | POLLPRI),
 					(POLLERR | POLLHUP | POLLNVAL),
@@ -1759,7 +1760,8 @@ void asetup(int n, int na)
     if (st->fd != NULL)
        FREE(st->fd);
 
-    m = n*N_IO_CHANNELS;
+/* add one for the stdin of gexec itself */
+    m = n*N_IO_CHANNELS + 1;
 
     st->ifd = 0;
     st->nfd = m;
@@ -1802,9 +1804,11 @@ static int _awatch_push_fd(process *pp, int fd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _AWATCH_POP_FD - remove everything to do with PP from stack */
+/* _AWATCH_POP_FD - remove everything to do with PP from stack
+ *                - this file static but left off to quiet compilers
+ */
 
-static void _awatch_pop_fd(process *pp)
+void _awatch_pop_fd(process *pp)
    {int ip, ifd, np, nfd;
     process_group_state *ps;
     process_stack *st;
@@ -1941,7 +1945,8 @@ process *arelaunch(process *pp)
     ps = get_process_group_state();
 
     if ((pp != NULL) && (pp->nattempt <= ps->stck.nattempt))
-       {_awatch_pop_fd(pp);
+       {if (pp->ip < 0)
+	   _awatch_pop_fd(pp);
 
 	npp = alaunch(pp->ip, pp->cmd, pp->mode, pp->a,
 		      pp->accept, pp->reject, pp->wait);
@@ -1958,6 +1963,90 @@ process *arelaunch(process *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _APOLL_TTY - process messages between the terminal and 
+ *            - the child processes
+ */
+
+static int _apoll_tty(process_group_state *ps, int i, int nrdy)
+   {int io, ip, is, np, fd;
+    short rev;
+    char **sa;
+    process *pp;
+    iodes *pio;
+    apollfd *fds;
+    
+    sa = NULL;
+    file_strings_push(stdin, &sa, FALSE, 0);
+    if (sa != NULL)
+       {np  = ps->stck.np;
+	fds = ps->stck.fd;
+	rev = fds[i].revents;
+
+/* find processes expecting messages from the terminal */
+	for (ip = 0; ip < np; ip++)
+	    {pp = ps->stck.proc[ip];
+	     if (job_alive(pp) == TRUE)
+	        {for (io = 0; io < N_IO_CHANNELS; io++)
+		     {pio = pp->io + io;
+		      if (((pio->knd == IO_STD_OUT) ||
+			   (pio->knd == IO_STD_BOND)) /* &&
+			  (pio->dev == IO_DEV_TERM) */)
+			 {fd = pio->fd;
+			  if (rev & ps->stck.mask_acc)
+			     {nrdy--;
+			      for (is = 0; sa[is] != NULL; is++)
+				  write_safe(fd, sa[i], strlen(sa[i]));}
+
+			  else if (rev & ps->stck.mask_rej)
+			     {nrdy--;
+			      for (is = 0; sa[is] != NULL; is++)
+				  fprintf(stderr, "GEXEC: rejected message '%s'\n",
+					  sa[i]);};};};};};
+
+	free_strings(sa);};
+
+    return(nrdy);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _APOLL_CHILD - process messages between the child processes */
+
+static int _apoll_child(process_group_state *ps, int i, int nrdy)
+   {int ip, ifd, nfd, fd, np;
+    int *map, *io;
+    short rev;
+    process *pp;
+    apollfd *fds;
+    
+    np  = ps->stck.np;
+    nfd = ps->stck.ifd;
+    fds = ps->stck.fd;
+    map = ps->stck.map;
+    io  = ps->stck.io;
+
+    rev = fds[i].revents;
+    fd  = fds[i].fd;
+
+/* find the process containing the file desciptor FD and drain it */
+    for (ip = 0; ip < np; ip++)
+        {pp = ps->stck.proc[ip];
+	 if (job_alive(pp) == TRUE)
+	    {for (ifd = 0; ifd < nfd; ifd++)
+	         {if ((map[ifd] == ip) && (io[ifd] == fd))
+		     {if (rev & ps->stck.mask_acc)
+			 {nrdy--;
+			  job_read(fd, pp, pp->accept);}
+
+		      else if (rev & ps->stck.mask_rej)
+			 {nrdy--;
+			  job_read(fd, pp, pp->reject);};};};};};
+
+    return(nrdy);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* APOLL - poll all the active jobs
  *       - TO is the number of milliseconds to wait for input
  *       - TO = -1 means block
@@ -1966,7 +2055,6 @@ process *arelaunch(process *pp)
 int apoll(int to)
    {int i, ip, n, ifd, nfd, fd, np, nrdy;
     int *map, *io;
-    short rev;
     process *pp;
     apollfd *fds;
     process_group_state *ps;
@@ -1979,8 +2067,16 @@ int apoll(int to)
     map = ps->stck.map;
     io  = ps->stck.io;
 
+    n = 0;
+
+/* add the stdin of the terminal */
+    fds[n].fd      = STDIN_FILENO;
+    fds[n].events  = ps->stck.mask_acc;
+    fds[n].revents = 0;
+    n++;
+
 /* find the descriptors of running jobs only */
-    for (n = 0, ip = 0; ip < np; ip++)
+    for (ip = 0; ip < np; ip++)
         {pp = ps->stck.proc[ip];
 	 if (job_running(pp))
 	    {for (ifd = 0; ifd < nfd; ifd++)
@@ -1995,22 +2091,11 @@ int apoll(int to)
 
     if (nrdy > 0)
        {for (i = 0; i < n; i++)
-            {rev = fds[i].revents;
-	     fd  = fds[i].fd;
-
-/* find the process containing the file desciptor FD and drain it */
-	     for (ip = 0; ip < np; ip++)
-	         {pp = ps->stck.proc[ip];
-		  if (job_alive(pp) == TRUE)
-		     {for (ifd = 0; ifd < nfd; ifd++)
-			  {if ((map[ifd] == ip) && (io[ifd] == fd))
-			      {if (rev & ps->stck.mask_acc)
-				  {nrdy--;
-				   job_read(fd, pp, pp->accept);}
-
-			       else if (rev & ps->stck.mask_rej)
-				  {nrdy--;
-				   job_read(fd, pp, pp->reject);};};};};};};};
+	    {fd  = fds[i].fd;
+	     if (fd == STDIN_FILENO)
+	        nrdy = _apoll_tty(ps, i, nrdy);
+	     else
+	        nrdy = _apoll_child(ps, i, nrdy);};};
 
     return(nrdy);}
 
@@ -2040,7 +2125,9 @@ int acheck(void)
 	        pp = arelaunch(pp);};
 
 	 nf += (job_running(pp) == FALSE);};
-
+/*
+printf("leaving acheck: n(%d < %d)\n", nf, np);
+*/
     return(nf);}
 
 /*--------------------------------------------------------------------------*/
@@ -2113,7 +2200,7 @@ void amap(void (*f)(process *pp, void *a))
 
 /* AFIN - finish out the jobs on the process stack */
 
-void afin(void (*f)(process *pp, void *a))
+int afin(void (*f)(process *pp, void *a))
    {int nd;
 
 /* check the job status one last time */
@@ -2124,7 +2211,7 @@ void afin(void (*f)(process *pp, void *a))
 
     _afinish();
 
-    return;}
+    return(nd);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

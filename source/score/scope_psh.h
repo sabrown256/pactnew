@@ -52,8 +52,7 @@ extern void
  _PS_job_child_prelim(process *pp),
  PS_job_wait(process *pp),
  PS_asetup(int n, int na),
- PS_amap(void (*f)(process *pp, void *a)),
- PS_afin(void (*f)(process *pp, void *a));
+ PS_amap(void (*f)(process *pp, void *a));
 
 extern int
  _PS_fd_close(int fd),
@@ -69,6 +68,7 @@ extern int
  PS_job_done(process *pp, int sig),
  PS_apoll(int to),
  PS_acheck(void),
+ PS_afin(void (*f)(process *pp, void *a)),
  PS_await(unsigned int tf, int dt, char *tag,
 	  int (*tty)(char *tag),
 	  void (*f)(int i, char *tag, void *a, int nd, int np, int tc, int tf),
@@ -288,7 +288,12 @@ extern int
  PS_strings_file(char **sa, char *fname, char *mode),
  PS_is_running(int pid);
 
+extern ssize_t
+ PS_read_safe(int fd, void *s, size_t nb, int req),
+ PS_write_safe(int fd, const void *s, size_t nb);
+
 extern size_t
+ PS_fread_safe(void *s, size_t bpi, size_t nitems, FILE *fp, int req),
  PS_fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp);
 
 extern char

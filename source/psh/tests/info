@@ -67,8 +67,8 @@ endif
 # PACT/PACT-INFO comparison
 
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
-      set lmsg = "util ........................"
-      NoteD $Log -n "                       $lmsg"
+      set lmsg = "util ......................."
+      NoteD $Log -n "                        $lmsg"
       Note $Log ""
 
       set lt = `timer -r`
@@ -124,8 +124,8 @@ endif
 
 # PACT/PERDB comparison
 
-   set lmsg = "db .........................."
-   NoteD $Log -n "                       $lmsg"
+   set lmsg = "db ........................."
+   NoteD $Log -n "                        $lmsg"
    Note $Log ""
 
    set lt = `timer -r`

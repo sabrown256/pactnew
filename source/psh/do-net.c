@@ -13,23 +13,6 @@
 #include "libtime.c"
 #include "libasync.c"
 
-/* exit states */
-#undef WAITING
-#undef PASSED
-#undef FAILED
-#undef TIMEDOUT
-#define WAITING   10
-#define PASSED    11
-#define FAILED    12
-#define TIMEDOUT  13
-
-/* running states */
-#define IDLE       20
-#define PENDING    21
-#define STARTED    22
-#define RUNNING    23
-#define DONE       24
-
 #define BY_HOST  100
 #define BY_NET   101
 
@@ -37,13 +20,6 @@
 #define VLOG  1
 #define NLOG  2
 #define QLOG  3
-
-#define PH_SETUP        0
-#define PH_BUILD        1
-#define PH_NETINSTALL   2
-#define PH_HOSTINSTALL  3
-#define PH_CLEAN        4
-#define PH_N_PHASES     5
 
 #define N_AUX 6
 
@@ -54,6 +30,40 @@
     (_p)->sp     = NULL;                                                         \
     (_p)->tlimit = 0;                                                            \
     memset((_p)->time, 0, 16);}
+
+/* enumerate exit states */
+#undef WAITING
+#undef PASSED
+#undef FAILED
+#undef TIMEDOUT
+
+enum e_exit_state
+   { WAITING  = 10,
+     PASSED   = 11,
+     FAILED   = 12,
+     TIMEDOUT = 13 };
+
+typedef enum e_exit_state exit_state;
+
+/* enumerate run states */
+enum e_run_state
+   { IDLE =    20,
+     PENDING = 21,
+     STARTED = 22,
+     RUNNING = 23,
+     DONE    = 24 };
+
+typedef enum e_run_state run_state;
+
+enum e_phases
+   { PH_SETUP       = 0,
+     PH_BUILD       = 1,
+     PH_NETINSTALL  = 2,
+     PH_HOSTINSTALL = 3,
+     PH_CLEAN       = 4,
+     PH_N_PHASES    = 5 };
+
+typedef enum e_phases phases;
 
 typedef struct s_hfspec hfspec;
 typedef struct s_auxdes auxdes;
@@ -71,8 +81,8 @@ struct s_hfspec
     char logn[BFLRG];
     FILE *log;
     process *proc;
-    int running;
-    int exit;};
+    run_state running;
+    exit_state exit;};
 
 struct s_auxdes
    {char proper[BFLRG];
@@ -154,7 +164,7 @@ static phasedes
  *current_phase = NULL;
 
 static char
- *run_state[] = { "IDLE", "PENDING", "STARTED", "RUNNING", "DONE" };
+ *run_state_name[] = { "IDLE", "PENDING", "STARTED", "RUNNING", "DONE" };
 
 static void
  finish(donetdes *st, double gti);
@@ -252,8 +262,8 @@ static void notej(process *pp, char *fmt, ...)
 
 /* TRANSITION - note the transition in run state to the log */
 
-static int transition(process *pp, int new)
-   {int old;
+static run_state transition(process *pp, run_state new)
+   {run_state old;
     char *olds, *news;
     hfspec *sp;
 
@@ -261,8 +271,8 @@ static int transition(process *pp, int new)
        {sp = (hfspec *) pp->a;
 
 	old = sp->running;
-	olds = run_state[old-IDLE];
-	news = run_state[new-IDLE];
+	olds = run_state_name[old-IDLE];
+	news = run_state_name[new-IDLE];
 
 	if (new == DONE)
 	   notej(pp, "transition from %s to %s (%s)",
@@ -583,7 +593,6 @@ static int log_in(process *pp, char *ar, char *s)
     FILE *fo;
 
     rv = TRUE;
-
     sp = (hfspec *) pp->a;
     if (sp != NULL)
        {fo = sp->log;
@@ -1738,7 +1747,7 @@ static int progress(donetdes *st)
  */
 
 static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
-   {int i, j, no, ng, tc;
+   {int i, j, no, ng, nd, tc;
     double tdi;
     char ahst[BFLRG], hserve[BFLRG], dt[16];
     char *hst;
@@ -1769,11 +1778,11 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
     ASSERT(tc == TRUE);
 
 /* close out the jobs */
-    afin(finup);
+    nd = afin(finup);
 
 /* log the end */
     noten(Log, st->verbose,
-	  "Waiting done on verify: %5d sec", tc);
+	  "Waiting done on verify: %d in %5d sec", nd, tc);
 
     stop_time(dt, 16, tdi);
 
@@ -1781,8 +1790,10 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
     no = 0;
     ng = 0;
     for (i = 0; i < nsp; i++)
-        {noten(Log, st->verbose, "   %3d  |%s|\t\t|%s|",
-	       i+1,
+        {noten(Log, st->verbose, "   %3d  (%3d,%3d) (%3d,%3d,%8d,%d) |%s|\t|%s|",
+	       i+1, sp[i].running, sp[i].exit,
+	       sp[i].proc->status, sp[i].proc->io[0].fd,
+	       sp[i].proc->id, job_running(sp[i].proc),
 	       (sp[i].host == NULL) ? "no-host" : sp[i].host,
 	       (sp[i].logn == NULL) ? "no-name" : sp[i].logn);
 	   
@@ -3560,7 +3571,7 @@ int main(int c, char **v)
     state.watch          = FALSE;
     state.usescp         = TRUE;
     state.interact       = TRUE;
-    state.vfyt           = 300;
+    state.vfyt           = 60;
     state.cargs          = NULL;
     state.clargs         = NULL;
     state.debug          = NULL;

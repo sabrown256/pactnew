@@ -154,7 +154,7 @@ static int read_fifo(char *root, int ch, char *s, int nc)
 	log_activity(flog, fifost.debug, 1, wh, "read - no db");}
 
     else
-       {nb = read(fd, s, nc);
+       {nb = read_safe(fd, s, nc, FALSE);
 	close(fd);
 
 /* guarantee NULL termination */
@@ -195,7 +195,7 @@ static int write_fifo(char *root, int ch, char *s, int nc)
 	   log_activity(flog, fifost.debug, 1, wh, "write no db");
 
 	else
-	   {nb = write(fd, s, nc);
+	   {nb = write_safe(fd, s, nc);
 	    close(fd);
 
 	    if (nb < 0)

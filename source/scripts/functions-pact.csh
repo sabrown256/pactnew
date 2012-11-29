@@ -73,7 +73,6 @@ endif
 
 alias get_line  'set \!\!:1 = `awk "NR == \!\!:3 { print ; exit }" \!\!:2`'
 alias flog      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
-alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
 alias ftty      'echo "Command: \!\!:2-$" >>& \!\!:1 ; echo "\!\!:2-$" ; \!\!:2-$ >>& \!\!:1'
 alias Note      'echo \!\!:2-$ >>& \!\!:1'
 alias NoteD     'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
@@ -81,6 +80,10 @@ alias Separator 'echo "---------------------------------------------------------
 alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
 alias Intervene 'test -f ~/\!\!:1 && source ~/\!\!:1'
 alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
+
+alias gtee      'echo "Command: $GEXEC \!\!:2-$" >>& \!\!:1 ; $GEXEC \!\!:2-$ @b tee -ai \!\!:1 ; set gstatus = $status'
+alias ftee      'echo "Command: $GEXEC \!\!:2-$" >>& \!\!:1 ; $GEXEC -nv \!\!:2-$ @b tee -ai \!\!:1 ; set gstatus = $status'
+#alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
 
 # dbset sets a variable in the database and the current environment
 # use dbset instead of setenv
@@ -128,8 +131,6 @@ alias envexp    'echo "parent \!\!:1($\!\!:1)"'
 # fexec logs the gexec command, runs it, and
 # gets gstatus out as a shell variable
 # usage: fexec $log <gexec-specs>
-
-alias gtee      'echo "Command: $GEXEC \!\!:2-$" >>& \!\!:1 ; $GEXEC \!\!:2-$ @b tee -ai \!\!:1 ; set gstatus = $status'
 
 alias fexec     'echo "Command: $GEXEC \!\!:2-$" >>& \!\!:1 ; $GEXEC \!\!:2-$ >>& \!\!:1 ; set gstatus = (`$PERDB -e gstatus`)'
 

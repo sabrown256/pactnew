@@ -123,6 +123,7 @@
 #define file_text 		PS_file_text
 #define fill_string 		PS_fill_string
 #define fillin_pgrp 		PS_fillin_pgrp
+#define fread_safe 		PS_fread_safe
 #define free_client 		PS_free_client
 #define free_db 		PS_free_db
 #define free_strings 		PS_free_strings
@@ -201,6 +202,7 @@
 #define push_tok 		PS_push_tok
 #define push_tok_beg 		PS_push_tok_beg
 #define put_db 			PS_put_db
+#define read_safe               PS_read_safe
 #define read_sock 		PS_read_sock
 #define redirect_io 		PS_redirect_io
 #define register_io_pgrp 	PS_register_io_pgrp
@@ -242,6 +244,7 @@
 #define verifyx 		PS_verifyx
 #define vstrcat 		PS_vstrcat
 #define wall_clock_time 	PS_wall_clock_time
+#define write_safe              PS_write_safe
 #define write_sock 		PS_write_sock
 
 /*--------------------------------------------------------------------------*/
