@@ -11,8 +11,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: site"
+Note $ALog "Analyze: site"
 
 dbmget $ALog SYS_SITE =\? ""^  \
              SYS_TYPE =\? ""^  \
@@ -20,9 +19,9 @@ dbmget $ALog SYS_SITE =\? ""^  \
              DAS_ROOT =\? ""
 
 if ($?SITE_SIGNATURE_DB == 1) then
-   Note $Log "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
+   Note $ALog "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
 else
-   Note $Log "SITE_SIGNATURE_DB not defined"
+   Note $ALog "SITE_SIGNATURE_DB not defined"
 endif
 
 if (-f $MngDir/extensions/sys-site) then

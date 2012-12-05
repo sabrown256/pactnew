@@ -16,8 +16,7 @@ if ($?Log == 0) then
    setenv Log $ALog
 endif
 
-Separator $Log
-Note $Log "Analyze: os"
+Note $ALog "Analyze: os"
 
 NoteD $ALog -n "   Operating System: "
 Note $ALog ""

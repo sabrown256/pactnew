@@ -11,8 +11,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: fc"
+Note $ALog "Analyze: fc"
 
 NoteD $ALog -n "   Fortran Compiler: "
 Note $ALog ""

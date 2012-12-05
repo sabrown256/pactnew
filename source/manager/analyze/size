@@ -11,7 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "      Find Integer Sizes"
+Note $ALog "----- analyze/size -----"
+Note $ALog "Analyze: Find Integer Sizes"
+Note $ALog ""
 
 dbmget $ALog INT4    =\? int^   \
              INT8    =\? long^  \

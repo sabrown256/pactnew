@@ -30,6 +30,8 @@ Tool CC {
                  4.*  >= -Wno-pragmas ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # stack checking
                  4.2.* >= -fstack-protector ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # unused return value
+                 4.3.* >= -Wunused-result ]
    Flags    += [ _env_ = Bits ;                 # address bit size
                  32    = -m32 ;
                  64    = -m64 -fPIC ]

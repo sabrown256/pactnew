@@ -11,8 +11,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: math"
+Note $ALog "Analyze: math"
 
 dbmget $ALog GSL_Path    =\? ""^     \
              BLAS_Path   =\? ""^     \
@@ -28,10 +27,10 @@ set MathLib = ""
 if (-d $RootInc/gsl) then
    set rinc = $RootInc
    set root = $rinc:h
-   flog $Log setenv GSL_Path $root
+   flog $ALog setenv GSL_Path $root
    set MathLib = ( $MathLib gsl )
 else
-   flog $Log setenv GSL_Path ""
+   flog $ALog setenv GSL_Path ""
 endif
 
 #--------------------------------------------------------------------------

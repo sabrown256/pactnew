@@ -11,8 +11,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: vsnprinft"
+Note $ALog "Analyze: vsnprinft"
 
 dbmget $ALog Cfe_CC_Exe
 

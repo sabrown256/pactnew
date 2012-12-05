@@ -11,8 +11,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: tracker"
+Note $ALog "Analyze: tracker"
 
 dbmget $ALog HAVE_TRACKER =\? ""^  \
              TRACKER_Exe  =\? ""^  \

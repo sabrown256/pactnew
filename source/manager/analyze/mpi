@@ -13,8 +13,7 @@ set lbase = $lme:h
 source $lbase/common
 
 if ($?Log == 1) then
-   Separator $Log
-   Note $Log "Analyze: mpi"
+   Note $ALog "Analyze: mpi"
 endif
 
 dbmget $ALog REQUEST_MPI        =\? FALSE^   \

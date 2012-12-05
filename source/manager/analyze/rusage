@@ -12,8 +12,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: resource usage"
+Note $ALog "Analyze: resource usage"
 
 dbmget $ALog CC_Exe^      \
              CC_Flags

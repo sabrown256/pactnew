@@ -11,8 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: readline"
+Note $ALog "----- analyze/readline -----"
+Note $ALog "Analyze: readline"
+Note $ALog ""
 
 dbget LIB
 

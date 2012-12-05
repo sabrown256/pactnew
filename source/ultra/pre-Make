@@ -72,7 +72,7 @@ IncAction =
 #
 # Required Libraries
 #
-Libs = ${LULTRA} ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDLibCfg}
+Libs = ${LULTRA} ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDE_Lib} ${MDLibCfg}
 
 targets :
 	@echo "Targets for ULTRA"

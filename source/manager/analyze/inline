@@ -11,6 +11,10 @@
 set Me = $0
 source $Me:h/common
 
+Note $ALog "----- analyze/inline -----"
+Note $ALog "Analyze: inline handling"
+Note $ALog ""
+
 dbmget $ALog Cfe_CC_Exe
 
 cat << EOF >! $Tmp.c

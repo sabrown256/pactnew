@@ -11,8 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: strerror_r"
+Note $ALog "----- analyze/strerror_r -----"
+Note $ALog "Analyze: strerror_r"
+Note $ALog ""
 
 dbmget $ALog Cfe_CC_Exe^     \
              Cfe_LD_Flags^   \

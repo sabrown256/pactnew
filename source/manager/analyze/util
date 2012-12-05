@@ -11,8 +11,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: util"
+Note $ALog "Analyze: util"
 
 NoteD $ALog "   System Utilities: "
 
@@ -51,13 +50,13 @@ if ($Cfe_CC_Exe != "") then
 
 cat << EOF >! foo.c
 extern int bar();
-foo(x){return(bar(x));}
+int foo(int x){return(bar(x));}
 EOF
 
    flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags -c foo.c
 
 cat << EOF >! bar.c
-bar(x){return(x);}
+int bar(int x){return(x);}
 EOF
 
    flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags -c bar.c

@@ -12,8 +12,9 @@
 set Me = $0
 source $Me:h/common
 
-Separator $ALog
+Note $ALog "----- analyze/dl -----"
 Note $ALog "Analyze: dynamic linker"
+Note $ALog ""
 
 dbmget $ALog MDE_Lib             =\? ""^      \
              HAVE_DYNAMIC_LINKER =\? FALSE^   \

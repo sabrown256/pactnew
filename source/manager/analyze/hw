@@ -12,8 +12,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: hw"
+Note $ALog "Analyze: hw"
 
 if ($?Arch == 0) then
    setenv Arch `../scripts/system-id`
