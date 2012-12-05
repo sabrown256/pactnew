@@ -11,8 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: jpeg"
+Note $ALog "----- analyze/jpeg -----"
+Note $ALog "Analyze: jpeg"
+Note $ALog ""
 
 dbmget $ALog MDG_Inc      =\? ""^        \
              MDG_Lib      =\? ""^        \

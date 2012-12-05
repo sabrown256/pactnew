@@ -2364,8 +2364,8 @@ int block_fd(int fd, int on)
 
 ssize_t read_safe(int fd, void *s, size_t nb, int req)
    {int ev, blk, zc;
-    size_t n, ns;
-    ssize_t nr;
+    size_t ns;
+    ssize_t n, nr;
     char *ps;
 
     blk = block_fd(fd, -1);
@@ -2471,8 +2471,8 @@ size_t fread_safe(void *s, size_t bpi, size_t ni, FILE *fp, int req)
 
 ssize_t write_safe(int fd, const void *s, size_t nb)
    {int ev, zc;
-    size_t n, ns;
-    ssize_t nw;
+    size_t ns;
+    ssize_t n, nw;
     char *ps;
 
     zc = 0;

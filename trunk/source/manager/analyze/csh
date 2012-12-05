@@ -11,8 +11,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: csh"
+Note $ALog "Analyze: csh"
 
 set inf = ( `ls -l /bin/csh` )
 @ n = $#inf

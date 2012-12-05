@@ -11,8 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: libz"
+Note $ALog "----- analyze/libz -----"
+Note $ALog "Analyze: libz"
+Note $ALog ""
 
 dbmget $ALog MD_Inc    =\? ""^        \
              MD_Lib    =\? ""^        \

@@ -11,6 +11,10 @@
 set Me = $0
 source $Me:h/common
 
+Note $ALog "----- analyze/quickdraw -----"
+Note $ALog "Analyze: QuickDrawn"
+Note $ALog ""
+
 dbmget $ALog MDG_Inc          =\? ""^        \
              MDG_Lib          =\? ""^        \
              MDG_Pck          =\? ""^        \
@@ -29,8 +33,7 @@ dbmget $ALog MDG_Inc          =\? ""^        \
 
 if ($OS_Name == Darwin) then
 
-   Separator $Log
-   Note $Log "Analyze: Quickdraw"
+   Note $ALog "Analyze: Quickdraw"
 
    set UTime = `timer -r`
 

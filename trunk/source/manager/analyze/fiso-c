@@ -14,6 +14,10 @@
 set Me = $0
 source $Me:h/common
 
+Note $ALog "----- analyze/fiso-c -----"
+Note $ALog "Analyze: iso_c_binding module"
+Note $ALog ""
+
 dbmget $ALog FC_Exe^         \
              FC_Flags^       \
              Cfg_FC_Exe^     \

@@ -68,3 +68,4 @@ dbmget $ALog BE    =\? ""^           \
 
 envini MngDir     $cwd
 
+Note $ALog ""

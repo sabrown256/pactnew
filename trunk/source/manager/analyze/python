@@ -19,8 +19,7 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: python"
+Note $ALog "Analyze: python"
 
 # if there is no python directory no need to look further
 if (-d ../../python) then

@@ -11,8 +11,8 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: signal"
+Note $ALog "Analyze: signal"
+Note $ALog ""
 
 dbmget $ALog HAVE_POSIX_SIGNALS =\? FALSE^ \
              Cfe_CC_Exe^                   \

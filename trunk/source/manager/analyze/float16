@@ -11,6 +11,10 @@
 set Me = $0
 source $Me:h/common
 
+Note $ALog "----- analyze/float16 -----"
+Note $ALog "Analyze: C90 long double support"
+Note $ALog ""
+
 dbmget $ALog CFE^        \
              Cfe_CC_Exe
 

@@ -7,6 +7,10 @@
 # include "cpyright.h"
 #
 
+Note $ALog "----- analyze/backslash -----"
+Note $ALog "Analyze: CSH backslash handling"
+Note $ALog ""
+
 setenv BackSlash "\\"
 
 set Tmp = "tmp-backslash"

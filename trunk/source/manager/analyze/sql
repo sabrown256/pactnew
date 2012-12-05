@@ -11,8 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-Separator $Log
-Note $Log "Analyze: sql"
+Note $ALog "----- analyze/sql -----"
+Note $ALog "Analyze: MySQL and SQLite"
+Note $ALog ""
 
 dbmget $ALog MDI_Inc    =\? ""^        \
              MDI_Lib    =\? ""^        \

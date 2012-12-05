@@ -12,6 +12,10 @@
 set Me = $0
 source $Me:h/common
 
+Note $ALog "----- analyze/noreturn -----"
+Note $ALog "Analyze: C11 _Noreturn handling"
+Note $ALog ""
+
 dbmget $ALog Cfe_CC_Exe
 
 cat << EOF >! $Tmp.c
