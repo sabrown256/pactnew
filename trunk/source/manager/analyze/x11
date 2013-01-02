@@ -53,6 +53,9 @@ else if ($Std_UseX == TRUE) then
       endif
    end
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # write a little X test that works around dumb Solaris
 # on which XOpenDisplay hangs forever if it does not
 # like the DISPLAY variable value
@@ -119,7 +122,7 @@ EOF
    source $AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "") && ($?IBM_BGL == 0)) then
-      NoteD $ALog "      has X11 ($PckLib)"
+      NoteD $ALog -n "      has X11 ($PckLib)"
 
 #      setenv HAVE_SOCKETS   Envir
       setenv GRAPHICS_Windows             "X"
@@ -149,10 +152,54 @@ EOF
       flog $ALog setenv MDG_Pck     "$MDG_Pck X11"
       flog $ALog setenv Std_UseX    TRUE
    else
-      NoteD $ALog "      no X11"
+      NoteD $ALog -n "      no X11"
       flog $ALog setenv Std_UseX    FALSE
    endif
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# write a little X test to do font detection
+
+      cat << EOF >! $Tmp-font.c
+#include <stdint.h>
+#include <X11/Xlib.h>
+int main(int c, char **v)
+   {int nf, ret;
+    char **names;
+    Display *disp;
+    extern char *getenv(const char *name);
+
+    ret  = 0;
+    disp = XOpenDisplay(getenv("DISPLAY"));
+    if (disp != NULL)
+       {names = XListFonts(disp, "*helvetica*-*-*", 1024, &nf);
+        ret   = (nf > 0);
+        XFreeFontNames(names);
+        XCloseDisplay(disp);};
+
+    ret = (ret != 0);
+
+    return(ret);}
+EOF
+
+   flog $ALog $Cfe_CC_Exe $Tmp-font.c -o $Tmp-font $Cfe_LD_Lib $MDG_Lib
+   if ($status == 0) then
+      flog $ALog $Tmp-font
+      if ($status == 0) then
+         NoteD $ALog " (have X11 fonts)"
+      else
+         NoteD $ALog " (no X11 fonts installed)"
+         flog $ALog setenv Std_UseX    FALSE
+      endif
+   endif
+
+   ${RM} $Tmp-font.c $Tmp-font
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# finish up
    set ETime = `timer -b $UTime`
 
    setenv X11_Inc   "$PckInc"

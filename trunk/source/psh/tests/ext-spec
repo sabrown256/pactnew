@@ -52,7 +52,8 @@ foreach i (1 2 3 4)
            set srt = FALSE
            breaksw
       case 3:
-           set cmd = ( gexec $opt /bin/echo "foo=bar" @v printenv foo '>&!' $res )
+#           set cmd = ( gexec $opt /bin/echo "foo=bar" @v printenv foo '>&!' $res )
+           set cmd = ( gexec $opt csh -c "'(echo foo=bar ; echo bar=baz ; echo baz=blat)'" @v printenv foo '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            breaksw

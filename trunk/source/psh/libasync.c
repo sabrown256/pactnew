@@ -274,7 +274,8 @@ struct process_group_state
 
 process_group_state *get_process_group_state(void)
    {process_group_state *ps;
-    static process_group_state st = { 0, 0, -1, GEX_CSH_EV, IO_DEV_PIPE,
+    static process_group_state st = { 0, 0, (uint64_t) -1,
+				      GEX_CSH_EV, IO_DEV_PIPE,
 				      { 0, 0, 0, 0, 3,
 					(POLLIN | POLLPRI),
 					(POLLERR | POLLHUP | POLLNVAL),
@@ -949,8 +950,7 @@ static void _job_set_process_env(process *pp)
 	if (sa != NULL)
 	   {for (i = 0; sa[i] != NULL; i++)
 	        {_dbg(2, "setenv %s", sa[i]);
-		 putenv(STRSAVE(sa[i]));
-		 break;};
+		 putenv(STRSAVE(sa[i]));};
 
 	    free_strings(sa);};};
 

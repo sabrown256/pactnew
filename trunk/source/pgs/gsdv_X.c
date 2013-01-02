@@ -280,18 +280,18 @@ static int _PG_X_setup_font(PG_device *dev, char *face, int size)
 	        i--;
 	     break;};};
     if (i >= nf)
-       i = nf-1;
+       {i = nf-1;
          
-    xf = XLoadQueryFont(disp, names[i]);
-    if (xf != NULL)
-       {XSetFont(disp, dev->gc, xf->fid);
+	xf = XLoadQueryFont(disp, names[i]);
+	if (xf != NULL)
+	   {XSetFont(disp, dev->gc, xf->fid);
 
-	if (dev->font_info != NULL)
-	   XFreeFont(disp, dev->font_info);
+	    if (dev->font_info != NULL)
+	       XFreeFont(disp, dev->font_info);
 
-	dev->font_info = xf;
+	    dev->font_info = xf;
 	
-	ret = TRUE;};
+	    ret = TRUE;};};
 
     XFreeFontNames(names);
 
