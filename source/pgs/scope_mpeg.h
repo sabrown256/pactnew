@@ -558,6 +558,8 @@ typedef int boolean;
 #define BOOLEAN_DEFINED
 #define HAVE_BOOLEAN
 
+#if 0
+
 /* LONG_32 should only be defined iff
  *	    1) long's are 32 bits and
  *	    2) int's are not
@@ -566,12 +568,12 @@ typedef int boolean;
 typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
 
-#if 0
-#ifdef LONG_32		
+# ifdef LONG_32		
 typedef unsigned long u_int32_t;
-#else
+# else
 typedef unsigned int u_int32_t;
-#endif
+# endif
+
 #endif
 
 /* _H_INTTYPES is defined by an AIX include which also typedefs

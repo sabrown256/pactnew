@@ -27,9 +27,13 @@ if (-x "$PACT") then
    endif
    source $Root/etc/functions-pact.csh
 
+   foreach i (SYS_SITE SYS_TYPE DAS_ROOT DAI_ROOT)
+      setenv $i `$PACT -info $i`
+   end
+
 # PACT must be on your path - end of story
-   set lsys = `where sys-site | head -n 1`
-   eval `$lsys`
+#   set lsys = `where sys-site | head -n 1`
+#   eval `$lsys`
 
 else
    setenv SYS_SITE unknown
