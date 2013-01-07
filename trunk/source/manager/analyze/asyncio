@@ -15,6 +15,7 @@ source $Me:h/common
 Note $ALog "Analyze: asynchronous I/O in STREAMS"
 
 dbmget $ALog HAVE_ASYNC_STREAMS =\? FALSE^   \
+             PACT_CC_VERSION^                \
              CC_Exe^                         \
              CC_Flags
 

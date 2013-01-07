@@ -18,7 +18,8 @@ Note $ALog ""
 setenv HAVE_VA_COPY FALSE
 setenv HAVE_VA_LIST TRUE
 
-dbmget $ALog Cfe_CC_Exe
+dbmget $ALog Cfe_CC_Exe^       \
+             PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 #include <stdarg.h>

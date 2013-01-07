@@ -420,7 +420,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 
 /* reassert raw mode */
     if (pe->raw == TRUE)
-       {in = fileno(stdin);
+       {in = STDIN_FILENO;
 	SC_set_raw_state(in, FALSE);
 	SC_set_io_attrs(in,
 			OPOST, SC_TERM_OUTPUT, TRUE,

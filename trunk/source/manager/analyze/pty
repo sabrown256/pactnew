@@ -13,8 +13,9 @@ source $Me:h/common
 
 Note $ALog "Analyze: pty"
 
-dbmget $ALog CC_Exe^      \
-             CC_Flags
+dbmget $ALog CC_Exe^          \
+             CC_Flags^        \
+             PACT_CC_VERSION
 
 # check for PTY functions grantpt, unlockpt, and ptsname
 

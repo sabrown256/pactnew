@@ -27,17 +27,19 @@ Separator $Log
 Note $Log "   F90 Include File - f90types.h f90kinds.inc"
 Note $Log ""
 
-dbmget $Log CFE^            \
-            Cfe_CC_Exe^     \
-            Cfe_CC_Flags^   \
-            Cfe_FC_Exe^     \
-            Cfe_FC_Flags^   \
-            Cfe_LD_Flags^   \
-            Cfe_LD_RPath^   \
-            F_STD^          \
-            HAVE_FORTRAN^   \
-            Host^           \
-            IncDir
+dbmget $Log CFE^              \
+            Cfe_CC_Exe^       \
+            Cfe_CC_Flags^     \
+            Cfe_FC_Exe^       \
+            Cfe_FC_Flags^     \
+            Cfe_LD_Flags^     \
+            Cfe_LD_RPath^     \
+            F_STD^            \
+            HAVE_FORTRAN^     \
+            Host^             \
+            IncDir^           \
+            PACT_CC_VERSION^  \
+            PACT_FC_VERSION
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

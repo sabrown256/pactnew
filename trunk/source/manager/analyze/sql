@@ -34,6 +34,7 @@ dbmget $ALog MDI_Inc    =\? ""^        \
              LIB^                      \
              Linking^                  \
              LibM_Lib^                 \
+             PACT_CC_VERSION^          \
              RPATH
 
 # if we have explicitly said we do not want SQL

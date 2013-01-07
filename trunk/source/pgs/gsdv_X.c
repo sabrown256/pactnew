@@ -280,9 +280,10 @@ static int _PG_X_setup_font(PG_device *dev, char *face, int size)
 	        i--;
 	     break;};};
     if (i >= nf)
-       {i = nf-1;
+       i = nf-1;
          
-	xf = XLoadQueryFont(disp, names[i]);
+    if ((0 <= i) && (i < nf))
+       {xf = XLoadQueryFont(disp, names[i]);
 	if (xf != NULL)
 	   {XSetFont(disp, dev->gc, xf->fid);
 

@@ -16,7 +16,8 @@ Note $ALog "----- analyze/line -----"
 Note $ALog "Analyze: line directive handling"
 Note $ALog ""
 
-dbmget $ALog Cfe_CC_Exe
+dbmget $ALog Cfe_CC_Exe^       \
+             PACT_CC_VERSION
 
 set AC = a$$.c
 set AO = a$$.o

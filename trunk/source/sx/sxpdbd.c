@@ -961,6 +961,8 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 
     nma = NULL;
     nmb = NULL;
+    pfa = NULL;
+    pfb = NULL;
 
     if (SS_consp(argl))
        {SX_GET_OBJECT_FROM_LIST(si, SX_ipdbfilep(obj), pfa, 

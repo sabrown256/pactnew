@@ -19,6 +19,7 @@ Note $ALog ""
 dbmget $ALog MDE_Lib             =\? ""^      \
              HAVE_DYNAMIC_LINKER =\? FALSE^   \
              PACT_SO_CACHE       =\? ""^      \
+             PACT_CC_VERSION^                 \
              CC_Exe^                          \
              CC_Flags^                        \
              CFE

@@ -16,7 +16,8 @@ Note $ALog "----- analyze/noreturn -----"
 Note $ALog "Analyze: C11 _Noreturn handling"
 Note $ALog ""
 
-dbmget $ALog Cfe_CC_Exe
+dbmget $ALog Cfe_CC_Exe^      \
+             PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 _Noreturn void b(void) {while (1) sleep(1);}

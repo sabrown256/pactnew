@@ -314,6 +314,7 @@ static object *_SXI_shift_domain(SS_psides *si, object *argl)
 
     set = NULL;
     ret = SS_null;
+    val = -HUGE;
     if (SS_consp(argl))
        {SX_GET_OBJECT_FROM_LIST(si, SX_MAPPINGP(obj), set,
 				MAPPING_DOMAIN(obj),
@@ -346,6 +347,7 @@ static object *_SXI_shift_range(SS_psides *si, object *argl)
 
     set = NULL;
     ret = SS_null;
+    val = -HUGE;
     if (SS_consp(argl))
        {SX_GET_OBJECT_FROM_LIST(si, SX_MAPPINGP(obj), set, MAPPING_RANGE(obj),
                                 argl, "BAD MAPPING - _SXI_SHIFT_RANGE");
@@ -404,6 +406,7 @@ static object *_SXI_scale_domain(SS_psides *si, object *argl)
 
     set = NULL;
     ret = SS_null;
+    val = -HUGE;
     if (SS_consp(argl))
        {SX_GET_OBJECT_FROM_LIST(si, SX_MAPPINGP(obj), set,
 				MAPPING_DOMAIN(obj),
@@ -435,6 +438,7 @@ static object *_SXI_scale_range(SS_psides *si, object *argl)
 
     set = NULL;
     ret = SS_null;
+    val = -HUGE;
     if (SS_consp(argl))
        {SX_GET_OBJECT_FROM_LIST(si, SX_MAPPINGP(obj), set, MAPPING_RANGE(obj),
                                 argl, "BAD MAPPING - _SXI_SCALE_RANGE");

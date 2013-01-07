@@ -19,7 +19,8 @@ dbmget $ALog HAVE_POSIX_SIGNALS =\? FALSE^ \
              Cfe_CC_Flags^                 \
              Cfe_LD_Flags^                 \
              Cfe_LD_Lib^                   \
-             Cfe_LD_RPath
+             Cfe_LD_RPath^                 \
+             PACT_CC_VERSION
 
 set sig = ""
 

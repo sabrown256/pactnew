@@ -18,12 +18,13 @@ Note $ALog "----- analyze/fiso-c -----"
 Note $ALog "Analyze: iso_c_binding module"
 Note $ALog ""
 
-dbmget $ALog FC_Exe^         \
-             FC_Flags^       \
-             Cfg_FC_Exe^     \
-             Cfg_FC_Flags^   \
-             Cfe_FC_Exe^     \
-             Cfe_FC_Flags
+dbmget $ALog FC_Exe^           \
+             FC_Flags^         \
+             Cfg_FC_Exe^       \
+             Cfg_FC_Flags^     \
+             Cfe_FC_Exe^       \
+             Cfe_FC_Flags^     \
+             PACT_FC_VERSION
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

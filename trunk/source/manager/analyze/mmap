@@ -13,11 +13,12 @@ source $Me:h/common
 
 Note $ALog "Analyze: mmap"
 
-dbmget $ALog CFE^           \
-             CC_Exe^        \
-             CC_Flags^      \
-             Cfe_LD_Flags^  \
-             Cfe_LD_RPath
+dbmget $ALog CFE^             \
+             CC_Exe^          \
+             CC_Flags^        \
+             Cfe_LD_Flags^    \
+             Cfe_LD_RPath^    \
+             PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 #include <unistd.h>
