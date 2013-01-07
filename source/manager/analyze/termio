@@ -13,9 +13,10 @@ source $Me:h/common
 
 Note $ALog "Analyze: termio"
 
-dbmget $ALog CC_Exe^      \
-             CC_Flags^    \
-             OS_Name
+dbmget $ALog CC_Exe^           \
+             CC_Flags^         \
+             OS_Name^          \
+             PACT_CC_VERSION
 
 set termio = ""
 

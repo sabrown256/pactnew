@@ -405,7 +405,8 @@ static void _PD_d_install_in(char *name, defstr *def, hasharr *tab,
 	else if (strcmp(typ, "bool") == 0)
 	   kind = KIND_OTHER;
 	else
-	   {switch (def->kind)
+	   {kind = KIND_OTHER;
+	    switch (def->kind)
 	       {case CHAR_KIND :
 		     kind = KIND_CHAR;
 		     break;
@@ -424,7 +425,6 @@ static void _PD_d_install_in(char *name, defstr *def, hasharr *tab,
 		     kind = KIND_STRUCT;
 		     break;
 		default :
-		     kind = KIND_OTHER;
 		     break;};};
 	SC_type_register(name, kind, def->size, 0);}
 
@@ -746,7 +746,7 @@ int64_t _PD_get_current_address(PDBfile *file, PD_major_op tag)
     fp = file->stream;
 
     addr = lio_tell(fp);
-    if ((addr == -1) && (tag != -1))
+    if ((addr == -1) && (tag != PD_UNINIT))
        PD_error("FAILED TO FIND ADDRESS - _PD_GET_CURRENT_ADDRESS", tag);
 
     return(addr);}
@@ -764,7 +764,7 @@ int _PD_set_current_address(PDBfile *file, int64_t addr, int wh,
     fp = file->stream;
 
     st = lio_seek(fp, addr, wh);
-    if ((st != 0) && (tag != -1))
+    if ((st != 0) && (tag != PD_UNINIT))
        PD_error("FAILED TO FIND ADDRESS - _PD_SET_CURRENT_ADDRESS", tag);
 
     return(st);}

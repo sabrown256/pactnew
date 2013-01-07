@@ -24,9 +24,10 @@ dbmget $ALog CC_Exe         =\? cc^         \
              BFD_Lib        =\? -lbfd^      \
              BFD_Path       =\? /usr/$LIB^  \
              BFD_Version    =\? 0.0.0^      \
+             BFD_SO         =\? ""^         \
              HAVE_BFD       =\? FALSE^      \
              HAVE_DEMANGLE  =\? FALSE^      \
-             BFD_SO         =\? ""^         \
+             PACT_CC_VERSION^               \
              Linking
 
 # if we have explicitly said we do not want BFD

@@ -21,7 +21,8 @@ dbmget $ALog HAVE_SOCKETS =\? TRUE^ \
              Cfe_CC_Flags^          \
              Cfe_LD_Flags^          \
              Cfe_LD_Lib^            \
-             Cfe_LD_RPath
+             Cfe_LD_RPath^          \
+             PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 #include <sys/socket.h>

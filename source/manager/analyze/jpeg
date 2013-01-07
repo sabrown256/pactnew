@@ -28,6 +28,7 @@ dbmget $ALog MDG_Inc      =\? ""^        \
              Cfe_LD_Flags^               \
              Cfe_LD_Lib^                 \
              Cfe_LD_RPath^               \
+             PACT_CC_VERSION^            \
              DAS_ROOT^                   \
              LIB^                        \
              RPATH

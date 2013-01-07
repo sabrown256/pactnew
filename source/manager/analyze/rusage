@@ -14,8 +14,9 @@ source $Me:h/common
 
 Note $ALog "Analyze: resource usage"
 
-dbmget $ALog CC_Exe^      \
-             CC_Flags
+dbmget $ALog CC_Exe^          \
+             CC_Flags^        \
+             PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 #include <sys/resource.h>

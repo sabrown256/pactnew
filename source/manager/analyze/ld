@@ -27,6 +27,7 @@ dbmget $ALog LD_Exe        =\? ""^   \
              DP_Lib        =\? ""^   \
              Cfe_CC_Exe^             \
              Cfg_RPATH^              \
+             PACT_CC_VERSION^        \
              OS_Name
 
 if (!(-x "$LD_Exe")) then

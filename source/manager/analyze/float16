@@ -15,8 +15,9 @@ Note $ALog "----- analyze/float16 -----"
 Note $ALog "Analyze: C90 long double support"
 Note $ALog ""
 
-dbmget $ALog CFE^        \
-             Cfe_CC_Exe
+dbmget $ALog CFE^               \
+             Cfe_CC_Exe^        \
+             PACT_CC_VERSION
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

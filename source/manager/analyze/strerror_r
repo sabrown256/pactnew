@@ -15,10 +15,11 @@ Note $ALog "----- analyze/strerror_r -----"
 Note $ALog "Analyze: strerror_r"
 Note $ALog ""
 
-dbmget $ALog Cfe_CC_Exe^     \
-             Cfe_LD_Flags^   \
-             Cfe_LD_Lib^     \
-             Cfe_LD_RPath
+dbmget $ALog Cfe_CC_Exe^      \
+             Cfe_LD_Flags^    \
+             Cfe_LD_Lib^      \
+             Cfe_LD_RPath^    \
+             PACT_CC_VERSION
 
 set str = ""
 

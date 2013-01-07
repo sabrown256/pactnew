@@ -1470,6 +1470,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
     range      = f->range;
     domain_dim = (domain == NULL) ? 0 : domain->dimension_elem;
     range_dim  = (range == NULL) ? 0 : range->dimension_elem;
+    apty       = PLOT_NONE;
     pty        = data->rendering;
     info       = (pcons *) data->info;
 

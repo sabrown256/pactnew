@@ -27,14 +27,15 @@ Separator $Log
 NoteD $Log "   C Environment Configuration - scdecls.h"
 Note $Log ""
 
-dbmget $Log BaseDir^       \
-            CFE^           \
-            Cfe_CC_Exe^    \
-            Cfe_CC_Flags^  \
-            Cfe_LD_Flags^  \
-            Cfe_LD_RPath^  \
-            CfgDir^        \
-            IncDir
+dbmget $Log BaseDir^         \
+            CFE^             \
+            Cfe_CC_Exe^      \
+            Cfe_CC_Flags^    \
+            Cfe_LD_Flags^    \
+            Cfe_LD_RPath^    \
+            CfgDir^          \
+            IncDir^          \
+            PACT_CC_VERSION
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

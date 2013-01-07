@@ -13,10 +13,11 @@ source $Me:h/common
 
 Note $ALog "Analyze: ipc"
 
-dbmget $ALog Cfe_CC_Exe^    \
-             Cfe_CC_Flags^  \
-             Cfe_LD_Flags^  \
-             Cfe_LD_RPath
+dbmget $ALog Cfe_CC_Exe^      \
+             Cfe_CC_Flags^    \
+             Cfe_LD_Flags^    \
+             Cfe_LD_RPath^    \
+             PACT_CC_VERSION
 
 # check for fork
 

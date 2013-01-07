@@ -15,7 +15,8 @@ Note $ALog "----- analyze/inline -----"
 Note $ALog "Analyze: inline handling"
 Note $ALog ""
 
-dbmget $ALog Cfe_CC_Exe
+dbmget $ALog Cfe_CC_Exe^      \
+             PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 inline int b(int y)

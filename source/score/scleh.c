@@ -1022,9 +1022,23 @@ static char *_SC_leh_gets(lehloc *lp)
 		    (long) lp->pos, _SC_leh.nh);
 	    fflush(fdbg);};
 
-	if (lp->c == CTRL_M)
+/* if we get a single character line consisting of a linefeed
+ * map it to a space and get out of the loop
+ * this is essential for 'mpi-io-wrap <code>'
+ * for codes such as basis which do their own line editing
+ */
+	if (lp->c == CTRL_J)
+	   {lp->bf[0] = ' ';
+            lp->bf[1] = '\0';
+	    rv = lp->bf;
+            ok = FALSE;}
+
+/* the line is complete when we get carriage return period */
+	else if (lp->c == CTRL_M)
 	   {rv = lp->bf;
 	    ok = FALSE;}
+
+/* exit the loop and return NULL if the mapper function failed */
 	else if (nc == FALSE)
 	   {rv = NULL;
 	    ok = FALSE;};};
@@ -1103,12 +1117,14 @@ char *SC_leh(const char *prompt)
        {_SC_leh_put_prompt(&loc);
 
 	fflush(stdout);
+
 	rv = fgets(bf, MAX_BFSZ, stdin);
+
         if (rv != NULL)
-	   {nc = strlen(rv);
-	    while ((nc > 0) && ((rv[nc-1] == '\n') || (rv[nc-1] == '\r')))
+	   {nc = strlen(bf);
+	    while ((nc > 0) && ((bf[nc-1] == '\n') || (bf[nc-1] == '\r')))
 	       {nc--;
-		rv[nc] = '\0';};};}
+		bf[nc] = '\0';};};}
 
     else
        rv = _SC_leh_raw(&loc);

@@ -19,7 +19,8 @@ dbmget $ALog AR_Exe   =\? ar^    \
              AR_Flags =\? ""^    \
              INSTALL  =\? cp^    \
              Cfe_CC_Exe^         \
-             Cfe_CC_Flags
+             Cfe_CC_Flags^       \
+             PACT_CC_VERSION
 
 rm -f foo.c foo.o bar.c bar.o main.c libfoo.a $Tmp
 

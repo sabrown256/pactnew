@@ -29,6 +29,8 @@ PD_scope_public
 
 /* data_standards */
            &INT_STD, NULL,
+
+/* the array of data_standard definitions */
            { DEF_TEXT_STD,
              DEF_I386_STD,
 	     DEF_I586L_STD,
@@ -41,6 +43,7 @@ PD_scope_public
 	     DEF_VAX_STD,
 	     DEF_CRAY_STD },
 
+/* the array of data_standard accesses - e.g. _SX_target */
            { &X86_64_STD,                 /* 1 */
              &I586L_STD,
              &I586O_STD,
@@ -54,6 +57,8 @@ PD_scope_public
 
 /* data_alignments */
 	   &INT_ALG, NULL, 
+
+/* the array of data_alignment definitions */
            { DEF_TEXT_ALIGN,
 	     DEF_BYTE_ALIGN,
 	     DEF_WORD2_ALIGN,
@@ -70,6 +75,7 @@ PD_scope_public
 	     DEF_GNU4_X86_64_ALIGN,
 	     DEF_PGI_X86_64_ALIGN },
 
+/* the array of data_alignment accesses - e.g. _SX_target */
            { &BYTE_ALIGNMENT,            /* 1 */
              &WORD2_ALIGNMENT,
              &WORD4_ALIGNMENT,

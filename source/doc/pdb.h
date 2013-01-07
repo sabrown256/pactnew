@@ -2138,7 +2138,7 @@ Available data alignments are:
 </TR>
 
 <TR>
-<TD>XLC32_PPC64_ALIGNMENT</TD>
+<TD>XLC64_PPC64_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">9</TD>
 <TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 4,  4, 0</TD>
 </TR>
@@ -2293,9 +2293,9 @@ void test_target(char *tgt, char *base, int n,
 
  c ... set target architecture
  c ... PPC32_STD
-       is = 1
+       is = 6
  c ... GNU3_PPC64_ALIGNMENT
-       ia = 3
+       ia = 8
        if (pftrgt(is, ia) .eq. 0)
       &amp;   call errproc
              .
@@ -2311,8 +2311,8 @@ void test_target(char *tgt, char *base, int n,
              .
 
  ; set target architecture
- ; PPC32_STD is 1 and GNU3_PPC64_ALIGNMENT is 3
-     (target 1 3)
+ ; PPC32_STD is 6 and GNU3_PPC64_ALIGNMENT is 8
+     (target 6 8)
              .
              .
              .

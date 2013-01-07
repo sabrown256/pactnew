@@ -29,6 +29,7 @@ dbmget $ALog MDG_Inc          =\? ""^        \
              Cfg_CC_Exe       =\? cc^        \
              CC_Exe^                         \
              LD_Flags^                       \
+             PACT_CC_VERSION^                \
              OS_Name
 
 if ($OS_Name == Darwin) then

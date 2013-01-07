@@ -1381,6 +1381,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
     po   = NULL;
     mn   = NULL;
     file = NULL;
+    name = NULL;
     SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             G_FILE, &po,

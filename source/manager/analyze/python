@@ -31,6 +31,7 @@ if (-d ../../python) then
                 Python_Path     =\? ""^        \
                 Python_CC_Exe   =\? "gcc"^     \
                 CC_Exe^                        \
+                PACT_CC_VERSION^               \
                 OS_Name
 
    Note $ALog ""

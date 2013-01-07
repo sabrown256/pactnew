@@ -28,19 +28,20 @@ NoteD $Log -n "   System make wrapper - smake"
 Note $Log ""
 Note $Log ""
 
-dbmget $Log InstBase^        \
-            CfgDir^          \
-            System^          \
-            GMAKE_Flag^      \
-            IncDir^          \
-            EtcDir^          \
-            BinDir^          \
-            MngDir^          \
-            Cfg_CC_Exe^      \
-            Cfg_CC_Flags^    \
-            Cfg_Lex_Flags^   \
-            Cfg_LD_Flags^    \
-            Cfg_LD_RPath^    \
+dbmget $Log InstBase^         \
+            CfgDir^           \
+            System^           \
+            GMAKE_Flag^       \
+            IncDir^           \
+            EtcDir^           \
+            BinDir^           \
+            MngDir^           \
+            Cfg_CC_Exe^       \
+            Cfg_CC_Flags^     \
+            Cfg_Lex_Flags^    \
+            Cfg_LD_Flags^     \
+            Cfg_LD_RPath^     \
+            PACT_CC_VERSION^  \
             UseTmpDir
 
 set lpactver = `cat $MngDir/.pact-version`

@@ -14,11 +14,12 @@ source $Me:h/common
 
 Note $ALog "Analyze: fork/exec"
 
-dbmget $ALog CC_Exe^        \
-             CC_Flags^      \
-             CFE^           \
-             Cfe_LD_Flags^  \
-             Cfe_LD_RPath
+dbmget $ALog CC_Exe^          \
+             CC_Flags^        \
+             CFE^             \
+             Cfe_LD_Flags^    \
+             Cfe_LD_RPath^    \
+             PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 #include <stdlib.h>

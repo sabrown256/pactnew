@@ -73,6 +73,8 @@ object *SS_unary_flt(SS_psides *si, C_procedure *cp, object *argl)
    {int id;
     object *x, *rv;
 
+    rv = SS_null;
+
     if (SS_nullobjp(argl))
        SS_error(si, "WRONG NUMBER OF ARGUMENTS - SS_UNARY_FLT", argl);
 
@@ -370,6 +372,7 @@ object *SS_binary_homogeneous(SS_psides *si, C_procedure *cp, object *argl)
     long ni;
     object *acc;
 
+    acc = SS_null;
     ido = _SS_max_numeric_type(si, argl, &ni);
     if (ido == -1)
        SS_error(si, "NON-NUMERIC OPERAND - SS_BINARY_HOMOGENEOUS", argl);
@@ -407,6 +410,7 @@ object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
     double n;
     object *acc;
 
+    acc = SS_null;
     ido = _SS_max_numeric_type(si, argl, &ni);
     if (ido == -1)
        SS_error(si, "NON-NUMERIC OPERAND - SS_BINARY_HETEROGENEOUS", argl);
