@@ -260,7 +260,9 @@ extern void
 extern int
  PS_lst_length(char **lst),
  PS_last_char(char *s),
- PS_nchar(char *s, int c),
+ PS_strcntc(char *s, int c, int ex),
+ PS_strcnts(char *s, char *r, int ex),
+ PS_strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int ex),
  PS_full_path(char *path, int nc, char *dir, char *name),
  PS_dir_exists(char *fmt, ...),
  PS_file_exists(char *fmt, ...),
