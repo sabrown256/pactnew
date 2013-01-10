@@ -722,7 +722,6 @@ extern int
  SC_file_path(char *name, char *path, int nc, int full),
  SC_full_path(char *name, char *path, int nc),
  SC_regx_match(char *s, char *patt),
- SC_char_count(char *s, int c),
  SC_remove(char *s),
  SC_assoc_info(pcons *alst, ...),
  SC_assoc_info_alt(pcons *alst, ...);
@@ -1186,6 +1185,8 @@ extern int
  SC_cmplxstrp(char *s),
  SC_chrstrp(char *s),
  SC_str_icmp(char *s, char *t),
+ SC_char_count(char *s, int c),
+ SC_str_count(char *s, char *r),
  SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list a);
 
 extern void

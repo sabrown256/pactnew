@@ -59,8 +59,8 @@ int
  (*SC_vsnprintf_hook)(char *dst, size_t nc,
 		      const char *fmt, va_list a) = VSNPRINTF_FUNCTION;
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SC_FMT_STRCAT - cat S onto D according to FMT
  *                - where D is ND long
@@ -484,6 +484,34 @@ char *SC_str_lower(char *s)
     PS_downcase(s);
 
     return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_CHAR_COUNT - count the number of occurences of the
+ *               - specified character C in the given string S
+ */
+
+int SC_char_count(char *s, int c)
+   {int rv;
+
+    rv = PS_strcntc(s, c, FALSE);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_STR_COUNT - count the number of occurences of any of the
+ *              - specified characters R in the given string S
+ */
+
+int SC_str_count(char *s, char *r)
+   {int rv;
+
+    rv = PS_strcnts(s, r, FALSE);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

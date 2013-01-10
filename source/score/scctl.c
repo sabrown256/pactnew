@@ -523,22 +523,6 @@ long SC_bit_count(long c, int n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_CHAR_COUNT - count the number of occurence of the specified character
- *               - in the given string
- */
-
-int SC_char_count(char *s, int c)
-   {int l, count;
-
-    count = 0;
-    while ((l = *s++) != '\0')
-       count += (l == c);
-
-    return(count);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_RANDOM_INT - pick a random int between A and B */
 
 int SC_random_int(int a, int b)

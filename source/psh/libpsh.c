@@ -584,15 +584,81 @@ int last_char(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* NCHAR - return the number of occurences of C in S */
+/* STRCNTC - return the number of occurences of C in S
+ *         - if EX is TRUE do not count escaped instances
+ */
 
-int nchar(char *s, int c)
+int strcntc(char *s, int c, int ex)
    {int i, nc;
 
-    for (i = 0, nc = 0; s[i] != '\0'; i++)
-        nc += (s[i] == c);
+    nc = 0;
+    if (s != NULL)
+       {for (i = 0, nc = 0; s[i] != '\0'; i++)
+	    nc += (s[i] == c);};
         
     return(nc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STRCNTS - count the number of occurences of any of the
+ *         - the specified characters R
+ *         - in the given string S
+ *         - if EX is TRUE do not count escaped instances
+ */
+
+int strcnts(char *s, char *r, int ex)
+   {int l, count;
+
+    count = 0;
+    while ((l = *s++) != '\0')
+       count += (strchr(r, l) != NULL);
+
+    return(count);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STRCPY_NEXT - copy S into D upto the first unescaped occurence of
+ *             - any character in R
+ *             - if EX is TRUE make the copy of an escaped character
+ *             - unescaped, that is:
+ *             -   "a\bc" -> "abc" or "a\\\"bc" -> "a\"bc"
+ *             - else if EX is FALSE make the copy of an escaped character
+ *             - escaped, that is:
+ *             -   "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
+ *             - copy no more than min of ND and NS characters
+ *             - return the number of characters copied
+ */
+
+int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int ex)
+   {int n, nc, c;
+
+    n = 0;
+
+    if ((s != NULL) && (d != NULL))
+       {nc = min(ns, nd-1);
+	nc = max(nc, 0);
+	for (n = 0; n < nc; n++)
+	    {c = *s++;
+
+/* handle escaped characters */
+             if (c == '\\')
+                {if (ex == FALSE)
+		    *d++ = c;
+                 *d++ = *s++;}
+
+/* copy over non-delimiting characters */
+	     else if (strchr(r, c) == NULL)
+	        *d++ = c;
+
+/* it is not escaped and it is a delimiting character */
+	     else
+	        break;};
+
+	*d++ = '\0';};
+
+    return(n);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -177,7 +177,6 @@
 #define name_db 		PS_name_db
 #define name_log 		PS_name_log
 #define name_conn 		PS_name_conn
-#define nchar 			PS_nchar
 #define note 			PS_note
 #define noted 			PS_noted
 #define nsleep 			PS_nsleep
@@ -218,6 +217,9 @@
 #define separator 		PS_separator
 #define splice_out_path 	PS_splice_out_path
 #define strclean 		PS_strclean
+#define strcntc                 PS_strcntc
+#define strcnts                 PS_strcnts
+#define strcpy_next             PS_strcpy_next
 #define string_sort 		PS_string_sort
 #define strings_file 		PS_strings_file
 #define strip_quote 		PS_strip_quote

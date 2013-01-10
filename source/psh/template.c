@@ -558,8 +558,8 @@ static template *parse_tmpl(FILE *fp, int *flo)
 	     fpr = FALSE;}
 	 else if (nt == 1)
 	    {if (fpr == FALSE)
-	        {npo += nchar(s, '(');
-	         npc += nchar(s, ')');
+	        {npo += strcntc(s, '(', TRUE);
+	         npc += strcntc(s, ')', TRUE);
 		 nstrcat(proto, BFLRG, s);
 		 if ((npo == npc) && (npo > 0))
 		    fpr = TRUE;}
