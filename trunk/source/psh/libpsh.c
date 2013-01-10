@@ -344,6 +344,100 @@ int unsetenv(char *var)
 
 /*--------------------------------------------------------------------------*/
 
+/* STRCNTC - return the number of occurences of C in S
+ *         - if EX is TRUE do not count escaped instances
+ */
+
+int strcntc(char *s, int c, int ex)
+   {int i, nc;
+
+    nc = 0;
+    if (s != NULL)
+       {for (i = 0, nc = 0; s[i] != '\0'; i++)
+	    nc += (s[i] == c);};
+        
+    return(nc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STRCNTS - count the number of occurences of any of the
+ *         - the specified characters R
+ *         - in the given string S
+ *         - if EX is TRUE do not count escaped instances
+ */
+
+int strcnts(char *s, char *r, int ex)
+   {int l, count;
+
+    count = 0;
+    while ((l = *s++) != '\0')
+       count += (strchr(r, l) != NULL);
+
+    return(count);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STRCPY_NEXT - copy S into D upto the first unescaped occurence of
+ *             - any character in R
+ *             - features:
+ *             -   1) if EX is TRUE make the copy of an escaped character
+ *             -      unescaped, that is:
+ *             -         "a\bc" -> "abc" or "a\\\"bc" -> "a\"bc"
+ *             -      else if EX is FALSE make the copy of an escaped
+ *             -      character escaped, that is:
+ *             -         "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
+ *             -   2) copy no more than min of ND and NS characters
+ *             -   3) do not check delimiters in quoted substrings
+ *             -      S = "a 'b;c' ; d" and R = ";"
+ *             -      gives D = "a 'b;c' "
+ *             -   4) return the number of characters copied from S
+ *             -      this can be greater than the number copied into D
+ *             -      strlen will tell you how many were copied into D
+ *             -      but cannot account for escaped characters from S
+ */
+
+int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int ex)
+   {int in, n, nc, c;
+
+    n = 0;
+
+    if ((s != NULL) && (d != NULL))
+       {in = FALSE;
+	nc = strlen(s);
+	nc = min(nc, ns);
+	nc = min(nc, nd-1);
+	nc = max(nc, 0);
+	for (n = 0; n < nc; n++)
+	    {c = *s++;
+
+/* handle escaped characters */
+             if (c == '\\')
+                {if (ex == FALSE)
+		    {*d++ = c;
+		     n++;};
+                 *d++ = *s++;}
+
+	     else if ((c == '\"') || (c == '\''))
+	        {in = !in;
+                 *d++ = c;}
+
+/* copy over non-delimiting characters */
+	     else if ((strchr(r, c) == NULL) || (in == TRUE))
+	        *d++ = c;
+
+/* it is not escaped and it is a delimiting character */
+	     else
+	        break;};
+
+	*d++ = '\0';};
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DELIMITED - return substring of S between matched delimiters BGN and END
  *           - example:
  *           -   "aa (foo(bar)) zz"  with  "(" and ")"
@@ -417,21 +511,40 @@ char *delimited(char *s, char *bgn, char *end)
  */
 
 char **tokenize(char *s, char *dlm)
-   {int i, n, c, ns;
-    char *p, *t, *ps, **sa;
+   {int i, n, nw;
+    char *t, *ps, **sa;
 
     sa = NULL;
     if (s != NULL)
        {n  = strlen(s);
-	t  = MAKE_N(char, n+100);
+	nw = n + 100;
+	t  = MAKE_N(char, nw);
 	if (t != NULL)
-	   {nstrncpy(t, n+100, s, -1);
+	   {nstrncpy(t, nw, s, -1);
+	    if (sa == NULL)
+	       sa = MAKE_N(char *, 1000);
 
-	    for (i = 0, ps = t; ps != NULL; )
-	        {if (sa == NULL)
-	            sa = MAKE_N(char *, 1000);
+	    if (sa != NULL)
+#if 1
+	       {int nc, ex;
+		char *w;
 
-		 if (sa != NULL)
+		ex = FALSE;
+
+		w = MAKE_N(char, nw);
+
+		for (i = 0, ps = t; *ps != '\0'; ps++)
+                    {nc = strcpy_next(w, nw, ps, -1, dlm, ex);
+		     if (nc > 0)
+		        {sa[i++] = STRSAVE(w);
+			 ps += nc;};};
+
+		FREE(w);};
+#else
+	       {int c, ns;
+		char *p;
+
+		for (i = 0, ps = t; ps != NULL; )
 		    {ns  = strspn(ps, dlm);
 		     ps += ns;
 
@@ -471,6 +584,7 @@ char **tokenize(char *s, char *dlm)
 		        {if (IS_NULL(ps) == FALSE)
 			    sa[i++] = STRSAVE(ps);
 			 break;};};};
+#endif
 
 	    if (sa != NULL)
 	       sa[i++] = NULL;
@@ -580,85 +694,6 @@ int last_char(char *s)
     nc = max(0, nc);
 
     return(nc);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* STRCNTC - return the number of occurences of C in S
- *         - if EX is TRUE do not count escaped instances
- */
-
-int strcntc(char *s, int c, int ex)
-   {int i, nc;
-
-    nc = 0;
-    if (s != NULL)
-       {for (i = 0, nc = 0; s[i] != '\0'; i++)
-	    nc += (s[i] == c);};
-        
-    return(nc);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* STRCNTS - count the number of occurences of any of the
- *         - the specified characters R
- *         - in the given string S
- *         - if EX is TRUE do not count escaped instances
- */
-
-int strcnts(char *s, char *r, int ex)
-   {int l, count;
-
-    count = 0;
-    while ((l = *s++) != '\0')
-       count += (strchr(r, l) != NULL);
-
-    return(count);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* STRCPY_NEXT - copy S into D upto the first unescaped occurence of
- *             - any character in R
- *             - if EX is TRUE make the copy of an escaped character
- *             - unescaped, that is:
- *             -   "a\bc" -> "abc" or "a\\\"bc" -> "a\"bc"
- *             - else if EX is FALSE make the copy of an escaped character
- *             - escaped, that is:
- *             -   "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
- *             - copy no more than min of ND and NS characters
- *             - return the number of characters copied
- */
-
-int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int ex)
-   {int n, nc, c;
-
-    n = 0;
-
-    if ((s != NULL) && (d != NULL))
-       {nc = min(ns, nd-1);
-	nc = max(nc, 0);
-	for (n = 0; n < nc; n++)
-	    {c = *s++;
-
-/* handle escaped characters */
-             if (c == '\\')
-                {if (ex == FALSE)
-		    *d++ = c;
-                 *d++ = *s++;}
-
-/* copy over non-delimiting characters */
-	     else if (strchr(r, c) == NULL)
-	        *d++ = c;
-
-/* it is not escaped and it is a delimiting character */
-	     else
-	        break;};
-
-	*d++ = '\0';};
-
-    return(n);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
