@@ -26,7 +26,10 @@ struct s_dir_stack
 typedef enum e_token_flag token_flag;
 
 enum e_token_flag
-   {NO_TOKEN = 0, EXPAND_ESC = 0x1, ADD_DELIMITER = 0x2};
+   {NO_TOKEN           = 0,
+    EXPAND_ESC         = 0x1,
+    ADD_DELIMITER      = 0x2,
+    TRANSPARENT_QUOTES = 0x4};
 
 # endif
 
@@ -410,15 +413,21 @@ int strcnts(char *s, char *r, int ex)
  */
 
 int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
-   {int in, n, nc, c, ex, ad;
+   {int ins, ind, n, nc, c, ex, ad, tr;
 
     n = 0;
 
     if ((s != NULL) && (d != NULL))
        {ex = ((flags & EXPAND_ESC) != 0);
 	ad = ((flags & ADD_DELIMITER) != 0);
+	tr = ((flags & TRANSPARENT_QUOTES) != 0);
 
-	in = FALSE;
+/* quotes must be transparent if they are delimiters */
+	tr |= ((strchr(r, '\"') != NULL) || (strchr(r, '\'') != NULL));
+
+	ins = FALSE;
+	ind = FALSE;
+
 	nc = strlen(s);
 	nc = min(nc, ns);
 	nc = min(nc, nd-1);
@@ -433,12 +442,18 @@ int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 		     n++;};
                  *d++ = *s++;}
 
-	     else if ((c == '\"') || (c == '\''))
-	        {in = !in;
+/* arrange to skip over quoted substrings - making them opaque */
+	     else if ((tr == FALSE) && (c == '\"'))
+	        {ind  = !ind;
+                 *d++ = c;}
+
+	     else if ((tr == FALSE) && (c == '\''))
+	        {ins  = !ins;
                  *d++ = c;}
 
 /* copy over non-delimiting characters */
-	     else if ((in == TRUE) || (strchr(r, c) == NULL))
+	     else if ((ins == TRUE) || (ind == TRUE) ||
+		      (strchr(r, c) == NULL))
 	        *d++ = c;
 
 /* it is not escaped and it is a delimiting character */
@@ -448,7 +463,7 @@ int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 		 break;};};
 
 	if (ad == TRUE)
-	   *d++ = r[0];
+	   *d++ = ' ';
 	*d++ = '\0';};
 
     return(n);}

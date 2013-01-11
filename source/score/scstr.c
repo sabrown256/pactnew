@@ -1069,26 +1069,38 @@ char **SC_tokenizef(char *s, char *delim, int flags)
 
 static void _SC_match_quote(char **ppi, char **ppo, int qc,
 			    char *bf, char *delim)
-   {int c, i, n, ks, ke;
+   {int c, n, ks, ke;
     char *pi, *po, *s;
 
     po = *ppo;
 
 /* count the characters for the target string */
     pi = *ppi;
-    for (n = 0, c = *pi++; (c != qc) && (c != '\0'); c = *pi++, n++)
-        {if (c == '\\')
-	    c = *pi++;};
+    n  = strlen(pi);
 
 /* make a copy of the target string */
-    s = CMAKE_N(char, n+1);
-
+    s  = CMAKE_N(char, n+1);
     pi = *ppi;
+
+#if 0
+    int nc;
+    char dlm[2];
+
+    dlm[0] = qc;
+    dlm[1] = '\0';
+    nc  = PS_strcpy_next(s, n+1, pi, -1, dlm, TRANSPARENT_QUOTES);
+    pi += nc;
+#else
+    int i;
+
     for (i = 0, c = *pi++; (c != qc) && (c != '\0'); c = *pi++, i++)
         {if (c == '\\')
 	    c = *pi++;
 	 s[i] = c;};
     s[i] = '\0';
+#endif
+
+    n = strlen(s);
 
 /* see what the next character is */
     c = *pi;
