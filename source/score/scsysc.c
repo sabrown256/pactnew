@@ -1607,7 +1607,18 @@ static tasklst *_SC_make_tasklst(char *shell, char *cmd)
     s = _SC_prep_command(cmd, FALSE);
 
 /* tokenize the command to facilitate looking for simple commands */
+
+#if 0
+/* this one takes the delimiter off */
+    ta = SC_tokenizef(s, " \t\n\r", ADD_DELIMITER);
+
+#else
+/* this one leaves the delimiter on which is needed to distinguish
+ * the newlines from other delimiters
+ */
     ta = SC_tokenize_literal(s, " \t\n\r", TRUE, 3);
+#endif
+
     SC_ptr_arr_len(na, ta);
 
     _SC_subst_task_env(na, ta);
@@ -1617,10 +1628,11 @@ static tasklst *_SC_make_tasklst(char *shell, char *cmd)
 /* count the apparent subtasks
  * constructs such as (cd .. ; ) would look like 2 subtasks
  */
-    for (nt = 1, n = 0; n < na; n++)
-        nt += (strcmp(ta[n], ";\n") == 0);
+    for (nt = na, n = 0; n < na; n++)
+        nt += PS_strcnts(ta[n], ";\n", FALSE);
+/*        nt += strcmp(ta[n], ";\n") == 0); */
 
-    sub = CMAKE_N(subtask, nt);
+    sub = CMAKE_N(subtask, 2*nt);
 
 /* initialize and get the real number of subtasks
  * constructs such as (cd .. ; ) would actually have 1 subtask

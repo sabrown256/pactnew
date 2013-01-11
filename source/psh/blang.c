@@ -649,7 +649,7 @@ static int process_qualifiers(farg *al, char *qual)
 	    if ((IS_NULL(val) == TRUE) || (val[0] == '*'))
 	       lookup_type(&lst, al->type, MODE_C, MODE_C);
 	    else
-	       lst = tokenize(val, "[,]");
+	       lst = tokenize(val, "[,]", 0);
 	    al->val = lst;
 	    al->nv  = lst_length(lst);
 
@@ -873,7 +873,7 @@ static int find_proto(fdecl *dcl, char **cpr, char *f)
 /* get the return type */
 	    ok = split_decl(&dcl->proto, pf, FALSE);
 	
-	    ty = tokenize(pf, " \t");
+	    ty = tokenize(pf, " \t", 0);
 	    if (ty != NULL)
 	       {nt = lst_length(ty);
 
@@ -1153,7 +1153,7 @@ static void add_derived_types(char **sbi)
 	 if (blank_line(sb) == FALSE)
 	    {if (strncmp(sb, "derived ", 8) == 0)
 		 {nstrncpy(s, BFLRG, sb, -1);
-		  ta = tokenize(s, " \t");
+		  ta = tokenize(s, " \t", 0);
 		  if (ta != NULL)
 		     {add_type(ta[1], ta[2], ta[3], ta[4], ta[5]);
 		      FREE(ta[0]);
@@ -1235,7 +1235,7 @@ static void find_bind(statedes *st)
 	    {sb = sbi[ib];
 	     if (blank_line(sb) == FALSE)
 	        {nstrncpy(t, BFLRG, sb, -1);
-		 sa = tokenize(t, " \t");
+		 sa = tokenize(t, " \t", 0);
 
 		 if ((sa != NULL) && (strcmp(sa[0], "derived") != 0))
 		    {ta = NULL;
@@ -2691,7 +2691,7 @@ static int bind_module(bindes *bd)
 	        {sb = fwr[iw];
 		 if (blank_line(sb) == FALSE)
 		    {nstrncpy(t, BFLRG, sb, -1);
-		     ta = tokenize(t, " \t");
+		     ta = tokenize(t, " \t", 0);
 		     module_pre_wrap_ext(fp, sb, ta, pck);
 		     free_strings(ta);};};};
 
@@ -2724,7 +2724,7 @@ static int bind_module(bindes *bd)
 	        {sb = fwr[iw];
 		 if (blank_line(sb) == FALSE)
 		    {nstrncpy(t, BFLRG, sb, -1);
-		     ta = tokenize(t, " \t");
+		     ta = tokenize(t, " \t", 0);
 		     module_pre_wrap_full(fp, sb, ta, pck);
 		     free_strings(ta);};};};
 
@@ -3361,7 +3361,7 @@ static void py_format(char *fmt, int nc, char *spec, char *name)
     memset(fmt, 0, nc);
 
     nstrncpy(t, BFLRG, spec, -1);
-    ta = tokenize(t, ", \t\n");
+    ta = tokenize(t, ", \t\n", 0);
     if (ta != NULL)
        {pf = fmt;
         for (i = 0; ta[i] != NULL; i += 2)
@@ -3416,7 +3416,7 @@ static void py_arg(char *arg, int nc, char *spec)
        {arg[0] = '\0';
 
 	nstrncpy(t, BFLRG, spec, -1);
-	ta = tokenize(t, ", \t\n");
+	ta = tokenize(t, ", \t\n", 0);
 	if (ta != NULL)
 	   {for (i = 1; ta[i] != NULL; i += 2)
 	        vstrcat(arg, nc, "%s, ", ta[i]);
@@ -3446,7 +3446,7 @@ static void python_def_structs(FILE *fp, statedes *st)
         {sb = sbi[ib];
 	 if (blank_line(sb) == FALSE)
 	    {nstrncpy(t, BFLRG, sb, -1);
-	     sa = tokenize(t, " \t");
+	     sa = tokenize(t, " \t", 0);
 	     if ((sa != NULL) && (strcmp(sa[0], "derived") == 0))
 	        {cty = sa[1];
 		 pty = sa[4];

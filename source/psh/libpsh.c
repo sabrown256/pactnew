@@ -23,6 +23,11 @@ struct s_dir_stack
    {int n;
     char *dir[N_STACK];};
 
+typedef enum e_token_flag token_flag;
+
+enum e_token_flag
+   {NO_TOKEN = 0, EXPAND_ESC = 0x1, ADD_DELIMITER = 0x2};
+
 # endif
 
 /*--------------------------------------------------------------------------*/
@@ -382,29 +387,38 @@ int strcnts(char *s, char *r, int ex)
 /* STRCPY_NEXT - copy S into D upto the first unescaped occurence of
  *             - any character in R
  *             - features:
- *             -   1) if EX is TRUE make the copy of an escaped character
- *             -      unescaped, that is:
- *             -         "a\bc" -> "abc" or "a\\\"bc" -> "a\"bc"
- *             -      else if EX is FALSE make the copy of an escaped
- *             -      character escaped, that is:
- *             -         "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
- *             -   2) copy no more than min of ND and NS characters
- *             -   3) do not check delimiters in quoted substrings
+ *             -   1) copy no more than min of ND and NS characters
+ *             -   2) do not check delimiters in quoted substrings
  *             -      S = "a 'b;c' ; d" and R = ";"
  *             -      gives D = "a 'b;c' "
- *             -   4) return the number of characters copied from S
+ *             -   3) return the number of characters copied from S
  *             -      this can be greater than the number copied into D
  *             -      strlen will tell you how many were copied into D
  *             -      but cannot account for escaped characters from S
+ *             -   4) FLAGS it a bit array controlling additional aspects
+ *             -      of operation:
+ *             -        EXPAND_ESC     
+ *             -           if set make the copy of an escaped
+ *             -           character unescaped, that is:
+ *             -              "a\bc" -> "abc" or "a\\\"bc" -> "a\"bc"
+ *             -           otherwise make the copy of an escaped
+ *             -           character escaped, that is:
+ *             -              "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
+ *             -        ADD_DELIMITER
+ *             -           if set include the delimiter in the resultant
+ *             -           token
  */
 
-int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int ex)
-   {int in, n, nc, c;
+int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
+   {int in, n, nc, c, ex, ad;
 
     n = 0;
 
     if ((s != NULL) && (d != NULL))
-       {in = FALSE;
+       {ex = ((flags & EXPAND_ESC) != 0);
+	ad = ((flags & ADD_DELIMITER) != 0);
+
+	in = FALSE;
 	nc = strlen(s);
 	nc = min(nc, ns);
 	nc = min(nc, nd-1);
@@ -424,12 +438,89 @@ int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int ex)
                  *d++ = c;}
 
 /* copy over non-delimiting characters */
-	     else if ((strchr(r, c) == NULL) || (in == TRUE))
+	     else if ((in == TRUE) || (strchr(r, c) == NULL))
 	        *d++ = c;
 
 /* it is not escaped and it is a delimiting character */
 	     else
-	        break;};
+                {if (ad == TRUE)
+		    *d++ = c;
+		 break;};};
+
+	*d++ = '\0';};
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STRCPY_STR - copy S into D upto the first unescaped occurence of
+ *            - the string R
+ *            - features:
+ *            -   1) copy no more than min of ND and NS characters
+ *            -   2) do not check delimiters in quoted substrings
+ *            -      S = "a, 'b;c,' c," and R = "c,"
+ *            -      gives D = "a, 'b;c,' "
+ *            -   3) return the number of characters copied from S
+ *            -      this can be greater than the number copied into D
+ *            -      strlen will tell you how many were copied into D
+ *            -      but cannot account for escaped characters from S
+ *            -   4) FLAGS it a bit array controlling additional aspects
+ *            -      of operation:
+ *            -        EXPAND_ESC     
+ *            -           if set make the copy of an escaped
+ *            -           character unescaped, that is:
+ *            -              "a\bc" -> "abc" or "a\\\"bc" -> "a\"bc"
+ *            -           otherwise make the copy of an escaped
+ *            -           character escaped, that is:
+ *            -              "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
+ *            -        ADD_DELIMITER
+ *            -           if set include the delimiter in the resultant
+ *            -           token
+ */
+
+int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
+   {int in, n, nc, nr, c, ex, ad;
+
+    n = 0;
+
+    if ((s != NULL) && (d != NULL))
+       {ex = ((flags & EXPAND_ESC) != 0);
+	ad = ((flags & ADD_DELIMITER) != 0);
+
+	in = FALSE;
+	nr = strlen(r);
+	nc = strlen(s);
+	nc = min(nc, ns);
+	nc = min(nc, nd-1);
+	nc = max(nc, 0);
+	for (n = 0; n < nc; n++)
+	    {c = *s++;
+
+/* handle escaped characters */
+             if (c == '\\')
+                {if (ex == FALSE)
+		    {*d++ = c;
+		     n++;};
+                 *d++ = *s++;}
+
+	     else if ((c == '\"') || (c == '\''))
+	        {in = !in;
+                 *d++ = c;}
+
+/* copy over non-delimiting characters */
+	     else if ((in == TRUE) ||
+		      (c != r[0]) || (strncmp(r, s-1, nr) != 0))
+	        *d++ = c;
+
+/* it is not escaped and it is a delimiting string */
+	     else
+                {if (ad == TRUE)
+		    {nstrncpy(d, nd-nr, r, -1);
+		     d += nr;
+		     n += nr;
+		     n = min(n, nc);};
+		 break;};};
 
 	*d++ = '\0';};
 
@@ -508,9 +599,13 @@ char *delimited(char *s, char *bgn, char *end)
  *          - single-character delimiters DLM
  *          - the array is terminated by a NULL string
  *          - it can be released by free_strings
+ *          - FLAGS it a bit array controlling additional aspects of
+ *          - the tokenization:
+ *          -   EXPAND_ESC     
+ *          -   ADD_DELIMITER
  */
 
-char **tokenize(char *s, char *dlm)
+char **tokenize(char *s, char *dlm, int flags)
    {int i, n, nw;
     char *t, *ps, **sa;
 
@@ -521,70 +616,21 @@ char **tokenize(char *s, char *dlm)
 	t  = MAKE_N(char, nw);
 	if (t != NULL)
 	   {nstrncpy(t, nw, s, -1);
-	    if (sa == NULL)
-	       sa = MAKE_N(char *, 1000);
 
+	    sa = MAKE_N(char *, 1000);
 	    if (sa != NULL)
-#if 1
-	       {int nc, ex;
+	       {int nc;
 		char *w;
-
-		ex = FALSE;
 
 		w = MAKE_N(char, nw);
 
 		for (i = 0, ps = t; *ps != '\0'; ps++)
-                    {nc = strcpy_next(w, nw, ps, -1, dlm, ex);
+                    {nc = strcpy_next(w, nw, ps, -1, dlm, flags);
 		     if (nc > 0)
 		        {sa[i++] = STRSAVE(w);
 			 ps += nc;};};
 
 		FREE(w);};
-#else
-	       {int c, ns;
-		char *p;
-
-		for (i = 0, ps = t; ps != NULL; )
-		    {ns  = strspn(ps, dlm);
-		     ps += ns;
-
-/* find the next unescaped delimiter
- * we could use strpbrk except for escapes
- */
-		     for (p = ps; *p != '\0'; p++)
-		         {c = *p;
-			  if (c == '\\')
-			     p++;
-
-/* skip to matching quotes when we find one */
-			  else if ((c == '\"') || (c == '\''))
-			     {char dl[2];
-			      char *sb, *u;
-
-			      u = MAKE_N(char, n);
-			      nstrncpy(u, n, p, -1);
-
-			      dl[0] = c;
-			      dl[1] = '\0';
-			      sb = delimited(u, dl, dl);
-			      p += (strlen(sb) + 1);
-
-			      FREE(u);}
-
-			  else if (strchr(dlm, c) != NULL)
-			     break;};
-
-		     if (*p != '\0')
-		        {c  = *p;
-			 *p = '\0';
-			 sa[i++] = STRSAVE(ps);
-			 *p = c;
-			 ps = p + 1;}
-		     else
-		        {if (IS_NULL(ps) == FALSE)
-			    sa[i++] = STRSAVE(ps);
-			 break;};};};
-#endif
 
 	    if (sa != NULL)
 	       sa[i++] = NULL;
@@ -603,62 +649,32 @@ char **tokenize(char *s, char *dlm)
  *           - it can be released by free_strings
  */
 
-char **tokenized(char *s, char *dlm)
-   {int i, n, c, nd;
-    char *p, *t, *ps, **sa;
+char **tokenized(char *s, char *dlm, int flags)
+   {int i, n, nw;
+    char *t, *ps, **sa;
 
     sa = NULL;
     if ((s != NULL) && (dlm != NULL))
-       {nd = strlen(dlm);
-	n  = strlen(s);
-	t  = MAKE_N(char, n+100);
+       {n  = strlen(s);
+	nw = n + 100;
+	t  = MAKE_N(char, nw);
 	if (t != NULL)
-	   {nstrncpy(t, n+100, s, -1);
+	   {nstrncpy(t, nw, s, -1);
 
-	    for (i = 0, ps = t; ps != NULL; )
-	        {if (sa == NULL)
-	            sa = MAKE_N(char *, 1000);
+	    sa = MAKE_N(char *, 1000);
+	    if (sa != NULL)
+	       {int nc;
+		char *w;
 
-		 if (sa != NULL)
+		w = MAKE_N(char, nw);
 
-/* find the next unescaped delimiter
- * we could use strpbrk except for escapes
- */
-		    {for (p = ps; *p != '\0'; p++)
-		         {c = *p;
-			  if (c == '\\')
-			     p++;
+		for (i = 0, ps = t; *ps != '\0'; ps++)
+                    {nc = strcpy_str(w, nw, ps, -1, dlm, flags);
+		     if (nc > 0)
+		        {sa[i++] = STRSAVE(w);
+			 ps += nc;};};
 
-/* skip to matching quotes when we find one */
-			  else if ((c == '\"') || (c == '\''))
-			     {char dl[2];
-			      char *sb, *u;
-
-			      u = MAKE_N(char, n);
-			      nstrncpy(u, n, p, -1);
-
-			      dl[0] = c;
-			      dl[1] = '\0';
-			      sb = delimited(u, dl, dl);
-			      p += (strlen(sb) + 1);
-
-			      FREE(u);}
-
-			  else if ((c == dlm[0]) &&
-				   (strncmp(p, dlm, nd) == 0))
-			     break;};
-
-		     if (*p != '\0')
-		        {c  = *p;
-			 *p = '\0';
-			 if (IS_NULL(ps) == FALSE)
-			    sa[i++] = STRSAVE(ps);
-			 *p = c;
-			 ps = p + nd;}
-		     else
-		        {if (IS_NULL(ps) == FALSE)
-			    sa[i++] = STRSAVE(ps);
-			 break;};};};
+		FREE(w);};
 
 	    if (sa != NULL)
 	       sa[i++] = NULL;
@@ -1060,7 +1076,7 @@ char *path_simplify(char *s, int dlm)
 
     d[0] = '\0';
 
-    sa = tokenize(s, " :");
+    sa = tokenize(s, " :", 0);
     
     if (sa != NULL)
        {nstrncpy(d, BFLRG, sa[0], -1);
@@ -1610,7 +1626,7 @@ char **cenv(int sort, char **rej)
     char *p, *s, *bf, **ta;
 
     bf = run(FALSE, "env");
-    ta = tokenize(bf, "\n");
+    ta = tokenize(bf, "\n", 0);
     if (ta != NULL)
        {n = lst_length(ta);
 

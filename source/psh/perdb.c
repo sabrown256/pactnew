@@ -300,7 +300,7 @@ static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
 
 /* options */
     if (strchr(s, ':') != NULL)
-       {opt = tokenize(s, ":");
+       {opt = tokenize(s, ":", 0);
 	no  = lst_length(opt);
 	lo  = 0;
 
@@ -357,7 +357,7 @@ static char *do_save(database *db, char *s)
 
     _parse_db_spec(s, &p, &fname, &fmt, &opt, &var);
 
-    var = tokenize(p, " \t\n\f");
+    var = tokenize(p, " \t\n\f", 0);
     if ((var != NULL) && (var[0] == NULL))
        {free_strings(var);
         var = NULL;};
@@ -525,7 +525,7 @@ static char **do_var_acc(database *db, char *s)
 	u  = t + ns;
 	*u++ = '\0';
 	dlm = STRSAVE(t);
-	sa = tokenized(u, dlm);
+	sa = tokenized(u, dlm, 0);
 	FREE(dlm);}
 
 /* single-character delimiter */
@@ -538,7 +538,7 @@ static char **do_var_acc(database *db, char *s)
 	else
 	   dl[0] = '^';
 	dl[1] = '\0';
-	sa = tokenize(s, dl);};
+	sa = tokenize(s, dl, 0);};
 
 /* process list of accesses */
     val = NULL;

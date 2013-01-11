@@ -1036,7 +1036,25 @@ char *SC_ntok(char *d, int nc, char *s, int n, char *delim)
 char **SC_tokenize(char *s, char *delim)
    {char **sa;
 
-    sa = PS_tokenize(s, delim);
+    sa = PS_tokenize(s, delim, 0);
+
+    return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_TOKENIZEF - return an array of strings obtained by
+ *              - tokenizing the string S according to the delimiters DELIM
+ *              - the array is terminated by a NULL string
+ *              - it can be released by SC_free_strings
+ *              - FLAGS is a bit array controlling additional aspects
+ *              - of the tokenization process
+ */
+
+char **SC_tokenizef(char *s, char *delim, int flags)
+   {char **sa;
+
+    sa = PS_tokenize(s, delim, flags);
 
     return(sa);}
 

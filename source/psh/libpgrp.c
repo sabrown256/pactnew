@@ -1321,7 +1321,7 @@ static void parse_pgrp(statement *s)
     ios   = NULL;
 
     ta = NULL;
-    sa = tokenize(s->text, " \t\n\r\f");
+    sa = tokenize(s->text, " \t\n\r\f", 0);
 
     sa = subst_syntax(sa);
     nc = lst_length(sa);

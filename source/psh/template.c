@@ -128,7 +128,7 @@ template *make_template(char *proto, int nl, char **body,
     LAST_CHAR(args) = '\0';
 
 /* get the function name */
-    sa = tokenize(p, " \t\n\r");
+    sa = tokenize(p, " \t\n\r", 0);
     for (n = 0; sa[n] != NULL; n++);
     fname = sa[--n];
 

@@ -392,11 +392,11 @@ static int write_class_pco(client *cl, FILE *out, char *clss, char *ctype,
 
 	 if (global == TRUE)
 	    {t  = dbget(cl, FALSE, "Globals");
-	     sa = tokenize(t, " \t\n\r");}
+	     sa = tokenize(t, " \t\n\r", 0);}
          else
 	    {fprintf(out, "%s%s %s {\n", ind, ctype, c);
 	     t  = run(BOTH, "env | egrep '^%s_' | sort", c);
-	     sa = tokenize(t, "\n\r");};
+	     sa = tokenize(t, "\n\r", 0);};
 
 	 if (sa != NULL)
 	    {for (n = 0; sa[n] != NULL; n++);
@@ -509,11 +509,11 @@ static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
 
 	 if (global == TRUE)
 	    {t  = dbget(cl, FALSE, "Globals");
-	     sa = tokenize(t, " \t\n\r");}
+	     sa = tokenize(t, " \t\n\r", 0);}
          else
 	    {fprintf(out, "%s'%s:%s_pact' => {\n", ind, ctype, c);
 	     t  = run(BOTH, "env | egrep '^%s_' | sort", c);
-	     sa = tokenize(t, "\n\r");};
+	     sa = tokenize(t, "\n\r", 0);};
 
 	 if (sa != NULL)
 	    {for (n = 0; sa[n] != NULL; n++);
@@ -695,7 +695,7 @@ static void add_spec_env_vars(client *cl,
     char *p, *v, *var, **va;
 
     var = cgetenv(TRUE, "ENV_VARS");
-    va  = tokenize(var, " :");
+    va  = tokenize(var, " :", 0);
     nv  = (va != NULL) ? lst_length(va) : 0;
     for (iv = 0; iv < nv; iv++)
 
@@ -1088,7 +1088,7 @@ static void parse_opt(client *cl, char *s, int nc)
     char vr[BFLRG], op[BFLRG], vl[BFLRG];
     char *t, *avl, *arg, *opt, **sa;
 
-    sa = tokenize(s, "[;]\n\r");
+    sa = tokenize(s, "[;]\n\r", 0);
     if (sa != NULL)
        {for (n = 0; sa[n] != NULL; n++);
 
@@ -1529,7 +1529,7 @@ static void default_var(client *cl, char *base)
     unamef(st.hw,    BFLRG, "m");
 
 /* remove parens from osrel - it is bad for the shells later on */
-    sa = tokenize(st.osrel, "()");
+    sa = tokenize(st.osrel, "()", 0);
     concatenate(st.osrel, BFLRG, sa, ",");
     free_strings(sa);
 
