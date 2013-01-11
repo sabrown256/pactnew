@@ -1423,7 +1423,7 @@ process *job_launch(char *cmd, char *mode, void *a)
 
     pp = NULL;
 
-    argv = tokenize(cmd, " \t");
+    argv = tokenize(cmd, " \t", 0);
     if (argv != NULL)
        {_job_setup_proc(&pp, &cp, argv, NULL, NULL);
 	pp = _job_fork(pp, cp, mode, a);
