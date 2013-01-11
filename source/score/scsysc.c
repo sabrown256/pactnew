@@ -1609,14 +1609,20 @@ static tasklst *_SC_make_tasklst(char *shell, char *cmd)
 /* tokenize the command to facilitate looking for simple commands */
 
 #if 0
+
 /* this one takes the delimiter off */
-    ta = SC_tokenizef(s, " \t\n\r", ADD_DELIMITER);
+    ta = SC_tokenizef(s, " \t\n\r", ADD_DELIMITER | EXPAND_ESC);
+    SC_ptr_arr_len(na, ta);
+    for (n = 0; n < na; n++)
+        SC_LAST_CHAR(ta[n]) = '\n';
 
 #else
+
 /* this one leaves the delimiter on which is needed to distinguish
  * the newlines from other delimiters
  */
     ta = SC_tokenize_literal(s, " \t\n\r", TRUE, 3);
+
 #endif
 
     SC_ptr_arr_len(na, ta);
@@ -1630,7 +1636,6 @@ static tasklst *_SC_make_tasklst(char *shell, char *cmd)
  */
     for (nt = na, n = 0; n < na; n++)
         nt += PS_strcnts(ta[n], ";\n", FALSE);
-/*        nt += strcmp(ta[n], ";\n") == 0); */
 
     sub = CMAKE_N(subtask, 2*nt);
 

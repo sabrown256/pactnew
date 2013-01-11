@@ -447,6 +447,8 @@ int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 		    *d++ = c;
 		 break;};};
 
+	if (ad == TRUE)
+	   *d++ = r[0];
 	*d++ = '\0';};
 
     return(n);}
@@ -522,6 +524,8 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 		     n = min(n, nc);};
 		 break;};};
 
+	if (ad == TRUE)
+	   *d++ = ' ';
 	*d++ = '\0';};
 
     return(n);}
