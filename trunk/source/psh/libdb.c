@@ -406,19 +406,21 @@ char *put_db(database *db, char *var, char *val)
 /* _PUSH_COL - push a character collection delimited by CB,CE onto D */
 
 static void _push_col(char **pd, char **ps, int cb, int ce)
-   {char *s, *d;
+   {int nc;
+    char dlm[2];
+    char *s, *d;
 
     s = *ps;
     d = *pd;
 
     *d++ = cb;
-    for (*d++ = *s++; *s != ce; *d++ = *s++)
-        {if (*s == '\\')
-            s++;};
-    *d++ = *s++;
 
-    *ps = s;
-    *pd = d;
+    dlm[0] = ce;
+    dlm[1] = '\0';
+    nc = strcpy_next(d, -1, s, -1, dlm, ADD_DELIMITER);
+
+    *ps = s + nc;
+    *pd = d + strlen(d);
 
     return;}
 
