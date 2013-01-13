@@ -408,8 +408,17 @@ int strcnts(char *s, char *r, int ex)
  *             -           character escaped, that is:
  *             -              "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
  *             -        ADD_DELIMITER
- *             -           if set include the delimiter in the resultant
- *             -           token
+ *             -           if set include the end delimiter in the
+ *             -           resultant string D
+ *             -        TRANSPARENT_QUOTES
+ *             -           if set treat quoted substrings as transparent
+ *             -           and look at the characters inside them
+ *             -           otherwise treat them as opaque and copy them
+ *             -           to D without looking at the characters inside
+ *             -   5) this is designed to handle things like:
+ *             -         "(a\(bc\)de)" + ")" -> "(a\(bc\)de"
+ *             -      but not searches for matching delimiters
+ *             -         "(a(bc)de)" + ")" -> "(a(bc)de)"
  */
 
 int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
@@ -494,18 +503,33 @@ int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
  *            -        ADD_DELIMITER
  *            -           if set include the delimiter in the resultant
  *            -           token
+ *            -        TRANSPARENT_QUOTES
+ *            -           if set treat quoted substrings as transparent
+ *            -           and look at the characters inside them
+ *            -           otherwise treat them as opaque and copy them
+ *            -           to D without looking at the characters inside
+ *            -   5) this is designed to handle things like:
+ *            -         "(a\(be\)de)" + "e)" -> "(a\(be\)d"
+ *            -      but not searches for matching delimiters
+ *            -         "(a(be)de)" + "e)" -> "(a(be)de)"
  */
 
 int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
-   {int in, n, nc, nr, c, ex, ad;
+   {int ins, ind, n, nc, nr, c, ex, ad, tr;
 
     n = 0;
 
     if ((s != NULL) && (d != NULL))
        {ex = ((flags & EXPAND_ESC) != 0);
 	ad = ((flags & ADD_DELIMITER) != 0);
+	tr = ((flags & TRANSPARENT_QUOTES) != 0);
 
-	in = FALSE;
+/* quotes must be transparent if they are delimiters */
+	tr |= ((strchr(r, '\"') != NULL) || (strchr(r, '\'') != NULL));
+
+	ins = FALSE;
+	ind = FALSE;
+
 	nr = strlen(r);
 	nc = strlen(s);
 	nc = min(nc, ns);
@@ -521,12 +545,17 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 		     n++;};
                  *d++ = *s++;}
 
-	     else if ((c == '\"') || (c == '\''))
-	        {in = !in;
+/* arrange to skip over quoted substrings - making them opaque */
+	     else if ((tr == FALSE) && (c == '\"'))
+	        {ind  = !ind;
+                 *d++ = c;}
+
+	     else if ((tr == FALSE) && (c == '\''))
+	        {ins  = !ins;
                  *d++ = c;}
 
 /* copy over non-delimiting characters */
-	     else if ((in == TRUE) ||
+	     else if ((ins == TRUE) || (ind == TRUE) ||
 		      (c != r[0]) || (strncmp(r, s-1, nr) != 0))
 	        *d++ = c;
 
