@@ -1,0 +1,16 @@
+#
+# test handling of very nested escaped quotes
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+CB = -DB=\\\"b\\\"
+
+all : 
+	@rm -f log.all
+	@touch log.all
+	@(echo "echo CA=a CB=\"$(CB)\" CC=1" ; \
+          echo CA=a CB=\"$(CB)\" CC=1) >> log.all 2>&1
+	@if [ $$? -eq 0 ] ; then echo "ok"; else echo "ng"; fi
+	cat log.all

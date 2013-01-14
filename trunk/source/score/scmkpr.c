@@ -1052,8 +1052,9 @@ void SC_free_state(anadep *state)
  */
 
 int SC_parse_makefile(anadep *state, char *fname)
-   {int i, nb, rv, ok, st;
-    char *s, *peq, *pcl, *t, *pt;
+   {int i, na, nb, rv, ok, st;
+    char *s, *pcl, *t, *pt;
+    char **sa;
     FILE *fp;
     ruledef a;
     vardef v;
@@ -1108,8 +1109,14 @@ int SC_parse_makefile(anadep *state, char *fname)
 				  pt, fname, i);}
 
 		 else
-		    {peq = strchr(s, '=');
-		     if (peq != NULL)
+		    {sa = SC_tokenize(s, " \t");
+		     if (sa == NULL)
+		        SC_error(-1, "syntax error on line %d: %s\n", i, s);
+		     SC_ptr_arr_len(na, sa);
+		     ok = ((strchr(sa[0], '=') != NULL) ||
+			   ((na > 1) && (sa[1][0] == '=')));
+
+		     if (ok == TRUE)
 		        {_SC_end_rule(&a, state);
 			 _SC_end_var(&v, state);
 			 _SC_start_var(&v, s, i);}
@@ -1129,7 +1136,9 @@ int SC_parse_makefile(anadep *state, char *fname)
 
 			 else
 			    {io_printf(state->log, "Syntax error in line %d\n", i);
-			     break;};};};};
+			     break;};};
+
+		     SC_free_strings(sa);};};
 
 	    _SC_end_rule(&a, state);
 	    _SC_end_var(&v, state);
