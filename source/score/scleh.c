@@ -185,12 +185,14 @@ static int _SC_leh_ena_raw(int fd)
 			     IXON,    SC_TERM_INPUT,     FALSE,
 			     OPOST,   SC_TERM_OUTPUT,    FALSE,
 			     ICANON,  SC_TERM_LOCAL,     FALSE,
-			     ECHO,    SC_TERM_LOCAL,     FALSE,
 			     IEXTEN,  SC_TERM_LOCAL,     FALSE,
 			     ISIG,    SC_TERM_LOCAL,     FALSE,
 			     CS8,     SC_TERM_CONTROL,   TRUE,
-			     VMIN,    SC_TERM_CHAR,      1,
+#ifndef MACOSX
+			     ECHO,    SC_TERM_LOCAL,     FALSE,
 			     VTIME,   SC_TERM_CHAR,      0,
+#endif
+			     VMIN,    SC_TERM_CHAR,      1,
 			     0);};
 
     if (rv == TRUE)
@@ -962,9 +964,24 @@ void SC_leh_vi_mode(void)
 
 static char *_SC_leh_gets(lehloc *lp)
    {int nr, nc, fd, ok;
+    int cr, lf;
     char bf[2];
     char *rv;
     PFlehact *map;
+
+/* GOTCHA: strange behavior in raw mode
+ * on linux "a\n" -> "a\r"  (yes - carriage return!!!)
+ *          "\n"  -> "\n"
+ * on osx   "a\n" -> "a\n"
+ *          "\n"  -> "\n"
+ */
+#ifdef MACOS
+    lf = 0;
+    cr = CTRL_J;
+#else
+    lf = CTRL_J;
+    cr = CTRL_M;
+#endif
 
     if ((trace == TRUE) && (fdbg == NULL))
        fdbg = fopen("log.keys", "w");
@@ -988,6 +1005,7 @@ static char *_SC_leh_gets(lehloc *lp)
 
     while (ok == TRUE)
        {nr = _SC_leh.read(fd, bf, 1);
+
         if (nr <= 0)
 	   break;
 
@@ -1021,20 +1039,32 @@ static char *_SC_leh_gets(lehloc *lp)
 		    nc, map[lp->c],
 		    (long) lp->pos, _SC_leh.nh);
 	    fflush(fdbg);};
-
+/*
+printf("\n\rgets> '%c' (%02x)  %d\n\r", lp->c, lp->c, lp->len);
+fflush(stdout);
+*/
 /* if we get a single character line consisting of a linefeed
- * map it to a space and get out of the loop
+ * return an empty line
  * this is essential for 'mpi-io-wrap <code>'
  * for codes such as basis which do their own line editing
  */
-	if (lp->c == CTRL_J)
-	   {lp->bf[0] = ' ';
-            lp->bf[1] = '\0';
+	if ((lp->c == lf) && (lp->len == 1))
+	   {lp->bf[0] = '\0';
+	    lp->len = 0;
+/* printf("linefeed and length = 1\n\r"); */
 	    rv = lp->bf;
             ok = FALSE;}
 
+/* only MACOS gets into this clause */
+	else if (lp->c == lf)
+	   {lp->len--;
+	    lp->bf[lp->len] = '\0';
+	    rv = lp->bf;
+/* printf("linefeed and length > 1\n\r"); */
+            ok = FALSE;}
+
 /* the line is complete when we get carriage return period */
-	else if (lp->c == CTRL_M)
+	else if (lp->c == cr)
 	   {rv = lp->bf;
 	    ok = FALSE;}
 

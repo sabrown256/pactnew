@@ -1138,10 +1138,14 @@ static int _SC_match_delim(char **ppi, char **ppo, int oc, int cc)
     for (c = *pi++; (level > 0) && (c != '\0'); c = *pi++)
         {*po++ = c;
 	 if (c == '\\')
-	    c = *pi++;
+	    {c = *pi++;
+
+/* put escaped quotes and delimiters on PO rather than match them below */
+	     if ((c == '\"') || (c == '\'') || (c == oc) || (c == cc))
+	        *po++ = c;}
 
 /* skip past quoted substrings */
-	 if ((c == '\"') || (c == '\''))
+	 else if ((c == '\"') || (c == '\''))
 	    _SC_match_quote(&pi, &po, c, po, NULL);
 
 	 else if (c == oc)
