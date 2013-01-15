@@ -177,14 +177,28 @@ int comm_read(client *cl, char *s, int nc, int to)
     if (cl->type == SERVER)
        nb = _comm_read_wrk(cl, s, nc, to);
     else
-       {char u[BFLRG];
+       {int nz, nzx, dt, tl;
+	char u[BFLRG];
 
-	for (nb = 0; nb == 0; )
+	tl  = 0;
+	dt  = 10;
+	nzx = (1000*to)/dt;
+        nzx = max(nzx, 2);
+
+	for (nz = 0, nb = 0; (nb == 0) && (nz < nzx); )
 	    {nb = ring_pop(&cl->ior, s, nc, '\0');
 	     if (nb == 0)
 	        {memset(u, 0, BFLRG);
-		 nt = _comm_read_wrk(cl, u, BFLRG, to);
-		 ok = ring_push(&cl->ior, u, nt);};};};
+		 nt = _comm_read_wrk(cl, u, BFLRG, tl);
+		 ok = ring_push(&cl->ior, u, nt);
+	         if (nt <= 0)
+		    {nz++;
+		     nsleep(dt);}
+	         else
+		    nz = 0;};};
+
+	if ((nb == 0) && (nz >= nzx))
+	   return(-1);};
 
     if (cl->cauth != NULL)
        ok = cl->cauth(cl, nb, s, NULL);

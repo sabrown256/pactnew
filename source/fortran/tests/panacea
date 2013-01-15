@@ -10,7 +10,6 @@
 
 source ../../tests/common
 
-
 set msg = "PANACEA API Test ..................."
 set exe = $BinDir/tpath
 set opt = ( -c 2 )

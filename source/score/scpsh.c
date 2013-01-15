@@ -219,7 +219,7 @@
 #define strclean 		PS_strclean
 #define strcntc                 PS_strcntc
 #define strcnts                 PS_strcnts
-#define strcpy_next             PS_strcpy_next
+#define strcpy_tok              PS_strcpy_tok
 #define string_sort 		PS_string_sort
 #define strings_file 		PS_strings_file
 #define strip_quote 		PS_strip_quote

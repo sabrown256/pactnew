@@ -1086,7 +1086,7 @@ static void _SC_match_quote(char **ppi, char **ppo, int qc,
     s  = CMAKE_N(char, n+1);
     pi = *ppi;
 
-    nc  = PS_strcpy_next(s, n+1, pi, -1, dlm, TRANSPARENT_QUOTES);
+    nc  = PS_strcpy_tok(s, n+1, pi, -1, NULL, dlm, TRANSPARENT_QUOTES);
     pi += (nc + 1);
     n   = strlen(s);
 
@@ -1173,8 +1173,8 @@ static int _SC_match_delim(char **ppi, char **ppo, int oc, int cc)
  */
 
 char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
-   {int c, n, front, more;
-    char *bf, *pi, *po, *t, *u, *sb, **sa;
+   {int c, n;
+    char *pi, *t, **sa;
     SC_array *arr;
 
     t = CSTRSAVE(s);
@@ -1186,8 +1186,21 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
     arr = SC_STRING_ARRAY();
     SC_array_resize(arr, n/2, -1.0);
 
-    bf   = CMAKE_N(char, MAX_BFSZ);
-    pi   = t;
+    pi = t;
+
+#if 1
+
+/* NOTE: this does
+ *     'echo "ok"' -> 'echo "ok"'
+ *     'echo b"c"  -> 'echo bc'
+ */
+
+    int front, more;
+    char *bf, *po, *u, *sb;
+
+    bf = CMAKE_N(char, MAX_BFSZ);
+    po = bf;
+
     more = TRUE;
     while (more)
 
@@ -1250,16 +1263,101 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
 
 /* end of input string */
 	     else if (c == '\0')
-	       {sb   = NULL;
-		more = FALSE;
-	        break;};};
+	        {sb   = NULL;
+		 more = FALSE;
+		 break;};};
 
 	SC_array_string_add(arr, sb);};
 
-    CFREE(t);
     CFREE(bf);
 
+# ifdef DEBUG
+  char **ta;
+  ta = SC_array_done(arr);
+# endif
+
+#else
+
+# ifdef DEBUG
+  t = CSTRSAVE(s);
+  pi = t;
+  arr = SC_STRING_ARRAY();
+  SC_array_resize(arr, n/2, -1.0);
+# endif
+
+/* NOTE: this does
+ *     'echo "ok"' -> 'echo "ok"'
+ *     'echo b"c"  -> 'echo b"c"'
+ * or
+ *     'echo "ok"' -> 'echo ok'
+ *     'echo b"c"  -> 'echo bc'
+ * depending on FLAGS
+ * not the same as other coding
+ */
+
+    int i, nw, ni, flags;
+    char *w;
+
+    flags = EXPAND_ESC | REMOVE_QUOTES;
+    flags = EXPAND_ESC;
+
+    nw = n + 100;
+    w  = CMAKE_N(char, nw);
+    w[0] = '\0';
+
+    for (i = 0, c = *pi; (c != '\0') && (i < n); c = *pi++, i++)
+
+/* treat ';' specially - it must be its own token */
+        {if (c == ';')
+	    {strcpy(w, ";");
+	     ni = 1;}
+
+	 else
+
+/* look for strings with " or ' as the delimiter */
+	    {if ((c == '\"') && ((qu & 1) != 0))
+	        ni = PS_strcpy_tok(w, nw, pi, -1, "\"", "\"", flags);
+
+	     else if ((c == '\'') && ((qu & 2) != 0))
+	        ni = PS_strcpy_tok(w, nw, pi, -1, "'", "'", flags);
+	        
+/* look for strings with {}, [], or () as the delimiter */
+	     else if ((c == '{') || (c == '[') || (c == '('))
+	        ni = PS_strcpy_tok(w, nw, pi, -1, "{[(", "}])", flags);
+
+	     else
+	        ni = PS_strcpy_tok(w, nw, pi, -1, NULL, delim, flags);};
+
+	 if (ni > 0)
+	    {pi += ni;
+	     if ((w[0] != ';') && (SC_LAST_CHAR(w) == ';'))
+	        {SC_LAST_CHAR(w) = '\n';
+		 SC_array_string_add_copy(arr, w);
+		 strcpy(w, ";\n");}
+	     else
+	        SC_strcat(w, nw, "\n");
+	     SC_array_string_add_copy(arr, w);};};
+
+    CFREE(w);
+
+#endif
+
+    CFREE(t);
+
     sa = SC_array_done(arr);
+
+#ifdef DEBUG
+int na, nb;
+SC_ptr_arr_len(na, ta);
+SC_ptr_arr_len(nb, sa);
+if (na != nb)
+   printf("-> number of tokens differ: %d and %d\n", na, nb);
+n = min(na, nb);
+for (i = 0; i < n; i++)
+    {if (strcmp(ta[i], sa[i]) != 0)
+        {printf("-> a %3d: |%s|\n", i, ta[i]);
+	 printf("-> b %3d: |%s|\n", i, sa[i]);};};
+#endif
 
     return(sa);}
 
