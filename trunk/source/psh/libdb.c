@@ -417,7 +417,7 @@ static void _push_col(char **pd, char **ps, int cb, int ce)
 
     dlm[0] = ce;
     dlm[1] = '\0';
-    nc = strcpy_next(d, -1, s, -1, dlm, ADD_DELIMITER);
+    nc = strcpy_tok(d, -1, s, -1, NULL, dlm, ADD_DELIMITER);
 
     *ps = s + nc;
     *pd = d + strlen(d);

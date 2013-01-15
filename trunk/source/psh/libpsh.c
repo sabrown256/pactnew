@@ -17,19 +17,20 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
+enum e_token_flag
+   {NO_TOKEN           = 0,
+    EXPAND_ESC         = 0x1,
+    ADD_DELIMITER      = 0x2,
+    TRANSPARENT_QUOTES = 0x4,
+    REMOVE_QUOTES      = 0x8};
+
+typedef enum e_token_flag token_flag;
+
 typedef struct s_dir_stack dir_stack;
 
 struct s_dir_stack
    {int n;
     char *dir[N_STACK];};
-
-typedef enum e_token_flag token_flag;
-
-enum e_token_flag
-   {NO_TOKEN           = 0,
-    EXPAND_ESC         = 0x1,
-    ADD_DELIMITER      = 0x2,
-    TRANSPARENT_QUOTES = 0x4};
 
 # endif
 
@@ -387,42 +388,48 @@ int strcnts(char *s, char *r, int ex)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* STRCPY_NEXT - copy S into D upto the first unescaped occurence of
- *             - any character in R
- *             - features:
- *             -   1) copy no more than min of ND and NS characters
- *             -   2) do not check delimiters in quoted substrings
- *             -      S = "a 'b;c' ; d" and R = ";"
- *             -      gives D = "a 'b;c' "
- *             -   3) return the number of characters copied from S
- *             -      this can be greater than the number copied into D
- *             -      strlen will tell you how many were copied into D
- *             -      but cannot account for escaped characters from S
- *             -   4) FLAGS it a bit array controlling additional aspects
- *             -      of operation:
- *             -        EXPAND_ESC     
- *             -           if set make the copy of an escaped
- *             -           character unescaped, that is:
- *             -              "a\bc" -> "abc" or "a\\\"bc" -> "a\"bc"
- *             -           otherwise make the copy of an escaped
- *             -           character escaped, that is:
- *             -              "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
- *             -        ADD_DELIMITER
- *             -           if set include the end delimiter in the
- *             -           resultant string D
- *             -        TRANSPARENT_QUOTES
- *             -           if set treat quoted substrings as transparent
- *             -           and look at the characters inside them
- *             -           otherwise treat them as opaque and copy them
- *             -           to D without looking at the characters inside
- *             -   5) this is designed to handle things like:
- *             -         "(a\(bc\)de)" + ")" -> "(a\(bc\)de"
- *             -      but not searches for matching delimiters
- *             -         "(a(bc)de)" + ")" -> "(a(bc)de)"
+/* _STRCPY_NEXT - copy S into D upto the first unescaped occurence of
+ *              - any character in R
+ *              - features:
+ *              -   1) copy no more than min of ND and NS characters
+ *              -   2) do not check delimiters in quoted substrings
+ *              -      S = "a 'b;c' ; d" and R = ";"
+ *              -      gives D = "a 'b;c' "
+ *              -   3) return the number of characters copied from S
+ *              -      this can be greater than the number copied into D
+ *              -      strlen will tell you how many were copied into D
+ *              -      but cannot account for escaped characters from S
+ *              -   4) FLAGS it a bit array controlling additional aspects
+ *              -      of operation:
+ *              -        EXPAND_ESC     
+ *              -           if set make the copy of an escaped
+ *              -           character unescaped, that is:
+ *              -              "a\bc" -> "abc" or "a\\\"bc" -> "a\"bc"
+ *              -           otherwise make the copy of an escaped
+ *              -           character escaped, that is:
+ *              -              "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
+ *              -        ADD_DELIMITER
+ *              -           if set include the end delimiter in the
+ *              -           resultant string D
+ *              -              "a b;" with " ;" -> "a " and "b;"
+ *              -        TRANSPARENT_QUOTES
+ *              -           if set treat quoted substrings as transparent
+ *              -           and look at the characters inside them
+ *              -           otherwise treat them as opaque and copy them
+ *              -           to D without looking at the characters inside
+ *              -        REMOVE_QUOTES
+ *              -           if set do not copy quote characters into D
+ *              -           otherwise do copy them into D
+ *              -              "ab'cd'ef" -> "abcdef"
+ *              -   5) this is designed to handle things like:
+ *              -         "(a\(bc\)de)" + ")" -> "(a\(bc\)de"
+ *              -      but not searches for matching delimiters
+ *              -         "(a(bc)de)" + ")" -> "(a(bc)de)"
  */
 
-int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
-   {int ins, ind, n, nc, c, ex, ad, tr;
+static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
+			char *r, int flags)
+   {int ins, ind, n, nc, c, ex, ad, tr, rq;
 
     n = 0;
 
@@ -430,6 +437,7 @@ int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
        {ex = ((flags & EXPAND_ESC) != 0);
 	ad = ((flags & ADD_DELIMITER) != 0);
 	tr = ((flags & TRANSPARENT_QUOTES) != 0);
+	rq = ((flags & REMOVE_QUOTES) != 0);
 
 /* quotes must be transparent if they are delimiters */
 	tr |= ((strchr(r, '\"') != NULL) || (strchr(r, '\'') != NULL));
@@ -447,18 +455,20 @@ int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 /* handle escaped characters */
              if (c == '\\')
                 {if (ex == FALSE)
-		    {*d++ = c;
-		     n++;};
-                 *d++ = *s++;}
+		    *d++ = c;
+                 *d++ = *s++;
+		 n++;}
 
 /* arrange to skip over quoted substrings - making them opaque */
 	     else if ((tr == FALSE) && (c == '\"'))
-	        {ind  = !ind;
-                 *d++ = c;}
+	        {ind = !ind;
+                 if (rq == FALSE)
+		    *d++ = c;}
 
 	     else if ((tr == FALSE) && (c == '\''))
-	        {ins  = !ins;
-                 *d++ = c;}
+	        {ins = !ins;
+                 if (rq == FALSE)
+		    *d++ = c;}
 
 /* copy over non-delimiting characters */
 	     else if ((ins == TRUE) || (ind == TRUE) ||
@@ -508,6 +518,10 @@ int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
  *            -           and look at the characters inside them
  *            -           otherwise treat them as opaque and copy them
  *            -           to D without looking at the characters inside
+ *            -        REMOVE_QUOTES
+ *            -           if set do not copy quote characters into D
+ *            -           otherwise do copy them into D
+ *            -              "ab'cd'ef" -> "abcdef"
  *            -   5) this is designed to handle things like:
  *            -         "(a\(be\)de)" + "e)" -> "(a\(be\)d"
  *            -      but not searches for matching delimiters
@@ -515,7 +529,7 @@ int strcpy_next(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
  */
 
 int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
-   {int ins, ind, n, nc, nr, c, ex, ad, tr;
+   {int ins, ind, n, nc, nr, c, ex, ad, tr, rq;
 
     n = 0;
 
@@ -523,6 +537,7 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
        {ex = ((flags & EXPAND_ESC) != 0);
 	ad = ((flags & ADD_DELIMITER) != 0);
 	tr = ((flags & TRANSPARENT_QUOTES) != 0);
+	rq = ((flags & REMOVE_QUOTES) != 0);
 
 /* quotes must be transparent if they are delimiters */
 	tr |= ((strchr(r, '\"') != NULL) || (strchr(r, '\'') != NULL));
@@ -541,18 +556,20 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 /* handle escaped characters */
              if (c == '\\')
                 {if (ex == FALSE)
-		    {*d++ = c;
-		     n++;};
-                 *d++ = *s++;}
+		    *d++ = c;
+                 *d++ = *s++;
+		 n++;}
 
 /* arrange to skip over quoted substrings - making them opaque */
 	     else if ((tr == FALSE) && (c == '\"'))
-	        {ind  = !ind;
-                 *d++ = c;}
+	        {ind = !ind;
+                 if (rq == FALSE)
+		    *d++ = c;}
 
 	     else if ((tr == FALSE) && (c == '\''))
-	        {ins  = !ins;
-                 *d++ = c;}
+	        {ins = !ins;
+                 if (rq == FALSE)
+		    *d++ = c;}
 
 /* copy over non-delimiting characters */
 	     else if ((ins == TRUE) || (ind == TRUE) ||
@@ -573,6 +590,143 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 	*d++ = '\0';};
 
     return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _STRCPY_BAL - copy S into D upto the first unescaped occurence of
+ *             - any character in B and E that is not balanced
+ *             - features:
+ *             -   1) copy no more than min of ND and NS characters
+ *             -   2) do not check delimiters in quoted substrings
+ *             -      S = "(a '(bc)' d)efg" and B = "(" and E = ")"
+ *             -      gives D = "(a '(bc)' d)"
+ *             -   3) return the number of characters copied from S
+ *             -      this can be greater than the number copied into D
+ *             -      strlen will tell you how many were copied into D
+ *             -      but cannot account for escaped characters from S
+ *             -   4) FLAGS it a bit array controlling additional aspects
+ *             -      of operation:
+ *             -        EXPAND_ESC     
+ *             -           if set make the copy of an escaped
+ *             -           character unescaped, that is:
+ *             -              "a\bc" -> "abc" or "a\\\"bc" -> "a\"bc"
+ *             -           otherwise make the copy of an escaped
+ *             -           character escaped, that is:
+ *             -              "a\bc" -> "a\bc" or "a\\\"bc" -> "a\\\"bc"
+ *             -        ADD_DELIMITER
+ *             -           if set include the end delimiter in the
+ *             -           resultant string D
+ *             -        TRANSPARENT_QUOTES
+ *             -           if set treat quoted substrings as transparent
+ *             -           and look at the characters inside them
+ *             -           otherwise treat them as opaque and copy them
+ *             -           to D without looking at the characters inside
+ *             -        REMOVE_QUOTES
+ *             -           if set do not copy quote characters into D
+ *             -           otherwise do copy them into D
+ *             -              "ab'cd'ef" -> "abcdef"
+ *             -   5) this is designed to handle matching delimiters
+ *             -         "(a(bc)de)" + ")" -> "(a(bc)de)"
+ *             -      but not searches for things like:
+ *             -         "(a\(bc\)de)" + ")" -> "(a\(bc\)de"
+ */
+
+static int _strcpy_bal(char *d, size_t nd, char *s, size_t ns,
+		       char *b, char *e, int flags)
+   {int ins, ind, lev, n, nc, c, ex, ad, tr, rq;
+
+    n = 0;
+
+    if ((s != NULL) && (d != NULL))
+       {ex = ((flags & EXPAND_ESC) != 0);
+	ad = ((flags & ADD_DELIMITER) != 0);
+	tr = ((flags & TRANSPARENT_QUOTES) != 0);
+	rq = ((flags & REMOVE_QUOTES) != 0);
+
+/* quotes must be transparent if they are delimiters */
+	tr |= ((strchr(b, '\"') != NULL) || (strchr(b, '\'') != NULL));
+	tr |= ((strchr(e, '\"') != NULL) || (strchr(e, '\'') != NULL));
+
+	ins = FALSE;
+	ind = FALSE;
+
+	nc = strlen(s);
+	nc = min(nc, ns);
+	nc = min(nc, nd-1);
+	nc = max(nc, 0);
+
+/* start lev properly
+ *   "(a b c)" with b = "(" should have lev = 0
+ *   "a b c)" with b = "(" should have lev = 1
+ */
+	lev = ((b == NULL) || (strchr(b, s[0]) == NULL));
+
+	for (n = 0; (n < nc) && ((0 < lev) || (n == 0)); n++)
+	    {c = *s++;
+
+/* handle escaped characters */
+             if (c == '\\')
+                {if (ex == FALSE)
+		    *d++ = c;
+                 *d++ = *s++;
+		 n++;}
+
+/* arrange to skip over quoted substrings - making them opaque */
+	     else if ((tr == FALSE) && (c == '\"'))
+	        {ind = !ind;
+                 if (rq == FALSE)
+		    *d++ = c;}
+
+	     else if ((tr == FALSE) && (c == '\''))
+	        {ins = !ins;
+                 if (rq == FALSE)
+		    *d++ = c;}
+
+/* copy over non-delimiting characters */
+	     else if ((ins == TRUE) || (ind == TRUE))
+	        *d++ = c;
+
+	     else if ((b != NULL) && (strchr(b, c) != NULL))
+	        {lev++;
+		 *d++ = c;}
+
+	     else if ((e != NULL) && (strchr(e, c) != NULL))
+	        {lev--;
+		 *d++ = c;}
+
+/* it is not escaped and it is not a delimiting character */
+	     else
+	        *d++ = c;};
+
+	if (ad == TRUE)
+	   *d++ = c;
+	*d++ = '\0';};
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STRCPY_TOK - better tokenizer */
+
+int strcpy_tok(char *d, size_t nd, char *s, size_t ns,
+	       char *b, char *e, int flags)
+   {int rv;
+
+    rv = -1;
+    if ((d != NULL) && (s != NULL))
+       {d[0] = '\0';
+	if ((b == NULL) && (e == NULL))
+	   rv = 0;
+        else if (b == NULL)
+	   rv = _strcpy_next(d, nd, s, ns, e, flags);
+	else if (e == NULL)
+	   rv = 0;
+	else
+	   rv = _strcpy_bal(d, nd, s, ns, b, e, flags);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -673,7 +827,7 @@ char **tokenize(char *s, char *dlm, int flags)
 		w = MAKE_N(char, nw);
 
 		for (i = 0, ps = t; *ps != '\0'; ps++)
-                    {nc = strcpy_next(w, nw, ps, -1, dlm, flags);
+                    {nc = strcpy_tok(w, nw, ps, -1, NULL, dlm, flags);
 		     if (nc > 0)
 		        {sa[i++] = STRSAVE(w);
 			 ps += nc;};};

@@ -14,14 +14,26 @@ set msg = "PDB API Test ....................... "
 
 set tst = $1
 
+@ xstatus = 0
+
 # check for Fortran compiler before doing Fortran test
 set FC = `awk '$1 == "FCompiler" { print $3 }' $EtcDir/make-def`
 if ("$FC" != "") then
    Note $Log "Using fortran compiler $FC"
    flog $Log swhich -1 $FC
-   flog $Log set xstatus = $status
+   flog $Log @ xstatus = $xstatus + $status
 else
-   flog $Log set xstatus = 1
+   flog $Log @ xstatus = $xstatus + 1
+endif
+
+# check for compiled modules
+set inf = ( `ls -1 $IncDir/*.mod` )
+if ($#inf >= 17) then
+   Note $Log "Expected number of modules present: $#inf"
+   Note $Log " $inf"
+   flog $Log @ xstatus = $xstatus + 0
+else
+   flog $Log @ xstatus = $xstatus + 1
 endif
 
 #if (($xstatus == 0) && ("$MPI" == "")) then
@@ -31,7 +43,7 @@ if ($xstatus == 0) then
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE +na 2 pdb
-   set xstatus = $status
+   @ xstatus = $status
    flog $Log popd
 
    if ($xstatus != 0) then
@@ -103,7 +115,7 @@ if ($xstatus == 0) then
       if ($MPI == TRUE) then
          flog $Log pushd $SrcDir
          flog $Log $MAKE +na 2 fdp
-         set xstatus = $status
+         @ xstatus = $status
          flog $Log popd
 
          set CFE = $BinDir/do-run
