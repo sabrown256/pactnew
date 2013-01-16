@@ -81,6 +81,13 @@ Note () {
    echo $msg >> $log_ 2>&1
 }
 
+PrintF () {
+   log_=$1
+   shift
+   msg=$*
+   printf $msg >> $log_ 2>&1
+}
+
 NoteD () {
    log_=$1
    shift

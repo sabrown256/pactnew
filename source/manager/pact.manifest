@@ -61,6 +61,7 @@ scm pdbvdemo.scm pdbvxmpl.scm pdbvthemes.scm nature.scm
 scm gcel.scm vcel.scm runt.scm rmath.scm slib.scm spokes.scm
 scm sxcomp.scm sxdm.scm sxview.scm synon.scm toolbox.scm
 scm tpu.scm trig.scm ultra.ini ultra.pui ultra.scm mouse.scm
+scm slice.scm movie.scm
 
 script do-local do-automake do-stats iopr iocl nbit
 script nfsmon timer rmalbut px sinstall ls-jobs ls-all

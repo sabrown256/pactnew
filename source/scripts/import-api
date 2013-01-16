@@ -447,11 +447,13 @@ if (($nf > 0) || ($nv > 0)) then
 
    foreach v ($varl)
       set m = v$v
-      Note $api "	_${pck}_.$m \t = SC_so_get(OBJ_SO, "'"'${pck}'", "'$v'");'
+#      Note $api "	_${pck}_.$m \t = SC_so_get(OBJ_SO, "'"'${pck}'", "'$v'");'
+      PrintF $api '	_%s_.%s \t = SC_so_get(OBJ_SO, \"%s\", \"%s\");\n' $pck $m $pck $v
    end
    foreach f ($fncl)
       set m = f$f
-      Note $api "	ASSIGN_FNC(_${pck}_.$m, \t SC_so_get(OBJ_SO, "'"'${pck}'", "'$f'"));'
+#      Note $api "	ASSIGN_FNC(_${pck}_.$m, \t SC_so_get(OBJ_SO, "'"'${pck}'", "'$f'"));'
+      PrintF $api '	ASSIGN_FNC(_%s_.%s, \t SC_so_get(OBJ_SO, \"%s\", \"%s\"));\n' $pck $m $pck $f
    end
 
    Note $api '       }'
@@ -464,11 +466,13 @@ if (($nf > 0) || ($nv > 0)) then
 
    foreach v ($varl)
       set m = v$v
-      Note $api "	_${pck}_.$m \t = &$v;"
+#      Note $api "	_${pck}_.$m \t = &$v;\n"
+      PrintF $api "	_%s_.%s \t = &%s\n;" $pck $m $v
    end
    foreach f ($fncl)
       set m = f$f
-      Note $api "	_${pck}_.$m \t = $f;"
+#      Note $api "	_${pck}_.$m \t = $f;\n"
+      PrintF $api "	_%s_.%s \t = %s;\n" $pck $m $f
    end
 
    Note $api '       };'
@@ -486,11 +490,13 @@ Note $api ''
 if (($nf > 0) || ($nv > 0)) then
    foreach v ($varl)
       set m = v$v
-      Note $api "#define $v \t "'*('_${pck}_.$m')'
+#      Note $api "#define $v \t "'*('_${pck}_.$m')'
+      PrintF $api "#define %s \t *(_%s_.%s)\n" $v $pck $m
    end
    foreach f ($fncl)
       set m = f$f
-      Note $api "#define $f \t _${pck}_.$m"
+#      Note $api "#define $f \t _${pck}_.$m"
+      PrintF $api "#define %s \t _%s_.%s\n" $f $pck $m
    end
    Note $api ''
 endif

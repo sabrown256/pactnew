@@ -608,11 +608,16 @@ static char **srv_process(srvdes *sv, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SERVER - run the server side of the database */
+/* SERVER - run the server side of the database
+ *        - return TRUE iff successful
+ */
 
 static int server(char *root, int init, int dmn)
-   {client *cl;
+   {int rv;
+    client *cl;
     srvdes sv;
+
+    rv = FALSE;
 
     if ((dmn == FALSE) || (demonize() == TRUE))
        {signal(SIGTERM, sigdone);
@@ -638,11 +643,14 @@ static int server(char *root, int init, int dmn)
 	    async_server(&sv);
 
 	    db_srv_save(-1, db);
-	    db_srv_close(db);};
+	    db_srv_close(db);
+
+	    cl = NULL;
+	    rv = TRUE;};
 
 	CLOG(cl, 1, "end server");};
 
-    return(0);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -772,6 +780,7 @@ int main(int c, char **v)
       {LAST_CHAR(req) = '\0';
        rv = exchange(root, ltr, req);};
 
+/* reverse sense for exit status */
     rv = (rv == 0);
 
     return(rv);}
