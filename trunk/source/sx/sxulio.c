@@ -129,7 +129,7 @@ static int SX_read_pdb_curve(PDBfile *fp, char *fname, char *cname,
    {int n, rv;
     double wc[PG_BOXSZ];
     double *x[PG_SPACEDM];
-    char label[MAXLINE];
+    char label[MAX_BFSZ];
 
     rv = FALSE;
 

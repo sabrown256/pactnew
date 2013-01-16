@@ -13,12 +13,12 @@ TGTLib = ${LibDir}/lib${LibName}.a
 TGTExe = ${BinDir}/ultra
 TGTInc = ultra.h
 
-TGTScmA = applications/ultra.scm applications/consts.scm applications/func.scm
-TGTScmB = applications/annotate.scm applications/compare.scm applications/trig.scm
-TGTScmC = applications/help.scm applications/synon.scm
-TGTScmD = applications/toolbox.scm applications/mouse.scm applications/ultra.pui
-TGTScmE = applications/slib.scm
-TGTScm  = ${TGTScmA} ${TGTScmB} ${TGTScmC} ${TGTScmD} ${TGTScmE}
+TGTScm = applications/ultra.scm applications/consts.scm applications/func.scm  \
+         applications/annotate.scm applications/compare.scm applications/trig.scm \
+         applications/slice.scm applications/movie.scm \
+         applications/help.scm applications/synon.scm \
+         applications/toolbox.scm applications/mouse.scm applications/ultra.pui \
+         applications/slib.scm
 
 OD = DefaultG
 

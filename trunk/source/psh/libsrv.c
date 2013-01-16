@@ -177,13 +177,14 @@ int comm_read(client *cl, char *s, int nc, int to)
     if (cl->type == SERVER)
        nb = _comm_read_wrk(cl, s, nc, to);
     else
-       {int nz, nzx, dt, tl;
+       {int nz, nzx, tl;
 	char u[BFLRG];
 
+/* there is about a 6 second delay down in _comm_read_wrk due
+ * to retry logic so only give it a few chances here
+ */
+	nzx = 4;
 	tl  = 0;
-	dt  = 10;
-	nzx = (1000*to)/dt;
-        nzx = max(nzx, 2);
 
 	for (nz = 0, nb = 0; (nb == 0) && (nz < nzx); )
 	    {nb = ring_pop(&cl->ior, s, nc, '\0');
@@ -192,8 +193,7 @@ int comm_read(client *cl, char *s, int nc, int to)
 		 nt = _comm_read_wrk(cl, u, BFLRG, tl);
 		 ok = ring_push(&cl->ior, u, nt);
 	         if (nt <= 0)
-		    {nz++;
-		     nsleep(dt);}
+		    nz++;
 	         else
 		    nz = 0;};};
 
@@ -579,6 +579,8 @@ void free_client(client *cl)
 
 	CLOG(cl, 1, "----- end client -----");
 
+	cl->clog = NULL;
+
 	FREE(cl->fcon);
 	FREE(cl->key);
 	FREE(cl);};
@@ -608,7 +610,7 @@ char **client_ex(client *cl, char *req)
 	char *t;
 
 	ne = 0;
-	nx = 100;
+	nx = (cl->type == SERVER) ? 100 : 2;
 	to = 4;
 	for (ok = TRUE; ok == TRUE; )
 	    {nb = comm_read(cl, s, BFLRG, to);

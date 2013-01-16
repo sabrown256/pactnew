@@ -22,7 +22,7 @@
 
 #ifndef S_SPLINT_S
 #define CLOG(_c, ...)                                                    \
-    {if ((_c)->clog != NULL)                                             \
+    {if (((_c) != NULL) && ((_c)->clog != NULL))                         \
         (_c)->clog((_c), __VA_ARGS__);}  
 #endif
 

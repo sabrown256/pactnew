@@ -1135,4 +1135,36 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; LDER - logarithmic derivative
+
+(define (lder crvs)
+    "Procedure: take the logarithmic derivative of the specified curves"
+    (map (lambda (cv) (der (ln cv))) crvs))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; VS - versus command
+
+(define (vs c1 c2)
+    "Procedure: Plot the range of the first curve against the range of the
+     second curve.
+     Usage: vs <curve> <curve>"
+    (let* ((tmp (copy c1))
+	   (dmn (get-common-domain c1 c2)))
+          (if dmn
+	      (let* ((xn (car dmn))
+		     (xx (cdr dmn))
+		     (ci1 (xmm c1 xn xx))
+		     (ci2 (rev (xmm c2 xn xx))))
+		    (del tmp)
+		    (set! tmp
+			  (label (compose ci1 ci2)
+				 (sprintf "%s vs %s" c1 c2)))
+		    (del ci1 ci2)
+		    tmp))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ;(printf nil "done\n")
