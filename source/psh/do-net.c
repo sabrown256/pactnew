@@ -47,11 +47,12 @@ typedef enum e_exit_state exit_state;
 
 /* enumerate run states */
 enum e_run_state
-   { IDLE =    20,
-     PENDING = 21,
-     STARTED = 22,
-     RUNNING = 23,
-     DONE    = 24 };
+   { UNLAUNCHED = 19,
+     IDLE       = 20,
+     PENDING    = 21,
+     STARTED    = 22,
+     RUNNING    = 23,
+     DONE       = 24 };
 
 typedef enum e_run_state run_state;
 
@@ -163,9 +164,6 @@ static donetdes
 static phasedes
  *current_phase = NULL;
 
-static char
- *run_state_name[] = { "IDLE", "PENDING", "STARTED", "RUNNING", "DONE" };
-
 static void
  finish(donetdes *st, double gti);
 
@@ -266,13 +264,15 @@ static run_state transition(process *pp, run_state new)
    {run_state old;
     char *olds, *news;
     hfspec *sp;
+    static char *run_state_name[] = { "UNLAUNCHED", "IDLE", "PENDING",
+				      "STARTED", "RUNNING", "DONE" };
 
     if (pp != NULL)
        {sp = (hfspec *) pp->a;
 
-	old = sp->running;
-	olds = run_state_name[old-IDLE];
-	news = run_state_name[new-IDLE];
+	old  = sp->running;
+	olds = run_state_name[old-UNLAUNCHED];
+	news = run_state_name[new-UNLAUNCHED];
 
 	if (new == DONE)
 	   notej(pp, "transition from %s to %s (%s)",
@@ -360,7 +360,7 @@ static char *stop_time(char *et, int nc, double ti)
 static int count_specs(hfspec *specs, size_t nsp)
    {int n;
 
-    for (n = 0; (n < nsp) && (specs[n].running != -1); n++);
+    for (n = 0; (n < nsp) && (specs[n].running != UNLAUNCHED); n++);
 
     return(n);}
 
@@ -1848,7 +1848,7 @@ static hfspec *checklist(donetdes *st, char *delim, hfspec *sp, int nsp)
 	    {hs[i].delim   = NULL;
 	     hs[i].rawh    = NULL;
 	     hs[i].host    = NULL;
-	     hs[i].running = -1;
+	     hs[i].running = UNLAUNCHED;
 	     hs[i].exit    = WAITING;};};
 
     return(hs);}
@@ -1959,7 +1959,7 @@ static int testhosts(donetdes *st, int c, char **v)
 	        {hs[i].delim   = NULL;
 		 hs[i].rawh    = NULL;
 		 hs[i].host    = NULL;
-		 hs[i].running = -1;
+		 hs[i].running = UNLAUNCHED;
 		 hs[i].exit    = WAITING;};
 
 	    if (downonly == FALSE)
@@ -2044,7 +2044,7 @@ static hfspec *speclist(char *delim, char *specs)
 	    {hs[i].delim   = NULL;
 	     hs[i].host    = NULL;
 	     hs[i].rawh    = NULL;
-	     hs[i].running = -1;
+	     hs[i].running = UNLAUNCHED;
 	     hs[i].exit    = WAITING;};};
 
     return(hs);}

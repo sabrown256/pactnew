@@ -62,10 +62,12 @@ char *name_db(char *root)
 
 /*--------------------------------------------------------------------------*/
 
-/* _DB_SRV_LAUNCH - launch a DB server */
+/* _DB_SRV_LAUNCH - launch a DB server
+ *                - return TRUE iff successful
+ */
 
 static int _db_srv_launch(client *cl)
-   {int i, st, pid, rv;
+   {int i, st, pid, rv, na;
     char s[BFLRG];
     char *root, *fcon;
 
@@ -78,8 +80,9 @@ static int _db_srv_launch(client *cl)
 	st   = 0;
 	s[0] = '\0';
 
-/* wait until we have a server going */
-	for (i = 0; file_exists(fcon) == FALSE; i++)
+/* wait until we have a server going - or 10 seconds*/
+        na = 100;
+	for (i = 0; (file_exists(fcon) == FALSE) && (i < na); i++)
 	    {if (i == 1)
 		{if (cl->auth == TRUE)
 		    snprintf(s, BFLRG, "perdb -a -f %s -s -l", root);
@@ -91,17 +94,22 @@ static int _db_srv_launch(client *cl)
 	     else
 	        nsleep(100);};
 
-	pid = -1;
+	if (i < na)
+	   {pid = -1;
 
 /* check the connection file info */
-	pid = get_conn_client(cl);
+	    pid = get_conn_client(cl);
 
 /* GOTCHA: if it is not running - clean up and restart */
-	st = is_running(pid);
+	    st = is_running(pid);
 
-	cl->scon->pid = pid;
+	    cl->scon->pid = pid;
 
-        CLOG(cl, 1, "server pid %d (%d)", pid, i);};
+	    rv = TRUE;
+
+	    CLOG(cl, 1, "server pid %d (%d)", pid, i);}
+	else
+	    CLOG(cl, 1, "server launch failed");};
 
     return(rv);}
 
@@ -111,18 +119,23 @@ static int _db_srv_launch(client *cl)
 /* _DB_CLNT_EX - do a transaction from the client side of the database */
 
 char **_db_clnt_ex(client *cl, int init, char *req)
-   {char **p, *root;
+   {int ok;
+    char **p, *root;
 
     if (cl == NULL)
        {root = cgetenv(TRUE, "PERDB_PATH");
 	cl   = make_client(CLIENT, DB_PORT, FALSE,
 			   root, cl_logger, NULL);};
 
+    ok = TRUE;
+    p  = NULL;
+
 /* make sure that there is a server running */
     if (init == TRUE)
-       _db_srv_launch(cl);
+       ok = _db_srv_launch(cl);
 
-    p = client_ex(cl, req);
+    if (ok == TRUE)
+       p = client_ex(cl, req);
 
     return(p);}
 
@@ -508,7 +521,9 @@ char *get_db(database *db, char *var)
 	        {st = FALSE;
 		 pt = t;
 		 ok = TRUE;
-		 for (c = *pk++; (c != ')') && (ok == TRUE); c = *pk++)
+		 for (c = *pk++;
+		      (c != '\0') && (c != ')') && (ok == TRUE);
+		      c = *pk++)
 		     {switch (c)
 			 {case '"' :
 			  case '\'' :

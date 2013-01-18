@@ -28,6 +28,8 @@ while ($#argv > 0)
       case -n:
            set db = FALSE
            breaksw
+      case -vg:
+           breaksw
       case -*:
            set opt = ( $opt $1 )
            breaksw

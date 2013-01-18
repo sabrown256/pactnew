@@ -10,6 +10,7 @@ set t = file
 @ err = 0
 
 source $TestScrDir/functions-pact.csh
+alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
 
 set f = ( `fill-string -n 8 -c ' ' $t` )
 NoteD $Log -n "                        $f "
@@ -99,53 +100,68 @@ foreach i (1 2 3 4 5 6)
    Note $Log "cmd = $cmd"
    Note $Log "srt = $srt"
 
-   flog $Log eval $cmd
+   if ("$Valgrind" == "") then
+      flog $Log eval $cmd
 
-   if ($srt == TRUE) then
-      flog $Log ( sort $raw >&! $res )
-      flog $Log rm -f $raw
-   endif
-
-   if ("$cfl" != NULL) then
-      foreach c ($cfl)
-         if (-f $c) then
-            Note $Log "> $c = `cat $c`"
-         endif
-      end
-   endif
-
-   flog $Log cat $res
-
-   if ($?PERDB_PATH == 0) then
-      eval `grep "setenv gstatus" $res`
-      grep -v "setenv gstatus" $res >&! $res.new
-      flog $Log mv $res.new $res
-   else
-      dbget gstatus
-   endif
-
-   Note $Log "> gstatus = $gstatus"
-   if ("$gstatus" != "$gst") then
-      flog $Log @ err = $err + 1
-      NoteD $Log -n "x"
-      Note $Log "$id failed"
-   else if (-f $ref) then
-      flog $Log ( diff $res $ref >&! $dif )
-      if ($status == 0) then
-         NoteD $Log -n "."
-         Note $Log "$id passed"
-         flog $Log rm -f $res $dif
-      else
-         flog $Log @ err = $err + 1
-         NoteD $Log -n "o"
-         Note $Log "$id differed"
-         flog $Log cat $dif
+      if ($srt == TRUE) then
+         flog $Log ( sort $raw >&! $res )
+         flog $Log rm -f $raw
       endif
+
+      if ("$cfl" != NULL) then
+         foreach c ($cfl)
+            if (-f $c) then
+               Note $Log "> $c = `cat $c`"
+            endif
+         end
+      endif
+
+      flog $Log cat $res
+
+      if ($?PERDB_PATH == 0) then
+         eval `grep "setenv gstatus" $res`
+         grep -v "setenv gstatus" $res >&! $res.new
+         flog $Log mv $res.new $res
+      else
+         dbget gstatus
+      endif
+
+      Note $Log "> gstatus = $gstatus"
+      if ("$gstatus" != "$gst") then
+         flog $Log @ err = $err + 1
+         NoteD $Log -n "x"
+         Note $Log "$id failed"
+      else if (-f $ref) then
+         flog $Log ( diff $res $ref >&! $dif )
+         if ($status == 0) then
+            NoteD $Log -n "."
+            Note $Log "$id passed"
+            flog $Log rm -f $res $dif
+         else
+            flog $Log @ err = $err + 1
+            NoteD $Log -n "o"
+            Note $Log "$id differed"
+            flog $Log cat $dif
+         endif
+      else
+         NoteD $Log -n "+"
+         Note $Log "$id added"
+         flog $Log cp $res $ref
+         flog $Log rm -f $res
+      endif
+
    else
-      NoteD $Log -n "+"
-      Note $Log "$id added"
-      flog $Log cp $res $ref
-      flog $Log rm -f $res
+      set cmd = ( `echo "$cmd" | sed 's+>.*$++'` )
+      ftee $Log $Valgrind $cmd                |& \
+      grep "ERROR SUMMARY:"                   |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      @ err = $err + $xstatus
+      if ($xstatus == 0) then
+         NoteD $Log -n "."
+      else
+         NoteD $Log -n "x"
+      endif
    endif
 
 end

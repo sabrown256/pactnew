@@ -367,6 +367,7 @@ static u_int64_t _PD_mpread(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
     pf = GET_PFILE(stream);
 
+    nbr  = 0;
     fail = 0;
 
     if (pf == NULL)
@@ -425,6 +426,7 @@ static u_int64_t _PD_mpwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
     pf = GET_PFILE(stream);
 
+    nbw  = 0;
     fail = 0;
 
     if ((pf == NULL) || (nbi*ni == 0))
@@ -481,6 +483,7 @@ static u_int64_t _PD_mpwritec(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
     pf = GET_PFILE(stream);
 
+    nbw  = 0;
     fail = 0;
 
     if ((pf == NULL) || (nbi*ni == 0))

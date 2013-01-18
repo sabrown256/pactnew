@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "ppc.h"
+#include "ppc_int.h"
 #include "scope_proc.h"
 
 /*--------------------------------------------------------------------------*/
