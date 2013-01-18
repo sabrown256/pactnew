@@ -864,7 +864,7 @@ static void print_help(void)
 
 int main(int c, char **v)
    {int i, n, err;
-    int ton[10];
+    int ton[11];
     int use_mapped_files, check_writes;
     int64_t bfsz;
 

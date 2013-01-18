@@ -119,7 +119,6 @@ struct s_state
     int verbose;
     int launched;               /* TRUE iff PCO launched PERDB
                                  * FALSE if PERDB was already running */
-
     int na;
     char **args;
     char *db;
@@ -484,59 +483,92 @@ static void write_pco(client *cl, state *st, char *dbname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SUBLIST - return a list of string from TA 'matching' C
+ *         - remove matches from TA
+ */
+
+char **sublist(char **ta, int na, char *s, char **exc, int ne)
+   {int i, ie, nw, ok;
+    char w[BFLRG];
+    char *t, **sa;
+
+    snprintf(w, BFLRG, "%s_", s);
+    nw = strlen(w);
+
+    sa = NULL;
+
+    for (i = 0; i < na; i++)
+        {t = ta[i];
+	 if (t == NULL)
+	    continue;
+
+	 if (((nw == 1) && (w[0] == '_')) || (strncmp(t, w, nw) == 0))
+	    {ta[i] = NULL;
+
+	     ok = TRUE;
+	     if (ne != 0)
+	        {for (ie = 0; (ie < ne) && (ok == TRUE); ie++)
+		     ok &= (strncmp(t, exc[ie], strlen(exc[ie])) != 0);};
+
+	     if (ok == TRUE)
+	        sa = lst_push(sa, t);};};
+
+    return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* WRITE_CLASS_PERL - write a PERL form text representation of
  *                  - a class CLSS of type CTYPE
- *                  - look for sub-class SUB of type STYPE
+ *                  - omit NE variables named by EXC
  */
 
 static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
-			    char *sub, char *stype, char *ind)
-   {int i, n, ic, nc, global;
+			    char *ind, char **ta, int na, char **exc, int ne)
+   {int i, l, n, ic, nc, ni, global;
     char cln[BFLRG], fmt[BFLRG];
-    char *c, *pc, *t, *var, *val, *entry;
-    char **vars, **vals, **sa;
+    char *c, *var, *val;
+    char **vars, **vals, **ca, **sa;
 
     nstrncpy(cln, BFLRG, clss, -1);
-    for (c = cln; c != NULL; c = pc)
-        {pc = strchr(c, ' ');
-         if (pc == NULL)
-            {if (IS_NULL(c) == TRUE)
-                break;}
-         else
-            *pc++ = '\0';
+    ca = tokenize(cln, " \t", 0);
+    ni = lst_length(ca);
+    string_sort(ca, ni);
 
-	 global = (strcmp(c, "Glb") == 0);
+    for (l = 0; l < ni; l++)
+        {c = ca[l];
+
+	 if (strcmp(c, "Glb") == 0)
+	    continue;
+
+	 global = (strcmp(c, "Global") == 0);
 
 	 if (global == TRUE)
-	    {t  = dbget(cl, FALSE, "Globals");
-	     sa = tokenize(t, " \t\n\r", 0);}
+	    {sa = sublist(ta, na, "", exc, ne);
+	     n  = lst_length(sa);
+             string_sort(sa, n);
+	     if (n > 0)
+	        fprintf(out, "# Global variables\n\n");}
          else
-	    {fprintf(out, "%s'%s:%s_pact' => {\n", ind, ctype, c);
-	     t  = run(BOTH, "env | egrep '^%s_' | sort", c);
-	     sa = tokenize(t, "\n\r", 0);};
+	    {fprintf(out, "%s'%s:%s' => {\n", ind, ctype, c);
+	     sa = sublist(ta, na, c, exc, ne);
+	     n  = lst_length(sa);};
 
 	 if (sa != NULL)
-	    {for (n = 0; sa[n] != NULL; n++);
-
-	     if ((global == TRUE) && (n > 0))
-	        fprintf(out, "# Global variables\n");
-
-	     vars = MAKE_N(char *, n+1);
+	    {vars = MAKE_N(char *, n+1);
 	     vals = MAKE_N(char *, n+1);
 	     if ((vars != NULL) && (vals != NULL))
 	        {nc = 0;
 		 for (i = 0; i < n; i++)
-		     {entry = sa[i];
-		      if (IS_NULL(entry) == TRUE)
+		     {var = sa[i];
+		      if (IS_NULL(var) == TRUE)
 			 continue;
-		      if (global == TRUE)
-			 {var = entry;
-			  val = dbget(cl, FALSE, var);}
-		      else
-			 {var = entry + strlen(c) + 1;
-			  val = strchr(var, '=');
-			  if (val != NULL)
-			     *val++ = '\0';};
+		      else if (global == FALSE)
+			 var += (strlen(c) + 1);
+
+		      val = strchr(var, '=');
+		      if (val != NULL)
+			 *val++ = '\0';
 
 		      ic = strlen(var);
 		      nc = max(nc, ic);
@@ -556,14 +588,17 @@ static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
 		     {if ((vars[i] != NULL) && (vals[i] != NULL))
 			 fprintf(out, fmt, ind, vars[i], vals[i]);};
 
-		 if (global == TRUE)
-		    fprintf(out, "\n");
-		 else
-		    fprintf(out, "%s},\n\n", ind);};
+		 FREE(vars);
+		 free_strings(vals);};
 
-	     FREE(vars);
-	     free_strings(vals);
-	     free_strings(sa);};};
+	     free_strings(sa);};
+
+	 if (global == TRUE)
+	    fprintf(out, "\n");
+	 else
+	    fprintf(out, "%s},\n\n", ind);};
+
+    free_strings(ca);
 
     return(TRUE);}
 
@@ -575,9 +610,15 @@ static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
  */
 
 static void write_perl(client *cl, state *st, char *dbname)
-   {int rv;
+   {int rv, na, ne;
     char t[BFLRG];
+    char **ta;
     FILE *out;
+    char *exc[] = { "Globals", "CurrGrp", "CurrTool",
+		    "ENV_VARS", "Save_CC", "Save_CFLAGS",
+		    "gstatus", "t" };
+
+    ne = sizeof(exc)/sizeof(char *);
 
     if (dbname != NULL)
        snprintf(t, BFLRG, "%s.%s.pl", cgetenv(FALSE, "PERDB_PATH"), dbname);
@@ -587,15 +628,24 @@ static void write_perl(client *cl, state *st, char *dbname)
 
     fprintf(out, "$PACT = {\n");
 
+    ta = _db_clnt_ex(cl, FALSE, "save:");
+    na = lst_length(ta);
+
     rv = write_class_perl(cl, out, st->def_tools, "Tool",
-			  NULL, NULL, "   ");
+			  "   ", ta, na, NULL, 0);
     ASSERT(rv == 0);
 
     rv = write_class_perl(cl, out, st->def_groups, "Group",
-			  st->def_tools, "Tool", "   ");
+			  "   ", ta, na, NULL, 0);
+    ASSERT(rv == 0);
+
+    rv = write_class_perl(cl, out, "Global", NULL,
+			  "   ", ta, na, exc, ne);
     ASSERT(rv == 0);
 
     fprintf(out, "};\n");
+
+    free_strings(ta);
 
     fclose(out);
 

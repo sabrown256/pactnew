@@ -66,8 +66,71 @@ ThreadLibExt     =
 F90_MOD_FLAG     = -I
 PTHREAD_POSIX    = FALSE
 
+# initialize standard tools
+
+Tool CC {
+}
+
+Tool CXX {
+}
+
+Tool FC {
+}
+
 Tool LD {
    SpokeDepLib =
+}
+
+Tool Lex {
+}
+
+Tool Yacc {
+}
+
+Tool MAKE {
+}
+
+Tool GMAKE {
+}
+
+# PY contains the specifics of the python versions
+# to be used as derived from the specifications in
+# the Python group
+
+Tool PY {
+}
+
+# initialize standard groups
+
+Group STD {
+   C      = X99
+   F      = F90
+   IPC    = POSIX
+   POSIX  = 200112
+   XOPEN  = 600
+   MPI    =
+   OPENMP = 
+}
+
+Group OS {
+}
+
+Group Cfg {
+}
+
+Group Cfe {
+}
+
+Group RL {
+}
+
+Group SSL {
+}
+
+Group GSL {
+}
+
+Group GRAPHICS {
 }
 
 Group Shared {
@@ -85,6 +148,16 @@ Group FPE {
    Exe    = gcc
    Flags  = -g -Wall
    Flags += -fPIC
+}
+
+# Math library
+Group LibM {
+}
+
+Group BLAS {
+}
+
+Group LAPACK {
 }
 
 # machine dependent graphics for PGS - e.g. X11

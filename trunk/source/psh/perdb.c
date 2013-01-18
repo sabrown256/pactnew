@@ -250,7 +250,7 @@ static void srv_setup(srvdes *sv, int *ptmax, int *pdt)
     if (IS_NULL(s) == TRUE)
        tmax = 60;
     else
-       {tmax = atoi(s);
+       {tmax = abs(atoi(s));
 	SLOG(sv, 4, "PERDB_IDLE_TIMEOUT = %d", tmax);};
 
     s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
@@ -286,10 +286,11 @@ static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
 			   char ***popt, char ***pvar)
    {int lo, no;
     char *p, *fname, *fmt, **opt, **var;
+    static char *defmt[] = { "%s=%s", "setenv %s %s ;", "export %s=%s ;" };
 
     p     = s;
     fname = NULL;
-    fmt   = "%s=%s";
+    fmt   = defmt[0];
     opt   = NULL;
     var   = NULL;
 
@@ -307,10 +308,10 @@ static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
 /* determine format */
 	if ((no - lo > 0) && (opt[lo] != NULL))
 	   {if (strcmp(opt[lo], "csh") == 0)
-	       {fmt = "setenv %s %s ;";
+	       {fmt = defmt[1];
 		lo++;}
 	    else if (strcmp(opt[lo], "sh") == 0)
-	       {fmt = "export %s=%s ;";
+	       {fmt = defmt[2];
 		lo++;}
 	    else if (strcmp(opt[lo], "db") == 0)
 	       lo++;};
@@ -647,6 +648,8 @@ static int server(char *root, int init, int dmn)
 
 	    cl = NULL;
 	    rv = TRUE;};
+
+	svs.cl = NULL;
 
 	CLOG(cl, 1, "end server");};
 
