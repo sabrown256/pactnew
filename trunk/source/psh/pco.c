@@ -630,6 +630,8 @@ static void write_perl(client *cl, state *st, char *dbname)
 
     ta = _db_clnt_ex(cl, FALSE, "save:");
     na = lst_length(ta);
+    na--;
+    FREE(ta[na]);
 
     rv = write_class_perl(cl, out, st->def_tools, "Tool",
 			  "   ", ta, na, NULL, 0);
