@@ -35,15 +35,24 @@ struct s_io_ring
 /* RING_INIT - initialize the io_ring RING with an NB bytes long buffer */
 
 int ring_init(io_ring *ring, unsigned int nb)
-   {
+   {unsigned int n;
 
     if (ring != NULL)
-       {ring->nb_ring = nb;
-	ring->in_ring = MAKE_N(unsigned char, nb);
+
+/* NOTE: make actual buffer size incommensurate with common array sizes
+ * which are often passed in as the buffer size
+ * this avoids problems in which the buffer copied in or out is
+ * the same size so that ib_in and ob_in have the same value
+ * indicating and empty buffer when there would in fact be a "full" buffer
+ */
+       {n = 1.3*nb;
+
+	ring->nb_ring = n;
+	ring->in_ring = MAKE_N(unsigned char, n);
 	ring->ib_in   = 0;
 	ring->ob_in   = 0;
 
-	memset(ring->in_ring, 0, nb);};
+	memset(ring->in_ring, 0, n);};
 
     return(TRUE);}
 

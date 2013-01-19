@@ -115,6 +115,25 @@ void cl_logger(client *cl, int lvl, char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* COMM_READY - return TRUE iff there are bytes ready to be read on CL */
+
+int comm_ready(client *cl, int to)
+   {int ok;
+    struct pollfd fds[1];
+
+    ok = FALSE;
+    if ((cl != NULL) && (cl->cfd >= 0))
+       {fds[0].fd      = cl->cfd;
+	fds[0].events  = (POLLIN | POLLPRI);
+	fds[0].revents = 0;
+
+	ok = poll(fds, 1, to);};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _COMM_READ_WRK - read worker routine */
 
 static int _comm_read_wrk(client *cl, char *t, int nt, int to)
@@ -178,7 +197,7 @@ int comm_read(client *cl, char *s, int nc, int to)
        nb = _comm_read_wrk(cl, s, nc, to);
     else
        {int nz, nzx, tl;
-	char u[BFLRG];
+	char u[BFMG];
 
 /* there is about a 6 second delay down in _comm_read_wrk due
  * to retry logic so only give it a few chances here
@@ -189,8 +208,8 @@ int comm_read(client *cl, char *s, int nc, int to)
 	for (nz = 0, nb = 0; (nb == 0) && (nz < nzx); )
 	    {nb = ring_pop(&cl->ior, s, nc, '\0');
 	     if (nb == 0)
-	        {memset(u, 0, BFLRG);
-		 nt = _comm_read_wrk(cl, u, BFLRG, tl);
+	        {memset(u, 0, BFMG);
+		 nt = _comm_read_wrk(cl, u, BFMG, tl);
 		 ok = ring_push(&cl->ior, u, nt);
 	         if (nt <= 0)
 		    nz++;
@@ -556,7 +575,7 @@ client *make_client(ckind type, int port, int auth, char *root,
         cl->clog   = clog;
         cl->cauth  = cauth;
 
-	ring_init(&cl->ior, BFLRG);
+	ring_init(&cl->ior, BFMG);
 
 	CLOG(cl, 1, "----- start client -----");};
 
