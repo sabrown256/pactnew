@@ -19,7 +19,7 @@ ERR_PATTERN  = "Error: (S)"
 Tool CC {
    Exe       = xlc
    Flags     = -D_ALL_SOURCE
-   Flags    += [ _env_ = C_STD ;             # C standard flags
+   Flags    += [ _env_ = STD_C ;             # C standard flags
                  C89   = -qlanglvl=stdc89 ;
                  C99   = -qlanglvl=stdc99 ;
                  X89   = -qlanglvl=extc89 ;
@@ -62,7 +62,7 @@ Tool LD {
 
 Tool Lex {
    Flags  = -D_ALL_SOURCE -D_LARGE_FILES -qsuppress=1506-1300:1506-1298
-   Flags += [ _env_ = C_STD ;                # C standard flags
+   Flags += [ _env_ = STD_C ;                # C standard flags
               C89   = -qlanglvl=stdc89 ;
               C99   = -qlanglvl=stdc99 ]
    Flags += [ _env_ = Bits ;                 # address bit size

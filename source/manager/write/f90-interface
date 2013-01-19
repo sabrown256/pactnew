@@ -34,7 +34,7 @@ dbmget $Log CFE^              \
             Cfe_FC_Flags^     \
             Cfe_LD_Flags^     \
             Cfe_LD_RPath^     \
-            F_STD^            \
+            STD_F^            \
             HAVE_FORTRAN^     \
             Host^             \
             IncDir^           \
@@ -45,7 +45,7 @@ dbmget $Log CFE^              \
 #--------------------------------------------------------------------------
 
 if ($HAVE_FORTRAN == TRUE) then
-   if (($Cfe_FC_Exe != "") && ($F_STD == 'F90')) then
+   if (($Cfe_FC_Exe != "") && ($STD_F == 'F90')) then
       NoteD $Log "   F90 Include File - f90types.h f90kinds.inc"
 
       if (!(-d f90kinds)) then

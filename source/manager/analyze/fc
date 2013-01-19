@@ -22,7 +22,7 @@ else
    setenv HAVE_FORTRAN   TRUE
 endif
 
-dbmget $ALog F_STD            =\? "F90"^        \
+dbmget $ALog STD_F            =\? "F90"^        \
              FC_Exe           =\? "f90"^        \
              FC_Flags         =\? ""^           \
              FC_Debug         =\? "-g"^         \
@@ -168,9 +168,9 @@ if ($FC_Exe != "") then
    flog $ALog cat $Tmp.f
    flog $ALog $FC_Exe $Tmp.f -c $FC_Flags
    if ($status == 0) then
-      setenv F_STD "F90"
+      setenv STD_F "F90"
    else
-      setenv F_STD "F77"
+      setenv STD_F "F77"
    endif
 
    set ETime = `timer -b $UTime`
@@ -179,7 +179,7 @@ if ($FC_Exe != "") then
    Note $ALog "Results of Fortran compiler analysis ($ETime)"
    Note $ALog "   FC_Exe = |$FC_Exe|"
    Note $ALog "   F90C   = |$F90C|"
-   Note $ALog "   F_STD  = |$F_STD|"
+   Note $ALog "   STD_F  = |$STD_F|"
    Note $ALog ""
 
 # make a file to test how Fortran compilers map identifiers
@@ -254,7 +254,7 @@ DONE:
 dbmset $ALog CC_Exe           = $CC_Exe^           \
              CC_Flags         = $CC_Flags^         \
              HAVE_FORTRAN     = $HAVE_FORTRAN^     \
-             F_STD            = $F_STD^            \
+             STD_F            = $STD_F^            \
              FC_Exe           = $FC_Exe^           \
              FC_Flags         = $FC_Flags^         \
              FC_Debug         = $FC_Debug^         \

@@ -19,7 +19,7 @@ XArch = -qarch=450
 Tool CC {
    Exe       = mpixlc_r
    Flags     = ${XArch} -D_ALL_SOURCE -qsuppress=1500-010:1506-1300:1506-1298:1506-383:1506-377
-   Flags    += [ _env_ = C_STD ;             # C standard flags
+   Flags    += [ _env_ = STD_C ;             # C standard flags
                  C89   = -qlanglvl=stdc89 ;
                  C99   = -qlanglvl=stdc99 ;
                  X89   = -qlanglvl=extc89 ;

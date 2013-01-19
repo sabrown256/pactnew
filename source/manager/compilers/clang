@@ -20,7 +20,7 @@ Tool CC {
    Flags     =
 #   Flags    += -Wcovered-switch-default
    Flags    += -Wunknown-pragmas
-   Flags    += [ _env_ = C_STD ;                # C standard flags
+   Flags    += [ _env_ = STD_C ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
                  X89   = -std=gnu89 ;           # gcc default

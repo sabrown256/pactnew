@@ -54,7 +54,7 @@ PACT_CC_EXE      = `which cc`
 PACT_CC_VERSION  = ""
 PACT_FC_FAMILY   = generic
 PACT_FC_VERSION  = ""
-C_STD            = X99
+STD_C            = X99
 LIB              = lib
 MAKE_Shared_Libs = FALSE
 FilterDir        =
@@ -108,8 +108,8 @@ Group STD {
    IPC    = POSIX
    POSIX  = 200112
    XOPEN  = 600
-   MPI    =
-   OPENMP = 
+   MPI    = 2.0
+   OPENMP = 3.0
 }
 
 Group OS {
