@@ -46,7 +46,7 @@ dbmget $Log Arch^                     \
             OS_Name^                  \
             OS_Release^               \
             IncDir^                   \
-            IPC_STD^                  \
+            STD_IPC^                  \
             Linking^                  \
             LONG64^                   \
             HAVE_MPI_STDIN_ALL^       \
@@ -312,7 +312,7 @@ dbmget $Log Arch^                     \
        endif
     endif
 
-    if ($IPC_STD != "NOIPC") then
+    if ($STD_IPC != "NOIPC") then
        flog $Log $RM $IncDir/noipc
        Note $STDOUT "#define HAVE_PROCESS_CONTROL"
        if ($HAVE_SOCKETS != "FALSE") then

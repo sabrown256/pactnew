@@ -17,7 +17,7 @@ ERR_PATTERN  = "PGFTN-S- PGF90-S- PGC-S- PGC-F-"
 Tool CC {
    Exe      = pgcc
    Flags    = -Kieee
-   Flags   += [ _env_ = C_STD ;             # C standard flags
+   Flags   += [ _env_ = STD_C ;             # C standard flags
                 C89   = -c89 ;
                 C99   = -c99 ;
                 X89   = -c89 ;

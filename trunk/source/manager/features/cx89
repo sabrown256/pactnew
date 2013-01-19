@@ -7,5 +7,5 @@
 # include "cpyright.h"
 #
 
-setenv C_STD             X89
+setenv STD_C             X89
 

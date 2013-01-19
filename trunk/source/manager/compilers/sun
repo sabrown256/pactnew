@@ -15,7 +15,7 @@ ERR_PATTERN  = ":+sp+error:"
 Tool CC {
    Exe      = suncc
 #   Flags   += -xcode=pic32
-   Flags   += [ _env_ = C_STD ;              # C standard flags
+   Flags   += [ _env_ = STD_C ;              # C standard flags
                 C89   = -xc99=none ;
                 C99   = -xc99 ;
                 X89   = -xc99=none ;

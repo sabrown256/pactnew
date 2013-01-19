@@ -58,7 +58,7 @@ dbmget $Log AR_IFlag^               \
             IncDir^                 \
             InstBase^               \
             INSTALL^                \
-            IPC_STD^                \
+            STD_IPC^                \
             Lex_Exe^                \
             Lex_Flags^              \
             LIB^                    \
@@ -313,10 +313,10 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 # Parallel I/O
     if ($MAKE_Strategy == "SpaceSaving") then
        set MPDev  = '${Ar'$STD_PARALLEL_COMM'}'
-       set IPCDev = '${Ar'$IPC_STD'}'
+       set IPCDev = '${Ar'$STD_IPC'}'
     else
        set MPDev  = '${O'$STD_PARALLEL_COMM'}'
-       set IPCDev = '${O'$IPC_STD'}'
+       set IPCDev = '${O'$STD_IPC'}'
     endif
     Note $STDOUT "MPassDevices = $MPDev"
     Note $STDOUT "IPCDevices   = $IPCDev"

@@ -7,5 +7,5 @@
 # include "cpyright.h"
 #
 
-C_STD = C99
+STD_C = C99
 
