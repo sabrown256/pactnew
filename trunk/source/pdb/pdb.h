@@ -158,34 +158,34 @@
 #define SYMENT_P_S      PD_gs.tnames[5]
 #define PD_N_TYPES      6
 
-#define TEXT_STD        PD_gs.standards[0]
-#define I386_STD        PD_gs.standards[1]
-#define I586L_STD       PD_gs.standards[2]
-#define I586O_STD       PD_gs.standards[3]
-#define PPC32_STD       PD_gs.standards[4]
-#define X86_64_STD      PD_gs.standards[5]
-#define X86_64A_STD     PD_gs.standards[6]
-#define PPC64_STD       PD_gs.standards[7]
-#define M68X_STD        PD_gs.standards[8]
-#define VAX_STD         PD_gs.standards[9]
-#define CRAY_STD        PD_gs.standards[10]
+#define TEXT_STD        PD_gs.standards[PD_TEXT_STD]
+#define I386_STD        PD_gs.standards[PD_I386_STD]
+#define I586L_STD       PD_gs.standards[PD_I586L_STD]
+#define I586O_STD       PD_gs.standards[PD_I586O_STD]
+#define PPC32_STD       PD_gs.standards[PD_PPC32_STD]
+#define X86_64_STD      PD_gs.standards[PD_X86_64_STD]
+#define X86_64A_STD     PD_gs.standards[PD_X86_64A_STD]
+#define PPC64_STD       PD_gs.standards[PD_PPC64_STD]
+#define M68X_STD        PD_gs.standards[PD_M68X_STD]
+#define VAX_STD         PD_gs.standards[PD_VAX_STD]
+#define CRAY_STD        PD_gs.standards[PD_CRAY_STD]
 #define PD_N_STANDARDS  11
 
-#define TEXT_ALIGNMENT         PD_gs.alignments[0]
-#define BYTE_ALIGNMENT         PD_gs.alignments[1]
-#define WORD2_ALIGNMENT        PD_gs.alignments[2]
-#define WORD4_ALIGNMENT        PD_gs.alignments[3]
-#define WORD8_ALIGNMENT        PD_gs.alignments[4]
-#define GNU4_I686_ALIGNMENT    PD_gs.alignments[5]
-#define OSX_10_5_ALIGNMENT     PD_gs.alignments[6]
-#define SPARC_ALIGNMENT        PD_gs.alignments[7]
-#define XLC32_PPC64_ALIGNMENT  PD_gs.alignments[8]
-#define CYGWIN_I686_ALIGNMENT  PD_gs.alignments[9]
-#define GNU3_PPC64_ALIGNMENT   PD_gs.alignments[10]
-#define GNU4_PPC64_ALIGNMENT   PD_gs.alignments[11]
-#define XLC64_PPC64_ALIGNMENT  PD_gs.alignments[12]
-#define GNU4_X86_64_ALIGNMENT  PD_gs.alignments[13]
-#define PGI_X86_64_ALIGNMENT   PD_gs.alignments[14]
+#define TEXT_ALIGNMENT         PD_gs.alignments[PD_TEXT_ALGN]
+#define BYTE_ALIGNMENT         PD_gs.alignments[PD_BYTE_ALGN]
+#define WORD2_ALIGNMENT        PD_gs.alignments[PD_WORD2_ALGN]
+#define WORD4_ALIGNMENT        PD_gs.alignments[PD_WORD4_ALGN]
+#define WORD8_ALIGNMENT        PD_gs.alignments[PD_WORD8_ALGN]
+#define GNU4_I686_ALIGNMENT    PD_gs.alignments[PD_GNU4_I686_ALGN]
+#define OSX_10_5_ALIGNMENT     PD_gs.alignments[PD_OSX_10_5_ALGN]
+#define SPARC_ALIGNMENT        PD_gs.alignments[PD_SPARC_ALGN]
+#define XLC32_PPC64_ALIGNMENT  PD_gs.alignments[PD_XLC32_PPC64_ALGN]
+#define CYGWIN_I686_ALIGNMENT  PD_gs.alignments[PD_CYGWIN_I686_ALGN]
+#define GNU3_PPC64_ALIGNMENT   PD_gs.alignments[PD_GNU3_PPC64_ALGN]
+#define GNU4_PPC64_ALIGNMENT   PD_gs.alignments[PD_GNU4_PPC64_ALGN]
+#define XLC64_PPC64_ALIGNMENT  PD_gs.alignments[PD_XLC64_PPC64_ALGN]
+#define GNU4_X86_64_ALIGNMENT  PD_gs.alignments[PD_GNU4_X86_64_ALGN]
+#define PGI_X86_64_ALIGNMENT   PD_gs.alignments[PD_PGI_X86_64_ALGN]
 #define PD_N_ALIGNMENTS        15
 
 /*--------------------------------------------------------------------------*/
@@ -274,6 +274,50 @@ typedef memdes *(*PFPDBread)(memdes *members);
 typedef int (*PFSymDelay)(PDBfile *file, int ad, char *name, char *type,
 			  char *acc, char *rej);
 
+
+/*
+ * #bind derived PD_data_std_i integer SC_ENUM_I SC_ENUM_I PD_GENERIC
+ */
+
+enum e_PD_data_std_i
+   {PD_NO_STD      = -1,
+    PD_TEXT_STD    =  0,
+    PD_I386_STD    =  1,
+    PD_I586L_STD   =  2,
+    PD_I586O_STD   =  3,
+    PD_PPC32_STD   =  4,
+    PD_X86_64_STD  =  5,
+    PD_X86_64A_STD =  6,
+    PD_PPC64_STD   =  7,
+    PD_M68X_STD    =  8,
+    PD_VAX_STD     =  9,
+    PD_CRAY_STD    = 10};
+
+typedef enum e_PD_data_std_i PD_data_std_i;
+
+/*
+ * #bind derived PD_data_algn_i integer SC_ENUM_I SC_ENUM_I PD_GENERIC
+ */
+
+enum e_PD_data_algn_i
+   {PD_NO_ALGN          = -1,
+    PD_TEXT_ALGN        =  0,
+    PD_BYTE_ALGN        =  1,
+    PD_WORD2_ALGN       =  2,
+    PD_WORD4_ALGN       =  3,
+    PD_WORD8_ALGN       =  4,
+    PD_GNU4_I686_ALGN   =  5,
+    PD_OSX_10_5_ALGN    =  6,
+    PD_SPARC_ALGN       =  7,
+    PD_XLC32_PPC64_ALGN =  8,
+    PD_CYGWIN_I686_ALGN =  9,
+    PD_GNU3_PPC64_ALGN  = 10,
+    PD_GNU4_PPC64_ALGN  = 11,
+    PD_XLC64_PPC64_ALGN = 12,
+    PD_GNU4_X86_64_ALGN = 13,
+    PD_PGI_X86_64_ALGN  = 14};
+
+typedef enum e_PD_data_algn_i PD_data_algn_i;
 
 /*
  * #bind derived PD_major_op integer SC_ENUM_I SC_ENUM_I PD_GENERIC

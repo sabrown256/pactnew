@@ -197,7 +197,7 @@ int comm_read(client *cl, char *s, int nc, int to)
        nb = _comm_read_wrk(cl, s, nc, to);
     else
        {int nz, nzx, tl;
-	char u[BFMG];
+	char u[BFVLG];
 
 /* there is about a 6 second delay down in _comm_read_wrk due
  * to retry logic so only give it a few chances here
@@ -208,8 +208,8 @@ int comm_read(client *cl, char *s, int nc, int to)
 	for (nz = 0, nb = 0; (nb == 0) && (nz < nzx); )
 	    {nb = ring_pop(&cl->ior, s, nc, '\0');
 	     if (nb == 0)
-	        {memset(u, 0, BFMG);
-		 nt = _comm_read_wrk(cl, u, BFMG, tl);
+	        {memset(u, 0, BFVLG);
+		 nt = _comm_read_wrk(cl, u, BFVLG, tl);
 		 ok = ring_push(&cl->ior, u, nt);
 	         if (nt <= 0)
 		    nz++;
@@ -575,7 +575,7 @@ client *make_client(ckind type, int port, int auth, char *root,
         cl->clog   = clog;
         cl->cauth  = cauth;
 
-	ring_init(&cl->ior, BFMG);
+	ring_init(&cl->ior, BFVLG);
 
 	CLOG(cl, 1, "----- start client -----");};
 

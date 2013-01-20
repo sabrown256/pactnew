@@ -47,14 +47,6 @@ setenv RootLib  /usr/lib
 
 setenv SUFFIXES  '.i'
 
-# PACT_CC_ refers to the Compiler Collection used to build PACT
-# rather than COMPILER_ which is overloaded to the extreme
-PACT_CC_FAMILY   = generic
-PACT_CC_EXE      = `which cc`
-PACT_CC_VERSION  = ""
-PACT_FC_FAMILY   = generic
-PACT_FC_VERSION  = ""
-STD_C            = X99
 LIB              = lib
 MAKE_Shared_Libs = FALSE
 FilterDir        =
@@ -101,6 +93,16 @@ Tool PY {
 }
 
 # initialize standard groups
+
+# PACT_CC_ refers to the Compiler Collection used to build PACT
+# rather than COMPILER_ which is overloaded to the extreme
+Group PACT {
+   CC_FAMILY  = generic
+   CC_EXE     = `which cc`
+   CC_VERSION = ""
+   FC_FAMILY  = generic
+   FC_VERSION = ""
+}
 
 Group STD {
    C      = X99

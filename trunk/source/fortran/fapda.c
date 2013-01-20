@@ -2393,6 +2393,7 @@ FIXNUM FF_ID(pfrent, PFRENT)(FIXNUM *sfid, FIXNUM *sncn, char *name)
 /* PFTRGT - target the next file to be opened
  *        - given an index from the following list:
  *        -
+ * old - bad mapping of names and indeces
  *        -   (1,  5)  - GCC 4.0 and later X86_64
  *        -   (2,  5)  - GCC 4.0 and later Ix86
  *        -   (1,  5)  - Mac OSX 10.6 and later
@@ -2403,22 +2404,34 @@ FIXNUM FF_ID(pfrent, PFRENT)(FIXNUM *sfid, FIXNUM *sncn, char *name)
  *        -   (6, 12)  - SPARC
  *        -   (4,  2)  - DOS
  *        -
+ * new - corrected mapping of name and indeces
+ *        -   (5, 13)  - GCC 4.0 and later X86_64
+ *        -   (2, 13)  - GCC 4.0 and later Ix86
+ *        -   (5, 13)  - Mac OSX 10.6 and later
+ *        -   (3,  6)  - Mac OSX 10.5
+ *        -   (2,  9)  - Cygwin i686
+ *        -   (7, 12)  - IBM PPC64 XLC 64 bit
+ *        -   (4,  8)  - IBM PPC64 XLC 32 bit
+ *        -   (4,  7)  - SPARC
+ *        -   (1,  2)  - DOS
+ *        -
  *        - return TRUE iff successful
  */
 
 FIXNUM FF_ID(pftrgt, PFTRGT)(FIXNUM *sis, FIXNUM *sia)
-   {int al, st;
+   {PD_data_std_i st;
+    PD_data_algn_i al;
     FIXNUM rv;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
 
-    al = *sia;
-    st = *sis;
-    rv = (al != 6);
+    st = *sis - 1;
+    al = *sia - 1;
+    rv = (al != 5);
     if (rv)
-       {pa->req_std   = PD_gs.std_standards[st - 1];
-        pa->req_align = PD_gs.std_alignments[al - 1];}
+       {pa->req_std   = PD_gs.std_standards[st];
+        pa->req_align = PD_gs.std_alignments[al];}
 
     else
        {pa->req_std   = NULL;
@@ -2437,16 +2450,18 @@ FIXNUM FF_ID(pftrgt, PFTRGT)(FIXNUM *sis, FIXNUM *sia)
  */
 
 FIXNUM FF_ID(pfntgt, PFNTGT)(FIXNUM *sis, FIXNUM *sia)
-   {int al, st, ret;
+   {PD_data_std_i st;
+    PD_data_algn_i al;
+    int ret;
     FIXNUM rv;
     hasharr *chart;
 
-    al = *sia;
-    st = *sis;
-    ret = (al != 6);
+    al = *sia - 1;
+    st = *sis - 1;
+    ret = (al != 5);
     if (ret)
-       {chart = PN_target(PD_gs.std_standards[st - 1],
-			  PD_gs.std_alignments[al - 1]);
+       {chart = PN_target(PD_gs.std_standards[st],
+			  PD_gs.std_alignments[al]);
         rv    = SC_ADD_POINTER(chart);}
 
     else
