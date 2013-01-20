@@ -1984,7 +1984,7 @@ file, PDBLib can carry out a large class of data compressions.
 <p>
 
 <p>
-Available data standards are:
+Available builtin data standards are:
 
 <BLOCKQUOTE>
 <TABLE>
@@ -1992,22 +1992,34 @@ Available data standards are:
 <TR>
 <TD ALIGN="CENTER">C</TD>
 <TD ALIGN="CENTER">Fortran</TD>
+<TD WIDTH="105" ALIGN="CENTER">Scheme</TD>
 <TD ALIGN="CENTER">Byte Order</TD>
 <TD ALIGN="CENTER">S/I/L/LL</TD>
 <TD ALIGN="CENTER">F/D</TD>
 </TR>
 
 <TR>
-<TD>X86_64_STD</TD>
-<TD ALIGN="CENTER">1</TD>
+<TD>TEXT_STD</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD WIDTH="105" ALIGN="CENTER">text-std</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,8,8</TD>
 <TD WIDTH="40" ALIGN="CENTER">4,8</TD>
 </TR>
 
 <TR>
+<TD>I386_STD</TD>
+<TD ALIGN="CENTER">1</TD>
+<TD WIDTH="105" ALIGN="CENTER">i386-std</TD>
+<TD>REVERSE_ORDER</TD>
+<TD WIDTH="80" ALIGN="CENTER">2,2,4,4</TD>
+<TD WIDTH="40" ALIGN="CENTER">4,8</TD>
+</TR>
+
+<TR>
 <TD>I586L_STD</TD>
 <TD ALIGN="CENTER">2</TD>
+<TD WIDTH="105" ALIGN="CENTER">i586l-std</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
 <TD WIDTH="40" ALIGN="CENTER">4,8</TD>
@@ -2016,38 +2028,43 @@ Available data standards are:
 <TR>
 <TD>I586O_STD</TD>
 <TD ALIGN="CENTER">3</TD>
+<TD WIDTH="105" ALIGN="CENTER">i586o-std</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
 <TD WIDTH="40" ALIGN="CENTER">4,8</TD>
 </TR>
 
 <TR>
-<TD>I386_STD</TD>
+<TD>PPC32_STD</TD>
 <TD ALIGN="CENTER">4</TD>
+<TD WIDTH="105" ALIGN="CENTER">ppc32-std</TD>
+<TD>NORMAL_ORDER</TD>
+<TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
+<TD WIDTH="40" ALIGN="CENTER">4,8</TD>
+</TR>
+
+<TR>
+<TD>X86_64_STD</TD>
+<TD ALIGN="CENTER">5</TD>
+<TD WIDTH="105" ALIGN="CENTER">x86-64-std</TD>
 <TD>REVERSE_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,2,4,4</TD>
+<TD WIDTH="80" ALIGN="CENTER">2,4,8,8</TD>
 <TD WIDTH="40" ALIGN="CENTER">4,8</TD>
 </TR>
 
 <TR>
 <TD>PPC64_STD</TD>
-<TD ALIGN="CENTER">5</TD>
+<TD ALIGN="CENTER">7</TD>
+<TD WIDTH="105" ALIGN="CENTER">ppc64-std</TD>
 <TD>NORMAL_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,8,8</TD>
 <TD WIDTH="40" ALIGN="CENTER">4,8</TD>
 </TR>
 
 <TR>
-<TD>PPC32_STD</TD>
-<TD ALIGN="CENTER">6</TD>
-<TD>NORMAL_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,8</TD>
-</TR>
-
-<TR>
 <TD>M68X_STD</TD>
-<TD ALIGN="CENTER">7</TD>
+<TD ALIGN="CENTER">8</TD>
+<TD WIDTH="105" ALIGN="CENTER">m68x-std</TD>
 <TD>NORMAL_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,2,4,4</TD>
 <TD WIDTH="40" ALIGN="CENTER">4,12</TD>
@@ -2055,7 +2072,8 @@ Available data standards are:
 
 <TR>
 <TD>VAX_STD</TD>
-<TD ALIGN="CENTER">8</TD>
+<TD ALIGN="CENTER">9</TD>
+<TD WIDTH="105" ALIGN="CENTER">vax-std</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
 <TD WIDTH="40" ALIGN="CENTER">4,8</TD>
@@ -2063,7 +2081,8 @@ Available data standards are:
 
 <TR>
 <TD>CRAY_STD</TD>
-<TD ALIGN="CENTER">9</TD>
+<TD ALIGN="CENTER">10</TD>
+<TD WIDTH="105" ALIGN="CENTER">cray-std</TD>
 <TD>NORMAL_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">8,8,8,8</TD>
 <TD WIDTH="40" ALIGN="CENTER">8,8</TD>
@@ -2086,79 +2105,99 @@ Available data alignments are:
 <TR>
 <TD ALIGN="CENTER">C</TD>
 <TD WIDTH="60" ALIGN="CENTER">Fortran</TD>
+<TD WIDTH="85" ALIGN="CENTER">Scheme</TD>
 <TD WIDTH="240" ALIGN="CENTER">P/C/S/I/L/LL/F/D/LD/Str</TD>
+</TR>
+
+<TR>
+<TD>TEXT_ALIGNMENT</TD>
+<TD WIDTH="60" ALIGN="CENTER">0</TD>
+<TD WIDTH="85" ALIGN="CENTER">text-algn</TD>
+<TD WIDTH="240" ALIGN="CENTER">1, 1, 1, 1, 1, 1, 1, 1,  1, 0</TD>
 </TR>
 
 <TR>
 <TD>BYTE_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">1</TD>
+<TD WIDTH="85" ALIGN="CENTER">byte-algn</TD>
 <TD WIDTH="240" ALIGN="CENTER">1, 1, 1, 1, 1, 1, 1, 1,  1, 0</TD>
 </TR>
 
 <TR>
 <TD>WORD2_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">2</TD>
+<TD WIDTH="85" ALIGN="CENTER">word2-algn</TD>
 <TD WIDTH="240" ALIGN="CENTER">2, 1, 2, 2, 2, 2, 2, 2,  2, 0</TD>
 </TR>
 
 <TR>
 <TD>WORD4_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">3</TD>
+<TD WIDTH="85" ALIGN="CENTER">word4-algn</TD>
 <TD WIDTH="240" ALIGN="CENTER">4, 1, 4, 4, 4, 4, 4, 4,  4, 0</TD>
 </TR>
 
 <TR>
 <TD>WORD8_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">4</TD>
+<TD WIDTH="85" ALIGN="CENTER">work8-algn</TD>
 <TD WIDTH="240" ALIGN="CENTER">8, 4, 8, 8, 8, 8, 8, 8,  8, 8</TD>
 </TR>
 
 <TR>
-<TD>GNU4_X86_64_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">5</TD>
-<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 8, 16, 0</TD>
-</TR>
-
-<TR>
 <TD>GNU4_I686_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">6</TD>
-<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 4,  4, 0</TD>
-</TR>
-
-<TR>
-<TD>CYGWIN_I686_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">7</TD>
-<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 8,  4, 0</TD>
-</TR>
-
-<TR>
-<TD>GNU3_PPC64_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">8</TD>
-<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 8, 16, 0</TD>
-</TR>
-
-<TR>
-<TD>XLC64_PPC64_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">9</TD>
-<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 4,  4, 0</TD>
-</TR>
-
-<TR>
-<TD>XLC32_PPC64_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">10</TD>
+<TD WIDTH="60" ALIGN="CENTER">5</TD>
+<TD WIDTH="85" ALIGN="CENTER">gnu4-i686-algn</TD>
 <TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 4,  4, 0</TD>
 </TR>
 
 <TR>
 <TD>OSX_10_5_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">11</TD>
+<TD WIDTH="60" ALIGN="CENTER">6</TD>
+<TD WIDTH="85" ALIGN="CENTER">osx-10-5-algn</TD>
 <TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 4, 4, 4, 16, 0</TD>
 </TR>
 
 <TR>
 <TD>SPARC_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">12</TD>
+<TD WIDTH="60" ALIGN="CENTER">7</TD>
+<TD WIDTH="85" ALIGN="CENTER">sparc-algn</TD>
 <TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 4, 4, 8,  8, 0</TD>
+</TR>
+
+<TR>
+<TD>XLC32_PPC64_ALIGNMENT</TD>
+<TD WIDTH="60" ALIGN="CENTER">8</TD>
+<TD WIDTH="85" ALIGN="CENTER">xlc32-ppc64-algn</TD>
+<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 4,  4, 0</TD>
+</TR>
+
+<TR>
+<TD>CYGWIN_I686_ALIGNMENT</TD>
+<TD WIDTH="60" ALIGN="CENTER">9</TD>
+<TD WIDTH="85" ALIGN="CENTER">cygwin-i686-algn</TD>
+<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 8,  4, 0</TD>
+</TR>
+
+<TR>
+<TD>GNU3_PPC64_ALIGNMENT</TD>
+<TD WIDTH="60" ALIGN="CENTER">10</TD>
+<TD WIDTH="85" ALIGN="CENTER">gnu3-ppc64-algn</TD>
+<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 8, 16, 0</TD>
+</TR>
+
+<TR>
+<TD>XLC64_PPC64_ALIGNMENT</TD>
+<TD WIDTH="60" ALIGN="CENTER">12</TD>
+<TD WIDTH="85" ALIGN="CENTER">xlc64-ppc64-algn</TD>
+<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 4,  4, 0</TD>
+</TR>
+
+<TR>
+<TD>GNU4_X86_64_ALIGNMENT</TD>
+<TD WIDTH="60" ALIGN="CENTER">13</TD>
+<TD WIDTH="85" ALIGN="CENTER">gnu4-x86-64-algn</TD>
+<TD WIDTH="240" ALIGN="CENTER">4, 1, 2, 4, 4, 8, 4, 8, 16, 0</TD>
 </TR>
 
 </TABLE>
@@ -2180,64 +2219,154 @@ Some common configurations are:
 <TABLE>
 <TR>
 <TD>Platform</TD>
-<TD>C Method</TD>
-<TD>Fortran</TD>
-<TD>SX Method</TD>
+<TD WIDTH=100 ALIGN=CENTER>Method</TD>
+<TD>Call</TD>
 </TR>
+
 <TR>
 <TD>GCC 4.0 and later X86_64</TD>
+<TD WIDTH=100 ALIGN=CENTER>C</TD>
 <TD><tt>PD_target(&amp;X86_64_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(1, 5)</tt></TD>
-<TD><tt>(target 1 5)</tt></TD>
 </TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Fortran</TD>
+<TD><tt>PFTRGT(5, 13)</tt></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Scheme</TD>
+<TD><tt>(target x86-64-std gnu4-x86-64-algn)</tt></TD>
+</TR>
+
 <TR>
 <TD>GCC 4.0 and later Ix86</TD>
+<TD WIDTH=100 ALIGN=CENTER>C</TD>
 <TD><tt>PD_target(&amp;I586L_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(2, 5)</tt></TD>
-<TD><tt>(target 2 5)</tt></TD>
 </TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Fortran</TD>
+<TD><tt>PFTRGT(2, 13)</tt></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Scheme</TD>
+<TD><tt>(target i586l-std gnu4-x86-64-algn)</tt></TD>
+</TR>
+
 <TR>
 <TD>Mac OSX 10.6 and later</TD>
+<TD WIDTH=100 ALIGN=CENTER>C</TD>
 <TD><tt>PD_target(&amp;X86_64_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(1, 5)</tt></TD>
-<TD><tt>(target 1 5)</tt></TD>
 </TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Fortran</TD>
+<TD><tt>PFTRGT(5, 13)</tt></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Scheme</TD>
+<TD><tt>(target x86-64-std gnu4-x86-64-algn)</tt></TD>
+</TR>
+
 <TR>
 <TD>Mac OSX 10.5</TD>
+<TD WIDTH=100 ALIGN=CENTER>C</TD>
 <TD><tt>PD_target(&amp;I586O_STD, &amp;OSX_10_5_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(3, 11)</tt></TD>
-<TD><tt>(target 3 11)</tt></TD>
 </TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Fortran</TD>
+<TD><tt>PFTRGT(3, 6)</tt></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Scheme</TD>
+<TD><tt>(target i586o-std osx-10-5-algn)</tt></TD>
+</TR>
+
 <TR>
 <TD>Cygwin i686</TD>
+<TD WIDTH=100 ALIGN=CENTER>C</TD>
 <TD><tt>PD_target(&amp;I586L_STD, &amp;CYGWIN_I686_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(2, 7)</tt></TD>
-<TD><tt>(target 2 7)</tt></TD>
 </TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Fortran</TD>
+<TD><tt>PFTRGT(2, 9)</tt></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Scheme</TD>
+<TD><tt>(target i586l-std cygwin-i686-algn)</tt></TD>
+</TR>
+
 <TR>
 <TD>IBM PPC64 XLC 64 bit</TD>
+<TD WIDTH=100 ALIGN=CENTER>C</TD>
 <TD><tt>PD_target(&amp;PPC64_STD, &amp;XLC64_PPC64_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(5, 9)</tt></TD>
-<TD><tt>(target 5 9)</tt></TD>
 </TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Fortran</TD>
+<TD><tt>PFTRGT(7, 12)</tt></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Scheme</TD>
+<TD><tt>(target ppc64-std xlc64-ppc64-algn)</tt></TD>
+</TR>
+
 <TR>
 <TD>IBM PPC64 XLC 32 bit</TD>
+<TD WIDTH=100 ALIGN=CENTER>C</TD>
 <TD><tt>PD_target(&amp;PPC32_STD, &amp;XLC32_PPC64_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(6, 10)</tt></TD>
-<TD><tt>(target 6 10)</tt></TD>
 </TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Fortran</TD>
+<TD><tt>PFTRGT(4, 8)</tt></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Scheme</TD>
+<TD><tt>(target ppc32-std xlc32-ppc64-algn)</tt></TD>
+</TR>
+
 <TR>
 <TD>SPARC</TD>
+<TD WIDTH=100 ALIGN=CENTER>C</TD>
 <TD><tt>PD_target(&amp;PPC32_STD, &amp;SPARC_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(6 12)</tt></TD>
-<TD><tt>(target 6 12)</tt></TD>
 </TR>
 <TR>
-<TD>DOS</TD>
-<TD><tt>PD_target(&amp;I386_STD, &amp;WORD2_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(4, 2)</tt></TD>
-<TD><tt>(target 4 2)</tt></TD>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Fortran</TD>
+<TD><tt>PFTRGT(4, 7)</tt></TD>
 </TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Scheme</TD>
+<TD><tt>(target ppc32-std sparc-algn)</tt></TD>
+</TR>
+
+<TR>
+<TD>DOS</TD>
+<TD WIDTH=100 ALIGN=CENTER>C</TD>
+<TD><tt>PD_target(&amp;I386_STD, &amp;WORD2_ALIGNMENT)</tt></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Fortran</TD>
+<TD><tt>PFTRGT(1, 2)</tt></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD WIDTH=100 ALIGN=CENTER>Scheme</TD>
+<TD><tt>(target i386-std word2-algn)</tt></TD>
+</TR>
+
 </TABLE>
 
 <br>
@@ -2293,9 +2422,9 @@ void test_target(char *tgt, char *base, int n,
 
  c ... set target architecture
  c ... PPC32_STD
-       is = 6
+       is = 4
  c ... GNU3_PPC64_ALIGNMENT
-       ia = 8
+       ia = 10
        if (pftrgt(is, ia) .eq. 0)
       &amp;   call errproc
              .
@@ -2311,8 +2440,8 @@ void test_target(char *tgt, char *base, int n,
              .
 
  ; set target architecture
- ; PPC32_STD is 6 and GNU3_PPC64_ALIGNMENT is 8
-     (target 6 8)
+ ; PPC32_STD and GNU3_PPC64_ALIGNMENT
+     (target ppc32-std gnu3-ppc64-algn)
              .
              .
              .

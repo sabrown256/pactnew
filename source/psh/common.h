@@ -114,6 +114,7 @@ enum e_array_size_constants
    {BFSML   = 256,
     BFMDM   = 512,
     BFLRG   = 4096,
+    BFVLG   = 131072,
     BFMG    = 1048576,
     N_STACK = 32};
 

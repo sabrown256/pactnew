@@ -21,12 +21,12 @@ typedef int (*PDBFileRead)(PDBfile *fp, char *path, char *ty,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_TARGET - set the data standard and alignment for the next file to be
- *            - created. If an argument is 0 or missing, the corresponding
- *            - value is not changed.
+/* _SX_TARGET_OLD - set the data standard and alignment for the next file to be
+ *                - created. If an argument is 0 or missing, the corresponding
+ *                - value is not changed.
  */
 
-static void _SX_target(SS_psides *si, int data, int align)
+static void _SX_target_old(SS_psides *si, int data, int align)
    {int data_max, align_max;
 
     data_max  = 0;
@@ -62,6 +62,48 @@ static void _SX_target(SS_psides *si, int data, int align)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_TARGET - set the data standard and alignment for the next file to be
+ *            - created. If an argument is 0 or missing, the corresponding
+ *            - value is not changed.
+ */
+
+static void _SX_target(SS_psides *si,
+		       PD_data_std_i data, PD_data_algn_i align)
+   {int data_max, align_max;
+
+    data_max  = 0;
+    align_max = 0;
+
+    if (data == PD_NO_STD)
+       {if (PD_gs.req_standard != NULL)
+           while (PD_gs.req_standard != PD_gs.std_standards[data++]);}
+    else
+       {while (PD_gs.std_standards[data_max++] != NULL);
+        if ((data < 1) || (data >= data_max))
+           SS_error(si, "UNKNOWN DATA STANDARD - _SX_TARGET",
+                    SS_mk_integer(si, data));};
+        
+    if (align == PD_NO_ALGN)
+       {if (PD_gs.req_alignment != NULL)
+           while (PD_gs.req_alignment != PD_gs.std_alignments[align++]);}
+    else
+       {while (PD_gs.std_alignments[align_max++] != NULL);
+	if ((align < 1) || (align >= align_max))
+           SS_error(si, "UNKNOWN DATA ALIGNMENT - _SX_TARGET",
+		    SS_mk_integer(si, align));};
+
+    if (data != PD_NO_STD)
+       PD_gs.req_standard  = PD_gs.std_standards[data];
+    if (align != PD_NO_ALGN)
+       PD_gs.req_alignment = PD_gs.std_alignments[align];
+
+    PD_target(PD_gs.req_standard, PD_gs.req_alignment);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SXI_TARGET - set the data standard and alignment for subsequently created
  *             - files. If an argument is 0 or missing, the corresponding
  *             - value is not changed. The data standard and alignment are
@@ -70,15 +112,16 @@ static void _SX_target(SS_psides *si, int data, int align)
  */
 
 static object *_SXI_target(SS_psides *si, object *arg)
-   {int data, align;
+   {PD_data_std_i data;
+    PD_data_algn_i align;
     object *o;
 
-    data  = 0;
-    align = 0;
+    data  = PD_NO_STD;
+    align = PD_NO_ALGN;
 
     SS_args(si, arg,
-            SC_INT_I, &data,
-            SC_INT_I, &align,
+            SC_ENUM_I, &data,
+            SC_ENUM_I, &align,
             0);
 
     _SX_target(si, data, align);
@@ -97,7 +140,8 @@ static object *_SXI_target(SS_psides *si, object *arg)
 /* _SXI_OPEN_RAW_FILE - open a file as a binary input port */
 
 static object *_SXI_open_raw_file(SS_psides *si, object *argl)
-   {int data, align;
+   {PD_data_std_i data;
+    PD_data_algn_i align;
     char *name, *mode, *type, *md;
     SC_udl *pu;
     PDBfile *file;
@@ -108,15 +152,15 @@ static object *_SXI_open_raw_file(SS_psides *si, object *argl)
     if (!_PD_IS_SMP_INIT)
        PD_init_threads(0, NULL);
 
-    data  = 0;
-    align = 0;
+    data  = PD_NO_STD;
+    align = PD_NO_ALGN;
     type  = NULL;
     SS_args(si, argl,
             SC_STRING_I, &name,
             SC_STRING_I, &mode,
             SC_STRING_I, &type,
-            SC_INT_I, &data,
-            SC_INT_I, &align,
+            SC_ENUM_I, &data,
+            SC_ENUM_I, &align,
             0);
 
 /* if it is a UDL */
