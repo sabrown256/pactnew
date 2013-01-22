@@ -85,7 +85,7 @@ dbmget $Log AR_IFlag^               \
             PY_Vers^                \
             Ranlib_Exe^             \
             RPATH^                  \
-            STD_PARALLEL_COMM^      \
+            PARALLEL_COMM_METH^     \
             SUFFIXES^               \
             Sys^                    \
             SysDir^                 \
@@ -312,10 +312,10 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
 # Parallel I/O
     if ($MAKE_Strategy == "SpaceSaving") then
-       set MPDev  = '${Ar'$STD_PARALLEL_COMM'}'
+       set MPDev  = '${Ar'$PARALLEL_COMM_METH'}'
        set IPCDev = '${Ar'$STD_IPC'}'
     else
-       set MPDev  = '${O'$STD_PARALLEL_COMM'}'
+       set MPDev  = '${O'$PARALLEL_COMM_METH'}'
        set IPCDev = '${O'$STD_IPC'}'
     endif
     Note $STDOUT "MPassDevices = $MPDev"

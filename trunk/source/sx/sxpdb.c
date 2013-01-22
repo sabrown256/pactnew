@@ -19,6 +19,9 @@ typedef int (*PDBFileRead)(PDBfile *fp, char *path, char *ty,
 			   syment *ep, void *vr);
 
 /*--------------------------------------------------------------------------*/
+
+#if 0
+
 /*--------------------------------------------------------------------------*/
 
 /* _SX_TARGET_OLD - set the data standard and alignment for the next file to be
@@ -60,6 +63,9 @@ static void _SX_target_old(SS_psides *si, int data, int align)
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* _SX_TARGET - set the data standard and alignment for the next file to be
@@ -69,33 +75,30 @@ static void _SX_target_old(SS_psides *si, int data, int align)
 
 static void _SX_target(SS_psides *si,
 		       PD_data_std_i data, PD_data_algn_i align)
-   {int data_max, align_max;
-
-    data_max  = 0;
-    align_max = 0;
+   {int a, d;
 
     if (data == PD_NO_STD)
        {if (PD_gs.req_standard != NULL)
-           while (PD_gs.req_standard != PD_gs.std_standards[data++]);}
+           while (PD_gs.req_standard != &PD_gs.standards[data++]);}
     else
-       {while (PD_gs.std_standards[data_max++] != NULL);
-        if ((data < 1) || (data >= data_max))
+       {d = data;
+        if ((d < 0) || (d >= PD_N_STANDARDS))
            SS_error(si, "UNKNOWN DATA STANDARD - _SX_TARGET",
-                    SS_mk_integer(si, data));};
+                    SS_mk_integer(si, d));};
         
     if (align == PD_NO_ALGN)
        {if (PD_gs.req_alignment != NULL)
-           while (PD_gs.req_alignment != PD_gs.std_alignments[align++]);}
+           while (PD_gs.req_alignment != &PD_gs.alignments[align++]);}
     else
-       {while (PD_gs.std_alignments[align_max++] != NULL);
-	if ((align < 1) || (align >= align_max))
+       {a = align;
+	if ((a < 0) || (a >= PD_N_ALIGNMENTS))
            SS_error(si, "UNKNOWN DATA ALIGNMENT - _SX_TARGET",
-		    SS_mk_integer(si, align));};
+		    SS_mk_integer(si, a));};
 
     if (data != PD_NO_STD)
-       PD_gs.req_standard  = PD_gs.std_standards[data];
+       PD_gs.req_standard  = &PD_gs.standards[data];
     if (align != PD_NO_ALGN)
-       PD_gs.req_alignment = PD_gs.std_alignments[align];
+       PD_gs.req_alignment = &PD_gs.alignments[align];
 
     PD_target(PD_gs.req_standard, PD_gs.req_alignment);
 

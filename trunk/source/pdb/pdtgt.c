@@ -152,3 +152,24 @@ int PD_target(data_standard *data, data_alignment *align)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_TARGET_I - setup for the target machine data formats and alignments
+ *             - using indeces for builtin data_standards and data_alignments
+ *
+ * #bind PD_target_i fortran() scheme() python()
+ */
+
+int PD_target_i(PD_data_std_i is, PD_data_algn_i ia)
+   {PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+    
+    _PD_init_state(FALSE);
+
+    pa->req_std   = &PD_gs.standards[is];
+    pa->req_align = &PD_gs.alignments[ia];
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

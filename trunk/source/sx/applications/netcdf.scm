@@ -57,7 +57,7 @@
 
 (define (open-netcdf-file-for-reading name mode)
    (if (file? name)
-       (let* ((nf (open-raw-binary-file name mode "NETCDF" 1 1)))
+       (let* ((nf (open-raw-binary-file name mode "NETCDF" x86-64-std byte-algn)))
 	     (if nf
 		 (let* ((magic (scalar-value nf "long" SEEK-SET))
 			(numrecs (scalar-value nf "long" SEEK-CUR)))

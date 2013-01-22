@@ -21,7 +21,7 @@ dbmget $ALog REQUEST_MPI        =\? FALSE^   \
              HAVE_MPI_2         =\? FALSE^   \
              HAVE_MPI_STDIN_ALL =\? FALSE^   \
              HAVE_MPI_GOOD_IO   =\? FALSE^   \
-             STD_PARALLEL_COMM  =\? PARC^    \
+             PARALLEL_COMM_METH =\? PARC^    \
              Save_CC            =\? "cc"^    \
              DP_Inc             =\? ""^      \
              DP_Lib             =\? ""^      \
@@ -67,8 +67,8 @@ foreach j ($DP_Inc $RootInc)
 # check for <path>/<pkg>/<pkg>.h form
    if ($GotIt == TRUE) then
       flog $ALog set lParComm = ( mpi $lParComm )
-      if ("$STD_PARALLEL_COMM" == "") then
-         setenv STD_PARALLEL_COMM MPI
+      if ("$PARALLEL_COMM_METH" == "") then
+         setenv PARALLEL_COMM_METH MPI
       endif
       break
    endif
@@ -237,7 +237,7 @@ dbmget $ALog HAVE_OPENMPI       = $HAVE_OPENMPI^        \
              HAVE_MPI_2         = $HAVE_MPI_2^          \
              HAVE_MPI_STDIN_ALL = $HAVE_MPI_STDIN_ALL^  \
              HAVE_MPI_GOOD_IO   = $HAVE_MPI_GOOD_IO^    \
-             STD_PARALLEL_COMM  = $STD_PARALLEL_COMM^   \
+             PARALLEL_COMM_METH = $PARALLEL_COMM_METH^   \
              DP_Inc             = $DP_Inc^              \
              DP_Lib             = $DP_Lib^              \
              DP_RPath           = $DP_RPath^            \

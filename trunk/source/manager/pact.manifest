@@ -50,6 +50,7 @@ f90 pact_pgs.mod pact_panacea.mod pact_scheme.mod pact_fortran.mod
 f90 pact_libc.mod
 f90 types_score.mod types_pml.mod types_pdb.mod types_ppc.mod
 f90 types_pgs.mod types_panacea.mod types_scheme.mod types_fortran.mod
+f90 parameters_pdb.mod
 
 scm annotate.scm binedit.scm compare.scm consts.scm csynt.scm
 scm fsynt.scm func.scm exec.scm help.scm lang.scm

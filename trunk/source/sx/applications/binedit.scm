@@ -17,48 +17,36 @@
 
 (define-macro (open-binary-file file  . arg)
     "OPEN-BINARY-FILE - Open the named file for raw binary access.
-               Standard  defaults to 7 (Cray)
-               Alignment defaults to 6 (Cray)
+               Standard  defaults to x86-64-std
+               Alignment defaults to gnu4-x86-64-algn
                Mode      defaults to r
 
-               Allowable values for standard are:  1 IEEEA_STD
-                                                   2 IEEEB_STD
-                                                   3 IEEEC_STD
-                                                   4 INTELA_STD
-                                                   5 INTELB_STD
-                                                   6 VAX_STD
-                                                   7 CRAY_STD
-                                                   8 IEEED_STD
-                                                   9 IEEEE_STD
+               Allowable values for standard are:
+                   text-std, i386-std, i586l-std, i586o-std,
+                   ppc32-std, x86-64-std, x86-64a-std, ppc64-std,
+                   m68x-std, vax-std, cray-std
 
-               Allowable values for alignment are: 1 M68000_ALIGNMENT
-                                                   2 SPARC_ALIGNMENT
-                                                   3 MIPS_ALIGNMENT
-                                                   4 INTELA_ALIGNMENT
-                                                   5 DEF_ALIGNMENT
-                                                   6 UNICOS_ALIGNMENT
-                                                   7 UNICOS_ALIGNMENT
-                                                   8 RS6000_ALIGNMENT
-                                                   9 MIPS64_ALIGNMENT
-                                                  10 ALPHA64_ALIGNMENT
-                                                  11 INTELB_ALIGNMENT
-                                                  12 INTELC_ALIGNMENT
-                                                  13 VAX_ALIGNMENT
+               Allowable values for alignment are:
+                   text-algn, byte-algn, word2-algn, word4-algn,
+                   word8-algn, gnu4-i686-algn, osx-10-5-algn,
+                   sparc-algn, xlc32-ppc64-algn, cygwin-i686-algn,
+                   gnu3-ppc64-algn, gnu4-ppc64-algn, xlc64-ppc64-algn,
+                   gnu4-x86-64-algn, pgi-x86-64-algn
 
      Usage: open-binary-file <filename> [<standard> <alignment> <mode>]
        
-     Examples: open-binary-file foo 7 6 r 
-               open binary file foo with Cray standard and alignment and 
+     Examples: open-binary-file foo x86-64-std gnu4-x86-64-algn r 
+               open binary file foo with X86-64 standard and alignment and 
                     read access."
 (plot-flag off)
 
      (let* ((name (print-name file))
 	   (std  (if (and arg (> (length arg) 0))
 		      (list-ref arg 0)
-		      7))
+		      x86-64-std))
 	   (align (if (and arg (> (length arg) 1))
 		      (list-ref arg 1)
-		      6))
+		      gnu4-x86-64-algn))
 	   (mode  (if (and arg (> (length arg) 2))
 		      (print-name (list-ref arg 2))
 		      "r"))

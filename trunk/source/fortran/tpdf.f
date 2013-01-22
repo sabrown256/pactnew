@@ -1233,6 +1233,7 @@
 ! TPDF - main test routine
 
       program tpdf
+      use parameters_pdb
       implicit none 
 
 !     Program input command option flags:
@@ -1382,8 +1383,8 @@
          endif
 
 ! ... CRAY standard and alignment
-         is = 9
-         ia = 4
+         is = PD_CRAY_STD
+         ia = PD_WORD8_ALGN
 
          if (pftrgt(is, ia) .eq. 0) &
             call errproc

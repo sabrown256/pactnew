@@ -4,9 +4,8 @@
 ; include "cpyright.h"
 ;
 
-(define le-std 1)	; X86_64_STD
-(define be-std 5)	; PPC64_STD
-(define cray-std 9)	; CRAY_STD
+(define le-std x86-64-std)	; X86_64_STD
+(define be-std ppc64-std)	; PPC64_STD
 (define kind "RAW")
 
 ;--------------------------------------------------------------------------
@@ -37,7 +36,7 @@
 
 (define (get-endian name)
   (if (file? name)
-      (let* ((fp  (open-raw-binary-file name "r" kind 1 1))
+      (let* ((fp  (open-raw-binary-file name "r" kind x86-64-std byte-algn))
              (jnk (seek-file fp 8 SEEK-SET))
 	     (str (value-list fp "char" 1 SEEK-CUR))
 	     (int (if (> (string-length str) 0)
@@ -73,9 +72,9 @@
   (if (file? name)
       (let* ((endian (get-endian name)))
 	    (cond ((string=? endian "little-endian")
-                   (read-doubles name endian le-std 1))
+                   (read-doubles name endian le-std byte-algn))
 		  ((string=? endian "big-endian")
-                   (read-doubles name endian be-std 1))
+                   (read-doubles name endian be-std byte-algn))
 		  (else
 		   (printf nil "Unknown endianness for %s - exiting\n" name)
 		   (quit))))))
