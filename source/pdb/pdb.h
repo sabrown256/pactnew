@@ -953,11 +953,13 @@ struct s_PD_scope_public
     data_standard *int_standard;
     data_standard *req_standard;
     data_standard standards[PD_N_STANDARDS];
-    data_standard *std_standards[PD_N_STANDARDS + 1];
 
     data_alignment *int_alignment;
     data_alignment *req_alignment;
     data_alignment alignments[PD_N_ALIGNMENTS];
+
+/* NOTE: these next two members are deprecated - do not use */
+    data_standard *std_standards[PD_N_STANDARDS + 1];
     data_alignment *std_alignments[PD_N_ALIGNMENTS + 1];
 
     PD_pfm_fnc par;};
@@ -1436,7 +1438,8 @@ extern int
  PD_target_n_platforms(void),
  PD_target_platform(char *tgt),
  PD_target_platform_n(int np),
- PD_target(data_standard *data, data_alignment *align);
+ PD_target(data_standard *data, data_alignment *align),
+ PD_target_i(PD_data_std_i is, PD_data_algn_i ia);
 
 extern char
  *PD_target_platform_name(int np);

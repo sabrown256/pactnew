@@ -28,6 +28,8 @@ NoteD $Log "   C Standards Configuration - iso-c.h"
 Note $Log ""
 
 dbmget $Log STD_C^          \
+            STD_POSIX^      \
+            STD_XOPEN^      \
             GLIBC_VERSION^  \
             OS_Name^        \
             IncDir^         \
@@ -79,7 +81,8 @@ dbmget $Log STD_C^          \
 #                 excluding the XSI extension
 #                 glibc 2.10 and >
 #
-    setenv STD_POSIX   200112
+# default is STD_POSIX   200112
+#
     if ($#inf >= 3) then
        setenv STD_POSIX   199506
 
@@ -117,7 +120,8 @@ dbmget $Log STD_C^          \
 #                 specification, the XSI extension)
 #                 glibc 2.10 and >
 #
-    setenv STD_XOPEN   600
+# default is STD_XOPEN   600
+#
     if ($#inf >= 2) then
        setenv STD_XOPEN   500
 

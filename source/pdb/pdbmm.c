@@ -43,18 +43,6 @@ PD_scope_public
 	     DEF_VAX_STD,
 	     DEF_CRAY_STD },
 
-/* the array of data_standard accesses - e.g. _SX_target */
-           { &X86_64_STD,                 /* 1 */
-             &I586L_STD,
-             &I586O_STD,
-             &I386_STD,
-             &PPC64_STD,                  /* 5 */
-             &PPC32_STD,
-             &M68X_STD,
-             &VAX_STD,
-             &CRAY_STD,
-             NULL },
-
 /* data_alignments */
 	   &INT_ALG, NULL, 
 
@@ -75,7 +63,21 @@ PD_scope_public
 	     DEF_GNU4_X86_64_ALIGN,
 	     DEF_PGI_X86_64_ALIGN },
 
-/* the array of data_alignment accesses - e.g. _SX_target */
+/* NOTE: these next two members are deprecated - do not use */
+
+/* the array of data_standard accesses */
+           { &X86_64_STD,                 /* 1 */
+             &I586L_STD,
+             &I586O_STD,
+             &I386_STD,
+             &PPC64_STD,                  /* 5 */
+             &PPC32_STD,
+             &M68X_STD,
+             &VAX_STD,
+             &CRAY_STD,
+             NULL },
+
+/* the array of data_alignment accesses */
            { &BYTE_ALIGNMENT,            /* 1 */
              &WORD2_ALIGNMENT,
              &WORD4_ALIGNMENT,

@@ -109,7 +109,7 @@ ArObjs = ${gma} ${gfa} ${TGTLib}(flibc.o) \
          ${TGTLib}(fascm.o) \
          ${TGTLib}(famla.o) ${TGTLib}(fapda.o) ${TGTLib}(fapana.o) \
          ${TGTLib}(fagsa.o) ${TGTLib}(fagsb.o) ${TGTLib}(fagsc.o) \
-         ${TGTLib}(fasxa.o)
+         ${TGTLib}(fasxa.o) ${TGTLib}(fapdprm.o)
 
 ${ArObjs} : ${Hdrs}
 ${Objs} : ${Hdrs}

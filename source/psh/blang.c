@@ -2459,9 +2459,9 @@ static void module_pre_wrap_full(FILE *fp, char *pr, char **ta, char *pck)
 	    {if (strcmp(ta[i], "character") == 0)
 		fprintf(fp, "%s         %s(*) :: %s\n", ind, ta[i], ta[i+1]);
              else if (strcmp(ta[i], "integer-A") == 0)
-                fprintf(fp, "%s         %-12s :: %s(*)\n", "integer", ind, ta[i+1]);
+                fprintf(fp, "%s         %-12s :: %s(*)\n", ind, "integer", ta[i+1]);
              else if (strcmp(ta[i], "real8-A") == 0)
-                fprintf(fp, "%s         %-12s :: %s(*)\n", "real*8", ind, ta[i+1]);
+                fprintf(fp, "%s         %-12s :: %s(*)\n", ind, "real*8", ta[i+1]);
              else
                 fprintf(fp, "%s         %-12s :: %s\n", ind, ta[i], ta[i+1]);};
 

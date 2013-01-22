@@ -106,11 +106,11 @@ Group PACT {
 
 Group STD {
    C      = X99
-   F      = F90
+   F      = F2003
    IPC    = POSIX
    POSIX  = 200112
    XOPEN  = 600
-   MPI    = 2.0
+   MPI    = 1.2
    OPENMP = 3.0
 }
 

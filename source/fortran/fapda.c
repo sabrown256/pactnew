@@ -2348,7 +2348,7 @@ FIXNUM FF_ID(pfgfln, PFGFLN)(FIXNUM *sfid, FIXNUM *sln)
 
 FIXNUM FF_ID(pfdnrm, PFDNRM)(FIXNUM *istd, FIXNUM *snct, char *type,
 			     FIXNUM *sln, void *vr) 
-   {int is;
+   {PD_data_std_i is;
     long n;
     FIXNUM rv;
     data_standard* std;
@@ -2358,10 +2358,10 @@ FIXNUM FF_ID(pfdnrm, PFDNRM)(FIXNUM *istd, FIXNUM *snct, char *type,
     n  = *sln;
     SC_FORTRAN_STR_C(t, type, *snct);
 
-    if (is == -1)
+    if (is == PD_NO_STD)
        std = NULL;
     else
-       std = PD_gs.std_standards[is - 1];
+       std = &PD_gs.standards[is];
 
     rv = PD_fix_denorm(std, t, n, vr);
 
@@ -2393,7 +2393,7 @@ FIXNUM FF_ID(pfrent, PFRENT)(FIXNUM *sfid, FIXNUM *sncn, char *name)
 /* PFTRGT - target the next file to be opened
  *        - given an index from the following list:
  *        -
- * old - bad mapping of names and indeces
+ * old - mapping of names and indeces used PD_gs.std_standards - removed
  *        -   (1,  5)  - GCC 4.0 and later X86_64
  *        -   (2,  5)  - GCC 4.0 and later Ix86
  *        -   (1,  5)  - Mac OSX 10.6 and later
@@ -2404,7 +2404,7 @@ FIXNUM FF_ID(pfrent, PFRENT)(FIXNUM *sfid, FIXNUM *sncn, char *name)
  *        -   (6, 12)  - SPARC
  *        -   (4,  2)  - DOS
  *        -
- * new - corrected mapping of name and indeces
+ * new - mapping of name and indeces uses PD_gs.standards
  *        -   (5, 13)  - GCC 4.0 and later X86_64
  *        -   (2, 13)  - GCC 4.0 and later Ix86
  *        -   (5, 13)  - Mac OSX 10.6 and later
@@ -2426,12 +2426,12 @@ FIXNUM FF_ID(pftrgt, PFTRGT)(FIXNUM *sis, FIXNUM *sia)
 
     pa = _PD_get_state(-1);
 
-    st = *sis - 1;
-    al = *sia - 1;
-    rv = (al != 5);
+    st = *sis;
+    al = *sia;
+    rv = (al != 6);
     if (rv)
-       {pa->req_std   = PD_gs.std_standards[st];
-        pa->req_align = PD_gs.std_alignments[al];}
+       {pa->req_std   = &PD_gs.standards[st];
+        pa->req_align = &PD_gs.alignments[al];}
 
     else
        {pa->req_std   = NULL;
@@ -2456,12 +2456,12 @@ FIXNUM FF_ID(pfntgt, PFNTGT)(FIXNUM *sis, FIXNUM *sia)
     FIXNUM rv;
     hasharr *chart;
 
-    al = *sia - 1;
-    st = *sis - 1;
-    ret = (al != 5);
+    al = *sia;
+    st = *sis;
+    ret = (al != 6);
     if (ret)
-       {chart = PN_target(PD_gs.std_standards[st],
-			  PD_gs.std_alignments[al]);
+       {chart = PN_target(&PD_gs.standards[st],
+			  &PD_gs.alignments[al]);
         rv    = SC_ADD_POINTER(chart);}
 
     else

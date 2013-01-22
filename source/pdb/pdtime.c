@@ -48,9 +48,11 @@ static void print_help(void)
  */
 
 int main(int c, char **v)
-   {int i, len, n, is, ia, size, bytes;
+   {int i, it, len, n, size, bytes;
     char filename[20];
     double dt, *f;
+    PD_data_std_i is;
+    PD_data_algn_i ia;
 #ifdef PDB_TIME
     char s[20], **names;
     PDBfile *pdbf;
@@ -60,8 +62,8 @@ int main(int c, char **v)
 
     len = -1;
     n   = -1;
-    is  = -1;
-    ia  = -1;
+    is  = PD_NO_STD;
+    ia  = PD_NO_ALGN;
 
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
@@ -76,13 +78,19 @@ int main(int c, char **v)
 	    len = SC_stoi(v[i]);
          else if (n == -1)
 	    n = SC_stoi(v[i]);
-         else if (is == -1)
-	    {is = SC_stoi(v[i]);
-	     PD_gs.req_standard  = PD_gs.std_standards[is - 1];
+         else if (is == PD_NO_STD)
+	    {it = SC_stoi(v[i]);
+	     it = max(it, 0);
+	     it = min(it, PD_N_STANDARDS);
+	     is = it;
+	     PD_gs.req_standard = &PD_gs.standards[is];
 	     printf("Data Standard  = %d\n", is);}
-         else if (ia == -1)
-	    {ia = SC_stoi(v[i]);
-	     PD_gs.req_alignment = PD_gs.std_alignments[ia - 1];
+         else if (ia == PD_NO_ALGN)
+	    {it = SC_stoi(v[i]);
+	     it = max(it, 0);
+	     it = min(it, PD_N_ALIGNMENTS);
+	     ia = it;
+	     PD_gs.req_alignment = &PD_gs.alignments[ia];
 	     printf("Data Alignment = %d\n", ia);};};
 
     SC_signal(SIGINT, SIG_DFL);
