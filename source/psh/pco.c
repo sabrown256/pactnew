@@ -19,12 +19,13 @@
 #define STACK_TOOL      3
 #define STACK_GROUP     4
 
-#define PHASE_READ      10
-#define PHASE_ANALYZE   11
-#define PHASE_WRITE     12
-
 #define LOG_ON      {Log = open_file("a", st.logf); setbuf(Log, NULL);}
 #define LOG_OFF     {fclose(Log); Log = NULL;}
+
+enum e_phase_id
+   { PHASE_READ = 10, PHASE_ANALYZE, PHASE_WRITE };
+
+typedef enum e_phase_id phase_id;
 
 enum e_exoper
    { PNONE, PEQ, PLT, PLE, PGT, PGE, PNE };
@@ -107,18 +108,19 @@ struct s_state
     int create_dirs;
     int have_python;
     int have_db;
-    int installp;
 
+    int installp;
     int loadp;
     int analyzep;
     int exep;
-    int phase;
     int profilep;
 
     int tmp_dirp;
     int verbose;
     int launched;               /* TRUE iff PCO launched PERDB
                                  * FALSE if PERDB was already running */
+    phase_id phase;
+
     int na;
     char **args;
     char *db;
@@ -150,10 +152,17 @@ struct s_state
     char sys[BFLRG];
     char system[BFLRG];};
 
+
+int abs_deb, abs_opt, create_dirs, have_python, have_db;
+int installp, loadp, analyzep, exep, phase;
+int profilep;
+
+
 static state
  st = { FALSE, FALSE, FALSE, FALSE, FALSE,
-        TRUE, FALSE, FALSE, PHASE_READ, FALSE,
-	FALSE, FALSE, FALSE, 0, };
+        TRUE, FALSE, FALSE, FALSE, FALSE,
+	FALSE, FALSE, FALSE,
+        PHASE_READ, 0, };
 
 static void
  parse_line(client *cl, char *s, char *key, char *oper, char *value, int nc);
@@ -2285,8 +2294,8 @@ static void read_config(client *cl, char *cfg, int quiet)
 		 dbset(cl, "PubLib",   "-L%s/lib", value);};}
 
 	 else if (strcmp(key, "exep") == 0)
-	    {st.exep = TRUE;
-	     st.loadp  = FALSE;}
+	    {st.exep  = TRUE;
+	     st.loadp = FALSE;}
 
 	 else if (strcmp(key, "define") == 0)
 	    {if (st.aux.CEF == NULL)

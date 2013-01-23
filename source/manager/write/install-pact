@@ -268,7 +268,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT ""
 
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing F90 modules in $InstDir/include"'
+       Note $STDOUT 'echo "Installing Fortran modules in $InstDir/include"'
        Note $STDOUT 'set DestDir = $InstDir/include'
        Note $STDOUT 'foreach file ($Mods)'
        Note $STDOUT '   if (-f $file) then'

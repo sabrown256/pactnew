@@ -30,7 +30,7 @@ while ($#argv > 0)
             echo "  l   use <path> for LD_LIBRARY_PATH to detect compiler"
             echo "  p   use full path to compiler"
             echo "  v   increment verbosity level"
-            echo "  w   compiler works ANSI or not"
+            echo "  w   compiler is ANSI compliant or not"
             echo ""
             exit(1)
        case -l:

@@ -5,7 +5,7 @@
 # include "cpyright.h"
 #
 
-F90    = pgf90
+FC     = pgf90
 FFLAGS = 
 
 .c.o:
@@ -21,16 +21,16 @@ from_f from_c : getbytes
 	./getbytes
 
 getbytes : csizer.o getbytes.f
-	${F90} ${FFLAGS} getbytes.f csizer.o -o getbytes
+	${FC} ${FFLAGS} getbytes.f csizer.o -o getbytes
 
 getbytes.f : getkinds
 	./getkinds > getbytes.f
 
 getkinds : getkinds.f
-	${F90} ${FFLAGS} getkinds.f -o getkinds
+	${FC} ${FFLAGS} getkinds.f -o getkinds
 
 sizeint : sizeint.f
-	${F90} ${FFLAGS} sizeint.f -o sizeint
+	${FC} ${FFLAGS} sizeint.f -o sizeint
 	sizeint
 
 clean:

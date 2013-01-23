@@ -319,22 +319,20 @@ TRY:
       if (-d $e) then
          @ i = $i + 1
          set fbin = TRUE
+      else
+         set missing = ( $missing $e )
       endif
    end
-   if ($fbin == FALSE) then
-      set missing = ( $missing bin )
-   endif
 
 # test for the lib directory
    foreach e ( $tlib )
       if (-d $e) then
          @ i = $i + 1
          set flib = TRUE
+      else
+         set missing = ( $missing $e )
       endif
    end
-   if ($flib == FALSE) then
-      set missing = ( $missing lib )
-   endif
 
 # test for the include directory
    foreach e ( $tinc )
@@ -345,12 +343,13 @@ TRY:
          if (-f $e/mpi.h) then
             @ i = $i + 1
             set finc = TRUE
+         else
+            set missing = ( $missing $e/mpi.h )
          endif
+      else
+         set missing = ( $missing $e )
       endif
    end
-   if ($finc == FALSE) then
-      set missing = ( $missing include )
-   endif
 
    @ n = $#tbin + $#tlib + $#tinc + 1
 
@@ -361,17 +360,22 @@ TRY:
          if ("$i" =~ *mpi*) then
             set found = FALSE
             foreach e ( $tlib )
-               if ((-f $e/lib$i.a) || (-f $e/lib$i.so)) then
+               if ((-f $e/lib$i.a) || (-f $e/lib$i.so) || (-l $e/lib$i.a) || (-l $e/lib$i.so)) then
                   set found = TRUE
                   break
                endif
             end
             if ($found == FALSE) then
                set ok = FALSE
+               if ($Verbose == TRUE) then
+                  echo "Failed to find lib$i.a or lib$i.so"
+               endif
                break
             endif
          endif
       end
+   else if ($Verbose == TRUE) then
+      echo "Expected $n elements found $i"
    endif
 
    if ($Verbose == TRUE) then

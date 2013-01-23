@@ -40,14 +40,6 @@ dbmget $ALog STD_F            =\? "F90"^        \
 
 set UTime = `timer -r`
 
-cat << EOF >! $Tmp.f
-      subroutine foo(bar)
-      integer :: bar
-      integer, intrinsic :: selected_int_kind
-      bar = selected_int_kind(5)
-      end subroutine foo
-EOF
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -60,18 +52,18 @@ if ($?Cfg_FC_Exe == 1) then
    set fclst = ( $fclst $Cfg_FC_Exe )
 endif
 
-# find the available F90 compilers
-set F90C = ( `../analyze/fc-find $fclst` )
+# find the available ANSI Fortran compilers
+set AnsiFC = ( `../analyze/fc-find $fclst` )
 
 Note $ALog ""
-Note $ALog "Fortran 90 compilers: $F90C"
+Note $ALog "Fortran compilers: $AnsiFC"
 Note $ALog ""
 
-if ("$F90C" != "") then
-   if ($#F90C > 1) then
-      NoteD $ALog "$F90C[1] (others $F90C[2-])"
+if ("$AnsiFC" != "") then
+   if ($#AnsiFC > 1) then
+      NoteD $ALog "$AnsiFC[1] (others $AnsiFC[2-])"
    else
-      NoteD $ALog "$F90C"
+      NoteD $ALog "$AnsiFC"
    endif
 else
    NoteD $ALog " none"
@@ -121,7 +113,10 @@ endif
 if ($FC_Exe != "") then
    Note $ALog ""
 
-# check the compiler version
+#--------------------------------------------------------------------------
+
+# VERSION -  check the compiler version
+
    Note $ALog "Check the version of the FORTRAN compiler"
    Note $ALog "   PATH   = $PATH"
    Note $ALog "   FAMILY = $PACT_FC_FAMILY"
@@ -164,25 +159,59 @@ if ($FC_Exe != "") then
    endif
    Note $ALog ""
 
-   Note $ALog "Verify the standard of $FC_Exe"
-   flog $ALog cat $Tmp.f
-   flog $ALog $FC_Exe $Tmp.f -c $FC_Flags
-   if ($status == 0) then
-      setenv STD_F "F90"
-   else
-      setenv STD_F "F77"
-   endif
+#--------------------------------------------------------------------------
+
+# STANDARD - check the compiler standard compliance
+
+cat << EOF >! $Tmp-90.f
+      subroutine foo(bar)
+      integer :: bar
+      integer, intrinsic :: selected_int_kind
+      bar = selected_int_kind(5)
+      end subroutine foo
+EOF
+
+cat << EOF >! $Tmp-03.f
+      subroutine foo(bar)
+      use iso_c_binding
+      implicit none
+      integer(C_INT), value, intent(in) :: bar
+      type(C_PTR) :: cp
+      end subroutine foo
+EOF
+
+   setenv STD_F none
+
+   Note $ALog "Find the standard of $FC_Exe"
+   set lst = ( F2003 $Tmp-03.f F90 $Tmp-90.f )
+   while ($#lst > 0)
+      set s = $lst[1]
+      set f = $lst[2]
+      shift lst
+      shift lst
+      Note $ALog "   check $f for $s standard"
+      flog $ALog cat $f
+      flog $ALog $FC_Exe $f -c $FC_Flags
+      if ($status == 0) then
+         NoteD $ALog "      gfortran is $s compliant"
+         setenv STD_F $s
+         break
+      endif
+   end
 
    set ETime = `timer -b $UTime`
 
    Note $ALog ""
    Note $ALog "Results of Fortran compiler analysis ($ETime)"
+   Note $ALog "   AnsiFC = |$AnsiFC|"
    Note $ALog "   FC_Exe = |$FC_Exe|"
-   Note $ALog "   F90C   = |$F90C|"
    Note $ALog "   STD_F  = |$STD_F|"
    Note $ALog ""
 
-# make a file to test how Fortran compilers map identifiers
+#--------------------------------------------------------------------------
+
+# IDENTIFIERS - make a file to test how Fortran compilers map identifiers
+
 cat << EOF >! $Tmp.f
       subroutine foo
       end subroutine foo
@@ -237,6 +266,8 @@ EOF
          flog $ALog setenv FC_ID_CASE $FID_case
       endif
    endif
+
+#--------------------------------------------------------------------------
 
 endif
 

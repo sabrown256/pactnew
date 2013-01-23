@@ -55,7 +55,6 @@ ERR_PATTERN      =
 SchemeSpokes     = netcdf
 CSpokes          =
 ThreadLibExt     =
-F90_MOD_FLAG     = -I
 PTHREAD_POSIX    = FALSE
 
 # initialize standard tools
@@ -67,6 +66,7 @@ Tool CXX {
 }
 
 Tool FC {
+   MOD_FLAG = -I
 }
 
 Tool LD {

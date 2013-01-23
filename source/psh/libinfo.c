@@ -31,6 +31,7 @@ typedef struct s_infodes infodes;
 struct s_infodes
    {int complete;
     int literal;
+    int db_only;
     char root[BFLRG];};
 
 # endif
@@ -144,39 +145,41 @@ static int report_var(infodes *st, char *dir, char *fname,
 /* REPORT - report the value of one of the configuration quantities */
 
 static void report(infodes *st, char *q, int newl)
-   {int ok;
+   {int ok, dbo;
     char *s;
 
-    ok = FALSE;
+    ok  = FALSE;
+    dbo = st->db_only;
 
-     if (strcmp(q, "make") == 0)
-       ok = report_var(st, "etc", "make-def", "UMake",
-		       NULL, newl, FALSE);
+    if (dbo == FALSE)
+       {if (strcmp(q, "make") == 0)
+	   ok = report_var(st, "etc", "make-def", "UMake",
+			   NULL, newl, FALSE);
 
-    if (strcmp(q, "config") == 0)
-       ok = report_var(st, "etc", "make-def", "System",
-		       NULL, newl, FALSE);
+	if (strcmp(q, "config") == 0)
+	   ok = report_var(st, "etc", "make-def", "System",
+			   NULL, newl, FALSE);
 
-    if (!ok)
-       ok = report_var(st, "include", "scconfig.h", q,
-		       "#define", newl, FALSE);
+	if (!ok)
+	   ok = report_var(st, "include", "scconfig.h", q,
+			   "#define", newl, FALSE);
 
-    if (!ok)
-       ok = report_var(st, "etc", "make-def", q,
-		       NULL, newl, FALSE);
+	if (!ok)
+	   ok = report_var(st, "etc", "make-def", q,
+			   NULL, newl, FALSE);
 
-    if (!ok)
-       ok = report_var(st, "etc", "configured", q,
-		       NULL, newl, FALSE);
+	if (!ok)
+	   ok = report_var(st, "etc", "configured", q,
+			   NULL, newl, FALSE);
 
-    if (!ok)
-       {s = getenv("SHELL");
-	if ((s != NULL) && (strstr(s, "csh") != NULL))
-	   ok = report_var(st, "etc", "env-pact.csh",
-			   q, "setenv", newl, FALSE);
-	else
-	   ok = report_var(st, "etc", "env-pact.sh",
-			   q, "export", newl, FALSE);};
+	if (!ok)
+	   {s = getenv("SHELL");
+	    if ((s != NULL) && (strstr(s, "csh") != NULL))
+	       ok = report_var(st, "etc", "env-pact.csh",
+			       q, "setenv", newl, FALSE);
+	    else
+	       ok = report_var(st, "etc", "env-pact.sh",
+			       q, "export", newl, FALSE);};};
 
     if (!ok)
        ok = report_var(st, "etc", "cfg.db", q,
@@ -212,12 +215,14 @@ static void report_cl(infodes *st, char *q)
 
 /* REPORT_INFO - function call API for pact-info */
 
-int report_info(char *root, int cmpl, int ltrl, itarget tgt, char *ptrn)
+int report_info(char *root, int cmpl, int ltrl, int dbo,
+		itarget tgt, char *ptrn)
    {int ok;
     infodes st;
 
     st.complete = cmpl;
     st.literal  = ltrl;
+    st.db_only  = dbo;
     nstrncpy(st.root, BFLRG, root, -1);
 
     ok = 0;

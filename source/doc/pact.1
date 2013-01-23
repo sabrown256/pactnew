@@ -16,7 +16,7 @@ operation.  Also reports how it was configured.
 .B      [-rcr] [-s] [-sys <dir>] [-v]
 .B      <make-args> <target>
 
-.B pact [-incpath] [-info <pttrn> | <var>] [+info <var>] [-link] [+l]
+.B pact [-db] [-incpath] [-info <pttrn> | <var>] [+info <var>] [-link] [+l]
 
 The pact utility fills two roles.  It provides a persistent make facility and
 it provides information about the configuration of the PACT distribution
@@ -88,6 +88,9 @@ Print all commands before executing them (overrides '@').
 
 .SH INFO-MODE OPTIONS
 
+.TP
+.B \-db
+Use the database only (default is off).
 .TP
 .B \-incpath
 Report elements needed to compile files.
