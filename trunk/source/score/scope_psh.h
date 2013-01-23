@@ -165,7 +165,8 @@ extern hashen
 /* LIBINFO.C declarations */
 
 extern int
- PS_report_info(char *root, int cmpl, int ltrl, itarget tgt, char *ptrn),
+ PS_report_info(char *root, int cmpl, int ltrl, int dbo,
+		itarget tgt, char *ptrn),
  PS_build_makefile(char *root, char *arch, char *mkfile, int vrb);
 
 

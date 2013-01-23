@@ -101,9 +101,6 @@ enum {
       STACK_PROCESS,
       STACK_TOOL,
       STACK_GROUP,
-      PHASE_READ,
-      PHASE_ANALYZE,
-      PHASE_WRITE,
 
 
 /* LIBTIME.C */

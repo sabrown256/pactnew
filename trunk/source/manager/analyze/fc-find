@@ -12,7 +12,7 @@
 set Me = $0
 source $Me:h/common
 
-set F90     = TRUE
+set ANSI    = TRUE
 set Verbose = FALSE
 set nfclst  = ""
 while ($#argv > 0)
@@ -22,14 +22,14 @@ while ($#argv > 0)
             echo "Usage: fc-find [-h] [-v] [-w] <fc>*"
             echo "  h   this help message"
             echo "  v   verbose mode"
-            echo "  w   compiler works F90 or not"
+            echo "  w   compiler is ANSI compliant or not"
             echo ""
             exit(1)
        case -v:
             set Verbose = TRUE
             breaksw
        case -w:
-            set F90 = FALSE
+            set ANSI = FALSE
             breaksw
        default:
             set ok = TRUE
@@ -82,8 +82,8 @@ set fclst = ( $nfclst )
 
 # CHECK - try the compilers on the list
 
-set allfc = ""
-set f90fc = ""
+set allfc  = ""
+set ansifc = ""
 
 foreach fc ($fclst)
    set res = `$MngDir/pwhich $fc`
@@ -100,7 +100,7 @@ foreach fc ($fclst)
       if (-f $Tmp.o) then
          set allfc = ( $allfc $fc )
          if ($xstatus == 0) then
-            set f90fc = ( $f90fc $fc )
+            set ansifc = ( $ansifc $fc )
          endif
       endif
    endif
@@ -109,8 +109,8 @@ end
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ($F90 == TRUE) then
-   echo "$f90fc"
+if ($ANSI == TRUE) then
+   echo "$ansifc"
 else
    echo "$allfc"
 endif

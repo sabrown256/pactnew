@@ -42,11 +42,12 @@ void usage(void)
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int i, ok, cmpl, ltrl;
+   {int i, ok, cmpl, dbo, ltrl;
     char root[BFLRG];
     char *ptrn;
     itarget tgt;
 
+    dbo  = FALSE;
     cmpl = FALSE;
     ltrl = FALSE;
     file_path(v[0], root, BFLRG);
@@ -56,7 +57,10 @@ int main(int c, char **v)
     ok   = 0;
     ptrn = NULL;
     for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-f") == 0)
+        {if (strcmp(v[i], "-d") == 0)
+            dbo = TRUE;
+
+	 else if (strcmp(v[i], "-f") == 0)
             cmpl = TRUE;
 
 	 else if (strcmp(v[i], "-incpath") == 0)
@@ -85,7 +89,7 @@ int main(int c, char **v)
 	     break;};};
 
     if (ok == 0)
-       ok = report_info(root, cmpl, ltrl, tgt, ptrn);
+       ok = report_info(root, cmpl, ltrl, dbo, tgt, ptrn);
 
     return(ok);}
 

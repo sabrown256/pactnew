@@ -47,6 +47,7 @@ dbmget $Log AR_IFlag^               \
             CSpokes^                \
             DEFAULT_SHELL^          \
             EtcDir^                 \
+            FC_MOD_FLAG^            \
             FC_Debug_Default^       \
             FC_Optimize_Default^    \
             HAVE_GOOD_OMP_PRAGMAS^  \
@@ -523,6 +524,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "FOptimize     = ${FC_Optimize}"
     Note $STDOUT "FDefDebug     = ${FC_Debug_Default}"
     Note $STDOUT "FDefOptimize  = ${FC_Optimize_Default}"
+    Note $STDOUT "FC_MOD_FLAG   = ${FC_MOD_FLAG}"
 
     Note $STDOUT "Linker       = ${LD_Exe}"
     Note $STDOUT ""

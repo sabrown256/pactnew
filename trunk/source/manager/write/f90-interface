@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# F90-INTERFACE - write F90 include file
+# F90-INTERFACE - write Fortran include file
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -24,7 +24,7 @@ source $ScrDir/functions-pact.csh
 
 Separator $Log
 
-Note $Log "   F90 Include File - f90types.h f90kinds.inc"
+Note $Log "   Fortran Include File - f90types.h f90kinds.inc"
 Note $Log ""
 
 dbmget $Log CFE^              \
@@ -45,8 +45,8 @@ dbmget $Log CFE^              \
 #--------------------------------------------------------------------------
 
 if ($HAVE_FORTRAN == TRUE) then
-   if (($Cfe_FC_Exe != "") && ($STD_F == 'F90')) then
-      NoteD $Log "   F90 Include File - f90types.h f90kinds.inc"
+   if (($Cfe_FC_Exe != "") && (($STD_F == 'F90') || ($STD_F == 'F2003'))) then
+      NoteD $Log "   Fortran Include File - f90types.h f90kinds.inc"
 
       if (!(-d f90kinds)) then
          NoteD $Log ""

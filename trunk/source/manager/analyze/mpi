@@ -21,6 +21,7 @@ dbmget $ALog REQUEST_MPI        =\? FALSE^   \
              HAVE_MPI_2         =\? FALSE^   \
              HAVE_MPI_STDIN_ALL =\? FALSE^   \
              HAVE_MPI_GOOD_IO   =\? FALSE^   \
+             STD_MPI            =\? 1.0^     \
              PARALLEL_COMM_METH =\? PARC^    \
              Save_CC            =\? "cc"^    \
              DP_Inc             =\? ""^      \
@@ -168,7 +169,7 @@ endif
 
 # MPI II
 
-set vrs = ""
+set vrs = "none"
 
 if ("$lParComm" =~ *mpi*) then
 
@@ -237,7 +238,8 @@ dbmget $ALog HAVE_OPENMPI       = $HAVE_OPENMPI^        \
              HAVE_MPI_2         = $HAVE_MPI_2^          \
              HAVE_MPI_STDIN_ALL = $HAVE_MPI_STDIN_ALL^  \
              HAVE_MPI_GOOD_IO   = $HAVE_MPI_GOOD_IO^    \
-             PARALLEL_COMM_METH = $PARALLEL_COMM_METH^   \
+             STD_MPI            = $vrs^                 \
+             PARALLEL_COMM_METH = $PARALLEL_COMM_METH^  \
              DP_Inc             = $DP_Inc^              \
              DP_Lib             = $DP_Lib^              \
              DP_RPath           = $DP_RPath^            \

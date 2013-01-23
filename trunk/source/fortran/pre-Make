@@ -20,7 +20,7 @@ OD = DefaultO
 # Compiler/Loader Options
 #
 CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc} ${MDGInc}
-FcFlags = ${ODF} ${F90_MOD_FLAG}${IncDir} ${MDInc}
+FcFlags = ${ODF} ${FC_MOD_FLAG}${IncDir} ${MDInc}
 LdFlags = -g -L${LibDir} ${LDFLAGS}
 
 CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}

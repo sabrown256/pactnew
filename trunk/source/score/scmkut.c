@@ -322,6 +322,7 @@ void usage(void)
     printf("\n");
 
     printf("Info Options:\n");
+    printf("    -db      use the database only\n");
     printf("    -incpath report elements needed to compile files\n");
     printf("    -info    report configuration elements matching the argument\n");
     printf("    +info    complete report of configuration variable matching the argument\n");
@@ -340,7 +341,7 @@ void usage(void)
 
 int main(int c, char **v, char **env)
    {int i, dryrun, ignore, show, st, na, no, nt, rv;
-    int async, nconn, recur, dmp, mem, cs;
+    int async, nconn, recur, dbo, dmp, mem, cs;
     int rnfd, rnprc;
     int64_t rmem, rcpu, rfsz;
     char mkfile[MAXLINE], s[MAXLINE], server[MAXLINE], srvna[MAXLINE];
@@ -387,6 +388,7 @@ int main(int c, char **v, char **env)
 
     cs     = 0;
     async  = FALSE;
+    dbo    = FALSE;
     debug  = FALSE;
     dryrun = FALSE;
     ignore = FALSE;
@@ -421,6 +423,8 @@ int main(int c, char **v, char **env)
 	 else if (strcmp(v[i], "-d") == 0)
 	    {state->show_rules = TRUE;
 	     state->show_vars  = TRUE;}
+         else if (strcmp(v[i], "-db") == 0)
+	    dbo = TRUE;
 	 else if (strcmp(v[i], "-dbg") == 0)
 	    debug = TRUE;
 	 else if (strcmp(v[i], "-dmp") == 0)
@@ -437,24 +441,24 @@ int main(int c, char **v, char **env)
          else if (strcmp(v[i], "-i") == 0)
 	    ignore = TRUE;
 	 else if (strcmp(v[i], "-incpath") == 0)
-	    {PS_report_info(state->root, state->complete, state->literal,
+	    {PS_report_info(state->root, state->complete, state->literal, dbo,
 			    INCL, NULL);
 	     return(0);}
 	 else if (strcmp(v[i], "-info") == 0)
 	    {if (++i < c)
-	        PS_report_info(state->root, state->complete, state->literal,
+	        PS_report_info(state->root, state->complete, state->literal, dbo,
 			       REGEX, v[i]);
 	     return(0);}
 	 else if (strcmp(v[i], "+info") == 0)
 	    {if (++i < c)
 	        {state->complete = TRUE;
-		 PS_report_info(state->root, state->complete, state->literal,
+		 PS_report_info(state->root, state->complete, state->literal, dbo,
 				REGEX, v[i]);};
 	     return(0);}
          else if (strcmp(v[i], "+l") == 0)
 	    state->literal = TRUE;
 	 else if (strcmp(v[i], "-link") == 0)
-	    {PS_report_info(state->root, state->complete, state->literal,
+	    {PS_report_info(state->root, state->complete, state->literal, dbo,
 			    LINK, NULL);
 	     return(0);}
          else if (strcmp(v[i], "-log") == 0)
@@ -502,7 +506,7 @@ int main(int c, char **v, char **env)
 	 else if (strcmp(v[i], "-sys") == 0)
 	    snprintf(state->arch, MAXLINE, "%s", v[++i]);
 	 else if (strcmp(v[i], "-v") == 0)
-	    {PS_report_info(state->root, state->complete, state->literal,
+	    {PS_report_info(state->root, state->complete, state->literal, dbo,
 			    VERS, NULL);
 	     return(0);}
          else if (strcmp(v[i], "-vrb") == 0)

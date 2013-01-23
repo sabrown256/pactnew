@@ -156,7 +156,7 @@
           write(6, 1001) "double precision", "dd"
 
           write(6, 1100) "  open(7, file='from_f', status='replace')"
-          write(6, 1100) "  call f90sizeofinit"
+          write(6, 1100) "  call fcsizeofinit"
 
           ! call C subroutine to determine size
 
@@ -183,15 +183,15 @@
           enddo
          
           write(6, 1100) "  close(7)"
-          write(6, 1100) "  call f90external"
+          write(6, 1100) "  call fcexternal"
 
           write(6, 1101) "100     format(a20,3i5)"
           write(6, 1100) "end program xxx"
 
 1001      format(8x,a," :: ",a,"(2)")
 1002      format(8x,a,"(kind=",i3,") :: ",a,i3.3,"(2)")
-1003      format(8x,"call f90sizeof(",a,"(1),",a,"(2))")
-1004      format(8x,"call f90sizeof(",a,i3.3,"(1),",a,i3.3,"(2))")
+1003      format(8x,"call fcsizeof(",a,"(1),",a,"(2))")
+1004      format(8x,"call fcsizeof(",a,i3.3,"(1),",a,i3.3,"(2))")
           !1005  format("  write(7,*) '",a,"', ",i5)
 1005      format(8x,"write(7,100) '",a,"'", 3(", ",i5))
 1100      format(6x,a)

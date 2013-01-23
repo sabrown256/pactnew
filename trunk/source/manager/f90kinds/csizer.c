@@ -36,12 +36,12 @@
 
 static int 
   counter,
-  f90_sizes[MAX_SIZES];
+  fc_sizes[MAX_SIZES];
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* EXTERNAL_WORKER - find out how f90 sees C externals */
+/* EXTERNAL_WORKER - find out how the Fortran compiler sees C externals */
 
 static void external_worker(char *s)
    {int i;
@@ -72,67 +72,67 @@ static void external_worker(char *s)
 
 /* write out sizes of fortran types */
     for (i = 0; i < counter; i++)
-        fprintf(out, "%d\n", f90_sizes[i]);
+        fprintf(out, "%d\n", fc_sizes[i]);
 
     fclose(out);
 
     return;}
 
-void f90external()  { external_worker("x"); }
-void f90external_() { external_worker("x ## _"); }
-void F90EXTERNAL()  { external_worker("X"); }
+void fcexternal()  { external_worker("x"); }
+void fcexternal_() { external_worker("x ## _"); }
+void FCEXTERNAL()  { external_worker("X"); }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void f90sizeofinit()  { counter = 0; }
-void f90sizeofinit_() { counter = 0; }
-void F90SIZEOFINIT()  { counter = 0; }
+void fcsizeofinit()  { counter = 0; }
+void fcsizeofinit_() { counter = 0; }
+void FCSIZEOFINIT()  { counter = 0; }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* F90SIZEOF - compute the difference between two addresses
- *           - this is real useful when you're trying to find the byte size of
- *           - a f90 derived type in a portable manner
+/* FCSIZEOF - compute the difference between two addresses
+ *          - this is real useful when you're trying to find the byte size of
+ *          - a Fortran derived type in a portable manner
  */
 
-int f90sizeof(char *addr1, char *addr2)
+int fcsizeof(char *addr1, char *addr2)
    {
 
     if (counter >= MAX_SIZES)
        {printf("counter too large\n");
 	exit(1);};
 
-    f90_sizes[counter++] = addr2 - addr1;
+    fc_sizes[counter++] = addr2 - addr1;
 
     return(0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int f90sizeof_(char *addr1, char *addr2)
+int fcsizeof_(char *addr1, char *addr2)
    {
 
     if (counter >= MAX_SIZES)
        {printf("counter too large\n");
 	exit(1);};
 
-    f90_sizes[counter++] = addr2 - addr1;
+    fc_sizes[counter++] = addr2 - addr1;
 
     return(0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int F90SIZEOF(char *addr1, char *addr2)
+int FCSIZEOF(char *addr1, char *addr2)
    {
 
     if (counter >= MAX_SIZES)
        {printf("counter too large\n");
 	exit(1);};
 
-    f90_sizes[counter++] =  addr2 - addr1;
+    fc_sizes[counter++] =  addr2 - addr1;
 
     return(0);}
 

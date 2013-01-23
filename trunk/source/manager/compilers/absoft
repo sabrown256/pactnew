@@ -13,7 +13,6 @@ run analyze/rpath gnu
 
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
-F90_MOD_FLAG = -p
 
 Tool CC {
    Exe       = gcc
@@ -50,6 +49,7 @@ Tool FC {
                  64    = -m64 ]
    Flags    += [ _cmd_ = -p ;                   # profiling
 	         on    = -P ]
+   MOD_FLAG  = -p
    Debug     = -g
    Optimize  = -g -O3
    Version   = -v

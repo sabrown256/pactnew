@@ -18,6 +18,7 @@ struct s_statedes
    {int show;
     int complete;
     int literal;
+    int db_only;
     int quote;
     char sys[BFLRG];
     char arch[BFLRG];
@@ -325,6 +326,7 @@ static int setup_env(statedes *st, char *src)
     st->show     = 0;
     st->complete = FALSE;
     st->literal  = FALSE;
+    st->db_only  = FALSE;
 
     memset(st->cwd, 0, BFLRG);
 
@@ -375,21 +377,22 @@ void usage(void)
     printf("            [-log <file>] [-link] [+l] [-na <n>] [-sys <dir>] [-v] <make-args> <target>\n");
     printf("\n");
 
-    printf("Info Options:\n");
+    printf("Make Options:\n");
+    printf("    -B       build Makefile from pre-Make\n");
     printf("    -async   number of processes to use\n");
+    printf("    -h       this help message\n");
     printf("    -na      number of attempts to make\n");
     printf("    -log     log output to designated file\n");
+    printf("    -sys     directory in which to put/find Makefile\n");
     printf("\n");
 
     printf("Info Options:\n");
-    printf("    -B       build Makefile from pre-Make\n");
-    printf("    -h       this help message\n");
+    printf("    -db      use the database only\n");
     printf("    -incpath report elements needed to compile files\n");
     printf("    -info    report configuration elements matching the argument\n");
     printf("    +info    complete report of configuration variable matching the argument\n");
     printf("    -link    report elements needed to link applications\n");
     printf("    +l       report only exact matches of the argument\n");
-    printf("    -sys     directory in which to put/find Makefile\n");
     printf("    -v       report the PACT version\n");
     printf("\n");
     printf("    All other arguments are passed into make\n");
@@ -426,6 +429,9 @@ int main(int c, char **v)
          else if (strcmp(v[i], "-show") == 0)
 	    st.show = 1;
 
+         else if (strcmp(v[i], "-db") == 0)
+	    st.db_only = 1;
+
 /* get dmake options taking the next argument later */
 	 else if ((strcmp(v[i], "-async") == 0) ||
 		  (strcmp(v[i], "-na") == 0)   ||
@@ -448,11 +454,13 @@ int main(int c, char **v)
 	     i++;}
 
 	 else if (strcmp(v[i], "-incpath") == 0)
-	    {report_info(st.root, st.complete, st.literal, INCL, NULL);
+	    {report_info(st.root, st.complete, st.literal, st.db_only,
+			 INCL, NULL);
 	     return(0);}
 
 	 else if (strcmp(v[i], "-link") == 0)
-	    {report_info(st.root, st.complete, st.literal, LINK, NULL);
+	    {report_info(st.root, st.complete, st.literal, st.db_only,
+			 LINK, NULL);
 	     return(0);}
 
 /* ignore dmake options taking no argument */
@@ -478,7 +486,7 @@ int main(int c, char **v)
 		      if (strcmp(v[i], "-info") == 0)
 			 {if (++i < c)
 			     report_info(st.root, st.complete, st.literal,
-					 REGEX, v[i]);
+					 st.db_only, REGEX, v[i]);
 			  return(0);};
 		      i--;
 		      ok = FALSE;
@@ -490,7 +498,7 @@ int main(int c, char **v)
                       mv[mc++] = v[i];
 		      break;
 	         case 'v' :
-		      report_info(st.root, st.complete, st.literal,
+		      report_info(st.root, st.complete, st.literal, st.db_only,
 				  VERS, NULL);
 		      return(0);};}
 
@@ -501,7 +509,7 @@ int main(int c, char **v)
 			 {if (++i < c)
 			     {st.complete = TRUE;
 			      report_info(st.root, st.complete, st.literal,
-					  REGEX, v[i]);};
+					  st.db_only, REGEX, v[i]);};
 			  return(0);};
 		      break;
 		 case 'l' :
