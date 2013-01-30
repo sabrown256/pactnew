@@ -1006,15 +1006,27 @@ int SC_mpi_io_suppress(int on)
 
 #ifdef HAVE_BAD_MPI_IO
     char *s;
+    static int use_mpi = -1;
+
+    if (use_mpi == -1)
+       use_mpi = (getenv("SC_MPI_NO_SUPPRESSION") == NULL);
 
     rv = SC_mpi_suppress(on);
 
-    if (on == TRUE)
-       s = "+SC_SUPPRESS_UNTAGGED_ON+\n";
-    else
-       s = "+SC_SUPPRESS_UNTAGGED_OFF+\n";
+/* NOTE: if this is called from a non-MPI code you probabaly
+ * are not running this with mpi-io-wrap and hence do not want
+ * these messages
+ * since you are calling MPI related functions in a non-MPI code
+ * the onus is on you to set the SC_MPI_NO_SUPPRESSION variable
+ * in order to turn off this message
+ */
+    if (use_mpi == TRUE)
+       {if (on == TRUE)
+	   s = "+SC_SUPPRESS_UNTAGGED_ON+\n";
+        else
+	   s = "+SC_SUPPRESS_UNTAGGED_OFF+\n";
 
-    SAFE_FPUTS(s, stdout);
+	SAFE_FPUTS(s, stdout);};
 #else
     rv = FALSE;
 #endif
