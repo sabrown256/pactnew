@@ -260,8 +260,13 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 	 id = (dataid == NULL) ? 0 : dataid[i];
 	 md = (modified == NULL) ? FALSE : modified[i];
 
-	 if ((lcf == TRUE) && (clr != NULL))
+	 if (clr != NULL)
 	    {tc = clr[i];
+	     if (lcf == TRUE)
+	        tc = (tc == -1) ? dev->GRAY : tc;
+	     else
+	        tc = (tc == -1) ? dev->GRAY : dev->WHITE;
+
 	     PG_fset_text_color(dev, tc, TRUE);};
 
 /* prep the label text */

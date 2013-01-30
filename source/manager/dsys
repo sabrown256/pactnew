@@ -593,6 +593,9 @@ switch ($Cmnd)
         unsetenv HAVE_READLINE
         unsetenv PTHREAD_POSIX
 
+# do not bother with core files for the many analyzers
+        limit coredumpsize 0 >& /dev/null
+
         setenv ConfigDir ""
         if ($?SYS_SITE == 1) then
            set lsite     = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`

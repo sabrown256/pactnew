@@ -216,11 +216,11 @@ static void _UL_print_curve_labels(PG_device *dev, int *mark)
 	    {if (mark[j] >= 0)
 	        {i = mark[j];
 
-		 tc = dev->WHITE;
-		 if (labcf == TRUE)
-		    PG_get_attrs_alist(data[i].info,
-				       "LINE-COLOR", SC_INT_I, &tc, dev->WHITE,
-				       NULL);
+		 PG_get_attrs_alist(data[i].info,
+				    "LINE-COLOR", SC_INT_I, &tc, dev->WHITE,
+				    NULL);
+		 if (labcf == FALSE)
+		    tc = (tc == -1) ? tc : dev->WHITE;
 
 		 PG_get_attrs_glb(TRUE,
 				  "numeric-data-id", &ndi,
