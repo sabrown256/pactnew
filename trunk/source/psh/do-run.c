@@ -1183,7 +1183,7 @@ static void help(void)
 
     printf("\n");
     printf("Usage: do-run [-b] [-bf <file>] [-c] [-cross <cross-fe>] [-d] [-dbg <dbg>] [-dr]\n");
-    printf("              [-e] [-f] [-h] [-level #] [-m] [-mpi <mpi-fe>] [-m] [-n #] [-o <file>]\n");
+    printf("              [-e] [-env] [-f] [-h] [-level #] [-m] [-mpi <mpi-fe>] [-m] [-n #] [-o <file>]\n");
     printf("              [-p #] [-prf] [-prt <name>] [-q] [-r] [-s <file>] [-t #] [-v] [-vg] [-vgd]\n");
     printf("              [-x] [-z] args\n");
     printf("\n");
@@ -1195,6 +1195,7 @@ static void help(void)
     printf("       dbg   - override default debugger\n");
     printf("       dr    - show command but do not execute it\n");
     printf("       e     - output to stderr is suppressed\n");
+    printf("       env   - retain the PACT environment variable settings\n");
     printf("       f     - force a distributed run even with 1 MPI process\n");
     printf("       h     - this help message\n");
     printf("       level - diagnostic trace of session\n");
@@ -1264,6 +1265,9 @@ static int process_args(rundes *st, int c, char **v)
 	 else if (strcmp(v[i], "-e") == 0)
             {st->errio = FALSE;
 	     csetenv("STDERR", "FALSE");}
+
+	 else if (strcmp(v[i], "-env") == 0)
+            {}
 
 	 else if (strcmp(v[i], "-f") == 0)
             csetenv("Force", "TRUE");
@@ -1339,6 +1343,9 @@ static int process_args(rundes *st, int c, char **v)
             {st->debug = TRUE;
 	     nstrncpy(st->dbgtgt, BFMED, "zf", -1);}
 
+	 else if (v[i][0] == '-')
+            printf("DO-RUN: unknown option '%s' - ignored\n", v[i]);
+
 	 else
             {char *p;
 
@@ -1369,13 +1376,22 @@ static int process_args(rundes *st, int c, char **v)
 /* MAIN - start it out here */
 
 int main(int c, char **v)
-   {int ok, rv;
+   {int i, ok, rv;
     char exe[BFMED], os[BFMED], host[BFMED];
     rundes state;
 
     setbuf(stdout, NULL);
     prune_env("rules", NULL);
-    prune_env("pact", v[0]);
+
+/* determine whether or not to prune the PACT environment variables */
+    ok = TRUE;
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-env") == 0)
+	    {ok = FALSE;
+	     break;};};
+
+    if (ok == TRUE)
+       prune_env("pact", v[0]);
 
     signal(SIGINT, interrupt);
 
