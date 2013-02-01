@@ -3851,7 +3851,7 @@ void SX_install_pdb_funcs(SS_psides *si)
                _SXI_desc_variable, SS_PR_PROC);
 
     SS_install(si, "diff-variable",
-               "Compare an entry in two files\nFORM: (diff-variable <file1> <file2> <name>)",
+               "Compare an entry in two files\nFORM: (diff-variable <file1> <file2> <var1> <var2> [<n-digits>] [<individ-diff-flag>] [<promote-flag>])",
                SS_nargs, 
                _SXI_diff_var, SS_PR_PROC);
 

@@ -21,10 +21,11 @@ void usage(void)
    {
 
     printf("\n");
-    printf("Usage: pact-info [-f] [-h] [-incpath] <pttrn>\n");
+    printf("Usage: pact-info [-db] [-f] [-h] [-incpath] <pttrn>\n");
     printf("            [-l] [-link]\n");
     printf("\n");
 
+    printf("    -db      use the configuration database only\n");
     printf("    -f       report full matches as <var>=<val>\n");
     printf("    -h       this help message\n");
     printf("    -incpath report elements needed to compile files\n");
@@ -57,7 +58,7 @@ int main(int c, char **v)
     ok   = 0;
     ptrn = NULL;
     for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-d") == 0)
+        {if (strcmp(v[i], "-db") == 0)
             dbo = TRUE;
 
 	 else if (strcmp(v[i], "-f") == 0)
