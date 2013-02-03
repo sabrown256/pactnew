@@ -12,6 +12,12 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* include the PSH files with SCOPE_SCORE_PREPROC to get in
+ * macro definitions, function and variable declarations
+ * this one time right here
+ * the function and variable definitions will be brought in in scpsh.h
+ */
+
 #define SCOPE_SCORE
 #define SCOPE_SCORE_PREPROC
 
@@ -453,7 +459,6 @@ extern char
 #undef REMAKE
 #undef FREE
 #undef STRSAVE
-#undef ASSERT
 #undef LST_FREE
 #undef LAST_CHAR
 #undef VA_START
