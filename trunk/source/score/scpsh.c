@@ -256,6 +256,15 @@
 
 #include "score_int.h" 
 
+/* include the PSH files with SCOPE_SCORE_COMPILE to get in
+ * function and variable definitions
+ * this one time right here
+ * the macro definitions and function and variable declarations
+ * were brought in in scope_psh.h
+ */
+
+#define SCOPE_SCORE_COMPILE
+
 #undef SCOPE_SCORE_PREPROC
 #undef LIBIO
 #undef LIBPSH
@@ -268,8 +277,6 @@
 #undef LIBDB
 #undef LIBPGRP
 #undef LIBINFO
-
-#define SCOPE_SCORE_COMPILE
 
 #undef MAKE
 #undef MAKE_N

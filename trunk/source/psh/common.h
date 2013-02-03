@@ -43,9 +43,6 @@
 #define FREE(_p)            {if (_p != NULL) free(_p); _p = NULL;}
 #define STRSAVE(_s)         nstrsave(_s)
 
-#undef ASSERT
-#define ASSERT(_t)        {if (_t) _assert_fail++;}
-
 #define LST_FREE(_x)                                                         \
     {lst_free(_x);                                                           \
      _x = NULL;}
@@ -126,6 +123,9 @@ typedef enum e_array_size_constants array_size_constants;
 /* keep these out of PACT proper - only in PSH */
 
 #ifndef SCOPE_SCORE
+
+#undef ASSERT
+#define ASSERT(_t)        {if (_t) _assert_fail++;}
 
 #define FOREACH(_i, _v, _delim)                                              \
    {char *_i, *_t, *_pt;                                                     \
