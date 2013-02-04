@@ -497,7 +497,7 @@ int SC_get_ncpu(void)
 
 int SC_get_pname(char *path, int nc, int pid)
    {int rv, st;
-    char *p, *t;
+    char *p, *s, *t;
     SC_rusedes ru;
 
     if (pid < 0)
@@ -505,42 +505,13 @@ int SC_get_pname(char *path, int nc, int pid)
 
      rv = -1;
 
-#if 1
-    {char *s;
-
      st = SC_resource_usage(&ru, pid);
      if (st == 1)
         {s  = CSTRSAVE(ru.cmd);
 	 t  = SC_strtok(s, " \t\n", p);
 	 if (t != NULL)
 	    rv = SC_full_path(t, path, nc);
-	 CFREE(s);};};
-#else
-    {int i, tid;
-     char *cmd, *s, **out;
-
-#if defined(MACOSX)
-     cmd = "ps -eo pid,command";
-#else
-     cmd = "ps -eo pid,args";
-#endif
-
-     st = SC_exec(&out, cmd, NULL, -1);
-     if (st == 0)
-        {for (i = 0; TRUE; i++)
-	     {s = out[i];
-	      if (s == NULL)
-	         break;
-
-	      t   = SC_strtok(s, " \t\n", p);
-	      tid = SC_stoi(t);
-	      if (pid == tid)
-	         {t  = SC_strtok(NULL, " \t\n", p);
-		  rv = SC_full_path(t, path, nc);
-		  break;};};};
-
-     SC_free_strings(out);};
-#endif
+	 CFREE(s);};
 
     return(rv);}
 
@@ -767,12 +738,8 @@ int SC_nfs_monitor(int *st, int nc)
 
 void SC_sleep(int to)
    {int n;
-
-
-#if 1
-    
-    struct timespec req, rem;
     double t, ts, tn;
+    struct timespec req, rem;
 
     t  = 1.0e-3*to;
     ts = floor(t);
@@ -786,12 +753,6 @@ void SC_sleep(int to)
 	   req = rem;
 	else
 	   break;};
-
-#else
-
-    n = SC_poll(NULL, 0, to);
-
-#endif
 
     return;}
 
@@ -824,46 +785,6 @@ char **SC_get_env(void)
 
 /*--------------------------------------------------------------------------*/
 
-/* _SC_WHICH_DBG - decide which debugger to use
- *               - return the full path to the debugger in the buffer PATH
- *               - which is NC long
- *               - use PREFER or the SC_DEBUGGER environment variable
- *               - for an expressed debugger preference
- *               - return the debugger id code
- *               - or -1 if no debugger found
- */
-#if 0
-static int _SC_which_dbg(char *prefer, char *path, int nc)
-   {int rv, id;
-
-    if (prefer == NULL)
-       prefer = getenv("SC_DEBUGGER");
-
-    if (prefer == NULL)
-       {rv = SC_full_path("gdb", path, MAXLINE);
-	if (rv != 0)
-	   {rv = SC_full_path("totalview", path, MAXLINE);
-	    if (rv != 0)
-	       rv = SC_full_path("dbx", path, MAXLINE);};}
-    else
-       rv = SC_full_path(prefer, path, MAXLINE);
-
-    if (rv == 0)
-       {if (strstr(path, "gdb") != NULL)
-	   id = SC_DBG_GDB;
-	else if (strstr(path, "totalview") != NULL)
-	   id = SC_DBG_TOTALVIEW;
-	else if (strstr(path, "dbx") != NULL)
-	   id = SC_DBG_DBX;}
-    else
-       id = -1;
-
-    return(id);}
-#endif
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_ATTACH_DBG - attach a debugger to the process PID
  *               - if PID < 0 use the current process id
  *               - return TRUE iff successful
@@ -884,32 +805,6 @@ int SC_attach_dbg(int pid)
 	CFREE(cmd);}
     else
        rv = -1;
-
-#if 0
-    if (rv == 0)
-       {id = _SC_which_dbg(NULL, dbg, MAXLINE);
-	switch (id)
-	   {case SC_DBG_GDB :
-	         cmd = SC_dsnprintf(TRUE, "xterm -sb -e %s %s %d", dbg, path, pid);
-		 system(cmd);
-		 rv = TRUE;
-		 break;
-	    case SC_DBG_TOTALVIEW :
-		 cmd = SC_dsnprintf(TRUE, "%s %s -pid %d", dbg, path, pid);
-		 system(cmd);
-		 rv = TRUE;
-		 break;
-	    case SC_DBG_DBX :
-		 cmd = SC_dsnprintf(TRUE, "%s %s -pid %d", dbg, path, pid);
-		 system(cmd);
-		 rv = TRUE;
-		 break;
-	    default :
-		 rv = FALSE;
-		 break;};
-
-	CFREE(cmd);};
-#endif
 
     return(rv);}
 
@@ -1201,12 +1096,7 @@ char *SC_get_uname(char *name, int nc, int uid)
 int SC_yield(void)
    {int rv;
 
-#if 1
     rv = sched_yield();
-#else
-    SC_sleep(10);
-    rv = TRUE;
-#endif
 
     return(rv);}
 

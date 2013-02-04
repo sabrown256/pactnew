@@ -947,12 +947,6 @@ char *SC_ntos(char *t, int nc, int id, void *s, long n, int mode)
     
     rv = NULL;
 
-#if 0
-    if (id > N_TYPES)
-       {id -= (SC_POINTER_I - SC_BIT_I);
-	s   = *(void **) s;};
-#endif
-
     if (id < N_TYPES)
        {if (_SC_strf[id] != NULL)
 	   rv = _SC_strf[id](t, nc, s, n, mode);};

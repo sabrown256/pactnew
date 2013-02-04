@@ -1508,10 +1508,6 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
 
 	pp = SC_open(ca, state->env, "apvo",
 #if 0
-		     "EXIT", _SC_next_task, state,
-#endif
-
-#if 0
                      "IO-DES", fd, SC_N_IO_CH,
 #else
 		     "STDIN",  fd[0].file, fd[0].flag,

@@ -1311,13 +1311,6 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 	    SC_set_term_state(ts, fd);
 	    close(fd);};};
 
-# if 0
-printf("-> (%d) set term size = %dx%d background(%d) ppid(%d) pgid(%d)\n",
-       getpid(), cw, ch, bg,
-       getppid(),
-       getpgrp());
-# endif
-
 #endif
 
     return(rv);}

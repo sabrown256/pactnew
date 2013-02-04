@@ -262,11 +262,6 @@ static int _SC_posix_exec(PROCESS *cp, char **argv, char **env, char *mode)
 	_SC_dup_fd("STDERR", to, cp->fd, 2, cio[1]);
 
 /* now that they are copied release the old values */
-#if 0
-	if (close(cio[2]) < 0)
-	   SC_error(SC_NO_CLOSE, "COULDN'T CLOSE STDERR - _SC_POSIX_EXEC");
-#endif
-
 	if (cio[1] != cio[0])
 	   {if (close(cio[1]) < 0)
 	       SC_error(SC_NO_CLOSE,

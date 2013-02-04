@@ -4128,22 +4128,6 @@ static void doc_proto_python(char *a, int nc, char *dcn, fdecl *dcl)
     if_call_list(t, BFLRG, dcl, ",");
     vstrcat(a, nc, "(%s)", t);
 
-#if 0
-    int i, na;
-    farg *al;
-
-    na = dcl->na;
-    al = dcl->al;
-
-    vstrcat(a, nc, "%s(", dcn);
-    if (na != 0)
-       {for (i = 0; i < na; i++)
-	    {if (al[i].cls == FALSE)
-		vstrcat(a, BFLRG, "%s, ", al[i].name);};
-	a[strlen(a)-2] = '\0';};
-    nstrcat(a, nc, ")");
-#endif
-
     memmove(a, trim(a, BOTH, " "), nc);
 
     return;}

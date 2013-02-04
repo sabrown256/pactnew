@@ -515,73 +515,6 @@ static void finup(process *pp, void *a)
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* BAD_BUILD - forge a build log for a bad build */
-
-static void bad_build(hfspec *sp)
-   {char fields[BFLRG];
-    char *ltmp, *lcfg, *lopt, *file, *host;
-    FILE *fp;
-
-    host = sp->host;
-    file = sp->logn;
-    ltmp = sp->args[2];
-    lcfg = sp->args[4];
-    lopt = sp->args[5];
-    get_fields(fields, BFLRG, sp);
-
-    fp = open_file("w", file);
-
-    note(fp, TRUE, "Starting build/test on %s (%s-%s) at `date`",
-	 host,  host, lcfg);
-    note(fp, TRUE, " ");
-    note(fp, TRUE, "DO-NET: configure %s option %s %s",
-	 lcfg, lopt, ltmp);
-    note(fp, TRUE, "   Configuring from %s using %s",
-	 lcfg, lopt);
-    note(fp, TRUE, "   Removing ... OK");
-    note(fp, TRUE, "   Building ... OK (0:00)");
-    note(fp, TRUE, "   Testing .... OK (0:00)");
-    note(fp, TRUE, " ");
-    note(fp, TRUE, "Failed on %s (0:00)", host);
-
-/* NOTE: this is a diagnostic to debug the above assignment of ltmp, lcfg, and lopt */
-    note(fp, TRUE, " ");
-    note(fp, TRUE, "HFields = |%s|", fields);
-
-    fclose(fp);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* BAD_SECT - forge a log file for a bad SECT */
-
-static void bad_sect(hfspec *sp, char *sect)
-   {char *host, *file;
-    FILE *fp;
-
-    host = sp->host;
-    file = sp->logn;
-
-    fp = open_file("w", file);
-
-    note(fp, TRUE, "   %s ................. FAILED (0:00)", host);
-    note(fp, TRUE, "Failed on %s (0:00)", host);
-
-    fclose(fp);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* LOG_IN - log input messages from the process */
@@ -616,16 +549,6 @@ static int log_in(process *pp, char *ar, char *s)
 	    p = strchr(sp->config, ' ');
 	    if (p != NULL)
 	       *p = '\0';}
-
-#if 0
-	else if (strstr(s, "log/auto:") != NULL)
-	   bad_build(sp);
-
-	else if (strstr(s, "log/") != NULL)
-	   {p = current_phase->name;
-	    if (strncmp(s+4, p, strlen(p)) == 0)
-	       bad_sect(sp, p);};
-#endif
 
 /* copy it to the log file if open */
 	if (fo != NULL)
@@ -2871,16 +2794,7 @@ static int clearout(donetdes *st)
        run(FALSE, "%s %s do-net -c %s %s", st->ssh, host, st->stamp, file);
 
     else
-       {clean(st, st->hosts, st->n_hosts, PH_CLEAN, NULL);
-
-#if 0
-/* remove the log files */
-	printf("   Removing the log files %s/%s/*\n",
-	       st->logdir, st->stamp);
-        chdir(st->logdir);
-        run(FALSE, "rm -f %s/*", st->stamp);
-#endif
-	};
+       clean(st, st->hosts, st->n_hosts, PH_CLEAN, NULL);
 
     return(0);}
 

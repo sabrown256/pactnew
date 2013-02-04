@@ -1741,21 +1741,7 @@ int csetenv(char *var, char *fmt, ...)
 int cunsetenv(char *var)
    {int err;
 
-#if 0
-    int nc;
-    char *t;
-
-    err = 0;
-    nc  = strlen(var) + 12;
-    t   = malloc(nc);
-    if (t != NULL)
-       {snprintf(t, nc, "%s=%s", var, UNDEFINED);
-	err = putenv(t);
-
-	note(Log, TRUE, "unsetenv %s", var);};
-#else
     err = unsetenv(var);
-#endif
 
     return(err);}
 

@@ -97,18 +97,10 @@ static int report_var(infodes *st, char *dir, char *fname,
 			    {*p++ = '\0';
 			     val  = p;}
 			 else
-#if 0
-			    {if (litrl && !compl)
-			        continue;
-			     else
-			        val = var;};
-#else
 			    {if (!compl)
 			        continue;
 			     else
-			        val = "";};
-#endif
-		         }
+			        val = "";};}
 
 /* with env-pact.csh you WILL get here with val <val> and var <var> */
 		     else

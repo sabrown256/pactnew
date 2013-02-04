@@ -740,9 +740,6 @@ int _SC_prune_major_blocks(void)
 
 	 if (nf == nu)
 	    {nbl++;
-#if 0
-	     printf("Major block %d is eligible to be released\n", i);
-#else
 	     nby += nu*sz;
 
              md = (mem_descriptor *) mbl[i].block;
@@ -758,9 +755,7 @@ int _SC_prune_major_blocks(void)
 	     mbl[nmj].index  = -1;
 	     mbl[nmj].nunits = 0;
 	     mbl[nmj].size   = 0;
-	     mbl[nmj].block  = NULL;
-#endif
-	    };};
+	     mbl[nmj].block  = NULL;};};
 
     ph->n_major_blocks = nmj;
 

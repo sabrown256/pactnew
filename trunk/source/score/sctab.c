@@ -121,11 +121,7 @@ static void _SC_free_haelem(hasharr *ha, haelem *hp)
 
     addr = HA_ADDR_KEY(ha->hash);
     if (addr == FALSE)
-#if 1
        CFREE(hp->name);
-#else
-       hp->name = NULL;
-#endif
 
 /*    CFREE(hp->type); */
     hp->type = NULL;

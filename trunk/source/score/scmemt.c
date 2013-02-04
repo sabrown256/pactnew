@@ -140,13 +140,6 @@ static int _SC_find_thread(SC_thread tid, int lck)
 	        {ti->tid = tid;
 		 break;};};
 
-#if 0
-{int jd;
- jd = SC_current_thread();
- if (it != jd)
-    printf("find> %d %d\n", it, jd);};
-#endif
-
         if (lck == TRUE)
            SC_LOCKOFF(SC_ts_lock);};
 
