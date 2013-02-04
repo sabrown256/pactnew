@@ -113,13 +113,11 @@ static void interrupt_handler(int sig)
 /* PS_DIFF_OPEN - open a GS session */
 
 static PROCESS *ps_diff_open(char *f, int off, int side)
-   {PROCESS *pp;
-
-#if 1
-    int pid, rv, ok;
+   {int pid, rv, ok;
     char xrdb[PATH_MAX];
     char *rn, *s;
     FILE *fp;
+    PROCESS *pp;
     SC_contextdes hnd;
     static char *a[] = {"gs", "-sDEVICE=x11", NULL, "-", NULL};
 
@@ -157,14 +155,6 @@ static PROCESS *ps_diff_open(char *f, int off, int side)
     SC_signal_n(SIGCHLD, hnd.f, hnd.a);
 
     a[2] = f;
-
-#else
-    static char *a[] = {"gs", "-sDEVICE=x11", "-r72x72", "-g512x512",
-			NULL, "-", NULL};
-
-    a[4] = f;
-
-#endif
 
     pp = SC_open(a, NULL, "apo", NULL);
 

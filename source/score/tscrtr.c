@@ -74,9 +74,6 @@ static void *work(void *a)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
-
-#if 1
-
 /*--------------------------------------------------------------------------*/
 
 /* DRIVER - test driver with NT threads
@@ -107,41 +104,6 @@ static int driver(int nt)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
-
-#else
-
-/*--------------------------------------------------------------------------*/
-
-/* DRIVER - test driver with NT threads
- *        - strategy: single entry handed to multiple threads
- */
-
-static int driver(int nt)
-   {int rv, nto;
-    int *npt;
-    PFPVoidAPV *fnc;
-
-    nto = SC_init_threads(nt, NULL);
-
-    fnc = CMAKE_N(PFPVoidAPV, 1);
-    npt = CMAKE_N(int, 1);
-
-    fnc[0] = work;
-    npt[0] = nto;
-
-    SC_do_threads(1, npt, fnc, NULL, NULL);
-
-    rv = 1;
-
-    CFREE(fnc);
-    CFREE(npt);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* MAIN - start here */

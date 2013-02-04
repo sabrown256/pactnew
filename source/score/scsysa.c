@@ -323,12 +323,6 @@ void SC_show_state_log(parstate *state)
 char *_SC_shell_no_rc_cmd(char *shell)
    {static char rv[80];
 
-#if 0
-    rv = "-c";
-
-    if ((shell != NULL) && (strstr(shell, "csh") != NULL))
-       rv = "-cf";
-#else
     SC_strncpy(rv, 80, " ", -1);
 
     if (shell != NULL)
@@ -337,8 +331,6 @@ char *_SC_shell_no_rc_cmd(char *shell)
 
 	else if (strstr(shell, "bash") != NULL)
 	   SC_strncpy(rv, 80, "--noprofile", -1);};
-
-#endif
 
     return(rv);}
 

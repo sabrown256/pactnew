@@ -258,15 +258,8 @@ char *SC_prompt(char *prompt, char *s, int n)
 /* _SC_RL_FGETS - use SC_prompt for fgets on stdin */ 
 
 char *_SC_rl_fgets(char *s, int n)
-   {char *rv;
-
-#if 0
-
-    rv = SC_prompt(NULL, s, n);
-
-#else
-
-    int nc;
+   {int nc;
+    char *rv;
 
     rv = NULL;
 
@@ -275,8 +268,6 @@ char *_SC_rl_fgets(char *s, int n)
     if (nc > 0)
        {rv = fgets(s, nc, stdin);
 	s[n] = '\0';};
-
-#endif
 
     return(rv);}
 

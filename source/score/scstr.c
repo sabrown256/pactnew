@@ -690,13 +690,7 @@ char *SC_trim_right(char *s, char *delim)
 int SC_isalnum(int c)
    {int rv;
 
-#if 0
-    rv = ((('0' <= c) && (c <= '9')) ||
-	  (('A' <= c) && (c <= 'Z')) ||
-	  (('a' <= c) && (c <= 'z')));
-#else
     rv = isalnum(c);
-#endif
 
     return(rv);}
 
@@ -708,14 +702,8 @@ int SC_isalnum(int c)
 int SC_ishexdigit(int c)
    {int rv;
 
-#if 0
-    rv = ((('0' <= c) && (c <= '9')) ||
-	  (('A' <= c) && (c <= 'F')) ||
-	  (('a' <= c) && (c <= 'f')));
-#else
     rv = (isdigit(c) ? (c) - '0' :
                        islower(c) ? (c) + 10 - 'a' : (c) + 10 - 'A');
-#endif
 
     return(rv);}
 
@@ -727,11 +715,7 @@ int SC_ishexdigit(int c)
 int SC_isxdigit(int c)
    {int rv;
 
-#if 0
-    rv = ((c == 'x') || (c == 'X'));
-#else
     rv = isxdigit(c);
-#endif
 
     return(rv);}
 
@@ -743,11 +727,7 @@ int SC_isxdigit(int c)
 int SC_isdigit(int c)
    {int rv;
 
-#if 0
-    rv = (('0' <= c) && (c <= '9'));
-#else
     rv = isdigit(c);
-#endif
 
     return(rv);}
 
@@ -759,11 +739,7 @@ int SC_isdigit(int c)
 int SC_ispunct(int c)
    {int rv;
 
-#if 0
-    rv = (strchr("!\"#$%&'()*+,-./@[\\]^_`{|}~", c) != NULL);
-#else
     rv = ispunct(c);
-#endif
 
     return(rv);}
 
@@ -775,11 +751,7 @@ int SC_ispunct(int c)
 int SC_isspace(int c)
    {int rv;
 
-#if 0
-    rv = (strchr(" \t\r\n\f\v", c) != NULL);
-#else
     rv = isspace(c);
-#endif
 
     return(rv);}
 

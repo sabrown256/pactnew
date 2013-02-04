@@ -140,25 +140,7 @@ void _SC_exec_test(char **argv, char **envp, char *mode)
 static int _SC_complete_messagep(PROCESS *pp)
    {int rv;
 
-#if 1
     rv = PS_ring_ready(&pp->ior, pp->line_sep);
-#else
-
-    unsigned int nb, ob, ls;
-    unsigned char *ring, c;
-
-    rv = FALSE;
-
-    ob   = pp->ob_in;
-    nb   = pp->nb_ring;
-    ring = pp->in_ring;
-    ls   = pp->line_sep;
-
-    while ((c = ring[ob]) != '\0')
-       {ob = (ob + 1) % nb;
-        if ((c == ls) || (c == (unsigned char) EOF))
-           return(TRUE);};
-#endif
 
     return(rv);}
 
@@ -325,16 +307,7 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
     pp->gone        = -1;
     pp->data_type   = SC_UNKNOWN;
 
-#if 1
     PS_ring_init(&pp->ior, nb);
-#else
-    pp->nb_ring = nb;
-    pp->in_ring = CMAKE_N(unsigned char, nb);
-    pp->ib_in   = 0;
-    pp->ob_in   = 0;
-
-    memset(pp->in_ring, 0, nb);
-#endif
 
     pp->type        = SC_LOCAL;
     pp->rcpu        = -1;
@@ -1555,60 +1528,7 @@ PROCESS *SC_open_remote(char *host, char *cmnd,
 int SC_buffer_in(char *bf, int n, PROCESS *pp)
    {int rv;
 
-#if 1
     rv = PS_ring_push(&pp->ior, bf, n);
-#else
-
-    int i;
-    unsigned int ib, ob, ab, db, mb, nb, nnb;
-    unsigned char *ring, *po, *pn;
-
-    ib   = pp->ib_in;
-    ob   = pp->ob_in;
-    nb   = pp->nb_ring;
-    ring = pp->in_ring;    
-
-/* compute available space remaining in the ring */
-    while (TRUE)
-       {if (ib >= ob)
-	   ab = nb - ib + ob;
-        else
-	   ab = ob - ib;
-
-	if (ab >= n)
-	   break;
-
-/* find the size delta - try doubling */
-	db = nb;
-
-/* resize the ring */
-	nnb = nb + db;
-	CREMAKE(ring, unsigned char, nnb);
-
-/* adjust the ring if the "in use" section is discontiguous */
-	if (ib < ob)
-	   {mb = nb - ob;
-	    pn = ring + nnb - 1;
-	    po = ring + nb - 1;
-	    for (i = 0; i < mb; i++)
-	        *pn-- = *po--;
-
-	    ob += db;};
-
-	nb = nnb;
-
-	pp->in_ring = ring;
-	pp->nb_ring = nb;
-	pp->ob_in   = ob;};
-
-    if (bf != NULL)
-       {for (i = 0; i < n; i++, ib = (ib + 1) % nb)
-            ring[ib] = *bf++;
-
-        pp->ib_in = ib;};
-
-    rv = TRUE;
-#endif
 
     return(rv);}
 
@@ -1620,39 +1540,7 @@ int SC_buffer_in(char *bf, int n, PROCESS *pp)
 int SC_buffer_out(char *bf, PROCESS *pp, int n, int binf)
    {int i;
 
-#if 1
     i = PS_ring_pop(&pp->ior, bf, n, pp->line_sep);
-
-#else
-    int ok;
-    unsigned int ib, nb, ob, ls;
-    unsigned char *ring, c;
-    char *pbf;
-
-/* setup to copy from the ring to the buffer */
-    ib   = pp->ib_in;
-    ob   = pp->ob_in;
-    nb   = pp->nb_ring;
-    ring = pp->in_ring;    
-    ls   = pp->line_sep;
-
-/* copy until hitting a line separator or N characters have been copied */
-    pbf = bf;
-    ok  = TRUE;
-    for (i = 0; ok && (ob != ib) && (i < n); i++, ob = (ob + 1) % nb)
-        {c        = ring[ob];
-	 *pbf++   = c;
-	 ring[ob] = '\0';
-
-	 if ((c == ls) && (binf == FALSE))
-	    ok = FALSE;};
-
-/* null terminate unless the character count maxed out */
-    if (i < n)
-       *pbf++ = '\0';
-
-    pp->ob_in = ob;
-#endif
 
     return(i);}
 
@@ -1891,6 +1779,7 @@ int _SC_redir_fail(SC_iodes *fd)
 
 void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
    {int ofd, excl, fl;
+    int flc, flt, fla;
     SC_io_kind knd;
     SC_io_mode md;
     char *nm, *name;
@@ -1917,33 +1806,7 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
 	else
 	   excl = O_EXCL;
 
-#if 0
-/* shell redirection syntax and file mode correspondence */
-	switch (md)
-
-/*  <   ->  O_RDONLY */
-	   {case SC_IO_MODE_RO :
-	         fl = O_RDONLY;
-		 break;
-
-/*  >!  ->  O_WRONLY | O_CREAT | O_TRUNC */
-	    case SC_IO_MODE_WD :
-	         fl = O_WRONLY | O_CREAT | O_TRUNC;
-		 break;
-
-/*  >>  ->  O_WRONLY | O_APPEND */
-	    case SC_IO_MODE_APPEND :
-		 fl = O_WRONLY | O_CREAT | O_APPEND;
-		 break;
-
-/*  >   ->  O_WRONLY | O_CREAT | O_EXCL */
-	    default :
-		 fl = O_WRONLY | O_CREAT | excl;
-		 break;};
-
-#else
-	int flc, flt, fla;
-
+/* work redirection syntax */
 	flc = O_WRONLY | O_CREAT | excl;
 	flt = O_WRONLY | O_CREAT | O_TRUNC;
 	fla = O_WRONLY | O_CREAT | O_APPEND;
@@ -1986,7 +1849,6 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
 	         break;
 	    default :
 	         break;};
-#endif
 
 	switch (knd)
 	   {case SC_IO_STD_IN :

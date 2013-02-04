@@ -285,12 +285,6 @@ static int _SC_server_check_jobs(int *pst, int *pnr, int *pnc,
     if (state->done == FALSE)
        ex &= (n != 0);
 
-#if 0
-    if (ex == TRUE)
-       _SC_server_printf(as, state, _SC_EXEC_INFO,
-			 "all jobs done %d %d %d\n", nr, nc, rst);
-#endif
-
     SC_END_ACTIVITY(state);
 
     return(ex);}

@@ -2545,13 +2545,6 @@ int transfer_ff(FILE *fi, FILE *fo)
              ne++;
 	     if (nr > 0)
 	        {nw = fwrite_safe(t, 1, nr, fo);
-#if 0
-		 size_t ni;
-		 for (nw = 0; nw < nr; )
-                     {ni  = fwrite(t, 1, nr-nw, fo);
-                      ev  = errno;
-                      nw += ni;};
-#endif
 		 _dbg(-2, "sent %d chars from file to %d (%d)",
 		      nw, fileno(fo), rv);
 

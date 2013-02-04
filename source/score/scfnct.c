@@ -70,25 +70,12 @@ void SC_get_time(double *psec, double *pmusec)
  * so go the simpler route with gettimeofday
  */
 
-#if 0
-
-    struct timespec ts;
-
-    clock_gettime(CLOCK_REALTIME, &ts);
-
-    t[0] = ts.tv_sec;
-    t[1] = ts.tv_nsec;
-
-#else
-
     struct timeval ts;
 
     gettimeofday(&ts, NULL);
 
     t[0] = ts.tv_sec;
     t[1] = ts.tv_usec;
-
-#endif
 
     if (psec != NULL)
        *psec = t[0];

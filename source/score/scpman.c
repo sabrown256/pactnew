@@ -223,10 +223,6 @@ static int _SC_lookup_exited_child(int pid, int *pcnd, int *psts)
 	    {sr = *(sigchld_rec **) SC_array_get(_SC.wait_list, i);
 	     if (sr->pid == pid)
 	        {rv = TRUE;
-#if 0
-                 dstatelog("lookup exited child %d %d/%d (%d/%d)\n",
-		           pid, i, n, sr->condition, sr->exit);
-#endif
 
 		 if (pcnd != NULL)
 		    *pcnd = sr->condition;
@@ -379,14 +375,7 @@ static void _SC_rl_process(PROCESS *pp)
 	CFREE(pp->stop_time);
 	CFREE(pp->spty);
 
-#if 1
 	PS_ring_clear(&pp->ior);
-#else
-	CFREE(pp->in_ring);
-        pp->nb_ring = 0L;
-        pp->ib_in   = 0L;
-        pp->ob_in   = 0L;
-#endif
 
         pp->status    = -1;
         pp->reason    = -1;

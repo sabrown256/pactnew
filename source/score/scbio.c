@@ -599,7 +599,7 @@ static void _SC_bio_read_opt(bio_desc *bid, char *mode, int64_t bsz)
    {
 
 
-/* GOTCHA: turning this on only has the effect of adding and fstat
+/* GOTCHA: turning this on only has the effect of adding an fstat
  * and an ioctl to the set of operations reported by strace
  * the reference is reading all variables in a PDB file with a
  * buffer size greater than the file size
@@ -942,7 +942,6 @@ static int64_t _SC_bio_in(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 	if (fr == NULL)
 	   fr = _SC_bfr_read_setup(bid, NULL);
 
-#if 1
 	for (i = 0, ok = TRUE; ok == TRUE; i++)
 	    {nbc = _SC_bfr_infill(&rq, fr);
 	     nr += nbc;
@@ -970,24 +969,6 @@ static int64_t _SC_bio_in(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 /* signify that something happened and we cannot exit the loop */
 		 nbc = -1;};
 	     ok = (nbc != 0);};
-#else
-	do {nbc = _SC_bfr_infill(&rq, fr);
-	    nr += nbc;
-	    if (rq.nb != rq.sz)
-	       {bsz = fr->sz;
-		olc = fr->addr;
-		nlc = olc + bsz;
-		if (olc != bid->curr)
-		   {na += (bid->curr - nlc);
-		    ad  = _SC_bio_seek(bid, nlc, SEEK_SET, BIO_OPER_READ);
-		    SC_ASSERT(ad >= 0);};
-
-		fr = _SC_bfr_read_setup(bid, fr);
-
-/* signify that something happened and we cannot exit the loop */
-	        nbc = -1;};}
-	while (nbc != 0);
-#endif
 
 	_SC_bfr_push(bid, fr, TRUE);
 

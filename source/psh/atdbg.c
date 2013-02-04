@@ -331,10 +331,6 @@ static int use_totalview(atdbgdes *st, atproc *al)
 	    pp->a      = &gr;
 
 	    send_msg(pp, 0, NULL);
-#if 0
-	    gr.prompt = "tvcli> ";
-	    send_msg(pp, 0, "dset PROMPT {tvcli> }");
-#endif
 	    send_msg(pp, 0, "dset LINES_PER_SCREEN 0");
 	    send_msg(pp, 0, "dattach -no_attach_parallel %s %d", al->name, al->pid);
 	    send_msg(pp, 0, "dhalt");
@@ -489,11 +485,6 @@ static int use_dbx(atdbgdes *st, char *fname, atproc *al)
 	       s = subst(s, ">", " ", 1);
 	       cache_rsp(st, s);
 	    ENDFOR;
-#if 0
-        $dbg $exe -c $Tmp  |&              \
-        sed 's/>/ /'      |                \
-        awk '$1 ~ /[0-9]+/ { print }';
-#endif
 
 	    unlink_safe(fname);};}
 
@@ -728,10 +719,6 @@ int main(int c, char **v)
    {int rv;
     char exe[BFLRG], bindir[BFLRG];
     atdbgdes state;
-
-#if 0
-    setbuf(stdout, NULL);
-#endif
 
 /* find the directory with atdbg */
     strcpy(exe, cwhich(v[0]));

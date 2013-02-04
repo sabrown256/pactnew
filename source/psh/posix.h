@@ -11,26 +11,6 @@
 #ifndef PCK_POSIX
 #define PCK_POSIX
 
-#if 0
-
-/* GOTCHA: we would like to do this but bootstrapping configuration
- * is a nightmare for now
-  #include "iso-c.h"
- */
-
-#define ISO_C99
-
-/* introduced with C99 compiles */
-#ifdef ISO_C99
-# ifdef __GNUC__
-#  define _POSIX_C_SOURCE   200112L
-#  define _XOPEN_SOURCE     600
-#  define _DARWIN_C_SOURCE
-# endif
-#endif
-
-#endif
-
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/stat.h>

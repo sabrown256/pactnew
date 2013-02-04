@@ -1039,10 +1039,7 @@ static char *_SC_leh_gets(lehloc *lp)
 		    nc, map[lp->c],
 		    (long) lp->pos, _SC_leh.nh);
 	    fflush(fdbg);};
-/*
-printf("\n\rgets> '%c' (%02x)  %d\n\r", lp->c, lp->c, lp->len);
-fflush(stdout);
-*/
+
 /* if we get a single character line consisting of a linefeed
  * return an empty line
  * this is essential for 'mpi-io-wrap <code>'
@@ -1051,7 +1048,6 @@ fflush(stdout);
 	if ((lp->c == lf) && (lp->len == 1))
 	   {lp->bf[0] = '\0';
 	    lp->len = 0;
-/* printf("linefeed and length = 1\n\r"); */
 	    rv = lp->bf;
             ok = FALSE;}
 

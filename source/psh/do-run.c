@@ -412,8 +412,6 @@ static int check(rundes *st)
        {printf("No code '%s' on your path\n", c);
 	rv = FALSE;};
 
-#if 1
-
     if (IS_NULL(st->sgn) == TRUE)
        snprintf(st->sgn, BFMED, "%s/etc/do-run-db",
                 path_head(st->bindir));
@@ -423,19 +421,6 @@ static int check(rundes *st)
            nstrncpy(st->sgn, BFMED, cgetenv(TRUE, "RUN_SIGNATURE_DB"), -1);
         else
 	   nstrncpy(st->sgn, BFMED, "run.sgn", -1);};
-
-#else
-
-    char *s;
-
-    s = cgetenv(TRUE, "RUN_SIGNATURE_DB");
-    if (file_exists(s) == TRUE)
-       nstrncpy(st->sgn, BFMED, s, -1);
-    else
-       snprintf(st->sgn, BFMED, "%s/etc/do-run-db",
-                path_head(st->bindir));
-
-#endif
 
     if (file_exists(st->sgn) == TRUE)
        {if (st->verbose > 0)
