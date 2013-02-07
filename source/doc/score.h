@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 11/15/2011
+MOD: 02/07/2013
 
 <CENTER>
 <P>
@@ -16,6 +16,9 @@ MOD: 11/15/2011
 
 <ul>
 <li><a href="#score.intro">Introduction</a>
+<ul>
+<li><a href="#score.headers">Headers</a>
+</ul>
 
 <li><a href="#score.api">The SCORE API</a>
 <ul>
@@ -92,47 +95,139 @@ that the &#147;standard&#148; C library supplied with such implementations is
 so far from true ANSI or PCC standard that PACT would have to include its own
 version of the standard C library in order to work at all.<p>
 
+Currently, you should plan on using a C99 compliant compiler to work
+with PACT.  Most compilers support enough of the C99 standard to work
+well with PACT.<p>
+
 Even with standardized compilers life is not dead simple. The ANSI standard
 leaves several crucial points ambiguous as &#147;implementation defined&#148;.
 Under these conditions one can find significant differences in going from one
 ANSI standard compiler to another.<p>
 
-SCORE&#146;s job is to include the requisite standard headers and ensure that
-certain key standard library functions exist and function correctly (there are
-bugs in the standard library functions supplied with some compilers) so that,
-to applications which include the SCORE header(s) and load with SCORE, all C
-implementations look the same. This is a tall order, but in practice once
-SCORE has been successfully compiled only the areas of graphics, IPC, and
-binary data handling require special handling! This has more of an impact on
-some programmers than on others. Those who prefer to specify only the exact
-headers to be included in each source file will find SCORE and PACT unusual.
-At the expense of a slight increase in compile time, the most commonly used
-headers are always included. This is crucial to getting the C implementation
-independence. <font color="#FF0000">The upshot is that PACT headers MUST 
+<!-------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------->
+
+<a name="score.headers">
+<h3>Headers</h3>
+</a>
+
+One of SCORE&#146;s jobs is to include the requisite standard headers and
+ensure that certain key standard library functions exist and function
+correctly so that, to applications which include the SCORE
+header(s) and load with SCORE, all C implementations look the same. This
+is a tall order, but in practice once SCORE has been successfully
+compiled only the areas of graphics and binary data handling
+require special handling! This has more of an impact on some programmers
+than on others. Those who prefer to specify only the exact headers to
+be included in each source file will find SCORE and PACT unusual.<p>
+
+The design and use of headers in PACT has evolved to accomodate several
+principles to the greatest extent possible: 1) headers should be
+shrouded; 2) the use of headers should be controlled so that each
+PACT package and the user code gets the same compilation environment;
+3) there needs to be C implementation independence in order to get
+portability; and 4) the user code should have the last word.<p>
+
+First of all, headers should be shrouded so that if they are &#35include&#39d
+more than once only the first time is effective.  This prevents multiple
+definitions of macros, functions, variables, typedefs, and so on. These
+are situations which different compilers handle differently.  They cause
+confusion to the developers.<p>
+
+Secondly, compilers interact with their headers.  For example, many
+compilers have command line options to specify the standard compliance
+of the source code to be compiled.  Because of the way C works this
+is often implemented via &#35define&#39d variables.  Also most compilers
+have a command line option to define variables (in the &#35define sense).
+This means that the behavior of your code can depend on the order in
+which the header files are &#35include&#39d.
+To avoid problems with this, and at the expense of a slight increase
+in compile time, PACT has a root header which &#35include&#39s all the
+system headers that are needed by any part of PACT (or many, many
+pieces of POSIX standard functionality provided in the standard
+system or C libraries).  A header such as score.h or pdb.h &#35include&#39s
+this header and therefore gets the same environment for the
+compilation.   This is crucial to getting the C implementation
+independence.<p>
+
+Taken together, these these principles imply a fourth.  Namely, that
+if you are using PACT you should include the PACT headers before
+any others.
+
+The following situation should be avoided:
+<pre>
+#include "your-header.h"
+#include "score.h"
+#include "your-other-header.h"
+</pre>
+
+If <i>your-header.h</i> includes <i>stdlib.h</i>, for example, and does not
+&#35define the elements upon which PACT depends, the fact that it
+is shrouded means that, when <i>score.h</i> is &#35include&#39d, <i>stdlib.h</i>
+will not effectively be &#35include&#39d again with the behavior altering
+&#35define&#39s from <i>score.h</i>.  In other words,<p>
+
+<pre>
+#include "your-header.h"
+#include "score.h"
+</pre>
+
+will produce different behavior than<p>
+
+<pre>
+#include "score.h"
+#include "your-header.h"
+</pre>
+
+Furthermore, if you shroud your own headers (which you should) you
+can run into the situation where certain macro name collisions occur.  Keeping
+in mind that C does not have namespaces, there is no real, standard
+way of preventing name collisions.  Naming conventions help -
+and PACT uses several - but they cannot guarantee that no collisions
+will occur.  For example, if you include <i>your-header.h</i> first and it
+defines something like:<p>
+
+<pre>
+#undef FOO
+#define FOO "abc"
+</pre>
+
+and then <i>score.h</i> does:<p>
+
+<pre>
+#undef FOO
+#define FOO 3
+</pre>
+
+The SCORE version of FOO will prevail.  In this case, since they are
+of different types, the compiler may save you by throwing
+an error.<p>
+
+On the other hand, if you include <i>your-header.h</i> after <i>score.h</i>
+you would have your definition of <i>FOO</i>.  Therefore, you should put
+your headers last so that you have more control over &#35define&#39d
+quantities.  This is the fourth principle stated above.  As a final
+note here, PACT headers often &#35undef macros that they then &#35define
+to prevent the compiler from warning about changed macro definitions.<p>
+
+The fine points of the philosophy behind the PACT headers occasionally
+causes problems.  On the whole the design has proven to be very
+portable, consistent, robust, and stable.<p>
+
+<font color="#FF0000">The upshot is that PACT headers MUST 
 be included before all other headers.</font><p>
 
-Typically, the SCORE header scstd.h includes the following:<p>
-
-<BLOCKQUOTE>
-<TABLE>
-<TR><TD WIDTH="40"><B>ANSI</B></TD>    <TD>stdlib.h stddef.h stdarg.h float.h</TD></TR>
-<TR><TD><B>PCC</B></TD>     <TD> sys/types.h varargs.h malloc.h</TD></TR>
-<TR><TD><B>Both</B></TD>    <TD> limits.h stdio.h string.h math.h ctype.h signal.h setjmp.h time.h</TD></TR>
-</TABLE>
-</BLOCKQUOTE>
-
-The single header, scstd.h, smooths over most of the generic problems that
-arise because of implementation defined behavior in the host C implementation.
-The remainder of the PACT sources ultimately include scstd.h. This strategy
-has been extremely successful for PACT and applications which use PACT.<p>
-
-There are basically three other areas which SCORE functions address: memory
-management; hash array management; and extended string handling.<p>
+<!-------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------->
 
 
 <a name="score.api">
 <h2 ALIGN="CENTER">The SCORE API</h2>
 </a>
+
+There are several areas which SCORE functions address.  Some of
+the principal areas are: memory
+management; hash array management; and extended string handling.<p>
 
 This section of the manual details the SCORE functions intended for use by C
 application programs. 
@@ -178,9 +273,9 @@ strings will be used as the hash keys and in the second case memory
 or disk addresses will be used as the hash keys.
 <p>
 The size of a hash array should be a prime number for greatest efficiency. 
-For C based applications, there are four #define&#146;d sizes in the header, 
+For C based applications, there are enum&#146;d values include from
 score.h. They are <tt>HSZSMALL</tt> (31), <tt>HSZSMINT</tt> (67),
-<tt>HSZLRINT</tt> (127), and <tt>HSZLARGE</tt> (521).
+<tt>HSZLRINT</tt> (127), <tt>HSZLARGE</tt> (521), and <tt>HSZHUGE</tt> (4483).
 <p>
 Control of the memory involved in a hasharr is controlled by <tt>flags</tt>
 which is a bit array.  Bit 1 marks all the memory as permanent if on and
@@ -2302,7 +2397,7 @@ The following constants are defined in the SC_ipc_mode enumeration:
 
 <h4>Hash Table Constants</h4>
 
-The following #define'd constants are defined for specifying hash table sizes:
+The following enum&#39d constants are defined for specifying hash table sizes:
 <BLOCKQUOTE>
 <TABLE>
 <TR><TD>HSZSMALL</TD><td>31</td></TR>
@@ -2313,7 +2408,7 @@ The following #define'd constants are defined for specifying hash table sizes:
 </TABLE>
 </BLOCKQUOTE>
 
-The following #define'd constants are defined for specifying hash tables
+The following &#35define'd constants are defined for specifying hash tables
 have documentation:
 <BLOCKQUOTE>
 <TABLE>
@@ -2346,7 +2441,7 @@ The following constants are defined in the SC_token_type enumeration:
 <a name="score.scstd"></a>
 <h3 ALIGN="CENTER">scstd.h Constants</h3>
 
-The following are general purpose #define'd constants:
+The following are general purpose &#35define'd constants:
 
 <BLOCKQUOTE>
 <TABLE>
@@ -2368,7 +2463,7 @@ The following are general purpose #define'd constants:
 </TABLE>
 </BLOCKQUOTE>
 
-The following #define'd constants help with fopen portability:
+The following &#35define'd constants help with fopen portability:
 
 <BLOCKQUOTE>
 <TABLE>
@@ -2379,7 +2474,7 @@ The following #define'd constants help with fopen portability:
 </TABLE>
 </BLOCKQUOTE>
 
-The following #define'd constants help with fseek portability:
+The following &#35define'd constants help with fseek portability:
 
 <BLOCKQUOTE>
 <TABLE>
@@ -2389,7 +2484,7 @@ The following #define'd constants help with fseek portability:
 </TABLE>
 </BLOCKQUOTE>
 
-The following #define'd constants help with path portability:
+The following &#35define'd constants help with path portability:
 
 <BLOCKQUOTE>
 <TABLE>
