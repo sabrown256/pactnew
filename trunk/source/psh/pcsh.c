@@ -44,11 +44,10 @@ static void script_env(FILE *fo, char *pact)
 
 /* MAKE_SHELL_SCRIPT - prepare a shell script for invocation */
 
-static int make_shell_script(FILE *fi, char *fname, char *shell, char *pact,
+static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
 			     char *args, int henv,
 			     char **vo, char **v, int k)
    {int i, co;
-    char s[BFLRG];
     FILE *fo;
 
 /* initialize the repackaged version */
@@ -64,8 +63,7 @@ static int make_shell_script(FILE *fi, char *fname, char *shell, char *pact,
 	fprintf(fo, "\n");
 
 /* add the remainder of the shell script */
-	for (i = 0; fgets(s, BFLRG, fi) != NULL; i++)
-	    fputs(s, fo);
+        strings_out(sa, fo, TRUE);
 
 /* finish up the file */
 	fclose(fo);
@@ -96,8 +94,8 @@ static int make_shell_script(FILE *fi, char *fname, char *shell, char *pact,
 
 /* MAKE_C_SCRIPT - write and compile a C program for invocation */
 
-static int make_c_script(FILE *fi, char *fname, char **v)
-   {int i, co;
+static int make_c_script(char **sa, char *fname, char **v)
+   {int co;
     char s[BFLRG], cname[BFLRG], exe[BFLRG];
     char bindir[BFLRG], incdir[BFLRG];
     FILE *fo;
@@ -113,8 +111,7 @@ static int make_c_script(FILE *fi, char *fname, char **v)
 
 /* copy the remainder as the C program */
     if (fo != NULL)
-       {for (i = 0; fgets(s, BFLRG, fi) != NULL; i++)
-	    fputs(s, fo);
+       {strings_out(sa, fo, TRUE);
 
 /* finish up the file */
 	fclose(fo);};
@@ -137,10 +134,8 @@ static int make_c_script(FILE *fi, char *fname, char **v)
 static void invoke_script(char **vo, char *shell, char *pact,
 			  char **v, int k, int c)
    {int i, co, henv;
-    off_t ad;
     char fname[BFLRG], s[BFLRG], args[BFLRG];
-    char *sname, *p;
-    FILE *fi;
+    char *sname, *p, **sa;
 
     sname = v[k];
 
@@ -150,22 +145,21 @@ static void invoke_script(char **vo, char *shell, char *pact,
     co = 0;
 
 /* read the first line of the shell script */
-    fi = fopen(sname, "r");
-    if (fi != NULL)
-       {fgets(s, BFLRG, fi);
+    sa = file_text(FALSE, sname);
+    if (sa != NULL)
+       {nstrncpy(s, BFLRG, sa[0], -1);
 
 	p = strtok(s, " ");
 
 /* look for #!/usr/bin/env as a special case */
 	if ((p != NULL) && (strstr(p, "bin/env") != NULL))
 	   {henv = TRUE;
-	    ad   = ftell(fi);
-	    fgets(s, BFLRG, fi);
+	    nstrncpy(s, BFLRG, sa[1], -1);
 	    if (strncmp(s, "#OPT", 4) == 0)
-	       p = strtok(s + 4, "\n");
+               {nstrncpy(sa[1], 3, "#\n", -1);
+		p = strtok(s + 4, "\n");}
 	    else
-	       {fseek(fi, ad, SEEK_SET);
-		p = "";};}
+	       p = "";}
 	else
 	   {henv = FALSE;
 	    p    = strtok(NULL, "\n");};
@@ -174,11 +168,11 @@ static void invoke_script(char **vo, char *shell, char *pact,
 
 	p = strstr(args, "-lang");
 	if (p == NULL)
-	   co = make_shell_script(fi, fname, shell, pact, args, henv, vo, v, k);
+	   co = make_shell_script(sa, fname, shell, pact, args, henv, vo, v, k);
 	else if (strcmp(p+6, "c") == 0)
-	   co = make_c_script(fi, fname, v);
+	   co = make_c_script(sa+2, fname, v);
 
-	fclose(fi);};
+	free_strings(sa);};
 
     vo[co++] = STRSAVE(fname);
 

@@ -3003,6 +3003,47 @@ int demonize(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* STRINGS_OUT - write the strings SA to a file FP */
+
+int strings_out(char **sa, FILE *fp, int newl)
+   {int i, n, rv;
+
+    rv = FALSE;
+    if ((fp != NULL) && (sa != NULL))
+       {n = lst_length(sa);
+	for (i = 0; i < n; i++)
+	    {fputs(sa[i], fp);
+             if (newl == TRUE)
+                fputc('\n', fp);};
+
+        rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STRINGS_FILE - write the strings SA to a file FNAME */
+
+int strings_file(char **sa, char *fname, char *mode)
+   {int rv;
+    FILE *fp;
+
+    rv = FALSE;
+    if ((fname != NULL) && (sa != NULL))
+       {fp = fopen(fname, mode);
+
+	rv = strings_out(sa, fp, FALSE);
+
+	fclose(fp);
+
+        rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* FILE_STRINGS_PUSH - get the text of FP as a
  *                   - NULL terminated list of strings
  *                   - appended to the list PSA
@@ -3057,29 +3098,6 @@ int file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr)
 	*psa = lst_add(*psa, NULL);
 
 	ost = block_fd(fd, ost);};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* STRINGS_FILE - write the strings SA to a file FNAME */
-
-int strings_file(char **sa, char *fname, char *mode)
-   {int i, n, rv;
-    FILE *fp;
-
-    rv = FALSE;
-    if ((fname != NULL) && (sa != NULL))
-       {n  = lst_length(sa);
-	fp = fopen(fname, mode);
-
-	for (i = 0; i < n; i++)
-	    fputs(sa[i], fp);
-
-	fclose(fp);
-
-        rv = TRUE;};
 
     return(rv);}
 
