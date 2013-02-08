@@ -42,6 +42,39 @@ static void script_env(FILE *fo, char *pact)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* HAS_PAR_CONST - return the line number in SA of the first parallel
+ *               - construct indicated by TOK
+ *               - return -1 if there are none or there is not a matching PEND
+ */
+
+static int has_par_const(char **sa, char *tok)
+   {int i, ie, is, nc, ne, ns;
+    char *t;
+
+    ns = 0;
+    ne = 0;
+    is = -1;
+    ie = -1;
+
+    if ((sa != NULL) && (tok != NULL))
+       {nc = strlen(tok);
+
+	for (i = 0; sa[i] != NULL; i++)
+	    {t = trim(sa[i], FRONT, " \t");
+	     if (strncmp(t, tok, nc) == 0)
+	        {ns++;
+		 is = i;};
+	     if (strncmp(t, "pend", 4) == 0)
+	        {ne++;
+		 ie = i;};};};
+            
+    is = ((ns == 1) && (ns == ne)) ? is : -1;
+
+    return(is);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MAKE_SHELL_SCRIPT - prepare a shell script for invocation */
 
 static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
@@ -63,7 +96,7 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
 	fprintf(fo, "\n");
 
 /* add the remainder of the shell script */
-        strings_out(sa, fo, TRUE);
+        strings_out(fo, sa, 0, -1, TRUE);
 
 /* finish up the file */
 	fclose(fo);
@@ -92,6 +125,244 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* COMPUTE_PDO_LIMITS - from SA[IS] compute the skeleton SO for the
+ *                    - shell line in a PDO construct
+ */
+
+static char **compute_pdo_limits(char **sa, int is, char *so, int nc)
+   {int n;
+    char fn[BFLRG], t[BFLRG];
+    char *p, *r, **rv, **ra, **ta;
+    FILE *fp;
+
+    rv = NULL;
+
+    snprintf(fn, BFLRG, "/tmp/pcsh-pdo.%d", getpid());    
+    fp = fopen(fn, "w");
+
+/* write the prelimary part of the script */
+    strings_out(fp, sa, 0, is, TRUE);
+
+/* parse SA[IS] and write the conclusion of the temporary script */
+    nstrncpy(t, BFLRG, sa[is], -1);
+    ta = tokenize(t, "[]", 0);
+
+    nstrncpy(t, BFLRG, ta[0], -1);
+
+/* expected tokens are: pdo, <var>, <mn>, <mx>, and <dm> */
+    ra = tokenize(t, "=, \t", 0);
+    n  = lst_length(ra);
+    fprintf(fp, "    echo \"var %s ; \"\n", ra[1]);
+    fprintf(fp, "    echo \"mn  %s ; \"\n", ra[2]);
+    fprintf(fp, "    echo \"mx  %s ; \"\n", ra[3]);
+    if (n < 5)
+       fprintf(fp, "    echo \"dm  1 ; \"\n");
+    else
+       fprintf(fp, "    echo \"dm  %s ; \"\n", ra[4]);
+
+    fprintf(fp, "    echo \"_cmd_ %s\"\n", ta[1]);
+
+    free_strings(ta);
+    free_strings(ra);
+
+/* close the file */
+    fprintf(fp, "    exit(131)\n");
+    fclose(fp);
+
+/* run the script */
+    r = run(FALSE, "csh %s | tail -n 5", fn);
+    p = strstr(r, "_cmd_");
+    rv = lst_add(rv, p + 6);
+
+    unlink(fn);
+
+    ta = tokenize(r, " ;\n", 0);
+    rv = lst_add(rv, ta[1]);
+    rv = lst_add(rv, ta[3]);
+    rv = lst_add(rv, ta[5]);
+    rv = lst_add(rv, ta[7]);
+
+    free_strings(ta);
+
+    rv = lst_add(rv, NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAKE_PDO_SCRIPT - prepare a shell script for parallel DO invocation */
+
+static int make_pdo_script(char **sa, int is, char *fname, char *shell,
+			   char *pact, char *args, int henv,
+			   char **vo, char **v, int k)
+   {int i, ip, co, n, mn, mx, dm;
+    char t[BFLRG], r[BFLRG], fn[BFLRG];
+    char *ro, **ta;
+    FILE *fp;
+
+    ta = compute_pdo_limits(sa, is, t, BFLRG);
+    n  = lst_length(ta);
+    mn = (n > 1) ? atoi(ta[2]) : 0;
+    mx = (n > 2) ? atoi(ta[3]) : -1;
+    dm = (n > 3) ? atoi(ta[4]) : 1;
+
+/* open the master file */
+    fp = fopen(fname, "w");
+    fprintf(fp, "#!/bin/csh -f\n");
+    fprintf(fp, "unalias *\n");
+    fprintf(fp, "@ err = 0\n");
+
+    ro = sa[is];
+    sa[is] = r;
+
+/* blank out the pend line */
+    for (i = is; sa[is] != NULL; i++)
+        {if (strncmp(trim(sa[i], FRONT, " \t"), "pend", 4) == 0)
+	    {sa[i][0] = '\0';
+	     break;};};
+
+/* write one script for each loop iteration */
+    for (ip = mn; ip < mx; ip += dm)
+        {snprintf(fn, BFLRG, "%s.%d", fname, ip);
+	 snprintf(r, BFLRG, "   set %s = %d", ta[1], ip);
+
+	 fprintf(fp, "%s %s\n", ta[0], fn);
+	 fprintf(fp, "@ err = $err + $status\n");
+
+	 co = make_shell_script(sa, fn, shell, pact,
+				args, henv, vo, v, k);};
+
+/* clean up */
+    free_strings(ta);
+
+    sa[is] = ro;
+
+/* close the master file */
+    fprintf(fp, "exit($err)\n");
+    fclose(fp);
+    chmod(fname, S_IRUSR | S_IWUSR | S_IXUSR);
+
+    return(co);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* COMPUTE_PFOR_LIMITS - from SA[IS] compute the skeleton SO for the
+ *                     - shell line in a PFOR construct
+ */
+
+static char **compute_pfor_limits(char **sa, int is, char *so, int nc)
+   {int i, n;
+    char fn[BFLRG], t[BFLRG];
+    char *p, *r, **rv, **ra, **ta;
+    FILE *fp;
+
+    rv = NULL;
+
+    snprintf(fn, BFLRG, "/tmp/pcsh-pfor.%d", getpid());    
+    fp = fopen(fn, "w");
+
+/* write the prelimary part of the script */
+    strings_out(fp, sa, 0, is, TRUE);
+
+/* parse SA[IS] and write the conclusion of the temporary script */
+    nstrncpy(t, BFLRG, sa[is], -1);
+    ta = tokenize(t, "[]", 0);
+
+    nstrncpy(t, BFLRG, ta[0], -1);
+
+/* expected tokens are: pfor, <var>, <lst> */
+    ra = tokenize(t, "()", 0);
+    n  = lst_length(ra);
+    fprintf(fp, "    echo \"var %s ; \"\n", trim(ra[0]+4, BOTH, " \t"));
+    fprintf(fp, "    echo \"lst %s ; \"\n", ra[1]);
+    fprintf(fp, "    echo \"_cmd_ %s\"\n", ta[1]);
+
+    free_strings(ta);
+    free_strings(ra);
+
+/* close the file */
+    fprintf(fp, "    exit(131)\n");
+    fclose(fp);
+
+/* run the script */
+    r = run(FALSE, "csh %s | tail -n 5", fn);
+    p = strstr(r, "_cmd_");
+    *p = '\0';
+    rv = lst_add(rv, p + 6);
+
+    unlink(fn);
+
+    ta = tokenize(r, " ;\n", 0);
+    n  = lst_length(ta);
+    rv = lst_add(rv, ta[1]);
+
+    for (i = 3; i < n; i++)
+        rv = lst_add(rv, ta[i]);
+
+    free_strings(ta);
+
+    rv = lst_add(rv, NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAKE_PFOR_SCRIPT - prepare a shell script for parallel FOR invocation */
+
+static int make_pfor_script(char **sa, int is, char *fname, char *shell,
+			    char *pact, char *args, int henv,
+			    char **vo, char **v, int k)
+   {int i, ip, co, n;
+    char t[BFLRG], r[BFLRG], fn[BFLRG];
+    char *ro, **ta;
+    FILE *fp;
+
+    ta = compute_pfor_limits(sa, is, t, BFLRG);
+    n  = lst_length(ta);
+
+/* open the master file */
+    fp = fopen(fname, "w");
+    fprintf(fp, "#!/bin/csh -f\n");
+    fprintf(fp, "unalias *\n");
+    fprintf(fp, "@ err = 0\n");
+
+    ro = sa[is];
+    sa[is] = r;
+
+/* blank out the pend line */
+    for (i = is; sa[is] != NULL; i++)
+        {if (strncmp(trim(sa[i], FRONT, " \t"), "pend", 4) == 0)
+	    {sa[i][0] = '\0';
+	     break;};};
+
+    for (ip = 2; ip < n; ip++)
+        {snprintf(fn, BFLRG, "%s.%d", fname, ip);
+	 snprintf(r, BFLRG, "   set %s = %s\n", ta[1], ta[ip]);
+
+	 fprintf(fp, "%s %s\n", ta[0], fn);
+	 fprintf(fp, "@ err = $err + $status\n");
+
+	 co = make_shell_script(sa, fn, shell, pact,
+				args, henv, vo, v, k);};
+
+/* clean up */
+    free_strings(ta);
+
+    sa[is] = ro;
+
+/* close the master file */
+    fprintf(fp, "exit($err)\n");
+    fclose(fp);
+    chmod(fname, S_IRUSR | S_IWUSR | S_IXUSR);
+
+    return(co);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MAKE_C_SCRIPT - write and compile a C program for invocation */
 
 static int make_c_script(char **sa, char *fname, char **v)
@@ -111,7 +382,7 @@ static int make_c_script(char **sa, char *fname, char **v)
 
 /* copy the remainder as the C program */
     if (fo != NULL)
-       {strings_out(sa, fo, TRUE);
+       {strings_out(fo, sa, 0, -1, TRUE);
 
 /* finish up the file */
 	fclose(fo);};
@@ -133,7 +404,7 @@ static int make_c_script(char **sa, char *fname, char **v)
 
 static void invoke_script(char **vo, char *shell, char *pact,
 			  char **v, int k, int c)
-   {int i, co, henv;
+   {int i, is, co, henv;
     char fname[BFLRG], s[BFLRG], args[BFLRG];
     char *sname, *p, **sa;
 
@@ -168,7 +439,16 @@ static void invoke_script(char **vo, char *shell, char *pact,
 
 	p = strstr(args, "-lang");
 	if (p == NULL)
-	   co = make_shell_script(sa, fname, shell, pact, args, henv, vo, v, k);
+           {is = -1;
+	    if ((is = has_par_const(sa, "pdo")) >= 0)
+	       co = make_pdo_script(sa, is, fname, shell, pact,
+				    args, henv, vo, v, k);
+	    else if ((is = has_par_const(sa, "pfor")) >= 0)
+	       co = make_pfor_script(sa, is, fname, shell, pact,
+				     args, henv, vo, v, k);
+	    else
+	       co = make_shell_script(sa, fname, shell, pact,
+				      args, henv, vo, v, k);}
 	else if (strcmp(p+6, "c") == 0)
 	   co = make_c_script(sa+2, fname, v);
 
@@ -363,7 +643,7 @@ int main(int c, char **v)
 
 /* locate the tools needed for subshells */
     build_path(NULL,
-	       "mv", "sed", "rm", "cc",
+	       "mv", "sed", "rm", "cc", "pcsh",
 	       NULL);
 
 /* print the entire command line */
