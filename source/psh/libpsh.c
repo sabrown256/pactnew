@@ -3003,15 +3003,22 @@ int demonize(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* STRINGS_OUT - write the strings SA to a file FP */
+/* STRINGS_OUT - write the strings SA[I] from MN <= I < MX to a file FP
+ *             - if NEWL is TRUE add a newline to each string
+ */
 
-int strings_out(char **sa, FILE *fp, int newl)
+int strings_out(FILE *fp, char **sa, int mn, int mx, int newl)
    {int i, n, rv;
 
     rv = FALSE;
     if ((fp != NULL) && (sa != NULL))
        {n = lst_length(sa);
-	for (i = 0; i < n; i++)
+	if (mx < 0)
+	   mx = n;
+	else
+	   mx = min(mx, n);
+	mn = max(mn, 0);
+	for (i = mn; i < mx; i++)
 	    {fputs(sa[i], fp);
              if (newl == TRUE)
                 fputc('\n', fp);};
@@ -3033,7 +3040,7 @@ int strings_file(char **sa, char *fname, char *mode)
     if ((fname != NULL) && (sa != NULL))
        {fp = fopen(fname, mode);
 
-	rv = strings_out(sa, fp, FALSE);
+	rv = strings_out(fp, sa, 0, -1, FALSE);
 
 	fclose(fp);
 

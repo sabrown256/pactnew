@@ -1,0 +1,18 @@
+#!/usr/bin/env pcsh
+#OPT -f
+#
+# PSH6 - basic test of parallel loop PCSH - PFOR
+#
+
+set np = 3
+set nt = 8
+set dt = 300
+
+set lst = ( 1 3 a c -d -z )
+
+pfor i ($lst) [do-batch -p $np -t $nt -dt $dt]
+   echo "$i" >&! psh6-$i.res
+pend
+
+exit($status)
+

@@ -1,0 +1,17 @@
+#!/usr/bin/env pcsh
+#OPT -f
+#
+# PSH5 - basic test of parallel loop PCSH - PDO
+#
+
+set np = 3
+set nt = 8
+set dt = 300
+set n  = 10
+
+pdo i = 0, $n, 1 [do-batch -p $np -t $nt -dt $dt]
+   echo $i >&! psh5-$i.res
+pend
+
+exit($status)
+
