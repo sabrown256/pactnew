@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# DO-BATCH - run a batch job at LC
+# DO-BATCH - run a batch job
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
