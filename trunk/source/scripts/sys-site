@@ -217,11 +217,11 @@ else if ($deflt == TRUE) then
       unset inf
    endif
 
+   echo "$bindir/no-op"
+
    unset lsys
    
 endif
-
-echo "$bindir/no-op"
 
 unset noglob
 

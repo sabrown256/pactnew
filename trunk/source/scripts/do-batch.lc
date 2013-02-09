@@ -1,6 +1,7 @@
 #!/bin/csh -f
 #
-# DO-BATCH - run a batch job
+# DO-BATCH.LC - run a batch job on a SYS_SITE = LC site host
+#             - feeds jobs to local batch system
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -13,20 +14,20 @@ unalias *
 set HostOS  = `uname -s`
 set HostHW  = `uname -m`
 
-set Host    = none
-set Prob    = unknown
-set Bank    = `/usr/apps/pactnew/bin/pcexec -q -s /usr/local/bin/bac | awk '$3 !~ /default/ && $1 !~ /USERNAME/ { print $2 }'`
-set Bank    = $Bank[$#Bank]
-set NNodes  = 1
-set NCpus   = 1
-set TimeMax = 10
-set Notify  = "n"
-set Date    = `date`
-set Count   = $$
-set TTY     = ""
-set Quiet   = FALSE
-set Literal = FALSE
-set Info    = ""
+set Host     = none
+set Prob     = unknown
+set Bank     = `/usr/apps/pactnew/bin/pcexec -q -s /usr/local/bin/bac | awk '$3 !~ /default/ && $1 !~ /USERNAME/ { print $2 }'`
+set Bank     = $Bank[$#Bank]
+set NNodes   = 1
+set NThreads = 1
+set NCpus    = 1
+set TimeMax  = 10
+set Notify   = "n"
+set Date     = `date`
+set TTY      = ""
+set Quiet    = FALSE
+set Literal  = FALSE
+set Info     = ""
 
 # use environment variable so that do-run can set this if needed
 if (!($?Wrap)) then
@@ -43,11 +44,15 @@ while ($#argv > 0)
            shift
            set Bank = $1
            breaksw
+      case -dt:
+           shift
+           set TimeMax = $1
+           breaksw
       case -e:
            shift
            set EnvVar = ( $EnvVar $1 )
+           set EnvVar = ( $EnvVar $2 )
            shift
-           set EnvVar = ( $EnvVar $1 )
            breaksw
       case -f:
            shift
@@ -55,29 +60,26 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: do-batch [-b <bank>] [-e <var> <value>] [-f <file>] [-h]"
+           echo "Usage: do-batch [-b <bank>] [-dt #] [-e <var> <value>] [-f <file>] [-h]"
            echo "                [-H <host>] [-l] [-m] [-n #] [-o <file>] [-p #]"
            echo "                [-q] [-t #] [-w]"
            echo ""
            echo "Options:"
-           echo "     b - which bank to use (uses bac by default)"
-           echo "     e - add environment variables to the batch script"
-           echo "     f - file containing batch control specifications"
-           echo "     h - this help message"
-           echo "     H - host on which to run"
-           echo "     l - run literal command (needed by debuggers)"
-           echo "     m - notify by mail"
-           echo "     n - number of nodes to use"
-           echo "     o - set the name of the output file"
-           echo "     p - number of processes to use"
-           echo "     q - suppress do-batch messages in the logs"
-           echo "     t - time limit in seconds"
-           echo "     w - notify via the write utiliy"
+           echo "     b  - which bank to use (uses bac by default)"
+           echo "     dt - time limit in seconds"
+           echo "     e  - add environment variables to the batch script"
+           echo "     f  - file containing batch control specifications"
+           echo "     h  - this help message"
+           echo "     H  - host on which to run"
+           echo "     l  - run literal command (needed by debuggers)"
+           echo "     m  - notify by mail"
+           echo "     n  - number of nodes to use"
+           echo "     o  - set the name of the output file"
+           echo "     p  - number of processes to use"
+           echo "     q  - suppress do-batch messages in the logs"
+           echo "     t  - number of threads"
+           echo "     w  - notify via the write utiliy"
            echo ""
-           echo "Other batch utilties:"
-           echo "     pstat - list batch jobs in queues"
-           echo "     prm   - remove batch jobs from queues"
-           echo "     rinfo - display resource usage for parallel jobs"
            exit(1)
            breaksw
       case -H:
@@ -107,7 +109,7 @@ while ($#argv > 0)
            breaksw
       case -t:
            shift
-           set TimeMax = $1
+           set NThreads = $1
            breaksw
       case -w:
            set Notify = "w"
@@ -181,10 +183,10 @@ endif
 
 # WRITE_SCRIPT
 
-set Script = "b.$Prob.$Count"
-set Log    = "$cwd/$Script.err"
+set Script = $cwd/b.$Prob.$$
+set Log    = $Script.err
 if ("$TTY" == "") then
-   set TTY = "$cwd/$Script.out"
+   set TTY = $Script.out
 endif
 
 rm -f $Script
@@ -192,19 +194,19 @@ touch $Script
 
 Note $Script '#\!/bin/csh'
 if ("$Host" != "none") then
-   Note $Script '# PSUB -c' "$Host"
+   Note $Script '# MSUB -c' "$Host"
 endif
 
-Note $Script '# PSUB -o' $Log
-Note $Script '# PSUB -b' $Bank
+Note $Script '# MSUB -o' $Log
+Note $Script '# MSUB -b' $Bank
 if (($NNodes > 1) || ($NCpus > 1)) then
-   Note $Script '# PSUB -ln' $NNodes -g $NCpus
+   Note $Script '# MSUB -ln' $NNodes -g $NCpus
 else if ("$HostOS" == "Linux") then
-   Note $Script '# PSUB -ln 1'
+   Note $Script '# MSUB -ln 1'
 endif
-Note $Script '# PSUB -x'
-Note $Script '# PSUB -ro -eo'
-Note $Script '# PSUB -tM' $TimeMax
+Note $Script '# MSUB -x'
+Note $Script '# MSUB -ro -eo'
+Note $Script '# MSUB -tM' $TimeMax
 Note $Script ''
 
 Note $Script 'cd' $cwd
@@ -292,7 +294,7 @@ endsw
 # EXECUTE
 
 chmod 750 $Script
-/usr/local/bin/psub $Script
+/usr/local/bin/msub $Script
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
