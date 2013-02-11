@@ -624,9 +624,12 @@ int SC_exec_async_h(char *shell, char **env,
 
 /* count hosts and get the maximum string length of all hosts */
     ln = 0;
-    for (nh = 0; hstl[nh] != NULL; nh++)
-        {ih = strlen(hstl[nh]);
-	 ln = max(ln, ih);};
+    if (hstl == NULL)
+       nh = 0;
+    else
+       {for (nh = 0; hstl[nh] != NULL; nh++)
+	    {ih = strlen(hstl[nh]);
+	     ln = max(ln, ih);};};
 
 /* count the directories */
     if (dirs == NULL)
