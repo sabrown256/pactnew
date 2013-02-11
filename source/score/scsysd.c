@@ -54,9 +54,6 @@ struct s_connectdes
     int srv_done;             /* TRUE for normal server completion */
     int cpu_factor;           /* CPU number use factor */
     int cpu_acc;              /* CPU recruiting accelaration factor */
-    double time_abs;          /* absolute job time limit */
-    double time_rel;          /* relative job time limit */
-    double time_threshold;    /* job time limit threshold */
     double load;              /* load average for connection */
     double load_min;          /* minimum load average for connection */
     double load_max;          /* maximum load average for connection */

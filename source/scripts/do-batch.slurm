@@ -1,7 +1,6 @@
 #!/bin/csh -f
 #
-# DO-BATCH.LC - run a batch job on a SYS_SITE = LC site host
-#             - feeds jobs to local batch system
+# DO-BATCH.SLURM - run a batch job on a site using MOAB and SLURM
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -16,23 +15,18 @@ set HostHW  = `uname -m`
 
 set Host     = none
 set Prob     = unknown
-set Bank     = `/usr/apps/pactnew/bin/pcexec -q -s /usr/local/bin/bac | awk '$3 !~ /default/ && $1 !~ /USERNAME/ { print $2 }'`
-set Bank     = $Bank[$#Bank]
-set NNodes   = 1
-set NThreads = 1
-set NCpus    = 1
-set TimeMax  = 10
 set Notify   = "n"
 set Date     = `date`
 set TTY      = ""
 set Quiet    = FALSE
-set Literal  = FALSE
 set Info     = ""
 
-# use environment variable so that do-run can set this if needed
-if (!($?Wrap)) then
-   set Wrap = ""
-endif
+# msub controls
+set TimeMax  = 10
+
+# dual srun/msub controls
+set NThreads = 1
+set NNodes   = 1
 
 alias Note 'echo \!\!:2-$ >>& \!\!:^'
 
@@ -40,10 +34,6 @@ set Cmnd   = ""
 set EnvVar = ""
 while ($#argv > 0)
    switch ($1)
-      case -b:
-           shift
-           set Bank = $1
-           breaksw
       case -dt:
            shift
            set TimeMax = $1
@@ -60,20 +50,17 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: do-batch [-b <bank>] [-dt #] [-e <var> <value>] [-f <file>] [-h]"
-           echo "                [-H <host>] [-l] [-m] [-n #] [-o <file>] [-p #]"
+           echo "Usage: do-batch [-dt #] [-e <var> <value>] [-f <file>] [-h]"
+           echo "                [-H <host>] [-m] [-o <file>] [-p #]"
            echo "                [-q] [-t #] [-w]"
            echo ""
            echo "Options:"
-           echo "     b  - which bank to use (uses bac by default)"
            echo "     dt - time limit in seconds"
            echo "     e  - add environment variables to the batch script"
            echo "     f  - file containing batch control specifications"
            echo "     h  - this help message"
            echo "     H  - host on which to run"
-           echo "     l  - run literal command (needed by debuggers)"
            echo "     m  - notify by mail"
-           echo "     n  - number of nodes to use"
            echo "     o  - set the name of the output file"
            echo "     p  - number of processes to use"
            echo "     q  - suppress do-batch messages in the logs"
@@ -86,15 +73,8 @@ while ($#argv > 0)
            shift
            set Host = $1
            breaksw
-      case -l:
-           set Literal = TRUE
-           breaksw
       case -m:
            set Notify = "m"
-           breaksw
-      case -n:
-           shift
-           set NNodes = $1
            breaksw
       case -o:
            shift
@@ -102,7 +82,7 @@ while ($#argv > 0)
            breaksw
       case -p:
            shift
-           set NCpus = $1
+           set NNodes = $1
            breaksw
       case -q:
            set Quiet = TRUE
@@ -134,48 +114,28 @@ end
 # PROCESS_INFO_FILE
 
 # Batch info file may contain any of the following:
-#   bank = <bank>
 #   host = <host>
 #   time = <time>
 # Note: time is in seconds
 
 if ($Info != "") then
    set Batch    = `awk '$1 == "batch"  { print $3 }' $Info`
-   set tBank    = `awk '$1 == "bank"   { print $3 }' $Info`
    set tHost    = `awk '$1 == "host"   { print $3 }' $Info`
    set tTimeMax = `awk '$1 == "time"   { print $3 }' $Info`
    set HaveMPI  = `awk '$1 == "mpi"    { print $3 }' $Info`
    set EnvVar   = `awk '$1 == "setenv" { printf("%s %s\n", $2, $3); }' $Info`
 
-   if ("$tBank" != "") then
-      set Bank = $tBank
-   endif
    if ("$tHost" != "") then
       set Host = $tHost
    endif
    if ("$tTimeMax" != "") then
       set TimeMax = $tTimeMax
    endif
-   if ("$HaveMPI" != "") then
-      setenv Wrap `where mpi-io-wrap | head -n 1`
-   endif
 
 # Note: count on the Info file having been automatically generated
 # in a script that may never regain control to remove it
    rm -f $Info
 
-endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CHECK
-
-if ("$Bank" == "") then
-   echo ""
-   echo "No bank found - exiting DO-BATCH"
-   echo ""
-   exit(1)
 endif
 
 #--------------------------------------------------------------------------
@@ -198,15 +158,14 @@ if ("$Host" != "none") then
 endif
 
 Note $Script '# MSUB -o' $Log
-Note $Script '# MSUB -b' $Bank
-if (($NNodes > 1) || ($NCpus > 1)) then
-   Note $Script '# MSUB -ln' $NNodes -g $NCpus
-else if ("$HostOS" == "Linux") then
-   Note $Script '# MSUB -ln 1'
+if (($NThreads > 1) || ($NNodes > 1)) then
+   Note $Script '# MSUB -l nodes='$NNodes
+#   Note $Script '# MSUB -l nodes='$NNodes":ppn="$NThreads
 endif
-Note $Script '# MSUB -x'
-Note $Script '# MSUB -ro -eo'
-Note $Script '# MSUB -tM' $TimeMax
+
+# convert time to seconds
+set TimeMax = `timer -t $TimeMax`
+Note $Script '# MSUB -l walltime='$TimeMax
 Note $Script ''
 
 Note $Script 'cd' $cwd
@@ -218,20 +177,15 @@ Note $Script 'touch $TTY'
 Note $Script ''
 
 if ($Quiet == FALSE) then
-   if ("$Wrap" != "") then
-      Note $Script 'echo "Batch Job: '$Wrap $Cmnd'" >> $TTY'
-      Note $Script 'echo "MPI Job  : yes" >> $TTY'
-   else
-      Note $Script 'echo "Batch Job: '$Cmnd'" >> $TTY'
-      Note $Script 'echo "MPI Job  : no" >> $TTY'
-   endif
+   Note $Script 'echo "Batch Job: '$Cmnd'" >> $TTY'
+   Note $Script 'echo "MPI Job  : no" >> $TTY'
    Note $Script 'echo "Date     : '$Date'" >> $TTY'
    Note $Script 'echo "----------------------------------------------------" >> $TTY'
    Note $Script ''
 endif
 
 # add specified environment variables
-while ($#EnvVar > 0)
+while ($#EnvVar > 1)
    set Var = $EnvVar[1]
    set Val = $EnvVar[2]
    shift EnvVar
@@ -240,25 +194,10 @@ while ($#EnvVar > 0)
 end
 Note $Script ''
 
-if ($Literal == TRUE) then
-   Note $Script "$Cmnd" '>>& $TTY'
-else
-   switch ($HostOS)
-      case Linux:
-           if ($HostHW != "alpha") then
-              if ("$Cmnd[1]" == "/usr/bin/prun") then
-                 Note $Script "$Wrap $Cmnd" '>>& $TTY'
-              else
-                 Note $Script "$Wrap /usr/bin/prun -c$NNodes -n$NCpus $Cmnd" '>>& $TTY'
-              endif
-              breaksw
-           endif
-      case OSF1:
-      case AIX:
-           Note $Script "/usr/local/bin/run -rsi $Wrap $Cmnd" '>>& $TTY'
-           breaksw
-   endsw
-endif
+Note $Script "setenv OMP_NUM_THREADS $NThreads"
+Note $Script ''
+
+Note $Script "do-run -p $NNodes $Cmnd" '>>& $TTY'
 Note $Script 'set Err = $status'
 Note $Script ''
 
@@ -276,12 +215,12 @@ endif
 
 switch ($Notify)
    case m:
-        Note $Script '(echo "UPCS jobs for '$Prob' has finished in '$cwd'" ; \'
+        Note $Script '(echo "BATCH job for '$Prob' has finished in '$cwd'" ; \'
         Note $Script ' echo "$ErrMsg" ) | \'
         Note $Script 'mail "'$USER'"'
         breaksw
    case w:
-        Note $Script '(echo "UPCS jobs for '$Prob' has finished in '$cwd'" ; \'
+        Note $Script '(echo "BATCH job for '$Prob' has finished in '$cwd'" ; \'
         Note $Script ' echo "$ErrMsg" ) | \'
         Note $Script 'write "'$USER'"'
         breaksw
@@ -294,7 +233,7 @@ endsw
 # EXECUTE
 
 chmod 750 $Script
-/usr/local/bin/msub $Script
+msub $Script
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
