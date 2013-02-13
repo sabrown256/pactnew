@@ -21,6 +21,20 @@
 #define EXEC_LOG            104
 #define EXEC_CORE           105
 
+typedef struct s_execdes execdes;
+
+struct s_execdes
+   {int n;
+    int to;
+    int na;
+    int show;
+    int dmp;
+    int *res;
+    char *shell;
+    char **cmnds;
+    char **env;
+    fspec *filter;};
+
 extern asyncstate
  _SC_server_state;
 
@@ -716,9 +730,11 @@ int SC_exec_async_h(char *shell, char **env,
  *          - return the exit status
  */
 
-static int _SC_exec(SC_array *out, char *cmnd, char *shell,
-		    char **env, int to, int na, int dbg)
+static int _SC_exec(int i, SC_array *out, execdes *ed)
    {int ns, rv, ioi, sto, st, nf, ok;
+    int to, na, dbg;
+    int *res;
+    char *cmnd, *shell, **env;
     char *cwd;
     SC_evlpdes *pe;
     taskdesc *job;
@@ -726,6 +742,14 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
     parstate state;
     SC_contextdes osi;
     conpool *cpo;
+
+    to    = ed->to;
+    na    = ed->na;
+    dbg   = ed->dmp;
+    cmnd  = ed->cmnds[i];
+    shell = ed->shell;
+    env   = ed->env;
+    res   = ed->res;
 
     nf = SC_gs.assert_fail;
 
@@ -777,6 +801,8 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 
 	state.free_tasks(&state);};
 
+    res[i] = rv;
+
     _SC_set_run_task_state(NULL);
 
     if (cwd != NULL)
@@ -823,11 +849,23 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 int SC_exec(char ***out, char *cmnd, char *shell, int to)
    {int st;
     SC_array *str;
+    execdes ed;
     static int dbg = FALSE;
+
+    ed.n      = 1;
+    ed.to     = to;
+    ed.na     = 1;
+    ed.show   = FALSE;
+    ed.dmp    = dbg;
+    ed.shell  = shell;
+    ed.cmnds  = &cmnd;
+    ed.env    = NULL;
+    ed.filter = NULL;
+    ed.res    = &st;
 
     str = SC_STRING_ARRAY();
 
-    st = _SC_exec(str, cmnd, shell, NULL, to, 1, dbg);
+    st = _SC_exec(0, str, &ed);
 
 /* return command output in good condition */
     *out = _SC_array_string_join(&str);
@@ -948,6 +986,44 @@ char **SC_syscmnd(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_EXEC_ONE - execute one command CM
+ *              - worker for SC_exec_commands
+ */
+
+int _SC_exec_one(void **a, int *it)
+   {int i, mn, mx, st, err;
+    char *cm, **sa;
+    execdes *ed;
+    SC_array *out;
+
+    mn = it[0];
+    mx = it[1];
+    ed = *(execdes **) a;
+
+    for (i = mn; i < mx; i++)
+        {out = SC_STRING_ARRAY();
+
+	 cm           = ed->cmnds[i];
+	 ed->cmnds[i] = _SC_put_command(out, cm, ed->show);
+
+	 err = _SC_exec(i, out, ed);
+
+	 ed->cmnds[i] = cm;
+
+	 sa = SC_array_done(out);
+	 if (sa != NULL)
+	    _SC_print_filtered(&_SC_async_state, sa, ed->filter, -1, NULL);
+
+	 SC_free_strings(sa);
+
+	 st = (err != 0);
+	 ed->res[i] = st;};
+
+    return(st);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_EXEC_COMMANDS - execute each command in CMNDS with persistence
  *                  - using SHELL
  *                  - send output to file LNAME as well as stdout
@@ -971,11 +1047,10 @@ char **SC_syscmnd(char *fmt, ...)
 int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
 		     char *lname, char *fname, int na, int show,
 		     int ignore, int dmp)
-   {int i, n, st, err, sto;
-    char *p, *cm, **sa;
+   {int i, n, st, sto;
     conpool *cpo;
-    SC_array *out;
     fspec *filter;
+    execdes ed;
 
 /* filter junk messages out of response */
     filter = _SC_read_filter(fname);
@@ -993,28 +1068,32 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
 
     SC_ptr_arr_len(n, cmnds);
 
+    ed.n      = n;
+    ed.to     = to;
+    ed.na     = na;
+    ed.show   = show;
+    ed.dmp    = dmp;
+    ed.cmnds  = cmnds;
+    ed.shell  = shell;
+    ed.env    = env;
+    ed.filter = filter;
+    ed.res    = CMAKE_N(int, n);
+
 /* run each command until it succeeds or definitively fails
  * try to avoid failing on system fault type errors
  */
+#if 1
+    SC_do_tasks((PFInt) _SC_exec_one, &ed, n, 0, TRUE);
     st = 0;
     for (i = 0; i < n; i++)
-        {cm = cmnds[i];
-
-	 out = SC_STRING_ARRAY();
-
-	 p   = _SC_put_command(out, cm, show);
-	 err = _SC_exec(out, p, shell, env, to, na, dmp);
-
-	 sa = SC_array_done(out);
-	 if (sa != NULL)
-	    _SC_print_filtered(&_SC_async_state, sa, filter, -1, NULL);
-
-	 SC_free_strings(sa);
-
-	 st |= (err != 0);
-
-	 if ((ignore == FALSE) && (err != 0))
+        st |= ed.res[i];
+#else
+    st = 0;
+    for (i = 0; i < n; i++)
+        {st |= _SC_exec_one(i, &ed);
+	 if ((ignore == FALSE) && (st == TRUE))
 	    break;};
+#endif
 
     if (lname != NULL)
        io_close(_SC_async_state.log);
@@ -1023,6 +1102,7 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
     _SC_async_state.to_stdout = sto;
 
     _SC_free_filter(filter);
+    CFREE(ed.res);
 
     return(st);}
 

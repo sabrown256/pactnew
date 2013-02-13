@@ -16,10 +16,10 @@ typedef struct s_thread_chunk thread_chunk;
 typedef struct s_thread_pool thread_pool;
 
 struct s_thread_work
-   {int n_thread;              /* number of threads that will do this work unit */
-    void *(*func)(void *a);    /* function that will do the work */
-    void *arg;                 /* the single argument that the function will take */
-    void **ret;};              /* the n_thread return values from the function */
+   {int n_thread;             /* number of threads that will do this work unit */
+    void *(*func)(void *a);   /* function that will do the work */
+    void *arg;                /* the single argument that the function will take */
+    void **ret;};             /* the n_thread return values from the function */
 
 struct s_thread_queue
    {int nxt;
@@ -380,9 +380,9 @@ void SC_chunk_loop(PFPVoidAPV fnc, int mn, int mx, int serial, void *argl)
     if (SC_n_threads < 0)
        SC_init_threads(1, _SC_ts.oper.id);
 
-    otid        = _SC.tid_hook;
+    otid         = _SC.tid_hook;
     _SC.tid_hook = _SC_ts.oper.id;
-    _SC_tc.wid  = 0;
+    _SC_tc.wid   = 0;
 
     nt = (serial) ? 1 : SC_n_threads;
     nt = max(nt, 1);
@@ -516,7 +516,8 @@ void SC_queue_work(PFPVoidAPV fnc, int serial, void *argl)
  */
 
 static void *_SC_do_task(void *arg)
-   {int it, is, off;
+   {int off;
+    int ind[2];
     void *rv, *a;
     int (*fnc)(void **a, int *it);
     SC_address *tsk;
@@ -527,11 +528,13 @@ static void *_SC_do_task(void *arg)
     a   = tsk[1].memaddr;
     off = tsk[2].diskaddr;
 
-    SC_chunk_split(&it, &is, &rv);
+/* get index of first item in chunk and number of items */
+    SC_chunk_split(&ind[0], &ind[1], &rv);
 
-    it += off;
+    ind[0] += off;
+    ind[1] += off;
 
-    (*fnc)(&a, &it);
+    (*fnc)(&a, ind);
 
     return(rv);}
 
