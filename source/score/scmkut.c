@@ -294,7 +294,7 @@ void usage(void)
     printf("Usage: pact [-async <n>] [-B] [-cmd <file> <cmd>] [-d] [-dbg] [-dmp] [-f <file>]\n");
     printf("            [-flt <file>] [-h] [-i] [-incpath] [-info <pttrn> | <var>] [+info <var>]\n");
     printf("            [-link] [-log <file>] [+l] [-n] [-na <n>] [+na <n>] [-pna <n>] [-rcr]\n");
-    printf("            [-s] [-sys <dir>] [-v] <make-args> <target>\n");
+    printf("            [-s] [-sys <dir>] [-t <n>] [-v] <make-args> <target>\n");
     printf("\n");
 
     printf("Make Options:\n");
@@ -317,6 +317,7 @@ void usage(void)
     printf("    -rcr     expand simple recursive invocations in place\n");
     printf("    -s       do not print commands before executing them\n");
     printf("    -sys     directory in which to put/find Makefile\n");
+    printf("    -t       use <n> threads\n");
     printf("    -vrb     print all commands before executing them (overrides '@')\n");
 
     printf("\n");
@@ -509,6 +510,9 @@ int main(int c, char **v, char **env)
 	    {PS_report_info(state->root, state->complete, state->literal, dbo,
 			    VERS, NULL);
 	     return(0);}
+         else if (strcmp(v[i], "-t") == 0)
+	    {nt = SC_stoi(v[++i]);
+	     SC_init_threads(nt, NULL);}
          else if (strcmp(v[i], "-vrb") == 0)
 	    {show = 2;
              state->verbose = TRUE;}

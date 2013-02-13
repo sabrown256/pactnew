@@ -535,7 +535,7 @@ char **sublist(char **ta, int na, char *s, char **exc, int ne)
 static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
 			    char *ind, char **ta, int na, char **exc, int ne)
    {int i, l, n, ic, nc, ni, global;
-    char cln[BFLRG], fmt[BFLRG];
+    char cln[BFLRG];
     char *c, *var, *val;
     char **vars, **vals, **ca, **sa;
 
@@ -588,14 +588,28 @@ static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
 		 vars[n] = NULL;
 		 vals[n] = NULL;
 
-		 if (global == TRUE)
-		    snprintf(fmt, BFLRG, "%%s%%-%ds => '%%s',\n", nc);
-		 else
-		    snprintf(fmt, BFLRG, "%%s   %%-%ds => '%%s',\n", nc);
-
 		 for (i = 0; i < n; i++)
 		     {if ((vars[i] != NULL) && (vals[i] != NULL))
-			 fprintf(out, fmt, ind, vars[i], vals[i]);};
+			 {if (global == TRUE)
+			     {if (vals[i][0] == '"')
+				 fprintf(out, "%s%-*s => %s,\n",
+					 ind, nc, vars[i], vals[i]);
+			      else if (strcmp(vals[i], "\\") == 0)
+				 fprintf(out, "%s%-*s => '\\\\',\n",
+					 ind, nc, vars[i]);
+			      else
+				 fprintf(out, "%s%-*s => '%s',\n",
+					 ind, nc, vars[i], vals[i]);}
+			  else
+			     {if (vals[i][0] == '"')
+				 fprintf(out, "%s   %-*s => %s,\n",
+					 ind, nc, vars[i], vals[i]);
+			      else if (strcmp(vals[i], "\\") == 0)
+				 fprintf(out, "%s%-*s => '\\\\',\n",
+					 ind, nc, vars[i]);
+			      else
+				 fprintf(out, "%s   %-*s => '%s',\n",
+					 ind, nc, vars[i], vals[i]);};};};
 
 		 FREE(vars);
 		 free_strings(vals);};

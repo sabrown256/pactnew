@@ -281,6 +281,9 @@ switch ($Cmnd)
         flog $Log umask
 	flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/build.error
 
+# do not bother with core files for the compilation tools
+        limit coredumpsize 0 >& /dev/null
+
         set BeginTime = `$TIMER -r`
 
 # provide context for child processes
@@ -2941,6 +2944,11 @@ CFG_DONE:
         flog $Log $Which pact
         flog $Log umask
 	flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/test.error
+
+# clear out existing test corefiles - easier to investigate any failures
+        foreach i (`find .. -name z-$System`)
+           flog $Log $RM $i/test/*.core
+        end
 
         set BeginTime = `$TIMER -r`
 

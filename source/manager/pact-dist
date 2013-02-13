@@ -41,14 +41,16 @@ set SRCDate       = ( -D "`./pact-get-tag`" )
 set WhoIAm        = $USER
 set HeaderFile    = "../pact-update"
 set VersionID     = `cat ./.pact-version`
+set TarArgs       = cvf
 set TmpFile       = tmp-file
 set TmpDir        = tmp-dir
 set Host          = `uname -n`
 set OS            = `uname -s | tr "[A-Z]" "[a-z]"`
 
-set LLNL = FALSE
-set KEEP = FALSE
-set Extn = FALSE
+set LLNL             = FALSE
+set KEEP             = FALSE
+set Extn             = FALSE
+set UseRepo          = TRUE
 set RepositoryExport = FALSE
 
 set MV    = "mv -f"
@@ -67,11 +69,11 @@ while ($#argv >= 1)
            breaksw
       case help:
       case -h*:
-           echo "Usage: dsys dist [-c <repo>] [-s MngDir] [-h]"
+           echo "Usage: dsys dist [-c <repo>] [-h] [-s]"
            echo "                 [-v | +v | -T] [-l [-x]] [-r] [-k] [-Z]"
            echo "    -c    use the specified repository (default to current source repository)"
            echo "    -h    this help message"
-           echo "    -s    directory for Source Control System info file"
+           echo "    -s    use the current sources to make the distribution"
            echo "    -v    get the distribution as of the given date mm/dd/yy"
            echo "    +v    get the distribution as of the given date mm/dd/yy_hh:mm:ss"
            echo "    -T    get the distribution for revision Tag Tyy_mm_dd_hh_mm_ss"
@@ -93,8 +95,7 @@ while ($#argv >= 1)
            set RepositoryExport = TRUE
            breaksw
       case -s:
-           shift
-           set MngDir = $1
+           set UseRepo = FALSE
            breaksw
       case -v:
       case +v:
@@ -126,7 +127,11 @@ Note $Log "Source tag: $SRCDate[2]"
 
    call INIT()
 
-   call GET_SOURCE()
+#   if ($UseRepo == TRUE) then
+      call GET_REPO_SOURCE()
+#   else
+#      call GET_CURRENT_SOURCE()
+#   endif
 
    call PREP_TREE()
 
@@ -142,10 +147,9 @@ Note $Log "Source tag: $SRCDate[2]"
 
 # for non export distributions
    if ($RepositoryExport == TRUE) then
-         call EXPORT_DIST()
+      call EXPORT_DIST()
 
    else
-
       call UNIX_DIST()
 
 # handle the LLNL specific material
@@ -185,29 +189,13 @@ INIT:
    if (!(-e $MngDir/pact-scs)) then
       NoteD $Log "Can't find Source Control System Information in $MngDir"
       NoteD $Log " "
-      exit(25)
+      quit(25)
    endif
 
 # Source Control System Variables
    source $MngDir/pact-scs
 
-# check if repository locked
-   set lockst = `$ScrDir/scs-lock status`
-   if ($lockst == "locked") then
-      NoteD $Log " *** REPOSITORY IS LOCKED ***"
-      NoteD $Log ""
-      $ScrDir/scs-lock cat
-      NoteD $Log ""
-      exit(26)
-   endif
-
-# lock repository
-   $ScrDir/scs-lock lock
-   echo "  pact-dist in progress - " $USER  `date`>> $Lock
-   Note $Lock ""
-
    if (!(-d distribution)) then
-      Note $Lock "Creating distribution directory"
       flog $Log mkdir distribution
    endif
 
@@ -233,41 +221,60 @@ INIT:
    Note $Log "Operation: $Opt " 
    Note $Log " " 
 
+   flog $Log pwd
+
    return
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# GET_SOURCE - check out the source
+# GET_REPO_SOURCE - check out the source
 
-GET_SOURCE:
+GET_REPO_SOURCE:
 
    Separator $Log
+
+# check if repository locked
+   set lockst = `$ScrDir/scs-lock status`
+   if ($lockst == "locked") then
+      NoteD $Log " *** REPOSITORY IS LOCKED ***"
+      NoteD $Log ""
+      $ScrDir/scs-lock cat
+      NoteD $Log ""
+      quit(26)
+   endif
+
+# lock repository
+   $ScrDir/scs-lock lock
+   echo "  pact-dist in progress - " $USER  `date`>> $Lock
+   Note $Lock ""
+
    NoteD $Log "Getting out the sources for $DTag"
    Note $Lock "Getting out the sources"
-
-   set PactList = ( `awk '$1 == "pkg" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' ../pact.manifest` )
-   Note $Log "packages to add to distribution: $PactList"
 
    flog $Log pwd
    flog $Log mkdir pact
    flog $Log cd pact
    flog $Log $ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository pact
+   set xstatus = $status
+   Note $Log " " 
+
+# release the lock
+   flog $Log $ScrDir/scs-lock unlock
+   flog $Log $ScrDir/scs-lock status
    Note $Log " " 
 
    flog $Log mv pact/* .
    flog $Log $RMDir pact
 
-   if ($status == 0) then
+   if ($xstatus == 0) then
       Note $Log "Sources checked out" 
    else
       NoteD $Log "Source check out failed" 
       Note $Log "SCSRepository = $SCSRepository"
       echo "See $Log"
 
-# release the lock
-      $ScrDir/scs-lock unlock
-      exit(1)
+      quit(1)
    endif
    Note $Log " " 
 
@@ -281,11 +288,40 @@ GET_SOURCE:
 
    flog $Log cd ..
 
-# release the lock
-   flog $Log $ScrDir/scs-lock unlock
-   flog $Log $ScrDir/scs-lock status
+   flog $Log ls -lR pact
+
+   flog $Log pwd
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_CURRENT_SOURCE - check out the source
+
+GET_CURRENT_SOURCE:
+
+   Separator $Log
+   NoteD $Log "Using the current sources"
+
+   flog $Log pwd
+   flog $Log mkdir pact
+   flog $Log cd pact
+   flog $Log pwd
+   flog $Log rsync -avC --exclude dev --exclude 'z-*' ../../../ .
+   flog $Log ( find . -name "*.core" | xargs rm )
+
+   flog $Log rm -rf dev
+   Note $Log " " 
+
+   Note $Log "Sources copied" 
+   Note $Log " " 
+
+   flog $Log cd ..
 
    flog $Log ls -lR pact
+
+   flog $Log pwd
 
    return
 
@@ -324,6 +360,7 @@ SAVE_EXT:
 PREP_TREE:
 
    Separator $Log
+   flog $Log pwd
 
 # remove the source control system sub-directories
    NoteD $Log "Cleaning up the sources"
@@ -341,14 +378,13 @@ PREP_TREE:
 
 # determine whether local tar supports o option
    Note $Log "Determining whether tar support o option"
-   flog $Log set TarArgs = cvof
+   flog $Log set lta = cvof
    flog $Log mkdir $TmpDir
    flog $Log cd $TmpDir
    echo "foo" > $TmpFile.file
-   flog $Log tar $TarArgs $TmpFile.tar $TmpFile.file
-   if ($status != 0) then
-      flog $Log set TarArgs = cvf
-      flog $Log set status = 0
+   flog $Log tar $lta $TmpFile.tar $TmpFile.file
+   if ($status == 0) then
+      flog $Log set TarArgs = $lta
    endif
    flog $Log cd ..
    flog $Log $RMDir $TmpDir
