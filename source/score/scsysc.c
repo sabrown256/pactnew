@@ -1008,6 +1008,9 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
    {int it, n, dosh, doif, term;
     char *t, *ios;
     SC_array *tf;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     it    = 0;
     doif  = FALSE;
@@ -1021,7 +1024,7 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
     for (n = 0; n < na; n++)
         {t = ta[n];
 
-	 if ((t[0] == SC_PROCESS_DELIM) && (_SC_ps.msh_syntax == TRUE))
+	 if ((t[0] == SC_PROCESS_DELIM) && (ps->msh_syntax == TRUE))
 	    ios = t;
 
 	 else if (strpbrk(t, "[]()@$*`") != NULL)

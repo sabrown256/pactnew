@@ -37,10 +37,7 @@ extern int
  *               - node
  */
 
-PC_open_group(name, mode, pn, nl)
-   char *name, *mode;
-   int *pn;
-   PROCESS *nl;
+int PC_open_group(char *name, char *mode, int *pn, PROCESS *nl)
    {int i, n, mytid;
 
     return(TRUE);}
@@ -52,8 +49,7 @@ PC_open_group(name, mode, pn, nl)
  *                - node
  */
 
-PROCESS *PC_open_member(pnn)
-   int *pnn;
+PROCESS *PC_open_member(int *pnn)
    {PROCESS *pp;
 
     pp = CMAKE(PROCESS);
@@ -72,16 +68,15 @@ PROCESS *PC_open_member(pnn)
  *        - or a LINDA-like PUT
  */
 
-PC_out(bf, type, ni, pp, filt)
-   void *bf;
-   char *type;
-   size_t ni;
-   PROCESS *pp;
-   int *filt;
-   {int i, j, ityp, dn, did, nb, t, more, *p;
+int PC_out(void *bf, char *type, size_t ni, PROCESS *pp, int *filt)
+   {int i, j, ityp, dn, did, nb, t, more;
     int type_index, default_node, default_id, host_node;
-    int *nl, *pnl, *pl, *ppl, nn, np;
+    int nn, np, rv;
+    int *p, *nl, *pnl, *pl, *ppl;
     int block_state;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     type_index   = 0;
     default_node = -1;
@@ -145,7 +140,7 @@ PC_out(bf, type, ni, pp, filt)
 
 	     SEND(&dn, ityp, bf, nb, 0);
 
-	     if (_SC_ps.debug)
+	     if (ps->debug)
 	        PRINT(stdout, "\t\t\tNode %d sent %d bytes to %d\n",
 		      pp->acpu, nb, dn);};};
 
@@ -159,15 +154,14 @@ PC_out(bf, type, ni, pp, filt)
  *       - or a LINDA-like GET
  */
 
-PC_in(bf, type, ni, pp, filt)
-   void *bf;
-   char *type;
-   size_t ni;
-   PROCESS *pp;
-   int *filt;
-   {int i, n, ityp, dn, did, nb, t, more, *p;
-    int oid, otyp;
+int PC_in(void *bf, char *type, size_t ni, PROCESS *pp, int *filt)
+   {int i, n, ityp, dn, did, nb, t, more;
+    int oid, otyp, rv;
     int type_index, block_state;
+    int *p;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     ityp = 0;
     type_index  = 0;
@@ -204,17 +198,19 @@ PC_in(bf, type, ni, pp, filt)
     else
        SRECVNW(&oid, &otyp, bf, pp->acpu, ityp, nb);
 
-    if (_SC_ps.debug)
+    if (ps->debug)
        PRINT(stdout, "Node %d got %d bytes\n", pp->acpu, nb);
 
-    return((int) ni);}
+    rv = ni;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PC_SYNC_EXECUTION - synchronize the execution of the tasks */
 
-void PC_sync_execution()
+void PC_sync_execution(void)
    {
 
     return;}

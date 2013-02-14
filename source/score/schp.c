@@ -74,15 +74,17 @@ void _SC_dethread(void)
 /* _SC_DIAGNOSTIC - log a diagnostic message */
 
 void _SC_diagnostic(char *fmt, ...)
-   {
+   {SC_scope_proc *ps;
 
-    if (_SC_ps.debug == TRUE)
+    ps = &_SC_ps;
+
+    if (ps->debug == TRUE)
        {char *s;
 
 	SC_VDSNPRINTF(TRUE, s, fmt);
 
-	fputs(s, _SC_ps.diag);
-	fflush(_SC_ps.diag);
+	fputs(s, ps->diag);
+	fflush(ps->diag);
 
 	CFREE(s);};
 

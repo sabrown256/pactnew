@@ -925,6 +925,9 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
    {int i, to, ost;
     char *cmd, **output;
     object *lst;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     output = NULL;
     cmd    = NULL;
@@ -934,8 +937,8 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
 	    SC_INT_I, &to,
 	    0);
 
-    ost = _SC_ps.msh_syntax;
-    _SC_ps.msh_syntax = TRUE;
+    ost = ps->msh_syntax;
+    ps->msh_syntax = TRUE;
 
     if (to > 0)
        {if (SC_time_allow(to) == 0)
@@ -959,7 +962,7 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
 
         SC_free_strings(output);}
 
-    _SC_ps.msh_syntax = ost;
+    ps->msh_syntax = ost;
 
     return(lst);}
 

@@ -28,7 +28,9 @@ static int _PC_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
    {int nbo, data;
     char reply[MAXLINE], fmt[MAXLINE];
     char *pbf;
-    
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     PC_printf(pp, "%c,%s,%ld,%d\n", PC_FWRITE, type, ni, dn);
 
@@ -39,9 +41,9 @@ static int _PC_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
 	nbo = SC_write_sigsafe(data, pbf, nb);
 	if (nbo < 0)
 	   continue;
-	else if (_SC_ps.debug)
-	   {fprintf(_PC_diag, ".%d", nbo);
-	    fflush(_PC_diag);};
+	else if (ps->debug)
+	   {fprintf(ps->diag, ".%d", nbo);
+	    fflush(ps->diag);};
 	nb  -= nbo;
 	pbf += nbo;};
 
@@ -234,6 +236,9 @@ int PC_open_group(char **argv, int *pn)
     PROCESS *pp;
 
 #if defined(HAVE_POSIX_SYS)
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     PC_init_communications(NULL);
 
@@ -263,7 +268,7 @@ int PC_open_group(char **argv, int *pn)
 
 	_PC.server_port = SC_stoi(SC_strtok(NULL, ",\n", t));
 	_PC.n_nodes  = SC_stoi(SC_strtok(NULL, ",\n", t));
-	_SC_ps.debug   = SC_stoi(SC_strtok(NULL, ",\n", t));
+	ps->debug   = SC_stoi(SC_strtok(NULL, ",\n", t));
 
 	for (i = 0; i < offs; i++)
 	    CFREE(args[i]);
@@ -292,6 +297,9 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
     PROCESS *pp;
 
 #if defined(HAVE_POSIX_SYS)
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
 /* if the server is the parent of this process, argv will have the
  * server name and port number just after the first NULL item in argv
@@ -334,7 +342,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 	PC_block(pp);
 	PC_gets(t, MAXLINE, pp);
 
-	sscanf(t, "%d,%d,%d\n", &pp->acpu, pnn, &_SC_ps.debug);
+	sscanf(t, "%d,%d,%d\n", &pp->acpu, pnn, &ps->debug);
 
 	PC_printf(pp, "%s,%d,%d\n", srvr, port, (int) getpid());
 	pp->data = PC_init_client(srvr, port);
@@ -342,13 +350,13 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 	SC_gs.comm_size = *pnn;};
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
+    if (ps->debug)
        {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) getpid());
-	_PC_diag = fopen(t, "w");
-	if (_PC_diag != NULL)
-	   {fprintf(_PC_diag, "\n\n   Node #%d at %s:%d.%d\n",
+	ps->diag = fopen(t, "w");
+	if (ps->diag != NULL)
+	   {fprintf(ps->diag, "\n\n   Node #%d at %s:%d.%d\n",
 		    pp->acpu, srvr, port, pp->data);
-	    fflush(_PC_diag);};};
+	    fflush(ps->diag);};};
 
 #else
 	pp = NULL;
@@ -365,12 +373,15 @@ static void _PC_close_member_n(PROCESS *pp)
    {
 
 #if defined(HAVE_POSIX_SYS)
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     PC_close(pp);
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fclose(_PC_diag);};
+    if (ps->debug)
+       {fclose(ps->diag);};
 
 #endif
 
@@ -441,6 +452,9 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     long nis, nib;
     char reply[MAXLINE], types[MAXLINE], *bf;
     PDBfile *vif, *tf;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     ok = SC_ERR_TRAP();
     if (ok != 0)
@@ -462,10 +476,10 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	nn  = *pnl++;};
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "   Write");
-	fprintf(_PC_diag, " Attempt(%d,%s,%d)",	(int) ni, type, pp->acpu);
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "   Write");
+	fprintf(ps->diag, " Attempt(%d,%s,%d)",	(int) ni, type, pp->acpu);
+	fflush(ps->diag);};
 
 /* get the buffer size */
     nbr = PD_sizeof(vif, type, ni, vr);
@@ -504,9 +518,9 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 			  types, MAXLINE, &is);};};
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, " Sent(%ld,%s,%d)\n", nis, types, dn);
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, " Sent(%ld,%s,%d)\n", nis, types, dn);
+	fflush(ps->diag);};
 
     SC_ERR_UNTRAP();
 
@@ -527,6 +541,9 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     long nir, nb, nbt, nbr;
     char reply[MAXLINE], types[MAXLINE], *bf, *pbf;
     PDBfile *vif, *tf;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     vif = pp->vif;
     nir = ni;
@@ -543,9 +560,9 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
        ip  = nl[1];
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "   Read");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "   Read");
+	fflush(ps->diag);};
 
 /* get the buffer size and allocate it */
     if (buf_siz > 0)
@@ -567,9 +584,9 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     for (nbr = nb, bs = FALSE; nbr > 0; pbf += nbt, bs = block)
         {nbt = PC_buffer_data_out(pp, pbf, nbr, bs);
 	 if (nbt > 0)
-	    {if (_SC_ps.debug)
-	        {fprintf(_PC_diag, " Recv(%ld,%s)", nbt, types);
-		 fflush(_PC_diag);};};
+	    {if (ps->debug)
+	        {fprintf(ps->diag, " Recv(%ld,%s)", nbt, types);
+		 fflush(ps->diag);};};
 
          nbr -= nbt;
          if (nbr > 0)
@@ -579,9 +596,9 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	     PC_gets(reply, MAXLINE, pp);
 	     sscanf(reply, "%d,%254s\n", &nis, types);
 
-	     if (_SC_ps.debug && block && (nis > 0))
-	        {fprintf(_PC_diag, " Expect(%d,%s)", nis, types);
-		 fflush(_PC_diag);};};
+	     if (ps->debug && block && (nis > 0))
+	        {fprintf(ps->diag, " Expect(%d,%s)", nis, types);
+		 fflush(ps->diag);};};
 
          if (!block)
             break;};
@@ -596,12 +613,12 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	CFREE(bf);};
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
+    if (ps->debug)
        {if (nir > 0)
-	   fprintf(_PC_diag, "\n");
+	   fprintf(ps->diag, "\n");
 	else
-           fprintf(_PC_diag, " Nothing\n");
-	fflush(_PC_diag);};
+           fprintf(ps->diag, " Nothing\n");
+	fflush(ps->diag);};
 
     return(nir);}
 
@@ -619,15 +636,18 @@ static long _PC_wait_n(PROCESS *pp)
     void *vr;
     size_t ni;
     PDBfile *vif, *tf;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     vif = pp->vif;
 
     np = pp->n_pending;
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "   Wait");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "   Wait");
+	fflush(ps->diag);};
 
 /* convert the message to the requested output data */
     for (i = 0; i < np; i++)
@@ -643,8 +663,8 @@ static long _PC_wait_n(PROCESS *pp)
 	 CFREE(bf);};
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       fprintf(_PC_diag, "\n");
+    if (ps->debug)
+       fprintf(ps->diag, "\n");
 
     return(np);}
 

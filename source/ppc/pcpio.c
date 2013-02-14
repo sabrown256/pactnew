@@ -13,13 +13,6 @@
 
 #define DATA_BLOCK 4096
 
-#define REPLY(msg, val)                                                      \
-   {printf("%s:%ld\n", msg, (long) val);                                     \
-    fflush(stdout);                                                          \
-    if (_SC_ps.debug)                                                        \
-       {fprintf(_PC_diag, "%s:%ld\n", msg, (long) val);                      \
-        fflush(_PC_diag);};}
-
 struct s_REMOTE_FILE
    {PROCESS *pp;
     int type;
@@ -104,6 +97,9 @@ static int _PC_setup_children(char **argv, char *mode)
     PROCESS *pp;
 
 #if defined(HAVE_POSIX_SYS)
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     gethostname(host, MAXLINE);
     port = PC_init_server(SC_GET_PORT, FALSE);
@@ -114,7 +110,7 @@ static int _PC_setup_children(char **argv, char *mode)
     which     = 0;
     off       = 1;
     parentp   = FALSE;
-    _SC_ps.debug = FALSE;
+    ps->debug = FALSE;
     for (i = 1; argv[i] != NULL; i++)
         {if (argv[i][0] == '-')
 	    {switch (argv[i][1])
@@ -122,7 +118,7 @@ static int _PC_setup_children(char **argv, char *mode)
 	              which = SC_stoi(argv[++i]);
 		      break;
 	         case 'l' :
-		      _SC_ps.debug = TRUE;
+		      ps->debug = TRUE;
 		      break;
 		 case 'n' :
 	              n = SC_stoi(argv[++i]);
@@ -136,14 +132,14 @@ static int _PC_setup_children(char **argv, char *mode)
 
     argv += off;
 
-    if (_SC_ps.debug)
+    if (ps->debug)
        {snprintf(s, MAXLINE, "PC_srvr_log.%d", (int) getpid());
-	_PC_diag = fopen(s, "w");
-	if (_PC_diag != NULL)
-	   {fprintf(_PC_diag, "\n   ------ Begin Setup ------\n\n");
-	    fprintf(_PC_diag, "Requesting %d nodes (%d)\n", n, which);
-	    fprintf(_PC_diag, "Exec: %s %s\n\n", argv[0], argv[1]);
-	    fflush(_PC_diag);};};
+	ps->diag = fopen(s, "w");
+	if (ps->diag != NULL)
+	   {fprintf(ps->diag, "\n   ------ Begin Setup ------\n\n");
+	    fprintf(ps->diag, "Requesting %d nodes (%d)\n", n, which);
+	    fprintf(ps->diag, "Exec: %s %s\n\n", argv[0], argv[1]);
+	    fflush(ps->diag);};};
 
     if (parentp)
 
@@ -152,9 +148,9 @@ static int _PC_setup_children(char **argv, char *mode)
  * remember it as node specified by "which"
  */
        {pp = PC_mk_process(argv, mode, SC_CHILD);
-	if ((_SC_ps.debug) && (_PC_diag != NULL))
-	   {fprintf(_PC_diag, "Open node #%d (%p)\n", which, pp);
-	    fflush(_PC_diag);};
+	if ((ps->debug) && (ps->diag != NULL))
+	   {fprintf(ps->diag, "Open node #%d (%p)\n", which, pp);
+	    fflush(ps->diag);};
 
 	if (pp != NULL)
 	   {pp->io[0] = 0;
@@ -163,30 +159,30 @@ static int _PC_setup_children(char **argv, char *mode)
 	    pp->acpu  = which;
 
 /* this goes to PC_open_group */
-	    PC_printf(pp, "%s,%d,%d,%d\n", host, port, n, _SC_ps.debug);
+	    PC_printf(pp, "%s,%d,%d,%d\n", host, port, n, ps->debug);
 
 /* this goes to PC_open_member */
-	    PC_printf(pp, "%d,%d,%d\n", which, n, _SC_ps.debug);
+	    PC_printf(pp, "%d,%d,%d\n", which, n, ps->debug);
 	    PC_block(pp);
 	    PC_gets(s, MAXLINE, pp);
-	    if ((_SC_ps.debug) && (_PC_diag != NULL))
-	       {fprintf(_PC_diag, "Latch up with parent: %s", s);
-		fflush(_PC_diag);};
+	    if ((ps->debug) && (ps->diag != NULL))
+	       {fprintf(ps->diag, "Latch up with parent: %s", s);
+		fflush(ps->diag);};
 
-	    if ((_SC_ps.debug) && (_PC_diag != NULL))
-	       {fprintf(_PC_diag, "Get data socket for node #%d\n",
+	    if ((ps->debug) && (ps->diag != NULL))
+	       {fprintf(ps->diag, "Get data socket for node #%d\n",
 			which);
-		fflush(_PC_diag);};
+		fflush(ps->diag);};
 	    pp->data = PC_init_server(SC_GET_CONNECTION, FALSE);
-	    if ((_SC_ps.debug) && (_PC_diag != NULL))
-	       {fprintf(_PC_diag, "Data socket for node #%d: %d\n",
+	    if ((ps->debug) && (ps->diag != NULL))
+	       {fprintf(ps->diag, "Data socket for node #%d: %d\n",
 			which, pp->data);
-		fflush(_PC_diag);};
+		fflush(ps->diag);};
 
 	    cbk = _PC_register_proc(pp, which);
-	    if ((_SC_ps.debug) && (_PC_diag != NULL))
-	       {fprintf(_PC_diag, "I/O interrupt: %d\n\n", cbk);
-		fflush(_PC_diag);};};}
+	    if ((ps->debug) && (ps->diag != NULL))
+	       {fprintf(ps->diag, "I/O interrupt: %d\n\n", cbk);
+		fflush(ps->diag);};};}
 
 /* the process on the other end of stdin and stdout is a terminal */
     else
@@ -210,37 +206,37 @@ static int _PC_setup_children(char **argv, char *mode)
 
          pp = PC_open(args, NULL, mode);
 
-	 if ((_SC_ps.debug) && (_PC_diag != NULL))
-	    {fprintf(_PC_diag, "Open node #%d (%p)\n", i, pp);
-	     fflush(_PC_diag);};
+	 if ((ps->debug) && (ps->diag != NULL))
+	    {fprintf(ps->diag, "Open node #%d (%p)\n", i, pp);
+	     fflush(ps->diag);};
 
 	 if (pp != NULL)
-	    {PC_printf(pp, "%d,%d,%d\n", i, n, _SC_ps.debug);
+	    {PC_printf(pp, "%d,%d,%d\n", i, n, ps->debug);
 	     pp->acpu = i;
 
 	     PC_block(pp);
 	     PC_gets(s, MAXLINE, pp);
-	     if ((_SC_ps.debug) && (_PC_diag != NULL))
-	        {fprintf(_PC_diag, "Latch up with child: %s", s);
-	         fprintf(_PC_diag, "Get data socket for node #%d\n", i);
-		 fflush(_PC_diag);};
+	     if ((ps->debug) && (ps->diag != NULL))
+	        {fprintf(ps->diag, "Latch up with child: %s", s);
+	         fprintf(ps->diag, "Get data socket for node #%d\n", i);
+		 fflush(ps->diag);};
 	     pp->data = PC_init_server(SC_GET_CONNECTION, FALSE);
-	     if ((_SC_ps.debug) && (_PC_diag != NULL))
-	        {fprintf(_PC_diag, "Data socket for node #%d: %d\n",
+	     if ((ps->debug) && (ps->diag != NULL))
+	        {fprintf(ps->diag, "Data socket for node #%d: %d\n",
 			 i, pp->data);
-		 fflush(_PC_diag);};
+		 fflush(ps->diag);};
 
 	     cbk = _PC_register_proc(pp, i);
-	     if ((_SC_ps.debug) && (_PC_diag != NULL))
-	        {fprintf(_PC_diag, "I/O interrupt: %d\n\n", cbk);
-		 fflush(_PC_diag);};};};
+	     if ((ps->debug) && (ps->diag != NULL))
+	        {fprintf(ps->diag, "I/O interrupt: %d\n\n", cbk);
+		 fflush(ps->diag);};};};
 
     CFREE(args[argc]);
     CFREE(args);
 
-    if ((_SC_ps.debug) && (_PC_diag != NULL))
-       {fprintf(_PC_diag, "   ------ End of Setup ------\n\n");
-	fflush(_PC_diag);};
+    if ((ps->debug) && (ps->diag != NULL))
+       {fprintf(ps->diag, "   ------ End of Setup ------\n\n");
+	fflush(ps->diag);};
 
 #endif
 
@@ -260,6 +256,9 @@ static int _PC_get_msg(int i)
     char *type, **msg, **typ, *pbf;
     PROCESS *pi;
     PDBfile *pf;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     msg = MESSAGES(i);
     typ = MESSAGE_TYPES(i);
@@ -273,16 +272,16 @@ static int _PC_get_msg(int i)
         ni   = nis[0];
         data = pi->data;
         if (pbf != NULL)
-	   {if (_SC_ps.debug)
-	       {fprintf(_PC_diag, "   Read");
-		fflush(_PC_diag);};
+	   {if (ps->debug)
+	       {fprintf(ps->diag, "   Read");
+		fflush(ps->diag);};
 
 	    PC_printf(pi, "%s,%s\n", SC_itos(NULL, 0, ni, NULL), type);
 
-	    if (_SC_ps.debug)
-	       {fprintf(_PC_diag, " Put(%s,%s)",
+	    if (ps->debug)
+	       {fprintf(ps->diag, " Put(%s,%s)",
 			SC_itos(NULL, 0, ni, NULL), type);
-		fflush(_PC_diag);};
+		fflush(ps->diag);};
 
 	    bpi = PN_sizeof(type, pf->host_chart);
 	    nbo = ni*bpi;
@@ -291,18 +290,18 @@ static int _PC_get_msg(int i)
 		nbe = SC_write_sigsafe(data, pbf, nbo);
                 if (nbe < 0)
                    continue;
-		else if (_SC_ps.debug)
-		   {fprintf(_PC_diag, ".%s", SC_itos(NULL, 0, nbe, NULL));
-		    fflush(_PC_diag);};
+		else if (ps->debug)
+		   {fprintf(ps->diag, ".%s", SC_itos(NULL, 0, nbe, NULL));
+		    fflush(ps->diag);};
 
 		pbf += nbe;
 		nbo -= nbe;};
 
-	    if (_SC_ps.debug)
-	       {fprintf(_PC_diag, " Sent(%s,%s,%d)\n",
+	    if (ps->debug)
+	       {fprintf(ps->diag, " Sent(%s,%s,%d)\n",
 			SC_itos(NULL, 0, ni - nbo/bpi, NULL),
 			type, i);
-		fflush(_PC_diag);};
+		fflush(ps->diag);};
 
             PC_pop_message(i);
 
@@ -322,6 +321,9 @@ static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
     intb bpi;
     char *bf;
     PDBfile *pf;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     if ((pi != NULL) && (type != NULL))
        {pf = (PDBfile *) pi->vif;
@@ -329,20 +331,20 @@ static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
 	bpi = PN_sizeof(type, pf->host_chart);
 	nbi = ni*bpi;
 	bf  = CMAKE_N(char, nbi);
-	if (_SC_ps.debug)
-	   {fprintf(_PC_diag, "   Write Get(%s,%s,%d)",
+	if (ps->debug)
+	   {fprintf(ps->diag, "   Write Get(%s,%s,%d)",
 		    SC_itos(NULL, 0, ni, NULL), type, pi->acpu);
-	    fflush(_PC_diag);};
+	    fflush(ps->diag);};
 
 	nbt = PC_buffer_data_out(pi, bf, nbi, TRUE);
 	nir = nbt/bpi;
 
 	PC_push_message(PC_procs.m + indx, indx, ni, type, bf);
 
-	if (_SC_ps.debug)
-	   {fprintf(_PC_diag, " Recv(%s,%s,%d)\n",
+	if (ps->debug)
+	   {fprintf(ps->diag, " Recv(%s,%s,%d)\n",
 		    SC_itos(NULL, 0, nir, NULL), type, indx);
-	    fflush(_PC_diag);};
+	    fflush(ps->diag);};
 
 	PC_printf(pi, "%d,%s,%d\n", nir, type, indx);};
 
@@ -357,6 +359,9 @@ static int _PC_get_message(int i)
    {int ni, code, indx, c;
     char s[MAXLINE], *type, *t;
     PROCESS *pi;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     pi = PC_procs.p[i];
     if (pi == NULL)
@@ -367,9 +372,9 @@ static int _PC_get_message(int i)
        return(FALSE);
 
     c = s[0];
-    if (_SC_ps.debug && SC_is_print_char(c, 4))
-       {fprintf(_PC_diag, "Message from node #%d: %s", i, s);
-	fflush(_PC_diag);};
+    if (ps->debug && SC_is_print_char(c, 4))
+       {fprintf(ps->diag, "Message from node #%d: %s", i, s);
+	fflush(ps->diag);};
 
     code = s[0];
 
