@@ -68,6 +68,8 @@ static int has_par_const(char **sa, char *tok)
 	        {ne++;
 		 ie = i;};};};
             
+    ASSERT(ie != -1);
+
     is = ((ns == 1) && (ns == ne)) ? is : -1;
 
     return(is);}
@@ -125,11 +127,11 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* COMPUTE_PDO_LIMITS - from SA[IS] compute the skeleton SO for the
+/* COMPUTE_PDO_LIMITS - from SA[IS] compute the skeleton for the
  *                    - shell line in a PDO construct
  */
 
-static char **compute_pdo_limits(char **sa, int is, char *so, int nc)
+static char **compute_pdo_limits(char **sa, int is, char *al, int nc)
    {int n;
     char fn[BFLRG], t[BFLRG];
     char *p, *r, **rv, **ra, **ta;
@@ -170,7 +172,7 @@ static char **compute_pdo_limits(char **sa, int is, char *so, int nc)
     fclose(fp);
 
 /* run the script */
-    r = run(FALSE, "csh %s | tail -n 5", fn);
+    r = run(FALSE, "csh %s %s | tail -n 5", fn, al);
     p = strstr(r, "_cmd_");
     rv = lst_add(rv, p + 6);
 
@@ -197,11 +199,13 @@ static int make_pdo_script(char **sa, int is, char *fname, char *shell,
 			   char *pact, char *args, int henv,
 			   char **vo, char **v, int k)
    {int i, ip, co, n, mn, mx, dm;
-    char t[BFLRG], r[BFLRG], fn[BFLRG];
+    char al[BFLRG], r[BFLRG], fn[BFLRG];
     char *ro, **ta;
     FILE *fp;
 
-    ta = compute_pdo_limits(sa, is, t, BFLRG);
+    concatenate(al, BFLRG, v+k+1, " ");
+
+    ta = compute_pdo_limits(sa, is, al, BFLRG);
     n  = lst_length(ta);
     mn = (n > 1) ? atoi(ta[2]) : 0;
     mx = (n > 2) ? atoi(ta[3]) : -1;
@@ -227,7 +231,7 @@ static int make_pdo_script(char **sa, int is, char *fname, char *shell,
         {snprintf(fn, BFLRG, "%s.%d", fname, ip);
 	 snprintf(r, BFLRG, "   set %s = %d", ta[1], ip);
 
-	 fprintf(fp, "%s %s\n", ta[0], fn);
+	 fprintf(fp, "%s %s %s\n", ta[0], fn, al);
 	 fprintf(fp, "@ err = $err + $status\n");
 
 	 co = make_shell_script(sa, fn, shell, pact,
@@ -248,11 +252,11 @@ static int make_pdo_script(char **sa, int is, char *fname, char *shell,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* COMPUTE_PFOR_LIMITS - from SA[IS] compute the skeleton SO for the
+/* COMPUTE_PFOR_LIMITS - from SA[IS] compute the skeleton for the
  *                     - shell line in a PFOR construct
  */
 
-static char **compute_pfor_limits(char **sa, int is, char *so, int nc)
+static char **compute_pfor_limits(char **sa, int is, char *al, int nc)
    {int i, n;
     char fn[BFLRG], t[BFLRG];
     char *p, *r, **rv, **ra, **ta;
@@ -287,7 +291,7 @@ static char **compute_pfor_limits(char **sa, int is, char *so, int nc)
     fclose(fp);
 
 /* run the script */
-    r = run(FALSE, "csh %s | tail -n 5", fn);
+    r = run(FALSE, "csh %s %s | tail -n 5", fn, al);
     p = strstr(r, "_cmd_");
     *p = '\0';
     rv = lst_add(rv, p + 6);
@@ -316,11 +320,13 @@ static int make_pfor_script(char **sa, int is, char *fname, char *shell,
 			    char *pact, char *args, int henv,
 			    char **vo, char **v, int k)
    {int i, ip, co, n;
-    char t[BFLRG], r[BFLRG], fn[BFLRG];
+    char al[BFLRG], r[BFLRG], fn[BFLRG];
     char *ro, **ta;
     FILE *fp;
 
-    ta = compute_pfor_limits(sa, is, t, BFLRG);
+    concatenate(al, BFLRG, v+k+1, " ");
+
+    ta = compute_pfor_limits(sa, is, al, BFLRG);
     n  = lst_length(ta);
 
 /* open the master file */
@@ -342,7 +348,7 @@ static int make_pfor_script(char **sa, int is, char *fname, char *shell,
         {snprintf(fn, BFLRG, "%s.%d", fname, ip);
 	 snprintf(r, BFLRG, "   set %s = %s\n", ta[1], ta[ip]);
 
-	 fprintf(fp, "%s %s\n", ta[0], fn);
+	 fprintf(fp, "%s %s %s\n", ta[0], fn, al);
 	 fprintf(fp, "@ err = $err + $status\n");
 
 	 co = make_shell_script(sa, fn, shell, pact,

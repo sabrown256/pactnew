@@ -530,7 +530,10 @@ static int log_in(process *pp, char *ar, char *s)
     if (sp != NULL)
        {fo = sp->log;
 
-	if (strstr(s, "Succeeded on ") != NULL)
+	if (s == NULL)
+	   s = "-- LOG_IN - empty message --";
+
+	else if (strstr(s, "Succeeded on ") != NULL)
 	   {sp->exit    = PASSED;
 	    sp->running = transition(pp, DONE);}
 
@@ -2498,7 +2501,8 @@ static void lockout(donetdes *st, char *host, char *uhost)
         {nhst = st->nets[i].host;
 	 wdir = st->nets[i].workdir;
 
-	 if ((strcmp(nhst, host) == 0) || (strcmp(nhst, uhost) == 0))
+	 if ((nhst != NULL) &&
+	     ((strcmp(nhst, host) == 0) || (strcmp(nhst, uhost) == 0)))
 	    {nstrncpy(tdir, BFLRG, path_tail(wdir), -1);
 	     snprintf(lock, BFLRG, "%s/%s.%s.lock",
 		      path_head(wdir), st->system, tdir);

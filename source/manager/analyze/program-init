@@ -110,8 +110,8 @@ Group STD {
    IPC    = POSIX
    POSIX  = 200112
    XOPEN  = 600
-   MPI    = 1.2
-   OPENMP = 3.0
+   MPI    = none
+   OPENMP = none
 }
 
 Group OS {
