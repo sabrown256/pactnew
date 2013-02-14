@@ -51,14 +51,10 @@
 #ifndef __cplusplus
 
 # undef max
-# ifndef max
-#  define max(a, b) ((a) > (b) ? (a) : (b))
-# endif
+# define max(a, b) ((a) > (b) ? (a) : (b))
 
 # undef min
-# ifndef min
-#  define min(a, b) ((a) < (b) ? (a) : (b))
-# endif
+# define min(a, b) ((a) < (b) ? (a) : (b))
 
 #endif
 

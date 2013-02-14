@@ -27,9 +27,7 @@ dbmget $ALog IMF_Lib     =\? -limf^  \
 # Intel Math library
 
 if (-d "$IMF_Path") then
-   set nbits = `nbit -d`
-
-   fexvars $ALog t ls -rt $IMF_Path/{icc,ic*}/lib/libimf.a @b grep -v beta @o tail -n 1
+   fexvars $ALog t ls -t $IMF_Path/{icc,ic*}/lib/libimf.a @b grep -v beta @o head -n 3 @o tail -n 1
 else
    set t = ""
 endif

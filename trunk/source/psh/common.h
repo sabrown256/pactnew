@@ -124,10 +124,14 @@ typedef enum e_array_size_constants array_size_constants;
 
 #ifndef SCOPE_SCORE
 
-#undef ASSERT
-#define ASSERT(_t)        {if (_t) _assert_fail++;}
+# undef vlimit
+# define vlimit(x, a, b) ((x) < (a) ? (a) : ((x) > (b) ? (b) : (x)))
 
-#define FOREACH(_i, _v, _delim)                                              \
+# undef ASSERT
+# define ASSERT(_t)        {if (_t) _assert_fail++;}
+
+# undef FOREACH
+# define FOREACH(_i, _v, _delim)                                             \
    {char *_i, *_t, *_pt;                                                     \
     _t = STRSAVE(_v);                                                        \
     for (_pt = _t; TRUE; _pt = NULL)                                         \
@@ -137,11 +141,13 @@ typedef enum e_array_size_constants array_size_constants;
 	 else                                                                \
             {
 
-#define NEXT(_i, _delim)                                                     \
+# undef NEXT
+# define NEXT(_i, _delim)                                                    \
     {_pt = NULL;                                                             \
      _i  = strtok(_pt, _delim);}
 
-#define ENDFOR                                                               \
+# undef ENDFOR
+# define ENDFOR                                                              \
       };};                                                                   \
    FREE(_t);}
 

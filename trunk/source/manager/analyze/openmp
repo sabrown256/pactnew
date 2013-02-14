@@ -21,6 +21,8 @@ dbmget $ALog PTHREAD_OMP =\? FALSE^ \
              Cfe_LD_RPath^          \
              PACT_CC_VERSION
 
+setenv STD_OPENMP  unknown
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -35,20 +37,22 @@ int main(int c, char **v)
 EOF
 
 setenv HAVE_OPENMP FALSE
+
 set opt = ""
 set opt = ( $opt $Cfe_CC_Flags )
 set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 set opt = ( $opt $Cfe_LD_Lib )
+
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    if ($PTHREAD_OMP == FALSE) then
-      NoteD $ALog "      no OpenMP (by request)"
+      NoteD $ALog -n "      no OpenMP (by request)"
    else
       setenv HAVE_OPENMP TRUE
-      NoteD $ALog "      has OpenMP"
+      NoteD $ALog -n "      has OpenMP"
    endif
 else
-   NoteD $ALog "      no OpenMP"
+   NoteD $ALog -n "      no OpenMP"
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -56,8 +60,106 @@ flog $ALog rm -f $Tmp.c $Tmp
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# check for OpenMP standard level
+
+if ($HAVE_OPENMP == TRUE) then
+
+   if ("$STD_OPENMP" == unknown) then
+
+# version 4.0 adds omp_get_level
+      cat << EOF >! $Tmp.c
+#include <omp.h>
+int main(int c, char **v)
+{int n;
+ extern int omp_get_level(void);
+ n = omp_get_level();
+ return(0);}
+EOF
+
+      flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
+      if ($status == 0) then
+         setenv STD_OPENMP 4.0
+      endif
+
+      flog $ALog rm -f $Tmp.c $Tmp
+   endif
+
+   if ("$STD_OPENMP" == unknown) then
+
+# version 3.0 adds omp_set_schedule and omp_get_schedule
+      cat << EOF >! $Tmp.c
+#include <omp.h>
+int main(int c, char **v)
+{int m;
+ omp_sched_t k;
+ extern void omp_get_schedule(omp_sched_t *kind, int *mod);
+ omp_get_schedule(&k, &m);
+ return(0);}
+EOF
+
+      flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
+      if ($status == 0) then
+         setenv STD_OPENMP 3.0
+      endif
+
+      flog $ALog rm -f $Tmp.c $Tmp
+   endif
+
+   if ("$STD_OPENMP" == unknown) then
+
+# version 2.5 adds omp_get_dynamic and omp_get_nested
+      cat << EOF >! $Tmp.c
+#include <omp.h>
+int main(int c, char **v)
+{int n;
+ extern int omp_get_dynamic(void);
+ n = omp_get_dynamic();
+ return(0);}
+EOF
+
+      flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
+      if ($status == 0) then
+         setenv STD_OPENMP 2.5
+      endif
+
+      flog $ALog rm -f $Tmp.c $Tmp
+   endif
+
+   if ("$STD_OPENMP" == unknown) then
+
+# version 2.0 adds omp_get_wtick and omp_get_wtime
+      cat << EOF >! $Tmp.c
+#include <omp.h>
+int main(int c, char **v)
+{int np;
+ extern int omp_get_wtick(void);
+ np = omp_get_wtick();
+ return(0);}
+EOF
+
+      flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
+      if ($status == 0) then
+         setenv STD_OPENMP 2.5
+      endif
+
+      flog $ALog rm -f $Tmp.c $Tmp
+   endif
+
+   if ("$STD_OPENMP" == unknown) then
+       setenv STD_OPENMP 1.0
+   endif
+
+   NoteD $ALog -n " ($STD_OPENMP)"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+NoteD $ALog ""
+
 # export the results
 dbexp HAVE_OPENMP
+dbexp STD_OPENMP
 
 exit(0)
 

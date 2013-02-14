@@ -106,9 +106,12 @@ char *nstrcat(char *d, int nc, char *s)
        {nd = strlen(d);
 	ns = strlen(s);
 	n  = nc - 1 - nd;
+#if 1
+	n  = vlimit(n, 0, ns);
+#else
 	n  = min(n, ns);
 	n  = max(n, 0);
-
+#endif
 	nstrncpy(d+nd, n+1, s, -1);
 	d[nd+n] = '\0';};
 
@@ -446,9 +449,13 @@ static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
 	ind = FALSE;
 
 	nc = strlen(s);
-	nc = min(nc, ns);
 	nc = min(nc, nd-1);
+#if 1
+	nc  = vlimit(nc, 0, ns);
+#else
+	nc = min(nc, ns);
 	nc = max(nc, 0);
+#endif
 	for (n = 0; n < nc; n++)
 	    {c = *s++;
 
@@ -547,9 +554,13 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 
 	nr = strlen(r);
 	nc = strlen(s);
-	nc = min(nc, ns);
 	nc = min(nc, nd-1);
+#if 1
+	nc  = vlimit(nc, 0, ns);
+#else
+	nc = min(nc, ns);
 	nc = max(nc, 0);
+#endif
 	for (n = 0; n < nc; n++)
 	    {c = *s++;
 
@@ -652,9 +663,13 @@ static int _strcpy_bal(char *d, size_t nd, char *s, size_t ns,
 	ind = FALSE;
 
 	nc = strlen(s);
-	nc = min(nc, ns);
 	nc = min(nc, nd-1);
+#if 1
+	nc  = vlimit(nc, 0, ns);
+#else
+	nc = min(nc, ns);
 	nc = max(nc, 0);
+#endif
 
 /* start lev properly
  *   "(a b c)" with b = "(" should have lev = 0
@@ -1192,10 +1207,7 @@ char *path_base(char *s)
 
     nstrncpy(d, BFLRG, s, -1);
     nc = strlen(d);
-    if (nc >= BFLRG)
-       nc = BFLRG;
-    if (nc < 1)
-       nc = 1;
+    nc = vlimit(nc, 1, BFLRG);
 
     for (pd = d + nc-1; pd >= d; pd--)
         {if (*pd == '.')
@@ -1216,10 +1228,7 @@ char *path_suffix(char *s)
 
     nstrncpy(d, BFLRG, s, -1);
     nc = strlen(d);
-    if (nc >= BFLRG)
-       nc = BFLRG;
-    if (nc < 1)
-       nc = 1;
+    nc = vlimit(nc, 1, BFLRG);
 
     for (pd = d + nc-1; pd >= d; pd--)
         {if (*pd == '.')
