@@ -29,7 +29,7 @@
 typedef PROCESS *(*PFPPROC)(char **argv, char *mode, int type);
 
 SC_scope_proc
- _SC_ps = { -1, FALSE, FALSE, NULL };
+ _SC_ps = { -1, -1, FALSE, FALSE, FALSE, NULL, NULL, NULL };
 
 #if defined(HAVE_POSIX_SYS)
 
@@ -295,6 +295,8 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
  * value of -1 is essential!
  */
     pp->id          = -1;
+
+    pp->tstate      = _SC_tid_proc();
 
     pp->status      = NOT_FINISHED;
     pp->reason      = NOT_FINISHED;

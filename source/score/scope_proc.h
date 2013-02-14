@@ -252,7 +252,6 @@ typedef struct s_subtask subtask;
 typedef struct s_SC_process_group SC_process_group;
 typedef struct s_parstate parstate;
 typedef struct s_asyncstate asyncstate;
-typedef struct s_SC_scope_proc SC_scope_proc;
 
 struct s_conpool
    {int n_jobs;                    /* number of jobs launched in pool */
@@ -399,12 +398,6 @@ struct s_taskdesc
     int (*remove)(taskdesc *job);};
 
 
-struct s_SC_scope_proc
-   {int current_flushed_process;
-    int debug;
-    int msh_syntax;
-    FILE *diag;};
-
 enum e_SC_proc_kind
    {SC_CHILD,
     SC_PARENT};
@@ -528,6 +521,9 @@ extern PROCESS
 
 /* SCPMAN.C declarations */
 
+extern SC_scope_proc
+ *_SC_tid_proc(void);
+
 extern PROCESS
  *SC_hasharr_lookup_process(int pid);
 
@@ -543,6 +539,7 @@ extern int
  SC_running_children(void);
 
 extern void
+ _SC_init_thr_processes(SC_scope_proc *ps, int id),
  SC_process_free_rusage(SC_process_rusedes *pru),
  _SC_set_process_status(PROCESS *pp, int sts, int rsn, char *tm),
  _SC_manage_process(PROCESS *pp),
