@@ -18,12 +18,11 @@
  *               - node
  */
 
-PC_open_group(argv, pn)
-   char **argv;
-   int *pn;
+int PC_open_group(char **argv, int *pn)
    {
+
 #if 0
-int i, n;
+    int i, n;
 
     mpsc_init();
 
@@ -38,6 +37,7 @@ int i, n;
 
     *pn = n;
 #endif
+
     return(TRUE);}
 
 /*--------------------------------------------------------------------------*/
@@ -47,9 +47,7 @@ int i, n;
  *                - node
  */
 
-PROCESS *PC_open_member(argv, pnn)
-   char **argv;
-   int *pnn;
+PROCESS *PC_open_member(char **argv, int *pnn)
    {PROCESS *pp;
 
     mpsc_init();
@@ -59,6 +57,7 @@ PROCESS *PC_open_member(argv, pnn)
     pp->rcpu = myhost();
 
     *pnn = numnodes();
+
     return(pp);}
 
 /*--------------------------------------------------------------------------*/
@@ -69,15 +68,13 @@ PROCESS *PC_open_member(argv, pnn)
  *        - or a LINDA-like PUT
  */
 
-PC_out(bf, type, ni, pp, filt)
-   void *bf;
-   char *type;
-   size_t ni;
-   PROCESS *pp;
-   int *filt;
-   {int i, j, ityp, dn, did, nb, t, more, *p;
+int PC_out(void *bf, char *type, size_t ni, PROCESS *pp, int *filt)
+   {int i, j, ityp, dn, did, nb, t, more, nn, np, rv;
     int type_index, default_node, default_id, host_node;
-    int *nl, *pnl, *pl, *ppl, nn, np;
+    int *p, *nl, *pnl, *pl, *ppl;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     type_index   = 0;
     default_node = -1;
@@ -142,11 +139,13 @@ PC_out(bf, type, ni, pp, filt)
 	     {did = *ppl++;
 	      csend(ityp, bf, nb, dn, did);
 
-	      if (_SC_ps.debug)
+	      if (ps->debug)
 	         PRINT(stdout, "\t\t\tNode %d sent %d bytes to %d\n",
 		       pp->acpu, nb, dn);};};
 
-    return((int) ni);}
+    rv = ni;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -156,14 +155,12 @@ PC_out(bf, type, ni, pp, filt)
  *       - or a LINDA-like GET
  */
 
-PC_in(bf, type, ni, pp, filt)
-   void *bf;
-   char *type;
-   size_t ni;
-   PROCESS *pp;
-   int *filt;
-   {int i, n, ityp, dn, did, nb, t, more, *p;
-    int type_index;
+int PC_in(void *bf, char *type, size_t ni, PROCESS *pp, int *filt)
+   {int i, n, ityp, dn, did, nb, t, more, type_index, rv;
+    int *p;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     ityp = 0;
     type_index = 0;
@@ -192,18 +189,22 @@ PC_in(bf, type, ni, pp, filt)
     nb = ni*sizeof(int);
     crecv(ityp, bf, nb);
 
-    if (_SC_ps.debug)
+    if (ps->debug)
        PRINT(stdout, "Node %d got %d bytes\n", pp->acpu, nb);
 
-    return((int) ni);}
+    rv = ni;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PC_SYNC_EXECUTION - synchronize the execution of the tasks */
 
-void PC_sync_execution()
-   {gsync();
+void PC_sync_execution(void)
+   {
+
+    gsync();
 
     return;}
 

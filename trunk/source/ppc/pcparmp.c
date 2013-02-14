@@ -24,6 +24,9 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
    {int port, argc;
     char *tok, t[MAXLINE], srvr[MAXLINE], *s, *u;
     PROCESS *pp;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
 /* if the server is the parent of this process, argv will have the
  * server name and port number just after the first NULL item in argv
@@ -50,12 +53,12 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
     MPI_Comm_size(MPI_COMM_WORLD, &SC_gs.comm_size);
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
+    if (ps->debug)
        {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) getpid());
-	_PC_diag = fopen(t, "w");
-	fprintf(_PC_diag, "\n\n   Node #%d at %s:%d.%d\n",
+	ps->diag = fopen(t, "w");
+	fprintf(ps->diag, "\n\n   Node #%d at %s:%d.%d\n",
 		pp->acpu, srvr, port, pp->data);
-	fflush(_PC_diag);};
+	fflush(ps->diag);};
 
     return(pp);}
 
@@ -65,14 +68,16 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
 /* _PC_CLOSE_MEMBER_D - close the member process */
 
 static void _PC_close_member_d(PROCESS *pp)
-   {
+   {SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     MPI_Finalize();
     PC_close(pp);
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fclose(_PC_diag);};
+    if (ps->debug)
+       {fclose(ps->diag);};
 
     return;}
 
@@ -124,6 +129,9 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     long nis;
     char types[MAXLINE], *bf;
     PDBfile *vif, *tf;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     ok = SC_ERR_TRAP();
     if (ok != 0)
@@ -145,10 +153,10 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	nn  = *pnl++;};
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "   Write");
-	fprintf(_PC_diag, " Attempt(%d,%s,%d)",	(int) ni, type, pp->acpu);
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "   Write");
+	fprintf(ps->diag, " Attempt(%d,%s,%d)",	(int) ni, type, pp->acpu);
+	fflush(ps->diag);};
 
 /* get the buffer size */
     nbr = PD_sizeof(vif, type, ni, vr);
@@ -188,9 +196,9 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 			     bf, type, ni, vr, (void *) &requ);};};};
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, " Sent(%ld,%s,%d)\n", nis, types, dn);
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, " Sent(%ld,%s,%d)\n", nis, types, dn);
+	fflush(ps->diag);};
 
     SC_ERR_UNTRAP();
 
@@ -211,6 +219,9 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     int type_index, block, buf_siz;
     char *bf;
     PDBfile *vif, *tf;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     vif = pp->vif;
     nir = ni;
@@ -227,9 +238,9 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
        ip  = nl[1];
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "   Read");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "   Read");
+	fflush(ps->diag);};
 
 /* get the buffer size and allocate it */
     if (buf_siz > 0)
@@ -263,12 +274,12 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	CFREE(bf);};
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
+    if (ps->debug)
        {if (nir > 0)
-	   fprintf(_PC_diag, "\n");
+	   fprintf(ps->diag, "\n");
 	else
-           fprintf(_PC_diag, " Nothing\n");
-	fflush(_PC_diag);};
+           fprintf(ps->diag, " Nothing\n");
+	fflush(ps->diag);};
 
     return(nir);}
 
@@ -286,15 +297,18 @@ static long _PC_wait_d(PROCESS *pp)
     void *vr;
     size_t ni;
     PDBfile *vif, *tf;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     vif = pp->vif;
 
     np = pp->n_pending;
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "   Wait");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "   Wait");
+	fflush(ps->diag);};
 
    {MPI_Status *stats;
     MPI_Request *reqs;
@@ -322,8 +336,8 @@ static long _PC_wait_d(PROCESS *pp)
 	 CFREE(bf);};
 
 /* conditional diagnostic messages */
-    if (_SC_ps.debug)
-       fprintf(_PC_diag, "\n");
+    if (ps->debug)
+       fprintf(ps->diag, "\n");
 
     return(np);}
 

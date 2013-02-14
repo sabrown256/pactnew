@@ -540,6 +540,7 @@ extern int
 
 extern void
  _SC_init_thr_processes(SC_scope_proc *ps, int id),
+ _SC_fin_thr_processes(void),
  SC_process_free_rusage(SC_process_rusedes *pru),
  _SC_set_process_status(PROCESS *pp, int sts, int rsn, char *tm),
  _SC_manage_process(PROCESS *pp),

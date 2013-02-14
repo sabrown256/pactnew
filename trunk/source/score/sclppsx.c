@@ -440,6 +440,9 @@ static int _SC_posix_close(PROCESS *pp)
 
 static int _SC_posix_flush(PROCESS *pp)
    {int iv, ov, rv;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     iv = -2;
     ov = -2;
@@ -447,7 +450,7 @@ static int _SC_posix_flush(PROCESS *pp)
     if (!SC_process_alive(pp))
        return(FALSE);
 
-    _SC_ps.current_flushed_process = pp->id;
+    ps->current_flushed_process = pp->id;
 
 #ifdef BSD_TERMINAL
     static int one = 1;

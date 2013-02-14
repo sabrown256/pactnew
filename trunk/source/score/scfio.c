@@ -678,13 +678,16 @@ NORETURN void SC_file_access(int log)
    {int code, cfd, indx, ret;
     char s[MAXLINE], *bf, *t;
     FILE *file[MAX_FILES], *fp;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     SC_MEM_INIT_N(FILE *, file, MAX_FILES);
 
-    _SC_ps.debug = log;
+    ps->debug = log;
 
-    if (_SC_ps.debug)
-       _SC_ps.diag = SC_fopen_safe("SC_fs.log", "w");
+    if (ps->debug)
+       ps->diag = SC_fopen_safe("SC_fs.log", "w");
 
     cfd = -1;
     while (TRUE)

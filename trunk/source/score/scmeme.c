@@ -31,8 +31,7 @@ void SC_end_session(void)
     SC_free_array(_SC.eth_keys, NULL);
     SC_free_array(_SC.eth_conds, NULL);
 
-    SC_free_array(_SC_ps.wait_list, SC_array_free_n);
-    SC_free_array(_SC_ps.process_list, NULL);
+    _SC_fin_thr_processes();
 
 /* free strings */
     CFREE(_SC.ta);

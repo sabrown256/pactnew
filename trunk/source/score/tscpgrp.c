@@ -68,9 +68,12 @@ static int do_cmd(int n, char **sa)
 
 static int test_pipe_1(void)
    {int n, st, os;
+    SC_scope_proc *ps;
 
-    os = _SC_ps.msh_syntax;
-    _SC_ps.msh_syntax = TRUE;
+    ps = &_SC_ps;
+
+    os = ps->msh_syntax;
+    ps->msh_syntax = TRUE;
 
     st = 0;
 
@@ -88,7 +91,7 @@ static int test_pipe_1(void)
 
     printf("\t\t\tsimple pipes ..... %s\n", (st == 0) ? "ok" : "ng");
 
-    _SC_ps.msh_syntax = os;
+    ps->msh_syntax = os;
 
     return(st);}
 
@@ -99,9 +102,12 @@ static int test_pipe_1(void)
 
 static int test_pipe_2(void)
    {int n, st, os;
+    SC_scope_proc *ps;
 
-    os = _SC_ps.msh_syntax;
-    _SC_ps.msh_syntax = TRUE;
+    ps = &_SC_ps;
+
+    os = ps->msh_syntax;
+    ps->msh_syntax = TRUE;
 
     st = 0;
 
@@ -120,7 +126,7 @@ static int test_pipe_2(void)
 
     printf("\t\t\tprocess groups ..... %s\n", (st == 0) ? "ok" : "ng");
 
-    _SC_ps.msh_syntax = os;
+    ps->msh_syntax = os;
 
     return(st);}
 
@@ -131,9 +137,12 @@ static int test_pipe_2(void)
 
 static int test_file_1(void)
    {int n, st, os;
+    SC_scope_proc *ps;
 
-    os = _SC_ps.msh_syntax;
-    _SC_ps.msh_syntax = TRUE;
+    ps = &_SC_ps;
+
+    os = ps->msh_syntax;
+    ps->msh_syntax = TRUE;
 
     st = 0;
 
@@ -152,7 +161,7 @@ static int test_file_1(void)
 
     printf("\t\t\tsimple files ..... %s\n", (st == 0) ? "ok" : "ng");
 
-    _SC_ps.msh_syntax = os;
+    ps->msh_syntax = os;
 
     return(st);}
 

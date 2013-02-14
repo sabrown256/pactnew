@@ -50,6 +50,9 @@ static int
 int main(int argc, char **argv)
    {int i, pid, which;
     PROCESS *pp;
+    SC_scope_proc *ps;
+
+    ps = &_SC_ps;
 
     iter = 3;
 
@@ -65,49 +68,49 @@ int main(int argc, char **argv)
     else
        sleep(1);
 
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "Initialized node #%d of %d\n", pid, nodes);
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "Initialized node #%d of %d\n", pid, nodes);
+	fflush(ps->diag);};
     PRINT(stdout, "Initialized node #%d of %d\n", pid, nodes);
 
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "Setup\n");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "Setup\n");
+	fflush(ps->diag);};
     setup();
 
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "Non-blocking patterned read\n");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "Non-blocking patterned read\n");
+	fflush(ps->diag);};
     test_nb_read_patterned(pp);
 
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "Blocking ring\n");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "Blocking ring\n");
+	fflush(ps->diag);};
     test_ring_b(pp);
 
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "Non-blocking ring\n");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "Non-blocking ring\n");
+	fflush(ps->diag);};
     test_ring_nb(pp);
 
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "Type selection\n");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "Type selection\n");
+	fflush(ps->diag);};
     test_type_sel(pp);
 
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "Broadcast\n");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "Broadcast\n");
+	fflush(ps->diag);};
     test_broadcast(pp);
 
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "Transfer rates\n");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "Transfer rates\n");
+	fflush(ps->diag);};
     test_rates(pp);
 
-    if (_SC_ps.debug)
-       {fprintf(_PC_diag, "Error handling test\n");
-	fflush(_PC_diag);};
+    if (ps->debug)
+       {fprintf(ps->diag, "Error handling test\n");
+	fflush(ps->diag);};
     test_error(pp);
 
     return(0);}
