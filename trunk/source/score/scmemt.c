@@ -11,9 +11,20 @@
 
 #include "score_int.h"
 #include "scope_mem.h"
+#include "scope_proc.h"
 
 #define DELTA_THREAD   64
 #define DELTA_ELEMENT  8
+
+enum e_SC_thread_private
+   { SC_THR_HEAPS = 0,
+     SC_THR_THREADS,
+     SC_THR_TIMEOUTS,
+     SC_THR_EVENTS,
+     SC_THR_ERRORS,
+     SC_THR_PROCESSES };
+
+typedef enum e_SC_thread_private SC_thread_private;
 
 typedef struct s_SC_per_thread_reg SC_per_thread_reg;
 typedef struct s_memt_state memt_state;
@@ -47,8 +58,8 @@ static memt_state
 SC_heap_des *_SC_get_heap(int id)
    {SC_heap_des *ph;
 
-/* heaps are registered at per thread state 0 */
-    ph = (SC_heap_des *) SC_get_thread_element(id, 0);
+/* heaps are registered as per thread state */
+    ph = (SC_heap_des *) SC_get_thread_element(id, SC_THR_HEAPS);
 
     return(ph);}
 
@@ -62,8 +73,8 @@ SC_heap_des *_SC_get_heap(int id)
 emu_thread_info *_SC_get_thread_info(int id)
    {emu_thread_info *ti;
 
-/* thread are registered at per thread state 1 */
-    ti = (emu_thread_info *) SC_get_thread_element(id, 1);
+/* threads are registered as per thread state */
+    ti = (emu_thread_info *) SC_get_thread_element(id, SC_THR_THREADS);
 
     return(ti);}
 
@@ -77,8 +88,8 @@ emu_thread_info *_SC_get_thread_info(int id)
 JMP_BUF *_SC_get_to_buf(int id)
    {JMP_BUF *bf;
 
-/* timeouts are registered at per thread state 2 */
-    bf = (JMP_BUF *) SC_get_thread_element(id, 2);
+/* timeouts are registered as per thread state */
+    bf = (JMP_BUF *) SC_get_thread_element(id, SC_THR_TIMEOUTS);
 
     return(bf);}
 
@@ -92,8 +103,8 @@ JMP_BUF *_SC_get_to_buf(int id)
 SC_evlpdes **_SC_get_ev_loop(int id)
    {SC_evlpdes **ev;
 
-/* event loops are registered at per thread state 3 */
-    ev = (SC_evlpdes **) SC_get_thread_element(id, 3);
+/* event loops are registered as per thread state */
+    ev = (SC_evlpdes **) SC_get_thread_element(id, SC_THR_EVENTS);
 
     return(ev);}
 
@@ -107,10 +118,25 @@ SC_evlpdes **_SC_get_ev_loop(int id)
 SC_array *_SC_get_error_stack(int id)
    {SC_array *arr;
 
-/* error stacks are registered at per thread state 4 */
-    arr = (SC_array *) SC_get_thread_element(id, 4);
+/* error stacks are registered as per thread state */
+    arr = (SC_array *) SC_get_thread_element(id, SC_THR_ERRORS);
 
     return(arr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_GET_THR_PROCESSES - return the process list for thread ID
+ *                       - use current thread if ID == -1
+ */
+
+SC_scope_proc *_SC_get_thr_processes(int id)
+   {SC_scope_proc *ps;
+
+/* error stacks are registered as per thread state */
+    ps = (SC_scope_proc *) SC_get_thread_element(id, SC_THR_PROCESSES);
+
+    return(ps);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -289,6 +315,10 @@ void SC_register_thread_state(void)
        SC_register_thread_data("errors", "SC_array", 1,
 			       sizeof(SC_array),
 			       (PFTinit) _SC_init_error_stack);
+
+       SC_register_thread_data("processes", "SC_scope_proc", 1,
+			       sizeof(SC_scope_proc),
+			       (PFTinit) _SC_init_thr_processes);
 
        st.init = TRUE;
 

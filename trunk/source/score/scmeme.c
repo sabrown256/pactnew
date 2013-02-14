@@ -9,6 +9,7 @@
 #include "cpyright.h"
 #include "score_int.h"
 #include "scope_mem.h"
+#include "scope_proc.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -26,11 +27,12 @@ void SC_end_session(void)
 
 /* free arrays */
     SC_free_array(_SC.ptr_lst, NULL);
-    SC_free_array(_SC.wait_list, SC_array_free_n);
-    SC_free_array(_SC.process_list, NULL);
     SC_free_array(_SC.eth_locks, NULL);
     SC_free_array(_SC.eth_keys, NULL);
     SC_free_array(_SC.eth_conds, NULL);
+
+    SC_free_array(_SC_ps.wait_list, SC_array_free_n);
+    SC_free_array(_SC_ps.process_list, NULL);
 
 /* free strings */
     CFREE(_SC.ta);

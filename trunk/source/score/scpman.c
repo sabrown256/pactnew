@@ -37,7 +37,7 @@ void drproc(int ev, int pid)
     char idx[10], prc[10], st[80];
     PROCESS *pp;
 
-    np = SC_array_get_n(_SC.process_list);
+    np = SC_array_get_n(_SC_ps.process_list);
 
     switch (ev)
        {case SC_PROC_EXEC :
@@ -57,11 +57,11 @@ void drproc(int ev, int pid)
 	     break;};
 
     io_printf(stdout, "Managed process list after %s %d (%d/%d)\n",
-	      st, pid, np, _SC.process_list->nx);
+	      st, pid, np, _SC_ps.process_list->nx);
 
     io_printf(stdout, "   #  Index       Address       PID  State  # Ref\n");
     for (i = 0; i < np; i++)
-        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
+        {pp = *(PROCESS **) SC_array_get(_SC_ps.process_list, i);
 	 if (pp == NULL)
 	    continue;
 
@@ -114,14 +114,14 @@ void drwait(void)
     char *cnd;
     sigchld_rec *sr;
 
-    np  = SC_array_get_n(_SC.wait_list);
-    nx  = _SC.wait_list->nx;
+    np  = SC_array_get_n(_SC_ps.wait_list);
+    nx  = _SC_ps.wait_list->nx;
     cnd = "none";
 
     io_printf(stdout, "Finished process list (%d/%d)\n", np, nx);
     io_printf(stdout, "    #      PID   Exit Status\n");
     for (i = 0; i < np; i++)
-        {sr = *(sigchld_rec **) SC_array_get(_SC.wait_list, i);
+        {sr = *(sigchld_rec **) SC_array_get(_SC_ps.wait_list, i);
 	 ic = sr->condition;
 	 if (ic & SC_SIGNALED)
 	    cnd = "signaled";
@@ -138,6 +138,44 @@ void drwait(void)
 		   i, sr->pid, sr->exit, cnd);};
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_INIT_THR_PROCESSES - initialize an SC_scope_proc instance */
+
+void _SC_init_thr_processes(SC_scope_proc *ps, int id)
+   {
+
+    assert(ps != NULL);
+
+    ps->tid                     = id;
+    ps->current_flushed_process = -1;
+    ps->debug                   = FALSE;
+    ps->msh_syntax              = FALSE;
+    ps->debug_proc              = FALSE;
+    ps->wait_list               = NULL;
+    ps->process_list            = NULL;
+    ps->diag                    = NULL;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_TID_PROC - get the ID for the current thread
+ *              - and be sure that there is an initialized
+ *              - SC_scope_proc instance for this thread
+ */
+
+SC_scope_proc *_SC_tid_proc(void)
+   {int id;
+    SC_scope_proc *ps;
+
+    id = SC_current_thread();
+    ps = _SC_get_thr_processes(id);
+
+    return(ps);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -159,7 +197,7 @@ static void _SC_make_wait(void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_INIT_WAIT - initialize the array _SC.wait_list
+/* _SC_INIT_WAIT - initialize the array _SC_ps.wait_list
  *               - this is called out so that the list can be initialized
  *               - in a thread safe execution region
  *               - NOTE: on LINUX boxes if the child completes while
@@ -171,9 +209,9 @@ static void _SC_init_wait(void)
    {
 
 /* if never initialized do it now */
-    if (_SC.wait_list == NULL)
-       {_SC.wait_list = CMAKE_ARRAY(sigchld_rec *, _SC_make_wait, 3);
-	SC_array_resize(_SC.wait_list, N_PROC_MNG, -1.0);};
+    if (_SC_ps.wait_list == NULL)
+       {_SC_ps.wait_list = CMAKE_ARRAY(sigchld_rec *, _SC_make_wait, 3);
+	SC_array_resize(_SC_ps.wait_list, N_PROC_MNG, -1.0);};
 
     return;}
 
@@ -194,8 +232,8 @@ static void _SC_record_wait(int pid, int cnd, int sts)
 	sr.condition = cnd;
 	sr.exit      = sts;
 
-	SC_array_inc_n(_SC.wait_list, 1L, 1);
-	ps = SC_array_get(_SC.wait_list, -1);
+	SC_array_inc_n(_SC_ps.wait_list, 1L, 1);
+	ps = SC_array_get(_SC_ps.wait_list, -1);
 
 	**ps = sr;};
 
@@ -217,10 +255,10 @@ static int _SC_lookup_exited_child(int pid, int *pcnd, int *psts)
 
     rv = FALSE;
     if (pid > 0)
-       {n = SC_array_get_n(_SC.wait_list);
+       {n = SC_array_get_n(_SC_ps.wait_list);
 
 	for (i = n-1; 0 <= i; i--)
-	    {sr = *(sigchld_rec **) SC_array_get(_SC.wait_list, i);
+	    {sr = *(sigchld_rec **) SC_array_get(_SC_ps.wait_list, i);
 	     if (sr->pid == pid)
 	        {rv = TRUE;
 
@@ -247,11 +285,11 @@ static void _SC_mark_exited_child(PROCESS *pp)
     sigchld_rec *sr;
 
     if (SC_process_alive(pp))
-       {n = SC_array_get_n(_SC.wait_list);
+       {n = SC_array_get_n(_SC_ps.wait_list);
 
 	pid = pp->id;
 	for (i = n-1; 0 <= i; i--)
-	    {sr = *(sigchld_rec **) SC_array_get(_SC.wait_list, i);
+	    {sr = *(sigchld_rec **) SC_array_get(_SC_ps.wait_list, i);
 	     if (sr->pid == pid)
 	        {sr->pid *= -1;
 		 break;};};};
@@ -271,13 +309,13 @@ static void _SC_mark_exited_child(PROCESS *pp)
 void _SC_manage_process(PROCESS *pp)
    {
 
-    if (_SC.process_list == NULL)
-       {_SC.process_list = CMAKE_ARRAY(PROCESS *, NULL, 3);
-	SC_array_resize(_SC.process_list, N_PROC_MNG, -1.0);};
+    if (_SC_ps.process_list == NULL)
+       {_SC_ps.process_list = CMAKE_ARRAY(PROCESS *, NULL, 3);
+	SC_array_resize(_SC_ps.process_list, N_PROC_MNG, -1.0);};
 
-    pp->index = SC_array_get_n(_SC.process_list);
+    pp->index = SC_array_get_n(_SC_ps.process_list);
 
-    SC_array_push(_SC.process_list, &pp);
+    SC_array_push(_SC_ps.process_list, &pp);
 
     SC_mark(pp, 1);
 
@@ -294,9 +332,9 @@ PROCESS *SC_lookup_process(int pid)
    {int i, n;
     PROCESS *pp;
 
-    n = SC_array_get_n(_SC.process_list);
+    n = SC_array_get_n(_SC_ps.process_list);
     for (i = 0; i < n; i++)
-        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
+        {pp = *(PROCESS **) SC_array_get(_SC_ps.process_list, i);
 	 if (pp->id == pid)
 	    break;};
 
@@ -325,10 +363,10 @@ int _SC_delete_pid(int pid)
 
     fr = FALSE;
 
-    n = SC_array_get_n(_SC.process_list);
+    n = SC_array_get_n(_SC_ps.process_list);
 
     for (i = 0; i < n; i++)
-        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
+        {pp = *(PROCESS **) SC_array_get(_SC_ps.process_list, i);
 
 /* do not remove the process if the I/O has not been finished
  * someone might still come looking for it
@@ -343,7 +381,7 @@ int _SC_delete_pid(int pid)
 
              fr = SC_process_state(pp, SC_PROC_RM | SC_PROC_SIG);
 
-	     n = SC_array_remove(_SC.process_list, i);
+	     n = SC_array_remove(_SC_ps.process_list, i);
 	     if ((i < n) && (fr == FALSE))
 	        pp->index = i;
 
@@ -352,7 +390,7 @@ int _SC_delete_pid(int pid)
     if (n == 0)
        SC_reset_terminal();
 
-    SC_array_set_n(_SC.process_list, n);
+    SC_array_set_n(_SC_ps.process_list, n);
 
     return(fr);}
 
@@ -455,7 +493,7 @@ int SC_process_state(PROCESS *pp, int ev)
 
 	    fr = _SC_delete_pid(pp->id);};
 
-	if (_SC.debug_proc)
+	if (_SC_ps.debug_proc)
 	   drproc(ev, pp->id);};
 
     rv = fr;
@@ -847,11 +885,11 @@ int SC_check_children(void)
    {int i, n, np;
     PROCESS *pp;
 
-    n = SC_array_get_n(_SC.process_list);
+    n = SC_array_get_n(_SC_ps.process_list);
 
     np = 0;
     for (i = 0; i < n; i++)
-        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
+        {pp = *(PROCESS **) SC_array_get(_SC_ps.process_list, i);
 	 if (SC_process_alive(pp) && (SC_status(pp) == SC_RUNNING))
 	    {if (SC_process_status(pp) != SC_RUNNING)
 	        np++;};};
@@ -872,11 +910,11 @@ int SC_running_children(void)
    {int i, n, nr, st;
     PROCESS *pp;
 
-    n = SC_array_get_n(_SC.process_list);
+    n = SC_array_get_n(_SC_ps.process_list);
 
     nr = 0;
     for (i = 0; i < n; i++)
-        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
+        {pp = *(PROCESS **) SC_array_get(_SC_ps.process_list, i);
 	 if (SC_process_alive(pp))
 	    {st = SC_process_status(pp);
 	     if (st == 0)

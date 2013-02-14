@@ -283,11 +283,6 @@ struct s_SC_scope_private
    char ibf[MAXLINE];                         /* working buffer for SC_itoa */
    char banner[MAXLINE];              /* Code and Version string for banner */
 
-/* SCPMAN.C */
-   int debug_proc;
-   SC_array *wait_list;
-   SC_array *process_list;
-
    JMP_BUF btt;                                                 /* scterm.c */
    JMP_BUF srv_rstrt;                                           /* scsysb.c */
 
@@ -375,6 +370,9 @@ extern emu_thread_info
 
 extern SC_evlpdes
  **_SC_get_ev_loop(int id);
+
+extern SC_scope_proc
+ *_SC_get_thr_processes(int id);
 
 
 /* SCSTR.C declarations */
