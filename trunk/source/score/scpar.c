@@ -271,6 +271,36 @@ int dtid(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_SET_OMP_NUM_THREADS - set the value of OMP_NUM_THREADS
+ *                         - harmless in non-OPENMP builds
+ *                         - but the only way to really control OPENMP
+ */
+
+static void _SC_set_omp_num_threads(int nt)
+   {
+
+#ifdef PTHREAD_OMP
+    if (nt > 1)
+       {
+/*      PS_csetenv("OMP_NUM_THREADS", "%d", nt); */
+
+/* omp_set_num_threads takes precedence over OMP_NUM_THREADS */
+	omp_set_num_threads(nt);
+
+int na=0;
+#pragma omp parallel sections
+   {
+    na = omp_get_num_threads();
+   }
+fprintf(stderr, ">>> OMP_NUM_THREADS = %d\n", na);
+	};
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_INIT_THREADS - initialize SCORE threads
  *                 - return the number of threads initialized in this call or
  *                 - the number of threads originally initialized
@@ -287,6 +317,8 @@ int SC_init_threads(int nt, PFTid tid)
     emu_thread_info *ti;
 
     ret = SC_n_threads;
+
+    _SC_set_omp_num_threads(nt);
 
     ONCE_SAFE(TRUE, NULL)
         SC_n_threads = nt;

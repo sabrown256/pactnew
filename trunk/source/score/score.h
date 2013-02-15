@@ -773,6 +773,7 @@ extern char
  *SC_error_msg(void);
 
 extern void
+ _SC_assert(int t),
  SC_warn(char *fmt, ...),
  SC_error(int st, char *fmt, ...);
 

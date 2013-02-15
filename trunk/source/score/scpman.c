@@ -32,13 +32,13 @@ extern void
  *        - strictly a degugging aid
  */
 
-void drproc(int ev, int pid)
+void drproc(int ev, int pid, int tid)
    {int i, np;
     char idx[10], prc[10], st[80];
     PROCESS *pp;
     SC_thread_proc *ps;
 
-    ps = _SC_get_thr_processes(-1);
+    ps = _SC_get_thr_processes(tid);
 
     np = SC_array_get_n(ps->process_list);
 
@@ -148,6 +148,24 @@ void drwait(int tid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_LOG_PROC - log process management */
+
+static void _SC_log_proc(int tid, char *fmt, ...)
+   {char t[MAXLINE];
+    static int dbg = FALSE;
+
+    if (dbg == TRUE)
+       {SC_VA_START(fmt);
+	SC_VSNPRINTF(t, MAXLINE, fmt);
+	SC_VA_END;
+
+	fprintf(stderr, "%2d>>> %s\n", tid, t);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_INIT_THR_PROCESSES - initialize an SC_thread_proc instance */
 
 void _SC_init_thr_processes(SC_thread_proc *ps, int id)
@@ -175,7 +193,7 @@ void _SC_fin_thr_processes(void)
    {int i, nt;
     SC_thread_proc *ps;
 
-    nt = SC_n_threads;
+    nt = max(SC_n_threads, 1);
     for (i = 0; i < nt; i++)
         {ps = _SC_get_thr_processes(i);
 
@@ -221,7 +239,7 @@ static void _SC_make_wait(void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_INIT_WAIT - initialize the array ps->wait_list
+/* _SC_INIT_WAIT - initialize the wait_list array of PS
  *               - this is called out so that the list can be initialized
  *               - in a thread safe execution region
  *               - NOTE: on LINUX boxes if the child completes while
@@ -229,10 +247,8 @@ static void _SC_make_wait(void *a)
  *               - lock if we have to allocate any memory
  */
 
-static void _SC_init_wait(void)
-   {SC_thread_proc *ps;
-
-    ps = _SC_get_thr_processes(-1);
+static void _SC_init_wait(SC_thread_proc *ps)
+   {
 
 /* if never initialized do it now */
     if (ps->wait_list == NULL)
@@ -248,13 +264,10 @@ static void _SC_init_wait(void)
  *                 - of processes for which a waitpid has succeeded
  */
 
-static void _SC_record_wait(int pid, int cnd, int sts)
+static void _SC_record_wait(SC_thread_proc *ps, int pid, int cnd, int sts)
    {sigchld_rec sr, **ra;
-    SC_thread_proc *ps;
-
-    ps = _SC_get_thr_processes(-1);
-
-    _SC_init_wait();
+    
+    _SC_init_wait(ps);
 
     if (pid > 0)
        {sr.pid       = pid;
@@ -271,19 +284,17 @@ static void _SC_record_wait(int pid, int cnd, int sts)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_LOOKUP_EXITED_CHILD - lookup the process PID in the list
+/* _SC_LOOKUP_EXITED_CHILD - lookup the process PID in the PS list
  *                         - of processes for which a waitpid has succeeded
  *                         - return TRUE iff found
  *                         - if found return the condition, PCND,
  *                         - and status, PSTS
  */
 
-static int _SC_lookup_exited_child(int pid, int *pcnd, int *psts)
+static int _SC_lookup_exited_child(SC_thread_proc *ps, int pid,
+				   int *pcnd, int *psts)
    {int i, n, rv;
     sigchld_rec *sr;
-    SC_thread_proc *ps;
-
-    ps = _SC_get_thr_processes(-1);
 
     rv = FALSE;
     if (pid > 0)
@@ -326,8 +337,10 @@ static void _SC_mark_exited_child(PROCESS *pp)
 	for (i = n-1; 0 <= i; i--)
 	    {sr = *(sigchld_rec **) SC_array_get(ps->wait_list, i);
 	     if (sr->pid == pid)
-	        {sr->pid *= -1;
-		 break;};};};
+	        {_SC_log_proc(ps->tid,
+			      "mark as exited process %d", sr->pid);
+		 sr->pid *= -1;
+                 break;};};};
 
     return;}
 
@@ -361,16 +374,16 @@ void _SC_manage_process(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_LOOKUP_PROCESS - given a PID return the managed process
- *                   - which contains it or NULL
+/* _SC_LOOKUP_PROCESS - given a PID return the managed process
+ *                    - which contains it or NULL
  */
 
-PROCESS *SC_lookup_process(int pid)
+static PROCESS *_SC_lookup_process(int pid, int tid)
    {int i, n;
     PROCESS *pp;
     SC_thread_proc *ps;
 
-    ps = _SC_get_thr_processes(-1);
+    ps = _SC_get_thr_processes(tid);
 
     n = SC_array_get_n(ps->process_list);
     for (i = 0; i < n; i++)
@@ -380,6 +393,25 @@ PROCESS *SC_lookup_process(int pid)
 
     if (i >= n)
        pp = NULL;
+
+    return(pp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LOOKUP_PROCESS - given a PID return the managed process
+ *                   - which contains it or NULL
+ */
+
+PROCESS *SC_lookup_process(int pid)
+   {int it, nt;
+    PROCESS *pp;
+
+    pp = NULL;
+
+    nt = max(SC_n_threads, 1);
+    for (it = 0; (it < nt) && (pp == NULL); it++)
+        pp = _SC_lookup_process(pid, it);
 
     return(pp);}
 
@@ -398,42 +430,48 @@ PROCESS *SC_lookup_process(int pid)
  */
 
 int _SC_delete_pid(int pid)
-   {int i, n, fl, fr;
+   {int i, it, n, na, nt, fl, fr, ok;
     PROCESS *pp;
     SC_thread_proc *ps;
 
-    ps = _SC_get_thr_processes(-1);
-
     fr = FALSE;
 
-    n = SC_array_get_n(ps->process_list);
+    na = 0;
+    ok = TRUE;
+    nt = max(SC_n_threads, 1);
+    for (it = 0; (it < nt) && (ok == FALSE); it++)
+        {ps = _SC_get_thr_processes(it);
 
-    for (i = 0; i < n; i++)
-        {pp = *(PROCESS **) SC_array_get(ps->process_list, i);
+	 n  = SC_array_get_n(ps->process_list);
+	 na = max(n, na);
+
+	 for (i = 0; i < n; i++)
+	     {pp = *(PROCESS **) SC_array_get(ps->process_list, i);
 
 /* do not remove the process if the I/O has not been finished
  * someone might still come looking for it
  */
-	 fl = pp->flags & SC_PROC_IO;
+	      fl = pp->flags & SC_PROC_IO;
 
-	 if ((pp->id == pid) && (fl != 0))
-	    {SC_rl_io_callback(pp->io[0]);
-	     SC_rl_io_callback(pp->io[1]);
+	      if ((pp->id == pid) && (fl != 0))
+		 {SC_rl_io_callback(pp->io[0]);
+		  SC_rl_io_callback(pp->io[1]);
 
-	     _SC_mark_exited_child(pp);
+		  _SC_mark_exited_child(pp);
 
-             fr = SC_process_state(pp, SC_PROC_RM | SC_PROC_SIG);
+		  fr = SC_process_state(pp, SC_PROC_RM | SC_PROC_SIG);
 
-	     n = SC_array_remove(ps->process_list, i);
-	     if ((i < n) && (fr == FALSE))
-	        pp->index = i;
+		  n = SC_array_remove(ps->process_list, i);
+		  if ((i < n) && (fr == FALSE))
+		     pp->index = i;
 
-	     break;};};
+		  ok = FALSE;
+		  break;};};
 
-    if (n == 0)
+	 SC_array_set_n(ps->process_list, n);};
+
+    if (na == 0)
        SC_reset_terminal();
-
-    SC_array_set_n(ps->process_list, n);
 
     return(fr);}
 
@@ -521,13 +559,16 @@ int SC_process_state(PROCESS *pp, int ev)
     chld = pp->ischild;
 
     if (chld == FALSE)
+       {if (pp->id != 0)
+	   _SC_log_proc(ps->tid, "add process #%d (%d)",
+			pp->index, pp->id);
 
 /* if we have closed the I/O there is no further possibility of
  * communication with this process so remove it from
  * the managed process list
  * and assign an exit status for the process
  */
-       {if (ev == SC_PROC_IO)
+	if (ev == SC_PROC_IO)
 
 /* if we killed it count it as a normal termination */
 	   {if (fl & SC_PROC_SIG)
@@ -540,7 +581,7 @@ int SC_process_state(PROCESS *pp, int ev)
 	    fr = _SC_delete_pid(pp->id);};
 
 	if (ps->debug_proc)
-	   drproc(ev, pp->id);};
+	   drproc(ev, pp->id, ps->tid);};
 
     rv = fr;
     if ((fr == FALSE) &&
@@ -574,6 +615,10 @@ void _SC_set_process_status(PROCESS *pp, int sts, int rsn, char *tm)
     pp->reason    = rsn;
     pp->stop_time = tm;
 
+    if (pp->id != 0)
+       _SC_log_proc(pp->tstate->tid,
+		    "change status on process #%d (%d) to %d/%d",
+		    pp->index, pp->id, sts, rsn);
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -632,7 +677,7 @@ static void _SC_child_exit(int w, int *pcnd, int *psts)
  *                 - and SC_child_status is like a step function)
  */
 
-static int _SC_child_check(int pid)
+static int _SC_child_check(SC_thread_proc *ps, int pid)
    {int st, w, cnd, sts;
 
     SC_signal_block(NULL, SC_ALL_SIGNALS, -1);
@@ -643,7 +688,7 @@ static int _SC_child_check(int pid)
 	sts = -1;
 
 	_SC_child_exit(w, &cnd, &sts);
-	_SC_record_wait(st, cnd, sts);}
+	_SC_record_wait(ps, st, cnd, sts);}
 
     else if ((st == -1) && (errno != ECHILD))
        st = -2;
@@ -701,12 +746,15 @@ int SC_child_kill(int pid)
 
 void SC_save_exited_children(void)
    {int st;
+    SC_thread_proc *ps;
 
-    _SC_init_wait();
+    ps = _SC_tid_proc();
+
+    _SC_init_wait(ps);
 
 /* look for any processes finishing up */
     while (TRUE)
-       {st = _SC_child_check(-1);
+       {st = _SC_child_check(ps, -1);
 	if (st <= 0)
 	   break;};
 
@@ -741,16 +789,26 @@ void SC_save_exited_children(void)
  */
 
 int SC_child_status(int pid, int *pcnd, int *psts)
-   {int st, ok;
+   {int it, nt, st, ok;
+    SC_thread_proc *ps;
 
-    _SC_init_wait();
+    nt = max(SC_n_threads, 1);
+    for (it = 0; it < nt; it++)
+        {ps = _SC_get_thr_processes(it);
 
-    st = _SC_child_check(pid);
+	 _SC_init_wait(ps);
+
+	 st = _SC_child_check(ps, pid);
 
 /* now lookup the requested process */
-    ok = _SC_lookup_exited_child(pid, pcnd, psts);
-    if (ok == TRUE)
-       st = pid;
+	 ok = _SC_lookup_exited_child(ps, pid, pcnd, psts);
+	 if (ok == TRUE)
+	    st = pid;
+
+	 if (st == -1)
+	    continue;
+	 else
+	    break;};
 
     return(st);}
 
@@ -856,8 +914,9 @@ void SC_process_rusage(PROCESS *pp)
 /* SC_PROCESS_STATUS - check on the state of a process PP and return
  *                   - return the process status which will be
  *                   -   a) SC_RUNNING if the process is running
- *                   -   b) a combination of SC_EXITED, SC_STOPPED, SC_SIGNALED,
- *                   -      SC_KILLED, SC_DEAD, SC_LOST, or SC_CHANGED
+ *                   -   b) a combination of SC_EXITED, SC_STOPPED,
+ *                   -      SC_SIGNALED, SC_KILLED, SC_DEAD, SC_LOST,
+ *                   -      or SC_CHANGED
  *                   -      if the process has exited
  *                   -   c) -1 on error or no process
  */
@@ -921,18 +980,18 @@ int SC_process_status(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_CHECK_CHILDREN - check each running child on the managed list
- *                   - and update its run/exit status
- *                   - return the number of children who finished
- *                   - during this call
+/* _SC_CHECK_CHILDREN - check each running child on the managed list
+ *                    - and update its run/exit status
+ *                    - return the number of children who finished
+ *                    - during this call
  */
 
-int SC_check_children(void)
+static int _SC_check_children(int tid)
    {int i, n, np;
     PROCESS *pp;
     SC_thread_proc *ps;
 
-    ps = _SC_get_thr_processes(-1);
+    ps = _SC_get_thr_processes(tid);
 
     n = SC_array_get_n(ps->process_list);
 
@@ -948,19 +1007,39 @@ int SC_check_children(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_RUNNING_CHILDREN - check each running child on the managed list
- *                     - and update its run/exit status
- *                     - return the number of children who
- *                     - are still running
- *                     - return -1 if there is a lost child
+/* SC_CHECK_CHILDREN - check each running child on the managed list
+ *                   - and update its run/exit status
+ *                   - return the number of children who finished
+ *                   - during this call
  */
 
-int SC_running_children(void)
+int SC_check_children(void)
+   {int it, np, nt;
+
+    np = 0;
+
+    nt = max(SC_n_threads, 1);
+    for (it = 0; it < nt; it++)
+        np += _SC_check_children(it);
+
+    return(np);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_RUNNING_CHILDREN - check each running child on the managed list
+ *                      - and update its run/exit status
+ *                      - return the number of children who
+ *                      - are still running
+ *                      - return -1 if there is a lost child
+ */
+
+static int _SC_running_children(int tid)
    {int i, n, nr, st;
     PROCESS *pp;
     SC_thread_proc *ps;
 
-    ps = _SC_get_thr_processes(-1);
+    ps = _SC_get_thr_processes(tid);
 
     n = SC_array_get_n(ps->process_list);
 
@@ -974,6 +1053,32 @@ int SC_running_children(void)
 	     else if ((st & (SC_DEAD | SC_KILLED | SC_SIGNALED)) != 0)
 	        {nr = -1;
 		 break;};};};
+
+    return(nr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_RUNNING_CHILDREN - check the running children on the managed list
+ *                     - of each thread
+ *                     - and update its run/exit status
+ *                     - return the number of children who
+ *                     - are still running
+ *                     - return -1 if there is a lost child
+ */
+
+int SC_running_children(void)
+   {int it, n, nr, nt;
+
+    nr = 0;
+
+    nt = max(SC_n_threads, 1);
+    for (it = 0; (it < nt) && (nr != -1); it++)
+        {n = _SC_running_children(it);
+	 if (n >= 0)
+	    nr += n;
+	 else
+	    nr = -1;};
 
     return(nr);}
 

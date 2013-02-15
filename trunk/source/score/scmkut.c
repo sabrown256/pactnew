@@ -338,6 +338,25 @@ void usage(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_SETUP_DMAKE_THREADS - setup thread situation for dmake session */
+
+static void _SC_setup_dmake_threads(int c, char **v)
+   {int i, nt;
+
+    nt = 0;
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-t") == 0)
+	    {nt = SC_stoi(v[++i]);
+	     SC_init_threads(nt, NULL);};};
+
+    if (nt < 2)
+       SC_single_thread();
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MAIN - start here */
 
 int main(int c, char **v, char **env)
@@ -351,7 +370,7 @@ int main(int c, char **v, char **env)
     char *err, *p;
     anadep *state;
 
-    SC_single_thread();
+    _SC_setup_dmake_threads(c, v);
 
     SC_init("PACT: Exit with error", NULL,
             TRUE, NULL, NULL,
@@ -510,9 +529,6 @@ int main(int c, char **v, char **env)
 	    {PS_report_info(state->root, state->complete, state->literal, dbo,
 			    VERS, NULL);
 	     return(0);}
-         else if (strcmp(v[i], "-t") == 0)
-	    {nt = SC_stoi(v[++i]);
-	     SC_init_threads(nt, NULL);}
          else if (strcmp(v[i], "-vrb") == 0)
 	    {show = 2;
              state->verbose = TRUE;}
