@@ -28,9 +28,9 @@ static int _PC_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
    {int nbo, data;
     char reply[MAXLINE], fmt[MAXLINE];
     char *pbf;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     PC_printf(pp, "%c,%s,%ld,%d\n", PC_FWRITE, type, ni, dn);
 
@@ -236,9 +236,7 @@ int PC_open_group(char **argv, int *pn)
     PROCESS *pp;
 
 #if defined(HAVE_POSIX_SYS)
-    SC_scope_proc *ps;
-
-    ps = &_SC_ps;
+    SC_thread_proc *ps;
 
     PC_init_communications(NULL);
 
@@ -259,7 +257,9 @@ int PC_open_group(char **argv, int *pn)
 
     pp = PC_open(args, NULL, "rb+");
     if (pp != NULL)
-       {PC_block(pp);
+       {ps = pp->tstate;
+
+	PC_block(pp);
 	PC_gets(s, MAXLINE, pp);
 
 	p = SC_strtok(s, ",", t);
@@ -297,9 +297,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
     PROCESS *pp;
 
 #if defined(HAVE_POSIX_SYS)
-    SC_scope_proc *ps;
-
-    ps = &_SC_ps;
+    SC_thread_proc *ps;
 
 /* if the server is the parent of this process, argv will have the
  * server name and port number just after the first NULL item in argv
@@ -322,6 +320,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
         argv[argc] = NULL;};
 
     pp = PC_mk_process(argv, "rb+", SC_CHILD);
+    ps = pp->tstate;
 
     if (pnn != NULL)
        {if ((srvr[0] == '\0') || (port < 0))
@@ -373,9 +372,9 @@ static void _PC_close_member_n(PROCESS *pp)
    {
 
 #if defined(HAVE_POSIX_SYS)
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     PC_close(pp);
 
@@ -452,9 +451,9 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     long nis, nib;
     char reply[MAXLINE], types[MAXLINE], *bf;
     PDBfile *vif, *tf;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     ok = SC_ERR_TRAP();
     if (ok != 0)
@@ -541,9 +540,9 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     long nir, nb, nbt, nbr;
     char reply[MAXLINE], types[MAXLINE], *bf, *pbf;
     PDBfile *vif, *tf;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     vif = pp->vif;
     nir = ni;
@@ -636,9 +635,9 @@ static long _PC_wait_n(PROCESS *pp)
     void *vr;
     size_t ni;
     PDBfile *vif, *tf;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     vif = pp->vif;
 

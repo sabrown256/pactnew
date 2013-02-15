@@ -678,9 +678,9 @@ NORETURN void SC_file_access(int log)
    {int code, cfd, indx, ret;
     char s[MAXLINE], *bf, *t;
     FILE *file[MAX_FILES], *fp;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     SC_MEM_INIT_N(FILE *, file, MAX_FILES);
 

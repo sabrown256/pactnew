@@ -19,10 +19,10 @@
 enum e_SC_thread_private
    { SC_THR_HEAPS = 0,
      SC_THR_THREADS,
+     SC_THR_PROCESSES,
      SC_THR_TIMEOUTS,
      SC_THR_EVENTS,
-     SC_THR_ERRORS,
-     SC_THR_PROCESSES };
+     SC_THR_ERRORS };
 
 typedef enum e_SC_thread_private SC_thread_private;
 
@@ -130,11 +130,11 @@ SC_array *_SC_get_error_stack(int id)
  *                       - use current thread if ID == -1
  */
 
-SC_scope_proc *_SC_get_thr_processes(int id)
-   {SC_scope_proc *ps;
+SC_thread_proc *_SC_get_thr_processes(int id)
+   {SC_thread_proc *ps;
 
 /* error stacks are registered as per thread state */
-    ps = (SC_scope_proc *) SC_get_thread_element(id, SC_THR_PROCESSES);
+    ps = (SC_thread_proc *) SC_get_thread_element(id, SC_THR_PROCESSES);
 
     return(ps);}
 
@@ -304,6 +304,10 @@ void SC_register_thread_state(void)
 			       sizeof(emu_thread_info),
 			       (PFTinit) _SC_eth_init_thread);
 
+       SC_register_thread_data("processes", "SC_thread_proc", 1,
+			       sizeof(SC_thread_proc),
+			       (PFTinit) _SC_init_thr_processes);
+
        SC_register_thread_data("timeouts", "JMP_BUF", 1,
 			       sizeof(JMP_BUF),
 			       NULL);
@@ -315,10 +319,6 @@ void SC_register_thread_state(void)
        SC_register_thread_data("errors", "SC_array", 1,
 			       sizeof(SC_array),
 			       (PFTinit) _SC_init_error_stack);
-
-       SC_register_thread_data("processes", "SC_scope_proc", 1,
-			       sizeof(SC_scope_proc),
-			       (PFTinit) _SC_init_thr_processes);
 
        st.init = TRUE;
 

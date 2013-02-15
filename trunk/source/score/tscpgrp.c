@@ -68,9 +68,9 @@ static int do_cmd(int n, char **sa)
 
 static int test_pipe_1(void)
    {int n, st, os;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     os = ps->msh_syntax;
     ps->msh_syntax = TRUE;
@@ -102,9 +102,9 @@ static int test_pipe_1(void)
 
 static int test_pipe_2(void)
    {int n, st, os;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     os = ps->msh_syntax;
     ps->msh_syntax = TRUE;
@@ -137,9 +137,9 @@ static int test_pipe_2(void)
 
 static int test_file_1(void)
    {int n, st, os;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     os = ps->msh_syntax;
     ps->msh_syntax = TRUE;

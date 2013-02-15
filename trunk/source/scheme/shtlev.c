@@ -925,9 +925,9 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
    {int i, to, ost;
     char *cmd, **output;
     object *lst;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     output = NULL;
     cmd    = NULL;
