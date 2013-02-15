@@ -36,9 +36,9 @@ void drproc(int ev, int pid)
    {int i, np;
     char idx[10], prc[10], st[80];
     PROCESS *pp;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     np = SC_array_get_n(ps->process_list);
 
@@ -112,13 +112,13 @@ void drproc(int ev, int pid)
  *        - strictly a degugging aid
  */
 
-void drwait(void)
+void drwait(int tid)
    {int i, np, nx, ic;
     char *cnd;
     sigchld_rec *sr;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(tid);
 
     np  = SC_array_get_n(ps->wait_list);
     nx  = ps->wait_list->nx;
@@ -148,9 +148,9 @@ void drwait(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_INIT_THR_PROCESSES - initialize an SC_scope_proc instance */
+/* _SC_INIT_THR_PROCESSES - initialize an SC_thread_proc instance */
 
-void _SC_init_thr_processes(SC_scope_proc *ps, int id)
+void _SC_init_thr_processes(SC_thread_proc *ps, int id)
    {
 
     assert(ps != NULL);
@@ -169,15 +169,18 @@ void _SC_init_thr_processes(SC_scope_proc *ps, int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_FIN_THR_PROCESSES - initialize an SC_scope_proc instance */
+/* _SC_FIN_THR_PROCESSES - cleanup the SC_thread_proc instances */
 
 void _SC_fin_thr_processes(void)
-   {SC_scope_proc *ps;
+   {int i, nt;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    nt = SC_n_threads;
+    for (i = 0; i < nt; i++)
+        {ps = _SC_get_thr_processes(i);
 
-    SC_free_array(ps->wait_list, SC_array_free_n);
-    SC_free_array(ps->process_list, NULL);
+	 SC_free_array(ps->wait_list, SC_array_free_n);
+	 SC_free_array(ps->process_list, NULL);}
 
     return;}
 
@@ -186,12 +189,12 @@ void _SC_fin_thr_processes(void)
 
 /* _SC_TID_PROC - get the ID for the current thread
  *              - and be sure that there is an initialized
- *              - SC_scope_proc instance for this thread
+ *              - SC_thread_proc instance for this thread
  */
 
-SC_scope_proc *_SC_tid_proc(void)
+SC_thread_proc *_SC_tid_proc(void)
    {int id;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
     id = SC_current_thread();
     ps = _SC_get_thr_processes(id);
@@ -227,9 +230,9 @@ static void _SC_make_wait(void *a)
  */
 
 static void _SC_init_wait(void)
-   {SC_scope_proc *ps;
+   {SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
 /* if never initialized do it now */
     if (ps->wait_list == NULL)
@@ -247,9 +250,9 @@ static void _SC_init_wait(void)
 
 static void _SC_record_wait(int pid, int cnd, int sts)
    {sigchld_rec sr, **ra;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     _SC_init_wait();
 
@@ -278,9 +281,9 @@ static void _SC_record_wait(int pid, int cnd, int sts)
 static int _SC_lookup_exited_child(int pid, int *pcnd, int *psts)
    {int i, n, rv;
     sigchld_rec *sr;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     rv = FALSE;
     if (pid > 0)
@@ -312,9 +315,9 @@ static int _SC_lookup_exited_child(int pid, int *pcnd, int *psts)
 static void _SC_mark_exited_child(PROCESS *pp)
    {int i, n, pid;
     sigchld_rec *sr;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     if (SC_process_alive(pp))
        {n = SC_array_get_n(ps->wait_list);
@@ -339,9 +342,9 @@ static void _SC_mark_exited_child(PROCESS *pp)
  */
 
 void _SC_manage_process(PROCESS *pp)
-   {SC_scope_proc *ps;
+   {SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     if (ps->process_list == NULL)
        {ps->process_list = CMAKE_ARRAY(PROCESS *, NULL, 3);
@@ -365,9 +368,9 @@ void _SC_manage_process(PROCESS *pp)
 PROCESS *SC_lookup_process(int pid)
    {int i, n;
     PROCESS *pp;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     n = SC_array_get_n(ps->process_list);
     for (i = 0; i < n; i++)
@@ -397,9 +400,9 @@ PROCESS *SC_lookup_process(int pid)
 int _SC_delete_pid(int pid)
    {int i, n, fl, fr;
     PROCESS *pp;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     fr = FALSE;
 
@@ -507,9 +510,9 @@ static void _SC_rl_process(PROCESS *pp)
 
 int SC_process_state(PROCESS *pp, int ev)
    {int fl, fr, chld, rv;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     pp->flags |= ev;
 
@@ -927,9 +930,9 @@ int SC_process_status(PROCESS *pp)
 int SC_check_children(void)
    {int i, n, np;
     PROCESS *pp;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     n = SC_array_get_n(ps->process_list);
 
@@ -955,9 +958,9 @@ int SC_check_children(void)
 int SC_running_children(void)
    {int i, n, nr, st;
     PROCESS *pp;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     n = SC_array_get_n(ps->process_list);
 

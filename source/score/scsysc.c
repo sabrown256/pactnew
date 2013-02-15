@@ -1008,9 +1008,9 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
    {int it, n, dosh, doif, term;
     char *t, *ios;
     SC_array *tf;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     it    = 0;
     doif  = FALSE;

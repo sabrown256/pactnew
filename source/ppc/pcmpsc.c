@@ -72,9 +72,9 @@ int PC_out(void *bf, char *type, size_t ni, PROCESS *pp, int *filt)
    {int i, j, ityp, dn, did, nb, t, more, nn, np, rv;
     int type_index, default_node, default_id, host_node;
     int *p, *nl, *pnl, *pl, *ppl;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     type_index   = 0;
     default_node = -1;
@@ -158,9 +158,9 @@ int PC_out(void *bf, char *type, size_t ni, PROCESS *pp, int *filt)
 int PC_in(void *bf, char *type, size_t ni, PROCESS *pp, int *filt)
    {int i, n, ityp, dn, did, nb, t, more, type_index, rv;
     int *p;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     ityp = 0;
     type_index = 0;

@@ -28,9 +28,6 @@
 
 typedef PROCESS *(*PFPPROC)(char **argv, char *mode, int type);
 
-SC_scope_proc
- _SC_ps = { -1, -1, FALSE, FALSE, FALSE, NULL, NULL, NULL };
-
 #if defined(HAVE_POSIX_SYS)
 
 #ifdef HAVE_PROCESS_CONTROL
@@ -74,9 +71,9 @@ void _SC_dethread(void)
 /* _SC_DIAGNOSTIC - log a diagnostic message */
 
 void _SC_diagnostic(char *fmt, ...)
-   {SC_scope_proc *ps;
+   {SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     if (ps->debug == TRUE)
        {char *s;
@@ -355,6 +352,7 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
     _SC_init_filedes(pp->fd);
 
     pp->tty = NULL;
+    pp->pru = NULL;
 
     if (type == SC_PARENT)
        {pp->ischild = FALSE;

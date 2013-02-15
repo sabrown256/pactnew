@@ -24,9 +24,9 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
    {int port, argc;
     char *tok, t[MAXLINE], srvr[MAXLINE], *s, *u;
     PROCESS *pp;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
 /* if the server is the parent of this process, argv will have the
  * server name and port number just after the first NULL item in argv
@@ -68,9 +68,9 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
 /* _PC_CLOSE_MEMBER_D - close the member process */
 
 static void _PC_close_member_d(PROCESS *pp)
-   {SC_scope_proc *ps;
+   {SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     MPI_Finalize();
     PC_close(pp);
@@ -129,9 +129,9 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     long nis;
     char types[MAXLINE], *bf;
     PDBfile *vif, *tf;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     ok = SC_ERR_TRAP();
     if (ok != 0)
@@ -219,9 +219,9 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     int type_index, block, buf_siz;
     char *bf;
     PDBfile *vif, *tf;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     vif = pp->vif;
     nir = ni;
@@ -297,9 +297,9 @@ static long _PC_wait_d(PROCESS *pp)
     void *vr;
     size_t ni;
     PDBfile *vif, *tf;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     vif = pp->vif;
 

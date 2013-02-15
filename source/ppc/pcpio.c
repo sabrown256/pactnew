@@ -97,9 +97,9 @@ static int _PC_setup_children(char **argv, char *mode)
     PROCESS *pp;
 
 #if defined(HAVE_POSIX_SYS)
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = _SC_get_thr_processes(-1);
 
     gethostname(host, MAXLINE);
     port = PC_init_server(SC_GET_PORT, FALSE);
@@ -256,15 +256,15 @@ static int _PC_get_msg(int i)
     char *type, **msg, **typ, *pbf;
     PROCESS *pi;
     PDBfile *pf;
-    SC_scope_proc *ps;
-
-    ps = &_SC_ps;
+    SC_thread_proc *ps;
 
     msg = MESSAGES(i);
     typ = MESSAGE_TYPES(i);
     nis = MESSAGE_LENGTHS(i);
     pi  = PC_procs.p[i];
     pf  = (PDBfile *) pi->vif;
+
+    ps = pi->tstate;
 
     if ((msg != NULL) && (typ != NULL) && (nis != NULL))
        {pbf  = msg[0];
@@ -321,9 +321,9 @@ static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
     intb bpi;
     char *bf;
     PDBfile *pf;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pi->tstate;
 
     if ((pi != NULL) && (type != NULL))
        {pf = (PDBfile *) pi->vif;
@@ -359,13 +359,13 @@ static int _PC_get_message(int i)
    {int ni, code, indx, c;
     char s[MAXLINE], *type, *t;
     PROCESS *pi;
-    SC_scope_proc *ps;
-
-    ps = &_SC_ps;
+    SC_thread_proc *ps;
 
     pi = PC_procs.p[i];
     if (pi == NULL)
        return(FALSE);
+
+    ps = pi->tstate;
 
     s[0] = '\0';
     if (PC_gets(s, MAXLINE, pi) == NULL)

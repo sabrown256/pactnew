@@ -440,9 +440,9 @@ static int _SC_posix_close(PROCESS *pp)
 
 static int _SC_posix_flush(PROCESS *pp)
    {int iv, ov, rv;
-    SC_scope_proc *ps;
+    SC_thread_proc *ps;
 
-    ps = &_SC_ps;
+    ps = pp->tstate;
 
     iv = -2;
     ov = -2;

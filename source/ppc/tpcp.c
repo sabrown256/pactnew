@@ -50,9 +50,7 @@ static int
 int main(int argc, char **argv)
    {int i, pid, which;
     PROCESS *pp;
-    SC_scope_proc *ps;
-
-    ps = &_SC_ps;
+    SC_thread_proc *ps;
 
     iter = 3;
 
@@ -61,6 +59,8 @@ int main(int argc, char **argv)
        return(1);
 
     SC_setbuf(stdout, NULL);
+
+    ps = pp->tstate;
 
     pid = pp->acpu;
     if (pid == 0)
