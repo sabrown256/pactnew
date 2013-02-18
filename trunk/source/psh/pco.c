@@ -1605,7 +1605,7 @@ static void default_var(client *cl, char *base)
 
 /* remove parens from osrel - it is bad for the shells later on */
     sa = tokenize(st.osrel, "()", 0);
-    concatenate(st.osrel, BFLRG, sa, ",");
+    concatenate(st.osrel, BFLRG, sa, 0, -1, ",");
     free_strings(sa);
 
     snprintf(st.dir.scr, BFLRG, "%s/scripts", base);

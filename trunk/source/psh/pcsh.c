@@ -203,7 +203,7 @@ static int make_pdo_script(char **sa, int is, char *fname, char *shell,
     char *ro, **ta;
     FILE *fp;
 
-    concatenate(al, BFLRG, v+k+1, " ");
+    concatenate(al, BFLRG, v, k+1, -1, " ");
 
     ta = compute_pdo_limits(sa, is, al, BFLRG);
     n  = lst_length(ta);
@@ -324,7 +324,7 @@ static int make_pfor_script(char **sa, int is, char *fname, char *shell,
     char *ro, **ta;
     FILE *fp;
 
-    concatenate(al, BFLRG, v+k+1, " ");
+    concatenate(al, BFLRG, v, k+1, -1, " ");
 
     ta = compute_pfor_limits(sa, is, al, BFLRG);
     n  = lst_length(ta);

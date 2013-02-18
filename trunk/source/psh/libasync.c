@@ -537,7 +537,7 @@ static process *_job_mk_process(int child, char **arg,
        {if (arg == NULL)
 	   sc = NULL;
 	else
-	   {sc = concatenate(s, BFLRG, arg, " ");
+	   {sc = concatenate(s, BFLRG, arg, 0, -1, " ");
 	    sc = STRSAVE(sc);};
 
 	_init_process(pp);

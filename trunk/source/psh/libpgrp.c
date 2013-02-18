@@ -2613,7 +2613,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 	    case IO_MODE_WO :
 	    case IO_MODE_WD :
 	         rv = file_strings_push(fio[0], &sa, TRUE, -1);
-		 vl = concatenate(t, BFLRG, sa, " ");
+		 vl = concatenate(t, BFLRG, sa, 0, -1, " ");
 
 		 if (IS_NULL(db) == FALSE)
 		    dbset(NULL, vr, vl);
@@ -2629,7 +2629,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 		    sa = lst_add(sa, vl);
 
 	         rv = file_strings_push(fio[0], &sa, TRUE, -1);
-		 vl = concatenate(t, BFLRG, sa, " ");
+		 vl = concatenate(t, BFLRG, sa, 0, -1, " ");
 
 		 fprintf(fio[1], "%s\n", vl);
 

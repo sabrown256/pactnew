@@ -1211,7 +1211,7 @@ int main(int c, char **v, char **env)
         else if (v[i][0] == '(')
            {commnd_flag = TRUE;
             strcpy(commnd, " ");
-	    SC_concatenate(commnd, MAXLINE, c-i, v+i, " ", TRUE);};
+	    SC_concatenate(commnd, MAXLINE, v+i, 0, c-i, " ", TRUE);};
 
 #ifndef NO_SHELL
     if (!no_banner && !commnd_flag)

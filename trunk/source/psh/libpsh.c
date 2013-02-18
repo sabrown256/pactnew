@@ -300,16 +300,20 @@ void lst_free(char **lst)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CONCATENATE - concatenate tokens SA to string S */
+/* CONCATENATE - concatenate tokens from MN to MX of SA
+ *             - to string make S
+ */
 
-char *concatenate(char *s, int nc, char **sa, char *dlm)
+char *concatenate(char *s, int nc, char **sa,
+		  unsigned int mn, unsigned int mx, char *dlm)
    {int i, ns, nd, n;
 
     if ((s != NULL) && (nc > 0))
        {s[0] = '\0';
 
 	if (sa != NULL)
-	   {for (i = 0; sa[i] != NULL; i++)
+	   {mn = max(mn, 0);
+	    for (i = mn; (sa[i] != NULL) && (i < mx); i++)
 	        vstrcat(s, nc, "%s%s", sa[i], dlm);
 
 	    ns = strlen(s);
