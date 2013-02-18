@@ -3203,7 +3203,7 @@ static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
 /* prepare the function inline documenation */
     t[0] = '\0';
     if (com != NULL)
-       concatenate(t, BFLRG, com, " ");
+       concatenate(t, BFLRG, com, 0, -1, " ");
 
     if (IS_NULL(t) == TRUE)
        {if_call_list(a, BFLRG, dcl, NULL);

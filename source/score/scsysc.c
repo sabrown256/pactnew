@@ -958,7 +958,7 @@ static void _SC_push_subtask(subtask *sub, int it, char *shell,
     nt = SC_array_get_n(tf);
     sa = SC_array_done(tf);
 
-    sc = SC_dconcatenate(nt, sa, " ");
+    sc = SC_dconcatenate(sa, 0, nt, " ");
 
     ps->kind    = TASK_COMPOUND;
     ps->need    = dosh;

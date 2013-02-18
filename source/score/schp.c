@@ -715,7 +715,7 @@ static subtask *_SC_make_group_tasks(char **argv, char **env)
     for (i = 0; i <= n; i++)
         {al = pg[i].argf;
 	 SC_ptr_arr_len(na, al);
-	 SC_concatenate(cmd, MAXLINE, na, al, " ", FALSE);
+	 SC_concatenate(cmd, MAXLINE, al, 0, na, " ", FALSE);
 	 pg[i].command = CSTRSAVE(cmd);
 	 pg[i].kind    = TASK_GROUP;};
 

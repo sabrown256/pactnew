@@ -1420,14 +1420,16 @@ void SC_remove_string(char **sa, int n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_CONCATENATE - concatenate an array of strings A into S
+/* SC_CONCATENATE - concatenate elements MN to MX of an array of strings A
+ *                - into S
  *                - this is the opposite of SC_tokenize
  */
 
-char *SC_concatenate(char *s, int nc, int n, char **a, char *delim, int add)
+char *SC_concatenate(char *s, int nc, char **a,
+		     unsigned int mn, unsigned int mx, char *delim, int add)
    {char *rv;
 
-    rv = PS_concatenate(s, nc, a, delim);
+    rv = PS_concatenate(s, nc, a, mn, mx, delim);
 
     return(rv);}
 
@@ -1440,22 +1442,23 @@ char *SC_concatenate(char *s, int nc, int n, char **a, char *delim, int add)
  *                 - and the user is responsible freeing it
  */
 
-char *SC_dconcatenate(int n, char **a, char *delim)
-   {int i, nc;
+char *SC_dconcatenate(char **a, unsigned int mn, unsigned int mx,
+		      char *delim)
+   {int i, nc, nd;
     char *rv;
     char *s;
 
     rv = NULL;
 
-    if ((a != NULL) && (n > 0))
+    if (a != NULL)
        {nc = 2;
-	for (i = 0; i < n; i++)
-	    nc += strlen(a[i]);
-	nc += n*strlen(delim);
+	nd = strlen(delim);
+	for (i = mn; i < mx; i++)
+	    nc += (strlen(a[i]) + nd);
 
 	s = CMAKE_N(char, nc);
 
-	rv = SC_concatenate(s, nc, n, a, delim, FALSE);};
+	rv = SC_concatenate(s, nc, a, mn, mx, delim, FALSE);};
 
     return(rv);}
 
