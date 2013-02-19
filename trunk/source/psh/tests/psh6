@@ -10,7 +10,8 @@ set dt = 300
 
 set lst = ( 1 3 a c -d -z )
 
-pfor i ($lst) [do-batch -p $np -t $nt -dt $dt]
+#pfor i ($lst) [do-batch -p $np -t $nt -dt $dt]
+pfor i ($lst) [do-run -p $np -t $nt]
    echo "$i" >&! psh6-$i.res
 pend
 
