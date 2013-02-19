@@ -66,6 +66,31 @@ if ($HAVE_OPENMP == TRUE) then
 
    if ("$STD_OPENMP" == unknown) then
 
+      Note $ALog "Look for _OPENMP macro version"
+      cat << EOF >! $Tmp.c
+#include <omp.h>
+#include <stdio.h>
+int main(int c, char **v)
+{int n;
+ printf("%d\n", _OPENMP);
+ return(0);}
+EOF
+
+      flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
+      if ($status == 0) then
+         flog $ALog $Tmp
+         if ($status == 0) then
+            setenv STD_OPENMP `$Tmp`
+         endif
+      endif
+
+      flog $ALog rm -f $Tmp.c $Tmp
+   endif
+
+   if ("$STD_OPENMP" == unknown) then
+
+      Note $ALog "Look for OPENMP 4.0 features"
+
 # version 4.0 adds omp_get_level
       cat << EOF >! $Tmp.c
 #include <omp.h>
@@ -79,12 +104,15 @@ EOF
       flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
       if ($status == 0) then
          setenv STD_OPENMP 4.0
+         setenv STD_OPENMP 201211
       endif
 
       flog $ALog rm -f $Tmp.c $Tmp
    endif
 
    if ("$STD_OPENMP" == unknown) then
+
+      Note $ALog "Look for OPENMP 3.0 features"
 
 # version 3.0 adds omp_set_schedule and omp_get_schedule
       cat << EOF >! $Tmp.c
@@ -100,12 +128,15 @@ EOF
       flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
       if ($status == 0) then
          setenv STD_OPENMP 3.0
+         setenv STD_OPENMP 200805
       endif
 
       flog $ALog rm -f $Tmp.c $Tmp
    endif
 
    if ("$STD_OPENMP" == unknown) then
+
+      Note $ALog "Look for OPENMP 2.5 features"
 
 # version 2.5 adds omp_get_dynamic and omp_get_nested
       cat << EOF >! $Tmp.c
@@ -120,12 +151,15 @@ EOF
       flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
       if ($status == 0) then
          setenv STD_OPENMP 2.5
+         setenv STD_OPENMP 200505
       endif
 
       flog $ALog rm -f $Tmp.c $Tmp
    endif
 
    if ("$STD_OPENMP" == unknown) then
+
+      Note $ALog "Look for OPENMP 2.0 features"
 
 # version 2.0 adds omp_get_wtick and omp_get_wtime
       cat << EOF >! $Tmp.c
@@ -139,13 +173,16 @@ EOF
 
       flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
       if ($status == 0) then
-         setenv STD_OPENMP 2.5
+         setenv STD_OPENMP 2.0
+         setenv STD_OPENMP 200203
       endif
 
       flog $ALog rm -f $Tmp.c $Tmp
    endif
 
+# take it to be version 1.0
    if ("$STD_OPENMP" == unknown) then
+       Note $ALog "Assumed OPENMP 1.0"
        setenv STD_OPENMP 1.0
    endif
 

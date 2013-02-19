@@ -39,7 +39,7 @@ NoteD $Log ""
 if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
    NoteD $Log "                    $msg"
 
-   set List = (psh1 psh2 psh3 psh4)
+   set List = (psh1 psh2 psh3 psh4 psh5 psh6)
 
    Note $Log "Using $PCSH"
 
@@ -53,10 +53,10 @@ if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
       flog $Log set Res = $t.res
       flog $Log set Ref = $RefDir/$t
 
-      flog $Log $RM ${t}*
+      flog $Log $RM ${t}* b.g.${t}.*
 
       set noglob
-      $PCSH $FilesDir/$t |& sed 's|/tmp/psh.*$|xxx|' | grep -v "open display" >&! $Res
+      $PCSH $FilesDir/$t |& sed 's|/tmp/g.psh.*$|xxx|' | grep -v "open display" >&! $Res
       set xstatus = $status
       unset noglob
 
@@ -70,7 +70,7 @@ if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
 
       if ($xstatus == 0) then
          NoteD $Log "ok"
-         flog $Log rm -f $Res $Res.diff
+         flog $Log rm -f $Res.diff log.g.${t}.* ${t}*.res
       else
          flog $Log cat $Res.diff
          flog $Log set nerr = 1

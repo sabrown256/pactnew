@@ -9,7 +9,8 @@ set nt = 8
 set dt = 300
 set n  = 10
 
-pdo i = 0, $n, 1 [do-batch -p $np -t $nt -dt $dt]
+#pdo i = 0, $n, 1 [do-batch -p $np -t $nt -dt $dt]
+pdo i = 0, $n, 1 [do-run -p $np -t $nt]
    echo $i >&! psh5-$i.res
 pend
 
