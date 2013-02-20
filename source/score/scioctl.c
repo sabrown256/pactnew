@@ -12,6 +12,8 @@
 #include "score_int.h"
 #include "scope_proc.h"
 
+static SC_THREAD_LOCK(SC_poll_lock);
+
 int
  _SC_unblock = FALSE;
 
@@ -390,6 +392,8 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
     SC_contextdes hnd;
     SC_evlpdes *old, **ev;
 
+    SC_LOCKON(SC_poll_lock);
+
     ev = _SC_get_ev_loop(-1);
 
     pe->state = a;
@@ -462,6 +466,8 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 /* restore the current event loop descriptor */
     if (ev != NULL)
        *ev = old;
+
+    SC_LOCKOFF(SC_poll_lock);
 
     return(nrdy);}
 

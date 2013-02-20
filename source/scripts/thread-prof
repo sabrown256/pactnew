@@ -1,0 +1,65 @@
+#!/bin/csh -f
+#
+# THREAD-PROF
+#
+
+set dts = 0
+set pid = ""
+#set pid = `pidof mysqld`
+set tgt = proc
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: thread-prof [-h] [-r] <pid>"
+           echo "   h      this help message"
+           echo "   r      just show the raw data"
+           echo "   <pid>  process id of job to profile"
+           echo ""
+           exit(1)
+      case -r:
+           set tgt = raw
+           breaksw
+      default:
+           set pid = $1
+           breaksw
+   endsw
+   shift
+end
+
+set log = /tmp/thread-prof.$$
+
+@ i = 0
+@ n = 1
+while ($i < $n)
+   @ i = $i + 1
+   gdb -ex "set pagination 0" -ex "thread apply all bt" -batch -p $pid >>& $log
+   sleep $dts
+end
+
+switch ($tgt)
+   case raw:
+        cat $log
+        breaksw
+
+   case proc:
+        cat $log                              | \
+        awk 'BEGIN     {s = ""}                 \
+             /^Thread/ {print s;                \
+                        s = "(#"$2","$6"):"}    \
+             /^\#/     {if (s != "")            \
+                           {s = s","$4}         \
+                        else                    \
+                           {s = $4};}           \
+             END       {print s}'             | \
+        sort                                  | \
+        uniq -c                               | \
+        sort -r -n -k 1,1                     | \
+        sed 's|)):||'
+        breaksw
+endsw
+        
+rm -f $log
+
+exit($status)

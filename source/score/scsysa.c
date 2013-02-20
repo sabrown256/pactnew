@@ -141,6 +141,9 @@ void _SC_process_output(int fd, int mask, void *a)
         {job = *(taskdesc **) SC_array_get(state->tasks, i);
 	 if (job != NULL)
 	    {pp = job->pp;
+/*
+fprintf(stderr, "%-16s: %4d %8d (%d/%d)\n", "process_out", SC_current_thread(), pp->id, pp->status, pp->reason);
+*/
 	     if (SC_process_alive(pp))
 	        {if (pp->io[0] == fd)
 		    {nb = pp->n_read;
@@ -199,7 +202,11 @@ void _SC_process_out_reject(int fd, int mask, void *a)
 	 if (job != NULL)
 	    {pp = job->pp;
 	     if (SC_process_alive(pp))
-	        {if ((pp->io[0] == fd) && (SC_status(pp) == SC_RUNNING))
+	        {
+/*
+fprintf(stderr, "%-16s: %4d %8d (%d/%d)\n", "out_reject", SC_current_thread(), pp->id, pp->status, pp->reason);
+*/
+                 if ((pp->io[0] == fd) && (SC_status(pp) == SC_RUNNING))
 		    _SC_rejected_process(as, state, job, mask);};};};
 
     SC_END_ACTIVITY(state);
