@@ -48,10 +48,14 @@ switch ($tgt)
         awk 'BEGIN     {s = ""}                 \
              /^Thread/ {print s;                \
                         s = "(#"$2","$6"):"}    \
-             /^\#/     {if (s != "")            \
-                           {s = s","$4}         \
+             /^\#/     {if ($2 ~ /^0x/)         \
+                           {nm = $4}            \
+			else                    \
+                           {nm = $2};           \
+                        if (s != "")            \
+                           {s = s","nm}         \
                         else                    \
-                           {s = $4};}           \
+                           {s = nm};}           \
              END       {print s}'             | \
         sort                                  | \
         uniq -c                               | \

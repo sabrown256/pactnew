@@ -195,13 +195,23 @@ static char **compute_pdo_limits(char **sa, int is, char *al, int nc)
 
 /* MAKE_PDO_SCRIPT - prepare a shell script for parallel DO invocation */
 
-static int make_pdo_script(char **sa, int is, char *fname, char *shell,
-			   char *pact, char *args, int henv,
+static int make_pdo_script(char **sa, int is, char *fname, int nc,
+			   char *shell, char *pact, char *args, int henv,
 			   char **vo, char **v, int k)
    {int i, ip, co, n, mn, mx, dm;
     char al[BFLRG], r[BFLRG], fn[BFLRG];
+    char dname[BFLRG], lname[BFLRG];
     char *ro, **ta;
     FILE *fp;
+
+    memset(dname, 0, BFLRG);
+    memset(lname, 0, BFLRG);
+
+    snprintf(dname, BFLRG, "tmp-%d", (int) getpid());
+    nstrncpy(lname, BFLRG, path_base(path_tail(fname)), -1);
+    snprintf(fname, nc, "%s/%s", dname, lname);
+
+    mkdir(dname, 0770);
 
     concatenate(al, BFLRG, v, k+1, -1, " ");
 
@@ -216,7 +226,7 @@ static int make_pdo_script(char **sa, int is, char *fname, char *shell,
     fprintf(fp, "#!/bin/csh -f\n");
     fprintf(fp, "unalias *\n");
     fprintf(fp, "@ err = 0\n");
-    fprintf(fp, "set log = log.%s\n", fname);
+    fprintf(fp, "set log = %s/log.%s\n", dname, lname);
     fprintf(fp, "rm -f $log\n");
     fprintf(fp, "touch $log\n");
 
@@ -230,11 +240,13 @@ static int make_pdo_script(char **sa, int is, char *fname, char *shell,
 	     break;};};
 
 /* write one script for each loop iteration */
+    memset(fn, 0, BFLRG);
+    memset(r, 0, BFLRG);
     for (ip = mn; ip < mx; ip += dm)
         {snprintf(fn, BFLRG, "%s.%d", fname, ip);
 	 snprintf(r, BFLRG, "   set %s = %d\n", ta[1], ip);
 
-	 fprintf(fp, "%s $cwd/%s %s >>& $log\n", ta[0], fn, al);
+	 fprintf(fp, "%s %s %s >>& $log\n", ta[0], fn, al);
 	 fprintf(fp, "@ err = $err + $status\n");
 
 	 co = make_shell_script(sa, fn, shell, pact,
@@ -246,7 +258,7 @@ static int make_pdo_script(char **sa, int is, char *fname, char *shell,
     sa[is] = ro;
 
     fprintf(fp, "if ($err == 0) then\n");
-    fprintf(fp, "   unlink $cwd/%s\n", fname);
+    fprintf(fp, "   unlink %s\n", fname);
     fprintf(fp, "endif\n");
 
 /* close the master file */
@@ -323,13 +335,23 @@ static char **compute_pfor_limits(char **sa, int is, char *al, int nc)
 
 /* MAKE_PFOR_SCRIPT - prepare a shell script for parallel FOR invocation */
 
-static int make_pfor_script(char **sa, int is, char *fname, char *shell,
-			    char *pact, char *args, int henv,
+static int make_pfor_script(char **sa, int is, char *fname, int nc,
+			    char *shell, char *pact, char *args, int henv,
 			    char **vo, char **v, int k)
    {int i, ip, co, n;
     char al[BFLRG], r[BFLRG], fn[BFLRG];
+    char dname[BFLRG], lname[BFLRG];
     char *ro, **ta;
     FILE *fp;
+
+    memset(dname, 0, BFLRG);
+    memset(lname, 0, BFLRG);
+
+    snprintf(dname, BFLRG, "tmp-%d", (int) getpid());
+    nstrncpy(lname, BFLRG, path_base(path_tail(fname)), -1);
+    snprintf(fname, nc, "%s/%s", dname, lname);
+
+    mkdir(dname, 0770);
 
     concatenate(al, BFLRG, v, k+1, -1, " ");
 
@@ -341,7 +363,7 @@ static int make_pfor_script(char **sa, int is, char *fname, char *shell,
     fprintf(fp, "#!/bin/csh -f\n");
     fprintf(fp, "unalias *\n");
     fprintf(fp, "@ err = 0\n");
-    fprintf(fp, "set log = log.%s\n", fname);
+    fprintf(fp, "set log = %s/log.%s\n", dname, lname);
     fprintf(fp, "rm -f $log\n");
     fprintf(fp, "touch $log\n");
 
@@ -354,11 +376,14 @@ static int make_pfor_script(char **sa, int is, char *fname, char *shell,
 	    {sa[i][0] = '\0';
 	     break;};};
 
+/* write one script for each list element */
+    memset(fn, 0, BFLRG);
+    memset(r, 0, BFLRG);
     for (ip = 2; ip < n; ip++)
         {snprintf(fn, BFLRG, "%s.%d", fname, ip);
 	 snprintf(r, BFLRG, "   set %s = %s\n", ta[1], ta[ip]);
 
-	 fprintf(fp, "%s $cwd/%s %s >>& $log\n", ta[0], fn, al);
+	 fprintf(fp, "%s %s %s >>& $log\n", ta[0], fn, al);
 	 fprintf(fp, "@ err = $err + $status\n");
 
 	 co = make_shell_script(sa, fn, shell, pact,
@@ -370,7 +395,7 @@ static int make_pfor_script(char **sa, int is, char *fname, char *shell,
     sa[is] = ro;
 
     fprintf(fp, "if ($err == 0) then\n");
-    fprintf(fp, "   unlink $cwd/%s\n", fname);
+    fprintf(fp, "   unlink %s\n", fname);
     fprintf(fp, "endif\n");
 
 /* close the master file */
@@ -426,12 +451,11 @@ static void invoke_script(char **vo, char *shell, char *pact,
 			  char **v, int k, int c)
    {int i, is, co, henv;
     char fname[BFLRG], s[BFLRG], args[BFLRG];
-    char *sname, *p, *pf, **sa;
+    char *sname, *p, **sa;
 
     sname = v[k];
 
     snprintf(fname, BFLRG, "/tmp/g.%s.%d", path_tail(sname), (int) getpid());
-    pf = fname;
 
     co = 0;
 
@@ -466,14 +490,12 @@ static void invoke_script(char **vo, char *shell, char *pact,
  * the current host
  */
 	    if ((is = has_par_const(sa, "pdo")) >= 0)
-	       {pf += 5;
-		co = make_pdo_script(sa, is, pf, shell, pact,
-				     args, henv, vo, v, k);}
+	       co = make_pdo_script(sa, is, fname, BFLRG, shell, pact,
+				     args, henv, vo, v, k);
 		
 	    else if ((is = has_par_const(sa, "pfor")) >= 0)
-	       {pf += 5;
-	        co = make_pfor_script(sa, is, pf, shell, pact,
-				      args, henv, vo, v, k);}
+	       co = make_pfor_script(sa, is, fname, BFLRG, shell, pact,
+				     args, henv, vo, v, k);
 	    else
 	       co = make_shell_script(sa, fname, shell, pact,
 				      args, henv, vo, v, k);}
@@ -483,7 +505,7 @@ static void invoke_script(char **vo, char *shell, char *pact,
 
 	free_strings(sa);};
 
-    vo[co++] = STRSAVE(pf);
+    vo[co++] = STRSAVE(fname);
 
 /* get any command line args destined for the script */
     for (i = k+1; i < c; i++)

@@ -739,7 +739,7 @@ int SC_exec_async_h(char *shell, char **env,
 
 static int _SC_exec(int i, SC_array *out, execdes *ed)
    {int ns, rv, ioi, sto, st, nf, ok;
-    int to, na, dbg;
+    int to, toi, na, dbg;
     int *res;
     char *cmnd, *shell, **env;
     char *cwd;
@@ -802,7 +802,10 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
 
 	SC_catch_event_loop_interrupts(pe, TRUE);
 
-	rv = SC_event_loop(pe, &state, DEFAULT_WAIT);
+	toi = (SC_n_threads > 1) ? 1 : DEFAULT_WAIT;
+        toi = 10;
+
+	rv = SC_event_loop(pe, &state, toi);
 	ns = SC_array_string_append(out, job->inf.out);
 	SC_ASSERT(ns >= 0);
 
