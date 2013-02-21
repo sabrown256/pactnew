@@ -102,7 +102,14 @@ int verifyx(client *cl, int nc, char *ans, char *res)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SRV_SAVE_DB - save the database */
+/* SRV_SAVE_DB - save the database
+ *             - destination is controlled by FNAME
+ *             - examples:
+ *             -     FNAME = NULL   -> <stdout>
+ *             -     FNAME = /a/b/c -> /a/b/c
+ *             -     FNAME = foo    -> <root>.foo.db
+ *             -     FNAME = @      -> <root>.db
+ */
 
 static char *srv_save_db(database *db, char *fname,
 			 char **var, const char *fmt)
@@ -117,6 +124,8 @@ static char *srv_save_db(database *db, char *fname,
     else
        {if (fname[0] == '/')
 	   nstrncpy(s, BFLRG, fname, -1);
+	else if (strcmp(fname, "@") == 0)
+	   snprintf(s, BFLRG, "%s.db", db->cl->root);
         else
 	   snprintf(s, BFLRG, "%s.%s.db", db->cl->root, fname);
 
@@ -279,7 +288,7 @@ static void srv_setup(srvdes *sv, int *ptmax, int *pdt)
  *                -    <inf>    := stdin | stdout | stderr | <db> | <file>
  *                -    <db>     := <identifier>
  *                -    <file>   := <full-path>
- *                -     <var>   := variable name to be saved
+ *                -    <var>    := variable name to be saved
  */
 
 static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
@@ -287,6 +296,7 @@ static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
    {int lo, no;
     char *p, *fname, *fmt, **opt, **var;
     static char *defmt[] = { "%s=%s", "setenv %s %s ;", "export %s=%s ;" };
+    static char *def_db = "@";
 
     p     = s;
     fname = NULL;
@@ -314,7 +324,9 @@ static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
 	       {fmt = defmt[2];
 		lo++;}
 	    else if (strcmp(opt[lo], "db") == 0)
-	       lo++;};
+	       {fmt   = defmt[0];
+		fname = def_db;
+		lo++;};};
 
 /* determine file */
 	if ((no - lo > 0) && (opt[lo] != NULL))
@@ -344,7 +356,7 @@ static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,
  *         -    <inf>    := stdin | stdout | stderr | <db> | <file>
  *         -    <db>     := <identifier>
  *         -    <file>   := <full-path>
- *         -     <var>   := variable name to be saved
+ *         -    <var>    := variable name to be saved
  *         - if <inf> is stdout or stderr dumps to that device
  *         - else if <inf> is full path saves to specified file
  *         - otherwise database will be named <root>.<db>.db

@@ -309,7 +309,7 @@ char *concatenate(char *s, int nc, char **sa,
    {int i, ns, nd, n;
 
     if ((s != NULL) && (nc > 0))
-       {s[0] = '\0';
+       {memset(s, 0, nc);
 
 	if (sa != NULL)
 	   {mn = max(mn, 0);

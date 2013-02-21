@@ -20,6 +20,7 @@ set Date     = `date`
 set TTY      = ""
 set Quiet    = FALSE
 set Info     = ""
+set TDir     = $cwd
 
 # msub controls
 set TimeMax  = 10
@@ -34,6 +35,10 @@ set Cmnd   = ""
 set EnvVar = ""
 while ($#argv > 0)
    switch ($1)
+      case -d:
+           shift
+           set TDir = $1
+           breaksw
       case -dt:
            shift
            set TimeMax = $1
@@ -50,11 +55,12 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: do-batch [-dt #] [-e <var> <value>] [-f <file>] [-h]"
-           echo "                [-H <host>] [-m] [-o <file>] [-p #]"
+           echo "Usage: do-batch [-d <dir>] [-dt #] [-e <var> <value>] [-f <file>]"
+           echo "                [-h] [-H <host>] [-m] [-o <file>] [-p #]"
            echo "                [-q] [-t #] [-w]"
            echo ""
            echo "Options:"
+           echo "     d  - temporary file directory"
            echo "     dt - time limit in seconds"
            echo "     e  - add environment variables to the batch script"
            echo "     f  - file containing batch control specifications"
@@ -143,7 +149,7 @@ endif
 
 # WRITE_SCRIPT
 
-set Script = $cwd/b.$Prob.$$
+set Script = $TDir/b.$Prob.$$
 set Log    = $Script.err
 if ("$TTY" == "") then
    set TTY = $Script.out
@@ -168,7 +174,7 @@ set TimeMax = `timer -t $TimeMax`
 Note $Script '# MSUB -l walltime='$TimeMax
 Note $Script ''
 
-Note $Script 'cd' $cwd
+Note $Script "cd $cwd >& /dev/null"
 Note $Script ''
 
 Note $Script 'set TTY = "'$TTY'"'

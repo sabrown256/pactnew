@@ -1156,7 +1156,7 @@ switch ($Cmnd)
         endif
 
 # save the database before building dmake because import-api needs it
-	flog $Log $PERDB -l save:
+	flog $Log $PERDB -l save:db:
 
 # using existing dmake/smake build new dmake
         Separator $Log
