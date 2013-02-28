@@ -58,6 +58,7 @@ link :
 	pact scrinstall
 
 install :
+	cp do-batch.${JOBS_System} ${BinDir}/do-batch
 	pact link
 
 #

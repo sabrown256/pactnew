@@ -25,6 +25,7 @@ setenv ENV_VARS "RUN_SIGNATURE_DB SITE_SIGNATURE_DB \
                  FC_Exe FC_Flags \
                  FC_Debug_Default FC_Optimize_Default \
                  DP_Inc DP_Lib DP_RPath DP_Path \
+                 JOBS_System \
                  LIB LibM_Lib LibM_RPath \
                  MDG_Inc MDG_Lib MDG_RPath MDG_Path \
                  MAKE_Exe \
@@ -83,6 +84,10 @@ Tool MAKE {
 }
 
 Tool GMAKE {
+}
+
+Tool JOBS {
+   System = loner
 }
 
 # PY contains the specifics of the python versions
