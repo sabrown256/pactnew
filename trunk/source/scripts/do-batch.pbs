@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# DO-BATCH.SLURM - run a batch job on a site using MOAB and SLURM
+# DO-BATCH.PBS - run a batch job on a site using MOAB and PBS
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -10,8 +10,8 @@
 
 unalias *
 
-set tag = MSUB
-set sub = msub
+set tag = PBS
+set sub = qsub
 
 set hst    = none
 set prob   = unknown
@@ -173,7 +173,8 @@ case group:
 
    setenv OMP_NUM_THREADS $NThreads
 
-   mpi-io-run srun -i all -I -c 1 -n 1 -p $pool $exe $prob >>& $TTY &
+# GOTCHA: what is PBS version of srun/salloc 
+#   mpi-io-run srun -i all -I -c 1 -n 1 -p $pool $exe $prob >>& $TTY &
 
    exit($err)
 
