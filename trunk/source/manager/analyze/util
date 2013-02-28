@@ -158,5 +158,8 @@ dbmget $ALog AR_Exe     = $AR_Exe^       \
              UPDATE     = $UPDATE^       \
              INSTALL    = $INSTALL
 
+# look for job schedulers
+source $AnaDir/jobs
+
 exit(0)
 

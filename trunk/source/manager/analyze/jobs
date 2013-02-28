@@ -1,0 +1,70 @@
+#!/bin/csh -f
+#
+# JOBS - analyze platform job scheduler
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $ALog "----- analyze/jobs -----"
+Note $ALog "Analyze: job scheduler"
+Note $ALog ""
+
+dbmget $ALog JOBS_System   =\? "loner"^  \
+             JOBS_Exe      =\? "none"^   \
+             JOBS_Path     =\? "none"
+
+setenv HAVE_JOBS_PBS      no
+setenv HAVE_JOBS_MOAB     no
+setenv HAVE_JOBS_SLURM    no
+
+set avail = ""
+
+set inf = ( `which qsub` )
+if (-x "$inf") then
+   setenv HAVE_JOBS_PBS yes
+   set avail = ( $avail pbs )
+endif
+
+set inf = ( `which msub` )
+if (-x "$inf") then
+   setenv HAVE_JOBS_MOAB yes
+   set avail = ( $avail moab )
+endif
+
+set inf = ( `which srun` )
+if (-x "$inf") then
+   setenv HAVE_JOBS_SLURM yes
+   set avail = ( $avail slurm )
+endif
+
+if (($HAVE_JOBS_SLURM == yes) && ($HAVE_JOBS_MOAB == yes)) then
+   set exe = `which msub`
+   setenv JOBS_Path    $exe:h
+   setenv JOBS_Exe     $exe:t
+   setenv JOBS_System  slurm
+   NoteD $ALog "      has job schedulers $avail (using slurm)"
+else if ($HAVE_JOBS_PBS == yes) then
+   set exe = `which qsub`
+   setenv JOBS_Path    $exe:h
+   setenv JOBS_Exe     $exe:t
+   setenv JOBS_System  pbs
+   NoteD $ALog "      has job schedulers $avail (using pbs)"
+else
+   setenv JOBS_Path    none
+   setenv JOBS_Exe     none
+   setenv JOBS_System  loner
+   NoteD $ALog "      no job schedulers"
+endif
+
+NoteD $ALog ""
+
+# export the results
+   dbmset $ALog JOBS_System      = $JOBS_System^         \
+                JOBS_Exe         = $JOBS_Exe^            \
+                JOBS_Path        = $JOBS_Path
+
+exit(0)
+

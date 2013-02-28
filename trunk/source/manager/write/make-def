@@ -59,7 +59,7 @@ dbmget $Log AR_IFlag^               \
             IncDir^                 \
             InstBase^               \
             INSTALL^                \
-            STD_IPC^                \
+            JOBS_System^            \
             Lex_Exe^                \
             Lex_Flags^              \
             LIB^                    \
@@ -87,6 +87,7 @@ dbmget $Log AR_IFlag^               \
             Ranlib_Exe^             \
             RPATH^                  \
             PARALLEL_COMM_METH^     \
+            STD_IPC^                \
             SUFFIXES^               \
             Sys^                    \
             SysDir^                 \
@@ -536,6 +537,9 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'OD           = DefaultG'
     Note $STDOUT 'ODC          = ${C${${OD}}}'
     Note $STDOUT 'ODF          = ${F${${OD}}}'
+    Note $STDOUT ""
+
+    Note $STDOUT "JOBS_System  = $JOBS_System"
     Note $STDOUT ""
 
 # get the entries for RPATH
