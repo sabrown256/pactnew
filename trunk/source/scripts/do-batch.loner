@@ -8,87 +8,91 @@
 
 unalias *
 
-set HostOS  = `uname -s`
-set HostHW  = `uname -m`
+set tag = BATCH
+set sub = ssh
 
-set Host     = `hostname`
-set Prob     = unknown
-set NNodes   = 1
+set hst    = `hostname`
+set prob   = unknown
+set ntfy   = "n"
+set datest = `date`
+set TTY    = ""
+set pool   = ""
+set quiet  = FALSE
+set info   = ""
+set tdir   = $cwd
+set tgt    = batch
+
+# $sub controls
+set tmx  = 10
+
+# dual controls
 set NThreads = 1
-set NCpus    = 1
-set TimeMax  = 10
-set Notify   = "n"
-set Date     = `date`
-set TTY      = ""
-set Quiet    = FALSE
-set Literal  = FALSE
-set Info     = ""
-
-# use environment variable so that do-run can set this if needed
-if ($?Wrap == 0) then
-   setenv Wrap  ""
-endif
+set NNodes   = 1
 
 alias Note 'echo \!\!:2-$ >>& \!\!:^'
 
-set Cmnd   = ""
-set EnvVar = ""
+set cmdln = ( $0 $argv )
+set cmnd  = ""
+set evar  = ""
+
 while ($#argv > 0)
    switch ($1)
-      case -b:
+      case -a:
            shift
+           set cmnd = ( $cmnd $1 )
+           breaksw
+      case -d:
+           shift
+           set tdir = $1
            breaksw
       case -dt:
            shift
-           set TimeMax = $1
+           set tmx = `timer -t $1`
            breaksw
       case -e:
            shift
-           set EnvVar = ( $EnvVar $1 )
-           set EnvVar = ( $EnvVar $2 )
+           set evar = ( $evar $1 )
+           set evar = ( $evar $2 )
            shift
            breaksw
       case -f:
            shift
-           set Info = $1
+           set info = $1
+           breaksw
+      case -g:
+           set tgt = group
            breaksw
       case -h:
            echo ""
-           echo "Usage: do-batch [-b <bank>] [-dt #] [-e <var> <value>] [-f <file>] [-h]"
-           echo "                [-H <host>] [-l] [-m] [-n #] [-o <file>] [-p #]"
-           echo "                [-q] [-t #] [-w]"
+           echo "Usage: do-batch [-a <args>] [-d <dir>] [-dt #] [-e <var> <value>]"
+           echo "                [-f <file>] [-g] [-h] [-H <host>] [-m]"
+           echo "                [-o <file>] [-p #] [-prt <queue>] [-q] [-t #] [-w]"
            echo ""
            echo "Options:"
-           echo "     b  - which bank to use (ignored)"
-           echo "     dt - time limit in seconds"
-           echo "     e  - add environment variables to the batch script"
-           echo "     f  - file containing batch control specifications"
-           echo "     h  - this help message"
-           echo "     H  - host on which to run"
-           echo "     l  - run literal command (needed by debuggers)"
-           echo "     m  - notify by mail"
-           echo "     n  - number of nodes to use"
-           echo "     o  - set the name of the output file"
-           echo "     p  - number of processes to use"
-           echo "     q  - suppress do-batch messages in the logs"
-           echo "     t  - number of threads"
-           echo "     w  - notify via the write utiliy"
+           echo "     a   - quoted string with arguments for the command"
+           echo "     d   - temporary file directory"
+           echo "     dt  - time limit in S or M:S or H:M:S form"
+           echo "     e   - add environment variables to the batch script"
+           echo "     f   - file containing batch control specifications"
+           echo "     g   - run group of jobs in preallocated pool of nodes"
+           echo "     h   - this help message"
+           echo "     H   - host on which to run"
+           echo "     m   - notify by mail"
+           echo "     o   - set the name of the output file"
+           echo "     p   - number of processes to use"
+           echo "     prt - batch pool/queue/partition to use"
+           echo "     q   - suppress do-batch messages in the logs"
+           echo "     t   - number of threads"
+           echo "     w   - notify via the write utiliy"
            echo ""
            exit(1)
            breaksw
       case -H:
            shift
-           set Host = $1
-           breaksw
-      case -l:
-           set Literal = TRUE
+           set hst = $1
            breaksw
       case -m:
-           set Notify = "m"
-           breaksw
-      case -n:
-           shift
-           set NNodes = $1
+           set ntfy = "m"
            breaksw
       case -o:
            shift
@@ -96,162 +100,236 @@ while ($#argv > 0)
            breaksw
       case -p:
            shift
-           set NCpus = $1
+           set NNodes = $1
+           breaksw
+      case -prt:
+           shift
+           set pool = $1
            breaksw
       case -q:
-           set Quiet = TRUE
+           set quiet = TRUE
            breaksw
       case -t:
            shift
            set NThreads = $1
            breaksw
       case -w:
-           set Notify = "w"
+           set ntfy = "w"
            breaksw
       default:
-           set Prob = $1
-           set Prob = $Prob:t
+           set prob = $1
+
+           shift
+           set cmnd = ( $prob $cmnd )
            while ($#argv > 0)
-              set Cmnd = ( $Cmnd $1 )
+              set cmnd = ( $cmnd $1 )
               shift
            end
 
+           set prob = $prob:t
            break
            breaksw
    endsw
    shift
 end
 
+switch ($tgt)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GROUP - srun a bunch of jobs in a pool already salloc'd
+
+case group:
+   set root = $cwd
+   set tdir = `dirname $0`
+   set scr  = $0:t
+   set prob = ""
+
+   set exe = $prob[1]
+
+   cd $root >& /dev/null
+
+# sleep until there are fewer jobs running than nodes
+   pushd $tdir >& /dev/null
+   @ nn = $SLURM_JOB_NUM_NODES
+   @ nr = $nn + 1
+   while ($nr > $nn)
+      touch running.group
+      @ nr = `ls -1 running.* | wc -l`
+      @ nr = $nr - 1
+      rm -f running.group
+      if ($nr > $nn) then
+         sleep 10
+      endif
+   end
+   popd >& /dev/null
+
+   set TTY = "$tdir/b.$scr.$$.out"
+   rm -f $TTY
+   touch $TTY
+
+   echo "Job      : $exe $prob" >> $TTY
+   echo "MPI Job  : no" >> $TTY
+   echo "Date     : $datest" >> $TTY
+   echo "----------------------------------------------------" >> $TTY
+
+   nohup $sub $hst ( setenv OMP_NUM_THREADS $NThread ; $exe $prob ) >>& $TTY &
+
+   exit($err)
+
+   breaksw
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # PROCESS_INFO_FILE
+
+case batch:
 
 # Batch info file may contain any of the following:
 #   host = <host>
 #   time = <time>
 # Note: time is in seconds
 
-if ($Info != "") then
-   set Batch    = `awk '$1 == "batch"  { print $3 }' $Info`
-   set tHost    = `awk '$1 == "host"   { print $3 }' $Info`
-   set tTimeMax = `awk '$1 == "time"   { print $3 }' $Info`
-   set HaveMPI  = `awk '$1 == "mpi"    { print $3 }' $Info`
-   set EnvVar   = `awk '$1 == "setenv" { printf("%s %s\n", $2, $3); }' $Info`
+   if ($info != "") then
+      set Batch   = `awk '$1 == "batch"  { print $3 }' $info`
+      set lhst    = `awk '$1 == "host"   { print $3 }' $info`
+      set ltmx    = `awk '$1 == "time"   { print $3 }' $info`
+      set HaveMPI = `awk '$1 == "mpi"    { print $3 }' $info`
+      set evar    = `awk '$1 == "setenv" { printf("%s %s\n", $2, $3); }' $info`
 
-   if ("$tHost" != "") then
-      set Host = $tHost
-   endif
-   if ("$tTimeMax" != "") then
-      set TimeMax = $tTimeMax
-   endif
-   if ("$HaveMPI" != "") then
-      setenv Wrap `where mpi-io-wrap | head -n 1`
-   endif
+      if ("$lhst" != "") then
+         set hst = $lhst
+      endif
+      if ("$ltmx" != "") then
+         set tmx = `timer -t $ltmx`
+      endif
+      unset ltmx
+      unset lhst
 
-# Note: count on the Info file having been automatically generated
+# Note: count on the info file having been automatically generated
 # in a script that may never regain control to remove it
-   rm -f $Info
+      rm -f $info
 
-endif
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # WRITE_SCRIPT
 
-set Script = $cwd/b.$Prob.$$
-set Log    = $Script.err
-if ("$TTY" == "") then
-   set TTY = $Script.out
-endif
-
-rm -f $Script
-touch $Script
-
-Note $Script '#\!/bin/csh'
-Note $Script '# BATCH -c' "$Host"
-Note $Script '# BATCH -o' $Log
-if (($NNodes > 1) || ($NCpus > 1)) then
-   Note $Script '# BATCH -ln' $NNodes -g $NCpus
-else if ("$HostOS" == "Linux") then
-   Note $Script '# BATCH -ln 1'
-endif
-Note $Script '# BATCH -x'
-Note $Script '# BATCH -ro -eo'
-Note $Script '# BATCH -tM' $TimeMax
-Note $Script ''
-
-Note $Script 'cd' $cwd
-Note $Script ''
-
-Note $Script 'set TTY = "'$TTY'"'
-Note $Script 'rm -f $TTY'
-Note $Script 'touch $TTY'
-Note $Script ''
-
-if ($Quiet == FALSE) then
-   if ("$Wrap" != "") then
-      Note $Script 'echo "Batch Job: '$Wrap $Cmnd'" >> $TTY'
-      Note $Script 'echo "MPI Job  : yes" >> $TTY'
-   else
-      Note $Script 'echo "Batch Job: '$Cmnd'" >> $TTY'
-      Note $Script 'echo "MPI Job  : no" >> $TTY'
+   set scr = $tdir/b.$prob.$$
+   set log = $scr.err
+   if ("$TTY" == "") then
+      set TTY = $scr.out
    endif
-   Note $Script 'echo "Date     : '$Date'" >> $TTY'
-   Note $Script 'echo "----------------------------------------------------" >> $TTY'
-   Note $Script ''
-endif
+
+   rm -f $scr
+   touch $scr
+
+   Note $scr '#\!/bin/csh'
+   Note $scr "#"
+   Note $scr "# Script generated by do-batch from"
+   Note $scr "# command line: $cmdln"
+   Note $scr "#"
+   Note $scr ""
+
+   Note $scr "# $tag -o $log"
+   if ("$pool" != "") then
+      Note $scr "# $tag -q $pool"
+   endif
+
+# setup resources
+   set res = ""
+
+   if (($NThreads > 1) || ($NNodes > 1)) then
+      set res = "nodes=$NNodes"
+      set res = "${res}:ppn=$NThreads"
+   endif
+
+# convert time to seconds
+   set tmx = `timer -t $tmx`
+   set res = "${res}:walltime=$tmx"
+
+# add the resource request
+   Note $scr "# $tag -l $res"
+   Note $scr ''
+
+   Note $scr 'unalias *'
+   Note $scr ''
+
+   Note $scr "cd $tdir >& /dev/null"
+   Note $scr ''
+
+   Note $scr 'set TTY = "'$TTY'"'
+   Note $scr 'rm -f $TTY'
+   Note $scr 'touch $TTY'
+   Note $scr ''
+
+   if ($quiet == FALSE) then
+      Note $scr 'echo "Batch Job: '$cmnd'" >> $TTY'
+      Note $scr 'echo "MPI Job  : no" >> $TTY'
+      Note $scr 'echo "Date     : '$datest'" >> $TTY'
+      Note $scr 'echo "----------------------------------------------------" >> $TTY'
+      Note $scr ''
+   endif
 
 # add specified environment variables
-while ($#EnvVar > 1)
-   set Var = $EnvVar[1]
-   set Val = $EnvVar[2]
-   shift EnvVar
-   shift EnvVar
-   Note $Script "setenv $Var $Val" '>>& $TTY'
-end
-Note $Script ''
+   while ($#evar > 1)
+      set Var = $evar[1]
+      set Val = $evar[2]
+      shift evar
+      shift evar
+      Note $scr "setenv $Var $Val" '>>& $TTY'
+   end
+   Note $scr ''
 
-Note $Script "$Cmnd" '>>& $TTY'
-Note $Script 'set Err = $status'
-Note $Script ''
+   Note $scr "setenv OMP_NUM_THREADS $NThreads"
+   Note $scr ''
 
-if ($Quiet == FALSE) then
-   Note $Script 'echo "----------------------------------------------------" >> $TTY'
-   Note $Script ''
-   Note $Script 'if ($Err == 0) then'
-   Note $Script '   set ErrMsg = "'$Prob' succeeded"'
-   Note $Script 'else'
-   Note $Script '   set ErrMsg = "'$Prob' failed ($Err)"'
-   Note $Script 'endif'
-   Note $Script 'echo "$ErrMsg" >> $TTY'
-   Note $Script ''
-endif
+   Note $scr "do-run -p $NNodes $cmnd" '>>& $TTY'
+   Note $scr 'set Err = $status'
+   Note $scr ''
 
-switch ($Notify)
-   case m:
-        Note $Script '(echo "BATCH job '$Prob' has finished in '$cwd'" ; \'
-        Note $Script ' echo "$ErrMsg" ) | \'
-        Note $Script 'mail "'$USER'"'
-        breaksw
-   case w:
-        Note $Script '(echo "BATCH job '$Prob' has finished in '$cwd'" ; \'
-        Note $Script ' echo "$ErrMsg" ) | \'
-        Note $Script 'write "'$USER'"'
-        breaksw
-        breaksw
-endsw
+   if ($quiet == FALSE) then
+      Note $scr 'echo "----------------------------------------------------" >> $TTY'
+      Note $scr ''
+      Note $scr 'if ($Err == 0) then'
+      Note $scr '   set ErrMsg = "'$prob' succeeded"'
+      Note $scr 'else'
+      Note $scr '   set ErrMsg = "'$prob' failed ($Err)"'
+      Note $scr 'endif'
+      Note $scr 'echo "$ErrMsg" >> $TTY'
+      Note $scr ''
+   endif
+
+   switch ($ntfy)
+      case m:
+           Note $scr '(echo "BATCH job for '$prob' has finished in '$cwd'" ; \'
+           Note $scr ' echo "$ErrMsg" ) | \'
+           Note $scr 'mail "'$USER'"'
+           breaksw
+      case w:
+           Note $scr '(echo "BATCH job for '$prob' has finished in '$cwd'" ; \'
+           Note $scr ' echo "$ErrMsg" ) | \'
+           Note $scr 'write "'$USER'"'
+           breaksw
+           breaksw
+   endsw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # EXECUTE
 
-chmod 750 $Script
-nohup ssh $Host $Script >&! $Log
+   chmod 750 $scr
+   ( nohup $sub $hst $scr ) |& cat
+   breaksw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+endsw
 
 exit($status)
