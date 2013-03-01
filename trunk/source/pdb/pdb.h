@@ -276,7 +276,7 @@ typedef int (*PFSymDelay)(PDBfile *file, int ad, char *name, char *type,
 
 
 /*
- * #bind derived PD_data_std_i integer SC_ENUM_I SC_ENUM_I PD_GENERIC
+ * #bind derived PD_data_std_i integer SC_ENUM_I SC_ENUM_I PD_NO_STD
  */
 
 enum e_PD_data_std_i
@@ -296,7 +296,7 @@ enum e_PD_data_std_i
 typedef enum e_PD_data_std_i PD_data_std_i;
 
 /*
- * #bind derived PD_data_algn_i integer SC_ENUM_I SC_ENUM_I PD_GENERIC
+ * #bind derived PD_data_algn_i integer SC_ENUM_I SC_ENUM_I PD_NO_ALGN
  */
 
 enum e_PD_data_algn_i
