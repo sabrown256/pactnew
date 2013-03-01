@@ -24,10 +24,10 @@ set info   = ""
 set tdir   = $cwd
 set tgt    = batch
 
-# msub controls
+# $sub controls
 set tmx  = 10
 
-# dual srun/msub controls
+# dual controls
 set NThreads = 1
 set NNodes   = 1
 

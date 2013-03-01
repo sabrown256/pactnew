@@ -2,9 +2,6 @@
 #
 # DO-BATCH.PBS - run a batch job on a site using MOAB and PBS
 #
-# Source Version: 3.0
-# Software Release #: LLNL-CODE-422942
-#
 # include "cpyright.h"
 #
 
@@ -24,10 +21,10 @@ set info   = ""
 set tdir   = $cwd
 set tgt    = batch
 
-# msub controls
+# $sub controls
 set tmx  = 10
 
-# dual srun/msub controls
+# dual controls
 set NThreads = 1
 set NNodes   = 1
 
