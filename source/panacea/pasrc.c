@@ -225,7 +225,7 @@ void _PA_init_queue(PA_src_variable *svp, double t, double dt)
     pd       = svp->queue;
     
 /* lookup up the PA_variable that this PA_src_variable is controlling
- * and set the conversion from CGS PA_gs.unitss to INTERNAL PA_gs.unitss
+ * and set the conversion from CGS units to INTERNAL units
  */
     strcpy(var_name, svp->name);
     token = SC_strtok(var_name, "(", s);

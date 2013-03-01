@@ -18,6 +18,7 @@ set prob   = unknown
 set ntfy   = "n"
 set datest = `date`
 set TTY    = ""
+set pool   = ""
 set quiet  = FALSE
 set info   = ""
 set tdir   = $cwd
@@ -48,7 +49,7 @@ while ($#argv > 0)
            breaksw
       case -dt:
            shift
-           set tmx = $1
+           set tmx = `timer -t $1`
            breaksw
       case -e:
            shift
@@ -67,23 +68,24 @@ while ($#argv > 0)
            echo ""
            echo "Usage: do-batch [-a <args>] [-d <dir>] [-dt #] [-e <var> <value>]"
            echo "                [-f <file>] [-g] [-h] [-H <host>] [-m]"
-           echo "                [-o <file>] [-p #] [-q] [-t #] [-w]"
+           echo "                [-o <file>] [-p #] [-prt <queue>] [-q] [-t #] [-w]"
            echo ""
            echo "Options:"
-           echo "     a  - quoted string with arguments for the command"
-           echo "     d  - temporary file directory"
-           echo "     dt - time limit in seconds"
-           echo "     e  - add environment variables to the batch script"
-           echo "     f  - file containing batch control specifications"
-           echo "     g  - run group of jobs in preallocated pool of nodes"
-           echo "     h  - this help message"
-           echo "     H  - host on which to run"
-           echo "     m  - notify by mail"
-           echo "     o  - set the name of the output file"
-           echo "     p  - number of processes to use"
-           echo "     q  - suppress do-batch messages in the logs"
-           echo "     t  - number of threads"
-           echo "     w  - notify via the write utiliy"
+           echo "     a   - quoted string with arguments for the command"
+           echo "     d   - temporary file directory"
+           echo "     dt  - time limit in S or M:S or H:M:S form"
+           echo "     e   - add environment variables to the batch script"
+           echo "     f   - file containing batch control specifications"
+           echo "     g   - run group of jobs in preallocated pool of nodes"
+           echo "     h   - this help message"
+           echo "     H   - host on which to run"
+           echo "     m   - notify by mail"
+           echo "     o   - set the name of the output file"
+           echo "     p   - number of processes to use"
+           echo "     prt - batch pool/queue/partition to use"
+           echo "     q   - suppress do-batch messages in the logs"
+           echo "     t   - number of threads"
+           echo "     w   - notify via the write utiliy"
            echo ""
            exit(1)
            breaksw
@@ -101,6 +103,10 @@ while ($#argv > 0)
       case -p:
            shift
            set NNodes = $1
+           breaksw
+      case -prt:
+           shift
+           set pool = $1
            breaksw
       case -q:
            set quiet = TRUE
@@ -141,7 +147,6 @@ case group:
    set tdir = `dirname $0`
    set scr  = $0:t
    set prob = ""
-   set pool = foo
 
    set exe = $prob[1]
 
@@ -173,7 +178,11 @@ case group:
 
    setenv OMP_NUM_THREADS $NThreads
 
-   mpi-io-run srun -i all -I -c 1 -n 1 -p $pool $exe $prob >>& $TTY &
+   if ("$pool" == "") then
+      mpi-io-run srun -i all -I -c 1 -n 1 $exe $prob >>& $TTY &
+   else
+      mpi-io-run srun -i all -I -c 1 -n 1 -p $pool $exe $prob >>& $TTY &
+   endif
 
    exit($err)
 
@@ -202,7 +211,7 @@ case batch:
          set hst = $lhst
       endif
       if ("$ltmx" != "") then
-         set tmx = $ltmx
+         set tmx = `timer -t $ltmx`
       endif
       unset ltmx
       unset lhst
@@ -235,14 +244,24 @@ case batch:
    Note $scr ""
 
    Note $scr "# $tag -o $log"
+   if ("$pool" != "") then
+      Note $scr "# $tag -q $pool"
+   endif
+
+# setup resources
+   set res = ""
+
    if (($NThreads > 1) || ($NNodes > 1)) then
-      Note $scr "# $tag -l nodes=$NNodes"
-#      Note $scr "# $tag -l nodes=${NNodes}:ppn=$NThreads"
+      set res = "nodes=$NNodes"
+      set res = "${res}:ppn=$NThreads"
    endif
 
 # convert time to seconds
    set tmx = `timer -t $tmx`
-   Note $scr "# $tag -l walltime=$tmx"
+   set res = "${res}:walltime=$tmx"
+
+# add the resource request
+   Note $scr "# $tag -l $res"
    Note $scr ''
 
    Note $scr 'unalias *'

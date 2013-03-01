@@ -906,7 +906,7 @@ void PA_wrrstrth(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_gs.donE - gracefully leave the generator */
+/* PA_DONE - gracefully leave the generator */
 
 void PA_done(void)
    {

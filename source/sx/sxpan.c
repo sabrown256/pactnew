@@ -408,14 +408,14 @@ static int *_SX_index_ptr(SS_psides *si, object **pargl, char *msg)
  *              - (define-variable <name> <type> <init_val> <init_func>
  *              -            <attrribute_spec> ... ATTRIBUTE
  *              -            <dimension_spec> ... DIMENSION
- *              -            <PA_gs.units_spec> ... UNITS
+ *              -            <unit_spec> ... UNITS
  *              -            [<ptr to data>])
  *              -
  *              - <attribute_spec> := <attribute_id> <attribute_val>
  *              - <dimension_spec> := <ptr to # values> |
  *              -                     PA_gs.dul <ptr to lower> <ptr to upper> |
  *              -                     PA_gs.don <ptr to offset> <ptr to # elem>
- *              - <PA_gs.units_spec>      := <PA_gs.units_index> | PER
+ *              - <unit_spec>      := <PA_gs.units_index> | PER
  *              -
  *              - The valid attribute_id's are:
  *              -      PA_INFO_SCOPE, PA_INFO_CLASS, PA_INFO_PERSIST,
