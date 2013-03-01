@@ -374,13 +374,13 @@ static void _PC_close_member_n(PROCESS *pp)
 #if defined(HAVE_POSIX_SYS)
     SC_thread_proc *ps;
 
-    ps = pp->tstate;
-
     PC_close(pp);
 
 /* conditional diagnostic messages */
-    if (ps->debug)
-       {fclose(ps->diag);};
+    if (pp != NULL)
+       {ps = pp->tstate;
+	if (ps->debug)
+	   {fclose(ps->diag);};};
 
 #endif
 

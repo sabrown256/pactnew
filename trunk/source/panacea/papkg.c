@@ -55,7 +55,7 @@ void PA_gencmd(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_DEFUN - define PA_gs.unitss for PANACEA */
+/* PA_DEFUN - define units for PANACEA */
 
 void PA_defunc(void )
    {

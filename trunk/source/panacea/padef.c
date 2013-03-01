@@ -135,7 +135,7 @@ PA_dimens *PA_def_var_dimension(char *name, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_DEF_VAR_UNIT - define variable PA_gs.unitss */
+/* PA_DEF_VAR_UNIT - define variable units */
 
 pcons *PA_def_var_units(char *name, ...)
    {pcons *unit_alist;

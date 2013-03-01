@@ -531,7 +531,7 @@ void PA_physical_constants_int(void)
 /* electron mass in g */
     PM_c.m_e     *= PA_gs.units[G];
 
-/* atomic mass PA_gs.units in g */
+/* atomic mass unit in g */
     PM_c.m_a     *= PA_gs.units[G];
 
 /* Boltzman constant (erg/K) */

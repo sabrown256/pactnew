@@ -195,7 +195,7 @@ static int _PA_init_time_plot(PA_plot_request *pr,
     if ((pp == NULL) && (pr->data == NULL))
        return(itu);
 
-/* this is a way of handling the PA_gs.units problem in the post-processor */
+/* this is a way of handling the units problem in the post-processor */
     if (pp != NULL)
        {dtype = pp->desc->type;
         pr->data_type = SC_type_id(dtype, FALSE);
@@ -212,7 +212,7 @@ static int _PA_init_time_plot(PA_plot_request *pr,
 
 /* splice the PSEUDO variable time plots into the package pseudo lists
  * this must be done before the package initializers are called because
- * they are supposed to have the opportPA_gs.unitsy to work over the PSEUDO
+ * they are supposed to have the opportunity to work over the PSEUDO
  * plot requests before anything is plotted
  */
        {pp = PA_inquire_variable(pr->range_name);

@@ -249,8 +249,8 @@ char *PA_cpp_value_to_name(char *group, ...)
 /*--------------------------------------------------------------------------*/
 
 /* PA_CPP_DEFAULT - install panacea cpp names into tables
- *                - must be called after PA_defun (defines PA_gs.unitss) and
- *                - PA_init_strings (defines PA_gs.unitss)
+ *                - must be called after PA_defun (defines units) and
+ *                - PA_init_strings (defines units)
  */
 
 void PA_cpp_default(void)
@@ -434,7 +434,7 @@ void PA_cpp_default(void)
     PA_cpp_add_name("STATIC",  PA_gs.cpp_allocation, STATIC);
     PA_cpp_add_name("DYNAMIC", PA_gs.cpp_allocation, DYNAMIC);
 
-/* the PA_gs.unitss macros are actually references to variables,
+/* the units macros are actually references to variables,
  * If the variable were to change values, (which it shouldn't)
  * These names would be wrong.
  */
