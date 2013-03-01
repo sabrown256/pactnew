@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 04/05/2012
+MOD: 03/01/2013
 
 <CENTER>
 <P>
@@ -5391,6 +5391,15 @@ a pointer in a derived type may point to data of any kind. In C, casts
 are used to control this behavior. PDBLib permits a member of a struct
 which is of type "char *" specify the actual type of another pointered
 member. The function <tt>PD_cast</tt> is used to set up this behavior.
+<p>
+<b>WARNING:</b> with the addition of alignment controls in C11,
+<b>_Alignas</b>, <b>alignof</b>, and <b>aligned_alloc</b>, users have to
+be aware of data alignment issues.  In principal, one can use these
+features of C11 with PDBLib.  BUT, in practice you should NOT use them.
+The problem stems from the fact that when PDBLib is built, it computes
+the alignment information it needs with the default state of the compiler.
+If your C11 code defines structs using the new controls it may lead to
+conflicting specifications and a malfunctioning code.
 <p>
 
 <hr>
