@@ -1,0 +1,239 @@
+#!/bin/csh -f
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+@ err = 0
+
+#--------------------------------------------------------------------------
+
+# _STRCPY_NEXT
+
+#--------------------------------------------------------------------------
+
+# do not check delimiters in quoted substrings
+
+@ lerr = 0
+
+echo -n "      smp "
+
+tpstok -s "a 'b;c' ; d"   -d ";" -a "a 'b;c' "
+@ lerr = $lerr + $status
+echo -n "."
+
+if ($lerr == 0) then
+   echo " ok"
+else
+   echo " ng ($lerr)"
+   @ err = $err + 1
+endif
+
+# EXPAND_ESC  if set make the copy of an escaped character unescaped
+
+@ lerr = 0
+
+echo -n "      exp "
+
+tpstok -f exp -s 'a\bc'    -d "\n"  -a 'abc'
+@ lerr = $lerr + $status
+echo -n "."
+
+tpstok -f exp -s 'a\\\"bc' -d "\n"  -a 'a\"bc'
+@ lerr = $lerr + $status
+echo -n "."
+
+tpstok        -s 'a\bc'    -d "\n"  -a 'a\bc'
+@ lerr = $lerr + $status
+echo -n "."
+
+tpstok        -s 'a\\\"bc' -d "\n"  -a 'a\\\"bc'
+@ lerr = $lerr + $status
+echo -n "."
+
+if ($lerr == 0) then
+   echo " ok"
+else
+   echo " ng ($lerr)"
+   @ err = $err + 1
+endif
+
+# ADD_DELIMITER  if set include the end delimiter in the resultant string D
+
+@ lerr = 0
+
+echo -n "      add "
+
+tpstok -f add -s "a b;"    -d " ;"  -a "a " -a "b;"
+@ lerr = $lerr + $status
+echo -n "."
+
+tpstok        -s "a b;"    -d " ;"  -a "a" -a "b"
+@ lerr = $lerr + $status
+echo -n "."
+
+if ($lerr == 0) then
+   echo " ok"
+else
+   echo " ng ($lerr)"
+   @ err = $err + 1
+endif
+
+# TRANSPARENT_QUOTES if set treat quoted substrings as transparent
+#                    and look at the characters inside them
+
+@ lerr = 0
+
+echo -n "      tqu "
+
+tpstok -f tqu -s 'a \"1 2\" b'    -d " "  -a 'a' -a '\"1" -a "2\"' -a 'b'
+@ lerr = $lerr + $status
+echo -n "."
+
+tpstok        -s 'a \"1 2\" b'    -d " "  -a 'a' -a '\"1 2\"' -a 'b'
+@ lerr = $lerr + $status
+
+if ($lerr == 0) then
+   echo " ok"
+else
+   echo " ng ($lerr)"
+   @ err = $err + 1
+endif
+
+# REMOVE_QUOTES  if set do not copy quote characters into D
+
+@ lerr = 0
+
+echo -n "      rqu "
+
+tpstok -f rqu -s "ab'cd'ef"       -d "\n" -a "abcdef"
+@ lerr = $lerr + $status
+echo -n "."
+
+tpstok        -s "ab'cd'ef"       -d "\n" -a "ab'cd'ef"
+@ lerr = $lerr + $status
+echo -n "."
+
+if ($lerr == 0) then
+   echo " ok"
+else
+   echo " ng ($lerr)"
+   @ err = $err + 1
+endif
+
+# this is designed to handle things like:
+# but not searches for matching delimiters
+
+@ lerr = 0
+
+echo -n "      tok "
+
+tpstok -s "(a\(bc\)de)" -d ")" -a "(a\(bc\)de"
+@ lerr = $lerr + $status
+echo -n "."
+
+tpstok -s "(a(bc)de)"   -d ")" -a "(a(bc" -a "de"
+@ lerr = $lerr + $status
+echo -n "."
+
+if ($lerr == 0) then
+   echo " ok"
+else
+   echo " ng ($lerr)"
+   @ err = $err + 1
+endif
+
+#--------------------------------------------------------------------------
+
+# STRCPY_STR - like _STRCPY_NEXT but the entire delimiter string
+#            - must match not just individual characters in it
+
+#--------------------------------------------------------------------------
+
+@ lerr = 0
+
+echo -n "      str "
+
+tpstok -m -s "a, b;c, c,"   -d "c,"  -a "a, b;" -a " "
+@ lerr = $lerr + $status
+echo -n "."
+
+
+# do not check delimiters in quoted substrings
+tpstok -m -s "a, 'b;c,' c,"   -d "c,"  -a "a, 'b;c,' "
+@ lerr = $lerr + $status
+echo -n "."
+
+if ($lerr == 0) then
+   echo " ok"
+else
+   echo " ng ($lerr)"
+   @ err = $err + 1
+endif
+
+#--------------------------------------------------------------------------
+
+# _STRCPY_BAL - like _STRCPY_NEXT but taking different delimiters
+#             - for the beginning and end of the match
+
+#--------------------------------------------------------------------------
+
+@ lerr = 0
+
+echo -n "      bal "
+
+tpstok -s "(a (bc) d)efg" -b  "(" -e ")"  -a "(a (bc) d)" -a "efg"
+@ lerr = $lerr + $status
+echo -n "."
+
+
+# do not check delimiters in quoted substrings
+tpstok -s "(a '(bc)' d)efg" -b  "(" -e ")"  -a "(a '(bc)' d)" -a "efg"
+@ lerr = $lerr + $status
+echo -n "."
+
+# this is designed to handle matching delimiters
+# but not searches for things like:
+tpstok -s "(a(bc)de)"   -e ")" -a "(a(bc)de)"
+@ lerr = $lerr + $status
+echo -n "."
+
+tpstok -s "(a\(bc\)de)" -e ")" -a "(a\(bc\)de"
+@ lerr = $lerr + $status
+echo -n "."
+
+if ($lerr == 0) then
+   echo " ok"
+else
+   echo " ng ($lerr)"
+   @ err = $err + 1
+endif
+
+# start lev properly
+#   "(a b c)" with b = "(" should have lev = 0
+#   "a b c)" with b = "(" should have lev = 1
+
+#--------------------------------------------------------------------------
+
+# DELIMITED
+
+#--------------------------------------------------------------------------
+
+@ lerr = 0
+
+echo -n "      del "
+
+tpstok -s "a (f(b)) z"  -b "(" -e ")" -a "f(b)"
+@ lerr = $lerr + $status
+echo -n "."
+
+if ($lerr == 0) then
+   echo " ok"
+else
+   echo " ng ($lerr)"
+   @ err = $err + 1
+endif
+
+exit($err)
+

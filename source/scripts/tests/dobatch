@@ -1,0 +1,43 @@
+#!/bin/csh -f
+#
+# DOBATCH - test do-batch
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "DO-BATCH Test .................."
+
+set lst = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: dobatch [-h]"
+           echo "   h  this help message"
+           echo ""
+           exit(1);
+      default:
+           set lst = ( $lst $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ("$lst" == "") then
+   set lst = ( )
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DOB - test functions-pact
+
+NoteD $Log "                    $msg"
+
+
+$TEST_CHECK part -a dobatch -e $nerr -rpf "$rpf" "$msg"
+
+exit($status)
