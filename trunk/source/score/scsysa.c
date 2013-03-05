@@ -996,8 +996,8 @@ char **SC_syscmnd(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_EXEC_ONE - execute one command CM
- *              - worker for SC_exec_commands
+/* _SC_EXEC_ONE - execute one chunk of commands
+ *              - thread worker for SC_exec_commands
  */
 
 int _SC_exec_one(void **a, int *it)

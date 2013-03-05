@@ -111,14 +111,22 @@ osrc : ${BinDir}/osrc
 ${BinDir}/osrc : osrc.c ${LibFiles}
 	${PCC} osrc.c -o ${BinDir}/osrc ${MDLib}
 
-smake : ${BinDir}/pact-info ${BinDir}/smake
+pact-info : ${BinDir}/pact-info ${BinDir}/pact-info
 
 ${BinDir}/pact-info : pact-info.c common.h
 	${PCC} -DPACT_VERSION=\"${Version}\" pact-info.c -o ${BinDir}/pact-info
 
+smake : ${BinDir}/pact-info ${BinDir}/smake
+
 ${BinDir}/smake : smake.c common.h
 	ccw -DSYSTEM_ID=\"${System}\" -DPACT_VERSION=\"${Version}\" smake.c -o ${BinDir}/smake
 
+
+# tester for strcpy_tok, strcpy_str
+tpstok : ${BinDir}/tpstok
+
+${BinDir}/tpstok : tpstok.c ${LibFiles}
+	${PCC} tpstok.c -o ${BinDir}/tpstok ${MDLib}
 
 # debugging only - never to be included in InstallDep
 template : ${BinDir}/template

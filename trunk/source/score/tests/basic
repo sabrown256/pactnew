@@ -51,6 +51,7 @@ setenv SC_EXEC_TIME_FACTOR    16
    set Tsts = ($Tsts a.5 all)
    set Tsts = ($Tsts a.6 all)
    set Tsts = ($Tsts a.7 all)
+#   set Tsts = ($Tsts a.8 all)
 
    set LErr = 0
    while ($#Tsts > 1)
