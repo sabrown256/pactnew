@@ -1,0 +1,139 @@
+#!/bin/csh -f
+#
+# BATL - do-batch test script - loop body
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set pact = `which pact`
+set root = `dirname $pact`
+set root = $root:h
+source $root/etc/env-pact.csh
+source $root/etc/functions-pact.csh
+unset pact
+unset root
+
+set running = $cwd/running.$$
+rm -rf $running
+touch $running
+Note $running "Node: `uname -n`"
+Note $running "Date: `date`"
+Note $running "User: $USER"
+Note $running "CWD:  $cwd"
+
+@ err = 0
+@ iv  = -1
+
+set log  = ""
+set prob = ""
+set cmnd = ""
+set exe  = $0
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: batl [-iv <n>] [-h] [-l <logfile>] <cmnd>"
+           echo "   h      this help message"
+           echo "   <cmnd> the command with arguments"
+           echo ""
+           exit(1)
+      case -iv:
+           shift
+           @ iv = $1
+           breaksw
+      case -l:
+           shift
+           set log = $1
+           breaksw
+      default:
+           set prob = $1
+           set cmnd = ( $prob )
+           shift
+           while ($#argv > 0)
+              set cmnd = ( $cmnd $1 )
+              shift
+           end
+           break
+           breaksw
+   endsw
+   shift
+end
+
+if ("$prob" == "") then
+   echo "No problem specified - exiting"
+   @ err = 1
+   goto DONE
+endif
+
+@ iv = $iv + 1
+
+if ("$log" == "") then
+   set ln = $exe:t
+   InitLog log $cwd/log.$ln.$iv
+   unset ln
+endif
+
+Separator $log
+
+set dir = ../wrk-$prob:t
+flog $log pushd $dir
+flog $log set refd = $cwd
+
+flog $log ls -d v[0-9]*
+if ($status == 0) then
+   @ nx = ( `ls -1dv v[0-9]* | tail -n 1 | sed 's/v//'` )
+   @ ix = 0
+   while ($ix < $nx)
+      @ ix = $ix + 1
+      if (!(-d v$ix)) then
+         flog $log @ iv = $ix
+         flog $log mkdir v$iv
+         break
+      endif
+   end
+   if ($ix >= $nx) then
+      flog $log @ iv = $nx + 1
+      flog $log mkdir v$iv
+   endif
+endif
+
+flog $log popd
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $log
+
+flog $log set vdir = $cwd/v${iv}
+flog $log mkdir -p $vdir
+flog $log pushd $vdir
+
+NoteD $log ""
+NoteD $log -n "$iv "
+Note $log ""
+
+flog $log setenv THIS_PASS $iv
+flog $log ( $cmnd >&! res.$iv )
+flog $log ls
+
+NoteD $log "done"
+
+flog $log popd
+
+set vd = $vdir:t
+flog $log rm -rf $refd/$vd
+flog $log mv $vdir $refd
+mv $log $refd/$vd
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+DONE:
+
+rm -f $running
+
+exit($err)
+

@@ -55,10 +55,10 @@ IncAction = sinstall ${TGTEtc} ${EtcDir}
 
 
 link :
+	sinstall do-batch.${JOBS_System} ${BinDir}/do-batch
 	pact scrinstall
 
 install :
-	cp do-batch.${JOBS_System} ${BinDir}/do-batch
 	pact link
 
 #
