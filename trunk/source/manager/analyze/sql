@@ -61,12 +61,14 @@ else
 # existence - mere existence doesn't work with 32/64 bit machines
    cat << EOF >! $Tmp.c
 #include <stdlib.h>
+#include <stdio.h>
 #include <mysql.h>
 int main(int c, char **v)
 {MYSQL *conn;
  conn = mysql_init(NULL);
  if (mysql_real_connect(conn, v[1], v[2], NULL, v[3], 0, NULL, 0) != NULL)
     mysql_query(conn, "SET NAMES 'utf8'");
+ printf("%s\n", MYSQL_SERVER_VERSION);
  return(0);}
 EOF
 
@@ -127,10 +129,12 @@ EOF
 # existence - mere existence doesn't work with 32/64 bit machines
    cat << EOF >! $Tmp.c
 #include <stdlib.h>
+#include <stdio.h>
 #include <sqlite3.h>
 int main(int c, char **v)
 {sqlite3 *conn;
  sqlite3_open(v[1], &conn);
+ printf("%s\n", SQLITE_VERSION);
  return(0);}
 EOF
 
@@ -188,12 +192,14 @@ EOF
 # existence - mere existence doesn't work with 32/64 bit machines
    cat << EOF >! $Tmp.c
 #include <stdlib.h>
+#include <stdio.h>
 #include <sqlite3.h>
 int main(int c, char **v)
 {sqlite3 *conn;
  sqlite3_open_v2(v[1], &conn,
 		 SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX,
   	         NULL);
+ printf("%s\n", SQLITE_VERSION);
  return(0);}
 EOF
 

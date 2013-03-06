@@ -1,0 +1,108 @@
+#!/usr/bin/env pcsh
+#
+#OPT -f
+#!/bin/csh -f
+#
+# BATP - do-batch test script - run a parallel loop
+#
+# include "cpyright.h"
+#
+
+if ($?PCSH_TMP_ == 0) then
+   set pact = `which pact`
+   set root = `dirname $pact`
+   set root = $root:h
+   source $root/etc/env-pact.csh
+   source $root/etc/functions-pact.csh
+   unset pact
+   unset root
+endif
+
+@ err = 0
+
+set prob  = ""
+set cmdn  = ""
+set exe   = $0
+set tdir  = ""
+set cmdln = ( $0 $argv )
+set cargs = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -d:
+           shift
+           set tdir = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: batp [-d <dir>] [-h] <cmnd>"
+           echo "   d      working directory"
+           echo "   h      this help message"
+           echo "   <cmnd> the command with arguments"
+           echo ""
+           exit(1)
+      default:
+           set prob = `rpath $1`
+           set cmnd = ( $prob )
+           shift
+           while ($#argv > 0)
+              set cmnd = ( $cmnd $1 )
+              shift
+           end
+           break
+           breaksw
+   endsw
+   shift
+end
+
+if ("$prob" == "") then
+   echo "No problem specified - exiting"
+   exit(1)
+endif
+
+if ($?PCSH_TMP_ == 1) then
+   set lt   = $PCSH_TMP_
+   set tdir = $lt:h
+   InitLog log $tdir/log.$lt:t
+   Note $log ">> with PCSH_TMP_ = $lt"
+else
+   set lt = $exe:e
+   set tdir = $cwd/tmp-$lt
+   InitLog log $tdir/log.junko.$$
+   Note $log ">> without PCSH_TMP_"
+endif
+unset lt
+
+Note $log "Command: $cmdln"
+if ($?batl == 0) then
+   flog $log setenv batl $cwd/batl
+endif
+flog $log cd $tdir
+
+flog $log uname -n
+flog $log ( env | sort )
+
+set dir = $tdir:h/wrk-$prob:t
+if (!(-d $dir)) then
+   flog $log mkdir $dir
+endif
+
+@ nt = `ncpu`
+flog $log @ np = 2
+flog $log @ nv = 2 * $np
+flog $log @ dt = 300
+
+if ($?PCSH_TMP_ == 0) then
+   @ $iv = 0
+   while ($iv < $nv)
+      @ $iv = $iv + 1
+      ftee $log $batl -iv $iv $cmnd
+   end
+else
+   pdo iv = 0, $nv, 1 [do-batch -p $np -t $nt -dt $dt]
+      $batl -l $log -iv $iv $cmnd
+   pend
+endif
+
+exit($status)
+

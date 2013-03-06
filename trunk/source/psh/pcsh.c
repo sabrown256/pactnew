@@ -177,7 +177,7 @@ static char **compute_pdo_limits(char **sa, int is, char *al, int nc)
     fclose(fp);
 
 /* run the script */
-    r = run(FALSE, "csh %s %s | tail -n 5", fn, al);
+    r = run(FALSE, "pcsh %s %s | tail -n 5", fn, al);
     p = strstr(r, "_cmd_");
     rv = lst_add(rv, p + 6);
 
@@ -315,7 +315,7 @@ static char **compute_pfor_limits(char **sa, int is, char *al, int nc)
     fclose(fp);
 
 /* run the script */
-    r = run(FALSE, "csh %s %s | tail -n 5", fn, al);
+    r = run(FALSE, "pcsh %s %s | tail -n 5", fn, al);
     p = strstr(r, "_cmd_");
     *p = '\0';
     rv = lst_add(rv, p + 6);

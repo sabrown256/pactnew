@@ -49,6 +49,8 @@ else
 # write a little HDF5 test to do better detection than mere
 # existence - mere existence doesn't work with 32/64 bit machines
    cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <stdio.h>
 #include <hdf5.h>
 int main(int c, char **v)
 {H5_init_library();
@@ -58,6 +60,7 @@ int main(int c, char **v)
  H5Eset_auto1(H5E_DEFAULT, NULL);
 #endif
  H5check_version(H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE);
+ printf("%d.%d.%d\n", H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE);
  return(0);}
 EOF
 

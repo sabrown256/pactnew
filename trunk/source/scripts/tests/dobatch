@@ -26,18 +26,35 @@ while ($#argv > 0)
    shift
 end
 
-if ("$lst" == "") then
-   set lst = ( )
-endif
+if ($CROSS_COMPILE == FALSE) then
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # DOB - test functions-pact
 
-NoteD $Log "                    $msg"
+   NoteD $Log -n "                    $msg"
 
+   flog $Log cp $FilesDir/bat? .
+   flog $Log batp date -d 1/1/2001
+   set xstatus = $status
 
-$TEST_CHECK part -a dobatch -e $nerr -rpf "$rpf" "$msg"
+   sleep 10
+
+   @ nerr = $nerr + $xstatus
+   if ($xstatus == 0) then
+      flog $Log ls -lR tmp-* wrk-*
+      flog $Log cat wrk-*/v*/res*
+      flog $Log rm -rf tmp-* wrk-*
+   endif
+
+   set rpf = ( $rpf b.g.* batl batp )
+
+   $TEST_CHECK part -a dobatch -e $nerr -rpf "$rpf" none
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endif
 
 exit($status)
