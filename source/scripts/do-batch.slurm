@@ -136,7 +136,7 @@ while ($#argv > 0)
            set ntfy = "w"
            breaksw
       default:
-           set prob = $1
+           set prob = `rpath $1`
 
            shift
            set cmnd = ( $prob $cmnd )
@@ -160,6 +160,11 @@ else
 endif
 
 set scr = $tdir/b.$prob.$$
+set log = $scr.err
+if ("$TTY" == "") then
+   set TTY = $scr.out
+endif
+
 
 switch ($tgt)
 
@@ -185,14 +190,8 @@ case group:
    end
    popd >& /dev/null
 
-   set TTY = "$tdir/b.$scr.$$.out"
    rm -f $TTY
    touch $TTY
-
-   echo "Job      : $cmnd" >> $TTY
-   echo "MPI Job  : no" >> $TTY
-   echo "Date     : $datest" >> $TTY
-   echo "----------------------------------------------------" >> $TTY
 
    setenv OMP_NUM_THREADS $NThreads
 
@@ -202,6 +201,12 @@ case group:
    if ("$pool" != "") then
       set opt = ( $opt -c 1 -p $pool )
    endif
+
+   echo "Job     : $cmnd" >> $TTY
+   echo "Date    : $datest" >> $TTY
+   echo "Pool    : $SLURM_JOB_NODELIST" >> $TTY
+   echo "Command : $wrap $brun $opt $cmnd" >> $TTY
+   echo "----------------------------------------------------" >> $TTY
 
    $wrap $brun $opt $cmnd >>& $TTY &
 
@@ -250,35 +255,33 @@ case batch:
 
 # WRITE_SCRIPT
 
-   set log = $scr.err
-   if ("$TTY" == "") then
-      set TTY = $scr.out
-   endif
-
    rm -f $scr
    touch $scr
 
+   set bopt = ""
+
    Note $scr '#\!/bin/csh'
 
+#   set bopt = ( $bopt -l $log )
    Note $scr "# $tag -o $log"
    if ("$pool" != "") then
+#      set bopt = ( $bopt -q $pool )
       Note $scr "# $tag -q $pool"
    endif
 
 # setup resources
-   set res = ""
-
    if (($NThreads > 1) || ($NNodes > 1)) then
-      set res = "nodes=$NNodes"
-      set res = "${res}:ppn=$NThreads"
+      set res = "nodes=${NNodes}:ppn=${NThreads}"
+      set bopt = ( $bopt -l $res )
+      Note $scr "# $tag -l $res"
    endif
 
 # convert time to seconds
    set tmx = `timer -t $tmx`
    set res = "${res}:walltime=$tmx"
-
-# add the resource request
+#   set bopt = ( $bopt -l $res )
    Note $scr "# $tag -l $res"
+
    Note $scr ''
 
    Note $scr "#"
@@ -300,8 +303,10 @@ case batch:
 
    if ($quiet == FALSE) then
       Note $scr 'echo "Batch Job: '$cmnd'" >> $TTY'
-      Note $scr 'echo "MPI Job  : no" >> $TTY'
-      Note $scr 'echo "Date     : '$datest'" >> $TTY'
+      Note $scr 'echo "MPI Job : no" >> $TTY'
+      Note $scr 'echo "Date    : '$datest'" >> $TTY'
+      Note $scr 'echo "CWD     : $cwd" >> $TTY'
+      Note $scr 'echo "Command : '$cmnd'" >> $TTY'
       Note $scr 'echo "----------------------------------------------------" >> $TTY'
       Note $scr ''
    endif
@@ -319,7 +324,15 @@ case batch:
    Note $scr "setenv OMP_NUM_THREADS $NThreads"
    Note $scr ''
 
-   Note $scr "do-run -p $NNodes $cmnd" '>>& $TTY'
+   set opt = ""
+   set opt = ( $opt -i all -I )
+   set opt = ( $opt -c $NThreads -n $NNodes )
+   if ("$pool" != "") then
+      set opt = ( $opt -p $pool )
+   endif
+
+#   Note $scr "do-run -p $NNodes $cmnd" '>>& $TTY'
+   Note $scr "$wrap $brun $opt $cmnd" '>>& $TTY'
    Note $scr 'set Err = $status'
    Note $scr ''
 
@@ -355,7 +368,7 @@ case batch:
 # EXECUTE
 
    chmod 750 $scr
-   ( $bsub $scr ) |& cat
+   ( $bsub $bopt $scr ) |& cat
    @ err = $status
    breaksw
 
