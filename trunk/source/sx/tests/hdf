@@ -28,8 +28,8 @@ if ($HAVE_HDF5 == yes) then
    if (($xstatus == 0) && ("$Valgrind" == "")) then
       set ref = $FilesDir/ref/sxhdf
       if (-f $ref) then
-         grep -v Address $io  | grep -v Date >& $io.cmp
-         grep -v Address $ref | grep -v Date >& sxhdf.ref.cmp
+         grep -v Address $io  | grep -v Date | grep -v lfread >& $io.cmp
+         grep -v Address $ref | grep -v Date | grep -v lfread >& sxhdf.ref.cmp
          set rpf = ( $rpf *.cmp )
          flog $Log diff $io.cmp sxhdf.ref.cmp
          set xstatus = $status
