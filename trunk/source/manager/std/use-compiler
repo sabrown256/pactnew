@@ -79,6 +79,16 @@ switch ($cname)
         set prog  = ( '$0 ~ /'$pat'/ { print $5 } $0 ~ /Compile line:/ { print $3 }' )
         breaksw
 
+# CLANG
+   default:
+        setenv PACT_CC_FAMILY   CLANG
+        setenv PACT_FC_FAMILY   GNU
+        set opt   = ( -v )
+        set pat   = ( clang version )
+        set prog  = ( '$0 ~ /'$pat'/ { print $3 } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = gfortran
+        breaksw
+
 # INTEL
    case icc*:
         setenv PACT_CC_FAMILY   INTEL

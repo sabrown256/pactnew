@@ -9,6 +9,7 @@ source ../../tests/common
 
 set msg = "DO-BATCH Test .................."
 
+@ err = 0
 set lst = ""
 
 while ($#argv > 0)
@@ -48,13 +49,18 @@ if ($CROSS_COMPILE == FALSE) then
       flog $Log rm -rf tmp-* wrk-*
    endif
 
+   touch b.g.foo
    set rpf = ( $rpf b.g.* batl batp )
 
    $TEST_CHECK part -a dobatch -e $nerr -rpf "$rpf" none
+
+   @ err = $err + $status
+
+   flog $Log rm -f b.g.foo
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-exit($status)
+exit($err)
