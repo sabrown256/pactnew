@@ -351,6 +351,7 @@ static int reset_env(int c, char **v)
 	    {sa = file_text(FALSE, v[++i]);
 	     break;};};
 
+    rv = 0;
     if (sa != NULL)
        {except = NULL;
 
@@ -2531,6 +2532,7 @@ static void write_do_run_db(client *cl, state *st)
 
 /* see if file is properly specified via environment variable */
     p   = cgetenv(TRUE, "RUN_SIGNATURE_DB");
+    nm  = 0;
     ok  = TRUE;
     ok &= (file_exists(p) == TRUE);
     ok &= (strcmp(p, db) != 0);
@@ -2593,7 +2595,6 @@ static void write_do_run_db(client *cl, state *st)
         ENDFOR;
 
 /* process the specs in CND */
-	nm = 0;
 	for (i = 0; cnd[i] != NULL; i++)
 	    {note(Log, TRUE, "Checking %s", cnd[i]);
 

@@ -187,6 +187,10 @@ if ($Cfg_CC_Exe != "") then
       flog $ALog $Cfg_CC_Exe $CC_Version
       flog $ALog set CmpVers = any
       set xstatus = $status
+   else if ($PACT_CC_FAMILY == CLANG) then
+      flog $ALog gexec $Cfg_CC_Exe $CC_Version @b grep $PACT_CC_VERSION
+      flog $ALog set CmpVers = $PACT_CC_VERSION
+      set xstatus = $status
    else if ($PACT_CC_FAMILY == GNU) then
       flog $ALog gexec $Cfg_CC_Exe $CC_Version @b grep $PACT_CC_VERSION
       flog $ALog set CmpVers = $PACT_CC_VERSION

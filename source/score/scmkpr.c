@@ -1080,7 +1080,7 @@ int SC_parse_makefile(anadep *state, char *fname)
 	    nb = 0;
 	    st = TRUE;
 
-	    for (i = 1; (st == TRUE); i++)
+	    for (i = 1; st == TRUE; i++)
 	        {s = SC_dgets(s, &nb, fp);
 		 if (s == NULL)
 		    break;

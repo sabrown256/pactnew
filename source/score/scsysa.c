@@ -1092,17 +1092,27 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
 /* run each command until it succeeds or definitively fails
  * try to avoid failing on system fault type errors
  */
+    st = 0;
+    if (SC_n_threads > 1)
+       {SC_do_tasks((PFInt) _SC_exec_one, &ed, n, 0, TRUE);
+	for (i = 0; i < n; i++)
+	    st |= ed.res[i];}
+    else
 #if 1
-    SC_do_tasks((PFInt) _SC_exec_one, &ed, n, 0, TRUE);
-    st = 0;
-    for (i = 0; i < n; i++)
-        st |= ed.res[i];
+       {int it[2];
+	void *a;
+
+	a     = &ed;
+	it[0] = 0;
+	it[1] = n;
+	st = _SC_exec_one(&a, it);
+	for (i = 0; i < n; i++)
+	    st |= ed.res[i];};
 #else
-    st = 0;
-    for (i = 0; i < n; i++)
-        {st |= _SC_exec_one(i, &ed);
-	 if ((ignore == FALSE) && (st == TRUE))
-	    break;};
+       {for (i = 0; i < n; i++)
+	    {st |= _SC_exec_one(i, &ed);
+	     if ((ignore == FALSE) && (st == TRUE))
+	        break;};};
 #endif
 
     if (lname != NULL)

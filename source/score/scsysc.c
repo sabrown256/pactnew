@@ -1517,8 +1517,8 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
 		     "STDOUT", fd[1].file, fd[1].flag,
 		     "STDERR", fd[2].file, fd[2].flag,
 #endif
-		     "OPEN-RETRY-TIME", to,
-		     "RING-EXP", 18,
+		     "OPEN-RETRY-TIME", (int) to,
+		     "RING-EXP", (int) 18,
 		     NULL);
 
 	if (pp == NULL)

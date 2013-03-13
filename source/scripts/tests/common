@@ -12,3 +12,5 @@ setenv Package  scripts
 setenv Test     $0:t
 source ../../../scripts/test-env
 
+# batch system are inherently unreliable
+setenv TEST_ADVISORY ${TEST_ADVISORY}:scripts_dobatch
