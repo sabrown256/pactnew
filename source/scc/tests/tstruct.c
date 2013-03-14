@@ -31,3 +31,10 @@ extern struct {int m1; double m2;}
 struct {int m1; double m2;}
  v2d;
 
+/*
+struct s2
+   {int m1;
+    int m2;};
+
+extern struct s2 *f(struct s2 *a);
+*/

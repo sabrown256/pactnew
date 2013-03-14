@@ -10,6 +10,38 @@
 
 unalias *
 
+set save  = ""
+set files = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: scs-revert [-h] [-s <sfx>] <file>*"
+           echo "   h   this help message"
+           echo "   s   copy <file> to <file>.<sfx> before reverting"
+           echo ""
+           exit(1)
+      case -s:
+           shift
+           set save = $1
+           breaksw
+      default:
+           set files = ( $files $1 )
+           breaksw
+   end
+   shift
+end
+
+# save the files to be reverted
+if ("$save" != "") then
+   foreach f ($files)
+      if (-f "$f") then
+         cp $f $f.$save
+      endif
+   end
+endif
+
 set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
@@ -25,13 +57,13 @@ if (-d $gitd[1]) then
 # to revert a change that you have committed:
 #    git revert ...
 
-   git checkout $argv
+   git checkout $files
 
 else if (-d CVS) then
 
    setenv CVS_RSH  ssh
 
-   foreach f ($argv)
+   foreach f ($files)
       if (-f $f) then
          rm -f $f
       endif
@@ -40,7 +72,7 @@ else if (-d CVS) then
 
 else if (-d .svn) then
 
-   svn revert $argv
+   svn revert $files
 
 endif
 

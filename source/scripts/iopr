@@ -444,6 +444,17 @@ else if ($Mode == diff) then
    endif
 endif
 
+# rpcinfo -p $SrvN
+# nmap
+#
+# Server side (NFS is running):
+#  rpcinfo -p | egrep 'nfs|nlock'
+#  netstat -a -n | grep 2049
+# 
+# Client side:
+#  rpcinfo -p | grep nlock
+#  netstat -a -n | grep 2049
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 

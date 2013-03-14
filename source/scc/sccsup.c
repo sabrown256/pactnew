@@ -120,6 +120,15 @@ void CC_init_c_syntax_mode(void)
 	CC_add_type("signed",   CC_TYPEQ);
 	CC_add_type("unsigned", CC_TYPEQ);
 
+/* NOTE: this was added to handle
+ *     typedef struct s2
+ *        {const unsigned short *m1;
+ *         const int *m2;
+ *         const char *m3[4];} *t9;
+ */
+	CC_add_type("const",    CC_TYPEQ);
+	CC_add_type("volatile", CC_TYPEQ);
+
 	CC_diagnose_parse(FALSE);};
 
     return;}
