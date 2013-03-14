@@ -80,7 +80,7 @@ switch ($cname)
         breaksw
 
 # CLANG
-   default:
+   case clang*:
         setenv PACT_CC_FAMILY   CLANG
         setenv PACT_FC_FAMILY   GNU
         set opt   = ( -v )

@@ -23,3 +23,9 @@ struct s_info
 typedef struct s_info t7;
 typedef struct {int m1; int m2;} t8;
 
+/*
+typedef struct s2
+   {const unsigned short *m1;
+    const int *m2;
+    const char *m3[4];} *t9;
+*/

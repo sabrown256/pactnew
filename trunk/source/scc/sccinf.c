@@ -626,7 +626,22 @@ expr *_CC_der_decl(expr *t, expr *v)
     _CC_type_decl(t);
 
     pd->kind = CC_TYP;
-    if (strspn(pd->type, " \t") == 0)
+
+/* NOTE: this first clause was added to handle the case:
+ *   struct s2
+ *     {int m1;
+ *      int m2;};
+ *   extern struct s2 *f(struct s2 *a);
+ */
+    if (pd->type == NULL)
+       {if ((t->type != NULL) && (v->type != NULL))
+	   snprintf(s, MAXLINE, "%s %s", t->type, v->type);
+	else if (v->type != NULL)
+	   snprintf(s, MAXLINE, "%s", v->type);
+	else
+	   snprintf(s, MAXLINE, "%s", t->type);}
+
+    else if (strspn(pd->type, " \t") == 0)
        {if (v->type != NULL)
 	   snprintf(s, MAXLINE, "%s %s", pd->type, v->type);
 	else if (v->name == NULL)
