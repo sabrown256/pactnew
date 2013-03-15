@@ -90,7 +90,7 @@ endif
 @ nt = `ncpu`
 
 # if we have do not have MPI then run only 1 node
-if ("$MPI" == "") then
+if ("$DP_Lib" == "") then
    flog $log @ np = 1
 else
    flog $log @ np = 2
