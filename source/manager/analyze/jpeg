@@ -41,6 +41,8 @@ if ("$JPEG_Path" == none) then
 
 else
 
+   set lvjp = ""
+
    set UTime = `timer -r`
 
 # write a little JPEG test to do better detection than mere
@@ -55,6 +57,7 @@ int main(int c, char **v)
  struct jpeg_compress_struct cinfo;
  cinfo.err = jpeg_std_error(&jerr);
  jpeg_create_compress(&cinfo);
+ printf("%d\n", JPEG_LIB_VERSION);
  return(0);}
 EOF
 
@@ -68,10 +71,11 @@ EOF
    set lLibDirs = ( $lLibDirs $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
 
    set Implicit = FALSE
-   set lHdrs    = ( jpeglib.h jconfig.h jmorecfg.h jerror.h )
+   set lHdrs    = ( jpeglib.h jmorecfg.h jerror.h )
    set ASList   = ( a so )
    set lLib     = jpeg
    set lFile    = $Tmp
+   set lKeep    = TRUE
 
    set lALibs = ""
    foreach i ( `var-list -l $RPATH` )
@@ -93,10 +97,16 @@ EOF
       flog $ALog setenv MDG_Lib        "$MDG_Lib $PckLib"
       flog $ALog setenv MDG_Pck        "$MDG_Pck JPEG"
       flog $ALog setenv HAVE_JPEGLIB   TRUE
+
+      flog $ALog $Tmp
+      set lvjp = ( `$Tmp` )
+
    else
       NoteD $ALog "      no JPEG"
       flog $ALog setenv HAVE_JPEGLIB FALSE
    endif
+
+   flog $ALog $RM $Tmp $Tmp.c
 
    set ETime = `timer -b $UTime`
 
@@ -108,14 +118,15 @@ EOF
    setenv JPEG_Path ""
 
 # export the results
-   dbmset $ALog MDG_Inc    = $MDG_Inc^     \
-                MDG_Lib    = $MDG_Lib^     \
-                MDG_Pck    = $MDG_Pck^     \
-                JPEG_Inc   = $JPEG_Inc^    \
-                JPEG_Lib   = $JPEG_Lib^    \
-                JPEG_RPath = $JPEG_RPath^  \
-                JPEG_Path  = $JPEG_Path^   \
-                RPATH      = $RPATH
+   dbmset $ALog MDG_Inc      = $MDG_Inc^     \
+                MDG_Lib      = $MDG_Lib^     \
+                MDG_Pck      = $MDG_Pck^     \
+                JPEG_Inc     = $JPEG_Inc^    \
+                JPEG_Lib     = $JPEG_Lib^    \
+                JPEG_RPath   = $JPEG_RPath^  \
+                JPEG_Path    = $JPEG_Path^   \
+                JPEG_VERSION = $lvjp^        \
+                RPATH        = $RPATH
 
 endif
 

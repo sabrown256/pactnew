@@ -17,6 +17,10 @@ include features/dld
 
 setenv ENV_VARS "RUN_SIGNATURE_DB SITE_SIGNATURE_DB \
                  SYS_SITE SYS_TYPE DAI_ROOT DAS_ROOT \
+                 GLIBC_VERSION BFD_VERSION \
+                 HDF_VERSION MYSQL_VERSION SQLITE3_VERSION \
+                 PNG_VERSION JPEG_VERSION \
+                 PACT_VERSION \
                  Bits OS_Name System \
                  CC_Exe CC_Flags \
                  CC_Debug_Default CC_Optimize_Default \

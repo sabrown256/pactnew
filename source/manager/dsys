@@ -569,6 +569,11 @@ switch ($Cmnd)
 
    case config:
 
+        if (!(-x /bin/true)) then
+           echo "ERROR: /bin/true not executable - exiting"
+           exit(1)
+        endif
+
         if ($?USER == 0) then
            if ($?LOGNAME == 0) then
               set USER = "anonymous"

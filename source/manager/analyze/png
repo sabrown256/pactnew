@@ -49,6 +49,8 @@ else if ($Z_Path == none) then
 
 else
 
+   set lvpn = ""
+
    set UTime = `timer -r`
 
 # write a little PNG test to do better detection than mere
@@ -56,16 +58,18 @@ else
    cat << EOF >! $Tmp.c
 #include <png.h>
 int main(int c, char **v)
-{png_structp pw;
+{int rv;
+ png_structp pw;
  pw = png_create_write_struct(PNG_LIBPNG_VER_STRING,
 		              (png_voidp) NULL, NULL, NULL);
  if (pw == NULL)
-    return(1);
+    rv = 1;
  else
-    {png_destroy_write_struct(&pw, (png_infopp) NULL);
-     return(0);};}
+    {rv = 0;
+     png_destroy_write_struct(&pw, (png_infopp) NULL);
+     printf("%s\n", PNG_LIBPNG_VER_STRING);};
+ return(rv);}
 EOF
-
 
    set lIncDirs = ""
    set lLibDirs = ""
@@ -83,6 +87,7 @@ EOF
    set ASList   = ( a so )
    set lLib     = png
    set lFile    = $Tmp
+   set lKeep    = TRUE
 
    set lALibs = ""
    foreach i ( $lrpath )
@@ -107,10 +112,16 @@ EOF
       flog $ALog setenv MDG_Lib      "$MDG_Lib $PckLib"
       flog $ALog setenv MDG_Pck      "$MDG_Pck PNG"
       flog $ALog setenv HAVE_PNGLIB  TRUE
+
+      flog $ALog $Tmp
+      set lvpn = ( `$Tmp` )
+
    else
       NoteD $ALog "      no PNG"
       flog $ALog setenv HAVE_PNGLIB FALSE
    endif
+
+   flog $ALog $RM $Tmp $Tmp.c
 
    set ETime = `timer -b $UTime`
 
@@ -122,14 +133,15 @@ EOF
    setenv PNG_Path  ""
 
 # export the results
-   dbmset $ALog MDG_Inc   = $MDG_Inc^    \
-                MDG_Lib   = $MDG_Lib^    \
-                MDG_Pck   = $MDG_Pck^    \
-                PNG_Inc   = $PNG_Inc^    \
-                PNG_Lib   = $PNG_Lib^    \
-                PNG_RPath = $PNG_RPath^  \
-                PNG_Path  = $PNG_Path^   \
-                RPATH     = $RPATH
+   dbmset $ALog MDG_Inc     = $MDG_Inc^    \
+                MDG_Lib     = $MDG_Lib^    \
+                MDG_Pck     = $MDG_Pck^    \
+                PNG_Inc     = $PNG_Inc^    \
+                PNG_Lib     = $PNG_Lib^    \
+                PNG_RPath   = $PNG_RPath^  \
+                PNG_Path    = $PNG_Path^   \
+                PNG_VERSION = $lvpn^       \
+                RPATH       = $RPATH
 endif
 
 dbexp HAVE_PNGLIB
