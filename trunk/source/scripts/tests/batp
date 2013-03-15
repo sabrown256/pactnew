@@ -88,7 +88,14 @@ if (!(-d $dir)) then
 endif
 
 @ nt = `ncpu`
-flog $log @ np = 2
+
+# if we have do not have MPI then run only 1 node
+if ("$MPI" == "") then
+   flog $log @ np = 1
+else
+   flog $log @ np = 2
+endif
+
 flog $log @ nv = 2 * $np
 flog $log @ dt = 300
 
