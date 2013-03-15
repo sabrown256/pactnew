@@ -569,7 +569,7 @@ switch ($Cmnd)
 
    case config:
 
-        if (!(-x /bin/true)) then
+        if (!(-x /bin/true) && !(-x /usr/bin/true)) then
            echo "ERROR: /bin/true not executable - exiting"
            exit(1)
         endif
