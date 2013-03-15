@@ -165,7 +165,6 @@ if ("$TTY" == "") then
    set TTY = $scr.out
 endif
 
-
 switch ($tgt)
 
 #--------------------------------------------------------------------------
@@ -303,10 +302,10 @@ case batch:
 
    if ($quiet == FALSE) then
       Note $scr 'echo "Batch Job: '$cmnd'" >> $TTY'
-      Note $scr 'echo "MPI Job : no" >> $TTY'
-      Note $scr 'echo "Date    : '$datest'" >> $TTY'
-      Note $scr 'echo "CWD     : $cwd" >> $TTY'
-      Note $scr 'echo "Command : '$cmnd'" >> $TTY'
+      Note $scr 'echo "MPI Job  : no" >> $TTY'
+      Note $scr 'echo "Date     : '$datest'" >> $TTY'
+      Note $scr 'echo "CWD      : $cwd" >> $TTY'
+      Note $scr 'echo "Command  : '$cmnd'" >> $TTY'
       Note $scr 'echo "----------------------------------------------------" >> $TTY'
       Note $scr ''
    endif
