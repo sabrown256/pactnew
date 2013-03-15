@@ -83,7 +83,8 @@ foreach p ( $plst )
    set pinc = ${p}_Inc
    set ppth = ${p}_Path
    set prpt = ${p}_RPath
-   set vl = ( $vl $plib $pinc $ppth $prpt )
+   set pvrs = ${p}_VERSION
+   set vl = ( $vl $plib $pinc $ppth $prpt $pvrs )
 end
 unset plib
 unset pinc

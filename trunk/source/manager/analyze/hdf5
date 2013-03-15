@@ -44,6 +44,8 @@ if ("$HDF_Path" == none) then
 
 else
 
+   set lvhd = ""
+
    set UTime = `timer -r`
 
 # write a little HDF5 test to do better detection than mere
@@ -78,6 +80,7 @@ EOF
    set ASList   = ( so a )
    set lLib     = hdf5
    set lFile    = $Tmp
+   set lKeep    = TRUE
 
    set lALibs = ""
    foreach i ( `var-list -l $RPATH` )
@@ -101,10 +104,16 @@ EOF
       flog $ALog setenv RPATH         ${RPATH}:${HDF_RPath}
       flog $ALog setenv MDI_Pck       "HDF $MDI_Pck"
       flog $ALog setenv HAVE_HDF5     TRUE
+
+      flog $ALog $Tmp
+      set lvhd = ( `$Tmp` )
+
    else
       NoteD $ALog "      no compatible HDF5 version"
       flog $ALog setenv HAVE_HDF5 ""
    endif
+
+   flog $ALog $RM $Tmp $Tmp.c
 
    set ETime = `timer -b $UTime`
 
@@ -116,15 +125,16 @@ EOF
    setenv HDF_Path  ""
 
 # export the results
-   dbmset $ALog MDI_Inc    = $MDI_Inc^    \
-                MDI_Lib    = $MDI_Lib^    \
-                MDI_Pck    = $MDI_Pck^    \
-                HDF_Inc    = $HDF_Inc^    \
-                HDF_Lib    = $HDF_Lib^    \
-                HDF_RPath  = $HDF_RPath^  \
-                HDF_Path   = $HDF_Path^   \
-                HDF5_SO    = $HDF5_SO^    \
-                RPATH      = $RPATH
+   dbmset $ALog MDI_Inc     = $MDI_Inc^    \
+                MDI_Lib     = $MDI_Lib^    \
+                MDI_Pck     = $MDI_Pck^    \
+                HDF_Inc     = $HDF_Inc^    \
+                HDF_Lib     = $HDF_Lib^    \
+                HDF_RPath   = $HDF_RPath^  \
+                HDF_Path    = $HDF_Path^   \
+                HDF_VERSION = $lvhd^        \
+                HDF5_SO     = $HDF5_SO^    \
+                RPATH       = $RPATH
 
 endif
 

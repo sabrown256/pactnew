@@ -13,6 +13,8 @@
 #
 #    source find-package(libjpeg, $Tmp)
 #
+#              - if lKeep is defined do not remove test code
+#
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
 #
@@ -25,6 +27,7 @@ Note $ALog ""
 Note $ALog "lIncDirs: ($#lIncDirs) $lIncDirs"
 Note $ALog "lLibDirs: ($#lLibDirs) $lLibDirs"
 Note $ALog "lHdrs:    ($#lHdrs) $lHdrs"
+Note $ALog "lKeep:    $?lKeep"
 Note $ALog ""
 
 #--------------------------------------------------------------------------
@@ -239,7 +242,7 @@ if ($#t > 2) then
 endif
 unset t
 
-if ("$lFile" != "none") then
+if (("$lFile" != "none") && ($?lKeep == 0)) then
    flog $ALog $RM $lFile $lFile.c
 endif
 

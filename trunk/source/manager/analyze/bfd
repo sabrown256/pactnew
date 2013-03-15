@@ -23,7 +23,7 @@ dbmget $ALog CC_Exe         =\? cc^         \
              MDE_Lib        =\? ""^         \
              BFD_Lib        =\? -lbfd^      \
              BFD_Path       =\? /usr/$LIB^  \
-             BFD_Version    =\? 0.0.0^      \
+             BFD_VERSION    =\? 0.0.0^      \
              BFD_SO         =\? ""^         \
              HAVE_BFD       =\? FALSE^      \
              HAVE_DEMANGLE  =\? FALSE^      \
@@ -142,14 +142,14 @@ EOF
             set t = ( `echo $l:r | sed 's/-/ /g'` )
             if ($#t > 1) then
                Note $ALog "t = ($#t) |$t|"
-               flog $ALog setenv BFD_Version  $t[2]
+               flog $ALog setenv BFD_VERSION  $t[2]
                break
             endif
          end      
          unset t
       endif
 
-      NoteD $ALog "      has bfd ($BFD_Version)"
+      NoteD $ALog "      has bfd ($BFD_VERSION)"
 
       if (($Linking == dynamic) && ($?lSO == 1)) then
          setenv BFD_SO    $lSO
@@ -197,7 +197,7 @@ EOF
 endif
 
 dbmset $ALog CC_Exe        = $CC_Exe^           \
-             BFD_Version   = $BFD_Version^      \
+             BFD_VERSION   = $BFD_VERSION^      \
              BFD_Lib       = $BFD_Lib^          \
              BFD_Path      = $BFD_Path^         \
              MDE_Lib       = $MDE_Lib^          \

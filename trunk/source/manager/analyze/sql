@@ -55,6 +55,8 @@ else
 
 # MYSQL
 
+   set lvms = ""
+
    set UTime = `timer -r`
 
 # write a little MYSQL test to do better detection than mere
@@ -87,6 +89,7 @@ EOF
    set ASList   = ( a so )
    set lLib     = mysqlclient
    set lFile    = $Tmp
+   set lKeep    = TRUE
 
    set lALibs = ""
    foreach i ( `var-list -l $RPATH` )
@@ -112,9 +115,15 @@ EOF
       set spkl = ( $spkl mysql )
 
       setenv HAVE_MYSQL  TRUE
+
+      flog $ALog $Tmp
+      set lvms = ( `$Tmp` )
+
    else
       setenv HAVE_MYSQL  ""
    endif
+
+   flog $ALog $RM $Tmp $Tmp.c
 
    set ETime = `timer -b $UTime`
 
@@ -122,6 +131,8 @@ EOF
 #--------------------------------------------------------------------------
 
 # SQLITE - version 1
+
+   set lvsl = ""
 
    set UTime = `timer -r`
 
@@ -150,6 +161,7 @@ EOF
    set ASList   = ( a so )
    set lLib     = sqlite3
    set lFile    = $Tmp
+   set lKeep    = TRUE
 
    set lALibs = ""
    foreach i ( `var-list -l $RPATH` )
@@ -175,9 +187,15 @@ EOF
       set spkl = ( $spkl sqlite )
 
       setenv HAVE_SQLITE TRUE
+
+      flog $ALog $Tmp
+      set lvsl = ( `$Tmp` )
+
    else
       setenv HAVE_SQLITE ""
    endif
+
+   flog $ALog $RM $Tmp $Tmp.c
 
    set ETime = `timer -b $UTime`
 
@@ -210,12 +228,13 @@ EOF
       set lIncDirs = ( /usr/local/include $RootInc )
       set lLibDirs = ( /usr/local/lib /usr/$LIB )
    endif
+   set Implicit = FALSE
    set lHdrs    = ( sqlite3.h )
    set ASList   = ( a so )
    set lLib     = sqlite3
    set lFile    = $Tmp
+   set lKeep    = TRUE
    set lALibs   = ( $LD_Lib )
-   set Implicit = FALSE
 
    source $AnaDir/find-package
 
@@ -230,14 +249,22 @@ EOF
       if (($Linking == dynamic) && ($?lSO == 1)) then
          setenv SQLITE3_SO    $lSO
       else
-         set libl = ( $libl $PckLib )
+         if ("$PckLib" !~ *$libl*) then
+            set libl = ( $libl $PckLib )
+         endif
       endif
 
       setenv HAVE_SQLITE_V2 TRUE
       setenv HAVE_SQLITE    TRUE
+
+      flog $ALog $Tmp
+      set lvsl = ( `$Tmp` )
+
    else
       setenv HAVE_SQLITE_V2 ""
    endif
+
+   flog $ALog $RM $Tmp $Tmp.c
 
    set ETime = `timer -b $UTime`
 
@@ -268,19 +295,21 @@ EOF
    endif
 
 # export the results
-   dbmset $ALog MDI_Inc        = $MDI_Inc^        \
-                MDI_Lib        = $MDI_Lib^        \
-                MDI_Pck        = $MDI_Pck^        \
-                SQL_Inc        = $SQL_Inc^        \
-                SQL_Lib        = $SQL_Lib^        \
-                SQL_RPath      = $SQL_RPath^      \
-                SQL_Path       = $SQL_Path^       \
-                MYSQL_SO       = $MYSQL_SO^       \
-                SQLITE3_SO     = $SQLITE3_SO^     \
-                HAVE_MYSQL     = $HAVE_MYSQL^     \
-                HAVE_SQLITE    = $HAVE_SQLITE^    \
-                HAVE_SQLITE_V2 = $HAVE_SQLITE_V2^ \
-                RPATH          = $RPATH
+   dbmset $ALog MDI_Inc         = $MDI_Inc^        \
+                MDI_Lib         = $MDI_Lib^        \
+                MDI_Pck         = $MDI_Pck^        \
+                SQL_Inc         = $SQL_Inc^        \
+                SQL_Lib         = $SQL_Lib^        \
+                SQL_RPath       = $SQL_RPath^      \
+                SQL_Path        = $SQL_Path^       \
+                HAVE_MYSQL      = $HAVE_MYSQL^     \
+                MYSQL_SO        = $MYSQL_SO^       \
+                MYSQL_VERSION   = $lvms^           \
+                HAVE_SQLITE     = $HAVE_SQLITE^    \
+                HAVE_SQLITE_V2  = $HAVE_SQLITE_V2^ \
+                SQLITE3_SO      = $SQLITE3_SO^     \
+                SQLITE3_VERSION = $lvsl^           \
+                RPATH           = $RPATH
 endif
 
 dbexp HAVE_SQL
