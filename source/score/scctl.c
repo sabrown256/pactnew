@@ -1287,8 +1287,11 @@ void daprint(pcons *alst)
 
 	 id = SC_type_id(ths->cdr_type, FALSE);
 
-         if (id == SC_STRING_I)
-            io_printf(stdout, "\t%s", ths->cdr);
+         if (id == SC_CHAR_I)
+            io_printf(stdout, "\t%s", ((char *) ths->cdr));
+
+         else if (id == SC_STRING_I)
+            io_printf(stdout, "\t%s", ((char **) ths->cdr)[0]);
 
 /* print the first value only */
 	 else

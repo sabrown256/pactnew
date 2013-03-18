@@ -29,7 +29,7 @@ while ($#argv > 0)
       default:
            set files = ( $files $1 )
            breaksw
-   end
+   endsw
    shift
 end
 
