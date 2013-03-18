@@ -24,7 +24,7 @@ set part = "."
 
 # CVS/SVN
 
-if ((-d CVS) || (-d .svn)) then
+if ((-d CVS) || (-d .svn) || (-d ../CVS) || (-d ../.svn)) then
    if (-d CVS) then
       set t = CVS
    else
@@ -34,7 +34,7 @@ if ((-d CVS) || (-d .svn)) then
    while ($i < $n)
       @ i = $i + 1
 
-      if (!(-d $t)) then
+      if (!(-d $t) && ($i > 1)) then
          set ok = 0
          if (-d CVS) then
             set kind = cvs
