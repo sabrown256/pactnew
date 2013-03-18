@@ -16,28 +16,13 @@ if ("$ldir" == ".") then
 endif
 set scsi = ( `$ldir/which-scs` )
 set repo = ( `$ldir/scs-meta -r` )
-
-if ($?lmngdir == 0) then
-   set exe = `dirname $0`
-   if ("$exe" == ".") then
-      set lmngdir = $cwd
-   else
-      set lmngdir = $exe
-   endif
-endif
-
-# work in the manager directory
-cd $lmngdir >& /dev/null
-
-set lmsg   = ""
-set lock   = ""
-set lstage = "$lmngdir/stage"
+unset ldir
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: scs-lock lock | unlock | status | cat"
+           echo "Usage: scs-lock lock | unlock | status | cat | dir"
            echo ""
            exit(1)
       case lock:
@@ -49,12 +34,27 @@ while ($#argv > 0)
       case status:
            set oper = status
            breaksw
+      case dir:
+           set oper = dir
+           breaksw
       case cat:
            set oper = cat
            breaksw
    endsw
    shift
 end
+
+# make a lock dir next to the base SCS dir
+pushd $scsi[2] >& /dev/null
+set lstage = $cwd/.repo-lockd
+if (!(-d $lstage)) then
+   mkdir $lstage
+   chmod 770 $lstage
+endif
+popd >& /dev/null
+
+set lock = "$lstage/commit.lock"
+set lmsg = ""
 
 # initial lock message
 if ($oper == lock) then
@@ -123,20 +123,19 @@ switch ($scsi[1])
                       echo "unlocked"
                    endif
                    breaksw
+              case dir:
+                   echo "$lstage"
+                   breaksw
               case cat:
-                   cat $lock
+                   if (-f $lock) then
+                      cat $lock
+                   endif
                    breaksw
            endsw
 
 # handle the REMOTE repository case
         else
-           set lock  = "$lstage/commit.lock"
            set rlock = "$repodir/commit.lock"
-
-           if (!(-d $lstage)) then
-              mkdir $lstage
-              chmod 770 $lstage
-           endif
 
            switch ($oper)
               case lock:
@@ -166,6 +165,9 @@ switch ($scsi[1])
                          echo "unlocked"
                       endif
                    endif
+                   breaksw
+              case dir:
+                   echo "$lstage"
                    breaksw
               case cat:
                    $SSH $repohost cat $rlock
@@ -222,20 +224,19 @@ switch ($scsi[1])
                       echo "unlocked"
                    endif
                    breaksw
+              case dir:
+                   echo "$lstage"
+                   breaksw
               case cat:
-                   cat $lock
+                   if (-f $lock) then
+                      cat $lock
+                   endif
                    breaksw
            endsw
 
 # handle the REMOTE repository case
         else
-           set lock  = "$lstage/commit.lock"
            set rlock = "$repodir/commit.lock"
-
-           if (!(-d $lstage)) then
-              mkdir $lstage
-              chmod 770 $lstage
-           endif
 
            switch ($oper)
               case lock:
@@ -266,6 +267,9 @@ switch ($scsi[1])
                       endif
                    endif
                    breaksw
+              case dir:
+                   echo "$lstage"
+                   breaksw
               case cat:
                    $CVS_RSH $repohost cat $rlock
                    breaksw
@@ -282,23 +286,16 @@ switch ($scsi[1])
 # SVN
 
    case svn:
-        if (!(-d $lstage)) then
-           mkdir $lstage
-           chmod 770 $lstage
-        endif
-
-        set root = $lmngdir:h
-        set lock = "$lstage/commit.lock"
         switch ($oper)
            case lock:
                 touch $lock
                 chmod 660 $lock
                 echo $lmsg >> $lock
-                svn lock $root/* >>& /dev/null
+                svn lock $scsi[2]/* >>& /dev/null
                 breaksw
            case unlock:
                 rm -f $lock
-                svn unlock $root/* >>& /dev/null
+                svn unlock $scsi[2]/* >>& /dev/null
                 breaksw
            case status:
                 if (-e $lock) then
@@ -307,8 +304,13 @@ switch ($scsi[1])
                    echo "unlocked"
                 endif
                 breaksw
+           case dir:
+                echo "$lstage"
+                breaksw
            case cat:
-                cat $lock
+                if (-f $lock) then
+                   cat $lock
+                endif
                 breaksw
         endsw
         breaksw
