@@ -246,7 +246,7 @@ GET_REPO_SOURCE:
 
 # lock repository
    $ScrDir/scs-lock lock
-   echo "  pact-dist in progress - " $USER  `date`>> $Lock
+   Note $Lock "  pact-dist in progress - $USER  `date`"
    Note $Lock ""
 
    NoteD $Log "Getting out the sources for $DTag"
