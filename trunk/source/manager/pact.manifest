@@ -74,7 +74,7 @@ script no-op dargs merge-aix panache
 script pdbdiff pdbview pdbcp pdbls label-ps tpu tzu remod mem-stats
 script which-cfg sys-site use-tcsh fill-string mpi-info
 script simplify-path sunrace cross-info find-comments where-git
-script scs-update scs-commit scs-co scs-history scs-meta
+script which-scs scs-update scs-commit scs-co scs-history scs-meta
 script scs-add scs-remove scs-lock scs-diff scs-move scs-tag
 script scs-revert scs-sync scs-init
 script var-list
