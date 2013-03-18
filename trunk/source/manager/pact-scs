@@ -16,7 +16,6 @@ if ($?SCSOpt == 0) then
 endif
 
 set repo     = `$ScrDir/scs-meta -r`
-set repohost = ""
 set SCSDir   = `scs-meta -n`
 set SCSExe   = `scs-meta -x`
 set repohost = `scs-meta -m`
@@ -24,22 +23,21 @@ set repohost = `scs-meta -m`
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# handle the local repository case
-if ("$repohost" == "--local--") then
-   set Lock = commit.lock
-   if (-d $repo) then
-      set Lock = $repo/commit.lock
-   endif
+# set the Lock name one time only
+if ($?Lock == 0) then
+   set lockd = `$ScrDir/scs-lock dir`
 
-# handle the remote repository case
-else
-   set Stage = "$MngDir/stage"
-   set Lock  = "$Stage/commit.lock"
+# handle the local repository case specially
+   if (("$repohost" == "--local--") && (-d $repo)) then
+      set lockd = $repo
+   endif
+   set Lock = $lockd/commit.lock
+   unset lockd
 endif
 
 # make the Message
-set Host    = `uname -n`
-set WhoIAm  = $USER
+set Host   = `uname -n`
+set WhoIAm = $USER
 
 # for commits
 if ($?TagOnly == 1) then
