@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# SCS-MOVE - rename sources whether GIT, CVS or SVN
+# SCS-MOVE - rename sources whether SCSI, CVS or SVN
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -14,29 +14,27 @@ set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
 endif
-set gitd = ( `$ldir/where-git` )
+set scsi = ( `$ldir/which-scs` )
 
-if (-d $gitd[1]) then
+switch ($scsi[1])
+   case git:
+        git mv $argv
+        breaksw
 
-#   pushd $gitd[1] >& /dev/null
-   git mv $argv
-#   popd >& /dev/null
+   case cvs:
+        setenv CVS_RSH  ssh
 
-else if (-d CVS) then
+        set old = $1
+        set new = $2
 
-   setenv CVS_RSH  ssh
+        mv $old $new
+        cvs remove $old
+        cvs add $new
+        breaksw
 
-   set old = $1
-   set new = $2
-
-   mv $old $new
-   cvs remove $old
-   cvs add $new
-
-else if (-d .svn) then
-
-   svn mv $argv
-
-endif
+   case svn:
+        svn mv $argv
+        breaksw
+endsw
 
 exit($status)

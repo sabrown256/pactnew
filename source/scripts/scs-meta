@@ -16,7 +16,7 @@ set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
 endif
-set gitd = ( `$ldir/where-git` )
+set scsi = ( `$ldir/which-scs` )
 
 set tgt   = ""
 set nrepo = ""
@@ -75,152 +75,152 @@ set res = ""
 
 # GIT
 
-if (-d $gitd[1]) then
+switch ($scsi[1])
+   case git:
+        pushd $scsi[2] >& /dev/null
 
-   pushd $gitd[1] >& /dev/null
+        switch ($tgt)
+           case change-repo:
+                pushd .git >& /dev/null
+                set orepo = ( `grep -w url config |& grep = | sed 's/^[ \t]*url[ \t]*=[ \t]*//'` )
+                echo -n "Change '$orepo' to '$nrepo'? "
+                set resp = ( $< )
+                if ("$resp" =~ [yY]*) then
+                   cat config | sed "s|$orepo|$nrepo|" >&! config.$$
+                   mv config.$$ config
+                endif
+                popd >& /dev/null
+                breaksw
+           case directories:
+                if ("$opt" == "-a") then
+                   set res = ( $res `find $scsi[2] -name .git -type d` )
+                else
+                   set res = ( $res `find $scsi[2] -name .git -type d | grep -v $scsi[2]/.git` )
+                endif
+                breaksw
+           case exe:
+                set res = `which git`
+                breaksw
+           case kind:
+                set res = git
+                breaksw
+           case machine:
+                set repo = ( `grep url $scsi[2]/.git/config | tr "\t" " " | sed 's|^ *url =||'` )
+                if ("$repo" =~ *:/*) then
+                   set res = `echo $repo | sed 's|:/.*$||'`
+                else if ("$repo" =~ http*://*) then
+                   set res = `echo $repo | sed 's|http*://||' | sed 's|/.*$||'`
+                else
+                   set res = "--local--"
+                endif
+                unset repo
+                breaksw
+           case metan:
+                set res = .git
+                breaksw
+           case repo:
+                set res = ( `grep url $scsi[2]/.git/config | tr "\t" " " | sed 's|^ *url =||'` )
+                breaksw
+        endsw
 
-   switch ($tgt)
-      case change-repo:
-           pushd .git >& /dev/null
-           set orepo = ( `grep -w url config |& grep = | sed 's/^[ \t]*url[ \t]*=[ \t]*//'` )
-           echo -n "Change '$orepo' to '$nrepo'? "
-           set resp = ( $< )
-           if ("$resp" =~ [yY]*) then
-              cat config | sed "s|$orepo|$nrepo|" >&! config.$$
-              mv config.$$ config
-           endif
-           popd >& /dev/null
-           breaksw
-      case directories:
-           if ("$opt" == "-a") then
-              set res = ( $res `find $gitd[1] -name .git -type d` )
-           else
-              set res = ( $res `find $gitd[1] -name .git -type d | grep -v $gitd[1]/.git` )
-           endif
-           breaksw
-      case exe:
-           set res = `which git`
-           breaksw
-      case kind:
-           set res = git
-           breaksw
-      case machine:
-           set repo = ( `grep url $gitd[1]/.git/config | tr "\t" " " | sed 's|^ *url =||'` )
-           if ("$repo" =~ *:/*) then
-              set res = `echo $repo | sed 's|:/.*$||'`
-           else if ("$repo" =~ http*://*) then
-              set res = `echo $repo | sed 's|http*://||' | sed 's|/.*$||'`
-           else
-              set res = "--local--"
-           endif
-           unset repo
-           breaksw
-      case metan:
-           set res = .git
-           breaksw
-      case repo:
-           set res = ( `grep url $gitd[1]/.git/config | tr "\t" " " | sed 's|^ *url =||'` )
-           breaksw
-   endsw
-
-   popd >& /dev/null
+        popd >& /dev/null
+        breaksw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # CVS
 
-else if (-d CVS) then
-
-   switch ($tgt)
-      case change-repo:
-           foreach f (`scs-meta -d`)
-              set r = $f/Root
-              rm -f $r
-              echo $repo > $r
-           end
-           breaksw
-      case directories:
-           set res = ""
+   case cvs:
+        switch ($tgt)
+           case change-repo:
+                foreach f (`scs-meta -d`)
+                   set r = $f/Root
+                   rm -f $r
+                   echo $repo > $r
+                end
+                breaksw
+           case directories:
+                set res = ""
 # NOTE: too many directories to put in a list
-           find . -name CVS -type d
-           breaksw
-      case exe:
-           set res = `which cvs`
-           breaksw
-      case kind:
-           set res = cvs
-           breaksw
-      case machine:
-           set repo = ( `cat CVS/Root` )
-           if ("$repo" =~ *:/*) then
-              set res = `echo $repo | sed 's|:/.*$||' | sed 's|^.*@||'`
-           else
-              set res = "--local--"
-           endif
-           unset repo
-           breaksw
-      case metan:
-           set res = CVS
-           breaksw
-      case repo:
-           set res = ( `cat CVS/Root` )
-           breaksw
-   endsw
+                find . -name CVS -type d
+                breaksw
+           case exe:
+                set res = `which cvs`
+                breaksw
+           case kind:
+                set res = cvs
+                breaksw
+           case machine:
+                set repo = ( `cat CVS/Root` )
+                if ("$repo" =~ *:/*) then
+                   set res = `echo $repo | sed 's|:/.*$||' | sed 's|^.*@||'`
+                else
+                   set res = "--local--"
+                endif
+                unset repo
+                breaksw
+           case metan:
+                set res = CVS
+                breaksw
+           case repo:
+                set res = ( `cat CVS/Root` )
+                breaksw
+        endsw
+        breaksw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # SVN
 
-else if (-d .svn) then
-
-   switch ($tgt)
-      case change-repo:
-           echo "Not implemented yet"
-           exit(1)
-           breaksw
-      case directories:
-           set res = ""
+   case svn:
+        switch ($tgt)
+           case change-repo:
+                echo "Not implemented yet"
+                exit(1)
+                breaksw
+           case directories:
+                set res = ""
 # NOTE: too many directories to put in a list
-           find . -name .svn -type d
-           breaksw
-      case exe:
-           set res = `which svn`
-           breaksw
-      case kind:
-           set res = svn
-           breaksw
-      case machine:
-           get_line dir .svn/entries 5
-           set repo = $dir:h
+                find . -name .svn -type d
+                breaksw
+           case exe:
+                set res = `which svn`
+                breaksw
+           case kind:
+                set res = svn
+                breaksw
+           case machine:
+                get_line dir .svn/entries 5
+                set repo = $dir:h
 
 # expect svn+ssh://<host><path>
 # https://<host><path>
-           if ("$repo" =~ svn+ssh://*) then
-              set res = `echo $repo | sed 's|^svn+ssh://||' | sed 's|/.*$||'`
-           else if ("$repo" =~ http*://*) then
-              set res = `echo $repo | sed 's|^http.*://||' | sed 's|/.*$||'`
-           else
-              set res = "--local--"
-           endif
-           unset repo
-           unset dir
-           breaksw
-      case metan:
-           set res = .svn
-           breaksw
-      case repo:
-           get_line dir  .svn/entries 5
-           get_line base .svn/entries 6
-           set res = $dir:h
-           breaksw
-   endsw
-
+                if ("$repo" =~ svn+ssh://*) then
+                   set res = `echo $repo | sed 's|^svn+ssh://||' | sed 's|/.*$||'`
+                else if ("$repo" =~ http*://*) then
+                   set res = `echo $repo | sed 's|^http.*://||' | sed 's|/.*$||'`
+                else
+                   set res = "--local--"
+                endif
+                unset repo
+                unset dir
+                breaksw
+           case metan:
+                set res = .svn
+                breaksw
+           case repo:
+                get_line dir  .svn/entries 5
+                get_line base .svn/entries 6
+                set res = $dir:h
+                breaksw
+        endsw
+        breaksw
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-endif
+endsw
 
 # print results
 echo "$res"

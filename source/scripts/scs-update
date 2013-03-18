@@ -14,7 +14,7 @@ set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
 endif
-set gitd = ( `$ldir/where-git` )
+set scsi = ( `$ldir/which-scs` )
 
 set unmngd = FALSE
 set cvsopt = ""
@@ -40,26 +40,26 @@ while ($#argv > 0)
    shift
 end
 
-if (-d $gitd[1]) then
+switch ($scsi[1])
+   case git:
+        pushd $scsi[2] >& /dev/null
 
-   pushd $gitd[1] >& /dev/null
-
-   if ($unmngd == TRUE) then
-      git status -s |& egrep '^\?' | sed 's/^??/? /' | grep "$gitd[2]/"
-   else
-      set repo = ( `$ldir/scs-meta -r` )
+        if ($unmngd == TRUE) then
+           git status -s |& egrep '^\?' | sed 's/^??/? /' | grep "$scsi[3]/"
+        else
+           set repo = ( `$ldir/scs-meta -r` )
 
 # update local copy with changes from master repo
-      git pull $repo master >&! .log.sup
-      set xstatus = $status
+           git pull $repo master >&! .log.sup
+           set xstatus = $status
 
 # report changed files
-      grep '|' .log.sup | sed 's/|.*$//' | awk '{printf("   P %s\n", $1);}'
-      if ($xstatus == 0) then
-         rm .log.sup
-      else
-         cat .log.sup
-      endif
+           grep '|' .log.sup | sed 's/|.*$//' | awk '{printf("   P %s\n", $1);}'
+           if ($xstatus == 0) then
+              rm .log.sup
+           else
+              cat .log.sup
+           endif
 
 # update this way
 # if this is not done then you eventually get messages like:
@@ -67,37 +67,39 @@ if (-d $gitd[1]) then
 #    Your branch is ahead of 'origin/master' by 17 commits.
 # from git status
 # what is the difference between the two pulls?
-      git pull >&! .log.sup
-      set xstatus = $status
+           git pull >&! .log.sup
+           set xstatus = $status
 
 # report status of local changes
-      if ("$gitd[2]" == ".") then
-         git status -s |& egrep -v '^\?'
-      else
-         git status -s |& egrep -v '^\?' | grep "$gitd[2]/"
-      endif
-   endif
+           if ("$scsi[3]" == ".") then
+              git status -s |& egrep -v '^\?'
+           else
+              git status -s |& egrep -v '^\?' | grep "$scsi[3]/"
+           endif
+        endif
 
-   popd >& /dev/null
+        popd >& /dev/null
+        breaksw
 
-else if (-d CVS) then
+   case cvs:
 
-   setenv CVS_RSH  ssh
-   if ($unmngd == TRUE) then
-      cvs update $cvsopt $args |& egrep '^\?'
-   else
-      cvs update $cvsopt $args |& egrep -v '^\?' |& grep -v 'cvs update'
-   endif
+        setenv CVS_RSH  ssh
+        if ($unmngd == TRUE) then
+           cvs update $cvsopt $args |& egrep '^\?'
+        else
+           cvs update $cvsopt $args |& egrep -v '^\?' |& grep -v 'cvs update'
+        endif
+        breaksw
 
-else if (-d .svn) then
+   case svn:
 
-   svn update $svnopt $args
-   if ($unmngd == TRUE) then
-      svn status $svnopt |& egrep '^\?'
-   else
-      svn status $svnopt |& egrep -v '^\?' | sed 's|+| |'
-   endif
-
-endif
+        svn update $svnopt $args
+        if ($unmngd == TRUE) then
+           svn status $svnopt |& egrep '^\?'
+        else
+           svn status $svnopt |& egrep -v '^\?' | sed 's|+| |'
+        endif
+        breaksw
+endsw
 
 exit($status)
