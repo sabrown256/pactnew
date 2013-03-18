@@ -18,6 +18,7 @@ if ("$ldir" == ".") then
 endif
 set scsi = ( `$ldir/which-scs` )
 if ($#scsi < 3) then
+   echo ">>> SCS-META no metadata from '$ldir' - exiting"
    exit(1)
 endif
 
@@ -73,6 +74,8 @@ end
 
 set res = ""
 
+pushd $scsi[2] >& /dev/null
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -80,8 +83,6 @@ set res = ""
 
 switch ($scsi[1])
    case git:
-        pushd $scsi[2] >& /dev/null
-
         switch ($tgt)
            case change-repo:
                 pushd .git >& /dev/null
@@ -125,8 +126,6 @@ switch ($scsi[1])
                 set res = ( `grep url $scsi[2]/.git/config | tr "\t" " " | sed 's|^ *url =||'` )
                 breaksw
         endsw
-
-        popd >& /dev/null
         breaksw
 
 #--------------------------------------------------------------------------
@@ -220,10 +219,13 @@ switch ($scsi[1])
                 breaksw
         endsw
         breaksw
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endsw
+
+popd >& /dev/null
 
 # print results
 echo "$res"

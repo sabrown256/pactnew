@@ -15,6 +15,13 @@ if ("$ldir" == ".") then
    set ldir = $cwd
 endif
 set scsi = ( `$ldir/which-scs` )
+
+# if we cannot find metadata call it locked to prevent disaster
+if ($#scsi < 3) then
+   echo "locked"
+   exit(1)
+endif
+
 set repo = ( `$ldir/scs-meta -r` )
 unset ldir
 
