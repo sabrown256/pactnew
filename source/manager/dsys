@@ -1665,7 +1665,7 @@ CFG_DONE:
 
               case -t:
                    source $MngDir/pact-scs
-                   set Tags = "-T -a"
+                   set Tags = "-def"
                    breaksw
 
               case -x:
