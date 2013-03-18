@@ -17,6 +17,9 @@ if ("$ldir" == ".") then
    set ldir = $cwd
 endif
 set scsi = ( `$ldir/which-scs` )
+if ($#scsi < 3) then
+   exit(1)
+endif
 
 set tgt   = ""
 set nrepo = ""
