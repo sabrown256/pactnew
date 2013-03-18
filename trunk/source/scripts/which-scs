@@ -1,0 +1,88 @@
+#!/bin/csh -f
+#
+# WHICH-SCS - report on the source management system used
+#
+# include "cpyright.h"
+#
+
+unalias *
+set path = ( /usr/bin /bin )
+
+set cur = $cwd
+pushd $cur >& /dev/null
+
+set ok   = 1
+set kind = none
+set bdir = "+none+"
+set part = "."
+
+@ n = 5
+@ i = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CVS/SVN
+
+if ((-d CVS) || (-d .svn)) then
+   if (-d CVS) then
+      set t = CVS
+   else
+      set t = .svn
+   endif
+
+   while ($i < $n)
+      @ i = $i + 1
+
+      if (!(-d $t)) then
+         set ok = 0
+         if (-d CVS) then
+            set kind = cvs
+         else
+            set kind = svn
+         endif
+         break
+      else
+         set bdir = $cwd
+         cd .. >& /dev/null
+      endif
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GIT
+
+else
+   set t = .git
+   while ($i < $n)
+      @ i = $i + 1
+
+      if (-d $t) then
+         set ok   = 0
+         set bdir = $cwd
+         set kind = git
+         break
+      else
+         cd .. >& /dev/null
+      endif
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endif
+
+if ($ok == 0) then
+   if ("$bdir" == "$cur") then
+      set part = "."
+   else
+      set part = ( `echo $cur | sed 's|'$bdir'/||'` )
+   endif
+
+   echo $kind $bdir $part
+endif
+
+popd >& /dev/null
+
+exit($ok)

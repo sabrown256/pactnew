@@ -14,7 +14,7 @@ set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
 endif
-set gitd = ( `$ldir/where-git` )
+set scsi = ( `$ldir/which-scs` )
 
 set args = ""
 while ($#argv > 0)
@@ -33,20 +33,19 @@ while ($#argv > 0)
    shift
 end
 
-if (-d $gitd[1]) then
+switch ($scsi[1])
+   case git:
+        git diff -U0 $args
+        breaksw
 
-#   pushd $gitd[1] >& /dev/null
-   git diff -U0 $args
-#   popd >& /dev/null
+   case cvs:
+        setenv CVS_RSH  ssh
+        cvs diff $args
+        breaksw
 
-else if (-d CVS) then
-
-   setenv CVS_RSH  ssh
-   cvs diff $args
-
-else if (-d .svn) then
-   svn diff --diff-cmd `which diff` -x -r $args
-
-endif
+   case svn:
+        svn diff --diff-cmd `which diff` -x -r $args
+        breaksw
+endsw
 
 exit($status)

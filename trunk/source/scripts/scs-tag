@@ -14,23 +14,23 @@ set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
 endif
-set gitd = ( `$ldir/where-git` )
+set scsi = ( `$ldir/which-scs` )
 unset ldir
 
-if (-d $gitd[1]) then
+switch ($scsi[1])
+   case git:
+        git tag $argv
+        breaksw
 
-   git tag $argv
-
-else if (-d CVS) then
-
-   setenv CVS_RSH  ssh
-   cvs tag $argv
+   case cvs:
+        setenv CVS_RSH  ssh
+        cvs tag $argv
 # example: cvs rtag $TagID $codename doc test
+        breaksw
 
-else if (-d .svn) then
-
-   svn tag $argv
-
-endif
+   case svn:
+        svn tag $argv
+        breaksw
+endsw
 
 exit($status)

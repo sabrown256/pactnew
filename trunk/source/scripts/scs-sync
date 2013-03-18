@@ -20,7 +20,6 @@ set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
 endif
-set gitd = ( `$ldir/where-git` )
 set repo = ( `$ldir/scs-meta -r` )
 set knd  = ( `$ldir/scs-meta -k` )
 
@@ -249,7 +248,7 @@ endif
 
 flog $log cd $pkg
 
-set gitd = ( `$ldir/where-git` )
+set scsi = ( `$ldir/which-scs` )
 set repo = ( `$ldir/scs-meta -r` )
 set knd  = ( `$ldir/scs-meta -k` )
 set dirs = ( `$ldir/scs-meta -d -a | sed 's|'$cwd'|\.|g'` )
@@ -264,83 +263,83 @@ Note $log ""
 
 set lt = `timer -r`
 
-if (-d $gitd[1]) then
+switch ($scsi[1])
+   case git:
+        flog $log git add -A
+        flog $log git status -s
+        breaksw
 
-   flog $log git add -A
-   flog $log git status -s
+   case cvs:
+        foreach d ( $ignd )
+           set td = $d:t
+           if (("$td" != CVS) && ("$td" != .svn) && ("$td" != .git)) then
+              Note $log "Remove: $d"
+              flog $log ( find . -type d -name $td | xargs rm -r )
+           endif
+        end
 
-else if (-d CVS) then
-
-   foreach d ( $ignd )
-      set td = $d:t
-      if (("$td" != CVS) && ("$td" != .svn) && ("$td" != .git)) then
-         Note $log "Remove: $d"
-         flog $log ( find . -type d -name $td | xargs rm -r )
-      endif
-   end
-
-   foreach d ($dirs)
-      set sd = $d:h
-      if (-d $sd) then
-         flog $log pushd $sd
-
-# remove entries
-         foreach f ( `cat CVS/Entries | sed 's|^/||' | sed 's|/.*//$||'` )
-            if ($f != D) then
-               if (!(-f $f)) then
-                  flog $log cvs remove $f
-               endif
-            endif
-         end
-
-# add entries
-         foreach f ( `ls -1` )
-            if ($f != CVS) then
-               grep "/$f/" CVS/Entries >& /dev/null
-               if ($status != 0) then
-                  flog $log cvs add $f
-               endif
-            endif
-         end
-         flog $log popd
-      endif
-   end
-
-else if (-d .svn) then
-
-   foreach d ( $ignd )
-      set td = $d:t
-      if (("$td" != CVS) && ("$td" != .svn) && ("$td" != .git)) then
-         Note $log "Remove: $d"
-         flog $log ( find . -type d -name $td | xargs rm -r )
-      endif
-   end
-
-   foreach d ($dirs)
-      set sd = $d:h
-      if (-d $sd) then
-         flog $log pushd $sd
+        foreach d ($dirs)
+           set sd = $d:h
+           if (-d $sd) then
+              flog $log pushd $sd
 
 # remove entries
-         foreach e ( `ls -1 .svn/text-base` )
-            set f = $e:r
-            if (!(-f $f)) then
-               flog $log svn remove $f
-            endif
-         end
+              foreach f ( `cat CVS/Entries | sed 's|^/||' | sed 's|/.*//$||'` )
+                 if ($f != D) then
+                    if (!(-f $f)) then
+                       flog $log cvs remove $f
+                    endif
+                 endif
+              end
 
 # add entries
-         foreach e ( `ls -1` )
-            set f = .svn/text-base/$e.svn-base
-            if (!(-f $f)) then
-               flog $log svn add $e
-            endif
-         end
-         flog $log popd
-      endif
-   end
+              foreach f ( `ls -1` )
+                 if ($f != CVS) then
+                    grep "/$f/" CVS/Entries >& /dev/null
+                    if ($status != 0) then
+                       flog $log cvs add $f
+                    endif
+                 endif
+              end
+              flog $log popd
+           endif
+        end
+        breaksw
 
-endif
+   case svn:
+        foreach d ( $ignd )
+           set td = $d:t
+           if (("$td" != CVS) && ("$td" != .svn) && ("$td" != .git)) then
+              Note $log "Remove: $d"
+              flog $log ( find . -type d -name $td | xargs rm -r )
+           endif
+        end
+
+        foreach d ($dirs)
+           set sd = $d:h
+           if (-d $sd) then
+              flog $log pushd $sd
+
+# remove entries
+              foreach e ( `ls -1 .svn/text-base` )
+                 set f = $e:r
+                 if (!(-f $f)) then
+                    flog $log svn remove $f
+                 endif
+              end
+
+# add entries
+              foreach e ( `ls -1` )
+                 set f = .svn/text-base/$e.svn-base
+                 if (!(-f $f)) then
+                    flog $log svn add $e
+                 endif
+              end
+              flog $log popd
+           endif
+        end
+        breaksw
+endsw
 
 set lt = `timer -b $lt`
 NoteD $log "ok ($lt)"

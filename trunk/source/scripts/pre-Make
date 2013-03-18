@@ -21,7 +21,7 @@ TGTScr = do-local do-stats do-automake distribute \
          simplify-path simplify-list gcc-info sinstall fill-string \
          mall png-diff sunrace cross-info find-comments where-git \
          pcpp import-api import-so prune-env measure-env \
-         scs-update scs-commit scs-co scs-history scs-meta \
+         which-scs scs-update scs-commit scs-co scs-history scs-meta \
          scs-add scs-remove scs-lock scs-diff scs-move scs-tag \
          scs-sync scs-revert scs-init \
          var-list winer loco who-does

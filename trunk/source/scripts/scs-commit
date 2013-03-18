@@ -14,7 +14,7 @@ set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
 endif
-set gitd = ( `$ldir/where-git` )
+set scsi = ( `$ldir/which-scs` )
 set repo = ( `$ldir/scs-meta -r` )
 
 set args = ""
@@ -42,107 +42,122 @@ while ($#argv > 0)
    shift
 end
 
-if (-d $gitd[1]) then
+switch ($scsi[1])
 
-   set log = $cwd/log.commit
-   rm -f $log
-   touch $log
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-   set part = $gitd[2]
-   pushd $gitd[1] >>& $log
+   case git:
+        set log = $cwd/log.commit
+        rm -f $log
+        touch $log
+
+        set part = $scsi[3]
+        pushd $scsi[2] >>& $log
 
 # do a pull first
-   echo -n "Sync .............. "
-   echo "git pull $repo master" >>& $log
-   git pull $repo master >>& $log
-   set xstatus = $status
-   if ($xstatus == 0) then
-      echo "ok"
-   else
-      echo "ng ($xstatus)"
-   endif
+        echo -n "Sync .............. "
+        echo "git pull $repo master" >>& $log
+        git pull $repo master >>& $log
+        set xstatus = $status
+        if ($xstatus == 0) then
+           echo "ok"
+        else
+           echo "ng ($xstatus)"
+        endif
 
 # find changed files
-   if ("$part" == ".") then
-      set inf = ( `git status -s |& egrep -v '^\?'` )
-   else
-      set inf = ( `git status -s |& egrep -v '^\?' | grep $part` )
-   endif
-   echo "Committing:"
-   set files = ""
-   while ($#inf > 0)
-      set tag  = $inf[1]
-      set file = $inf[2]
-      shift inf
-      shift inf
-      if ((-f $file) || ($tag == 'D')) then
-         set files = ( $files $file )
-         echo " $tag  $file"
-      endif
-   end
-   echo "$#files changed"
+        if ("$part" == ".") then
+           set inf = ( `git status -s |& egrep -v '^\?'` )
+        else
+           set inf = ( `git status -s |& egrep -v '^\?' | grep $part` )
+        endif
+        echo "Committing:"
+        set files = ""
+        while ($#inf > 0)
+           set tag  = $inf[1]
+           set file = $inf[2]
+           shift inf
+           shift inf
+           if ((-f $file) || ($tag == 'D')) then
+              set files = ( $files $file )
+              echo " $tag  $file"
+           endif
+        end
+        echo "$#files changed"
 
 # do the local commit
 # NOTE: if files list is too big shell will kill off before the commit
 # if you do not give files you must do git add to the files first
-   echo -n "Local commit ...... "
+        echo -n "Local commit ...... "
 
 # GOTCHA: too many files and the echo hacks up a 'Word too long' hairball
-   if ($#files < 40) then
-      echo "git commit $args -q -m '$msg' $files" >>& $log
-   endif
+        if ($#files < 40) then
+           echo "git commit $args -q -m '$msg' $files" >>& $log
+        endif
 
-   git commit $args -q -m "$msg" $files >>& $log
-   set xstatus = $status
-   if ($xstatus == 0) then
-      echo "ok"
-   else
-      echo "ng ($xstatus)"
-   endif
+        git commit $args -q -m "$msg" $files >>& $log
+        set xstatus = $status
+        if ($xstatus == 0) then
+           echo "ok"
+        else
+           echo "ng ($xstatus)"
+        endif
 
-   echo "---------------------" >>& $log
+        echo "---------------------" >>& $log
 
 # push it up to the master repository
-   if ($xstatus == 0) then
-      echo -n "Pushing changes ... "
-      echo "git push $repo" >>& $log
-      git push $repo >>& $log
-      if ($xstatus == 0) then
-         echo "ok"
-      else
-         echo "ng ($xstatus)"
-         echo "Need 'git config --bool core.bare true' on master"
-      endif
-   endif
+        if ($xstatus == 0) then
+           echo -n "Pushing changes ... "
+           echo "git push $repo" >>& $log
+           git push $repo >>& $log
+           if ($xstatus == 0) then
+              echo "ok"
+           else
+              echo "ng ($xstatus)"
+              echo "Need 'git config --bool core.bare true' on master"
+           endif
+        endif
 
-   echo "---------------------" >>& $log
+        echo "---------------------" >>& $log
 
 # do final pull back from the master repository
 # so that git status does not show being ahead of origin/master
-   if ($xstatus == 0) then
-      echo -n "Pulling back ...... "
-      echo "git pull" >>& $log
-      git pull >>& $log
-#      echo "git pull $repo" >>& $log
-#      git pull $repo >>& $log
-      if ($xstatus == 0) then
-         echo "ok"
-      else
-         echo "ng ($xstatus)"
-      endif
-   endif
+        if ($xstatus == 0) then
+           echo -n "Pulling back ...... "
+           echo "git pull" >>& $log
+           git pull >>& $log
+#           echo "git pull $repo" >>& $log
+#           git pull $repo >>& $log
+           if ($xstatus == 0) then
+              echo "ok"
+           else
+              echo "ng ($xstatus)"
+           endif
+        endif
 
-   popd >& /dev/null
+        popd >& /dev/null
+        breaksw
 
-else if (-d CVS) then
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-   setenv CVS_RSH  ssh
-   cvs commit $args -m "$msg"
+   case cvs:
+        setenv CVS_RSH  ssh
+        cvs commit $args -m "$msg"
 
-else if (-d .svn) then
+        breaksw
 
-   svn commit $args -m "$msg"
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-endif
+   case svn:
+        svn commit $args -m "$msg"
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endsw
 
 exit($status)

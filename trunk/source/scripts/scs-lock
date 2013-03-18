@@ -14,7 +14,7 @@ set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
 endif
-set gitd = ( `$ldir/where-git` )
+set scsi = ( `$ldir/which-scs` )
 set repo = ( `$ldir/scs-meta -r` )
 
 if ($?lmngdir == 0) then
@@ -85,235 +85,238 @@ if ($oper == lock) then
    unset ldate
 endif
 
+switch ($scsi[1])
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # GIT
 
-if (-d $gitd[1]) then
-   setenv SSH  ssh
-   setenv SCP  scp
+   case git:
+        setenv SSH  ssh
+        setenv SCP  scp
 
-   if ("$repo" =~ *:/*) then
-      set repohost = `echo $repo | sed 's|:/.*$||'`
-      set repodir  = `echo $repo | sed 's|^.*:||'`
-   else
-      set repohost = ""
-      set repodir  = $repo
-   endif
+        if ("$repo" =~ *:/*) then
+           set repohost = `echo $repo | sed 's|:/.*$||'`
+           set repodir  = `echo $repo | sed 's|^.*:||'`
+        else
+           set repohost = ""
+           set repodir  = $repo
+        endif
 
 # handle the LOCAL repository case
-   if ("$repohost" == "") then
-      set lock = $repodir/commit.lock
-      switch ($oper)
-         case lock:
-              touch $lock
-              chmod 660 $lock
-              echo $lmsg >> $lock
-              breaksw
-         case unlock:
-              rm -f $lock
-              breaksw
-         case status:
-              if (-e $lock) then
-                 echo "locked"
-              else
-                 echo "unlocked"
-              endif
-              breaksw
-         case cat:
-              cat $lock
-              breaksw
-      endsw
+        if ("$repohost" == "") then
+           set lock = $repodir/commit.lock
+           switch ($oper)
+              case lock:
+                   touch $lock
+                   chmod 660 $lock
+                   echo $lmsg >> $lock
+                   breaksw
+              case unlock:
+                   rm -f $lock
+                   breaksw
+              case status:
+                   if (-e $lock) then
+                      echo "locked"
+                   else
+                      echo "unlocked"
+                   endif
+                   breaksw
+              case cat:
+                   cat $lock
+                   breaksw
+           endsw
 
 # handle the REMOTE repository case
-   else
-      set lock  = "$lstage/commit.lock"
-      set rlock = "$repodir/commit.lock"
+        else
+           set lock  = "$lstage/commit.lock"
+           set rlock = "$repodir/commit.lock"
 
-      if (!(-d $lstage)) then
-         mkdir $lstage
-         chmod 770 $lstage
-      endif
+           if (!(-d $lstage)) then
+              mkdir $lstage
+              chmod 770 $lstage
+           endif
 
-      switch ($oper)
-         case lock:
-              touch $lock
-              chmod 660 $lock
-              echo $lmsg >> $lock
-              $SCP $lock ${repohost}:${repodir} >& /dev/null
-              breaksw
-         case unlock:
-              rm -f $lock
-              $SSH $repohost rm -f $rlock
-              breaksw
-         case status:
-              if ($?DoingConfig == 0) then
-                 set inf   = `$SSH $repohost ls $repodir |& cat`
-                 set elock = FALSE
-                 foreach i ($inf)
-                    set entry = $i:h
-                    if ("$entry" == "commit.lock") then
-                       set elock = TRUE
-                    endif
-                 end
-                 unset inf
-                 if ($elock == TRUE) then
-                    echo "locked"
-                 else
-                    echo "unlocked"
-                 endif
-              endif
-              breaksw
-         case cat:
-              $SSH $repohost cat $rlock
-              breaksw
-      endsw
+           switch ($oper)
+              case lock:
+                   touch $lock
+                   chmod 660 $lock
+                   echo $lmsg >> $lock
+                   $SCP $lock ${repohost}:${repodir} >& /dev/null
+                   breaksw
+              case unlock:
+                   rm -f $lock
+                   $SSH $repohost rm -f $rlock
+                   breaksw
+              case status:
+                   if ($?DoingConfig == 0) then
+                      set inf   = `$SSH $repohost ls $repodir |& cat`
+                      set elock = FALSE
+                      foreach i ($inf)
+                         set entry = $i:h
+                         if ("$entry" == "commit.lock") then
+                            set elock = TRUE
+                         endif
+                      end
+                      unset inf
+                      if ($elock == TRUE) then
+                         echo "locked"
+                      else
+                         echo "unlocked"
+                      endif
+                   endif
+                   breaksw
+              case cat:
+                   $SSH $repohost cat $rlock
+                   breaksw
+           endsw
 
-      unset rlock
+           unset rlock
 
-   endif
+        endif
+        breaksw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # CVS
 
-else if (-d CVS) then
+   case cvs:
+        setenv CVS_RSH  ssh
 
-   setenv CVS_RSH  ssh
-
-   if ($?repo == 1) then
-      if ("$repo" =~ *:*) then
-         set repohost = `echo $repo | sed 's|:/.*$||' | sed 's|^.*@||'`
-         set repodir  = `echo $repo | sed 's|^.*:||'`
-      else
-         set repohost = `hostname`
-         set repodir  = $repo
-      endif
-   else
-      set repohost = ""
-   endif
+        if ($?repo == 1) then
+           if ("$repo" =~ *:*) then
+              set repohost = `echo $repo | sed 's|:/.*$||' | sed 's|^.*@||'`
+              set repodir  = `echo $repo | sed 's|^.*:||'`
+           else
+              set repohost = `hostname`
+              set repodir  = $repo
+           endif
+        else
+           set repohost = ""
+        endif
 
 # handle the LOCAL repository case
-   if ("$repohost" == "") then
-      set lock = commit.lock
-      if ($?repo) then
-         if (`expr "$repo" : '.*\(:\).*'` == "") then
-            set lock = $repo/commit.lock
-         endif
-      endif
-
-      switch ($oper)
-         case lock:
-              touch $lock
-              chmod 660 $lock
-              echo $lmsg >> $lock
-              breaksw
-         case unlock:
-              rm -f $lock
-              breaksw
-         case status:
-              if (-e $lock) then
-                 echo "locked"
-              else
-                 echo "unlocked"
+        if ("$repohost" == "") then
+           set lock = commit.lock
+           if ($?repo) then
+              if (`expr "$repo" : '.*\(:\).*'` == "") then
+                 set lock = $repo/commit.lock
               endif
-              breaksw
-         case cat:
-              cat $lock
-              breaksw
-      endsw
+           endif
+
+           switch ($oper)
+              case lock:
+                   touch $lock
+                   chmod 660 $lock
+                   echo $lmsg >> $lock
+                   breaksw
+              case unlock:
+                   rm -f $lock
+                   breaksw
+              case status:
+                   if (-e $lock) then
+                      echo "locked"
+                   else
+                      echo "unlocked"
+                   endif
+                   breaksw
+              case cat:
+                   cat $lock
+                   breaksw
+           endsw
 
 # handle the REMOTE repository case
-   else
-      set lock  = "$lstage/commit.lock"
-      set rlock = "$repodir/commit.lock"
+        else
+           set lock  = "$lstage/commit.lock"
+           set rlock = "$repodir/commit.lock"
 
-      if (!(-d $lstage)) then
-         mkdir $lstage
-         chmod 770 $lstage
-      endif
+           if (!(-d $lstage)) then
+              mkdir $lstage
+              chmod 770 $lstage
+           endif
 
-      switch ($oper)
-         case lock:
-              touch $lock
-              chmod 660 $lock
-              echo $lmsg >> $lock
-              scp $lock ${repohost}:${repodir} >& /dev/null
-              breaksw
-         case unlock:
-              rm -f $lock
-              $CVS_RSH $repohost rm -f $rlock
-              breaksw
-         case status:
-              if ($?DoingConfig == 0) then
-                 set inf   = `$CVS_RSH $repohost ls $repodir |& cat`
-                 set elock = FALSE
-                 foreach i ($inf)
-                    set entry = $i:h
-                    if ("$entry" == "commit.lock") then
-                       set elock = TRUE
-                    endif
-                 end
-                 unset inf
-                 if ($elock == TRUE) then
-                    echo "locked"
-                 else
-                    echo "unlocked"
-                 endif
-              endif
-              breaksw
-         case cat:
-              $CVS_RSH $repohost cat $rlock
-              breaksw
-      endsw
+           switch ($oper)
+              case lock:
+                   touch $lock
+                   chmod 660 $lock
+                   echo $lmsg >> $lock
+                   scp $lock ${repohost}:${repodir} >& /dev/null
+                   breaksw
+              case unlock:
+                   rm -f $lock
+                   $CVS_RSH $repohost rm -f $rlock
+                   breaksw
+              case status:
+                   if ($?DoingConfig == 0) then
+                      set inf   = `$CVS_RSH $repohost ls $repodir |& cat`
+                      set elock = FALSE
+                      foreach i ($inf)
+                         set entry = $i:h
+                         if ("$entry" == "commit.lock") then
+                            set elock = TRUE
+                         endif
+                      end
+                      unset inf
+                      if ($elock == TRUE) then
+                         echo "locked"
+                      else
+                         echo "unlocked"
+                      endif
+                   endif
+                   breaksw
+              case cat:
+                   $CVS_RSH $repohost cat $rlock
+                   breaksw
+           endsw
 
-      unset rlock
+           unset rlock
 
-   endif
+        endif
+        breaksw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # SVN
 
-else if (-d .svn) then
+   case svn:
+        if (!(-d $lstage)) then
+           mkdir $lstage
+           chmod 770 $lstage
+        endif
 
-   if (!(-d $lstage)) then
-      mkdir $lstage
-      chmod 770 $lstage
-   endif
-
-   set root = $lmngdir:h
-   set lock = "$lstage/commit.lock"
-   switch ($oper)
-      case lock:
-           touch $lock
-           chmod 660 $lock
-           echo $lmsg >> $lock
-           svn lock $root/* >>& /dev/null
-           breaksw
-      case unlock:
-           rm -f $lock
-           svn unlock $root/* >>& /dev/null
-           breaksw
-      case status:
-           if (-e $lock) then
-              echo "locked"
-           else
-              echo "unlocked"
-           endif
-           breaksw
-      case cat:
-           cat $lock
-           breaksw
-   endsw
-
-endif
+        set root = $lmngdir:h
+        set lock = "$lstage/commit.lock"
+        switch ($oper)
+           case lock:
+                touch $lock
+                chmod 660 $lock
+                echo $lmsg >> $lock
+                svn lock $root/* >>& /dev/null
+                breaksw
+           case unlock:
+                rm -f $lock
+                svn unlock $root/* >>& /dev/null
+                breaksw
+           case status:
+                if (-e $lock) then
+                   echo "locked"
+                else
+                   echo "unlocked"
+                endif
+                breaksw
+           case cat:
+                cat $lock
+                breaksw
+        endsw
+        breaksw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+endsw
 
 unset lmsg
 unset lock
