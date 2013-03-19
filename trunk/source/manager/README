@@ -245,7 +245,7 @@ installation.
 
           -> cd pact/manager
 
-          -> install-pact
+          -> dsys install
 
 
                          PARALLEL PACT ISSUES

@@ -196,6 +196,7 @@ set croot  = none
 set froot  = none
 set lcvers = none
 set lfvers = none
+set lrpath = ""
 
 # in case compilers were put in different directories (ala Intel)
 # check both Fortran and C compilers to get both on the PATH
@@ -310,7 +311,29 @@ foreach c ($fname $cname)
       set croot = $bindir:h
       unset bindir
    endif
+
+# gather up LD_LIBRARY_PATH settings from compiler database
+   set inf = ( `$cmp -cwenv | grep LD_LIBRARY_PATH` )
+   if ($#inf > 1) then
+      set lp = $inf[2]
+      set ok = TRUE
+      foreach p ( $lrpath )
+         if ($p == $lp) then
+            set ok = FALSE
+            break
+         endif
+      end
+      if ($ok == TRUE) then
+         set lrpath = ( $lrpath $lp )
+      endif
+   endif
+
 end
+
+# add the LD_LIBRARY_PATH settings to the configuration database
+if ("$lrpath" != "") then
+   analyze/rpath -a $lrpath
+endif
 
 # check the bits for the compiler library
 if ("$lbits" == 32) then

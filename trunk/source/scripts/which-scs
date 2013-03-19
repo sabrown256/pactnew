@@ -16,61 +16,75 @@ set kind = none
 set bdir = "+none+"
 set part = "."
 
-@ n = 5
-@ i = 0
+if ($?SCS_ROOT == 1) then
+   set ok   = 0
+   set bdir = $SCS_ROOT
+   if (-d $bdir/CVS) then
+      set kind = cvs
+   else if (-d $bdir/.svn) then
+      set kind = svn
+   else if (-d $bdir/.git) then
+      set kind = git
+   endif
+else
+
+   @ n = 5
+   @ i = 0
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # CVS/SVN
 
-if ((-d CVS) || (-d .svn) || (-d ../CVS) || (-d ../.svn)) then
-   if (-d CVS) then
-      set t = CVS
-   else
-      set t = .svn
-   endif
-
-   while ($i < $n)
-      @ i = $i + 1
-
-      if (!(-d $t) && ($i > 1)) then
-         set ok = 0
-         if (-d CVS) then
-            set kind = cvs
-         else
-            set kind = svn
-         endif
-         break
+   if ((-d CVS) || (-d ../CVS) || (-d .svn) || (-d ../.svn)) then
+      if ((-d CVS) || (-d ../CVS)) then
+         set t = CVS
+         set k = cvs
       else
-         set bdir = $cwd
-         cd .. >& /dev/null
+         set t = .svn
+         set k = svn
       endif
-   end
+
+      while ($i < $n)
+         @ i = $i + 1
+
+         if (!(-d $t) && ($i > 1)) then
+            set ok   = 0
+            set kind = $k
+            break
+         else
+            set bdir = $cwd
+            cd .. >& /dev/null
+         endif
+      end
+      unset t
+      unset k
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # GIT
 
-else
-   set t = .git
-   while ($i < $n)
-      @ i = $i + 1
+   else
+      set t = .git
+      while ($i < $n)
+         @ i = $i + 1
 
-      if (-d $t) then
-         set ok   = 0
-         set bdir = $cwd
-         set kind = git
-         break
-      else
-         cd .. >& /dev/null
-      endif
-   end
+         if (-d $t) then
+            set ok   = 0
+            set bdir = $cwd
+            set kind = git
+            break
+         else
+            cd .. >& /dev/null
+         endif
+      end
+      unset t
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+   endif
 endif
 
 if ($ok == 0) then

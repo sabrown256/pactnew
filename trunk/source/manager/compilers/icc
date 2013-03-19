@@ -16,7 +16,7 @@ ERR_PATTERN  = ":+sp+error:"
 
 Tool CC {
    Exe       = icc
-   Flags     = -wd71,72,161,188,267,1357
+   Flags     = -wd161,188,267,1357
    Flags    += [ _env_ = STD_C ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
@@ -74,8 +74,8 @@ Group PThread {
 }
 
 Group OpenMP {
-   CC_Flags = -openmp
-   FC_Flags = -openmp
+   CC_Flags = -openmp -wd71,72 -par-affinity=none
+   FC_Flags = -openmp -par-affinity=none
    LD_Lib   = -lpthread 
 }
 
