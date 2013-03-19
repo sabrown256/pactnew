@@ -1931,9 +1931,12 @@ CFG_DONE:
         endif
 
         set InstF = ""
-        set InstF = ( $InstF pact-dist pact-update code-date )
+        set InstF = ( $InstF pact-update code-date )
         set InstF = ( $InstF for-pact install-ext )
         set InstF = ( $InstF ../scripts/{import-api,pcpp,sinstall} )
+
+# requiring pact-dist to be run from manager - no need to install
+#        set InstF = ( $InstF pact-dist )
 
         set liu = ../scripts/sinstall
 

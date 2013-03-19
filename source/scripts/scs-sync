@@ -15,6 +15,7 @@ alias flog      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
 alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
 alias Note      'echo \!\!:2-$ >>& \!\!:1'
 alias NoteD     'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
+alias Separator 'echo "--------------------------------------------------------------------------" >>& \!\!:1 ; echo "" >>& \!\!:1'
 
 set ldir = `dirname $0`
 if ("$ldir" == ".") then
@@ -87,6 +88,7 @@ Note $log "Exclude directories: $excd"
 # SOURCE SETUP
 
 # get a working copy of the source
+Separator $log
 flog $log mkdir syncs
 flog $log pushd syncs
 
@@ -148,6 +150,7 @@ flog $log popd
 # DESTINATION SETUP
 
 # get a working copy of the destination repo
+Separator $log
 flog $log mkdir syncd
 flog $log pushd syncd
 
@@ -222,6 +225,7 @@ end
 
 # MERGE
 
+Separator $log
 flog $log pushd syncd
 
 flog $log cat $excf
@@ -246,6 +250,7 @@ endif
 
 # ADD/REMOVE ENTRIES
 
+Separator $log
 flog $log cd $pkg
 
 set scsi = ( `$ldir/which-scs` )
@@ -349,6 +354,7 @@ NoteD $log "ok ($lt)"
 
 # COMMIT
 
+Separator $log
 ftee $log scs-update
 
 NoteD $log ""
@@ -364,9 +370,12 @@ set xstatus = $status
 flog $log cd $here
 
 if ($xstatus == 0) then
+   Separator $log
    flog $log scs-commit -m "Import from $repos"
+   Separator $log
    flog $log cat log.commit
-   flog $log rm -f $excf
+   Separator $log
+   flog $log rm -f $excf log.commit
    flog $log rm -rf syncs syncd
 else
    NoteD $log ""

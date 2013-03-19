@@ -235,8 +235,8 @@ GET_REPO_SOURCE:
    Separator $Log
 
 # check if repository locked
-   set lockst = `$ScrDir/scs-lock status`
-   if ($lockst == "locked") then
+   set lockst = ( `$ScrDir/scs-lock status` )
+   if ("$lockst" != "unlocked") then
       NoteD $Log " *** REPOSITORY IS LOCKED ***"
       NoteD $Log ""
       $ScrDir/scs-lock cat
@@ -264,17 +264,16 @@ GET_REPO_SOURCE:
    flog $Log $ScrDir/scs-lock status
    Note $Log " " 
 
-   flog $Log mv pact/* .
-   flog $Log $RMDir pact
-
    if ($xstatus == 0) then
+      flog $Log mv pact/* .
+      flog $Log $RMDir pact
       Note $Log "Sources checked out" 
    else
       NoteD $Log "Source check out failed" 
       Note $Log "SCSRepository = $SCSRepository"
       echo "See $Log"
 
-      quit(1)
+      quit(27)
    endif
    Note $Log " " 
 
@@ -369,30 +368,36 @@ PREP_TREE:
       $RMDir $i
    end
 
-   flog $Log cd pact
-   mkdir -p $cwd/$Manager
-   echo $DName > $Manager/.pact-date
+   if (-d pact) then
+      flog $Log cd pact
+      mkdir -p $cwd/$Manager
+      echo $DName > $Manager/.pact-date
 
-   Note $Log Current Directory: $cwd
-   Note $Log Manager Directory: $Manager
+      Note $Log Current Directory: $cwd
+      Note $Log Manager Directory: $Manager
 
 # determine whether local tar supports o option
-   Note $Log "Determining whether tar support o option"
-   flog $Log set lta = cvof
-   flog $Log mkdir $TmpDir
-   flog $Log cd $TmpDir
-   echo "foo" > $TmpFile.file
-   flog $Log tar $lta $TmpFile.tar $TmpFile.file
-   if ($status == 0) then
-      flog $Log set TarArgs = $lta
-   endif
-   flog $Log cd ..
-   flog $Log $RMDir $TmpDir
-   Note $Log "done"
-   Note $Log ""
+      Note $Log "Determining whether tar support o option"
+      flog $Log set lta = cvof
+      flog $Log mkdir $TmpDir
+      flog $Log cd $TmpDir
+      echo "foo" > $TmpFile.file
+      flog $Log tar $lta $TmpFile.tar $TmpFile.file
+      if ($status == 0) then
+         flog $Log set TarArgs = $lta
+      endif
+      flog $Log cd ..
+      flog $Log $RMDir $TmpDir
+      Note $Log "done"
+      Note $Log ""
 
 # add read to permissions for debugging purposes
-   flog $Log chmod -R a+r *
+      flog $Log chmod -R a+r *
+   else
+      NoteD $Log "Prep tree failed - no sources available"
+      echo "See $Log"
+      quit(28)
+   endif
 
    return
 
@@ -475,11 +480,6 @@ FINISH:
       flog $Log $RM pact-src
       flog $Log touch pact-src
 
-#      flog pact-src cat $HeaderFile
-#      Note pact-src echo "$Signature"
-#      Note pact-src echo "pact.tar.gz"
-#      flog pact-src cat pact.tar.gz
-
       cat $HeaderFile >> pact-src
       echo "$Signature" >> pact-src
       echo "pact.tar.gz" >> pact-src
@@ -496,7 +496,10 @@ FINISH:
    endif
 
    flog $Log touch $TmpFile
-   flog $Log $RM *
+   flog $Log pwd
+   if ($cwd =~ */manager/distribution) then
+      flog $Log $RM *
+   endif
 
    NoteD $Log "Distribution for PACT version $VersionID made"
    NoteD $Log ""

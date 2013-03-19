@@ -96,6 +96,7 @@ while ($#argv > 0)
            set upopt = ( $upopt -force )
            breaksw
       case -h:
+      case --help:
            echo ""
            if ($name == "pact-update") then
               echo "Usage:"
