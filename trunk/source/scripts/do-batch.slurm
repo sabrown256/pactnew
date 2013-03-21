@@ -270,10 +270,10 @@ case batch:
 
    Note $scr '#\!/bin/csh'
 
-#   set bopt = ( $bopt -l $log )
+#   set bopt = ( $bopt -o $log )
    Note $scr "# $tag -o $log"
    if ("$pool" != "") then
-#      set bopt = ( $bopt -q $pool )
+      set bopt = ( $bopt -q $pool )
       Note $scr "# $tag -q $pool"
    endif
 
