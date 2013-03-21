@@ -14,13 +14,16 @@ Env SLURM_EXIT_IMMEDIATE = 255
 #-------------------------------------------------------------------------
 
 MPI : srun {
-   TArg  = ($NThread > 0) ? -c $NThread : -O
-#   NArg  = -N $NNode
-   NArg  = ($NNode < 2) ? "" : --nodes=$NNode-$NNode
+   TArg = ($NThread > 0) ? -c $NThread : -O
+
+# running smaller number of processes than nodes makes no sense
+   lnn  = $NNode
+   lnp  = ($NProc < $NNode) ? $NNode : $NProc
+   SArg = -i all -I --exclusive $MPI_TArg -n $MPI_lnp -N $MPI_lnn -p $Pool
 
 # do it this way for codes that unconditionally call MPI_Init
    Exe   = ($MPICnd == FALSE) ? srun
-   Flags = ($MPICnd == FALSE) ? -i all -I $MPI_TArg -n $NProc $MPI_NArg -p $Pool
+   Flags = ($MPICnd == FALSE) ? $MPI_SArg
 
 # handle nonMPI codes
    Exe   = ("$MPIFE" == "") ? "" : -noop-
@@ -29,7 +32,7 @@ MPI : srun {
 # do it this way for codes that conditionally call MPI_Init
 # they run serial for 0 or 1 processes
    Exe   = (($MPICnd == TRUE) && (($NProc > 1) || ($Force == TRUE))) ? srun : -noop-
-   Flags = (($MPICnd == TRUE) && (($NProc > 1) || ($Force == TRUE))) ? -i all -I $MPI_TArg -n $NProc $MPI_NArg -p $Pool : -noop-
+   Flags = (($MPICnd == TRUE) && (($NProc > 1) || ($Force == TRUE))) ? $MPI_SArg : -noop-
 
 # NOTE: they have a non-functional srun on BG/P which gets us into here
 # rather than the desired mpirun clause
