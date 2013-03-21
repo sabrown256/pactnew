@@ -171,26 +171,28 @@ static void mp_hostfile(char *s, int nc, rundes *st)
 /* INIT_MPI - setup for MPI */
 
 static void init_mpi(rundes *st)
-   {int ok;
+   {int ok, fi;
     char t[BFMED];
-    char *s, *c, *p;
+    char *s, *c, *p, *f;
     FILE *fp;
 
-    c = cgetenv(TRUE, "Code");
+    c  = cgetenv(TRUE, "Code");
+    f  = cgetenv(TRUE, "Non_MPI_Force");
+    fi = (strcmp(f, "FALSE") == 0);
 
     ok = TRUE;
 
 /* figure out whether we have an MPI code */
 
 /* a script cannot be an MPI code */
-    if (file_script(c) == TRUE)
+    if ((file_script(c) == TRUE) && (fi == TRUE))
        {ok = FALSE;
         csetenv("MPI", "");};
 
 /* a code without MPI_Init cannot be an MPI code */
     if (cdefenv("MPI") == 0)
        {s = run(FALSE, "mpi-info -x %s", c);
-	if (strcmp(s, "no") == 0)
+	if ((strcmp(s, "no") == 0) && (fi == TRUE))
 	   {ok = FALSE;
 	    csetenv("MPI", "");}
 	else
@@ -346,16 +348,17 @@ static int init(rundes *st, char *os, char *host)
     st->crosstgt[0] = '\0';
 
 /* variables for use in run signature database */
-    csetenv("Batch",   "FALSE");
-    csetenv("Code",    "");
-    csetenv("CArgs",   "");
-    csetenv("Force",   "FALSE");
-    csetenv("MPICnd",  "FALSE");
-    csetenv("MPINot",  "FALSE");
-    csetenv("NNode",   "1");
-    csetenv("NProc",   "1");
-    csetenv("NThread", "1");
-    csetenv("STDERR",  "TRUE");
+    csetenv("Batch",         "FALSE");
+    csetenv("Code",          "");
+    csetenv("CArgs",         "");
+    csetenv("Force",         "FALSE");
+    csetenv("Non_MPI_Force", "FALSE");
+    csetenv("MPICnd",        "FALSE");
+    csetenv("MPINot",        "FALSE");
+    csetenv("NNode",         "1");
+    csetenv("NProc",         "1");
+    csetenv("NThread",       "1");
+    csetenv("STDERR",        "TRUE");
 
     return(rv);}
 
@@ -1011,6 +1014,7 @@ static char *cleanup_env(rundes *st)
 	cunsetenv("DBG_Exe");
 	cunsetenv("DBG_Flags");
 	cunsetenv("Force");
+	cunsetenv("Non_MPI_Force");
 	cunsetenv("Host");
 	cunsetenv("MPI");
 	cunsetenv("MPICnd");
@@ -1168,7 +1172,7 @@ static void help(void)
 
     printf("\n");
     printf("Usage: do-run [-b] [-bf <file>] [-c] [-cross <cross-fe>] [-d] [-dbg <dbg>] [-dr]\n");
-    printf("              [-e] [-env] [-f] [-h] [-level #] [-m] [-mpi <mpi-fe>] [-m] [-n #] [-o <file>]\n");
+    printf("              [-e] [-env] [-f] [-fn] [-h] [-level #] [-m] [-mpi <mpi-fe>] [-m] [-n #] [-o <file>]\n");
     printf("              [-p #] [-prf] [-prt <name>] [-q] [-r] [-s <file>] [-t #] [-v] [-vg] [-vgd]\n");
     printf("              [-x] [-z] args\n");
     printf("\n");
@@ -1182,6 +1186,7 @@ static void help(void)
     printf("       e     - output to stderr is suppressed\n");
     printf("       env   - retain the PACT environment variable settings\n");
     printf("       f     - force a distributed run even with 1 MPI process\n");
+    printf("       fn    - force a distributed run even with a non-MPI code\n");
     printf("       h     - this help message\n");
     printf("       level - diagnostic trace of session\n");
     printf("       m     - suppress MPI I/O bug fix\n");
@@ -1256,6 +1261,9 @@ static int process_args(rundes *st, int c, char **v)
 
 	 else if (strcmp(v[i], "-f") == 0)
             csetenv("Force", "TRUE");
+
+	 else if (strcmp(v[i], "-fn") == 0)
+            csetenv("Non_MPI_Force", "TRUE");
 
 	 else if ((strcmp(v[i], "-h") == 0) ||
 		  (strcmp(v[i], "help") == 0))

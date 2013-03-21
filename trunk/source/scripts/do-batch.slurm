@@ -20,6 +20,7 @@ set bsub = msub
 
 # BRUN is the name of the utility which runs batch jobs
 set brun = srun
+set opt  = ( -i all -I )
 
 # BVAR must be the name of the batch system variable containing
 # the number of allocated nodes
@@ -80,8 +81,8 @@ while ($#argv > 0)
       case -h:
            echo ""
            echo "Usage: do-batch [-a <args>] [-d <dir>] [-dt #] [-e <var> <value>]"
-           echo "                [-f <file>] [-g] [-h] [-H <host>] [-m]"
-           echo "                [-o <file>] [-p #] [-prt <queue>] [-q] [-t #] [-w]"
+           echo "                [-f <file>] [-g] [-h] [-H <host>] [-m] [-o <file>]"
+           echo "                [-p #] [-prt <queue>] [-q] [-t #] [-w] [-x]"
            echo ""
            echo "Options:"
            echo "     a   - quoted string with arguments for the command"
@@ -100,6 +101,7 @@ while ($#argv > 0)
            echo "     q   - suppress do-batch messages in the logs"
            echo "     t   - number of threads"
            echo "     w   - notify via the write utiliy"
+           echo "     x   - suppress the MPI front end utility"
            echo ""
            exit(1)
            breaksw
@@ -124,6 +126,7 @@ while ($#argv > 0)
       case -prt:
            shift
            set pool = $1
+           set opt = ( $opt -p $pool )
            breaksw
       case -q:
            set quiet = TRUE
@@ -134,6 +137,10 @@ while ($#argv > 0)
            breaksw
       case -w:
            set ntfy = "w"
+           breaksw
+      case -x:
+           set brun = ""
+           set wrap = ""
            breaksw
       default:
            set prob = `rpath $1`
@@ -151,6 +158,15 @@ while ($#argv > 0)
    endsw
    shift
 end
+
+set opt = ( $opt -c $NThreads -n $NNodes )
+
+# consolidate options into BRUN variable
+if ("$brun" != "") then
+   set brun = ( $wrap $brun $opt )
+endif
+unset opt
+unset wrap
 
 set lbv = ( `printenv $bvar` )
 if ("$lbv" == "") then
@@ -194,20 +210,13 @@ case group:
 
    setenv OMP_NUM_THREADS $NThreads
 
-   set opt = ""
-   set opt = ( $opt -i all -I )
-   set opt = ( $opt -c 1 -n 1 )
-   if ("$pool" != "") then
-      set opt = ( $opt -c 1 -p $pool )
-   endif
-
    echo "Job     : $cmnd" >> $TTY
    echo "Date    : $datest" >> $TTY
    echo "Pool    : $SLURM_JOB_NODELIST" >> $TTY
-   echo "Command : $wrap $brun $opt $cmnd" >> $TTY
+   echo "Command : $brun $cmnd" >> $TTY
    echo "----------------------------------------------------" >> $TTY
 
-   $wrap $brun $opt $cmnd >>& $TTY &
+   $brun $cmnd >>& $TTY &
 
    @ err = $status
 
@@ -277,7 +286,7 @@ case batch:
 
 # convert time to seconds
    set tmx = `timer -t $tmx`
-   set res = "${res}:walltime=$tmx"
+   set res = "walltime=$tmx"
 #   set bopt = ( $bopt -l $res )
    Note $scr "# $tag -l $res"
 
@@ -323,15 +332,7 @@ case batch:
    Note $scr "setenv OMP_NUM_THREADS $NThreads"
    Note $scr ''
 
-   set opt = ""
-   set opt = ( $opt -i all -I )
-   set opt = ( $opt -c $NThreads -n $NNodes )
-   if ("$pool" != "") then
-      set opt = ( $opt -p $pool )
-   endif
-
-#   Note $scr "do-run -p $NNodes $cmnd" '>>& $TTY'
-   Note $scr "$wrap $brun $opt $cmnd" '>>& $TTY'
+   Note $scr "$brun $cmnd" '>>& $TTY'
    Note $scr 'set Err = $status'
    Note $scr ''
 
