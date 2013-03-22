@@ -142,7 +142,8 @@ Note $Log "Source tag: $SRCDate[2]"
 
 # remove the local extensions directories
    if ($LLNL != "TRUE") then
-      flog $Log (find .. -type d -name extensions -exec $RMDir {} \;)
+      flog $Log pwd
+      flog $Log (find . -type d -name extensions -exec $RMDir {} \;)
    endif
 
 # for non export distributions
@@ -157,8 +158,6 @@ Note $Log "Source tag: $SRCDate[2]"
          call REMOVE_LOCAL()
       endif
    endif
-
-   flog $Log cd ..
 
    Separator $Log
    NoteD $Log "Archiving the distribution"
@@ -254,20 +253,26 @@ GET_REPO_SOURCE:
 
    flog $Log pwd
    flog $Log mkdir pact
-   flog $Log cd pact
+   flog $Log pushd pact
    flog $Log $ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository pact
    set xstatus = $status
    Note $Log " " 
 
 # release the lock
+   flog $Log popd
    flog $Log $ScrDir/scs-lock unlock
    flog $Log $ScrDir/scs-lock status
    Note $Log " " 
 
+   flog $Log pushd pact
    if ($xstatus == 0) then
-      flog $Log mv pact/* .
+      set mngd = ( `find . -type d -name manager` )
+      set root = $mngd:h
+      flog $Log mv $root/* $root/.[a-zA-Z].* .
       flog $Log $RMDir pact
       Note $Log "Sources checked out" 
+      unset root
+      unset mngd
    else
       NoteD $Log "Source check out failed" 
       Note $Log "SCSRepository = $SCSRepository"
@@ -285,11 +290,9 @@ GET_REPO_SOURCE:
       flog $Log $RMDir auto
    endif
 
-   flog $Log cd ..
+   flog $Log popd
 
    flog $Log ls -lR pact
-
-   flog $Log pwd
 
    return
 
@@ -305,7 +308,7 @@ GET_CURRENT_SOURCE:
 
    flog $Log pwd
    flog $Log mkdir pact
-   flog $Log cd pact
+   flog $Log pushd pact
    flog $Log pwd
    flog $Log rsync -avC --exclude dev --exclude 'z-*' ../../../ .
    flog $Log ( find . -name "*.core" | xargs rm )
@@ -316,11 +319,10 @@ GET_CURRENT_SOURCE:
    Note $Log "Sources copied" 
    Note $Log " " 
 
-   flog $Log cd ..
+   flog $Log popd
+   flog $Log pwd
 
    flog $Log ls -lR pact
-
-   flog $Log pwd
 
    return
 
@@ -363,15 +365,16 @@ PREP_TREE:
 
 # remove the source control system sub-directories
    NoteD $Log "Cleaning up the sources"
-   flog $Log set List = ( `$ScrDir/scs-meta -d` )
-   foreach i ($List)
-      $RMDir $i
-   end
+   set inf = ( `$ScrDir/which-scs` )
+   Note $Log "Repo metadata: $inf"
+   unset inf
 
    if (-d pact) then
-      flog $Log cd pact
-      mkdir -p $cwd/$Manager
-      echo $DName > $Manager/.pact-date
+      flog $Log pushd pact
+      flog $Log ( $ScrDir/scs-meta -d |& xargs rm -rf )
+
+      flog $Log mkdir -p $cwd/$Manager
+      flog $Log ( echo $DName > $Manager/.pact-date )
 
       Note $Log Current Directory: $cwd
       Note $Log Manager Directory: $Manager
@@ -386,7 +389,7 @@ PREP_TREE:
       if ($status == 0) then
          flog $Log set TarArgs = $lta
       endif
-      flog $Log cd ..
+      flog $Log popd
       flog $Log $RMDir $TmpDir
       Note $Log "done"
       Note $Log ""
