@@ -313,8 +313,8 @@ foreach c ($fname $cname)
    endif
 
 # gather up LD_LIBRARY_PATH settings from compiler database
-   set inf = ( `$cmp -cwenv | grep LD_LIBRARY_PATH` )
-   if ($#inf > 1) then
+   set inf = ( `$cmp -cwenv |& grep LD_LIBRARY_PATH` )
+   if ("$inf" =~ LD_LIBRARY_PATH*) then
       set lp = $inf[2]
       set ok = TRUE
       foreach p ( $lrpath )
