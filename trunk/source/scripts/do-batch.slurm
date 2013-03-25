@@ -12,6 +12,8 @@ unalias *
 
 @ err = 0
 
+set use_do_run = TRUE
+
 # TAG is the value of the option tag used in batch scripts
 set tag  = MSUB
 
@@ -19,8 +21,13 @@ set tag  = MSUB
 set bsub = msub
 
 # BRUN is the name of the utility which runs batch jobs
-set brun = srun
-set opt  = ( -i all -I )
+if ($use_do_run == TRUE) then
+   set brun = do-run
+   set opt  = ( -v -m -c -f -fn )
+else
+   set brun = srun
+   set opt  = ( -i all -I )
+endif
 
 # BVAR must be the name of the batch system variable containing
 # the number of allocated nodes
@@ -110,7 +117,11 @@ while ($#argv > 0)
            set hst = $1
            breaksw
       case -io:
-           set wrap = mpi-io-wrap
+           if ($use_do_run == TRUEE) then
+              set opt  = ( `echo "$opt" | sed 's| -m||'` )
+           else
+              set wrap = mpi-io-wrap
+           endif
            breaksw
       case -m:
            set ntfy = "m"
@@ -126,7 +137,11 @@ while ($#argv > 0)
       case -prt:
            shift
            set pool = $1
-           set opt = ( $opt -p $pool )
+           if ($use_do_run == TRUE) then
+              set opt = ( $opt -prt $pool )
+           else
+              set opt = ( $opt -p $pool )
+           endif
            breaksw
       case -q:
            set quiet = TRUE
@@ -159,7 +174,11 @@ while ($#argv > 0)
    shift
 end
 
-set opt = ( $opt -c $NThreads -n $NNodes )
+if ($use_do_run == TRUE) then
+   set opt = ( $opt -t $NThreads -p $NNodes -n $NNodes )
+else
+   set opt = ( $opt -c $NThreads -n $NNodes )
+endif
 
 # consolidate options into BRUN variable
 if ("$brun" != "") then
@@ -216,7 +235,11 @@ case group:
    echo "Command : $brun $cmnd" >> $TTY
    echo "----------------------------------------------------" >> $TTY
 
-   $brun $cmnd >>& $TTY &
+   if ($?SEMEX == 1) then
+      ( touch $SEMEX.$$ ; $brun $cmnd ; rm -f $SEMEX.$$ ) >>& $TTY &
+   else
+      $brun $cmnd >>& $TTY &
+   endif
 
    @ err = $status
 
