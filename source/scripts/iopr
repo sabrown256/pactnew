@@ -363,6 +363,31 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# PROTOCOL - determine NFS protocol used TCP or UDP
+#          - rpcinfo -p $SrvN
+#          - nmap
+#          -
+#          - Server side (NFS is running):
+#          -  rpcinfo -p | egrep 'nfs|nlock'
+#          -  netstat -a -n | grep 2049
+#          - 
+#          - Client side:
+#          -  rpcinfo -p | grep nlock
+#          -  netstat -a -n | grep 2049
+
+set Proto = unknown
+if (-e /proc/mounts) then
+   set inf = ( `grep $SrvN /proc/mounts | tail -n 1 | sed 's|,| |g'` )
+   foreach i ($inf)
+      if ("$i" =~ proto=*) then
+         set Proto = ( `echo $i | sed 's|^proto=||'` )
+      endif
+   end
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # RAW - get the raw packet statistics
 #     - return a list, NPack, containing
 #     -   MTU  - packet size in bytes
@@ -416,8 +441,10 @@ if ($Mode == info) then
    echo "   Name: $SrvN"
    echo "   Address: $SrvI"
    echo "   Network Interface: $Intf"
+   echo "   Protocol: $Proto"
    echo "   Packet Size: $PckSz bytes"
    echo "   Ave Round Trip Time: $RTdT ms" 
+
    echo "Data Transfer Info"
    echo "   Sent: $NBSnd MB"
    echo "   Recv: $NBRec MB"
@@ -443,17 +470,6 @@ else if ($Mode == diff) then
       echo "Time: $dT sec"
    endif
 endif
-
-# rpcinfo -p $SrvN
-# nmap
-#
-# Server side (NFS is running):
-#  rpcinfo -p | egrep 'nfs|nlock'
-#  netstat -a -n | grep 2049
-# 
-# Client side:
-#  rpcinfo -p | grep nlock
-#  netstat -a -n | grep 2049
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -232,6 +232,7 @@ static int make_pdo_script(char **sa, int is, char *fname, int nc,
     fprintf(fp, "unalias *\n");
     fprintf(fp, "@ err = 0\n");
     fprintf(fp, "set log = %s/log.%s\n", dname, lname);
+    fprintf(fp, "setenv SEMEX %s/sem.%s\n", dname, lname);
     fprintf(fp, "rm -f $log\n");
     fprintf(fp, "touch $log\n");
 
@@ -261,6 +262,24 @@ static int make_pdo_script(char **sa, int is, char *fname, int nc,
     free_strings(ta);
 
     sa[is] = ro;
+
+    fprintf(fp, "\n");
+    fprintf(fp, "echo \"Host: `uname -n`\" >>& $log\n");
+    fprintf(fp, "echo \"PID:  $$\" >>& $log\n");
+    fprintf(fp, "echo \"CWD:  $cwd\" >>& $log\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "while (1)\n");
+    fprintf(fp, "   sleep 30\n");
+    fprintf(fp, "   @ ns = `ls -1 %s | grep $SEMEX:t | wc -l`\n", dname);
+    fprintf(fp, "   if ($ns != 0) then\n");
+    fprintf(fp, "      echo -n '.' >>& $log\n");
+    fprintf(fp, "   else\n");
+    fprintf(fp, "      echo ' done' >>& $log\n");
+    fprintf(fp, "      break\n");
+    fprintf(fp, "   endif\n");
+    fprintf(fp, "end\n");
+    fprintf(fp, "\n");
 
     fprintf(fp, "if ($err == 0) then\n");
     fprintf(fp, "   unlink %s\n", fname);
