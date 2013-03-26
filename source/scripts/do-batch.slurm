@@ -117,7 +117,7 @@ while ($#argv > 0)
            set hst = $1
            breaksw
       case -io:
-           if ($use_do_run == TRUEE) then
+           if ($use_do_run == TRUE) then
               set opt  = ( `echo "$opt" | sed 's| -m||'` )
            else
               set wrap = mpi-io-wrap
@@ -236,12 +236,11 @@ case group:
    echo "----------------------------------------------------" >> $TTY
 
    if ($?SEMEX == 1) then
-      ( touch $SEMEX.$$ ; $brun $cmnd ; rm -f $SEMEX.$$ ) >>& $TTY &
+      ( touch $SEMEX.$$ ; $brun $cmnd ; @ err = $status ; rm -f $SEMEX.$$ ) >>& $TTY &
    else
       $brun $cmnd >>& $TTY &
+      @ err = $status
    endif
-
-   @ err = $status
 
    breaksw
 

@@ -10,6 +10,8 @@
 
 unalias *
 
+@ err = 0
+
 set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
@@ -42,16 +44,16 @@ while ($#argv > 0)
    shift
 end
 
+set log = $cwd/log.commit
+rm -f $log
+touch $log
+
 switch ($scsi[1])
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
    case git:
-        set log = $cwd/log.commit
-        rm -f $log
-        touch $log
-
         set part = $scsi[3]
         pushd $scsi[2] >>& $log
 
@@ -63,6 +65,7 @@ switch ($scsi[1])
         if ($xstatus == 0) then
            echo "ok"
         else
+           @ err = $err + $xstatus
            echo "ng ($xstatus)"
         endif
 
@@ -96,11 +99,12 @@ switch ($scsi[1])
            echo "git commit $args -q -m '$msg' $files" >>& $log
         endif
 
-        git commit $args -q -m "$msg" $files >>& $log
+        ( git commit $args -q -m "$msg" $files ; exit($status) ) >>& $log
         set xstatus = $status
         if ($xstatus == 0) then
            echo "ok"
         else
+           @ err = $err + $xstatus
            echo "ng ($xstatus)"
         endif
 
@@ -114,6 +118,7 @@ switch ($scsi[1])
            if ($xstatus == 0) then
               echo "ok"
            else
+              @ err = $err + $xstatus
               echo "ng ($xstatus)"
               echo "Need 'git config --bool core.bare true' on master"
            endif
@@ -132,6 +137,7 @@ switch ($scsi[1])
            if ($xstatus == 0) then
               echo "ok"
            else
+              @ err = $err + $xstatus
               echo "ng ($xstatus)"
            endif
         endif
@@ -144,7 +150,8 @@ switch ($scsi[1])
 
    case cvs:
         setenv CVS_RSH  ssh
-        cvs commit $args -m "$msg"
+        ( cvs commit $args -m "$msg" ; exit($status) ) |& tee -a $log
+        @ err = $status
 
         breaksw
 
@@ -152,7 +159,8 @@ switch ($scsi[1])
 #--------------------------------------------------------------------------
 
    case svn:
-        svn commit $args -m "$msg"
+        ( svn commit $args -m "$msg" ; exit($status) ) |& tee -a $log
+        @ err = $status
         breaksw
 
 #--------------------------------------------------------------------------
@@ -160,4 +168,4 @@ switch ($scsi[1])
 
 endsw
 
-exit($status)
+exit($err)
