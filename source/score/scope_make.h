@@ -81,6 +81,7 @@ struct s_ruledef
 struct s_vardef
    {char name[MAXLINE];
     int line;
+    int oper;
     char *text;};
 
 struct s_anadep

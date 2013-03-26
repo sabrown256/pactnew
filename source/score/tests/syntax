@@ -47,6 +47,7 @@ setenv SC_EXEC_TIME_FACTOR    16
    set Tsts = ($Tsts d.1 - all)
    set Tsts = ($Tsts d.2 - fooa.c)
    set Tsts = ($Tsts d.3 opt=vb s.o)
+   set Tsts = ($Tsts d.4 - all)
 
    set LErr = 0
    while ($#Tsts > 1)
@@ -120,10 +121,10 @@ setenv SC_EXEC_TIME_FACTOR    16
 
    Separator $Log
    if ($LErr == 0) then
-      NoteD $Log "..... ok ($ETime)"
+      NoteD $Log ".... ok ($ETime)"
       flog $Log *.[chlyoa]
    else
-      NoteD $Log "..... ng ($ETime)"
+      NoteD $Log ".... ng ($ETime)"
       @ Err = $Err + 32
    endif
 
