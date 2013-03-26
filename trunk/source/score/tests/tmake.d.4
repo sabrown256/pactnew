@@ -1,0 +1,14 @@
+#
+# test conditional assignment
+#
+
+v1 = 3
+v2 ?= ${v1}
+
+v3  = 2
+v3 ?= ${v1}
+
+all :
+	@echo "v2 = ${v2}"
+	@echo "v3 = ${v3}"
+

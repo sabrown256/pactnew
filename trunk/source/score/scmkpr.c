@@ -14,11 +14,15 @@
 #include "scope_make.h"
 
 #define DEFAULT_BARRIER   "@sync"
+#define NEQ   0
+#define UEQ   1
+#define CEQ   2
 
 typedef struct s_mkvdes mkvdes;
 
 struct s_mkvdes
    {int line;
+    int oper;
     char *text;};
 
 /*--------------------------------------------------------------------------*/
@@ -509,11 +513,12 @@ void SC_show_make_rules(anadep *state)
 
 /* _SC_START_VAR - begin defining a variable */
 
-static void _SC_start_var(vardef *v, char *s, int line)
+static void _SC_start_var(vardef *v, char *s, int line, int oper)
    {
 
     v->text = SC_dstrcpy(v->text, s);
     v->line = line;
+    v->oper = oper;
 
     return;}
 
@@ -542,17 +547,22 @@ static void _SC_add_var(vardef *v, char *s)
 /* _SC_END_VAR - finish the definition of the specified variable */
 
 static void _SC_end_var(vardef *v, anadep *state)
-   {char *name, *text;
+   {char *name, *text, *def;
 
     if (v->text != NULL)
-       {name = strtok(v->text, "= \t");
+       {name = strtok(v->text, "?= \t");
 	text = strtok(NULL, "\n");
 	if (text != NULL)
-	   text = SC_trim_left(text, "= \t");
+	   text = SC_trim_left(text, "?= \t");
 	else
 	   text = "";
 
-	_SC_var_install(state, name, text, v->line);
+	if (v->oper == CEQ)
+	   {def = _SC_var_lookup(state, name);
+	    if (def == NULL)
+	       _SC_var_install(state, name, text, v->line);}
+	else
+	   _SC_var_install(state, name, text, v->line);
 
 	CFREE(v->text);
         v->line = -1;};
@@ -1113,13 +1123,19 @@ int SC_parse_makefile(anadep *state, char *fname)
 		     if (sa == NULL)
 		        SC_error(-1, "syntax error on line %d: %s\n", i, s);
 		     SC_ptr_arr_len(na, sa);
-		     ok = ((strchr(sa[0], '=') != NULL) ||
-			   ((na > 1) && (sa[1][0] == '=')));
 
-		     if (ok == TRUE)
+		     if ((strchr(sa[0], '=') != NULL) ||
+			 ((na > 1) && (sa[1][0] == '=')))
+		        ok = UEQ;
+		     else if ((na > 1) && (strcmp(sa[1], "?=") == 0))
+		        ok = CEQ;
+		     else
+		        ok = NEQ;
+
+		     if (ok != NEQ)
 		        {_SC_end_rule(&a, state);
 			 _SC_end_var(&v, state);
-			 _SC_start_var(&v, s, i);}
+			 _SC_start_var(&v, s, i, ok);}
 
 		     else
 		        {pcl = strchr(s, ':');
