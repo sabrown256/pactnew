@@ -339,6 +339,7 @@ case batch:
    end
    Note $scr ''
 
+   Note $scr "setenv PCSH_NPROC      $NNodes"
    Note $scr "setenv OMP_NUM_THREADS $NThreads"
    Note $scr ''
 

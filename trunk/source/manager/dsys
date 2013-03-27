@@ -1189,12 +1189,9 @@ switch ($Cmnd)
               if (-x $Mk) then
                  Note $Log "   $i is executable - trying"
 
-# if the configuration we are doing, UCFG, is different than
-# the one Mk used we must do a remove and start clean
-                 set MCfg = `$Mk -info Config`
-                 if ("$MCfg" != "$ucfg") then
-                    flog $Log $Mk remove
-                 endif
+# always remove and start clean in case there is toxic rubble
+# left over from a failed build
+                 flog $Log $Mk remove
 
 # NOTE: do it twice as a fault tolerance measure
 # this role will be assumed by dmake after it is successfully built

@@ -301,15 +301,15 @@ case batch:
 
 # setup resources
    if (($NThreads > 1) || ($NNodes > 1)) then
-      set res = "nodes=${NNodes}:ppn=${NThreads}"
+      set res  = "nodes=${NNodes}:ppn=${NThreads}"
       set bopt = ( $bopt -l $res )
       Note $scr "# $tag -l $res"
    endif
 
 # convert time to seconds
-   set tmx = `timer -t $tmx`
-   set res = "walltime=$tmx"
-#   set bopt = ( $bopt -l $res )
+   set tmx  = `timer -t $tmx`
+   set res  = "walltime=$tmx"
+   set bopt = ( $bopt -l $res )
    Note $scr "# $tag -l $res"
 
    Note $scr ''
@@ -351,6 +351,7 @@ case batch:
    end
    Note $scr ''
 
+   Note $scr "setenv PCSH_NPROC      $NNodes"
    Note $scr "setenv OMP_NUM_THREADS $NThreads"
    Note $scr ''
 

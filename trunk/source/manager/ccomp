@@ -140,10 +140,6 @@ set path   = ( $bindir $path )
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ($?LD_LIBRARY_PATH == 0) then
-   setenv LD_LIBRARY_PATH  /usr/lib
-endif
-
 if ($?MANPATH == 0) then
    setenv MANPATH  ":"
 endif
@@ -158,10 +154,10 @@ switch ($comp)
    case gfortran:
         set root = $exe:h
         set root = $root:h
-        if ("$LD_LIBRARY_PATH" == "") then
-           setenv LD_LIBRARY_PATH  $root/lib64:$root/lib
-        else
+        if ($?LD_LIBRARY_PATH == 1) then
            setenv LD_LIBRARY_PATH  $root/lib64:$root/lib:${LD_LIBRARY_PATH}
+        else
+           setenv LD_LIBRARY_PATH  $root/lib64:$root/lib
         endif
 
         if (-d $root/share/man) then
@@ -176,10 +172,10 @@ switch ($comp)
         set root  = $exe:h
         set root  = $root:h
         set lvers = `ls $root/lib`
-        if ("$LD_LIBRARY_PATH" == "") then
-           setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32
-        else
+        if ($?LD_LIBRARY_PATH == 1) then
            setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32:${LD_LIBRARY_PATH}
+        else
+           setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32
         endif
 
         if (-d $root/man) then
@@ -195,7 +191,9 @@ endsw
 
 if ($prenv == TRUE) then
 
-   echo "LD_LIBRARY_PATH       $LD_LIBRARY_PATH"
+   if ($?LD_LIBRARY_PATH == 1) then
+      echo "LD_LIBRARY_PATH       $LD_LIBRARY_PATH"
+   endif
    echo "MANPATH               $MANPATH"
 
 else
@@ -210,7 +208,9 @@ else
 # verbose mode diagnostic for debugging
    if ($vrb == TRUE) then
       echo "   Root: $bindir"
-      echo "   LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+      if ($?LD_LIBRARY_PATH == 1) then
+         echo "   LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+      endif
       echo "   Compile line: $exe $args"
    endif
 
