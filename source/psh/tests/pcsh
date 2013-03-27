@@ -76,6 +76,8 @@ if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
          flog $Log set nerr = 1
          NoteD $Log "ng"
       endif
+
+      flog $Log rm -rf tmp-*
    end
 
    flog $Log touch run.foo

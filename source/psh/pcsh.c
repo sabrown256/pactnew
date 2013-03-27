@@ -132,6 +132,82 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MAKE_CTL_SCRIPT - write the parallel controller script */
+
+void make_ctl_script(char *fname, char *dname, char *lname,
+		     char *cmd, char *al, int *lm)
+   {FILE *fp;
+
+    fp = fopen(fname, "w");
+
+    fprintf(fp, "#!/bin/csh -f\n");
+    fprintf(fp, "unalias *\n");
+    fprintf(fp, "@ err = 0\n");
+    fprintf(fp, "setenv SEMEX %s/sem.%s\n", dname, lname);
+    fprintf(fp, "set log = %s/log.%s\n", dname, lname);
+    fprintf(fp, "set cmd = ( %s )\n", cmd);
+    fprintf(fp, "set arg = ( %s )\n", al);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "rm -f $log\n");
+    fprintf(fp, "touch $log\n");
+    fprintf(fp, "echo \"Host:  `uname -n`\" >>& $log\n");
+    fprintf(fp, "echo \"PID:   $$\" >>& $log\n");
+    fprintf(fp, "echo \"CWD:   $cwd\" >>& $log\n");
+
+    fprintf(fp, "if ($?PCSH_NPROC == 1) then\n");
+    fprintf(fp, "   @ nn = $PCSH_NPROC\n");
+    fprintf(fp, "   @ dt = 10\n");
+    fprintf(fp, "else\n");
+    fprintf(fp, "   @ nn = 1\n");
+    fprintf(fp, "   @ dt = 0\n");
+    fprintf(fp, "endif\n");
+    fprintf(fp, "echo \"NPROC: $nn\" >>& $log\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "@ ip = %d\n", lm[0]);
+    fprintf(fp, "@ mx = %d\n", lm[1]);
+    fprintf(fp, "@ dm = %d\n", lm[2]);
+    fprintf(fp, "while ($ip < $mx)\n");
+    fprintf(fp, "   while (1)\n");
+    fprintf(fp, "      sleep $dt\n");
+    fprintf(fp, "      @ ns = `ls -1 %s | grep $SEMEX:t | wc -l`\n", dname);
+    fprintf(fp, "      if ($ns < $nn) then\n");
+    fprintf(fp, "         $cmd %s.$ip $arg >>& $log\n", fname);
+    fprintf(fp, "         @ err = $err + $status\n");
+    fprintf(fp, "         @ ip  = $ip + $dm\n");
+    fprintf(fp, "         break\n");
+    fprintf(fp, "      endif\n");
+    fprintf(fp, "   end\n");
+    fprintf(fp, "end\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "while (1)\n");
+    fprintf(fp, "   sleep $dt\n");
+    fprintf(fp, "   @ ns = `ls -1 %s | grep $SEMEX:t | wc -l`\n", dname);
+    fprintf(fp, "   if ($ns == 0) then\n");
+    fprintf(fp, "      echo ' done' >>& $log\n");
+    fprintf(fp, "      break\n");
+    fprintf(fp, "   endif\n");
+    fprintf(fp, "end\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "if ($err == 0) then\n");
+    fprintf(fp, "   unlink %s\n", fname);
+    fprintf(fp, "endif\n");
+    fprintf(fp, "\n");
+
+/* close the master file */
+    fprintf(fp, "exit($err)\n");
+    fclose(fp);
+
+    chmod(fname, S_IRUSR | S_IWUSR | S_IXUSR);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* COMPUTE_PDO_LIMITS - from SA[IS] compute the skeleton for the
  *                    - shell line in a PDO construct
  */
@@ -203,11 +279,11 @@ static char **compute_pdo_limits(char **sa, int is, char *al, int nc)
 static int make_pdo_script(char **sa, int is, char *fname, int nc,
 			   char *shell, char *pact, char *args, int henv,
 			   char **vo, char **v, int k)
-   {int i, ip, co, n, mn, mx, dm;
+   {int i, ip, co, n;
+    int lm[3];
     char al[BFLRG], r[BFLRG], fn[BFLRG];
     char dname[BFLRG], lname[BFLRG];
     char *ro, **ta;
-    FILE *fp;
 
     memset(dname, 0, BFLRG);
     memset(lname, 0, BFLRG);
@@ -222,19 +298,9 @@ static int make_pdo_script(char **sa, int is, char *fname, int nc,
 
     ta = compute_pdo_limits(sa, is, al, BFLRG);
     n  = lst_length(ta);
-    mn = (n > 1) ? atoi(ta[2]) : 0;
-    mx = (n > 2) ? atoi(ta[3]) : -1;
-    dm = (n > 3) ? atoi(ta[4]) : 1;
-
-/* open the master file */
-    fp = fopen(fname, "w");
-    fprintf(fp, "#!/bin/csh -f\n");
-    fprintf(fp, "unalias *\n");
-    fprintf(fp, "@ err = 0\n");
-    fprintf(fp, "set log = %s/log.%s\n", dname, lname);
-    fprintf(fp, "setenv SEMEX %s/sem.%s\n", dname, lname);
-    fprintf(fp, "rm -f $log\n");
-    fprintf(fp, "touch $log\n");
+    lm[0] = (n > 1) ? atoi(ta[2]) : 0;
+    lm[1] = (n > 2) ? atoi(ta[3]) : -1;
+    lm[2] = (n > 3) ? atoi(ta[4]) : 1;
 
     ro = sa[is];
     sa[is] = r;
@@ -248,47 +314,19 @@ static int make_pdo_script(char **sa, int is, char *fname, int nc,
 /* write one script for each loop iteration */
     memset(fn, 0, BFLRG);
     memset(r, 0, BFLRG);
-    for (ip = mn; ip < mx; ip += dm)
+    for (ip = lm[0]; ip < lm[1]; ip += lm[2])
         {snprintf(fn, BFLRG, "%s.%d", fname, ip);
 	 snprintf(r, BFLRG, "   set %s = %d\n", ta[1], ip);
-
-	 fprintf(fp, "%s %s %s >>& $log\n", ta[0], fn, al);
-	 fprintf(fp, "@ err = $err + $status\n");
-
 	 co = make_shell_script(sa, fn, shell, pact,
 				args, henv, vo, v, k);};
 
-/* clean up */
-    free_strings(ta);
-
     sa[is] = ro;
 
-    fprintf(fp, "\n");
-    fprintf(fp, "echo \"Host: `uname -n`\" >>& $log\n");
-    fprintf(fp, "echo \"PID:  $$\" >>& $log\n");
-    fprintf(fp, "echo \"CWD:  $cwd\" >>& $log\n");
-    fprintf(fp, "\n");
+/* write a controller script to run them all */
+    make_ctl_script(fname, dname, lname, ta[0], al, lm);
 
-    fprintf(fp, "while (1)\n");
-    fprintf(fp, "   sleep 30\n");
-    fprintf(fp, "   @ ns = `ls -1 %s | grep $SEMEX:t | wc -l`\n", dname);
-    fprintf(fp, "   if ($ns != 0) then\n");
-    fprintf(fp, "      echo -n '.' >>& $log\n");
-    fprintf(fp, "   else\n");
-    fprintf(fp, "      echo ' done' >>& $log\n");
-    fprintf(fp, "      break\n");
-    fprintf(fp, "   endif\n");
-    fprintf(fp, "end\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "if ($err == 0) then\n");
-    fprintf(fp, "   unlink %s\n", fname);
-    fprintf(fp, "endif\n");
-
-/* close the master file */
-    fprintf(fp, "exit($err)\n");
-    fclose(fp);
-    chmod(fname, S_IRUSR | S_IWUSR | S_IXUSR);
+/* clean up */
+    free_strings(ta);
 
     return(co);}
 
@@ -363,10 +401,10 @@ static int make_pfor_script(char **sa, int is, char *fname, int nc,
 			    char *shell, char *pact, char *args, int henv,
 			    char **vo, char **v, int k)
    {int i, ip, co, n;
+    int lm[3];
     char al[BFLRG], r[BFLRG], fn[BFLRG];
     char dname[BFLRG], lname[BFLRG];
     char *ro, **ta;
-    FILE *fp;
 
     memset(dname, 0, BFLRG);
     memset(lname, 0, BFLRG);
@@ -381,15 +419,6 @@ static int make_pfor_script(char **sa, int is, char *fname, int nc,
 
     ta = compute_pfor_limits(sa, is, al, BFLRG);
     n  = lst_length(ta);
-
-/* open the master file */
-    fp = fopen(fname, "w");
-    fprintf(fp, "#!/bin/csh -f\n");
-    fprintf(fp, "unalias *\n");
-    fprintf(fp, "@ err = 0\n");
-    fprintf(fp, "set log = %s/log.%s\n", dname, lname);
-    fprintf(fp, "rm -f $log\n");
-    fprintf(fp, "touch $log\n");
 
     ro = sa[is];
     sa[is] = r;
@@ -406,26 +435,20 @@ static int make_pfor_script(char **sa, int is, char *fname, int nc,
     for (ip = 2; ip < n; ip++)
         {snprintf(fn, BFLRG, "%s.%d", fname, ip);
 	 snprintf(r, BFLRG, "   set %s = %s\n", ta[1], ta[ip]);
-
-	 fprintf(fp, "%s %s %s >>& $log\n", ta[0], fn, al);
-	 fprintf(fp, "@ err = $err + $status\n");
-
 	 co = make_shell_script(sa, fn, shell, pact,
 				args, henv, vo, v, k);};
 
-/* clean up */
-    free_strings(ta);
-
     sa[is] = ro;
 
-    fprintf(fp, "if ($err == 0) then\n");
-    fprintf(fp, "   unlink %s\n", fname);
-    fprintf(fp, "endif\n");
+    lm[0] = 2;
+    lm[1] = n;
+    lm[2] = 1;
 
-/* close the master file */
-    fprintf(fp, "exit($err)\n");
-    fclose(fp);
-    chmod(fname, S_IRUSR | S_IWUSR | S_IXUSR);
+/* write a controller script to run them all */
+    make_ctl_script(fname, dname, lname, ta[0], al, lm);
+
+/* clean up */
+    free_strings(ta);
 
     return(co);}
 
