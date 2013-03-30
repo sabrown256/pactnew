@@ -477,6 +477,42 @@
 
 /*--------------------------------------------------------------------------*/
 
+/* SCHEME object type designations */
+
+enum e_SX_object_type
+   {G_FILE = 240,
+    G_PDBFILE,
+    G_DEFSTR,
+    G_SYMENT,
+    G_DIMDES,
+    G_MEMDES,
+    G_PDBDATA,
+    G_PANVAR,
+    G_PACKAGE,
+    G_SOURCE_VARIABLE,
+    G_IV_SPECIFICATION,
+    G_PLOT_REQUEST,
+    G_PLOT_MAP,
+    G_PLT_CRV,
+    G_GRAPH,
+    G_DEVICE,
+    G_DEV_ATTRIBUTES,
+    G_NUM_ARRAY,
+    G_POLYGON,
+    G_MAPPING,
+    G_SET,
+    G_FUNCTION,
+    G_IMAGE,
+    G_INTERFACE_OBJECT};
+
+typedef enum e_SX_object_type SX_object_type;
+
+enum e_SX_session_mode
+   {SX_MODE_SCHEME = 0, SX_MODE_PDBVIEW, SX_MODE_ULTRA};
+
+typedef enum e_SX_session_mode SX_session_mode;
+
+
 typedef struct s_g_pdbdata g_pdbdata;
 typedef struct s_SX_object SX_object;
 typedef struct s_SX_menu_item SX_menu_item;
@@ -585,6 +621,8 @@ struct s_SX_scope_public
     double view_dx[PG_SPACEDM];
     double view_angle[PG_SPACEDM];
 
+    SX_session_mode sm;
+
     char *text_output_format;
     char *command_log_name;
     char *console_type;
@@ -631,36 +669,6 @@ struct s_SX_scope_public
 
     PG_device *graphics_device;};
 
-
-/* SCHEME object type designations */
-
-enum e_SX_object_type
-   {G_FILE = 240,
-    G_PDBFILE,
-    G_DEFSTR,
-    G_SYMENT,
-    G_DIMDES,
-    G_MEMDES,
-    G_PDBDATA,
-    G_PANVAR,
-    G_PACKAGE,
-    G_SOURCE_VARIABLE,
-    G_IV_SPECIFICATION,
-    G_PLOT_REQUEST,
-    G_PLOT_MAP,
-    G_PLT_CRV,
-    G_GRAPH,
-    G_DEVICE,
-    G_DEV_ATTRIBUTES,
-    G_NUM_ARRAY,
-    G_POLYGON,
-    G_MAPPING,
-    G_SET,
-    G_FUNCTION,
-    G_IMAGE,
-    G_INTERFACE_OBJECT};
-
-typedef enum e_SX_object_type SX_object_type;
 
 #ifdef __cplusplus
 extern "C" {

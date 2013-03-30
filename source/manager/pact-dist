@@ -381,9 +381,10 @@ PREP_TREE:
 
 # determine whether local tar supports o option
       Note $Log "Determining whether tar support o option"
-      flog $Log set lta = cvof
+
       flog $Log mkdir $TmpDir
-      flog $Log cd $TmpDir
+      flog $Log pushd $TmpDir
+      flog $Log set lta = cvof
       echo "foo" > $TmpFile.file
       flog $Log tar $lta $TmpFile.tar $TmpFile.file
       if ($status == 0) then
@@ -391,6 +392,8 @@ PREP_TREE:
       endif
       flog $Log popd
       flog $Log $RMDir $TmpDir
+
+      flog $Log popd
       Note $Log "done"
       Note $Log ""
 

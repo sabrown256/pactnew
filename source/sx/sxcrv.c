@@ -143,15 +143,17 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
          SX_gs.dataset[i].n        = 0;
          SX_gs.dataset[i].modified = FALSE;
          SX_gs.dataset[i].info     = PG_set_line_info(NULL,
-						   PLOT_CARTESIAN, CARTESIAN_2D,
-						   LINE_SOLID, FALSE, 0, 0,
-						   0, 0.0);
+						      PLOT_CARTESIAN,
+						      CARTESIAN_2D,
+						      LINE_SOLID,
+						      FALSE, 0, 0,
+						      0, 0.0);
          SX_gs.number[i]           = -1;
 	 SX_gs.data_index[i]       = -1;
 
 /* initialize the curve reference variables, procedures, and objects */
 
-         if (i < 26)
+         if ((i < 26) && (SX_gs.sm == SX_MODE_ULTRA))
             {s[0] = i + 'a';
 	     s[1] = '\0';
 	     t[0] = i + 'A';
@@ -178,7 +180,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
          _SX.crv_proc[i]  = p;
          _SX.crv_varbl[i] = v;
 
-         if (i < 26)
+         if ((i < 26) && (SX_gs.sm == SX_MODE_ULTRA))
             {if (SC_hasharr_install(si->symtab, s1, o, SS_OBJECT_S, 3, -1) == NULL)
                 LONGJMP(SC_gs.cpu, ABORT);};
 
