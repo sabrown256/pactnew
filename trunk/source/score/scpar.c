@@ -287,12 +287,14 @@ static void _SC_set_omp_num_threads(int nt)
 /* omp_set_num_threads takes precedence over OMP_NUM_THREADS */
 	omp_set_num_threads(nt);
 
-int na=0;
+#ifdef DEBUG
+	int na = 0;
 #pragma omp parallel sections
-   {
-    na = omp_get_num_threads();
-   }
-fprintf(stderr, ">>> OMP_NUM_THREADS = %d\n", na);
+	{
+	 na = omp_get_num_threads();
+        }
+	fprintf(stderr, ">>> OMP_NUM_THREADS = %d\n", na);
+#endif
 	};
 #endif
 

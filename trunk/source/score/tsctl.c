@@ -35,6 +35,38 @@ double *rel_temp(double *d)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* TIME_TIMER - measure time taken by SC_wall_clock_time */
+
+static int time_timer(int nt, int ni)
+   {int it, rv;
+    double ap, tt;
+    volatile double ta;
+
+    io_printf(stdout, "\t\t\ttime timer ........ ");
+
+    rv = TRUE;
+
+    tt = SC_wall_clock_time();
+
+    ni *= 200;
+    for (it = 0; it < ni; it++)
+        ta = SC_wall_clock_time();
+
+    SC_ASSERT(ta > tt);
+
+    tt = SC_wall_clock_time() - tt;
+
+    ap = tt/((double) ni);
+
+    io_printf(stdout, "ok\n\n");
+    io_printf(stdout, "\t\t    Iter      Ttot       Tper\n");
+    io_printf(stdout, "\t\t%8d  %10.2e %10.2e\n\n", it, tt, ap);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* TIME_THREAD_LOCK - measure time to lock and unlock */
 
 static int time_thread_lock(int nt, int nd, int ni)
@@ -43,7 +75,7 @@ static int time_thread_lock(int nt, int nd, int ni)
     double tt;
     SC_thread_lock lck = SC_LOCK_INIT_STATE;
 
-    io_printf(stdout, "\t\t\ttiming ............ ");
+    io_printf(stdout, "\t\t\ttime lock ......... ");
 
     rv = TRUE;
 
@@ -89,7 +121,7 @@ static int test_omp(int nt, int nd, int ni)
     char *mem;
     double **dptr;
 
-    io_printf(stdout, "\t\t\tomp ............... ");
+    io_printf(stdout, "\t\t\ttest omp .......... ");
 
     tid = -1;
     SC_ASSERT(tid == -1);
@@ -233,6 +265,7 @@ int main(int c, char **v)
 
     rv &= test_omp(nt, nd, ni);
     rv &= time_thread_lock(nt, nd, ni);
+    rv &= time_timer(nt, ni);
 
     rv = (rv == FALSE);
 

@@ -1237,10 +1237,6 @@ switch ($Cmnd)
            if ($status == 0) then
               flog $Log set Opt = dmake
            endif
-        else if (-f $BaseDir/score/z-$System/test/log.tmake) then
-           flog $Log cat $BaseDir/score/z-$System/test/log.tmake
-        else
-           Note $Log "Proceding with untested version"
         endif
         ftee $Log $DSYS pact $Opt
 

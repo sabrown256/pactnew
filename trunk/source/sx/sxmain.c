@@ -21,7 +21,7 @@
 /* MAIN - start up a fun filled session of SX right here */
 
 int main(int c, char **v, char **env)
-   {int i, n, commnd_flag, tflag, pvflag, load_rc;
+   {int i, n, commnd_flag, tflag, load_rc;
     int load_init, n_files, ret, zsp, trap_error;
     int upix, script_file;
     char *cmd;
@@ -53,7 +53,6 @@ int main(int c, char **v, char **env)
     cmd           = NULL;
     commnd_flag   = FALSE;
     script_file   = FALSE;
-    pvflag        = FALSE;
     tflag         = FALSE;
     load_init     = TRUE;
     trap_error    = TRUE;
@@ -107,7 +106,7 @@ int main(int c, char **v, char **env)
 #ifdef AIX
                      PG_IO_INTERRUPTS(TRUE);
 #endif
-                     pvflag = TRUE;
+		     SX_gs.sm = SX_MODE_PDBVIEW;
                      break;
                 case 'q' :               /* quite mode suppress version and */
                                          /* cannot connect to display       */
@@ -134,12 +133,13 @@ int main(int c, char **v, char **env)
 		        printf("ERROR: Bad flag %s\n", v[i]);
                      break;};}
 
-        else if ((pvflag) && (v[i][0] != '(') && !commnd_flag)
+        else if ((SX_gs.sm == SX_MODE_PDBVIEW) &&
+		 (v[i][0] != '(') && !commnd_flag)
            order[n_files++] = -i;
 
         else
            {commnd_flag = TRUE;
-            cmd        = SC_dstrcpy(cmd, " ");
+            cmd = SC_dstrcpy(cmd, " ");
             for ( ; i < c; i++)
                 {cmd = SC_dstrcat(cmd, v[i]);
                  cmd = SC_dstrcat(cmd, " ");};};
@@ -147,7 +147,7 @@ int main(int c, char **v, char **env)
 #else
 
 /* assume we always want PDBVIEW mode if there is no shell */
-    pvflag = TRUE;
+    SX_gs.sm = SX_MODE_PDBVIEW;
 
 #endif
 
@@ -169,7 +169,7 @@ int main(int c, char **v, char **env)
     SX_gs.background_color_white = TRUE;
 
 /* run in PDBView mode */
-    if (pvflag)
+    if (SX_gs.sm == SX_MODE_PDBVIEW)
        {SC_set_banner(" %s  -  %s\n\n", PCODE, VERSION);
 
         SX_init_view(si);
@@ -193,7 +193,7 @@ int main(int c, char **v, char **env)
 
     SS_load_scm(si, "nature.scm");
 
-    if (pvflag)
+    if (SX_gs.sm == SX_MODE_PDBVIEW)
        {if (SX_gs.gr_mode)
 	   SX_mode_graphics(si);
         else

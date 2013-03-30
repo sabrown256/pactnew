@@ -56,33 +56,34 @@ static int UL_rd_scm(SS_psides *si, char *name)
 void UL_init_view(SS_psides *si)
    {int j;
 
-    SX_gs.default_npts      = 100;
-    SX_gs.gr_mode           = TRUE;
-    SX_gs.plot_flag         = TRUE;
+    SX_gs.default_npts   = 100;
+    SX_gs.gr_mode        = TRUE;
+    SX_gs.plot_flag      = TRUE;
+    SX_gs.sm             = SX_MODE_ULTRA;
 
     PG_box_init(3, SX_gs.gwc, 0.0, 1.0);
 
-    SX_gs.view_x[0]       = 0.18;
-    SX_gs.view_x[1]       = 0.93;
-    SX_gs.view_x[2]       = 0.18;
-    SX_gs.view_x[3]       = 0.93;
-    SX_gs.view_x[4]       = 0.0;
-    SX_gs.view_x[5]       = 1.0;
+    SX_gs.view_x[0]      = 0.18;
+    SX_gs.view_x[1]      = 0.93;
+    SX_gs.view_x[2]      = 0.18;
+    SX_gs.view_x[3]      = 0.93;
+    SX_gs.view_x[4]      = 0.0;
+    SX_gs.view_x[5]      = 1.0;
 
-    SX_gs.view_dx[0]        = 0.75;
-    SX_gs.view_dx[1]        = 0.75;
-    SX_gs.view_aspect       = 1.0;
-    SX_gs.window_x[0]       = 0.5;
-    SX_gs.window_x[1]       = 0.1;
-    SX_gs.window_dx[0]      = 0.4;
-    SX_gs.window_dx[1]      = 0.4;
-    SX_gs.window_dx_P[0]    = 1.0;
-    SX_gs.window_dx_P[1]    = 1.0;
+    SX_gs.view_dx[0]     = 0.75;
+    SX_gs.view_dx[1]     = 0.75;
+    SX_gs.view_aspect    = 1.0;
+    SX_gs.window_x[0]    = 0.5;
+    SX_gs.window_x[1]    = 0.1;
+    SX_gs.window_dx[0]   = 0.4;
+    SX_gs.window_dx[1]   = 0.4;
+    SX_gs.window_dx_P[0] = 1.0;
+    SX_gs.window_dx_P[1] = 1.0;
 
-    SX_gs.console_x[0]      = 0.0;
-    SX_gs.console_x[1]      = 0.0;
-    SX_gs.console_dx[0]     = 0.33;
-    SX_gs.console_dx[1]     = 0.33;
+    SX_gs.console_x[0]   = 0.0;
+    SX_gs.console_x[1]   = 0.0;
+    SX_gs.console_dx[0]  = 0.33;
+    SX_gs.console_dx[1]  = 0.33;
 
     SX_gs.console_type       = CSTRSAVE("MONOCHROME");
     SX_gs.text_output_format = CSTRSAVE("%13.6e");
