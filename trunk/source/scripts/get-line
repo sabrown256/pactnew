@@ -1,0 +1,42 @@
+#!/bin/csh -f
+#
+# GET-LINE - return the specified line of a file
+#
+
+#include "cpyright.h"
+
+unalias *
+
+@ err = 1
+@ n   = -1
+
+set file = ""
+
+while ($#argv > 0)
+   switch($1)
+      case -h:
+           echo ""
+           echo "Usage: get-line [-h] [-n #] <file>"
+           echo "   h  this help message"
+           echo ""
+           exit(1)
+      case -n:
+           shift
+           @ n = $1
+           breaksw
+      default:
+           set file = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$file" != "") then
+   @ ln = `cat $file | wc -l`
+   if ((0 < $n) && ($n <= $ln)) then
+      head -n +$n $file |& tail -n 1
+      @ err = 0
+   endif
+endif
+
+exit($err)
