@@ -77,7 +77,7 @@ script simplify-path sunrace cross-info find-comments where-git
 script which-scs scs-update scs-commit scs-co scs-history scs-meta
 script scs-add scs-remove scs-lock scs-diff scs-move scs-tag
 script scs-revert scs-sync scs-init
-script var-list
+script var-list get-line
 
 doc pact.ps panacea.ps pdb.ps pdbdiff.ps pdbview.ps pgs.ps
 doc pml.ps ppc.ps score.ps sx.ps ultra.ps
