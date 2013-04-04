@@ -1,0 +1,67 @@
+<!--
+ -- TGS-JS.HTML - test the Javascript PGS bindings
+ --
+ -- #include "cpyright.h"
+ --> 
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="/store/apps/codes/clanb/scripts/pgs.js"></script>
+</head>
+
+<body>
+  <center>
+  <hr>
+  Drawing<p>
+  <hr>
+  <canvas id="JS" width="1000" height="1000"></canvas>
+  <script>
+    var dev;
+
+    document.write("<a href='foo.jpg'>Photo 1</a>");
+
+    dev = PG_open("JS", "2d");
+
+/* this works
+    var x0 = new Array();
+    var x1 = new Array();
+    x0[0] = 100;
+    x0[1] = 100;
+    x1[0] = 100;
+    x1[1] = 900;
+*/
+/* or this works */
+    var x0 = new Array(100, 100);
+    var x1 = new Array(100, 900);
+
+    PG_draw_line_n(dev, 2, PIXELC, x0, x1, TRUE);
+
+    PG_fset_line_color(dev, BLUE, TRUE);
+    PG_draw_line_n(dev, 2, PIXELC, [120,110], [220,110], TRUE);
+
+    PG_fset_line_color(dev, DARK_RED, TRUE);
+    PG_draw_line_n(dev, 2, PIXELC, [120,130], [220,130], TRUE);
+
+    PG_fset_line_color(dev, YELLOW, TRUE);
+    PG_draw_line_n(dev, 2, PIXELC, [120,150], [220,150], TRUE);
+
+    PG_fset_line_color(dev, BROWN, TRUE);
+    PG_draw_line_n(dev, 2, PIXELC, [120,170], [220,170], TRUE);
+
+    PG_set_font(dev, "helvetica", "medium", 14);
+
+    PG_fset_text_color(dev, GREEN, TRUE);
+    PG_draw_text(dev, "ev 1", [500,110]);
+    PG_fset_text_color(dev, CYAN, TRUE);
+    PG_draw_text(dev, "ev 2", [500,130]);
+    PG_fset_text_color(dev, MAGENTA, TRUE);
+    PG_draw_text(dev, "ev 3", [500,150]);
+
+  </script>
+</center>
+</body>
+
+</html>
+
