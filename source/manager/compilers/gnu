@@ -32,6 +32,10 @@ Tool CC {
                  4.2.* >= -fstack-protector ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # unused return value
                  4.4.* > -Wunused-result ]
+#   Flags    += [ _env_ = PACT_CC_VERSION ;      # memory checks
+#                 4.8.* >= -fsanitize=address ]
+#   Flags    += [ _env_ = PACT_CC_VERSION ;      # thread checks
+#                 4.8.* >= -fsanitize=thread -pie ]
    Flags    += [ _env_ = Bits ;                 # address bit size
                  32    = -m32 ;
                  64    = -m64 -fPIC ]
@@ -81,6 +85,8 @@ Tool LD {
                 Linux = -rdynamic ]
    Flags   += [ _env_ = HOSTOS ;
                 Linux = -Wl,--disable-new-dtags ] # save us from RUN_PATH
+#   Flags   += [ _env_ = PACT_CC_VERSION ;         # memory and thread checks
+#                4.8.* >= -pie ]
    Flags   += [ _cmd_ = -p ;                      # profiling
 	        on    = -pg ]
    Flags   += [ _cmd_ = -cov ;                    # coverage analysis
