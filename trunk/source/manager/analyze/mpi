@@ -234,7 +234,7 @@ endif
 flog $ALog setenv ParComm "$lParComm"
 
 # export the results
-dbmget $ALog HAVE_OPENMPI       = $HAVE_OPENMPI^        \
+dbmset $ALog HAVE_OPENMPI       = $HAVE_OPENMPI^        \
              HAVE_MPI_2         = $HAVE_MPI_2^          \
              HAVE_MPI_STDIN_ALL = $HAVE_MPI_STDIN_ALL^  \
              HAVE_MPI_GOOD_IO   = $HAVE_MPI_GOOD_IO^    \
