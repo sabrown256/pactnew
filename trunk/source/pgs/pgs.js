@@ -887,26 +887,26 @@ function _PG_box_wc(dev, nd, cs, bi)
  *              - OCS coordinates BO
  */
 
-function PG_trans_box(dev, nd, ics, bi, ocs, bo)
+function PG_trans_box(dev, nd, ics, bi, ocs)
    {
 
     switch (ocs)
        {case WORLDC :
-             _PG_box_wc(dev, nd, ics, bi, bo);
+             bo = _PG_box_wc(dev, nd, ics, bi);
              break;
 
         case NORMC :
-             _PG_box_ndc(dev, nd, ics, bi, bo);
+             bo = _PG_box_ndc(dev, nd, ics, bi);
              break;
 
         case PIXELC :
-             _PG_box_pc(dev, nd, ics, bi, bo);
+             bo = _PG_box_pc(dev, nd, ics, bi);
              break;
 
         default :
              break;};
 
-    return;}
+    return(bo);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -1485,6 +1485,38 @@ function PG_draw_line_n(dev, nd, cs, x1, x2, clip)
 
     return;}
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* PG_DRAW_BOX_N - draw the BOX in the specified coordinates */
+
+function PG_draw_box_n(dev, nd, cs, box)
+   {var x, y, bx;
+
+    x  = new Array();
+    y  = new Array();
+    bx = PG_trans_box(dev, nd, cs, box, WORLDC);
+
+    switch (nd)
+       {default :
+	case 2  :
+	     x[0] = bx[0];
+	     y[0] = bx[2];
+	     x[1] = bx[0];
+	     y[1] = bx[3];
+	     x[2] = bx[1];
+	     y[2] = bx[3];
+	     x[3] = bx[1];
+	     y[3] = bx[2];
+
+	     PG_draw_line_n(dev, 2, WORLDC, [x[0],y[0]], [x[1],y[1]], TRUE);
+	     PG_draw_line_n(dev, 2, WORLDC, [x[1],y[1]], [x[2],y[2]], TRUE);
+	     PG_draw_line_n(dev, 2, WORLDC, [x[2],y[2]], [x[3],y[3]], TRUE);
+	     PG_draw_line_n(dev, 2, WORLDC, [x[3],y[3]], [x[0],y[0]], TRUE);
+	     break;};
+
+    return;}
+ 
 /*--------------------------------------------------------------------------*/
 
 /*                        TEXT DRAWING ROUTINES                             */
