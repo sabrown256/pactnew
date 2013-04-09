@@ -195,8 +195,8 @@ endif
 NoteD $ALog ""
 
 # export the results
-dbexp HAVE_OPENMP
-dbexp STD_OPENMP
+dbmset $ALog HAVE_OPENMP = $HAVE_OPENMP^            \
+             STD_OPENMP  = $STD_OPENMP
 
 exit(0)
 

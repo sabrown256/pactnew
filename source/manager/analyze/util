@@ -150,7 +150,7 @@ else
 endif
 
 # export the results
-dbmget $ALog AR_Exe     = $AR_Exe^       \
+dbmset $ALog AR_Exe     = $AR_Exe^       \
              AR_Flags   = $AR_Flags^     \
              AR_IFlag   = $AR_IFlag^     \
              AR_XFlag   = $AR_XFlag^     \
