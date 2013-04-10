@@ -1003,9 +1003,7 @@ function _PG_set_space_FRM(dev, nd, frm)
     if (dev != NULL)
        {var ndc;
 
-        ndc = new Array();
-
-	PG_get_viewspace(dev, NORMC, ndc);
+	ndc = PG_get_viewspace(dev, NORMC);
 
 	gs_fr = PG_box_copy(nd, frm);
 
@@ -1075,8 +1073,8 @@ function _PG_set_space_WC(dev, nd, wc)
 
 /* PG_GET_VIEWSPACE - return the viewspace limits */
 
-function PG_get_viewspace(dev, cs, box)
-   {
+function PG_get_viewspace(dev, cs)
+   {var box;
 
     switch (cs)
        {case BOUNDC :
