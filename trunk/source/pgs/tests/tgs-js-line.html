@@ -1,0 +1,90 @@
+<!--
+ -- TGS-JS-LINE.HTML - test the Javascript PGS line drawing bindings
+ --
+ -- #include "cpyright.h"
+ --> 
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="../pgs.js"></script>
+</head>
+
+<body>
+   <center>
+   Line Drawing Test<p>
+   <hr>
+   <canvas id="JS" width="600" height="500"></canvas>
+   <script>
+      var ic, ir, nc, nr;
+      var xmn, xmx, ymn, ymx;
+      var w, h;
+      var x1, x2, clr, wid;
+      var dev;
+
+      w = 600;
+      h = 500;
+
+/* get the x limits figured */
+      xmn = 0.0;
+      xmx = 3.0;
+
+/* get the y limits figured */
+      ymn = 0.0;
+      ymx = 1.0;
+
+      dev = PG_open("JS", "2d");
+      PG_open_device(dev, w, h, 1.0, 1.0);
+
+      PG_set_viewspace(dev, 2, NORMC, [0.01, 0.99, 0.01, 1.0]);
+      PG_set_viewspace(dev, 2, WORLDC, [xmn, xmx, ymn, ymx]);
+
+      PG_draw_box_n(dev, 2, WORLDC, gs_wc);
+
+      nr     = 14;
+      clr    = new Array();
+      clr[0] = BLUE;
+      clr[1] = CYAN;
+      clr[2] = GREEN;
+      clr[3] = YELLOW;
+      clr[4] = RED;
+      clr[5] = MAGENTA;
+  
+      clr[6] = DARK_BLUE;
+      clr[7] = DARK_CYAN;
+      clr[8] = DARK_GREEN;
+      clr[9] = BROWN;
+      clr[10] = DARK_RED;
+      clr[11] = DARK_MAGENTA;
+
+      clr[12] = GRAY;
+      clr[13] = DARK_GRAY;
+
+      nc     = 3;
+      wid    = new Array();
+      wid[0] = 0.5;
+      wid[1] = 1.0;
+      wid[2] = 3.0;
+
+      x1 = new Array();
+      x2 = new Array();
+
+      for (ic = 0; ic < 3; ic++)
+          {PG_fset_line_width(dev, wid[ic]);
+	   x1[0] = ic + 0.1;
+	   x2[0] = ic + 0.9;
+
+	  for (ir = 0; ir < nr; ir++)
+	      {PG_fset_line_color(dev, clr[ir], TRUE);
+	       x1[1] = (1 + ir)/(nr + 1.0);
+	       x2[1] = (1 + ir)/(nr + 1.0);
+
+	       PG_draw_line_n(dev, 2, WORLDC, x1, x2, TRUE);};};
+
+  </script>
+</center>
+</body>
+
+</html>
+

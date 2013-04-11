@@ -1550,7 +1550,7 @@ function PG_set_font(dev, face, style, size)
 
     sz = size.toString();
 
-    dev.font=face.concat(sz, "px", face);
+    dev.font = face.concat(sz, "px", face);
 
     return;}
 
