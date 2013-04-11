@@ -674,7 +674,7 @@ static int64_t _SC_get_cmd_resp(PROCESS *pp, char *msg)
  *                - the command codes are defined in the SC_file_oper enum
  */
 
-NORETURN void SC_file_access(int log)
+void SC_file_access(int log)
    {int code, cfd, indx, ret;
     char s[MAXLINE], *bf, *t;
     FILE *file[MAX_FILES], *fp;
