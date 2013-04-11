@@ -1,0 +1,83 @@
+<!--
+ -- TGS-JS-TEXT.HTML - test the Javascript PGS text drawing bindings
+ --
+ -- #include "cpyright.h"
+ --> 
+
+<!DOCTYPE html>
+<html>
+
+<head>
+   <script src="../pgs.js"></script>
+</head>
+
+<body>
+   <center>
+   Text Drawing Test<p>
+   <hr>
+   <canvas id="JS" width="600" height="500"></canvas>
+   <script>
+      var ic, ir, nc, nr;
+      var xmn, xmx, ymn, ymx;
+      var w, h;
+      var x1, x2, fnt, sty, clr;
+      var dev;
+
+      w = 600;
+      h = 500;
+
+/* get the x limits figured */
+      xmn = 0.0;
+      xmx = 3.0;
+
+/* get the y limits figured */
+      ymn = 0.0;
+      ymx = 1.0;
+
+      dev = PG_open("JS", "2d");
+      PG_open_device(dev, w, h, 1.0, 1.0);
+
+      PG_set_viewspace(dev, 2, NORMC, [0.01, 0.99, 0.01, 1.0]);
+      PG_set_viewspace(dev, 2, WORLDC, [xmn, xmx, ymn, ymx]);
+
+      PG_draw_box_n(dev, 2, WORLDC, gs_wc);
+
+      nr     = 4;
+      fnt    = new Array();
+      fnt[0] = "helvetica";
+      fnt[1] = "times";
+      fnt[2] = "courier";
+      fnt[3] = "ariel";
+  
+      clr    = new Array();
+      clr[0] = BLACK;
+      clr[1] = BLUE;
+      clr[2] = RED;
+      clr[3] = BROWN;
+  
+      nc     = 3;
+      sty    = new Array();
+      sty[0] = "italic";
+      sty[1] = "medium";
+      sty[2] = "bold";
+
+      x1 = new Array();
+      x2 = new Array();
+
+      for (ic = 0; ic < 3; ic++)
+          {x1[0] = ic + 0.3;
+
+ 	   for (ir = 0; ir < nr; ir++)
+	       {PG_fset_text_color(dev, clr[ir], TRUE);
+
+                for (ip = 8; ip < 18; ip += 4)
+	            {x1[1] = (1 + 3*ir + (ip - 8)/4)/(3*nr + 1.0);
+                     PG_set_font(dev, fnt[ir], sty[ic], ip);
+                     PG_write_n(dev, 2, WORLDC, x1, "Abc Def", TRUE);};};};
+
+  </script>
+</center>
+</body>
+
+</html>
+
