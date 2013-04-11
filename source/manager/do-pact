@@ -184,7 +184,7 @@ switch ($Phase)
 # clean out residue from a previous MultiConfig build
         flog $LogHost cd $WrkDir/$Builder
         flog $LogHost dsys delete -a
-        flog $LogHost rm -rf gen/*
+        flog $LogHost $RMDir gen/*
 
         if ($use_rsync == FALSE) then
            if ($?TmpTar) then
@@ -198,9 +198,9 @@ switch ($Phase)
 
 # clean out panacea/abc to force clean build and test
         flog $LogHost pushd $WrkDir/panacea/abc
-        flog $LogHost rm -rf dev
-        flog $LogHost rm -f *.[ch] main/abc.c
-        flog $LogHost ( find . -type d -name 'z-*' -exec rm -rf {} \; )
+        flog $LogHost $RMDir dev
+        flog $LogHost $RM *.[ch] main/abc.c
+        flog $LogHost ( find . -type d -name 'z-*' -exec $RMDir {} \; )
         flog $LogHost popd
 
         breaksw

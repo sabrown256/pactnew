@@ -1107,7 +1107,7 @@ switch ($Cmnd)
         set GenFiles = ( $GenFiles make-def make-macros Makefile )
         set GenFiles = ( $GenFiles env-mio )
         foreach i ( $GenFiles )
-           flog $Log $RM $IncDir/$i
+           flog $Log $RM $EtcDir/$i
         end
 
 # remove files we are about to generate in bin
@@ -1191,7 +1191,7 @@ switch ($Cmnd)
 
 # always remove and start clean in case there is toxic rubble
 # left over from a failed build
-                 flog $Log $Mk remove
+                 flog $Log $Mk -i -na 1 remove
 
 # NOTE: do it twice as a fault tolerance measure
 # this role will be assumed by dmake after it is successfully built
@@ -2341,11 +2341,11 @@ CFG_DONE:
            flog $Log mkdir tmp
            flog $Log $MV $ScmFiles tmp
            flog $Log touch foo
-           flog $Log $RM *
+           flog $Log $RM $ScmDir/*
            flog $Log $MV tmp/* .
            flog $Log rmdir tmp
         else
-           flog $Log $RM *
+           flog $Log $RM $ScmDir/*
         endif
         flog $Log popd
 
@@ -2356,11 +2356,11 @@ CFG_DONE:
            flog $Log mkdir tmp
            flog $Log $MV $IncFiles tmp
            flog $Log touch foo
-           flog $Log $RM *
+           flog $Log $RM $IncDir/*
            flog $Log $MV tmp/* .
            flog $Log rmdir tmp
         else
-           flog $Log $RM *
+           flog $Log $RM $IncDir/*
         endif
         flog $Log popd
  
@@ -2371,11 +2371,11 @@ CFG_DONE:
            flog $Log mkdir tmp
            flog $Log $MV $EtcFiles tmp
            flog $Log touch foo
-           flog $Log $RM *
+           flog $Log $RM $EtcDir/*
            flog $Log $MV tmp/* .
            flog $Log rmdir tmp
         else
-           flog $Log $RM *
+           flog $Log $RM $EtcDir/*
         endif
         flog $Log popd
  
@@ -2386,11 +2386,11 @@ CFG_DONE:
            flog $Log mkdir tmp
            flog $Log $MV $BinFiles tmp
            flog $Log touch foo
-           flog $Log $RM *
+           flog $Log $RM $BinDir/*
            flog $Log $MV tmp/* .
            flog $Log rmdir tmp
         else
-           flog $Log $RM *
+           flog $Log $RM $BinDir/*
         endif
         flog $Log popd
  
@@ -2398,7 +2398,7 @@ CFG_DONE:
         NoteD $Log "    in $LibDir"
         flog $Log pushd $LibDir
         flog $Log touch foo.a foo.so
-        flog $Log $RM *.a *.so*
+        flog $Log $RM $LibDir/*.a $LibDir/*.so*
         if (-d $lpybind) then
            flog $Log $RMDir $lpybind
         endif

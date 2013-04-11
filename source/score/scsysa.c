@@ -29,6 +29,7 @@ struct s_execdes
     int na;
     int show;
     int dmp;
+    int ignore;
     int *res;
     char *shell;
     char **cmnds;
@@ -867,6 +868,7 @@ int SC_exec(char ***out, char *cmnd, char *shell, int to)
     ed.na     = 1;
     ed.show   = FALSE;
     ed.dmp    = dbg;
+    ed.ignore = FALSE;
     ed.shell  = shell;
     ed.cmnds  = &cmnd;
     ed.env    = NULL;
@@ -1010,7 +1012,9 @@ int _SC_exec_one(void **a, int *it)
     mx = it[1];
     ed = *(execdes **) a;
 
-    for (i = mn; i < mx; i++)
+    st = 0;
+
+    for (i = mn; (i < mx) && ((st == 0) || (ed->ignore == TRUE)); i++)
         {out = SC_STRING_ARRAY();
 
 	 cm           = ed->cmnds[i];
@@ -1083,11 +1087,14 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
     ed.na     = na;
     ed.show   = show;
     ed.dmp    = dmp;
+    ed.ignore = ignore;
     ed.cmnds  = cmnds;
     ed.shell  = shell;
     ed.env    = env;
     ed.filter = filter;
     ed.res    = CMAKE_N(int, n);
+    for (i = 0; i < n; i++)
+        ed.res[i] = 0;
 
 /* run each command until it succeeds or definitively fails
  * try to avoid failing on system fault type errors
