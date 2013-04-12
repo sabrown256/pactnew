@@ -68,7 +68,7 @@ int PC_send_formats(void)
 
     fp = stdout;
 
-    fflush(fp);
+    SC_fflush_safe(fp);
     SC_setbuf(fp, NULL);
 
     tty = SC_get_terminal_process();

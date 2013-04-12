@@ -58,7 +58,7 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
 	ps->diag = SC_fopen_safe(t, "w");
 	fprintf(ps->diag, "\n\n   Node #%d at %s:%d.%d\n",
 		pp->acpu, srvr, port, pp->data);
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
     return(pp);}
 
@@ -156,7 +156,7 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     if (ps->debug)
        {fprintf(ps->diag, "   Write");
 	fprintf(ps->diag, " Attempt(%d,%s,%d)",	(int) ni, type, pp->acpu);
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
 /* get the buffer size */
     nbr = PD_sizeof(vif, type, ni, vr);
@@ -198,7 +198,7 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 /* conditional diagnostic messages */
     if (ps->debug)
        {fprintf(ps->diag, " Sent(%ld,%s,%d)\n", nis, types, dn);
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
     SC_ERR_UNTRAP();
 
@@ -240,7 +240,7 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 /* conditional diagnostic messages */
     if (ps->debug)
        {fprintf(ps->diag, "   Read");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
 /* get the buffer size and allocate it */
     if (buf_siz > 0)
@@ -279,7 +279,7 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	   fprintf(ps->diag, "\n");
 	else
            fprintf(ps->diag, " Nothing\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
     return(nir);}
 
@@ -308,7 +308,7 @@ static long _PC_wait_d(PROCESS *pp)
 /* conditional diagnostic messages */
     if (ps->debug)
        {fprintf(ps->diag, "   Wait");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
    {MPI_Status *stats;
     MPI_Request *reqs;

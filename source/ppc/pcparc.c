@@ -43,7 +43,7 @@ static int _PC_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
 	   continue;
 	else if (ps->debug)
 	   {fprintf(ps->diag, ".%d", nbo);
-	    fflush(ps->diag);};
+	    SC_fflush_safe(ps->diag);};
 	nb  -= nbo;
 	pbf += nbo;};
 
@@ -355,7 +355,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 	if (ps->diag != NULL)
 	   {fprintf(ps->diag, "\n\n   Node #%d at %s:%d.%d\n",
 		    pp->acpu, srvr, port, pp->data);
-	    fflush(ps->diag);};};
+	    SC_fflush_safe(ps->diag);};};
 
 #else
 	pp = NULL;
@@ -478,7 +478,7 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     if (ps->debug)
        {fprintf(ps->diag, "   Write");
 	fprintf(ps->diag, " Attempt(%d,%s,%d)",	(int) ni, type, pp->acpu);
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
 /* get the buffer size */
     nbr = PD_sizeof(vif, type, ni, vr);
@@ -519,7 +519,7 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 /* conditional diagnostic messages */
     if (ps->debug)
        {fprintf(ps->diag, " Sent(%ld,%s,%d)\n", nis, types, dn);
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
     SC_ERR_UNTRAP();
 
@@ -561,7 +561,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 /* conditional diagnostic messages */
     if (ps->debug)
        {fprintf(ps->diag, "   Read");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
 /* get the buffer size and allocate it */
     if (buf_siz > 0)
@@ -585,7 +585,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	 if (nbt > 0)
 	    {if (ps->debug)
 	        {fprintf(ps->diag, " Recv(%ld,%s)", nbt, types);
-		 fflush(ps->diag);};};
+		 SC_fflush_safe(ps->diag);};};
 
          nbr -= nbt;
          if (nbr > 0)
@@ -597,7 +597,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 
 	     if (ps->debug && block && (nis > 0))
 	        {fprintf(ps->diag, " Expect(%d,%s)", nis, types);
-		 fflush(ps->diag);};};
+		 SC_fflush_safe(ps->diag);};};
 
          if (!block)
             break;};
@@ -617,7 +617,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	   fprintf(ps->diag, "\n");
 	else
            fprintf(ps->diag, " Nothing\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
     return(nir);}
 
@@ -646,7 +646,7 @@ static long _PC_wait_n(PROCESS *pp)
 /* conditional diagnostic messages */
     if (ps->debug)
        {fprintf(ps->diag, "   Wait");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
 
 /* convert the message to the requested output data */
     for (i = 0; i < np; i++)

@@ -369,7 +369,7 @@ size_t fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
 	zc = (n == 0) ? zc + 1 : 0;
 
         if (n < ns)
-           fflush(fp);
+           fflush_safe(fp);
 
 	ps += bpi*n;
 	ns -= n;

@@ -338,7 +338,7 @@ static void _SC_leh_beep(void)
    {
 
     fprintf(stderr, "\x7");
-    fflush(stderr);
+    SC_fflush_safe(stderr);
 
     return;}
 
@@ -525,7 +525,7 @@ static int _SC_leh_up_down(lehloc *lp, int wh)
 
 	    if (fdbg != NULL)
 	       {fprintf(fdbg, ": <up/down> %d %d", ih, nh);
-		fflush(fdbg);};};
+		SC_fflush_safe(fdbg);};};
 
 	lp->hind = ih;};
 
@@ -1015,7 +1015,7 @@ static char *_SC_leh_gets(lehloc *lp)
 	   {fprintf(fdbg, "> '%c'  %d %d  (%ld %ld)  ",
 		    lp->c, lp->hind, _SC_leh.nh,
 		    (long) lp->pos, (long) lp->len);
-	    fflush(fdbg);};
+	    SC_fflush_safe(fdbg);};
 
 /* autocomplete when the callback is set
  * completion returns -1 on error
@@ -1038,7 +1038,7 @@ static char *_SC_leh_gets(lehloc *lp)
 	   {fprintf(fdbg, ": %d %p (%ld %d)\n",
 		    nc, map[lp->c],
 		    (long) lp->pos, _SC_leh.nh);
-	    fflush(fdbg);};
+	    SC_fflush_safe(fdbg);};
 
 /* if we get a single character line consisting of a linefeed
  * return an empty line
@@ -1142,7 +1142,7 @@ char *SC_leh(const char *prompt)
     if (_SC_leh_sup_termp() == FALSE)
        {_SC_leh_put_prompt(&loc);
 
-	fflush(stdout);
+	SC_fflush_safe(stdout);
 
 	rv = fgets(bf, MAX_BFSZ, stdin);
 

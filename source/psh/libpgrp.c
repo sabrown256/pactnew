@@ -2180,7 +2180,7 @@ static int run_pgrp(statement *s)
 		     break;
                 case GEX_NONE :
 		     break;};
-	    fflush(stdout);};
+	    fflush_safe(stdout);};
 
         FREE(s->st);};
 
@@ -2600,7 +2600,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 		      fprintf(fio[1], "%s ", sa[i]);};
 		 fprintf(fio[1], "\n");
 		 nw++;
-                 fflush(fio[1]);
+                 fflush_safe(fio[1]);
 		 ic++;
 		 rv = (ic < nc);
 
@@ -2713,7 +2713,7 @@ int gexec_file(char *db, io_mode md, FILE **fio,
 	        case IO_MODE_WD :
 	        case IO_MODE_APPEND :
 		     rv = transfer_ff(fio[0], fp);
-		     fflush(fp);
+		     fflush_safe(fp);
 		     break;
 
 	        default :

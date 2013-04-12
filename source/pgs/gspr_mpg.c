@@ -421,7 +421,7 @@ boolean init_MPEGjob(PG_device *dev)
 #ifdef BLEAH
 fprintf(stdout, "firstFrame, lastFrame = %d, %d;  real = %d, %d\n",
         firstFrame, lastFrame, realStart, realEnd);
-fflush(stdout);
+SC_fflush_safe(stdout);
 #endif
 
     pastRefFrame = NULL;
@@ -765,7 +765,7 @@ static void ProcessRefFrame(MpegDevInfo *MpegDev, int lastFrame,
 #ifdef BLEAH
         fprintf(stdout, "I-frame %d, currentGOP = %d\n",
 	        mfr->id, currentGOP);
-        fflush(stdout);
+        SC_fflush_safe(stdout);
 #endif
 
         /* only start a new GOP with I */
@@ -787,7 +787,7 @@ static void ProcessRefFrame(MpegDevInfo *MpegDev, int lastFrame,
 		   {fprintf(stdout, 
 			    "Creating new Sequence before GOP %d\n", 
 			    num_gop);
-	            fflush(stdout);}
+	            SC_fflush_safe(stdout);}
 
 	        Mhead_GenSequenceHeader(bb, Fsize_x, Fsize_y,
 			/*pratio*/         aspectRatio,
@@ -806,7 +806,7 @@ static void ProcessRefFrame(MpegDevInfo *MpegDev, int lastFrame,
 	       {fprintf(stdout, 
 			"Creating new GOP (closed = %c) before frame %d\n",
 			"FT"[closed], mfr->id);
-		fflush(stdout);}
+		SC_fflush_safe(stdout);}
 
 	    num_gop++;
 	    Mhead_GenGOPHeader(bb,
