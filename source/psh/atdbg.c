@@ -473,7 +473,7 @@ static int use_dbx(atdbgdes *st, char *fname, atproc *al)
     rv = TRUE;
 
     if (st->mode == TRACE)
-       {fp = fopen(fname, "w");
+       {fp = fopen_safe(fname, "w");
 	if (fp != NULL)
 	   {fprintf(fp, "attach %d\n", al->pid);
 	    fprintf(fp, "where\n");
@@ -514,7 +514,7 @@ static int session(atdbgdes *st)
 /* open the log file if requested */
     if (IS_NULL(st->logname) == FALSE)
        {snprintf(fname, BFLRG, "%s.%d", st->logname, (int) getpid());
-	log = fopen(fname, "w");
+	log = fopen_safe(fname, "w");
 	if (log != NULL)
 	   setbuf(log, NULL);
 	st->log = log;};

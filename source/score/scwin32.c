@@ -59,7 +59,7 @@ static int64_t _SC_file_length_win32(char *path)
     FILE *fp;
 
     ln = 0L;
-    fp = fopen(path, "r");
+    fp = SC_fopen_safe(path, "r");
     if (fp != NULL)
        {ln = SC_file_size(fp);
 	io_close(fp);};

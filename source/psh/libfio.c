@@ -14,6 +14,9 @@
 
 /* define only for SCOPE_SCORE_COMPILE */
 
+int
+ _assert_fail = 0;
+
 static int
  db_log_level = 1;
 
@@ -165,16 +168,21 @@ int fflush_safe(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* BLOCK_FD - set the file descriptor to be blocked in ON is TRUE
- *          - otherwise unblocked
- *          - return the original value
+/* BLOCK_FD - set the file descriptor to be blocked/unblocked
+ *          - if ON is  1  blocked
+ *          - if ON is  0  unblocked
+ *          - if ON is -1  do not change status
+ *          - return TRUE if original status was blocked
+ *          - and FALSE if original status was unblocked
+ *          - NOTE: on Linux O_NDELAY == O_NONBLOCK
  */
 
 int block_fd(int fd, int on)
-   {int ov, nv;
+   {int ov, nv, rv;
 
     ov = 0;
     ov = fcntl(fd, F_GETFL, ov);
+    rv = ((ov & O_NDELAY) == 0);
 
 /* block */
     if (on == TRUE)
@@ -189,7 +197,7 @@ int block_fd(int fd, int on)
 
     ASSERT(nv != -1);
 
-    return(ov);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -204,64 +212,50 @@ int block_fd(int fd, int on)
  */
 
 ssize_t read_safe(int fd, void *s, size_t nb, int req)
-   {int ev, blk, zc;
+   {int ev, blk, zc, nz, wait;
     size_t ns;
     ssize_t n, nr;
     char *ps;
 
     blk = block_fd(fd, -1);
     zc  = 0;
+    nz  = 10;
 
-/* non-blocking read or terminal - take what you get */
+/* non-blocking read or terminal - take what you get
+ * retry on errors but do not wait (i.e. sleep) for the bytes
+ */
     if ((blk == FALSE) || (isatty(fd) == TRUE))
-       {while (zc < 10)
-	   {nr = read(fd, s, nb);
-	    ev = errno;
-	    if (nr < 0)
-
-/* if the error is recoverable, sleep and try again */
-	       {if ((ev == EAGAIN) ||
-		    (ev == EWOULDBLOCK) ||
-		    (ev == EINTR))
-		   {zc++;
-		    sleep(1);}
-
-/* if the error is unrecoverable, stop now */
-	        else
-		   {nr = -1;
-		    zc = 10;};};};}
+       wait = FALSE;
 
 /* blocking read - insist on the specified number of bytes or an error */
     else
-       {ns = nb;
-	nr = 0;
-	ps = s;
+       wait = TRUE;
 
-	while ((ns > 0) && (zc < 10))
-	   {n  = read(fd, ps, ns);
-	    ev = errno;
-	    if (n < 0)
+    ns = nb;
+    nr = 0;
+    ps = s;
+
+    for (zc = 0; (ns > 0) && (zc < nz); zc++)
+        {n  = read(fd, ps, ns);
+	 ev = errno;
+	 if (n < 0)
 
 /* if the error is recoverable, sleep and try again */
-	       {if ((ev == EAGAIN) ||
-		    (ev == EWOULDBLOCK) ||
-		    (ev == EINTR))
-		   {zc++;
+	    {if ((ev == EAGAIN) ||
+		 (ev == EWOULDBLOCK) ||
+		 (ev == EINTR))
+		{if ((zc < nz-1) && (wait == TRUE))
 		    sleep(1);}
 
 /* if the error is unrecoverable, stop now */
-	        else
-		   {nr = -1;
-		    zc = 10;};}
+	     else
+	        zc = nz;}
 
-	    else if (n == 0)
-	       zc++;
-
-	    else
-	       {zc  = (req == TRUE) ? 0 : 10;
-		ps += n;
-		ns -= n;
-		nr += n;};};};
+	 else if (n > 0)
+	    {zc  = (req == FALSE) ? nz : 0;
+	     ps += n;
+	     ns -= n;
+	     nr += n;};};
 
     return(nr);}
 
@@ -437,7 +431,7 @@ void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
     FILE *log;
 
     if ((ilog == TRUE) && (flog != NULL) && (ilev <= db_log_level))
-       {log = fopen(flog, "a");
+       {log = fopen_safe(flog, "a");
 	if (log != NULL)
 	   {VA_START(fmt);
 	    VSNPRINTF(msg, BFLRG, fmt);

@@ -241,7 +241,7 @@ static char *push_file(char *s, int itype)
                snprintf(t, BFLRG, "%s/%s", st.dir.mng, lfile);
 	    else
 	       nstrncpy(t, BFLRG, lfile, -1);
-	    se->fp = fopen(t, "r");}
+	    se->fp = fopen_safe(t, "r");}
 
 	else if (itype == STACK_PROCESS)
 	   se->fp = popen(lfile, "r");};
@@ -2546,7 +2546,7 @@ static void write_do_run_db(client *cl, state *st)
     else
        {note(Log, TRUE, "      generating %s", db);
 
-	fp = fopen(db, "w");
+	fp = fopen_safe(db, "w");
 
 	fprintf(fp, "#\n");
 	fprintf(fp, "# DO-RUN-DB - execution signatures for do-run\n");

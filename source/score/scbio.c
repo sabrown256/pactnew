@@ -1494,7 +1494,7 @@ FILE *SC_bopen(char *name, char *mode)
     ret = NULL;
 
     if (name != NULL)
-       {fp = fopen(name, mode);
+       {fp = SC_fopen_safe(name, mode);
 	if (fp != NULL)
 	   {bid        = CMAKE(bio_desc);
             bid->sz    = SC_file_size(fp);
@@ -1558,7 +1558,7 @@ FILE *SC_lbopen(char *name, char *mode)
     ret = NULL;
 
     if (name != NULL)
-       {fp = fopen(name, mode);
+       {fp = SC_fopen_safe(name, mode);
 	if (fp != NULL)
 	   {bid        = CMAKE(bio_desc);
             bid->sz    = SC_file_size(fp);

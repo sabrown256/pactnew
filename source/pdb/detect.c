@@ -13,6 +13,11 @@
 
 #undef LONGLONG_MAX
 
+#undef LIBFIO
+#undef SCOPE_SCORE_PREPROC
+#include "../psh/common.h"
+#include "../psh/libfio.c"
+
 #include "scstd.h"
 #include "scope_typeh.h"
 
@@ -1168,7 +1173,7 @@ int main(int c, char **v)
             break;};
 
     if (outf != NULL)
-       fo = fopen(outf, "w");
+       fo = fopen_safe(outf, "w");
     else
        fo = stdout;
 

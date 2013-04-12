@@ -501,7 +501,7 @@ int main(int c, char **v)
 		      dscg = FALSE;
 		      break;
 		 case 'd':
-		      fp = fopen("tmlcg.dat", "w");
+		      fp = SC_fopen_safe("tmlcg.dat", "w");
 		      break;
 		 case 'h':
 		      PRINT(stdout, "Usgae: tmlcg [-b] [-c] [-d] [-h] [-i] [-l] [-s]\n");

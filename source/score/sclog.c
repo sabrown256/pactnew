@@ -98,7 +98,7 @@ SC_logfile SC_open_log(void)
 		      _SC.nlog);
   
 /* truncate this file and open it for writing/reading */ 
-    log.file = fopen(uf, "w+");
+    log.file = SC_fopen_safe(uf, "w+");
 
 /* if successful: print initial log and setup tmp log to delete on close */
     if (log.file != NULL)

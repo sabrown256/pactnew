@@ -43,7 +43,7 @@ int tSC_regx_match(void)
     strcpy(name, "regxfil");
 
 /* process input file */
-    fp = fopen(name, "r");
+    fp = SC_fopen_safe(name, "r");
     if (fp != NULL)
        {io_printf(STDOUT, "\nString\tPattern\tExpect\tMeasured Status\n");
 	while (fscanf(fp,"%10s %10s %d", s, patt, &truth) != EOF)
@@ -105,7 +105,7 @@ int tSC_xxxstrp(void)
 
 /* process input file of integers */
     strcpy(name, "intfil");
-    fp = fopen(name, "r");
+    fp = SC_fopen_safe(name, "r");
     if (fp != NULL)
        {io_printf(STDOUT, "\nString\tBase\tExpect\tMeasured Status\n");
 	while (fscanf(fp, "%31s %d %*d %d", xxx, &base, &truth) != EOF)
@@ -125,7 +125,7 @@ int tSC_xxxstrp(void)
 
 /* process input file of floats */
     strcpy(name, "fltfil");
-    fp = fopen(name, "r");
+    fp = SC_fopen_safe(name, "r");
 
     if (fp != NULL)
        {io_printf(STDOUT, "\nString\tExpect\tMeasured Status\n");

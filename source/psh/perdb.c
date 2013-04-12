@@ -129,7 +129,7 @@ static char *srv_save_db(database *db, char *fname,
         else
 	   snprintf(s, BFLRG, "%s.%s.db", db->cl->root, fname);
 
-	fp = fopen(s, "w");
+	fp = fopen_safe(s, "w");
 	if (fp == NULL)
 	   {snprintf(t, BFLRG, "could not open %s - save %s",
 		     s, strerror(errno));
@@ -189,7 +189,7 @@ static char *srv_load_db(client *cl, char *fname, char *var)
         else
 	   snprintf(s, BFLRG, "%s.%s.db", root, fname);
 
-	fp = fopen(s, "r");
+	fp = fopen_safe(s, "r");
         if (fp == NULL)
 	   {snprintf(t, BFLRG, "could not open %s - load %s",
 		     s, strerror(errno));

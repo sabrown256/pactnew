@@ -1045,7 +1045,7 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
     bls[0]    = '\0';
 
 /* open the phase log file */
-    fp = fopen(plog, "r");
+    fp = fopen_safe(plog, "r");
     if (fp == NULL)
        return(running);
 
@@ -1207,7 +1207,7 @@ static int watch_sect(char *plog, FILE *repf, char *sect,
     nstrncpy(tim, BFLRG, skip, -1);
 
 /* open the phase log file */
-    fp = fopen(plog, "r");
+    fp = fopen_safe(plog, "r");
     if (fp == NULL)
        return(running);
 
@@ -1373,7 +1373,7 @@ static void watch_emit(donetdes *st, char *repfn, char *file,
 	note(htmlf, TRUE,  "<body>");
 	note(htmlf, TRUE,  "<pre>");
 
-	fp = fopen(repfn, "r");
+	fp = fopen_safe(repfn, "r");
 	if (fp == NULL)
 	   {fclose(htmlf);
 	    return;};
@@ -2026,7 +2026,7 @@ static void readhost(donetdes *st, int log)
     nlst[0]  = '\0';
 
 /* read the host file */
-    fp = fopen(hf, "r");
+    fp = fopen_safe(hf, "r");
     if (fp != NULL)
        {while (TRUE)
 	   {p = fgets(t, BFLRG, fp);
@@ -2518,7 +2518,7 @@ static void lockout(donetdes *st, char *host, char *uhost)
 
 		 exit(1);};
 
-	     lf = fopen(lock, "w");
+	     lf = fopen_safe(lock, "w");
 	     if (lf != NULL)
 	        {note(lf, TRUE, "Host file = %s", st->hostfile);
 		 note(lf, TRUE, "Command line arguments = %s", st->clargs);

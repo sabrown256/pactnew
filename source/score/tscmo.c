@@ -60,7 +60,7 @@ static int test_2(int n, double *pdt)
 
     *pdt = (SC_wall_clock_time() - t0)/((double) n);
 
-    fp = fopen("test_2.map", "w");
+    fp = SC_fopen_safe("test_2.map", "w");
     SC_mem_map(fp, 15);
     fclose(fp);
 

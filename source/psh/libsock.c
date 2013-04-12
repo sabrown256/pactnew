@@ -326,7 +326,7 @@ static int make_server_conn(client *cl, int auth, char *host, int port)
 
     if ((cl != NULL) && (host != NULL))
        {snprintf(s, BFLRG, "%s.conn", cl->root);
-	fp = fopen(s, "w");
+	fp = fopen_safe(s, "w");
 	if (fp != NULL)
 	   {long pid, haddr;
 

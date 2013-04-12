@@ -27,7 +27,7 @@ int main(int c, char **v)
             {fname = v[i];
              break;};};
 
-    fp = fopen(fname, "wb");
+    fp = SC_fopen_safe(fname, "wb");
 
     a[0] = 0.0;
     a[1] = 1.0;

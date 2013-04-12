@@ -41,13 +41,13 @@ static int text_file(void)
     n = 0;
 
 /* create a text file */
-    fp  = fopen("fd.dat", "w");
+    fp  = SC_fopen_safe("fd.dat", "w");
     fd[n++] = fileno(fp);
     fprintf(fp, "text\n");
     fclose(fp);
 
 /* check reading the text file */
-    fp = fopen("fd.dat", "r");
+    fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
     fclose(fp);
 
@@ -55,7 +55,7 @@ static int text_file(void)
     pf = PD_open("fd.dat", "a");
     SC_ASSERT(pf != NULL);
     
-    fp = fopen("fd.dat", "r");
+    fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
     fclose(fp);
 
@@ -65,7 +65,7 @@ static int text_file(void)
     pf = PD_open("fd.dat", "r");
     SC_ASSERT(pf != NULL);
 
-    fp = fopen("fd.dat", "r");
+    fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
     fclose(fp);
 
@@ -94,7 +94,7 @@ static int pdb_file(void)
     PD_close(pf);
 
 /* check reading the text file */
-    fp = fopen("fd.dat", "r");
+    fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
     fclose(fp);
 
@@ -109,7 +109,7 @@ static int pdb_file(void)
     PD_close(pf);
 
 /* check reading the text file */
-    fp = fopen("fd.dat", "r");
+    fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
     fclose(fp);
 

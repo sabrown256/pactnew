@@ -984,7 +984,7 @@ static char *_SC_leh_gets(lehloc *lp)
 #endif
 
     if ((trace == TRUE) && (fdbg == NULL))
-       fdbg = fopen("log.keys", "w");
+       fdbg = SC_fopen_safe("log.keys", "w");
 
     if (_SC_leh.map == NULL)
        SC_leh_emacs_mode();
@@ -1267,7 +1267,7 @@ int SC_leh_hist_save(char *fname)
 
     rv = FALSE;
 
-    fp = fopen(fname, "w");
+    fp = SC_fopen_safe(fname, "w");
     if (fp != NULL)
        {for (i = 0; i < _SC_leh.nh; i++)
 	    fprintf(fp, "%s\n", _SC_leh.hist[i]);
@@ -1293,7 +1293,7 @@ int SC_leh_hist_load(char *fname)
 
     rv = FALSE;
 
-    fp = fopen(fname, "r");
+    fp = SC_fopen_safe(fname, "r");
     if (fp != NULL)
        {while (fgets(t, MAX_BFSZ, fp) != NULL)
 	   {p = strchr(t, '\r');

@@ -3917,7 +3917,7 @@ static void python_header(bindes *bd)
     else
        snprintf(name, BFLRG, "%s/py-%s.h", st->path, pck);
 
-    fh = fopen(name, "w");
+    fh = fopen_safe(name, "w");
     if (fh == NULL)
        return;
 
@@ -4333,7 +4333,7 @@ static void man_wrap(statedes *st, fdecl *dcl,
     else
        snprintf(fname, BFLRG, "%s/%s.3", st->path, cfn);
 
-    fp = fopen(fname, "w");
+    fp = fopen_safe(fname, "w");
     if (fp == NULL)
        return;
 

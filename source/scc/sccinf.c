@@ -368,7 +368,7 @@ int CC_compile_file(char *name, char *cmp, char **v)
 
     snprintf(inm, MAXLINE, "%s.i", _CC.rloc.fname);
 
-    fp = fopen(inm, "r");
+    fp = SC_fopen_safe(inm, "r");
     if (fp != NULL)
        {_CC.n_error = 0;
 

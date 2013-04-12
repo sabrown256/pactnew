@@ -134,7 +134,7 @@ static int _PC_setup_children(char **argv, char *mode)
 
     if (ps->debug)
        {snprintf(s, MAXLINE, "PC_srvr_log.%d", (int) getpid());
-	ps->diag = fopen(s, "w");
+	ps->diag = SC_fopen_safe(s, "w");
 	if (ps->diag != NULL)
 	   {fprintf(ps->diag, "\n   ------ Begin Setup ------\n\n");
 	    fprintf(ps->diag, "Requesting %d nodes (%d)\n", n, which);

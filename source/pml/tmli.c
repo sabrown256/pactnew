@@ -86,7 +86,7 @@ int test_1(void)
         y[l] = PM_linear_int(x, f, nx, r[l]);
 
 /* print the results */
-    out = fopen("test_1.out", "w");
+    out = SC_fopen_safe("test_1.out", "w");
     if (out == NULL)
        {printf("CAN'T OPEN TEST_1.OUT\n");
         rv = FALSE;}
@@ -153,7 +153,7 @@ int test_2(void)
         y[l] = PM_cubic_spline_int(x, f, df, nx, r[l]);
 
 /* print the results */
-    out = fopen("test_2.out", "w");
+    out = SC_fopen_safe("test_2.out", "w");
     if (out == NULL)
        {printf("CAN'T OPEN TEST_2.OUT\n");
         rv = FALSE;}
@@ -237,7 +237,7 @@ int test_3(void)
     vals = PM_interpol(grid, r, nl, fncs, 4);
 
 /* print the results */
-    out = fopen("test_3.out", "w");
+    out = SC_fopen_safe("test_3.out", "w");
     if (out == NULL)
        {printf("CAN'T OPEN TEST_3.OUT\n");
         rv = FALSE;}
@@ -311,7 +311,7 @@ int test_4(void)
     SC_ASSERT(ok == TRUE);
 
 /* print the results */
-    out = fopen("test_4.out", "w");
+    out = SC_fopen_safe("test_4.out", "w");
     if (out == NULL)
        {printf("CAN'T OPEN TEST_4.OUT\n");
         rv = FALSE;}
@@ -385,7 +385,7 @@ int test_5(void)
     SC_ASSERT(ok == TRUE);
 
 /* print the results */
-    out = fopen("test_5.out", "w");
+    out = SC_fopen_safe("test_5.out", "w");
     if (out == NULL)
        {printf("CAN'T OPEN TEST_5.OUT\n");
         rv = FALSE;}

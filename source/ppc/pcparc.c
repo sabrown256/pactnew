@@ -351,7 +351,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 /* conditional diagnostic messages */
     if (ps->debug)
        {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) getpid());
-	ps->diag = fopen(t, "w");
+	ps->diag = SC_fopen_safe(t, "w");
 	if (ps->diag != NULL)
 	   {fprintf(ps->diag, "\n\n   Node #%d at %s:%d.%d\n",
 		    pp->acpu, srvr, port, pp->data);

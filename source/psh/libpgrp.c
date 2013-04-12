@@ -2674,7 +2674,7 @@ int gexec_file(char *db, io_mode md, FILE **fio,
 /* open the file */
 	   {switch (md)
 	       {case IO_MODE_RO :
-		     fp = fopen(fn, "r");
+		     fp = fopen_safe(fn, "r");
 		     if (fp == NULL)
 		        fprintf(stderr, "Cannot open '%s' for reading\n", fn);
 		     break;
@@ -2684,13 +2684,13 @@ int gexec_file(char *db, io_mode md, FILE **fio,
 		        return(-1);
 
 	        case IO_MODE_WD :
-		     fp = fopen(fn, "w");
+		     fp = fopen_safe(fn, "w");
 		     if (fp == NULL)
 		        fprintf(stderr, "Cannot open '%s' for writing\n", fn);
 		     break;
 
 	        case IO_MODE_APPEND :
-		     fp = fopen(fn, "a");
+		     fp = fopen_safe(fn, "a");
 		     if (fp == NULL)
 		        fprintf(stderr, "Cannot open '%s' for append\n", fn);
 		     break;

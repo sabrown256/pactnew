@@ -89,7 +89,7 @@ FILE *setup_file(statedes *st, char *fname, char *mode)
     char s[MAXLINE];
     FILE *fp;
 
-    fp = fopen(fname, mode);
+    fp = SC_fopen_safe(fname, mode);
     if (st->bfsz != -1)
        setvbuf(fp, NULL, _IOFBF, st->bfsz);
 
