@@ -5,11 +5,6 @@
  *
  */
 
-/*
-enum e_PG_coord_sys
-   {WORLDC = 1, NORMC, PIXELC, BOUNDC, FRAMEC};
-typedef enum e_PG_coord_sys PG_coord_sys;
-*/
 var WORLDC = 1;
 var NORMC  = 2;
 var PIXELC = 3;
@@ -1634,7 +1629,7 @@ function PG_fget_fill_color(dev)
 function PG_fset_fill_color(dev, clr, mapped)
    {
 
-    gs_text_color = clr;
+    gs_fill_color = clr;
 
     return;}
 
@@ -1644,7 +1639,180 @@ function PG_fset_fill_color(dev, clr, mapped)
 /* PG_SHADE_POLY_N - fill the ND polygon defined by the N points R */
 
 function PG_shade_poly_n(dev, nd, n, r)
-   {
+   {var i;
+    var ix, rx, ry;
+
+    if ((nd == 2) && (n > 1))
+       {dev.beginPath();
+
+        ix = new Array();
+
+/* assume the points are given in counter-clockwise order */
+        for (i = 0; i < n; i++)
+	    {ix[0] = r[0][i];
+	     ix[1] = r[1][i];
+       
+	     ix = PG_trans_point(dev, 2, WORLDC, ix, PIXELC);
+
+	     PG_QUAD_FOUR_POINT(dev, ix);
+
+	     if (i == 0)
+	        dev.moveTo(ix[0], ix[1]);
+	     else
+	        dev.lineTo(ix[0], ix[1]);};
+
+	dev.fillStyle = gs_fill_color;
+	dev.fill();
+
+	dev.lineWidth   = gs_line_width;
+	dev.strokeStyle = gs_line_color;
+	dev.stroke();};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_MAKE_POLYGON - initialize and return a PM_polygon
+ *                 - which encapsulates existing arrays
+ */
+
+function PM_make_polygon(nd, n, x)
+   {var py, y, t;
+
+    py = new Object();
+    y  = new Array();
+
+    for (id = 0; id < nd; id++)
+        {t = new Array();
+	 for (i = 0; i < n; i++)
+	     t[i] = x[id][i];
+	 y[id] = t;};
+
+    py.nd = nd;
+    py.np = n;
+    py.nn = n;
+    py.x  = y;
+
+    return(py);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_MAKE_CURVE - make and return a curve */
+
+function PG_make_curve(dev, cs, closed, n, xo, r)
+   {var i;
+    var crv, ix, ixo, xi, p;
+
+    crv = new Object();
+
+    if (cs == WORLDC)
+       xo = PG_log_point(dev, 2, xo);
+    ixo = PG_trans_point(dev, 2, cs, xo, PIXELC);
+
+    p     = new Array();
+    xi    = new Array();
+    xi[0] = new Array();
+    xi[1] = new Array();
+
+    for (i = 0; i < n; i++)
+        {p[0] = r[0][i];
+	 p[1] = r[1][i];
+          
+	 if (cs == WORLDC)
+	    p = PG_log_point(dev, 2, p);
+
+	 ix = PG_trans_point(dev, 2, cs, p, PIXELC);
+
+	 ix = PG_QUAD_FOUR_POINT(dev, ix);
+
+	 xi[0][i] = ix[0] - ixo[0];
+	 xi[1][i] = ix[1] - ixo[1];};
+
+    crv.closed    = closed;
+    crv.n         = n;
+    crv.x         = xi[0];
+    crv.y         = xi[1];
+    crv.x_origin  = ixo[0];
+    crv.y_origin  = ixo[1];
+    crv.rx_origin = xo[0];
+    crv.ry_origin = xo[1];
+
+    return(crv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_DRAW_CURVE - fill the ND polygon defined by the N points R */
+
+function PG_draw_curve(dev, crv, clip)
+   {var i, n, xo, yo;
+    var x, y, ix;
+
+    n  = crv.n;
+    x  = crv.x;
+    y  = crv.y;
+    xo = crv.rx_origin;
+    yo = crv.ry_origin;
+
+    ix = new Array();
+
+    dev.beginPath();
+
+/* assume the points are given in counter-clockwise order */
+    for (i = 0; i < n; i++)
+        {ix[0] = x[i] + xo;
+	 ix[1] = y[i] + yo;
+       
+	 if (i == 0)
+	    dev.moveTo(ix[0], ix[1]);
+	 else
+	    dev.lineTo(ix[0], ix[1]);};
+
+    dev.lineWidth   = gs_line_width;
+    dev.strokeStyle = gs_line_color;
+    dev.stroke();
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* PG_DRAW_POLYGON - draw a polygon in WC */
+ 
+function PG_draw_polygon(dev, py, clip)
+   {var crv, xo;
+
+    if ((py != NULL) && (py.nn > 0))
+       {xo    = new Array();
+	xo[0] = gs_wc[0];
+        xo[1] = gs_wc[2];
+
+	crv = PG_make_curve(dev, WORLDC, FALSE, py.nn, xo, py.x);
+
+	PG_draw_curve(dev, crv, clip);};
+
+    return;}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FILL_POLYGON_N - draw an ND polygon with N nodes R in CS
+ *                   - and fill the interior with COLOR
+ */
+
+function PG_fill_polygon_n(dev, color, mapped, nd, cs, n, r)
+   {var py;
+
+    if (n > nd)
+       {r = PG_trans_points(dev, n, nd, cs, r, WORLDC);
+
+	py = PM_make_polygon(nd, n, r);
+
+	PG_fset_fill_color(dev, color, mapped);
+
+	PG_shade_poly_n(dev, nd, n, py.x);};
 
     return;}
 
