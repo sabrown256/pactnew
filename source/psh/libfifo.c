@@ -145,7 +145,7 @@ static int read_fifo(char *root, int ch, char *s, int nc)
 
     flog = name_log(root);
     fifo = name_fifo(root, ch);
-    fd   = open(fifo, O_RDONLY, 0400);
+    fd   = open_safe(fifo, O_RDONLY, 0400);
 
     wh = WHICH_PROC();
 
@@ -187,7 +187,7 @@ static int write_fifo(char *root, int ch, char *s, int nc)
 
 	flog = name_log(root);
 	fifo = name_fifo(root, ch);
-	fd   = open(fifo, O_WRONLY, 0200);
+	fd   = open_safe(fifo, O_WRONLY, 0200);
 
 	wh = WHICH_PROC();
 

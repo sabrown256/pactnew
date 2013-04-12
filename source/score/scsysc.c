@@ -1860,7 +1860,7 @@ static void _SC_print_redir(taskdesc *job, asyncstate *as,
 
 /* write stdout */
 	if (fno != NULL)
-	   {df = open(fno, ffo, p);
+	   {df = SC_open_safe(fno, ffo, p);
 	    if (df != -1)
 	       {SC_write_sigsafe(df, s, nc);
 		if (newl == TRUE)
@@ -1873,7 +1873,7 @@ static void _SC_print_redir(taskdesc *job, asyncstate *as,
 
 /* write stderr */
 	if (fne != NULL)
-	   {df = open(fne, ffe, p);
+	   {df = SC_open_safe(fne, ffe, p);
 	    if (df != -1)
 	       {SC_write_sigsafe(df, s, nc);
 		if (newl == TRUE)

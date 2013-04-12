@@ -960,7 +960,7 @@ int SC_retrace_dbg(char ***pout, int pid)
 static void _SC_time_file_open(char *s)
    {int fd;
 
-    fd = open(s, O_CREAT, 0600);
+    fd = SC_open_safe(s, O_CREAT, 0600);
     close(fd);
     SC_remove(s);
 

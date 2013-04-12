@@ -60,7 +60,7 @@ void *_SC_alloc_guarded(size_t nb)
        SC_LOCKON(SC_mma_lock);
 
 #ifdef HAVE_DEV_ZERO 
-    {int err;
+    {int err, p;
      size_t na, no;
      char *pc;
      long *pl;
@@ -72,7 +72,8 @@ void *_SC_alloc_guarded(size_t nb)
 	    _SC.page_size = getpagesize();
 
 	 if (fdz == -1)
-	    {fdz = open("/dev/zero", O_RDWR);
+	    {p   = SC_get_perm(FALSE);
+	     fdz = SC_open_safe("/dev/zero", O_RDWR, p);
 	     if (fdz < 0)
 	        {io_printf(stdout,
 			   "Cannot initialize Protected Score Memory Manager - exiting\n");

@@ -1175,7 +1175,7 @@ int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
 
 #else
 
-    int i, fd, bg, act;
+    int i, fd, bg, act, p;
     char *name, *s;
     TERMINAL_STATE *ts;
 
@@ -1192,7 +1192,8 @@ int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
 	if (name == NULL)
 	   name = "/dev/tty";
 
-	fd = open(name, O_RDWR | O_NDELAY | O_NOCTTY);
+	p  = SC_get_perm(FALSE);
+	fd = SC_open_safe(name, O_RDWR | O_NDELAY | O_NOCTTY, p);
 
 	if (fd < 0)
 	   rv = FALSE;
@@ -1240,7 +1241,7 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 
 #else
 
-    int fd, bg, act;
+    int fd, bg, act, p;
     int pw, ph, cw, ch;
     char *name, *s;
     TERMINAL_STATE *ts;
@@ -1258,7 +1259,8 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 	if (name == NULL)
 	   name = "/dev/tty";
 
-	fd = open(name, O_RDWR | O_NDELAY | O_NOCTTY);
+	p  = SC_get_perm(FALSE);
+	fd = SC_open_safe(name, O_RDWR | O_NDELAY | O_NOCTTY, p);
 
 	if (fd < 0)
 	   rv = FALSE;
@@ -1455,9 +1457,10 @@ void SC_disconnect_tty(void)
 #endif
 
 #ifdef BSD_TERMINAL
-    int fd;
+    int fd, p;
 
-    fd = open("/dev/tty", O_RDWR);
+    p  = SC_get_perm(FALSE);
+    fd = SC_open_safe("/dev/tty", O_RDWR, p);
     if (fd >= 0)
        {if (ioctl(fd, TIOCNOTTY, NULL) < 0)
 	   SC_error(SC_NO_TTY,

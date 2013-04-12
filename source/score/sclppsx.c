@@ -93,7 +93,7 @@ static int _SC_posix_release(PROCESS *pp)
  */
 
 static int _SC_posix_setup_tty(PROCESS *pp, int child)
-   {int rv, in, medium;
+   {int rv, in, medium, p;
     SC_ttydes *tty;
 
     if (!SC_process_alive(pp))
@@ -107,7 +107,8 @@ static int _SC_posix_setup_tty(PROCESS *pp, int child)
 
 /* when using PTY's now is the time to open the slave side of the PTY */
        {if (medium == USE_PTYS)
-           {in = open(pp->spty, O_RDWR & ~NONBLOCK);
+	   {p  = SC_get_perm(FALSE);
+            in = SC_open_safe(pp->spty, O_RDWR & ~NONBLOCK, p);
             if (in < 0)
                SC_error(-1, "COULDN'T OPEN SLAVE %s - _SC_POSIX_SETUP_TTY",
                         pp->spty);
@@ -155,7 +156,7 @@ static int _SC_get_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
 /* otherwise open the descriptor */
     else
        {p   = SC_get_perm(FALSE);
-	ofd = open(fd[nfd].file, fd[nfd].flag, p);
+	ofd = SC_open_safe(fd[nfd].file, fd[nfd].flag, p);
 
 /* GOTCHA: retry failed opens if the cause might be due to slow
  * NFS response or transient system issues
@@ -188,7 +189,7 @@ static int _SC_get_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
 	     (err == ENOENT) || (err == EEXIST) ||
 	     (err == ETXTBSY)))
 	   {SC_sleep(to);
-	    ofd = open(fd[nfd].file, fd[nfd].flag, p);};};
+	    ofd = SC_open_safe(fd[nfd].file, fd[nfd].flag, p);};};
 
     return(ofd);}
 
