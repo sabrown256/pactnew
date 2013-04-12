@@ -758,7 +758,7 @@ io_device _ioc_pair(int *fds, int id)
 	      st = -1;
 
 	      if (id != lid)
-		 {fdl[0]  = open("/dev/ptmx", O_RDWR | O_NOCTTY);
+		 {fdl[0]  = open_safe("/dev/ptmx", O_RDWR | O_NOCTTY, 0);
 		  err  = grantpt(fdl[0]);
 		  err |= unlockpt(fdl[0]);
 		  if (err != 0)
@@ -766,7 +766,7 @@ io_device _ioc_pair(int *fds, int id)
 		  else
 		     {lid = id;
 		      ps  = ptsname(fdl[0]);
-		      fdl[1] = open(ps, O_RDWR);};};
+		      fdl[1] = open_safe(ps, O_RDWR, 0);};};
 
 	      if (fdl[0] >= 0)
 		 {fds[0] = fcntl(fdl[0], F_DUPFD, fdl[0]);

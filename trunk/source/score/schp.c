@@ -182,8 +182,10 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
 /* _SC_OPEN_PTY_UNIX - generic unix pseudo terminal open routine */
 
 static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
-   {int i, c, d, ok, pty;
+   {int i, c, d, ok, pty, p;
     char *mpty, *spty, *pc, *pd;
+
+    p = SC_get_perm(FALSE);
 
     c  = ' ';
     pc = NULL;
@@ -192,7 +194,7 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
         {for (pd = SC_MASTER_PTY_DIGITS; (d = *pd) != '\0'; pd++)
 	     {mpty = SC_dsnprintf(FALSE, "/dev/%s%c%c",
 				  SC_MASTER_PTY_NAME, c, d);
-	      pty = open(mpty, O_RDWR | O_NDELAY);
+	      pty = SC_open_safe(mpty, O_RDWR | O_NDELAY, p);
 	      if (pty >= 0)
 		 {spty = SC_dsnprintf(TRUE, "/dev/%s%c%c",
 				      SC_SLAVE_PTY_NAME, c, d);
@@ -220,14 +222,16 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
 /*--------------------------------------------------------------------------*/
 
 static int _SC_open_pty_unix98(PROCESS *pp, PROCESS *cp)
-   {int i, ok, err, pty;
+   {int i, ok, err, pty, p;
     char *ps;
     extern char *ptsname(int fd);
     extern int grantpt(int fd);
     extern int unlockpt(int fd);
 
+    p = SC_get_perm(FALSE);
+
     ok   = FALSE;
-    pty  = open("/dev/ptmx", O_RDWR|O_NOCTTY);
+    pty  = SC_open_safe("/dev/ptmx", O_RDWR|O_NOCTTY, p);
     err  = grantpt(pty);
     err |= unlockpt(pty);
     if ((pty >= 0) && (err == 0))
@@ -994,7 +998,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 
 /*  <   ->  O_RDONLY */
 		 if (kind == SC_IO_STD_IN)
-		    fd = open(nm, O_RDONLY);
+		    fd = SC_open_safe(nm, O_RDONLY, prm);
 		 else
 		    {switch (ps[0])
 
@@ -1012,7 +1016,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 			 case 'a' :
 			      md = O_WRONLY | O_APPEND;
 			      break;};
-		     fd = open(nm, md, prm);};
+		     fd = SC_open_safe(nm, md, prm);};
 		 break;
 
 	    case 's' :

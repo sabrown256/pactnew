@@ -32,16 +32,17 @@ char *getenv();
 
 /* GET_VIEW_SURFACE - try SUN's way of finding a view surface */
 
-get_view_surface(vsptr)
-   struct vwsurf *vsptr;
-   {int fd, devhaswindows;
+get_view_surface(struct vwsurf *vsptr)
+   {int fd, p, devhaswindows;
     char *wptr, dev[DEVNAMESIZE];
     struct screen screen;
     struct fbtype fbtype;
 
+    p = SC_get_perm(FALSE);
+
     if (wptr = getenv("WINDOW_ME"))
        {devhaswindows = TRUE;
-        if ((fd = open(wptr, O_RDWR, 0)) < 0)
+        if ((fd = SC_open_safe(wptr, O_RDWR, p)) < 0)
            {io_printf(stderr, "GET_VIEW_SURFACE: CAN'T OPEN %s\n", wptr);
             return(FALSE);};
         win_screenget(fd, &screen);
@@ -51,7 +52,7 @@ get_view_surface(vsptr)
        {devhaswindows = FALSE;
         strncpy(dev, "/dev/fb", DEVNAMESIZE);};
 
-    if ((fd = open(dev, O_RDWR, 0)) < 0)
+    if ((fd = SC_open_safe(dev, O_RDWR, p)) < 0)
        {io_printf(stderr, "GET_VIEW_SURFACE: CAN'T OPEN %s\n", dev);
         return(FALSE);};
 

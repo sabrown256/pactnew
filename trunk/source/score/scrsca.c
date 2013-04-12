@@ -223,7 +223,7 @@ static int _SC_res_usage_self(SC_rusedes *ru, int whch)
  */
 
 int SC_resource_usage(SC_rusedes *ru, int pid)
-   {int rv;
+   {int rv, p;
 
     rv = FALSE;
 
@@ -231,6 +231,8 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
        return(rv);
 
     SC_MEM_INIT(SC_rusedes, ru);
+
+    p = SC_get_perm(FALSE);
 
     if (pid == -1)
        rv = _SC_res_usage_self(ru, FALSE);
@@ -255,7 +257,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	   mby = getpagesize()/(1024.0*1024.0);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/stat", pid);
-	fd    = open(fname, O_RDONLY);
+	fd    = SC_open_safe(fname, O_RDONLY, p);
 	if (fd >= 0)
 	   {nc = read(fd, s, MAXLINE);
 	    if (nc < 0)
@@ -289,7 +291,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	CFREE(fname);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/cmdline", pid);
-	fd    = open(fname, O_RDONLY);
+	fd    = SC_open_safe(fname, O_RDONLY, p);
 	if (fd >= 0)
 	   {nc = read(fd, s, MAXLINE);
 	    if (nc < 0)
@@ -314,7 +316,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	static double mby = 1.0/(1024.0*1024.0);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/status", pid);
-	fd    = open(fname, O_RDONLY);
+	fd    = SC_open_safe(fname, O_RDONLY, p);
 	if (fd > 0)
 	   {nc = sizeof(pstatus_t);
 	    nb = read(fd, &sp, nc);
@@ -340,7 +342,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	CFREE(fname);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/psinfo", pid);
-	fd    = open(fname, O_RDONLY);
+	fd    = SC_open_safe(fname, O_RDONLY, p);
 	if (fd > 0)
 	   {nc = sizeof(psinfo_t);
 	    nb = read(fd, &si, nc);
@@ -368,7 +370,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	static double mby = 1.0/(1024.0*1024.0);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/status", pid);
-	fd    = open(fname, O_RDONLY);
+	fd    = SC_open_safe(fname, O_RDONLY, p);
 	if (fd > 0)
 	   {nc = sizeof(pstatus_t);
 	    nb = read(fd, &sp, nc);
@@ -394,7 +396,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	CFREE(fname);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/psinfo", pid);
-	fd    = open(fname, O_RDONLY);
+	fd    = SC_open_safe(fname, O_RDONLY, p);
 	if (fd > 0)
 	   {nc = sizeof(psinfo_t);
 	    nb = read(fd, &si, nc);
@@ -408,7 +410,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	CFREE(fname);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/usage", pid);
-	fd    = open(fname, O_RDONLY);
+	fd    = SC_open_safe(fname, O_RDONLY, p);
 	if (fd > 0)
 	   {nc = sizeof(prusage_t);
 	    nb = read(fd, &su, sizeof(prusage_t));

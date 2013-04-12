@@ -154,7 +154,7 @@ int SC_close_log(SC_logfile log)
     if (fname == NULL)
        return(-1);
 
-    global_log = open(fname, O_WRONLY | O_APPEND | O_CREAT, 0644);
+    global_log = SC_open_safe(fname, O_WRONLY | O_APPEND | O_CREAT, 0644);
 
     if (global_log == -1)
        {status = -1;}

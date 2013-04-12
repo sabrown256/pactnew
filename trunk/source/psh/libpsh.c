@@ -2718,9 +2718,9 @@ int demonize(void)
 	umask(0);
 
 /* attach stdin, stdout, and stderr to /dev/null */
-	fd = open("/dev/null", O_RDWR);        /* stdin */
-	dup(fd);                               /* stdout */
-	dup(fd);};                             /* stderr */
+	fd = open_safe("/dev/null", O_RDWR, 0);     /* stdin */
+	dup(fd);                                    /* stdout */
+	dup(fd);};                                  /* stderr */
 
     return(rv);}
 
