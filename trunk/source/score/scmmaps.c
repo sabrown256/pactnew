@@ -596,7 +596,7 @@ static void _SC_mf_unmap(SC_mapped_file *mf)
        {st = truncate(mf->name, len);
 	SC_ASSERT(st == 0);};
 
-    err = close(mf->fd);
+    err = SC_close_safe(mf->fd);
     SC_ASSERT(err == 0);
 
     return;}
@@ -1735,7 +1735,7 @@ int _SC_mf_close(FILE *fp)
 
     _SC_mf_unmap(mf);
 
-    err = close(mf->fd);
+    err = SC_close_safe(mf->fd);
     SC_ASSERT(err == 0);
 
     SC_mf_free(mf);

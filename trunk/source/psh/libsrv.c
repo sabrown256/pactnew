@@ -359,7 +359,7 @@ static void _new_connection(srvdes *sv)
     if (fd > 0)
        add_fd(sv, fd);
     else
-       {close(fd);
+       {close_safe(fd);
 	SLOG(sv, 1, "accept error - %s (%d)", strerror(errno), errno);};
 
     return;}

@@ -245,7 +245,7 @@ static int _SC_open_pty_unix98(PROCESS *pp, PROCESS *cp)
 	ok = TRUE;}
 
     else if (pty >= 0)
-       close(pty);
+       SC_close_safe(pty);
 
     if (ok == FALSE)
        ok = _SC_open_pty_unix(pp, cp);
@@ -481,8 +481,8 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
 
 /* child stdin */
               if (pipe(ports) < 0)
-                 {close(pp->io[0]);
-                  close(cp->io[1]);
+                 {SC_close_safe(pp->io[0]);
+                  SC_close_safe(cp->io[1]);
                   SC_error(-1, "COULDN'T CREATE PIPE #1 - _SC_INIT_IPC");};
 
               cp->io[0] = ports[0];
@@ -497,8 +497,8 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
 
 /* child stderr */
               if (pipe(ports) < 0)
-                 {close(pp->io[0]);
-                  close(cp->io[1]);
+                 {SC_close_safe(pp->io[0]);
+                  SC_close_safe(cp->io[1]);
                   SC_error(-1, "COULDN'T CREATE PIPE #3 - _SC_INIT_IPC");};
 
               cp->io[2] = ports[0];
@@ -520,8 +520,8 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
 
 /* child stdin */
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
-                 {close(pp->io[0]);
-                  close(cp->io[1]);
+                 {SC_close_safe(pp->io[0]);
+                  SC_close_safe(cp->io[1]);
                   SC_error(-1, "COULDN'T CREATE SOCKET PAIR #1 - _SC_INIT_IPC");};
               cp->io[0] = ports[0];
               pp->io[1] = ports[1];
@@ -534,8 +534,8 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
 
 /* child stderr */
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
-                 {close(pp->io[0]);
-                  close(cp->io[1]);
+                 {SC_close_safe(pp->io[0]);
+                  SC_close_safe(cp->io[1]);
                   SC_error(-1, "COULDN'T CREATE SOCKET PAIR #3 - _SC_INIT_IPC");};
               cp->io[2] = ports[1];
               pp->io[2] = ports[0];
@@ -1158,7 +1158,7 @@ static void _SC_reconnect_process_group(int n, subtask *pg,
 /* reconnect terminal process output to first process */
 	pp = pa[nm];
 	pn = pa[0];
-	close(pp->io[1]);
+	SC_close_safe(pp->io[1]);
 	pp->io[1] = pn->io[1];
 	pn->io[1] = -2;
 
@@ -1167,8 +1167,8 @@ static void _SC_reconnect_process_group(int n, subtask *pg,
 	    {pp = pa[i];
 	     cp = ca[i];
 
-	     close(pp->io[1]);
-	     close(cp->io[0]);
+	     SC_close_safe(pp->io[1]);
+	     SC_close_safe(cp->io[0]);
 
 	     pp->io[1] = -2;
 	     cp->io[0] = -2;};
@@ -1183,7 +1183,7 @@ static void _SC_reconnect_process_group(int n, subtask *pg,
 	     cp = ca[i];
 	     cn = ca[ido];
 
-	     close(cn->io[0]);
+	     SC_close_safe(cn->io[0]);
 
 	     cn->io[0] = pp->io[0];
 	     pp->io[0] = -2;};};
@@ -2116,7 +2116,7 @@ int SC_init_server(int step, int closep)
     if (ok != 0)
        {if (closep)
 	   {if (_SC.sfd >= 0)
-	       close(_SC.sfd);
+	       SC_close_safe(_SC.sfd);
 	    _SC.sfd = -1;};
 
 	rv = _SC.sfd;}
@@ -2144,7 +2144,7 @@ int SC_init_server(int step, int closep)
 		    SC_error(-1, "ACCEPT FAILED - SC_INIT_SERVER");
 
 		 if (closep)
-		    {close(_SC.sfd);
+		    {SC_close_safe(_SC.sfd);
 
 		     _SC_diagnostic("      Socket closed: %d\n", _SC.sfd);
 

@@ -46,7 +46,7 @@ get_view_surface(struct vwsurf *vsptr)
            {io_printf(stderr, "GET_VIEW_SURFACE: CAN'T OPEN %s\n", wptr);
             return(FALSE);};
         win_screenget(fd, &screen);
-        close(fd);
+        SC_close_safe(fd);
         strncpy(dev, screen.scr_fbname, DEVNAMESIZE);}
     else
        {devhaswindows = FALSE;
@@ -59,10 +59,10 @@ get_view_surface(struct vwsurf *vsptr)
     if (ioctl(fd, FBIOGTYPE, &fbtype) == -1)
        {io_printf(stderr, "GET_VIEW_SURFACE: IOCTL FBIOGTYPE FAILED ON %s\n",
 		  dev);
-        close(fd);
+        SC_close_safe(fd);
         return(FALSE);};
 
-    close(fd);
+    SC_close_safe(fd);
 
     if (devhaswindows)
        {switch (fbtype.fb_type)

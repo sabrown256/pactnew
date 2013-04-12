@@ -50,7 +50,7 @@ int64_t SC_dsk_space(char *dir, int64_t nbx)
 	        ok = TRUE;};};
 
 /* close the temporary file and remove it */
-    st = close(fd);
+    st = SC_close_safe(fd);
     st = SC_remove(t);
 
 /* go back to the directory we came from */

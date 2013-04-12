@@ -155,7 +155,7 @@ static int read_fifo(char *root, int ch, char *s, int nc)
 
     else
        {nb = read_safe(fd, s, nc, FALSE);
-	close(fd);
+	close_safe(fd);
 
 /* guarantee NULL termination */
 	s[nc-1] = '\0';
@@ -196,7 +196,7 @@ static int write_fifo(char *root, int ch, char *s, int nc)
 
 	else
 	   {nb = write_safe(fd, s, nc);
-	    close(fd);
+	    close_safe(fd);
 
 	    if (nb < 0)
 	       log_activity(flog, fifost.debug, 1, wh, "write |%s| (%s)",

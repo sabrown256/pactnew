@@ -315,7 +315,7 @@ void _dbg(unsigned int lvl, char *fmt, ...)
 int _fd_close(int fd)
    {int rv;
 
-    rv = close(fd);
+    rv = close_safe(fd);
 
     _dbg(1, "closing %d (%d)", fd, rv);
 

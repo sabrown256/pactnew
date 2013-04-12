@@ -2579,7 +2579,7 @@ int touch(char *fmt, ...)
 
     fd = creat(path, 0660);
     if (fd > 0)
-       close(fd);
+       close_safe(fd);
 
     return(fd);}
 
@@ -2690,9 +2690,9 @@ int demonize(void)
     if (st == 0)
 
 /* close stdin, stdout, and stderr */
-       {close(0);
-	close(1);
-	close(2);
+       {close_safe(0);
+	close_safe(1);
+	close_safe(2);
 
 /* disassociate from the controlling terminal */
 	st = setsid();
