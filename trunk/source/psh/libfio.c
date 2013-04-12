@@ -1,0 +1,458 @@
+/*
+ * LIBFIO.C - routines supporting file I/O for PSH
+ *          - mostly wrappers of NFS vulnerable operations
+ *
+ * include "cpyright.h"
+ *
+ */
+
+#ifndef LIBFIO
+
+# define LIBFIO
+
+# ifndef SCOPE_SCORE_PREPROC
+
+/* define only for SCOPE_SCORE_COMPILE */
+
+static int
+ db_log_level = 1;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FOPEN_SAFE - make fopen safe for bad file systems
+ *            - necessitated by networks that cannot keep up with CPUs
+ */
+
+FILE *fopen_safe(const char *path, const char *mode)
+   {int ok, ev;
+    FILE *rv;
+
+    for (ok = TRUE; ok == TRUE; )
+        {rv = fopen(path, mode);
+	 ev = errno;
+	 if (rv != NULL)
+	    ok = FALSE;
+
+/* these errors have a chance of being temporary */
+	 else if ((ev == EINTR) ||
+		  (ev == EAGAIN) ||
+		  (ev == EWOULDBLOCK) ||
+		  (ev == ENOSPC) ||
+		  (ev == ETXTBSY))
+	    ok = TRUE;
+
+/* these don't */
+	 else
+	    ok = FALSE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* OPEN_SAFE - make open safe for bad file systems
+ *           - necessitated by networks that cannot keep up with CPUs
+ */
+
+int open_safe(const char *path, int flags, mode_t mode)
+   {int ok, ev, rv;
+
+    for (ok = TRUE; ok == TRUE; )
+        {rv = open(path, flags, mode);
+	 ev = errno;
+	 if (rv != -1)
+	    ok = FALSE;
+
+/* these errors have a chance of being temporary */
+	 else if ((ev == EINTR) ||
+		  (ev == EAGAIN) ||
+		  (ev == EWOULDBLOCK) ||
+		  (ev == ENOSPC) ||
+		  (ev == ETXTBSY))
+	    ok = TRUE;
+
+/* these don't */
+	 else
+	    ok = FALSE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CLOSE_SAFE - make close safe for bad file systems
+ *            - necessitated by networks that cannot keep up with CPUs
+ */
+
+int close_safe(int fd)
+   {int ok, ev, rv;
+
+    for (ok = TRUE; ok == TRUE; )
+        {rv = close(fd);
+	 ev = errno;
+	 if (rv != -1)
+	    ok = FALSE;
+
+/* these errors have a chance of being temporary */
+	 else if ((ev == EINTR) ||
+		  (ev == EIO))
+	    ok = TRUE;
+
+/* these don't */
+	 else
+	    ok = FALSE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FCLOSE_SAFE - make close safe for bad file systems
+ *             - necessitated by networks that cannot keep up with CPUs
+ */
+
+int fclose_safe(FILE *fp)
+   {int ok, ev, rv;
+
+    for (ok = TRUE; ok == TRUE; )
+        {rv = fclose(fp);
+	 ev = errno;
+	 if (rv != -1)
+	    ok = FALSE;
+
+/* these errors have a chance of being temporary */
+	 else if ((ev == EINTR) ||
+		  (ev == EAGAIN) ||
+		  (ev == EWOULDBLOCK) ||
+		  (ev == EIO))
+	    ok = TRUE;
+
+/* these don't */
+	 else
+	    ok = FALSE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FFLUSH_SAFE - make fflush safe for bad file systems
+ *             - necessitated by networks that cannot keep up with CPUs
+ */
+
+int fflush_safe(FILE *fp)
+   {int ok, ev, rv;
+
+    for (ok = TRUE; ok == TRUE; )
+        {rv = fflush(fp);
+	 ev = errno;
+	 if (rv != -1)
+	    ok = FALSE;
+
+/* these errors have a chance of being temporary */
+	 else if ((ev == EINTR) ||
+		  (ev == EAGAIN) ||
+		  (ev == EWOULDBLOCK))
+	    ok = TRUE;
+
+/* these don't */
+	 else
+	    ok = FALSE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* BLOCK_FD - set the file descriptor to be blocked in ON is TRUE
+ *          - otherwise unblocked
+ *          - return the original value
+ */
+
+int block_fd(int fd, int on)
+   {int ov, nv;
+
+    ov = 0;
+    ov = fcntl(fd, F_GETFL, ov);
+
+/* block */
+    if (on == TRUE)
+       nv = fcntl(fd, F_SETFL, ov & ~O_NDELAY);
+
+/* unblock */
+    else if (on == FALSE)
+       nv = fcntl(fd, F_SETFL, ov | O_NDELAY);
+
+    else
+       nv = 0;
+
+    ASSERT(nv != -1);
+
+    return(ov);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* READ_SAFE - make read more reliable
+ *           - retry on recoverable errors
+ *           - if REQ == TRUE ensure that the requested number of bytes
+ *           - are read if at all possible
+ *           - if REQ == FALSE read the bytes that are
+ *           - available without error
+ *           - return number of bytes read or -1
+ */
+
+ssize_t read_safe(int fd, void *s, size_t nb, int req)
+   {int ev, blk, zc;
+    size_t ns;
+    ssize_t n, nr;
+    char *ps;
+
+    blk = block_fd(fd, -1);
+    zc  = 0;
+
+/* non-blocking read or terminal - take what you get */
+    if ((blk == FALSE) || (isatty(fd) == TRUE))
+       {while (zc < 10)
+	   {nr = read(fd, s, nb);
+	    ev = errno;
+	    if (nr < 0)
+
+/* if the error is recoverable, sleep and try again */
+	       {if ((ev == EAGAIN) ||
+		    (ev == EWOULDBLOCK) ||
+		    (ev == EINTR))
+		   {zc++;
+		    sleep(1);}
+
+/* if the error is unrecoverable, stop now */
+	        else
+		   {nr = -1;
+		    zc = 10;};};};}
+
+/* blocking read - insist on the specified number of bytes or an error */
+    else
+       {ns = nb;
+	nr = 0;
+	ps = s;
+
+	while ((ns > 0) && (zc < 10))
+	   {n  = read(fd, ps, ns);
+	    ev = errno;
+	    if (n < 0)
+
+/* if the error is recoverable, sleep and try again */
+	       {if ((ev == EAGAIN) ||
+		    (ev == EWOULDBLOCK) ||
+		    (ev == EINTR))
+		   {zc++;
+		    sleep(1);}
+
+/* if the error is unrecoverable, stop now */
+	        else
+		   {nr = -1;
+		    zc = 10;};}
+
+	    else if (n == 0)
+	       zc++;
+
+	    else
+	       {zc  = (req == TRUE) ? 0 : 10;
+		ps += n;
+		ns -= n;
+		nr += n;};};};
+
+    return(nr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FREAD_SAFE - make fread more reliable
+ *            - retry on recoverable errors
+ *            - if REQ == TRUE ensure that the requested number of bytes
+ *            - are read if at all possible
+ *            - if REQ == FALSE read the bytes that are
+ *            - available without error
+ *            - return number of bytes read or -1
+ */
+
+size_t fread_safe(void *s, size_t bpi, size_t ni, FILE *fp, int req)
+   {size_t zc, n, ns, nr;
+    char *ps;
+
+    zc = 0;
+    ns = ni;
+    nr = 0;
+    ps = (char *) s;
+    while ((ns > 0) && (zc < 10))
+       {n = fread(ps, bpi, ns, fp);
+	if (ferror(fp) != 0)
+	   {zc++;
+	    sleep(1);}
+
+	else if (n == 0)
+	   zc++;
+
+	else if (n > 0)
+	   {zc = (req == TRUE) ? 0 : 10;
+	    ps += bpi*n;
+	    ns -= n;
+	    nr += n;};};
+
+    return(nr);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_SAFE - make write ensure that the requested number of bytes
+ *            - is written if at all possible
+ *            - return number of bytes written or -1
+ */
+
+ssize_t write_safe(int fd, const void *s, size_t nb)
+   {int ev, zc;
+    size_t ns;
+    ssize_t n, nw;
+    char *ps;
+
+    zc = 0;
+    ns = nb;
+    nw = 0;
+    ps = (char *) s;
+    while ((ns > 0) && (zc < 10))
+       {n  = write(fd, ps, ns);
+        ev = errno;
+	if (n < 0)
+
+/* if the error is recoverable, sleep and try again */
+	   {if ((ev == EAGAIN) ||
+		(ev == EWOULDBLOCK) ||
+		(ev == EINTR))
+	       {zc++;
+		sleep(10);}
+
+/* if the error is unrecoverable, stop now */
+	    else
+	       {nw = -1;
+                zc = 10;};}
+
+/* no error but no bytes either */
+	else if (n == 0)
+	   zc++;
+
+/* finally something read */
+	else
+	   {zc  = 0;
+	    ps += n;
+	    ns -= n;
+	    nw += n;};};
+
+    return(nw);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FWRITE_SAFE - make fwrite ensure that the requested number of bytes
+ *             - is written if at all possible
+ *             - return number of bytes written or -1
+ */
+
+size_t fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
+   {size_t zc, n, ns, nw;
+    char *ps;
+
+    zc = 0;
+    ns = nitems;
+    nw = 0;
+    ps = (char *) s;
+    while ((ns > 0) && (zc < 10))
+       {n = fwrite(ps, bpi, ns, fp);
+	if (ferror(fp) != 0)
+	   {clearerr(fp);
+	    sleep(10);};
+
+	zc = (n == 0) ? zc + 1 : 0;
+
+        if (n < ns)
+           fflush(fp);
+
+	ps += bpi*n;
+	ns -= n;
+        nw += n;};
+
+    return(nw);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* UNLINK_SAFE - make unlink ensure that the file is really removed
+ *             - if at all possible
+ *             - return 0 iff successful
+ */
+
+int unlink_safe(char *s)
+   {int i, ev, rv, na;
+    struct stat sb;
+
+/* maximum number of attempts */
+    na = 100;
+
+    for (i = 0, rv = -2; (i < na) && (rv != 0); i++)
+
+/* try to unlink the file */
+        {rv = unlink(s);
+	 ev = errno;
+	 switch (ev)
+
+/* worth a retry */
+	    {case EBUSY :
+	     case EIO :
+	          break;
+
+/* path or permissions problems will never work so bail */
+	     default :
+                  i = na;
+                  continue;};
+
+/* check the for the continued existence of the file */
+	 rv = stat(s, &sb);
+	 ev = errno;
+         if (rv == 0)
+	    {rv = -1;
+             i  = na;
+	     sched_yield();}
+	 else
+	    rv = 0;};
+
+    return(rv);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LOG_ACTIVITY - log messages to FLOG */
+
+void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
+   {char msg[BFLRG];
+    FILE *log;
+
+    if ((ilog == TRUE) && (flog != NULL) && (ilev <= db_log_level))
+       {log = fopen(flog, "a");
+	if (log != NULL)
+	   {VA_START(fmt);
+	    VSNPRINTF(msg, BFLRG, fmt);
+	    VA_END;
+	    fprintf(log, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
+	    fclose(log);};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* undefine when passing out of SCOPE_SCORE_COMPILE */
+
+#undef UNDEFINED
+
+# endif
+#endif

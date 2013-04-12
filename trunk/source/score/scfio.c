@@ -2728,8 +2728,12 @@ int64_t SC_filelen(FILE *fp)
  */
 
 FILE *SC_fopen_safe(const char *path, const char *mode)
-   {int ok, ev;
-    FILE *rv;
+   {FILE *rv;
+
+#if 1
+    rv = PS_fopen_safe(path, mode);
+#else
+    int ok, ev;
 
     for (ok = TRUE; ok == TRUE; )
         {rv = fopen(path, mode);
@@ -2750,6 +2754,7 @@ FILE *SC_fopen_safe(const char *path, const char *mode)
 		 default :
 		      ok = FALSE;
 		      break;};};};
+#endif
 
     return(rv);}
 
@@ -2761,7 +2766,12 @@ FILE *SC_fopen_safe(const char *path, const char *mode)
  */
 
 int SC_open_safe(const char *path, int flags, mode_t mode)
-   {int ok, ev, rv;
+   {int rv;
+
+#if 1
+    rv = PS_open_safe(path, flags, mode);
+#else
+    int ok, ev;
 
     for (ok = TRUE; ok == TRUE; )
         {rv = open(path, flags, mode);
@@ -2782,6 +2792,7 @@ int SC_open_safe(const char *path, int flags, mode_t mode)
 		 default :
 		      ok = FALSE;
 		      break;};};};
+#endif
 
     return(rv);}
 
@@ -2794,10 +2805,7 @@ int SC_open_safe(const char *path, int flags, mode_t mode)
  */
 
 ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
-   {int blk;
-    long nbo, nbr;
-    ssize_t rv;
-    char *pbf;
+   {ssize_t rv;
 
 #ifdef AIX
     PFSignal_handler oh;
@@ -2807,6 +2815,13 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
        oh = SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
 
 #endif
+
+#if 1
+    rv = PS_read_safe(fd, bf, n, TRUE);
+#else
+    int blk;
+    long nbo, nbr;
+    char *pbf;
 
     blk = SC_isblocked_fd(fd);
 
@@ -2834,6 +2849,7 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 	    pbf += nbr;
 	    nbo -= nbr;
 	    rv  += nbr;};};
+#endif
 
 #ifdef AIX
 
@@ -2855,9 +2871,14 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
  */
 
 ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
-   {int err;
-    long nbo, nbw, zc;
+   {long nbw;
     ssize_t rv;
+
+#if 1
+    nbw = PS_write_safe(fd, bf, n);
+#else
+    int err;
+    long nbo, zc;
     char *pbf;
 
     nbo = n;
@@ -2887,6 +2908,7 @@ ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
 
 	pbf += nbw;
 	nbo -= nbw;};
+#endif
 
     rv = (nbw < 0) ? nbw : n;
 
@@ -2898,7 +2920,12 @@ ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
 /* _SC_FREAD_SAFE - atomic worker for SC_FREAD_SIGSAFE */
 
 static size_t _SC_fread_safe(void *s, size_t bpi, size_t ni, FILE *fp)
-   {size_t zc, n, ns, nr;
+   {size_t nr;
+
+#if 1
+    nr = PS_fread_safe(s, bpi, ni, fp, TRUE);
+#else
+    size_t zc, n, ns;
     char *ps;
 
     zc = 0;
@@ -2918,6 +2945,7 @@ static size_t _SC_fread_safe(void *s, size_t bpi, size_t ni, FILE *fp)
 	ps += bpi*n;
 	ns -= n;
         nr += n;};
+#endif
 
     return(nr);}
  
@@ -2962,7 +2990,12 @@ size_t SC_fread_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
  */
 
 size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
-   {size_t zc, n, ns, nw;
+   {size_t nw;
+
+#if 1
+    nw = PS_fwrite_safe(s, bpi, ni, fp);
+#else
+    size_t zc, n, ns;
     char *ps;
 
     zc = 0;
@@ -2985,6 +3018,7 @@ size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
 	ps += bpi*n;
 	ns -= n;
         nw += n;};
+#endif
 
     return(nw);}
  

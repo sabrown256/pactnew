@@ -56,6 +56,18 @@
 #define _post_info 		_PS_post_info
 
 /* API functions */
+
+#define close_safe 		PS_close_safe
+#define fclose_safe 		PS_fclose_safe
+#define fflush_safe 		PS_fflush_safe
+#define fopen_safe 		PS_fopen_safe
+#define fread_safe 		PS_fread_safe
+#define fwrite_safe 		PS_fwrite_safe
+#define open_safe 		PS_open_safe
+#define read_safe               PS_read_safe
+#define unlink_safe 		PS_unlink_safe
+#define write_safe              PS_write_safe
+
 #define acheck 			PS_acheck
 #define afin 			PS_afin
 #define alaunch 		PS_alaunch
@@ -123,12 +135,10 @@
 #define file_text 		PS_file_text
 #define fill_string 		PS_fill_string
 #define fillin_pgrp 		PS_fillin_pgrp
-#define fread_safe 		PS_fread_safe
 #define free_client 		PS_free_client
 #define free_db 		PS_free_db
 #define free_strings 		PS_free_strings
 #define full_path 		PS_full_path
-#define fwrite_safe 		PS_fwrite_safe
 #define get_connect_socket 	PS_get_connect_socket
 #define get_date 		PS_get_date
 #define get_db 			PS_get_db
@@ -201,7 +211,6 @@
 #define push_tok 		PS_push_tok
 #define push_tok_beg 		PS_push_tok_beg
 #define put_db 			PS_put_db
-#define read_safe               PS_read_safe
 #define read_sock 		PS_read_sock
 #define redirect_io 		PS_redirect_io
 #define register_io_pgrp 	PS_register_io_pgrp
@@ -241,12 +250,10 @@
 #define trim 			PS_trim
 #define unamef 			PS_unamef
 #define unique 			PS_unique
-#define unlink_safe 		PS_unlink_safe
 #define upcase 			PS_upcase
 #define verifyx 		PS_verifyx
 #define vstrcat 		PS_vstrcat
 #define wall_clock_time 	PS_wall_clock_time
-#define write_safe              PS_write_safe
 #define write_sock 		PS_write_sock
 
 /*--------------------------------------------------------------------------*/
@@ -267,6 +274,7 @@
 
 #undef SCOPE_SCORE_PREPROC
 #undef LIBIO
+#undef LIBFIO
 #undef LIBPSH
 #undef LIBHASH
 #undef LIBTIME
@@ -292,6 +300,7 @@
 
 #include <network.h>
 #include <shell/libio.c>
+#include <shell/libfio.c>
 #include <shell/libpsh.c>
 #include <shell/libhash.c>
 #include <shell/libtime.c>

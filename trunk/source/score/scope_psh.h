@@ -23,6 +23,7 @@
 
 #include <network.h>
 #include <shell/libio.c>
+#include <shell/libfio.c>
 #include <shell/libpsh.c>
 #include <shell/libhash.c>
 #include <shell/libtime.c>
@@ -101,7 +102,6 @@ extern process_group_state
  *PS_get_process_group_state(void);
 
 
-
 /* LIBDB.C declarations */
 
 extern void
@@ -143,6 +143,31 @@ extern void
 extern char
  *PS_expand(char *expr, int nc, char *varn, int rnull),
  *PS_eval(char *expr, int nc, char *varn);
+
+
+/* LIBFIO.C declarations */
+
+extern void
+ PS_log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...);
+
+extern int
+ PS_open_safe(const char *path, int flags, mode_t mode),
+ PS_close_safe(int fd),
+ PS_fclose_safe(FILE *fp),
+ PS_fflush_safe(FILE *fp),
+ PS_block_fd(int fd, int on),
+ PS_unlink_safe(char *s);
+
+extern ssize_t
+ PS_read_safe(int fd, void *s, size_t nb, int req),
+ PS_write_safe(int fd, const void *s, size_t nb);
+
+extern size_t
+ PS_fread_safe(void *s, size_t bpi, size_t nitems, FILE *fp, int req),
+ PS_fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp);
+
+extern FILE
+ *PS_fopen_safe(const char *path, const char *mode);
 
 
 /* LIBHASH.C declarations */
@@ -261,7 +286,6 @@ extern void
  PS_push_path(int end, char *dpath, char *path),
  PS_build_path(char *base, ...),
  PS_key_val(char **key, char **val, char *s, char *dlm),
- PS_log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...),
  PS_unamef(char *s, int nc, char *wh);
 
 extern int
@@ -291,20 +315,10 @@ extern int
  PS_file_path(char *name, char *path, int nc),
  PS_match(char *s, char *patt),
  PS_touch(char *fmt, ...),
- PS_block_fd(int fd, int on),
- PS_unlink_safe(char *s),
  PS_demonize(void),
  PS_file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr),
  PS_strings_file(char **sa, char *fname, char *mode),
  PS_is_running(int pid);
-
-extern ssize_t
- PS_read_safe(int fd, void *s, size_t nb, int req),
- PS_write_safe(int fd, const void *s, size_t nb);
-
-extern size_t
- PS_fread_safe(void *s, size_t bpi, size_t nitems, FILE *fp, int req),
- PS_fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp);
 
 extern char
  *PS_nstrsave(char *s),
