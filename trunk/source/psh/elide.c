@@ -56,7 +56,7 @@ int elide(char *pa, char *pb, char *fname)
 	if (strcmp(fname, "-") == 0)
 	   fp = stdin;
 	else
-	   fp = fopen(fname, "r");
+	   fp = fopen_safe(fname, "r");
 
 	nc = 0;
 	while (TRUE)

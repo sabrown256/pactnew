@@ -54,9 +54,6 @@ static FILE
 static dir_stack
  dstck;
 
-int
- _assert_fail = 0;
-
 extern void
  unamef(char *s, int nc, char *wh);
 
@@ -1119,7 +1116,7 @@ void cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...)
     VSNPRINTF(fname, BFLRG, fmt);
     VA_END;
 
-    in = fopen(fname, "r");
+    in = fopen_safe(fname, "r");
     if (in != NULL)
        {for (i = 0; fgets(s, BFLRG, in) != NULL; i++)
             {if ((nskip <= i) && (i < ncat))
@@ -1142,7 +1139,7 @@ void copy(char *out, char *fmt, ...)
     VSNPRINTF(in, BFLRG, fmt);
     VA_END;
 
-    fp = fopen(out, "w");
+    fp = fopen_safe(out, "w");
     if (fp != NULL)
        {cat(fp, 0, -1, in);
 	fclose(fp);};
@@ -1447,7 +1444,7 @@ int file_script(char *fmt, ...)
 
     rv = file_executable(s);
     if (rv == TRUE)
-       {fp = fopen(s, "r");
+       {fp = fopen_safe(s, "r");
 	if (fp != NULL)
 	   {if (fgets(t, BFLRG, fp) != NULL)
 	       rv = (strncmp(t, "#!", 2) == 0);
@@ -1544,7 +1541,7 @@ char *grep(FILE *fp, char *name, char *fmt, ...)
 
     if (fp == NULL)
        {clf = TRUE;
-	fp  = fopen(name, "r");}
+	fp  = fopen_safe(name, "r");}
     else
        clf = FALSE;
 
@@ -2015,7 +2012,7 @@ FILE *open_file(char *mode, char *fmt, ...)
     VSNPRINTF(bf, BFLRG, fmt);
     VA_END;
 
-    fp = fopen(bf, mode);
+    fp = fopen_safe(bf, mode);
 
     return(fp);}
 
@@ -2765,7 +2762,7 @@ int strings_file(char **sa, char *fname, char *mode)
 
     rv = FALSE;
     if ((fname != NULL) && (sa != NULL))
-       {fp = fopen(fname, mode);
+       {fp = fopen_safe(fname, mode);
 
 	rv = strings_out(fp, sa, 0, -1, FALSE);
 
@@ -2871,7 +2868,7 @@ char **file_text(int sort, char *fname, ...)
 
     sa = NULL;
 	
-    in = fopen(file, "r");
+    in = fopen_safe(file, "r");
     if (in != NULL)
        {sa = file_strings(in);
 	fclose(in);};

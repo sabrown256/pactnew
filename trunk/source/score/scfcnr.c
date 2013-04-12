@@ -22,7 +22,7 @@ static SC_file_type _SC_fcontainer_type(char *name)
 
     type = SC_OTHER;
 
-    fp = fopen(name, "r");
+    fp = SC_fopen_safe(name, "r");
     if (fp != NULL)
        {if (_SC_is_tarfile(fp))
            type = SC_TAR;
@@ -115,7 +115,7 @@ fcdes *_SC_unknown_container(char *name)
 	fp = NULL;
 	ok = TRUE;
 	if (nt == 3)
-	   {fp  = fopen(ta[0], "r");
+	   {fp  = SC_fopen_safe(ta[0], "r");
 	    sad = SC_stol(ta[1]);
 	    ead = SC_stol(ta[2]);
 	    ok &= (ead > sad);};

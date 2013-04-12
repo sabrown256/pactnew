@@ -1,14 +1,14 @@
 #!/usr/bin/env scheme
 ;
+; SHENV.SCM - executable nature of scheme scripts
+;           - environment manipulation
+;           - process execution with pipelines
+;
 ; Source Version: 3.0
 ; Software Release #: LLNL-CODE-422942
 ;
 ; include "cpyright.h"
 ;
-; test:
-;    executable nature of scheme scripts
-;    environment manipulation
-;    process execution with pipelines
 
 (printf nil "\ndefine environment variable FOO\n")
 (define $FOO 3)

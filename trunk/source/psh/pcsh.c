@@ -86,7 +86,7 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
     FILE *fo;
 
 /* initialize the repackaged version */
-    fo = fopen(fname, "w");
+    fo = fopen_safe(fname, "w");
     if (fo != NULL)
        {char lpath[BFLRG];
 
@@ -138,7 +138,7 @@ void make_ctl_script(char *fname, char *dname, char *lname,
 		     char *cmd, char *al, int *lm)
    {FILE *fp;
 
-    fp = fopen(fname, "w");
+    fp = fopen_safe(fname, "w");
 
     fprintf(fp, "#!/bin/csh -f\n");
     fprintf(fp, "unalias *\n");
@@ -221,7 +221,7 @@ static char **compute_pdo_limits(char **sa, int is, char *al, int nc)
     rv = NULL;
 
     snprintf(fn, BFLRG, "/tmp/pcsh-pdo.%d", getpid());    
-    fp = fopen(fn, "w");
+    fp = fopen_safe(fn, "w");
 
 /* write the prelimary part of the script */
     strings_out(fp, sa, 0, is, TRUE);
@@ -346,7 +346,7 @@ static char **compute_pfor_limits(char **sa, int is, char *al, int nc)
     rv = NULL;
 
     snprintf(fn, BFLRG, "/tmp/pcsh-pfor.%d", getpid());    
-    fp = fopen(fn, "w");
+    fp = fopen_safe(fn, "w");
 
 /* write the prelimary part of the script */
     strings_out(fp, sa, 0, is, TRUE);
@@ -470,7 +470,7 @@ static int make_c_script(char **sa, char *fname, char **v)
     snprintf(cname, BFLRG, "%s.c", fname);
 
 /* initialize the repackaged version */
-    fo = fopen(cname, "w");
+    fo = fopen_safe(cname, "w");
 
 /* copy the remainder as the C program */
     if (fo != NULL)
@@ -658,7 +658,7 @@ static void invoke_session(char **vo, char *shell, char *pact,
 
 /* write a temporary .cshrc */
     snprintf(fname, BFLRG, "%s/.cshrc", dname);
-    fo = fopen(fname, "w");
+    fo = fopen_safe(fname, "w");
     if (fo != NULL)
        {fprintf(fo, "setenv HOME %s\n", home);
 	fprintf(fo, "cd %s\n", home);

@@ -617,7 +617,7 @@ int main(int c, char **v)
 	    inf = v[i];};
 
     if (inf != NULL)
-       fi = fopen(inf, "r+");
+       fi = fopen_safe(inf, "r+");
 
     if (tgt == 2)
        {nt  = 0;
@@ -639,7 +639,7 @@ int main(int c, char **v)
 	     tl[nt] = t;};};
 
     if (outf != NULL)
-       fo = fopen(outf, "w");
+       fo = fopen_safe(outf, "w");
     else
        fo = stdout;
 

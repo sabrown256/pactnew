@@ -801,7 +801,7 @@ database *db_srv_load(client *cl, int dbg, int auth)
 
     db = make_db(cl, dbg, auth);
     if ((db != NULL) && (db->file != NULL))
-       {fp = fopen(db->file, "r");
+       {fp = fopen_safe(db->file, "r");
 	if (fp != NULL)
 	   {load_db(db, NULL, fp);
 	    fclose(fp);};
@@ -876,7 +876,7 @@ int db_srv_save(int fd, database *db)
 
 	CLOG(cl, 1, "save %d |%s|", db->tab->ne, db->file);
 
-	fp = fopen(db->file, "w");
+	fp = fopen_safe(db->file, "w");
 	if (fp != NULL)
 	   {save_db(db, NULL, fp, NULL);
 

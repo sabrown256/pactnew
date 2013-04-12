@@ -189,7 +189,7 @@ static int _CC_emit_vardef(char *cmp, char **v, int cfl)
 
     snprintf(nm, MAXLINE, "%s-0.i", _CC.rloc.fname);
 
-    fp = fopen(nm, "w");
+    fp = SC_fopen_safe(nm, "w");
     if (fp != NULL)
        {n = _CC.nd;
 	for (i = 0; i < n; i++)
@@ -224,7 +224,7 @@ static int _CC_emit_fnc(int i, int j, char *cmp, char **v, int cfl)
 
     snprintf(nm, MAXLINE, "%s-%d.i", _CC.rloc.fname, j);
 
-    fp = fopen(nm, "w");
+    fp = SC_fopen_safe(nm, "w");
     if (fp != NULL)
        {dc = _CC.all[i];
 	dl = dc->dep;

@@ -110,7 +110,7 @@ int main(int c, char **v)
     static char *casename[]  = {"SC_atof", "SC_strtod", "SC_strtol"};
 
 /* process fltfil for atof/strtod functions */
-    fp = fopen("fltfil", "r");
+    fp = SC_fopen_safe("fltfil", "r");
 
     io_printf(STDOUT, "\nString\t\tFunction\t  Measured       Expected\tStatus\n");
 
@@ -129,7 +129,7 @@ int main(int c, char **v)
     io_printf(STDOUT, "\nString\tFunction\t  Measured     Expected   Status\n");
 
 /* process intfil for strtol functions */
-    fp = fopen("intfil", "r");
+    fp = SC_fopen_safe("intfil", "r");
 
     if (fp != NULL)
        {while (fscanf(fp, "%10s %d %ld %d", xxx, &base, &lval, &lexpected) != EOF)

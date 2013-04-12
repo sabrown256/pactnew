@@ -93,7 +93,7 @@ fcdes *SC_scan_archive(char *arf)
     fc  = NULL;
     tab = NULL;
 
-    fp = fopen(arf, "r");
+    fp = SC_fopen_safe(arf, "r");
     if (fp != NULL)
        {nr = fread(s, 1, 8, fp);
 	if (nr < 0)
@@ -234,7 +234,7 @@ fcdes *SC_scan_archive(char *arf)
     fc  = NULL;
     tab = NULL;
 
-    fp = fopen(arf, "r");
+    fp = SC_fopen_safe(arf, "r");
     if (fp != NULL)
        {nr = fread(s, 1, 8, fp);
 	if (nr < 0)
@@ -335,7 +335,7 @@ fcdes *SC_scan_archive(char *arf)
     ne  = strlen(AR_EFMT1);
     na  = sizeof(hdr.ar_name);
 
-    fp = fopen(arf, "r");
+    fp = SC_fopen_safe(arf, "r");
     if (fp != NULL)
        {nr = fread(s, 1, 8, fp);
 	if (nr < 0)
@@ -446,7 +446,7 @@ fcdes *SC_scan_archive(char *arf)
     fc  = NULL;
     tab = NULL;
 
-    fp = fopen(arf, "r");
+    fp = SC_fopen_safe(arf, "r");
     if (fp != NULL)
        {nr = fread(s, 1, 8, fp);
 	if (nr < 0)

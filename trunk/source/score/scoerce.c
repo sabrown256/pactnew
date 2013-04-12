@@ -1,5 +1,5 @@
 /*
- * CONVERT.C - generate primitive type converters
+ * SCOERCE.C - generate primitive type converters
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -7,6 +7,11 @@
  */
 
 #define NO_VA_ARG_ID
+
+#undef LIBFIO
+#undef SCOPE_SCORE_PREPROC
+#include "../psh/common.h"
+#include "../psh/libfio.c"
 
 #include "scstd.h"
 #include "scope_typeh.h"
@@ -842,7 +847,7 @@ int main(int c, char **v)
 	    outf = v[++i];};
 
     if (outf != NULL)
-       fo = fopen(outf, "w");
+       fo = fopen_safe(outf, "w");
     else
        fo = stdout;
 

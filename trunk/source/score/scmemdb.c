@@ -537,7 +537,7 @@ int SC_mem_ss(char *base, int flag)
     nbl = 0;
 
     snprintf(s, MAXLINE, "%s.%03d.map", root, idx++);
-    fp = fopen(s, "w");
+    fp = SC_fopen_safe(s, "w");
     if (fp != NULL)
        {nbl = _SC_mem_map(fp, flag, ((flag & 8) != 0), TRUE);
 
@@ -598,14 +598,14 @@ static long _SC_mem_monitor(int old, int lev, char *id, char *msg, int dif)
 
     if (old == -1)
        {if (leva > 1)
-	   {fp = fopen(tb, "w");
+	   {fp = SC_fopen_safe(tb, "w");
 	    if (fp != NULL)
 	       {_SC_mem_map(fp, actfl, show, FALSE);
 		fclose(fp);};};}
 
     else
        {if (leva > 1)
-	   {fp = fopen(ta, "w");
+	   {fp = SC_fopen_safe(ta, "w");
 	    if (fp != NULL)
 	       {_SC_mem_map(fp, actfl, show, FALSE);
 		fclose(fp);};

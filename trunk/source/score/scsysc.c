@@ -172,7 +172,7 @@ fspec *_SC_read_filter(char *fname)
     if (fname == NULL)
        fp = NULL;
     else
-       fp = fopen(fname, "r");
+       fp = SC_fopen_safe(fname, "r");
 
     if (fp != NULL)
        {filter = CMAKE_N(fspec, 1000);

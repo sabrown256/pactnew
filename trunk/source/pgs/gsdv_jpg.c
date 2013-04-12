@@ -64,7 +64,7 @@ static void _PG_JP_finish_plot(PG_device *dev)
 
     PG_make_raster_family_name(mdv, fname, MAXLINE);
 
-    fh = fopen(fname, "wb");
+    fh = SC_fopen_safe(fname, "wb");
     if (fh == NULL)
        return;
 
