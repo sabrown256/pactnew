@@ -800,7 +800,7 @@ static void add_set_cfg(client *cl,
    {int i, j, n, nc, ok;
     char *var, *val, *p, **sa;
 
-    fflush(st.aux.SEF);
+    fflush_safe(st.aux.SEF);
     sa = file_text(TRUE, "%s/log/file.se", st.dir.root);
     n  = (sa != NULL) ? lst_length(sa) : 0;
 

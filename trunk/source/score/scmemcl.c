@@ -786,7 +786,7 @@ void dprfree(long jmn, long jmx)
              {fprintf(stdout, " %10p", md);
 	      if (i % 6 == 5)
 		 fprintf(stdout, "\n");
-	      fflush(stdout);};
+	      SC_fflush_safe(stdout);};
 	 if (i % 6 != 0)
 	    fprintf(stdout, "\n");};
 

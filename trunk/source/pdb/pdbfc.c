@@ -241,7 +241,7 @@ static int _PD_fcflush(FILE *fp)
     cf = GET_CONTAINERF(fp);
     fl = GET_FILE(cf);
 
-    rv = fflush(fl);
+    rv = SC_fflush_safe(fl);
 
 #if defined(MACOSX) || defined(FREEBSD)
 /* on OSX the fflush sometimes fails for the last file in a container

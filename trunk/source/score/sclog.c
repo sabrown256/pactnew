@@ -179,7 +179,7 @@ int SC_close_log(SC_logfile log)
 /* LOCK HELD: No returns allowed until lock released */
 
 /* coax buffers bound for the tmp log to disk */
-        fflush(log.file);  
+        SC_fflush_safe(log.file);  
         sync(); 
 
 /* append tmp log to global log */

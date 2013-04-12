@@ -29,7 +29,7 @@
 
 #define REPLY(msg, val)                                                      \
    {printf("%s:%ld\n", msg, (long) (val));                                   \
-    fflush(stdout);                                                          \
+    SC_fflush_safe(stdout);                                                  \
     _SC_diagnostic("%s:%ld\n", msg, (long) (val));}
 
 #define IO_OPER_START_TIME(_f)                                               \
@@ -285,7 +285,7 @@ static int _SC_fflush(FILE *fp)
     ret = FALSE;
 
     if (fp != NULL)
-       ret = fflush(fp);
+       ret = SC_fflush_safe(fp);
 
     return(ret);}
 
@@ -797,7 +797,7 @@ void SC_file_access(int log)
                  break;
 
             case SC_FFLUSH :
-                 REPLY(FLUSH_MSG, fflush(fp));
+                 REPLY(FLUSH_MSG, SC_fflush_safe(fp));
                  break;
 
             case SC_FTELL :
@@ -1640,7 +1640,7 @@ static u_int64_t _SC_lfwrite(void *s, size_t bpi, u_int64_t ni, FILE *fp)
 	zc = (n == 0) ? zc + 1 : 0;
 
         if (n < ns)
-           fflush(fp);
+           SC_fflush_safe(fp);
 
 	ps += bpi*n;
 	ns -= n;
@@ -2016,7 +2016,7 @@ int io_flush(FILE *fp)
     rv = EOF;
     if (fp != NULL)
        {if (IS_STD_IO(fp))
-	   rv = fflush(fp);
+	   rv = SC_fflush_safe(fp);
     
         else
 	   {fid = (file_io_desc *) fp;
@@ -2454,7 +2454,7 @@ int lio_flush(FILE *fp)
     rv = EOF;
     if (fp != NULL)
        {if (IS_STD_IO(fp))
-	   rv = fflush(fp);
+	   rv = SC_fflush_safe(fp);
     
         else
 	   {fid = (file_io_desc *) fp;
@@ -3055,7 +3055,7 @@ size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
 	zc = (n == 0) ? zc + 1 : 0;
 
         if (n < ns)
-           fflush(fp);
+           SC_fflush_safe(fp);
 
 	ps += bpi*n;
 	ns -= n;

@@ -1073,7 +1073,7 @@ static int _SC_bio_flush(bio_desc *bid)
 
 #ifdef USE_C_BUFFERED_IO
 
-    ret = fflush(bid->fp);
+    ret = SC_fflush_safe(bid->fp);
 
 #else
 

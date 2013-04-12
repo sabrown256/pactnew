@@ -91,7 +91,7 @@ static int _SC_aux_flush(FILE *stream)
 
     ret = 0;
     if (stream == stdout)
-       ret = fflush(stream);
+       ret = SC_fflush_safe(stream);
 
     return(ret);}
 

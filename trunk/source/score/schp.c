@@ -81,7 +81,7 @@ void _SC_diagnostic(char *fmt, ...)
 	SC_VDSNPRINTF(TRUE, s, fmt);
 
 	fputs(s, ps->diag);
-	fflush(ps->diag);
+	SC_fflush_safe(ps->diag);
 
 	CFREE(s);};
 

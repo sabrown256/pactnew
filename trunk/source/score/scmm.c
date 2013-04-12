@@ -409,7 +409,7 @@ static void test_mm(void *(*am)(), void (*fm)(), int n, FILE *fp,
 
     if (fp != NULL)
        {io_printf(fp, "F\t\t\t%8lx\tList\n", (long) p);
-        fflush(fp);};
+        SC_fflush_safe(fp);};
 
     *pt = SC_cpu_time() - t;
 

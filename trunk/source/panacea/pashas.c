@@ -106,7 +106,7 @@ void PA_interrupt_handler(int sig)
 
     SC_strtok(bf, " \t\n\r", s);
 
-    fflush(stdout);
+    SC_fflush_safe(stdout);
 
     pck  = PA_current_package();
     tcon = PA_gs.convrsns[SEC]/PA_gs.units[SEC];

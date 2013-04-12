@@ -70,47 +70,47 @@ int main(int argc, char **argv)
 
     if (ps->debug)
        {fprintf(ps->diag, "Initialized node #%d of %d\n", pid, nodes);
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
     PRINT(stdout, "Initialized node #%d of %d\n", pid, nodes);
 
     if (ps->debug)
        {fprintf(ps->diag, "Setup\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
     setup();
 
     if (ps->debug)
        {fprintf(ps->diag, "Non-blocking patterned read\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
     test_nb_read_patterned(pp);
 
     if (ps->debug)
        {fprintf(ps->diag, "Blocking ring\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
     test_ring_b(pp);
 
     if (ps->debug)
        {fprintf(ps->diag, "Non-blocking ring\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
     test_ring_nb(pp);
 
     if (ps->debug)
        {fprintf(ps->diag, "Type selection\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
     test_type_sel(pp);
 
     if (ps->debug)
        {fprintf(ps->diag, "Broadcast\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
     test_broadcast(pp);
 
     if (ps->debug)
        {fprintf(ps->diag, "Transfer rates\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
     test_rates(pp);
 
     if (ps->debug)
        {fprintf(ps->diag, "Error handling test\n");
-	fflush(ps->diag);};
+	SC_fflush_safe(ps->diag);};
     test_error(pp);
 
     return(0);}
