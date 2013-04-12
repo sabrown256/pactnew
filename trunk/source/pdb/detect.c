@@ -1219,7 +1219,7 @@ int main(int c, char **v)
 	   print_human(fo, sflag, fc, dc, lc);
 
 	if (outf != NULL)
-	   fclose(fo);};
+	   fclose_safe(fo);};
 
     return(0);}
 

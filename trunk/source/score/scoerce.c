@@ -863,7 +863,7 @@ int main(int c, char **v)
 	Separator(fo);
 
 	if (outf != NULL)
-	   fclose(fo);};
+	   fclose_safe(fo);};
 
     return(rv);}
 

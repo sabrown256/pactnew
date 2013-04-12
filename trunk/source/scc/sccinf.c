@@ -383,7 +383,7 @@ int CC_compile_file(char *name, char *cmp, char **v)
 
 	rv &= (_CC.n_error == 0);
 
-	fclose(fp);};
+	SC_fclose_safe(fp);};
 
     CFREE(_CC.rloc.fname);
 

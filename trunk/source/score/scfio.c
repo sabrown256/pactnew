@@ -793,7 +793,7 @@ void SC_file_access(int log)
                  file[indx] = NULL;
 		  _SC_diagnostic("   Close: %d(%p) ... ", indx, fp);
 
-                 REPLY(CLOSE_MSG, fclose(fp));
+                 REPLY(CLOSE_MSG, SC_fclose_safe(fp));
                  break;
 
             case SC_FFLUSH :
@@ -904,7 +904,7 @@ void SC_file_access(int log)
                   ret = TRUE;
 		  for (i = 0; i < MAX_FILES; i++)
 		      {if (file[i] == NULL)
-			  ret &= fclose(file[i]);};
+			  ret &= SC_fclose_safe(file[i]);};
 
 /* close the data socket */
                   close(cfd);
@@ -1866,7 +1866,7 @@ int io_close(FILE *fp)
     rv = EOF;
     if (fp != NULL)
        {if (IS_STD_IO(fp))
-	   rv = fclose(fp);
+	   rv = SC_fclose_safe(fp);
     
         else
 	   {fid = (file_io_desc *) fp;
@@ -2304,7 +2304,7 @@ int lio_close(FILE *fp)
     rv = EOF;
     if (fp != NULL)
        {if (IS_STD_IO(fp))
-	   rv = fclose(fp);
+	   rv = SC_fclose_safe(fp);
     
         else
 	   {fid = (file_io_desc *) fp;
@@ -2793,6 +2793,48 @@ int SC_open_safe(const char *path, int flags, mode_t mode)
 		      ok = FALSE;
 		      break;};};};
 #endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_FCLOSE_SAFE - make fclose safe for bad file systems
+ *                - necessitated by networks that cannot keep up with CPUs
+ */
+
+int SC_fclose_safe(FILE *fp)
+   {int rv;
+
+    rv = PS_fclose_safe(fp);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_CLOSE_SAFE - make close safe for bad file systems
+ *               - necessitated by networks that cannot keep up with CPUs
+ */
+
+int SC_close_safe(int fd)
+   {int rv;
+
+    rv = PS_close_safe(fd);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_FFLUSH_SAFE - make fflush safe for bad file systems
+ *                - necessitated by networks that cannot keep up with CPUs
+ */
+
+int SC_fflush_safe(FILE *fp)
+   {int rv;
+
+    rv = PS_fflush_safe(fp);
 
     return(rv);}
 

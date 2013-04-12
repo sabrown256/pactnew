@@ -195,7 +195,7 @@ fspec *_SC_read_filter(char *fname)
 	filter[n].itok    = -1;
 	n++;
 
-	fclose(fp);}
+	SC_fclose_safe(fp);}
 
     else
        filter = NULL;

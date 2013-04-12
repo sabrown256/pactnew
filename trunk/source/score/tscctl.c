@@ -54,7 +54,7 @@ int tSC_regx_match(void)
 		      s, patt, truth, retval,
 		      (fail ? "Fail" : " OK"));};
 
-	fclose(fp);};
+	SC_fclose_safe(fp);};
 
 /* report failures */
     if (failsum)
@@ -117,7 +117,7 @@ int tSC_xxxstrp(void)
 		      xxx, base, truth, retval,
 		      (fail ? "Fail" : " OK"));};
 
-	fclose(fp);};
+	SC_fclose_safe(fp);};
 
     if (ifailsum)
        io_printf(STDOUT, "\n%d failure%s in SC_intstrp\n",
@@ -138,7 +138,7 @@ int tSC_xxxstrp(void)
 		      xxx, truth, retval,
 		      (fail ? "Fail" : " OK"));};
 
-	fclose(fp);};
+	SC_fclose_safe(fp);};
 
 /* report failures */
     if (ffailsum)

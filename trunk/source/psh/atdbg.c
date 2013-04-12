@@ -478,7 +478,7 @@ static int use_dbx(atdbgdes *st, char *fname, atproc *al)
 	   {fprintf(fp, "attach %d\n", al->pid);
 	    fprintf(fp, "where\n");
 	    fprintf(fp, "quit\n");
-	    fclose(fp);
+	    fclose_safe(fp);
 
 	    FOREACH(t, run(FALSE, "%s %s -c %s", st->dbg, al->name, fname), "\n")
 	       s = t;
@@ -574,7 +574,7 @@ static int session(atdbgdes *st)
 
 /* close the log file if requested */
     if (st->log != NULL)
-       fclose(st->log);
+       fclose_safe(st->log);
 
     return(rv);}
 

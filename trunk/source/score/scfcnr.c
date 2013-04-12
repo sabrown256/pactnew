@@ -29,7 +29,7 @@ static SC_file_type _SC_fcontainer_type(char *name)
         else if (_SC_is_archive(fp))
            type = SC_AR;
 
-        fclose(fp);}
+        SC_fclose_safe(fp);}
 
     return(type);}
 
@@ -79,7 +79,7 @@ void SC_free_fcontainer(fcdes *fc)
        {CFREE(fc->name);
 
 	if (fc->file != NULL)
-	   fclose(fc->file);
+	   SC_fclose_safe(fc->file);
 
 	if (fc->entries != NULL)
 	   SC_hasharr_clear(fc->entries, _SC_rel_entry, NULL);
@@ -146,7 +146,7 @@ fcdes *_SC_unknown_container(char *name)
 	    fc->entries = tab;}
 
 	else if (fp != NULL)
-	   fclose(fp);
+	   SC_fclose_safe(fp);
 
 	SC_free_strings(ta);};
 

@@ -118,7 +118,7 @@ static void _PG_JP_finish_plot(PG_device *dev)
     jpeg_finish_compress(&cinfo);
 
 /* close the output file */
-    fclose(fh);
+    SC_fclose_safe(fh);
 
     CFREE(input);
 

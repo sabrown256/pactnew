@@ -541,7 +541,7 @@ int SC_mem_ss(char *base, int flag)
     if (fp != NULL)
        {nbl = _SC_mem_map(fp, flag, ((flag & 8) != 0), TRUE);
 
-	fclose(fp);};
+	SC_fclose_safe(fp);};
 
     return(nbl);}
 
@@ -601,14 +601,14 @@ static long _SC_mem_monitor(int old, int lev, char *id, char *msg, int dif)
 	   {fp = SC_fopen_safe(tb, "w");
 	    if (fp != NULL)
 	       {_SC_mem_map(fp, actfl, show, FALSE);
-		fclose(fp);};};}
+		SC_fclose_safe(fp);};};}
 
     else
        {if (leva > 1)
 	   {fp = SC_fopen_safe(ta, "w");
 	    if (fp != NULL)
 	       {_SC_mem_map(fp, actfl, show, FALSE);
-		fclose(fp);};
+		SC_fclose_safe(fp);};
 
 	    REMOVE(td);
 

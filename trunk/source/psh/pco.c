@@ -20,7 +20,7 @@
 #define STACK_GROUP     4
 
 #define LOG_ON      {Log = open_file("a", st.logf); setbuf(Log, NULL);}
-#define LOG_OFF     {fclose(Log); Log = NULL;}
+#define LOG_OFF     {fclose_safe(Log); Log = NULL;}
 
 enum e_phase_id
    { PHASE_READ = 10, PHASE_ANALYZE, PHASE_WRITE };
@@ -263,7 +263,7 @@ static void pop_file(void)
     se = st.fstck.file + n;
 
     if (se->itype == STACK_FILE)
-       fclose(se->fp);
+       fclose_safe(se->fp);
     else if (se->itype == STACK_PROCESS)
        pclose(se->fp);
 
@@ -486,7 +486,7 @@ static void write_pco(client *cl, state *st, char *dbname)
 			 "Group", st->def_tools, "Tool", "");
     ASSERT(rv == 0);
 
-    fclose(out);
+    fclose_safe(out);
 
     return;}
 
@@ -673,7 +673,7 @@ static void write_perl(client *cl, state *st, char *dbname)
 
     free_strings(ta);
 
-    fclose(out);
+    fclose_safe(out);
 
     return;}
 
@@ -995,10 +995,10 @@ static void write_envf(client *cl, int lnotice)
     note(fmd, TRUE, "setenv SCHEME  %s/scheme;", st.dir.root);
     note(fmd, TRUE, "setenv ULTRA   %s/scheme;", st.dir.root);
 
-    fclose(fcsh);
-    fclose(fsh);
-    fclose(fdk);
-    fclose(fmd);
+    fclose_safe(fcsh);
+    fclose_safe(fsh);
+    fclose_safe(fdk);
+    fclose_safe(fmd);
 
 /* log the results */
     n = sizeof(sfx)/sizeof(char *);
@@ -1374,7 +1374,7 @@ static void setup_analyze_env(client *cl, char *base)
     snprintf(alog, BFLRG, "%s/log/analyze",  st.dir.root);
     out = open_file("w", alog);
     note(out, TRUE, "%s", get_date());
-    fclose(out);
+    fclose_safe(out);
 
     dbset(cl, "Host",    st.host);
     dbset(cl, "Arch",    st.arch);
@@ -1474,19 +1474,19 @@ static void setup_output_env(client *cl, char *base)
 /* close any open intermediate files and export their names */
     dbset(cl, "DPFile", st.aux.dpfn);
     if (st.aux.DPF != NULL)
-       fclose(st.aux.DPF);
+       fclose_safe(st.aux.DPF);
 
     dbset(cl, "CEFile", st.aux.cefn);
     if (st.aux.CEF != NULL)
-       fclose(st.aux.CEF);
+       fclose_safe(st.aux.CEF);
 
     dbset(cl, "MVFile", st.aux.mvfn);
     if (st.aux.MVF != NULL)
-       fclose(st.aux.MVF);
+       fclose_safe(st.aux.MVF);
 
     dbset(cl, "URFile", st.aux.urfn);
     if (st.aux.URF != NULL)
-       fclose(st.aux.URF);
+       fclose_safe(st.aux.URF);
 
 /* remove duplicate tokens in selected lists */
     dbset(cl, "DP_Inc",  unique(dbget(cl, FALSE, "DP_Inc"),  FALSE, ' '));
@@ -2635,7 +2635,7 @@ static void write_do_run_db(client *cl, state *st)
 
 	fprintf(fp, "\n");
 
-	fclose(fp);};
+	fclose_safe(fp);};
 
 /* add the signature variable to the databases iff
  * there were specification - ns > 0 

@@ -354,7 +354,7 @@ static int make_server_conn(client *cl, int auth, char *host, int port)
 	    fprintf(fp, "%s\n", key);
 	    fprintf(fp, "%ld\n", pid);
 
-	    fclose(fp);
+	    fclose_safe(fp);
 
 /* set the file permission */
 	    if (auth == TRUE)

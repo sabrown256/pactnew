@@ -141,7 +141,7 @@ static char *srv_save_db(database *db, char *fname,
     ASSERT(ok == 0);
 
     if (fp != NULL)
-       fclose(fp);
+       fclose_safe(fp);
 	
 /* make up the ending message */
     if ((IS_NULL(fmt) == FALSE) &&
@@ -213,7 +213,7 @@ static char *srv_load_db(client *cl, char *fname, char *var)
 		    var, fname);};
 
     if (fp != NULL)
-       fclose(fp);
+       fclose_safe(fp);
 	
     return(t);}
 

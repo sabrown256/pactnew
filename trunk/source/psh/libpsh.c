@@ -1122,7 +1122,7 @@ void cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...)
             {if ((nskip <= i) && (i < ncat))
 	        fputs(s, out);};
 
-	fclose(in);};
+	fclose_safe(in);};
 
     return;}
 
@@ -1142,7 +1142,7 @@ void copy(char *out, char *fmt, ...)
     fp = fopen_safe(out, "w");
     if (fp != NULL)
        {cat(fp, 0, -1, in);
-	fclose(fp);};
+	fclose_safe(fp);};
 
     return;}
 
@@ -1448,7 +1448,7 @@ int file_script(char *fmt, ...)
 	if (fp != NULL)
 	   {if (fgets(t, BFLRG, fp) != NULL)
 	       rv = (strncmp(t, "#!", 2) == 0);
-	    fclose(fp);};};
+	    fclose_safe(fp);};};
 
     return(rv);}
 
@@ -1558,7 +1558,7 @@ char *grep(FILE *fp, char *name, char *fmt, ...)
 	        strcat(r, t);};
 
 	if (clf == TRUE)
-	   err = fclose(fp);
+	   err = fclose_safe(fp);
 	else
 	   err = fseek(fp, 0, SEEK_END);
 
@@ -2766,7 +2766,7 @@ int strings_file(char **sa, char *fname, char *mode)
 
 	rv = strings_out(fp, sa, 0, -1, FALSE);
 
-	fclose(fp);
+	fclose_safe(fp);
 
         rv = TRUE;};
 
@@ -2871,7 +2871,7 @@ char **file_text(int sort, char *fname, ...)
     in = fopen_safe(file, "r");
     if (in != NULL)
        {sa = file_strings(in);
-	fclose(in);};
+	fclose_safe(in);};
 
     if (sort == TRUE)
        run(FALSE, "rm -f %s", file);

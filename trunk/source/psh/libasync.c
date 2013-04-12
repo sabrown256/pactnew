@@ -339,7 +339,7 @@ void _job_io_close(process *pp, io_kind knd)
 	   _fd_close(af);
 
 	if (fp != NULL)
-	   fclose(fp);
+	   fclose_safe(fp);
 
 	pp->io[knd].fd  = -1;
 	pp->io[knd].fp  = NULL;

@@ -200,7 +200,7 @@ static int _CC_emit_vardef(char *cmp, char **v, int cfl)
 
 	fprintf(fp, "\n");
 
-	fclose(fp);
+	SC_fclose_safe(fp);
 
 	if (cfl == TRUE)
 	   rv &= CC_compile(nm, cmp, v);};
@@ -245,7 +245,7 @@ static int _CC_emit_fnc(int i, int j, char *cmp, char **v, int cfl)
 
 	fprintf(fp, "\n");
 
-	fclose(fp);
+	SC_fclose_safe(fp);
 
 	if (cfl == TRUE)
 	   rv &= CC_compile(nm, cmp, v);};

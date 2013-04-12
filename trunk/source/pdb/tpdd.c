@@ -296,7 +296,7 @@ static int test_wfa(statedes *st, int iv, int it)
     setup_data(st, IFREE, iv);
 
     if (iv+1 == st->nv)
-       {fclose(fp);
+       {SC_fclose_safe(fp);
 	st->sz[st->i] = SC_file_length(fname);
 	fp = NULL;};
 
@@ -370,7 +370,7 @@ static int test_wfai(statedes *st, int iv, int it)
     setup_data(st, IFREE, iv);
 
     if (iv+1 == st->nv)
-       {fclose(fp);
+       {SC_fclose_safe(fp);
 	st->sz[st->i] = SC_file_length(fname);
 	fp = NULL;};
 
@@ -455,7 +455,7 @@ static int test_rfa(statedes *st, int iv, int it)
     setup_data(st, IFREE, iv);
 
     if (iv+1 == st->nv)
-       {fclose(fp);
+       {SC_fclose_safe(fp);
 	st->sz[st->i] = SC_file_length(fname);
 	fp = NULL;};
 
@@ -516,7 +516,7 @@ static int test_wfb(statedes *st, int iv, int it)
     setup_data(st, IFREE, iv);
 
     if (iv+1 == st->nv)
-       {fclose(fp);
+       {SC_fclose_safe(fp);
 	st->sz[st->i] = SC_file_length(fname);
 	fp = NULL;};
 
@@ -576,7 +576,7 @@ static int test_rfb(statedes *st, int iv, int it)
     setup_data(st, IFREE, iv);
 
     if (iv+1 == st->nv)
-       {fclose(fp);
+       {SC_fclose_safe(fp);
 	st->sz[st->i] = SC_file_length(fname);
 	fp = NULL;};
 
@@ -644,7 +644,7 @@ static int test_wsb(statedes *st, int iv, int it)
     setup_data(st, IFREE, iv);
 
     if (iv+1 == st->nv)
-       {fclose(fp);
+       {SC_fclose_safe(fp);
 	st->sz[st->i] = SC_file_length(fname);
 	fp = NULL;
 	fd = -1;};
@@ -707,7 +707,7 @@ static int test_rsb(statedes *st, int iv, int it)
     setup_data(st, IFREE, iv);
 
     if (iv+1 == st->nv)
-       {fclose(fp);
+       {SC_fclose_safe(fp);
 	st->sz[st->i] = SC_file_length(fname);
 	fp = NULL;
 	fd = -1;};
@@ -902,7 +902,7 @@ static int test_whdf(statedes *st, int iv, int it)
     setup_data(st, IFREE, iv);
 
     if (iv+1 == st->nv)
-       {rv = H5Fclose(fp);
+       {rv = H5SC_Fclose_Safe(fp);
 	st->sz[st->i] = SC_file_length(fname);
 	fp = -1;};
 
@@ -962,7 +962,7 @@ static int test_rhdf(statedes *st, int iv, int it)
     setup_data(st, IFREE, iv);
 
     if (iv+1 == st->nv)
-       {rv = H5Fclose(fp);
+       {rv = H5Close(fp);
 	st->sz[st->i] = SC_file_length(fname);
 	fp = -1;};
 

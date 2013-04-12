@@ -124,7 +124,7 @@ int main(int c, char **v)
 	    fail[1] += checkd(SC_strtod(xxx, &endptr), "SC_strtod",
 			      xxx, expected, lexpected);};
 
-	fclose(fp);};
+	SC_fclose_safe(fp);};
   
     io_printf(STDOUT, "\nString\tFunction\t  Measured     Expected   Status\n");
 
@@ -136,7 +136,7 @@ int main(int c, char **v)
 	   fail[2] += checkl(SC_strtol(xxx, &endptr, base), "SC_strtol", xxx,
 			     lval, lexpected);
 
-	fclose(fp);};
+	SC_fclose_safe(fp);};
   
 /* report failures */
     failsum = 0;

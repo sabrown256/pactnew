@@ -1274,7 +1274,7 @@ int SC_leh_hist_save(char *fname)
 
 	rv = TRUE;
 
-	fclose(fp);};
+	SC_fclose_safe(fp);};
 
     return(rv);}
 
@@ -1307,7 +1307,7 @@ int SC_leh_hist_load(char *fname)
 
 	 rv = TRUE;
 
-	 fclose(fp);};
+	 SC_fclose_safe(fp);};
 
     return(rv);}
 

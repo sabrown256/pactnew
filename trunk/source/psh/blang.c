@@ -1999,7 +1999,7 @@ static void fin_fortran(bindes *bd)
     fp = bd->fp;
 
     csep(fp);
-    fclose(fp);
+    fclose_safe(fp);
 
     bd->fp = NULL;
 
@@ -2759,7 +2759,7 @@ static void fin_module(bindes *bd)
     fprintf(fp, "%send module pact_%s\n", ind, pck);
     fprintf(fp, "\n");
 
-    fclose(fp);
+    fclose_safe(fp);
 
     bd->fp = NULL;
 
@@ -3339,7 +3339,7 @@ static void fin_scheme(bindes *bd)
     fp = bd->fp;
 
     csep(fp);
-    fclose(fp);
+    fclose_safe(fp);
 
     bd->fp = NULL;
 
@@ -3954,7 +3954,7 @@ static void python_header(bindes *bd)
 
     fprintf(fh, "\n");
 
-    fclose(fh);
+    fclose_safe(fh);
 
     return;}
 
@@ -4044,7 +4044,7 @@ static void fin_python(bindes *bd)
     fp = bd->fp;
 
     csep(fp);
-    fclose(fp);
+    fclose_safe(fp);
 
     bd->fp = NULL;
 
@@ -4417,7 +4417,7 @@ static void man_wrap(statedes *st, fdecl *dcl,
 
     fprintf(fp, "\n");
 
-    fclose(fp);
+    fclose_safe(fp);
 
     return;}
 
@@ -4464,7 +4464,7 @@ static void fin_doc(bindes *bd)
     fp = bd->fp;
 
     hsep(fp);
-    fclose(fp);
+    fclose_safe(fp);
 
     bd->fp = NULL;
 

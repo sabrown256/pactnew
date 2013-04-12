@@ -217,7 +217,7 @@ int SC_close_log(SC_logfile log)
 
 /* and finally, close the tmp log, deleting it in the process */
     if (log.file != NULL)
-       fclose(log.file);
+       SC_fclose_safe(log.file);
 
     return(status);}
 

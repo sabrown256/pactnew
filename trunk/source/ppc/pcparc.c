@@ -380,7 +380,7 @@ static void _PC_close_member_n(PROCESS *pp)
     if (pp != NULL)
        {ps = pp->tstate;
 	if (ps->debug)
-	   {fclose(ps->diag);};};
+	   {SC_fclose_safe(ps->diag);};};
 
 #endif
 

@@ -1437,7 +1437,7 @@ static int _SC_bclose(FILE *fp)
 
     if (fp != NULL)
        {ret = _SC_bio_flush(bid);
-	ret = fclose(fp);};
+	ret = SC_fclose_safe(fp);};
 
     bio_stats[0] += bid->nhr;
     bio_stats[1] += bid->nhits[BIO_OPER_READ];

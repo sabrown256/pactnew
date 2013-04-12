@@ -106,7 +106,7 @@ int elide(char *pa, char *pb, char *fname)
 	        puts(s);};
 
 	if (strcmp(fname, "-") != 0)
-	   fclose(fp);};
+	   fclose_safe(fp);};
 
     return(rv);}
 

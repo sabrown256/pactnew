@@ -470,6 +470,9 @@ extern void
 
 extern int
  SC_open_safe(const char *path, int flags, mode_t mode),
+ SC_fclose_safe(FILE *fp),
+ SC_close_safe(int fd),
+ SC_fflush_safe(FILE *fp),
  SC_collect_io_info(int wh),
  SC_gather_io_info(FILE *fp, int wh),
  SC_io_connect(int flag),
