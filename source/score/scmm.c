@@ -487,7 +487,7 @@ int main(int argc, char **argv)
          io_printf(STDOUT, "%s\t%6d\t   %.3e\t   %.2e\n", "SMM", nf, time, mb);}
 
 /*
-    fclose(fp);
+    SC_fclose_safe(fp);
 */
     return(0);}
 

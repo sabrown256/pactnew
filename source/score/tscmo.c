@@ -62,7 +62,7 @@ static int test_2(int n, double *pdt)
 
     fp = SC_fopen_safe("test_2.map", "w");
     SC_mem_map(fp, 15);
-    fclose(fp);
+    SC_fclose_safe(fp);
 
     for (i = 0; i < n; i++)
         free(p[i]);

@@ -44,12 +44,12 @@ static int text_file(void)
     fp  = SC_fopen_safe("fd.dat", "w");
     fd[n++] = fileno(fp);
     fprintf(fp, "text\n");
-    fclose(fp);
+    SC_fclose_safe(fp);
 
 /* check reading the text file */
     fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
-    fclose(fp);
+    SC_fclose_safe(fp);
 
 /* check append mode */
     pf = PD_open("fd.dat", "a");
@@ -57,7 +57,7 @@ static int text_file(void)
     
     fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
-    fclose(fp);
+    SC_fclose_safe(fp);
 
     ok = PD_isfile("fd.dat");
 
@@ -67,7 +67,7 @@ static int text_file(void)
 
     fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
-    fclose(fp);
+    SC_fclose_safe(fp);
 
     SC_remove("fd.dat");
 
@@ -96,7 +96,7 @@ static int pdb_file(void)
 /* check reading the text file */
     fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
-    fclose(fp);
+    SC_fclose_safe(fp);
 
     ok = PD_isfile("fd.dat");
 
@@ -111,7 +111,7 @@ static int pdb_file(void)
 /* check reading the text file */
     fp = SC_fopen_safe("fd.dat", "r");
     fd[n++] = fileno(fp);
-    fclose(fp);
+    SC_fclose_safe(fp);
 
     SC_remove("fd.dat");
 

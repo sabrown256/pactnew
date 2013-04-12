@@ -102,7 +102,7 @@ int test_1(void)
 	    fprintf(out, " %4d   %12.6e   %12.6e\n",
 		    l, r[l], y[l]);
 
-	fclose(out);
+	SC_fclose_safe(out);
 
 	rv = TRUE;};
 
@@ -169,7 +169,7 @@ int test_2(void)
 	    fprintf(out, " %4d   %12.6e   %12.6e\n",
 		    l, r[l], y[l]);
 
-	fclose(out);
+	SC_fclose_safe(out);
 
 	rv = TRUE;};
 
@@ -255,7 +255,7 @@ int test_3(void)
 	    fprintf(out, " %4d   %12.6e %12.6e   %12.6e %12.6e\n",
 		    l, vals[2][l], vals[3][l], vals[0][l], vals[1][l]);
 
-	fclose(out);
+	SC_fclose_safe(out);
 
 	rv = TRUE;};
 
@@ -329,7 +329,7 @@ int test_4(void)
 		 fprintf(out, " %4d %4d   %12.6e %12.6e   %12.6e\n",
 			 i, j, xo[0][i], xo[1][j], fo[0][l]);};
 
-	fclose(out);
+	SC_fclose_safe(out);
 
 	rv = TRUE;};
 
@@ -403,7 +403,7 @@ int test_5(void)
 		 fprintf(out, " %4d %4d   %12.6e %12.6e   %12.6e\n",
 			 i, j, xo[0][i], xo[1][j], fo[0][l]);};
 
-	fclose(out);
+	SC_fclose_safe(out);
 
 	rv = TRUE;};
 

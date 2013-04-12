@@ -2664,7 +2664,7 @@ int gexec_file(char *db, io_mode md, FILE **fio,
     rv = 0;
     if (fn != v[0])
        {if (fp != NULL)
-	   fclose(fp);
+	   fclose_safe(fp);
 	fp = NULL;
 	fn = v[0];};
 

@@ -804,7 +804,7 @@ database *db_srv_load(client *cl, int dbg, int auth)
        {fp = fopen_safe(db->file, "r");
 	if (fp != NULL)
 	   {load_db(db, NULL, fp);
-	    fclose(fp);};
+	    fclose_safe(fp);};
 
 	CLOG(cl, 1, "load %d |%s|", db->tab->ne, db->file);};
 
@@ -880,7 +880,7 @@ int db_srv_save(int fd, database *db)
 	if (fp != NULL)
 	   {save_db(db, NULL, fp, NULL);
 
-	    fclose(fp);
+	    fclose_safe(fp);
 
 	    rv = TRUE;};};
 

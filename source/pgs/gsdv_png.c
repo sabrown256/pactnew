@@ -110,7 +110,7 @@ static void _PG_PNG_finish_plot(PG_device *dev)
 #ifdef PNG_SETJMP_SUPPORTED
     if (setjmp(png_jmpbuf(pw)))
        {png_destroy_write_struct(&pw, &pi);
-        fclose(fh);
+        SC_fclose_safe(fh);
 	return;};
 #endif
 
@@ -160,7 +160,7 @@ static void _PG_PNG_finish_plot(PG_device *dev)
 
     png_destroy_write_struct(&pw, &pi);
 
-    fclose(fh);
+    SC_fclose_safe(fh);
 
     return;}
  

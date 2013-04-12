@@ -589,7 +589,7 @@ int main(int c, char **v)
 				    i, dim, tol);};};
 
     if (fp != NULL)
-       fclose(fp);
+       SC_fclose_safe(fp);
 
     return(err);}
 

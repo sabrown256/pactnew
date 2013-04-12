@@ -202,7 +202,7 @@ fcdes *SC_scan_archive(char *arf)
 		       io_error(errno, "fseek to %s failed",
 				SC_itos(NULL, 0, ad, NULL));};};};
 
-	fclose(fp);
+	SC_fclose_safe(fp);
 
 	fc = _SC_make_archive(arf, NULL, nb, tab);};
 
@@ -301,7 +301,7 @@ fcdes *SC_scan_archive(char *arf)
 		   io_error(errno, "fseek to %s failed",
 			    SC_itos(NULL, 0, pos, NULL));};};
 
-	fclose(fp);
+	SC_fclose_safe(fp);
 
 	fc = _SC_make_archive(arf, NULL, nb, tab);};
 
@@ -520,7 +520,7 @@ fcdes *SC_scan_archive(char *arf)
 	fc = _SC_make_archive(arf, fp, nb, tab);
 
         if (fc == NULL)
-	   fclose(fp);};
+	   SC_fclose_safe(fp);};
 
     return(fc);}
 

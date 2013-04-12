@@ -106,7 +106,7 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
         strings_out(fo, sa, 0, -1, TRUE);
 
 /* finish up the file */
-	fclose(fo);
+	fclose_safe(fo);
 
 	run(FALSE, "mv %s %s.tmp ; sed 's/[ \t]*exit(/ quit(/g' %s.tmp | sed 's/[ \t]*exit[ \t]/ quit /g' > %s ; rm %s.tmp",
 	    fname, fname, fname, fname, fname);
@@ -199,7 +199,7 @@ void make_ctl_script(char *fname, char *dname, char *lname,
 
 /* close the master file */
     fprintf(fp, "exit($err)\n");
-    fclose(fp);
+    fclose_safe(fp);
 
     chmod(fname, S_IRUSR | S_IWUSR | S_IXUSR);
 
@@ -250,7 +250,7 @@ static char **compute_pdo_limits(char **sa, int is, char *al, int nc)
 
 /* close the file */
     fprintf(fp, "    exit(131)\n");
-    fclose(fp);
+    fclose_safe(fp);
 
 /* run the script */
     r = run(FALSE, "pcsh %s %s | tail -n 5", fn, al);
@@ -369,7 +369,7 @@ static char **compute_pfor_limits(char **sa, int is, char *al, int nc)
 
 /* close the file */
     fprintf(fp, "    exit(131)\n");
-    fclose(fp);
+    fclose_safe(fp);
 
 /* run the script */
     r = run(FALSE, "pcsh %s %s | tail -n 5", fn, al);
@@ -477,7 +477,7 @@ static int make_c_script(char **sa, char *fname, char **v)
        {strings_out(fo, sa, 0, -1, TRUE);
 
 /* finish up the file */
-	fclose(fo);};
+	fclose_safe(fo);};
 
     execute(TRUE, "cc -g -I%s %s -o %s -lc -lm", incdir, cname, fname);
     unlink(cname);
@@ -675,7 +675,7 @@ static void invoke_session(char **vo, char *shell, char *pact,
 
 	fprintf(fo, "rm -rf %s\n", dname);
 
-	fclose(fo);};
+	fclose_safe(fo);};
 
 /* set the HOME variable to reference the temporary .cshrc */
     if (file_exists(fname) == TRUE)

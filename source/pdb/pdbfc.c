@@ -156,7 +156,7 @@ static int _PD_fcclose(FILE *fp)
     cf = GET_CONTAINERF(fp);
     fl = GET_FILE(cf);
 
-    rv = fclose(fl);
+    rv = SC_fclose_safe(fl);
 
     return(rv);}
 

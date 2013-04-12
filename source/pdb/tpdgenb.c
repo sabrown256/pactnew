@@ -40,7 +40,7 @@ int main(int c, char **v)
     else
        err = 0;
 
-    fclose(fp);
+    SC_fclose_safe(fp);
 
     return(err);}
 

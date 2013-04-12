@@ -213,7 +213,7 @@ static void init_mpi(rundes *st)
 	fp = open_file("w", t);
 
 	fprintf(fp, "%s\n", st->host);
-	fclose(fp);};
+	fclose_safe(fp);};
 
 /* if we are MPI then we are not CROSS */
     if (cmpenv("MPI", "") != 0)
@@ -952,7 +952,7 @@ static int setup_dbg_path(rundes *st)
 		     (strcmp(ent, "dev") != 0))
 		    fprintf(fp, "%s/%s\n", s, ent);};
 
-	    fclose(fp);
+	    fclose_safe(fp);
 
 	    free_strings(lst);
 

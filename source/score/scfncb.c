@@ -390,7 +390,7 @@ int SC_get_ncpu(void)
 		    {ps     = strtok(NULL, " :\t\n\r");
 		     np     = SC_stoi(ps);
 		     method = 0;};};};
-	 fclose(fp);
+	 SC_fclose_safe(fp);
 
 	 np += method;};}
 

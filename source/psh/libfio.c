@@ -437,7 +437,7 @@ void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
 	    VSNPRINTF(msg, BFLRG, fmt);
 	    VA_END;
 	    fprintf(log, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
-	    fclose(log);};};
+	    fclose_safe(log);};};
 
     return;}
 

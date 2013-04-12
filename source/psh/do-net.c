@@ -23,12 +23,12 @@
 
 #define N_AUX 6
 
-#define INIT_PHASE(_p, _i, _s)                                                   \
-   {(_p)->id     = _i;                                                           \
-    (_p)->name   = _s;                                                           \
-    (_p)->nsp    = 0;                                                            \
-    (_p)->sp     = NULL;                                                         \
-    (_p)->tlimit = 0;                                                            \
+#define INIT_PHASE(_p, _i, _s)                                               \
+   {(_p)->id     = _i;                                                       \
+    (_p)->name   = _s;                                                       \
+    (_p)->nsp    = 0;                                                        \
+    (_p)->sp     = NULL;                                                     \
+    (_p)->tlimit = 0;                                                        \
     memset((_p)->time, 0, 16);}
 
 /* enumerate exit states */
@@ -502,7 +502,7 @@ static void finup(process *pp, void *a)
 
 /* close the log */
     if (sp->log != NULL)
-       {err = fclose(sp->log);
+       {err = fclose_safe(sp->log);
         if (err == 0)
 	   notej(pp, "successfully closed log %s", sp->logn);
 	else
@@ -1112,7 +1112,7 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 		       if (p != NULL)
 			  nstrncpy(usetmp, BFLRG, p, -1);};};};};};
 
-    fclose(fp);
+    fclose_safe(fp);
 
 /* if the log file indicates the job is pending or has only started */
     if ((strcmp(hst, "--- pending ---") == 0) ||
@@ -1244,7 +1244,7 @@ static int watch_sect(char *plog, FILE *repf, char *sect,
 	       p = strtok(NULL, " \t\n");
 	       if (p != NULL)
 		  nstrncpy(tim, BFLRG, trim(p, BOTH, " ()"), -1);};};};
-    fclose(fp);
+    fclose_safe(fp);
 
 /* figure out the status and timing */
     if (strcasecmp(sts, "ok") == 0)
@@ -1375,7 +1375,7 @@ static void watch_emit(donetdes *st, char *repfn, char *file,
 
 	fp = fopen_safe(repfn, "r");
 	if (fp == NULL)
-	   {fclose(htmlf);
+	   {fclose_safe(htmlf);
 	    return;};
 
 	while (TRUE)
@@ -1395,12 +1395,12 @@ static void watch_emit(donetdes *st, char *repfn, char *file,
 		   subst(s, clr, "", -1);
 
 		note(htmlf, FALSE, s);};};
-	fclose(fp);
+	fclose_safe(fp);
 
 	note(htmlf, TRUE,  "</pre>");
 	note(htmlf, TRUE,  "</body>");
 	note(htmlf, TRUE,  "</html>");
-	fclose(htmlf);};
+	fclose_safe(htmlf);};
 
     return;}
 
@@ -1504,7 +1504,7 @@ static int watch(donetdes *st, int c, char **v)
 
 	    free_strings(plog);};
 
-	fclose(repf);
+	fclose_safe(repf);
 
 	watch_emit(st, repfn, file, shm, ehm, clr);
 
@@ -1593,7 +1593,7 @@ static void start_watch(donetdes *st, char *exe)
     note(fp, TRUE, "rm -f %s", fn);
     note(fp, TRUE, "exit($status)");
 
-    fclose(fp);
+    fclose_safe(fp);
 
     chmod(fn, 0700);
 
@@ -2078,7 +2078,7 @@ static void readhost(donetdes *st, int log)
 	    else if (strncmp(p, "net", 3) == 0)
 	       push_tok(nlst, BFLRG, ' ', p);};
 
-	fclose(fp);};
+	fclose_safe(fp);};
 
     if (cdefenv("SHARED") == TRUE)
        st->shared = STRSAVE(cgetenv(FALSE, "SHARED"));
@@ -2435,7 +2435,7 @@ static void report(donetdes *st)
     run(FALSE, "mv -f %s %s", st->lnetfn, tlog);
 
 /* close the log while we operate on its contents */
-    fclose(Log);
+    fclose_safe(Log);
 
 /* filter junk out of net log and write report */
     fin  = open_file("r", tlog);
@@ -2469,9 +2469,9 @@ static void report(donetdes *st)
 		if (strstr(s, "Failed on") != NULL)
 		   st->err = 10;};};};
 
-    fclose(fout);
-    fclose(frpt);
-    fclose(fin);
+    fclose_safe(fout);
+    fclose_safe(frpt);
+    fclose_safe(fin);
     unlink_safe(tlog);
 
 /* reopen the log for remaining activities */
@@ -2524,7 +2524,7 @@ static void lockout(donetdes *st, char *host, char *uhost)
 		 note(lf, TRUE, "Command line arguments = %s", st->clargs);
 		 note(lf, TRUE, "Date = %s", run(FALSE, "date"));
 		 note(lf, TRUE, "User = %s", cgetenv(TRUE, "USER"));
-		 fclose(lf);};};};
+		 fclose_safe(lf);};};};
 
     return;}
 
@@ -2999,8 +2999,8 @@ static void fin_sect(donetdes *st, hfspec *sp, int nsp,
 		      fputs(s, Log);
 		      nl++;};};
 
-	     fclose(elog);
-	     fclose(fin);
+	     fclose_safe(elog);
+	     fclose_safe(fin);
 	     unlink_safe(file);};};
 
     if ((nl > 0) && (bld == FALSE))
@@ -3070,7 +3070,7 @@ static void finish(donetdes *st, double gti)
 
 	 fin_sect(st, sp, nsp, slog, sect, time);};
 
-    fclose(slog);
+    fclose_safe(slog);
 
 /* remove empty log.<host> files */
     run(FALSE, "find . -size 0c -name \"log.*\" -exec rm {} \\;");
@@ -3577,7 +3577,7 @@ int main(int c, char **v)
        rv = session(&state, exe, host, uhost);
 
     if (Log != NULL)
-       fclose(Log);
+       fclose_safe(Log);
 
     cleanup(&state);
 

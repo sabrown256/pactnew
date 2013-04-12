@@ -77,7 +77,7 @@ static void _PC_close_member_d(PROCESS *pp)
 
 /* conditional diagnostic messages */
     if (ps->debug)
-       {fclose(ps->diag);};
+       {SC_fclose_safe(ps->diag);};
 
     return;}
 

@@ -675,7 +675,7 @@ int main(int c, char **v)
     write_trailer(fo, inf);
 
     if (outf != NULL)
-       fclose(fo);
+       fclose_safe(fo);
 
     return(rv);}
 
