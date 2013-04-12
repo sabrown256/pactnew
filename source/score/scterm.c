@@ -1218,7 +1218,7 @@ int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
 
 /* close the terminal */
 	    SC_set_term_state(ts, fd);
-	    close(fd);};};
+	    SC_close_safe(fd);};};
 
 #endif
 
@@ -1311,7 +1311,7 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 
 /* close the terminal */
 	    SC_set_term_state(ts, fd);
-	    close(fd);};};
+	    SC_close_safe(fd);};};
 
 #endif
 
@@ -1465,7 +1465,7 @@ void SC_disconnect_tty(void)
        {if (ioctl(fd, TIOCNOTTY, NULL) < 0)
 	   SC_error(SC_NO_TTY,
 		    "COULDN'T DITCH CONTROLLING TERMINAL - SC_DISCONNECT_TTY");
-	close(fd);};
+	SC_close_safe(fd);};
 #endif
 
     return;}

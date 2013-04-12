@@ -907,7 +907,7 @@ void SC_file_access(int log)
 			  ret &= SC_fclose_safe(file[i]);};
 
 /* close the data socket */
-                  close(cfd);
+                  SC_close_safe(cfd);
 
                   REPLY(EXIT_MSG, ret);};
 

@@ -2462,7 +2462,7 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 /* diagnostic for leaked descriptors */
     if ((ps != NULL) && (ps->dbg_level & 4))
        {fb = fcntl(0, F_DUPFD, 2);
-	close(fb);};
+	close_safe(fb);};
 
 /* concatenate command line arguments into one big string */
     s = NULL;
@@ -2503,7 +2503,7 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 /* diagnostic for leaked descriptors */
     if ((ps != NULL) && (ps->dbg_level & 4))
        {fa = fcntl(0, F_DUPFD, fb);
-	close(fa);
+	close_safe(fa);
         if (fa == fb)
 	   _dbg(4, "no descriptors leaked\n");
 	else

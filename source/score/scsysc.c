@@ -1865,7 +1865,7 @@ static void _SC_print_redir(taskdesc *job, asyncstate *as,
 	       {SC_write_sigsafe(df, s, nc);
 		if (newl == TRUE)
 		   SC_write_sigsafe(df, "\n", 1);
-		close(df);}
+		SC_close_safe(df);}
 	    else
 	       job->print(job, as,
 			  "error opening file '%s' mode 0%o - %d\n",
@@ -1878,7 +1878,7 @@ static void _SC_print_redir(taskdesc *job, asyncstate *as,
 	       {SC_write_sigsafe(df, s, nc);
 		if (newl == TRUE)
 		   SC_write_sigsafe(df, "\n", 1);
-		close(df);}
+		SC_close_safe(df);}
 	    else
 	       job->print(job, as,
 			  "error opening file '%s' mode 0o%o - %d\n",

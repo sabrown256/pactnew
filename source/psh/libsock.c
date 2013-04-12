@@ -401,7 +401,7 @@ char **parse_conn(char *root)
 static int connect_close(int fd, client *cl)
    {
 
-    close(fd);
+    close_safe(fd);
 
     CLOG(cl, 1, "close socket %d", fd);
 

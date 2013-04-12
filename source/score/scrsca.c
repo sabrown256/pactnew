@@ -264,7 +264,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	       io_error(errno, "read of %s bytes on %d failed",
 			SC_itos(NULL, 0, MAXLINE, NULL), fd);
 
-	    close(fd);
+	    SC_close_safe(fd);
 
 	    if ((0 < nc) && (nc < MAXLINE))
 	       {if (stat(fname, &bf) == 0)
@@ -297,7 +297,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    if (nc < 0)
 	       io_error(errno, "read of %s bytes on %d failed",
 			SC_itos(NULL, 0, MAXLINE, NULL), fd);
-	    close(fd);
+	    SC_close_safe(fd);
 	    if (nc > 0)
 	       SC_strncpy(ru->cmd, MAXLINE, s, -1);};
 	CFREE(fname);
@@ -323,7 +323,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    if (nc < 0)
 	       io_error(errno, "read of %s bytes on %d failed",
 			SC_itos(NULL, 0, nc, NULL), fd);
-	    close(fd);
+	    SC_close_safe(fd);
 
 	    if (stat(fname, &bf) == 0)
 	       ru->uid = bf.st_uid;
@@ -349,7 +349,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    if (nc < 0)
 	       io_error(errno, "read of %s bytes on %d failed",
 			SC_itos(NULL, 0, nc, NULL), fd);
-	    close(fd);
+	    SC_close_safe(fd);
 
 	    if (nb == nc)
 	       SC_strncpy(ru->cmd, MAXLINE, si.pr_psargs, -1);};
@@ -377,7 +377,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    if (nc < 0)
 	       io_error(errno, "read of %s bytes on %d failed",
 			SC_itos(NULL, 0, nc, NULL), fd);
-	    close(fd);
+	    SC_close_safe(fd);
 
 	    if (stat(fname, &bf) == 0)
 	       ru->uid = bf.st_uid;
@@ -403,7 +403,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    if (nc < 0)
 	       io_error(errno, "read of %s bytes on %d failed",
 			SC_itos(NULL, 0, nc, NULL), fd);
-	    close(fd);
+	    SC_close_safe(fd);
 
 	    if (nb == nc)
 	       SC_strncpy(ru->cmd, MAXLINE, si.pr_psargs, -1);};
@@ -417,7 +417,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    if (nc < 0)
 	       io_error(errno, "read of %ld bytes on %d failed",
 			(long) sizeof(prusage_t), fd);
-	    close(fd);
+	    SC_close_safe(fd);
 
 	    if (nb == nc)
 	       {ru->minflt   = su.pr_minf;

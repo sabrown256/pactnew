@@ -66,16 +66,16 @@ static int _SC_posix_release(PROCESS *pp)
 /* stdin */
 	    if (SC_time_allow(1) == 0)
 	       {if (io[0] >= 0)
-		   close(io[0]);
+		   SC_close_safe(io[0]);
 		SC_time_allow(0);};
 
 /* stdout */
 	    if ((io[0] != io[1]) && (io[1] >= 0))
-	       close(io[1]);
+	       SC_close_safe(io[1]);
 
 /* stderr */
 	    if (io[2] >= 0)
-	       close(io[2]);
+	       SC_close_safe(io[2]);
 
 	    SC_process_state(pp, SC_PROC_IO);};};
 
@@ -115,7 +115,7 @@ static int _SC_posix_setup_tty(PROCESS *pp, int child)
 
 /* now close the master */
             if (in != pp->io[0])
-               {if (close(pp->io[0]) < 0)
+               {if (SC_close_safe(pp->io[0]) < 0)
                    SC_error(-1, "COULDN'T CLOSE MASTER - _SC_POSIX_SETUP_TTY");};
 
 	    tty = pp->tty;
@@ -218,7 +218,7 @@ static int _SC_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
     if (rv == TRUE)
        fd[nfd].fd = ofd;
     else
-       {close(ofd);
+       {SC_close_safe(ofd);
 	SC_error(SC_EXIT_ERRNO(), "COULD NOT DUP %s (%d/%d) - _SC_DUP_FD",
 		 fd[nfd].file, ofd, errno);};
 
@@ -264,11 +264,11 @@ static int _SC_posix_exec(PROCESS *cp, char **argv, char **env, char *mode)
 
 /* now that they are copied release the old values */
 	if (cio[1] != cio[0])
-	   {if (close(cio[1]) < 0)
+	   {if (SC_close_safe(cio[1]) < 0)
 	       SC_error(SC_NO_CLOSE,
 			"COULDN'T CLOSE STDOUT - _SC_POSIX_EXEC");};
 
-	if (close(cio[0]) < 0)
+	if (SC_close_safe(cio[0]) < 0)
 	   SC_error(SC_NO_CLOSE, "COULDN'T CLOSE STDIN - _SC_POSIX_EXEC");
 
 /* if this is a binary connection inform the parent of the binary formats */

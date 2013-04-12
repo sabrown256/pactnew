@@ -111,7 +111,7 @@ int SC_request_http(int fd, char *cmnd, char *url, char *vers)
 void SC_close_http(int fd)
    {
 
-    close(fd);
+    SC_close_safe(fd);
 
     return;}
 

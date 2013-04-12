@@ -173,7 +173,7 @@ int SC_close_log(SC_logfile log)
 
 /* interrupt sent while waiting for lock: global log NOT locked, return */
         if (status == -1)
-	   {close(global_log);
+	   {SC_close_safe(global_log);
 	    return(-1);};
 
 /* LOCK HELD: No returns allowed until lock released */
@@ -213,7 +213,7 @@ int SC_close_log(SC_logfile log)
 /* LOCK RELEASED */
  
 /* release our handle to the global log file resource */
-        close(global_log);};
+        SC_close_safe(global_log);};
 
 /* and finally, close the tmp log, deleting it in the process */
     if (log.file != NULL)

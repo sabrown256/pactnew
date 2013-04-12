@@ -237,7 +237,7 @@ static void _SC_tcp_acceptor(int fd, int mask, void *a)
 					     acc, rej, -1);
 	SC_ASSERT(pi != 0);}
     else
-       close(nfd);
+       SC_close_safe(nfd);
 
 #endif
 

@@ -961,7 +961,7 @@ static void _SC_time_file_open(char *s)
    {int fd;
 
     fd = SC_open_safe(s, O_CREAT, 0600);
-    close(fd);
+    SC_close_safe(fd);
     SC_remove(s);
 
     return;}

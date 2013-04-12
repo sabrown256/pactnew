@@ -105,7 +105,7 @@ int _SC_ping_host(char *host, int to, int fm)
     fd = SC_open_port(ph, 22, to, fm);
 
     if (fd > 0)
-       {close(fd);
+       {SC_close_safe(fd);
 	st = TRUE;}
     else
        st = FALSE;
