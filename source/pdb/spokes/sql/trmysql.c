@@ -298,7 +298,7 @@ FILE *_MYSQL_open(PDBfile *file, char *name, char *mode)
 /* otherwise prompt for pwd */
 	else
            {printf("password: ");
-	    fflush(stdout);
+	    SC_fflush_safe(stdout);
 	    SC_echo_off_file(stdin);
 	    pwd = fgets(s, MAXLINE, stdin);
 	    SC_LAST_CHAR(s) = '\0';
