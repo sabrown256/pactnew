@@ -1530,7 +1530,7 @@ conpool *SC_open_connection_pool(int n, char *sys, char *shell, char **env,
 /* take NFS stats before as a reference */
     SC_nfs_monitor(cp->ref_net, 8);
 
-/*    SC_gs.io_interrupts_on = TRUE; */
+/*    SC_set_io_interrupts(TRUE); */
 
     cp->as        = NULL;
     cp->show      = show;

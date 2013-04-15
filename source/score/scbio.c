@@ -1151,7 +1151,7 @@ static size_t _SC_bwrite(void *s, size_t bpi, size_t ni, FILE *fp)
     nw = _SC_bio_out(s, bpi, ni, bid);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+    SC_catch_io_interrupts(-1);
 
     return(nw);}
  
@@ -1216,7 +1216,7 @@ static u_int64_t _SC_blwrite(void *s, size_t bpi, u_int64_t ni, FILE *fp)
     nw = _SC_bio_out(s, bpi, ni, bid);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+    SC_catch_io_interrupts(-1);
 
     return(nw);}
  

@@ -865,11 +865,11 @@ static void _PG_X_connect_server(PG_device *dev)
  * but debugging gets to be horrendous, so ...
  */
 	else
-	   {PG_IO_INTERRUPTS(FALSE);
+	   {SC_set_io_interrupts(FALSE);
 	    _PG.tty_intr = FALSE;};};
 
 /* if interrupts were on before, turn them back on again */
-    PG_catch_interrupts(SC_gs.io_interrupts_on);
+    PG_catch_interrupts(-1);
 
     return;}
 
@@ -1517,7 +1517,7 @@ static void _PG_X_next_line(PG_device *dev, FILE *fp)
        putchar('\n');
 
 /* turn on SIGIO handler */
-    PG_catch_interrupts(SC_gs.io_interrupts_on);
+    PG_catch_interrupts(-1);
  
     return;}
  

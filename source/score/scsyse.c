@@ -398,7 +398,7 @@ static int _SC_do_session(PROCESS *pp,
     descriptors d;
     SC_evlpdes *pe;
 
-    SC_gs.io_interrupts_on = FALSE;
+    SC_set_io_interrupts(FALSE);
 
 /* create the event loop state */
     pe = SC_make_event_loop(NULL, NULL, _SC_process_end, -1, -1, -1);

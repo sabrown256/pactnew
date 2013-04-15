@@ -496,7 +496,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
        nw = _SC_fwrite_atm(s, bpi, ni, fp);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+    SC_catch_io_interrupts(-1);
 
     return(nw);}
  
@@ -2850,10 +2850,12 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
    {ssize_t rv;
 
 #ifdef AIX
+    int ioi;
     PFSignal_handler oh;
 
 /* turn off SIGIO handler */
-    if (SC_gs.io_interrupts_on == TRUE)
+    ioi = SC_set_io_interrupts(-1);
+    if (ioi == TRUE)
        oh = SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
 
 #endif
@@ -2896,7 +2898,7 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 #ifdef AIX
 
 /* turn on SIGIO handler */
-    if (SC_gs.io_interrupts_on == TRUE)
+    if (ioi == TRUE)
        SC_signal_action_n(SC_SIGIO, oh, NULL, 0, BLOCK_WITH_SIGIO, -1);
  
 #endif
@@ -3002,16 +3004,18 @@ size_t SC_fread_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t rv;
 
 #ifdef AIX
+    int ioi;
     PFSignal_handler oh;
 
 /* turn off SIGIO handler */
-    if (SC_gs.io_interrupts_on == TRUE)
+    ioi = SC_set_io_interrupts(-1);
+    if (ioi == TRUE)
        oh = SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
 
     rv = _SC_fread_safe(s, bpi, ni, fp);
 
 /* turn on SIGIO handler */
-    if (SC_gs.io_interrupts_on == TRUE)
+    if (ioi == TRUE)
        SC_signal_action_n(SC_SIGIO, oh, NULL, 0, BLOCK_WITH_SIGIO, -1);
  
 #else

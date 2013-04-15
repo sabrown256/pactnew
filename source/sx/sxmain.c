@@ -48,7 +48,7 @@ int main(int c, char **v, char **env)
 
     PD_init_threads(0, NULL);
 
-    PG_IO_INTERRUPTS(FALSE);
+    SC_set_io_interrupts(FALSE);
 
     cmd           = NULL;
     commnd_flag   = FALSE;
@@ -74,7 +74,7 @@ int main(int c, char **v, char **env)
 
 #ifndef AIX
 # ifndef linux
-    PG_IO_INTERRUPTS(TRUE);
+    SC_set_io_interrupts(TRUE);
 # endif
 #endif
 
@@ -91,7 +91,7 @@ int main(int c, char **v, char **env)
 		     trap_error = FALSE;
 		     break;
                 case 'i' :                       /* IO not interrupt driven */
-		     PG_IO_INTERRUPTS(FALSE);
+		     SC_set_io_interrupts(FALSE);
                      break;
                 case 'l' :                              /* load Scheme file */
                      order[n_files++] = ++i;
@@ -104,7 +104,7 @@ int main(int c, char **v, char **env)
                      break;
                 case 'p' :                       /* do everything (PDBView) */
 #ifdef AIX
-                     PG_IO_INTERRUPTS(TRUE);
+                     SC_set_io_interrupts(TRUE);
 #endif
 		     SX_gs.sm = SX_MODE_PDBVIEW;
                      break;
@@ -117,7 +117,7 @@ int main(int c, char **v, char **env)
                      break;
                 case 's' :                                       /* SX mode */
                      SX_gs.gr_mode = FALSE;
-		     PG_IO_INTERRUPTS(FALSE);
+		     SC_set_io_interrupts(FALSE);
                      break;
                 case 't' :                                /* time the loads */
                      tflag = TRUE;

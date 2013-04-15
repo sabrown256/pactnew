@@ -274,9 +274,9 @@ int _SC_tcp_serve(int fd, sckades ad, void *a,
 					     _SC_tcp_acceptor, NULL, -1);
 
 /* if all channels are OK activate the interrupt handling */
-	SC_gs.io_interrupts_on = pi;
-	if (pi)
-	   SC_catch_event_loop_interrupts(pe, SC_gs.io_interrupts_on);
+	SC_set_io_interrupts(pi);
+	if (pi == TRUE)
+	   SC_catch_event_loop_interrupts(pe, pi);
 
 	lp.a   = a;
 	lp.ad  = ad;
