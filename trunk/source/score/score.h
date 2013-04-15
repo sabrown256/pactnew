@@ -352,7 +352,6 @@ typedef struct s_SC_proc_info SC_proc_info;
 
 typedef union u_SC_address SC_address;
 typedef struct s_SC_process_rusedes SC_process_rusedes;
-typedef struct s_SC_thread_proc SC_thread_proc;
 typedef struct s_PROCESS PROCESS;
 typedef struct s_SC_message SC_message;
 typedef struct s_SC_pending_msg SC_pending_msg;
@@ -429,16 +428,6 @@ struct s_SC_process_rusedes
     double dusrt;            /* rate of user time */
     double dmem;};           /* rate of memory change */
 
-struct s_SC_thread_proc
-   {int tid;
-    int current_flushed_process;
-    int debug;
-    int msh_syntax;
-    int debug_proc;
-    SC_array *wait_list;
-    SC_array *process_list;
-    FILE *diag;};
-
 struct s_PROCESS
    {int status;              /* process status - SC_RUNNING, SC_EXITED, ... */
     int reason; /* reason for latest status change - also child exit status */
@@ -476,9 +465,11 @@ struct s_PROCESS
     char *stop_time;
 
     SC_process_rusedes *pru;
-
+#if 0
     SC_thread_proc *tstate;       /* state for all processes owned by thread */
-
+#else
+    void *tstate;       /* state for all processes owned by thread */
+#endif
     int open_retry;   /* time in milliseconds to retry select open failures */
     SC_iodes fd[3];      /* file desc for stdin, stdout, stderr redirection */
 

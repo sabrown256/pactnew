@@ -26,9 +26,6 @@
 #define JOB_COMPLETE      210
 #define SERVER_LOG        211
 
-asyncstate
- _SC_server_state;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -94,7 +91,8 @@ static void _SC_signal_server(int sig)
     if (sig == SIGPIPE)
        exit(SC_EXIT_IO);
 
-    as    = &_SC_server_state;
+    GET_SERVER_STATE(as);
+
     state = as->server;
 
     SC_block_file(stdin);
@@ -189,7 +187,8 @@ static int _SC_server_complete(taskdesc *job, char *msg)
 
 	SC_START_ACTIVITY(state, JOB_COMPLETE);
 
-	as   = &_SC_server_state;
+	GET_SERVER_STATE(as);
+
 	rtry = job->finish(job, as, state->server);
 	if (rtry == FALSE)
 	   {inf = &job->inf;
@@ -234,7 +233,7 @@ static int _SC_server_check_jobs(int *pst, int *pnr, int *pnc,
 
     SC_START_ACTIVITY(state, SERVER_CHECK);
 
-    as = &_SC_server_state;
+    GET_SERVER_STATE(as);
 
     n = SC_array_get_n(state->tasks);
 
@@ -303,7 +302,8 @@ static int _SC_server_exit(parstate *state, int fl)
 
     SC_START_ACTIVITY(state, SERVER_EXIT);
 
-    as = &_SC_server_state;
+    GET_SERVER_STATE(as);
+
     if (fl == -1)
        ex = _SC_server_check_jobs(NULL, &nr, &nc, state);
     else
@@ -340,7 +340,7 @@ static void _SC_send_heartbeat(parstate *state, int nr, int nc)
     extern void _SC_kill_runaways(void);
     asyncstate *as;
 
-    as = &_SC_server_state;
+    GET_SERVER_STATE(as);
 
     if (state->done == FALSE)
        {_SC_kill_runaways();
@@ -378,7 +378,7 @@ int _SC_server_heartbeat(int *prv, void *a)
 
     SC_save_exited_children();
 
-    as = &_SC_server_state;
+    GET_SERVER_STATE(as);
 
 /* if the parent PID changes - for example being orphaned
  * then we are done
@@ -449,7 +449,7 @@ static int _SC_server_env(parstate *state, char *t)
 
     SC_START_ACTIVITY(state, SERVER_ENV);
 
-    as = &_SC_server_state;
+    GET_SERVER_STATE(as);
 
     if (_SC.slog_env == TRUE)
        state->print(state, "<env> rcv %s", t);
@@ -494,7 +494,7 @@ static void _SC_server_command(parstate *state, char *t)
 
     SC_START_ACTIVITY(state, SERVER_COMMAND);
 
-    as = &_SC_server_state;
+    GET_SERVER_STATE(as);
 
     p = NULL;
 
@@ -549,8 +549,9 @@ static void _SC_server_job(parstate *state, char *t)
 
     SC_START_ACTIVITY(state, SERVER_JOB);
 
-    as = &_SC_server_state;
-    p  = NULL;
+    GET_SERVER_STATE(as);
+
+    p = NULL;
 
     t = SC_strtok(t, ":", p);
     if (t == NULL)
@@ -669,7 +670,8 @@ static void _SC_server_in_reject(int fd, int mask, void *a)
     PROCESS *pp;
     taskdesc *job;
 
-    as    = &_SC_server_state;
+    GET_SERVER_STATE(as);
+
     state = (parstate *) a;
 
     SC_START_ACTIVITY(state, IN_REJECT);
@@ -707,7 +709,7 @@ static int _SC_exec_srv_core(char *shell, char *fname, int na,
 
     SC_START_ACTIVITY(state, SERVER_CORE);
 
-    as = &_SC_server_state;
+    GET_SERVER_STATE(as);
 
 /* re/set the signal handlers */
     SC_setup_sig_handlers(_SC_server_handler, as, TRUE);
@@ -821,7 +823,8 @@ int SC_exec_server(char *shell, char *fname, int na, int show, int ignore,
 
     filter = NULL;
     st     = -1;
-    as     = &_SC_server_state;
+
+    GET_SERVER_STATE(as);
 
     as->ppid = getppid();
 

@@ -599,7 +599,7 @@ int SC_process_state(PROCESS *pp, int ev)
  */
 
 void _SC_set_process_status(PROCESS *pp, int sts, int rsn, char *tm)
-   {
+   {SC_thread_proc *ps;
 
     if (tm == NULL)
 
@@ -616,9 +616,10 @@ void _SC_set_process_status(PROCESS *pp, int sts, int rsn, char *tm)
     pp->stop_time = tm;
 
     if (pp->id != 0)
-       _SC_log_proc(pp->tstate->tid,
-		    "change status on process #%d (%d) to %d/%d",
-		    pp->index, pp->id, sts, rsn);
+       {ps = pp->tstate;
+	_SC_log_proc(ps->tid,
+		     "change status on process #%d (%d) to %d/%d",
+		     pp->index, pp->id, sts, rsn);};
     return;}
 
 /*--------------------------------------------------------------------------*/

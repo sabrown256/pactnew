@@ -21,15 +21,16 @@ struct s_descriptors
 #ifdef DEBUG
 
 # define START_LOG                                                           \
-   {lgf = io_open("log.wrap", "w")
+   {SC_thread_proc _ps;                                                      \
+    _ps = SC_get_thr_processes(-1);                                          \
+    _lg = _ps->lgf;                                                          \
+    _lg = io_open("log.wrap", "w")
 
 # define WRITE_LOG(_x, _s)                                                   \
-    io_printf(lgf, "\n%s %s", _x, _s)
+    io_printf(_lg, "\n%s %s", _x, _s)
 
 # define END_LOG                                                             \
-    io_close(lgf);}
-
-static FILE *lgf = NULL;
+    io_close(_lg);}
 
 #else
 

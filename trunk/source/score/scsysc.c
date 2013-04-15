@@ -35,9 +35,6 @@
     SC_LAST_CHAR(_s) = '\0';                                                 \
     strcat(_s, " ");}
 
-static parstate
- *_SC_run_task_state = NULL;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -63,12 +60,13 @@ void dprsubtask(subtask *t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_SET_RUN_TASK_STATE - set the _SC_run_task_state to STATE */
+/* _SC_SET_RUN_TASK_STATE - set the thread parstate to STATE */
 
 void _SC_set_run_task_state(parstate *state)
-   {
+   {SC_thread_proc *ps;
 
-    _SC_run_task_state = state;
+    ps = _SC_get_thr_processes(-1);
+    ps->task = state;
 
     return;}
 
@@ -463,7 +461,8 @@ void dstatelog(char *fmt, ...)
 
     SC_VDSNPRINTF(TRUE, msg, fmt);
 
-    state = _SC_run_task_state;
+    GET_TASK_STATE(state);
+
     if (state != NULL)
        {tm  = SC_datef();
 	tms = tm + 11;
