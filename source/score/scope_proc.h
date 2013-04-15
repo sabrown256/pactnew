@@ -195,6 +195,22 @@
 #define SC_END_ACTIVITY(_s)                                                  \
     (_s)->doing = _oa;}
 
+
+#define GET_SERVER_STATE(_a)                                                 \
+   {SC_thread_proc *_ps;                                                     \
+    _ps = _SC_get_thr_processes(-1);                                         \
+    _a  = &_ps->server;}
+
+#define GET_CLIENT_STATE(_a)                                                 \
+   {SC_thread_proc *_ps;                                                     \
+    _ps = _SC_get_thr_processes(-1);                                         \
+    _a  = &_ps->client;}
+
+#define GET_TASK_STATE(_a)                                                   \
+   {SC_thread_proc *_ps;                                                     \
+    _ps = _SC_get_thr_processes(-1);                                         \
+    _a  = _ps->task;}
+
 /*--------------------------------------------------------------------------*/
 
 /*                             TYPEDEFS AND STRUCTS                         */
@@ -252,6 +268,7 @@ typedef struct s_subtask subtask;
 typedef struct s_SC_process_group SC_process_group;
 typedef struct s_parstate parstate;
 typedef struct s_asyncstate asyncstate;
+typedef struct s_SC_thread_proc SC_thread_proc;
 
 struct s_conpool
    {int n_jobs;                    /* number of jobs launched in pool */
@@ -397,6 +414,20 @@ struct s_taskdesc
     void (*add)(taskdesc *job);
     int (*remove)(taskdesc *job);};
 
+struct s_SC_thread_proc
+   {int tid;
+    int current_flushed_process;
+    int debug;
+    int msh_syntax;
+    int debug_proc;
+    SC_array *wait_list;
+    SC_array *process_list;
+    asyncstate server;
+    asyncstate client;
+    parstate *task;
+    FILE *lgf;
+    FILE *diag;};
+
 
 enum e_SC_proc_kind
    {SC_CHILD,
@@ -514,6 +545,12 @@ extern int
 
 extern PROCESS
  *SC_get_terminal_process(void);
+
+
+/* SCMEMT.C declarations */
+
+extern SC_thread_proc
+ *_SC_get_thr_processes(int id);
 
 
 /* SCPMAN.C declarations */

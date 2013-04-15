@@ -371,9 +371,6 @@ extern emu_thread_info
 extern SC_evlpdes
  **_SC_get_ev_loop(int id);
 
-extern SC_thread_proc
- *_SC_get_thr_processes(int id);
-
 
 /* SCSTR.C declarations */
 

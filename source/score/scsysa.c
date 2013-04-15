@@ -36,12 +36,6 @@ struct s_execdes
     char **env;
     fspec *filter;};
 
-extern asyncstate
- _SC_server_state;
-
-static asyncstate
- _SC_async_state;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -57,9 +51,12 @@ static asyncstate
 int SC_signal_async(int sig)
    {int rv;
     conpool *cp;
+    asyncstate *cs;
+
+    GET_CLIENT_STATE(cs);
 
     rv = TRUE;
-    cp = _SC_async_state.pool;
+    cp = cs->pool;
     if (cp != NULL)
        {if (cp->active == TRUE)
 	   {switch (sig)
@@ -131,7 +128,8 @@ void _SC_process_output(int fd, int mask, void *a)
     parstate *state;
     asyncstate *as;
 
-    as    = &_SC_server_state;
+    GET_SERVER_STATE(as);
+
     state = (parstate *) a;
 
     SC_START_ACTIVITY(state, EXEC_OUT_ACCEPT);
@@ -189,7 +187,8 @@ void _SC_process_out_reject(int fd, int mask, void *a)
     parstate *state;
     asyncstate *as;
 
-    as    = &_SC_server_state;
+    GET_SERVER_STATE(as);
+
     state = (parstate *) a;
 
     SC_START_ACTIVITY(state, EXEC_OUT_REJECT);
@@ -232,7 +231,8 @@ static int _SC_job_complete(taskdesc *job, char *msg)
 
     SC_START_ACTIVITY(state, EXEC_JOB_COMPLETE);
 
-    as   = &_SC_async_state;
+    GET_CLIENT_STATE(as);
+
     rtry = job->finish(job, as, FALSE);
 
 /* if successful completion */
@@ -265,7 +265,8 @@ static int _SC_process_end(int *prv, void *a)
     parstate *state;
 
     state = (parstate *) a;
-    as    = &_SC_server_state;
+
+    GET_SERVER_STATE(as);
 
     SC_START_ACTIVITY(state, EXEC_END);
 
@@ -523,8 +524,11 @@ int SC_exec_async_s(char *shell, char **env,
     SC_evlpdes *pe;
     fspec *filter;
     taskdesc *job;
+    asyncstate *cs;
     parstate state;
     SC_contextdes hnd;
+
+    GET_CLIENT_STATE(cs);
 
 /* count commands */
     SC_ptr_arr_len(nc, cmnds);
@@ -540,8 +544,7 @@ int SC_exec_async_s(char *shell, char **env,
     else
        SC_ptr_arr_len(nd, dirs);
 
-    _SC_setup_async_state(&_SC_async_state,
-			  SC_get_sys_length_max(TRUE, FALSE));
+    _SC_setup_async_state(cs, SC_get_sys_length_max(TRUE, FALSE));
 
 /* save old interrupt state */
     hnd = SC_which_signal_handler(SC_SIGIO);
@@ -639,7 +642,10 @@ int SC_exec_async_h(char *shell, char **env,
     fspec *filter;
     taskdesc *job;
     parstate state;
+    asyncstate *cs;
     SC_contextdes hnd;
+
+    GET_CLIENT_STATE(cs);
 
 /* count commands */
     SC_ptr_arr_len(nc, cmnds);
@@ -661,7 +667,7 @@ int SC_exec_async_h(char *shell, char **env,
     else
        SC_ptr_arr_len(nd, dirs);
 
-    _SC_setup_async_state(&_SC_async_state, ln);
+    _SC_setup_async_state(cs, ln);
 
 /* save old interrupt state */
     hnd = SC_which_signal_handler(SC_SIGIO);
@@ -750,6 +756,9 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
     parstate state;
     SC_contextdes osi;
     conpool *cpo;
+    asyncstate *cs;
+
+    GET_CLIENT_STATE(cs);
 
     to    = ed->to;
     na    = ed->na;
@@ -762,10 +771,10 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
     nf = SC_gs.assert_fail;
 
     as  = NULL;
-    cpo = _SC_async_state.pool;
-    sto = _SC_async_state.to_stdout;
+    cpo = cs->pool;
+    sto = cs->to_stdout;
 
-    _SC_setup_async_state(&_SC_async_state, 0);
+    _SC_setup_async_state(cs, 0);
 
 /* save old interrupt state */
     ioi = SC_gs.io_interrupts_on;
@@ -835,8 +844,8 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
     SC_gs.io_interrupts_on = ioi;
     SC_signal_n(SC_SIGIO, osi.f, osi.a);
 
-    _SC_async_state.pool      = cpo;
-    _SC_async_state.to_stdout = sto;
+    cs->pool      = cpo;
+    cs->to_stdout = sto;
 
     nf = SC_gs.assert_fail - nf;
     if (nf > 0)
@@ -1007,6 +1016,9 @@ int _SC_exec_one(void **a, int *it)
     char *cm, **sa;
     execdes *ed;
     SC_array *out;
+    asyncstate *cs;
+
+    GET_CLIENT_STATE(cs);
 
     mn = it[0];
     mx = it[1];
@@ -1026,7 +1038,7 @@ int _SC_exec_one(void **a, int *it)
 
 	 sa = SC_array_done(out);
 	 if (sa != NULL)
-	    _SC_print_filtered(&_SC_async_state, sa, ed->filter, -1, NULL);
+	    _SC_print_filtered(cs, sa, ed->filter, -1, NULL);
 
 	 SC_free_strings(sa);
 
@@ -1065,20 +1077,23 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
     conpool *cpo;
     fspec *filter;
     execdes ed;
+    asyncstate *cs;
+
+    GET_CLIENT_STATE(cs);
 
 /* filter junk messages out of response */
     filter = _SC_read_filter(fname);
 
-    cpo = _SC_async_state.pool;
-    sto = _SC_async_state.to_stdout;
+    cpo = cs->pool;
+    sto = cs->to_stdout;
 
-    _SC_setup_async_state(&_SC_async_state, 0);
+    _SC_setup_async_state(cs, 0);
 
     if (lname != NULL)
-       {_SC_async_state.log = io_open(lname, "a");
-	SC_setbuf(_SC_async_state.log, NULL);}
+       {cs->log = io_open(lname, "a");
+	SC_setbuf(cs->log, NULL);}
     else
-       _SC_async_state.log = NULL;
+       cs->log = NULL;
 
     SC_ptr_arr_len(n, cmnds);
 
@@ -1123,10 +1138,10 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
 #endif
 
     if (lname != NULL)
-       io_close(_SC_async_state.log);
+       io_close(cs->log);
 
-    _SC_async_state.pool      = cpo;
-    _SC_async_state.to_stdout = sto;
+    cs->pool      = cpo;
+    cs->to_stdout = sto;
 
     _SC_free_filter(filter);
     CFREE(ed.res);
