@@ -410,7 +410,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	    0);
 
     if (flag)
-       {PG_IO_INTERRUPTS(TRUE);
+       {SC_set_io_interrupts(TRUE);
 
 	axsca  = PG_ptr_attr_glb("axis-char-angle");
 	axslxf = PG_ptr_attr_glb("axis-label-x-format");

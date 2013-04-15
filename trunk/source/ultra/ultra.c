@@ -825,7 +825,7 @@ static void UL_init_env(SS_psides *si)
 /* you doublely want to do interrupt based terminal I/O so as to not
  * have ULTRA hog the CPU while polling for input (especially on a CRAY)
  */
-    PG_IO_INTERRUPTS(TRUE);
+    SC_set_io_interrupts(TRUE);
 
     return;}
 
@@ -1115,7 +1115,7 @@ int main(int c, char **v, char **env)
 /* start out with interrupts off until we are set
  * that is until we are ready to process the command line args
  */
-    PG_IO_INTERRUPTS(FALSE);
+    SC_set_io_interrupts(FALSE);
 
     commnd_flag = FALSE;
     tflag       = FALSE;
@@ -1164,7 +1164,7 @@ int main(int c, char **v, char **env)
 		     return(1);
 		     break;
                 case 'i' :                       /* IO not interrupt driven */
-		     PG_IO_INTERRUPTS(FALSE);
+		     SC_set_io_interrupts(FALSE);
                      break;
                 case 'l' :                              /* load Scheme file */
                      order[n_files++] = ++i;
@@ -1186,7 +1186,7 @@ int main(int c, char **v, char **env)
                      break;
                 case 's' :                                   /* Scheme mode */
                      SX_gs.gr_mode = FALSE;
-		     PG_IO_INTERRUPTS(FALSE);
+		     SC_set_io_interrupts(FALSE);
                      break;
                 case 't' :                                /* time the loads */
                      tflag = TRUE;

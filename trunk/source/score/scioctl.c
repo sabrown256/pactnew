@@ -26,9 +26,13 @@ int
 /* SC_CATCH_EVENT_LOOP_INTERRUPTS - activate the SIGIO handler */
 
 void SC_catch_event_loop_interrupts(SC_evlpdes *pe, int flag)
-   {
+   {int ioi;
 
-    if ((pe != NULL) && flag && SC_gs.io_interrupts_on)
+    ioi = SC_set_io_interrupts(-1);
+    if (flag == -1)
+       flag = ioi;
+
+    if ((pe != NULL) && flag && ioi)
        SC_signal_action_n(SC_SIGIO, pe->sigio, NULL, 0, BLOCK_WITH_SIGIO, -1);
     else
        SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
@@ -456,7 +460,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 		 if (fn != NULL)
 		    (*fn)(pd->fd, rev, a);};
 
-             SC_catch_event_loop_interrupts(pe, SC_gs.io_interrupts_on);};
+             SC_catch_event_loop_interrupts(pe, -1);};
 
 	nrdy -= (nacc + nrej);}
 
@@ -538,9 +542,9 @@ int SC_process_event_loop(PROCESS *pp, void *a,
 					 acc, rej, -1);
 
 /* if all channels are OK activate the interrupt handling */
-    SC_gs.io_interrupts_on = pi;
-    if (pi)
-       SC_catch_event_loop_interrupts(pe, SC_gs.io_interrupts_on);
+    SC_set_io_interrupts(pi);
+    if (pi == TRUE)
+       SC_catch_event_loop_interrupts(pe, pi);
 
     rv = SC_event_loop(pe, a, -1);
 
@@ -559,11 +563,12 @@ int SC_process_event_loop(PROCESS *pp, void *a,
 /* SC_SET_FD_ASYNC_STREAMS - setup asynchronous I/O when using STREAMS */
 
 static int SC_set_fd_async_streams(int fd, int state)
-   {int rv;
+   {int rv, ioi;
 
     rv = FALSE;
 
-    if (SC_gs.io_interrupts_on)
+    ioi = SC_set_io_interrupts(-1);
+    if (ioi == TRUE)
        {
 
 #if defined(HAVE_ASYNC_STREAMS)
@@ -614,12 +619,13 @@ static int SC_set_fd_async_streams(int fd, int state)
  */
 
 int SC_set_fd_async_fasync(int fd, int state, int pid)
-   {int arg, status, rstrct, rv;
+   {int ioi, arg, status, rstrct, rv;
     SC_contextdes hnd;
 
     rv = FALSE;
 
-    if (SC_gs.io_interrupts_on)
+    ioi = SC_set_io_interrupts(-1);
+    if (ioi == TRUE)
 
 /* get the control flag */
        {arg = fcntl(fd, F_GETFL);
@@ -1164,19 +1170,50 @@ void SC_rl_io_callback_file(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_CATCH_IO_INTERRUPTS - activate the SIGIO handler */
+/* SC_SET_IO_INTERRUPTS - depending on FLAG set the io_interrupts_on state
+ *                      - if TRUE or FALSE set it to FLAG
+ *                      - otherwise do nothing
+ *                      - return the old value
+ */
+
+int SC_set_io_interrupts(int flag)
+   {int rv;
+
+    rv = SC_gs.io_interrupts_on;
+    if ((flag == TRUE) || (flag == FALSE))
+       SC_gs.io_interrupts_on = flag;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_CATCH_IO_INTERRUPTS - activate the SIGIO handler
+ *                        - if FLAG is -1 use the current value of
+ *                        - the io_interrupts_on state
+ */
 
 void SC_catch_io_interrupts(int flag)
    {
 
+#if 0
+    int ioi;
+
+    ioi = SC_set_io_interrupts(-1);
+    if (flag == -1)
+       flag = ioi;
+
     if (_SC.evloop != NULL)
        SC_catch_event_loop_interrupts(_SC.evloop, flag);
 
-    else if (flag && SC_gs.io_interrupts_on)
+    else if ((flag == TRUE) && (ioi == TRUE))
        SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
 			  0, BLOCK_WITH_SIGIO, -1);
     else
        SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
+#else
+    SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
+#endif
 
     return;}
 

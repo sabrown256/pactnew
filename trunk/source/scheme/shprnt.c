@@ -88,7 +88,7 @@ void SS_print(SS_psides *si, object *strm, object *obj, char *begin, char *end)
 	PRINT(str, "%s", end);
 
 /* turn on SIGIO handler */
-	SC_catch_io_interrupts(SC_gs.io_interrupts_on);};
+	SC_catch_io_interrupts(-1);};
 
     return;}
 
@@ -146,7 +146,7 @@ char *_SS_printout(SS_psides *si, char *fmt, object *obj)
 	s = CSTRSAVE(_SS.vbf);};
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+    SC_catch_io_interrupts(-1);
 
     return(s);}
 
@@ -167,7 +167,7 @@ static object *_SS_sprint(SS_psides *si, object *obj, char *fmt, object *strm)
     CFREE(s);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+    SC_catch_io_interrupts(-1);
 
     return(SS_f);}
 
@@ -427,7 +427,7 @@ char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
 	s = CSTRSAVE(_SS.vbf);};
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+    SC_catch_io_interrupts(-1);
 
 #else
 
@@ -490,7 +490,7 @@ static object *_SSI_fprintf(SS_psides *si, object *argl)
     SS_set_put_string(si, ps);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+    SC_catch_io_interrupts(-1);
 
     return(SS_f);}
 

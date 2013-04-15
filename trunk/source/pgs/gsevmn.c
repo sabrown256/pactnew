@@ -23,6 +23,9 @@ SC_evlpdes
 void PG_catch_interrupts(int flg)
    {
 
+    if (flg == -1)
+       flg = SC_set_io_interrupts(-1);
+
     SC_catch_event_loop_interrupts(_PG_ev_loop, TRUE);
 
     return;}

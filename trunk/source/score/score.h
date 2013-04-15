@@ -924,6 +924,7 @@ extern void
  SC_catch_io_interrupts(int flag);
 
 extern int
+ SC_set_io_interrupts(int flag),
  SC_register_event_loop_callback(SC_evlpdes *pe, int type, void *p,
 				 PFFileCallback acc, PFFileCallback rej,
 				 int pid),

@@ -541,7 +541,7 @@ systems support this through the use of assignable interrupts. Input handled
 this way is said to be interrupt driven. In PGS, when a screen window is
 opened all of the machinery is put into place to allow interrupt driven I/O.
 The application switches interrupt handling on and off through the macro
-PG_IO_INTERRUPTS which take a value of TRUE to turn it on and FALSE to turn
+SC_set_io_interrupts which take a value of TRUE to turn it on and FALSE to turn
 it off. When I/O interrupts are on input from the terminal is saved in a
 buffer to be copied into the buffer of the next GETLN call, and input from
 the windowing system is dispatched to the appropriate event handler. After

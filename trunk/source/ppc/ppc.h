@@ -127,7 +127,6 @@
 #define PC_set_cooked_state         SC_set_cooked_state
 
 #define PC_exit_all                 SC_exit_all
-#define PC_io_interrupts_on         SC_gs.io_interrupts_on
 
 
 #define PC_BINARY_MODEP(x)  (strchr(&((x)[1]), 'b') != NULL)

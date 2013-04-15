@@ -308,12 +308,12 @@ int main(int argc, char *argv[])
     theta     = 30.0;
 
 /* process the command line arguments */
-    PG_IO_INTERRUPTS(TRUE);
+    SC_set_io_interrupts(TRUE);
     for (i = 1; i < argc; i++)
         {if (argv[i][0] == '-')
             {switch (argv[i][1])
                 {case 'i' :
-                      PG_IO_INTERRUPTS(FALSE);
+                      SC_set_io_interrupts(FALSE);
 		      break;};};};
 
     SC_setbuf(STDOUT, NULL);

@@ -505,7 +505,7 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 
 	PD_init_threads(0, NULL);
 
-	PG_IO_INTERRUPTS(FALSE);
+	SC_set_io_interrupts(FALSE);
 
 	SS_init(si, "Aborting with error", SX_end,
 		TRUE, SS_interrupt_handler,
@@ -516,7 +516,7 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 	SS_set_put_string(si, SS_fputs);
 	SC_set_get_line(io_gets);
 
-	PG_IO_INTERRUPTS(FALSE);
+	SC_set_io_interrupts(FALSE);
 
 	SX_gs.gr_mode = TRUE;
 	SX_gs.qflag   = TRUE;
