@@ -2560,6 +2560,7 @@ static void write_do_run_db(client *cl, state *st)
 	    fprintf(fp, "default DBG %s\n", path_base(ldbg));}
 	else
 	   {cnd = lst_push(cnd, "gdb");
+	    cnd = lst_push(cnd, "ts");
 	    cnd = lst_push(cnd, "tv");
 	    cnd = lst_push(cnd, "vg");
 	    cnd = lst_push(cnd, "vgd");
@@ -2904,7 +2905,7 @@ int main(int c, char **v, char **env)
 	       "sed", "grep", "awk", "sort",
 	       "ls", "cp", "rm", "mv",
 	       "find", "chmod", "cat",
-	       "env", "mkdir", "nm", "perdb",
+	       "env", "mkdir", "nm", "perdb", "tsan",
 	       NULL);
 
     st.have_db = launch_perdb(c, v);
