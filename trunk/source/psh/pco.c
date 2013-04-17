@@ -2905,7 +2905,7 @@ int main(int c, char **v, char **env)
 	       "sed", "grep", "awk", "sort",
 	       "ls", "cp", "rm", "mv",
 	       "find", "chmod", "cat",
-	       "env", "mkdir", "nm", "perdb", "tsan",
+	       "env", "mkdir", "nm", "perdb",
 	       NULL);
 
     st.have_db = launch_perdb(c, v);
