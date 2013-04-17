@@ -54,6 +54,12 @@ static FILE
 static dir_stack
  dstck;
 
+static int
+ db_log_level = 1;
+
+int
+ _assert_fail = 0;
+
 extern void
  unamef(char *s, int nc, char *wh);
 
@@ -2897,6 +2903,26 @@ int is_running(int pid)
 	   ok = FALSE;};
 
     return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LOG_ACTIVITY - log messages to FLOG */
+
+void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
+   {char msg[BFLRG];
+    FILE *log;
+
+    if ((ilog == TRUE) && (flog != NULL) && (ilev <= db_log_level))
+       {log = fopen_safe(flog, "a");
+	if (log != NULL)
+	   {VA_START(fmt);
+	    VSNPRINTF(msg, BFLRG, fmt);
+	    VA_END;
+	    fprintf(log, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
+	    fclose_safe(log);};};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

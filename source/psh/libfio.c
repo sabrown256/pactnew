@@ -14,12 +14,6 @@
 
 /* define only for SCOPE_SCORE_COMPILE */
 
-int
- _assert_fail = 0;
-
-static int
- db_log_level = 1;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -178,24 +172,33 @@ int fflush_safe(FILE *fp)
  */
 
 int block_fd(int fd, int on)
-   {int ov, nv, rv;
+   {int ov, nv, rv, ev, zc, nz;
 
-    ov = 0;
-    ov = fcntl(fd, F_GETFL, ov);
-    rv = ((ov & O_NDELAY) == 0);
+    nz = 10;
+    for (zc = 0; zc < nz; zc++)
+        {nv = -2;
+	 ov = 0;
+	 ov = fcntl(fd, F_GETFL, ov);
+	 rv = ((ov & O_NDELAY) == 0);
 
 /* block */
-    if (on == TRUE)
-       nv = fcntl(fd, F_SETFL, ov & ~O_NDELAY);
+	 if (on == TRUE)
+	    nv = fcntl(fd, F_SETFL, ov & ~O_NDELAY);
 
 /* unblock */
-    else if (on == FALSE)
-       nv = fcntl(fd, F_SETFL, ov | O_NDELAY);
+	 else if (on == FALSE)
+	    nv = fcntl(fd, F_SETFL, ov | O_NDELAY);
 
-    else
-       nv = 0;
+         if (nv == -1)
+	    {ev = errno;
+	     if ((ev == EACCES) ||
+		 (ev == EAGAIN) ||
+		 (ev == EINTR) ||
+		 (ev == ENOLCK))
+	        {sleep(1);
+		 continue;};};
 
-    ASSERT(nv != -1);
+	 zc = nz;};
 
     return(rv);}
 
@@ -421,26 +424,6 @@ int unlink_safe(char *s)
 
     return(rv);}
  
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* LOG_ACTIVITY - log messages to FLOG */
-
-void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
-   {char msg[BFLRG];
-    FILE *log;
-
-    if ((ilog == TRUE) && (flog != NULL) && (ilev <= db_log_level))
-       {log = fopen_safe(flog, "a");
-	if (log != NULL)
-	   {VA_START(fmt);
-	    VSNPRINTF(msg, BFLRG, fmt);
-	    VA_END;
-	    fprintf(log, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
-	    fclose_safe(log);};};
-
-    return;}
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

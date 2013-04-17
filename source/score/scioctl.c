@@ -1178,10 +1178,13 @@ void SC_rl_io_callback_file(FILE *fp)
 
 int SC_set_io_interrupts(int flag)
    {int rv;
+    SC_thread_proc *ps;
 
-    rv = SC_gs.io_interrupts_on;
+    ps = _SC_get_thr_processes(-1);
+
+    rv = ps->io_interrupts;
     if ((flag == TRUE) || (flag == FALSE))
-       SC_gs.io_interrupts_on = flag;
+       ps->io_interrupts = flag;
 
     return(rv);}
 

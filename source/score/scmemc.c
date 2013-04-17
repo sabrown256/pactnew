@@ -856,7 +856,11 @@ int SC_mem_trim(size_t pad)
     rv = FALSE;
 
 #if defined(LINUX) || defined(CYGWIN)
+    SC_LOCKON(SC_mm_lock);
+
     rv = malloc_trim(pad);
+
+    SC_LOCKOFF(SC_mm_lock);
 #endif
 
     return(rv);}
