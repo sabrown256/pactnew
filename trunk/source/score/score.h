@@ -626,7 +626,6 @@ struct s_SC_scope_public
     int comm_rank;
     int comm_size;
     int errn;
-    int io_interrupts_on;
     int mm_debug;
     int radix;
     int unary_plus;

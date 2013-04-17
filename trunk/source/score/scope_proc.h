@@ -420,6 +420,7 @@ struct s_SC_thread_proc
     int debug;
     int msh_syntax;
     int debug_proc;
+    int io_interrupts;
     SC_array *wait_list;
     SC_array *process_list;
     asyncstate server;

@@ -13,13 +13,12 @@
 
 #undef LONGLONG_MAX
 
-#undef LIBFIO
-#undef SCOPE_SCORE_PREPROC
-#include "../psh/common.h"
-#include "../psh/libfio.c"
-
 #include "scstd.h"
 #include "scope_typeh.h"
+
+#undef LIBFIO
+#undef SCOPE_SCORE_PREPROC
+#include "../psh/libfio.c"
 
 #define DBFSZ                  512
 #define BITS_DEFAULT             8

@@ -147,9 +147,6 @@ extern char
 
 /* LIBFIO.C declarations */
 
-extern void
- PS_log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...);
-
 extern int
  PS_open_safe(const char *path, int flags, mode_t mode),
  PS_close_safe(int fd),
@@ -286,7 +283,8 @@ extern void
  PS_push_path(int end, char *dpath, char *path),
  PS_build_path(char *base, ...),
  PS_key_val(char **key, char **val, char *s, char *dlm),
- PS_unamef(char *s, int nc, char *wh);
+ PS_unamef(char *s, int nc, char *wh),
+ PS_log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...);
 
 extern int
  PS_lst_length(char **lst),
