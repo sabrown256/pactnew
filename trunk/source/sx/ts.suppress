@@ -1,0 +1,81 @@
+#
+# TS.SUPPRESS - suppressions for TSAN
+#
+# 266 before
+
+{
+  sup_date_1
+  ThreadSanitizer:Race
+  fun:__tzfile_compute
+  fun:__tz_convert
+  fun:SC_localtime
+  fun:SC_datef
+}
+
+{
+  sup_self_1
+  ThreadSanitizer:Race
+  fun:_SC_omp_thread_self
+  fun:_SC_eth_lockon
+  fun:_SC_do_new_thread
+}
+
+{
+  sup_lock_1
+  ThreadSanitizer:Race
+  fun:_SC_omp_lockon
+  fun:_SC_eth_lockon
+  fun:_SC_do_new_thread
+}
+
+{
+  sup_lock_2
+  ThreadSanitizer:Race
+  fun:_SC_omp_init_lock
+  fun:_SC_omp_lockon
+  fun:_SC_eth_lockon
+}
+
+{
+  sup_lock_3
+  ThreadSanitizer:Race
+  fun:_SC_eth_lockon
+  fun:SC_chunk_split
+}
+
+{
+  sup_lock_4
+  ThreadSanitizer:Race
+  fun:_SC_eth_lockon
+  fun:_SC_do_new_thread
+}
+
+{
+  sup_lock_5
+  ThreadSanitizer:Race
+  fun:omp_unset_lock
+  fun:_SC_omp_lockoff
+  fun:_SC_eth_lockoff
+}
+
+{
+  sup_lock_6
+  ThreadSanitizer:Race
+  fun:_SC_eth_lockon
+  fun:_SC_alloc_ns
+}
+
+{
+  sup_mem_1
+  ThreadSanitizer:Race
+  fun:free
+  fun:_SC_free_ns
+}
+
+{
+  sup_mem_2
+  ThreadSanitizer:Race
+  fun:malloc_consolidate.part.3
+  fun:malloc_trim
+  fun:SC_mem_trim
+}

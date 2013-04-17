@@ -265,6 +265,7 @@ typedef struct s_jobinfo jobinfo;
 typedef struct s_taskdesc taskdesc;
 typedef struct s_tasklst tasklst;
 typedef struct s_subtask subtask;
+typedef struct s_execdes execdes;
 typedef struct s_SC_process_group SC_process_group;
 typedef struct s_parstate parstate;
 typedef struct s_asyncstate asyncstate;
@@ -414,6 +415,19 @@ struct s_taskdesc
     void (*add)(taskdesc *job);
     int (*remove)(taskdesc *job);};
 
+struct s_execdes
+   {int n;
+    int to;
+    int na;
+    int show;
+    int dmp;
+    int ignore;
+    int *res;
+    char *shell;
+    char **cmnds;
+    char **env;
+    fspec *filter;};
+
 struct s_SC_thread_proc
    {int tid;
     int current_flushed_process;
@@ -423,6 +437,7 @@ struct s_SC_thread_proc
     int io_interrupts;
     SC_array *wait_list;
     SC_array *process_list;
+    execdes ed;
     asyncstate server;
     asyncstate client;
     parstate *task;

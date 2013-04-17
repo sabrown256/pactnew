@@ -7,7 +7,7 @@
 
 # from AMD 64 bit Intel
 {
-   <insert a suppression name here>
+   sup_X_1
    Memcheck:Param
    write(buf)
    fun:__write_nocancel
