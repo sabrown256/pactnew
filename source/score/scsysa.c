@@ -21,21 +21,6 @@
 #define EXEC_LOG            104
 #define EXEC_CORE           105
 
-typedef struct s_execdes execdes;
-
-struct s_execdes
-   {int n;
-    int to;
-    int na;
-    int show;
-    int dmp;
-    int ignore;
-    int *res;
-    char *shell;
-    char **cmnds;
-    char **env;
-    fspec *filter;};
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -865,24 +850,26 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
 int SC_exec(char ***out, char *cmnd, char *shell, int to)
    {int st;
     SC_array *str;
-    execdes ed;
+    SC_thread_proc *ps;
     static int dbg = FALSE;
 
-    ed.n      = 1;
-    ed.to     = to;
-    ed.na     = 1;
-    ed.show   = FALSE;
-    ed.dmp    = dbg;
-    ed.ignore = FALSE;
-    ed.shell  = shell;
-    ed.cmnds  = &cmnd;
-    ed.env    = NULL;
-    ed.filter = NULL;
-    ed.res    = &st;
+    ps = _SC_get_thr_processes(-1);
+
+    ps->ed.n      = 1;
+    ps->ed.to     = to;
+    ps->ed.na     = 1;
+    ps->ed.show   = FALSE;
+    ps->ed.dmp    = dbg;
+    ps->ed.ignore = FALSE;
+    ps->ed.shell  = shell;
+    ps->ed.cmnds  = &cmnd;
+    ps->ed.env    = NULL;
+    ps->ed.filter = NULL;
+    ps->ed.res    = &st;
 
     str = SC_STRING_ARRAY();
 
-    st = _SC_exec(0, str, &ed);
+    st = _SC_exec(0, str, &ps->ed);
 
 /* return command output in good condition */
     *out = _SC_array_string_join(&str);
@@ -1072,8 +1059,10 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
    {int i, n, st, sto;
     conpool *cpo;
     fspec *filter;
-    execdes ed;
     asyncstate *cs;
+    SC_thread_proc *ps;
+
+    ps = _SC_get_thr_processes(-1);
 
     GET_CLIENT_STATE(cs);
 
@@ -1093,42 +1082,42 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
 
     SC_ptr_arr_len(n, cmnds);
 
-    ed.n      = n;
-    ed.to     = to;
-    ed.na     = na;
-    ed.show   = show;
-    ed.dmp    = dmp;
-    ed.ignore = ignore;
-    ed.cmnds  = cmnds;
-    ed.shell  = shell;
-    ed.env    = env;
-    ed.filter = filter;
-    ed.res    = CMAKE_N(int, n);
+    ps->ed.n      = n;
+    ps->ed.to     = to;
+    ps->ed.na     = na;
+    ps->ed.show   = show;
+    ps->ed.dmp    = dmp;
+    ps->ed.ignore = ignore;
+    ps->ed.cmnds  = cmnds;
+    ps->ed.shell  = shell;
+    ps->ed.env    = env;
+    ps->ed.filter = filter;
+    ps->ed.res    = CMAKE_N(int, n);
     for (i = 0; i < n; i++)
-        ed.res[i] = 0;
+        ps->ed.res[i] = 0;
 
 /* run each command until it succeeds or definitively fails
  * try to avoid failing on system fault type errors
  */
     st = 0;
     if (SC_n_threads > 1)
-       {SC_do_tasks((PFInt) _SC_exec_one, &ed, n, 0, TRUE);
+       {SC_do_tasks((PFInt) _SC_exec_one, &ps->ed, n, 0, TRUE);
 	for (i = 0; i < n; i++)
-	    st |= ed.res[i];}
+	    st |= ps->ed.res[i];}
     else
 #if 1
        {int it[2];
 	void *a;
 
-	a     = &ed;
+	a     = &ps->ed;
 	it[0] = 0;
 	it[1] = n;
 	st = _SC_exec_one(&a, it);
 	for (i = 0; i < n; i++)
-	    st |= ed.res[i];};
+	    st |= ps->ed.res[i];};
 #else
        {for (i = 0; i < n; i++)
-	    {st |= _SC_exec_one(i, &ed);
+	    {st |= _SC_exec_one(i, &ps->ed);
 	     if ((ignore == FALSE) && (st == TRUE))
 	        break;};};
 #endif
@@ -1140,7 +1129,7 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
     cs->to_stdout = sto;
 
     _SC_free_filter(filter);
-    CFREE(ed.res);
+    CFREE(ps->ed.res);
 
     return(st);}
 
