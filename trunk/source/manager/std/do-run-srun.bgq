@@ -16,7 +16,7 @@ Env SLURM_EXIT_IMMEDIATE = 255
 CROSS : srun {
 
    Exe   = srun
-   Flags = --runjob-opts=--verbose=OFF
+   Flags = --runjob-opts=--verbose=OFF -p $Pool
    Flags = ($?DO_RUN_SRUN_ENV == 0) ? $CROSS_Flags : $CROSS_Flags $DO_RUN_SRUN_ENV
 }
 
