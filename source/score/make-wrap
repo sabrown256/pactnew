@@ -37,12 +37,14 @@ if ($err != 0) then
    set ut    = ""
    set sys   = `system-id`
 
+   pushd ../dev >& /dev/null
    set lst = ""
-   foreach d ( `ls ../dev` )
+   foreach d ( * )
       if (-d $d) then
-         set lst = ( $lst $d/bin )
+         set lst = ( $lst $cwd/$d/bin )
       endif
    end
+   popd >& /dev/null
 
    if ($?DAS_ROOT == 1) then
       set lst = ( $lst $DAS_ROOT/pactnew/bin $DAS_ROOT/pact/bin )
