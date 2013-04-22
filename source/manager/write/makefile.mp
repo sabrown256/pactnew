@@ -5,17 +5,12 @@
 # include "cpyright.h"
 #
 
-echo "mf-> a"
-
 unalias *
 
 # put these in shell variables since
 # prune-env will remove them as environment variables
 set Log    = $1
 set ScrDir = $2
-
-echo "mf-> b $Log"
-echo "mf-> c $ScrDir"
 
 eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
@@ -30,8 +25,11 @@ NoteD $Log "   Distribution Makefile - Makefile"
 Note $Log ""
 
 dbmget $Log SysDir^     \
-            Platforms^  \
-            Pck
+            Platforms
+
+echo "mf-> a $Log"
+echo "mf-> b $SysDir"
+echo "mf-> c $Platforms"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

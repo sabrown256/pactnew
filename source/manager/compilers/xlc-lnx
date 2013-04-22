@@ -1,0 +1,124 @@
+#
+# XLC-LNX - define IBM XLC compiler for BG/X front ends
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run analyze/rpath -a /usr/${LIB}
+
+## NOTE: this should eventually be put in a site specific file
+#setenv PATH         ${PATH}:/usr/local/bin
+#setenv OBJECT_MODE  ${Bits}
+
+WARN_PATTERN = "WARNING: (E) (W) (I)"
+ERR_PATTERN  = "Error: (S)"
+
+Tool CC {
+   Exe       = xlc
+   Flags     = -D_ALL_SOURCE
+   Flags    += [ _env_ = STD_C ;             # C standard flags
+                 C89   = -qlanglvl=stdc89 ;
+                 C99   = -qlanglvl=stdc99 ;
+                 X89   = -qlanglvl=extc89 ;
+                 X99   = -qlanglvl=extc99 ;
+                 X11   = -qlanglvl=extc1x ]
+   Flags    =+ -qldbl128                     # 16 byte long double
+   Flags    =+ -qsuppress=1500-010:1500-029:1506-1300:1506-1298:1506-273 
+#   Flags    =+ -qnostaticlink
+   Flags    += [ _env_ = Bits ;              # address bit size
+                 *     = -q* ]
+   Flags    += [ _cmd_ = -p ;                # profiling
+	         on    = -qpdf1 ]
+   Debug     = -g -O0
+   Optimize  = -g -O -qmaxmem=32768
+   Version   = -qversion
+}
+
+Tool FC {
+   Exe     = xlf90
+}
+
+Tool CXX {
+   Exe       = xlC
+   Flags     = 
+   Debug     = -g -O0
+   Optimize  = -g -O
+   Version   = -qversion
+}
+
+Tool LD {
+   RPath    = -Wl,-rpath,@
+   Flags   += [ _env_ = HOSTOS ;
+                Linux = -rdynamic ]
+   Flags   += [ _env_ = HOSTOS ;
+                Linux = -Wl,--disable-new-dtags ] # save us from RUN_PATH
+   Flags   += [ _cmd_ = -p ;                      # profiling
+	        on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;                    # coverage analysis
+	        on    = -lgcov ]
+   Lib      = -lc
+}
+
+Tool LD {
+   RPath    = -Wl,-rpath,@
+   Flags   += [ _cmd_ = -p ;                      # profiling
+	        on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;                    # coverage analysis
+	        on    = -lgcov ]
+   Lib      = -lc
+}
+
+Tool Lex {
+   Flags  = -D_ALL_SOURCE -D_LARGE_FILES -qsuppress=1506-1300:1506-1298
+   Flags += [ _env_ = STD_C ;                # C standard flags
+              C89   = -qlanglvl=stdc89 ;
+              C99   = -qlanglvl=stdc99 ]
+   Flags += [ _env_ = Bits ;                 # address bit size
+              *     = -q* ]
+}
+
+Group Std {
+   CC_Flags = ${CC_Flags}
+   FC_Flags = ${FC_Flags}
+   LD_Flags = ${LD_Flags}
+}
+
+Group Cfg {
+   Use = Std
+}
+
+Group Shared {
+   LD_Exe    = xlc
+   LD_Flags  = -G
+   LD_Flags += [ _env_ = Bits ;             # address bit size
+                 *     = -q* ]
+}
+
+Group PThread {
+   CC_Exe = xlc_r
+   FC_Exe = xlf90_r
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Exe    = xlc_r
+   FC_Exe    = xlf90_r
+   CC_Flags  = -qsmp=omp:noauto
+   FC_Flags  = -qsmp=omp:noauto
+   Lex_Flags = -qsmp=omp:noauto
+   LD_Flags  = -qsmp=omp:noauto
+}
+
+.c.i:
+	${CC} -P $<
+
+.f.o:
+	${FC} ${FFLAGS} ${LDFLAGS} -c $<
+
+define GETSOCKNAME_LONG
+
+include serial
+

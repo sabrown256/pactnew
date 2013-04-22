@@ -2230,14 +2230,15 @@ static void process_use(client *cl, char *sg, char *oper)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO_PLATFORM - process a platform command */
+/* DO_PLATFORM - process a platform command
+ *             - syntax: platform <cfg> <alias> <instbase> [<args>*]
+ */
 
 static void do_platform(client *cl, char *oper, char *value)
    {int i, ok;
     char t[BFLRG];
-    char *p, *cfg, *aid, **spec;
+    char *p, *cfg, *aid, *sib, **spec;
 
-    st.analyzep = FALSE;
     st.np++;
 
     spec = tokenize(value, " \t\n\r", 0);
@@ -2263,7 +2264,9 @@ static void do_platform(client *cl, char *oper, char *value)
     vstrcat(t, BFLRG, " -a %s", aid);
 
 /* add instbase */
-    vstrcat(t, BFLRG, " -i %s", spec[1]);
+    sib = dbget(cl, TRUE, "InstBase");
+    if ((IS_NULL(sib) == FALSE) && (strcmp(sib, "none") != 0))
+       vstrcat(t, BFLRG, " -i %s", spec[1]);
 
 /* add other options for this platform */
     for (i = 2; spec[i] != NULL; i++)
@@ -2337,9 +2340,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 	 parse_line(cl, line, key, oper, value, BFLRG);
 
-/* handle platform directives
- * syntax: platform <cfg> <alias> <instbase> [<args>*]
- */
+/* handle platform directives */
 	 if (strcmp(key, "platform") == 0)
             do_platform(cl, oper, value);
 
@@ -2742,14 +2743,19 @@ static void analyze_config(client *cl, char *base)
 /* setup the environment for programs which analyze features */
     setup_analyze_env(cl, base);
 
-    push_dir(st.dir.cfg);
+    if (st.np < 1) then
+       {separator(Log);
+        noted(Log, "Analyzing system on %s", st.host);
+        note(Log, TRUE, "");
+
+        push_dir(st.dir.cfg);
 
 /* read the file which does the analysis */
-    if (file_exists("../analyze/program-analyze") == TRUE)
-       read_config(cl, "program-analyze", TRUE);
+        if (file_exists("../analyze/program-analyze") == TRUE)
+           read_config(cl, "program-analyze", TRUE);
 
-    run(BOTH, "rm * > /dev/null 2>&1");
-    pop_dir();
+        run(BOTH, "rm * > /dev/null 2>&1");
+        pop_dir();};
 
     noted(Log, "");
 
@@ -2765,8 +2771,6 @@ static void summarize_config(client *cl)
 
     if ((st.np < 1) && (file_executable("analyze/summary") == TRUE))
        printf("%s\n", run(BOTH, "analyze/summary"));
-
-    pco_save_db(cl, NULL);
 
     return;}
 
@@ -3149,6 +3153,8 @@ int main(int c, char **v, char **env)
 	check_dir(cl);};
 
     summarize_config(cl);
+
+    pco_save_db(cl, NULL);
 
     finish_config(cl, base);
 
