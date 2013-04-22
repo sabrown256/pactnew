@@ -971,6 +971,7 @@ switch ($Cmnd)
               set ucfg = `gen-cfg $Configuration`
               set dir  = $gdir
            endif
+           echo ""
            echo "Configuring from $ucfg ($cmod)"
            unset gdir
         endif
@@ -1096,7 +1097,6 @@ switch ($Cmnd)
         set GenFiles = ""
         set GenFiles = ( $GenFiles package configured )
         set GenFiles = ( $GenFiles make-def make-macros Makefile )
-        set GenFiles = ( $GenFiles env-mio )
         foreach i ( $GenFiles )
            flog $Log $RM $EtcDir/$i
         end
@@ -2321,7 +2321,6 @@ CFG_DONE:
            set EtcFiles = ( $EtcFiles Makefile make-def make-macros package )
            set EtcFiles = ( $EtcFiles env-pact.csh env-pact.sh )
            set EtcFiles = ( $EtcFiles env-pact.dk env-pact.mod )
-           set EtcFiles = ( $EtcFiles env-mio )
         endif
         Note $Log "EtcFiles = $EtcFiles"
 
