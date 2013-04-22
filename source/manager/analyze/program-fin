@@ -19,7 +19,7 @@ run write/scconfig.h      $Log $ScrDir
 run write/scdecls.h       $Log $ScrDir
 run write/syntax.h        $Log $ScrDir
 run write/spokes.scm      $Log $ScrDir
-run write/env-mio         $Log $ScrDir
+#run write/env-mio         $Log $ScrDir
 run write/install-pact    $Log $ScrDir
 run write/smake           $Log $ScrDir
 

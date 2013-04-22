@@ -119,9 +119,6 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set LogFile = $LogDir/$Cmnd
-$RM $LogFile
-
 if ($#argv > 0) then
    if ("$1" == "-time") then
       set Time = ""
@@ -568,7 +565,6 @@ switch ($Cmnd)
 #--------------------------------------------------------------------------
 
    case config:
-
         if (!(-x /bin/true) && !(-x /usr/bin/true)) then
            echo "ERROR: /bin/true not executable - exiting"
            exit(1)
@@ -618,17 +614,16 @@ switch ($Cmnd)
 	setenv Bits  `$ScrDir/nbit -d`
 
         set Configuration = ""
-        set ExplSystem    = FALSE
         set Method        = 2
         set reconfig      = FALSE
         set mpi           = FALSE
         set python        = FALSE
         set shared        = FALSE
         set openmp        = FALSE
+        set platform      = FALSE
         set pthread       = FALSE
         set pydir         = ""
         set pyexe         = "python"
-        set sid           = ""
         set flst          = ""
         set dbcfg         = ""
         set ucfg          = ""
@@ -649,7 +644,7 @@ switch ($Cmnd)
            switch ($1)
               case -a:
                    shift
-                   set sid = $1
+                   setenv SESSION_CONFIG $1
                    breaksw
               case -b:
                    shift
@@ -718,7 +713,7 @@ switch ($Cmnd)
                    echo ""
                    echo "Usage: dsys config [-a <sid>] [-b 32 | 64] [-c] [-db <db>]"
                    echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
-                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp <path>] [-o] [-O] [-os <sys-id>]"
+                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp <path>] [-o] [-O]"
                    echo "                   [-p] [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
                    echo ""
                    echo "        -a         set the system id for this config"
@@ -736,7 +731,6 @@ switch ($Cmnd)
                    echo "                   special value '.' for path computed from compiler location (old default)"
                    echo "        -o         build an absolutely optimizied version"
                    echo "        -O         build an mixed debuggable/optimizied version"
-                   echo "        -os        explicitly set the hardware/OS/release system id"
                    echo "        -p         build a profiling version"
                    echo "        -v         display the Version of the Source Control System"
                    echo "        -V         configuration/build makefiles verbose"
@@ -821,16 +815,11 @@ switch ($Cmnd)
                    setenv DbgOpt  optimize
                    set PArgs = ( $PArgs "-o" )
                    breaksw
-              case -os:
-                   shift
-                   setenv System  $1
-                   set ExplSystem = TRUE
-                   set IncDir     = $SysDir/include
-                   set EnvCsh     = $EtcDir/env-pact.csh
-                   set EnvSh      = $EtcDir/env-pact.sh
-                   breaksw
               case -p:
                    set PArgs = ( $PArgs "-p" )
+                   breaksw
+              case -plt:
+                   set platform = TRUE
                    breaksw
               case -py:
                    set python = TRUE
@@ -873,6 +862,56 @@ switch ($Cmnd)
 # provide context for child processes
         setenv DSYS_TARGET pact_config
 
+# set the configuration for this system
+        if ($?SESSION_CONFIG == 1) then
+           setenv System `$CfgMan use`
+        else
+           setenv System `$CfgMan add $sid`
+        endif
+
+# now that we have the system, reset the variables that depend on it
+        set SysDir = $DevDir/$System
+        set IncDir = $SysDir/include
+        set EtcDir = $SysDir/etc
+        set BinDir = $SysDir/bin
+        set LibDir = $SysDir/lib
+        set ScmDir = $SysDir/scheme
+        set LogDir = $SysDir/log
+        set PACT   = $BinDir/pact
+
+        setenv PERDB  $BinDir/perdb
+        setenv GEXEC  $BinDir/gexec
+
+        set EnvCsh = $EtcDir/env-pact.csh
+        set EnvSh  = $EtcDir/env-pact.sh
+
+        set temp   = $SHELL
+        set CurrSh = $temp:t
+        setenv CURR_SH $CurrSh
+
+# source control system variables
+        source pact-scs
+
+# set up some items in the working environment
+        set path = ( . $BinDir $ScrDir $path )
+
+# make sure the log directory is there - do not wait for later
+        if (!(-d $LogDir)) then
+           mkdir -p $LogDir
+        endif
+
+        InitLog Log $LogDir/config
+
+        Note $Log "System    = $System"
+        Note $Log "SysDir    = $SysDir"
+        Note $Log "Args      = $nargs"
+        Note $Log "ConfigDir = $ConfigDir"
+
+        flog $Log umask
+
+        flog $Log $RM *.core *~
+
+# figure out from where configuration info is coming
         set gdir = gen/$Arch
         if (!(-d $gdir)) then
            mkdir -p $gdir >& /dev/null
@@ -902,14 +941,14 @@ switch ($Cmnd)
 
 # if no configuration is specified - generate from scratch
            if ("$Configuration" == "") then
-              echo "Generating configuration from command line options"
               call GEN_CONFIG()
+              set cmod = "command line options"
               set ucfg = $gdir/$Configuration
               set dir  = $gdir
 
 # if file exists as is use it
            else if (-f $Configuration) then
-              echo "Using specified configuration $Configuration"
+              set cmod = "full path file"
               set ucfg = $gdir/$Configuration
               set dir  = $gdir
 
@@ -918,7 +957,7 @@ switch ($Cmnd)
               set inf   = ( `gen-cfg-root $Configuration` )
               set croot = $inf[1]
               if ($croot == none) then
-                 echo "Using configuration $Configuration"
+                 set cmod = "existing file"
                  set ucfg = $gdir/$Configuration
                  set dir  = $gdir
               endif
@@ -928,63 +967,13 @@ switch ($Cmnd)
    
 # if there still is no config file - generate from what we know
            if ("$ucfg" == "") then
-              echo "Generating configuration $Configuration from name"
+              set cmod = "generated file"
               set ucfg = `gen-cfg $Configuration`
-   	   set dir  = $gdir
+              set dir  = $gdir
            endif
+           echo "Configuring from $ucfg ($cmod)"
            unset gdir
         endif
-
-
-# set the configuration for this system
-        if ("$sid" == "") then
-           setenv System `$CfgMan use`
-        else
-           setenv System `$CfgMan add $sid`
-        endif
-
-# now that we have the system, reset the variables that depend on it
-        set SysDir = $DevDir/$System
-        set IncDir = $SysDir/include
-        set BinDir = $SysDir/bin
-        set LibDir = $SysDir/lib
-        set LogDir = $SysDir/log
-        set ScmDir = $SysDir/scheme
-        set PACT   = $BinDir/pact
-
-        setenv PERDB  $BinDir/perdb
-        setenv GEXEC  $BinDir/gexec
-
-        if ($ExplSystem == FALSE) then
-           set EnvCsh = $EtcDir/env-pact.csh
-           set EnvSh  = $EtcDir/env-pact.sh
-        endif
-
-        set temp   = $SHELL
-        set CurrSh = $temp:t
-        setenv CURR_SH $CurrSh
-
-# source control system variables
-        source pact-scs
-
-# set up some items in the working environment
-        set path = ( . $BinDir $ScrDir $path )
-
-# make sure the log directory is there - do not wait for later
-        if (!(-d $LogDir)) then
-           mkdir -p $LogDir
-        endif
-
-        InitLog Log $LogDir/config
-
-        Note $Log "System    = $System"
-        Note $Log "SysDir    = $SysDir"
-        Note $Log "Args      = $nargs"
-        Note $Log "ConfigDir = $ConfigDir"
-
-        flog $Log umask
-
-        flog $Log $RM *.core *~
 
 # make sure that the installation directories exist
         setenv OS_Name     `uname -s`
@@ -1058,14 +1047,16 @@ switch ($Cmnd)
            endsw
 	end
 
-# set path for PERDB - spawned by PCO
-        flog $Log set dbopt = ( -f $EtcDir/cfg )
-        flog $Log $RM $EtcDir/cfg*
-
+# setup for PERDB session
+        flog $Log setenv PERDB_IDLE_TIMEOUT 600
         flog $Log setenv PERDB_PATH $EtcDir/cfg
+
 	flog $Log $PERDB -l -c -s
 
 	flog $Log $PERDB PACT_VERSION=$PACTVer
+
+        flog $Log set dbopt = ( -f $EtcDir/cfg )
+        flog $Log $RM $EtcDir/cfg*
 
 	if (($Method == 2) && (-x $BinDir/pco)) then
            flog $Log set PConf = ( $BinDir/pco $dbopt -env $cwd/pact.env -l )
@@ -1123,7 +1114,6 @@ switch ($Cmnd)
 
 # do the main configuration work
         if ("$ucfg" != "") then
-           NoteD $Log "Using $Configuration to configure this PACT installation."
            Note $Log "Command: $PConf $PArgs -s $System $ucfg"
            $PConf -s $System $PArgs $ucfg
            set RStatus = $status
@@ -1138,6 +1128,7 @@ switch ($Cmnd)
            NoteD $Log "There is no $Configuration in $ConfigDir"
            set RStatus = 3
         endif
+
         unset dir
         if ($RStatus != 0) then
            goto CFG_DONE
@@ -1241,43 +1232,46 @@ switch ($Cmnd)
         ftee $Log $DSYS pact $Opt
 
         Separator $Log
-        NoteD $Log ""
-        NoteD $Log "Configuration for version $PACTVer complete"
-        NoteD $Log ""
 
-        echo $cwd
-        rehash
+   	flog $Log $PERDB -l quit:
+
+        if ($platform == FALSE) then
+           NoteD $Log ""
+           NoteD $Log "Configuration for version $PACTVer complete"
+           NoteD $Log ""
+
+           echo $cwd
+           rehash
 
 # create empty extensions directories if they don't exist already
-        set ExtDirs = ( $BaseDir/sx/applications/extensions $BaseDir/ultra/applications/extensions )
-        foreach d ($ExtDirs)
-           if (-d $d:h) then
-              if (!(-d $d)) then
-                 flog $Log mkdir $d
+           set ExtDirs = ( $BaseDir/sx/applications/extensions $BaseDir/ultra/applications/extensions )
+           foreach d ($ExtDirs)
+              if (-d $d:h) then
+                 if (!(-d $d)) then
+                    flog $Log mkdir $d
+                 endif
               endif
-           endif
-        end
-
-	flog $Log $PERDB -l quit:
+           end
 
 # figure out which shell you are using
-        NoteD $Log ""
-        NoteD $Log "Your shell is $CURR_SH.  Consequently, you should do:"
-        NoteD $Log ""
-        if (($CURR_SH != csh) && ($CURR_SH != tcsh)) then
-           NoteD $Log "   . $EnvSh"
-        else
-           NoteD $Log "   source $EnvCsh"
+           NoteD $Log ""
+           NoteD $Log "Your shell is $CURR_SH.  Consequently, you should do:"
+           NoteD $Log ""
+           if (($CURR_SH != csh) && ($CURR_SH != tcsh)) then
+              NoteD $Log "   . $EnvSh"
+           else
+              NoteD $Log "   source $EnvCsh"
+           endif
+           NoteD $Log ""
+           NoteD $Log "into your current environment before proceeding to do work"
+           NoteD $Log "on the PACT system not covered by the installation process."
+
+           set ETime = `$TIMER -b $BeginTime`
+
+           NoteD $Log ""
+           NoteD $Log "PACT configured ($RStatus/$ETime)"
+           NoteD $Log ""
         endif
-        NoteD $Log ""
-        NoteD $Log "into your current environment before proceeding to do work"
-        NoteD $Log "on the PACT system not covered by the installation process."
-
-        set ETime = `$TIMER -b $BeginTime`
-
-        NoteD $Log ""
-        NoteD $Log "PACT configured ($RStatus/$ETime)"
-        NoteD $Log ""
 
 CFG_DONE:
 	unset dbopt
@@ -1908,7 +1902,9 @@ CFG_DONE:
 #--------------------------------------------------------------------------
 
    case install:
-        ftee $LogFile install-pact
+        InitLog Log $LogDir/install
+
+        ftee $Log install-pact
         set RStatus = $gstatus[1]
 
         breaksw
@@ -1959,6 +1955,7 @@ CFG_DONE:
 #            - do-net run
 
    case net-update:
+        InitLog Log $LogDir/net-update
 
         set CArgs    = ""
         set DArgs    = ""
@@ -2020,15 +2017,15 @@ CFG_DONE:
            shift
         end
 
-        InitLog LogFile $LogDir/net-update
+        InitLog Log $LogDir/net-update
 
         set DO_PACT = $MngDir/do-pact
 
-        flog $LogFile $ScrDir/scs-update
-        Note $LogFile do-net -e $DO_PACT $DArgs $CArgs
+        flog $Log $ScrDir/scs-update
+        Note $Log do-net -e $DO_PACT $DArgs $CArgs
 
-#        do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $LogFile
-	fexec $LogFile do-net -e $DO_PACT $DArgs $CArgs @b tee -ai $LogFile
+#        do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $Log
+	fexec $Log do-net -e $DO_PACT $DArgs $CArgs @b tee -ai $Log
         set RStatus = $gstatus[1]
 
         breaksw
@@ -2105,53 +2102,53 @@ CFG_DONE:
            echo "Rebuilding $Cfg"
         endif
 
-        InitLog LogFile $LogDir/rebuild
+        InitLog Log $LogDir/rebuild
 
-        flog $LogFile setenv SESSION_CONFIG $Cfg
-        flog $LogFile source $DevDir/$Cfg/etc/env-pact.csh
+        flog $Log setenv SESSION_CONFIG $Cfg
+        flog $Log source $DevDir/$Cfg/etc/env-pact.csh
 
-        NoteD $LogFile -n "   Re-compiling ... "
-        Note $LogFile ""
-        flog $LogFile $DSYS build
+        NoteD $Log -n "   Re-compiling ... "
+        Note $Log ""
+        flog $Log $DSYS build
         set BStat = $status
         if ($BStat != 0) then
-           NoteD $LogFile "failed"
+           NoteD $Log "failed"
            exit($BStat)
         else
-           NoteD $LogFile "succeeded"
+           NoteD $Log "succeeded"
         endif
         
-        NoteD $LogFile -n "   Re-testing ..... "
-        Note $LogFile ""
-        flog $LogFile $DSYS test
+        NoteD $Log -n "   Re-testing ..... "
+        Note $Log ""
+        flog $Log $DSYS test
         set TStat = $status
         if ($TStat != 0) then
-           NoteD $LogFile "failed"
+           NoteD $Log "failed"
            exit($TStat)
         else
-           NoteD $LogFile "succeeded"
+           NoteD $Log "succeeded"
         endif
 
-        NoteD $LogFile -n "   Installing ..... "
-        Note $LogFile ""
-        flog $LogFile install-pact
+        NoteD $Log -n "   Installing ..... "
+        Note $Log ""
+        flog $Log install-pact
         set IStat = $status
         if ($IStat != 0) then
-           NoteD $LogFile "failed"
+           NoteD $Log "failed"
            exit($IStat)
         else
-           NoteD $LogFile "succeeded"
+           NoteD $Log "succeeded"
         endif
 
-        NoteD $LogFile -n "   Deleting ....... "
-        Note $LogFile ""
-        flog $LogFile $DSYS delete $Cfg
+        NoteD $Log -n "   Deleting ....... "
+        Note $Log ""
+        flog $Log $DSYS delete $Cfg
         set DStat = $status
         if ($DStat != 0) then
-           NoteD $LogFile "failed"
+           NoteD $Log "failed"
            exit($DStat)
         else
-           NoteD $LogFile "succeeded"
+           NoteD $Log "succeeded"
         endif
 
         set RStatus = 0
@@ -3075,6 +3072,8 @@ CFG_DONE:
 #--------------------------------------------------------------------------
 
    case test-ssh:
+        InitLog Log $LogDir/test-ssh
+
         echo ""
         echo -n "Testing SSH ..."
 
@@ -3100,33 +3099,33 @@ CFG_DONE:
         end
 
         set Tmp = .tmp-dsys-test-ssh.$System
-        flog $LogFile $RM $Tmp
+        flog $Log $RM $Tmp
         echo "ssh-test" > $Tmp
 
         set Hosts = `awk '$1 == "host" { print $2 }' $HFile`
         set HFail = ""
         set CFail = ""
 
-        Note $LogFile "Testing hosts: $Hosts"
+        Note $Log "Testing hosts: $Hosts"
 
         foreach i ($Hosts)
            echo -n '.'
 
-           Separator $LogFile
-           Note $LogFile "Testing host $i"
-           Note $LogFile ""
+           Separator $Log
+           Note $Log "Testing host $i"
+           Note $Log ""
 
 # test scp to the host
-           Note $LogFile "Command: pcexec -c 30 scp -v $Tmp ${i}:"
-           pcexec -c 30 scp -v $Tmp ${i}: >>& $LogFile
+           Note $Log "Command: pcexec -c 30 scp -v $Tmp ${i}:"
+           pcexec -c 30 scp -v $Tmp ${i}: >>& $Log
            set cstat = $status
            if ($cstat != 0) then
               set CFail = ( $CFail $i )
            endif
 
 # test ssh to the host
-           Note $LogFile "Command: pcexec -c 30 ssh -v $i rm -f $Tmp"
-           pcexec -c 30 ssh -v $i rm -f $Tmp >>& $LogFile
+           Note $Log "Command: pcexec -c 30 ssh -v $i rm -f $Tmp"
+           pcexec -c 30 ssh -v $i rm -f $Tmp >>& $Log
            set hstat = $status
            if ($hstat != 0) then
               set HFail = ( $HFail $i )
@@ -3139,20 +3138,20 @@ CFG_DONE:
 # look for and report failures
         set Rstatus = 0
         if ("$HFail" == "") then
-           NoteD $LogFile "   Your SSH setup is OK"
+           NoteD $Log "   Your SSH setup is OK"
         else
-           NoteD $LogFile "   Your SSH setup needs work ($HFail)"
+           NoteD $Log "   Your SSH setup needs work ($HFail)"
            set Rstatus = 1
         endif
 
         if ("$CFail" == "") then
-           NoteD $LogFile "   Your SCP setup is OK"
+           NoteD $Log "   Your SCP setup is OK"
         else
-           NoteD $LogFile "   Your SCP setup needs work ($CFail)"
+           NoteD $Log "   Your SCP setup needs work ($CFail)"
            set Rstatus = 1
         endif
 
-        flog $LogFile $RM $Tmp
+        flog $Log $RM $Tmp
         echo " "
 
         breaksw
