@@ -1,6 +1,5 @@
 /*
  * PCO.C - processor for auto-configuration information
- *       - this program is like the PACT-CONFIG script but adds the RUN command
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -121,6 +120,8 @@ struct s_state
                                  * FALSE if PERDB was already running */
     phase_id phase;
 
+    int np;                     /* number of platforms */
+
     int na;
     char **args;
     char *db;
@@ -152,17 +153,11 @@ struct s_state
     char sys[BFLRG];
     char system[BFLRG];};
 
-
-int abs_deb, abs_opt, create_dirs, have_python, have_db;
-int installp, loadp, analyzep, exep, phase;
-int profilep;
-
-
 static state
  st = { FALSE, FALSE, FALSE, FALSE, FALSE,
-        TRUE, FALSE, FALSE, FALSE, FALSE,
+        TRUE, FALSE, TRUE, FALSE, FALSE,
 	FALSE, FALSE, FALSE,
-        PHASE_READ, 0, };
+        PHASE_READ, 0, 0, };
 
 static void
  parse_line(client *cl, char *s, char *key, char *oper, char *value, int nc);
@@ -210,7 +205,7 @@ static char *push_file(char *s, int itype)
 	ok = FALSE;
 	for (id = 0; (id < nd) && (ok == FALSE); id++)
 	    {if (places[id] == NULL)
-	        {strcpy(lfile, s);
+	        {nstrncpy(lfile, BFLRG, s, -1);
 		 ok = file_exists(lfile);}
 	     else
 	        {snprintf(lfile, BFLRG, "%s/%s", places[id], s);
@@ -897,9 +892,9 @@ static void write_envf(client *cl, int lnotice)
 
     separator(Log);
     if (lnotice == TRUE)
-       noted(Log, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mdl");
+       noted(Log, "   Environment setup files - env-pact (csh, sh, dk, and mdl)");
     else
-       note(Log, TRUE, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mdl");
+       note(Log, TRUE, "   Environment setup files - env-pact (csh, sh, dk, and mdl)");
     note(Log, TRUE, "");
 
     fcsh = open_file("w", "%s/env-pact.csh", st.dir.etc);
@@ -1618,6 +1613,8 @@ static void default_var(client *cl, char *base)
        nstrncpy(st.system, BFLRG, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
     cinitenv("System", st.system);
 
+    dbset(cl, "PACT_CFG_ID", st.system);
+
     dbinitv(cl, "CfgMan",        "%s/cfgman", st.dir.scr);
     dbinitv(cl, "Globals",       "");
     dbinitv(cl, "MngDir",        st.dir.mng);
@@ -2233,6 +2230,75 @@ static void process_use(client *cl, char *sg, char *oper)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DO_PLATFORM - process a platform command */
+
+static void do_platform(client *cl, char *oper, char *value)
+   {int i, ok;
+    char t[BFLRG];
+    char *p, *cfg, *aid, **spec;
+
+    st.analyzep = FALSE;
+    st.np++;
+
+    spec = tokenize(value, " \t\n\r", 0);
+    cfg  = oper;
+    aid  = spec[0];
+
+    note(Log, TRUE, "");
+    if (st.np == 1)
+       noted(Log, "\n----------------------------------------------\n");
+    noted(Log, "Adding platform %s", cfg);
+
+    snprintf(t, BFLRG, "dsys config -plt");
+
+/* add options affecting all platforms */
+    if (st.abs_deb == TRUE)
+       vstrcat(t, BFLRG, " -g");
+    if (st.abs_opt == TRUE)
+       vstrcat(t, BFLRG, " -o");
+    if (st.create_dirs == TRUE)
+       vstrcat(t, BFLRG, " -c");
+
+/* add alias */
+    vstrcat(t, BFLRG, " -a %s", aid);
+
+/* add instbase */
+    vstrcat(t, BFLRG, " -i %s", spec[1]);
+
+/* add other options for this platform */
+    for (i = 2; spec[i] != NULL; i++)
+        vstrcat(t, BFLRG, " %s", spec[i]);
+
+/* finish up with config file */
+    if (strcmp(cfg, "none") != 0)
+       vstrcat(t, BFLRG, " %s", cfg);
+
+/* run the config for this platform */
+    ok = system(t);
+    if (ok != 0)
+       {noted(Log, "Configuration of platform %s failed - exiting",
+	      cfg);
+	exit(1);}
+    else
+       note(Log, TRUE, "Configuration of platform %s succeeded",
+	    cfg);
+
+    noted(Log, "\n----------------------------------------------\n");
+
+/* add this platform to the list */
+    p = dbget(cl, FALSE, "Platforms");
+    if (IS_NULL(p) == TRUE)
+       dbset(cl, "Platforms", "%s(%s)", cfg, aid);
+    else
+       dbset(cl, "Platforms", "%s:%s(%s)", p, cfg, aid);
+
+    free_strings(spec);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* READ_CONFIG - read the user configuration file */
 
 static void read_config(client *cl, char *cfg, int quiet)
@@ -2271,8 +2337,14 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 	 parse_line(cl, line, key, oper, value, BFLRG);
 
+/* handle platform directives
+ * syntax: platform <cfg> <alias> <instbase> [<args>*]
+ */
+	 if (strcmp(key, "platform") == 0)
+            do_platform(cl, oper, value);
+
 /* handle include directives */
-	 if (strcmp(key, "include") == 0)
+	 else if (strcmp(key, "include") == 0)
 	    {int n;
 	     char ldepth[BFLRG];
 
@@ -2691,7 +2763,7 @@ static void analyze_config(client *cl, char *base)
 static void summarize_config(client *cl)
    {
 
-    if (file_executable("analyze/summary") == TRUE)
+    if ((st.np < 1) && (file_executable("analyze/summary") == TRUE))
        printf("%s\n", run(BOTH, "analyze/summary"));
 
     pco_save_db(cl, NULL);
@@ -2719,23 +2791,6 @@ static void finish_config(client *cl, char *base)
     noted(Log, "Writing system dependent files");
     note(Log, TRUE, "");
 
-/* if T3D, fiddle pdb fortran interface regression test source */
-    if (dbcmp(cl, "PFE", "mppexec") == 0)
-       {char tmpf[BFLRG];
-
-	snprintf(tmpf, BFLRG, "tmp-%s", st.system);
-
-	push_dir("%s/pdb", base);
-
-        run(BOTH, "mv pdftst.f %s.f", tmpf);
-        run(BOTH, "sed -e s/'iarg, iargc'/'iarg, ipxfargc, ilen, ierror'/"
-            "-e s/'iargc()'/'ipxfargc()'/"
-            "-e s/'getarg(iarg, arg)'/'pxfgetarg(iarg, arg, ilen, ierror)'/g"
-            "%s.f > pdftst.f",
-            tmpf);
-
-       pop_dir();};
-
     setup_output_env(cl, base);
 
 /* write the configured files for PACT */
@@ -2743,7 +2798,11 @@ static void finish_config(client *cl, char *base)
 
     LOG_OFF;
 
-    if (file_exists("analyze/program-fin") == TRUE)
+    if (st.np > 0)
+       {if (file_exists("analyze/program-mfin") == TRUE)
+	   read_config(cl, "program-mfin", TRUE);}
+
+    else if (file_exists("analyze/program-fin") == TRUE)
        read_config(cl, "program-fin", TRUE);
 
     LOG_ON;
@@ -2942,6 +3001,7 @@ int main(int c, char **v, char **env)
 		    kill_perdb();
 		 return(1);};
 	     st.db = d;
+             dbset(cl, "PACT_CFG_FILE", "db");
 	     dbset(cl, "CONFIG_METHOD", "database");}
  
 /* this was handled in reset_env */
@@ -2951,7 +3011,7 @@ int main(int c, char **v, char **env)
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'a':
-		       st.analyzep = TRUE;
+		       st.analyzep = FALSE;
                        break;
 
                  case 'c':
@@ -3003,6 +3063,7 @@ int main(int c, char **v, char **env)
 
          else
 	    {nstrncpy(st.cfgf, BFLRG, v[i], -1);
+             dbset(cl, "PACT_CFG_FILE", st.cfgf);
 	     dbset(cl, "CONFIG_METHOD", "file");};};
 
     set_inst_base(cl, ib);
@@ -3043,7 +3104,7 @@ int main(int c, char **v, char **env)
 
 	check_dir(cl);
 
-	if (st.analyzep == FALSE)
+	if (st.analyzep == TRUE)
 	   analyze_config(cl, base);}
 
     else
