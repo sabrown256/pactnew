@@ -624,27 +624,50 @@ results in the value '-mtune foo'.  An empty value for '-t' is an error.
 
                          SPECIAL CIRCUMSTANCES
 
-For the most part PACT is configured and built on computers like workstattions
+For the most part PACT is configured and built on computers like workstations
 and servers.  There are certain machines which don't fit a simple mold like
 that.  Some supercomputers have complex architectures which optimize high
 performance parallel execution.  In order to try to be portable the PACT
 configuration system has to model such platforms as well as the simple
 platforms on which it is built most of the time.
 
-PACT wants to build using a single C compiler.  There are four kinds of
-compilations that are done when configuring and building PACT: 1) small
-test programs which probe the features of the system; 2) infrastructure
-utilities used for building PACT; 3) building the
-libraries and utilities; and 4) programs for the test suite.
+To accomodate this, the PACT configuration system has a multi-platform
+model.  This provides a complete framework to build PACT consistently
+for more than a single target platform.  Examples of multi-platform
+builds would be:
 
-On the most complex supercomputers, PACT is actually cross-compiled.  For
-this discussion we will talk about a front end host and back end hosts
-which are the ones for which the libraries and main utilities are built.
-The category (1), (3), and (4) compilations are done on the front end
-but run on the back end.  The category (2) compilations are done on the
-front end and run on the front end.  Category (3) and (4) compilations
-may be for parallel applications and have special compiler flags.
-Category (1) and (2) compilations are always serial.
+   1) Linux/Windows build.
+      All libraries and executables are build for each platform,
+      but utilities such as the do-run utility are used to configure,
+      and test the Windows build under Wine.
+
+   2) Front End/Back End supercomputer build.
+      All the libraries are built for each platform.  Not all
+      utilities are built for the back end because is makes no
+      sense to run them there.  Again do-run is used to run
+      configuration and test executables on the back end.
+
+Multi-platforms builds should not be limites to two platforms.  For
+example, building for a heterogenous environment where some nodes
+have differents kinds of special purpose co-processors.
+
+There are four kinds of compilations that are done when configuring
+and building PACT: 1) small test programs which probe the features
+of the system; 2) infrastructure utilities used for building PACT;
+3) building the libraries and utilities; and 4) programs for the
+test suite.  The multi-platform model requires that the individual
+configurations for each platform must be fully realized.  The
+model addresses the issue of running certain executables on a
+platform other than the one on which the build is being done.
+
+In the multi-platform model, the category (1), (3), and (4)
+compilations are done on the primary platform but targeted
+to the configuration of each platform where they are run
+via do-run.  The category (2) compilations are done on the
+primary platform and also run there.  Category (3) and (4) compilations
+will in general have platform specific compiler flags.
+Category (1) and (2) compilations are always serial and minimalist
+in some sense.
 
 Finally, in the config files the compiler and flags for (3) and (4)
 are specified in the standard group Std.  The group Cfg is used to
@@ -841,9 +864,6 @@ HAVE_X11
 
                    Other System Dependent Parameters
 
-AIX
-   This indicates the IBM UNIX variant.
-
 BINARY_MODE_R
    Binary file mode parameter for read only mode. Default is "rb".
 
@@ -855,9 +875,6 @@ BINARY_MODE_W
 
 BINARY_MODE_WPLUS 
    Binary file mode parameter for create for update. Default is "w+b".
-
-BSD
-   This indicates the presence of BSD UNIX 4.2 or later.
 
 FIXNUM
    C type corresponding to FORTRAN integer. Defaults to int. Don't set this.
@@ -888,19 +905,10 @@ HAVE_STREAMS
    Indicate the presence of a working STREAMS package. Default is off.
    PACT-ANALYZE detects this for you.
 
-HPUX
-   This indicates the HP UNIX variant.
-
 HYPOT
    This allows the user to specify a routine to be used in place of the
    standard math library's "hypot". The PACT routine PM_hypot may be used
    here, or the user may provide their own.
-
-LINUX
-   This indicates the presence of the LINUX OS.
-
-MAC
-   This indicates the presence of Apple Macintosh OS.
 
 POW
    This allows the user to specify a routine to be used in place of the
@@ -930,9 +938,6 @@ SIGNAL_FUNCTION
    stub routine provided to prevent unsatisfied externals; it does not
    perform any actual signal handling.)
 
-SOLARIS
-   This indicates the presence of the SOLARIS OS.
-
 STRTOD_FUNCTION
    This allows the user to specify a routine to be used in place of the
    standard math library's "strtod". The PACT routine _SC_strtod may be
@@ -944,8 +949,4 @@ SYSTEM
    here, or the user may provide their own. (NOTE: SC_system is a wrapper
    that calls 'system' on platforms with fork/exec and does nothing on
    those without).
-
-SYSV
-   This indicates the presence of UNIX System V.
-
 

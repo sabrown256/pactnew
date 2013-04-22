@@ -106,6 +106,8 @@ Tool PY {
 # PACT_CC_ refers to the Compiler Collection used to build PACT
 # rather than COMPILER_ which is overloaded to the extreme
 Group PACT {
+   CFG_FILE   = ""
+   CFG_ID     = ""
    CC_FAMILY  = generic
    CC_EXE     = `which cc`
    CC_VERSION = ""
