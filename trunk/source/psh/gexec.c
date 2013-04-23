@@ -225,7 +225,7 @@ int main(int c, char **v, char **env)
 	        ps->medium = IO_DEV_PTY;
 
 	     else
-	        {rv = gexec(db, c-i, v+i, env, maps);
+	        {rv = gexeca(db, c-i, v+i, env, maps);
 		 break;};};};
 
     return(rv);}

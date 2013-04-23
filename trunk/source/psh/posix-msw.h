@@ -66,6 +66,10 @@
 #define directory_delim "\\"
 #define directory_delim_c '\\'
 
+/* necessitated by MS non-standard intransigence */
+
+#define LL_FMT  "%I64d"
+
 /* errno set */
 
 #define	ETXTBSY		26
@@ -785,7 +789,7 @@ int kill(pid_t pid, int sig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCHED_YIELD - SCHED_yield for MSW */
+/* SCHED_YIELD - sched_yield for MSW */
 
 int sched_yield(void)
    {int rv;

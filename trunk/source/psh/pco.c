@@ -2237,18 +2237,18 @@ static void process_use(client *cl, char *sg, char *oper)
 static void do_platform(client *cl, char *oper, char *value)
    {int i, ok;
     char t[BFLRG];
-    char *p, *cfg, *aid, *sib, **spec;
+    char *p, *cfg, *sid, *sib, **spec;
 
     st.np++;
 
     spec = tokenize(value, " \t\n\r", 0);
     cfg  = oper;
-    aid  = spec[0];
+    sid  = spec[0];
 
     note(Log, TRUE, "");
     if (st.np == 1)
        noted(Log, "\n----------------------------------------------\n");
-    noted(Log, "Adding platform %s", cfg);
+    noted(Log, "Adding platform %s from %s", sid, cfg);
 
     snprintf(t, BFLRG, "dsys config -plt");
 
@@ -2261,7 +2261,7 @@ static void do_platform(client *cl, char *oper, char *value)
        vstrcat(t, BFLRG, " -c");
 
 /* add alias */
-    vstrcat(t, BFLRG, " -a %s", aid);
+    vstrcat(t, BFLRG, " -a %s", sid);
 
 /* add instbase */
     sib = dbget(cl, TRUE, "InstBase");
@@ -2286,16 +2286,52 @@ static void do_platform(client *cl, char *oper, char *value)
        note(Log, TRUE, "Configuration of platform %s succeeded",
 	    cfg);
 
-    noted(Log, "\n----------------------------------------------\n");
-
 /* add this platform to the list */
     p = dbget(cl, FALSE, "Platforms");
     if (IS_NULL(p) == TRUE)
-       dbset(cl, "Platforms", "%s(%s)", cfg, aid);
+       dbset(cl, "Platforms", "%s(%s)", cfg, sid);
     else
-       dbset(cl, "Platforms", "%s:%s(%s)", p, cfg, aid);
+       dbset(cl, "Platforms", "%s:%s(%s)", p, cfg, sid);
+
+    noted(Log, "\n----------------------------------------------\n");
 
     free_strings(spec);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DO_WORK - gather job specifications and execute them asynchronously
+ *         - the jobs will add their results to the database directly
+ *         - via perdb
+ *         - syntax:
+ *         - Work {
+ *         -    <job>
+ *         -     ...
+ *         -    <job>
+ *         - }
+ */
+
+static void do_work(client *cl, int il, char *oper, char *value)
+   {int ok;
+    char t[BFLRG];
+    char **jl;
+
+    if (oper[0] != '{')
+       fprintf(stderr, "Syntax error on line %d: '%s %s'\n",
+	       il, oper, value);
+    else
+       {jl = NULL;
+
+	for (ok = TRUE; ok == TRUE; )
+	    {read_line(t, BFLRG);
+             if (t[0] == '}')
+	        ok = FALSE;
+	     else
+	        jl = lst_push(jl, t);};
+
+        free_strings(jl);}
 
     return;}
 
@@ -2415,6 +2451,10 @@ static void read_config(client *cl, char *cfg, int quiet)
 /*	     if (st.phase == PHASE_READ) */
 	        note(st.aux.SEF, TRUE, "%s \"%s\"", var, val);
 	     note(Log, TRUE, "Command: setenv %s %s", var, val);}
+
+/* handle Work specifications */
+	 else if (strcmp(key, "Work") == 0)
+            do_work(cl, il, oper, value);
 
 /* handle Tool specifications */
 	 else if (strcmp(key, "Tool") == 0)
@@ -2735,7 +2775,7 @@ static void analyze_config(client *cl, char *base)
     st.phase = PHASE_ANALYZE;
 
     separator(Log);
-    noted(Log, "Analyzing system on %s", st.host);
+    noted(Log, "Analyzing %s on %s", st.system, st.host);
     note(Log, TRUE, "");
 
     write_envf(cl, FALSE);
@@ -2743,19 +2783,18 @@ static void analyze_config(client *cl, char *base)
 /* setup the environment for programs which analyze features */
     setup_analyze_env(cl, base);
 
-    if (st.np < 1) then
-       {separator(Log);
-        noted(Log, "Analyzing system on %s", st.host);
-        note(Log, TRUE, "");
-
-        push_dir(st.dir.cfg);
+    push_dir(st.dir.cfg);
 
 /* read the file which does the analysis */
-        if (file_exists("../analyze/program-analyze") == TRUE)
-           read_config(cl, "program-analyze", TRUE);
+    if (st.np > 0)
+       {if (file_exists("../analyze/program-analyze.mp") == TRUE)
+	   read_config(cl, "program-analyze.mp", TRUE);}
 
-        run(BOTH, "rm * > /dev/null 2>&1");
-        pop_dir();};
+    else if (file_exists("../analyze/program-analyze") == TRUE)
+       read_config(cl, "program-analyze", TRUE);
+
+    run(BOTH, "rm * > /dev/null 2>&1");
+    pop_dir();
 
     noted(Log, "");
 
@@ -2792,7 +2831,7 @@ static void finish_config(client *cl, char *base)
     snprintf(st.dir.sch, BFLRG, "%s/scheme",  st.dir.root);
 
     separator(Log);
-    noted(Log, "Writing system dependent files");
+    noted(Log, "Writing system dependent files for %s", st.system);
     note(Log, TRUE, "");
 
     setup_output_env(cl, base);
@@ -2803,8 +2842,8 @@ static void finish_config(client *cl, char *base)
     LOG_OFF;
 
     if (st.np > 0)
-       {if (file_exists("analyze/program-mfin") == TRUE)
-	   read_config(cl, "program-mfin", TRUE);}
+       {if (file_exists("analyze/program-fin.mp") == TRUE)
+	   read_config(cl, "program-fin.mp", TRUE);}
 
     else if (file_exists("analyze/program-fin") == TRUE)
        read_config(cl, "program-fin", TRUE);

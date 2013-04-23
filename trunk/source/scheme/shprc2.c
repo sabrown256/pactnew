@@ -71,7 +71,7 @@ static object *_SS_string_list(SS_psides *si, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_PROC_EXEC - evaluate a function for gexec */
+/* _SS_PROC_EXEC - evaluate a function for gexeca */
 
 static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
 			 char *name, int c, char **v)
@@ -154,7 +154,7 @@ static PFPCAL _SS_maps(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SSI_GEXEC - gexec wrapper/access for SCHEME */
+/* _SSI_GEXEC - gexeca wrapper/access for SCHEME */
 
 static object *_SSI_gexec(SS_psides *si, object *argl)
    {int n;
@@ -180,7 +180,7 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
     n  = SS_length(si, argl);
     al = _SS_list_strings(si, argl);
 
-    PS_gexec(db, n, al, NULL, _SS_maps);
+    PS_gexeca(db, n, al, NULL, _SS_maps);
 
     s = PS_dbget(cl, FALSE, "gstatus");
     o = _SS_string_list(si, s);

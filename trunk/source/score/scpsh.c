@@ -144,7 +144,8 @@
 #define get_db 			PS_get_db
 #define get_multi_line 		PS_get_multi_line
 #define get_process_group_state PS_get_process_group_state
-#define gexec 			PS_gexec
+#define gexeca 			PS_gexeca
+#define gexecs			PS_gexecs
 #define gexec_file 		PS_gexec_file
 #define gexec_var 		PS_gexec_var
 #define gpoll 			PS_gpoll
