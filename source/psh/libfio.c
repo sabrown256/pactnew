@@ -14,6 +14,10 @@
 
 /* define only for SCOPE_SCORE_COMPILE */
 
+#ifndef EWOULDBLOCK
+# define EWOULDBLOCK  EAGAIN
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -149,8 +153,8 @@ int fflush_safe(FILE *fp)
 
 /* these errors have a chance of being temporary */
 	 else if ((ev == EINTR) ||
-		  (ev == EAGAIN) ||
-		  (ev == EWOULDBLOCK))
+		  (ev == EWOULDBLOCK) ||
+		  (ev == EAGAIN))
 	    ok = TRUE;
 
 /* these don't */

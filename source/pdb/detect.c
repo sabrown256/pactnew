@@ -13,6 +13,8 @@
 
 #undef LONGLONG_MAX
 
+#include "../psh/posix.h"
+
 #include "scstd.h"
 #include "scope_typeh.h"
 
@@ -659,15 +661,25 @@ int derive_complex_format(int *fc, int *dc, int *lc)
 /* PRINT_HTML - organize the detect output in the form of a web page */
 
 void print_html(FILE *fp)
-    {int mfields;
-     char temp[MAXLINE];
+   {int mfields;
+    char lmx[MAXLINE], lmn[MAXLINE], t[MAXLINE];
+    char dmx[MAXLINE], dmn[MAXLINE];
 
 /* determine the size of the min and max fields */     
-     snprintf(temp, MAXLINE, "%lld", (long long) LLONG_MAX);
-     mfields = strlen(temp);
+    snprintf(lmn, MAXLINE, LL_FMT, (long long) LLONG_MIN);
+    snprintf(lmx, MAXLINE, LL_FMT, (long long) LLONG_MAX);
+    mfields = strlen(lmx);
 
-     snprintf(temp, MAXLINE, "%3.8g", DBL_MAX);
-     mfields = max(mfields, strlen(temp));
+#if defined(MSW)
+    snprintf(dmn, MAXLINE, "%.8e", (double) LDBL_MIN);
+    snprintf(dmx, MAXLINE, "%.8e", (double) LDBL_MAX);
+#else
+    snprintf(dmn, MAXLINE, "%.8Le", (long double) LDBL_MIN);
+    snprintf(dmx, MAXLINE, "%.8Le", (long double) LDBL_MAX);
+#endif
+
+     snprintf(t, MAXLINE, "%3.8g", DBL_MAX);
+     mfields = max(mfields, strlen(t));
      mfields += 2;
 
 /* dump the output page */
@@ -730,9 +742,9 @@ void print_html(FILE *fp)
             size[I_LONG], align[I_LONG], LONG_MIN, LONG_MAX);
 
 /* long long */
-     fprintf(fp, "<TR ALIGN=RIGHT><TD>Long long</TD><TD>%d</TD><TD>%d</TD><TD>%lld</TD><TD>%lld</TD></TR>\n",
-            size[I_LONG_LONG], align[I_LONG_LONG],
-	     (long long) LLONG_MIN, (long long) LLONG_MAX);
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Long long</TD><TD>%d</TD><TD>%d</TD><TD>%s</TD><TD>%s</TD></TR>\n",
+	     size[I_LONG_LONG], align[I_LONG_LONG],
+	     lmn, lmx);
 
 /* float */
      fprintf(fp, "<TR ALIGN=RIGHT><TD>Float</TD><TD>%d</TD><TD>%d</TD><TD>%3.8g</TD><TD>%3.8g</TD></TR>\n",
@@ -743,8 +755,8 @@ void print_html(FILE *fp)
             size[I_DOUBLE], align[I_DOUBLE], DBL_MIN, DBL_MAX);
 
 /* long double */
-     fprintf(fp, "<TR ALIGN=RIGHT><TD>Long double</TD><TD>%d</TD><TD>%d</TD><TD>%.8Le</TD><TD>%.8Le</TD></TR>\n",
-            size[I_LONG_DOUBLE], align[I_LONG_DOUBLE], LDBL_MIN, LDBL_MAX);
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Long double</TD><TD>%d</TD><TD>%d</TD><TD>%s</TD><TD>%s</TD></TR>\n",
+            size[I_LONG_DOUBLE], align[I_LONG_DOUBLE], dmn, dmx);
 
      fprintf(fp, "</TABLE></CENTER>\n");
 
@@ -763,6 +775,7 @@ static void print_fix_type(char *type, int sz, int aln,
 			   int mfields, int64_t mn, int64_t mx)
    {int tfield, sfield, afield;
     char bf[MAXLINE], t[MAXLINE];
+    char lmn[MAXLINE], lmx[MAXLINE];
     char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
 /* sizes of the fields in the output table */
@@ -786,10 +799,13 @@ static void print_fix_type(char *type, int sz, int aln,
     snprintf(t, MAXLINE, "%9d", aln);
     strncpy(aptr, t, strlen(t));
 
-    snprintf(t, MAXLINE, "%*lld", mfields, (long long) mn);
+    snprintf(lmn, MAXLINE, LL_FMT, (long long) mn);
+    snprintf(lmx, MAXLINE, LL_FMT, (long long) mx);
+
+    snprintf(t, MAXLINE, "%*s", mfields, lmn);
     strncpy(mnptr, t, strlen(t));
 
-    snprintf(t, MAXLINE, "%*lld", mfields, (long long) mx);
+    snprintf(t, MAXLINE, "%*s", mfields, lmx);
     strcpy(mxptr, t);
 
     puts(bf);
@@ -803,8 +819,8 @@ static void print_fix_type(char *type, int sz, int aln,
 
 static void print_flt_type(char *type, int sz, int aln,
 			   int mfields, long double mn, long double mx)
-   {int tfield, sfield, afield, offset;
-    char bf[MAXLINE], s[MAXLINE], t[MAXLINE];
+   {int tfield, sfield, afield, offset, np;
+    char bf[MAXLINE], s[MAXLINE], t[MAXLINE], fmt[MAXLINE];
     char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
 /* sizes of the fields in the output table */
@@ -828,6 +844,29 @@ static void print_flt_type(char *type, int sz, int aln,
     snprintf(t, MAXLINE, "%9d", aln);
     strncpy(aptr, t, strlen(t));
 
+#if defined(MSW)
+    if (sz < 5)
+       np = 7;
+    else if (sz < 9)
+       np = 9;
+    else
+       np = 11;
+    snprintf(fmt, MAXLINE, "%%.%dle", np);
+    snprintf(s, MAXLINE, fmt, (double) mn);
+    snprintf(t, MAXLINE, fmt, (double) mx);
+#else
+    if (sz < 5)
+       np = 7;
+    else if (sz < 9)
+       np = 9;
+    else
+       np = 11;
+    snprintf(fmt, MAXLINE, "%%.%dLe", np);
+    snprintf(s, MAXLINE, fmt, mn);
+    snprintf(t, MAXLINE, fmt, mx);
+#endif
+
+/*
     if (sz < 5)
        {snprintf(s, MAXLINE, "%.7Le", mn);
 	snprintf(t, MAXLINE, "%.7Le", mx);}
@@ -837,7 +876,7 @@ static void print_flt_type(char *type, int sz, int aln,
     else
        {snprintf(s, MAXLINE, "%.11Le", mn);
 	snprintf(t, MAXLINE, "%.11Le", mx);};
-
+*/
     offset = mfields - strlen(t);
     strncpy(mnptr+offset, t, strlen(t));
 
@@ -864,7 +903,7 @@ void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
      int afield = 11;
 
 /* determine the size of the min and max fields */     
-     snprintf(t, MAXLINE, "%lld", (long long) LLONG_MAX);
+     snprintf(t, MAXLINE, LL_FMT, (long long) LLONG_MAX);
      mfields = strlen(t);
 
      snprintf(t, MAXLINE, "%3.8g", DBL_MAX);

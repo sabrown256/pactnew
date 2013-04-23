@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# MAKEFILE - write the distribution multi-platform MAKEFILE
+# MAKEFILE.MP - write the distribution multi-platform MAKEFILE
 #
 # include "cpyright.h"
 #
@@ -27,30 +27,72 @@ Note $Log ""
 dbmget $Log SysDir^     \
             Platforms
 
-echo "mf-> a $Log"
-echo "mf-> b $SysDir"
-echo "mf-> c $Platforms"
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set base = $SysDir:h
+   set etcb = $SysDir/etc
+   set binb = $SysDir/bin
+
+   set inf  = ( `echo "$Platforms" | sed 's|:| |g'` )
+   @ np = $#inf
+   Note $Log "$np platforms"
+
+   set inf  = ( `echo "$Platforms" | sed 's|[:()]| |g'` )
+   @ ni = $#inf
+   Note $Log "$ni platforms components"
+
+# get the package list
+   set sid  = $inf[2]
+   set root = $base/$sid 
+   set etcd = $root/etc
+   set bind = $root/bin
+   set Pck  = ( `cat $etcd/package` )
+
+# set the pact links
+   set pact = $bind/pact
+   @ i = 2
+   while ($i < $ni)
+      @ i = $i + 1
+      set cfg = $inf[$i]
+      @ i = $i + 1
+      set sid = $inf[$i]
+
+      set root = $base/$sid 
+      set bind = $root/bin
+      flog $Log pushd $bind
+      flog $Log mv pact pact.cfg
+      flog $Log ln -s $pact pact
+      flog $Log popd
+   end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set inf  = ( `echo "$Platforms" | sed 's|[:()]| |g'` )
-@ ni = $#inf
-
-set base = $SysDir:h
-set etcb = $SysDir/etc
-set binb = $SysDir/bin
-
-set STDOUT = $etcb/Makefile
-flog $Log $RM $STDOUT
-flog $Log touch $STDOUT
+   set STDOUT = $etcb/Makefile
+   flog $Log $RM $STDOUT
+   flog $Log touch $STDOUT
 
    Note $STDOUT "#"
    Note $STDOUT "# MAKEFILE - operate on this distribution"
    Note $STDOUT "#"
    Note $STDOUT ""
 
-   Note $STDOUT "PACT = $bind/pact"
+   @ i = 0
+   @ n = 0
+   while ($i < $ni)
+      @ n = $n + 1
+      @ i = $i + 1
+      set cfg = $inf[$i]
+      @ i = $i + 1
+      set sid = $inf[$i]
+
+      set root = $base/$sid 
+      set etcd = $root/etc
+      set bind = $root/bin
+
+      Note $STDOUT "PACT$n = $bind/pact"
+   end
    Note $STDOUT ""
 
 #--------------------------------------------------------------------------
@@ -60,22 +102,21 @@ flog $Log touch $STDOUT
    Note $STDOUT '	@(echo "" ; echo "Generate sources")'
    Note $STDOUT '	${BARRIER}'
 
-   @ i = 0
-   while ($i < $ni)
-      @ i = $i + 1
-      set cfg = $inf[$i]
-      @ i = $i + 1
-      set sid = $inf[$i]
+   foreach p ($Pck)
+      @ i = 0
+      @ n = 0
+      while ($i < $ni)
+         @ n = $n + 1
+         @ i = $i + 1
+         set cfg = $inf[$i]
+         @ i = $i + 1
+         set sid = $inf[$i]
 
-      set root = $base/$sid 
-      set etcd = $root/etc
-      set bind = $root/bin
+         set root = $base/$sid 
+         set etcd = $root/etc
    
-      set Pck = ( `cat $etcd/package` )
-
-      foreach i ($Pck)
-         Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact generate in '$i'" ; ${PACT} -rcr generate)'
-         if ($i == score) then
+         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact generate in '$p' for '$sid'" ; ${PACT'$n'} -rcr generate)'
+         if ($p == score) then
             Note $STDOUT '	${BARRIER}'
          endif
       end
@@ -88,21 +129,20 @@ flog $Log touch $STDOUT
    Note $STDOUT '	@(echo "" ; echo "Install headers")'
    Note $STDOUT '	${BARRIER}'
 
-   @ i = 0
-   while ($i < $ni)
-      @ i = $i + 1
-      set cfg = $inf[$i]
-      @ i = $i + 1
-      set sid = $inf[$i]
+   foreach p ($Pck)
+      @ i = 0
+      @ n = 0
+      while ($i < $ni)
+         @ n = $n + 1
+         @ i = $i + 1
+         set cfg = $inf[$i]
+         @ i = $i + 1
+         set sid = $inf[$i]
 
-      set root = $base/$sid 
-      set etcd = $root/etc
-      set bind = $root/bin
+         set root = $base/$sid 
+         set etcd = $root/etc
    
-      set Pck = ( `cat $etcd/package` )
-
-      foreach i ($Pck)
-         Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact incinstall in '$i'" ; ${PACT} -rcr incinstall)'
+         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact incinstall in '$p' for '$sid'" ; ${PACT'$n'} -rcr incinstall)'
       end
    end
    Note $STDOUT '	${BARRIER}'
@@ -113,21 +153,20 @@ flog $Log touch $STDOUT
    Note $STDOUT '	@(echo "" ; echo "Compile sources")'
    Note $STDOUT '	${BARRIER}'
 
-   @ i = 0
-   while ($i < $ni)
-      @ i = $i + 1
-      set cfg = $inf[$i]
-      @ i = $i + 1
-      set sid = $inf[$i]
+   foreach p ($Pck)
+      @ i = 0
+      @ n = 0
+      while ($i < $ni)
+         @ n = $n + 1
+         @ i = $i + 1
+         set cfg = $inf[$i]
+         @ i = $i + 1
+         set sid = $inf[$i]
 
-      set root = $base/$sid 
-      set etcd = $root/etc
-      set bind = $root/bin
+         set root = $base/$sid 
+         set etcd = $root/etc
    
-      set Pck = ( `cat $etcd/package` )
-
-      foreach i ($Pck)
-         Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact devlib in '$i'" ; ${PACT} -rcr devlib)'
+         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact devlib in '$p' for '$sid'" ; ${PACT'$n'} -rcr devlib)'
       end
    end
    Note $STDOUT '	${BARRIER}'
@@ -138,21 +177,20 @@ flog $Log touch $STDOUT
    Note $STDOUT '	@(echo "" ; echo "Link Executables")'
    Note $STDOUT '	${BARRIER}'
 
-   @ i = 0
-   while ($i < $ni)
-      @ i = $i + 1
-      set cfg = $inf[$i]
-      @ i = $i + 1
-      set sid = $inf[$i]
+   foreach p ($Pck)
+      @ i = 0
+      @ n = 0
+      while ($i < $ni)
+         @ n = $n + 1
+         @ i = $i + 1
+         set cfg = $inf[$i]
+         @ i = $i + 1
+         set sid = $inf[$i]
 
-      set root = $base/$sid 
-      set etcd = $root/etc
-      set bind = $root/bin
+         set root = $base/$sid 
+         set etcd = $root/etc
    
-      set Pck = ( `cat $etcd/package` )
-
-      foreach i ($Pck)
-         Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact link in '$i'" ; ${PACT} -rcr link)'
+         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact link in '$p' for '$sid'" ; ${PACT'$n'} -rcr link)'
       end
    end
    Note $STDOUT ''
@@ -164,21 +202,20 @@ flog $Log touch $STDOUT
    Note $STDOUT '	@(echo "" ; echo "Link Executables")'
    Note $STDOUT '	${BARRIER}'
 
-   @ i = 0
-   while ($i < $ni)
-      @ i = $i + 1
-      set cfg = $inf[$i]
-      @ i = $i + 1
-      set sid = $inf[$i]
+   foreach p ($Pck)
+      @ i = 0
+      @ n = 0
+      while ($i < $ni)
+         @ n = $n + 1
+         @ i = $i + 1
+         set cfg = $inf[$i]
+         @ i = $i + 1
+         set sid = $inf[$i]
 
-      set root = $base/$sid 
-      set etcd = $root/etc
-      set bind = $root/bin
+         set root = $base/$sid 
+         set etcd = $root/etc
    
-      set Pck = ( `cat $etcd/package` )
-
-      foreach i ($Pck)
-         Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact link in '$i'" ; ${PACT} -rcr link)'
+         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact link in '$p' for '$sid'" ; ${PACT'$n'} -rcr link)'
       end
    end
    Note $STDOUT ''
@@ -186,7 +223,30 @@ flog $Log touch $STDOUT
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-echo "mf-> z"
+   Note $STDOUT 'remove:'
+   Note $STDOUT '	@(echo "" ; echo "Remove Binaries")'
+   Note $STDOUT '	${BARRIER}'
+
+   foreach p ($Pck)
+      @ i = 0
+      @ n = 0
+      while ($i < $ni)
+         @ n = $n + 1
+         @ i = $i + 1
+         set cfg = $inf[$i]
+         @ i = $i + 1
+         set sid = $inf[$i]
+
+         set root = $base/$sid 
+         set etcd = $root/etc
+   
+         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact remove in '$p' for '$sid'" ; ${PACT'$n'} -rcr remove)'
+      end
+   end
+   Note $STDOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 exit(0)
 

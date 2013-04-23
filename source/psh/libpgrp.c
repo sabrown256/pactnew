@@ -2446,12 +2446,12 @@ void job_background(process_session *ps, process *pp, int cont)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* GEXEC - execute a <statement> */
+/* GEXECS - execute a process group specified by the string S */
 
-int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
+int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
    {int i, nc, rv, st;
     int fa, fb;
-    char *s, *shell;
+    char *shell;
     statement *sl;
     process_group_state *ps;
 
@@ -2463,16 +2463,6 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
     if ((ps != NULL) && (ps->dbg_level & 4))
        {fb = fcntl(0, F_DUPFD, 2);
 	close_safe(fb);};
-
-/* concatenate command line arguments into one big string */
-    s = NULL;
-    for (i = 0; i < c; i++)
-        {if (strpbrk(v[i], " \t") == NULL)
-	    s = append_tok(s, ' ', "%s", v[i]);
-	 else if (strpbrk(v[i], "\"") != NULL)
-	    s = append_tok(s, ' ', "'%s'", v[i]);
-	 else
-	    s = append_tok(s, ' ', "\"%s\"", v[i]);};
 
 /* parse command to list of statements - ;, &&, or || */
     sl = parse_statement(s, env, shell, map);
@@ -2513,6 +2503,29 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
     block_fd(0, TRUE);
 
     return(st);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GEXECA - execute a process group specified by C and V */
+
+int gexeca(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
+   {int i, rv;
+    char *s;
+
+/* concatenate command line arguments into one big string */
+    s = NULL;
+    for (i = 0; i < c; i++)
+        {if (strpbrk(v[i], " \t") == NULL)
+	    s = append_tok(s, ' ', "%s", v[i]);
+	 else if (strpbrk(v[i], "\"") != NULL)
+	    s = append_tok(s, ' ', "'%s'", v[i]);
+	 else
+	    s = append_tok(s, ' ', "\"%s\"", v[i]);};
+
+    rv = gexecs(db, s, env, map);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 

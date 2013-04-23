@@ -1154,83 +1154,109 @@ switch ($Cmnd)
 # save the database before building dmake because import-api needs it
 	flog $Log $PERDB -l save:db:
 
-# using existing dmake/smake build new dmake
+# settle on smake or dmake
         Separator $Log
-        NoteD $Log "   Persistent Portable Parallel Make - dmake"
+        flog $Log set Opt = smake
 
-        if ($?IBM_BGL == 1) then
-           envini CROSS_COMPILE none
-        else           
-           envini CROSS_COMPILE FALSE
-        endif
+# check for multi-platform build
+        dbget Platforms
+        if ("$Platforms" != "") then
+           set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
+           @ np = $#inf
+           Note $Log "$np platforms"
 
-        Note $Log "CROSS_COMPILE = $CROSS_COMPILE"
+           set inf = ( `echo "$inf" | sed 's|[()]| |g'` )
+           set sid = $inf[2]
 
-        set LStat = 1
-        if ($CROSS_COMPILE == "FALSE") then
-           flog $Log pushd $BaseDir/score
-           if (-x ${BinDir}/dmake) then
-              flog $Log mv ${BinDir}/dmake ${BinDir}/dmake.exec
+# set the main pact link to the first platform pact
+           flog $Log pushd ${BinDir}
+           flog $Log mv pact pact.cfg
+           flog $Log ln -s $BaseDir/$sid/bin/pact pact
+           flog $Log popd
+
+# single platform build
+        else
+
+# using existing dmake/smake build new dmake
+           NoteD $Log "   Persistent Portable Parallel Make - dmake"
+
+# sort out cross compile situation
+           if ($?IBM_BGL == 1) then
+              envini CROSS_COMPILE none
+           else           
+              envini CROSS_COMPILE FALSE
            endif
 
-           foreach i (dmake.exec smake)
-              Note $Log ""
-              Note $Log "Check $i for building dmake"
-              set Mk = ${BinDir}/$i
-              if (-x $Mk) then
-                 Note $Log "   $i is executable - trying"
+           Note $Log "CROSS_COMPILE = $CROSS_COMPILE"
+
+           set LStat = 1
+           if ($CROSS_COMPILE == "FALSE") then
+
+              flog $Log pushd $BaseDir/score
+              if (-x ${BinDir}/dmake) then
+                 flog $Log mv ${BinDir}/dmake ${BinDir}/dmake.exec
+              endif
+
+              foreach i (dmake.exec smake)
+                 Note $Log ""
+                 Note $Log "Check $i for building dmake"
+                 set Mk = ${BinDir}/$i
+                 if (-x $Mk) then
+                    Note $Log "   $i is executable - trying"
 
 # always remove and start clean in case there is toxic rubble
 # left over from a failed build
-                 flog $Log $Mk -i -na 1 remove
+                    flog $Log $Mk -i -na 1 remove
 
 # NOTE: do it twice as a fault tolerance measure
 # this role will be assumed by dmake after it is successfully built
-                 flog $Log $Mk dmake
-                 flog $Log $Mk dmake
-                 set LStat = $status
-                 if ($LStat == 0) then
-                    Note $Log "Build of dmake succeeded"
-                    break
+                    flog $Log $Mk dmake
+                    flog $Log $Mk dmake
+                    set LStat = $status
+                    if ($LStat == 0) then
+                       Note $Log "Build of dmake succeeded"
+                       break
+                    else
+                       Note $Log "Build of dmake failed"
+                    endif
                  else
-                    Note $Log "Build of dmake failed"
+                    Note $Log "   $i is not executable"
                  endif
-              else
-                 Note $Log "   $i is not executable"
-              endif
-           end
-           flog $Log $RM ${BinDir}/dmake.exec
-           flog $Log popd
-        else
+              end
+              flog $Log $RM ${BinDir}/dmake.exec
+              flog $Log popd
+           else
 
 # try to find a dmake
-           set dm = `which-exe -d ${BinDir} dmake`
-           if (-x "$dm") then
-              flog $Log cp $dm ${BinDir}/dmake
-              flog $Log set LStat = 0
-
-# try pact if no dmake found
-           else
-              set dm = `which-exe -d ${BinDir} pact`
+              set dm = `which-exe -d ${BinDir} dmake`
               if (-x "$dm") then
                  flog $Log cp $dm ${BinDir}/dmake
                  flog $Log set LStat = 0
+
+# try pact if no dmake found
               else
-                 Note $Log "No dmake found for bootstrap CROSS_COMPILE"
+                 set dm = `which-exe -d ${BinDir} pact`
+                 if (-x "$dm") then
+                    flog $Log cp $dm ${BinDir}/dmake
+                    flog $Log set LStat = 0
+                 else
+                    Note $Log "No dmake found for bootstrap CROSS_COMPILE"
+                 endif
+              endif
+              unset dm
+           endif
+
+           if ($LStat == 0) then
+              flog $Log ${BinDir}/dmake -v
+              if ($status == 0) then
+                 flog $Log set Opt = dmake
               endif
            endif
-           unset dm
+           ftee $Log $DSYS pact $Opt
+           unset Opt
         endif
 
-        flog $Log set Opt = smake
-        if ($LStat == 0) then
-           flog $Log ${BinDir}/dmake -v
-           if ($status == 0) then
-              flog $Log set Opt = dmake
-           endif
-        endif
-        ftee $Log $DSYS pact $Opt
-
+# wrap it up
         Separator $Log
 
    	flog $Log $PERDB -l quit:

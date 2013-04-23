@@ -1887,7 +1887,7 @@ char *SC_itos(char *s, int nc, long long n, char *fmt)
 	nc = 80;};
 
     if (fmt == NULL)
-       fmt = "%lld";
+       fmt = LL_FMT;
 
 #if defined(MSW)
 

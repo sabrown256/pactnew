@@ -19,6 +19,7 @@ dbmget $Log HAVE_FORTRAN^     \
             MAKE_Shared_Libs^ \
             BaseDir^          \
             SysDir^           \
+            System^           \
             PY_Exe^           \
             PY_Ext^           \
             PY_DirPy^         \
@@ -35,7 +36,7 @@ dbmget $Log HAVE_FORTRAN^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    NoteD $Log "Configuration Summary"
+    NoteD $Log "Configuration Summary for $System"
 
     if (($?Cfe_CC_Exe == 0) || ("$Cfe_CC_Exe" == "none") || ("$Cfe_CC_Exe" == "")) then
        NoteD $Log "   ERROR: No C compiler available - check your system or your path"

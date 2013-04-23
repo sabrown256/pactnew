@@ -1,6 +1,6 @@
 #
-# PROGRAM-MFIN - define the actions to complete a
-#              - multi-platform configuration of PACT
+# PROGRAM-FIN.MP - define the actions to complete a
+#                - multi-platform configuration of PACT
 #
 # include "cpyright.h"
 #

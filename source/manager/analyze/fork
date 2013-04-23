@@ -40,10 +40,17 @@ set opt = ""
 set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   fexvar $ALog HAVE_FORK_EXEC $CFE $Tmp
-   if ($gstatus[1] == 0) then
+   flog $ALog $CFE $Tmp
+   if ($status == 0) then
+      dbset HAVE_FORK_EXEC TRUE
       set ok = TRUE
+   else
+      dbset HAVE_FORK_EXEC FALSE
    endif
+#   fexvar $ALog HAVE_FORK_EXEC $CFE $Tmp
+#   if ($gstatus[1] == 0) then
+#      set ok = TRUE
+#   endif
 endif
 
 flog $ALog $RM $Tmp.c $Tmp
