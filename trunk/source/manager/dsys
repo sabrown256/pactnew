@@ -646,6 +646,9 @@ switch ($Cmnd)
                    shift
                    setenv SESSION_CONFIG $1
                    breaksw
+              case -as:
+                   set PArgs = ( $PArgs "-as" )
+                   breaksw
               case -b:
                    shift
                    setenv Bits $1
@@ -711,12 +714,13 @@ switch ($Cmnd)
                    breaksw
               case -h:
                    echo ""
-                   echo "Usage: dsys config [-a <sid>] [-b 32 | 64] [-c] [-db <db>]"
+                   echo "Usage: dsys config [-a <sid>] [-as] [-b 32 | 64] [-c] [-db <db>]"
                    echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
                    echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp <path>] [-o] [-O]"
                    echo "                   [-p] [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
                    echo ""
                    echo "        -a         set the system id for this config"
+                   echo "        -as        do parts of config asynchronously"
                    echo "        -c         create missing directories for -i option"
                    echo "        -db        configure from specified database"
                    echo "        -f         a directory containing your configuration file"
