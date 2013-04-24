@@ -12,6 +12,7 @@
 #include "libpsh.c"
 #include "libeval.c"
 #include "libdb.c"
+#include "libpgrp.c"
 
 #define STACK_FILE      1
 #define STACK_PROCESS   2
@@ -107,6 +108,7 @@ struct s_state
     int create_dirs;
     int have_python;
     int have_db;
+    int async;
 
     int installp;
     int loadp;
@@ -154,7 +156,7 @@ struct s_state
     char system[BFLRG];};
 
 static state
- st = { FALSE, FALSE, FALSE, FALSE, FALSE,
+ st = { FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
         TRUE, FALSE, TRUE, FALSE, FALSE,
 	FALSE, FALSE, FALSE,
         PHASE_READ, 0, 0, };
@@ -1932,9 +1934,9 @@ static void bad_pragma_rules(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* INIT_SESSION - initialize the state of the config session */
+/* INIT_PCO_SESSION - initialize the state of the config session */
 
-static void init_session(client *cl, char *base, int append)
+static void init_pco_session(client *cl, char *base, int append)
    {
 
 /* setup default variable values */
@@ -2313,27 +2315,42 @@ static void do_platform(client *cl, char *oper, char *value)
  *         - }
  */
 
-static void do_work(client *cl, int il, char *oper, char *value)
-   {int ok;
-    char t[BFLRG];
-    char **jl;
+static int do_work(client *cl, int il, char *oper, char *value)
+   {int i, ok, nc, rv;
+    char t[BFLRG], cmd[BFLRG];
+    char *db;
+
+    rv = 0;
 
     if (oper[0] != '{')
        fprintf(stderr, "Syntax error on line %d: '%s %s'\n",
 	       il, oper, value);
-    else
-       {jl = NULL;
 
-	for (ok = TRUE; ok == TRUE; )
+    else if (st.async == TRUE)
+       {cmd[0] = '\0';
+
+	for (i = 0, ok = TRUE; ok == TRUE; i++)
 	    {read_line(t, BFLRG);
              if (t[0] == '}')
 	        ok = FALSE;
 	     else
-	        jl = lst_push(jl, t);};
+	        vstrcat(cmd, BFLRG, "%s @ ", echo(FALSE, t));};
 
-        free_strings(jl);}
+	nc = strlen(cmd);
+	cmd[nc-3] = '\0';
 
-    return;}
+	db = cgetenv(TRUE, "PERDB_PATH");
+        rv = gexecs(db, cmd, NULL, NULL);}
+
+    else
+       {for (i = 0, ok = TRUE; ok == TRUE; i++)
+	    {read_line(t, BFLRG);
+             if (t[0] == '}')
+	        ok = FALSE;
+	     else
+	        rv |= system(echo(FALSE, t));};};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2844,7 +2861,11 @@ static void finish_config(client *cl, char *base)
     if (st.np > 0)
        {if (file_exists("analyze/program-fin.mp") == TRUE)
 	   read_config(cl, "program-fin.mp", TRUE);}
-
+#if 0
+    else if ((st.async == TRUE) &&
+	     (file_exists("analyze/program-fin.as") == TRUE))
+       read_config(cl, "program-fin.as", TRUE);
+#endif
     else if (file_exists("analyze/program-fin") == TRUE)
        read_config(cl, "program-fin", TRUE);
 
@@ -3036,6 +3057,9 @@ int main(int c, char **v, char **env)
         {if (strcmp(v[i], "-strict") == 0)
 	    strct = v[++i];
 
+         else if (strcmp(v[i], "-as") == 0)
+            st.async = TRUE;
+
          else if (strcmp(v[i], "-db") == 0)
 	    {full_path(d, BFLRG, NULL, v[++i]);
              if (file_exists(d) == FALSE)
@@ -3111,7 +3135,7 @@ int main(int c, char **v, char **env)
 
     set_inst_base(cl, ib);
 
-    init_session(cl, base, append);
+    init_pco_session(cl, base, append);
 
 /* make config directory */
     snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.system);
