@@ -7,18 +7,20 @@
 # include "cpyright.h"
 #
 
-#run write/do-run-db       $Log $ScrDir
 run write/package         $Log $ScrDir
-run write/configured      $Log $ScrDir $CONFIG_FILE
-run write/f90-interface   $Log $ScrDir
-run write/make-def        $Log $ScrDir
-run write/make-macros     $Log $ScrDir
-run write/makefile        $Log $ScrDir
-run write/iso-c.h         $Log $ScrDir
 run write/scconfig.h      $Log $ScrDir
-run write/scdecls.h       $Log $ScrDir
-run write/syntax.h        $Log $ScrDir
-run write/spokes.scm      $Log $ScrDir
-run write/install-pact    $Log $ScrDir
-run write/smake           $Log $ScrDir
+
+Work {
+   write/configured      $Log $ScrDir $CONFIG_FILE
+   write/f90-interface   $Log $ScrDir
+   write/make-def        $Log $ScrDir
+   write/make-macros     $Log $ScrDir
+   write/makefile        $Log $ScrDir
+   write/iso-c.h         $Log $ScrDir
+   write/scdecls.h       $Log $ScrDir
+   write/syntax.h        $Log $ScrDir
+   write/spokes.scm      $Log $ScrDir
+   write/install-pact    $Log $ScrDir
+   write/smake           $Log $ScrDir
+}
 
