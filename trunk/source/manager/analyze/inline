@@ -44,3 +44,4 @@ rm -f $Tmp $Tmp.c $Tmp.o
 # export the result
 dbexp HAVE_INLINE
 
+exit(0)

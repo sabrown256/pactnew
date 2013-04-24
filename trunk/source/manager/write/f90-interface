@@ -111,12 +111,11 @@ if ($HAVE_FORTRAN == TRUE) then
 # run sizefix to generate Finteger.bytes
          flog $Log $lCC -I../.. ../sizefix.c -o sizefix
          flog $Log ($CFE ./sizefix $si >&! $IncDir/Finteger.bytes)
-         if ($status != 0) then
+         set xstatus = $status
+         flog $Log cat $IncDir/Finteger.bytes
+         if ($xstatus != 0) then
             NoteD $Log "      Cannot compute Fortran integer size"
-            flog $Log cat $IncDir/Finteger.bytes
             flog $Log ${RM} $IncDir/Finteger.bytes
-         else
-            flog $Log cat $IncDir/Finteger.bytes
          endif
       endif
 

@@ -644,6 +644,7 @@ switch ($Cmnd)
            switch ($1)
               case -a:
                    shift
+                   $CfgMan add $1 >& /dev/null
                    setenv SESSION_CONFIG $1
                    breaksw
               case -as:
@@ -867,11 +868,7 @@ switch ($Cmnd)
         setenv DSYS_TARGET pact_config
 
 # set the configuration for this system
-        if ($?SESSION_CONFIG == 1) then
-           setenv System `$CfgMan use`
-        else
-           setenv System `$CfgMan add $sid`
-        endif
+        setenv System `$CfgMan use`
 
 # now that we have the system, reset the variables that depend on it
         set SysDir = $DevDir/$System
@@ -1055,13 +1052,12 @@ switch ($Cmnd)
 # setup for PERDB session
         flog $Log setenv PERDB_IDLE_TIMEOUT 600
         flog $Log setenv PERDB_PATH $EtcDir/cfg
+        flog $Log set dbopt = ( -f $PERDB_PATH )
+        flog $Log $RM ${PERDB_PATH}*
 
 	flog $Log $PERDB -l -c -s
 
 	flog $Log $PERDB PACT_VERSION=$PACTVer
-
-        flog $Log set dbopt = ( -f $EtcDir/cfg )
-        flog $Log $RM $EtcDir/cfg*
 
 	if (($Method == 2) && (-x $BinDir/pco)) then
            flog $Log set PConf = ( $BinDir/pco $dbopt -env $cwd/pact.env -l )
