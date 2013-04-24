@@ -8,11 +8,11 @@
 #
 
 run write/package         $Log $ScrDir
+run write/f90-interface   $Log $ScrDir
 run write/scconfig.h      $Log $ScrDir
 
-Work {
+Run {
    write/configured      $Log $ScrDir $CONFIG_FILE
-   write/f90-interface   $Log $ScrDir
    write/make-def        $Log $ScrDir
    write/make-macros     $Log $ScrDir
    write/makefile        $Log $ScrDir

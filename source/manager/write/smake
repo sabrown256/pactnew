@@ -24,8 +24,7 @@ source $ScrDir/functions-pact.csh
 
 Separator $Log
 
-NoteD $Log -n "   System make wrapper - smake"
-Note $Log ""
+Note $Log "   System make wrapper - smake"
 Note $Log ""
 
 dbmget $Log InstBase^         \
@@ -140,7 +139,10 @@ EOF
 
        flog $Log ls -l $BinDir/smake
        flog $Log $BinDir/smake -f $TMAKEF a
-       if ($status == 0) then
+       set xstatus = $status
+
+       NoteD $Log -n "   System make wrapper - smake"
+       if ($xstatus == 0) then
           if ($n == 1) then
              NoteD $Log " (Does use PATH)"
           else

@@ -2304,18 +2304,18 @@ static void do_platform(client *cl, char *oper, char *value)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO_WORK - gather job specifications and execute them asynchronously
- *         - the jobs will add their results to the database directly
- *         - via perdb
- *         - syntax:
- *         - Work {
- *         -    <job>
- *         -     ...
- *         -    <job>
- *         - }
+/* DO_RUN_WORK - gather job specifications and execute them asynchronously
+ *             - the jobs will add their results to the database directly
+ *             - via perdb
+ *             - syntax:
+ *             - Run {
+ *             -    <job>
+ *             -     ...
+ *             -    <job>
+ *             - }
  */
 
-static int do_work(client *cl, int il, char *oper, char *value)
+static int do_run_work(client *cl, int il, char *oper, char *value)
    {int i, ok, nc, rv;
     char t[BFLRG], cmd[BFLRG];
     char *db;
@@ -2469,9 +2469,9 @@ static void read_config(client *cl, char *cfg, int quiet)
 	        note(st.aux.SEF, TRUE, "%s \"%s\"", var, val);
 	     note(Log, TRUE, "Command: setenv %s %s", var, val);}
 
-/* handle Work specifications */
-	 else if (strcmp(key, "Work") == 0)
-            do_work(cl, il, oper, value);
+/* handle Run specifications */
+	 else if (strcmp(key, "Run") == 0)
+            do_run_work(cl, il, oper, value);
 
 /* handle Tool specifications */
 	 else if (strcmp(key, "Tool") == 0)
@@ -2861,11 +2861,7 @@ static void finish_config(client *cl, char *base)
     if (st.np > 0)
        {if (file_exists("analyze/program-fin.mp") == TRUE)
 	   read_config(cl, "program-fin.mp", TRUE);}
-#if 0
-    else if ((st.async == TRUE) &&
-	     (file_exists("analyze/program-fin.as") == TRUE))
-       read_config(cl, "program-fin.as", TRUE);
-#endif
+
     else if (file_exists("analyze/program-fin") == TRUE)
        read_config(cl, "program-fin", TRUE);
 

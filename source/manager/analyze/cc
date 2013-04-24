@@ -166,8 +166,7 @@ endif
 set lrpath = `../analyze/rpath -o rpath`
 
 # set compile options for characterizing compiler
-set ccopt = ""
-set ccopt = ( $ccopt $Cfe_CC_Flags $lrpath )
+setenv ccopt "$Cfe_CC_Flags $lrpath"
 
 # now lets look at this compiler
 if ($Cfg_CC_Exe != "") then
@@ -441,19 +440,16 @@ dbmset $ALog CC_Exe              = $CC_Exe^              \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-source $AnaDir/line
-source $AnaDir/pragma
-source $AnaDir/inline
-source $AnaDir/noreturn
-source $AnaDir/valist
-source $AnaDir/float16
-source $AnaDir/complex
-source $AnaDir/headers
-source $AnaDir/glibc
-source $AnaDir/size
-
-unset lrpath
-unset ccopt
+gexec $AnaDir/line       @ \
+      $AnaDir/pragma     @ \
+      $AnaDir/inline     @ \
+      $AnaDir/noreturn   @ \
+      $AnaDir/valist     @ \
+      $AnaDir/float16    @ \
+      $AnaDir/complex    @ \
+      $AnaDir/headers    @ \
+      $AnaDir/glibc      @ \
+      $AnaDir/size
 
 exit(0)
 
