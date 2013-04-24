@@ -2488,7 +2488,6 @@ int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
 	          break;};};
 
     free_statements(sl);
-    FREE(s);
 
 /* diagnostic for leaked descriptors */
     if ((ps != NULL) && (ps->dbg_level & 4))
@@ -2524,6 +2523,8 @@ int gexeca(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 	    s = append_tok(s, ' ', "\"%s\"", v[i]);};
 
     rv = gexecs(db, s, env, map);
+
+    FREE(s);
 
     return(rv);}
 
