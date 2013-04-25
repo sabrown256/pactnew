@@ -12,10 +12,7 @@ Note $ALog "----- analyze/ssl -----"
 Note $ALog "Analyze: openssl"
 Note $ALog ""
 
-dbmget $ALog MDI_Inc      =\? ""^        \
-             MDI_Lib      =\? ""^        \
-             MDI_Pck      =\? ""^        \
-             SSL_Inc      =\? ""^        \
+dbmget $ALog SSL_Inc      =\? ""^        \
              SSL_Lib      =\? ""^        \
              SSL_RPath    =\? $RootLib^  \
              SSL_Path     =\? /usr^      \
@@ -135,9 +132,6 @@ EOF
    end
 
    if ($essl == TRUE) then
-      flog $ALog setenv MDI_Inc      "$MDI_Inc $incl"
-      flog $ALog setenv MDI_Lib      "$libl $MDI_Lib"
-      flog $ALog setenv MDI_Pck      "SSL $MDI_Pck"
       flog $ALog setenv HAVE_OPENSSL TRUE
       NoteD $ALog "      has openssl ($spkl)"
    else
@@ -145,15 +139,13 @@ EOF
    endif
 
 # export the results
-   dbmset $ALog MDI_Inc        = $MDI_Inc^        \
-                MDI_Lib        = $MDI_Lib^        \
-                MDI_Pck        = $MDI_Pck^        \
-                SSL_Inc        = $SSL_Inc^        \
-                SSL_Lib        = $SSL_Lib^        \
-                SSL_RPath      = $SSL_RPath^      \
-                SSL_Path       = $SSL_Path^       \
-                OPENSSL_SO     = $OPENSSL_SO^     \
-                RPATH          = $RPATH
+   dbmset $ALog SSL_Inc    = $SSL_Inc^        \
+                SSL_Lib    = $SSL_Lib^        \
+                SSL_RPath  = $SSL_RPath^      \
+                SSL_Path   = $SSL_Path^       \
+                OPENSSL_SO = $OPENSSL_SO^     \
+                RPATH      = $RPATH
+
 endif
 
 dbexp HAVE_OPENSSL

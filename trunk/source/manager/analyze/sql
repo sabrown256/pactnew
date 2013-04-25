@@ -15,10 +15,7 @@ Note $ALog "----- analyze/sql -----"
 Note $ALog "Analyze: MySQL and SQLite"
 Note $ALog ""
 
-dbmget $ALog MDI_Inc    =\? ""^        \
-             MDI_Lib    =\? ""^        \
-             MDI_Pck    =\? ""^        \
-             SQL_Inc    =\? ""^        \
+dbmget $ALog SQL_Inc    =\? ""^        \
              SQL_Lib    =\? ""^        \
              SQL_RPath  =\? $RootLib^  \
              SQL_Path   =\? /usr^      \
@@ -285,9 +282,6 @@ EOF
    end
 
    if ($esql == TRUE) then
-      flog $ALog setenv MDI_Inc    "$MDI_Inc $incl"
-      flog $ALog setenv MDI_Lib    "$libl $MDI_Lib"
-      flog $ALog setenv MDI_Pck    "SQL $MDI_Pck"
       flog $ALog setenv HAVE_SQL   TRUE
       NoteD $ALog "      has SQL ($spkl)"
    else
@@ -295,10 +289,7 @@ EOF
    endif
 
 # export the results
-   dbmset $ALog MDI_Inc         = $MDI_Inc^        \
-                MDI_Lib         = $MDI_Lib^        \
-                MDI_Pck         = $MDI_Pck^        \
-                SQL_Inc         = $SQL_Inc^        \
+   dbmset $ALog SQL_Inc         = $SQL_Inc^        \
                 SQL_Lib         = $SQL_Lib^        \
                 SQL_RPath       = $SQL_RPath^      \
                 SQL_Path        = $SQL_Path^       \
@@ -310,6 +301,7 @@ EOF
                 SQLITE3_SO      = $SQLITE3_SO^     \
                 SQLITE3_VERSION = $lvsl^           \
                 RPATH           = $RPATH
+
 endif
 
 dbexp HAVE_SQL
