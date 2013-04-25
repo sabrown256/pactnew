@@ -35,8 +35,6 @@ if ($HAVE_FORTRAN == TRUE) then
       Note $ALog "lCC = $lCC"
       Note $ALog "lFC = $lFC"
 
-      set Tmp = $cwd/fc-type
-
 # find the Fortran integer size
       cat << EOF >&! $Tmp.f
       program sizeint
