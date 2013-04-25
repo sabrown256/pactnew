@@ -17,10 +17,7 @@ Note $ALog ""
 
 dbget LIB
 
-dbmget $ALog MD_Inc        =\? ""^           \
-             MD_Lib        =\? ""^           \
-             MD_Pck        =\? ""^           \
-             RL_Inc        =\? ""^           \
+dbmget $ALog RL_Inc        =\? ""^           \
              RL_Lib        =\? ""^           \
              RL_RPath      =\? /usr/${LIB}^  \
              RL_Path       =\? /usr^         \
@@ -87,7 +84,6 @@ EOF
 
    if ($ok == TRUE) then
       flog $ALog set llib = ( $libl )
-      flog $ALog setenv MD_Pck        "RL $MD_Pck"
       dbget READLINE_Version
       NoteD $ALog "      has readline $READLINE_Version ($llib)"
    else
@@ -99,7 +95,6 @@ EOF
 
    flog $ALog $RM $Tmp.c $Tmp
 
-#   setenv MD_Lib   "$llib $MD_Lib"
    setenv RL_Inc   ""
    setenv RL_Lib   "$llib"
    setenv RL_RPath ""
@@ -108,13 +103,11 @@ EOF
    setenv RL_Path  ""
 
 # export the results
-   dbmset $ALog MD_Inc   = $MD_Inc^    \
-                MD_Lib   = $MD_Lib^    \
-                MD_Pck   = $MD_Pck^    \
-                RL_Inc   = $RL_Inc^    \
+   dbmset $ALog RL_Inc   = $RL_Inc^    \
                 RL_Lib   = $RL_Lib^    \
                 RL_RPath = $RL_RPath^  \
                 RL_Path  = $RL_Path
+
 endif
 
 exit(0)

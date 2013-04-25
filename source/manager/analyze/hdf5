@@ -15,10 +15,7 @@ Note $ALog "----- analyze/hdf5 -----"
 Note $ALog "Analyze: hdf5"
 Note $ALog ""
 
-dbmget $ALog MDI_Inc    =\? ""^        \
-             MDI_Lib    =\? ""^        \
-             MDI_Pck    =\? ""^        \
-             HDF_Inc    =\? ""^        \
+dbmget $ALog HDF_Inc    =\? ""^        \
              HDF_Lib    =\? ""^        \
              HDF_RPath  =\? $RootLib^  \
              HDF_Path   =\? /usr^      \
@@ -93,16 +90,10 @@ EOF
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has HDF5 ($PckLib)"
 
-      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         setenv MDI_Inc "$MDI_Inc $PckInc"
-      endif
       if (($Linking == dynamic) && ($?lSO == 1)) then
          setenv HDF5_SO    $lSO
-      else
-         setenv MDI_Lib       "$PckLib $MDI_Lib"
       endif
       flog $ALog setenv RPATH         ${RPATH}:${HDF_RPath}
-      flog $ALog setenv MDI_Pck       "HDF $MDI_Pck"
       flog $ALog setenv HAVE_HDF5     TRUE
 
       flog $ALog $Tmp
@@ -125,14 +116,11 @@ EOF
    setenv HDF_Path  ""
 
 # export the results
-   dbmset $ALog MDI_Inc     = $MDI_Inc^    \
-                MDI_Lib     = $MDI_Lib^    \
-                MDI_Pck     = $MDI_Pck^    \
-                HDF_Inc     = $HDF_Inc^    \
+   dbmset $ALog HDF_Inc     = $HDF_Inc^    \
                 HDF_Lib     = $HDF_Lib^    \
                 HDF_RPath   = $HDF_RPath^  \
                 HDF_Path    = $HDF_Path^   \
-                HDF_VERSION = $lvhd^        \
+                HDF_VERSION = $lvhd^       \
                 HDF5_SO     = $HDF5_SO^    \
                 RPATH       = $RPATH
 
