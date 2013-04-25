@@ -1,0 +1,105 @@
+#!/bin/csh -f
+#
+# FC-INT - analyze Fortran integer type for C interoperability
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $ALog "----- analyze/fc-int -----"
+Note $ALog "Analyze: Fortran integer type for C interoperability"
+Note $ALog ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+dbmget $ALog CFE^                          \
+             Cfe_CC_Exe^                   \
+             Cfe_CC_Flags^                 \
+             Cfe_FC_Exe^                   \
+             Cfe_FC_Flags^                 \
+             Cfe_LD_Flags^                 \
+             Cfe_LD_RPath^                 \
+             FC_INTEGER_C  =\? "unknown"^  \
+             HAVE_FORTRAN
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($HAVE_FORTRAN == TRUE) then
+   if ($Cfe_FC_Exe != "") then
+      set lCC = ( `echo $Cfe_CC_Exe $Cfe_CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
+      set lFC = ( `echo $Cfe_FC_Exe $Cfe_FC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
+      Note $ALog "lCC = $lCC"
+      Note $ALog "lFC = $lFC"
+
+      set Tmp = $cwd/fc-type
+
+# find the Fortran integer size
+      cat << EOF >&! $Tmp.f
+      program sizeint
+      implicit none
+      integer a, i, n
+      character*32 c
+      equivalence(a, c)
+      do i = 1, 32
+         c(i:i) = char(65)
+      enddo
+      a = 0
+      n = 0
+      do i = 1, 32
+         if (c(i:i) .ne. char(65)) then
+            n = n + 1
+         endif
+      enddo
+      write(6, *) n
+      end program sizeint
+EOF
+
+      flog $ALog $lFC $Tmp.f -o $Tmp
+      if ($status != 0) then
+         @ si = 0
+      else
+         @ si = `$CFE $Tmp`
+      endif
+      Note $ALog "Fortran integer size = $si"
+
+      flog $ALog $RM $Tmp*
+
+# find the C type which is the same size as Fortran integer
+      if ($si > 0) then
+
+         cat << EOF >&! $Tmp.c
+#include <stdio.h>
+#include <stdlib.h>
+int main(int c, char **v)
+   {int n;
+    n = atol(v[1]);
+    if (n == sizeof(long))
+       printf("long\n");
+    else if (n == sizeof(short))
+       printf("short\n");
+    else
+       printf("int\n");
+    return(0);}
+EOF
+
+         flog $ALog $lCC $Tmp.c -o $Tmp
+         fexvar $ALog FC_INTEGER_C $Tmp $si
+      endif
+
+      flog $ALog $RM $Tmp*
+
+      NoteD $ALog "      integer is C $FC_INTEGER_C"
+
+   endif
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

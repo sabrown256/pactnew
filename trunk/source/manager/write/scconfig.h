@@ -40,6 +40,7 @@ dbmget $Log Arch^                     \
             FC_ID_CASE^               \
             FC_ID_UNDERSCORE^         \
             FC_INT_PTR_DIFFER^        \
+            FC_INTEGER_C^             \
             FilterDir^                \
             FPU^                      \
             GETSOCKOPT_TYPE^          \
@@ -194,9 +195,8 @@ dbmget $Log Arch^                     \
        Note $STDOUT "#define LONG64"
     endif
 
-    if (-e $IncDir/Finteger.bytes) then
-       Note $STDOUT `cat $IncDir/Finteger.bytes`
-       $RM $IncDir/Finteger.bytes
+    if ("$FC_INTEGER_C" != "unknown") then
+       Note $STDOUT "#define FIXNUM $FC_INTEGER_C"
     endif
 
     Note $STDOUT ""
