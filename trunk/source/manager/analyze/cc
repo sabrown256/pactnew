@@ -258,7 +258,7 @@ EOF
    flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
 
-      fexvar $ALog FC_INT_PTR_DIFFER $CFE ./$Tmp $BE
+      fexvar $ALog FC_INT_PTR_DIFFER $CFE $Tmp $BE
       if ("$FC_INT_PTR_DIFFER" == TRUE) then
          NoteD $ALog "      pointer size differs from Fortran INTEGER size"
       endif
@@ -292,7 +292,7 @@ EOF
    flog $ALog cat $Tmp.c
    flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
-      set LONG64 = `$CFE ./$Tmp $BE`
+      set LONG64 = `$CFE $Tmp $BE`
    else
       NoteD $ALog " "
       NoteD $ALog " "
@@ -324,7 +324,7 @@ EOF
    flog $ALog cat $Tmp.c
    flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
-      set NEED_ALT_LARGE_FILE = `$CFE ./$Tmp $BE`
+      set NEED_ALT_LARGE_FILE = `$CFE $Tmp $BE`
    else
       NoteD $ALog " "
       NoteD $ALog " "

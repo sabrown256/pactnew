@@ -29,10 +29,6 @@ getbytes.f : getkinds
 getkinds : getkinds.f
 	${FC} ${FFLAGS} getkinds.f -o getkinds
 
-sizeint : sizeint.f
-	${FC} ${FFLAGS} sizeint.f -o sizeint
-	sizeint
-
 clean:
 	rm -f getkinds getbytes genfiles
 	rm -f getbytes.f
