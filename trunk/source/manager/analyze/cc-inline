@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# NORETURN - analyze _Noreturn for C11 compiler
+# CC-INLINE - analyze inline for C compiler
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -8,35 +8,40 @@
 # include "cpyright.h"
 #
 
-
 set Me = $0
 source $Me:h/common
 
-Note $ALog "----- analyze/noreturn -----"
-Note $ALog "Analyze: C11 _Noreturn handling"
+Note $ALog "----- analyze/cc-inline -----"
+Note $ALog "Analyze: inline handling"
 Note $ALog ""
 
 dbmget $ALog Cfe_CC_Exe^      \
              PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
-_Noreturn void b(void) {while (1) sleep(1);}
+inline int b(int y)
+   {int x;
+    x = y % 2;
+    return(x);}
 int main(int c, char **v)
-   {b();
+   {int x, y;
+    y = 8;
+    x = b(y);
     return(0);}
 EOF
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if ($status == 0) then
-   setenv HAVE_NORETURN TRUE
-   NoteD $ALog "      has _Noreturn support"
+   setenv HAVE_INLINE TRUE
+   NoteD $ALog "      has inline support"
 else
-   setenv HAVE_NORETURN FALSE
-   NoteD $ALog "      no _Noreturn support"
+   setenv HAVE_INLINE FALSE
+   NoteD $ALog "      no inline support"
 endif
 
 rm -f $Tmp $Tmp.c $Tmp.o
 
 # export the result
-dbexp HAVE_NORETURN
+dbexp HAVE_INLINE
 
+exit(0)

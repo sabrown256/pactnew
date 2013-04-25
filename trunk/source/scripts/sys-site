@@ -14,6 +14,7 @@ endif
 
 set exe    = $0
 set bindir = $exe:h
+set path   = ( $path $bindir )
 
 set deflt = FALSE
 set osh   = csh

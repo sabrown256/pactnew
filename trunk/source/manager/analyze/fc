@@ -22,14 +22,11 @@ else
    setenv HAVE_FORTRAN   TRUE
 endif
 
-dbmget $ALog STD_F            =\? "F90"^        \
-             FC_Exe           =\? "f90"^        \
+dbmget $ALog FC_Exe           =\? "f90"^        \
              FC_Flags         =\? ""^           \
              FC_Debug         =\? "-g"^         \
              FC_Optimize      =\? "-O"^         \
              FC_Linker        =\? ""^           \
-             FC_ID_UNDERSCORE =\? "_"^          \
-             FC_ID_CASE       =\? "lower"^      \
              Cfg_FC_Flags     =\? "$FC_Flags"^  \
              PACT_FC_FAMILY^                    \
              PACT_FC_VERSION^                   \
@@ -37,8 +34,6 @@ dbmget $ALog STD_F            =\? "F90"^        \
              PACT_FC_EXE^                       \
              NM^                                \
              OS_Name
-
-set UTime = `timer -r`
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -113,8 +108,6 @@ endif
 if ($FC_Exe != "") then
    Note $ALog ""
 
-#--------------------------------------------------------------------------
-
 # VERSION -  check the compiler version
 
    Note $ALog "Check the version of the FORTRAN compiler"
@@ -159,119 +152,7 @@ if ($FC_Exe != "") then
    endif
    Note $ALog ""
 
-#--------------------------------------------------------------------------
-
-# STANDARD - check the compiler standard compliance
-
-cat << EOF >! $Tmp-90.f
-      subroutine foo(bar)
-      integer :: bar
-      integer, intrinsic :: selected_int_kind
-      bar = selected_int_kind(5)
-      end subroutine foo
-EOF
-
-cat << EOF >! $Tmp-03.f
-      subroutine foo(bar)
-      use iso_c_binding
-      implicit none
-      integer(C_INT), value, intent(in) :: bar
-      type(C_PTR) :: cp
-      end subroutine foo
-EOF
-
-   setenv STD_F none
-
-   Note $ALog "Find the standard of $FC_Exe"
-   set lst = ( F2003 $Tmp-03.f F90 $Tmp-90.f )
-   while ($#lst > 0)
-      set s = $lst[1]
-      set f = $lst[2]
-      shift lst
-      shift lst
-      Note $ALog "   check $f for $s standard"
-      flog $ALog cat $f
-      flog $ALog $FC_Exe $f -c $FC_Flags
-      if ($status == 0) then
-         NoteD $ALog "      gfortran is $s compliant"
-         setenv STD_F $s
-         break
-      endif
-   end
-
-   set ETime = `timer -b $UTime`
-
-   Note $ALog ""
-   Note $ALog "Results of Fortran compiler analysis ($ETime)"
-   Note $ALog "   AnsiFC = |$AnsiFC|"
-   Note $ALog "   FC_Exe = |$FC_Exe|"
-   Note $ALog "   STD_F  = |$STD_F|"
-   Note $ALog ""
-
-#--------------------------------------------------------------------------
-
-# IDENTIFIERS - make a file to test how Fortran compilers map identifiers
-
-cat << EOF >! $Tmp.f
-      subroutine foo
-      end subroutine foo
-      subroutine Bar
-      end subroutine Bar
-EOF
-
-   flog $ALog cat $Tmp.f
-   flog $ALog $FC_Exe $FC_Flags -c $Tmp.f -o $Tmp.o
-   if (-f $Tmp.o) then
-
-# check for appended characters (such as underscores)
-
-      flog $ALog $NM $Tmp.o
-      flog $ALog gexec $NM $Tmp.o @b grep -i foo @o tr '[A-Z]' '[a-z]' @o fw:$Tmp.nm
-      flog $ALog cat $Tmp.nm
-
-      set FID = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /foo/) { print $i };};}' $Tmp.nm`
-      Note $ALog "Number of tokens = $#FID"
-
-# SGI nm uses bar as field delimiter without space between delimiter and field
-# AIX nm prints with dot in front of id to distinguish definition from reference
-      set FID = `expr "$FID[1]" : '.*\(foo.*\)'`
-
-      rm $Tmp.nm
-      Note $ALog "FID = |$FID|"
-      flog $ALog set FID_app = `expr "$FID" : 'foo\(.*\)'`
-      if ("$FID_app" == "") then
-         NoteD $ALog "      $FC_Exe appends nothing to identifiers"
-      else
-         NoteD $ALog "      $FC_Exe appends '$FID_app' to identifiers"
-      endif
-
-      flog $ALog setenv FC_ID_UNDERSCORE "$FID_app"
-
-# check for handling of identifier case
-      flog $ALog gexec $NM $Tmp.o @b grep -i bar @o fw:$Tmp.nm
-      flog $ALog cat $Tmp.nm
-      set Lower = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bar/) { print $i };};}' $Tmp.nm`
-      set Upper = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /BAR/) { print $i };};}' $Tmp.nm`
-      flog $ALog rm $Tmp.nm
-      flog $ALog set FID_case = nomap
-      if ("$Lower" != "") then
-         NoteD $ALog "      $FC_Exe maps identifiers to lower case"
-         flog $ALog set FID_case = lower
-      endif
-      if ("$Upper" != "") then
-         NoteD $ALog "      $FC_Exe maps identifiers to upper case"
-         flog $ALog set FID_case = upper
-      endif
-      if ($?FC_ID_CASE == 0) then
-         flog $ALog setenv FC_ID_CASE $FID_case
-      endif
-   endif
-
-#--------------------------------------------------------------------------
-
 endif
-
-flog $ALog rm -f $Tmp.f $Tmp $Tmp.o
 
 setenv FC_Flags "$Save_FFLAGS"
 
@@ -282,10 +163,7 @@ DONE:
 
 # export the results
 
-dbmset $ALog CC_Exe           = $CC_Exe^           \
-             CC_Flags         = $CC_Flags^         \
-             HAVE_FORTRAN     = $HAVE_FORTRAN^     \
-             STD_F            = $STD_F^            \
+dbmset $ALog HAVE_FORTRAN     = $HAVE_FORTRAN^     \
              FC_Exe           = $FC_Exe^           \
              FC_Flags         = $FC_Flags^         \
              FC_Debug         = $FC_Debug^         \
@@ -294,14 +172,14 @@ dbmset $ALog CC_Exe           = $CC_Exe^           \
              Cfg_FC_Exe       = $Cfg_FC_Exe^       \
              Cfg_FC_Flags     = $Cfg_FC_Flags^     \
              Cfe_FC_Exe       = $Cfe_FC_Exe^       \
-             Cfe_FC_Flags     = $Cfe_FC_Flags^     \
-             FC_ID_UNDERSCORE = $FC_ID_UNDERSCORE^ \
-             FC_ID_CASE       = $FC_ID_CASE
+             Cfe_FC_Flags     = $Cfe_FC_Flags
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-source $AnaDir/fiso-c
+gexec $AnaDir/fc-id    @ \
+      $AnaDir/fc-std   @ \
+      $AnaDir/fc-iso
 
 exit(0)
 
