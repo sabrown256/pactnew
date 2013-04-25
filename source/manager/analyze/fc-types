@@ -1,0 +1,81 @@
+#!/bin/csh -f
+#
+# FC-TYPES - analyze Fortran types
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $ALog "----- analyze/fc-types -----"
+Note $ALog "Analyze: Fortran types"
+Note $ALog ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+dbmget $ALog CFE^                          \
+             Cfe_CC_Exe^                   \
+             Cfe_CC_Flags^                 \
+             Cfe_FC_Exe^                   \
+             Cfe_FC_Flags^                 \
+             Cfe_LD_Flags^                 \
+             Cfe_LD_RPath^                 \
+             STD_F^                        \
+             HAVE_FORTRAN^                 \
+             SysDir
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($HAVE_FORTRAN == TRUE) then
+   if (($Cfe_FC_Exe != "") && (($STD_F == 'F90') || ($STD_F == 'F2003'))) then
+
+      set lCC = ( `echo $Cfe_CC_Exe $Cfe_CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
+      set lFC = ( `echo $Cfe_FC_Exe $Cfe_FC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
+      Note $ALog "lCC = $lCC"
+      Note $ALog "lFC = $lFC"
+
+      flog $ALog set lsdir = ../f90kinds
+
+# run getkinds to generate getbytes.f
+      flog $ALog $lFC $lsdir/getkinds.f -o getkinds
+      flog $ALog ($CFE ./getkinds >&! getbytes.f)
+      if ($status != 0) then
+         NoteD $ALog "      Cannot determine Fortran kinds"
+         flog $ALog cat getbytes.f
+      endif
+
+# compile and link getbytes
+      flog $ALog $lCC -I../.. -c $lsdir/csizer.c -o csizer.o
+      flog $ALog $lFC getbytes.f csizer.o -o getbytes
+      if ($status != 0) then
+         NoteD $ALog "      Cannot compute Fortran primitive byte sizes"
+      endif
+
+# run getbytes to generate from_c and from_h
+      flog $ALog $CFE ./getbytes
+      if ($status != 0) then
+         Note $ALog "***> Cannot run getbytes"
+      endif
+
+# run genfiles to generate f90types.h and f90kinds.inc
+# requires from_c and from_h as input
+      flog $ALog $lCC -I../.. $lsdir/genfiles.c -o genfiles
+      flog $ALog $CFE ./genfiles
+      if ($status != 0) then
+         Note $ALog "***> Cannot run genfiles"
+      endif
+
+      flog $ALog mv f90types.h f90kinds.inc $SysDir/include
+
+   endif
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

@@ -19,7 +19,6 @@ source $AnaDir/quickdraw
 source $AnaDir/opengl
 source $AnaDir/x11
 
-#source $AnaDir/libz
 source $AnaDir/png
 source $AnaDir/jpeg
 
