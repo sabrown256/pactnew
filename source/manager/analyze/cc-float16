@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# FLOAT16 - analyze long double support for C compiler
+# CC-FLOAT16 - analyze long double support for C compiler
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -11,7 +11,7 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "----- analyze/float16 -----"
+Note $ALog "----- analyze/cc-float16 -----"
 Note $ALog "Analyze: C90 long double support"
 Note $ALog ""
 

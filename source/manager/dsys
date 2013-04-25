@@ -911,6 +911,7 @@ switch ($Cmnd)
         flog $Log umask
 
         flog $Log $RM *.core *~
+        flog $Log $RM $LogDir/analyze*
 
 # figure out from where configuration info is coming
         set gdir = gen/$Arch

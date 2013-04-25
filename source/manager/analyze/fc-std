@@ -1,0 +1,71 @@
+#!/bin/csh -f
+#
+# FC-STD - analyze the platform Fortran Compiler standard
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $ALog "----- analyze/fc-std -----"
+Note $ALog "Analyze: Fortran compiler standard"
+Note $ALog ""
+
+dbmget $ALog FC_Exe           =\? "f90"^        \
+             FC_Flags         =\? ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# STANDARD - check the compiler standard compliance
+
+cat << EOF >! $Tmp-90.f
+      subroutine foo(bar)
+      integer :: bar
+      integer, intrinsic :: selected_int_kind
+      bar = selected_int_kind(5)
+      end subroutine foo
+EOF
+
+cat << EOF >! $Tmp-03.f
+      subroutine foo(bar)
+      use iso_c_binding
+      implicit none
+      integer(C_INT), value, intent(in) :: bar
+      type(C_PTR) :: cp
+      end subroutine foo
+EOF
+
+   setenv STD_F none
+
+   Note $ALog "Find the standard of $FC_Exe"
+   set lst = ( F2003 $Tmp-03.f F90 $Tmp-90.f )
+   while ($#lst > 0)
+      set s = $lst[1]
+      set f = $lst[2]
+      shift lst
+      shift lst
+      Note $ALog "   check $f for $s standard"
+      flog $ALog cat $f
+      flog $ALog $FC_Exe $f -c $FC_Flags
+      if ($status == 0) then
+         NoteD $ALog "      $FC_Exe:t is $s compliant"
+         setenv STD_F $s
+         break
+      endif
+   end
+
+   flog $ALog rm -f $Tmp*.f $Tmp*.o
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# export the results
+   dbmset $ALog STD_F = $STD_F
+
+   exit(0)
+

@@ -15,30 +15,20 @@ set ExeDir = $Cmd:h
 if ($?AnaDir == 0) then
    setenv AnaDir $ExeDir
 endif
-if ($?ALog == 0) then
-   setenv ALog $cwd/cfg-$System/log.analyze
-endif
 
 if (-f ../scripts/functions-pact.csh) then
-   set MngDir = $cwd
+   set MngDir  = $cwd
 else if (-f ../../scripts/functions-pact.csh) then
-   set MngDir = $cwd:h
+   set MngDir  = $cwd:h
 endif
-set ldir = $MngDir:h/scripts
+set ldir  = $MngDir:h/scripts
 set Which = "$MngDir/pwhich"
 
 if ($?FirstCommon == 0) then
-   if (-x ../scripts/cfgman) then
-      set larch = `../scripts/cfgman use`
-      set lroot = $cwd:h
-   else if (-x ../../scripts/cfgman) then
-      set larch = `../../scripts/cfgman use`
-      set lroot = $cwd:h
-      set lroot = $lroot:h
-   endif
-
-   set lbin = $lroot/dev/$larch/bin
-   set path = ( $ldir $lbin $path )
+   set lroot = $ldir:h
+   set larch = `$ldir/cfgman use`
+   set lbin  = $lroot/dev/$larch/bin
+   set path  = ( $ldir $lbin $path )
 
    unset lbin
    unset lroot
@@ -51,6 +41,19 @@ source $ldir/functions-pact.csh
 source $ldir/csh-subroutines
 
 set Tmp = tmp-$Exe
+
+if ($?ALog == 1) then
+   set lalog = $ALog:h/analyze.$Exe
+else
+   set lalog = $cwd/analyze.$Exe
+endif
+
+if (-f $lalog) then
+   set ALog = $lalog
+else
+   InitLog ALog $lalog
+endif
+unset lalog
 
 Note $ALog ""
 Separator $ALog

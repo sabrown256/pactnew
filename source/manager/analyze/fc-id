@@ -1,0 +1,91 @@
+#!/bin/csh -f
+#
+# FC-ID - analyze the platform Fortran Compiler handling of identifiers
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $ALog "----- analyze/fc-id -----"
+Note $ALog "Analyze: identifier handling"
+Note $ALog ""
+
+dbmget $ALog FC_Exe           =\? "f90"^        \
+             FC_Flags         =\? ""^           \
+             FC_ID_UNDERSCORE =\? "_"^          \
+             FC_ID_CASE       =\? "lower"^      \
+             NM
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+cat << EOF >! $Tmp.f
+      subroutine foo
+      end subroutine foo
+      subroutine Bar
+      end subroutine Bar
+EOF
+
+   flog $ALog cat $Tmp.f
+   flog $ALog $FC_Exe $FC_Flags -c $Tmp.f -o $Tmp.o
+   if (-f $Tmp.o) then
+
+# check for appended characters (such as underscores)
+
+      flog $ALog $NM $Tmp.o
+      flog $ALog gexec $NM $Tmp.o @b grep -i foo @o tr '[A-Z]' '[a-z]' @o fw:$Tmp.nm
+      flog $ALog cat $Tmp.nm
+
+      set FID = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /foo/) { print $i };};}' $Tmp.nm`
+      Note $ALog "Number of tokens = $#FID"
+
+# SGI nm uses bar as field delimiter without space between delimiter and field
+# AIX nm prints with dot in front of id to distinguish definition from reference
+      set FID = `expr "$FID[1]" : '.*\(foo.*\)'`
+
+      rm $Tmp.nm
+      Note $ALog "FID = |$FID|"
+      flog $ALog set FID_app = `expr "$FID" : 'foo\(.*\)'`
+      if ("$FID_app" == "") then
+         NoteD $ALog "      $FC_Exe appends nothing to identifiers"
+      else
+         NoteD $ALog "      $FC_Exe appends '$FID_app' to identifiers"
+      endif
+
+      flog $ALog setenv FC_ID_UNDERSCORE "$FID_app"
+
+# check for handling of identifier case
+      flog $ALog gexec $NM $Tmp.o @b grep -i bar @o fw:$Tmp.nm
+      flog $ALog cat $Tmp.nm
+      set Lower = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bar/) { print $i };};}' $Tmp.nm`
+      set Upper = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /BAR/) { print $i };};}' $Tmp.nm`
+      flog $ALog rm $Tmp.nm
+      flog $ALog set FID_case = nomap
+      if ("$Lower" != "") then
+         NoteD $ALog "      $FC_Exe maps identifiers to lower case"
+         flog $ALog set FID_case = lower
+      endif
+      if ("$Upper" != "") then
+         NoteD $ALog "      $FC_Exe maps identifiers to upper case"
+         flog $ALog set FID_case = upper
+      endif
+      if ($?FC_ID_CASE == 0) then
+         flog $ALog setenv FC_ID_CASE $FID_case
+      endif
+   endif
+
+   flog $ALog rm -f $Tmp.f $Tmp $Tmp.o
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+DONE:
+
+# export the results
+   dbmset $ALog FC_ID_UNDERSCORE = $FC_ID_UNDERSCORE^ \
+                FC_ID_CASE       = $FC_ID_CASE
+
+   exit(0)
+
