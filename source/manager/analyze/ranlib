@@ -1,9 +1,6 @@
 #!/bin/csh -f
 #
-# UTIL - analyze the platform utilities
-#
-# Source Version: 3.0
-# Software Release #: LLNL-CODE-422942
+# RANLIB - analyze the platform ranlib utility
 #
 # include "cpyright.h"
 #
@@ -11,22 +8,16 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: util"
-
-NoteD $ALog "   System Utilities: "
+Note $ALog "----- analyze/ranlib -----"
+Note $ALog "Analyze: ranlib utility"
+Note $ALog ""
 
 dbmget $ALog AR_Exe   =\? ar^    \
              AR_Flags =\? ""^    \
-             INSTALL  =\? cp^    \
              Cfe_CC_Exe^         \
-             Cfe_CC_Flags^       \
-             PACT_CC_VERSION
+             Cfe_CC_Flags
 
 rm -f foo.c foo.o bar.c bar.o main.c libfoo.a $Tmp
-
-Note $ALog "analyze/util"
-Note $ALog "Cfe_CC_Exe   = |$Cfe_CC_Exe|"
-Note $ALog "Cfe_CC_Flags = |$Cfe_CC_Flags|"
 
 # this script is necessary because some idiot ld writers insist
 # that error messages be printed directly to /dev/tty in addition to
@@ -124,30 +115,15 @@ EOF
       else
          setenv UPDATE "ranlib"
       endif
-      NoteD $ALog "      uses ranlib"
+      NoteD $ALog "   Ranlib: $UPDATE"
    else
       setenv UPDATE $Ranlib_Exe
-      NoteD $ALog "      no ranlib"
+      NoteD $ALog "   Ranlib: no ranlib"
    endif
 
 endif
 
 rm -f foo.c foo.o bar.c bar.o main.c libfoo.a $Tmp load
-
-# let's understand install on this system
-# but let's not use it
-
-set res = `$MngDir/pwhich install`
-if (`expr $res[1] : "/."` >= 1) then
-   set MINSTALL = "install"
-   NoteD $ALog "      has install"
-else if (-e /etc/install) then
-   set MINSTALL = "install"
-   NoteD $ALog "      has install"
-else   
-   set MINSTALL = "cp"
-   NoteD $ALog "      no install"
-endif
 
 # export the results
 dbmset $ALog AR_Exe     = $AR_Exe^       \
@@ -155,11 +131,7 @@ dbmset $ALog AR_Exe     = $AR_Exe^       \
              AR_IFlag   = $AR_IFlag^     \
              AR_XFlag   = $AR_XFlag^     \
              Ranlib_Exe = $Ranlib_Exe^   \
-             UPDATE     = $UPDATE^       \
-             INSTALL    = $INSTALL
-
-# look for job schedulers
-source $AnaDir/jobs
+             UPDATE     = $UPDATE
 
 exit(0)
 

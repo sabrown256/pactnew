@@ -12,14 +12,13 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: hw"
+Note $ALog "----- analyze/hw -----"
+Note $ALog "Analyze: platform hardware"
+Note $ALog ""
 
 if ($?Arch == 0) then
    setenv Arch `../scripts/system-id`
 endif
-
-NoteD $ALog -n "   Hardware: "
-Note $ALog ""
 
 dbmget $ALog CPU =\? "unknown"^  \
              FPU =\? "unknown"
@@ -53,14 +52,14 @@ if ($FPU == "unknown") then
    endif
 endif
 
-NoteD $ALog -n "$HostHW"
+set msg = "Hardware: $HostHW"
 if ("$CPU" != "unknown") then
-   NoteD $ALog -n " $CPU"
+   set msg = "$msg $CPU"
 endif
 if ("$FPU" != "unknown") then
-   NoteD $ALog -n " ($FPU)"
+   set msg = "$msg $CPU ($FPU)"
 endif
-NoteD $ALog ""
+NoteD $ALog "   $msg"
 
 dbmset $ALog CPU = $CPU^  \
              FPU = $FPU

@@ -11,7 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: csh"
+Note $ALog "----- analyze/csh -----"
+Note $ALog "Analyze: C shell"
+Note $ALog ""
 
 set inf = ( `ls -l /bin/csh` )
 @ n = $#inf
@@ -21,18 +23,12 @@ else
    set exe = "/bin/csh"
 endif
 
-NoteD $ALog -n "   CSH: $exe "
-Note $ALog ""
-
-Note $ALog "cwd    = |$cwd|"
-Note $ALog "MngDir = |$MngDir|"
-Note $ALog "AnaDir = |$AnaDir|"
 source $AnaDir/backslash
 
 if ("$BackSlash" == "\") then
-   NoteD $ALog "(uses \)"
+   NoteD $ALog "   CSH: $exe (uses \)"
 else
-   NoteD $ALog "(uses \\\\)"
+   NoteD $ALog "   CSH: $exe (uses \\\\)"
 endif
 
 dbexp BackSlash

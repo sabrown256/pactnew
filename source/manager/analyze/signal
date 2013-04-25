@@ -11,7 +11,8 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: signal"
+Note $ALog "----- analyze/signal -----"
+Note $ALog "Analyze: signal call"
 Note $ALog ""
 
 dbmget $ALog HAVE_POSIX_SIGNALS =\? FALSE^ \
@@ -47,7 +48,6 @@ flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    setenv HAVE_POSIX_SIGNALS TRUE
    set sig = ( $sig posix )
-#   NoteD $ALog -n " posix"
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -68,7 +68,6 @@ EOF
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    set sig = ( $sig sysv )
-#   NoteD $ALog -n " sysv"
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -89,7 +88,6 @@ EOF
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    set sig = ( $sig bsd )
-#   NoteD $ALog -n " bsd"
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp

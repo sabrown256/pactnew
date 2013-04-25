@@ -24,11 +24,6 @@ while ($#argv > 0)
    shift
 end
 
-if ($lQuiet == FALSE) then
-   NoteD $ALog -n "   Library base: "
-   Note $ALog ""
-endif
-
 dbmget $ALog Bits
 
 set lroot = /usr
@@ -37,7 +32,7 @@ unset lroot
 setenv LIB $LibT
 
 if ($lQuiet == FALSE) then
-   NoteD $ALog $LIB
+   NoteD $ALog "   Library base: $LIB"
 endif
 
 # export the results

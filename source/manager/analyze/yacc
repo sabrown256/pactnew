@@ -12,9 +12,8 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: yacc"
-
-NoteD $ALog -n "   Yacc: "
+Note $ALog "----- analyze/yacc -----"
+Note $ALog "Analyze: yacc utility"
 Note $ALog ""
 
 dbmget $ALog Yacc_Exe   =\? yacc^    \
@@ -46,18 +45,16 @@ endif
 
 # report none if there is nothing available
 if ("$Yacc_Exe" == "") then
-   NoteD $ALog "none"
+   NoteD $ALog "   Yacc: none"
 
 # check whether this is bison or yacc
 else
-   NoteD $ALog -n "$Yacc_Exe"
-   Note $ALog ""
    fexec $ALog $Yacc_Exe --help @b grep bison
    if ($gstatus[2] == 0) then
       setenv Yacc_Flags "-y $Yacc_Flags"
-      NoteD $ALog " (bison)"
+      NoteD $ALog "   Yacc: $Yacc_Exe (bison)"
    else
-      NoteD $ALog ""
+      NoteD $ALog "   Yacc: $Yacc_Exe"
    endif
 endif
 

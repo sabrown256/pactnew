@@ -11,9 +11,8 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: lex"
-
-NoteD $ALog -n "   Lex: "
+Note $ALog "----- analyze/lex -----"
+Note $ALog "Analyze: lex utility"
 Note $ALog ""
 
 dbmget $ALog Lex_Exe           =\? ""^    \
@@ -36,28 +35,28 @@ foreach i ($path /usr/bin /bin)
    if (-x $lLex) then
       $lLex $Tmp.l >& /dev/null
       if ($status == 0) then
-         NoteD $ALog -n "$lLex"
          setenv Lex_Exe $lLex
          grep FLEX lex.yy.c >& /dev/null
          if ($status == 0) then
-            NoteD $ALog -n " (FLEX)"
+            NoteD $ALog "   Lex: $lLex (FLEX)"
             setenv HAVE_FLEX_SCANNER TRUE
+         else
+            NoteD $ALog "   Lex: $lLex"
          endif
          break
       endif
    else if (-x $fLex) then
       $fLex $Tmp.l >& /dev/null
       if ($status == 0) then
-         NoteD $ALog -n "$fLex"
          setenv Lex_Exe $fLex
          setenv HAVE_FLEX_SCANNER TRUE
-         NoteD $ALog -n " (FLEX)"
+         NoteD $ALog "   Lex: $fLex (FLEX)"
+      else
+         NoteD $ALog "   Lex: $fLex"
       endif
       break
    endif
 end
-
-NoteD $ALog ""
 
 rm -f $Tmp.l
 
