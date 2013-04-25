@@ -12,7 +12,9 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: poll"
+Note $ALog "----- analyze/poll -----"
+Note $ALog "Analyze: select/poll"
+Note $ALog ""
 
 dbmget $ALog HAVE_SELECT  =\? FALSE^  \
              HAVE_STREAMS =\? FALSE^  \
@@ -90,16 +92,15 @@ endif
 rm -f $Tmp.c $Tmp
 
 if ("$poll" == "") then
-   NoteD $ALog "      no file polling"
+   set mex = "no file polling"
 else
-   NoteD $ALog -n "      has $poll file polling"
-   Note $ALog ""
+   set mex = "has $poll file polling"
 endif
 
 # make the decisions
 if ($HAVE_SELECT == File) then
    if ($FOUND_SELECT == FALSE) then
-      NoteD $ALog "   select requested but not found"
+      set mex = "select requested but not found"
    else
       set FOUND_POLL = FALSE
    endif
@@ -108,7 +109,7 @@ setenv HAVE_SELECT $FOUND_SELECT
 
 if ($HAVE_STREAMS == File) then
    if ($FOUND_POLL == FALSE) then
-      NoteD $ALog "   poll requested but not found"
+      set mex = "poll requested but not found"
    else
       set FOUND_SELECT = FALSE
    endif
@@ -117,16 +118,14 @@ setenv HAVE_STREAMS $FOUND_POLL
 
 if (($HAVE_SELECT == TRUE) && ($HAVE_STREAMS == TRUE)) then
    setenv HAVE_SELECT FALSE
-   NoteD $ALog -n " (using poll)"
+   NoteD $ALog "      $mex (using poll)"
 else if ($#IOHandling > 1) then
    if ($HAVE_STREAMS == TRUE) then
-      NoteD $ALog -n " (using poll)"
+      NoteD $ALog "      $mex (using poll)"
    else if ($HAVE_SELECT == TRUE) then
-      NoteD $ALog -n " (using select)"
+      NoteD $ALog "      $mex (using select)"
    endif
 endif
-
-NoteD $ALog ""
 
 # export the results
 dbmset $ALog HAVE_STREAMS = $HAVE_STREAMS^   \

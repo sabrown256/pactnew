@@ -11,7 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: openmp"
+Note $ALog "----- analyze/openmp -----"
+Note $ALog "Analyze: OpenMP"
+Note $ALog ""
 
 dbmget $ALog PTHREAD_OMP =\? FALSE^ \
              Cfe_CC_Exe^            \
@@ -43,16 +45,15 @@ set opt = ( $opt $Cfe_CC_Flags )
 set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 set opt = ( $opt $Cfe_LD_Lib )
 
+set msg = "no OpenMP"
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    if ($PTHREAD_OMP == FALSE) then
-      NoteD $ALog -n "      no OpenMP (by request)"
+      set msg = "$msg (by request)"
    else
       setenv HAVE_OPENMP TRUE
-      NoteD $ALog -n "      has OpenMP"
+      set msg = "has OpenMP"
    endif
-else
-   NoteD $ALog -n "      no OpenMP"
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -186,13 +187,13 @@ EOF
        setenv STD_OPENMP 1.0
    endif
 
-   NoteD $ALog -n " ($STD_OPENMP)"
+   NoteD $ALog "      $msg ($STD_OPENMP)"
+else
+   NoteD $ALog "      $msg"
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-NoteD $ALog ""
 
 # export the results
 dbmset $ALog HAVE_OPENMP = $HAVE_OPENMP^            \

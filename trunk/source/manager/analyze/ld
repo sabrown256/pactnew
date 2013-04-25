@@ -11,9 +11,8 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: ld"
-
-NoteD $ALog -n "   Ld: "
+Note $ALog "----- analyze/ld -----"
+Note $ALog "Analyze: linker"
 Note $ALog ""
 
 dbmget $ALog LD_Exe        =\? ""^   \
@@ -54,10 +53,10 @@ else
    set LStat = $status
 endif
 if ($LStat == 0) then
-   NoteD $ALog "$LD_Exe (has -rpath)"
+   NoteD $ALog "   Ld: $LD_Exe (has -rpath)"
    setenv HAVE_RPATH TRUE
 else
-   NoteD $ALog "$LD_Exe (no -rpath)"
+   NoteD $ALog "   Ld: $LD_Exe (no -rpath)"
    setenv HAVE_RPATH FALSE
 endif
 

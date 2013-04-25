@@ -10,31 +10,39 @@
 # figure out libm first to minimize variable reset tangle
 run ../analyze/libm
 
+Run {
+
 # greater context
-run ../analyze/site
+   ../analyze/site
 
 # hardware
-run ../analyze/hw
+   ../analyze/hw
 
 # operating system
-run ../analyze/os
+   ../analyze/os
 
 # shells
-run ../analyze/csh
-run ../analyze/sh
+   ../analyze/csh
+   ../analyze/sh
 
 # compilers/linkers
-run ../analyze/cc
-run ../analyze/fc
-run ../analyze/ld
-run ../analyze/yacc
-run ../analyze/lex
+   ../analyze/cc
+}
+
+Run {
+   ../analyze/fc
+   ../analyze/ld
+   ../analyze/yacc
+   ../analyze/lex
 
 # system level utilities
-run ../analyze/make
-run ../analyze/python
-run ../analyze/util
-run ../analyze/tracker
+   ../analyze/make
+   ../analyze/python
+   ../analyze/ranlib
+   ../analyze/install
+   ../analyze/jobs
+   ../analyze/tracker
+}
 
 # system features
 run ../analyze/features

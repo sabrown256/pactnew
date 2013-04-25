@@ -11,9 +11,8 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: socket"
-
-NoteD $ALog -n "      getsockopt type: "
+Note $ALog "----- analyze/socket -----"
+Note $ALog "Analyze: socket handling"
 Note $ALog ""
 
 dbmget $ALog HAVE_SOCKETS =\? TRUE^ \
@@ -42,8 +41,9 @@ if ($t == 0) then
 else
    setenv GETSOCKOPT_TYPE "unsigned int"
 endif
-NoteD $ALog $GETSOCKOPT_TYPE
 unset t
+
+NoteD $ALog "      getsockopt type: $GETSOCKOPT_TYPE"
 
 flog $ALog rm -f $Tmp.c $Tmp
 

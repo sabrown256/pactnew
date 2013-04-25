@@ -1,0 +1,33 @@
+#!/bin/csh -f
+#
+# INSTALL - analyze the install utility
+#         - understand install on this system
+#         - but do not use it
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $ALog "----- analyze/install -----"
+Note $ALog "Analyze: install utility"
+Note $ALog ""
+
+dbmget $ALog INSTALL  =\? cp
+
+set res = `where install |& head -n 1`
+if (-x "$res") then
+   set MINSTALL = $res
+else if (-e /etc/install) then
+   set MINSTALL = /etc/install
+else   
+   set MINSTALL = `which cp`
+endif
+NoteD $ALog "   Install: $MINSTALL"
+
+# export the results
+dbmset $ALog INSTALL = $MINSTALL
+
+exit(0)
+

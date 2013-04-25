@@ -16,9 +16,8 @@ if ($?Log == 0) then
    setenv Log $ALog
 endif
 
-Note $ALog "Analyze: os"
-
-NoteD $ALog -n "   Operating System: "
+Note $ALog "----- analyze/os -----"
+Note $ALog "Analyze: platform OS"
 Note $ALog ""
 
 set los = ( `uname -s` )
@@ -64,8 +63,7 @@ if ($OS_Name == Darwin) then
 endif
 
 # there are systems that put out garbage if this is on a single echo (AIX)
-NoteD $ALog -n "$OS_Name $OS_Release"
-NoteD $ALog " ($OS_Type)"
+NoteD $ALog "   Operating System: $OS_Name $OS_Release ($OS_Type)"
 
 setenv OS_Type USE_$OS_Type
 

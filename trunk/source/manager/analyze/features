@@ -14,6 +14,7 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: system features"
 
+NoteD $ALog ""
 NoteD $ALog "   System Features:"
 
 gexec $AnaDir/fork      @ \
