@@ -19,9 +19,6 @@ dbmget $ALog X11_Inc          =\? $RootInc^  \
              X11_Lib          =\? ""^        \
              X11_RPath        =\? $RootLib^  \
              X11_Path         =\? /usr^      \
-             GRAPHICS_Windows =\? ""^        \
-             GRAPHICS_Devices =\? ""^        \
-             GRAPHICS_Flags   =\? ""^        \
              Std_UseX         =\? FALSE^     \
              Cfe_CC_Exe^                     \
              Cfe_CC_Flags^                   \
@@ -36,7 +33,7 @@ dbmget $ALog X11_Inc          =\? $RootInc^  \
 # if we have explicitly said we do not want X11
 # do NOT detect it
 if ("$X11_Path" == none) then
-   NoteD $ALog "      no X11 (by request)"
+   set msg = "no X11 (by request)"
    setenv Std_UseX FALSE
 
 else if ($Std_UseX == TRUE) then
@@ -112,12 +109,7 @@ EOF
    source $AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "") && ($?IBM_BGL == 0)) then
-      NoteD $ALog "      has X11 ($PckLib)"
-
-#      setenv HAVE_SOCKETS   Envir
-      setenv GRAPHICS_Windows   "X"
-      setenv GRAPHICS_Devices   "$GRAPHICS_Devices X"
-      setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DX11"
+      set msg = "has X11 ($PckLib)"
 
       set lok = FALSE
       if ("$PckInc" != "none") then
@@ -131,12 +123,9 @@ EOF
       endif
       unset lok
 
-      if ("$PckPath" != "") then
-         flog $ALog setenv RPATH    ${RPATH}:${PckPath}
-      endif
       flog $ALog setenv Std_UseX    TRUE
    else
-      NoteD $ALog "      no X11"
+      set msg = "no X11"
       flog $ALog setenv Std_UseX    FALSE
    endif
 
@@ -169,13 +158,22 @@ int main(int c, char **v)
     return(ret);}
 EOF
 
-      flog $ALog $Cfe_CC_Exe $PckInc -L$PckPath $Tmp-font.c -o $Tmp-font $Cfe_LD_Lib $X11_Lib
+      flog $ALog ls -l $Tmp*
+
+      set opt = ""
+      set opt = ( $opt $Cfe_CC_Flags $PckInc )
+      set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
+      if ("$PckPath" != "") then
+         set opt = ( $opt -L$PckPath )
+      endif
+
+      flog $ALog $Cfe_CC_Exe $opt $Tmp-font.c -o $Tmp-font $Cfe_LD_Lib $PckLib
       if ($status == 0) then
          flog $ALog $Tmp-font
          if ($status == 0) then
-            NoteD $ALog "          found installed X11 fonts"
+            set msg = "$msg has fonts"
          else
-            NoteD $ALog "          no X11 fonts installed"
+            set msg = "$msg no fonts"
             flog $ALog setenv Std_UseX    FALSE
          endif
       endif
@@ -183,6 +181,7 @@ EOF
       ${RM} $Tmp-font.c $Tmp-font
 
    endif
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -198,18 +197,19 @@ EOF
       setenv X11_Path  ""
    endif
 
-# export the results
-   dbmset $ALog X11_Inc          = $X11_Inc^            \
-                X11_Lib          = $X11_Lib^            \
-                X11_RPath        = $X11_RPath^          \
-                X11_Path         = $X11_Path^           \
-                GRAPHICS_Windows = $GRAPHICS_Windows^   \
-                GRAPHICS_Devices = $GRAPHICS_Devices^   \
-                GRAPHICS_Flags   = $GRAPHICS_Flags^     \
-                RPATH            = $RPATH
 endif
 
-dbexp Std_UseX
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   NoteD $ALog "      $msg"
+
+# export the results
+   dbmset $ALog X11_Inc   = $X11_Inc^            \
+                X11_Lib   = $X11_Lib^            \
+                X11_RPath = $X11_RPath^          \
+                X11_Path  = $X11_Path^           \
+                Std_UseX  = $Std_UseX
 
 exit(0)
 

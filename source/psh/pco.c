@@ -3005,6 +3005,9 @@ int main(int c, char **v, char **env)
        {help();
 	return(1);};
 
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
+
     signal(SIGSEGV, sigdone);
     signal(SIGBUS,  sigdone);
     signal(SIGFPE,  sigdone);

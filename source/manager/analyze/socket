@@ -36,10 +36,11 @@ set opt = ( $opt $Cfe_CC_Flags )
 set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 
 fexvars $ALog t $Cfe_CC_Exe $Tmp.c -o $Tmp $opt @b wc -l
+Note $ALog "t = |$t|"
 if ($t == 0) then
-   setenv GETSOCKOPT_TYPE "int"
+   flog $ALog setenv GETSOCKOPT_TYPE "int"
 else
-   setenv GETSOCKOPT_TYPE "unsigned int"
+   flog $ALog setenv GETSOCKOPT_TYPE "unsigned int"
 endif
 unset t
 
