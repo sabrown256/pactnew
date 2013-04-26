@@ -15,34 +15,113 @@ Note $ALog "Analyze: system graphics"
 
 NoteD $ALog "   System Graphics:"
 
-source $AnaDir/quickdraw
-source $AnaDir/opengl
-source $AnaDir/x11
+gexec $AnaDir/quickdraw  @ \
+      $AnaDir/opengl     @ \
+      $AnaDir/x11        @ \
+      $AnaDir/png        @ \
+      $AnaDir/jpeg
 
-source $AnaDir/png
-source $AnaDir/jpeg
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# gather the results into the MDG_ variables
+
+   Separator $ALog
+
+   dbmget $ALog CC_Exe^         \
+                MDG_Inc^        \
+                MDG_Lib^        \
+                MDG_Pck^        \
+                JPEG_Inc^       \
+                JPEG_Lib^       \
+                PNG_Inc^        \
+                PNG_Lib^        \
+                X11_Inc^        \
+                X11_Lib^        \
+                OGL_Inc^        \
+                OGL_Lib^        \
+   	        HAVE_PNGLIB^    \
+   	        HAVE_JPEGLIB^   \
+                OS_Name^        \
+                Std_UseOGL^     \
+                Std_UseQD^      \
+                Std_UseX
+   
+   flog $ALog setenv MDG_Inc "$MDG_Inc $OGL_Inc $X11_Inc $PNG_Inc $JPEG_Inc"
+
+   flog $ALog setenv MDG_Lib "$MDG_Lib $OGL_Lib $X11_Lib $PNG_Lib $JPEG_Lib"
+   if (($OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
+      Note $ALog "Finding GL on MAC OS X"
+      flog $ALog setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
+   endif
+
+   if ($HAVE_JPEGLIB == TRUE) then
+      flog $ALog setenv MDG_Pck          "$MDG_Pck JPEG"
+   endif
+   if ($HAVE_PNGLIB == TRUE) then
+      flog $ALog setenv MDG_Pck          "$MDG_Pck PNG"
+   endif
+   if ($Std_UseX == TRUE) then
+      flog $ALog setenv MDG_Pck          "$MDG_Pck X11"
+   endif
+   if ($Std_UseOGL == TRUE) then
+      flog $ALog setenv MDG_Pck          "$MDG_Pck OGL"
+   endif
+   if ($Std_UseQD == TRUE) then
+      flog $ALog setenv MDG_Pck          "$MDG_Pck QD"
+   endif
+
+# eliminate redundancies in MDG_Inc
+# NOTE: compilers look at /usr/include by default not
+# necessarily $RootInc
+   set lincs = ""
+   foreach i ($MDG_Inc)
+      if ("$i" != "-I/usr/include") then
+         set ok = TRUE
+         foreach j ( $lincs )
+             if ("$i" == "$j") then
+                set ok = FALSE
+                break
+             endif
+         end
+         if ($ok == TRUE) then
+            set lincs = ( $lincs $i )
+         endif
+      endif
+   end
+   flog $ALog setenv MDG_Inc  "$lincs"
+   unset lincs
+
+# eliminate redundancies in MDG_Lib
+   set llibs = ""
+   foreach i ($MDG_Lib)
+      set ok = TRUE
+      foreach j ( $llibs )
+          if ("$i" == "$j") then
+             set ok = FALSE
+             break
+          endif
+      end
+      if ($ok == TRUE) then
+         set llibs = ( $llibs $i )
+      endif
+   end
+   flog $ALog setenv MDG_Lib  "$llibs"
+   unset llibs
+
+   Note $ALog "Graphics summary variables:"
+   Note $ALog "MDG_Inc = |$MDG_Inc|"
+   Note $ALog "MDG_Lib = |$MDG_Lib|"
+   Note $ALog "MDG_Pck = |$MDG_Pck|"
+
+   dbmset $ALog MDG_Inc = $MDG_Inc^        \
+                MDG_Lib = $MDG_Lib^        \
+                MDG_Pck = $MDG_Pck
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 Separator $ALog
-
-dbmget $ALog CC_Exe^       \
-             MDG_Inc^      \
-             MDG_Lib^      \
-             MDG_Pck^      \
-             RPATH
-
-Note $Log "Graphics summary variables:"
-Note $Log "   RPATH   = $RPATH"
-Note $Log "   MDG_Inc = $MDG_Inc"
-Note $Log "   MDG_Lib = $MDG_Lib"
-Note $Log "   MDG_Pck = $MDG_Pck"
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-Separator $Log
 
 exit(0)
 

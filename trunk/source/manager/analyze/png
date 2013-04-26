@@ -15,10 +15,7 @@ Note $ALog "----- analyze/png -----"
 Note $ALog "Analyze: png"
 Note $ALog ""
 
-dbmget $ALog MDG_Inc     =\? ""^        \
-             MDG_Lib     =\? ""^        \
-             MDG_Pck     =\? ""^        \
-             PNG_Inc     =\? ""^        \
+dbmget $ALog PNG_Inc     =\? ""^        \
              PNG_Lib     =\? ""^        \
              PNG_RPath   =\? $RootLib^  \
              PNG_Path    =\? /usr^      \
@@ -102,15 +99,9 @@ EOF
    if (("$PckLib" != "") && ("$Z_Lib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has PNG ($PckLib)"
 
-      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         flog $ALog setenv MDG_Inc "$MDG_Inc $PckInc"
-      endif
-
       if ("$PckPath" != "") then
          flog $ALog setenv RPATH     ${RPATH}:${PckPath}
       endif
-      flog $ALog setenv MDG_Lib      "$MDG_Lib $PckLib"
-      flog $ALog setenv MDG_Pck      "$MDG_Pck PNG"
       flog $ALog setenv HAVE_PNGLIB  TRUE
 
       flog $ALog $Tmp
@@ -133,10 +124,7 @@ EOF
    setenv PNG_Path  ""
 
 # export the results
-   dbmset $ALog MDG_Inc     = $MDG_Inc^    \
-                MDG_Lib     = $MDG_Lib^    \
-                MDG_Pck     = $MDG_Pck^    \
-                PNG_Inc     = $PNG_Inc^    \
+   dbmset $ALog PNG_Inc     = $PNG_Inc^    \
                 PNG_Lib     = $PNG_Lib^    \
                 PNG_RPath   = $PNG_RPath^  \
                 PNG_Path    = $PNG_Path^   \

@@ -15,10 +15,7 @@ Note $ALog "----- analyze/opengl -----"
 Note $ALog "Analyze: opengl"
 Note $ALog ""
 
-dbmget $ALog MDG_Inc          =\? ""^        \
-             MDG_Lib          =\? ""^        \
-             MDG_Pck          =\? ""^        \
-             OGL_Inc          =\? ""^        \
+dbmget $ALog OGL_Inc          =\? ""^        \
              OGL_Lib          =\? ""^        \
              OGL_RPath        =\? $RootLib^  \
              OGL_Path         =\? /usr^      \
@@ -45,22 +42,6 @@ else
 
    set UTime = `timer -r`
 
-   if (($OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
-      Note $ALog "Finding GL on MAC OS X"
-      setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
-   endif
-
-   set lLibDirs = ""
-   foreach i ($MDG_Lib)
-      set j = $i:h
-      if (-d $j) then
-         set lLibDirs = ( $lLibDirs $j )
-      endif
-   end
-
-   Note $ALog "MDG_Lib  = |$MDG_Lib|"
-   Note $ALog "lLibDirs = |$lLibDirs|"
-
    cat << EOF >! $Tmp.c
 #include <GL/gl.h>
 #include <GL/glx.h>
@@ -70,12 +51,18 @@ int main(int c, char **v)
  return(0);}
 EOF
 
+   set lIncDirs = ""
+   set lLibDirs = ""
+   foreach i ($OGL_Path)
+      set lIncDirs = ( $lIncDirs $i/include )
+      set lLibDirs = ( $lLibDirs $i/$LIB )
+   end
+   set lIncDirs = ( $lIncDirs $OGL_Inc )
+   set lLibDirs = ( $lLibDirs $OGL_RPath )
+
    set Implicit = TRUE
    set lIncDirs = ( $RootInc )
    set lLibDirs = ( $lLibDirs /usr/lib64 $RootLib /usr/openwin/lib )
-# NOTE: X11R6 is mostly gone
-#   set lIncDirs = ( $RootInc /usr/X11R6/include )
-#   set lLibDirs = ( $lLibDirs /usr/lib64 $RootLib /usr/openwin/lib /usr/X11R6/lib )
    set lHdrs    = ( GL/gl.h GL/glx.h )
    set ASList   = ( a so )
    set lLib     = GL
@@ -96,13 +83,6 @@ EOF
       setenv GRAPHICS_Devices   "$GRAPHICS_Devices OGL"
       setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DOGL"
 
-      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         flog $ALog setenv MDG_Inc "$MDG_Inc $PckInc"
-      endif
-      Note $ALog "MDG Include = |$MDG_Inc|"
-
-      flog $ALog setenv MDG_Lib    "$MDG_Lib $PckLib"
-      flog $ALog setenv MDG_Pck    "$MDG_Pck OGL"
       flog $ALog setenv Std_UseOGL TRUE
    else
       NoteD $ALog "      no OpenGL"
@@ -123,10 +103,7 @@ EOF
    if ($Std_UseOGL == TRUE) then
 
 # export the results
-      dbmset $ALog MDG_Inc          = $MDG_Inc^            \
-                   MDG_Lib          = $MDG_Lib^            \
-                   MDG_Pck          = $MDG_Pck^            \
-                   OGL_Inc          = $OGL_Inc^            \
+      dbmset $ALog OGL_Inc          = $OGL_Inc^            \
                    OGL_Lib          = $OGL_Lib^            \
                    OGL_RPath        = $OGL_RPath^          \
                    OGL_Path         = $OGL_Path^           \

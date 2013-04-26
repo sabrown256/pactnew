@@ -15,10 +15,7 @@ Note $ALog "----- analyze/x11 -----"
 Note $ALog "Analyze: x11"
 Note $ALog ""
 
-dbmget $ALog MDG_Inc          =\? ""^        \
-             MDG_Lib          =\? ""^        \
-             MDG_Pck          =\? ""^        \
-             X11_Inc          =\? $RootInc^  \
+dbmget $ALog X11_Inc          =\? $RootInc^  \
              X11_Lib          =\? ""^        \
              X11_RPath        =\? $RootLib^  \
              X11_Path         =\? /usr^      \
@@ -45,14 +42,6 @@ if ("$X11_Path" == none) then
 else if ($Std_UseX == TRUE) then
 
    set UTime = `timer -r`
-
-   set lLibDirs = ""
-   foreach i ($MDG_Lib)
-      set j = $i:h
-      if (-d $j) then
-         set lLibDirs = ( $lLibDirs $j )
-      endif
-   end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -140,17 +129,11 @@ EOF
             set lok = TRUE
          endif
       endif
-
-      if ($lok == TRUE) then
-         flog $ALog setenv MDG_Inc "$MDG_Inc $PckInc"
-      endif
       unset lok
 
       if ("$PckPath" != "") then
          flog $ALog setenv RPATH    ${RPATH}:${PckPath}
       endif
-      flog $ALog setenv MDG_Lib     "$MDG_Lib $PckLib"
-      flog $ALog setenv MDG_Pck     "$MDG_Pck X11"
       flog $ALog setenv Std_UseX    TRUE
    else
       NoteD $ALog "      no X11"
@@ -186,7 +169,7 @@ int main(int c, char **v)
     return(ret);}
 EOF
 
-      flog $ALog $Cfe_CC_Exe $PckInc -L$PckPath $Tmp-font.c -o $Tmp-font $Cfe_LD_Lib $MDG_Lib
+      flog $ALog $Cfe_CC_Exe $PckInc -L$PckPath $Tmp-font.c -o $Tmp-font $Cfe_LD_Lib $X11_Lib
       if ($status == 0) then
          flog $ALog $Tmp-font
          if ($status == 0) then
@@ -216,10 +199,7 @@ EOF
    endif
 
 # export the results
-   dbmset $ALog MDG_Inc          = $MDG_Inc^            \
-                MDG_Lib          = $MDG_Lib^            \
-                MDG_Pck          = $MDG_Pck^            \
-                X11_Inc          = $X11_Inc^            \
+   dbmset $ALog X11_Inc          = $X11_Inc^            \
                 X11_Lib          = $X11_Lib^            \
                 X11_RPath        = $X11_RPath^          \
                 X11_Path         = $X11_Path^           \
