@@ -17,66 +17,110 @@ else
    @ na = 3
 endif
 
-set ArgL = ""
+set cmd = ""
+set crt = ""
+set ncr = ""
+
 while ($#argv)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: px [-h] [-na #] <command>"
+           echo "Usage: px [-c <criterion>] [-h] [-na #] <command>"
            echo "Run <command> and until it succeeds"
+           echo "   c   run <criterion> to determine success"
+           echo "       this should be a quoted string"
+           echo "       success <criterion> has exit status of 0"
+           echo "       defaults to exit status == 0"
+           echo "   n   run <criterion> to determine success"
+           echo "       this should be a quoted string"
+           echo "       success <criterion> has exit status other than 0"
            echo "   na  number of attempts to make (default 3)"
            echo "   h   this help message"
            echo ""
            exit(1)
+      case -c:
+           shift
+           set crt = ( $1 )
+      case -n:
+           shift
+           set ncr = ( $1 )
       case -na:
            shift
            @ na = $1
       default:
-           set ArgL = ( $ArgL $1 )
+           while ($#argv > 0)
+              set cmd = ( $cmd $1 )
+              shift
+           end
+           break
            breaksw
    endsw
    shift
 end
 
-@ Err    = 0
-@ count  = 1
-@ NSleep = 0
-set Out  = ""
+@ err   = 0
+@ count = 1
+@ dt    = 0
+set out = ""
 
 set noglob
 
 while ($count <= $na)
    if ($count > 1) then
-      echo "***> failed ($Err) [$Stamp] - attempt $count in $NSleep seconds"
-      echo "***>       $ArgL"
-      sleep $NSleep
-      echo "***> retry '"$ArgL"'"
+      echo "***> failed ($err) [$dts] - attempt $count in $dt seconds"
+      echo "***>       $cmd"
+      sleep $dt
+      echo "***> retry '"$cmd"'"
    endif
 
-   set Stamp = `date +"%Y/%m/%d %H:%M:%S"`
-   set Out   = `eval $ArgL`
-   set Err   = $status
-   if ($Err == 0) then
+   set dts = `date +"%Y/%m/%d %H:%M:%S"`
+
+# run the command
+   set out = `eval "$cmd"`
+
+# default criterion is exit status
+   @ err   = $status
+
+# check for positive criterion
+   if ("$crt" != "") then
+      eval "$crt"
+      if ($status == 0) then
+         @ err = 0
+      else
+         @ err = 1
+      endif
+
+# check for negative criterion
+   else if ("$ncr" != "") then
+      eval "$ncr"
+      if ($status != 0) then
+         @ err = 0
+      else
+         @ err = 1
+      endif
+   endif
+
+   if ($err == 0) then
       if ($count > 1) then
-         echo "***> succeeded [$Stamp] - on attempt $count"
-         echo "***>       $ArgL"
+         echo "***> succeeded [$dts] - on attempt $count"
+         echo "***>       $cmd"
       endif
       break
    else
       @ count = $count + 1
       if ($count < 3) then
-         @ NSleep = 1
+         @ dt = $dt + 1
       else
-         @ NSleep = 31
+         @ dt = $dt + 30
       endif
    endif
 end
 
-if (($count > $na) && ($Err != 0)) then
+if (($count > $na) && ($err != 0)) then
    @ count = $count - 1
-   echo "***> failed ($Err) - quitting after $count attempts"
+   echo "***> failed ($err) - quitting after $count attempts"
 endif
 
-echo "$Out"
+echo "$out"
 
-exit($Err)
+exit($err)
