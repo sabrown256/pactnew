@@ -15,10 +15,7 @@ Note $ALog "----- analyze/jpeg -----"
 Note $ALog "Analyze: jpeg"
 Note $ALog ""
 
-dbmget $ALog MDG_Inc      =\? ""^        \
-             MDG_Lib      =\? ""^        \
-             MDG_Pck      =\? ""^        \
-             JPEG_Inc     =\? ""^        \
+dbmget $ALog JPEG_Inc     =\? ""^        \
              JPEG_Lib     =\? ""^        \
              JPEG_RPath   =\? $RootLib^  \
              JPEG_Path    =\? /usr^      \
@@ -87,15 +84,9 @@ EOF
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has JPEG ($PckLib)"
 
-      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         flog $ALog setenv MDG_Inc "$MDG_Inc $PckInc"
-      endif
-
       if ("$PckPath" != "") then
          flog $ALog setenv RPATH       ${RPATH}:${PckPath}
       endif
-      flog $ALog setenv MDG_Lib        "$MDG_Lib $PckLib"
-      flog $ALog setenv MDG_Pck        "$MDG_Pck JPEG"
       flog $ALog setenv HAVE_JPEGLIB   TRUE
 
       flog $ALog $Tmp
@@ -118,10 +109,7 @@ EOF
    setenv JPEG_Path ""
 
 # export the results
-   dbmset $ALog MDG_Inc      = $MDG_Inc^     \
-                MDG_Lib      = $MDG_Lib^     \
-                MDG_Pck      = $MDG_Pck^     \
-                JPEG_Inc     = $JPEG_Inc^    \
+   dbmset $ALog JPEG_Inc     = $JPEG_Inc^    \
                 JPEG_Lib     = $JPEG_Lib^    \
                 JPEG_RPath   = $JPEG_RPath^  \
                 JPEG_Path    = $JPEG_Path^   \

@@ -14,8 +14,7 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: finish"
 
-dbmget $ALog MDG_Inc =\? ""^    \
-             GRAPHICS_Windows^  \
+dbmget $ALog GRAPHICS_Windows^  \
              Std_UseX^          \
              Std_UseOGL^        \
              Std_UseQD^         \
@@ -66,12 +65,6 @@ if ("$Cfe_CC_Inc" == "$RootInc") then
    flog $ALog setenv Cfe_CC_Inc ""
 endif
 
-# NOTE: compilers look at /usr/include by default not
-# necessarily $RootInc
-if ("$MDG_Inc" == "-I/usr/include") then
-   flog $ALog setenv MDG_Inc ""
-endif
-
 if ($?Save_CC == 1) then
    flog $ALog setenv CC_Exe "$Save_CC"
 endif
@@ -102,8 +95,7 @@ dbmset $ALog CC_Exe              = $CC_Exe^               \
              CC_Optimize_Default = $CC_Optimize_Default^  \
              FC_Debug_Default    = $FC_Debug_Default^     \
              FC_Optimize_Default = $FC_Optimize_Default^  \
-             Cfe_CC_Inc          = $Cfe_CC_Inc^           \
-             MDG_Inc             = $MDG_Inc
+             Cfe_CC_Inc          = $Cfe_CC_Inc
 
 exit(0)
 

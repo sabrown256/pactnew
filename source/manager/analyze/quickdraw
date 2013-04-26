@@ -15,10 +15,7 @@ Note $ALog "----- analyze/quickdraw -----"
 Note $ALog "Analyze: QuickDrawn"
 Note $ALog ""
 
-dbmget $ALog MDG_Inc          =\? ""^        \
-             MDG_Lib          =\? ""^        \
-             MDG_Pck          =\? ""^        \
-             QD_Inc           =\? ""^        \
+dbmget $ALog QD_Inc           =\? ""^        \
              QD_Lib           =\? ""^        \
              QD_RPath         =\? $RootLib^  \
              QD_Path          =\? /usr^      \
@@ -70,8 +67,6 @@ EOF
          setenv GRAPHICS_Devices  "$GRAPHICS_Devices QD"
          setenv GRAPHICS_Flags     "$GRAPHICS_Flags -framework Carbon"
 
-         setenv MDG_Pck          "$MDG_Pck QD"
-
          setenv QD_Inc           "-framework Carbon"
          setenv QD_Lib           ""
          setenv QD_RPath         ""
@@ -92,10 +87,7 @@ EOF
    endif
 
 # export the results
-   dbmset $ALog MDG_Inc          = $MDG_Inc^           \
-                MDG_Lib          = $MDG_Lib^           \
-                MDG_Pck          = $MDG_Pck^           \
-                QD_Inc           = $QD_Inc^            \
+   dbmset $ALog QD_Inc           = $QD_Inc^            \
                 QD_Lib           = $QD_Lib^            \
                 QD_RPath         = $QD_RPath^          \
                 QD_Path          = $QD_Path^           \
