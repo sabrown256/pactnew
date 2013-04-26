@@ -17,19 +17,36 @@ endif
 set scsi = ( `$ldir/which-scs` )
 unset ldir
 
+set args = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: scs-remove [-h] <file>*"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           set args = ( $args $1 )
+           breaksw
+   endsw
+   shift
+end
+
 switch ($scsi[1])
    case git:
-        git rm $argv
+        git rm $args
         breaksw
 
    case cvs:
         setenv CVS_RSH  ssh
-        rm -f $argv
-        cvs remove $argv
+        rm -f $args
+        cvs remove $args
         breaksw
 
    case svn:
-        svn remove $argv
+        svn remove $args
         breaksw
 endsw
 

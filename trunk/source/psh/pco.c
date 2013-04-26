@@ -1868,8 +1868,7 @@ static void bad_pragma_rules(void)
     snprintf(st.rules.co_bp, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
-	     "${RM} $*.int.c",
-	     "${CC} -E $< -o $@ > $*.int.c",
+	     "px -c \"test -s $*.int.c\" ${CC} -E $< -o $@ > $*.int.c",
 	     "${CC} -c $*.int.c -o $@",
 	     "${RM} $*.int.c");
 
@@ -1877,8 +1876,7 @@ static void bad_pragma_rules(void)
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     cd, rm, tc,
-	     "${RM} $*.int.c",
-	     "${CC} -E ${PACTSrcDir}/$< > $*.int.c",
+	     "px -c \"test -s $*.int.c\" ${CC} -E ${PACTSrcDir}/$< > $*.int.c",
 	     "${CC} -c $*.int.c -o $*.o",
 	     ar,
 	     "${RM} $*.int.c $*.o 2>> errlog");
@@ -1890,7 +1888,7 @@ static void bad_pragma_rules(void)
 	     rm, tc,
 	     "${LEX} $< 2>> errlog",
 	     le,
-	     "${LX} -E $*.c > $*.int.c",
+	     "px -c \"test -s $*.int.c\" ${LX} -E $*.c > $*.int.c",
 	     "${LX} -c $*.int.c",
 	     "${RM} lex.yy.c $*.int.c $*.c");
 
@@ -1901,7 +1899,7 @@ static void bad_pragma_rules(void)
 	     "${LEX} -t ${PACTSrcDir}/$< 1> lex.yy.c 2>> errlog",
 	     le,
 	     "echo \"${LX} -c $*.c\"",
-	     "${LX} -E $*.c > $*.int.c",
+	     "px -c \"test -s $*.int.c\" ${LX} -E $*.c > $*.int.c",
 	     "${LX} -c $*.int.c -o $*.o",
 	     ar,
 	     "${RM} lex.yy.c $*.int.c $*.c");
@@ -1913,7 +1911,7 @@ static void bad_pragma_rules(void)
 	     cd, rm, tc,
 	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
 	     ye,
-	     "${YC} -E $*.c > $*.int.c",
+	     "px -c \"test -s $*.int.c\" ${YC} -E $*.c > $*.int.c",
 	     "${YC} -c $*.int.c -o $*.o",
 	     "${RM} $*.int.c $*.c");
 
@@ -1924,7 +1922,7 @@ static void bad_pragma_rules(void)
 	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
 	     ye,
 	     "echo \"${YC} -c $*.c\"",
-	     "${YC} -E $*.c > $*.int.c",
+	     "px -c \"test -s $*.int.c\" ${YC} -E $*.c > $*.int.c",
 	     "${YC} -c $*.int.c -o $*.o",
 	     ar,
 	     "${RM} $*.c $*.int.c $*.o");

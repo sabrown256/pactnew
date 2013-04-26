@@ -16,24 +16,47 @@ if ("$ldir" == ".") then
 endif
 set scsi = ( `$ldir/which-scs` )
 
+set args = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: scs-move [-h] <file>*"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           set args = ( $args $1 )
+           breaksw
+   endsw
+   shift
+end
+
 switch ($scsi[1])
    case git:
-        git mv $argv
+        git mv $args
         breaksw
 
    case cvs:
         setenv CVS_RSH  ssh
 
-        set old = $1
-        set new = $2
+        @ i = 0
+        @ n = $#args
+        while ($i < $n)
+           set old = $args[1]
+           set new = $args[2]
+           shift args
+           shift args
 
-        mv $old $new
-        cvs remove $old
-        cvs add $new
+           mv $old $new
+           cvs remove $old
+           cvs add $new
+        end
         breaksw
 
    case svn:
-        svn mv $argv
+        svn mv $args
         breaksw
 endsw
 
