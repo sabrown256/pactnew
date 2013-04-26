@@ -19,9 +19,6 @@ dbmget $ALog OGL_Inc          =\? ""^        \
              OGL_Lib          =\? ""^        \
              OGL_RPath        =\? $RootLib^  \
              OGL_Path         =\? /usr^      \
-             GRAPHICS_Windows =\? ""^        \
-             GRAPHICS_Devices =\? ""^        \
-             GRAPHICS_Flags   =\? ""^        \
              Std_UseOGL       =\? FALSE^     \
              Cfe_CC_Exe^                     \
              Cfe_CC_Flags^                   \
@@ -79,10 +76,6 @@ EOF
       NoteD $ALog "      has OpenGL ($PckLib)"
       Note $ALog "Include = |$PckInc|"
 
-      setenv GRAPHICS_Windows   "OGL"
-      setenv GRAPHICS_Devices   "$GRAPHICS_Devices OGL"
-      setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DOGL"
-
       flog $ALog setenv Std_UseOGL TRUE
    else
       NoteD $ALog "      no OpenGL"
@@ -106,11 +99,7 @@ EOF
       dbmset $ALog OGL_Inc          = $OGL_Inc^            \
                    OGL_Lib          = $OGL_Lib^            \
                    OGL_RPath        = $OGL_RPath^          \
-                   OGL_Path         = $OGL_Path^           \
-                   GRAPHICS_Windows = $GRAPHICS_Windows^   \
-                   GRAPHICS_Devices = $GRAPHICS_Devices^   \
-                   GRAPHICS_Flags   = $GRAPHICS_Flags^     \
-                   RPATH            = $RPATH
+                   OGL_Path         = $OGL_Path
    endif
 
 endif

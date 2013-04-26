@@ -19,9 +19,6 @@ dbmget $ALog QD_Inc           =\? ""^        \
              QD_Lib           =\? ""^        \
              QD_RPath         =\? $RootLib^  \
              QD_Path          =\? /usr^      \
-             GRAPHICS_Windows =\? ""^        \
-             GRAPHICS_Devices =\? ""^        \
-             GRAPHICS_Flags   =\? ""^        \
              Std_UseQD        =\? FALSE^     \
              Cfg_CC_Exe       =\? cc^        \
              CC_Exe^                         \
@@ -63,10 +60,6 @@ EOF
       if ($Std_UseQD == TRUE) then
          NoteD $ALog "      has Quickdraw (Carbon)"
 
-         setenv GRAPHICS_Windows             "QD"
-         setenv GRAPHICS_Devices  "$GRAPHICS_Devices QD"
-         setenv GRAPHICS_Flags     "$GRAPHICS_Flags -framework Carbon"
-
          setenv QD_Inc           "-framework Carbon"
          setenv QD_Lib           ""
          setenv QD_RPath         ""
@@ -90,10 +83,7 @@ EOF
    dbmset $ALog QD_Inc           = $QD_Inc^            \
                 QD_Lib           = $QD_Lib^            \
                 QD_RPath         = $QD_RPath^          \
-                QD_Path          = $QD_Path^           \
-                GRAPHICS_Windows = $GRAPHICS_Windows^  \
-                GRAPHICS_Devices = $GRAPHICS_Devices^  \
-                GRAPHICS_Flags   = $GRAPHICS_Flags
+                QD_Path          = $QD_Path
 
 endif
 

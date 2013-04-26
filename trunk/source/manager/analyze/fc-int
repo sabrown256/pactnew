@@ -60,7 +60,8 @@ EOF
       if ($status != 0) then
          @ si = 0
       else
-         @ si = `$CFE $Tmp`
+         fexec $ALog $CFE $Tmp @o vw:si
+         @ si = ( `$PERDB -e si` )
       endif
       Note $ALog "Fortran integer size = $si"
 
