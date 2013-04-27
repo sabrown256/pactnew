@@ -44,14 +44,38 @@ Run {
    ../analyze/tracker
 }
 
-# system features
-run ../analyze/features
+Note "   System features:"
 
-# I/O
-run ../analyze/io
-
-# graphics
-run ../analyze/graphics
+Run {
+   ../analyze/fork
+   ../analyze/ipc
+   ../analyze/signal
+   ../analyze/mmap
+   ../analyze/gethost
+   ../analyze/rusage
+   ../analyze/getpwuid
+   ../analyze/poll
+   ../analyze/pty
+   ../analyze/socket
+   ../analyze/termio
+   ../analyze/asyncio
+   ../analyze/fpe
+   ../analyze/math
+   ../analyze/libz
+   ../analyze/vsnprintf
+   ../analyze/strerror_r
+   ../analyze/openmp
+   ../analyze/mpi
+   ../analyze/readline
+   ../analyze/hdf5
+   ../analyze/sql
+   ../analyze/ssl
+   ../analyze/quickdraw
+   ../analyze/opengl
+   ../analyze/x11
+   ../analyze/png
+   ../analyze/jpeg
+}
 
 # wrap up
 run ../analyze/finish

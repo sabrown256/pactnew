@@ -13,53 +13,10 @@ source $Me:h/common
 
 Note $ALog "Analyze: I/O features"
 
-NoteD $ALog "   I/O Features:"
-
-gexec $AnaDir/readline   @ \
-      $AnaDir/hdf5       @ \
-      $AnaDir/sql        @ \
-      $AnaDir/ssl
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # gather the results into the MDI_ and MD_ variables
-
-dbmget $ALog MDI_Inc^        \
-             MDI_Lib^        \
-             MDI_Pck^        \
-             MD_Pck^         \
-             HDF_Inc^        \
-             HDF_Lib^        \
-             SQL_Inc^        \
-             SQL_Lib^        \
-             SSL_Inc^        \
-             SSL_Lib^        \
-             HAVE_READLINE^  \
-             HAVE_HDF5^      \
-             HAVE_SQL^       \
-             HAVE_SSL
-
-setenv MDI_Inc "$MDI_Inc $HDF_Inc $SQL_Inc $SSL_Inc"
-setenv MDI_Lib "$MDI_Lib $HDF_Lib $SQL_Lib $SSL_Lib"
-if ($HAVE_HDF5 == TRUE) then
-   flog $ALog setenv MDI_Pck "HDF $MDI_Pck"
-endif
-if ($HAVE_SQL == TRUE) then
-   flog $ALog setenv MDI_Pck "SQL $MDI_Pck"
-endif
-if ($HAVE_SSL == TRUE) then
-   flog $ALog setenv MDI_Pck "SSL $MDI_Pck"
-endif
-
-if ($HAVE_READLINE == TRUE) then
-   flog $ALog setenv MD_Pck "RL $MD_Pck"
-endif
-
-dbmset $ALog MDI_Inc = $MDI_Inc^        \
-             MDI_Lib = $MDI_Lib^        \
-             MDI_Pck = $MDI_Pck^        \
-             MD_Pck  = $MD_Pck
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
