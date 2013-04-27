@@ -7,6 +7,8 @@
 # include "cpyright.h"
 #
 
+Note "Initializing configuration"
+
 run analyze/default-bits
 
 # include PACT libraries in RPATH for the memory manager interposers

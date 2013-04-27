@@ -14,20 +14,139 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: finish"
 
-dbmget $ALog GRAPHICS_Windows^  \
-             Std_UseX^          \
-             Std_UseOGL^        \
-             Std_UseQD^         \
-             AbsoluteDeb^       \
-             CC_Exe^            \
-             CC_Flags^          \
-             CC_Optimize^       \
-             CC_Debug^          \
-             FC_Optimize^       \
-             FC_Debug^          \
-             Save_CC^           \
-             Save_CFLAGS^       \
-             Cfe_CC_Inc
+dbmget $ALog AbsoluteDeb^              \
+             CC_Exe^                   \
+             CC_Flags^                 \
+             CC_Optimize^              \
+             CC_Debug^                 \
+             FC_Optimize^              \
+             FC_Debug^                 \
+             Save_CC^                  \
+             Save_CFLAGS^              \
+             Cfe_CC_Inc^               \
+             MDI_Inc^                  \
+             MDI_Lib^                  \
+             MDI_Pck^                  \
+             MD_Pck^                   \
+             HDF_Inc^                  \
+             HDF_Lib^                  \
+             SQL_Inc^                  \
+             SQL_Lib^                  \
+             SSL_Inc^                  \
+             SSL_Lib^                  \
+             HAVE_READLINE^            \
+             HAVE_HDF5^                \
+             HAVE_SQL^                 \
+             HAVE_SSL^                 \
+             MDG_Inc^                  \
+             MDG_Lib^                  \
+             MDG_Pck^                  \
+             JPEG_Inc^                 \
+             JPEG_Lib^                 \
+             PNG_Inc^                  \
+             PNG_Lib^                  \
+             X11_Inc^                  \
+             X11_Lib^                  \
+             X11_RPath^                \
+             OGL_Inc^                  \
+             OGL_Lib^                  \
+             OGL_RPath^                \
+             GRAPHICS_Windows =\? ""^  \
+             GRAPHICS_Devices =\? ""^  \
+             GRAPHICS_Flags   =\? ""^  \
+   	     HAVE_PNGLIB^              \
+   	     HAVE_JPEGLIB^             \
+             Std_UseOGL^               \
+             Std_UseQD^                \
+             Std_UseX^                 \
+             OS_Name^                  \
+             RPATH
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# finalize graphics features features
+   
+   Separator $ALog
+
+   flog $ALog setenv MDG_Inc "$MDG_Inc $OGL_Inc $X11_Inc $PNG_Inc $JPEG_Inc"
+
+   flog $ALog setenv MDG_Lib "$MDG_Lib $OGL_Lib $X11_Lib $PNG_Lib $JPEG_Lib"
+   if (($OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
+      Note $ALog "Finding GL on MAC OS X"
+      flog $ALog setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
+   endif
+
+   if ($Std_UseQD == TRUE) then
+      flog $ALog setenv MDG_Pck            "$MDG_Pck QD"
+      flog $ALog setenv GRAPHICS_Windows   "QD"
+      flog $ALog setenv GRAPHICS_Devices   "$GRAPHICS_Devices QD"
+      flog $ALog setenv GRAPHICS_Flags     "$GRAPHICS_Flags -framework Carbon"
+   endif
+   if ($Std_UseOGL == TRUE) then
+      flog $ALog setenv MDG_Pck            "$MDG_Pck OGL"
+      flog $ALog setenv GRAPHICS_Windows   "OGL"
+      flog $ALog setenv GRAPHICS_Devices   "$GRAPHICS_Devices OGL"
+      flog $ALog setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DOGL"
+   endif
+   if ($Std_UseX == TRUE) then
+      flog $ALog setenv MDG_Pck            "$MDG_Pck X11"
+      flog $ALog setenv GRAPHICS_Windows   "X"
+      flog $ALog setenv GRAPHICS_Devices   "$GRAPHICS_Devices X"
+      flog $ALog setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DX11"
+      if ("$X11_RPath" != "") then
+         flog $ALog setenv RPATH           ${RPATH}:${X11_RPath}
+      endif
+   endif
+   if ($HAVE_PNGLIB == TRUE) then
+      flog $ALog setenv MDG_Pck          "$MDG_Pck PNG"
+   endif
+   if ($HAVE_JPEGLIB == TRUE) then
+      flog $ALog setenv MDG_Pck          "$MDG_Pck JPEG"
+   endif
+
+# eliminate redundancies in MDG_Inc
+# NOTE: compilers look at /usr/include by default not
+# necessarily $RootInc
+   set lincs = ""
+   foreach i ($MDG_Inc)
+      if ("$i" != "-I/usr/include") then
+         set ok = TRUE
+         foreach j ( $lincs )
+             if ("$i" == "$j") then
+                set ok = FALSE
+                break
+             endif
+         end
+         if ($ok == TRUE) then
+            set lincs = ( $lincs $i )
+         endif
+      endif
+   end
+   flog $ALog setenv MDG_Inc  "$lincs"
+   unset lincs
+
+# eliminate redundancies in MDG_Lib
+   set llibs = ""
+   foreach i ($MDG_Lib)
+      set ok = TRUE
+      foreach j ( $llibs )
+          if ("$i" == "$j") then
+             set ok = FALSE
+             break
+          endif
+      end
+      if ($ok == TRUE) then
+         set llibs = ( $llibs $i )
+      endif
+   end
+   flog $ALog setenv MDG_Lib  "$llibs"
+   unset llibs
+
+   Note $ALog "Graphics summary variables:"
+   Note $ALog "MDG_Inc = |$MDG_Inc|"
+   Note $ALog "MDG_Lib = |$MDG_Lib|"
+   Note $ALog "MDG_Pck = |$MDG_Pck|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -61,29 +180,59 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ("$Cfe_CC_Inc" == "$RootInc") then
-   flog $ALog setenv Cfe_CC_Inc ""
-endif
+# finalize I/O features into MDI_ and MD_ variables
 
-if ($?Save_CC == 1) then
-   flog $ALog setenv CC_Exe "$Save_CC"
-endif
+   Separator $ALog
 
-set tmp = ($Save_CFLAGS)
-flog $ALog setenv CC_Flags "$tmp"
+   setenv MDI_Inc "$MDI_Inc $HDF_Inc $SQL_Inc $SSL_Inc"
+   setenv MDI_Lib "$MDI_Lib $HDF_Lib $SQL_Lib $SSL_Lib"
 
-flog $Log setenv CC_Optimize_Default "$CC_Optimize"
-flog $Log setenv CC_Debug_Default    "$CC_Debug"
-flog $Log setenv FC_Optimize_Default "$FC_Optimize"
-flog $Log setenv FC_Debug_Default    "$FC_Debug"
+   if ($HAVE_HDF5 == TRUE) then
+      flog $ALog setenv MDI_Pck "HDF $MDI_Pck"
+   endif
 
-if ($AbsoluteDeb == TRUE) then
-   flog $Log setenv CC_Optimize_Default "$CC_Debug"
-   flog $Log setenv FC_Optimize_Default "$FC_Debug"
-else if ($AbsoluteOpt == TRUE) then
-   flog $Log setenv CC_Debug_Default "$CC_Optimize"
-   flog $Log setenv FC_Debug_Default "$FC_Optimize"
-endif
+   if ($HAVE_SQL == TRUE) then
+      flog $ALog setenv MDI_Pck "SQL $MDI_Pck"
+   endif
+
+   if ($HAVE_SSL == TRUE) then
+      flog $ALog setenv MDI_Pck "SSL $MDI_Pck"
+   endif
+
+   if ($HAVE_READLINE == TRUE) then
+      flog $ALog setenv MD_Pck "RL $MD_Pck"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# finalize compiler settings
+
+   Separator $ALog
+
+   if ("$Cfe_CC_Inc" == "$RootInc") then
+      flog $ALog setenv Cfe_CC_Inc ""
+   endif
+
+   if ($?Save_CC == 1) then
+      flog $ALog setenv CC_Exe "$Save_CC"
+   endif
+
+   set tmp = ($Save_CFLAGS)
+   flog $ALog setenv CC_Flags "$tmp"
+
+   flog $Log setenv CC_Optimize_Default "$CC_Optimize"
+   flog $Log setenv CC_Debug_Default    "$CC_Debug"
+   flog $Log setenv FC_Optimize_Default "$FC_Optimize"
+   flog $Log setenv FC_Debug_Default    "$FC_Debug"
+
+   if ($AbsoluteDeb == TRUE) then
+      flog $Log setenv CC_Optimize_Default "$CC_Debug"
+      flog $Log setenv FC_Optimize_Default "$FC_Debug"
+   else if ($AbsoluteOpt == TRUE) then
+      flog $Log setenv CC_Debug_Default "$CC_Optimize"
+      flog $Log setenv FC_Debug_Default "$FC_Optimize"
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -95,7 +244,18 @@ dbmset $ALog CC_Exe              = $CC_Exe^               \
              CC_Optimize_Default = $CC_Optimize_Default^  \
              FC_Debug_Default    = $FC_Debug_Default^     \
              FC_Optimize_Default = $FC_Optimize_Default^  \
-             Cfe_CC_Inc          = $Cfe_CC_Inc
+             Cfe_CC_Inc          = $Cfe_CC_Inc^           \
+             GRAPHICS_Windows    = $GRAPHICS_Windows^     \
+             GRAPHICS_Devices    = $GRAPHICS_Devices^     \
+             GRAPHICS_Flags      = $GRAPHICS_Flags^       \
+             MDG_Inc             = $MDG_Inc^              \
+             MDG_Lib             = $MDG_Lib^              \
+             MDG_Pck             = $MDG_Pck^              \
+             MDI_Inc             = $MDI_Inc^              \
+             MDI_Lib             = $MDI_Lib^              \
+             MDI_Pck             = $MDI_Pck^              \
+             MD_Pck              = $MD_Pck^               \
+             RPATH               = $RPATH
 
 exit(0)
 

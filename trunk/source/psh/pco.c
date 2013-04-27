@@ -1866,14 +1866,14 @@ static void bad_pragma_rules(void)
 
 /* C rules */
     snprintf(st.rules.co_bp, BFLRG,
-             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
+             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     "px -c \"test -s $*.int.c\" ${CC} -E $< -o $@ > $*.int.c",
 	     "${CC} -c $*.int.c -o $@",
 	     "${RM} $*.int.c");
 
     snprintf(st.rules.ca_bp, BFLRG,
-             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
+             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     cd, rm, tc,
 	     "px -c \"test -s $*.int.c\" ${CC} -E ${PACTSrcDir}/$< > $*.int.c",
@@ -2466,6 +2466,10 @@ static void read_config(client *cl, char *cfg, int quiet)
 /*	     if (st.phase == PHASE_READ) */
 	        note(st.aux.SEF, TRUE, "%s \"%s\"", var, val);
 	     note(Log, TRUE, "Command: setenv %s %s", var, val);}
+
+/* handle Note specifications */
+	 else if (strcmp(key, "Note") == 0)
+            printf("%s\n", trim(line+5, BOTH, "\""));
 
 /* handle Run specifications */
 	 else if (strcmp(key, "Run") == 0)
