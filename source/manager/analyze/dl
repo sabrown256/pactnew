@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # DL - analyze platform dynamic linker
-#    - Computes: HAVE_DYNAMIC_LINKER, MDE_Lib
+#    - Computes: HAVE_DYNAMIC_LINKER
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -16,21 +16,21 @@ Note $ALog "----- analyze/dl -----"
 Note $ALog "Analyze: dynamic linker"
 Note $ALog ""
 
-dbmget $ALog MDE_Lib             =\? ""^      \
-             HAVE_DYNAMIC_LINKER =\? FALSE^   \
+dbmget $ALog HAVE_DYNAMIC_LINKER =\? FALSE^   \
              PACT_SO_CACHE       =\? ""^      \
              PACT_CC_VERSION^                 \
              CC_Exe^                          \
              CC_Flags^                        \
              CFE
 
-Note $ALog "MDE_Lib             = |$MDE_Lib|"
 Note $ALog "HAVE_DYNAMIC_LINKER = |$HAVE_DYNAMIC_LINKER|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # check for DLSYM
+
+Separator $ALog
 
 cat << EOF >! $Tmp.c
 #include <stdlib.h>
@@ -72,7 +72,6 @@ if ($ok == FALSE) then
    NoteD $ALog "      no dl"
 else
    if ($ok == NEED) then
-      flog $ALog setenv MDE_Lib "$MDE_Lib -ldl"
       NoteD $ALog "      need explicit dl"
    else
       NoteD $ALog "      has implicit dl"
@@ -87,8 +86,7 @@ endif
 setenv PACT_SO_CACHE  $PACT_SO_CACHE/$System
 
 dbmset $ALog PACT_SO_CACHE       = $PACT_SO_CACHE^         \
-             HAVE_DYNAMIC_LINKER = $HAVE_DYNAMIC_LINKER^   \
-             MDE_Lib             = $MDE_Lib
+             HAVE_DYNAMIC_LINKER = $HAVE_DYNAMIC_LINKER
 
 Separator $ALog
 

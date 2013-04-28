@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # BFD - analyze platform exe format access support
-#     - Computes: HAVE_BFD, HAVE_DEMANGLE, MDE_Lib
+#     - Computes: HAVE_BFD, HAVE_DEMANGLE
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -20,7 +20,6 @@ dbget LIB
 
 dbmget $ALog CC_Exe         =\? cc^         \
              CC_Flags       =\? ""^         \
-             MDE_Lib        =\? ""^         \
              BFD_Lib        =\? -lbfd^      \
              BFD_Path       =\? /usr/$LIB^  \
              BFD_VERSION    =\? 0.0.0^      \
@@ -68,6 +67,8 @@ else
 
 # BFD
 
+   Separator $ALog
+
    cat << EOF >! $Tmp.c
 #include <stdlib.h>
 #include <bfd.h>
@@ -88,7 +89,8 @@ EOF
 
    set libs = ""
 
-# try building without $BFD_Lib
+   Note $ALog "Try building without $BFD_Lib"
+
    set ok = FALSE
    flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
    if ($status == 0) then
@@ -98,31 +100,35 @@ EOF
       endif
    endif
 
-# try building with $BFD_Lib
-   if ($ok == FALSE) then
-      flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags $BFD_Lib
-      if ($status == 0) then
-         flog $ALog $Tmp
+# try building with $BFD_Lib and other common system libs
+# GOTCHA: there may be a problem wrt libdl, libz, and libm which
+# are detected elsewhere and possibly concurrently - hmmmm
+   set auxlib = ( -ldl -lz -lm -lc )
+   foreach l ( $BFD_Lib -liberty )
+      if ($ok == FALSE) then
+         Separator $ALog
+         set libs = ( $libs $l )
+         Note $ALog "Try building with $libs"
+
+         flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags $libs $auxlib
          if ($status == 0) then
-            set libs = ( $libs $BFD_Lib )
-            set ok   = NEED
+            flog $ALog $Tmp
+            if ($status == 0) then
+               set ok = NEED
+               break
+            endif
          endif
       endif
-   endif
+   end
 
-# try building with $BFD_Lib and -liberty
-   if ($ok == FALSE) then
-      flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags $BFD_Lib -liberty
-      if ($status == 0) then
-         flog $ALog $Tmp
-         if ($status == 0) then
-            set libs = ( $libs $BFD_Lib -liberty )
-            set ok   = NEED
-         endif
-      endif
-   endif
+   setenv BFD_Lib "$libs"
 
-# check for static vs dynamic linking
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   Separator $ALog
+   Note $ALog "Check for static vs dynamic linking"
+
    fexvars $ALog t ldd $Tmp @b grep libbfd
    if ($#t > 2) then
       set lSO = $t[3];
@@ -153,8 +159,6 @@ EOF
 
       if (($Linking == dynamic) && ($?lSO == 1)) then
          setenv BFD_SO    $lSO
-      else
-         flog $ALog setenv MDE_Lib "$MDE_Lib $libs"
       endif
       flog $ALog setenv HAVE_BFD TRUE
    endif
@@ -163,6 +167,9 @@ EOF
 #--------------------------------------------------------------------------
 
 # DEMANGLE
+
+   Separator $ALog
+   Note $ALog "Check for demangle"
 
    cat << EOF >! $Tmp.c
 #include <stdlib.h>
@@ -196,16 +203,15 @@ EOF
 
 endif
 
+Separator $ALog
+
 dbmset $ALog CC_Exe        = $CC_Exe^           \
              BFD_VERSION   = $BFD_VERSION^      \
              BFD_Lib       = $BFD_Lib^          \
              BFD_Path      = $BFD_Path^         \
-             MDE_Lib       = $MDE_Lib^          \
              HAVE_BFD      = $HAVE_BFD^         \
              HAVE_DEMANGLE = $HAVE_DEMANGLE^    \
              BFD_SO        = $BFD_SO
-
-Separator $ALog
 
 exit(0)
 

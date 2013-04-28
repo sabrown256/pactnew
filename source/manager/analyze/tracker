@@ -11,7 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-Note $ALog "Analyze: tracker"
+Note $ALog "----- analyze/tracker -----"
+Note $ALog "Analyze: job tracker"
+Note $ALog ""
 
 dbmget $ALog HAVE_TRACKER =\? ""^  \
              TRACKER_Exe  =\? ""^  \

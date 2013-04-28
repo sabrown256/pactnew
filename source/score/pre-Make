@@ -56,10 +56,8 @@ BinObj =
 #
 Libs  = ${LSCORE} ${MDLib}
 MLibs = ${LSCORE} ${LMM} ${MDLib}
-OLibs = ${LSCORE} -losmm ${MDLib} ${MDE_Lib}
-#OLibs = ${LSCORE} -losmm ${MDLib} /usr/lib64/libbfd-2.17.50.0.6-14.el5.so ${MDE_Lib}
-# GOTCHA: need this for BGP
-#OLibs = ${LSCORE} -Wl,-dynamic -losmm ${MDLib}
+DLibs = ${LSCORE} ${MDE_Lib} ${MDLib}
+OLibs = ${LSCORE} -losmm ${MDE_Lib} ${MDLib}
 
 targets :
 	@echo "Targets for SCORE"
@@ -457,7 +455,7 @@ ${BinDir}/tscpr : tscpr.c ${TGTLib}
 retrace : ${BinDir}/tscrtr
 
 ${BinDir}/tscrtr : ${TGTLib} tscrtr.c
-	${CLD} ${LdFlags} tscrtr.c -o ${BinDir}/tscrtr ${Libs} ${MDE_Lib}
+	${CLD} ${LdFlags} tscrtr.c -o ${BinDir}/tscrtr ${DLibs}
 
 #
 # large file types
@@ -504,7 +502,7 @@ ${BinDir}/tscar : ${TGTLib} tscar.c
 	${CLD} ${LdFlags} tscar.c -o ${BinDir}/tscar ${Libs}
 
 ${BinDir}/tscdl : ${TGTLib} tscdl.c
-	${CLD} ${LdFlags} tscdl.c -o ${BinDir}/tscdl ${Libs} ${MDE_Lib}
+	${CLD} ${LdFlags} tscdl.c -o ${BinDir}/tscdl ${DLibs}
 
 foo : ${TGTLib} foo.c
 	${CC} -c foo.c -o foo.o

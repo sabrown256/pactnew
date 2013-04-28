@@ -15,9 +15,9 @@ Note $ALog "Analyze: libm"
 
 dbmget $ALog IMF_Lib     =\? -limf^  \
              IMF_Path    =\? ""^     \
+             USE_IMF     =\? FALSE^  \
              LibM_Lib    =\? "-lm"^  \
              LibM_RPath  =\? ""^     \
-             MD_Pck      =\? FALSE^  \
              Cfg_RPATH   =\? ""^     \
              RPATH
 
@@ -25,6 +25,8 @@ dbmget $ALog IMF_Lib     =\? -limf^  \
 #--------------------------------------------------------------------------
 
 # Intel Math library
+# use Intel Math library in preference to GNU math library
+# because of very poor performance of functions such as sqrt near 1.0
 
 if (-d "$IMF_Path") then
    fexvars $ALog t ls -t $IMF_Path/{icc,ic*}/lib/libimf.a @b grep -v beta @o head -n 3 @o tail -n 1
@@ -38,8 +40,6 @@ Note $ALog "t        = |$t|"
 if (-f "$t") then
    set root = $t:h
    flog $ALog setenv IMF_Path $root
-else
-   flog $ALog setenv IMF_Path ""
 endif
 
 #--------------------------------------------------------------------------
@@ -50,21 +50,23 @@ endif
 if ("$IMF_Path" != "") then
    flog $ALog setenv RPATH         ${RPATH}:${IMF_Path}
    flog $ALog setenv Cfg_RPATH     ${Cfg_RPATH}:${IMF_Path}
-   flog $ALog setenv MD_Pck        "$MD_Pck LibM"
    flog $ALog setenv LibM_Lib      "${IMF_Lib}"
    flog $ALog setenv LibM_RPath    ${IMF_Path}
-
+   flog $ALog setenv USE_IMF       TRUE
 else
    flog $ALog setenv LibM_Lib      "-lm"
-
 endif
+
 NoteD $ALog "   Math library: $LibM_Lib"
 
+# we do not have any executables from here
+flog $ALog setenv IMF_Path ""
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-dbmset $ALog MD_Pck     = $MD_Pck^     \
-             IMF_Path   = $IMF_Path^   \
+dbmset $ALog IMF_Path   = $IMF_Path^   \
+             USE_IMF    = $USE_IMF^    \
              LibM_Lib   = $LibM_Lib^   \
              LibM_RPath = $LibM_RPath^ \
              Cfg_RPATH  = $Cfg_RPATH^  \

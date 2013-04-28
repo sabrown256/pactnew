@@ -22,12 +22,12 @@ dbmget $ALog REQUEST_MPI        =\? FALSE^   \
              HAVE_MPI_STDIN_ALL =\? FALSE^   \
              HAVE_MPI_GOOD_IO   =\? FALSE^   \
              STD_MPI            =\? 1.0^     \
+             USE_MPI            =\? FALSE^   \
              PARALLEL_COMM_METH =\? PARC^    \
              Save_CC            =\? "cc"^    \
              DP_Inc             =\? ""^      \
              DP_Lib             =\? ""^      \
              DP_RPath           =\? ""^      \
-             MD_Pck             =\? ""^      \
              BE^                             \
              Bits^                           \
              CC_Flags^                       \
@@ -222,7 +222,7 @@ else if (("$lParComm" != "") && ($REQUEST_MPI == TRUE)) then
    endif
    NoteD $ALog "         $DP_Lib"
    NoteD $ALog "         stdin $MPIStdIO"
-   flog $ALog setenv MD_Pck   "DP $MD_Pck"
+   flog $ALog setenv USE_MPI  TRUE
 
 else
    setenv DP_Inc    ""
@@ -239,11 +239,11 @@ dbmset $ALog HAVE_OPENMPI       = $HAVE_OPENMPI^        \
              HAVE_MPI_STDIN_ALL = $HAVE_MPI_STDIN_ALL^  \
              HAVE_MPI_GOOD_IO   = $HAVE_MPI_GOOD_IO^    \
              STD_MPI            = $vrs^                 \
+             USE_MPI            = $USE_MPI^             \
              PARALLEL_COMM_METH = $PARALLEL_COMM_METH^  \
              DP_Inc             = $DP_Inc^              \
              DP_Lib             = $DP_Lib^              \
-             DP_RPath           = $DP_RPath^            \
-             MD_Pck             = $MD_Pck
+             DP_RPath           = $DP_RPath
 
 exit(0)
 
