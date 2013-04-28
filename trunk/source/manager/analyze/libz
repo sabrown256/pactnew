@@ -15,10 +15,7 @@ Note $ALog "----- analyze/libz -----"
 Note $ALog "Analyze: libz"
 Note $ALog ""
 
-dbmget $ALog MD_Inc    =\? ""^        \
-             MD_Lib    =\? ""^        \
-             MD_Pck    =\? ""^        \
-             Z_Inc     =\? ""^        \
+dbmget $ALog Z_Inc     =\? ""^        \
              Z_Lib     =\? ""^        \
              Z_RPath   =\? $RootLib^  \
              Z_Path    =\? /usr^      \
@@ -79,18 +76,12 @@ EOF
    source $AnaDir/find-package
 
    setenv Z_Lib "-lz"
-   if (("$PckLib" != "") && ("$Z_Lib" != "") && ("$PckInc" != "")) then
+   if (("$PckLib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has libz ($PckLib)"
-
-      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         flog $ALog setenv MD_Inc "$PckInc $MD_Inc"
-      endif
 
       if ("$PckPath" != "") then
          flog $ALog setenv RPATH    ${RPATH}:${PckPath}
       endif
-      flog $ALog setenv MD_Lib      "$MD_Lib $PckLib"
-      flog $ALog setenv MD_Pck      "Z $MD_Pck"
       flog $ALog setenv HAVE_ZLIB   TRUE
    else
       NoteD $ALog "      no libz"
@@ -107,10 +98,7 @@ EOF
    set ETime = `timer -b $UTime`
 
 # export the results
-   dbmset $ALog MD_Inc  = $MD_Inc^   \
-                MD_Lib  = $MD_Lib^   \
-                MD_Pck  = $MD_Pck^   \
-                Z_Inc   = $Z_Inc^    \
+   dbmset $ALog Z_Inc   = $Z_Inc^    \
                 Z_Lib   = $Z_Lib^    \
                 Z_RPath = $Z_RPath^  \
                 Z_Path  = $Z_Path^   \

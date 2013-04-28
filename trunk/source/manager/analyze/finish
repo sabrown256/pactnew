@@ -24,10 +24,22 @@ dbmget $ALog AbsoluteDeb^              \
              Save_CC^                  \
              Save_CFLAGS^              \
              Cfe_CC_Inc^               \
+             USE_IMF^                  \
+             MD_Inc     =\? ""^        \
+             MD_Lib     =\? ""^        \
+             MD_Pck     =\? ""^        \
+             Z_Inc^                    \
+             Z_Lib^                    \
+             Z_RPath^                  \
+   	     HAVE_ZLIB^                \
+             USE_MPI^                  \
+             MDE_Lib      =\? ""^      \
+             HAVE_DYNAMIC_LINKER^      \
+             HAVE_BFD^                 \
+             BFD_Lib^                  \
              MDI_Inc^                  \
              MDI_Lib^                  \
              MDI_Pck^                  \
-             MD_Pck^                   \
              HDF_Inc^                  \
              HDF_Lib^                  \
              SQL_Inc^                  \
@@ -180,7 +192,7 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# finalize I/O features into MDI_ and MD_ variables
+# finalize I/O features into MDI_ variables
 
    Separator $ALog
 
@@ -197,6 +209,42 @@ endif
 
    if ($HAVE_SSL == TRUE) then
       flog $ALog setenv MDI_Pck "SSL $MDI_Pck"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# finalize exec features into MDE_ variables
+
+   Separator $ALog
+
+   if ($HAVE_BFD == TRUE) then
+      flog $ALog setenv MDE_Lib "$MDE_Lib $BFD_Lib"
+   endif
+
+   if ($HAVE_DYNAMIC_LINKER == TRUE) then
+      flog $ALog setenv MDE_Lib "$MDE_Lib -ldl"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# finalize MD_ variables
+
+   Separator $ALog
+
+   if ($USE_IMF == TRUE) then
+      flog $ALog setenv MD_Pck "$MD_Pck LibM"
+   endif
+
+   if ($HAVE_ZLIB == TRUE) then
+      flog $ALog setenv MD_Inc "$MD_Inc $Z_Inc"
+      flog $ALog setenv MD_Lib "$MD_Lib $Z_Lib"
+      flog $ALog setenv MD_Pck "Z $MD_Pck"
+   endif
+
+   if ($USE_MPI == TRUE) then
+      flog $ALog setenv MD_Pck "DP $MD_Pck"
    endif
 
    if ($HAVE_READLINE == TRUE) then
@@ -248,12 +296,16 @@ dbmset $ALog CC_Exe              = $CC_Exe^               \
              GRAPHICS_Windows    = $GRAPHICS_Windows^     \
              GRAPHICS_Devices    = $GRAPHICS_Devices^     \
              GRAPHICS_Flags      = $GRAPHICS_Flags^       \
+             MD_Inc              = $MD_Inc^               \
+             MD_Lib              = $MD_Lib^               \
+             MD_Pck              = $MD_Pck^               \
              MDG_Inc             = $MDG_Inc^              \
              MDG_Lib             = $MDG_Lib^              \
              MDG_Pck             = $MDG_Pck^              \
              MDI_Inc             = $MDI_Inc^              \
              MDI_Lib             = $MDI_Lib^              \
              MDI_Pck             = $MDI_Pck^              \
+             MDE_Lib             = $MDE_Lib^              \
              MD_Pck              = $MD_Pck^               \
              RPATH               = $RPATH
 

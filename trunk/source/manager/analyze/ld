@@ -105,8 +105,9 @@ dbmset $ALog LD_Exe        = $LD_Exe^              \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-source $AnaDir/dl
-source $AnaDir/bfd
+ftee $ALog gexec $AnaDir/dl     @ \
+                 $AnaDir/bfd    @ \
+                 $AnaDir/libz
 
 exit(0)
 

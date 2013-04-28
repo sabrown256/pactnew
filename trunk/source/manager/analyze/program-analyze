@@ -7,10 +7,11 @@
 # include "cpyright.h"
 #
 
-# figure out libm first to minimize variable reset tangle
-run ../analyze/libm
-
+# figure out the system basics now
 Run {
+
+# figure out libm first to minimize variable reset tangle
+   ../analyze/libm
 
 # greater context
    ../analyze/site
@@ -29,6 +30,7 @@ Run {
    ../analyze/cc
 }
 
+# with the C compiler in hand figure out the remaining utilities
 Run {
    ../analyze/fc
    ../analyze/ld
@@ -40,13 +42,19 @@ Run {
    ../analyze/python
    ../analyze/ranlib
    ../analyze/install
-   ../analyze/jobs
-   ../analyze/tracker
 }
 
 Note "   System features:"
 
 Run {
+
+# C features
+   ../analyze/socket
+   ../analyze/vsnprintf
+   ../analyze/strerror_r
+   ../analyze/fpe
+
+# POSIX features
    ../analyze/fork
    ../analyze/ipc
    ../analyze/signal
@@ -56,20 +64,25 @@ Run {
    ../analyze/getpwuid
    ../analyze/poll
    ../analyze/pty
-   ../analyze/socket
    ../analyze/termio
    ../analyze/asyncio
-   ../analyze/fpe
+
+# library support
    ../analyze/math
-   ../analyze/libz
-   ../analyze/vsnprintf
-   ../analyze/strerror_r
+
+# parallel support
    ../analyze/openmp
    ../analyze/mpi
+   ../analyze/jobs
+
+# I/O
+   ../analyze/tracker
    ../analyze/readline
    ../analyze/hdf5
    ../analyze/sql
    ../analyze/ssl
+
+# graphics
    ../analyze/quickdraw
    ../analyze/opengl
    ../analyze/x11

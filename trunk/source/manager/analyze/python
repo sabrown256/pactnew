@@ -19,7 +19,9 @@
 set Me = $0
 source $Me:h/common
 
+Note $ALog "----- analyze/python -----"
 Note $ALog "Analyze: python"
+Note $ALog ""
 
 # if there is no python directory no need to look further
 if (-d ../../python) then

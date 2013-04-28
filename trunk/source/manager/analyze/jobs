@@ -45,18 +45,18 @@ if (($HAVE_JOBS_SLURM == yes) && ($HAVE_JOBS_MOAB == yes)) then
    setenv JOBS_Path    $exe:h
    setenv JOBS_Exe     $exe:t
    setenv JOBS_System  slurm
-   NoteD $ALog "   Scheduler: has job schedulers $avail (using slurm)"
+   NoteD $ALog "      has job schedulers $avail (using slurm)"
 else if ($HAVE_JOBS_PBS == yes) then
    set exe = `which qsub`
    setenv JOBS_Path    $exe:h
    setenv JOBS_Exe     $exe:t
    setenv JOBS_System  pbs
-   NoteD $ALog "   Scheduler: has job schedulers $avail (using pbs)"
+   NoteD $ALog "      has job schedulers $avail (using pbs)"
 else
    setenv JOBS_Path    none
    setenv JOBS_Exe     none
    setenv JOBS_System  loner
-   NoteD $ALog "   Scheduler: no job schedulers"
+   NoteD $ALog "      no job schedulers"
 endif
 
 # export the results
