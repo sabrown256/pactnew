@@ -11,6 +11,7 @@
 #include "common.h"
 #include "libpsh.c"
 #include "libeval.c"
+#include "libtime.c"
 #include "libdb.c"
 #include "libpgrp.c"
 
@@ -2786,16 +2787,50 @@ static void write_do_run_db(client *cl, state *st)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* READ_CONFIG_FILES - read the config files */
+
+static void read_config_files(client *cl)
+   {double dt;
+    char ts[BFSML];
+
+    separator(Log);
+    note(Log, TRUE, "Reading config files for %s on %s", st.system, st.host);
+
+    dt = wall_clock_time();
+
+    push_file(st.cfgf, STACK_FILE);
+    strcpy(st.cfgf, st.fstck.file[st.fstck.n-1].name);
+    pop_file();
+
+    if (file_exists("analyze/program-init") == TRUE)
+       read_config(cl, "program-init", TRUE);
+
+    read_config(cl, st.cfgf, FALSE);
+
+    dt = wall_clock_time() - dt;
+    note(Log, TRUE, "Completed - config files read (%s)",
+	  time_string(ts, BFSML, TIME_HMS, dt));
+
+    separator(Log);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* ANALYZE_CONFIG - analyze the system configuration */
 
 static void analyze_config(client *cl, char *base)
-   {
+   {double dt;
+    char ts[BFSML];
 
     st.phase = PHASE_ANALYZE;
 
     separator(Log);
     noted(Log, "Analyzing %s on %s", st.system, st.host);
     note(Log, TRUE, "");
+
+    dt = wall_clock_time();
 
     write_envf(cl, FALSE);
     
@@ -2814,6 +2849,11 @@ static void analyze_config(client *cl, char *base)
 
     run(BOTH, "rm * > /dev/null 2>&1");
     pop_dir();
+
+    dt = wall_clock_time() - dt;
+    note(Log, TRUE, "Completed - analysis done (%s)",
+	  time_string(ts, BFSML, TIME_HMS, dt));
+    separator(Log);
 
     noted(Log, "");
 
@@ -2838,7 +2878,8 @@ static void summarize_config(client *cl)
 /* FINISH_CONFIG - complete the configuration files */
 
 static void finish_config(client *cl, char *base)
-   {
+   {double dt;
+    char ts[BFSML];
 
     st.phase = PHASE_WRITE;
 
@@ -2852,6 +2893,8 @@ static void finish_config(client *cl, char *base)
     separator(Log);
     noted(Log, "Writing system dependent files for %s", st.system);
     note(Log, TRUE, "");
+
+    dt = wall_clock_time();
 
     setup_output_env(cl, base);
 
@@ -2868,6 +2911,11 @@ static void finish_config(client *cl, char *base)
        read_config(cl, "program-fin", TRUE);
 
     LOG_ON;
+
+    dt = wall_clock_time() - dt;
+    note(Log, TRUE, "Completed - files written (%s)",
+	  time_string(ts, BFSML, TIME_HMS, dt));
+    separator(Log);
 
     note(Log, TRUE, "");
 
@@ -3146,14 +3194,7 @@ int main(int c, char **v, char **env)
     if (st.db == NULL)
        {dbset(cl, "STRICT", strct);
 
-	push_file(st.cfgf, STACK_FILE);
-	strcpy(st.cfgf, st.fstck.file[st.fstck.n-1].name);
-	pop_file();
-
-	if (file_exists("analyze/program-init") == TRUE)
-	   read_config(cl, "program-init", TRUE);
-
-	read_config(cl, st.cfgf, FALSE);
+	read_config_files(cl);
 
         write_do_run_db(cl, &st);
 
