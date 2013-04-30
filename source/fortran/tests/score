@@ -18,7 +18,7 @@ set msg = "SCORE API Test ....................."
 set FC = `awk '$1 == "FCompiler" { print $3 }' $EtcDir/make-def`
 if ("$FC" != "") then
    Note $Log "Using fortran compiler $FC"
-   flog $Log swhich -1 $FC
+   flog $Log ( where $FC | head -n 1 )
    flog $Log @ xstatus = $xstatus + $status
 else
    flog $Log @ xstatus = $xstatus + 1

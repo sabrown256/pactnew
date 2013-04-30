@@ -97,6 +97,7 @@
 # define LIBASYNC
 
 # include "common.h"
+# include "posix.h"
 # include "network.h"
 
 /*--------------------------------------------------------------------------*/
@@ -730,7 +731,6 @@ int _ioc_fd(int fd, io_kind k)
 io_device _ioc_pair(int *fds, int id)
    {int st;
     io_device medium, rv;
-    static int lid = -1;
     process_group_state *ps;
 
     ps = get_process_group_state();
@@ -748,12 +748,15 @@ io_device _ioc_pair(int *fds, int id)
 	     break;
 
         case IO_DEV_PTY :
+
+#if !defined(_WIN32)
 	     {int err;
 	      char *ps;
 	      static int fdl[2] = {-1, -1};
 	      extern char *ptsname(int fd);
 	      extern int grantpt(int fd);
 	      extern int unlockpt(int fd);
+	      static int lid = -1;
 
 	      st = -1;
 
@@ -771,8 +774,9 @@ io_device _ioc_pair(int *fds, int id)
 	      if (fdl[0] >= 0)
 		 {fds[0] = fcntl(fdl[0], F_DUPFD, fdl[0]);
 		  fds[1] = fcntl(fdl[1], F_DUPFD, fdl[1]);
-		  st = 0;};
-	      break;};};
+		  st = 0;};};
+#endif
+	      break;};
 
     if (st == 0)
        rv = medium;

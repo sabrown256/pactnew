@@ -145,11 +145,6 @@ switch ($Tgt)
         setenv RPATH     /usr/${LIB}:${RPATH}
         setenv Cfg_RPATH /usr/${LIB}:${RPATH}
 
-# NOTE: X11R6 is mostly gone
-#        setenv RPATH     /usr/X11R6/${LIB}:/usr/${LIB}:${RPATH}
-#        setenv Cfg_RPATH /usr/X11R6/${LIB}:/usr/${LIB}:${RPATH}
-        breaksw
-
    case path:
 	if ($?PACT_CC_PATH == 1) then
            setenv RPATH     ${PACT_CC_PATH}/32:${RPATH}

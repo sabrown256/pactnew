@@ -422,6 +422,11 @@
 
 #endif
 
+#define SIG_BLOCK          0
+#define SIG_UNBLOCK        1
+#define RLIMIT_CORE        4
+#define RUSAGE_CHILDREN   -1
+
 /*--------------------------------------------------------------------------*/
 
 /*                          STANDARD PROCEDURAL MACROS                      */
@@ -483,6 +488,12 @@ struct rusage
     long int ru_msgsnd;
     long int ru_msgrcv;
     long int ru_nsignals;};
+
+typedef long int rlim_t;
+
+struct rlimit
+   {rlim_t rlim_cur;     /* the current, soft limits */
+    rlim_t rlim_max;};   /* the hard limits */
 
 /*--------------------------------------------------------------------------*/
 
@@ -957,6 +968,102 @@ void siglongjmp(sigjmp_buf env, int val)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SIGEMPTYSET - for MSW */
+
+int sigemptyset(sigset_t *set)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SIGFILLSET - for MSW */
+
+int sigfillset(sigset_t *set)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SIGPROCMASK - for MSW */
+
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SOCKETPAIR - for MSW */
+
+int socketpair(int domain, int type, int protocol, int sv[2])
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GETRLIMIT - for MSW */
+
+int getrlimit(int resource, struct rlimit *rlim)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SETRLIMIT - for MSW */
+
+int setrlimit(int resource, const struct rlimit *rlim)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GETRUSAGE -  for MSW */
+
+int getrusage(int who, struct rusage *usage)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STRERROR_r -  for MSW */
+
+int strerror_r(int errnum, char *buf, size_t buflen)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SYNC - sync for MSW */
 
 void sync(void)
@@ -1026,6 +1133,24 @@ int select_msw(int nfds, fd_set *readfds, fd_set *writefds,
     return(rv);}
 
 #define select    select_msw
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GETHOSTBYADDR_MSW - gethostbyaddr for MSW */
+
+struct hostent *gethostbyaddr_msw(const void *addr, socklen_t len, int type)
+   {struct hostent *rv;
+
+#if 0
+    rv = gethostbyaddr((const char *) addr, len, type);
+#else
+    rv = NULL;
+#endif
+
+    return(rv);}
+
+#define gethostbyaddr    gethostbyaddr_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

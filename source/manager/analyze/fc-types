@@ -40,35 +40,68 @@ if ($HAVE_FORTRAN == TRUE) then
       flog $ALog set lsdir = ../f90kinds
 
 # run getkinds to generate getbytes.f
+      Note $ALog ""
+      Note $ALog "Determing Fortran kinds"
+
+      Note $ALog ""
+      Note $ALog "Compile getkinds.f"
       flog $ALog $lFC $lsdir/getkinds.f -o getkinds
-      flog $ALog ($CFE ./getkinds >&! getbytes.f)
       if ($status != 0) then
-         NoteD $ALog "      Cannot determine Fortran kinds"
-         flog $ALog cat getbytes.f
+         Note $ALog "      Cannot compile getkinds.f"
+      else
+         flog $ALog ($CFE ./getkinds >&! getbytes.f)
+         if ($status != 0) then
+            NoteD $ALog "      Cannot determine Fortran kinds"
+            flog $ALog cat getbytes.f
+         endif
       endif
 
 # compile and link getbytes
+      Note $ALog ""
+      Note $ALog "Compute Fortran primitive byte sizes"
+
+      Note $ALog ""
+      Note $ALog "Compile csizer.c"
       flog $ALog $lCC -I../.. -c $lsdir/csizer.c -o csizer.o
+      if ($status != 0) then
+         Note $ALog "      Cannot compile csizer.c"
+      endif
+
+      Note $ALog ""
+      Note $ALog "Compile getbytes.f"
       flog $ALog $lFC getbytes.f csizer.o -o getbytes
       if ($status != 0) then
-         NoteD $ALog "      Cannot compute Fortran primitive byte sizes"
+         Note $ALog "      Cannot compile getbytes.f"
       endif
 
 # run getbytes to generate from_c and from_h
+      Note $ALog ""
+      Note $ALog "Run getbytes"
       flog $ALog $CFE ./getbytes
       if ($status != 0) then
-         Note $ALog "***> Cannot run getbytes"
+         NoteD $ALog "         Cannot compute Fortran primitive byte sizes"
       endif
 
 # run genfiles to generate f90types.h and f90kinds.inc
 # requires from_c and from_h as input
+      Note $ALog ""
+      Note $ALog "Generate Fortran primitive byte size files"
+
+      Note $ALog ""
+      Note $ALog "Compiler genfiles.c"
       flog $ALog $lCC -I../.. $lsdir/genfiles.c -o genfiles
-      flog $ALog $CFE ./genfiles
       if ($status != 0) then
-         Note $ALog "***> Cannot run genfiles"
+         Note $ALog "      Cannot compile genfiles.c"
+      else
+         flog $ALog $CFE ./genfiles
+         if ($status != 0) then
+            NoteD $ALog "         Cannot generate Fortran primitive type files"
+         endif
       endif
 
-      flog $ALog mv f90types.h f90kinds.inc $SysDir/include
+      if ((-f f90types.h) && (-f f90kinds.inc)) then
+         flog $ALog mv f90types.h f90kinds.inc $SysDir/include
+      endif
 
    endif
 
