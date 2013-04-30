@@ -40,6 +40,9 @@ Note $ALog "t        = |$t|"
 if (-f "$t") then
    set root = $t:h
    flog $ALog setenv IMF_Path $root
+   flog $ALog setenv USE_IMF  TRUE
+else
+   flog $ALog setenv USE_IMF  FALSE
 endif
 
 #--------------------------------------------------------------------------
@@ -47,13 +50,13 @@ endif
 
 # figure out the math library situation
 
-if ("$IMF_Path" != "") then
+if ($USE_IMF == TRUE) then
    flog $ALog setenv RPATH         ${RPATH}:${IMF_Path}
    flog $ALog setenv Cfg_RPATH     ${Cfg_RPATH}:${IMF_Path}
    flog $ALog setenv LibM_Lib      "${IMF_Lib}"
    flog $ALog setenv LibM_RPath    ${IMF_Path}
-   flog $ALog setenv USE_IMF       TRUE
 else
+   flog $ALog setenv IMF_Path      ""
    flog $ALog setenv LibM_Lib      "-lm"
 endif
 
