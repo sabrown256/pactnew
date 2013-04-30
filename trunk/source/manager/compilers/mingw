@@ -29,8 +29,8 @@ Tool CC {
                  X99   = -std=gnu99 ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # pragma warning flags
                  4.*  >= -Wno-pragmas ]
-   Flags    += [ _env_ = Bits ;                 # address bit size
-                 *     = -m* ]
+#   Flags    += [ _env_ = Bits ;                 # address bit size
+#                 *     = -m* ]
    Flags    += [ _cmd_ = -p ;                   # profiling
 	         on    = -pg ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
@@ -48,8 +48,8 @@ Tool FC {
    Flags  += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                4.*   = -fsignaling-nans ;
                4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
-   Flags  += [ _env_ = Bits ;                 # address bit size
-               *     = -m* ]
+#   Flags  += [ _env_ = Bits ;                 # address bit size
+#               *     = -m* ]
    Flags  += [ _cmd_ = -p ;                   # profiling
 	       on    = -pg ]
    Flags  += [ _cmd_ = -cov ;                 # coverage analysis
@@ -81,8 +81,8 @@ Tool LD {
 
 Tool Lex {
    Flags  = -w
-   Flags += [ _env_ = Bits ;                 # address bit size
-              *     = -m* ]
+#   Flags += [ _env_ = Bits ;                 # address bit size
+#              *     = -m* ]
 }
 
 Tool Ranlib {
@@ -98,8 +98,8 @@ Group FPE {
               32    = i586-mingw32msvc-gcc ;
               64    = i686-w64-mingw32-gcc ]
    Flags  = -g -Wall
-   Flags += [ _env_ = Bits ;                    # compiler flags
-              *     = -m* ]
+#   Flags += [ _env_ = Bits ;                    # compiler flags
+#              *     = -m* ]
 }
 
 Group Std {
@@ -110,13 +110,17 @@ Group Std {
 
 Group Cfg {
    Use    = Std
-   CC_Exe = i586-mingw32msvc-gcc
+   CC_Exe = [ _env_ = Bits ;                    # compiler version
+              32    = i586-mingw32msvc-gcc ;
+              64    = i686-w64-mingw32-gcc ]
 }
 
 Group Shared {
-   LD_Exe    = i586-mingw32msvc-gcc
-   CC_Flags += [ _env_ = Bits ;                 # address bit size
-                *     = -m* ]
+   LD_Exe = [ _env_ = Bits ;                    # compiler version
+              32    = i586-mingw32msvc-gcc ;
+              64    = i686-w64-mingw32-gcc ]
+#   CC_Flags += [ _env_ = Bits ;                 # address bit size
+#                *     = -m* ]
    LD_Flags  = -shared
 }
 

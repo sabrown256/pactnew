@@ -18,7 +18,7 @@ set tst = $1
 set FC = `awk '$1 == "FCompiler" { print $3 }' $EtcDir/make-def`
 if ("$FC" != "") then
    Note $Log "Using fortran compiler $FC"
-   flog $Log swhich -1 $FC
+   flog $Log ( where $FC | head -n 1 )
    flog $Log set xstatus = $status
 else
    flog $Log set xstatus = 1

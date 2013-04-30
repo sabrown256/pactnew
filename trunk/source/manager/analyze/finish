@@ -81,7 +81,16 @@ dbmget $ALog AbsoluteDeb^              \
    
    Separator $ALog
 
-   flog $ALog setenv MDG_Inc "$MDG_Inc $OGL_Inc $X11_Inc $PNG_Inc $JPEG_Inc"
+# regularize (all have -I) and complete MDG_Inc
+   set minc = ""
+   foreach i ( $MDG_Inc $OGL_Inc $X11_Inc $PNG_Inc $JPEG_Inc )
+      if ("$i" =~ "-I"*) then
+         set minc = ( $minc $i)
+      else
+         set minc = ( $minc -I$i)
+      endif
+   end
+   flog $ALog setenv MDG_Inc "$minc"
 
    flog $ALog setenv MDG_Lib "$MDG_Lib $OGL_Lib $X11_Lib $PNG_Lib $JPEG_Lib"
    if (($OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
@@ -306,7 +315,6 @@ dbmset $ALog CC_Exe              = $CC_Exe^               \
              MDI_Lib             = $MDI_Lib^              \
              MDI_Pck             = $MDI_Pck^              \
              MDE_Lib             = $MDE_Lib^              \
-             MD_Pck              = $MD_Pck^               \
              RPATH               = $RPATH
 
 exit(0)

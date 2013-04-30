@@ -751,28 +751,6 @@ static int _SC_process_group_n(subtask *pg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_INIT_IO_SPEC - initialize an SC_iodes specification PG->fd[KIND] */
-
-static void _SC_init_io_spec(subtask *pg, int n, int id)
-   {
-
-    pg->fd[SC_IO_STD_IN].knd = SC_IO_STD_IN;
-    pg->fd[SC_IO_STD_IN].fd  = -1;
-    pg->fd[SC_IO_STD_IN].gid = pg->id - 1;
-
-    pg->fd[SC_IO_STD_OUT].knd = SC_IO_STD_OUT;
-    pg->fd[SC_IO_STD_OUT].fd  = -1;
-    pg->fd[SC_IO_STD_OUT].gid = (id < n-1) ? pg->id + 1 : -1;
-
-    pg->fd[SC_IO_STD_ERR].knd = SC_IO_STD_ERR;
-    pg->fd[SC_IO_STD_ERR].fd  = -1;
-    pg->fd[SC_IO_STD_ERR].gid = -1;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SC_IO_KIND - return the SC_io_kind of IOS in KND
  *             - the SC_io_device of IOS in DEV
  *             - and the file mode in MODE
@@ -931,190 +909,6 @@ int _SC_kind_io(SC_io_kind k)
 	     break;};
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_SET_IO_SPEC - initialize an SC_iodes specification PG->fd[KIND]
- *                 - according to LINK whose syntax is:
- *                 -   <ios><gid><iod>
- *                 - where
- *                 -   <ios>  := 'i' | 'o' | 'e' | 'b'
- *                 -   <gid>  := <n> | +<n> | -<n> | <expr>
- *                 -   <expr> := 't' | <var> | <file>
- *                 -   <var>  := environment variable
- *                 -   <file> := file name
- */
-
-static void _SC_set_io_spec(subtask *pg, int n, int id,
-			    SC_io_kind kind, char *link)
-   {int fd, gid, nc, md, prm, excl;
-    SC_io_device dev;
-    SC_iodes ios, iod;
-    SC_iodes *ips, *ipd;
-    char s[MAXLINE];
-    char *p, *ps, *nm;
-    subtask *pgs, *pgd;
-
-    if ((0 <= id) && (id < n))
-       {pgs  = pg + id;
-	fd  = -1;
-	gid = -1;
-	dev = SC_IO_DEV_NONE;
-
-	SC_strncpy(s, MAXLINE, link, -1);
-	nc  = strlen(s);
-	_SC_io_kind(&ios, s);
-	_SC_io_kind(&iod, s + nc - 1);
-
-	SC_ASSERT(ios.knd == kind);
-
-	ps = s + 1;
-	switch (ps[0])
-	   {case '+' :
-	    case '-' :
-	         dev = SC_IO_DEV_PIPE;
-		 gid = pgs->id + SC_stoi(ps);
-		 break;
-	    case 'e' :
-		 dev = SC_IO_DEV_EXPR;
-		 break;
-
-	    case 'a' :
-	    case 'f' :
-	    case 'w' :
-	         nm  = ps + 1;
-		 dev = SC_IO_DEV_FILE;
-
-/* GOTCHA: what should the real permissions be? */
-		 prm = 0600;
-		 prm = SC_get_perm(FALSE);
-
-/* do not try to use O_EXCL bit with devices - think about it */
-		 if (strncmp(nm, "/dev/", 5) == 0)
-		    excl = 0;
-		 else
-		    excl = O_EXCL;
-
-/*  <   ->  O_RDONLY */
-		 if (kind == SC_IO_STD_IN)
-		    fd = SC_open_safe(nm, O_RDONLY, prm);
-		 else
-		    {switch (ps[0])
-
-/*  >   ->  O_WRONLY | O_CREAT | O_EXCL */
-		        {case 'f' :
-			      md = O_WRONLY | O_CREAT | excl;
-			      break;
-
-/*  >!  ->  O_WRONLY | O_CREAT | O_TRUNC */
-			 case 'w' :
-			      md = O_WRONLY | O_CREAT | O_TRUNC;
-			      break;
-
-/*  >>  ->  O_WRONLY | O_APPEND */
-			 case 'a' :
-			      md = O_WRONLY | O_APPEND;
-			      break;};
-		     fd = SC_open_safe(nm, md, prm);};
-		 break;
-
-	    case 's' :
-		 dev = SC_IO_DEV_SOCKET;
-		 {int to, fm, port;
-		  char *host;
-
-		  to = 10000;         /* timeout after 10 seconds */
-		  fm = FALSE;         /* fatal on timeout */
-
-		  host = ps + 1;
-		  p    = strchr(host, ':');
-		  *p++ = '\0';
-		  port = SC_stoi(p);
-
-		  fd = _SC_tcp_connect(host, port, to, fm);};
-		 break;
-	    case 't' :
-		 dev = SC_IO_DEV_TERM;
-		 s[nc-1] = '\0';
-		 break;
-	    case 'v' :
-		 dev = SC_IO_DEV_VAR;
-		 break;
-	    default :
-		 dev = SC_IO_DEV_PIPE;
-		 if (SC_numstrp(ps) == TRUE)
-		    gid = SC_stoi(ps) - 1;
-		 else
-		    {s[nc-1] = '\0';
-		     if (SC_numstrp(ps) == TRUE)
-		        gid = SC_stoi(ps) - 1;};
-		 break;};
-
-/* set the destination io spec for a pipe */
-	if ((dev == SC_IO_DEV_PIPE) &&
-	    (0 <= gid) && (gid < n))
-	   {pgd = pg + gid;
-	    if ((0 <= iod.knd) && (iod.knd < (int) SC_N_IO_CH))
-	       {ipd = pgd->fd + iod.knd;
-		if (ipd != NULL)
-		   {ipd->knd = iod.knd;
-		    ipd->dev = dev;
-		    ipd->fd  = fd;
-		    ipd->gid = id;};};};
-
-/* set the source io spec */
-	if ((0 <= ios.knd) && (ios.knd < (int) SC_N_IO_CH))
-	   {ips = pgs->fd + ios.knd;
-	    if (ips != NULL)
-	       {ips->knd = ios.knd;
-		ips->dev = dev;
-		ips->fd  = fd;
-		ips->gid = gid;};};};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_PROCESS_GROUP_PARSE - parse out the I/O specifications for the ID job
- *                         - out of the N PG
- */
-
-static void _SC_process_group_parse(subtask *pg, int n, int id)
-   {int i;
-    char **sa;
-    subtask *pgs;
-
-    if ((pg != NULL) && (id >= 0))
-       {pgs = pg + id;
-
-	pgs->id   = id;
-	pgs->exit = -1;
-
-	_SC_init_io_spec(pgs, n, id);
-	if (pgs->ios != NULL)
-	   {sa = SC_tokenize(pgs->ios, "@");
-
-	    for (i = 0; sa[i] != NULL; i++)
-	        {switch (sa[i][0])
-		    {case 'i' :
-		          _SC_set_io_spec(pg, n, id, SC_IO_STD_IN,  sa[i]);
-			  break;
-		     case 'o' :
-			  _SC_set_io_spec(pg, n, id, SC_IO_STD_OUT, sa[i]);
-			  break;
-		     case 'e' :
-			  _SC_set_io_spec(pg, n, id, SC_IO_STD_ERR, sa[i]);
-			  break;
-		     case 'b' :
-			  _SC_set_io_spec(pg, n, id, SC_IO_STD_OUT, sa[i]);
-			  _SC_set_io_spec(pg, n, id, SC_IO_STD_ERR, sa[i]);
-			  break;};};
-
-	    SC_free_strings(sa);};};
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1297,6 +1091,215 @@ static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
 #endif
 
 /*--------------------------------------------------------------------------*/
+
+#ifdef HAVE_PROCESS_CONTROL
+
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_IO_SPEC - initialize an SC_iodes specification PG->fd[KIND]
+ *                 - according to LINK whose syntax is:
+ *                 -   <ios><gid><iod>
+ *                 - where
+ *                 -   <ios>  := 'i' | 'o' | 'e' | 'b'
+ *                 -   <gid>  := <n> | +<n> | -<n> | <expr>
+ *                 -   <expr> := 't' | <var> | <file>
+ *                 -   <var>  := environment variable
+ *                 -   <file> := file name
+ */
+
+static void _SC_set_io_spec(subtask *pg, int n, int id,
+			    SC_io_kind kind, char *link)
+   {int fd, gid, nc, md, prm, excl;
+    SC_io_device dev;
+    SC_iodes ios, iod;
+    SC_iodes *ips, *ipd;
+    char s[MAXLINE];
+    char *p, *ps, *nm;
+    subtask *pgs, *pgd;
+
+    if ((0 <= id) && (id < n))
+       {pgs  = pg + id;
+	fd  = -1;
+	gid = -1;
+	dev = SC_IO_DEV_NONE;
+
+	SC_strncpy(s, MAXLINE, link, -1);
+	nc  = strlen(s);
+	_SC_io_kind(&ios, s);
+	_SC_io_kind(&iod, s + nc - 1);
+
+	SC_ASSERT(ios.knd == kind);
+
+	ps = s + 1;
+	switch (ps[0])
+	   {case '+' :
+	    case '-' :
+	         dev = SC_IO_DEV_PIPE;
+		 gid = pgs->id + SC_stoi(ps);
+		 break;
+	    case 'e' :
+		 dev = SC_IO_DEV_EXPR;
+		 break;
+
+	    case 'a' :
+	    case 'f' :
+	    case 'w' :
+	         nm  = ps + 1;
+		 dev = SC_IO_DEV_FILE;
+
+/* GOTCHA: what should the real permissions be? */
+		 prm = 0600;
+		 prm = SC_get_perm(FALSE);
+
+/* do not try to use O_EXCL bit with devices - think about it */
+		 if (strncmp(nm, "/dev/", 5) == 0)
+		    excl = 0;
+		 else
+		    excl = O_EXCL;
+
+/*  <   ->  O_RDONLY */
+		 if (kind == SC_IO_STD_IN)
+		    fd = SC_open_safe(nm, O_RDONLY, prm);
+		 else
+		    {switch (ps[0])
+
+/*  >   ->  O_WRONLY | O_CREAT | O_EXCL */
+		        {case 'f' :
+			      md = O_WRONLY | O_CREAT | excl;
+			      break;
+
+/*  >!  ->  O_WRONLY | O_CREAT | O_TRUNC */
+			 case 'w' :
+			      md = O_WRONLY | O_CREAT | O_TRUNC;
+			      break;
+
+/*  >>  ->  O_WRONLY | O_APPEND */
+			 case 'a' :
+			      md = O_WRONLY | O_APPEND;
+			      break;};
+		     fd = SC_open_safe(nm, md, prm);};
+		 break;
+
+	    case 's' :
+		 dev = SC_IO_DEV_SOCKET;
+		 {int to, fm, port;
+		  char *host;
+
+		  to = 10000;         /* timeout after 10 seconds */
+		  fm = FALSE;         /* fatal on timeout */
+
+		  host = ps + 1;
+		  p    = strchr(host, ':');
+		  *p++ = '\0';
+		  port = SC_stoi(p);
+
+		  fd = _SC_tcp_connect(host, port, to, fm);};
+		 break;
+	    case 't' :
+		 dev = SC_IO_DEV_TERM;
+		 s[nc-1] = '\0';
+		 break;
+	    case 'v' :
+		 dev = SC_IO_DEV_VAR;
+		 break;
+	    default :
+		 dev = SC_IO_DEV_PIPE;
+		 if (SC_numstrp(ps) == TRUE)
+		    gid = SC_stoi(ps) - 1;
+		 else
+		    {s[nc-1] = '\0';
+		     if (SC_numstrp(ps) == TRUE)
+		        gid = SC_stoi(ps) - 1;};
+		 break;};
+
+/* set the destination io spec for a pipe */
+	if ((dev == SC_IO_DEV_PIPE) &&
+	    (0 <= gid) && (gid < n))
+	   {pgd = pg + gid;
+	    if ((0 <= iod.knd) && (iod.knd < (int) SC_N_IO_CH))
+	       {ipd = pgd->fd + iod.knd;
+		if (ipd != NULL)
+		   {ipd->knd = iod.knd;
+		    ipd->dev = dev;
+		    ipd->fd  = fd;
+		    ipd->gid = id;};};};
+
+/* set the source io spec */
+	if ((0 <= ios.knd) && (ios.knd < (int) SC_N_IO_CH))
+	   {ips = pgs->fd + ios.knd;
+	    if (ips != NULL)
+	       {ips->knd = ios.knd;
+		ips->dev = dev;
+		ips->fd  = fd;
+		ips->gid = gid;};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_INIT_IO_SPEC - initialize an SC_iodes specification PG->fd[KIND] */
+
+static void _SC_init_io_spec(subtask *pg, int n, int id)
+   {
+
+    pg->fd[SC_IO_STD_IN].knd = SC_IO_STD_IN;
+    pg->fd[SC_IO_STD_IN].fd  = -1;
+    pg->fd[SC_IO_STD_IN].gid = pg->id - 1;
+
+    pg->fd[SC_IO_STD_OUT].knd = SC_IO_STD_OUT;
+    pg->fd[SC_IO_STD_OUT].fd  = -1;
+    pg->fd[SC_IO_STD_OUT].gid = (id < n-1) ? pg->id + 1 : -1;
+
+    pg->fd[SC_IO_STD_ERR].knd = SC_IO_STD_ERR;
+    pg->fd[SC_IO_STD_ERR].fd  = -1;
+    pg->fd[SC_IO_STD_ERR].gid = -1;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_PROCESS_GROUP_PARSE - parse out the I/O specifications for the ID job
+ *                         - out of the N PG
+ */
+
+static void _SC_process_group_parse(subtask *pg, int n, int id)
+   {int i;
+    char **sa;
+    subtask *pgs;
+
+    if ((pg != NULL) && (id >= 0))
+       {pgs = pg + id;
+
+	pgs->id   = id;
+	pgs->exit = -1;
+
+	_SC_init_io_spec(pgs, n, id);
+	if (pgs->ios != NULL)
+	   {sa = SC_tokenize(pgs->ios, "@");
+
+	    for (i = 0; sa[i] != NULL; i++)
+	        {switch (sa[i][0])
+		    {case 'i' :
+		          _SC_set_io_spec(pg, n, id, SC_IO_STD_IN,  sa[i]);
+			  break;
+		     case 'o' :
+			  _SC_set_io_spec(pg, n, id, SC_IO_STD_OUT, sa[i]);
+			  break;
+		     case 'e' :
+			  _SC_set_io_spec(pg, n, id, SC_IO_STD_ERR, sa[i]);
+			  break;
+		     case 'b' :
+			  _SC_set_io_spec(pg, n, id, SC_IO_STD_OUT, sa[i]);
+			  _SC_set_io_spec(pg, n, id, SC_IO_STD_ERR, sa[i]);
+			  break;};};
+
+	    SC_free_strings(sa);};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SC_SETUP_PROCESS_GROUP - setup and return a process group
@@ -1426,6 +1429,9 @@ static PROCESS *_SC_launch_process_group(SC_process_group *pgr)
     return(pp);}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* _SC_OPEN_PROC - start up a process on the current CPU

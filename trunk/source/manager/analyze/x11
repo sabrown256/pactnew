@@ -92,8 +92,10 @@ EOF
 
 # the X11R6 directories are pretty much gone
 # except for some older systems
-   set lIncDirs = ( $lIncDirs /usr/X11R6/include )
-   set lLibDirs = ( $lLibDirs /usr/X11R6/$LIB /usr/X11R6/lib )
+   if (-d /usr/X11R6) then
+      set lIncDirs = ( $lIncDirs /usr/X11R6/include )
+      set lLibDirs = ( $lLibDirs /usr/X11R6/$LIB /usr/X11R6/lib )
+   endif
 
    set Implicit = TRUE
    set lHdrs    = ( X11/Xlib.h )

@@ -1400,11 +1400,11 @@ int main(int c, char **v)
 /* locate the tools needed for subshells */
     if (strcmp(os, "AIX") == 0)
        build_path(NULL,
-		  "swhich", "mpi-info", "dump", "nm", "file",
+		  "mpi-info", "dump", "nm", "file",
 		  NULL);
     else
        build_path(NULL,
-		  "swhich", "mpi-info", "nm", "ls", "file",
+		  "mpi-info", "nm", "ls", "file",
 		  NULL);
 
     push_path(P_PREPEND, lpath, state.bindir);
