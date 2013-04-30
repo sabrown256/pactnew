@@ -16,6 +16,10 @@ install :
 	make-html
 	pact man
 
+tar :
+	tar cvf pact-doc-html.tar *.html *.gif
+
+
 html :
 	make-html -i
 	cp ${HTML} ${HTMLDir}

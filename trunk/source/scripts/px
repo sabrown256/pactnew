@@ -22,7 +22,7 @@ set crt = ""
 set ncr = ""
 
 while ($#argv)
-   switch ($1)
+   switch ("$1")
       case -h:
            echo ""
            echo "Usage: px [-c <criterion>] [-h] [-na #] <command>"
@@ -41,12 +41,15 @@ while ($#argv)
       case -c:
            shift
            set crt = ( $1 )
+           breaksw
       case -n:
            shift
            set ncr = ( $1 )
+           breaksw
       case -na:
            shift
            @ na = $1
+           breaksw
       default:
            while ($#argv > 0)
               set cmd = ( $cmd $1 )
@@ -79,7 +82,7 @@ while ($count <= $na)
    set out = `eval "$cmd"`
 
 # default criterion is exit status
-   @ err   = $status
+   @ err = $status
 
 # check for positive criterion
    if ("$crt" != "") then
@@ -121,6 +124,8 @@ if (($count > $na) && ($err != 0)) then
    echo "***> failed ($err) - quitting after $count attempts"
 endif
 
-echo "$out"
+if ("$out" != "") then
+   echo "$out"
+endif
 
 exit($err)
