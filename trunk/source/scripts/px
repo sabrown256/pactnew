@@ -11,7 +11,7 @@
 
 unalias *
 
-if ($?SC_EXEC_N_ATTEMPTS) then
+if ($?SC_EXEC_N_ATTEMPTS == 1) then
    @ na = $SC_EXEC_N_ATTEMPTS
 else
    @ na = 3
@@ -70,10 +70,10 @@ set noglob
 
 while ($count <= $na)
    if ($count > 1) then
-      echo "***> failed ($err) [$dts] - attempt $count in $dt seconds"
-      echo "***>       $cmd"
+      echo "px ***> failed ($err) [$dts] - attempt $count in $dt seconds"
+      echo "px ***>       $cmd"
       sleep $dt
-      echo "***> retry '"$cmd"'"
+      echo "px ***> retry '"$cmd"'"
    endif
 
    set dts = `date +"%Y/%m/%d %H:%M:%S"`
@@ -105,8 +105,8 @@ while ($count <= $na)
 
    if ($err == 0) then
       if ($count > 1) then
-         echo "***> succeeded [$dts] - on attempt $count"
-         echo "***>       $cmd"
+         echo "px ***> succeeded [$dts] - on attempt $count"
+         echo "px ***>       $cmd"
       endif
       break
    else
@@ -121,7 +121,7 @@ end
 
 if (($count > $na) && ($err != 0)) then
    @ count = $count - 1
-   echo "***> failed ($err) - quitting after $count attempts"
+   echo "px ***> failed ($err) - quitting after $count attempts"
 endif
 
 if ("$out" != "") then

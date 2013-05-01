@@ -63,6 +63,7 @@
 #define fopen_safe 		PS_fopen_safe
 #define fread_safe 		PS_fread_safe
 #define fwrite_safe 		PS_fwrite_safe
+#define log_safe 		PS_log_safe
 #define open_safe 		PS_open_safe
 #define read_safe               PS_read_safe
 #define unlink_safe 		PS_unlink_safe

@@ -677,6 +677,8 @@ int main(int c, char **v)
     if (outf != NULL)
        fclose_safe(fo);
 
+    log_safe("dump", 0, NULL, NULL);
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/

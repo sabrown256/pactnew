@@ -535,6 +535,8 @@ int main(int c, char **v)
 
     status = method_1(&st, mc, mv, pmname);
 
+    log_safe("dump", 0, NULL, NULL);
+
 /* reverse the status */
     status = (status == 0) ? 0 : 1;
 

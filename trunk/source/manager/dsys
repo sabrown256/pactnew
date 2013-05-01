@@ -1949,7 +1949,7 @@ CFG_DONE:
         set InstF = ""
         set InstF = ( $InstF pact-update code-date )
         set InstF = ( $InstF for-pact install-ext )
-        set InstF = ( $InstF ../scripts/{import-api,pcpp,px,sinstall} )
+        set InstF = ( $InstF ../scripts/{import-api,pcpp,px,frnsic,sinstall} )
 
 # requiring pact-dist to be run from manager - no need to install
 #        set InstF = ( $InstF pact-dist )
@@ -2317,7 +2317,7 @@ CFG_DONE:
 # save the files in BinDir
         set BinFiles = ""
         if ($strict == FALSE) then
-           set BinFiles = ( $BinFiles smake dmake pact template timer px )
+           set BinFiles = ( $BinFiles smake dmake pact template timer px frnsic )
            set BinFiles = ( $BinFiles do-run elide blang gexec perdb )
            set BinFiles = ( $BinFiles make-syntax )
            set BinFiles = ( $BinFiles import-api pcpp )
