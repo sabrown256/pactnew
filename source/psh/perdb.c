@@ -795,6 +795,8 @@ int main(int c, char **v)
       {LAST_CHAR(req) = '\0';
        rv = exchange(root, ltr, req);};
 
+    log_safe("dump", 0, NULL, NULL);
+
 /* reverse sense for exit status */
     rv = (rv == 0);
 

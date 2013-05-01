@@ -147,6 +147,9 @@ extern char
 
 /* LIBFIO.C declarations */
 
+extern void
+ PS_log_safe(char *fnc, int err, char *type, void *a);
+
 extern int
  PS_open_safe(const char *path, int flags, mode_t mode),
  PS_close_safe(int fd),

@@ -811,6 +811,8 @@ int main(int c, char **v)
 	    printf(" %s", vo[i]);
 	printf("\n");};
 
+    log_safe("dump", 0, NULL, NULL);
+
     execvp(vo[0], vo);
 
     return(1);}

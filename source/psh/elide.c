@@ -141,6 +141,8 @@ int main(int c, char **v)
 	     else
 	        rv &= elide(pa, pb, v[i]);};};
 
+    log_safe("dump", 0, NULL, NULL);
+
     rv = (rv != TRUE);
 
     return(rv);}

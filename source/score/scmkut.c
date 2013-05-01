@@ -661,6 +661,8 @@ int main(int c, char **v, char **env)
     if (mem == TRUE)
        SC_mem_monitor(cs, 2, "dmake", msg);
 
+    PS_log_safe("dump", 0, NULL, NULL);
+
     return(st);}
 
 /*--------------------------------------------------------------------------*/

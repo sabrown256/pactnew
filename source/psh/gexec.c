@@ -228,6 +228,8 @@ int main(int c, char **v, char **env)
 	        {rv = gexeca(db, c-i, v+i, env, maps);
 		 break;};};};
 
+    log_safe("dump", 0, NULL, NULL);
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/

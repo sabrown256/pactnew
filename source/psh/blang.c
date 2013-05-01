@@ -4692,6 +4692,8 @@ int main(int c, char **v)
 
     printf("done\n");
 
+    log_safe("dump", 0, NULL, NULL);
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/

@@ -3581,6 +3581,8 @@ int main(int c, char **v)
 
     cleanup(&state);
 
+    log_safe("dump", 0, NULL, NULL);
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/

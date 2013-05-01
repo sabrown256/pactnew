@@ -1,0 +1,55 @@
+#!/bin/csh -f
+#
+# FRNSIC - forensic checks on files
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set files = ""
+set cmt   = ""
+
+while ($#argv)
+   switch ("$1")
+      case -h:
+           echo ""
+           echo "Usage: frnsic [-c <cmt>] [-h] <file>*"
+           echo "   c   comment, e.g. the command producing the files"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      case -c:
+           shift
+           set cmt = ( $1 )
+           breaksw
+      default:
+           set files = ( $files $1 )
+           breaksw
+   endsw
+   shift
+end
+
+set dts = `date +"%Y/%m/%d %H:%M:%S.%N"`
+
+echo "Host: `uname -n`"
+echo "Date: $dts"
+echo "CWD: $cwd"
+
+foreach f ($files)
+   echo "--- $f ---"
+   if (-f $f) then
+      echo "   Directory: `ls -ld $f:h`"
+      echo "   File:      `ls -l $f`"
+      echo "   Checksum:  `md5sum $f`"
+   else
+      echo "   No such file"
+   endif
+end
+
+echo ""
+
+exit(0)

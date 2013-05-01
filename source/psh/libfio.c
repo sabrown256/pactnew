@@ -18,6 +18,62 @@
 # define EWOULDBLOCK  EAGAIN
 #endif
 
+typedef struct s_ioerrdes ioerrdes;
+
+struct s_ioerrdes
+   {int n;
+    int err;
+    char *fnc;
+    char *type;
+    void *a;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LOG_SAFE - track failures of the functions wrapped as xxx_safe */
+
+#define NERR  64
+
+void log_safe(char *fnc, int err, char *type, void *a)
+   {ioerrdes *pe;
+    static ioerrdes errev[NERR];
+    static int ne = 0;
+
+/* report errors */
+    if (strcmp(fnc, "dump") == 0)
+       {int i, n;
+
+	for (n = 0, i = ne; n < NERR; n++, i = (i + 1) % NERR)
+	    {pe = errev + i;
+	     if (pe->fnc != NULL)
+	        {if (strcmp(pe->type, "char *") == 0)
+		    printf("%4d %12s %4d %12s %s\n",
+			   pe->n, pe->fnc, pe->err,
+			   pe->type, (char *) pe->a);
+		 else if (strcmp(pe->type, "int *") == 0)
+		    printf("%4d %12s %4d %12s %d\n",
+			   pe->n, pe->fnc, pe->err,
+			   pe->type, *(int *) pe->a);
+		 else
+		    printf("%4d %12s %4d %12s %p\n",
+			   pe->n, pe->fnc, pe->err,
+			   pe->type, pe->a);};};}
+
+/* record errors */
+    else
+       {pe = errev + ne;
+	ne = (ne + 1) % NERR;
+
+	pe->n    = ne;
+	pe->err  = err;
+	pe->fnc  = fnc;
+	pe->type = type;
+	pe->a    = a;};
+
+    return;}
+
+#undef NERR
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -41,7 +97,8 @@ FILE *fopen_safe(const char *path, const char *mode)
 		  (ev == EWOULDBLOCK) ||
 		  (ev == ENOSPC) ||
 		  (ev == ETXTBSY))
-	    ok = TRUE;
+	    {log_safe("fopen", ev, "char *", (char *) path);
+	     ok = TRUE;}
 
 /* these don't */
 	 else
@@ -71,7 +128,8 @@ int open_safe(const char *path, int flags, mode_t mode)
 		  (ev == EWOULDBLOCK) ||
 		  (ev == ENOSPC) ||
 		  (ev == ETXTBSY))
-	    ok = TRUE;
+	    {log_safe("open", ev, "char *", (char *) path);
+	     ok = TRUE;}
 
 /* these don't */
 	 else
@@ -98,7 +156,8 @@ int close_safe(int fd)
 /* these errors have a chance of being temporary */
 	 else if ((ev == EINTR) ||
 		  (ev == EIO))
-	    ok = TRUE;
+	    {log_safe("close", ev, "int *", &fd);
+	     ok = TRUE;}
 
 /* these don't */
 	 else
@@ -127,7 +186,8 @@ int fclose_safe(FILE *fp)
 		  (ev == EAGAIN) ||
 		  (ev == EWOULDBLOCK) ||
 		  (ev == EIO))
-	    ok = TRUE;
+	    {log_safe("fclose", ev, "FILE *", fp);
+	     ok = TRUE;}
 
 /* these don't */
 	 else
@@ -155,7 +215,8 @@ int fflush_safe(FILE *fp)
 	 else if ((ev == EINTR) ||
 		  (ev == EWOULDBLOCK) ||
 		  (ev == EAGAIN))
-	    ok = TRUE;
+	    {log_safe("fflush", ev, "FILE *", fp);
+	     ok = TRUE;}
 
 /* these don't */
 	 else
@@ -199,7 +260,8 @@ int block_fd(int fd, int on)
 		 (ev == EAGAIN) ||
 		 (ev == EINTR) ||
 		 (ev == ENOLCK))
-	        {sleep(1);
+	        {log_safe("block_fd", ev, "int *", &fd);
+	         sleep(1);
 		 continue;};};
 
 	 zc = nz;};
@@ -251,8 +313,9 @@ ssize_t read_safe(int fd, void *s, size_t nb, int req)
 	    {if ((ev == EAGAIN) ||
 		 (ev == EWOULDBLOCK) ||
 		 (ev == EINTR))
-		{if ((zc < nz-1) && (wait == TRUE))
-		    sleep(1);}
+	        {if ((zc < nz-1) && (wait == TRUE))
+		    {log_safe("read", ev, "int *", &fd);
+		     sleep(1);};}
 
 /* if the error is unrecoverable, stop now */
 	     else
@@ -289,7 +352,8 @@ size_t fread_safe(void *s, size_t bpi, size_t ni, FILE *fp, int req)
     while ((ns > 0) && (zc < 10))
        {n = fread(ps, bpi, ns, fp);
 	if (ferror(fp) != 0)
-	   {zc++;
+	   {log_safe("fread", n, "FILE *", fp);
+	    zc++;
 	    sleep(1);}
 
 	else if (n == 0)
@@ -330,7 +394,8 @@ ssize_t write_safe(int fd, const void *s, size_t nb)
 	   {if ((ev == EAGAIN) ||
 		(ev == EWOULDBLOCK) ||
 		(ev == EINTR))
-	       {zc++;
+	       {log_safe("write", ev, "int *", &fd);
+	        zc++;
 		sleep(10);}
 
 /* if the error is unrecoverable, stop now */
@@ -370,7 +435,8 @@ size_t fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
     while ((ns > 0) && (zc < 10))
        {n = fwrite(ps, bpi, ns, fp);
 	if (ferror(fp) != 0)
-	   {clearerr(fp);
+	   {log_safe("fwrite", n, "FILE *", fp);
+	    clearerr(fp);
 	    sleep(10);};
 
 	zc = (n == 0) ? zc + 1 : 0;
@@ -409,6 +475,7 @@ int unlink_safe(char *s)
 /* worth a retry */
 	    {case EBUSY :
 	     case EIO :
+	          log_safe("unlink", ev, "char *", s);
 	          break;
 
 /* path or permissions problems will never work so bail */

@@ -77,7 +77,7 @@ dbmget $ALog AbsoluteDeb^              \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# finalize graphics features features
+# finalize graphics features
    
    Separator $ALog
 
@@ -126,77 +126,36 @@ dbmget $ALog AbsoluteDeb^              \
       flog $ALog setenv MDG_Pck          "$MDG_Pck JPEG"
    endif
 
-# eliminate redundancies in MDG_Inc
-# NOTE: compilers look at /usr/include by default not
-# necessarily $RootInc
-   set lincs = ""
-   foreach i ($MDG_Inc)
-      if ("$i" != "-I/usr/include") then
-         set ok = TRUE
-         foreach j ( $lincs )
-             if ("$i" == "$j") then
-                set ok = FALSE
-                break
-             endif
-         end
-         if ($ok == TRUE) then
-            set lincs = ( $lincs $i )
-         endif
-      endif
-   end
-   flog $ALog setenv MDG_Inc  "$lincs"
-   unset lincs
-
-# eliminate redundancies in MDG_Lib
-   set llibs = ""
-   foreach i ($MDG_Lib)
-      set ok = TRUE
-      foreach j ( $llibs )
-          if ("$i" == "$j") then
-             set ok = FALSE
-             break
-          endif
-      end
-      if ($ok == TRUE) then
-         set llibs = ( $llibs $i )
-      endif
-   end
-   flog $ALog setenv MDG_Lib  "$llibs"
-   unset llibs
-
-   Note $ALog "Graphics summary variables:"
-   Note $ALog "MDG_Inc = |$MDG_Inc|"
-   Note $ALog "MDG_Lib = |$MDG_Lib|"
-   Note $ALog "MDG_Pck = |$MDG_Pck|"
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-if ($Std_UseX == FALSE) then
+   if ($Std_UseX == FALSE) then
 
 # have OpenGL
-   if ($Std_UseOGL == "TRUE") then
-      flog $ALog setenv GRAPHICS_Windows OGL
+      if ($Std_UseOGL == "TRUE") then
+         flog $ALog setenv GRAPHICS_Windows OGL
 
 # have Quickdraw
-   else if ($Std_UseQD == "TRUE") then
-      flog $ALog setenv GRAPHICS_Windows QD
+      else if ($Std_UseQD == "TRUE") then
+         flog $ALog setenv GRAPHICS_Windows QD
 
 # no screen graphics
-   else
-      flog $ALog setenv GRAPHICS_Windows       ""
-      flog $ALog setenv Std_UseX   FALSE
-      flog $ALog setenv Std_UseOGL FALSE
-      flog $ALog setenv Std_UseQD  FALSE
+      else
+         flog $ALog setenv GRAPHICS_Windows       ""
+         flog $ALog setenv Std_UseX   FALSE
+         flog $ALog setenv Std_UseOGL FALSE
+         flog $ALog setenv Std_UseQD  FALSE
 
-      dbmset $ALog Std_UseX   = $Std_UseX^    \
-                   Std_UseOGL = $Std_UseOGL^  \
-                   Std_UseQD  = $Std_UseQD
+         dbmset $ALog Std_UseX   = $Std_UseX^    \
+                      Std_UseOGL = $Std_UseOGL^  \
+                      Std_UseQD  = $Std_UseQD
+      endif
+
+      dbexp GRAPHICS_Windows
+
    endif
 
-   dbexp GRAPHICS_Windows
-
-endif
+   Note $ALog "Graphics summary variables:"
+   Note $ALog "   MDG_Inc = |$MDG_Inc|"
+   Note $ALog "   MDG_Lib = |$MDG_Lib|"
+   Note $ALog "   MDG_Pck = |$MDG_Pck|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -220,6 +179,11 @@ endif
       flog $ALog setenv MDI_Pck "SSL $MDI_Pck"
    endif
 
+   Note $ALog "I/O summary variables:"
+   Note $ALog "   MDI_Inc = |$MDI_Inc|"
+   Note $ALog "   MDI_Lib = |$MDI_Lib|"
+   Note $ALog "   MDI_Pck = |$MDI_Pck|"
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -234,6 +198,9 @@ endif
    if ($HAVE_DYNAMIC_LINKER == TRUE) then
       flog $ALog setenv MDE_Lib "$MDE_Lib -ldl"
    endif
+
+   Note $ALog "Execution summary variables:"
+   Note $ALog "   MDE_Lib = |$MDE_Lib|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -259,6 +226,74 @@ endif
    if ($HAVE_READLINE == TRUE) then
       flog $ALog setenv MD_Pck "RL $MD_Pck"
    endif
+
+   Note $ALog "MD summary variables:"
+   Note $ALog "   MD_Inc = |$MD_Inc|"
+   Note $ALog "   MD_Lib = |$MD_Lib|"
+   Note $ALog "   MD_Pck = |$MD_Pck|"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# eliminate redundancies in MDx_Inc especially /usr/include
+# NOTE: compilers look at /usr/include by default not
+# necessarily $RootInc
+
+   Separator $ALog
+
+   foreach p (MDE_Inc MDG_Inc MDI_Inc MD_Inc)
+
+      Note $ALog "Cleanup $p"
+
+      set lincs = ""
+      foreach i (`printenv $p`)
+         if ("$i" != "-I/usr/include") then
+            set ok = TRUE
+            foreach j ( $lincs )
+                if ("$i" == "$j") then
+                   set ok = FALSE
+                   break
+                endif
+            end
+            if ($ok == TRUE) then
+               set lincs = ( $lincs $i )
+            endif
+         endif
+      end
+
+      flog $ALog setenv $p  "$lincs"
+      unset lincs
+
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# eliminate redundancies in MDx_Lib
+
+   Separator $ALog
+
+   foreach p (MDE_Lib MDG_Lib MDI_Lib MD_Lib)
+
+      Note $ALog "Cleanup $p"
+
+      set llibs = ""
+      foreach i (`printenv $p`)
+         set ok = TRUE
+         foreach j ( $llibs )
+             if ("$i" == "$j") then
+                set ok = FALSE
+                break
+             endif
+         end
+         if ($ok == TRUE) then
+            set llibs = ( $llibs $i )
+         endif
+      end
+      flog $ALog setenv $p  "$llibs"
+      unset llibs
+
+   end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

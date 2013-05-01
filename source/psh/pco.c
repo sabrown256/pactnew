@@ -1745,18 +1745,18 @@ static void default_rules(void)
 /* C rules */
     snprintf(st.rules.ccp,   BFLRG,
              "\t%s\n",
-	     "${CC} -E $<");
+	     "( ${CC} -E $< ) || frnsic ${PACTSrcDir}/$<");
 
     snprintf(st.rules.co, BFLRG,
              "\t@(%s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
-	     "${CC} -c $< -o $@");
+	     "( ${CC} -c $< -o $@ ) || frnsic $< $@");
 
     snprintf(st.rules.ca, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     cd, rm, tc,
-	     "${CC} -c ${PACTSrcDir}/$< -o $*.o",
+	     "( ${CC} -c ${PACTSrcDir}/$< -o $*.o ) || frnsic ${PACTSrcDir}/$< $*.o",
 	     ar,
 	     "${RM} $*.o 2>> errlog");
 
@@ -1767,17 +1767,17 @@ static void default_rules(void)
 	     rm, tc,
 	     "${LEX} $< 2>> errlog",
 	     le,
-	     "${LX} -c $*.c",
+	     "( ${LX} -c $*.c ) || frnsic $*.c",
 	     "${RM} lex.yy.c $*.c");
 
     snprintf(st.rules.la, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"lex $<\"",
 	     cd, rm, tc,
-	     "${LEX} -t ${PACTSrcDir}/$< 1> lex.yy.c 2>> errlog",
+	     "( ${LEX} -t ${PACTSrcDir}/$< 1> lex.yy.c 2>> errlog ) || frnsic ${PACTSrcDir}/$< lex.yy.c",
 	     le,
 	     "echo \"${LX} -c $*.c\"",
-	     "${LX} -c $*.c -o $*.o",
+	     "( ${LX} -c $*.c -o $*.o ) || frnsic $*.c $*.o",
 	     ar,
 	     "${RM} lex.yy.c $*.c");
 
@@ -1785,7 +1785,7 @@ static void default_rules(void)
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"lex $<\"",
 	     cd, rm, tc,
-	     "${LEX} ${PACTSrcDir}/$< 2>> errlog",
+	     "( ${LEX} ${PACTSrcDir}/$< 2>> errlog ) || frnsic ${PACTSrcDir}/$<",
 	     le,
 	     "${RM} lex.yy.c");
 
@@ -1794,19 +1794,19 @@ static void default_rules(void)
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
-	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
+	     "( ${YACC} ${PACTSrcDir}/$< 2>> errlog ) || frnsic ${PACTSrcDir}/$<",
 	     ye,
-	     "${YC} -c $*.c -o $*.o",
+	     "( ${YC} -c $*.c -o $*.o ) || frnsic $*.c $*.o",
 	     "${RM} $*.c");
 
     snprintf(st.rules.ya, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
-	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
+	     "( ${YACC} ${PACTSrcDir}/$< 2>> errlog ) || frnsic ${PACTSrcDir}/$<",
 	     ye,
 	     "echo \"${YC} -c $*.c\"",
-	     "${YC} -c $*.c -o $*.o",
+	     "( ${YC} -c $*.c -o $*.o ) || frnsic $*.c $*.o",
 	     ar,
 	     "${RM} $*.c $*.o");
 
@@ -1814,7 +1814,7 @@ static void default_rules(void)
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
-	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
+	     "( ${YACC} ${PACTSrcDir}/$< 2>> errlog ) || frnsic ${PACTSrcDir}/$<",
 	     ye,
 	     "mv $*.c ${PACTSrcDir}");
       
@@ -1825,7 +1825,7 @@ static void default_rules(void)
 	     "   echo \"No Fortran compiler for $<\" ;",
 	     "else",
 	     "   echo \"${FCAnnounce} -c $<\" ;",
-	     "   ${FC} -c $< -o $@ ;",
+	     "   ( ${FC} -c $< -o $@ ) || frnsic $< $@ ;",
 	     "fi");
 
     snprintf(st.rules.fa, BFLRG,
@@ -1835,7 +1835,7 @@ static void default_rules(void)
 	     "else",
 	     "   echo \"${FCAnnounce} -c $<\" ;",
 	     cd, rm, tc,
-	     "     ${FC} -c ${PACTSrcDir}/$< -o $*.o ;",
+	     "     ( ${FC} -c ${PACTSrcDir}/$< -o $*.o ) || frnsic ${PACTSrcDir}/$< $*.o ;",
 	     ar,
 	     "     ${RM} $*.o 2>> errlog ;",
 	     "fi");
@@ -1870,15 +1870,15 @@ static void bad_pragma_rules(void)
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     "px -c \"test -s $*.int.c\" \"${CC} -E $< -o $@ > $*.int.c\"",
-	     "${CC} -c $*.int.c -o $@",
+	     "( ${CC} -c $*.int.c -o $@ ) || frnsic $< $*.int.c $@",
 	     "${RM} $*.int.c");
 
     snprintf(st.rules.ca_bp, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     cd, rm, tc,
-	     "px -c \"test -s $*.int.c\" \"${CC} -E ${PACTSrcDir}/$< > $*.int.c\"",
-	     "${CC} -c $*.int.c -o $*.o",
+	     "( px -c \"test -s $*.int.c\" \"${CC} -E ${PACTSrcDir}/$< > $*.int.c\") || frnsic ${PACTSrcDir}/$< $*.int.c",
+	     "( ${CC} -c $*.int.c -o $*.o ) || frnsic ${PACTSrcDir}/$< $*.int.c $*.o",
 	     ar,
 	     "${RM} $*.int.c $*.o 2>> errlog");
 
@@ -1890,7 +1890,7 @@ static void bad_pragma_rules(void)
 	     "${LEX} $< 2>> errlog",
 	     le,
 	     "px -c \"test -s $*.int.c\" \"${LX} -E $*.c > $*.int.c\"",
-	     "${LX} -c $*.int.c",
+	     "( ${LX} -c $*.int.c ) || frnsic $*.int.c lex.yy.c $*.c",
 	     "${RM} lex.yy.c $*.int.c $*.c");
 
     snprintf(st.rules.la_bp, BFLRG,
@@ -1901,7 +1901,7 @@ static void bad_pragma_rules(void)
 	     le,
 	     "echo \"${LX} -c $*.c\"",
 	     "px -c \"test -s $*.int.c\" \"${LX} -E $*.c > $*.int.c\"",
-	     "${LX} -c $*.int.c -o $*.o",
+	     "( ${LX} -c $*.int.c -o $*.o ) || frnsic $*.int.c $*.c $*.o",
 	     ar,
 	     "${RM} lex.yy.c $*.int.c $*.c");
 
@@ -1913,7 +1913,7 @@ static void bad_pragma_rules(void)
 	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
 	     ye,
 	     "px -c \"test -s $*.int.c\" \"${YC} -E $*.c > $*.int.c\"",
-	     "${YC} -c $*.int.c -o $*.o",
+	     "( ${YC} -c $*.int.c -o $*.o ) || frnsic $*.int.c $*.c $*.o",
 	     "${RM} $*.int.c $*.c");
 
     snprintf(st.rules.ya_bp, BFLRG,
@@ -1924,7 +1924,7 @@ static void bad_pragma_rules(void)
 	     ye,
 	     "echo \"${YC} -c $*.c\"",
 	     "px -c \"test -s $*.int.c\" \"${YC} -E $*.c > $*.int.c\"",
-	     "${YC} -c $*.int.c -o $*.o",
+	     "( ${YC} -c $*.int.c -o $*.o ) || frnsic $*.int.c $*.c $*.o",
 	     ar,
 	     "${RM} $*.c $*.int.c $*.o");
 
@@ -3272,6 +3272,8 @@ int main(int c, char **v, char **env)
 
     if (st.have_db == TRUE)
        kill_perdb();
+
+    log_safe("dump", 0, NULL, NULL);
 
     return(0);}
 
