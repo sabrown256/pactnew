@@ -24,8 +24,6 @@ CcFlags = ${ODC} -I${IncDir} ${MDInc}
 FcFlags =
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
-
 CXX = ${CC_Exe} ${CcFlags}
 
 #
@@ -227,7 +225,8 @@ ${BinDir}/tmlck : tmlck.c ${TGTLib}
 	${CLD} ${LdFlags} tmlck.c -o ${BinDir}/tmlck ${Libs}
 
 ${BinDir}/tmlcsm : tmlcsm.c ${TGTLib}
-	${CLD} ${LdFlags} tmlcsm.c -o ${BinDir}/tmlcsm ${Libs}
+	@(echo "${CCAnnounce} tmlcsm.c -o ${BinDir}/tmlcsm" ; \
+	  ${CLD} ${LdFlags} tmlcsm.c -o ${BinDir}/tmlcsm ${Libs})
 
 #
 # test FPE

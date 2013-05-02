@@ -10,6 +10,7 @@
 Run {
    write/package         $Log $ScrDir
    write/scconfig.h      $Log $ScrDir
+   write/iso-c.h         $Log $ScrDir
 }
 
 Run {
@@ -17,7 +18,6 @@ Run {
    write/make-def        $Log $ScrDir
    write/make-macros     $Log $ScrDir
    write/makefile        $Log $ScrDir
-   write/iso-c.h         $Log $ScrDir
    write/scdecls.h       $Log $ScrDir
    write/syntax.h        $Log $ScrDir
    write/spokes.scm      $Log $ScrDir

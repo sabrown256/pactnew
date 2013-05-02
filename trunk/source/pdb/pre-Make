@@ -24,8 +24,6 @@ CcFlags  = ${ODC} -I. -I${IncDir} ${MDInc} ${MDI_Inc}
 FcFlags  = ${ODF} -I. -I${IncDir}
 LdFlags  = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
-
 #
 # Files to Save for Backup (pact save)
 #
@@ -119,7 +117,8 @@ ${LibDep} : ${hdrf} ${Hdrs} pdspoke.c scope_formats.h
 # detect
 
 ${BinDir}/detect : detect.c ${Hdrs} 
-	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score detect.c -o ${BinDir}/detect ${Cfe_LD_Lib}
+	@(echo "${CCAnnounce} $< -o $@" ; \
+	  ${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score detect.c -o ${BinDir}/detect ${Cfe_LD_Lib})
 
 detect : ${BinDir}/detect
 

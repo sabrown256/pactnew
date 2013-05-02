@@ -26,8 +26,6 @@ CcFlags = ${ODC} -I. -I../.. -I${IncDir} ${MDInc}
 FcFlags =
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
-
 # files to Save for Backup (pact save)
 SaveFiles = *.c *.h *.scm
 
@@ -78,7 +76,7 @@ ${TGTLib}(shgrc.o) : shlrc.l shgrc.y
 	  ${YACC} ${PACTSrcDir}/shgrc.y 2>> errlog ; \
           sed "s|y.tab.c|shgrc.c|" y.tab.c | sed "s|yy|shgrc_|g" > shgrc.c ; \
 	  ${RM} y.tab.c ; \
-	  echo "${YC} -c shgrc.c" ; \
+	  echo "${YCAnnounce} -c shgrc.c" ; \
 	  ${YC} -c shgrc.c -o shgrc.o ; \
 	  ${AR} ${AROpt} ${TGTLib} shgrc.o 2>> errlog ; \
 	  ${RM} shgrc.c shgrc.o shlrc.c )
@@ -103,7 +101,7 @@ ${TGTLib}(shgrf.o) : shlrf.l shgrf.y
 	  ${YACC} ${PACTSrcDir}/shgrf.y 2>> errlog ; \
           sed "s|y.tab.c|shgrf.c|" y.tab.c | sed "s|yy|shgrf_|g" > shgrf.c ; \
 	  ${RM} y.tab.c ; \
-	  echo "${YC} -c shgrf.c" ; \
+	  echo "${YCAnnounce} -c shgrf.c" ; \
 	  ${YC} -c shgrf.c -o shgrf.o ; \
 	  ${AR} ${AROpt} ${TGTLib} shgrf.o 2>> errlog ; \
 	  ${RM} shgrf.c shgrf.o shlrf.c )
@@ -128,7 +126,7 @@ ${TGTLib}(shgrm.o) : shlrm.l shgrm.y
 	  ${YACC} ${PACTSrcDir}/shgrm.y 2>> errlog ; \
           sed "s|y.tab.c|shgrm.c|" y.tab.c | sed "s|yy|shgrm_|g" > shgrm.c ; \
 	  ${RM} y.tab.c ; \
-	  echo "${YC} -c shgrm.c" ; \
+	  echo "${YCAnnounce} -c shgrm.c" ; \
 	  ${YC} -c shgrm.c -o shgrm.o ; \
 	  ${AR} ${AROpt} ${TGTLib} shgrm.o 2>> errlog ; \
 	  ${RM} shgrm.c shgrm.o shlrm.c )
@@ -176,7 +174,8 @@ profiler :
 
 # make the executable
 ${TGTExe} : ${BinDep}
-	${CLD} ${LdFlags} shmain.c -o ${TGTExe} ${Libs}
+	@(echo "${CCAnnounce} shmain.c -o ${TGTExe}" ; \
+	  ${CLD} ${LdFlags} shmain.c -o ${TGTExe} ${Libs})
 
 scheme :
 	touch shmain.c

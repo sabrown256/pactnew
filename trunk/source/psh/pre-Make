@@ -24,9 +24,10 @@ targets :
 
 OD = DefaultG
 
-CcFlags = ${ODC} ${LDPath} ${LDRPath}
-PCC     = ${CCSer}
-#PCC     = cc -g
+CcFlags    = ${ODC} ${LDPath} ${LDRPath}
+PCC        = ${CCSer}
+#PCC        = cc -g
+PCAnnounce = ${Ser_CC_Exe}
 
 POSIXHdrs = posix.h posix-unix.h posix-msw.h posix-beos.h
 ANSIHdrs  = ansic.h
@@ -64,57 +65,68 @@ IncAction = sinstall ${IncFiles} ${IncDir}/shell
 pco : ${BinDir}/pco
 
 ${BinDir}/pco : pco.c libpsh.c
-	${PCC} pco.c -o ${BinDir}/pco ${MDLib}
+	@(echo "${PCAnnounce} pco.c -o ${BinDir}/pco" ; \
+	  ${PCC} pco.c -o ${BinDir}/pco ${MDLib})
 
 do-net : ${BinDir}/do-net
 
 ${BinDir}/do-net : do-net.c ${LibFiles}
-	${PCC} do-net.c -o ${BinDir}/do-net ${MDLib}
+	@(echo "${PCAnnounce} do-net.c -o ${BinDir}/do-net" ; \
+	  ${PCC} do-net.c -o ${BinDir}/do-net ${MDLib})
 
 do-run : ${BinDir}/do-run
 
 ${BinDir}/do-run : do-run.c ${LibFiles}
-	${PCC} do-run.c -o ${BinDir}/do-run ${MDLib}
+	@(echo "${PCAnnounce} do-run.c -o ${BinDir}/do-run" ; \
+	  ${PCC} do-run.c -o ${BinDir}/do-run ${MDLib})
 
 atdbg : ${BinDir}/atdbg
 
 ${BinDir}/atdbg : atdbg.c libpsh.c
-	${PCC} atdbg.c -o ${BinDir}/atdbg ${MDLib}
+	@(echo "${PCAnnounce} atdbg.c -o ${BinDir}/atdbg" ; \
+	  ${PCC} atdbg.c -o ${BinDir}/atdbg ${MDLib})
 
 gexec : ${BinDir}/gexec
 
 ${BinDir}/gexec : gexec.c libpsh.c
-	${PCC} gexec.c -o ${BinDir}/gexec ${MDLib}
+	@(echo "${PCAnnounce} gexec.c -o ${BinDir}/gexec" ; \
+	  ${PCC} gexec.c -o ${BinDir}/gexec ${MDLib})
 
 pcsh : ${BinDir}/pcsh
 
 ${BinDir}/pcsh : pcsh.c libpsh.c
-	${PCC} pcsh.c -o ${BinDir}/pcsh
+	@(echo "${PCAnnounce} pcsh.c -o ${BinDir}/pcsh" ; \
+	  ${PCC} pcsh.c -o ${BinDir}/pcsh)
 
 perdb : ${BinDir}/perdb
 
 ${BinDir}/perdb : perdb.c ${LibFiles}
-	${PCC} perdb.c -o ${BinDir}/perdb ${MDLib}
+	@(echo "${PCAnnounce} perdb.c -o ${BinDir}/perdb" ; \
+	  ${PCC} perdb.c -o ${BinDir}/perdb ${MDLib})
 
 elide : ${BinDir}/elide
 
 ${BinDir}/elide : elide.c ${LibFiles}
-	${PCC} elide.c -o ${BinDir}/elide ${MDLib}
+	@(echo "${PCAnnounce} elide.c -o ${BinDir}/elide" ; \
+	  ${PCC} elide.c -o ${BinDir}/elide ${MDLib})
 
 blang : ${BinDir}/blang
 
 ${BinDir}/blang : blang.c ${LibFiles}
-	${PCC} blang.c -o ${BinDir}/blang
+	@(echo "${PCAnnounce} blang.c -o ${BinDir}/blang" ; \
+	  ${PCC} blang.c -o ${BinDir}/blang)
 
 osrc : ${BinDir}/osrc
 
 ${BinDir}/osrc : osrc.c ${LibFiles}
-	${PCC} osrc.c -o ${BinDir}/osrc ${MDLib}
+	@(echo "${PCAnnounce} osrc.c -o ${BinDir}/osrc" ; \
+	  ${PCC} osrc.c -o ${BinDir}/osrc ${MDLib})
 
 pact-info : ${BinDir}/pact-info ${BinDir}/pact-info
 
 ${BinDir}/pact-info : pact-info.c common.h
-	${PCC} -DPACT_VERSION=\"${Version}\" pact-info.c -o ${BinDir}/pact-info
+	@(echo "${PCAnnounce} -DPACT_VERSION=\"${Version}\" pact-info.c -o ${BinDir}/pact-info" ; \
+	 ${PCC} -DPACT_VERSION=\"${Version}\" pact-info.c -o ${BinDir}/pact-info)
 
 smake : ${BinDir}/pact-info ${BinDir}/smake
 
@@ -126,7 +138,8 @@ ${BinDir}/smake : smake.c common.h
 tpstok : ${BinDir}/tpstok
 
 ${BinDir}/tpstok : tpstok.c ${LibFiles}
-	${PCC} tpstok.c -o ${BinDir}/tpstok ${MDLib}
+	@(echo "${PCAnnounce} tpstok.c -o ${BinDir}/tpstok" ; \
+	  ${PCC} tpstok.c -o ${BinDir}/tpstok ${MDLib})
 
 # debugging only - never to be included in InstallDep
 template : ${BinDir}/template

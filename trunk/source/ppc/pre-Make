@@ -24,8 +24,6 @@ UniFlags =
 CcFlags = ${ODC} -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
-
 #
 # Files to Save for Backup (pact save)
 #
@@ -148,7 +146,8 @@ ${BinDir}/tpcch : ${TGTLib} tpcch.c
 # make the executable
 #
 ${TGTExe} : ${BinDep}
-	${CLD} ${LdFlags} pcexec.c -o ${TGTExe} ${SLibs}
+	@(echo "${CCAnnounce} pcexec.c -o ${TGTExe}" ; \
+	  ${CLD} ${LdFlags} pcexec.c -o ${TGTExe} ${SLibs})
 
 #
 # async - run the shell script pc-async in the resulting xterm 

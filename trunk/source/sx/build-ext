@@ -38,6 +38,7 @@ CcFlags  = \${CDebug} -I\${IncDir} \${MDInc} \${MDGInc}
 FcFlags  =
 LdFlags  = -L\${LibDir} \${LDFLAGS}
 CCAnnounce = \${CCompiler} \${CDebug} \${Shared_CC_Flags} \${CFLAGS}
+CCAnnounce = \${CCompiler} \${CDebug}
 InstallDep = \${TGTLib}
 BinDep = \${Hdrs} \${TGTLib}
 Hdrs = ../sx_int.h

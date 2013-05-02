@@ -39,8 +39,6 @@ CcFlags  = ${ODC} -I${IncDir} ${MDInc} ${MDGInc}
 FcFlags  =
 LdFlags  = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
-
 #
 # Files to Save for Backup (pact save)
 #
@@ -149,13 +147,15 @@ LibAction = @(echo "build-ext" ; build-ext ; cd ${PACTTmpDir} ; echo "bindings" 
 # make the executable
 #
 ${TGTExe} : ${BinDep}
-	${CLD} ${LdFlags} sxmain.c -o ${TGTExe} ${Libs}
+	@(echo "${CCAnnounce} sxmain.c -o ${TGTExe}" ; \
+	  ${CLD} ${LdFlags} sxmain.c -o ${TGTExe} ${Libs})
 
 #
 # make the command test wrapper
 #
 ${BinDir}/tsxcmd : ${BinDep}
-	${CLD} ${LdFlags} tsxcmd.c -o ${BinDir}/tsxcmd ${Libs}
+	@(echo "${CCAnnounce} tsxcmd.c -o ${BinDir}/tsxcmd" ; \
+	  ${CLD} ${LdFlags} tsxcmd.c -o ${BinDir}/tsxcmd ${Libs})
 
 command :
 	pact ${BinDir}/tsxcmd

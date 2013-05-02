@@ -419,8 +419,15 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "YACC       = $Yacc_Exe $Yacc_Flags"
     Note $STDOUT "LEX        = $Lex_Exe"
 
-    Note $STDOUT 'CCAnnounce = ${CC}'
-    Note $STDOUT 'FCAnnounce = ${FC}'
+    Note $STDOUT '#CCAnnounce = ${CC}'
+    Note $STDOUT '#FCAnnounce = ${FC}'
+    Note $STDOUT '#LXAnnounce = ${LX}'
+    Note $STDOUT '#YCAnnounce = ${YC}'
+
+    Note $STDOUT 'CCAnnounce = ${CCompiler} ${ODC}'
+    Note $STDOUT 'FCAnnounce = ${FCompiler} ${ODF}'
+    Note $STDOUT 'LXAnnounce = ${CCompiler} ${ODC}'
+    Note $STDOUT 'YCAnnounce = ${CCompiler} ${ODC}'
 
     Note $STDOUT ""
     Note $STDOUT "CFE       = $CFE"

@@ -33,8 +33,6 @@ UniFlags =
 LdFlags  = -L${DevLib} -L${LibDir} ${LDFLAGS}
 CcFlags  = ${ODC} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
 
-CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
-
 PactLibs = ${LSX} ${LSCHEME} ${LPANACEA} ${LPGS} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLibs}
 SysLibs  = -lmesh -llag \
            -lmisc

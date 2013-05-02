@@ -28,8 +28,6 @@ CcFlags  = ${ODC} -I${IncDir} ${MDInc} ${MDGInc}
 FcFlags  =
 LdFlags  = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
-
 #
 # Files to Save for Backup (pact save)
 #
@@ -130,7 +128,8 @@ ${BinDir}/tpadef : tpadef.c ${TGTLib}
 # make the executable
 #
 ${TGTExe} : ${BinDep}
-	${CLD} ${LdFlags} toul.c -o ${TGTExe} ${Libs}
+	@(echo "${CCAnnounce} toul.c -o ${TGTExe}" ; \
+	  ${CLD} ${LdFlags} toul.c -o ${TGTExe} ${Libs})
 
 #
 # link 
