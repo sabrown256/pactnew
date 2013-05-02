@@ -8,16 +8,12 @@
 # include "cpyright.h"
 #
 
-unalias *
+set Me = $0
+source $Me:h/common
 
-# put these in shell variables since
-# prune-env will remove them as environment variables
-set Log    = $1
-set ScrDir = $2
-
-eval `$ScrDir/prune-env pact`
-set path = ( $ScrDir $path )
-source $ScrDir/functions-pact.csh
+Note $Log "----- write/package -----"
+Note $Log "Write: package"
+Note $Log ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

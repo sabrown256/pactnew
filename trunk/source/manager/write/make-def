@@ -8,20 +8,13 @@
 # include "cpyright.h"
 #
 
-# put these in shell variables since
-# prune-env will remove them as environment variables
-set Log    = $1
-set ScrDir = $2
+set Me = $0
+source $Me:h/common
 
-if ($?pruned == 0) then
-   eval `$ScrDir/prune-env pact`
-   set path   = ( $ScrDir $path )
-   set pruned = TRUE
-endif
+Note $Log "----- write/make-def -----"
+Note $Log "Write: make-def"
+Note $Log ""
 
-source $ScrDir/functions-pact.csh
-
-source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
 #--------------------------------------------------------------------------
