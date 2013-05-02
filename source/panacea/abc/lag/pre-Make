@@ -28,8 +28,6 @@ UniFlags =
 CcFlags = ${ODC} ${GraphicsFlag} -I${DevInc} -I${IncDir} ${MDGInc}
 LdFlags = 
 
-CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
-
 #
 # Code Units
 #

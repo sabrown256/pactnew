@@ -13,7 +13,8 @@ source $Me:h/common
 
 Note $ALog "Analyze: cc"
 
-NoteD $ALog -n "   C Compiler: "
+Note $ALog "----- analyze/cc -----"
+Note $ALog "Analyze: C compiler"
 Note $ALog ""
 
 if ($CROSS_COMPILE == "FALSE") then
@@ -67,6 +68,8 @@ if ($?Cfg_CC_Exe == 1) then
    set cclst = ( $cclst $Cfg_CC_Exe )
 endif
 
+set msg = "C Compiler:"
+
 Note $ALog ""
 Note $ALog "Candidate C compilers: $cclst"
 Note $ALog ""
@@ -80,17 +83,19 @@ Note $ALog ""
 
 if ("$AnsiCC" != "") then
    if ($#AnsiCC > 1) then
-      NoteD $ALog "$AnsiCC[1] (others $AnsiCC[2-])"
+      set msg = "$msg $AnsiCC[1] (others $AnsiCC[2-])"
    else
-      NoteD $ALog "$AnsiCC"
+      set msg = "$msg $AnsiCC"
    endif
 else
-   NoteD $ALog " none"
+   set msg = "$msg none"
+   NoteD $Alog "   $msg"
    NoteD $ALog "      No ANSI C compiler found, PACT cannot be built without one"
    setenv STOP ""
    dbexp STOP
    exit(0)
 endif
+NoteD $ALog "   $msg"
 
 # make sure we have a Cfg compiler defined
 if ($?Cfg_CC_Exe == 0) then

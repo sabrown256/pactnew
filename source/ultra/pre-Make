@@ -30,8 +30,6 @@ CcFlags  = ${ODC} -I${IncDir} ${MDInc} ${MDGInc}
 FcFlags  =
 LdFlags  = -L${LibDir} ${LDFLAGS} 
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
-
 #
 # Files to Save for Backup (pact save)
 #
@@ -98,19 +96,11 @@ ${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs}
 
 #
-# pixie version
-#
-pixie : ${TGTBin}
-	pixie -o ultra.pixie ultra
-	ultra.pixie -s -l ulperf.scm
-	rm -f pixie.stats
-	prof -pixie ultra ultra.Addrs ultra.Counts > pixie.stats
-
-#
 # make the executable
 #
 ${TGTExe} : ${BinDep}
-	${CLD} ${LdFlags} ultra.c -o ${TGTExe} ${Libs}
+	@(echo "${CCAnnounce} ultra.c -o ${TGTExe}" ; \
+	  ${CLD} ${LdFlags} ultra.c -o ${TGTExe} ${Libs})
 
 #
 # link 

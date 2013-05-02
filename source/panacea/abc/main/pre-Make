@@ -30,8 +30,6 @@ UniFlags =
 LdFlags  = -L${DevLib} -L${LibDir} ${LDFLAGS}
 CcFlags  = ${ODC} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
 
-CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
-
 #
 # Things upon which install depends (pact install)
 #

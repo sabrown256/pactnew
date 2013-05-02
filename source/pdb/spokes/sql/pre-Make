@@ -21,8 +21,6 @@ UniFlags =
 CcFlags = ${ODC} -I. -I${PACTTmpDir} -I${IncDir} ${MDInc} ${MDI_Inc}
 LdFlags = -L${LibDir}
 
-CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
-
 #
 # Files to remove in directory clean (make clean)
 #

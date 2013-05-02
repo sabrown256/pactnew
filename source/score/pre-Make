@@ -28,8 +28,6 @@ CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
 FcFlags = ${ODF}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
-
 #
 # Files to Save for Backup (make save)
 #
@@ -207,7 +205,8 @@ ${MMDep}  : ${Hdrs}
 # scoerce
 
 ${BinDir}/scoerce : scoerce.c ${Hdrs} 
-	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../psh -I../score scoerce.c -o ${BinDir}/scoerce ${Cfe_LD_Lib}
+	@(echo "${CCAnnounce} $< -o $@" ; \
+	  ${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../psh -I../score scoerce.c -o ${BinDir}/scoerce ${Cfe_LD_Lib})
 
 scoerce : ${BinDir}/scoerce
 
@@ -269,31 +268,36 @@ score-config :
 fcscan : ${BinDir}/fcscan
 
 ${BinDir}/fcscan : ${TGTLib} scfcsc.c
-	${CLD} ${LdFlags} scfcsc.c -o ${BinDir}/fcscan ${Libs}
+	@(echo "${CCAnnounce} scfcsc.c -o ${BinDir}/fcscan" ; \
+	  ${CLD} ${LdFlags} scfcsc.c -o ${BinDir}/fcscan ${Libs})
 
 #
 # RPATH
 #
 ${BinDir}/rpath : ${TGTLib} scrp.c
-	${CLD} ${LdFlags} scrp.c -o ${BinDir}/rpath ${Libs}
+	@(echo "${CCAnnounce} scrp.c -o ${BinDir}/rpath" ; \
+	  ${CLD} ${LdFlags} scrp.c -o ${BinDir}/rpath ${Libs})
 
 #
 # PTIME
 #
 ${BinDir}/ptime : ${TGTLib} sctime.c
-	${CLD} ${LdFlags} sctime.c -o ${BinDir}/ptime ${Libs}
+	@(echo "${CCAnnounce} sctime.c -o ${BinDir}/ptime" ; \
+	  ${CLD} ${LdFlags} sctime.c -o ${BinDir}/ptime ${Libs})
 
 #
 # NCPU
 #
 ${BinDir}/ncpu : ${TGTLib} scncpu.c
-	${CLD} ${LdFlags} scncpu.c -o ${BinDir}/ncpu ${Libs}
+	@(echo "${CCAnnounce} scncpu.c -o ${BinDir}/ncpu" ; \
+	  ${CLD} ${LdFlags} scncpu.c -o ${BinDir}/ncpu ${Libs})
 
 #
 # LATENCY
 #
 ${BinDir}/latency : ${TGTLib} sclatnt.c
-	${CLD} ${LdFlags} sclatnt.c -o ${BinDir}/latency ${Libs}
+	@(echo "${CCAnnounce} sclatnt.c -o ${BinDir}/latency" ; \
+	  ${CLD} ${LdFlags} sclatnt.c -o ${BinDir}/latency ${Libs})
 
 latency : ${BinDir}/latency
 
@@ -301,25 +305,29 @@ latency : ${BinDir}/latency
 # PS-DIFF
 #
 ${BinDir}/ps-diff : ${TGTLib} scpsd.c
-	${CLD} ${LdFlags} scpsd.c -o ${BinDir}/ps-diff ${Libs}
+	@(echo "${CCAnnounce} scpsd.c -o ${BinDir}/ps-diff" ; \
+	  ${CLD} ${LdFlags} scpsd.c -o ${BinDir}/ps-diff ${Libs})
 
 #
 # DMNZ
 #
 ${BinDir}/dmnz : ${TGTLib} scdmnz.c
-	${CLD} ${LdFlags} scdmnz.c -o ${BinDir}/dmnz ${Libs}
+	@(echo "${CCAnnounce} scdmnz.c -o ${BinDir}/dmnz" ; \
+	  ${CLD} ${LdFlags} scdmnz.c -o ${BinDir}/dmnz ${Libs})
 
 #
 # PROPR
 #
 ${BinDir}/propr : ${TGTLib} scprpr.c
-	${CLD} ${LdFlags} scprpr.c -o ${BinDir}/propr ${Libs}
+	@(echo "${CCAnnounce} scprpr.c -o ${BinDir}/propr" ; \
+	  ${CLD} ${LdFlags} scprpr.c -o ${BinDir}/propr ${Libs})
 
 #
 # HSERVE
 #
 ${BinDir}/hserve : ${TGTLib} schsru.c
-	${CLD} ${LdFlags} schsru.c -o ${BinDir}/hserve ${Libs}
+	@(echo "${CCAnnounce} schsru.c -o ${BinDir}/hserve" ; \
+	  ${CLD} ${LdFlags} schsru.c -o ${BinDir}/hserve ${Libs})
 
 #
 # DSK-SPACE
@@ -327,7 +335,9 @@ ${BinDir}/hserve : ${TGTLib} schsru.c
 disk : ${BinDir}/dspace
 
 ${BinDir}/dspace : scdsk.c ${TGTLib}
-	${CLD} ${LdFlags} scdsk.c -o ${BinDir}/dspace ${Libs}
+	@(echo "${CCAnnounce} scdsk.c -o ${BinDir}/dspace" ; \
+	  ${CLD} ${LdFlags} scdsk.c -o ${BinDir}/dspace ${Libs})
+
 #
 # ERROR
 #
@@ -355,10 +365,12 @@ ${BinDir}/tscpgrp : ${TGTLib} tscpgrp.c
 mpitty : ${BinDir}/sctty ${BinDir}/mpi-io-wrap
 
 ${BinDir}/mpi-io-wrap : ${TGTLib} scwrap.c
-	make-wrap ${CCCfg} ${LdFlags} scwrap.c -o ${BinDir}/mpi-io-wrap ${Libs}
+	@(echo "${CCAnnounce} scwrap.c -o ${BinDir}/mpi-io-wrap" ; \
+	  make-wrap ${CCCfg} ${LdFlags} scwrap.c -o ${BinDir}/mpi-io-wrap ${Libs})
 
 ${BinDir}/sctty : ${TGTLib} sctty.c
-	${CC} ${LdFlags} sctty.c -o ${BinDir}/sctty ${Libs} ${DPLib}
+	@(echo "${CCAnnounce} sctty.c -o ${BinDir}/sctty" ; \
+	  ${CC} ${LdFlags} sctty.c -o ${BinDir}/sctty ${Libs} ${DPLib})
 
 #
 # shared memory parallel test

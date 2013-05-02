@@ -37,7 +37,7 @@ UniFlags =
 CcFlags = ${ODC} ${lpynum} -I. -I../.. -I../../.. -I${PACTGenDir} -I${lpyinc} -I${IncDir} ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${lpynum} ${Shared_CC_Flags} ${CFLAGS}
+#CCAnnounce = ${CCompiler} ${ODC} ${lpynum} ${Shared_CC_Flags} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)

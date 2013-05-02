@@ -21,8 +21,6 @@ CcFlags = ${ODC} -I. -I../.. -I${IncDir} ${MDInc}
 FcFlags =
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
-
 # files to Save for Backup (pact save)
 SaveFiles = *.c *.h *.y *.l
 
@@ -65,7 +63,7 @@ ${TGTLib}(sccgr.o) : scclr.l sccgr.y
 	  ${YACC} ${PACTSrcDir}/sccgr.y 2>> errlog ; \
           sed "s|y.tab.c|sccgr.c|" y.tab.c | sed "s|yy|sccgr_|g" > sccgr.c ; \
 	  ${RM} y.tab.c ; \
-	  echo "${YC} -c sccgr.c" ; \
+	  echo "${YCAnnounce} -c sccgr.c" ; \
 	  ${YC} -c sccgr.c -o sccgr.o ; \
 	  ${AR} ${AROpt} ${TGTLib} sccgr.o 2>> errlog ; \
 	  ${RM} sccgr.c sccgr.o scclr.c )
@@ -102,7 +100,8 @@ profiler :
 
 # make the executable
 ${TGTExe} : ${BinDep}
-	${CLD} ${LdFlags} sccmain.c -o ${TGTExe} ${Libs}
+	@(echo "${CCAnnounce} sccmain.c -o ${TGTExe}" ; \
+	  ${CLD} ${LdFlags} sccmain.c -o ${TGTExe} ${Libs})
 
 scc :
 	pact install

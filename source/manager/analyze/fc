@@ -13,7 +13,8 @@ source $Me:h/common
 
 Note $ALog "Analyze: fc"
 
-NoteD $ALog -n "   Fortran Compiler: "
+Note $ALog "----- analyze/fc -----"
+Note $ALog "Analyze: Fortran compiler"
 Note $ALog ""
 
 if ($?NO_FORTRAN == 1) then
@@ -50,18 +51,21 @@ endif
 # find the available ANSI Fortran compilers
 set AnsiFC = ( `../analyze/fc-find $fclst` )
 
+set msg = "Fortran Compiler:"
+
 Note $ALog ""
 Note $ALog "Fortran compilers: $AnsiFC"
 Note $ALog ""
 
 if ("$AnsiFC" != "") then
    if ($#AnsiFC > 1) then
-      NoteD $ALog "$AnsiFC[1] (others $AnsiFC[2-])"
+      set msg = "$msg $AnsiFC[1] (others $AnsiFC[2-])"
    else
-      NoteD $ALog "$AnsiFC"
+      set msg = "$msg $AnsiFC"
    endif
 else
-   NoteD $ALog " none"
+   set msg = "$msg none"
+   NoteD $ALog "   $msg"
    NoteD $ALog "      No FORTRAN compiler found"
 
    flog $ALog setenv FC_Exe        none
@@ -74,6 +78,8 @@ else
 
    goto DONE
 endif
+
+NoteD $ALog "   $msg"
 
 # make sure we have a configuration compiler defined
 if ($?Cfg_FC_Exe == 0) then
