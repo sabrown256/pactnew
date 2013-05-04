@@ -202,10 +202,6 @@ switch ($Cmnd)
    case build:
         echo ""
 
-        InitLog Log $LogDir/build
-
-        flog $Log $Which pact
-
         set Shared = ( `dsys configured | awk '$1 == "Shared" { print $3 }'` )
         if ("$Shared" == "yes") then
            set MTgt = shared
@@ -224,7 +220,11 @@ switch ($Cmnd)
         set Tgts = ""
         while ($#argv > 0)
            switch ($1)
-              case -a :
+              case -a:
+                   shift
+                   setenv SESSION_CONFIG $1
+                   breaksw
+              case -all :
                    ./bpc $argv
                    exit($status)
                    breaksw
@@ -233,14 +233,15 @@ switch ($Cmnd)
                    breaksw
               case -h :
                    echo ""
-                   echo "Usage: dsys build [-a] [-h] [-na #] [-p #] [-s] [-u] [tgts]*"
+                   echo "Usage: dsys build [-a <sys>] [-all] [-h] [-na #] [-p #] [-s] [-u] [tgts]*"
                    echo ""
-                   echo "     a  - build all current configurations"
-                   echo "     h  - this help message"
-                   echo "     na - number of attempts when commands fail"
-                   echo "     p  - number of nodes to use"
-                   echo "     s  - build shared libraries if configured"
-                   echo "     u  - build static libraries only (default)"
+                   echo "     a   - do build for configuration <sys>"
+                   echo "     all - build all current configurations"
+                   echo "     h   - this help message"
+                   echo "     na  - number of attempts when commands fail"
+                   echo "     p   - number of nodes to use"
+                   echo "     s   - build shared libraries if configured"
+                   echo "     u   - build static libraries only (default)"
                    echo ""
                    exit(1)
                    breaksw
@@ -275,109 +276,154 @@ switch ($Cmnd)
            shift
         end
 
-        flog $Log umask
-	flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/build.error
+        setenv System  `$CfgMan -d ../dev use`
+        set DevDir  = $BaseDir/dev
+        set SysDir  = $DevDir/$System
+        set BinDir  = $SysDir/bin
+        set EtcDir  = $SysDir/etc
+        set LogDir  = $SysDir/log
 
-# do not bother with core files for the compilation tools
-        limit coredumpsize 0 >& /dev/null
+        InitLog Log $LogDir/build
+
+        flog $Log $Which pact
 
         set BeginTime = `$TIMER -r`
 
+# check for multi-platform build
+        flog $Log setenv PERDB_PATH $EtcDir/cfg
+        dbget Platforms
+        if ("$Platforms" != "") then
+
+           set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
+           @ np = $#inf
+           Note $Log "Build for $np platforms"
+
+           @ lerr = 0
+           set inf = ( `echo "$inf" | sed 's|[()]| |g'` )
+           while ($#inf > 0)
+              set cfg = $inf[1]
+              set sid = $inf[2]
+              shift inf
+              shift inf
+
+              Separator $Log
+              flog $Log dsys select $sid
+              ftee $Log dsys build
+              flog $Log @ lerr = $lerr + $status
+           end
+           set RStatus = $lerr
+
+           flog $Log dsys select $System
+
+           set ETime = `$TIMER -b $BeginTime`
+
+           NoteD $Log "PACT multi-platform build completed ($RStatus/$ETime)"
+           NoteD $Log ""
+
+# single platform build
+        else
+           flog $Log umask
+           flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/build.error
+
+# do not bother with core files for the compilation tools
+           limit coredumpsize 0 >& /dev/null
+
 # provide context for child processes
-        setenv DSYS_TARGET pact_build
+           setenv DSYS_TARGET pact_build
 
 # preliminary - generate headers in score needed by other packages
-        flog $Log pushd ../score
-        flog $Log pact $Args gen
-        flog $Log popd
-
-        if ("$Tgts" == "") then
-           NoteD $Log "Building PACT on $Host ($Msg) ..."
-           NoteD $Log "Using C Compiler $PACT_CC_EXE ($PACT_CC_FAMILY)"
-
-           flog $Log $DSYS linstall
-           flog $Log pushd ..
-
-           flog $Log setenv SESSION_CONFIG $System
-           flog $Log setenv PACTRoot $cwd
-
-           flog $Log setenv  SC_EXEC_SERVER_WAIT     300
-           flog $Log setenv  SC_EXEC_TIME_LIMIT      3600
-           flog $Log setenv  SC_EXEC_TIME_FACTOR     80
-           flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
-
-           Note $Log "pact -log $Log -f $EtcDir/Makefile $Args build"
-           pact -log $Log -f $EtcDir/Makefile $Args build
-           set RStatus = $status
-
+           flog $Log pushd ../score
+           flog $Log pact $Args gen
            flog $Log popd
-        else
-           NoteD $Log "Building packages on $Host ($Msg) ..."
-           NoteD $Log ""
-           while ($#Tgts > 0)
-              set tgt = $Tgts[1]
-              shift Tgts
-              if (-d $BaseDir/$tgt) then
-                 flog $Log pushd $BaseDir/$tgt
 
-                 NoteD $Log "$BaseDir/$tgt"
-                 flog $Log $PACT $Args install
-                 NoteD $Log ""
+           if ("$Tgts" == "") then
+              NoteD $Log "Building PACT for $System ($Msg) ..."
+              NoteD $Log "Using C Compiler $PACT_CC_EXE ($PACT_CC_FAMILY)"
 
-                 flog $Log popd
-              endif
-           end
-           set RStatus = $status
-        endif
+              flog $Log $DSYS linstall
+              flog $Log pushd ..
 
-        Note $Log "Build exit status = $RStatus"
-        flog $Log pushd ../doc
-        flog $Log pact install
-        flog $Log popd
+              flog $Log setenv SESSION_CONFIG $System
+              flog $Log setenv PACTRoot $cwd
+
+              flog $Log setenv  SC_EXEC_SERVER_WAIT     300
+              flog $Log setenv  SC_EXEC_TIME_LIMIT      3600
+              flog $Log setenv  SC_EXEC_TIME_FACTOR     80
+              flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
+
+              Note $Log "pact -log $Log -f $EtcDir/Makefile $Args build"
+              pact -log $Log -f $EtcDir/Makefile $Args build
+              set RStatus = $status
+
+              flog $Log popd
+           else
+              NoteD $Log "Building packages for $System ($Msg) ..."
+              NoteD $Log ""
+              while ($#Tgts > 0)
+                 set tgt = $Tgts[1]
+                 shift Tgts
+                 if (-d $BaseDir/$tgt) then
+                    flog $Log pushd $BaseDir/$tgt
+
+                    NoteD $Log "$BaseDir/$tgt"
+                    flog $Log $PACT $Args install
+                    NoteD $Log ""
+
+                    flog $Log popd
+                 endif
+              end
+              set RStatus = $status
+           endif
+
+           Note $Log "Build exit status = $RStatus"
+           flog $Log pushd ../doc
+           flog $Log pact install
+           flog $Log popd
 
 # fix up cross compile executables that need to run on the current host
 # some things should be on the back end for testing
 # but some need to be used by the system on the front end
 # see score/make-wrap
-        envini CROSS_COMPILE FALSE
-        if ($CROSS_COMPILE != FALSE) then
+           envini CROSS_COMPILE FALSE
+           if ($CROSS_COMPILE != FALSE) then
+              NoteD $Log ""
+              Separator $Log
+              NoteD $Log "Cross compile fixes"
+              set CrossFix = ( hserve mpi-io-wrap )
+#              set CrossFix = ( $CrossFix ps-diff png-diff )
+              foreach i ( $CrossFix )
+                 set exe = `which-exe -d ${BinDir} $i`
+                 if (-x "$exe") then
+                    NoteD $Log "   $exe"
+                    flog $Log cp $exe ${BinDir}
+                 endif
+              end
+              NoteD $Log "done"
+           endif
+
+           if ($RStatus == 0) then
+              NoteD $Log ""
+              Separator $Log
+              NoteD $Log "Making integrated PACT library for $System"
+              ftee $Log ./pact-lib
+              NoteD $Log "done"
+           endif
+
+           set ETime = `$TIMER -b $BeginTime`
+
            NoteD $Log ""
            Separator $Log
-           NoteD $Log "Cross compile fixes"
-           set CrossFix = ( hserve mpi-io-wrap )
-#           set CrossFix = ( $CrossFix ps-diff png-diff )
-           foreach i ( $CrossFix )
-              set exe = `which-exe -d ${BinDir} $i`
-              if (-x "$exe") then
-                 NoteD $Log "   $exe"
-                 flog $Log cp $exe ${BinDir}
-              endif
-           end
-           NoteD $Log "done"
-        endif
-
-        if ($RStatus == 0) then
-           NoteD $Log ""
-           Separator $Log
-           NoteD $Log "Making integrated PACT library"
-           ftee $Log ./pact-lib
-           NoteD $Log "done"
-        endif
-
-        set ETime = `$TIMER -b $BeginTime`
-
-        NoteD $Log ""
-        Separator $Log
-        if ($RStatus != 0) then
-           foreach i (../*/z-$System/obj/errlog)
-              if (!(-z $i)) then
-                 flog $Log cat $i
-              endif
-           end
-           NoteD $Log "PACT build on $Host failed ($RStatus/$ETime)"
-           NoteD $Log "Check log file: ../dev/$System/log/build"
-        else
-           NoteD $Log "PACT build on $Host complete ($ETime)"
+           if ($RStatus != 0) then
+              foreach i (../*/z-$System/obj/errlog)
+                 if (!(-z $i)) then
+                    flog $Log cat $i
+                 endif
+              end
+              NoteD $Log "PACT build for $System failed ($RStatus/$ETime)"
+              NoteD $Log "Check log file: ../dev/$System/log/build"
+           else
+              NoteD $Log "PACT build for $System complete ($ETime)"
+           endif
         endif
 
         NoteD $Log ""
@@ -611,7 +657,7 @@ switch ($Cmnd)
         setenv CCompiler  gnu
 
         setenv Arch  `$ScrDir/system-id`
-	setenv Bits  `$ScrDir/nbit -d`
+        setenv Bits  `$ScrDir/nbit -d`
 
         set Configuration = ""
         set Method        = 2
@@ -1038,7 +1084,7 @@ switch ($Cmnd)
         flog $Log popd
 
 # remove standard Tool and Group variables from the environment
-	foreach v ( `env |& sed 's|^[ \t].*||' | sed 's|=.*$||'` )
+        foreach v ( `env |& sed 's|^[ \t].*||' | sed 's|=.*$||'` )
            switch ($v)
               case CC_*:
               case FC_*:
@@ -1048,7 +1094,7 @@ switch ($Cmnd)
               case Cfe_*:
                    unsetenv $v
            endsw
-	end
+        end
 
 # setup for PERDB session
         flog $Log setenv PERDB_IDLE_TIMEOUT 600
@@ -1056,11 +1102,11 @@ switch ($Cmnd)
         flog $Log set dbopt = ( -f $PERDB_PATH )
         flog $Log $RM ${PERDB_PATH}*
 
-	flog $Log $PERDB -l -c -s
+        flog $Log $PERDB -l -c -s
 
-	flog $Log $PERDB PACT_VERSION=$PACTVer
+        flog $Log $PERDB PACT_VERSION=$PACTVer
 
-	if (($Method == 2) && (-x $BinDir/pco)) then
+        if (($Method == 2) && (-x $BinDir/pco)) then
            flog $Log set PConf = ( $BinDir/pco $dbopt -env $cwd/pact.env -l )
            Note $Log "Using binary pco to process input"
         else
@@ -1153,7 +1199,7 @@ switch ($Cmnd)
         endif
 
 # save the database before building dmake because import-api needs it
-	flog $Log $PERDB -l save:db:
+        flog $Log $PERDB -l save:db:
 
 # settle on smake or dmake
         Separator $Log
@@ -1172,8 +1218,13 @@ switch ($Cmnd)
 # set the main pact link to the first platform pact
            flog $Log pushd ${BinDir}
            flog $Log mv pact pact.cfg
-           flog $Log ln -s $BaseDir/$sid/bin/pact pact
+           flog $Log ln -s $DevDir/$sid/bin/pact pact
            flog $Log popd
+
+# restore configuration
+           flog $Log set sid = $SESSION_CONFIG
+           flog $Log unsetenv SESSION_CONFIG
+           flog $Log $CfgMan add $sid
 
 # single platform build
         else
@@ -1260,7 +1311,7 @@ switch ($Cmnd)
 # wrap it up
         Separator $Log
 
-   	flog $Log $PERDB -l quit:
+        flog $Log $PERDB -l quit:
 
         if ($platform == FALSE) then
            NoteD $Log ""
@@ -1301,7 +1352,7 @@ switch ($Cmnd)
         endif
 
 CFG_DONE:
-	unset dbopt
+        unset dbopt
 
         breaksw
 
@@ -1372,7 +1423,7 @@ CFG_DONE:
                                Note $Log "   Host: |$hst| |$ishst| |$Host|"
                                if ("$ishst" != "Host") then
                                   set Cfgs = ( $Cfgs $c )
-	                       else
+                               else
                                   set ishst = `host $hst-pub | awk '{ print $1 }'`
                                   if ("$ishst" != "Host") then
                                      set Cfgs = ( $Cfgs $c )
@@ -1956,7 +2007,7 @@ CFG_DONE:
 
         set liu = ../scripts/sinstall
 
-	@ lerr = 0
+        @ lerr = 0
 
         $liu gdbinit $BinDir/.gdbinit
         @ lerr = $lerr + $status
@@ -2052,7 +2103,7 @@ CFG_DONE:
         Note $Log do-net -e $DO_PACT $DArgs $CArgs
 
 #        do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $Log
-	fexec $Log do-net -e $DO_PACT $DArgs $CArgs @b tee -ai $Log
+        fexec $Log do-net -e $DO_PACT $DArgs $CArgs @b tee -ai $Log
         set RStatus = $gstatus[1]
 
         breaksw
@@ -2276,13 +2327,18 @@ CFG_DONE:
         set strict = FALSE
         while ($#argv > 0)
            switch ($1)
+              case -a:
+                   shift
+                   setenv SESSION_CONFIG $1
+                   breaksw
               case -cfg:
                    set strict = TRUE
                    breaksw
               case -h:
               case help:
-                   echo "Usage: dsys remove [-cfg] [-h]"
+                   echo "Usage: dsys remove [-a <sys>] [-cfg] [-h]"
                    echo ""
+                   echo "   a     do remove of configuration <sys>"
                    echo "   cfg   do more strict config remove"
                    echo "   h     this help message"
                    echo ""
@@ -2292,156 +2348,198 @@ CFG_DONE:
            shift
         end
 
+        setenv System  `$CfgMan -d ../dev use`
+        set DevDir  = $BaseDir/dev
+        set SysDir  = $DevDir/$System
+        set BinDir  = $SysDir/bin
+        set IncDir  = $SysDir/include
+        set LibDir  = $SysDir/lib
+        set EtcDir  = $SysDir/etc
+        set ScmDir  = $SysDir/scheme
+        set LogDir  = $SysDir/log
+
         InitLog Log $LogDir/remove
-
-        set lpybind = none
-        if (-f $EtcDir/cfg.db) then
-           set inf = ( `grep PY_DirSrc $EtcDir/cfg.db | sed 's|=| |'` )
-           if (("$inf" != "") && ($#inf > 2)) then
-              set lpybind = $inf[3]:t
-           endif
-           unset inf
-        endif
-
-# cleanup path so as not to tax wimpy OSs such as Solaris
-        eval `$ScrDir/simplify-path`
 
         set BeginTime = `$TIMER -r`
 
-        flog $Log date
-        flog $Log $Which pact
+# check for multi-platform build
+        flog $Log setenv PERDB_PATH $EtcDir/cfg
+        dbget Platforms
+        if ("$Platforms" != "") then
 
-        NoteD $Log "Removing PACT"
-        Note $Log "strict = $strict"
+           set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
+           @ np = $#inf
+           Note $Log "Remove for $np platforms"
+
+           @ lerr = 0
+           set inf = ( `echo "$inf" | sed 's|[()]| |g'` )
+           while ($#inf > 0)
+              set cfg = $inf[1]
+              set sid = $inf[2]
+              shift inf
+              shift inf
+
+              Separator $Log
+              ftee $Log dsys remove -a $sid
+              flog $Log @ lerr = $lerr + $status
+           end
+           set RStatus = $lerr
+
+           set ETime = `$TIMER -b $BeginTime`
+
+           NoteD $Log "PACT multi-platforms remove completed ($RStatus/$ETime)"
+           NoteD $Log ""
+
+# single platform build
+        else
+           set lpybind = none
+           if (-f $EtcDir/cfg.db) then
+              set inf = ( `grep PY_DirSrc $EtcDir/cfg.db | sed 's|=| |'` )
+              if (("$inf" != "") && ($#inf > 2)) then
+                 set lpybind = $inf[3]:t
+              endif
+              unset inf
+           endif
+
+# cleanup path so as not to tax wimpy OSs such as Solaris
+           eval `$ScrDir/simplify-path`
+
+           flog $Log date
+           flog $Log $Which pact
+
+           NoteD $Log "Removing PACT for $System"
+           Note $Log "strict = $strict"
 
 # save the files in BinDir
-        set BinFiles = ""
-        if ($strict == FALSE) then
-           set BinFiles = ( $BinFiles smake dmake pact template timer px frnsic )
-           set BinFiles = ( $BinFiles do-run elide blang gexec perdb )
-           set BinFiles = ( $BinFiles make-syntax )
-           set BinFiles = ( $BinFiles import-api pcpp )
-           set BinFiles = ( $BinFiles sinstall install-pact install-ext )
-        endif
-        Note $Log "BinFiles = $BinFiles"
+           set BinFiles = ""
+           if ($strict == FALSE) then
+              set BinFiles = ( $BinFiles smake dmake pact template )
+              set BinFiles = ( $BinFiles timer px frnsic )
+              set BinFiles = ( $BinFiles do-run elide blang gexec perdb )
+              set BinFiles = ( $BinFiles make-syntax )
+              set BinFiles = ( $BinFiles import-api pcpp )
+              set BinFiles = ( $BinFiles sinstall install-pact install-ext )
+           endif
+           Note $Log "BinFiles = $BinFiles"
 
 # save the files in IncDir
-        set IncFiles = ""
-        if ($strict == FALSE) then
-           set IncFiles = ( $IncFiles iso-c.h scconfig.h scdecls.h )
-           set IncFiles = ( $IncFiles cpyright.h syntax.h )
-           set IncFiles = ( $IncFiles posix.h posix-unix.h )
-           set IncFiles = ( $IncFiles posix-msw.h posix-beos.h )
-           set IncFiles = ( $IncFiles network.h network-unix.h )
-           set IncFiles = ( $IncFiles network-msw.h network-beos.h )
-           set IncFiles = ( $IncFiles ansic.h )
-           set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
-        endif
-        Note $Log "IncFiles = $IncFiles"
+           set IncFiles = ""
+           if ($strict == FALSE) then
+              set IncFiles = ( $IncFiles iso-c.h scconfig.h scdecls.h )
+              set IncFiles = ( $IncFiles cpyright.h syntax.h )
+              set IncFiles = ( $IncFiles posix.h posix-unix.h )
+              set IncFiles = ( $IncFiles posix-msw.h posix-beos.h )
+              set IncFiles = ( $IncFiles network.h network-unix.h )
+              set IncFiles = ( $IncFiles network-msw.h network-beos.h )
+              set IncFiles = ( $IncFiles ansic.h )
+              set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
+           endif
+           Note $Log "IncFiles = $IncFiles"
 
 # save the files in EtcDir
-        set EtcFiles = ""
-        set EtcFiles = ( $EtcFiles configured )
-        if ($strict == FALSE) then
-           set EtcFiles = ( $EtcFiles do-run-db cfg.db cfg.pco cfg.pl )
-           set EtcFiles = ( $EtcFiles cfg.log )
-           set EtcFiles = ( $EtcFiles Makefile make-def make-macros package )
-           set EtcFiles = ( $EtcFiles env-pact.csh env-pact.sh )
-           set EtcFiles = ( $EtcFiles env-pact.dk env-pact.mod )
-        endif
-        Note $Log "EtcFiles = $EtcFiles"
+           set EtcFiles = ""
+           set EtcFiles = ( $EtcFiles configured )
+           if ($strict == FALSE) then
+              set EtcFiles = ( $EtcFiles do-run-db cfg.db cfg.pco cfg.pl )
+              set EtcFiles = ( $EtcFiles cfg.log package )
+              set EtcFiles = ( $EtcFiles Makefile make-def make-macros )
+              set EtcFiles = ( $EtcFiles env-pact.csh env-pact.sh )
+              set EtcFiles = ( $EtcFiles env-pact.dk env-pact.mod )
+           endif
+           Note $Log "EtcFiles = $EtcFiles"
 
-        set ScmFiles = ""
-        if ($strict == FALSE) then
-           set ScmFiles = ( $ScmFiles spokes.scm )
-        endif
-        Note $Log "ScmFiles = $ScmFiles"
+           set ScmFiles = ""
+           if ($strict == FALSE) then
+              set ScmFiles = ( $ScmFiles spokes.scm )
+           endif
+           Note $Log "ScmFiles = $ScmFiles"
 
 # remove scheme files
-        NoteD $Log "    in $ScmDir"
-        flog $Log pushd $ScmDir
-        if ("$ScmFiles" != "") then
-           flog $Log mkdir tmp
-           flog $Log $MV $ScmFiles tmp
-           flog $Log touch foo
-           flog $Log $RM $ScmDir/*
-           flog $Log $MV tmp/* .
-           flog $Log rmdir tmp
-        else
-           flog $Log $RM $ScmDir/*
-        endif
-        flog $Log popd
+           NoteD $Log "    in $ScmDir"
+           flog $Log pushd $ScmDir
+           if ("$ScmFiles" != "") then
+              flog $Log mkdir tmp
+              flog $Log $MV $ScmFiles tmp
+              flog $Log touch foo
+              flog $Log $RM $ScmDir/*
+              flog $Log $MV tmp/* .
+              flog $Log rmdir tmp
+           else
+              flog $Log $RM $ScmDir/*
+           endif
+           flog $Log popd
 
 # remove headers
-        NoteD $Log "    in $IncDir"
-        flog $Log pushd $IncDir
-        if ("$IncFiles" != "") then
-           flog $Log mkdir tmp
-           flog $Log $MV $IncFiles tmp
-           flog $Log touch foo
-           flog $Log $RM $IncDir/*
-           flog $Log $MV tmp/* .
-           flog $Log rmdir tmp
-        else
-           flog $Log $RM $IncDir/*
-        endif
-        flog $Log popd
+           NoteD $Log "    in $IncDir"
+           flog $Log pushd $IncDir
+           if ("$IncFiles" != "") then
+              flog $Log mkdir tmp
+              flog $Log $MV $IncFiles tmp
+              flog $Log touch foo
+              flog $Log $RM $IncDir/*
+              flog $Log $MV tmp/* .
+              flog $Log rmdir tmp
+           else
+              flog $Log $RM $IncDir/*
+           endif
+           flog $Log popd
  
 # remove configs
-        NoteD $Log "    in $EtcDir"
-        flog $Log pushd $EtcDir
-        if ("$EtcFiles" != "") then
-           flog $Log mkdir tmp
-           flog $Log $MV $EtcFiles tmp
-           flog $Log touch foo
-           flog $Log $RM $EtcDir/*
-           flog $Log $MV tmp/* .
-           flog $Log rmdir tmp
-        else
-           flog $Log $RM $EtcDir/*
-        endif
-        flog $Log popd
+           NoteD $Log "    in $EtcDir"
+           flog $Log pushd $EtcDir
+           if ("$EtcFiles" != "") then
+              flog $Log mkdir tmp
+              flog $Log $MV $EtcFiles tmp
+              flog $Log touch foo
+              flog $Log $RM $EtcDir/*
+              flog $Log $MV tmp/* .
+              flog $Log rmdir tmp
+           else
+              flog $Log $RM $EtcDir/*
+           endif
+           flog $Log popd
  
 # remove binaries
-        NoteD $Log "    in $BinDir"
-        flog $Log pushd $BinDir
-        if ("$BinFiles" != "") then
-           flog $Log mkdir tmp
-           flog $Log $MV $BinFiles tmp
-           flog $Log touch foo
-           flog $Log $RM $BinDir/*
-           flog $Log $MV tmp/* .
-           flog $Log rmdir tmp
-        else
-           flog $Log $RM $BinDir/*
-        endif
-        flog $Log popd
+           NoteD $Log "    in $BinDir"
+           flog $Log pushd $BinDir
+           if ("$BinFiles" != "") then
+              flog $Log mkdir tmp
+              flog $Log $MV $BinFiles tmp
+              flog $Log touch foo
+              flog $Log $RM $BinDir/*
+              flog $Log $MV tmp/* .
+              flog $Log rmdir tmp
+           else
+              flog $Log $RM $BinDir/*
+           endif
+           flog $Log popd
  
 # remove libraries
-        NoteD $Log "    in $LibDir"
-        flog $Log pushd $LibDir
-        flog $Log touch foo.a foo.so
-        flog $Log $RM $LibDir/*.a $LibDir/*.so*
-        if (-d $lpybind) then
-           flog $Log $RMDir $lpybind
-        endif
-        flog $Log popd
+           NoteD $Log "    in $LibDir"
+           flog $Log pushd $LibDir
+           flog $Log touch foo.a foo.so
+           flog $Log $RM $LibDir/*.a $LibDir/*.so*
+           if (-d $lpybind) then
+              flog $Log $RMDir $lpybind
+           endif
+           flog $Log popd
 
 # remove other files
-        NoteD $Log "    in $BaseDir/"'*'"/z-$System directories"
-        flog $Log $RM ../*/z-$System/obj/*.[cfo] ../*/z-$System/obj/*.mod
-        flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
-        flog $Log $RM ../sx/z-$System/obj/*.[cfo]
+           NoteD $Log "    in $BaseDir/"'*'"/z-$System directories"
+           flog $Log $RM ../*/z-$System/obj/*.[cfo] ../*/z-$System/obj/*.mod
+           flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
+           flog $Log $RM ../sx/z-$System/obj/*.[cfo]
 
 # check the result
-        flog $Log ls -lR $SysDir
+           flog $Log ls -lR $SysDir
 
-        set RStatus = $status
+           set RStatus = $status
 
-        set ETime = `$TIMER -b $BeginTime`
+           set ETime = `$TIMER -b $BeginTime`
 
-        NoteD $Log "PACT removed ($RStatus/$ETime)"
-        NoteD $Log ""
+           NoteD $Log "PACT removed ($RStatus/$ETime)"
+           NoteD $Log ""
+        endif
 
         breaksw
 
@@ -2885,25 +2983,30 @@ CFG_DONE:
 
    case test:
 
-	set TLog = test
+        set TLog = test
         set Args = "-i"
         set NA   = ( -na 1 )
         set Tgts = ""
         setenv Valgrind  ""
         while ($#argv > 0)
            switch ($1)
+              case -a:
+                   shift
+                   setenv SESSION_CONFIG $1
+                   breaksw
               case -dmp :
                    set Args = ( $Args $1 )
                    breaksw
               case -h :
                    echo ""
-                   echo "Usage: dsys test [-h] [-na #] [-p #] [-r] [-vg] [tgts]*"
+                   echo "Usage: dsys test [-a <sys>] [-h] [-na #] [-p #] [-r] [-vg] [tgts]*"
                    echo ""
-                   echo "     h  - this help message"
-                   echo "     na - number of attempts for each test (default is 1)"
-                   echo "     p  - number of nodes to use"
-                   echo "     r  - remove test executables of passing tests"
-                   echo "     vg - run most tests under valgrind"
+                   echo "     a    do test of configuration <sys>"
+                   echo "     h    this help message"
+                   echo "     na   number of attempts for each test (default is 1)"
+                   echo "     p    number of nodes to use"
+                   echo "     r    remove test executables of passing tests"
+                   echo "     vg   run most tests under valgrind"
                    echo ""
                    exit(1)
                    breaksw
@@ -2933,8 +3036,17 @@ CFG_DONE:
            shift
         end
 
-# provide context for child processes
-        setenv DSYS_TARGET pact_test
+        setenv System  `$CfgMan -d ../dev use`
+        set DevDir  = $BaseDir/dev
+        set SysDir  = $DevDir/$System
+        set BinDir  = $SysDir/bin
+        set IncDir  = $SysDir/include
+        set LibDir  = $SysDir/lib
+        set EtcDir  = $SysDir/etc
+        set ScmDir  = $SysDir/scheme
+        set LogDir  = $SysDir/log
+
+        set BeginTime = `$TIMER -r`
 
 # work with mpi-io-wrap to suppress messages from MPI front ends
 # that cannot be silenced by their own means
@@ -2965,110 +3077,148 @@ CFG_DONE:
            InitLog Log $LogDir/$TLog
         endif
 
-        flog $Log $Which pact
-        flog $Log umask
-	flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/test.error
+# check for multi-platform build
+        flog $Log setenv PERDB_PATH $EtcDir/cfg
+        dbget Platforms
+        if ("$Platforms" != "") then
+
+           set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
+           @ np = $#inf
+           Note $Log "Testing $np platforms"
+
+           @ lerr = 0
+           set inf = ( `echo "$inf" | sed 's|[()]| |g'` )
+           while ($#inf > 0)
+              set cfg = $inf[1]
+              set sid = $inf[2]
+              shift inf
+              shift inf
+
+              Separator $Log
+              flog $Log dsys select $sid
+              ftee $Log dsys test
+              flog $Log @ lerr = $lerr + $status
+           end
+           set RStatus = $lerr
+
+           flog $Log dsys select $System
+
+           set ETime = `$TIMER -b $BeginTime`
+
+           NoteD $Log "PACT multi-platforms test completed ($RStatus/$ETime)"
+           NoteD $Log ""
+
+# single platform build
+        else
+
+# provide context for child processes
+           setenv DSYS_TARGET pact_test
+
+           flog $Log $Which pact
+           flog $Log umask
+           flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/test.error
 
 # clear out existing test corefiles - easier to investigate any failures
-        foreach i (`find .. -name z-$System`)
-           flog $Log $RM $i/test/*.core
-        end
+           foreach i (`find .. -name z-$System`)
+              flog $Log $RM $i/test/*.core
+           end
 
-        set BeginTime = `$TIMER -r`
+           set BeginTime = `$TIMER -r`
 
-        NoteD $Log ""
-        NoteD $Log "Running PACT Tests ..."
+           NoteD $Log ""
+           NoteD $Log "Running PACT Tests ..."
 
-        flog $Log (ls -l `$Which pact` |& grep smake)
+           flog $Log (ls -l `$Which pact` |& grep smake)
 
 # do it for smake
-        if ($status == 0) then
-           set PCKS = ( `awk '$1 == "pkg" {print}' pact.manifest | sed 's/^pkg//'` )
-           flog $Log pushd ..
-           NoteD $Log " --------------------------------------------------------"
-           foreach d ($PCKS)
-              flog $Log pushd $d
-              ftee $Log pact $NA test
-              if ($gstatus[1] != 0) then
-                 set RStatus = 1
-              endif
+           if ($status == 0) then
+              set PCKS = ( `awk '$1 == "pkg" {print}' pact.manifest | sed 's/^pkg//'` )
+              flog $Log pushd ..
+              NoteD $Log " --------------------------------------------------------"
+              foreach d ($PCKS)
+                 flog $Log pushd $d
+                 ftee $Log pact $NA test
+                 if ($gstatus[1] != 0) then
+                    set RStatus = 1
+                 endif
+                 flog $Log popd
+              end
               flog $Log popd
-           end
-           flog $Log popd
 
 # do it for dmake
-        else
+           else
 
 # NOTE: this is for the outer pact - the package level one is controlled by NA
-           set Args = ( $Args -na 1 )
-           set Tmp  = /tmp/pact-test.$Host.$$
+              set Args = ( $Args -na 1 )
+              set Tmp  = /tmp/pact-test.$Host.$$
 
-           if ("$Tgts" == "") then
-              flog $Log set Tgts = $PCKS
-           else
-              echo $Tgts >! $Tmp
-              flog $Log cat $Tmp
-              flog $Log set Tgts = $Tmp
+              if ("$Tgts" == "") then
+                 flog $Log set Tgts = $PCKS
+              else
+                 echo $Tgts >! $Tmp
+                 flog $Log cat $Tmp
+                 flog $Log set Tgts = $Tmp
+              endif
+
+              flog $Log pushd ..
+              Note $Log "pact -log $Log $Args -cmd $Tgts pact $NA test"
+              NoteD $Log " --------------------------------------------------------"
+              pact -log $Log $Args -cmd $Tgts pact $NA test
+              set RStatus = $status
+
+              flog $Log $RM $Tmp
+              flog $Log popd
            endif
 
-           flog $Log pushd ..
-           Note $Log "pact -log $Log $Args -cmd $Tgts pact $NA test"
-           NoteD $Log " --------------------------------------------------------"
-           pact -log $Log $Args -cmd $Tgts pact $NA test
-           set RStatus = $status
+           set ETime = `$TIMER -b $BeginTime`
 
-           flog $Log $RM $Tmp
-           flog $Log popd
-        endif
-
-        set ETime = `$TIMER -b $BeginTime`
-
-        NoteD $Log ""
-        if ($RStatus == 0) then
-           NoteD $Log "All tests passed ($RStatus/$ETime)"
-        else
-
-# NOTE: NFS may prevent this from always working
-           set Failed = ( `grep 'TEST ... FAILED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
-           if ("$Failed" == "") then
-              flog $Log set RStatus = 0
+           NoteD $Log ""
+           if ($RStatus == 0) then
               NoteD $Log "All tests passed ($RStatus/$ETime)"
-
            else
 
-# try to find out specific tests that failed
-# comparing against tests that passed
-              set Passed = ( `grep 'TEST ... PASSED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
-              set lfail = ""
-              foreach f ($Failed)
-                 set lok = TRUE
-                 foreach p ($Passed)
-                    if ($f == $p) then
-                       set lok = FALSE
-                       break
-                    endif
-                 end
-                 if ($lok == TRUE) then
-                    set lfail = ( $lfail $f )
-                 endif
-              end
-              set Failed = ( $lfail )
-              unset lfail
-              unset lok
-
-# if they all really passed then say so
-              if ($#Failed == 0) then
+# NOTE: NFS may prevent this from always working
+              set Failed = ( `grep 'TEST ... FAILED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
+              if ("$Failed" == "") then
                  flog $Log set RStatus = 0
                  NoteD $Log "All tests passed ($RStatus/$ETime)"
 
-# report failed tests
               else
-                 NoteD $Log "$#Failed test(s) failed ($RStatus/$ETime)"
-                 NoteD $Log "   $Failed"
+
+# try to find out specific tests that failed
+# comparing against tests that passed
+                 set Passed = ( `grep 'TEST ... PASSED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
+                 set lfail = ""
+                 foreach f ($Failed)
+                    set lok = TRUE
+                    foreach p ($Passed)
+                       if ($f == $p) then
+                          set lok = FALSE
+                          break
+                       endif
+                    end
+                    if ($lok == TRUE) then
+                       set lfail = ( $lfail $f )
+                    endif
+                 end
+                 set Failed = ( $lfail )
+                 unset lfail
+                 unset lok
+
+# if they all really passed then say so
+                 if ($#Failed == 0) then
+                    flog $Log set RStatus = 0
+                    NoteD $Log "All tests passed ($RStatus/$ETime)"
+
+# report failed tests
+                 else
+                    NoteD $Log "$#Failed test(s) failed ($RStatus/$ETime)"
+                    NoteD $Log "   $Failed"
+                 endif
               endif
            endif
+           NoteD $Log ""
         endif
-        NoteD $Log ""
 
         breaksw
 

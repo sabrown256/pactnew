@@ -25,6 +25,7 @@ Note $Log ""
 
 dbmget $Log BinDir^   \
             EtcDir^   \
+            System^   \
             Pck
 
 #--------------------------------------------------------------------------
@@ -48,7 +49,7 @@ dbmget $Log BinDir^   \
     Note $STDOUT ""
 
     Note $STDOUT 'build:'
-    Note $STDOUT '	@(echo "" ; echo "Generate sources")'
+    Note $STDOUT '	@(echo "" ; echo "Generate sources for '$System'")'
     Note $STDOUT '	${BARRIER}'
     foreach i ($Pck)
        Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact generate in '$i'" ; ${PACT} -rcr generate)'
@@ -58,21 +59,21 @@ dbmget $Log BinDir^   \
     end
     Note $STDOUT '	${BARRIER}'
 
-    Note $STDOUT '	@(echo "" ; echo "Install headers")'
+    Note $STDOUT '	@(echo "" ; echo "Install headers for '$System'")'
     Note $STDOUT '	${BARRIER}'
     foreach i ($Pck)
        Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact incinstall in '$i'" ; ${PACT} -rcr incinstall)'
     end
     Note $STDOUT '	${BARRIER}'
 
-    Note $STDOUT '	@(echo "" ; echo "Compile sources")'
+    Note $STDOUT '	@(echo "" ; echo "Compile sources for '$System'")'
     Note $STDOUT '	${BARRIER}'
     foreach i ($Pck)
        Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact devlib in '$i'" ; ${PACT} -rcr devlib)'
     end
     Note $STDOUT '	${BARRIER}'
 
-    Note $STDOUT '	@(echo "" ; echo "Link Executables")'
+    Note $STDOUT '	@(echo "" ; echo "Link Executables for '$System'")'
     Note $STDOUT '	${BARRIER}'
     foreach i ($Pck)
        Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact link in '$i'" ; ${PACT} -rcr link)'
@@ -80,7 +81,7 @@ dbmget $Log BinDir^   \
     Note $STDOUT ''
 
     Note $STDOUT 'link:'
-    Note $STDOUT '	@(echo "" ; echo "Link Executables")'
+    Note $STDOUT '	@(echo "" ; echo "Link Executables for '$System'")'
     Note $STDOUT '	${BARRIER}'
     foreach i ($Pck)
        Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact link in '$i'" ; ${PACT} -rcr link)'
