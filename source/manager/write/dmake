@@ -1,0 +1,104 @@
+#!/bin/csh -f
+#
+# DMAKE - compile the dmake program
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $Log "----- write/dmake -----"
+Note $Log "Write: dmake"
+Note $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $Log
+
+NoteD $Log "   Persistent Portable Parallel Make - dmake"
+Note $Log ""
+
+dbmget $Log CROSS_COMPILE^    \
+            IBM_BGL^          \
+            BaseDir^          \
+            BinDir^           \
+            MngDir
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+    flog $Log set DSYS = $MngDir/dsys
+
+    set LStat = 1
+    if ($CROSS_COMPILE == "FALSE") then
+
+       flog $Log pushd $BaseDir/score
+       if (-x ${BinDir}/dmake) then
+          flog $Log mv ${BinDir}/dmake ${BinDir}/dmake.exec
+       endif
+
+       foreach i (dmake.exec smake)
+          Note $Log ""
+          Note $Log "Check $i for building dmake"
+          set Mk = ${BinDir}/$i
+          if (-x $Mk) then
+             Note $Log "   $i is executable - trying"
+
+# always remove and start clean in case there is toxic rubble
+# left over from a failed build
+             flog $Log $Mk -i -na 1 remove
+
+# NOTE: do it twice as a fault tolerance measure
+# this role will be assumed by dmake after it is successfully built
+             flog $Log $Mk dmake
+             flog $Log $Mk dmake
+             set LStat = $status
+             if ($LStat == 0) then
+                Note $Log "Build of dmake succeeded"
+                break
+             else
+                Note $Log "Build of dmake failed"
+             endif
+          else
+             Note $Log "   $i is not executable"
+          endif
+       end
+       flog $Log $RM ${BinDir}/dmake.exec
+       flog $Log popd
+    else
+
+# try to find a dmake
+       set dm = `which-exe -d ${BinDir} dmake`
+       if (-x "$dm") then
+          flog $Log cp $dm ${BinDir}/dmake
+          flog $Log set LStat = 0
+
+# try pact if no dmake found
+       else
+          set dm = `which-exe -d ${BinDir} pact`
+          if (-x "$dm") then
+             flog $Log cp $dm ${BinDir}/dmake
+             flog $Log set LStat = 0
+          else
+             Note $Log "No dmake found for bootstrap CROSS_COMPILE"
+          endif
+       endif
+       unset dm
+    endif
+
+    if ($LStat == 0) then
+       flog $Log ${BinDir}/dmake -v
+       if ($status == 0) then
+          flog $Log set Opt = dmake
+       endif
+    endif
+    ftee $Log $DSYS pact $Opt
+    unset Opt
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+
