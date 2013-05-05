@@ -597,7 +597,8 @@ int main(int c, char **v, char **env)
 	   {char *cwd;
 
 	    cwd = SC_getcwd();
-	    io_printf(stdout, "PACT: error %d parsing %s/%s\n", rv, cwd, mkname);
+	    io_printf(stdout, "PACT: error %d parsing %s/%s\n",
+		      rv, cwd, mkname);
 	    CFREE(cwd);};
 
 	st = 1;}

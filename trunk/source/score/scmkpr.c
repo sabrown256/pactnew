@@ -1187,7 +1187,8 @@ int SC_parse_premake(anadep *state, char *fname)
    {int rv, ok;
     char *s;
 
-    ok = SC_execs(NULL, 0, NULL, -1, "mkdir -p %s/obj >& /dev/null", state->arch);
+    ok = SC_execs(NULL, 0, NULL, -1, "mkdir -p %s/obj >& /dev/null",
+		  state->arch);
 
     if (ok != 0)
        rv = -1;
