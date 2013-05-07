@@ -400,7 +400,7 @@ extern void
 		 intb nbo, intb nbti, int *ord),
  _PD_ones_complement(char *out, inti ni, intb nbo, int *order),
  _PD_insert_field(long inl, intb nb, char *out,
-		  intb offs, int lord, intb lby),
+		  inti offs, int lord, intb lby),
  _PD_iconvert(char **out, char **in, inti ni,
 	      intb nbi, PD_byte_order ordi,
 	      intb nbo, PD_byte_order ordo,

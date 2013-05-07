@@ -1100,6 +1100,14 @@ switch ($Cmnd)
         flog $Log setenv PERDB_IDLE_TIMEOUT 600
         flog $Log setenv PERDB_PATH $EtcDir/cfg
         flog $Log set dbopt = ( -f $PERDB_PATH )
+
+# NOTE: a dsys reconfig will launch a server so kill any running
+# servers and do dsys config with a clean slate
+        flog $Log $PERDB -l quit:
+        while (-f $PERDB_PATH.conn)
+           sleep 1
+        end
+
         flog $Log $RM ${PERDB_PATH}*
 
         flog $Log $PERDB -l -c -s
@@ -2296,7 +2304,7 @@ CFG_DONE:
                 breaksw
         endsw
         unset meth
- 
+
         $DSYS config $args $inst
         set RStatus = $status
 
@@ -2438,7 +2446,7 @@ CFG_DONE:
 
 # save the files in EtcDir
            set EtcFiles = ""
-           set EtcFiles = ( $EtcFiles configured )
+           set EtcFiles = ( $EtcFiles configured cfg.conn )
            if ($strict == FALSE) then
               set EtcFiles = ( $EtcFiles do-run-db cfg.db cfg.pco cfg.pl )
               set EtcFiles = ( $EtcFiles cfg.log package )

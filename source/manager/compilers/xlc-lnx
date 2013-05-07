@@ -72,7 +72,7 @@ Tool LD {
 }
 
 Tool Lex {
-   Flags  = -D_ALL_SOURCE -D_LARGE_FILES -qsuppress=1506-1300:1506-1298
+   Flags  = -D_ALL_SOURCE -D_LARGE_FILES -qsuppress=1500-010:1506-1300:1506-1298
    Flags += [ _env_ = STD_C ;                # C standard flags
               C89   = -qlanglvl=stdc89 ;
               C99   = -qlanglvl=stdc99 ]
@@ -112,13 +112,11 @@ Group OpenMP {
    LD_Flags  = -qsmp=omp:noauto
 }
 
-.c.i:
-	${CC} -P $<
-
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
 define GETSOCKNAME_LONG
 
+include cpp-rule
 include serial
 

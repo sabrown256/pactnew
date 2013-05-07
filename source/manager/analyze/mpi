@@ -12,9 +12,9 @@ set lme   = $0
 set lbase = $lme:h
 source $lbase/common
 
-if ($?Log == 1) then
-   Note $ALog "Analyze: mpi"
-endif
+Note $ALog "----- analyze/mpi -----"
+Note $ALog "Analyze: mpi"
+Note $ALog ""
 
 dbmget $ALog REQUEST_MPI        =\? FALSE^   \
              HAVE_OPENMPI       =\? FALSE^   \
@@ -38,7 +38,7 @@ dbmget $ALog REQUEST_MPI        =\? FALSE^   \
 # before feature/mpi is invoked you can end up with MPI
 # libary paths in your link line for non-MPI builds
 # so if feature/mpi is not invoked remove DP_RPath from RPATH
-if ($REQUEST_MPI == FALSE) then
+if (($REQUEST_MPI == FALSE) && ("$DP_RPath" != "")) then
    ../analyze/rpath -d $DP_RPath
 endif
 
@@ -208,13 +208,19 @@ endif
 Note $ALog "lParComm    = |$lParComm|"
 Note $ALog "REQUEST_MPI = |$REQUEST_MPI|"
 
-if (("$lParComm" == no) || ($REQUEST_MPI == FALSE)) then
+if ($REQUEST_MPI == FALSE) then
+   setenv DP_Inc    ""
+   setenv DP_Lib    ""
+   setenv DP_RPath  ""
+   NoteD $ALog "      no MPI (by request)"
+
+else if ("$lParComm" == no) then
    setenv DP_Inc    ""
    setenv DP_Lib    ""
    setenv DP_RPath  ""
    NoteD $ALog "      no MPI"
 
-else if (("$lParComm" != "") && ($REQUEST_MPI == TRUE)) then
+else if ("$lParComm" != "") then
    if ($HAVE_MPI_2 == TRUE) then
       NoteD $ALog "      has MPI 2 ($vrs)"
    else
@@ -223,12 +229,6 @@ else if (("$lParComm" != "") && ($REQUEST_MPI == TRUE)) then
    NoteD $ALog "         $DP_Lib"
    NoteD $ALog "         stdin $MPIStdIO"
    flog $ALog setenv USE_MPI  TRUE
-
-else
-   setenv DP_Inc    ""
-   setenv DP_Lib    ""
-   setenv DP_RPath  ""
-   NoteD $ALog "      no MPI (by request)"
 endif
 
 flog $ALog setenv ParComm "$lParComm"

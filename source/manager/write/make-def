@@ -260,9 +260,9 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "#"
     Note $STDOUT "# Site Dependent Graphics Information"
     Note $STDOUT "#"
-    Note $STDOUT "GRAPHICS_Flags    = $GRAPHICS_Flags"
-    Note $STDOUT "MDGInc          = $MDG_Inc"
-    Note $STDOUT "MDGLib          = $MDG_Lib"
+    Note $STDOUT "GRAPHICS_Flags   = $GRAPHICS_Flags"
+    Note $STDOUT "MDGInc           = $MDG_Inc"
+    Note $STDOUT "MDGLib           = $MDG_Lib"
 
     Note $STDOUT -n "GRAPHICS_Devices ="
     foreach dev ($GRAPHICS_Devices)

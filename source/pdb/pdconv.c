@@ -316,7 +316,7 @@ void PD_byte_reverse(char *out, int32_t nb, int64_t ni)
  */
 
 void _PD_insert_field(long inl, intb nb, char *out,
-		      intb offs, int lord, intb lby)
+		      inti offs, int lord, intb lby)
    {int mi, n, dm;
     long longmask;
     static int MaxBits = 8*sizeof(long);
@@ -444,7 +444,12 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
 	    cnv |= (dpf->kind        != dph->kind);
 	    cnv |= (dpf->size_bits   != dph->size_bits);
 	    cnv |= (dpf->size        != dph->size);
+#if 0
+/* alignment should be irrelevant to conversion
+ * issues of alignment would be handled elsewhere
+ */
 	    cnv |= (dpf->alignment   != dph->alignment);
+#endif
 	    cnv |= (dpf->n_indirects != dph->n_indirects);
 	    cnv |= (dpf->is_indirect != dph->is_indirect);
 	    cnv |= (dpf->onescmp     != dph->onescmp);

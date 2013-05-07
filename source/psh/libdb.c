@@ -813,30 +813,84 @@ database *db_srv_load(client *cl, int dbg, int auth)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DB_SRV_OPEN - open the database */
+/* _IS_SRV_RUNNING - is there is a running server
+ *                 - return value is:
+ *                 -   0 if there is no running server
+ *                 -   1 if the running server is the current process
+ *                 -  -1 if the running server is not the current process
+ */
 
-int db_srv_open(client *cl, int init, int dbg, int auth)
-   {int rv, pid;
-    database *db;
+int _is_srv_running(client *cl)
+   {int rv, pid, w, st;
 
-    if (init == TRUE)
-       db = db_srv_create(cl, dbg, auth);
-    else
-       db = db_srv_load(cl, dbg, auth);
+    rv = 0;
 
-    if (db != NULL)
-       {pid   = getpid();
-	cl->a = db;
+if (cl->fcon != NULL)
+   {int i;
+    char **sa;
+    CLOG(cl, 1, "_is_srv_running: 1 (%d) %s", file_exists(cl->fcon), cl->fcon);
+    sa = file_text(FALSE, cl->fcon);
+    if (sa != NULL)
+       {for (i = 0; sa[i] != NULL; i++)
+	    CLOG(cl, 1, "%d: %s", i+1, sa[i]);
+	free_strings(sa);};};
 
 /* if a server is already running there will be a PID file */
-	if ((cl->fcon != NULL) && (file_exists(cl->fcon) == FALSE))
-	   rv = open_server(cl, SERVER, cl->auth);
+    pid = get_conn_client(cl);
 
+/* check for a server in this process */
+    if (pid == getpid())
+       {CLOG(cl, 1, "running server on current process %d (%d)", pid, rv);
+	rv = 1;}
+
+/* check for a server in a different process */
+    else if (pid != -1)
+       {st = waitpid(pid, &w, WNOHANG);
+	if (st == -1)
+	   {CLOG(cl, 1, "running server on process %d (%d)", pid, rv);
+	    rv = -1;}
 	else
-	   {free_db(db);
-	    db = NULL;};
+	   CLOG(cl, 1, "no running server (%d)", rv);}
 
-	cl->scon->pid = pid;};
+    else
+       CLOG(cl, 1, "running server - no (%d)", rv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DB_SRV_OPEN - open the database
+ *             - return TRUE iff successful
+ */
+
+int db_srv_open(client *cl, int init, int dbg, int auth)
+   {int rv, st, pid;
+    database *db;
+
+    db = NULL;
+    rv = FALSE;
+    st = _is_srv_running(cl);
+    if (st != -1)
+       {if (init == TRUE)
+	   db = db_srv_create(cl, dbg, auth);
+        else
+	   db = db_srv_load(cl, dbg, auth);
+
+	if (db != NULL)
+	   {pid   = getpid();
+	    cl->a = db;
+
+/* no server is running */
+	    if (st == 0)
+	       rv = open_server(cl, SERVER, cl->auth);
+
+/* another server is running */
+	    else
+	       {free_db(db);
+		db = NULL;};
+
+	    cl->scon->pid = pid;};};
 
     rv = (db != NULL);
 
