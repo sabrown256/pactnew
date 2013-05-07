@@ -1434,11 +1434,11 @@ static void setup_analyze_env(client *cl, char *base)
     else
        dbinitv(cl, "CFE", "");
 
-/* initialization of graphics flags */
-    dbinitv(cl, "GRAPHICS_Windows",       "X");
-    dbinitv(cl, "Std_UseX",   "TRUE");
-    dbinitv(cl, "Std_UseOGL", "FALSE");
-    dbinitv(cl, "Std_UseQD",  "FALSE");
+/* initialization of graphics flags - there is NO default system */
+    dbinitv(cl, "GRAPHICS_Windows", "");
+    dbinitv(cl, "Std_UseX",         "FALSE");
+    dbinitv(cl, "Std_UseOGL",       "FALSE");
+    dbinitv(cl, "Std_UseQD",        "FALSE");
 
     dbinitv(cl, "DP_Inc",          "");
     dbinitv(cl, "DP_Lib",          "");

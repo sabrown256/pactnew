@@ -30,18 +30,28 @@ dbmget $ALog X11_Inc          =\? $RootInc^  \
              PACT_CC_VERSION^                \
              RPATH
 
+set msg = "no X11"
+flog $ALog setenv Std_UseX    FALSE
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # if we have explicitly said we do not want X11
-# do NOT detect it
+# do NOT detect it and blank out the X11 group variables
+
 if ("$X11_Path" == none) then
    set msg = "no X11 (by request)"
-   setenv Std_UseX FALSE
+   flog $ALog setenv X11_Inc    ""
+   flog $ALog setenv X11_Lib    ""
+   flog $ALog setenv X11_RPath  ""
+   flog $ALog setenv X11_Path   ""
 
-else if ($Std_UseX == TRUE) then
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+else
 
    set UTime = `timer -r`
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 # write a little X test that works around dumb Solaris
 # on which XOpenDisplay hangs forever if it does not
@@ -110,33 +120,14 @@ EOF
 
    source $AnaDir/find-package
 
-   if (("$PckLib" != "") && ("$PckInc" != "") && ($?IBM_BGL == 0)) then
+   if ("$PckLib" != "") then
       set msg = "has X11 ($PckLib)"
-
-      set lok = FALSE
-      if ("$PckInc" != "none") then
-
-# NOTE: we really mean /usr/include and not Root Inc here because
-# all compilers automatically look to /usr/include but not necessarily
-# to whatever RootInc is set to
-         if (("$PckInc" != "-I/usr/include") || ($?IBM_BGP == 1)) then
-            set lok = TRUE
-         endif
-      endif
-      unset lok
-
       flog $ALog setenv Std_UseX    TRUE
-   else
-      set msg = "no X11"
-      flog $ALog setenv Std_UseX    FALSE
-   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# write a little X test to do font detection
-
-   if ($Std_UseX == TRUE) then
+# do X11 font detection
 
       cat << EOF >! $Tmp-font.c
 #include <stdint.h>
