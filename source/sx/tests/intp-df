@@ -12,9 +12,8 @@ source ../../tests/common
 
 set make_ps = FALSE
 
-set msg = "PDBView Mesh Intp Test ......."
+set msg = "PDBView Mesh IntpDF Test ....."
 set exe = $BinDir/sx
-set opt = ( $pvopt -l $FilesDir/intp.scm )
 set io  = intp-df.res
 
 @ err = 0

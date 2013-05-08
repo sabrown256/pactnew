@@ -2370,7 +2370,7 @@ CFG_DONE:
 
         set BeginTime = `$TIMER -r`
 
-# check for multi-platform build
+# check for multi-platform remove
         flog $Log setenv PERDB_PATH $EtcDir/cfg
         dbget Platforms
         if ("$Platforms" != "") then
@@ -3085,7 +3085,7 @@ CFG_DONE:
            InitLog Log $LogDir/$TLog
         endif
 
-# check for multi-platform build
+# check for multi-platform test
         flog $Log setenv PERDB_PATH $EtcDir/cfg
         dbget Platforms
         if ("$Platforms" != "") then

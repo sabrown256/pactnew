@@ -113,59 +113,9 @@ flog $log rm -f $api
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# find the shared library for a dynamic link
-set so = ( `grep -w so $def` )
-set so = $so[2]
-set ok = FALSE
-foreach d ($libdir)
-   if (-f $d/$so) then
-      set so = $d/$so
-      set ok = TRUE
-      NoteD $log "   Using shared library '$so'"
-      break
-   endif
-end
-if ($ok == FALSE) then
-#   NoteD $log "   Warning: '$so' not found in '$libdir'"
-   flog $log @ nwarn = $nwarn + 1
-endif
-
-# find the archive for a static link
-set ok  = FALSE
-set arc = ( `grep -w arc $def` )
-if ("$#arc" > 1) then
-   set arc = $arc[2]
-   foreach d ($libdir)
-      if (-f $d/$arc) then
-         set arc = $d/$arc
-         set ok  = TRUE
-         NoteD $log "   Using archive '$arc'"
-         break
-      endif
-   end
-   if ($ok == FALSE) then
-#      NoteD $log "   Warning: '$arc' not found in '$libdir'"
-      flog $log @ nwarn = $nwarn + 2
-   endif
-endif
-
-# find the header
-set ok  = FALSE
-set hdr = ( `grep -w header $def` )
-set hdr = $hdr[2]
-foreach d ($incdir)
-   if (-f $d/$hdr) then
-      set hdr = $d/$hdr
-      set ok  = TRUE
-      break
-   endif
-end
-if ($ok == FALSE) then
-   NoteD $log "   Error: '$hdr' not found in '$incdir'"
-   exit($fatal)
-endif
-
 # find the condition for needing this API
+# if we do not need it go no further
+
 set cnd = ( `grep -w condition $def` )
 if ("$cnd" != "") then
    set cnd = $cnd[2]
@@ -176,12 +126,12 @@ if ("$cnd" != "") then
 
 # if the condition variable is not set
    if ("$defc" == "") then
-      NoteD $log "$api is not needed"
+      NoteD $log "   not needed '$api'"
       exit($fatal)
 
 # if the condition variable is set to FALSE
    else if ("$defc" !~ *TRUE) then
-      NoteD $log "$api is not needed"
+      NoteD $log "   not needed '$api'"
       exit($fatal)
    endif
    unset defc
@@ -189,7 +139,65 @@ if ("$cnd" != "") then
 endif
 unset cnd
 
-NoteD $log "   Generating '$api' from '$hdr'"
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# find the header
+set ok  = FALSE
+set hdr = ( `grep -w header $def` )
+set hdr = $hdr[2]
+foreach d ($incdir)
+   if (-f $d/$hdr) then
+      set hdr = $d/$hdr
+      set ok  = TRUE
+      NoteD $log "   using header '$hdr'"
+      break
+   endif
+end
+if ($ok == FALSE) then
+   NoteD $log "   no header '$hdr'"
+   Note $log "   Error: '$hdr' not found in '$incdir'"
+   exit($fatal)
+endif
+
+# find the shared library for a potential dynamic link
+set so = ( `grep -w so $def` )
+set so = $so[2]
+set ok = FALSE
+foreach d ($libdir)
+   if (-f $d/$so) then
+      set so = $d/$so
+      set ok = TRUE
+      NoteD $log "   have lib '$so'"
+      break
+   endif
+end
+if ($ok == FALSE) then
+   Note $log "   Warning: '$so' not found in '$libdir'"
+   flog $log @ nwarn = $nwarn + 1
+endif
+
+# find the archive for a potential static link
+set ok  = FALSE
+set arc = ( `grep -w arc $def` )
+if ("$#arc" > 1) then
+   set arc = $arc[2]
+   foreach d ($libdir)
+      if (-f $d/$arc) then
+         set arc = $d/$arc
+         set ok  = TRUE
+         Note $log "   have lib '$arc'"
+         break
+      endif
+   end
+   if ($ok == FALSE) then
+      Note $log "   Warning: '$arc' not found in '$libdir'"
+#      flog $log @ nwarn = $nwarn + 2
+   endif
+endif
+unset arc
+
+Note $log "   generating '$api'"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -523,7 +531,7 @@ Separator $log
 Note $log "Finishing up"
 
 if ($nwarn > 0) then
-   NoteD $log "   Completed with warning status $nwarn"
+   NoteD $log "   completed with $nwarn warnings"
 endif
 
 if ($keep == FALSE) then

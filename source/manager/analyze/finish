@@ -93,10 +93,6 @@ dbmget $ALog AbsoluteDeb^              \
    flog $ALog setenv MDG_Inc "$minc"
 
    flog $ALog setenv MDG_Lib "$MDG_Lib $OGL_Lib $X11_Lib $PNG_Lib $JPEG_Lib"
-   if (($OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
-      Note $ALog "Finding GL on MAC OS X"
-      flog $ALog setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
-   endif
 
    if ($Std_UseQD == TRUE) then
       flog $ALog setenv MDG_Pck            "$MDG_Pck QD"
@@ -105,6 +101,10 @@ dbmget $ALog AbsoluteDeb^              \
       flog $ALog setenv GRAPHICS_Flags     "$GRAPHICS_Flags -framework Carbon"
    endif
    if ($Std_UseOGL == TRUE) then
+      if (($OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
+         Note $ALog "Have GL on MAC OS X"
+         flog $ALog setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
+      endif
       flog $ALog setenv MDG_Pck            "$MDG_Pck OGL"
       flog $ALog setenv GRAPHICS_Windows   "OGL"
       flog $ALog setenv GRAPHICS_Devices   "$GRAPHICS_Devices OGL"
@@ -281,7 +281,7 @@ dbmget $ALog AbsoluteDeb^              \
       foreach i (`printenv $p`)
          set ok = TRUE
          foreach j ( $llibs )
-             if ("$i" == "$j") then
+             if (("$i" == "$j") && ("$i" != "-framework")) then
                 set ok = FALSE
                 break
              endif

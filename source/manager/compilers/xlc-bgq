@@ -113,3 +113,6 @@ define IBM_BGQ
 define GETSOCKNAME_LONG
 
 include serial
+
+# NOTE: despite debug flags no symbol info so undebuggable
+setenv TEST_ADVISORY ${TEST_ADVISORY}:pdb_fd:sx_intp3
