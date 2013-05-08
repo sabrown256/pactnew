@@ -31,5 +31,4 @@ include no-png
 include no-libz
 include features/bgp
 
-setenv TEST_ADVISORY ${TEST_ADVISORY}:sx_intp3
 

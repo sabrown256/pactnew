@@ -84,7 +84,7 @@ static INLINE double DISTANCE(double **a, int ia, double **b,
  *                         - interpolation template
  */
 
-static int *_PM_find_overlap_margin(int nc, PM_set *dd, PM_set *sd,
+static int *_PM_find_overlap_margin(PM_set *dd, PM_set *sd,
 				    double *prm)
    {int id, dnde, snde, snd;
     int lc, tc;
@@ -92,8 +92,6 @@ static int *_PM_find_overlap_margin(int nc, PM_set *dd, PM_set *sd,
     char *sty, *dty;
     double sc, dc, rc, ic;
     double ssc[20], dsc[20];
-
-    ta = CMAKE_N(int, nc);
 
     snd  = sd->dimension;
     snde = sd->dimension_elem;
@@ -105,6 +103,8 @@ static int *_PM_find_overlap_margin(int nc, PM_set *dd, PM_set *sd,
     ddix = dd->max_index;
     dty  = dd->es_type;
     PM_array_real(dty, dd->scales, dnde, dsc);
+
+    ta = CMAKE_N(int, dnde);
 
 #pragma omp parallel for private(rc, dc, sc, ic, lc, tc)
     for (id = 0; id < dnde; id++)
@@ -422,7 +422,7 @@ double **PM_interpolate_mapping_id(PM_mapping *dest, PM_mapping *source,
 
     tre = PM_make_vectors(dnde, dne);
 
-    ta = _PM_find_overlap_margin(dnde, dd, sd, prm);
+    ta = _PM_find_overlap_margin(dd, sd, prm);
 
     for (j = 0; j < dnde; j++)
         PM_array_set(tre[j], dne, 0.0);

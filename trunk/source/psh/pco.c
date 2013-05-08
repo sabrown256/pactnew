@@ -1745,7 +1745,7 @@ static void default_rules(void)
 /* C rules */
     snprintf(st.rules.ccp,   BFLRG,
              "\t%s\n",
-	     "( ${CC} -E $< ) || frnsic ${PACTSrcDir}/$<");
+	     "${CC} -E $<");
 
     snprintf(st.rules.co, BFLRG,
              "\t@(%s ; \\\n          %s)\n",
@@ -2711,9 +2711,11 @@ static void write_do_run_db(client *cl, state *st)
 	    cnd = lst_push(cnd, "mpirun");};
 
 /* check for cross compile specs */
-	if ((IS_NULL(lcrs) == FALSE) && (strcmp(lcrs, "none") != 0))
-	   {cnd = lst_push(cnd, lcrs);
-	    fprintf(fp, "default CROSS %s\n", path_base(lcrs));}
+	if ((IS_NULL(lcrs) == FALSE) &&
+	    (strcmp(lcrs, "none") != 0))
+	   {if (strcmp(lcrs, "lmpi") != 0)
+	       {cnd = lst_push(cnd, lcrs);
+		fprintf(fp, "default CROSS %s\n", path_base(lcrs));};}
 	else
 	   cnd = lst_push(cnd, "submit");
 
