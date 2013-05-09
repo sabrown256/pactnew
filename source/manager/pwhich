@@ -14,7 +14,7 @@
 unalias *
 
 foreach i ($path)
-   if (-e $i/$1) then
+   if (-x $i/$1) then
       echo $i/$1
       exit(0)
    endif
