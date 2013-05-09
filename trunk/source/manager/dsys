@@ -1211,7 +1211,6 @@ switch ($Cmnd)
 
 # settle on smake or dmake
         Separator $Log
-        flog $Log set Opt = smake
 
 # check for multi-platform build
         dbget Platforms
@@ -1236,84 +1235,7 @@ switch ($Cmnd)
 
 # single platform build
         else
-
-# using existing dmake/smake build new dmake
-           NoteD $Log "   Persistent Portable Parallel Make - dmake"
-
-# sort out cross compile situation
-           if ($?IBM_BGL == 1) then
-              envini CROSS_COMPILE none
-           else           
-              envini CROSS_COMPILE FALSE
-           endif
-
-           Note $Log "CROSS_COMPILE = $CROSS_COMPILE"
-
-           set LStat = 1
-           if ($CROSS_COMPILE == "FALSE") then
-
-              flog $Log pushd $BaseDir/score
-              if (-x ${BinDir}/dmake) then
-                 flog $Log mv ${BinDir}/dmake ${BinDir}/dmake.exec
-              endif
-
-              foreach i (dmake.exec smake)
-                 Note $Log ""
-                 Note $Log "Check $i for building dmake"
-                 set Mk = ${BinDir}/$i
-                 if (-x $Mk) then
-                    Note $Log "   $i is executable - trying"
-
-# always remove and start clean in case there is toxic rubble
-# left over from a failed build
-                    flog $Log $Mk -i -na 1 remove
-
-# NOTE: do it twice as a fault tolerance measure
-# this role will be assumed by dmake after it is successfully built
-                    flog $Log $Mk dmake
-                    flog $Log $Mk dmake
-                    set LStat = $status
-                    if ($LStat == 0) then
-                       Note $Log "Build of dmake succeeded"
-                       break
-                    else
-                       Note $Log "Build of dmake failed"
-                    endif
-                 else
-                    Note $Log "   $i is not executable"
-                 endif
-              end
-              flog $Log $RM ${BinDir}/dmake.exec
-              flog $Log popd
-           else
-
-# try to find a dmake
-              set dm = `which-exe -d ${BinDir} dmake`
-              if (-x "$dm") then
-                 flog $Log cp $dm ${BinDir}/dmake
-                 flog $Log set LStat = 0
-
-# try pact if no dmake found
-              else
-                 set dm = `which-exe -d ${BinDir} pact`
-                 if (-x "$dm") then
-                    flog $Log cp $dm ${BinDir}/dmake
-                    flog $Log set LStat = 0
-                 else
-                    Note $Log "No dmake found for bootstrap CROSS_COMPILE"
-                 endif
-              endif
-              unset dm
-           endif
-
-           if ($LStat == 0) then
-              flog $Log ${BinDir}/dmake -v
-              if ($status == 0) then
-                 flog $Log set Opt = dmake
-              endif
-           endif
-           ftee $Log $DSYS pact $Opt
-           unset Opt
+           write/dmake $Log $ScrDir
         endif
 
 # wrap it up
@@ -1647,45 +1569,51 @@ CFG_DONE:
               case -c:
               case log:
                    shift
-                   set RepoDir = `scs-meta -r`
-                   if ($#argv > 0) then
-                      set Date = ""
-                      while ($#argv > 0)
-                         switch ($1)
-                            case -d:
-                                 shift
-                                 set Date = `echo "$1" | sed 's|/|_|g' | sed 's|-|_|g'`
-                                 breaksw
-                            case -h:
-                                 echo "Usage: dsys info -c [-h] [[-d <date>] <tag>]*"
-                                 echo "  h  this help message"
-                                 echo "  d  search for tags after <date>"
-                                 echo "     <date> may be yy/mm/dd, yy-mm-dd, or yy_mm_dd"
-                                 echo "  <tag> may be one of F, B, M, S, X"
-                                 breaksw
-                            default:
-                                 git log
-#                                 set Tag = "|$1|"
-#                                 if ("$Date" == "") then
-#                                    grep $Tag $RepoDir/commitlog
-#                                 else
-#                                    grep $Tag $RepoDir/commitlog    |&  \
-#                                    sed "s/'//g"                    |&  \
-#                                    sed 's/\"//g'                   |&  \
-#                                    awk '$4 >= "D'$Date'" { print }'
-#                                 endif
-                                 set Date = ""
-                                 breaksw
-                         endsw
-                         shift
-                      end
-                   else
-                      echo ""
-                      echo "PACT commit log:"
-                      eval "more $RepoDir/commitlog"
-                   endif
 
-                   unset RepoDir
+# check that these sources are checked out rather than
+# from a distribution
+                   scs-meta -k >>& /dev/null
+                   if ($status == 0) then
+                      set RepoDir = `scs-meta -r`
+                      if ($#argv > 0) then
+                         set Date = ""
+                         while ($#argv > 0)
+                            switch ($1)
+                               case -d:
+                                    shift
+                                    set Date = `echo "$1" | sed 's|/|_|g' | sed 's|-|_|g'`
+                                    breaksw
+                               case -h:
+                                    echo "Usage: dsys info -c [-h] [[-d <date>] <tag>]*"
+                                    echo "  h  this help message"
+                                    echo "  d  search for tags after <date>"
+                                    echo "     <date> may be yy/mm/dd, yy-mm-dd, or yy_mm_dd"
+                                    echo "  <tag> may be one of F, B, M, S, X"
+                                    breaksw
+                               default:
+                                    git log
+#                                    set Tag = "|$1|"
+#                                    if ("$Date" == "") then
+#                                       grep $Tag $RepoDir/commitlog
+#                                    else
+#                                       grep $Tag $RepoDir/commitlog    |&  \
+#                                       sed "s/'//g"                    |&  \
+#                                       sed 's/\"//g'                   |&  \
+#                                       awk '$4 >= "D'$Date'" { print }'
+#                                    endif
+                                    set Date = ""
+                                    breaksw
+                            endsw
+                            shift
+                         end
+                      else
+                         echo ""
+                         echo "PACT commit log:"
+                         eval "more $RepoDir/commitlog"
+                      endif
+
+                      unset RepoDir
+                   endif
 
                    break
                    breaksw

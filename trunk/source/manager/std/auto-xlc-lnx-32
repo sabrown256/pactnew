@@ -1,0 +1,10 @@
+#
+# AUTO-XLC-32 - 32 bit XLC on BG/X front ends
+#
+# include "cpyright.h"
+#
+
+include 32-bit
+include compilers/xlc-lnx
+
+

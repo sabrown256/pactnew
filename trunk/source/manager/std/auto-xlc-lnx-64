@@ -1,0 +1,10 @@
+#
+# AUTO-XLC-64 - 64 bit XLC on BG/X front ends
+#
+# include "cpyright.h"
+#
+
+include 64-bit
+include compilers/xlc-lnx
+
+

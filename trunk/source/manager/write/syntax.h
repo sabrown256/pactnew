@@ -60,7 +60,7 @@ dbmget $Log BaseDir^    \
        set Dirs = `ls`
        foreach dir ($Dirs)
           if (-d $dir) then
-             if ($dir != $scsd) then
+             if ($dir != "$scsd") then
                 set lsm   = ( $lsm $dir )
                 @ nsyntxs = $nsyntxs + 1
              endif

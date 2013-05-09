@@ -319,6 +319,14 @@ switch ($tgt)
                       NoteD $log " leaked ($dt)"
                    endif
                    breaksw
+# externally killed  (128 + SIGKILL)
+              case 137:
+                   if ($mode == major) then
+                      NoteD $log " KILLED ($dt)"
+                   else
+                      NoteD $log " killed ($dt)"
+                   endif
+                   breaksw
               case 0:
                    if ($rev == FALSE) then
                       set lpass = pass
@@ -379,6 +387,10 @@ switch ($tgt)
                    end
                 endif
                 Note $log ""
+                breaksw
+# externally killed  (128 + SIGKILL)
+           case 137:
+                set terr = 0
                 breaksw
 # crashed
            case 253:
