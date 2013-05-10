@@ -1,0 +1,194 @@
+#!/bin/csh -f
+#
+# ACC - abstract compiler wrapper
+#     - thicker wrapper than manager/ccomp
+#     - rationale:
+#     -   1) manage abstract compilation options
+#     -      -ag    all debug options
+#     -      -aO    all optimize options
+#     -      -aprf  all profiling options
+#     -      -apre  all pre-processing options
+#     -   2) may use special knowledge of buggy compilers
+#     -      e.g. pgcc _Pragma handling problem
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+@ err = 0
+
+set sys = `system-id`
+
+set comp = $0
+set base = $comp:h
+set compilers = $base/compilers
+
+if ($?PACT_CC_EXE == 0) then
+   set base = `which pact`
+   set base = $base:h
+   set base = $base:h
+   source $base/etc/env-pact.csh
+endif
+unset base
+
+set exe  = $PACT_CC_EXE
+set vers = $PACT_CC_VERSION
+set comp = $exe:t
+set dbg  = FALSE
+set opt  = FALSE
+set prf  = FALSE
+set pre  = FALSE
+set vrb  = FALSE
+
+set args  = ""
+while ($#argv > 0)
+   switch ("$1")
+      case -ag:
+           shift
+           set dbg = TRUE
+           set opt = FALSE
+           breaksw
+      case -ahelp:
+           echo ""
+           echo "Usage: acc [-ag] [-ahelp] [-aO] [-apre] [-aprf] [-avrb] <args>*"
+           echo "   ag      compile debuggable"
+           echo "   ahelp   this help message"
+           echo "   aO      compile optimized"
+           echo "   apre    preprocess only"
+           echo "   aprf    compile for profiling"
+           echo "   avrb    verbose mode"
+           echo ""
+           exit(1)
+           breaksw
+      case -aO:
+           shift
+           set dbg = FALSE
+           set opt = TRUE
+           breaksw
+      case -aprf:
+           shift
+           set prf = TRUE
+           breaksw
+      case -apre:
+           shift
+           set pre = TRUE
+           breaksw
+      case -avrb:
+           set vrb = TRUE
+           breaksw
+      default:
+           set args = ( $args "$1" )
+           breaksw
+   endsw
+   shift
+end
+
+# check the compilers database for needed environment variables
+# such as license file, directory paths
+
+if (-f $compilers) then
+
+   set inf = ( `awk '($2 == "'$comp'") && ($1 == "'$sys'") && ($3 == "'$vers'") {print}' $compilers` )
+   if ($#inf < 4) then
+      set inf = ( `awk '($2 == "'$comp'") && ($1 == "'$sys'") {print}' $compilers | tail -n 1` )
+   endif
+
+   if ($#inf > 4) then
+      shift inf
+      shift inf
+      shift inf
+      shift inf
+
+# get other key,value pairs
+# useful for setting compiler license variables
+      while ($#inf > 1)
+         set var = $inf[1]
+         set val = $inf[2]
+         shift inf
+         shift inf
+         if ($vrb == TRUE) then
+            echo "   setenv $var $val"
+         endif
+         setenv $var $val
+      end
+   endif
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set bindir = $exe:h
+set path   = ( $bindir $path )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+switch ($comp)
+
+# NOTE: newest GNU compilers require this to run because
+# for some reason they were not built with -rpath
+# this is not for the compiled executables but the compiler
+   case gcc:
+   case g++:
+   case gfortran:
+        set root = $exe:h
+        set root = $root:h
+        if ($?LD_LIBRARY_PATH == 1) then
+           setenv LD_LIBRARY_PATH  $root/lib64:$root/lib:${LD_LIBRARY_PATH}
+        else
+           setenv LD_LIBRARY_PATH  $root/lib64:$root/lib
+        endif
+
+        unset root
+        breaksw
+
+   case pathcc:
+   case pathCC:
+   case pathf90:
+        set root  = $exe:h
+        set root  = $root:h
+        set lvers = `ls $root/lib`
+        if ($?LD_LIBRARY_PATH == 1) then
+           setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32:${LD_LIBRARY_PATH}
+        else
+           setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32
+        endif
+
+        unset root
+        breaksw
+endsw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# these are variables which may be used elsewhere
+# we are done with them - so unset them
+   unsetenv PACT_CC_FAMILY
+   unsetenv PACT_CC_VERSION
+   unsetenv PACT_CC_PATH
+
+# verbose mode diagnostic for debugging
+   if ($vrb == TRUE) then
+      echo "   Root: $bindir"
+      if ($?LD_LIBRARY_PATH == 1) then
+         echo "   LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+      endif
+      echo "   Compile line: $exe $args"
+   endif
+
+   if (-x $exe) then
+      exec $exe $args
+   else
+      @ err = 1
+      set comp = $0
+      set comp = $comp:t
+      echo "${comp}: Command not found."
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)
+
