@@ -18,13 +18,7 @@ unalias *
 
 @ err = 0
 
-set sys = `system-id`
-
-set comp = $0
-set base = $comp:h
-set compilers = $base/compilers
-
-set base = `which pact`
+set base = $0
 set base = $base:h
 set base = $base:h
 setenv PERDB_PATH $base/etc/cfg
@@ -45,7 +39,7 @@ set inf  = ""
 set pref = ""
 set outf = ""
 
-set args  = ""
+set args = ""
 while ($#argv > 0)
    switch ("$1")
       case -ag:
@@ -103,43 +97,83 @@ if (("$outf" == "") && ("$pref" == "")) then
    exit(1)
 endif
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # check the compilers database for needed environment variables
 # such as license file, directory paths
 
-if (-f $compilers) then
+   set wexe      = `which $comp`
+   set compilers = $wexe:h/compilers
+   if (-f $compilers) then
 
-   set inf = ( `awk '($2 == "'$comp'") && ($1 == "'$sys'") && ($3 == "'$vers'") {print}' $compilers` )
-   if ($#inf < 4) then
-      set inf = ( `awk '($2 == "'$comp'") && ($1 == "'$sys'") {print}' $compilers | tail -n 1` )
-   endif
+      set sys  = `system-id`
+      set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$sys'") && ($3 == "'$vers'") {print}' $compilers` )
+      if ($#linf < 4) then
+         set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$sys'") {print}' $compilers | tail -n 1` )
+      endif
 
-   if ($#inf > 4) then
-      shift inf
-      shift inf
-      shift inf
-      shift inf
+      if ($#linf > 4) then
+         shift linf
+         shift linf
+         shift linf
+         shift linf
 
 # get other key,value pairs
 # useful for setting compiler license variables
-      while ($#inf > 1)
-         set var = $inf[1]
-         set val = $inf[2]
-         shift inf
-         shift inf
-         if ($vrb == TRUE) then
-            echo "   setenv $var $val"
-         endif
-         setenv $var $val
-      end
+         while ($#linf > 1)
+            set var = $linf[1]
+            set val = $linf[2]
+            shift linf
+            shift linf
+            if ($vrb == TRUE) then
+               echo "   setenv $var $val"
+            endif
+            setenv $var $val
+         end
+      endif
+
+      unset linf
+      unset sys
+   endif
+   unset wexe
+   unset compilers
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set bindir = $exe:h
+   set path   = ( $bindir $path )
+   set action = ""
+
+   if ($?SC_EXEC_N_ATTEMPTS == 1) then
+      @ na = $SC_EXEC_N_ATTEMPTS
+   else
+      @ na = 1
    endif
 
-endif
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set bindir = $exe:h
-set path   = ( $bindir $path )
+# check abstract options
+
+   if ($dbg == TRUE) then
+      set linf  = ( `perdb CC_Debug | sed 's|\"||g'` )
+      set args = ( $linf $args )
+   else if ($opt == TRUE) then
+      set linf  = ( `perdb CC_Optimize | sed 's|\"||g'` )
+      set args = ( $linf $args )
+   endif
+
+   if ($prf == TRUE) then
+      set linf  = ( `perdb CC_Profile | sed 's|\"||g'` )
+      set args = ( $linf $args )
+   endif
+   unset linf
+
+   if ("$pref" != "") then
+      exec pcpp $args -o $pref $inf
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -177,30 +211,41 @@ switch ($comp)
 
         unset root
         breaksw
+
+   case pgcc:
+        set pref = $inf:r.int.c
+        if ($vrb == TRUE) then
+#           echo "   Preprocess: pcpp $args -o $pref $inf"
+           echo "   Preprocess: $comp $args -E $inf >&! $pref"
+        endif
+
+# try preprocessing until the preprocessed file is at least as big
+# as the unpreprocessed file and the exit status is 0
+        @ lerr = 1
+        @ ia  = 0
+        @ nli = `cat $inf | wc -l`
+        while ($ia < $na)
+           @ ia = $ia + 1
+           rm -f $pref
+#           pcpp $args -o $pref $inf
+           $comp $args -E $inf >&! $pref
+           set xstatus = $status
+           @ nlp = `cat $pref | wc -l`
+           if (($xstatus == 0) && ($nli <= $nlp)) then
+              @ lerr = 0
+              break
+           endif
+        end
+        if ($lerr == 1) then
+           echo "Preprocessing '$inf' failed - exiting"
+           exit(1)
+        endif
+
+        set inf    = $pref
+        set action = ( rm -f $inf )
+
+        breaksw
 endsw
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# check abstract options
-
-   if ($dbg == TRUE) then
-      set linf  = ( `perdb CC_Debug | sed 's|\"||g'` )
-      set args = ( $linf $args )
-   else if ($opt == TRUE) then
-      set linf  = ( `perdb CC_Optimize | sed 's|\"||g'` )
-      set args = ( $linf $args )
-   endif
-
-   if ($prf == TRUE) then
-      set linf  = ( `perdb CC_Profile | sed 's|\"||g'` )
-      set args = ( $linf $args )
-   endif
-   unset linf
-
-   if ("$pref" != "") then
-      exec pcpp $args -o $pref $inf
-   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -211,19 +256,22 @@ endsw
    unsetenv PACT_CC_VERSION
    unsetenv PACT_CC_PATH
 
-   set cmd = ( $exe $args $inf )
+   rm -f $outf
+   set cmd = ( $exe $args -o $outf $inf )
 
 # verbose mode diagnostic for debugging
    if ($vrb == TRUE) then
-      echo "   Root: $bindir"
-      if ($?LD_LIBRARY_PATH == 1) then
-         echo "   LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
-      endif
-      echo "   Compile line: $cmd"
+      echo "   Compile: $cmd"
    endif
 
    if (-x $exe) then
-      exec $cmd
+      if ("$action" == "") then
+         exec $cmd
+      else
+         $cmd
+         @ err = $status
+         $action
+      endif
    else
       @ err = 1
       set comp = $0

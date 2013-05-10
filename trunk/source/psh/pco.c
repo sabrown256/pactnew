@@ -1849,6 +1849,87 @@ static void default_rules(void)
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+#if 0
+
+/*--------------------------------------------------------------------------*/
+
+/* BAD_PRAGMA_RULES - setup the rules for CC, Lex, Yacc, and FC
+ *                  - allowing for bad handling of _Pragma
+ */
+
+static void bad_pragma_rules(void)
+   {char *ar, *cd, *le, *ye, *rm, *tc;
+
+    le  = "sed \"s|lex.yy.c|$*.c|\" lex.yy.c | sed \"s|yy|$*_|g\" > $*.c";
+    ye  = "sed \"s|y.tab.c|$*.c|\" y.tab.c | sed \"s|yy|$*_|g\" > $*.c";
+    ar  = "${AR} ${AROpt} ${TGTLib} $*.o 2>> errlog";
+    rm  = "${RM} errlog";
+    cd  = "cd ${PACTTmpDir}";
+    tc  = "touch errlog";
+
+/* C rules */
+    snprintf(st.rules.co_bp, BFLRG,
+             "\t@(%s ; \\\n          %s)\n",
+	     "echo \"acc -c $<\"",
+	     "acc ${ACCFlags} -c $< -ao $@");
+
+    snprintf(st.rules.ca_bp, BFLRG,
+             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
+	     "echo \"acc -c $<\"",
+	     cd, rm, tc,
+	     "acc ${ACCFlags} -c  ${PACTSrcDir}/$< -ao $*.o",
+	     ar,
+	     "${RM} $*.o 2>> errlog");
+
+/* lex rules */
+    snprintf(st.rules.lo_bp, BFLRG,
+             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
+             "echo \"lex $<\"",
+	     rm, tc,
+	     "${LEX} $< 2>> errlog",
+	     le,
+	     "acc ${ALXFlags} -c $*.c -ao $*.o",
+	     "${RM} lex.yy.c $*.c");
+
+    snprintf(st.rules.la_bp, BFLRG,
+	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
+	     "echo \"lex $<\"",
+	     cd, rm, tc,
+	     "${LEX} -t ${PACTSrcDir}/$< 1> lex.yy.c 2>> errlog",
+	     le,
+	     "echo \"${LXAnnounce} -c $*.c\"",
+	     "acc ${ALXFlags} -c $*.c -ao $*.o",
+	     ar,
+	     "${RM} lex.yy.c $*.c");
+
+/* yacc rules */
+    snprintf(st.rules.yo_bp, BFLRG,
+	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
+	     "echo \"yacc $<\"",
+	     cd, rm, tc,
+	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
+	     ye,
+	     "acc ${ALXFlags} -c $.c -ao $*.o",
+	     "${RM} $*.c");
+
+    snprintf(st.rules.ya_bp, BFLRG,
+	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
+	     "echo \"yacc $<\"",
+	     cd, rm, tc,
+	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
+	     ye,
+	     "echo \"${YCAnnounce} -c $*.c\"",
+	     "acc ${ALXFlags} -c $*.c -ao $*.o",
+	     ar,
+	     "${RM} $*.c $*.o");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
 /*--------------------------------------------------------------------------*/
 
 /* BAD_PRAGMA_RULES - setup the rules for CC, Lex, Yacc, and FC
@@ -1931,6 +2012,9 @@ static void bad_pragma_rules(void)
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* INIT_PCO_SESSION - initialize the state of the config session */
