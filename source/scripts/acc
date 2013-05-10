@@ -24,10 +24,11 @@ set comp = $0
 set base = $comp:h
 set compilers = $base/compilers
 
+set base = `which pact`
+set base = $base:h
+set base = $base:h
+setenv PERDB_PATH $base/etc/cfg
 if ($?PACT_CC_EXE == 0) then
-   set base = `which pact`
-   set base = $base:h
-   set base = $base:h
    source $base/etc/env-pact.csh
 endif
 unset base
@@ -35,54 +36,72 @@ unset base
 set exe  = $PACT_CC_EXE
 set vers = $PACT_CC_VERSION
 set comp = $exe:t
+set cpp  = ""
 set dbg  = FALSE
 set opt  = FALSE
 set prf  = FALSE
-set pre  = FALSE
 set vrb  = FALSE
+set inf  = ""
+set pref = ""
+set outf = ""
 
 set args  = ""
 while ($#argv > 0)
    switch ("$1")
       case -ag:
-           shift
            set dbg = TRUE
            set opt = FALSE
            breaksw
       case -ahelp:
            echo ""
-           echo "Usage: acc [-ag] [-ahelp] [-aO] [-apre] [-aprf] [-avrb] <args>*"
+           echo "Usage: acc [-ag] [-ahelp] [-aO] [-apre <file>] [-aprf] [-avrb] -ao <outf> <args>*"
            echo "   ag      compile debuggable"
            echo "   ahelp   this help message"
            echo "   aO      compile optimized"
-           echo "   apre    preprocess only"
+           echo "   apre    preprocess <file> only"
            echo "   aprf    compile for profiling"
            echo "   avrb    verbose mode"
            echo ""
            exit(1)
            breaksw
       case -aO:
-           shift
            set dbg = FALSE
            set opt = TRUE
            breaksw
-      case -aprf:
+      case -ao:
            shift
+           set outf = $1
+           breaksw
+      case -aprf:
            set prf = TRUE
            breaksw
       case -apre:
            shift
-           set pre = TRUE
+           set pref = $1
            breaksw
       case -avrb:
            set vrb = TRUE
            breaksw
       default:
-           set args = ( $args "$1" )
+           if (-f "$1") then
+              set inf = ( $inf "$1" )
+           else
+              set args = ( $args "$1" )
+           endif
            breaksw
    endsw
    shift
 end
+
+if ("$inf" == "") then
+   echo "No input file specified - exiting"
+   exit(1)
+endif
+
+if (("$outf" == "") && ("$pref" == "")) then
+   echo "No output file specified - exiting"
+   exit(1)
+endif
 
 # check the compilers database for needed environment variables
 # such as license file, directory paths
@@ -163,11 +182,36 @@ endsw
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# check abstract options
+
+   if ($dbg == TRUE) then
+      set linf  = ( `perdb CC_Debug | sed 's|\"||g'` )
+      set args = ( $linf $args )
+   else if ($opt == TRUE) then
+      set linf  = ( `perdb CC_Optimize | sed 's|\"||g'` )
+      set args = ( $linf $args )
+   endif
+
+   if ($prf == TRUE) then
+      set linf  = ( `perdb CC_Profile | sed 's|\"||g'` )
+      set args = ( $linf $args )
+   endif
+   unset linf
+
+   if ("$pref" != "") then
+      exec pcpp $args -o $pref $inf
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # these are variables which may be used elsewhere
 # we are done with them - so unset them
    unsetenv PACT_CC_FAMILY
    unsetenv PACT_CC_VERSION
    unsetenv PACT_CC_PATH
+
+   set cmd = ( $exe $args $inf )
 
 # verbose mode diagnostic for debugging
    if ($vrb == TRUE) then
@@ -175,11 +219,11 @@ endsw
       if ($?LD_LIBRARY_PATH == 1) then
          echo "   LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
       endif
-      echo "   Compile line: $exe $args"
+      echo "   Compile line: $cmd"
    endif
 
    if (-x $exe) then
-      exec $exe $args
+      exec $cmd
    else
       @ err = 1
       set comp = $0
