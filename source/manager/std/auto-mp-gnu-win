@@ -1,0 +1,8 @@
+#
+# MP-GNU-WIN - multi-platform GNU and MINGW Windows build
+#
+# include "cpyright.h"
+#
+
+platform gnu-64-py-s ognu  ${InstBase}
+platform win-64      ow64  none
