@@ -39,7 +39,7 @@ Tool CC {
                  32    = -m32 ;
                  64    = -m64 -fPIC ]
    Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = -pg ]
+	         on    = $CC_Pofile ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
 	         on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
@@ -49,6 +49,7 @@ Tool CC {
                  *.*   = -g -O -Wunused ]
    Optimize += [ _cmd_ = -tune @ ;              # optimization tuning
                  *     = -mtune=* ]
+   Profile   = -pg
    Version   = -v
 }
 
@@ -62,11 +63,12 @@ Tool FC {
                  32    = -m32 ;
                  64    = -m64 -fPIC ]
    Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = -pg ]
+	         on    = $FC_Profile ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
 	         on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
+   Profile   = -pg
    Version   = -v
 }
 
