@@ -1233,9 +1233,6 @@ switch ($Cmnd)
            flog $Log unsetenv SESSION_CONFIG
            flog $Log $CfgMan add $sid
 
-# single platform build
-        else
-           write/dmake $Log $ScrDir
         endif
 
 # wrap it up

@@ -510,7 +510,8 @@ int main(int c, char **v, char **env)
 	    recur = TRUE;
          else if (strcmp(v[i], "-s") == 0)
 	    show = 0;
-
+         else if (strcmp(v[i], "-sf") == 0)
+	    state->show_flags = TRUE;
 	 else if (strcmp(v[i], "-srv") == 0)
 	    {phase = 3;
 	     if (mem == TRUE)
