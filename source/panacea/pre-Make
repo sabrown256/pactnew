@@ -23,10 +23,8 @@ OD = DefaultG
 #
 # Compiler/Loader Options
 #
-UniFlags =
-CcFlags  = ${ODC} -I${IncDir} ${MDInc} ${MDGInc}
-FcFlags  =
-LdFlags  = -L${LibDir} ${LDFLAGS}
+CcFlags = -I${IncDir} ${MDInc} ${MDGInc}
+LdFlags = -L${LibDir} ${LDFLAGS}
 
 #
 # Files to Save for Backup (pact save)

@@ -16,7 +16,6 @@ Note $ALog "Analyze: C90 long double support"
 Note $ALog ""
 
 dbmget $ALog CFE^               \
-             Cfe_CC_Exe^        \
              PACT_CC_VERSION
 
 #--------------------------------------------------------------------------
@@ -56,7 +55,7 @@ set ok = FALSE
 
 flog $ALog cat $Tmp.c
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt -lm
+flog $ALog $lCC $Tmp.c -o $Tmp -lm
 if ($status == 0) then
    fexec $ALog $CFE $Tmp @o2 @e3 fa:$ALog @ vw:HAVE_ANSI_FLOAT16
    if ($gstatus[1] == 0) then

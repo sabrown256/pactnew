@@ -1936,7 +1936,7 @@ CFG_DONE:
         set InstF = ""
         set InstF = ( $InstF pact-update code-date )
         set InstF = ( $InstF for-pact install-ext )
-        set InstF = ( $InstF ../scripts/{import-api,pcpp,px,frnsic,sinstall} )
+        set InstF = ( $InstF ../scripts/{import-api,acc,pcpp,px,frnsic,sinstall} )
 
 # requiring pact-dist to be run from manager - no need to install
 #        set InstF = ( $InstF pact-dist )

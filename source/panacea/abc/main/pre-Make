@@ -26,9 +26,8 @@ OD = DefaultG
 #
 # Compiler/Loader Options
 #
-UniFlags =
-LdFlags  = -L${DevLib} -L${LibDir} ${LDFLAGS}
-CcFlags  = ${ODC} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags = -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
+LdFlags = -L${DevLib} -L${LibDir} ${LDFLAGS}
 
 #
 # Things upon which install depends (pact install)

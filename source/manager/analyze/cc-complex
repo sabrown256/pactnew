@@ -16,7 +16,6 @@ Note $ALog "Analyze: C90 complex"
 Note $ALog ""
 
 dbmget $ALog HAVE_ANSI_C9X_COMPLEX =\?  TRUE^  \
-             Cfe_CC_Exe^                       \
              PACT_CC_VERSION
 
 Note $ALog "HAVE_ANSI_C9X_COMPLEX = $HAVE_ANSI_C9X_COMPLEX"
@@ -35,7 +34,7 @@ int main(int c, char **v)
     }
 EOF
 
-   flog $ALog $Cfe_CC_Exe -c $Tmp.c -o $Tmp.o $ccopt
+   flog $ALog $lCC -c $Tmp.c -o $Tmp.o
    if ($status == 0) then
       NoteD $ALog "      has C99 complex support"
    else

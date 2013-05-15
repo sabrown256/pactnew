@@ -17,8 +17,7 @@ OD = DefaultG
 #
 # Compiler/Loader Options
 #
-UniFlags =
-CcFlags = ${ODC} -I${IncDir} ${MDInc} ${MDI_Inc}
+CcFlags = -I${IncDir} ${MDInc} ${MDI_Inc}
 LdFlags = -L${LibDir} ${MechDepLib}
 
 #

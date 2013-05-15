@@ -1850,7 +1850,7 @@ static void default_rules(void)
 
 /*--------------------------------------------------------------------------*/
 
-#if 0
+#if 1
 
 /*--------------------------------------------------------------------------*/
 
@@ -1871,25 +1871,26 @@ static void bad_pragma_rules(void)
 /* C rules */
     snprintf(st.rules.co_bp, BFLRG,
              "\t@(%s ; \\\n          %s)\n",
-	     "echo \"acc -c $<\"",
-	     "acc ${ACCFlags} -c $< -ao $@");
+	     "echo \"${ACCAnnounce} -c $<\"",
+	     "${ACC} -c $< -ao $@");
 
     snprintf(st.rules.ca_bp, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
-	     "echo \"acc -c $<\"",
+	     "echo \"${ACCAnnounce} -c $<\"",
 	     cd, rm, tc,
-	     "acc ${ACCFlags} -c  ${PACTSrcDir}/$< -ao $*.o",
+	     "${ACC} -c  ${PACTSrcDir}/$< -ao $*.o",
 	     ar,
 	     "${RM} $*.o 2>> errlog");
 
 /* lex rules */
     snprintf(st.rules.lo_bp, BFLRG,
-             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
+             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
              "echo \"lex $<\"",
 	     rm, tc,
 	     "${LEX} $< 2>> errlog",
 	     le,
-	     "acc ${ALXFlags} -c $*.c -ao $*.o",
+	     "echo \"${ALXAnnounce} -c $*.c\"",
+	     "${ALX} -c $*.c -ao $*.o",
 	     "${RM} lex.yy.c $*.c");
 
     snprintf(st.rules.la_bp, BFLRG,
@@ -1898,19 +1899,20 @@ static void bad_pragma_rules(void)
 	     cd, rm, tc,
 	     "${LEX} -t ${PACTSrcDir}/$< 1> lex.yy.c 2>> errlog",
 	     le,
-	     "echo \"${LXAnnounce} -c $*.c\"",
-	     "acc ${ALXFlags} -c $*.c -ao $*.o",
+	     "echo \"${ALXAnnounce} -c $*.c\"",
+	     "${ALX} -c $*.c -ao $*.o",
 	     ar,
 	     "${RM} lex.yy.c $*.c");
 
 /* yacc rules */
     snprintf(st.rules.yo_bp, BFLRG,
-	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
+	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
 	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
 	     ye,
-	     "acc ${ALXFlags} -c $.c -ao $*.o",
+	     "echo \"${ALXAnnounce} -c $*.c\"",
+	     "${ALX} -c $.c -ao $*.o",
 	     "${RM} $*.c");
 
     snprintf(st.rules.ya_bp, BFLRG,
@@ -1919,8 +1921,8 @@ static void bad_pragma_rules(void)
 	     cd, rm, tc,
 	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
 	     ye,
-	     "echo \"${YCAnnounce} -c $*.c\"",
-	     "acc ${ALXFlags} -c $*.c -ao $*.o",
+	     "echo \"${ALXAnnounce} -c $*.c\"",
+	     "${ALX} -c $*.c -ao $*.o",
 	     ar,
 	     "${RM} $*.c $*.o");
 
@@ -2774,7 +2776,9 @@ static void write_do_run_db(client *cl, state *st)
 /* check for debug specs */
 	if ((IS_NULL(ldbg) == FALSE) && (strcmp(ldbg, "none") != 0))
 	   {cnd = lst_push(cnd, ldbg);
-	    fprintf(fp, "default DBG %s\n", path_base(ldbg));}
+	    p   = path_base(ldbg);
+            note(Log, TRUE, "default DBG %s\n", p);
+	    fprintf(fp, "default DBG %s\n", p);}
 	else
 	   {cnd = lst_push(cnd, "gdb");
 	    cnd = lst_push(cnd, "ts");
@@ -2787,7 +2791,9 @@ static void write_do_run_db(client *cl, state *st)
 /* check for MPI specs */
 	if ((IS_NULL(lmpi) == FALSE) && (strcmp(lmpi, "none") != 0))
 	   {cnd = lst_push(cnd, lmpi);
-	    fprintf(fp, "default MPI %s\n", path_base(lmpi));}
+	    p   = path_base(lmpi);
+            note(Log, TRUE, "default MPI %s\n", p);
+	    fprintf(fp, "default MPI %s\n", p);}
 	else
 	   {cnd = lst_push(cnd, "poe");
 	    cnd = lst_push(cnd, "srun");
@@ -2795,11 +2801,14 @@ static void write_do_run_db(client *cl, state *st)
 	    cnd = lst_push(cnd, "mpirun");};
 
 /* check for cross compile specs */
-	if ((IS_NULL(lcrs) == FALSE) &&
-	    (strcmp(lcrs, "none") != 0))
-	   {if (strcmp(lcrs, "lmpi") != 0)
+	if ((IS_NULL(lcrs) == FALSE) && (strcmp(lcrs, "none") != 0))
+	   {if ((IS_NULL(lmpi) == FALSE) && (strcmp(lcrs, lmpi) != 0))
 	       {cnd = lst_push(cnd, lcrs);
-		fprintf(fp, "default CROSS %s\n", path_base(lcrs));};}
+		p   = path_base(lcrs);
+		note(Log, TRUE, "default CROSS %s\n", p);
+		fprintf(fp, "default CROSS %s\n", p);}
+	    else
+	       note(Log, TRUE, "default CROSS same as default MPI\n");}
 	else
 	   cnd = lst_push(cnd, "submit");
 

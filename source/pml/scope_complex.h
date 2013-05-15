@@ -18,14 +18,8 @@
 
 #ifndef __cplusplus
 
-/*--------------------------------------------------------------------------*/
-
-/*                               C99 COMPLEX                                */
-
-/*--------------------------------------------------------------------------*/
-
+/* clean the slate */
 #undef complex
-#define complex      double _Complex 
 
 /*--------------------------------------------------------------------------*/
 
@@ -42,6 +36,8 @@
 /*--------------------------------------------------------------------------*/
 
 #if defined(HAVE_ANSI_C9X_COMPLEX)
+
+# define complex      double _Complex 
 
 /* if we have C99 or later complex types and functions these
  * macros give older, pre-C99 complex support

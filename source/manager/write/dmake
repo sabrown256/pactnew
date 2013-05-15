@@ -34,6 +34,7 @@ dbmget $Log CROSS_COMPILE^    \
     flog $Log set DSYS = $MngDir/dsys
     flog $Log set MAKE = $BinDir/smake
     flog $Log set opt  = smake
+    flog $Log set path = ( $BinDir $path )
 
     set err = 1
 

@@ -318,39 +318,52 @@ dbmget $ALog AbsoluteDeb^              \
    flog $Log setenv FC_Optimize_Default "$FC_Optimize"
    flog $Log setenv FC_Debug_Default    "$FC_Debug"
 
+   flog $Log setenv ACC_Optimize_Default "-aO"
+   flog $Log setenv ACC_Debug_Default    "-ag"
+   flog $Log setenv AFC_Optimize_Default "-aO"
+   flog $Log setenv AFC_Debug_Default    "-ag"
+
    if ($AbsoluteDeb == TRUE) then
       flog $Log setenv CC_Optimize_Default "$CC_Debug"
       flog $Log setenv FC_Optimize_Default "$FC_Debug"
+      flog $Log setenv ACC_Optimize_Default "-ag"
+      flog $Log setenv AFC_Optimize_Default "-ag"
    else if ($AbsoluteOpt == TRUE) then
       flog $Log setenv CC_Debug_Default "$CC_Optimize"
       flog $Log setenv FC_Debug_Default "$FC_Optimize"
+      flog $Log setenv ACC_Optimize_Default "-aO"
+      flog $Log setenv AFC_Optimize_Default "-aO"
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # export the results
-dbmset $ALog CC_Exe              = $CC_Exe^               \
-             CC_Flags            = $CC_Flags^             \
-             CC_Debug_Default    = $CC_Debug_Default^     \
-             CC_Optimize_Default = $CC_Optimize_Default^  \
-             FC_Debug_Default    = $FC_Debug_Default^     \
-             FC_Optimize_Default = $FC_Optimize_Default^  \
-             Cfe_CC_Inc          = $Cfe_CC_Inc^           \
-             GRAPHICS_Windows    = $GRAPHICS_Windows^     \
-             GRAPHICS_Devices    = $GRAPHICS_Devices^     \
-             GRAPHICS_Flags      = $GRAPHICS_Flags^       \
-             MD_Inc              = $MD_Inc^               \
-             MD_Lib              = $MD_Lib^               \
-             MD_Pck              = $MD_Pck^               \
-             MDG_Inc             = $MDG_Inc^              \
-             MDG_Lib             = $MDG_Lib^              \
-             MDG_Pck             = $MDG_Pck^              \
-             MDI_Inc             = $MDI_Inc^              \
-             MDI_Lib             = $MDI_Lib^              \
-             MDI_Pck             = $MDI_Pck^              \
-             MDE_Lib             = $MDE_Lib^              \
-             RPATH               = $RPATH
+dbmset $ALog CC_Exe               = $CC_Exe^               \
+             CC_Flags             = $CC_Flags^             \
+             CC_Debug_Default     = $CC_Debug_Default^     \
+             CC_Optimize_Default  = $CC_Optimize_Default^  \
+             FC_Debug_Default     = $FC_Debug_Default^     \
+             FC_Optimize_Default  = $FC_Optimize_Default^  \
+             ACC_Debug_Default    = $ACC_Debug_Default^     \
+             ACC_Optimize_Default = $ACC_Optimize_Default^  \
+             AFC_Debug_Default    = $AFC_Debug_Default^     \
+             AFC_Optimize_Default = $AFC_Optimize_Default^  \
+             Cfe_CC_Inc           = $Cfe_CC_Inc^           \
+             GRAPHICS_Windows     = $GRAPHICS_Windows^     \
+             GRAPHICS_Devices     = $GRAPHICS_Devices^     \
+             GRAPHICS_Flags       = $GRAPHICS_Flags^       \
+             MD_Inc               = $MD_Inc^               \
+             MD_Lib               = $MD_Lib^               \
+             MD_Pck               = $MD_Pck^               \
+             MDG_Inc              = $MDG_Inc^              \
+             MDG_Lib              = $MDG_Lib^              \
+             MDG_Pck              = $MDG_Pck^              \
+             MDI_Inc              = $MDI_Inc^              \
+             MDI_Lib              = $MDI_Lib^              \
+             MDI_Pck              = $MDI_Pck^              \
+             MDE_Lib              = $MDE_Lib^              \
+             RPATH                = $RPATH
 
 exit(0)
 
