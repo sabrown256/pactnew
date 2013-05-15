@@ -18,13 +18,13 @@ unalias *
 
 @ err = 0
 
-set base = $0
+set base = `dirname $0`
 set base = $base:h
-set base = $base:h
-setenv PERDB_PATH $base/etc/cfg
 if ($?PACT_CC_EXE == 0) then
    source $base/etc/env-pact.csh
 endif
+setenv PERDB_PATH $base/etc/cfg
+set PERDB = $base/bin/perdb
 unset base
 
 set exe  = $PACT_CC_EXE
@@ -158,15 +158,15 @@ endif
 # check abstract options
 
    if ($dbg == TRUE) then
-      set linf  = ( `perdb CC_Debug | sed 's|\"||g'` )
+      set linf  = ( `$PERDB CC_Debug | sed 's|\"||g'` )
       set args = ( $linf $args )
    else if ($opt == TRUE) then
-      set linf  = ( `perdb CC_Optimize | sed 's|\"||g'` )
+      set linf  = ( `$PERDB CC_Optimize | sed 's|\"||g'` )
       set args = ( $linf $args )
    endif
 
    if ($prf == TRUE) then
-      set linf  = ( `perdb CC_Profile | sed 's|\"||g'` )
+      set linf  = ( `$PERDB CC_Profile | sed 's|\"||g'` )
       set args = ( $linf $args )
    endif
    unset linf
@@ -222,6 +222,7 @@ switch ($comp)
 # try preprocessing until the preprocessed file is at least as big
 # as the unpreprocessed file and the exit status is 0
         @ lerr = 1
+        @ dt  = 0
         @ ia  = 0
         @ nli = `cat $inf | wc -l`
         while ($ia < $na)
@@ -230,15 +231,22 @@ switch ($comp)
 #           pcpp $args -o $pref $inf
            $comp $args -E $inf >&! $pref
            set xstatus = $status
-           @ nlp = `cat $pref | wc -l`
-           if (($xstatus == 0) && ($nli <= $nlp)) then
-              @ lerr = 0
-              break
+           if (-f $pref) then
+              @ nlp = `cat $pref | wc -l`
+              if (($xstatus == 0) && ($nli <= $nlp)) then
+                 @ lerr = 0
+                 break
+              endif
            endif
+           echo "***> preprocessing '$inf' failed on attempt $ia - retrying"
+           @ dt = $dt + 1
+           sleep $dt
         end
         if ($lerr == 1) then
-           echo "Preprocessing '$inf' failed - exiting"
+           echo "***> preprocessing '$inf' failed after $na attempts - exiting"
            exit(1)
+        else if ($ia > 1) then
+           echo "***> preprocessing '$inf' succeeded"
         endif
 
         set inf    = $pref

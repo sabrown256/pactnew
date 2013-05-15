@@ -23,21 +23,27 @@ else
    setenv HAVE_FORTRAN   TRUE
 endif
 
-dbmget $ALog FC_Exe           =\? "f90"^        \
-             FC_Flags         =\? ""^           \
-             FC_Debug         =\? "-g"^         \
-             FC_Optimize      =\? "-O"^         \
-             FC_Linker        =\? ""^           \
-             Cfg_FC_Flags     =\? "$FC_Flags"^  \
-             PACT_FC_FAMILY^                    \
-             PACT_FC_VERSION^                   \
-             PACT_FC_PATH^                      \
-             PACT_FC_EXE^                       \
-             NM^                                \
+dbmget $ALog FC_Exe           =\? "f90"^  \
+             FC_Flags         =\? ""^     \
+             FC_Debug         =\? "-g"^   \
+             FC_Optimize      =\? "-O"^   \
+             FC_Linker        =\? ""^     \
+             Cfg_FC_Flags     =\? ""^     \
+             Cfe_CC_Exe^                  \
+             Cfe_CC_Flags^                \
+             PACT_FC_FAMILY^              \
+             PACT_FC_VERSION^             \
+             PACT_FC_PATH^                \
+             PACT_FC_EXE^                 \
+             NM^                          \
              OS_Name
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+if (("$Cfg_FC_Flags" == "") && ("$FC_Flags" != "")) then
+   setenv Cfg_FC_Flags  "$FC_Flags"
+endif
 
 set fclst = ""
 if ($?FC_Exe == 1) then
@@ -101,21 +107,34 @@ endif
 if ($CROSS_COMPILE == "FALSE") then
    flog $ALog setenv Cfe_FC_Exe    $Cfg_FC_Exe
    flog $ALog setenv Cfe_FC_Flags  "$Cfg_FC_Flags"
+
+# NOTE: properly this is done in analyze/ld but we need to bootstrap
+# our way through compiler issues before getting to analyze/ld
+# so set this temporary
+   set lrpath = `../analyze/rpath -o rpath`
+
 else
    flog $ALog setenv Cfe_FC_Exe    $FC_Exe
    flog $ALog setenv Cfe_FC_Flags  "$FC_Flags"
+   set lrpath = ""
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# now lets look at this compiler
+# set canonical compiler invocation for characterizing compiler
+setenv lCC   `echo $Cfe_CC_Exe $Cfe_CC_Flags $lrpath | sed 's|\"||g'`
+setenv lFC   `echo $Cfe_FC_Exe $Cfe_FC_Flags $lrpath | sed 's|\"||g'`
 
+# now lets look at this compiler
 if ($FC_Exe != "") then
-   Note $ALog ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 # VERSION -  check the compiler version
 
+   Note $ALog ""
    Note $ALog "Check the version of the FORTRAN compiler"
    Note $ALog "   PATH   = $PATH"
    Note $ALog "   FAMILY = $PACT_FC_FAMILY"

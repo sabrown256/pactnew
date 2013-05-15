@@ -19,8 +19,8 @@ OD = DefaultO
 #
 # Compiler/Loader Options
 #
-CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc} ${MDGInc}
-FcFlags = ${ODF} ${FC_MOD_FLAG}${IncDir} ${MDInc}
+CcFlags = -I. -I${PACTSrcDir} -I${IncDir} ${MDInc} ${MDGInc}
+FcFlags = ${FC_MOD_FLAG}${IncDir} ${MDInc}
 LdFlags = -g -L${LibDir} ${LDFLAGS}
 
 #

@@ -24,8 +24,7 @@ OD = DefaultG
 #
 # Compiler/Loader Options
 #
-UniFlags =
-CcFlags = ${ODC} ${GraphicsFlag} -I${DevInc} -I${IncDir} ${MDGInc}
+CcFlags = ${GraphicsFlag} -I${DevInc} -I${IncDir} ${MDGInc}
 LdFlags = 
 
 #

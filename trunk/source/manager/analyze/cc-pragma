@@ -15,8 +15,7 @@ Note $ALog "----- analyze/cc-pragma -----"
 Note $ALog "Analyze: pragma handling"
 Note $ALog ""
 
-dbmget $ALog Cfe_CC_Exe^      \
-             PACT_CC_VERSION
+dbmget $ALog PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 #define LOCKON(_l)         \
@@ -32,7 +31,7 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+flog $ALog $lCC $Tmp.c -o $Tmp
 if ($status == 0) then
    setenv HAVE_GOOD_OMP_PRAGMAS  TRUE
    NoteD $ALog "      proper pragma handling"

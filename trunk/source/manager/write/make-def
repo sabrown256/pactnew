@@ -33,6 +33,8 @@ dbmget $Log AR_IFlag^               \
             Bits^                   \
             CC_Debug_Default^       \
             CC_Optimize_Default^    \
+            ACC_Debug_Default^      \
+            ACC_Optimize_Default^   \
             CFE^                    \
             Cfg_CC_Exe^             \
             Cfg_CC_Flags^           \
@@ -43,6 +45,8 @@ dbmget $Log AR_IFlag^               \
             FC_MOD_FLAG^            \
             FC_Debug_Default^       \
             FC_Optimize_Default^    \
+            AFC_Debug_Default^      \
+            AFC_Optimize_Default^   \
             HAVE_GOOD_OMP_PRAGMAS^  \
             GMAKE_Flag^             \
             GRAPHICS_Devices^       \
@@ -417,19 +421,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     end
     Note $STDOUT ""
 
-    Note $STDOUT "YACC       = $Yacc_Exe $Yacc_Flags"
-    Note $STDOUT "LEX        = $Lex_Exe"
-
-    Note $STDOUT '#CCAnnounce = ${CC}'
-    Note $STDOUT '#FCAnnounce = ${FC}'
-    Note $STDOUT '#LXAnnounce = ${LX}'
-    Note $STDOUT '#YCAnnounce = ${YC}'
-
-    Note $STDOUT 'CCAnnounce = ${CCompiler} ${ODC}'
-    Note $STDOUT 'FCAnnounce = ${FCompiler} ${ODF}'
-    Note $STDOUT 'LXAnnounce = ${CCompiler} ${ODC}'
-    Note $STDOUT 'YCAnnounce = ${CCompiler} ${ODC}'
-
     Note $STDOUT ""
     Note $STDOUT "CFE       = $CFE"
     Note $STDOUT "BE        = $BE"
@@ -503,46 +494,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'DATE    = `./code-date`'
     Note $STDOUT ""
 
-# match up what derives from the config process with what is used in the pre-Makes
-    Note $STDOUT "CCompiler     = ${CC_Exe}"
-    Note $STDOUT "CCmpLdr       = ${CC_Linker}"
-    Note $STDOUT "CFLAGS        = ${CC_Flags}"
-    Note $STDOUT "CDebug        = ${CC_Debug}"
-    Note $STDOUT "COptimize     = ${CC_Optimize}"
-    Note $STDOUT "CDefDebug     = ${CC_Debug_Default}"
-    Note $STDOUT "CDefOptimize  = ${CC_Optimize_Default}"
-
-    Note $STDOUT "CXCompiler    = ${CXX_Exe}"
-    Note $STDOUT "CXCmpLdr      = ${CXX_Linker}"
-    Note $STDOUT "CXFLAGS       = ${CXX_Flags}"
-    Note $STDOUT "CXDebug       = ${CXX_Debug}"
-    Note $STDOUT "CXOptimize    = ${CXX_Optimize}"
-    Note $STDOUT "CXDefDebug    = ${CC_Debug_Default}"
-    Note $STDOUT "CXDefOptimize = ${CC_Optimize_Default}"
-
-    Note $STDOUT "FCompiler     = ${FC_Exe}"
-    Note $STDOUT "FFLAGS        = ${FC_Flags}"
-    Note $STDOUT "FDebug        = ${FC_Debug}"
-    Note $STDOUT "FOptimize     = ${FC_Optimize}"
-    Note $STDOUT "FDefDebug     = ${FC_Debug_Default}"
-    Note $STDOUT "FDefOptimize  = ${FC_Optimize_Default}"
-    Note $STDOUT "FC_MOD_FLAG   = ${FC_MOD_FLAG}"
-
-    Note $STDOUT "Linker       = ${LD_Exe}"
-    Note $STDOUT ""
-
-    Note $STDOUT 'DefaultG     = DefDebug'
-    Note $STDOUT 'DefaultO     = DefOptimize'
-    Note $STDOUT 'g            = Debug'
-    Note $STDOUT 'o            = Optimize'
-    Note $STDOUT 'OD           = DefaultG'
-    Note $STDOUT 'ODC          = ${C${${OD}}}'
-    Note $STDOUT 'ODF          = ${F${${OD}}}'
-    Note $STDOUT ""
-
-    Note $STDOUT "JOBS_System  = $JOBS_System"
-    Note $STDOUT ""
-
 # get the entries for RPATH
     set npath = `analyze/rpath -o link`
     Note $Log "analyze/rpath -o link => |$npath|"
@@ -568,30 +519,98 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     endif
     Note $STDOUT ""
 
-    Note $STDOUT "AR         = ${AR_Exe}"
-    Note $STDOUT "AROpt      = ${AR_Flags} ${AR_IFlag}"
-    Note $STDOUT "ARXOpt     = ${AR_Flags} ${AR_XFlag}"
+    Note $STDOUT '#CCAnnounce = ${CC}'
+    Note $STDOUT '#FCAnnounce = ${FC}'
+    Note $STDOUT '#LXAnnounce = ${LX}'
+    Note $STDOUT '#YCAnnounce = ${YC}'
+
+    Note $STDOUT 'ACCAnnounce = acc ${AODC}'
+    Note $STDOUT 'AFCAnnounce = afc ${AODF}'
+    Note $STDOUT 'ALXAnnounce = acc ${AODC}'
+
+    Note $STDOUT 'CCAnnounce = ${CCompiler} ${ODC}'
+    Note $STDOUT 'FCAnnounce = ${FCompiler} ${ODF}'
+    Note $STDOUT 'LXAnnounce = ${CCompiler} ${ODC}'
+    Note $STDOUT 'YCAnnounce = ${CCompiler} ${ODC}'
+
+# match up what derives from the config process with what is used in the pre-Makes
+    Note $STDOUT "ACDefDebug    = ${ACC_Debug_Default}"
+    Note $STDOUT "ACDefOptimize = ${ACC_Optimize_Default}"
+    Note $STDOUT "AFDefDebug    = ${AFC_Debug_Default}"
+    Note $STDOUT "AFDefOptimize = ${AFC_Optimize_Default}"
+
+    Note $STDOUT "CCompiler     = ${CC_Exe}"
+    Note $STDOUT "CCmpLdr       = ${CC_Linker}"
+    Note $STDOUT "CFLAGS        = ${CC_Flags}"
+    Note $STDOUT "CDebug        = ${CC_Debug}"
+    Note $STDOUT "COptimize     = ${CC_Optimize}"
+    Note $STDOUT "CDefDebug     = ${CC_Debug_Default}"
+    Note $STDOUT "CDefOptimize  = ${CC_Optimize_Default}"
+
+    Note $STDOUT "CXCompiler    = ${CXX_Exe}"
+    Note $STDOUT "CXCmpLdr      = ${CXX_Linker}"
+    Note $STDOUT "CXFLAGS       = ${CXX_Flags}"
+    Note $STDOUT "CXDebug       = ${CXX_Debug}"
+    Note $STDOUT "CXOptimize    = ${CXX_Optimize}"
+    Note $STDOUT "CXDefDebug    = ${CC_Debug_Default}"
+    Note $STDOUT "CXDefOptimize = ${CC_Optimize_Default}"
+
+    Note $STDOUT "FCompiler     = ${FC_Exe}"
+    Note $STDOUT "FFLAGS        = ${FC_Flags}"
+    Note $STDOUT "FDebug        = ${FC_Debug}"
+    Note $STDOUT "FOptimize     = ${FC_Optimize}"
+    Note $STDOUT "FDefDebug     = ${FC_Debug_Default}"
+    Note $STDOUT "FDefOptimize  = ${FC_Optimize_Default}"
+    Note $STDOUT "FC_MOD_FLAG   = ${FC_MOD_FLAG}"
+    Note $STDOUT "Linker        = ${LD_Exe}"
+    Note $STDOUT "JOBS_System   = $JOBS_System"
     Note $STDOUT ""
 
-    Note $STDOUT 'CC  = ${CCompiler} ${CFLAGS} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'CXX = ${CXCompiler} ${CXFLAGS} ${UniFlags} ${CxFlags}'
-    Note $STDOUT 'FC  = ${FCompiler} ${FFLAGS} ${UniFlags} ${FcFlags}'
-    Note $STDOUT 'LX  = ${CCompiler} ${LXFLAGS} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'YC  = ${CCompiler} ${LXFLAGS} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'LD  = ${Linker} ${UniFlags} ${LdFlags}'
+    Note $STDOUT 'DefaultG = DefDebug'
+    Note $STDOUT 'DefaultO = DefOptimize'
+    Note $STDOUT 'g        = Debug'
+    Note $STDOUT 'o        = Optimize'
+    Note $STDOUT 'OD       = DefaultG'
+    Note $STDOUT 'ODC      = ${C${${OD}}}'
+    Note $STDOUT 'ODF      = ${F${${OD}}}'
+    Note $STDOUT 'AODC     = ${AC${${OD}}}'
+    Note $STDOUT ""
+
+# abstract compiler invocations
+    Note $STDOUT 'ACC = acc ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}'
+    Note $STDOUT 'AFC = afc ${AODF} ${FFLAGS} ${Shared_FC_Flags} ${FcFlags}'
+    Note $STDOUT 'ALX = acc ${AODC} ${LXFLAGS} ${CcFlags}'
+    Note $STDOUT ""
+
+# compiler invocations
+    Note $STDOUT 'CC  = ${CCompiler} ${ODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}'
+    Note $STDOUT 'CXX = ${CXCompiler} ${ODC} ${CXFLAGS} ${CxFlags}'
+    Note $STDOUT 'FC  = ${FCompiler} ${ODF} ${FFLAGS} ${FcFlags}'
+    Note $STDOUT 'LX  = ${CCompiler} ${ODC} ${LXFLAGS} ${CcFlags}'
+    Note $STDOUT 'YC  = ${CCompiler} ${ODC} ${LXFLAGS} ${CcFlags}'
+    Note $STDOUT 'LD  = ${Linker} ${LdFlags}'
     Note $STDOUT ""
  
-    Note $STDOUT 'CLD            = ${CCmpLdr} ${CFLAGS} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${Cfg_CC_Flags} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'FCCfg          = ${Cfg_FC_Exe} ${Cfg_FC_Flags} ${UniFlags} ${FcFlags}'
+    Note $STDOUT 'CLD            = ${CCmpLdr} ${CFLAGS} ${ODC} ${CcFlags}'
+    Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${Cfg_CC_Flags} ${Shared_CC_Flags} ${ODC} ${CcFlags}'
+    Note $STDOUT 'FCCfg          = ${Cfg_FC_Exe} ${Cfg_FC_Flags} ${ODF} ${FcFlags}'
 
-    Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${Ser_CC_Flags} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'FCSer          = ${Ser_FC_Exe} ${Ser_FC_Flags} ${UniFlags} ${FcFlags}'
+    Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${Ser_CC_Flags} ${Shared_CC_Flags} ${ODC} ${CcFlags}'
+    Note $STDOUT 'FCSer          = ${Ser_FC_Exe} ${Ser_FC_Flags} ${ODF} ${FcFlags}'
 
-    Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${Cfe_CC_Flags} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'FCCfe          = ${Cfe_FC_Exe} ${Cfe_FC_Flags} ${UniFlags} ${FcFlags}'
+    Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${Cfe_CC_Flags} ${Shared_CC_Flags} ${ODC} ${CcFlags}'
+    Note $STDOUT 'FCCfe          = ${Cfe_FC_Exe} ${Cfe_FC_Flags} ${ODF} ${FcFlags}'
     Note $STDOUT 'CCCfe_LD_Flags = ${Cfe_LD_Flags}'
     Note $STDOUT 'CCCfe_LD_Lib   = ${Cfe_LD_Lib}'
+    Note $STDOUT ""
+
+# other tool invocations
+    Note $STDOUT "YACC     = $Yacc_Exe $Yacc_Flags"
+    Note $STDOUT "LEX      = $Lex_Exe"
+    Note $STDOUT "AR       = ${AR_Exe}"
+    Note $STDOUT "AROpt    = ${AR_Flags} ${AR_IFlag}"
+    Note $STDOUT "ARXOpt   = ${AR_Flags} ${AR_XFlag}"
+    Note $STDOUT ""
 
     if ($Load == TRUE) then
        Note $STDOUT 'Load           = ${CCmpLdr}'

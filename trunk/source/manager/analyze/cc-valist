@@ -18,8 +18,7 @@ Note $ALog ""
 setenv HAVE_VA_COPY FALSE
 setenv HAVE_VA_LIST TRUE
 
-dbmget $ALog Cfe_CC_Exe^       \
-             PACT_CC_VERSION
+dbmget $ALog PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 #include <stdarg.h>
@@ -43,7 +42,7 @@ int main(int c, char **v)
     return(i != 2);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+flog $ALog $lCC $Tmp.c -o $Tmp
 if (($status == 0) && ($?IBM_BGL == 0)) then
    setenv HAVE_VA_COPY TRUE
    NoteD $ALog "      has va_copy"
@@ -60,7 +59,7 @@ void foo(va_list *lst)
     return;}
 EOF
 
-   flog $ALog $Cfe_CC_Exe -c $Tmp.c -o $Tmp.o $ccopt
+   flog $ALog $lCC -c $Tmp.c -o $Tmp.o
    if ($status == 0) then
       NoteD $ALog "      has complete variable arg list support"
    else

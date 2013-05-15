@@ -16,10 +16,6 @@ Note $ALog ""
 #--------------------------------------------------------------------------
 
 dbmget $ALog CFE^                          \
-             Cfe_CC_Exe^                   \
-             Cfe_CC_Flags^                 \
-             Cfe_FC_Exe^                   \
-             Cfe_FC_Flags^                 \
              Cfe_LD_Flags^                 \
              Cfe_LD_RPath^                 \
              FC_INTEGER_C  =\? "unknown"^  \
@@ -29,9 +25,8 @@ dbmget $ALog CFE^                          \
 #--------------------------------------------------------------------------
 
 if ($HAVE_FORTRAN == TRUE) then
-   if ($Cfe_FC_Exe != "") then
-      set lCC = ( `echo $Cfe_CC_Exe $Cfe_CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
-      set lFC = ( `echo $Cfe_FC_Exe $Cfe_FC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
+   if ("$lFC" != "") then
+
       Note $ALog "lCC = $lCC"
       Note $ALog "lFC = $lFC"
 
@@ -85,7 +80,7 @@ EOF
 
       if ($si > 0) then
          flog $ALog $lCC $Tmp.c -o $Tmp
-         fexvar $ALog FC_INTEGER_C $Tmp $si
+         fexvar $ALog FC_INTEGER_C $CFE $Tmp $si
       endif
 
       flog $ALog $RM $Tmp*

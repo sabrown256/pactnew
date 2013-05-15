@@ -21,9 +21,7 @@ TGTScm = applications/runt.scm applications/lang.scm \
 OD = DefaultO
 
 # Compiler/Loader Options
-UniFlags =
-CcFlags = ${ODC} -I. -I../.. -I${IncDir} ${MDInc}
-FcFlags =
+CcFlags = -I. -I../.. -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 # files to Save for Backup (pact save)

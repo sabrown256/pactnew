@@ -18,7 +18,6 @@ Note $ALog ""
 dbmget $ALog INT4    =\? int^   \
              INT8    =\? long^  \
              CFE^               \
-             Cfe_CC_Exe^        \
              PACT_CC_VERSION
 
 #--------------------------------------------------------------------------
@@ -33,7 +32,7 @@ int main(int c, char **v)
  return(0);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+flog $ALog $lCC $Tmp.c -o $Tmp
 if ($status != 0) then
    setenv NO_LONG_LONG TRUE
 else
@@ -60,7 +59,7 @@ int main(int c, char **v)
 return(0);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+flog $ALog $lCC $Tmp.c -o $Tmp
 if ($status == 0) then
    fexec $ALog $CFE $Tmp @o2 @e3 vw:INT4 @ fw:/dev/null
 endif
@@ -128,7 +127,7 @@ EOF
 
 COMPILE:
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+flog $ALog $lCC $Tmp.c -o $Tmp
 if ($status == 0) then
    fexec $ALog $CFE $Tmp @o2 @e3 vw:INT8 @ fw:/dev/null
 endif

@@ -101,7 +101,7 @@ case bin:
 
            set Dir = ""
            foreach d ($tLst)
-              if (-d $d) then
+              if (-d "$d") then
                  echo "$Dir" | grep -w $d >& /dev/null
                  if ($status == 1) then
                     set Dir = ( $Dir $d )
@@ -113,27 +113,29 @@ case bin:
 # now search the Dirs for the frontend
         foreach d ($Dir /usr/local/bin)
            if ("$FEL" != "") break
-           
-           set ok = FALSE
-           while ($ok == FALSE)
-              set d = $d:h
-              if ("$d" == "") then
-	         set ok = TRUE
-              else if (-d $d/bin) then
-                 set Bin = $d/bin
-                 foreach f ($Tgts)
-                    set fexe = `$RPATH $Bin/$f`
-                    if (-x $fexe) then
-                       echo "$FEL" | grep -w $fexe >& /dev/null
-                       if ($status == 1) then
-                          set FEL = ( $FEL $fexe )
-                          set ok = TRUE
-                          break
+
+           if (-d "$d") then
+              set ok = FALSE
+              while ($ok == FALSE)
+                 set d = $d:h
+                 if ("$d" == "") then
+    	            set ok = TRUE
+                 else if (-d $d/bin) then
+                    set Bin = $d/bin
+                    foreach f ($Tgts)
+                       set fexe = `$RPATH $Bin/$f`
+                       if (-x $fexe) then
+                          echo "$FEL" | grep -w $fexe >& /dev/null
+                          if ($status == 1) then
+                             set FEL = ( $FEL $fexe )
+                             set ok  = TRUE
+                             break
+                          endif
                        endif
-                    endif
-                 end
-             endif
-           end
+                    end
+                endif
+              end
+           endif
         end
      endif
 

@@ -19,9 +19,7 @@ OD = DefaultO
 #
 # Compiler/Loader Options
 #
-UniFlags =
-CcFlags = ${ODC} -I${IncDir} ${MDInc}
-FcFlags =
+CcFlags = -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 CXX = ${CC_Exe} ${CcFlags}

@@ -170,8 +170,9 @@ endif
 # so set this temporary
 set lrpath = `../analyze/rpath -o rpath`
 
-# set compile options for characterizing compiler
-setenv ccopt "$Cfe_CC_Flags $lrpath"
+# set canonical compiler invocation for characterizing compiler
+# NOTE: lCC is used in the cc-xxx scripts which are executed below
+setenv lCC   `echo $Cfe_CC_Exe $Cfe_CC_Flags $lrpath | sed 's|\"||g'`
 
 # now lets look at this compiler
 if ($Cfg_CC_Exe != "") then
@@ -260,7 +261,7 @@ int main(int c, char **v)
 EOF
 
    flog $ALog cat $Tmp.c
-   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+   flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
 
       fexvar $ALog FC_INT_PTR_DIFFER $CFE $Tmp $BE
@@ -295,7 +296,7 @@ int main(int c, char **v)
 EOF
 
    flog $ALog cat $Tmp.c
-   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+   flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
       set LONG64 = `$CFE $Tmp $BE`
    else
@@ -327,7 +328,7 @@ int main(int c, char **v)
 EOF
 
    flog $ALog cat $Tmp.c
-   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+   flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
       set NEED_ALT_LARGE_FILE = `$CFE $Tmp $BE`
    else
@@ -369,7 +370,7 @@ EOF
       set hw = `uname -m`
       flog $ALog which $Cfe_CC_Exe
       flog $ALog cat $Tmp.c
-      flog $ALog $Cfe_CC_Exe -arch $hw $Tmp.c -o $Tmp $ccopt
+      flog $ALog $lCC -arch $hw $Tmp.c -o $Tmp
       if ($status == 0) then
          flog $ALog $Tmp
          if ($status == 0) then

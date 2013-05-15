@@ -24,9 +24,8 @@ OD = DefaultG
 #
 # Compiler/Loader Options
 #
-UniFlags =
-CcFlags  = ${ODC} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
-LdFlags  = -L${LibDir} ${LDFLAGS}
+CcFlags = -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
+LdFlags = -L${LibDir} ${LDFLAGS}
 
 #
 # Files to remove in directory clean (make clean)
