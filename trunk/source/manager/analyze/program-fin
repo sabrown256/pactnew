@@ -22,6 +22,8 @@ Run {
    write/syntax.h        $Log $ScrDir
    write/spokes.scm      $Log $ScrDir
    write/install-pact    $Log $ScrDir
+   write/acc             $Log $ScrDir
    write/smake           $Log $ScrDir
+   write/dmake           $Log $ScrDir
 }
 

@@ -89,6 +89,7 @@ struct s_anadep
     int need_subst;
     int show_vars;
     int show_rules;
+    int show_flags;
     int verbose;
     int complete;              /* info mode <var> = <val>  or just <val> */
     int literal;               /* info mode <var> must be exact match */

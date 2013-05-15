@@ -982,6 +982,7 @@ anadep *SC_make_state(void)
     state->need_subst  = TRUE;
     state->show_vars   = FALSE;
     state->show_rules  = FALSE;
+    state->show_flags  = FALSE;
     state->verbose     = FALSE;
     state->log         = stdout;
     state->rules       = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
@@ -1209,7 +1210,12 @@ int SC_parse_premake(anadep *state, char *fname)
 
 	s = SC_dsnprintf(TRUE, "PACTSrcDir = ../..");
 	SC_make_def_var(state, s, -1);
-	CFREE(s);};
+	CFREE(s);
+
+        if (state->show_flags == TRUE)
+	   {s = SC_dsnprintf(TRUE, "SFL_       = Full");
+	    SC_make_def_var(state, s, -1);
+	    CFREE(s);};};
 
     if (rv == TRUE)
        {ok = SC_parse_makefile(state, fname);
