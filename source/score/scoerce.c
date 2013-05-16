@@ -651,6 +651,7 @@ static void _SC_write_bool(FILE *fp, int id)
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
 
+    fprintf(fp, "    nb = -1;\n");
     fprintf(fp, "    if (strchr(fmt, 's') != NULL)\n");
     fprintf(fp, "       nb = snprintf(t, nc, fmt, pv[n] ? \"T\" : \"F\");\n");
     fprintf(fp, "    else if (strchr(fmt, 'd') != NULL)\n");

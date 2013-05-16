@@ -1026,7 +1026,10 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
 	 if ((t[0] == SC_PROCESS_DELIM) && (ps->msh_syntax == TRUE))
 	    ios = t;
 
-	 else if (strpbrk(t, "[]()@$*`") != NULL)
+/* NOTE: *?[] are essential regular expression syntax elements
+ * which must be handled by the shell - cannot leave any of these off
+ */
+	 else if (strpbrk(t, "[]()@$*?`") != NULL)
 	    dosh = TRUE;
 
 	 else if (strncmp(t, "if", 2) == 0)

@@ -1933,7 +1933,7 @@ CFG_DONE:
         set InstF = ""
         set InstF = ( $InstF pact-update code-date )
         set InstF = ( $InstF for-pact install-ext )
-        set InstF = ( $InstF ../scripts/{import-api,acc,pcpp,px,frnsic,sinstall} )
+        set InstF = ( $InstF ../scripts/{import-api,pcpp,px,frnsic,sinstall} )
 
 # requiring pact-dist to be run from manager - no need to install
 #        set InstF = ( $InstF pact-dist )
@@ -2048,7 +2048,8 @@ CFG_DONE:
 #      - portable, persistent (dmake) version
 
    case pact:
-        set Log = /dev/null
+        InitLog Log $LogDir/pact-link
+#        set Log = /dev/null
 
         flog $Log pushd $BinDir
         if ($#argv == 0) then
@@ -2346,7 +2347,7 @@ CFG_DONE:
 # save the files in BinDir
            set BinFiles = ""
            if ($strict == FALSE) then
-              set BinFiles = ( $BinFiles smake dmake pact template )
+              set BinFiles = ( $BinFiles smake dmake acc pact template )
               set BinFiles = ( $BinFiles timer px frnsic )
               set BinFiles = ( $BinFiles do-run elide blang gexec perdb )
               set BinFiles = ( $BinFiles make-syntax )

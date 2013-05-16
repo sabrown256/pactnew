@@ -10,6 +10,8 @@
 
 unalias *
 
+@ err = 0
+
 set files = ""
 set cmt   = ""
 
@@ -17,14 +19,19 @@ while ($#argv)
    switch ("$1")
       case -h:
            echo ""
-           echo "Usage: frnsic [-c <cmt>] [-h] <file>*"
+           echo "Usage: frnsic [-c <cmt>] [-e <n>] [-h] <file>*"
            echo "   c   comment, e.g. the command producing the files"
+           echo "   e   increment the error count which starts at 0"
            echo "   h   this help message"
            echo ""
            exit(1)
       case -c:
            shift
            set cmt = ( $1 )
+           breaksw
+      case -e:
+           shift
+           @ err = $err + $1
            breaksw
       default:
            set files = ( $files $1 )
@@ -47,9 +54,10 @@ foreach f ($files)
       echo "   Checksum:  `md5sum $f`"
    else
       echo "   No such file"
+      @ err = $err + 1
    endif
 end
 
 echo ""
 
-exit(0)
+exit($err)

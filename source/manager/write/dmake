@@ -96,6 +96,8 @@ dbmget $Log CROSS_COMPILE^    \
           flog $Log set opt = dmake
        endif
     endif
+
+    flog $Log setenv SESSION_CONFIG $System
     ftee $Log $DSYS pact $opt
     unset opt
 

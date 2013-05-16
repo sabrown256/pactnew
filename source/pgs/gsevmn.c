@@ -121,7 +121,8 @@ static void _PG_get_input(int fd, int mask, void *a)
     if (_PG_gcont.input_nr != -1)
        n = SC_read_sigsafe(fd, bf, _PG_gcont.input_nr);
     else
-       n = SC_read_sigsafe(fd, bf, MAX_BFSZ);
+       n = PS_read_safe(fd, bf, MAX_BFSZ, FALSE);
+/*       n = SC_read_sigsafe(fd, bf, MAX_BFSZ); */
 
 /* if we have no input buffer throw the input away (nobody asked for it)
  * and return to whoever called
