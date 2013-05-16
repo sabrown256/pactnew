@@ -448,13 +448,13 @@ fcdes *SC_scan_archive(char *arf)
 
     fp = SC_fopen_safe(arf, "r");
     if (fp != NULL)
-       {nr = fread(s, 1, 8, fp);
+       {nb = sizeof(struct ar_hdr);
+	nr = fread(s, 1, 8, fp);
 	if (nr < 0)
 	   io_error(errno, "fread of 8 bytes failed");
 
 	if (nr == 8)
-	   {nb = sizeof(struct ar_hdr);
-	    p  = (char *) &hdr;
+	   {p = (char *) &hdr;
 
 	    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 	    ext = 0;

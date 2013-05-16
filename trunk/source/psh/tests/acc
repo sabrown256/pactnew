@@ -1,0 +1,40 @@
+#!/bin/csh -f
+
+set sys = $1
+set path = ( ../dev/$sys/bin $path )
+rehash
+
+which acc.g
+
+echo "-------------------"
+acc.g -ahelp
+
+echo "-------------------"
+acc.g -avrb -apre hello.i hello.c
+echo "status = $status"
+ls -l hello.c
+ls -l hello.i
+
+echo "-------------------"
+acc.g -avrb -ag -apre hello.i hello.c
+echo "status = $status"
+ls -l hello.c
+ls -l hello.i
+
+echo "-------------------"
+acc.g -avrb -ag -ao hello hello.c
+echo "status = $status"
+./hello
+ls -l hello.c
+ls -l hello
+
+echo "-------------------"
+acc.g -avrb -aO -ao hello hello.c
+echo "status = $status"
+./hello
+ls -l hello.c
+ls -l hello
+
+echo ""
+
+exit($status)

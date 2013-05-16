@@ -1219,11 +1219,9 @@ static int _SC_rprintf(FILE *stream, char *fmt, va_list a)
     REMOTE_FILE *fp;
     char *msg;
 
+    nw = 0;
     fp = (REMOTE_FILE *) stream;
-    if (fp == NULL)
-       nw = 0;
-
-    else if (fp != NULL)
+    if (fp != NULL)
        {msg = SC_vdsnprintf(TRUE, fmt, a);
 	ni  = strlen(msg);
 	nw  = io_write((void *) msg, (size_t) 1, ni, (FILE *) fp->pp);
