@@ -509,10 +509,16 @@ void async_server(srvdes *sv)
 			      sched_yield();};};};
 		  ng = 0;}
 	     else
-	        ng += dt;};
+	        ng += dt;
+
+/* if the connection file goes away - quit immediately */
+	     if (find_conn(cl->root, -1) == NULL)
+	        ok = 2;};
 
 	if (ok != TRUE)
 	   {SLOG(sv, 4, "done by command");}
+	else if (ok == 2)
+	   {SLOG(sv, 4, "missing connection file");}
 	else if (ng >= tmax)
 	   {SLOG(sv, 4, "done by time: %d >= %d", ng, tmax);}
 	else if (nb >= nbmax)
