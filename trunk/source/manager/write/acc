@@ -181,9 +181,9 @@ Note $STDOUT ""
             shift linf
             shift linf
             Note $STDOUT 'if ($vrb == TRUE) then'
-            Note $STDOUT '   echo "   setenv $var $val"'
+            Note $STDOUT '   echo "   setenv '$var $val'"'
             Note $STDOUT 'endif'
-            Note $STDOUT 'setenv $var $val'
+            Note $STDOUT "setenv $var $val"
          end
       endif
 

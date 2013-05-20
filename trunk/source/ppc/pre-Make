@@ -111,26 +111,31 @@ web : ${BinDir}/pcweb
 # binary data tests
 #
 ${BinDir}/tpcb : ${TGTLib} tpcb.c
-	${CLD} ${LdFlags} tpcb.c -o ${BinDir}/tpcb ${Libs}
+	@(echo "${CCAnnounce} tpcb.c -o ${BinDir}/tpcb" ; \
+	  ${CLD} ${LdFlags} tpcb.c -o ${BinDir}/tpcb ${Libs})
 
 ${BinDir}/tpcc : ${TGTLib} tpcc.c
-	${CLD} ${LdFlags} tpcc.c -o ${BinDir}/tpcc ${Libs}
+	@(echo "${CCAnnounce} tpcc.c -o ${BinDir}/tpcc" ; \
+	  ${CLD} ${LdFlags} tpcc.c -o ${BinDir}/tpcc ${Libs})
 
 #
 # multiple process tests
 #
 ${BinDir}/tpcm : ${TGTLib} tpcm.c
-	${CLD} ${LdFlags} tpcm.c -o ${BinDir}/tpcm ${Libs}
+	@(echo "${CCAnnounce} tpcm.c -o ${BinDir}/tpcm" ; \
+	  ${CLD} ${LdFlags} tpcm.c -o ${BinDir}/tpcm ${Libs})
 #
 # parallel process tests
 #
 ${BinDir}/tpcp : ${TGTLib} tpcp.c
-	${CLD} ${LdFlags} tpcp.c -o ${BinDir}/tpcp ${Libs}
+	@(echo "${CCAnnounce} tpcp.c -o ${BinDir}/tpcp" ; \
+	  ${CLD} ${LdFlags} tpcp.c -o ${BinDir}/tpcp ${Libs})
 #
 # http reader
 #
 ${BinDir}/pcweb : ${TGTLib} pcweb.c
-	${CLD} ${LdFlags} pcweb.c -o ${BinDir}/pcweb ${Libs}
+	@(echo "${CCAnnounce} pcweb.c -o ${BinDir}/pcweb" ; \
+	  ${CLD} ${LdFlags} pcweb.c -o ${BinDir}/pcweb ${Libs})
 
 #
 # process report

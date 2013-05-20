@@ -378,16 +378,20 @@ ${BinDir}/sctty : ${TGTLib} sctty.c
 smp : ${BinDir}/tscthr ${BinDir}/tsctl ${BinDir}/tscsmp ${BinDir}/tscsmpb
 
 ${BinDir}/tscthr : tscthr.c ${TGTLib}
-	${CLD} ${LdFlags} tscthr.c -o ${BinDir}/tscthr ${Libs}
+	@(echo "${CCAnnounce} tscthr.c -o ${BinDir}/tscthr" ; \
+	  ${CLD} ${LdFlags} tscthr.c -o ${BinDir}/tscthr ${Libs})
 
 ${BinDir}/tsctl : tsctl.c ${TGTLib}
-	${CLD} ${LdFlags} tsctl.c -o ${BinDir}/tsctl ${Libs}
+	@(echo "${CCAnnounce} tsctl.c -o ${BinDir}/tsctl" ; \
+	  ${CLD} ${LdFlags} tsctl.c -o ${BinDir}/tsctl ${Libs})
 
 ${BinDir}/tscsmp : tscsmp.c ${TGTLib}
-	${CLD} ${LdFlags} tscsmp.c -o ${BinDir}/tscsmp ${Libs}
+	@(echo "${CCAnnounce} tscsmp.c -o ${BinDir}/tscsmp" ; \
+	  ${CLD} ${LdFlags} tscsmp.c -o ${BinDir}/tscsmp ${Libs})
 
 ${BinDir}/tscsmpb : tscsmpb.c ${TGTLib}
-	${CLD} ${LdFlags} tscsmpb.c -o ${BinDir}/tscsmpb ${Libs}
+	@(echo "${CCAnnounce} tscsmpb.c -o ${BinDir}/tscsmpb" ; \
+	  ${CLD} ${LdFlags} tscsmpb.c -o ${BinDir}/tscsmpb ${Libs})
 
 #
 # memory management test
@@ -395,24 +399,28 @@ ${BinDir}/tscsmpb : tscsmpb.c ${TGTLib}
 mm : ${BinDir}/scmm
 
 ${BinDir}/scmm : scmm.c ${TGTLib}
-	${CLD} ${LdFlags} scmm.c -o ${BinDir}/scmm ${Libs}
+	@(echo "${CCAnnounce} scmm.c -o ${BinDir}/scmm" ; \
+	  ${CLD} ${LdFlags} scmm.c -o ${BinDir}/scmm ${Libs})
 #
 # memory diagnostic test
 #
 memchk : ${MMLib} ${BinDir}/tscmtr
 
 ${BinDir}/tscmtr : tscmtr.c ${TGTLib}
-	${CLD} ${LdFlags} tscmtr.c -o ${BinDir}/tscmtr ${MLibs}
+	@(echo "${CCAnnounce} tscmtr.c -o ${BinDir}/tscmtr" ; \
+	  ${CLD} ${LdFlags} tscmtr.c -o ${BinDir}/tscmtr ${MLibs})
 
 memprf : ${MMLib} ${BinDir}/tscmpf
 
 ${BinDir}/tscmpf : tscmpf.c ${TGTLib}
-	${CLD} ${LdFlags} tscmpf.c -o ${BinDir}/tscmpf ${Libs}
+	@(echo "${CCAnnounce} tscmpf.c -o ${BinDir}/tscmpf" ; \
+	  ${CLD} ${LdFlags} tscmpf.c -o ${BinDir}/tscmpf ${Libs})
 
 memovr : ${OMLib} ${BinDir}/tscmo
 
 ${BinDir}/tscmo : ${TGTLib} tscmo.c
-	${CLD} ${LdFlags} tscmo.c -o ${BinDir}/tscmo ${OLibs}
+	@(echo "${CCAnnounce} tscmo.c -o ${BinDir}/tscmo" ; \
+	  ${CLD} ${LdFlags} tscmo.c -o ${BinDir}/tscmo ${OLibs})
 
 #
 # hash/alist test
@@ -420,10 +428,12 @@ ${BinDir}/tscmo : ${TGTLib} tscmo.c
 ha : ${BinDir}/tsca ${BinDir}/tsctr
 
 ${BinDir}/tsca : ${TGTLib} tsca.c
-	${CLD} ${LdFlags} tsca.c -o ${BinDir}/tsca ${Libs}
+	@(echo "${CCAnnounce} tsca.c -o ${BinDir}/tsca" ; \
+	  ${CLD} ${LdFlags} tsca.c -o ${BinDir}/tsca ${Libs})
 
 ${BinDir}/tsctr : ${TGTLib} tsctr.c
-	${CLD} ${LdFlags} tsctr.c -o ${BinDir}/tsctr ${Libs}
+	@(echo "${CCAnnounce} tsctr.c -o ${BinDir}/tsctr" ; \
+	  ${CLD} ${LdFlags} tsctr.c -o ${BinDir}/tsctr ${Libs})
 
 #
 # resource usage test
@@ -431,7 +441,8 @@ ${BinDir}/tsctr : ${TGTLib} tsctr.c
 resource : ${BinDir}/tscrs
 
 ${BinDir}/tscrs : ${TGTLib} tscrs.c
-	${CLD} ${LdFlags} tscrs.c -o ${BinDir}/tscrs ${Libs}
+	@(echo "${CCAnnounce} tscrs.c -o ${BinDir}/tscrs" ; \
+	  ${CLD} ${LdFlags} tscrs.c -o ${BinDir}/tscrs ${Libs})
 
 #
 # io file test
@@ -439,10 +450,12 @@ ${BinDir}/tscrs : ${TGTLib} tscrs.c
 io : ${BinDir}/tscio ${BinDir}/tscbf
 
 ${BinDir}/tscio : tscio.c ${TGTLib}
-	${CLD} ${LdFlags} tscio.c -o ${BinDir}/tscio ${Libs}
+	@(echo "${CCAnnounce} tscio.c -o ${BinDir}/tscio" ; \
+	  ${CLD} ${LdFlags} tscio.c -o ${BinDir}/tscio ${Libs})
 
 ${BinDir}/tscbf : tscbf.c ${TGTLib}
-	${CLD} ${LdFlags} tscbf.c -o ${BinDir}/tscbf ${Libs}
+	@(echo "${CCAnnounce} tscbf.c -o ${BinDir}/tscbf" ; \
+	  ${CLD} ${LdFlags} tscbf.c -o ${BinDir}/tscbf ${Libs})
 
 #
 # mapped file test
@@ -450,7 +463,8 @@ ${BinDir}/tscbf : tscbf.c ${TGTLib}
 mf : ${BinDir}/tscmf
 
 ${BinDir}/tscmf : tscmf.c ${TGTLib}
-	${CLD} ${LdFlags} tscmf.c -o ${BinDir}/tscmf ${Libs}
+	@(echo "${CCAnnounce} tscmf.c -o ${BinDir}/tscmf" ; \
+	  ${CLD} ${LdFlags} tscmf.c -o ${BinDir}/tscmf ${Libs})
 
 #
 # isprint test
@@ -458,7 +472,8 @@ ${BinDir}/tscmf : tscmf.c ${TGTLib}
 print : ${BinDir}/tscpr
 
 ${BinDir}/tscpr : tscpr.c ${TGTLib}
-	${CLD} ${LdFlags} tscpr.c -o ${BinDir}/tscpr ${Libs}
+	@(echo "${CCAnnounce} tscpr.c -o ${BinDir}/tscpr" ; \
+	  ${CLD} ${LdFlags} tscpr.c -o ${BinDir}/tscpr ${Libs})
 
 #
 # retrace test
@@ -467,7 +482,8 @@ ${BinDir}/tscpr : tscpr.c ${TGTLib}
 retrace : ${BinDir}/tscrtr
 
 ${BinDir}/tscrtr : ${TGTLib} tscrtr.c
-	${CLD} ${LdFlags} tscrtr.c -o ${BinDir}/tscrtr ${DLibs}
+	@(echo "${CCAnnounce} tscrtr.c -o ${BinDir}/tscrtr" ; \
+	  ${CLD} ${LdFlags} tscrtr.c -o ${BinDir}/tscrtr ${DLibs})
 
 #
 # large file types
@@ -475,7 +491,8 @@ ${BinDir}/tscrtr : ${TGTLib} tscrtr.c
 lf : ${BinDir}/tscoff
 
 ${BinDir}/tscoff : ${TGTLib} tscoff.c
-	${CLD} ${LdFlags} tscoff.c -o ${BinDir}/tscoff ${Libs}
+	@(echo "${CCAnnounce} tscoff.c -o ${BinDir}/tscoff" ; \
+	  ${CLD} ${LdFlags} tscoff.c -o ${BinDir}/tscoff ${Libs})
 
 #
 # memory manager overhead
@@ -483,7 +500,8 @@ ${BinDir}/tscoff : ${TGTLib} tscoff.c
 mmov : ${BinDir}/tscmov
 
 ${BinDir}/tscmov : ${TGTLib} tscmov.c
-	${CLD} ${LdFlags} tscmov.c -o ${BinDir}/tscmov ${Libs}
+	@(echo "${CCAnnounce} tscmov.c -o ${BinDir}/tscmov" ; \
+	  ${CLD} ${LdFlags} tscmov.c -o ${BinDir}/tscmov ${Libs})
 
 #
 # comprehensive test suite
@@ -493,35 +511,44 @@ compre : ${BinDir}/tscstr ${BinDir}/tscctl ${BinDir}/tscmemc \
          ${BinDir}/tscdl
 
 ${BinDir}/tscstr : ${TGTLib} tscstr.c
-	${CLD} ${LdFlags} tscstr.c -o ${BinDir}/tscstr ${Libs}
+	@(echo "${CCAnnounce} tscstr.c -o ${BinDir}/tscstr" ; \
+	  ${CLD} ${LdFlags} tscstr.c -o ${BinDir}/tscstr ${Libs})
 
 ${BinDir}/tscctl : ${TGTLib} tscctl.c
-	${CLD} ${LdFlags} tscctl.c -o ${BinDir}/tscctl ${Libs}
+	@(echo "${CCAnnounce} tscctl.c -o ${BinDir}/tscctl" ; \
+	  ${CLD} ${LdFlags} tscctl.c -o ${BinDir}/tscctl ${Libs})
 
 ${BinDir}/tscmemc : ${TGTLib} tscmemc.c
-	${CLD} ${LdFlags} tscmemc.c -o ${BinDir}/tscmemc ${Libs}
+	@(echo "${CCAnnounce} tscmemc.c -o ${BinDir}/tscmemc" ; \
+	  ${CLD} ${LdFlags} tscmemc.c -o ${BinDir}/tscmemc ${Libs})
 
 ${BinDir}/interact : ${TGTLib} interact.c
-	${CLD} ${LdFlags} interact.c -o ${BinDir}/interact ${Libs}
+	@(echo "${CCAnnounce} interact.c -o ${BinDir}/interact" ; \
+	  ${CLD} ${LdFlags} interact.c -o ${BinDir}/interact ${Libs})
 
 ${BinDir}/tscvs : ${TGTLib} tscvs.c
-	${CLD} ${LdFlags} tscvs.c -o ${BinDir}/tscvs ${Libs}
+	@(echo "${CCAnnounce} tscvs.c -o ${BinDir}/tscvs" ; \
+	  ${CLD} ${LdFlags} tscvs.c -o ${BinDir}/tscvs ${Libs})
 
 ${BinDir}/dmake : ${TGTLib} scmkut.c
-	${CLD} -I../psh ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
+	@(echo "${CCAnnounce ${LdFlags} scmkut.c -o ${BinDir}/dmake" ; \
+	  ${CLD} -I../psh ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs})
 
 ${BinDir}/tscar : ${TGTLib} tscar.c
-	${CLD} ${LdFlags} tscar.c -o ${BinDir}/tscar ${Libs}
+	@(echo "${CCAnnounce} tscar.c -o ${BinDir}/tscar" ; \
+	  ${CLD} ${LdFlags} tscar.c -o ${BinDir}/tscar ${Libs})
 
 ${BinDir}/tscdl : ${TGTLib} tscdl.c
-	${CLD} ${LdFlags} tscdl.c -o ${BinDir}/tscdl ${DLibs}
+	@(echo "${CCAnnounce} tscdl.c -o ${BinDir}/tscdl" ; \
+	  ${CLD} ${LdFlags} tscdl.c -o ${BinDir}/tscdl ${DLibs})
 
 foo : ${TGTLib} foo.c
 	${CC} -c foo.c -o foo.o
 	${CLD} ${LdFlags} foo.o -o foo ${Libs}
 
 example : ${TGTLib} example.c
-	${CLD} ${LdFlags} example.c -o example ${Libs}
+	@(echo "${CCAnnounce} example.c -o example" ; \
+	  ${CLD} ${LdFlags} example.c -o example ${Libs})
 
 #
 # dmake - build and test dmake

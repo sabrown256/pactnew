@@ -113,14 +113,16 @@ IncAction = @pact generate
 prep : ${BinDir}/tpacpp
 
 ${BinDir}/tpacpp : tpacpp.c ${TGTLib}
-	${CLD} ${LdFlags} tpacpp.c -o ${BinDir}/tpacpp ${NGLibs}
+	@(echo "${CCAnnounce} tpacpp.c -o ${BinDir}/tpacpp" ; \
+	  ${CLD} ${LdFlags} tpacpp.c -o ${BinDir}/tpacpp ${NGLibs})
 #
 # test new variable definition
 #
 defvar : ${BinDir}/tpadef
 
 ${BinDir}/tpadef : tpadef.c ${TGTLib}
-	${CLD} ${LdFlags} tpadef.c -o ${BinDir}/tpadef ${NGLibs}
+	@(echo "${CCAnnounce} tpadef.c -o ${BinDir}/tpadef" ; \
+	  ${CLD} ${LdFlags} tpadef.c -o ${BinDir}/tpadef ${NGLibs})
 
 #
 # make the executable

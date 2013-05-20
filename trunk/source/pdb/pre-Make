@@ -153,52 +153,68 @@ Gst : ${BinDir}/tpdgs
 Lst : ${BinDir}/tpdls
 
 ${BinDir}/tpdb : tpdb.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdb.c -o ${BinDir}/tpdb ${Libs}
+	@(echo "${CCAnnounce} tpdb.c -o ${BinDir}/tpdb" ; \
+	  ${CLD} ${LdFlags} tpdb.c -o ${BinDir}/tpdb ${Libs})
 
 ${BinDir}/tpdc : tpdc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdc.c -o ${BinDir}/tpdc ${Libs}
+	@(echo "${CCAnnounce} tpdc.c -o ${BinDir}/tpdc" ; \
+	  ${CLD} ${LdFlags} tpdc.c -o ${BinDir}/tpdc ${Libs})
 
 ${BinDir}/tpdf : tpdf.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdf.c -o ${BinDir}/tpdf ${Libs}
+	@(echo "${CCAnnounce} tpdf.c -o ${BinDir}/tpdf" ; \
+	  ${CLD} ${LdFlags} tpdf.c -o ${BinDir}/tpdf ${Libs})
 
 ${BinDir}/tpdp : tpdp.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdp.c -o ${BinDir}/tpdp ${Libs}
+	@(echo "${CCAnnounce} tpdp.c -o ${BinDir}/tpdp" ; \
+	  ${CLD} ${LdFlags} tpdp.c -o ${BinDir}/tpdp ${Libs})
 
 ${BinDir}/tpda : tpda.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpda.c -o ${BinDir}/tpda ${Libs}
+	@(echo "${CCAnnounce} tpda.c -o ${BinDir}/tpda" ; \
+	  ${CLD} ${LdFlags} tpda.c -o ${BinDir}/tpda ${Libs})
 
 ${BinDir}/tpdas : tpdas.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdas.c -o ${BinDir}/tpdas ${Libs}
+	@(echo "${CCAnnounce} tpdas.c -o ${BinDir}/tpdas" ; \
+	  ${CLD} ${LdFlags} tpdas.c -o ${BinDir}/tpdas ${Libs})
 
 ${BinDir}/tpdop : tpdop.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdop.c -o ${BinDir}/tpdop ${Libs}
+	@(echo "${CCAnnounce} tpdop.c -o ${BinDir}/tpdop" ; \
+	  ${CLD} ${LdFlags} tpdop.c -o ${BinDir}/tpdop ${Libs})
 
 ${BinDir}/tpdap : tpdap.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdap.c -o ${BinDir}/tpdap ${Libs}
+	@(echo "${CCAnnounce} tpdap.c -o ${BinDir}/tpdap" ; \
+	  ${CLD} ${LdFlags} tpdap.c -o ${BinDir}/tpdap ${Libs})
 
 ${BinDir}/tpdgs : tpdgs.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdgs.c -o ${BinDir}/tpdgs ${Libs}
+	@(echo "${CCAnnounce} tpdgs.c -o ${BinDir}/tpdgs" ; \
+	  ${CLD} ${LdFlags} tpdgs.c -o ${BinDir}/tpdgs ${Libs})
 
 ${BinDir}/tpdls : tpdls.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdls.c -o ${BinDir}/tpdls ${Libs}
+	@(echo "${CCAnnounce} tpdls.c -o ${BinDir}/tpdls" ; \
+	  ${CLD} ${LdFlags} tpdls.c -o ${BinDir}/tpdls ${Libs})
 
 ${BinDir}/tpdnrm : tpdnrm.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdnrm.c -o ${BinDir}/tpdnrm ${Libs}
+	@(echo "${CCAnnounce} tpdnrm.c -o ${BinDir}/tpdnrm" ; \
+	  ${CLD} ${LdFlags} tpdnrm.c -o ${BinDir}/tpdnrm ${Libs})
 
 ${BinDir}/tpdcs : tpdcs.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdcs.c -o ${BinDir}/tpdcs ${Libs}
+	@(echo "${CCAnnounce} tpdcs.c -o ${BinDir}/tpdcs" ; \
+	  ${CLD} ${LdFlags} tpdcs.c -o ${BinDir}/tpdcs ${Libs})
         
 ${BinDir}/tpdfr : tpdfr.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdfr.c -o ${BinDir}/tpdfr ${Libs}
+	@(echo "${CCAnnounce} tpdfr.c -o ${BinDir}/tpdfr" ; \
+	  ${CLD} ${LdFlags} tpdfr.c -o ${BinDir}/tpdfr ${Libs})
         
 ${BinDir}/tpdbf : tpdbf.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdbf.c -o ${BinDir}/tpdbf ${Libs}
+	@(echo "${CCAnnounce} tpdbf.c -o ${BinDir}/tpdbf" ; \
+	  ${CLD} ${LdFlags} tpdbf.c -o ${BinDir}/tpdbf ${Libs})
         
 ${BinDir}/tpdfc : tpdfc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdfc.c -o ${BinDir}/tpdfc ${Libs}
+	@(echo "${CCAnnounce} tpdfc.c -o ${BinDir}/tpdfc" ; \
+	  ${CLD} ${LdFlags} tpdfc.c -o ${BinDir}/tpdfc ${Libs})
         
 ${BinDir}/tpdds : tpdds.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
-	${CLD} ${LdFlags} tpdds.c -o ${BinDir}/tpdds ${Libs}
+	@(echo "${CCAnnounce} tpdds.c -o ${BinDir}/tpdds" ; \
+	  ${CLD} ${LdFlags} tpdds.c -o ${BinDir}/tpdds ${Libs})
         
 #
 # ascii vs binary performance
@@ -206,7 +222,8 @@ ${BinDir}/tpdds : tpdds.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 ascii : ${BinDir}/tpdd
 
 ${BinDir}/tpdd : tpdd.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} tpdd.c -o ${BinDir}/tpdd ${Libs} ${MDI_Lib}
+	@(echo "${CCAnnounce} tpdd.c -o ${BinDir}/tpdd ${Libs} ${M" ; \
+	  ${CLD} ${LdFlags} tpdd.c -o ${BinDir}/tpdd ${Libs} ${MDI_Lib})
 
 #
 # large file test
@@ -214,7 +231,8 @@ ${BinDir}/tpdd : tpdd.c ${InstallDep} ${Hdrs} ${DepLib}
 lf : ${BinDir}/tpdlf
 
 ${BinDir}/tpdlf : tpdlf.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} tpdlf.c -o ${BinDir}/tpdlf ${Libs} ${MDI_Lib}
+	@(echo "${CCAnnounce} tpdlf.c -o ${BinDir}/tpdlf ${Libs} ${M" ; \
+	  ${CLD} ${LdFlags} tpdlf.c -o ${BinDir}/tpdlf ${Libs} ${MDI_Lib})
 
 #
 # net io test
@@ -222,7 +240,8 @@ ${BinDir}/tpdlf : tpdlf.c ${InstallDep} ${Hdrs} ${DepLib}
 net : ${BinDir}/tpdn
 
 ${BinDir}/tpdn : tpdn.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} tpdn.c -o ${BinDir}/tpdn ${Libs}
+	@(echo "${CCAnnounce} tpdn.c -o ${BinDir}/tpdn" ; \
+	  ${CLD} ${LdFlags} tpdn.c -o ${BinDir}/tpdn ${Libs})
 
 #
 # pdb to hdf converter
@@ -230,7 +249,8 @@ ${BinDir}/tpdn : tpdn.c ${InstallDep} ${Hdrs} ${DepLib}
 pdb2hdf :
 
 ${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} pdb2hdf.c -o ${BinDir}/pdb2hdf ${Libs}
+	@(echo "${CCAnnounce} pdb2hdf.c -o ${BinDir}/pdb2hdf" ; \
+	  ${CLD} ${LdFlags} pdb2hdf.c -o ${BinDir}/pdb2hdf ${Libs})
 
 #
 # smp i/o test
@@ -238,7 +258,8 @@ ${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs} ${DepLib}
 smp : ${BinDir}/tpdsmp
 
 ${BinDir}/tpdsmp : tpdsmp.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} tpdsmp.c -o ${BinDir}/tpdsmp ${Libs}
+	@(echo "${CCAnnounce} tpdsmp.c -o ${BinDir}/tpdsmp" ; \
+	  ${CLD} ${LdFlags} tpdsmp.c -o ${BinDir}/tpdsmp ${Libs})
 
 #
 # distributed mp i/o test
@@ -246,7 +267,8 @@ ${BinDir}/tpdsmp : tpdsmp.c ${InstallDep} ${Hdrs} ${DepLib}
 dp : ${BinDir}/tpddp
 
 ${BinDir}/tpddp : tpddp.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CC} ${LdFlags} tpddp.c -o ${BinDir}/tpddp ${Libs} ${DPLib}
+	@(echo "${CCAnnounce} tpddp.c -o ${BinDir}/tpddp ${Libs}" ; \
+	  ${CC} ${LdFlags} tpddp.c -o ${BinDir}/tpddp ${Libs} ${DPLib})
 
 #
 # test attribute handling
@@ -254,10 +276,12 @@ ${BinDir}/tpddp : tpddp.c ${InstallDep} ${Hdrs} ${DepLib}
 attr : ${BinDir}/tpda ${BinDir}/tpdxrd ${BinDir}/tpdxn
 
 ${BinDir}/tpdxrd : tpdxrd.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} tpdxrd.c -o ${BinDir}/tpdxrd ${Libs}
+	@(echo "${CCAnnounce} tpdxrd.c -o ${BinDir}/tpdxrd" ; \
+	  ${CLD} ${LdFlags} tpdxrd.c -o ${BinDir}/tpdxrd ${Libs})
 
 ${BinDir}/tpdxn : tpdxn.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} tpdxn.c -o ${BinDir}/tpdxn ${Libs}
+	@(echo "${CCAnnounce} tpdxn.c -o ${BinDir}/tpdxn" ; \
+	  ${CLD} ${LdFlags} tpdxn.c -o ${BinDir}/tpdxn ${Libs})
 
 #
 # test cast and typedef of primitives handling
@@ -265,10 +289,12 @@ ${BinDir}/tpdxn : tpdxn.c ${InstallDep} ${Hdrs} ${DepLib}
 def : ${BinDir}/tpdrc ${BinDir}/tpdtd
 
 ${BinDir}/tpdrc : tpdrc.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} tpdrc.c -o ${BinDir}/tpdrc ${Libs}
+	@(echo "${CCAnnounce} tpdrc.c -o ${BinDir}/tpdrc" ; \
+	  ${CLD} ${LdFlags} tpdrc.c -o ${BinDir}/tpdrc ${Libs})
 
 ${BinDir}/tpdtd : tpdtd.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} tpdtd.c -o ${BinDir}/tpdtd ${Libs}
+	@(echo "${CCAnnounce} tpdtd.c -o ${BinDir}/tpdtd" ; \
+	  ${CLD} ${LdFlags} tpdtd.c -o ${BinDir}/tpdtd ${Libs})
 
 #
 # test file descriptor usage
@@ -276,7 +302,8 @@ ${BinDir}/tpdtd : tpdtd.c ${InstallDep} ${Hdrs} ${DepLib}
 fd : ${BinDir}/tpdfd
 
 ${BinDir}/tpdfd : tpdfd.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} tpdfd.c -o ${BinDir}/tpdfd ${Libs}
+	@(echo "${CCAnnounce} tpdfd.c -o ${BinDir}/tpdfd" ; \
+	  ${CLD} ${LdFlags} tpdfd.c -o ${BinDir}/tpdfd ${Libs})
 
 #
 # timing test
@@ -284,7 +311,8 @@ ${BinDir}/tpdfd : tpdfd.c ${InstallDep} ${Hdrs} ${DepLib}
 time : ${BinDir}/pdtime
 
 ${BinDir}/pdtime : pdtime.c ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} pdtime.c -o ${BinDir}/pdtime ${Libs}
+	@(echo "${CCAnnounce} pdtime.c -o ${BinDir}/pdtime" ; \
+	  ${CLD} ${LdFlags} pdtime.c -o ${BinDir}/pdtime ${Libs})
 
 #
 # exam
@@ -293,10 +321,12 @@ exambin :
 	${CLD} ${LdFlags} exambin.c -o ${BinDir}/exambin
 
 exam :
-	${CLD} ${LdFlags} exam.c -o ${BinDir}/exam
+	@(echo "${CCAnnounce} exam.c -o ${BinDi" ; \
+	  ${CLD} ${LdFlags} exam.c -o ${BinDir}/exam)
 
 trans : ${InstallDep} ${Hdrs} ${DepLib}
-	${CLD} ${LdFlags} pdctrns.c -o ${BinDir}/pdctrns ${Libs}
+	@(echo "${CCAnnounce} pdctrns.c -o ${BinDir}/pdctrns" ; \
+	  ${CLD} ${LdFlags} pdctrns.c -o ${BinDir}/pdctrns ${Libs})
 
 # extra commands needed when building TGTLib
 LibAction = build-spokes
