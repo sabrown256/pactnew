@@ -264,7 +264,7 @@ static void srv_setup(srvdes *sv, int *ptmax, int *pdt)
 
     s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
     if (IS_NULL(s) == TRUE)
-       dt = tmax >> 1;
+       dt = tmax >> 3;
     else
        {dt = atoi(s);
 	SLOG(sv, 4, "PERDB_IDLE_INTERVAL = %d", dt);};

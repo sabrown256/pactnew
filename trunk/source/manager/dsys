@@ -1098,16 +1098,34 @@ switch ($Cmnd)
 
 # setup for PERDB session
         flog $Log setenv PERDB_IDLE_TIMEOUT 600
+        flog $Log setenv PERDB_IDLE_INTERVAL 10
         flog $Log setenv PERDB_PATH $EtcDir/cfg
         flog $Log set dbopt = ( -f $PERDB_PATH )
 
 # NOTE: a dsys reconfig will launch a server so kill any running
 # servers and do dsys config with a clean slate
-        flog $Log $PERDB -l quit:
-        while (-f $PERDB_PATH.conn)
-           sleep 1
-        end
-
+# perdb quit: can hang if the connection is already gone so avoid this
+# perdb will quit if the connection goes but it may take awhile so
+# lags are a problem
+        if (0) then
+           flog $Log $PERDB -l quit:
+           while (-f $PERDB_PATH.conn)
+              sleep 1
+           end
+        else
+           Note $Log "Checking for running perdb servers"
+           if (-f $PERDB_PATH.conn) then
+              set linf = ( `cat $PERDB_PATH.conn |& sed 's|[^a-zA-Z0-9]|x|g'` )
+              set lpid = "$linf[$#linf]"
+              Note $Log "   pid = $lpid"
+              flog $Log (ps -ef | grep $lpid | grep perdb)
+              if ($status == 0) then
+                 flog $Log kill -9 $lpid
+              endif
+              unset lpid
+              unset linf
+           endif
+        endif
         flog $Log $RM ${PERDB_PATH}*
 
         flog $Log $PERDB -l -c -s
