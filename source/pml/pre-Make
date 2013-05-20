@@ -129,7 +129,8 @@ chk++ :
 matrix : ${BinDir}/tmlmtx
 
 ${BinDir}/tmlmtx : tmlmtx.c ${TGTLib}
-	${CLD} ${LdFlags} tmlmtx.c -o ${BinDir}/tmlmtx ${Libs}
+	@(echo "${CCAnnounce} tmlmtx.c -o ${BinDir}/tmlmtx" ; \
+	  ${CLD} ${LdFlags} tmlmtx.c -o ${BinDir}/tmlmtx ${Libs})
 
 #
 # test functions
@@ -137,7 +138,8 @@ ${BinDir}/tmlmtx : tmlmtx.c ${TGTLib}
 funcs : ${BinDir}/tmlfn
 
 ${BinDir}/tmlfn : tmlfn.c ${TGTLib}
-	${CLD} ${LdFlags} tmlfn.c -o ${BinDir}/tmlfn ${Libs}
+	@(echo "${CCAnnounce} tmlfn.c -o ${BinDir}/tmlfn" ; \
+	  ${CLD} ${LdFlags} tmlfn.c -o ${BinDir}/tmlfn ${Libs})
 
 #
 # test LR to AC mapping
@@ -145,7 +147,8 @@ ${BinDir}/tmlfn : tmlfn.c ${TGTLib}
 lrac : ${BinDir}/tmlac
 
 ${BinDir}/tmlac : tmlac.c ${TGTLib}
-	${CLD} ${LdFlags} tmlac.c -o ${BinDir}/tmlac ${Libs}
+	@(echo "${CCAnnounce} tmlac.c -o ${BinDir}/tmlac" ; \
+	  ${CLD} ${LdFlags} tmlac.c -o ${BinDir}/tmlac ${Libs})
 
 #
 # test topological sort
@@ -153,7 +156,8 @@ ${BinDir}/tmlac : tmlac.c ${TGTLib}
 topsort : ${BinDir}/tmlstp
 
 ${BinDir}/tmlstp : tmlstp.c ${TGTLib}
-	${CLD} ${LdFlags} tmlstp.c -o ${BinDir}/tmlstp ${Libs}
+	@(echo "${CCAnnounce} tmlstp.c -o ${BinDir}/tmlstp" ; \
+	  ${CLD} ${LdFlags} tmlstp.c -o ${BinDir}/tmlstp ${Libs})
 
 #
 # test matrix ICG solvers
@@ -161,10 +165,12 @@ ${BinDir}/tmlstp : tmlstp.c ${TGTLib}
 icsolv : ${BinDir}/tmlic ${BinDir}/tmlics ${BinDir}/tmlcg
 
 ${BinDir}/tmlic : tmlic.c ${TGTLib}
-	${CLD} ${LdFlags} tmlic.c -o ${BinDir}/tmlic ${Libs}
+	@(echo "${CCAnnounce} tmlic.c -o ${BinDir}/tmlic" ; \
+	  ${CLD} ${LdFlags} tmlic.c -o ${BinDir}/tmlic ${Libs})
 
 ${BinDir}/tmlics : tmlics.c ${TGTLib}
-	${CLD} ${LdFlags} tmlics.c -o ${BinDir}/tmlics ${Libs}
+	@(echo "${CCAnnounce} tmlics.c -o ${BinDir}/tmlics" ; \
+	  ${CLD} ${LdFlags} tmlics.c -o ${BinDir}/tmlics ${Libs})
 
 #
 # test sparse linear CG solvers
@@ -172,7 +178,8 @@ ${BinDir}/tmlics : tmlics.c ${TGTLib}
 cgsolv : ${BinDir}/tmlcg
 
 ${BinDir}/tmlcg : tmlcg.c ${TGTLib}
-	${CLD} ${LdFlags} tmlcg.c -o ${BinDir}/tmlcg ${Libs}
+	@(echo "${CCAnnounce} tmlcg.c -o ${BinDir}/tmlcg" ; \
+	  ${CLD} ${LdFlags} tmlcg.c -o ${BinDir}/tmlcg ${Libs})
 
 #
 # test SVD solvers
@@ -180,7 +187,8 @@ ${BinDir}/tmlcg : tmlcg.c ${TGTLib}
 svdsolv : ${BinDir}/tmlsvd
 
 ${BinDir}/tmlsvd : tmlsvd.c ${TGTLib}
-	${CLD} ${LdFlags} tmlsvd.c -o ${BinDir}/tmlsvd ${Libs}
+	@(echo "${CCAnnounce} tmlsvd.c -o ${BinDir}/tmlsvd" ; \
+	  ${CLD} ${LdFlags} tmlsvd.c -o ${BinDir}/tmlsvd ${Libs})
 
 #
 # test EIGEN systems
@@ -188,7 +196,8 @@ ${BinDir}/tmlsvd : tmlsvd.c ${TGTLib}
 eigen : ${BinDir}/tmlev
 
 ${BinDir}/tmlev : tmlev.c ${TGTLib}
-	${CLD} ${LdFlags} tmlev.c -o ${BinDir}/tmlev ${Libs}
+	@(echo "${CCAnnounce} tmlev.c -o ${BinDir}/tmlev" ; \
+	  ${CLD} ${LdFlags} tmlev.c -o ${BinDir}/tmlev ${Libs})
 
 #
 # test polygon intersection
@@ -196,7 +205,8 @@ ${BinDir}/tmlev : tmlev.c ${TGTLib}
 ipoly : ${BinDir}/tmlip
 
 ${BinDir}/tmlip : tmlip.c ${TGTLib}
-	${CLD} ${LdFlags} tmlip.c -o ${BinDir}/tmlip ${Libs}
+	@(echo "${CCAnnounce} tmlip.c -o ${BinDir}/tmlip" ; \
+	  ${CLD} ${LdFlags} tmlip.c -o ${BinDir}/tmlip ${Libs})
 
 #
 # test interpolation
@@ -204,7 +214,8 @@ ${BinDir}/tmlip : tmlip.c ${TGTLib}
 interp : ${BinDir}/tmli
 
 ${BinDir}/tmli : tmli.c ${TGTLib}
-	${CLD} ${LdFlags} tmli.c -o ${BinDir}/tmli ${Libs}
+	@(echo "${CCAnnounce} tmli.c -o ${BinDir}/tmli" ; \
+	  ${CLD} ${LdFlags} tmli.c -o ${BinDir}/tmli ${Libs})
 
 #
 # test ln norm
@@ -212,7 +223,8 @@ ${BinDir}/tmli : tmli.c ${TGTLib}
 lnnorm : ${BinDir}/tmllnnm
 
 ${BinDir}/tmllnnm : tmllnnm.c ${TGTLib}
-	${CLD} ${LdFlags} tmllnnm.c -o ${BinDir}/tmllnnm ${Libs}
+	@(echo "${CCAnnounce} tmllnnm.c -o ${BinDir}/tmllnnm" ; \
+	  ${CLD} ${LdFlags} tmllnnm.c -o ${BinDir}/tmllnnm ${Libs})
 
 #
 # test checksum routines
@@ -220,7 +232,8 @@ ${BinDir}/tmllnnm : tmllnnm.c ${TGTLib}
 checksum : ${BinDir}/tmlck ${BinDir}/tmlcsm
 
 ${BinDir}/tmlck : tmlck.c ${TGTLib}
-	${CLD} ${LdFlags} tmlck.c -o ${BinDir}/tmlck ${Libs}
+	@(echo "${CCAnnounce} tmlck.c -o ${BinDir}/tmlck" ; \
+	  ${CLD} ${LdFlags} tmlck.c -o ${BinDir}/tmlck ${Libs})
 
 ${BinDir}/tmlcsm : tmlcsm.c ${TGTLib}
 	@(echo "${CCAnnounce} tmlcsm.c -o ${BinDir}/tmlcsm" ; \
@@ -232,7 +245,8 @@ ${BinDir}/tmlcsm : tmlcsm.c ${TGTLib}
 fpe : ${BinDir}/tmlfpe ${BinDir}/tmlnan
 
 ${BinDir}/tmlfpe : tmlfpe.c ${TGTLib}
-	${CLD} ${LdFlags} tmlfpe.c -o ${BinDir}/tmlfpe ${Libs}
+	@(echo "${CCAnnounce} tmlfpe.c -o ${BinDir}/tmlfpe" ; \
+	  ${CLD} ${LdFlags} tmlfpe.c -o ${BinDir}/tmlfpe ${Libs})
 
 ${BinDir}/tmlnan : tmlnan.c ${TGTLib}
 	${CC} -c tmlnan.c -o ${PACTTmpDir}/tmlnan.o
@@ -244,7 +258,8 @@ ${BinDir}/tmlnan : tmlnan.c ${TGTLib}
 perf : ${BinDir}/tmlpf ${BinDir}/tmlnan
 
 ${BinDir}/tmlpf : tmlpf.c ${TGTLib}
-	${CLD} ${LdFlags} tmlpf.c -o ${BinDir}/tmlpf ${Libs}
+	@(echo "${CCAnnounce} tmlpf.c -o ${BinDir}/tmlpf" ; \
+	  ${CLD} ${LdFlags} tmlpf.c -o ${BinDir}/tmlpf ${Libs})
 
 #
 # link 

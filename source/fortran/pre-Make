@@ -150,7 +150,8 @@ ${BinDir}/tscfomp : tscfomp.f ${InstallDep}
 scan : ${BinDir}/tscls
 
 ${BinDir}/tscls : tscls.c ${InstallDep}
-	${CLD} ${LdFlags} tscls.c -o ${BinDir}/tscls ${Libs}
+	@(echo "${CCAnnounce} tscls.c -o ${BinDir}/tscls" ; \
+	  ${CLD} ${LdFlags} tscls.c -o ${BinDir}/tscls ${Libs})
 
 # PDB tests
 
@@ -201,7 +202,8 @@ ${BinDir}/tgsfc : tgsfc.f ${InstallDep}
 panacea : ${BinDir}/tpath ${BinDir}/tpafth
 
 ${BinDir}/tpath : tpath.c ${InstallDep}
-	${CLD} ${LdFlags} tpath.c -o ${BinDir}/tpath ${NGLibs}
+	@(echo "${CCAnnounce} tpath.c -o ${BinDir}/tpath" ; \
+	  ${CLD} ${LdFlags} tpath.c -o ${BinDir}/tpath ${NGLibs})
 
 ${BinDir}/tpafth : tpafth.f ${InstallDep}
 	${FC} ${LdFlags} tpafth.f -o ${BinDir}/tpafth ${NGLibs}

@@ -174,7 +174,8 @@ sharedlib:
 Cstd : ${BinDir}/tgsa
 
 ${BinDir}/tgsa : tgsa.c ${TGTLib}
-	${CLD} ${LdFlags} tgsa.c -o ${BinDir}/tgsa ${Libs}
+	@(echo "${CCAnnounce} tgsa.c -o ${BinDir}/tgsa" ; \
+	  ${CLD} ${LdFlags} tgsa.c -o ${BinDir}/tgsa ${Libs})
 
 #
 # event handling test
@@ -183,7 +184,8 @@ ${BinDir}/tgsa : tgsa.c ${TGTLib}
 event : ${BinDir}/tgsev
 
 ${BinDir}/tgsev : ${TGTLib} tgsev.c
-	${CLD} ${LdFlags} tgsev.c -o ${BinDir}/tgsev ${Libs}
+	@(echo "${CCAnnounce} tgsev.c -o ${BinDir}/tgsev" ; \
+	  ${CLD} ${LdFlags} tgsev.c -o ${BinDir}/tgsev ${Libs})
 
 #
 # line drawing test
@@ -191,7 +193,8 @@ ${BinDir}/tgsev : ${TGTLib} tgsev.c
 line : ${BinDir}/tgscl
 
 ${BinDir}/tgscl : tgscl.c ${TGTLib}
-	${CLD} ${LdFlags} tgscl.c -o ${BinDir}/tgscl ${Libs}
+	@(echo "${CCAnnounce} tgscl.c -o ${BinDir}/tgscl" ; \
+	  ${CLD} ${LdFlags} tgscl.c -o ${BinDir}/tgscl ${Libs})
 
 #
 # poly segment test
@@ -199,7 +202,8 @@ ${BinDir}/tgscl : tgscl.c ${TGTLib}
 polyseg : ${BinDir}/tgsml
 
 ${BinDir}/tgsml : tgsml.c ${TGTLib}
-	${CLD} ${LdFlags} tgsml.c -o ${BinDir}/tgsml ${Libs}
+	@(echo "${CCAnnounce} tgsml.c -o ${BinDir}/tgsml" ; \
+	  ${CLD} ${LdFlags} tgsml.c -o ${BinDir}/tgsml ${Libs})
 
 #
 # text handling test
@@ -207,7 +211,8 @@ ${BinDir}/tgsml : tgsml.c ${TGTLib}
 text : ${BinDir}/tgstx
 
 ${BinDir}/tgstx : tgstx.c ${TGTLib}
-	${CLD} ${LdFlags} tgstx.c -o ${BinDir}/tgstx ${Libs}
+	@(echo "${CCAnnounce} tgstx.c -o ${BinDir}/tgstx" ; \
+	  ${CLD} ${LdFlags} tgstx.c -o ${BinDir}/tgstx ${Libs})
 
 #
 # transformation test
@@ -215,7 +220,8 @@ ${BinDir}/tgstx : tgstx.c ${TGTLib}
 trans : ${BinDir}/tgstr
 
 ${BinDir}/tgstr : tgstr.c ${TGTLib}
-	${CLD} ${LdFlags} tgstr.c -o ${BinDir}/tgstr ${Libs}
+	@(echo "${CCAnnounce} tgstr.c -o ${BinDir}/tgstr" ; \
+	  ${CLD} ${LdFlags} tgstr.c -o ${BinDir}/tgstr ${Libs})
 
 #
 # curve drawing test
@@ -223,7 +229,8 @@ ${BinDir}/tgstr : tgstr.c ${TGTLib}
 curve : ${BinDir}/tgsln
 
 ${BinDir}/tgsln : tgsln.c ${TGTLib}
-	${CLD} ${LdFlags} tgsln.c -o ${BinDir}/tgsln ${Libs}
+	@(echo "${CCAnnounce} tgsln.c -o ${BinDir}/tgsln" ; \
+	  ${CLD} ${LdFlags} tgsln.c -o ${BinDir}/tgsln ${Libs})
 
 #
 # surface test
@@ -231,7 +238,8 @@ ${BinDir}/tgsln : tgsln.c ${TGTLib}
 surface : ${BinDir}/tgssf
 
 ${BinDir}/tgssf : tgssf.c ${TGTLib}
-	${CLD} ${LdFlags} tgssf.c -o ${BinDir}/tgssf ${Libs}
+	@(echo "${CCAnnounce} tgssf.c -o ${BinDir}/tgssf" ; \
+	  ${CLD} ${LdFlags} tgssf.c -o ${BinDir}/tgssf ${Libs})
 
 #
 # fill-poly test
@@ -239,7 +247,8 @@ ${BinDir}/tgssf : tgssf.c ${TGTLib}
 fillpoly: ${BinDir}/tgsfp
 
 ${BinDir}/tgsfp : tgsfp.c ${TGTLib}
-	${CLD} ${LdFlags} tgsfp.c -o ${BinDir}/tgsfp ${Libs}
+	@(echo "${CCAnnounce} tgsfp.c -o ${BinDir}/tgsfp" ; \
+	  ${CLD} ${LdFlags} tgsfp.c -o ${BinDir}/tgsfp ${Libs})
 
 #
 # contour test
@@ -247,7 +256,8 @@ ${BinDir}/tgsfp : tgsfp.c ${TGTLib}
 contour : ${BinDir}/tgscn
 
 ${BinDir}/tgscn : tgscn.c ${TGTLib}
-	${CLD} ${LdFlags} tgscn.c -o ${BinDir}/tgscn ${Libs}
+	@(echo "${CCAnnounce} tgscn.c -o ${BinDir}/tgscn" ; \
+	  ${CLD} ${LdFlags} tgscn.c -o ${BinDir}/tgscn ${Libs})
 
 #
 # simple contour test
@@ -255,7 +265,8 @@ ${BinDir}/tgscn : tgscn.c ${TGTLib}
 scontour : ${BinDir}/tgscnb
 
 ${BinDir}/tgscnb : tgscnb.c ${TGTLib}
-	${CLD} ${LdFlags} tgscnb.c -o ${BinDir}/tgscnb ${Libs}
+	@(echo "${CCAnnounce} tgscnb.c -o ${BinDir}/tgscnb" ; \
+	  ${CLD} ${LdFlags} tgscnb.c -o ${BinDir}/tgscnb ${Libs})
 
 #
 # vector test
@@ -263,7 +274,8 @@ ${BinDir}/tgscnb : tgscnb.c ${TGTLib}
 vector : ${BinDir}/tgsvc
 
 ${BinDir}/tgsvc : tgsvc.c ${TGTLib}
-	${CLD} ${LdFlags} tgsvc.c -o ${BinDir}/tgsvc ${Libs}
+	@(echo "${CCAnnounce} tgsvc.c -o ${BinDir}/tgsvc" ; \
+	  ${CLD} ${LdFlags} tgsvc.c -o ${BinDir}/tgsvc ${Libs})
 
 #
 # image test
@@ -271,7 +283,8 @@ ${BinDir}/tgsvc : tgsvc.c ${TGTLib}
 image : ${BinDir}/tgsim
 
 ${BinDir}/tgsim : tgsim.c ${TGTLib}
-	${CLD} ${LdFlags} tgsim.c -o ${BinDir}/tgsim ${Libs}
+	@(echo "${CCAnnounce} tgsim.c -o ${BinDir}/tgsim" ; \
+	  ${CLD} ${LdFlags} tgsim.c -o ${BinDir}/tgsim ${Libs})
 
 #
 # show colormap
@@ -279,10 +292,12 @@ ${BinDir}/tgsim : tgsim.c ${TGTLib}
 colormap : ${BinDir}/tgsscm
 
 ${BinDir}/tgsscm : tgsscm.c ${TGTLib}
-	${CLD} ${LdFlags} tgsscm.c -o ${BinDir}/tgsscm ${Libs}
+	@(echo "${CCAnnounce} tgsscm.c -o ${BinDir}/tgsscm" ; \
+	  ${CLD} ${LdFlags} tgsscm.c -o ${BinDir}/tgsscm ${Libs})
 
 ${BinDir}/tgscm : tgscm.c ${TGTLib}
-	${CLD} ${LdFlags} tgscm.c -o ${BinDir}/tgscm ${Libs}
+	@(echo "${CCAnnounce} tgscm.c -o ${BinDir}/tgscm" ; \
+	  ${CLD} ${LdFlags} tgscm.c -o ${BinDir}/tgscm ${Libs})
 
 #
 # Raster test
@@ -290,7 +305,8 @@ ${BinDir}/tgscm : tgscm.c ${TGTLib}
 raster : ${BinDir}/tgsrst
 
 ${BinDir}/tgsrst : tgsrst.c ${TGTLib}
-	${CLD} ${LdFlags} tgsrst.c -o ${BinDir}/tgsrst ${Libs}
+	@(echo "${CCAnnounce} tgsrst.c -o ${BinDir}/tgsrst" ; \
+	  ${CLD} ${LdFlags} tgsrst.c -o ${BinDir}/tgsrst ${Libs})
 
 #
 # axis test
@@ -298,7 +314,8 @@ ${BinDir}/tgsrst : tgsrst.c ${TGTLib}
 axis : ${BinDir}/tgslax
 
 ${BinDir}/tgslax : tgslax.c ${TGTLib}
-	${CLD} ${LdFlags} tgslax.c -o ${BinDir}/tgslax ${Libs}
+	@(echo "${CCAnnounce} tgslax.c -o ${BinDir}/tgslax" ; \
+	  ${CLD} ${LdFlags} tgslax.c -o ${BinDir}/tgslax ${Libs})
 
 #
 # grotrian test
@@ -306,7 +323,8 @@ ${BinDir}/tgslax : tgslax.c ${TGTLib}
 grotrian : ${BinDir}/tgsgrt
 
 ${BinDir}/tgsgrt : tgsgrt.c ${TGTLib}
-	${CLD} ${LdFlags} tgsgrt.c -o ${BinDir}/tgsgrt ${Libs}
+	@(echo "${CCAnnounce} tgsgrt.c -o ${BinDir}/tgsgrt" ; \
+	  ${CLD} ${LdFlags} tgsgrt.c -o ${BinDir}/tgsgrt ${Libs})
 
 #
 # inform
@@ -327,8 +345,10 @@ test :
 mpeg : ${BinDir}/tgsmpg1 ${BinDir}/tgsmpg2
 
 ${BinDir}/tgsmpg1 : tgsmpg1.c ${TGTLib}
-	${CLD} ${LdFlags} tgsmpg1.c -o ${BinDir}/tgsmpg1 ${Libs}
+	@(echo "${CCAnnounce} tgsmpg1.c -o ${BinDir}/tgsmpg1" ; \
+	  ${CLD} ${LdFlags} tgsmpg1.c -o ${BinDir}/tgsmpg1 ${Libs})
 
 ${BinDir}/tgsmpg2 : tgsmpg2.c ${TGTLib}
-	${CLD} ${LdFlags} tgsmpg2.c -o ${BinDir}/tgsmpg2 ${Libs}
+	@(echo "${CCAnnounce} tgsmpg2.c -o ${BinDir}/tgsmpg2" ; \
+	  ${CLD} ${LdFlags} tgsmpg2.c -o ${BinDir}/tgsmpg2 ${Libs})
 
