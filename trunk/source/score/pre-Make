@@ -531,7 +531,7 @@ ${BinDir}/tscvs : ${TGTLib} tscvs.c
 	  ${CLD} ${LdFlags} tscvs.c -o ${BinDir}/tscvs ${Libs})
 
 ${BinDir}/dmake : ${TGTLib} scmkut.c
-	@(echo "${CCAnnounce ${LdFlags} scmkut.c -o ${BinDir}/dmake" ; \
+	@(echo "${CCAnnounce} ${LdFlags} scmkut.c -o ${BinDir}/dmake" ; \
 	  ${CLD} -I../psh ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs})
 
 ${BinDir}/tscar : ${TGTLib} tscar.c

@@ -121,20 +121,25 @@ if ("$cnd" != "") then
    set cnd = $cnd[2]
 
    flog $log set db = $devetc/cfg.db
-   set defc = ( `grep -w $cnd $db | sed 's|=| |'` )
-   Note $log "Condition $cnd = |$defc|"
+   if (-f $db) then
+      set defc = ( `grep -w $cnd $db | sed 's|=| |'` )
+      Note $log "Condition $cnd = |$defc|"
 
 # if the condition variable is not set
-   if ("$defc" == "") then
-      NoteD $log "   not needed '$api'"
-      exit($fatal)
+      if ("$defc" == "") then
+         NoteD $log "   not needed '$api'"
+         exit($fatal)
 
 # if the condition variable is set to FALSE
-   else if ("$defc" !~ *TRUE) then
-      NoteD $log "   not needed '$api'"
-      exit($fatal)
+      else if ("$defc" !~ *TRUE) then
+         NoteD $log "   not needed '$api'"
+         exit($fatal)
+      endif
+      unset defc
+   else
+      NoteD $log "   configuration database not found - fatal"
+      exit(1)
    endif
-   unset defc
    unset db
 endif
 unset cnd

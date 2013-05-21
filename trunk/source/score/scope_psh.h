@@ -391,10 +391,10 @@ extern sckades
 
 extern void
  PS_cl_logger(client *cl, int lvl, char *fmt, ...),
- PS_async_server(srvdes *sv),
  PS_free_client(client *cl);
 
 extern int
+ PS_async_server(srvdes *sv),
  PS_verifyx(client *cl, char *ans, char *res),
  PS_comm_read(client *cl, char *s, int nc, int to),
  PS_comm_write(client *cl, char *s, int nc, int to);

@@ -45,11 +45,21 @@ dbmget $Log CROSS_COMPILE^    \
 
     if ($CROSS_COMPILE == "FALSE") then
 
+       flog $Log ls -l ${PERDB_PATH}*
+
+# save the database before building dmake because import-api needs it
+       flog $Log $PERDB -l save:db:
+
        flog $Log pushd $BaseDir/score
 
 # always remove and start clean in case there is toxic rubble
 # left over from a failed build
+# NOTE: the pact link may not be in place so remove may not invoke
+# clean - therefore do both separately
+       flog $Log $MAKE -i -na 1 clean
        flog $Log $MAKE -i -na 1 remove
+
+       flog $Log ls -l ${PERDB_PATH}*
 
        flog $Log $MAKE dmake
        set err = $status
