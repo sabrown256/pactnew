@@ -1096,6 +1096,8 @@ switch ($Cmnd)
            endsw
         end
 
+        Separator $Log
+
 # setup for PERDB session
         flog $Log setenv PERDB_IDLE_TIMEOUT 600
         flog $Log setenv PERDB_IDLE_INTERVAL 10
@@ -1113,6 +1115,7 @@ switch ($Cmnd)
               sleep 1
            end
         else
+           flog $Log ls -l ${PERDB_PATH}*
            Note $Log "Checking for running perdb servers"
            if (-f $PERDB_PATH.conn) then
               set linf = ( `cat $PERDB_PATH.conn |& sed 's|[^a-zA-Z0-9]|x|g'` )
@@ -1124,12 +1127,17 @@ switch ($Cmnd)
               endif
               unset lpid
               unset linf
+           else
+              Note $Log "   none found"
            endif
         endif
         flog $Log $RM ${PERDB_PATH}*
-
+        sleep 1
         flog $Log $PERDB -l -c -s
+        sleep 1
+        flog $Log ls -l ${PERDB_PATH}*
 
+        Separator $Log
         flog $Log $PERDB PACT_VERSION=$PACTVer
 
         if (($Method == 2) && (-x $BinDir/pco)) then
@@ -1223,9 +1231,6 @@ switch ($Cmnd)
            NoteD $Log "   linstall failed during 'dsys config'"
            goto CFG_DONE
         endif
-
-# save the database before building dmake because import-api needs it
-        flog $Log $PERDB -l save:db:
 
 # settle on smake or dmake
         Separator $Log

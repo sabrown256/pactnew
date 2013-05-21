@@ -449,14 +449,19 @@ static int _process_act(srvdes *sv, int fd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* ASYNC_SERVER - run a fully asynchronous server */
+/* ASYNC_SERVER - run a fully asynchronous server
+ *              - return value of TRUE means that it would be
+ *              - safe for the caller to write the database
+ *              - otherwise it should not do so
+ */
 
-void async_server(srvdes *sv)
-   {int fd, nr, ok;
+int async_server(srvdes *sv)
+   {int fd, nr, ok, rv;
     fd_set rfs;
     client *cl;
     connection *srv;
 
+    rv  = FALSE;
     cl  = (client *) sv->a;
     srv = cl->scon;
 
@@ -477,7 +482,7 @@ void async_server(srvdes *sv)
 	nbmax = 10;
 
 	ng = 0;
-	for (ok = TRUE; (ok == TRUE) && (ng < tmax) && (nb < nbmax); )
+	for (ok = 1; (ok == 1) && (ng < tmax) && (nb < nbmax); )
 	    {_check_fd(sv);
 
 /* timeout the select every DT seconds */
@@ -487,7 +492,7 @@ void async_server(srvdes *sv)
 	     rfs = srv->afs;
 	     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, &t);
 	     if (nr > 0)
-	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
+	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == 1); ++fd)
 		     {if (FD_ISSET(fd, &rfs))
 			 {SLOG(sv, 4, "data available on %d (server %d)",
 			       fd, srv->sfd);
@@ -500,7 +505,7 @@ void async_server(srvdes *sv)
 			  else
 			     {ok = _process_act(sv, fd);
                               if (ok == -1)
-				 {ok = TRUE;
+				 {ok = 1;
 				  remove_fd(sv, fd);
 				  nb++;}
 			      else
@@ -515,19 +520,21 @@ void async_server(srvdes *sv)
 	     if (find_conn(cl->root, -1) == NULL)
 	        ok = 2;};
 
-	if (ok != TRUE)
-	   {SLOG(sv, 4, "done by command");}
-	else if (ok == 2)
+	if (ok == 2)
 	   {SLOG(sv, 4, "missing connection file");}
+	else if (ok == 0)
+	   {rv = TRUE;
+	    SLOG(sv, 4, "done by command");}
 	else if (ng >= tmax)
-	   {SLOG(sv, 4, "done by time: %d >= %d", ng, tmax);}
+	   {rv = TRUE;
+	    SLOG(sv, 4, "done by time: %d >= %d", ng, tmax);}
 	else if (nb >= nbmax)
 	   {SLOG(sv, 4, "done by failed reads: %d >= %d", nb, nbmax);};}
 
     else
-       SLOG(sv, 1, "async_server error (%s - %d)", strerror(errno), errno);
+       {SLOG(sv, 1, "async_server error (%s - %d)", strerror(errno), errno);};
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 

@@ -626,7 +626,7 @@ static char **srv_process(srvdes *sv, char *s)
  */
 
 static int server(char *root, int init, int dmn)
-   {int rv;
+   {int rv, st;
     client *cl;
     srvdes sv;
 
@@ -653,9 +653,9 @@ static int server(char *root, int init, int dmn)
             sv.setup   = srv_setup;
             sv.process = srv_process;
 
-	    async_server(&sv);
-
-	    db_srv_save(-1, db);
+	    st = async_server(&sv);
+            if (st == TRUE)
+	       db_srv_save(-1, db);
 	    db_srv_close(db);
 
 	    cl = NULL;
