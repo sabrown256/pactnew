@@ -16,8 +16,6 @@ if ($?SCSOpt == 0) then
 endif
 
 set repo     = `$ScrDir/scs-meta -r`
-set SCSDir   = `scs-meta -n`
-set SCSExe   = `scs-meta -x`
 set repohost = `scs-meta -m`
 
 #--------------------------------------------------------------------------
@@ -28,7 +26,7 @@ if ($?Lock == 0) then
    set lockd = `$ScrDir/scs-lock dir`
 
 # handle the local repository case specially
-   if (("$repohost" == "--local--") && (-d $repo)) then
+   if (("$repohost" == "--local--") && (-d "$repo")) then
       set lockd = $repo
    endif
    set Lock = $lockd/commit.lock

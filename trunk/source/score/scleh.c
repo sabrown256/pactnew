@@ -179,7 +179,9 @@ static int _SC_leh_ena_raw(int fd)
 
 	rv = SC_set_io_attrs(fd,
 			     BRKINT,  SC_TERM_INPUT,     FALSE,
+#ifdef LEH_TTY_CRNL
 			     ICRNL,   SC_TERM_INPUT,     FALSE,
+#endif
 			     INPCK,   SC_TERM_INPUT,     FALSE,
 			     ISTRIP,  SC_TERM_INPUT,     FALSE,
 			     IXON,    SC_TERM_INPUT,     FALSE,
@@ -188,8 +190,10 @@ static int _SC_leh_ena_raw(int fd)
 			     IEXTEN,  SC_TERM_LOCAL,     FALSE,
 			     ISIG,    SC_TERM_LOCAL,     FALSE,
 			     CS8,     SC_TERM_CONTROL,   TRUE,
-#ifndef MACOSX
+#ifdef LEH_TTY_ECHO
 			     ECHO,    SC_TERM_LOCAL,     FALSE,
+#endif
+#ifdef LEH_TTY_VTIME
 			     VTIME,   SC_TERM_CHAR,      0,
 #endif
 			     VMIN,    SC_TERM_CHAR,      1,

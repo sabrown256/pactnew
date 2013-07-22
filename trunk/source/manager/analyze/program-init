@@ -252,3 +252,8 @@ Group BFD {
    Path  = 
 }
 
+Group LEH {
+   TTY_ECHO  = TRUE
+   TTY_CRNL  = TRUE
+   TTY_VTIME = TRUE
+}

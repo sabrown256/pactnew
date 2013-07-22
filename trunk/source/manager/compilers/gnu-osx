@@ -127,6 +127,11 @@ Group Python {
    CC_Optimize = -g -O -Wunused
 }
 
+Group LEH {
+   TTY_ECHO  = FALSE
+   TTY_VTIME = FALSE
+}
+
 include cpp-rule
 include serial
 

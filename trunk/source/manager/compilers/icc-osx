@@ -82,6 +82,11 @@ Group OpenMP {
    LD_Lib   = -lpthread 
 }
 
+Group LEH {
+   TTY_ECHO  = FALSE
+   TTY_VTIME = FALSE
+}
+
 include cpp-rule
 include serial
 
