@@ -108,6 +108,9 @@ dbmget $Log Arch^                     \
             HAVE_BFD^                 \
             HAVE_DEMANGLE^            \
             USE_FULL_MM^              \
+            LEH_TTY_CRNL^             \
+            LEH_TTY_ECHO^             \
+            LEH_TTY_VTIME^            \
             Std_UseX^                 \
             Std_UseOGL^               \
             Std_UseQD
@@ -245,6 +248,11 @@ dbmget $Log Arch^                     \
     set lhave = ( $lhave Std_UseX                 HAVE_X11 )
     set lhave = ( $lhave Std_UseOGL               HAVE_OGL )
     set lhave = ( $lhave Std_UseQD                HAVE_QUICKDRAW )
+
+# termios TTY controls
+    set lhave = ( $lhave LEH_TTY_CRNL             none )
+    set lhave = ( $lhave LEH_TTY_ECHO             none )
+    set lhave = ( $lhave LEH_TTY_VTIME            none )
 
     while ($#lhave > 0)
        set lvr = $lhave[1]

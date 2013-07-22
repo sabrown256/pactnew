@@ -18,7 +18,7 @@ if ("$ldir" == ".") then
 endif
 set scsi = ( `$ldir/which-scs` )
 if ($#scsi < 3) then
-   echo ">>> SCS-META no metadata from '$ldir' - exiting"
+   echo "SCS-META no metadata from '$ldir' - exiting"
    exit(1)
 endif
 

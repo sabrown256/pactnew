@@ -75,7 +75,7 @@
 		  (del diff den)
 		  0.0)
 
-; this did not account for curves which where constant!
+; this did not account for curves which were constant!
 ;		       ((eqv? rim 0.0)
 ;			(del diff den)
 ;			0.0)
