@@ -18,7 +18,7 @@ set devetc = $lbase/etc
 if (-d ../scripts) then
    source ../scripts/functions-pact.csh
 else
-   source $lbase/etc/functions-pact.csh
+   source $devetc/functions-pact.csh
 endif
 
 unset bindir
@@ -121,26 +121,41 @@ if ("$cnd" != "") then
    set cnd = $cnd[2]
 
    flog $log set db = $devetc/cfg.db
-   if (-f $db) then
-      set defc = ( `grep -w $cnd $db | sed 's|=| |'` )
-      Note $log "Condition $cnd = |$defc|"
+
+# try and retry to find the database
+   set ok = FALSE
+   @ na = 3
+   @ ia = 0
+   while (($ia < $na) && ($ok == FALSE))
+      @ ia = $ia + 1
+      flog $log stat $devetc
+      if (-f $db) then
+         set ok = TRUE
+         set defc = ( `grep -w $cnd $db | sed 's|=| |'` )
+         Note $log "Condition $cnd = |$defc|"
 
 # if the condition variable is not set
-      if ("$defc" == "") then
-         NoteD $log "   not needed '$api'"
-         exit($fatal)
+         if ("$defc" == "") then
+            NoteD $log "   not needed '$api'"
+            exit($fatal)
 
 # if the condition variable is set to FALSE
-      else if ("$defc" !~ *TRUE) then
-         NoteD $log "   not needed '$api'"
-         exit($fatal)
+         else if ("$defc" !~ *TRUE) then
+            NoteD $log "   not needed '$api'"
+            exit($fatal)
+         endif
+         unset defc
+      else
+         sleep $ia
       endif
-      unset defc
-   else
+   end
+   if ($ok == FALSE) then
       NoteD $log "   configuration database not found - fatal"
       exit(1)
    endif
+
    unset db
+
 endif
 unset cnd
 

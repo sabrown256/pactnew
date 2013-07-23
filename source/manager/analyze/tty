@@ -1,0 +1,61 @@
+#!/bin/csh -f
+#
+# TTY - analyze the TTY state for LEH
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $ALog "Analyze: tty"
+
+dbmget $ALog LEH_TTY_CRNL^         \
+             LEH_TTY_ECHO^         \
+             LEH_TTY_VTIME^        \
+             OS_Name
+
+set termio = ""
+
+set NO_TERMINAL = TRUE
+
+# NOTE: properly we should probe the actual state of the terminal
+# this is a temporary approximation based on OS and hardware
+# it explicitly uses only GCC whose predefined macros are reliable
+# __powerpc__ indicates IBM BG/x hosts and their peculiar line settings
+# __APPLE__ indicates OSX 10.x
+
+cat >! $Tmp.c << EOF
+#include <unistd.h>
+#include <stdio.h>
+int main(int c, char **v)
+   {
+#ifdef __powerpc__
+    printf("setenv LEH_TTY_CRNL  FALSE; ");
+    printf("setenv LEH_TTY_ECHO  FALSE; ");
+#endif
+#ifdef __APPLE__
+    printf("setenv LEH_TTY_ECHO  FALSE; ");
+    printf("setenv LEH_TTY_VTIME FALSE; ");
+#endif
+    printf("true\n");
+    return(0);}
+EOF
+
+flog $ALog gcc -g -O0 $Tmp.c -o $Tmp
+if ($status == 0) then
+   eval `$Tmp`
+endif
+
+flog $ALog rm -f $Tmp*
+
+# export the results
+dbmset $ALog LEH_TTY_CRNL  = $LEH_TTY_CRNL^         \
+             LEH_TTY_ECHO  = $LEH_TTY_ECHO^         \
+             LEH_TTY_VTIME = $LEH_TTY_VTIME
+
+exit(0)
+
