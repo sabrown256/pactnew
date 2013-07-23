@@ -45,6 +45,8 @@ dbmget $Log CROSS_COMPILE^    \
 
     if ($CROSS_COMPILE == "FALSE") then
 
+       Note $Log "Build local dmake"
+
        flog $Log ls -l ${PERDB_PATH}*
 
 # save the database before building dmake because import-api needs it
@@ -77,7 +79,12 @@ dbmget $Log CROSS_COMPILE^    \
 
     else
 
+       Note $Log "Find dmake for CROSS_COMPILE"
+       Note $Log "   System = |$System|"
+       Note $Log "   BinDir = |$BinDir|"
+
        set dm = `which-exe -d ${BinDir} dmake`
+       Note $Log "   dm     = |$dm|"
        if (-x "$dm") then
           flog $Log cp $dm ${BinDir}/dmake
           flog $Log set err = 0
@@ -85,6 +92,7 @@ dbmget $Log CROSS_COMPILE^    \
 # try pact if no dmake found
        else
           set dm = `which-exe -d ${BinDir} pact`
+          Note $Log "   dm     = |$dm|"
           if (-x "$dm") then
              flog $Log cp $dm ${BinDir}/dmake
              flog $Log set err = 0

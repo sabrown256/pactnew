@@ -158,8 +158,12 @@ Note $STDOUT ""
 # check the compilers database for needed environment variables
 # such as license file, directory paths
 
-   set wexe      = `which $comp`
-   set compilers = $wexe:h/compilers
+   set wexe = `which $comp`
+   if (-x "$wexe") then
+      set compilers = $wexe:h/compilers
+   else
+      set compilers = no.file
+   endif
    if (-f $compilers) then
 
       set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$Arch'") && ($3 == "'$vers'") {print}' $compilers` )
