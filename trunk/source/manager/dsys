@@ -1256,6 +1256,18 @@ switch ($Cmnd)
            flog $Log unsetenv SESSION_CONFIG
            flog $Log $CfgMan add $sid
 
+        else
+           if (!(-f $PERDB_PATH.db)) then
+              NoteD $Log ""
+              NoteD $Log "No configuration database '$PERDB_PATH.db' - fatal"
+              NoteD $Log ""
+              exit(1)
+           else if (-z $PERDB_PATH.db) then
+              NoteD $Log ""
+              NoteD $Log "Zero length configuration database '$PERDB_PATH.db' - fatal"
+              NoteD $Log ""
+              exit(1)
+           endif
         endif
 
 # wrap it up
@@ -2347,7 +2359,7 @@ CFG_DONE:
            NoteD $Log "PACT multi-platforms remove completed ($RStatus/$ETime)"
            NoteD $Log ""
 
-# single platform build
+# single platform remove
         else
            set lpybind = none
            if (-f $EtcDir/cfg.db) then

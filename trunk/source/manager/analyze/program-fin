@@ -9,6 +9,7 @@
 
 Run {
    write/package         $Log $ScrDir
+   write/cfg.db          $Log $ScrDir
    write/scconfig.h      $Log $ScrDir
    write/iso-c.h         $Log $ScrDir
 }
