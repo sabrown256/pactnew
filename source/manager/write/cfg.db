@@ -1,0 +1,38 @@
+#!/bin/csh -f
+#
+# CFG.DB - write the final configuration database
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $Log "----- write/cfg.db -----"
+Note $Log "Write: cfg.db"
+Note $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $Log
+
+NoteD $Log "   Write configuration database - cfg.db"
+Note $Log ""
+
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+flog $Log ls -l ${PERDB_PATH}*
+
+flog $Log $PERDB -l save:db:
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

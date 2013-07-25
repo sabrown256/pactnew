@@ -120,7 +120,9 @@ set cnd = ( `grep -w condition $def` )
 if ("$cnd" != "") then
    set cnd = $cnd[2]
 
-   flog $log set db = $devetc/cfg.db
+# we are in much more trouble if scconfig.h does not exist
+# than if cfg.db does not exist (somebody is truncating/rewriting it)
+   flog $log set cfg = $devinc/scconfig.h
 
 # try and retry to find the database
    set ok = FALSE
@@ -128,19 +130,13 @@ if ("$cnd" != "") then
    @ ia = 0
    while (($ia < $na) && ($ok == FALSE))
       @ ia = $ia + 1
-      flog $log stat $devetc
-      if (-f $db) then
+      if (-f $cfg) then
          set ok = TRUE
-         set defc = ( `grep -w $cnd $db | sed 's|=| |'` )
+         set defc = ( `grep -w $cnd $cfg | sed 's|^#define | |'` )
          Note $log "Condition $cnd = |$defc|"
 
 # if the condition variable is not set
          if ("$defc" == "") then
-            NoteD $log "   not needed '$api'"
-            exit($fatal)
-
-# if the condition variable is set to FALSE
-         else if ("$defc" !~ *TRUE) then
             NoteD $log "   not needed '$api'"
             exit($fatal)
          endif
@@ -154,7 +150,7 @@ if ("$cnd" != "") then
       exit(1)
    endif
 
-   unset db
+   unset cfg
 
 endif
 unset cnd
