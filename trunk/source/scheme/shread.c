@@ -423,16 +423,27 @@ static object *_SS_pr_read(SS_psides *si, object *str)
  */
 
 object *SS_read(SS_psides *si, object *str)
-   {object *obj;
+   {object *obj, *fp;
+    char *pr;
+
+    fp = NULL;
+    pr = NULL;
+    SS_args(si, str,
+	    SS_OBJECT_I, &fp,
+	    SC_STRING_I, &pr,
+	    0);
 
     if (si->read == NULL)
        si->read = _SS_pr_read;
 
-    obj = READ_EXPR(str);
+    if (pr != NULL)
+       _SS.pr_prompt = pr;
+
+    obj = READ_EXPR(fp);
 
     switch (si->hist_flag)
        {case STDIN_ONLY :
-	     if (str != si->indev)
+	     if (fp != si->indev)
 	        break;
 
         case ALL :
@@ -448,19 +459,30 @@ object *SS_read(SS_psides *si, object *str)
 
 /* _SSI_READ - the Scheme level reader which invokes the C level reader */
 
-static object *_SSI_read(SS_psides *si, object *obj)
-   {object *op, *o;
+static object *_SSI_read(SS_psides *si, object *args)
+   {object *o, *fp;
+    char *pr;
+
+    fp = NULL;
+    pr = NULL;
+    SS_args(si, args,
+	    SS_OBJECT_I, &fp,
+	    SC_STRING_I, &pr,
+	    0);
+
+    if (pr != NULL)
+       _SS.pr_prompt = pr;
 
     o = SS_null;
 
-    if (SS_nullobjp(obj))
+    if (SS_nullobjp(fp))
        o = SS_read(si, si->indev);
 
-    else if (SS_inportp(op = SS_car(si, obj)))
-       o = SS_read(si, op);
+    else if (SS_inportp(fp))
+       o = SS_read(si, fp);
 
     else
-       SS_error(si, "ARGUMENT TO READ NOT INPUT-PORT", obj);
+       SS_error(si, "ARGUMENT TO READ NOT INPUT-PORT", fp);
 
     return(o);}
 

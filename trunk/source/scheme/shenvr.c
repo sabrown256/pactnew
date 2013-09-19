@@ -1164,6 +1164,8 @@ static void _SS_init_scheme(SS_psides *si)
 		       "compiler-version", SC_STRING_I, COMPILER_VERSION,
 		       "pact-version",     SC_STRING_I, PACT_VERSION,
 		       "argv",             SS_OBJECT_I, SS_null,
+		       "stdin",            SS_OBJECT_I, si->indev,
+		       "stdout",           SS_OBJECT_I, si->outdev,
 		       NULL);
 
 /* hide the memory figures for the interpreter state instance */

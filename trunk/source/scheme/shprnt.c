@@ -31,6 +31,24 @@ void SS_set_prompt(SS_psides *si, char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SSI_SET_PROMPT - set the interpreter prompt at Scheme level */
+
+static object *_SSI_set_prompt(SS_psides *si, object *obj)
+   {char *s;
+
+    s = NULL;
+    SS_args(si, obj,
+	    SC_STRING_I, &s,
+	    0);
+
+    if (s != NULL)
+       SC_strncpy(si->prompt, MAXLINE, s, -1);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_SET_ANS_PROMPT - set the answer "prompt" */
 
 void _SS_set_ans_prompt(SS_psides *si)
@@ -1337,6 +1355,11 @@ void _SS_inst_print(SS_psides *si)
                "Procedure: Toggle printing of values",
                SS_zargs,
                _SSI_print_toggle, SS_PR_PROC);
+
+    SS_install(si, "set-prompt!",
+               "Set the interpreter prompt: (set-prompt! <string>)",
+               SS_sargs, 
+               _SSI_set_prompt, SS_PR_PROC);
 
     SS_install(si, "sprintf",
                "C style sprintf string builder function: (sprintf format . rest)",

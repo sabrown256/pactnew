@@ -1,0 +1,144 @@
+#!/usr/bin/env pdbview
+;
+; DRUN - run multiple instances of commands differentially
+;
+
+(define jobs nil)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (send-command job cmd)
+    (printf nil "\nSending: %s\n" cmd)
+    (process-send-line job cmd)
+    (display-response job)
+    (show-status job))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (show-status job)
+    (let* ((stat (process-status job))
+	   (runs (cdddr stat))
+	   (runp (car runs))
+	   (reason (cadr runs)))
+          (printf nil
+		  "Status for process \#%d: %s\n"
+		  (car stat)
+		  (cond ((= runp 0)  "Running")
+			((= runp 1)  (sprintf "Stopped (%d)" reason))
+			((= runp 2)  (sprintf "Changed (%d)" reason))
+			((or (= runp 4) (= runp 6))
+			 (sprintf "Exited (%d)" reason))
+			((or (= runp 8) (= runp 10))
+			 (sprintf "Coredumped (%d)" reason))
+			((= runp 16) (sprintf "Signaled (%d)" reason))
+			(else        (sprintf "Unkown (%d %d)" runp reason))))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (exit-status job)
+    (sleep 500)
+    (display-response job)
+    (let* ((stat (process-status job))
+	   (runs (cdddr stat))
+	   (runp (car runs))
+	   (reason (cadr runs)))
+          (if (= runp 0)
+	      (exit-status job)
+	      reason)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (display-response job)
+    (let* ((s (process-read-line job)))
+          (if s
+	      (begin (printf nil "| %s" s)
+		     (display-response job))
+	      (printf nil "\n"))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; MAKE-JOB - exec a new job
+;          - this means spawning a new process,
+;          - writing the function to send it messages,
+;          - and adding it to the list of jobs
+
+(define (make-job fmt . x)
+    (let* ((cmd (apply sprintf (cons fmt x)))
+           (job (process-open "a" cmd)))
+
+; check that the jobs is running and get startup messages
+          (show-status job)
+	  (display-response job)
+
+; write the function to send messages to the job
+
+; add the job to the list
+          (set! jobs (cons job jobs))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; DONE - cleanup and exit this session
+
+(define (done)
+    (let* ((st 0))
+
+          (define (do-one job)
+	      (let* ((js (exit-status job)))
+		    (if (not (=? js 0))
+			(set! st js))
+		    (process-close job)))
+
+          (for-each do-one jobs)
+
+	  (quit st)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; HELP - print help message
+
+(define (help)
+   (printf nil "\n")
+   (printf nil "Usage: drun [--help] <cmd>*\n")
+   (printf nil "   help  this help message\n")
+   (printf nil "   <cmd> job command line\n")
+   (printf nil "\n")
+   (quit 1))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; MAIN - start here - mostly
+
+(define (main args)
+   (let* ((arg (list-ref args 0))
+	  (rst (list-tail args 1)))
+         (cond ((or (null? arg) (string=? arg "--help"))
+		(help))
+	       (else
+		#t))
+	 (printf nil "command line args = %s\n" args)
+	 (scheme-repl "drun> " " ")))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+;(printf nil "Old # read attempts: %d\n" (process-read-tries))
+;(printf nil "New # read attempts: %d\n" (process-read-tries 10000))
+;(show-status job)
+;(display-response job)
+;(send-command job "(car (list 1 2 3))")
+;(send-command job "(describe process-status)")
+;(send-command job "(quit)")
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(main argv)
+
