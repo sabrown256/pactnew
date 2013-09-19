@@ -301,6 +301,9 @@ static object *_SSI_pr_sn_line(SS_psides *si, object *argl)
             SC_STRING_I, &s,
             0);
 
+    if (s[0] == '"')
+       s = PS_trim(s, BOTH, "\"");
+
     ret = SC_printf(pp, "%s\n", s);
     o   = ret ? SS_t : SS_f;
 

@@ -170,36 +170,12 @@ int main(int c, char **v, char **env)
 
 /* run in PDBView mode */
     if (SX_gs.sm == SX_MODE_PDBVIEW)
-       {SC_set_banner(" %s  -  %s\n\n", PCODE, VERSION);
-
-        SX_init_view(si);
-        SX_install_global_vars(si);
-        SX_init_mappings(si);
-        SX_init_env(si);
-
-#ifndef NO_SHELL
-        if (SX_gs.gr_mode && !SX_gs.qflag)
-	   SS_banner(si, SS_mk_string(si, PCODE));
-#endif
-
-/* load the SCHEME level PDBView functionality */
-	if (load_init)
-           SX_load_rc(si, "pdbview.scm",
-		      load_rc, ".pdbviewrc", "pdbview.rc");}
+       _SX_pdbview_mode(si, PCODE, load_init, load_rc);
 
 /* run in vanilla SCHEME mode */
     else
-       SC_set_banner(" %s  -  %s\n\n", SCODE, VERSION);
-
-    SS_load_scm(si, "nature.scm");
-
-    if (SX_gs.sm == SX_MODE_PDBVIEW)
-       {if (SX_gs.gr_mode)
-	   SX_mode_graphics(si);
-        else
-           SX_mode_text(si);
-
-        PG_expose_device(PG_gs.console);};
+       {SC_set_banner(" %s  -  %s\n\n", SCODE, VERSION);
+	SS_load_scm(si, "nature.scm");};
 
 #ifdef NO_SHELL
 

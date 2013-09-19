@@ -365,7 +365,14 @@ static object *_SSI_strset(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SSI_STRSUB - substring in Scheme */
+/* _SSI_STRSUB - substring in Scheme
+ *             - non-standard behavior if N1 < 0
+ *             - then abs(N1) characters from the end is the start point
+ *             - and abs(N2) characters are taken
+ *             - usage: (substring s n1 n2)
+ *             - e.g. (substring "foo bar" 2 5) => "o b"
+ *             - e.g. (substring "foo bar" -2 2) => "ar"
+ */
 
 static object *_SSI_strsub(SS_psides *si, object *argl)
    {int n, n1, n2;
@@ -382,10 +389,14 @@ static object *_SSI_strsub(SS_psides *si, object *argl)
             0);
 
     n = strlen(s);
-    if ((n1 > n) || (n1 < 0))
+    if (n1 < 0)
+       {n1 = n + n1;
+	n2 = n1 + abs(n2);};
+
+    if ((n1 < 0) || (n < n1))
        n1 = 0;
 
-    if ((n2 > n) || (n2 < 0))
+    if ((n2 < 0) || (n < n2))
        n2 = n;
 
     s[n2] = '\0';
@@ -761,7 +772,7 @@ static object *_SSI_istrstr(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SSI_BLANKSTR - wrapper for SCORE */
+/* _SSI_BLANKSTR - wrapper for SCORE SC_blankp function */
 
 static object *_SSI_blankstr(SS_psides *si, object *argl)
    {int ok;

@@ -103,6 +103,44 @@ void SX_install_funcs(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_PDBVIEW_MODE - setup PDBView mode */
+
+void _SX_pdbview_mode(SS_psides *si, char *code, int load_init, int load_rc)
+   {
+
+    SX_gs.gr_mode = TRUE;
+
+    SC_set_banner(" %s  -  %s\n\n", code, VERSION);
+
+    SX_init_view(si);
+    SX_install_global_vars(si);
+    SX_init_mappings(si);
+    SX_init_env(si);
+
+#ifndef NO_SHELL
+    if (SX_gs.gr_mode && !SX_gs.qflag)
+       SS_banner(si, SS_mk_string(si, code));
+#endif
+
+/* load the SCHEME level PDBView functionality */
+    if (load_init)
+       SX_load_rc(si, "pdbview.scm",
+		  load_rc, ".pdbviewrc", "pdbview.rc");
+
+    SS_load_scm(si, "nature.scm");
+
+    if (SX_gs.gr_mode)
+       SX_mode_graphics(si);
+    else
+       SX_mode_text(si);
+
+    PG_expose_device(PG_gs.console);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SX_INIT - initialize SX */
 
 SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
@@ -174,7 +212,26 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
  */
     script = SS_exe_script(c, v);
     if (script != NULL)
-       {switch (SETJMP(SC_gs.cpu))
+       {
+
+#if 0
+        int i;
+
+	for (i = 1; i < c; i++)
+	    if (v[i][0] == '-')
+	       {switch (v[i][1])
+		   {case 'p' :
+#ifdef AIX
+		         SC_set_io_interrupts(TRUE);
+#endif
+			 SX_gs.sm = SX_MODE_PDBVIEW;
+			 break;};};
+#endif
+
+        if (SX_gs.sm == SX_MODE_PDBVIEW)
+           _SX_pdbview_mode(si, code, TRUE, TRUE);
+
+	switch (SETJMP(SC_gs.cpu))
 	   {case ABORT :
 		 SX_end(si, ABORT);
 		 exit(1);

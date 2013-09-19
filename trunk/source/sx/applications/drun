@@ -4,20 +4,58 @@
 ;
 
 (define jobs nil)
+(define vrb  #f)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-(define (send-command job cmd)
-    (printf nil "\nSending: %s\n" cmd)
-    (process-send-line job cmd)
-    (display-response job)
-    (show-status job))
+; JOB-NUMBER - return the 1 based job index of JOB
+
+(define (job-number-aux job jlst n)
+    (if (pair? jlst)
+	(if (eqv? job (list-ref jlst 0))
+	    n
+	    (job-number-aux job (list-tail jlst 1) (+ n 1)))
+	n))
+
+(define (job-number job)
+    (job-number-aux job jobs 1))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-(define (show-status job)
+; JOB-DISPLAY-RESPONSE - display output from JOB N
+;                      - in response to a job-send-command
+
+(define (job-display-response job n)
+    (let* ((s  (process-read-line job))
+	   (lc (char->integer (list-ref (string->list (substring s -1 1))
+					0))))
+          (if s
+	      (begin (if (= lc 10)
+			 (printf nil "%d| %s" n s)
+			 (printf nil "%s" s))
+		     (job-display-response job n))
+	      (printf nil "\n"))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-SEND-COMMAND - send text CMD to job JB
+
+(define (job-send-command jb cmd)
+    (let* ((jn  (list-ref jb 0))
+	   (job (list-ref jb 1)))
+          (process-send-line job cmd)
+	  (job-display-response job jn)
+	  (job-show-status job)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-SHOW-STATUS - show the status of process JOB
+
+(define (job-show-status job)
     (let* ((stat (process-status job))
 	   (runs (cdddr stat))
 	   (runp (car runs))
@@ -38,26 +76,19 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-(define (exit-status job)
+; JOB-EXIT-STATUS - wait for process JOB of job JN to exit
+;                 - and return the reason
+
+(define (job-exit-status job jn)
     (sleep 500)
-    (display-response job)
+    (job-display-response job jn)
     (let* ((stat (process-status job))
 	   (runs (cdddr stat))
 	   (runp (car runs))
 	   (reason (cadr runs)))
           (if (= runp 0)
-	      (exit-status job)
+	      (job-exit-status job)
 	      reason)))
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-(define (display-response job)
-    (let* ((s (process-read-line job)))
-          (if s
-	      (begin (printf nil "| %s" s)
-		     (display-response job))
-	      (printf nil "\n"))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -69,16 +100,23 @@
 
 (define (make-job fmt . x)
     (let* ((cmd (apply sprintf (cons fmt x)))
-           (job (process-open "a" cmd)))
+           (job (process-open "a" cmd))
+	   (jn  (job-number nil))
+	   (jb  (list jn job))
+	   (jnm (string->symbol (sprintf "p%d" jn)))
+	   (fnc nil))
 
 ; check that the jobs is running and get startup messages
-          (show-status job)
-	  (display-response job)
+          (job-show-status job)
+	  (sleep 100)
+	  (job-display-response job jn)
 
 ; write the function to send messages to the job
+          (set! fnc (eval `(define-global-macro ,(list jnm 'msg)
+			       (job-send-command (quote ,jb) (sprintf "\"%s\"" msg)))))
 
 ; add the job to the list
-          (set! jobs (cons job jobs))))
+          (set! jobs (cons jb jobs))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -88,9 +126,11 @@
 (define (done)
     (let* ((st 0))
 
-          (define (do-one job)
-	      (let* ((js (exit-status job)))
-		    (if (not (=? js 0))
+          (define (do-one x)
+	      (let* ((jn  (list-ref x 0))
+		     (job (list-ref x 1))
+		     (js  (job-exit-status job)))
+		    (if (not (= js 0))
 			(set! st js))
 		    (process-close job)))
 
@@ -105,8 +145,9 @@
 
 (define (help)
    (printf nil "\n")
-   (printf nil "Usage: drun [--help] <cmd>*\n")
+   (printf nil "Usage: drun [--help] [--vrb] <cmd>*\n")
    (printf nil "   help  this help message\n")
+   (printf nil "   vrb   run more verbosely\n")
    (printf nil "   <cmd> job command line\n")
    (printf nil "\n")
    (quit 1))
@@ -116,26 +157,19 @@
 
 ; MAIN - start here - mostly
 
-(define (main args)
+(define (main args jl)
    (let* ((arg (list-ref args 0))
 	  (rst (list-tail args 1)))
-         (cond ((or (null? arg) (string=? arg "--help"))
+         (cond ((null? arg)
+		(if jl
+		    (c-repl "drun> " " ")
+		    (help)))
+	       ((string=? arg "--help")
 		(help))
+	       ((string=? arg "--vrb")
+		(set! vrb #t))
 	       (else
-		#t))
-	 (printf nil "command line args = %s\n" args)
-	 (scheme-repl "drun> " " ")))
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-;(printf nil "Old # read attempts: %d\n" (process-read-tries))
-;(printf nil "New # read attempts: %d\n" (process-read-tries 10000))
-;(show-status job)
-;(display-response job)
-;(send-command job "(car (list 1 2 3))")
-;(send-command job "(describe process-status)")
-;(send-command job "(quit)")
+		(main rst (make-job arg))))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
