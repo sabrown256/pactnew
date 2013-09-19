@@ -598,6 +598,20 @@
 	    (quit))))
 
 ;-----------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; SCHEME-REPL - Scheme level read/eval/print loop
+
+(define-global (scheme-repl in-prompt out-prefix)
+    "Procedure: Run a Scheme level read/eval/print loop.
+     Usage: (scheme-repl <in-prompt> <out-prefix>)
+        IN-PROMPT is the prompt for input.
+        OUT-PREFIX precedes each line of output.
+     Example: (scheme-repl \"in> \" \"answer = \")"
+    (printf stdout "%s%s\n\n" out-prefix (eval (read stdin in-prompt)))
+    (scheme-repl in-prompt out-prefix))
+
+;-----------------------------------------------------------------------------
 ;-----------------------------------------------------------------------------
 
 ; AUTOLOAD* - do real autoloading of procedures
