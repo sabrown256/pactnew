@@ -422,6 +422,9 @@ extern object
 extern int
  _SX_get_input(SS_psides *si, object *str);
 
+extern void
+ _SX_pdbview_mode(SS_psides *si, char *code, int load_init, int load_rc);
+
 
 /* SXSHAR.C declarations */
 

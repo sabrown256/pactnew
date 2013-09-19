@@ -201,6 +201,33 @@ NORETURN void SS_repl(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SSI_REPL - run a real/eval/print loop from the interpreter
+ *           - this differs from the break command and
+ *           - the function SCHEME-REPL in interpreted code
+ *           - in that it can run the various hooks used in
+ *           - PDBView mode and ULTRA mode
+ */
+
+static object *_SSI_repl(SS_psides *si, object *arg)
+   {char *prompt, *prefix;
+
+    prompt = NULL;
+    prefix = NULL;
+    SS_args(si, arg,
+	    SC_STRING_I, &prompt,
+	    SC_STRING_I, &prefix,
+	    0);
+
+    if (prompt != NULL)
+       SS_set_prompt(si, prompt);
+
+    SS_repl(si);
+
+    return(SS_null);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SS_END_SCHEME - gracefully exit from Scheme */
 
 void SS_end_scheme(SS_psides *si, int val)
@@ -988,6 +1015,11 @@ void _SS_inst_prm(SS_psides *si)
                "Procedure: enter a Scheme break, return with return-level",
                SS_zargs,
                _SSI_break, SS_PR_PROC);
+
+    SS_install(si, "c-repl",
+               "Procedure: enter a Scheme read/eval/print loop using all hooks",
+               SS_nargs,
+               _SSI_repl, SS_PR_PROC);
 
     SS_install(si, "defined?",
                "Special Form: returns #t if its argument has been defined in the current environment",
