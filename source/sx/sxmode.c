@@ -338,6 +338,13 @@ object *SX_mode_text(SS_psides *si)
 
     SS_set_prompt(si, "SX-> ");
 
+/* GOTCHA: is this the right thing to do?
+ * this is at rock bottom SX not SCHEME
+ * on the other hand it has none of the post hooks of
+ * PDBView or ULTRRA modes
+ */
+    SX_gs.sm = SX_MODE_SCHEME;
+
     return(ret);}
 
 /*--------------------------------------------------------------------------*/
@@ -490,6 +497,98 @@ object *SX_mode_graphics(SS_psides *si)
     PG_make_device_current(PG_gs.console);
 
     return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_MODE_PDBVIEW - setup PDBView mode */
+
+void SX_mode_pdbview(SS_psides *si, int load_init, int load_rc)
+   {
+
+    SX_gs.gr_mode = TRUE;
+
+    SC_set_banner(" %s  -  %s\n\n", PCODE, VERSION);
+
+    SX_init_view(si);
+    SX_install_global_vars(si);
+    SX_init_mappings(si);
+    SX_init_env(si);
+
+#ifndef NO_SHELL
+    if (SX_gs.gr_mode && !SX_gs.qflag)
+       SS_banner(si, SS_mk_string(si, PCODE));
+#endif
+
+/* load the SCHEME level PDBView functionality */
+    if (load_init)
+       SX_load_rc(si, "pdbview.scm",
+		  load_rc, ".pdbviewrc", "pdbview.rc");
+
+    SS_load_scm(si, "nature.scm");
+
+    if (SX_gs.gr_mode)
+       SX_mode_graphics(si);
+    else
+       SX_mode_text(si);
+
+    PG_expose_device(PG_gs.console);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_MODE_PDBVIEW - go into PDBView mode
+ *                   - return "#t" if PDBView mode was already in effect
+ *                   - else return "#f"
+ */
+
+static object *_SXI_mode_pdbview(SS_psides *si)
+   {int load_init, load_rc;
+    object *ret;
+    static int first = TRUE;
+
+    ret = (SX_gs.sm == SX_MODE_PDBVIEW) ? SS_t : SS_f;
+
+    if (first == TRUE)
+       {first     = FALSE;
+	load_init = TRUE;
+	load_rc   = TRUE;}
+    else
+       {load_init = FALSE;
+	load_rc   = FALSE;};
+
+    SX_mode_pdbview(si, load_init, load_rc);
+
+    SX_gs.sm = SX_MODE_PDBVIEW;
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_INSTALL_MODES - install some SX mode functions */
+
+void SX_install_modes(SS_psides *si)
+   {
+
+    SS_install(si, "enter-text-mode",
+               "Macro: Enter text mode - no graphics are available\n     Usage: enter-text-mode",
+               SS_zargs,
+               SX_mode_text, SS_UR_MACRO);
+
+    SS_install(si, "enter-graphics-mode",
+               "Macro: Enter graphics mode\n     Usage: enter-graphics-mode",
+               SS_zargs,
+               SX_mode_graphics, SS_UR_MACRO);
+
+    SS_install(si, "enter-pdbview-mode",
+               "Macro: Enter PDBView mode\n     Usage: enter-pdbview-mode",
+               SS_zargs,
+               _SXI_mode_pdbview, SS_UR_MACRO);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

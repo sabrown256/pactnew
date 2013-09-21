@@ -12,9 +12,6 @@
 #include "scope_raster.h"
 #include "scope_proc.h"
 
-#define SCODE "SX 3.0"
-#define PCODE "PDBView 2.0"
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -170,7 +167,7 @@ int main(int c, char **v, char **env)
 
 /* run in PDBView mode */
     if (SX_gs.sm == SX_MODE_PDBVIEW)
-       _SX_pdbview_mode(si, PCODE, load_init, load_rc);
+       SX_mode_pdbview(si, load_init, load_rc);
 
 /* run in vanilla SCHEME mode */
     else
