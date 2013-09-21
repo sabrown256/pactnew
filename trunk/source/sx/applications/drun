@@ -9,6 +9,22 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; JOB-GET-INDEX - return the 1 based index for JOB
+
+(define (job-get-index jb)
+    (list-ref jb 0))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-GET-PROCESS - return the process for JOB
+
+(define (job-get-process jb)
+    (list-ref jb 1))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ; JOB-NUMBER - return the 1 based job index of JOB
 
 (define (job-number-aux job jlst n)
@@ -44,11 +60,12 @@
 ; JOB-SEND-COMMAND - send text CMD to job JB
 
 (define (job-send-command jb cmd)
-    (let* ((jn  (list-ref jb 0))
-	   (job (list-ref jb 1)))
+    (let* ((jn  (job-get-index jb))
+	   (job (job-get-process jb)))
           (process-send-line job cmd)
 	  (job-display-response job jn)
-	  (job-show-status job)))
+;	  (job-show-status job)
+	  ))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -102,18 +119,18 @@
     (let* ((cmd (apply sprintf (cons fmt x)))
            (job (process-open "a" cmd))
 	   (jn  (job-number nil))
-	   (jb  (list jn job))
 	   (jnm (string->symbol (sprintf "p%d" jn)))
-	   (fnc nil))
+
+  	   (msn (eval `(define-global-macro ,(list jnm 'msg)
+			   (job-send-command (quote ,jb)
+					     (sprintf "\"%s\"" msg)))))
+	   (jb  (list jn job)))
+
 
 ; check that the jobs is running and get startup messages
           (job-show-status job)
 	  (sleep 100)
 	  (job-display-response job jn)
-
-; write the function to send messages to the job
-          (set! fnc (eval `(define-global-macro ,(list jnm 'msg)
-			       (job-send-command (quote ,jb) (sprintf "\"%s\"" msg)))))
 
 ; add the job to the list
           (set! jobs (cons jb jobs))))
@@ -127,8 +144,8 @@
     (let* ((st 0))
 
           (define (do-one x)
-	      (let* ((jn  (list-ref x 0))
-		     (job (list-ref x 1))
+	      (let* ((jn  (job-get-index x))
+		     (job (job-get-process x))
 		     (js  (job-exit-status job)))
 		    (if (not (= js 0))
 			(set! st js))
@@ -137,6 +154,18 @@
           (for-each do-one jobs)
 
 	  (quit st)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; PA - send command CMD to all jobs
+
+(define-macro (pa cmd)
+
+    (define (do-one x)
+        (job-send-command x (sprintf "%s" cmd)))
+
+    (for-each do-one jobs))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -174,5 +203,6 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+(enter-pdbview-mode)
 (main argv)
 

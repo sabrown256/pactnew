@@ -837,6 +837,10 @@ extern object
  *SX_mode_text(SS_psides *si),
  *SX_mode_graphics(SS_psides *si);
 
+extern void
+ SX_mode_pdbview(SS_psides *si, int load_init, int load_rc),
+ SX_install_modes(SS_psides *si);
+
 
 /* SXPAN.C declarations */
 
