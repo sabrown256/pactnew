@@ -46,7 +46,7 @@ void SC_reset_terminal(void)
    {
 
     if (_SC.orig_tty != NULL)
-       {SC_set_term_state(_SC.orig_tty, -1);
+       {SC_change_term_state(-1, SC_TERM_CUSTOM, TRUE, _SC.orig_tty);
         CFREE(_SC.orig_tty);};
 
     return;}
@@ -632,9 +632,9 @@ static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
 
     if (SC_process_alive(pp) && (pp->medium == USE_PTYS))
        {if (_SC.orig_tty != NULL)
-	   SC_set_raw_state(0, FALSE);
+	   SC_change_term_state(0, SC_TERM_RAW, FALSE, NULL);
 
-	SC_set_raw_state(pp->io[0], FALSE);
+	SC_change_term_state(pp->io[0], SC_TERM_RAW, FALSE, NULL);
 
 	for (i = 0; i < SC_N_IO_CH; i++)
 	    cp->io[i] = -1;};
@@ -1045,7 +1045,7 @@ static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
  * this point
  */
     if ((savetty == TRUE) && (_SC.orig_tty == NULL))
-       _SC.orig_tty = SC_get_term_state(0, TRUE);
+       _SC.orig_tty = SC_term_get_state(0, TRUE);
 
 /* set up the communications pipe */
     flag = _SC_init_ipc(pp, cp);

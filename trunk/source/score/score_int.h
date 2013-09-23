@@ -181,6 +181,7 @@ struct s_SC_scope_private
 
 /* SCTERM.C */
     int suppress;
+    SC_termst term;
 
 /* SCFNCT.C */
     PFSignal_handler to_lst;

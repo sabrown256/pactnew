@@ -123,9 +123,6 @@
 #define PC_get_number_processors    SC_get_number_processors
 #define PC_get_processor_number     SC_get_processor_number
 
-#define PC_set_raw_state            SC_set_raw_state
-#define PC_set_cooked_state         SC_set_cooked_state
-
 #define PC_exit_all                 SC_exit_all
 
 

@@ -54,7 +54,6 @@ struct s_lehcmp
 
 struct s_lehdes
    {int fd;
-    int raw;
     int exr;
     int nhx;             /* maximum number of history items */
     int nh;              /* current number of history items */
@@ -78,7 +77,8 @@ struct s_lehloc
     char *prompt;};       /* prompt text */
 
 static lehdes
- _SC_leh = { -1, FALSE, 0, MAX_HIST_N, 0, NULL,
+ _SC_leh = { -1, 0, MAX_HIST_N, 0,
+	     NULL,
 	     read, fgets, NULL, NULL, };
 
 static int
@@ -131,21 +131,6 @@ static void _SC_leh_free_hist(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_LEH_DISA_RAW - put FD into cooked mode */
-
-static void _SC_leh_disa_raw(int fd)
-   {int rv;
-
-    if (_SC_leh.raw == TRUE)
-       {rv = SC_set_cooked_state(fd, FALSE);
-	if (rv == TRUE)
-	   _SC_leh.raw = FALSE;};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SC_LEH_DONE - at exit try to restore the terminal
  *              - to its initial conditions
  */
@@ -155,7 +140,7 @@ static void _SC_leh_done(void)
 
     fd = _SC_leh.fd;
     if (fd != -1)
-       {_SC_leh_disa_raw(fd);
+       {SC_change_term_state(fd, SC_TERM_COOKED, TRUE, NULL);
 
 	_SC_leh_free_hist();
 
@@ -166,9 +151,11 @@ static void _SC_leh_done(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_LEH_ENA_RAW - put FD into raw mode */
+/* _SC_LEH_ENA_RAW - put FD into raw mode
+ *                 - return the prior terminal state
+ */
 
-static int _SC_leh_ena_raw(int fd)
+int _SC_leh_ena_raw(int fd)
    {int rv;
 
     rv = FALSE;
@@ -201,8 +188,7 @@ static int _SC_leh_ena_raw(int fd)
 			     0);};
 
     if (rv == TRUE)
-       _SC_leh.raw = TRUE;
-
+       _SC.term = SC_TERM_LEH_RAW;
     else
        errno = ENOTTY;
 
@@ -779,7 +765,7 @@ static int _SC_leh_clear_screen(lehloc *lp)
 static int _SC_leh_intr(lehloc *lp)
    {
 
-    _SC_leh_disa_raw(STDIN_FILENO);
+    SC_change_term_state(STDIN_FILENO, SC_TERM_COOKED, TRUE, NULL);
 
     kill(0, SIGINT);
 
@@ -810,7 +796,7 @@ static void _SC_leh_resume(int sig)
    {
 
 /* return to raw mode */
-    _SC_leh_ena_raw(STDIN_FILENO);
+    SC_change_term_state(STDIN_FILENO, SC_TERM_LEH_RAW, TRUE, NULL);
 
     return;}
 
@@ -823,7 +809,7 @@ static int _SC_leh_suspend(lehloc *lp)
    {
 
 /* switch to cooked mode for terminal */
-    _SC_leh_disa_raw(STDIN_FILENO);
+    SC_change_term_state(STDIN_FILENO, SC_TERM_COOKED, TRUE, NULL);
 
 /* put handler on SIGCONT */
     SC_signal_n(SIGCONT, _SC_leh_resume, NULL);
@@ -1088,6 +1074,7 @@ static char *_SC_leh_raw(lehloc *lp)
     char *bf;
     size_t nb;
     char *rv;
+    SC_termst st;
 
     fd = lp->fd;
     bf = lp->bf;
@@ -1109,9 +1096,10 @@ static char *_SC_leh_raw(lehloc *lp)
 		rv[nc] = '\0';};};}
 
     else
-       {if (_SC_leh_ena_raw(fd) == TRUE)
+       {st = SC_change_term_state(fd, SC_TERM_LEH_RAW, TRUE, NULL);
+        if (_SC.term == SC_TERM_LEH_RAW);
 	   {rv = _SC_leh_gets(lp);
-	    _SC_leh_disa_raw(fd);
+	    st = SC_change_term_state(fd, st, TRUE, NULL);
 	    printf("\n");};};
 
     return(rv);}
@@ -1143,6 +1131,7 @@ char *SC_leh(const char *prompt)
 
     rv = NULL;
     _SC_leh.fd = STDIN_FILENO;
+    _SC.term   = SC_TERM_COOKED;
 
     if (_SC_leh_sup_termp() == FALSE)
        {_SC_leh_put_prompt(&loc);

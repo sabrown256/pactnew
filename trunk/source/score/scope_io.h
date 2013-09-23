@@ -92,6 +92,12 @@
 
 /*--------------------------------------------------------------------------*/
 
+enum e_SC_termst
+   {SC_TERM_UNKNOWN, SC_TERM_COOKED,
+    SC_TERM_RAW, SC_TERM_LEH_RAW, SC_TERM_CUSTOM};
+
+typedef enum e_SC_termst SC_termst;
+
 enum e_io_oper
    {IO_OPER_NONE, IO_OPER_FOPEN, IO_OPER_FCLOSE,
     IO_OPER_FTELL, IO_OPER_LFTELL, IO_OPER_FSEEK, IO_OPER_LFSEEK,
@@ -541,6 +547,12 @@ extern PFIOErr
  SC_set_io_error_handler(PFIOErr hnd);
 
 
+/* SCLEH.C declarations */
+
+extern int
+ _SC_leh_ena_raw(int fd);
+
+
 /* SCMMAP.C declarations */
 
 extern FILE
@@ -603,9 +615,7 @@ extern int
  SC_set_io_attr(int fd, int attr, int state),
  SC_set_io_attrs(int fd, ...),
  SC_is_background_process(int pid),
- SC_set_term_state(void *t, int trmfd),
- SC_set_raw_state(int fd, int trap),
- SC_set_cooked_state(int fd, int trap),
+ SC_term_set_state(int fd, void *a),
  SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc),
  SC_set_term_size(int fd, int nr, int nc, int pw, int ph),
  SC_io_suspend(int fl),
@@ -615,8 +625,11 @@ extern int
  SC_mpi_io_suppress(int on),
  SC_mpi_suppress(int st);
 
+extern SC_termst
+ SC_change_term_state(int fd, SC_termst st, int trap, void *a);
+
 extern void
- *SC_get_term_state(int fd, int size),
+ *SC_term_get_state(int fd, int size),
  SC_disconnect_tty(void);
 
 extern void

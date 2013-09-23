@@ -12,6 +12,8 @@
 #include "scope_term.h"
 #include "scope_proc.h"
 
+#define OLDWAY
+
 #define SET_ATTR(_v, _a, _s)                                                 \
     switch (_s)                                                              \
        {case 1 :                                                             \
@@ -618,15 +620,15 @@ void dbck(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_SET_RAW_STATE - set the RAW processing on the given descriptor
- *                  - don't do anything else if you can't get the
- *                  - parameters for the stream
- *                  - this also weeds out descriptors (e.g. sockets
- *                  - and pipes) for which this is inappropriate
- *                  - (TTY's and PTY's need this stuff)
+/* _SC_SET_RAW_STATE - set the RAW processing on the given descriptor
+ *                   - don't do anything else if you can't get the
+ *                   - parameters for the stream
+ *                   - this also weeds out descriptors (e.g. sockets
+ *                   - and pipes) for which this is inappropriate
+ *                   - (TTY's and PTY's need this stuff)
  */
 
-int SC_set_raw_state(int fd, int trap)
+static int _SC_set_raw_state(int fd, int trap)
    {int rv;
 
     rv = FALSE;
@@ -647,7 +649,7 @@ int SC_set_raw_state(int fd, int trap)
 
 	    rv = _SC_set_tty_attr(fd, &t, TRUE);
 	    if (rv < 0)
-	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - SC_SET_RAW_STATE",
+	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - _SC_SET_RAW_STATE",
 			errno);};};
 
 # else
@@ -675,6 +677,9 @@ int SC_set_raw_state(int fd, int trap)
 			    0);
 # endif
 
+    if (rv == TRUE)
+       _SC.term = SC_TERM_RAW;
+
     if (trap)
        {SC_ERR_UNTRAP();};
 
@@ -685,15 +690,15 @@ int SC_set_raw_state(int fd, int trap)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_SET_COOKED_STATE - set the COOKED processing on the given descriptor
- *                     - don't do anything else if you can't get the
- *                     - parameters for the stream
- *                     - this also weeds out descriptors (e.g. sockets
- *                     - and pipes) for which this is inappropriate
- *                     - (TTY's and PTY's need this stuff)
+/* _SC_SET_COOKED_STATE - set the COOKED processing on the given descriptor
+ *                      - don't do anything else if you can't get the
+ *                      - parameters for the stream
+ *                      - this also weeds out descriptors (e.g. sockets
+ *                      - and pipes) for which this is inappropriate
+ *                      - (TTY's and PTY's need this stuff)
  */
 
-int SC_set_cooked_state(int fd, int trap)
+static int _SC_set_cooked_state(int fd, int trap)
    {int rv;
 
     rv = FALSE;
@@ -715,7 +720,7 @@ int SC_set_cooked_state(int fd, int trap)
 
 	    rv = _SC_set_tty_attr(fd, &t, TRUE);
 	    if (rv < 0)
-	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - SC_SET_COOKED_STATE",
+	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - _SC_SET_COOKED_STATE",
 			errno);};};
 # else
 
@@ -741,6 +746,11 @@ int SC_set_cooked_state(int fd, int trap)
 			    0);
 # endif
 
+#ifndef OLDWAY
+    if (rv == TRUE)
+       _SC.term = SC_TERM_COOKED;
+#endif
+
     if (trap)
        {SC_ERR_UNTRAP();};
 
@@ -751,7 +761,7 @@ int SC_set_cooked_state(int fd, int trap)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_GET_TERM_STATE - get the terminal state on the given descriptor
+/* SC_TERM_GET_STATE - get the terminal state on the given descriptor
  *                   - allocate and return a TERMINAL_STATE
  *                   - containing the old state
  *                   - don't do anything else if you can't get the
@@ -761,7 +771,7 @@ int SC_set_cooked_state(int fd, int trap)
  *                   - this stuff)
  */
 
-void *SC_get_term_state(int fd, int size)
+void *SC_term_get_state(int fd, int size)
    {TERMINAL_STATE *t;
     void *rv;
 
@@ -813,7 +823,7 @@ void *SC_get_term_state(int fd, int size)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_SET_TERM_STATE - set the terminal state on the given descriptor
+/* SC_TERM_SET_STATE - set the terminal state on the given descriptor
  *                   - don't do anything else if you can't get the
  *                   - parameters for the stream
  *                   - this also weeds out descriptors (e.g. sockets and
@@ -822,7 +832,7 @@ void *SC_get_term_state(int fd, int size)
  *                   - return TRUE iff successful
  */
 
-int SC_set_term_state(void *pt, int trmfd)
+int SC_term_set_state(int fd, void *a)
    {int rv;
     SC_contextdes oh;
 
@@ -830,15 +840,13 @@ int SC_set_term_state(void *pt, int trmfd)
     oh = SC_signal_n(SIGTTOU, SIG_IGN, NULL);
 
 #ifdef TERMINAL
-    int fd, st;
+    int st;
     TERMINAL_STATE *t;
 
-    t = (TERMINAL_STATE *) pt;
+    t = (TERMINAL_STATE *) a;
 
     if (t != NULL)
-       {if (trmfd >= 0)
-	   fd = trmfd;
-        else
+       {if (fd < 0)
 	   fd = t->fd;
 
 	st = _SC_set_tty_attr(fd, &t->term, TRUE);
@@ -862,11 +870,46 @@ int SC_set_term_state(void *pt, int trmfd)
 
 	    if (t->valid_size == TRUE)
 	       {if (ioctl(fd, TIOCSWINSZ, &t->window_size) < 0)
-		   rv = FALSE;};};};
+		   rv = FALSE;};
+
+	    if (rv == TRUE)
+	       _SC.term = SC_TERM_CUSTOM;};};
 
 #endif
 
     SC_signal_n(SIGTTOU, oh.f, oh.a);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_CHANGE_TERM_STATE - change the terminal state to one of the
+ *                      - modes defined by the SC_termst enum
+ *                      - return the prior state
+ */
+
+SC_termst SC_change_term_state(int fd, SC_termst st, int trap, void *a)
+   {SC_termst rv;
+
+    rv = _SC.term;
+    if (st != rv)
+       {switch (st)
+	   {case SC_TERM_COOKED :
+	         _SC_set_cooked_state(fd, trap);
+		 break;
+	    case SC_TERM_RAW :
+		 _SC_set_raw_state(fd, trap);
+		 break;
+	    case SC_TERM_LEH_RAW :
+		 _SC_leh_ena_raw(fd);
+		 break;
+	    case SC_TERM_CUSTOM :
+		 SC_term_set_state(fd, a);
+		 break;
+	    case SC_TERM_UNKNOWN :
+	    default:
+		 break;};};
 
     return(rv);}
 
@@ -1199,7 +1242,7 @@ int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
 	   rv = FALSE;
 
 	else
-	   {ts = SC_get_term_state(fd, FALSE);
+	   {ts = SC_term_get_state(fd, FALSE);
 
 /* set the terminal for nice querying */
 	    _SC_set_query_state(fd);
@@ -1217,7 +1260,7 @@ int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
 	    rv = TRUE;
 
 /* close the terminal */
-	    SC_set_term_state(ts, fd);
+	    SC_change_term_state(fd, SC_TERM_CUSTOM, TRUE, ts);
 	    SC_close_safe(fd);};};
 
 #endif
@@ -1266,7 +1309,7 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 	   rv = FALSE;
 
 	else
-	   {ts = SC_get_term_state(fd, FALSE);
+	   {ts = SC_term_get_state(fd, FALSE);
 
 /* set the terminal for nice querying */
 	    _SC_set_query_state(fd);
@@ -1310,7 +1353,7 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 		rv = TRUE;};
 
 /* close the terminal */
-	    SC_set_term_state(ts, fd);
+	    SC_change_term_state(fd, SC_TERM_CUSTOM, TRUE, ts);
 	    SC_close_safe(fd);};};
 
 #endif

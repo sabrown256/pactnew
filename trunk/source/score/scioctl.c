@@ -429,7 +429,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 /* reassert raw mode */
     if (pe->raw == TRUE)
        {in = STDIN_FILENO;
-	SC_set_raw_state(in, FALSE);
+	SC_change_term_state(in, SC_TERM_RAW, FALSE, NULL);
 	SC_set_io_attrs(in,
 			OPOST, SC_TERM_OUTPUT, TRUE,
 			0);};
