@@ -1281,6 +1281,9 @@ extern void
 extern PFread
  SC_leh_set_read(PFread f);
 
+extern PFfgets
+ SC_leh_set_fgets(PFfgets f);
+
 
 /* SCLOG.C declarations */
 

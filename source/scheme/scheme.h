@@ -986,6 +986,12 @@ extern void
  SS_gc(SS_psides *si, object *obj);
 
 
+/* SHPRC1.C declarations */
+
+extern object
+ *SS_mk_process(SS_psides *si, PROCESS *pp);
+
+
 /* SHPRM1.C declarations */
 
 extern object

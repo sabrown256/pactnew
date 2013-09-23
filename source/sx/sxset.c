@@ -286,11 +286,14 @@ int _SX_get_input(SS_psides *si, object *str)
        rv = -1;
 
     else if (fp == stdin)
-       {PFread o;
+       {PFread r;
+	PFfgets f;
 
-        o = SC_leh_set_read(PG_wind_read);
+        r = SC_leh_set_read(PG_wind_read);
+        f = SC_leh_set_fgets(PG_wind_fgets);
 	p = SC_prompt(_SS.pr_prompt, SS_BUFFER(str), MAXLINE);
-        SC_leh_set_read(o);
+        SC_leh_set_read(r);
+        SC_leh_set_fgets(f);
 
 	_SS.pr_prompt = NULL;
 

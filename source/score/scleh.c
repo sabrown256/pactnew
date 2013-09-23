@@ -60,6 +60,7 @@ struct s_lehdes
     int nh;              /* current number of history items */
     char **hist;
     PFread read;
+    PFfgets fgets;
     PFlehact *map;
     PFlehcb cmp_cb;};
 
@@ -78,7 +79,7 @@ struct s_lehloc
 
 static lehdes
  _SC_leh = { -1, FALSE, 0, MAX_HIST_N, 0, NULL,
-	     read, NULL, NULL, };
+	     read, fgets, NULL, NULL, };
 
 static int
  trace = FALSE;
@@ -1100,7 +1101,7 @@ static char *_SC_leh_raw(lehloc *lp)
 	rv    = NULL;}
 
     else if (isatty(fd) == FALSE)
-       {rv = fgets(bf, nb, stdin);
+       {rv = _SC_leh.fgets(bf, nb, stdin);
 	if (rv != NULL)
 	   {nc = strlen(rv);
 	    if ((nc > 0) && (rv[nc-1] == '\n'))
@@ -1148,7 +1149,7 @@ char *SC_leh(const char *prompt)
 
 	SC_fflush_safe(stdout);
 
-	rv = fgets(bf, MAX_BFSZ, stdin);
+	rv = _SC_leh.fgets(bf, MAX_BFSZ, stdin);
 
         if (rv != NULL)
 	   {nc = strlen(bf);
@@ -1299,7 +1300,7 @@ int SC_leh_hist_load(char *fname)
 
     fp = SC_fopen_safe(fname, "r");
     if (fp != NULL)
-       {while (fgets(t, MAX_BFSZ, fp) != NULL)
+       {while (_SC_leh.fgets(t, MAX_BFSZ, fp) != NULL)
 	   {p = strchr(t, '\r');
 	    if (p == NULL)
 	       p = strchr(t, '\n');
@@ -1327,6 +1328,21 @@ PFread SC_leh_set_read(PFread f)
 
     ov = _SC_leh.read;
     _SC_leh.read = f;
+
+    return(ov);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LEH_SET_FGETS - set the fgets method for LEH
+ *                  - return the old function
+ */
+
+PFfgets SC_leh_set_fgets(PFfgets f)
+   {PFfgets ov;
+
+    ov = _SC_leh.fgets;
+    _SC_leh.fgets = f;
 
     return(ov);}
 
