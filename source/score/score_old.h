@@ -272,6 +272,15 @@ extern char
  *SC_strsaven(char *s, char *name);
 
 
+/* former SCTERM.C declarations */
+
+extern int
+ SC_set_term_state(void *pt, int trmfd);
+
+extern void
+ *SC_get_term_state(int fd, int size);
+
+
 #ifdef __cplusplus
 }
 #endif

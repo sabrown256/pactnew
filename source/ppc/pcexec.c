@@ -44,16 +44,14 @@ static void child_has_txt(int fd, int mask, void *a)
 /* TTY_HAS_TXT - handle text from the tty */
 
 static void tty_has_txt(int fd, int mask, void *a)
-   {int in;
-    char s[MAX_BFSZ];
+   {char s[MAX_BFSZ];
     PROCESS *pp;
     descriptors *pd;
 
     pd = (descriptors *) a;
     pp = pd->pp;
 
-    in = fileno(stdin);
-    SC_set_raw_state(in, FALSE);
+    SC_change_term_state(STDIN_FILENO, SC_TERM_RAW, FALSE, NULL);
 
     if (SC_fgets(s, MAX_BFSZ, stdin) != NULL)
        PC_printf(pp, "%s", s);

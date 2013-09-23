@@ -369,3 +369,42 @@ PFSignal_handler SC_signal(int sig, PFSignal_handler fnc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_SET_TERM_STATE - set the terminal state on the given descriptor
+ *                   - don't do anything else if you can't get the
+ *                   - parameters for the stream
+ *                   - this also weeds out descriptors (e.g. sockets and
+ *                   - pipes) for which this is inappropriate (PTY's need
+ *                   - this stuff)
+ *                   - return TRUE iff successful
+ */
+
+int SC_set_term_state(void *a, int fd)
+   {int rv;
+
+    rv = SC_term_set_state(fd, a);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_GET_TERM_STATE - get the terminal state on the given descriptor
+ *                   - allocate and return a TERMINAL_STATE
+ *                   - containing the old state
+ *                   - don't do anything else if you can't get the
+ *                   - parameters for the stream
+ *                   - this also weeds out descriptors (e.g. sockets and
+ *                   - pipes) for which this is inappropriate (PTY's need
+ *                   - this stuff)
+ */
+
+void *SC_get_term_state(int fd, int size)
+   {void *rv;
+
+    rv = SC_term_get_state(fd, size);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

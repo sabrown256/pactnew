@@ -124,7 +124,7 @@ static int _SC_posix_setup_tty(PROCESS *pp, int child)
 	    else
 	       SC_set_term_size(in, -1, -1, -1, -1);
 
-	    SC_set_raw_state(in, FALSE);
+	    SC_change_term_state(in, SC_TERM_RAW, FALSE, NULL);
 
             pp->io[1] = in;
             pp->io[0] = in;};};
