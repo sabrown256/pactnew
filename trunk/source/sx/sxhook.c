@@ -10,6 +10,16 @@
  
 #include "sx_int.h"
 
+typedef struct s_SX_iodes SX_iodes;
+
+struct s_SX_iodes
+   {int fd;
+    PROCESS *pp;
+    object *fnc;};
+
+static SX_iodes
+ _SX_callbacks[100];
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -209,6 +219,86 @@ int SX_fputs(const char *s, FILE *fp)
     SC_ASSERT(rv == TRUE);
 
     return(FALSE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_PROC_CALLBACK - handle I/O callbacks to Scheme level functions */
+
+static void _SS_proc_callback(int fd, int mask, void *a)
+   {char *nm;
+    PROCESS *pp;
+    SX_iodes *pi;
+    SS_psides *si;
+
+    pi = _SX_callbacks + fd;
+    si = SS_get_current_scheme(-1);
+
+    if (SS_procedurep(pi->fnc))
+       {nm = SS_PROCEDURE_NAME(pi->fnc);
+	pp = pi->pp;
+
+	SS_call_scheme(si, nm,
+		       SS_PROCESS_I, pp,
+		       0);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_PROCESS_IO_CALLBACK - setup I/O callbacks for poll */
+
+void _SX_process_io_callback(PROCESS *pp, object *frd, object *fwr)
+   {int fd;
+    SX_iodes *pi;
+
+    fd = pp->io[0];
+    PG_loop_callback(SC_INTEGER_I, &fd,
+		     _SS_proc_callback, NULL, pp->id);
+
+    pi = _SX_callbacks + fd;
+    pi->fd  = fd;
+    pi->pp  = pp;
+    pi->fnc = frd;
+
+    fd = pp->io[1];
+    PG_loop_callback(SC_INTEGER_I, &fd,
+		     _SS_proc_callback, NULL, pp->id);
+
+    pi = _SX_callbacks + fd;
+    pi->fd  = fd;
+    pi->pp  = pp;
+    pi->fnc = fwr;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_PROCESS_REMOVE_CALLBACK - remove callbacks for poll */
+
+void _SX_process_remove_callback(PROCESS *pp)
+   {int fd;
+    SX_iodes *pi;
+
+    fd = pp->io[0];
+    PG_remove_callback(&fd);
+
+    pi = _SX_callbacks + fd;
+    pi->fd  = 0;
+    pi->pp  = NULL;
+    pi->fnc = NULL;
+
+    fd = pp->io[1];
+    PG_remove_callback(&fd);
+
+    pi = _SX_callbacks + fd;
+    pi->fd  = 0;
+    pi->pp  = NULL;
+    pi->fnc = NULL;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

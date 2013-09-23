@@ -29,9 +29,10 @@
 
 (define (job-number-aux job jlst n)
     (if (pair? jlst)
-	(if (eqv? job (list-ref jlst 0))
-	    n
-	    (job-number-aux job (list-tail jlst 1) (+ n 1)))
+	(let* ((jb (list-ref jlst 0)))
+	      (if (eqv? job (job-get-process jb))
+		  (job-get-index jb)
+		  (job-number-aux job (list-tail jlst 1) (+ n 1))))
 	n))
 
 (define (job-number job)
@@ -49,7 +50,8 @@
 					0))))
           (if s
 	      (begin (if (= lc 10)
-			 (printf nil "%d| %s" n s)
+			 (printf nil "%d | %s" n s)
+;			 (printf nil "%d %s | %s" n job s)
 			 (printf nil "%s" s))
 		     (job-display-response job n))
 	      (printf nil "\n"))))
@@ -110,6 +112,21 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+(define (poll-read job)
+(printf nil "\npoll-read> %d %s ----------------------\n"
+	(job-number job) job)
+    (let* ((n (job-number job)))
+          (job-display-response job n)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (poll-write job)
+    (printf nil "> poll read %s\n" job))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ; MAKE-JOB - exec a new job
 ;          - this means spawning a new process,
 ;          - writing the function to send it messages,
@@ -117,18 +134,17 @@
 
 (define (make-job fmt . x)
     (let* ((cmd (apply sprintf (cons fmt x)))
-           (job (process-open "a" cmd))
+           (job (process-open "a" (list cmd) poll-read nil))
 	   (jn  (job-number nil))
 	   (jnm (string->symbol (sprintf "p%d" jn)))
+	   (jb  (list jn job))
 
   	   (msn (eval `(define-global-macro ,(list jnm 'msg)
 			   (job-send-command (quote ,jb)
-					     (sprintf "\"%s\"" msg)))))
-	   (jb  (list jn job)))
-
+					     (sprintf "\"%s\"" msg))))))
 
 ; check that the jobs is running and get startup messages
-          (job-show-status job)
+;          (job-show-status job)
 	  (sleep 100)
 	  (job-display-response job jn)
 

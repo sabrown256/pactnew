@@ -79,6 +79,7 @@ struct s_SS_scope_private
 
 /* SHPRC1.C */
     int n_tries;
+    void (*io_callback)(PROCESS *pp, object *frd, object *fwr);
 
 /* SHREAD.C */
     hasharr *parser_tab;

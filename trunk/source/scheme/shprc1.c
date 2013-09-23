@@ -82,6 +82,22 @@ void _SS_rl_process(SS_psides *si, object *obj)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_MK_PROCESS - return an object encapsulating a PROCESS */
+
+object *SS_mk_process(SS_psides *si, PROCESS *pp)
+   {object *rv;
+
+    if (pp != NULL)
+       rv = SS_mk_object(si, pp, SS_PROCESS_I, SELF_EV, NULL,
+			 _SS_wr_process, _SS_rl_process);
+    else
+       rv = SS_null;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                           PROCESS PREDICATES                             */
 
@@ -120,23 +136,32 @@ static object *_SSI_pr_runp(SS_psides *si, object *obj)
 /* _SSI_OPN_PR - process-open in Scheme */
 
 static object *_SSI_opn_pr(SS_psides *si, object *argl)
-   {int n, i;
+   {int i, n;
     char **argv, *mode;
     PROCESS *pp;
-    object *obj;
+    object *obj, *rv, *frd, *fwr;
 
-    obj = SS_null;
+    rv = SS_null;
 
 /* pull the mode off */
     mode = NULL;
+    obj  = SS_null;
+    frd  = SS_null;
+    fwr  = SS_null;
     SS_args(si, argl,
             SC_STRING_I, &mode,
+	    SS_OBJECT_I, &obj,
+	    SS_OBJECT_I, &frd,
+	    SS_OBJECT_I, &fwr,
             0);
 
     if (strchr("rwa", mode[0]) == NULL)
        SS_error(si, "BAD MODE - _SSI_OPN_PR", SS_car(si, argl));
 
-    argl = SS_cdr(si, argl);
+    if (SS_consp(obj))
+       argl = obj;
+    else
+       argl = SS_cdr(si, argl);
 
 /* the rest of the args constitute the command line */
     n = SS_length(si, argl);
@@ -163,12 +188,16 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
 
     CFREE(argv);
 
-    obj = SS_mk_object(si, pp, SS_PROCESS_I, SELF_EV, NULL,
-		       _SS_wr_process, _SS_rl_process);
+    if (_SS.io_callback != NULL)
+       {SC_unblock_file(stdin);   
+	_SS.io_callback(pp, frd, fwr);};
+
+    rv = SS_mk_object(si, pp, SS_PROCESS_I, SELF_EV, NULL,
+		      _SS_wr_process, _SS_rl_process);
 
     SC_mark(pp, 1);
 
-    return(obj);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

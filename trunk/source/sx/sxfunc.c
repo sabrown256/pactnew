@@ -58,6 +58,8 @@ double compose(double a, int i)
 void SX_quit(int i)
    {
 
+    SC_block_file(stdin);
+
     SC_exit_all();
 
 /* check the need to close the command log */

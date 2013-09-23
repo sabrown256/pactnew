@@ -590,6 +590,11 @@ object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 	     ht  = (hasharr *) vl;
 	     lst = SS_mk_cons(si, SS_mk_hasharr(si, ht), lst);}
 
+	 else if (ityp == SS_PROCESS_I)
+	    {PROCESS *pp;
+	     pp  = (PROCESS *) vl;
+	     lst = SS_mk_cons(si, SS_mk_process(si, pp), lst);}
+
 #endif
  
 	 else
@@ -703,45 +708,49 @@ object *SS_eval_form(SS_psides *si, object *first, ...)
 
 object *SS_call_scheme(SS_psides *si, char *func, ...)
    {int i, type[MAXLINE];
-    object *fnc, *expr;
+    object *fnc, *expr, *rv;
     void *ptr[MAXLINE];
-
-    SC_VA_START(func);
 
     fnc = _SS_lk_var_valc(si, func, si->env);
 /*    fnc = (object *) SC_hasharr_def_lookup(si->symtab, func); */
-    if (fnc == NULL)
-       SS_error(si, "UNKNOWN PROCEDURE - SS_CALL_SCHEME",
-		SS_mk_string(si, func));
+    if ((fnc == NULL) || (SS_procedurep(fnc) == FALSE))
+       {rv = SS_f;
+        io_printf(stdout,
+		  "Unknown procedure '%s' to SS_call_scheme - ignored\n",
+		  func);}
+    else
+       {SC_VA_START(func);
 
-    for (i = 0; i < MAXLINE; i++)
-        {type[i] = SC_VA_ARG(int);
-         if (type[i] == 0)
-            break;
+        for (i = 0; i < MAXLINE; i++)
+	    {type[i] = SC_VA_ARG(int);
+	     if (type[i] == 0)
+	        break;
 
-         ptr[i] = SC_VA_ARG(void *);
-         if (ptr[i] == (void *) LAST)
-            break;};
+	     ptr[i] = SC_VA_ARG(void *);
+	     if (ptr[i] == (void *) LAST)
+	        break;};
 
-    SC_VA_END;
+	SC_VA_END;
 
-    SC_mem_stats_set(0L, 0L);
+	SC_mem_stats_set(0L, 0L);
 
-    expr = SS_mk_cons(si, fnc, _SS_make_list(si, i, type, ptr));
-    SC_mark(expr, 1);
+	expr = SS_mk_cons(si, fnc, _SS_make_list(si, i, type, ptr));
+	SC_mark(expr, 1);
 
-    SS_eval(si, expr);
+	SS_eval(si, expr);
 
-    SS_gc(si, expr);
+	SS_gc(si, expr);
 
-    SS_assign(si, si->env, si->global_env);
-    SS_assign(si, si->this, SS_null);
-    SS_assign(si, si->exn, SS_null);
-    SS_assign(si, si->unev, SS_null);
-    SS_assign(si, si->argl, SS_null);
-    SS_assign(si, si->fun, SS_null);
+	SS_assign(si, si->env, si->global_env);
+	SS_assign(si, si->this, SS_null);
+	SS_assign(si, si->exn, SS_null);
+	SS_assign(si, si->unev, SS_null);
+	SS_assign(si, si->argl, SS_null);
+	SS_assign(si, si->fun, SS_null);
 
-    return(si->val);}
+	rv = si->val;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

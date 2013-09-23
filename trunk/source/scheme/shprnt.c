@@ -838,7 +838,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 
     str = SS_OUTSTREAM(strm);
 
-    fmt = (SS_bound_name(si, "format-expr") != SS_null);
+    fmt = (SS_procedurep(SS_bound_name(si, "format-expr")) == TRUE);
 
 /* take anything that will give a name - procedure, string, variable ... */
     obj = SS_lookup_object(si, obj);

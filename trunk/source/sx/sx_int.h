@@ -311,7 +311,8 @@ extern memdes
  *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp);
 
 extern void
- _SX_init_hash_objects(SS_psides *si, PDBfile *file);
+ _SX_init_hash_objects(SS_psides *si, PDBfile *file),
+ _SX_process_io_callback(PROCESS *pp, object *frd, object *fwr);
 
 
 /* SXMM.C declarations */

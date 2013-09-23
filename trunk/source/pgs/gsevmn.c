@@ -109,7 +109,7 @@ void PG_flush_events(PG_device *dev)
 /* _PG_GET_INPUT - respond to an input available interrupt */
 
 static void _PG_get_input(int fd, int mask, void *a)
-   {int n, nc;
+   {int n, nc, bl;
     char bf[MAX_BFSZ], eof;
     char *p;
 
@@ -118,11 +118,20 @@ static void _PG_get_input(int fd, int mask, void *a)
     fd  = fileno(stdin);
     eof = (char) EOF;
 
+/* check for terminal and block it if so */
+    if (isatty(fd) == TRUE)
+       {bl  = SC_isblocked_fd(fd);
+	SC_block_file(stdin);}
+    else
+       bl = TRUE;
+
     if (_PG_gcont.input_nr != -1)
        n = SC_read_sigsafe(fd, bf, _PG_gcont.input_nr);
     else
        n = PS_read_safe(fd, bf, MAX_BFSZ, FALSE);
-/*       n = SC_read_sigsafe(fd, bf, MAX_BFSZ); */
+
+    if (bl == FALSE)
+       SC_unblock_file(stdin);
 
 /* if we have no input buffer throw the input away (nobody asked for it)
  * and return to whoever called

@@ -419,6 +419,8 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 object *SX_mode_graphics(SS_psides *si)
    {object *ret;
 
+    _SS.io_callback = _SX_process_io_callback;
+
     if (PG_gs.console == NULL)
        {if (!PG_open_console("PDBView", SX_gs.console_type,
                              SX_gs.background_color_white,
