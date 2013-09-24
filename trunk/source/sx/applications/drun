@@ -29,6 +29,16 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; JOB-GET-OUT-BUFFER - return the output buffer for JOB
+
+(define (job-get-out-buffer jb)
+    (if (pair? jb)
+	(list-ref jb 2)
+	nil))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ; JOB-NUMBER - return the 1 based job index of JOB
 
 (define (job-number-aux job jlst n)
@@ -45,35 +55,63 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; JOB-DISPLAY-RESPONSE - display output from JOB N
-;                      - in response to a job-send-command
+; JOB-WHICH - return the process JB containing JOB
 
-(define (job-display-response job n)
-    (let* ((s  (process-read-line job))
-	   (lc (char->integer (list-ref (string->list (substring s -1 1))
-					0))))
+(define (job-which-aux job jlst)
+    (if (pair? jlst)
+	(let* ((jb (list-ref jlst 0)))
+	      (if (eqv? job (job-get-process jb))
+		  jb
+		  (job-which-aux job (list-tail jlst 1))))))
+
+(define (job-which job)
+    (job-which-aux job jobs))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-PUSH-RESPONSE - push output from job JB
+;                   - in response to a job-send-cmd
+
+(define (job-push-response jb)
+    (let* ((job (job-get-process jb))
+           (bf  (job-get-out-buffer jb))
+	   (s   (process-read-line job)))
           (if s
-	      (begin (if (= lc 10)
-			 (printf nil "%d | %s" n s)
-;			 (printf nil "%d %s | %s" n job s)
-			 (printf nil "%s" s))
-		     (job-display-response job n))
-	      (printf nil "\n"))))
+	      (begin (set-car! (cddr jb) (string-append bf s))
+		     (job-push-response jb))
+	      (job-pop-line jb))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; JOB-SEND-COMMAND - send text CMD to job JB
+; JOB-POP-LINE - pop complete line of text from job JB
 
-(define (job-send-command jb cmd)
+(define (job-pop-line jb)
+    (let* ((bf (job-get-out-buffer jb))
+	   (t  (if (null? bf) "" bf))
+	   (s  (strtok t "\n"))
+	   (r  (strtok t "")))
+          (set-car! (cddr jb) r)
+          (if s
+	      (let* ((n (job-get-index jb)))
+		    (printf nil "%d | %s\n" n s)
+		    (job-pop-line jb))
+	      (if r
+		  (job-pop-line jb)))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-SEND-CMD - send text CMD to job JB
+
+(define (job-send-cmd jb cmd)
     (let* ((jn  (job-get-index jb))
 	   (job (job-get-process jb)))
           (if vrb
 	      (printf nil "sending to %d> %s\n" jn cmd))
           (process-send-line job cmd)
-	  (job-display-response job jn)
-;	  (job-show-status job)
-	  ))
+	  (job-push-response jb)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -108,7 +146,7 @@
     (let* ((jn  (job-get-index jb))
 	   (job (job-get-process jb)))
           (sleep 500)
-	  (job-display-response job jn)
+	  (job-push-response jb)
 	  (let* ((stat (process-status job))
 		 (runs (cdddr stat))
 		 (runp (car runs))
@@ -120,15 +158,19 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; POLL-READ - read method for poll on processes
+
 (define (poll-read job)
-    (let* ((n (job-number job))
+    (let* ((jb (job-which job))
 	   (st (change-term-state nil TERM_COOKED FALSE)))
-          (newline)
-          (job-display-response job n)
+          (job-push-response jb)
 	  (change-term-state nil st FALSE)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
+
+; POLL-WRITE - write method for poll on processes
+;            - not currently used
 
 (define (poll-write job)
     (printf nil "> poll write %s\n" job))
@@ -146,16 +188,16 @@
            (job (process-open "a" (list cmd) poll-read poll-write))
 	   (jn  (job-number nil))
 	   (jnm (string->symbol (sprintf "p%d" jn)))
-	   (jb  (list jn job))
+	   (jb  (list jn job ""))
 
   	   (msn (eval `(define-global-macro ,(list jnm 'msg)
-			   (job-send-command (quote ,jb)
+			   (job-send-cmd (quote ,jb)
 					     (sprintf "\"%s\"" msg))))))
 
 ; check that the jobs is running and get startup messages
 ;          (job-show-status job)
 	  (sleep 100)
-	  (job-display-response job jn)
+	  (job-push-response jb)
 
 ; add the job to the list
           (set! jobs (reverse (cons jb (reverse jobs))))))
@@ -188,7 +230,7 @@
 (define-macro (pa cmd)
 
     (define (do-one x)
-        (job-send-command x (sprintf "%s" cmd)))
+        (job-send-cmd x (sprintf "%s" cmd)))
 
     (for-each do-one jobs))
 

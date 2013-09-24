@@ -176,7 +176,8 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
  */
     script = SS_exe_script(c, v);
     if (script != NULL)
-       {if (SX_gs.sm == SX_MODE_PDBVIEW)
+       {SX_gs.qflag = TRUE;
+	if (SX_gs.sm == SX_MODE_PDBVIEW)
            SX_mode_pdbview(si, TRUE, TRUE);
 
 	switch (SETJMP(SC_gs.cpu))

@@ -24,8 +24,8 @@ static void _SS_wr_process(SS_psides *si, object *obj, object *strm)
     str = SS_OUTSTREAM(strm);
 
     pp = SS_PROCESS_VALUE(obj);
-    PRINT(str, "<PROCESS|%d-%d-%d-%d-", pp->id, pp->index,
-	  pp->io[0], pp->io[1]);
+    PRINT(str, "<PROCESS|%d-%d-%d-%d|",
+	  pp->id, pp->index, pp->io[0], pp->io[1]);
 
     flag = (pp->status & ~SC_CHANGED);
     switch (flag)
@@ -33,34 +33,23 @@ static void _SS_wr_process(SS_psides *si, object *obj, object *strm)
 	     PRINT(str, "Running");
 	     break;
         case SC_STOPPED :
-	     PRINT(str, "Stopped-");
+	     PRINT(str, "Stopped-%d", pp->reason);
 	     break;
         case SC_EXITED :
-	     PRINT(str, "Exited-");
+	     PRINT(str, "Exited-%d", pp->reason);
 	     break;
         case (SC_EXITED | SC_COREDUMPED) :
-	     PRINT(str, "Exited-Core-Dumped-");
+	     PRINT(str, "Exited-Core-Dumped-%d", pp->reason);
 	     break;
         case SC_SIGNALED :
-	     PRINT(str, "Signaled-");
+	     PRINT(str, "Signaled-%d", pp->reason);
 	     break;
         case (SC_SIGNALED | SC_COREDUMPED) :
-	     PRINT(str, "Signaled-Core-Dumped-");
+	     PRINT(str, "Signaled-Core-Dumped-%d", pp->reason);
 	     break;
         default :
 	     PRINT(str, "Unknown");
 	     break;};
-
-    if (flag != SC_RUNNING)
-       switch (flag)
-          {case SC_STOPPED :
-           case SC_EXITED :
-           case (SC_EXITED | SC_COREDUMPED) :
-           case SC_SIGNALED :
-           case (SC_SIGNALED | SC_COREDUMPED) :
-	        PRINT(str, "%d", pp->reason);
-           default :
-	        break;};
 
     PRINT(str, ">");
 
@@ -75,9 +64,12 @@ void _SS_rl_process(SS_psides *si, object *obj)
    {PROCESS *pp;
 
     pp = SS_PROCESS_VALUE(obj);
-    SC_close(pp);
 
-    CFREE(SS_OBJECT(obj));
+    if (SC_ref_count(pp) <= 1)
+       SC_close(pp);
+
+/* balance the SC_mark call in SS_mk_process */
+    CFREE(pp);
 
     return;}
 
@@ -90,8 +82,10 @@ object *SS_mk_process(SS_psides *si, PROCESS *pp)
    {object *rv;
 
     if (pp != NULL)
-       rv = SS_mk_object(si, pp, SS_PROCESS_I, SELF_EV, NULL,
-			 _SS_wr_process, _SS_rl_process);
+       {rv = SS_mk_object(si, pp, SS_PROCESS_I, SELF_EV, NULL,
+			  _SS_wr_process, _SS_rl_process);
+	SC_mark(pp, 1);}
+
     else
        rv = SS_null;
 
@@ -202,10 +196,7 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
        {SC_unblock_file(stdin);   
 	_SS.io_callback(pp, frd, fwr);};
 
-    rv = SS_mk_object(si, pp, SS_PROCESS_I, SELF_EV, NULL,
-		      _SS_wr_process, _SS_rl_process);
-
-    SC_mark(pp, 1);
+    rv = SS_mk_process(si, pp);
 
     return(rv);}
 
