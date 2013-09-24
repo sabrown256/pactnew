@@ -426,7 +426,7 @@ object *SX_mode_graphics(SS_psides *si)
                              SX_gs.background_color_white,
                              SX_gs.console_x[0], SX_gs.console_x[1],
                              SX_gs.console_dx[1], SX_gs.console_dx[1]))
-           {if (!SX_gs.qflag)
+           {if (SX_gs.qflag == FALSE)
                PRINT(STDOUT, "\nCannot connect to display\n");};}
 
     if (SX_gs.graphics_device == NULL)
@@ -518,7 +518,7 @@ void SX_mode_pdbview(SS_psides *si, int load_init, int load_rc)
     SX_init_env(si);
 
 #ifndef NO_SHELL
-    if (SX_gs.gr_mode && !SX_gs.qflag)
+    if ((SX_gs.gr_mode == TRUE) && (SX_gs.qflag == FALSE))
        SS_banner(si, SS_mk_string(si, PCODE));
 #endif
 

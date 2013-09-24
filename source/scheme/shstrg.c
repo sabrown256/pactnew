@@ -840,7 +840,7 @@ static object *_SS_strtok(SS_psides *si, object *argl,
 			  char *(*fnc)(char *, char *))
    {int c;
     char *text, *delim, t[MAXLINE], d[MAXLINE], *ps, *pt;
-    object *obj, *flag, *rv, *str;
+    object *flag, *rv, *str;
 
     str   = SS_null;
     delim = NULL;
@@ -851,19 +851,16 @@ static object *_SS_strtok(SS_psides *si, object *argl,
             SS_OBJECT_I, &flag,
             0);
 
-    text = SS_STRING_TEXT(str);
+    if (SS_nullobjp(str))
+       text = "";
+    else if (!SS_stringp(str))
+       SS_error(si, "BAD STRING - _SS_STRTOK", str);
+    else
+       text = SS_STRING_TEXT(str);
 
     if (SS_true(flag))
        {strcpy(t, text);
-        text = t;}
-
-/* this may look weird but it is correct!!!! */
-    else
-       {obj = SS_car(si, argl);
-        if (!SS_stringp(obj))
-           SS_error(si, "BAD STRING - _SS_STRTOK", obj);
-
-        text = SS_STRING_TEXT(obj);};
+        text = t;};
 
     for (ps = delim, pt = d; (c = *ps) != '\0'; ps++)
         {if (c == '\\')

@@ -200,8 +200,9 @@ int main(int c, char **v, char **env)
        ret = !SS_run(si, cmd);
 
     else
-       {if (SX_gs.gr_mode && !SX_gs.qflag)
+       {if ((SX_gs.gr_mode == TRUE) && (SX_gs.qflag == FALSE))
 	   SS_banner(si, SS_mk_string(si, SCODE));
+
 	SS_repl(si);
 
         ret = TRUE;};
