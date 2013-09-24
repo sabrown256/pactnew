@@ -28,15 +28,14 @@ endif
 
 # setup default values
 set track  = 1
-set Mode   = 0
-set Digits = 4
-set Argl   =
+set mode   = 0
+set digits = 4
 
 # handle args
 while ($#argv > 0)
-   switch ($argv[1])
+   switch ("$1")
       case -d:
-         set Mode = 1
+         set mode = 1
          breaksw
       case -h:
 	 echo ""
@@ -53,13 +52,13 @@ while ($#argv > 0)
          exit(0)
       case -p:
          shift
-         set Digits = $argv[1]
+         set digits = "$1"
          breaksw
       case -x:
          set track = 0
          breaksw
       default:
-         set Argl = "$Argl$argv[1] "
+         break
          breaksw
    endsw
    shift
@@ -71,11 +70,11 @@ if ((-x "$TRACKER_Exe") && ($track == 1)) then
 endif
 
 # do the browsing of the PDB file
-if ($Mode == 1) then
-   $CFE $BinDir/sx -s -l sxview.scm \(binls $Argl $Digits\)
+if ($mode == 1) then
+   $CFE $BinDir/sx -s -l sxview.scm \(binls $argv $digits\)
    set RetVal = $status;
 else
-   $CFE $BinDir/sx -p $Argl
+   $CFE $BinDir/sx -p $argv
    set RetVal = $status;
 endif
 

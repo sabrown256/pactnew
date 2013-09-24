@@ -1,4 +1,4 @@
-#!/usr/bin/env pdbview
+#!/usr/bin/env sx
 ;
 ; DRUN - run multiple instances of commands differentially
 ;
@@ -12,7 +12,9 @@
 ; JOB-GET-INDEX - return the 1 based index for JOB
 
 (define (job-get-index jb)
-    (list-ref jb 0))
+    (if (pair? jb)
+	(list-ref jb 0)
+	-1))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -20,7 +22,9 @@
 ; JOB-GET-PROCESS - return the process for JOB
 
 (define (job-get-process jb)
-    (list-ref jb 1))
+    (if (pair? jb)
+	(list-ref jb 1)
+	nil))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -64,6 +68,8 @@
 (define (job-send-command jb cmd)
     (let* ((jn  (job-get-index jb))
 	   (job (job-get-process jb)))
+          (if vrb
+	      (printf nil "sending to %d> %s\n" jn cmd))
           (process-send-line job cmd)
 	  (job-display-response job jn)
 ;	  (job-show-status job)
@@ -98,31 +104,34 @@
 ; JOB-EXIT-STATUS - wait for process JOB of job JN to exit
 ;                 - and return the reason
 
-(define (job-exit-status job jn)
-    (sleep 500)
-    (job-display-response job jn)
-    (let* ((stat (process-status job))
-	   (runs (cdddr stat))
-	   (runp (car runs))
-	   (reason (cadr runs)))
-          (if (= runp 0)
-	      (job-exit-status job)
-	      reason)))
+(define (job-exit-status jb)
+    (let* ((jn  (job-get-index jb))
+	   (job (job-get-process jb)))
+          (sleep 500)
+	  (job-display-response job jn)
+	  (let* ((stat (process-status job))
+		 (runs (cdddr stat))
+		 (runp (car runs))
+		 (reason (cadr runs)))
+	        (if (= runp 0)
+		    (job-exit-status jb)
+		    reason))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 (define (poll-read job)
-(printf nil "\npoll-read> %d %s ----------------------\n"
-	(job-number job) job)
-    (let* ((n (job-number job)))
-          (job-display-response job n)))
+    (let* ((n (job-number job))
+	   (st (change-term-state nil TERM_COOKED FALSE)))
+          (newline)
+          (job-display-response job n)
+	  (change-term-state nil st FALSE)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 (define (poll-write job)
-    (printf nil "> poll read %s\n" job))
+    (printf nil "> poll write %s\n" job))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -134,7 +143,7 @@
 
 (define (make-job fmt . x)
     (let* ((cmd (apply sprintf (cons fmt x)))
-           (job (process-open "a" (list cmd) poll-read nil))
+           (job (process-open "a" (list cmd) poll-read poll-write))
 	   (jn  (job-number nil))
 	   (jnm (string->symbol (sprintf "p%d" jn)))
 	   (jb  (list jn job))
@@ -149,7 +158,7 @@
 	  (job-display-response job jn)
 
 ; add the job to the list
-          (set! jobs (cons jb jobs))))
+          (set! jobs (reverse (cons jb (reverse jobs))))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -162,7 +171,7 @@
           (define (do-one x)
 	      (let* ((jn  (job-get-index x))
 		     (job (job-get-process x))
-		     (js  (job-exit-status job)))
+		     (js  (job-exit-status x)))
 		    (if (not (= js 0))
 			(set! st js))
 		    (process-close job)))

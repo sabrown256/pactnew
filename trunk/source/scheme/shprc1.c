@@ -167,13 +167,23 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
     n = SS_length(si, argl);
 
 /* we need one extra for a NULL argument to terminate argv */
-    argv = CMAKE_N(char *, n+1);
+    argv = CMAKE_N(char *, 100*(n+1));
 
     for (i = 0 ; i < n; argl = SS_cdr(si, argl))
         {obj = SS_car(si, argl);
 
          if (SS_stringp(obj))
-            argv[i++] = SS_STRING_TEXT(obj);
+	    {char t[BFLRG];
+	     char *p, *pt;
+
+	     SC_strncpy(t, BFLRG, SS_STRING_TEXT(obj), -1);
+	     for (pt = t; TRUE; pt = NULL)
+	         {p = strtok(pt, " \t");
+	          if (p != NULL)
+		     argv[i++] = p;
+		  else
+		     break;};}
+
          else if (SS_variablep(obj))
             argv[i++] = SS_VARIABLE_NAME(obj);
          else
@@ -485,6 +495,11 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
 
 void _SS_inst_proc(SS_psides *si)
    {
+
+    SS_install(si, "change-term-state",
+               "Procedure: Change the process input terminal state, return the prior state",
+               SS_nargs,
+               SS_change_term_state, SS_PR_PROC);
 
     SS_install(si, "process?",
                "Procedure: Returns #t if the object is a PROCESS object",

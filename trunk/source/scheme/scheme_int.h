@@ -360,6 +360,11 @@ extern void
  _SS_restore_state(SS_psides *si, object *esc_proc);
 
 
+/* SHTTY.C declarations */
+
+extern object
+ *SS_change_term_state(SS_psides *si, object *argl);
+
 #ifdef __cplusplus
 }
 #endif
