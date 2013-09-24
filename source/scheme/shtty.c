@@ -236,6 +236,43 @@ int SS_fputs(const char *s, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SS_CHANGE_TERM_STATE - change the terminal state
+ *                      - return the prior terminal state
+ *                      - Usage: (change-term-state pp st trap)
+ */
+
+object *SS_change_term_state(SS_psides *si, object *argl)
+   {int fd, trap;
+    SC_termst st;
+    void *a;
+    PROCESS *pp;
+    object *p, *rv;
+
+    fd   = STDIN_FILENO;
+    st   = SC_TERM_UNKNOWN;
+    p    = SS_null;
+    trap = TRUE;
+    a    = NULL;
+    SS_args(si, argl,
+            SS_OBJECT_I,  &p,
+            SC_ENUM_I,    &st,
+            SC_INTEGER_I, &trap,
+            SC_VOID_I,    &a,
+            0);
+
+    if (SS_processp(p))
+       {pp = SS_PROCESS_VALUE(p);
+	fd = pp->io[0];};
+
+    st = SC_change_term_state(fd, st, trap, a);
+
+    rv = SS_mk_integer(si, st);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SS_GET_STRING - convert a SCHEME object to a string */
 
 char *SS_get_string(object *obj)

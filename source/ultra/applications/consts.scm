@@ -21,6 +21,16 @@
 (define mq  -1)
 
 ;
+; SCORE terminal related constants
+;
+
+(define TERM_UNKNOWN  0)
+(define TERM_COOKED   1)
+(define TERM_RAW      2)
+(define TERM_LEH_RAW  3)
+(define TERM_CUSTOM   4)
+
+;
 ; PGS graphics related constants
 ;
 
