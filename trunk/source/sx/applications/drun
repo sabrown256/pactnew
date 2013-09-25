@@ -85,19 +85,44 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; LAST-CHAR - return the integer ASCII value of the last character of S
+
+(define (last-char t nt)
+    (let* ((nt (string-length t)))
+          (if (> nt 0)
+	      (let* ((s (substring t (- nt 1) nt)))
+		    (char->integer (car (string->list s))))
+	      0)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ; JOB-POP-LINE - pop complete line of text from job JB
 
 (define (job-pop-line jb)
+;(trace substring string-length)
+;(trace char->integer string->list)
+;(trace last-char)
     (let* ((bf (job-get-out-buffer jb))
 	   (t  (if (null? bf) "" bf))
-	   (s  (strtok t "\n"))
-	   (r  (strtok t "")))
+	   (nt (string-length t))
+	   (it (+ (istrchr t "\n") 1))
+	   (s  (substring t 0 it))
+	   (r  (substring t it nt))
+	   (lc (last-char s)))
+;(printf nil "\na ---------------------------------------------\n")
+;(printf nil ">> t = (0,%d) to (%d,%d) (%d) |%s|\n" it it nt nt t)
+;(printf nil ">> s = (%d) |%s|\n" (string-length s) s)
+;(printf nil ">> r = (%d) |%s|\n" (string-length r) r)
+;(printf nil "z ---------------------------------------------\n")
           (set-car! (cddr jb) r)
-          (if s
+          (if (> (string-length s) 0)
 	      (let* ((n (job-get-index jb)))
-		    (printf nil "%d | %s\n" n s)
+		    (if (= lc 10)
+			(printf nil "%d | %s" n s)
+			(printf nil "%d | %s\n" n s))
 		    (job-pop-line jb))
-	      (if r
+	      (if (> (string-length r) 0)
 		  (job-pop-line jb)))))
 
 ;--------------------------------------------------------------------------

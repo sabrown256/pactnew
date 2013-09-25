@@ -13,6 +13,44 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_DESCAPE_STRING - convert sequences such as '\\' 'n' to '\n' */
+
+static int _SS_descape_string(char *dst, char *src)
+   {int c, rv;
+    char *ps, *pd;
+
+    rv = FALSE;
+    if ((src != NULL) && (dst != NULL))
+       {rv = TRUE;
+	for (ps = src, pd = dst; (c = *ps) != '\0'; ps++)
+	    {if (c == '\\')
+	        {c = *(++ps);
+		 switch (c)
+		    {case 'n' :
+		          *pd++ = '\n';
+			  break;
+		     case 't' :
+			  *pd++ = '\t';
+			  break;
+		     case 'r' :
+			  *pd++ = '\r';
+			  break;
+		     case 'f' :
+			  *pd++ = '\f';
+			  break;
+		     default :
+			  *pd++ = c;
+			  break;};}
+	     else
+	        *pd++ = c;};
+
+	*pd = '\0';};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_STRCMP - Scheme version of strcmp */
 
 static object *_SS_strcmp(SS_psides *si, object *argl,
@@ -258,14 +296,18 @@ static object *_SSI_cistrlt(SS_psides *si, object *argl)
 
 static object *_SSI_strlen(SS_psides *si, object *str)
    {int64_t ln;
+    char *s;
     object *rv;
 
-    if (!SS_stringp(str))
-       SS_error(si, "ARGUMENT NOT STRING - STRING-LENGTH", str);
+    s = NULL;
+    SS_args(si, str,
+            SC_STRING_I, &s,
+            0);
 
-/* when tokenizing strings this definition makes more sense */
-    ln = strlen(SS_STRING_TEXT(str));
+    ln = (s == NULL) ? 0 : strlen(s);
     rv = SS_mk_integer(si, ln);
+
+    CFREE(s);
 
     return(rv);}
 
@@ -393,11 +435,14 @@ static object *_SSI_strsub(SS_psides *si, object *argl)
        {n1 = n + n1;
 	n2 = n1 + abs(n2);};
 
-    if ((n1 < 0) || (n < n1))
-       n1 = 0;
+/* confine n1 to be between 0 and n-1*/
+    n1 = max(n1, 0);
+    n1 = min(n1, n-1);
 
-    if ((n2 < 0) || (n < n2))
+/* take negative n2 to mean "to the end of the string" */
+    if (n2 < 0)
        n2 = n;
+    n2 = min(n2, n);
 
     s[n2] = '\0';
     str   = SS_mk_string(si, &s[n1]);
@@ -647,6 +692,9 @@ static object *_SSI_strchr(SS_psides *si, object *argl)
             SC_STRING_I, &delim,
             0);
 
+    _SS_descape_string(delim, delim);
+    _SS_descape_string(text, text);
+
     s  = strchr(text, (int) delim[0]);
     rv = (s == NULL) ? SS_null : SS_mk_string(si, s);
 
@@ -725,6 +773,9 @@ static object *_SSI_istrchr(SS_psides *si, object *argl)
             SC_STRING_I, &text,
             SC_STRING_I, &delim,
             0);
+
+    _SS_descape_string(delim, delim);
+    _SS_descape_string(text, text);
 
     s = strchr(text, (int) delim[0]);
     if (s == NULL)
@@ -837,9 +888,8 @@ static object *_SSI_trim(SS_psides *si, object *argl)
  */
 
 static object *_SS_strtok(SS_psides *si, object *argl,
-			  char *(*fnc)(char *, char *))
-   {int c;
-    char *text, *delim, t[MAXLINE], d[MAXLINE], *ps, *pt;
+			  char *(*fnc)(char *t, char *d))
+   {char *text, *delim, t[MAXLINE], d[BFLRG], *ps;
     object *flag, *rv, *str;
 
     str   = SS_null;
@@ -862,29 +912,9 @@ static object *_SS_strtok(SS_psides *si, object *argl,
        {strcpy(t, text);
         text = t;};
 
-    for (ps = delim, pt = d; (c = *ps) != '\0'; ps++)
-        {if (c == '\\')
-            {c = *(++ps);
-	     switch (c)
-	        {case 'n' :
-		      *pt++ = '\n';
-		      break;
-                 case 't' :
-		      *pt++ = '\t';
-		      break;
-                 case 'r' :
-		      *pt++ = '\r';
-		      break;
-                 case 'f' :
-		      *pt++ = '\f';
-		      break;
-		 default :
-		      *pt++ = c;
-		      break;};}
-	 else
-	    *pt++ = c;};
-
-    *pt = '\0';
+/* convert sequences such as '\\' 'n' to '\n' */
+    _SS_descape_string(d, delim);
+    _SS_descape_string(text, text);
 
     ps = (*fnc)(text, d);
 
