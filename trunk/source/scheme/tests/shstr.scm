@@ -72,12 +72,12 @@
 	 (set! err (map driver '(("aaaaa" "a")
 				 ("abc" "abc")
 				 ("   " "  "))))
-	 (apply + err)))
+	 (set! status (+ status (apply + err)))))
 
 (printf nil "\n")
 (printf nil "String tokenizer tests:\n")
-(set! status (test-null-tok strtok))
-(set! status (test-null-tok lasttok))
+(test-null-tok strtok)
+(test-null-tok lasttok)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -139,6 +139,94 @@
 (printf nil "\n")
 (printf nil "Substring primitives tests:\n")
 (test-string-extr)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; SUBSTRING
+
+(define (test-substring)
+    (let* ((src "0123456789"))
+
+          (define (test-substring s n1 n2 res)
+	      (let* ((r (substring s n1 n2)))
+		    (printf nil "   %s %s  (%d,%d) -> %s\n"
+			    (if (string=? r res)
+				"ok"
+				(begin (set! status (+ status 1))
+				       "ng"))
+			    s n1 n2 r)))
+
+	  (define (test-substring-1 s res)
+	      (let* ((r (substring s)))
+		    (printf nil "   %s %s  -> %s\n"
+			    (if (string=? r res)
+				"ok"
+				(begin (set! status (+ status 1))
+				       "ng"))
+			    s r)))
+
+	  (define (test-substring-2 s n1 res)
+	      (let* ((r (substring s n1)))
+		    (printf nil "   %s %s  (%d) -> %s\n"
+			    (if (string=? r res)
+				"ok"
+				(begin (set! status (+ status 1))
+				       "ng"))
+			    s n1 r)))
+
+; left end limit from the left end
+
+	  (test-substring "0123456789" 2 3 "2")
+	  (test-substring "0123456789" 2 5 "234")
+	  (test-substring "0123456789" 2 9 "2345678")
+
+; off the right end
+	  (test-substring "0123456789" 2 10 "23456789")
+	  (test-substring "0123456789" 2 20 "23456789")
+
+; bad right end limits
+	  (test-substring "0123456789" 2  2 "")
+	  (test-substring "0123456789" 2  1 "")
+	  (test-substring "0123456789" 2  0 "")
+	  (test-substring "0123456789" 2 -1 "2345678")
+
+; left end limit from the right end
+
+	  (test-substring "0123456789" -8 3 "2")
+	  (test-substring "0123456789" -8 9 "2345678")
+	  (test-substring "0123456789" -8 10 "23456789")
+	  (test-substring "0123456789" -8 20 "23456789")
+
+	  (test-substring "0123456789" -8 -7 "2")
+	  (test-substring "0123456789" -8 -2 "234567")
+	  (test-substring "0123456789" -8 -1 "2345678")
+	  (test-substring "0123456789" -8  0 "")
+
+; off the right end
+	  (test-substring "0123456789" -8  9 "2345678")
+	  (test-substring "0123456789" -8 10 "23456789")
+	  (test-substring "0123456789" -8 20 "23456789")
+
+; bad right end limits
+	  (test-substring "0123456789" -8  2 "")
+	  (test-substring "0123456789" -8  1 "")
+	  (test-substring "0123456789" -8  0 "")
+	  (test-substring "0123456789" -8 -1 "2345678")
+
+; special cases
+
+	  (test-substring-1 "0123456789" "0123456789")
+
+	  (test-substring-2 "0123456789" 0 "0123456789")
+	  (test-substring-2 "0123456789" 2 "23456789")
+	  (test-substring-2 "0123456789" 20 "")
+	  (test-substring-2 "0123456789" -2 "89")
+	  (test-substring-2 "0123456789" -20 "0123456789")))
+
+(printf nil "\n")
+(printf nil "Substring tests:\n")
+(test-substring)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

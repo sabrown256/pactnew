@@ -300,15 +300,16 @@
 ;                        - pieces
 
 (define (split-name-at-terminal name)
-    (let* ((nm (sprintf "%s" name))
+    (let* ((nm  (string-copy name))
 	   (tm  (lasttok nm ".>"))
 	   (nt  (lasttok nm "\n"))
 	   (lnt (string-length nt))
+	   (lnu (- lnt 1))
 	   (lnm (string-length name))
 	   (chk (string-ref name lnt)))
           (cond ((eqv? chk #\>)
-		 (cons (substring name 0 (- lnt 1))
-		       (substring name (- lnt 1) lnm)))
+		 (cons (substring name 0 lnu)
+		       (substring name lnu lnm)))
 		((eqv? chk #\.)
 		 (cons (substring name 0 lnt)
 		       (substring name lnt lnm)))
@@ -765,9 +766,9 @@
 			       (type (variable-type x))
 			       (xd   (if (eqv? (substring s 0 1) "/")
 					 (sprintf "%s%s"
-					      dstd (substring s 1 -1))
+					      dstd (substring s 1))
 					 (sprintf "%s%s"
-					      dstd (substring s 0 -1)))))
+					      dstd (string-copy s)))))
 			  (if (equal? type "Directory")
 			      (if (not (equal? x "/"))
 				  (make-directory fp xd directory-error-on-copy))

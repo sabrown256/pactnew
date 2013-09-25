@@ -408,22 +408,21 @@ static object *_SSI_strset(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 
 /* _SSI_STRSUB - substring in Scheme
- *             - non-standard behavior if N1 < 0
- *             - then abs(N1) characters from the end is the start point
- *             - and abs(N2) characters are taken
+ *             - non-standard behavior:
+ *             -   negative N1 or N2 are from the right end of the string
  *             - usage: (substring s n1 n2)
- *             - e.g. (substring "foo bar" 2 5) => "o b"
- *             - e.g. (substring "foo bar" -2 2) => "ar"
+ *             - e.g. (substring "foo bar" 2 5)   => "o b"
+ *             - e.g. (substring "foo bar" -3 -1) => "ba"
  */
 
 static object *_SSI_strsub(SS_psides *si, object *argl)
    {int n, n1, n2;
-    char *s;
+    char *s, *r;
     object *str;
 
     s  = NULL;
-    n1 = 0;
-    n2 = 0;
+    n1 = INT_MAX;
+    n2 = INT_MAX;
     SS_args(si, argl,
             SC_STRING_I, &s,
             SC_INT_I, &n1,
@@ -431,21 +430,33 @@ static object *_SSI_strsub(SS_psides *si, object *argl)
             0);
 
     n = strlen(s);
-    if (n1 < 0)
-       {n1 = n + n1;
-	n2 = n1 + abs(n2);};
 
-/* confine n1 to be between 0 and n-1*/
+/* fix left side limit */
+    if (n1 == INT_MAX)
+       n1 = 0;
+    else if (n1 < 0)
+       n1 = n + n1;
+
     n1 = max(n1, 0);
-    n1 = min(n1, n-1);
+    n1 = min(n1, n);
 
-/* take negative n2 to mean "to the end of the string" */
-    if (n2 < 0)
+/* fix right side limit */
+    if (n2 == INT_MAX)
        n2 = n;
+    else if (n2 < 0)
+       n2 = n + n2;
+
+    n2 = max(n2, 0);
     n2 = min(n2, n);
 
-    s[n2] = '\0';
-    str   = SS_mk_string(si, &s[n1]);
+/* make the substring object */
+    if (n1 < n2)
+       {s[n2] = '\0';
+	r     = s + n1;}
+    else
+       r = "";
+
+    str = SS_mk_string(si, r);
 
     CFREE(s);
 

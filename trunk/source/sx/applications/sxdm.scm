@@ -157,7 +157,7 @@
 		n dc a)
 	(let (form fl)
 	     (set! form (read))
-	     (set! fl (substring (sprintf "%s" form) 0 1))
+	     (set! fl (substring (string-copy form) 0 1))
 	     (cond ((eqv? fl "n")
 		    (note-difference n dc))
 		   ((eqv? fl "y")
