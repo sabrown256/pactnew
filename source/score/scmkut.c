@@ -88,6 +88,7 @@ static int command_makefile(anadep *state, char **a)
 
 static int setup_env(char *src, anadep *state)
    {int st, nc, ok;
+    char npath[PATH_MAX];
     char *p, *t, *s;
 
 /* setup the exe path string */
@@ -104,6 +105,13 @@ static int setup_env(char *src, anadep *state)
     if (p == state->root)
        {io_printf(stdout, "Cannot understand path %s - exiting\n", src);
 	return(FALSE);};
+
+/* put the directory of the executable at the head of the path
+ * important for multi-platform builds
+ */
+    SC_strncpy(npath, PATH_MAX, getenv("PATH"), -1);
+    PS_push_path(P_PREPEND, npath, state->root);
+    setenv("PATH", npath, 1);
 
 /* remove the bin directory */
     p = SC_pop_path(state->root);

@@ -53,77 +53,99 @@
 ; (flag == 1) => remove from list, (flag == 2) => add to list
   (cond ((null? lst) lst)
 	((not (string? str)) lst)
-	(else (begin
-		(let* ((strlen0 (string-length str))
-		       (strlen1 (- strlen0 1))
-		       (has_star (string=? "*" (substring str strlen1 strlen0)))
-		       (pattern "")
-		       (astring "")
-		       (newlist '()))
+	(else
+	 (let* ((ln0 (string-length str))
+		(ln1 (- ln0 1))
+		(has_star (string=? "*" (substring str ln1 ln0)))
+		(pattern "")
+		(astring "")
+		(newlist '()))
 
 ; pat-match returns #t if there is a match, #f otherwise
-	          (define (pat-match pat astr)
-		    (if has_star
-			(if (> strlen1 (string-length astr))
-			    (set! astring astr)
-			    (set! astring (substring astr 0 strlen1)))
-			(set! astring astr))
+	       (define (pat-match pat astr)
+		   (if has_star
+		       (if (> ln1 (string-length astr))
+			   (set! astring astr)
+			   (set! astring (substring astr 0 ln1)))
+		       (set! astring astr))
 ;		    (printf nil "astring = %s\n" astring)
-		    (if (not (string=? "/" (substring astring 0 1)))
-			(if (string=? pat (string-append "/" astring))
-			    #t
+		   (if (not (string=? "/" (substring astring 0 1)))
+		       (if (string=? pat (string-append "/" astring))
+			   #t
+
 ; check for both variables with no / at the beginning
-			    (if (string=? pat astring) #t #f))
-			(if (or (string=? pat astring)
-                                (string=? (string-append "/" pat) astring))
-			    #t
+			   (if (string=? pat astring) #t #f))
+		       (if (or (string=? pat astring)
+			       (string=? (string-append "/" pat) astring))
+			   #t
+
 ; check for directory such as "/dir1" without ending /
-			    (if (string=? (string-append pat "/") astring) #t #f))))
+			   (if (string=? (string-append pat "/") astring)
+			       #t #f))))
 
-	          (define (rm-list pat alist)
+	       (define (rm-list pat alist)
+
 ; done if alist is null, reverse newlist and end the recursion
-	            (cond ((null? alist) (reverse newlist))
+		   (cond ((null? alist)
+			  (reverse newlist))
+
 ; if the pattern matches skip the list entry and check the next one
-			  ((pat-match pat (car alist)) (rm-list pat (cdr alist)))
+			 ((pat-match pat (car alist))
+			  (rm-list pat (cdr alist)))
+
 ; if the pattern didn't match add the item to newlist then check the next one
-		          (else (begin (set! newlist (cons (car alist) newlist))
-;				       (printf nil "newlist = %s\n" newlist)
-				       (rm-list pat (cdr alist))))))
+			 (else
+			  (set! newlist (cons (car alist) newlist))
+;			  (printf nil "newlist = %s\n" newlist)
+			  (rm-list pat (cdr alist)))))
 
-	          (define (add-list pat alist)
+	       (define (add-list pat alist)
+
 ; done if alist is null, reverse newlist and end the recursion
-	            (cond ((null? alist) (reverse newlist))
+		   (cond ((null? alist)
+			  (reverse newlist))
+
 ; if the pattern doesn't match skip the list entry and check the next one
-			  ((not (pat-match pat (car alist))) (add-list pat (cdr alist)))
+			 ((not (pat-match pat (car alist)))
+			  (add-list pat (cdr alist)))
+
 ; if the pattern matches add the item to newlist then check the next one
-		          (else (begin (set! newlist (cons (car alist) newlist))
-;				       (printf nil "newlist = %s\n" newlist)
-				       (add-list pat (cdr alist))))))
+			 (else
+			  (set! newlist (cons (car alist) newlist))
+;			  (printf nil "newlist = %s\n" newlist)
+			  (add-list pat (cdr alist)))))
 
 
-		  (if has_star
-		      (set! pattern (substring str 0 strlen1))
-		      (set! pattern str))
-		  (cond ((equal? flag 2) (add-list pattern lst))
-                        (else       (rm-list pattern lst))))))))
+	       (if has_star
+		   (set! pattern (substring str 0 ln1))
+		   (set! pattern str))
+
+	       (cond ((equal? flag 2)
+		      (add-list pattern lst))
+		     (else
+		      (rm-list pattern lst)))))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 (define (rm-topdir lst)
-  (if (memv "/" lst)
-      (if (string=? "/" (car lst))
-	  (cdr lst)
-	  (cons (car lst) (rm-topdir (cdr lst))))
-      lst))
+    (if (memv "/" lst)
+	(if (string=? "/" (car lst))
+	    (cdr lst)
+	    (cons (car lst) (rm-topdir (cdr lst))))
+	lst))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 (define (add-slash lst)
-  (cond ((null? lst) lst)
-	((eqv? "/" (substring (car lst) 0 1)) (cons (car lst) (add-slash (cdr lst))))
-	(else (cons (string-append "/" (car lst)) (add-slash (cdr lst))))))
+    (cond ((null? lst) lst)
+	  ((eqv? "/" (substring (car lst) 0 1))
+	   (cons (car lst)
+		 (add-slash (cdr lst))))
+	  (else
+	   (cons (string-append "/" (car lst))
+		 (add-slash (cdr lst))))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
