@@ -1,5 +1,5 @@
 /*
- * SXHOOK.C - write hook for SX
+ * SXHOOK.C - various function hooks for SX
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
