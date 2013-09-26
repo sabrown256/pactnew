@@ -98,7 +98,7 @@
 	    (coshx 3)
 	    (divy 3.14159 3)
 
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 
 	    (wu)
@@ -149,7 +149,7 @@
 	    (dx 5.0 3 4)
 	    (dy 5.0 3 4)
 
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 
 	    (wu)
@@ -196,7 +196,7 @@
 ;(cfft 1 2)
 	    (hide 1 2)
 
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 
 	    (wu)
@@ -265,7 +265,7 @@
 	    (axis-line-style solid)
 	    (axis-grid-style dotdashed)
 	    
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 
 	    (wu)
@@ -315,7 +315,7 @@
 ;NOTE: the following (annot... ) goes to the screen; the plot produced by the (hc 5)
 ;      which follows does not. Don't worry that the annotation on the screen changes while
 ;      the picture stays the same!
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 
 	    (wu)
@@ -373,7 +373,7 @@
 	    (type-style "bold")
 	    (hide 1 3 4 5 6)
 
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 
 	    (wu)
@@ -419,7 +419,7 @@
 	    (print-stats on)
 	    (prompt "P-> ")
 
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 
 	    (wu)
@@ -492,7 +492,7 @@
 ;(xindex 3)
 ;(xmm 2 1 9)
 
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 	    
 	    (wu)
@@ -541,7 +541,7 @@
 	    (axis-grid-style dotted)
 
 	    (printf nil "%s" page)
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 
 	    (wu)
@@ -658,7 +658,7 @@
 	    (ynx 3 6)
 	    (mx 25.0 6)
 	    
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 	    
 	    (wu)
@@ -684,7 +684,7 @@
 ;(diffraction 0.001 18)
 ;(hide 1 2 5)
 
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 
 	    (wu)
@@ -712,7 +712,7 @@
 ;(+ 5 9)
 ;(hide 5 9)
 
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 	    
 	    (wu)
@@ -738,7 +738,7 @@
 	    (+ 10 12)
 	    (hide 10 12)
 	    
-	    (annot (sprintf "%s" page) white
+	    (annot (sprintf "%d" page) white
 		   xOff (+ xOff 0.05) 0.95 0.98)
 	    
 	    (wu)

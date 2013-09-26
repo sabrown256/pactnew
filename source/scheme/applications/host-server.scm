@@ -27,7 +27,7 @@
 
 (define (get-token proc)
     (let* ((t (process-read-line proc))
-	   (u (sprintf "%s" (if (string? t) t "")))
+	   (u (string-copy (if (string? t) t "")))
 	   (s (strtok u " \t\f\n")))
           (if (and (string? s) (< 1 (string-length s)))
 	      s
@@ -110,7 +110,7 @@
 (define (host-server-query)
     (if (not (null? host-server-table))
 	(let* ((q (read)))
-              (cond ((eqv? (sprintf "%s" q) "-types-")
+              (cond ((eqv? (string-copy q) "-types-")
 		     (printf nil "%s\n" host-server-types))
 
 ; handle host queries

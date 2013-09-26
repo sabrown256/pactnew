@@ -100,7 +100,7 @@
 (replot)
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -149,7 +149,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -213,7 +213,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -240,7 +240,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -265,7 +265,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -292,7 +292,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -318,7 +318,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -417,7 +417,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -444,7 +444,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -493,7 +493,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -529,7 +529,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -572,7 +572,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -677,7 +677,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 ; make a set of curves
 (cur 1 2 3 4 5 6 7)
