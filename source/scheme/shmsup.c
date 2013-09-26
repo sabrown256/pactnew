@@ -139,7 +139,7 @@ object *SS_syntax_m(SS_psides *si, object *str)
 static object *SS_m_mode(SS_psides *si)
    {
 
-    snprintf(si->prompt, MAXLINE, "M-> ");
+    SS_set_prompt(si, "M-> ");
     si->read        = SS_syntax_m;
     si->name_reproc = SS_name_map_synt;
 

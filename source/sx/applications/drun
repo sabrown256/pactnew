@@ -7,9 +7,20 @@
 (define vrb  #f)
 
 ;--------------------------------------------------------------------------
+
+;                          JOB HANDLING ROUTINES
+
 ;--------------------------------------------------------------------------
 
-; JOB-GET-INDEX - return the 1 based index for JOB
+; JOB-MAKE - instantiate a job
+
+(define (job-make n pp prompt bf)
+    (list n pp prompt bf))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-GET-INDEX - return the 1 based index for JB
 
 (define (job-get-index jb)
     (if (pair? jb)
@@ -19,7 +30,7 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; JOB-GET-PROCESS - return the process for JOB
+; JOB-GET-PROCESS - return the process for JB
 
 (define (job-get-process jb)
     (if (pair? jb)
@@ -29,12 +40,47 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; JOB-GET-OUT-BUFFER - return the output buffer for JOB
+; JOB-GET-PROMPT - return the prompt for JB
 
-(define (job-get-out-buffer jb)
+(define (job-get-prompt jb)
     (if (pair? jb)
 	(list-ref jb 2)
 	nil))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-GET-BUFFER - return the output buffer for JB
+
+(define (job-get-buffer jb)
+    (if (pair? jb)
+	(list-ref jb 3)
+	nil))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-PUSH-BUFFER - push S onto the output buffer of JB
+
+(define (job-push-buffer jb s)
+    (let* ((bf  (job-get-buffer jb)))
+	  (set-car! (cdddr jb) (string-append bf s))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-SET-BUFFER - set the output buffer of JB to S
+
+(define (job-set-buffer jb s)
+    (set-car! (cdddr jb) s))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-SET-PROMPT - set the prompt of JB to S
+
+(define (job-set-prompt jb s)
+    (set-car! (cddr jb) s))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -70,24 +116,57 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; JOB-PUSH-RESPONSE - push output from job JB
-;                   - in response to a job-send-cmd
+; POLL-READ - read method for poll on processes
 
-(define (job-push-response jb)
-    (let* ((job (job-get-process jb))
-           (bf  (job-get-out-buffer jb))
-	   (s   (process-read-line job)))
-          (if s
-	      (begin (set-car! (cddr jb) (string-append bf s))
-		     (job-push-response jb))
-	      (job-pop-line jb))))
+(define (poll-read job)
+    (let* ((jb (job-which job))
+	   (st (change-term-state nil TERM_COOKED FALSE)))
+          (job-get-response jb #f #t)
+	  (change-term-state nil st FALSE)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; LAST-CHAR - return the integer ASCII value of the last character of S
+; POLL-WRITE - write method for poll on processes
+;            - not currently used
 
-(define (last-char t nt)
+(define (poll-write job)
+    (printf nil "> poll write %s\n" job))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; MAKE-JOB - exec a new job
+;          - this means spawning a new process,
+;          - writing the function to send it messages,
+;          - and adding it to the list of jobs
+
+(define (make-job fmt . x)
+    (let* ((cmd (apply sprintf (cons fmt x)))
+           (job (process-open "a" (list cmd) poll-read poll-write))
+	   (jn  (job-number nil))
+	   (jnm (string->symbol (sprintf "p%d" jn)))
+	   (jb  (job-make jn job nil ""))
+
+  	   (msn (eval `(define-global-macro ,(list jnm 'msg)
+			   (job-send-cmd (quote ,jb)
+					     (sprintf "\"%s\"" msg))
+			   (job-get-response (quote ,jb) #t #f)))))
+
+; check that the jobs is running and get startup messages
+;          (job-show-status job)
+	  (sleep 100)
+	  (job-get-response jb #f #t)
+
+; add the job to the list
+          (set! jobs (reverse (cons jb (reverse jobs))))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; LAST-CHAR - return the integer ASCII value of the last character of T
+
+(define (last-char t)
     (let* ((nt (string-length t)))
           (if (> nt 0)
 	      (let* ((s (substring t (- nt 1) nt)))
@@ -97,14 +176,11 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; JOB-POP-LINE - pop complete line of text from job JB
+; POP-STRING - pop a newline delimited string off S
+;            - return a list of the result and the remainder of S
 
-(define (job-pop-line jb)
-;(trace substring string-length)
-;(trace char->integer string->list)
-;(trace last-char)
-    (let* ((bf (job-get-out-buffer jb))
-	   (t  (if (null? bf) "" bf))
+(define (pop-string bf)
+    (let* ((t  (if (null? bf) "" bf))
 	   (nt (string-length t))
 	   (it (+ (istrchr t "\n") 1))
 	   (s  (substring t 0 it))
@@ -115,28 +191,78 @@
 ;(printf nil ">> s = (%d) |%s|\n" (string-length s) s)
 ;(printf nil ">> r = (%d) |%s|\n" (string-length r) r)
 ;(printf nil "z ---------------------------------------------\n")
-          (set-car! (cddr jb) r)
-          (if (> (string-length s) 0)
-	      (let* ((n (job-get-index jb)))
-		    (if (= lc 10)
-			(printf nil "%d | %s" n s)
-			(printf nil "%d | %s\n" n s))
-		    (job-pop-line jb))
-	      (if (> (string-length r) 0)
-		  (job-pop-line jb)))))
+          (list s r)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; JOB-SEND-CMD - send text CMD to job JB
+; BUFFER-POP-LINE - pop and print complete line of text from BF
+;                 - until there is no more text
+;                 - prefix each line with JN
+
+(define (buffer-pop-line jn bf)
+    (let* ((t  (if (null? bf) "" bf))
+	   (x  (pop-string t))
+	   (s  (list-ref x 0))
+	   (r  (list-ref x 1))
+	   (lc (last-char s)))
+          (cond ((> (string-length s) 0)
+		 (if (= lc 10)
+		     (printf nil "%d | %s" jn s)
+		     (printf nil "%d | %s\n" jn s))
+		 (buffer-pop-line jn r))
+
+		((> (string-length r) 0)
+		 (buffer-pop-line jn r)))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-FLUSH-BUFFER - return the output buffer from JB
+;                  - and flush it
+;                  - print it if SHOW it #t
+
+(define (job-flush-buffer jb show)
+    (let* ((jn (job-get-index jb))
+	   (s  (job-get-buffer jb)))
+          (job-set-buffer jb "")
+          (if show
+	      (buffer-pop-line jn s))
+	  s))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-GET-RESPONSE - push output from JB
+;                  - if WAIT it #t wait until a prompt is received
+;                  - otherwise stop when an empty string is received
+
+(define (job-get-response jb wait show)
+    (let* ((job (job-get-process jb))
+	   (pr  (job-get-prompt jb))
+	   (s   (process-read-line job))
+	   (atp (strstr s pr)))
+;	   (atp (string=? pr s)))
+
+          (cond (atp
+		 (job-flush-buffer jb show))
+		((or s wait)
+		 (job-push-buffer jb s)
+		 (job-get-response jb wait show))
+		(else
+		 (job-flush-buffer jb show)))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; JOB-SEND-CMD - send text CMD to JB
 
 (define (job-send-cmd jb cmd)
     (let* ((jn  (job-get-index jb))
 	   (job (job-get-process jb)))
           (if vrb
 	      (printf nil "sending to %d> %s\n" jn cmd))
-          (process-send-line job cmd)
-	  (job-push-response jb)))
+          (process-send-line job cmd)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -164,14 +290,14 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; JOB-EXIT-STATUS - wait for process JOB of job JN to exit
+; JOB-EXIT-STATUS - wait for JB to exit
 ;                 - and return the reason
 
 (define (job-exit-status jb)
     (let* ((jn  (job-get-index jb))
 	   (job (job-get-process jb)))
           (sleep 500)
-	  (job-push-response jb)
+	  (job-get-response jb #f #t)
 	  (let* ((stat (process-status job))
 		 (runs (cdddr stat))
 		 (runp (car runs))
@@ -181,59 +307,15 @@
 		    reason))))
 
 ;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
 
-; POLL-READ - read method for poll on processes
+;                              API ROUTINES
 
-(define (poll-read job)
-    (let* ((jb (job-which job))
-	   (st (change-term-state nil TERM_COOKED FALSE)))
-          (job-push-response jb)
-	  (change-term-state nil st FALSE)))
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-; POLL-WRITE - write method for poll on processes
-;            - not currently used
-
-(define (poll-write job)
-    (printf nil "> poll write %s\n" job))
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-; MAKE-JOB - exec a new job
-;          - this means spawning a new process,
-;          - writing the function to send it messages,
-;          - and adding it to the list of jobs
-
-(define (make-job fmt . x)
-    (let* ((cmd (apply sprintf (cons fmt x)))
-           (job (process-open "a" (list cmd) poll-read poll-write))
-	   (jn  (job-number nil))
-	   (jnm (string->symbol (sprintf "p%d" jn)))
-	   (jb  (list jn job ""))
-
-  	   (msn (eval `(define-global-macro ,(list jnm 'msg)
-			   (job-send-cmd (quote ,jb)
-					     (sprintf "\"%s\"" msg))))))
-
-; check that the jobs is running and get startup messages
-;          (job-show-status job)
-	  (sleep 100)
-	  (job-push-response jb)
-
-; add the job to the list
-          (set! jobs (reverse (cons jb (reverse jobs))))))
-
-;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ; DONE - cleanup and exit this session
 
-(define (done)
-    (let* ((st 0))
+(define (done . rv)
+    (let* ((st (if rv (list-ref rv 0) 0)))
 
           (define (do-one x)
 	      (let* ((jn  (job-get-index x))
@@ -254,8 +336,35 @@
 
 (define-macro (pa cmd)
 
-    (define (do-one x)
-        (job-send-cmd x (sprintf "%s" cmd)))
+    (define (do-one jb)
+        (job-send-cmd jb (sprintf "%s" cmd))
+	(job-get-response jb #f #t))
+
+    (for-each do-one jobs))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; PW - send command CMD to all jobs and wait for prompt (if specified)
+
+(define-macro (pw cmd)
+
+    (define (do-one jb)
+        (job-send-cmd jb (sprintf "%s" cmd))
+	(job-get-response jb #t #f))
+
+    (map do-one jobs))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; PF - flush all jobs
+;    - if WAIT is #t wait for prompt
+
+(define-macro (pf wait)
+
+    (define (do-one jb)
+	(job-get-response jb wait #f))
 
     (for-each do-one jobs))
 
@@ -278,19 +387,28 @@
 
 ; MAIN - start here - mostly
 
-(define (main args jl)
+(define load-files nil)
+
+(define (main args)
    (let* ((arg (list-ref args 0))
 	  (rst (list-tail args 1)))
          (cond ((null? arg)
-		(if jl
-		    (c-repl "drun> " " ")
+		(if jobs
+		    (begin (if load-files
+			       (for-each load (reverse load-files)))
+			   (c-repl "drun> " " "))
 		    (help)))
 	       ((string=? arg "--help")
 		(help))
+	       ((string=? arg "--load")
+		(set! arg (list-ref rst 0))
+		(set! rst (list-tail rst 1))
+		(set! load-files (cons arg load-files)))
 	       ((string=? arg "--vrb")
 		(set! vrb #t))
 	       (else
-		(main rst (make-job arg))))))
+		(make-job arg)))
+	 (main rst)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
