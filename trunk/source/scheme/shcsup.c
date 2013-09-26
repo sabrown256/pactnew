@@ -282,7 +282,7 @@ object *SS_syntax_c(SS_psides *si, object *str)
 static object *SS_c_mode(SS_psides *si)
    {
 
-    snprintf(si->prompt, MAXLINE, "C-> ");
+    SS_set_prompt(si, "C-> ");
     si->read        = SS_syntax_c;
     si->name_reproc = SS_name_map_synt;
 

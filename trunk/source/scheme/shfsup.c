@@ -98,7 +98,7 @@ object *SS_syntax_f(SS_psides *si, object *str)
 static object *SS_f_mode(SS_psides *si)
    {
 
-    snprintf(si->prompt, MAXLINE, "F-> ");
+    SS_set_prompt(si, "F-> ");
     si->read        = SS_syntax_f;
     si->name_reproc = SS_name_map_synt;
 

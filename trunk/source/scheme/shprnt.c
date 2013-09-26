@@ -44,7 +44,21 @@ static object *_SSI_set_prompt(SS_psides *si, object *obj)
     if (s != NULL)
        SC_strncpy(si->prompt, MAXLINE, s, -1);
 
+    CFREE(s);
+
     return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_GET_PROMPT - get the interpreter prompt at Scheme level */
+
+static object *_SSI_get_prompt(SS_psides *si, object *obj)
+   {object *rv;
+
+    rv = SS_mk_string(si, si->prompt);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1330,6 +1344,11 @@ void _SS_inst_print(SS_psides *si)
                "Procedure: prints an object to the specified device in human readable form",
                SS_nargs,
                _SSI_display, SS_PR_PROC);
+
+    SS_install(si, "get-prompt",
+               "Get the interpreter prompt: (get-prompt)",
+               SS_zargs, 
+               _SSI_get_prompt, SS_PR_PROC);
 
     SS_install(si, "newline",
                "Procedure: print a <CR><LF> or equivalent to the specified device",
