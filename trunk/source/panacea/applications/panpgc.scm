@@ -162,7 +162,7 @@
 (define (proc-init-fnc fnc)
     (if (null? fnc)
 	NULL
-	(sprintf "%s" val)))
+	(string-copy val)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -394,7 +394,7 @@
 	  (let* ((pckname  (package-name package))
 		 (function (lookup-by-title "install-type-definitions" package))
 		 (fncname  (declaration-name function))
-		 (fncncom  (up-case (sprintf "%s" fncname)))
+		 (fncncom  (up-case (string-copy fncname)))
 		 (type     (declaration-type function))
 		 (args     (declaration-arguments function)))
 
@@ -428,8 +428,8 @@
 		      (for-each do-member members)
 		      (printf file "                   LAST);\n")
 		      (generate-typedef-error file name fncncom))
-		    (let* ((memb (list-ref members 0))
-			   (cmmb (sprintf "%s" memb))
+		    (let* ((memb  (list-ref members 0))
+			   (cmmb  (string-copy memb))
 			   (otype (strtok cmmb " \t\n"))
 			   (ntype (strtok cmmb " \t\n")))
 		      (if (legal-type memb)

@@ -127,7 +127,7 @@
            (st   (if ent (watch-entry-status  ent) " 0"))
            (dtx  (if ent (watch-entry-time    ent) zero-dt))
            (nr   (if ent (watch-entry-running ent) 0))
-	   (pck  (lasttok (sprintf "%s" dir) "/"))
+	   (pck  (lasttok (string-copy dir) "/"))
 	   (jsi  (if (process? prc)
 		     " "
 		     (if (job-succeeded? job)

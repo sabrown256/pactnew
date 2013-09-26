@@ -36,7 +36,7 @@
 	      (let* ((dsc (read-table* name n))
 		     (nr  (list-ref dsc 0))
 		     (nc  (list-ref dsc 1))
-		     (lbl (sprintf "%s" tag))
+		     (lbl (string-copy tag))
 		     (tc  (table-curve nr 3 nc 0 nc))
 		     (fc  (table-curve nr 1 nc 0 nc))
 		     (rv #t))
@@ -45,9 +45,9 @@
 		    rv))
 
 	  (define (do-curves name)
-	      (let* ((dat  (strtok (sprintf "%s" name) "\n"))
-		     (base (strtok (sprintf "%s" name) "."))
-		     (cbas (sprintf "%s" base))
+	      (let* ((dat  (strtok (string-copy name) "\n"))
+		     (base (strtok (string-copy name) "."))
+		     (cbas (string-copy base))
 		     (iv   (begin (strtok cbas "-") (strtok cbas "\n"))))
 		    (era)
 

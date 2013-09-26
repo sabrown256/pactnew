@@ -331,7 +331,7 @@
 
 (define-global (format-end-list file tail buffer indent)
     (if tail
-	(let* ((end-line (strtok (sprintf "%s" buffer) " \n")))
+	(let* ((end-line (strtok (string-copy buffer) " \n")))
 	      (cond ((and (string? end-line) (string=? end-line ")"))
 		     (format-emit file ")" indent))
 		    ((not end-line)

@@ -88,8 +88,8 @@
 ; STRCMP? - a "smart" string comparison predicate ala C standard library
 
 (define (strcmp? s1 s2)
-    (let* ((t1 (sprintf "%s" s1))
-	   (t2 (sprintf "%s" s2)))
+    (let* ((t1 (string-copy s1))
+	   (t2 (string-copy s2)))
       (eqv? t1 t2)))
 
 ;--------------------------------------------------------------------------

@@ -442,10 +442,10 @@
             (if (or cdrn sflag)
                 (begin
                     (replot)
-                    (stitle (sprintf "%s" (get-label carn)))
+                    (stitle (string-copy (get-label carn)))
                     (if (pause "   Enter y/n to continue/quit: ")
                         (obo-driver sflag cdrn)))
-                (stitle (sprintf "%s" (get-label carn))))
+                (stitle (string-copy (get-label carn))))
             (if sflag (show clst)))))
 
 ;--------------------------------------------------------------------------

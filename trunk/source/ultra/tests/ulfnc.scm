@@ -39,7 +39,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -67,7 +67,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -102,7 +102,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -129,7 +129,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -156,7 +156,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -179,7 +179,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -202,7 +202,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -224,7 +224,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (ran -1.0 1.2)
 
@@ -251,7 +251,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) white xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) white xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -276,7 +276,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -301,7 +301,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -331,7 +331,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -355,7 +355,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -377,7 +377,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
@@ -399,7 +399,7 @@
 
 (set! page (+ page 1))
 (set! xOff (+ xOff .05))
-(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+(annot (sprintf "%d" page) black xOff (+ xOff .05) .95 .98)
 
 (replot)
 (hardcopy)
