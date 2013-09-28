@@ -2325,6 +2325,7 @@ static void do_platform(client *cl, char *oper, char *value)
    {int i, ok;
     char t[BFLRG];
     char *p, *cfg, *sid, *sib, **spec;
+    static char *cross_sid = NULL;
 
     st.np++;
 
@@ -2332,12 +2333,15 @@ static void do_platform(client *cl, char *oper, char *value)
     cfg  = oper;
     sid  = spec[0];
 
+    if (cross_sid == NULL)
+       cross_sid = STRSAVE(sid);
+
     note(Log, TRUE, "");
     if (st.np == 1)
        noted(Log, "\n----------------------------------------------\n");
     noted(Log, "Adding platform %s from %s", sid, cfg);
 
-    snprintf(t, BFLRG, "dsys config -plt");
+    snprintf(t, BFLRG, "dsys config -plt %s", cross_sid);
 
 /* add options affecting all platforms */
     if (st.abs_deb == TRUE)
