@@ -1,0 +1,11 @@
+#
+# NO-PYTHON - override finding a PYTHON
+#
+# include "cpyright.h"
+#
+
+Group Python {
+   Path = none
+}
+
+

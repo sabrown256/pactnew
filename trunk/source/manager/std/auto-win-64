@@ -1,10 +1,8 @@
 #
-# AUTO-MINGW - default MINGW configuration
-#
-# include "cpyright.h"
+# AUTO-WIN-64 - 64 bit MINGW configuration
 #
 
-include 32-bit
+include 64-bit
 include compilers/mingw
 include spokes
 include no-x11
@@ -14,9 +12,9 @@ include no-png
 include no-libz
 include no-python
 
-setenv CROSS_COMPILE  MINGW32
+setenv CROSS_COMPILE  MINGW64
 setenv DO_RUN_CROSS   "wine"
-setenv MINGW32
-define MINGW32
+setenv MINGW64
+
 
 

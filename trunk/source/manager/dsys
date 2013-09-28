@@ -619,6 +619,7 @@ switch ($Cmnd)
 
         set Configuration = ""
         set Method        = 2
+        set CROSS_REF     = ""
         set reconfig      = FALSE
         set mpi           = FALSE
         set python        = FALSE
@@ -828,7 +829,9 @@ switch ($Cmnd)
                    set PArgs = ( $PArgs "-p" )
                    breaksw
               case -plt:
-                   set platform = TRUE
+                   shift
+                   set CROSS_REF = $1
+                   set platform  = TRUE
                    breaksw
               case -py:
                    set python = TRUE
@@ -1097,6 +1100,9 @@ switch ($Cmnd)
 
         Separator $Log
         flog $Log $PERDB PACT_VERSION=$PACTVer
+	if ($platform == TRUE) then
+           flog $Log $PERDB CROSS_REF=$CROSS_REF
+        endif
 
         if (($Method == 2) && (-x $BinDir/pco)) then
            flog $Log set PConf = ( $BinDir/pco $dbopt -env $cwd/pact.env -l )

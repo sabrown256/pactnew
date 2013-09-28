@@ -1,7 +1,5 @@
 #
-# AUTO-MINGW - default MINGW configuration
-#
-# include "cpyright.h"
+# AUTO-WIN-32 - 32 bit MINGW configuration
 #
 
 include 32-bit
@@ -17,6 +15,6 @@ include no-python
 setenv CROSS_COMPILE  MINGW32
 setenv DO_RUN_CROSS   "wine"
 setenv MINGW32
-define MINGW32
+
 
 

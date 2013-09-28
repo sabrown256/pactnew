@@ -20,15 +20,16 @@ Separator $Log
 NoteD $Log "   Persistent Portable Parallel Make - dmake"
 Note $Log ""
 
-dbmget $Log CROSS_COMPILE^    \
-            PACT_CC_EXE^      \
-            PACT_CC_FAMILY^   \
-            PACT_CC_PATH^     \
-            PACT_CC_VERSION^  \
-            System^           \
-            BaseDir^          \
-            BinDir^           \
-            LibDir^           \
+dbmget $Log CROSS_COMPILE^           \
+            CROSS_REF       =\?  ""^ \
+            PACT_CC_EXE^             \
+            PACT_CC_FAMILY^          \
+            PACT_CC_PATH^            \
+            PACT_CC_VERSION^         \
+            System^                  \
+            BaseDir^                 \
+            BinDir^                  \
+            LibDir^                  \
             MngDir
 
     flog $Log set DSYS = $MngDir/dsys
@@ -78,7 +79,11 @@ dbmget $Log CROSS_COMPILE^    \
        Note $Log "   System = |$System|"
        Note $Log "   BinDir = |$BinDir|"
 
-       set dm = `which-exe -d ${BinDir} dmake`
+       if ("$CROSS_REF" != "") then
+          set dm = $BaseDir/dev/$CROSS_REF/bin/dmake
+       else
+          set dm = `which-exe -d ${BinDir} dmake`
+       endif
        Note $Log "   dm     = |$dm|"
        if (-x "$dm") then
           flog $Log cp $dm ${BinDir}/dmake
@@ -86,7 +91,11 @@ dbmget $Log CROSS_COMPILE^    \
 
 # try pact if no dmake found
        else
-          set dm = `which-exe -d ${BinDir} pact`
+          if ("$CROSS_REF" != "") then
+             set dm = $BaseDir/dev/$CROSS_REF/bin/pact
+          else
+             set dm = `which-exe -d ${BinDir} pact`
+          endif
           Note $Log "   dm     = |$dm|"
           if (-x "$dm") then
              flog $Log cp $dm ${BinDir}/dmake
