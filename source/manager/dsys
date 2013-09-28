@@ -289,125 +289,83 @@ switch ($Cmnd)
 
         set BeginTime = `$TIMER -r`
 
-# check for multi-platform build
-        flog $Log setenv PERDB_PATH $EtcDir/cfg
-        dbget Platforms
-        if ("$Platforms" != "") then
-
-           set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
-           @ np = $#inf
-           Note $Log "Build for $np platforms"
-
-           @ lerr = 0
-           set inf = ( `echo "$inf" | sed 's|[()]| |g'` )
-           while ($#inf > 0)
-              set cfg = $inf[1]
-              set sid = $inf[2]
-              shift inf
-              shift inf
-
-              Separator $Log
-              flog $Log dsys select $sid
-              ftee $Log dsys build
-              flog $Log @ lerr = $lerr + $status
-           end
-           set RStatus = $lerr
-
-           flog $Log dsys select $System
-
-           set ETime = `$TIMER -b $BeginTime`
-
-           NoteD $Log "PACT multi-platform build completed ($RStatus/$ETime)"
-           NoteD $Log ""
-
-# single platform build
-        else
-           flog $Log umask
-           flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/build.error
+        flog $Log umask
+        flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/build.error
 
 # do not bother with core files for the compilation tools
-           limit coredumpsize 0 >& /dev/null
+        limit coredumpsize 0 >& /dev/null
 
 # provide context for child processes
-           setenv DSYS_TARGET pact_build
+        setenv DSYS_TARGET pact_build
 
 # preliminary - generate headers in score needed by other packages
-           flog $Log pushd ../score
-           flog $Log pact $Args gen
+        flog $Log pushd ../score
+        flog $Log pact $Args gen
+        flog $Log popd
+
+        if ("$Tgts" == "") then
+           NoteD $Log "Building PACT for $System ($Msg) ..."
+           NoteD $Log "Using C Compiler $PACT_CC_EXE ($PACT_CC_FAMILY)"
+
+           flog $Log $DSYS linstall
+           flog $Log pushd ..
+
+           flog $Log setenv SESSION_CONFIG $System
+           flog $Log setenv PACTRoot $cwd
+
+           flog $Log setenv  SC_EXEC_SERVER_WAIT     300
+           flog $Log setenv  SC_EXEC_TIME_LIMIT      3600
+           flog $Log setenv  SC_EXEC_TIME_FACTOR     80
+           flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
+
+           Note $Log "pact -log $Log -f $EtcDir/Makefile $Args build"
+           pact -log $Log -f $EtcDir/Makefile $Args build
+           set RStatus = $status
+
            flog $Log popd
+        else
+           NoteD $Log "Building packages for $System ($Msg) ..."
+           NoteD $Log ""
+           while ($#Tgts > 0)
+              set tgt = $Tgts[1]
+              shift Tgts
+              if (-d $BaseDir/$tgt) then
+                 flog $Log pushd $BaseDir/$tgt
 
-           if ("$Tgts" == "") then
-              NoteD $Log "Building PACT for $System ($Msg) ..."
-              NoteD $Log "Using C Compiler $PACT_CC_EXE ($PACT_CC_FAMILY)"
+                 NoteD $Log "$BaseDir/$tgt"
+                 flog $Log $PACT $Args install
+                 NoteD $Log ""
 
-              flog $Log $DSYS linstall
-              flog $Log pushd ..
+                 flog $Log popd
+              endif
+           end
+           set RStatus = $status
+        endif
 
-              flog $Log setenv SESSION_CONFIG $System
-              flog $Log setenv PACTRoot $cwd
-
-              flog $Log setenv  SC_EXEC_SERVER_WAIT     300
-              flog $Log setenv  SC_EXEC_TIME_LIMIT      3600
-              flog $Log setenv  SC_EXEC_TIME_FACTOR     80
-              flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
-
-              Note $Log "pact -log $Log -f $EtcDir/Makefile $Args build"
-              pact -log $Log -f $EtcDir/Makefile $Args build
-              set RStatus = $status
-
-              flog $Log popd
-           else
-              NoteD $Log "Building packages for $System ($Msg) ..."
-              NoteD $Log ""
-              while ($#Tgts > 0)
-                 set tgt = $Tgts[1]
-                 shift Tgts
-                 if (-d $BaseDir/$tgt) then
-                    flog $Log pushd $BaseDir/$tgt
-
-                    NoteD $Log "$BaseDir/$tgt"
-                    flog $Log $PACT $Args install
-                    NoteD $Log ""
-
-                    flog $Log popd
-                 endif
-              end
-              set RStatus = $status
-           endif
-
-           Note $Log "Build exit status = $RStatus"
-           flog $Log pushd ../doc
-           flog $Log pact install
-           flog $Log popd
+        Note $Log "Build exit status = $RStatus"
+        flog $Log pushd ../doc
+        flog $Log pact install
+        flog $Log popd
 
 # fix up cross compile executables that need to run on the current host
 # some things should be on the back end for testing
 # but some need to be used by the system on the front end
 # see score/make-wrap
-           envini CROSS_COMPILE FALSE
-           if ($CROSS_COMPILE != FALSE) then
-              NoteD $Log ""
-              Separator $Log
-              NoteD $Log "Cross compile fixes"
-              set CrossFix = ( hserve mpi-io-wrap )
-#              set CrossFix = ( $CrossFix ps-diff png-diff )
-              foreach i ( $CrossFix )
-                 set exe = `which-exe -d ${BinDir} $i`
-                 if (-x "$exe") then
-                    NoteD $Log "   $exe"
-                    flog $Log cp $exe ${BinDir}
-                 endif
-              end
-              NoteD $Log "done"
-           endif
-
-           if ($RStatus == 0) then
-              NoteD $Log ""
-              Separator $Log
-              NoteD $Log "Making integrated PACT library for $System"
-              ftee $Log ./pact-lib
-              NoteD $Log "done"
-           endif
+        envini CROSS_COMPILE FALSE
+        if ($CROSS_COMPILE != FALSE) then
+           NoteD $Log ""
+           Separator $Log
+           NoteD $Log "Cross compile fixes"
+           set CrossFix = ( hserve mpi-io-wrap )
+#           set CrossFix = ( $CrossFix ps-diff png-diff )
+           foreach i ( $CrossFix )
+              set exe = `which-exe -d ${BinDir} $i`
+              if (-x "$exe") then
+                 NoteD $Log "   $exe"
+                 flog $Log cp $exe ${BinDir}
+              endif
+           end
+           NoteD $Log "done"
 
            set ETime = `$TIMER -b $BeginTime`
 
