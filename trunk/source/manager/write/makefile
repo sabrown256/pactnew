@@ -45,7 +45,8 @@ dbmget $Log BinDir^   \
     Note $STDOUT "#"
     Note $STDOUT ""
 
-    Note $STDOUT "PACT = $BinDir/pact"
+    Note $STDOUT "PACT   = $BinDir/pact"
+    Note $STDOUT "MkFile = $EtcDir/Makefile"
     Note $STDOUT ""
 
     Note $STDOUT 'build:'
@@ -72,12 +73,7 @@ dbmget $Log BinDir^   \
        Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact devlib in '$i'" ; ${PACT} -rcr devlib)'
     end
     Note $STDOUT '	${BARRIER}'
-
-    Note $STDOUT '	@(echo "" ; echo "Link Executables for '$System'")'
-    Note $STDOUT '	${BARRIER}'
-    foreach i ($Pck)
-       Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact link in '$i'" ; ${PACT} -rcr link)'
-    end
+    Note $STDOUT '	${PACT} -f ${MkFile} link'
     Note $STDOUT ''
 
     Note $STDOUT 'link:'
@@ -86,6 +82,12 @@ dbmget $Log BinDir^   \
     foreach i ($Pck)
        Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact link in '$i'" ; ${PACT} -rcr link)'
     end
+    Note $STDOUT '	${BARRIER}'
+    Note $STDOUT '	${PACT} -f ${MkFile} unilib'
+    Note $STDOUT ''
+
+    Note $STDOUT 'unilib:'
+    Note $STDOUT '	@(cd manager ; ./pact-lib)'
     Note $STDOUT ''
 
 #--------------------------------------------------------------------------

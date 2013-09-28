@@ -5,6 +5,13 @@
 # include "cpyright.h"
 #
 
-run write/configured      $Log $ScrDir $CONFIG_FILE
-run write/makefile.mp     $Log $ScrDir
+Run {
+   write/package         $Log $ScrDir
+   write/cfg.db          $Log $ScrDir
+   write/scconfig.h      $Log $ScrDir
+}
 
+Run {
+   write/configured      $Log $ScrDir $CONFIG_FILE
+   write/makefile.mp     $Log $ScrDir
+}

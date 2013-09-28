@@ -31,6 +31,9 @@ set AR     = `pact +l -info AR`
 set AROpt  = `pact +l -info AROpt`
 set ARXOpt = `pact +l -info ARXOpt`
 
+echo ""
+echo "Making integrated PACT library for $System"
+
 pushd $LibDir >& /dev/null
 
 # make a temporary directory to work in
@@ -80,5 +83,7 @@ $RMDir $tmp
 # ls -l libpact.*
 
 popd >& /dev/null
+
+echo ""
 
 exit($err)
