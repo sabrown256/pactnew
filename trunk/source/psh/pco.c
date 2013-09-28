@@ -3159,6 +3159,11 @@ int main(int c, char **v, char **env)
     signal(SIGTERM, sigdone);
     signal(SIGINT,  sigdone);
 
+/* multi-platform configs will go idle for the child configs
+ * so give it more time
+ */
+    csetenv("PERDB_IDLE_TIMEOUT", "600");
+
     root = cgetenv(TRUE, "PERDB_PATH");
     cl   = make_client(CLIENT, DB_PORT, FALSE, root, cl_logger, NULL);
 
@@ -3354,7 +3359,7 @@ int main(int c, char **v, char **env)
 
     summarize_config(cl);
 
-    pco_save_db(cl, NULL);
+    pco_save_db(cl, "db");
 
     finish_config(cl, base);
 
