@@ -17,8 +17,8 @@
 set Me = $0
 source $Me:h/common
 
-Note $Log "----- write/make-def -----"
-Note $Log "Write: make-def"
+Note $Log "----- write/acc -----"
+Note $Log "Write: acc"
 Note $Log ""
 
 HAVE_SUBROUTINES

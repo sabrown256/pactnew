@@ -225,7 +225,7 @@ dbmget $Log SysDir^     \
       set root = $base/$sid 
       set etcd = $root/etc
    
-      Note $STDOUT '	${PACT'$n'} -f ${MkFile'$n'} SESSION_CONFIG='$sid' unilib'
+      Note $STDOUT '	${PACT'$n'} -f ${MkFile'$n'} unilib'
    end
    Note $STDOUT ''
 

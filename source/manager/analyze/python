@@ -23,6 +23,8 @@ Note $ALog "----- analyze/python -----"
 Note $ALog "Analyze: python"
 Note $ALog ""
 
+setenv HAVE_PYTHON  FALSE
+
 # if there is no python directory no need to look further
 if (-d ../../python) then
 
@@ -35,8 +37,6 @@ if (-d ../../python) then
                 CC_Exe^                        \
                 PACT_CC_VERSION^               \
                 OS_Name
-
-   setenv HAVE_PYTHON  FALSE
 
    Note $ALog ""
    Note $ALog "Python_Exe    = $Python_Exe"
@@ -304,9 +304,9 @@ if (-d ../../python) then
                    PY_DirPy        = "$py_dirpy"
    endif
 
-   dbexp HAVE_PYTHON
-
 endif
+
+dbexp HAVE_PYTHON
 
 exit(0)
 
