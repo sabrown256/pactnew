@@ -87,12 +87,18 @@ dbmget $Log SysDir^     \
       set etcd = $root/etc
       set bind = $root/bin
 
-      Note $STDOUT "PACT$n = $bind/pact"
+      Note $STDOUT "PACT$n   = $bind/pact"
+      Note $STDOUT "MkFile$n = $etcd/Makefile"
    end
+
+   Note $STDOUT "PACT    = $binb/pact"
+   Note $STDOUT "MkFile  = $etcb/Makefile"
    Note $STDOUT ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+# build target
 
    Note $STDOUT 'build:'
    Note $STDOUT '	@(echo "" ; echo "Generate sources")'
@@ -112,10 +118,10 @@ dbmget $Log SysDir^     \
          set etcd = $root/etc
    
          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact generate in '$p' for '$sid'" ; ${PACT'$n'} -rcr generate)'
-         if ($p == score) then
-            Note $STDOUT '	${BARRIER}'
-         endif
       end
+      if ($p == score) then
+         Note $STDOUT '	${BARRIER}'
+      endif
    end
    Note $STDOUT '	${BARRIER}'
 
@@ -166,33 +172,14 @@ dbmget $Log SysDir^     \
       end
    end
    Note $STDOUT '	${BARRIER}'
+   Note $STDOUT '	${PACT} -f ${MkFile} link'
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-   Note $STDOUT '	@(echo "" ; echo "Link Executables")'
-   Note $STDOUT '	${BARRIER}'
-
-   foreach p ($Pck)
-      @ i = 0
-      @ n = 0
-      while ($i < $ni)
-         @ n = $n + 1
-         @ i = $i + 1
-         set cfg = $inf[$i]
-         @ i = $i + 1
-         set sid = $inf[$i]
-
-         set root = $base/$sid 
-         set etcd = $root/etc
-   
-         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact link in '$p' for '$sid'" ; ${PACT'$n'} -rcr link)'
-      end
-   end
    Note $STDOUT ''
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+# link target
 
    Note $STDOUT 'link:'
    Note $STDOUT '	@(echo "" ; echo "Link Executables")'
@@ -214,13 +201,66 @@ dbmget $Log SysDir^     \
          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact link in '$p' for '$sid'" ; ${PACT'$n'} -rcr link)'
       end
    end
+
+   Note $STDOUT '	${BARRIER}'
+   Note $STDOUT '	${PACT} -f ${MkFile} unilib'
+
    Note $STDOUT ''
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# unilib target
+
+   Note $STDOUT 'unilib:'
+   @ i = 0
+   @ n = 0
+   while ($i < $ni)
+      @ n = $n + 1
+      @ i = $i + 1
+      set cfg = $inf[$i]
+      @ i = $i + 1
+      set sid = $inf[$i]
+
+      set root = $base/$sid 
+      set etcd = $root/etc
+   
+      Note $STDOUT '	${PACT'$n'} -f ${MkFile'$n'} SESSION_CONFIG='$sid' unilib'
+   end
+   Note $STDOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# remove target
+
    Note $STDOUT 'remove:'
    Note $STDOUT '	@(echo "" ; echo "Remove Binaries")'
+   Note $STDOUT '	${BARRIER}'
+
+   @ i = 0
+   @ n = 0
+   while ($i < $ni)
+      @ n = $n + 1
+      @ i = $i + 1
+      set cfg = $inf[$i]
+      @ i = $i + 1
+      set sid = $inf[$i]
+
+      set root = $base/$sid 
+      set etcd = $root/etc
+   
+      Note $STDOUT '	@(cd manager ; dsys remove -a '$sid')'
+   end
+   Note $STDOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# test target
+
+   Note $STDOUT 'test:'
+   Note $STDOUT '	@(echo "" ; echo "Test PACT")'
    Note $STDOUT '	${BARRIER}'
 
    foreach p ($Pck)
@@ -236,7 +276,7 @@ dbmget $Log SysDir^     \
          set root = $base/$sid 
          set etcd = $root/etc
    
-         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact remove in '$p' for '$sid'" ; ${PACT'$n'} -rcr remove)'
+         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact test in '$p' for '$sid'" ; ${PACT'$n'} -rcr test)'
       end
    end
    Note $STDOUT ''

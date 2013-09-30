@@ -49,6 +49,7 @@ dbmget $Log BinDir^   \
     Note $STDOUT "MkFile = $EtcDir/Makefile"
     Note $STDOUT ""
 
+# build target
     Note $STDOUT 'build:'
     Note $STDOUT '	@(echo "" ; echo "Generate sources for '$System'")'
     Note $STDOUT '	${BARRIER}'
@@ -76,6 +77,7 @@ dbmget $Log BinDir^   \
     Note $STDOUT '	${PACT} -f ${MkFile} link'
     Note $STDOUT ''
 
+# link target
     Note $STDOUT 'link:'
     Note $STDOUT '	@(echo "" ; echo "Link Executables for '$System'")'
     Note $STDOUT '	${BARRIER}'
@@ -86,8 +88,18 @@ dbmget $Log BinDir^   \
     Note $STDOUT '	${PACT} -f ${MkFile} unilib'
     Note $STDOUT ''
 
+# unilib target
     Note $STDOUT 'unilib:'
     Note $STDOUT '	@(cd manager ; ./pact-lib)'
+    Note $STDOUT ''
+
+# test target
+    Note $STDOUT 'test:'
+    Note $STDOUT '	@(echo "" ; echo "Test PACT for '$System'")'
+    Note $STDOUT '	${BARRIER}'
+    foreach i ($Pck)
+       Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact test in '$i'" ; ${PACT} -rcr test)'
+    end
     Note $STDOUT ''
 
 #--------------------------------------------------------------------------
