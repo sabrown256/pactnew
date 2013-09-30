@@ -11,7 +11,7 @@ unalias *
 
 set exe = `which pact`
 set bindir = $exe:h
-set sysdir  = $bindir:h
+set sysdir = $bindir:h
 set etcdir = $sysdir/etc
 source $etcdir/env-pact.csh
 unset etcdir
@@ -42,13 +42,17 @@ while ($#argv > 0)
    shift
 end
 
-if ($tgt != generate) then
+set archo = z-${System}
+InitLog log $cwd/$archo/log.psys.$tgt
+
+# touch the library into existence in case ranlib is called on  it
+if ("$HAVE_PYTHON" == "") then
+   NoteD $log "ERROR: No python dispostion for $System"
+
+else if (("$HAVE_PYTHON" !~ *FALSE*) && ($tgt != generate)) then
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-   set archo = z-${System}
-   InitLog log $cwd/$archo/log.psys.$tgt
 
    set lhave_py    = ( $HAVE_PYTHON )
    set lpy_vers    = ( $PY_Vers )
@@ -56,6 +60,8 @@ if ($tgt != generate) then
    set lpy_inc     = ( $PY_Inc )
    set lpy_numeric = ( $HAVE_PY_NUMERIC )
    set lpy_numpy   = ( $HAVE_PY_NUMPY )
+
+   setenv SESSION_CONFIG $System
 
    @ n = $#lhave_py
    @ i = 0

@@ -90,7 +90,7 @@ dbmget $Log BinDir^   \
 
 # unilib target
     Note $STDOUT 'unilib:'
-    Note $STDOUT '	@(cd manager ; ./pact-lib)'
+    Note $STDOUT '	@(cd manager ; ./pact-lib -a '$System')'
     Note $STDOUT ''
 
 # test target

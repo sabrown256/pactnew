@@ -1,0 +1,92 @@
+#!/bin/csh -f
+#
+# ARANLIB - abstract ranlib wrapper
+#         - no error for empty or non-existent archive
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $Log "----- write/aranlib -----"
+Note $Log "Write: aranlib"
+Note $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $Log
+
+NoteD $Log "   Abstract ranlib wrapper - aranlib"
+Note $Log ""
+
+dbmget $Log BinDir^            \
+            Ranlib_Exe
+
+flog $Log set STDOUT = $BinDir/aranlib
+flog $Log $RM $STDOUT
+flog $Log touch $STDOUT
+
+Note $STDOUT '#\!/bin/csh -f'
+Note $STDOUT '#'
+Note $STDOUT '# ARANLIB - execute ranlib type command with proper behavior'
+Note $STDOUT '#'
+Note $STDOUT '# include "cpyright.h"'
+Note $STDOUT '#'
+Note $STDOUT ''
+Note $STDOUT 'unalias *'
+Note $STDOUT ''
+Note $STDOUT 'if ($?SC_EXEC_N_ATTEMPTS) then'
+Note $STDOUT '   @ na = $SC_EXEC_N_ATTEMPTS'
+Note $STDOUT 'else'
+Note $STDOUT '   @ na = 3'
+Note $STDOUT 'endif'
+Note $STDOUT ''
+Note $STDOUT '@ nerr = 0'
+Note $STDOUT ''
+Note $STDOUT 'set libs = ""'
+Note $STDOUT ''
+Note $STDOUT 'while ($#argv)'
+Note $STDOUT '   switch ($1)'
+Note $STDOUT '      case -h:'
+Note $STDOUT '           echo ""'
+Note $STDOUT '           echo "Usage: aranlib [-h] [-na #] <lib>*"'
+Note $STDOUT '           echo ""'
+Note $STDOUT '           echo "   h      this help message"'
+Note $STDOUT '           echo "   na     number of attempts to make (default 3)"'
+Note $STDOUT '           echo "   <lib>  archive to be fixed"'
+Note $STDOUT '           echo ""'
+Note $STDOUT '           exit(1)'
+Note $STDOUT '      case -na:'
+Note $STDOUT '           shift'
+Note $STDOUT '           @ na = $1'
+Note $STDOUT '	   breaksw'
+Note $STDOUT '      default:'
+Note $STDOUT '           set libs = ( $libs $1 )'
+Note $STDOUT '           breaksw'
+Note $STDOUT '   endsw'
+Note $STDOUT '   shift'
+Note $STDOUT 'end'
+Note $STDOUT ''
+Note $STDOUT 'if ("$libs" == "") then'
+Note $STDOUT '   echo "No file specifications - exiting"'
+Note $STDOUT '   exit(1)'
+Note $STDOUT 'else'
+Note $STDOUT '   foreach l ( $libs )'
+Note $STDOUT '      if (-f $l) then'
+Note $STDOUT '         '$Ranlib_Exe' $l'
+Note $STDOUT '         @ nerr = $nerr + $status'
+Note $STDOUT '      endif'
+Note $STDOUT '   end'
+Note $STDOUT 'endif'
+Note $STDOUT ''
+Note $STDOUT 'exit($nerr)'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+flog $Log chmod a+x $STDOUT
+
+exit(0)
+

@@ -24,6 +24,7 @@ NoteD $Log "   System Dependent MAKE Macros - make-macros"
 Note $Log ""
 
 dbmget $Log Bits^              \
+            CROSS_COMPILE^     \
             MAKE_Shared_Libs^  \
             MAKE_Strategy^     \
             EtcDir^            \
@@ -98,7 +99,7 @@ set LibVers = 1
        Note $STDOUT '	${AR} ${AROpt} ${TGTLib} ${Objs}'
     endif
     if ("$Ranlib_Exe" != "touch") then
-       Note $STDOUT "	$Ranlib_Exe "'${TGTLib}'
+       Note $STDOUT '	aranlib ${TGTLib}'
     endif
     Note $STDOUT ''
 
@@ -155,7 +156,7 @@ set LibVers = 1
 # NOTE: this usage should reflect the libinstall target usage
 #       some SUN systems insist on it!
     if ("$Ranlib_Exe" != "touch") then
-       Note $STDOUT "	$Ranlib_Exe "'${LibDir}/${TGTArc}'
+       Note $STDOUT '	aranlib ${LibDir}/${TGTArc}'
     endif
     Note $STDOUT ''
 

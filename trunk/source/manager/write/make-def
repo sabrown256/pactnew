@@ -394,23 +394,10 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "# tool LEX"
     Note $STDOUT "Lex_Exe   = $Lex_Exe"
     Note $STDOUT "Lex_Flags = $Lex_Flags"
-#    foreach v (Exe Flags)
-#        dbgets Lex_${v}
-#        Note $STDOUT "Lex_${v} = $Lex_${v}"
-#    end
     Note $STDOUT ""
 
     Note $STDOUT "# tool RANLIB"
     Note $STDOUT "Ranlib_Exe = $Ranlib_Exe"
-#    foreach v (Exe)
-#       DEFD_VAR Ranlib_${v}
-#       if ("$ok" == "") then
-#          Note $STDOUT "Ranlib_${v} = `printenv ${v}`"
-#       else
-#          VAR_VALUE Ranlib ${v}
-#          Note $STDOUT "Ranlib_${v} = $value"
-#       endif
-#    end
     Note $STDOUT ""
 
 # emit items from the Glb group
@@ -454,8 +441,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "INSTALL    = $INSTALL"
     Note $STDOUT "RM         = $RM"
 
-# emit RANLIB in case a pre-Make has to reference it!!!!
-    Note $STDOUT "RANLIB     = $Ranlib_Exe"
+    Note $STDOUT "RANLIB     = aranlib"
     Note $STDOUT "UPDATE     = $UPDATE"
 
     if ("$HAVE_PYTHON" =~ *TRUE*) then
