@@ -430,35 +430,15 @@ int main(int c, char **v)
     ok = TRUE;
     mc = 1;
     for (i = 1; (i < c) && ok; i++)
-        {if (strcmp(v[i], "-sys") == 0)
-	    sprintf(st.arch, "%s", v[++i]);
-
-         else if (strcmp(v[i], "-show") == 0)
-	    st.show = 1;
-
-         else if (strcmp(v[i], "-db") == 0)
-	    st.db_only = 1;
-
-/* get dmake options taking the next argument later */
-	 else if ((strcmp(v[i], "-async") == 0) ||
-		  (strcmp(v[i], "-na") == 0)   ||
-		  (strcmp(v[i], "+na") == 0)   ||
-		  (strcmp(v[i], "-log") == 0))
-	    {mv[mc++] = v[i++];
-	     mv[mc++] = v[i];}
 
 /* handle dmake -cmd option */
-	 else if (strcmp(v[i], "-cmd") == 0)
+	{if (strcmp(v[i], "-cmd") == 0)
             {i++;
 	     ok = command_makefile(&st, v[i], c, v, v+i+1);
 	     return(ok);}
 
-/* ignore dmake options taking the next argument */
-	 else if ((strcmp(v[i], "-dst") == 0)   ||
-		  (strcmp(v[i], "-flt") == 0)   ||
-		  (strcmp(v[i], "-cmd") == 0))
-            {printf("smake: option %s ignored\n", v[i]);
-	     i++;}
+         else if (strcmp(v[i], "-db") == 0)
+	    st.db_only = 1;
 
 	 else if (strcmp(v[i], "-incpath") == 0)
 	    {report_info(st.root, st.complete, st.literal, st.db_only,
@@ -470,6 +450,27 @@ int main(int c, char **v)
 			 LINK, NULL);
 	     return(0);}
 
+         else if (strcmp(v[i], "-show") == 0)
+	    st.show = 1;
+
+	 else if (strcmp(v[i], "-sys") == 0)
+	    sprintf(st.arch, "%s", v[++i]);
+
+/* get dmake options taking the next argument later */
+	 else if ((strcmp(v[i], "-async") == 0) ||
+		  (strcmp(v[i], "-na") == 0)   ||
+		  (strcmp(v[i], "+na") == 0)   ||
+		  (strcmp(v[i], "-log") == 0))
+	    {mv[mc++] = v[i++];
+	     mv[mc++] = v[i];}
+
+/* ignore dmake options taking the next argument */
+	 else if ((strcmp(v[i], "-dst") == 0)   ||
+		  (strcmp(v[i], "-flt") == 0)   ||
+		  (strcmp(v[i], "-cmd") == 0))
+            {printf("smake: option %s ignored\n", v[i]);
+	     i++;}
+
 /* ignore dmake options taking no argument */
 	 else if ((strcmp(v[i], "-dbg") == 0) ||
 		  (strcmp(v[i], "-dmp") == 0) ||
@@ -480,7 +481,10 @@ int main(int c, char **v)
 
          else if (v[i][0] == '-')
             {switch (v[i][1])
-                {case 'B' :
+	        {case 'a' :
+		      setenv("SESSION_CONFIG", v[++i], 1);
+		      break;
+                 case 'B' :
                       snprintf(mkfile, BFLRG, "%s/Makefile", st.arch);
                       status = build_makefile(st.root, st.arch, mkfile, TRUE);
 		      return(status);

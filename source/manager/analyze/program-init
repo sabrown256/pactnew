@@ -40,7 +40,7 @@ setenv ENV_VARS "RUN_SIGNATURE_DB SITE_SIGNATURE_DB \
                  PY_Inc PY_Lib PY_RPath PY_Path PY_Vers PY_Ext \
                  HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
                  TRACKER_Exe HAVE_OPENMP \
-                 CFE PFE CROSS_COMPILE"
+                 CFE PFE CROSS_COMPILE CROSS_REF"
 
 setenv TEST_ADVISORY     ""
 setenv DO_RUN_DBG        none

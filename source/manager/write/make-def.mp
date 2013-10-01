@@ -17,7 +17,7 @@ Note $Log ""
 
 Separator $Log
 
-NoteD $Log "   Site Dependent MAKE Configuration - make-def.mp"
+NoteD $Log "   Site Dependent MAKE Configuration - make-def"
 Note $Log ""
 
 dbmget $Log BaseDir^                \
@@ -89,13 +89,13 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    set STDOUT = $EtcDir/make-def.mp
+    set STDOUT = $EtcDir/make-def
 
     flog $Log $RM $STDOUT
     flog $Log touch $STDOUT
 
     Note $STDOUT "#"
-    Note $STDOUT "# MAKE-DEF.MP - installation dependent definitions for $Sys"
+    Note $STDOUT "# MAKE-DEF - multi-platform installation dependent definitions for $Sys"
     Note $STDOUT "#"
     Note $STDOUT ""
     Note $STDOUT "System  = $System"
@@ -138,8 +138,10 @@ endif
     Note $STDOUT 'LibName = noname'
     Note $STDOUT ""
 
-    exit(0)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+flog $Log ls -l $STDOUT
+
+exit(0)
 

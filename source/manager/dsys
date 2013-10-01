@@ -326,6 +326,7 @@ switch ($Cmnd)
         else
            NoteD $Log "Building packages for $System ($Msg) ..."
            NoteD $Log ""
+           flog $Log @ lerr = 0
            while ($#Tgts > 0)
               set tgt = $Tgts[1]
               shift Tgts
@@ -334,12 +335,13 @@ switch ($Cmnd)
 
                  NoteD $Log "$BaseDir/$tgt"
                  flog $Log $PACT $Args install
+                 flog $Log @ lerr = $lerr + $status
                  NoteD $Log ""
 
                  flog $Log popd
               endif
            end
-           set RStatus = $status
+           set RStatus = $lerr
         endif
 
         Note $Log "Build exit status = $RStatus"
@@ -351,37 +353,40 @@ switch ($Cmnd)
 # some things should be on the back end for testing
 # but some need to be used by the system on the front end
 # see score/make-wrap
-        envini CROSS_COMPILE FALSE
-        if ($CROSS_COMPILE != FALSE) then
+        if ("$CROSS_REF" != "") then
            NoteD $Log ""
            Separator $Log
            NoteD $Log "Cross compile fixes"
-           set CrossFix = ( hserve mpi-io-wrap )
-#           set CrossFix = ( $CrossFix ps-diff png-diff )
-           foreach i ( $CrossFix )
-              set exe = `which-exe -d ${BinDir} $i`
-              if (-x "$exe") then
-                 NoteD $Log "   $exe"
-                 flog $Log cp $exe ${BinDir}
-              endif
-           end
-           NoteD $Log "done"
-
-           set ETime = `$TIMER -b $BeginTime`
-
-           NoteD $Log ""
-           Separator $Log
-           if ($RStatus != 0) then
-              foreach i (../*/z-$System/obj/errlog)
-                 if (!(-z $i)) then
-                    flog $Log cat $i
+           set srcb = $BaseDir/dev/$CROSS_REF/bin
+	   if ($srcb != $BinDir) then
+              set CrossFix = ( hserve mpi-io-wrap )
+#              set CrossFix = ( $CrossFix ps-diff png-diff )
+              foreach i ( $CrossFix )
+                 set exe = $srcb/$i
+                 if (-x "$exe") then
+                    NoteD $Log "   $exe"
+                    flog $Log cp $exe ${BinDir}
                  endif
               end
-              NoteD $Log "PACT build for $System failed ($RStatus/$ETime)"
-              NoteD $Log "Check log file: ../dev/$System/log/build"
-           else
-              NoteD $Log "PACT build for $System complete ($ETime)"
            endif
+	   unset srcb
+           NoteD $Log "done"
+        endif
+
+        set ETime = `$TIMER -b $BeginTime`
+
+        NoteD $Log ""
+        Separator $Log
+        if ($RStatus != 0) then
+           foreach i (../*/z-$System/obj/errlog)
+              if (!(-z $i)) then
+                 flog $Log cat $i
+              endif
+           end
+           NoteD $Log "PACT build for $System failed ($RStatus/$ETime)"
+           NoteD $Log "Check log file: ../dev/$System/log/build"
+        else
+           NoteD $Log "PACT build for $System complete ($ETime)"
         endif
 
         NoteD $Log ""
@@ -1706,15 +1711,15 @@ CFG_DONE:
 
         set LS = 'ls -l'
 
-        set Libs = ( `awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
-        set Incs = ( `awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
-        set Bins = ( `awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
-        set Scrs = ( `awk '$1 == "script" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
-        set Mods = ( `awk '$1 == "f90"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
-        set Scms = ( `awk '$1 == "scm"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
-        set Docs = ( `awk '$1 == "doc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
-        set Pact = ( `awk '$1 == "pkg"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
-        set Mgrs = ( `awk '$1 == "mgr"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+        set Libs = ( `awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $MngDir/pact.manifest` )
+        set Incs = ( `awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $MngDir/pact.manifest` )
+        set Bins = ( `awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $MngDir/pact.manifest` )
+        set Scrs = ( `awk '$1 == "script" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $MngDir/pact.manifest` )
+        set Mods = ( `awk '$1 == "f90"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $MngDir/pact.manifest` )
+        set Scms = ( `awk '$1 == "scm"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $MngDir/pact.manifest` )
+        set Docs = ( `awk '$1 == "doc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $MngDir/pact.manifest` )
+        set Pact = ( `awk '$1 == "pkg"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $MngDir/pact.manifest` )
+        set Mgrs = ( `awk '$1 == "mgr"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $MngDir/pact.manifest` )
 
         set ScrB = ( $Scrs )
 
@@ -3016,15 +3021,15 @@ CFG_DONE:
         set BeginTime = `$TIMER -r`
 
         NoteD $Log ""
-        NoteD $Log "Running PACT Tests ..."
+        NoteD $Log "Testing PACT for $System ..."
+        NoteD $Log " --------------------------------------------------------"
 
-        flog $Log (ls -l `$Which pact` |& grep smake)
+        flog $Log pushd ..
 
 # do it for smake
+        flog $Log (ls -l `$Which pact` |& grep smake)
         if ($status == 0) then
-           set PCKS = ( `awk '$1 == "pkg" {print}' pact.manifest | sed 's/^pkg//'` )
-           flog $Log pushd ..
-           NoteD $Log " --------------------------------------------------------"
+           set PCKS = ( `awk '$1 == "pkg" {print}' $MngDir/pact.manifest | sed 's/^pkg//'` )
            foreach d ($PCKS)
               flog $Log pushd $d
               ftee $Log pact $NA test
@@ -3033,7 +3038,6 @@ CFG_DONE:
               endif
               flog $Log popd
            end
-           flog $Log popd
 
 # do it for dmake
         else
@@ -3042,8 +3046,6 @@ CFG_DONE:
            set Args = ( $Args -na 1 )
            set Tmp  = /tmp/pact-test.$Host.$$
 
-           NoteD $Log " --------------------------------------------------------"
-           flog $Log pushd ..
            if ("$Tgts" == "") then
               ftee $Log pact $Args -f $EtcDir/Makefile test
               set RStatus = $status
@@ -3058,8 +3060,9 @@ CFG_DONE:
 
               flog $Log $RM $Tmp
            endif
-           flog $Log popd
         endif
+
+        flog $Log popd
 
         set ETime = `$TIMER -b $BeginTime`
 

@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# MAKE-MACROS.MP - write the MAKE-MACROS.MP file
+# MAKE-MACROS.MP - write the multi-platform MAKE-MACROS file
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -20,22 +20,23 @@ Note $Log ""
 
 Separator $Log
 
-NoteD $Log "   System Dependent MAKE Macros - make-macros.mp"
+NoteD $Log "   System Dependent MAKE Macros - make-macros"
 Note $Log ""
 
 dbmget $Log EtcDir^            \
+            MAKE_Shared_Libs^  \
             Sys
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    set STDOUT = $EtcDir/make-macros.mp
+    set STDOUT = $EtcDir/make-macros
 
     flog $Log $RM $STDOUT
     flog $Log touch $STDOUT
 
     Note $STDOUT '#'
-    Note $STDOUT '# MAKE-MACROS.MP - PACT Makefile macros for '$Sys
+    Note $STDOUT '# MAKE-MACROS - multi-platform PACT Makefile macros for '$Sys
     Note $STDOUT '#'
     Note $STDOUT ""
 
@@ -128,6 +129,8 @@ dbmget $Log EtcDir^            \
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+flog $Log ls -l $STDOUT
 
 exit(0)
 

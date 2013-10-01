@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# MAKEFILE.MP - write the distribution multi-platform MAKEFILE
+# MAKEFILE.MP - write the multi-platform distribution MAKEFILE
 #
 # include "cpyright.h"
 #
@@ -260,8 +260,6 @@ dbmget $Log SysDir^     \
 # test target
 
    Note $STDOUT 'test:'
-   Note $STDOUT '	@(echo "" ; echo "Test PACT")'
-   Note $STDOUT '	${BARRIER}'
 
    foreach p ($Pck)
       @ i = 0
@@ -276,7 +274,7 @@ dbmget $Log SysDir^     \
          set root = $base/$sid 
          set etcd = $root/etc
    
-         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact test in '$p' for '$sid'" ; ${PACT'$n'} -rcr test)'
+         Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact test in '$p' for '$sid'" ; ${PACT'$n'} -a '$sid' -rcr test)'
       end
    end
    Note $STDOUT ''
