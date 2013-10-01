@@ -95,8 +95,7 @@ dbmget $Log BinDir^   \
 
 # test target
     Note $STDOUT 'test:'
-    Note $STDOUT '	@(echo "" ; echo "Test PACT for '$System'")'
-    Note $STDOUT '	${BARRIER}'
+
     foreach i ($Pck)
        Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact test in '$i'" ; ${PACT} -rcr test)'
     end
