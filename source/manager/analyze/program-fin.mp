@@ -13,5 +13,7 @@ Run {
 
 Run {
    write/configured      $Log $ScrDir $CONFIG_FILE
+   write/make-def.mp     $Log $ScrDir
+   write/make-macros.mp  $Log $ScrDir
    write/makefile.mp     $Log $ScrDir
 }

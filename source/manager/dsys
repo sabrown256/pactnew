@@ -1224,6 +1224,11 @@ switch ($Cmnd)
            flog $Log unsetenv SESSION_CONFIG
            flog $Log $CfgMan add $sid
 
+# install the scripts
+           flog $Log pushd ${ScrDir}
+           flog $Log pact scrinstall
+           flog $Log popd
+
         else
            if (!(-f $PERDB_PATH.db)) then
               NoteD $Log ""
@@ -2333,7 +2338,7 @@ CFG_DONE:
 # save the files in BinDir
         set BinFiles = ""
         if ($strict == FALSE) then
-           set BinFiles = ( $BinFiles smake dmake acc pact template )
+           set BinFiles = ( $BinFiles smake dmake acc aranlib pact template )
            set BinFiles = ( $BinFiles timer px frnsic )
            set BinFiles = ( $BinFiles do-run elide blang gexec perdb )
            set BinFiles = ( $BinFiles make-syntax )

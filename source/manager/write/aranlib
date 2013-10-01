@@ -87,6 +87,8 @@ Note $STDOUT 'exit($nerr)'
 #--------------------------------------------------------------------------
 
 flog $Log chmod a+x $STDOUT
+flog $Log ls -l $STDOUT
+flog $Log cat $STDOUT
 
 exit(0)
 
