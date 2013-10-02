@@ -1,0 +1,12 @@
+#
+# AUTO-MP-GNU-BGP - multi-platform GNU build
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+platform auto-gnu-32-py    bgpgs   ${InstBase}
+platform auto-gnu-bgp-mpi  bgpg    ${InstBase}-mpi
+

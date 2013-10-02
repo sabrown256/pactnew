@@ -1,0 +1,9 @@
+#
+# AUTO-MP-XLC-BGL - multi-platform XLC build
+#
+# include "cpyright.h"
+#
+
+platform auto-xlc-lnx-32       bglxs  ${InstBase}
+platform auto-xlc-bgl-32-mpi   bglx   ${InstBase}-mpi
+

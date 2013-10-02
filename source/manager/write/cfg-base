@@ -129,13 +129,13 @@
                    unset lcc
                    breaksw
               case gnu-bgl:
-                   echo "include auto-gnu-bgl" >>& $Tmp
+                   echo "include auto-mp-gnu-bgl" >>& $Tmp
                    breaksw
               case gnu-bgp:
-                   echo "include auto-gnu-bgp" >>& $Tmp
+                   echo "include auto-mp-gnu-bgp" >>& $Tmp
                    breaksw
               case gnu-bgq:
-                   echo "include auto-gnu-bgq" >>& $Tmp
+                   echo "include auto-mp-gnu-bgq" >>& $Tmp
                    breaksw
               case gnu-cxe:
                    echo "include auto-gnu-cxe" >>& $Tmp
@@ -173,13 +173,13 @@
                    unset ladv
                    breaksw
               case xlc-bgl:
-                   echo "include auto-xlc-bgl" >>& $Tmp
+                   echo "include auto-mp-xlc-bgl" >>& $Tmp
                    breaksw
               case xlc-bgp:
-                   echo "include auto-xlc-bgp" >>& $Tmp
+                   echo "include auto-mp-xlc-bgp" >>& $Tmp
                    breaksw
               case xlc-bgq:
-                   echo "include auto-xlc-bgq" >>& $Tmp
+                   echo "include auto-mp-xlc-bgq" >>& $Tmp
                    breaksw
               default:
               case *gnu:
