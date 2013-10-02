@@ -31,13 +31,17 @@ static fcdes *_SC_make_archive(char *name, FILE *fp, int nb, hasharr *tab)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_MAKE_AR_ENTRY - allocate and initialize a file container entry */
+/* _SC_MAKE_AR_ENTRY - allocate and initialize a file container entry
+ *                   - NOTE: this is really file static but
+ *                   - conditionalizations cause compiler warnings which
+ *                   - are silenced by removing the static declaration
+ */
 
-static fcent *_SC_make_ar_entry(FILE *fp, int round,
-				char *name, char *date,
-				char *uid, char *gid,
-				char *size, char *mode,
-				int64_t *ppos)
+fcent *_SC_make_ar_entry(FILE *fp, int round,
+			 char *name, char *date,
+			 char *uid, char *gid,
+			 char *size, char *mode,
+			 int64_t *ppos)
    {int64_t sz, pos, ada;
     fcent *ae;
 

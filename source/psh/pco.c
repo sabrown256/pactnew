@@ -154,7 +154,8 @@ struct s_state
     char osrel[BFLRG];
     char hw[BFLRG];
     char sys[BFLRG];
-    char system[BFLRG];};
+    char system[BFLRG];
+    char features[BFSML];};
 
 static state
  st = { FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
@@ -1628,6 +1629,7 @@ static void default_var(client *cl, char *base)
     dbinitv(cl, "Man1Dir",       "man/man1");
     dbinitv(cl, "Man3Dir",       "man/man3");
     dbinitv(cl, "CROSS_COMPILE", "FALSE");
+    dbinitv(cl, "CONFIG_PATH",   "");
 
 /* global variables */
     snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.system);
@@ -2317,21 +2319,77 @@ static void process_use(client *cl, char *sg, char *oper)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PARSE_FEATURES - look through the features FT for any
+ *                - that apply to platform NP
+ *                - return the results in T
+ * feature syntax:
+ *     <features> := <feature> | <features> <feature>
+ *     <feature>  := <general> | <specific>
+ *     <specific> := <cfg-id>.<general> | <specific>.<general>
+ *     <general>  := 's' | 't' | 'py' | 'mpi' | ...
+ *     <cfg-id>   := 1 based index of platform for specific features
+ */
+
+static void parse_features(char *t, int nc, int np, char *ft)
+   {int i, nt, i_this, has_other;
+    char anp[10];
+    char **lst, *tk;
+
+    snprintf(anp, 10, "%d", np);
+    lst = tokenize(ft, " .-", 0);
+    nt  = lst_length(lst);
+
+    t[0] = '\0';
+
+    i_this    = -1;
+    has_other = FALSE;
+    for (i = 0; i < nt; i++)
+        {tk = lst[i];
+	 if (strcmp(anp, tk) == 0)
+	    i_this = i;
+         else if (is_number(tk, 1) == TRUE)
+	    has_other = TRUE;};
+
+/* if there are specifications for this platform */
+    if (i_this != -1)
+       {for (i = i_this+1; i < nt; i++)
+	    {tk = lst[i];
+	     if (is_number(tk, 1) == TRUE)
+	        break;
+	     else
+	        vstrcat(t, nc, "-%s", tk);};}
+
+/* if there are no specifications for a different platform */
+    else if (has_other == FALSE)
+       {for (i = 0; i < nt; i++)
+	    vstrcat(t, nc, "-%s", lst[i]);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DO_PLATFORM - process a platform command
  *             - syntax: platform <cfg> <alias> <instbase> [<args>*]
  */
 
 static void do_platform(client *cl, char *oper, char *value)
    {int i, ok;
-    char t[BFLRG];
-    char *p, *cfg, *sid, *sib, **spec;
+    char t[BFLRG], cfg[BFSML];
+    char *p, *sid, *sib, **spec;
     static char *cross_sid = NULL;
 
     st.np++;
 
     spec = tokenize(value, " \t\n\r", 0);
-    cfg  = oper;
     sid  = spec[0];
+
+/* determine appropriate features */
+    if (st.features[0] != '\0')
+       {parse_features(t, BFLRG, st.np, st.features);
+	snprintf(cfg, BFSML, "%s%s", oper, t);}
+    else
+       nstrncpy(cfg, BFSML, oper, -1);
 
     if (cross_sid == NULL)
        cross_sid = STRSAVE(sid);
@@ -3119,13 +3177,14 @@ static void help(void)
    {
 
     printf("\n");
-    printf("Usage: pact-config [-a] [-c] [-db <db>] [-f <path>] [-F] [-g] [-i <directory>] [-l] [-o] [-p] [-s <sysid>] [-v] | <cfg>\n");
+    printf("Usage: pco [-a] [-c] [-db <db>] [-f <path>] [-F] [-ft <features>] [-g] [-i <directory>] [-l] [-o] [-p] [-s <sysid>] [-v] | <cfg>\n");
     printf("\n");
     printf("             -a      do NOT perform PACT-ANALYZE step\n");
     printf("             -c      create missing directories for -i option\n");
     printf("             -db     configure using database <db>\n");
     printf("             -f      path to database\n");
     printf("             -F      do builds in /tmp for speed\n");
+    printf("             -ft     hyphen delimited feature list\n");
     printf("             -g      build debuggable version\n");
     printf("             -i      base installation directory (default /usr/local)\n");
     printf("             -l      append to the log file\n");
@@ -3184,6 +3243,7 @@ int main(int c, char **v, char **env)
 	       "env", "mkdir", "nm", "perdb",
 	       NULL);
 
+    st.features[0] = '\0';
     st.have_db = launch_perdb(c, v);
 
 /* technically this is set by 'dsys config' */
@@ -3228,6 +3288,10 @@ int main(int c, char **v, char **env)
          else if (strcmp(v[i], "-env") == 0)
             i++;
  
+         else if (strcmp(v[i], "-ft") == 0)
+	    {nstrncpy(st.features, BFSML, v[++i], -1);
+	     dbset(cl, "FEATURES", st.features);}
+
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'a':

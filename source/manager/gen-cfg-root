@@ -15,6 +15,10 @@ set cfg = $1
 
 set features = ( `echo $cfg | sed 's/-/ /g'` )
 
+if ($?ConfigDir == 0) then
+   setenv ConfigDir "local std"
+endif
+
 set croot = "none"
 set ok    = FALSE
 @ i = $#features
@@ -33,7 +37,7 @@ end
 # complete the features list
 @ i = $i + 2
 if ($i > $#features) then
-   set feature = ""
+   set features = ""
 else
    set features = ( $features[$i-] )
 endif
