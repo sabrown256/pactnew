@@ -283,7 +283,7 @@ if (-d ../../python) then
          set py_dirsrc       = ( $py_dirsrc       $lpy_dirsrc )
       end
 
-      setenv HAVE_PYTHON "$have_python"
+      flog $ALog setenv HAVE_PYTHON "$have_python"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -306,7 +306,7 @@ if (-d ../../python) then
 
 endif
 
-dbexp HAVE_PYTHON
+dbmset $ALog HAVE_PYTHON = "$HAVE_PYTHON"
 
 exit(0)
 

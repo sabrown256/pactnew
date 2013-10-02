@@ -4,5 +4,5 @@
 # include "cpyright.h"
 #
 
-platform gnu-64-py-s ognu  ${InstBase}
-platform win-64      ow64  none
+platform gnu-64-py ognu  ${InstBase}
+platform win-64    ow64  none

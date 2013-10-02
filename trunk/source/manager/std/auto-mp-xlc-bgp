@@ -4,6 +4,6 @@
 # include "cpyright.h"
 #
 
-platform auto-xlc-lnx-32-s       bgpxs  ${InstBase}
-platform auto-xlc-bgp-32-mpi-s   bgpx   ${InstBase}-mpi
+platform auto-xlc-lnx-32       bgpxs  ${InstBase}
+platform auto-xlc-bgp-32-mpi   bgpx   ${InstBase}-mpi
 

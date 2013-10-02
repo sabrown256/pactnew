@@ -4,6 +4,6 @@
 # include "cpyright.h"
 #
 
-platform auto-xlc-lnx-64-s       bgqxs  ${InstBase}
-platform auto-xlc-bgq-64-mpi-s   bgqx   ${InstBase}-mpi
+platform auto-xlc-lnx-64       bgqxs  ${InstBase}
+platform auto-xlc-bgq-64-mpi   bgqx   ${InstBase}-mpi
 

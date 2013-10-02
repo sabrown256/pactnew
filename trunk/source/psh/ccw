@@ -31,7 +31,7 @@ switch ($os)
         breaksw
 
    default:
-        set path = ( /usr/bin /sw/bin $path )
+        set path = ( /sw/bin /usr/bin $path )
         set cc   = ( `where gcc | head -n 1` )
 	if (!(-x "$cc")) then
            set cc = ( `where cc | head -n 1` )

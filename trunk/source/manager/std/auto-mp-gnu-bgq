@@ -1,0 +1,12 @@
+#
+# AUTO-MP-GNU-BGQ - multi-platform GNU build
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+platform auto-gnu-64-py    bgqgs   ${InstBase}
+platform auto-gnu-bgq-mpi  bgqg    ${InstBase}-mpi
+
