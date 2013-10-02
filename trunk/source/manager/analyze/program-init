@@ -48,6 +48,7 @@ setenv DO_RUN_MPI        none
 setenv DO_RUN_CROSS      none
 
 setenv HAVE_PYTHON       FALSE
+setenv CONFIG_PATH       "local:std"
 
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler

@@ -970,6 +970,9 @@ switch ($Cmnd)
            else
               set inf   = ( `gen-cfg-root $Configuration` )
               set croot = $inf[1]
+              if ($#inf > 1) then
+                 set flst  = ( $flst $inf[2-] )
+              endif
               if ($croot == none) then
                  set cmod = "existing file"
                  set ucfg = $gdir/$Configuration
@@ -1161,6 +1164,10 @@ switch ($Cmnd)
 
 # must have cpyright.h available during configuration
         flog $Log cp cpyright.h $IncDir
+
+	if ("$flst" != "") then
+           set PArgs = ( $PArgs -ft `echo $flst | sed 's| |-|g'` )
+        endif
 
 # do the main configuration work
         if ("$ucfg" != "") then

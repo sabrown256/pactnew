@@ -937,6 +937,37 @@ int last_char(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* IS_NUMBER - return TRUE if S is a number of type mask KND
+ *           - bit values of KND:
+ *           -   1  integer
+ *           -   2  float
+ *           - so KND = 0xff would be any kind of number
+ */
+
+int is_number(char *s, int knd)
+   {int rv, nc;
+    char *ps;
+
+    rv = FALSE;
+
+    if (s != NULL)
+       {nc = strlen(s);
+
+	if (knd & 1)
+           {errno = 0;
+	    strtoll(s, &ps, 0);
+	    rv |= (ps-s == nc);};
+
+	if (knd & 1)
+           {errno = 0;
+	    strtold(s, &ps);
+	    rv |= (ps-s == nc);};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* UPCASE - map S to upper case */
 
 char *upcase(char *s)

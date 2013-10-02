@@ -202,9 +202,12 @@ static int _SC_get_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
  *            - retry the open in TO milliseconds
  *            - use MSG for error reporing purposes
  *            - return TRUE iff successful
+ *            - NOTE: this is really file static but conditionalizations
+ *            - cause compiler warnings which are silenced by
+ *            - removing the static declaration
  */
 
-static int _SC_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
+int _SC_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
    {int rv;
 
     if (fd[nfd].flag != -1)

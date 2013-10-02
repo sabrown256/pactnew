@@ -235,8 +235,6 @@ dbmget $Log SysDir^     \
 # remove target
 
    Note $STDOUT 'remove:'
-   Note $STDOUT '	@(echo "" ; echo "Remove Binaries")'
-   Note $STDOUT '	${BARRIER}'
 
    @ i = 0
    @ n = 0

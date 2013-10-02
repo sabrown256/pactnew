@@ -102,9 +102,12 @@ static int _SC_set_tty_attr(int fd, TERMINAL *t, int now)
 
 /* _SC_SET_IO_ATTR - set the ATTR to STATE in terminal T
  *                 - STATE is either 1 (on), 0 (off), -1 (only)
+ *                 - NOTE: this is really file static but conditionalizations
+ *                 - cause compiler warnings which are silenced by
+ *                 - removing the static declaration
  */
 
-static void _SC_set_io_attr(void *pt, int class, int attr, int state)
+void _SC_set_io_attr(void *pt, int class, int attr, int state)
    {
 
 #ifdef TERMINAL
