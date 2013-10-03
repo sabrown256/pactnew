@@ -1933,9 +1933,65 @@ CFG_DONE:
 #--------------------------------------------------------------------------
 
    case install:
+ 
+        set Args = ""
+
+        while ($#argv > 0)
+           switch ($1)
+              case -a:
+                   shift
+                   setenv SESSION_CONFIG $1
+                   breaksw
+              case -h:
+              case help:
+                   echo "Usage: dsys install [-a <sys>] [-h] [-p #]"
+                   echo ""
+                   echo "   a     do remove of configuration <sys>"
+                   echo "   h     this help message"
+                   echo "   p     do work in parallel"
+                   echo ""
+                   exit(1)
+                   breaksw
+              case -p :
+                   shift
+                   if ($1 > 0) then
+                      set Args = ( $Args "-async" $1 )
+                   endif
+                   breaksw
+           endsw
+           shift
+        end
+
+        setenv System  `$CfgMan -d ../dev use`
+        set DevDir  = $BaseDir/dev
+        set SysDir  = $DevDir/$System
+        set BinDir  = $SysDir/bin
+        set EtcDir  = $SysDir/etc
+        set LogDir  = $SysDir/log
+
+        setenv GEXEC   $BinDir/gexec
+        setenv PATH    ${BinDir}:${PATH}
+
         InitLog Log $LogDir/install
 
-        ftee $Log install-pact
+# do install for multi-platform configuration
+        flog $Log setenv PERDB_PATH $EtcDir/cfg
+        dbget Platforms
+        if ("$Platforms" != "") then
+           set Args = ( $Args -f $EtcDir/Makefile )
+
+           set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
+           @ np = $#inf
+           Note $Log "$np platforms"
+
+           NoteD $Log ""
+
+           flog $Log pushd ..
+           ftee $Log pact $Args install
+           flog $Log popd
+        else
+           ftee $Log install-pact
+        endif
         set RStatus = $gstatus[1]
 
         breaksw
@@ -2279,6 +2335,8 @@ CFG_DONE:
         echo ""
 
         set strict = FALSE
+        set Args   = ""
+
         while ($#argv > 0)
            switch ($1)
               case -a:
@@ -2290,13 +2348,20 @@ CFG_DONE:
                    breaksw
               case -h:
               case help:
-                   echo "Usage: dsys remove [-a <sys>] [-cfg] [-h]"
+                   echo "Usage: dsys remove [-a <sys>] [-cfg] [-h] [-p #]"
                    echo ""
                    echo "   a     do remove of configuration <sys>"
                    echo "   cfg   do more strict config remove"
                    echo "   h     this help message"
+                   echo "   p     do work in parallel"
                    echo ""
                    exit(1)
+                   breaksw
+              case -p :
+                   shift
+                   if ($1 > 0) then
+                      set Args = ( $Args "-async" $1 )
+                   endif
                    breaksw
            endsw
            shift
@@ -2338,12 +2403,14 @@ CFG_DONE:
         flog $Log setenv PERDB_PATH $EtcDir/cfg
         dbget Platforms
         if ("$Platforms" != "") then
+           set Args = ( $Args -f $EtcDir/Makefile )
+
            set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
            @ np = $#inf
            Note $Log "$np platforms"
 
            flog $Log pushd ..
-           ftee $Log pact -f $EtcDir/Makefile remove
+           ftee $Log pact $Args remove
            flog $Log popd
         endif
 

@@ -263,6 +263,8 @@
 
 #define PCK_SCPSH
 
+#define DEFINE_MSW_FUNCS
+
 #include "score_int.h" 
 
 /* include the PSH files with SCOPE_SCORE_COMPILE to get in
