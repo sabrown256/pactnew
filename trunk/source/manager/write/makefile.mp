@@ -232,6 +232,29 @@ dbmget $Log SysDir^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# install target
+
+   Note $STDOUT 'install:'
+
+   @ i = 0
+   @ n = 0
+   while ($i < $ni)
+      @ n = $n + 1
+      @ i = $i + 1
+      set cfg = $inf[$i]
+      @ i = $i + 1
+      set sid = $inf[$i]
+
+      set root = $base/$sid 
+      set etcd = $root/etc
+   
+      Note $STDOUT '	@(echo "Installing PACT on '$sid' ; cd manager ; dsys install -a '$sid')'
+   end
+   Note $STDOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # remove target
 
    Note $STDOUT 'remove:'

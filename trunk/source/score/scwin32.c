@@ -9,8 +9,6 @@
 
 #include "cpyright.h"
 
-#define DEFINE_MSW_FUNCS
-
 #include "score_int.h" 
 
 #if defined(MSW)

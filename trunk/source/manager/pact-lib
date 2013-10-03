@@ -67,8 +67,10 @@ rm -f libpsmm.a libscc.a libultra.a libpy.a libpact.a
 # extract all the .o files from all the .a files
 echo "   Extracting:"
 foreach i (*.a)
-   echo "      $i"
-   $AR $ARXOpt $i
+   if ($i !~ libpy*.a) then
+      echo "      $i"
+      $AR $ARXOpt $i
+   endif
 end
 
 # make libpact.a with all the .o files

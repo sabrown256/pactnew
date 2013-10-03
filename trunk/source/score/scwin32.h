@@ -14,6 +14,11 @@
 
 #include "cpyright.h"
 
+#ifndef DEFINE_MSW_FUNCS
+# define NO_DEFINE_MSW_POSIX_FUNCS
+# define NO_DEFINE_MSW_NETWORK_FUNCS
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                        STANDARD CONFIGURATIONS                           */
