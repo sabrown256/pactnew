@@ -2551,7 +2551,7 @@ void push_path(int end, char *dpath, char *path)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* BUILD_PATH - build up lpath to include all specified programs
+/* BUILD_PATH - build up the global LPATH to include all specified programs
  *            - BASE is a string containing colon separated
  *            - directories ala PATH
  */
