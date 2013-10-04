@@ -41,8 +41,10 @@ set SysDir  = $DevDir/$System
 set IncDir  = $SysDir/include
 set BinDir  = $SysDir/bin
 set LibDir  = $SysDir/lib
+set EtcDir  = $SysDir/etc
 setenv ScrDir $BaseDir/scripts
 
+source $EtcDir/env-pact.csh
 source $ScrDir/functions-pact.csh
 
 set AR     = `pact +l -info AR`

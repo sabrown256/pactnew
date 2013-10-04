@@ -138,7 +138,7 @@
                    echo "include auto-mp-gnu-bgq" >>& $Tmp
                    breaksw
               case gnu-cxe:
-                   echo "include auto-gnu-cxe" >>& $Tmp
+                   echo "include auto-mp-gnu-cxe" >>& $Tmp
                    breaksw
               case *icc:
                    echo "run std/use-compiler $lcc" >>& $Tmp
@@ -155,7 +155,7 @@
                    echo "include compilers/path" >>& $Tmp
                    breaksw
               case pgi-cxe:
-                   echo "include auto-pgi-cxe" >>& $Tmp
+                   echo "include auto-mp-pgi-cxe" >>& $Tmp
                    breaksw
               case *pgi:
               case *pgcc:

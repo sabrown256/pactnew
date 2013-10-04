@@ -1,0 +1,9 @@
+#
+# AUTO-MP-GNU-CXE - multi-platform GNU build
+#
+# include "cpyright.h"
+#
+
+platform auto-gnu-64        cxegs  ${InstBase}
+platform auto-gnu-cxe-mpi   cxeg   ${InstBase}-mpi
+

@@ -1216,16 +1216,30 @@ switch ($Cmnd)
         if ("$Platforms" != "") then
            set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
            @ np = $#inf
-           Note $Log "$np platforms"
+           Note $Log "$np added platforms"
 
-           set inf = ( `echo "$inf" | sed 's|[()]| |g'` )
-           set sid = $inf[2]
+           set lpact = ${BinDir}/pact
+           set inf   = ( `echo "$inf" | sed 's|[()]| |g'` )
+
+           @ ni = $#inf
+           @ i  = 0
+           while ($i < $ni)
+              @ i = $i + 1
+              set cfg = $inf[$i]
+              @ i = $i + 1
+              set sid = $inf[$i]
+
+              set bind = $DevDir/$sid/bin
 
 # set the main pact link to the first platform pact
-           flog $Log pushd ${BinDir}
-           flog $Log mv pact pact.cfg
-           flog $Log ln -s $DevDir/$sid/bin/pact pact
-           flog $Log popd
+              flog $Log pushd ${bind}
+              flog $Log mv pact pact.cfg
+              flog $Log ln -s $lpact pact
+              flog $Log popd
+           end
+           unset lpact
+           unset bind
+           unset inf
 
 # restore configuration
            if ($?SESSION_CONFIG == 1) then
@@ -1235,11 +1249,6 @@ switch ($Cmnd)
            endif
            flog $Log unsetenv SESSION_CONFIG
            flog $Log $CfgMan add $sid
-
-# install the scripts
-           flog $Log pushd ${ScrDir}
-           flog $Log pact scrinstall
-           flog $Log popd
 
         else
            if (!(-f $PERDB_PATH.db)) then
