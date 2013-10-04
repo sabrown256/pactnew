@@ -1,0 +1,9 @@
+#
+# AUTO-MP-PGI-CXE - multi-platform PGI build
+#
+# include "cpyright.h"
+#
+
+platform auto-pgi-64        cxeps  ${InstBase}
+platform auto-pgi-cxe-mpi   cxep   ${InstBase}-mpi
+

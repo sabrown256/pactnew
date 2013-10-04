@@ -23,10 +23,23 @@ Separator $Log
 NoteD $Log "   Distribution Makefile - Makefile"
 Note $Log ""
 
-dbmget $Log BinDir^   \
-            EtcDir^   \
-            System^   \
+dbmget $Log BinDir^     \
+            EtcDir^     \
+            SysDir^     \
+            System^     \
+            Platforms^  \
             Pck
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set inf = ( base $System )
+   set inf = ( $inf `echo "$Platforms" | sed 's|[:()]| |g'` )
+   @ ni = $#inf
+   Note $Log "Added platform components ($ni):"
+   Note $Log "   $inf"
+
+   set base = $SysDir:h
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -45,60 +58,230 @@ dbmget $Log BinDir^   \
     Note $STDOUT "#"
     Note $STDOUT ""
 
-    Note $STDOUT "PACT   = $BinDir/pact"
-    Note $STDOUT "MkFile = $EtcDir/Makefile"
+    @ i = 0
+    @ n = 0
+    while ($i < $ni)
+       @ n = $n + 1
+       @ i = $i + 1
+       set cfg = $inf[$i]
+       @ i = $i + 1
+       set sid = $inf[$i]
+
+       set root = $base/$sid 
+       set etcd = $root/etc
+       set bind = $root/bin
+
+       Note $STDOUT "PACT$n   = $bind/pact"
+       Note $STDOUT "MkFile$n = $etcd/Makefile"
+    end
+
     Note $STDOUT ""
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # build target
+
     Note $STDOUT 'build:'
     Note $STDOUT '	@(echo "" ; echo "Generate sources for '$System'")'
     Note $STDOUT '	${BARRIER}'
-    foreach i ($Pck)
-       Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact generate in '$i'" ; ${PACT} -rcr generate)'
-       if ($i == score) then
+
+    foreach p ($Pck)
+       @ i = 0
+       @ n = 0
+       while ($i < $ni)
+          @ n = $n + 1
+          @ i = $i + 1
+          set cfg = $inf[$i]
+          @ i = $i + 1
+          set sid = $inf[$i]
+
+          set root = $base/$sid 
+          set etcd = $root/etc
+   
+          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact generate in '$p' for '$sid'" ; ${PACT'$n'} -rcr generate)'
+       end
+       if ($p == score) then
           Note $STDOUT '	${BARRIER}'
        endif
     end
+
     Note $STDOUT '	${BARRIER}'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
     Note $STDOUT '	@(echo "" ; echo "Install headers for '$System'")'
     Note $STDOUT '	${BARRIER}'
-    foreach i ($Pck)
-       Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact incinstall in '$i'" ; ${PACT} -rcr incinstall)'
+
+    foreach p ($Pck)
+       @ i = 0
+       @ n = 0
+       while ($i < $ni)
+          @ n = $n + 1
+          @ i = $i + 1
+          set cfg = $inf[$i]
+          @ i = $i + 1
+          set sid = $inf[$i]
+
+          set root = $base/$sid 
+          set etcd = $root/etc
+   
+          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact incinstall in '$p' for '$sid'" ; ${PACT'$n'} -rcr incinstall)'
+       end
     end
+
     Note $STDOUT '	${BARRIER}'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
     Note $STDOUT '	@(echo "" ; echo "Compile sources for '$System'")'
     Note $STDOUT '	${BARRIER}'
-    foreach i ($Pck)
-       Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact devlib in '$i'" ; ${PACT} -rcr devlib)'
+
+    foreach p ($Pck)
+       @ i = 0
+       @ n = 0
+       while ($i < $ni)
+          @ n = $n + 1
+          @ i = $i + 1
+          set cfg = $inf[$i]
+          @ i = $i + 1
+          set sid = $inf[$i]
+
+          set root = $base/$sid 
+          set etcd = $root/etc
+   
+          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact devlib in '$p' for '$sid'" ; ${PACT'$n'} -rcr devlib)'
+       end
     end
+
     Note $STDOUT '	${BARRIER}'
-    Note $STDOUT '	${PACT} -f ${MkFile} link'
+    Note $STDOUT '	${PACT1} -f ${MkFile1} link'
     Note $STDOUT ''
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # link target
+
     Note $STDOUT 'link:'
     Note $STDOUT '	@(echo "" ; echo "Link Executables for '$System'")'
     Note $STDOUT '	${BARRIER}'
-    foreach i ($Pck)
-       Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact link in '$i'" ; ${PACT} -rcr link)'
+
+    foreach p ($Pck)
+       @ i = 0
+       @ n = 0
+       while ($i < $ni)
+          @ n = $n + 1
+          @ i = $i + 1
+          set cfg = $inf[$i]
+          @ i = $i + 1
+          set sid = $inf[$i]
+
+          set root = $base/$sid 
+          set etcd = $root/etc
+   
+          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact link in '$p' for '$sid'" ; ${PACT'$n'} -rcr link)'
+       end
     end
+
     Note $STDOUT '	${BARRIER}'
-    Note $STDOUT '	${PACT} -f ${MkFile} unilib'
+    Note $STDOUT '	${PACT1} -f ${MkFile1} unilib'
     Note $STDOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 # unilib target
+
     Note $STDOUT 'unilib:'
-    Note $STDOUT '	@(cd manager ; ./pact-lib -a '$System')'
+
+    @ i = 0
+    @ n = 0
+    while ($i < $ni)
+       @ n = $n + 1
+       @ i = $i + 1
+       set cfg = $inf[$i]
+       @ i = $i + 1
+       set sid = $inf[$i]
+
+       set root = $base/$sid 
+       set etcd = $root/etc
+   
+       Note $STDOUT '	@(cd manager ; ./pact-lib -a '$sid')'
+    end
+
     Note $STDOUT ''
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# install added platforms
+
+   Note $STDOUT 'install:'
+
+   @ i = 2
+   while ($i < $ni)
+      @ i = $i + 1
+      set cfg = $inf[$i]
+      @ i = $i + 1
+      set sid = $inf[$i]
+
+      set root = $base/$sid 
+      set etcd = $root/etc
+   
+      Note $STDOUT '	@(echo "Installing PACT on '$sid'" ; cd manager ; dsys install -a '$sid')'
+   end
+
+   Note $STDOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# remove added platforms
+
+   Note $STDOUT 'remove:'
+
+   @ i = 2
+   while ($i < $ni)
+      @ i = $i + 1
+      set cfg = $inf[$i]
+      @ i = $i + 1
+      set sid = $inf[$i]
+
+      set root = $base/$sid 
+      set etcd = $root/etc
+   
+      Note $STDOUT '	@(cd manager ; dsys remove -a '$sid')'
+   end
+
+   Note $STDOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # test target
+
     Note $STDOUT 'test:'
 
-    foreach i ($Pck)
-       Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact test in '$i'" ; ${PACT} -rcr test)'
+    foreach p ($Pck)
+       @ i = 0
+       @ n = 0
+       while ($i < $ni)
+          @ n = $n + 1
+          @ i = $i + 1
+          set cfg = $inf[$i]
+          @ i = $i + 1
+          set sid = $inf[$i]
+
+          set root = $base/$sid 
+          set etcd = $root/etc
+   
+          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact test in '$p' for '$sid'" ; ${PACT'$n'} -a '$sid' -rcr test)'
+       end
     end
+
     Note $STDOUT ''
 
 #--------------------------------------------------------------------------
