@@ -4,6 +4,9 @@
 # include "cpyright.h"
 #
 
-platform auto-gnu-64        cxegs  ${InstBase}
-platform auto-gnu-cxe-mpi   cxeg   ${InstBase}-mpi
+include auto-gnu-64-py
+include cross-gnu-cxe
+
+#platform auto-gnu-64        cxegs  ${InstBase}
+#platform auto-gnu-cxe-mpi   cxeg   ${InstBase}-mpi
 

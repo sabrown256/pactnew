@@ -7,6 +7,9 @@
 # include "cpyright.h"
 #
 
-platform auto-gnu-32-py    bgpgs   ${InstBase}
-platform auto-gnu-bgp-mpi  bgpg    ${InstBase}-mpi
+include auto-gnu-32-py
+include cross-gnu-bgp
+
+#platform auto-gnu-32-py    bgpgs   ${InstBase}
+#platform auto-gnu-bgp-mpi  bgpg    ${InstBase}-mpi
 

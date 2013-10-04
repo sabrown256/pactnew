@@ -1,0 +1,5 @@
+#
+# CROSS-GNU-BGQ - add GNU-BGQ as a CROSS-COMPILEd second platform 
+#
+
+platform auto-gnu-bgq-mpi  bgqg    ${InstBase}-mpi
