@@ -4,6 +4,9 @@
 # include "cpyright.h"
 #
 
-platform auto-pgi-64        cxeps  ${InstBase}
-platform auto-pgi-cxe-mpi   cxep   ${InstBase}-mpi
+include auto-pgi-64
+include cross-pgi-cxe
+
+#platform auto-pgi-64        cxeps  ${InstBase}
+#platform auto-pgi-cxe-mpi   cxep   ${InstBase}-mpi
 

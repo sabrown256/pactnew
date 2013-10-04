@@ -16,6 +16,7 @@ if ("$ldir" == ".") then
 endif
 set scsi = ( `$ldir/which-scs` )
 
+set sort   = FALSE
 set unmngd = FALSE
 set cvsopt = ""
 set svnopt = ""
@@ -29,6 +30,9 @@ while ($#argv > 0)
       case -l:
            set cvsopt = ( $cvsopt -l )
            set svnopt = ( $svnopt --depth files )
+           breaksw
+      case -s:
+           set sort = TRUE
            breaksw
       case -u:
            set unmngd = TRUE
@@ -45,7 +49,11 @@ switch ($scsi[1])
         pushd $scsi[2] >& /dev/null
 
         if ($unmngd == TRUE) then
-           git status -s |& egrep '^\?' | sed 's/^??/? /' | grep "$scsi[3]/"
+	   if ($sort == TRUE) then
+              git status -s |& egrep '^\?' | sed 's/^??/? /' | grep "$scsi[3]/" | sort -k 2
+           else
+              git status -s |& egrep '^\?' | sed 's/^??/? /' | grep "$scsi[3]/"
+           endif
         else
            set repo = ( `$ldir/scs-meta -r` )
 
@@ -54,7 +62,11 @@ switch ($scsi[1])
            set xstatus = $status
 
 # report changed files
-           grep '|' .log.sup | sed 's/|.*$//' | awk '{printf("   P %s\n", $1);}'
+	   if ($sort == TRUE) then
+              grep '|' .log.sup | sed 's/|.*$//' | awk '{printf("   P %s\n", $1);}' | sort -k 2
+           else
+              grep '|' .log.sup | sed 's/|.*$//' | awk '{printf("   P %s\n", $1);}'
+           endif
            if ($xstatus == 0) then
               rm .log.sup
            else
@@ -85,9 +97,17 @@ switch ($scsi[1])
 
         setenv CVS_RSH  ssh
         if ($unmngd == TRUE) then
-           cvs update $cvsopt $args |& egrep '^\?'
+	   if ($sort == TRUE) then
+              cvs update $cvsopt $args |& egrep '^\?' | sort -k 2
+           else
+              cvs update $cvsopt $args |& egrep '^\?'
+           endif
         else
-           cvs update $cvsopt $args |& egrep -v '^\?' |& grep -v 'cvs update'
+	   if ($sort == TRUE) then
+              cvs update $cvsopt $args |& egrep -v '^\?' |& grep -v 'cvs update' | sort -k 2
+           else
+              cvs update $cvsopt $args |& egrep -v '^\?' |& grep -v 'cvs update'
+           endif
         endif
         breaksw
 
@@ -95,9 +115,17 @@ switch ($scsi[1])
 
         svn update $svnopt $args
         if ($unmngd == TRUE) then
-           svn status $svnopt |& egrep '^\?'
+	   if ($sort == TRUE) then
+              svn status $svnopt |& egrep '^\?' | sort -k 2
+           else
+              svn status $svnopt |& egrep '^\?'
+           endif
         else
-           svn status $svnopt |& egrep -v '^\?' | sed 's|+| |'
+	   if ($sort == TRUE) then
+              svn status $svnopt |& egrep -v '^\?' | sed 's|+| |' | sort -k 2
+           else
+              svn status $svnopt |& egrep -v '^\?' | sed 's|+| |'
+           endif
         endif
         breaksw
 endsw

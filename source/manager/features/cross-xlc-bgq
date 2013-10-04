@@ -1,0 +1,5 @@
+#
+# CROSS-XLC-BGQ - add XLC-BGQ as a CROSS-COMPILEd second platform 
+#
+
+platform auto-xlc-bgq-64-mpi  bgqx    ${InstBase}-mpi

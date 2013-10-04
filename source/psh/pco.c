@@ -3025,13 +3025,6 @@ static void analyze_config(client *cl, char *base)
     push_dir(st.dir.cfg);
 
 /* read the file which does the analysis */
-#if 0
-    if (st.np > 0)
-       {if (file_exists("../analyze/program-analyze.mp") == TRUE)
-	   read_config(cl, "program-analyze.mp", TRUE);}
-
-    else
-#endif
     if (file_exists("../analyze/program-analyze") == TRUE)
        read_config(cl, "program-analyze", TRUE);
 
@@ -3055,11 +3048,7 @@ static void analyze_config(client *cl, char *base)
 static void summarize_config(client *cl)
    {
 
-#if 0
-    if ((st.np < 1) && (file_executable("analyze/summary") == TRUE))
-#else
     if (file_executable("analyze/summary") == TRUE)
-#endif
        printf("%s\n", run(BOTH, "analyze/summary"));
 
     return;}
@@ -3095,13 +3084,7 @@ static void finish_config(client *cl, char *base)
 
     LOG_OFF;
 
-#if 0
-    if (st.np > 0)
-       {if (file_exists("analyze/program-fin.mp") == TRUE)
-	   read_config(cl, "program-fin.mp", TRUE);}
-
-    else if (file_exists("analyze/program-fin") == TRUE)
-#endif
+    if (file_exists("analyze/program-fin") == TRUE)
        read_config(cl, "program-fin", TRUE);
 
     LOG_ON;

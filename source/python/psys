@@ -42,14 +42,10 @@ while ($#argv > 0)
    shift
 end
 
-set archo = z-${System}
-InitLog log $cwd/$archo/log.psys.$tgt
+if (("$HAVE_PYTHON" !~ *FALSE*) && ($tgt != generate)) then
 
-# touch the library into existence in case ranlib is called on  it
-if ("$HAVE_PYTHON" == "") then
-   NoteD $log "ERROR: No python dispostion for $System"
-
-else if (("$HAVE_PYTHON" !~ *FALSE*) && ($tgt != generate)) then
+   set archo = z-${System}
+   InitLog log $cwd/$archo/log.psys.$tgt
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

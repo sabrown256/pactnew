@@ -1,0 +1,5 @@
+#
+# CROSS-GNU-BGP - add GNU-BGP as a CROSS-COMPILEd second platform 
+#
+
+platform auto-gnu-bgp-mpi  bgpg    ${InstBase}-mpi
