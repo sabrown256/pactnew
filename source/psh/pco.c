@@ -124,6 +124,8 @@ struct s_state
     phase_id phase;
 
     int np;                     /* number of platforms */
+    char **pltfcmd;             /* platform config commands */
+    char **pltfcfg;             /* platform config file */
 
     int na;
     char **args;
@@ -161,7 +163,7 @@ static state
  st = { FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
         TRUE, FALSE, TRUE, FALSE, FALSE,
 	FALSE, FALSE, FALSE,
-        PHASE_READ, 0, 0, };
+        PHASE_READ, 0, NULL, NULL, 0, NULL, };
 
 static void
  parse_line(client *cl, char *s, char *key, char *oper, char *value, int nc);
@@ -344,6 +346,7 @@ static int reset_env(int c, char **v)
    {int i, rv;
     char *p, **sa, **except;
 
+/* get the list of variables that are to be left intact from the -env file */
     sa = NULL;
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-env") == 0)
@@ -352,6 +355,8 @@ static int reset_env(int c, char **v)
 
     rv = 0;
     if (sa != NULL)
+
+/* make a clean list of variables - throwing away comments from the file */
        {except = NULL;
 
 	for (i = 0; sa[i] != NULL; i++)
@@ -2359,8 +2364,10 @@ static void parse_features(char *t, int nc, int np, char *ft)
 	     else
 	        vstrcat(t, nc, "-%s", tk);};}
 
-/* if there are no specifications for a different platform */
-    else if (has_other == FALSE)
+/* if there are no specifications for a different platform
+ * NOTE: with the new way only attach features to specific platforms
+ */
+    else if ((has_other == FALSE) && 0)
        {for (i = 0; i < nt; i++)
 	    vstrcat(t, nc, "-%s", lst[i]);};
 
@@ -2374,10 +2381,9 @@ static void parse_features(char *t, int nc, int np, char *ft)
  */
 
 static void do_platform(client *cl, char *oper, char *value)
-   {int i, ok;
+   {int i;
     char t[BFLRG], cfg[BFSML];
     char *p, *sid, *sib, **spec;
-    static char *cross_sid = NULL;
 
     st.np++;
 
@@ -2391,15 +2397,10 @@ static void do_platform(client *cl, char *oper, char *value)
     else
        nstrncpy(cfg, BFSML, oper, -1);
 
-    if (cross_sid == NULL)
-       cross_sid = STRSAVE(sid);
-
     note(Log, TRUE, "");
-    if (st.np == 1)
-       noted(Log, "\n----------------------------------------------\n");
-    noted(Log, "Adding platform %s from %s", sid, cfg);
 
-    snprintf(t, BFLRG, "dsys config -plt %s", cross_sid);
+/* assemble the config command line */
+    snprintf(t, BFLRG, "dsys config -plt %s", st.system);
 
 /* add options affecting all platforms */
     if (st.abs_deb == TRUE)
@@ -2425,15 +2426,9 @@ static void do_platform(client *cl, char *oper, char *value)
     if (strcmp(cfg, "none") != 0)
        vstrcat(t, BFLRG, " %s", cfg);
 
-/* run the config for this platform */
-    ok = system(t);
-    if (ok != 0)
-       {noted(Log, "Configuration of platform %s failed - exiting",
-	      cfg);
-	exit(1);}
-    else
-       note(Log, TRUE, "Configuration of platform %s succeeded",
-	    cfg);
+/* add this command to the list */
+    st.pltfcmd = lst_push(st.pltfcmd, t);
+    st.pltfcfg = lst_push(st.pltfcfg, cfg);
 
 /* add this platform to the list */
     p = dbget(cl, FALSE, "Platforms");
@@ -2442,9 +2437,42 @@ static void do_platform(client *cl, char *oper, char *value)
     else
        dbset(cl, "Platforms", "%s:%s(%s)", p, cfg, sid);
 
-    noted(Log, "\n----------------------------------------------\n");
-
     free_strings(spec);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CONFIG_PLATFORMS - run the config commands for additional platforms */
+
+static void config_platforms(void)
+   {int i, ok;
+    char *cmd, *cfg;
+
+    noted(Log, "");
+
+    for (i = 0; i < st.np; i++)
+        {cmd = st.pltfcmd[i];
+	 cfg = st.pltfcfg[i];
+
+	 noted(Log, "----------------------------------------------");
+
+/* run the config for this platform */
+	 ok = system(cmd);
+	 if (ok != 0)
+	    {noted(Log, "Configuration of platform %s failed - exiting",
+		   cfg);
+	     exit(1);}
+	 else
+	    note(Log, TRUE, "Configuration of platform %s succeeded",
+		 cfg);};
+
+    if (st.np > 0)
+       noted(Log, "----------------------------------------------");
+
+    free_strings(st.pltfcmd);
+    free_strings(st.pltfcfg);
 
     return;}
 
@@ -2997,11 +3025,14 @@ static void analyze_config(client *cl, char *base)
     push_dir(st.dir.cfg);
 
 /* read the file which does the analysis */
+#if 0
     if (st.np > 0)
        {if (file_exists("../analyze/program-analyze.mp") == TRUE)
 	   read_config(cl, "program-analyze.mp", TRUE);}
 
-    else if (file_exists("../analyze/program-analyze") == TRUE)
+    else
+#endif
+    if (file_exists("../analyze/program-analyze") == TRUE)
        read_config(cl, "program-analyze", TRUE);
 
     run(BOTH, "rm * > /dev/null 2>&1");
@@ -3024,7 +3055,11 @@ static void analyze_config(client *cl, char *base)
 static void summarize_config(client *cl)
    {
 
+#if 0
     if ((st.np < 1) && (file_executable("analyze/summary") == TRUE))
+#else
+    if (file_executable("analyze/summary") == TRUE)
+#endif
        printf("%s\n", run(BOTH, "analyze/summary"));
 
     return;}
@@ -3060,11 +3095,13 @@ static void finish_config(client *cl, char *base)
 
     LOG_OFF;
 
+#if 0
     if (st.np > 0)
        {if (file_exists("analyze/program-fin.mp") == TRUE)
 	   read_config(cl, "program-fin.mp", TRUE);}
 
     else if (file_exists("analyze/program-fin") == TRUE)
+#endif
        read_config(cl, "program-fin", TRUE);
 
     LOG_ON;
@@ -3222,14 +3259,6 @@ int main(int c, char **v, char **env)
     signal(SIGTERM, sigdone);
     signal(SIGINT,  sigdone);
 
-/* multi-platform configs will go idle for the child configs
- * so give it more time
- */
-    csetenv("PERDB_IDLE_TIMEOUT", "600");
-
-    root = cgetenv(TRUE, "PERDB_PATH");
-    cl   = make_client(CLIENT, DB_PORT, FALSE, root, cl_logger, NULL);
-
     ok = reset_env(c, v);
     if (ok == -1)
        {printf("Could not clear environment - exiting\n");
@@ -3243,6 +3272,14 @@ int main(int c, char **v, char **env)
 	       "env", "mkdir", "nm", "perdb",
 	       NULL);
 
+/* multi-platform configs will go idle for the child configs
+ * so give it more time
+ */
+    csetenv("PERDB_IDLE_TIMEOUT", "600");
+
+    root = cgetenv(TRUE, "PERDB_PATH");
+    cl   = make_client(CLIENT, DB_PORT, FALSE, root, cl_logger, NULL);
+
     st.features[0] = '\0';
     st.have_db = launch_perdb(c, v);
 
@@ -3250,7 +3287,7 @@ int main(int c, char **v, char **env)
     cinitenv("DbgOpt", "-g");
 
 /* NOTE: because of OSX's nefarious automounter we have to get the current
- * directory this way (rather that via the getcwd library call) so that
+ * directory this way (rather than via the getcwd library call) so that
  * we get the same value that shell scripts get in other parts of the
  * config process - and consistency is essential
  */
@@ -3430,6 +3467,9 @@ int main(int c, char **v, char **env)
     pco_save_db(cl, "db");
 
     finish_config(cl, base);
+
+/* configure added platforms */
+    config_platforms();
 
     separator(Log);
     run(BOTH, "rm -rf %s", st.dir.cfg);
