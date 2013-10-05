@@ -619,8 +619,8 @@ switch ($Cmnd)
 
         setenv CCompiler  gnu
 
-        setenv Arch  `$ScrDir/system-id`
-        setenv Bits  `$ScrDir/nbit -d`
+        setenv SYS_Arch  `$ScrDir/system-id`
+        setenv Bits      `$ScrDir/nbit -d`
 
         set Configuration = ""
         set Method        = 2
@@ -926,7 +926,7 @@ switch ($Cmnd)
         flog $Log $RM $LogDir/analyze*
 
 # figure out from where configuration info is coming
-        set gdir = gen/$Arch
+        set gdir = gen/$SYS_Arch
         if (!(-d $gdir)) then
            mkdir -p $gdir >& /dev/null
         endif
@@ -994,8 +994,7 @@ switch ($Cmnd)
         endif
 
 # make sure that the installation directories exist
-        setenv OS_Name     `uname -s`
-        setenv HostArch   `uname -m`
+        setenv OS_Name  `uname -s`
         set InstBase  = $DevDir/$SYS_ID
         if (!(-d $DevDir)) then
            mkdir $DevDir
@@ -3670,7 +3669,7 @@ GEN_CONFIG:
 
    set vrb = FALSE
 
-   set gdir = gen/$Arch
+   set gdir = gen/$SYS_Arch
    if (!(-d $gdir)) then
       mkdir -p $gdir
    endif

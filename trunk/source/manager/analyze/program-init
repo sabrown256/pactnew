@@ -18,7 +18,7 @@ run analyze/rpath -i init
 include features/dld
 
 setenv ENV_VARS "RUN_SIGNATURE_DB SITE_SIGNATURE_DB \
-                 SYS_Prefix SYS_CfgDir SYS_TmpDir SYS_ID \
+                 SYS_Prefix SYS_CfgDir SYS_TmpDir SYS_Arch SYS_ID \
                  SYS_SITE SYS_TYPE DAI_ROOT DAS_ROOT \
                  GLIBC_VERSION BFD_VERSION \
                  HDF_VERSION MYSQL_VERSION SQLITE3_VERSION \
@@ -131,7 +131,17 @@ Group STD {
    OPENMP = none
 }
 
+# Group SYS contains variables describing the system
+#   SYS_Arch    the system ID as defined by 'system-id'
+#   SYS_ID      the system ID as defined by 'cfgman use'
+#   SYS_TYPE    the system type as defined by 'site-signature'
+#   SYS_SITE    the site of the system as defined by 'site-signature'
+#   SYS_Prefix  the temporary directory prefix, e.g. "z-"
+#   SYS_CfgDir  the temporary configuration directory
+#   SYS_TmpDir  the temporary build/test directory
+
 Group SYS {
+   Arch   = ${SYS_Arch}
    ID     = ${SYS_ID}
    TYPE   = ""
    SITE   = ""

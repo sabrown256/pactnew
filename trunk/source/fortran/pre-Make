@@ -54,7 +54,7 @@ targets :
 	@echo "   contour      : make PGS Fortran contour test"
 	@echo "   fdp          : make PDB Fortran DP IO test"
 	@echo "   fha          : make Fortran API of hash test"
-	@echo "   install      : install PFTN headers and utilities in dev/arch"
+	@echo "   install      : install PFTN headers and utilities in dev/sys_id"
 	@echo "   link         : link PFTN utilities for public use"
 	@echo "   panacea      : make PANACEA Fortran API tests"
 	@echo "   pdb          : make PDB Fortran API tests"

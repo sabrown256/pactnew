@@ -14,9 +14,9 @@ set Which = "$cwd/pwhich"
 set Exe   = `$Which toby`
 
 if (-x "$Exe") then
-   set Arch    = `../scripts/cfgman use`
+   set sys_id  = `../scripts/cfgman use`
    set BaseDir = $cwd:h
-   set LibDir  = $BaseDir/dev/$Arch/lib
+   set LibDir  = $BaseDir/dev/$sys_id/lib
    set Libs    = `ls $LibDir`
 
    set Tmp    = tobydb

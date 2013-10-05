@@ -38,11 +38,11 @@ Libs = ${TGTLib} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for SCC"
-	@echo "   install   : install SCC headers and utilities in dev/arch"
+	@echo "   install   : install SCC headers and utilities in dev/sys_id"
 	@echo "   link      : link SCC utilities for public use"
 	@echo "   profiler  : make a profiling version"
 	@echo "   scc       : make the SCC executable"
-	@echo "   sharedlib : build and install SCC shared libs in dev/arch"
+	@echo "   sharedlib : build and install SCC shared libs in dev/sys_id"
 	@echo "   test      : run the SCC test suite"
 
 

@@ -212,12 +212,12 @@ set LibVers = 1
     Note $STDOUT 'man1install :'
     Note $STDOUT '	@[ ! -f ${Man1Dir}/.lock ] || { echo "${Man1Dir} is locked" ; exit 1 ; }'
     Note $STDOUT '	${ScrDir}/maninstall -s 1'
-#    Note $STDOUT '	@(echo "sinstall ${archo}/*.1 ${Man1Dir}" ; sinstall ${archo}/*.1 ${Man1Dir})'
+#    Note $STDOUT '	@(echo "sinstall ${tmpobj}/*.1 ${Man1Dir}" ; sinstall ${tmpobj}/*.1 ${Man1Dir})'
     Note $STDOUT ""
     Note $STDOUT 'man3install :'
     Note $STDOUT '	@[ ! -f ${Man3Dir}/.lock ] || { echo "${Man3Dir} is locked" ; exit 1 ; }'
     Note $STDOUT '	${ScrDir}/maninstall -s 3'
-#    Note $STDOUT '	@(echo "sinstall ${archo}/*.3 ${Man3Dir}" ; sinstall ${archo}/*.3 ${Man3Dir})'
+#    Note $STDOUT '	@(echo "sinstall ${tmpobj}/*.3 ${Man3Dir}" ; sinstall ${tmpobj}/*.3 ${Man3Dir})'
     Note $STDOUT ""
 
     Note $STDOUT '#'
@@ -305,10 +305,10 @@ set LibVers = 1
     Note $STDOUT '# language bindings'
     Note $STDOUT ''
 
-    Note $STDOUT 'gfb  = ../fortran/${archo}/gf-${LibName}.c'
-    Note $STDOUT 'gmb  = ../fortran/${archo}/gm-${LibName}.f'
-    Note $STDOUT 'gsb  = ../sx/${archo}/gs-${LibName}.c'
-    Note $STDOUT 'gpb  = ../python/${archo}/gp-${LibName}.c'
+    Note $STDOUT 'gfb  = ../fortran/${tmpobj}/gf-${LibName}.c'
+    Note $STDOUT 'gmb  = ../fortran/${tmpobj}/gm-${LibName}.f'
+    Note $STDOUT 'gsb  = ../sx/${tmpobj}/gs-${LibName}.c'
+    Note $STDOUT 'gpb  = ../python/${tmpobj}/gp-${LibName}.c'
     Note $STDOUT ''
 
 # NOTE: technically this should be all of them but that results in

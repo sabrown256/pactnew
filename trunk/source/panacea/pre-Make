@@ -63,10 +63,10 @@ targets :
 	@echo "   Cth       : make C time history tests"
 	@echo "   defvar    : make variable definition test"
 	@echo "   Fth       : make Fortran time history tests"
-	@echo "   install   : install PANACEA headers and utilities in dev/arch"
+	@echo "   install   : install PANACEA headers and utilities in dev/sys_id"
 	@echo "   link      : link PANACEA utilities for public use"
 	@echo "   prep      : make preprocessing test"
-	@echo "   sharedlib : build and install PANACEA shared libs in dev/arch"
+	@echo "   sharedlib : build and install PANACEA shared libs in dev/sys_id"
 	@echo "   test      : run the PANACEA test suite"
 
 #

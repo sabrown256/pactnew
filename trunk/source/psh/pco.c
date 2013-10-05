@@ -1380,16 +1380,16 @@ static void setup_analyze_env(client *cl, char *base)
     note(out, TRUE, "%s", get_date());
     fclose_safe(out);
 
-    dbset(cl, "Host",    st.host);
-    dbset(cl, "Arch",    st.arch);
-    dbset(cl, "SYS_ID",  st.sys_id);
-    dbset(cl, "Sys",     st.sys);
-    dbset(cl, "BaseDir", base);
-    dbset(cl, "SysDir",  st.dir.root);
-    dbset(cl, "ScrDir",  st.dir.scr);
-    dbset(cl, "AnaDir",  "%s/analyze", st.dir.mng);
-    dbset(cl, "Log",     st.logf);
-    dbset(cl, "ALog",    alog);
+    dbset(cl, "Host",     st.host);
+    dbset(cl, "SYS_Arch", st.arch);
+    dbset(cl, "SYS_ID",   st.sys_id);
+    dbset(cl, "Sys",      st.sys);
+    dbset(cl, "BaseDir",  base);
+    dbset(cl, "SysDir",   st.dir.root);
+    dbset(cl, "ScrDir",   st.dir.scr);
+    dbset(cl, "AnaDir",   "%s/analyze", st.dir.mng);
+    dbset(cl, "Log",      st.logf);
+    dbset(cl, "ALog",     alog);
 
     dbset(cl, "AbsoluteDeb", st.abs_deb ? "TRUE" : "FALSE");
     dbset(cl, "AbsoluteOpt", st.abs_opt ? "TRUE" : "FALSE");

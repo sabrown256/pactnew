@@ -78,7 +78,7 @@ setenv Host       `uname -n`
 setenv OS_Name     `uname -s`
 setenv OS_Release  `uname -r`
 
-setenv Arch `$ScrDir/system-id`
+setenv SYS_Arch `$ScrDir/system-id`
 
 #
 # Global Variables

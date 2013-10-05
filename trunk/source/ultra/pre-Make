@@ -72,9 +72,9 @@ Libs = ${LULTRA} ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB}
 
 targets :
 	@echo "Targets for ULTRA"
-	@echo "   install   : install ULTRA headers and utilities in dev/arch"
+	@echo "   install   : install ULTRA headers and utilities in dev/sys_id"
 	@echo "   link      : link ULTRA utilities for public use"
-	@echo "   sharedlib : build and install ULTRA shared libs in dev/arch"
+	@echo "   sharedlib : build and install ULTRA shared libs in dev/sys_id"
 	@echo "   test      : run the ULTRA test suite"
 
 #

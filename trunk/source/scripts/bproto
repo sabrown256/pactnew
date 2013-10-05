@@ -10,9 +10,9 @@
 
 unalias *
 
-set ldir = `dirname $0`
-set arch = `$ldir/cfgman use`
-set root = $ldir:h/dev/$arch
+set ldir   = `dirname $0`
+set sys_id = `$ldir/cfgman use`
+set root   = $ldir:h/dev/$sys_id
 
 set err = 0
 set d   = $cwd

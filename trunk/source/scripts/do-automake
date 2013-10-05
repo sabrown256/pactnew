@@ -578,10 +578,10 @@ GET_HOST_ARG:
 
     set lFile = $args_[1]
 
-    set path = ( . /usr/local/apps/pactnew/bin $path )
-    set arch   = `system-id`
-    Note $lFile "Arch = $arch"
-    flog $lFile set DevDir = $WrkDir/dev/$arch
+    set path      = ( . /usr/local/apps/pactnew/bin $path )
+    set lsys_arch = `system-id`
+    Note $lFile "SYS_Arch = $lsys_arch"
+    flog $lFile set DevDir = $WrkDir/dev/$lsys_arch
 
 # set default values
     Note $lFile "Set default values for get_host_arg"
@@ -648,10 +648,10 @@ GET_NET_ARG:
 
     set lFile = $args_[1]
 
-    set path = ( . /usr/local/apps/pactnew/bin $path )
-    set arch   = `system-id`
-    Note $lFile "Arch = $arch"
-    flog $lFile set DevDir = $WrkDir/dev/$arch
+    set path      = ( . /usr/local/apps/pactnew/bin $path )
+    set lsys_arch = `system-id`
+    Note $lFile "SYS_Arch = $lsys_arch"
+    flog $lFile set DevDir = $WrkDir/dev/$lsys_arch
 
 # set default values
     Note $lFile "Set default values for get_net_arg"
