@@ -99,11 +99,12 @@ setenv AbsoluteDeb    FALSE
 setenv AbsoluteOpt    FALSE
 setenv CROSS_COMPILE  FALSE
 
-setenv MngDir   $cwd
-setenv CfgMan   $ScrDir/cfgman
-setenv System   `$CfgMan use`
-setenv CfgDir   cfg-$System
-setenv SysDir   $BaseDir/dev/$System
+setenv MngDir      $cwd
+setenv CfgMan      $ScrDir/cfgman
+setenv SYS_ID      `$CfgMan use`
+setenv SYS_CfgDir  cfg-$SYS_ID
+
+setenv SysDir   $BaseDir/dev/$SYS_ID
 setenv IncDir   $SysDir/include
 setenv EtcDir   $SysDir/etc
 setenv BinDir   $SysDir/bin
@@ -114,6 +115,7 @@ setenv Man3Dir  man/man3
 setenv EnvCsh   $EtcDir/env-pact.csh
 setenv EnvSh    $EtcDir/env-pact.sh
 setenv EnvDk    $EtcDir/env-pact.dk
+
 
 setenv CEFile   $SysDir/log/file.ce
 setenv CDFile   $SysDir/log/file.cd
@@ -156,8 +158,8 @@ setenv PubLib  "-L$InstBase/lib"
 # we need the back slash treatment now - later will not do
 source analyze/backslash
 
-$RMDir $CfgDir
-mkdir $CfgDir
+$RMDir $SYS_CfgDir
+mkdir $SYS_CfgDir
 
 flog $Log date
 
@@ -215,8 +217,8 @@ Main:
 
           case -s:
                    shift
-                   setenv System   $1
-                   setenv SysDir   $BaseDir/dev/$System
+                   setenv SYS_ID   $1
+                   setenv SysDir   $BaseDir/dev/$SYS_ID
                    setenv IncDir   $SysDir/include
                    setenv EnvCsh   $EtcDir/env-pact.csh
                    setenv EnvSh    $EtcDir/env-pact.sh
@@ -324,7 +326,7 @@ AnalyzeConfig:
 
     write/envf FALSE
     
-    flog $Log pushd $CfgDir
+    flog $Log pushd $SYS_CfgDir
 
     include $MngDir/pact-analyze
 
@@ -700,7 +702,7 @@ while (1)
    case run:
 
         @ nrun = $nrun + 1
-        set lfile = $CfgDir/run.$nrun
+        set lfile = $SYS_CfgDir/run.$nrun
         set cmd   = ( $Line[2-] )
         $cmd >&! $lfile
 
@@ -860,7 +862,7 @@ end
 ReplaceText:
     if ("$Replace" != "") then
 
-       set TmpFile = file.tmp-$System
+       set TmpFile = file.tmp-$SYS_ID
 
        sed "$Replace" $STDOUT > $TmpFile
        ${RM} $STDOUT
@@ -879,7 +881,7 @@ ReplaceText:
 PrintText:
     if ("$Text" != "") then
 
-       set STDAUX = tmp-$System.1
+       set STDAUX = tmp-$SYS_ID.1
        $RM $STDAUX
 
        echo "$Text" > $STDAUX
@@ -1325,7 +1327,7 @@ Finish:
     if ("$PFE" == "mppexec") then
        cd $BaseDir/pdb
 
-       set STDAUX = tmp-$System.f
+       set STDAUX = tmp-$SYS_ID.f
        flog $Log $RM $STDAUX
        sed -e s/'iarg, iargc'/'iarg, ipxfargc, ilen, ierror'/              \
            -e s/'iargc()'/'ipxfargc()'/                                    \
@@ -1389,7 +1391,7 @@ Finish:
 
     write/smake
 
-    flog $Log $RMDir $CfgDir
+    flog $Log $RMDir $SYS_CfgDir
 
     flog $Log unset noglob
 

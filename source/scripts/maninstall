@@ -35,11 +35,12 @@ while ($#argv)
    shift
 end
 
-set arch  = ( `cfgman use` )
-set zarch = z-$arch
+set SYS_ID     = ( `cfgman use` )
+set SYS_Prefix = "z-"
+set SYS_TmpDir = ${SYS_Prefix}${SYS_ID}
 
-set sdir = $zarch/obj
-set ddir = ../dev/$arch/man/man$section
+set sdir = $SYS_TmpDir/obj
+set ddir = ../dev/$SYS_ID/man/man$section
 pushd $ddir >& /dev/null
 set ddir = $cwd
 popd >& /dev/null
@@ -60,7 +61,5 @@ foreach i (*.$section)
       endif
    endif
 end
-
-#cp $zarch/obj/*.$section ../dev/$arch/man/man$section
 
 exit($err)

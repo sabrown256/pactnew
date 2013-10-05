@@ -18,12 +18,13 @@ run analyze/rpath -i init
 include features/dld
 
 setenv ENV_VARS "RUN_SIGNATURE_DB SITE_SIGNATURE_DB \
+                 SYS_Prefix SYS_CfgDir SYS_TmpDir SYS_ID \
                  SYS_SITE SYS_TYPE DAI_ROOT DAS_ROOT \
                  GLIBC_VERSION BFD_VERSION \
                  HDF_VERSION MYSQL_VERSION SQLITE3_VERSION \
                  PNG_VERSION JPEG_VERSION \
                  PACT_VERSION \
-                 Bits OS_Name System \
+                 Bits OS_Name \
                  CC_Exe CC_Flags \
                  CC_Debug_Default CC_Optimize_Default \
                  Cfg_CC_Exe Cfg_CC_Flags Cfg_CC_Inc \
@@ -128,6 +129,15 @@ Group STD {
    XOPEN  = 600
    MPI    = none
    OPENMP = none
+}
+
+Group SYS {
+   ID     = ${SYS_ID}
+   TYPE   = ""
+   SITE   = ""
+   Prefix = "z-"
+   CfgDir = cfg-${SYS_ID}
+   TmpDir = ${SYS_Prefix}${SYS_ID}
 }
 
 Group OS {

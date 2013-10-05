@@ -118,7 +118,7 @@ modules : ${LibDep}
 	@touch dummy.mod
 	sinstall *.mod ${IncDir}
 	@rm -f dummy.mod ${IncDir}/dummy.mod
-	@rm -rf z-${System}
+	@rm -rf ${SYS_TmpDir}
 
 ${PACTTmpDir}/gm-${LibName}.f : ${SDir}/flibc.f
 	@../scripts/bproto

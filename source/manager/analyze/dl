@@ -83,7 +83,7 @@ endif
 #--------------------------------------------------------------------------
 
 # make PACT_SO_CACHE specific to the current configuration
-setenv PACT_SO_CACHE  $PACT_SO_CACHE/$System
+setenv PACT_SO_CACHE  $PACT_SO_CACHE/$SYS_ID
 
 dbmset $ALog PACT_SO_CACHE       = $PACT_SO_CACHE^         \
              HAVE_DYNAMIC_LINKER = $HAVE_DYNAMIC_LINKER

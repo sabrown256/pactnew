@@ -30,7 +30,7 @@ if ($?USER == 0) then
    endif
 endif
 
-setenv System `$ScrDir/cfgman use`
+setenv SYS_ID `$ScrDir/cfgman use`
 set Manager       = manager
 set Exe           = $MngDir/$0
 set DTag          = ( `./pact-get-tag -d` )
@@ -46,6 +46,7 @@ set TmpFile       = tmp-file
 set TmpDir        = tmp-dir
 set Host          = `uname -n`
 set OS            = `uname -s | tr "[A-Z]" "[a-z]"`
+set SYS_Prefix    = "z-"
 
 set LLNL             = FALSE
 set KEEP             = FALSE
@@ -57,7 +58,7 @@ set MV    = "mv -f"
 set RM    = "rm -f"
 set RMDir = "rm -rf"
 
-InitLog Log $BaseDir/dev/$System/log/dist
+InitLog Log $BaseDir/dev/$SYS_ID/log/dist
 
 set Opt = "$Exe:t  $argv"
 
@@ -310,7 +311,7 @@ GET_CURRENT_SOURCE:
    flog $Log mkdir pact
    flog $Log pushd pact
    flog $Log pwd
-   flog $Log rsync -avC --exclude dev --exclude 'z-*' ../../../ .
+   flog $Log rsync -avC --exclude dev --exclude $SYS_Prefix'*' ../../../ .
    flog $Log ( find . -name "*.core" | xargs rm )
 
    flog $Log rm -rf dev

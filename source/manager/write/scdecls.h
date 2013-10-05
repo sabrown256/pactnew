@@ -29,8 +29,8 @@ dbmget $Log BaseDir^         \
             Cfe_CC_Flags^    \
             Cfe_LD_Flags^    \
             Cfe_LD_RPath^    \
-            CfgDir^          \
             IncDir^          \
+            SYS_CfgDir^      \
             PACT_CC_VERSION
 
 #--------------------------------------------------------------------------
@@ -57,8 +57,8 @@ dbmget $Log BaseDir^         \
     set inc = ""
     set inc = ( $inc -I.. -I../../psh -I$IncDir )
 
-    flog $Log mkdir $CfgDir
-    flog $Log cd $CfgDir
+    flog $Log mkdir $SYS_CfgDir
+    flog $Log cd $SYS_CfgDir
     flog $Log $Cfe_CC_Exe -DMM_CONFIG $inc ../scmemi.c -o score-config $opt
     if ($status == 0) then
 
@@ -79,7 +79,7 @@ dbmget $Log BaseDir^         \
        Note $STDOUT "#define N_DOUBLES_MD 8"
     endif
     flog $Log cd ..
-    flog $Log $RMDir $CfgDir
+    flog $Log $RMDir $SYS_CfgDir
 
     flog $Log popd
     Note $STDOUT ""

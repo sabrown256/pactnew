@@ -612,13 +612,13 @@ flog $Log cd $mngdir
 # settle environment of build
    flog $Log set base = $cwd:h
 
-   flog $Log unset System
-   flog $Log unsetenv System
+   flog $Log unset SYS_ID
+   flog $Log unsetenv SYS_ID
 
-   setenv System `$base/scripts/cfgman -d $base/dev use`
-   Note $Log "System = $System"
+   setenv SYS_ID `$base/scripts/cfgman -d $base/dev use`
+   Note $Log "SYS_ID = $SYS_ID"
 
-   set root   = $base/dev/$System
+   set root   = $base/dev/$SYS_ID
    set etcdir = $root/etc
    set logdir = $root/log
    set scrdir = $base/scripts
@@ -642,7 +642,7 @@ if ($docfg == TRUE) then
    endif
 
    Note $Log ""
-   Note $Log "Building PACT version $versid ($System) with: $cargs"
+   Note $Log "Building PACT version $versid ($SYS_ID) with: $cargs"
 
    NoteD $Log -n "   configure ......... "
    set lt = `$TIMER -r`
@@ -695,7 +695,7 @@ endif
 
 if ($doupd == TRUE) then
 
-   Note $Log "Sourcing environment file $envf for $System"
+   Note $Log "Sourcing environment file $envf for $SYS_ID"
    if (-e $envf) then
       source $envf
       rehash

@@ -113,7 +113,11 @@ dbmget $Log Arch^                     \
             LEH_TTY_VTIME^            \
             Std_UseX^                 \
             Std_UseOGL^               \
-            Std_UseQD
+            Std_UseQD^                \
+            SYS_ID^                   \
+            SYS_TYPE^                 \
+            SYS_Prefix^               \
+            SYS_TmpDir
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -140,29 +144,33 @@ dbmget $Log Arch^                     \
 
     set QUOTE = \"
     set THE_DATE = `cat .pact-version`
-    Note $STDOUT '#define PACT_VERSION        '$QUOTE$THE_DATE$QUOTE
+    Note $STDOUT '#define PACT_VERSION        '$QUOTE${THE_DATE}$QUOTE
 
     Note $STDOUT "#define CPU_TYPE            $CPU"
     Note $STDOUT "#define FPU_TYPE            $FPU"
-    Note $STDOUT '#define SYSTEM_ID           '$QUOTE$Arch$QUOTE
+    Note $STDOUT '#define SYSTEM_ID           '$QUOTE${Arch}$QUOTE
+    Note $STDOUT '#define SYS_TYPE            '$QUOTE${SYS_TYPE}$QUOTE
+    Note $STDOUT '#define SYS_ID              '$QUOTE${SYS_ID}$QUOTE
+    Note $STDOUT '#define SYS_Prefix          '$QUOTE${SYS_Prefix}$QUOTE
+    Note $STDOUT '#define SYS_TmpDir          '$QUOTE${SYS_TmpDir}$QUOTE
     if ("$OSX_Version" != "") then
        Note $STDOUT "#define MACOSX_VERSION      $OSX_Version"
     endif
 
-    Note $STDOUT '#define USE_COMPILER        '$QUOTE$CC_Exe$QUOTE
+    Note $STDOUT '#define USE_COMPILER        '$QUOTE${CC_Exe}$QUOTE
 
     Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
-    Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_VERSION${QUOTE}
+    Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}${PACT_CC_VERSION}${QUOTE}
 
-    Note $STDOUT '#define DEFAULT_SHELL       '$QUOTE$DEFAULT_SHELL$QUOTE
+    Note $STDOUT '#define DEFAULT_SHELL       '$QUOTE${DEFAULT_SHELL}$QUOTE
 
     if ("$FilterDir" != "") then
        set FiltFile = $FilterDir/$Arch
-       Note $STDOUT '#define MAKE_FILTER_FILE    '$QUOTE$FiltFile$QUOTE
+       Note $STDOUT '#define MAKE_FILTER_FILE    '$QUOTE${FiltFile}$QUOTE
     endif
 
     if ("$PACT_SO_CACHE" != "") then
-       Note $STDOUT '#define PACT_SO_CACHE       '$QUOTE$PACT_SO_CACHE$QUOTE
+       Note $STDOUT '#define PACT_SO_CACHE       '$QUOTE${PACT_SO_CACHE}$QUOTE
     endif
 
     Note $STDOUT ""
@@ -308,7 +316,7 @@ dbmget $Log Arch^                     \
 
     if ($HAVE_TRACKER == TRUE) then
        Note $STDOUT "#define HAVE_TRACKER"
-       Note $STDOUT "#define TRACKER_EXE "$QUOTE$TRACKER_Exe$QUOTE
+       Note $STDOUT "#define TRACKER_EXE "$QUOTE${TRACKER_Exe}$QUOTE
     endif
 
     if (-e /dev/zero) then

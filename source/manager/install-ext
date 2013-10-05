@@ -10,12 +10,12 @@
 
 unalias *
 
-setenv System $1
+setenv SYS_ID $1
 shift
 set ScrX   = ( $argv )
 
-set BinDir  = $System/bin
-set ScmDir  = $System/scheme/extensions
+set BinDir  = $SYS_ID/bin
+set ScmDir  = $SYS_ID/scheme/extensions
 set SrcDirX = applications/extensions
 
 if (!(-d $ScmDir)) then

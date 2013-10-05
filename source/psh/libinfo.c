@@ -149,7 +149,7 @@ static void report(infodes *st, char *q, int newl)
 			   NULL, newl, FALSE);
 
 	if (strcmp(q, "config") == 0)
-	   ok = report_var(st, "etc", "make-def", "System",
+	   ok = report_var(st, "etc", "make-def", "SYS_ID",
 			   NULL, newl, FALSE);
 
 	if (!ok)

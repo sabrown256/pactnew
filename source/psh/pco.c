@@ -156,7 +156,7 @@ struct s_state
     char osrel[BFLRG];
     char hw[BFLRG];
     char sys[BFLRG];
-    char system[BFLRG];
+    char sys_id[BFLRG];
     char features[BFSML];};
 
 static state
@@ -1382,7 +1382,7 @@ static void setup_analyze_env(client *cl, char *base)
 
     dbset(cl, "Host",    st.host);
     dbset(cl, "Arch",    st.arch);
-    dbset(cl, "System",  st.system);
+    dbset(cl, "SYS_ID",  st.sys_id);
     dbset(cl, "Sys",     st.sys);
     dbset(cl, "BaseDir", base);
     dbset(cl, "SysDir",  st.dir.root);
@@ -1510,12 +1510,13 @@ static void setup_output_env(client *cl, char *base)
     if (strcmp(st.os, "Darwin") != 0)
        dbset(cl, "MDG_Lib", unique(dbget(cl, FALSE, "MDG_Lib"), FALSE, ' '));
 
+    dbset(cl, "SYS_CfgDir",  st.dir.cfg);
+
     dbset(cl, "BinDir",  st.dir.bin);
     dbset(cl, "IncDir",  st.dir.inc);
     dbset(cl, "EtcDir",  st.dir.etc);
     dbset(cl, "ScrDir",  st.dir.scr);
     dbset(cl, "SchDir",  st.dir.sch);
-    dbset(cl, "CfgDir",  st.dir.cfg);
 
     dbset(cl, "Load",        st.loadp ? "TRUE" : "FALSE");
     dbset(cl, "NoExe",       st.exep ? "TRUE" : "FALSE");
@@ -1618,11 +1619,11 @@ static void default_var(client *cl, char *base)
     nstrncpy(st.arch, BFLRG, run(BOTH, cmd), -1);
 
 /* check variables which may have been initialized from the command line */
-    if (IS_NULL(st.system) == TRUE)
-       nstrncpy(st.system, BFLRG, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
-    cinitenv("System", st.system);
+    if (IS_NULL(st.sys_id) == TRUE)
+       nstrncpy(st.sys_id, BFLRG, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
+    cinitenv("SYS_ID", st.sys_id);
 
-    dbset(cl, "PACT_CFG_ID", st.system);
+    dbset(cl, "PACT_CFG_ID", st.sys_id);
 
     dbinitv(cl, "CfgMan",        "%s/cfgman", st.dir.scr);
     dbinitv(cl, "Globals",       "");
@@ -1637,7 +1638,7 @@ static void default_var(client *cl, char *base)
     dbinitv(cl, "CONFIG_PATH",   "");
 
 /* global variables */
-    snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.system);
+    snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.sys_id);
     snprintf(st.dir.inc,  BFLRG, "%s/include", st.dir.root);
     snprintf(st.dir.etc,  BFLRG, "%s/etc",     st.dir.root);
     snprintf(st.dir.lib,  BFLRG, "%s/lib",     st.dir.root);
@@ -2400,7 +2401,7 @@ static void do_platform(client *cl, char *oper, char *value)
     note(Log, TRUE, "");
 
 /* assemble the config command line */
-    snprintf(t, BFLRG, "dsys config -plt %s", st.system);
+    snprintf(t, BFLRG, "dsys config -plt %s", st.sys_id);
 
 /* add options affecting all platforms */
     if (st.abs_deb == TRUE)
@@ -2979,7 +2980,7 @@ static void read_config_files(client *cl)
     char ts[BFSML];
 
     separator(Log);
-    note(Log, TRUE, "Reading config files for %s on %s", st.system, st.host);
+    note(Log, TRUE, "Reading config files for %s on %s", st.sys_id, st.host);
 
     dt = wall_clock_time();
 
@@ -3012,7 +3013,7 @@ static void analyze_config(client *cl, char *base)
     st.phase = PHASE_ANALYZE;
 
     separator(Log);
-    noted(Log, "Analyzing %s on %s", st.system, st.host);
+    noted(Log, "Analyzing %s on %s", st.sys_id, st.host);
     note(Log, TRUE, "");
 
     dt = wall_clock_time();
@@ -3072,7 +3073,7 @@ static void finish_config(client *cl, char *base)
     snprintf(st.dir.sch, BFLRG, "%s/scheme",  st.dir.root);
 
     separator(Log);
-    noted(Log, "Writing system dependent files for %s", st.system);
+    noted(Log, "Writing system dependent files for %s", st.sys_id);
     note(Log, TRUE, "");
 
     dt = wall_clock_time();
@@ -3353,7 +3354,7 @@ int main(int c, char **v, char **env)
                       break;
  
                  case 's':
-                      nstrncpy(st.system, BFLRG, v[++i], -1);
+                      nstrncpy(st.sys_id, BFLRG, v[++i], -1);
                       break;
  
                  case 'v':
@@ -3375,7 +3376,7 @@ int main(int c, char **v, char **env)
     init_pco_session(cl, base, append);
 
 /* make config directory */
-    snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.system);
+    snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.sys_id);
     run(BOTH, "rm -rf %s", st.dir.cfg);
     run(BOTH, "mkdir %s", st.dir.cfg);
 
@@ -3413,10 +3414,10 @@ int main(int c, char **v, char **env)
         env_subst(cl, "InstBase",      ib);
         env_subst(cl, "SysDir",        st.dir.root);
         env_subst(cl, "BaseDir",       base);
-        env_subst(cl, "System",        st.system);
+        env_subst(cl, "SYS_ID",        st.sys_id);
         env_subst(cl, "CONFIG_METHOD", "database");
 
-	snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.system);
+	snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.sys_id);
 	nstrncpy(st.cfgf,    BFLRG, cgetenv(FALSE, "CONFIG_FILE"), -1);
 
 /* reset the rules */

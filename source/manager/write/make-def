@@ -88,7 +88,9 @@ dbmget $Log AR_IFlag^               \
             SUFFIXES^               \
             Sys^                    \
             SysDir^                 \
-            System^                 \
+	    SYS_ID^                 \
+	    SYS_CfgDir^             \
+	    SYS_TmpDir^             \
             ThreadLibExt^           \
             UPDATE^                 \
             URFile^                 \
@@ -170,20 +172,24 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "# MAKE-DEF - installation dependent definitions for $Sys"
     Note $STDOUT "#"
     Note $STDOUT ""
-    Note $STDOUT "System  = $System"
-    Note $STDOUT 'archo   = z-${System}/obj'
+    Note $STDOUT "SYS_ID     = $SYS_ID"
+    Note $STDOUT "SYS_CfgDir = $SYS_CfgDir"
+    Note $STDOUT "SYS_TmpDir = $SYS_TmpDir"
+    Note $STDOUT ""
+
     set QUOTE = \"
     set THE_DATE = `cat .pact-version`
-    Note $STDOUT "Version = $THE_DATE"
+    Note $STDOUT "Version    = $THE_DATE"
 
     set mk = ( `$MngDir/pwhich gmake` )
     if (!(-x "$mk")) then
        set mk = `$MngDir/pwhich make`
     endif
     Note $Log "Using '$mk' for system make"
-    Note $STDOUT "UMake   = $mk"
+    Note $STDOUT "UMake      = $mk"
     unset mk
 
+    Note $STDOUT 'archo   = ${SYS_TmpDir}/obj'
     Note $STDOUT "BaseDir = $BaseDir"
     Note $STDOUT "ScrDir  = $BaseDir/scripts"
     Note $STDOUT "SysDir  = $SysDir"

@@ -49,9 +49,9 @@ set VersionID = `code-date`
 set HelpCode  = $MngDir/$0
 set CfgMan    = $ScrDir/cfgman
 
-setenv System  `$CfgMan use`
+setenv SYS_ID  `$CfgMan use`
 
-set SysDir    = $BaseDir/dev/$System
+set SysDir    = $BaseDir/dev/$SYS_ID
 set UpdateLog = $SysDir/log/update
 set Changed   = $MngDir/Changed
 set UnChanged = $MngDir/UnChanged
@@ -507,7 +507,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    NoteD $Log "Resetting time stamps on Local PACT Sources"
 
    find . -name "*.[chf]" -exec touch {} \;
-   flog $Log cd dev/$System/lib
+   flog $Log cd dev/$SYS_ID/lib
    flog $Log touch foo.a
    flog $Log mkdir $TmpDir
    flog $Log mv *.a $TmpDir

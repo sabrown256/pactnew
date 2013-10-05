@@ -53,13 +53,13 @@ umask 007
 
 limit stacksize unlimited >& /dev/null
 
-unset System
-unsetenv System
+unset SYS_ID
+unsetenv SYS_ID
 
 set CfgMan = $ScrDir/cfgman
 
-setenv System  `$CfgMan -d ../dev use`
-setenv PACTVer `cat $MngDir/.pact-version`
+setenv SYS_ID      `$CfgMan -d ../dev use`
+setenv PACTVer     `cat $MngDir/.pact-version`
 
 # directory name conventions
 # to be consistenly used in config, build, test, and install
@@ -71,7 +71,7 @@ setenv PACTVer `cat $MngDir/.pact-version`
 #   ..../pact/dev/$sys   ->     SysDir
 
 set DevDir  = $BaseDir/dev
-set SysDir  = $DevDir/$System
+set SysDir  = $DevDir/$SYS_ID
 set IncDir  = $SysDir/include
 set BinDir  = $SysDir/bin
 set LibDir  = $SysDir/lib
@@ -82,7 +82,7 @@ set PACT    = $BinDir/pact
 set EnvCsh  = $EtcDir/env-pact.csh
 
 set PCKS    = "-"
-set Tmp     = tmp_$System
+set Tmp     = tmp_$SYS_ID
 set Host    = `uname -n`
 set Time    = time
 
@@ -276,9 +276,9 @@ switch ($Cmnd)
            shift
         end
 
-        setenv System  `$CfgMan -d ../dev use`
+        setenv SYS_ID  `$CfgMan -d ../dev use`
         set DevDir  = $BaseDir/dev
-        set SysDir  = $DevDir/$System
+        set SysDir  = $DevDir/$SYS_ID
         set BinDir  = $SysDir/bin
         set EtcDir  = $SysDir/etc
         set LogDir  = $SysDir/log
@@ -304,13 +304,13 @@ switch ($Cmnd)
         flog $Log popd
 
         if ("$Tgts" == "") then
-           NoteD $Log "Building PACT for $System ($Msg) ..."
+           NoteD $Log "Building PACT for $SYS_ID ($Msg) ..."
            NoteD $Log "Using C Compiler $PACT_CC_EXE ($PACT_CC_FAMILY)"
 
            flog $Log $DSYS linstall
            flog $Log pushd ..
 
-           flog $Log setenv SESSION_CONFIG $System
+           flog $Log setenv SESSION_CONFIG $SYS_ID
            flog $Log setenv PACTRoot $cwd
 
            flog $Log setenv  SC_EXEC_SERVER_WAIT     300
@@ -324,7 +324,7 @@ switch ($Cmnd)
 
            flog $Log popd
         else
-           NoteD $Log "Building packages for $System ($Msg) ..."
+           NoteD $Log "Building packages for $SYS_ID ($Msg) ..."
            NoteD $Log ""
            flog $Log @ lerr = 0
            while ($#Tgts > 0)
@@ -378,15 +378,15 @@ switch ($Cmnd)
         NoteD $Log ""
         Separator $Log
         if ($RStatus != 0) then
-           foreach i (../*/z-$System/obj/errlog)
+           foreach i (../*/$SYS_TmpDir/obj/errlog)
               if (!(-z $i)) then
                  flog $Log cat $i
               endif
            end
-           NoteD $Log "PACT build for $System failed ($RStatus/$ETime)"
-           NoteD $Log "Check log file: ../dev/$System/log/build"
+           NoteD $Log "PACT build for $SYS_ID failed ($RStatus/$ETime)"
+           NoteD $Log "Check log file: ../dev/$SYS_ID/log/build"
         else
-           NoteD $Log "PACT build for $System complete ($ETime)"
+           NoteD $Log "PACT build for $SYS_ID complete ($ETime)"
         endif
 
         NoteD $Log ""
@@ -467,7 +467,7 @@ switch ($Cmnd)
            NoteD $Log "Linking PACT on $Host ..."
 
            flog $Log pushd ..
-           flog $Log setenv SESSION_CONFIG $System
+           flog $Log setenv SESSION_CONFIG $SYS_ID
            flog $Log setenv PACTRoot $cwd
 
            flog $Log setenv  SC_EXEC_SERVER_WAIT     300
@@ -504,7 +504,7 @@ switch ($Cmnd)
 
         if ($RStatus != 0) then
            Note $Log "Link failed - some hints may be found in the files:"
-           flog $Log ls -l ../*/z-$System/obj/errlog
+           flog $Log ls -l ../*/$SYS_TmpDir/obj/errlog
         endif
 
         NoteD $Log ""
@@ -880,10 +880,10 @@ switch ($Cmnd)
         setenv DSYS_TARGET pact_config
 
 # set the configuration for this system
-        setenv System `$CfgMan use`
+        setenv SYS_ID `$CfgMan use`
 
 # now that we have the system, reset the variables that depend on it
-        set SysDir = $DevDir/$System
+        set SysDir = $DevDir/$SYS_ID
         set IncDir = $SysDir/include
         set EtcDir = $SysDir/etc
         set BinDir = $SysDir/bin
@@ -915,7 +915,7 @@ switch ($Cmnd)
 
         InitLog Log $LogDir/config
 
-        Note $Log "System    = $System"
+        Note $Log "SYS_ID    = $SYS_ID"
         Note $Log "SysDir    = $SysDir"
         Note $Log "Args      = $nargs"
         Note $Log "ConfigDir = $ConfigDir"
@@ -939,7 +939,7 @@ switch ($Cmnd)
            echo "Using database $dbcfg to configure this PACT installation."
 
            if (-f $dbcfg) then
-              set ndbcfg = $cwd/$gdir/$System.cfg
+              set ndbcfg = $cwd/$gdir/$SYS_ID.cfg
               if ($dbcfg != $ndbcfg) then
                  cp $dbcfg $ndbcfg
               endif
@@ -996,7 +996,7 @@ switch ($Cmnd)
 # make sure that the installation directories exist
         setenv OS_Name     `uname -s`
         setenv HostArch   `uname -m`
-        set InstBase  = $DevDir/$System
+        set InstBase  = $DevDir/$SYS_ID
         if (!(-d $DevDir)) then
            mkdir $DevDir
         endif
@@ -1124,15 +1124,15 @@ switch ($Cmnd)
         $RM $EnvCsh
         touch $EnvCsh
         Note $EnvCsh ""
-        Note $EnvCsh "setenv System $System"
-        Note $EnvCsh "set path   = ( . $DevDir/"'$System/bin $path )'
+        Note $EnvCsh "setenv SYS_ID $SYS_ID"
+        Note $EnvCsh "set path   = ( . $DevDir/"'$SYS_ID/bin $path )'
         Note $EnvCsh ""
 
         $RM $EnvSh
         touch $EnvSh
         Note $EnvSh ""
-        Note $EnvSh "export System=$System"
-        Note $EnvSh "export PATH=.:$DevDir/"'$System/bin:$PATH'
+        Note $EnvSh "export SYS_ID=$SYS_ID"
+        Note $EnvSh "export PATH=.:$DevDir/"'$SYS_ID/bin:$PATH'
         Note $EnvSh ""
 
 # remove files we are about to generate in include
@@ -1171,13 +1171,13 @@ switch ($Cmnd)
 
 # do the main configuration work
         if ("$ucfg" != "") then
-           Note $Log "Command: $PConf $PArgs -s $System $ucfg"
-           $PConf -s $System $PArgs $ucfg
+           Note $Log "Command: $PConf $PArgs -s $SYS_ID $ucfg"
+           $PConf -s $SYS_ID $PArgs $ucfg
            set RStatus = $status
 
         else if ("$dbcfg" != "") then
-           Note $Log "Command: $PConf -s $System $PArgs -db $dbcfg"
-           $PConf -s $System $PArgs -db $dbcfg
+           Note $Log "Command: $PConf -s $SYS_ID $PArgs -db $dbcfg"
+           $PConf -s $SYS_ID $PArgs -db $dbcfg
            set RStatus = $status
            unset dbcfg
 
@@ -1245,7 +1245,7 @@ switch ($Cmnd)
            if ($?SESSION_CONFIG == 1) then
               flog $Log set sid = $SESSION_CONFIG
            else
-              flog $Log set sid = $System
+              flog $Log set sid = $SYS_ID
            endif
            flog $Log unsetenv SESSION_CONFIG
            flog $Log $CfgMan add $sid
@@ -1696,8 +1696,8 @@ CFG_DONE:
                    breaksw
 
               case -x:
-                   setenv System  `$CfgMan use`
-                   set SysDir  = $DevDir/$System
+                   setenv SYS_ID  `$CfgMan use`
+                   set SysDir  = $DevDir/$SYS_ID
                    set IncDir  = $SysDir/include
                    set Pck     = `cat $EtcDir/package`
                    pushd .. >& /dev/null
@@ -1755,7 +1755,7 @@ CFG_DONE:
            echo "PACT sources reside in $SrcDir"
            set CSrc = ""
            foreach i ($Pact)
-              set CSrc = ( $CSrc `find $i -name "*.[ch]" | grep -v /z- | grep -v /dev/` )
+              set CSrc = ( $CSrc `find $i -name "*.[ch]" | grep -v /$SYS_Prefix | grep -v /dev/` )
            end
            wc -l $CSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
@@ -1766,7 +1766,7 @@ CFG_DONE:
            touch foobar
            set FSrc = ""
            foreach i ($Pact)
-              set FSrc = ( $FSrc `find $i -name "*.f" | grep -v /z- | grep -v /dev/` )
+              set FSrc = ( $FSrc `find $i -name "*.f" | grep -v /$SYS_Prefix | grep -v /dev/` )
            end
            wc -l $FSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
@@ -1776,10 +1776,10 @@ CFG_DONE:
            echo " in $#FSrc files" >>& $STDOUT
 
            set SSrc = ""
-           set SSrc = ( $SSrc `find panacea -name "*.scm" | grep -v /z- | grep -v /dev/` )
-           set SSrc = ( $SSrc `find scheme -name "*.scm" | grep -v /z- | grep -v /dev/` )
-           set SSrc = ( $SSrc `find sx -name "*.scm" | grep -v /z- | grep -v /dev/` )
-           set SSrc = ( $SSrc `find ultra -name "*.scm" | grep -v /z- | grep -v /dev/` )
+           set SSrc = ( $SSrc `find panacea -name "*.scm" | grep -v /$SYS_Prefix | grep -v /dev/` )
+           set SSrc = ( $SSrc `find scheme -name "*.scm" | grep -v /$SYS_Prefix | grep -v /dev/` )
+           set SSrc = ( $SSrc `find sx -name "*.scm" | grep -v /$SYS_Prefix | grep -v /dev/` )
+           set SSrc = ( $SSrc `find ultra -name "*.scm" | grep -v /$SYS_Prefix | grep -v /dev/` )
            wc -l $SSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
            tail -n 1       |                                                  \
@@ -1971,9 +1971,9 @@ CFG_DONE:
            shift
         end
 
-        setenv System  `$CfgMan -d ../dev use`
+        setenv SYS_ID  `$CfgMan -d ../dev use`
         set DevDir  = $BaseDir/dev
-        set SysDir  = $DevDir/$System
+        set SysDir  = $DevDir/$SYS_ID
         set BinDir  = $SysDir/bin
         set EtcDir  = $SysDir/etc
         set LogDir  = $SysDir/log
@@ -2376,9 +2376,9 @@ CFG_DONE:
            shift
         end
 
-        setenv System  `$CfgMan -d ../dev use`
+        setenv SYS_ID  `$CfgMan -d ../dev use`
         set DevDir  = $BaseDir/dev
-        set SysDir  = $DevDir/$System
+        set SysDir  = $DevDir/$SYS_ID
         set BinDir  = $SysDir/bin
         set IncDir  = $SysDir/include
         set LibDir  = $SysDir/lib
@@ -2405,7 +2405,7 @@ CFG_DONE:
         flog $Log date
         flog $Log $Which pact
 
-        NoteD $Log "Removing PACT for $System"
+        NoteD $Log "Removing PACT for $SYS_ID"
         Note $Log "strict = $strict"
 
 # do remove for multi-platform configuration
@@ -2538,10 +2538,10 @@ CFG_DONE:
         flog $Log popd
 
 # remove other files
-        NoteD $Log "    in $BaseDir/"'*'"/z-$System directories"
-        flog $Log $RM ../*/z-$System/obj/*.[cfo] ../*/z-$System/obj/*.mod
+        NoteD $Log "    in $BaseDir/"'*'"/$SYS_TmpDir directories"
+        flog $Log $RM ../*/$SYS_TmpDir/obj/*.[cfo] ../*/$SYS_TmpDir/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
-        flog $Log $RM ../sx/z-$System/obj/*.[cfo]
+        flog $Log $RM ../sx/$SYS_TmpDir/obj/*.[cfo]
 
 # check the result
         flog $Log ls -lR $SysDir
@@ -3048,9 +3048,9 @@ CFG_DONE:
            shift
         end
 
-        setenv System  `$CfgMan -d ../dev use`
+        setenv SYS_ID  `$CfgMan -d ../dev use`
         set DevDir  = $BaseDir/dev
-        set SysDir  = $DevDir/$System
+        set SysDir  = $DevDir/$SYS_ID
         set BinDir  = $SysDir/bin
         set IncDir  = $SysDir/include
         set LibDir  = $SysDir/lib
@@ -3097,14 +3097,14 @@ CFG_DONE:
         flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/test.error
 
 # clear out existing test corefiles - easier to investigate any failures
-        foreach i (`find .. -name z-$System`)
+        foreach i (`find .. -name $SYS_TmpDir`)
            flog $Log $RM $i/test/*.core
         end
 
         set BeginTime = `$TIMER -r`
 
         NoteD $Log ""
-        NoteD $Log "Testing PACT for $System ..."
+        NoteD $Log "Testing PACT for $SYS_ID ..."
         NoteD $Log " --------------------------------------------------------"
 
         flog $Log pushd ..
@@ -3250,7 +3250,7 @@ CFG_DONE:
            shift
         end
 
-        set Tmp = .tmp-dsys-test-ssh.$System
+        set Tmp = .tmp-dsys-test-ssh.$SYS_ID
         flog $Log $RM $Tmp
         echo "ssh-test" > $Tmp
 

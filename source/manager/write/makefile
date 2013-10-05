@@ -26,14 +26,14 @@ Note $Log ""
 dbmget $Log BinDir^     \
             EtcDir^     \
             SysDir^     \
-            System^     \
+            SYS_ID^     \
             Platforms^  \
             Pck
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   set inf = ( base $System )
+   set inf = ( base $SYS_ID )
    set inf = ( $inf `echo "$Platforms" | sed 's|[:()]| |g'` )
    @ ni = $#inf
    Note $Log "Added platform components ($ni):"
@@ -83,7 +83,7 @@ dbmget $Log BinDir^     \
 # build target
 
     Note $STDOUT 'build:'
-    Note $STDOUT '	@(echo "" ; echo "Generate sources for '$System'")'
+    Note $STDOUT '	@(echo "" ; echo "Generate sources for '$SYS_ID'")'
     Note $STDOUT '	${BARRIER}'
 
     foreach p ($Pck)
@@ -111,7 +111,7 @@ dbmget $Log BinDir^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Note $STDOUT '	@(echo "" ; echo "Install headers for '$System'")'
+    Note $STDOUT '	@(echo "" ; echo "Install headers for '$SYS_ID'")'
     Note $STDOUT '	${BARRIER}'
 
     foreach p ($Pck)
@@ -136,7 +136,7 @@ dbmget $Log BinDir^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Note $STDOUT '	@(echo "" ; echo "Compile sources for '$System'")'
+    Note $STDOUT '	@(echo "" ; echo "Compile sources for '$SYS_ID'")'
     Note $STDOUT '	${BARRIER}'
 
     foreach p ($Pck)
@@ -166,7 +166,7 @@ dbmget $Log BinDir^     \
 # link target
 
     Note $STDOUT 'link:'
-    Note $STDOUT '	@(echo "" ; echo "Link Executables for '$System'")'
+    Note $STDOUT '	@(echo "" ; echo "Link Executables for '$SYS_ID'")'
     Note $STDOUT '	${BARRIER}'
 
     foreach p ($Pck)

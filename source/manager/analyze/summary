@@ -19,7 +19,7 @@ dbmget $Log HAVE_FORTRAN^     \
             MAKE_Shared_Libs^ \
             BaseDir^          \
             SysDir^           \
-            System^           \
+            SYS_ID^           \
             PY_Exe^           \
             PY_Ext^           \
             PY_DirPy^         \
@@ -36,7 +36,7 @@ dbmget $Log HAVE_FORTRAN^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    NoteD $Log "Configuration Summary for $System"
+    NoteD $Log "Configuration Summary for $SYS_ID"
 
     if (($?Cfe_CC_Exe == 0) || ("$Cfe_CC_Exe" == "none") || ("$Cfe_CC_Exe" == "")) then
        NoteD $Log "   ERROR: No C compiler available - check your system or your path"
@@ -164,7 +164,7 @@ dbmget $Log HAVE_FORTRAN^     \
        NoteD $Log "   Doing fast builds using /tmp"
     endif
 
-    NoteD $Log "   Building into $cwd:h/dev/$System"
+    NoteD $Log "   Building into $cwd:h/dev/$SYS_ID"
 
     NoteD $Log ""
 

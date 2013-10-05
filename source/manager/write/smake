@@ -24,8 +24,9 @@ Note $Log "   System make wrapper - smake"
 Note $Log ""
 
 dbmget $Log InstBase^         \
-            CfgDir^           \
-            System^           \
+            SYS_Prefix^       \
+            SYS_CfgDir^       \
+            SYS_ID^           \
             GMAKE_Flag^       \
             IncDir^           \
             EtcDir^           \
@@ -46,11 +47,11 @@ Note $Log "   lpactver      = |$lpactver|"
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    flog $Log pushd $CfgDir
+    flog $Log pushd $SYS_CfgDir
 
     set InstOld = instold
 
-    set Tmp    = tmp-$System
+    set Tmp    = tmp-$SYS_ID
     set TPACTX = pactx.$Tmp
     set TMAKEF = mk.$Tmp
 
@@ -95,7 +96,8 @@ EOF
 # build the small version of the PACT program - smake
     set mkopt = ""
     set mkopt = ( $mkopt -g )
-    set mkopt = ( $mkopt -DSYSTEM_ID=\"${System}\" )
+    set mkopt = ( $mkopt -DSYS_ID=\"${SYS_ID}\" )
+    set mkopt = ( $mkopt -DSYS_Prefix=\"${SYS_Prefix}\" )
     set mkopt = ( $mkopt -DPACT_VERSION=\"${lpactver}\" )
     set mkopt = ( $mkopt $GMAKE_Flag )
     set mkopt = ( $mkopt -I${IncDir} )
@@ -162,7 +164,7 @@ EOF
     unset opt
     unset ok
 
-    flog $Log $RMDir z-*
+    flog $Log $RMDir ${SYS_Prefix}*
     flog $Log $RM `ls`
     flog $Log popd
 

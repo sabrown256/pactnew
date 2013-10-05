@@ -121,8 +121,8 @@ switch ($Tgt)
            if ($InstBase == none) then
               set ldir = $cwd
               set ldir = $ldir:h
-              setenv RPATH      $ldir/dev/$System/lib
-              setenv Cfg_RPATH  $ldir/dev/$System/lib
+              setenv RPATH      $ldir/dev/$SYS_ID/lib
+              setenv Cfg_RPATH  $ldir/dev/$SYS_ID/lib
               unset ldir
            else
               setenv RPATH      $InstBase/lib
