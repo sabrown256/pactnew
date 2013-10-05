@@ -16,8 +16,8 @@ Note $ALog "----- analyze/hw -----"
 Note $ALog "Analyze: platform hardware"
 Note $ALog ""
 
-if ($?Arch == 0) then
-   setenv Arch `../scripts/system-id`
+if ($?SYS_Arch == 0) then
+   setenv SYS_Arch `../scripts/system-id`
 endif
 
 dbmget $ALog CPU =\? "unknown"^  \
@@ -29,9 +29,9 @@ if ($CPU == "unknown") then
    setenv CPU "$HostHW"
    if ("$HostHW" =~ i*86) then
       setenv CPU  ia32
-   else if ("$Arch" =~ osx-*-x86) then
+   else if ("$SYS_Arch" =~ osx-*-x86) then
       setenv CPU  ia32
-   else if ("$Arch" =~ osx-*-ppc) then
+   else if ("$SYS_Arch" =~ osx-*-ppc) then
       setenv CPU  ppc
    endif
 endif
@@ -45,9 +45,9 @@ if ($FPU == "unknown") then
       setenv FPU  x87
    else if ("$HostHW" =~ i*86) then
       setenv FPU  x87
-   else if ("$Arch" =~ osx-*-x86) then
+   else if ("$SYS_Arch" =~ osx-*-x86) then
       setenv FPU  x87
-   else if ("$Arch" =~ osx-*-ppc) then
+   else if ("$SYS_Arch" =~ osx-*-ppc) then
       setenv FPU  ppc
    endif
 endif

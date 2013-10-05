@@ -44,12 +44,21 @@ while ($#argv > 0)
    shift
 end
 
+set dir    = ""
+set etcdir = $bindir:h/etc
 if ("$dbdir" != "") then
+   set dir = $dbdir
+else if (-f $etcdir/env-pact.csh) then
+   set dir = $etcdir
+endif
 
-   eval `grep SYS_ $dbdir/env-pact.csh | awk '{printf("%s ; \n", $0);}'`
+if ("$dir" != "") then
+
+   eval `grep SYS_ $dir/env-pact.csh | awk '{printf("%s ; \n", $0);}'`
 
 else
 
+   setenv SYS_Arch    `system-id`
    setenv SYS_ID      `cfgman -d ../dev use`
    setenv SYS_TYPE    ""
    setenv SYS_SITE    ""
@@ -59,8 +68,7 @@ else
 
 endif
 
-#set Arch = `system-id`
-
+echo "setenv SYS_Arch    $SYS_Arch ; "
 echo "setenv SYS_ID      $SYS_ID ; "
 echo "setenv SYS_TYPE    $SYS_TYPE ; "
 echo "setenv SYS_SITE    $SYS_SITE ; "

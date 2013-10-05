@@ -217,7 +217,7 @@
           (cond ((procedure? y)
 		 (y))
 		((string? y)
-		 (let* ((cmd (sprintf "ssh -x -q %s pact -info SYSTEM_ID" y))
+		 (let* ((cmd (sprintf "ssh -x -q %s pact -info SYS_Arch" y))
 			(res (syscmnd cmd)))
 		       (if (pair? res)
 			   (sprintf "%s" (car res)))))

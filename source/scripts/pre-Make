@@ -33,7 +33,7 @@ IncAction = sinstall cross-info ${BinDir}
 
 targets :
 	@echo "Targets for SCRIPTS"
-	@echo "   install   : install utilities in dev/arch"
+	@echo "   install   : install utilities in dev/sys_id"
 	@echo "   link      : install utilities for public use"
 	@echo "   test      : run the SCRIPTS test suite"
 

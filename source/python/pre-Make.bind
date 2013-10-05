@@ -11,8 +11,8 @@
 
 sysdir = none
 include ${sysdir}/etc/make-def
-PACTGenDir = ${BaseDir}/python/${archo}
-PACTTmpDir = ${BaseDir}/python/${lpyext}/${archo}
+PACTGenDir = ${BaseDir}/python/${tmpobj}
+PACTTmpDir = ${BaseDir}/python/${lpyext}/${tmpobj}
 PACTSrcDir = ${BaseDir}/python
 
 PDB_MOD_NAME = _pdb
@@ -58,9 +58,9 @@ BinObj =
 
 targets :
 	@echo "Targets for PYTHON"
-	@echo "   install   : install PYTHON headers and utilities in dev/arch"
+	@echo "   install   : install PYTHON headers and utilities in dev/sys_id"
 	@echo "   link      : link PYTHON utilities for public use"
-	@echo "   sharedlib : build and install PYTHON shared libs in dev/arch"
+	@echo "   sharedlib : build and install PYTHON shared libs in dev/sys_id"
 	@echo "   test      : run the PYTHON test suite"
 
 

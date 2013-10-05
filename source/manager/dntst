@@ -134,8 +134,8 @@ switch ($Phase)
 
         call QUALIFY()
 
-        set arch   = `../../scripts/cfgman use`
-        set DevDir = $WrkDir/dev/$arch
+        set sys_id = `../../scripts/cfgman use`
+        set DevDir = $WrkDir/dev/$sys_id
 
         mkdir -p $DevDir
         mkdir -p $DevDir/log
@@ -162,7 +162,7 @@ switch ($Phase)
            set SPList = ""
         endif
 
-        set EnvCsh = ../dev/$arch/etc/env-pact.csh
+        set EnvCsh = ../dev/$sys_id/etc/env-pact.csh
         if (-e $EnvCsh) then
            source $EnvCsh
         endif

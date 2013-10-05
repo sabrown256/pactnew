@@ -6,7 +6,7 @@
 
 unalias *
 
-set Arch   = `../scripts/cfgman use`
+set sys_id   = `../scripts/cfgman use`
 set SysDir = ""
 set Err    = 0
 
@@ -18,21 +18,21 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: verify-cfg [-b <path>] [-h] [<arch>]"
-           echo "   b       the full path to the configuration to be verified"
-           echo "   h       this help message"
-           echo "   <arch>  the configuration to be verified"
+           echo "Usage: verify-cfg [-b <path>] [-h] [<sys_id>]"
+           echo "   b         the full path to the configuration to be verified"
+           echo "   h         this help message"
+           echo "   <sys_id>  the configuration to be verified"
            echo ""
            exit(1)
       default:
-           set Arch = $1
+           set sys_id = $1
            breaksw
    endsw
    shift
 end
 
 if ("$SysDir" == "") then
-   set SysDir = $cwd:h/dev/$Arch
+   set SysDir = $cwd:h/dev/$sys_id
 endif
 
 set CfgLog = $SysDir/log/config
@@ -42,7 +42,7 @@ set EtcDir = $SysDir/etc
 
 source ../scripts/functions-pact.csh
 
-InitLog Log $cwd/log.verify-cfg.$Arch
+InitLog Log $cwd/log.verify-cfg.$sys_id
 
 set Cfg = `awk '$2 ~ /SCCONFIG.H/ { print $7 }' $IncDir/scconfig.h`
 

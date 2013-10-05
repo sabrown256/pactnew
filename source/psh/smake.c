@@ -359,7 +359,7 @@ static int setup_env(statedes *st, char *src)
 	ps = pop_path(s);
 	p  = pop_path(s);
 
-/* if root is of the form /.../dev/<arch> use <arch> */
+/* if root is of the form /.../dev/<sys_id> use <sys_id> */
 	if (strcmp(p, "dev") == 0)
 	   strcpy(st->sys, ps);
 

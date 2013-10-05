@@ -46,11 +46,11 @@ Libs = ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDE_Lib}
 
 targets :
 	@echo "Targets for SCHEME"
-	@echo "   install   : install SCHEME headers and utilities in dev/arch"
+	@echo "   install   : install SCHEME headers and utilities in dev/sys_id"
 	@echo "   link      : link SCHEME utilities for public use"
 	@echo "   profiler  : make a profiling version"
 	@echo "   scheme    : make the SCHEME executable"
-	@echo "   sharedlib : build and install SCHEME shared libs in dev/arch"
+	@echo "   sharedlib : build and install SCHEME shared libs in dev/sys_id"
 	@echo "   test      : run the SCHEME test suite"
 
 

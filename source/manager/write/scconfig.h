@@ -23,8 +23,7 @@ Separator $Log
 NoteD $Log "   C Environment Configuration - scconfig.h"
 Note $Log ""
 
-dbmget $Log Arch^                     \
-            BFD_Version^              \
+dbmget $Log BFD_Version^              \
             BUILD_DEBUG^              \
             BUILD_OPTIMIZE^           \
             BUILD_PROFILE^            \
@@ -114,6 +113,7 @@ dbmget $Log Arch^                     \
             Std_UseX^                 \
             Std_UseOGL^               \
             Std_UseQD^                \
+            SYS_Arch^                 \
             SYS_ID^                   \
             SYS_TYPE^                 \
             SYS_Prefix^               \
@@ -148,7 +148,7 @@ dbmget $Log Arch^                     \
 
     Note $STDOUT "#define CPU_TYPE            $CPU"
     Note $STDOUT "#define FPU_TYPE            $FPU"
-    Note $STDOUT '#define SYSTEM_ID           '$QUOTE${Arch}$QUOTE
+    Note $STDOUT '#define SYS_Arch            '$QUOTE${SYS_Arch}$QUOTE
     Note $STDOUT '#define SYS_TYPE            '$QUOTE${SYS_TYPE}$QUOTE
     Note $STDOUT '#define SYS_ID              '$QUOTE${SYS_ID}$QUOTE
     Note $STDOUT '#define SYS_Prefix          '$QUOTE${SYS_Prefix}$QUOTE
@@ -165,7 +165,7 @@ dbmget $Log Arch^                     \
     Note $STDOUT '#define DEFAULT_SHELL       '$QUOTE${DEFAULT_SHELL}$QUOTE
 
     if ("$FilterDir" != "") then
-       set FiltFile = $FilterDir/$Arch
+       set FiltFile = $FilterDir/$SYS_Arch
        Note $STDOUT '#define MAKE_FILTER_FILE    '$QUOTE${FiltFile}$QUOTE
     endif
 

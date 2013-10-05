@@ -67,7 +67,7 @@ targets :
 	@echo "   exec         : make test program for SC_exec_server"
 	@echo "   fcscan       : make simple utility to scan containers such as tar files"
 	@echo "   ha           : make tsca and tsctr test programs for hash and alist functionality"
-	@echo "   install      : install SCORE headers and utilities in dev/arch"
+	@echo "   install      : install SCORE headers and utilities in dev/sys_id"
 	@echo "   io           : make test programs for I/O functionality"
 	@echo "   latency      : make simple utility to measure file system latencies"
 	@echo "   lf           : make tscoff test program for large file access functionality"
@@ -84,7 +84,7 @@ targets :
 	@echo "   retrace      : make tscrtr test program for debug/retrace functionality"
 	@echo "   scan         : make test program for lexical scanner functionality"
 	@echo "   score-config : make SCORE memory manager configuration utility"
-	@echo "   sharedlib    : build and install SCORE shared libs in dev/arch"
+	@echo "   sharedlib    : build and install SCORE shared libs in dev/sys_id"
 	@echo "   smp          : make tscthr tscsmp and tscsmpb for SMP parallel testing"
 	@echo "   test         : run the SCORE test suite"
 

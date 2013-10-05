@@ -50,11 +50,11 @@ SLibs = ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 targets :
 	@echo "Targets for PPC"
 	@echo "   Cstd      : make standard tests and pcexec"
-	@echo "   install   : install PPC headers and utilities in dev/arch"
+	@echo "   install   : install PPC headers and utilities in dev/sys_id"
 	@echo "   link      : link PPC utilities for public use"
 	@echo "   parallel  : make parallel process tests"
 	@echo "   proc      : make process report"
-	@echo "   sharedlib : build and install PPC shared libs in dev/arch"
+	@echo "   sharedlib : build and install PPC shared libs in dev/sys_id"
 	@echo "   test      : run the PPC test suite"
 	@echo "   web       : make http reader"
 

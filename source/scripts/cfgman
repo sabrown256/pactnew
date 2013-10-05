@@ -44,8 +44,8 @@ while (1)
    sleep 1
 end
 
-set path = ( $ExeRoot /usr/bin /bin )
-set Arch = `system-id`
+set path     = ( $ExeRoot /usr/bin /bin )
+set sys_arch = `system-id`
 
 set SGN   = .pc
 set ret   = 0
@@ -116,7 +116,7 @@ if ("$DB" == "") then
    echo "CFGMAN: no database directory found"
    exit(112)
 else
-   set DB = $DB/$SGN-$Arch
+   set DB = $DB/$SGN-$sys_arch
    if (!(-d $DB)) then
       mkdir -p $DB
       chmod 2770 $DB >& /dev/null
@@ -252,16 +252,16 @@ switch ($Tgt)
    case reconst:
         set hf = $1
         if ($#argv > 1) then
-           set arch = $2
+           set lsys_arch = $2
         else
-           set arch = `system-id`
+           set lsys_arch = `system-id`
         endif
 
 # remove old entries
         rm -f * >& /dev/null
 
 # find the proper entries in the host file
-	set lst = ( `grep $arch $hf | grep host | awk '{print $6}'` )
+	set lst = ( `grep $lsys_arch $hf | grep host | awk '{print $6}'` )
         foreach i ($lst)
            set j = ( `echo $i | sed 's|^.*@||'` )
            if ("$j" != "") then
@@ -275,6 +275,8 @@ switch ($Tgt)
         if ("$j" != "") then
            ln -s $j current
         endif
+
+	unset lsys_arch
 
         breaksw
 
@@ -310,7 +312,7 @@ USE:
    if ($?SESSION_CONFIG == 1) then
       set use = $SESSION_CONFIG
    else
-      set use = "$Arch"
+      set use = "$sys_arch"
       if (-e current) then
          set inf = ( `ls -l current` )
          if ("$inf" != "") then

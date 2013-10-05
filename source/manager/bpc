@@ -107,7 +107,7 @@ object *by_config(char *dr)
     char *cfg, *sys, *cmd, *ar;
     object *rv;
 
-    cmd = sprintf("grep SYSTEM_ID ../dev/%s/include/scconfig.h",
+    cmd = sprintf("grep SYS_Arch ../dev/%s/include/scconfig.h",
 		  dr);
     cfg = sprintf("%s", list_ref(syscmnd(cmd), 0));
     sys = lasttok(sprintf("%s", cfg), " \t\n");

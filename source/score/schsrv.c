@@ -157,7 +157,7 @@ static hrng *_SC_host_server_lookup(char *type, hasharr *tab)
     hrng *h;
 
     if (type == NULL)
-       type = SYSTEM_ID;
+       type = SYS_Arch;
 
     if (strcmp(type, "all") == 0)
        {h = NULL;
@@ -405,7 +405,7 @@ int SC_host_server_init(char *file, int reset, int vrb)
 	    SC_hostname(t, MAXLINE);
 	    r   = SC_dsnprintf(FALSE, "(%s)", t);
 	    rng = _SC_list(r);
-	    SC_hasharr_install(_SC.hsst, SYSTEM_ID, rng, "hrng", 3, -1);};};
+	    SC_hasharr_install(_SC.hsst, SYS_Arch, rng, "hrng", 3, -1);};};
 
     rv = (_SC.hsst != NULL);
 
@@ -878,7 +878,7 @@ char **SC_get_system_list(char *sys)
    {char **tp;
 
     if (sys == NULL)
-       sys = SYSTEM_ID;
+       sys = SYS_Arch;
 
     if (sys[0] == '@')
        tp = SC_get_host_types(2, sys);
@@ -1018,11 +1018,11 @@ int SC_hostsystem(char *type, int nc, char *node)
     st = 1;
     if (node != NULL)
        st = SC_execs(type, nc, NULL, -1,
-                     "ssh -x -q %s pact -info SYSTEM_ID", node);
+                     "ssh -x -q %s pact -info SYS_Arch", node);
 
     if (st != 0)
        {st = 0;
-	SC_strncpy(type, nc, SYSTEM_ID, nc);};
+	SC_strncpy(type, nc, SYS_Arch, nc);};
         
     rv = (st == 0);
 

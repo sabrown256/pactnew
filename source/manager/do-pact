@@ -109,8 +109,8 @@ switch ($Phase)
 # if syncing from the repository
            if (($SyncOnly == "yes") && ("$Repo" != "")) then
               flog $LogHost cd $Builder
-              set Arch = `../scripts/cfgman use`
-              Note $LogHost "SYS_ID = $Arch"
+              set lsys_id = `../scripts/cfgman use`
+              Note $LogHost "SYS_ID = $lsys_id"
 
 # clean out old builds first
               flog $LogHost $RMDir gen
@@ -132,7 +132,9 @@ switch ($Phase)
               Separator $LogHost
 
 # send sync log to update file
-              tlog "(LOG)" cat $WrkDir/dev/$Arch/log/sync
+              tlog "(LOG)" cat $WrkDir/dev/$lsys_id/log/sync
+
+              unset lsys_id
 
 # any other source option
            else
@@ -219,8 +221,8 @@ switch ($Phase)
 
         call QUALIFY()
 
-        set arch   = `../scripts/cfgman use`
-        set DevDir = $WrkDir/dev/$arch
+        set sys_id = `../scripts/cfgman use`
+        set DevDir = $WrkDir/dev/$sys_id
         set LogDir = $DevDir/log
         set EtcDir = $DevDir/etc
         set Passed = $LogDir/passed
@@ -352,9 +354,9 @@ switch ($Phase)
               flog $LogHost $RM $Passed
 
 # assure a clean make of dmake in the config
-              if (-d $WrkDir/dev/$arch/lib) then
-                 flog $LogHost touch $WrkDir/dev/$arch/lib/libscore.foo
-                 flog $LogHost $RM $WrkDir/dev/$arch/lib/libscore*.*
+              if (-d $WrkDir/dev/$sys_id/lib) then
+                 flog $LogHost touch $WrkDir/dev/$sys_id/lib/libscore.foo
+                 flog $LogHost $RM $WrkDir/dev/$sys_id/lib/libscore*.*
               endif
 
 #--------------------------------------------------------------------------
@@ -446,7 +448,7 @@ switch ($Phase)
 
 # now that we are configured check the pattern for warnings and errors
 
-              set Cnfgrd = $WrkDir/dev/$arch/etc/configured
+              set Cnfgrd = $WrkDir/dev/$sys_id/etc/configured
 
               set WarnPattern = `pact +l -info WARN_PATTERN | sed 's| |+sp+|g'`
               if ("$WarnPattern" == "") then
@@ -592,9 +594,9 @@ switch ($Phase)
                  endif
 
                  if ($?DoValgrind == 1) then
-                    flog $LogHost set TestLog = $WrkDir/dev/$arch/log/test-vg
+                    flog $LogHost set TestLog = $WrkDir/dev/$sys_id/log/test-vg
                  else
-                    flog $LogHost set TestLog = $WrkDir/dev/$arch/log/test
+                    flog $LogHost set TestLog = $WrkDir/dev/$sys_id/log/test
                  endif
 
                  if ("$ParOpt" == "") then

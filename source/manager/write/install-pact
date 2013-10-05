@@ -27,7 +27,6 @@ dbmget $Log InstBase^     \
             UPDATE^       \
             BinDir^       \
             CfgMan^       \
-            Arch^         \
             ScmDir^       \
             Man1Dir^      \
             Man3Dir^      \
@@ -35,7 +34,8 @@ dbmget $Log InstBase^     \
             PY_Vers^      \
             PY_DirPy^     \
             PY_DirDst^    \
-            PY_DirSrc
+            PY_DirSrc^    \
+            SYS_Arch
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -69,7 +69,7 @@ dbmget $Log InstBase^     \
 
        Note $STDOUT "set Owner     = $USER"
        Note $STDOUT "set Group     = "'`'"groups | awk '{print "'$1'"}'"'`'
-       Note $STDOUT 'set Arch      = `'$CfgMan' use`'
+       Note $STDOUT 'set sys_id    = `'$CfgMan' use`'
 
 # NOTE: this can only be successfully run from the manager directory
        if ($cwd !~ */manager) then
@@ -79,7 +79,7 @@ dbmget $Log InstBase^     \
 
        Note $STDOUT 'set lbase     = $cwd'
        Note $STDOUT 'set lbasedir  = $lbase:h'
-       Note $STDOUT 'set lsysdir   = $lbasedir/dev/$Arch'
+       Note $STDOUT 'set lsysdir   = $lbasedir/dev/$sys_id'
        Note $STDOUT 'set ldocdir   = $lbasedir/doc'
        Note $STDOUT 'unset lbase'
        Note $STDOUT ""
@@ -193,7 +193,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT ''
 
 # substitute $InstDir for the build directory
-# something like /usr/local/apps for ..../dev/$arch
+# something like /usr/local/apps for ..../dev/$sys_id
 # difference between $cwd and pwd makes the original path unpredictable
 # so find what actually appeared in the generated files
        Note $STDOUT 'set inf     = ( `grep SCHEME env-pact.csh | tail -n 1` )'

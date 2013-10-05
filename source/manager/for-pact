@@ -222,8 +222,8 @@ if ("$Base" == "") then
    set Base = $cwd
 endif
 
-set arch    = `$Base/scripts/cfgman use`
-set Root    = $Base/dev/$arch
+set sys_id  = `$Base/scripts/cfgman use`
+set Root    = $Base/dev/$sys_id
 set CFDFile = $Root/etc/configured
 set FORPACT = $Root/bin/for-pact
 
@@ -396,7 +396,7 @@ SETUP_PARALLEL:
 
 DO_PARALLEL_MASTER:
 
-   setenv SESSION_CONFIG "$arch"
+   setenv SESSION_CONFIG "$sys_id"
 
    if ("$Directories" == "") then
       cd .. >& /dev/null
@@ -571,7 +571,7 @@ DO_PACKAGE:
       call HANDLE_ENV($LogFile)
 
       Note $LogFile "FOR-PACT: SESSION_CONFIG = |$SESSION_CONFIG|"
-      Note $LogFile "FOR-PACT: Arch           = |$arch|"
+      Note $LogFile "FOR-PACT: SYS_ID         = |$sys_id|"
       Note $LogFile "FOR-PACT: LogFile        = |$LogFile|"
       Note $LogFile "FOR-PACT: CWD            = |$cwd|"
       Note $LogFile "FOR-PACT: Base           = |$Base|"

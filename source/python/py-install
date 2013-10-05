@@ -2,7 +2,7 @@
 #
 # PY-INSTALL - script for installation of PyPACT directory files
 #            - invoked by install-pact
-#            - assume we are already in dev/$Arch/lib
+#            - assume we are already in dev/$SYS_Arch/lib
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
