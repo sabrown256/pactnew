@@ -46,8 +46,8 @@ setenv OS_Release     `uname -r`
 setenv HostName      `uname -n`
 setenv MajorVersion  `expr $OS_Release : "\(.\)"`
 
-envini System  `$ScrDir/cfgman use`
-envini SysDir  $BaseDir/dev/$System
+envini SYS_ID  `$ScrDir/cfgman use`
+envini SysDir  $BaseDir/dev/$SYS_ID
 
 InitLog ALog $SysDir/log/analyze
 

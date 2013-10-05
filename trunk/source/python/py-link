@@ -58,16 +58,15 @@ else
 endif
 
 @ err    = 0
-set Arch = `../../scripts/cfgman use`
 
-InitLog Log $cwd/z-$Arch/obj/log.load
+InitLog Log $cwd/$SYS_TmpDir/obj/log.load
 
 set PDB_MOD_NAME = _pdb
 
 flog $Log (env | sort)
 flog $Log set SrcDir = $cwd
 flog $Log set OS     = `uname -s`
-flog $Log set Root   = $cwd:h:h/dev/$Arch
+flog $Log set Root   = $cwd:h:h/dev/$SYS_ID
 flog $Log set DevInc = $Root/include
 flog $Log set DevLib = $Root/lib
 

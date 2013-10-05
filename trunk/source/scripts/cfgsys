@@ -1,0 +1,72 @@
+#!/bin/csh -f
+#
+# CFGSYS - find and export the SYS group variables
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+@ err = 0
+
+set exe = $0
+
+@ count = 1
+while (1)
+   set bindir = `dirname $exe`
+   if ("$bindir" != "") break
+   if ($count >= 10) then
+      echo "CFGMAN: dirname returned null"
+      exit(111)
+   endif
+   @ count = $count + 1
+   sleep 1
+end
+
+set path = ( $bindir /usr/bin /bin )
+
+set dbdir = ""
+while ($#argv > 0)
+   switch ($1)
+      case -d:
+           shift
+           set dbdir = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: cfgsys [-d <dir>] [-h]"
+           echo ""
+           echo "  d    directory where database lives"
+           echo "  h    this help message"
+           echo ""
+           exit(1)
+   endsw
+   shift
+end
+
+if ("$dbdir" != "") then
+
+   eval `grep SYS_ $dbdir/env-pact.csh | awk '{printf("%s ; \n", $0);}'`
+
+else
+
+   setenv SYS_ID      `cfgman -d ../dev use`
+   setenv SYS_TYPE    ""
+   setenv SYS_SITE    ""
+   setenv SYS_Prefix  "z-"
+   setenv SYS_CfgDir  cfg-${SYS_ID}
+   setenv SYS_TmpDir  ${SYS_Prefix}${SYS_ID}
+
+endif
+
+#set Arch = `system-id`
+
+echo "setenv SYS_ID      $SYS_ID ; "
+echo "setenv SYS_TYPE    $SYS_TYPE ; "
+echo "setenv SYS_SITE    $SYS_SITE ; "
+echo "setenv SYS_Prefix  $SYS_Prefix ; "
+echo "setenv SYS_CfgDir  $SYS_CfgDir ; "
+echo "setenv SYS_TmpDir  $SYS_TmpDir"
+
+exit($err)
+

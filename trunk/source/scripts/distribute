@@ -59,7 +59,7 @@ dbg        = 0
 childPIDs  = {}
 
 # Watcher
-states     = ['UNAVAILABLE', 'Sending', 'Configure', 'System', 'Build', \
+states     = ['UNAVAILABLE', 'Sending', 'Configure', 'SYS_ID', 'Build', \
               'Check', 'Install', 'Clean', 'PASS', 'FAIL', 'DONE'] 
 keywords   = {}
 
@@ -442,7 +442,7 @@ class Host:
       # System
       if not self.fail and len(self.flags.runSystem()) > 0:
         subcmd = cmdCHDIR + self.flags.runSystem()
-        title = keywords['System']
+        title = keywords['SYS_ID']
         status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
 
       os.system('sleep 1')

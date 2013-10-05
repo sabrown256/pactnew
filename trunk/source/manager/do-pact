@@ -35,7 +35,8 @@ set argv  = `cat $ArgFile`
 set Phase = $1
 shift
 
-set UseTmp = no
+set UseTmp     = no
+set SYS_Prefix = "z-"
 
 switch ($Phase)
 
@@ -109,7 +110,7 @@ switch ($Phase)
            if (($SyncOnly == "yes") && ("$Repo" != "")) then
               flog $LogHost cd $Builder
               set Arch = `../scripts/cfgman use`
-              Note $LogHost "System id = $Arch"
+              Note $LogHost "SYS_ID = $Arch"
 
 # clean out old builds first
               flog $LogHost $RMDir gen
@@ -200,7 +201,7 @@ switch ($Phase)
         flog $LogHost pushd $WrkDir/panacea/abc
         flog $LogHost $RMDir dev
         flog $LogHost $RM *.[ch] main/abc.c
-        flog $LogHost ( find . -type d -name 'z-*' -exec $RMDir {} \; )
+        flog $LogHost ( find . -type d -name $SYS_Prefix'*' -exec $RMDir {} \; )
         flog $LogHost popd
 
         breaksw
@@ -674,7 +675,7 @@ switch ($Phase)
               set opt = ( $opt --del )
 
 # rsync just the changed files
-              flog $LogHost rsync $opt --exclude 'z-*' --exclude dev --exclude manager --exclude panacea/abc --exclude tests $WrkDir/ $SrcDir
+              flog $LogHost rsync $opt --exclude $SYS_Prefix'*' --exclude dev --exclude manager --exclude panacea/abc --exclude tests $WrkDir/ $SrcDir
               @ lerr = $lerr + $status
 
 # fix the permissions for users
@@ -693,7 +694,7 @@ switch ($Phase)
               flog $LogHost $RMDir $SrcDir/$SCSDir
               flog $LogHost $RMDir $SrcDir/*/$SCSDir
 
-              flog $LogHost $RMDir $SrcDir/z-*
+              flog $LogHost $RMDir $SrcDir/${SYS_Prefix}*
               flog $LogHost $RMDir $SrcDir/dev
               flog $LogHost $RMDir $SrcDir/manager/*
               flog $LogHost $RMDir $SrcDir/panacea/abc/*
@@ -744,8 +745,8 @@ switch ($Phase)
         call QUALIFY()
 
         flog $LogHost pwd
-        flog $LogHost setenv System `../scripts/cfgman use`
-        flog $LogHost set path = ( . $WrkDir/dev/$System/bin $path )
+        flog $LogHost setenv SYS_ID `../scripts/cfgman use`
+        flog $LogHost set path = ( . $WrkDir/dev/$SYS_ID/bin $path )
 
         flog $LogHost setenv Err  2
         if (($InstBase != none) && (-e "$Passed")) then
@@ -999,7 +1000,7 @@ TOTMP:
       flog $LogHost touch $SemDir/loading
 
       if ($use_rsync == TRUE) then
-         flog $LogHost $RSYNC -arclp --exclude=doc/ --exclude=dev/ --exclude=$SCSDir/ '--exclude=z-*/' $TrueWrkDir $WrkDir:h
+         flog $LogHost $RSYNC -arclp --exclude=doc/ --exclude=dev/ --exclude=$SCSDir/ --exclude=$SYS_Prefix'*/' $TrueWrkDir $WrkDir:h
          flog $LogHost $MV $WrkDir:h/$TrueWrkDir:t $WrkDir
          flog $LogHost pushd $WrkDir/$Builder
       else
@@ -1009,7 +1010,7 @@ TOTMP:
          flog $LogHost pushd $WrkDir
 
          flog $LogHost tar xof $TrueWrkDir/pact-tmp.tar
-         find . -type d -name "z-*" -exec rm -r {} \;
+         find . -type d -name "${SYS_Prefix}*" -exec rm -r {} \;
          flog $LogHost cd $Builder
       endif
 

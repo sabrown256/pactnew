@@ -26,7 +26,7 @@ dbmget $Log CROSS_COMPILE^           \
             PACT_CC_FAMILY^          \
             PACT_CC_PATH^            \
             PACT_CC_VERSION^         \
-            System^                  \
+            SYS_ID^                  \
             BaseDir^                 \
             BinDir^                  \
             LibDir^                  \
@@ -76,7 +76,7 @@ dbmget $Log CROSS_COMPILE^           \
     else
 
        Note $Log "Find dmake for CROSS_COMPILE"
-       Note $Log "   System    = |$System|"
+       Note $Log "   SYS_ID    = |$SYS_ID|"
        Note $Log "   BinDir    = |$BinDir|"
        Note $Log "   CROSS_REF = |$CROSS_REF|"
 
@@ -114,7 +114,7 @@ dbmget $Log CROSS_COMPILE^           \
        endif
     endif
 
-    flog $Log setenv SESSION_CONFIG $System
+    flog $Log setenv SESSION_CONFIG $SYS_ID
     ftee $Log $DSYS pact $opt
     unset opt
 

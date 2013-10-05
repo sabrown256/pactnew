@@ -58,7 +58,7 @@ void manage_tmp_dir(statedes *st, int start)
         else
 	    sprintf(st->tmpdir, "/tmp/pact_make_%d", (int) getpid());
 #else
-	sprintf(st->tmpdir, "%s/z-%s/obj", st->cwd, st->sys);
+	sprintf(st->tmpdir, "%s/%s%s/obj", st->cwd, SYS_Prefix, st->sys);
 #endif
 
 	snprintf(cmd, BFLRG, "test -d %s/", st->tmpdir);
@@ -201,7 +201,7 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
     i = strlen(st->cwd) - 7;
     i = max(i, 0);
     if (strcmp(st->cwd+i, "manager") == 0)
-       {snprintf(s, BFLRG, "echo \"System = %s\" ; ", st->sys);
+       {snprintf(s, BFLRG, "echo \"SYS_ID = %s\" ; ", st->sys);
 
         snprintf(s, BFLRG, "cat %s", pmname);
 	nstrcat(cmd, BFLRG, s);}
@@ -363,11 +363,11 @@ static int setup_env(statedes *st, char *src)
 	if (strcmp(p, "dev") == 0)
 	   strcpy(st->sys, ps);
 
-/* otherwise use the configured system_id */
+/* otherwise use the configured SYS_ID */
 	else
-	   strcpy(st->sys, SYSTEM_ID);};
+	   strcpy(st->sys, SYS_ID);};
 
-    sprintf(st->arch, "z-%s", st->sys);
+    sprintf(st->arch, "%s%s", SYS_Prefix, st->sys);
 
     return(TRUE);}
 

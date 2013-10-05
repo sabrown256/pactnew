@@ -92,8 +92,8 @@ setenv ZeroSpace  "-z 2"
 #   setenv BaseDir  $cwd
 #   popd >& /dev/null
 
-   setenv System    `$BaseDir/scripts/cfgman use`
-   setenv SysDir    $BaseDir/dev/$System
+   setenv SYS_ID    `$BaseDir/scripts/cfgman use`
+   setenv SysDir    $BaseDir/dev/$SYS_ID
    setenv SrcDir    $BaseDir/$Package
 
    setenv EtcDir    $SysDir/etc
@@ -101,7 +101,7 @@ setenv ZeroSpace  "-z 2"
    setenv LibDir    $SysDir/lib
    setenv BinDir    $SysDir/bin
 
-   setenv TestDir   $SrcDir/z-$System/test
+   setenv TestDir   $SrcDir/$SYS_TmpDir/test
    setenv FilesDir  $SrcDir/tests
    setenv RefDir    $FilesDir/ref
 
@@ -234,7 +234,7 @@ Note $Log "Test environment"
 Note $Log ""
 Note $Log "Directories:"
 Note $Log "BaseDir    = |$BaseDir|"
-Note $Log "System     = |$System|"
+Note $Log "SYS_ID     = |$SYS_ID|"
 Note $Log "SysDir     = |$SysDir|"
 Note $Log "SrcDir     = |$SrcDir|"
 Note $Log "IncDir     = |$IncDir|"

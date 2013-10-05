@@ -131,7 +131,7 @@ ${BinDir}/pact-info : pact-info.c common.h
 smake : ${BinDir}/pact-info ${BinDir}/smake
 
 ${BinDir}/smake : smake.c common.h
-	ccw -DSYSTEM_ID=\"${System}\" -DPACT_VERSION=\"${Version}\" smake.c -o ${BinDir}/smake
+	ccw -DSYS_ID=\"${SYS_ID}\" -DSYS_Prefix=\"${SYS_Prefix}\" -DPACT_VERSION=\"${Version}\" smake.c -o ${BinDir}/smake
 
 
 # tester for strcpy_tok, strcpy_str

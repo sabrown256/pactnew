@@ -33,11 +33,11 @@ end
 setenv OS_Name  `uname -s`
 
 set MngDir = $cwd
-setenv System  `../scripts/cfgman use`
+setenv SYS_ID  `../scripts/cfgman use`
 
 set BaseDir = $MngDir:h
 set DevDir  = $BaseDir/dev
-set SysDir  = $DevDir/$System
+set SysDir  = $DevDir/$SYS_ID
 set IncDir  = $SysDir/include
 set BinDir  = $SysDir/bin
 set LibDir  = $SysDir/lib
@@ -52,7 +52,7 @@ set AROpt  = `pact +l -info AROpt`
 set ARXOpt = `pact +l -info ARXOpt`
 
 echo ""
-echo "Making integrated PACT library for $System"
+echo "Making integrated PACT library for $SYS_ID"
 
 pushd $LibDir >& /dev/null
 
