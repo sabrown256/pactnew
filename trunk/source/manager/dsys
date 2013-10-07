@@ -2547,7 +2547,7 @@ CFG_DONE:
         flog $Log $RM ../*/$SYS_TmpDir/obj/*.[cfo] ../*/$SYS_TmpDir/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
         flog $Log $RM ../sx/$SYS_TmpDir/obj/*.[cfo]
-        flog $Log $RMDir ../$SYS_TmpDir ../.pc-
+        flog $Log $RMDir ../$SYS_TmpDir ../dev/.pc-
 
 # check the result
         flog $Log ls -lR $SYS_Dir
