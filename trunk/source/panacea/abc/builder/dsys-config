@@ -17,17 +17,18 @@ set Root = $Here:h
 set Base = $Root:h
 set Base = $Base:h
 
-set System   = `$Base/scripts/cfgman -d $Base/dev use`
-set PACTDir  = $Base/dev/$System
+set SYS_ID   = `$Base/scripts/cfgman -d $Base/dev use`
+set PACTDir  = $Base/dev/$SYS_ID
 set PACTBin  = $PACTDir/bin
 set PACTInc  = $PACTDir/include
+set PACTEtc  = $PACTDir/etc
 set PACTExe  = $PACTBin/pact
 
 set ThreadLibExt = `$PACTExe -info ThreadLibExt | sed s-ThreadLibExt=--`
 set configname   = "none"
 
-set MDGInc   = `awk '($1 == "MDGInc") { print $3 }' $PACTInc/make-def`
-set PUBInc   = `awk '($1 == "PubInc") { print $3 }' $PACTInc/make-def`
+set MDGInc   = `awk '($1 == "MDGInc") { print $3 }' $PACTEtc/make-def`
+set PUBInc   = `awk '($1 == "PubInc") { print $3 }' $PACTEtc/make-def`
 set Optimize = FALSE
 
 set tmp         = `uname -m`
@@ -175,13 +176,13 @@ set FcFlags =
     echo '#' >>& $STDOUT
     echo '' >>& $STDOUT
 
-    echo 'DevDir = '$Root'/dev/${System}' >>& $STDOUT
+    echo 'DevDir = '$Root'/dev/${SYS_ID}' >>& $STDOUT
     echo 'DevBin = ${DevDir}/bin' >>& $STDOUT
     echo 'DevLib = ${DevDir}/lib' >>& $STDOUT
     echo 'DevInc = ${DevDir}/include' >>& $STDOUT
     echo '' >>& $STDOUT
 
-    echo 'PACTDir = ${SysDir}' >>& $STDOUT
+    echo 'PACTDir = ${SYS_Dir}' >>& $STDOUT
     echo 'PACTInc = ${PACTDir}/include' >>& $STDOUT
     echo 'PACTLib = ${PACTDir}/lib' >>& $STDOUT
     echo 'PANACHE = ${PACTDir}/bin/panache' >>& $STDOUT

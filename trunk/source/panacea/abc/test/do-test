@@ -19,15 +19,15 @@ set Base     = $cwd
 set Base     = $Base:h
 set RootDir  = $Base/dev
 
-set RootDir  = $RootDir/$System
+set RootDir  = $RootDir/$SYS_ID
 set BinDir   = $RootDir/bin
 set IncDir   = $RootDir/include
 
-if (!(-d z-$System)) then
-   mkdir z-$System
+if (!(-d $SYS_Prefix)) then
+   mkdir $SYS_Prefix
 endif
 
-cd z-$System
+cd $SYS_Prefix
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

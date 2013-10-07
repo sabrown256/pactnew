@@ -9,7 +9,7 @@
 # include "cpyright.h"
 #
 
-include ../dev/${System}/include/pre-Make.defs
+include ../dev/${SYS_ID}/include/pre-Make.defs
 
 TGTBin = none
 TGTExe = ${DevBin}/s

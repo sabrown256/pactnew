@@ -12,7 +12,7 @@ set rpf = ""
 
 @ nerr = 0
 
-set DevInc    = $SysDir/include
+set DevInc    = $SYS_Dir/include
 set MISrc     = $DevInc/make-def
 set CCompiler = `pact +l -info Cfg_CC_Exe | uniq`
 set CFLAGS    = `pact +l -info Cfg_CC_Flags | uniq`

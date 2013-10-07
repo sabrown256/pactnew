@@ -28,8 +28,8 @@ alias RETURN  'goto $Return'
 
 set Base     = $Root:h
 set Base     = $Base:h
-set HostArch = `$Base/scripts/cfgman -d $Base/dev use`
-set DevDir   = "dev/$HostArch"
+set SYS_ID   = `$Base/scripts/cfgman -d $Base/dev use`
+set DevDir   = "dev/$SYS_ID"
 set BuildDir = "$Root/builder"
 
 setenv DevBin    "$DevDir/bin"
@@ -230,7 +230,7 @@ switch ($1)
         rm -f $LogFile
         touch $LogFile
 
-        dsys-config -a $HostArch
+        dsys-config -a $SYS_ID
 	if ($status != 0) then
            echo "Configuration process failed"
            exit(1)
