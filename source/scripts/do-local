@@ -334,7 +334,7 @@ switch ($Phase)
            call INITLOG()
 
            set StartTime = `date +%r\ on\ %a\ %D`
-           NoteD $LogHost "Starting build/test on $UHost ($SYS_Arch) at $StartTime"
+           NoteD $LogHost "Starting build/test on $UHost ($SYS_ID) at $StartTime"
            NoteD $LogHost " "
 
            NoteNT "Get starting time: $TIMER -r"

@@ -2401,7 +2401,7 @@ static void do_platform(client *cl, char *oper, char *value)
     note(Log, TRUE, "");
 
 /* assemble the config command line */
-    snprintf(t, BFLRG, "dsys config -plt %s", st.sys_id);
+    snprintf(t, BFLRG, "./dsys config -plt %s", st.sys_id);
 
 /* add options affecting all platforms */
     if (st.abs_deb == TRUE)
