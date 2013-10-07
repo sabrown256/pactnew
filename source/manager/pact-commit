@@ -49,10 +49,9 @@ set VersionID = `code-date`
 set HelpCode  = $MngDir/$0
 set CfgMan    = $ScrDir/cfgman
 
-setenv SYS_ID  `$CfgMan use`
+eval `$ScrDir/cfgsys`
 
-set SysDir    = $BaseDir/dev/$SYS_ID
-set UpdateLog = $SysDir/log/update
+set UpdateLog = $SYS_Dir/log/update
 set Changed   = $MngDir/Changed
 set UnChanged = $MngDir/UnChanged
 
@@ -63,7 +62,7 @@ set Sleep         = "NO"
 
 set CleanBuild   = FALSE
 
-InitLog Log $SysDir/log/commit
+InitLog Log $SYS_Dir/log/commit
 
 switch ($OS)
    case irix:

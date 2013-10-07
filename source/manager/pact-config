@@ -104,11 +104,11 @@ setenv CfgMan      $ScrDir/cfgman
 setenv SYS_ID      `$CfgMan use`
 setenv SYS_CfgDir  cfg-$SYS_ID
 
-setenv SysDir   $BaseDir/dev/$SYS_ID
-setenv IncDir   $SysDir/include
-setenv EtcDir   $SysDir/etc
-setenv BinDir   $SysDir/bin
-setenv LibDir   $SysDir/lib
+setenv SYS_Dir  $BaseDir/dev/$SYS_ID
+setenv IncDir   $SYS_Dir/include
+setenv EtcDir   $SYS_Dir/etc
+setenv BinDir   $SYS_Dir/bin
+setenv LibDir   $SYS_Dir/lib
 setenv ScmDir   scheme
 setenv Man1Dir  man/man1
 setenv Man3Dir  man/man3
@@ -117,13 +117,13 @@ setenv EnvSh    $EtcDir/env-pact.sh
 setenv EnvDk    $EtcDir/env-pact.dk
 
 
-setenv CEFile   $SysDir/log/file.ce
-setenv CDFile   $SysDir/log/file.cd
-setenv DPFile   $SysDir/log/file.dpe
-setenv SEFile   $SysDir/log/file.se
-setenv MVFile   $SysDir/log/file.mv
-setenv URFile   $SysDir/log/file.ur
-setenv Log      $SysDir/log/config
+setenv CEFile   $SYS_Dir/log/file.ce
+setenv CDFile   $SYS_Dir/log/file.cd
+setenv DPFile   $SYS_Dir/log/file.dpe
+setenv SEFile   $SYS_Dir/log/file.se
+setenv MVFile   $SYS_Dir/log/file.mv
+setenv URFile   $SYS_Dir/log/file.ur
+setenv Log      $SYS_Dir/log/config
 
 setenv NoExe   FALSE
 setenv Load    TRUE
@@ -218,8 +218,8 @@ Main:
           case -s:
                    shift
                    setenv SYS_ID   $1
-                   setenv SysDir   $BaseDir/dev/$SYS_ID
-                   setenv IncDir   $SysDir/include
+                   setenv SYS_Dir   $BaseDir/dev/$SYS_ID
+                   setenv IncDir   $SYS_Dir/include
                    setenv EnvCsh   $EtcDir/env-pact.csh
                    setenv EnvSh    $EtcDir/env-pact.sh
                    setenv EnvDk    $EtcDir/env-pact.dk
@@ -331,7 +331,7 @@ AnalyzeConfig:
     include $MngDir/pact-analyze
 
 # restore config as the log file
-    set Log = "$SysDir/log/config"
+    set Log = "$SYS_Dir/log/config"
     flog $Log $RM `ls`
     flog $Log popd
 
@@ -1316,10 +1316,10 @@ Unique:
 Finish:
 
 # these are finally determined by now and it is safe to define them
-    setenv IncDir  $SysDir/include
-    setenv LibDir  $SysDir/lib
-    setenv BinDir  $SysDir/bin
-    setenv SchDir  $SysDir/scheme
+    setenv IncDir  $SYS_Dir/include
+    setenv LibDir  $SYS_Dir/lib
+    setenv BinDir  $SYS_Dir/bin
+    setenv SchDir  $SYS_Dir/scheme
 
     NoteD $Log "Writing system dependent files"
 

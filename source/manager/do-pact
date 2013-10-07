@@ -35,8 +35,7 @@ set argv  = `cat $ArgFile`
 set Phase = $1
 shift
 
-set UseTmp     = no
-set SYS_Prefix = "z-"
+set UseTmp = no
 
 switch ($Phase)
 
@@ -853,6 +852,9 @@ GET_NET_ARG:
        flog $lFile set WrkDir = $HOME/$WrkDir
     endif
 
+# get the SYS group variables defined
+    eval `$WrkDir/scripts/cfgsys`
+
     return
 
 #--------------------------------------------------------------------------
@@ -949,6 +951,9 @@ GET_HOST_ARG:
     if (`expr "$WrkDir" : '/.*'` == 0) then
        flog $lFile set WrkDir = $HOME/$WrkDir
     endif
+
+# get the SYS group variables defined
+    eval `$WrkDir/scripts/cfgsys`
 
     return
 

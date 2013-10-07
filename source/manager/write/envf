@@ -95,20 +95,20 @@ dbmget $Log MDG_Pck^         \
 
 # emit MANPATH settings
     Note $EnvCsh 'if ($?MANPATH == 1) then'
-    Note $EnvCsh '   setenv MANPATH '$SysDir'/man:$MANPATH'
+    Note $EnvCsh '   setenv MANPATH '$SYS_Dir'/man:$MANPATH'
     Note $EnvCsh 'else'
-    Note $EnvCsh '   setenv MANPATH '$SysDir'/man:'
+    Note $EnvCsh '   setenv MANPATH '$SYS_Dir'/man:'
     Note $EnvCsh 'endif'
     Note $EnvCsh ""
 
     Note $EnvSh 'if [ "$MANPATH" != "" ]; then'
-    Note $EnvSh "   export MANPATH=$SysDir/man"':$MANPATH'
+    Note $EnvSh "   export MANPATH=$SYS_Dir/man"':$MANPATH'
     Note $EnvSh "else"
-    Note $EnvSh "   export MANPATH=$SysDir/man"
+    Note $EnvSh "   export MANPATH=$SYS_Dir/man"
     Note $EnvSh "fi"
     Note $EnvSh ""
 
-    Note $EnvDk 'dk_alter MANPATH '$SysDir'/man'
+    Note $EnvDk 'dk_alter MANPATH '$SYS_Dir'/man'
     Note $EnvDk ""
 
     if ($?HAVE_PYTHON == 1) then
@@ -134,27 +134,27 @@ dbmget $Log MDG_Pck^         \
           Note $EnvDk  "dk_alter PATH $dir"
        end
        set EPath = `echo "$EPath"':$PATH' | sed 's/::/:/g'`
-       Note $EnvCsh "setenv PATH    $SysDir/bin:${EPath}"
-       Note $EnvSh  "export PATH=$SysDir/bin:${EPath}"
+       Note $EnvCsh "setenv PATH    $SYS_Dir/bin:${EPath}"
+       Note $EnvSh  "export PATH=$SYS_Dir/bin:${EPath}"
     else
-       Note $EnvCsh 'setenv PATH    '$SysDir'/bin:$PATH'
-       Note $EnvSh 'export PATH='$SysDir'/bin:$PATH'
-       Note $EnvDk 'dk_alter  PATH    '$SysDir'/bin'
+       Note $EnvCsh 'setenv PATH    '$SYS_Dir'/bin:$PATH'
+       Note $EnvSh 'export PATH='$SYS_Dir'/bin:$PATH'
+       Note $EnvDk 'dk_alter  PATH    '$SYS_Dir'/bin'
     endif
 
 # write the CSH version like this because PCSH scripts like
 # PDBView need to get the users SCHEME variable if defined
     Note $EnvCsh 'if ($?SCHEME == 1) then'
-    Note $EnvCsh '   setenv SCHEME  ${SCHEME}:'"$SysDir/scheme"
+    Note $EnvCsh '   setenv SCHEME  ${SCHEME}:'"$SYS_Dir/scheme"
     Note $EnvCsh 'else'
-    Note $EnvCsh "   setenv SCHEME  $SysDir/scheme"
+    Note $EnvCsh "   setenv SCHEME  $SYS_Dir/scheme"
     Note $EnvCsh 'endif'
-    Note $EnvCsh "setenv ULTRA   $SysDir/scheme"
+    Note $EnvCsh "setenv ULTRA   $SYS_Dir/scheme"
 
-    Note $EnvSh "export SCHEME=$SysDir/scheme"
-    Note $EnvSh "export ULTRA=$SysDir/scheme"
-    Note $EnvDk "dk_setenv SCHEME  $SysDir/scheme"
-    Note $EnvDk "dk_setenv ULTRA   $SysDir/scheme"
+    Note $EnvSh "export SCHEME=$SYS_Dir/scheme"
+    Note $EnvSh "export ULTRA=$SYS_Dir/scheme"
+    Note $EnvDk "dk_setenv SCHEME  $SYS_Dir/scheme"
+    Note $EnvDk "dk_setenv ULTRA   $SYS_Dir/scheme"
 
     flog $Log cat $EnvCsh
     flog $Log cat $EnvSh

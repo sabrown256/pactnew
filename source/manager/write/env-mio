@@ -62,7 +62,7 @@ dbmget $Log MDG_Pck^            \
             RUN_SIGNATURE_DB^   \
             SITE_SIGNATURE_DB^  \
             Sys^                \
-            SysDir^             \
+            SYS_Dir^            \
             SYS_SITE^           \
             SYS_TYPE^           \
             UPDATE_SYS_DB
@@ -247,7 +247,7 @@ source $MngDir/write/import-db
     Note $FOUT ""
 
     if ($InstBase == none) then
-       set proot = $SysDir
+       set proot = $SYS_Dir
     else
        set proot = $InstBase
     endif
@@ -259,8 +259,8 @@ source $MngDir/write/import-db
     endif
 
 # get CFE and PFE right when being installed
-    set lcfe = ( `echo "$CFE" | sed "s@$SysDir@$proot@"` )
-    set lpfe = ( `echo "$PFE" | sed "s@$SysDir@$proot@"` )
+    set lcfe = ( `echo "$CFE" | sed "s@$SYS_Dir@$proot@"` )
+    set lpfe = ( `echo "$PFE" | sed "s@$SYS_Dir@$proot@"` )
 
     Note $FOUT "CFE           = $lcfe"
     Note $FOUT "PFE           = $lpfe"

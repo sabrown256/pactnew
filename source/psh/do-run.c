@@ -24,8 +24,6 @@
 #include "libasync.c"
 #include "libeval.c"
 
-#define SYS_Prefix "z-"
-
 #undef BFMED
 #define BFMED 512
 

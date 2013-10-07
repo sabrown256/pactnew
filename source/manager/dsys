@@ -56,28 +56,28 @@ limit stacksize unlimited >& /dev/null
 unset SYS_ID
 unsetenv SYS_ID
 
+eval `$ScrDir/cfgsys`
+
 set CfgMan = $ScrDir/cfgman
 
-setenv SYS_ID      `$CfgMan -d ../dev use`
 setenv PACTVer     `cat $MngDir/.pact-version`
 
 # directory name conventions
 # to be consistenly used in config, build, test, and install
-#   ..../pact            ->     BaseDir
-#   ..../pact/manager    ->     MngDir
-#   ..../pact/scripts    ->     ScrDir
-#   ..../pact/<pkg>      ->     PkgDir
-#   ..../pact/dev        ->     DevDir
-#   ..../pact/dev/$sys   ->     SysDir
+#   ..../pact              ->     BaseDir
+#   ..../pact/manager      ->     MngDir
+#   ..../pact/scripts      ->     ScrDir
+#   ..../pact/<pkg>        ->     PkgDir
+#   ..../pact/dev          ->     DevDir
+#   ..../pact/dev/$sys_id  ->     SYS_Dir
 
 set DevDir  = $BaseDir/dev
-set SysDir  = $DevDir/$SYS_ID
-set IncDir  = $SysDir/include
-set BinDir  = $SysDir/bin
-set LibDir  = $SysDir/lib
-set EtcDir  = $SysDir/etc
-set LogDir  = $SysDir/log
-set ScmDir  = $SysDir/scheme
+set IncDir  = $SYS_Dir/include
+set BinDir  = $SYS_Dir/bin
+set LibDir  = $SYS_Dir/lib
+set EtcDir  = $SYS_Dir/etc
+set LogDir  = $SYS_Dir/log
+set ScmDir  = $SYS_Dir/scheme
 set PACT    = $BinDir/pact
 set EnvCsh  = $EtcDir/env-pact.csh
 
@@ -276,12 +276,14 @@ switch ($Cmnd)
            shift
         end
 
+        set DevDir = $BaseDir/dev
+
         setenv SYS_ID  `$CfgMan -d ../dev use`
-        set DevDir  = $BaseDir/dev
-        set SysDir  = $DevDir/$SYS_ID
-        set BinDir  = $SysDir/bin
-        set EtcDir  = $SysDir/etc
-        set LogDir  = $SysDir/log
+        setenv SYS_Dir $DevDir/$SYS_ID
+
+        set BinDir  = $SYS_Dir/bin
+        set EtcDir  = $SYS_Dir/etc
+        set LogDir  = $SYS_Dir/log
 
         InitLog Log $LogDir/build
 
@@ -880,17 +882,17 @@ switch ($Cmnd)
         setenv DSYS_TARGET pact_config
 
 # set the configuration for this system
-        setenv SYS_ID `$CfgMan use`
+        setenv SYS_ID  `$CfgMan use`
+        setenv SYS_Dir  $DevDir/$SYS_ID
 
 # now that we have the system, reset the variables that depend on it
-        set SysDir = $DevDir/$SYS_ID
-        set IncDir = $SysDir/include
-        set EtcDir = $SysDir/etc
-        set BinDir = $SysDir/bin
-        set LibDir = $SysDir/lib
-        set ScmDir = $SysDir/scheme
-        set LogDir = $SysDir/log
-        set PACT   = $BinDir/pact
+        set IncDir  = $SYS_Dir/include
+        set EtcDir  = $SYS_Dir/etc
+        set BinDir  = $SYS_Dir/bin
+        set LibDir  = $SYS_Dir/lib
+        set ScmDir  = $SYS_Dir/scheme
+        set LogDir  = $SYS_Dir/log
+        set PACT    = $BinDir/pact
 
         setenv PERDB  $BinDir/perdb
         setenv GEXEC  $BinDir/gexec
@@ -916,7 +918,7 @@ switch ($Cmnd)
         InitLog Log $LogDir/config
 
         Note $Log "SYS_ID    = $SYS_ID"
-        Note $Log "SysDir    = $SysDir"
+        Note $Log "SYS_Dir   = $SYS_Dir"
         Note $Log "Args      = $nargs"
         Note $Log "ConfigDir = $ConfigDir"
 
@@ -1042,7 +1044,7 @@ switch ($Cmnd)
         unsetenv LD_LIBRARY_PATH
         flog $Log ./ccw -g pco.c -o $BinDir/pco
         if ($status == 0) then
-           flog $Log ./ccw -g do-run.c -o $BinDir/do-run
+           flog $Log ./ccw -g -DSYS_Prefix=\"${SYS_Prefix}\" do-run.c -o $BinDir/do-run
            flog $Log ./ccw -g perdb.c -o $BinDir/perdb
            flog $Log ./ccw -g gexec.c -o $BinDir/gexec
            flog $Log ./ccw -g elide.c -o $BinDir/elide
@@ -1480,29 +1482,29 @@ CFG_DONE:
         if (!(-d $DevDir)) then
            mkdir $DevDir
         endif
-        if (!(-d $SysDir)) then
-           mkdir $SysDir
+        if (!(-d $SYS_Dir)) then
+           mkdir $SYS_Dir
         endif
-        if (!(-d $SysDir/bin)) then
-           mkdir $SysDir/bin
+        if (!(-d $SYS_Dir/bin)) then
+           mkdir $SYS_Dir/bin
         endif
-        if (!(-d $SysDir/lib)) then
-           mkdir $SysDir/lib
+        if (!(-d $SYS_Dir/lib)) then
+           mkdir $SYS_Dir/lib
         endif
-        if (!(-d $SysDir/include)) then
-           mkdir $SysDir/include
+        if (!(-d $SYS_Dir/include)) then
+           mkdir $SYS_Dir/include
         endif
-        if (!(-d $SysDir/etc)) then
-           mkdir $SysDir/etc
+        if (!(-d $SYS_Dir/etc)) then
+           mkdir $SYS_Dir/etc
         endif
-        if (!(-d $SysDir/scheme)) then
-           mkdir $SysDir/scheme
+        if (!(-d $SYS_Dir/scheme)) then
+           mkdir $SYS_Dir/scheme
         endif
-        if (!(-d $SysDir/scheme/extensions)) then
-           mkdir $SysDir/scheme/extensions
+        if (!(-d $SYS_Dir/scheme/extensions)) then
+           mkdir $SYS_Dir/scheme/extensions
         endif
-        if (!(-d $SysDir/log)) then
-           mkdir $SysDir/log
+        if (!(-d $SYS_Dir/log)) then
+           mkdir $SYS_Dir/log
         endif
 
         breaksw
@@ -1695,12 +1697,12 @@ CFG_DONE:
                    breaksw
 
               case -x:
-                   setenv SYS_ID  `$CfgMan use`
-                   set SysDir  = $DevDir/$SYS_ID
-                   set IncDir  = $SysDir/include
-                   set Pck     = `cat $EtcDir/package`
+                   setenv SYS_ID   `$CfgMan use`
+                   setenv SYS_Dir  $DevDir/$SYS_ID
+                   set IncDir = $SYS_Dir/include
+                   set Pck    = `cat $EtcDir/package`
                    pushd .. >& /dev/null
-                   set NB = `du -sb $Pck manager python $SysDir | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
+                   set NB = `du -sb $Pck manager python $SYS_Dir | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
                    popd >& /dev/null
                    echo "Approximately $NB MB of sources, objects, libraries, and binaries"
                    exit(0)
@@ -1970,12 +1972,14 @@ CFG_DONE:
            shift
         end
 
-        setenv SYS_ID  `$CfgMan -d ../dev use`
-        set DevDir  = $BaseDir/dev
-        set SysDir  = $DevDir/$SYS_ID
-        set BinDir  = $SysDir/bin
-        set EtcDir  = $SysDir/etc
-        set LogDir  = $SysDir/log
+        set DevDir = $BaseDir/dev
+
+        setenv SYS_ID   `$CfgMan -d ../dev use`
+        setenv SYS_Dir  $DevDir/$SYS_ID
+
+        set BinDir  = $SYS_Dir/bin
+        set EtcDir  = $SYS_Dir/etc
+        set LogDir  = $SYS_Dir/log
 
         setenv GEXEC   $BinDir/gexec
         setenv PATH    ${BinDir}:${PATH}
@@ -2375,15 +2379,17 @@ CFG_DONE:
            shift
         end
 
-        setenv SYS_ID  `$CfgMan -d ../dev use`
         set DevDir  = $BaseDir/dev
-        set SysDir  = $DevDir/$SYS_ID
-        set BinDir  = $SysDir/bin
-        set IncDir  = $SysDir/include
-        set LibDir  = $SysDir/lib
-        set EtcDir  = $SysDir/etc
-        set ScmDir  = $SysDir/scheme
-        set LogDir  = $SysDir/log
+
+        setenv SYS_ID   `$CfgMan -d ../dev use`
+        setenv SYS_Dir  $DevDir/$SYS_ID
+
+        set BinDir  = $SYS_Dir/bin
+        set IncDir  = $SYS_Dir/include
+        set LibDir  = $SYS_Dir/lib
+        set EtcDir  = $SYS_Dir/etc
+        set ScmDir  = $SYS_Dir/scheme
+        set LogDir  = $SYS_Dir/log
 
         InitLog Log $LogDir/remove
 
@@ -2541,9 +2547,10 @@ CFG_DONE:
         flog $Log $RM ../*/$SYS_TmpDir/obj/*.[cfo] ../*/$SYS_TmpDir/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
         flog $Log $RM ../sx/$SYS_TmpDir/obj/*.[cfo]
+        flog $Log $RMDir ../$SYS_TmpDir ../.pc-
 
 # check the result
-        flog $Log ls -lR $SysDir
+        flog $Log ls -lR $SYS_Dir
 
         set RStatus = $status
 
@@ -3047,15 +3054,17 @@ CFG_DONE:
            shift
         end
 
-        setenv SYS_ID  `$CfgMan -d ../dev use`
-        set DevDir  = $BaseDir/dev
-        set SysDir  = $DevDir/$SYS_ID
-        set BinDir  = $SysDir/bin
-        set IncDir  = $SysDir/include
-        set LibDir  = $SysDir/lib
-        set EtcDir  = $SysDir/etc
-        set ScmDir  = $SysDir/scheme
-        set LogDir  = $SysDir/log
+        set DevDir = $BaseDir/dev
+
+        setenv SYS_ID   `$CfgMan -d ../dev use`
+        setenv SYS_Dir  $DevDir/$SYS_ID
+
+        set BinDir  = $SYS_Dir/bin
+        set IncDir  = $SYS_Dir/include
+        set LibDir  = $SYS_Dir/lib
+        set EtcDir  = $SYS_Dir/etc
+        set ScmDir  = $SYS_Dir/scheme
+        set LogDir  = $SYS_Dir/log
 
         set BeginTime = `$TIMER -r`
 

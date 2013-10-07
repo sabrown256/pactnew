@@ -44,6 +44,7 @@ while ($#argv > 0)
    shift
 end
 
+# see if there is an env-pact.csh to be found
 set dir    = ""
 set etcdir = $bindir:h/etc
 if ("$dbdir" != "") then
@@ -52,16 +53,19 @@ else if (-f $etcdir/env-pact.csh) then
    set dir = $etcdir
 endif
 
+# from env-pact.csh
 if ("$dir" != "") then
-
    eval `grep SYS_ $dir/env-pact.csh | awk '{printf("%s ; \n", $0);}'`
 
+# best defaults
 else
+   set basedir = $bindir:h
 
    setenv SYS_Arch    `system-id`
    setenv SYS_ID      `cfgman -d ../dev use`
-   setenv SYS_TYPE    ""
-   setenv SYS_SITE    ""
+   setenv SYS_TYPE    ${SYS_Arch}
+   setenv SYS_SITE    LONER
+   setenv SYS_Dir     $basedir/dev/${SYS_ID}
    setenv SYS_Prefix  "z-"
    setenv SYS_CfgDir  cfg-${SYS_ID}
    setenv SYS_TmpDir  ${SYS_Prefix}${SYS_ID}
@@ -72,6 +76,7 @@ echo "setenv SYS_Arch    $SYS_Arch ; "
 echo "setenv SYS_ID      $SYS_ID ; "
 echo "setenv SYS_TYPE    $SYS_TYPE ; "
 echo "setenv SYS_SITE    $SYS_SITE ; "
+echo "setenv SYS_Dir     $SYS_Dir ; "
 echo "setenv SYS_Prefix  $SYS_Prefix ; "
 echo "setenv SYS_CfgDir  $SYS_CfgDir ; "
 echo "setenv SYS_TmpDir  $SYS_TmpDir"
