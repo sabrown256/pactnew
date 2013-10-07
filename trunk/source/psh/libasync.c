@@ -1769,9 +1769,15 @@ void asetup(int n, int na)
 
     st->ifd = 0;
     st->nfd = m;
-    st->fd  = MAKE_N(apollfd, m);
-    st->map = MAKE_N(int, m);
-    st->io  = MAKE_N(int, m);
+
+/* GOTCHA: valgrind claims that we access st->map[nfd] and st->io[nfd]
+ * in _apoll_child in the for (ifd ... ) loop
+ * while running do-net
+ * so allocate one extra element until we find the problem
+ */
+    st->fd  = MAKE_N(apollfd, m+1);
+    st->map = MAKE_N(int, m+1);
+    st->io  = MAKE_N(int, m+1);
 
 /* everything else */
     st->nattempt = na;

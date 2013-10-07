@@ -30,7 +30,8 @@ if ($?USER == 0) then
    endif
 endif
 
-setenv SYS_ID `$ScrDir/cfgman use`
+eval `$ScrDir/cfgsys`
+
 set Manager       = manager
 set Exe           = $MngDir/$0
 set DTag          = ( `./pact-get-tag -d` )
@@ -46,7 +47,6 @@ set TmpFile       = tmp-file
 set TmpDir        = tmp-dir
 set Host          = `uname -n`
 set OS            = `uname -s | tr "[A-Z]" "[a-z]"`
-set SYS_Prefix    = "z-"
 
 set LLNL             = FALSE
 set KEEP             = FALSE

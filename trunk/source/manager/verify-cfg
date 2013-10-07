@@ -6,15 +6,15 @@
 
 unalias *
 
-set sys_id   = `../scripts/cfgman use`
-set SysDir = ""
-set Err    = 0
+set sys_id  = `../scripts/cfgman use`
+set sys_dir = ""
+set Err     = 0
 
 while ($#argv > 0)
    switch ($1)
       case -b:
            shift
-           set SysDir = $1
+           set sys_dir = $1
            breaksw
       case -h:
            echo ""
@@ -31,14 +31,14 @@ while ($#argv > 0)
    shift
 end
 
-if ("$SysDir" == "") then
-   set SysDir = $cwd:h/dev/$sys_id
+if ("$sys_dir" == "") then
+   set sys_dir = $cwd:h/dev/$sys_id
 endif
 
-set CfgLog = $SysDir/log/config
-set BinDir = $SysDir/bin
-set IncDir = $SysDir/include
-set EtcDir = $SysDir/etc
+set CfgLog = $sys_dir/log/config
+set BinDir = $sys_dir/bin
+set IncDir = $sys_dir/include
+set EtcDir = $sys_dir/etc
 
 source ../scripts/functions-pact.csh
 
@@ -47,7 +47,7 @@ InitLog Log $cwd/log.verify-cfg.$sys_id
 set Cfg = `awk '$2 ~ /SCCONFIG.H/ { print $7 }' $IncDir/scconfig.h`
 
 NoteD $Log ""
-NoteD $Log "Verifying configuration $Cfg in $SysDir"
+NoteD $Log "Verifying configuration $Cfg in $sys_dir"
 
 # Debug/Optimize
 Separator $Log

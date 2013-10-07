@@ -20,7 +20,7 @@ dbmget $ALog CFE^                          \
              Cfe_LD_RPath^                 \
              STD_F^                        \
              HAVE_FORTRAN^                 \
-             SysDir
+             SYS_Dir
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -94,7 +94,7 @@ if ($HAVE_FORTRAN == TRUE) then
       endif
 
       if ((-f f90types.h) && (-f f90kinds.inc)) then
-         flog $ALog mv f90types.h f90kinds.inc $SysDir/include
+         flog $ALog mv f90types.h f90kinds.inc $SYS_Dir/include
       endif
 
    endif

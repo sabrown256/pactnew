@@ -2958,6 +2958,27 @@ void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MEM_CHK - crude memory check */
+
+int mem_chk(int fl)
+   {int i, n, rv;
+    char *p;
+    static int sz[] = { 1, 101, 1001, 10001 };
+
+    rv = 0;
+
+    n = sizeof(sz)/sizeof(int);
+
+    for (i = 0; i < n; i++)
+        {p = malloc(sz[i]);
+	 rv += (p != NULL);
+	 free(p);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* undefine when passing out of SCOPE_SCORE_COMPILE */
 
 #undef UNDEFINED

@@ -11,6 +11,8 @@
 
 unalias *
 
+set bindir = `dirname $0`
+
 @ section = 3
 
 while ($#argv)
@@ -35,12 +37,10 @@ while ($#argv)
    shift
 end
 
-set SYS_ID     = ( `cfgman use` )
-set SYS_Prefix = "z-"
-set SYS_TmpDir = ${SYS_Prefix}${SYS_ID}
+eval `$bindir/cfgsys`
 
 set sdir = $SYS_TmpDir/obj
-set ddir = ../dev/$SYS_ID/man/man$section
+set ddir = $SYS_Dir/man/man$section
 pushd $ddir >& /dev/null
 set ddir = $cwd
 popd >& /dev/null

@@ -39,8 +39,9 @@ set nsys = $osys-$cfg:t
 setenv SESSION_CONFIG      $nsys
 setenv SC_EXEC_N_ATTEMPTS  1
 
-set tsys = `cfgman use`
-set tdir = z-$tsys
+eval `../scripts/cfgsys`
+set tsys = $SYS_ID
+set tdir = $SYS_TmpDir
 
 source ../scripts/functions-pact.csh
 

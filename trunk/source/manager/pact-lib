@@ -33,15 +33,15 @@ end
 setenv OS_Name  `uname -s`
 
 set MngDir = $cwd
-setenv SYS_ID  `../scripts/cfgman use`
+
+eval `../scripts/cfgsys`
 
 set BaseDir = $MngDir:h
 set DevDir  = $BaseDir/dev
-set SysDir  = $DevDir/$SYS_ID
-set IncDir  = $SysDir/include
-set BinDir  = $SysDir/bin
-set LibDir  = $SysDir/lib
-set EtcDir  = $SysDir/etc
+set IncDir  = $SYS_Dir/include
+set BinDir  = $SYS_Dir/bin
+set LibDir  = $SYS_Dir/lib
+set EtcDir  = $SYS_Dir/etc
 setenv ScrDir $BaseDir/scripts
 
 source $EtcDir/env-pact.csh

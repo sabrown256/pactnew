@@ -18,7 +18,7 @@ dbmget $Log HAVE_FORTRAN^     \
             MAKE_Exe^         \
             MAKE_Shared_Libs^ \
             BaseDir^          \
-            SysDir^           \
+            SYS_Dir^          \
             SYS_ID^           \
             PY_Exe^           \
             PY_Ext^           \
@@ -181,7 +181,7 @@ dbmget $Log HAVE_FORTRAN^     \
 Note $Log "Install shell includes from psh"
 
 flog $Log pushd $BaseDir/psh
-flog $Log $MAKE_Exe IncDir=$SysDir/include -f pre-Make mkinstall
+flog $Log $MAKE_Exe IncDir=$SYS_Dir/include -f pre-Make mkinstall
 flog $Log popd
 
 #--------------------------------------------------------------------------

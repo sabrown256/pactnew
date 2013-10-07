@@ -73,7 +73,7 @@ Note $Log "   lpactver      = |$lpactver|"
        endif
 
        if (-d $InstBase/include) then
-          sed "s|$SysDir|$InstBase|" $EtcDir/make-def > $InstBase/etc/make-def
+          sed "s|$SYS_Dir|$InstBase|" $EtcDir/make-def > $InstBase/etc/make-def
           flog $Log cp $EtcDir/make-macros $InstBase/etc/make-macros
        endif
     endif

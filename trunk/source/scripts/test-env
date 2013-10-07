@@ -93,13 +93,13 @@ setenv ZeroSpace  "-z 2"
 #   popd >& /dev/null
 
    setenv SYS_ID    `$BaseDir/scripts/cfgman use`
-   setenv SysDir    $BaseDir/dev/$SYS_ID
+   setenv SYS_Dir   $BaseDir/dev/$SYS_ID
    setenv SrcDir    $BaseDir/$Package
 
-   setenv EtcDir    $SysDir/etc
-   setenv IncDir    $SysDir/include
-   setenv LibDir    $SysDir/lib
-   setenv BinDir    $SysDir/bin
+   setenv EtcDir    $SYS_Dir/etc
+   setenv IncDir    $SYS_Dir/include
+   setenv LibDir    $SYS_Dir/lib
+   setenv BinDir    $SYS_Dir/bin
 
    setenv TestDir   $SrcDir/$SYS_TmpDir/test
    setenv FilesDir  $SrcDir/tests
@@ -175,7 +175,7 @@ else
    setenv SCHEME $BaseDir/panacea/applications:${SCHEME}
 endif
 
-setenv SCHEME $SysDir/scheme:${SCHEME}
+setenv SCHEME $SYS_Dir/scheme:${SCHEME}
 
 # test inside a subdirectory
 if (!(-d $TestDir)) then
@@ -235,7 +235,7 @@ Note $Log ""
 Note $Log "Directories:"
 Note $Log "BaseDir    = |$BaseDir|"
 Note $Log "SYS_ID     = |$SYS_ID|"
-Note $Log "SysDir     = |$SysDir|"
+Note $Log "SYS_Dir    = |$SYS_Dir|"
 Note $Log "SrcDir     = |$SrcDir|"
 Note $Log "IncDir     = |$IncDir|"
 Note $Log "LibDir     = |$LibDir|"
