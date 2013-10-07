@@ -23,6 +23,8 @@ end
 source $TestScrDir/functions-pact.csh
 setenv TEST_CHECK $TestScrDir/test-check
 
+eval `$TestScrDir/cfgsys`
+
 if ($?TEST_ADVISORY == 0) then
    setenv TEST_ADVISORY
 endif
@@ -92,8 +94,6 @@ setenv ZeroSpace  "-z 2"
 #   setenv BaseDir  $cwd
 #   popd >& /dev/null
 
-   setenv SYS_ID    `$BaseDir/scripts/cfgman use`
-   setenv SYS_Dir   $BaseDir/dev/$SYS_ID
    setenv SrcDir    $BaseDir/$Package
 
    setenv EtcDir    $SYS_Dir/etc

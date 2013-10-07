@@ -28,15 +28,26 @@ set path = ( $bindir /usr/bin /bin )
 set dbdir = ""
 while ($#argv > 0)
    switch ($1)
+      case -c:
+           unsetenv SYS_Arch
+           unsetenv SYS_ID
+           unsetenv SYS_TYPE
+           unsetenv SYS_SITE
+           unsetenv SYS_Dir
+           unsetenv SYS_Prefix
+           unsetenv SYS_CfgDir
+           unsetenv SYS_TmpDir
+           breaksw
       case -d:
            shift
            set dbdir = $1
            breaksw
       case -h:
            echo ""
-           echo "Usage: cfgsys [-d <dir>] [-h]"
+           echo "Usage: cfgsys [-c] [-d <dir>] [-h]"
            echo ""
-           echo "  d    directory where database lives"
+           echo "  c    clear all SYS group variables first"
+           echo '  d    directory where database lives (i.e. .../pact/dev/$sys_id/etc)'
            echo "  h    this help message"
            echo ""
            exit(1)
@@ -61,14 +72,38 @@ if ("$dir" != "") then
 else
    set basedir = $bindir:h
 
-   setenv SYS_Arch    `system-id`
-   setenv SYS_ID      `cfgman -d ../dev use`
-   setenv SYS_TYPE    ${SYS_Arch}
-   setenv SYS_SITE    LONER
-   setenv SYS_Dir     $basedir/dev/${SYS_ID}
-   setenv SYS_Prefix  "z-"
-   setenv SYS_CfgDir  cfg-${SYS_ID}
-   setenv SYS_TmpDir  ${SYS_Prefix}${SYS_ID}
+   if ($?SYS_Arch == 0) then
+      setenv SYS_Arch    `system-id`
+   endif
+
+   if ($?SYS_ID == 0) then
+      setenv SYS_ID      `cfgman -d ../dev use`
+   endif
+
+   if ($?SYS_TYPE == 0) then
+      setenv SYS_TYPE    ${SYS_Arch}
+   endif
+
+   if ($?SYS_SITE == 0) then
+      setenv SYS_SITE    LONER
+   endif
+
+   if ($?SYS_Dir == 0) then
+      setenv SYS_Dir     $basedir/dev/${SYS_ID}
+   endif
+
+   if ($?SYS_Prefix == 0) then
+      setenv SYS_Prefix  "z-"
+   endif
+
+   if ($?SYS_CfgDir == 0) then
+      setenv SYS_CfgDir  cfg-${SYS_ID}
+   endif
+
+   if ($?SYS_TmpDir == 0) then
+      setenv SYS_TmpDir  ${SYS_Prefix}${SYS_ID}
+   endif
+
 
 endif
 
