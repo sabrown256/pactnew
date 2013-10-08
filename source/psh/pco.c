@@ -2365,10 +2365,8 @@ static void parse_features(char *t, int nc, int np, char *ft)
 	     else
 	        vstrcat(t, nc, "-%s", tk);};}
 
-/* if there are no specifications for a different platform
- * NOTE: with the new way only attach features to specific platforms
- */
-    else if ((has_other == FALSE) && 0)
+/* if there are no specifications for a different platform */
+    else if (has_other == FALSE)
        {for (i = 0; i < nt; i++)
 	    vstrcat(t, nc, "-%s", lst[i]);};
 
@@ -3448,7 +3446,7 @@ int main(int c, char **v, char **env)
 
     summarize_config(cl);
 
-    pco_save_db(cl, "db");
+    pco_save_db(cl, NULL);
 
     finish_config(cl, base);
 
