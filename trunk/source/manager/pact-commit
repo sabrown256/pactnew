@@ -51,7 +51,7 @@ set CfgMan    = $ScrDir/cfgman
 
 eval `$ScrDir/cfgsys`
 
-set UpdateLog = $SYS_Dir/log/update
+set UpdateLog = $SYS_Root/log/update
 set Changed   = $MngDir/Changed
 set UnChanged = $MngDir/UnChanged
 
@@ -62,7 +62,7 @@ set Sleep         = "NO"
 
 set CleanBuild   = FALSE
 
-InitLog Log $SYS_Dir/log/commit
+InitLog Log $SYS_Root/log/commit
 
 switch ($OS)
    case irix:

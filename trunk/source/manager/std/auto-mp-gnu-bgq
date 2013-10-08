@@ -10,6 +10,6 @@
 include auto-gnu-64-py
 include cross-gnu-bgq
 
-#platform auto-gnu-64-py    bgqgs   ${InstBase}
-#platform auto-gnu-bgq-mpi  bgqg    ${InstBase}-mpi
+#platform auto-gnu-64-py    bgqgs   ${SYS_InstRoot}
+#platform auto-gnu-bgq-mpi  bgqg    ${SYS_InstRoot}-mpi
 

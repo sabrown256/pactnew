@@ -96,10 +96,10 @@ setenv ZeroSpace  "-z 2"
 
    setenv SrcDir    $BaseDir/$Package
 
-   setenv EtcDir    $SYS_Dir/etc
-   setenv IncDir    $SYS_Dir/include
-   setenv LibDir    $SYS_Dir/lib
-   setenv BinDir    $SYS_Dir/bin
+   setenv EtcDir    $SYS_Root/etc
+   setenv IncDir    $SYS_Root/include
+   setenv LibDir    $SYS_Root/lib
+   setenv BinDir    $SYS_Root/bin
 
    setenv TestDir   $SrcDir/$SYS_TmpDir/test
    setenv FilesDir  $SrcDir/tests
@@ -175,7 +175,7 @@ else
    setenv SCHEME $BaseDir/panacea/applications:${SCHEME}
 endif
 
-setenv SCHEME $SYS_Dir/scheme:${SCHEME}
+setenv SCHEME $SYS_Root/scheme:${SCHEME}
 
 # test inside a subdirectory
 if (!(-d $TestDir)) then
@@ -235,7 +235,7 @@ Note $Log ""
 Note $Log "Directories:"
 Note $Log "BaseDir    = |$BaseDir|"
 Note $Log "SYS_ID     = |$SYS_ID|"
-Note $Log "SYS_Dir    = |$SYS_Dir|"
+Note $Log "SYS_Root   = |$SYS_Root|"
 Note $Log "SrcDir     = |$SrcDir|"
 Note $Log "IncDir     = |$IncDir|"
 Note $Log "LibDir     = |$LibDir|"
@@ -278,8 +278,8 @@ endif
 if ($?DO_RUN_SUBMIT_ENV == 1) then
    Note $Log "DO_RUN_SUBMIT_ENV = |$DO_RUN_SUBMIT_ENV|"
 endif
-if ($?RUN_SIGNATURE_DB == 1) then
-   Note $Log "RUN_SIGNATURE_DB  = $RUN_SIGNATURE_DB"
+if ($?DB_RUN_SIGNATURE == 1) then
+   Note $Log "DB_RUN_SIGNATURE  = $DB_RUN_SIGNATURE"
 endif
 
 flog $Log ( where pact | head -n 1 )

@@ -18,7 +18,7 @@ dbmget $Log HAVE_FORTRAN^     \
             MAKE_Exe^         \
             MAKE_Shared_Libs^ \
             BaseDir^          \
-            SYS_Dir^          \
+            SYS_Root^         \
             SYS_ID^           \
             PY_Exe^           \
             PY_Ext^           \
@@ -127,7 +127,7 @@ dbmget $Log HAVE_FORTRAN^     \
              flog $ALog mkdir -p $ldp
 
              NoteD $Log "      $lex -> $lds"
-             if ("$InstBase" != none) then
+             if ("$SYS_InstRoot" != none) then
                 NoteD $Log "   Python bindings will be installed in:"
                 NoteD $Log "      $ldd"
                 if (-d $ldp) then
@@ -181,7 +181,7 @@ dbmget $Log HAVE_FORTRAN^     \
 Note $Log "Install shell includes from psh"
 
 flog $Log pushd $BaseDir/psh
-flog $Log $MAKE_Exe IncDir=$SYS_Dir/include -f pre-Make mkinstall
+flog $Log $MAKE_Exe IncDir=$SYS_Root/include -f pre-Make mkinstall
 flog $Log popd
 
 #--------------------------------------------------------------------------

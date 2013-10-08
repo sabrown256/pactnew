@@ -2,4 +2,4 @@
 # CROSS-PGI-CXE - add PGI-CXE as a CROSS-COMPILEd second platform 
 #
 
-platform auto-pgi-cxe-64-mpi  cxep    ${InstBase}-mpi
+platform auto-pgi-cxe-64-mpi  cxep    ${SYS_InstRoot}-mpi

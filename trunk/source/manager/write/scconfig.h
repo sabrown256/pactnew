@@ -37,7 +37,6 @@ dbmget $Log BFD_Version^              \
             FC_ID_UNDERSCORE^         \
             FC_INT_PTR_DIFFER^        \
             FC_INTEGER_C^             \
-            FilterDir^                \
             FPU^                      \
             GETSOCKOPT_TYPE^          \
             OS_Name^                  \
@@ -56,7 +55,6 @@ dbmget $Log BFD_Version^              \
             PTHREAD_POSIX^            \
             OS_Type^                  \
             OSX_Version^              \
-            Sys^                      \
             TRACKER_Exe^              \
             MYSQL_SO^                 \
             SQLITE3_SO^               \
@@ -114,6 +112,8 @@ dbmget $Log BFD_Version^              \
             Std_UseOGL^               \
             Std_UseQD^                \
             SYS_Arch^                 \
+            SYS_Cfg^                  \
+            SYS_FltDir^               \
             SYS_ID^                   \
             SYS_TYPE^                 \
             SYS_Prefix^               \
@@ -128,7 +128,7 @@ dbmget $Log BFD_Version^              \
     flog $Log touch $STDOUT
 
     Note $STDOUT "/*"
-    Note $STDOUT " * SCCONFIG.H - configuration defined by $Sys"
+    Note $STDOUT " * SCCONFIG.H - configuration defined by $SYS_Cfg"
     Note $STDOUT " *            - defines the following configuration parameters for PACT"
     Note $STDOUT " *"
     Note $STDOUT " * Source Version: 3.0"
@@ -164,8 +164,8 @@ dbmget $Log BFD_Version^              \
 
     Note $STDOUT '#define DEFAULT_SHELL       '$QUOTE${DEFAULT_SHELL}$QUOTE
 
-    if ("$FilterDir" != "") then
-       set FiltFile = $FilterDir/$SYS_Arch
+    if ("$SYS_FltDir" != "") then
+       set FiltFile = $SYS_FltDir/$SYS_Arch
        Note $STDOUT '#define MAKE_FILTER_FILE    '$QUOTE${FiltFile}$QUOTE
     endif
 

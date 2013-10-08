@@ -34,7 +34,7 @@ dbmget $Log Bits^              \
             INSTALL^           \
             NoExe^             \
             Ranlib_Exe^        \
-            Sys^               \
+            SYS_Cfg^           \
             SYS_TYPE^          \
             UPDATE
 
@@ -54,7 +54,7 @@ set LibVers = 1
     flog $Log touch $STDOUT
 
     Note $STDOUT '#'
-    Note $STDOUT '# MAKE-MACROS - PACT Makefile macros for '$Sys
+    Note $STDOUT '# MAKE-MACROS - PACT Makefile macros for '$SYS_Cfg
     Note $STDOUT '#'
     Note $STDOUT ""
 

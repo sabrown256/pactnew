@@ -502,14 +502,14 @@ int main(int c, char **v)
     SC_putenv(s);
 
     if (file == NULL)
-       file = getenv("HOST_SERVER_DB");
+       file = getenv("DB_HOST_SERVER");
 
     st = SC_host_server_init(file, FALSE, vrb);
     if (st == FALSE)
        {if (file == NULL)
-           io_printf(stdout, "No HOST_SERVER_DB specified - exiting\n");
+           io_printf(stdout, "No DB_HOST_SERVER specified - exiting\n");
         else
-           io_printf(stdout, "Unable to use %s for HOST_SERVER_DB - exiting\n",
+           io_printf(stdout, "Unable to use %s for DB_HOST_SERVER - exiting\n",
 		     file);
         return(1);};
 

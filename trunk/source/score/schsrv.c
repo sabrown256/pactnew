@@ -391,7 +391,7 @@ int SC_host_server_init(char *file, int reset, int vrb)
        SC_host_server_fin();
 
     if (file == NULL)
-       file = getenv("HOST_SERVER_DB");
+       file = getenv("DB_HOST_SERVER");
 
     if (_SC.hsst == NULL)
        {if ((file != NULL) && (SC_isfile(file)))

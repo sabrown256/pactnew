@@ -25,7 +25,7 @@ Note $Log ""
 
 dbmget $Log BaseDir^    \
             IncDir^     \
-            Sys^        \
+            SYS_Cfg^    \
             Yacc_Exe^   \
             BackSlash
 
@@ -38,7 +38,7 @@ dbmget $Log BaseDir^    \
     flog $Log touch $STDOUT
 
     Note $STDOUT "/*"
-    Note $STDOUT " * SYNTAX.H - Configure SCHEME Syntax Modes for $Sys"
+    Note $STDOUT " * SYNTAX.H - Configure SCHEME Syntax Modes for $SYS_Cfg"
     Note $STDOUT " *"
     Note $STDOUT " * Source Version: 5.0"
     Note $STDOUT " * Software Release #: LLNL-CODE-422942"

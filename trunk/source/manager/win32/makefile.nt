@@ -2,10 +2,10 @@
 # Makefile for the PACT Distribution
 #
 
-RootDr = f:\home\minner\pact
-PactDir = $(RootDr)
-InstDir = $(RootDr)\dev
-MANAGER = $(PactDir)\manager
+RootDr   = f:\home\minner\pact
+PactDir  = $(RootDr)
+InstRoot = $(RootDr)\dev
+MANAGER  = $(PactDir)\manager
 
 pact :
 	@echo Building Pact ...
@@ -86,8 +86,8 @@ ultra :
 	@echo ULTRA installed
 
 install:
-	cp scdecls.h scconfig.h cpyright.h $(InstDir)\include
-	cp pupdate.bat $(InstDir)\bin
+	cp scdecls.h scconfig.h cpyright.h $(InstRoot)\include
+	cp pupdate.bat $(InstRoot)\bin
 
 makes :
 	@echo Making Pact Makefiles ...

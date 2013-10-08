@@ -57,8 +57,8 @@ foreach d ( * )
 end
 popd >>& /dev/null
 
-if ($?DAS_ROOT == 1) then
-   set lst = ( $lst $DAS_ROOT/pactnew/bin $DAS_ROOT/pact/bin )
+if ($?SYS_ASRoot == 1) then
+   set lst = ( $lst $SYS_ASRoot/pactnew/bin $SYS_ASRoot/pact/bin )
 endif
 
 # GOTCHA: this is very weak logic in a do-net situation

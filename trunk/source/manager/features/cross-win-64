@@ -2,6 +2,6 @@
 # CROSS-WIN-64 - add WIN-64 as a CROSS-COMPILEd second platform 
 #
 
-# platform <cfg> <alias> <instbase> [<args>*]
-platform win-64  win64  ${InstBase}/../win64
+# platform <cfg> <alias> <SYS_InstRoot> [<args>*]
+platform win-64  win64  ${SYS_InstRoot}/../win64
 

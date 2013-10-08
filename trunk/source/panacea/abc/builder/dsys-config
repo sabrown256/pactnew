@@ -182,7 +182,7 @@ set FcFlags =
     echo 'DevInc = ${DevDir}/include' >>& $STDOUT
     echo '' >>& $STDOUT
 
-    echo 'PACTDir = ${SYS_Dir}' >>& $STDOUT
+    echo 'PACTDir = ${SYS_Root}' >>& $STDOUT
     echo 'PACTInc = ${PACTDir}/include' >>& $STDOUT
     echo 'PACTLib = ${PACTDir}/lib' >>& $STDOUT
     echo 'PANACHE = ${PACTDir}/bin/panache' >>& $STDOUT

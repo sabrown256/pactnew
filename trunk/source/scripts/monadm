@@ -66,12 +66,12 @@ end
 # SETUP
 
 date
-if ($?HOST_SERVER_DB == 0) then
-   setenv HOST_SERVER_DB /usr/gapps/pact/db/host-server-db
+if ($?DB_HOST_SERVER == 0) then
+   setenv DB_HOST_SERVER /usr/gapps/pact/db/host-server-db
 endif
-echo "HOST_SERVER_DB = $HOST_SERVER_DB"
+echo "DB_HOST_SERVER = $DB_HOST_SERVER"
 
-set dat = ( `grep '\.net' $HOST_SERVER_DB` )
+set dat = ( `grep '\.net' $DB_HOST_SERVER` )
 set net = $dat[2]
 unset dat
 echo "Default net = $net"

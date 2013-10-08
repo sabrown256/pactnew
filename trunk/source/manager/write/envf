@@ -20,16 +20,16 @@ set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
 source $ldir/functions-pact.csh
 
-dbmget $Log MDG_Pck^         \
-             HAVE_OPENMP^    \
-             HAVE_READLINE^  \
-             HAVE_PYTHON^    \
-             PY_Vers^        \
-             SYS_Dir^        \
-             SYS_SITE^       \
-             SYS_TYPE^       \
-             DAS_ROOT^       \
-             DAI_ROOT
+dbmget $Log MDG_Pck^        \
+            HAVE_OPENMP^    \
+            HAVE_READLINE^  \
+            HAVE_PYTHON^    \
+            PY_Vers^        \
+            SYS_Root^       \
+            SYS_SITE^       \
+            SYS_TYPE^       \
+            SYS_ASRoot^     \
+            SYS_AIRoot
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -49,8 +49,8 @@ dbmget $Log MDG_Pck^         \
     touch $tmpF
     Note $tmpF "setenv SYS_TYPE $SYS_TYPE"
     Note $tmpF "setenv SYS_SITE $SYS_SITE"
-    Note $tmpF "setenv DAS_ROOT $DAS_ROOT"
-    Note $tmpF "setenv DAI_ROOT $DAI_ROOT"
+    Note $tmpF "setenv SYS_ASRoot $SYS_ASRoot"
+    Note $tmpF "setenv SYS_AIRoot $SYS_AIRoot"
 
 # make a temporary approximation to EnvCsh
     cat $SEFile | \
@@ -96,20 +96,20 @@ dbmget $Log MDG_Pck^         \
 
 # emit MANPATH settings
     Note $EnvCsh 'if ($?MANPATH == 1) then'
-    Note $EnvCsh '   setenv MANPATH '$SYS_Dir'/man:$MANPATH'
+    Note $EnvCsh '   setenv MANPATH '$SYS_Root'/man:$MANPATH'
     Note $EnvCsh 'else'
-    Note $EnvCsh '   setenv MANPATH '$SYS_Dir'/man:'
+    Note $EnvCsh '   setenv MANPATH '$SYS_Root'/man:'
     Note $EnvCsh 'endif'
     Note $EnvCsh ""
 
     Note $EnvSh 'if [ "$MANPATH" != "" ]; then'
-    Note $EnvSh "   export MANPATH=$SYS_Dir/man"':$MANPATH'
+    Note $EnvSh "   export MANPATH=$SYS_Root/man"':$MANPATH'
     Note $EnvSh "else"
-    Note $EnvSh "   export MANPATH=$SYS_Dir/man"
+    Note $EnvSh "   export MANPATH=$SYS_Root/man"
     Note $EnvSh "fi"
     Note $EnvSh ""
 
-    Note $EnvDk 'dk_alter MANPATH '$SYS_Dir'/man'
+    Note $EnvDk 'dk_alter MANPATH '$SYS_Root'/man'
     Note $EnvDk ""
 
     if ($?HAVE_PYTHON == 1) then
@@ -135,27 +135,27 @@ dbmget $Log MDG_Pck^         \
           Note $EnvDk  "dk_alter PATH $dir"
        end
        set EPath = `echo "$EPath"':$PATH' | sed 's/::/:/g'`
-       Note $EnvCsh "setenv PATH    $SYS_Dir/bin:${EPath}"
-       Note $EnvSh  "export PATH=$SYS_Dir/bin:${EPath}"
+       Note $EnvCsh "setenv PATH    $SYS_Root/bin:${EPath}"
+       Note $EnvSh  "export PATH=$SYS_Root/bin:${EPath}"
     else
-       Note $EnvCsh 'setenv PATH    '$SYS_Dir'/bin:$PATH'
-       Note $EnvSh 'export PATH='$SYS_Dir'/bin:$PATH'
-       Note $EnvDk 'dk_alter  PATH    '$SYS_Dir'/bin'
+       Note $EnvCsh 'setenv PATH    '$SYS_Root'/bin:$PATH'
+       Note $EnvSh 'export PATH='$SYS_Root'/bin:$PATH'
+       Note $EnvDk 'dk_alter  PATH    '$SYS_Root'/bin'
     endif
 
 # write the CSH version like this because PCSH scripts like
 # PDBView need to get the users SCHEME variable if defined
     Note $EnvCsh 'if ($?SCHEME == 1) then'
-    Note $EnvCsh '   setenv SCHEME  ${SCHEME}:'"$SYS_Dir/scheme"
+    Note $EnvCsh '   setenv SCHEME  ${SCHEME}:'"$SYS_Root/scheme"
     Note $EnvCsh 'else'
-    Note $EnvCsh "   setenv SCHEME  $SYS_Dir/scheme"
+    Note $EnvCsh "   setenv SCHEME  $SYS_Root/scheme"
     Note $EnvCsh 'endif'
-    Note $EnvCsh "setenv ULTRA   $SYS_Dir/scheme"
+    Note $EnvCsh "setenv ULTRA   $SYS_Root/scheme"
 
-    Note $EnvSh "export SCHEME=$SYS_Dir/scheme"
-    Note $EnvSh "export ULTRA=$SYS_Dir/scheme"
-    Note $EnvDk "dk_setenv SCHEME  $SYS_Dir/scheme"
-    Note $EnvDk "dk_setenv ULTRA   $SYS_Dir/scheme"
+    Note $EnvSh "export SCHEME=$SYS_Root/scheme"
+    Note $EnvSh "export ULTRA=$SYS_Root/scheme"
+    Note $EnvDk "dk_setenv SCHEME  $SYS_Root/scheme"
+    Note $EnvDk "dk_setenv ULTRA   $SYS_Root/scheme"
 
     flog $Log cat $EnvCsh
     flog $Log cat $EnvSh

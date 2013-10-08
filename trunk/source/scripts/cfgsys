@@ -33,7 +33,7 @@ while ($#argv > 0)
            unsetenv SYS_ID
            unsetenv SYS_TYPE
            unsetenv SYS_SITE
-           unsetenv SYS_Dir
+           unsetenv SYS_Root
            unsetenv SYS_Prefix
            unsetenv SYS_CfgDir
            unsetenv SYS_TmpDir
@@ -88,8 +88,8 @@ else
       setenv SYS_SITE    LONER
    endif
 
-   if ($?SYS_Dir == 0) then
-      setenv SYS_Dir     $basedir/dev/${SYS_ID}
+   if ($?SYS_Root == 0) then
+      setenv SYS_Root     $basedir/dev/${SYS_ID}
    endif
 
    if ($?SYS_Prefix == 0) then
@@ -104,17 +104,41 @@ else
       setenv SYS_TmpDir  ${SYS_Prefix}${SYS_ID}
    endif
 
+   if ($?SYS_AIRoot == 0) then
+      setenv SYS_AIRoot  /usr/local
+   endif
+
+   if ($?SYS_ASRoot == 0) then
+      setenv SYS_ASRoot  /usr/share
+   endif
+
+   if ($?SYS_Cfg == 0) then
+      setenv SYS_Cfg  ""
+   endif
+
+   if ($?SYS_FltDir == 0) then
+      setenv SYS_FltDir  ""
+   endif
+
+   if ($?SYS_InstRoot == 0) then
+      setenv SYS_InstRoot  none
+   endif
 
 endif
 
-echo "setenv SYS_Arch    $SYS_Arch ; "
-echo "setenv SYS_ID      $SYS_ID ; "
-echo "setenv SYS_TYPE    $SYS_TYPE ; "
-echo "setenv SYS_SITE    $SYS_SITE ; "
-echo "setenv SYS_Dir     $SYS_Dir ; "
-echo "setenv SYS_Prefix  $SYS_Prefix ; "
-echo "setenv SYS_CfgDir  $SYS_CfgDir ; "
-echo "setenv SYS_TmpDir  $SYS_TmpDir"
+echo "setenv SYS_Arch     $SYS_Arch ; "
+echo "setenv SYS_AIRoot   $SYS_AIRoot ; "
+echo "setenv SYS_ASRoot   $SYS_ASRoot ; "
+echo "setenv SYS_Cfg      $SYS_Cfg ; "
+echo "setenv SYS_FltDir   $SYS_FltDir ; "
+echo "setenv SYS_InstRoot $SYS_InstRoot ; "
+echo "setenv SYS_ID       $SYS_ID ; "
+echo "setenv SYS_TYPE     $SYS_TYPE ; "
+echo "setenv SYS_SITE     $SYS_SITE ; "
+echo "setenv SYS_Root     $SYS_Root ; "
+echo "setenv SYS_Prefix   $SYS_Prefix ; "
+echo "setenv SYS_CfgDir   $SYS_CfgDir ; "
+echo "setenv SYS_TmpDir   $SYS_TmpDir"
 
 exit($err)
 

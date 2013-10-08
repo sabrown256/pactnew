@@ -1890,7 +1890,7 @@ static int testhosts(donetdes *st, int c, char **v)
 
 	    if (downonly == FALSE)
 	       printf("Host status (%s):\n",
-		      cgetenv(FALSE, "HOST_SERVER_DB"));
+		      cgetenv(FALSE, "DB_HOST_SERVER"));
 
 	    verifyhosts(st, hs, ns);
 
@@ -1984,7 +1984,7 @@ static void process_var(donetdes *st, char *s)
    {int iv, nv;
     char val[BFLRG];
     char *var, *pv;
-    static char *varl[] = { "HOST_SERVER_DB", "SC_EXEC_TIME_VERIFY" };
+    static char *varl[] = { "DB_HOST_SERVER", "SC_EXEC_TIME_VERIFY" };
 
     if (LAST_CHAR(s) == '\n')
        LAST_CHAR(s) = '\0';

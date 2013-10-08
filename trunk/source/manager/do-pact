@@ -386,7 +386,7 @@ switch ($Phase)
 # configure
 
               if (($IErr == 0) && ($TestOnly == no)) then
-                 set Where = ( -c -i $InstBase )
+                 set Where = ( -c -i $SYS_InstRoot )
                  set Opt   = ( $Opt $Where )
 
                  if ($DeleteOld == yes) then
@@ -655,9 +655,9 @@ switch ($Phase)
 
         flog $LogHost setenv Err  2
 
-        if (($InstBase != none) && ($Cancel == FALSE)) then
+        if (($SYS_InstRoot != none) && ($Cancel == FALSE)) then
 
-           flog $LogHost set WhichType = $InstBase:t
+           flog $LogHost set WhichType = $SYS_InstRoot:t
            if ($WhichType == "pactnew") then
               flog $LogHost set SrcType = "new_sources"
            else if ($WhichType == "pact") then
@@ -750,7 +750,7 @@ switch ($Phase)
         flog $LogHost set path = ( . $WrkDir/dev/$SYS_ID/bin $path )
 
         flog $LogHost setenv Err  2
-        if (($InstBase != none) && (-e "$Passed")) then
+        if (($SYS_InstRoot != none) && (-e "$Passed")) then
            Note $LogHost "Doing dsys install (verbose mode)"
            flog $LogHost ./dsys install
            set xstatus = $status
@@ -761,7 +761,7 @@ switch ($Phase)
                  ./dsys delete $SESSION_CONFIG >& /dev/null
               endif
            else
-              flog $LogHost ls -lR $InstBase
+              flog $LogHost ls -lR $SYS_InstRoot
               flog $LogHost setenv Err  1
               tlog "(LOG)" cat $LogHost
            endif
@@ -795,7 +795,7 @@ GET_NET_ARG:
 
     flog $lFile set Cfg      = none
     flog $lFile set Cancel   = FALSE
-    flog $lFile set InstBase = none
+    flog $lFile set SYS_InstRoot = none
 
     Note $lFile "Get values for get_net_arg from command line"
     while ($#argv > 0)
@@ -823,7 +823,7 @@ GET_NET_ARG:
                flog $LogHost set RawWrkDir = $1
                flog $LogHost shift
                if ($#argv > 0) then 
-                  flog $LogHost set InstBase = $1
+                  flog $LogHost set SYS_InstRoot = $1
                   flog $LogHost shift
                endif
                if ($#argv > 0) then 
@@ -875,7 +875,7 @@ GET_HOST_ARG:
     flog $lFile set SerPar      = s
     flog $lFile set Cfg         = none
     flog $lFile set ParN        = ""
-    flog $lFile set InstBase    = none
+    flog $lFile set SYS_InstRoot    = none
     flog $lFile set UseTmp      = no
     flog $lFile set TestOnly    = no
     flog $lFile set CfgOptions  = ""
@@ -919,7 +919,7 @@ GET_HOST_ARG:
                flog $lFile set ParN = $1
                shift
                if ($#argv == 0) break
-               flog $lFile set InstBase = $1
+               flog $lFile set SYS_InstRoot = $1
                shift
 
 # anything else

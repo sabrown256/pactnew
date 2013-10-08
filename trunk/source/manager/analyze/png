@@ -28,7 +28,7 @@ dbmget $ALog PNG_Inc     =\? ""^        \
              Cfe_LD_Lib^                \
              Cfe_LD_RPath^              \
              PACT_CC_VERSION^           \
-             DAS_ROOT^                  \
+             SYS_ASRoot^                \
              LD_Lib^                    \
              LIB^                       \
              LibM_Lib^                  \
@@ -76,8 +76,8 @@ EOF
       set lLibDirs = ( $lLibDirs $i/lib )
    end
    set lLibDirs = ( $lLibDirs $lrpath )
-   set lLibDirs = ( $lLibDirs $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
-   set lIncDirs = ( $lIncDirs $DAS_ROOT/include /usr/local/include $RootInc )
+   set lLibDirs = ( $lLibDirs $SYS_ASRoot/lib /usr/local/lib /usr/$LIB /$LIB )
+   set lIncDirs = ( $lIncDirs $SYS_ASRoot/include /usr/local/include $RootInc )
 
    set Implicit = FALSE
    set lHdrs    = ( png.h )

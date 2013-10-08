@@ -72,12 +72,12 @@ endif
 
 #--------------------------------------------------------------------------
 
-if ($?SITE_SIGNATURE_DB == 0) then
-   setenv SITE_SIGNATURE_DB ""
+if ($?DB_SITE_SIGNATURE == 0) then
+   setenv DB_SITE_SIGNATURE ""
 endif
 
-if ($?RUN_SIGNATURE_DB == 0) then
-   setenv RUN_SIGNATURE_DB ""
+if ($?DB_RUN_SIGNATURE == 0) then
+   setenv DB_RUN_SIGNATURE ""
 endif
 
 set opt = "$name  $argv"
@@ -293,11 +293,11 @@ while ($#argv > 0)
                    breaksw
               case run:
                    shift
-                   setenv RUN_SIGNATURE_DB $1
+                   setenv DB_RUN_SIGNATURE $1
                    breaksw
               case site:
                    shift
-                   setenv SITE_SIGNATURE_DB $1
+                   setenv DB_SITE_SIGNATURE $1
                    breaksw
            endsw
            breaksw
@@ -572,19 +572,19 @@ flog $Log cd $mngdir
    if ($?SYS_TYPE == 0) then
       setenv SYS_TYPE SYS_TYPE
    endif
-   if ($?DAI_ROOT == 0) then
-      setenv DAI_ROOT DAI_ROOT
+   if ($?SYS_AIRoot == 0) then
+      setenv SYS_AIRoot SYS_AIRoot
    endif
-   if ($?DAS_ROOT == 0) then
-      setenv DAS_ROOT DAS_ROOT
+   if ($?SYS_ASRoot == 0) then
+      setenv SYS_ASRoot SYS_ASRoot
    endif
 
 # settle SITE signature
    Note $Log ""
    set lok = FALSE
-   if ($?SITE_SIGNATURE_DB == 1) then
-      if (-f "$SITE_SIGNATURE_DB") then
-         Note $Log "Setting up site signature using '$SITE_SIGNATURE_DB'"
+   if ($?DB_SITE_SIGNATURE == 1) then
+      if (-f "$DB_SITE_SIGNATURE") then
+         Note $Log "Setting up site signature using '$DB_SITE_SIGNATURE'"
          set lok = TRUE
       endif
    endif
@@ -595,15 +595,15 @@ flog $Log cd $mngdir
    Note $Log "Site signature:"
    Note $Log "   SYS_SITE = $SYS_SITE"
    Note $Log "   SYS_TYPE = $SYS_TYPE"
-   Note $Log "   DAI_ROOT = $DAI_ROOT"
-   Note $Log "   DAS_ROOT = $DAS_ROOT"
+   Note $Log "   SYS_AIRoot = $SYS_AIRoot"
+   Note $Log "   SYS_ASRoot = $SYS_ASRoot"
    Note $Log ""
    unset lok
 
 # settle RUN signature
 # NOTE: essential for cross compiling
-   if (-f "$RUN_SIGNATURE_DB") then
-      Note $Log "Setting up run signature using '$RUN_SIGNATURE_DB'"
+   if (-f "$DB_RUN_SIGNATURE") then
+      Note $Log "Setting up run signature using '$DB_RUN_SIGNATURE'"
    else
       Note $Log "No run signature found"
    endif
@@ -671,7 +671,7 @@ if ($docfg == TRUE) then
    endif
 
    source $envf
-   if (!(-f "$RUN_SIGNATURE_DB")) then
+   if (!(-f "$DB_RUN_SIGNATURE")) then
       set inf = ( `grep CROSS_COMPILE= $etcdir/cfg*.db | grep -v =FALSE` )
       if ("$inf" != "") then
          NoteD $Log ""

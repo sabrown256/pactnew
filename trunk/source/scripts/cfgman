@@ -90,12 +90,19 @@ while ($#argv > 0)
    shift
 end
 
+# clear DB_CFGMAN if it is not a directory
+if ($?DB_CFGMAN == 1) then
+   if (!(-d "$DB_CFGMAN")) then
+      unsetenv DB_CFGMAN
+   endif
+endif
+
 # settle on the root database directory
 set DB = ""
 if ("$dbdir" != "") then
    set DB = $dbdir
-else if ($?CFGMAN_DB == 1) then
-   set DB = $CFGMAN_DB
+else if ($?DB_CFGMAN == 1) then
+   set DB = $DB_CFGMAN
 else
    set lwd = $cwd
    @ nd = 10

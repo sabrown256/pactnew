@@ -27,7 +27,7 @@ if (-x "$PACT") then
    endif
    source $Root/etc/functions-pact.csh
 
-   foreach i (SYS_SITE SYS_TYPE DAS_ROOT DAI_ROOT)
+   foreach i (SYS_SITE SYS_TYPE SYS_ASRoot SYS_AIRoot)
       setenv $i `$PACT -info $i`
    end
 
@@ -93,11 +93,11 @@ end
 # SETUP - get ready to go to work
 
 if ("$UpF" == "") then
-   if ($?UPDATE_SYS_DB == 1) then
-      set UpF = $UPDATE_SYS_DB
-   else if ($?DAI_ROOT == 1) then
-      if (-f $DAI_ROOT/pact/db/update-sys-db) then
-         set UpF = "$DAI_ROOT/pact/db/update-sys-db"
+   if ($?DB_UPDATE_SYS == 1) then
+      set UpF = $DB_UPDATE_SYS
+   else if ($?SYS_AIRoot == 1) then
+      if (-f $SYS_AIRoot/pact/db/update-sys-db) then
+         set UpF = "$SYS_AIRoot/pact/db/update-sys-db"
       endif
    endif
    if ("$UpF" == "") then

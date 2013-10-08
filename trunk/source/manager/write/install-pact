@@ -23,8 +23,7 @@ Separator $Log
 NoteD $Log "   PACT Installer Script - install-pact"
 Note $Log ""
 
-dbmget $Log InstBase^     \
-            UPDATE^       \
+dbmget $Log UPDATE^       \
             BinDir^       \
             CfgMan^       \
             ScmDir^       \
@@ -35,12 +34,13 @@ dbmget $Log InstBase^     \
             PY_DirPy^     \
             PY_DirDst^    \
             PY_DirSrc^    \
-            SYS_Arch
-
+            SYS_Arch^     \
+            SYS_InstRoot
+            
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Note $Log "Installation base: |$InstBase|"
+    Note $Log "Installation base: |$SYS_InstRoot|"
 
     set STDOUT = $BinDir/install-pact
 
@@ -58,7 +58,7 @@ dbmget $Log InstBase^     \
     Note $STDOUT "@ err = 0"
     Note $STDOUT ""
 
-    if ("$InstBase" == "none") then
+    if ("$SYS_InstRoot" == "none") then
 
        Note $STDOUT 'echo ""'
        Note $STDOUT 'echo " ** By request PACT is NOT being installed **"'
@@ -84,10 +84,10 @@ dbmget $Log InstBase^     \
        Note $STDOUT 'unset lbase'
        Note $STDOUT ""
 
-       Note $STDOUT "set InstDir   = $InstBase"
-       Note $STDOUT 'set SchemeDir = $InstDir/'$ScmDir
-       Note $STDOUT 'set Man1Dir   = $InstDir/'$Man1Dir
-       Note $STDOUT 'set Man3Dir   = $InstDir/'$Man3Dir
+       Note $STDOUT "set instroot  = $SYS_InstRoot"
+       Note $STDOUT 'set SchemeDir = $instroot/'$ScmDir
+       Note $STDOUT 'set Man1Dir   = $instroot/'$Man1Dir
+       Note $STDOUT 'set Man3Dir   = $instroot/'$Man3Dir
        Note $STDOUT ""
 
        Note $STDOUT 'set Bins = ( '`awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
@@ -110,7 +110,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT ""
 
        Note $STDOUT 'chdir $lsysdir'
-       Note $STDOUT 'set DestDir = $InstDir/bin'
+       Note $STDOUT 'set DestDir = $instroot/bin'
        Note $STDOUT ""
 
 #--------------------------------------------------------------------------
@@ -121,7 +121,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT "# install executable files with 775"
        Note $STDOUT 'pushd bin >& /dev/null'
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing scripts in $InstDir/bin"'
+       Note $STDOUT 'echo "Installing scripts in $instroot/bin"'
        Note $STDOUT 'foreach file ($Scrs)'
        Note $STDOUT '   if (-f $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
@@ -136,7 +136,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT ""
 
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing binary executables in $InstDir/bin"'
+       Note $STDOUT 'echo "Installing binary executables in $instroot/bin"'
        Note $STDOUT 'foreach file ($Bins)'
        Note $STDOUT '   if (-x $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
@@ -151,7 +151,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT ""
 
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing pact utility in $InstDir/bin"'
+       Note $STDOUT 'echo "Installing pact utility in $instroot/bin"'
        Note $STDOUT 'set file = pact'
        Note $STDOUT 'set base = $file:t'
        Note $STDOUT 'if (-x "$file") then'
@@ -177,8 +177,8 @@ dbmget $Log InstBase^     \
        Note $STDOUT "# install etc with 664"
        Note $STDOUT 'pushd etc >& /dev/null'
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing config/info in $InstDir/etc"'
-       Note $STDOUT 'set DestDir = $InstDir/etc'
+       Note $STDOUT 'echo "Installing config/info in $instroot/etc"'
+       Note $STDOUT 'set DestDir = $instroot/etc'
        Note $STDOUT 'foreach file ($Etcs)'
        Note $STDOUT '   if (-f $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
@@ -192,7 +192,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT 'end'
        Note $STDOUT ''
 
-# substitute $InstDir for the build directory
+# substitute $instroot for the build directory
 # something like /usr/local/apps for ..../dev/$sys_id
 # difference between $cwd and pwd makes the original path unpredictable
 # so find what actually appeared in the generated files
@@ -206,7 +206,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT '      touch $DestDir/.lock'
 #       Note $STDOUT '      sinstall -p 664 $file $DestDir'
        Note $STDOUT '      $RM $DestDir/$file'
-       Note $STDOUT "      sed 's|'"'$lblddir'"'|'"'$InstDir'"'|' "'$file >! $DestDir/$file'
+       Note $STDOUT "      sed 's|'"'$lblddir'"'|'"'$instroot'"'|' "'$file >! $DestDir/$file'
        Note $STDOUT '      if ($status != 0) then'
        Note $STDOUT '         echo "   FAILED ($status) $file"'
        Note $STDOUT '      else'
@@ -229,8 +229,8 @@ dbmget $Log InstBase^     \
        Note $STDOUT "# install include with 664"
        Note $STDOUT 'pushd include >& /dev/null'
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing includes in $InstDir/include"'
-       Note $STDOUT 'set DestDir = $InstDir/include'
+       Note $STDOUT 'echo "Installing includes in $instroot/include"'
+       Note $STDOUT 'set DestDir = $instroot/include'
        Note $STDOUT 'foreach file ($Incs)'
        Note $STDOUT '   if (-f $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
@@ -247,8 +247,8 @@ dbmget $Log InstBase^     \
        Note $STDOUT "# install include/shell with 664"
        Note $STDOUT 'pushd shell >& /dev/null'
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing shell includes in $InstDir/include/shell"'
-       Note $STDOUT 'set DestDir = $InstDir/include/shell'
+       Note $STDOUT 'echo "Installing shell includes in $instroot/include/shell"'
+       Note $STDOUT 'set DestDir = $instroot/include/shell'
        Note $STDOUT 'foreach file (*.[ch])'
        Note $STDOUT '   if (-f $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
@@ -264,8 +264,8 @@ dbmget $Log InstBase^     \
        Note $STDOUT ""
 
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing Fortran modules in $InstDir/include"'
-       Note $STDOUT 'set DestDir = $InstDir/include'
+       Note $STDOUT 'echo "Installing Fortran modules in $instroot/include"'
+       Note $STDOUT 'set DestDir = $instroot/include'
        Note $STDOUT 'foreach file ($Mods)'
        Note $STDOUT '   if (-f $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
@@ -311,8 +311,8 @@ dbmget $Log InstBase^     \
        Note $STDOUT "# install lib with 664"
        Note $STDOUT 'pushd lib >& /dev/null'
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing libs in $InstDir/lib"'
-       Note $STDOUT 'set DestDir = $InstDir/lib'
+       Note $STDOUT 'echo "Installing libs in $instroot/lib"'
+       Note $STDOUT 'set DestDir = $instroot/lib'
        Note $STDOUT 'foreach f ($Libs)'
        Note $STDOUT '   set file = $f'
        Note $STDOUT '   if (-f $file) then'
@@ -330,7 +330,7 @@ dbmget $Log InstBase^     \
        Note $STDOUT 'end'
 
        if ("$HAVE_PYTHON" =~ *TRUE*) then
-          Note $STDOUT 'py-install $InstDir'
+          Note $STDOUT 'py-install $instroot'
        endif
 
        Note $STDOUT 'popd >& /dev/null'

@@ -117,10 +117,10 @@ if ((($Oper == "list") || ($Oper == "remove")) && ("$Tags" == "")) then
 endif
 
 if ("$UpF" == "") then
-   if ($?UPDATE_SYS_DB == 1) then
-      set UpF = $UPDATE_SYS_DB
-   else if (-f $DAI_ROOT/pact/db/update-sys-db) then
-      set UpF = "$DAI_ROOT/pact/db/update-sys-db"
+   if ($?DB_UPDATE_SYS == 1) then
+      set UpF = $DB_UPDATE_SYS
+   else if (-f $SYS_AIRoot/pact/db/update-sys-db) then
+      set UpF = "$SYS_AIRoot/pact/db/update-sys-db"
    else
       if ($Quiet == FALSE) then
          echo "No update file specified - exiting"

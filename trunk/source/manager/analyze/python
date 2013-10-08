@@ -246,7 +246,7 @@ if (-d ../../python) then
          endif
 
          if ($lhave_python == TRUE) then
-            set lpr = $SYS_Dir
+            set lpr = $SYS_Root
             set lph = python${lpy_vers}/pact
             if ("$lpy_path" != "") then
                set lpr = $lpy_exe
@@ -259,10 +259,10 @@ if (-d ../../python) then
             set lpy_dirpy = $lpr/lib/$lph/site-packages
 
 # install destination in PACT tree
-            set lpy_dirdst = $InstBase/lib/$lph
+            set lpy_dirdst = $SYS_InstRoot/lib/$lph
 
 # install source (local build destination)
-            set lpy_dirsrc = $SYS_Dir/lib/python${lpy_vers}
+            set lpy_dirsrc = $SYS_Root/lib/python${lpy_vers}
 
             unset lpr
             unset lph

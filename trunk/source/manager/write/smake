@@ -23,11 +23,11 @@ Separator $Log
 Note $Log "   System make wrapper - smake"
 Note $Log ""
 
-dbmget $Log InstBase^         \
-            SYS_Prefix^       \
-            SYS_CfgDir^       \
+dbmget $Log SYS_CfgDir^       \
+            SYS_Root^         \
             SYS_ID^           \
-            SYS_Dir^          \
+            SYS_InstRoot^     \
+            SYS_Prefix^       \
             GMAKE_Flag^       \
             IncDir^           \
             EtcDir^           \
@@ -57,25 +57,25 @@ Note $Log "   lpactver      = |$lpactver|"
     set TMAKEF = mk.$Tmp
 
 # backup the public files
-    if ($InstBase != "none") then
+    if ($SYS_InstRoot != "none") then
        if (-d $InstOld) then
           flog $Log $RMDir $InstOld
        endif
        flog $Log mkdir $InstOld
 
-       if (-e $InstBase/bin/pact) then
-          flog $Log cp $InstBase/bin/pact $InstOld
+       if (-e $SYS_InstRoot/bin/pact) then
+          flog $Log cp $SYS_InstRoot/bin/pact $InstOld
        endif
-       if (-e $InstBase/etc/make-def) then
-          flog $Log cp $InstBase/etc/make-def $InstOld
+       if (-e $SYS_InstRoot/etc/make-def) then
+          flog $Log cp $SYS_InstRoot/etc/make-def $InstOld
        endif
-       if (-e $InstBase/etc/make-macros) then
-          flog $Log cp $InstBase/etc/make-macros $InstOld
+       if (-e $SYS_InstRoot/etc/make-macros) then
+          flog $Log cp $SYS_InstRoot/etc/make-macros $InstOld
        endif
 
-       if (-d $InstBase/include) then
-          sed "s|$SYS_Dir|$InstBase|" $EtcDir/make-def > $InstBase/etc/make-def
-          flog $Log cp $EtcDir/make-macros $InstBase/etc/make-macros
+       if (-d $SYS_InstRoot/include) then
+          sed "s|$SYS_Root|$SYS_InstRoot|" $EtcDir/make-def > $SYS_InstRoot/etc/make-def
+          flog $Log cp $EtcDir/make-macros $SYS_InstRoot/etc/make-macros
        endif
     endif
 

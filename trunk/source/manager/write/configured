@@ -26,7 +26,7 @@ Note $Log ""
 
 dbmget $Log EtcDir^        \
             UseTmpDir^     \
-            FilterDir^     \
+            SYS_FltDir^    \
             Host^          \
             OS_Name^       \
             HAVE_JPEGLIB^  \
@@ -68,7 +68,7 @@ dbmget $Log EtcDir^        \
     endif
 
     Note $STDOUT "UseTmpDir    = $UseTmpDir"
-    Note $STDOUT "FilterDir    = $FilterDir"
+    Note $STDOUT "SYS_FltDir    = $SYS_FltDir"
     Note $STDOUT "WARN_PATTERN = $WARN_PATTERN"
     Note $STDOUT "ERR_PATTERN  = $ERR_PATTERN"
 

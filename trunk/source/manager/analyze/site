@@ -13,15 +13,15 @@ source $Me:h/common
 
 Note $ALog "Analyze: site"
 
-dbmget $ALog SYS_SITE =\? ""^  \
-             SYS_TYPE =\? ""^  \
-             DAI_ROOT =\? ""^  \
-             DAS_ROOT =\? ""
+dbmget $ALog SYS_SITE   =\? ""^  \
+             SYS_TYPE   =\? ""^  \
+             SYS_AIRoot =\? ""^  \
+             SYS_ASRoot =\? ""
 
-if ($?SITE_SIGNATURE_DB == 1) then
-   Note $ALog "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
+if ($?DB_SITE_SIGNATURE == 1) then
+   Note $ALog "DB_SITE_SIGNATURE = $DB_SITE_SIGNATURE"
 else
-   Note $ALog "SITE_SIGNATURE_DB not defined"
+   Note $ALog "DB_SITE_SIGNATURE not defined"
 endif
 
 if (-f $MngDir/extensions/sys-site) then
@@ -31,10 +31,10 @@ else
 endif
 
 # export the results
-dbmset $ALog SYS_SITE = $SYS_SITE^  \
-             SYS_TYPE = $SYS_TYPE^  \
-             DAI_ROOT = $DAI_ROOT^  \
-             DAS_ROOT = $DAS_ROOT
+dbmset $ALog SYS_SITE   = $SYS_SITE^    \
+             SYS_TYPE   = $SYS_TYPE^    \
+             SYS_AIRoot = $SYS_AIRoot^  \
+             SYS_ASRoot = $SYS_ASRoot
 
 exit(0)
 

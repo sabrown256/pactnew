@@ -2,4 +2,4 @@
 # CROSS-GNU-CXE - add GNU-CXE as a CROSS-COMPILEd second platform 
 #
 
-platform auto-gnu-cxe-mpi  cxeg    ${InstBase}-mpi
+platform auto-gnu-cxe-mpi  cxeg    ${SYS_InstRoot}-mpi
