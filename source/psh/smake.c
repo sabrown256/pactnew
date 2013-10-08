@@ -320,7 +320,7 @@ static int command_makefile(statedes *st, char *fname, int c, char **v, char **a
  */
 
 static int setup_env(statedes *st, char *src)
-   {char s[BFLRG], npath[PATH_MAX];
+   {char s[BFLRG], npath[BFLRG];
     char *p, *ps;
 
     st->show     = 0;
@@ -340,7 +340,7 @@ static int setup_env(statedes *st, char *src)
 /* put the directory of the executable at the head of the path
  * important for multi-platform builds
  */
-    nstrncpy(npath, PATH_MAX, getenv("PATH"), -1);
+    nstrncpy(npath, BFLRG, getenv("PATH"), -1);
     push_path(P_PREPEND, npath, st->root);
     setenv("PATH", npath, 1);
 

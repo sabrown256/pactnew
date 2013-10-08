@@ -88,7 +88,7 @@ static int command_makefile(anadep *state, char **a)
 
 static int setup_env(char *src, anadep *state)
    {int st, nc, ok;
-    char npath[PATH_MAX];
+    char npath[BFLRG];
     char *p, *t, *s;
 
 /* setup the exe path string */
@@ -109,7 +109,7 @@ static int setup_env(char *src, anadep *state)
 /* put the directory of the executable at the head of the path
  * important for multi-platform builds
  */
-    SC_strncpy(npath, PATH_MAX, getenv("PATH"), -1);
+    SC_strncpy(npath, BFLRG, getenv("PATH"), -1);
     PS_push_path(P_PREPEND, npath, state->root);
     setenv("PATH", npath, 1);
 

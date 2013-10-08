@@ -25,6 +25,7 @@ dbmget $Log MDG_Pck^         \
              HAVE_READLINE^  \
              HAVE_PYTHON^    \
              PY_Vers^        \
+             SYS_Dir^        \
              SYS_SITE^       \
              SYS_TYPE^       \
              DAS_ROOT^       \
