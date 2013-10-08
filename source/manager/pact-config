@@ -104,11 +104,11 @@ setenv CfgMan      $ScrDir/cfgman
 setenv SYS_ID      `$CfgMan use`
 setenv SYS_CfgDir  cfg-$SYS_ID
 
-setenv SYS_Dir  $BaseDir/dev/$SYS_ID
-setenv IncDir   $SYS_Dir/include
-setenv EtcDir   $SYS_Dir/etc
-setenv BinDir   $SYS_Dir/bin
-setenv LibDir   $SYS_Dir/lib
+setenv SYS_Root  $BaseDir/dev/$SYS_ID
+setenv IncDir   $SYS_Root/include
+setenv EtcDir   $SYS_Root/etc
+setenv BinDir   $SYS_Root/bin
+setenv LibDir   $SYS_Root/lib
 setenv ScmDir   scheme
 setenv Man1Dir  man/man1
 setenv Man3Dir  man/man3
@@ -117,13 +117,13 @@ setenv EnvSh    $EtcDir/env-pact.sh
 setenv EnvDk    $EtcDir/env-pact.dk
 
 
-setenv CEFile   $SYS_Dir/log/file.ce
-setenv CDFile   $SYS_Dir/log/file.cd
-setenv DPFile   $SYS_Dir/log/file.dpe
-setenv SEFile   $SYS_Dir/log/file.se
-setenv MVFile   $SYS_Dir/log/file.mv
-setenv URFile   $SYS_Dir/log/file.ur
-setenv Log      $SYS_Dir/log/config
+setenv CEFile   $SYS_Root/log/file.ce
+setenv CDFile   $SYS_Root/log/file.cd
+setenv DPFile   $SYS_Root/log/file.dpe
+setenv SEFile   $SYS_Root/log/file.se
+setenv MVFile   $SYS_Root/log/file.mv
+setenv URFile   $SYS_Root/log/file.ur
+setenv Log      $SYS_Root/log/config
 
 setenv NoExe   FALSE
 setenv Load    TRUE
@@ -148,12 +148,12 @@ set lConfigVars = ( $lConfigVars LD_Exe LD_Flags LD_Lib )
 
 # variable defaults
 
-setenv InstBase       none
+setenv SYS_InstRoot   none
 setenv FPU            unknown
 setenv Globals        ""
 
-setenv PubInc  "-I$InstBase/include"
-setenv PubLib  "-L$InstBase/lib"
+setenv PubInc  "-I$SYS_InstRoot/include"
+setenv PubLib  "-L$SYS_InstRoot/lib"
 
 # we need the back slash treatment now - later will not do
 source analyze/backslash
@@ -194,12 +194,12 @@ Main:
 
           case -i:
                    shift
-                   setenv InstBase $1
-                   if ("$InstBase" =~ */) then
-                      setenv InstBase `expr "$InstBase" : '\(.*\)/'`
+                   setenv SYS_InstRoot $1
+                   if ("$SYS_InstRoot" =~ */) then
+                      setenv SYS_InstRoot `expr "$SYS_InstRoot" : '\(.*\)/'`
                    endif
-                   setenv PubInc "-I$InstBase/include"
-                   setenv PubLib "-L$InstBase/lib"
+                   setenv PubInc "-I$SYS_InstRoot/include"
+                   setenv PubLib "-L$SYS_InstRoot/lib"
                    set IBSet = "input"
                    breaksw
 
@@ -218,8 +218,8 @@ Main:
           case -s:
                    shift
                    setenv SYS_ID   $1
-                   setenv SYS_Dir   $BaseDir/dev/$SYS_ID
-                   setenv IncDir   $SYS_Dir/include
+                   setenv SYS_Root  $BaseDir/dev/$SYS_ID
+                   setenv IncDir   $SYS_Root/include
                    setenv EnvCsh   $EtcDir/env-pact.csh
                    setenv EnvSh    $EtcDir/env-pact.sh
                    setenv EnvDk    $EtcDir/env-pact.dk
@@ -239,8 +239,9 @@ Main:
        shift
     end
 
-    set lSys = $CONFIG_FILE:t
-    setenv Sys  $lSys
+    set lcfg = $CONFIG_FILE:t
+    setenv SYS_Cfg  $lcfg
+    unset lcfg
 
     flog $Log $RM $CEFile
     flog $Log touch $CEFile
@@ -331,7 +332,7 @@ AnalyzeConfig:
     include $MngDir/pact-analyze
 
 # restore config as the log file
-    set Log = "$SYS_Dir/log/config"
+    set Log = "$SYS_Root/log/config"
     flog $Log $RM `ls`
     flog $Log popd
 
@@ -358,30 +359,30 @@ CheckDir:
 
     if ($CreateDirs == TRUE) then
        set Created = ""
-       if ("$InstBase" != "none") then
-          if (!(-d $InstBase/bin)) then
-             mkdir -p $InstBase/bin
-             set Created = ( $Created $InstBase/bin )
+       if ("$SYS_InstRoot" != "none") then
+          if (!(-d $SYS_InstRoot/bin)) then
+             mkdir -p $SYS_InstRoot/bin
+             set Created = ( $Created $SYS_InstRoot/bin )
           endif
-          if (!(-d $InstBase/lib)) then
-             mkdir -p $InstBase/lib
-             set Created = ( $Created $InstBase/lib )
+          if (!(-d $SYS_InstRoot/lib)) then
+             mkdir -p $SYS_InstRoot/lib
+             set Created = ( $Created $SYS_InstRoot/lib )
           endif
-          if (!(-d $InstBase/include)) then
-             mkdir -p $InstBase/include
-             set Created = ( $Created $InstBase/include )
+          if (!(-d $SYS_InstRoot/include)) then
+             mkdir -p $SYS_InstRoot/include
+             set Created = ( $Created $SYS_InstRoot/include )
           endif
-          if (!(-d $InstBase/$ScmDir)) then
-             mkdir -p $InstBase/$ScmDir
-             set Created = ( $Created $InstBase/$ScmDir )
+          if (!(-d $SYS_InstRoot/$ScmDir)) then
+             mkdir -p $SYS_InstRoot/$ScmDir
+             set Created = ( $Created $SYS_InstRoot/$ScmDir )
           endif
-          if (!(-d $InstBase/$Man1Dir)) then
-             mkdir -p $InstBase/$Man1Dir
-             set Created = ( $Created $InstBase/$Man1Dir )
+          if (!(-d $SYS_InstRoot/$Man1Dir)) then
+             mkdir -p $SYS_InstRoot/$Man1Dir
+             set Created = ( $Created $SYS_InstRoot/$Man1Dir )
           endif
-          if (!(-d $InstBase/$Man3Dir)) then
-             mkdir -p $InstBase/$Man3Dir
-             set Created = ( $Created $InstBase/$Man3Dir )
+          if (!(-d $SYS_InstRoot/$Man3Dir)) then
+             mkdir -p $SYS_InstRoot/$Man3Dir
+             set Created = ( $Created $SYS_InstRoot/$Man3Dir )
           endif
        endif
        if ("$Created" != "") then
@@ -395,24 +396,24 @@ CheckDir:
        endif
     else
        set Missing = ""
-       if ("$InstBase" != "none") then
-          if (!(-d $InstBase/bin)) then
-             set Missing = ( $Missing $InstBase/bin )
+       if ("$SYS_InstRoot" != "none") then
+          if (!(-d $SYS_InstRoot/bin)) then
+             set Missing = ( $Missing $SYS_InstRoot/bin )
           endif
-          if (!(-d $InstBase/lib)) then
-             set Missing = ( $Missing $InstBase/lib )
+          if (!(-d $SYS_InstRoot/lib)) then
+             set Missing = ( $Missing $SYS_InstRoot/lib )
           endif
-          if (!(-d $InstBase/include)) then
-             set Missing = ( $Missing $InstBase/include )
+          if (!(-d $SYS_InstRoot/include)) then
+             set Missing = ( $Missing $SYS_InstRoot/include )
           endif
-          if (!(-d $InstBase/$ScmDir)) then
-             set Missing = ( $Missing $InstBase/$ScmDir )
+          if (!(-d $SYS_InstRoot/$ScmDir)) then
+             set Missing = ( $Missing $SYS_InstRoot/$ScmDir )
           endif
-          if (!(-d $InstBase/$Man1Dir)) then
-             set Missing = ( $Missing $InstBase/$Man1Dir )
+          if (!(-d $SYS_InstRoot/$Man1Dir)) then
+             set Missing = ( $Missing $SYS_InstRoot/$Man1Dir )
           endif
-          if (!(-d $InstBase/$Man3Dir)) then
-             set Missing = ( $Missing $InstBase/$Man3Dir )
+          if (!(-d $SYS_InstRoot/$Man3Dir)) then
+             set Missing = ( $Missing $SYS_InstRoot/$Man3Dir )
           endif
        endif
        if ("$Missing" != "") then
@@ -749,11 +750,11 @@ while (1)
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   case InstBase:
+   case SYS_InstRoot:
         if ($IBSet == "dflt") then
-           flog $Log setenv InstBase "$Value"
-           flog $Log setenv PubInc       "-I$InstBase/include"
-           flog $Log setenv PubLib       "-L$InstBase/lib"
+           flog $Log setenv SYS_InstRoot "$Value"
+           flog $Log setenv PubInc       "-I$SYS_InstRoot/include"
+           flog $Log setenv PubLib       "-L$SYS_InstRoot/lib"
         endif
         breaksw
 
@@ -1316,10 +1317,10 @@ Unique:
 Finish:
 
 # these are finally determined by now and it is safe to define them
-    setenv IncDir  $SYS_Dir/include
-    setenv LibDir  $SYS_Dir/lib
-    setenv BinDir  $SYS_Dir/bin
-    setenv SchDir  $SYS_Dir/scheme
+    setenv IncDir  $SYS_Root/include
+    setenv LibDir  $SYS_Root/lib
+    setenv BinDir  $SYS_Root/bin
+    setenv SchDir  $SYS_Root/scheme
 
     NoteD $Log "Writing system dependent files"
 

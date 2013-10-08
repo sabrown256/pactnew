@@ -47,9 +47,9 @@ setenv HostName      `uname -n`
 setenv MajorVersion  `expr $OS_Release : "\(.\)"`
 
 envini SYS_ID  `$ScrDir/cfgman use`
-envini SYS_Dir  $BaseDir/dev/$SYS_ID
+envini SYS_Root  $BaseDir/dev/$SYS_ID
 
-InitLog ALog $SYS_Dir/log/analyze
+InitLog ALog $SYS_Root/log/analyze
 
 Note $ALog "HostName         = $HostName"
 Note $ALog "OS_Name           = $OS_Name"

@@ -40,7 +40,7 @@ end
 eval `$bindir/cfgsys`
 
 set sdir = $SYS_TmpDir/obj
-set ddir = $SYS_Dir/man/man$section
+set ddir = $SYS_Root/man/man$section
 pushd $ddir >& /dev/null
 set ddir = $cwd
 popd >& /dev/null

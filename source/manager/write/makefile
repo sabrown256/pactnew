@@ -25,7 +25,7 @@ Note $Log ""
 
 dbmget $Log BinDir^     \
             EtcDir^     \
-            SYS_Dir^    \
+            SYS_Root^   \
             SYS_ID^     \
             Platforms^  \
             Pck
@@ -39,7 +39,7 @@ dbmget $Log BinDir^     \
    Note $Log "Added platform components ($ni):"
    Note $Log "   $inf"
 
-   set base = $SYS_Dir:h
+   set base = $SYS_Root:h
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

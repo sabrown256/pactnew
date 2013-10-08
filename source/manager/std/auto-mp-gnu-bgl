@@ -10,6 +10,6 @@
 include auto-gnu-32-py
 include cross-gnu-bgl
 
-#platform auto-gnu-32-py    bglgs   ${InstBase}
-#platform auto-gnu-bgl-mpi  bglg    ${InstBase}-mpi
+#platform auto-gnu-32-py    bglgs   ${SYS_InstRoot}
+#platform auto-gnu-bgl-mpi  bglg    ${SYS_InstRoot}-mpi
 

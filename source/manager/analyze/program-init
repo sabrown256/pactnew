@@ -17,14 +17,13 @@ run analyze/rpath -i init
 # dynamically link dependent libraries by default
 include features/dld
 
-setenv ENV_VARS "RUN_SIGNATURE_DB SITE_SIGNATURE_DB \
-                 SYS_Prefix SYS_CfgDir SYS_TmpDir SYS_Arch SYS_ID \
-                 SYS_SITE SYS_TYPE SYS_Dir DAI_ROOT DAS_ROOT \
+setenv ENV_VARS "Bits OS_Name \
+                 DB_CFGMAN DB_HOST_SERVER \
+                 DB_RUN_SIGNATURE DB_SITE_SIGNATURE DB_UPDATE_SYS \
                  GLIBC_VERSION BFD_VERSION \
                  HDF_VERSION MYSQL_VERSION SQLITE3_VERSION \
                  PNG_VERSION JPEG_VERSION \
                  PACT_VERSION \
-                 Bits OS_Name \
                  CC_Exe CC_Flags \
                  CC_Debug_Default CC_Optimize_Default \
                  Cfg_CC_Exe Cfg_CC_Flags Cfg_CC_Inc \
@@ -41,7 +40,10 @@ setenv ENV_VARS "RUN_SIGNATURE_DB SITE_SIGNATURE_DB \
                  PY_Inc PY_Lib PY_RPath PY_Path PY_Vers PY_Ext \
                  HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
                  TRACKER_Exe HAVE_OPENMP \
-                 CFE PFE CROSS_COMPILE CROSS_REF"
+                 CFE PFE CROSS_COMPILE CROSS_REF \
+                 SYS_FltDir \
+                 SYS_Prefix SYS_CfgDir SYS_TmpDir SYS_Arch SYS_ID \
+                 SYS_SITE SYS_TYPE SYS_Root SYS_AIRoot SYS_ASRoot"
 
 setenv TEST_ADVISORY     ""
 setenv DO_RUN_DBG        none
@@ -60,7 +62,6 @@ setenv SUFFIXES  '.i'
 
 LIB              = lib
 MAKE_Shared_Libs = FALSE
-FilterDir        =
 WARN_PATTERN     =
 ERR_PATTERN      =
 SchemeSpokes     = netcdf
@@ -132,24 +133,43 @@ Group STD {
 }
 
 # Group SYS contains variables describing the system
-#   SYS_Arch    the system ID as defined by 'system-id'
-#   SYS_ID      the system ID as defined by 'cfgman use'
-#   SYS_TYPE    the system type as defined by 'site-signature'
-#   SYS_SITE    the site of the system as defined by 'site-signature'
-#   SYS_Dir     the ..../pact/dev/$SYS_ID directory
-#   SYS_Prefix  the temporary directory prefix, e.g. "z-"
-#   SYS_CfgDir  the temporary configuration directory
-#   SYS_TmpDir  the temporary build/test directory
+#   SYS_Arch      the system ID as defined by 'system-id'
+#   SYS_Cfg       the system config file
+#   SYS_ID        the system ID as defined by 'cfgman use'
+#   SYS_TYPE      the system type as defined by 'site-signature'
+#   SYS_SITE      the site of the system as defined by 'site-signature'
+#   SYS_Root      the root ..../pact/dev/$SYS_ID directory
+#   SYS_AIRoot    the architecture independent root directory
+#   SYS_ASRoot    the architecture specific root directory
+#   SYS_InstRoot  the root installation directory
+#   SYS_Prefix    the temporary directory prefix, e.g. "z-"
+#   SYS_CfgDir    the temporary configuration directory
+#   SYS_FltDir    the directory containing filter files
+#   SYS_TmpDir    the temporary build/test directory
 
 Group SYS {
-   Arch   = ${SYS_Arch}
-   ID     = ${SYS_ID}
-   TYPE   = ""
-   SITE   = ""
-   Dir    = pact/dev/${SYS_ID}
-   Prefix = "z-"
-   CfgDir = cfg-${SYS_ID}
-   TmpDir = ${SYS_Prefix}${SYS_ID}
+   Arch     = ${SYS_Arch}
+   ID       = ${SYS_ID}
+   TYPE     = ""
+   SITE     = ""
+   Root     = pact/dev/${SYS_ID}
+   AIRoot   = ""
+   ASRoot   = ""
+   InstRoot = none
+   FltDir   = ""
+   Prefix   = "z-"
+   Cfg      = ""
+   CfgDir   = cfg-${SYS_ID}
+   FltDir   = ""
+   TmpDir   = ${SYS_Prefix}${SYS_ID}
+}
+
+Group DB {
+   CFGMAN         =
+   HOST_SERVER    = 
+   RUN_SIGNATURE  = 
+   SITE_SIGNATURE =
+   UPDATE_SYS     = 
 }
 
 Group OS {

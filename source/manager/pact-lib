@@ -38,10 +38,10 @@ eval `../scripts/cfgsys`
 
 set BaseDir = $MngDir:h
 set DevDir  = $BaseDir/dev
-set IncDir  = $SYS_Dir/include
-set BinDir  = $SYS_Dir/bin
-set LibDir  = $SYS_Dir/lib
-set EtcDir  = $SYS_Dir/etc
+set IncDir  = $SYS_Root/include
+set BinDir  = $SYS_Root/bin
+set LibDir  = $SYS_Root/lib
+set EtcDir  = $SYS_Root/etc
 setenv ScrDir $BaseDir/scripts
 
 source $EtcDir/env-pact.csh

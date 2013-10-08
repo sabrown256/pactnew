@@ -147,7 +147,7 @@ Run under ZeroFault on AIX only.
 
 .SH ENVIRONMENT VARIABLES
 
-RUN_SIGNATURE_DB  this variable names the default run signature file
+DB_RUN_SIGNATURE  this variable names the default run signature file
 used by do-run.  The '-f' option is used to override this default.
 SC_DEBUGGER  this variable contains an ordered list of debuggers.
 do-run will search the list in order and use the first one which
@@ -158,7 +158,7 @@ is found to be executable on the current host.
 
 Most users can ignore this section.  It is only for those people who have
 to setup and maintain a run signature database.   Most users just need to
-set the RUN_SIGNATURE_DB environment variable in their $HOME/.cshrc or
+set the DB_RUN_SIGNATURE environment variable in their $HOME/.cshrc or
 $HOME/.profile and then proceed to simply use do-run.  They should ask
 the person who setup the database for the correct setting.
 

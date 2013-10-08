@@ -155,7 +155,7 @@ struct s_state
     char os[BFLRG];
     char osrel[BFLRG];
     char hw[BFLRG];
-    char sys[BFLRG];
+    char sys_cfg[BFLRG];
     char sys_id[BFLRG];
     char features[BFSML];};
 
@@ -1016,7 +1016,7 @@ static void write_envf(client *cl, int lnotice)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CHECK_CROSS - verify that we have a RUN_SIGNATURE_DB if
+/* CHECK_CROSS - verify that we have a DB_RUN_SIGNATURE if
  *             - we are cross compiling
  */
 
@@ -1028,14 +1028,14 @@ static int check_cross(client *cl)
 
     s = cgetenv(TRUE, "CROSS_COMPILE");
     if (strcmp(s, "FALSE") != 0)
-       {s = cgetenv(TRUE, "RUN_SIGNATURE_DB");
+       {s = cgetenv(TRUE, "DB_RUN_SIGNATURE");
 	if (file_exists(s) == FALSE)
 	   {noted(Log, "");
 	    noted(Log, "Cross compiling without a run_signature database - exiting");
 	    noted(Log, "");
 	    rv = FALSE;}
 	else
-	   {dbset(cl, "RUN_SIGNATURE_DB", s);
+	   {dbset(cl, "DB_RUN_SIGNATURE", s);
 	    note(Log, TRUE, "");
 	    note(Log, TRUE, "Cross compiling with run_signature database %s",
 		 s);
@@ -1056,7 +1056,7 @@ static void check_dir(client *cl)
 			   "etc", "scheme", "man", "man/man1", "man/man3"};
 
     n   = sizeof(dlst)/sizeof(char *);
-    sib = dbget(cl, TRUE, "InstBase");
+    sib = dbget(cl, TRUE, "SYS_InstRoot");
 
     if (st.create_dirs == TRUE)
        {Created[0] = '\0';
@@ -1383,8 +1383,8 @@ static void setup_analyze_env(client *cl, char *base)
     dbset(cl, "Host",     st.host);
     dbset(cl, "SYS_Arch", st.arch);
     dbset(cl, "SYS_ID",   st.sys_id);
-    dbset(cl, "SYS_Dir",  st.dir.root);
-    dbset(cl, "Sys",      st.sys);
+    dbset(cl, "SYS_Root",  st.dir.root);
+    dbset(cl, "SYS_Cfg",  st.sys_cfg);
     dbset(cl, "BaseDir",  base);
     dbset(cl, "ScrDir",   st.dir.scr);
     dbset(cl, "AnaDir",   "%s/analyze", st.dir.mng);
@@ -1602,7 +1602,7 @@ static void default_var(client *cl, char *base)
     push_tok(st.cfgv, BFLRG, ' ', "LD_Flags");
     push_tok(st.cfgv, BFLRG, ' ', "LD_Lib");
 
-    strcpy(st.sys, path_tail(st.cfgf));
+    strcpy(st.sys_cfg, path_tail(st.cfgf));
 
     unamef(st.host,  BFLRG, "n");
     unamef(st.os,    BFLRG, "s");
@@ -1628,7 +1628,7 @@ static void default_var(client *cl, char *base)
     dbinitv(cl, "CfgMan",        "%s/cfgman", st.dir.scr);
     dbinitv(cl, "Globals",       "");
     dbinitv(cl, "MngDir",        st.dir.mng);
-    dbinitv(cl, "InstBase",      "none");
+    dbinitv(cl, "SYS_InstRoot",  "none");
     dbinitv(cl, "PubInc",        "");
     dbinitv(cl, "PubLib",        "");
     dbinitv(cl, "ScmDir",        "scheme");
@@ -2049,7 +2049,7 @@ static void init_pco_session(client *cl, char *base, int append)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SET_INST_BASE - setup the InstBase related state */
+/* SET_INST_BASE - setup the SYS_InstRoot related state */
 
 static void set_inst_base(client *cl, char *ib)
    {
@@ -2060,9 +2060,9 @@ static void set_inst_base(client *cl, char *ib)
 
 	st.installp = TRUE;};
 
-    dbset(cl, "InstBase", ib);
-    dbset(cl, "PubInc",   "-I%s/include", ib);
-    dbset(cl, "PubLib",   "-L%s/lib", ib);
+    dbset(cl, "SYS_InstRoot", ib);
+    dbset(cl, "PubInc",       "-I%s/include", ib);
+    dbset(cl, "PubLib",       "-L%s/lib", ib);
 
     return;}
 
@@ -2376,7 +2376,7 @@ static void parse_features(char *t, int nc, int np, char *ft)
 /*--------------------------------------------------------------------------*/
 
 /* DO_PLATFORM - process a platform command
- *             - syntax: platform <cfg> <alias> <instbase> [<args>*]
+ *             - syntax: platform <cfg> <alias> <SYS_InstRoot> [<args>*]
  */
 
 static void do_platform(client *cl, char *oper, char *value)
@@ -2412,8 +2412,8 @@ static void do_platform(client *cl, char *oper, char *value)
 /* add alias */
     vstrcat(t, BFLRG, " -a %s", sid);
 
-/* add instbase */
-    sib = dbget(cl, TRUE, "InstBase");
+/* add SYS_InstRoot */
+    sib = dbget(cl, TRUE, "SYS_InstRoot");
     if ((IS_NULL(sib) == FALSE) && (strcmp(sib, "none") != 0))
        vstrcat(t, BFLRG, " -i %s", spec[1]);
 
@@ -2602,9 +2602,9 @@ static void read_config(client *cl, char *cfg, int quiet)
 	 else if (strcmp(key, "DPEnvironment") == 0)
 	    dp_define();
 
-	 else if (strcmp(key, "InstBase") == 0)
+	 else if (strcmp(key, "SYS_InstRoot") == 0)
 	    {if (st.installp == FALSE)
-	        {dbset(cl, "InstBase", value);
+	        {dbset(cl, "SYS_InstRoot", value);
 		 dbset(cl, "PubInc",   "-I%s/include", value);
 		 dbset(cl, "PubLib",   "-L%s/lib", value);};}
 
@@ -2839,7 +2839,7 @@ static void write_do_run_db(client *cl, state *st)
     snprintf(db, BFLRG, "%s/do-run-db", st->dir.etc);
 
 /* see if file is properly specified via environment variable */
-    p   = cgetenv(TRUE, "RUN_SIGNATURE_DB");
+    p   = cgetenv(TRUE, "DB_RUN_SIGNATURE");
     nm  = 0;
     ok  = TRUE;
     ok &= (file_exists(p) == TRUE);
@@ -2960,9 +2960,9 @@ static void write_do_run_db(client *cl, state *st)
  * and there were no missing specifications - nm == 0
  */
     if ((nm == 0) && (ns > 0))
-       {dbset(cl, "RUN_SIGNATURE_DB", db);
-	csetenv("RUN_SIGNATURE_DB", db);
-	note(st->aux.SEF, TRUE, "RUN_SIGNATURE_DB %s", db);};
+       {dbset(cl, "DB_RUN_SIGNATURE", db);
+	csetenv("DB_RUN_SIGNATURE", db);
+	note(st->aux.SEF, TRUE, "DB_RUN_SIGNATURE %s", db);};
 
     separator(Log);
 
@@ -3409,9 +3409,9 @@ int main(int c, char **v, char **env)
         write_do_run_db(cl, &st);
 
 /* order matters crucially here */
-        env_subst(cl, "InstBase",      ib);
-        env_subst(cl, "SYS_Dir",       st.dir.root);
         env_subst(cl, "BaseDir",       base);
+        env_subst(cl, "SYS_InstRoot",  ib);
+        env_subst(cl, "SYS_Root",       st.dir.root);
         env_subst(cl, "SYS_ID",        st.sys_id);
         env_subst(cl, "CONFIG_METHOD", "database");
 

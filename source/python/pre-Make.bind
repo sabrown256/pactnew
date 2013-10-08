@@ -141,7 +141,7 @@ IncAction =
 
 SDir = ${PACTGenDir}
 
-LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${SDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\"${PACTGenDir}\" PACTTmpDir=\"${PACTTmpDir}\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" lpyext=${lpyext} lpycfg=${lpycfg} lpyver=${lpyver} lpyinc=${lpyinc} lpynum=${lpynum} -f ../../pre-Make.bind sysdir=${SYS_Dir} devlib)
+LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${SDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\"${PACTGenDir}\" PACTTmpDir=\"${PACTTmpDir}\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" lpyext=${lpyext} lpycfg=${lpycfg} lpyver=${lpyver} lpyinc=${lpyinc} lpynum=${lpynum} -f ../../pre-Make.bind sysdir=${SYS_Root} devlib)
 
 
 TGTSPDB  = ${PyDir}/libpypdb.so

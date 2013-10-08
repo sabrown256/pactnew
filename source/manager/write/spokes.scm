@@ -25,7 +25,7 @@ Note $Log ""
 
 dbmget $Log BaseDir^         \
             SchDir^          \
-            Sys^             \
+            SYS_Cfg^         \
             SchemeSpokes^    \
             CSpokes^         \
             BackSlash
@@ -41,7 +41,7 @@ if (-d $BaseDir/sx/applications) then
     flog $Log touch $STDOUT
 
     Note $STDOUT ";"
-    Note $STDOUT "; SPOKES.SCM - initialization of SX translation spokes for $Sys"
+    Note $STDOUT "; SPOKES.SCM - initialization of SX translation spokes for $SYS_Cfg"
     Note $STDOUT ";"
     Note $STDOUT ""
     Note $STDOUT '(define (safe-load file)'

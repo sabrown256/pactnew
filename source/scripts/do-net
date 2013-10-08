@@ -855,14 +855,14 @@ TESTHOSTS:
       set NetSpecs  = `cat $File | awk '$1 == "net"    { print $2 }'`
       set HostSpecs = `cat $File | awk '$1 == "host"   { print $2 }'`
 
-      set HSDB = `cat $File | grep -v "#" | awk '$0 ~ /HOST_SERVER_DB/ { print $3 }'`
+      set HSDB = `cat $File | grep -v "#" | awk '$0 ~ /DB_HOST_SERVER/ { print $3 }'`
       if ("$HSDB" != "") then
-         setenv HOST_SERVER_DB $HSDB[1]
+         setenv DB_HOST_SERVER $HSDB[1]
       endif
 
       set Hosts = `echo $NetSpecs $HostSpecs | sort | uniq`
       if (($DownOnly == FALSE) && ("$Hosts" != "")) then
-         echo "Host status ($HOST_SERVER_DB):"
+         echo "Host status ($DB_HOST_SERVER):"
       endif
 
 HostLoop:
@@ -1166,7 +1166,7 @@ READHOST:
    endif
 
 # check for variables of interest to the do-net front end 
-   foreach var (HOST_SERVER_DB SC_EXEC_TIME_VERIFY)
+   foreach var (DB_HOST_SERVER SC_EXEC_TIME_VERIFY)
       set lVal = `cat $HostFile | awk '$0 ~ /'$var'/ { print $3 }'`
       if ("$lVal" != "") then
          eval "setenv $var $lVal[1]"

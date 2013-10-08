@@ -118,15 +118,15 @@ switch ($Tgt)
 
    case init:
         if ($IncPACT == TRUE) then
-           if ($InstBase == none) then
+           if ($SYS_InstRoot == none) then
               set ldir = $cwd
               set ldir = $ldir:h
               setenv RPATH      $ldir/dev/$SYS_ID/lib
               setenv Cfg_RPATH  $ldir/dev/$SYS_ID/lib
               unset ldir
            else
-              setenv RPATH      $InstBase/lib
-              setenv Cfg_RPATH  $InstBase/lib
+              setenv RPATH      $SYS_InstRoot/lib
+              setenv Cfg_RPATH  $SYS_InstRoot/lib
            endif
         else
            setenv RPATH ""

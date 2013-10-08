@@ -523,14 +523,14 @@ switch ($Phase)
         flog $LogHost date
         flog $LogHost pwd
 
-        Note $LogHost "Install base = $InstBase"
+        Note $LogHost "Install base = $SYS_InstRoot"
         if (-f $Passed) then
            Note $LogHost "All tests passed"
         else
            Note $LogHost "Not all tests passed"
         endif
 
-        if (($InstBase != none) && (-f "$Passed")) then
+        if (($SYS_InstRoot != none) && (-f "$Passed")) then
            flog $LogHost cd $BldDir
            if ($HaveGMake == TRUE) then
               flog $LogHost $UMake install
@@ -540,20 +540,20 @@ switch ($Phase)
               set xstatus = $status
            endif
 
-# NOTE: we are assuming that InstBase is expected to
+# NOTE: we are assuming that SYS_InstRoot is expected to
 # be a link to where the code really is
-# therefore InstBase should not be something like /usr/local
+# therefore SYS_InstRoot should not be something like /usr/local
 # but something like /usr/local/gnu might acceptable
 
-           flog $LogHost $RM $InstBase
-           if (!(-d $InstBase)) then
-              flog $LogHost ln -s $DevDir $InstBase
+           flog $LogHost $RM $SYS_InstRoot
+           if (!(-d $SYS_InstRoot)) then
+              flog $LogHost ln -s $DevDir $SYS_InstRoot
            endif
 
            if ($xstatus == 0) then
               flog $LogHost setenv Err  OK
            else
-              flog $LogHost ls -lR $InstBase
+              flog $LogHost ls -lR $SYS_InstRoot
               flog $LogHost setenv Err  FAILED
            endif
         else
@@ -589,7 +589,7 @@ GET_HOST_ARG:
     flog $lFile set ConfOpt = ""
     flog $lFile setenv SysID     none
     flog $lFile setenv WrkDir    none
-    flog $lFile setenv InstBase  none
+    flog $lFile setenv SYS_InstRoot  none
     flog $lFile setenv SingleSrc TRUE
 
     Note $lFile "Get values for get_host_arg from command line"
@@ -657,7 +657,7 @@ GET_NET_ARG:
     Note $lFile "Set default values for get_net_arg"
     flog $lFile setenv SysID     none
     flog $lFile setenv WrkDir    none
-    flog $lFile setenv InstBase  none
+    flog $lFile setenv SYS_InstRoot  none
     flog $lFile setenv Code      none
     flog $lFile setenv SingleSrc TRUE
 

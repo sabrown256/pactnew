@@ -69,15 +69,15 @@ setenv PACTVer     `cat $MngDir/.pact-version`
 #   ..../pact/scripts      ->     ScrDir
 #   ..../pact/<pkg>        ->     PkgDir
 #   ..../pact/dev          ->     DevDir
-#   ..../pact/dev/$sys_id  ->     SYS_Dir
+#   ..../pact/dev/$sys_id  ->     SYS_Root
 
 set DevDir  = $BaseDir/dev
-set IncDir  = $SYS_Dir/include
-set BinDir  = $SYS_Dir/bin
-set LibDir  = $SYS_Dir/lib
-set EtcDir  = $SYS_Dir/etc
-set LogDir  = $SYS_Dir/log
-set ScmDir  = $SYS_Dir/scheme
+set IncDir  = $SYS_Root/include
+set BinDir  = $SYS_Root/bin
+set LibDir  = $SYS_Root/lib
+set EtcDir  = $SYS_Root/etc
+set LogDir  = $SYS_Root/log
+set ScmDir  = $SYS_Root/scheme
 set PACT    = $BinDir/pact
 set EnvCsh  = $EtcDir/env-pact.csh
 
@@ -279,11 +279,11 @@ switch ($Cmnd)
         set DevDir = $BaseDir/dev
 
         setenv SYS_ID  `$CfgMan -d ../dev use`
-        setenv SYS_Dir $DevDir/$SYS_ID
+        setenv SYS_Root $DevDir/$SYS_ID
 
-        set BinDir  = $SYS_Dir/bin
-        set EtcDir  = $SYS_Dir/etc
-        set LogDir  = $SYS_Dir/log
+        set BinDir  = $SYS_Root/bin
+        set EtcDir  = $SYS_Root/etc
+        set LogDir  = $SYS_Root/log
 
         InitLog Log $LogDir/build
 
@@ -883,15 +883,15 @@ switch ($Cmnd)
 
 # set the configuration for this system
         setenv SYS_ID  `$CfgMan use`
-        setenv SYS_Dir  $DevDir/$SYS_ID
+        setenv SYS_Root  $DevDir/$SYS_ID
 
 # now that we have the system, reset the variables that depend on it
-        set IncDir  = $SYS_Dir/include
-        set EtcDir  = $SYS_Dir/etc
-        set BinDir  = $SYS_Dir/bin
-        set LibDir  = $SYS_Dir/lib
-        set ScmDir  = $SYS_Dir/scheme
-        set LogDir  = $SYS_Dir/log
+        set IncDir  = $SYS_Root/include
+        set EtcDir  = $SYS_Root/etc
+        set BinDir  = $SYS_Root/bin
+        set LibDir  = $SYS_Root/lib
+        set ScmDir  = $SYS_Root/scheme
+        set LogDir  = $SYS_Root/log
         set PACT    = $BinDir/pact
 
         setenv PERDB  $BinDir/perdb
@@ -918,7 +918,7 @@ switch ($Cmnd)
         InitLog Log $LogDir/config
 
         Note $Log "SYS_ID    = $SYS_ID"
-        Note $Log "SYS_Dir   = $SYS_Dir"
+        Note $Log "SYS_Root   = $SYS_Root"
         Note $Log "Args      = $nargs"
         Note $Log "ConfigDir = $ConfigDir"
 
@@ -997,45 +997,45 @@ switch ($Cmnd)
 
 # make sure that the installation directories exist
         setenv OS_Name  `uname -s`
-        set InstBase  = $DevDir/$SYS_ID
+        set SYS_InstRoot  = $DevDir/$SYS_ID
         if (!(-d $DevDir)) then
            mkdir $DevDir
         endif
-        if (!(-d $InstBase)) then
-           mkdir $InstBase
+        if (!(-d $SYS_InstRoot)) then
+           mkdir $SYS_InstRoot
         endif
-        if (!(-d $InstBase/bin)) then
-           mkdir $InstBase/bin
+        if (!(-d $SYS_InstRoot/bin)) then
+           mkdir $SYS_InstRoot/bin
         endif
-        if (!(-d $InstBase/lib)) then
-           mkdir $InstBase/lib
+        if (!(-d $SYS_InstRoot/lib)) then
+           mkdir $SYS_InstRoot/lib
         endif
-        if (!(-d $InstBase/include)) then
-           mkdir $InstBase/include
+        if (!(-d $SYS_InstRoot/include)) then
+           mkdir $SYS_InstRoot/include
         endif
-        if (!(-d $InstBase/include/shell)) then
-           mkdir $InstBase/include/shell
+        if (!(-d $SYS_InstRoot/include/shell)) then
+           mkdir $SYS_InstRoot/include/shell
         endif
-        if (!(-d $InstBase/etc)) then
-           mkdir $InstBase/etc
+        if (!(-d $SYS_InstRoot/etc)) then
+           mkdir $SYS_InstRoot/etc
         endif
-        if (!(-d $InstBase/man)) then
-           mkdir $InstBase/man
+        if (!(-d $SYS_InstRoot/man)) then
+           mkdir $SYS_InstRoot/man
         endif
-        if (!(-d $InstBase/man/man1)) then
-           mkdir $InstBase/man/man1
+        if (!(-d $SYS_InstRoot/man/man1)) then
+           mkdir $SYS_InstRoot/man/man1
         endif
-        if (!(-d $InstBase/man/man3)) then
-           mkdir $InstBase/man/man3
+        if (!(-d $SYS_InstRoot/man/man3)) then
+           mkdir $SYS_InstRoot/man/man3
         endif
-        if (!(-d $InstBase/scheme)) then
-           mkdir $InstBase/scheme
+        if (!(-d $SYS_InstRoot/scheme)) then
+           mkdir $SYS_InstRoot/scheme
         endif
-        if (!(-d $InstBase/scheme/extensions)) then
-           mkdir $InstBase/scheme/extensions
+        if (!(-d $SYS_InstRoot/scheme/extensions)) then
+           mkdir $SYS_InstRoot/scheme/extensions
         endif
-        if (!(-d $InstBase/log)) then
-           mkdir $InstBase/log
+        if (!(-d $SYS_InstRoot/log)) then
+           mkdir $SYS_InstRoot/log
         endif
 
         set RStatus = $status
@@ -1324,7 +1324,7 @@ CFG_DONE:
                    set db  = $EtcDir/cfg.db
                    set inf = ( `pact +l -info CONFIG_METHOD` )
                    set mth = $inf[1]
-                   set cfg = ( `grep Sys= $db | sed 's/^Sys=//'` )
+                   set cfg = ( `grep SYS_Cfg= $db | sed 's/^SYS_Cfg=//'` )
                    set inf = ( `$CfgMan list` )
                    set cur = ( `$CfgMan use` )
                    echo "Configuration list:    $inf"
@@ -1482,29 +1482,29 @@ CFG_DONE:
         if (!(-d $DevDir)) then
            mkdir $DevDir
         endif
-        if (!(-d $SYS_Dir)) then
-           mkdir $SYS_Dir
+        if (!(-d $SYS_Root)) then
+           mkdir $SYS_Root
         endif
-        if (!(-d $SYS_Dir/bin)) then
-           mkdir $SYS_Dir/bin
+        if (!(-d $SYS_Root/bin)) then
+           mkdir $SYS_Root/bin
         endif
-        if (!(-d $SYS_Dir/lib)) then
-           mkdir $SYS_Dir/lib
+        if (!(-d $SYS_Root/lib)) then
+           mkdir $SYS_Root/lib
         endif
-        if (!(-d $SYS_Dir/include)) then
-           mkdir $SYS_Dir/include
+        if (!(-d $SYS_Root/include)) then
+           mkdir $SYS_Root/include
         endif
-        if (!(-d $SYS_Dir/etc)) then
-           mkdir $SYS_Dir/etc
+        if (!(-d $SYS_Root/etc)) then
+           mkdir $SYS_Root/etc
         endif
-        if (!(-d $SYS_Dir/scheme)) then
-           mkdir $SYS_Dir/scheme
+        if (!(-d $SYS_Root/scheme)) then
+           mkdir $SYS_Root/scheme
         endif
-        if (!(-d $SYS_Dir/scheme/extensions)) then
-           mkdir $SYS_Dir/scheme/extensions
+        if (!(-d $SYS_Root/scheme/extensions)) then
+           mkdir $SYS_Root/scheme/extensions
         endif
-        if (!(-d $SYS_Dir/log)) then
-           mkdir $SYS_Dir/log
+        if (!(-d $SYS_Root/log)) then
+           mkdir $SYS_Root/log
         endif
 
         breaksw
@@ -1668,7 +1668,7 @@ CFG_DONE:
                    breaksw
 
               case -d:
-                   set DocDir = $DAI_ROOT/pact/docs
+                   set DocDir = $SYS_AIRoot/pact/docs
                    breaksw
 
               case -e:
@@ -1688,7 +1688,7 @@ CFG_DONE:
                    breaksw
 
               case -s:
-                   set SrcDir = $DAI_ROOT/pact/wrk
+                   set SrcDir = $SYS_AIRoot/pact/wrk
                    breaksw
 
               case -t:
@@ -1698,11 +1698,11 @@ CFG_DONE:
 
               case -x:
                    setenv SYS_ID   `$CfgMan use`
-                   setenv SYS_Dir  $DevDir/$SYS_ID
-                   set IncDir = $SYS_Dir/include
+                   setenv SYS_Root  $DevDir/$SYS_ID
+                   set IncDir = $SYS_Root/include
                    set Pck    = `cat $EtcDir/package`
                    pushd .. >& /dev/null
-                   set NB = `du -sb $Pck manager python $SYS_Dir | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
+                   set NB = `du -sb $Pck manager python $SYS_Root | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
                    popd >& /dev/null
                    echo "Approximately $NB MB of sources, objects, libraries, and binaries"
                    exit(0)
@@ -1716,14 +1716,14 @@ CFG_DONE:
         end
 
         if ($All != "") then
-           set SrcDir  = $DAI_ROOT/pact/wrk
+           set SrcDir  = $SYS_AIRoot/pact/wrk
            set BinDir  = "$BINDIR"
            set LibDir  = ( "$BINDIR:h""/lib" )
            set IncDir  = ( "$BINDIR:h""/include" )
            set EtcDir  = ( "$BINDIR:h""/etc" )
-           set Man1Dir = $DAI_ROOT/pact/man/man1
-           set Man3Dir = $DAI_ROOT/pact/man/man3
-           set DocDir  = $DAI_ROOT/pact/docs
+           set Man1Dir = $SYS_AIRoot/pact/man/man1
+           set Man3Dir = $SYS_AIRoot/pact/man/man3
+           set DocDir  = $SYS_AIRoot/pact/docs
         endif
 
         set LS = 'ls -l'
@@ -1926,14 +1926,14 @@ CFG_DONE:
         if ($ChkVer == "yes") then
            echo ""
            echo "Version info for PACT:"
-           echo "   pact-date    =  `cat $DAI_ROOT/pact/std_sources/manager/.pact-date`" 
-           echo "   pact-version =  `cat $DAI_ROOT/pact/std_sources/manager/.pact-version`" 
-           echo "   pact-tag     =  `cat $DAI_ROOT/pact/std_sources/manager/.pact-version-tag`" 
+           echo "   pact-date    =  `cat $SYS_AIRoot/pact/std_sources/manager/.pact-date`" 
+           echo "   pact-version =  `cat $SYS_AIRoot/pact/std_sources/manager/.pact-version`" 
+           echo "   pact-tag     =  `cat $SYS_AIRoot/pact/std_sources/manager/.pact-version-tag`" 
            echo ""
            echo "Version info for PACTNEW:"
-           echo "   pact-date    =  `cat $DAI_ROOT/pact/new_sources/manager/.pact-date`" 
-           echo "   pact-version =  `cat $DAI_ROOT/pact/new_sources/manager/.pact-version`" 
-           echo "   pact-tag     =  `cat $DAI_ROOT/pact/new_sources/manager/.pact-version-tag`" 
+           echo "   pact-date    =  `cat $SYS_AIRoot/pact/new_sources/manager/.pact-date`" 
+           echo "   pact-version =  `cat $SYS_AIRoot/pact/new_sources/manager/.pact-version`" 
+           echo "   pact-tag     =  `cat $SYS_AIRoot/pact/new_sources/manager/.pact-version-tag`" 
         endif
 
         set RStatus = $status
@@ -1975,11 +1975,11 @@ CFG_DONE:
         set DevDir = $BaseDir/dev
 
         setenv SYS_ID   `$CfgMan -d ../dev use`
-        setenv SYS_Dir  $DevDir/$SYS_ID
+        setenv SYS_Root  $DevDir/$SYS_ID
 
-        set BinDir  = $SYS_Dir/bin
-        set EtcDir  = $SYS_Dir/etc
-        set LogDir  = $SYS_Dir/log
+        set BinDir  = $SYS_Root/bin
+        set EtcDir  = $SYS_Root/etc
+        set LogDir  = $SYS_Root/log
 
         setenv GEXEC   $BinDir/gexec
         setenv PATH    ${BinDir}:${PATH}
@@ -2267,7 +2267,7 @@ CFG_DONE:
         if (-f $db) then
            set inf  = ( `pact +l -info CONFIG_METHOD` )
            set meth = $inf[1]
-           set cfg  = ( `grep Sys= $db |& sed 's/^Sys=//'` )
+           set cfg  = ( `grep SYS_Cfg= $db |& sed 's/^SYS_Cfg=//'` )
         else
            set meth = file
            set inf  = ( `awk '($1 == "Config") { print $3 }' $EtcDir/configured` )
@@ -2382,14 +2382,14 @@ CFG_DONE:
         set DevDir  = $BaseDir/dev
 
         setenv SYS_ID   `$CfgMan -d ../dev use`
-        setenv SYS_Dir  $DevDir/$SYS_ID
+        setenv SYS_Root  $DevDir/$SYS_ID
 
-        set BinDir  = $SYS_Dir/bin
-        set IncDir  = $SYS_Dir/include
-        set LibDir  = $SYS_Dir/lib
-        set EtcDir  = $SYS_Dir/etc
-        set ScmDir  = $SYS_Dir/scheme
-        set LogDir  = $SYS_Dir/log
+        set BinDir  = $SYS_Root/bin
+        set IncDir  = $SYS_Root/include
+        set LibDir  = $SYS_Root/lib
+        set EtcDir  = $SYS_Root/etc
+        set ScmDir  = $SYS_Root/scheme
+        set LogDir  = $SYS_Root/log
 
         InitLog Log $LogDir/remove
 
@@ -2550,7 +2550,7 @@ CFG_DONE:
         flog $Log $RMDir ../$SYS_TmpDir ../dev/.pc-
 
 # check the result
-        flog $Log ls -lR $SYS_Dir
+        flog $Log ls -lR $SYS_Root
 
         set RStatus = $status
 
@@ -3057,14 +3057,14 @@ CFG_DONE:
         set DevDir = $BaseDir/dev
 
         setenv SYS_ID   `$CfgMan -d ../dev use`
-        setenv SYS_Dir  $DevDir/$SYS_ID
+        setenv SYS_Root  $DevDir/$SYS_ID
 
-        set BinDir  = $SYS_Dir/bin
-        set IncDir  = $SYS_Dir/include
-        set LibDir  = $SYS_Dir/lib
-        set EtcDir  = $SYS_Dir/etc
-        set ScmDir  = $SYS_Dir/scheme
-        set LogDir  = $SYS_Dir/log
+        set BinDir  = $SYS_Root/bin
+        set IncDir  = $SYS_Root/include
+        set LibDir  = $SYS_Root/lib
+        set EtcDir  = $SYS_Root/etc
+        set ScmDir  = $SYS_Root/scheme
+        set LogDir  = $SYS_Root/log
 
         set BeginTime = `$TIMER -r`
 

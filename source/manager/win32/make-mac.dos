@@ -11,10 +11,10 @@
 #
 # the standard places
 #
-BinDir = ${SYS_Dir}\bin
-LibDir = ${SYS_Dir}\lib
-IncDir = ${SYS_Dir}\include
-ScmDir = ${SYS_Dir}\scheme
+BinDir = ${SYS_Root}\bin
+LibDir = ${SYS_Root}\lib
+IncDir = ${SYS_Root}\include
+ScmDir = ${SYS_Root}\scheme
 
 #
 # install library

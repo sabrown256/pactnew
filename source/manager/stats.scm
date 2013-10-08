@@ -10,7 +10,7 @@
 ; the following code specific definitions and
 ; load of standard stats procedures are required
 
-(define dai-root (getenv "DAI_ROOT"))
+(define dai-root (getenv "SYS_AIRoot"))
 (define codename "pact")
 (define stats-directory (sprintf "%s/%s/stats" dai-root codename))
 (define demo-directory stats-directory)

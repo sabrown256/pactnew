@@ -420,8 +420,8 @@ static int check(rundes *st)
                 path_head(st->bindir));
 
     if (file_exists(st->sgn) == FALSE)
-       {if (cdefenv("RUN_SIGNATURE_DB") == TRUE)
-           nstrncpy(st->sgn, BFMED, cgetenv(TRUE, "RUN_SIGNATURE_DB"), -1);
+       {if (cdefenv("DB_RUN_SIGNATURE") == TRUE)
+           nstrncpy(st->sgn, BFMED, cgetenv(TRUE, "DB_RUN_SIGNATURE"), -1);
         else
 	   nstrncpy(st->sgn, BFMED, "run.sgn", -1);};
 

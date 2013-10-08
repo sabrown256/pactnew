@@ -8,8 +8,8 @@ unalias *
 set END   = '}'
 set signf = ""
 
-if ($?SITE_SIGNATURE_DB == 1) then
-   set signf = $SITE_SIGNATURE_DB
+if ($?DB_SITE_SIGNATURE == 1) then
+   set signf = $DB_SITE_SIGNATURE
 endif
 
 set exe    = $0
@@ -168,14 +168,14 @@ else if ($deflt == TRUE) then
          echo "SYS_TYPE=$lsys ; export SYS_TYPE ; "
       endif
       if ($osh == csh) then
-         echo "setenv DAI_ROOT /usr/local ; "
+         echo "setenv SYS_AIRoot /usr/local ; "
       else if ($osh == sh) then
-         echo "DAI_ROOT=/usr/local ; export DAI_ROOT ; "
+         echo "SYS_AIRoot=/usr/local ; export SYS_AIRoot ; "
       endif
       if ($osh == csh) then
-         echo "setenv DAS_ROOT /usr/share ; "
+         echo "setenv SYS_ASRoot /usr/share ; "
       else if ($osh == sh) then
-         echo "DAS_ROOT=/usr/share ; export DAS_ROOT ; "
+         echo "SYS_ASRoot=/usr/share ; export SYS_ASRoot ; "
       endif
 
 # set these only if not already set
@@ -198,21 +198,21 @@ else if ($deflt == TRUE) then
          endif
       endif
 
-      set inf = ( `printenv DAI_ROOT` )
+      set inf = ( `printenv SYS_AIRoot` )
       if ("$inf" == "") then
          if ($osh == csh) then
-            echo "setenv DAI_ROOT /usr/local ; "
+            echo "setenv SYS_AIRoot /usr/local ; "
          else if ($osh == sh) then
-            echo "DAI_ROOT=/usr/local ; export DAI_ROOT ; "
+            echo "SYS_AIRoot=/usr/local ; export SYS_AIRoot ; "
          endif
       endif
 
-      set inf = ( `printenv DAS_ROOT` )
+      set inf = ( `printenv SYS_ASRoot` )
       if ("$inf" == "") then
          if ($osh == csh) then
-            echo "setenv DAS_ROOT /usr/share ; "
+            echo "setenv SYS_ASRoot /usr/share ; "
          else if ($osh == sh) then
-            echo "DAS_ROOT=/usr/share ; export DAS_ROOT ; "
+            echo "SYS_ASRoot=/usr/share ; export SYS_ASRoot ; "
          endif
       endif
       unset inf

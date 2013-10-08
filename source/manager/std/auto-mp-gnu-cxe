@@ -7,6 +7,6 @@
 include auto-gnu-64-py
 include cross-gnu-cxe
 
-#platform auto-gnu-64        cxegs  ${InstBase}
-#platform auto-gnu-cxe-mpi   cxeg   ${InstBase}-mpi
+#platform auto-gnu-64        cxegs  ${SYS_InstRoot}
+#platform auto-gnu-cxe-mpi   cxeg   ${SYS_InstRoot}-mpi
 

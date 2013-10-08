@@ -7,6 +7,6 @@
 include auto-pgi-64
 include cross-pgi-cxe
 
-#platform auto-pgi-64        cxeps  ${InstBase}
-#platform auto-pgi-cxe-mpi   cxep   ${InstBase}-mpi
+#platform auto-pgi-64        cxeps  ${SYS_InstRoot}
+#platform auto-pgi-cxe-mpi   cxep   ${SYS_InstRoot}-mpi
 
