@@ -27,6 +27,7 @@ dbmget $Log InstBase^         \
             SYS_Prefix^       \
             SYS_CfgDir^       \
             SYS_ID^           \
+            SYS_Dir^          \
             GMAKE_Flag^       \
             IncDir^           \
             EtcDir^           \
