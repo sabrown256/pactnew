@@ -105,11 +105,23 @@ else
    endif
 
    if ($?SYS_AIRoot == 0) then
-      setenv SYS_AIRoot  /usr/local
+
+# GOTHA: OLD_DB_VARS look for old variable
+      if ($?DAI_ROOT == 1) then
+         setenv SYS_AIRoot  $DAI_ROOT
+      else
+         setenv SYS_AIRoot  /usr/local
+      endif
    endif
 
    if ($?SYS_ASRoot == 0) then
-      setenv SYS_ASRoot  /usr/share
+
+# GOTHA: OLD_DB_VARS look for old variable
+      if ($?DAS_ROOT == 1) then
+         setenv SYS_ASRoot  $DAS_ROOT
+      else
+         setenv SYS_ASRoot  /usr/share
+      endif
    endif
 
    if ($?SYS_Cfg == 0) then

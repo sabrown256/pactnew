@@ -61,13 +61,13 @@ Here is an example:
       local  true
     }
     
-    variable : AI_ROOT {
+    variable : SYS_AIRoot {
       /mnt/apps    (-d /mnt/apps)
       /usr/share   true
     }
     
-    variable : AS_ROOT {
-      /usr/local/apps  ($AI_ROOT == /mnt/apps)
+    variable : SYS_ASRoot {
+      /usr/local/apps  ($SYS_AIRoot == /mnt/apps)
       /usr/local       true
     }
     
@@ -80,7 +80,7 @@ Here is an example:
 .fi
 
 In this example 4 variables are to be defined and initialized:
-SYS_SITE, SYS_TYPE, AI_ROOT, AS_ROOT.  Default values can be
+SYS_SITE, SYS_TYPE, SYS_AIRoot, SYS_ASRoot.  Default values can be
 given by the use of a clause whose test is "true".
 
 
