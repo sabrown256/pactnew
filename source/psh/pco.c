@@ -107,7 +107,6 @@ struct s_state
    {int abs_deb;
     int abs_opt;
     int create_dirs;
-    int have_python;
     int have_db;
     int async;
 
@@ -160,7 +159,7 @@ struct s_state
     char features[BFSML];};
 
 static state
- st = { FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+ st = { FALSE, FALSE, FALSE, FALSE, FALSE,
         TRUE, FALSE, TRUE, FALSE, FALSE,
 	FALSE, FALSE, FALSE,
         PHASE_READ, 0, NULL, NULL, 0, NULL, };
@@ -878,7 +877,7 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 	         if (strcmp(var, "PATH") == 0)
 		    push_path(P_APPEND, epath, val);
 
-		else
+		 else
 		   {snprintf(s, BFLRG, "\"%s\"", val);
 		    env_out(fsh, fcsh, fdk, fmd, var, s);};};};
 
