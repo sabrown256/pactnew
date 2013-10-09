@@ -72,7 +72,7 @@ else
 
    foreach i ($Tests)
       ftee $Log $SrcDir/tests/$i $opt
-      if ($status != 0) then
+      if ($gstatus != 0) then
          Note $Log "Test $i exited with error"
          flog $Log @ nerr = $nerr + 1
       endif

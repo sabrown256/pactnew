@@ -117,7 +117,11 @@ if ((($Oper == "list") || ($Oper == "remove")) && ("$Tags" == "")) then
 endif
 
 if ("$UpF" == "") then
-   if ($?DB_UPDATE_SYS == 1) then
+
+# GOTHA: OLD_DB_VARS look for old variable
+   if ($?UPDATE_SYS_DB == 1) then
+      set UpF = $UPDATE_SYS_DB
+   else if ($?DB_UPDATE_SYS == 1) then
       set UpF = $DB_UPDATE_SYS
    else if (-f $SYS_AIRoot/pact/db/update-sys-db) then
       set UpF = "$SYS_AIRoot/pact/db/update-sys-db"

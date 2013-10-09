@@ -517,7 +517,7 @@ int async_server(srvdes *sv)
 	        ng += dt;
 
 /* if the connection file goes away - quit immediately */
-	     if (find_conn(cl->root, -1) == NULL)
+	     if ((ok != 0) && (find_conn(cl->root, -1) == NULL))
 	        ok = 2;};
 
 	if (ok == 2)

@@ -8,6 +8,11 @@ unalias *
 set END   = '}'
 set signf = ""
 
+# GOTHA: OLD_DB_VARS look for old variable
+if ($?SITE_SIGNATURE_DB == 1) then
+   set signf = $SITE_SIGNATURE_DB
+endif
+
 if ($?DB_SITE_SIGNATURE == 1) then
    set signf = $DB_SITE_SIGNATURE
 endif

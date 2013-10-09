@@ -30,8 +30,8 @@ while ($#argv > 0)
 end
 
 if ("$lst" == "") then
-   set lst = ( $lst RUN_SIGNATURE_DB SITE_SIGNATURE_DB )
-   set lst = ( $lst SYS_SITE SYS_TYPE DAI_ROOT DAS_ROOT )
+   set lst = ( $lst DB_RUN_SIGNATURE DB_SITE_SIGNATURE )
+   set lst = ( $lst SYS_SITE SYS_TYPE SYS_AIRoot SYS_ASRoot )
    set lst = ( $lst Bits OS_Name )
    set lst = ( $lst CC_Exe CC_Flags )
    set lst = ( $lst CC_Debug_Default CC_Optimize_Default )
