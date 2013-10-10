@@ -425,6 +425,12 @@ int main(int c, char **v)
 
     pmname = default_pmname;
 
+/* find/get SESSION_CONFIG before setup_env */
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-a") == 0)
+	    {setenv("SESSION_CONFIG", v[++i], 1);
+	     break;};};
+
     setup_env(&st, v[0]);
 
     ok = TRUE;
@@ -481,10 +487,7 @@ int main(int c, char **v)
 
          else if (v[i][0] == '-')
             {switch (v[i][1])
-	        {case 'a' :
-		      setenv("SESSION_CONFIG", v[++i], 1);
-		      break;
-                 case 'B' :
+	        {case 'B' :
                       snprintf(mkfile, BFLRG, "%s/Makefile", st.arch);
                       status = build_makefile(st.root, st.arch, mkfile, TRUE);
 		      return(status);

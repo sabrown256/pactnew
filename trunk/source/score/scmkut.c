@@ -386,6 +386,12 @@ int main(int c, char **v, char **env)
 
     argv = v;
 
+/* find/get SESSION_CONFIG before setup_env */
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-a") == 0)
+	    {setenv("SESSION_CONFIG", v[++i], 1);
+	     break;};};
+
     SC_get_resource_limits(&rmem, &rcpu, &rfsz, &rnfd, &rnprc);
     SC_set_resource_limits(-1, -1, -1, -1, -1);
 
@@ -435,9 +441,7 @@ int main(int c, char **v, char **env)
     srvna[0] = '\0';
 
     for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-a") == 0)
-	    setenv("SESSION_CONFIG", v[++i], 1);
-	 else if (strcmp(v[i], "-async") == 0)
+        {if (strcmp(v[i], "-async") == 0)
 	    {async = TRUE;
 	     nconn = SC_stoi(v[++i]);
              snprintf(srvna, MAXLINE, "-na %d", na);
