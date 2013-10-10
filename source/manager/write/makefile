@@ -100,8 +100,8 @@ dbmget $Log BinDir^     \
           set root = $base/$sid 
           set etcd = $root/etc
    
-          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact generate in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr generate)"'
-#          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact generate in '$p' for '$sid'" ; ${PACT'$n'} -rcr generate)'
+#          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact generate in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr generate)"'
+          Note $STDOUT '	@(cd '$p' ; printf "\npact generate in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr generate)'
        end
        if ($p == score) then
           Note $STDOUT '	${BARRIER}'
@@ -129,8 +129,8 @@ dbmget $Log BinDir^     \
           set root = $base/$sid 
           set etcd = $root/etc
    
-          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact incinstall in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr incinstall)"'
-#          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact incinstall in '$p' for '$sid'" ; ${PACT'$n'} -rcr incinstall)'
+#          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact incinstall in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr incinstall)"'
+          Note $STDOUT '	@(cd '$p' ; printf "\npact incinstall in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr incinstall)'
        end
     end
 
@@ -155,8 +155,8 @@ dbmget $Log BinDir^     \
           set root = $base/$sid 
           set etcd = $root/etc
    
-          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact devlib in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr devlib)"'
-#          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact devlib in '$p' for '$sid'" ; ${PACT'$n'} -rcr devlib)'
+#          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact devlib in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr devlib)"'
+          Note $STDOUT '	@(cd '$p' ; printf "\npact devlib in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr devlib)'
        end
     end
 
@@ -186,8 +186,8 @@ dbmget $Log BinDir^     \
           set root = $base/$sid 
           set etcd = $root/etc
    
-          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact link in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr link)"'
-#          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact link in '$p' for '$sid'" ; ${PACT'$n'} -rcr link)'
+#          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact link in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr link)"'
+          Note $STDOUT '	@(cd '$p' ; printf "\npact link in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr link)'
        end
     end
 
@@ -283,7 +283,9 @@ dbmget $Log BinDir^     \
           set root = $base/$sid 
           set etcd = $root/etc
    
-          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; source ${Env'$n'} ; ${PACT'$n'} -a '$sid' -rcr test)"'
+          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; printf '"'"'\npact test in %s for %s\n'"'" $p $sid' ; source ${Env'$n'} ; ${PACT'$n'} -a '$sid' -rcr test)"'
+#          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; source ${Env'$n'} ; ${PACT'$n'} -a '$sid' -rcr test)"'
+#          Note $STDOUT '	@(cd '$p' ; printf "\npact test in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr test)'
 #          Note $STDOUT '	@(cd '$p' ; echo "" ; echo "pact test in '$p' for '$sid'" ; ${PACT'$n'} -a '$sid' -rcr test)'
        end
     end
