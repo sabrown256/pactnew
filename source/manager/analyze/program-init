@@ -133,7 +133,9 @@ Group STD {
 # Group SYS contains variables describing the system
 #   SYS_Arch      the system ID as defined by 'system-id'
 #   SYS_Cfg       the system config file
+#   SYS_CfgMan    full path to the cfgman utility
 #   SYS_ID        the system ID as defined by 'cfgman use'
+#   SYS_Host      the system host name
 #   SYS_Prefix    the temporary directory prefix, e.g. "z-"
 #   SYS_TYPE      the system type as defined by 'site-signature'
 #   SYS_SITE      the site of the system as defined by 'site-signature'
@@ -154,6 +156,8 @@ Group STD {
 Group SYS {
    Arch     = ${SYS_Arch}
    Cfg      = ""
+   CfgMan   = ${SYS_ScrDir}/cfgman
+   Host     = ${SYS_Host}
    ID       = ${SYS_ID}
    Prefix   = "z-"
    TYPE     = ""

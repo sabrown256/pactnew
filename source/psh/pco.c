@@ -1379,7 +1379,7 @@ static void setup_analyze_env(client *cl, char *base)
     note(out, TRUE, "%s", get_date());
     fclose_safe(out);
 
-    dbset(cl, "Host",       st.host);
+    dbset(cl, "SYS_Host",   st.host);
     dbset(cl, "SYS_Arch",   st.arch);
     dbset(cl, "SYS_ID",     st.sys_id);
     dbset(cl, "SYS_Root",   st.dir.root);
@@ -1624,8 +1624,8 @@ static void default_var(client *cl, char *base)
 
     dbset(cl, "PACT_CFG_ID", st.sys_id);
 
-    dbinitv(cl, "CfgMan",        "%s/cfgman", st.dir.scr);
     dbinitv(cl, "Globals",       "");
+    dbinitv(cl, "SYS_CfgMan",    "%s/cfgman", st.dir.scr);
     dbinitv(cl, "SYS_MngDir",    st.dir.mng);
     dbinitv(cl, "SYS_InstRoot",  "none");
     dbinitv(cl, "PubInc",        "");

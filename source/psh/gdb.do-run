@@ -8,8 +8,8 @@
 # include "cpyright.h"
 #
 
-set Host  = `uname -n`
-set GInit = $cwd/.gdb-init.$Host.$$
+set sys_host = `uname -n`
+set GInit    = $cwd/.gdb-init.$sys_host.$$
 
 if ($?TVDirs == 1) then
    awk '{ printf("dir %s\n", $0); }' $TVDirs >&! $GInit

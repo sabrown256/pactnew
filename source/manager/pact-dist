@@ -45,7 +45,6 @@ set VersionID     = `cat ./.pact-version`
 set TarArgs       = cvf
 set TmpFile       = tmp-file
 set TmpDir        = tmp-dir
-set Host          = `uname -n`
 set OS            = `uname -s | tr "[A-Z]" "[a-z]"`
 
 set LLNL             = FALSE
@@ -215,7 +214,7 @@ INIT:
       flog $Log $RMDir pact
    endif
 
-   Note $Log "Distribution Log             Host: $Host running $OS"
+   Note $Log "Distribution Log             Host: $SYS_Host running $OS"
    Note $Log "User: $WhoIAm                Date: `date`"
    Note $Log " " 
    Note $Log "Operation: $Opt " 

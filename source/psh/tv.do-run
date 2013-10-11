@@ -8,10 +8,10 @@
 # include "cpyright.h"
 #
 
-set Host  = `uname -n`
-set TInit = $cwd/.tv-init.$Host.$$
-set Tmp   = $cwd/.tmp.$Host.$$
-set RM    = ( /bin/rm -f )
+set sys_host = `uname -n`
+set TInit    = $cwd/.tv-init.$sys_host.$$
+set Tmp      = $cwd/.tmp.$sys_host.$$
+set RM       = ( /bin/rm -f )
 
 set path = ( $path <your-tv-path> )
 

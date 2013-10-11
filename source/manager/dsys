@@ -58,8 +58,6 @@ unsetenv SYS_ID
 
 eval `$sys_scrdir/cfgsys`
 
-set CfgMan = $SYS_ScrDir/cfgman
-
 setenv PACTVer     `cat $sys_mngdir/.pact-version`
 
 # directory name conventions
@@ -81,10 +79,10 @@ set ScmDir  = $SYS_Root/scheme
 set PACT    = $BinDir/pact
 set EnvCsh  = $EtcDir/env-pact.csh
 
-set PCKS    = "-"
-set Tmp     = tmp_$SYS_ID
-set Host    = `uname -n`
-set Time    = time
+set PCKS     = "-"
+set Tmp      = tmp_$SYS_ID
+set sys_host = `uname -n`
+set Time     = time
 
 set DSYS    = $sys_mngdir/dsys
 set TIMER   = $SYS_ScrDir/timer
@@ -278,7 +276,7 @@ switch ($Cmnd)
 
         set DevDir = $sys_base/dev
 
-        setenv SYS_ID  `$CfgMan -d ../dev use`
+        setenv SYS_ID   `$SYS_CfgMan -d ../dev use`
         setenv SYS_Root $DevDir/$SYS_ID
 
         set BinDir  = $SYS_Root/bin
@@ -466,7 +464,7 @@ switch ($Cmnd)
         set BeginTime = `$TIMER -r`
 
         if ("$Tgts" == "") then
-           NoteD $Log "Linking PACT on $Host ..."
+           NoteD $Log "Linking PACT on $sys_host ..."
 
            flog $Log pushd ..
            flog $Log setenv SESSION_CONFIG $SYS_ID
@@ -483,7 +481,7 @@ switch ($Cmnd)
 
            flog $Log popd
         else
-           NoteD $Log "Linking packages on $Host ..."
+           NoteD $Log "Linking packages on $sys_host ..."
            NoteD $Log ""
            while ($#Tgts > 0)
               set tgt = $Tgts[1]
@@ -510,7 +508,7 @@ switch ($Cmnd)
         endif
 
         NoteD $Log ""
-        NoteD $Log "PACT $Build on $Host complete ($RStatus/$ETime)"
+        NoteD $Log "PACT $Build on $sys_host complete ($RStatus/$ETime)"
         NoteD $Log ""
 
         breaksw
@@ -656,7 +654,7 @@ switch ($Cmnd)
            switch ($1)
               case -a:
                    shift
-                   $CfgMan add $1 >& /dev/null
+                   $SYS_CfgMan add $1 >& /dev/null
                    setenv SESSION_CONFIG $1
                    breaksw
               case -as:
@@ -882,7 +880,7 @@ switch ($Cmnd)
         setenv DSYS_TARGET pact_config
 
 # set the configuration for this system
-        setenv SYS_ID  `$CfgMan use`
+        setenv SYS_ID    `$SYS_CfgMan use`
         setenv SYS_Root  $DevDir/$SYS_ID
 
 # now that we have the system, reset the variables that depend on it
@@ -1249,7 +1247,7 @@ switch ($Cmnd)
               flog $Log set sid = $SYS_ID
            endif
            flog $Log unsetenv SESSION_CONFIG
-           flog $Log $CfgMan add $sid
+           flog $Log $SYS_CfgMan add $sid
 
         else
            if (!(-f $PERDB_PATH.db)) then
@@ -1325,8 +1323,8 @@ CFG_DONE:
                    set inf = ( `pact +l -info CONFIG_METHOD` )
                    set mth = $inf[1]
                    set cfg = ( `grep SYS_Cfg= $db | sed 's/^SYS_Cfg=//'` )
-                   set inf = ( `$CfgMan list` )
-                   set cur = ( `$CfgMan use` )
+                   set inf = ( `$SYS_CfgMan list` )
+                   set cur = ( `$SYS_CfgMan use` )
                    echo "Configuration list:    $inf"
                    echo "Current configuration: $cur"
                    echo "Current config file:   $cfg"
@@ -1377,7 +1375,7 @@ CFG_DONE:
                             if ("$iscfg" != "") then
                                set hst   = $spec[1]
                                set ishst = `host $hst | awk '{ print $1 }'`
-                               Note $Log "   Host: |$hst| |$ishst| |$Host|"
+                               Note $Log "   Host: |$hst| |$ishst| |$sys_host|"
                                if ("$ishst" != "Host") then
                                   set Cfgs = ( $Cfgs $c )
                                else
@@ -1418,7 +1416,7 @@ CFG_DONE:
            Note $Log ""
 
            flog $Log pwd
-           flog $Log $CfgMan delete $c
+           flog $Log $SYS_CfgMan delete $c
 
            find .. -name "*$c" -type d |& grep -v '\.pc' |& xargs rm -rf
            set RStatus = $status
@@ -1697,7 +1695,7 @@ CFG_DONE:
                    breaksw
 
               case -x:
-                   setenv SYS_ID   `$CfgMan use`
+                   setenv SYS_ID    `$SYS_CfgMan use`
                    setenv SYS_Root  $DevDir/$SYS_ID
                    set IncDir = $SYS_Root/include
                    set Pck    = `cat $EtcDir/package`
@@ -1974,7 +1972,7 @@ CFG_DONE:
 
         set DevDir = $sys_base/dev
 
-        setenv SYS_ID   `$CfgMan -d ../dev use`
+        setenv SYS_ID    `$SYS_CfgMan -d ../dev use`
         setenv SYS_Root  $DevDir/$SYS_ID
 
         set BinDir  = $SYS_Root/bin
@@ -2381,7 +2379,7 @@ CFG_DONE:
 
         set DevDir  = $sys_base/dev
 
-        setenv SYS_ID   `$CfgMan -d ../dev use`
+        setenv SYS_ID    `$SYS_CfgMan -d ../dev use`
         setenv SYS_Root  $DevDir/$SYS_ID
 
         set BinDir  = $SYS_Root/bin
@@ -2571,9 +2569,9 @@ CFG_DONE:
         set Cfg = $1
 
         echo ""
-        echo -n "Changing from configuration `$CfgMan use` to "
+        echo -n "Changing from configuration `$SYS_CfgMan use` to "
 
-        $CfgMan add $Cfg
+        $SYS_CfgMan add $Cfg
         set RStatus = $status
 
         echo ""
@@ -2744,7 +2742,7 @@ CFG_DONE:
         set ConflFile = $sys_mngdir/Confl.Sources
         set HelpCode  = $sys_mngdir/$0
         set Merges    = $sys_mngdir/merge.el
-        set Host      = `uname -n`
+        set sys_host  = `uname -n`
         set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
 
         set SCSRepository = ""
@@ -2829,7 +2827,7 @@ CFG_DONE:
            Note $Log " "
            Note $Log "$Operation (`date`)"
         endif
-        Note $Log "  Host: $Host running $OS"
+        Note $Log "  Host: $sys_host running $OS"
         Note $Log "  User:  $WhoIAm             Date: `date`"
         Note $Log " "  
 
@@ -3056,7 +3054,7 @@ CFG_DONE:
 
         set DevDir = $sys_base/dev
 
-        setenv SYS_ID   `$CfgMan -d ../dev use`
+        setenv SYS_ID    `$SYS_CfgMan -d ../dev use`
         setenv SYS_Root  $DevDir/$SYS_ID
 
         set BinDir  = $SYS_Root/bin
@@ -3135,7 +3133,7 @@ CFG_DONE:
 
 # NOTE: this is for the outer pact - the package level one is controlled by NA
            set Args = ( $Args -na 1 )
-           set Tmp  = /tmp/pact-test.$Host.$$
+           set Tmp  = /tmp/pact-test.$sys_host.$$
 
            if ("$Tgts" == "") then
               ftee $Log pact $Args -f $EtcDir/Makefile test

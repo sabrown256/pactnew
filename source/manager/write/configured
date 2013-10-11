@@ -27,7 +27,7 @@ Note $Log ""
 dbmget $Log EtcDir^        \
             UseTmpDir^     \
             SYS_FltDir^    \
-            Host^          \
+            SYS_Host^      \
             OS_Name^       \
             HAVE_JPEGLIB^  \
             HAVE_PNGLIB^   \

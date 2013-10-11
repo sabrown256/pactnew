@@ -51,8 +51,8 @@ set TagFile       = $RepoDir/.import-tag
 set TagID         = ( `/bin/date '+%Y-%m-%d %H:%M'` )
 set ImportingDir  = $cwd
 set SRCDate       = ""
-set Host          = `uname -n`
-set Message       = (\" $USER on "$Host", Running import.\")
+set sys_host      = `uname -n`
+set Message       = (\" $USER on "$sys_host", Running import.\")
 set TmpScr        = tmp-script
 set TmpFile       = tmp-file
 

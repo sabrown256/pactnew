@@ -25,7 +25,6 @@ Note $Log ""
 
 dbmget $Log UPDATE^       \
             BinDir^       \
-            CfgMan^       \
             ScmDir^       \
             Man1Dir^      \
             Man3Dir^      \
@@ -35,6 +34,7 @@ dbmget $Log UPDATE^       \
             PY_DirDst^    \
             PY_DirSrc^    \
             SYS_Arch^     \
+            SYS_CfgMan^   \
             SYS_InstRoot
             
 #--------------------------------------------------------------------------
@@ -69,7 +69,7 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT "set Owner     = $USER"
        Note $STDOUT "set Group     = "'`'"groups | awk '{print "'$1'"}'"'`'
-       Note $STDOUT 'set sys_id    = `'$CfgMan' use`'
+       Note $STDOUT 'set sys_id    = `'$SYS_CfgMan' use`'
 
 # NOTE: this can only be successfully run from the manager directory
        if ($cwd !~ */manager) then

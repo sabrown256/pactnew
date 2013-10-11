@@ -42,12 +42,10 @@ set SccOnly   = FALSE
 set TagOnly   = FALSE
 set TmpMsg    = $sys_mngdir/msg-tmp
 set TmpDir    = ftmp
-set Host      = `uname -n`
 set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
 
 set VersionID = `code-date`
 set HelpCode  = $sys_mngdir/$0
-set CfgMan    = $sys_scrdir/cfgman
 
 eval `$sys_scrdir/cfgsys`
 
@@ -315,7 +313,7 @@ flog $Log touch $UpdateLog
 # Start doing the actual commits
 #
 if ($TagOnly == FALSE) then
-   Note $Log "Commit Log		Host: $Host running $OS"
+   Note $Log "Commit Log		Host: $SYS_Host running $OS"
    Note $Log "User:  $WhoIAm		Date: `date`"
    Note $Log ""
 
@@ -369,7 +367,7 @@ if ($TagOnly == FALSE) then
 
    flog $Log rm -f $UpdateLog
    flog $Log touch $UpdateLog
-   Note $UpdateLog "Host: $Host           Date: `date`"
+   Note $UpdateLog "Host: $SYS_Host           Date: `date`"
    Note $UpdateLog ""
    flog $Log ($SYS_ScrDir/scs-update >> $UpdateLog)
    flog $Log set xstatus = $status

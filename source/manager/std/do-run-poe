@@ -15,7 +15,7 @@ MPI : poe {
    Flags = 
 
    HostDir  = ($?DORUN_HOST_DIR == 0) ? . : $DORUN_HOST_DIR
-   HostFile = $MPI_HostDir/.dp-aix.$Host.$$
+   HostFile = $MPI_HostDir/.dp-aix.$SYS_Host.$$
 
 # NOTE: do not do this unless we can figure immediate mode for poe
 #   Env Pool = ("$Pool" == pdebug) ? pbatch : -noop-
