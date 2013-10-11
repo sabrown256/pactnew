@@ -66,7 +66,7 @@ alias NoteNT    'echo "DO-NET:" \!\!:1-$'
 Intervene help.do-local
 
 set sys_host  = `uname -n`
-set sys_jhost = `expr $sys_host : '\(.*\)\..*\..*'`
+set sys_uhost = `expr $sys_host : '\(.*\)\..*\..*'`
 if ("$sys_uhost" == "") then
    set sys_uhost = $sys_host
 endif

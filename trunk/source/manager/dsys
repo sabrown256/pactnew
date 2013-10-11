@@ -35,8 +35,8 @@ pushd $BldDir >& /dev/null
 set Which = "$cwd/pwhich"
 
 set sys_mngdir = $cwd
-set sys_base   = $sys_mngdir:h
-set sys_scrdir = $sys_base/scripts
+setenv SYS_Base   $sys_mngdir:h
+setenv SYS_ScrDir $SYS_Base/scripts
 
 if (-f extensions/sys-site) then
    eval `extensions/sys-site`
@@ -44,8 +44,8 @@ else
    eval `../scripts/sys-site -du -f local/site-signature`
 endif
 
-source $sys_scrdir/functions-pact.csh
-source $sys_scrdir/csh-subroutines
+source $SYS_ScrDir/functions-pact.csh
+source $SYS_ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
 unsetenv BASH_ENV
@@ -53,23 +53,24 @@ umask 007
 
 limit stacksize unlimited >& /dev/null
 
+unset sys_mngdir
 unset SYS_ID
 unsetenv SYS_ID
 
-eval `$sys_scrdir/cfgsys`
+eval `$SYS_ScrDir/cfgsys`
 
-setenv PACTVer     `cat $sys_mngdir/.pact-version`
+setenv PACTVer     `cat $SYS_MngDir/.pact-version`
 
 # directory name conventions
 # to be consistenly used in config, build, test, and install
 #   ..../pact              ->     SYS_Base
-#   ..../pact/manager      ->     sys_mngdir
+#   ..../pact/manager      ->     SYS_MngDir
 #   ..../pact/scripts      ->     SYS_ScrDir
 #   ..../pact/<pkg>        ->     PkgDir
 #   ..../pact/dev          ->     DevDir
 #   ..../pact/dev/$sys_id  ->     SYS_Root
 
-set DevDir  = $sys_base/dev
+set DevDir  = $SYS_Base/dev
 set IncDir  = $SYS_Root/include
 set BinDir  = $SYS_Root/bin
 set LibDir  = $SYS_Root/lib
@@ -84,7 +85,7 @@ set Tmp      = tmp_$SYS_ID
 set sys_host = `uname -n`
 set Time     = time
 
-set DSYS    = $sys_mngdir/dsys
+set DSYS    = $SYS_MngDir/dsys
 set TIMER   = $SYS_ScrDir/timer
 
 set path = ( $path . )
@@ -274,7 +275,7 @@ switch ($Cmnd)
            shift
         end
 
-        set DevDir = $sys_base/dev
+        set DevDir = $SYS_Base/dev
 
         setenv SYS_ID   `$SYS_CfgMan -d ../dev use`
         setenv SYS_Root $DevDir/$SYS_ID
@@ -330,10 +331,10 @@ switch ($Cmnd)
            while ($#Tgts > 0)
               set tgt = $Tgts[1]
               shift Tgts
-              if (-d $sys_base/$tgt) then
-                 flog $Log pushd $sys_base/$tgt
+              if (-d $SYS_Base/$tgt) then
+                 flog $Log pushd $SYS_Base/$tgt
 
-                 NoteD $Log "$sys_base/$tgt"
+                 NoteD $Log "$SYS_Base/$tgt"
                  flog $Log $PACT $Args install
                  flog $Log @ lerr = $lerr + $status
                  NoteD $Log ""
@@ -357,7 +358,7 @@ switch ($Cmnd)
            NoteD $Log ""
            Separator $Log
            NoteD $Log "Cross compile fixes"
-           set srcb = $sys_base/dev/$CROSS_REF/bin
+           set srcb = $SYS_Base/dev/$CROSS_REF/bin
 	   if ($srcb != $BinDir) then
               set CrossFix = ( hserve mpi-io-wrap )
 #              set CrossFix = ( $CrossFix ps-diff png-diff )
@@ -486,10 +487,10 @@ switch ($Cmnd)
            while ($#Tgts > 0)
               set tgt = $Tgts[1]
               shift Tgts
-              if (-d $sys_base/$tgt) then
-                 flog $Log pushd $sys_base/$tgt
+              if (-d $SYS_Base/$tgt) then
+                 flog $Log pushd $SYS_Base/$tgt
 
-                 NoteD $Log "$sys_base/$tgt"
+                 NoteD $Log "$SYS_Base/$tgt"
                  flog $Log $PACT $Args link
                  NoteD $Log ""
 
@@ -667,7 +668,7 @@ switch ($Cmnd)
               case -cc:
                    shift
                    setenv CCompiler  $1
-                   $sys_mngdir/verify-cc $CCompiler
+                   $SYS_MngDir/verify-cc $CCompiler
                    if ($status != 0) then
                       exit(1)
                    endif
@@ -1277,7 +1278,7 @@ switch ($Cmnd)
            rehash
 
 # create empty extensions directories if they don't exist already
-           set ExtDirs = ( $sys_base/sx/applications/extensions $sys_base/ultra/applications/extensions )
+           set ExtDirs = ( $SYS_Base/sx/applications/extensions $SYS_Base/ultra/applications/extensions )
            foreach d ($ExtDirs)
               if (-d $d:h) then
                  if (!(-d $d)) then
@@ -1565,7 +1566,7 @@ CFG_DONE:
 #--------------------------------------------------------------------------
 
    case info:
-        set HelpCode  = $sys_mngdir/$0
+        set HelpCode  = $SYS_MngDir/$0
         set SCSOpt    = ""
 
         set SCSRepository = ""
@@ -1682,7 +1683,7 @@ CFG_DONE:
                    breaksw
 
               case -m:
-                   set MgrDir = "$sys_mngdir"
+                   set MgrDir = "$SYS_MngDir"
                    breaksw
 
               case -s:
@@ -1690,7 +1691,7 @@ CFG_DONE:
                    breaksw
 
               case -t:
-                   source $sys_mngdir/pact-scs
+                   source $SYS_MngDir/pact-scs
                    set Tags = "-def"
                    breaksw
 
@@ -1726,15 +1727,15 @@ CFG_DONE:
 
         set LS = 'ls -l'
 
-        set Libs = ( `awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $sys_mngdir/pact.manifest` )
-        set Incs = ( `awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $sys_mngdir/pact.manifest` )
-        set Bins = ( `awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $sys_mngdir/pact.manifest` )
-        set Scrs = ( `awk '$1 == "script" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $sys_mngdir/pact.manifest` )
-        set Mods = ( `awk '$1 == "f90"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $sys_mngdir/pact.manifest` )
-        set Scms = ( `awk '$1 == "scm"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $sys_mngdir/pact.manifest` )
-        set Docs = ( `awk '$1 == "doc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $sys_mngdir/pact.manifest` )
-        set Pact = ( `awk '$1 == "pkg"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $sys_mngdir/pact.manifest` )
-        set Mgrs = ( `awk '$1 == "mgr"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $sys_mngdir/pact.manifest` )
+        set Libs = ( `awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
+        set Incs = ( `awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
+        set Bins = ( `awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
+        set Scrs = ( `awk '$1 == "script" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
+        set Mods = ( `awk '$1 == "f90"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
+        set Scms = ( `awk '$1 == "scm"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
+        set Docs = ( `awk '$1 == "doc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
+        set Pact = ( `awk '$1 == "pkg"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
+        set Mgrs = ( `awk '$1 == "mgr"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
 
         set ScrB = ( $Scrs )
 
@@ -1970,7 +1971,7 @@ CFG_DONE:
            shift
         end
 
-        set DevDir = $sys_base/dev
+        set DevDir = $SYS_Base/dev
 
         setenv SYS_ID    `$SYS_CfgMan -d ../dev use`
         setenv SYS_Root  $DevDir/$SYS_ID
@@ -2116,7 +2117,7 @@ CFG_DONE:
 
         InitLog Log $LogDir/net-update
 
-        set DO_PACT = $sys_mngdir/do-pact
+        set DO_PACT = $SYS_MngDir/do-pact
 
         flog $Log $SYS_ScrDir/scs-update
         Note $Log do-net -e $DO_PACT $DArgs $CArgs
@@ -2377,7 +2378,7 @@ CFG_DONE:
            shift
         end
 
-        set DevDir  = $sys_base/dev
+        set DevDir  = $SYS_Base/dev
 
         setenv SYS_ID    `$SYS_CfgMan -d ../dev use`
         setenv SYS_Root  $DevDir/$SYS_ID
@@ -2541,7 +2542,7 @@ CFG_DONE:
         flog $Log popd
 
 # remove other files
-        NoteD $Log "    in $sys_base/"'*'"/$SYS_TmpDir directories"
+        NoteD $Log "    in $SYS_Base/"'*'"/$SYS_TmpDir directories"
         flog $Log $RM ../*/$SYS_TmpDir/obj/*.[cfo] ../*/$SYS_TmpDir/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
         flog $Log $RM ../sx/$SYS_TmpDir/obj/*.[cfo]
@@ -2684,7 +2685,7 @@ CFG_DONE:
 
    case stats-update:
 
-        set PrntDir   = $sys_base:h
+        set PrntDir   = $SYS_Base:h
         set UpdateDir = $PrntDir/update
         set StatsDir  = $PrntDir/stats
 
@@ -2739,9 +2740,9 @@ CFG_DONE:
         set SCSOpt      = "-q"
         set Quiet       = FALSE
 
-        set ConflFile = $sys_mngdir/Confl.Sources
-        set HelpCode  = $sys_mngdir/$0
-        set Merges    = $sys_mngdir/merge.el
+        set ConflFile = $SYS_MngDir/Confl.Sources
+        set HelpCode  = $SYS_MngDir/$0
+        set Merges    = $SYS_MngDir/merge.el
         set sys_host  = `uname -n`
         set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
 
@@ -2835,9 +2836,9 @@ CFG_DONE:
         flog $Log pwd
         flog $Log printenv
 
-#        set TmpV = $sys_mngdir/.tmp.$$
+#        set TmpV = $SYS_MngDir/.tmp.$$
 #        flog $Log mkdir $TmpV
-#        flog $Log $MV $sys_mngdir/.pact-version* $TmpV
+#        flog $Log $MV $SYS_MngDir/.pact-version* $TmpV
 
 # GOTCHA: check git status for things like:
 #     Your branch is behind 'origin/master' by <n> commits
@@ -2849,7 +2850,7 @@ CFG_DONE:
         flog $Log $SYS_ScrDir/scs-update
         set ErrStat = $status
 
-#        flog $Log $MV $TmpV/.pact-version* $sys_mngdir
+#        flog $Log $MV $TmpV/.pact-version* $SYS_MngDir
 #        flog $Log $RMDir $TmpV
 
 # take care of conflicting changes
@@ -2956,8 +2957,8 @@ CFG_DONE:
         set excl = ( $excl -exclude local )
         set excl = ( $excl -exclude hosts )
         set excl = ( $excl -exclude extensions )
-        if (-f $sys_mngdir/local/exclusions) then
-           foreach i (`cat $sys_mngdir/local/exclusions | grep -v '^#'`)
+        if (-f $SYS_MngDir/local/exclusions) then
+           foreach i (`cat $SYS_MngDir/local/exclusions | grep -v '^#'`)
               set excl = ( $excl -exclude $i )
            end
         endif
@@ -3052,7 +3053,7 @@ CFG_DONE:
            shift
         end
 
-        set DevDir = $sys_base/dev
+        set DevDir = $SYS_Base/dev
 
         setenv SYS_ID    `$SYS_CfgMan -d ../dev use`
         setenv SYS_Root  $DevDir/$SYS_ID
@@ -3118,7 +3119,7 @@ CFG_DONE:
 # do it for smake
         flog $Log (ls -l `$Which pact` |& grep smake)
         if ($status == 0) then
-           set PCKS = ( `awk '$1 == "pkg" {print}' $sys_mngdir/pact.manifest | sed 's/^pkg//'` )
+           set PCKS = ( `awk '$1 == "pkg" {print}' $SYS_MngDir/pact.manifest | sed 's/^pkg//'` )
            foreach d ($PCKS)
               flog $Log pushd $d
               ftee $Log pact $NA test
@@ -3478,7 +3479,7 @@ CFG_DONE:
 
         InitLog Log $LogDir/update
 
-        set TIMER = $sys_base/scripts/timer
+        set TIMER = $SYS_Base/scripts/timer
         set BTime = `$TIMER -r`
 
 # remove binaries
@@ -3696,7 +3697,7 @@ GEN_CONFIG:
 
 SCS_SETUP:
 
-   source $sys_mngdir/pact-scs
+   source $SYS_MngDir/pact-scs
 
    return
 

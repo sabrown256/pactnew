@@ -156,7 +156,7 @@ Group STD {
 Group SYS {
    Arch     = ${SYS_Arch}
    Cfg      = ""
-   CfgMan   = ${SYS_ScrDir}/cfgman
+   CfgMan   = ${SYS_CfgMan}
    Host     = ${SYS_Host}
    ID       = ${SYS_ID}
    Prefix   = "z-"
@@ -164,7 +164,7 @@ Group SYS {
    SITE     = ""
 
    Base     = ${SYS_Base}
-   Root     = ${SYS_Base}/dev/${SYS_ID}
+   Root     = ${SYS_Root}
    AIRoot   = ""
    ASRoot   = ""
    InstRoot = none

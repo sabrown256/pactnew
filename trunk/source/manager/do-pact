@@ -82,7 +82,7 @@ switch ($Phase)
         call GET_NET_ARG($LogHost)
 
         if ($MultiConfig == yes) then
-           setenv SESSION_CONFIG $UHost+$Cfg
+           setenv SESSION_CONFIG $sys_uhost+$Cfg
            Note $LogHost "Using multiconfig name $SESSION_CONFIG"
         endif
 
@@ -423,7 +423,7 @@ switch ($Phase)
                  endif
                  if ($xstatus != 0) then
                     echo "   Failed to configure"
-                    echo "   Look in $LogHost on $UHost"
+                    echo "   Look in $LogHost on $sys_uhost"
                     set IErr = 1
                  endif
      
@@ -965,7 +965,7 @@ GET_HOST_ARG:
 QUALIFY:
 
     if ($Cfg == none) then
-       set tCfg = $UHost
+       set tCfg = $sys_uhost
     else
        set tCfg = $Cfg
     endif
@@ -977,7 +977,7 @@ QUALIFY:
       setenv SESSION_CONFIG $Alias
    
    else if ($MultiConfig == yes) then
-      setenv SESSION_CONFIG $UHost+$tCfg
+      setenv SESSION_CONFIG $sys_uhost+$tCfg
    endif
 
    return

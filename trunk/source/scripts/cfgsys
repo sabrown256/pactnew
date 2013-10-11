@@ -16,7 +16,7 @@ while (1)
    set bindir = `dirname $exe`
    if ("$bindir" != "") break
    if ($count >= 10) then
-      echo "CFGMAN: dirname returned null"
+      echo "CFGSYS: dirname returned null"
       exit(111)
    endif
    @ count = $count + 1
@@ -94,9 +94,9 @@ else
       setenv SYS_Cfg  ""
    endif
 
-   if ($?SYS_CfgMan == 0) then
+#   if ($?SYS_CfgMan == 0) then
       setenv SYS_CfgMan  $basedir/scripts/cfgman
-   endif
+#   endif
 
    if ($?SYS_ID == 0) then
       setenv SYS_ID      `cfgman -d ../dev use`
@@ -110,9 +110,9 @@ else
       setenv SYS_TYPE    ${SYS_Arch}
    endif
 
-   if ($?SYS_SITE == 0) then
-      setenv SYS_SITE    LONER
-   endif
+#   if ($?SYS_SITE == 0) then
+#      setenv SYS_SITE    LONER
+#   endif
 
    if ($?SYS_Prefix == 0) then
       setenv SYS_Prefix  "z-"
@@ -185,7 +185,9 @@ echo "setenv SYS_ID       $SYS_ID ; "
 echo "setenv SYS_Host     $SYS_Host ; "
 echo "setenv SYS_Prefix   $SYS_Prefix ; "
 echo "setenv SYS_TYPE     $SYS_TYPE ; "
-echo "setenv SYS_SITE     $SYS_SITE ; "
+if ($?SYS_SITE == 0) then
+   echo "setenv SYS_SITE     $SYS_SITE ; "
+endif
 
 # root directories
 echo "setenv SYS_Base     $SYS_Base ; "

@@ -320,7 +320,7 @@ switch ($Phase)
 
               if ($status != 0) then
                  echo "   Failed to configure"
-                 echo "   Look in $LogHost on $UHost"
+                 echo "   Look in $LogHost on $sys_uhost"
                  set IErr = 1
               endif
            endif
