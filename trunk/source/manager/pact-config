@@ -74,7 +74,7 @@ set SRCDate       = ""
 
 source pact-scs
 
-setenv Host       `uname -n`
+setenv SYS_Host    `uname -n`
 setenv OS_Name     `uname -s`
 setenv OS_Release  `uname -r`
 
@@ -99,12 +99,12 @@ setenv AbsoluteDeb    FALSE
 setenv AbsoluteOpt    FALSE
 setenv CROSS_COMPILE  FALSE
 
-setenv SYS_MngDir      $cwd
-setenv CfgMan      $SYS_ScrDir/cfgman
-setenv SYS_ID      `$CfgMan use`
+setenv SYS_CfgMan  $SYS_ScrDir/cfgman
+setenv SYS_ID      `$SYS_CfgMan use`
 setenv SYS_CfgDir  cfg-$SYS_ID
+setenv SYS_MngDir  $cwd
 
-setenv SYS_Root  $SYS_Base/dev/$SYS_ID
+setenv SYS_Root $SYS_Base/dev/$SYS_ID
 setenv IncDir   $SYS_Root/include
 setenv EtcDir   $SYS_Root/etc
 setenv BinDir   $SYS_Root/bin
@@ -323,7 +323,7 @@ Main:
 AnalyzeConfig:
 
     NoteD $Log ""
-    NoteD $Log "Analyzing system on $Host"
+    NoteD $Log "Analyzing system on $SYS_Host"
 
     write/envf FALSE
     

@@ -10,11 +10,11 @@
 
 onintr FINISH
 
-set HostOS = `uname -s`
-set Host   = `uname -n`
-set Tmp    = .tmp-nfsmon-$Host-$$
-set TmpR   = .tmp-nfsmon-rpt-$Host-$$
-set TmpD   = .tmp-nfsmon-dif-$Host-$$
+set HostOS   = `uname -s`
+set sys_host = `uname -n`
+set Tmp      = .tmp-nfsmon-$sys_host-$$
+set TmpR     = .tmp-nfsmon-rpt-$sys_host-$$
+set TmpD     = .tmp-nfsmon-dif-$sys_host-$$
 
 set Cont   = FALSE
 set Diff   = FALSE

@@ -53,7 +53,7 @@ set node     = `uname -n`
 set pattern  = 'pact.README pact*-src pact*.tar.gz'
 set tmpf     = tmp-file
 set tmpd     = tmp-dir
-set host     = `uname -n`
+set sys_host = `uname -n`
 set os       = `uname -s | tr "[A-Z]" "[a-z]"`
 set vrb      = FALSE
 
@@ -235,7 +235,7 @@ while ($#argv > 0)
            set savedocs = TRUE
       case -net:
            shift
-           set host    = $1
+           set sys_host    = $1
            set srcmode = "net"
            breaksw
       case -src:
@@ -319,7 +319,7 @@ InitLog Log $base/Build.Log
 Note $Log "Operation:  $opt "
 Note $Log "Update PACT installation on $node"
 Note $Log ""				 
-Note $Log "Update Log		Host: $host running $os"
+Note $Log "Update Log		Host: $sys_host running $os"
 Note $Log "User: $USER		Date: `date`"
 Note $Log ""				 
 Note $Log ""				 
@@ -342,12 +342,12 @@ switch ($srcmode)
 
 # anonymous ftp based update
    case net:
-        NoteD $Log "Getting the PACT sources from $host"
+        NoteD $Log "Getting the PACT sources from $sys_host"
 
 # echo the FTP command into the log
         Note $Log ""
         Note $Log "FTP Commands for Update"
-        Note $Log "   open $host"
+        Note $Log "   open $sys_host"
         Note $Log "   user anonymous password $USER@$node"
         Note $Log "   prompt"
         Note $Log "   bin"
@@ -357,7 +357,7 @@ switch ($srcmode)
         Note $Log ""
 
 # do the transfer
-        (echo "open $host" ; \
+        (echo "open $sys_host" ; \
          echo "user anonymous password $USER@$node" ; \
          echo "prompt" ; \
          echo "bin" ; \
@@ -388,7 +388,7 @@ switch ($srcmode)
           endif
         end
         if ($name == "") then
-           Note $Log "FTP failed to find PACT sources on $host"
+           Note $Log "FTP failed to find PACT sources on $sys_host"
            exit(1)
         endif
 
@@ -745,7 +745,7 @@ endif
 
    NoteD $Log ""
    NoteD $Log "Distribution: $DName"
-   NoteD $Log "Host:         $host"
+   NoteD $Log "Host:         $sys_host"
    NoteD $Log "Date:         `date`"
 
 # move the log now

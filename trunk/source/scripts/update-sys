@@ -144,16 +144,16 @@ set Lock = $UpF:h/.lock.update-sys
 
 # SETUP - read the update file and setup the session
 
-    set Host  = `awk '$1 ~ /Host/  {print $3}' $UpF`
-    set Loc   = `awk '$1 ~ /Loc/   {print $3}' $UpF`
-    set Sites = `awk '$1 ~ /Sites/ {for (i = 3; i <= NF; i++) {printf(" %s", $i);};}' $UpF`
+    set sys_host  = `awk '$1 ~ /Host/  {print $3}' $UpF`
+    set Loc       = `awk '$1 ~ /Loc/   {print $3}' $UpF`
+    set Sites     = `awk '$1 ~ /Sites/ {for (i = 3; i <= NF; i++) {printf(" %s", $i);};}' $UpF`
 
 # allow for dynamic host
-    set Host = `hserve -m $Host`
-    if ("$Host" == "-none-") then
-       set Host  = `awk '$1 ~ /Host/  {print $3}' $UpF`
+    set sys_host = `hserve -m $sys_host`
+    if ("$sys_host" == "-none-") then
+       set sys_host  = `awk '$1 ~ /Host/  {print $3}' $UpF`
        echo ""
-       echo "No host found matching $Host - exiting"
+       echo "No host found matching $sys_host - exiting"
        echo ""
        exit(1)
     endif
@@ -219,9 +219,9 @@ case remove:
 
        if ("$Tags" == all) then
           if ($Verbose == TRUE) then
-             echo "$SSH $Host rm -f $Loc/$LSite.*"
+             echo "$SSH $sys_host rm -f $Loc/$LSite.*"
           endif
-          $SSH $Host 'rm -f '$Loc'/'$LSite'.*'
+          $SSH $sys_host 'rm -f '$Loc'/'$LSite'.*'
        else
           foreach i ($Tags)
              if ($AllSites == TRUE) then
@@ -230,14 +230,14 @@ case remove:
                    set TagF = ( $TagF $Loc/$site.$i )
                 end
                 if ($Verbose == TRUE) then
-                   echo "$SSH $Host rm -f $TagF"
+                   echo "$SSH $sys_host rm -f $TagF"
                 endif
-                $SSH $Host rm -f $TagF
+                $SSH $sys_host rm -f $TagF
              else
                 if ($Verbose == TRUE) then
-                   echo "$SSH $Host rm -f $Loc/$LSite.$i"
+                   echo "$SSH $sys_host rm -f $Loc/$LSite.$i"
                 endif
-                $SSH $Host rm -f $Loc/$LSite.$i
+                $SSH $sys_host rm -f $Loc/$LSite.$i
              endif
           end
        endif
@@ -263,9 +263,9 @@ case list:
 
        if ("$Tags" == all) then
           if ($Verbose == TRUE) then
-             echo "$SSH $Host ls -1rt $Loc | grep -v $UpF:t"
+             echo "$SSH $sys_host ls -1rt $Loc | grep -v $UpF:t"
           endif
-          $SSH $Host ls -1rt $Loc | grep -v $UpF:t
+          $SSH $sys_host ls -1rt $Loc | grep -v $UpF:t
        else
           foreach i ($Tags)
              if ($AllSites == TRUE) then
@@ -274,14 +274,14 @@ case list:
                    set TagF = ( $TagF $Loc/$site.$i )
                 end
                 if ($Verbose == TRUE) then
-                   echo "$SSH $Host ls -1rt $TagF"
+                   echo "$SSH $sys_host ls -1rt $TagF"
                 endif
-                $SSH $Host ls -1 $TagF
+                $SSH $sys_host ls -1 $TagF
              else
                 if ($Verbose == TRUE) then
-                   echo "$SSH $Host ls -1rt $Loc/$LSite.$i"
+                   echo "$SSH $sys_host ls -1rt $Loc/$LSite.$i"
                 endif
-                $SSH $Host ls -1rt $Loc/$LSite.$i
+                $SSH $sys_host ls -1rt $Loc/$LSite.$i
              endif
           end
        endif
@@ -314,15 +314,15 @@ case add:
                 set List = ( $List $Loc/$site.$i )
              end
              if ($Verbose == TRUE) then
-                echo "$SSH $Host touch $List"
+                echo "$SSH $sys_host touch $List"
              endif
-             $SSH $Host touch $List
+             $SSH $sys_host touch $List
              sleep 1
           else
              if ($Verbose == TRUE) then
-                echo "$SSH $Host touch $Loc/$LSite.$i"
+                echo "$SSH $sys_host touch $Loc/$LSite.$i"
              endif
-             $SSH $Host touch $Loc/$LSite.$i
+             $SSH $sys_host touch $Loc/$LSite.$i
              sleep 1
           endif
        end
@@ -431,8 +431,8 @@ case daemon:
     set TStamp = `/bin/date +%y%m%d%H%M%S`
     flog $Log set rUpF = $Tmp.update-sys-db.$LSite.$USER.$TStamp
 
-    flog $Log $SSH $Host $LPath/sign -9 $Watch
-    flog $Log $SCP $UpF ${Host}:$rUpF
+    flog $Log $SSH $sys_host $LPath/sign -9 $Watch
+    flog $Log $SCP $UpF ${sys_host}:$rUpF
 
     while (1)
 
@@ -441,10 +441,10 @@ case daemon:
        @ ia = 0
        while ($ia < $NAttempts)
           if ($Verbose == TRUE) then
-             flog $Log $SSH $Host $LPath/$Watch -l -s $LSite -f $rUpF
+             flog $Log $SSH $sys_host $LPath/$Watch -l -s $LSite -f $rUpF
              set Status = $status
           else
-             flog $Log $SSH $Host $LPath/$Watch -s $LSite -f $rUpF
+             flog $Log $SSH $sys_host $LPath/$Watch -s $LSite -f $rUpF
              set Status = $status
           endif
           if ($Status > 3) break
@@ -452,7 +452,7 @@ case daemon:
        end
        if ($ia >= $NAttempts) then
           NoteD $Log ""
-          NoteD $Log "Cannot SSH to $Host - exiting"
+          NoteD $Log "Cannot SSH to $sys_host - exiting"
           NoteD $Log ""
           exit(1)
        endif
@@ -513,7 +513,7 @@ case daemon:
        endif
     end
 
-    flog $Log $SSH $Host $LPath/sign -9 $Watch
+    flog $Log $SSH $sys_host $LPath/sign -9 $Watch
     flog $Log $SSH $RM $rUpF
     flog $Log $RM $Lock
 
@@ -544,7 +544,7 @@ exit($Err)
 
 INTERRUPT:
 
-$SSH $Host $LPath/sign -9 $Watch >& /dev/null
+$SSH $sys_host $LPath/sign -9 $Watch >& /dev/null
 $SSH $RM $rUpF
 $RM $Lock
 
