@@ -217,7 +217,7 @@ static char *push_file(char *s, int itype)
 		 ok = file_exists("%s/%s", st.dir.mng, lfile);};};
 
 	if (ok == FALSE)
-	   {noted(Log, "***> Cannot find file %s\n", s);
+	   {noted(Log, "***> Cannot find file '%s'\n", s);
 	    ok = FALSE;};}
 
     else if (itype == STACK_PROCESS)

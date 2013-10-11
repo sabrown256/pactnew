@@ -89,7 +89,7 @@ if ("$AnsiCC" != "") then
    endif
 else
    set msg = "$msg none"
-   NoteD $Alog "   $msg"
+   NoteD $ALog "   $msg"
    NoteD $ALog "      No ANSI C compiler found, PACT cannot be built without one"
    setenv STOP ""
    dbexp STOP

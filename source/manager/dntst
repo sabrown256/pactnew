@@ -97,7 +97,7 @@ switch ($Phase)
         end
 
 	if ($MultiConfig == yes) then
-           setenv SESSION_CONFIG $UHost-$Cfg
+           setenv SESSION_CONFIG $sys_uhost-$Cfg
            Note $LogHost "Using multiconfig name $SESSION_CONFIG"
         endif
 
@@ -173,7 +173,7 @@ switch ($Phase)
         set IErr = 0
 
         if ($MultiConfig == yes) then
-           setenv SESSION_CONFIG $UHost-$Cfg
+           setenv SESSION_CONFIG $sys_uhost-$Cfg
            Note $LogHost "  Multiconfig name: $SESSION_CONFIG"
         endif
 
@@ -431,7 +431,7 @@ GET_HOST_ARG:
 QUALIFY:
 
    if ($MultiConfig == yes) then
-      setenv SESSION_CONFIG $UHost-$Cfg
+      setenv SESSION_CONFIG $sys_uhost-$Cfg
    endif
 
    return

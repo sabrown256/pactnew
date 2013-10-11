@@ -71,3 +71,4 @@ dbmget $ALog BE    =\? ""^           \
 envini SYS_MngDir     $cwd
 
 Note $ALog ""
+Separator $ALog
