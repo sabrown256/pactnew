@@ -12,14 +12,14 @@
 
 unalias *
 
-if ($?MngDir == 0) then
-   set MngDir   = $cwd
-   set BaseDir  = $MngDir:h
-   setenv ScrDir $BaseDir/scripts
+if ($?sys_mngdir == 0) then
+   set sys_mngdir = $cwd
+   set sys_base   = $sys_mngdir:h
+   set sys_scrdir = $sys_base/scripts
 endif
 
-source $ScrDir/functions-pact.csh
-source $ScrDir/csh-subroutines
+source $sys_scrdir/functions-pact.csh
+source $sys_scrdir/csh-subroutines
 HAVE_SUBROUTINES
 
 if ($?USER == 0) then
@@ -30,14 +30,14 @@ if ($?USER == 0) then
    endif
 endif
 
-eval `$ScrDir/cfgsys`
+eval `$sys_scrdir/cfgsys`
 
 set Manager       = manager
-set Exe           = $MngDir/$0
+set Exe           = $sys_mngdir/$0
 set DTag          = ( `./pact-get-tag -d` )
 set DName         = "pact$DTag"
-set SCSRepository = ( -d "`$ScrDir/scs-meta -r`" )
-set SCSKind       = ( -k "`$ScrDir/scs-meta -k`" )
+set SCSRepository = ( -d "`$SYS_ScrDir/scs-meta -r`" )
+set SCSKind       = ( -k "`$SYS_ScrDir/scs-meta -k`" )
 set SRCDate       = ( -D "`./pact-get-tag`" )
 set WhoIAm        = $USER
 set HeaderFile    = "../pact-update"
@@ -58,7 +58,7 @@ set MV    = "mv -f"
 set RM    = "rm -f"
 set RMDir = "rm -rf"
 
-InitLog Log $BaseDir/dev/$SYS_ID/log/dist
+InitLog Log $sys_base/dev/$SYS_ID/log/dist
 
 set Opt = "$Exe:t  $argv"
 
@@ -186,14 +186,14 @@ INIT:
    Separator $Log
    NoteD $Log " "
 
-   if (!(-e $MngDir/pact-scs)) then
-      NoteD $Log "Can't find Source Control System Information in $MngDir"
+   if (!(-e $sys_mngdir/pact-scs)) then
+      NoteD $Log "Can't find Source Control System Information in $sys_mngdir"
       NoteD $Log " "
       quit(25)
    endif
 
 # Source Control System Variables
-   source $MngDir/pact-scs
+   source $sys_mngdir/pact-scs
 
    if (!(-d distribution)) then
       flog $Log mkdir distribution
@@ -235,17 +235,17 @@ GET_REPO_SOURCE:
    Separator $Log
 
 # check if repository locked
-   set lockst = ( `$ScrDir/scs-lock status` )
+   set lockst = ( `$SYS_ScrDir/scs-lock status` )
    if ("$lockst" != "unlocked") then
       NoteD $Log " *** REPOSITORY IS LOCKED ***"
       NoteD $Log ""
-      $ScrDir/scs-lock cat
+      $SYS_ScrDir/scs-lock cat
       NoteD $Log ""
       quit(26)
    endif
 
 # lock repository
-   $ScrDir/scs-lock lock
+   $SYS_ScrDir/scs-lock lock
    Note $Lock "  pact-dist in progress - $USER  `date`"
    Note $Lock ""
 
@@ -255,14 +255,14 @@ GET_REPO_SOURCE:
    flog $Log pwd
    flog $Log mkdir pact
    flog $Log pushd pact
-   flog $Log $ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository pact
+   flog $Log $SYS_ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository pact
    set xstatus = $status
    Note $Log " " 
 
 # release the lock
    flog $Log popd
-   flog $Log $ScrDir/scs-lock unlock
-   flog $Log $ScrDir/scs-lock status
+   flog $Log $SYS_ScrDir/scs-lock unlock
+   flog $Log $SYS_ScrDir/scs-lock status
    Note $Log " " 
 
    flog $Log pushd pact
@@ -366,13 +366,13 @@ PREP_TREE:
 
 # remove the source control system sub-directories
    NoteD $Log "Cleaning up the sources"
-   set inf = ( `$ScrDir/which-scs` )
+   set inf = ( `$SYS_ScrDir/which-scs` )
    Note $Log "Repo metadata: $inf"
    unset inf
 
    if (-d pact) then
       flog $Log pushd pact
-      flog $Log ( $ScrDir/scs-meta -d |& xargs rm -rf )
+      flog $Log ( $SYS_ScrDir/scs-meta -d |& xargs rm -rf )
 
       flog $Log mkdir -p $cwd/$Manager
       flog $Log ( echo $DName > $Manager/.pact-date )

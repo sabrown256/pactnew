@@ -134,31 +134,42 @@ Group STD {
 #   SYS_Arch      the system ID as defined by 'system-id'
 #   SYS_Cfg       the system config file
 #   SYS_ID        the system ID as defined by 'cfgman use'
+#   SYS_Prefix    the temporary directory prefix, e.g. "z-"
 #   SYS_TYPE      the system type as defined by 'site-signature'
 #   SYS_SITE      the site of the system as defined by 'site-signature'
-#   SYS_Root      the root ..../pact/dev/$SYS_ID directory
+#
+#   SYS_Base      the base directory containing sources
+#   SYS_Root      the root dev directory for this SYS_ID
 #   SYS_AIRoot    the architecture independent root directory
 #   SYS_ASRoot    the architecture specific root directory
 #   SYS_InstRoot  the root installation directory
-#   SYS_Prefix    the temporary directory prefix, e.g. "z-"
+#
+#   SYS_AnaDir    the manager/analyze directory
 #   SYS_CfgDir    the temporary configuration directory
 #   SYS_FltDir    the directory containing filter files
+#   SYS_MngDir    the manager directory
+#   SYS_ScrDir    the scripts directory
 #   SYS_TmpDir    the temporary build/test directory
 
 Group SYS {
    Arch     = ${SYS_Arch}
+   Cfg      = ""
    ID       = ${SYS_ID}
+   Prefix   = "z-"
    TYPE     = ""
    SITE     = ""
-   Root     = pact/dev/${SYS_ID}
+
+   Base     = ${SYS_Base}
+   Root     = ${SYS_Base}/dev/${SYS_ID}
    AIRoot   = ""
    ASRoot   = ""
    InstRoot = none
-   FltDir   = ""
-   Prefix   = "z-"
-   Cfg      = ""
+
+   AnaDir   = ${SYS_Base}/manager/analyze
    CfgDir   = cfg-${SYS_ID}
    FltDir   = ""
+   MngDir   = ${SYS_Base}/manager
+   ScrDir   = ${SYS_Base}/scripts
    TmpDir   = ${SYS_Prefix}${SYS_ID}
 }
 

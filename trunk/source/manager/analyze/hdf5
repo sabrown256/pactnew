@@ -85,7 +85,7 @@ EOF
    end
    set lALibs = ( $lALibs $LD_Lib $LibM_Lib $Z_Lib )
 
-   source $AnaDir/find-package
+   source $SYS_AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has HDF5 ($PckLib)"

@@ -10,24 +10,24 @@ set Cmd    = $0
 set Exe    = $Cmd:t
 set ExeDir = $Cmd:h
 
-set llog   = $1
-set ScrDir = $2
-set MngDir = $ScrDir:h/manager
+set llog       = $1
+set sys_scrdir = $2
+set sys_mngdir = $sys_scrdir:h/manager
 
-source $ScrDir/functions-pact.csh
-source $ScrDir/csh-subroutines
+source $sys_scrdir/functions-pact.csh
+source $sys_scrdir/csh-subroutines
 
 if ($?FirstCommon == 0) then
-   set lroot = $ScrDir:h
-   set larch = `$ScrDir/cfgman use`
+   set lroot = $sys_scrdir:h
+   set larch = `$sys_scrdir/cfgman use`
    set lbin  = $lroot/dev/$larch/bin
-   set path  = ( $ScrDir $lbin $path )
+   set path  = ( $sys_scrdir $lbin $path )
 
    unset lbin
    unset lroot
    unset larch
 
-   eval `$ScrDir/prune-env -e MngDir pact`
+   eval `$sys_scrdir/prune-env -e sys_mngdir pact`
 
    setenv FirstCommon FALSE
 
@@ -39,7 +39,7 @@ if ($?FirstCommon == 0) then
    Note $Log "Command: $Cmd"
    Note $Log "Current: $cwd"
    Note $Log "Date: `date`"
-   Note $Log "Manager directory: $MngDir"
+   Note $Log "Manager directory: $sys_mngdir"
    Note $Log ""
 endif
 

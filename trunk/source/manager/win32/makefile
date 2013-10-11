@@ -2,9 +2,9 @@
 # Makefile for the PACT Distribution
 #
 
-BaseDir = d:\users\sabrown\pact
-MngDir = ${BaseDir}\manager
-DevDir = ${BaseDir}\dev
+SYS_Base   = d:\users\sabrown\pact
+SYS_MngDir = ${SYS_Base}\manager
+DevDir     = ${SYS_Base}\dev
 
 pact :
 	@echo Building Pact ...
@@ -90,8 +90,8 @@ install:
 
 makes :
 	@echo Making Pact Makefiles ...
-	set MANAGER=${MngDir}
-	for-pact ${MngDir}\manager\bmake
+	set MANAGER=${SYS_MngDir}
+	for-pact ${SYS_MngDir}\manager\bmake
 	@echo Pact Makefiles made
 
 remove :

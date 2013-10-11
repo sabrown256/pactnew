@@ -114,6 +114,7 @@ dbmget $Log BFD_Version^              \
             SYS_Arch^                 \
             SYS_Cfg^                  \
             SYS_FltDir^               \
+            SYS_MngDir^               \
             SYS_ID^                   \
             SYS_TYPE^                 \
             SYS_Prefix^               \
@@ -406,7 +407,7 @@ dbmget $Log BFD_Version^              \
     Note $STDOUT "#undef $OS_Type"
     Note $STDOUT "#define $OS_Type"
 
-    set OSL = ( `cat $MngDir/std/os | grep -v '#'` )
+    set OSL = ( `cat $SYS_MngDir/std/os | grep -v '#'` )
     while ($#OSL > 2)
        set sysn = $OSL[1]
        set pctn = $OSL[2]

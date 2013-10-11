@@ -108,7 +108,7 @@ if ($CDecls == TRUE) then
    Note $Tmp 'exit($status)'
    Note $Tmp ""
 
-   set CF = $MngDir/clib.fncs
+   set CF = $SYS_MngDir/clib.fncs
    chmod a+x $Tmp
    fexec $ALog fr:$CF @o $Tmp $CF $ANSI
 

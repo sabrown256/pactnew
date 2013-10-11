@@ -23,13 +23,13 @@ Separator $Log
 NoteD $Log "   C Environment Configuration - scdecls.h"
 Note $Log ""
 
-dbmget $Log BaseDir^         \
-            CFE^             \
+dbmget $Log CFE^             \
             Cfe_CC_Exe^      \
             Cfe_CC_Flags^    \
             Cfe_LD_Flags^    \
             Cfe_LD_RPath^    \
             IncDir^          \
+            SYS_Base^        \
             SYS_CfgDir^      \
             PACT_CC_VERSION
 
@@ -47,7 +47,7 @@ dbmget $Log BaseDir^         \
     Note $STDOUT " */"
     Note $STDOUT ""
 
-    flog $Log pushd $BaseDir/score
+    flog $Log pushd $SYS_Base/score
 
     set opt = ""
     set opt = ( $opt $Cfe_CC_Flags )

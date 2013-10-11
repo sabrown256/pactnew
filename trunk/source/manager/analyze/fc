@@ -202,11 +202,11 @@ dbmset $ALog HAVE_FORTRAN     = $HAVE_FORTRAN^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-ftee $ALog gexec $AnaDir/fc-id    @ \
-                 $AnaDir/fc-std   @ \
-                 $AnaDir/fc-types @ \
-                 $AnaDir/fc-int   @ \
-                 $AnaDir/fc-iso
+ftee $ALog gexec $SYS_AnaDir/fc-id    @ \
+                 $SYS_AnaDir/fc-std   @ \
+                 $SYS_AnaDir/fc-types @ \
+                 $SYS_AnaDir/fc-int   @ \
+                 $SYS_AnaDir/fc-iso
 
 exit(0)
 

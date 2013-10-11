@@ -27,12 +27,12 @@ dbmget $Log CROSS_COMPILE^           \
             PACT_CC_PATH^            \
             PACT_CC_VERSION^         \
             SYS_ID^                  \
-            BaseDir^                 \
+            SYS_Base^                \
             BinDir^                  \
             LibDir^                  \
-            MngDir
+            SYS_MngDir
 
-    flog $Log set DSYS = $MngDir/dsys
+    flog $Log set DSYS = $SYS_MngDir/dsys
     flog $Log set MAKE = $BinDir/smake
     flog $Log set opt  = smake
     flog $Log set path = ( $BinDir $path )
@@ -48,7 +48,7 @@ dbmget $Log CROSS_COMPILE^           \
 
        Note $Log "Build local dmake"
 
-       flog $Log pushd $BaseDir/score
+       flog $Log pushd $SYS_Base/score
 
 # always remove and start clean in case there is toxic rubble
 # left over from a failed build
@@ -80,7 +80,7 @@ dbmget $Log CROSS_COMPILE^           \
        Note $Log "   BinDir    = |$BinDir|"
        Note $Log "   CROSS_REF = |$CROSS_REF|"
 
-       set srcb = $BaseDir/dev/$CROSS_REF/bin
+       set srcb = $SYS_Base/dev/$CROSS_REF/bin
        set dm   = $srcb/dmake
 
        Note $Log "   dm        = |$dm|"

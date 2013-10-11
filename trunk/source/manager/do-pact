@@ -167,15 +167,15 @@ switch ($Phase)
               if ($Err == 0) then
                  set Prnt = $cwd:h
                  if (!(-d $Prnt/repository)) then
-                    flog $LogHost $RMDir $Prnt/$BaseDir
+                    flog $LogHost $RMDir $Prnt/$SYS_Base
                  endif
-                 flog $LogHost $MV $Code $Prnt/$BaseDir
+                 flog $LogHost $MV $Code $Prnt/$SYS_Base
                  flog $LogHost cd $Prnt
                  if (!(-d $ltmp/repository)) then
                     flog $LogHost $RMDir $ltmp
                  endif         
                  flog $LogHost find . -type d chmod 2770 {} \;
-                 flog $LogHost chmod -R ug+rw,g+X $BaseDir
+                 flog $LogHost chmod -R ug+rw,g+X $SYS_Base
               else
                  Note $LogHost "Source setup FAILED"
               endif

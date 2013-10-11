@@ -17,7 +17,7 @@ dbmget $Log HAVE_FORTRAN^     \
             HAVE_PY_NUMPY^    \
             MAKE_Exe^         \
             MAKE_Shared_Libs^ \
-            BaseDir^          \
+            SYS_Base^         \
             SYS_Root^         \
             SYS_ID^           \
             PY_Exe^           \
@@ -43,7 +43,7 @@ dbmget $Log HAVE_FORTRAN^     \
        NoteD $Log ""
        exit(1)
     else
-       set UCC = `$MngDir/pwhich $CC_Exe`
+       set UCC = `$SYS_MngDir/pwhich $CC_Exe`
        NoteD $Log "   C Compiler used is $UCC"
     endif
 
@@ -57,7 +57,7 @@ dbmget $Log HAVE_FORTRAN^     \
        NoteD $Log "   ERROR: No Fortran compiler available - check your system or your path"
        NoteD $Log ""
     else
-       set UFC = `$MngDir/pwhich $FC_Exe`
+       set UFC = `$SYS_MngDir/pwhich $FC_Exe`
        if (-x "$UFC") then
           NoteD $Log "   Fortran Compiler used is $UFC"
        else
@@ -180,7 +180,7 @@ dbmget $Log HAVE_FORTRAN^     \
 
 Note $Log "Install shell includes from psh"
 
-flog $Log pushd $BaseDir/psh
+flog $Log pushd $SYS_Base/psh
 flog $Log $MAKE_Exe IncDir=$SYS_Root/include -f pre-Make mkinstall
 flog $Log popd
 
