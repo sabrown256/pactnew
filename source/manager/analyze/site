@@ -24,10 +24,10 @@ else
    Note $ALog "DB_SITE_SIGNATURE not defined"
 endif
 
-if (-f $MngDir/extensions/sys-site) then
-   eval `$MngDir/extensions/sys-site`
+if (-f $SYS_MngDir/extensions/sys-site) then
+   eval `$SYS_MngDir/extensions/sys-site`
 else
-   eval `$ScrDir/sys-site -dc`
+   eval `$SYS_ScrDir/sys-site -dc`
 endif
 
 # export the results

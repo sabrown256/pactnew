@@ -12,11 +12,11 @@
 
 unalias *
 
-set MngDir = $cwd
-set ScrDir = $MngDir:h/scripts
+set sys_mngdir = $cwd
+set sys_scrdir = $sys_mngdir:h/scripts
 
-source $ScrDir/functions-pact.csh
-source $ScrDir/csh-subroutines
+source $sys_scrdir/functions-pact.csh
+source $sys_scrdir/csh-subroutines
 HAVE_SUBROUTINES
 
 if ($?USER == 0) then
@@ -29,8 +29,8 @@ endif
 
 InitLog Log $cwd/log.import
 
-set RepoDir = `$ScrDir/scs-meta -r`
-set RepoKnd = ( -k `$ScrDir/scs-meta -k` )
+set RepoDir = `$sys_scrdir/scs-meta -r`
+set RepoKnd = ( -k `$sys_scrdir/scs-meta -k` )
 
 if ("$RepoDir" =~ *:/*) then
    set RepoDir = ( `echo $RepoDir | sed 's|^.*:||'` )
@@ -119,9 +119,9 @@ endif
 # do an ls to wake up the automounter if one is present
 flog $Log ls $RepoDir
 
-if (!(-e $MngDir/pact-scs)) then
+if (!(-e $sys_mngdir/pact-scs)) then
    NoteD $Log " "
-   NoteD $Log "Can't find Source Control System Information in $MngDir"
+   NoteD $Log "Can't find Source Control System Information in $sys_mngdir"
    NoteD $Log " "
    exit(1)
 endif
@@ -132,15 +132,15 @@ endif
 # MAIN - start the work here
 
 # source control system variables
-   flog $Log source $MngDir/pact-scs
+   flog $Log source $sys_mngdir/pact-scs
 
 # check if repository is locked
-   set lockst = `$ScrDir/scs-lock status`
+   set lockst = `$sys_scrdir/scs-lock status`
    if ($lockst == "locked") then
       NoteD $Log ""
       NoteD $Log " *** REPOSITORY IS LOCKED ***"
       NoteD $Log ""
-      $ScrDir/scs-lock cat
+      $sys_scrdir/scs-lock cat
       NoteD $Log ""
       exit(1)
    endif
@@ -318,7 +318,7 @@ BACKUP:
    Note $Log ""
 
 # initiate a lock on the repository
-   ftee $Log $ScrDir/scs-lock lock
+   ftee $Log $sys_scrdir/scs-lock lock
    Note $Lock $Message
    Note $Lock "Source: $SrcFile" 
 
@@ -393,7 +393,7 @@ GET_OLD:
    flog $Log mkdir $Old
    flog $Log cd $Old
 
-   flog $Log $ScrDir/scs-co $SCSTag $RepoKnd -d $RepoDir pact
+   flog $Log $sys_scrdir/scs-co $SCSTag $RepoKnd -d $RepoDir pact
    flog $Log set ErrStat = $status
 
    flog $Log popd
@@ -438,7 +438,7 @@ PROCESS_OLD:
 
    Note $Log "process the old sources"
    flog $Log cd pact
-   flog $Log ($ScrDir/scs-meta -d >! ../$TmpFile.lst)
+   flog $Log ($sys_scrdir/scs-meta -d >! ../$TmpFile.lst)
    flog $Log cat ../$TmpFile.lst
    Note $Log ""
    flog $Log $ltmp `cat ../$TmpFile.lst`
@@ -499,7 +499,7 @@ ADJUST_OLD_TREE:
 
 # list all the directories of this tree sorted from most nested to least
 # then remove them if they have no counterpart in the other tree
-   set scsd = `$ScrDir/scs-meta -n`
+   set scsd = `$sys_scrdir/scs-meta -n`
    flog $Log cd pact
    flog $Log (find . -type d \! -name $scsd | sort -r | sed s'|\.\/||' >! ../$TmpFile.lst)
    unset scsd
@@ -599,7 +599,7 @@ ADJUST_NEW_TREE:
 
 # list all the directories of this tree sorted from most nested to least
    flog $Log cd pact
-   flog $Log ($ScrDir/scs-meta -d | xargs $ltmp >! ../$TmpFile.lst)
+   flog $Log ($sys_scrdir/scs-meta -d | xargs $ltmp >! ../$TmpFile.lst)
    flog $Log cat ../$TmpFile.lst
    flog $Log @ AddNew = `wc -l ../$TmpFile.lst | awk '{print $1}'`
    Note $Log ""
@@ -619,7 +619,7 @@ ADJUST_NEW_TREE:
          foreach dir (`cat ../$TmpFile.lst`)
             Note $Log "Adding $dir"
             flog $Log mkdir $dir
-            flog $Log $ScrDir/scs-add $dir
+            flog $Log $sys_scrdir/scs-add $dir
          end
          flog $Log popd
       else
@@ -668,13 +668,13 @@ RECONCILE:
    Note $STDOUT 'else if (-e $lbase.new) then'
    Note $STDOUT '   cp $lbase.new $lbase'
    Note $STDOUT '   pushd $lbdir >& /dev/null'
-   Note $STDOUT "   $ScrDir/scs-add" '$lfile'
+   Note $STDOUT "   $sys_scrdir/scs-add" '$lfile'
    Note $STDOUT '   popd >& /dev/null'
    Note $STDOUT 'else if (-e $lbase.old) then'
    Note $STDOUT '   pushd $lbdir >& /dev/null'
-   Note $STDOUT "   $ScrDir/scs-update -A" '$lfile'
+   Note $STDOUT "   $sys_scrdir/scs-update -A" '$lfile'
    Note $STDOUT '   rm -f $lfile' 
-   Note $STDOUT "   $ScrDir/scs-remove" '$lfile'
+   Note $STDOUT "   $sys_scrdir/scs-remove" '$lfile'
    Note $STDOUT '   popd >& /dev/null'
    Note $STDOUT 'endif'
    Note $STDOUT 'rm -f $1'
@@ -734,10 +734,10 @@ UPDATE:
    Note $Log ""
 
    if ($SCSTag != "") then
-      flog $Log ($ScrDir/scs-update -A >&! $TmpFile)
+      flog $Log ($sys_scrdir/scs-update -A >&! $TmpFile)
    else
       flog $Log cd pact
-      flog $Log ($ScrDir/scs-update -A >&! ../$TmpFile)
+      flog $Log ($sys_scrdir/scs-update -A >&! ../$TmpFile)
       flog $Log cd ..
    endif
 
@@ -798,7 +798,7 @@ COMMIT:
    Note $Log "   Current Directory:    $cwd"
    Note $Log ""
 
-   flog $Log $ScrDir/scs-commit -m "+++++ Import from $CodeDate +++++"
+   flog $Log $sys_scrdir/scs-commit -m "+++++ Import from $CodeDate +++++"
    set ErrStat = $status
 
    if ($ErrStat != 0) then
@@ -833,8 +833,8 @@ SYNC:
    set excl = ( $excl -exclude local )
    set excl = ( $excl -exclude hosts )
    set excl = ( $excl -exclude extensions )
-   if (-f $MngDir/local/exclusions) then
-      foreach i (`cat $MngDir/local/exclusions | grep -v '^#'`)
+   if (-f $sys_mngdir/local/exclusions) then
+      foreach i (`cat $sys_mngdir/local/exclusions | grep -v '^#'`)
          set excl = ( $excl -exclude $i )
       end
    endif
@@ -886,7 +886,7 @@ FINISH:
 
 # release the lock
    NoteD $Log "The repository is unlocked"
-   $ScrDir/scs-lock unlock
+   $sys_scrdir/scs-lock unlock
 
    NoteD $Log ""
    NoteD $Log "Version $CodeDate imported"

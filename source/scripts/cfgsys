@@ -30,12 +30,20 @@ while ($#argv > 0)
    switch ($1)
       case -c:
            unsetenv SYS_Arch
+           unsetenv SYS_Base
            unsetenv SYS_ID
            unsetenv SYS_TYPE
            unsetenv SYS_SITE
+           unsetenv SYS_AIRoot
+           unsetenv SYS_ASRoot
+           unsetenv SYS_InstRoot
            unsetenv SYS_Root
            unsetenv SYS_Prefix
+           unsetenv SYS_AnaDir
            unsetenv SYS_CfgDir
+           unsetenv SYS_FltDir
+           unsetenv SYS_MngDir
+           unsetenv SYS_ScrDir
            unsetenv SYS_TmpDir
            breaksw
       case -d:
@@ -71,9 +79,16 @@ if ("$dir" != "") then
 # best defaults
 else
    set basedir = $bindir:h
+   pushd $basedir >>& /dev/null
+   set basedir = $cwd
+   popd >>& /dev/null
 
    if ($?SYS_Arch == 0) then
       setenv SYS_Arch    `system-id`
+   endif
+
+   if ($?SYS_Cfg == 0) then
+      setenv SYS_Cfg  ""
    endif
 
    if ($?SYS_ID == 0) then
@@ -88,20 +103,17 @@ else
       setenv SYS_SITE    LONER
    endif
 
-   if ($?SYS_Root == 0) then
-      setenv SYS_Root     $basedir/dev/${SYS_ID}
-   endif
-
    if ($?SYS_Prefix == 0) then
       setenv SYS_Prefix  "z-"
    endif
 
-   if ($?SYS_CfgDir == 0) then
-      setenv SYS_CfgDir  cfg-${SYS_ID}
+# root directories
+   if ($?SYS_Base == 0) then
+      setenv SYS_Base    $basedir
    endif
 
-   if ($?SYS_TmpDir == 0) then
-      setenv SYS_TmpDir  ${SYS_Prefix}${SYS_ID}
+   if ($?SYS_Root == 0) then
+      setenv SYS_Root     $basedir/dev/${SYS_ID}
    endif
 
    if ($?SYS_AIRoot == 0) then
@@ -124,32 +136,57 @@ else
       endif
    endif
 
-   if ($?SYS_Cfg == 0) then
-      setenv SYS_Cfg  ""
+   if ($?SYS_InstRoot == 0) then
+      setenv SYS_InstRoot  none
+   endif
+
+# directories
+   if ($?SYS_AnaDir == 0) then
+      setenv SYS_AnaDir  $basedir/manager/analyze
+   endif
+
+   if ($?SYS_CfgDir == 0) then
+      setenv SYS_CfgDir  cfg-${SYS_ID}
    endif
 
    if ($?SYS_FltDir == 0) then
       setenv SYS_FltDir  ""
    endif
 
-   if ($?SYS_InstRoot == 0) then
-      setenv SYS_InstRoot  none
+   if ($?SYS_MngDir == 0) then
+      setenv SYS_MngDir  $basedir/manager
+   endif
+
+   if ($?SYS_ScrDir == 0) then
+      setenv SYS_ScrDir  $basedir/scripts
+   endif
+
+   if ($?SYS_TmpDir == 0) then
+      setenv SYS_TmpDir  ${SYS_Prefix}${SYS_ID}
    endif
 
 endif
 
 echo "setenv SYS_Arch     $SYS_Arch ; "
-echo "setenv SYS_AIRoot   $SYS_AIRoot ; "
-echo "setenv SYS_ASRoot   $SYS_ASRoot ; "
 echo "setenv SYS_Cfg      $SYS_Cfg ; "
-echo "setenv SYS_FltDir   $SYS_FltDir ; "
-echo "setenv SYS_InstRoot $SYS_InstRoot ; "
 echo "setenv SYS_ID       $SYS_ID ; "
+echo "setenv SYS_Prefix   $SYS_Prefix ; "
 echo "setenv SYS_TYPE     $SYS_TYPE ; "
 echo "setenv SYS_SITE     $SYS_SITE ; "
+
+# root directories
+echo "setenv SYS_Base     $SYS_Base ; "
 echo "setenv SYS_Root     $SYS_Root ; "
-echo "setenv SYS_Prefix   $SYS_Prefix ; "
+echo "setenv SYS_AIRoot   $SYS_AIRoot ; "
+echo "setenv SYS_ASRoot   $SYS_ASRoot ; "
+echo "setenv SYS_InstRoot $SYS_InstRoot ; "
+
+# specific directories
+echo "setenv SYS_AnaDir   $SYS_AnaDir ; "
 echo "setenv SYS_CfgDir   $SYS_CfgDir ; "
+echo "setenv SYS_FltDir   $SYS_FltDir ; "
+echo "setenv SYS_MngDir   $SYS_MngDir ; "
+echo "setenv SYS_ScrDir   $SYS_ScrDir ; "
 echo "setenv SYS_TmpDir   $SYS_TmpDir"
 
 exit($err)

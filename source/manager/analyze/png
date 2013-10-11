@@ -94,7 +94,7 @@ EOF
 
    unset lrpath
 
-   source $AnaDir/find-package
+   source $SYS_AnaDir/find-package
 
    if (("$PckLib" != "") && ("$Z_Lib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has PNG ($PckLib)"

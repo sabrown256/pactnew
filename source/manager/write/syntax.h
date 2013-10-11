@@ -23,11 +23,11 @@ Separator $Log
 NoteD $Log "   Interpeter Syntax Mode Configuration - syntax.h"
 Note $Log ""
 
-dbmget $Log BaseDir^    \
+dbmget $Log BackSlash^  \
             IncDir^     \
-            SYS_Cfg^    \
             Yacc_Exe^   \
-            BackSlash
+            SYS_Base^   \
+            SYS_Cfg
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -51,7 +51,7 @@ dbmget $Log BaseDir^    \
     set lsm   = ""
     @ nsyntxs = 0
     if ("$Yacc_Exe" != "") then
-       flog $Log pushd $BaseDir/scheme
+       flog $Log pushd $SYS_Base/scheme
        if (!(-d syntax)) then
           flog $Log mkdir syntax
        endif

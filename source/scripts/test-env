@@ -15,7 +15,7 @@ foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
    if (-f $f/functions-pact.csh) then
       pushd $f >>& /dev/null
       setenv TestScrDir $cwd
-      setenv BaseDir $cwd:h
+      setenv SYS_Base $cwd:h
       popd >>& /dev/null
       break
    endif
@@ -91,10 +91,10 @@ setenv ZeroSpace  "-z 2"
 #   while (!(-d dev) && !(-d manager))
 #      cd .. >& /dev/null
 #   end
-#   setenv BaseDir  $cwd
+#   setenv SYS_Base  $cwd
 #   popd >& /dev/null
 
-   setenv SrcDir    $BaseDir/$Package
+   setenv SrcDir    $SYS_Base/$Package
 
    setenv EtcDir    $SYS_Root/etc
    setenv IncDir    $SYS_Root/include
@@ -109,7 +109,7 @@ setenv ZeroSpace  "-z 2"
    setenv MAKE      $BinDir/pact
    setenv DORUN     $BinDir/do-run
    setenv PSDIFF    $BinDir/ps-diff
-   setenv PX        $BaseDir/scripts/px
+   setenv PX        $SYS_Base/scripts/px
 
    source $EtcDir/env-pact.csh
 
@@ -157,22 +157,22 @@ setenv ZeroSpace  "-z 2"
 
 set path = ( . $BinDir $path )
 
-setenv SCHEME $BaseDir/scheme/applications
-setenv SCHEME $BaseDir/scheme/applications/extensions:${SCHEME}
-setenv SCHEME $BaseDir/scheme/tests:${SCHEME}
+setenv SCHEME $SYS_Base/scheme/applications
+setenv SCHEME $SYS_Base/scheme/applications/extensions:${SCHEME}
+setenv SCHEME $SYS_Base/scheme/tests:${SCHEME}
 
 if ($?Package == 1) then
-   setenv SCHEME $BaseDir/$Package/tests:${SCHEME}
-   setenv SCHEME $BaseDir/$Package/applications:${SCHEME}
-   setenv SCHEME $BaseDir/$Package/applications/extensions:${SCHEME}
+   setenv SCHEME $SYS_Base/$Package/tests:${SCHEME}
+   setenv SCHEME $SYS_Base/$Package/applications:${SCHEME}
+   setenv SCHEME $SYS_Base/$Package/applications/extensions:${SCHEME}
 else
-   setenv SCHEME $BaseDir/sx/applications:${SCHEME}
-   setenv SCHEME $BaseDir/sx/applications/extensions:${SCHEME}
-   setenv SCHEME $BaseDir/sx/tests:${SCHEME}
-   setenv SCHEME $BaseDir/ultra:${SCHEME}
-   setenv SCHEME $BaseDir/ultra/applications:${SCHEME}
-   setenv SCHEME $BaseDir/ultra/applications/extensions:${SCHEME}
-   setenv SCHEME $BaseDir/panacea/applications:${SCHEME}
+   setenv SCHEME $SYS_Base/sx/applications:${SCHEME}
+   setenv SCHEME $SYS_Base/sx/applications/extensions:${SCHEME}
+   setenv SCHEME $SYS_Base/sx/tests:${SCHEME}
+   setenv SCHEME $SYS_Base/ultra:${SCHEME}
+   setenv SCHEME $SYS_Base/ultra/applications:${SCHEME}
+   setenv SCHEME $SYS_Base/ultra/applications/extensions:${SCHEME}
+   setenv SCHEME $SYS_Base/panacea/applications:${SCHEME}
 endif
 
 setenv SCHEME $SYS_Root/scheme:${SCHEME}
@@ -210,7 +210,7 @@ if ("$Test" == "") then
          if ("$i" == ".") then
             set base = $FilesDir/vg.suppress
          else
-            set base = $BaseDir/$i/tests/vg.suppress
+            set base = $SYS_Base/$i/tests/vg.suppress
          endif
          if (-f $base) then
             setenv Valgrind  "$Valgrind --suppressions=$base"
@@ -233,7 +233,7 @@ Note $Log "Test environment"
 
 Note $Log ""
 Note $Log "Directories:"
-Note $Log "BaseDir    = |$BaseDir|"
+Note $Log "SYS_Base    = |$SYS_Base|"
 Note $Log "SYS_ID     = |$SYS_ID|"
 Note $Log "SYS_Root   = |$SYS_Root|"
 Note $Log "SrcDir     = |$SrcDir|"

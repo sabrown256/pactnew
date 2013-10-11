@@ -24,6 +24,7 @@ Note $Log "   System make wrapper - smake"
 Note $Log ""
 
 dbmget $Log SYS_CfgDir^       \
+            SYS_MngDir^       \
             SYS_Root^         \
             SYS_ID^           \
             SYS_InstRoot^     \
@@ -32,7 +33,6 @@ dbmget $Log SYS_CfgDir^       \
             IncDir^           \
             EtcDir^           \
             BinDir^           \
-            MngDir^           \
             Cfg_CC_Exe^       \
             Cfg_CC_Flags^     \
             Cfg_Lex_Flags^    \
@@ -41,7 +41,7 @@ dbmget $Log SYS_CfgDir^       \
             PACT_CC_VERSION^  \
             UseTmpDir
 
-set lpactver = `cat $MngDir/.pact-version`
+set lpactver = `cat $SYS_MngDir/.pact-version`
 
 Note $Log "   lpactver      = |$lpactver|"
 

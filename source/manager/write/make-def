@@ -28,7 +28,6 @@ Note $Log ""
 dbmget $Log AR_IFlag^               \
             AR_XFlag^               \
             ArW32Objs^              \
-            BaseDir^                \
             BE^                     \
             Bits^                   \
             CC_Debug_Default^       \
@@ -61,7 +60,6 @@ dbmget $Log AR_IFlag^               \
             LIB^                    \
             Load^                   \
             MAKE_Strategy^          \
-            MngDir^                 \
             OS_Name^                \
             OS_Type^                \
             OW32Objs^               \
@@ -85,11 +83,13 @@ dbmget $Log AR_IFlag^               \
             PARALLEL_COMM_METH^     \
             STD_IPC^                \
             SUFFIXES^               \
+            SYS_Base^               \
             SYS_Cfg^                \
             SYS_Root^               \
 	    SYS_ID^                 \
             SYS_InstRoot^           \
 	    SYS_CfgDir^             \
+            SYS_MngDir^             \
 	    SYS_TmpDir^             \
             ThreadLibExt^           \
             UPDATE^                 \
@@ -141,7 +141,7 @@ foreach t (MD MDE MDI MDG DP LibM)
    end
 end
 
-source $MngDir/write/import-db
+source $SYS_MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -181,25 +181,25 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     set THE_DATE = `cat .pact-version`
     Note $STDOUT "Version    = $THE_DATE"
 
-    set mk = ( `$MngDir/pwhich gmake` )
+    set mk = ( `$SYS_MngDir/pwhich gmake` )
     if (!(-x "$mk")) then
-       set mk = `$MngDir/pwhich make`
+       set mk = `$SYS_MngDir/pwhich make`
     endif
     Note $Log "Using '$mk' for system make"
     Note $STDOUT "UMake      = $mk"
     unset mk
 
-    Note $STDOUT 'tmpobj  = ${SYS_TmpDir}/obj'
-    Note $STDOUT "BaseDir = $BaseDir"
-    Note $STDOUT "ScrDir  = $BaseDir/scripts"
-    Note $STDOUT "SYS_Root = $SYS_Root"
-    Note $STDOUT 'ScmDir  = ${SYS_Root}/scheme'
-    Note $STDOUT 'BinDir  = ${SYS_Root}/bin'
-    Note $STDOUT 'LibDir  = ${SYS_Root}/lib'
-    Note $STDOUT 'IncDir  = ${SYS_Root}/include'
-    Note $STDOUT 'EtcDir  = ${SYS_Root}/etc'
-    Note $STDOUT 'Man1Dir = ${SYS_Root}/man/man1'
-    Note $STDOUT 'Man3Dir = ${SYS_Root}/man/man3'
+    Note $STDOUT 'tmpobj     = ${SYS_TmpDir}/obj'
+    Note $STDOUT "SYS_Base   = $SYS_Base"
+    Note $STDOUT "SYS_ScrDir = $SYS_Base/scripts"
+    Note $STDOUT "SYS_Root   = $SYS_Root"
+    Note $STDOUT 'ScmDir     = ${SYS_Root}/scheme'
+    Note $STDOUT 'BinDir     = ${SYS_Root}/bin'
+    Note $STDOUT 'LibDir     = ${SYS_Root}/lib'
+    Note $STDOUT 'IncDir     = ${SYS_Root}/include'
+    Note $STDOUT 'EtcDir     = ${SYS_Root}/etc'
+    Note $STDOUT 'Man1Dir    = ${SYS_Root}/man/man1'
+    Note $STDOUT 'Man3Dir    = ${SYS_Root}/man/man3'
     Note $STDOUT ""
 
     if ("$OS_Name" == "HP-UX") then
@@ -298,7 +298,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT -n "SyntaxModes  ="
     if ("$Yacc_Exe" != "") then
        set scsd = `scs-meta -n`
-       pushd $BaseDir/scheme/syntax >& /dev/null
+       pushd $SYS_Base/scheme/syntax >& /dev/null
        foreach mod (*)
           if (-d $mod) then
              if ($mod != "$scsd") then
@@ -482,7 +482,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     Note $STDOUT "SHELL   = $DEFAULT_SHELL"
-    Note $STDOUT "Manager = $MngDir"
+    Note $STDOUT "Manager = $SYS_MngDir"
     Note $STDOUT 'DATE    = `./code-date`'
     Note $STDOUT ""
 

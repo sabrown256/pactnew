@@ -8,24 +8,24 @@
 #
 
 Run {
-   write/package         $Log $ScrDir
-   write/cfg.db          $Log $ScrDir
-   write/scconfig.h      $Log $ScrDir
-   write/iso-c.h         $Log $ScrDir
+   write/package         $Log $SYS_ScrDir
+   write/cfg.db          $Log $SYS_ScrDir
+   write/scconfig.h      $Log $SYS_ScrDir
+   write/iso-c.h         $Log $SYS_ScrDir
 }
 
 Run {
-   write/configured      $Log $ScrDir $CONFIG_FILE
-   write/make-def        $Log $ScrDir
-   write/make-macros     $Log $ScrDir
-   write/makefile        $Log $ScrDir
-   write/scdecls.h       $Log $ScrDir
-   write/syntax.h        $Log $ScrDir
-   write/spokes.scm      $Log $ScrDir
-   write/install-pact    $Log $ScrDir
-   write/acc             $Log $ScrDir
-   write/aranlib         $Log $ScrDir
-   write/smake           $Log $ScrDir
-   write/dmake           $Log $ScrDir
+   write/configured      $Log $SYS_ScrDir $CONFIG_FILE
+   write/make-def        $Log $SYS_ScrDir
+   write/make-macros     $Log $SYS_ScrDir
+   write/makefile        $Log $SYS_ScrDir
+   write/scdecls.h       $Log $SYS_ScrDir
+   write/syntax.h        $Log $SYS_ScrDir
+   write/spokes.scm      $Log $SYS_ScrDir
+   write/install-pact    $Log $SYS_ScrDir
+   write/acc             $Log $SYS_ScrDir
+   write/aranlib         $Log $SYS_ScrDir
+   write/smake           $Log $SYS_ScrDir
+   write/dmake           $Log $SYS_ScrDir
 }
 

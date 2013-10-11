@@ -3,10 +3,10 @@
 #
 
 # SYSTEM  = DOS
-SYSTEM  =
-MACHINE = DOS
-BaseDir = c:\pactdir\pact
-ScmDir  = ${BaseDir}\scheme
+SYSTEM   =
+MACHINE  = DOS
+SYS_Base = c:\pactdir\pact
+ScmDir   = ${SYS_Base}\scheme
 
 #
 # Site Dependent Graphics Information

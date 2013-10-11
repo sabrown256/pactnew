@@ -73,7 +73,7 @@ EOF
    end
    set lALibs = ( $lALibs $LD_Lib $LibM_Lib )
 
-   source $AnaDir/find-package
+   source $SYS_AnaDir/find-package
 
    setenv Z_Lib "-lz"
    if (("$PckLib" != "") && ("$PckInc" != "")) then

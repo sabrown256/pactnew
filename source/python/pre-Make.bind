@@ -11,9 +11,9 @@
 
 sysdir = none
 include ${sysdir}/etc/make-def
-PACTGenDir = ${BaseDir}/python/${tmpobj}
-PACTTmpDir = ${BaseDir}/python/${lpyext}/${tmpobj}
-PACTSrcDir = ${BaseDir}/python
+PACTGenDir = ${SYS_Base}/python/${tmpobj}
+PACTTmpDir = ${SYS_Base}/python/${lpyext}/${tmpobj}
+PACTSrcDir = ${SYS_Base}/python
 
 PDB_MOD_NAME = _pdb
 

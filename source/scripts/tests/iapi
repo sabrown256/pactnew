@@ -32,10 +32,10 @@ NoteD $Log "                    $msg"
 Note $Log ""
 
 set defl = ""
-set defl = ( $defl $BaseDir/pdb/spokes/hdf5/hdf5.def none )
-set defl = ( $defl $BaseDir/pdb/spokes/sql/mysql.def -I/usr/include/mysql )
-set defl = ( $defl $BaseDir/pdb/spokes/sql/sqlite3.def none )
-set defl = ( $defl $BaseDir/score/bfd.def none )
+set defl = ( $defl $SYS_Base/pdb/spokes/hdf5/hdf5.def none )
+set defl = ( $defl $SYS_Base/pdb/spokes/sql/mysql.def -I/usr/include/mysql )
+set defl = ( $defl $SYS_Base/pdb/spokes/sql/sqlite3.def none )
+set defl = ( $defl $SYS_Base/score/bfd.def none )
 
 unsetenv xstatus
 unset xstatus

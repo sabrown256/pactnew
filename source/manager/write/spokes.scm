@@ -23,17 +23,17 @@ Separator $Log
 NoteD $Log "   Binary File Translation Spokes Loader - spokes.scm"
 Note $Log ""
 
-dbmget $Log BaseDir^         \
-            SchDir^          \
-            SYS_Cfg^         \
-            SchemeSpokes^    \
+dbmget $Log SchDir^          \
             CSpokes^         \
-            BackSlash
+            SchemeSpokes^    \
+            BackSlash^       \
+            SYS_Base^        \
+            SYS_Cfg
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if (-d $BaseDir/sx/applications) then
+if (-d $SYS_Base/sx/applications) then
 
     set STDOUT = $SchDir/spokes.scm
 

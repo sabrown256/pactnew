@@ -11,7 +11,7 @@
 
 unalias *
 
-if ($?MngDir == 0) then
+if ($?sys_mngdir == 0) then
    if ($?USER == 0) then
       if ($?LOGNAME == 0) then
          set USER = "anonymous"
@@ -20,16 +20,16 @@ if ($?MngDir == 0) then
       endif
    endif
 
-   set MngDir = $cwd
-   set lbase  = $MngDir:h
+   set sys_mngdir = $cwd
+   set sys_base   = $sys_mngdir:h
 
-   setenv BaseDir   $lbase
-   setenv ScrDir    $BaseDir/scripts
+   setenv SYS_Base   $sys_base
+   setenv SYS_ScrDir $SYS_Base/scripts
 
-   source $ScrDir/functions-pact.csh
+   source $SYS_ScrDir/functions-pact.csh
 endif
 
-source $ScrDir/csh-subroutines
+source $SYS_ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
 if ($#argv < 1) then
@@ -66,7 +66,7 @@ set StructStack = "Glb"
 setenv CurrTool  ""
 setenv CurrGrp   Glb
 
-set path = ( $MngDir $path )
+set path = ( $sys_mngdir $path )
 
 # Source Control System Variables
 set SCSRepository = ""
@@ -78,7 +78,7 @@ setenv Host       `uname -n`
 setenv OS_Name     `uname -s`
 setenv OS_Release  `uname -r`
 
-setenv SYS_Arch `$ScrDir/system-id`
+setenv SYS_Arch `$SYS_ScrDir/system-id`
 
 #
 # Global Variables
@@ -99,12 +99,12 @@ setenv AbsoluteDeb    FALSE
 setenv AbsoluteOpt    FALSE
 setenv CROSS_COMPILE  FALSE
 
-setenv MngDir      $cwd
-setenv CfgMan      $ScrDir/cfgman
+setenv SYS_MngDir      $cwd
+setenv CfgMan      $SYS_ScrDir/cfgman
 setenv SYS_ID      `$CfgMan use`
 setenv SYS_CfgDir  cfg-$SYS_ID
 
-setenv SYS_Root  $BaseDir/dev/$SYS_ID
+setenv SYS_Root  $SYS_Base/dev/$SYS_ID
 setenv IncDir   $SYS_Root/include
 setenv EtcDir   $SYS_Root/etc
 setenv BinDir   $SYS_Root/bin
@@ -218,7 +218,7 @@ Main:
           case -s:
                    shift
                    setenv SYS_ID   $1
-                   setenv SYS_Root  $BaseDir/dev/$SYS_ID
+                   setenv SYS_Root  $SYS_Base/dev/$SYS_ID
                    setenv IncDir   $SYS_Root/include
                    setenv EnvCsh   $EtcDir/env-pact.csh
                    setenv EnvSh    $EtcDir/env-pact.sh
@@ -329,7 +329,7 @@ AnalyzeConfig:
     
     flog $Log pushd $SYS_CfgDir
 
-    include $MngDir/pact-analyze
+    include $SYS_MngDir/pact-analyze
 
 # restore config as the log file
     set Log = "$SYS_Root/log/config"
@@ -1326,7 +1326,7 @@ Finish:
 
 # if T3D, fiddle pdb fortran interface regression test source
     if ("$PFE" == "mppexec") then
-       cd $BaseDir/pdb
+       cd $SYS_Base/pdb
 
        set STDAUX = tmp-$SYS_ID.f
        flog $Log $RM $STDAUX
@@ -1336,7 +1336,7 @@ Finish:
            pdftst.f > $STDAUX
        flog $Log ${RM} pdftst.f
        flog $Log mv $STDAUX pdftst.f
-       flog $Log cd $MngDir
+       flog $Log cd $SYS_MngDir
     endif
 
 # remove duplicate tokens in selected lists
@@ -1384,7 +1384,7 @@ Finish:
     write/scdecls.h
     write/syntax.h
 
-    if (-d $BaseDir/sx/applications) then
+    if (-d $SYS_Base/sx/applications) then
        write/spokes.scm
     endif
 

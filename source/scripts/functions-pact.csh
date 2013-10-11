@@ -8,6 +8,25 @@
 # include "cpyright.h"
 #
 
+# turn off echo and/or verbose mode
+
+if ($?echo == 1) then
+   unset echo
+   set re_echo = TRUE
+else
+   set re_echo = FALSE
+endif
+
+if ($?verbose == 1) then
+   unset verbose
+   set re_verbose = TRUE
+else
+   set re_verbose = FALSE
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 unalias cd
 unalias ls
 unalias rm
@@ -147,4 +166,20 @@ alias fexvars    'echo "Command: $GEXEC \!\!:3-$ @b vw:\!\!:2" >>& \!\!:1 ; $GEX
 alias dbmget 'echo "Command: dbmget $PERDB ^fmt:csh^ \!\!:2-$" >>& \!\!:1 ; set t_ = ( `$PERDB ^fmt:csh^ \!\!:2-$` ) ; echo "$t_" >>& \!\!:1 ; eval $t_ ; echo "dbmget status = $status" >>& \!\!:1 ; unset t_'
 
 alias dbmset 'echo "Command: dbmset $PERDB ^fmt:db^ \!\!:2-$" >>& \!\!:1 ; $PERDB ^fmt:db^ \!\!:2-$ >>& \!\!:1 ; echo "dbmset status = $status" >>& \!\!:1'
+
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# restore echo and/or verbose mode
+
+if ($re_echo == TRUE) then
+   set echo
+endif
+unset re_echo
+
+if ($re_verbose == TRUE) then
+   set verbose
+endif
+unset re_verbose
 

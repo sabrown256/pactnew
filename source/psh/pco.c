@@ -1379,16 +1379,16 @@ static void setup_analyze_env(client *cl, char *base)
     note(out, TRUE, "%s", get_date());
     fclose_safe(out);
 
-    dbset(cl, "Host",     st.host);
-    dbset(cl, "SYS_Arch", st.arch);
-    dbset(cl, "SYS_ID",   st.sys_id);
-    dbset(cl, "SYS_Root",  st.dir.root);
-    dbset(cl, "SYS_Cfg",  st.sys_cfg);
-    dbset(cl, "BaseDir",  base);
-    dbset(cl, "ScrDir",   st.dir.scr);
-    dbset(cl, "AnaDir",   "%s/analyze", st.dir.mng);
-    dbset(cl, "Log",      st.logf);
-    dbset(cl, "ALog",     alog);
+    dbset(cl, "Host",       st.host);
+    dbset(cl, "SYS_Arch",   st.arch);
+    dbset(cl, "SYS_ID",     st.sys_id);
+    dbset(cl, "SYS_Root",   st.dir.root);
+    dbset(cl, "SYS_Cfg",    st.sys_cfg);
+    dbset(cl, "SYS_Base",   base);
+    dbset(cl, "SYS_AnaDir", "%s/analyze", st.dir.mng);
+    dbset(cl, "SYS_ScrDir", st.dir.scr);
+    dbset(cl, "Log",        st.logf);
+    dbset(cl, "ALog",       alog);
 
     dbset(cl, "AbsoluteDeb", st.abs_deb ? "TRUE" : "FALSE");
     dbset(cl, "AbsoluteOpt", st.abs_opt ? "TRUE" : "FALSE");
@@ -1514,7 +1514,7 @@ static void setup_output_env(client *cl, char *base)
     dbset(cl, "BinDir",  st.dir.bin);
     dbset(cl, "IncDir",  st.dir.inc);
     dbset(cl, "EtcDir",  st.dir.etc);
-    dbset(cl, "ScrDir",  st.dir.scr);
+/*    dbset(cl, "SYS_ScrDir",  st.dir.scr); */
     dbset(cl, "SchDir",  st.dir.sch);
 
     dbset(cl, "Load",        st.loadp ? "TRUE" : "FALSE");
@@ -1626,7 +1626,7 @@ static void default_var(client *cl, char *base)
 
     dbinitv(cl, "CfgMan",        "%s/cfgman", st.dir.scr);
     dbinitv(cl, "Globals",       "");
-    dbinitv(cl, "MngDir",        st.dir.mng);
+    dbinitv(cl, "SYS_MngDir",    st.dir.mng);
     dbinitv(cl, "SYS_InstRoot",  "none");
     dbinitv(cl, "PubInc",        "");
     dbinitv(cl, "PubLib",        "");
@@ -3408,11 +3408,11 @@ int main(int c, char **v, char **env)
         write_do_run_db(cl, &st);
 
 /* order matters crucially here */
-        env_subst(cl, "BaseDir",       base);
-        env_subst(cl, "SYS_InstRoot",  ib);
+        env_subst(cl, "SYS_Base",       base);
+        env_subst(cl, "SYS_InstRoot",   ib);
         env_subst(cl, "SYS_Root",       st.dir.root);
-        env_subst(cl, "SYS_ID",        st.sys_id);
-        env_subst(cl, "CONFIG_METHOD", "database");
+        env_subst(cl, "SYS_ID",         st.sys_id);
+        env_subst(cl, "CONFIG_METHOD",  "database");
 
 	snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.sys_id);
 	nstrncpy(st.cfgf,    BFLRG, cgetenv(FALSE, "CONFIG_FILE"), -1);

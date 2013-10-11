@@ -79,7 +79,7 @@ EOF
        set lALibs = ( $lALibs -L$i )
    end
 
-   source $AnaDir/find-package
+   source $SYS_AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has JPEG ($PckLib)"

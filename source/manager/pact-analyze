@@ -25,29 +25,29 @@
 
 unalias *
 
-if ($?ScrDir == 0) then
+if ($?SYS_ScrDir == 0) then
    if (-d ../scripts) then
-      setenv ScrDir ../scripts
+      setenv SYS_ScrDir ../scripts
    else if (-d ../../scripts) then
-      setenv ScrDir ../../scripts
+      setenv SYS_ScrDir ../../scripts
    endif
 endif
-set BaseDir = $ScrDir:h
-set ScrDir  = $BaseDir/scripts
-source $ScrDir/functions-pact.csh
-source $ScrDir/csh-subroutines
+set sys_base = $SYS_ScrDir:h
+set SYS_ScrDir  = $sys_base/scripts
+source $SYS_ScrDir/functions-pact.csh
+source $SYS_ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
 set help     = FALSE
 set HelpCode = ./$0                      
 
-setenv OS_Name        `uname -s`
-setenv OS_Release     `uname -r`
+setenv OS_Name       `uname -s`
+setenv OS_Release    `uname -r`
 setenv HostName      `uname -n`
 setenv MajorVersion  `expr $OS_Release : "\(.\)"`
 
-envini SYS_ID  `$ScrDir/cfgman use`
-envini SYS_Root  $BaseDir/dev/$SYS_ID
+envini SYS_ID    `$SYS_ScrDir/cfgman use`
+envini SYS_Root  $sys_base/dev/$SYS_ID
 
 InitLog ALog $SYS_Root/log/analyze
 
@@ -55,7 +55,7 @@ Note $ALog "HostName         = $HostName"
 Note $ALog "OS_Name           = $OS_Name"
 Note $ALog "OS_Release        = $OS_Release"
 Note $ALog "MajorVersion     = $MajorVersion"
-Note $ALog "Source Directory = $ScrDir"
+Note $ALog "Source Directory = $SYS_ScrDir"
 
 if ($?USER == 0) then
    if ($?LOGNAME == 0) then
@@ -105,7 +105,7 @@ set lTmp = ( "tmp-"`echo $OS_Name-$$ | tr "[A-Z]" "[a-z]"` )
 setenv Tmp "$lTmp"
 
 flog $ALog setenv DORUN  $BinDir/do-run
-flog $ALog setenv TIMER  $ScrDir/timer
+flog $ALog setenv TIMER  $SYS_ScrDir/timer
 
 if ($OS_Name == "AIX") then
    set lNM = ( /usr/bin/nm -g )
@@ -194,9 +194,9 @@ if ($ToTTY == TRUE) then
 endif
 
 if (-d analyze) then
-   setenv AnaDir  analyze
+   setenv SYS_AnaDir  analyze
 else
-   setenv AnaDir  ../analyze
+   setenv SYS_AnaDir  ../analyze
 endif
 
 #--------------------------------------------------------------------------
@@ -235,7 +235,7 @@ foreach f ($Features "-fnc-" $Functions "-pst-" $Post)
       Separator $ALog
 
 # run the program f
-      set Text = (`$AnaDir/$f | awk '{ printf("%s ; \n", $0); }'`)
+      set Text = (`$SYS_AnaDir/$f | awk '{ printf("%s ; \n", $0); }'`)
 
 # look through the output for setenvs and other text to echo
       set Line = ""
