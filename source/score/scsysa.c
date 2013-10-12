@@ -417,10 +417,10 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
        SC_ptr_arr_len(nd, dirs);
 
 /* open the connection pool */
-    nhst = SC_get_nhosts(SYS_Arch);
+    nhst = SC_get_nhosts(PSY_Arch);
     nc   = min(nc, nhst);
     nc   = min(nc, ns);
-    cp   = SC_open_connection_pool(nc, SYS_Arch, consh, conenv,
+    cp   = SC_open_connection_pool(nc, PSY_Arch, consh, conenv,
 				   na, show, ignore,
 				   DEFAULT_HEARTBEAT, filter);
 

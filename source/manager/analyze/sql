@@ -94,7 +94,7 @@ EOF
    end
    set lALibs = ( $lALibs $LD_Lib $LibM_Lib -lz )
 
-   source $SYS_AnaDir/find-package
+   source $PSY_AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       set esql = TRUE
@@ -166,7 +166,7 @@ EOF
    end
    set lALibs = ( $lALibs $LD_Lib )
 
-   source $SYS_AnaDir/find-package
+   source $PSY_AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       set esql = TRUE
@@ -233,7 +233,7 @@ EOF
    set lKeep    = TRUE
    set lALibs   = ( $LD_Lib )
 
-   source $SYS_AnaDir/find-package
+   source $PSY_AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       set esql = TRUE

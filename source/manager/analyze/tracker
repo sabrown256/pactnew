@@ -17,9 +17,9 @@ Note $ALog ""
 
 dbmget $ALog HAVE_TRACKER =\? ""^  \
              TRACKER_Exe  =\? ""^  \
-             SYS_ASRoot
+             PSY_ASRoot
 
-foreach d ( /usr/apps/tracker $SYS_ASRoot/tracker /usr /usr/local )
+foreach d ( /usr/apps/tracker $PSY_ASRoot/tracker /usr /usr/local )
    if (-d $d) then
       set OK = FALSE
       if (-x $d/bin/tracker) then

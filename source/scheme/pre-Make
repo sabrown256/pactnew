@@ -46,11 +46,11 @@ Libs = ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDE_Lib}
 
 targets :
 	@echo "Targets for SCHEME"
-	@echo "   install   : install SCHEME headers and utilities in dev/sys_id"
+	@echo "   install   : install SCHEME headers and utilities in dev/PSY_id"
 	@echo "   link      : link SCHEME utilities for public use"
 	@echo "   profiler  : make a profiling version"
 	@echo "   scheme    : make the SCHEME executable"
-	@echo "   sharedlib : build and install SCHEME shared libs in dev/sys_id"
+	@echo "   sharedlib : build and install SCHEME shared libs in dev/PSY_id"
 	@echo "   test      : run the SCHEME test suite"
 
 
@@ -185,7 +185,7 @@ scheme :
 link: ${InstallDep}
 	pact man3install
 	pact scminstall
-	@${BinDir}/install-ext ${SYS_Root}
+	@${BinDir}/install-ext ${PSY_Root}
 
 #
 # install 

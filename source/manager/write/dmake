@@ -26,13 +26,13 @@ dbmget $Log CROSS_COMPILE^           \
             PACT_CC_FAMILY^          \
             PACT_CC_PATH^            \
             PACT_CC_VERSION^         \
-            SYS_ID^                  \
-            SYS_Base^                \
             BinDir^                  \
             LibDir^                  \
-            SYS_MngDir
+            PSY_ID^                  \
+            PSY_Base^                \
+            PSY_MngDir
 
-    flog $Log set DSYS = $SYS_MngDir/dsys
+    flog $Log set DSYS = $PSY_MngDir/dsys
     flog $Log set MAKE = $BinDir/smake
     flog $Log set opt  = smake
     flog $Log set path = ( $BinDir $path )
@@ -48,7 +48,7 @@ dbmget $Log CROSS_COMPILE^           \
 
        Note $Log "Build local dmake"
 
-       flog $Log pushd $SYS_Base/score
+       flog $Log pushd $PSY_Base/score
 
 # always remove and start clean in case there is toxic rubble
 # left over from a failed build
@@ -76,11 +76,11 @@ dbmget $Log CROSS_COMPILE^           \
     else
 
        Note $Log "Find dmake for CROSS_COMPILE"
-       Note $Log "   SYS_ID    = |$SYS_ID|"
+       Note $Log "   PSY_ID    = |$PSY_ID|"
        Note $Log "   BinDir    = |$BinDir|"
        Note $Log "   CROSS_REF = |$CROSS_REF|"
 
-       set srcb = $SYS_Base/dev/$CROSS_REF/bin
+       set srcb = $PSY_Base/dev/$CROSS_REF/bin
        set dm   = $srcb/dmake
 
        Note $Log "   dm        = |$dm|"
@@ -114,7 +114,7 @@ dbmget $Log CROSS_COMPILE^           \
        endif
     endif
 
-    flog $Log setenv SESSION_CONFIG $SYS_ID
+    flog $Log setenv SESSION_CONFIG $PSY_ID
     ftee $Log $DSYS pact $opt
     unset opt
 

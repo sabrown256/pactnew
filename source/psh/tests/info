@@ -31,7 +31,7 @@ end
 
 if ("$lst" == "") then
    set lst = ( $lst DB_RUN_SIGNATURE DB_SITE_SIGNATURE )
-   set lst = ( $lst SYS_SITE SYS_TYPE SYS_AIRoot SYS_ASRoot )
+   set lst = ( $lst PSY_SITE PSY_TYPE PSY_AIRoot PSY_ASRoot )
    set lst = ( $lst Bits OS_Name )
    set lst = ( $lst CC_Exe CC_Flags )
    set lst = ( $lst CC_Debug_Default CC_Optimize_Default )

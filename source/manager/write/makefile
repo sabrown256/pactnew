@@ -25,21 +25,21 @@ Note $Log ""
 
 dbmget $Log BinDir^     \
             EtcDir^     \
-            SYS_Root^   \
-            SYS_ID^     \
+            PSY_Root^   \
+            PSY_ID^     \
             Platforms^  \
             Pck
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   set inf = ( base $SYS_ID )
+   set inf = ( base $PSY_ID )
    set inf = ( $inf `echo "$Platforms" | sed 's|[:()]| |g'` )
    @ ni = $#inf
    Note $Log "Added platform components ($ni):"
    Note $Log "   $inf"
 
-   set base = $SYS_Root:h
+   set base = $PSY_Root:h
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -84,7 +84,7 @@ dbmget $Log BinDir^     \
 # build target
 
     Note $STDOUT 'build:'
-    Note $STDOUT '	@(echo "" ; echo "Generate sources for '$SYS_ID'")'
+    Note $STDOUT '	@(echo "" ; echo "Generate sources for '$PSY_ID'")'
     Note $STDOUT '	${BARRIER}'
 
     foreach p ($Pck)
@@ -113,7 +113,7 @@ dbmget $Log BinDir^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Note $STDOUT '	@(echo "" ; echo "Install headers for '$SYS_ID'")'
+    Note $STDOUT '	@(echo "" ; echo "Install headers for '$PSY_ID'")'
     Note $STDOUT '	${BARRIER}'
 
     foreach p ($Pck)
@@ -139,7 +139,7 @@ dbmget $Log BinDir^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Note $STDOUT '	@(echo "" ; echo "Compile sources for '$SYS_ID'")'
+    Note $STDOUT '	@(echo "" ; echo "Compile sources for '$PSY_ID'")'
     Note $STDOUT '	${BARRIER}'
 
     foreach p ($Pck)
@@ -170,7 +170,7 @@ dbmget $Log BinDir^     \
 # link target
 
     Note $STDOUT 'link:'
-    Note $STDOUT '	@(echo "" ; echo "Link Executables for '$SYS_ID'")'
+    Note $STDOUT '	@(echo "" ; echo "Link Executables for '$PSY_ID'")'
     Note $STDOUT '	${BARRIER}'
 
     foreach p ($Pck)

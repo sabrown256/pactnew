@@ -44,7 +44,7 @@ end
 
 if (("$HAVE_PYTHON" !~ *FALSE*) && ($tgt != generate)) then
 
-   InitLog log $cwd/$SYS_TmpDir/log.psys.$tgt
+   InitLog log $cwd/$PSY_TmpDir/log.psys.$tgt
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -56,7 +56,7 @@ if (("$HAVE_PYTHON" !~ *FALSE*) && ($tgt != generate)) then
    set lpy_numeric = ( $HAVE_PY_NUMERIC )
    set lpy_numpy   = ( $HAVE_PY_NUMPY )
 
-   setenv SESSION_CONFIG $SYS_ID
+   setenv SESSION_CONFIG $PSY_ID
 
    @ n = $#lhave_py
    @ i = 0
@@ -77,7 +77,7 @@ if (("$HAVE_PYTHON" !~ *FALSE*) && ($tgt != generate)) then
       NoteD $log "   in $v pact $arg $tgt"
       NoteD $log ""
 
-      flog $log mkdir -p $v/$SYS_TmpDir/obj
+      flog $log mkdir -p $v/$PSY_TmpDir/obj
 
       if (($tgt == devlib) || ("$tgt" =~ *.i) || ("$tgt" =~ *.i)) then
          pact -f pre-Make.bind sysdir=$sysdir $dev $arg $tgt

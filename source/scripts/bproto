@@ -11,8 +11,8 @@
 unalias *
 
 set ldir   = `dirname $0`
-set sys_id = `$ldir/cfgman use`
-set root   = $ldir:h/dev/$sys_id
+set psy_id = `$ldir/cfgman use`
+set root   = $ldir:h/dev/$psy_id
 
 set err = 0
 set d   = $cwd
@@ -21,7 +21,7 @@ set d   = $d:t
 set tgt  = premk
 set vrb  = FALSE
 set flst = ""
-set dst  = $SYS_TmpDir/obj
+set dst  = $PSY_TmpDir/obj
 
 while ($#argv > 0)
    switch ($1)
@@ -35,7 +35,7 @@ while ($#argv > 0)
       case -h:
            echo ""
            echo "Usage: bproto [-d <dir>] [-f] [-h] [-m] [-v]"
-           echo "   d   put files in <dir> (default $SYS_TmpDir/obj)"
+           echo "   d   put files in <dir> (default $PSY_TmpDir/obj)"
            echo "   f   generate prototypes for specified files"
            echo "   h   this help message"
            echo "   m   generate prototypes from pre-Make files (default)"
@@ -381,7 +381,7 @@ Note $Log ""
    NoteD $Log "done"
 
 # only move generated files if DST equals ZDIR
-   set zdir = $SYS_TmpDir/obj
+   set zdir = $PSY_TmpDir/obj
    if ($dst == $zdir) then
       flog $Log pushd $zdir
 

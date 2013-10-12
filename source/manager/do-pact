@@ -108,8 +108,8 @@ switch ($Phase)
 # if syncing from the repository
            if (($SyncOnly == "yes") && ("$Repo" != "")) then
               flog $LogHost cd $Builder
-              set lsys_id = `../scripts/cfgman use`
-              Note $LogHost "SYS_ID = $lsys_id"
+              set lpsy_id = `../scripts/cfgman use`
+              Note $LogHost "PSY_ID = $lpsy_id"
 
 # clean out old builds first
               flog $LogHost $RMDir gen
@@ -131,9 +131,9 @@ switch ($Phase)
               Separator $LogHost
 
 # send sync log to update file
-              tlog "(LOG)" cat $WrkDir/dev/$lsys_id/log/sync
+              tlog "(LOG)" cat $WrkDir/dev/$lpsy_id/log/sync
 
-              unset lsys_id
+              unset lpsy_id
 
 # any other source option
            else
@@ -167,15 +167,15 @@ switch ($Phase)
               if ($Err == 0) then
                  set Prnt = $cwd:h
                  if (!(-d $Prnt/repository)) then
-                    flog $LogHost $RMDir $Prnt/$SYS_Base
+                    flog $LogHost $RMDir $Prnt/$PSY_Base
                  endif
-                 flog $LogHost $MV $Code $Prnt/$SYS_Base
+                 flog $LogHost $MV $Code $Prnt/$PSY_Base
                  flog $LogHost cd $Prnt
                  if (!(-d $ltmp/repository)) then
                     flog $LogHost $RMDir $ltmp
                  endif         
                  flog $LogHost find . -type d chmod 2770 {} \;
-                 flog $LogHost chmod -R ug+rw,g+X $SYS_Base
+                 flog $LogHost chmod -R ug+rw,g+X $PSY_Base
               else
                  Note $LogHost "Source setup FAILED"
               endif
@@ -202,7 +202,7 @@ switch ($Phase)
         flog $LogHost pushd $WrkDir/panacea/abc
         flog $LogHost $RMDir dev
         flog $LogHost $RM *.[ch] main/abc.c
-        flog $LogHost ( find . -type d -name $SYS_Prefix'*' -exec $RMDir {} \; )
+        flog $LogHost ( find . -type d -name $PSY_Prefix'*' -exec $RMDir {} \; )
         flog $LogHost popd
 
         breaksw
@@ -220,8 +220,8 @@ switch ($Phase)
 
         call QUALIFY()
 
-        set sys_id = `../scripts/cfgman use`
-        set DevDir = $WrkDir/dev/$sys_id
+        set psy_id = `../scripts/cfgman use`
+        set DevDir = $WrkDir/dev/$psy_id
         set LogDir = $DevDir/log
         set EtcDir = $DevDir/etc
         set Passed = $LogDir/passed
@@ -353,9 +353,9 @@ switch ($Phase)
               flog $LogHost $RM $Passed
 
 # assure a clean make of dmake in the config
-              if (-d $WrkDir/dev/$sys_id/lib) then
-                 flog $LogHost touch $WrkDir/dev/$sys_id/lib/libscore.foo
-                 flog $LogHost $RM $WrkDir/dev/$sys_id/lib/libscore*.*
+              if (-d $WrkDir/dev/$psy_id/lib) then
+                 flog $LogHost touch $WrkDir/dev/$psy_id/lib/libscore.foo
+                 flog $LogHost $RM $WrkDir/dev/$psy_id/lib/libscore*.*
               endif
 
 #--------------------------------------------------------------------------
@@ -386,7 +386,7 @@ switch ($Phase)
 # configure
 
               if (($IErr == 0) && ($TestOnly == no)) then
-                 set Where = ( -c -i $SYS_InstRoot )
+                 set Where = ( -c -i $PSY_InstRoot )
                  set Opt   = ( $Opt $Where )
 
                  if ($DeleteOld == yes) then
@@ -447,7 +447,7 @@ switch ($Phase)
 
 # now that we are configured check the pattern for warnings and errors
 
-              set Cnfgrd = $WrkDir/dev/$sys_id/etc/configured
+              set Cnfgrd = $WrkDir/dev/$psy_id/etc/configured
 
               set WarnPattern = `pact +l -info WARN_PATTERN | sed 's| |+sp+|g'`
               if ("$WarnPattern" == "") then
@@ -459,7 +459,7 @@ switch ($Phase)
                  set ErrPattern = ( "error" "ERROR" )
               endif
 
-              set SysPattern = `pact +l -info SYS_PATTERN | sed 's| |+sp+|g'`
+              set SysPattern = `pact +l -info PSY_PATTERN | sed 's| |+sp+|g'`
               if ("$SysPattern" == "") then
                  set SysPattern = ( "error" "ERROR" "NFS" )
               endif
@@ -593,9 +593,9 @@ switch ($Phase)
                  endif
 
                  if ($?DoValgrind == 1) then
-                    flog $LogHost set TestLog = $WrkDir/dev/$sys_id/log/test-vg
+                    flog $LogHost set TestLog = $WrkDir/dev/$psy_id/log/test-vg
                  else
-                    flog $LogHost set TestLog = $WrkDir/dev/$sys_id/log/test
+                    flog $LogHost set TestLog = $WrkDir/dev/$psy_id/log/test
                  endif
 
                  if ("$ParOpt" == "") then
@@ -655,9 +655,9 @@ switch ($Phase)
 
         flog $LogHost setenv Err  2
 
-        if (($SYS_InstRoot != none) && ($Cancel == FALSE)) then
+        if (($PSY_InstRoot != none) && ($Cancel == FALSE)) then
 
-           flog $LogHost set WhichType = $SYS_InstRoot:t
+           flog $LogHost set WhichType = $PSY_InstRoot:t
            if ($WhichType == "pactnew") then
               flog $LogHost set SrcType = "new_sources"
            else if ($WhichType == "pact") then
@@ -676,7 +676,7 @@ switch ($Phase)
               set opt = ( $opt --del )
 
 # rsync just the changed files
-              flog $LogHost rsync $opt --exclude $SYS_Prefix'*' --exclude dev --exclude manager --exclude panacea/abc --exclude tests $WrkDir/ $SrcDir
+              flog $LogHost rsync $opt --exclude $PSY_Prefix'*' --exclude dev --exclude manager --exclude panacea/abc --exclude tests $WrkDir/ $SrcDir
               @ lerr = $lerr + $status
 
 # fix the permissions for users
@@ -695,7 +695,7 @@ switch ($Phase)
               flog $LogHost $RMDir $SrcDir/$SCSDir
               flog $LogHost $RMDir $SrcDir/*/$SCSDir
 
-              flog $LogHost $RMDir $SrcDir/${SYS_Prefix}*
+              flog $LogHost $RMDir $SrcDir/${PSY_Prefix}*
               flog $LogHost $RMDir $SrcDir/dev
               flog $LogHost $RMDir $SrcDir/manager/*
               flog $LogHost $RMDir $SrcDir/panacea/abc/*
@@ -746,11 +746,11 @@ switch ($Phase)
         call QUALIFY()
 
         flog $LogHost pwd
-        flog $LogHost setenv SYS_ID `../scripts/cfgman use`
-        flog $LogHost set path = ( . $WrkDir/dev/$SYS_ID/bin $path )
+        flog $LogHost setenv PSY_ID `../scripts/cfgman use`
+        flog $LogHost set path = ( . $WrkDir/dev/$PSY_ID/bin $path )
 
         flog $LogHost setenv Err  2
-        if (($SYS_InstRoot != none) && (-e "$Passed")) then
+        if (($PSY_InstRoot != none) && (-e "$Passed")) then
            Note $LogHost "Doing dsys install (verbose mode)"
            flog $LogHost ./dsys install
            set xstatus = $status
@@ -761,7 +761,7 @@ switch ($Phase)
                  ./dsys delete $SESSION_CONFIG >& /dev/null
               endif
            else
-              flog $LogHost ls -lR $SYS_InstRoot
+              flog $LogHost ls -lR $PSY_InstRoot
               flog $LogHost setenv Err  1
               tlog "(LOG)" cat $LogHost
            endif
@@ -795,7 +795,7 @@ GET_NET_ARG:
 
     flog $lFile set Cfg      = none
     flog $lFile set Cancel   = FALSE
-    flog $lFile set SYS_InstRoot = none
+    flog $lFile set PSY_InstRoot = none
 
     Note $lFile "Get values for get_net_arg from command line"
     while ($#argv > 0)
@@ -823,7 +823,7 @@ GET_NET_ARG:
                flog $LogHost set RawWrkDir = $1
                flog $LogHost shift
                if ($#argv > 0) then 
-                  flog $LogHost set SYS_InstRoot = $1
+                  flog $LogHost set PSY_InstRoot = $1
                   flog $LogHost shift
                endif
                if ($#argv > 0) then 
@@ -875,7 +875,7 @@ GET_HOST_ARG:
     flog $lFile set SerPar      = s
     flog $lFile set Cfg         = none
     flog $lFile set ParN        = ""
-    flog $lFile set SYS_InstRoot    = none
+    flog $lFile set PSY_InstRoot    = none
     flog $lFile set UseTmp      = no
     flog $lFile set TestOnly    = no
     flog $lFile set CfgOptions  = ""
@@ -919,7 +919,7 @@ GET_HOST_ARG:
                flog $lFile set ParN = $1
                shift
                if ($#argv == 0) break
-               flog $lFile set SYS_InstRoot = $1
+               flog $lFile set PSY_InstRoot = $1
                shift
 
 # anything else
@@ -1007,7 +1007,7 @@ TOTMP:
       flog $LogHost touch $SemDir/loading
 
       if ($use_rsync == TRUE) then
-         flog $LogHost $RSYNC -arclp --exclude=doc/ --exclude=dev/ --exclude=$SCSDir/ --exclude=$SYS_Prefix'*/' $TrueWrkDir $WrkDir:h
+         flog $LogHost $RSYNC -arclp --exclude=doc/ --exclude=dev/ --exclude=$SCSDir/ --exclude=$PSY_Prefix'*/' $TrueWrkDir $WrkDir:h
          flog $LogHost $MV $WrkDir:h/$TrueWrkDir:t $WrkDir
          flog $LogHost pushd $WrkDir/$Builder
       else
@@ -1017,7 +1017,7 @@ TOTMP:
          flog $LogHost pushd $WrkDir
 
          flog $LogHost tar xof $TrueWrkDir/pact-tmp.tar
-         find . -type d -name "${SYS_Prefix}*" -exec rm -r {} \;
+         find . -type d -name "${PSY_Prefix}*" -exec rm -r {} \;
          flog $LogHost cd $Builder
       endif
 

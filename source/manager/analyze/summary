@@ -17,9 +17,9 @@ dbmget $Log HAVE_FORTRAN^     \
             HAVE_PY_NUMPY^    \
             MAKE_Exe^         \
             MAKE_Shared_Libs^ \
-            SYS_Base^         \
-            SYS_Root^         \
-            SYS_ID^           \
+            PSY_Base^         \
+            PSY_Root^         \
+            PSY_ID^           \
             PY_Exe^           \
             PY_Ext^           \
             PY_DirPy^         \
@@ -36,14 +36,14 @@ dbmget $Log HAVE_FORTRAN^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    NoteD $Log "Configuration Summary for $SYS_ID"
+    NoteD $Log "Configuration Summary for $PSY_ID"
 
     if (($?Cfe_CC_Exe == 0) || ("$Cfe_CC_Exe" == "none") || ("$Cfe_CC_Exe" == "")) then
        NoteD $Log "   ERROR: No C compiler available - check your system or your path"
        NoteD $Log ""
        exit(1)
     else
-       set UCC = `$SYS_MngDir/pwhich $CC_Exe`
+       set UCC = `$PSY_MngDir/pwhich $CC_Exe`
        NoteD $Log "   C Compiler used is $UCC"
     endif
 
@@ -57,7 +57,7 @@ dbmget $Log HAVE_FORTRAN^     \
        NoteD $Log "   ERROR: No Fortran compiler available - check your system or your path"
        NoteD $Log ""
     else
-       set UFC = `$SYS_MngDir/pwhich $FC_Exe`
+       set UFC = `$PSY_MngDir/pwhich $FC_Exe`
        if (-x "$UFC") then
           NoteD $Log "   Fortran Compiler used is $UFC"
        else
@@ -102,7 +102,7 @@ dbmget $Log HAVE_FORTRAN^     \
 # PY_Vers    the version of the python executable
 # PY_Path    addition to path in order to find python executable
 #            this comes from config files only
-# PY_DirSrc  pact/dev/$SYS_ID/lib/pythond.d       (install to PY_DirDst and PY_DirPy)
+# PY_DirSrc  pact/dev/$PSY_ID/lib/pythond.d       (install to PY_DirDst and PY_DirPy)
 # PY_DirDst  pact    lib/pythond.d                (install into)
 # PY_DirPy   python  lib/pythond.d/site-packages  (install into)
 
@@ -127,7 +127,7 @@ dbmget $Log HAVE_FORTRAN^     \
              flog $ALog mkdir -p $ldp
 
              NoteD $Log "      $lex -> $lds"
-             if ("$SYS_InstRoot" != none) then
+             if ("$PSY_InstRoot" != none) then
                 NoteD $Log "   Python bindings will be installed in:"
                 NoteD $Log "      $ldd"
                 if (-d $ldp) then
@@ -164,7 +164,7 @@ dbmget $Log HAVE_FORTRAN^     \
        NoteD $Log "   Doing fast builds using /tmp"
     endif
 
-    NoteD $Log "   Building into $cwd:h/dev/$SYS_ID"
+    NoteD $Log "   Building into $cwd:h/dev/$PSY_ID"
 
     NoteD $Log ""
 
@@ -180,8 +180,8 @@ dbmget $Log HAVE_FORTRAN^     \
 
 Note $Log "Install shell includes from psh"
 
-flog $Log pushd $SYS_Base/psh
-flog $Log $MAKE_Exe IncDir=$SYS_Root/include -f pre-Make mkinstall
+flog $Log pushd $PSY_Base/psh
+flog $Log $MAKE_Exe IncDir=$PSY_Root/include -f pre-Make mkinstall
 flog $Log popd
 
 #--------------------------------------------------------------------------

@@ -738,7 +738,7 @@ Group
    and the Cfg group will be the same as the standard
    group.  See pdb/pre-Make for an example of the usage.
 
-SYS_InstRoot
+PSY_InstRoot
    The directory in which the PACT manager expects to find
    lib, bin, include, man, and scheme directories into which
    to install PACT.  Default is "/usr/local".
@@ -792,8 +792,8 @@ PubInc
    in some public directory.  This is primarily used for
    developers who are working on a single package but need
    headers from other parts of PACT. This follows the
-   SYS_InstRoot variable by default so any resetting of PubInc
-   must come after the last setting of SYS_InstRoot (e.g.
+   PSY_InstRoot variable by default so any resetting of PubInc
+   must come after the last setting of PSY_InstRoot (e.g.
    -I /home/pact/include).
    Default is "-I /usr/local/include".
 
@@ -802,8 +802,8 @@ PubLib
    in some public directory.  This is primarily used for
    developers who are working on a single package but need
    libraries from other parts of PACT. This follows the
-   SYS_InstRoot variable by default so any resetting of PubLib
-   must come after the last setting of SYS_InstRoot (e.g.
+   PSY_InstRoot variable by default so any resetting of PubLib
+   must come after the last setting of PSY_InstRoot (e.g.
    -L /home/pact/lib).
    Default is "-L /usr/local/lib".
 
@@ -822,7 +822,7 @@ SchemeSpokes
 
 ScmDir
    A directory in which to install scheme source files.
-   This should also be a subdirectory of SYS_InstRoot.  Default
+   This should also be a subdirectory of PSY_InstRoot.  Default
    is "scheme".
 
 Shared_LD_Exe

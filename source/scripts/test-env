@@ -15,7 +15,7 @@ foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
    if (-f $f/functions-pact.csh) then
       pushd $f >>& /dev/null
       setenv TestScrDir $cwd
-      setenv SYS_Base $cwd:h
+      setenv PSY_Base $cwd:h
       popd >>& /dev/null
       break
    endif
@@ -91,17 +91,17 @@ setenv ZeroSpace  "-z 2"
 #   while (!(-d dev) && !(-d manager))
 #      cd .. >& /dev/null
 #   end
-#   setenv SYS_Base  $cwd
+#   setenv PSY_Base  $cwd
 #   popd >& /dev/null
 
-   setenv SrcDir    $SYS_Base/$Package
+   setenv SrcDir    $PSY_Base/$Package
 
-   setenv EtcDir    $SYS_Root/etc
-   setenv IncDir    $SYS_Root/include
-   setenv LibDir    $SYS_Root/lib
-   setenv BinDir    $SYS_Root/bin
+   setenv EtcDir    $PSY_Root/etc
+   setenv IncDir    $PSY_Root/include
+   setenv LibDir    $PSY_Root/lib
+   setenv BinDir    $PSY_Root/bin
 
-   setenv TestDir   $SrcDir/$SYS_TmpDir/test
+   setenv TestDir   $SrcDir/$PSY_TmpDir/test
    setenv FilesDir  $SrcDir/tests
    setenv RefDir    $FilesDir/ref
 
@@ -109,7 +109,7 @@ setenv ZeroSpace  "-z 2"
    setenv MAKE      $BinDir/pact
    setenv DORUN     $BinDir/do-run
    setenv PSDIFF    $BinDir/ps-diff
-   setenv PX        $SYS_Base/scripts/px
+   setenv PX        $PSY_Base/scripts/px
 
    source $EtcDir/env-pact.csh
 
@@ -157,25 +157,25 @@ setenv ZeroSpace  "-z 2"
 
 set path = ( . $BinDir $path )
 
-setenv SCHEME $SYS_Base/scheme/applications
-setenv SCHEME $SYS_Base/scheme/applications/extensions:${SCHEME}
-setenv SCHEME $SYS_Base/scheme/tests:${SCHEME}
+setenv SCHEME $PSY_Base/scheme/applications
+setenv SCHEME $PSY_Base/scheme/applications/extensions:${SCHEME}
+setenv SCHEME $PSY_Base/scheme/tests:${SCHEME}
 
 if ($?Package == 1) then
-   setenv SCHEME $SYS_Base/$Package/tests:${SCHEME}
-   setenv SCHEME $SYS_Base/$Package/applications:${SCHEME}
-   setenv SCHEME $SYS_Base/$Package/applications/extensions:${SCHEME}
+   setenv SCHEME $PSY_Base/$Package/tests:${SCHEME}
+   setenv SCHEME $PSY_Base/$Package/applications:${SCHEME}
+   setenv SCHEME $PSY_Base/$Package/applications/extensions:${SCHEME}
 else
-   setenv SCHEME $SYS_Base/sx/applications:${SCHEME}
-   setenv SCHEME $SYS_Base/sx/applications/extensions:${SCHEME}
-   setenv SCHEME $SYS_Base/sx/tests:${SCHEME}
-   setenv SCHEME $SYS_Base/ultra:${SCHEME}
-   setenv SCHEME $SYS_Base/ultra/applications:${SCHEME}
-   setenv SCHEME $SYS_Base/ultra/applications/extensions:${SCHEME}
-   setenv SCHEME $SYS_Base/panacea/applications:${SCHEME}
+   setenv SCHEME $PSY_Base/sx/applications:${SCHEME}
+   setenv SCHEME $PSY_Base/sx/applications/extensions:${SCHEME}
+   setenv SCHEME $PSY_Base/sx/tests:${SCHEME}
+   setenv SCHEME $PSY_Base/ultra:${SCHEME}
+   setenv SCHEME $PSY_Base/ultra/applications:${SCHEME}
+   setenv SCHEME $PSY_Base/ultra/applications/extensions:${SCHEME}
+   setenv SCHEME $PSY_Base/panacea/applications:${SCHEME}
 endif
 
-setenv SCHEME $SYS_Root/scheme:${SCHEME}
+setenv SCHEME $PSY_Root/scheme:${SCHEME}
 
 # test inside a subdirectory
 if (!(-d $TestDir)) then
@@ -210,7 +210,7 @@ if ("$Test" == "") then
          if ("$i" == ".") then
             set base = $FilesDir/vg.suppress
          else
-            set base = $SYS_Base/$i/tests/vg.suppress
+            set base = $PSY_Base/$i/tests/vg.suppress
          endif
          if (-f $base) then
             setenv Valgrind  "$Valgrind --suppressions=$base"
@@ -233,9 +233,9 @@ Note $Log "Test environment"
 
 Note $Log ""
 Note $Log "Directories:"
-Note $Log "SYS_Base    = |$SYS_Base|"
-Note $Log "SYS_ID     = |$SYS_ID|"
-Note $Log "SYS_Root   = |$SYS_Root|"
+Note $Log "PSY_Base    = |$PSY_Base|"
+Note $Log "PSY_ID     = |$PSY_ID|"
+Note $Log "PSY_Root   = |$PSY_Root|"
 Note $Log "SrcDir     = |$SrcDir|"
 Note $Log "IncDir     = |$IncDir|"
 Note $Log "LibDir     = |$LibDir|"

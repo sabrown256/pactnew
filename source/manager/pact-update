@@ -566,17 +566,17 @@ flog $Log cd $mngdir
 
 # settle SITE signature
 # initialize these in such a way to make it clear what is missing
-   if ($?SYS_SITE == 0) then
-      setenv SYS_SITE SYS_SITE
+   if ($?PSY_SITE == 0) then
+      setenv PSY_SITE PSY_SITE
    endif
-   if ($?SYS_TYPE == 0) then
-      setenv SYS_TYPE SYS_TYPE
+   if ($?PSY_TYPE == 0) then
+      setenv PSY_TYPE PSY_TYPE
    endif
-   if ($?SYS_AIRoot == 0) then
-      setenv SYS_AIRoot SYS_AIRoot
+   if ($?PSY_AIRoot == 0) then
+      setenv PSY_AIRoot PSY_AIRoot
    endif
-   if ($?SYS_ASRoot == 0) then
-      setenv SYS_ASRoot SYS_ASRoot
+   if ($?PSY_ASRoot == 0) then
+      setenv PSY_ASRoot PSY_ASRoot
    endif
 
 # settle SITE signature
@@ -593,10 +593,10 @@ flog $Log cd $mngdir
    endif
    eval `../scripts/sys-site -du`
    Note $Log "Site signature:"
-   Note $Log "   SYS_SITE = $SYS_SITE"
-   Note $Log "   SYS_TYPE = $SYS_TYPE"
-   Note $Log "   SYS_AIRoot = $SYS_AIRoot"
-   Note $Log "   SYS_ASRoot = $SYS_ASRoot"
+   Note $Log "   PSY_SITE = $PSY_SITE"
+   Note $Log "   PSY_TYPE = $PSY_TYPE"
+   Note $Log "   PSY_AIRoot = $PSY_AIRoot"
+   Note $Log "   PSY_ASRoot = $PSY_ASRoot"
    Note $Log ""
    unset lok
 
@@ -612,13 +612,13 @@ flog $Log cd $mngdir
 # settle environment of build
    flog $Log set base = $cwd:h
 
-   flog $Log unset SYS_ID
-   flog $Log unsetenv SYS_ID
+   flog $Log unset PSY_ID
+   flog $Log unsetenv PSY_ID
 
-   setenv SYS_ID `$base/scripts/cfgman -d $base/dev use`
-   Note $Log "SYS_ID = $SYS_ID"
+   setenv PSY_ID `$base/scripts/cfgman -d $base/dev use`
+   Note $Log "PSY_ID = $PSY_ID"
 
-   set root   = $base/dev/$SYS_ID
+   set root   = $base/dev/$PSY_ID
    set etcdir = $root/etc
    set logdir = $root/log
    set scrdir = $base/scripts
@@ -642,7 +642,7 @@ if ($docfg == TRUE) then
    endif
 
    Note $Log ""
-   Note $Log "Building PACT version $versid ($SYS_ID) with: $cargs"
+   Note $Log "Building PACT version $versid ($PSY_ID) with: $cargs"
 
    NoteD $Log -n "   configure ......... "
    set lt = `$TIMER -r`
@@ -695,7 +695,7 @@ endif
 
 if ($doupd == TRUE) then
 
-   Note $Log "Sourcing environment file $envf for $SYS_ID"
+   Note $Log "Sourcing environment file $envf for $PSY_ID"
    if (-e $envf) then
       source $envf
       rehash

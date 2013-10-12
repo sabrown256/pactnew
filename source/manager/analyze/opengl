@@ -70,7 +70,7 @@ EOF
        set lALibs = ( $lALibs -L$i )
    end
 
-   source $SYS_AnaDir/find-package
+   source $PSY_AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has OpenGL ($PckLib)"

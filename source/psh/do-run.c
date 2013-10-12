@@ -948,7 +948,7 @@ static int setup_dbg_path(rundes *st)
 	        {nstrncpy(ent, BFMED, path_tail(lst[i]), -1);
 		 if ((dir_exists("%s/%s", s, ent) == TRUE) &&
 		     (strcmp(ent, "CVS") != 0) &&
-		     (strncmp(ent, SYS_Prefix, 2) != 0) &&
+		     (strncmp(ent, PSY_Prefix, 2) != 0) &&
 		     (strcmp(ent, "dev") != 0))
 		    fprintf(fp, "%s/%s\n", s, ent);};
 

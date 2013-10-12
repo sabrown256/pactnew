@@ -39,10 +39,10 @@ while ($#argv > 0)
 end
 
 eval `sys-site`
-source $SYS_ASRoot/pactnew/etc/functions-pact.csh
+source $PSY_ASRoot/pactnew/etc/functions-pact.csh
 
 set ID   = `system-id`
-set Site = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`
+set Site = `echo $PSY_SITE | tr "[A-Z]" "[a-z]"`
 set Prop = $ID@$Site
 
 # find nearest sys-type/sys-site match

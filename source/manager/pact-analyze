@@ -25,17 +25,17 @@
 
 unalias *
 
-if ($?SYS_ScrDir == 0) then
+if ($?PSY_ScrDir == 0) then
    if (-d ../scripts) then
-      setenv SYS_ScrDir ../scripts
+      setenv PSY_ScrDir ../scripts
    else if (-d ../../scripts) then
-      setenv SYS_ScrDir ../../scripts
+      setenv PSY_ScrDir ../../scripts
    endif
 endif
-set sys_base = $SYS_ScrDir:h
-set SYS_ScrDir  = $sys_base/scripts
-source $SYS_ScrDir/functions-pact.csh
-source $SYS_ScrDir/csh-subroutines
+set psy_base = $PSY_ScrDir:h
+set PSY_ScrDir  = $psy_base/scripts
+source $PSY_ScrDir/functions-pact.csh
+source $PSY_ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
 set help     = FALSE
@@ -46,16 +46,16 @@ setenv OS_Release    `uname -r`
 setenv HostName      `uname -n`
 setenv MajorVersion  `expr $OS_Release : "\(.\)"`
 
-envini SYS_ID    `$SYS_ScrDir/cfgman use`
-envini SYS_Root  $sys_base/dev/$SYS_ID
+envini PSY_ID    `$PSY_ScrDir/cfgman use`
+envini PSY_Root  $psy_base/dev/$PSY_ID
 
-InitLog ALog $SYS_Root/log/analyze
+InitLog ALog $PSY_Root/log/analyze
 
 Note $ALog "HostName         = $HostName"
 Note $ALog "OS_Name           = $OS_Name"
 Note $ALog "OS_Release        = $OS_Release"
 Note $ALog "MajorVersion     = $MajorVersion"
-Note $ALog "Source Directory = $SYS_ScrDir"
+Note $ALog "Source Directory = $PSY_ScrDir"
 
 if ($?USER == 0) then
    if ($?LOGNAME == 0) then
@@ -105,7 +105,7 @@ set lTmp = ( "tmp-"`echo $OS_Name-$$ | tr "[A-Z]" "[a-z]"` )
 setenv Tmp "$lTmp"
 
 flog $ALog setenv DORUN  $BinDir/do-run
-flog $ALog setenv TIMER  $SYS_ScrDir/timer
+flog $ALog setenv TIMER  $PSY_ScrDir/timer
 
 if ($OS_Name == "AIX") then
    set lNM = ( /usr/bin/nm -g )
@@ -194,9 +194,9 @@ if ($ToTTY == TRUE) then
 endif
 
 if (-d analyze) then
-   setenv SYS_AnaDir  analyze
+   setenv PSY_AnaDir  analyze
 else
-   setenv SYS_AnaDir  ../analyze
+   setenv PSY_AnaDir  ../analyze
 endif
 
 #--------------------------------------------------------------------------
@@ -235,7 +235,7 @@ foreach f ($Features "-fnc-" $Functions "-pst-" $Post)
       Separator $ALog
 
 # run the program f
-      set Text = (`$SYS_AnaDir/$f | awk '{ printf("%s ; \n", $0); }'`)
+      set Text = (`$PSY_AnaDir/$f | awk '{ printf("%s ; \n", $0); }'`)
 
 # look through the output for setenvs and other text to echo
       set Line = ""

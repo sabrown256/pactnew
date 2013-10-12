@@ -6,48 +6,48 @@
 
 unalias *
 
-set sys_id  = `../scripts/cfgman use`
-set sys_dir = ""
+set psy_id  = `../scripts/cfgman use`
+set psy_dir = ""
 set Err     = 0
 
 while ($#argv > 0)
    switch ($1)
       case -b:
            shift
-           set sys_dir = $1
+           set psy_dir = $1
            breaksw
       case -h:
            echo ""
-           echo "Usage: verify-cfg [-b <path>] [-h] [<sys_id>]"
+           echo "Usage: verify-cfg [-b <path>] [-h] [<psy_id>]"
            echo "   b         the full path to the configuration to be verified"
            echo "   h         this help message"
-           echo "   <sys_id>  the configuration to be verified"
+           echo "   <psy_id>  the configuration to be verified"
            echo ""
            exit(1)
       default:
-           set sys_id = $1
+           set psy_id = $1
            breaksw
    endsw
    shift
 end
 
-if ("$sys_dir" == "") then
-   set sys_dir = $cwd:h/dev/$sys_id
+if ("$psy_dir" == "") then
+   set psy_dir = $cwd:h/dev/$psy_id
 endif
 
-set CfgLog = $sys_dir/log/config
-set BinDir = $sys_dir/bin
-set IncDir = $sys_dir/include
-set EtcDir = $sys_dir/etc
+set CfgLog = $psy_dir/log/config
+set BinDir = $psy_dir/bin
+set IncDir = $psy_dir/include
+set EtcDir = $psy_dir/etc
 
 source ../scripts/functions-pact.csh
 
-InitLog Log $cwd/log.verify-cfg.$sys_id
+InitLog Log $cwd/log.verify-cfg.$psy_id
 
 set Cfg = `awk '$2 ~ /SCCONFIG.H/ { print $7 }' $IncDir/scconfig.h`
 
 NoteD $Log ""
-NoteD $Log "Verifying configuration $Cfg in $sys_dir"
+NoteD $Log "Verifying configuration $Cfg in $psy_dir"
 
 # Debug/Optimize
 Separator $Log

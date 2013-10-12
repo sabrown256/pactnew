@@ -118,7 +118,7 @@ EOF
        set lALibs = ( $lALibs -L$i )
    end
 
-   source $SYS_AnaDir/find-package
+   source $PSY_AnaDir/find-package
 
    if ("$PckLib" != "") then
       set msg = "has X11 ($PckLib)"

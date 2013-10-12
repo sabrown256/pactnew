@@ -27,8 +27,8 @@ dbmget $ALog OSX_Version  =\? ""^  \
 
 unset los
 
-if ($?SYS_Arch == 0) then
-   setenv SYS_Arch `../scripts/system-id`
+if ($?PSY_Arch == 0) then
+   setenv PSY_Arch `../scripts/system-id`
 endif
 
 # remove parens - they confuse shells later on
@@ -59,7 +59,7 @@ Note $ALog "OS_Release = $OS_Release"
 Note $ALog "OS_Type    = $OS_Type"
 
 if ($OS_Name == Darwin) then
-   fexvar $ALog OSX_Version echo $SYS_Arch @o sed 's/osx-10\.//' @o sed 's/-.*//'
+   fexvar $ALog OSX_Version echo $PSY_Arch @o sed 's/osx-10\.//' @o sed 's/-.*//'
 endif
 
 # there are systems that put out garbage if this is on a single echo (AIX)

@@ -209,8 +209,8 @@ foreach c ($fname $cname)
 
 # if blank try to find compiler on your path
    if ("$cpath" == "") then
-      if (-x $SYS_AIRoot/pact/scripts/$c) then
-         set cmp = $SYS_AIRoot/pact/scripts/$c
+      if (-x $PSY_AIRoot/pact/scripts/$c) then
+         set cmp = $PSY_AIRoot/pact/scripts/$c
          set opt = ( $opt -cwvrb )
          if ("$lvers" != "") then
             set opt = ( $opt -cwvers $lvers )

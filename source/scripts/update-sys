@@ -38,7 +38,7 @@ set TestOnly = FALSE
 set AllSites = FALSE
 set Watch    = update-watch
 set Err      = 0
-set LSite    = $SYS_SITE
+set LSite    = $PSY_SITE
 set Quiet    = FALSE
 set Verbose  = FALSE
 set UnLock   = FALSE
@@ -119,12 +119,12 @@ endif
 if ("$UpF" == "") then
 
 # GOTHA: OLD_DB_VARS look for old variable
-   if ($?UPDATE_SYS_DB == 1) then
-      set UpF = $UPDATE_SYS_DB
+   if ($?UPDATE_PSY_DB == 1) then
+      set UpF = $UPDATE_PSY_DB
    else if ($?DB_UPDATE_SYS == 1) then
       set UpF = $DB_UPDATE_SYS
-   else if (-f $SYS_AIRoot/pact/db/update-sys-db) then
-      set UpF = "$SYS_AIRoot/pact/db/update-sys-db"
+   else if (-f $PSY_AIRoot/pact/db/update-sys-db) then
+      set UpF = "$PSY_AIRoot/pact/db/update-sys-db"
    else
       if ($Quiet == FALSE) then
          echo "No update file specified - exiting"

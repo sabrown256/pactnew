@@ -5,7 +5,7 @@
 #        - PY_Vers      the version of the python executable
 #        - PY_Path      addition to path in order to find python executable
 #        -              this comes from config files only
-#        - PY_DirSrc    pact/dev/$SYS_ID/lib/pythond.d       (install to PY_DirDst and PY_DirPy)
+#        - PY_DirSrc    pact/dev/$PSY_ID/lib/pythond.d       (install to PY_DirDst and PY_DirPy)
 #        - PY_DirDst    pact    lib/pythond.d                (install into)
 #        - PY_DirPy     python  lib/pythond.d/site-packages  (install into)
 #

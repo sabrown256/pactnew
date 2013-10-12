@@ -13,7 +13,7 @@ targets :
 	@echo "   atdbg   : make atdbg utility"
 	@echo "   do-net  : make do-net utility"
 	@echo "   do-run  : make do-run utility"
-	@echo "   install : install PSH headers and utilities in dev/sys_id"
+	@echo "   install : install PSH headers and utilities in dev/psy_id"
 	@echo "   link    : link PSH utilities for public use"
 	@echo "   pcsh    : make pcsh utility"
 	@echo "   pco     : make PACT configuration utility"
@@ -131,7 +131,7 @@ ${BinDir}/pact-info : pact-info.c common.h
 smake : ${BinDir}/pact-info ${BinDir}/smake
 
 ${BinDir}/smake : smake.c common.h
-	ccw -DSYS_ID=\"${SYS_ID}\" -DSYS_Prefix=\"${SYS_Prefix}\" -DPACT_VERSION=\"${Version}\" smake.c -o ${BinDir}/smake
+	ccw -DPSY_ID=\"${PSY_ID}\" -DPSY_Prefix=\"${PSY_Prefix}\" -DPACT_VERSION=\"${Version}\" smake.c -o ${BinDir}/smake
 
 
 # tester for strcpy_tok, strcpy_str

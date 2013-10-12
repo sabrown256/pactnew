@@ -29,7 +29,7 @@ dbmget $Log STD_C^          \
             GLIBC_VERSION^  \
             OS_Name^        \
             IncDir^         \
-            SYS_Cfg
+            PSY_Cfg
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -40,7 +40,7 @@ dbmget $Log STD_C^          \
     flog $Log touch $STDOUT
 
     Note $STDOUT '/*'
-    Note $STDOUT " * ISO-C.H - configuration defined by $SYS_Cfg"
+    Note $STDOUT " * ISO-C.H - configuration defined by $PSY_Cfg"
     Note $STDOUT ' *         - defines the ISO C, POSIX and XOPEN compliance expected'
     Note $STDOUT ' *'
     Note $STDOUT ' * Source Version: 3.0'

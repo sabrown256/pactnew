@@ -9,7 +9,7 @@
 #
 
 # NOTE: use node name for config file base
-# if multiple hosts have the same SYS_TYPE there will be contention
+# if multiple hosts have the same PSY_TYPE there will be contention
 # over the file - the node name is truly host specific
    set cfg = `uname -n | tr "[A-Z]" "[a-z]" | sed 's/\..*\..*$//'`
    set los = `uname -s | tr "[A-Z]" "[a-z]"`

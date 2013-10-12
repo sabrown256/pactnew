@@ -163,61 +163,61 @@ else if ($deflt == TRUE) then
 # unconditionally set these
    if ($ucnd == TRUE) then
       if ($osh == csh) then
-         echo "setenv SYS_SITE LONER ; "
+         echo "setenv PSY_SITE LONER ; "
       else if ($osh == sh) then
-         echo "SYS_SITE=LONER ; export SYS_SITE ; "
+         echo "PSY_SITE=LONER ; export PSY_SITE ; "
       endif
       if ($osh == csh) then
-         echo "setenv SYS_TYPE $lsys ; "
+         echo "setenv PSY_TYPE $lsys ; "
       else if ($osh == sh) then
-         echo "SYS_TYPE=$lsys ; export SYS_TYPE ; "
+         echo "PSY_TYPE=$lsys ; export PSY_TYPE ; "
       endif
       if ($osh == csh) then
-         echo "setenv SYS_AIRoot /usr/local ; "
+         echo "setenv PSY_AIRoot /usr/local ; "
       else if ($osh == sh) then
-         echo "SYS_AIRoot=/usr/local ; export SYS_AIRoot ; "
+         echo "PSY_AIRoot=/usr/local ; export PSY_AIRoot ; "
       endif
       if ($osh == csh) then
-         echo "setenv SYS_ASRoot /usr/share ; "
+         echo "setenv PSY_ASRoot /usr/share ; "
       else if ($osh == sh) then
-         echo "SYS_ASRoot=/usr/share ; export SYS_ASRoot ; "
+         echo "PSY_ASRoot=/usr/share ; export PSY_ASRoot ; "
       endif
 
 # set these only if not already set
    else
-      set inf = ( `printenv SYS_SITE` )
+      set inf = ( `printenv PSY_SITE` )
       if ("$inf" == "") then
          if ($osh == csh) then
-            echo "setenv SYS_SITE LONER ; "
+            echo "setenv PSY_SITE LONER ; "
          else if ($osh == sh) then
-            echo "SYS_SITE=LONER ; export SYS_SITE ; "
+            echo "PSY_SITE=LONER ; export PSY_SITE ; "
          endif
       endif
 
-      set inf = ( `printenv SYS_TYPE` )
+      set inf = ( `printenv PSY_TYPE` )
       if ("$inf" == "") then
          if ($osh == csh) then
-            echo "setenv SYS_TYPE $lsys ; "
+            echo "setenv PSY_TYPE $lsys ; "
          else if ($osh == sh) then
-            echo "SYS_TYPE=$lsys ; export SYS_TYPE ; "
+            echo "PSY_TYPE=$lsys ; export PSY_TYPE ; "
          endif
       endif
 
-      set inf = ( `printenv SYS_AIRoot` )
+      set inf = ( `printenv PSY_AIRoot` )
       if ("$inf" == "") then
          if ($osh == csh) then
-            echo "setenv SYS_AIRoot /usr/local ; "
+            echo "setenv PSY_AIRoot /usr/local ; "
          else if ($osh == sh) then
-            echo "SYS_AIRoot=/usr/local ; export SYS_AIRoot ; "
+            echo "PSY_AIRoot=/usr/local ; export PSY_AIRoot ; "
          endif
       endif
 
-      set inf = ( `printenv SYS_ASRoot` )
+      set inf = ( `printenv PSY_ASRoot` )
       if ("$inf" == "") then
          if ($osh == csh) then
-            echo "setenv SYS_ASRoot /usr/share ; "
+            echo "setenv PSY_ASRoot /usr/share ; "
          else if ($osh == sh) then
-            echo "SYS_ASRoot=/usr/share ; export SYS_ASRoot ; "
+            echo "PSY_ASRoot=/usr/share ; export PSY_ASRoot ; "
          endif
       endif
       unset inf

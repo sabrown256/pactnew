@@ -48,39 +48,39 @@ Here is an example:
     #                - actual specifications
     #
     
-    # the SYS_TYPE is imbedded in the path name to which the symbolic
+    # the PSY_TYPE is imbedded in the path name to which the symbolic
     # links point - just extract them now for later possible use
     asyst = `ls -l /usr/asys     |& awk '{print $NF}' | sed 's+/mnt/apps++' | sed 's|/||g'`
     bsyst = `ls -l /usr/local/bs |& awk '{print $NF}' | sed 's+/mnt/apps++' | sed 's|/||g'`
     
-    # define a variable SYS_SITE which will be one of A, B, or local
+    # define a variable PSY_SITE which will be one of A, B, or local
     # depending on the outcome of the tests
-    variable : SYS_SITE {
+    variable : PSY_SITE {
       B      ls -d /mnt/apps/b_*
       A      (-d /usr/asys/hosts)
       local  true
     }
     
-    variable : SYS_AIRoot {
+    variable : PSY_AIRoot {
       /mnt/apps    (-d /mnt/apps)
       /usr/share   true
     }
     
-    variable : SYS_ASRoot {
-      /usr/local/apps  ($SYS_AIRoot == /mnt/apps)
+    variable : PSY_ASRoot {
+      /usr/local/apps  ($PSY_AIRoot == /mnt/apps)
       /usr/local       true
     }
     
-    variable : SYS_TYPE {
-      $asyst       ($SYS_SITE == A)
-      $bsyst       ($SYS_SITE == B)
+    variable : PSY_TYPE {
+      $asyst       ($PSY_SITE == A)
+      $bsyst       ($PSY_SITE == B)
       `system-id`  true
     }
 
 .fi
 
 In this example 4 variables are to be defined and initialized:
-SYS_SITE, SYS_TYPE, SYS_AIRoot, SYS_ASRoot.  Default values can be
+PSY_SITE, PSY_TYPE, PSY_AIRoot, PSY_ASRoot.  Default values can be
 given by the use of a clause whose test is "true".
 
 

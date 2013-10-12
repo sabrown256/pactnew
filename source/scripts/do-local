@@ -333,7 +333,7 @@ switch ($Phase)
            call INITLOG()
 
            set StartTime = `date +%r\ on\ %a\ %D`
-           NoteD $LogHost "Starting build/test on $hsy_uhost ($SYS_ID) at $StartTime"
+           NoteD $LogHost "Starting build/test on $hsy_uhost ($PSY_ID) at $StartTime"
            NoteD $LogHost " "
 
            NoteNT "Get starting time: $TIMER -r"
@@ -615,7 +615,7 @@ DIRVAR:
 #       OSF1 csh won't work with an environment variable!!!!!
    set WrkDirTmp = $WrkDir
 
-   setenv SYS_Base   $WrkDirTmp:t
+   setenv PSY_Base   $WrkDirTmp:t
    setenv Root      $WrkDirTmp:h
    setenv SetupLog  $Root/$hsy_uhost.$Stamp.setup
    setenv ArgFile   $SHARED/.do-local-args.$hsy_uhost.$Stamp.$$
@@ -677,7 +677,7 @@ INITLOG:
       touch $LogHost
    endif
 
-   Note $LogHost "Base directory: $SYS_Base"
+   Note $LogHost "Base directory: $PSY_Base"
    Note $LogHost "Root directory: $Root"
    Note $LogHost "Argument File : $ArgFile"
    Note $LogHost "Setup log file: $SetupLog"

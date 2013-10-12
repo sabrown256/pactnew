@@ -42,9 +42,9 @@ setenv ENV_VARS "Bits OS_Name \
                  HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
                  TEST_ADVISORY TRACKER_Exe HAVE_OPENMP \
                  CFE PFE CROSS_COMPILE CROSS_REF \
-                 SYS_FltDir \
-                 SYS_Prefix SYS_CfgDir SYS_TmpDir SYS_Arch SYS_ID \
-                 SYS_SITE SYS_TYPE SYS_Root SYS_AIRoot SYS_ASRoot"
+                 PSY_FltDir \
+                 PSY_Prefix PSY_CfgDir PSY_TmpDir PSY_Arch PSY_ID \
+                 PSY_SITE PSY_TYPE PSY_Root PSY_AIRoot PSY_ASRoot"
 
 setenv CONFIG_PATH       "local:std"
 
@@ -285,30 +285,28 @@ Group PACT {
 #   PSY_MngDir    the manager directory
 #   PSY_ScrDir    the scripts directory
 #   PSY_TmpDir    the temporary build/test directory
-Group PSY {
-}
 
-Group SYS {
-   Arch     = ${SYS_Arch}
+Group PSY {
+   Arch     = ${PSY_Arch}
    Cfg      = ""
-   CfgMan   = ${SYS_CfgMan}
-   ID       = ${SYS_ID}
+   CfgMan   = ${PSY_CfgMan}
+   ID       = ${PSY_ID}
    Prefix   = "z-"
    TYPE     = ""
    SITE     = ""
 
-   Base     = ${SYS_Base}
-   Root     = ${SYS_Root}
+   Base     = ${PSY_Base}
+   Root     = ${PSY_Root}
    AIRoot   = ""
    ASRoot   = ""
    InstRoot = none
 
-   AnaDir   = ${SYS_Base}/manager/analyze
-   CfgDir   = cfg-${SYS_ID}
+   AnaDir   = ${PSY_Base}/manager/analyze
+   CfgDir   = cfg-${PSY_ID}
    FltDir   = ""
-   MngDir   = ${SYS_Base}/manager
-   ScrDir   = ${SYS_Base}/scripts
-   TmpDir   = ${SYS_Prefix}${SYS_ID}
+   MngDir   = ${PSY_Base}/manager
+   ScrDir   = ${PSY_Base}/scripts
+   TmpDir   = ${PSY_Prefix}${PSY_ID}
 }
 
 # requested features - pre-analyze

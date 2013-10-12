@@ -154,8 +154,8 @@ struct s_state
     char os[BFLRG];
     char osrel[BFLRG];
     char hw[BFLRG];
-    char sys_cfg[BFLRG];
-    char sys_id[BFLRG];
+    char psy_cfg[BFLRG];
+    char psy_id[BFLRG];
     char features[BFSML];};
 
 static state
@@ -1055,7 +1055,7 @@ static void check_dir(client *cl)
 			   "etc", "scheme", "man", "man/man1", "man/man3"};
 
     n   = sizeof(dlst)/sizeof(char *);
-    sib = dbget(cl, TRUE, "SYS_InstRoot");
+    sib = dbget(cl, TRUE, "PSY_InstRoot");
 
     if (st.create_dirs == TRUE)
        {Created[0] = '\0';
@@ -1380,13 +1380,13 @@ static void setup_analyze_env(client *cl, char *base)
     fclose_safe(out);
 
     dbset(cl, "HSY_Host",   st.host);
-    dbset(cl, "SYS_Arch",   st.arch);
-    dbset(cl, "SYS_ID",     st.sys_id);
-    dbset(cl, "SYS_Root",   st.dir.root);
-    dbset(cl, "SYS_Cfg",    st.sys_cfg);
-    dbset(cl, "SYS_Base",   base);
-    dbset(cl, "SYS_AnaDir", "%s/analyze", st.dir.mng);
-    dbset(cl, "SYS_ScrDir", st.dir.scr);
+    dbset(cl, "PSY_Arch",   st.arch);
+    dbset(cl, "PSY_ID",     st.psy_id);
+    dbset(cl, "PSY_Root",   st.dir.root);
+    dbset(cl, "PSY_Cfg",    st.psy_cfg);
+    dbset(cl, "PSY_Base",   base);
+    dbset(cl, "PSY_AnaDir", "%s/analyze", st.dir.mng);
+    dbset(cl, "PSY_ScrDir", st.dir.scr);
     dbset(cl, "Log",        st.logf);
     dbset(cl, "ALog",       alog);
 
@@ -1509,12 +1509,12 @@ static void setup_output_env(client *cl, char *base)
     if (strcmp(st.os, "Darwin") != 0)
        dbset(cl, "MDG_Lib", unique(dbget(cl, FALSE, "MDG_Lib"), FALSE, ' '));
 
-    dbset(cl, "SYS_CfgDir",  st.dir.cfg);
+    dbset(cl, "PSY_CfgDir",  st.dir.cfg);
 
     dbset(cl, "BinDir",  st.dir.bin);
     dbset(cl, "IncDir",  st.dir.inc);
     dbset(cl, "EtcDir",  st.dir.etc);
-/*    dbset(cl, "SYS_ScrDir",  st.dir.scr); */
+/*    dbset(cl, "PSY_ScrDir",  st.dir.scr); */
     dbset(cl, "SchDir",  st.dir.sch);
 
     dbset(cl, "Load",        st.loadp ? "TRUE" : "FALSE");
@@ -1601,7 +1601,7 @@ static void default_var(client *cl, char *base)
     push_tok(st.cfgv, BFLRG, ' ', "LD_Flags");
     push_tok(st.cfgv, BFLRG, ' ', "LD_Lib");
 
-    strcpy(st.sys_cfg, path_tail(st.cfgf));
+    strcpy(st.psy_cfg, path_tail(st.cfgf));
 
     unamef(st.host,  BFLRG, "n");
     unamef(st.os,    BFLRG, "s");
@@ -1618,16 +1618,16 @@ static void default_var(client *cl, char *base)
     nstrncpy(st.arch, BFLRG, run(BOTH, cmd), -1);
 
 /* check variables which may have been initialized from the command line */
-    if (IS_NULL(st.sys_id) == TRUE)
-       nstrncpy(st.sys_id, BFLRG, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
-    cinitenv("SYS_ID", st.sys_id);
+    if (IS_NULL(st.psy_id) == TRUE)
+       nstrncpy(st.psy_id, BFLRG, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
+    cinitenv("PSY_ID", st.psy_id);
 
-    dbset(cl, "PACT_CFG_ID", st.sys_id);
+    dbset(cl, "PACT_CFG_ID", st.psy_id);
 
     dbinitv(cl, "Globals",       "");
-    dbinitv(cl, "SYS_CfgMan",    "%s/cfgman", st.dir.scr);
-    dbinitv(cl, "SYS_MngDir",    st.dir.mng);
-    dbinitv(cl, "SYS_InstRoot",  "none");
+    dbinitv(cl, "PSY_CfgMan",    "%s/cfgman", st.dir.scr);
+    dbinitv(cl, "PSY_MngDir",    st.dir.mng);
+    dbinitv(cl, "PSY_InstRoot",  "none");
     dbinitv(cl, "PubInc",        "");
     dbinitv(cl, "PubLib",        "");
     dbinitv(cl, "ScmDir",        "scheme");
@@ -1637,7 +1637,7 @@ static void default_var(client *cl, char *base)
     dbinitv(cl, "CONFIG_PATH",   "");
 
 /* global variables */
-    snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.sys_id);
+    snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.psy_id);
     snprintf(st.dir.inc,  BFLRG, "%s/include", st.dir.root);
     snprintf(st.dir.etc,  BFLRG, "%s/etc",     st.dir.root);
     snprintf(st.dir.lib,  BFLRG, "%s/lib",     st.dir.root);
@@ -2048,7 +2048,7 @@ static void init_pco_session(client *cl, char *base, int append)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SET_INST_BASE - setup the SYS_InstRoot related state */
+/* SET_INST_BASE - setup the PSY_InstRoot related state */
 
 static void set_inst_base(client *cl, char *ib)
    {
@@ -2059,7 +2059,7 @@ static void set_inst_base(client *cl, char *ib)
 
 	st.installp = TRUE;};
 
-    dbset(cl, "SYS_InstRoot", ib);
+    dbset(cl, "PSY_InstRoot", ib);
     dbset(cl, "PubInc",       "-I%s/include", ib);
     dbset(cl, "PubLib",       "-L%s/lib", ib);
 
@@ -2375,7 +2375,7 @@ static void parse_features(char *t, int nc, int np, char *ft)
 /*--------------------------------------------------------------------------*/
 
 /* DO_PLATFORM - process a platform command
- *             - syntax: platform <cfg> <alias> <SYS_InstRoot> [<args>*]
+ *             - syntax: platform <cfg> <alias> <PSY_InstRoot> [<args>*]
  */
 
 static void do_platform(client *cl, char *oper, char *value)
@@ -2398,7 +2398,7 @@ static void do_platform(client *cl, char *oper, char *value)
     note(Log, TRUE, "");
 
 /* assemble the config command line */
-    snprintf(t, BFLRG, "./dsys config -plt %s", st.sys_id);
+    snprintf(t, BFLRG, "./dsys config -plt %s", st.psy_id);
 
 /* add options affecting all platforms */
     if (st.abs_deb == TRUE)
@@ -2411,8 +2411,8 @@ static void do_platform(client *cl, char *oper, char *value)
 /* add alias */
     vstrcat(t, BFLRG, " -a %s", sid);
 
-/* add SYS_InstRoot */
-    sib = dbget(cl, TRUE, "SYS_InstRoot");
+/* add PSY_InstRoot */
+    sib = dbget(cl, TRUE, "PSY_InstRoot");
     if ((IS_NULL(sib) == FALSE) && (strcmp(sib, "none") != 0))
        vstrcat(t, BFLRG, " -i %s", spec[1]);
 
@@ -2601,9 +2601,9 @@ static void read_config(client *cl, char *cfg, int quiet)
 	 else if (strcmp(key, "DPEnvironment") == 0)
 	    dp_define();
 
-	 else if (strcmp(key, "SYS_InstRoot") == 0)
+	 else if (strcmp(key, "PSY_InstRoot") == 0)
 	    {if (st.installp == FALSE)
-	        {dbset(cl, "SYS_InstRoot", value);
+	        {dbset(cl, "PSY_InstRoot", value);
 		 dbset(cl, "PubInc",   "-I%s/include", value);
 		 dbset(cl, "PubLib",   "-L%s/lib", value);};}
 
@@ -2977,7 +2977,7 @@ static void read_config_files(client *cl)
     char ts[BFSML];
 
     separator(Log);
-    note(Log, TRUE, "Reading config files for %s on %s", st.sys_id, st.host);
+    note(Log, TRUE, "Reading config files for %s on %s", st.psy_id, st.host);
 
     dt = wall_clock_time();
 
@@ -3010,7 +3010,7 @@ static void analyze_config(client *cl, char *base)
     st.phase = PHASE_ANALYZE;
 
     separator(Log);
-    noted(Log, "Analyzing %s on %s", st.sys_id, st.host);
+    noted(Log, "Analyzing %s on %s", st.psy_id, st.host);
     note(Log, TRUE, "");
 
     dt = wall_clock_time();
@@ -3070,7 +3070,7 @@ static void finish_config(client *cl, char *base)
     snprintf(st.dir.sch, BFLRG, "%s/scheme",  st.dir.root);
 
     separator(Log);
-    noted(Log, "Writing system dependent files for %s", st.sys_id);
+    noted(Log, "Writing system dependent files for %s", st.psy_id);
     note(Log, TRUE, "");
 
     dt = wall_clock_time();
@@ -3351,7 +3351,7 @@ int main(int c, char **v, char **env)
                       break;
  
                  case 's':
-                      nstrncpy(st.sys_id, BFLRG, v[++i], -1);
+                      nstrncpy(st.psy_id, BFLRG, v[++i], -1);
                       break;
  
                  case 'v':
@@ -3373,7 +3373,7 @@ int main(int c, char **v, char **env)
     init_pco_session(cl, base, append);
 
 /* make config directory */
-    snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.sys_id);
+    snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.psy_id);
     run(BOTH, "rm -rf %s", st.dir.cfg);
     run(BOTH, "mkdir %s", st.dir.cfg);
 
@@ -3408,13 +3408,13 @@ int main(int c, char **v, char **env)
         write_do_run_db(cl, &st);
 
 /* order matters crucially here */
-        env_subst(cl, "SYS_Base",       base);
-        env_subst(cl, "SYS_InstRoot",   ib);
-        env_subst(cl, "SYS_Root",       st.dir.root);
-        env_subst(cl, "SYS_ID",         st.sys_id);
+        env_subst(cl, "PSY_Base",       base);
+        env_subst(cl, "PSY_InstRoot",   ib);
+        env_subst(cl, "PSY_Root",       st.dir.root);
+        env_subst(cl, "PSY_ID",         st.psy_id);
         env_subst(cl, "CONFIG_METHOD",  "database");
 
-	snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.sys_id);
+	snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.psy_id);
 	nstrncpy(st.cfgf,    BFLRG, cgetenv(FALSE, "CONFIG_FILE"), -1);
 
 /* reset the rules */

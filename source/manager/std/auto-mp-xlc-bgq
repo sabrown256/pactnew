@@ -7,6 +7,6 @@
 include auto-xlc-lnx-64
 include cross-xlc-bgq
 
-#platform auto-xlc-lnx-64       bgqxs  ${SYS_InstRoot}
-#platform auto-xlc-bgq-64-mpi   bgqx   ${SYS_InstRoot}-mpi
+#platform auto-xlc-lnx-64       bgqxs  ${PSY_InstRoot}
+#platform auto-xlc-bgq-64-mpi   bgqx   ${PSY_InstRoot}-mpi
 

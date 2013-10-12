@@ -27,7 +27,7 @@ if (-x "$PACT") then
    endif
    source $Root/etc/functions-pact.csh
 
-   foreach i (SYS_SITE SYS_TYPE SYS_ASRoot SYS_AIRoot)
+   foreach i (PSY_SITE PSY_TYPE PSY_ASRoot PSY_AIRoot)
       setenv $i `$PACT -info $i`
    end
 
@@ -36,7 +36,7 @@ if (-x "$PACT") then
 #   eval `$lsys`
 
 else
-   setenv SYS_SITE unknown
+   setenv PSY_SITE unknown
    alias flog      'echo "Command: \!\!:2-$" >>& \!\!:^ ; \!\!:2-$ >>& \!\!:^'
    alias Note      'echo \!\!:2-$ >>& \!\!:^'
    alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
@@ -48,7 +48,7 @@ set Tags      = ""
 set AllSites  = FALSE
 set Watch     = update-watch
 set STime     = 60
-set LSite     = $SYS_SITE
+set LSite     = $PSY_SITE
 set LogAction = FALSE
 
 while ($#argv > 0)
@@ -95,13 +95,13 @@ end
 if ("$UpF" == "") then
 
 # GOTHA: OLD_DB_VARS look for old variable
-   if ($?UPDATE_SYS_DB == 1) then
-      set UpF = $UPDATE_SYS_DB
+   if ($?UPDATE_PSY_DB == 1) then
+      set UpF = $UPDATE_PSY_DB
    else if ($?DB_UPDATE_SYS == 1) then
       set UpF = $DB_UPDATE_SYS
-   else if ($?SYS_AIRoot == 1) then
-      if (-f $SYS_AIRoot/pact/db/update-sys-db) then
-         set UpF = "$SYS_AIRoot/pact/db/update-sys-db"
+   else if ($?PSY_AIRoot == 1) then
+      if (-f $PSY_AIRoot/pact/db/update-sys-db) then
+         set UpF = "$PSY_AIRoot/pact/db/update-sys-db"
       endif
    endif
    if ("$UpF" == "") then

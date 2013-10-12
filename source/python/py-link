@@ -59,14 +59,14 @@ endif
 
 @ err    = 0
 
-InitLog Log $cwd/$SYS_TmpDir/obj/log.load
+InitLog Log $cwd/$PSY_TmpDir/obj/log.load
 
 set PDB_MOD_NAME = _pdb
 
 flog $Log (env | sort)
 flog $Log set SrcDir = $cwd
 flog $Log set OS     = `uname -s`
-flog $Log set Root   = $cwd:h:h/dev/$SYS_ID
+flog $Log set Root   = $cwd:h:h/dev/$PSY_ID
 flog $Log set DevInc = $Root/include
 flog $Log set DevLib = $Root/lib
 
