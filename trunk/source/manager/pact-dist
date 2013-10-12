@@ -214,7 +214,7 @@ INIT:
       flog $Log $RMDir pact
    endif
 
-   Note $Log "Distribution Log             Host: $SYS_Host running $OS"
+   Note $Log "Distribution Log             Host: $HSY_Host running $OS"
    Note $Log "User: $WhoIAm                Date: `date`"
    Note $Log " " 
    Note $Log "Operation: $Opt " 

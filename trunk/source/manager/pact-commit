@@ -12,9 +12,9 @@ unalias *
 
 @ err = 0
 
-set sys_mngdir  = $cwd
-set sys_base = $sys_mngdir:h
-set sys_scrdir  = $sys_base/scripts
+set sys_mngdir = $cwd
+set sys_base   = $sys_mngdir:h
+set sys_scrdir = $sys_base/scripts
 set PshDir  = $sys_base/psh
 set SccDir  = $sys_base/scc
 
@@ -313,7 +313,7 @@ flog $Log touch $UpdateLog
 # Start doing the actual commits
 #
 if ($TagOnly == FALSE) then
-   Note $Log "Commit Log		Host: $SYS_Host running $OS"
+   Note $Log "Commit Log		Host: $HSY_Host running $OS"
    Note $Log "User:  $WhoIAm		Date: `date`"
    Note $Log ""
 
@@ -367,7 +367,7 @@ if ($TagOnly == FALSE) then
 
    flog $Log rm -f $UpdateLog
    flog $Log touch $UpdateLog
-   Note $UpdateLog "Host: $SYS_Host           Date: `date`"
+   Note $UpdateLog "Host: $HSY_Host           Date: `date`"
    Note $UpdateLog ""
    flog $Log ($SYS_ScrDir/scs-update >> $UpdateLog)
    flog $Log set xstatus = $status

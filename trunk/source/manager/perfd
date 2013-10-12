@@ -7,11 +7,11 @@ unalias *
 
 source /usr/local/apps/pactnew/etc/functions-pact.csh
 
-set sys_host = `uname -n`
-set sys_host = $sys_host:r
-set sys_host = $sys_host:r
-set Log      = $cwd/perfd-$sys_host.log
-set Dat      = $cwd/perfd-$sys_host.dat
+set hsy_host = `uname -n`
+set hsy_host = $hsy_host:r
+set hsy_host = $hsy_host:r
+set Log      = $cwd/perfd-$hsy_host.log
+set Dat      = $cwd/perfd-$hsy_host.dat
 
 $RM $Log $Dat
 touch $Log

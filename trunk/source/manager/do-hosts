@@ -29,10 +29,10 @@ set Root = $cwd:h
 set This = $cwd:t
 
 set Stamp     = `date +%m_%d_%H_%M`
-set sys_host  = `uname -n`
-set sys_uhost = `expr $sys_host : '\(.*\)\..*\..*'`
-if ("$sys_uhost" == "") then
-   set sys_uhost = $sys_host
+set hsy_host  = `uname -n`
+set hsy_uhost = `expr $hsy_host : '\(.*\)\..*\..*'`
+if ("$hsy_uhost" == "") then
+   set hsy_uhost = $hsy_host
 endif
 
 set SSH = ""

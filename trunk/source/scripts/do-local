@@ -65,10 +65,10 @@ alias NoteNT    'echo "DO-NET:" \!\!:1-$'
 
 Intervene help.do-local
 
-set sys_host  = `uname -n`
-set sys_uhost = `expr $sys_host : '\(.*\)\..*\..*'`
-if ("$sys_uhost" == "") then
-   set sys_uhost = $sys_host
+set hsy_host  = `uname -n`
+set hsy_uhost = `expr $hsy_host : '\(.*\)\..*\..*'`
+if ("$hsy_uhost" == "") then
+   set hsy_uhost = $hsy_host
 endif
 
 if ($?CVS_RSH == 0) then
@@ -146,7 +146,7 @@ switch ($Phase)
         setenv LogHost interrupt
         call INITLOG()
 
-        set SemDir = ./interrupt.$Stamp.$sys_host
+        set SemDir = ./interrupt.$Stamp.$hsy_host
         flog $LogHost mkdir -p $SemDir
         if ($status == 0) then
 
@@ -185,19 +185,19 @@ switch ($Phase)
 
            if ($Err == 0) then
               NoteD $LogHost "   $Fill OK  ($ElapsedTime)"
-              NoteD $LogHost "Succeeded on $sys_uhost"
+              NoteD $LogHost "Succeeded on $hsy_uhost"
               flog $LogHost setenv xstatus 0
            else
               NoteD $LogHost "   $Fill FAILED  ($ElapsedTime)"
-              NoteD $LogHost "      Look in $LogHost on $sys_uhost"
-              NoteD $LogHost "Failed on $sys_uhost"
+              NoteD $LogHost "      Look in $LogHost on $hsy_uhost"
+              NoteD $LogHost "Failed on $hsy_uhost"
               flog $LogHost setenv xstatus 1
            endif
 
 # if this host didn't make the semaphore just pass and finish
         else
            NoteD $LogHost "   $Fill OK  (0)"
-           NoteD $LogHost "Succeeded on $sys_uhost"
+           NoteD $LogHost "Succeeded on $hsy_uhost"
            flog $LogHost setenv xstatus 0
         endif
 
@@ -276,12 +276,12 @@ switch ($Phase)
 
         if ($Err == 0) then
            NoteD $LogHost "   $Fill OK  ($ElapsedTime)"
-           NoteD $LogHost "Succeeded on $sys_uhost"
+           NoteD $LogHost "Succeeded on $hsy_uhost"
            flog $LogHost setenv xstatus 0
         else
            NoteD $LogHost "   $Fill FAILED  ($ElapsedTime)"
-           NoteD $LogHost "      Look in $LogHost on $sys_uhost"
-           NoteD $LogHost "Failed on $sys_uhost"
+           NoteD $LogHost "      Look in $LogHost on $hsy_uhost"
+           NoteD $LogHost "Failed on $hsy_uhost"
            flog $LogHost setenv xstatus 1
         endif
 
@@ -333,7 +333,7 @@ switch ($Phase)
            call INITLOG()
 
            set StartTime = `date +%r\ on\ %a\ %D`
-           NoteD $LogHost "Starting build/test on $sys_uhost ($SYS_ID) at $StartTime"
+           NoteD $LogHost "Starting build/test on $hsy_uhost ($SYS_ID) at $StartTime"
            NoteD $LogHost " "
 
            NoteNT "Get starting time: $TIMER -r"
@@ -386,11 +386,11 @@ switch ($Phase)
            endif
 
            if ($Err == 0) then
-              NoteD $LogHost "Succeeded on $sys_uhost ($ElapsedTime)"
+              NoteD $LogHost "Succeeded on $hsy_uhost ($ElapsedTime)"
               flog $LogHost setenv xstatus 0
            else
-              NoteD $LogHost "Failed on $sys_uhost ($ElapsedTime)"
-              NoteD $LogHost "Look in $LogHost on $sys_uhost"
+              NoteD $LogHost "Failed on $hsy_uhost ($ElapsedTime)"
+              NoteD $LogHost "Look in $LogHost on $hsy_uhost"
               flog $LogHost setenv xstatus 1
            endif
 
@@ -398,7 +398,7 @@ switch ($Phase)
 
         else
            setenv Err DONT_INSTALL
-           NoteD $LogHost "Succeeded on $sys_uhost (work directory gone)"
+           NoteD $LogHost "Succeeded on $hsy_uhost (work directory gone)"
            flog $LogHost setenv xstatus 0
         endif
 
@@ -466,35 +466,35 @@ switch ($Phase)
 # ok
               case 0:
                    NoteD $LogHost "   $Fill OK  ($ElapsedTime)"
-                   NoteD $LogHost "Succeeded on $sys_uhost"
+                   NoteD $LogHost "Succeeded on $hsy_uhost"
                    flog $LogHost setenv xstatus 0
                    breaksw
 
 # failed
               case 1:
                    NoteD $LogHost "   $Fill FAILED  ($ElapsedTime)"
-                   NoteD $LogHost "      Look in $LogHost on $sys_uhost"
-                   NoteD $LogHost "Failed on $sys_uhost"
+                   NoteD $LogHost "      Look in $LogHost on $hsy_uhost"
+                   NoteD $LogHost "Failed on $hsy_uhost"
                    flog $LogHost setenv xstatus 1
                    breaksw
 
 # no install
               case 2:
                    NoteD $LogHost "   $Fill NONE  ($ElapsedTime)"
-                   NoteD $LogHost "Succeeded on $sys_uhost"
+                   NoteD $LogHost "Succeeded on $hsy_uhost"
                    flog $LogHost setenv xstatus 0
                    breaksw
 
 # do not install
               case 3:
-                   NoteD $LogHost "Succeeded on $sys_uhost"
+                   NoteD $LogHost "Succeeded on $hsy_uhost"
                    flog $LogHost setenv xstatus 0
                    breaksw
            endsw
            NoteVT "(STAT)" "hostinstall_$SysID ($ElapsedTime)"
         else
            setenv Err DONT_INSTALL
-           NoteD $LogHost "Succeeded on $sys_uhost (work directory gone)"
+           NoteD $LogHost "Succeeded on $hsy_uhost (work directory gone)"
            flog $LogHost setenv xstatus 0
         endif
 
@@ -560,22 +560,22 @@ switch ($Phase)
         switch ($Err)
            case OK:
                 NoteD $LogHost "   $Fill OK  ($ElapsedTime)"
-                NoteD $LogHost "Succeeded on $sys_uhost"
+                NoteD $LogHost "Succeeded on $hsy_uhost"
                 flog $LogHost setenv xstatus 0
                 breaksw
            case FAILED:
                 NoteD $LogHost "   $Fill FAILED  ($ElapsedTime)"
-                NoteD $LogHost "      Look in $LogHost on $sys_uhost"
-                NoteD $LogHost "Failed on $sys_uhost"
+                NoteD $LogHost "      Look in $LogHost on $hsy_uhost"
+                NoteD $LogHost "Failed on $hsy_uhost"
                 flog $LogHost setenv xstatus 1
                 breaksw
            case NO_INSTALL:
                 NoteD $LogHost "   $Fill NONE  ($ElapsedTime)"
-                NoteD $LogHost "Succeeded on $sys_uhost"
+                NoteD $LogHost "Succeeded on $hsy_uhost"
                 flog $LogHost setenv xstatus 0
                 breaksw
            case DONT_INSTALL:
-                NoteD $LogHost "Succeeded on $sys_uhost"
+                NoteD $LogHost "Succeeded on $hsy_uhost"
                 flog $LogHost setenv xstatus 0
                 breaksw
         endsw
@@ -617,8 +617,8 @@ DIRVAR:
 
    setenv SYS_Base   $WrkDirTmp:t
    setenv Root      $WrkDirTmp:h
-   setenv SetupLog  $Root/$sys_uhost.$Stamp.setup
-   setenv ArgFile   $SHARED/.do-local-args.$sys_uhost.$Stamp.$$
+   setenv SetupLog  $Root/$hsy_uhost.$Stamp.setup
+   setenv ArgFile   $SHARED/.do-local-args.$hsy_uhost.$Stamp.$$
 
    setenv TIMER    "$SHARED/.do-timer.$Stamp"
    setenv NFSMON   "$SHARED/.do-nfsmon.$Stamp"
@@ -650,7 +650,7 @@ INITLOG:
 # NOTE: most local scripts will not care about this point
 # it is even probably a bad idea but some will do it anyway
       setenv TLog    $LogHost
-      setenv LogHost $LogHost.$sys_host.$$
+      setenv LogHost $LogHost.$hsy_host.$$
 
       $RM $LogHost
       touch $LogHost
@@ -686,11 +686,11 @@ INITLOG:
    
    Note $LogHost `date`
    Note $LogHost ""
-   Note $LogHost "User $USER on $sys_host "
+   Note $LogHost "User $USER on $hsy_host "
    Note $LogHost ""
    
    Separator $LogHost
-   Note $LogHost "Logging environment for $Phase on $sys_uhost"
+   Note $LogHost "Logging environment for $Phase on $hsy_uhost"
    
    Note $LogHost ""
    Note $LogHost "----- SET -----"
@@ -724,7 +724,7 @@ INITLOG:
 # this works everywhere
    w | head -n 1 >>& $LogHost
 
-   set TmpFile = ~/.do-local-tmp-$sys_uhost-$$
+   set TmpFile = ~/.do-local-tmp-$hsy_uhost-$$
    $RM $TmpFile
 
    which ls-jobs >& $TmpFile
@@ -744,13 +744,13 @@ INITLOG:
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# FORMAT - fill ragged sys_uhost name with "." to column 20 
+# FORMAT - fill ragged host name with "." to column 20 
 
 FORMAT:
 
-   @ CCount = `echo $sys_uhost | wc -c`
+   @ CCount = `echo $hsy_uhost | wc -c`
    @ NDots  = 20 - $CCount
-   set Fill = "$sys_uhost "
+   set Fill = "$hsy_uhost "
    while ($NDots > 0)
       set Fill = "$Fill."
       @ NDots = $NDots - 1

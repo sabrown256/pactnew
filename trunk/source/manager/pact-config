@@ -74,7 +74,7 @@ set SRCDate       = ""
 
 source pact-scs
 
-setenv SYS_Host    `uname -n`
+setenv HSY_Host    `uname -n`
 setenv OS_Name     `uname -s`
 setenv OS_Release  `uname -r`
 
@@ -323,7 +323,7 @@ Main:
 AnalyzeConfig:
 
     NoteD $Log ""
-    NoteD $Log "Analyzing system on $SYS_Host"
+    NoteD $Log "Analyzing system on $HSY_Host"
 
     write/envf FALSE
     
