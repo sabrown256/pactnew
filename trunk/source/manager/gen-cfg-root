@@ -47,7 +47,7 @@ unset ok
 unset lname
 
 # work over the features list to accomodate platform targets
-# platform 0 is the "main" config which gets the default SYS_ID
+# platform 0 is the "main" config which gets the default PSY_ID
 # all other platforms are specified by the 'platform' command in
 # the config file and are assigned an index 1, ...
 # every platform should get non-targeted features

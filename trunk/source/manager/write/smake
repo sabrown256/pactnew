@@ -23,12 +23,12 @@ Separator $Log
 Note $Log "   System make wrapper - smake"
 Note $Log ""
 
-dbmget $Log SYS_CfgDir^       \
-            SYS_MngDir^       \
-            SYS_Root^         \
-            SYS_ID^           \
-            SYS_InstRoot^     \
-            SYS_Prefix^       \
+dbmget $Log PSY_CfgDir^       \
+            PSY_MngDir^       \
+            PSY_Root^         \
+            PSY_ID^           \
+            PSY_InstRoot^     \
+            PSY_Prefix^       \
             GMAKE_Flag^       \
             IncDir^           \
             EtcDir^           \
@@ -41,41 +41,41 @@ dbmget $Log SYS_CfgDir^       \
             PACT_CC_VERSION^  \
             UseTmpDir
 
-set lpactver = `cat $SYS_MngDir/.pact-version`
+set lpactver = `cat $PSY_MngDir/.pact-version`
 
 Note $Log "   lpactver      = |$lpactver|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    flog $Log pushd $SYS_CfgDir
+    flog $Log pushd $PSY_CfgDir
 
     set InstOld = instold
 
-    set Tmp    = tmp-$SYS_ID
+    set Tmp    = tmp-$PSY_ID
     set TPACTX = pactx.$Tmp
     set TMAKEF = mk.$Tmp
 
 # backup the public files
-    if ($SYS_InstRoot != "none") then
+    if ($PSY_InstRoot != "none") then
        if (-d $InstOld) then
           flog $Log $RMDir $InstOld
        endif
        flog $Log mkdir $InstOld
 
-       if (-e $SYS_InstRoot/bin/pact) then
-          flog $Log cp $SYS_InstRoot/bin/pact $InstOld
+       if (-e $PSY_InstRoot/bin/pact) then
+          flog $Log cp $PSY_InstRoot/bin/pact $InstOld
        endif
-       if (-e $SYS_InstRoot/etc/make-def) then
-          flog $Log cp $SYS_InstRoot/etc/make-def $InstOld
+       if (-e $PSY_InstRoot/etc/make-def) then
+          flog $Log cp $PSY_InstRoot/etc/make-def $InstOld
        endif
-       if (-e $SYS_InstRoot/etc/make-macros) then
-          flog $Log cp $SYS_InstRoot/etc/make-macros $InstOld
+       if (-e $PSY_InstRoot/etc/make-macros) then
+          flog $Log cp $PSY_InstRoot/etc/make-macros $InstOld
        endif
 
-       if (-d $SYS_InstRoot/include) then
-          sed "s|$SYS_Root|$SYS_InstRoot|" $EtcDir/make-def > $SYS_InstRoot/etc/make-def
-          flog $Log cp $EtcDir/make-macros $SYS_InstRoot/etc/make-macros
+       if (-d $PSY_InstRoot/include) then
+          sed "s|$PSY_Root|$PSY_InstRoot|" $EtcDir/make-def > $PSY_InstRoot/etc/make-def
+          flog $Log cp $EtcDir/make-macros $PSY_InstRoot/etc/make-macros
        endif
     endif
 
@@ -97,8 +97,8 @@ EOF
 # build the small version of the PACT program - smake
     set mkopt = ""
     set mkopt = ( $mkopt -g )
-    set mkopt = ( $mkopt -DSYS_ID=\"${SYS_ID}\" )
-    set mkopt = ( $mkopt -DSYS_Prefix=\"${SYS_Prefix}\" )
+    set mkopt = ( $mkopt -DPSY_ID=\"${PSY_ID}\" )
+    set mkopt = ( $mkopt -DPSY_Prefix=\"${PSY_Prefix}\" )
     set mkopt = ( $mkopt -DPACT_VERSION=\"${lpactver}\" )
     set mkopt = ( $mkopt $GMAKE_Flag )
     set mkopt = ( $mkopt -I${IncDir} )
@@ -165,7 +165,7 @@ EOF
     unset opt
     unset ok
 
-    flog $Log $RMDir ${SYS_Prefix}*
+    flog $Log $RMDir ${PSY_Prefix}*
     flog $Log $RM `ls`
     flog $Log popd
 

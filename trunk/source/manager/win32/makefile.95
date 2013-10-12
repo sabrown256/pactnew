@@ -2,9 +2,9 @@
 # Makefile for the PACT Distribution
 #
 
-SYS_Base   = c:\pactdir\pact
-SYS_MngDir = ${SYS_Base}\manager
-DevDir     = ${SYS_Base}\dev
+PSY_Base   = c:\pactdir\pact
+PSY_MngDir = ${PSY_Base}\manager
+DevDir     = ${PSY_Base}\dev
 
 pact :
         @echo Building Pact ...
@@ -90,11 +90,11 @@ install:
 
 makes :
         @echo Making Pact Makefiles ...
-#        set MANAGER = ${SYS_MngDir}
+#        set MANAGER = ${PSY_MngDir}
 # The above set does not work on win95.  In order for this
 # environmental variable to be set on my system I had to set
 # it in config.sys.
-        for-pact ${SYS_MngDir}\bmake
+        for-pact ${PSY_MngDir}\bmake
         @echo Pact Makefiles made
 
 remove :

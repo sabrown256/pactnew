@@ -34,21 +34,21 @@ setenv OS_Name  `uname -s`
 
 eval `../scripts/cfgsys`
 
-set DevDir = $SYS_Base/dev
-set IncDir = $SYS_Root/include
-set BinDir = $SYS_Root/bin
-set LibDir = $SYS_Root/lib
-set EtcDir = $SYS_Root/etc
+set DevDir = $PSY_Base/dev
+set IncDir = $PSY_Root/include
+set BinDir = $PSY_Root/bin
+set LibDir = $PSY_Root/lib
+set EtcDir = $PSY_Root/etc
 
 source $EtcDir/env-pact.csh
-source $SYS_ScrDir/functions-pact.csh
+source $PSY_ScrDir/functions-pact.csh
 
 set AR     = `pact +l -info AR`
 set AROpt  = `pact +l -info AROpt`
 set ARXOpt = `pact +l -info ARXOpt`
 
 echo ""
-echo "Making integrated PACT library for $SYS_ID"
+echo "Making integrated PACT library for $PSY_ID"
 
 pushd $LibDir >& /dev/null
 

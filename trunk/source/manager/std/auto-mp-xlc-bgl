@@ -7,6 +7,6 @@
 include auto-xlc-lnx-32
 include cross-xlc-bgl
 
-#platform auto-xlc-lnx-32       bglxs  ${SYS_InstRoot}
-#platform auto-xlc-bgl-32-mpi   bglx   ${SYS_InstRoot}-mpi
+#platform auto-xlc-lnx-32       bglxs  ${PSY_InstRoot}
+#platform auto-xlc-bgl-32-mpi   bglx   ${PSY_InstRoot}-mpi
 

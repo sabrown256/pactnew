@@ -11,7 +11,7 @@
 
 unalias *
 
-if ($?sys_mngdir == 0) then
+if ($?psy_mngdir == 0) then
    if ($?USER == 0) then
       if ($?LOGNAME == 0) then
          set USER = "anonymous"
@@ -20,16 +20,16 @@ if ($?sys_mngdir == 0) then
       endif
    endif
 
-   set sys_mngdir = $cwd
-   set sys_base   = $sys_mngdir:h
+   set psy_mngdir = $cwd
+   set psy_base   = $psy_mngdir:h
 
-   setenv SYS_Base   $sys_base
-   setenv SYS_ScrDir $SYS_Base/scripts
+   setenv PSY_Base   $psy_base
+   setenv PSY_ScrDir $PSY_Base/scripts
 
-   source $SYS_ScrDir/functions-pact.csh
+   source $PSY_ScrDir/functions-pact.csh
 endif
 
-source $SYS_ScrDir/csh-subroutines
+source $PSY_ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
 if ($#argv < 1) then
@@ -66,7 +66,7 @@ set StructStack = "Glb"
 setenv CurrTool  ""
 setenv CurrGrp   Glb
 
-set path = ( $sys_mngdir $path )
+set path = ( $psy_mngdir $path )
 
 # Source Control System Variables
 set SCSRepository = ""
@@ -78,7 +78,7 @@ setenv HSY_Host    `uname -n`
 setenv OS_Name     `uname -s`
 setenv OS_Release  `uname -r`
 
-setenv SYS_Arch `$SYS_ScrDir/system-id`
+setenv PSY_Arch `$PSY_ScrDir/system-id`
 
 #
 # Global Variables
@@ -99,16 +99,16 @@ setenv AbsoluteDeb    FALSE
 setenv AbsoluteOpt    FALSE
 setenv CROSS_COMPILE  FALSE
 
-setenv SYS_CfgMan  $SYS_ScrDir/cfgman
-setenv SYS_ID      `$SYS_CfgMan use`
-setenv SYS_CfgDir  cfg-$SYS_ID
-setenv SYS_MngDir  $cwd
+setenv PSY_CfgMan  $PSY_ScrDir/cfgman
+setenv PSY_ID      `$PSY_CfgMan use`
+setenv PSY_CfgDir  cfg-$PSY_ID
+setenv PSY_MngDir  $cwd
 
-setenv SYS_Root $SYS_Base/dev/$SYS_ID
-setenv IncDir   $SYS_Root/include
-setenv EtcDir   $SYS_Root/etc
-setenv BinDir   $SYS_Root/bin
-setenv LibDir   $SYS_Root/lib
+setenv PSY_Root $PSY_Base/dev/$PSY_ID
+setenv IncDir   $PSY_Root/include
+setenv EtcDir   $PSY_Root/etc
+setenv BinDir   $PSY_Root/bin
+setenv LibDir   $PSY_Root/lib
 setenv ScmDir   scheme
 setenv Man1Dir  man/man1
 setenv Man3Dir  man/man3
@@ -117,13 +117,13 @@ setenv EnvSh    $EtcDir/env-pact.sh
 setenv EnvDk    $EtcDir/env-pact.dk
 
 
-setenv CEFile   $SYS_Root/log/file.ce
-setenv CDFile   $SYS_Root/log/file.cd
-setenv DPFile   $SYS_Root/log/file.dpe
-setenv SEFile   $SYS_Root/log/file.se
-setenv MVFile   $SYS_Root/log/file.mv
-setenv URFile   $SYS_Root/log/file.ur
-setenv Log      $SYS_Root/log/config
+setenv CEFile   $PSY_Root/log/file.ce
+setenv CDFile   $PSY_Root/log/file.cd
+setenv DPFile   $PSY_Root/log/file.dpe
+setenv SEFile   $PSY_Root/log/file.se
+setenv MVFile   $PSY_Root/log/file.mv
+setenv URFile   $PSY_Root/log/file.ur
+setenv Log      $PSY_Root/log/config
 
 setenv NoExe   FALSE
 setenv Load    TRUE
@@ -148,18 +148,18 @@ set lConfigVars = ( $lConfigVars LD_Exe LD_Flags LD_Lib )
 
 # variable defaults
 
-setenv SYS_InstRoot   none
+setenv PSY_InstRoot   none
 setenv FPU            unknown
 setenv Globals        ""
 
-setenv PubInc  "-I$SYS_InstRoot/include"
-setenv PubLib  "-L$SYS_InstRoot/lib"
+setenv PubInc  "-I$PSY_InstRoot/include"
+setenv PubLib  "-L$PSY_InstRoot/lib"
 
 # we need the back slash treatment now - later will not do
 source analyze/backslash
 
-$RMDir $SYS_CfgDir
-mkdir $SYS_CfgDir
+$RMDir $PSY_CfgDir
+mkdir $PSY_CfgDir
 
 flog $Log date
 
@@ -194,12 +194,12 @@ Main:
 
           case -i:
                    shift
-                   setenv SYS_InstRoot $1
-                   if ("$SYS_InstRoot" =~ */) then
-                      setenv SYS_InstRoot `expr "$SYS_InstRoot" : '\(.*\)/'`
+                   setenv PSY_InstRoot $1
+                   if ("$PSY_InstRoot" =~ */) then
+                      setenv PSY_InstRoot `expr "$PSY_InstRoot" : '\(.*\)/'`
                    endif
-                   setenv PubInc "-I$SYS_InstRoot/include"
-                   setenv PubLib "-L$SYS_InstRoot/lib"
+                   setenv PubInc "-I$PSY_InstRoot/include"
+                   setenv PubLib "-L$PSY_InstRoot/lib"
                    set IBSet = "input"
                    breaksw
 
@@ -217,9 +217,9 @@ Main:
 
           case -s:
                    shift
-                   setenv SYS_ID   $1
-                   setenv SYS_Root  $SYS_Base/dev/$SYS_ID
-                   setenv IncDir   $SYS_Root/include
+                   setenv PSY_ID   $1
+                   setenv PSY_Root  $PSY_Base/dev/$PSY_ID
+                   setenv IncDir   $PSY_Root/include
                    setenv EnvCsh   $EtcDir/env-pact.csh
                    setenv EnvSh    $EtcDir/env-pact.sh
                    setenv EnvDk    $EtcDir/env-pact.dk
@@ -240,7 +240,7 @@ Main:
     end
 
     set lcfg = $CONFIG_FILE:t
-    setenv SYS_Cfg  $lcfg
+    setenv PSY_Cfg  $lcfg
     unset lcfg
 
     flog $Log $RM $CEFile
@@ -327,12 +327,12 @@ AnalyzeConfig:
 
     write/envf FALSE
     
-    flog $Log pushd $SYS_CfgDir
+    flog $Log pushd $PSY_CfgDir
 
-    include $SYS_MngDir/pact-analyze
+    include $PSY_MngDir/pact-analyze
 
 # restore config as the log file
-    set Log = "$SYS_Root/log/config"
+    set Log = "$PSY_Root/log/config"
     flog $Log $RM `ls`
     flog $Log popd
 
@@ -359,30 +359,30 @@ CheckDir:
 
     if ($CreateDirs == TRUE) then
        set Created = ""
-       if ("$SYS_InstRoot" != "none") then
-          if (!(-d $SYS_InstRoot/bin)) then
-             mkdir -p $SYS_InstRoot/bin
-             set Created = ( $Created $SYS_InstRoot/bin )
+       if ("$PSY_InstRoot" != "none") then
+          if (!(-d $PSY_InstRoot/bin)) then
+             mkdir -p $PSY_InstRoot/bin
+             set Created = ( $Created $PSY_InstRoot/bin )
           endif
-          if (!(-d $SYS_InstRoot/lib)) then
-             mkdir -p $SYS_InstRoot/lib
-             set Created = ( $Created $SYS_InstRoot/lib )
+          if (!(-d $PSY_InstRoot/lib)) then
+             mkdir -p $PSY_InstRoot/lib
+             set Created = ( $Created $PSY_InstRoot/lib )
           endif
-          if (!(-d $SYS_InstRoot/include)) then
-             mkdir -p $SYS_InstRoot/include
-             set Created = ( $Created $SYS_InstRoot/include )
+          if (!(-d $PSY_InstRoot/include)) then
+             mkdir -p $PSY_InstRoot/include
+             set Created = ( $Created $PSY_InstRoot/include )
           endif
-          if (!(-d $SYS_InstRoot/$ScmDir)) then
-             mkdir -p $SYS_InstRoot/$ScmDir
-             set Created = ( $Created $SYS_InstRoot/$ScmDir )
+          if (!(-d $PSY_InstRoot/$ScmDir)) then
+             mkdir -p $PSY_InstRoot/$ScmDir
+             set Created = ( $Created $PSY_InstRoot/$ScmDir )
           endif
-          if (!(-d $SYS_InstRoot/$Man1Dir)) then
-             mkdir -p $SYS_InstRoot/$Man1Dir
-             set Created = ( $Created $SYS_InstRoot/$Man1Dir )
+          if (!(-d $PSY_InstRoot/$Man1Dir)) then
+             mkdir -p $PSY_InstRoot/$Man1Dir
+             set Created = ( $Created $PSY_InstRoot/$Man1Dir )
           endif
-          if (!(-d $SYS_InstRoot/$Man3Dir)) then
-             mkdir -p $SYS_InstRoot/$Man3Dir
-             set Created = ( $Created $SYS_InstRoot/$Man3Dir )
+          if (!(-d $PSY_InstRoot/$Man3Dir)) then
+             mkdir -p $PSY_InstRoot/$Man3Dir
+             set Created = ( $Created $PSY_InstRoot/$Man3Dir )
           endif
        endif
        if ("$Created" != "") then
@@ -396,24 +396,24 @@ CheckDir:
        endif
     else
        set Missing = ""
-       if ("$SYS_InstRoot" != "none") then
-          if (!(-d $SYS_InstRoot/bin)) then
-             set Missing = ( $Missing $SYS_InstRoot/bin )
+       if ("$PSY_InstRoot" != "none") then
+          if (!(-d $PSY_InstRoot/bin)) then
+             set Missing = ( $Missing $PSY_InstRoot/bin )
           endif
-          if (!(-d $SYS_InstRoot/lib)) then
-             set Missing = ( $Missing $SYS_InstRoot/lib )
+          if (!(-d $PSY_InstRoot/lib)) then
+             set Missing = ( $Missing $PSY_InstRoot/lib )
           endif
-          if (!(-d $SYS_InstRoot/include)) then
-             set Missing = ( $Missing $SYS_InstRoot/include )
+          if (!(-d $PSY_InstRoot/include)) then
+             set Missing = ( $Missing $PSY_InstRoot/include )
           endif
-          if (!(-d $SYS_InstRoot/$ScmDir)) then
-             set Missing = ( $Missing $SYS_InstRoot/$ScmDir )
+          if (!(-d $PSY_InstRoot/$ScmDir)) then
+             set Missing = ( $Missing $PSY_InstRoot/$ScmDir )
           endif
-          if (!(-d $SYS_InstRoot/$Man1Dir)) then
-             set Missing = ( $Missing $SYS_InstRoot/$Man1Dir )
+          if (!(-d $PSY_InstRoot/$Man1Dir)) then
+             set Missing = ( $Missing $PSY_InstRoot/$Man1Dir )
           endif
-          if (!(-d $SYS_InstRoot/$Man3Dir)) then
-             set Missing = ( $Missing $SYS_InstRoot/$Man3Dir )
+          if (!(-d $PSY_InstRoot/$Man3Dir)) then
+             set Missing = ( $Missing $PSY_InstRoot/$Man3Dir )
           endif
        endif
        if ("$Missing" != "") then
@@ -703,7 +703,7 @@ while (1)
    case run:
 
         @ nrun = $nrun + 1
-        set lfile = $SYS_CfgDir/run.$nrun
+        set lfile = $PSY_CfgDir/run.$nrun
         set cmd   = ( $Line[2-] )
         $cmd >&! $lfile
 
@@ -750,11 +750,11 @@ while (1)
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   case SYS_InstRoot:
+   case PSY_InstRoot:
         if ($IBSet == "dflt") then
-           flog $Log setenv SYS_InstRoot "$Value"
-           flog $Log setenv PubInc       "-I$SYS_InstRoot/include"
-           flog $Log setenv PubLib       "-L$SYS_InstRoot/lib"
+           flog $Log setenv PSY_InstRoot "$Value"
+           flog $Log setenv PubInc       "-I$PSY_InstRoot/include"
+           flog $Log setenv PubLib       "-L$PSY_InstRoot/lib"
         endif
         breaksw
 
@@ -863,7 +863,7 @@ end
 ReplaceText:
     if ("$Replace" != "") then
 
-       set TmpFile = file.tmp-$SYS_ID
+       set TmpFile = file.tmp-$PSY_ID
 
        sed "$Replace" $STDOUT > $TmpFile
        ${RM} $STDOUT
@@ -882,7 +882,7 @@ ReplaceText:
 PrintText:
     if ("$Text" != "") then
 
-       set STDAUX = tmp-$SYS_ID.1
+       set STDAUX = tmp-$PSY_ID.1
        $RM $STDAUX
 
        echo "$Text" > $STDAUX
@@ -1317,18 +1317,18 @@ Unique:
 Finish:
 
 # these are finally determined by now and it is safe to define them
-    setenv IncDir  $SYS_Root/include
-    setenv LibDir  $SYS_Root/lib
-    setenv BinDir  $SYS_Root/bin
-    setenv SchDir  $SYS_Root/scheme
+    setenv IncDir  $PSY_Root/include
+    setenv LibDir  $PSY_Root/lib
+    setenv BinDir  $PSY_Root/bin
+    setenv SchDir  $PSY_Root/scheme
 
     NoteD $Log "Writing system dependent files"
 
 # if T3D, fiddle pdb fortran interface regression test source
     if ("$PFE" == "mppexec") then
-       cd $SYS_Base/pdb
+       cd $PSY_Base/pdb
 
-       set STDAUX = tmp-$SYS_ID.f
+       set STDAUX = tmp-$PSY_ID.f
        flog $Log $RM $STDAUX
        sed -e s/'iarg, iargc'/'iarg, ipxfargc, ilen, ierror'/              \
            -e s/'iargc()'/'ipxfargc()'/                                    \
@@ -1336,7 +1336,7 @@ Finish:
            pdftst.f > $STDAUX
        flog $Log ${RM} pdftst.f
        flog $Log mv $STDAUX pdftst.f
-       flog $Log cd $SYS_MngDir
+       flog $Log cd $PSY_MngDir
     endif
 
 # remove duplicate tokens in selected lists
@@ -1384,7 +1384,7 @@ Finish:
     write/scdecls.h
     write/syntax.h
 
-    if (-d $SYS_Base/sx/applications) then
+    if (-d $PSY_Base/sx/applications) then
        write/spokes.scm
     endif
 
@@ -1392,7 +1392,7 @@ Finish:
 
     write/smake
 
-    flog $Log $RMDir $SYS_CfgDir
+    flog $Log $RMDir $PSY_CfgDir
 
     flog $Log unset noglob
 

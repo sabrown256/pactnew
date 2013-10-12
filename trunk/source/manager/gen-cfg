@@ -111,8 +111,8 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set sys_arch = `system-id`
-set gdir     = gen/$sys_arch
+set psy_arch = `system-id`
+set gdir     = gen/$psy_arch
 if (!(-d $gdir)) then
    mkdir -p $gdir
 endif

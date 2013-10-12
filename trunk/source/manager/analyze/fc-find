@@ -86,7 +86,7 @@ set allfc  = ""
 set ansifc = ""
 
 foreach fc ($fclst)
-   set res = `$SYS_MngDir/pwhich $fc`
+   set res = `$PSY_MngDir/pwhich $fc`
    if ("$res[1]" =~ /*) then
 
       set bindir = $res:h

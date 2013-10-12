@@ -415,7 +415,7 @@ int main(int c, char **v)
     file  = NULL;
     host  = NULL;
     name  = NULL;
-    sys   = SYS_Arch;
+    sys   = PSY_Arch;
     sysl  = NULL;
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-dt") == 0)

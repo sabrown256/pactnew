@@ -58,7 +58,7 @@ void manage_tmp_dir(statedes *st, int start)
         else
 	    sprintf(st->tmpdir, "/tmp/pact_make_%d", (int) getpid());
 #else
-	sprintf(st->tmpdir, "%s/%s%s/obj", st->cwd, SYS_Prefix, st->sys);
+	sprintf(st->tmpdir, "%s/%s%s/obj", st->cwd, PSY_Prefix, st->sys);
 #endif
 
 	snprintf(cmd, BFLRG, "test -d %s/", st->tmpdir);
@@ -201,7 +201,7 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
     i = strlen(st->cwd) - 7;
     i = max(i, 0);
     if (strcmp(st->cwd+i, "manager") == 0)
-       {snprintf(s, BFLRG, "echo \"SYS_ID = %s\" ; ", st->sys);
+       {snprintf(s, BFLRG, "echo \"PSY_ID = %s\" ; ", st->sys);
 
         snprintf(s, BFLRG, "cat %s", pmname);
 	nstrcat(cmd, BFLRG, s);}
@@ -359,15 +359,15 @@ static int setup_env(statedes *st, char *src)
 	ps = pop_path(s);
 	p  = pop_path(s);
 
-/* if root is of the form /.../dev/<sys_id> use <sys_id> */
+/* if root is of the form /.../dev/<PSY_id> use <PSY_id> */
 	if (strcmp(p, "dev") == 0)
 	   strcpy(st->sys, ps);
 
-/* otherwise use the configured SYS_ID */
+/* otherwise use the configured PSY_ID */
 	else
-	   strcpy(st->sys, SYS_ID);};
+	   strcpy(st->sys, PSY_ID);};
 
-    sprintf(st->arch, "%s%s", SYS_Prefix, st->sys);
+    sprintf(st->arch, "%s%s", PSY_Prefix, st->sys);
 
     return(TRUE);}
 

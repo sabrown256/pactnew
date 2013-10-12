@@ -17,8 +17,8 @@ set Root = $Here:h
 set Base = $Root:h
 set Base = $Base:h
 
-set SYS_ID   = `$Base/scripts/cfgman -d $Base/dev use`
-set PACTDir  = $Base/dev/$SYS_ID
+set PSY_ID   = `$Base/scripts/cfgman -d $Base/dev use`
+set PACTDir  = $Base/dev/$PSY_ID
 set PACTBin  = $PACTDir/bin
 set PACTInc  = $PACTDir/include
 set PACTEtc  = $PACTDir/etc
@@ -176,13 +176,13 @@ set FcFlags =
     echo '#' >>& $STDOUT
     echo '' >>& $STDOUT
 
-    echo 'DevDir = '$Root'/dev/${SYS_ID}' >>& $STDOUT
+    echo 'DevDir = '$Root'/dev/${PSY_ID}' >>& $STDOUT
     echo 'DevBin = ${DevDir}/bin' >>& $STDOUT
     echo 'DevLib = ${DevDir}/lib' >>& $STDOUT
     echo 'DevInc = ${DevDir}/include' >>& $STDOUT
     echo '' >>& $STDOUT
 
-    echo 'PACTDir = ${SYS_Root}' >>& $STDOUT
+    echo 'PACTDir = ${PSY_Root}' >>& $STDOUT
     echo 'PACTInc = ${PACTDir}/include' >>& $STDOUT
     echo 'PACTLib = ${PACTDir}/lib' >>& $STDOUT
     echo 'PANACHE = ${PACTDir}/bin/panache' >>& $STDOUT

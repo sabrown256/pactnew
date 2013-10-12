@@ -15,7 +15,7 @@ if ($?SCSOpt == 0) then
    set SCSOpt = ""
 endif
 
-set repo     = `$SYS_ScrDir/scs-meta -r`
+set repo     = `$PSY_ScrDir/scs-meta -r`
 set repohost = `scs-meta -m`
 
 #--------------------------------------------------------------------------
@@ -23,7 +23,7 @@ set repohost = `scs-meta -m`
 
 # set the Lock name one time only
 if ($?Lock == 0) then
-   set lockd = `$SYS_ScrDir/scs-lock dir`
+   set lockd = `$PSY_ScrDir/scs-lock dir`
 
 # handle the local repository case specially
    if (("$repohost" == "--local--") && (-d "$repo")) then

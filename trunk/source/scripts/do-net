@@ -1047,7 +1047,7 @@ INIT:
    call READHOST()
 
    if ($Silent == FALSE) then
-      echo "Beginning update of $SYS_ID ($Stamp)"
+      echo "Beginning update of $PSY_ID ($Stamp)"
    endif
 
    $RM $LogNet >& /dev/null
@@ -1067,7 +1067,7 @@ INIT:
    endif
 
    Note $LogNet ""
-   Note $LogNet "Updating $SYS_ID from $hsy_uhost according to $HostFile"
+   Note $LogNet "Updating $PSY_ID from $hsy_uhost according to $HostFile"
    if ("$CLArgs" != "") then
       Note $LogNet "Command line args: $CLArgs"
    endif
@@ -1122,7 +1122,7 @@ READHOST:
    set MailList = `cat $HostFile | awk '$1 == "mail"         { for (i = 2; i <= NF; i++) print $i }'`
    set Mailer   = `cat $HostFile | awk '$1 == "mailprogram"  { for (i = 2; i <= NF; i++) print $i }'`
    set VarSpecs = `cat $HostFile | awk '$1 == "var"          { print $2 " " $3 }'`
-   set SYS_ID   = `cat $HostFile | awk '$1 == "system"       { print $2 }'`
+   set PSY_ID   = `cat $HostFile | awk '$1 == "system"       { print $2 }'`
    set Repo     = `cat $HostFile | awk '$1 == "repository"   { print $2 }'`
    set LogDir   = `cat $HostFile | awk '$1 == "logdir"       { print $2 }'`
    set HandTOut = `cat $HostFile | awk '$1 == "timeout"      { print $2 }'`
@@ -1202,8 +1202,8 @@ READHOST:
       quit(4)
    endif
 
-   if ("$SYS_ID" == "") then
-      set SYS_ID = "code"
+   if ("$PSY_ID" == "") then
+      set PSY_ID = "code"
    endif
    if ("$HandTOut" == "") then
       set HandTOut = "pass"
@@ -1466,7 +1466,7 @@ LOCKOUT:
 
       if (($nhst == $hsy_host) || ($nhst == $hsy_uhost)) then
          set TDir = $WDir:t
-         set Lock = $WDir:h/$SYS_ID.$TDir.lock
+         set Lock = $WDir:h/$PSY_ID.$TDir.lock
 
          if (-e $Lock) then
             NoteD $LogNet ""
@@ -1833,7 +1833,7 @@ REPORT:
    cat $LogNet | awk '($1 != "DO-NET:") { print }' >! $Report
 
    if (("$Mailer" != "") && ("$MailList" != "")) then
-      vlog $LogNet ( $Mailer -s "$SYS_ID auto build log ($HostFile:t)" $MailList < $Report )
+      vlog $LogNet ( $Mailer -s "$PSY_ID auto build log ($HostFile:t)" $MailList < $Report )
    endif
 
 # check for failure on any hosts
@@ -2063,7 +2063,7 @@ FINISH:
       endif
 
       set TDir = $WDir:t
-      set Lock = $WDir:h/$SYS_ID.$TDir.lock
+      set Lock = $WDir:h/$PSY_ID.$TDir.lock
 
       $RM $Lock
 

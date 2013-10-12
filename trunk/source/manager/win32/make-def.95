@@ -5,8 +5,8 @@
 # SYSTEM  = DOS
 SYSTEM   =
 MACHINE  = DOS
-SYS_Base = c:\pactdir\pact
-ScmDir   = ${SYS_Base}\scheme
+PSY_Base = c:\pactdir\pact
+ScmDir   = ${PSY_Base}\scheme
 
 #
 # Site Dependent Graphics Information

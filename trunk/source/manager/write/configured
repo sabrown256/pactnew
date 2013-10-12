@@ -27,7 +27,7 @@ Note $Log ""
 dbmget $Log EtcDir^        \
             UseTmpDir^     \
             HSY_Host^      \
-            SYS_FltDir^    \
+            PSY_FltDir^    \
             OS_Name^       \
             HAVE_JPEGLIB^  \
             HAVE_PNGLIB^   \
@@ -68,7 +68,7 @@ dbmget $Log EtcDir^        \
     endif
 
     Note $STDOUT "UseTmpDir    = $UseTmpDir"
-    Note $STDOUT "SYS_FltDir    = $SYS_FltDir"
+    Note $STDOUT "PSY_FltDir    = $PSY_FltDir"
     Note $STDOUT "WARN_PATTERN = $WARN_PATTERN"
     Note $STDOUT "ERR_PATTERN  = $ERR_PATTERN"
 

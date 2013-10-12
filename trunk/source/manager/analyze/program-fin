@@ -8,24 +8,24 @@
 #
 
 Run {
-   write/package         $Log $SYS_ScrDir
-   write/cfg.db          $Log $SYS_ScrDir
-   write/scconfig.h      $Log $SYS_ScrDir
-   write/iso-c.h         $Log $SYS_ScrDir
+   write/package         $Log $PSY_ScrDir
+   write/cfg.db          $Log $PSY_ScrDir
+   write/scconfig.h      $Log $PSY_ScrDir
+   write/iso-c.h         $Log $PSY_ScrDir
 }
 
 Run {
-   write/configured      $Log $SYS_ScrDir $CONFIG_FILE
-   write/make-def        $Log $SYS_ScrDir
-   write/make-macros     $Log $SYS_ScrDir
-   write/makefile        $Log $SYS_ScrDir
-   write/scdecls.h       $Log $SYS_ScrDir
-   write/syntax.h        $Log $SYS_ScrDir
-   write/spokes.scm      $Log $SYS_ScrDir
-   write/install-pact    $Log $SYS_ScrDir
-   write/acc             $Log $SYS_ScrDir
-   write/aranlib         $Log $SYS_ScrDir
-   write/smake           $Log $SYS_ScrDir
-   write/dmake           $Log $SYS_ScrDir
+   write/configured      $Log $PSY_ScrDir $CONFIG_FILE
+   write/make-def        $Log $PSY_ScrDir
+   write/make-macros     $Log $PSY_ScrDir
+   write/makefile        $Log $PSY_ScrDir
+   write/scdecls.h       $Log $PSY_ScrDir
+   write/syntax.h        $Log $PSY_ScrDir
+   write/spokes.scm      $Log $PSY_ScrDir
+   write/install-pact    $Log $PSY_ScrDir
+   write/acc             $Log $PSY_ScrDir
+   write/aranlib         $Log $PSY_ScrDir
+   write/smake           $Log $PSY_ScrDir
+   write/dmake           $Log $PSY_ScrDir
 }
 

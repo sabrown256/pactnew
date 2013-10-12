@@ -40,7 +40,7 @@ dbmget $Log BinDir^             \
             PACT_CC_VERSION^    \
             PACT_CC_PATH^       \
             PACT_CC_EXE^        \
-            SYS_Arch
+            PSY_Arch
             
 flog $Log set exe    = $PACT_CC_EXE
 flog $Log set vers   = $PACT_CC_VERSION
@@ -166,9 +166,9 @@ Note $STDOUT ""
    endif
    if (-f $compilers) then
 
-      set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$SYS_Arch'") && ($3 == "'$vers'") {print}' $compilers` )
+      set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") && ($3 == "'$vers'") {print}' $compilers` )
       if ($#linf < 4) then
-         set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$SYS_Arch'") {print}' $compilers | tail -n 1` )
+         set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") {print}' $compilers | tail -n 1` )
       endif
 
       if ($#linf > 4) then

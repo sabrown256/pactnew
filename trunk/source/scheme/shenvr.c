@@ -1159,8 +1159,8 @@ static void _SS_init_scheme(SS_psides *si)
     SS_assign(si, si->env, si->global_env);
 
     SS_define_constant(si, 1,
-		       "system-arch",      SC_STRING_I, SYS_Arch,
-		       "system-id",        SC_STRING_I, SYS_ID,
+		       "system-arch",      SC_STRING_I, PSY_Arch,
+		       "system-id",        SC_STRING_I, PSY_ID,
 		       "system-compiler",  SC_STRING_I, USE_COMPILER,
 		       "compiler-version", SC_STRING_I, COMPILER_VERSION,
 		       "pact-version",     SC_STRING_I, PACT_VERSION,

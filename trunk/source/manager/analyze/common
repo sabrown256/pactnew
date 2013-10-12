@@ -12,17 +12,17 @@ unalias *
 set Cmd    = $0
 set Exe    = $Cmd:t
 set ExeDir = $Cmd:h
-if ($?SYS_AnaDir == 0) then
-   setenv SYS_AnaDir $ExeDir
+if ($?PSY_AnaDir == 0) then
+   setenv PSY_AnaDir $ExeDir
 endif
 
 if (-f ../scripts/functions-pact.csh) then
-   set sys_mngdir  = $cwd
+   set psy_mngdir  = $cwd
 else if (-f ../../scripts/functions-pact.csh) then
-   set sys_mngdir  = $cwd:h
+   set psy_mngdir  = $cwd:h
 endif
-set ldir  = $sys_mngdir:h/scripts
-set Which = "$sys_mngdir/pwhich"
+set ldir  = $psy_mngdir:h/scripts
+set Which = $psy_mngdir/pwhich
 
 if ($?FirstCommon == 0) then
    set lroot = $ldir:h
@@ -60,7 +60,7 @@ Note $ALog "Command: $Cmd"
 Note $ALog "Current: $cwd"
 Note $ALog "Date: `date`"
 Note $ALog "Temporary file base: $Tmp"
-Note $ALog "Manager directory: $sys_mngdir"
+Note $ALog "Manager directory: $psy_mngdir"
 Note $ALog ""
 
 dbmget $ALog BE    =\? ""^           \
@@ -68,7 +68,7 @@ dbmget $ALog BE    =\? ""^           \
              PFE   =\? "do-run -m"^  \
              CFE   =\? ""
 
-envini SYS_MngDir     $cwd
+envini PSY_MngDir     $cwd
 
 Note $ALog ""
 Separator $ALog

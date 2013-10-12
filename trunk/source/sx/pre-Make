@@ -70,9 +70,9 @@ Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} $
 
 targets :
 	@echo "Targets for SX"
-	@echo "   install    : install SX headers and utilities in dev/sys_id"
+	@echo "   install    : install SX headers and utilities in dev/PSY_id"
 	@echo "   link       : link SX utilities for public use"
-	@echo "   sharedlib  : build and install SX shared libs in dev/sys_id"
+	@echo "   sharedlib  : build and install SX shared libs in dev/PSY_id"
 	@echo "   remove-sys : remove everything"
 	@echo "   test       : run the SX test suite"
 
@@ -164,7 +164,7 @@ command :
 link: ${InstallDep}
 	pact scminstall
 	pact scrinstall
-	@${BinDir}/install-ext ${SYS_Root} ${TGTScrX}
+	@${BinDir}/install-ext ${PSY_Root} ${TGTScrX}
 
 #
 # install 

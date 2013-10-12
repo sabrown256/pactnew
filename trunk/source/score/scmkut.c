@@ -126,7 +126,7 @@ static int setup_env(char *src, anadep *state)
 /* setup the architecture string */
     p = getenv("SESSION_CONFIG");
     if (p != NULL)
-       snprintf(state->arch, MAXLINE, "%s%s", SYS_Prefix, p);
+       snprintf(state->arch, MAXLINE, "%s%s", PSY_Prefix, p);
     else
        {s  = SC_dstrcpy(NULL, state->root);
 	ok = FALSE;
@@ -138,13 +138,13 @@ static int setup_env(char *src, anadep *state)
 	    nc = max(nc, 3);
 	    p  = s + nc - 3;
 	    if (strcmp(p, "dev") == 0)
-	       {snprintf(state->arch, MAXLINE, "%s%s", SYS_Prefix, t);
+	       {snprintf(state->arch, MAXLINE, "%s%s", PSY_Prefix, t);
 		ok = TRUE;};};
 	       
 	CFREE(s);
 
 	if (!ok)
-	   SC_strncpy(state->arch, MAXLINE, SYS_TmpDir, -1);};
+	   SC_strncpy(state->arch, MAXLINE, PSY_TmpDir, -1);};
 
     return(TRUE);}
 

@@ -2,4 +2,4 @@
 # CROSS-XLC-BGP - add XLC-BGP as a CROSS-COMPILEd second platform 
 #
 
-platform auto-xlc-bgp-mpi  bgpx    ${SYS_InstRoot}-mpi
+platform auto-xlc-bgp-mpi  bgpx    ${PSY_InstRoot}-mpi

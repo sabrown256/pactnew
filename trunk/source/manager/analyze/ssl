@@ -91,7 +91,7 @@ EOF
    end
    set lALibs = ( $lALibs $LD_Lib $LibM_Lib -lz )
 
-   source $SYS_AnaDir/find-package
+   source $PSY_AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       set essl = TRUE

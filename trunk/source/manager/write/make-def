@@ -83,14 +83,14 @@ dbmget $Log AR_IFlag^               \
             PARALLEL_COMM_METH^     \
             STD_IPC^                \
             SUFFIXES^               \
-            SYS_Base^               \
-            SYS_Cfg^                \
-            SYS_Root^               \
-	    SYS_ID^                 \
-            SYS_InstRoot^           \
-	    SYS_CfgDir^             \
-            SYS_MngDir^             \
-	    SYS_TmpDir^             \
+            PSY_Base^               \
+            PSY_Cfg^                \
+            PSY_Root^               \
+	    PSY_ID^                 \
+            PSY_InstRoot^           \
+	    PSY_CfgDir^             \
+            PSY_MngDir^             \
+	    PSY_TmpDir^             \
             ThreadLibExt^           \
             UPDATE^                 \
             URFile^                 \
@@ -141,7 +141,7 @@ foreach t (MD MDE MDI MDG DP LibM)
    end
 end
 
-source $SYS_MngDir/write/import-db
+source $PSY_MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -169,37 +169,37 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     flog $Log touch $STDOUT
 
     Note $STDOUT "#"
-    Note $STDOUT "# MAKE-DEF - installation dependent definitions for $SYS_Cfg"
+    Note $STDOUT "# MAKE-DEF - installation dependent definitions for $PSY_Cfg"
     Note $STDOUT "#"
     Note $STDOUT ""
-    Note $STDOUT "SYS_ID     = $SYS_ID"
-    Note $STDOUT "SYS_CfgDir = $SYS_CfgDir"
-    Note $STDOUT "SYS_TmpDir = $SYS_TmpDir"
+    Note $STDOUT "PSY_ID     = $PSY_ID"
+    Note $STDOUT "PSY_CfgDir = $PSY_CfgDir"
+    Note $STDOUT "PSY_TmpDir = $PSY_TmpDir"
     Note $STDOUT ""
 
     set QUOTE = \"
     set THE_DATE = `cat .pact-version`
     Note $STDOUT "Version    = $THE_DATE"
 
-    set mk = ( `$SYS_MngDir/pwhich gmake` )
+    set mk = ( `$PSY_MngDir/pwhich gmake` )
     if (!(-x "$mk")) then
-       set mk = `$SYS_MngDir/pwhich make`
+       set mk = `$PSY_MngDir/pwhich make`
     endif
     Note $Log "Using '$mk' for system make"
     Note $STDOUT "UMake      = $mk"
     unset mk
 
-    Note $STDOUT 'tmpobj     = ${SYS_TmpDir}/obj'
-    Note $STDOUT "SYS_Base   = $SYS_Base"
-    Note $STDOUT "SYS_ScrDir = $SYS_Base/scripts"
-    Note $STDOUT "SYS_Root   = $SYS_Root"
-    Note $STDOUT 'ScmDir     = ${SYS_Root}/scheme'
-    Note $STDOUT 'BinDir     = ${SYS_Root}/bin'
-    Note $STDOUT 'LibDir     = ${SYS_Root}/lib'
-    Note $STDOUT 'IncDir     = ${SYS_Root}/include'
-    Note $STDOUT 'EtcDir     = ${SYS_Root}/etc'
-    Note $STDOUT 'Man1Dir    = ${SYS_Root}/man/man1'
-    Note $STDOUT 'Man3Dir    = ${SYS_Root}/man/man3'
+    Note $STDOUT 'tmpobj     = ${PSY_TmpDir}/obj'
+    Note $STDOUT "PSY_Base   = $PSY_Base"
+    Note $STDOUT "PSY_ScrDir = $PSY_Base/scripts"
+    Note $STDOUT "PSY_Root   = $PSY_Root"
+    Note $STDOUT 'ScmDir     = ${PSY_Root}/scheme'
+    Note $STDOUT 'BinDir     = ${PSY_Root}/bin'
+    Note $STDOUT 'LibDir     = ${PSY_Root}/lib'
+    Note $STDOUT 'IncDir     = ${PSY_Root}/include'
+    Note $STDOUT 'EtcDir     = ${PSY_Root}/etc'
+    Note $STDOUT 'Man1Dir    = ${PSY_Root}/man/man1'
+    Note $STDOUT 'Man3Dir    = ${PSY_Root}/man/man3'
     Note $STDOUT ""
 
     if ("$OS_Name" == "HP-UX") then
@@ -298,7 +298,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT -n "SyntaxModes  ="
     if ("$Yacc_Exe" != "") then
        set scsd = `scs-meta -n`
-       pushd $SYS_Base/scheme/syntax >& /dev/null
+       pushd $PSY_Base/scheme/syntax >& /dev/null
        foreach mod (*)
           if (-d $mod) then
              if ($mod != "$scsd") then
@@ -418,7 +418,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "CFE       = $CFE"
     Note $STDOUT "BE        = $BE"
 
-    if ("$SYS_InstRoot" == "none") then
+    if ("$PSY_InstRoot" == "none") then
        Note $STDOUT "PubLib    = "
        Note $STDOUT "PubInc    = "
     else
@@ -482,7 +482,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     Note $STDOUT "SHELL   = $DEFAULT_SHELL"
-    Note $STDOUT "Manager = $SYS_MngDir"
+    Note $STDOUT "Manager = $PSY_MngDir"
     Note $STDOUT 'DATE    = `./code-date`'
     Note $STDOUT ""
 

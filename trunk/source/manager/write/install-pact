@@ -33,14 +33,14 @@ dbmget $Log UPDATE^       \
             PY_DirPy^     \
             PY_DirDst^    \
             PY_DirSrc^    \
-            SYS_Arch^     \
-            SYS_CfgMan^   \
-            SYS_InstRoot
+            PSY_Arch^     \
+            PSY_CfgMan^   \
+            PSY_InstRoot
             
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Note $Log "Installation base: |$SYS_InstRoot|"
+    Note $Log "Installation base: |$PSY_InstRoot|"
 
     set STDOUT = $BinDir/install-pact
 
@@ -58,7 +58,7 @@ dbmget $Log UPDATE^       \
     Note $STDOUT "@ err = 0"
     Note $STDOUT ""
 
-    if ("$SYS_InstRoot" == "none") then
+    if ("$PSY_InstRoot" == "none") then
 
        Note $STDOUT 'echo ""'
        Note $STDOUT 'echo " ** By request PACT is NOT being installed **"'
@@ -69,7 +69,7 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT "set Owner     = $USER"
        Note $STDOUT "set Group     = "'`'"groups | awk '{print "'$1'"}'"'`'
-       Note $STDOUT 'set sys_id    = `'$SYS_CfgMan' use`'
+       Note $STDOUT 'set psy_id    = `'$PSY_CfgMan' use`'
 
 # NOTE: this can only be successfully run from the manager directory
        if ($cwd !~ */manager) then
@@ -79,12 +79,12 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT 'set lbase     = $cwd'
        Note $STDOUT 'set lbasedir  = $lbase:h'
-       Note $STDOUT 'set lsysdir   = $lbasedir/dev/$sys_id'
+       Note $STDOUT 'set lsysdir   = $lbasedir/dev/$psy_id'
        Note $STDOUT 'set ldocdir   = $lbasedir/doc'
        Note $STDOUT 'unset lbase'
        Note $STDOUT ""
 
-       Note $STDOUT "set instroot  = $SYS_InstRoot"
+       Note $STDOUT "set instroot  = $PSY_InstRoot"
        Note $STDOUT 'set SchemeDir = $instroot/'$ScmDir
        Note $STDOUT 'set Man1Dir   = $instroot/'$Man1Dir
        Note $STDOUT 'set Man3Dir   = $instroot/'$Man3Dir
@@ -193,7 +193,7 @@ dbmget $Log UPDATE^       \
        Note $STDOUT ''
 
 # substitute $instroot for the build directory
-# something like /usr/local/apps for ..../dev/$sys_id
+# something like /usr/local/apps for ..../dev/$psy_id
 # difference between $cwd and pwd makes the original path unpredictable
 # so find what actually appeared in the generated files
        Note $STDOUT 'set inf     = ( `grep SCHEME env-pact.csh | tail -n 1` )'

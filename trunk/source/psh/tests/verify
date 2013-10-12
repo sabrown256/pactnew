@@ -28,7 +28,7 @@ end
 
 InitLog Log $TestDir/log.verify.$LogSfx
 
-flog $Log pushd $SYS_Base/score
+flog $Log pushd $PSY_Base/score
 flog $Log $MAKE -i mpitty
 flog $Log popd
 flog $Log rehash

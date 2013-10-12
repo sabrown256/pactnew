@@ -26,8 +26,8 @@ Note $Log ""
 dbmget $Log BackSlash^  \
             IncDir^     \
             Yacc_Exe^   \
-            SYS_Base^   \
-            SYS_Cfg
+            PSY_Base^   \
+            PSY_Cfg
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -38,7 +38,7 @@ dbmget $Log BackSlash^  \
     flog $Log touch $STDOUT
 
     Note $STDOUT "/*"
-    Note $STDOUT " * SYNTAX.H - Configure SCHEME Syntax Modes for $SYS_Cfg"
+    Note $STDOUT " * SYNTAX.H - Configure SCHEME Syntax Modes for $PSY_Cfg"
     Note $STDOUT " *"
     Note $STDOUT " * Source Version: 5.0"
     Note $STDOUT " * Software Release #: LLNL-CODE-422942"
@@ -51,7 +51,7 @@ dbmget $Log BackSlash^  \
     set lsm   = ""
     @ nsyntxs = 0
     if ("$Yacc_Exe" != "") then
-       flog $Log pushd $SYS_Base/scheme
+       flog $Log pushd $PSY_Base/scheme
        if (!(-d syntax)) then
           flog $Log mkdir syntax
        endif

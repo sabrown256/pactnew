@@ -54,7 +54,7 @@ targets :
 	@echo "   contour      : make PGS Fortran contour test"
 	@echo "   fdp          : make PDB Fortran DP IO test"
 	@echo "   fha          : make Fortran API of hash test"
-	@echo "   install      : install PFTN headers and utilities in dev/sys_id"
+	@echo "   install      : install PFTN headers and utilities in dev/PSY_id"
 	@echo "   link         : link PFTN utilities for public use"
 	@echo "   panacea      : make PANACEA Fortran API tests"
 	@echo "   pdb          : make PDB Fortran API tests"
@@ -118,7 +118,7 @@ modules : ${LibDep}
 	@touch dummy.mod
 	sinstall *.mod ${IncDir}
 	@rm -f dummy.mod ${IncDir}/dummy.mod
-	@rm -rf ${SYS_TmpDir}
+	@rm -rf ${PSY_TmpDir}
 
 ${PACTTmpDir}/gm-${LibName}.f : ${SDir}/flibc.f
 	@../scripts/bproto

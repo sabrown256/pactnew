@@ -27,7 +27,7 @@ if (-f $inf) then
             switch ($var)
                case MANPATH:
                case PATH:
-               case SYS_TYPE:
+               case PSY_TYPE:
                     breaksw
                default:
                     echo "unsetenv $line[2] ;"

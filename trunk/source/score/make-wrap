@@ -46,8 +46,8 @@ if ($err != 0) then
    end
    popd >& /dev/null
 
-   if ($?SYS_ASRoot == 1) then
-      set lst = ( $lst $SYS_ASRoot/pactnew/bin $SYS_ASRoot/pact/bin )
+   if ($?PSY_ASRoot == 1) then
+      set lst = ( $lst $PSY_ASRoot/pactnew/bin $PSY_ASRoot/pact/bin )
    endif
  
    set path = ( /usr/bin /bin . )

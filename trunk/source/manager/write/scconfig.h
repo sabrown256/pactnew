@@ -111,14 +111,14 @@ dbmget $Log BFD_Version^              \
             Std_UseX^                 \
             Std_UseOGL^               \
             Std_UseQD^                \
-            SYS_Arch^                 \
-            SYS_Cfg^                  \
-            SYS_FltDir^               \
-            SYS_MngDir^               \
-            SYS_ID^                   \
-            SYS_TYPE^                 \
-            SYS_Prefix^               \
-            SYS_TmpDir
+            PSY_Arch^                 \
+            PSY_Cfg^                  \
+            PSY_FltDir^               \
+            PSY_MngDir^               \
+            PSY_ID^                   \
+            PSY_TYPE^                 \
+            PSY_Prefix^               \
+            PSY_TmpDir
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -129,7 +129,7 @@ dbmget $Log BFD_Version^              \
     flog $Log touch $STDOUT
 
     Note $STDOUT "/*"
-    Note $STDOUT " * SCCONFIG.H - configuration defined by $SYS_Cfg"
+    Note $STDOUT " * SCCONFIG.H - configuration defined by $PSY_Cfg"
     Note $STDOUT " *            - defines the following configuration parameters for PACT"
     Note $STDOUT " *"
     Note $STDOUT " * Source Version: 3.0"
@@ -149,11 +149,11 @@ dbmget $Log BFD_Version^              \
 
     Note $STDOUT "#define CPU_TYPE            $CPU"
     Note $STDOUT "#define FPU_TYPE            $FPU"
-    Note $STDOUT '#define SYS_Arch            '$QUOTE${SYS_Arch}$QUOTE
-    Note $STDOUT '#define SYS_TYPE            '$QUOTE${SYS_TYPE}$QUOTE
-    Note $STDOUT '#define SYS_ID              '$QUOTE${SYS_ID}$QUOTE
-    Note $STDOUT '#define SYS_Prefix          '$QUOTE${SYS_Prefix}$QUOTE
-    Note $STDOUT '#define SYS_TmpDir          '$QUOTE${SYS_TmpDir}$QUOTE
+    Note $STDOUT '#define PSY_Arch            '$QUOTE${PSY_Arch}$QUOTE
+    Note $STDOUT '#define PSY_TYPE            '$QUOTE${PSY_TYPE}$QUOTE
+    Note $STDOUT '#define PSY_ID              '$QUOTE${PSY_ID}$QUOTE
+    Note $STDOUT '#define PSY_Prefix          '$QUOTE${PSY_Prefix}$QUOTE
+    Note $STDOUT '#define PSY_TmpDir          '$QUOTE${PSY_TmpDir}$QUOTE
     if ("$OSX_Version" != "") then
        Note $STDOUT "#define MACOSX_VERSION      $OSX_Version"
     endif
@@ -165,8 +165,8 @@ dbmget $Log BFD_Version^              \
 
     Note $STDOUT '#define DEFAULT_SHELL       '$QUOTE${DEFAULT_SHELL}$QUOTE
 
-    if ("$SYS_FltDir" != "") then
-       set FiltFile = $SYS_FltDir/$SYS_Arch
+    if ("$PSY_FltDir" != "") then
+       set FiltFile = $PSY_FltDir/$PSY_Arch
        Note $STDOUT '#define MAKE_FILTER_FILE    '$QUOTE${FiltFile}$QUOTE
     endif
 
@@ -407,7 +407,7 @@ dbmget $Log BFD_Version^              \
     Note $STDOUT "#undef $OS_Type"
     Note $STDOUT "#define $OS_Type"
 
-    set OSL = ( `cat $SYS_MngDir/std/os | grep -v '#'` )
+    set OSL = ( `cat $PSY_MngDir/std/os | grep -v '#'` )
     while ($#OSL > 2)
        set sysn = $OSL[1]
        set pctn = $OSL[2]

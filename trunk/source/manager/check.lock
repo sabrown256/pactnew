@@ -10,24 +10,24 @@
 
 unalias *
 
-set sys_mngdir    = $cwd
-set sys_scrdir    = $sys_mngdir:h/scripts
+set psy_mngdir    = $cwd
+set psy_scrdir    = $psy_mngdir:h/scripts
 set SCSRepository = ""
 set SRCDate       = ""
 set LockOn        = "NO"
 
 # define the Source Control System
-source $sys_mngdir/pact-scs
+source $psy_mngdir/pact-scs
 
 #
 # check if repository is locked
 #
-set lockst = `$sys_scrdir/scs-lock status`
+set lockst = `$psy_scrdir/scs-lock status`
 if ($lockst == "locked") then
    echo ""
    echo " *** REPOSITORY IS LOCKED ***"
    echo ""
-   $sys_scrdir/scs-lock cat
+   $psy_scrdir/scs-lock cat
    echo ""
    set LockOn = "YES"
 endif
@@ -37,7 +37,7 @@ if ($LockOn == "NO") then
 else
    echo -n "Sleeping ZZZZZ"
 Loop:
-   set lockst = `$sys_scrdir/scs-lock status`
+   set lockst = `$psy_scrdir/scs-lock status`
    if ($lockst == "locked") then
       echo -n "Z"
       sleep 30

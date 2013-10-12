@@ -40,8 +40,8 @@ setenv SESSION_CONFIG      $nsys
 setenv SC_EXEC_N_ATTEMPTS  1
 
 eval `../scripts/cfgsys`
-set tsys = $SYS_ID
-set tdir = $SYS_TmpDir
+set tsys = $PSY_ID
+set tdir = $PSY_TmpDir
 
 source ../scripts/functions-pact.csh
 

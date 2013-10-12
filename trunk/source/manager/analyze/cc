@@ -446,16 +446,16 @@ dbmset $ALog CC_Exe              = $CC_Exe^              \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-ftee $ALog gexec $SYS_AnaDir/cc-line       @ \
-                 $SYS_AnaDir/cc-pragma     @ \
-                 $SYS_AnaDir/cc-inline     @ \
-                 $SYS_AnaDir/cc-noreturn   @ \
-                 $SYS_AnaDir/cc-valist     @ \
-                 $SYS_AnaDir/cc-float16    @ \
-                 $SYS_AnaDir/cc-complex    @ \
-                 $SYS_AnaDir/cc-headers    @ \
-                 $SYS_AnaDir/cc-glibc      @ \
-                 $SYS_AnaDir/cc-size
+ftee $ALog gexec $PSY_AnaDir/cc-line       @ \
+                 $PSY_AnaDir/cc-pragma     @ \
+                 $PSY_AnaDir/cc-inline     @ \
+                 $PSY_AnaDir/cc-noreturn   @ \
+                 $PSY_AnaDir/cc-valist     @ \
+                 $PSY_AnaDir/cc-float16    @ \
+                 $PSY_AnaDir/cc-complex    @ \
+                 $PSY_AnaDir/cc-headers    @ \
+                 $PSY_AnaDir/cc-glibc      @ \
+                 $PSY_AnaDir/cc-size
 
 exit(0)
 

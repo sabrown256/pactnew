@@ -5,7 +5,7 @@
 #        - PY_Vers    the version of the python executable
 #        - PY_Path    addition to path in order to find python executable
 #        -            this comes from config files only
-#        - PY_DirSrc  pact/dev/$SYS_ID/lib (install this to PY_DirDst and PY_DirPy)
+#        - PY_DirSrc  pact/dev/$PSY_ID/lib (install this to PY_DirDst and PY_DirPy)
 #        - PY_DirDst  pact    lib/pythond.d                (install into)
 #        - PY_DirPy   python  lib/pythond.d/site-packages  (install into)
 #
@@ -246,7 +246,7 @@ if (-d ../../python) then
          endif
 
          if ($lhave_python == TRUE) then
-            set lpr = $SYS_Root
+            set lpr = $PSY_Root
             set lph = python${lpy_vers}/pact
             if ("$lpy_path" != "") then
                set lpr = $lpy_exe
@@ -259,10 +259,10 @@ if (-d ../../python) then
             set lpy_dirpy = $lpr/lib/$lph/site-packages
 
 # install destination in PACT tree
-            set lpy_dirdst = $SYS_InstRoot/lib/$lph
+            set lpy_dirdst = $PSY_InstRoot/lib/$lph
 
 # install source (local build destination)
-            set lpy_dirsrc = $SYS_Root/lib/python${lpy_vers}
+            set lpy_dirsrc = $PSY_Root/lib/python${lpy_vers}
 
             unset lpr
             unset lph

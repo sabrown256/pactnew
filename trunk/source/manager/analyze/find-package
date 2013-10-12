@@ -6,8 +6,8 @@
 #              - PckPath will contain a list of directories for libraries
 #              - Example:
 #
-#    set lIncDirs = ( $JPEG_Path/include $SYS_ASRoot/include /usr/local/include $RootInc )
-#    set lLibDirs = ( $JPEG_Path/lib $SYS_ASRoot/lib /usr/local/lib /usr/lib /lib )
+#    set lIncDirs = ( $JPEG_Path/include $PSY_ASRoot/include /usr/local/include $RootInc )
+#    set lLibDirs = ( $JPEG_Path/lib $PSY_ASRoot/lib /usr/local/lib /usr/lib /lib )
 #    set lHdrs    = ( jpeglib.h jconfig.h jmorecfg.h jerror.h )
 #    set ASList   = ( a so )
 #

@@ -27,13 +27,13 @@ dbmget $Log SchDir^          \
             CSpokes^         \
             SchemeSpokes^    \
             BackSlash^       \
-            SYS_Base^        \
-            SYS_Cfg
+            PSY_Base^        \
+            PSY_Cfg
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if (-d $SYS_Base/sx/applications) then
+if (-d $PSY_Base/sx/applications) then
 
     set STDOUT = $SchDir/spokes.scm
 
@@ -41,7 +41,7 @@ if (-d $SYS_Base/sx/applications) then
     flog $Log touch $STDOUT
 
     Note $STDOUT ";"
-    Note $STDOUT "; SPOKES.SCM - initialization of SX translation spokes for $SYS_Cfg"
+    Note $STDOUT "; SPOKES.SCM - initialization of SX translation spokes for $PSY_Cfg"
     Note $STDOUT ";"
     Note $STDOUT ""
     Note $STDOUT '(define (safe-load file)'

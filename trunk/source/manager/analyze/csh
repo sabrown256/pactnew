@@ -23,7 +23,7 @@ else
    set exe = "/bin/csh"
 endif
 
-source $SYS_AnaDir/backslash
+source $PSY_AnaDir/backslash
 
 if ("$BackSlash" == "\") then
    NoteD $ALog "   CSH: $exe (uses \)"

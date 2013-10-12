@@ -34,8 +34,8 @@ dbmget $Log Bits^              \
             INSTALL^           \
             NoExe^             \
             Ranlib_Exe^        \
-            SYS_Cfg^           \
-            SYS_TYPE^          \
+            PSY_Cfg^           \
+            PSY_TYPE^          \
             UPDATE
 
 set LibVers = 1
@@ -54,7 +54,7 @@ set LibVers = 1
     flog $Log touch $STDOUT
 
     Note $STDOUT '#'
-    Note $STDOUT '# MAKE-MACROS - PACT Makefile macros for '$SYS_Cfg
+    Note $STDOUT '# MAKE-MACROS - PACT Makefile macros for '$PSY_Cfg
     Note $STDOUT '#'
     Note $STDOUT ""
 
@@ -211,12 +211,12 @@ set LibVers = 1
     Note $STDOUT '#'
     Note $STDOUT 'man1install :'
     Note $STDOUT '	@[ ! -f ${Man1Dir}/.lock ] || { echo "${Man1Dir} is locked" ; exit 1 ; }'
-    Note $STDOUT '	${SYS_ScrDir}/maninstall -s 1'
+    Note $STDOUT '	${PSY_ScrDir}/maninstall -s 1'
 #    Note $STDOUT '	@(echo "sinstall ${tmpobj}/*.1 ${Man1Dir}" ; sinstall ${tmpobj}/*.1 ${Man1Dir})'
     Note $STDOUT ""
     Note $STDOUT 'man3install :'
     Note $STDOUT '	@[ ! -f ${Man3Dir}/.lock ] || { echo "${Man3Dir} is locked" ; exit 1 ; }'
-    Note $STDOUT '	${SYS_ScrDir}/maninstall -s 3'
+    Note $STDOUT '	${PSY_ScrDir}/maninstall -s 3'
 #    Note $STDOUT '	@(echo "sinstall ${tmpobj}/*.3 ${Man3Dir}" ; sinstall ${tmpobj}/*.3 ${Man3Dir})'
     Note $STDOUT ""
 
@@ -314,7 +314,7 @@ set LibVers = 1
 # NOTE: technically this should be all of them but that results in
 # bproto being run 3 times - at least by dmake
     Note $STDOUT '${gfb} :'
-    Note $STDOUT '	@${SYS_ScrDir}/bproto'
+    Note $STDOUT '	@${PSY_ScrDir}/bproto'
     Note $STDOUT ''
 
     Note $STDOUT 'generate : ${gfb} ${hdrf}'

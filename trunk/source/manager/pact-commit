@@ -12,13 +12,19 @@ unalias *
 
 @ err = 0
 
-set sys_mngdir = $cwd
-set sys_base   = $sys_mngdir:h
-set sys_scrdir = $sys_base/scripts
-set PshDir  = $sys_base/psh
-set SccDir  = $sys_base/scc
+set psy_mngdir = $cwd
+set psy_base   = $psy_mngdir:h
+set psy_scrdir = $psy_base/scripts
+set PshDir  = $psy_base/psh
+set SccDir  = $psy_base/scc
 
-source $sys_scrdir/functions-pact.csh
+eval `$psy_scrdir/cfgsys`
+
+unset psy_base
+unset psy_mngdir
+unset psy_scrdir
+
+source $PSY_ScrDir/functions-pact.csh
 
 if ($?USER == 0) then
    if ($?LOGNAME == 0) then
@@ -40,27 +46,25 @@ set ScrOnly   = FALSE
 set PshOnly   = FALSE
 set SccOnly   = FALSE
 set TagOnly   = FALSE
-set TmpMsg    = $sys_mngdir/msg-tmp
+set TmpMsg    = $PSY_MngDir/msg-tmp
 set TmpDir    = ftmp
 set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
 
 set VersionID = `code-date`
-set HelpCode  = $sys_mngdir/$0
+set HelpCode  = $PSY_MngDir/$0
 
-eval `$sys_scrdir/cfgsys`
+set UpdateLog = $PSY_Root/log/update
+set Changed   = $PSY_MngDir/Changed
+set UnChanged = $PSY_MngDir/UnChanged
 
-set UpdateLog = $SYS_Root/log/update
-set Changed   = $sys_mngdir/Changed
-set UnChanged = $sys_mngdir/UnChanged
-
-set SCSCom        = $SYS_ScrDir/scs-commit
+set SCSCom        = $PSY_ScrDir/scs-commit
 set SCSRepository = ""
 set SRCDate       = ""
 set Sleep         = "NO"
 
 set CleanBuild   = FALSE
 
-InitLog Log $SYS_Root/log/commit
+InitLog Log $PSY_Root/log/commit
 
 switch ($OS)
    case irix:
@@ -97,7 +101,7 @@ while ("$1" =~ -*)
 
       case -M*:                                  # get log message from file
               shift
-              set MsgFile = $sys_mngdir/$1
+              set MsgFile = $PSY_MngDir/$1
               if (! -e $MsgFile ) then
                  NoteD $Log "Can not find message file $MsgFile"
                  goto Help
@@ -145,7 +149,7 @@ while ("$1" =~ -*)
               breaksw
 
       case -v*:                                  # Display version...
-              source $sys_mngdir/pact-scs
+              source $PSY_MngDir/pact-scs
 	      NoteD $Log "  Source Version:   " $SCSVersion
 	      NoteD $Log "  Software Release: " $SCSRelease
 	      NoteD $Log ""
@@ -202,7 +206,7 @@ endif
 set Message = (\"<$WhoIAm $TagAnn $TagID> $argv\")
 
 # define the Source Control System
-source $sys_mngdir/pact-scs
+source $PSY_MngDir/pact-scs
 
 # do everything with full option
 if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then
@@ -211,7 +215,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    flog $Log set xstatus = $status
    flog $Log @ err = $err + $xstatus
    if ($xstatus != 0) then
-      $SYS_ScrDir/scs-lock unlock
+      $PSY_ScrDir/scs-lock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed to sync sources"
       NoteD $Log "You may have a source conflict that needs to be resolved"
@@ -227,7 +231,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
       flog $Log set xstatus = $status
       flog $Log @ err = $err + $xstatus
       if ($xstatus != 0) then
-         $SYS_ScrDir/scs-lock unlock
+         $PSY_ScrDir/scs-lock unlock
          NoteD $Log ""
          NoteD $Log "Your binaries could not be removed"
          NoteD $Log "Check to see whether your permissions are set properly"
@@ -243,7 +247,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    flog $Log set xstatus = $status
    flog $Log @ err = $err + $xstatus
    if ($xstatus != 0) then
-      $SYS_ScrDir/scs-lock unlock
+      $PSY_ScrDir/scs-lock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed to build after syncing"
       NoteD $Log "This must be resolved before you may commit your changes"
@@ -257,18 +261,18 @@ endif
 #
 # check if repository is locked
 #
-set lockst = `$SYS_ScrDir/scs-lock status`
+set lockst = `$PSY_ScrDir/scs-lock status`
 
 Note $Log "Sleep = $Sleep"
 Note $Log "Lock  = $lockst"
 if ($Sleep == "YES") then
-   $sys_mngdir/check.lock
+   $PSY_MngDir/check.lock
 else
    if ($lockst == "locked") then
       NoteD $Log ""
       NoteD $Log " *** REPOSITORY IS LOCKED ***"
       NoteD $Log ""
-      $SYS_ScrDir/scs-lock cat
+      $PSY_ScrDir/scs-lock cat
       NoteD $Log ""
       NoteD $Log ""
       exit(1)
@@ -278,7 +282,7 @@ endif
 #
 # initiate a lock on the repository
 #
-$SYS_ScrDir/scs-lock lock
+$PSY_ScrDir/scs-lock lock
 Note $Lock $Message
 
 #
@@ -296,7 +300,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    flog $Log @ err = $err + $xstatus
 
    if ($err != 0) then
-      $SYS_ScrDir/scs-lock unlock
+      $PSY_ScrDir/scs-lock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed the test suite"
       NoteD $Log "All tests must pass before the commit will be allowed"
@@ -329,7 +333,7 @@ if ($TagOnly == FALSE) then
       NoteD $Log "Committing changes to the Manager only"
    
    else if ($DocOnly == TRUE) then
-      flog $Log cd $sys_base/doc
+      flog $Log cd $PSY_Base/doc
       NoteD $Log "Committing changes to the Documents only"
 
 # NOTE: we realize that the handling of .pact-version* is such
@@ -337,7 +341,7 @@ if ($TagOnly == FALSE) then
 #       problem and the sources matter most wrt the version
 
    else if ($ScrOnly == TRUE) then
-      flog $Log cd $SYS_ScrDir
+      flog $Log cd $PSY_ScrDir
       NoteD $Log "Committing changes to the scripts only"
 
    else if ($PshOnly == TRUE) then
@@ -353,7 +357,7 @@ if ($TagOnly == FALSE) then
 #       problem and the sources matter most wrt the version
 
    else
-      flog $Log cd $sys_base
+      flog $Log cd $PSY_Base
       NoteD $Log "Committing source changes"
    endif
 
@@ -369,11 +373,11 @@ if ($TagOnly == FALSE) then
    flog $Log touch $UpdateLog
    Note $UpdateLog "Host: $HSY_Host           Date: `date`"
    Note $UpdateLog ""
-   flog $Log ($SYS_ScrDir/scs-update >> $UpdateLog)
+   flog $Log ($PSY_ScrDir/scs-update >> $UpdateLog)
    flog $Log set xstatus = $status
    flog $Log @ err = $err + $xstatus
    if ($xstatus != 0) then
-      $SYS_ScrDir/scs-lock unlock
+      $PSY_ScrDir/scs-lock unlock
       NoteD $Log "$SCSExe UPDATE FAILED"
       exit($xstatus)
    endif
@@ -391,7 +395,7 @@ if ($TagOnly == FALSE) then
    set UnChangedList = `cat $UnChanged`
 
    if ($#ChangedList > 0) then
-      $SYS_ScrDir/scs-lock unlock
+      $PSY_ScrDir/scs-lock unlock
       NoteD $Log ""
       NoteD $Log "There are files with conflicts to be resolved."
       NoteD $Log "See $Changed for the list."
@@ -408,7 +412,7 @@ endif
 # do this after the sync to avoid a meaningless conflict
 #
 if (($ManOnly == TRUE) || ($DocOnly == TRUE) || ($ScrOnly == TRUE) || ($PshOnly == TRUE) || ($SccOnly == TRUE) || ($TagOnly == TRUE)) then
-   flog $Log pushd $sys_base/manager
+   flog $Log pushd $PSY_Base/manager
 else
    flog $Log pushd manager
 endif
@@ -428,7 +432,7 @@ if ($TagOnly == TRUE) then
    flog $Log @ err = $err + $xstatus
    if ($xstatus != 0) then
       flog $Log rm -f $TmpMsg
-      $SYS_ScrDir/scs-lock unlock
+      $PSY_ScrDir/scs-lock unlock
       NoteD $Log "Commit FAILED"
       exit($xstatus)
    endif
@@ -447,7 +451,7 @@ else
         flog $Log set xstatus = $status
         flog $Log @ err = $err + $xstatus
         if ($xstatus != 0) then
-           $SYS_ScrDir/scs-lock unlock
+           $PSY_ScrDir/scs-lock unlock
            NoteD $Log "Commit FAILED"
            exit($xstatus)
         endif
@@ -461,7 +465,7 @@ else
         flog $Log @ err = $err + $xstatus
         if ($xstatus != 0) then
            flog $Log rm -f $TmpMsg
-           $SYS_ScrDir/scs-lock unlock
+           $PSY_ScrDir/scs-lock unlock
            NoteD $Log "Commit FAILED"
            exit($xstatus)
         endif
@@ -480,7 +484,7 @@ else
    Note $Lock "done"
 
    if (($ManOnly == TRUE) || ($DocOnly == TRUE) || ($ScrOnly == TRUE) || ($PshOnly == TRUE) || ($SccOnly == TRUE) || ($TagOnly == TRUE)) then
-      flog $Log cd $sys_base
+      flog $Log cd $PSY_Base
    endif
 endif
 
@@ -489,8 +493,8 @@ endif
 #
 NoteD $Log ""
 NoteD $Log "The Repository is Unlocked"
-flog $Log $SYS_ScrDir/scs-lock unlock
-flog $Log $SYS_ScrDir/scs-lock status
+flog $Log $PSY_ScrDir/scs-lock unlock
+flog $Log $PSY_ScrDir/scs-lock status
 
 #
 # untouch the local source libraries
@@ -504,7 +508,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    NoteD $Log "Resetting time stamps on Local PACT Sources"
 
    find . -name "*.[chf]" -exec touch {} \;
-   flog $Log cd dev/$SYS_ID/lib
+   flog $Log cd dev/$PSY_ID/lib
    flog $Log touch foo.a
    flog $Log mkdir $TmpDir
    flog $Log mv *.a $TmpDir
@@ -540,8 +544,8 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    NoteD $Log "Time stamps reset"
 endif
 
-flog $Log cd $sys_mngdir
-flog $Log $SYS_ScrDir/scs-update -l
+flog $Log cd $PSY_MngDir
+flog $Log $PSY_ScrDir/scs-update -l
 flog $Log cat .pact-version
 flog $Log cat .pact-version-tag
 

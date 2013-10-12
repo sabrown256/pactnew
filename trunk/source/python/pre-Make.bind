@@ -11,9 +11,9 @@
 
 sysdir = none
 include ${sysdir}/etc/make-def
-PACTGenDir = ${SYS_Base}/python/${tmpobj}
-PACTTmpDir = ${SYS_Base}/python/${lpyext}/${tmpobj}
-PACTSrcDir = ${SYS_Base}/python
+PACTGenDir = ${PSY_Base}/python/${tmpobj}
+PACTTmpDir = ${PSY_Base}/python/${lpyext}/${tmpobj}
+PACTSrcDir = ${PSY_Base}/python
 
 PDB_MOD_NAME = _pdb
 
@@ -58,9 +58,9 @@ BinObj =
 
 targets :
 	@echo "Targets for PYTHON"
-	@echo "   install   : install PYTHON headers and utilities in dev/sys_id"
+	@echo "   install   : install PYTHON headers and utilities in dev/PSY_id"
 	@echo "   link      : link PYTHON utilities for public use"
-	@echo "   sharedlib : build and install PYTHON shared libs in dev/sys_id"
+	@echo "   sharedlib : build and install PYTHON shared libs in dev/PSY_id"
 	@echo "   test      : run the PYTHON test suite"
 
 
@@ -141,7 +141,7 @@ IncAction =
 
 SDir = ${PACTGenDir}
 
-LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${SDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\"${PACTGenDir}\" PACTTmpDir=\"${PACTTmpDir}\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" lpyext=${lpyext} lpycfg=${lpycfg} lpyver=${lpyver} lpyinc=${lpyinc} lpynum=${lpynum} -f ../../pre-Make.bind sysdir=${SYS_Root} devlib)
+LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${SDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\"${PACTGenDir}\" PACTTmpDir=\"${PACTTmpDir}\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" lpyext=${lpyext} lpycfg=${lpycfg} lpyver=${lpyver} lpyinc=${lpyinc} lpynum=${lpynum} -f ../../pre-Make.bind sysdir=${PSY_Root} devlib)
 
 
 TGTSPDB  = ${PyDir}/libpypdb.so

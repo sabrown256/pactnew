@@ -34,9 +34,9 @@ pushd $BldDir >& /dev/null
 
 set Which = "$cwd/pwhich"
 
-set sys_mngdir = $cwd
-setenv SYS_Base   $sys_mngdir:h
-setenv SYS_ScrDir $SYS_Base/scripts
+set psy_mngdir = $cwd
+setenv PSY_Base   $psy_mngdir:h
+setenv PSY_ScrDir $PSY_Base/scripts
 
 if (-f extensions/sys-site) then
    eval `extensions/sys-site`
@@ -44,8 +44,8 @@ else
    eval `../scripts/sys-site -du -f local/site-signature`
 endif
 
-source $SYS_ScrDir/functions-pact.csh
-source $SYS_ScrDir/csh-subroutines
+source $PSY_ScrDir/functions-pact.csh
+source $PSY_ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
 unsetenv BASH_ENV
@@ -53,45 +53,45 @@ umask 007
 
 limit stacksize unlimited >& /dev/null
 
-unset sys_mngdir
-unset SYS_ID
-unsetenv SYS_ID
+unset psy_mngdir
+unset PSY_ID
+unsetenv PSY_ID
 
-eval `$SYS_ScrDir/cfgsys`
+eval `$PSY_ScrDir/cfgsys`
 
-setenv PACTVer     `cat $SYS_MngDir/.pact-version`
+setenv PACTVer     `cat $PSY_MngDir/.pact-version`
 
 # directory name conventions
 # to be consistenly used in config, build, test, and install
-#   ..../pact              ->     SYS_Base
-#   ..../pact/manager      ->     SYS_MngDir
-#   ..../pact/scripts      ->     SYS_ScrDir
+#   ..../pact              ->     PSY_Base
+#   ..../pact/manager      ->     PSY_MngDir
+#   ..../pact/scripts      ->     PSY_ScrDir
 #   ..../pact/<pkg>        ->     PkgDir
 #   ..../pact/dev          ->     DevDir
-#   ..../pact/dev/$sys_id  ->     SYS_Root
+#   ..../pact/dev/$psy_id  ->     PSY_Root
 
-set DevDir  = $SYS_Base/dev
-set IncDir  = $SYS_Root/include
-set BinDir  = $SYS_Root/bin
-set LibDir  = $SYS_Root/lib
-set EtcDir  = $SYS_Root/etc
-set LogDir  = $SYS_Root/log
-set ScmDir  = $SYS_Root/scheme
+set DevDir  = $PSY_Base/dev
+set IncDir  = $PSY_Root/include
+set BinDir  = $PSY_Root/bin
+set LibDir  = $PSY_Root/lib
+set EtcDir  = $PSY_Root/etc
+set LogDir  = $PSY_Root/log
+set ScmDir  = $PSY_Root/scheme
 set PACT    = $BinDir/pact
 set EnvCsh  = $EtcDir/env-pact.csh
 
 set PCKS     = "-"
-set Tmp      = tmp_$SYS_ID
+set Tmp      = tmp_$PSY_ID
 set hsy_host = `uname -n`
 set Time     = time
 
-set DSYS    = $SYS_MngDir/dsys
-set TIMER   = $SYS_ScrDir/timer
+set DSYS    = $PSY_MngDir/dsys
+set TIMER   = $PSY_ScrDir/timer
 
 set path = ( $path . )
 
 # put ../scripts on the end of the path just in case - bootstrap
-set path = ( $path $SYS_ScrDir )
+set path = ( $path $PSY_ScrDir )
 
 # if we have the issue ticket tracker available note it
 set HaveTicket = FALSE
@@ -275,14 +275,14 @@ switch ($Cmnd)
            shift
         end
 
-        set DevDir = $SYS_Base/dev
+        set DevDir = $PSY_Base/dev
 
-        setenv SYS_ID   `$SYS_CfgMan -d ../dev use`
-        setenv SYS_Root $DevDir/$SYS_ID
+        setenv PSY_ID   `$PSY_CfgMan -d ../dev use`
+        setenv PSY_Root $DevDir/$PSY_ID
 
-        set BinDir  = $SYS_Root/bin
-        set EtcDir  = $SYS_Root/etc
-        set LogDir  = $SYS_Root/log
+        set BinDir  = $PSY_Root/bin
+        set EtcDir  = $PSY_Root/etc
+        set LogDir  = $PSY_Root/log
 
         InitLog Log $LogDir/build
 
@@ -305,13 +305,13 @@ switch ($Cmnd)
         flog $Log popd
 
         if ("$Tgts" == "") then
-           NoteD $Log "Building PACT for $SYS_ID ($Msg) ..."
+           NoteD $Log "Building PACT for $PSY_ID ($Msg) ..."
            NoteD $Log "Using C Compiler $PACT_CC_EXE ($PACT_CC_FAMILY)"
 
            flog $Log $DSYS linstall
            flog $Log pushd ..
 
-           flog $Log setenv SESSION_CONFIG $SYS_ID
+           flog $Log setenv SESSION_CONFIG $PSY_ID
            flog $Log setenv PACTRoot $cwd
 
            flog $Log setenv  SC_EXEC_SERVER_WAIT     300
@@ -325,16 +325,16 @@ switch ($Cmnd)
 
            flog $Log popd
         else
-           NoteD $Log "Building packages for $SYS_ID ($Msg) ..."
+           NoteD $Log "Building packages for $PSY_ID ($Msg) ..."
            NoteD $Log ""
            flog $Log @ lerr = 0
            while ($#Tgts > 0)
               set tgt = $Tgts[1]
               shift Tgts
-              if (-d $SYS_Base/$tgt) then
-                 flog $Log pushd $SYS_Base/$tgt
+              if (-d $PSY_Base/$tgt) then
+                 flog $Log pushd $PSY_Base/$tgt
 
-                 NoteD $Log "$SYS_Base/$tgt"
+                 NoteD $Log "$PSY_Base/$tgt"
                  flog $Log $PACT $Args install
                  flog $Log @ lerr = $lerr + $status
                  NoteD $Log ""
@@ -358,7 +358,7 @@ switch ($Cmnd)
            NoteD $Log ""
            Separator $Log
            NoteD $Log "Cross compile fixes"
-           set srcb = $SYS_Base/dev/$CROSS_REF/bin
+           set srcb = $PSY_Base/dev/$CROSS_REF/bin
 	   if ($srcb != $BinDir) then
               set CrossFix = ( hserve mpi-io-wrap )
 #              set CrossFix = ( $CrossFix ps-diff png-diff )
@@ -379,15 +379,15 @@ switch ($Cmnd)
         NoteD $Log ""
         Separator $Log
         if ($RStatus != 0) then
-           foreach i (../*/$SYS_TmpDir/obj/errlog)
+           foreach i (../*/$PSY_TmpDir/obj/errlog)
               if (!(-z $i)) then
                  flog $Log cat $i
               endif
            end
-           NoteD $Log "PACT build for $SYS_ID failed ($RStatus/$ETime)"
-           NoteD $Log "Check log file: ../dev/$SYS_ID/log/build"
+           NoteD $Log "PACT build for $PSY_ID failed ($RStatus/$ETime)"
+           NoteD $Log "Check log file: ../dev/$PSY_ID/log/build"
         else
-           NoteD $Log "PACT build for $SYS_ID complete ($ETime)"
+           NoteD $Log "PACT build for $PSY_ID complete ($ETime)"
         endif
 
         NoteD $Log ""
@@ -468,7 +468,7 @@ switch ($Cmnd)
            NoteD $Log "Linking PACT on $hsy_host ..."
 
            flog $Log pushd ..
-           flog $Log setenv SESSION_CONFIG $SYS_ID
+           flog $Log setenv SESSION_CONFIG $PSY_ID
            flog $Log setenv PACTRoot $cwd
 
            flog $Log setenv  SC_EXEC_SERVER_WAIT     300
@@ -487,10 +487,10 @@ switch ($Cmnd)
            while ($#Tgts > 0)
               set tgt = $Tgts[1]
               shift Tgts
-              if (-d $SYS_Base/$tgt) then
-                 flog $Log pushd $SYS_Base/$tgt
+              if (-d $PSY_Base/$tgt) then
+                 flog $Log pushd $PSY_Base/$tgt
 
-                 NoteD $Log "$SYS_Base/$tgt"
+                 NoteD $Log "$PSY_Base/$tgt"
                  flog $Log $PACT $Args link
                  NoteD $Log ""
 
@@ -505,7 +505,7 @@ switch ($Cmnd)
 
         if ($RStatus != 0) then
            Note $Log "Link failed - some hints may be found in the files:"
-           flog $Log ls -l ../*/$SYS_TmpDir/obj/errlog
+           flog $Log ls -l ../*/$PSY_TmpDir/obj/errlog
         endif
 
         NoteD $Log ""
@@ -611,8 +611,8 @@ switch ($Cmnd)
         limit coredumpsize 0 >& /dev/null
 
         setenv ConfigDir ""
-        if ($?SYS_SITE == 1) then
-           set lsite     = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`
+        if ($?PSY_SITE == 1) then
+           set lsite     = `echo $PSY_SITE | tr "[A-Z]" "[a-z]"`
            setenv ConfigDir  "$ConfigDir local/$lsite"
            unset lsite
         endif
@@ -620,8 +620,8 @@ switch ($Cmnd)
 
         setenv CCompiler  gnu
 
-        setenv SYS_Arch  `$SYS_ScrDir/system-id`
-        setenv Bits      `$SYS_ScrDir/nbit -d`
+        setenv PSY_Arch  `$PSY_ScrDir/system-id`
+        setenv Bits      `$PSY_ScrDir/nbit -d`
 
         set Configuration = ""
         set Method        = 2
@@ -655,7 +655,7 @@ switch ($Cmnd)
            switch ($1)
               case -a:
                    shift
-                   $SYS_CfgMan add $1 >& /dev/null
+                   $PSY_CfgMan add $1 >& /dev/null
                    setenv SESSION_CONFIG $1
                    breaksw
               case -as:
@@ -668,7 +668,7 @@ switch ($Cmnd)
               case -cc:
                    shift
                    setenv CCompiler  $1
-                   $SYS_MngDir/verify-cc $CCompiler
+                   $PSY_MngDir/verify-cc $CCompiler
                    if ($status != 0) then
                       exit(1)
                    endif
@@ -881,16 +881,16 @@ switch ($Cmnd)
         setenv DSYS_TARGET pact_config
 
 # set the configuration for this system
-        setenv SYS_ID    `$SYS_CfgMan use`
-        setenv SYS_Root  $DevDir/$SYS_ID
+        setenv PSY_ID    `$PSY_CfgMan use`
+        setenv PSY_Root  $DevDir/$PSY_ID
 
 # now that we have the system, reset the variables that depend on it
-        set IncDir  = $SYS_Root/include
-        set EtcDir  = $SYS_Root/etc
-        set BinDir  = $SYS_Root/bin
-        set LibDir  = $SYS_Root/lib
-        set ScmDir  = $SYS_Root/scheme
-        set LogDir  = $SYS_Root/log
+        set IncDir  = $PSY_Root/include
+        set EtcDir  = $PSY_Root/etc
+        set BinDir  = $PSY_Root/bin
+        set LibDir  = $PSY_Root/lib
+        set ScmDir  = $PSY_Root/scheme
+        set LogDir  = $PSY_Root/log
         set PACT    = $BinDir/pact
 
         setenv PERDB  $BinDir/perdb
@@ -907,7 +907,7 @@ switch ($Cmnd)
         source pact-scs
 
 # set up some items in the working environment
-        set path = ( . $BinDir $SYS_ScrDir $path )
+        set path = ( . $BinDir $PSY_ScrDir $path )
 
 # make sure the log directory is there - do not wait for later
         if (!(-d $LogDir)) then
@@ -916,8 +916,8 @@ switch ($Cmnd)
 
         InitLog Log $LogDir/config
 
-        Note $Log "SYS_ID    = $SYS_ID"
-        Note $Log "SYS_Root   = $SYS_Root"
+        Note $Log "PSY_ID    = $PSY_ID"
+        Note $Log "PSY_Root   = $PSY_Root"
         Note $Log "Args      = $nargs"
         Note $Log "ConfigDir = $ConfigDir"
 
@@ -927,7 +927,7 @@ switch ($Cmnd)
         flog $Log $RM $LogDir/analyze*
 
 # figure out from where configuration info is coming
-        set gdir = gen/$SYS_Arch
+        set gdir = gen/$PSY_Arch
         if (!(-d $gdir)) then
            mkdir -p $gdir >& /dev/null
         endif
@@ -940,7 +940,7 @@ switch ($Cmnd)
            echo "Using database $dbcfg to configure this PACT installation."
 
            if (-f $dbcfg) then
-              set ndbcfg = $cwd/$gdir/$SYS_ID.cfg
+              set ndbcfg = $cwd/$gdir/$PSY_ID.cfg
               if ($dbcfg != $ndbcfg) then
                  cp $dbcfg $ndbcfg
               endif
@@ -996,45 +996,45 @@ switch ($Cmnd)
 
 # make sure that the installation directories exist
         setenv OS_Name  `uname -s`
-        set SYS_InstRoot  = $DevDir/$SYS_ID
+        set PSY_InstRoot  = $DevDir/$PSY_ID
         if (!(-d $DevDir)) then
            mkdir $DevDir
         endif
-        if (!(-d $SYS_InstRoot)) then
-           mkdir $SYS_InstRoot
+        if (!(-d $PSY_InstRoot)) then
+           mkdir $PSY_InstRoot
         endif
-        if (!(-d $SYS_InstRoot/bin)) then
-           mkdir $SYS_InstRoot/bin
+        if (!(-d $PSY_InstRoot/bin)) then
+           mkdir $PSY_InstRoot/bin
         endif
-        if (!(-d $SYS_InstRoot/lib)) then
-           mkdir $SYS_InstRoot/lib
+        if (!(-d $PSY_InstRoot/lib)) then
+           mkdir $PSY_InstRoot/lib
         endif
-        if (!(-d $SYS_InstRoot/include)) then
-           mkdir $SYS_InstRoot/include
+        if (!(-d $PSY_InstRoot/include)) then
+           mkdir $PSY_InstRoot/include
         endif
-        if (!(-d $SYS_InstRoot/include/shell)) then
-           mkdir $SYS_InstRoot/include/shell
+        if (!(-d $PSY_InstRoot/include/shell)) then
+           mkdir $PSY_InstRoot/include/shell
         endif
-        if (!(-d $SYS_InstRoot/etc)) then
-           mkdir $SYS_InstRoot/etc
+        if (!(-d $PSY_InstRoot/etc)) then
+           mkdir $PSY_InstRoot/etc
         endif
-        if (!(-d $SYS_InstRoot/man)) then
-           mkdir $SYS_InstRoot/man
+        if (!(-d $PSY_InstRoot/man)) then
+           mkdir $PSY_InstRoot/man
         endif
-        if (!(-d $SYS_InstRoot/man/man1)) then
-           mkdir $SYS_InstRoot/man/man1
+        if (!(-d $PSY_InstRoot/man/man1)) then
+           mkdir $PSY_InstRoot/man/man1
         endif
-        if (!(-d $SYS_InstRoot/man/man3)) then
-           mkdir $SYS_InstRoot/man/man3
+        if (!(-d $PSY_InstRoot/man/man3)) then
+           mkdir $PSY_InstRoot/man/man3
         endif
-        if (!(-d $SYS_InstRoot/scheme)) then
-           mkdir $SYS_InstRoot/scheme
+        if (!(-d $PSY_InstRoot/scheme)) then
+           mkdir $PSY_InstRoot/scheme
         endif
-        if (!(-d $SYS_InstRoot/scheme/extensions)) then
-           mkdir $SYS_InstRoot/scheme/extensions
+        if (!(-d $PSY_InstRoot/scheme/extensions)) then
+           mkdir $PSY_InstRoot/scheme/extensions
         endif
-        if (!(-d $SYS_InstRoot/log)) then
-           mkdir $SYS_InstRoot/log
+        if (!(-d $PSY_InstRoot/log)) then
+           mkdir $PSY_InstRoot/log
         endif
 
         set RStatus = $status
@@ -1043,7 +1043,7 @@ switch ($Cmnd)
         unsetenv LD_LIBRARY_PATH
         flog $Log ./ccw -g pco.c -o $BinDir/pco
         if ($status == 0) then
-           flog $Log ./ccw -g -DSYS_Prefix=\"${SYS_Prefix}\" do-run.c -o $BinDir/do-run
+           flog $Log ./ccw -g -DPSY_Prefix=\"${PSY_Prefix}\" do-run.c -o $BinDir/do-run
            flog $Log ./ccw -g perdb.c -o $BinDir/perdb
            flog $Log ./ccw -g gexec.c -o $BinDir/gexec
            flog $Log ./ccw -g elide.c -o $BinDir/elide
@@ -1124,15 +1124,15 @@ switch ($Cmnd)
         $RM $EnvCsh
         touch $EnvCsh
         Note $EnvCsh ""
-        Note $EnvCsh "setenv SYS_ID $SYS_ID"
-        Note $EnvCsh "set path   = ( . $DevDir/"'$SYS_ID/bin $path )'
+        Note $EnvCsh "setenv PSY_ID $PSY_ID"
+        Note $EnvCsh "set path   = ( . $DevDir/"'$PSY_ID/bin $path )'
         Note $EnvCsh ""
 
         $RM $EnvSh
         touch $EnvSh
         Note $EnvSh ""
-        Note $EnvSh "export SYS_ID=$SYS_ID"
-        Note $EnvSh "export PATH=.:$DevDir/"'$SYS_ID/bin:$PATH'
+        Note $EnvSh "export PSY_ID=$PSY_ID"
+        Note $EnvSh "export PATH=.:$DevDir/"'$PSY_ID/bin:$PATH'
         Note $EnvSh ""
 
 # remove files we are about to generate in include
@@ -1171,13 +1171,13 @@ switch ($Cmnd)
 
 # do the main configuration work
         if ("$ucfg" != "") then
-           Note $Log "Command: $PConf $PArgs -s $SYS_ID $ucfg"
-           $PConf -s $SYS_ID $PArgs $ucfg
+           Note $Log "Command: $PConf $PArgs -s $PSY_ID $ucfg"
+           $PConf -s $PSY_ID $PArgs $ucfg
            set RStatus = $status
 
         else if ("$dbcfg" != "") then
-           Note $Log "Command: $PConf -s $SYS_ID $PArgs -db $dbcfg"
-           $PConf -s $SYS_ID $PArgs -db $dbcfg
+           Note $Log "Command: $PConf -s $PSY_ID $PArgs -db $dbcfg"
+           $PConf -s $PSY_ID $PArgs -db $dbcfg
            set RStatus = $status
            unset dbcfg
 
@@ -1195,7 +1195,7 @@ switch ($Cmnd)
         source $EnvCsh
         
 # cleanup path so as not to tax wimpy OSs such as Solaris
-        eval `$SYS_ScrDir/simplify-path`
+        eval `$PSY_ScrDir/simplify-path`
 
         flog $Log chmod a+x code-date
         flog $Log pwd
@@ -1245,10 +1245,10 @@ switch ($Cmnd)
            if ($?SESSION_CONFIG == 1) then
               flog $Log set sid = $SESSION_CONFIG
            else
-              flog $Log set sid = $SYS_ID
+              flog $Log set sid = $PSY_ID
            endif
            flog $Log unsetenv SESSION_CONFIG
-           flog $Log $SYS_CfgMan add $sid
+           flog $Log $PSY_CfgMan add $sid
 
         else
            if (!(-f $PERDB_PATH.db)) then
@@ -1278,7 +1278,7 @@ switch ($Cmnd)
            rehash
 
 # create empty extensions directories if they don't exist already
-           set ExtDirs = ( $SYS_Base/sx/applications/extensions $SYS_Base/ultra/applications/extensions )
+           set ExtDirs = ( $PSY_Base/sx/applications/extensions $PSY_Base/ultra/applications/extensions )
            foreach d ($ExtDirs)
               if (-d $d:h) then
                  if (!(-d $d)) then
@@ -1323,9 +1323,9 @@ CFG_DONE:
                    set db  = $EtcDir/cfg.db
                    set inf = ( `pact +l -info CONFIG_METHOD` )
                    set mth = $inf[1]
-                   set cfg = ( `grep SYS_Cfg= $db | sed 's/^SYS_Cfg=//'` )
-                   set inf = ( `$SYS_CfgMan list` )
-                   set cur = ( `$SYS_CfgMan use` )
+                   set cfg = ( `grep PSY_Cfg= $db | sed 's/^PSY_Cfg=//'` )
+                   set inf = ( `$PSY_CfgMan list` )
+                   set cur = ( `$PSY_CfgMan use` )
                    echo "Configuration list:    $inf"
                    echo "Current configuration: $cur"
                    echo "Current config file:   $cfg"
@@ -1417,7 +1417,7 @@ CFG_DONE:
            Note $Log ""
 
            flog $Log pwd
-           flog $Log $SYS_CfgMan delete $c
+           flog $Log $PSY_CfgMan delete $c
 
            find .. -name "*$c" -type d |& grep -v '\.pc' |& xargs rm -rf
            set RStatus = $status
@@ -1481,29 +1481,29 @@ CFG_DONE:
         if (!(-d $DevDir)) then
            mkdir $DevDir
         endif
-        if (!(-d $SYS_Root)) then
-           mkdir $SYS_Root
+        if (!(-d $PSY_Root)) then
+           mkdir $PSY_Root
         endif
-        if (!(-d $SYS_Root/bin)) then
-           mkdir $SYS_Root/bin
+        if (!(-d $PSY_Root/bin)) then
+           mkdir $PSY_Root/bin
         endif
-        if (!(-d $SYS_Root/lib)) then
-           mkdir $SYS_Root/lib
+        if (!(-d $PSY_Root/lib)) then
+           mkdir $PSY_Root/lib
         endif
-        if (!(-d $SYS_Root/include)) then
-           mkdir $SYS_Root/include
+        if (!(-d $PSY_Root/include)) then
+           mkdir $PSY_Root/include
         endif
-        if (!(-d $SYS_Root/etc)) then
-           mkdir $SYS_Root/etc
+        if (!(-d $PSY_Root/etc)) then
+           mkdir $PSY_Root/etc
         endif
-        if (!(-d $SYS_Root/scheme)) then
-           mkdir $SYS_Root/scheme
+        if (!(-d $PSY_Root/scheme)) then
+           mkdir $PSY_Root/scheme
         endif
-        if (!(-d $SYS_Root/scheme/extensions)) then
-           mkdir $SYS_Root/scheme/extensions
+        if (!(-d $PSY_Root/scheme/extensions)) then
+           mkdir $PSY_Root/scheme/extensions
         endif
-        if (!(-d $SYS_Root/log)) then
-           mkdir $SYS_Root/log
+        if (!(-d $PSY_Root/log)) then
+           mkdir $PSY_Root/log
         endif
 
         breaksw
@@ -1566,7 +1566,7 @@ CFG_DONE:
 #--------------------------------------------------------------------------
 
    case info:
-        set HelpCode  = $SYS_MngDir/$0
+        set HelpCode  = $PSY_MngDir/$0
         set SCSOpt    = ""
 
         set SCSRepository = ""
@@ -1667,7 +1667,7 @@ CFG_DONE:
                    breaksw
 
               case -d:
-                   set DocDir = $SYS_AIRoot/pact/docs
+                   set DocDir = $PSY_AIRoot/pact/docs
                    breaksw
 
               case -e:
@@ -1683,25 +1683,25 @@ CFG_DONE:
                    breaksw
 
               case -m:
-                   set MgrDir = "$SYS_MngDir"
+                   set MgrDir = "$PSY_MngDir"
                    breaksw
 
               case -s:
-                   set SrcDir = $SYS_AIRoot/pact/wrk
+                   set SrcDir = $PSY_AIRoot/pact/wrk
                    breaksw
 
               case -t:
-                   source $SYS_MngDir/pact-scs
+                   source $PSY_MngDir/pact-scs
                    set Tags = "-def"
                    breaksw
 
               case -x:
-                   setenv SYS_ID    `$SYS_CfgMan use`
-                   setenv SYS_Root  $DevDir/$SYS_ID
-                   set IncDir = $SYS_Root/include
+                   setenv PSY_ID    `$PSY_CfgMan use`
+                   setenv PSY_Root  $DevDir/$PSY_ID
+                   set IncDir = $PSY_Root/include
                    set Pck    = `cat $EtcDir/package`
                    pushd .. >& /dev/null
-                   set NB = `du -sb $Pck manager python $SYS_Root | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
+                   set NB = `du -sb $Pck manager python $PSY_Root | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
                    popd >& /dev/null
                    echo "Approximately $NB MB of sources, objects, libraries, and binaries"
                    exit(0)
@@ -1715,27 +1715,27 @@ CFG_DONE:
         end
 
         if ($All != "") then
-           set SrcDir  = $SYS_AIRoot/pact/wrk
+           set SrcDir  = $PSY_AIRoot/pact/wrk
            set BinDir  = "$BINDIR"
            set LibDir  = ( "$BINDIR:h""/lib" )
            set IncDir  = ( "$BINDIR:h""/include" )
            set EtcDir  = ( "$BINDIR:h""/etc" )
-           set Man1Dir = $SYS_AIRoot/pact/man/man1
-           set Man3Dir = $SYS_AIRoot/pact/man/man3
-           set DocDir  = $SYS_AIRoot/pact/docs
+           set Man1Dir = $PSY_AIRoot/pact/man/man1
+           set Man3Dir = $PSY_AIRoot/pact/man/man3
+           set DocDir  = $PSY_AIRoot/pact/docs
         endif
 
         set LS = 'ls -l'
 
-        set Libs = ( `awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
-        set Incs = ( `awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
-        set Bins = ( `awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
-        set Scrs = ( `awk '$1 == "script" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
-        set Mods = ( `awk '$1 == "f90"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
-        set Scms = ( `awk '$1 == "scm"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
-        set Docs = ( `awk '$1 == "doc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
-        set Pact = ( `awk '$1 == "pkg"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
-        set Mgrs = ( `awk '$1 == "mgr"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $SYS_MngDir/pact.manifest` )
+        set Libs = ( `awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $PSY_MngDir/pact.manifest` )
+        set Incs = ( `awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $PSY_MngDir/pact.manifest` )
+        set Bins = ( `awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $PSY_MngDir/pact.manifest` )
+        set Scrs = ( `awk '$1 == "script" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $PSY_MngDir/pact.manifest` )
+        set Mods = ( `awk '$1 == "f90"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $PSY_MngDir/pact.manifest` )
+        set Scms = ( `awk '$1 == "scm"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $PSY_MngDir/pact.manifest` )
+        set Docs = ( `awk '$1 == "doc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $PSY_MngDir/pact.manifest` )
+        set Pact = ( `awk '$1 == "pkg"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $PSY_MngDir/pact.manifest` )
+        set Mgrs = ( `awk '$1 == "mgr"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' $PSY_MngDir/pact.manifest` )
 
         set ScrB = ( $Scrs )
 
@@ -1755,7 +1755,7 @@ CFG_DONE:
            echo "PACT sources reside in $SrcDir"
            set CSrc = ""
            foreach i ($Pact)
-              set CSrc = ( $CSrc `find $i -name "*.[ch]" | grep -v /$SYS_Prefix | grep -v /dev/` )
+              set CSrc = ( $CSrc `find $i -name "*.[ch]" | grep -v /$PSY_Prefix | grep -v /dev/` )
            end
            wc -l $CSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
@@ -1766,7 +1766,7 @@ CFG_DONE:
            touch foobar
            set FSrc = ""
            foreach i ($Pact)
-              set FSrc = ( $FSrc `find $i -name "*.f" | grep -v /$SYS_Prefix | grep -v /dev/` )
+              set FSrc = ( $FSrc `find $i -name "*.f" | grep -v /$PSY_Prefix | grep -v /dev/` )
            end
            wc -l $FSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
@@ -1776,10 +1776,10 @@ CFG_DONE:
            echo " in $#FSrc files" >>& $STDOUT
 
            set SSrc = ""
-           set SSrc = ( $SSrc `find panacea -name "*.scm" | grep -v /$SYS_Prefix | grep -v /dev/` )
-           set SSrc = ( $SSrc `find scheme -name "*.scm" | grep -v /$SYS_Prefix | grep -v /dev/` )
-           set SSrc = ( $SSrc `find sx -name "*.scm" | grep -v /$SYS_Prefix | grep -v /dev/` )
-           set SSrc = ( $SSrc `find ultra -name "*.scm" | grep -v /$SYS_Prefix | grep -v /dev/` )
+           set SSrc = ( $SSrc `find panacea -name "*.scm" | grep -v /$PSY_Prefix | grep -v /dev/` )
+           set SSrc = ( $SSrc `find scheme -name "*.scm" | grep -v /$PSY_Prefix | grep -v /dev/` )
+           set SSrc = ( $SSrc `find sx -name "*.scm" | grep -v /$PSY_Prefix | grep -v /dev/` )
+           set SSrc = ( $SSrc `find ultra -name "*.scm" | grep -v /$PSY_Prefix | grep -v /dev/` )
            wc -l $SSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
            tail -n 1       |                                                  \
@@ -1919,20 +1919,20 @@ CFG_DONE:
         if ("$Tags" != "") then
            echo ""
            echo "PACT revision tags:"
-           eval "($SYS_ScrDir/scs-history $Tags | tail -n 20 )"
+           eval "($PSY_ScrDir/scs-history $Tags | tail -n 20 )"
         endif
 
         if ($ChkVer == "yes") then
            echo ""
            echo "Version info for PACT:"
-           echo "   pact-date    =  `cat $SYS_AIRoot/pact/std_sources/manager/.pact-date`" 
-           echo "   pact-version =  `cat $SYS_AIRoot/pact/std_sources/manager/.pact-version`" 
-           echo "   pact-tag     =  `cat $SYS_AIRoot/pact/std_sources/manager/.pact-version-tag`" 
+           echo "   pact-date    =  `cat $PSY_AIRoot/pact/std_sources/manager/.pact-date`" 
+           echo "   pact-version =  `cat $PSY_AIRoot/pact/std_sources/manager/.pact-version`" 
+           echo "   pact-tag     =  `cat $PSY_AIRoot/pact/std_sources/manager/.pact-version-tag`" 
            echo ""
            echo "Version info for PACTNEW:"
-           echo "   pact-date    =  `cat $SYS_AIRoot/pact/new_sources/manager/.pact-date`" 
-           echo "   pact-version =  `cat $SYS_AIRoot/pact/new_sources/manager/.pact-version`" 
-           echo "   pact-tag     =  `cat $SYS_AIRoot/pact/new_sources/manager/.pact-version-tag`" 
+           echo "   pact-date    =  `cat $PSY_AIRoot/pact/new_sources/manager/.pact-date`" 
+           echo "   pact-version =  `cat $PSY_AIRoot/pact/new_sources/manager/.pact-version`" 
+           echo "   pact-tag     =  `cat $PSY_AIRoot/pact/new_sources/manager/.pact-version-tag`" 
         endif
 
         set RStatus = $status
@@ -1971,14 +1971,14 @@ CFG_DONE:
            shift
         end
 
-        set DevDir = $SYS_Base/dev
+        set DevDir = $PSY_Base/dev
 
-        setenv SYS_ID    `$SYS_CfgMan -d ../dev use`
-        setenv SYS_Root  $DevDir/$SYS_ID
+        setenv PSY_ID    `$PSY_CfgMan -d ../dev use`
+        setenv PSY_Root  $DevDir/$PSY_ID
 
-        set BinDir  = $SYS_Root/bin
-        set EtcDir  = $SYS_Root/etc
-        set LogDir  = $SYS_Root/log
+        set BinDir  = $PSY_Root/bin
+        set EtcDir  = $PSY_Root/etc
+        set LogDir  = $PSY_Root/log
 
         setenv GEXEC   $BinDir/gexec
         setenv PATH    ${BinDir}:${PATH}
@@ -2117,9 +2117,9 @@ CFG_DONE:
 
         InitLog Log $LogDir/net-update
 
-        set DO_PACT = $SYS_MngDir/do-pact
+        set DO_PACT = $PSY_MngDir/do-pact
 
-        flog $Log $SYS_ScrDir/scs-update
+        flog $Log $PSY_ScrDir/scs-update
         Note $Log do-net -e $DO_PACT $DArgs $CArgs
 
 #        do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $Log
@@ -2266,7 +2266,7 @@ CFG_DONE:
         if (-f $db) then
            set inf  = ( `pact +l -info CONFIG_METHOD` )
            set meth = $inf[1]
-           set cfg  = ( `grep SYS_Cfg= $db |& sed 's/^SYS_Cfg=//'` )
+           set cfg  = ( `grep PSY_Cfg= $db |& sed 's/^PSY_Cfg=//'` )
         else
            set meth = file
            set inf  = ( `awk '($1 == "Config") { print $3 }' $EtcDir/configured` )
@@ -2378,17 +2378,17 @@ CFG_DONE:
            shift
         end
 
-        set DevDir  = $SYS_Base/dev
+        set DevDir  = $PSY_Base/dev
 
-        setenv SYS_ID    `$SYS_CfgMan -d ../dev use`
-        setenv SYS_Root  $DevDir/$SYS_ID
+        setenv PSY_ID    `$PSY_CfgMan -d ../dev use`
+        setenv PSY_Root  $DevDir/$PSY_ID
 
-        set BinDir  = $SYS_Root/bin
-        set IncDir  = $SYS_Root/include
-        set LibDir  = $SYS_Root/lib
-        set EtcDir  = $SYS_Root/etc
-        set ScmDir  = $SYS_Root/scheme
-        set LogDir  = $SYS_Root/log
+        set BinDir  = $PSY_Root/bin
+        set IncDir  = $PSY_Root/include
+        set LibDir  = $PSY_Root/lib
+        set EtcDir  = $PSY_Root/etc
+        set ScmDir  = $PSY_Root/scheme
+        set LogDir  = $PSY_Root/log
 
         InitLog Log $LogDir/remove
 
@@ -2404,12 +2404,12 @@ CFG_DONE:
         endif
 
 # cleanup path so as not to tax wimpy OSs such as Solaris
-        eval `$SYS_ScrDir/simplify-path`
+        eval `$PSY_ScrDir/simplify-path`
 
         flog $Log date
         flog $Log $Which pact
 
-        NoteD $Log "Removing PACT for $SYS_ID"
+        NoteD $Log "Removing PACT for $PSY_ID"
         Note $Log "strict = $strict"
 
 # do remove for multi-platform configuration
@@ -2542,14 +2542,14 @@ CFG_DONE:
         flog $Log popd
 
 # remove other files
-        NoteD $Log "    in $SYS_Base/"'*'"/$SYS_TmpDir directories"
-        flog $Log $RM ../*/$SYS_TmpDir/obj/*.[cfo] ../*/$SYS_TmpDir/obj/*.mod
+        NoteD $Log "    in $PSY_Base/"'*'"/$PSY_TmpDir directories"
+        flog $Log $RM ../*/$PSY_TmpDir/obj/*.[cfo] ../*/$PSY_TmpDir/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
-        flog $Log $RM ../sx/$SYS_TmpDir/obj/*.[cfo]
-        flog $Log $RMDir ../$SYS_TmpDir ../dev/.pc-
+        flog $Log $RM ../sx/$PSY_TmpDir/obj/*.[cfo]
+        flog $Log $RMDir ../$PSY_TmpDir ../dev/.pc-
 
 # check the result
-        flog $Log ls -lR $SYS_Root
+        flog $Log ls -lR $PSY_Root
 
         set RStatus = $status
 
@@ -2570,9 +2570,9 @@ CFG_DONE:
         set Cfg = $1
 
         echo ""
-        echo -n "Changing from configuration `$SYS_CfgMan use` to "
+        echo -n "Changing from configuration `$PSY_CfgMan use` to "
 
-        $SYS_CfgMan add $Cfg
+        $PSY_CfgMan add $Cfg
         set RStatus = $status
 
         echo ""
@@ -2685,7 +2685,7 @@ CFG_DONE:
 
    case stats-update:
 
-        set PrntDir   = $SYS_Base:h
+        set PrntDir   = $PSY_Base:h
         set UpdateDir = $PrntDir/update
         set StatsDir  = $PrntDir/stats
 
@@ -2740,9 +2740,9 @@ CFG_DONE:
         set SCSOpt      = "-q"
         set Quiet       = FALSE
 
-        set ConflFile = $SYS_MngDir/Confl.Sources
-        set HelpCode  = $SYS_MngDir/$0
-        set Merges    = $SYS_MngDir/merge.el
+        set ConflFile = $PSY_MngDir/Confl.Sources
+        set HelpCode  = $PSY_MngDir/$0
+        set Merges    = $PSY_MngDir/merge.el
         set hsy_host  = `uname -n`
         set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
 
@@ -2805,12 +2805,12 @@ CFG_DONE:
         if ($Sleep == "YES") then
            manager/check.lock
         else
-           set lockst = `$SYS_ScrDir/scs-lock status`
+           set lockst = `$PSY_ScrDir/scs-lock status`
            if ($lockst == "locked") then
               echo ""
               echo " *** REPOSITORY IS LOCKED ***"
               echo ""
-              $SYS_ScrDir/scs-lock cat
+              $PSY_ScrDir/scs-lock cat
               echo ""
               echo ""
               exit(1)
@@ -2836,9 +2836,9 @@ CFG_DONE:
         flog $Log pwd
         flog $Log printenv
 
-#        set TmpV = $SYS_MngDir/.tmp.$$
+#        set TmpV = $PSY_MngDir/.tmp.$$
 #        flog $Log mkdir $TmpV
-#        flog $Log $MV $SYS_MngDir/.pact-version* $TmpV
+#        flog $Log $MV $PSY_MngDir/.pact-version* $TmpV
 
 # GOTCHA: check git status for things like:
 #     Your branch is behind 'origin/master' by <n> commits
@@ -2847,10 +2847,10 @@ CFG_DONE:
 # 2) git stash save ; git pull ; git stash pop
 # 3) git stash ; git pull ; git stash clear
 
-        flog $Log $SYS_ScrDir/scs-update
+        flog $Log $PSY_ScrDir/scs-update
         set ErrStat = $status
 
-#        flog $Log $MV $TmpV/.pact-version* $SYS_MngDir
+#        flog $Log $MV $TmpV/.pact-version* $PSY_MngDir
 #        flog $Log $RMDir $TmpV
 
 # take care of conflicting changes
@@ -2957,8 +2957,8 @@ CFG_DONE:
         set excl = ( $excl -exclude local )
         set excl = ( $excl -exclude hosts )
         set excl = ( $excl -exclude extensions )
-        if (-f $SYS_MngDir/local/exclusions) then
-           foreach i (`cat $SYS_MngDir/local/exclusions | grep -v '^#'`)
+        if (-f $PSY_MngDir/local/exclusions) then
+           foreach i (`cat $PSY_MngDir/local/exclusions | grep -v '^#'`)
               set excl = ( $excl -exclude $i )
            end
         endif
@@ -3053,17 +3053,17 @@ CFG_DONE:
            shift
         end
 
-        set DevDir = $SYS_Base/dev
+        set DevDir = $PSY_Base/dev
 
-        setenv SYS_ID    `$SYS_CfgMan -d ../dev use`
-        setenv SYS_Root  $DevDir/$SYS_ID
+        setenv PSY_ID    `$PSY_CfgMan -d ../dev use`
+        setenv PSY_Root  $DevDir/$PSY_ID
 
-        set BinDir  = $SYS_Root/bin
-        set IncDir  = $SYS_Root/include
-        set LibDir  = $SYS_Root/lib
-        set EtcDir  = $SYS_Root/etc
-        set ScmDir  = $SYS_Root/scheme
-        set LogDir  = $SYS_Root/log
+        set BinDir  = $PSY_Root/bin
+        set IncDir  = $PSY_Root/include
+        set LibDir  = $PSY_Root/lib
+        set EtcDir  = $PSY_Root/etc
+        set ScmDir  = $PSY_Root/scheme
+        set LogDir  = $PSY_Root/log
 
         set BeginTime = `$TIMER -r`
 
@@ -3104,14 +3104,14 @@ CFG_DONE:
         flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/test.error
 
 # clear out existing test corefiles - easier to investigate any failures
-        foreach i (`find .. -name $SYS_TmpDir`)
+        foreach i (`find .. -name $PSY_TmpDir`)
            flog $Log $RM $i/test/*.core
         end
 
         set BeginTime = `$TIMER -r`
 
         NoteD $Log ""
-        NoteD $Log "Testing PACT for $SYS_ID ..."
+        NoteD $Log "Testing PACT for $PSY_ID ..."
         NoteD $Log " --------------------------------------------------------"
 
         flog $Log pushd ..
@@ -3119,7 +3119,7 @@ CFG_DONE:
 # do it for smake
         flog $Log (ls -l `$Which pact` |& grep smake)
         if ($status == 0) then
-           set PCKS = ( `awk '$1 == "pkg" {print}' $SYS_MngDir/pact.manifest | sed 's/^pkg//'` )
+           set PCKS = ( `awk '$1 == "pkg" {print}' $PSY_MngDir/pact.manifest | sed 's/^pkg//'` )
            foreach d ($PCKS)
               flog $Log pushd $d
               ftee $Log pact $NA test
@@ -3257,7 +3257,7 @@ CFG_DONE:
            shift
         end
 
-        set Tmp = .tmp-dsys-test-ssh.$SYS_ID
+        set Tmp = .tmp-dsys-test-ssh.$PSY_ID
         flog $Log $RM $Tmp
         echo "ssh-test" > $Tmp
 
@@ -3421,7 +3421,7 @@ CFG_DONE:
 
         call SCS_SETUP()
 
-        $SYS_ScrDir/scs-lock unlock
+        $PSY_ScrDir/scs-lock unlock
         set RStatus = $status
         breaksw        
 
@@ -3479,7 +3479,7 @@ CFG_DONE:
 
         InitLog Log $LogDir/update
 
-        set TIMER = $SYS_Base/scripts/timer
+        set TIMER = $PSY_Base/scripts/timer
         set BTime = `$TIMER -r`
 
 # remove binaries
@@ -3677,7 +3677,7 @@ GEN_CONFIG:
 
    set vrb = FALSE
 
-   set gdir = gen/$SYS_Arch
+   set gdir = gen/$PSY_Arch
    if (!(-d $gdir)) then
       mkdir -p $gdir
    endif
@@ -3697,7 +3697,7 @@ GEN_CONFIG:
 
 SCS_SETUP:
 
-   source $SYS_MngDir/pact-scs
+   source $PSY_MngDir/pact-scs
 
    return
 

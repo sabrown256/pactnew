@@ -43,9 +43,9 @@ if ("$lst" == "") then
 endif
 
 set path   = ( /usr/gapps/pact/scripts $path )
-set sys_id = `../scripts/cfgman use`
+set psy_id = `../scripts/cfgman use`
 
-source ../dev/$sys_id/etc/functions-pact.csh
+source ../dev/$psy_id/etc/functions-pact.csh
 
 InitLog log $cwd/log.splint
 
@@ -57,8 +57,8 @@ foreach i ($lst)
    NoteD $log ""
    NoteD $log "File: $i"
    NoteD $log ""
-#   ftee $log splint $opt -I../dev/$sys_id/include -I. $i
-   gtee $log splint $opt -I../dev/$sys_id/include -I. $i
+#   ftee $log splint $opt -I../dev/$psy_id/include -I. $i
+   gtee $log splint $opt -I../dev/$psy_id/include -I. $i
    @ err = $err + $gstatus[1]
 end
 

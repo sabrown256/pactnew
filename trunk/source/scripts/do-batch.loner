@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# DO-BATCH.LONER - run a batch job on a SYS_SITE = LONER site host
+# DO-BATCH.LONER - run a batch job on a PSY_SITE = LONER site host
 #                - really just a dispatcher
 #
 # include "cpyright.h"

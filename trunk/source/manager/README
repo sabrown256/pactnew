@@ -742,7 +742,7 @@ INSTALL
    Place holder for either "install <options>" or "cp" depending on whether
    or not your system has install.  Default is "cp".
 
-SYS_InstRoot
+PSY_InstRoot
    The directory in which the PACT manager expects to find lib, bin, include,
    and scheme directories into which to install PACT.  Default is "/usr/local".
 
@@ -773,7 +773,7 @@ SchemeSpokes
 
 ScmDir
    A directory in which to install scheme source files.  This should also be
-   a subdirectory of SYS_InstRoot.  Default is "scheme".
+   a subdirectory of PSY_InstRoot.  Default is "scheme".
 
 Shared_LD_Exe
    The linker to use when building shared libraries.  This

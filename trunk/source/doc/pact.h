@@ -1240,7 +1240,7 @@ FOptimize for those purposes.
 <BR>Default is &#147;cp&#148;</UL>
 
 <P>
-<B>SYS_InstRoot</B>
+<B>PSY_InstRoot</B>
 <BR>
 <UL>The directory in which the PACT manager expects to find lib, bin, and
 include directories into which to install PACT.
@@ -1322,7 +1322,7 @@ A netCDF spoke is included with the distribution.
 <B>ScmDir</B>
 <BR>
 <UL>A directory in which to install scheme source files.  This should also be
-a subdirectory of SYS_InstRoot.
+a subdirectory of PSY_InstRoot.
 <BR>Default is &#147;scheme&#148;</UL>
 
 <P>
