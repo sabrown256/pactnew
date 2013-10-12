@@ -34,7 +34,7 @@ if ($?Lock == 0) then
 endif
 
 # make the Message
-set sys_host = `uname -n`
+set hsy_host = `uname -n`
 set WhoIAm   = $USER
 
 # for commits
@@ -51,8 +51,8 @@ else
 endif
 
 if ($?TagAnn == 1) then
-   set Message = (\'<$WhoIAm $TagAnn $Date|Remote $sys_host> $argv\')
+   set Message = (\'<$WhoIAm $TagAnn $Date|Remote $hsy_host> $argv\')
 else
-   set Message = (\'<$WhoIAm|$Date|Remote $sys_host> $argv\')
+   set Message = (\'<$WhoIAm|$Date|Remote $hsy_host> $argv\')
 endif
 

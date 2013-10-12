@@ -1379,7 +1379,7 @@ static void setup_analyze_env(client *cl, char *base)
     note(out, TRUE, "%s", get_date());
     fclose_safe(out);
 
-    dbset(cl, "SYS_Host",   st.host);
+    dbset(cl, "HSY_Host",   st.host);
     dbset(cl, "SYS_Arch",   st.arch);
     dbset(cl, "SYS_ID",     st.sys_id);
     dbset(cl, "SYS_Root",   st.dir.root);

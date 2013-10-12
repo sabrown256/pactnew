@@ -12,16 +12,16 @@ unalias *
 
 set path = ( /usr/bin /bin )
 
-set sys_host = `uname -n`
+set hsy_host = `uname -n`
 set OS       = `uname -s | tr "[A-Z]" "[a-z]"`
 set Rel      = `uname -r`
 
 if ($?TIMER_FILE == 1) then
    set TFile = $TIMER_FILE
 else if ($?HOME == 1) then
-   set TFile = $HOME/.timer-$sys_host
+   set TFile = $HOME/.timer-$hsy_host
 else
-   set TFile = /tmp/.timer-$sys_host
+   set TFile = /tmp/.timer-$hsy_host
 endif
 
 set TTF    = $TFile-tmp

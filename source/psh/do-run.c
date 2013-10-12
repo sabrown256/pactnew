@@ -321,7 +321,7 @@ static int init(rundes *st, char *os, char *host)
     nstrncpy(st->os,   BFMED, os, -1);
     nstrncpy(st->host, BFMED, host, -1);
 
-    csetenv("SYS_Host", st->host);
+    csetenv("HSY_Host", st->host);
 
 /* determine use of mpi-io-wrap */
     if (cdefenv("Wrap") == FALSE)
@@ -1015,7 +1015,7 @@ static char *cleanup_env(rundes *st)
 	cunsetenv("DBG_Flags");
 	cunsetenv("Force");
 	cunsetenv("Non_MPI_Force");
-	cunsetenv("SYS_Host");
+	cunsetenv("HSY_Host");
 	cunsetenv("MPI");
 	cunsetenv("MPICnd");
 	cunsetenv("MPIFE");

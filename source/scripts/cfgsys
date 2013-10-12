@@ -34,7 +34,7 @@ while ($#argv > 0)
            unsetenv SYS_Cfg
            unsetenv SYS_CfgMan
            unsetenv SYS_ID
-           unsetenv SYS_Host
+           unsetenv HSY_Host
            unsetenv SYS_TYPE
            unsetenv SYS_SITE
            unsetenv SYS_AIRoot
@@ -102,8 +102,8 @@ else
       setenv SYS_ID      `cfgman -d ../dev use`
    endif
 
-   if ($?SYS_Host == 0) then
-      setenv SYS_Host    `uname -n`
+   if ($?HSY_Host == 0) then
+      setenv HSY_Host    `uname -n`
    endif
 
    if ($?SYS_TYPE == 0) then
@@ -182,7 +182,7 @@ echo "setenv SYS_Arch     $SYS_Arch ; "
 echo "setenv SYS_Cfg      $SYS_Cfg ; "
 echo "setenv SYS_CfgMan   $SYS_CfgMan ; "
 echo "setenv SYS_ID       $SYS_ID ; "
-echo "setenv SYS_Host     $SYS_Host ; "
+echo "setenv HSY_Host     $HSY_Host ; "
 echo "setenv SYS_Prefix   $SYS_Prefix ; "
 echo "setenv SYS_TYPE     $SYS_TYPE ; "
 if ($?SYS_SITE == 0) then

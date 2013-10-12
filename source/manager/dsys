@@ -82,7 +82,7 @@ set EnvCsh  = $EtcDir/env-pact.csh
 
 set PCKS     = "-"
 set Tmp      = tmp_$SYS_ID
-set sys_host = `uname -n`
+set hsy_host = `uname -n`
 set Time     = time
 
 set DSYS    = $SYS_MngDir/dsys
@@ -465,7 +465,7 @@ switch ($Cmnd)
         set BeginTime = `$TIMER -r`
 
         if ("$Tgts" == "") then
-           NoteD $Log "Linking PACT on $sys_host ..."
+           NoteD $Log "Linking PACT on $hsy_host ..."
 
            flog $Log pushd ..
            flog $Log setenv SESSION_CONFIG $SYS_ID
@@ -482,7 +482,7 @@ switch ($Cmnd)
 
            flog $Log popd
         else
-           NoteD $Log "Linking packages on $sys_host ..."
+           NoteD $Log "Linking packages on $hsy_host ..."
            NoteD $Log ""
            while ($#Tgts > 0)
               set tgt = $Tgts[1]
@@ -509,7 +509,7 @@ switch ($Cmnd)
         endif
 
         NoteD $Log ""
-        NoteD $Log "PACT $Build on $sys_host complete ($RStatus/$ETime)"
+        NoteD $Log "PACT $Build on $hsy_host complete ($RStatus/$ETime)"
         NoteD $Log ""
 
         breaksw
@@ -1376,7 +1376,7 @@ CFG_DONE:
                             if ("$iscfg" != "") then
                                set hst   = $spec[1]
                                set ishst = `host $hst | awk '{ print $1 }'`
-                               Note $Log "   Host: |$hst| |$ishst| |$sys_host|"
+                               Note $Log "   Host: |$hst| |$ishst| |$hsy_host|"
                                if ("$ishst" != "Host") then
                                   set Cfgs = ( $Cfgs $c )
                                else
@@ -2743,7 +2743,7 @@ CFG_DONE:
         set ConflFile = $SYS_MngDir/Confl.Sources
         set HelpCode  = $SYS_MngDir/$0
         set Merges    = $SYS_MngDir/merge.el
-        set sys_host  = `uname -n`
+        set hsy_host  = `uname -n`
         set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
 
         set SCSRepository = ""
@@ -2828,7 +2828,7 @@ CFG_DONE:
            Note $Log " "
            Note $Log "$Operation (`date`)"
         endif
-        Note $Log "  Host: $sys_host running $OS"
+        Note $Log "  Host: $hsy_host running $OS"
         Note $Log "  User:  $WhoIAm             Date: `date`"
         Note $Log " "  
 
@@ -3134,7 +3134,7 @@ CFG_DONE:
 
 # NOTE: this is for the outer pact - the package level one is controlled by NA
            set Args = ( $Args -na 1 )
-           set Tmp  = /tmp/pact-test.$sys_host.$$
+           set Tmp  = /tmp/pact-test.$hsy_host.$$
 
            if ("$Tgts" == "") then
               ftee $Log pact $Args -f $EtcDir/Makefile test

@@ -84,10 +84,10 @@ set Root = $cwd:h
 set This = $cwd:t
 
 set Stamp     = `date +%m_%d_%H_%M`
-set sys_host  = `uname -n`
-set sys_uhost = `expr $sys_host : '\(.*\)\..*\..*'`
-if ("$sys_uhost" == "") then
-   set sys_uhost = $sys_host
+set hsy_host  = `uname -n`
+set hsy_uhost = `expr $hsy_host : '\(.*\)\..*\..*'`
+if ("$hsy_uhost" == "") then
+   set hsy_uhost = $hsy_host
 endif
 
 set RM = "rm -f"
@@ -440,16 +440,16 @@ PROGRESS:
    set HFile = $HostFile
 
    if (`expr $HFile : '.*:.*'` == 0) then
-      set sys_host = ""
-      set File = $HFile
+      set hsy_host = ""
+      set File     = $HFile
    else
-      set sys_host = `expr $HFile : '\(.*\):.*'`
-      set File = `expr $HFile : '.*:\(.*\)'`
+      set hsy_host = `expr $HFile : '\(.*\):.*'`
+      set File     = `expr $HFile : '.*:\(.*\)'`
    endif
 
-   if ("$sys_host" != "") then
+   if ("$hsy_host" != "") then
 
-      $SSH $sys_host do-net -p $Stamp $File
+      $SSH $hsy_host do-net -p $Stamp $File
 
    else
 
@@ -839,16 +839,16 @@ TESTHOSTS:
 
    set HFile = $Args[1]
    if (`expr $HFile : '.*:.*'` == 0) then
-      set sys_host = ""
-      set File = $HFile
+      set hsy_host = ""
+      set File     = $HFile
    else
-      set sys_host = `expr $HFile : '\(.*\):.*'`
-      set File = `expr $HFile : '.*:\(.*\)'`
+      set hsy_host = `expr $HFile : '\(.*\):.*'`
+      set File     = `expr $HFile : '.*:\(.*\)'`
    endif
 
-   if ("$sys_host" != "") then
+   if ("$hsy_host" != "") then
 
-      $SSH $sys_host do-net -g $File $Args
+      $SSH $hsy_host do-net -g $File $Args
 
    else
 
@@ -867,18 +867,18 @@ TESTHOSTS:
 
 HostLoop:
       if ("$Hosts" != "") then
-         set sys_uhost = $Hosts[1]
+         set hsy_uhost = $Hosts[1]
          shift Hosts
 
          call FORMAT()
 
-         set RHost = `$HSERVE -m $sys_uhost`
+         set RHost = `$HSERVE -m $hsy_uhost`
 	 if ("$RHost" != "-none-") then
             $SSH $RHost pwd >& /dev/null
             set LErr = $status
             if ($DownOnly == TRUE) then
                if ($LErr != 0) then
-                  echo "$sys_uhost "
+                  echo "$hsy_uhost "
                endif
             else if ($LErr == 0) then
                echo "   $Fill up"
@@ -904,16 +904,16 @@ CLEAROUT:
    set HFile = $HostFile
 
    if (`expr $HFile : '.*:.*'` == 0) then
-      set sys_host = ""
-      set File = $HFile
+      set hsy_host = ""
+      set File     = $HFile
    else
-      set sys_host = `expr $HFile : '\(.*\):.*'`
-      set File = `expr $HFile : '.*:\(.*\)'`
+      set hsy_host = `expr $HFile : '\(.*\):.*'`
+      set File     = `expr $HFile : '.*:\(.*\)'`
    endif
 
-   if ("$sys_host" != "") then
+   if ("$hsy_host" != "") then
 
-      $SSH $sys_host do-net -c $Stamp $File
+      $SSH $hsy_host do-net -c $Stamp $File
 
    else
 
@@ -1067,7 +1067,7 @@ INIT:
    endif
 
    Note $LogNet ""
-   Note $LogNet "Updating $SYS_ID from $sys_uhost according to $HostFile"
+   Note $LogNet "Updating $SYS_ID from $hsy_uhost according to $HostFile"
    if ("$CLArgs" != "") then
       Note $LogNet "Command line args: $CLArgs"
    endif
@@ -1464,7 +1464,7 @@ LOCKOUT:
          set WDir = $HOME/$WDir
       endif
 
-      if (($nhst == $sys_host) || ($nhst == $sys_uhost)) then
+      if (($nhst == $hsy_host) || ($nhst == $hsy_uhost)) then
          set TDir = $WDir:t
          set Lock = $WDir:h/$SYS_ID.$TDir.lock
 
@@ -1794,13 +1794,13 @@ return
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# FORMAT - fill ragged sys_uhost name with "." to column 20 
+# FORMAT - fill ragged host name with "." to column 20 
 
 FORMAT:
 
-   @ CCount = `echo $sys_uhost | wc -c`
+   @ CCount = `echo $hsy_uhost | wc -c`
    @ NDots  = 20 - $CCount
-   set Fill = "$sys_uhost "
+   set Fill = "$hsy_uhost "
    while ($NDots > 0)
       set Fill = "$Fill."
       @ NDots = $NDots - 1

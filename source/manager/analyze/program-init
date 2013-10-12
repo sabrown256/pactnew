@@ -20,6 +20,7 @@ include features/dld
 setenv ENV_VARS "Bits OS_Name \
                  DB_CFGMAN DB_HOST_SERVER \
                  DB_RUN_SIGNATURE DB_SITE_SIGNATURE DB_UPDATE_SYS \
+                 DO_RUN_DBG DO_RUN_MPI DO_RUN_CROSS \
                  GLIBC_VERSION BFD_VERSION \
                  HDF_VERSION MYSQL_VERSION SQLITE3_VERSION \
                  PNG_VERSION JPEG_VERSION \
@@ -39,16 +40,12 @@ setenv ENV_VARS "Bits OS_Name \
                  PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH PACT_FC_EXE \
                  PY_Inc PY_Lib PY_RPath PY_Path PY_Vers PY_Ext \
                  HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
-                 TRACKER_Exe HAVE_OPENMP \
+                 TEST_ADVISORY TRACKER_Exe HAVE_OPENMP \
                  CFE PFE CROSS_COMPILE CROSS_REF \
                  SYS_FltDir \
                  SYS_Prefix SYS_CfgDir SYS_TmpDir SYS_Arch SYS_ID \
                  SYS_SITE SYS_TYPE SYS_Root SYS_AIRoot SYS_ASRoot"
 
-setenv TEST_ADVISORY     ""
-setenv DO_RUN_DBG        none
-setenv DO_RUN_MPI        none
-setenv DO_RUN_CROSS      none
 setenv CONFIG_PATH       "local:std"
 
 # GOTCHA: this root may be different for CROSS_COMPILE
@@ -59,7 +56,6 @@ setenv RootLib  /usr/lib
 setenv SUFFIXES  '.i'
 
 LIB              = lib
-MAKE_Shared_Libs = FALSE
 WARN_PATTERN     =
 ERR_PATTERN      =
 SchemeSpokes     = netcdf
@@ -67,7 +63,15 @@ CSpokes          =
 ThreadLibExt     =
 PTHREAD_POSIX    = FALSE
 
+#--------------------------------------------------------------------------
+
 # initialize standard tools
+
+Tool ACC {
+}
+
+Tool AFC {
+}
 
 Tool CC {
 }
@@ -75,8 +79,17 @@ Tool CC {
 Tool CXX {
 }
 
+Tool DO_RUN {
+   DBG   = none
+   MPI   = none
+   CROSS = none
+}
+
 Tool FC {
    MOD_FLAG = -I
+}
+
+Tool IMF {
 }
 
 Tool LD {
@@ -89,14 +102,21 @@ Tool Lex {
 Tool Yacc {
 }
 
-Tool MAKE {
-}
-
 Tool GMAKE {
 }
 
 Tool JOBS {
    System = loner
+}
+
+Tool MAKE {
+   Shared_Libs = FALSE
+}
+
+Tool MYSQL {
+}
+
+Tool OPENSSL {
 }
 
 # PY contains the specifics of the python versions
@@ -106,86 +126,25 @@ Tool JOBS {
 Tool PY {
 }
 
+Tool Ranlib {
+}
+
+Tool SQLITE3 {
+}
+
+Tool TRACKER {
+}
+
+#--------------------------------------------------------------------------
+
 # initialize standard groups
 
-# PACT_CC_ refers to the Compiler Collection used to build PACT
-# rather than COMPILER_ which is overloaded to the extreme
-Group PACT {
-   CFG_FILE   = ""
-   CFG_ID     = ""
-   CC_FAMILY  = generic
-   CC_EXE     = `which cc`
-   CC_VERSION = ""
-   FC_FAMILY  = generic
-   FC_VERSION = ""
-}
-
-Group STD {
-   C      = X99
-   F      = F2003
-   IPC    = POSIX
-   POSIX  = 200112
-   XOPEN  = 600
-   MPI    = none
-   OPENMP = none
-}
-
-# Group SYS contains variables describing the system
-#   SYS_Arch      the system ID as defined by 'system-id'
-#   SYS_Cfg       the system config file
-#   SYS_CfgMan    full path to the cfgman utility
-#   SYS_ID        the system ID as defined by 'cfgman use'
-#   SYS_Host      the system host name
-#   SYS_Prefix    the temporary directory prefix, e.g. "z-"
-#   SYS_TYPE      the system type as defined by 'site-signature'
-#   SYS_SITE      the site of the system as defined by 'site-signature'
-#
-#   SYS_Base      the base directory containing sources
-#   SYS_Root      the root dev directory for this SYS_ID
-#   SYS_AIRoot    the architecture independent root directory
-#   SYS_ASRoot    the architecture specific root directory
-#   SYS_InstRoot  the root installation directory
-#
-#   SYS_AnaDir    the manager/analyze directory
-#   SYS_CfgDir    the temporary configuration directory
-#   SYS_FltDir    the directory containing filter files
-#   SYS_MngDir    the manager directory
-#   SYS_ScrDir    the scripts directory
-#   SYS_TmpDir    the temporary build/test directory
-
-Group SYS {
-   Arch     = ${SYS_Arch}
-   Cfg      = ""
-   CfgMan   = ${SYS_CfgMan}
-   Host     = ${SYS_Host}
-   ID       = ${SYS_ID}
-   Prefix   = "z-"
-   TYPE     = ""
-   SITE     = ""
-
-   Base     = ${SYS_Base}
-   Root     = ${SYS_Root}
-   AIRoot   = ""
-   ASRoot   = ""
-   InstRoot = none
-
-   AnaDir   = ${SYS_Base}/manager/analyze
-   CfgDir   = cfg-${SYS_ID}
-   FltDir   = ""
-   MngDir   = ${SYS_Base}/manager
-   ScrDir   = ${SYS_Base}/scripts
-   TmpDir   = ${SYS_Prefix}${SYS_ID}
-}
-
-Group DB {
-   CFGMAN         =
-   HOST_SERVER    = 
-   RUN_SIGNATURE  = 
-   SITE_SIGNATURE =
-   UPDATE_SYS     = 
-}
-
-Group OS {
+Group BFD {
+   Flags = 
+   Inc   =
+   Lib   = -lbfd
+   RPath = 
+   Path  = 
 }
 
 Group Cfg {
@@ -194,27 +153,32 @@ Group Cfg {
 Group Cfe {
 }
 
-Group RL {
+# cross compiling group
+Group CROSS {
+   COMPILE = FALSE
+   REF     = ""
 }
 
-Group SSL {
+# database group
+Group DB {
+   CFGMAN         =
+   HOST_SERVER    = 
+   RUN_SIGNATURE  = 
+   SITE_SIGNATURE =
+   UPDATE_SYS     = 
 }
 
-Group GSL {
+# detected, defined, or computed features - post analyze
+Group DFT {
 }
 
-Group GRAPHICS {
+# Distributed Parallel processing group
+Group DP {
+   Inc   = ""
+   Lib   = ""
+   RPath = /usr/lib
+   Path  = /usr/bin
 }
-
-Group Shared {
-   CC_Flags =
-   CC_Inc   =
-   LD_RPath =
-   LD_Flags =
-   LD_Lib   =
-}
-
-# define some groups for analysis
 
 # specifications for FPE patching
 Group FPE {
@@ -223,14 +187,40 @@ Group FPE {
    Flags += -fPIC
 }
 
-# Math library
-Group LibM {
+Group GSL {
 }
 
-Group BLAS {
+Group GRAPHICS {
 }
 
-Group LAPACK {
+Group HDF {
+   Inc   = 
+   Lib   = 
+   RPath = 
+   Path  = 
+}
+
+# Host SYstem information
+#   HSY_Host      the system host name
+
+Group HSY {
+   Host     = ${HSY_Host}
+}
+
+Group HW {
+}
+
+Group LEH {
+   TTY_ECHO  = TRUE
+   TTY_CRNL  = TRUE
+   TTY_VTIME = TRUE
+}
+
+# other machine dependent packages for PACT - e.g. RL
+Group MD {
+   Inc   = ""
+   Lib   = ""
+   Pck   = ""
 }
 
 # machine dependent graphics for PGS - e.g. X11
@@ -254,65 +244,144 @@ Group MDE {
    Pck   = ""
 }
 
-# other machine dependent packages for PACT - e.g. RL
-Group MD {
-   Inc   = ""
-   Lib   = ""
-   Pck   = ""
-}
-
 # Open MP group
 Group OpenMP {
    SharedFnc = no
 }
 
-# distributed processing group
-Group DP {
-   Inc   = ""
-   Lib   = ""
-   RPath = /usr/lib
-   Path  = /usr/bin
+Group OS {
 }
 
-Group Z {
+# PACT_CC_ refers to the Compiler Collection used to build PACT
+# rather than COMPILER_ which is overloaded to the extreme
+Group PACT {
+   CFG_FILE   = ""
+   CFG_ID     = ""
+   CC_FAMILY  = generic
+   CC_EXE     = `which cc`
+   CC_VERSION = ""
+   FC_FAMILY  = generic
+   FC_VERSION = ""
 }
 
-Group PNG {
+# PACT System group
+#   PSY_Arch      the system ID as defined by 'system-id'
+#   PSY_Cfg       the system config file
+#   PSY_CfgMan    full path to the cfgman utility
+#   PSY_ID        the system ID as defined by 'cfgman use'
+#   PSY_Prefix    the temporary directory prefix, e.g. "z-"
+#   PSY_TYPE      the system type as defined by 'site-signature'
+#   PSY_SITE      the site of the system as defined by 'site-signature'
+#
+#   PSY_Base      the base directory containing sources
+#   PSY_Root      the root dev directory for this PSY_ID
+#   PSY_AIRoot    the architecture independent root directory
+#   PSY_ASRoot    the architecture specific root directory
+#   PSY_InstRoot  the root installation directory
+#
+#   PSY_AnaDir    the manager/analyze directory
+#   PSY_CfgDir    the temporary configuration directory
+#   PSY_FltDir    the directory containing filter files
+#   PSY_MngDir    the manager directory
+#   PSY_ScrDir    the scripts directory
+#   PSY_TmpDir    the temporary build/test directory
+Group PSY {
 }
 
-Group JPEG {
+Group SYS {
+   Arch     = ${SYS_Arch}
+   Cfg      = ""
+   CfgMan   = ${SYS_CfgMan}
+   ID       = ${SYS_ID}
+   Prefix   = "z-"
+   TYPE     = ""
+   SITE     = ""
+
+   Base     = ${SYS_Base}
+   Root     = ${SYS_Root}
+   AIRoot   = ""
+   ASRoot   = ""
+   InstRoot = none
+
+   AnaDir   = ${SYS_Base}/manager/analyze
+   CfgDir   = cfg-${SYS_ID}
+   FltDir   = ""
+   MngDir   = ${SYS_Base}/manager
+   ScrDir   = ${SYS_Base}/scripts
+   TmpDir   = ${SYS_Prefix}${SYS_ID}
 }
 
-Group X11 {
+# requested features - pre-analyze
+Group RFT {
 }
 
-Group OGL {
+Group RL {
 }
 
-Group QD {
+Group Shared {
+   CC_Flags =
+   CC_Inc   =
+   LD_RPath =
+   LD_Flags =
+   LD_Lib   =
+}
+
+Group SHELL {
+}
+
+Group SMP {
 }
 
 Group SQL {
 }
 
-Group HDF {
-   Inc   = 
-   Lib   = 
-   RPath = 
-   Path  = 
+Group SSL {
 }
 
-Group BFD {
-   Flags = 
-   Inc   =
-   Lib   = -lbfd
-   RPath = 
-   Path  = 
+Group STD {
+   C      = X99
+   F      = F2003
+   IPC    = POSIX
+   POSIX  = 200112
+   XOPEN  = 600
+   MPI    = none
+   OPENMP = none
 }
 
-Group LEH {
-   TTY_ECHO  = TRUE
-   TTY_CRNL  = TRUE
-   TTY_VTIME = TRUE
+Group TEST {
+   ADVISORY = ""
+}
+
+#--------------------------------------------------------------------------
+
+# functionally related groups
+
+# graphics device groups
+Group JPEG {
+}
+
+Group OGL {
+}
+
+Group PNG {
+}
+
+Group QD {
+}
+
+Group X11 {
+}
+
+Group Z {
+}
+
+# Math library
+Group LibM {
+}
+
+Group BLAS {
+}
+
+Group LAPACK {
 }
 
