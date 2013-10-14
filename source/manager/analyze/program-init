@@ -42,14 +42,10 @@ setenv ENV_VARS "Bits OS_Name \
                  PY_Inc PY_Lib PY_RPath PY_Path PY_Vers PY_Ext \
                  HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
                  TEST_ADVISORY TRACKER_Exe HAVE_OPENMP \
+                 HSY_RootInc HSY_RootLib \
                  PSY_FltDir \
                  PSY_Prefix PSY_CfgDir PSY_TmpDir PSY_Arch PSY_ID \
                  PSY_SITE PSY_TYPE PSY_Root PSY_AIRoot PSY_ASRoot"
-
-# GOTCHA: this root may be different for CROSS_COMPILE
-# need script to figure out root includes for given compiler
-setenv RootInc  /usr/include
-setenv RootLib  /usr/lib
 
 setenv SUFFIXES  '.i'
 
@@ -165,7 +161,7 @@ Group DB {
 }
 
 # detected, defined, or computed features - post analyze
-Group DFT {
+Group DF {
 }
 
 # Distributed Parallel processing group
@@ -208,6 +204,12 @@ Group HDF {
 
 Group HSY {
    Host     = ${HSY_Host}
+
+# GOTCHA: this root may be different for CROSS_COMPILE
+# need script to figure out root includes for given compiler
+   RootInc  = /usr/include
+   RootLib  = /usr/lib
+
 }
 
 Group HW {
@@ -321,7 +323,7 @@ Group PSY {
 }
 
 # requested features - pre-analyze
-Group RFT {
+Group RF {
 }
 
 Group RL {

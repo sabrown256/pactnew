@@ -15,18 +15,18 @@ Note $ALog "----- analyze/opengl -----"
 Note $ALog "Analyze: opengl"
 Note $ALog ""
 
-dbmget $ALog OGL_Inc          =\? ""^        \
-             OGL_Lib          =\? ""^        \
-             OGL_RPath        =\? $RootLib^  \
-             OGL_Path         =\? /usr^      \
-             Std_UseOGL       =\? FALSE^     \
-             Cfe_CC_Exe^                     \
-             Cfe_CC_Flags^                   \
-             Cfe_LD_Flags^                   \
-             Cfe_LD_Lib^                     \
-             Cfe_LD_RPath^                   \
-             PACT_CC_VERSION^                \
-             OS_Name^                        \
+dbmget $ALog HSY_RootInc^                        \
+             OGL_Lib          =\? ""^            \
+             OGL_RPath        =\? $HSY_RootLib^  \
+             OGL_Path         =\? /usr^          \
+             Std_UseOGL       =\? FALSE^         \
+             Cfe_CC_Exe^                         \
+             Cfe_CC_Flags^                       \
+             Cfe_LD_Flags^                       \
+             Cfe_LD_Lib^                         \
+             Cfe_LD_RPath^                       \
+             PACT_CC_VERSION^                    \
+             OS_Name^                            \
              RPATH
 
 # if we have explicitly said we do not want OGL
@@ -58,8 +58,8 @@ EOF
    set lLibDirs = ( $lLibDirs $OGL_RPath )
 
    set Implicit = TRUE
-   set lIncDirs = ( $RootInc )
-   set lLibDirs = ( $lLibDirs /usr/lib64 $RootLib /usr/openwin/lib )
+   set lIncDirs = ( $HSY_RootInc )
+   set lLibDirs = ( $lLibDirs /usr/lib64 $HSY_RootLib /usr/openwin/lib )
    set lHdrs    = ( GL/gl.h GL/glx.h )
    set ASList   = ( a so )
    set lLib     = GL

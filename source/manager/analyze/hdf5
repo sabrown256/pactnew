@@ -15,22 +15,23 @@ Note $ALog "----- analyze/hdf5 -----"
 Note $ALog "Analyze: hdf5"
 Note $ALog ""
 
-dbmget $ALog HDF_Inc    =\? ""^        \
-             HDF_Lib    =\? ""^        \
-             HDF_RPath  =\? $RootLib^  \
-             HDF_Path   =\? /usr^      \
-             HDF5_SO    =\? ""^        \
-             Z_Lib      =\? "-lz"^     \
-             Cfe_CC_Exe^               \
-             Cfe_CC_Flags^             \
-             Cfe_LD_Flags^             \
-             Cfe_LD_Lib^               \
-             Cfe_LD_RPath^             \
-             PACT_CC_VERSION^          \
-             LD_Lib^                   \
-             LIB^                      \
-             LibM_Lib^                 \
-             Linking^                  \
+dbmget $ALog HSY_RootLib^                  \
+             HDF_Inc    =\? ""^            \
+             HDF_Lib    =\? ""^            \
+             HDF_RPath  =\? $HSY_RootLib^  \
+             HDF_Path   =\? /usr^          \
+             HDF5_SO    =\? ""^            \
+             Z_Lib      =\? "-lz"^         \
+             Cfe_CC_Exe^                   \
+             Cfe_CC_Flags^                 \
+             Cfe_LD_Flags^                 \
+             Cfe_LD_Lib^                   \
+             Cfe_LD_RPath^                 \
+             PACT_CC_VERSION^              \
+             LD_Lib^                       \
+             LIB^                          \
+             LibM_Lib^                     \
+             Linking^                      \
              RPATH
 
 # if we have explicitly said we do not want HDF5
@@ -69,7 +70,7 @@ EOF
       set lIncDirs = ( $lIncDirs $i/include )
       set lLibDirs = ( $lLibDirs $i/lib )
    end
-   set lIncDirs = ( $lIncDirs /usr/local/hdf5/include /usr/local/include $RootInc )
+   set lIncDirs = ( $lIncDirs /usr/local/hdf5/include /usr/local/include $HSY_RootInc )
    set lLibDirs = ( $lLibDirs /usr/local/hdf5/lib /usr/local/lib /usr/$LIB )
 
    set Implicit = TRUE

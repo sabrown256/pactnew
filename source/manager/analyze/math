@@ -13,7 +13,8 @@ source $Me:h/common
 
 Note $ALog "Analyze: math"
 
-dbmget $ALog GSL_Path    =\? ""^     \
+dbmget $ALog HSY_RootInc^            \
+             GSL_Path    =\? ""^     \
              BLAS_Path   =\? ""^     \
              LAPACK_Path =\? ""
 
@@ -24,8 +25,8 @@ set MathLib = ""
 
 # look for GNU Scientific library
 
-if (-d $RootInc/gsl) then
-   set rinc = $RootInc
+if (-d $HSY_RootInc/gsl) then
+   set rinc = $HSY_RootInc
    set root = $rinc:h
    flog $ALog setenv GSL_Path $root
    set MathLib = ( $MathLib gsl )

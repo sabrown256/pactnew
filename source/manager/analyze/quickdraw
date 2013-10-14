@@ -15,15 +15,16 @@ Note $ALog "----- analyze/quickdraw -----"
 Note $ALog "Analyze: QuickDrawn"
 Note $ALog ""
 
-dbmget $ALog QD_Inc           =\? ""^        \
-             QD_Lib           =\? ""^        \
-             QD_RPath         =\? $RootLib^  \
-             QD_Path          =\? /usr^      \
-             Std_UseQD        =\? FALSE^     \
-             Cfg_CC_Exe       =\? cc^        \
-             CC_Exe^                         \
-             LD_Flags^                       \
-             PACT_CC_VERSION^                \
+dbmget $ALog HSY_RootInc^                        \
+             QD_Inc           =\? ""^            \
+             QD_Lib           =\? ""^            \
+             QD_RPath         =\? $HYS_RootLib^  \
+             QD_Path          =\? /usr^          \
+             Std_UseQD        =\? FALSE^         \
+             Cfg_CC_Exe       =\? cc^            \
+             CC_Exe^                             \
+             LD_Flags^                           \
+             PACT_CC_VERSION^                    \
              OS_Name
 
 if ($OS_Name == Darwin) then

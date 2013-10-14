@@ -15,19 +15,20 @@ Note $ALog "----- analyze/jpeg -----"
 Note $ALog "Analyze: jpeg"
 Note $ALog ""
 
-dbmget $ALog JPEG_Inc     =\? ""^        \
-             JPEG_Lib     =\? ""^        \
-             JPEG_RPath   =\? $RootLib^  \
-             JPEG_Path    =\? /usr^      \
-             HAVE_JPEGLIB =\? FALSE^     \
-             Cfe_CC_Exe^                 \
-             Cfe_CC_Flags^               \
-             Cfe_LD_Flags^               \
-             Cfe_LD_Lib^                 \
-             Cfe_LD_RPath^               \
-             PACT_CC_VERSION^            \
-             PSY_ASRoot^                 \
-             LIB^                        \
+dbmget $ALog HSY_RootLib^                    \
+             JPEG_Inc     =\? ""^            \
+             JPEG_Lib     =\? ""^            \
+             JPEG_RPath   =\? $HSY_RootLib^  \
+             JPEG_Path    =\? /usr^          \
+             HAVE_JPEGLIB =\? FALSE^         \
+             Cfe_CC_Exe^                     \
+             Cfe_CC_Flags^                   \
+             Cfe_LD_Flags^                   \
+             Cfe_LD_Lib^                     \
+             Cfe_LD_RPath^                   \
+             PACT_CC_VERSION^                \
+             PSY_ASRoot^                     \
+             LIB^                            \
              RPATH
 
 # if we have explicitly said we do not want JPEG
@@ -64,7 +65,7 @@ EOF
       set lIncDirs = ( $lIncDirs $i/include )
       set lLibDirs = ( $lLibDirs $i/lib )
    end
-   set lIncDirs = ( $lIncDirs $PSY_ASRoot/include /usr/local/include $RootInc )
+   set lIncDirs = ( $lIncDirs $PSY_ASRoot/include /usr/local/include $HSY_RootInc )
    set lLibDirs = ( $lLibDirs $PSY_ASRoot/lib /usr/local/lib /usr/$LIB /$LIB )
 
    set Implicit = FALSE

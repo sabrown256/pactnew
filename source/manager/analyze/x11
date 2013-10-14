@@ -15,19 +15,20 @@ Note $ALog "----- analyze/x11 -----"
 Note $ALog "Analyze: x11"
 Note $ALog ""
 
-dbmget $ALog X11_Inc          =\? $RootInc^  \
-             X11_Lib          =\? ""^        \
-             X11_RPath        =\? $RootLib^  \
-             X11_Path         =\? /usr^      \
-             Std_UseX         =\? FALSE^     \
-             Cfe_CC_Exe^                     \
-             Cfe_CC_Flags^                   \
-             Cfe_LD_Flags^                   \
-             Cfe_LD_Lib^                     \
-             Cfe_LD_RPath^                   \
-             LIB^                            \
-             OS_Name^                        \
-             PACT_CC_VERSION^                \
+dbmget $ALog HSY_RootInc^                        \
+             X11_Inc          =\? $HSY_RootInc^  \
+             X11_Lib          =\? ""^            \
+             X11_RPath        =\? $HSY_RootLib^  \
+             X11_Path         =\? /usr^          \
+             Std_UseX         =\? FALSE^         \
+             Cfe_CC_Exe^                         \
+             Cfe_CC_Flags^                       \
+             Cfe_LD_Flags^                       \
+             Cfe_LD_Lib^                         \
+             Cfe_LD_RPath^                       \
+             LIB^                                \
+             OS_Name^                            \
+             PACT_CC_VERSION^                    \
              RPATH
 
 set msg = "no X11"

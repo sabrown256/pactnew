@@ -114,17 +114,17 @@ else
 endif
 flog $ALog setenv NM "$lNM"
 
-envini CPU  "unknown"
-envini FPU  "unknown"
+envini HSY_CPU  "unknown"
+envini HSY_FPU  "unknown"
 
 if ($OS_Name == Linux) then
    set i = `uname -m`
    if ($i == "alpha") then
-      flog $ALog setenv FPU "alpha"
+      flog $ALog setenv HSY_FPU "alpha"
    else if (`expr $i : 'i.86'` != 0) then
-      flog $ALog setenv FPU "x87"
-   else if ($CPU == "x86") then
-      flog $ALog setenv FPU "x87"
+      flog $ALog setenv HSY_FPU "x87"
+   else if ($HSY_CPU == "x86") then
+      flog $ALog setenv HSY_FPU "x87"
    endif
 endif
 

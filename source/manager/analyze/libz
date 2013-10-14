@@ -15,20 +15,21 @@ Note $ALog "----- analyze/libz -----"
 Note $ALog "Analyze: libz"
 Note $ALog ""
 
-dbmget $ALog Z_Inc     =\? ""^        \
-             Z_Lib     =\? ""^        \
-             Z_RPath   =\? $RootLib^  \
-             Z_Path    =\? /usr^      \
-             Cfe_CC_Exe^              \
-             Cfe_CC_Flags^            \
-             Cfe_LD_Flags^            \
-             Cfe_LD_Lib^              \
-             Cfe_LD_RPath^            \
-             PACT_CC_VERSION^         \
-             PSY_ASRoot^              \
-             LD_Lib^                  \
-             LIB^                     \
-             LibM_Lib^                \
+dbmget $ALog HSY_RootLib^                 \
+             Z_Inc     =\? ""^            \
+             Z_Lib     =\? ""^            \
+             Z_RPath   =\? $HSY_RootLib^  \
+             Z_Path    =\? /usr^          \
+             Cfe_CC_Exe^                  \
+             Cfe_CC_Flags^                \
+             Cfe_LD_Flags^                \
+             Cfe_LD_Lib^                  \
+             Cfe_LD_RPath^                \
+             PACT_CC_VERSION^             \
+             PSY_ASRoot^                  \
+             LD_Lib^                      \
+             LIB^                         \
+             LibM_Lib^                    \
              RPATH
 
 # if we have explicitly said we do not want libZ do NOT detect it
@@ -58,7 +59,7 @@ EOF
       set lIncDirs = ( $lIncDirs $i/include )
       set lLibDirs = ( $lLibDirs $i/lib )
    end
-   set lIncDirs = ( $lIncDirs $PSY_ASRoot/include /usr/local/include $RootInc )
+   set lIncDirs = ( $lIncDirs $PSY_ASRoot/include /usr/local/include $HSY_RootInc )
    set lLibDirs = ( $lLibDirs $PSY_ASRoot/lib /usr/local/lib /usr/$LIB /$LIB )
 
    set Implicit = TRUE

@@ -9,8 +9,6 @@
 
 setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
 
-setenv RootInc /bgsys/drivers/ppctoolchain.gomp/gnu-linux/powerpc-bgp-linux/sys-include
-
 run std/use-compiler /usr/local/tools/compilers/ibm/mpicc-4.3.2
 
 # specify DP group directly for BG/P since there is no variation
@@ -19,6 +17,10 @@ Group DP {
    Lib   = -lmpich.cnk
    RPath = /bgsys/drivers/ppcfloor/comm/lib
    Path  = /bgsys/drivers/ppcfloor/comm/bin
+}
+
+Group HSY {
+   RootInc = /bgsys/drivers/ppctoolchain.gomp/gnu-linux/powerpc-bgp-linux/sys-include
 }
 
 include 32-bit

@@ -19,7 +19,9 @@ Group DP {
    Path  = /bgsys/drivers/ppcfloor/comm/gcc/bin
 }
 
-setenv RootInc /bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/sys-include
+Group HSY {
+   RootInc = /bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/sys-include
+}
 
 include 64-bit
 include compilers/gnu-bgp

@@ -15,23 +15,24 @@ Note $ALog "----- analyze/sql -----"
 Note $ALog "Analyze: MySQL and SQLite"
 Note $ALog ""
 
-dbmget $ALog SQL_Inc    =\? ""^        \
-             SQL_Lib    =\? ""^        \
-             SQL_RPath  =\? $RootLib^  \
-             SQL_Path   =\? /usr^      \
-             MYSQL_SO   =\? ""^        \
-             SQLITE3_SO =\? ""^        \
-             HAVE_SQL   =\? FALSE^     \
-             Cfe_CC_Exe^               \
-             Cfe_CC_Flags^             \
-             Cfe_LD_Flags^             \
-             Cfe_LD_Lib^               \
-             Cfe_LD_RPath^             \
-             LD_Lib^                   \
-             LIB^                      \
-             Linking^                  \
-             LibM_Lib^                 \
-             PACT_CC_VERSION^          \
+dbmget $ALog HSY_RootInc^                  \
+             SQL_Inc    =\? ""^            \
+             SQL_Lib    =\? ""^            \
+             SQL_RPath  =\? $HSY_RootLib^  \
+             SQL_Path   =\? /usr^          \
+             MYSQL_SO   =\? ""^            \
+             SQLITE3_SO =\? ""^            \
+             HAVE_SQL   =\? FALSE^         \
+             Cfe_CC_Exe^                   \
+             Cfe_CC_Flags^                 \
+             Cfe_LD_Flags^                 \
+             Cfe_LD_Lib^                   \
+             Cfe_LD_RPath^                 \
+             LD_Lib^                       \
+             LIB^                          \
+             Linking^                      \
+             LibM_Lib^                     \
+             PACT_CC_VERSION^              \
              RPATH
 
 # if we have explicitly said we do not want SQL
@@ -77,7 +78,7 @@ EOF
       set lIncDirs = ( $lIncDirs $i/include )
       set lLibDirs = ( $lLibDirs $i/$LIB )
    end
-   set lIncDirs = ( $lIncDirs /usr/local/include $RootInc/mysql $RootInc )
+   set lIncDirs = ( $lIncDirs /usr/local/include $HSY_RootInc/mysql $HSY_RootInc )
 #   set lLibDirs = ( $lLibDirs /usr/local/lib /usr/$LIB/mysql /usr/lib/mysql /usr/$LIB /sw/lib/mysql )
    set lLibDirs = ( $lLibDirs /usr/local/lib /usr/lib/mysql /usr/$LIB /sw/lib/mysql )
 
@@ -98,7 +99,7 @@ EOF
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       set esql = TRUE
-      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$HSY_RootInc")) then
          set incl = ( $incl $PckInc )
       endif
       if ("$PckPath" != "") then
@@ -147,10 +148,10 @@ int main(int c, char **v)
 EOF
 
    if ($?SQL_Path == 1) then
-      set lIncDirs = ( $SQL_Path/include /usr/local/include $RootInc )
+      set lIncDirs = ( $SQL_Path/include /usr/local/include $HSY_RootInc )
       set lLibDirs = ( $SQL_Path/$LIB /usr/local/lib /usr/$LIB )
    else
-      set lIncDirs = ( /usr/local/include $RootInc )
+      set lIncDirs = ( /usr/local/include $HSY_RootInc )
       set lLibDirs = ( /usr/local/lib /usr/$LIB )
    endif
    set Implicit = FALSE
@@ -170,7 +171,7 @@ EOF
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       set esql = TRUE
-      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$HSY_RootInc")) then
          set incl = ( $incl $PckInc )
       endif
       if ("$PckPath" != "") then
@@ -219,10 +220,10 @@ int main(int c, char **v)
 EOF
 
    if ($?SQL_Path == 1) then
-      set lIncDirs = ( $SQL_Path/include /usr/local/include $RootInc )
+      set lIncDirs = ( $SQL_Path/include /usr/local/include $HSY_RootInc )
       set lLibDirs = ( $SQL_Path/lib /usr/local/lib /usr/$LIB )
    else
-      set lIncDirs = ( /usr/local/include $RootInc )
+      set lIncDirs = ( /usr/local/include $HSY_RootInc )
       set lLibDirs = ( /usr/local/lib /usr/$LIB )
    endif
    set Implicit = FALSE
@@ -237,7 +238,7 @@ EOF
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       set esql = TRUE
-      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$HSY_RootInc")) then
          set incl = ( $incl $PckInc )
       endif
       if ("$PckPath" != "") then

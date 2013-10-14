@@ -15,23 +15,24 @@ Note $ALog "----- analyze/png -----"
 Note $ALog "Analyze: png"
 Note $ALog ""
 
-dbmget $ALog PNG_Inc     =\? ""^        \
-             PNG_Lib     =\? ""^        \
-             PNG_RPath   =\? $RootLib^  \
-             PNG_Path    =\? /usr^      \
-             Z_Lib       =\? ""^        \
-             Z_Path      =\? /usr^      \
-             HAVE_PNGLIB =\? FALSE^     \
-             Cfe_CC_Exe^                \
-             Cfe_CC_Flags^              \
-             Cfe_LD_Flags^              \
-             Cfe_LD_Lib^                \
-             Cfe_LD_RPath^              \
-             PACT_CC_VERSION^           \
-             PSY_ASRoot^                \
-             LD_Lib^                    \
-             LIB^                       \
-             LibM_Lib^                  \
+dbmget $ALog HSY_RootInc^                   \
+             PNG_Inc     =\? ""^            \
+             PNG_Lib     =\? ""^            \
+             PNG_RPath   =\? $HSY_RootLib^  \
+             PNG_Path    =\? /usr^          \
+             Z_Lib       =\? ""^            \
+             Z_Path      =\? /usr^          \
+             HAVE_PNGLIB =\? FALSE^         \
+             Cfe_CC_Exe^                    \
+             Cfe_CC_Flags^                  \
+             Cfe_LD_Flags^                  \
+             Cfe_LD_Lib^                    \
+             Cfe_LD_RPath^                  \
+             PACT_CC_VERSION^               \
+             PSY_ASRoot^                    \
+             LD_Lib^                        \
+             LIB^                           \
+             LibM_Lib^                      \
              RPATH
 
 # if we have explicitly said we do not want PNG
@@ -77,7 +78,7 @@ EOF
    end
    set lLibDirs = ( $lLibDirs $lrpath )
    set lLibDirs = ( $lLibDirs $PSY_ASRoot/lib /usr/local/lib /usr/$LIB /$LIB )
-   set lIncDirs = ( $lIncDirs $PSY_ASRoot/include /usr/local/include $RootInc )
+   set lIncDirs = ( $lIncDirs $PSY_ASRoot/include /usr/local/include $HSY_RootInc )
 
    set Implicit = FALSE
    set lHdrs    = ( png.h )
