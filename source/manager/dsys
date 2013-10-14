@@ -610,13 +610,13 @@ switch ($Cmnd)
 # do not bother with core files for the many analyzers
         limit coredumpsize 0 >& /dev/null
 
-        setenv ConfigDir ""
+        setenv PSY_CONFIG_PATH ""
         if ($?PSY_SITE == 1) then
-           set lsite     = `echo $PSY_SITE | tr "[A-Z]" "[a-z]"`
-           setenv ConfigDir  "$ConfigDir local/$lsite"
+           set lsite = `echo $PSY_SITE | tr "[A-Z]" "[a-z]"`
+           setenv PSY_CONFIG_PATH  "$PSY_CONFIG_PATH local/$lsite"
            unset lsite
         endif
-        setenv ConfigDir  "$ConfigDir local std"
+        setenv PSY_CONFIG_PATH  "$PSY_CONFIG_PATH local std"
 
         setenv CCompiler  gnu
 
@@ -696,7 +696,7 @@ switch ($Cmnd)
                    breaksw
               case -f:
                    shift
-                   setenv ConfigDir   "$1 $ConfigDir"
+                   setenv PSY_CONFIG_PATH   "$1 $PSY_CONFIG_PATH"
                    breaksw
               case -F:
                    set PArgs = ( $PArgs "-F" )
@@ -919,7 +919,7 @@ switch ($Cmnd)
         Note $Log "PSY_ID    = $PSY_ID"
         Note $Log "PSY_Root   = $PSY_Root"
         Note $Log "Args      = $nargs"
-        Note $Log "ConfigDir = $ConfigDir"
+        Note $Log "PSY_CONFIG_PATH = $PSY_CONFIG_PATH"
 
         flog $Log umask
 
@@ -1182,7 +1182,7 @@ switch ($Cmnd)
            unset dbcfg
 
         else
-           NoteD $Log "There is no $Configuration in $ConfigDir"
+           NoteD $Log "There is no $Configuration in $PSY_CONFIG_PATH"
            set RStatus = 3
         endif
 

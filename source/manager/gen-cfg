@@ -57,7 +57,7 @@ set croot    = $features[1]
 shift features
 
 if ($vrb == TRUE) then
-   echo "Config directories: $ConfigDir"
+   echo "Config directories: $PSY_CONFIG_PATH"
    echo "Root config file:   $croot"
    echo "Feature list:       $features"
 endif

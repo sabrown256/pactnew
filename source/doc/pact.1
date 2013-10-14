@@ -787,22 +787,22 @@ NoExe
    will be linked and installed (e.g. no ULTRA or SX).
    Default is "FALSE".
 
-PubInc
+PSY_PubInc
    Specification for C compiler to find PACT include files
    in some public directory.  This is primarily used for
    developers who are working on a single package but need
    headers from other parts of PACT. This follows the
-   PSY_InstRoot variable by default so any resetting of PubInc
+   PSY_InstRoot variable by default so any resetting of PSY_PubInc
    must come after the last setting of PSY_InstRoot (e.g.
    -I /home/pact/include).
    Default is "-I /usr/local/include".
 
-PubLib
+PSY_PubLib
    Specification for the loader to find PACT library files
    in some public directory.  This is primarily used for
    developers who are working on a single package but need
    libraries from other parts of PACT. This follows the
-   PSY_InstRoot variable by default so any resetting of PubLib
+   PSY_InstRoot variable by default so any resetting of PSY_PubLib
    must come after the last setting of PSY_InstRoot (e.g.
    -L /home/pact/lib).
    Default is "-L /usr/local/lib".

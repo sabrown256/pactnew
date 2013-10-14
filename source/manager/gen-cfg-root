@@ -15,8 +15,8 @@ set cfg = $1
 
 set features = ( `echo $cfg | sed 's/-/ /g'` )
 
-if ($?ConfigDir == 0) then
-   setenv ConfigDir "local std"
+if ($?PSY_CONFIG_PATH == 0) then
+   setenv PSY_CONFIG_PATH "local std"
 endif
 
 set croot = "none"
@@ -24,7 +24,7 @@ set ok    = FALSE
 @ i = $#features
 while (($i > 0) && ($ok == FALSE))
    set lname = `echo $features[1-$i] | sed 's/ /-/g'`
-   foreach d ($ConfigDir)
+   foreach d ($PSY_CONFIG_PATH)
       if (-f $d/$lname) then
          set croot = $d/$lname
          set ok    = TRUE
