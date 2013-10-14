@@ -29,7 +29,6 @@ dbmget $Log BFD_Version^              \
             BUILD_PROFILE^            \
             CC_Exe^                   \
             CEFile^                   \
-            CPU^                      \
             SHELL_Default^            \
             DP_Lib^                   \
             DP_Inc^                   \
@@ -37,7 +36,6 @@ dbmget $Log BFD_Version^              \
             FC_ID_UNDERSCORE^         \
             FC_INT_PTR_DIFFER^        \
             FC_INTEGER_C^             \
-            FPU^                      \
             GETSOCKOPT_TYPE^          \
             OS_Name^                  \
             OS_Release^               \
@@ -111,6 +109,8 @@ dbmget $Log BFD_Version^              \
             Std_UseX^                 \
             Std_UseOGL^               \
             Std_UseQD^                \
+            HSY_CPU^                  \
+            HSY_FPU^                  \
             PSY_Arch^                 \
             PSY_Cfg^                  \
             PSY_FltDir^               \
@@ -149,8 +149,8 @@ dbmget $Log BFD_Version^              \
     set THE_DATE = `cat .pact-version`
     Note $STDOUT '#define PACT_VERSION        '$q${THE_DATE}$q
 
-    Note $STDOUT "#define CPU_TYPE            $CPU"
-    Note $STDOUT "#define FPU_TYPE            $FPU"
+    Note $STDOUT "#define CPU_TYPE            $HSY_CPU"
+    Note $STDOUT "#define FPU_TYPE            $HSY_FPU"
     Note $STDOUT '#define PSY_Arch            '$q${PSY_Arch}$q
     Note $STDOUT '#define PSY_TYPE            '$q${PSY_TYPE}$q
     Note $STDOUT '#define PSY_ID              '$q${PSY_ID}$q

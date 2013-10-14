@@ -17,7 +17,9 @@ Group DP {
    Path  = /bgsys/drivers/ppcfloor/comm/xl/bin
 }
 
-setenv RootInc /opt/ibmcmp/vac/bg/12.1/include
+Group HSY {
+   RootInc = /opt/ibmcmp/vac/bg/12.1/include
+}
 
 include 64-bit
 include compilers/xlc-bgq

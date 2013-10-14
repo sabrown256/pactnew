@@ -192,8 +192,8 @@ if (-f local/mpi-db) then
 
 else
    set lbin = /usr/bin
-   set llib = $RootLib
-   set linc = $RootInc
+   set llib = $HSY_RootLib
+   set linc = $HSY_RootInc
    set link = mpi
    call TRY($lbin, end, $llib, end, $linc, end, $link)
 endif

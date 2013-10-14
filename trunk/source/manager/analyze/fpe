@@ -20,7 +20,7 @@ set fpe = ""
 
 # check for standard FPE handling
 
-if (-e $RootInc/fenv.h) then
+if (-e $HSY_RootInc/fenv.h) then
    setenv HAVE_ANSI_C9X_FENV TRUE
    set fpe = ( $fpe "ANSI C99" )
 else

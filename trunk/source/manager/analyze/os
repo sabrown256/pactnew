@@ -22,7 +22,8 @@ Note $ALog ""
 
 set los = ( `uname -s` )
 
-dbmget $ALog OSX_Version  =\? ""^  \
+dbmget $ALog HSY_RootInc^          \
+             OSX_Version  =\? ""^  \
              OS_Name      =\? "$los"
 
 unset los
@@ -34,7 +35,7 @@ endif
 # remove parens - they confuse shells later on
 fexvar $ALog OS_Release uname -r @b sed 's/(/,/g' @o sed 's/)/,/g'
 
-Note $ALog "RootInc   = $RootInc"
+Note $ALog "HSY_RootInc   = $HSY_RootInc"
 if ($CROSS_COMPILE == MINGW32) then
    setenv OS_Type     MSW
    setenv OS_Name     WIN32
@@ -46,9 +47,9 @@ else if ($CROSS_COMPILE == MINGW64) then
    setenv OS_Release  mingw64
 
 else if (("$OS_Name" == "Windows_NT") || \
-    (("$OS_Name" == "Linux") && (-e $RootInc/termio.h)) || \
+    (("$OS_Name" == "Linux") && (-e $HSY_RootInc/termio.h)) || \
     ($?IBM_BGP == 1) || ($?IBM_BGQ == 1) || \
-    (-e $RootInc/sys/termio.h)) then
+    (-e $HSY_RootInc/sys/termio.h)) then
    setenv OS_Type "SYSV"
 
 else

@@ -16,7 +16,8 @@ Note $ALog "----- analyze/mpi -----"
 Note $ALog "Analyze: mpi"
 Note $ALog ""
 
-dbmget $ALog Save_CC            =\? "cc"^    \
+dbmget $ALog HSY_RootInc^                    \
+             Save_CC            =\? "cc"^    \
              STD_MPI            =\? 1.0^     \
              USE_MPI            =\? FALSE^   \
              HAVE_OPENMPI       =\? FALSE^   \
@@ -51,7 +52,7 @@ set lParComm = ""
 
 Note $ALog "DP_Inc = $DP_Inc"
 
-foreach j ($DP_Inc $RootInc)
+foreach j ($DP_Inc $HSY_RootInc)
    set k = `echo $j | sed 's/-I//g'`
    Note $ALog "Looking for include directory $k"
 

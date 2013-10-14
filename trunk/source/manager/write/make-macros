@@ -28,10 +28,10 @@ dbmget $Log Bits^              \
             MAKE_Shared_Libs^  \
             MAKE_Strategy^     \
             EtcDir^            \
-            FPU^               \
-            HAVE_GNU_FENV^     \
             IncDir^            \
             INSTALL^           \
+            HSY_FPU^           \
+            HAVE_GNU_FENV^     \
             NoExe^             \
             Ranlib_Exe^        \
             PSY_Cfg^           \
@@ -247,7 +247,7 @@ set LibVers = 1
     Note $STDOUT '#'
     Note $STDOUT 'patch-fpe :'
 
-    if ("$FPU" == "x87") then
+    if ("$HSY_FPU" == "x87") then
        set lcc = ( $FPE_Exe $FPE_Flags )
 
        Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
@@ -256,7 +256,7 @@ set LibVers = 1
        Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpex86.o 2> /dev/null ; \'
        Note $STDOUT '          ${RM} mlfpex86.o 2> /dev/null )'
 
-    else if ("$FPU" == "ppc") then
+    else if ("$HSY_FPU" == "ppc") then
        set lcc = ( $FPE_Exe -g -Wall )
        if ($?Bits == 1) then
           set lcc = ( $lcc -m$Bits )

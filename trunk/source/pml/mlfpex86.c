@@ -46,9 +46,6 @@
 
 #ifdef __GNUC__
 
-/* too many codes define this - so get rid of it in this context */
-#undef CPU
-
 #define GCC_FPE_X86
 #include <score.h>
 

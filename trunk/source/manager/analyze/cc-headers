@@ -76,8 +76,8 @@ if ($CDecls == TRUE) then
 
    Note $Tmp '      set GotIt = FALSE'
    Note $Tmp '      foreach file ($Hdrs)'
-   Note $Tmp '         if (-e "$RootInc/$file") then'
-   Note $Tmp '            egrep "$Pattn" $RootInc/$file >>& /dev/null'
+   Note $Tmp '         if (-e "$HSY_RootInc/$file") then'
+   Note $Tmp '            egrep "$Pattn" $HSY_RootInc/$file >>& /dev/null'
    Note $Tmp '            if ($status == 0) then'
    Note $Tmp '               set GotIt = TRUE'
    Note $Tmp '               break'

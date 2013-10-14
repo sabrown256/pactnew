@@ -12,22 +12,23 @@ Note $ALog "----- analyze/ssl -----"
 Note $ALog "Analyze: openssl"
 Note $ALog ""
 
-dbmget $ALog SSL_Inc      =\? ""^        \
-             SSL_Lib      =\? ""^        \
-             SSL_RPath    =\? $RootLib^  \
-             SSL_Path     =\? /usr^      \
-             OPENSSL_SO   =\? ""^        \
-             HAVE_OPENSSL =\? FALSE^     \
-             Cfe_CC_Exe^                 \
-             Cfe_CC_Flags^               \
-             Cfe_LD_Flags^               \
-             Cfe_LD_Lib^                 \
-             Cfe_LD_RPath^               \
-             LD_Lib^                     \
-             LIB^                        \
-             Linking^                    \
-             LibM_Lib^                   \
-             PACT_CC_VERSION^            \
+dbmget $ALog HSY_RootInc^                    \
+             SSL_Inc      =\? ""^            \
+             SSL_Lib      =\? ""^            \
+             SSL_RPath    =\? $HSY_RootLib^  \
+             SSL_Path     =\? /usr^          \
+             OPENSSL_SO   =\? ""^            \
+             HAVE_OPENSSL =\? FALSE^         \
+             Cfe_CC_Exe^                     \
+             Cfe_CC_Flags^                   \
+             Cfe_LD_Flags^                   \
+             Cfe_LD_Lib^                     \
+             Cfe_LD_RPath^                   \
+             LD_Lib^                         \
+             LIB^                            \
+             Linking^                        \
+             LibM_Lib^                       \
+             PACT_CC_VERSION^                \
              RPATH
 
 # if we have explicitly said we do not want OPENSSL
@@ -75,7 +76,7 @@ EOF
       set lIncDirs = ( $lIncDirs $i/include )
       set lLibDirs = ( $lLibDirs $i/$LIB )
    end
-   set lIncDirs = ( $lIncDirs /usr/local/include $RootInc/openssl $RootInc )
+   set lIncDirs = ( $lIncDirs /usr/local/include $HSY_RootInc/openssl $HSY_RootInc )
 #   set lLibDirs = ( $lLibDirs /usr/local/lib /usr/$LIB/openssl /usr/lib/openssl /usr/$LIB /sw/lib/openssl )
    set lLibDirs = ( $lLibDirs /usr/local/lib /usr/lib/openssl /usr/$LIB /sw/lib/openssl )
 
@@ -95,7 +96,7 @@ EOF
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       set essl = TRUE
-      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$HSY_RootInc")) then
          set incl = ( $incl $PckInc )
       endif
       if ("$PckPath" != "") then

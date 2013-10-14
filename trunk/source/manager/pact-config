@@ -150,7 +150,7 @@ set lConfigVars = ( $lConfigVars LD_Exe LD_Flags LD_Lib )
 setenv PSY_InstRoot   none
 setenv PSY_PubInc     "-I$PSY_InstRoot/include"
 setenv PSY_PubLib     "-L$PSY_InstRoot/lib"
-setenv FPU            unknown
+setenv HSY_FPU        unknown
 setenv Globals        ""
 
 # we need the back slash treatment now - later will not do

@@ -68,6 +68,7 @@ dbmget $ALog AbsoluteDeb^              \
              GRAPHICS_Flags   =\? ""^  \
    	     HAVE_PNGLIB^              \
    	     HAVE_JPEGLIB^             \
+             HSY_Rootinc^              \
              Std_UseOGL^               \
              Std_UseQD^                \
              Std_UseX^                 \
@@ -237,7 +238,7 @@ dbmget $ALog AbsoluteDeb^              \
 
 # eliminate redundancies in MDx_Inc especially /usr/include
 # NOTE: compilers look at /usr/include by default not
-# necessarily $RootInc
+# necessarily $HSY_RootInc
 
    Separator $ALog
 
@@ -302,7 +303,7 @@ dbmget $ALog AbsoluteDeb^              \
 
    Separator $ALog
 
-   if ("$Cfe_CC_Inc" == "$RootInc") then
+   if ("$Cfe_CC_Inc" == "$HSY_RootInc") then
       flog $ALog setenv Cfe_CC_Inc ""
    endif
 

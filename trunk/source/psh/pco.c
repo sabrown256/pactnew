@@ -1425,8 +1425,8 @@ static void setup_analyze_env(client *cl, char *base)
     dbinitv(cl, "LD_RPath",  "");
     dbinitv(cl, "LD_Flags",  "");
 
-    dbinitv(cl, "CPU",       "unknown");
-    dbinitv(cl, "FPU",       "unknown");
+    dbinitv(cl, "HSY_CPU",   "unknown");
+    dbinitv(cl, "HSY_FPU",   "unknown");
     dbinitv(cl, "DP_BE",     "");
     dbinitv(cl, "DP_FE",     "%s/do-run -m", st.dir.bin);
 

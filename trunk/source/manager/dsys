@@ -594,7 +594,7 @@ switch ($Cmnd)
 
 # do not let the current environment dictate compiler choices
         unsetenv Bits
-        unsetenv CPU
+        unsetenv HSY_CPU
         unsetenv HAVE_ANSI_C9X_COMPLEX
         unsetenv HAVE_READLINE
         unsetenv PACT_CC_FAMILY

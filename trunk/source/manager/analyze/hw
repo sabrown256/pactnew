@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # HW - analyze the hardware
-#    - Computes: CPU, FPU
+#    - Computes: HSY_CPU, HSY_FPU
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -20,49 +20,49 @@ if ($?PSY_Arch == 0) then
    setenv PSY_Arch `../scripts/system-id`
 endif
 
-dbmget $ALog CPU =\? "unknown"^  \
-             FPU =\? "unknown"
+dbmget $ALog HSY_CPU =\? "unknown"^  \
+             HSY_FPU =\? "unknown"
 
 set HostHW  = `uname -m`
 
-if ($CPU == "unknown") then
-   setenv CPU "$HostHW"
+if ($HSY_CPU == "unknown") then
+   setenv HSY_CPU "$HostHW"
    if ("$HostHW" =~ i*86) then
-      setenv CPU  ia32
+      setenv HSY_CPU  ia32
    else if ("$PSY_Arch" =~ osx-*-x86) then
-      setenv CPU  ia32
+      setenv HSY_CPU  ia32
    else if ("$PSY_Arch" =~ osx-*-ppc) then
-      setenv CPU  ppc
+      setenv HSY_CPU  ppc
    endif
 endif
 
-if ($FPU == "unknown") then
+if ($HSY_FPU == "unknown") then
    if ("$HostHW" == "alpha") then
-      setenv FPU  alpha
+      setenv HSY_FPU  alpha
    else if ("$HostHW" =~ sun*) then
-      setenv FPU  sparc
+      setenv HSY_FPU  sparc
    else if ("$HostHW" == x86_64) then
-      setenv FPU  x87
+      setenv HSY_FPU  x87
    else if ("$HostHW" =~ i*86) then
-      setenv FPU  x87
+      setenv HSY_FPU  x87
    else if ("$PSY_Arch" =~ osx-*-x86) then
-      setenv FPU  x87
+      setenv HSY_FPU  x87
    else if ("$PSY_Arch" =~ osx-*-ppc) then
-      setenv FPU  ppc
+      setenv HSY_FPU  ppc
    endif
 endif
 
 set msg = "Hardware: $HostHW"
-if ("$CPU" != "unknown") then
-   set msg = "$msg $CPU"
+if ("$HSY_CPU" != "unknown") then
+   set msg = "$msg $HSY_CPU"
 endif
-if ("$FPU" != "unknown") then
-   set msg = "$msg $CPU ($FPU)"
+if ("$HSY_FPU" != "unknown") then
+   set msg = "$msg $HSY_CPU ($HSY_FPU)"
 endif
 NoteD $ALog "   $msg"
 
-dbmset $ALog CPU = $CPU^  \
-             FPU = $FPU
+dbmset $ALog HSY_CPU = $HSY_CPU^  \
+             HSY_FPU = $HSY_FPU
 
 exit(0)
 
