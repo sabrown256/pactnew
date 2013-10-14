@@ -23,11 +23,11 @@ Separator $Log
 NoteD $Log "   C Environment Configuration - scdecls.h"
 Note $Log ""
 
-dbmget $Log CFE^             \
-            Cfe_CC_Exe^      \
+dbmget $Log Cfe_CC_Exe^      \
             Cfe_CC_Flags^    \
             Cfe_LD_Flags^    \
             Cfe_LD_RPath^    \
+            CROSS_FE^        \
             IncDir^          \
             PSY_Base^        \
             PSY_CfgDir^      \
@@ -63,8 +63,8 @@ dbmget $Log CFE^             \
     if ($status == 0) then
 
 # NOTE: coded this way to throw away message to stderr
-# which may come from CFE instead of score-config
-       flog $Log ( ( $CFE ./score-config >> $STDOUT ) >& /dev/null )
+# which may come from CROSS_FE instead of score-config
+       flog $Log ( ( $CROSS_FE ./score-config >> $STDOUT ) >& /dev/null )
        if ($status == 0) then
           flog $Log $RM ./score-config
           Note $Log "score-config execution succeeded"

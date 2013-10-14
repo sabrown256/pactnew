@@ -24,7 +24,7 @@ if (0) then
          NoteD $Log -n "                    $msg"
          Note $Log ""
 
-         (echo "hello" ; echo "end") | $CFE $exe >&! tpcb.res
+         (echo "hello" ; echo "end") | $CROSS_FE $exe >&! tpcb.res
          set xstatus = $status
          if ($xstatus == 123) then
             set xstatus = 251

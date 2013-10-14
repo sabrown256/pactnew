@@ -66,8 +66,8 @@ flog $Log date
 
 source ../../tests/common-make
 
-if ($?CFE == 0) then
-   flog $Log setenv CFE
+if ($?CROSS_FE == 0) then
+   flog $Log setenv CROSS_FE
 endif
 
 setenv SC_EXEC_CPU_FACTOR   1024

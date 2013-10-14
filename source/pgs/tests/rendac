@@ -22,7 +22,7 @@ set io  = ftee
 
       if ($xstatus == 0) then
          flog $Log ls -l gspsta.ps $RefDir/gspsta.ps
-#         flog $Log $CFE $PSDIFF gspsta.ps $RefDir/gspsta.ps
+#         flog $Log $CROSS_FE $PSDIFF gspsta.ps $RefDir/gspsta.ps
 #         set xstatus = $status
       endif
 

@@ -14,10 +14,10 @@ source ../../../scripts/test-env
 
 set shopt = ( -e )
 
-if ("$CFE" == "") then
-   set cfe = ""
+if ("$CROSS_FE" == "") then
+   set cross_fe = ""
 else
-   set cfe = ( $CFE -v )
+   set cross_fe = ( $CROSS_FE -v )
 endif
 
 set do_syntax = 0

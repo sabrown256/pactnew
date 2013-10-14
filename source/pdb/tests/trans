@@ -51,7 +51,6 @@ else
          set opt = ( $ostd $TFile -f $file )
          source ../../../scripts/test-run
 
-#         flog $Log $CFE $exe $ostd $TFile -f $file
          if ($xstatus >= 254) then
             NoteD $Log -n "o"
          else if ($xstatus != 0) then

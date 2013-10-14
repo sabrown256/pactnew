@@ -30,7 +30,7 @@ set io  = ultest.tmp
          awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' ultest.ps > ultest.ps.tmp
          flog $Log mv ultest.ps.tmp ultest.ps
 
-         flog $Log $cfe $PSDIFF ultest.ps $RefDir/ultest.ps
+         flog $Log $cross_fe $PSDIFF ultest.ps $RefDir/ultest.ps
          if ($status != 0) then
             set xstatus = 252
          else

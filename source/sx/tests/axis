@@ -22,7 +22,7 @@ set io  = flog
    source ../../../scripts/test-run
 
    if ($xstatus == 0) then
-      flog $Log ( $CFE $PSDIFF sxaxs.ps $RefDir/sxaxs.ps > sxaxs.ps.diff )
+      flog $Log ( $CROSS_FE $PSDIFF sxaxs.ps $RefDir/sxaxs.ps > sxaxs.ps.diff )
       set xstatus = $status
    endif
 

@@ -128,9 +128,9 @@ if ($OS_Name == Linux) then
    endif
 endif
 
-envini CFE        ""
-envini PFE        "$DORUN -m"
-envini BE         ""
+envini CROSS_FE   ""
+envini DP_FE      "$DORUN -m"
+envini DP_BE      ""
 envini CC_Inc     ""
 envini CC_Flags   ""
 envini LD_Lib     ""

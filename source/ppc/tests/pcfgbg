@@ -140,7 +140,7 @@ while ($iline <= $nlines)
 # run via pipe, socket, and pty
    foreach i ("-p" "-s" "-t")
       Separator $Log
-      flog $Log $CFE $DMNZ $exe -q -d $i /bin/csh -cf "$c"
+      flog $Log $CROSS_FE $DMNZ $exe -q -d $i /bin/csh -cf "$c"
       set LStat = $status
       if (($LStat == 0) || ("$ct" =~ stty*)) then
          Note $Log "passed"

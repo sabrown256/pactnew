@@ -33,7 +33,7 @@ set io  = ftee
 
       if (($xstatus == 0) && ("$Valgrind" == "")) then
          flog $Log ls -l gspsts.ps $RefDir/gspsts.ps
-         flog $Log $CFE $PSDIFF gspsts.ps $RefDir/gspsts.ps
+         flog $Log $CROSS_FE $PSDIFF gspsts.ps $RefDir/gspsts.ps
          set xstatus = $status
       endif
 

@@ -63,10 +63,10 @@ Note $ALog "Temporary file base: $Tmp"
 Note $ALog "Manager directory: $psy_mngdir"
 Note $ALog ""
 
-dbmget $ALog BE    =\? ""^           \
-             CList =\? ""^           \
-             PFE   =\? "do-run -m"^  \
-             CFE   =\? ""
+dbmget $ALog CList    =\? ""^           \
+             CROSS_FE =\? ""^           \
+             DP_BE    =\? ""^           \
+             DP_FE    =\? "do-run -m"
 
 envini PSY_MngDir     $cwd
 

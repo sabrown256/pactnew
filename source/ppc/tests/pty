@@ -29,7 +29,7 @@ set exe = $BinDir/pcexec
          source ../../../scripts/test-run
 
 #         if ("$Valgrind" == "") then
-#            $CFE $exe $opt | tr -d "\015" > pcexec.ptyp
+#            $CROSS_FE $exe $opt | tr -d "\015" > pcexec.ptyp
 #            set xstatus = $status
 #         else
 #            ftee $Log $Valgrind $exe $opt       |& \

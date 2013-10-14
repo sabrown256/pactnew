@@ -18,7 +18,7 @@ set msg = "Unit Test ......................"
 
    Note $Log "PYTHONPATH = $PYTHONPATH"
 
-   flog $Log $CFE $PYTHON $FilesDir/unittests.py
+   flog $Log $CROSS_FE $PYTHON $FilesDir/unittests.py
    set xstatus = $status
 
    flog $Log touch foo.pyc

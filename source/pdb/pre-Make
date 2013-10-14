@@ -117,13 +117,13 @@ ${LibDep} : ${hdrf} ${Hdrs} pdspoke.c scope_formats.h
 
 ${BinDir}/detect : detect.c ${Hdrs} 
 	@(echo "${CCAnnounce} $< -o $@" ; \
-	  ${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score detect.c -o ${BinDir}/detect ${Cfe_LD_Lib})
+	  ${CCCfe} ${CROSS_FE_LD_Flags} ${CROSS_FE_LD_RPath} -I../score detect.c -o ${BinDir}/detect ${CROSS_FE_LD_Lib})
 
 detect : ${BinDir}/detect
 
 ${IncDir}/pdform.h : ${BinDir}/detect
-	@(echo "detect -c ${BE} -o pdform.h" ; \
-	  ${CFE} ${BinDir}/detect -c ${BE} -o ${IncDir}/pdform.h)
+	@(echo "detect -c ${DP_BE} -o pdform.h" ; \
+	  ${CROSS_FE} ${BinDir}/detect -c ${DP_BE} -o ${IncDir}/pdform.h)
 
 hdrf = ${IncDir}/pdform.h
 

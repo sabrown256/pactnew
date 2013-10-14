@@ -7,10 +7,12 @@
 # include "cpyright.h"
 #
 
-REQUEST_MPI = TRUE
-
 # NOTE: on BG/P DP_Path has to come after path to compiler
 setenv PATH   ${PATH}:${DP_Path}
+
+Group DP {
+   REQUEST_MPI = TRUE
+}
 
 Tool CC {
    Exe    =? ${MPI_CC_Exe}

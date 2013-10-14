@@ -13,11 +13,11 @@ source $Me:h/common
 
 Note $ALog "Analyze: mmap"
 
-dbmget $ALog CFE^             \
-             CC_Exe^          \
+dbmget $ALog CC_Exe^          \
              CC_Flags^        \
              Cfe_LD_Flags^    \
              Cfe_LD_RPath^    \
+             CROSS_FE^        \
              PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
@@ -63,7 +63,7 @@ set opt = ""
 set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   flog $ALog $CFE $Tmp $Tmp.dat
+   flog $ALog $CROSS_FE $Tmp $Tmp.dat
    if ($status == 0) then
       if ($?IBM_BGP == 0) then
          setenv HAVE_MMAP TRUE

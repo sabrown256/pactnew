@@ -24,8 +24,8 @@ flog $Log popd
 
 if ($xstatus == 0) then
 
-   if ("$CFE" != "") then
-      setenv CFE   "$CFE -v"
+   if ("$CROSS_FE" != "") then
+      setenv CROSS_FE   "$CROSS_FE -v"
    endif
 
 #--------------------------------------------------------------------------
@@ -76,7 +76,7 @@ if ($xstatus == 0) then
 
    source ../../../scripts/test-run
 
-   @ NL = `$CFE $exe $opt | sort | wc -l`
+   @ NL = `$CROSS_FE $exe $opt | sort | wc -l`
    @ NL = $NL
 
    flog $Log ar -t $LibDir/libscore.a

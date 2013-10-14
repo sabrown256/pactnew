@@ -18,6 +18,7 @@ run analyze/rpath -i init
 include features/dld
 
 setenv ENV_VARS "Bits OS_Name \
+                 CROSS_FE CROSS_COMPILE CROSS_REF \
                  DB_CFGMAN DB_HOST_SERVER \
                  DB_RUN_SIGNATURE DB_SITE_SIGNATURE DB_UPDATE_SYS \
                  DO_RUN_DBG DO_RUN_MPI DO_RUN_CROSS \
@@ -31,7 +32,7 @@ setenv ENV_VARS "Bits OS_Name \
                  CXX_Exe CXX_Flags CXX_Linker \
                  FC_Exe FC_Flags \
                  FC_Debug_Default FC_Optimize_Default \
-                 DP_Inc DP_Lib DP_RPath DP_Path \
+                 DP_FE DP_Inc DP_Lib DP_RPath DP_Path \
                  JOBS_System \
                  LIB LibM_Lib LibM_RPath \
                  MDG_Inc MDG_Lib MDG_RPath MDG_Path \
@@ -41,7 +42,6 @@ setenv ENV_VARS "Bits OS_Name \
                  PY_Inc PY_Lib PY_RPath PY_Path PY_Vers PY_Ext \
                  HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
                  TEST_ADVISORY TRACKER_Exe HAVE_OPENMP \
-                 CFE PFE CROSS_COMPILE CROSS_REF \
                  PSY_FltDir \
                  PSY_Prefix PSY_CfgDir PSY_TmpDir PSY_Arch PSY_ID \
                  PSY_SITE PSY_TYPE PSY_Root PSY_AIRoot PSY_ASRoot"
@@ -193,6 +193,13 @@ Group GSL {
 Group GRAPHICS {
 }
 
+# the HAVE group contains features that have been requested, verified to
+# exist, and ready to use
+# these mostly imply that they will be used (see USE group)
+
+Group HAVE {
+}
+
 Group HDF {
    Inc   = 
    Lib   = 
@@ -254,6 +261,7 @@ Group OS {
 
 # PACT_CC_ refers to the Compiler Collection used to build PACT
 # rather than COMPILER_ which is overloaded to the extreme
+
 Group PACT {
    CFG_FILE   = ""
    CFG_ID     = ""
@@ -348,6 +356,16 @@ Group STD {
 
 Group TEST {
    ADVISORY = ""
+}
+
+# the USE group contains features that have been requested, verified to
+# exist, ready to use, and chosen over other options
+# there are a few things that we HAVE but choose not use USE
+# this group clarifies the intention (see HAVE group)
+
+Group USE {
+   IMF = FALSE
+   MPI = FALSE
 }
 
 #--------------------------------------------------------------------------

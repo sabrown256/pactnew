@@ -31,7 +31,7 @@ set io  = flog
       if ($?TEST_MAX_THREADS == 1) then
          @ nc = $TEST_MAX_THREADS
       else
-         @ nc = `$CFE ncpu`
+         @ nc = `$CROSS_FE ncpu`
       endif
 
       set NThrds = ""
@@ -43,8 +43,8 @@ set io  = flog
 
       set lerr = 0
 
-      if ("$CFE" != "") then
-         setenv CFE   "$CFE -v"
+      if ("$CROSS_FE" != "") then
+         setenv CROSS_FE   "$CROSS_FE -v"
       endif
 
 #--------------------------------------------------------------------------

@@ -71,10 +71,10 @@ endif
 
 # do the browsing of the PDB file
 if ($mode == 1) then
-   $CFE $BinDir/sx -s -l sxview.scm \(binls $argv $digits\)
+   $CROSS_FE $BinDir/sx -s -l sxview.scm \(binls $argv $digits\)
    set RetVal = $status;
 else
-   $CFE $BinDir/sx -p $argv
+   $CROSS_FE $BinDir/sx -p $argv
    set RetVal = $status;
 endif
 

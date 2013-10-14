@@ -23,10 +23,10 @@ dbmget $ALog RL_Inc        =\? ""^           \
              RL_Path       =\? /usr^         \
              HAVE_READLINE =\? FALSE^        \
              CC_Flags^                       \
-             CFE^                            \
              Cfe_LD_Flags^                   \
              Cfe_LD_Lib^                     \
              Cfe_LD_RPath^                   \
+             CROSS_FE^                       \
              PACT_CC_VERSION
 
 # if we have explicitly said we do not want READLINE
@@ -75,7 +75,7 @@ EOF
    set opt   = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath $libl )
    flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
    if ($status == 0) then
-      fexec $ALog $CFE $Tmp @o2 @e3 vw:READLINE_Version @ vw:HAVE_READLINE
+      fexec $ALog $CROSS_FE $Tmp @o2 @e3 vw:READLINE_Version @ vw:HAVE_READLINE
       if ($gstatus[1] == 0) then
          set ok = TRUE
       endif

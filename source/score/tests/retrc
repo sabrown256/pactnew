@@ -26,8 +26,8 @@ if (($CROSS_COMPILE == FALSE) && ("$Valgrind" == "")) then
    set xstatus = $status
    flog $Log popd
 
-   if ("$CFE" != "") then
-      setenv CFE   "$CFE -v"
+   if ("$CROSS_FE" != "") then
+      setenv CROSS_FE   "$CROSS_FE -v"
    endif
 
    source ../../../scripts/test-run

@@ -109,7 +109,7 @@ if ($xstatus == 0) then
       set t0 = `$TIMER -r`
 
       if ("$Valgrind" == "") then
-         flog $Log ( echo 2 | $CFE $exe )
+         flog $Log ( echo 2 | $CROSS_FE $exe )
          @ xstatus = $status
       else
          ftee $Log echo 2 @o $Valgrind $exe              |& \

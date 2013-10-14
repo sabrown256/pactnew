@@ -12,7 +12,7 @@
 set Me = $0
 source $Me:h/common
 
-dbget CFE
+dbget CROSS_FE
 
 set ANSI     = TRUE
 set FullPath = FALSE
@@ -143,11 +143,11 @@ foreach cc ($cclst)
 
       if (-x $Tmp) then
          if ($Verbose > 2) then
-            echo "$CFE $Tmp"
-            $CFE $Tmp
+            echo "$CROSS_FE $Tmp"
+            $CROSS_FE $Tmp
 	    set xstatus = $status
          else
-            $CFE $Tmp >& /dev/null
+            $CROSS_FE $Tmp >& /dev/null
 	    set xstatus = $status
          endif
          if ($xstatus == 0) then
@@ -157,7 +157,7 @@ foreach cc ($cclst)
                set tcc = $cc
             endif
 
-            gexec $CFE $Tmp @b fw:/dev/null
+            gexec $CROSS_FE $Tmp @b fw:/dev/null
             dbgets gstatus
             if ($gstatus[1] == 0) then
                set allcc = ( $allcc $tcc )

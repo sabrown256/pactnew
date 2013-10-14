@@ -29,8 +29,8 @@ if (($?STATIC_LINKING == 0) && ("$HaveDevZero" == "HAVE_DEV_ZERO")) then
       NoteD $Log "                         ERROR Building Heap Check Test Program"
       NoteD $Log "                    ${msg} FAILED"
    else
-      if ("$CFE" != "") then
-         setenv CFE   "$CFE -v"
+      if ("$CROSS_FE" != "") then
+         setenv CROSS_FE   "$CROSS_FE -v"
       endif
 
       source ../../../scripts/test-run

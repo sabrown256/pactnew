@@ -15,11 +15,11 @@ Note $ALog ""
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-dbmget $ALog CFE^                          \
-             Cfe_LD_Flags^                 \
-             Cfe_LD_RPath^                 \
-             STD_F^                        \
-             HAVE_FORTRAN^                 \
+dbmget $ALog Cfe_LD_Flags^      \
+             Cfe_LD_RPath^      \
+             STD_F^             \
+             HAVE_FORTRAN^      \
+             CROSS_FE^          \
              PSY_Root
 
 #--------------------------------------------------------------------------
@@ -43,7 +43,7 @@ if ($HAVE_FORTRAN == TRUE) then
       if ($status != 0) then
          Note $ALog "      Cannot compile getkinds.f"
       else
-         flog $ALog ($CFE ./getkinds >&! getbytes.f)
+         flog $ALog ($CROSS_FE ./getkinds >&! getbytes.f)
          if ($status != 0) then
             NoteD $ALog "      Cannot determine Fortran kinds"
             flog $ALog cat getbytes.f
@@ -71,7 +71,7 @@ if ($HAVE_FORTRAN == TRUE) then
 # run getbytes to generate from_c and from_h
       Note $ALog ""
       Note $ALog "Run getbytes"
-      flog $ALog $CFE ./getbytes
+      flog $ALog $CROSS_FE ./getbytes
       if ($status != 0) then
          NoteD $ALog "         Cannot compute Fortran primitive byte sizes"
       endif
@@ -87,7 +87,7 @@ if ($HAVE_FORTRAN == TRUE) then
       if ($status != 0) then
          Note $ALog "      Cannot compile genfiles.c"
       else
-         flog $ALog $CFE ./genfiles
+         flog $ALog $CROSS_FE ./genfiles
          if ($status != 0) then
             NoteD $ALog "         Cannot generate Fortran primitive type files"
          endif

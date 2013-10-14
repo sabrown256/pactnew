@@ -217,8 +217,8 @@ static void init_mpi(rundes *st)
 
 /* if we are MPI then we are not CROSS */
     if (cmpenv("MPI", "") != 0)
-       {csetenv("CROSS", "");
-	csetenv("CFE", "");};
+       {csetenv("CROSS",    "");
+	csetenv("CROSS_FE", "");};
 
 /* find the corresponding frontend */
     if (cdefenv("MPIFE") == 0)
@@ -288,10 +288,10 @@ static void init_cross(rundes *st)
 	   csetenv("CROSS", st->crosstgt);};
 
 /* find the corresponding frontend */
-    if (cdefenv("CFE") == 0)
+    if (cdefenv("CROSS_FE") == 0)
        {s = run(FALSE, "cross-info -b %s", c);
 	p = strtok(s, " \t\n");
-	csetenv("CFE", s);
+	csetenv("CROSS_FE", s);
 	nstrncpy(t, BFMED, s, -1);
 	for (p = t + strlen(t) - 1; (p >= t) && (*p != '/'); p--);
         if (p >= t)
@@ -300,8 +300,8 @@ static void init_cross(rundes *st)
 	push_path(P_PREPEND, lpath, t);};
 
     if (st->trace > 3)
-       {printf("CROSS = %s\n", cgetenv(TRUE, "CROSS"));
-        printf("CFE   = %s\n", cgetenv(TRUE, "CFE"));};
+       {printf("CROSS    = %s\n", cgetenv(TRUE, "CROSS"));
+        printf("CROSS_FE = %s\n", cgetenv(TRUE, "CROSS_FE"));};
 
     return;}
 

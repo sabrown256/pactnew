@@ -96,8 +96,8 @@ flog $Log date
       set lg = log-$Series.$i
       flog $Log rm $lg.sync $lg.async
 
-      flog $Log ($CFE dmake -f $MkF -na 1 $tgt >&! $lg.sync)
-      flog $Log ($CFE dmake -f $MkF -na 1 -async 1 $tgt >&! $lg.tmp)
+      flog $Log ($CROSS_FE dmake -f $MkF -na 1 $tgt >&! $lg.sync)
+      flog $Log ($CROSS_FE dmake -f $MkF -na 1 -async 1 $tgt >&! $lg.tmp)
       set LStat = $status
       Note $Log "Asynchronous dmake status = $LStat"
 

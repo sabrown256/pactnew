@@ -206,7 +206,7 @@ ${MMDep}  : ${Hdrs}
 
 ${BinDir}/scoerce : scoerce.c ${Hdrs} 
 	@(echo "${CCAnnounce} $< -o $@" ; \
-	  ${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../psh -I../score scoerce.c -o ${BinDir}/scoerce ${Cfe_LD_Lib})
+	  ${CCCfe} ${CROSS_FE_LD_Flags} ${CROSS_FE_LD_RPath} -I../psh -I../score scoerce.c -o ${BinDir}/scoerce ${CROSS_FE_LD_Lib})
 
 scoerce : ${BinDir}/scoerce
 
@@ -214,7 +214,7 @@ scoerce : ${BinDir}/scoerce
 
 ${IncDir}/sctypeg.h : ${BinDir}/scoerce
 	@(echo "scoerce -o ${IncDir}/sctypeg.h" ; \
-	  ${CFE} ${BinDir}/scoerce -o ${IncDir}/sctypeg.h)
+	  ${CROSS_FE} ${BinDir}/scoerce -o ${IncDir}/sctypeg.h)
 
 ${IncDir}/scarg.h :
 	@(echo "template -va -o ${IncDir}/scarg.h" ; \

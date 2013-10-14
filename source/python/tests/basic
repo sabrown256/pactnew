@@ -18,7 +18,7 @@ set msg = "Basic Test ....................."
 
    Note $Log "PYTHONPATH = $PYTHONPATH"
 
-   flog $Log $CFE $PYTHON $FilesDir/basic.py
+   flog $Log $CROSS_FE $PYTHON $FilesDir/basic.py
    set xstatus = $status
 
    flog $Log touch foo.pyc
