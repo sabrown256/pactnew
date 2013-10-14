@@ -23,11 +23,11 @@ Separator $Log
 NoteD $Log "   Binary File Translation Spokes Loader - spokes.scm"
 Note $Log ""
 
-dbmget $Log SchDir^          \
-            CSpokes^         \
+dbmget $Log CSpokes^         \
             SchemeSpokes^    \
-            BackSlash^       \
+            SHELL_Cont^      \
             PSY_Base^        \
+            PSY_Root^        \
             PSY_Cfg
 
 #--------------------------------------------------------------------------
@@ -35,7 +35,7 @@ dbmget $Log SchDir^          \
 
 if (-d $PSY_Base/sx/applications) then
 
-    set STDOUT = $SchDir/spokes.scm
+    set STDOUT = $PSY_Root/scheme/spokes.scm
 
     flog $Log $RM $STDOUT
     flog $Log touch $STDOUT
@@ -47,7 +47,7 @@ if (-d $PSY_Base/sx/applications) then
     Note $STDOUT '(define (safe-load file)'
     Note $STDOUT '  (if (file? file nil nil "global")'
     Note $STDOUT '      (load file #t)'
-    Note $STDOUT '      (printf nil "Cannot find %s'$BackSlash'n" file)))'
+    Note $STDOUT '      (printf nil "Cannot find %s'$SHELL_Cont'n" file)))'
     Note $STDOUT ""
 
     flog $Log set lSpokes = ( `echo $SchemeSpokes` )

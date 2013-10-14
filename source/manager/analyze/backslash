@@ -1,5 +1,5 @@
 #
-# BACKSLASH - analyze the treatment of backslash
+# BACKSLASH - analyze the treatment of continuation lines in the SHELL
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -11,13 +11,13 @@ Note $ALog "----- analyze/backslash -----"
 Note $ALog "Analyze: CSH backslash handling"
 Note $ALog ""
 
-setenv BackSlash "\\"
+setenv SHELL_Cont "\\"
 
 set Tmp = "tmp-backslash"
 
-echo $BackSlash >! $Tmp
-if (`cat $Tmp` == "$BackSlash") then
-   set BackSlash = "\"
+echo $SHELL_Cont >! $Tmp
+if (`cat $Tmp` == "$SHELL_Cont") then
+   setenv SHELL_Cont "\"
 endif
 
 rm -f $Tmp

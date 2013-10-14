@@ -25,12 +25,12 @@ endif
 
 source $PSY_AnaDir/backslash
 
-if ("$BackSlash" == "\") then
+if ("$SHELL_Cont" == "\") then
    NoteD $ALog "   CSH: $exe (uses \)"
 else
    NoteD $ALog "   CSH: $exe (uses \\\\)"
 endif
 
-dbexp BackSlash
+dbexp SHELL_Cont
 
 exit(0)

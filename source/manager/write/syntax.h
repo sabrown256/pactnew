@@ -23,8 +23,8 @@ Separator $Log
 NoteD $Log "   Interpeter Syntax Mode Configuration - syntax.h"
 Note $Log ""
 
-dbmget $Log BackSlash^  \
-            IncDir^     \
+dbmget $Log IncDir^     \
+            SHELL_Cont^ \
             Yacc_Exe^   \
             PSY_Base^   \
             PSY_Cfg
@@ -81,7 +81,7 @@ dbmget $Log BackSlash^  \
 
        Note $STDOUT ""
 
-       Note $STDOUT "#define DEF_SYNTAX_MODES(_si) "$BackSlash
+       Note $STDOUT "#define DEF_SYNTAX_MODES(_si) "$SHELL_Cont
 
        set isyntx = $nsyntxs
        while (`expr $isyntx \> 0`)
@@ -89,7 +89,7 @@ dbmget $Log BackSlash^  \
           if ($isyntx == 1) then
              Note $STDOUT "    SS_init_"$Syntx"_syntax_mode(_si)"
           else
-             Note $STDOUT "    SS_init_"$Syntx"_syntax_mode(_si); "$BackSlash
+             Note $STDOUT "    SS_init_"$Syntx"_syntax_mode(_si); "$SHELL_Cont
           endif
           set isyntx = `expr $isyntx - 1`
        end

@@ -19,17 +19,17 @@ set path = ( $path <your-tv-path> )
 if ($?TVDirs == 1) then
 
 # figure out the back slash treatment
-   set BackSlash = "\\"
-   echo $BackSlash >! $Tmp
-   if (`cat $Tmp` == "$BackSlash") then
-      set BackSlash = "\"
+   set shell_cont = "\\"
+   echo $shell_cont >! $Tmp
+   if (`cat $Tmp` == "$shell_cont") then
+      set shell_cont = "\"
    endif
    $RM $Tmp
 
    $RM $TInit
    touch $TInit
    echo "totalview*geometry: 640x960+0+30" >>& $TInit
-   echo "totalview*searchPath: .,$BackSlash" >>& $TInit
+   echo "totalview*searchPath: .,$shell_cont" >>& $TInit
    awk '{ printf("                      %s,\\\n", $0); }' $TVDirs >>& $TInit
    echo "                      .." >>& $TInit
 

@@ -1884,9 +1884,9 @@ char **cenv(int sort, char **rej)
 			  break;};};};};
 	        
 
-/* fix BackSlash because the escaped newline is a problem */
+/* fix SHELL_Cont because the escaped newline is a problem */
 	for (i = 0; i < n; i++)
-	    {if (strncmp(ta[i], "BackSlash=", 10) == 0)
+	    {if (strncmp(ta[i], "SHELL_Cont=", 10) == 0)
 	        {p = strchr(ta[i], '\n');
 		 if (p != NULL)
 		    {*p++ = '\0';

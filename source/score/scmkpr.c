@@ -990,7 +990,7 @@ anadep *SC_make_state(void)
     state->archives    = NULL;
     state->pred        = _SC_is_newer;
 
-    s = SC_dsnprintf(TRUE, "SHELL = %s", DEFAULT_SHELL);
+    s = SC_dsnprintf(TRUE, "SHELL = %s", SHELL_Default);
     SC_make_def_var(state, s, -1);
     CFREE(s);
 
