@@ -7,11 +7,17 @@
 # include "cpyright.h"
 #
 
-#setenv CROSS_COMPILE  BGL
-#setenv DO_RUN_MPI     "salloc.bgl"
-#setenv DO_RUN_CROSS   "no-op"
+# Group CROSS {
+#    COMPILE = BGL
+#}
+
+# Tool DO_RUN {
+#    MPI   = "salloc.bgl"
+#    CROSS = "no-op"
+#}
 
 setenv IBM_BGL
 define IBM_BGL
+
 define GETSOCKNAME_LONG
 

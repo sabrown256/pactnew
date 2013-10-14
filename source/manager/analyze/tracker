@@ -15,8 +15,8 @@ Note $ALog "----- analyze/tracker -----"
 Note $ALog "Analyze: job tracker"
 Note $ALog ""
 
-dbmget $ALog HAVE_TRACKER =\? ""^  \
-             TRACKER_Exe  =\? ""^  \
+dbmget $ALog HAVE_TRACKER =\? FALSE^  \
+             TRACKER_Exe  =\? ""^     \
              PSY_ASRoot
 
 foreach d ( /usr/apps/tracker $PSY_ASRoot/tracker /usr /usr/local )

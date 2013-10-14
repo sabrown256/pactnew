@@ -1325,14 +1325,6 @@ A netCDF spoke is included with the distribution.
 a subdirectory of PSY_InstRoot.
 <BR>Default is &#147;scheme&#148;</UL>
 
-<P>
-<B>UPDATE</B>
-<BR>
-<UL>Place holder for either &#147;ranlib&#148; or &#147;touch&#148; depending
-on whether or not your system needs ranlib to update archives which have
-been copied.
-<BR>Default is &#147;touch&#148;</UL>
-
 
 <!--------------------------------------------------------------------------------->
 <!--------------------------------------------------------------------------------->

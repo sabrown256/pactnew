@@ -6,8 +6,6 @@
 
 run analyze/rpath gnu
 
-NM = /usr/bin/i686-w64-mingw32-nm
-
 GMAKE_Flag   = TRUE
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
@@ -85,7 +83,8 @@ Tool Ranlib {
 }
 
 Tool NM {
-   Exe = i686-w64-mingw32-nm
+   Exe = /usr/bin/i686-w64-mingw32-nm
+   Cmd = $NM_Exe
 }
 
 #CPU          = [ _env_ = Bits ;                 # target CPU

@@ -8,10 +8,16 @@
 #
 
 setenv STATIC_LINKING  TRUE
-setenv CROSS_COMPILE   BGQ
-setenv DO_RUN_MPI      "srun.bgq"
-setenv DO_RUN_DBG      "tv.bgq"
-setenv DO_RUN_CROSS    "srun.bgq"
+
+Group CROSS
+   COMPILE = BGQ
+}
+
+Tool DO_RUN {
+   MPI   = "srun.bgq"
+   DBG   = "tv.bgq"
+   CROSS = "srun.bgq"
+}
 
 setenv IBM_BGQ
 define IBM_BGQ

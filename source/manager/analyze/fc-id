@@ -16,7 +16,7 @@ dbmget $ALog FC_Exe           =\? "f90"^        \
              FC_Flags         =\? ""^           \
              FC_ID_UNDERSCORE =\? "_"^          \
              FC_ID_CASE       =\? "lower"^      \
-             NM
+             NM_Cmd
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -34,8 +34,8 @@ EOF
 
 # check for appended characters (such as underscores)
 
-      flog $ALog $NM $Tmp.o
-      flog $ALog gexec $NM $Tmp.o @b grep -i foo @o tr '[A-Z]' '[a-z]' @o fw:$Tmp.nm
+      flog $ALog $NM_Cmd $Tmp.o
+      flog $ALog gexec $NM_Cmd $Tmp.o @b grep -i foo @o tr '[A-Z]' '[a-z]' @o fw:$Tmp.nm
       flog $ALog cat $Tmp.nm
 
       set FID = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /foo/) { print $i };};}' $Tmp.nm`
@@ -57,7 +57,7 @@ EOF
       flog $ALog setenv FC_ID_UNDERSCORE "$FID_app"
 
 # check for handling of identifier case
-      flog $ALog gexec $NM $Tmp.o @b grep -i bar @o fw:$Tmp.nm
+      flog $ALog gexec $NM_Cmd $Tmp.o @b grep -i bar @o fw:$Tmp.nm
       flog $ALog cat $Tmp.nm
       set Lower = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bar/) { print $i };};}' $Tmp.nm`
       set Upper = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /BAR/) { print $i };};}' $Tmp.nm`

@@ -14,7 +14,7 @@ Note $ALog "----- analyze/install -----"
 Note $ALog "Analyze: install utility"
 Note $ALog ""
 
-dbmget $ALog INSTALL  =\? cp
+dbmget $ALog INSTALL_Exe  =\? cp
 
 set res = `where install |& head -n 1`
 if (-x "$res") then
@@ -27,7 +27,7 @@ endif
 NoteD $ALog "   Install: $MINSTALL"
 
 # export the results
-dbmset $ALog INSTALL = $MINSTALL
+dbmset $ALog INSTALL_Exe = $MINSTALL
 
 exit(0)
 

@@ -730,13 +730,6 @@ SMP_LibExt
    then libscore.a will become instead libscore_r.a.
    Default is "".
 
-
-UPDATE
-   Place holder for either "ranlib" or "touch" depending on whether or not
-   your system needs ranlib to update archives which have been copied.
-   Default is "touch".
-
-
 UseGnuMake
    This variable if present in your config file tells GNU make to
    suppress the messages about entering and leaving directories.
