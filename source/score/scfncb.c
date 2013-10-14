@@ -416,7 +416,7 @@ int SC_get_ncpu(void)
  * NCPU threads)
  */
 
-#elif defined(PTHREAD_OMP)
+#elif defined(SMP_OpenMP)
 
    {extern int omp_get_num_procs(void);
 

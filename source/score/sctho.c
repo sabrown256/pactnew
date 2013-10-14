@@ -12,7 +12,7 @@
 
 #include "score_int.h"
 
-#ifdef PTHREAD_OMP
+#ifdef SMP_OpenMP
 
 typedef struct s_omp_funarg omp_funarg;
 

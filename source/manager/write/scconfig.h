@@ -52,7 +52,7 @@ dbmget $Log BFD_Version^              \
             PACT_CC_FAMILY^           \
             PACT_CC_VERSION^          \
             PACT_SO_CACHE^            \
-            PTHREAD_POSIX^            \
+            SMP_Pthread^              \
             OS_Type^                  \
             OSX_Version^              \
             TRACKER_Exe^              \
@@ -347,11 +347,11 @@ dbmget $Log BFD_Version^              \
 
 # parallel defines
     if ($HAVE_OPENMP == TRUE) then
-       Note $STDOUT "#define PTHREAD_OMP"
+       Note $STDOUT "#define SMP_OpenMP"
        Note $STDOUT "#define THREADING openmp"
 
-    else if ($PTHREAD_POSIX == TRUE) then
-       Note $STDOUT "#define PTHREAD_POSIX"
+    else if ($SMP_Pthread == TRUE) then
+       Note $STDOUT "#define SMP_Pthread"
        Note $STDOUT "#define THREADING pthread"
     endif
 

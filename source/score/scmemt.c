@@ -544,7 +544,7 @@ int SC_get_n_thread_elements(void)
 void SC_single_thread(void)
    {
 
-#ifdef PTHREAD_OMP
+#ifdef SMP_OpenMP
 
 # ifdef AIX
 

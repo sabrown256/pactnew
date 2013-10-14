@@ -15,12 +15,12 @@ Note $ALog "----- analyze/openmp -----"
 Note $ALog "Analyze: OpenMP"
 Note $ALog ""
 
-dbmget $ALog PTHREAD_OMP =\? FALSE^ \
-             Cfe_CC_Exe^            \
-             Cfe_CC_Flags^          \
-             Cfe_LD_Flags^          \
-             Cfe_LD_Lib^            \
-             Cfe_LD_RPath^          \
+dbmget $ALog SMP_OpenMP     =\? FALSE^ \
+             Cfe_CC_Exe^               \
+             Cfe_CC_Flags^             \
+             Cfe_LD_Flags^             \
+             Cfe_LD_Lib^               \
+             Cfe_LD_RPath^             \
              PACT_CC_VERSION
 
 setenv STD_OPENMP  unknown
@@ -48,7 +48,7 @@ set opt = ( $opt $Cfe_LD_Lib )
 set msg = "no OpenMP"
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   if ($PTHREAD_OMP == FALSE) then
+   if ($SMP_OpenMP == FALSE) then
       set msg = "$msg (by request)"
    else
       setenv HAVE_OPENMP TRUE

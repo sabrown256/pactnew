@@ -22,7 +22,7 @@
 struct tm *SC_localtime(const time_t *t, struct tm *tms)
    {struct tm *rv;
 
-#if ((defined PTHREAD_POSIX) || (defined PTHREAD_DRAFT4))
+#if ((defined SMP_Pthread) || (defined PTHREAD_DRAFT4))
     rv = localtime_r(t, tms);
 #else
     rv = localtime(t);

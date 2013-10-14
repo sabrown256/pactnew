@@ -7,10 +7,6 @@
 # include "cpyright.h"
 #
 
-PTHREAD_OMP = TRUE
-
-ThreadLibExt = _s
-
 Tool CC {
    Exe      =? ${OpenMP_CC_Exe}
    Flags    += ${OpenMP_CC_Flags}
@@ -36,6 +32,11 @@ Tool Lex {
    Flags    += ${OpenMP_Lex_Flags}
    Debug    += ${OpenMP_Lex_Debug}
    Optimize += ${OpenMP_Lex_Optimize}
+}
+
+Group SMP {
+   OpenMP = TRUE
+   LibExt = _s
 }
 
 Group Cfg {

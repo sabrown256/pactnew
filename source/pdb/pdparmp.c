@@ -14,7 +14,7 @@
 
 #ifndef HAVE_MPI
 
-# if defined(PTHREAD_POSIX) && defined(HAVE_THREAD_SAFE_MPI)
+# if defined(SMP_Pthread) && defined(HAVE_THREAD_SAFE_MPI)
 #  define USE_THREAD_SAFE_MPI
 # endif
 
