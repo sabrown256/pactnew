@@ -114,10 +114,6 @@ if ($CDecls == TRUE) then
 
    rm -f $Tmp
 
-   if ($MeOnly == TRUE) then
-      goto done
-   endif
-
 else
 
    Note $ALog "      Checking C header files"

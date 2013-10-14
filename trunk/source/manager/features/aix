@@ -1,0 +1,11 @@
+#
+# AIX - config elements for AIX
+#
+# include "cpyright.h"
+#
+
+Group NM {
+   Exe = /usr/bin/nm
+   Cmd = "$NM_Exe -g -X $Bits"
+}
+

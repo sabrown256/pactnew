@@ -10,4 +10,5 @@
 include spokes
 include 64-bit
 include compilers/xlc
+include aix
 

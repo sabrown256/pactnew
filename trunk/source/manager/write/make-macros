@@ -29,7 +29,6 @@ dbmget $Log Bits^              \
             MAKE_Strategy^     \
             EtcDir^            \
             IncDir^            \
-            INSTALL^           \
             HSY_FPU^           \
             HAVE_GNU_FENV^     \
             NoExe^             \

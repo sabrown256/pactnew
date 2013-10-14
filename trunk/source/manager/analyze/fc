@@ -35,7 +35,7 @@ dbmget $ALog FC_Exe           =\? "f90"^  \
              PACT_FC_VERSION^             \
              PACT_FC_PATH^                \
              PACT_FC_EXE^                 \
-             NM^                          \
+             NM_Cmd^                      \
              OS_Name
 
 #--------------------------------------------------------------------------

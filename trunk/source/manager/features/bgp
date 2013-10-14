@@ -7,10 +7,16 @@
 # include "cpyright.h"
 #
 
-setenv CROSS_COMPILE  BGP
-setenv DO_RUN_MPI     "salloc.bgp"
-setenv DO_RUN_DBG     "tv.bgp"
-setenv DO_RUN_CROSS   "submit.bgp"
+Group CROSS {
+   COMPILE = BGP
+}
+
+Tool DO_RUN {
+   MPI   = "salloc.bgp"
+   DBG   = "tv.bgp"
+   CROSS = "submit.bgp"
+}
+
 setenv IBM_BGP
 define IBM_BGP
 

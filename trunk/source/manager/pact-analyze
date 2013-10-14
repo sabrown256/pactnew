@@ -71,7 +71,6 @@ else
    flog $ALog setenv CDecls FALSE
 endif
 flog $ALog setenv ANSI    ANSI
-flog $ALog setenv MeOnly  TRUE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -107,12 +106,9 @@ setenv Tmp "$lTmp"
 flog $ALog setenv DORUN  $BinDir/do-run
 flog $ALog setenv TIMER  $PSY_ScrDir/timer
 
-if ($OS_Name == "AIX") then
-   set lNM = ( /usr/bin/nm -g )
-else
-   set lNM = ( `where nm | head -n 1` -g )
-endif
-flog $ALog setenv NM "$lNM"
+set lNM = ( `where nm | head -n 1` -g )
+envini NM_Exe   "$lNM"
+envini NM_Cmd   "-g"
 
 envini HSY_CPU  "unknown"
 envini HSY_FPU  "unknown"
