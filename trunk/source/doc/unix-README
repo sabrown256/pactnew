@@ -725,7 +725,7 @@ SyntaxModes
    A list of Scheme syntax/languages which can be parsed.
    A C syntax mode is included with the distribution.  Default is "c".
 
-ThreadLibExt
+SMP_LibExt
    Used to differentiate threaded library names.  For example, set to "_r"
    then libscore.a will become instead libscore_r.a.
    Default is "".
@@ -809,7 +809,7 @@ POW
    standard math library's "pow". The PACT routine PM_pow may be used
    here, or the user may provide their own.
 
-PTHREAD_POSIX
+SMP_Pthread
    This indicates the presence of a POSIX compliant thread library
    for the system.  This is one of the thread standards which PACT
    can use to support shared memory parallel applications.

@@ -83,7 +83,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef PTHREAD_OMP
+#ifdef SMP_OpenMP
 
 # ifndef GCC_FPE_X86
 #  include <omp.h>
@@ -111,7 +111,7 @@ struct s_omp_lockdes
 
 /*--------------------------------------------------------------------------*/
 
-#if (defined PTHREAD_POSIX)
+#if (defined SMP_Pthread)
 
 # ifdef SOLARIS
 #  define _REENTRANT

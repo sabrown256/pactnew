@@ -91,7 +91,7 @@ dbmget $Log AR_IFlag^               \
 	    PSY_CfgDir^             \
             PSY_MngDir^             \
 	    PSY_TmpDir^             \
-            ThreadLibExt^           \
+            SMP_LibExt^             \
             UPDATE^                 \
             URFile^                 \
             Yacc_Exe^               \
@@ -428,7 +428,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
 # emit the load names for the libraries - cover threaded/nonthreaded
-    Note $STDOUT "ThreadLibExt=$ThreadLibExt"
+    Note $STDOUT "SMP_LibExt=$SMP_LibExt"
     Note $STDOUT "LSCORE      = -lscore"
     Note $STDOUT "LMM         = -lpsmm"
     Note $STDOUT "LPML        = -lpml"

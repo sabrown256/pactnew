@@ -279,7 +279,7 @@ int dtid(void)
 static void _SC_set_omp_num_threads(int nt)
    {
 
-#ifdef PTHREAD_OMP
+#ifdef SMP_OpenMP
     if (nt > 1)
        {
 /*      PS_csetenv("OMP_NUM_THREADS", "%d", nt); */
@@ -353,7 +353,7 @@ int SC_init_omp(int c, char **v)
     if (first == TRUE)
        {first = FALSE;
 
-#ifdef PTHREAD_OMP
+#ifdef SMP_OpenMP
 	int i, ip, rs, nt;
 	char *p;
 

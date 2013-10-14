@@ -12,7 +12,7 @@
 
 #include "score_int.h"
 
-#ifdef PTHREAD_POSIX
+#ifdef SMP_Pthread
 
 #ifdef SOLARIS
 # define HAVE_PTHREAD_STRUCT

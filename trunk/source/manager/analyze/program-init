@@ -58,8 +58,6 @@ WARN_PATTERN     =
 ERR_PATTERN      =
 SchemeSpokes     = netcdf
 CSpokes          =
-ThreadLibExt     =
-PTHREAD_POSIX    = FALSE
 
 #--------------------------------------------------------------------------
 
@@ -341,6 +339,9 @@ Group SHELL {
 }
 
 Group SMP {
+   OpenMP  = FALSE
+   Pthread = FALSE
+   LibExt  =
 }
 
 Group SQL {

@@ -116,7 +116,7 @@ static int time_thread_lock(int nt, int nd, int ni)
 static int test_omp(int nt, int nd, int ni)
    {int rv;
 
-#ifdef PTHREAD_OMP
+#ifdef SMP_OpenMP
     int i, tid;
     char *mem;
     double **dptr;

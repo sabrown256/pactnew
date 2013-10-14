@@ -7,10 +7,6 @@
 # include "cpyright.h"
 #
 
-PTHREAD_POSIX = TRUE
-
-ThreadLibExt = _r
-
 Tool CC {
    Exe   =? ${PThread_CC_Exe}
    Flags += ${PThread_CC_Flags}
@@ -34,6 +30,11 @@ Tool Lex {
 
 Tool Cfg_Lex {
    Flags += ${PThread_Lex_Flags}
+}
+
+Group SMP {
+   Pthread = TRUE
+   LibExt  = _r
 }
 
 Group Cfg {

@@ -593,6 +593,10 @@ switch ($Cmnd)
         set DoingConfig = TRUE
 
 # do not let the current environment dictate compiler choices
+        unsetenv Bits
+        unsetenv CPU
+        unsetenv HAVE_ANSI_C9X_COMPLEX
+        unsetenv HAVE_READLINE
         unsetenv PACT_CC_FAMILY
         unsetenv PACT_CC_EXE
         unsetenv PACT_CC_VERSION
@@ -601,11 +605,7 @@ switch ($Cmnd)
         unsetenv PACT_FC_EXE
         unsetenv PACT_FC_VERSION
         unsetenv PACT_FC_PATH
-        unsetenv Bits
-        unsetenv CPU
-        unsetenv HAVE_ANSI_C9X_COMPLEX
-        unsetenv HAVE_READLINE
-        unsetenv PTHREAD_POSIX
+        unsetenv SMP_Pthread
 
 # do not bother with core files for the many analyzers
         limit coredumpsize 0 >& /dev/null

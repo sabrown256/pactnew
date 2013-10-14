@@ -588,7 +588,7 @@ void _SC_thread_error(int id, char *msg)
  * is often called from those initializers
  */
 
-#ifndef PTHREAD_POSIX
+#ifndef SMP_Pthread
 
     int ld;
 

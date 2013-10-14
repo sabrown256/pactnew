@@ -59,7 +59,7 @@ void SC_reset_terminal(void)
 void _SC_dethread(void)
    {
 
-#if defined(PTHREAD_OMP) && defined(COMPILER_PGI)
+#if defined(SMP_OpenMP) && defined(COMPILER_PGI)
     omp_set_num_threads(1);
 #endif
 
