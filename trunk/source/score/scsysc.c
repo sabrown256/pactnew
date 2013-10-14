@@ -117,7 +117,7 @@ char *SC_get_shell(char *shell)
        shell = getenv("SHELL");
 
     if (shell == NULL)
-       shell = DEFAULT_SHELL;
+       shell = SHELL_Default;
 
     return(shell);}
 

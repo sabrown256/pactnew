@@ -69,7 +69,6 @@ struct s_dirdes
     char etc[BFLRG];
     char lib[BFLRG];
     char mng[BFLRG];
-    char sch[BFLRG];
     char scr[BFLRG];};
 
 struct s_ruledes
@@ -1512,8 +1511,6 @@ static void setup_output_env(client *cl, char *base)
     dbset(cl, "BinDir",  st.dir.bin);
     dbset(cl, "IncDir",  st.dir.inc);
     dbset(cl, "EtcDir",  st.dir.etc);
-/*    dbset(cl, "PSY_ScrDir",  st.dir.scr); */
-    dbset(cl, "SchDir",  st.dir.sch);
 
     dbset(cl, "Load",        st.loadp ? "TRUE" : "FALSE");
     dbset(cl, "NoExe",       st.exep ? "TRUE" : "FALSE");
@@ -1636,7 +1633,6 @@ static void default_var(client *cl, char *base)
     snprintf(st.dir.etc,  BFLRG, "%s/etc",     st.dir.root);
     snprintf(st.dir.lib,  BFLRG, "%s/lib",     st.dir.root);
     snprintf(st.dir.bin,  BFLRG, "%s/bin",     st.dir.root);
-    snprintf(st.dir.sch,  BFLRG, "%s/scheme",  st.dir.root);
 
     snprintf(st.env_csh,  BFLRG, "%s/env-pact.csh", st.dir.etc);
     snprintf(st.env_sh,   BFLRG, "%s/env-pact.sh",  st.dir.etc);
@@ -3061,7 +3057,6 @@ static void finish_config(client *cl, char *base)
     snprintf(st.dir.etc, BFLRG, "%s/etc",     st.dir.root);
     snprintf(st.dir.lib, BFLRG, "%s/lib",     st.dir.root);
     snprintf(st.dir.bin, BFLRG, "%s/bin",     st.dir.root);
-    snprintf(st.dir.sch, BFLRG, "%s/scheme",  st.dir.root);
 
     separator(Log);
     noted(Log, "Writing system dependent files for %s", st.psy_id);

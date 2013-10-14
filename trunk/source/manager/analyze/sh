@@ -15,13 +15,13 @@ Note $ALog "----- analyze/sh -----"
 Note $ALog "Analyze: Bourne shell"
 Note $ALog ""
 
-setenv DEFAULT_SHELL ""
+setenv SHELL_Default ""
 
 foreach i ($path /usr/bin /bin)
    if (-x $i/bash) then
       NoteD $ALog "   SH: $i/bash"
-      setenv DEFAULT_SHELL $i/bash
-      dbexp DEFAULT_SHELL
+      setenv SHELL_Default $i/bash
+      dbexp SHELL_Default
       exit(0)
    endif
 end
@@ -29,12 +29,12 @@ end
 foreach i ($path /usr/bin /bin)
    if (-x $i/sh) then
       NoteD $ALog "   SH: $i/sh"
-      setenv DEFAULT_SHELL $i/sh
-      dbexp DEFAULT_SHELL
+      setenv SHELL_Default $i/sh
+      dbexp SHELL_Default
       exit(0)
    endif
 end
 
-dbexp DEFAULT_SHELL
+dbexp SHELL_Default
 
 exit(1)

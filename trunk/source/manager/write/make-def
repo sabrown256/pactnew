@@ -38,7 +38,7 @@ dbmget $Log AR_IFlag^               \
             Cfg_CC_Inc^             \
             CSpokes^                \
             CROSS_FE^               \
-            DEFAULT_SHELL^          \
+            SHELL_Default^          \
             DP_BE^                  \
             DP_METHOD^              \
             EtcDir^                 \
@@ -177,7 +177,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "PSY_TmpDir = $PSY_TmpDir"
     Note $STDOUT ""
 
-    set QUOTE = \"
     set THE_DATE = `cat .pact-version`
     Note $STDOUT "Version    = $THE_DATE"
 
@@ -481,7 +480,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     endif
     Note $STDOUT ""
 
-    Note $STDOUT "SHELL   = $DEFAULT_SHELL"
+    Note $STDOUT "SHELL   = $SHELL_Default"
     Note $STDOUT "Manager = $PSY_MngDir"
     Note $STDOUT 'DATE    = `./code-date`'
     Note $STDOUT ""

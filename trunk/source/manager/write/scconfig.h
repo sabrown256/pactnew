@@ -30,7 +30,7 @@ dbmget $Log BFD_Version^              \
             CC_Exe^                   \
             CEFile^                   \
             CPU^                      \
-            DEFAULT_SHELL^            \
+            SHELL_Default^            \
             DP_Lib^                   \
             DP_Inc^                   \
             FC_ID_CASE^               \
@@ -143,35 +143,37 @@ dbmget $Log BFD_Version^              \
     Note $STDOUT "#define PCK_CONFIGURATION"
     Note $STDOUT ""
 
-    set QUOTE = \"
+# define Q to be a double quote
+    set q = \"
+
     set THE_DATE = `cat .pact-version`
-    Note $STDOUT '#define PACT_VERSION        '$QUOTE${THE_DATE}$QUOTE
+    Note $STDOUT '#define PACT_VERSION        '$q${THE_DATE}$q
 
     Note $STDOUT "#define CPU_TYPE            $CPU"
     Note $STDOUT "#define FPU_TYPE            $FPU"
-    Note $STDOUT '#define PSY_Arch            '$QUOTE${PSY_Arch}$QUOTE
-    Note $STDOUT '#define PSY_TYPE            '$QUOTE${PSY_TYPE}$QUOTE
-    Note $STDOUT '#define PSY_ID              '$QUOTE${PSY_ID}$QUOTE
-    Note $STDOUT '#define PSY_Prefix          '$QUOTE${PSY_Prefix}$QUOTE
-    Note $STDOUT '#define PSY_TmpDir          '$QUOTE${PSY_TmpDir}$QUOTE
+    Note $STDOUT '#define PSY_Arch            '$q${PSY_Arch}$q
+    Note $STDOUT '#define PSY_TYPE            '$q${PSY_TYPE}$q
+    Note $STDOUT '#define PSY_ID              '$q${PSY_ID}$q
+    Note $STDOUT '#define PSY_Prefix          '$q${PSY_Prefix}$q
+    Note $STDOUT '#define PSY_TmpDir          '$q${PSY_TmpDir}$q
     if ("$OSX_Version" != "") then
        Note $STDOUT "#define MACOSX_VERSION      $OSX_Version"
     endif
 
-    Note $STDOUT '#define USE_COMPILER        '$QUOTE${CC_Exe}$QUOTE
+    Note $STDOUT '#define USE_COMPILER        '$q${CC_Exe}$q
 
     Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
-    Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}${PACT_CC_VERSION}${QUOTE}
+    Note $STDOUT '#define COMPILER_VERSION    '${q}${PACT_CC_VERSION}${q}
 
-    Note $STDOUT '#define DEFAULT_SHELL       '$QUOTE${DEFAULT_SHELL}$QUOTE
+    Note $STDOUT '#define SHELL_Default       '$q${SHELL_Default}$q
 
     if ("$PSY_FltDir" != "") then
        set FiltFile = $PSY_FltDir/$PSY_Arch
-       Note $STDOUT '#define MAKE_FILTER_FILE    '$QUOTE${FiltFile}$QUOTE
+       Note $STDOUT '#define MAKE_FILTER_FILE    '$q${FiltFile}$q
     endif
 
     if ("$PACT_SO_CACHE" != "") then
-       Note $STDOUT '#define PACT_SO_CACHE       '$QUOTE${PACT_SO_CACHE}$QUOTE
+       Note $STDOUT '#define PACT_SO_CACHE       '$q${PACT_SO_CACHE}$q
     endif
 
     Note $STDOUT ""
@@ -317,7 +319,7 @@ dbmget $Log BFD_Version^              \
 
     if ($HAVE_TRACKER == TRUE) then
        Note $STDOUT "#define HAVE_TRACKER"
-       Note $STDOUT "#define TRACKER_EXE "$QUOTE${TRACKER_Exe}$QUOTE
+       Note $STDOUT "#define TRACKER_EXE "$q${TRACKER_Exe}$q
     endif
 
     if (-e /dev/zero) then
