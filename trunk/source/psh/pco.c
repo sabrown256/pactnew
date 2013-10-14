@@ -1428,16 +1428,14 @@ static void setup_analyze_env(client *cl, char *base)
 
     dbinitv(cl, "CPU",       "unknown");
     dbinitv(cl, "FPU",       "unknown");
-    dbinitv(cl, "BE",        "");
-
-/* parallel front end */
-    dbinitv(cl, "PFE",       "%s/do-run -m", st.dir.bin);
+    dbinitv(cl, "DP_BE",     "");
+    dbinitv(cl, "DP_FE",     "%s/do-run -m", st.dir.bin);
 
 /* cross compile front end */
     if (dbcmp(cl, "CROSS_COMPILE", "FALSE") != 0)
-       dbinitv(cl, "CFE", "%s/do-run -m", st.dir.bin);
+       dbinitv(cl, "CROSS_FE", "%s/do-run -m", st.dir.bin);
     else
-       dbinitv(cl, "CFE", "");
+       dbinitv(cl, "CROSS_FE", "");
 
 /* initialization of graphics flags - there is NO default system */
     dbinitv(cl, "GRAPHICS_Windows", "");

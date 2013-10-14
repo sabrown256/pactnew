@@ -14,9 +14,9 @@ source ../../../scripts/test-env
 
 set ulopt = ( -e -r -x -q -s $ZeroSpace )
 
-if ("$CFE" == "") then
-   set cfe = ""
+if ("$CROSS_FE" == "") then
+   set cross_fe = ""
 else
-   set cfe = ( $CFE -v )
+   set cross_fe = ( $CROSS_FE -v )
 endif
 

@@ -15,9 +15,9 @@ Note $ALog "----- analyze/cc-size -----"
 Note $ALog "Analyze: Find Integer Sizes"
 Note $ALog ""
 
-dbmget $ALog INT4    =\? int^   \
-             INT8    =\? long^  \
-             CFE^               \
+dbmget $ALog INT4       =\? int^   \
+             INT8       =\? long^  \
+             CROSS_FE^             \
              PACT_CC_VERSION
 
 #--------------------------------------------------------------------------
@@ -61,7 +61,7 @@ EOF
 
 flog $ALog $lCC $Tmp.c -o $Tmp
 if ($status == 0) then
-   fexec $ALog $CFE $Tmp @o2 @e3 vw:INT4 @ fw:/dev/null
+   fexec $ALog $CROSS_FE $Tmp @o2 @e3 vw:INT4 @ fw:/dev/null
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -129,7 +129,7 @@ COMPILE:
 
 flog $ALog $lCC $Tmp.c -o $Tmp
 if ($status == 0) then
-   fexec $ALog $CFE $Tmp @o2 @e3 vw:INT8 @ fw:/dev/null
+   fexec $ALog $CROSS_FE $Tmp @o2 @e3 vw:INT8 @ fw:/dev/null
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp

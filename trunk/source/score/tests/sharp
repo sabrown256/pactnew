@@ -27,8 +27,8 @@ if ($xstatus != 0) then
    NoteD $Log "                         Can't build SCORE Test Programs"
 else
 
-   if ("$CFE" != "") then
-      setenv CFE   "$CFE -v"
+   if ("$CROSS_FE" != "") then
+      setenv CROSS_FE   "$CROSS_FE -v"
    endif
 
    set DataFiles = ( fltfil intfil regxfil tokfil )

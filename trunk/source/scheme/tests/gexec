@@ -31,7 +31,7 @@ setenv PERDB_PATH $cwd/tgexec
 
       set t0 = `$TIMER -r`
 
-      $CFE $exe -e -l $FilesDir/gexecp.scm >&! shgexp.res
+      $CROSS_FE $exe -e -l $FilesDir/gexecp.scm >&! shgexp.res
       set xstatus = $status
 
       flog $Log ( sort shgexp.res >&! shgexp.srt )
@@ -64,7 +64,7 @@ setenv PERDB_PATH $cwd/tgexec
 
       set t0 = `$TIMER -r`
 
-      $CFE $exe -e -l $FilesDir/gexecf.scm >&! shgexf.res
+      $CROSS_FE $exe -e -l $FilesDir/gexecf.scm >&! shgexf.res
       set xstatus = $status
 
 #      flog $Log ( sort shgexf.res >&! shgexf.srt )
@@ -97,7 +97,7 @@ setenv PERDB_PATH $cwd/tgexec
 
       set t0 = `$TIMER -r`
 
-      $CFE $exe -e -l $FilesDir/gexecv.scm >&! shgexv.res
+      $CROSS_FE $exe -e -l $FilesDir/gexecv.scm >&! shgexv.res
       set xstatus = $status
 
 #      flog $Log ( sort shgexv.res >&! shgexv.srt )

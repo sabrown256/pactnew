@@ -41,11 +41,11 @@ set exe = $BinDir/sctty
       if ("$MPI" != "") then
 
          set dt = `$TIMER -r`
-         flog $Log $PFE -dr -p 2 $exe -t
+         flog $Log $DP_FE -dr -p 2 $exe -t
          if ($status >= 254) then
             @ NOut = 255
          else
-            @ NOut = `echo "a" | $PFE -p 2 $exe -t |& grep "Proc" |& wc -l`
+            @ NOut = `echo "a" | $DP_FE -p 2 $exe -t |& grep "Proc" |& wc -l`
          endif
          set dt = `$TIMER -b $dt`
 
@@ -81,7 +81,7 @@ set exe = $BinDir/sctty
          endif
       else
          Note $Log "Running MPI version of test"
-         flog $Log  ( (echo "a"; echo "b"; echo "end") | $PFE -f -p 1 $exe -q >&! scmpiwrap.res )
+         flog $Log  ( (echo "a"; echo "b"; echo "end") | $DP_FE -f -p 1 $exe -q >&! scmpiwrap.res )
          set xstatus = $status
          flog $Log grep 'ATTENTION:' scmpiwrap.res 
          if ($status == 0) then

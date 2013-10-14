@@ -95,7 +95,7 @@ flog $Log date
       set lg = log-$Series.$i
       flog $Log rm $lg.tot $lg.job
 
-      flog $Log ($CFE dmake -na 2 -srv < $Script >&! $lg.tot)
+      flog $Log ($CROSS_FE dmake -na 2 -srv < $Script >&! $lg.tot)
       set LStat = $status
 
       flog $Log (awk '$1 ~ /Job/ && $3 ~ /out/ { print }' $lg.tot >&! $lg.job)

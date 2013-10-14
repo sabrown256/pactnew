@@ -16,7 +16,7 @@ Note $ALog "Analyze: fork/exec"
 
 dbmget $ALog CC_Exe^          \
              CC_Flags^        \
-             CFE^             \
+             CROSS_FE^        \
              Cfe_LD_Flags^    \
              Cfe_LD_RPath^    \
              PACT_CC_VERSION
@@ -40,14 +40,14 @@ set opt = ""
 set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   flog $ALog $CFE $Tmp
+   flog $ALog $CROSS_FE $Tmp
    if ($status == 0) then
       dbset HAVE_FORK_EXEC TRUE
       set ok = TRUE
    else
       dbset HAVE_FORK_EXEC FALSE
    endif
-#   fexvar $ALog HAVE_FORK_EXEC $CFE $Tmp
+#   fexvar $ALog HAVE_FORK_EXEC $CROSS_FE $Tmp
 #   if ($gstatus[1] == 0) then
 #      set ok = TRUE
 #   endif

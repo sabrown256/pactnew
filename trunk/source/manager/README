@@ -693,8 +693,8 @@ Some examples:
 Along with this we distinguish to kinds of frontending: configurational
 and parallel.  There are two variables that control this:
 
-   CFE  for configuration type front ending
-   PFE  for parallel front ending
+   CROSS_FE  for CROSS platform front ending
+   DP_FE     for parallel front ending
 
 
                      CONFIGURATION PARAMETERS DESCRIBED
@@ -719,7 +719,7 @@ CCmpLdr
    set of libraries and object files which the loader driver knows about
    but you don't.  Default is the value of CCompiler.
 
-CFE
+CROSS_FE
    On some systems target codes must be cross compiled and run in
    a special way.  This is used to execute the target appropriately.
    Default is "".
@@ -759,7 +759,7 @@ NoExe
    is TRUE then no executables will be linked and installed (e.g.
    no ULTRA or SX).  Default is "FALSE".
 
-PFE
+DP_FE
    On some parallel systems target codes must be run in a special way.
    This is used to execute the target appropriately.  Default is "".
 

@@ -94,7 +94,7 @@ end
 
 # check against fiducials
                if (-f $RefDir/$ob.ps) then
-                  flog $Log ( $CFE $PSDIFF -tp 2 $ob.ps $RefDir/$ob.ps > $ob.ps.diff )
+                  flog $Log ( $CROSS_FE $PSDIFF -tp 2 $ob.ps $RefDir/$ob.ps > $ob.ps.diff )
                   set dstatus = $status
                   if (-z $ob.ps.diff) then
                      flog $Log rm $ob.ps.diff

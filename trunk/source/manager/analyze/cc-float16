@@ -15,7 +15,7 @@ Note $ALog "----- analyze/cc-float16 -----"
 Note $ALog "Analyze: C90 long double support"
 Note $ALog ""
 
-dbmget $ALog CFE^               \
+dbmget $ALog CROSS_FE^        \
              PACT_CC_VERSION
 
 #--------------------------------------------------------------------------
@@ -57,7 +57,7 @@ flog $ALog cat $Tmp.c
 
 flog $ALog $lCC $Tmp.c -o $Tmp -lm
 if ($status == 0) then
-   fexec $ALog $CFE $Tmp @o2 @e3 fa:$ALog @ vw:HAVE_ANSI_FLOAT16
+   fexec $ALog $CROSS_FE $Tmp @o2 @e3 fa:$ALog @ vw:HAVE_ANSI_FLOAT16
    if ($gstatus[1] == 0) then
       set ok = TRUE
    endif

@@ -24,7 +24,7 @@ set io  = ulfnc.log
 # CYGWIN 1.5 simply will not write output to ulfnc.log
 # the other tests are fine
    if ($OS =~ CYGWIN*) then
-      flog $Log $cfe $exe $opt
+      flog $Log $cross_fe $exe $opt
       set xstatus = $status
    else
       source ../../../scripts/test-run

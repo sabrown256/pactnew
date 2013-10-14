@@ -106,7 +106,7 @@ set exe = $BinDir/scheme
 
       set t0 = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $Log ( $CFE $exe $opt \(translate-c-file \"shctst.c\"\) >! shctst.scm )
+         flog $Log ( $CROSS_FE $exe $opt \(translate-c-file \"shctst.c\"\) >! shctst.scm )
          set xstatus = $status
       else
          ftee $Log $Valgrind $exe $opt \(translate-c-file \"shctst.c\"\)  |& \
@@ -120,7 +120,7 @@ set exe = $BinDir/scheme
       unset t0
 
       if ($xstatus == 0) then
-         flog $Log ( $CFE $exe $opt -l shctst.scm >! shctst-scm.res )
+         flog $Log ( $CROSS_FE $exe $opt -l shctst.scm >! shctst-scm.res )
          set xstatus = $status
       endif
 

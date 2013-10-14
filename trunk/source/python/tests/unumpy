@@ -18,7 +18,7 @@ set msg = "Numpy Test ....................."
 
    Note $Log "PYTHONPATH = $PYTHONPATH"
 
-   flog $Log $CFE $PYTHON $FilesDir/unumpy.py
+   flog $Log $CROSS_FE $PYTHON $FilesDir/unumpy.py
    set xstatus = $status
 
    flog $Log touch foo.pyc

@@ -20,6 +20,6 @@ source $RootDir/etc/env-pact.csh
 # followed by the do-run on sx below
 unsetenv CROSS
 
-$CFE sx -q -l panache.scm \(ld $1\)
+$CROSS_FE sx -q -l panache.scm \(ld $1\)
 
 exit($status)

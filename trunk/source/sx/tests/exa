@@ -36,7 +36,7 @@ set io  = pdbvbatch.res
       flog $Log @ xstatus = 0
       foreach i (A.ps B.ps C.ps)
          if (-f $FilesDir/ref/$i) then
-            flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
+            flog $Log ($CROSS_FE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
             @ st = $status
             @ xstatus = $xstatus + $st
             Note $Log "Test $i:r status $st"

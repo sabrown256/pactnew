@@ -28,7 +28,7 @@ set io  = ulenv.log
 #   source ../../../scripts/test-run
    set t0 = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $exe $opt \(end\) >&! ulenv.log)
+      flog $Log ($CROSS_FE $exe $opt \(end\) >&! ulenv.log)
       set xstatus = $status
    else
       ftee $Log $Valgrind $exe $opt \(end\)    |& \

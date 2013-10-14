@@ -22,7 +22,7 @@ set exe = $BinDir/scheme
 
       set t0 = `$TIMER -r`
 
-      $CFE $FilesDir/shenv.scm >&! shenv.res
+      $CROSS_FE $FilesDir/shenv.scm >&! shenv.res
       set xstatus = $status
       diff shenv.res $FilesDir/ref/shenv >&! shenv.res.diff
       set dstatus = $status
@@ -47,7 +47,7 @@ set exe = $BinDir/scheme
 
       set t0 = `$TIMER -r`
 
-      $CFE $FilesDir/shexe.scm a 1 2.3 '"abc"' >&! shexe.res
+      $CROSS_FE $FilesDir/shexe.scm a 1 2.3 '"abc"' >&! shexe.res
       set xstatus = $status
       diff shexe.res $FilesDir/ref/shexe >&! shexe.res.diff
       set dstatus = $status

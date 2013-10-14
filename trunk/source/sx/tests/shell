@@ -23,7 +23,7 @@ set exe = $BinDir/sx
 
       set t0 = `$TIMER -r`
 
-      $CFE $FilesDir/pdbvenv.scm >&! pdbvenv.res
+      $CROSS_FE $FilesDir/pdbvenv.scm >&! pdbvenv.res
       set xstatus = $status
 
       set dt = `$TIMER -b $t0`
@@ -49,7 +49,7 @@ set exe = $BinDir/sx
       set rpf = none
 
       set t0 = `$TIMER -r`
-      $CFE $FilesDir/pdbvexe.scm a 1 2.3 '"abc"' >&! pdbvexe.res
+      $CROSS_FE $FilesDir/pdbvexe.scm a 1 2.3 '"abc"' >&! pdbvexe.res
       set xstatus = $status
 
       set dt = `$TIMER -b $t0`

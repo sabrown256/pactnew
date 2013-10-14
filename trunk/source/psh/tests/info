@@ -31,7 +31,6 @@ end
 
 if ("$lst" == "") then
    set lst = ( $lst DB_RUN_SIGNATURE DB_SITE_SIGNATURE )
-   set lst = ( $lst PSY_SITE PSY_TYPE PSY_AIRoot PSY_ASRoot )
    set lst = ( $lst Bits OS_Name )
    set lst = ( $lst CC_Exe CC_Flags )
    set lst = ( $lst CC_Debug_Default CC_Optimize_Default )
@@ -39,14 +38,15 @@ if ("$lst" == "") then
    set lst = ( $lst CXX_Exe CXX_Flags CXX_Linker )
    set lst = ( $lst FC_Exe FC_Flags )
    set lst = ( $lst FC_Debug_Default FC_Optimize_Default )
-   set lst = ( $lst DP_Inc DP_Lib DP_RPath DP_Path )
+   set lst = ( $lst CROSS_FE CROSS_COMPILE )
+   set lst = ( $lst DP_FE DP_Inc DP_Lib DP_RPath DP_Path )
    set lst = ( $lst LIB LibM_Lib LibM_RPath )
    set lst = ( $lst MDG_Inc MDG_Lib MDG_RPath MDG_Path )
    set lst = ( $lst PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH PACT_CC_EXE )
    set lst = ( $lst PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH PACT_FC_EXE )
+   set lst = ( $lst PSY_SITE PSY_TYPE PSY_AIRoot PSY_ASRoot )
    set lst = ( $lst PY_Inc PY_Lib PY_RPath PY_Path )
    set lst = ( $lst TRACKER_Exe HAVE_PYTHON HAVE_OPENMP )
-   set lst = ( $lst CFE PFE CROSS_COMPILE )
 endif
 
 #--------------------------------------------------------------------------

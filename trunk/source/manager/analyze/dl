@@ -21,7 +21,7 @@ dbmget $ALog HAVE_DYNAMIC_LINKER =\? FALSE^   \
              PACT_CC_VERSION^                 \
              CC_Exe^                          \
              CC_Flags^                        \
-             CFE
+             CROSS_FE
 
 Note $ALog "HAVE_DYNAMIC_LINKER = |$HAVE_DYNAMIC_LINKER|"
 
@@ -49,7 +49,7 @@ flog $ALog cat $Tmp.c
 set ok = FALSE
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
 if ($status == 0) then
-   flog $ALog $CFE $Tmp
+   flog $ALog $CROSS_FE $Tmp
    if ($status == 0) then
       set ok = TRUE
    endif
@@ -59,7 +59,7 @@ endif
 if ($ok == FALSE) then
    flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags -ldl
    if ($status == 0) then
-      flog $ALog $CFE $Tmp
+      flog $ALog $CROSS_FE $Tmp
       if ($status == 0) then
          set ok = NEED
       endif

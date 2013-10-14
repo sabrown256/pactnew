@@ -31,9 +31,9 @@ if ("$MPI" != "") then
       set exe = $BinDir/tpddp
       set opt = ( -v $tst )
 
-      if (-x $PFE) then
-         flog $Log $PFE -dr -p 2 -t 0 $exe $opt
-         ftee $Log $PFE -p 2 -t 0 $exe $opt
+      if (-x $DP_FE) then
+         flog $Log $DP_FE -dr -p 2 -t 0 $exe $opt
+         ftee $Log $DP_FE -p 2 -t 0 $exe $opt
          set xstatus = $gstatus[1]
       else
          Note $Log "No MPI - test omitted"

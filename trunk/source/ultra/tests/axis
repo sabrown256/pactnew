@@ -23,7 +23,7 @@ set io  = ulaxs.log
 
    source ../../../scripts/test-run
 
-   flog $Log ($CFE $PSDIFF ulaxs.ps $RefDir/ulaxs.ps >&! ulaxs.ps.diff)
+   flog $Log ($CROSS_FE $PSDIFF ulaxs.ps $RefDir/ulaxs.ps >&! ulaxs.ps.diff)
 
    set rpf = ( $rpf ulaxs.* )
 

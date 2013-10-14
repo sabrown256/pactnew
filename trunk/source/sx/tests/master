@@ -32,7 +32,7 @@ set io  = pdbvtest.tmp
          awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' pdbvtest.ps > pdbvtest.ps.tmp
          flog $Log mv pdbvtest.ps.tmp pdbvtest.ps
 
-         flog $Log $cfe $PSDIFF pdbvtest.ps $FilesDir/ref/pdbvtest.ps
+         flog $Log $cross_fe $PSDIFF pdbvtest.ps $FilesDir/ref/pdbvtest.ps
          set xstatus = $status
       endif
    endif

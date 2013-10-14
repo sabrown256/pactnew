@@ -124,10 +124,10 @@ setenv ZeroSpace  "-z 2"
    endif
 
 # control when to use do-run
-   setenv PFE   $DORUN
-   setenv CFE   ""
+   setenv DP_FE     $DORUN
+   setenv CROSS_FE  ""
    if ($CROSS_COMPILE != FALSE) then
-      setenv CFE $DORUN
+      setenv CROSS_FE $DORUN
 
 # make up the list of environment variable to pass through submit
       set lenv = ""
@@ -142,7 +142,7 @@ setenv ZeroSpace  "-z 2"
       unset lenv
    endif
 
-   setenv PACT_Exe  "$CFE $BinDir/pact"
+   setenv PACT_Exe     "$CROSS_FE $BinDir/pact"
 
    setenv Parallel     `$PACT_Exe -info THREADING`
    setenv MPI          `$PACT_Exe +l -info HAVE_MPI`
@@ -250,11 +250,11 @@ Note $Log "Executables:"
 Note $Log "TIMER    = |$TIMER|"
 Note $Log "MAKE     = |$MAKE|"
 Note $Log "DORUN    = |$DORUN|"
-Note $Log "PX       = |$PX|"
-Note $Log "PFE      = |$PFE|"
-Note $Log "CFE      = |$CFE|"
+Note $Log "CROSS_FE = |$CROSS_FE|"
+Note $Log "DP_FE    = |$DP_FE|"
 Note $Log "PACT_Exe = |$PACT_Exe|"
 Note $Log "PSDIFF   = |$PSDIFF|"
+Note $Log "PX       = |$PX|"
 Note $Log "Valgrind = |$Valgrind|"
 
 Note $Log ""

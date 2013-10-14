@@ -29,7 +29,7 @@ else
    switch ($io)
       case ftee:
            if ("$Valgrind" == "") then
-              ftee $Log $CFE $exe $opt
+              ftee $Log $CROSS_FE $exe $opt
               set xstatus = $status
            else
               ftee $Log $Valgrind $exe $opt           |& \
@@ -42,7 +42,7 @@ else
 
       case flog:
            if ("$Valgrind" == "") then
-              flog $Log $CFE $exe $opt
+              flog $Log $CROSS_FE $exe $opt
               set xstatus = $status
            else
               ftee $Log $Valgrind $exe $opt           |& \
@@ -68,7 +68,7 @@ else
 
       default:
            if ("$Valgrind" == "") then
-              flog $Log ($CFE $exe $opt >&! $io)
+              flog $Log ($CROSS_FE $exe $opt >&! $io)
               set xstatus = $status
            else
               ftee $Log $Valgrind $exe $opt           |& \

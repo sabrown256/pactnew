@@ -16,9 +16,9 @@ Note $ALog "Analyze: gethostbyname"
 
 dbmget $ALog CC_Exe^          \
              CC_Flags^        \
-             CFE^             \
              Cfe_LD_Flags^    \
              Cfe_LD_RPath^    \
+             CROSS_FE^        \
              PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
@@ -48,7 +48,7 @@ set opt = ""
 set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   fexec $ALog $CFE $Tmp `uname -n` @o2 @e3 vw:HAVE_GETHOSTBYNAME @ fw:/dev/null
+   fexec $ALog $CROSS_FE $Tmp `uname -n` @o2 @e3 vw:HAVE_GETHOSTBYNAME @ fw:/dev/null
    if ($gstatus[1] == 0) then
       set ok = TRUE
    endif

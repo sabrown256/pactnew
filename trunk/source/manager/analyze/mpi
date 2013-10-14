@@ -16,29 +16,29 @@ Note $ALog "----- analyze/mpi -----"
 Note $ALog "Analyze: mpi"
 Note $ALog ""
 
-dbmget $ALog REQUEST_MPI        =\? FALSE^   \
+dbmget $ALog Save_CC            =\? "cc"^    \
+             STD_MPI            =\? 1.0^     \
+             USE_MPI            =\? FALSE^   \
              HAVE_OPENMPI       =\? FALSE^   \
              HAVE_MPI_2         =\? FALSE^   \
              HAVE_MPI_STDIN_ALL =\? FALSE^   \
              HAVE_MPI_GOOD_IO   =\? FALSE^   \
-             STD_MPI            =\? 1.0^     \
-             USE_MPI            =\? FALSE^   \
-             PARALLEL_COMM_METH =\? PARC^    \
-             Save_CC            =\? "cc"^    \
+             DP_REQUEST_MPI     =\? FALSE^   \
+             DP_METHOD          =\? PARC^    \
              DP_Inc             =\? ""^      \
              DP_Lib             =\? ""^      \
              DP_RPath           =\? ""^      \
-             BE^                             \
+             DP_BE^                          \
+             DP_FE^                          \
              Bits^                           \
              CC_Flags^                       \
-             LD_Flags^                       \
-             PFE
+             LD_Flags
 
 # NOTE: because locate-mpi ends up getting DP_RPath on your RPATH
 # before feature/mpi is invoked you can end up with MPI
 # libary paths in your link line for non-MPI builds
 # so if feature/mpi is not invoked remove DP_RPath from RPATH
-if (($REQUEST_MPI == FALSE) && ("$DP_RPath" != "")) then
+if (($DP_REQUEST_MPI == FALSE) && ("$DP_RPath" != "")) then
    ../analyze/rpath -d $DP_RPath
 endif
 
@@ -68,8 +68,8 @@ foreach j ($DP_Inc $RootInc)
 # check for <path>/<pkg>/<pkg>.h form
    if ($GotIt == TRUE) then
       flog $ALog set lParComm = ( mpi $lParComm )
-      if ("$PARALLEL_COMM_METH" == "") then
-         setenv PARALLEL_COMM_METH MPI
+      if ("$DP_METHOD" == "") then
+         setenv DP_METHOD MPI
       endif
       break
    endif
@@ -147,8 +147,8 @@ EOF
    else
       flog $ALog ldd $Tmp
 
-      flog $ALog $PFE -dr -v -p 2 $Tmp $BE
-      fexvars $ALog t echo a @o $PFE -v -p 2 $Tmp $BE @b grep Proc @o wc -l
+      flog $ALog $DP_FE -dr -v -p 2 $Tmp $DP_BE
+      fexvars $ALog t echo a @o $DP_FE -v -p 2 $Tmp $DP_BE @b grep Proc @o wc -l
       if (($gstatus[2] == 0) && ($t > 1)) then
          flog $ALog setenv HAVE_MPI_STDIN_ALL TRUE
          flog $ALog set MPIStdIO = "all processes"
@@ -192,7 +192,7 @@ EOF
    set opt = ( $opt $lLib )
    flog $ALog $Save_CC $Tmp.c -o $Tmp $opt
    if ($status == 0) then
-      set vrs = ( `$PFE $Tmp` )
+      set vrs = ( `$DP_FE $Tmp` )
       if ("$vrs" =~ 2.*) then
          flog $ALog setenv HAVE_MPI_2 TRUE
       endif
@@ -205,10 +205,10 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Note $ALog "lParComm    = |$lParComm|"
-Note $ALog "REQUEST_MPI = |$REQUEST_MPI|"
+Note $ALog "lParComm       = |$lParComm|"
+Note $ALog "DP_REQUEST_MPI = |$DP_REQUEST_MPI|"
 
-if ($REQUEST_MPI == FALSE) then
+if ($DP_REQUEST_MPI == FALSE) then
    setenv DP_Inc    ""
    setenv DP_Lib    ""
    setenv DP_RPath  ""
@@ -240,7 +240,7 @@ dbmset $ALog HAVE_OPENMPI       = $HAVE_OPENMPI^        \
              HAVE_MPI_GOOD_IO   = $HAVE_MPI_GOOD_IO^    \
              STD_MPI            = $vrs^                 \
              USE_MPI            = $USE_MPI^             \
-             PARALLEL_COMM_METH = $PARALLEL_COMM_METH^  \
+             DP_METHOD = $DP_METHOD^  \
              DP_Inc             = $DP_Inc^              \
              DP_Lib             = $DP_Lib^              \
              DP_RPath           = $DP_RPath

@@ -33,8 +33,8 @@ Note $Log ""
 
 # do foreground part
          NoteD $Log "                       foreground .........."
-         Note $Log "( $CFE tcsh -f $PCFGBG -fg ) >&! res.fg"
-         $CFE tcsh -f $PCFGBG -fg >&! res.fg
+         Note $Log "( $CROSS_FE tcsh -f $PCFGBG -fg ) >&! res.fg"
+         $CROSS_FE tcsh -f $PCFGBG -fg >&! res.fg
          set xstatus = $status
 
          cat res.fg
@@ -46,8 +46,8 @@ Note $Log ""
 
 # do background part
          NoteD $Log "                       background .........."
-         Note $Log "( $CFE tcsh -f $PCFGBG -bg & ) >&! res.bg"
-         ( $CFE tcsh -f $PCFGBG -bg & ) >&! res.bg
+         Note $Log "( $CROSS_FE tcsh -f $PCFGBG -bg & ) >&! res.bg"
+         ( $CROSS_FE tcsh -f $PCFGBG -bg & ) >&! res.bg
          set xstatus = $status
 
          @ count = 0

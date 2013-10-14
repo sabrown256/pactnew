@@ -15,10 +15,10 @@ source ../../../scripts/test-env
 set sxopt = ( -e -r -s $ZeroSpace )
 set pvopt = ( -p -e -r -q $ZeroSpace )
 
-if ("$CFE" == "") then
-   set cfe = ""
+if ("$CROSS_FE" == "") then
+   set cross_fe = ""
 else
-   set cfe = ( $CFE -v )
+   set cross_fe = ( $CROSS_FE -v )
 endif
 
 foreach v (THREADING HAVE_MPI HAVE_SQLITE HAVE_HDF5)

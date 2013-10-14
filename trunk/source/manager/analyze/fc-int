@@ -15,11 +15,11 @@ Note $ALog ""
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-dbmget $ALog CFE^                          \
-             Cfe_LD_Flags^                 \
+dbmget $ALog Cfe_LD_Flags^                 \
              Cfe_LD_RPath^                 \
              FC_INTEGER_C  =\? "unknown"^  \
-             HAVE_FORTRAN
+             HAVE_FORTRAN^                 \
+             CROSS_FE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ EOF
       if ($status != 0) then
          @ si = 0
       else
-         fexec $ALog $CFE $Tmp @o vw:si
+         fexec $ALog $CROSS_FE $Tmp @o vw:si
          @ si = ( `$PERDB -e si` )
       endif
       Note $ALog "Fortran integer size = |$si|"
@@ -80,7 +80,7 @@ EOF
 
       if ($si > 0) then
          flog $ALog $lCC $Tmp.c -o $Tmp
-         fexvar $ALog FC_INTEGER_C $CFE $Tmp $si
+         fexvar $ALog FC_INTEGER_C $CROSS_FE $Tmp $si
       endif
 
       flog $ALog $RM $Tmp*

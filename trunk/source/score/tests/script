@@ -75,7 +75,7 @@ setenv SC_EXEC_TIME_FACTOR    16
 
       setenv LogF log-$Series.$i
       flog $Log rm -f $LogF.*
-      flog $Log $CFE $Script
+      flog $Log $CROSS_FE $Script
       flog $Log (diff $LogF.dmake $LogF.make >! $LogF.diff)
       set LStat = $status
 

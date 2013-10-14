@@ -33,7 +33,7 @@ if (0) then
        echo "3 end" ; \
        echo "1 end" ; \
        echo "2 d" ; \
-       echo "2 end" ) | $CFE $exe -c 30 -i -n 3 >&! tpcm.resp
+       echo "2 end" ) | $CROSS_FE $exe -c 30 -i -n 3 >&! tpcm.resp
       set xstatus = $status
       if ($xstatus == 123) then
          set xstatus = 251
@@ -52,7 +52,7 @@ if (0) then
        echo "3 end" ; \
        echo "1 end" ; \
        echo "2 d" ; \
-       echo "2 end" ) | $CFE $exe -c 30 -n 3 >&! tpcm.resi
+       echo "2 end" ) | $CROSS_FE $exe -c 30 -n 3 >&! tpcm.resi
       set xstatus = $status
       if ($xstatus == 123) then
          set xstatus = 251

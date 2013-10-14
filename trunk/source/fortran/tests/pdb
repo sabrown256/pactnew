@@ -111,14 +111,15 @@ if ($xstatus == 0) then
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# distribute parallel test
+# distributed parallel test
       if ($MPI == TRUE) then
          flog $Log pushd $SrcDir
          flog $Log $MAKE +na 2 fdp
          @ xstatus = $status
          flog $Log popd
 
-         set CFE = $BinDir/do-run
+# force CROSS_FE into a DP mode for this test
+         setenv CROSS_FE $BinDir/do-run
 
          NoteD $Log -n "                        dp ............................. "
          Note $Log ""

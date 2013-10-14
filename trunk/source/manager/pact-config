@@ -98,6 +98,8 @@ setenv UseTmpDir      FALSE
 setenv AbsoluteDeb    FALSE
 setenv AbsoluteOpt    FALSE
 setenv CROSS_COMPILE  FALSE
+setenv CROSS_FE
+setenv DP_FE     "$BinDir/do-run -m"
 
 setenv PSY_CfgMan  $PSY_ScrDir/cfgman
 setenv PSY_ID      `$PSY_CfgMan use`
@@ -127,9 +129,6 @@ setenv Log      $PSY_Root/log/config
 
 setenv NoExe   FALSE
 setenv Load    TRUE
-
-setenv PFE     "$BinDir/do-run -m"
-setenv CFE
 
 flog $Log (env | sort)
 
@@ -1325,7 +1324,7 @@ Finish:
     NoteD $Log "Writing system dependent files"
 
 # if T3D, fiddle pdb fortran interface regression test source
-    if ("$PFE" == "mppexec") then
+    if ("$DP_FE" == "mppexec") then
        cd $PSY_Base/pdb
 
        set STDAUX = tmp-$PSY_ID.f

@@ -84,7 +84,7 @@ setenv SC_EXEC_TIME_FACTOR    16
          rm -f $lg
          touch $lg
 
-         flog $Log ($CFE $m $Opt -f $mkf $tgt |& grep -v gmake | grep -v display >>& $lg)
+         flog $Log ($CROSS_FE $m $Opt -f $mkf $tgt |& grep -v gmake | grep -v display >>& $lg)
       end
       flog $Log (diff log-$Series.$i.dmake log-$Series.$i.make >! log-$Series.$i.diff)
       set LStat = $status

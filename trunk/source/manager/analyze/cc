@@ -46,8 +46,8 @@ dbmget $ALog CC_Exe       =\? cc^      \
              PACT_CC_VERSION^          \
              PACT_CC_PATH^             \
              PACT_CC_EXE^              \
-             CFE^                      \
-             BE^                       \
+             CROSS_FE^                 \
+             DP_BE^                    \
              OS_Name
 
 set UTime = `timer -r`
@@ -264,7 +264,7 @@ EOF
    flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
 
-      fexvar $ALog FC_INT_PTR_DIFFER $CFE $Tmp $BE
+      fexvar $ALog FC_INT_PTR_DIFFER $CROSS_FE $Tmp $DP_BE
       if ("$FC_INT_PTR_DIFFER" == TRUE) then
          NoteD $ALog "      pointer size differs from Fortran INTEGER size"
       endif
@@ -298,7 +298,7 @@ EOF
    flog $ALog cat $Tmp.c
    flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
-      set LONG64 = `$CFE $Tmp $BE`
+      set LONG64 = `$CROSS_FE $Tmp $DP_BE`
    else
       NoteD $ALog " "
       NoteD $ALog " "
@@ -330,7 +330,7 @@ EOF
    flog $ALog cat $Tmp.c
    flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
-      set NEED_ALT_LARGE_FILE = `$CFE $Tmp $BE`
+      set NEED_ALT_LARGE_FILE = `$CROSS_FE $Tmp $DP_BE`
    else
       NoteD $ALog " "
       NoteD $ALog " "

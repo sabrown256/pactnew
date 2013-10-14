@@ -51,7 +51,7 @@ while ($#argv > 0)
    shift
 end
 
-$CFE $BinDir/sx -s -l sxview.scm \(binls $files $digits $full\)
+$CROSS_FE $BinDir/sx -s -l sxview.scm \(binls $files $digits $full\)
 set RetVal = $status;
 
 exit($RetVal)
