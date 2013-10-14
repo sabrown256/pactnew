@@ -27,6 +27,7 @@ Note $Log ""
 dbmget $Log DO_RUN_DBG^      \
             DO_RUN_MPI^      \
             DO_RUN_CROSS^    \
+            PSY_CONFIG_PATH^ \
             EtcDir
 
 #--------------------------------------------------------------------------
@@ -62,7 +63,7 @@ if ($lcrs != none) then
    echo "default CROSS $lcross:r" >>& $db
 endif
 
-foreach d ($ConfigDir)
+foreach d ($PSY_CONFIG_PATH)
    if (-f $d/do-run-prolog) then
       call ADD($d/do-run-prolog)
       break
@@ -98,7 +99,7 @@ foreach i ( $cnd )
    if (-f $i) then
       set file = $i
    else
-      foreach d ($ConfigDir)
+      foreach d ($PSY_CONFIG_PATH)
          if (-f $d/do-run-$i) then
             set file = $d/do-run-$i
             break

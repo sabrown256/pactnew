@@ -25,9 +25,6 @@ Note $Log ""
 
 dbmget $Log UPDATE^       \
             BinDir^       \
-            ScmDir^       \
-            Man1Dir^      \
-            Man3Dir^      \
             HAVE_PYTHON^  \
             PY_Vers^      \
             PY_DirPy^     \
@@ -60,9 +57,7 @@ dbmget $Log UPDATE^       \
 
     if ("$PSY_InstRoot" == "none") then
 
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo " ** By request PACT is NOT being installed **"'
-       Note $STDOUT 'echo ""'
+       Note $STDOUT 'printf "\n ** By request PACT is NOT being installed **\n\n"'
        Note $STDOUT ""
 
     else
@@ -85,9 +80,9 @@ dbmget $Log UPDATE^       \
        Note $STDOUT ""
 
        Note $STDOUT "set instroot  = $PSY_InstRoot"
-       Note $STDOUT 'set SchemeDir = $instroot/'$ScmDir
-       Note $STDOUT 'set Man1Dir   = $instroot/'$Man1Dir
-       Note $STDOUT 'set Man3Dir   = $instroot/'$Man3Dir
+       Note $STDOUT 'set SchemeDir = $instroot/scheme'
+       Note $STDOUT 'set Man1Dir   = $instroot/man/man1'
+       Note $STDOUT 'set Man3Dir   = $instroot/man/man3'
        Note $STDOUT ""
 
        Note $STDOUT 'set Bins = ( '`awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
@@ -105,8 +100,7 @@ dbmget $Log UPDATE^       \
        Note $STDOUT "set RM = ( $RM )"
        Note $STDOUT ""
 
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "INSTALLING PACT ..."'
+       Note $STDOUT 'printf "\nINSTALLING PACT ...\n"'
        Note $STDOUT ""
 
        Note $STDOUT 'chdir $lsysdir'
@@ -120,8 +114,7 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT "# install executable files with 775"
        Note $STDOUT 'pushd bin >& /dev/null'
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing scripts in $instroot/bin"'
+       Note $STDOUT 'printf "\nInstalling scripts in $instroot/bin\n"'
        Note $STDOUT 'foreach file ($Scrs)'
        Note $STDOUT '   if (-f $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
@@ -135,8 +128,7 @@ dbmget $Log UPDATE^       \
        Note $STDOUT 'end'
        Note $STDOUT ""
 
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing binary executables in $instroot/bin"'
+       Note $STDOUT 'printf "\nInstalling binary executables in $instroot/bin\n"'
        Note $STDOUT 'foreach file ($Bins)'
        Note $STDOUT '   if (-x $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
@@ -150,8 +142,7 @@ dbmget $Log UPDATE^       \
        Note $STDOUT 'end'
        Note $STDOUT ""
 
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing pact utility in $instroot/bin"'
+       Note $STDOUT 'printf "\nInstalling pact utility in $instroot/bin\n"'
        Note $STDOUT 'set file = pact'
        Note $STDOUT 'set base = $file:t'
        Note $STDOUT 'if (-x "$file") then'
@@ -176,8 +167,7 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT "# install etc with 664"
        Note $STDOUT 'pushd etc >& /dev/null'
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing config/info in $instroot/etc"'
+       Note $STDOUT 'printf "\nInstalling config/info in $instroot/etc\n"'
        Note $STDOUT 'set DestDir = $instroot/etc'
        Note $STDOUT 'foreach file ($Etcs)'
        Note $STDOUT '   if (-f $file) then'
@@ -228,8 +218,7 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT "# install include with 664"
        Note $STDOUT 'pushd include >& /dev/null'
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing includes in $instroot/include"'
+       Note $STDOUT 'printf "\nInstalling includes in $instroot/include\n"'
        Note $STDOUT 'set DestDir = $instroot/include'
        Note $STDOUT 'foreach file ($Incs)'
        Note $STDOUT '   if (-f $file) then'
@@ -246,8 +235,7 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT "# install include/shell with 664"
        Note $STDOUT 'pushd shell >& /dev/null'
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing shell includes in $instroot/include/shell"'
+       Note $STDOUT 'printf "\nInstalling shell includes in $instroot/include/shell\n"'
        Note $STDOUT 'set DestDir = $instroot/include/shell'
        Note $STDOUT 'foreach file (*.[ch])'
        Note $STDOUT '   if (-f $file) then'
@@ -263,8 +251,7 @@ dbmget $Log UPDATE^       \
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing Fortran modules in $instroot/include"'
+       Note $STDOUT 'printf "\nInstalling Fortran modules in $instroot/include\n"'
        Note $STDOUT 'set DestDir = $instroot/include'
        Note $STDOUT 'foreach file ($Mods)'
        Note $STDOUT '   if (-f $file) then'
@@ -310,8 +297,7 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT "# install lib with 664"
        Note $STDOUT 'pushd lib >& /dev/null'
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing libs in $instroot/lib"'
+       Note $STDOUT 'printf "\nInstalling libs in $instroot/lib\n"'
        Note $STDOUT 'set DestDir = $instroot/lib'
        Note $STDOUT 'foreach f ($Libs)'
        Note $STDOUT '   set file = $f'
@@ -343,8 +329,7 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT "# install SCHEME files with 664"
        Note $STDOUT 'pushd scheme >& /dev/null'
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing SCHEME files in $SchemeDir"'
+       Note $STDOUT 'printf "\nInstalling SCHEME files in $SchemeDir\n"'
        Note $STDOUT 'set DestDir = $SchemeDir'
        Note $STDOUT 'foreach file ($Scms)'
        Note $STDOUT '   if (-f $file) then'
@@ -368,8 +353,7 @@ dbmget $Log UPDATE^       \
        Note $STDOUT '   endif'
        Note $STDOUT '   set LSFiles = `ls extensions`'
        Note $STDOUT '   if ("$LSFiles" != "") then'
-       Note $STDOUT '      echo ""'
-       Note $STDOUT '      echo "Installing SCHEME EXTENSIONS in $SchemeDir/extensions"'
+       Note $STDOUT '      printf "\nInstalling SCHEME EXTENSIONS in $SchemeDir/extensions\n"'
        Note $STDOUT '      chdir extensions'
        Note $STDOUT '      foreach file (*)'
        Note $STDOUT '         if (!(-d $file)) then'
@@ -394,8 +378,7 @@ dbmget $Log UPDATE^       \
 
        Note $STDOUT "# install MAN files with 664"
        Note $STDOUT 'pushd $ldocdir >& /dev/null'
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing MAN files in $Man1Dir"'
+       Note $STDOUT 'printf "\nInstalling MAN files in %s\n" $Man1Dir'
        Note $STDOUT 'set DestDir = $Man1Dir'
        Note $STDOUT 'foreach file (*.1)'
        Note $STDOUT '   if (-f $file) then'
@@ -414,6 +397,7 @@ dbmget $Log UPDATE^       \
        Note $STDOUT ""
 
        Note $STDOUT 'pushd man/man3 >& /dev/null'
+       Note $STDOUT 'printf "\nInstalling MAN files in %s\n" $Man3Dir'
        Note $STDOUT 'set DestDir = $Man3Dir'
        Note $STDOUT 'foreach file (*.3)'
        Note $STDOUT '   if (-f $file) then'
@@ -431,9 +415,7 @@ dbmget $Log UPDATE^       \
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "... PACT INSTALLATION COMPLETE"'
-       Note $STDOUT 'echo ""'
+       Note $STDOUT 'printf "\n... PACT INSTALLATION COMPLETE\n\n"'
        Note $STDOUT ""
 
        Note $STDOUT 'exit($err)'

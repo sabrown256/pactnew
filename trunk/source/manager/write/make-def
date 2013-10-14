@@ -72,8 +72,6 @@ dbmget $Log AR_IFlag^               \
             PACT_FC_VERSION^        \
             PACT_FC_PATH^           \
             PACT_FC_EXE^            \
-            PubLib^                 \
-            PubInc^                 \
             PY_CC^                  \
             PY_Cfg^                 \
             PY_Exe^                 \
@@ -88,6 +86,8 @@ dbmget $Log AR_IFlag^               \
             PSY_Root^               \
 	    PSY_ID^                 \
             PSY_InstRoot^           \
+            PSY_PubLib^             \
+            PSY_PubInc^             \
 	    PSY_CfgDir^             \
             PSY_MngDir^             \
 	    PSY_TmpDir^             \
@@ -415,19 +415,19 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     Note $STDOUT ""
-    Note $STDOUT "CROSS_FE  = $CROSS_FE"
-    Note $STDOUT "DP_BE     = $DP_BE"
+    Note $STDOUT "CROSS_FE   = $CROSS_FE"
+    Note $STDOUT "DP_BE      = $DP_BE"
 
     if ("$PSY_InstRoot" == "none") then
-       Note $STDOUT "PubLib    = "
-       Note $STDOUT "PubInc    = "
+       Note $STDOUT "PSY_PubLib = "
+       Note $STDOUT "PSY_PubInc = "
     else
-       Note $STDOUT "PubLib    = $PubLib"
-       Note $STDOUT "PubInc    = $PubInc"
+       Note $STDOUT "PSY_PubLib = $PSY_PubLib"
+       Note $STDOUT "PSY_PubInc = $PSY_PubInc"
     endif
+    Note $STDOUT ""
 
 # emit the load names for the libraries - cover threaded/nonthreaded
-    Note $STDOUT ""
     Note $STDOUT "ThreadLibExt=$ThreadLibExt"
     Note $STDOUT "LSCORE      = -lscore"
     Note $STDOUT "LMM         = -lpsmm"
@@ -439,8 +439,8 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "LSCHEME     = -lscheme"
     Note $STDOUT "LSX         = -lsx"
     Note $STDOUT "LULTRA      = -lultra"
-
     Note $STDOUT ""
+
     Note $STDOUT "#"
     Note $STDOUT "# System utilities"
     Note $STDOUT "#"

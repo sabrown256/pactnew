@@ -46,8 +46,6 @@ setenv ENV_VARS "Bits OS_Name \
                  PSY_Prefix PSY_CfgDir PSY_TmpDir PSY_Arch PSY_ID \
                  PSY_SITE PSY_TYPE PSY_Root PSY_AIRoot PSY_ASRoot"
 
-setenv CONFIG_PATH       "local:std"
-
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler
 setenv RootInc  /usr/include
@@ -273,48 +271,55 @@ Group PACT {
 }
 
 # PACT System group
-#   PSY_Arch      the system ID as defined by 'system-id'
-#   PSY_Cfg       the system config file
-#   PSY_CfgMan    full path to the cfgman utility
-#   PSY_ID        the system ID as defined by 'cfgman use'
-#   PSY_Prefix    the temporary directory prefix, e.g. "z-"
-#   PSY_TYPE      the system type as defined by 'site-signature'
-#   PSY_SITE      the site of the system as defined by 'site-signature'
+#   PSY_Arch         the system ID as defined by 'system-id'
+#   PSY_Cfg          the system config file
+#   PSY_CfgMan       full path to the cfgman utility
+#   PSY_CONFIG_PATH  list of directories where config files may be found
+#   PSY_ID           the system ID as defined by 'cfgman use'
+#   PSY_Prefix       the temporary directory prefix, e.g. "z-"
+#   PSY_TYPE         the system type as defined by 'site-signature'
+#   PSY_SITE         the site of the system as defined by 'site-signature'
 #
-#   PSY_Base      the base directory containing sources
-#   PSY_Root      the root dev directory for this PSY_ID
-#   PSY_AIRoot    the architecture independent root directory
-#   PSY_ASRoot    the architecture specific root directory
-#   PSY_InstRoot  the root installation directory
+#   PSY_Base         the base directory containing sources
+#   PSY_Root         the root dev directory for this PSY_ID
+#   PSY_AIRoot       the architecture independent root directory
+#   PSY_ASRoot       the architecture specific root directory
+#   PSY_InstRoot     the root installation directory
+#   PSY_PubInc       the public PACT installation include directory
+#   PSY_PubLib       the public PACT installation lib directory
 #
-#   PSY_AnaDir    the manager/analyze directory
-#   PSY_CfgDir    the temporary configuration directory
-#   PSY_FltDir    the directory containing filter files
-#   PSY_MngDir    the manager directory
-#   PSY_ScrDir    the scripts directory
-#   PSY_TmpDir    the temporary build/test directory
+#   PSY_AnaDir       the manager/analyze directory
+#   PSY_CfgDir       the temporary configuration directory
+#   PSY_FltDir       the directory containing filter files
+#   PSY_MngDir       the manager directory
+#   PSY_ScrDir       the scripts directory
+#   PSY_TmpDir       the temporary build/test directory
 
 Group PSY {
-   Arch     = ${PSY_Arch}
-   Cfg      = ""
-   CfgMan   = ${PSY_CfgMan}
-   ID       = ${PSY_ID}
-   Prefix   = "z-"
-   TYPE     = ""
-   SITE     = ""
+   Arch        = ${PSY_Arch}
+   Cfg         = ""
+   CfgMan      = ${PSY_CfgMan}
+   CONFIG_PATH = ${PSY_CONFIG_PATH}
 
-   Base     = ${PSY_Base}
-   Root     = ${PSY_Root}
-   AIRoot   = ""
-   ASRoot   = ""
-   InstRoot = none
+   ID          = ${PSY_ID}
+   Prefix      = "z-"
+   TYPE        = ""
+   SITE        = ""
 
-   AnaDir   = ${PSY_Base}/manager/analyze
-   CfgDir   = cfg-${PSY_ID}
-   FltDir   = ""
-   MngDir   = ${PSY_Base}/manager
-   ScrDir   = ${PSY_Base}/scripts
-   TmpDir   = ${PSY_Prefix}${PSY_ID}
+   Base        = ${PSY_Base}
+   Root        = ${PSY_Root}
+   AIRoot      = ""
+   ASRoot      = ""
+   InstRoot    = ${PSY_InstRoot}
+   PubInc      = ${PSY_PubInc}
+   PubLib      = ${PSY_PubLib}
+
+   AnaDir      = ${PSY_Base}/manager/analyze
+   CfgDir      = cfg-${PSY_ID}
+   FltDir      = ""
+   MngDir      = ${PSY_Base}/manager
+   ScrDir      = ${PSY_Base}/scripts
+   TmpDir      = ${PSY_Prefix}${PSY_ID}
 }
 
 # requested features - pre-analyze

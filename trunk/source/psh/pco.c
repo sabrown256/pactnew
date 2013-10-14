@@ -1626,13 +1626,9 @@ static void default_var(client *cl, char *base)
     dbinitv(cl, "PSY_CfgMan",    "%s/cfgman", st.dir.scr);
     dbinitv(cl, "PSY_MngDir",    st.dir.mng);
     dbinitv(cl, "PSY_InstRoot",  "none");
-    dbinitv(cl, "PubInc",        "");
-    dbinitv(cl, "PubLib",        "");
-    dbinitv(cl, "ScmDir",        "scheme");
-    dbinitv(cl, "Man1Dir",       "man/man1");
-    dbinitv(cl, "Man3Dir",       "man/man3");
+    dbinitv(cl, "PSY_PubInc",    "");
+    dbinitv(cl, "PSY_PubLib",    "");
     dbinitv(cl, "CROSS_COMPILE", "FALSE");
-    dbinitv(cl, "CONFIG_PATH",   "");
 
 /* global variables */
     snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.psy_id);
@@ -2058,8 +2054,8 @@ static void set_inst_base(client *cl, char *ib)
 	st.installp = TRUE;};
 
     dbset(cl, "PSY_InstRoot", ib);
-    dbset(cl, "PubInc",       "-I%s/include", ib);
-    dbset(cl, "PubLib",       "-L%s/lib", ib);
+    dbset(cl, "PSY_PubInc",   "-I%s/include", ib);
+    dbset(cl, "PSY_PubLib",   "-L%s/lib", ib);
 
     return;}
 
@@ -2602,8 +2598,8 @@ static void read_config(client *cl, char *cfg, int quiet)
 	 else if (strcmp(key, "PSY_InstRoot") == 0)
 	    {if (st.installp == FALSE)
 	        {dbset(cl, "PSY_InstRoot", value);
-		 dbset(cl, "PubInc",   "-I%s/include", value);
-		 dbset(cl, "PubLib",   "-L%s/lib", value);};}
+		 dbset(cl, "PSY_PubInc",   "-I%s/include", value);
+		 dbset(cl, "PSY_PubLib",   "-L%s/lib", value);};}
 
 	 else if (strcmp(key, "exep") == 0)
 	    {st.exep  = TRUE;
@@ -2815,7 +2811,7 @@ static void write_do_run_db(client *cl, state *st)
     char **cnd, **sa, *file, *exe, *p;
     FILE *fp;
 
-    p = cgetenv(TRUE, "ConfigDir");
+    p = cgetenv(TRUE, "PSY_CONFIG_PATH");
     if (IS_NULL(p) == TRUE)
        p = "local std";
     nstrncpy(cfg,  BFLRG, p, -1);
@@ -2825,7 +2821,7 @@ static void write_do_run_db(client *cl, state *st)
     nstrncpy(lcrs, BFLRG, dbget(cl, TRUE, "DO_RUN_CROSS"), -1);
 
     separator(Log);
-    note(Log, TRUE, "   ConfigDir     = %s", cfg);
+    note(Log, TRUE, "   PSY_CONFIG_PATH     = %s", cfg);
     note(Log, TRUE, "   DO_RUN_DBG    = %s", ldbg);
     note(Log, TRUE, "   DO_RUN_MPI    = %s", lmpi);
     note(Log, TRUE, "   DO_RUN_CROSS  = %s", lcrs);
