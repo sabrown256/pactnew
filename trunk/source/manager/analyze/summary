@@ -82,19 +82,16 @@ dbmget $Log HAVE_FORTRAN^     \
     Note $Log "   Cfg C Compiler used is $Cfe_CC_Exe"
     Note $Log "   Cfg Fortran Compiler used is $Cfe_FC_Exe"
 
-    if ($AbsoluteDeb == TRUE) then
+    if ($RF_DEBUG == TRUE) then
        NoteD $Log "   Building absolutely debuggable version"
-       dbset BUILD_DEBUG TRUE
     endif
 
-    if ($AbsoluteOpt == TRUE) then
+    if ($RF_OPTIMIZE == TRUE) then
        NoteD $Log "   Building absolutely optimized version"
-       dbset BUILD_OPTIMIZE TRUE
     endif
 
-    if ($Profile == TRUE) then
+    if ($RF_PROFILE == TRUE) then
        NoteD $Log "   Building profiling version"
-       dbset BUILD_PROFILE TRUE
     endif
        
 # PY_Exe     the full path to the python executable

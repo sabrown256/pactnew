@@ -7,5 +7,6 @@
 # include "cpyright.h"
 #
 
-CSpokes = 
-
+Group RF {
+   SPOKES_C = 
+}

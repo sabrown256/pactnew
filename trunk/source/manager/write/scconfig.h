@@ -24,9 +24,6 @@ NoteD $Log "   C Environment Configuration - scconfig.h"
 Note $Log ""
 
 dbmget $Log BFD_Version^              \
-            BUILD_DEBUG^              \
-            BUILD_OPTIMIZE^           \
-            BUILD_PROFILE^            \
             CC_Exe^                   \
             CEFile^                   \
             SHELL_Default^            \
@@ -58,9 +55,9 @@ dbmget $Log BFD_Version^              \
             SQLITE3_SO^               \
             HDF5_SO^                  \
             HAVE_BAD_LINE_DIRECTIVES^ \
-            BUILD_DEBUG^              \
-            BUILD_OPTIMIZE^           \
-            BUILD_PROFILE^            \
+            RF_DEBUG^                 \
+            RF_OPTIMIZE^              \
+            RF_PROFILE^               \
             HAVE_INLINE^              \
             HAVE_NORETURN^            \
             HAVE_OPENMP^              \
@@ -214,9 +211,6 @@ dbmget $Log BFD_Version^              \
 
 # emit the HAVE/USE flags - no value
     set lhave = ""
-    set lhave = ( $lhave BUILD_DEBUG              none )
-    set lhave = ( $lhave BUILD_OPTIMIZE           none )
-    set lhave = ( $lhave BUILD_PROFILE            none )
     set lhave = ( $lhave FC_INT_PTR_DIFFER        none )
     set lhave = ( $lhave HAVE_ANSI_FLOAT16        none )
     set lhave = ( $lhave HAVE_ANSI_C9X_COMPLEX    none )
@@ -251,6 +245,9 @@ dbmget $Log BFD_Version^              \
     set lhave = ( $lhave HAVE_DYNAMIC_LINKER      none )
     set lhave = ( $lhave HAVE_BFD                 none )
     set lhave = ( $lhave HAVE_DEMANGLE            none )
+    set lhave = ( $lhave RF_DEBUG                 none )
+    set lhave = ( $lhave RF_OPTIMIZE              none )
+    set lhave = ( $lhave RF_PROFILE               none )
     set lhave = ( $lhave USE_FULL_MM              none )
 #    set lhave = ( $lhave HAVE_READLINE            none )
 

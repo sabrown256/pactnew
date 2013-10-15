@@ -95,11 +95,11 @@ set IBSet        = dflt
 set CreateDirs   = FALSE
 
 setenv UseTmpDir      FALSE
-setenv AbsoluteDeb    FALSE
-setenv AbsoluteOpt    FALSE
 setenv CROSS_COMPILE  FALSE
 setenv CROSS_FE
-setenv DP_FE     "$BinDir/do-run -m"
+setenv DP_FE          "$BinDir/do-run -m"
+setenv RF_DEBUG       FALSE
+setenv RF_OPTIMIZE    FALSE
 
 setenv PSY_CfgMan  $PSY_ScrDir/cfgman
 setenv PSY_ID      `$PSY_CfgMan use`
@@ -187,7 +187,7 @@ Main:
                    breaksw
 
           case -g:
-                   setenv AbsoluteDeb TRUE
+                   setenv RF_DEBUG TRUE
                    breaksw
 
           case -i:
@@ -206,7 +206,7 @@ Main:
                    breaksw
 
           case -o:
-                   setenv AbsoluteOpt TRUE
+                   setenv RF_OPTIMIZE TRUE
                    breaksw
 
           case -p:

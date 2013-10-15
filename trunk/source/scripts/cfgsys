@@ -186,7 +186,7 @@ echo "setenv PSY_CfgMan   $PSY_CfgMan ; "
 echo "setenv PSY_ID       $PSY_ID ; "
 echo "setenv PSY_Prefix   $PSY_Prefix ; "
 echo "setenv PSY_TYPE     $PSY_TYPE ; "
-if ($?PSY_SITE == 0) then
+if ($?PSY_SITE == 1) then
    echo "setenv PSY_SITE     $PSY_SITE ; "
 endif
 
