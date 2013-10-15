@@ -16,6 +16,8 @@ Note $ALog "Analyze: opengl"
 Note $ALog ""
 
 dbmget $ALog HSY_RootInc^                        \
+             HSY_RootLib^                        \
+             OGL_Inc          =\? ""^            \
              OGL_Lib          =\? ""^            \
              OGL_RPath        =\? $HSY_RootLib^  \
              OGL_Path         =\? /usr^          \

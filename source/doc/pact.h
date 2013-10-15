@@ -1188,7 +1188,7 @@ those purposes.
 <BR>Default is &#147;-O&#148;.</UL>
 
 <P>
-<B>CSpokes</B>
+<B>RF_SPOKES_C</B>
 <BR>
 <UL>A list of C codes binary file translation spokes to be built with SX. An
 NACF spoke is included with the distribution.
@@ -1312,7 +1312,7 @@ options your system&#146;s rm has.
 <BR>Default is &#147;rm -f&#148;</UL>
 
 <P>
-<B>SchemeSpokes</B>
+<B>RF_SPOKES_SCHEME</B>
 <BR>
 <UL>A list of Scheme coded binary file translation spokes to be used with SX.
 A netCDF spoke is included with the distribution.

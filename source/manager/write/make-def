@@ -92,7 +92,6 @@ dbmget $Log AR_IFlag^               \
             PSY_MngDir^             \
 	    PSY_TmpDir^             \
             SMP_LibExt^             \
-            UPDATE^                 \
             URFile^                 \
             Yacc_Exe^               \
             Yacc_Flags
@@ -445,9 +444,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "#"
     Note $STDOUT "INSTALL    = $INSTALL_Exe"
     Note $STDOUT "RM         = $RM"
-
     Note $STDOUT "RANLIB     = aranlib"
-    Note $STDOUT "UPDATE     = $UPDATE"
 
     if ("$HAVE_PYTHON" =~ *TRUE*) then
 # GOTCHA: what about the other python versions in the list

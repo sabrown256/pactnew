@@ -15,7 +15,8 @@ Note $ALog "----- analyze/libz -----"
 Note $ALog "Analyze: libz"
 Note $ALog ""
 
-dbmget $ALog HSY_RootLib^                 \
+dbmget $ALog HSY_RootInc^                 \
+             HSY_RootLib^                 \
              Z_Inc     =\? ""^            \
              Z_Lib     =\? ""^            \
              Z_RPath   =\? $HSY_RootLib^  \

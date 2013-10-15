@@ -16,6 +16,7 @@ Note $ALog "Analyze: x11"
 Note $ALog ""
 
 dbmget $ALog HSY_RootInc^                        \
+             HSY_RootLib^                        \
              X11_Inc          =\? $HSY_RootInc^  \
              X11_Lib          =\? ""^            \
              X11_RPath        =\? $HSY_RootLib^  \

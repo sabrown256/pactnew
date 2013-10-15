@@ -23,7 +23,7 @@ Separator $Log
 NoteD $Log "   PACT Installer Script - install-pact"
 Note $Log ""
 
-dbmget $Log UPDATE^       \
+dbmget $Log Ranlib_Exe^   \
             BinDir^       \
             HAVE_PYTHON^  \
             PY_Vers^      \
@@ -307,8 +307,8 @@ dbmget $Log UPDATE^       \
        Note $STDOUT '      if ($status != 0) then'
        Note $STDOUT '         echo "   FAILED ($status) $file"'
        Note $STDOUT '      else'
-       if ("$UPDATE" != "touch") then
-          Note $STDOUT "         $UPDATE "'$DestDir/$file >& /dev/null'
+       if ("$Ranlib_Exe" != "touch") then
+          Note $STDOUT "         aranlib "'$DestDir/$file >& /dev/null'
        endif
        Note $STDOUT '         echo "   $file"'
        Note $STDOUT '      endif'

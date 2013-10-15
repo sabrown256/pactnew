@@ -16,9 +16,10 @@ Note $ALog "Analyze: QuickDrawn"
 Note $ALog ""
 
 dbmget $ALog HSY_RootInc^                        \
+             HSY_RootLib^                        \
              QD_Inc           =\? ""^            \
              QD_Lib           =\? ""^            \
-             QD_RPath         =\? $HYS_RootLib^  \
+             QD_RPath         =\? $HSY_RootLib^  \
              QD_Path          =\? /usr^          \
              Std_UseQD        =\? FALSE^         \
              Cfg_CC_Exe       =\? cc^            \

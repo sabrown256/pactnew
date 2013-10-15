@@ -52,7 +52,9 @@ while ($#argv > 0)
    shift
 end
 
-dbmget /dev/null RPATH
+dbmget /dev/null HSY_RootInc^   \
+                 HSY_RootLib^   \
+                 RPATH
 
 setenv HAVE_OPENMPI FALSE
 unsetenv DP_Inc
