@@ -52,8 +52,6 @@ setenv SUFFIXES  '.i'
 LIB              = lib
 WARN_PATTERN     =
 ERR_PATTERN      =
-SchemeSpokes     = netcdf
-CSpokes          =
 
 #--------------------------------------------------------------------------
 
@@ -333,6 +331,8 @@ Group PSY {
 
 # requested features - pre-analyze
 Group RF {
+   SPOKES_C      =
+   SPOKES_SCHEME = netcdf
 }
 
 Group RL {

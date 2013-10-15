@@ -14,8 +14,7 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: finish"
 
-dbmget $ALog AbsoluteDeb^              \
-             CC_Exe^                   \
+dbmget $ALog CC_Exe^                   \
              CC_Flags^                 \
              CC_Optimize^              \
              CC_Debug^                 \
@@ -68,6 +67,7 @@ dbmget $ALog AbsoluteDeb^              \
              GRAPHICS_Flags   =\? ""^  \
    	     HAVE_PNGLIB^              \
    	     HAVE_JPEGLIB^             \
+             RF_DEBUG^                 \
              HSY_Rootinc^              \
              Std_UseOGL^               \
              Std_UseQD^                \
@@ -324,14 +324,14 @@ dbmget $ALog AbsoluteDeb^              \
    flog $Log setenv AFC_Optimize_Default "-aO"
    flog $Log setenv AFC_Debug_Default    "-ag"
 
-   if ($AbsoluteDeb == TRUE) then
-      flog $Log setenv CC_Optimize_Default "$CC_Debug"
-      flog $Log setenv FC_Optimize_Default "$FC_Debug"
+   if ($RF_DEBUG == TRUE) then
+      flog $Log setenv CC_Optimize_Default  "$CC_Debug"
+      flog $Log setenv FC_Optimize_Default  "$FC_Debug"
       flog $Log setenv ACC_Optimize_Default "-ag"
       flog $Log setenv AFC_Optimize_Default "-ag"
-   else if ($AbsoluteOpt == TRUE) then
-      flog $Log setenv CC_Debug_Default "$CC_Optimize"
-      flog $Log setenv FC_Debug_Default "$FC_Optimize"
+   else if ($RF_OPTIMIZE == TRUE) then
+      flog $Log setenv CC_Debug_Default     "$CC_Optimize"
+      flog $Log setenv FC_Debug_Default     "$FC_Optimize"
       flog $Log setenv ACC_Optimize_Default "-aO"
       flog $Log setenv AFC_Optimize_Default "-aO"
    endif

@@ -36,7 +36,7 @@ dbmget $Log AR_IFlag^               \
             Cfg_CC_Exe^             \
             Cfg_CC_Flags^           \
             Cfg_CC_Inc^             \
-            CSpokes^                \
+            RF_SPOKES_C^            \
             CROSS_FE^               \
             SHELL_Default^          \
             DP_BE^                  \

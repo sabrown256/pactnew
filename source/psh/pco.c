@@ -1386,13 +1386,14 @@ static void setup_analyze_env(client *cl, char *base)
     dbset(cl, "PSY_Base",   base);
     dbset(cl, "PSY_AnaDir", "%s/analyze", st.dir.mng);
     dbset(cl, "PSY_ScrDir", st.dir.scr);
+
+    dbset(cl, "RF_DEBUG",    st.abs_deb ? "TRUE" : "FALSE");
+    dbset(cl, "RF_OPTIMIZE", st.abs_opt ? "TRUE" : "FALSE");
+    dbset(cl, "RF_PROFILE",  st.profilep ? "TRUE" : "FALSE");
+    dbset(cl, "UseTmpDir",   st.tmp_dirp ? "TRUE" : "FALSE");
+
     dbset(cl, "Log",        st.logf);
     dbset(cl, "ALog",       alog);
-
-    dbset(cl, "AbsoluteDeb", st.abs_deb ? "TRUE" : "FALSE");
-    dbset(cl, "AbsoluteOpt", st.abs_opt ? "TRUE" : "FALSE");
-    dbset(cl, "Profile",     st.profilep ? "TRUE" : "FALSE");
-    dbset(cl, "UseTmpDir",   st.tmp_dirp ? "TRUE" : "FALSE");
 
     if (strncmp(st.os, "CYGWIN", 6) == 0)
        st.os[6] = '\0';

@@ -23,11 +23,11 @@ Separator $Log
 NoteD $Log "   Binary File Translation Spokes Loader - spokes.scm"
 Note $Log ""
 
-dbmget $Log CSpokes^         \
-            SchemeSpokes^    \
-            SHELL_Cont^      \
-            PSY_Base^        \
-            PSY_Root^        \
+dbmget $Log RF_SPOKES_C^         \
+            RF_SPOKES_SCHEME^    \
+            SHELL_Cont^          \
+            PSY_Base^            \
+            PSY_Root^            \
             PSY_Cfg
 
 #--------------------------------------------------------------------------
@@ -50,7 +50,7 @@ if (-d $PSY_Base/sx/applications) then
     Note $STDOUT '      (printf nil "Cannot find %s'$SHELL_Cont'n" file)))'
     Note $STDOUT ""
 
-    flog $Log set lSpokes = ( `echo $SchemeSpokes` )
+    flog $Log set lSpokes = ( `echo $RF_SPOKES_SCHEME` )
     flog $Log set nspokes = $#lSpokes
     flog $Log set ispoke  = 0
     while (`expr $ispoke \< $nspokes`)
@@ -59,7 +59,7 @@ if (-d $PSY_Base/sx/applications) then
        Note $STDOUT "(safe-load" '"'$tspoke".scm"'"'")"
     end
 
-    flog $Log set lSpokes = ( `echo $CSpokes` )
+    flog $Log set lSpokes = ( `echo $RF_SPOKES_C` )
     flog $Log set nspokes = $#lSpokes
     flog $Log set ispoke  = 0
     while (`expr $ispoke \< $nspokes`)
