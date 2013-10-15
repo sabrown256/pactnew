@@ -16,6 +16,7 @@ Note $ALog "Analyze: MySQL and SQLite"
 Note $ALog ""
 
 dbmget $ALog HSY_RootInc^                  \
+             HSY_RootLib^                  \
              SQL_Inc    =\? ""^            \
              SQL_Lib    =\? ""^            \
              SQL_RPath  =\? $HSY_RootLib^  \

@@ -15,7 +15,8 @@ Note $ALog "----- analyze/hdf5 -----"
 Note $ALog "Analyze: hdf5"
 Note $ALog ""
 
-dbmget $ALog HSY_RootLib^                  \
+dbmget $ALog HSY_RootInc^                  \
+             HSY_RootLib^                  \
              HDF_Inc    =\? ""^            \
              HDF_Lib    =\? ""^            \
              HDF_RPath  =\? $HSY_RootLib^  \

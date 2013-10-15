@@ -13,6 +13,7 @@ Note $ALog "Analyze: openssl"
 Note $ALog ""
 
 dbmget $ALog HSY_RootInc^                    \
+             HSY_RootLib^                    \
              SSL_Inc      =\? ""^            \
              SSL_Lib      =\? ""^            \
              SSL_RPath    =\? $HSY_RootLib^  \

@@ -13,6 +13,8 @@ source $Me:h/common
 
 Note $ALog "Analyze: fpe"
 
+dbmget $ALog HSY_RootInc
+
 set fpe = ""
 
 #--------------------------------------------------------------------------

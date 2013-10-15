@@ -15,7 +15,8 @@ Note $ALog "----- analyze/jpeg -----"
 Note $ALog "Analyze: jpeg"
 Note $ALog ""
 
-dbmget $ALog HSY_RootLib^                    \
+dbmget $ALog HSY_RootInc^                    \
+             HSY_RootLib^                    \
              JPEG_Inc     =\? ""^            \
              JPEG_Lib     =\? ""^            \
              JPEG_RPath   =\? $HSY_RootLib^  \

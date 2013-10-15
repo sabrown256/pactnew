@@ -31,11 +31,10 @@ dbmget $Log Bits^              \
             IncDir^            \
             HSY_FPU^           \
             HAVE_GNU_FENV^     \
-            NoExe^             \
             Ranlib_Exe^        \
             PSY_Cfg^           \
             PSY_TYPE^          \
-            UPDATE
+            NoExe
 
 set LibVers = 1
 
@@ -138,8 +137,8 @@ set LibVers = 1
     Note $STDOUT '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	${INSTALL} ${TGTLib} ${TGTLib}'
 
-    if ("$UPDATE" != "touch") then
-       Note $STDOUT "	$UPDATE "'${LibDir}/${TGTLib}'
+    if ("$Ranlib_Exe" != "touch") then
+       Note $STDOUT '	aranlib ${LibDir}/${TGTLib}'
     endif
     Note $STDOUT ''
 

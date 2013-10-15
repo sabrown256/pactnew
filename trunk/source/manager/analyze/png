@@ -16,6 +16,7 @@ Note $ALog "Analyze: png"
 Note $ALog ""
 
 dbmget $ALog HSY_RootInc^                   \
+             HSY_RootLib^                   \
              PNG_Inc     =\? ""^            \
              PNG_Lib     =\? ""^            \
              PNG_RPath   =\? $HSY_RootLib^  \

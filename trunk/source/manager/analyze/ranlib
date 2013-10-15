@@ -111,13 +111,12 @@ EOF
    if ($Ranlib_Exe == ranlib) then
       flog $ALog ranlib -t libfoo.a
       if ($status == 0) then
-         setenv UPDATE "ranlib -t"
+         set ranlib_exe = "ranlib -t"
       else
-         setenv UPDATE "ranlib"
+         set ranlib_exe = "ranlib"
       endif
-      NoteD $ALog "   Ranlib: $UPDATE"
+      NoteD $ALog "   Ranlib: $ranlib_exe"
    else
-      setenv UPDATE $Ranlib_Exe
       NoteD $ALog "   Ranlib: no ranlib"
    endif
 
@@ -130,8 +129,7 @@ dbmset $ALog AR_Exe     = $AR_Exe^       \
              AR_Flags   = $AR_Flags^     \
              AR_IFlag   = $AR_IFlag^     \
              AR_XFlag   = $AR_XFlag^     \
-             Ranlib_Exe = $Ranlib_Exe^   \
-             UPDATE     = $UPDATE
+             Ranlib_Exe = $Ranlib_Exe
 
 exit(0)
 
