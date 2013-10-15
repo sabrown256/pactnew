@@ -99,5 +99,6 @@ Group PThread {
    LD_Lib = -lpthread 
 }
 
+include features/aix
 include cpp-rule
 include serial

@@ -27,7 +27,7 @@ dbmget $ALog CC_Exe         =\? cc^         \
              HAVE_BFD       =\? FALSE^      \
              HAVE_DEMANGLE  =\? FALSE^      \
              PACT_CC_VERSION^               \
-             Linking
+             RF_Linking
 
 # if we have explicitly said we do not want BFD
 # do NOT detect it
@@ -157,7 +157,7 @@ EOF
 
       NoteD $ALog "      has bfd ($BFD_VERSION)"
 
-      if (($Linking == dynamic) && ($?lSO == 1)) then
+      if (($RF_Linking == dynamic) && ($?lSO == 1)) then
          setenv BFD_SO    $lSO
       endif
       flog $ALog setenv HAVE_BFD TRUE

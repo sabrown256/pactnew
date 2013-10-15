@@ -31,12 +31,13 @@ dbmget $ALog FC_Exe           =\? "f90"^  \
              Cfg_FC_Flags     =\? ""^     \
              Cfe_CC_Exe^                  \
              Cfe_CC_Flags^                \
+             NM_Cmd^                      \
+             OS_Name^                     \
              PACT_FC_FAMILY^              \
              PACT_FC_VERSION^             \
              PACT_FC_PATH^                \
              PACT_FC_EXE^                 \
-             NM_Cmd^                      \
-             OS_Name
+             RF_STRICT
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -167,7 +168,7 @@ if ($FC_Exe != "") then
    endif
    if ($xstatus == 0) then
       NoteD $ALog "      requested version $CmpVers"
-   else if (("$CmpVers" != any) && ($STRICT > 0)) then
+   else if (("$CmpVers" != any) && ($RF_STRICT > 0)) then
       NoteD $ALog "      requested version $CmpVers (not found)"
       setenv STOP ""
       dbexp STOP

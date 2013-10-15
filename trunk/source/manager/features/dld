@@ -7,5 +7,6 @@
 # include "cpyright.h"
 #
 
-Linking = dynamic
-
+Group RF {
+   Linking = dynamic
+}

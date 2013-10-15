@@ -748,6 +748,7 @@ switch ($Cmnd)
                    echo "        -o         build an absolutely optimizied version"
                    echo "        -O         build an mixed debuggable/optimizied version"
                    echo "        -p         build a profiling version"
+                   echo "        -strict    fail if exactly specified features are not found"
                    echo "        -v         display the Version of the Source Control System"
                    echo "        -V         configuration/build makefiles verbose"
                    echo ""
@@ -1321,7 +1322,7 @@ CFG_DONE:
            switch ($1)
               case -a:
                    set db  = $EtcDir/cfg.db
-                   set inf = ( `pact +l -info CONFIG_METHOD` )
+                   set inf = ( `pact +l -info RF_CONFIG_METHOD` )
                    set mth = $inf[1]
                    set cfg = ( `grep PSY_Cfg= $db | sed 's/^PSY_Cfg=//'` )
                    set inf = ( `$PSY_CfgMan list` )
@@ -2264,7 +2265,7 @@ CFG_DONE:
 
 # get config method and original config file
         if (-f $db) then
-           set inf  = ( `pact +l -info CONFIG_METHOD` )
+           set inf  = ( `pact +l -info RF_CONFIG_METHOD` )
            set meth = $inf[1]
            set cfg  = ( `grep PSY_Cfg= $db |& sed 's/^PSY_Cfg=//'` )
         else

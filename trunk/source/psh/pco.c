@@ -893,7 +893,7 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 
 static void write_envf(client *cl, int lnotice)
    {int i, n;
-    char *site[] = { "CONFIG_METHOD" };
+    char *site[] = { "RF_CONFIG_METHOD" };
     char *sfx[]  = { "csh", "sh", "dk", "mdl" };
     FILE *fcsh, *fsh, *fdk, *fmd;
 
@@ -1390,7 +1390,7 @@ static void setup_analyze_env(client *cl, char *base)
     dbset(cl, "RF_DEBUG",    st.abs_deb ? "TRUE" : "FALSE");
     dbset(cl, "RF_OPTIMIZE", st.abs_opt ? "TRUE" : "FALSE");
     dbset(cl, "RF_PROFILE",  st.profilep ? "TRUE" : "FALSE");
-    dbset(cl, "UseTmpDir",   st.tmp_dirp ? "TRUE" : "FALSE");
+    dbset(cl, "USE_TmpDir",  st.tmp_dirp ? "TRUE" : "FALSE");
 
     dbset(cl, "Log",        st.logf);
     dbset(cl, "ALog",       alog);
@@ -2529,7 +2529,7 @@ static void read_config(client *cl, char *cfg, int quiet)
     note(Log, TRUE, "");
 
     note(Log, TRUE, "");
-    note(Log, TRUE, "Strict checking level is %s", dbget(cl, TRUE, "STRICT"));
+    note(Log, TRUE, "Strict checking level is %s", dbget(cl, TRUE, "RF_STRICT"));
     note(Log, TRUE, "");
     separator(Log);
 
@@ -3283,7 +3283,7 @@ int main(int c, char **v, char **env)
 		 return(1);};
 	     st.db = d;
              dbset(cl, "PACT_CFG_FILE", "db");
-	     dbset(cl, "CONFIG_METHOD", "database");}
+	     dbset(cl, "RF_CONFIG_METHOD", "database");}
  
 /* this was handled in reset_env */
          else if (strcmp(v[i], "-env") == 0)
@@ -3291,7 +3291,7 @@ int main(int c, char **v, char **env)
  
          else if (strcmp(v[i], "-ft") == 0)
 	    {nstrncpy(st.features, BFSML, v[++i], -1);
-	     dbset(cl, "FEATURES", st.features);}
+	     dbset(cl, "RF_FEATURES", st.features);}
 
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
@@ -3349,7 +3349,7 @@ int main(int c, char **v, char **env)
          else
 	    {nstrncpy(st.cfgf, BFLRG, v[i], -1);
              dbset(cl, "PACT_CFG_FILE", st.cfgf);
-	     dbset(cl, "CONFIG_METHOD", "file");};};
+	     dbset(cl, "RF_CONFIG_METHOD", "file");};};
 
     set_inst_base(cl, ib);
 
@@ -3361,7 +3361,7 @@ int main(int c, char **v, char **env)
     run(BOTH, "mkdir %s", st.dir.cfg);
 
     if (st.db == NULL)
-       {dbset(cl, "STRICT", strct);
+       {dbset(cl, "RF_STRICT", strct);
 
 	read_config_files(cl);
 
@@ -3391,11 +3391,11 @@ int main(int c, char **v, char **env)
         write_do_run_db(cl, &st);
 
 /* order matters crucially here */
-        env_subst(cl, "PSY_Base",       base);
-        env_subst(cl, "PSY_InstRoot",   ib);
-        env_subst(cl, "PSY_Root",       st.dir.root);
-        env_subst(cl, "PSY_ID",         st.psy_id);
-        env_subst(cl, "CONFIG_METHOD",  "database");
+        env_subst(cl, "PSY_Base",         base);
+        env_subst(cl, "PSY_InstRoot",     ib);
+        env_subst(cl, "PSY_Root",         st.dir.root);
+        env_subst(cl, "PSY_ID",           st.psy_id);
+        env_subst(cl, "RF_CONFIG_METHOD", "database");
 
 	snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.psy_id);
 	nstrncpy(st.cfgf,    BFLRG, cgetenv(FALSE, "CONFIG_FILE"), -1);

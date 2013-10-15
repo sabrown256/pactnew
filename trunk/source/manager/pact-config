@@ -94,12 +94,12 @@ set NoAnalyze       = FALSE
 set IBSet        = dflt
 set CreateDirs   = FALSE
 
-setenv UseTmpDir      FALSE
 setenv CROSS_COMPILE  FALSE
 setenv CROSS_FE
 setenv DP_FE          "$BinDir/do-run -m"
 setenv RF_DEBUG       FALSE
 setenv RF_OPTIMIZE    FALSE
+setenv USE_TmpDir     FALSE
 
 setenv PSY_CfgMan  $PSY_ScrDir/cfgman
 setenv PSY_ID      `$PSY_CfgMan use`
@@ -179,11 +179,11 @@ Main:
                    breaksw
 
           case -F:
-                   setenv UseTmpDir FALSE
+                   setenv USE_TmpDir FALSE
                    breaksw
 
           case +F:
-                   setenv UseTmpDir TRUE
+                   setenv USE_TmpDir TRUE
                    breaksw
 
           case -g:

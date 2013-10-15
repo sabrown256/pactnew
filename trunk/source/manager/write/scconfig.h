@@ -38,7 +38,6 @@ dbmget $Log BFD_Version^              \
             OS_Release^               \
             IncDir^                   \
             STD_IPC^                  \
-            Linking^                  \
             LONG64^                   \
             HAVE_MPI_STDIN_ALL^       \
             HAVE_MPI_GOOD_IO^         \
@@ -58,6 +57,7 @@ dbmget $Log BFD_Version^              \
             RF_DEBUG^                 \
             RF_OPTIMIZE^              \
             RF_PROFILE^               \
+            RF_Linking^               \
             HAVE_INLINE^              \
             HAVE_NORETURN^            \
             HAVE_OPENMP^              \
@@ -280,7 +280,7 @@ dbmget $Log BFD_Version^              \
     Note $STDOUT ""
 
 # emit the SO flags
-    if ($Linking == dynamic) then
+    if ($RF_Linking == dynamic) then
        set lso = ""
        set lso = ( $lso HDF5_SO )
        set lso = ( $lso SQLITE3_SO )

@@ -50,21 +50,21 @@ if (-d $PSY_Base/sx/applications) then
     Note $STDOUT '      (printf nil "Cannot find %s'$SHELL_Cont'n" file)))'
     Note $STDOUT ""
 
-    flog $Log set lSpokes = ( `echo $RF_SPOKES_SCHEME` )
-    flog $Log set nspokes = $#lSpokes
+    flog $Log set lspokes = ( `echo $RF_SPOKES_SCHEME` )
+    flog $Log set nspokes = $#lspokes
     flog $Log set ispoke  = 0
     while (`expr $ispoke \< $nspokes`)
        set ispoke = `expr $ispoke + 1`
-       set tspoke = $lSpokes[$ispoke]
+       set tspoke = $lspokes[$ispoke]
        Note $STDOUT "(safe-load" '"'$tspoke".scm"'"'")"
     end
 
-    flog $Log set lSpokes = ( `echo $RF_SPOKES_C` )
-    flog $Log set nspokes = $#lSpokes
+    flog $Log set lspokes = ( `echo $RF_SPOKES_C` )
+    flog $Log set nspokes = $#lspokes
     flog $Log set ispoke  = 0
     while (`expr $ispoke \< $nspokes`)
        set ispoke = `expr $ispoke + 1`
-       set tspoke = $lSpokes[$ispoke]
+       set tspoke = $lspokes[$ispoke]
        Note $STDOUT "(safe-load" '"'$tspoke".scm"'"'")"
     end
     Note $STDOUT ""
