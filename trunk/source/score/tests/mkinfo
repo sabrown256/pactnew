@@ -30,12 +30,12 @@ if ($ok == TRUE) then
    set vars = ( $vars ANSI SIGNED SHELL_Default FF_ID )
 
 # things found in env-pact.csh
-#  LIB       has single token with no quotes
-#  Bits      has single token in double quotes
-#  SUFFIXES  has single token in single quotes
-#  NUMA      has ""
-#  CList     has multiple tokens in double quotes
-   set vars = ( $vars LIB Bits SUFFIXES NUMA CList )
+#  LIB            has single token with no quotes
+#  Bits           has single token in double quotes
+#  MAKE_SUFFIXES  has single token in single quotes
+#  SMP_NUMA       has ""
+#  CList          has multiple tokens in double quotes
+   set vars = ( $vars LIB Bits MAKE_SUFFIXES SMP_NUMA CList )
 
    foreach m (smake dmake)
       Separator $Log

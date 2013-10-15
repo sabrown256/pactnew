@@ -34,9 +34,9 @@ EOF
 
 flog $ALog $lCC $Tmp.c -o $Tmp
 if ($status != 0) then
-   setenv NO_LONG_LONG TRUE
+   setenv HAVE_LONG_LONG FALSE
 else
-   setenv NO_LONG_LONG FALSE
+   setenv HAVE_LONG_LONG TRUE
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -74,7 +74,7 @@ flog $ALog rm -f $Tmp.c $Tmp
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ($NO_LONG_LONG == TRUE) then
+if ($HAVE_LONG_LONG == FALSE) then
    goto VERSIONA
 else
    goto VERSIONB
@@ -144,9 +144,9 @@ Note $ALog ""
 Note $ALog "Integer size info:"
 Note $ALog "   INT4         = $INT4"
 Note $ALog "   INT8         = $INT8"
-Note $ALog "   NO_LONG_LONG = $NO_LONG_LONG"
+Note $ALog "   HAVE_LONG_LONG = $HAVE_LONG_LONG"
 Note $ALog ""
 
-dbexp NO_LONG_LONG
+dbexp HAVE_LONG_LONG
 
 

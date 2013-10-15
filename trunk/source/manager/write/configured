@@ -24,15 +24,15 @@ Separator $Log
 NoteD $Log "   Configuration record - configured"
 Note $Log ""
 
-dbmget $Log EtcDir^        \
-            HSY_Host^      \
-            PSY_FltDir^    \
-            OS_Name^       \
-            HAVE_JPEGLIB^  \
-            HAVE_PNGLIB^   \
-            WARN_PATTERN^  \
-            ERR_PATTERN^   \
-            USE_TmpDir^    \
+dbmget $Log EtcDir^           \
+            HSY_Host^         \
+            PSY_FltDir^       \
+            OS_Name^          \
+            HAVE_JPEGLIB^     \
+            HAVE_PNGLIB^      \
+            AF_PATTERN_WARN^  \
+            AF_PATTERN_ERR^   \
+            USE_TmpDir^       \
             USER
 
 #--------------------------------------------------------------------------
@@ -67,10 +67,10 @@ dbmget $Log EtcDir^        \
        endif
     endif
 
-    Note $STDOUT "USE_TmpDir   = $USE_TmpDir"
-    Note $STDOUT "PSY_FltDir   = $PSY_FltDir"
-    Note $STDOUT "WARN_PATTERN = $WARN_PATTERN"
-    Note $STDOUT "ERR_PATTERN  = $ERR_PATTERN"
+    Note $STDOUT "USE_TmpDir      = $USE_TmpDir"
+    Note $STDOUT "PSY_FltDir      = $PSY_FltDir"
+    Note $STDOUT "AF_PATTERN_WARN = $AF_PATTERN_WARN"
+    Note $STDOUT "AF_PATTERN_ERR  = $AF_PATTERN_ERR"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

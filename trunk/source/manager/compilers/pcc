@@ -10,9 +10,6 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath gnu
 
-WARN_PATTERN = ":+sp+warning:"
-ERR_PATTERN  = ":+sp+error:"
-
 Tool CC {
    Exe       = pcc
    Flags     = 
@@ -62,6 +59,11 @@ Tool Lex {
    Flags += [ _env_ = Bits ;                 # address bit size
               32    = -m32 ;
               64    = -m64 ]
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
 }
 
 Group Std {

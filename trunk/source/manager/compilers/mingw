@@ -7,8 +7,6 @@
 run analyze/rpath gnu
 
 GMAKE_Flag   = TRUE
-WARN_PATTERN = ":+sp+warning:"
-ERR_PATTERN  = ":+sp+error:"
 
 Tool CC {
    Exe       = [ _env_ = Bits ;                 # compiler version
@@ -101,6 +99,11 @@ Group FPE {
    Flags  = -g -Wall
 #   Flags += [ _env_ = Bits ;                    # compiler flags
 #              *     = -m* ]
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
 }
 
 Group Std {

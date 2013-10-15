@@ -11,8 +11,6 @@ run analyze/rpath -a /usr/${LIB}
 run analyze/rpath pgi
 
 GMAKE_Flag   = TRUE
-WARN_PATTERN = "PGFTN-W- PGF90-W- PGC-W-"
-ERR_PATTERN  = "PGFTN-S- PGF90-S- PGC-S- PGC-F-"
 
 Tool CC {
    Exe      = pgcc
@@ -51,9 +49,14 @@ Tool CXX {
 
 Tool LD {
    RPath   = -Wl,-rpath,@
-   Flags   = -Ktrap=fp ${NUMA}
+   Flags   = -Ktrap=fp ${SMP_NUMA}
    Flags   += [ _cmd_ = -p ;                # profiling
 	        on    = -Mprof=func ]
+}
+
+Group AF {
+   PATTERN_WARN = "PGFTN-W- PGF90-W- PGC-W-"
+   PATTERN_ERR  = "PGFTN-S- PGF90-S- PGC-S- PGC-F-"
 }
 
 Group Cfg {

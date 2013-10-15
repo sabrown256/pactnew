@@ -10,8 +10,6 @@
 run analyze/rpath gnu
 
 GMAKE_Flag   = TRUE
-WARN_PATTERN = ":+sp+warning:"
-ERR_PATTERN  = ":+sp+error:"
 
 setenv OBJECT_MODE ${Bits}
 
@@ -67,6 +65,11 @@ Tool Lex {
    Flags  = -w
    Flags += [ _env_ = Bits ;                 # address bit size
               *     = -m* ]
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
 }
 
 Group Std {

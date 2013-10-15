@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-include dev/${SYS_ID}/include/pre-Make.defs
+include dev/${PSY_ID}/include/pre-Make.defs
 
 GFiles = global/global.c ${DevInc}/global.h
 LFiles = lag/lag.c ${DevInc}/lag.h

@@ -9,13 +9,6 @@
 
 run analyze/rpath -a /usr/${LIB}
 
-## NOTE: this should eventually be put in a site specific file
-#setenv PATH         ${PATH}:/usr/local/bin
-#setenv OBJECT_MODE  ${Bits}
-
-WARN_PATTERN = "WARNING: (E) (W) (I)"
-ERR_PATTERN  = "Error: (S)"
-
 Tool CC {
    Exe       = xlc
    Flags     = -D_ALL_SOURCE
@@ -78,6 +71,11 @@ Tool Lex {
               C99   = -qlanglvl=stdc99 ]
    Flags += [ _env_ = Bits ;                 # address bit size
               *     = -q* ]
+}
+
+Group AF {
+   PATTERN_WARN = "WARNING: (E) (W) (I)"
+   PATTERN_ERR  = "Error: (S)"
 }
 
 Group Std {

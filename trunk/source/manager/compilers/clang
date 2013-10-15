@@ -11,8 +11,6 @@ run analyze/rpath -a /usr/${LIB}
 run analyze/rpath clang
 
 GMAKE_Flag   = TRUE
-WARN_PATTERN = ":+sp+warning:"
-ERR_PATTERN  = ":+sp+error:"
 
 Tool CC {
    Exe       = clang
@@ -63,6 +61,11 @@ Tool LD {
 
 Tool Lex {
    Flags  = -w
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
 }
 
 Group Std {

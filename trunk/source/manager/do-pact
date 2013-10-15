@@ -449,12 +449,12 @@ switch ($Phase)
 
               set Cnfgrd = $WrkDir/dev/$psy_id/etc/configured
 
-              set WarnPattern = `pact +l -info WARN_PATTERN | sed 's| |+sp+|g'`
+              set WarnPattern = `pact +l -info AF_PATTERN_WARN | sed 's| |+sp+|g'`
               if ("$WarnPattern" == "") then
                  set WarnPattern = ( "warning" "WARNING" )
               endif
 
-              set ErrPattern = `pact +l -info ERR_PATTERN | sed 's| |+sp+|g'`
+              set ErrPattern = `pact +l -info AF_PATTERN_ERR | sed 's| |+sp+|g'`
               if ("$ErrPattern" == "") then
                  set ErrPattern = ( "error" "ERROR" )
               endif

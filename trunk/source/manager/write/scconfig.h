@@ -41,7 +41,7 @@ dbmget $Log BFD_Version^              \
             LONG64^                   \
             HAVE_MPI_STDIN_ALL^       \
             HAVE_MPI_GOOD_IO^         \
-            NO_LONG_LONG^             \
+            HAVE_LONG_LONG^           \
             NEED_ALT_LARGE_FILE^      \
             PACT_CC_FAMILY^           \
             PACT_CC_VERSION^          \
@@ -195,7 +195,7 @@ dbmget $Log BFD_Version^              \
        Note $STDOUT "#define NORETURN"
     endif
 
-    if ($NO_LONG_LONG == TRUE) then
+    if ($HAVE_LONG_LONG == FALSE) then
        Note $STDOUT "#define NO_LONG_LONG"
     endif
 

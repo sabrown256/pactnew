@@ -13,9 +13,6 @@ run analyze/rpath aix
 setenv PATH         ${PATH}:/usr/local/bin
 setenv OBJECT_MODE  ${Bits}
 
-WARN_PATTERN = "WARNING: (E) (W) (I)"
-ERR_PATTERN  = "Error: (S)"
-
 Tool CC {
    Exe       = xlc
    Flags     = -D_ALL_SOURCE
@@ -73,6 +70,11 @@ Tool AR {
    Exe   = /bin/ar
    Flags = [ _env_ = Bits ;                  # address bit size
              *     = -X* ]
+}
+
+Group AF {
+   PATTERN_WARN = "WARNING: (E) (W) (I)"
+   PATTERN_ERR  = "Error: (S)"
 }
 
 Group Cfg {

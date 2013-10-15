@@ -10,9 +10,6 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath intel
 
-WARN_PATTERN = ":+sp+warning+sp+"
-ERR_PATTERN  = ":+sp+error:"
-
 Tool CC {
    Exe       = icc
    Flags     = -wd161,188,267,1357
@@ -54,6 +51,11 @@ Tool LD {
 
 Tool Lex {
    Flags = -wd177,266
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning+sp+"
+   PATTERN_ERR  = ":+sp+error:"
 }
 
 Group Cfg {
