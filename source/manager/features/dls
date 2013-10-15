@@ -7,5 +7,6 @@
 # include "cpyright.h"
 #
 
-Linking = static
-
+Group RF { 
+   Linking = static
+}

@@ -39,7 +39,7 @@ dbmget $Log PSY_CfgDir^       \
             Cfg_LD_Flags^     \
             Cfg_LD_RPath^     \
             PACT_CC_VERSION^  \
-            UseTmpDir
+            USE_TmpDir
 
 set lpactver = `cat $PSY_MngDir/.pact-version`
 
@@ -104,7 +104,7 @@ EOF
     set mkopt = ( $mkopt -I${IncDir} )
 
     set RootOpt = ( $mkopt )
-    if ($UseTmpDir == TRUE) then
+    if ($USE_TmpDir == TRUE) then
        set RootOpt = ( $RootOpt -DUSE_TMP_DIR )
     endif
 

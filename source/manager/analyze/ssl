@@ -27,9 +27,9 @@ dbmget $ALog HSY_RootInc^                    \
              Cfe_LD_RPath^                   \
              LD_Lib^                         \
              LIB^                            \
-             Linking^                        \
              LibM_Lib^                       \
              PACT_CC_VERSION^                \
+             RF_Linking^                     \
              RPATH
 
 # if we have explicitly said we do not want OPENSSL
@@ -103,7 +103,7 @@ EOF
       if ("$PckPath" != "") then
          set pthl = ( $pthl $PckPath )
       endif
-      if (($Linking == dynamic) && ($?lSO == 1)) then
+      if (($RF_Linking == dynamic) && ($?lSO == 1)) then
          setenv OPENSSL_SO    $lSO
       else
          set libl = ( $libl $PckLib )

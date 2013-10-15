@@ -32,7 +32,7 @@ dbmget $ALog HSY_RootInc^                  \
              LD_Lib^                       \
              LIB^                          \
              LibM_Lib^                     \
-             Linking^                      \
+             RF_Linking^                   \
              RPATH
 
 # if we have explicitly said we do not want HDF5
@@ -92,7 +92,7 @@ EOF
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has HDF5 ($PckLib)"
 
-      if (($Linking == dynamic) && ($?lSO == 1)) then
+      if (($RF_Linking == dynamic) && ($?lSO == 1)) then
          setenv HDF5_SO    $lSO
       endif
       flog $ALog setenv RPATH         ${RPATH}:${HDF_RPath}

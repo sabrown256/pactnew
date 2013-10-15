@@ -117,6 +117,7 @@ setenv DO_RUN_MPI   poe
 define GETSOCKNAME_LONG
 define HAVE_THREAD_SAFE_MPI
 
+include features/aix
 include aix-dp-env
 include serial
 

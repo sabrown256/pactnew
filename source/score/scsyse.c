@@ -44,7 +44,7 @@ struct s_descriptors
 /*--------------------------------------------------------------------------*/
 
 /* _SC_RESET_STDIN - fix up stdin for poll depending
- *                 - on the presence of readline
+ *                 - on the presence of LEH
  *                 - WH FALSE puts stdin in raw mode with echo off
  *                 - WH TRUE puts stdin in line mode with echo on
  */

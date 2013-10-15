@@ -25,6 +25,7 @@ dbmget $Log HAVE_FORTRAN^     \
             PY_DirPy^         \
             PY_DirSrc^        \
             PY_DirDst^        \
+            USE_TmpDir^       \
             CC_Exe^           \
             Cfe_CC_Exe^       \
             FC_Exe^           \
@@ -157,7 +158,7 @@ dbmget $Log HAVE_FORTRAN^     \
        NoteD $Log "   Scheme syntax modes will not be built (no yacc or bison)"
     endif
 
-    if ($UseTmpDir == TRUE) then
+    if ($USE_TmpDir == TRUE) then
        NoteD $Log "   Doing fast builds using /tmp"
     endif
 

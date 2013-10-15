@@ -42,13 +42,14 @@ dbmget $ALog CC_Exe       =\? cc^      \
              DP_Inc       =\? ""^      \
              Cfg_CC_Inc^               \
              Cfg_CC_Flags^             \
+             CROSS_FE^                 \
+             DP_BE^                    \
+             OS_Name^                  \
              PACT_CC_FAMILY^           \
              PACT_CC_VERSION^          \
              PACT_CC_PATH^             \
              PACT_CC_EXE^              \
-             CROSS_FE^                 \
-             DP_BE^                    \
-             OS_Name
+             RF_STRICT
 
 set UTime = `timer -r`
 
@@ -231,7 +232,7 @@ if ($Cfg_CC_Exe != "") then
 
    if ($xstatus == 0) then
       NoteD $ALog "      requested version $CmpVers"
-   else if (("$CmpVers" != any) && ($STRICT > 0)) then
+   else if (("$CmpVers" != any) && ($RF_STRICT> 0)) then
       NoteD $ALog "      requested version $CmpVers (not found)"
       setenv STOP ""
       dbexp STOP

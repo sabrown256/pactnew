@@ -25,7 +25,6 @@ NoteD $Log "   Configuration record - configured"
 Note $Log ""
 
 dbmget $Log EtcDir^        \
-            UseTmpDir^     \
             HSY_Host^      \
             PSY_FltDir^    \
             OS_Name^       \
@@ -33,6 +32,7 @@ dbmget $Log EtcDir^        \
             HAVE_PNGLIB^   \
             WARN_PATTERN^  \
             ERR_PATTERN^   \
+            USE_TmpDir^    \
             USER
 
 #--------------------------------------------------------------------------
@@ -67,8 +67,8 @@ dbmget $Log EtcDir^        \
        endif
     endif
 
-    Note $STDOUT "UseTmpDir    = $UseTmpDir"
-    Note $STDOUT "PSY_FltDir    = $PSY_FltDir"
+    Note $STDOUT "USE_TmpDir   = $USE_TmpDir"
+    Note $STDOUT "PSY_FltDir   = $PSY_FltDir"
     Note $STDOUT "WARN_PATTERN = $WARN_PATTERN"
     Note $STDOUT "ERR_PATTERN  = $ERR_PATTERN"
 

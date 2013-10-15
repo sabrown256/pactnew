@@ -99,6 +99,9 @@ Tool Yacc {
 Tool GMAKE {
 }
 
+Tool HDF5 {
+}
+
 Tool JOBS {
    System = loner
 }
