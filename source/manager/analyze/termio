@@ -20,7 +20,7 @@ dbmget $ALog CC_Exe^           \
 
 set termio = ""
 
-set NO_TERMINAL = TRUE
+set have_terminal = FALSE
 
 echo "" >! $Tmp.h
 Note $Tmp.h "#include <unistd.h>"
@@ -79,7 +79,7 @@ EOF
 
 flog $ALog $CC_Exe $CC_Flags $Tmp.c -o $Tmp
 if ($status == 0) then
-   set NO_TERMINAL = FALSE
+   set have_terminal = TRUE
    set termio = ( $termio posix )
 endif
 
@@ -102,7 +102,7 @@ EOF
 
 flog $ALog $CC_Exe $CC_Flags $Tmp.c -o $Tmp
 if ($status == 0) then
-   set NO_TERMINAL = FALSE
+   set have_terminal = TRUE
    set termio = ( $termio sysv )
 endif
 
@@ -125,7 +125,7 @@ EOF
 
 flog $ALog $CC_Exe $CC_Flags $Tmp.c -o $Tmp
 if ($status == 0) then
-   set NO_TERMINAL = FALSE
+   set have_terminal = TRUE
    set termio = ( $termio bsd )
 endif
 
@@ -134,14 +134,14 @@ rm -f $Tmp.c $Tmp
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ($NO_TERMINAL == TRUE) then
+if ($have_terminal == FALSE) then
    NoteD $ALog "      no terminal handling"
 else
    NoteD $ALog "      has $termio terminal handling"
 endif
 
 # export the results
-dbexp NO_TERMINAL
+dbmset $ALog HAVE_TERMINAL = $have_terminal
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

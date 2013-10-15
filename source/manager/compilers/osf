@@ -7,9 +7,6 @@
 # include "cpyright.h"
 #
 
-WARN_PATTERN = ":+sp+Warning: warning WARNING Info:"
-ERR_PATTERN  = ":+sp+Error:"
-
 Tool CC {
    Exe     = cc
    Flags   = -isoc94 -msg_disable longlongtype
@@ -35,6 +32,11 @@ Tool Lex {
 
 Tool PThread_Lex {
    Flags = -w -pthread
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+Warning: warning WARNING Info:"
+   PATTERN_ERR  = ":+sp+Error:"
 }
 
 Group Cfg {

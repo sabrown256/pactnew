@@ -20,8 +20,6 @@ dbmget $ALog LEH_TTY_CRNL^         \
 
 set termio = ""
 
-set NO_TERMINAL = TRUE
-
 # NOTE: properly we should probe the actual state of the terminal
 # this is a temporary approximation based on OS and hardware
 # it explicitly uses only GCC whose predefined macros are reliable

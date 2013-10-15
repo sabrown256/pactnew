@@ -12,8 +12,10 @@ run analyze/rpath gnu
 # NOTE: this should eventually be put in a site specific file
 setenv PATH  ${PATH}:/usr/local/bin
 
-WARN_PATTERN = ":+sp+warning:"
-ERR_PATTERN  = ":+sp+error:"
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
+}
 
 Tool CC {
    Exe       = gcc
@@ -69,6 +71,11 @@ Tool AR {
    Exe   = /bin/ar
    Flags = [ _env_ = Bits ;                 # address bit size
              *     = -X* ]
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
 }
 
 Group Std {

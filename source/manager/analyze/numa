@@ -8,19 +8,17 @@
 # include "cpyright.h"
 #
 
-dbmget /dev/null NUMA =\? ""^     \
+dbmget /dev/null SMP_NUMA =\? ""^     \
                  PACT_CC_FAMILY
 
 if ($PACT_CC_FAMILY == PGI) then
    /bin/ls /usr/lib*/libnuma*.so >& /dev/null
    if ($status == 0) then
-      setenv NUMA "-Mconcur=numa"
+      setenv SMP_NUMA "-Mconcur=numa"
    else
-      setenv NUMA "-Mconcur=nonuma"
+      setenv SMP_NUMA "-Mconcur=nonuma"
    endif
 endif
 
-dbexp NUMA
-
-
+dbexp SMP_NUMA
 

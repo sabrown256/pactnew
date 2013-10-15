@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-include ../dev/${SYS_ID}/include/pre-Make.defs
+include ../dev/${PSY_ID}/include/pre-Make.defs
 
 TGTBin = none
 TGTLib = ${DevLib}/libmisc.a

@@ -8,8 +8,6 @@
 #
 
 GMAKE_Flag   = TRUE
-WARN_PATTERN = "WARNING: (E) (W) (I)"
-ERR_PATTERN  = "Error: (S)"
 
 setenv OBJECT_MODE        ${Bits}
 setenv HAVE_MPI_GOOD_IO   TRUE
@@ -64,6 +62,11 @@ Tool Lex {
 
 Tool Cfg_Lex {
    Flags = -w
+}
+
+Group AF {
+   PATTERN_WARN = "WARNING: (E) (W) (I)"
+   PATTERN_ERR  = "Error: (S)"
 }
 
 Group Cfg {

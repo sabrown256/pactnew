@@ -24,11 +24,11 @@ set PACTInc  = $PACTDir/include
 set PACTEtc  = $PACTDir/etc
 set PACTExe  = $PACTBin/pact
 
-set ThreadLibExt = `$PACTExe -info ThreadLibExt | sed s-ThreadLibExt=--`
-set configname   = "none"
+set SMP_LibExt = `$PACTExe -info SMP_LibExt | sed s-SMP_LibExt=--`
+set configname = "none"
 
 set MDGInc   = `awk '($1 == "MDGInc") { print $3 }' $PACTEtc/make-def`
-set PUBInc   = `awk '($1 == "PubInc") { print $3 }' $PACTEtc/make-def`
+set PUBInc   = `awk '($1 == "PSY_PubInc") { print $3 }' $PACTEtc/make-def`
 set Optimize = FALSE
 
 set tmp         = `uname -m`
@@ -188,7 +188,7 @@ set FcFlags =
     echo 'PANACHE = ${PACTDir}/bin/panache' >>& $STDOUT
     echo '' >>& $STDOUT
 
-    echo "ThreadLibExt =$ThreadLibExt" >>& $STDOUT
+    echo "SMP_LibExt =$SMP_LibExt" >>& $STDOUT
     echo '' >>& $STDOUT
 
     echo '#' >>& $STDOUT

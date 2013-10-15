@@ -7,8 +7,6 @@
 # include "cpyright.h"
 #
 
-WARN_PATTERN = "Warning: warning WARNING"
-
 Tool CC {
    Exe      = c99
    Flags    = -woff 799,1110,1172,1174,1177,1429,1551,1552,3184
@@ -32,6 +30,10 @@ Tool Lex {
    Flags  = -woff 581,1167,1110,1196,3322
    Flags += [ _env_ = Bits ;                # address bit size
               *     = -* ]
+}
+
+Group AF {
+   PATTERN_WARN = "Warning: warning WARNING"
 }
 
 Group Std {

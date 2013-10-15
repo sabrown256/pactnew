@@ -61,6 +61,7 @@ dbmget $Log AR_IFlag^               \
             LIB^                    \
             Load^                   \
             MAKE_Strategy^          \
+            MAKE_SUFFIXES^          \
             OS_Name^                \
             OS_Type^                \
             OW32Objs^               \
@@ -80,7 +81,6 @@ dbmget $Log AR_IFlag^               \
             Ranlib_Exe^             \
             RPATH^                  \
             STD_IPC^                \
-            SUFFIXES^               \
             PSY_Base^               \
             PSY_Cfg^                \
             PSY_Root^               \
@@ -643,7 +643,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     Note $STDOUT ""
-    Note $STDOUT ".SUFFIXES: $SUFFIXES"
+    Note $STDOUT ".SUFFIXES: $MAKE_SUFFIXES"
     Note $STDOUT ""
 
     if ("$GMAKE_Flag" == "-DUSE_GNU_MAKE") then

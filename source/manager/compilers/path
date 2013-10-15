@@ -10,9 +10,6 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath path
 
-WARN_PATTERN = ":+sp+warning:"
-ERR_PATTERN  = ":+sp+error:"
-
 define BAD_COMPLEX_INITIALIZER
 
 Tool CC {
@@ -64,6 +61,11 @@ Tool Lex {
 
 Tool OpenMP_Lex {
    Flags = -mp
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
 }
 
 Group Cfg {

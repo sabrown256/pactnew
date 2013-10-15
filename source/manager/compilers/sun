@@ -9,9 +9,6 @@
 
 run analyze/rpath sun
 
-WARN_PATTERN = ":+sp+warning:"
-ERR_PATTERN  = ":+sp+error:"
-
 Tool CC {
    Exe      = suncc
 #   Flags   += -xcode=pic32
@@ -67,6 +64,11 @@ Tool OpenMP_Lex {
    Debug    = -xopenmp=noopt
 #   Optimize = -xopenmp=parallel -xO3
    Optimize = -xopenmp=noopt
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
 }
 
 Group Cfg {

@@ -7,8 +7,6 @@
 # include "cpyright.h"
 #
 
-WARN_PATTERN = "Warning: warning WARNING"
-
 define BAD_COMPLEX_INITIALIZER
 
 Tool CC {
@@ -36,6 +34,10 @@ Tool Lex {
    Flags  =
    Flags += [ _env_ = Bits ;                # address bit size
               *     = -m* ]
+}
+
+Group AF {
+   PATTERN_WARN = "Warning: warning WARNING"
 }
 
 Group Std {

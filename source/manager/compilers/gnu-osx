@@ -13,8 +13,6 @@ run analyze/osx-evolution
 #run analyze/rpath -a /opt/local/${LIB}
 
 GMAKE_Flag   = TRUE
-WARN_PATTERN = ":+sp+warning:"
-ERR_PATTERN  = ":+sp+error:"
 
 Tool CC {
    Exe       = gcc
@@ -87,6 +85,11 @@ Tool Lex {
 
 Tool Ranlib {
    Exe = ranlib
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
 }
 
 Group Std {
