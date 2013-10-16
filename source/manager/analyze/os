@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # OS - analyze the platform OS
-#    - Computes: OS_Type, OS_Name, OSX_Version
+#    - Computes: OS_Type, OS_Name, AF_VERSION_OSX
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -22,10 +22,10 @@ Note $ALog ""
 
 set los = ( `uname -s` )
 
-dbmget $ALog HSY_RootInc^          \
-             OSX_Version  =\? ""^  \
-             OS_Name      =\? "$los"
-
+dbmget $ALog AF_VERSION_OSX  =\? ""^      \
+             OS_Name         =\? "$los"^  \
+             HSY_RootInc
+             
 unset los
 
 if ($?PSY_Arch == 0) then
@@ -60,7 +60,7 @@ Note $ALog "OS_Release = $OS_Release"
 Note $ALog "OS_Type    = $OS_Type"
 
 if ($OS_Name == Darwin) then
-   fexvar $ALog OSX_Version echo $PSY_Arch @o sed 's/osx-10\.//' @o sed 's/-.*//'
+   fexvar $ALog AF_VERSION_OSX echo $PSY_Arch @o sed 's/osx-10\.//' @o sed 's/-.*//'
 endif
 
 # there are systems that put out garbage if this is on a single echo (AIX)

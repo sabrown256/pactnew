@@ -23,12 +23,12 @@ Separator $Log
 NoteD $Log "   C Standards Configuration - iso-c.h"
 Note $Log ""
 
-dbmget $Log STD_C^          \
-            STD_POSIX^      \
-            STD_XOPEN^      \
-            GLIBC_VERSION^  \
-            OS_Name^        \
-            IncDir^         \
+dbmget $Log AF_VERSION_GLIBC^  \
+            STD_C^             \
+            STD_POSIX^         \
+            STD_XOPEN^         \
+            OS_Name^           \
+            IncDir^            \
             PSY_Cfg
 
 #--------------------------------------------------------------------------
@@ -54,8 +54,8 @@ dbmget $Log STD_C^          \
     Note $STDOUT '#define PCK_ISO_C'
     Note $STDOUT ''
 
-    if ($?GLIBC_VERSION == 1) then
-       set inf = ( `echo $GLIBC_VERSION | sed 's/\./ /g'` )
+    if ($?AF_VERSION_GLIBC == 1) then
+       set inf = ( `echo $AF_VERSION_GLIBC | sed 's/\./ /g'` )
     else
        set inf = ( 0 )
     endif

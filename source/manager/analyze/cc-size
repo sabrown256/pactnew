@@ -15,9 +15,9 @@ Note $ALog "----- analyze/cc-size -----"
 Note $ALog "Analyze: Find Integer Sizes"
 Note $ALog ""
 
-dbmget $ALog INT4       =\? int^   \
-             INT8       =\? long^  \
-             CROSS_FE^             \
+dbmget $ALog AF_INT4       =\? int^   \
+             AF_INT8       =\? long^  \
+             CROSS_FE^                \
              PACT_CC_VERSION
 
 #--------------------------------------------------------------------------
@@ -44,7 +44,7 @@ flog $ALog rm -f $Tmp.c $Tmp
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# INT4
+# AF_INT4
 
 cat << EOF >! $Tmp.c
 #include <stdio.h>
@@ -61,7 +61,7 @@ EOF
 
 flog $ALog $lCC $Tmp.c -o $Tmp
 if ($status == 0) then
-   fexec $ALog $CROSS_FE $Tmp @o2 @e3 vw:INT4 @ fw:/dev/null
+   fexec $ALog $CROSS_FE $Tmp @o2 @e3 vw:AF_INT4 @ fw:/dev/null
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -69,7 +69,7 @@ flog $ALog rm -f $Tmp.c $Tmp
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# INT8
+# AF_INT8
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -129,7 +129,7 @@ COMPILE:
 
 flog $ALog $lCC $Tmp.c -o $Tmp
 if ($status == 0) then
-   fexec $ALog $CROSS_FE $Tmp @o2 @e3 vw:INT8 @ fw:/dev/null
+   fexec $ALog $CROSS_FE $Tmp @o2 @e3 vw:AF_INT8 @ fw:/dev/null
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -137,13 +137,13 @@ flog $ALog rm -f $Tmp.c $Tmp
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-dbmget $ALog INT4^   \
-             INT8
+dbmget $ALog AF_INT4^   \
+             AF_INT8
 
 Note $ALog ""
 Note $ALog "Integer size info:"
-Note $ALog "   INT4         = $INT4"
-Note $ALog "   INT8         = $INT8"
+Note $ALog "   AF_INT4        = $AF_INT4"
+Note $ALog "   AF_INT8        = $AF_INT8"
 Note $ALog "   HAVE_LONG_LONG = $HAVE_LONG_LONG"
 Note $ALog ""
 

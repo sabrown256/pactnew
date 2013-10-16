@@ -34,14 +34,14 @@ while ($#argv > 0)
    shift
 end
 
-set CList = ""
+set clist = ""
 if ("$OS" == AIX) then
-   set CList = ( $CList xlc -q32 -q64 )
+   set clist = ( $clist xlc -q32 -q64 )
 else if ("$OS" == OSF1) then
-   set CList = ( $CList cc -xtaso -g )
+   set clist = ( $clist cc -xtaso -g )
 endif
-set CList = ( $CList gcc -m32 -m64 )
-set CList = ( $CList gcc -mpowerpc -mpowerpc64 )
+set clist = ( $clist gcc -m32 -m64 )
+set clist = ( $clist gcc -mpowerpc -mpowerpc64 )
 
 cat << EOF >&! $Tmp.c 
 #include <stdio.h>
@@ -50,7 +50,7 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-set lst = ( $CList )
+set lst = ( $clist )
 while ($#lst > 0)
    set Cmp   = $lst[1]
    set Check = ( 32 $lst[2] 64 $lst[3] )

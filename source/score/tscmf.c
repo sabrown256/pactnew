@@ -357,7 +357,7 @@ int main(int c, char **v)
     io_printf(stdout, "                          int64_t   = %d\n", sizeof(int64_t));
     io_printf(stdout, "\n");
 
-#if defined(NEED_ALT_LARGE_FILE) && !defined(HAVE_ALT_LARGE_FILE)    
+#if defined(AF_ALT_LARGE_FILE) && !defined(HAVE_ALT_LARGE_FILE)    
     io_printf(stdout, "\n");
     io_printf(stdout, "                       This platform does not support the alternate\n");
     io_printf(stdout, "                       memory mapped file scheme (mmap64)\n");

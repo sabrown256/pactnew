@@ -15,10 +15,10 @@ Note $ALog "----- analyze/make -----"
 Note $ALog "Analyze: make utility"
 Note $ALog ""
 
-dbmget $ALog GMAKE_Flag =\? ""
+dbmget $ALog MAKE_UseGNU =\? ""
 
-if ("$GMAKE_Flag" == TRUE) then
-   setenv GMAKE_Flag "-DUSE_GNU_MAKE"
+if ("$MAKE_UseGNU" == TRUE) then
+   setenv MAKE_UseGNU "-DUSE_GNU_MAKE"
 endif
 
 rm -f $Tmp.c $Tmp.a
@@ -39,7 +39,7 @@ flog $ALog gmake --version
 if ($status == 0) then
    flog $ALog setenv MAKE_Exe gmake
    set msg = "$msg `$Which gmake` (GNU) library aware"
-   setenv GMAKE_Flag "-DUSE_GNU_MAKE"
+   setenv MAKE_UseGNU "-DUSE_GNU_MAKE"
    setenv MAKE_Strategy "SpaceSaving"
 
 else
@@ -70,7 +70,7 @@ flog $ALog rm -f $Tmp.make
 # export the results
 dbmset $ALog MAKE_Exe      = $MAKE_Exe^          \
              MAKE_Strategy = $MAKE_Strategy^     \
-             GMAKE_Flag    = $GMAKE_Flag
+             MAKE_UseGNU   = $MAKE_UseGNU
 
 exit(0)
 

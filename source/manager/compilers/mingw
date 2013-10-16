@@ -6,8 +6,6 @@
 
 run analyze/rpath gnu
 
-GMAKE_Flag   = TRUE
-
 Tool CC {
    Exe       = [ _env_ = Bits ;                 # compiler version
                  32    = i586-mingw32msvc-gcc ;
@@ -74,6 +72,10 @@ Tool Lex {
    Flags  = -w
 #   Flags += [ _env_ = Bits ;                 # address bit size
 #              *     = -m* ]
+}
+
+Tool MAKE {
+   UseGNU = TRUE
 }
 
 Tool Ranlib {

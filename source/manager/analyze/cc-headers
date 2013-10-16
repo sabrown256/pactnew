@@ -15,13 +15,14 @@ Note $ALog "----- analyze/cc-headers -----"
 Note $ALog "Analyze: C headers"
 Note $ALog ""
 
-dbmget $ALog HSY_RootInc
+dbmget $ALog HSY_RootInc^   \
+             AF_CDecls
 
-if ($?CDecls == 0) then
-   setenv CDecls FALSE
+if ($?AF_CDecls == 0) then
+   setenv AF_CDecls FALSE
 endif
 
-if ($CDecls == TRUE) then
+if ($AF_CDecls == TRUE) then
 
    NoteD $ALog "      checking C header files"
 

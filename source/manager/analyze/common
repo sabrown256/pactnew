@@ -63,7 +63,7 @@ Note $ALog "Temporary file base: $Tmp"
 Note $ALog "Manager directory: $psy_mngdir"
 Note $ALog ""
 
-dbmget $ALog CList    =\? ""^           \
+dbmget $ALog AF_CList =\? ""^           \
              CROSS_FE =\? ""^           \
              DP_BE    =\? ""^           \
              DP_FE    =\? "do-run -m"

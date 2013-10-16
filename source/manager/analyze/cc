@@ -292,14 +292,14 @@ EOF
 #include <stdio.h>
 int main(int c, char **v)
 {if (sizeof(long) == 8)
-    printf("LONG64");
+    printf("AF_LONG8");
  return(0);}
 EOF
 
    flog $ALog cat $Tmp.c
    flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
-      set LONG64 = `$CROSS_FE $Tmp $DP_BE`
+      set AF_LONG8 = `$CROSS_FE $Tmp $DP_BE`
    else
       NoteD $ALog " "
       NoteD $ALog " "
@@ -331,7 +331,7 @@ EOF
    flog $ALog cat $Tmp.c
    flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
-      set NEED_ALT_LARGE_FILE = `$CROSS_FE $Tmp $DP_BE`
+      set af_alt_large_file = `$CROSS_FE $Tmp $DP_BE`
    else
       NoteD $ALog " "
       NoteD $ALog " "
@@ -392,7 +392,7 @@ EOF
 
    set ETime = `timer -b $UTime`
 
-   setenv CList "$AnsiCC"
+   setenv AF_CList "$AnsiCC"
 
    Note $ALog ""
    Note $ALog "Results of C compiler analysis ($ETime)"
@@ -400,7 +400,7 @@ EOF
    Note $ALog "   CC_Exe             = |$CC_Exe|"
    Note $ALog "   Cfg_CC_Exe         = |$Cfg_CC_Exe|"
    Note $ALog "   FC_INT_PTR_DIFFER  = |$FC_INT_PTR_DIFFER|"
-   Note $ALog "   LONG64             = |$LONG64|"
+   Note $ALog "   AF_LONG8           = |$AF_LONG8|"
    Note $ALog ""
 
 endif
@@ -438,11 +438,11 @@ dbmset $ALog CC_Exe              = $CC_Exe^              \
              Cfe_CC_Inc          = $Cfe_CC_Inc^          \
              Save_CC             = $Save_CC^             \
              Save_CFLAGS         = $Save_CFLAGS^         \
-             CList               = $CList^               \
-             LONG64              = $LONG64^              \
-             FC_INT_PTR_DIFFER   = $FC_INT_PTR_DIFFER^   \
-             NEED_ALT_LARGE_FILE = $NEED_ALT_LARGE_FILE^ \
-             DP_Inc              = $DP_Inc
+             AF_CList            = $AF_CList^            \
+             AF_LONG8            = $AF_LONG8^            \
+             AF_ALT_LARGE_FILE   = $af_alt_large_file^   \
+             DP_Inc              = $DP_Inc^              \
+             FC_INT_PTR_DIFFER   = $FC_INT_PTR_DIFFER
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

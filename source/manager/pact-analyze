@@ -66,9 +66,9 @@ if ($?USER == 0) then
 endif
 
 if ("$OS_Name" == "Windows_NT") then
-   flog $ALog setenv CDecls TRUE
+   flog $ALog setenv AF_CDecls TRUE
 else
-   flog $ALog setenv CDecls FALSE
+   flog $ALog setenv AF_CDecls FALSE
 endif
 flog $ALog setenv ANSI    ANSI
 
@@ -80,7 +80,7 @@ setenv ToTTY  FALSE
 while ($#argv > 0)
    switch ($1)
       case -c:
-           flog $ALog setenv CDecls  TRUE
+           flog $ALog setenv AF_CDecls  TRUE
            shift
            flog $ALog setenv ANSI    $1
            breaksw

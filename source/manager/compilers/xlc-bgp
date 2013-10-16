@@ -7,8 +7,6 @@
 # include "cpyright.h"
 #
 
-GMAKE_Flag   = TRUE
-
 setenv OBJECT_MODE        ${Bits}
 setenv HAVE_MPI_GOOD_IO   TRUE
 
@@ -62,6 +60,10 @@ Tool Lex {
 
 Tool Cfg_Lex {
    Flags = -w
+}
+
+Tool MAKE {
+   UseGNU = TRUE
 }
 
 Group AF {

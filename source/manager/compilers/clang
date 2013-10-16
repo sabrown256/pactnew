@@ -10,8 +10,6 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath clang
 
-GMAKE_Flag   = TRUE
-
 Tool CC {
    Exe       = clang
    Flags     =
@@ -61,6 +59,10 @@ Tool LD {
 
 Tool Lex {
    Flags  = -w
+}
+
+Tool MAKE {
+   UseGNU = TRUE
 }
 
 Group AF {

@@ -1402,9 +1402,9 @@ static void setup_analyze_env(client *cl, char *base)
     dbset(cl, "OS_Release",   st.osrel);
 
     if (strcmp(st.os, "Windows_NT") == 0)
-       dbset(cl, "CDecls", "TRUE");
+       dbset(cl, "AF_CDecls", "TRUE");
     else
-       dbset(cl, "CDecls", "FALSE");
+       dbset(cl, "AF_CDecls", "FALSE");
 
     dbset(cl, "ANSI",   "ANSI");
 

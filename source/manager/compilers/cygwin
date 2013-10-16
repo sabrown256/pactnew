@@ -10,8 +10,6 @@
 setenv PACT_CC_PATH
 setenv PACT_FC_PATH
 
-GMAKE_Flag   = TRUE
-
 include compilers/gnu
 
 # cygwin does not support -rpath
@@ -19,6 +17,10 @@ run analyze/rpath init
 
 Tool LD {
    Flags =
+}
+
+Tool MAKE {
+   UseGNU = TRUE
 }
 
 # specifications for FPE patching

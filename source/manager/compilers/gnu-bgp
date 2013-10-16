@@ -9,8 +9,6 @@
 
 run analyze/rpath gnu
 
-GMAKE_Flag   = TRUE
-
 setenv OBJECT_MODE       ${Bits}
 setenv HAVE_MPI_GOOD_IO  TRUE
 
@@ -66,6 +64,10 @@ Tool Lex {
    Flags  = -w
    Flags += [ _env_ = Bits ;                 # address bit size
               *     = -m* ]
+}
+
+Tool MAKE {
+   UseGNU = TRUE
 }
 
 Group AF {

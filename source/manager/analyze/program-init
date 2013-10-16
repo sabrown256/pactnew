@@ -22,7 +22,7 @@ setenv ENV_VARS "Bits OS_Name \
                  DB_CFGMAN DB_HOST_SERVER \
                  DB_RUN_SIGNATURE DB_SITE_SIGNATURE DB_UPDATE_SYS \
                  DO_RUN_DBG DO_RUN_MPI DO_RUN_CROSS \
-                 GLIBC_VERSION BFD_VERSION \
+                 AF_VERSION_GLIBC BFD_VERSION \
                  HDF_VERSION MYSQL_VERSION SQLITE3_VERSION \
                  PNG_VERSION JPEG_VERSION \
                  PACT_VERSION \
@@ -90,9 +90,6 @@ Tool Lex {
 }
 
 Tool Yacc {
-}
-
-Tool GMAKE {
 }
 
 Tool HDF5 {

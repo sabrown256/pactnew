@@ -34,8 +34,8 @@ if ($ok == TRUE) then
 #  Bits           has single token in double quotes
 #  MAKE_SUFFIXES  has single token in single quotes
 #  SMP_NUMA       has ""
-#  CList          has multiple tokens in double quotes
-   set vars = ( $vars LIB Bits MAKE_SUFFIXES SMP_NUMA CList )
+#  AF_CList       has multiple tokens in double quotes
+   set vars = ( $vars LIB Bits MAKE_SUFFIXES SMP_NUMA AF_CList )
 
    foreach m (smake dmake)
       Separator $Log
