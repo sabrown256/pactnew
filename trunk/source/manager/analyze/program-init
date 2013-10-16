@@ -219,9 +219,6 @@ Group HSY {
 
 }
 
-Group HW {
-}
-
 Group LEH {
    TTY_ECHO  = TRUE
    TTY_CRNL  = TRUE

@@ -852,7 +852,7 @@ GET_NET_ARG:
        flog $lFile set WrkDir = $HOME/$WrkDir
     endif
 
-# get the SYS group variables defined
+# get the PSY group variables defined
     eval `$WrkDir/scripts/cfgsys`
 
     return
@@ -952,7 +952,7 @@ GET_HOST_ARG:
        flog $lFile set WrkDir = $HOME/$WrkDir
     endif
 
-# get the SYS group variables defined
+# get the PSY group variables defined
     eval `$WrkDir/scripts/cfgsys`
 
     return

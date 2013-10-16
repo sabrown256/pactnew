@@ -23,11 +23,11 @@ if ($ok == TRUE) then
    set vars = ""
 
 # things found in scconfig.h
-#  ANSI           has no token (no value)
+#  AF_ANSI        has no token (no value)
 #  SIGNED         has single token with no quotes
 #  SHELL_Default  has single token in double quotes
 #  FF_ID          has complex macro expression
-   set vars = ( $vars ANSI SIGNED SHELL_Default FF_ID )
+   set vars = ( $vars AF_ANSI SIGNED SHELL_Default FF_ID )
 
 # things found in env-pact.csh
 #  LIB            has single token with no quotes

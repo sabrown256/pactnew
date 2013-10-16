@@ -16,6 +16,7 @@ Note $ALog "Analyze: C headers"
 Note $ALog ""
 
 dbmget $ALog HSY_RootInc^   \
+             AF_ANSI^       \
              AF_CDecls
 
 if ($?AF_CDecls == 0) then
@@ -39,7 +40,7 @@ if ($AF_CDecls == TRUE) then
 
    Note $Tmp 'set nlines = `cat $1 | wc -l`'
    Note $Tmp 'set iline  = 0'
-   Note $Tmp 'set ANSI   = $2'
+   Note $Tmp 'set lansi  = $2'
    Note $Tmp "rm -f _${Tmp}_"
    Note $Tmp ""
 
@@ -71,7 +72,7 @@ if ($AF_CDecls == TRUE) then
    Note $Tmp ""
    Note $Tmp '      unset noglob'
 
-   if ("$ANSI" == "ANSI") then
+   if ("$AF_ANSI" == "ANSI") then
       Note $Tmp '      set Hdrs = (' "$ANSIHdrs" "$OtherHdrs" ')'
    else
       Note $Tmp '      set Hdrs = (' "$OtherHdrs" ')'
@@ -90,7 +91,7 @@ if ($AF_CDecls == TRUE) then
    Note $Tmp '      if ($GotIt == FALSE) then'
    Note $Tmp '         if ("$Args" == "Variable") then'
    Note $Tmp '            echo "extern $Decl;" >>& $OutDev'
-   Note $Tmp '         else if ($ANSI == ANSI) then'
+   Note $Tmp '         else if ($lansi == ANSI) then'
    Note $Tmp '            echo "extern $Decl$Args;" >>& $OutDev'
    Note $Tmp '         else '
    Note $Tmp '            echo "extern $Decl();" >>& $OutDev'
@@ -113,7 +114,7 @@ if ($AF_CDecls == TRUE) then
 
    set CF = $PSY_MngDir/clib.fncs
    chmod a+x $Tmp
-   fexec $ALog fr:$CF @o $Tmp $CF $ANSI
+   fexec $ALog fr:$CF @o $Tmp $CF $AF_ANSI
 
    rm -f $Tmp
 
