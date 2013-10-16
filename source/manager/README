@@ -771,10 +771,6 @@ RF_SPOKES_SCHEME
    A list of Scheme coded binary file translation spokes to be used with SX.
    A netCDF spoke is included with the distribution.  Default is "netcdf".
 
-ScmDir
-   A directory in which to install scheme source files.  This should also be
-   a subdirectory of PSY_InstRoot.  Default is "scheme".
-
 Shared_LD_Exe
    The linker to use when building shared libraries.  This
    makes the "shared" target meaningful.  Default is "ld".
@@ -841,7 +837,7 @@ using the "define" syntax explained above.
 These parameters define which C standard is to be assumed when compiling
 PACT sources. This is determined for you by PACT-ANALYZE from the compiler.
 
-ANSI
+AF_ANSI
    Conforming to ANSI C (this is the default).
 
 

@@ -70,7 +70,7 @@ if ("$OS_Name" == "Windows_NT") then
 else
    flog $ALog setenv AF_CDecls FALSE
 endif
-flog $ALog setenv ANSI    ANSI
+flog $ALog setenv AF_ANSI    ANSI
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -82,7 +82,7 @@ while ($#argv > 0)
       case -c:
            flog $ALog setenv AF_CDecls  TRUE
            shift
-           flog $ALog setenv ANSI    $1
+           flog $ALog setenv AF_ANSI    $1
            breaksw
 
       case -h:

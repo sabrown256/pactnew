@@ -94,8 +94,7 @@ installation.
    in order to use ULTRA, SCHEME, SX, PDBVIEW, or PDBDIFF. The SCHEME and
    ULTRA environment variables must be set to point to the directory in which
    the scheme files were installed. The default for this directory is
-   /usr/local/scheme and in the above example it would be /usr/local/pact/scheme
-   (see the SCMDir variable if in doubt).
+   /usr/local/scheme and in the above example it would be /usr/local/pact/scheme.
 
      -> setenv SCHEME /usr/local/pact/scheme
      -> setenv ULTRA /usr/local/pact/scheme
@@ -712,10 +711,6 @@ RM
 RF_SPOKES_SCHEME
    A list of Scheme coded binary file translation spokes to be used with SX.
    A netCDF spoke is included with the distribution.  Default is "netcdf".
-
-ScmDir
-   A directory in which to install scheme source files.  This should also be
-   a subdirectory of PSY_InstRoot.  Default is "scheme".
 
 Shared_CC_Flags
    The arguments to the C Compiler used when building shared libraries.  This

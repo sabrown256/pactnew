@@ -962,8 +962,7 @@ and SX.  Hopefully you will not have to do this.
    in order to use ULTRA, SCHEME, SX, PDBVIEW, or PDBDIFF. The SCHEME and
    ULTRA environment variables must be set to point to the directory in which
    the scheme files were installed. The default for this directory is
-   /usr/local/scheme and in the above example it would be /usr/local/pact/scheme
-   (see the SCMDir variable if in doubt).
+   /usr/local/scheme and in the above example it would be /usr/local/pact/scheme.
 <p>
 
 <pre>
@@ -1317,13 +1316,6 @@ options your system&#146;s rm has.
 <UL>A list of Scheme coded binary file translation spokes to be used with SX.
 A netCDF spoke is included with the distribution.
 <BR>Default is &#147;netcdf&#148;</UL>
-
-<P>
-<B>ScmDir</B>
-<BR>
-<UL>A directory in which to install scheme source files.  This should also be
-a subdirectory of PSY_InstRoot.
-<BR>Default is &#147;scheme&#148;</UL>
 
 
 <!--------------------------------------------------------------------------------->

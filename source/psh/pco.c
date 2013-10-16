@@ -1406,7 +1406,7 @@ static void setup_analyze_env(client *cl, char *base)
     else
        dbset(cl, "AF_CDecls", "FALSE");
 
-    dbset(cl, "ANSI",   "ANSI");
+    dbset(cl, "AF_ANSI",   "ANSI");
 
 /* initialization of non-graphics flags */
     dbinitv(cl, "CC_Version",  "");

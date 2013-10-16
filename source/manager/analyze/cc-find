@@ -14,7 +14,7 @@ source $Me:h/common
 
 dbget CROSS_FE
 
-set ANSI     = TRUE
+set af_ansi  = TRUE
 set FullPath = FALSE
 set LibPath  = ""
 set ncclst   = ""
@@ -44,7 +44,7 @@ while ($#argv > 0)
             @ Verbose = $Verbose + 1
             breaksw
        case -w:
-            set ANSI = FALSE
+            set af_ansi = FALSE
             breaksw
        default:
             set ok = TRUE
@@ -179,7 +179,7 @@ end
 
 rm -f $Tmp.c $Tmp
 
-if ($ANSI == TRUE) then
+if ($af_ansi == TRUE) then
    echo "$ansicc"
 else
    echo "$allcc"
