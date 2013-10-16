@@ -29,7 +29,7 @@ dbmget $Log PSY_CfgDir^       \
             PSY_ID^           \
             PSY_InstRoot^     \
             PSY_Prefix^       \
-            GMAKE_Flag^       \
+            MAKE_UseGNU^      \
             IncDir^           \
             EtcDir^           \
             BinDir^           \
@@ -100,7 +100,7 @@ EOF
     set mkopt = ( $mkopt -DPSY_ID=\"${PSY_ID}\" )
     set mkopt = ( $mkopt -DPSY_Prefix=\"${PSY_Prefix}\" )
     set mkopt = ( $mkopt -DPACT_VERSION=\"${lpactver}\" )
-    set mkopt = ( $mkopt $GMAKE_Flag )
+    set mkopt = ( $mkopt $MAKE_UseGNU )
     set mkopt = ( $mkopt -I${IncDir} )
 
     set RootOpt = ( $mkopt )

@@ -38,19 +38,19 @@ set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 fexvars $ALog t $Cfe_CC_Exe $Tmp.c -o $Tmp $opt @b wc -l
 Note $ALog "t = |$t|"
 if ($t == 0) then
-   flog $ALog setenv GETSOCKOPT_TYPE "int"
+   flog $ALog setenv AF_SOCKOPT_TYPE "int"
 else
-   flog $ALog setenv GETSOCKOPT_TYPE "unsigned int"
+   flog $ALog setenv AF_SOCKOPT_TYPE "unsigned int"
 endif
 unset t
 
-NoteD $ALog "      getsockopt type: $GETSOCKOPT_TYPE"
+NoteD $ALog "      getsockopt type: $AF_SOCKOPT_TYPE"
 
 flog $ALog rm -f $Tmp.c $Tmp
 
 # export the results
 dbmset $ALog HAVE_SOCKETS    = $HAVE_SOCKETS^    \
-             GETSOCKOPT_TYPE = $GETSOCKOPT_TYPE
+             AF_SOCKOPT_TYPE = $AF_SOCKOPT_TYPE
 
 exit(0)
 

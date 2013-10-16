@@ -10,8 +10,6 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath intel
 
-GMAKE_Flag   = TRUE
-
 Tool CC {
    Exe       = icc
    Flags     = -wd71,72,161,188,267,1357
@@ -52,6 +50,10 @@ Tool LD {
 
 Tool Lex {
    Flags = -wd177,266
+}
+
+Tool MAKE {
+   UseGNU = TRUE
 }
 
 Group AF {

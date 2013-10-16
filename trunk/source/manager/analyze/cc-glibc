@@ -17,7 +17,7 @@ Note $ALog ""
 
 dbmget $ALog HAVE_GNU_LIBC_6 =\? FALSE
 
-setenv GLIBC_VERSION ""
+setenv AF_VERSION_GLIBC ""
 
 set GCC = `$Which gcc`
 if (-x "$GCC") then
@@ -50,7 +50,7 @@ EOF
          endif
       endif
       NoteD $ALog "      has GNU LibC $lvers"
-      setenv GLIBC_VERSION $lvers
+      setenv AF_VERSION_GLIBC $lvers
       unset t
       unset lvers
    else
@@ -67,8 +67,8 @@ else
    NoteD $ALog "      no GCC found on this system"
 endif
 
-dbmset $ALog HAVE_GNU_LIBC_6 = $HAVE_GNU_LIBC_6^  \
-             GLIBC_VERSION   = $GLIBC_VERSION
+dbmset $ALog HAVE_GNU_LIBC_6  = $HAVE_GNU_LIBC_6^  \
+             AF_VERSION_GLIBC = $AF_VERSION_GLIBC
 
 
 

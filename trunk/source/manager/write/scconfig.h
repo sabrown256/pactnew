@@ -33,31 +33,21 @@ dbmget $Log BFD_Version^              \
             FC_ID_UNDERSCORE^         \
             FC_INT_PTR_DIFFER^        \
             FC_INTEGER_C^             \
-            GETSOCKOPT_TYPE^          \
-            OS_Name^                  \
-            OS_Release^               \
             IncDir^                   \
             STD_IPC^                  \
-            LONG64^                   \
             HAVE_MPI_STDIN_ALL^       \
             HAVE_MPI_GOOD_IO^         \
             HAVE_LONG_LONG^           \
-            NEED_ALT_LARGE_FILE^      \
             PACT_CC_FAMILY^           \
             PACT_CC_VERSION^          \
             PACT_SO_CACHE^            \
             SMP_Pthread^              \
             OS_Type^                  \
-            OSX_Version^              \
             TRACKER_Exe^              \
             MYSQL_SO^                 \
             SQLITE3_SO^               \
             HDF5_SO^                  \
             HAVE_BAD_LINE_DIRECTIVES^ \
-            RF_DEBUG^                 \
-            RF_OPTIMIZE^              \
-            RF_PROFILE^               \
-            RF_Linking^               \
             HAVE_INLINE^              \
             HAVE_NORETURN^            \
             HAVE_OPENMP^              \
@@ -103,6 +93,16 @@ dbmget $Log BFD_Version^              \
             LEH_TTY_CRNL^             \
             LEH_TTY_ECHO^             \
             LEH_TTY_VTIME^            \
+            AF_ALT_LARGE_FILE^        \
+            AF_LONG8^                 \
+            AF_SOCKOPT_TYPE^          \
+            AF_VERSION_OSX^           \
+            RF_DEBUG^                 \
+            RF_OPTIMIZE^              \
+            RF_PROFILE^               \
+            RF_Linking^               \
+            OS_Name^                  \
+            OS_Release^               \
             Std_UseX^                 \
             Std_UseOGL^               \
             Std_UseQD^                \
@@ -153,8 +153,8 @@ dbmget $Log BFD_Version^              \
     Note $STDOUT '#define PSY_ID              '$q${PSY_ID}$q
     Note $STDOUT '#define PSY_Prefix          '$q${PSY_Prefix}$q
     Note $STDOUT '#define PSY_TmpDir          '$q${PSY_TmpDir}$q
-    if ("$OSX_Version" != "") then
-       Note $STDOUT "#define MACOSX_VERSION      $OSX_Version"
+    if ("$AF_VERSION_OSX" != "") then
+       Note $STDOUT "#define MACOSX_VERSION      $AF_VERSION_OSX"
     endif
 
     Note $STDOUT '#define USE_COMPILER        '$q${CC_Exe}$q
@@ -199,8 +199,8 @@ dbmget $Log BFD_Version^              \
        Note $STDOUT "#define NO_LONG_LONG"
     endif
 
-    if ("$LONG64" != "") then
-       Note $STDOUT "#define LONG64"
+    if ("$AF_LONG8" != "") then
+       Note $STDOUT "#define AF_LONG8"
     endif
 
     if ("$FC_INTEGER_C" != "unknown") then
@@ -329,7 +329,7 @@ dbmget $Log BFD_Version^              \
        flog $Log $RM $IncDir/noipc
        Note $STDOUT "#define HAVE_PROCESS_CONTROL"
        if ($HAVE_SOCKETS != "FALSE") then
-          set sty = ( `echo $GETSOCKOPT_TYPE | sed 's|\"||g'` )
+          set sty = ( `echo $AF_SOCKOPT_TYPE | sed 's|\"||g'` )
           Note $STDOUT "#define HAVE_SOCKETS"
           Note $STDOUT "typedef $sty SOCKOPT_T;"
        endif
@@ -337,8 +337,8 @@ dbmget $Log BFD_Version^              \
        flog $Log touch $IncDir/noipc
     endif
 
-    if (("$NEED_ALT_LARGE_FILE" == "TRUE") && ($OS_Name != FreeBSD)) then
-       Note $STDOUT "#define NEED_ALT_LARGE_FILE"
+    if (("$AF_ALT_LARGE_FILE" == "TRUE") && ($OS_Name != FreeBSD)) then
+       Note $STDOUT "#define AF_ALT_LARGE_FILE"
        Note $STDOUT "#define HAVE_ALT_LARGE_FILE"
     endif
 

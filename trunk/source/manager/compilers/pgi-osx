@@ -10,8 +10,6 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath pgi
 
-GMAKE_Flag   = TRUE
-
 Tool CC {
    Exe      = pgcc
    Flags    = -Kieee
@@ -52,6 +50,10 @@ Tool LD {
    Flags   = -Ktrap=fp ${SMP_NUMA}
    Flags   += [ _cmd_ = -p ;                # profiling
 	        on    = -Mprof=func ]
+}
+
+Tool MAKE {
+   UseGNU = TRUE
 }
 
 Group AF {
