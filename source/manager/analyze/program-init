@@ -17,37 +17,45 @@ run analyze/rpath -i init
 # dynamically link dependent libraries by default
 include features/dld
 
-setenv ENV_VARS "Bits OS_Name \
-                 CROSS_FE CROSS_COMPILE CROSS_REF \
-                 DB_CFGMAN DB_HOST_SERVER \
-                 DB_RUN_SIGNATURE DB_SITE_SIGNATURE DB_UPDATE_SYS \
-                 DO_RUN_DBG DO_RUN_MPI DO_RUN_CROSS \
-                 AF_VERSION_GLIBC BFD_VERSION \
-                 HDF_VERSION MYSQL_VERSION SQLITE3_VERSION \
-                 PNG_VERSION JPEG_VERSION \
-                 PACT_VERSION \
-                 CC_Exe CC_Flags \
-                 CC_Debug_Default CC_Optimize_Default \
-                 Cfg_CC_Exe Cfg_CC_Flags Cfg_CC_Inc \
-                 CXX_Exe CXX_Flags CXX_Linker \
-                 FC_Exe FC_Flags \
-                 FC_Debug_Default FC_Optimize_Default \
-                 DP_FE DP_Inc DP_Lib DP_RPath DP_Path \
-                 JOBS_System \
-                 LIB LibM_Lib LibM_RPath \
-                 MDG_Inc MDG_Lib MDG_RPath MDG_Path \
-                 MAKE_Exe MAKE_SUFFIXES \
-                 PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH PACT_CC_EXE \
-                 PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH PACT_FC_EXE \
-                 PY_Inc PY_Lib PY_RPath PY_Path PY_Vers PY_Ext \
-                 HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
-                 TEST_ADVISORY TRACKER_Exe HAVE_OPENMP \
-                 HSY_RootInc HSY_RootLib \
-                 PSY_FltDir \
-                 PSY_Prefix PSY_CfgDir PSY_TmpDir PSY_Arch PSY_ID \
-                 PSY_SITE PSY_TYPE PSY_Root PSY_AIRoot PSY_ASRoot"
+setenv ENV_GT "AF BFD CC Cfg CROSS CXX DB DO_RUN DP FC \
+               HDF HSY JOBS JPEG LibM MAKE MDG MYSQL \
+               OS PACT PNG PSY PY SQLITE3 TEST TRACKER"
 
-LIB              = lib
+setenv ENV_VARS "Bits LIB \
+                 HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
+                 HAVE_OPENMP"
+
+#setenv ENV_VARS "Bits OS_Name \
+#                 CROSS_FE CROSS_COMPILE CROSS_REF \
+#                 DB_CFGMAN DB_HOST_SERVER \
+#                 DB_RUN_SIGNATURE DB_SITE_SIGNATURE DB_UPDATE_SYS \
+#                 DO_RUN_DBG DO_RUN_MPI DO_RUN_CROSS \
+#                 AF_VERSION_GLIBC BFD_VERSION \
+#                 HDF_VERSION MYSQL_VERSION SQLITE3_VERSION \
+#                 PNG_VERSION JPEG_VERSION \
+#                 PACT_VERSION \
+#                 CC_Exe CC_Flags \
+#                 CC_Debug_Default CC_Optimize_Default \
+#                 Cfg_CC_Exe Cfg_CC_Flags Cfg_CC_Inc \
+#                 CXX_Exe CXX_Flags CXX_Linker \
+#                 FC_Exe FC_Flags \
+#                 FC_Debug_Default FC_Optimize_Default \
+#                 DP_FE DP_Inc DP_Lib DP_RPath DP_Path \
+#                 JOBS_System \
+#                 LIB LibM_Lib LibM_RPath \
+#                 MDG_Inc MDG_Lib MDG_RPath MDG_Path \
+#                 MAKE_Exe MAKE_SUFFIXES \
+#                 PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH PACT_CC_EXE \
+#                 PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH PACT_FC_EXE \
+#                 PY_Inc PY_Lib PY_RPath PY_Path PY_Vers PY_Ext \
+#                 HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
+#                 TEST_ADVISORY TRACKER_Exe HAVE_OPENMP \
+#                 HSY_RootInc HSY_RootLib \
+#                 PSY_FltDir \
+#                 PSY_Prefix PSY_CfgDir PSY_TmpDir PSY_Arch PSY_ID \
+#                 PSY_SITE PSY_TYPE PSY_Root PSY_AIRoot PSY_ASRoot"
+
+LIB = lib
 
 #--------------------------------------------------------------------------
 
@@ -63,6 +71,9 @@ Tool CC {
 }
 
 Tool CXX {
+}
+
+Tool DL {
 }
 
 Tool DO_RUN {
@@ -138,8 +149,8 @@ Tool TRACKER {
 # analyzed features - detected, defined, or computed - post analyze
 
 Group AF {
-   PATTERN_WARN     =
-   PATTERN_ERR      =
+   PATTERN_WARN =
+   PATTERN_ERR  =
 }
 
 Group BFD {
@@ -158,8 +169,6 @@ Group Cfe {
 
 # cross compiling group
 Group CROSS {
-   COMPILE = FALSE
-   REF     = ""
 }
 
 # database group

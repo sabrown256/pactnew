@@ -20,6 +20,7 @@ dbmget $ALog CC_Exe^                   \
              CC_Debug^                 \
              FC_Optimize^              \
              FC_Debug^                 \
+             DL_Lib^                   \
              Save_CC^                  \
              Save_CFLAGS^              \
              Cfe_CC_Inc^               \
@@ -197,7 +198,7 @@ dbmget $ALog CC_Exe^                   \
    endif
 
    if ($HAVE_DYNAMIC_LINKER == TRUE) then
-      flog $ALog setenv MDE_Lib "$MDE_Lib -ldl"
+      flog $ALog setenv MDE_Lib "$MDE_Lib $DL_Lib"
    endif
 
    Note $ALog "Execution summary variables:"

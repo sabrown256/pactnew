@@ -354,7 +354,7 @@ switch ($Cmnd)
 # some things should be on the back end for testing
 # but some need to be used by the system on the front end
 # see score/make-wrap
-        if ("$CROSS_REF" != "") then
+        if ("$CROSS_REF" != "none") then
            NoteD $Log ""
            Separator $Log
            NoteD $Log "Cross compile fixes"
@@ -624,8 +624,8 @@ switch ($Cmnd)
         setenv Bits      `$PSY_ScrDir/nbit -d`
 
         set Configuration = ""
-        set Method        = 2
-        set CROSS_REF     = ""
+        set method        = 2
+        set cross_ref     = none
         set reconfig      = FALSE
         set mpi           = FALSE
         set python        = FALSE
@@ -820,7 +820,7 @@ switch ($Cmnd)
                    breaksw
               case -md:
                    shift
-                   set Method = $1
+                   set method = $1
                    breaksw
               case -mpi:
                    set mpi = TRUE
@@ -837,7 +837,7 @@ switch ($Cmnd)
                    breaksw
               case -plt:
                    shift
-                   set CROSS_REF = $1
+                   set cross_ref = $1
                    set platform  = TRUE
                    breaksw
               case -py:
@@ -970,7 +970,7 @@ switch ($Cmnd)
 
 # otherwise look in the configs directories
            else
-              set inf   = ( `gen-cfg-root $Configuration` )
+              set inf   = ( `gen-cfg-root -r $Configuration` )
               set croot = $inf[1]
               if ($#inf > 1) then
                  set flst  = ( $flst $inf[2-] )
@@ -1110,10 +1110,10 @@ switch ($Cmnd)
         Separator $Log
         flog $Log $PERDB PACT_VERSION=$PACTVer
 	if ($platform == TRUE) then
-           flog $Log $PERDB CROSS_REF=$CROSS_REF
+           flog $Log $PERDB CROSS_REF=$cross_ref
         endif
 
-        if (($Method == 2) && (-x $BinDir/pco)) then
+        if (($method == 2) && (-x $BinDir/pco)) then
            flog $Log set PConf = ( $BinDir/pco $dbopt -env $cwd/pact.env -l )
            Note $Log "Using binary pco to process input"
         else
@@ -2410,9 +2410,6 @@ CFG_DONE:
         flog $Log date
         flog $Log $Which pact
 
-        NoteD $Log "Removing PACT for $PSY_ID"
-        Note $Log "strict = $strict"
-
 # do remove for multi-platform configuration
         flog $Log setenv PERDB_PATH $EtcDir/cfg
         dbget Platforms
@@ -2427,6 +2424,9 @@ CFG_DONE:
            ftee $Log pact $Args remove
            flog $Log popd
         endif
+
+        NoteD $Log "Removing PACT for $PSY_ID"
+        Note $Log "strict = $strict"
 
 # save the files in BinDir
         set BinFiles = ""
