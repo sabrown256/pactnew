@@ -54,6 +54,10 @@ else
 
 # MYSQL
 
+   Separator $ALog
+   Note $ALog "MYSQL"
+   Note $ALog ""
+
    set lvms = ""
 
    set UTime = `timer -r`
@@ -107,19 +111,19 @@ EOF
          set pthl = ( $pthl $PckPath )
       endif
       if (($RF_Linking == dynamic) && ($?lSO == 1)) then
-         setenv MYSQL_SO    $lSO
+         flog $ALog setenv MYSQL_SO    $lSO
       else
          set libl = ( $libl $PckLib )
       endif
-      set spkl = ( $spkl mysql )
+      flog $ALog set spkl = ( $spkl mysql )
 
-      setenv HAVE_MYSQL  TRUE
+      flog $ALog setenv HAVE_MYSQL  TRUE
 
       flog $ALog $Tmp
       set lvms = ( `$Tmp` )
 
    else
-      setenv HAVE_MYSQL  ""
+      flog $ALog setenv HAVE_MYSQL  ""
    endif
 
    flog $ALog $RM $Tmp $Tmp.c
@@ -130,6 +134,10 @@ EOF
 #--------------------------------------------------------------------------
 
 # SQLITE - version 1
+
+   Separator $ALog
+   Note $ALog "SQLITE 1"
+   Note $ALog ""
 
    set lvsl = ""
 
@@ -179,19 +187,19 @@ EOF
          set pthl = ( $pthl $PckPath )
       endif
       if (($RF_Linking == dynamic) && ($?lSO == 1)) then
-         setenv SQLITE3_SO    $lSO
+         flog $ALog setenv SQLITE3_SO    $lSO
       else
          set libl = ( $libl $PckLib )
       endif
-      set spkl = ( $spkl sqlite )
+      flog $ALog set spkl = ( $spkl sqlite )
 
-      setenv HAVE_SQLITE TRUE
+      flog $ALog setenv HAVE_SQLITE TRUE
 
       flog $ALog $Tmp
       set lvsl = ( `$Tmp` )
 
    else
-      setenv HAVE_SQLITE ""
+      flog $ALog setenv HAVE_SQLITE ""
    endif
 
    flog $ALog $RM $Tmp $Tmp.c
@@ -202,6 +210,10 @@ EOF
 #--------------------------------------------------------------------------
 
 # SQLITE - version 2
+
+   Separator $ALog
+   Note $ALog "SQLITE 2"
+   Note $ALog ""
 
    set UTime = `timer -r`
 
@@ -246,21 +258,21 @@ EOF
          set pthl = ( $pthl $PckPath )
       endif
       if (($RF_Linking == dynamic) && ($?lSO == 1)) then
-         setenv SQLITE3_SO    $lSO
+         flog $ALog setenv SQLITE3_SO    $lSO
       else
          if ("$PckLib" !~ *$libl*) then
             set libl = ( $libl $PckLib )
          endif
       endif
 
-      setenv HAVE_SQLITE_V2 TRUE
-      setenv HAVE_SQLITE    TRUE
+      flog $ALog setenv HAVE_SQLITE_V2 TRUE
+      flog $ALog setenv HAVE_SQLITE    TRUE
 
       flog $ALog $Tmp
       set lvsl = ( `$Tmp` )
 
    else
-      setenv HAVE_SQLITE_V2 ""
+      flog $ALog setenv HAVE_SQLITE_V2 ""
    endif
 
    flog $ALog $RM $Tmp $Tmp.c
@@ -270,13 +282,17 @@ EOF
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   setenv SQL_Inc   "$incl"
-   setenv SQL_Lib   "$libl"
-   setenv SQL_RPath "$pthl"
+   Separator $ALog
+   Note $ALog "Finish"
+   Note $ALog ""
+
+   flog $ALog setenv SQL_Inc   "$incl"
+   flog $ALog setenv SQL_Lib   "$libl"
+   flog $ALog setenv SQL_RPath "$pthl"
 
 # NOTE: used SQL_Path to find libs, incs - there are no executables
    if ("$SQL_Path" == /usr) then
-      setenv SQL_Path  ""
+      flog $ALog setenv SQL_Path  ""
    endif
 
    foreach p ($pthl)

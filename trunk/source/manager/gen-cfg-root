@@ -11,7 +11,28 @@
 # include "cpyright.h"
 #
 
-set cfg = $1
+set raw = FALSE
+set cfg = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: gen-cfg-root [-h] [-r] <cfg>"
+           echo "   h     this help message"
+           echo "   r     do not process platform specifications out"
+           echo "   <cfg> configuration specification"
+           echo ""
+           exit(1)
+      case -r:
+           set raw = TRUE
+           breaksw
+      default:
+           set cfg = $1
+           breaksw
+   endsw
+   shift
+end
 
 set features = ( `echo $cfg | sed 's/-/ /g'` )
 
@@ -46,6 +67,8 @@ unset i
 unset ok
 unset lname
 
+if ($raw == FALSE) then
+
 # work over the features list to accomodate platform targets
 # platform 0 is the "main" config which gets the default PSY_ID
 # all other platforms are specified by the 'platform' command in
@@ -57,33 +80,35 @@ unset lname
 #   <n>    := integer platform index (0 for base config)
 #   <f>    := feature specification (e.g. py or s)
 
-set nfeat = ""
+   set nfeat = ""
 
 # add all non-targeted features
-foreach i ($features)
-   if ($i !~ [0-9]*.*) then
-      set nfeat = ( $nfeat $i )
-   endif
-end
+   foreach i ($features)
+      if ($i !~ [0-9]*.*) then
+         set nfeat = ( $nfeat $i )
+      endif   
+   end
 
 # expand and add features targeted at platform 0
-foreach i ($features)
-   if ($i =~ 0.*) then
-      set inf   = ( `echo $i | sed 's/\./ /g'` )
-      set nfeat = ( $nfeat $inf[2-] )
-   endif
-end
+   foreach i ($features)
+      if ($i =~ 0.*) then
+         set inf   = ( `echo $i | sed 's/\./ /g'` )
+         set nfeat = ( $nfeat $inf[2-] )
+      endif
+   end
 
 # last add all targeted features
-foreach i ($features)
-   if ($i =~ [1-9]*.*) then
-      set nfeat = ( $nfeat $i )
-   endif
-end
+   foreach i ($features)
+      if ($i =~ [1-9]*.*) then
+         set nfeat = ( $nfeat $i )
+      endif
+   end
 
-set features = ( $nfeat )
+   set features = ( $nfeat )
 
-unset nfeat
+   unset nfeat
+endif
+
 unset inf
 
 echo "$croot $features"

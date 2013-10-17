@@ -14,6 +14,12 @@ set ldir   = `dirname $0`
 set psy_id = `$ldir/cfgman use`
 set root   = $ldir:h/dev/$psy_id
 
+source $root/etc/env-pact.csh
+source $ldir/functions-pact.csh
+
+unset ldir
+unset root
+
 set err = 0
 set d   = $cwd
 set d   = $d:t
@@ -60,9 +66,6 @@ end
 # it at the moment
 set opt = "-l"
 set opt = ""
-
-source $root/etc/env-pact.csh
-source $ldir/functions-pact.csh
 
 InitLog Log $cwd/$dst/bproto
 

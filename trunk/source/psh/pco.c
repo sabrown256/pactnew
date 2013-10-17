@@ -127,6 +127,7 @@ struct s_state
 
     int na;
     char **args;
+    char **env;
     char *db;
 
     file_stack fstck;
@@ -161,7 +162,8 @@ static state
  st = { FALSE, FALSE, FALSE, FALSE, FALSE,
         TRUE, FALSE, TRUE, FALSE, FALSE,
 	FALSE, FALSE, FALSE,
-        PHASE_READ, 0, NULL, NULL, 0, NULL, };
+        PHASE_READ, 0, NULL, NULL,
+        0, NULL, NULL, NULL, };
 
 static void
  parse_line(client *cl, char *s, char *key, char *oper, char *value, int nc);
@@ -641,7 +643,7 @@ static void write_perl(client *cl, state *st, char *dbname)
     char **ta;
     FILE *out;
     char *exc[] = { "Globals", "CurrGrp", "CurrTool",
-		    "ENV_VARS", "Save_CC", "Save_CFLAGS",
+		    "ENV_GT", "ENV_VARS", "Save_CC", "Save_CFLAGS",
 		    "gstatus", "t" };
 
     ne = sizeof(exc)/sizeof(char *);
@@ -770,8 +772,45 @@ static void add_spec_env_vars(client *cl,
 			      FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd,
 			      int n, char **sa, int blank)
    {int i, iv, nv, ok;
-    char *p, *v, *var, **va;
+    char g[BFSML];
+    char *p, *v, *var, **gt, **va;
 
+/* check for Groups and Tools to add */
+    var = cgetenv(TRUE, "ENV_GT");
+    gt  = tokenize(var, " :", 0);
+    nv  = (gt != NULL) ? lst_length(gt) : 0;
+    if (nv > 0)
+       {int ia, na, nc, eq;
+	char **ta, *vr, *vl;
+
+	string_sort(gt, nv);
+
+	ta = _db_clnt_ex(cl, FALSE, "save:");
+	na = lst_length(ta);
+	na--;
+	string_sort(ta, na);
+
+	ia = 0;
+	for (iv = 0; iv < nv; iv++)
+	    {snprintf(g, BFSML, "%s_", gt[iv]);
+	     nc = strlen(g);
+	     for (ok = FALSE; ia < na; ia++)
+	         {eq = strncmp(g, ta[ia], nc);
+		  if (eq == 0)
+		     {ok = TRUE;
+		      vr = ta[ia];
+		      vl = strchr(vr, '=');
+		      if (vl != NULL)
+			 *vl++ = '\0';
+		      env_out(fsh, fcsh, fdk, fmd, vr, vl);}
+		  else if (eq > 0)
+		     continue;
+		  else
+		     break;};};};
+
+    free_strings(gt);
+
+/* check for individual variables */
     var = cgetenv(TRUE, "ENV_VARS");
     va  = tokenize(var, " :", 0);
     nv  = (va != NULL) ? lst_length(va) : 0;
@@ -818,7 +857,8 @@ static void add_set_cfg(client *cl,
 	        {nc  = strlen(var);
 		 val = strtok(NULL, "\n");
 		    
-		 if (strcmp(var, "ENV_VARS") == 0)
+		 if ((strcmp(var, "ENV_VARS") == 0) ||
+		     (strcmp(var, "ENV_GT") == 0))
 		    continue;
 
 /* handle PATH specially - just gather everything that is
@@ -1620,6 +1660,7 @@ static void default_var(client *cl, char *base)
     dbinitv(cl, "PSY_PubInc",    "");
     dbinitv(cl, "PSY_PubLib",    "");
     dbinitv(cl, "CROSS_COMPILE", "FALSE");
+    dbinitv(cl, "CROSS_REF",     "none");
 
 /* global variables */
     snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.psy_id);
@@ -3266,6 +3307,7 @@ int main(int c, char **v, char **env)
 
     st.na   = c - 1;
     st.args = v + 1;
+    st.env  = env;
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-strict") == 0)

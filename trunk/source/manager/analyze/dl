@@ -16,12 +16,13 @@ Note $ALog "----- analyze/dl -----"
 Note $ALog "Analyze: dynamic linker"
 Note $ALog ""
 
-dbmget $ALog HAVE_DYNAMIC_LINKER =\? FALSE^   \
-             PACT_SO_CACHE       =\? ""^      \
-             PACT_CC_VERSION^                 \
-             CC_Exe^                          \
+dbmget $ALog CC_Exe^                          \
              CC_Flags^                        \
-             CROSS_FE
+             CROSS_FE^                        \
+             HAVE_DYNAMIC_LINKER =\? FALSE^   \
+             DL_Lib              =\? ""^      \
+             PACT_SO_CACHE       =\? ""^      \
+             PACT_CC_VERSION
 
 Note $ALog "HAVE_DYNAMIC_LINKER = |$HAVE_DYNAMIC_LINKER|"
 
@@ -73,6 +74,7 @@ if ($ok == FALSE) then
 else
    if ($ok == NEED) then
       NoteD $ALog "      need explicit dl"
+      setenv DL_Lib  "-ldl"
    else
       NoteD $ALog "      has implicit dl"
    endif
@@ -86,6 +88,7 @@ endif
 setenv PACT_SO_CACHE  $PACT_SO_CACHE/$PSY_ID
 
 dbmset $ALog PACT_SO_CACHE       = $PACT_SO_CACHE^         \
+             DL_Lib              = $DL_Lib^                \
              HAVE_DYNAMIC_LINKER = $HAVE_DYNAMIC_LINKER
 
 Separator $ALog

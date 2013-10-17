@@ -20,16 +20,16 @@ Separator $Log
 NoteD $Log "   Persistent Portable Parallel Make - dmake"
 Note $Log ""
 
-dbmget $Log CROSS_COMPILE^           \
-            CROSS_REF       =\?  ""^ \
-            PACT_CC_EXE^             \
-            PACT_CC_FAMILY^          \
-            PACT_CC_PATH^            \
-            PACT_CC_VERSION^         \
-            BinDir^                  \
-            LibDir^                  \
-            PSY_ID^                  \
-            PSY_Base^                \
+dbmget $Log CROSS_COMPILE^               \
+            CROSS_REF       =\?  "none"^ \
+            PACT_CC_EXE^                 \
+            PACT_CC_FAMILY^              \
+            PACT_CC_PATH^                \
+            PACT_CC_VERSION^             \
+            BinDir^                      \
+            LibDir^                      \
+            PSY_ID^                      \
+            PSY_Base^                    \
             PSY_MngDir
 
     flog $Log set DSYS = $PSY_MngDir/dsys
