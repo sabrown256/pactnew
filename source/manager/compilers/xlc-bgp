@@ -113,15 +113,21 @@ Group X11 {
    RPath = /usr/X11R6/$LIB
 }
 
+Group CROSS {
+   COMPILE = BGP
+}
+
+# NOTE: despite debug flags no symbol info so undebuggable
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
+}
+
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
-setenv CROSS_COMPILE  BGP
 setenv IBM_BGP
 define IBM_BGP
 define GETSOCKNAME_LONG
 
 include serial
 
-# NOTE: despite debug flags no symbol info so undebuggable
-setenv TEST_ADVISORY ${TEST_ADVISORY}:pdb_fd:sx_intp3

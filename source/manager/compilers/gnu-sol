@@ -28,4 +28,6 @@ Group X11 {
 define SOLARIS
 
 # GCC 3.4.3 complex support is buggy
-setenv TEST_ADVISORY ${TEST_ADVISORY}:pml_func:pml_fpe
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:pml_func:pml_fpe
+}

@@ -18,8 +18,11 @@ include no-jpeg
 include no-png
 include no-libz
 
-setenv DO_RUN_MPI     "salloc.bgl"
-setenv DO_RUN_CROSS   "no-op"
+Tool DO_RUN {
+   MPI   = "salloc.bgl"
+   CROSS = "no-op"
+}
+
 setenv IBM_BGL
 define IBM_BGL
 define GETSOCKNAME_LONG

@@ -13,6 +13,11 @@ Group CROSS
    COMPILE = BGQ
 }
 
+Group TEST {
+   ADVISORY    = ${TEST_ADVISORY}:pgs_rendlr:pgs_rendac
+#   MAX_THREADS = 2
+}
+
 Tool DO_RUN {
    MPI   = "srun.bgq"
    DBG   = "tv.bgq"
@@ -24,11 +29,7 @@ define IBM_BGQ
 
 setenv OMIT_INTERP
 
-setenv TEST_ADVISORY ${TEST_ADVISORY}:pgs_rendlr:pgs_rendac
-
 # define GETSOCKNAME_LONG
-# 
-# setenv TEST_MAX_THREADS 2
 # 
 # Group BFD {
 #    Flags = -Wl,-dynamic

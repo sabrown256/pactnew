@@ -23,6 +23,14 @@ Group HSY {
    RootInc = /bgsys/drivers/ppctoolchain.gomp/gnu-linux/powerpc-bgp-linux/sys-include
 }
 
+Group TEST {
+   MAX_THREADS = 2
+}
+
+Group BFD {
+   Flags = -Wl,-dynamic
+}
+
 include 32-bit
 include compilers/gnu-bgp
 include no-x11
@@ -33,12 +41,6 @@ include no-libz
 include features/bgp
 
 define GETSOCKNAME_LONG
-
-setenv TEST_MAX_THREADS 2
-
-Group BFD {
-   Flags = -Wl,-dynamic
-}
 
 
 

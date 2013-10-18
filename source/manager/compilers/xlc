@@ -72,6 +72,10 @@ Tool AR {
              *     = -X* ]
 }
 
+Tool DO_RUN {
+   MPI = poe
+}
+
 Group AF {
    PATTERN_WARN = "WARNING: (E) (W) (I)"
    PATTERN_ERR  = "Error: (S)"
@@ -115,7 +119,6 @@ Group OpenMP {
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
-setenv DO_RUN_MPI   poe
 define GETSOCKNAME_LONG
 define HAVE_THREAD_SAFE_MPI
 
