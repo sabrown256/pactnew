@@ -12,8 +12,14 @@ include no-png
 include no-libz
 include no-python
 
-setenv CROSS_COMPILE  MINGW32
-setenv DO_RUN_CROSS   "wine"
+Group CROSS {
+   COMPILE = MINGW32
+}
+
+Tool DO_RUN {
+   CROSS = "wine"
+}
+
 setenv MINGW32
 
 

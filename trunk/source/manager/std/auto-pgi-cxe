@@ -19,7 +19,10 @@ run std/use-compiler pgcc
 include no-opengl
 include no-sql
 
-setenv DO_RUN_MPI     "aprun"
+Tool DO_RUN {
+   MPI = "aprun"
+}
+
 setenv CRAY_XE
 define CRAY_XE
 

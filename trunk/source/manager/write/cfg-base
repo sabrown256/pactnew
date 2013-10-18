@@ -60,7 +60,10 @@
            set ladv = ${ladv}:pml_perf:pml_nan:pml_fpe:pml_interp
            echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/cygwin" >>& $Tmp
-           echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+#           echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+           echo "Group TEST {" >>& $Tmp
+           echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+           echo "}" >>& $Tmp
            unset ladv
            breaksw
       case darwin:
@@ -73,14 +76,20 @@
               case *pgcc*:
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include compilers/pgi-osx" >>& $Tmp
-                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+#                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+                   echo "Group TEST {" >>& $Tmp
+                   echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+                   echo "}" >>& $Tmp
                    breaksw
               default:
               case *gcc*:
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include compilers/gnu-osx" >>& $Tmp
                    echo "include no-opengl" >>& $Tmp
-                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+#                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+                   echo "Group TEST {" >>& $Tmp
+                   echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+                   echo "}" >>& $Tmp
                    breaksw
            endsw
            unset ladv
@@ -117,7 +126,10 @@
                  echo "include compilers/sol" >>& $Tmp
               endif
            endif
-           echo 'setenv TEST_ADVISORY ${TEST_ADVISORY}:score_mpi' >>& $Tmp
+#           echo 'setenv TEST_ADVISORY ${TEST_ADVISORY}:score_mpi' >>& $Tmp
+           echo "Group TEST {" >>& $Tmp
+           echo '   ADVISORY = ${TEST_ADVISORY}:score_mpi' >>& $Tmp
+           echo "}" >>& $Tmp
            breaksw
       default:
       case linux:
@@ -169,7 +181,10 @@
                    set ladv = ${ladv}:score_mpi
                    echo "run std/use-compiler $lcc" >>& $Tmp
 		   echo "include compilers/sun" >>& $Tmp
-                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+#                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+                   echo "Group TEST {" >>& $Tmp
+                   echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+                   echo "}" >>& $Tmp
                    unset ladv
                    breaksw
               case xlc-bgl:

@@ -7,8 +7,9 @@
 # include "cpyright.h"
 #
 
-setenv TEST_ADVISORY     "psh_gexec:scheme_gexec"
-
+Group TEST {
+   ADVISORY = "psh_gexec:scheme_gexec"
+}
 
 
 

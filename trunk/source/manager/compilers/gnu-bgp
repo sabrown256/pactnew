@@ -114,4 +114,6 @@ include cpp-rule
 include serial
 
 # BFD is detected but tests do not work
-setenv TEST_ADVISORY ${TEST_ADVISORY}:score_retrc:fortran_pdb_manual 
+Group TEST {
+  ADVISORY = ${TEST_ADVISORY}:score_retrc:fortran_pdb_manual 
+}

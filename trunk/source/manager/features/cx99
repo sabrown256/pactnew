@@ -7,5 +7,8 @@
 # include "cpyright.h"
 #
 
-setenv STD_C             X99
+Group STD {
+   C = X99
+}
+
 

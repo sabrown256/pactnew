@@ -21,9 +21,14 @@ run analyze/rpath -a /opt/gcc/mpc/0.8.1/lib:/opt/gcc/mpfr/2.4.2/lib:/opt/gcc/gmp
 include no-opengl
 include no-sql
 
-setenv TEST_ADVISORY ${TEST_ADVISORY}:fortran_pdb_manual 
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:fortran_pdb_manual 
+}
 
-setenv DO_RUN_MPI     "aprun"
+Tool DO_RUN {
+   MPI = "aprun"
+}
+
 setenv CRAY_XE
 define CRAY_XE
 
