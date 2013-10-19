@@ -19,7 +19,7 @@ NoteD $Log ""
 NoteD $Log -n "                    $msg"
 Note $Log ""
 
-if (($?STATIC_LINKING == 0) && ("$HaveDevZero" == "HAVE_DEV_ZERO")) then
+if (($RF_STATIC_LINKING == FALSE) && ("$HaveDevZero" == "HAVE_DEV_ZERO")) then
    flog $Log pushd $SrcDir
    flog $Log $MAKE -i memchk
    set xstatus = $status

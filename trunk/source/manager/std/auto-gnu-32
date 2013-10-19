@@ -12,4 +12,7 @@ run std/use-compiler vers any gcc
 include 32-bit
 include compilers/gnu
 
-setenv OMIT_INTERP
+Group PSY {
+   OMIT_INTERP = TRUE
+}
+

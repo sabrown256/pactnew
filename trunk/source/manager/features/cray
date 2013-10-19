@@ -1,0 +1,13 @@
+#
+# CRAY - config elements for CRAY
+#
+# include "cpyright.h"
+#
+
+Tool DO_RUN {
+   MPI = "aprun"
+}
+
+setenv CRAY_XE
+define CRAY_XE
+

@@ -8,7 +8,6 @@
 #
 
 setenv OBJECT_MODE        ${Bits}
-setenv HAVE_MPI_GOOD_IO   TRUE
 
 XArch = 
 

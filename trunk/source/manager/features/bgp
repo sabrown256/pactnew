@@ -11,13 +11,18 @@ Group CROSS {
    COMPILE = BGP
 }
 
+Group PSY {
+   OMIT_INTERP = TRUE
+}
+
 Tool DO_RUN {
    MPI   = "salloc.bgp"
    DBG   = "tv.bgp"
    CROSS = "submit.bgp"
 }
 
+setenv HAVE_MPI_GOOD_IO   TRUE
+
 setenv IBM_BGP
 define IBM_BGP
 
-setenv OMIT_INTERP

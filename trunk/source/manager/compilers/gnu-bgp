@@ -10,7 +10,6 @@
 run analyze/rpath gnu
 
 setenv OBJECT_MODE       ${Bits}
-setenv HAVE_MPI_GOOD_IO  TRUE
 
 Tool CC {
    Exe       = mpicc

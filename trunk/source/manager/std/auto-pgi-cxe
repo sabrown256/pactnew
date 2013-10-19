@@ -16,13 +16,6 @@ include compilers/pgi
 run std/module-cray env 4.0.36 mpi 5.2.0.7 pgi 11.10.0
 run std/use-compiler pgcc
 
+include cray
 include no-opengl
 include no-sql
-
-Tool DO_RUN {
-   MPI = "aprun"
-}
-
-setenv CRAY_XE
-define CRAY_XE
-

@@ -158,7 +158,7 @@
                    echo "include compilers/icc" >>& $Tmp
                    breaksw
               case mingw*:
-                   echo "include auto-mingw" >>& $Tmp
+                   echo "include auto-win-64" >>& $Tmp
                    breaksw
               case *path:
               case *pathcc:

@@ -7,10 +7,16 @@
 # include "cpyright.h"
 #
 
-setenv STATIC_LINKING  TRUE
-
 Group CROSS
    COMPILE = BGQ
+}
+
+Group PSY {
+   OMIT_INTERP = TRUE
+}
+
+Group RF {
+   STATIC_LINKING = TRUE
 }
 
 Group TEST {
@@ -24,10 +30,10 @@ Tool DO_RUN {
    CROSS = "srun.bgq"
 }
 
+setenv HAVE_MPI_GOOD_IO   TRUE
+
 setenv IBM_BGQ
 define IBM_BGQ
-
-setenv OMIT_INTERP
 
 # define GETSOCKNAME_LONG
 # 
