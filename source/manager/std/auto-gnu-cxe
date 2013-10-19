@@ -18,17 +18,11 @@ run std/use-compiler gcc
 
 run analyze/rpath -a /opt/gcc/mpc/0.8.1/lib:/opt/gcc/mpfr/2.4.2/lib:/opt/gcc/gmp/4.3.2/lib:/opt/gcc/4.6.2/snos/lib64
 
+include cray
 include no-opengl
 include no-sql
 
 Group TEST {
    ADVISORY = ${TEST_ADVISORY}:fortran_pdb_manual 
 }
-
-Tool DO_RUN {
-   MPI = "aprun"
-}
-
-setenv CRAY_XE
-define CRAY_XE
 

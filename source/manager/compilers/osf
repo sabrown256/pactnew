@@ -63,8 +63,10 @@ Group PythonCfg {
    Use = Python
 }
 
-define OSF
+Group RF {
+   STATIC_LINKING = TRUE
+}
 
-setenv STATIC_LINKING   TRUE
+define OSF
 
 include serial

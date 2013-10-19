@@ -7,8 +7,10 @@
 # include "cpyright.h"
 #
 
-setenv PACT_CC_PATH
-setenv PACT_FC_PATH
+Group PACT {
+   CC_PATH =
+   FC_PATH =
+}
 
 include compilers/gnu
 

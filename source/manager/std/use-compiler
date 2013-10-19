@@ -70,8 +70,8 @@ switch ($cname)
 
 # ABSOFT
    case af90*:
-        setenv PACT_CC_FAMILY   GNU
-        setenv PACT_FC_FAMILY   ABSOFT
+        set pact_cc_family = GNU
+        set pact_fc_family = ABSOFT
         set cname = gcc
         set fname = af90
         set opt   = ( --version )
@@ -81,8 +81,8 @@ switch ($cname)
 
 # CLANG
    case clang*:
-        setenv PACT_CC_FAMILY   CLANG
-        setenv PACT_FC_FAMILY   GNU
+        set pact_cc_family = CLANG
+        set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( clang version )
         set prog  = ( '$0 ~ /'$pat'/ { print $3 } $0 ~ /Compile line:/ { print $3 }' )
@@ -91,8 +91,8 @@ switch ($cname)
 
 # INTEL
    case icc*:
-        setenv PACT_CC_FAMILY   INTEL
-        setenv PACT_FC_FAMILY   INTEL
+        set pact_cc_family = INTEL
+        set pact_fc_family = INTEL
         set opt   = ( -v )
         set pat   = ( Version )
         set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
@@ -101,8 +101,8 @@ switch ($cname)
 
 # OPEN64
    case opencc*:
-        setenv PACT_CC_FAMILY   OPEN64
-        setenv PACT_FC_FAMILY   OPEN64
+        set pact_cc_family = OPEN64
+        set pact_fc_family = OPEN64
         set opt   = ( -v )
         set pat   = ( Open64 Compiler Suite: Version )
         set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
@@ -111,8 +111,8 @@ switch ($cname)
 
 # PATHSCALE
    case pathcc*:
-        setenv PACT_CC_FAMILY   PATHSCALE
-        setenv PACT_FC_FAMILY   PATHSCALE
+        set pact_cc_family = PATHSCALE
+        set pact_fc_family = PATHSCALE
         set opt   = ( -v )
         set pat   = ( Compiler Suite: Version )
         set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
@@ -121,8 +121,8 @@ switch ($cname)
 
 # PCC
    case pcc*:
-        setenv PACT_CC_FAMILY   PCC
-        setenv PACT_FC_FAMILY   GNU
+        set pact_cc_family = PCC
+        set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( pcc )
         set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
@@ -131,8 +131,8 @@ switch ($cname)
 
 # PGI
    case pgcc*:
-        setenv PACT_CC_FAMILY   PGI
-        setenv PACT_FC_FAMILY   PGI
+        set pact_cc_family = PGI
+        set pact_fc_family = PGI
         set opt   = ( -V )
         set pat   = ( target on )
         set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
@@ -141,8 +141,8 @@ switch ($cname)
 
 # SUN
    case suncc*:
-        setenv PACT_CC_FAMILY   SUN
-        setenv PACT_FC_FAMILY   SUN
+        set pact_cc_family = SUN
+        set pact_fc_family = SUN
         set opt   = ( -V )
         set pat   = ( cc: Sun C )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
@@ -151,8 +151,8 @@ switch ($cname)
 
 # Tau
    case tau_cc*:
-        setenv PACT_CC_FAMILY   TAU
-        setenv PACT_FC_FAMILY   TAU
+        set pact_cc_family = TAU
+        set pact_fc_family = TAU
         set opt   = ( -v )
         set pat   = ( tau_cc version )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
@@ -161,8 +161,8 @@ switch ($cname)
 
 # TinyCC
    case tcc*:
-        setenv PACT_CC_FAMILY   TCC
-        setenv PACT_FC_FAMILY   GNU
+        set pact_cc_family = TCC
+        set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( tcc version )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
@@ -171,8 +171,8 @@ switch ($cname)
 
 # XLC
    case *xlc*:
-        setenv PACT_CC_FAMILY   XLC
-        setenv PACT_FC_FAMILY   XLF
+        set pact_cc_family = XLC
+        set pact_fc_family = XLF
         set opt   = ( -qversion )
         set pat   = ( IBM XL C )
         set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
@@ -181,8 +181,8 @@ switch ($cname)
 
 # GNU is default
    default:
-        setenv PACT_CC_FAMILY   GNU
-        setenv PACT_FC_FAMILY   GNU
+        set pact_cc_family = GNU
+        set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( gcc version )
         set prog  = ( '$0 ~ /'$pat'/ { print $3 } $0 ~ /Compile line:/ { print $3 }' )
@@ -341,27 +341,27 @@ if ("$lbits" == 32) then
    set froot = `echo $froot | $Sed 's/-64//'`
 endif
 
-setenv PACT_CC_VERSION  $lcvers
-setenv PACT_CC_PATH     $croot
-setenv PACT_CC_EXE      $cc
+set pact_cc_version = $lcvers
+set pact_cc_path    = $croot
+set pact_cc_exe     = $cc
 
-setenv PACT_FC_VERSION  $lfvers
-setenv PACT_FC_PATH     $froot
-setenv PACT_FC_EXE      $fc
+set pact_fc_version = $lfvers
+set pact_fc_path    = $froot
+set pact_fc_exe     = $fc
 
-if ($PACT_CC_FAMILY == PATHSCALE) then
-   setenv PACT_CC_PATH  $PACT_CC_PATH/lib/$lcvers
-   setenv PACT_FC_PATH  $PACT_FC_PATH/lib/$lfvers
+if ($pact_cc_family == PATHSCALE) then
+   set pact_cc_path = $pact_cc_path/lib/$lcvers
+   set pact_fc_path = $pact_fc_path/lib/$lfvers
 endif
 
-dbmset /dev/null PACT_CC_FAMILY   = $PACT_CC_FAMILY^   \
-                 PACT_CC_VERSION  = $PACT_CC_VERSION^  \
-                 PACT_CC_PATH     = $PACT_CC_PATH^     \
-                 PACT_CC_EXE      = $PACT_CC_EXE^      \
-                 PACT_FC_FAMILY   = $PACT_FC_FAMILY^   \
-                 PACT_FC_VERSION  = $PACT_FC_VERSION^  \
-                 PACT_FC_PATH     = $PACT_FC_PATH^     \
-                 PACT_FC_EXE      = $PACT_FC_EXE
+dbmset /dev/null PACT_CC_FAMILY   = $pact_cc_family^   \
+                 PACT_CC_VERSION  = $pact_cc_version^  \
+                 PACT_CC_PATH     = $pact_cc_path^     \
+                 PACT_CC_EXE      = $pact_cc_exe^      \
+                 PACT_FC_FAMILY   = $pact_fc_family^   \
+                 PACT_FC_VERSION  = $pact_fc_version^  \
+                 PACT_FC_PATH     = $pact_fc_path^     \
+                 PACT_FC_EXE      = $pact_fc_exe
 
 source analyze/numa
 

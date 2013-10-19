@@ -2787,7 +2787,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 /* ADD_DO_RUN - add an entry to the database */
 
-static void add_do_run(FILE *fp, char *lf)
+static void add_do_run(FILE *fl, FILE *fp, char *lf)
    {int i;
     char **sa;
 
@@ -2802,7 +2802,7 @@ static void add_do_run(FILE *fp, char *lf)
     fprintf(fp, "\n");
     fprintf(fp, "#-------------------------------------------------------------------------\n");
 
-    note(Log, TRUE, "Using %s", lf);
+    note(fl, TRUE, "Using %s", lf);
 
     return;}
 
@@ -2840,7 +2840,19 @@ static void write_do_run_db(client *cl, state *st)
     char cfg[BFLRG], db[BFLRG];
     char s[BFLRG];
     char **cnd, **sa, *file, *exe, *p;
-    FILE *fp;
+    FILE *fp, *fl;
+
+    fl = open_file("w", "%s/log/write.do-run-db", st->dir.root);
+
+    getcwd(s, BFLRG);
+
+    note(fl, TRUE, "");
+    separator(fl);
+    note(fl, TRUE, "Command: pco/write_do_run_db");
+    note(fl, TRUE, "Current: %s", s);
+    note(fl, TRUE, "Date: %s", get_date());
+    note(fl, TRUE, "Manager directory: %s", dbget(cl, FALSE, "PSY_MngDir"));
+    note(fl, TRUE, "");
 
     p = cgetenv(TRUE, "PSY_CONFIG_PATH");
     if (IS_NULL(p) == TRUE)
@@ -2851,14 +2863,14 @@ static void write_do_run_db(client *cl, state *st)
     nstrncpy(lmpi, BFLRG, dbget(cl, TRUE, "DO_RUN_MPI"), -1);
     nstrncpy(lcrs, BFLRG, dbget(cl, TRUE, "DO_RUN_CROSS"), -1);
 
-    separator(Log);
-    note(Log, TRUE, "   PSY_CONFIG_PATH     = %s", cfg);
-    note(Log, TRUE, "   DO_RUN_DBG    = %s", ldbg);
-    note(Log, TRUE, "   DO_RUN_MPI    = %s", lmpi);
-    note(Log, TRUE, "   DO_RUN_CROSS  = %s", lcrs);
+    separator(fl);
+    note(fl, TRUE, "   PSY_CONFIG_PATH     = %s", cfg);
+    note(fl, TRUE, "   DO_RUN_DBG    = %s", ldbg);
+    note(fl, TRUE, "   DO_RUN_MPI    = %s", lmpi);
+    note(fl, TRUE, "   DO_RUN_CROSS  = %s", lcrs);
 
 /* initialize the database file */
-    note(Log, TRUE, "   Do-run signature database - do-run-db");
+    note(fl, TRUE, "   Do-run signature database - do-run-db");
 
     snprintf(db, BFLRG, "%s/do-run-db", st->dir.etc);
 
@@ -2871,12 +2883,12 @@ static void write_do_run_db(client *cl, state *st)
 
 /* copy the do-run database */
     if (ok == TRUE)
-       {note(Log, TRUE, "      copying %s", p);
+       {note(fl, TRUE, "      copying %s", p);
         copy(db, p);}
 
 /* write the do-run database */
     else
-       {note(Log, TRUE, "      generating %s", db);
+       {note(fl, TRUE, "      generating %s", db);
 
 	fp = fopen_safe(db, "w");
 
@@ -2890,7 +2902,7 @@ static void write_do_run_db(client *cl, state *st)
 	if ((IS_NULL(ldbg) == FALSE) && (strcmp(ldbg, "none") != 0))
 	   {cnd = lst_push(cnd, ldbg);
 	    p   = path_base(ldbg);
-            note(Log, TRUE, "default DBG %s\n", p);
+            note(fl, TRUE, "default DBG %s\n", p);
 	    fprintf(fp, "default DBG %s\n", p);}
 	else
 	   {cnd = lst_push(cnd, "gdb");
@@ -2905,7 +2917,7 @@ static void write_do_run_db(client *cl, state *st)
 	if ((IS_NULL(lmpi) == FALSE) && (strcmp(lmpi, "none") != 0))
 	   {cnd = lst_push(cnd, lmpi);
 	    p   = path_base(lmpi);
-            note(Log, TRUE, "default MPI %s\n", p);
+            note(fl, TRUE, "default MPI %s\n", p);
 	    fprintf(fp, "default MPI %s\n", p);}
 	else
 	   {cnd = lst_push(cnd, "poe");
@@ -2918,10 +2930,10 @@ static void write_do_run_db(client *cl, state *st)
 	   {if ((IS_NULL(lmpi) == FALSE) && (strcmp(lcrs, lmpi) != 0))
 	       {cnd = lst_push(cnd, lcrs);
 		p   = path_base(lcrs);
-		note(Log, TRUE, "default CROSS %s\n", p);
+		note(fl, TRUE, "default CROSS %s\n", p);
 		fprintf(fp, "default CROSS %s\n", p);}
 	    else
-	       note(Log, TRUE, "default CROSS same as default MPI\n");}
+	       note(fl, TRUE, "default CROSS same as default MPI\n");}
 	else
 	   cnd = lst_push(cnd, "submit");
 
@@ -2931,28 +2943,28 @@ static void write_do_run_db(client *cl, state *st)
 	FOREACH(d, cfg, " \t\n")
 	   snprintf(s, BFLRG, "%s/do-run-prolog", d);
 	   if (file_exists(s) == TRUE)
-              {add_do_run(fp, s);
+              {add_do_run(fl, fp, s);
 	       ns++;
 	       break;};
         ENDFOR;
 
 /* process the specs in CND */
 	for (i = 0; cnd[i] != NULL; i++)
-	    {note(Log, TRUE, "Checking %s", cnd[i]);
+	    {note(fl, TRUE, "Checking %s", cnd[i]);
 
 	     file = do_run_spec(cfg, cnd[i]);
 	     if (IS_NULL(file) == TRUE)
 	        {nm++;
-		 note(Log, TRUE, "   missing do-run config = |%s|", file);}
+		 note(fl, TRUE, "   missing do-run config = |%s|", file);}
 
 	     else
-	        {note(Log, TRUE, "   using do-run config = |%s|", file);
+	        {note(fl, TRUE, "   using do-run config = |%s|", file);
 
 		 exe = cwhich(path_base(cnd[i]));
-		 note(Log, TRUE, "   candidate for %s name = |%s|",
+		 note(fl, TRUE, "   candidate for %s name = |%s|",
 		      cnd[i], exe);
 		 if (file_executable(exe) == TRUE)
-		    {add_do_run(fp, file);
+		    {add_do_run(fl, fp, file);
 		     ns++;}
 		 else
 		    {sa = file_text(FALSE, file);
@@ -2964,10 +2976,10 @@ static void write_do_run_db(client *cl, state *st)
 			      if (exe[0] != '/')
 				 exe = cwhich(exe);
 			      
-			      note(Log, TRUE, "   candidate for %s file = |%s|",
+			      note(fl, TRUE, "   candidate for %s file = |%s|",
 				   cnd[i], exe);
 			      if (file_executable(exe) == TRUE)
-				 {add_do_run(fp, file);
+				 {add_do_run(fl, fp, file);
 				  ns++;};
 			      break;};};
 
@@ -2984,11 +2996,11 @@ static void write_do_run_db(client *cl, state *st)
  * and there were no missing specifications - nm == 0
  */
     if ((nm == 0) && (ns > 0))
-       {dbset(cl, "DB_RUN_SIGNATURE", db);
-	csetenv("DB_RUN_SIGNATURE", db);
-	note(st->aux.SEF, TRUE, "DB_RUN_SIGNATURE %s", db);};
+       dbset(cl, "DB_RUN_SIGNATURE", db);
 
-    separator(Log);
+    separator(fl);
+
+    fclose_safe(fl);
 
     return;}
 

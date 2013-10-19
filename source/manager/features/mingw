@@ -1,0 +1,18 @@
+#
+# MINGW - config elements for MINGW
+#
+# include "cpyright.h"
+#
+
+Group CROSS {
+   COMPILE = MINGW$Bits
+}
+
+Group MINGW {
+   $Bits = TRUE
+}
+
+Tool DO_RUN {
+   CROSS = "wine"
+}
+
