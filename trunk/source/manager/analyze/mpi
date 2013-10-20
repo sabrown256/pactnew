@@ -35,76 +35,87 @@ dbmget $ALog HSY_RootInc^                    \
              CC_Flags^                       \
              LD_Flags
 
+set vrs = "none"
+
+if ($DP_REQUEST_MPI == FALSE) then
+
 # NOTE: because locate-mpi ends up getting DP_RPath on your RPATH
 # before feature/mpi is invoked you can end up with MPI
 # libary paths in your link line for non-MPI builds
 # so if feature/mpi is not invoked remove DP_RPath from RPATH
-if (($DP_REQUEST_MPI == FALSE) && ("$DP_RPath" != "")) then
-   ../analyze/rpath -d $DP_RPath
-endif
+   if ("$DP_RPath" != "") then
+      ../analyze/rpath -d $DP_RPath
+   endif
+
+   setenv DP_Inc    ""
+   setenv DP_Lib    ""
+   setenv DP_RPath  ""
+   NoteD $ALog "      no MPI (by request)"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+else
 
 # MPI Include
 
-set lParComm = ""
+   set lParComm = ""
 
-Note $ALog "DP_Inc = $DP_Inc"
+   Note $ALog "DP_Inc = $DP_Inc"
 
-foreach j ($DP_Inc $HSY_RootInc)
-   set k = `echo $j | sed 's/-I//g'`
-   Note $ALog "Looking for include directory $k"
-
-# check for <path>/<pkg>/<pkg>.h form
-   set GotIt = FALSE
-   if (-f "$k/mpi/mpi.h") then
-      flog $ALog set GotIt = TRUE
-      Note $ALog "   have $k/mpi/mpi.h"
-   else if (-f "$k/mpi.h") then
-      flog $ALog set GotIt = TRUE
-      Note $ALog "   have $k/mpi.h"
-   endif
+   foreach j ($DP_Inc $HSY_RootInc)
+      set k = `echo $j | sed 's/-I//g'`
+      Note $ALog "Looking for include directory $k"
 
 # check for <path>/<pkg>/<pkg>.h form
-   if ($GotIt == TRUE) then
-      flog $ALog set lParComm = ( mpi $lParComm )
-      if ("$DP_METHOD" == "") then
-         setenv DP_METHOD MPI
+      set GotIt = FALSE
+      if (-f "$k/mpi/mpi.h") then
+         flog $ALog set GotIt = TRUE
+         Note $ALog "   have $k/mpi/mpi.h"
+      else if (-f "$k/mpi.h") then
+         flog $ALog set GotIt = TRUE
+         Note $ALog "   have $k/mpi.h"
       endif
-      break
-   endif
-end
+
+# check for <path>/<pkg>/<pkg>.h form
+      if ($GotIt == TRUE) then
+         flog $ALog set lParComm = ( mpi $lParComm )
+         if ("$DP_METHOD" == "") then
+            setenv DP_METHOD MPI
+         endif
+         break
+      endif
+   end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # MPI Library
 
-if ($?DP_RPath == 0) then
-   set lroot = /usr
-   source $lbase/common-lib64
-   unset lroot
-   setenv DP_RPath /usr/$LibT
-endif
+   if ($?DP_RPath == 0) then
+      set lroot = /usr
+      source $lbase/common-lib64
+      unset lroot
+      setenv DP_RPath /usr/$LibT
+   endif
 
-set lrpath = `../analyze/rpath -o rpath`
+   set lrpath = `../analyze/rpath -o rpath`
 
-Note $ALog "DP_RPath = $DP_RPath"
-Note $ALog "lParComm = $lParComm"
-Note $ALog "lrpath   = $lrpath"
+   Note $ALog "DP_RPath = $DP_RPath"
+   Note $ALog "lParComm = $lParComm"
+   Note $ALog "lrpath   = $lrpath"
 
-if ("$lParComm" =~ *mpi*) then
+   if ("$lParComm" =~ *mpi*) then
 
-   set llib = ""
-   foreach i ($DP_RPath)
-      set llib = ( $llib -L$i )
-   end
-   setenv lLib   "$llib $DP_Lib"
+      set llib = ""
+      foreach i ($DP_RPath)
+         set llib = ( $llib -L$i )
+      end
+      setenv lLib   "$llib $DP_Lib"
 
-   set UTime = `timer -r`
+      set UTime = `timer -r`
 
-   cat << EOF >! $Tmp.c
+      cat << EOF >! $Tmp.c
 #include <stdio.h>
 #include <mpi.h>
 #define MAXLINE 255
@@ -128,55 +139,53 @@ EOF
 # but here we really need an MPI compiler so use the Save_CC
 # which was the one requested in the configs
 
-   Note $ALog "Save_CC  = $Save_CC"
-   Note $ALog "CC_Flags = $CC_Flags"
-   Note $ALog "LD_Flags = $LD_Flags"
-   Note $ALog "DP_Inc   = $DP_Inc"
-   Note $ALog "DP_Lib   = $DP_Lib"
-   Note $ALog "lLib     = $lLib"
+      Note $ALog "Save_CC  = $Save_CC"
+      Note $ALog "CC_Flags = $CC_Flags"
+      Note $ALog "LD_Flags = $LD_Flags"
+      Note $ALog "DP_Inc   = $DP_Inc"
+      Note $ALog "DP_Lib   = $DP_Lib"
+      Note $ALog "lLib     = $lLib"
 
-   flog $ALog cat $Tmp.c
+      flog $ALog cat $Tmp.c
 
-   set opt = ""
-   set opt = ( $opt $CC_Flags $DP_Inc )
-   set opt = ( $opt $LD_Flags $lrpath )
-   set opt = ( $opt $lLib )
-   flog $ALog $Save_CC $Tmp.c -o $Tmp $opt
-   if ($status != 0) then
-      set lParComm = "no"
-      setenv DP_Lib    ""
-   else
-      flog $ALog ldd $Tmp
-
-      flog $ALog $DP_FE -dr -v -p 2 $Tmp $DP_BE
-      fexvars $ALog t echo a @o $DP_FE -v -p 2 $Tmp $DP_BE @b grep Proc @o wc -l
-      if (($gstatus[2] == 0) && ($t > 1)) then
-         flog $ALog setenv HAVE_MPI_STDIN_ALL TRUE
-         flog $ALog set MPIStdIO = "all processes"
+      set opt = ""
+      set opt = ( $opt $CC_Flags $DP_Inc )
+      set opt = ( $opt $LD_Flags $lrpath )
+      set opt = ( $opt $lLib )
+      flog $ALog $Save_CC $Tmp.c -o $Tmp $opt
+      if ($status != 0) then
+         set lParComm = "no"
+         setenv DP_Lib    ""
       else
-         flog $ALog set MPIStdIO = "one process"
+         flog $ALog ldd $Tmp
+
+         flog $ALog $DP_FE -dr -v -p 2 $Tmp $DP_BE
+         fexvars $ALog t echo a @o $DP_FE -v -p 2 $Tmp $DP_BE @b grep Proc @o wc -l
+         if (($gstatus[2] == 0) && ($t > 1)) then
+            flog $ALog setenv HAVE_MPI_STDIN_ALL TRUE
+            flog $ALog set MPIStdIO = "all processes"
+         else
+            flog $ALog set MPIStdIO = "one process"
+         endif
+         unset t
       endif
-      unset t
+
+      flog $ALog rm -f $Tmp $Tmp.c $Tmp.res
+
+      set ETime = `timer -b $UTime`
+
    endif
-
-   flog $ALog rm -f $Tmp $Tmp.c $Tmp.res
-
-   set ETime = `timer -b $UTime`
-
-endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # MPI II
 
-set vrs = "none"
-
-if ("$lParComm" =~ *mpi*) then
+   if ("$lParComm" =~ *mpi*) then
 
 # test compile program with MPI 2 calls
 
-   cat << EOF >! $Tmp.c
+      cat << EOF >! $Tmp.c
 #include <stdio.h>
 #include <mpi.h>
 #define MAXLINE 255
@@ -185,66 +194,65 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   flog $ALog cat $Tmp.c
+      flog $ALog cat $Tmp.c
 
-   set opt = ""
-   set opt = ( $opt $CC_Flags $DP_Inc )
-   set opt = ( $opt $LD_Flags $lrpath )
-   set opt = ( $opt $lLib )
-   flog $ALog $Save_CC $Tmp.c -o $Tmp $opt
-   if ($status == 0) then
-      set vrs = ( `$DP_FE $Tmp` )
-      if ("$vrs" =~ 2.*) then
-         flog $ALog setenv HAVE_MPI_2 TRUE
+      set opt = ""
+      set opt = ( $opt $CC_Flags $DP_Inc )
+      set opt = ( $opt $LD_Flags $lrpath )
+      set opt = ( $opt $lLib )
+      flog $ALog $Save_CC $Tmp.c -o $Tmp $opt
+      if ($status == 0) then
+         set vrs = ( `$DP_FE $Tmp` )
+         if ("$vrs" =~ 2.*) then
+            flog $ALog setenv HAVE_MPI_2 TRUE
+         endif
       endif
+
+      flog $ALog rm -f $Tmp $Tmp.c
+
    endif
 
-   flog $ALog rm -f $Tmp $Tmp.c
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   Note $ALog "lParComm       = |$lParComm|"
+   Note $ALog "DP_REQUEST_MPI = |$DP_REQUEST_MPI|"
+
+   if ("$lParComm" == no) then
+      setenv DP_Inc    ""
+      setenv DP_Lib    ""
+      setenv DP_RPath  ""
+      NoteD $ALog "      no MPI"
+
+   else if ("$lParComm" != "") then
+      if ($HAVE_MPI_2 == TRUE) then
+         NoteD $ALog "      has MPI 2 ($vrs)"
+      else
+         NoteD $ALog "      has MPI ($vrs)"
+      endif
+      NoteD $ALog "         $DP_Lib"
+      NoteD $ALog "         stdin $MPIStdIO"
+      flog $ALog setenv USE_MPI  TRUE
+   endif
+
+   flog $ALog setenv ParComm "$lParComm"
 
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-Note $ALog "lParComm       = |$lParComm|"
-Note $ALog "DP_REQUEST_MPI = |$DP_REQUEST_MPI|"
-
-if ($DP_REQUEST_MPI == FALSE) then
-   setenv DP_Inc    ""
-   setenv DP_Lib    ""
-   setenv DP_RPath  ""
-   NoteD $ALog "      no MPI (by request)"
-
-else if ("$lParComm" == no) then
-   setenv DP_Inc    ""
-   setenv DP_Lib    ""
-   setenv DP_RPath  ""
-   NoteD $ALog "      no MPI"
-
-else if ("$lParComm" != "") then
-   if ($HAVE_MPI_2 == TRUE) then
-      NoteD $ALog "      has MPI 2 ($vrs)"
-   else
-      NoteD $ALog "      has MPI ($vrs)"
-   endif
-   NoteD $ALog "         $DP_Lib"
-   NoteD $ALog "         stdin $MPIStdIO"
-   flog $ALog setenv USE_MPI  TRUE
-endif
-
-flog $ALog setenv ParComm "$lParComm"
 
 # export the results
 dbmset $ALog HAVE_OPENMPI       = $HAVE_OPENMPI^        \
              HAVE_MPI_2         = $HAVE_MPI_2^          \
              HAVE_MPI_STDIN_ALL = $HAVE_MPI_STDIN_ALL^  \
              HAVE_MPI_GOOD_IO   = $HAVE_MPI_GOOD_IO^    \
-             STD_MPI            = $vrs^                 \
-             USE_MPI            = $USE_MPI^             \
-             DP_METHOD = $DP_METHOD^  \
+             DP_METHOD          = $DP_METHOD^           \
              DP_Inc             = $DP_Inc^              \
              DP_Lib             = $DP_Lib^              \
-             DP_RPath           = $DP_RPath
+             DP_RPath           = $DP_RPath^            \
+             STD_MPI            = $vrs^                 \
+             USE_MPI            = $USE_MPI
 
 exit(0)
 
