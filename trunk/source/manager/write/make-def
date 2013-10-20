@@ -420,8 +420,8 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
        Note $STDOUT "PSY_PubLib = "
        Note $STDOUT "PSY_PubInc = "
     else
-       Note $STDOUT "PSY_PubLib = $PSY_PubLib"
-       Note $STDOUT "PSY_PubInc = $PSY_PubInc"
+       Note $STDOUT "PSY_PubLib = -L$PSY_PubLib"
+       Note $STDOUT "PSY_PubInc = -I$PSY_PubInc"
     endif
     Note $STDOUT ""
 

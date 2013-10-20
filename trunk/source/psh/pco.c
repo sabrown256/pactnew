@@ -2085,8 +2085,8 @@ static void set_inst_base(client *cl, char *ib)
 	st.installp = TRUE;};
 
     dbset(cl, "PSY_InstRoot", ib);
-    dbset(cl, "PSY_PubInc",   "-I%s/include", ib);
-    dbset(cl, "PSY_PubLib",   "-L%s/lib", ib);
+    dbset(cl, "PSY_PubInc",   "%s/include", ib);
+    dbset(cl, "PSY_PubLib",   "%s/lib", ib);
 
     return;}
 
@@ -2629,8 +2629,8 @@ static void read_config(client *cl, char *cfg, int quiet)
 	 else if (strcmp(key, "PSY_InstRoot") == 0)
 	    {if (st.installp == FALSE)
 	        {dbset(cl, "PSY_InstRoot", value);
-		 dbset(cl, "PSY_PubInc",   "-I%s/include", value);
-		 dbset(cl, "PSY_PubLib",   "-L%s/lib", value);};}
+		 dbset(cl, "PSY_PubInc",   "%s/include", value);
+		 dbset(cl, "PSY_PubLib",   "%s/lib", value);};}
 
 	 else if (strcmp(key, "exep") == 0)
 	    {st.exep  = TRUE;
