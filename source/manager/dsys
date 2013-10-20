@@ -139,8 +139,7 @@ switch ($Cmnd)
         echo " "
         echo "Usage: dsys <command> <options> "
         echo " "
-        echo "Commands: analyze       - analyze the current platform"
-        echo "          build         - compile and load the system codes"
+        echo "Commands: build         - compile and load the system codes"
         echo "          clean         - clean out the source directories"
         echo "          commit        - commit source/builder/doc changes into repository"
         echo "                        - commit message is built from remaining args"
@@ -186,14 +185,6 @@ switch ($Cmnd)
         echo "          -V           - force make macros to be verbose during compilation"
         echo " "
         exit(1)
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-   case analyze:
-        $Time pact-analyze $argv
-        set RStatus = $status
-        breaksw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -1053,7 +1044,13 @@ switch ($Cmnd)
            flog $Log ./ccw -g elide.c -o $BinDir/elide
            flog $Log ./ccw -g blang.c -o $BinDir/blang
            flog $Log ./ccw -g -I../score -I../manager template.c -o $BinDir/template
+        else
+           NoteD $Log ""
+           NoteD $Log "Failed to build pco utility - exiting"
+           NoteD $Log ""
+           exit(1)
         endif
+
         flog $Log popd
 
 # remove standard Tool and Group variables from the environment
@@ -1110,18 +1107,12 @@ switch ($Cmnd)
         sleep 1
         flog $Log ls -l ${PERDB_PATH}*
 
+        flog $Log set PCO = ( $BinDir/pco $dbopt -env $PSY_MngDir/pact.env -l )
+
         Separator $Log
         flog $Log $PERDB PACT_VERSION=$PACTVer
 	if ($platform == TRUE) then
            flog $Log $PERDB CROSS_REF=$cross_ref
-        endif
-
-        if (($method == 2) && (-x $BinDir/pco)) then
-           flog $Log set PConf = ( $BinDir/pco $dbopt -env $cwd/pact.env -l )
-           Note $Log "Using binary pco to process input"
-        else
-           flog $Log set PConf = ./pact-config
-           Note $Log "Using script pact-config to process input"
         endif
 
 # start the env files
@@ -1175,13 +1166,13 @@ switch ($Cmnd)
 
 # do the main configuration work
         if ("$ucfg" != "") then
-           Note $Log "Command: $PConf $PArgs -s $PSY_ID $ucfg"
-           $PConf -s $PSY_ID $PArgs $ucfg
+           Note $Log "Command: $PCO $PArgs -s $PSY_ID $ucfg"
+           $PCO -s $PSY_ID $PArgs $ucfg
            set RStatus = $status
 
         else if ("$dbcfg" != "") then
-           Note $Log "Command: $PConf -s $PSY_ID $PArgs -db $dbcfg"
-           $PConf -s $PSY_ID $PArgs -db $dbcfg
+           Note $Log "Command: $PCO -s $PSY_ID $PArgs -db $dbcfg"
+           $PCO -s $PSY_ID $PArgs -db $dbcfg
            set RStatus = $status
            unset dbcfg
 
@@ -1195,7 +1186,7 @@ switch ($Cmnd)
            goto CFG_DONE
         endif
 
-# now that PConf made us one, source it        
+# now that PCO made us one, source it        
         source $EnvCsh
         
 # cleanup path so as not to tax wimpy OSs such as Solaris
