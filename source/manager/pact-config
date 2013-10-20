@@ -148,8 +148,8 @@ set lConfigVars = ( $lConfigVars LD_Exe LD_Flags LD_Lib )
 # variable defaults
 
 setenv PSY_InstRoot   none
-setenv PSY_PubInc     "-I$PSY_InstRoot/include"
-setenv PSY_PubLib     "-L$PSY_InstRoot/lib"
+setenv PSY_PubInc     "$PSY_InstRoot/include"
+setenv PSY_PubLib     "$PSY_InstRoot/lib"
 setenv HSY_FPU        unknown
 setenv Globals        ""
 
@@ -196,8 +196,8 @@ Main:
                    if ("$PSY_InstRoot" =~ */) then
                       setenv PSY_InstRoot `expr "$PSY_InstRoot" : '\(.*\)/'`
                    endif
-                   setenv PSY_PubInc "-I$PSY_InstRoot/include"
-                   setenv PSY_PubLib "-L$PSY_InstRoot/lib"
+                   setenv PSY_PubInc "$PSY_InstRoot/include"
+                   setenv PSY_PubLib "$PSY_InstRoot/lib"
                    set IBSet = "input"
                    breaksw
 
@@ -751,8 +751,8 @@ while (1)
    case PSY_InstRoot:
         if ($IBSet == "dflt") then
            flog $Log setenv PSY_InstRoot "$Value"
-           flog $Log setenv PSY_PubInc   "-I$PSY_InstRoot/include"
-           flog $Log setenv PSY_PubLib   "-L$PSY_InstRoot/lib"
+           flog $Log setenv PSY_PubInc   "$PSY_InstRoot/include"
+           flog $Log setenv PSY_PubLib   "$PSY_InstRoot/lib"
         endif
         breaksw
 

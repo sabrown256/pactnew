@@ -1,21 +1,6 @@
 #!/bin/csh -f
-#>
-#> PACT-ANALYZE - analyze the current UNIX environment
-#>
-#> Generally used by the script dsys via pact-config
-#>
-#> Usage: pact-analyze [-c] [-h] [-t]
-#>
-#> Options:
-#>   -c     Check C Declarations
-#>   -h     Help Package
-#>   -t     Analyzing Programming Environment Characteristics for
-#>          $HSY_Name
-#> WARNING: This analysis is partly based on your PATH and MANPATH.
-#>          The analysis may not reflect the complete state of this system.
-#>
 #
-#-----------------------------------------------------------------------
+# PACT-ANALYZE - analyze the current UNIX environment
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -33,13 +18,11 @@ if ($?PSY_ScrDir == 0) then
    endif
 endif
 set psy_base = $PSY_ScrDir:h
-set PSY_ScrDir  = $psy_base/scripts
+setenv PSY_ScrDir $psy_base/scripts
 source $PSY_ScrDir/functions-pact.csh
 source $PSY_ScrDir/csh-subroutines
-HAVE_SUBROUTINES
 
-set help     = FALSE
-set HelpCode = ./$0                      
+HAVE_SUBROUTINES
 
 setenv HSY_Name        `uname -n`
 setenv HSY_OS_Name     `uname -s`
@@ -75,8 +58,6 @@ flog $ALog setenv AF_ANSI    ANSI
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-setenv ToTTY  FALSE
-
 while ($#argv > 0)
    switch ($1)
       case -c:
@@ -86,10 +67,17 @@ while ($#argv > 0)
            breaksw
 
       case -h:
-           flog $ALog setenv help  "TRUE"
+           echo ""
+           echo "Usage: pact-analyze [-c] [-h] [-t]"
+           echo "  -c     check C declarations"
+           echo "  -h     this help message"
+           echo "  -t     analyzing programming environment for $HSY_Name"
+           echo "WARNING: this is partly based on your PATH and MANPATH"
+           echo "         it may not reflect the complete state of this system"
+           echo ""
+           exit(1)
 
       case -t:
-           setenv ToTTY  TRUE
            breaksw
    endsw
    shift
@@ -103,6 +91,7 @@ end
 set lTmp = ( "tmp-"`echo $HSY_OS_Name-$$ | tr "[A-Z]" "[a-z]"` )
 setenv Tmp "$lTmp"
 
+flog $ALog set BinDir = $PSY_Root/bin
 flog $ALog setenv DORUN  $BinDir/do-run
 flog $ALog setenv TIMER  $PSY_ScrDir/timer
 
@@ -173,22 +162,6 @@ Note $ALog ""
 
 Separator $ALog
 
-if ($help == "TRUE") then
-   awk '($1 == "#>") {print}' $HelpCode  #Print Usage:
-   endinclude
-endif
-
-if ($ToTTY == TRUE) then
-
-   NoteD $ALog ""
-   NoteD $ALog "Analyzing Programming Environment Characteristics for $HSY_Name"
-   NoteD $ALog ""
-   NoteD $ALog "WARNING: This analysis is partly based on your PATH and MANPATH."
-   NoteD $ALog "         The analysis may not reflect the complete state of this system."
-   NoteD $ALog ""
-
-endif
-
 if (-d analyze) then
    setenv PSY_AnaDir  analyze
 else
@@ -245,7 +218,6 @@ foreach f ($Features "-fnc-" $Functions "-pst-" $Post)
                set Cmd = ( 'setenv '$lst[2]' "'$lst[3-]'"' )
                eval "$Cmd"
                Note $ALog "Command: $Cmd"
-               Note $Log "Command: $Cmd"
 
 # indent the first printed line with 3 spaces 
             else if (($First == TRUE) && ($Fncs == FALSE)) then
