@@ -23,8 +23,6 @@ else
    Note $ALog "Cross compiling C compiler analysis"
 endif
 
-envini UseLDLibPath ""
-
 # NOTE: we cannot have nothing for CC_Exec
 # if nothing is specified try cc
 
@@ -44,12 +42,14 @@ dbmget $ALog CC_Exe       =\? cc^      \
              Cfg_CC_Flags^             \
              CROSS_FE^                 \
              DP_BE^                    \
-             OS_Name^                  \
+             HSY_OS_Name^              \
              PACT_CC_FAMILY^           \
              PACT_CC_VERSION^          \
              PACT_CC_PATH^             \
              PACT_CC_EXE^              \
-             RF_STRICT
+             RF_STRICT^                \
+             USE_LDLibPath =\? ""
+
 
 set UTime = `timer -r`
 
@@ -76,7 +76,7 @@ Note $ALog "Candidate C compilers: $cclst"
 Note $ALog ""
 
 # find the available ANSI C compilers
-set AnsiCC = ( `../analyze/cc-find $UseLDLibPath $cclst` )
+set AnsiCC = ( `../analyze/cc-find $USE_LDLibPath $cclst` )
 
 Note $ALog ""
 Note $ALog "ANSI C compilers: $AnsiCC"
@@ -189,7 +189,7 @@ if ($Cfg_CC_Exe != "") then
    Note $ALog "   FAMILY = $PACT_CC_FAMILY"
    flog $ALog which $Cfe_CC_Exe
 
-   if ($OS_Name == SunOS) then
+   if ($HSY_OS_Name == SunOS) then
       flog $ALog $Cfg_CC_Exe $CC_Version
       flog $ALog set CmpVers = any
       set xstatus = $status
@@ -351,7 +351,7 @@ EOF
 
 # OSX ARCH - check for -arch flag
 
-   if ("$OS_Name" == Darwin) then
+   if ("$HSY_OS_Name" == Darwin) then
 
       Note $ALog "Determine whether -arch flag is needed on GCC/OSX"
       cat << EOF >! $Tmp.c

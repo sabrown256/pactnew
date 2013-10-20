@@ -16,7 +16,8 @@
 # include "cpyright.h"
 #
 
-setenv OS_Name          `uname -s`
+set hsy_os_name = `uname -s`
+
 setenv HAVE_PYTHON      FALSE
 setenv HAVE_PY_NUMERIC  FALSE
 setenv HAVE_PY_NUMPY    FALSE
@@ -75,9 +76,9 @@ end
             @ ok = $ok + 1
 
 # get the compiler python was built with
-            if ((($OS_Name == "Linux")    || \
-                 ($OS_Name == "Darwin")   || \
-                 ($OS_Name == "FreeBSD")) && \
+            if ((($hsy_os_name == "Linux")    || \
+                 ($hsy_os_name == "Darwin")   || \
+                 ($hsy_os_name == "FreeBSD")) && \
                 ($PY_CC == cc)) then
                setenv PY_CC Python_CC_Exe
             endif

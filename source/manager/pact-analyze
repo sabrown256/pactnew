@@ -10,7 +10,7 @@
 #>   -c     Check C Declarations
 #>   -h     Help Package
 #>   -t     Analyzing Programming Environment Characteristics for
-#>          $HostName
+#>          $HSY_Name
 #> WARNING: This analysis is partly based on your PATH and MANPATH.
 #>          The analysis may not reflect the complete state of this system.
 #>
@@ -41,19 +41,19 @@ HAVE_SUBROUTINES
 set help     = FALSE
 set HelpCode = ./$0                      
 
-setenv OS_Name       `uname -s`
-setenv OS_Release    `uname -r`
-setenv HostName      `uname -n`
-setenv MajorVersion  `expr $OS_Release : "\(.\)"`
+setenv HSY_Name        `uname -n`
+setenv HSY_OS_Name     `uname -s`
+setenv HSY_OS_Release  `uname -r`
+setenv MajorVersion  `expr $HSY_OS_Release : "\(.\)"`
 
 envini PSY_ID    `$PSY_ScrDir/cfgman use`
 envini PSY_Root  $psy_base/dev/$PSY_ID
 
 InitLog ALog $PSY_Root/log/analyze
 
-Note $ALog "HostName         = $HostName"
-Note $ALog "OS_Name           = $OS_Name"
-Note $ALog "OS_Release        = $OS_Release"
+Note $ALog "HSY_Name         = $HSY_Name"
+Note $ALog "HSY_OS_Name      = $HSY_OS_Name"
+Note $ALog "HSY_OS_Release   = $HSY_OS_Release"
 Note $ALog "MajorVersion     = $MajorVersion"
 Note $ALog "Source Directory = $PSY_ScrDir"
 
@@ -65,7 +65,7 @@ if ($?USER == 0) then
    endif
 endif
 
-if ("$OS_Name" == "Windows_NT") then
+if ("$HSY_OS_Name" == "Windows_NT") then
    flog $ALog setenv AF_CDecls TRUE
 else
    flog $ALog setenv AF_CDecls FALSE
@@ -100,7 +100,7 @@ end
 
 # initialization of non-graphics flags
 
-set lTmp = ( "tmp-"`echo $OS_Name-$$ | tr "[A-Z]" "[a-z]"` )
+set lTmp = ( "tmp-"`echo $HSY_OS_Name-$$ | tr "[A-Z]" "[a-z]"` )
 setenv Tmp "$lTmp"
 
 flog $ALog setenv DORUN  $BinDir/do-run
@@ -113,7 +113,7 @@ envini NM_Cmd   "-g"
 envini HSY_CPU  "unknown"
 envini HSY_FPU  "unknown"
 
-if ($OS_Name == Linux) then
+if ($HSY_OS_Name == Linux) then
    set i = `uname -m`
    if ($i == "alpha") then
       flog $ALog setenv HSY_FPU "alpha"
@@ -181,7 +181,7 @@ endif
 if ($ToTTY == TRUE) then
 
    NoteD $ALog ""
-   NoteD $ALog "Analyzing Programming Environment Characteristics for $HostName"
+   NoteD $ALog "Analyzing Programming Environment Characteristics for $HSY_Name"
    NoteD $ALog ""
    NoteD $ALog "WARNING: This analysis is partly based on your PATH and MANPATH."
    NoteD $ALog "         The analysis may not reflect the complete state of this system."

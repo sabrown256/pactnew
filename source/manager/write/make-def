@@ -52,6 +52,8 @@ dbmget $Log AR_IFlag^               \
             GRAPHICS_Flags^         \
             GRAPHICS_Windows^       \
             HAVE_PYTHON^            \
+            HSY_OS_Name^            \
+            HSY_OS_Type^            \
             IncDir^                 \
             INSTALL_Exe^            \
             JOBS_System^            \
@@ -62,8 +64,6 @@ dbmget $Log AR_IFlag^               \
             MAKE_Strategy^          \
             MAKE_SUFFIXES^          \
             MAKE_UseGNU^            \
-            OS_Name^                \
-            OS_Type^                \
             OW32Objs^               \
             PACT_CC_FAMILY^         \
             PACT_CC_VERSION^        \
@@ -145,7 +145,7 @@ source $PSY_MngDir/write/import-db
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ("$OS_Type" == USE_MSW) then
+if ("$HSY_OS_Type" == USE_MSW) then
    set lostd = WIN32
 else
    set lostd = UNIX
@@ -200,7 +200,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'Man3Dir    = ${PSY_Root}/man/man3'
     Note $STDOUT ""
 
-    if ("$OS_Name" == "HP-UX") then
+    if ("$HSY_OS_Name" == "HP-UX") then
        Note $STDOUT 'TGTLib  = nolib'
     endif
     Note $STDOUT 'TGTBin  = nobin'

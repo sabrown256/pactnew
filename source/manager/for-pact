@@ -51,7 +51,7 @@ set GetQName  = ""
 set LastDir   = 0
 set Tee       = FALSE
 set MPId      = $$
-set HostName  = `uname -n`
+set hsy_name  = `uname -n`
 set Master    = ""
 set PIndx     = ""
 
@@ -485,7 +485,7 @@ ProcLoop:
                set Job = ( $Job -l $hout )
                set Job = ( $Job -e $SESSION_CONFIG )
                set Job = ( $Job -p $m )
-               set Job = ( $Job -a $Base $Dir $n $MPId $HostName $HInd +a)
+               set Job = ( $Job -a $Base $Dir $n $MPId $hsy_name $HInd +a)
                set Job = ( $Job $Cmmnd )
 
 # if the available host is the same as the current host
@@ -578,7 +578,7 @@ DO_PACKAGE:
       Note $LogFile "FOR-PACT: Dir            = |$Dir|"
       Note $LogFile "FOR-PACT: ProcN          = |$ProcN|"
       Note $LogFile "FOR-PACT: NameSeed       = |$NameSeed|"
-      Note $LogFile "FOR-PACT: HostName       = |$HostName|"
+      Note $LogFile "FOR-PACT: hsy_name       = |$hsy_name|"
       Note $LogFile "FOR-PACT: Master         = |$Master|"
       Note $LogFile "FOR-PACT: PIndx          = |$PIndx|"
 
@@ -596,7 +596,7 @@ DO_PACKAGE:
       endif
       sync
 
-      if ("$HostName" != "$Master") then
+      if ("$hsy_name" != "$Master") then
          scp $LogFile ${Master}:$LogFile
          rm -f $LogFile
       endif

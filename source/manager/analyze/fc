@@ -32,7 +32,7 @@ dbmget $ALog FC_Exe           =\? "f90"^  \
              Cfe_CC_Exe^                  \
              Cfe_CC_Flags^                \
              NM_Cmd^                      \
-             OS_Name^                     \
+             HSY_OS_Name^                 \
              PACT_FC_FAMILY^              \
              PACT_FC_VERSION^             \
              PACT_FC_PATH^                \
@@ -141,7 +141,7 @@ if ($FC_Exe != "") then
    Note $ALog "   FAMILY = $PACT_FC_FAMILY"
    flog $ALog which $Cfe_FC_Exe
 
-   if ($OS_Name == SunOS) then
+   if ($HSY_OS_Name == SunOS) then
       flog $ALog $Cfg_FC_Exe $FC_Version
       set CmpVers = any
       set xstatus = $status

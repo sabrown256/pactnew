@@ -30,7 +30,7 @@ while ($#argv > 0)
    shift
 end
 
-setenv OS_Name  `uname -s`
+set hsy_os_name = `uname -s`
 
 eval `../scripts/cfgsys`
 
@@ -78,7 +78,7 @@ mv libpact.a ..
 echo "done"
 
 # make libpact.so with all the .o files
-if ($OS_Name != Darwin) then
+if ($hsy_os_name != Darwin) then
    set bshld = `pact -db +l -info MAKE_Shared_Libs | tail -n 1`
    set sld   = `pact -db +l -info Shared_LD_Exe`
    set ldf   = `pact -db +l -info Shared_LD_Flags`

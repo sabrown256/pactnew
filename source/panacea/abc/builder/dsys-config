@@ -32,7 +32,7 @@ set PUBInc   = `awk '($1 == "PSY_PubInc") { print $3 }' $PACTEtc/make-def`
 set Optimize = FALSE
 
 set tmp         = `uname -m`
-set HostArch    = `echo $tmp | tr " " "."`
+set hsy_arch    = `echo $tmp | tr " " "."`
 set Interactive = TRUE
 
 # setup default machine dependant directories
@@ -48,7 +48,7 @@ while ($#argv > 0)
    switch ($1)
       case -a:
                shift
-               set HostArch = $1
+               set hsy_arch = $1
                breaksw
       case -o:
                set Optimize = TRUE
@@ -70,7 +70,7 @@ end
 
 # --------------------------------------------------------------------------
 
-set DevDir   = "dev/$HostArch"
+set DevDir   = "dev/$hsy_arch"
 set DevBin   = "$DevDir/bin"
 set DevLib   = "$DevDir/lib"
 set DevInc   = "$DevDir/include"

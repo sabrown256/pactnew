@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # OS - analyze the platform OS
-#    - Computes: OS_Type, OS_Name, AF_VERSION_OSX
+#    - Computes: HSY_OS_Type, HSY_OS_Name, AF_VERSION_OSX
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -23,7 +23,7 @@ Note $ALog ""
 set los = ( `uname -s` )
 
 dbmget $ALog AF_VERSION_OSX  =\? ""^      \
-             OS_Name         =\? "$los"^  \
+             HSY_OS_Name     =\? "$los"^  \
              HSY_RootInc
              
 unset los
@@ -33,45 +33,45 @@ if ($?PSY_Arch == 0) then
 endif
 
 # remove parens - they confuse shells later on
-fexvar $ALog OS_Release uname -r @b sed 's/(/,/g' @o sed 's/)/,/g'
+fexvar $ALog HSY_OS_Release uname -r @b sed 's/(/,/g' @o sed 's/)/,/g'
 
 Note $ALog "HSY_RootInc   = $HSY_RootInc"
 if ($CROSS_COMPILE == MINGW32) then
-   setenv OS_Type     MSW
-   setenv OS_Name     WIN32
-   setenv OS_Release  mingw32
+   setenv HSY_OS_Type     MSW
+   setenv HSY_OS_Name     WIN32
+   setenv HSY_OS_Release  mingw32
 
 else if ($CROSS_COMPILE == MINGW64) then
-   setenv OS_Type     MSW
-   setenv OS_Name     WIN64
-   setenv OS_Release  mingw64
+   setenv HSY_OS_Type     MSW
+   setenv HSY_OS_Name     WIN64
+   setenv HSY_OS_Release  mingw64
 
-else if (("$OS_Name" == "Windows_NT") || \
-    (("$OS_Name" == "Linux") && (-e $HSY_RootInc/termio.h)) || \
+else if (("$HSY_OS_Name" == "Windows_NT") || \
+    (("$HSY_OS_Name" == "Linux") && (-e $HSY_RootInc/termio.h)) || \
     ($?IBM_BGP == 1) || ($?IBM_BGQ == 1) || \
     (-e $HSY_RootInc/sys/termio.h)) then
-   setenv OS_Type "SYSV"
+   setenv HSY_OS_Type "SYSV"
 
 else
-   setenv OS_Type "BSD"
+   setenv HSY_OS_Type "BSD"
 endif
-Note $ALog "OS_Name    = $OS_Name"
-Note $ALog "OS_Release = $OS_Release"
-Note $ALog "OS_Type    = $OS_Type"
+Note $ALog "HSY_OS_Name    = $HSY_OS_Name"
+Note $ALog "HSY_OS_Release = $HSY_OS_Release"
+Note $ALog "HSY_OS_Type    = $HSY_OS_Type"
 
-if ($OS_Name == Darwin) then
+if ($HSY_OS_Name == Darwin) then
    fexvar $ALog AF_VERSION_OSX echo $PSY_Arch @o sed 's/osx-10\.//' @o sed 's/-.*//'
 endif
 
 # there are systems that put out garbage if this is on a single echo (AIX)
-NoteD $ALog "   Operating System: $OS_Name $OS_Release ($OS_Type)"
+NoteD $ALog "   Operating System: $HSY_OS_Name $HSY_OS_Release ($HSY_OS_Type)"
 
-setenv OS_Type USE_$OS_Type
+setenv HSY_OS_Type USE_$HSY_OS_Type
 
 # export results
-dbmset $ALog OS_Type     = $OS_Type^      \
-             OS_Release  = $OS_Release^   \
-             OS_Name     = $OS_Name
+dbmset $ALog HSY_OS_Type     = $HSY_OS_Type^      \
+             HSY_OS_Release  = $HSY_OS_Release^   \
+             HSY_OS_Name     = $HSY_OS_Name
 
 exit(0)
 

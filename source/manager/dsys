@@ -618,6 +618,8 @@ switch ($Cmnd)
         endif
         setenv PSY_CONFIG_PATH  "$PSY_CONFIG_PATH local std"
 
+	setenv USE_LDLibPath ""
+
         setenv CCompiler  gnu
 
         setenv PSY_Arch  `$PSY_ScrDir/system-id`
@@ -816,7 +818,7 @@ switch ($Cmnd)
                    breaksw
               case -llp:
                    shift
-                   setenv UseLDLibPath "-l $1"
+                   setenv USE_LDLibPath "-l $1"
                    breaksw
               case -md:
                    shift
@@ -996,49 +998,50 @@ switch ($Cmnd)
         endif
 
 # make sure that the installation directories exist
-        setenv OS_Name  `uname -s`
-        set PSY_InstRoot  = $DevDir/$PSY_ID
+        setenv HSY_OS_Name  `uname -s`
+        set psy_instroot  = $DevDir/$PSY_ID
         if (!(-d $DevDir)) then
            mkdir $DevDir
         endif
-        if (!(-d $PSY_InstRoot)) then
-           mkdir $PSY_InstRoot
+        if (!(-d $psy_instroot)) then
+           mkdir $psy_instroot
         endif
-        if (!(-d $PSY_InstRoot/bin)) then
-           mkdir $PSY_InstRoot/bin
+        if (!(-d $psy_instroot/bin)) then
+           mkdir $psy_instroot/bin
         endif
-        if (!(-d $PSY_InstRoot/lib)) then
-           mkdir $PSY_InstRoot/lib
+        if (!(-d $psy_instroot/lib)) then
+           mkdir $psy_instroot/lib
         endif
-        if (!(-d $PSY_InstRoot/include)) then
-           mkdir $PSY_InstRoot/include
+        if (!(-d $psy_instroot/include)) then
+           mkdir $psy_instroot/include
         endif
-        if (!(-d $PSY_InstRoot/include/shell)) then
-           mkdir $PSY_InstRoot/include/shell
+        if (!(-d $psy_instroot/include/shell)) then
+           mkdir $psy_instroot/include/shell
         endif
-        if (!(-d $PSY_InstRoot/etc)) then
-           mkdir $PSY_InstRoot/etc
+        if (!(-d $psy_instroot/etc)) then
+           mkdir $psy_instroot/etc
         endif
-        if (!(-d $PSY_InstRoot/man)) then
-           mkdir $PSY_InstRoot/man
+        if (!(-d $psy_instroot/man)) then
+           mkdir $psy_instroot/man
         endif
-        if (!(-d $PSY_InstRoot/man/man1)) then
-           mkdir $PSY_InstRoot/man/man1
+        if (!(-d $psy_instroot/man/man1)) then
+           mkdir $psy_instroot/man/man1
         endif
-        if (!(-d $PSY_InstRoot/man/man3)) then
-           mkdir $PSY_InstRoot/man/man3
+        if (!(-d $psy_instroot/man/man3)) then
+           mkdir $psy_instroot/man/man3
         endif
-        if (!(-d $PSY_InstRoot/scheme)) then
-           mkdir $PSY_InstRoot/scheme
+        if (!(-d $psy_instroot/scheme)) then
+           mkdir $psy_instroot/scheme
         endif
-        if (!(-d $PSY_InstRoot/scheme/extensions)) then
-           mkdir $PSY_InstRoot/scheme/extensions
+        if (!(-d $psy_instroot/scheme/extensions)) then
+           mkdir $psy_instroot/scheme/extensions
         endif
-        if (!(-d $PSY_InstRoot/log)) then
-           mkdir $PSY_InstRoot/log
+        if (!(-d $psy_instroot/log)) then
+           mkdir $psy_instroot/log
         endif
+        unset psy_instroot
 
-        set RStatus = $status
+        set RStatus = 0
 
         flog $Log pushd ../psh
         unsetenv LD_LIBRARY_PATH
