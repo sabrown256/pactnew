@@ -17,6 +17,7 @@ Note $ALog ""
 
 dbmget $ALog HSY_RootInc^                        \
              HSY_RootLib^                        \
+             HSY_OS_Name^                        \
              OGL_Inc          =\? ""^            \
              OGL_Lib          =\? ""^            \
              OGL_RPath        =\? $HSY_RootLib^  \
@@ -28,7 +29,6 @@ dbmget $ALog HSY_RootInc^                        \
              Cfe_LD_Lib^                         \
              Cfe_LD_RPath^                       \
              PACT_CC_VERSION^                    \
-             OS_Name^                            \
              RPATH
 
 # if we have explicitly said we do not want OGL

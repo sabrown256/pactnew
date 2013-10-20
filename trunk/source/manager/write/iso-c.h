@@ -24,12 +24,12 @@ NoteD $Log "   C Standards Configuration - iso-c.h"
 Note $Log ""
 
 dbmget $Log AF_VERSION_GLIBC^  \
+            HSY_OS_Name^       \
+            IncDir^            \
+            PSY_Cfg^           \
             STD_C^             \
             STD_POSIX^         \
-            STD_XOPEN^         \
-            OS_Name^           \
-            IncDir^            \
-            PSY_Cfg
+            STD_XOPEN
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -154,7 +154,7 @@ dbmget $Log AF_VERSION_GLIBC^  \
 #            Note $STDOUT '# endif'
 #            Note $STDOUT ''
 
-            if (($OS_Name != FreeBSD) && ($OS_Name != SunOS)) then
+            if (($HSY_OS_Name != FreeBSD) && ($HSY_OS_Name != SunOS)) then
                Note $STDOUT '# ifndef _XOPEN_SOURCE'
                Note $STDOUT "#  define _XOPEN_SOURCE     ${STD_XOPEN}"
                Note $STDOUT '# endif'
@@ -182,7 +182,7 @@ dbmget $Log AF_VERSION_GLIBC^  \
 #            Note $STDOUT '# endif'
 #            Note $STDOUT ''
 
-            if (($OS_Name != FreeBSD) && ($OS_Name != SunOS)) then
+            if (($HSY_OS_Name != FreeBSD) && ($HSY_OS_Name != SunOS)) then
                Note $STDOUT '# ifndef _XOPEN_SOURCE'
                Note $STDOUT "#  define _XOPEN_SOURCE     ${STD_XOPEN}"
                Note $STDOUT '# endif'

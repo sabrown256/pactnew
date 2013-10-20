@@ -21,6 +21,8 @@
 # include "cpyright.h"
 #
 
+Separator $ALog
+
 Note $ALog ""
 Note $ALog "Entering FIND_PACKAGE"
 Note $ALog ""
@@ -251,4 +253,6 @@ Note $ALog "   PckInc  = |$PckInc|"
 Note $ALog "   PckLib  = |$PckLib|"
 Note $ALog "   PckPath = |$PckPath|"
 Note $ALog ""
+
+Separator $ALog
 

@@ -36,7 +36,7 @@ if (-d ../../python) then
                 Python_CC_Exe   =\? "gcc"^     \
                 CC_Exe^                        \
                 PACT_CC_VERSION^               \
-                OS_Name
+                HSY_OS_Name
 
    Note $ALog ""
    Note $ALog "Python_Exe    = $Python_Exe"
@@ -139,9 +139,9 @@ if (-d ../../python) then
                   @ ok = $ok + 1
 
 # get the compiler python was built with
-                  if ((($OS_Name == "Linux")    || \
-                       ($OS_Name == "Darwin")   || \
-                       ($OS_Name == "FreeBSD")) && \
+                  if ((($HSY_OS_Name == "Linux")    || \
+                       ($HSY_OS_Name == "Darwin")   || \
+                       ($HSY_OS_Name == "FreeBSD")) && \
                       ($lpy_cc == cc)) then
                      flog $ALog set lpy_cc = Python_CC_Exe
                   endif
@@ -202,7 +202,7 @@ if (-d ../../python) then
                      flog $ALog set lhave_python = FALSE
                   endif
 
-                  if ($OS_Name == "AIX") then
+                  if ($HSY_OS_Name == "AIX") then
                      set CCVer = `$CC_Exe -qversion`
                      set PCVer = `$lpy_cc -qversion`
                      Note $ALog "CCVer = |$CCVer|"

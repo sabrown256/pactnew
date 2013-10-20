@@ -17,6 +17,7 @@ Note $ALog ""
 
 dbmget $ALog HSY_RootInc^                        \
              HSY_RootLib^                        \
+             HSY_OS_Name^                        \
              QD_Inc           =\? ""^            \
              QD_Lib           =\? ""^            \
              QD_RPath         =\? $HSY_RootLib^  \
@@ -25,10 +26,9 @@ dbmget $ALog HSY_RootInc^                        \
              Cfg_CC_Exe       =\? cc^            \
              CC_Exe^                             \
              LD_Flags^                           \
-             PACT_CC_VERSION^                    \
-             OS_Name
+             PACT_CC_VERSION
 
-if ($OS_Name == Darwin) then
+if ($HSY_OS_Name == Darwin) then
 
    Note $ALog "Analyze: Quickdraw"
 

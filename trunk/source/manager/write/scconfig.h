@@ -42,7 +42,6 @@ dbmget $Log BFD_Version^              \
             PACT_CC_VERSION^          \
             PACT_SO_CACHE^            \
             SMP_Pthread^              \
-            OS_Type^                  \
             TRACKER_Exe^              \
             MYSQL_SO^                 \
             SQLITE3_SO^               \
@@ -101,11 +100,9 @@ dbmget $Log BFD_Version^              \
             RF_OPTIMIZE^              \
             RF_PROFILE^               \
             RF_Linking^               \
-            OS_Name^                  \
-            OS_Release^               \
-            Std_UseX^                 \
-            Std_UseOGL^               \
-            Std_UseQD^                \
+            HSY_OS_Name^              \
+            HSY_OS_Release^           \
+            HSY_OS_Type^              \
             HSY_CPU^                  \
             HSY_FPU^                  \
             PSY_Arch^                 \
@@ -115,7 +112,10 @@ dbmget $Log BFD_Version^              \
             PSY_ID^                   \
             PSY_TYPE^                 \
             PSY_Prefix^               \
-            PSY_TmpDir
+            PSY_TmpDir^               \
+            Std_UseX^                 \
+            Std_UseOGL^               \
+            Std_UseQD
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -320,7 +320,7 @@ dbmget $Log BFD_Version^              \
     endif
 
     if (-e /dev/zero) then
-       if (("$OS_Name" != "HP-UX") && ("$OS_Name" != "Darwin")) then
+       if (("$HSY_OS_Name" != "HP-UX") && ("$HSY_OS_Name" != "Darwin")) then
           Note $STDOUT "#define HAVE_DEV_ZERO"
        endif
     endif
@@ -337,7 +337,7 @@ dbmget $Log BFD_Version^              \
        flog $Log touch $IncDir/noipc
     endif
 
-    if (("$AF_ALT_LARGE_FILE" == "TRUE") && ($OS_Name != FreeBSD)) then
+    if (("$AF_ALT_LARGE_FILE" == "TRUE") && ($HSY_OS_Name != FreeBSD)) then
        Note $STDOUT "#define AF_ALT_LARGE_FILE"
        Note $STDOUT "#define HAVE_ALT_LARGE_FILE"
     endif
@@ -395,16 +395,16 @@ dbmget $Log BFD_Version^              \
     endif
 
 # OS defines
-    if ("$OS_Type" == USE_MSW) then
-       Note $STDOUT "#undef $OS_Name"
-       Note $STDOUT "#define $OS_Name"
+    if ("$HSY_OS_Type" == USE_MSW) then
+       Note $STDOUT "#undef $HSY_OS_Name"
+       Note $STDOUT "#define $HSY_OS_Name"
     else
        Note $STDOUT "#undef UNIX"
        Note $STDOUT "#define UNIX"
     endif
 
-    Note $STDOUT "#undef $OS_Type"
-    Note $STDOUT "#define $OS_Type"
+    Note $STDOUT "#undef $HSY_OS_Type"
+    Note $STDOUT "#define $HSY_OS_Type"
 
     set OSL = ( `cat $PSY_MngDir/std/os | grep -v '#'` )
     while ($#OSL > 2)
@@ -414,7 +414,7 @@ dbmget $Log BFD_Version^              \
        shift OSL
        shift OSL
        shift OSL
-       if ("$OS_Name" == "$sysn") then
+       if ("$HSY_OS_Name" == "$sysn") then
           Note $STDOUT "#undef $pctn"
           Note $STDOUT "#define $pctn"
           Note $STDOUT '#include <'$incn'>'
@@ -422,8 +422,6 @@ dbmget $Log BFD_Version^              \
     end
 
     Note $STDOUT ""
-
-    SafeSet HostArch $OS_Release
 
     Note $STDOUT "#endif"
     Note $STDOUT ""

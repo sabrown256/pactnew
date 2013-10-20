@@ -69,11 +69,11 @@ dbmget $ALog CC_Exe^                   \
    	     HAVE_PNGLIB^              \
    	     HAVE_JPEGLIB^             \
              RF_DEBUG^                 \
+             HSY_OS_Name^              \
              HSY_Rootinc^              \
              Std_UseOGL^               \
              Std_UseQD^                \
              Std_UseX^                 \
-             OS_Name^                  \
              RPATH
 
 #--------------------------------------------------------------------------
@@ -103,7 +103,7 @@ dbmget $ALog CC_Exe^                   \
       flog $ALog setenv GRAPHICS_Flags     "$GRAPHICS_Flags -framework Carbon"
    endif
    if ($Std_UseOGL == TRUE) then
-      if (($OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
+      if (($HSY_OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
          Note $ALog "Have GL on MAC OS X"
          flog $ALog setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
       endif

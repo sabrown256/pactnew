@@ -17,6 +17,7 @@ Note $ALog ""
 
 dbmget $ALog HSY_RootInc^                        \
              HSY_RootLib^                        \
+             HSY_OS_Name^                        \
              X11_Inc          =\? $HSY_RootInc^  \
              X11_Lib          =\? ""^            \
              X11_RPath        =\? $HSY_RootLib^  \
@@ -28,7 +29,6 @@ dbmget $ALog HSY_RootInc^                        \
              Cfe_LD_Lib^                         \
              Cfe_LD_RPath^                       \
              LIB^                                \
-             OS_Name^                            \
              PACT_CC_VERSION^                    \
              RPATH
 
@@ -58,7 +58,7 @@ else
 # write a little X test that works around dumb Solaris
 # on which XOpenDisplay hangs forever if it does not
 # like the DISPLAY variable value
-   if ($OS_Name == SunOS) then
+   if ($HSY_OS_Name == SunOS) then
 
       cat << EOF >! $Tmp.c
 #include <stdint.h>

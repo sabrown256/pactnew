@@ -16,7 +16,7 @@ Note $ALog "Analyze: tty"
 dbmget $ALog LEH_TTY_CRNL^         \
              LEH_TTY_ECHO^         \
              LEH_TTY_VTIME^        \
-             OS_Name
+             HSY_OS_Name
 
 set termio = ""
 

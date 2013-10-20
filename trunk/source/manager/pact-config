@@ -74,9 +74,9 @@ set SRCDate       = ""
 
 source pact-scs
 
-setenv HSY_Host    `uname -n`
-setenv OS_Name     `uname -s`
-setenv OS_Release  `uname -r`
+setenv HSY_Host        `uname -n`
+setenv HSY_OS_Name     `uname -s`
+setenv HSY_OS_Release  `uname -r`
 
 setenv PSY_Arch `$PSY_ScrDir/system-id`
 

@@ -192,13 +192,15 @@ Group HDF {
 #   HSY_Host      the system host name
 
 Group HSY {
-   Host     = ${HSY_Host}
+   Host       = ${HSY_Host}
+   OS_Name    = ${HSY_OS_Name}
+   OS_Type    =
+   OS_Release =
 
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler
    RootInc  = /usr/include
    RootLib  = /usr/lib
-
 }
 
 Group IBM {
@@ -368,8 +370,9 @@ Group TEST {
 # this group clarifies the intention (see HAVE group)
 
 Group USE {
-   IMF = FALSE
-   MPI = FALSE
+   IMF       = FALSE
+   MPI       = FALSE
+   LDLibPath = ${USE_LDLibPath}
 }
 
 #--------------------------------------------------------------------------

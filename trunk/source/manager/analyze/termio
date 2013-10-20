@@ -15,7 +15,7 @@ Note $ALog "Analyze: termio"
 
 dbmget $ALog CC_Exe^           \
              CC_Flags^         \
-             OS_Name^          \
+             HSY_OS_Name^      \
              PACT_CC_VERSION
 
 set termio = ""
@@ -27,7 +27,7 @@ Note $Tmp.h "#include <unistd.h>"
 Note $Tmp.h "#include <sys/ioctl.h>"
 Note $Tmp.h "#include <fcntl.h>"
 
-switch ($OS_Name)
+switch ($HSY_OS_Name)
    case Darwin:
    case FreeBSD:
         Note $Tmp.h "#include <sys/termios.h>"

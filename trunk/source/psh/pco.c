@@ -1418,7 +1418,10 @@ static void setup_analyze_env(client *cl, char *base)
     note(out, TRUE, "%s", get_date());
     fclose_safe(out);
 
-    dbset(cl, "HSY_Host",   st.host);
+    dbset(cl, "HSY_Host",       st.host);
+    dbset(cl, "HSY_OS_Name",    st.os);
+    dbset(cl, "HSY_OS_Release", st.osrel);
+
     dbset(cl, "PSY_Arch",   st.arch);
     dbset(cl, "PSY_ID",     st.psy_id);
     dbset(cl, "PSY_Root",   st.dir.root);
@@ -1437,9 +1440,6 @@ static void setup_analyze_env(client *cl, char *base)
 
     if (strncmp(st.os, "CYGWIN", 6) == 0)
        st.os[6] = '\0';
-
-    dbset(cl, "OS_Name",      st.os);
-    dbset(cl, "OS_Release",   st.osrel);
 
     if (strcmp(st.os, "Windows_NT") == 0)
        dbset(cl, "AF_CDecls", "TRUE");
