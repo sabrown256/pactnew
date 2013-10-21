@@ -1,5 +1,5 @@
 #
-# GNU-BGP - define GNU compiler for IBM BG/P backend
+# GNU-BGQ - define GNU compiler for IBM BG/Q backend
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -107,12 +107,12 @@ Group X11 {
    RPath = /usr/X11R6/$LIB
 }
 
-include cpp-rule
-include serial
-include features/bgp
-
 # BFD is detected but tests do not work
 Group TEST {
   ADVISORY = ${TEST_ADVISORY}:score_retrc:fortran_pdb_manual 
 }
+
+include cpp-rule
+include serial
+include features/bgq
 

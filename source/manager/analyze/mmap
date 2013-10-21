@@ -18,6 +18,7 @@ dbmget $ALog CC_Exe^          \
              Cfe_LD_Flags^    \
              Cfe_LD_RPath^    \
              CROSS_FE^        \
+             IBM_HW^          \
              PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
@@ -65,7 +66,7 @@ flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    flog $ALog $CROSS_FE $Tmp $Tmp.dat
    if ($status == 0) then
-      if ($?IBM_BGP == 0) then
+      if ($IBM_HW != BGP) then
          setenv HAVE_MMAP TRUE
       endif
       flog $ALog rm -f $Tmp.c $Tmp $Tmp.dat

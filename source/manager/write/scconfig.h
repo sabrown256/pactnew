@@ -23,29 +23,22 @@ Separator $Log
 NoteD $Log "   C Environment Configuration - scconfig.h"
 Note $Log ""
 
-dbmget $Log BFD_Version^              \
+dbmget $Log AF_ALT_LARGE_FILE^        \
+            AF_LONG8^                 \
+            AF_SOCKOPT_TYPE^          \
+            AF_VERSION_OSX^           \
+            BFD_Version^              \
             CC_Exe^                   \
             CEFile^                   \
-            SHELL_Default^            \
             DP_Lib^                   \
             DP_Inc^                   \
             FC_ID_CASE^               \
             FC_ID_UNDERSCORE^         \
             FC_INT_PTR_DIFFER^        \
             FC_INTEGER_C^             \
-            IncDir^                   \
-            STD_IPC^                  \
             HAVE_MPI_STDIN_ALL^       \
             HAVE_MPI_GOOD_IO^         \
             HAVE_LONG_LONG^           \
-            PACT_CC_FAMILY^           \
-            PACT_CC_VERSION^          \
-            PACT_SO_CACHE^            \
-            SMP_Pthread^              \
-            TRACKER_Exe^              \
-            MYSQL_SO^                 \
-            SQLITE3_SO^               \
-            HDF5_SO^                  \
             HAVE_BAD_LINE_DIRECTIVES^ \
             HAVE_INLINE^              \
             HAVE_NORETURN^            \
@@ -88,23 +81,21 @@ dbmget $Log BFD_Version^              \
             HAVE_DYNAMIC_LINKER^      \
             HAVE_BFD^                 \
             HAVE_DEMANGLE^            \
-            USE_FULL_MM^              \
-            LEH_TTY_CRNL^             \
-            LEH_TTY_ECHO^             \
-            LEH_TTY_VTIME^            \
-            AF_ALT_LARGE_FILE^        \
-            AF_LONG8^                 \
-            AF_SOCKOPT_TYPE^          \
-            AF_VERSION_OSX^           \
-            RF_DEBUG^                 \
-            RF_OPTIMIZE^              \
-            RF_PROFILE^               \
-            RF_Linking^               \
+            HDF5_SO^                  \
             HSY_OS_Name^              \
             HSY_OS_Release^           \
             HSY_OS_Type^              \
             HSY_CPU^                  \
             HSY_FPU^                  \
+            IBM_HW^                   \
+            IncDir^                   \
+            LEH_TTY_CRNL^             \
+            LEH_TTY_ECHO^             \
+            LEH_TTY_VTIME^            \
+            MYSQL_SO^                 \
+            PACT_CC_FAMILY^           \
+            PACT_CC_VERSION^          \
+            PACT_SO_CACHE^            \
             PSY_Arch^                 \
             PSY_Cfg^                  \
             PSY_FltDir^               \
@@ -113,9 +104,19 @@ dbmget $Log BFD_Version^              \
             PSY_TYPE^                 \
             PSY_Prefix^               \
             PSY_TmpDir^               \
+            RF_DEBUG^                 \
+            RF_OPTIMIZE^              \
+            RF_PROFILE^               \
+            RF_Linking^               \
+            SHELL_Default^            \
+            SMP_Pthread^              \
+            SQLITE3_SO^               \
             Std_UseX^                 \
             Std_UseOGL^               \
-            Std_UseQD
+            Std_UseQD^                \
+            STD_IPC^                  \
+            TRACKER_Exe^              \
+            USE_FULL_MM
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -372,7 +373,15 @@ dbmget $Log BFD_Version^              \
 
     Note $STDOUT ""
 
+# do some defines for IBM BG hardware
+    if ($IBM_HW =~ BG*) then
+       Note $STDOUT "#define IBM_$IBM_HW"
+    endif
+            
+    endsw
+
     if (-f $CEFile) then
+       flog $Log cat $CEFile
        cat $CEFile >>& $STDOUT
        flog $Log $RM $CEFile
        Note $STDOUT ""

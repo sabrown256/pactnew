@@ -7,8 +7,6 @@
 # include "cpyright.h"
 #
 
-setenv OBJECT_MODE        ${Bits}
-
 XArch = -qarch=450
 
 Tool CC {
@@ -112,10 +110,6 @@ Group X11 {
    RPath = /usr/X11R6/$LIB
 }
 
-Group CROSS {
-   COMPILE = BGP
-}
-
 # NOTE: despite debug flags no symbol info so undebuggable
 Group TEST {
    ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
@@ -124,9 +118,6 @@ Group TEST {
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
-setenv IBM_BGP
-define IBM_BGP
-define GETSOCKNAME_LONG
-
 include serial
+include features/bgp
 

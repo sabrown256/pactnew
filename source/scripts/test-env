@@ -113,7 +113,7 @@ setenv ZeroSpace  "-z 2"
 
    source $EtcDir/env-pact.csh
 
-   if ($?IBM_BGL == 1) then
+   if ($IBM_HW == BGL) then
       setenv RUN_TESTS FALSE
    else
       setenv RUN_TESTS TRUE

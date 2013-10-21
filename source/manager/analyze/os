@@ -24,7 +24,8 @@ set los = ( `uname -s` )
 
 dbmget $ALog AF_VERSION_OSX  =\? ""^      \
              HSY_OS_Name     =\? "$los"^  \
-             HSY_RootInc
+             HSY_RootInc^                 \
+             IBM_HW
              
 unset los
 
@@ -48,7 +49,7 @@ else if ($CROSS_COMPILE == MINGW64) then
 
 else if (("$HSY_OS_Name" == "Windows_NT") || \
     (("$HSY_OS_Name" == "Linux") && (-e $HSY_RootInc/termio.h)) || \
-    ($?IBM_BGP == 1) || ($?IBM_BGQ == 1) || \
+    ($IBM_HW == BGP) || ($IBM_HW == BGQ) || \
     (-e $HSY_RootInc/sys/termio.h)) then
    setenv HSY_OS_Type "SYSV"
 

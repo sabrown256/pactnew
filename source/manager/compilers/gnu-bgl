@@ -9,8 +9,6 @@
 
 run analyze/rpath gnu
 
-setenv OBJECT_MODE ${Bits}
-
 Tool CC {
    Exe       = mpgcc
    Flags     = -fsignaling-nans -ffloat-store
@@ -108,3 +106,4 @@ Group X11 {
 
 include cpp-rule
 include serial
+include features/bgl

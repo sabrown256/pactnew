@@ -7,7 +7,6 @@
 # include "cpyright.h"
 #
 
-setenv OBJECT_MODE ${Bits}
 #XArch = -qarch=ppc
 XArch = ""
 
@@ -103,3 +102,4 @@ Group X11 {
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
 include serial
+include features/bgl

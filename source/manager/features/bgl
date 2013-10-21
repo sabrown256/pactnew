@@ -11,13 +11,17 @@
 #    COMPILE = BGL
 #}
 
-# Tool DO_RUN {
-#    MPI   = "salloc.bgl"
-#    CROSS = "no-op"
-#}
+ Tool DO_RUN {
+    MPI   = "salloc.bgl"
+    CROSS = "no-op"
+}
 
-setenv IBM_BGL
-define IBM_BGL
+Group IBM {
+   OS = Linux
+   HW = BGL
+}
 
 define GETSOCKNAME_LONG
+
+setenv OBJECT_MODE ${Bits}
 

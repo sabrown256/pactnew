@@ -19,7 +19,7 @@ set exe = $BinDir/tgsa
       NoteD $Log ""
       NoteD $Log "                    $msg"
 
-      if ($?IBM_BGP == 1) then
+      if ($IBM_HW == BGP) then
          set nthread = 2
       else
          set nthread = 4

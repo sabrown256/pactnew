@@ -15,7 +15,7 @@ set exe = $BinDir/sx
 set opt = ( $pvopt -l $FilesDir/sxsqlite.scm )
 set io  = sxsqlite.res
 
-if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then
+if (($HAVE_SQLITE == yes) && ($IBM_HW != BGP)) then
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"

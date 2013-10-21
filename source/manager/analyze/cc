@@ -43,6 +43,7 @@ dbmget $ALog CC_Exe       =\? cc^      \
              CROSS_FE^                 \
              DP_BE^                    \
              HSY_OS_Name^              \
+             IBM_HW^                   \
              PACT_CC_FAMILY^           \
              PACT_CC_VERSION^          \
              PACT_CC_PATH^             \
