@@ -19,6 +19,10 @@ Group RF {
    STATIC_LINKING = TRUE
 }
 
+# Group BFD {
+#    Flags = -Wl,-dynamic
+# }
+
 Group TEST {
    ADVISORY    = ${TEST_ADVISORY}:pgs_rendlr:pgs_rendac
 #   MAX_THREADS = 2
@@ -30,15 +34,13 @@ Tool DO_RUN {
    CROSS = "srun.bgq"
 }
 
+Group IBM {
+   OS = Linux
+   HW = BGQ
+}
+
+define GETSOCKNAME_LONG
+
 setenv HAVE_MPI_GOOD_IO   TRUE
-
-setenv IBM_BGQ
-define IBM_BGQ
-
-# define GETSOCKNAME_LONG
-# 
-# Group BFD {
-#    Flags = -Wl,-dynamic
-# }
-# 
+setenv OBJECT_MODE        ${Bits}
 

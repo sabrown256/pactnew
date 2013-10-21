@@ -772,7 +772,7 @@ static void add_spec_env_vars(client *cl,
 			      FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd,
 			      int n, char **sa, int blank)
    {int i, iv, nv, ok;
-    char g[BFSML];
+    char g[BFSML], s[BFLRG];
     char *p, *v, *var, **gt, **va;
 
 /* check for Groups and Tools to add */
@@ -802,6 +802,9 @@ static void add_spec_env_vars(client *cl,
 		      vl = strchr(vr, '=');
 		      if (vl != NULL)
 			 *vl++ = '\0';
+		      if ((strpbrk(vl, " \t()") != NULL) && (vl[0] != '"'))
+			 {snprintf(s, BFLRG, "\"%s\"", vl);
+			  vl = s;};
 		      env_out(fsh, fcsh, fdk, fmd, vr, vl);}
 		  else if (eq > 0)
 		     continue;
@@ -2454,11 +2457,11 @@ static void do_platform(client *cl, char *oper, char *value)
     st.pltfcfg = lst_push(st.pltfcfg, cfg);
 
 /* add this platform to the list */
-    p = dbget(cl, FALSE, "Platforms");
+    p = dbget(cl, FALSE, "PSY_Platforms");
     if (IS_NULL(p) == TRUE)
-       dbset(cl, "Platforms", "%s(%s)", cfg, sid);
+       dbset(cl, "PSY_Platforms", "%s(%s)", cfg, sid);
     else
-       dbset(cl, "Platforms", "%s:%s(%s)", p, cfg, sid);
+       dbset(cl, "PSY_Platforms", "%s:%s(%s)", p, cfg, sid);
 
     free_strings(spec);
 

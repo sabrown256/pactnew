@@ -60,7 +60,6 @@
            set ladv = ${ladv}:pml_perf:pml_nan:pml_fpe:pml_interp
            echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/cygwin" >>& $Tmp
-#           echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
            echo "Group TEST {" >>& $Tmp
            echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
            echo "}" >>& $Tmp
@@ -76,7 +75,6 @@
               case *pgcc*:
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include compilers/pgi-osx" >>& $Tmp
-#                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
                    echo "Group TEST {" >>& $Tmp
                    echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
                    echo "}" >>& $Tmp
@@ -86,7 +84,6 @@
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include compilers/gnu-osx" >>& $Tmp
                    echo "include no-opengl" >>& $Tmp
-#                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
                    echo "Group TEST {" >>& $Tmp
                    echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
                    echo "}" >>& $Tmp
@@ -116,8 +113,10 @@
            set CCSys = `$Which cc`
            set CCRoot = $CCSys:h
            set CCRoot = $CCRoot:h
-           echo "setenv PACT_CC_PATH $CCRoot" >>& $Tmp
-           echo "setenv PACT_FC_PATH $CCRoot" >>& $Tmp
+           echo "Group PACT {" >>& $Tmp
+           echo "   CC_PATH = $CCRoot" >>& $Tmp
+           echo "   FC_PATH = $CCRoot" >>& $Tmp
+           echo "}" >>& $Tmp
            if (-x "$CCSys") then
               $CCSys -v |& grep gcc >& /dev/null
               if ($status == 0) then
@@ -126,7 +125,6 @@
                  echo "include compilers/sol" >>& $Tmp
               endif
            endif
-#           echo 'setenv TEST_ADVISORY ${TEST_ADVISORY}:score_mpi' >>& $Tmp
            echo "Group TEST {" >>& $Tmp
            echo '   ADVISORY = ${TEST_ADVISORY}:score_mpi' >>& $Tmp
            echo "}" >>& $Tmp
@@ -181,7 +179,6 @@
                    set ladv = ${ladv}:score_mpi
                    echo "run std/use-compiler $lcc" >>& $Tmp
 		   echo "include compilers/sun" >>& $Tmp
-#                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
                    echo "Group TEST {" >>& $Tmp
                    echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
                    echo "}" >>& $Tmp

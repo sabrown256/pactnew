@@ -43,7 +43,7 @@ int main(int c, char **v)
 EOF
 
 flog $ALog $lCC $Tmp.c -o $Tmp
-if (($status == 0) && ($?IBM_BGL == 0)) then
+if (($status == 0) && ($IBM_HW != BGL)) then
    setenv HAVE_VA_COPY TRUE
    NoteD $ALog "      has va_copy"
 else

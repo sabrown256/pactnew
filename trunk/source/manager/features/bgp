@@ -21,8 +21,13 @@ Tool DO_RUN {
    CROSS = "submit.bgp"
 }
 
-setenv HAVE_MPI_GOOD_IO   TRUE
+Group IBM {
+   OS = Linux
+   HW = BGP
+}
 
-setenv IBM_BGP
-define IBM_BGP
+define GETSOCKNAME_LONG
+
+setenv HAVE_MPI_GOOD_IO   TRUE
+setenv OBJECT_MODE        ${Bits}
 

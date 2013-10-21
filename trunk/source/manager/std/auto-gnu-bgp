@@ -38,9 +38,6 @@ include no-sql
 include no-jpeg
 include no-png
 include no-libz
-include features/bgp
-
-define GETSOCKNAME_LONG
 
 
 

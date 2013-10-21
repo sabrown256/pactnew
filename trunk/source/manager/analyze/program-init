@@ -109,6 +109,9 @@ Tool PY {
 Tool Ranlib {
 }
 
+Tool READLINE {
+}
+
 Tool SQLITE3 {
 }
 
@@ -207,6 +210,8 @@ Group HSY {
 }
 
 Group IBM {
+   OS = AIX
+   HW = PPC
 }
 
 Group LEH {
@@ -306,8 +311,8 @@ Group PSY {
 
    Base        = ${PSY_Base}
    Root        = ${PSY_Root}
-   AIRoot      = ""
-   ASRoot      = ""
+   AIRoot      = ${PSY_AIRoot}
+   ASRoot      = ${PSY_ASRoot}
    InstRoot    = ${PSY_InstRoot}
    PubInc      = ${PSY_PubInc}
    PubLib      = ${PSY_PubLib}

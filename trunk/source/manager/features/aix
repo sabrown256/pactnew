@@ -9,3 +9,13 @@ Group NM {
    Cmd = "$NM_Exe -g -X $Bits"
 }
 
+Group IBM {
+   OS  = AIX
+   HW  = PPC
+}
+
+define GETSOCKNAME_LONG
+define HAVE_THREAD_SAFE_MPI
+
+setenv OBJECT_MODE  ${Bits}
+

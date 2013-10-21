@@ -1207,9 +1207,9 @@ switch ($Cmnd)
         Separator $Log
 
 # check for multi-platform build
-        dbget Platforms
-        if ("$Platforms" != "") then
-           set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
+        dbget PSY_Platforms
+        if ("$PSY_Platforms" != "") then
+           set inf = ( `echo "$PSY_Platforms" | sed 's|:| |g'` )
            @ np = $#inf
            Note $Log "$np added platforms"
 
@@ -1982,11 +1982,11 @@ CFG_DONE:
 
 # do install for multi-platform configuration
         flog $Log setenv PERDB_PATH $EtcDir/cfg
-        dbget Platforms
-        if ("$Platforms" != "") then
+        dbget PSY_Platforms
+        if ("$PSY_Platforms" != "") then
            set Args = ( $Args -f $EtcDir/Makefile )
 
-           set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
+           set inf = ( `echo "$PSY_Platforms" | sed 's|:| |g'` )
            @ np = $#inf
            Note $Log "$np platforms"
 
@@ -2406,11 +2406,11 @@ CFG_DONE:
 
 # do remove for multi-platform configuration
         flog $Log setenv PERDB_PATH $EtcDir/cfg
-        dbget Platforms
-        if ("$Platforms" != "") then
+        dbget PSY_Platforms
+        if ("$PSY_Platforms" != "") then
            set Args = ( $Args -f $EtcDir/Makefile )
 
-           set inf = ( `echo "$Platforms" | sed 's|:| |g'` )
+           set inf = ( `echo "$PSY_Platforms" | sed 's|:| |g'` )
            @ np = $#inf
            Note $Log "$np platforms"
 
@@ -2831,10 +2831,6 @@ CFG_DONE:
         flog $Log pwd
         flog $Log printenv
 
-#        set TmpV = $PSY_MngDir/.tmp.$$
-#        flog $Log mkdir $TmpV
-#        flog $Log $MV $PSY_MngDir/.pact-version* $TmpV
-
 # GOTCHA: check git status for things like:
 #     Your branch is behind 'origin/master' by <n> commits
 # Options:
@@ -2844,9 +2840,6 @@ CFG_DONE:
 
         flog $Log $PSY_ScrDir/scs-update
         set ErrStat = $status
-
-#        flog $Log $MV $TmpV/.pact-version* $PSY_MngDir
-#        flog $Log $RMDir $TmpV
 
 # take care of conflicting changes
         flog $Log (awk '($1 == "C") && ($2 !~ /Makefile/) {print $2}' $Log > Confl)
@@ -2978,6 +2971,8 @@ CFG_DONE:
            flog $Log rm -rf $tmp
         endif
         NoteD $Log ""
+
+        unset tmp
 
         set RStatus = $ErrStat
         breaksw
@@ -3129,12 +3124,12 @@ CFG_DONE:
 
 # NOTE: this is for the outer pact - the package level one is controlled by NA
            set Args = ( $Args -na 1 )
-           set Tmp  = /tmp/pact-test.$hsy_host.$$
 
            if ("$Tgts" == "") then
               ftee $Log pact $Args -f $EtcDir/Makefile test
-              set RStatus = $status
+              set RStatus = $gstatus[1]
            else
+              set Tmp  = /tmp/pact-test.$hsy_host.$$
               echo $Tgts >! $Tmp
               flog $Log cat $Tmp
               flog $Log set Tgts = $Tmp
@@ -3144,6 +3139,7 @@ CFG_DONE:
               set RStatus = $status
 
               flog $Log $RM $Tmp
+              unset Tmp
            endif
         endif
 
@@ -3306,6 +3302,7 @@ CFG_DONE:
         endif
 
         flog $Log $RM $Tmp
+        unset Tmp
         echo " "
 
         breaksw
@@ -3327,6 +3324,7 @@ CFG_DONE:
                          echo "$argv[2-]" >! $Tmp
                          $BugTck "close $1 $Tmp"
                          $RM $Tmp
+                         unset Tmp
                       else
                          $BugTck "close $1"
                       endif
@@ -3684,6 +3682,8 @@ GEN_CONFIG:
  
    mv $Tmp $gdir/$cfg
    set Configuration = $cfg
+
+   unset Tmp
 
    return
 

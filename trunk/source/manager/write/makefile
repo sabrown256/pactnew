@@ -23,18 +23,18 @@ Separator $Log
 NoteD $Log "   Distribution Makefile - Makefile"
 Note $Log ""
 
-dbmget $Log BinDir^     \
-            EtcDir^     \
-            PSY_Root^   \
-            PSY_ID^     \
-            Platforms^  \
+dbmget $Log BinDir^         \
+            EtcDir^         \
+            PSY_Root^       \
+            PSY_ID^         \
+            PSY_Platforms^  \
             Pck
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
    set inf = ( base $PSY_ID )
-   set inf = ( $inf `echo "$Platforms" | sed 's|[:()]| |g'` )
+   set inf = ( $inf `echo "$PSY_Platforms" | sed 's|[:()]| |g'` )
    @ ni = $#inf
    Note $Log "Added platform components ($ni):"
    Note $Log "   $inf"

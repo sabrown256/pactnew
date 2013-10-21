@@ -7,8 +7,6 @@
 # include "cpyright.h"
 #
 
-setenv OBJECT_MODE        ${Bits}
-
 XArch = 
 
 Tool CC {
@@ -108,10 +106,6 @@ Group MPI {
    FC_Exe = mpixlf90_r
 }
 
-Group CROSS {
-#   COMPILE = BGQ
-}
-
 # NOTE: despite debug flags no symbol info so undebuggable
 Group TEST {
    ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
@@ -120,9 +114,6 @@ Group TEST {
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
-setenv IBM_BGQ
-define IBM_BGQ
-define GETSOCKNAME_LONG
-
 include serial
+include features/bgq
 

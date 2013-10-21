@@ -11,7 +11,6 @@ run analyze/rpath aix
 
 # NOTE: this should eventually be put in a site specific file
 setenv PATH         ${PATH}:/usr/local/bin
-setenv OBJECT_MODE  ${Bits}
 
 Tool CC {
    Exe       = xlc
@@ -118,9 +117,6 @@ Group OpenMP {
 
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
-
-define GETSOCKNAME_LONG
-define HAVE_THREAD_SAFE_MPI
 
 include features/aix
 include aix-dp-env

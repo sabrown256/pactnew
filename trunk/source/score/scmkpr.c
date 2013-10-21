@@ -579,6 +579,7 @@ void SC_make_def_var(anadep *state, char *var, int wh)
 
     v.text    = SC_dstrcpy(NULL, var);
     v.line    = wh;
+    v.oper    = NEQ;
     v.name[0] = '\0';
 
     _SC_end_var(&v, state);
