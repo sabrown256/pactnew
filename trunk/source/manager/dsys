@@ -2541,11 +2541,10 @@ CFG_DONE:
         flog $Log $RM ../*/$PSY_TmpDir/obj/*.[cfo] ../*/$PSY_TmpDir/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
         flog $Log $RM ../sx/$PSY_TmpDir/obj/*.[cfo]
-        flog $Log $RMDir ../$PSY_TmpDir ../dev/.pc-
+        flog $Log $RMDir ../$PSY_TmpDir
 
-        flog $Log pushd ..
-        flog $Log $RMDir $PSY_TmpDir dev/.pc-
-        flog $Log $RMDir bin lib include etc log
+        flog $Log pushd ../dev
+        flog $Log $RMDir .pc- bin lib include etc log scheme man
         flog $Log popd
 
 # check the result
