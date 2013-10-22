@@ -1,13 +1,13 @@
 #!/bin/csh -f
 #
-# PERDB9 - test list set and get
-#        - use environment variable specification of DB
-#        - test suitability for environment variable
-#        - no FIFO
+# PERDB10 - test list set and get
+#         - use environment variable specification of DB
+#         - test suitability for environment variable
+#         - no FIFO
 #
 
 set opt = "-l"
-set db  = ./db9
+set db  = ./db10
 
 alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'

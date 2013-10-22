@@ -528,24 +528,26 @@ char *get_db(database *db, char *var)
 			 {case '"' :
 			  case '\'' :
 			       _push_col(&pt, &pk, c, c);
+			       pk++;
 			       break;
-			 case '(' :
-                              _push_col(&pt, &pk, c, ')');
-			      break;
-			 case '=' :
-			      *pt++ = '\0';
-			      if (st == TRUE)
-				 {_mem_name(t, pm);
-				  ok = FALSE;
-				  break;}
-			      else if (_mem_name(t, pm) == 0)
-				 {st = TRUE;
-				  val = t;};
-			      pt = t;
-			      break;
+			  case '(' :
+                               _push_col(&pt, &pk, c, ')');
+			       pk++;
+			       break;
+			  case '=' :
+			       *pt++ = '\0';
+			       if (st == TRUE)
+				  {_mem_name(t, pm);
+				   ok = FALSE;
+				   break;}
+			       else if (_mem_name(t, pm) == 0)
+				  {st  = TRUE;
+				   val = t;};
+			       pt = t;
+			       break;
 			 default :
-                              *pt++ = c;
-			      break;};};};};
+                               *pt++ = c;
+			       break;};};};};
 
 	CLOG(cl, 1, "get |%s|=|%s|", var, val);};
 

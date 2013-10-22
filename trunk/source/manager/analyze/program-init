@@ -194,19 +194,21 @@ Group HDF {
    Path  = 
 }
 
-# Host SYstem information
-#   HSY_Host      the system host name
+# Host SYstem group
+#   HSY_Host         the system host name
+#   HSY_OS_Name      the host OS name
+#   HSY_OS_Type      the host OS type
+#   HSY_OS_Release   the host OS release
+#   HSY_RootInc      the standard /usr/include equivalent for the host
+#   HSY_RootLib      the standard /usr/lib equivalent for the host
 
 Group HSY {
    Host       = ${HSY_Host}
    OS_Name    = ${HSY_OS_Name}
    OS_Type    =
    OS_Release =
-
-# GOTCHA: this root may be different for CROSS_COMPILE
-# need script to figure out root includes for given compiler
-   RootInc  = /usr/include
-   RootLib  = /usr/lib
+   RootInc    = /usr/include
+   RootLib    = /usr/lib
 }
 
 Group IBM {
@@ -272,7 +274,7 @@ Group PACT {
    FC_VERSION = ""
 }
 
-# PACT System group
+# PACT SYstem group
 #   PSY_Arch         the system ID as defined by 'system-id'
 #   PSY_Cfg          the system config file
 #   PSY_CfgMan       full path to the cfgman utility

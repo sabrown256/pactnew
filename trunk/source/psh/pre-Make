@@ -78,7 +78,7 @@ do-run : ${BinDir}/do-run
 
 ${BinDir}/do-run : do-run.c ${LibFiles}
 	@(echo "${PCAnnounce} do-run.c -o ${BinDir}/do-run" ; \
-	  ${PCC} do-run.c -o ${BinDir}/do-run ${MDLib})
+	  ${PCC} -DPSY_Prefix=\"${PSY_Prefix}\" do-run.c -o ${BinDir}/do-run ${MDLib})
 
 atdbg : ${BinDir}/atdbg
 
