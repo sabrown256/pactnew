@@ -296,11 +296,12 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT -n "SyntaxModes  ="
     if ("$Yacc_Exe" != "") then
        set scsd = `scs-meta -n`
-       pushd $PSY_Base/scheme/syntax >& /dev/null
+       Note $Log "scsd = $scsd"
+       flog $Log pushd $PSY_Base/scheme/syntax
        foreach mod (*)
           if (-d $mod) then
              if ($mod != "$scsd") then
-                set SynSCM = ( $SynSCM applications/${mod}synt.scm )
+                flog $Log set SynSCM = ( $SynSCM applications/${mod}synt.scm )
                 if ($MAKE_Strategy == "SpaceSaving") then
    	           Note $STDOUT -n ' ${Ar'$mod'}'
                 else
@@ -309,7 +310,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
              endif
           endif
        end
-       popd >& /dev/null
+       flog $Log popd
     endif
     Note $STDOUT ""
     Note $STDOUT "SyntaxScheme = $SynSCM"

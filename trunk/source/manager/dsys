@@ -2543,6 +2543,11 @@ CFG_DONE:
         flog $Log $RM ../sx/$PSY_TmpDir/obj/*.[cfo]
         flog $Log $RMDir ../$PSY_TmpDir ../dev/.pc-
 
+        flog $Log pushd ..
+        flog $Log $RMDir $PSY_TmpDir dev/.pc-
+        flog $Log $RMDir bin lib include etc log
+        flog $Log popd
+
 # check the result
         flog $Log ls -lR $PSY_Root
 
