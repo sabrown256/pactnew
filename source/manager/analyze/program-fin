@@ -7,6 +7,9 @@
 # include "cpyright.h"
 #
 
+# add old environment variable name bindings
+run write/old-env        $Log $PSY_ScrDir
+
 Run {
    write/package         $Log $PSY_ScrDir
    write/cfg.db          $Log $PSY_ScrDir
