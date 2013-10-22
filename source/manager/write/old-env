@@ -2,6 +2,8 @@
 #
 # OLD-ENV - generate old environment variable names
 #         - for backward compatibility
+#         - let an old PACT function with a new one's env files
+#         - or applications using new env files
 #
 # include "cpyright.h"
 #
@@ -35,56 +37,70 @@ flog $Log set envmd  = $EtcDir/env-pact.mod
 set lst = ""
 
 # AF Group
-set lst = ( $lst ANSI                 AF_ANSI )
-set lst = ( $lst CDecls               AF_CDecls )
-set lst = ( $lst CList                AF_CList )
-set lst = ( $lst INT4                 AF_INT4 )
-set lst = ( $lst INT8                 AF_INT8 )
-set lst = ( $lst LONG64               AF_LONG8 )
-set lst = ( $lst GETSOCKOPT_TYPE      AF_SOCKOPT_TYPE )
 set lst = ( $lst GLIBC_VERSION        AF_VERSION_GLIBC )
-set lst = ( $lst OSX_Version          AF_VERSION_OSX )
-set lst = ( $lst NEED_ALT_LARGE_FILE  AF_ALT_LARGE_FILE )
-set lst = ( $lst ERR_PATTERN          AF_PATTERN_ERR )
-set lst = ( $lst WARN_PATTERN         AF_PATTERN_WARN )
+#set lst = ( $lst ANSI                 AF_ANSI )
+#set lst = ( $lst CDecls               AF_CDecls )
+#set lst = ( $lst CList                AF_CList )
+#set lst = ( $lst GETSOCKOPT_TYPE      AF_SOCKOPT_TYPE )
+#set lst = ( $lst INT4                 AF_INT4 )
+#set lst = ( $lst INT8                 AF_INT8 )
+#set lst = ( $lst LONG64               AF_LONG8 )
+#set lst = ( $lst NEED_ALT_LARGE_FILE  AF_ALT_LARGE_FILE )
+#set lst = ( $lst OSX_Version          AF_VERSION_OSX )
+#set lst = ( $lst ERR_PATTERN          AF_PATTERN_ERR )
+#set lst = ( $lst WARN_PATTERN         AF_PATTERN_WARN )
 
 # RF Group
-
 set lst = ( $lst CONFIG_METHOD        RF_CONFIG_METHOD )
-set lst = ( $lst FEATURES             RF_FEATURES )
-set lst = ( $lst Linking              RF_Linking )
-set lst = ( $lst STRICT               RF_STRICT )
-set lst = ( $lst AbsoluteDeb          RF_DEBUG )
-set lst = ( $lst AbsoluteOpt          RF_OPTIMIZE )
-set lst = ( $lst BUILD_DEBUG          RF_DEBUG )
-set lst = ( $lst Profile              RF_PROFILE )
-set lst = ( $lst CSpokes              RF_SPOKES_C )
-set lst = ( $lst SchemeSpokes         RF_SPOKES_SCHEME )
+#set lst = ( $lst AbsoluteDeb          RF_DEBUG )
+#set lst = ( $lst AbsoluteOpt          RF_OPTIMIZE )
+#set lst = ( $lst BUILD_DEBUG          RF_DEBUG )
+#set lst = ( $lst CSpokes              RF_SPOKES_C )
+#set lst = ( $lst FEATURES             RF_FEATURES )
+#set lst = ( $lst Linking              RF_Linking )
+#set lst = ( $lst Profile              RF_PROFILE )
+#set lst = ( $lst STRICT               RF_STRICT )
+#set lst = ( $lst SchemeSpokes         RF_SPOKES_SCHEME )
 
 # CROSS Group
 set lst = ( $lst CFE                  CROSS_FE )
 
+# DB Group
+set lst = ( $lst HOST_SERVER_DB       DB_HOST_SERVER )
+set lst = ( $lst RUN_SIGNATURE_DB     DB_RUN_SIGNATURE )
+set lst = ( $lst SITE_SIGNATURE_DB    DB_SITE_SIGNATURE )
+set lst = ( $lst UPDATE_SYS_DB        DB_UPDATE_SYS )
+
 # DP Group
-set lst = ( $lst BE                   DP_BE )
-set lst = ( $lst PARALLEL_COMM_METH   DP_METHOD )
 set lst = ( $lst PFE                  DP_FE )
-set lst = ( $lst REQUEST_MPI          DP_REQUEST_MPI )
+#set lst = ( $lst BE                   DP_BE )
+#set lst = ( $lst PARALLEL_COMM_METH   DP_METHOD )
+#set lst = ( $lst REQUEST_MPI          DP_REQUEST_MPI )
+
+# HAVE Group
+set lst = ( $lst NO_LONG_LONG         HAVE_LONG_LONG )
+set lst = ( $lst NO_TERMINAL          HAVE_TERMINAL )
 
 # HSY Group
-set lst = ( $lst Host                 HSY_Host )
+set lst = ( $lst OS_Name              HSY_OS_Name )
 set lst = ( $lst RootInc              HSY_RootInc )
 set lst = ( $lst RootLib              HSY_RootLib )
-set lst = ( $lst CPU                  HSY_CPU )
-set lst = ( $lst FPU                  HSY_FPU )
+#set lst = ( $lst CPU                  HSY_CPU )
+#set lst = ( $lst FPU                  HSY_FPU )
+#set lst = ( $lst Host                 HSY_Host )
+
+# MAKE Group
+set lst = ( $lst SUFFIXES             MAKE_SUFFIXES )
 
 # PSY Group
 set lst = ( $lst System               PSY_ID )
-set lst = ( $lst Arch                 PSY_Arch )
-set lst = ( $lst InstBase             PSY_InstRoot )
+set lst = ( $lst CONFIG_PATH          PSY_CONFIG_PATH )
 set lst = ( $lst SYS_SITE             PSY_SITE )
 set lst = ( $lst SYS_TYPE             PSY_TYPE )
 set lst = ( $lst DAI_ROOT             PSY_AIRoot )
 set lst = ( $lst DAS_ROOT             PSY_ASRoot )
+#set lst = ( $lst Arch                 PSY_Arch )
+#set lst = ( $lst InstBase             PSY_InstRoot )
 
 # SHELL Group
 set lst = ( $lst BackSlash            SHELL_Cont )
@@ -95,10 +111,6 @@ set lst = ( $lst DEFAULT_SHELL        SHELL_Default )
 #set lst = ( $lst PTHREAD_POSIX        SMP_Pthread )
 #set lst = ( $lst ThreadLibExt         SMP_LibExt )
 #set lst = ( $lst NUMA                 SMP_NUMA )
-
-# HAVE Group
-set lst = ( $lst NO_LONG_LONG         HAVE_LONG_LONG )
-set lst = ( $lst NO_TERMINAL          HAVE_TERMINAL )
 
 # USE Group
 #set lst = ( $lst UseTmpDir            USE_TmpDir )

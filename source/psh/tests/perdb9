@@ -1,12 +1,12 @@
 #!/bin/csh -f
 #
-# PERDB8 - test adding members
+# PERDB9 - test adding members
 #        - GOTCHA: does not work as desired - some redesign required
 #        - no FIFO
 #
 
 set opt = "-l"
-set db  = ./db8
+set db  = ./db9
 
 alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
