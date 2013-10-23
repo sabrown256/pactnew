@@ -95,5 +95,15 @@ Group OpenMP {
 #   LD_Lib   = -xopenmp=parallel -xO3
 }
 
+# Sun builds fail MPI tests - maybe because the
+# system does not supply MPI libraries built with
+# the Sun compiler
+# so advise that the SCORE package mpi test will not
+# count as a failure
+
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:score_mpi
+}
+
 include cpp-rule
 include serial

@@ -504,6 +504,12 @@ int main(int c, char **v)
     if (file == NULL)
        file = getenv("DB_HOST_SERVER");
 
+/* GOTCHA: deprecated - delete after 06/2014 */
+    if (file == NULL)
+       {io_printf(stdout, "No DB_HOST_SERVER specified - ");
+        io_printf(stdout, "looking for deprecated HOST_SERVER_DB\n");
+	file = getenv("HOST_SERVER_DB");};
+
     st = SC_host_server_init(file, FALSE, vrb);
     if (st == FALSE)
        {if (file == NULL)

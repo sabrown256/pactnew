@@ -127,18 +127,26 @@ source $envcsh
 Note $envcsh ""
 Note $envcsh "#--------------------------------------------------------------------------"
 Note $envcsh ""
+Note $envcsh "# old variables for backward compatibility"
+Note $envcsh ""
 
 Note $envsh  ""
 Note $envsh  "#--------------------------------------------------------------------------"
+Note $envsh  ""
+Note $envsh  "# old variables for backward compatibility"
 Note $envsh  ""
 
 Note $envdk  ""
 Note $envdk  "#--------------------------------------------------------------------------"
 Note $envdk  ""
+Note $envdk  "# old variables for backward compatibility"
+Note $envdk  ""
 
-Note $envmd   ""
+#Note $envmd  ""
 #Note $envmd  "#--------------------------------------------------------------------------"
-Note $envmd   ""
+#Note $envmd  ""
+#Note $envmd  "# old variables for backward compatibility"
+#Note $envmd  ""
 
 @ i = 0
 while ($i < $ne)
@@ -150,13 +158,13 @@ while ($i < $ne)
    if ($status == 0) then
       set nv = ( `printenv $nn` )
       if ($#nv > 1) then
-         printf 'setenv %-24s "$%s"\n' $on $nn >>& $envcsh
-         printf 'export %s="$%s"\n' $on $nn >>& $envsh
-         printf 'dk_setenv %-24s "$%s"\n' $on $nn >>& $envdk
+         printf 'setenv %-24s "%s"\n' $on "$nv" >>& $envcsh
+         printf 'export %s="%s"\n' $on "$nv" >>& $envsh
+         printf 'dk_setenv %-24s "%s"\n' $on "$nv" >>& $envdk
       else
-         printf 'setenv %-24s $%s\n' $on $nn >>& $envcsh
-         printf 'export %s=$%s\n' $on $nn >>& $envsh
-         printf 'dk_setenv %-24s $%s\n' $on $nn >>& $envdk
+         printf 'setenv %-24s %s\n' $on $nv >>& $envcsh
+         printf 'export %s=%s\n' $on $nv >>& $envsh
+         printf 'dk_setenv %-24s %s\n' $on $nv >>& $envdk
       endif
    endif
 end

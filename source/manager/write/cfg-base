@@ -40,6 +40,7 @@
            breaksw
    endsw
 
+# build the config off the operating system
    echo "include spokes" >>& $Tmp
    switch ($los)
       case aix:
@@ -63,32 +64,6 @@
            echo "Group TEST {" >>& $Tmp
            echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
            echo "}" >>& $Tmp
-           unset ladv
-           breaksw
-      case darwin:
-           set ladv = ""
-           set ladv = ${ladv}:score_mpi:score_mk_async
-           set ladv = ${ladv}:pml_perf
-           set ladv = ${ladv}:ppc_pty_interrupt
-           set ladv = ${ladv}:sx_hdf
-           switch ($lcc)
-              case *pgcc*:
-                   echo "run std/use-compiler $lcc" >>& $Tmp
-                   echo "include compilers/pgi-osx" >>& $Tmp
-                   echo "Group TEST {" >>& $Tmp
-                   echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
-                   echo "}" >>& $Tmp
-                   breaksw
-              default:
-              case *gcc*:
-                   echo "run std/use-compiler $lcc" >>& $Tmp
-                   echo "include compilers/gnu-osx" >>& $Tmp
-                   echo "include no-opengl" >>& $Tmp
-                   echo "Group TEST {" >>& $Tmp
-                   echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
-                   echo "}" >>& $Tmp
-                   breaksw
-           endsw
            unset ladv
            breaksw
       case freebsd:
@@ -129,76 +104,130 @@
            echo '   ADVISORY = ${TEST_ADVISORY}:score_mpi' >>& $Tmp
            echo "}" >>& $Tmp
            breaksw
-      default:
-      case linux:
+
+      case darwin:
+
+# get the main compiler family
            switch ($lcc)
               case clang:
+                   set lcfam = clang-osx
+                   breaksw
+              case *intel:
+              case *icc*:
+                   set lcfam = icc-osx
+                   breaksw
+              case *pgi:
+              case *pgcc*:
+                   set lcfam = pgi-osx
+                   breaksw
+              default:
+              case *gnu:
+              case *gcc*:
+                   set lcfam = gnu-osx
+                   breaksw
+           endsw
+
+# build the config off the compiler and compiler family
+           switch ($lcc)
+              default:
+              case clang:
+              case *intel:
+              case *icc*:
+              case *pgi:
+              case *pgcc*:
+              case *gcc*:
                    echo "run std/use-compiler $lcc" >>& $Tmp
-                   echo "include ${Bits}-bit" >>& $Tmp
-                   echo "include compilers/clang" >>& $Tmp
-                   unset lcc
+                   echo "include compilers/$lcfam" >>& $Tmp
+                   echo "include no-opengl" >>& $Tmp
                    breaksw
-              case gnu-bgl:
-                   echo "include auto-mp-gnu-bgl" >>& $Tmp
+           endsw
+
+           set ladv = ""
+           set ladv = ${ladv}:score_mpi:score_mk_async
+           set ladv = ${ladv}:pml_perf
+           set ladv = ${ladv}:ppc_pty_interrupt
+           set ladv = ${ladv}:sx_hdf
+           echo "Group TEST {" >>& $Tmp
+           echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+           echo "}" >>& $Tmp
+           unset ladv
+           breaksw
+
+      default:
+      case linux:
+
+# get the main compiler family
+           switch ($lcc)
+              case clang:
+                   set lcfam = clang
                    breaksw
-              case gnu-bgp:
-                   echo "include auto-mp-gnu-bgp" >>& $Tmp
-                   breaksw
-              case gnu-bgq:
-                   echo "include auto-mp-gnu-bgq" >>& $Tmp
-                   breaksw
-              case gnu-cxe:
-                   echo "include auto-mp-gnu-cxe" >>& $Tmp
-                   breaksw
+              case *intel:
               case *icc:
-                   echo "run std/use-compiler $lcc" >>& $Tmp
-                   echo "include ${Bits}-bit" >>& $Tmp
-                   echo "include compilers/icc" >>& $Tmp
-                   breaksw
-              case mingw*:
-                   echo "include auto-win-64" >>& $Tmp
+                   set lcfam = icc
                    breaksw
               case *path:
               case *pathcc:
-                   echo "run std/use-compiler $lcc" >>& $Tmp
-                   echo "include ${Bits}-bit" >>& $Tmp
-                   echo "include compilers/path" >>& $Tmp
-                   breaksw
-              case pgi-cxe:
-                   echo "include auto-mp-pgi-cxe" >>& $Tmp
+                   set lcfam = path
                    breaksw
               case *pgi:
               case *pgcc:
-                   echo "run std/use-compiler $lcc" >>& $Tmp
-                   echo "include ${Bits}-bit" >>& $Tmp
-                   echo "include compilers/pgi" >>& $Tmp
+                   set lcfam = pgi
                    breaksw
 	      case *sun:
 	      case *suncc:
-                   set ladv = ""
-                   set ladv = ${ladv}:score_mpi
-                   echo "run std/use-compiler $lcc" >>& $Tmp
-		   echo "include compilers/sun" >>& $Tmp
-                   echo "Group TEST {" >>& $Tmp
-                   echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
-                   echo "}" >>& $Tmp
-                   unset ladv
-                   breaksw
-              case xlc-bgl:
-                   echo "include auto-mp-xlc-bgl" >>& $Tmp
-                   breaksw
-              case xlc-bgp:
-                   echo "include auto-mp-xlc-bgp" >>& $Tmp
-                   breaksw
-              case xlc-bgq:
-                   echo "include auto-mp-xlc-bgq" >>& $Tmp
+                   set lcfam = sun
                    breaksw
               default:
               case *gnu:
               case *gcc:
+                   set lcfam = gnu
+                   breaksw
+           endsw
+
+# build the config off the compiler and compiler family
+           switch ($lcc)
+              case mingw*:
+                   echo "include auto-win-64" >>& $Tmp
+                   breaksw
+
+	      case *sun:
+	      case *suncc:
+                   echo "run std/use-compiler $lcc" >>& $Tmp
+		   echo "include compilers/$lcfam" >>& $Tmp
+                   breaksw
+
+              case gnu-bgl:
+              case gnu-bgp:
+              case gnu-bgq:
+              case gnu-cxe:
+              case pgi-cxe:
+              case xlc-bgl:
+              case xlc-bgp:
+              case xlc-bgq:
+              case mp-gnu-bgl:
+              case mp-gnu-bgp:
+              case mp-gnu-bgq:
+              case mp-gnu-cxe:
+              case mp-pgi-cxe:
+              case mp-xlc-bgl:
+              case mp-xlc-bgp:
+              case mp-xlc-bgq:
+                   echo "include auto-$lcc" >>& $Tmp
+                   breaksw
+
+              default:
+              case clang:
+              case *intel:
+              case *icc:
+              case *path:
+              case *pathcc:
+              case *pgi:
+              case *pgcc:
+              case *gnu:
+              case *gcc:
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
-                   echo "include compilers/gnu" >>& $Tmp
+                   echo "include compilers/$lcfam" >>& $Tmp
                    unset lcc
                    breaksw
            endsw
