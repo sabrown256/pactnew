@@ -11,6 +11,10 @@
 #ifndef PCK_ANSIC
 #define PCK_ANSIC
 
+#ifdef __OPENCC__
+# undef __GNUC__
+#endif
+
 #ifndef NO_STD_INCLUDES
 # include <stdlib.h>
 # include <string.h>

@@ -1,0 +1,79 @@
+#!/bin/csh -f
+#
+# CC-PREDEF - find the predefined macros for the specified compiler
+#
+
+unalias *
+
+set cc = ""
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: cc-predef [-h] [<cc>]"
+           echo "    h   this help message"
+           echo ""
+           exit(1)
+      default:
+           set cc = $1
+	   breaksw
+   endsw
+   shift
+end
+
+if ("$cc" == "") then
+   set cc = ( `where cc | head -n 1` )
+endif
+
+if ("$cc" !~ /*) then
+   set cc = ( `where $cc | head -n 1` )
+endif
+
+if (!(-x "$cc")) then
+   echo "No cc found or specified - exiting"
+   exit(1)
+endif
+
+switch ($cc)
+   case *pcc*:
+        breaksw
+
+   case *pgcc*:
+        $cc -E -dM
+        breaksw
+
+   case *suncc*:
+   case *sunCC*:
+        $cc -xdumpmacros -E /dev/null
+        breaksw
+
+   case *xlc*:
+        $cc -qshowmacros -E /dev/null
+        breaksw
+
+   case *mingw*:
+        $cc -E -dM -mwin32 -x -c /dev/null
+        breaksw
+
+# for C compilers
+   case *icc*:
+   case *gcc*:
+   case *gnu*:
+   case *clang*:
+   case *opencc*:
+   case *pathcc*:
+   default:
+        $cc -E -dM -x c /dev/null
+        breaksw
+
+# for C++ compilers
+   case *icpc*:
+   case *g++*:
+   case *clang++*:
+   case *openCC*:
+   case *pathCC*:
+        $cc -E -dM -x c++ /dev/null
+        breaksw
+endsw
+
+exit($status)

@@ -10,11 +10,6 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath gnu
 
-Group AF {
-   PATTERN_WARN = ":+sp+warning:"
-   PATTERN_ERR  = ":+sp+error:"
-}
-
 Tool CC {
    Exe       = gcc
    Flags     = -ffloat-store
