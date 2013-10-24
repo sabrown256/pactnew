@@ -40,19 +40,19 @@ switch ($cc)
    case *pcc*:
         breaksw
 
-   case *pgcc*:
-        $cc -E -dM
-        breaksw
-
    case *suncc*:
    case *sunCC*:
         $cc -xdumpmacros -E /dev/null
         breaksw
 
    case *xlc*:
-        $cc -qshowmacros -E /dev/null
+   case *xlC*:
+        touch $tmp
+        $cc -qshowmacros -E /dev/null $tmp
+        rm $tmp
         breaksw
 
+   case *pgcc*:
    case *mingw*:
         touch $tmp
         $cc -E -dM $tmp
