@@ -1,0 +1,55 @@
+#!/bin/csh -f
+#
+# CC-DEBUG - help debug compiler crashes by narrowing to
+#          - function causing the compiler to crash
+#
+# include cpyright.h
+#
+
+unalias *
+
+@ err = 0
+
+set file = ""
+set cmd  = "gcc"
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: cc-debug [-h] -c <file> <cmd>"
+           echo "   h   this help message"
+           echo ""
+           echo ""
+           exit(1)
+      case -c:
+           shift
+           set file = $1
+           breaksw
+      default:
+           set cmd = ( $argv )
+           break
+           breaksw
+   endsw
+   shift
+end
+
+if ("$file" == "") then
+   echo "No file specified - exiting"
+   exit(1)
+endif
+
+$cmd -c $file
+
+@ i = 0
+while ($i < 1000)
+   echo "------------------------------------------------------------"
+   echo "Pass #$i"
+   @ i = $i + 1
+   set nf = $file:r-n.c
+   elide -ns 1 -ne $i '{' '}' $file >! $nf
+   $cmd -c $nf
+break
+end
+
+exit($status)
