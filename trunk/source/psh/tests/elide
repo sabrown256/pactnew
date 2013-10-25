@@ -29,6 +29,11 @@ end
 NoteD $Log ""
 NoteD $Log "                    $msg"
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TEST 1 - try different delimiters of varying depths
+
 set List = (1 2 3)
 
 foreach t (ebasic emlt echr)
@@ -89,6 +94,75 @@ foreach t (ebasic emlt echr)
 end
 
 Note $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TEST 2 - try eliding different range sets
+
+flog $Log set dat = $FilesDir/erng.dat
+
+@ l = 0
+while ($l < 3)
+   @ l = $l + 1
+
+   @ i = 0
+   while ($i < 7)
+      @ i = $i + 1
+
+      Separator $Log
+
+      switch ($l)
+         case 1:
+              set opt = ( -ns $i )
+              breaksw
+         case 2:
+              set opt = ( -ne $i )
+              breaksw
+         case 3:
+              set opt = ( -ns $i -ne $i )
+              breaksw
+      endsw
+
+      flog $Log set res = erng${l}-${i}
+      flog $Log set ref = $RefDir/$res
+
+      set f = ( `fill-string -n 28 $res` )
+      NoteD $Log -n "                        $f "
+      Note $Log ""
+
+      echo "# elide $opt '{' '}' $dat" >&! $res
+      flog $Log ( elide $opt '{' '}' $dat >>& $res )
+      set xstatus = $status
+
+      if (-f $ref) then
+         flog $Log ( diff -w -b $res $ref >! $res.diff )
+         set xstatus = $status
+      else
+         flog $Log cp $res $ref
+         set xstatus = $status
+      endif
+
+      if ($xstatus == 0) then
+         NoteD $Log "ok"
+         flog $Log rm -f $res $res.diff
+      else
+         if (-d $res.log) then
+            flog $Log cat $res.log
+         endif
+         flog $Log cat $res
+         flog $Log cat $res.diff
+         NoteD $Log "ng"
+      endif
+
+      @ nerr = $nerr + $xstatus
+   end
+end
+
+Note $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 touch dbfoo
 set rpf = ( $rpf db* )
