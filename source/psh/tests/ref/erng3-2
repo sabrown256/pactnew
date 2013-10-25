@@ -1,0 +1,31 @@
+# elide -ns 2 -ne 2 '{' '}' /gapps/codes/pact/wrk/psh/tests/erng.dat
+/* sets 1, 2, and 3 */
+x {1} y  z {3}
+
+typedef struct s_foo foo;
+
+/* set 4 */
+struct s_foo
+   {int a;
+    double b;
+    char *c;};;
+
+foo fu;
+
+/* set 5 */
+int f1(int a)
+   {int b;
+    b = a + 3;
+    return(b);}
+
+/* set 6 */
+double f2(int a)
+   {double b;
+    b = a + 3;
+    return(b);}
+
+/* set 7 */
+int main(int c, char **v)
+   {int rv;
+    rv = 0;
+    return(rv);}
