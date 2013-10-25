@@ -16,7 +16,8 @@
 typedef struct s_parse parse;
 
 struct s_parse
-   {int n;              /* number of sets passed */
+   {int il;             /* file line number */
+    int n;              /* number of sets passed */
     int range[2];       /* range of sets to elide */
     int depth;          /* delimiter depth */
     char *delim[2];     /* delimiters */
@@ -112,8 +113,10 @@ void retained_text(char *d, int nd, char *s, parse *ip)
 	    {nc--;
 	     if (nc < 0)
 	        {nc++;
-		 nstrcat(d, BFLRG, ps);};
-	     ps = tb + ncb;};};
+		 nstrcat(d, BFLRG, ps);
+		 break;}
+	     else
+	        ps = tb + ncb;};};
 
     ip->n     = in;
     ip->depth = max(nc, 0);
@@ -147,7 +150,9 @@ int elide(char *fname, parse *ip)
 	   fp = fopen_safe(fname, "r");
 
 	for (il = 0; TRUE; il++)
-	    {p = fgets(t, BFLRG, fp);
+            {ip->il = il;
+
+	     p = fgets(t, BFLRG, fp);
 	     if (p == NULL)
 	        break;
 
