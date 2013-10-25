@@ -158,8 +158,13 @@ int elide(char *fname, parse *ip)
 
 	     LAST_CHAR(p) = '\0';
 	     
-/* remove text between quotes */
-             del_quotation(t);
+/* remove text between quotes
+ * this appears to be the right thing to do only when
+ * doing all sets
+ * perhaps this needs its own switch
+ */
+	     if ((ip->range[0] == -1) && (ip->range[1] == INT_MAX))
+	        del_quotation(t);
 
 	     retained_text(s, BFLRG, p, ip);
 
