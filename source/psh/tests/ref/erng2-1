@@ -1,4 +1,4 @@
-# elide -ne 1 '{' '}' /gapps/codes/pact/wrk/psh/tests/erng.dat
+# elide -ne 1 '{' '}' erng.dat
 /* sets 1, 2, and 3 */
 x  y {2} z {3}
 

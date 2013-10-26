@@ -100,7 +100,13 @@ Note $Log ""
 
 # TEST 2 - try eliding different range sets
 
+set f = ( `fill-string -n 28 erng` )
+NoteD $Log -n "                        $f "
+Note $Log ""
+
 flog $Log set dat = $FilesDir/erng.dat
+
+@ lerr = 0
 
 @ l = 0
 while ($l < 3)
@@ -127,11 +133,7 @@ while ($l < 3)
       flog $Log set res = erng${l}-${i}
       flog $Log set ref = $RefDir/$res
 
-      set f = ( `fill-string -n 28 $res` )
-      NoteD $Log -n "                        $f "
-      Note $Log ""
-
-      echo "# elide $opt '{' '}' $dat" >&! $res
+      echo "# elide $opt '{' '}' $dat:t" >&! $res
       flog $Log ( elide $opt '{' '}' $dat >>& $res )
       set xstatus = $status
 
@@ -144,7 +146,6 @@ while ($l < 3)
       endif
 
       if ($xstatus == 0) then
-         NoteD $Log "ok"
          flog $Log rm -f $res $res.diff
       else
          if (-d $res.log) then
@@ -152,12 +153,91 @@ while ($l < 3)
          endif
          flog $Log cat $res
          flog $Log cat $res.diff
-         NoteD $Log "ng"
       endif
 
-      @ nerr = $nerr + $xstatus
+      @ lerr = $lerr + $xstatus
    end
 end
+
+if ($lerr == 0) then
+   NoteD $Log "ok"
+else
+   NoteD $Log "ng"
+   @ nerr = $nerr + $lerr
+endif
+
+Note $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TEST 3 - try eliding and substituting different range sets
+
+set f = ( `fill-string -n 28 esub` )
+NoteD $Log -n "                        $f "
+Note $Log ""
+
+flog $Log set dat = $FilesDir/esub.dat
+
+@ lerr = 0
+
+@ l = 0
+while ($l < 3)
+   @ l = $l + 1
+
+   @ i = 0
+   while ($i < 6)
+      @ i = $i + 1
+
+      Separator $Log
+
+      switch ($l)
+         case 1:
+              set opt = ( -ns $i -s "'x_y_z'" )
+              breaksw
+         case 2:
+              set opt = ( -ne $i -s "'x_y_z'"  )
+              breaksw
+         case 3:
+              set opt = ( -ns $i -ne $i -s "'x_y_z'"  )
+              breaksw
+      endsw
+
+      flog $Log set res = esub${l}-${i}
+      flog $Log set ref = $RefDir/$res
+
+      echo "# elide $opt '{' '}' $dat:t" >&! $res
+      flog $Log ( elide $opt '{' '}' $dat >>& $res )
+      set xstatus = $status
+
+      if (-f $ref) then
+         flog $Log ( diff -w -b $res $ref >! $res.diff )
+         set xstatus = $status
+      else
+         flog $Log cp $res $ref
+         set xstatus = $status
+      endif
+
+      if ($xstatus == 0) then
+         flog $Log rm -f $res $res.diff
+      else
+         if (-d $res.log) then
+            flog $Log cat $res.log
+         endif
+         flog $Log cat $res
+         flog $Log cat $res.diff
+      endif
+
+      @ lerr = $lerr + $xstatus
+   end
+end
+
+if ($lerr == 0) then
+   NoteD $Log "ok"
+else
+   NoteD $Log "ng"
+   @ nerr = $nerr + $lerr
+endif
 
 Note $Log ""
 

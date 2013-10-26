@@ -20,8 +20,9 @@ struct s_parse
     int n;              /* number of sets passed */
     int range[2];       /* range of sets to elide */
     int depth;          /* delimiter depth */
+    int dlen[2];        /* character length of delimiters */
     char *delim[2];     /* delimiters */
-    int dlen[2];};      /* character length of delimiters */
+    char *subst;};      /* substitution text */
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -79,7 +80,7 @@ void retained_text(char *d, int nd, char *s, parse *ip)
 /* no instance of PA or PB */
 	 if (wh == NULL)
 	    {if (nc == 0)
-	        nstrcat(d, BFLRG, ps);
+	        nstrcat(d, nd, ps);
 	     ps = NULL;}
 
 /* if an instance of PA came first */
@@ -95,16 +96,17 @@ void retained_text(char *d, int nd, char *s, parse *ip)
 		        {ta  = tb++;
 			 c   = *tb;
 			 *tb = '\0';
-			 nstrcat(d, BFLRG, ps);
+			 nstrcat(d, nd, ps);
 			 *tb = c;}
 		     else
-		        {nstrcat(d, BFLRG, ps);
+		        {nstrcat(d, nd, ps);
 			 break;};}
 
 /* remove if in the range */
 		 else
 		    {*ta = '\0';
-		     nstrcat(d, BFLRG, ps);};};
+		     nstrcat(d, nd, ps);
+		     nstrcat(d, nd, ip->subst);};};
 
 	     ps = ta + nca;}
 
@@ -113,7 +115,7 @@ void retained_text(char *d, int nd, char *s, parse *ip)
 	    {nc--;
 	     if (nc < 0)
 	        {nc++;
-		 nstrcat(d, BFLRG, ps);
+		 nstrcat(d, nd, ps);
 		 break;}
 	     else
 	        ps = tb + ncb;};};
@@ -168,7 +170,8 @@ int elide(char *fname, parse *ip)
 
 	     retained_text(s, BFLRG, p, ip);
 
-	     if (ip->depth == 0)
+	     if ((ip->depth == 0) ||
+		 ((IS_NULL(s) == FALSE) && (IS_NULL(ip->subst) == FALSE)))
 	        puts(s);};
 
 	if (strcmp(fname, "-") != 0)
@@ -182,20 +185,25 @@ int elide(char *fname, parse *ip)
 /* MAIN - start it out here */
 
 int main(int c, char **v)
-   {int i, ne, ns, rv;
-    char *pa, *pb;
+   {int i, rv;
     parse ip;
 
-    ns = -1;
-    ne = INT_MAX;
-
-    pa = "";
-    pb = "";
+    ip.n        = 0;
+    ip.range[0] = -1;
+    ip.range[1] = INT_MAX;
+    ip.depth    = 0;
+    ip.delim[0] = "";
+    ip.delim[1] = "";
+    ip.subst    = "";
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: elide [-h] <start> <stop> <file>*\n");
+            {printf("Usage: elide [-h] [-ns #] [-ne #] [-s <text>] <start> <stop> <file>*\n");
              printf("   h          this help message\n");
+             printf("   ns         remove starting with this occurence\n");
+             printf("   ne         do not remove after this occurence\n");
+             printf("   s          substitute <text> for each occurence\n");
+             printf("   <text>     quoted text\n");
              printf("   <start>    starting pattern\n");
              printf("   <stop>     ending pattern\n");
              printf("Examples:\n");
@@ -204,23 +212,19 @@ int main(int c, char **v)
              printf("   elide '#if' '#endif' foo.c\n");
              printf("\n");}
 	 else if (strcmp(v[i], "-ns") == 0)
-	     ns = atol(v[++i]);
+	     ip.range[0] = atol(v[++i]);
 	 else if (strcmp(v[i], "-ne") == 0)
-	     ne = atol(v[++i]);
+	     ip.range[1] = atol(v[++i]);
+	 else if (strcmp(v[i], "-s") == 0)
+	     ip.subst = v[++i];
 	 else
-	    {if (IS_NULL(pa) == TRUE)
-	        pa = v[i];
-	     else if (IS_NULL(pb) == TRUE)
-	        pb = v[i];
+	    {if (IS_NULL(ip.delim[0]) == TRUE)
+	        ip.delim[0] = v[i];
+	     else if (IS_NULL(ip.delim[1]) == TRUE)
+	        ip.delim[1] = v[i];
 	     else
-	        {ip.n        = 0;
-		 ip.range[0] = ns;
-		 ip.range[1] = ne;
-		 ip.depth    = 0;
-		 ip.delim[0] = pa;
-		 ip.delim[1] = pb;
-		 ip.dlen[0]  = strlen(pa);
-		 ip.dlen[1]  = strlen(pb);
+	        {ip.dlen[0] = strlen(ip.delim[0]);
+		 ip.dlen[1] = strlen(ip.delim[1]);
 
 		 rv &= elide(v[i], &ip);};};};
 
