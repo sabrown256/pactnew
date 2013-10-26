@@ -1,0 +1,10 @@
+# elide -ne 5 -s 'x_y_z' '{' '}' esub.dat
+/* sets 1, 2, and 3 */
+x 'x_y_z' y 'x_y_z' z 'x_y_z'
+
+/* set 4 */
+e1 'x_y_z'
+
+/* set 5 and 6 */
+e2 'x_y_z' e3 {1 2 {3}}
+

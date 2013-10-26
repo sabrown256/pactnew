@@ -1,4 +1,3 @@
-# elide -ns 6 '{' '}' erng.dat
 /* sets 1, 2, and 3 */
 x {1} y {2} z {3}
 
@@ -20,8 +19,12 @@ int f1(int a)
 
 /* set 6 */
 double f2(int a)
-
+   {double b;
+    b = a + 3;
+    return(b);}
 
 /* set 7 */
 int main(int c, char **v)
-
+   {int rv;
+    rv = 0;
+    return(rv);}
