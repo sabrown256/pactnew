@@ -39,17 +39,42 @@ if ("$file" == "") then
    exit(1)
 endif
 
-$cmd -c $file
+$cmd -c $file >&! $file.res
+set xstatus = $status
 
+set ok = TRUE
+
+@ n = 20
 @ i = 0
-while ($i < 1000)
-   echo "------------------------------------------------------------"
-   echo "Pass #$i"
+while ($i < $n)
    @ i = $i + 1
+#   echo "------------------------------------------------------------"
+#   echo "Pass #$i"
    set nf = $file:r-n.c
-   elide -ns 1 -ne $i '{' '}' $file >! $nf
-   $cmd -c $nf
-break
+   elide -ns 1 -ne $i -s ';' '{' '}' $file >! $nf
+   grep '{' $nf >& /dev/null
+   if ($status == 0) then
+      $cmd -c $nf >&! $nf.res
+      if ($status != $xstatus) then
+         echo "Status changed at expression #$i"
+         set ok = FALSE
+      else
+         diff $nf.res $file.res >& /dev/null
+         if ($status != 0) then
+            echo "Results changed at expression #$i"
+            set ok = FALSE
+         endif
+      endif
+      if ($ok == FALSE) then
+         @ i = $i - 1
+         elide -ns 1 -ne $i -s ';' '{' '}' $file >! $nf
+         break
+      endif
+   else
+      break
+   endif
 end
+
+rm $file.res $nf.res
 
 exit($status)
