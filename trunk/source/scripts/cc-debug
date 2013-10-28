@@ -39,42 +39,130 @@ if ("$file" == "") then
    exit(1)
 endif
 
-$cmd -c $file >&! $file.res
-set xstatus = $status
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-set ok = TRUE
+# count expressions delimited by { and }
 
-@ n = 20
-@ i = 0
-while ($i < $n)
-   @ i = $i + 1
-#   echo "------------------------------------------------------------"
-#   echo "Pass #$i"
-   set nf = $file:r-n.c
-   elide -ns 1 -ne $i -s ';' '{' '}' $file >! $nf
-   grep '{' $nf >& /dev/null
-   if ($status == 0) then
-      $cmd -c $nf >&! $nf.res
-      if ($status != $xstatus) then
-         echo "Status changed at expression #$i"
-         set ok = FALSE
-      else
-         diff $nf.res $file.res >& /dev/null
-         if ($status != 0) then
-            echo "Results changed at expression #$i"
-            set ok = FALSE
-         endif
-      endif
-      if ($ok == FALSE) then
-         @ i = $i - 1
-         elide -ns 1 -ne $i -s ';' '{' '}' $file >! $nf
-         break
-      endif
+echo -n "counting all expressions ... "
+
+set nf = $file:r-count.c
+@ nu = 100000
+@ nl = 1
+@ n  = $nu
+while (1)
+   elide -ns 1 -ne $n -s ';' '{' '}' $file >! $nf
+   @ nc = `grep '{' $nf | wc -l`
+   if ($nc == 0) then
+      @ nu = $n
    else
+      @ nl = $n
+   endif
+   if ($nl == $nu - 1) then
       break
    endif
+   @ n = ( $nl + $nu ) / 2
+end
+rm -f $nf
+unset nf
+unset nu
+unset nl
+
+echo "$n expressions"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# get baseline compiler messages and status for comparison
+
+set cres = $file.res
+
+$cmd -c $file >&! $cres
+set bstatus = $status
+@  nlb = `cat $file | wc -l`
+
+echo "crash status ............... $bstatus ($nlb)"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# outer loop tries to discover functions
+# that matter for compiler crash
+
+echo -n "finding fatal expressions "
+
+set base = $file:r
+set cf   = $file
+
+rm -f tmp-${base}-*.c* >& /dev/null
+
+@ l  = 0
+@ nx = $n
+while ($l < $nx)
+   @ i = $l
+   @ l = $l + 1
+
+   set nf  = tmp-${base}-${l}.c
+   set nres = $nf.res
+   @  nlc   = `cat $cf | wc -l`
+   set ok   = TRUE
+
+# inner loop tries to eliminate functions
+# that do not matter for compiler crash
+   while ($i < $n)
+      @ i = $i + 1
+
+      elide -ns $l -ne $i -s ';' '{' '}' $cf >! $nf
+      grep '{' $nf >& /dev/null
+      if ($status == 0) then
+         $cmd -c $nf >&! $nres
+         set xstatus = $status
+         if ($xstatus != $bstatus) then
+            echo -n "o"
+#            echo "   status changed at expression #$i ($xstatus)"
+            set ok = FALSE
+         else
+            @ nlr = `cat $nres | wc -l`
+            diff $nres $cres >& /dev/null
+            if ($status != 0) then
+               echo -n "x"
+#               echo "   results changed at expression #$i ($nlr)"
+               set ok = FALSE
+            endif
+         endif
+         if ($ok == FALSE) then
+            @ i = $i - 1
+            if ($i < $l) then
+               @ i = $l
+            endif
+            elide -ns $l -ne $i -s ';' '{' '}' $cf >! $nf
+@ n = $n - $i + 1
+            break
+         else
+            echo -n "."
+         endif
+      else
+         break
+      endif
+   end
+
+# if nothing new was discovered then quit
+   if ($ok == TRUE) then
+      break
+   endif
+
+   set cf   = $nf
+   set cres = $nres
 end
 
-rm $file.res $nf.res
+@ ne = $l - 1
+echo " done ($ne)"
+echo "results in ${base}-crash.c"
 
-exit($status)
+mv $nf ${base}-crash.c
+rm -f tmp-${base}-*.c* >& /dev/null
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)
