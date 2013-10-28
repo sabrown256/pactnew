@@ -17,12 +17,14 @@ typedef struct s_parse parse;
 
 struct s_parse
    {int il;             /* file line number */
-    int n;              /* number of sets passed */
-    int range[2];       /* range of sets to elide */
+    int ne;             /* number of expression sets passed */
     int depth;          /* delimiter depth */
+    int keep;           /* keep the current set */
     int dlen[2];        /* character length of delimiters */
+    int range[2];       /* range of sets to elide */
     char *delim[2];     /* delimiters */
-    char *subst;};      /* substitution text */
+    char *subst;        /* substitution text */
+    char *part[4];};    /* partitions of current line */
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -45,83 +47,183 @@ void del_quotation(char *t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PARTITION_TEXT - partition PS */
+
+static void partition_text(parse *ip, char *ps)
+   {int depth, nca, ncb;
+    char *ta, *tb, *wh, *pa, *pb;
+
+    depth = ip->depth;
+    pa    = ip->delim[0];
+    pb    = ip->delim[1];
+    nca   = ip->dlen[0];
+    ncb   = ip->dlen[1];
+
+    ta = strstr(ps, pa);
+    tb = strstr(ps, pb);
+    if ((ta != NULL) && (ta[nca] != '\'') &&
+	(tb != NULL) && (tb[ncb] != '\''))
+       wh = (ta < tb) ? ta : tb;
+    else if ((ta != NULL) && (ta[nca] != '\''))
+       wh = ta;
+    else if ((tb != NULL) && (tb[ncb] != '\''))
+       wh = tb;
+    else
+       wh = NULL;
+
+    ip->keep = (depth > 0) ? ip->keep : FALSE;
+
+    ip->part[0] = ps;      /* text fragment */
+    ip->part[1] = ta;      /* start of begin delimiter in fragment */
+    ip->part[2] = tb;      /* start of end delimiter in fragment */
+    ip->part[3] = wh;      /* actionable part of fragment */
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DELIM_BEGIN - handle case where PS has a beginning delimiter first */
+
+static int delim_begin(parse *ip, char *d, int nd)
+   {int c, nset, ns, ne, nca, ncb, depth, rv;
+    char *ps, *pb, *ta, *tb;
+
+    rv = TRUE;
+
+    nset  = ip->ne;
+    depth = ip->depth;
+    ns    = ip->range[0];
+    ne    = ip->range[1];
+    ps    = ip->part[0];
+    ta    = ip->part[1];
+    tb    = ip->part[2];
+    pb    = ip->delim[1];
+    nca   = ip->dlen[0];
+    ncb   = ip->dlen[1];
+
+    depth++;
+    if (depth == 1)
+
+/* keep if out of the range */
+       {nset++;
+	if ((nset < ns) || (ne < nset))
+	   {ip->keep = TRUE;
+	    if (tb != NULL)
+	       {ta  = tb++;
+		c   = *tb;
+		*tb = '\0';
+		nstrcat(d, nd, ps);
+		*tb = c;
+		if (strncmp(ta, pb, ncb) == 0)
+		   depth--;}
+	    else
+	       {nstrcat(d, nd, ps);
+		rv = FALSE;};}
+
+/* remove if in the range */
+	else
+	   {*ta = '\0';
+	    nstrcat(d, nd, ps);
+	    nstrcat(d, nd, ip->subst);};
+
+        ps = ta + nca;}
+
+    else if (ip->keep == TRUE)
+       {nstrcat(d, nd, ps);
+        ps = NULL;}
+
+    else
+       ps = ta + nca;
+
+    ip->ne      = nset;
+    ip->depth   = depth;
+    ip->part[0] = ps;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DELIM_END - handle case where PS has a ending delimiter first */
+
+static int delim_end(parse *ip, char *d, int nd)
+   {int ncb, depth, rv;
+    char *ps, *tb;
+
+    rv = TRUE;
+
+    depth = ip->depth;
+    ps    = ip->part[0];
+    tb    = ip->part[2];
+    ncb   = ip->dlen[1];
+
+    depth--;
+    if (depth < 0)
+       {depth++;
+	nstrcat(d, nd, ps);
+	ps = NULL;
+	rv = FALSE;}
+
+    else if (ip->keep == TRUE)
+       {nstrcat(d, nd, ps);
+	ps = NULL;}
+
+    else
+       ps = tb + ncb;
+
+    ip->depth   = depth;
+    ip->part[0] = ps;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* NON_DELIM_TEXT - handle text with no delimiters */
+
+static void non_delim_text(parse *ip, char *d, int nd)
+   {char *ps;
+
+    if ((ip->depth == 0) || (ip->keep == TRUE))
+       {ps = ip->part[0];
+	nstrcat(d, nd, ps);};
+
+    ip->part[0] = NULL;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* RETAINED_TEXT - find the text in S that is to be kept
  *               - return it in D
  */
 
 void retained_text(char *d, int nd, char *s, parse *ip)
-   {int c, nc, ns, in, ne, nca, ncb;
-    char *pa, *pb, *ta, *tb, *wh, *ps;
-
-    in  = ip->n;
-    nc  = ip->depth;
-    ns  = ip->range[0];
-    ne  = ip->range[1];
-    pa  = ip->delim[0];
-    pb  = ip->delim[1];
-    nca = ip->dlen[0];
-    ncb = ip->dlen[1];
+   {int ok;
+    char *ps;
 
     d[0] = '\0';
 
-    for (ps = s; IS_NULL(ps) == FALSE; )
-        {ta = strstr(ps, pa);
-	 tb = strstr(ps, pb);
-	 if ((ta != NULL) && (ta[nca] != '\'') &&
-	     (tb != NULL) && (tb[ncb] != '\''))
-	    wh = (ta < tb) ? ta : tb;
-	 else if ((ta != NULL) && (ta[nca] != '\''))
-	    wh = ta;
-	 else if ((tb != NULL) && (tb[ncb] != '\''))
-	    wh = tb;
-	 else
-	    wh = NULL;
+    ok = TRUE;
 
+    for (ps = s; (IS_NULL(ps) == FALSE) && (ok == TRUE); )
+        {partition_text(ip, ps);
+		     
 /* no instance of PA or PB */
-	 if (wh == NULL)
-	    {if (nc == 0)
-	        nstrcat(d, nd, ps);
-	     ps = NULL;}
+	 if (ip->part[3] == NULL)
+            non_delim_text(ip, d, nd);
 
 /* if an instance of PA came first */
-	 else if (wh == ta)
-	    {nc++;
-	     if (nc == 1)
-
-/* keep if out of the range */
-	        {in++;
-		 if ((in < ns) || (ne < in))
-		    {nc--;
-		     if (tb != NULL)
-		        {ta  = tb++;
-			 c   = *tb;
-			 *tb = '\0';
-			 nstrcat(d, nd, ps);
-			 *tb = c;}
-		     else
-		        {nstrcat(d, nd, ps);
-			 break;};}
-
-/* remove if in the range */
-		 else
-		    {*ta = '\0';
-		     nstrcat(d, nd, ps);
-		     nstrcat(d, nd, ip->subst);};};
-
-	     ps = ta + nca;}
+	 else if (ip->part[3] == ip->part[1])
+	    ok = delim_begin(ip, d, nd);
 
 /* if an instance of PB came first */
-	 else if (wh == tb)
-	    {nc--;
-	     if (nc < 0)
-	        {nc++;
-		 nstrcat(d, nd, ps);
-		 break;}
-	     else
-	        ps = tb + ncb;};};
+	 else if (ip->part[3] == ip->part[2])
+	    ok = delim_end(ip, d, nd);
 
-    ip->n     = in;
-    ip->depth = max(nc, 0);
+	 ps = ip->part[0];};
 
     return;}
 
@@ -170,7 +272,7 @@ int elide(char *fname, parse *ip)
 
 	     retained_text(s, BFLRG, p, ip);
 
-	     if ((ip->depth == 0) ||
+	     if ((ip->depth == 0) || (ip->keep == TRUE) ||
 		 ((IS_NULL(s) == FALSE) && (IS_NULL(ip->subst) == FALSE)))
 	        puts(s);};
 
@@ -188,10 +290,11 @@ int main(int c, char **v)
    {int i, rv;
     parse ip;
 
-    ip.n        = 0;
+    ip.ne       = 0;
+    ip.keep     = FALSE;
+    ip.depth    = 0;
     ip.range[0] = -1;
     ip.range[1] = INT_MAX;
-    ip.depth    = 0;
     ip.delim[0] = "";
     ip.delim[1] = "";
     ip.subst    = "";
