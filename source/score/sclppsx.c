@@ -110,13 +110,13 @@ static int _SC_posix_setup_tty(PROCESS *pp, int child)
 	   {p  = SC_get_perm(FALSE);
             in = SC_open_safe(pp->spty, O_RDWR & ~NONBLOCK, p);
             if (in < 0)
-               SC_error(-1, "COULDN'T OPEN SLAVE %s - _SC_POSIX_SETUP_TTY",
+               SC_error(-1, "COULD NOT OPEN SLAVE %s - _SC_POSIX_SETUP_TTY",
                         pp->spty);
 
 /* now close the master */
             if (in != pp->io[0])
                {if (SC_close_safe(pp->io[0]) < 0)
-                   SC_error(-1, "COULDN'T CLOSE MASTER - _SC_POSIX_SETUP_TTY");};
+                   SC_error(-1, "COULD NOT CLOSE MASTER - _SC_POSIX_SETUP_TTY");};
 
 	    tty = pp->tty;
 	    if (tty != NULL)
@@ -269,10 +269,10 @@ static int _SC_posix_exec(PROCESS *cp, char **argv, char **env, char *mode)
 	if (cio[1] != cio[0])
 	   {if (SC_close_safe(cio[1]) < 0)
 	       SC_error(SC_NO_CLOSE,
-			"COULDN'T CLOSE STDOUT - _SC_POSIX_EXEC");};
+			"COULD NOT CLOSE STDOUT - _SC_POSIX_EXEC");};
 
 	if (SC_close_safe(cio[0]) < 0)
-	   SC_error(SC_NO_CLOSE, "COULDN'T CLOSE STDIN - _SC_POSIX_EXEC");
+	   SC_error(SC_NO_CLOSE, "COULD NOT CLOSE STDIN - _SC_POSIX_EXEC");
 
 /* if this is a binary connection inform the parent of the binary formats */
 	if (cp->data_type == SC_BINARY)
@@ -283,7 +283,7 @@ static int _SC_posix_exec(PROCESS *cp, char **argv, char **env, char *mode)
 
 	    _SC.terminal = cp;
 	    if (!(*cp->send_formats)())
-	       SC_error(SC_NO_FMT, "COULDN'T SEND FORMATS - _SC_POSIX_EXEC");}
+	       SC_error(SC_NO_FMT, "COULD NOT SEND FORMATS - _SC_POSIX_EXEC");}
 	else
 	   _SC.terminal = NULL;
 

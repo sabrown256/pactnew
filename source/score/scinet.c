@@ -356,7 +356,7 @@ static int _SC_connect_to(sckades ad, int to, int fm)
 
 	fd = socket(PF_INET, SOCK_STREAM, 0);
 	if (fd < 0)
-	   SC_error(-1, "CAN'T OPEN SOCKET - _SC_CONNECT_TO");
+	   SC_error(-1, "CANNOT OPEN SOCKET - _SC_CONNECT_TO");
 		
 /* find out whether the socket is already blocked */
 	blck = SC_isblocked_fd(fd);
@@ -417,7 +417,7 @@ int _SC_tcp_connect(char *host, int port, int to, int fm)
 	    if (srva.in != NULL)
 	       {fd = _SC_connect_to(srva, to, fm);
 		if (fd < 0)
-		   SC_error(-1, "CAN'T CONNECT TO SERVER (%d) - _SC_TCP_CONNECT",
+		   SC_error(-1, "CANNOT CONNECT TO SERVER (%d) - _SC_TCP_CONNECT",
 			    errno);};
 
 	    CFREE(srva.in);};};

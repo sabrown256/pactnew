@@ -53,7 +53,7 @@ foreach t (ebasic emlt echr)
 
       switch ($i)
          case 1:
-              flog $Log ( elide '/*' '*/' $dat >&! $res )
+              flog $Log ( elide -q '/*' '*/' $dat >&! $res )
               set xstatus = $status
               breaksw
          case 2:

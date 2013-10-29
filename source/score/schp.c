@@ -422,7 +422,7 @@ static int _SC_init_pty(PROCESS *pp, PROCESS *cp)
 
     ret = (*open_pty)(pp, cp);
     if (ret == FALSE)
-       SC_error(-1, "CAN'T OPEN PTY - _SC_INIT_IPC");
+       SC_error(-1, "CANNOT OPEN PTY - _SC_INIT_IPC");
 
     nr = -1;
     nc = -1;
@@ -483,14 +483,14 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
               if (pipe(ports) < 0)
                  {SC_close_safe(pp->io[0]);
                   SC_close_safe(cp->io[1]);
-                  SC_error(-1, "COULDN'T CREATE PIPE #1 - _SC_INIT_IPC");};
+                  SC_error(-1, "COULD NOT CREATE PIPE #1 - _SC_INIT_IPC");};
 
               cp->io[0] = ports[0];
               pp->io[1] = ports[1];
 
 /* child stdout */
               if (pipe(ports) < 0)
-                 SC_error(-1, "COULDN'T CREATE PIPE #2 - _SC_INIT_IPC");
+                 SC_error(-1, "COULD NOT CREATE PIPE #2 - _SC_INIT_IPC");
 
               cp->io[1] = ports[1];
               pp->io[0] = ports[0];
@@ -499,7 +499,7 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
               if (pipe(ports) < 0)
                  {SC_close_safe(pp->io[0]);
                   SC_close_safe(cp->io[1]);
-                  SC_error(-1, "COULDN'T CREATE PIPE #3 - _SC_INIT_IPC");};
+                  SC_error(-1, "COULD NOT CREATE PIPE #3 - _SC_INIT_IPC");};
 
               cp->io[2] = ports[0];
               pp->io[2] = ports[1];
@@ -522,13 +522,13 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
                  {SC_close_safe(pp->io[0]);
                   SC_close_safe(cp->io[1]);
-                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #1 - _SC_INIT_IPC");};
+                  SC_error(-1, "COULD NOT CREATE SOCKET PAIR #1 - _SC_INIT_IPC");};
               cp->io[0] = ports[0];
               pp->io[1] = ports[1];
 
 /* child stdout */
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
-                 SC_error(-1, "COULDN'T CREATE SOCKET PAIR #2 - _SC_INIT_IPC");
+                 SC_error(-1, "COULD NOT CREATE SOCKET PAIR #2 - _SC_INIT_IPC");
               cp->io[1] = ports[1];
               pp->io[0] = ports[0];
 
@@ -536,7 +536,7 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
                  {SC_close_safe(pp->io[0]);
                   SC_close_safe(cp->io[1]);
-                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #3 - _SC_INIT_IPC");};
+                  SC_error(-1, "COULD NOT CREATE SOCKET PAIR #3 - _SC_INIT_IPC");};
               cp->io[2] = ports[1];
               pp->io[2] = ports[0];
 
@@ -667,7 +667,7 @@ static void _SC_error_fork(PROCESS *pp, PROCESS *cp)
 
     cp->release(cp);
 
-    SC_error(-1, "COULDN'T FORK PROCESS - _SC_ERROR_FORK");
+    SC_error(-1, "COULD NOT FORK PROCESS - _SC_ERROR_FORK");
 
     return;}
 
@@ -1054,7 +1054,7 @@ static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
 	CFREE(pp);
 	CFREE(cp->tty);
         CFREE(cp);
-        SC_error(-1, "COULDN'T CREATE IPC CHANNELS - _SC_SETUP_PROC");
+        SC_error(-1, "COULD NOT CREATE IPC CHANNELS - _SC_SETUP_PROC");
 	return(-1);};
 
 /* disable SIGTTOU when running in background */
@@ -2132,7 +2132,7 @@ int SC_init_server(int step, int closep)
 	   {case SC_GET_PORT :
 	         _SC.sfd = socket(PF_INET, SOCK_STREAM, 0);
 		 if (_SC.sfd < 0)
-		    SC_error(-1, "COULDN'T OPEN SOCKET - SC_INIT_SERVER");
+		    SC_error(-1, "COULD NOT OPEN SOCKET - SC_INIT_SERVER");
 
 		 _SC_diagnostic("      Socket opened: %d\n", _SC.sfd);
 

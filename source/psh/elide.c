@@ -16,15 +16,18 @@
 typedef struct s_parse parse;
 
 struct s_parse
-   {int il;             /* file line number */
-    int ne;             /* number of expression sets passed */
-    int depth;          /* delimiter depth */
-    int keep;           /* keep the current set */
-    int dlen[2];        /* character length of delimiters */
-    int range[2];       /* range of sets to elide */
-    char *delim[2];     /* delimiters */
-    char *subst;        /* substitution text */
-    char *part[4];};    /* partitions of current line */
+   {int il;                 /* file line number */
+    int ne;                 /* number of expression sets passed */
+    int depth;              /* delimiter depth */
+    int keep;               /* keep the current set */
+    int dquote;             /* delete text in quotes to simplify work */
+    int dlen[2];            /* character length of delimiters */
+    int range[2];           /* range of sets to elide */
+    token_flag fl;          /* modifiers for quote handling */
+    char *delim[2];         /* delimiters */
+    char *subst;            /* substitution text */
+    char *part[4];          /* partitions of current line */
+    char bf[2][BFLRG];};    /* working text buffers */
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -50,32 +53,47 @@ void del_quotation(char *t)
 /* PARTITION_TEXT - partition PS */
 
 static void partition_text(parse *ip, char *ps)
-   {int depth, nca, ncb;
-    char *ta, *tb, *wh, *pa, *pb;
+   {int i, ns;
+    int ln[2], acc[2];
+    char *ta[2], *wh;
 
-    depth = ip->depth;
-    pa    = ip->delim[0];
-    pb    = ip->delim[1];
-    nca   = ip->dlen[0];
-    ncb   = ip->dlen[1];
+#define TESTWAY
 
-    ta = strstr(ps, pa);
-    tb = strstr(ps, pb);
-    if ((ta != NULL) && (ta[nca] != '\'') &&
-	(tb != NULL) && (tb[ncb] != '\''))
-       wh = (ta < tb) ? ta : tb;
-    else if ((ta != NULL) && (ta[nca] != '\''))
-       wh = ta;
-    else if ((tb != NULL) && (tb[ncb] != '\''))
-       wh = tb;
+#ifdef TESTWAY
+char *tb[2];
+#endif
+    ns = strlen(ps);
+    for (i = 0; i < 2; i++)
+        {ln[i]  = strcpy_str(ip->bf[i], BFLRG, ps, ns,
+			     ip->delim[i], ip->fl);
+#ifdef TESTWAY
+	 tb[i]  = strstr(ps, ip->delim[i]);
+#endif
+	 ta[i]  = (ln[i] == ns) ? NULL : ps + ln[i];
+	 acc[i] = ((IS_NULL(ta[i]) == FALSE) &&
+		   (ta[i][ip->dlen[i]] != '\''));};
+
+#ifdef TESTWAY
+int err;
+err = TRUE;
+for (i = 0; i < 2; i++)
+    err &= (ta[i] == tb[i]);
+#endif
+
+    if (acc[0] && acc[1])
+       wh = min(ta[0], ta[1]);
+    else if (acc[0])
+       wh = ta[0];
+    else if (acc[1])
+       wh = ta[1];
     else
        wh = NULL;
 
-    ip->keep = (depth > 0) ? ip->keep : FALSE;
+    ip->keep = (ip->depth > 0) ? ip->keep : FALSE;
 
     ip->part[0] = ps;      /* text fragment */
-    ip->part[1] = ta;      /* start of begin delimiter in fragment */
-    ip->part[2] = tb;      /* start of end delimiter in fragment */
+    ip->part[1] = ta[0];   /* start of begin delimiter in fragment */
+    ip->part[2] = ta[1];   /* start of end delimiter in fragment */
     ip->part[3] = wh;      /* actionable part of fragment */
 
     return;}
@@ -267,7 +285,7 @@ int elide(char *fname, parse *ip)
  * doing all sets
  * perhaps this needs its own switch
  */
-	     if ((ip->range[0] == -1) && (ip->range[1] == INT_MAX))
+	     if (ip->dquote == TRUE)
 	        del_quotation(t);
 
 	     retained_text(s, BFLRG, p, ip);
@@ -293,6 +311,8 @@ int main(int c, char **v)
     ip.ne       = 0;
     ip.keep     = FALSE;
     ip.depth    = 0;
+    ip.dquote   = FALSE;
+    ip.fl       = 0;
     ip.range[0] = -1;
     ip.range[1] = INT_MAX;
     ip.delim[0] = "";
@@ -301,10 +321,12 @@ int main(int c, char **v)
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: elide [-h] [-ns #] [-ne #] [-s <text>] <start> <stop> <file>*\n");
+            {printf("Usage: elide [-d] [-h] [-ns #] [-ne #] [-q] [-s <text>] <start> <stop> <file>*\n");
+             printf("   d          delete text in quotes to simplify\n");
              printf("   h          this help message\n");
              printf("   ns         remove starting with this occurence\n");
              printf("   ne         do not remove after this occurence\n");
+             printf("   q          ignore single quotes\n");
              printf("   s          substitute <text> for each occurence\n");
              printf("   <text>     quoted text\n");
              printf("   <start>    starting pattern\n");
@@ -313,11 +335,16 @@ int main(int c, char **v)
              printf("   elide '{' '}' foo.c\n");
              printf("   elide '/*' '*/' foo.c\n");
              printf("   elide '#if' '#endif' foo.c\n");
-             printf("\n");}
+             printf("\n");
+             return(1);}
+	 else if (strcmp(v[i], "-d") == 0)
+	     ip.dquote = TRUE;
 	 else if (strcmp(v[i], "-ns") == 0)
 	     ip.range[0] = atol(v[++i]);
 	 else if (strcmp(v[i], "-ne") == 0)
 	     ip.range[1] = atol(v[++i]);
+	 else if (strcmp(v[i], "-q") == 0)
+	     ip.fl |= SINGLE_QUOTES;
 	 else if (strcmp(v[i], "-s") == 0)
 	     ip.subst = v[++i];
 	 else

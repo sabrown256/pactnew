@@ -181,7 +181,7 @@ Note $Log ""
 # FIND_CC_DECL - process the C declarations
 #
 #              - the transformations are:
-#   elide '/*' '*/' $Cfiles                        remove C comments
+#   elide -q '/*' '*/' $Cfiles                     remove C comments
 #   elide '{' '}' -                                remove compound statements
 #   awk '$NF ~ /\\/ { printf("%s ", $0); }         merge lines ending in  \
 #        $NF !~ /\\/ { printf("%s\n", $0); }'  
@@ -200,8 +200,9 @@ Note $Log ""
    flog $Log set cproto = $dst/$d.protoc
 
    if ("$Cfiles" != "") then
+      Note $Log "target = $tgt"
       if ($tgt == files) then
-         elide '/*' '*/' $Cfiles                         | \
+         elide -q '/*' '*/' $Cfiles                      | \
          elide '{' '}' -                                 | \
          awk '$NF ~ /\\/ { printf("%s ", $0); }            \
               $NF !~ /\\/ { printf("%s\n", $0); }'       | \
@@ -222,7 +223,7 @@ Note $Log ""
 #         cat
 #exit(1)
       else
-         elide '/*' '*/' $Cfiles                         | \
+         elide -q '/*' '*/' $Cfiles                      | \
          elide '{' '}' -                                 | \
          awk '$NF ~ /\\/ { printf("%s ", $0); }            \
               $NF !~ /\\/ { printf("%s\n", $0); }'       | \
@@ -242,6 +243,7 @@ Note $Log ""
          sort                                            | \
          cat >&! $cproto
       endif
+      flog $Log wc -l $cproto
    else
       flog $Log rm -f $cproto
       flog $Log touch $cproto

@@ -1,9 +1,41 @@
-void foo(int na)
-   {if (c == )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+" quote 7 /* - delimiter is in quoted string - look ahead for end quote "
+
+" quote 8 /* - delimiter is in quoted string with \" "
+
+
+void f1(int na)
+   {if (c == "({[")
        {(c == '{')
         (c != '}')
 	(c == '{')};
     return;}
 
-void bar(void)
+
+void f2(void)
    {return;}
+
+
+void f3(int na)
+   {{f("a'b");}
+    return;}
+
+#if 0
+
+void f4(void)
+   {return;}
+#endif
+

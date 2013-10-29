@@ -596,7 +596,7 @@ static int SC_set_fd_async_streams(int fd, int state)
 	       hnd = SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
 					0, BLOCK_WITH_SIGIO, -1);
 	       if (hnd.f == SIG_ERR)
-	          SC_error(-1, "CAN'T SET SIGIO HANDLER - SC_SET_FD_ASYNC_STREAMS");
+	          SC_error(-1, "CANNOT SET SIGIO HANDLER - SC_SET_FD_ASYNC_STREAMS");
 	    END_SAFE;};
 #endif
 
@@ -663,7 +663,7 @@ int SC_set_fd_async_fasync(int fd, int state, int pid)
 	       hnd = SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
 					0, BLOCK_WITH_SIGIO, -1);
 	       if (hnd.f == SIG_ERR)
-	          SC_error(-1, "CAN'T SET SIGIO HANDLER - SC_SET_FD_ASYNC_FASYNC");
+	          SC_error(-1, "CANNOT SET SIGIO HANDLER - SC_SET_FD_ASYNC_FASYNC");
 	    END_SAFE;};
 
 	rv = TRUE;};
