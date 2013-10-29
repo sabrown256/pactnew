@@ -12,19 +12,30 @@ unalias *
 
 set file = ""
 set cmd  = "gcc"
+set vrb  = FALSE
+set str  = FALSE
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: cc-debug [-h] -c <file> <cmd>"
-           echo "   h   this help message"
-           echo ""
+           echo "Usage: cc-debug [-h] [-s] [-v] -c <file> <cmd>"
+           echo "   c     the file that causes the compiler crash"
+           echo "   h     this help message"
+           echo "   s     strip comments from final result"
+           echo "   v     verbose mode"
+           echo "   <cmd> the compilation command without the file"
            echo ""
            exit(1)
       case -c:
            shift
            set file = $1
+           breaksw
+      case -s:
+           set str = TRUE
+           breaksw
+      case -v:
+           set vrb = TRUE
            breaksw
       default:
            set cmd = ( $argv )
@@ -36,6 +47,12 @@ end
 
 if ("$file" == "") then
    echo "No file specified - exiting"
+   exit(1)
+endif
+
+set exe = ( `which $cmd[1]` )
+if (!(-x "$exe")) then
+   echo "No such executable '$cmd[1]' - exiting"
    exit(1)
 endif
 
@@ -79,88 +96,171 @@ set cres = $file.res
 
 $cmd -c $file >&! $cres
 set bstatus = $status
-@  nlb = `cat $file | wc -l`
+@  nlb = `cat $cres | wc -l`
 
 echo "crash status ............... $bstatus ($nlb)"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# outer loop tries to discover functions
-# that matter for compiler crash
-
-echo -n "finding fatal expressions "
+echo "finding fatal expressions"
 
 set base = $file:r
 set cf   = $file
 
 rm -f tmp-${base}-*.c* >& /dev/null
 
-@ l  = 0
-@ nx = $n
-while ($l < $nx)
-   @ i = $l
-   @ l = $l + 1
+# outer loop iterates to convergence - i.e. no changes
+set lkf = $cf
 
-   set nf  = tmp-${base}-${l}.c
-   set nres = $nf.res
-   @  nlc   = `cat $cf | wc -l`
-   set ok   = TRUE
+@ k  = 0
+@ na = $n
+while ($k < $na)
+   @ k = $k + 1
+
+   echo -n "   iteration $k "
+
+# middle loop tries to discover functions
+# that matter for compiler crash
+
+   @ j  = 0
+   @ nx = $n
+   while ($j < $nx)
+      @ i = $j
+      @ j = $j + 1
+
+      set nf  = tmp-${base}-${k}-${j}.c
+      set nres = $nf.res
+      @  nlc   = `cat $cf | wc -l`
+      @ brk    = 0
+      set ok   = TRUE
+
+      if ($vrb == TRUE) then
+         echo ""
+         echo "   $j> working with $cf ($nlc)"
+      endif
 
 # inner loop tries to eliminate functions
 # that do not matter for compiler crash
-   while ($i < $n)
-      @ i = $i + 1
 
-      elide -ns $l -ne $i -s ';' '{' '}' $cf >! $nf
-      grep '{' $nf >& /dev/null
-      if ($status == 0) then
-         $cmd -c $nf >&! $nres
-         set xstatus = $status
-         if ($xstatus != $bstatus) then
-            echo -n "o"
-#            echo "   status changed at expression #$i ($xstatus)"
-            set ok = FALSE
-         else
-            @ nlr = `cat $nres | wc -l`
-            diff $nres $cres >& /dev/null
-            if ($status != 0) then
-               echo -n "x"
-#               echo "   results changed at expression #$i ($nlr)"
+      while (($i < $n) && ($brk == 0))
+         @ i = $i + 1
+
+         elide -ns $j -ne $i -s ';' '{' '}' $cf >! $nf
+         if ($vrb == TRUE) then
+            echo "      ${k}.${j}.${i}> elide -ns $j -ne $i -s ';' '{' '}' $cf -> $nf (`cat $nf | wc -l`)"
+         endif
+         grep '{' $nf >& /dev/null
+         if ($status == 0) then
+            $cmd -c $nf >&! $nres
+            set xstatus = $status
+            if ($vrb == TRUE) then
+               echo "      ${k}.${j}.${i}> $cmd -c $nf -> $xstatus (`cat $nres | wc -l`)"
+            endif
+            if ($xstatus != $bstatus) then
+               echo -n "o"
                set ok = FALSE
+            else
+               @ nlr = `cat $nres | wc -l`
+               diff $nres $cres >& /dev/null
+               if ($status != 0) then
+                  echo -n "x"
+                  set ok = FALSE
+               endif
             endif
-         endif
-         if ($ok == FALSE) then
-            @ i = $i - 1
-            if ($i < $l) then
-               @ i = $l
+            if ($ok == FALSE) then
+               @ brk = 1
+            else
+               echo -n "."
             endif
-            elide -ns $l -ne $i -s ';' '{' '}' $cf >! $nf
-@ n = $n - $i + 1
-            break
          else
-            echo -n "."
+            if ($vrb == TRUE) then
+               echo "      ${k}.${j}.${i}> no more expressions"
+            endif
+
+# if deleting the first expression drains the file - take note
+            if ($i == 1) then
+               @ brk = 3
+            else
+               @ brk = 2
+            endif
          endif
-      else
-         break
+         if ($vrb == TRUE) then
+            echo ""
+         endif
+      end                   # end of inner loop i
+
+# if we broke out it was because we went one expression
+# too far and there was no compiler crash
+# so reconstruct the previous file
+      if ($brk != 0) then
+         @ i = $i - 1
+         if ($i < $j) then
+            @ i = $j
+         endif
+         elide -ns $j -ne $i -s ';' '{' '}' $cf >! $nf
+         @ n = $n - $i + 1
       endif
-   end
 
 # if nothing new was discovered then quit
-   if ($ok == TRUE) then
+      if ($ok == TRUE) then
+         break
+      endif
+
+      set cf   = $nf
+      set cres = $nres
+   end                      # end of middle loop j
+
+   @ ne = $j - 1
+   if ($ne < 1) then
+      @ ne = 1
+   endif
+   echo " done ($ne)"
+
+# decide whether or not to iterate again
+
+# if the last middle loop ended with a file with no expressions
+# exit with the current working file
+   if ($brk == 3) then
+      if ($vrb == TRUE) then
+         echo "   ${k}> leaving with single expression"
+      endif
+      set nf = $cf
       break
+
+# if this iteration produced the same file as the previous one
+# take it as the result
+   else
+      set cf = $nf
+      diff $lkf $cf >>& /dev/null
+      if ($status == 0) then
+         if ($vrb == TRUE) then
+            echo "   ${k}> leaving with no differences"
+         endif
+         break
+      endif
    endif
 
-   set cf   = $nf
-   set cres = $nres
-end
+# remember this working file for the next iteration
+   set lkf = $cf
 
-@ ne = $l - 1
-echo " done ($ne)"
+end                         # end of outer loog k
+
 echo "results in ${base}-crash.c"
 
-mv $nf ${base}-crash.c
-rm -f tmp-${base}-*.c* >& /dev/null
+if ($str == TRUE) then
+   if ($vrb == TRUE) then
+      echo -n "stripping comments ... "
+   endif
+   elide '/*' '*/' $nf >&! ${base}-crash.c
+   if ($vrb == TRUE) then
+      echo "done"
+   endif
+   rm -f $nf
+else
+   mv $nf ${base}-crash.c
+endif
+rm -f tmp-${base}-*.c *${base}*.c.res >& /dev/null
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
