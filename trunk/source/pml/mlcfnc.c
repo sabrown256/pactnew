@@ -67,6 +67,21 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PM_MAKE_COMPLEX - return a complex number with real part RP and
+ *                  - imaginary par IP
+ */
+
+complex _PM_make_complex(double rp, double ip)
+   {complex rv;
+
+    rv  = rp;
+    rv += ip*I;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_PLUS_CC - add complex A and B */
 
 complex PM_plus_cc(complex b, complex c)
