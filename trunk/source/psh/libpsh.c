@@ -24,7 +24,8 @@ enum e_token_flag
     EXPAND_ESC         = 0x1,
     ADD_DELIMITER      = 0x2,
     TRANSPARENT_QUOTES = 0x4,
-    REMOVE_QUOTES      = 0x8};
+    REMOVE_QUOTES      = 0x8,
+    SINGLE_QUOTES      = 0x10};
 
 typedef enum e_token_flag token_flag;
 
@@ -432,7 +433,7 @@ int strcnts(char *s, char *r, int ex)
  *              -              "ab'cd'ef" -> "abcdef"
  *              -   5) this is designed to handle things like:
  *              -         "(a\(bc\)de)" + ")" -> "(a\(bc\)de"
- *              -      but not searches for matching delimiters
+ *              -      but NOT searches for matching delimiters
  *              -         "(a(bc)de)" + ")" -> "(a(bc)de)"
  */
 
@@ -505,6 +506,9 @@ static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
 
 /* STRCPY_STR - copy S into D upto the first unescaped occurence of
  *            - the string R
+ *            - this is to be used instead of strstr when dealing
+ *            - with text that has delimited (hence off limits) regions
+ *            - especially with escaped characters in the text
  *            - features:
  *            -   1) copy no more than min of ND and NS characters
  *            -   2) do not check delimiters in quoted substrings
@@ -535,14 +539,18 @@ static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
  *            -           if set do not copy quote characters into D
  *            -           otherwise do copy them into D
  *            -              "ab'cd'ef" -> "abcdef"
+ *            -        SINGLE_QUOTES
+ *            -           if set ignore unmatched quote characters
+ *            -           at the place where an ending delimiter is found
+ *            -              "(ab'cd)" + ")" -> "(ab'cd)"
  *            -   5) this is designed to handle things like:
  *            -         "(a\(be\)de)" + "e)" -> "(a\(be\)d"
- *            -      but not searches for matching delimiters
+ *            -      but NOT searches for matching delimiters
  *            -         "(a(be)de)" + "e)" -> "(a(be)de)"
  */
 
 int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
-   {int ins, ind, n, nc, nr, c, ex, ad, tr, rq;
+   {int ins, ind, n, nc, nr, c, ex, ad, tr, rq, sq;
 
     n = 0;
 
@@ -551,6 +559,7 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 	ad = ((flags & ADD_DELIMITER) != 0);
 	tr = ((flags & TRANSPARENT_QUOTES) != 0);
 	rq = ((flags & REMOVE_QUOTES) != 0);
+	sq = ((flags & SINGLE_QUOTES) != 0);
 
 /* quotes must be transparent if they are delimiters */
 	tr |= ((strchr(r, '\"') != NULL) || (strchr(r, '\'') != NULL));
@@ -561,12 +570,8 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 	nr = strlen(r);
 	nc = strlen(s);
 	nc = min(nc, nd-1);
-#if 1
-	nc  = vlimit(nc, 0, ns);
-#else
-	nc = min(nc, ns);
-	nc = max(nc, 0);
-#endif
+	nc = vlimit(nc, 0, ns);
+
 	for (n = 0; n < nc; n++)
 	    {c = *s++;
 
@@ -579,17 +584,24 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 
 /* arrange to skip over quoted substrings - making them opaque */
 	     else if ((tr == FALSE) && (c == '\"'))
-	        {ind = !ind;
+	        {ins = FALSE;      /* clear any lone single quote */
+		 ind = !ind;
+		 if (strchr(s, '\"') != NULL)
+		    sq = FALSE;
                  if (rq == FALSE)
 		    *d++ = c;}
 
 	     else if ((tr == FALSE) && (c == '\''))
-	        {ins = !ins;
+	        {ind = FALSE;      /* clear any lone double quote */
+		 ins = !ins;
+		 if (strchr(s, '\'') != NULL)
+		    sq = FALSE;
                  if (rq == FALSE)
 		    *d++ = c;}
 
 /* copy over non-delimiting characters */
-	     else if ((ins == TRUE) || (ind == TRUE) ||
+	     else if (((sq == FALSE) && (ins == TRUE)) ||
+		      ((sq == FALSE) && (ind == TRUE)) ||
 		      (c != r[0]) || (strncmp(r, s-1, nr) != 0))
 	        *d++ = c;
 
@@ -645,7 +657,7 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
  *             -              "ab'cd'ef" -> "abcdef"
  *             -   5) this is designed to handle matching delimiters
  *             -         "(a(bc)de)" + ")" -> "(a(bc)de)"
- *             -      but not searches for things like:
+ *             -      but NOT searches for things like:
  *             -         "(a\(bc\)de)" + ")" -> "(a\(bc\)de"
  */
 
@@ -729,7 +741,11 @@ static int _strcpy_bal(char *d, size_t nd, char *s, size_t ns,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* STRCPY_TOK - better tokenizer */
+/* STRCPY_TOK - better tokenizer
+ *            - this is to be used instead of strtok when dealing
+ *            - with text that has delimited (hence off limits) regions
+ *            - especially with escaped characters in the text
+ */
 
 int strcpy_tok(char *d, size_t nd, char *s, size_t ns,
 	       char *b, char *e, int flags)

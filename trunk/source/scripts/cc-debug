@@ -61,7 +61,7 @@ endif
 
 # count expressions delimited by { and }
 
-echo -n "counting all expressions ... "
+echo -n "counting all expressions .... "
 
 set nf = $file:r-count.c
 @ nu = 100000
@@ -98,12 +98,12 @@ $cmd -c $file >&! $cres
 set bstatus = $status
 @  nlb = `cat $cres | wc -l`
 
-echo "crash status ............... $bstatus ($nlb)"
+echo "crash status ................ $bstatus ($nlb)"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-echo "finding fatal expressions"
+echo "finding fatal expressions ... "
 
 set base = $file:r
 set cf   = $file
@@ -246,23 +246,49 @@ while ($k < $na)
 
 end                         # end of outer loog k
 
-echo "results in ${base}-crash.c"
+set ff = ${base}-crash.c
+echo "   results in $ff"
+
+# remove everything after the last expression
+@ ll = ( `grep -n '}' $nf | tail -n 1 | sed 's|:.*$||'` )
+mv $nf $nf.res
+head -n $ll $nf.res >&! $nf
 
 if ($str == TRUE) then
    if ($vrb == TRUE) then
       echo -n "stripping comments ... "
    endif
-   elide '/*' '*/' $nf >&! ${base}-crash.c
+   elide '/*' '*/' $nf >&! $ff
    if ($vrb == TRUE) then
       echo "done"
    endif
    rm -f $nf
 else
-   mv $nf ${base}-crash.c
+   mv $nf $ff
 endif
-rm -f tmp-${base}-*.c *${base}*.c.res >& /dev/null
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+echo -n "verifying crash ............. "
+set res = ok
+$cmd -c $ff >&! $ff.res
+set xstatus = $status
+if ($xstatus != $bstatus) then
+   set res = status
+   @ err = $err + 1
+else
+   diff $ff.res $cres >& /dev/null
+   if ($status != 0) then
+      set res = diff
+      @ err = $err + 1
+   endif
+endif
+echo "$res"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+rm -f tmp-${base}-*.c *${base}*.c.res >& /dev/null
 
 exit($err)

@@ -236,13 +236,13 @@ int SC_set_io_attr(int fd, int attr, int state)
 
 	rv = _SC_get_tty_attr(fd, &s);
 	if (rv == -1)
-	   SC_error(-1, "COULDN'T GET STATE - SC_SET_IO_ATTR");
+	   SC_error(-1, "COULD NOT GET STATE - SC_SET_IO_ATTR");
 
 	_SC_set_io_attr(&s, SC_TERM_LOCAL, attr, state);
 
 	rv = _SC_set_tty_attr(fd, &s, TRUE);
 	if (rv == -1)
-	   SC_error(-1, "COULDN'T SET STATE - SC_SET_IO_ATTR");
+	   SC_error(-1, "COULD NOT SET STATE - SC_SET_IO_ATTR");
 	else
 	   rv = TRUE;};
 
@@ -274,7 +274,7 @@ int SC_set_io_attrs(int fd, ...)
 
 	rv = _SC_get_tty_attr(fd, &s);
 	if (rv == -1)
-	   SC_error(-1, "COULDN'T GET STATE - SC_SET_IO_ATTR");
+	   SC_error(-1, "COULD NOT GET STATE - SC_SET_IO_ATTR");
 
 	ond  = 0;
 	offd = 0;
@@ -303,7 +303,7 @@ int SC_set_io_attrs(int fd, ...)
 /* set the attributes that go via ioctl first */
 	rv = _SC_set_tty_attr(fd, &s, TRUE);
 	if (rv == -1)
-	   SC_error(-1, "COULDN'T SET STATE - SC_SET_IO_ATTR");
+	   SC_error(-1, "COULD NOT SET STATE - SC_SET_IO_ATTR");
 	else
 	   rv = TRUE;
 
@@ -353,13 +353,13 @@ int SC_set_fd_attr(int fd, int i, int state)
 
 	    arg = fcntl(fd, F_GETFL);
 	    if (arg < 0)
-	       SC_error(-1, "COULDN'T GET DESCRIPTOR FLAG - SC_SET_FD_ATTR");
+	       SC_error(-1, "COULD NOT GET DESCRIPTOR FLAG - SC_SET_FD_ATTR");
 
 	    SET_ATTR(arg, i, state);
 
 	    status = fcntl(fd, F_SETFL, arg);
 	    if (status < 0)
-	       SC_error(-1, "COULDN'T SET DESCRIPTOR FLAG - SC_SET_FD_ATTR");
+	       SC_error(-1, "COULD NOT SET DESCRIPTOR FLAG - SC_SET_FD_ATTR");
 
 	    rv = TRUE;};};
 
@@ -388,7 +388,7 @@ void SC_print_term_state(FILE *fp, int fd)
 
     rv = tcgetattr(fd, &s);
     if (rv == -1)
-       SC_error(-1, "COULDN'T GET STATE - SC_PRINT_TERM_STATE");
+       SC_error(-1, "COULD NOT GET STATE - SC_PRINT_TERM_STATE");
 
 /* input mode constants */
     c = s.c_iflag;
@@ -652,7 +652,7 @@ static int _SC_set_raw_state(int fd, int trap)
 
 	    rv = _SC_set_tty_attr(fd, &t, TRUE);
 	    if (rv < 0)
-	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - _SC_SET_RAW_STATE",
+	       SC_error(-1, "COULD NOT SET I/O FLAGS %d - _SC_SET_RAW_STATE",
 			errno);};};
 
 # else
@@ -723,7 +723,7 @@ static int _SC_set_cooked_state(int fd, int trap)
 
 	    rv = _SC_set_tty_attr(fd, &t, TRUE);
 	    if (rv < 0)
-	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - _SC_SET_COOKED_STATE",
+	       SC_error(-1, "COULD NOT SET I/O FLAGS %d - _SC_SET_COOKED_STATE",
 			errno);};};
 # else
 
@@ -1499,7 +1499,7 @@ void SC_disconnect_tty(void)
 #ifdef HAVE_SYSV
     if ((cp->ischild == TRUE) && (setsid() < 0))
        SC_error(SC_NO_SETSID,
-		"COULDN'T DITCH CONTROLLING TERMINAL - SC_DISCONNECT_TTY");
+		"COULD NOT DITCH CONTROLLING TERMINAL - SC_DISCONNECT_TTY");
 #endif
 
 #ifdef BSD_TERMINAL
@@ -1510,7 +1510,7 @@ void SC_disconnect_tty(void)
     if (fd >= 0)
        {if (ioctl(fd, TIOCNOTTY, NULL) < 0)
 	   SC_error(SC_NO_TTY,
-		    "COULDN'T DITCH CONTROLLING TERMINAL - SC_DISCONNECT_TTY");
+		    "COULD NOT DITCH CONTROLLING TERMINAL - SC_DISCONNECT_TTY");
 	SC_close_safe(fd);};
 #endif
 
@@ -1608,7 +1608,7 @@ int SC_is_line_buffered_fd(int fd)
 
      rv = tcgetattr(fd, &s);
      if (rv == -1)
-        SC_error(-1, "COULDN'T GET STATE - SC_IS_LINE_BUFFERED");
+        SC_error(-1, "COULD NOT GET STATE - SC_IS_LINE_BUFFERED");
 
 /* local mode constants */
      c = s.c_lflag;

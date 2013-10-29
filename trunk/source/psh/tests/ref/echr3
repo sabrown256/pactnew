@@ -1,9 +1,39 @@
-void foo(int na)
-   {if (c == )
+/* quote 1a ' lone quote before end delimiter */
+/* quote 1b ' */
+
+/* quote 2 ' quote matched on following line before end delimiter
+ * ' */
+
+/* quote 3 ' quotes matched on line ' */
+
+/* quote 4a " lone quote before end delimiter */
+/* quote 4b " */
+
+/* quote 5 " quote matched on following line before end delimiter
+ * " */
+
+/* quote 6 " quotes matched on line " */
+
+" quote 7 /* - delimiter is in quoted string - look ahead for end quote "
+
+" quote 8 /* - delimiter is in quoted string with \" "
+
+/* function 1 test ' or " handling */
+void f1(int na)
+   {if (c == "({[")
        {(c == '{')
         (c != '}')
 	(c == '{')};
     return;}
 
-void bar(void)
+/* function 2 test 'a' or "b" handling */
+void f2(void)
    {return;}
+
+/* function 3 interleaved quotes - difficult */
+void f3(int na)
+   {{f("a'b");}
+    return;}
+
+
+

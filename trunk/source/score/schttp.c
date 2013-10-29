@@ -148,7 +148,7 @@ int SC_http_url_file(char *url, char *file, char *vrs)
     fd = SC_open_http(host, -1);
     if (fd < 0)
        {io_printf(stdout, "%s\n", SC_error_msg());
-	io_printf(stdout, "CAN'T CONNECT TO %s\n", host);}
+	io_printf(stdout, "CANNOT CONNECT TO %s\n", host);}
 
     else
        {err = SC_request_http(fd, "GET", url, vers);
