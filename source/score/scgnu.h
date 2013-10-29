@@ -67,7 +67,7 @@
 /*--------------------------------------------------------------------------*/
 
 #ifndef __cplusplus
-# ifdef ISO_C99
+# if defined(ISO_C99) || defined(__OPENCC__)
 
 extern int
  getpagesize(void);

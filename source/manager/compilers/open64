@@ -110,6 +110,10 @@ Group OpenMP {
    SharedFnc = yes
 }
 
+Group TEST {
+  ADVISORY = ${TEST_ADVISORY}:pdb_fd
+}
+
 include cpp-rule
 include serial
 

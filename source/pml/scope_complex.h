@@ -33,6 +33,14 @@
 # define CMPLX(_b, _c)               ((_b) + (_c)*I)
 #endif
 
+/* Open64 compiler has optimizer bug with original CMPLX macro */
+#if defined(__OPENCC__)
+
+# undef CMPLX
+# define CMPLX(_rp, _ip)  _PM_make_complex(_rp, _ip)
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 #if defined(HAVE_ANSI_C9X_COMPLEX)
@@ -166,6 +174,7 @@ extern int
 /* MLCFNC.C declarations */
 
 extern complex
+ _PM_make_complex(double rp, double ip),
  PM_plus_cc(complex b, complex c),
  PM_minus_cc(complex b, complex c),
  PM_times_cc(complex b, complex c),
