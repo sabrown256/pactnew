@@ -42,20 +42,20 @@ switch ($cc)
 
    case *suncc*:
    case *sunCC*:
-        $cc -xdumpmacros -E /dev/null
+        $cc -xdumpmacros -E /dev/null |& sort
         breaksw
 
    case *xlc*:
    case *xlC*:
         touch $tmp
-        $cc -qshowmacros -E /dev/null $tmp
+        $cc -qshowmacros -E /dev/null $tmp |& sort
         rm $tmp
         breaksw
 
    case *pgcc*:
    case *mingw*:
         touch $tmp
-        $cc -E -dM $tmp
+        $cc -E -dM $tmp |& sort
         rm $tmp
         breaksw
 
@@ -67,7 +67,7 @@ switch ($cc)
    case *opencc*:
    case *pathcc*:
    default:
-        $cc -E -dM -x c /dev/null
+        $cc -E -dM -x c /dev/null |& sort
         breaksw
 
 # for C++ compilers
@@ -76,7 +76,7 @@ switch ($cc)
    case *clang++*:
    case *openCC*:
    case *pathCC*:
-        $cc -E -dM -x c++ /dev/null
+        $cc -E -dM -x c++ /dev/null |& sort
         breaksw
 endsw
 

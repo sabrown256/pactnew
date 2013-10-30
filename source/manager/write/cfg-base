@@ -60,7 +60,7 @@
            set ladv = ${ladv}:score_mpi:score_error
            set ladv = ${ladv}:pml_perf:pml_nan:pml_fpe:pml_interp
            echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/cygwin" >>& $Tmp
+           echo "include compilers/gnu-cygwin" >>& $Tmp
            echo "Group TEST {" >>& $Tmp
            echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
            echo "}" >>& $Tmp

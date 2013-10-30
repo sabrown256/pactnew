@@ -103,10 +103,6 @@ Group OpenMP {
                 4.6.0  >= no ]
 }
 
-Group X11 {
-   RPath = /usr/X11R6/$LIB
-}
-
 # BFD is detected but tests do not work
 Group TEST {
   ADVISORY = ${TEST_ADVISORY}:score_retrc:fortran_pdb_manual 

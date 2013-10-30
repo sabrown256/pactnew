@@ -57,6 +57,12 @@
 #ifdef __linux__
 #endif
 
+/* CYGWIN */
+
+#ifdef __CYGWIN__
+#define strtold strtod
+#endif
+
 /* FreeBSD */
 
 #ifdef __FreeBSD__
