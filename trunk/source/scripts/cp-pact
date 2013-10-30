@@ -9,17 +9,24 @@ unalias *
 
 set oroot = ""
 set nroot = ""
+set repl  = ""
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: cp-pact [-h] <old> <new>"
-           echo "   h   this help message"
-           echo "   <old> old root directory"
-           echo "   <new> new root directory"
+           echo "Usage: cp-pact [-h] [-r <repl>]* <old> <new>"
+           echo "   h      this help message"
+           echo "   r      replace specified strings in <new>"
+           echo "   <repl> replacement spec <oldtext>,<newtext>"
+           echo "   <old>  old root directory"
+           echo "   <new>  new root directory"
            echo ""
            exit(1)
+      case -r:
+           shift
+           set repl = ( $repl $1 )
+           breaksw
       default:
            if ("$oroot" == "") then
               set oroot = $1
@@ -85,6 +92,12 @@ if ($nroot !~ /*) then
    popd >& /dev/null
 endif
 
+# if no replacement have been specified, replace oroot with nroot
+# if you have other replacements and want this one you can just specify it
+if ("$repl" == "") then
+   set repl = ( $repl $oroot,$nroot )
+endif
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -116,15 +129,29 @@ if ($err == 0) then
    Separator $log
    NoteD $log "   fixing files .... "
    set et = `timer -r`
+
    flog $log pushd $nroot
-   set files = ( `find . -type f | xargs grep $oroot | grep -v "Binary file" | sed 's|:.*$||' | uniq` )
-   foreach f ($files)
-      NoteD $log "      $f"
-      flog $log ( sed "s+$oroot+$nroot+g" $f >&! $f.new )
-      flog $log mv $f.new $f
+
+   foreach r ($repl)
+      set inf  = ( `echo $r | sed 's|,| |'` )
+      set opat = $inf[1]
+      set npat = $inf[2]
+      NoteD $log "      $opat -> $npat"
+
+      set files = ( `find . -type f | xargs grep $opat | grep -v "Binary file" | sed 's|:.*$||' | uniq` )
+      foreach f ($files)
+         NoteD $log "         $f"
+         flog $log ( sed "s~$opat~$npat~g" $f >&! $f.new )
+         flog $log mv $f.new $f
+      end
+      @ err = $err + $status
    end
+   unset inf
+   unset opat
+   unset npat
+
    flog $log popd
-   @ err = $err + $status
+
    set et = `timer -b $et`
    if ($err == 0) then
       NoteD $log "   fixed $#files files ... ok ($et)"

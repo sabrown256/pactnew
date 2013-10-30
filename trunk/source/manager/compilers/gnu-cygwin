@@ -1,5 +1,5 @@
 #
-# CYGWIN - basic configuration for compiling with CYGWIN
+# GNU-CYGWIN - GNU configuration on with CYGWIN
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -11,6 +11,8 @@ Group PACT {
    CC_PATH =
    FC_PATH =
 }
+
+define CYGWIN
 
 include compilers/gnu
 
