@@ -1,0 +1,146 @@
+#!/bin/csh -f
+#
+# CP-PACT - copy PACT installation to new root location
+#
+
+unalias *
+
+@ err = 0
+
+set oroot = ""
+set nroot = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: cp-pact [-h] <old> <new>"
+           echo "   h   this help message"
+           echo "   <old> old root directory"
+           echo "   <new> new root directory"
+           echo ""
+           exit(1)
+      default:
+           if ("$oroot" == "") then
+              set oroot = $1
+           else if ("$nroot" == "") then
+              set nroot = $1
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if ("$oroot" == "") then
+   echo "No source directory specified - exiting"
+   exit(1)
+endif
+
+if ("$nroot" == "") then
+   echo "No destination directory specified - exiting"
+   exit(1)
+endif
+
+set exe = ( `which pact` )
+if (-x $exe) then
+   set bindir = $exe:h
+   set etcdir = $bindir:h/etc
+else
+   echo "No pact found - exiting"
+   exit(1)
+endif
+
+source $etcdir/functions-pact.csh
+
+InitLog log $cwd/log.cp-pact
+
+set gt = `timer -r`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CHECK_ARGS
+
+if ("$oroot" =~ */) then
+   set oroot = ( `echo $oroot | sed 's|/$||'` )
+endif
+
+if ($oroot !~ /*) then
+   pushd $oroot >& /dev/null
+   set oroot = $cwd
+   popd >& /dev/null
+endif
+
+if ("$nroot" =~ */) then
+   set nroot = ( `echo $nroot | sed 's|/$||'` )
+endif
+
+if (!(-d $nroot)) then
+   flog $log mkdir -p $nroot
+endif
+
+if ($nroot !~ /*) then
+   pushd $nroot >& /dev/null
+   set nroot = $cwd
+   popd >& /dev/null
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COPY
+
+NoteD $log "Copying from $oroot to $nroot"
+
+if ($err == 0) then
+   Separator $log
+   NoteD $log -n "   copying files ... "
+   Note $log ""
+   set et = `timer -r`
+   flog $log rsync -avz $oroot/ $nroot
+   @ err = $err + $status
+   set et = `timer -b $et`
+   if ($err == 0) then
+      NoteD $log "ok ($et)"
+   else
+      NoteD $log "ng ($et)"
+   endif
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIXUP
+
+if ($err == 0) then
+   Separator $log
+   NoteD $log "   fixing files .... "
+   set et = `timer -r`
+   flog $log pushd $nroot
+   set files = ( `find . -type f | xargs grep $oroot | grep -v "Binary file" | sed 's|:.*$||' | uniq` )
+   foreach f ($files)
+      NoteD $log "      $f"
+      flog $log ( sed "s+$oroot+$nroot+g" $f >&! $f.new )
+      flog $log mv $f.new $f
+   end
+   flog $log popd
+   @ err = $err + $status
+   set et = `timer -b $et`
+   if ($err == 0) then
+      NoteD $log "   fixed $#files files ... ok ($et)"
+   else
+      NoteD $log "   fixed $#files files ... ng ($err/$et)"
+   endif
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set gt = `timer -b $gt`
+if ($err == 0) then
+   NoteD $log "Copying completed successfully ($gt)"
+else
+   NoteD $log "Copying fail ($err/$gt)"
+endif
+
+exit($err)

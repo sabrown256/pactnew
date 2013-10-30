@@ -24,4 +24,4 @@ while ($#argv > 0)
    shift
 end
 
-exit($status)
+exit($err)
