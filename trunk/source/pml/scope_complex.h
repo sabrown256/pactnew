@@ -27,18 +27,18 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* define the C11 complex constructor if not already defined */
-
-#if !defined(CMPLX)
-# define CMPLX(_b, _c)               ((_b) + (_c)*I)
-#endif
-
 /* Open64 compiler has optimizer bug with original CMPLX macro */
 #if defined(__OPENCC__)
 
 # undef CMPLX
 # define CMPLX(_rp, _ip)  _PM_make_complex(_rp, _ip)
 
+#endif
+
+/* define the C11 complex constructor if not already defined */
+
+#if !defined(CMPLX)
+# define CMPLX(_b, _c)               ((_b) + (_c)*I)
 #endif
 
 /*--------------------------------------------------------------------------*/

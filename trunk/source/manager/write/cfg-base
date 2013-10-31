@@ -85,7 +85,7 @@
            echo "include compilers/osf" >>& $Tmp
            breaksw
       case sunos:
-           set CCSys = `$Which cc`
+           set CCSys = `where cc |& head -n 1`
            set CCRoot = $CCSys:h
            set CCRoot = $CCRoot:h
            echo "Group PACT {" >>& $Tmp

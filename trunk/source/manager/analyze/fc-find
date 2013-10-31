@@ -86,8 +86,8 @@ set allfc  = ""
 set ansifc = ""
 
 foreach fc ($fclst)
-   set res = `$PSY_MngDir/pwhich $fc`
-   if ("$res[1]" =~ /*) then
+   set res = `where $fc |& head -n 1`
+   if ("$res" =~ /*) then
 
       set bindir = $res:h
       set libdir = $bindir:h/lib

@@ -89,6 +89,16 @@ Group OpenMP {
    LD_Lib =
 }
 
+# NOTE: despite debug flags no symbol info so undebuggable
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
+}
+
+.f.o:
+	${FC} ${FFLAGS} ${LDFLAGS} -c $<
+
+include serial
+
 Group MPI {
    CC_Exe = mpxlc
    FC_Exe = mpxlf90
@@ -98,8 +108,4 @@ Group X11 {
    RPath = /usr/X11R6/$LIB
 }
 
-.f.o:
-	${FC} ${FFLAGS} ${LDFLAGS} -c $<
-
-include serial
 include features/bgl

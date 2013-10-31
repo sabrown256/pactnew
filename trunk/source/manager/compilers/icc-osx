@@ -73,10 +73,6 @@ Group Shared {
    LD_Flags = -shared -undefined dynamic_lookup
 }
 
-Group MDG {
-   Lib = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
-}
-
 Group PThread {
    LD_Lib = -lpthread 
 }
@@ -87,26 +83,13 @@ Group OpenMP {
    LD_Lib   = -lpthread 
 }
 
-Group LEH {
-   TTY_ECHO  = FALSE
-   TTY_VTIME = FALSE
-}
-
 include cpp-rule
 include serial
+include osx
 
 define NON_INTEGER_ENUM
 
-setenv PATH /sw/bin:/usr/local/bin:$PATH
-
-Group PNG {
-   Path = /sw
+Group MDG {
+   Lib = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 }
 
-Group JPEG {
-   Path = /sw
-}
-
-Group HDF {
-   Path = /sw
-}

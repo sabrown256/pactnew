@@ -113,10 +113,6 @@ Group Shared {
 #   LD_Flags = -dynamiclib -flat_namespace -undefined suppress
 }
 
-Group MDG {
-   Lib = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
-}
-
 Group OpenMP {
    CC_Flags = -fopenmp
    LD_Flags = -fopenmp
@@ -126,30 +122,20 @@ Group OpenMP {
                 4.6.0  >= no ]
 }
 
+include cpp-rule
+include serial
+include osx
+
+setenv PATH $PACT_CC_PATH/bin:$PACT_FC_PATH/bin:/sw/bin:/usr/apps/gnu/bin:/usr/local/bin:$PATH
+#setenv PATH $PACT_CC_PATH/bin:$PACT_FC_PATH/bin:/usr/apps/gnu/bin:$PATH
+
 Group Python {
    CC_Exe      = gcc
    CC_Debug    = -g
    CC_Optimize = -g -O -Wunused
 }
 
-Group LEH {
-   TTY_ECHO  = FALSE
-   TTY_VTIME = FALSE
+Group MDG {
+   Lib = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 }
 
-include cpp-rule
-include serial
-
-setenv PATH $PACT_CC_PATH/bin:$PACT_FC_PATH/bin:/sw/bin:/usr/apps/gnu/bin:/usr/local/bin:$PATH
-
-Group PNG {
-   Path = /sw
-}
-
-Group JPEG {
-   Path = /sw
-}
-
-Group HDF {
-   Path = /sw
-}

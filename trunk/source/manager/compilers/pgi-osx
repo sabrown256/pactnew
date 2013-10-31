@@ -83,24 +83,7 @@ Group OpenMP {
    LD_Lib    =
 }
 
-Group LEH {
-   TTY_ECHO  = FALSE
-   TTY_VTIME = FALSE
-}
-
 include cpp-rule
 include serial
+include osx
 
-setenv PATH /sw/bin:/usr/local/bin:$PATH
-
-Group PNG {
-   Path = /sw
-}
-
-Group JPEG {
-   Path = /sw
-}
-
-Group HDF {
-   Path = /sw
-}

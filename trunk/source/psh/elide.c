@@ -57,28 +57,17 @@ static void partition_text(parse *ip, char *ps)
     int ln[2], acc[2];
     char *ta[2], *wh;
 
-#define TESTWAY
-
-#ifdef TESTWAY
-char *tb[2];
-#endif
     ns = strlen(ps);
+
+/* find tokens defined by both delimiters */
     for (i = 0; i < 2; i++)
         {ln[i]  = strcpy_str(ip->bf[i], BFLRG, ps, ns,
 			     ip->delim[i], ip->fl);
-#ifdef TESTWAY
-	 tb[i]  = strstr(ps, ip->delim[i]);
-#endif
 	 ta[i]  = (ln[i] == ns) ? NULL : ps + ln[i];
 	 acc[i] = ((IS_NULL(ta[i]) == FALSE) &&
-		   (ta[i][ip->dlen[i]] != '\''));};
+		   (ta[i][ip->dlen[i]] != '\''));
 
-#ifdef TESTWAY
-int err;
-err = TRUE;
-for (i = 0; i < 2; i++)
-    err &= (ta[i] == tb[i]);
-#endif
+	 ip->part[i+1] = ta[i];};   /* start of delimiter in fragment */
 
     if (acc[0] && acc[1])
        wh = min(ta[0], ta[1]);
@@ -89,11 +78,8 @@ for (i = 0; i < 2; i++)
     else
        wh = NULL;
 
-    ip->keep = (ip->depth > 0) ? ip->keep : FALSE;
-
+    ip->keep    = (ip->depth > 0) ? ip->keep : FALSE;
     ip->part[0] = ps;      /* text fragment */
-    ip->part[1] = ta[0];   /* start of begin delimiter in fragment */
-    ip->part[2] = ta[1];   /* start of end delimiter in fragment */
     ip->part[3] = wh;      /* actionable part of fragment */
 
     return;}

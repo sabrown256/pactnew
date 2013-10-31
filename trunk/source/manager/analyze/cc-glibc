@@ -19,7 +19,7 @@ dbmget $ALog HAVE_GNU_LIBC_6 =\? FALSE
 
 setenv AF_VERSION_GLIBC ""
 
-set GCC = `$Which gcc`
+set GCC = `where gcc |& head -n 1`
 if (-x "$GCC") then
 
    cat << EOF >! $Tmp.c
