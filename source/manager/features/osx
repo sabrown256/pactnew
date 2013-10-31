@@ -4,11 +4,17 @@
 # include "cpyright.h"
 #
 
-setenv PATH /sw/bin:/usr/local/bin:$PATH
+run analyze/osx-evolution
+
+setenv PATH $PACT_CC_PATH/bin:$PACT_FC_PATH/bin:/sw/bin:/usr/local/bin:$PATH
 
 Group LEH {
    TTY_ECHO  = FALSE
    TTY_VTIME = FALSE
+}
+
+Group MDG {
+   Lib = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 }
 
 Group PNG {

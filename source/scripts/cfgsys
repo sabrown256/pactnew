@@ -134,7 +134,7 @@ else
       if ($?DAI_ROOT == 1) then
          setenv PSY_AIRoot  $DAI_ROOT
       else
-         setenv PSY_AIRoot  /usr/local
+         setenv PSY_AIRoot  /usr/share
       endif
    endif
 
@@ -144,7 +144,7 @@ else
       if ($?DAS_ROOT == 1) then
          setenv PSY_ASRoot  $DAS_ROOT
       else
-         setenv PSY_ASRoot  /usr/share
+         setenv PSY_ASRoot  /usr/local
       endif
    endif
 

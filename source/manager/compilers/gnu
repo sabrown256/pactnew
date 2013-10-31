@@ -7,9 +7,6 @@
 # include "cpyright.h"
 #
 
-run analyze/rpath -a /usr/${LIB}
-run analyze/rpath gnu
-
 Tool CC {
    Exe       = gcc
    Flags     = -ffloat-store
@@ -79,9 +76,9 @@ Tool CXX {
 
 Tool LD {
    RPath    = -Wl,-rpath,@
-   Flags   += [ _env_ = HOSTOS ;
+   Flags   += [ _env_ = HSY_OS_NAME ;
                 Linux = -rdynamic ]
-   Flags   += [ _env_ = HOSTOS ;
+   Flags   += [ _env_ = HSY_OS_Name ;
                 Linux = -Wl,--disable-new-dtags ] # save us from RUN_PATH
 #   Flags   += [ _env_ = PACT_CC_VERSION ;         # memory and thread checks
 #                4.8.* >= -pie ]
@@ -136,4 +133,7 @@ Group OpenMP {
 
 include cpp-rule
 include serial
+
+run analyze/rpath -a /usr/${LIB}
+run analyze/rpath gnu
 

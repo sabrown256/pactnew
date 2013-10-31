@@ -106,12 +106,16 @@ endif
 NoteD $log "Copying from $oroot to $nroot"
 
 if ($err == 0) then
+
    Separator $log
    NoteD $log -n "   copying files ... "
    Note $log ""
    set et = `timer -r`
-   flog $log rsync -avz $oroot/ $nroot
+
+# exclude dev z-* manager/extensions
+   flog $log rsync -avz --exclude='*/dev' --exclude='*/z-*' --exclude='*/manager/extensions' $oroot/ $nroot
    @ err = $err + $status
+
    set et = `timer -b $et`
    if ($err == 0) then
       NoteD $log "ok ($et)"

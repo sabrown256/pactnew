@@ -1930,14 +1930,16 @@ CFG_DONE:
         if ($ChkVer == "yes") then
            echo ""
            echo "Version info for PACT:"
-           echo "   pact-date    =  `cat $PSY_AIRoot/pact/std_sources/manager/.pact-date`" 
-           echo "   pact-version =  `cat $PSY_AIRoot/pact/std_sources/manager/.pact-version`" 
-           echo "   pact-tag     =  `cat $PSY_AIRoot/pact/std_sources/manager/.pact-version-tag`" 
+           set lmand = $PSY_AIRoot/pact/public/std/src/manager
+           echo "   pact-date    =  `cat $lmand/.pact-date`" 
+           echo "   pact-version =  `cat $lmand/.pact-version`" 
+           echo "   pact-tag     =  `cat $lmand/.pact-version-tag`" 
            echo ""
            echo "Version info for PACTNEW:"
-           echo "   pact-date    =  `cat $PSY_AIRoot/pact/new_sources/manager/.pact-date`" 
-           echo "   pact-version =  `cat $PSY_AIRoot/pact/new_sources/manager/.pact-version`" 
-           echo "   pact-tag     =  `cat $PSY_AIRoot/pact/new_sources/manager/.pact-version-tag`" 
+           set lmand = $PSY_AIRoot/pact/public/new/src/manager
+           echo "   pact-date    =  `cat $lmand/.pact-date`" 
+           echo "   pact-version =  `cat $lmand/.pact-version`" 
+           echo "   pact-tag     =  `cat $lmand/.pact-version-tag`" 
         endif
 
         set RStatus = $status
