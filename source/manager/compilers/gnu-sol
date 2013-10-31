@@ -9,6 +9,8 @@
 
 include compilers/gnu
 
+define SOLARIS
+
 Tool LD {
    Lib = -lsocket -lnsl
 }
@@ -24,8 +26,6 @@ Group PThread {
 Group X11 {
    Path = /usr/openwin
 }
-
-define SOLARIS
 
 # GCC 3.4.3 complex support is buggy
 Group TEST {

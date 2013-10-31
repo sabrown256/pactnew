@@ -1,0 +1,24 @@
+#
+# OSX - config elements for OSX
+#
+# include "cpyright.h"
+#
+
+setenv PATH /sw/bin:/usr/local/bin:$PATH
+
+Group LEH {
+   TTY_ECHO  = FALSE
+   TTY_VTIME = FALSE
+}
+
+Group PNG {
+   Path = /sw
+}
+
+Group JPEG {
+   Path = /sw
+}
+
+Group HDF {
+   Path = /sw
+}

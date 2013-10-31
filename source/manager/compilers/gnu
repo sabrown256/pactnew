@@ -36,7 +36,7 @@ Tool CC {
                  32    = -m32 ;
                  64    = -m64 -fPIC ]
    Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = $CC_Pofile ]
+	         on    = $CC_Profile ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
 	         on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall

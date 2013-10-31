@@ -101,11 +101,6 @@ Group OpenMP {
    LD_Lib =
 }
 
-Group MPI {
-   CC_Exe = mpixlc_r
-   FC_Exe = mpixlf90_r
-}
-
 # NOTE: despite debug flags no symbol info so undebuggable
 Group TEST {
    ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
@@ -115,5 +110,11 @@ Group TEST {
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
 include serial
+
+Group MPI {
+   CC_Exe = mpixlc_r
+   FC_Exe = mpixlf90_r
+}
+
 include features/bgq
 

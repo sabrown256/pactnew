@@ -14,8 +14,7 @@ HAVE_SUBROUTINES
 set Code    = pact
 set Builder = manager
 
-set Which = "$WrkDir/$Builder/pwhich"
-set RSYNC = `$Which rsync`
+set RSYNC = `where rsync |& head -n 1`
 if (-x "$RSYNC")  then
    set use_rsync = TRUE
 else
@@ -439,7 +438,7 @@ switch ($Phase)
                  else
                     Note $LogHost "$EnvCsh not found"
                  endif
-                 flog $LogHost $Which pact
+                 flog $LogHost ( where pact |& head -n 1 )
               endif
    
 #--------------------------------------------------------------------------

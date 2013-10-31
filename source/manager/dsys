@@ -32,8 +32,6 @@ endif
 set BldDir = `dirname $0`
 pushd $BldDir >& /dev/null
 
-set Which = "$cwd/pwhich"
-
 set psy_mngdir = $cwd
 setenv PSY_Base   $psy_mngdir:h
 setenv PSY_ScrDir $PSY_Base/scripts
@@ -277,7 +275,7 @@ switch ($Cmnd)
 
         InitLog Log $LogDir/build
 
-        flog $Log $Which pact
+        flog $Log ( where pact |& head -n 1 )
 
         set BeginTime = `$TIMER -r`
 
@@ -393,7 +391,7 @@ switch ($Cmnd)
 
         InitLog Log $LogDir/load
 
-        flog $Log $Which pact
+        flog $Log ( where pact |& head -n 1 )
 
 #        set Args = "-dbg"
         set Args = ""
@@ -511,7 +509,7 @@ switch ($Cmnd)
    case clean:
         InitLog Log $LogDir/clean
 
-        flog $Log $Which pact
+        flog $Log ( where pact |& head -n 1 )
 
         set Args = "-i"
         while ($#argv > 0)
@@ -1440,7 +1438,7 @@ CFG_DONE:
    case diff-hdrs:
         InitLog Log $LogDir/diff-hdrs
 
-        flog $Log $Which pact
+        flog $Log ( where pact |& head -n 1 )
 
         set Args = "-i"
         while ($#argv > 0)
@@ -1581,7 +1579,7 @@ CFG_DONE:
 
         set All = "seld"
 
-        set ROOT    = `$Which smake`
+        set ROOT    = `where smake |& head -n 1`
         set BINDIR  = $ROOT:h
         set RepoDir = ""
         set SrcDir  = ""
@@ -2026,7 +2024,7 @@ CFG_DONE:
 
         set InstF = ""
         set InstF = ( $InstF pact-update code-date )
-        set InstF = ( $InstF for-pact install-ext )
+        set InstF = ( $InstF install-ext )
         set InstF = ( $InstF ../scripts/{import-api,pcpp,px,frnsic,sinstall} )
 
 # requiring pact-dist to be run from manager - no need to install
@@ -2414,7 +2412,7 @@ CFG_DONE:
         eval `$PSY_ScrDir/simplify-path`
 
         flog $Log date
-        flog $Log $Which pact
+        flog $Log ( where pact |& head -n 1 )
 
 # do remove for multi-platform configuration
         flog $Log setenv PERDB_PATH $EtcDir/cfg
@@ -2595,7 +2593,7 @@ CFG_DONE:
    case send:
         InitLog Log $LogDir/send
 
-        flog $Log $Which pact
+        flog $Log ( where pact |& head -n 1 )
 
         NoteD $Log ""
         NoteD $Log "Sending PACT Directories ..."
@@ -2616,7 +2614,7 @@ CFG_DONE:
    case shared:
         InitLog Log $LogDir/shared
 
-        flog $Log $Which pact
+        flog $Log ( where pact |& head -n 1 )
 
         set Args = "-i"
         while ($#argv > 0)
@@ -3086,11 +3084,11 @@ CFG_DONE:
 
 # verify that valgrind exists before trying to use it
         if ("$Valgrind" != "") then
-           set lvg = ( `$Which valgrind` )
+           set lvg = ( `where valgrind |& head -n 1` )
            if (-x "$lvg") then
               set TLog = test-vg
               InitLog Log $LogDir/$TLog
-              Note $Log "Using valgrind: `$Which valgrind`"
+              Note $Log "Using valgrind: $lvg"
               flog $Log setenv SC_EXEC_N_ATTEMPTS 1
               flog $Log set NA = ( -na 1 )
            else
@@ -3105,7 +3103,7 @@ CFG_DONE:
 # provide context for child processes
         setenv DSYS_TARGET pact_test
 
-        flog $Log $Which pact
+        flog $Log ( where pact |& head -n 1 )
         flog $Log umask
         flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/test.error
 
@@ -3123,7 +3121,7 @@ CFG_DONE:
         flog $Log pushd ..
 
 # do it for smake
-        flog $Log (ls -l `$Which pact` |& grep smake)
+        flog $Log (ls -l `where pact |& head -n 1` |& grep smake)
         if ($status == 0) then
            set PCKS = ( `awk '$1 == "pkg" {print}' $PSY_MngDir/pact.manifest | sed 's/^pkg//'` )
            foreach d ($PCKS)

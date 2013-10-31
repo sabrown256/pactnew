@@ -12,11 +12,6 @@ run analyze/rpath gnu
 # NOTE: this should eventually be put in a site specific file
 setenv PATH  ${PATH}:/usr/local/bin
 
-Group AF {
-   PATTERN_WARN = ":+sp+warning:"
-   PATTERN_ERR  = ":+sp+error:"
-}
-
 Tool CC {
    Exe       = gcc
    Flags     = -fsignaling-nans -mminimal-toc
@@ -87,15 +82,6 @@ Group Cfg {
    CC_Exe = gcc
 }
 
-Group OpenMP {
-   CC_Flags = -fopenmp
-   LD_Flags = -fopenmp
-   LD_Lib   = -lgomp
-   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
-                4.6.0  <  yes ;
-                4.6.0  >= no ]
-}
-
 Group Shared {
    LD_Exe   = gcc
    CC_Flags = -fPIC
@@ -106,6 +92,15 @@ Group PThread {
    LD_Lib = -lpthread 
 }
 
-include features/aix
+Group OpenMP {
+   CC_Flags  = -fopenmp
+   LD_Flags  = -fopenmp
+   LD_Lib    = -lgomp
+   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                4.6.0  <  yes ;
+                4.6.0  >= no ]
+}
+
 include cpp-rule
 include serial
+include features/aix

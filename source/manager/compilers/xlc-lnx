@@ -110,15 +110,17 @@ Group OpenMP {
    LD_Flags  = -qsmp=omp:noauto
 }
 
-.f.o:
-	${FC} ${FFLAGS} ${LDFLAGS} -c $<
-
-define GETSOCKNAME_LONG
-
-include cpp-rule
-include serial
-
 # NOTE: despite debug flags no symbol info so undebuggable
 Group TEST {
    ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
 }
+
+.f.o:
+	${FC} ${FFLAGS} ${LDFLAGS} -c $<
+
+include serial
+
+define GETSOCKNAME_LONG
+
+include cpp-rule
+

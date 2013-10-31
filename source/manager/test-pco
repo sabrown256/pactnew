@@ -9,8 +9,6 @@ umask 007
 
 unalias *
 
-set Which  = "$cwd/pwhich"
-
 set Setup     = TRUE
 set Configure = TRUE
 set Compare   = TRUE
@@ -43,7 +41,7 @@ while ($#argv > 0)
            set Compare = FALSE
            breaksw
       case -vg:
-           set ValGrind = `$Which valgrind`
+           set ValGrind = `where valgrind |& head -n 1`
            if (!(-x "$ValGrind")) then
               set ValGrind = ""
            endif

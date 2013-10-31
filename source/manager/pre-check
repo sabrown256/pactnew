@@ -13,8 +13,6 @@ unalias *
 
 @ Err = 0
 
-set Which = "$cwd/pwhich"
-
 # check for required utilities
 set Requ = ""
 set Requ = ( $Requ chmod cp ln ls mkdir mv pwd rm sync touch )
@@ -26,7 +24,7 @@ set Requ = ( $Requ csh make ar )
 
 set Missing = ""
 foreach i ($Requ)
-   if (!(-x `$Which $i`)) then
+   if (!(-x `where $i |& head -n 1`)) then
       set Missing = ( $Missing $i )
    endif
 end
@@ -40,11 +38,11 @@ endif
 
 # check for lex/flex
 set HaveLex = FALSE
-if (-x `$Which lex`) then
+if (-x `where lex |& head -n 1`) then
    set HaveLex = TRUE
 endif
 set HaveFlex = FALSE
-if (-x `$Which flex`) then
+if (-x `wher flex |& head -n 1`) then
    set HaveFlex = TRUE
 endif
 if (($HaveLex == FALSE) && ($HaveFlex == FALSE)) then
@@ -55,11 +53,11 @@ endif
 
 # check for yacc/bison
 set HaveYacc = FALSE
-if (-x `$Which yacc`) then
+if (-x `where yacc |& head -n 1`) then
    set HaveYacc = TRUE
 endif
 set HaveBison = FALSE
-if (-x `$Which bison`) then
+if (-x `where bison |& head -n 1`) then
    set HaveBison = TRUE
 endif
 if (($HaveYacc == FALSE) && ($HaveBison == FALSE)) then

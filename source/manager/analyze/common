@@ -22,7 +22,6 @@ else if (-f ../../scripts/functions-pact.csh) then
    set psy_mngdir  = $cwd:h
 endif
 set ldir  = $psy_mngdir:h/scripts
-set Which = $psy_mngdir/pwhich
 
 if ($?FirstCommon == 0) then
    set lroot = $ldir:h

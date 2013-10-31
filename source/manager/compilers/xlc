@@ -118,7 +118,8 @@ Group OpenMP {
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
+include serial
+
 include features/aix
 include aix-dp-env
-include serial
 
