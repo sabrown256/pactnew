@@ -24,4 +24,13 @@ while ($#argv > 0)
    shift
 end
 
+set exe    = `which pact`
+set bindir = $exe:h
+set etcdir = $bindir:h/etc
+
+source $etcdir/env-pact.csh
+source $etcdir/functions-pact.csh
+
+InitLog log $cwd/log.$0:t
+
 exit($err)

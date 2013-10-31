@@ -23,7 +23,7 @@ Tool CC {
                 64    = -tp k8-64 ]
    Flags   += [ _cmd_ = -p ;                # profiling
 	        on    = -Mprof=func ]
-   Debug    = -g
+   Debug    = -g -O0
    Optimize = -g -O1
    Version  = -V
 }
@@ -34,7 +34,9 @@ Tool FC {
    Flags  += [ _env_ = Bits ;               # address bit size
                32    = -tp px ;
                64    = -tp k8-64 ]
-   Version = -V
+   Debug    = -g -O0
+   Optimize = -g -O
+   Version  = -V
 }
 
 Tool CXX {
@@ -46,14 +48,10 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath   = -Wl,-rpath,@
-   Flags   = -Ktrap=fp ${SMP_NUMA}
-   Flags   += [ _cmd_ = -p ;                # profiling
-	        on    = -Mprof=func ]
-}
-
-Tool MAKE {
-   UseGNU = TRUE
+   RPath  = -Wl,-rpath,@
+   Flags  = -Ktrap=fp ${SMP_NUMA}
+   Flags += [ _cmd_ = -p ;                # profiling
+	      on    = -Mprof=func ]
 }
 
 Group AF {
@@ -86,4 +84,8 @@ Group OpenMP {
 include cpp-rule
 include serial
 include osx
+
+Tool MAKE {
+   UseGNU = TRUE
+}
 

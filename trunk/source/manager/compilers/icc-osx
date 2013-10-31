@@ -89,7 +89,3 @@ include osx
 
 define NON_INTEGER_ENUM
 
-Group MDG {
-   Lib = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
-}
-

@@ -7,8 +7,6 @@
 # include "cpyright.h"
 #
 
-run analyze/osx-evolution
-
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath clang
 
@@ -61,23 +59,17 @@ Tool LD {
 
    Flags   += [ _cmd_ = -p ;                 # profiling
 	        on    = -pg ]
-   Flags   += [ _cmd_ = -cov ;               # coverage analysis
-	        on    = -lgcov ]
    Lib      = -lc
 }
 
 Tool Lex {
    Flags  = -w
-   Flags += [ _env_ = Bits ;                 # address bit size
-              *     = -m* ]
+#   Flags += [ _env_ = Bits ;                 # address bit size
+#              *     = -m* ]
 }
 
 Tool MAKE {
    UseGNU = TRUE
-}
-
-Tool Ranlib {
-   Exe = ranlib
 }
 
 Group AF {
@@ -120,25 +112,9 @@ Group OpenMP {
 include cpp-rule
 include serial
 
-setenv PATH $PACT_CC_PATH/bin:$PACT_FC_PATH/bin:/sw/bin:/usr/apps/gnu/bin:/usr/local/bin:$PATH
+include osx
 
-Group LEH {
-   TTY_ECHO  = FALSE
-   TTY_VTIME = FALSE
+Tool Ranlib {
+   Exe = ranlib
 }
 
-Group MDG {
-   Lib = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
-}
-
-Group PNG {
-   Path = /sw
-}
-
-Group JPEG {
-   Path = /sw
-}
-
-Group HDF {
-   Path = /sw
-}
