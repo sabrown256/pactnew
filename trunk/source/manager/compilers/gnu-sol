@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-include compilers/gnu
+include compilers/gnu-lnx
 
 define SOLARIS
 
@@ -17,10 +17,6 @@ Tool LD {
 
 Group MDG {
    Lib += /usr/openwin/lib/libX11.so /usr/openwin/lib/libXext.so
-}
-
-Group PThread {
-   LD_Lib = -lpthread 
 }
 
 Group X11 {

@@ -6,7 +6,7 @@
  *             -    pgcc -c99 -D_XOPEN_SOURCE=600 standards.c -o standards
  *             -    suncc -xc99 -D_XOPEN_SOURCE=600 standards.c -o standards
  *             -    pathcc -std=c99 -D_XOPEN_SOURCE=600 standards.c -o standards
- *             -    bgxlc -qlanglvl=extc99 -D_XOPEN_SOURCE=600 standards.c -o standards
+ *             -    xlc -qlanglvl=extc99 -D_XOPEN_SOURCE=600 standards.c -o standards
  *
  *
  * Source Version: 9.0

@@ -7,82 +7,19 @@
 # include "cpyright.h"
 #
 
-run analyze/rpath -a /usr/${LIB}
-run analyze/rpath pgi
-
-Tool CC {
-   Exe      = pgcc
-   Flags    = -Kieee
-   Flags   += [ _env_ = STD_C ;             # C standard flags
-                C89   = -c89 ;
-                C99   = -c99 ;
-                X89   = -c89 ;
-                X99   = -c99 ]
-   Flags   += [ _env_ = Bits ;              # address bit size
-                32    = -tp px ;
-                64    = -tp k8-64 ]
-   Flags   += [ _cmd_ = -p ;                # profiling
-	        on    = -Mprof=func ]
-   Debug    = -g -O0
-   Optimize = -g -O1
-   Version  = -V
+Group OCV {
+   Bits   = [ _env_ = Bits ;              # address bit size
+              32    = -tp px ;
+              64    = -tp k8-64 ]
+   PIC    = 
+   RPath  = 
+   LD     = -Ktrap=fp ${SMP_NUMA}
+   LD_ShE = no-op
+   CC_Sh  =
+   LD_Sh  =
 }
 
-Tool FC {
-   Exe     = pgf90
-   Flags   = -Mfree -Mnoref_externals
-   Flags  += [ _env_ = Bits ;               # address bit size
-               32    = -tp px ;
-               64    = -tp k8-64 ]
-   Debug    = -g -O0
-   Optimize = -g -O
-   Version  = -V
-}
-
-Tool CXX {
-   Exe       = pgCC
-   Flags     = 
-   Debug     = -g -O0
-   Optimize  = -g -O1
-   Version   = -V
-}
-
-Tool LD {
-   RPath  = -Wl,-rpath,@
-   Flags  = -Ktrap=fp ${SMP_NUMA}
-   Flags += [ _cmd_ = -p ;                # profiling
-	      on    = -Mprof=func ]
-}
-
-Group AF {
-   PATTERN_WARN = "PGFTN-W- PGF90-W- PGC-W-"
-   PATTERN_ERR  = "PGFTN-S- PGF90-S- PGC-S- PGC-F-"
-}
-
-Group Cfg {
-   Use      = Std
-   LD_Flags = ${LD_Flags}
-}
-
-Group Shared {
-   LD_Exe   = no-op
-   CC_Flags =
-   LD_Flags =
-   LD_Lib   =
-}
-
-Group PThread {
-   LD_Lib = -lpthread 
-}
-
-Group OpenMP {
-   CC_Flags += -mp
-   LD_Flags += -mp
-   LD_Lib    =
-}
-
-include cpp-rule
-include serial
+include compilers/pgi
 include osx
 
 Tool MAKE {

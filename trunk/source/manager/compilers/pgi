@@ -7,6 +7,7 @@
 # include "cpyright.h"
 #
 
+
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath pgi
 
@@ -18,9 +19,8 @@ Tool CC {
                 C99   = -c99 ;
                 X89   = -c89 ;
                 X99   = -c99 ]
-   Flags   += [ _env_ = Bits ;              # address bit size
-                32    = -tp px ;
-                64    = -tp k8-64 -fpic ]
+   Flags   += ${OCV_Bits}
+   Flags   += ${OCV_PIC}
    Flags   += [ _cmd_ = -p ;                # profiling
 	        on    = -Mprof=func ]
    Debug    = -g -O0
@@ -31,9 +31,8 @@ Tool CC {
 Tool FC {
    Exe     = pgf90
    Flags   = -Mfree -Mnoref_externals
-   Flags  += [ _env_ = Bits ;               # address bit size
-               32    = -tp px ;
-               64    = -tp k8-64 -fpic ]
+   Flags  += ${OCV_Bits}
+   Flags  += ${OCV_PIC}
    Debug    = -g -O0
    Optimize = -g -O
    Version  = -V
@@ -48,11 +47,9 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath  = -Wl,-rpath,@
-#   Flags  = -Ktrap=fp ${SMP_NUMA}
-   Flags  = -Ktrap=fp
-   Flags += -Wl,-export-dynamic
-   Flags += [ _cmd_ = -p ;                  # profiling
+   RPath  = ${OCV_RPath}
+   Flags  = ${OCV_LD}
+   Flags += [ _cmd_ = -p ;                # profiling
 	      on    = -Mprof=func ]
 }
 
@@ -67,9 +64,9 @@ Group Cfg {
 }
 
 Group Shared {
-   LD_Exe   = gcc
-   CC_Flags = -fPIC
-   LD_Flags = -shared
+   LD_Exe   = ${OCV_LD_ShE}
+   CC_Flags = ${OCV_CC_Sh}
+   LD_Flags = ${OCV_LD_Sh}
 }
 
 Group PThread {
@@ -84,9 +81,3 @@ Group OpenMP {
 
 include cpp-rule
 include serial
-include full-mm
-
-Group TEST {
-   ADVISORY = ${TEST_ADVISORY}:score_mor
-}
-

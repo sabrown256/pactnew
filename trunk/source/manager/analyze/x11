@@ -55,6 +55,16 @@ else
 
    set UTime = `timer -r`
 
+# remove -I from X11_Inc
+   if ("$X11_Inc" =~ *-I*) then
+      setenv X11_Inc "`echo $X11_Inc | sed 's|-I||g'`"
+   endif
+
+# remove -L from X11_Lib
+   if ("$X11_Lib" =~ *-L*) then
+      setenv X11_Lib "`echo $X11_Lib | sed 's|-L||g'`"
+   endif
+
 # write a little X test that works around dumb Solaris
 # on which XOpenDisplay hangs forever if it does not
 # like the DISPLAY variable value

@@ -1,5 +1,5 @@
 #
-# IC-OSX - define Intel compiler for MAC OS X
+# ICC-LNX - define Intel compiler for Linux
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -9,17 +9,12 @@
 
 Group OCV {
    RPath  = -Wl,-rpath,@
-   LD    += -undefined dynamic_lookup
+   LD    += -Wl,-export-dynamic
    LD_ShE = gcc
    CC_Sh  = -fPIC
-   LD_Sh  = -shared -undefined dynamic_lookup
-   OMP    = 
+   LD_Sh  = -shared
+   OMP    = -par-affinity=none
 }
 
 include compilers/icc
-include osx
-
-Tool MAKE {
-   UseGNU = TRUE
-}
 

@@ -86,17 +86,14 @@ Group Std {
 Group Cfg {
    Use      = Std
    CC_Exe   = opencc
-#   Use      = CC
-#   LD_Flags = ${LD_Flags}
 }
 
 Group Shared {
    LD_Exe    = opencc
    CC_Flags  = -fPIC
    LD_Flags  = -shared
-   LD_Flags += [ _env_ = Bits ;                 # address bit size
-                 32    = -m32 ;
-                 64    = -m64 ]
+   LD_Flags += [ _env_ = Bits ;                # address bit size
+                 *     = -m* ]
 }
 
 Group PThread {
@@ -110,10 +107,10 @@ Group OpenMP {
    SharedFnc = yes
 }
 
+include cpp-rule
+include serial
+
 Group TEST {
   ADVISORY = ${TEST_ADVISORY}:pdb_fd
 }
-
-include cpp-rule
-include serial
 

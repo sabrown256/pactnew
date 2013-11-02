@@ -1,28 +1,21 @@
 #
 # XLC - define IBM XLC compiler
 #
-# Source Version: 3.0
-# Software Release #: LLNL-CODE-422942
-#
 # include "cpyright.h"
 #
 
-run analyze/rpath aix
-
-# NOTE: this should eventually be put in a site specific file
-setenv PATH         ${PATH}:/usr/local/bin
-
 Tool CC {
-   Exe       = xlc
+   Exe       = ${OCV_CC}
    Flags     = -D_ALL_SOURCE
+   Flags    += ${OCV_XArch}
    Flags    += [ _env_ = STD_C ;             # C standard flags
                  C89   = -qlanglvl=stdc89 ;
                  C99   = -qlanglvl=stdc99 ;
                  X89   = -qlanglvl=extc89 ;
                  X99   = -qlanglvl=extc99 ;
                  X11   = -qlanglvl=extc1x ]
-   Flags    =+ -qldbl128                     # 16 byte long double
-   Flags    =+ -qsuppress=1500-010:1506-1300:1506-1298:1506-273 
+   Flags    =+ ${OCV_Long16}
+   Flags    =+ ${OCV_CC_Warn}
    Flags    += [ _env_ = Bits ;              # address bit size
                  *     = -q* ]
    Flags    += [ _cmd_ = -p ;                # profiling
@@ -33,8 +26,9 @@ Tool CC {
 }
 
 Tool FC {
-   Exe     = xlf90
+   Exe     = ${OCV_FC}
    Flags   = -qrecur -qnullterm -qinitauto=ff -qalias=intptr -qundef
+   Flags  += ${OCV_XArch}
    Flags  += [ _env_ = Bits ;                # address bit size
                *     = -q* ]
    Flags  += [ _cmd_ = -p ;                  # profiling
@@ -43,7 +37,7 @@ Tool FC {
 }
 
 Tool CXX {
-   Exe       = xlc++
+   Exe       = ${OCV_CXX}
    Flags     = 
    Debug     = -g -O0
    Optimize  = -g -O
@@ -51,28 +45,24 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath = -bsvr4 -bnoexpfull -R @
-   Flags = [ _env_ = Bits ;                  # address bit size
-             *     = -b* ]
+   RPath  = ${OCV_RPath}
+   Lib    = ${OCV_LD_Lib}
+   Flags  = ${OCV_LD_Bits}
+   Flags += ${OCV_LD_Ext}
 }
 
 Tool Lex {
-   Flags  = -D_ALL_SOURCE -D_LARGE_FILES -qsuppress=1506-1300:1506-1298
-   Flags += [ _env_ = STD_C ;                # C standard flags
+   Flags  = -D_ALL_SOURCE -D_LARGE_FILES
+   Flags += ${OCV_XArch}
+   Flags += ${OCV_LX_Warn}
+   Flags += [ _env_ = STD_C ;             # C standard flags
               C89   = -qlanglvl=stdc89 ;
-              C99   = -qlanglvl=stdc99 ]
+              C99   = -qlanglvl=stdc99 ;
+              X89   = -qlanglvl=extc89 ;
+              X99   = -qlanglvl=extc99 ;
+              X11   = -qlanglvl=extc1x ]
    Flags += [ _env_ = Bits ;                 # address bit size
               *     = -q* ]
-}
-
-Tool AR {
-   Exe   = /bin/ar
-   Flags = [ _env_ = Bits ;                  # address bit size
-             *     = -X* ]
-}
-
-Tool DO_RUN {
-   MPI = poe
 }
 
 Group AF {
@@ -86,30 +76,31 @@ Group Cfg {
    LD_Flags = ${LD_Flags}
 }
 
-Group DP {
-   Lib = -binitfini:poe_remote_main
-}
-
 Group Shared {
-   LD_Exe    = cc
-   LD_Flags  = -G
-   LD_Flags += [ _env_ = Bits ;             # address bit size
+   LD_Exe    = ${OCV_CC}
+   CC_Flags  = -qpic
+   CC_Flags += [ _env_ = Bits ;              # address bit size
                  *     = -q* ]
+   LD_Flags  = -qmkshrobj
+#   LD_Exe    = cc
+#   LD_Flags  = -G
 }
 
 Group PThread {
-   CC_Exe = xlc_r
-   FC_Exe = xlf90_r
-   LD_Lib = -lpthread 
+   CC_Exe   = ${OCV_CC_SMP}
+   FC_Exe   = ${OCV_FC_SMP}
+   LD_Flags = -qsmp -qthreaded
+   LD_Lib   = -lpthread 
 }
 
 Group OpenMP {
-   CC_Exe    = xlc_r
-   FC_Exe    = xlf90_r
-   CC_Flags  = -qsmp=omp:noauto
-   FC_Flags  = -qsmp=omp:noauto
-   Lex_Flags = -qsmp=omp:noauto
-   LD_Flags  = -qsmp=omp:noauto
+   CC_Exe    = ${OCV_CC_SMP}
+   FC_Exe    = ${OCV_FC_SMP}
+   CC_Flags  = ${OCV_OMP}
+   FC_Flags  = ${OCV_OMP}
+   Lex_Flags = ${OCV_OMP}
+   LD_Flags  = ${OCV_OMP}
+   LD_Lib    =
 }
 
 .c.i:
@@ -119,7 +110,4 @@ Group OpenMP {
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
 include serial
-
-include features/aix
-include aix-dp-env
 

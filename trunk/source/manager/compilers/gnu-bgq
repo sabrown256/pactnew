@@ -7,109 +7,22 @@
 # include "cpyright.h"
 #
 
+Group OCV {
+   CC     = mpicc
+   FC     = mpif90
+   FC_Cfg = gfortran
+   FC_Ext = -funderscoring
+   LD_Lib = -lc
+   OMP_Lib = 
+}
+
 run analyze/rpath gnu
 
-Tool CC {
-   Exe       = mpicc
-   Flags     = -fsignaling-nans -ffloat-store
-   Flags    += [ _env_ = STD_C ;                # C standard flags
-                 C89   = -std=c89 ;
-                 C99   = -std=c99 ;
-                 X89   = -std=gnu89 ;           # gcc default
-                 X99   = -std=gnu99 ]
-   Flags    += [ _env_ = Bits ;                 # address bit size
-                 *     = -m* ]
-   Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = -pg ]
-   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
-	         on    = -fprofile-arcs -ftest-coverage ]
-   Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
-   Version   = -v
-}
-
-Tool FC {
-   Exe     = mpif90
-   Flags   = -funderscoring -ffree-form
-   Flags  += [ _env_ = Bits ;                # address bit size
-               *     = -m* ]
-   Flags  += [ _cmd_ = -p ;                  # profiling
-	       on    = -pg ]
-   Flags  += [ _cmd_ = -cov ;                # coverage analysis
-	       on    = -fprofile-arcs -ftest-coverage ]
-   Version = -v
-}
-
-Tool CXX {
-   Exe       = g++
-   Flags     = 
-   Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
-   Version   = -v
-}
-
-Tool LD {
-   RPath    = -Wl,-rpath,@
-   Flags   += [ _cmd_ = -p ;                 # profiling
-	        on    = -pg ]
-   Flags   += [ _cmd_ = -cov ;               # coverage analysis
-	        on    = -lgcov ]
-   Lib      = -lc
-}
-
-Tool Lex {
-   Flags  = -w
-   Flags += [ _env_ = Bits ;                 # address bit size
-              *     = -m* ]
-}
-
-Tool MAKE {
-   UseGNU = TRUE
-}
-
-Group AF {
-   PATTERN_WARN = ":+sp+warning:"
-   PATTERN_ERR  = ":+sp+error:"
-}
-
-Group Std {
-   LD_Flags = ${LD_Flags}
-}
-
-Group Cfg {
-   Use    = Std
-   CC_Exe = gcc
-   FC_Exe = gfortran
-}
-
-Group Shared {
-   LD_Exe    = gcc
-   CC_Flags  = -fPIC
-   CC_Flags += [ _env_ = Bits ;                 # address bit size
-                *     = -m* ]
-   LD_Flags  = -shared
-}
-
-Group PThread {
-   LD_Lib = -lpthread 
-}
-
-Group OpenMP {
-   CC_Flags  = -fopenmp
-   LD_Flags  = -fopenmp
-#   LD_Lib    = -lgomp
-   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
-                4.6.0  <  yes ;
-                4.6.0  >= no ]
-}
-
-include cpp-rule
-include serial
+include compilers/gnu-bg
+include features/bgq
 
 # BFD is detected but tests do not work
 Group TEST {
   ADVISORY = ${TEST_ADVISORY}:score_retrc:fortran_pdb_manual 
 }
-
-include features/bgq
 

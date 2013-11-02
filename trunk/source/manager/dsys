@@ -596,6 +596,12 @@ switch ($Cmnd)
         unsetenv PACT_FC_PATH
         unsetenv SMP_Pthread
 
+        unsetenv Z_Inc
+        unsetenv X11_Inc
+        unsetenv PNG_Inc
+        unsetenv JPEG_Inc
+        unsetenv MDG_Inc
+
 # do not bother with core files for the many analyzers
         limit coredumpsize 0 >& /dev/null
 

@@ -1,0 +1,40 @@
+#
+# XLC-BG - define XLC compiler for generic BlueGene system
+#
+# include "cpyright.h"
+#
+
+include compilers/xlc
+
+Group Cfg {
+   Use         = Std
+   CC_Exe      = gcc
+   CC_Flags    = -g
+   CC_Flags   += [ _env_ = Bits ;                # address bit size
+                   *     = -m* ]
+   CC_Debug    = -Wall
+   CC_Optimize = -O -Wunused
+   CC_Version  = -v
+   LD_Lib      = -lc
+   FC_Exe      = ${OCV_FC_Cfg}
+   LD_Flags    = ${LD_Flags}
+}
+
+Group MPI {
+   CC_Exe = ${OCV_CC_SMP}
+   FC_Exe = ${OCV_FC_SMP}
+}
+
+# NOTE: despite debug flags no symbol info so undebuggable
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
+}
+
+Tool Cfg_Lex {
+   Flags = -w
+}
+
+Tool MAKE {
+   UseGNU = TRUE
+}
+

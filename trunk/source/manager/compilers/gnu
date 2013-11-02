@@ -29,9 +29,8 @@ Tool CC {
 #                 4.8.* >= -fsanitize=address ]
 #   Flags    += [ _env_ = PACT_CC_VERSION ;      # thread checks
 #                 4.8.* >= -fsanitize=thread -pie ]
-   Flags    += [ _env_ = Bits ;                 # address bit size
-                 32    = -m32 ;
-                 64    = -m64 -fPIC ]
+   Flags    += ${OCV_Bits}
+   Flags    += ${OCV_PIC}
    Flags    += [ _cmd_ = -p ;                   # profiling
 	         on    = $CC_Profile ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
@@ -53,9 +52,8 @@ Tool FC {
    Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                  4.*   = -fsignaling-nans ;
                  4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
-   Flags    += [ _env_ = Bits ;                 # address bit size
-                 32    = -m32 ;
-                 64    = -m64 -fPIC ]
+   Flags    += ${OCV_Bits}
+   Flags    += ${OCV_PIC}
    Flags    += [ _cmd_ = -p ;                   # profiling
 	         on    = $FC_Profile ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
@@ -75,11 +73,8 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath    = -Wl,-rpath,@
-   Flags   += [ _env_ = HSY_OS_NAME ;
-                Linux = -rdynamic ]
-   Flags   += [ _env_ = HSY_OS_Name ;
-                Linux = -Wl,--disable-new-dtags ] # save us from RUN_PATH
+   RPath    = ${OCV_RPath}
+   Flags   += ${OCV_LD}
 #   Flags   += [ _env_ = PACT_CC_VERSION ;         # memory and thread checks
 #                4.8.* >= -pie ]
    Flags   += [ _cmd_ = -p ;                      # profiling
@@ -91,9 +86,8 @@ Tool LD {
 
 Tool Lex {
    Flags  = -w
-   Flags += [ _env_ = Bits ;                 # address bit size
-              32    = -m32 ;
-              64    = -m64 -fPIC ]
+   Flags += ${OCV_Bits}
+   Flags += ${OCV_PIC}
 }
 
 Group AF {
@@ -115,7 +109,8 @@ Group Cfg {
 Group Shared {
    LD_Exe   = gcc
    CC_Flags = -fPIC
-   LD_Flags = -shared
+   LD_Flags = ${OCV_Sh}
+   LD_Lib   = ${OCV_ShLb}
 }
 
 Group PThread {
@@ -131,9 +126,12 @@ Group OpenMP {
                 4.6.0  >= no ]
 }
 
+Group Python {
+   CC_Exe      = gcc
+   CC_Debug    = -g
+   CC_Optimize = -g -O -Wunused
+}
+
 include cpp-rule
 include serial
-
-run analyze/rpath -a /usr/${LIB}
-run analyze/rpath gnu
 

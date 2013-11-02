@@ -1,111 +1,31 @@
 #
 # XLC-BGL - define IBM BG/L XLC compiler
 #
-# Source Version: 3.0
-# Software Release #: LLNL-CODE-422942
-#
 # include "cpyright.h"
 #
 
-#XArch = -qarch=ppc
-XArch = ""
-
-Tool CC {
-   Exe       = mpxlc
-   Flags     = ${XArch} -D_ALL_SOURCE -qsuppress=1500-010:1506-1300:1506-1298:1506-383
-   Flags    += [ _env_ = STD_C ;             # C standard flags
-                 C89   = -qlanglvl=stdc89 ;
-                 C99   = -qlanglvl=stdc99 ;
-                 X89   = -qlanglvl=extc89 ;
-                 X99   = -qlanglvl=extc99 ]
-   Flags    += [ _env_ = Bits ;              # address bit size
-                 *     = -q* ]
-   Optimize  = -O -qmaxmem=32768
-   Version   = -qversion
+Group OCV {
+   CC      = mpxlc
+   CC_Warn = -qsuppress=1500-010:1506-1300:1506-1298:1506-383
+   CC_SMP  = mpixlc_r
+   CXX     = xlc++
+   FC      = mpxlf90
+   FC_SMP  = mpxlf90
+   FC_Cfg  = g77
+   LX_Warn = -qsuppress=1506-1300:1506-1298
+   LD_Bits = 
+   LD_Lib  = -lc -lnss_files -lnss_dns -lresolv
+   LD_Ext  = 
+   OMP     = 
+   Long16  = -qldbl128                     # 16 byte long double
+   RPath   = 
+   XArch   = 
 }
 
-Tool FC {
-   Exe     = mpxlf90
-   Flags   = -qrecur -qnullterm -qinitauto=ff -qalias=intptr -qundef
-   Flags  += ${XArch} -qrecur
-   Flags  += [ _env_ = Bits ;                # address bit size
-               *     = -q* ]
-   Version = -qversion
-}
-
-Tool CXX {
-   Exe       = xlc++
-   Flags     = 
-   Debug     = -g -O0
-   Optimize  = -g -O
-   Version   = -qversion
-}
-
-Tool LD {
-   Lib = -lc -lnss_files -lnss_dns -lresolv
-}
-
-Tool Lex {
-   Flags  = ${XArch} -D_ALL_SOURCE -D_LARGE_FILES -qsuppress=1506-1300:1506-1298
-   Flags += [ _env_ = Bits ;                 # address bit size
-              *     = -q* ]
-}
-
-Tool Cfg_Lex {
-   Flags = -w
-}
-
-Tool MAKE {
-   UseGNU = TRUE
-}
-
-Group AF {
-   PATTERN_WARN = "WARNING: (E) (W) (I)"
-   PATTERN_ERR  = "Error: (S)"
-}
-
-Group Cfg {
-   Use         = Std
-   CC_Exe      = gcc
-   CC_Flags    = -g
-   CC_Flags   += [ _env_ = Bits ;                # address bit size
-                   *     = -m* ]
-   CC_Debug    = -Wall
-   CC_Optimize = -O -Wunused
-   CC_Version  = -v
-   LD_Lib      = -lc
-   FC_Exe      = g77
-   LD_Flags    = ${LD_Flags}
-}
-
-Group PThread {
-   FC_Exe   = mpxlf90
-   LD_Flags = -qsmp
-   LD_Lib   = -lpthread 
-}
-
-Group OpenMP {
-   FC_Exe = mpxlf90
-   LD_Lib =
-}
-
-# NOTE: despite debug flags no symbol info so undebuggable
-Group TEST {
-   ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
-}
-
-.f.o:
-	${FC} ${FFLAGS} ${LDFLAGS} -c $<
-
-include serial
-
-Group MPI {
-   CC_Exe = mpxlc
-   FC_Exe = mpxlf90
-}
+include compilers/xlc-bg
+include features/bgl
 
 Group X11 {
    RPath = /usr/X11R6/$LIB
 }
 
-include features/bgl

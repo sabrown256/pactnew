@@ -85,7 +85,7 @@ EOF
 # LIST - make sure the list elements are unique and the requested
 #      - compiler is listed first
 
-set cclst = (gcc pgcc icc pathcc xlc cc)
+set cclst = (gcc clang pgcc icc opencc pathcc suncc xlc cc)
 foreach i ($cclst)
     set ok = TRUE
     foreach j ($ncclst)

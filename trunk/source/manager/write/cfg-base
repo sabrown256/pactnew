@@ -46,13 +46,13 @@
       case aix:
            set cfg = "$cfg-$Bits"
            echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/xlc" >>& $Tmp
+           echo "include compilers/xlc-aix" >>& $Tmp
            breaksw
       case beos:
       case haiku:
            set cfg = "$cfg-$Bits"
            echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/gnu" >>& $Tmp
+           echo "include compilers/gnu-lnx" >>& $Tmp
            breaksw
       case cygwin*:
            set ladv = ""
@@ -159,11 +159,11 @@
 # get the main compiler family
            switch ($lcc)
               case clang:
-                   set lcfam = clang
+                   set lcfam = clang-lnx
                    breaksw
               case *intel:
               case *icc:
-                   set lcfam = icc
+                   set lcfam = icc-lnx
                    breaksw
               case *path:
               case *pathcc:
@@ -171,16 +171,19 @@
                    breaksw
               case *pgi:
               case *pgcc:
-                   set lcfam = pgi
+                   set lcfam = pgi-lnx
                    breaksw
 	      case *sun:
 	      case *suncc:
                    set lcfam = sun
                    breaksw
+	      case *xlc*:
+                   set lcfam = xlc-lnx
+                   breaksw
               default:
               case *gnu:
               case *gcc:
-                   set lcfam = gnu
+                   set lcfam = gnu-lnx
                    breaksw
            endsw
 
@@ -225,6 +228,7 @@
               case *pgcc:
               case *gnu:
               case *gcc:
+              case *xlc*:
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/$lcfam" >>& $Tmp
