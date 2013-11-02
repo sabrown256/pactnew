@@ -1,124 +1,31 @@
 #
 # XLC-BGP - define IBM BG/P XLC compiler
 #
-# Source Version: 3.0
-# Software Release #: LLNL-CODE-422942
-#
 # include "cpyright.h"
 #
 
-XArch = -qarch=450
-
-Tool CC {
-   Exe       = mpixlc_r
-   Flags     = ${XArch} -D_ALL_SOURCE -qsuppress=1500-010:1506-1300:1506-1298:1506-383:1506-377
-   Flags    += [ _env_ = STD_C ;             # C standard flags
-                 C89   = -qlanglvl=stdc89 ;
-                 C99   = -qlanglvl=stdc99 ;
-                 X89   = -qlanglvl=extc89 ;
-                 X99   = -qlanglvl=extc99 ]
-   Flags    += [ _env_ = Bits ;              # address bit size
-                 *     = -q* ]
-   Flags    += [ _cmd_ = -p ;                # profiling
-	         on    = -qpdf1 ]
-   Debug     = -g -O0
-   Optimize  = -g -O -qmaxmem=32768
-   Version   = -qversion
+Group OCV {
+   CC      = mpixlc_r
+   CC_Warn = -qsuppress=1500-010:1506-1300:1506-1298:1506-383:1506-377
+   CC_SMP  = mpixlc_r
+   CXX     = xlc++
+   FC      = mpixlf90_r
+   FC_SMP  = mpixlf90_r
+   FC_Cfg  = gfortran
+   LX_Warn = -qsuppress=1506-1300:1506-1298:1506-377
+   LD_Bits = 
+   LD_Lib  = -lc -lnss_files -lnss_dns -lresolv
+   LD_Ext  = 
+   OMP     = 
+   Long16  = -qldbl128                     # 16 byte long double
+   RPath   = 
+   XArch   = -qarch=450
 }
 
-Tool FC {
-   Exe     = mpixlf90_r
-   Flags   = -qrecur -qnullterm -qinitauto=ff -qalias=intptr -qundef
-   Flags  += ${XArch} -qrecur
-   Flags  += [ _env_ = Bits ;                # address bit size
-               *     = -q* ]
-   Flags  += [ _cmd_ = -p ;                  # profiling
-	       on    = -qpdf1 ]
-   Version = -qversion
-}
-
-Tool CXX {
-   Exe       = xlc++
-   Flags     = 
-   Debug     = -g -O0
-   Optimize  = -g -O
-   Version   = -qversion
-}
-
-Tool LD {
-   Lib = -lc
-}
-
-Tool Lex {
-   Flags  = ${XArch} -D_ALL_SOURCE -D_LARGE_FILES -qsuppress=1506-1300:1506-1298:1506-377
-   Flags += [ _env_ = Bits ;                 # address bit size
-              *     = -q* ]
-}
-
-Tool Cfg_Lex {
-   Flags = -w
-}
-
-Tool MAKE {
-   UseGNU = TRUE
-}
-
-Group AF {
-   PATTERN_WARN = "WARNING: (E) (W) (I)"
-   PATTERN_ERR  = "Error: (S)"
-}
-
-Group Cfg {
-   Use         = Std
-   CC_Exe      = gcc
-   CC_Flags    = -g
-   CC_Debug    = -Wall
-   CC_Optimize = -O -Wunused
-   CC_Version  = -v
-   LD_Lib      = -lc
-   FC_Exe      = gfortran
-   LD_Flags    = ${LD_Flags}
-}
-
-Group Shared {
-   LD_Exe    = mpixlc_r
-   CC_Flags  = -qpic
-   CC_Flags += [ _env_ = Bits ;              # address bit size
-                 *     = -q* ]
-   LD_Flags  = -qmkshrobj
-}
-
-Group PThread {
-   CC_Exe   = mpixlc_r
-   FC_Exe   = mpixlf90_r
-   LD_Flags = -qsmp -qthreaded
-   LD_Lib   = -lpthread 
-}
-
-Group OpenMP {
-   CC_Exe = mpixlc_r
-   FC_Exe = mpixlf90_r
-   LD_Lib =
-}
-
-# NOTE: despite debug flags no symbol info so undebuggable
-Group TEST {
-   ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
-}
-
-.f.o:
-	${FC} ${FFLAGS} ${LDFLAGS} -c $<
-
-include serial
-
-Group MPI {
-   CC_Exe = mpixlc_r
-   FC_Exe = mpixlf90_r
-}
+include compilers/xlc-bg
+include features/bgp
 
 Group X11 {
    RPath = /usr/X11R6/$LIB
 }
-
-include features/bgp
 

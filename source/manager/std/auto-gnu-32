@@ -10,7 +10,7 @@
 run std/use-compiler vers any gcc
 
 include 32-bit
-include compilers/gnu
+include compilers/gnu-lnx
 
 Group PSY {
    OMIT_INTERP = TRUE

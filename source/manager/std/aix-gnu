@@ -8,6 +8,5 @@
 #
 
 include spokes
-include compilers/gnu
-include aix
+include compilers/gnu-aix
 

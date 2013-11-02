@@ -1,0 +1,48 @@
+#
+# XLC-AIX - define XLC compiler on AIX
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# NOTE: this should eventually be put in a site specific file
+setenv PATH         ${PATH}:/usr/local/bin
+
+Group OCV {
+   CC      = xlc
+   CC_SMP  = xlc_r
+   CC_Warn = -qsuppress=1500-010:1506-1300:1506-1298:1506-273 
+   FC      = xlf90
+   FC_SMP  = xlf90_r
+   LX_Warn = -qsuppress=1506-1300:1506-1298
+   LD_Bits = [ _env_ = Bits ;                  # address bit size
+               *     = -b* ]
+   LD_Lib  = 
+   OMP     = -qsmp=omp:noauto
+   Long16  = -qldbl128                     # 16 byte long double
+   RPath   = -bsvr4 -bnoexpfull -R @
+   XArch   = 
+}
+
+run analyze/rpath aix
+
+include compilers/xlc
+include features/aix
+include aix-dp-env
+
+Tool AR {
+   Exe   = /bin/ar
+   Flags = [ _env_ = Bits ;                  # address bit size
+             *     = -X* ]
+}
+
+Tool DO_RUN {
+   MPI = poe
+}
+
+Group DP {
+   Lib = -binitfini:poe_remote_main
+}
+

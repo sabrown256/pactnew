@@ -1,0 +1,18 @@
+#
+# CLANG-LNX - define clang compiler for Linux
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Group OCV {
+   RPath = -Wl,-rpath,@
+   LD    = -rdynamic
+   LDLb  = -ldl -lc
+   Sh    = -shared
+}
+
+include compilers/clang
+

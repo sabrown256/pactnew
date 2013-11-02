@@ -12,7 +12,7 @@ run analyze/rpath intel
 
 Tool CC {
    Exe       = icc
-   Flags     = -wd161,188,267,1357
+   Flags     = -wd71,72,161,188,267,1357
    Flags    += [ _env_ = STD_C ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
@@ -44,8 +44,8 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath  = -Wl,-rpath,@
-   Flags += -Wl,-export-dynamic
+   RPath  = ${OCV_RPath}
+   Flags += ${OCV_LD}
    Lib    = -lc
 }
 
@@ -67,7 +67,7 @@ Group Cfg {
 Group Shared {
    LD_Exe   = icc
    CC_Flags = -fpic
-   LD_Flags = -shared
+   LD_Flags = ${OCV_LD_Sh}
 }
 
 Group PThread {
@@ -75,8 +75,8 @@ Group PThread {
 }
 
 Group OpenMP {
-   CC_Flags = -openmp -wd71,72 -par-affinity=none
-   FC_Flags = -openmp -par-affinity=none
+   CC_Flags = -openmp ${OCV_OMP}
+   FC_Flags = -openmp ${OCV_OMP}
    LD_Lib   = -lpthread 
 }
 

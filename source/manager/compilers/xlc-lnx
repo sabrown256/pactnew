@@ -7,76 +7,46 @@
 # include "cpyright.h"
 #
 
+Group OCV {
+   CC      = xlc
+   CC_Warn = -qsuppress=1500-010:1500-029:1506-1300:1506-1298:1506-273 
+   CC_SMP  = xlc_r
+   CXX     = xlC
+   FC      = xlf90
+   FC_SMP  = xlf90_r
+   FC_Cfg  = gfortran
+   LX_Warn = -qsuppress=1500-010:1506-1300:1506-1298
+   LD_Bits = 
+   LD_Lib  = -lc
+   LD_Ext  = [ _env_ = HOSTOS ;
+               Linux = -rdynamic ]
+   LD_Ext += [ _env_ = HOSTOS ;
+               Linux = -Wl,--disable-new-dtags ] # save us from RUN_PATH
+   LD_Ext += [ _cmd_ = -p ;                      # profiling
+	       on    = -pg ]
+   LD_Ext += [ _cmd_ = -cov ;                    # coverage analysis
+	       on    = -lgcov ]
+   OMP     = -qsmp=omp:noauto
+   Long16  = -qldbl128                     # 16 byte long double
+   RPath   = -Wl,-rpath,@
+   XArch   = 
+}
+
 run analyze/rpath -a /usr/${LIB}
 
-Tool CC {
-   Exe       = xlc
-   Flags     = -D_ALL_SOURCE
-   Flags    += [ _env_ = STD_C ;             # C standard flags
-                 C89   = -qlanglvl=stdc89 ;
-                 C99   = -qlanglvl=stdc99 ;
-                 X89   = -qlanglvl=extc89 ;
-                 X99   = -qlanglvl=extc99 ;
-                 X11   = -qlanglvl=extc1x ]
-   Flags    =+ -qldbl128                     # 16 byte long double
-   Flags    =+ -qsuppress=1500-010:1500-029:1506-1300:1506-1298:1506-273 
-#   Flags    =+ -qnostaticlink
-   Flags    += [ _env_ = Bits ;              # address bit size
-                 *     = -q* ]
-   Flags    += [ _cmd_ = -p ;                # profiling
-	         on    = -qpdf1 ]
-   Debug     = -g -O0
-   Optimize  = -g -O -qmaxmem=32768
-   Version   = -qversion
+include compilers/xlc
+include cpp-rule
+
+define GETSOCKNAME_LONG
+
+# NOTE: despite debug flags no symbol info so undebuggable
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
 }
 
-Tool FC {
-   Exe     = xlf90
-}
+#--------------------------------------------------------------------------
 
-Tool CXX {
-   Exe       = xlC
-   Flags     = 
-   Debug     = -g -O0
-   Optimize  = -g -O
-   Version   = -qversion
-}
-
-Tool LD {
-   RPath    = -Wl,-rpath,@
-   Flags   += [ _env_ = HOSTOS ;
-                Linux = -rdynamic ]
-   Flags   += [ _env_ = HOSTOS ;
-                Linux = -Wl,--disable-new-dtags ] # save us from RUN_PATH
-   Flags   += [ _cmd_ = -p ;                      # profiling
-	        on    = -pg ]
-   Flags   += [ _cmd_ = -cov ;                    # coverage analysis
-	        on    = -lgcov ]
-   Lib      = -lc
-}
-
-Tool LD {
-   RPath    = -Wl,-rpath,@
-   Flags   += [ _cmd_ = -p ;                      # profiling
-	        on    = -pg ]
-   Flags   += [ _cmd_ = -cov ;                    # coverage analysis
-	        on    = -lgcov ]
-   Lib      = -lc
-}
-
-Tool Lex {
-   Flags  = -D_ALL_SOURCE -D_LARGE_FILES -qsuppress=1500-010:1506-1300:1506-1298
-   Flags += [ _env_ = STD_C ;                # C standard flags
-              C89   = -qlanglvl=stdc89 ;
-              C99   = -qlanglvl=stdc99 ]
-   Flags += [ _env_ = Bits ;                 # address bit size
-              *     = -q* ]
-}
-
-Group AF {
-   PATTERN_WARN = "WARNING: (E) (W) (I)"
-   PATTERN_ERR  = "Error: (S)"
-}
+# NOTE: can Std, Cfg, and Shared go?
 
 Group Std {
    CC_Flags = ${CC_Flags}
@@ -89,38 +59,10 @@ Group Cfg {
 }
 
 Group Shared {
-   LD_Exe    = xlc
+   LD_Exe    = ${OCV_CC}
    LD_Flags  = -G
    LD_Flags += [ _env_ = Bits ;             # address bit size
                  *     = -q* ]
 }
 
-Group PThread {
-   CC_Exe = xlc_r
-   FC_Exe = xlf90_r
-   LD_Lib = -lpthread 
-}
-
-Group OpenMP {
-   CC_Exe    = xlc_r
-   FC_Exe    = xlf90_r
-   CC_Flags  = -qsmp=omp:noauto
-   FC_Flags  = -qsmp=omp:noauto
-   Lex_Flags = -qsmp=omp:noauto
-   LD_Flags  = -qsmp=omp:noauto
-}
-
-# NOTE: despite debug flags no symbol info so undebuggable
-Group TEST {
-   ADVISORY = ${TEST_ADVISORY}:pdb_fd:sx_intp3
-}
-
-.f.o:
-	${FC} ${FFLAGS} ${LDFLAGS} -c $<
-
-include serial
-
-define GETSOCKNAME_LONG
-
-include cpp-rule
-
+#--------------------------------------------------------------------------

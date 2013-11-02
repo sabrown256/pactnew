@@ -7,14 +7,14 @@
 # include "cpyright.h"
 #
 
+include compilers/gnu-lnx
+
+define CYGWIN
+
 Group PACT {
    CC_PATH =
    FC_PATH =
 }
-
-define CYGWIN
-
-include compilers/gnu
 
 # cygwin does not support -rpath
 run analyze/rpath init
@@ -30,8 +30,7 @@ Tool MAKE {
 # specifications for FPE patching
 Group FPE {
    Flags  = -g -Wall
-   Flags += [ _env_ = Bits ;                    # compiler flags
-              *     = -m* ]
+   Flags += ${OCV_Bits}
 }
 
 Group Std {

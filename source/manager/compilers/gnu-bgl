@@ -7,104 +7,21 @@
 # include "cpyright.h"
 #
 
+Group OCV {
+   CC      = mpgcc
+   FC      = mpf90
+   FC_Cfg  = g77
+   FC_Ext  =
+   LD_Lib  = -lc -lnss_files -lnss_dns -lresolv
+   OMP_Lib = -lgomp
+}
+
 run analyze/rpath gnu
 
-Tool CC {
-   Exe       = mpgcc
-   Flags     = -fsignaling-nans -ffloat-store
-   Flags    += [ _env_ = STD_C ;                # C standard flags
-                 C89   = -std=c89 ;
-                 C99   = -std=c99 ;
-                 X89   = -std=gnu89 ;           # gcc default
-                 X99   = -std=gnu99 ]
-   Flags    += [ _env_ = Bits ;                 # address bit size
-                 *     = -m* ]
-   Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = -pg ]
-   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
-	         on    = -fprofile-arcs -ftest-coverage ]
-   Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
-   Version   = -v
-}
-
-Tool FC {
-   Exe     = mpf90
-   Flags   = -ffree-form
-   Flags  += [ _env_ = Bits ;                # address bit size
-               *     = -m* ]
-   Flags  += [ _cmd_ = -p ;                  # profiling
-	       on    = -pg ]
-   Flags  += [ _cmd_ = -cov ;                # coverage analysis
-	       on    = -fprofile-arcs -ftest-coverage ]
-   Version = -v
-}
-
-Tool CXX {
-   Exe       = g++
-   Flags     = 
-   Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
-   Version   = -v
-}
-
-Tool LD {
-   RPath    = -Wl,-rpath,@
-   Flags   += [ _cmd_ = -p ;                 # profiling
-	        on    = -pg ]
-   Flags   += [ _cmd_ = -cov ;               # coverage analysis
-	        on    = -lgcov ]
-   Lib      = -lc -lnss_files -lnss_dns -lresolv
-}
-
-Tool Lex {
-   Flags  = -w
-   Flags += [ _env_ = Bits ;                 # address bit size
-              *     = -m* ]
-}
-
-Tool MAKE {
-   UseGNU = TRUE
-}
-
-Group AF {
-   PATTERN_WARN = ":+sp+warning:"
-   PATTERN_ERR  = ":+sp+error:"
-}
-
-Group Std {
-   LD_Flags = ${LD_Flags}
-}
-
-Group Cfg {
-   Use    = Std
-   CC_Exe = gcc
-}
-
-Group Shared {
-   LD_Exe   = gcc
-   CC_Flags = -fPIC
-   LD_Flags = -shared
-}
-
-Group PThread {
-   LD_Lib = -lpthread 
-}
-
-Group OpenMP {
-   CC_Flags  = -fopenmp
-   LD_Flags  = -fopenmp
-   LD_Lib    = -lgomp
-   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
-                4.6.0  <  yes ;
-                4.6.0  >= no ]
-}
-
-include cpp-rule
-include serial
+include compilers/gnu-bg
+include features/bgl
 
 Group X11 {
    RPath = /usr/X11R6/$LIB
 }
 
-include features/bgl

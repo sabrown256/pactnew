@@ -1,5 +1,5 @@
 #
-# CLANG - define clang compiler
+# GNU-BG - define GNU compiler for IBM BlueGene generically
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -7,33 +7,16 @@
 # include "cpyright.h"
 #
 
-run analyze/rpath -a /usr/${LIB}
-run analyze/rpath clang
-
 Tool CC {
-   Exe       = clang
-   Flags     =
-#   Flags    += -Wcovered-switch-default
-   Flags    += -Wno-unknown-pragmas -Wno-empty-body
+   Exe       = ${OCV_CC}
+   Flags     = -fsignaling-nans -ffloat-store
    Flags    += [ _env_ = STD_C ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
                  X89   = -std=gnu89 ;           # gcc default
                  X99   = -std=gnu99 ]
-   Debug     = -g -O0 -Wall -Wno-unused-value
-   Optimize  = -g -O2
-   Version   = -v
-}
-
-Tool FC {
-   Exe       = gfortran
-   Flags     = -ffloat-store -ffree-form
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
-                 4.*   = -fsignaling-nans ;
-                 4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
    Flags    += [ _env_ = Bits ;                 # address bit size
-                 32    = -m32 ;
-                 64    = -m64 -fPIC ]
+                 *     = -m* ]
    Flags    += [ _cmd_ = -p ;                   # profiling
 	         on    = -pg ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
@@ -43,8 +26,21 @@ Tool FC {
    Version   = -v
 }
 
+Tool FC {
+   Exe     = ${OCV_FC}
+   Flags   = -ffree-form
+   Flags  += ${OCV_FC_Ext}
+   Flags  += [ _env_ = Bits ;                # address bit size
+               *     = -m* ]
+   Flags  += [ _cmd_ = -p ;                  # profiling
+	       on    = -pg ]
+   Flags  += [ _cmd_ = -cov ;                # coverage analysis
+	       on    = -fprofile-arcs -ftest-coverage ]
+   Version = -v
+}
+
 Tool CXX {
-   Exe       = clang++
+   Exe       = g++
    Flags     = 
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
@@ -52,15 +48,18 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath    = ${OCV_RPath}
-   Flags   += ${OCV_LD}
+   RPath    = -Wl,-rpath,@
    Flags   += [ _cmd_ = -p ;                 # profiling
 	        on    = -pg ]
-   Lib      = ${OCV_LDLb}
+   Flags   += [ _cmd_ = -cov ;               # coverage analysis
+	        on    = -lgcov ]
+   Lib      = ${OCV_LD_Lib}
 }
 
 Tool Lex {
    Flags  = -w
+   Flags += [ _env_ = Bits ;                 # address bit size
+              *     = -m* ]
 }
 
 Tool MAKE {
@@ -73,20 +72,21 @@ Group AF {
 }
 
 Group Std {
-   CC_Flags = ${CC_Flags}
-   FC_Flags = ${FC_Flags}
    LD_Flags = ${LD_Flags}
 }
 
 Group Cfg {
    Use    = Std
-   CC_Exe = clang
+   CC_Exe = gcc
+   FC_Exe = ${OCV_FC_Cfg}
 }
 
 Group Shared {
-   LD_Exe   = clang
-   CC_Flags = -fPIC
-   LD_Flags = ${OCV_Sh}
+   LD_Exe    = gcc
+   CC_Flags  = -fPIC
+   CC_Flags += [ _env_ = Bits ;                 # address bit size
+                *     = -m* ]
+   LD_Flags  = -shared
 }
 
 Group PThread {
@@ -94,9 +94,9 @@ Group PThread {
 }
 
 Group OpenMP {
-   CC_Flags  =
+   CC_Flags  = -fopenmp
    LD_Flags  = -fopenmp
-   LD_Lib    = -lgomp
+   LD_Lib    = ${OCV_OMP_Lib}
    SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                 4.6.0  <  yes ;
                 4.6.0  >= no ]

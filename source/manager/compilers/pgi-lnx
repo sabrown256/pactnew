@@ -1,0 +1,31 @@
+#
+# PGI-LNX - define PGI compiler for Linux
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Group OCV {
+   Bits   = [ _env_ = Bits ;              # address bit size
+              32    = -tp px ;
+              64    = -tp k8-64 ]
+   PIC    = [ _env_ = Bits ;
+              64    = -fpic ]
+   RPath  = -Wl,-rpath,@
+#   LD     = -Ktrap=fp ${SMP_NUMA}
+   LD     = -Ktrap=fp
+   LD    += -Wl,-export-dynamic
+   LD_ShE = gcc
+   CC_Sh  = -fPIC
+   LD_Sh  = -shared
+}
+
+include compilers/pgi
+include full-mm
+
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:score_mor
+}
+

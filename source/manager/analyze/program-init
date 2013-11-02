@@ -253,6 +253,10 @@ Group MDE {
 Group MINGW {
 }
 
+# OS dependent Compiler Variant group
+Group OCV {
+}
+
 # Open MP group
 Group OpenMP {
    SharedFnc = no

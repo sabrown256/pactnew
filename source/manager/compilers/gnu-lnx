@@ -1,0 +1,26 @@
+#
+# GNU-LNX - define GNU compiler for Linux
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Group OCV {
+   Bits  = [ _env_ = Bits ;              # address bit size
+             *     = -m* ]
+   PIC   = [ _env_ = Bits ;
+             64    = -fPIC ]
+   RPath = -Wl,-rpath,@
+   LD    = -rdynamic
+   LD   += -Wl,--disable-new-dtags       # save us from RUN_PATH
+   Sh    = -shared
+   ShLb  = 
+}
+
+include compilers/gnu
+
+run analyze/rpath -a /usr/${LIB}
+run analyze/rpath gnu
+
