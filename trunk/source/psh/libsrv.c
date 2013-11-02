@@ -521,18 +521,20 @@ int async_server(srvdes *sv)
 	        ok = 2;};
 
 	if (ok == 2)
-	   {SLOG(sv, 4, "missing connection file");}
+	   {SLOG(sv, 1, "server exit by missing connection file");}
 	else if (ok == 0)
 	   {rv = TRUE;
-	    SLOG(sv, 4, "done by command");}
+	    SLOG(sv, 1, "server exit by command");}
 	else if (ng >= tmax)
 	   {rv = TRUE;
-	    SLOG(sv, 4, "done by time: %d >= %d", ng, tmax);}
+	    SLOG(sv, 1, "server exit by time: %d >= %d", ng, tmax);}
 	else if (nb >= nbmax)
-	   {SLOG(sv, 4, "done by failed reads: %d >= %d", nb, nbmax);};}
+	   {SLOG(sv, 1, "server exit by failed reads: %d >= %d",
+		 nb, nbmax);};}
 
     else
-       {SLOG(sv, 1, "async_server error (%s - %d)", strerror(errno), errno);};
+       {SLOG(sv, 1, "server exit by launch failure (%s - %d)",
+	     strerror(errno), errno);};
 
     return(rv);}
 
