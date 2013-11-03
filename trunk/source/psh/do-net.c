@@ -2149,7 +2149,7 @@ static void readhost(donetdes *st, int log)
     if (IS_NULL(st->handtout) == TRUE)
        strcpy(st->handtout, "pass");
 
-    if (strcmp(linst, "yes") == 0)
+    if ((strcmp(linst, "yes") == 0) && (st->install == TRUE))
        st->localinstall = TRUE;
 
     if (IS_NULL(st->logdir) == TRUE)
@@ -3057,7 +3057,11 @@ static void finish(donetdes *st, double gti)
 
     note(Log, TRUE, "");
 
-    lrun(Log, NLOG, "( rm -f %s/log.* >& /dev/null )", st->logdir);
+/* NOTE: /bin/bash will succeed at this while /bin/dash will fail
+ * so to avoid the vagueries of the system explicitly run it with /bin/csh
+ */
+    lrun(Log, NLOG, "/bin/csh -c '( rm -f %s/log.* >& /dev/null )'",
+	 st->logdir);
 
     slog = open_file("a", "%s/stat", st->uplog);
 
