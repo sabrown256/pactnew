@@ -27,7 +27,15 @@ while ($#argv > 0)
    shift
 end
 
-if ($CROSS_COMPILE == FALSE) then
+# NOTE: this may be incorrect wrt JOBS_System
+# batch execution is not equivalent to DP but they often go together
+# the mpirun avaiable as a package with Linux distributions
+# such as Ubuntu hangs on this test even though it works with
+# some other simple usages
+# for now assume you have to have a real resource manager
+# such as SLURM in order to run batch
+
+if (($CROSS_COMPILE == FALSE) && ($JOBS_System != loner)) then
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -67,7 +67,13 @@ if ($?PCSH_TMP_ == 1) then
    Note $log ">> with PCSH_TMP_ = $lt"
 else
    set lt = $exe:e
+   if ("$lt" == "") then
+      set lt = csh-$$
+   endif
    set tdir = $cwd/tmp-$lt
+   if (!(-d $tdir)) then
+      mkdir -p $tdir
+   endif
    InitLog log $tdir/log.junko.$$
    Note $log ">> without PCSH_TMP_"
 endif
@@ -82,7 +88,11 @@ flog $log cd $tdir
 flog $log uname -n
 flog $log ( env | sort )
 
-set dir = $tdir:h/wrk-$prob:t
+set base = $tdir:h
+if ("$base" == "") then
+   set base = $cwd
+endif
+set dir = $base/wrk-$prob:t
 if (!(-d $dir)) then
    flog $log mkdir $dir
 endif
