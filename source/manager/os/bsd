@@ -1,0 +1,13 @@
+#
+# BSD - config elements for BSD variants - freebsd, openbsd, ...
+#
+# include "cpyright.h"
+#
+
+setenv PATH ${PATH}:/usr/local/bin
+
+Group HSY {
+   RootInc = /usr/local/include
+   RootLib = /usr/local/lib
+}
+

@@ -16,10 +16,8 @@ Group OCV {
    OMP_Lib = 
 }
 
-run analyze/rpath gnu
-
 include compilers/gnu-bg
-include features/bgq
+include os/bgq
 
 # BFD is detected but tests do not work
 Group TEST {

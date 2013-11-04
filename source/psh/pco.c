@@ -2277,6 +2277,23 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 
 	FREE(t);}
 
+/* set variable only if undefined */
+    else if (strcmp(oper, "?=") == 0)
+       {if (cdefenv(fvar) == FALSE)
+
+/* check value of val
+ * we want things such as "foo =? $bar" to do nothing if
+ * "$bar" is not defined
+ */
+	   {t = echo(FALSE, val);
+	    if (IS_NULL(t) == FALSE)
+	       dbset(cl, fvar, t);
+	    else
+	       note(Log, TRUE, "   ?= not changing %s - no value for |%s|",
+		    fvar, val);
+
+	    FREE(t);};}
+
     else
        noted(Log, "Bad operator '%s' in SET_VAR", oper);
 
@@ -2703,7 +2720,8 @@ static void read_config(client *cl, char *cfg, int quiet)
 		  (strcmp(oper, "+=") == 0) ||
 		  (strcmp(oper, "=+") == 0) ||
 		  (strcmp(oper, "-=") == 0) ||
-		  (strcmp(oper, "=?") == 0))
+		  (strcmp(oper, "=?") == 0) ||
+		  (strcmp(oper, "?=") == 0))
 	    set_var(cl, TRUE, key, oper, value);
 
 /* .c.i rule handler */

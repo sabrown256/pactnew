@@ -19,7 +19,7 @@ Group OCV {
 }
 
 include compilers/clang
-include osx
+include os/osx
 
 Tool Ranlib {
    Exe = ranlib

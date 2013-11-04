@@ -7,21 +7,22 @@
 # include "cpyright.h"
 #
 
-include compilers/gnu-lnx
-
-define SOLARIS
-
-Tool LD {
-   Lib = -lsocket -lnsl
+Group OCV {
+   Bits   = [ _env_ = Bits ;              # address bit size
+              *     = -m* ]
+   PIC    = [ _env_ = Bits ;
+              64    = -fPIC ]
+   RPath  =
+   LD     =
+   LD_Lib = -lsocket -lnsl
+   Sh     = -shared
+   ShLb   = 
 }
 
-Group MDG {
-   Lib += /usr/openwin/lib/libX11.so /usr/openwin/lib/libXext.so
-}
+include compilers/gnu
+include os/solaris
 
-Group X11 {
-   Path = /usr/openwin
-}
+run analyze/rpath -a /usr/${LIB}
 
 # GCC 3.4.3 complex support is buggy
 Group TEST {

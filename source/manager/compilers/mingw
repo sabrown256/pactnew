@@ -4,75 +4,33 @@
 # include "cpyright.h"
 #
 
-run analyze/rpath gnu
-
-Tool CC {
-   Exe       = [ _env_ = Bits ;                 # compiler version
-                 32    = i586-mingw32msvc-gcc ;
-                 64    = i686-w64-mingw32-gcc ]
-   Flags     = -fsignaling-nans -ffloat-store
-   Flags    += [ _env_ = STD_C ;                # C standard flags
-                 C89   = -std=c89 ;
-                 C99   = -std=c99 ;
-                 X89   = -std=gnu89 ;           # gcc default
-                 X99   = -std=gnu99 ]
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # pragma warning flags
-                 4.*  >= -Wno-pragmas ]
-#   Flags    += [ _env_ = Bits ;                 # address bit size
-#                 *     = -m* ]
-   Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = -pg ]
-   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
-	         on    = -fprofile-arcs -ftest-coverage ]
-   Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
-   Version   = -v
-}
-
-Tool FC {
-   Exe     = [ _env_ = Bits ;                 # compiler version
+Group OCV {
+   CC      = [ _env_ = Bits ;                 # compiler version
+               32    = i586-mingw32msvc-gcc ;
+               64    = i686-w64-mingw32-gcc ]
+   CXX     = [ _env_ = Bits ;                 # compiler version
+               32    = i586-mingw32msvc-g++ ;
+               64    = i686-w64-mingw32-g++ ]
+   FC      = [ _env_ = Bits ;                 # compiler version
                32    = i586-mingw32msvc-gfortran ;
                64    = i686-w64-mingw32-gfortran ]
-   Flags   = -funderscoring -ffree-form
-   Flags  += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
-               4.*   = -fsignaling-nans ;
-               4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
-#   Flags  += [ _env_ = Bits ;                 # address bit size
-#               *     = -m* ]
-   Flags  += [ _cmd_ = -p ;                   # profiling
-	       on    = -pg ]
-   Flags  += [ _cmd_ = -cov ;                 # coverage analysis
-	       on    = -fprofile-arcs -ftest-coverage ]
-   Version = -v
+   LD      = [ _env_ = Bits ;                 # linker version
+               32    = i586-mingw32msvc-ld ;
+               64    = i686-w64-mingw32-ld ]
+   Bits    =
+   PIC     =
+   RPath   = -Wl,-rpath,@
+   LD      =
+   LD_Lib  = -lwsock32
+   CC_Sh   =
+   Sh      = -shared
+   ShLb    =
+   OMP_Lib = -lgomp
 }
 
-Tool CXX {
-   Exe       = [ _env_ = Bits ;                 # compiler version
-                 32    = i586-mingw32msvc-g++ ;
-                 64    = i686-w64-mingw32-g++ ]
-   Flags     = 
-   Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
-   Version   = -v
-}
+run analyze/rpath gnu
 
-Tool LD {
-   Exe       = [ _env_ = Bits ;              # linker version
-                 32    = i586-mingw32msvc-ld ;
-                 64    = i686-w64-mingw32-ld ]
-   RPath    = -Wl,-rpath,@
-   Flags   += [ _cmd_ = -p ;                 # profiling
-	        on    = -pg ]
-   Flags   += [ _cmd_ = -cov ;               # coverage analysis
-	        on    = -lgcov ]
-   Lib      = -lwsock32
-}
-
-Tool Lex {
-   Flags  = -w
-#   Flags += [ _env_ = Bits ;                 # address bit size
-#              *     = -m* ]
-}
+include compilers/gnu
 
 Tool MAKE {
    UseGNU = TRUE
@@ -87,62 +45,12 @@ Tool NM {
    Cmd = $NM_Exe
 }
 
-#CPU          = [ _env_ = Bits ;                 # target CPU
-#                 x86 ;
-#                 x86_64 ]
 Group HSY {
    CPU = x86
 }
 
 Group FPE {
-   Exe    = [ _env_ = Bits ;                    # compiler version
-              32    = i586-mingw32msvc-gcc ;
-              64    = i686-w64-mingw32-gcc ]
+   Exe    = ${OCV_CC}
    Flags  = -g -Wall
-#   Flags += [ _env_ = Bits ;                    # compiler flags
-#              *     = -m* ]
 }
-
-Group AF {
-   PATTERN_WARN = ":+sp+warning:"
-   PATTERN_ERR  = ":+sp+error:"
-}
-
-Group Std {
-   CC_Flags = ${CC_Flags}
-   FC_Flags = ${FC_Flags}
-   LD_Flags = ${LD_Flags}
-}
-
-Group Cfg {
-   Use    = Std
-   CC_Exe = [ _env_ = Bits ;                    # compiler version
-              32    = i586-mingw32msvc-gcc ;
-              64    = i686-w64-mingw32-gcc ]
-}
-
-Group Shared {
-   LD_Exe = [ _env_ = Bits ;                    # compiler version
-              32    = i586-mingw32msvc-gcc ;
-              64    = i686-w64-mingw32-gcc ]
-#   CC_Flags += [ _env_ = Bits ;                 # address bit size
-#                *     = -m* ]
-   LD_Flags  = -shared
-}
-
-Group PThread {
-   LD_Lib = -lpthread 
-}
-
-Group OpenMP {
-   CC_Flags = -fopenmp
-   LD_Flags = -fopenmp
-#   LD_Lib   = -lgomp
-   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
-                4.6.0  <  yes ;
-                4.6.0  >= no ]
-}
-
-include cpp-rule
-include serial
 

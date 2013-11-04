@@ -8,17 +8,19 @@
 #
 
 Group OCV {
-   Bits  = [ _env_ = Bits ;              # address bit size
-             *     = -maix* ]
-   PIC   = 
-   RPath = -Wl,-bsvr4,-R,@
-   LD    = [ _env_ = Bits ;               # address bit size
-             *     = -Wl,-b* ]
-   Sh    = -shared
-   ShLb  = 
+   Bits   = [ _env_ = Bits ;              # address bit size
+              *     = -maix* ]
+   PIC    = 
+   RPath  = -Wl,-bsvr4,-R,@
+   LD     = [ _env_ = Bits ;               # address bit size
+              *     = -Wl,-b* ]
+   LD_Lib = -lc
+   Sh     = -shared
+   ShLb   = 
 }
 
 include compilers/gnu
+include os/aix
 
 Tool AR {
    Exe   = /bin/ar
@@ -30,10 +32,6 @@ Group Cfg {
    Use    = Std
    CC_Exe = gcc
 }
-
-include features/aix
-
-run analyze/rpath gnu
 
 # NOTE: this should eventually be put in a site specific file
 setenv PATH  ${PATH}:/usr/local/bin

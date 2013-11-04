@@ -7,40 +7,72 @@
 # include "cpyright.h"
 #
 
+Group OCV {
+   Bits   =? [ _env_ = Bits ;                 # address bit size
+               *     = -m* ]
+   PIC    =? 
+   RPath  =? -Wl,-rpath,@
+   LD     =?
+   CC_Cfg =? gcc
+}
+
 Tool CC {
    Exe       = ${OCV_CC}
-   Flags     = -fsignaling-nans -ffloat-store
+   Flags     = -ffloat-store
    Flags    += [ _env_ = STD_C ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
+                 C11   = -std=c11 ;
                  X89   = -std=gnu89 ;           # gcc default
-                 X99   = -std=gnu99 ]
-   Flags    += [ _env_ = Bits ;                 # address bit size
-                 *     = -m* ]
+                 X99   = -std=gnu99 ;
+                 X11   = -std=gnu11 ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                 4.*   = -fsignaling-nans ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # pragma warning flags
+                 4.*  >= -Wno-unknown-pragmas ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # stack checking
+                 4.2.* >= -fstack-protector ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # unused return value
+                 4.4.* > -Wunused-result ]
+#   Flags    += [ _env_ = PACT_CC_VERSION ;      # memory checks
+#                 4.8.* >= -fsanitize=address ]
+#   Flags    += [ _env_ = PACT_CC_VERSION ;      # thread checks
+#                 4.8.* >= -fsanitize=thread -pie ]
+   Flags    += ${OCV_Bits}
+   Flags    += ${OCV_PIC}
    Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = -pg ]
+                 on    = $CC_Profile ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
-	         on    = -fprofile-arcs -ftest-coverage ]
+                 on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
+#   Debug    += -Wno-unused-function -Wno-missing-declarations -Wno-inline
+   Optimize  = [ _env_ = PACT_CC_VERSION ;      # optimization level
+                 4.1.2 = -g -O0 -Wall ;         # 4.1.2 crashes on mlcfnc.c with -O
+                 *.*   = -g -O -Wunused ]
+   Optimize += [ _cmd_ = -tune @ ;              # optimization tuning
+                 *     = -mtune=* ]
+   Profile   = -pg
    Version   = -v
 }
 
 Tool FC {
-   Exe     = ${OCV_FC}
-   Flags   = -ffree-form
-   Flags  += ${OCV_FC_Ext}
-   Flags  += [ _env_ = Bits ;                # address bit size
-               *     = -m* ]
-   Flags  += [ _cmd_ = -p ;                  # profiling
-	       on    = -pg ]
-   Flags  += [ _cmd_ = -cov ;                # coverage analysis
-	       on    = -fprofile-arcs -ftest-coverage ]
-   Version = -v
+   Exe       = ${OCV_FC}
+   Flags     = -ffree-form
+   Flags    += ${OCV_FC_Ext}
+   Flags    += ${OCV_Bits}
+   Flags    += ${OCV_PIC}
+   Flags    += [ _cmd_ = -p ;                   # profiling
+                 on    = $FC_Profile ]
+   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
+                 on    = -fprofile-arcs -ftest-coverage ]
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Profile   = -pg
+   Version   = -v
 }
 
 Tool CXX {
-   Exe       = g++
+   Exe       = ${OCV_CXX}
    Flags     = 
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
@@ -48,22 +80,22 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath    = -Wl,-rpath,@
-   Flags   += [ _cmd_ = -p ;                 # profiling
-	        on    = -pg ]
-   Flags   += [ _cmd_ = -cov ;               # coverage analysis
-	        on    = -lgcov ]
+   Exe      = ${OCV_LD}
+   RPath    = ${OCV_RPath}
+   Flags   += ${OCV_LD}
+#   Flags   += [ _env_ = PACT_CC_VERSION ;        # memory and thread checks
+#                4.8.* >= -pie ]
+   Flags   += [ _cmd_ = -p ;                      # profiling
+                on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;                    # coverage analysis
+                on    = -lgcov ]
    Lib      = ${OCV_LD_Lib}
 }
 
 Tool Lex {
    Flags  = -w
-   Flags += [ _env_ = Bits ;                 # address bit size
-              *     = -m* ]
-}
-
-Tool MAKE {
-   UseGNU = TRUE
+   Flags += ${OCV_Bits}
+   Flags += ${OCV_PIC}
 }
 
 Group AF {
@@ -77,7 +109,7 @@ Group Std {
 
 Group Cfg {
    Use    = Std
-   CC_Exe = gcc
+   CC_Exe = ${OCV_CC_Cfg}
    FC_Exe = ${OCV_FC_Cfg}
 }
 
@@ -102,6 +134,16 @@ Group OpenMP {
                 4.6.0  >= no ]
 }
 
+Group Python {
+   CC_Exe      = ${OCV_CC}
+   CC_Debug    = -g
+   CC_Optimize = -g -O -Wunused
+}
+
 include cpp-rule
 include serial
+
+Tool MAKE {
+   UseGNU = TRUE
+}
 
