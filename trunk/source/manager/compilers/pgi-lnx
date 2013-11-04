@@ -23,6 +23,7 @@ Group OCV {
 }
 
 include compilers/pgi
+include os/lnx
 include full-mm
 
 Group TEST {

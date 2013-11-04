@@ -28,3 +28,8 @@ Group JPEG {
 Group HDF {
    Path = /sw
 }
+
+Tool MAKE {
+   UseGNU = TRUE
+}
+

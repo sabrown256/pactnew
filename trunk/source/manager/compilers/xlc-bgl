@@ -23,7 +23,7 @@ Group OCV {
 }
 
 include compilers/xlc-bg
-include features/bgl
+include os/bgl
 
 Group X11 {
    RPath = /usr/X11R6/$LIB

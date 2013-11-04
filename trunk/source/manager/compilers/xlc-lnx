@@ -35,6 +35,7 @@ Group OCV {
 run analyze/rpath -a /usr/${LIB}
 
 include compilers/xlc
+include os/lnx
 include cpp-rule
 
 define GETSOCKNAME_LONG

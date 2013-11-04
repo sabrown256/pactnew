@@ -16,10 +16,8 @@ Group OCV {
    OMP_Lib = 
 }
 
-run analyze/rpath gnu
-
 include compilers/gnu-bg
-include features/bgp
+include os/bgp
 
 Group X11 {
    RPath = /usr/X11R6/$LIB

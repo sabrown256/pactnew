@@ -23,5 +23,5 @@ Group OCV {
 }
 
 include compilers/xlc-bg
-include features/bgq
+include os/bgq
 

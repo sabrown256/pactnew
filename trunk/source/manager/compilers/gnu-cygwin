@@ -7,6 +7,9 @@
 # include "cpyright.h"
 #
 
+# cygwin does not support -rpath
+run analyze/rpath init
+
 include compilers/gnu-lnx
 
 define CYGWIN
@@ -15,9 +18,6 @@ Group PACT {
    CC_PATH =
    FC_PATH =
 }
-
-# cygwin does not support -rpath
-run analyze/rpath init
 
 Tool LD {
    Flags =

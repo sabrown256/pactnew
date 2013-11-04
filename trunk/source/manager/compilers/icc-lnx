@@ -17,4 +17,5 @@ Group OCV {
 }
 
 include compilers/icc
+include os/lnx
 

@@ -1,5 +1,5 @@
 #
-# MINGW - config elements for MINGW
+# CROSS-WIN - config elements for cross compiling for MSW using MINGW
 #
 # include "cpyright.h"
 #
@@ -9,7 +9,7 @@ Group CROSS {
 }
 
 Group MINGW {
-   $Bits = TRUE
+   Bits = TRUE
 }
 
 Tool DO_RUN {

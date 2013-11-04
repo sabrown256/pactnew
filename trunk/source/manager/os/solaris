@@ -1,0 +1,14 @@
+#
+# SOLARIS - config elements for Solaris variants - Solaris, Illumian, ...
+#
+# include "cpyright.h"
+#
+
+Group MDG {
+   Lib += /usr/openwin/lib/libX11.so /usr/openwin/lib/libXext.so
+}
+
+Group X11 {
+   Path = /usr/openwin
+}
+

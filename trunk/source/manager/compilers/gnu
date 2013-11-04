@@ -7,8 +7,19 @@
 # include "cpyright.h"
 #
 
+run analyze/rpath gnu
+
+Group OCV {
+   CC      ?= gcc
+   CXX     ?= g++
+   FC      ?= gfortran
+   LD      ?= 
+   CC_Sh   ?= -fPIC
+   OMP_Lib ?= -lgomp
+}
+
 Tool CC {
-   Exe       = gcc
+   Exe       = ${OCV_CC}
    Flags     = -ffloat-store
    Flags    += [ _env_ = STD_C ;                # C standard flags
                  C89   = -std=c89 ;
@@ -32,9 +43,9 @@ Tool CC {
    Flags    += ${OCV_Bits}
    Flags    += ${OCV_PIC}
    Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = $CC_Profile ]
+                 on    = $CC_Profile ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
-	         on    = -fprofile-arcs -ftest-coverage ]
+                 on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
 #   Debug    += -Wno-unused-function -Wno-missing-declarations -Wno-inline
    Optimize  = [ _env_ = PACT_CC_VERSION ;      # optimization level
@@ -47,7 +58,7 @@ Tool CC {
 }
 
 Tool FC {
-   Exe       = gfortran
+   Exe       = ${OCV_FC}
    Flags     = -ffloat-store -ffree-form
    Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                  4.*   = -fsignaling-nans ;
@@ -55,9 +66,9 @@ Tool FC {
    Flags    += ${OCV_Bits}
    Flags    += ${OCV_PIC}
    Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = $FC_Profile ]
+                 on    = $FC_Profile ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
-	         on    = -fprofile-arcs -ftest-coverage ]
+                 on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
    Profile   = -pg
@@ -65,7 +76,7 @@ Tool FC {
 }
 
 Tool CXX {
-   Exe       = g++
+   Exe       = ${OCV_CXX}
    Flags     = 
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
@@ -73,15 +84,16 @@ Tool CXX {
 }
 
 Tool LD {
+   Exe      = ${OCV_LD}
    RPath    = ${OCV_RPath}
    Flags   += ${OCV_LD}
-#   Flags   += [ _env_ = PACT_CC_VERSION ;         # memory and thread checks
+#   Flags   += [ _env_ = PACT_CC_VERSION ;        # memory and thread checks
 #                4.8.* >= -pie ]
    Flags   += [ _cmd_ = -p ;                      # profiling
-	        on    = -pg ]
+                on    = -pg ]
    Flags   += [ _cmd_ = -cov ;                    # coverage analysis
-	        on    = -lgcov ]
-   Lib      = -lc
+                on    = -lgcov ]
+   Lib      = ${OCV_LD_Lib}
 }
 
 Tool Lex {
@@ -103,12 +115,12 @@ Group Std {
 
 Group Cfg {
    Use    = Std
-   CC_Exe = gcc
+   CC_Exe = ${OCV_CC}
 }
 
 Group Shared {
-   LD_Exe   = gcc
-   CC_Flags = -fPIC
+   LD_Exe   = ${OCV_CC}
+   CC_Flags = ${OCV_CC_Sh}
    LD_Flags = ${OCV_Sh}
    LD_Lib   = ${OCV_ShLb}
 }
@@ -120,14 +132,14 @@ Group PThread {
 Group OpenMP {
    CC_Flags  = -fopenmp
    LD_Flags  = -fopenmp
-   LD_Lib    = -lgomp
+   LD_Lib    = ${OCV_OMP_Lib}
    SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                 4.6.0  <  yes ;
                 4.6.0  >= no ]
 }
 
 Group Python {
-   CC_Exe      = gcc
+   CC_Exe      = ${OCV_CC}
    CC_Debug    = -g
    CC_Optimize = -g -O -Wunused
 }

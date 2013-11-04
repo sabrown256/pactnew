@@ -20,9 +20,5 @@ Group OCV {
 }
 
 include compilers/pgi
-include osx
-
-Tool MAKE {
-   UseGNU = TRUE
-}
+include os/osx
 

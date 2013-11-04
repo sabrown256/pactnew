@@ -9,31 +9,27 @@
 
 Group OCV {
    Bits   = [ _env_ = Bits ;     # address bit size
-              *     = -m* ]
-   PIC   = 
-   RPath = 
-   LD    =
-#   LD   += -Wl,-export-dynamic
+               *     = -m* ]
+   PIC    = 
+   RPath  = 
+   LD     =
+#   LD    += -Wl,-export-dynamic
 # NOTE: readline detection is fouled up by this option
-#   LD   += -undefined dynamic_lookup
+#   LD    += -undefined dynamic_lookup
 
-    Sh  = -shared -undefined dynamic_lookup
-#    Sh += -dynamiclib -flat_namespace -undefined suppress
-   ShLb  = -lgomp
+   LD_Lib = -lc
+   Sh     = -shared -undefined dynamic_lookup
+#    Sh   += -dynamiclib -flat_namespace -undefined suppress
+   ShLb   = -lgomp
 }
 
 include compilers/gnu
+include os/osx
 
-Tool MAKE {
-   UseGNU = TRUE
-}
+# there is a libbfd in /opt/local/lib but it does not seem to work
+#run analyze/rpath -a /opt/local/${LIB}
 
 Tool Ranlib {
    Exe = ranlib
 }
-
-include osx
-
-# there is a libbfd in /opt/local/lib but it does not seem to work
-#run analyze/rpath -a /opt/local/${LIB}
 

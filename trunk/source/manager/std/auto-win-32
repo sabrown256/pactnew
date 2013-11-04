@@ -3,9 +3,11 @@
 #
 
 include 32-bit
+
 include compilers/mingw
+include cross-win
+
 include spokes
-include mingw
 include no-x11
 include no-sql
 include no-jpeg

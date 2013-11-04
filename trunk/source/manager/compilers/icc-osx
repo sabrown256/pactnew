@@ -17,9 +17,5 @@ Group OCV {
 }
 
 include compilers/icc
-include osx
-
-Tool MAKE {
-   UseGNU = TRUE
-}
+include os/osx
 
