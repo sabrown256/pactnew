@@ -7,6 +7,10 @@
 # include "cpyright.h"
 #
 
+Group OCV {
+   PIC = 
+}
+
 # cygwin does not support -rpath
 run analyze/rpath init
 

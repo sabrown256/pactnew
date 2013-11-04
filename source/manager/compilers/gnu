@@ -14,8 +14,13 @@ Group OCV {
    CXX     ?= g++
    FC      ?= gfortran
    LD      ?= 
+   CC_Cfg  ?= gcc
+   FC_Cfg  ?= gfortran
+   FC_Ext  ?= 
    CC_Sh   ?= -fPIC
    OMP_Lib ?= -lgomp
+   StackP  ?= [ _env_ = PACT_CC_VERSION ;      # stack checking
+               4.2.* >= -fstack-protector ]
 }
 
 Tool CC {
@@ -32,14 +37,13 @@ Tool CC {
                  4.*   = -fsignaling-nans ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # pragma warning flags
                  4.*  >= -Wno-unknown-pragmas ]
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # stack checking
-                 4.2.* >= -fstack-protector ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # unused return value
                  4.4.* > -Wunused-result ]
 #   Flags    += [ _env_ = PACT_CC_VERSION ;      # memory checks
 #                 4.8.* >= -fsanitize=address ]
 #   Flags    += [ _env_ = PACT_CC_VERSION ;      # thread checks
 #                 4.8.* >= -fsanitize=thread -pie ]
+   Flags    += ${OCV_StackP}
    Flags    += ${OCV_Bits}
    Flags    += ${OCV_PIC}
    Flags    += [ _cmd_ = -p ;                   # profiling
@@ -63,6 +67,7 @@ Tool FC {
    Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                  4.*   = -fsignaling-nans ;
                  4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
+   Flags    += ${OCV_FC_Ext}
    Flags    += ${OCV_Bits}
    Flags    += ${OCV_PIC}
    Flags    += [ _cmd_ = -p ;                   # profiling
@@ -115,7 +120,8 @@ Group Std {
 
 Group Cfg {
    Use    = Std
-   CC_Exe = ${OCV_CC}
+   CC_Exe = ${OCV_CC_Cfg}
+   FC_Exe = ${OCV_FC_Cfg}
 }
 
 Group Shared {

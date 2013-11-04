@@ -7,13 +7,13 @@
 # include "cpyright.h"
 #
 
-# Group CROSS {
+Group CROSS {
 #    COMPILE = BGL
-#}
+}
 
- Tool DO_RUN {
-    MPI   = "salloc.bgl"
-    CROSS = "no-op"
+Tool DO_RUN {
+   MPI   = "salloc.bgl"
+   CROSS = "no-op"
 }
 
 Group IBM {
