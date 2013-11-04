@@ -8,11 +8,11 @@
 #
 
 Group OCV {
-   CC     = mpicc
-   FC     = mpif90
-   FC_Cfg = gfortran
-   FC_Ext = -funderscoring
-   LD_Lib = -lc
+   CC      = mpicc
+   FC      = mpif90
+   FC_Cfg  = gfortran
+   FC_Ext  = -funderscoring
+   LD_Lib  = -lc
    OMP_Lib = 
 }
 

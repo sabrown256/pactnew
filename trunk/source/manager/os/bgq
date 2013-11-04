@@ -15,19 +15,6 @@ Group PSY {
    OMIT_INTERP = TRUE
 }
 
-Group RF {
-   STATIC_LINKING = TRUE
-}
-
-# Group BFD {
-#    Flags = -Wl,-dynamic
-# }
-
-Group TEST {
-   ADVISORY    = ${TEST_ADVISORY}:pgs_rendlr:pgs_rendac
-#   MAX_THREADS = 2
-}
-
 Tool DO_RUN {
    MPI   = "srun.bgq"
    DBG   = "tv.bgq"
@@ -43,4 +30,13 @@ define GETSOCKNAME_LONG
 
 setenv HAVE_MPI_GOOD_IO   TRUE
 setenv OBJECT_MODE        ${Bits}
+
+Group RF {
+   STATIC_LINKING = TRUE
+}
+
+Group TEST {
+   ADVISORY    = ${TEST_ADVISORY}:pgs_rendlr:pgs_rendac
+#   MAX_THREADS = 2
+}
 

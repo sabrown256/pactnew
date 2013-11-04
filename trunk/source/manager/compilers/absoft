@@ -7,32 +7,54 @@
 # include "cpyright.h"
 #
 
-run analyze/rpath -a /usr/${LIB}
 run analyze/rpath gnu
 
+Group OCV {
+   CC      ?= gcc
+   CXX     ?= g++
+   FC      ?= gfortran
+   LD      ?= 
+   CC_Sh   ?= -fPIC
+   OMP_Lib ?= -lgomp
+   StackP   = [ _env_ = PACT_CC_VERSION ;      # stack checking
+               4.2.* >= -fstack-protector ]
+}
+
 Tool CC {
-   Exe       = gcc
+   Exe       = ${OCV_CC}
    Flags     = -ffloat-store
    Flags    += [ _env_ = STD_C ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
+                 C11   = -std=c11 ;
                  X89   = -std=gnu89 ;           # gcc default
-                 X99   = -std=gnu99 ]
+                 X99   = -std=gnu99 ;
+                 X11   = -std=gnu11 ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                  4.*   = -fsignaling-nans ]
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # stack checking
-                 4.2.* >= -fstack-protector ]
-   Flags    += [ _env_ = Bits ;                 # address bit size
-                 32    = -m32 ;
-                 64    = -m64 -fPIC ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # pragma warning flags
+                 4.*  >= -Wno-unknown-pragmas ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # unused return value
+                 4.4.* > -Wunused-result ]
+#   Flags    += [ _env_ = PACT_CC_VERSION ;      # memory checks
+#                 4.8.* >= -fsanitize=address ]
+#   Flags    += [ _env_ = PACT_CC_VERSION ;      # thread checks
+#                 4.8.* >= -fsanitize=thread -pie ]
+   Flags    += ${OCV_Stackp}
+   Flags    += ${OCV_Bits}
+   Flags    += ${OCV_PIC}
    Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = -pg ]
+                 on    = $CC_Profile ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
-	         on    = -fprofile-arcs -ftest-coverage ]
+                 on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
+#   Debug    += -Wno-unused-function -Wno-missing-declarations -Wno-inline
+   Optimize  = [ _env_ = PACT_CC_VERSION ;      # optimization level
+                 4.1.2 = -g -O0 -Wall ;         # 4.1.2 crashes on mlcfnc.c with -O
+                 *.*   = -g -O -Wunused ]
    Optimize += [ _cmd_ = -tune @ ;              # optimization tuning
                  *     = -mtune=* ]
+   Profile   = -pg
    Version   = -v
 }
 
@@ -52,7 +74,7 @@ Tool FC {
 }
 
 Tool CXX {
-   Exe       = g++
+   Exe       = ${OCV_CXX}
    Flags     = 
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
@@ -88,12 +110,12 @@ Group Std {
 
 Group Cfg {
    Use    = Std
-   CC_Exe = gcc
+   CC_Exe = ${OCV_CC}
 }
 
 Group Shared {
-   LD_Exe   = gcc
-   CC_Flags = -fPIC
+   LD_Exe   = ${OCV_CC}
+   CC_Flags = ${OCV_CC_Sh}
    LD_Flags = -shared
 }
 
@@ -105,12 +127,20 @@ Group OpenMP {
    CC_Flags  = -fopenmp
    FC_Flags  = -openmp
    LD_Flags  = -fopenmp
-   LD_Lib    = -lgomp
+   LD_Lib    = ${OCV_OMP_Lib}
    SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                 4.6.0  <  yes ;
                 4.6.0  >= no ]
 }
 
+Group Python {
+   CC_Exe      = ${OCV_CC}
+   CC_Debug    = -g
+   CC_Optimize = -g -O -Wunused
+}
+
 include cpp-rule
 include serial
+
+run analyze/rpath -a /usr/${LIB}
 

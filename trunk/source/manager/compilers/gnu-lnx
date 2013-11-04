@@ -10,7 +10,7 @@
 Group OCV {
    Bits   = [ _env_ = Bits ;              # address bit size
               *     = -m* ]
-   PIC    = [ _env_ = Bits ;
+   PIC   ?= [ _env_ = Bits ;
               64    = -fPIC ]
    RPath  = -Wl,-rpath,@
    LD     = -rdynamic
