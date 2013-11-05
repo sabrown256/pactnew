@@ -19,6 +19,8 @@ dbmget $ALog IMF_Lib     =\? -limf^  \
              LibM_Lib    =\? "-lm"^  \
              LibM_RPath  =\? ""^     \
              Cfg_RPATH   =\? ""^     \
+             PACT_CC_FAMILY^         \
+             PACT_CC_PATH^           \
              RPATH
 
 #--------------------------------------------------------------------------
@@ -29,7 +31,16 @@ dbmget $ALog IMF_Lib     =\? -limf^  \
 # because of very poor performance of functions such as sqrt near 1.0
 
 if (-d "$IMF_Path") then
-   fexvars $ALog t ls -t $IMF_Path/{icc,ic*}/lib/libimf.a @b grep -v beta @o head -n 3 @o tail -n 1
+
+# for INTEL compiler use libimf that comes with compiler
+   if (($PACT_CC_FAMILY == INTEL) && ("$PACT_CC_PATH" =~ */icc*)) then
+      flog $ALog set t = $PACT_CC_PATH/lib/libimf.a
+
+# for other compiler find "best" libimf
+   else
+      fexvars $ALog t ls -t $IMF_Path/{icc,ic*}/lib/libimf.a @b grep -v beta @o head -n 3 @o tail -n 1
+   endif
+
 else
    set t = ""
 endif

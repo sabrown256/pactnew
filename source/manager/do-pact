@@ -219,8 +219,9 @@ switch ($Phase)
 
         call QUALIFY()
 
-        set psy_id = `../scripts/cfgman use`
-        set DevDir = $WrkDir/dev/$psy_id
+        setenv PSY_ID `../scripts/cfgman use`
+
+        set DevDir = $WrkDir/dev/$PSY_ID
         set LogDir = $DevDir/log
         set EtcDir = $DevDir/etc
         set Passed = $LogDir/passed
@@ -352,9 +353,9 @@ switch ($Phase)
               flog $LogHost $RM $Passed
 
 # assure a clean make of dmake in the config
-              if (-d $WrkDir/dev/$psy_id/lib) then
-                 flog $LogHost touch $WrkDir/dev/$psy_id/lib/libscore.foo
-                 flog $LogHost $RM $WrkDir/dev/$psy_id/lib/libscore*.*
+              if (-d $WrkDir/dev/$PSY_ID/lib) then
+                 flog $LogHost touch $WrkDir/dev/$PSY_ID/lib/libscore.foo
+                 flog $LogHost $RM $WrkDir/dev/$PSY_ID/lib/libscore*.*
               endif
 
 #--------------------------------------------------------------------------
@@ -446,7 +447,7 @@ switch ($Phase)
 
 # now that we are configured check the pattern for warnings and errors
 
-              set Cnfgrd = $WrkDir/dev/$psy_id/etc/configured
+              set Cnfgrd = $WrkDir/dev/$PSY_ID/etc/configured
 
               set WarnPattern = `pact +l -info AF_PATTERN_WARN | sed 's| |+sp+|g'`
               if ("$WarnPattern" == "") then
@@ -592,9 +593,9 @@ switch ($Phase)
                  endif
 
                  if ($?DoValgrind == 1) then
-                    flog $LogHost set TestLog = $WrkDir/dev/$psy_id/log/test-vg
+                    flog $LogHost set TestLog = $WrkDir/dev/$PSY_ID/log/test-vg
                  else
-                    flog $LogHost set TestLog = $WrkDir/dev/$psy_id/log/test
+                    flog $LogHost set TestLog = $WrkDir/dev/$PSY_ID/log/test
                  endif
 
                  if ("$ParOpt" == "") then

@@ -49,8 +49,6 @@ HAVE_SUBROUTINES
 unsetenv BASH_ENV
 umask 007
 
-limit stacksize unlimited >& /dev/null
-
 unset psy_mngdir
 unset PSY_ID
 unsetenv PSY_ID
@@ -100,6 +98,10 @@ endif
 
 setenv PERDB   $BinDir/perdb
 setenv GEXEC   $BinDir/gexec
+
+if ($PSY_Arch !~ cygwin*) then
+   limit stacksize unlimited >& /dev/null
+endif
 
 set Cmnd = $1
 shift

@@ -257,31 +257,34 @@ int elide(char *fname, parse *ip)
 	else
 	   fp = fopen_safe(fname, "r");
 
-	for (il = 0; TRUE; il++)
-            {ip->il = il;
+	if (fp != NULL)
+	   {for (il = 0; TRUE; il++)
+	        {ip->il = il;
 
-	     p = fgets(t, BFLRG, fp);
-	     if (p == NULL)
-	        break;
+		 p = fgets(t, BFLRG, fp);
+		 if (p == NULL)
+		    break;
 
-	     LAST_CHAR(p) = '\0';
+		 LAST_CHAR(p) = '\0';
 	     
 /* remove text between quotes
  * this appears to be the right thing to do only when
  * doing all sets
  * perhaps this needs its own switch
  */
-	     if (ip->dquote == TRUE)
-	        del_quotation(t);
+		 if (ip->dquote == TRUE)
+		    del_quotation(t);
 
-	     retained_text(s, BFLRG, p, ip);
+		 retained_text(s, BFLRG, p, ip);
 
-	     if ((ip->depth == 0) || (ip->keep == TRUE) ||
-		 ((IS_NULL(s) == FALSE) && (IS_NULL(ip->subst) == FALSE)))
-	        puts(s);};
+		 if ((ip->depth == 0) ||
+		     (ip->keep == TRUE) ||
+		     ((IS_NULL(s) == FALSE) &&
+		      (IS_NULL(ip->subst) == FALSE)))
+		    puts(s);};
 
-	if (strcmp(fname, "-") != 0)
-	   fclose_safe(fp);};
+	    if (strcmp(fname, "-") != 0)
+	       fclose_safe(fp);};};
 
     return(rv);}
 
