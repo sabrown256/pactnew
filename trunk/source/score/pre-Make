@@ -204,7 +204,7 @@ ${MMDep}  : ${Hdrs}
 
 # scoerce
 
-${BinDir}/scoerce : scoerce.c ${Hdrs} 
+${BinDir}/scoerce : scoerce.c ${IncDir}/scarg.h ${Hdrs} 
 	@(echo "${CCAnnounce} $< -o $@" ; \
 	  ${CCCfe} ${CROSS_FE_LD_Flags} ${CROSS_FE_LD_RPath} -I../psh -I../score scoerce.c -o ${BinDir}/scoerce ${CROSS_FE_LD_Lib})
 
@@ -224,7 +224,7 @@ ${IncDir}/scfnca.h : scfnca.t
 	@(echo "template scfnca.t -o ${IncDir}/scfnca.h" ;  \
 	  ${BinDir}/template scfnca.t -o ${IncDir}/scfnca.h)
 
-hdrf = ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
+hdrf = ${IncDir}/scarg.h ${IncDir}/sctypeg.h ${IncDir}/scfnca.h
 
 IncAction = @pact generate
 

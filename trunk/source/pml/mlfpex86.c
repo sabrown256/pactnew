@@ -83,12 +83,10 @@ union u_fpu_state
  */
 
 void _PM_detect_fpu_x86(unsigned int *pf, unsigned int *pm)
-   {unsigned int features, mask, x, y;
+   {unsigned int features, mask;
 
     features = 0;
     mask     = 0;
-    x        = 0;
-    y        = 0;
 
 #if (MACOSX_VERSION >= 6)
 
@@ -97,6 +95,11 @@ void _PM_detect_fpu_x86(unsigned int *pf, unsigned int *pm)
     mask     = 0x2ffff;
 
 #else
+
+    unsigned int x, y;
+
+    x = 0;
+    y = 0;
 
     __asm __volatile ("pushf\n\t pop %%"X86_PREFIX"ax" : "=a" (x));
 
