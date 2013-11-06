@@ -62,13 +62,14 @@ struct s_idecl
 
 struct s_farg
    {int nv;                          /* number of default values specified */
+    int arr;                         /* TRUE for array default values */
     int cls;                         /* TRUE for class */
     fparam knd;
     fdir dir;                        /* data flow direction */
     char *arg;                       /* original C argument specification */
     char *qualifier;                 /* ARG qualifiers on argument */
-    char type[BFLRG];              /* argument type */
-    char name[BFLRG];              /* argument name */
+    char type[BFLRG];                /* argument type */
+    char name[BFLRG];                /* argument name */
     char **val;                      /* default value specifications */
     idecl interp;};
 
@@ -501,7 +502,7 @@ static void id_fd_in_out(idecl *ip, char *ty, char *lty,
  */
 
 static void id_fd_in(idecl *ip, char *ty, char *lty,
-		     char *nm, int nvl, char **vls)
+		     char *nm, int arr, int nvl, char **vls)
    {int l, drf;
     char dty[BFLRG], lvl[BFLRG];
 
@@ -515,6 +516,13 @@ static void id_fd_in(idecl *ip, char *ty, char *lty,
 	snprintf(ip->argi, BFLRG, "            %s, &_l%s,\n", lty, nm);
 	snprintf(ip->argn, BFLRG, "\"%s\", ", nm);
 
+/* GOTCHA: this clause is certainly wrong for
+ *    char *s ARG("a b c",in)
+ * on the other hand it seems right for
+ *    int *b ARG([1],in)
+ * difference looks like "a b c" is formally a scalar string
+ * while [1] is formally an array of one element
+ */
 	if ((drf == TRUE) &&
 	    ((is_ptr(ty) == FALSE) || (strcmp(vls[0], "NULL") != 0)))
 	   {snprintf(ip->decl, BFLRG, "%s _l%s;\n", dty, nm);
@@ -547,7 +555,7 @@ static void id_fd_in(idecl *ip, char *ty, char *lty,
  */
 
 static void process_interp_def(farg *al)
-   {int nvl;
+   {int nvl, arr;
     fdir dir;
     char s[BFLRG], lty[BFLRG], lvl[BFLRG];
     char oexp[BFLRG], nexp[BFLRG];
@@ -560,6 +568,7 @@ static void process_interp_def(farg *al)
     nm  = al->name;
     dir = al->dir;
     arg = al->arg;
+    arr = al->arr;
     vls = al->val;
     nvl = al->nv;
 
@@ -600,7 +609,7 @@ static void process_interp_def(farg *al)
 		 break;
 
 	    case FD_IN :
-	         id_fd_in(ip, ty, lty, nm, nvl, vls);
+	         id_fd_in(ip, ty, lty, nm, arr, nvl, vls);
 		 break;
 
 	    default :
@@ -619,7 +628,7 @@ static void process_interp_def(farg *al)
  */
 
 static int process_qualifiers(farg *al, char *qual)
-   {int rv, ptr;
+   {int rv, arr, ptr;
     char t[BFLRG];
     char *val, *dir, **lst, **ta;
 
@@ -646,10 +655,13 @@ static int process_qualifiers(farg *al, char *qual)
  */
 	    val = ta[0];
 	    lst = NULL;
+	    arr = FALSE;
 	    if ((IS_NULL(val) == TRUE) || (val[0] == '*'))
 	       lookup_type(&lst, al->type, MODE_C, MODE_C);
 	    else
-	       lst = tokenize(val, "[,]", 0);
+	       {arr = (strchr(val, '[') != NULL);
+		lst = tokenize(val, "[,]", 0);};
+	    al->arr = arr;
 	    al->val = lst;
 	    al->nv  = lst_length(lst);
 
@@ -1614,6 +1626,7 @@ static void init_fortran(statedes *st, bindes *bd)
 	fprintf(fp, " */\n");
 	fprintf(fp, "\n");
 
+#if 0
 	fprintf(fp, "#include \"cpyright.h\"\n");
 
 	snprintf(hf, BFLRG, "%s_int.h", pck);
@@ -1621,6 +1634,11 @@ static void init_fortran(statedes *st, bindes *bd)
 	   fprintf(fp, "#include \"%s\"\n", hf);
 	else
 	   fprintf(fp, "#include \"sx_int.h\"\n");
+#else
+	fprintf(fp, "#include \"cpyright.h\"\n");
+	fprintf(fp, "#include \"sx_int.h\"\n");
+	fprintf(fp, "#include \"%s_int.h\"\n", pck);
+#endif
 
 	fprintf(fp, "\n");
 	csep(fp);};
@@ -2876,6 +2894,7 @@ static void init_scheme(statedes *st, bindes *bd)
     fp = open_file("w", fn);
 
     fprintf(fp, "\n");
+    fprintf(fp, "#include \"cpyright.h\"\n");
     fprintf(fp, "#include \"sx_int.h\"\n");
     fprintf(fp, "#include \"%s_int.h\"\n", pck);
     fprintf(fp, "\n");
@@ -4658,7 +4677,9 @@ int main(int c, char **v)
              printf("   p    directory for generated files\n");
              printf("   w    file containing Fortran wrapper specifications\n");
              printf("   wr   no Fortran wrappers (interoperability only)\n");
-             printf("\n");}
+             printf("\n");
+             return(1);}
+
 	 else if (strcmp(v[i], "-l") == 0)
             istrl = "long";
 	 else if (strcmp(v[i], "-nob") == 0)
