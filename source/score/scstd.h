@@ -132,26 +132,12 @@
 #undef MAX_BFSZ
 #define MAX_BFSZ     4096
 
-#define ABS fabs
+#ifndef ABS
+# define ABS fabs
+#endif
 
 #ifndef POW
 # define POW pow
-#endif
-
-#ifndef POWL
-# ifdef COMPILER_PGI
-#  define POWL pow
-# else
-#  define POWL powl
-# endif
-#endif
-
-#ifdef COMPILER_PGI
-# define CREALL creal
-# define CIMAGL cimag
-#else
-# define CREALL creall
-# define CIMAGL cimagl
 #endif
 
 /* get the ticks per second for clock straight */
@@ -239,7 +225,6 @@ typedef int (*PFIntBin)(void *a, void *b);
 #undef SIGNAL_HANDLER_DEFINED
 
 typedef char *CONST * CONST_STRINGS;
-
 
 typedef struct s_SC_srcloc SC_srcloc;
 

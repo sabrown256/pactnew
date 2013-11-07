@@ -1,0 +1,72 @@
+#!/bin/csh -f
+#
+# CC-FUNC - analyze presence of some C functions
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $ALog "----- analyze/cc-func -----"
+Note $ALog "Analyze: C Library functions"
+Note $ALog ""
+
+dbmget $ALog CROSS_FE^        \
+             PACT_CC_VERSION
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set flst = ""
+set flst = ( $flst POWL powl pow )
+set flst = ( $flst CREALL creall creal )
+set flst = ( $flst CIMAGL cimagl cimag )
+set have = ""
+set hlst = ""
+
+while ($#flst > 0)
+   
+   set m = $flst[1]
+   set f = $flst[2]
+   set a = $flst[3]
+   shift flst
+   shift flst
+   shift flst
+
+   Separator $ALog
+   Note $ALog "   $f"
+
+   cat << EOF >! $Tmp.c
+#include <float.h>
+#include <limits.h>
+#include <math.h>
+typedef double (*PFDD)(double x);
+int main(int c, char **v)
+   {PFDD f;
+    f = (PFDD) $f;
+    return(0);}
+EOF
+
+   flog $ALog cat $Tmp.c
+
+   flog $ALog $lCC $Tmp.c -o $Tmp -lm
+   if ($status == 0) then
+      set have = ( $have $f )
+      set hlst = ( $hlst $m $f )
+   else
+      set have = ( $have $a )
+      set hlst = ( $hlst $m $a )
+   endif
+
+   rm -f $Tmp $Tmp.c $Tmp.o
+end
+
+if ("$have" != "") then
+   NoteD $ALog "      has functions $have"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+dbmset $ALog LibM_Functions = $hlst
