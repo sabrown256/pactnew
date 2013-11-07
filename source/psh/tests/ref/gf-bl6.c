@@ -252,3 +252,45 @@ void FF_ID(fc7_f, FC7_F)(int *a, int *b, int *c, int *d)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |void fc8(char *s1 ARG("abc",in), char **s2 ARG(["def"],in), char *s3 ARG([*],in), char **s4 ARG([*,*],in))| */
+
+void FF_ID(fc8_f, FC8_F)(char *s1, char ***s2, char *s3, char ***s4, int sncs1, int sncs3)
+   {char _ls1[MAXLINE];
+    char **_ls2;
+    char _ls3[MAXLINE];
+    char **_ls4;
+    
+    SC_FORTRAN_STR_C(_ls1, s1, sncs1);
+    _ls2       = *(char ***) s2;
+    SC_FORTRAN_STR_C(_ls3, s3, sncs3);
+    _ls4       = *(char ***) s4;
+
+    fc8(_ls1, _ls2, _ls3, _ls4);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRAP |void fc9(char c1, char c2 ARG('a',in), char *c3 ARG(['b'],in), char *c4 ARG([*],in), char *c5 ARG([*,*],in))| */
+
+void FF_ID(fc9_f, FC9_F)(char *c1, char *c2, char *c3, char *c4, char *c5, int sncc3, int sncc4, int sncc5)
+   {char _lc1;
+    char _lc2;
+    char _lc3[MAXLINE];
+    char _lc4[MAXLINE];
+    char _lc5[MAXLINE];
+    
+    _lc1       = (char) *c1;
+    _lc2       = (char) *c2;
+    SC_FORTRAN_STR_C(_lc3, c3, sncc3);
+    SC_FORTRAN_STR_C(_lc4, c4, sncc4);
+    SC_FORTRAN_STR_C(_lc5, c5, sncc5);
+
+    fc9(_lc1, _lc2, _lc3, _lc4, _lc5);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

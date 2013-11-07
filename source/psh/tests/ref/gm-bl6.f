@@ -135,6 +135,27 @@ module pact_bl6
          integer         :: d(*)
       end subroutine fc7_f
 
+      subroutine fc8_f(s1, s2, s3, s4) 
+         use iso_c_binding
+         use types_bl6
+         implicit none
+         character(*)    :: s1
+         type(C_PTR)     :: s2
+         character(*)    :: s3
+         type(C_PTR)     :: s4
+      end subroutine fc8_f
+
+      subroutine fc9_f(c1, c2, c3, c4, c5) 
+         use iso_c_binding
+         use types_bl6
+         implicit none
+         character       :: c1
+         character       :: c2
+         character(*)    :: c3
+         character(*)    :: c4
+         character(*)    :: c5
+      end subroutine fc9_f
+
 ! ... declarations for interoperability
       function fa1f_i(a) &
                 bind(c, name='fa1')
@@ -257,6 +278,27 @@ module pact_bl6
          type(C_PTR), value :: c
          type(C_PTR), value :: d
       end subroutine fc7_i
+
+      subroutine fc8_i(s1, s2, s3, s4) &
+                bind(c, name='fc8')
+         use iso_c_binding
+         implicit none
+         type(C_PTR), value :: s1
+         type(C_PTR), value :: s2
+         type(C_PTR), value :: s3
+         type(C_PTR), value :: s4
+      end subroutine fc8_i
+
+      subroutine fc9_i(c1, c2, c3, c4, c5) &
+                bind(c, name='fc9')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: c1
+         integer(C_INT), value :: c2
+         type(C_PTR), value :: c3
+         type(C_PTR), value :: c4
+         type(C_PTR), value :: c5
+      end subroutine fc9_i
 
    end interface
 
