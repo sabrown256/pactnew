@@ -654,8 +654,8 @@ switch ($Cmnd)
            switch ($1)
               case -a:
                    shift
-                   $PSY_CfgMan add $1 >& /dev/null
                    setenv SESSION_CONFIG $1
+                   $PSY_CfgMan add $1 >& /dev/null
                    breaksw
               case -as:
                    set PArgs = ( $PArgs "-as" )
@@ -928,9 +928,12 @@ switch ($Cmnd)
 
         InitLog Log $LogDir/config
 
-        Note $Log "PSY_ID    = $PSY_ID"
-        Note $Log "PSY_Root   = $PSY_Root"
-        Note $Log "Args      = $nargs"
+        Note $Log "Args            = $nargs"
+        if ($?SESSION_CONFIG == 1) then
+           Note $Log "SESSION_CONFIG  = $SESSION_CONFIG"
+        endif
+        Note $Log "PSY_ID          = $PSY_ID"
+        Note $Log "PSY_Root        = $PSY_Root"
         Note $Log "PSY_CONFIG_PATH = $PSY_CONFIG_PATH"
 
         flog $Log umask
@@ -1322,6 +1325,11 @@ switch ($Cmnd)
 
 CFG_DONE:
         unset dbopt
+
+        if ($?SESSION_CONFIG == 1) then
+           Note $Log "Leaving with:"
+           Note $Log "   SESSION_CONFIG  = $SESSION_CONFIG"
+        endif
 
         breaksw
 

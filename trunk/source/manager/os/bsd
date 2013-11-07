@@ -11,3 +11,7 @@ Group HSY {
    RootLib = /usr/local/lib
 }
 
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:pgs_axis
+}
+

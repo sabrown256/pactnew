@@ -57,6 +57,7 @@ else
    exit(1)
 endif
 
+source $etcdir/env-pact.csh
 source $etcdir/functions-pact.csh
 
 InitLog log $cwd/log.cp-pact
@@ -112,8 +113,8 @@ if ($err == 0) then
    Note $log ""
    set et = `timer -r`
 
-# exclude dev z-* manager/extensions
-   flog $log rsync -avz --exclude='*/dev' --exclude='*/z-*' --exclude='*/manager/extensions' $oroot/ $nroot
+# exclude dev, PSY_Prefix, and manager/extensions directories
+   flog $log rsync -avz --exclude='*/dev' --exclude='*/'$PSY_Prefix'*' --exclude='*/manager/extensions' $oroot/ $nroot
    @ err = $err + $status
 
    set et = `timer -b $et`

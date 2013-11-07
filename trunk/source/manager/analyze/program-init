@@ -311,7 +311,7 @@ Group PSY {
    OMIT_INTERP = FALSE
 
    ID          = ${PSY_ID}
-   Prefix      = "z-"
+   Prefix      = ${PSY_Prefix}
    TYPE        = ""
    SITE        = ""
 
