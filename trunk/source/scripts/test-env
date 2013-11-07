@@ -185,6 +185,7 @@ endif
 setenv Tmp $TestDir/.tmp.$$
 
 InitLog Log $TestDir/log.$TLog.$LogSfx
+Note $Log "Host:    $HSY_Host"
 Note $Log "Package: $Package"
 Note $Log "Test:    $Test"
 Note $Log "Log:     $Log"
