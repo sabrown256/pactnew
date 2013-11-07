@@ -23,6 +23,8 @@ void fb1(int a, int b ARG(1,in))
 void fb2(int a, int b ARG(,in))
 void fb3(int a, int b ARG(*,in))
 
+# variations of non-char IN or IO
+# especially pointer versus array initializations
 void fc1(int a, int *b ARG(NULL,in), int *c ARG(NULL,io), int *d ARG(NULL,out))
 void fc2(int a, int *b ARG(,in), int *c ARG(,io), int *d ARG(,out))
 void fc3(int a, int *b ARG(*,in), int *c ARG(*,io), int *d ARG(*,out))
@@ -30,6 +32,14 @@ void fc4(int a, int *b ARG([1],in), int *c ARG([1],io), int *d ARG([1],out))
 void fc5(int a, int *b ARG([1,2],in), int *c ARG([1,2],io), int *d ARG([1,2],out))
 void fc6(int a, int *b ARG([*],in), int *c ARG([*],io), int *d ARG([*],out))
 void fc7(int a, int *b ARG([*,*],in), int *c ARG([*,*],io), int *d ARG([*,*],out))
+
+# variations of string IN or IO
+# especially pointer versus array initializations
+void fc8(char *s1 ARG("abc",in), char **s2 ARG(["def"],in), char *s3 ARG([*],in), char **s4 ARG([*,*],in))
+
+# variations of non-string char IN or IO
+# especially pointer versus array initializations
+void fc9(char c1, char c2 ARG('a',in), char *c3 ARG(['b'],in), char *c4 ARG([*],in), char *c5 ARG([*,*],in))
 
 # tests of ARG cls specifications
 void fd1(str *a ARG(,,cls), int b)

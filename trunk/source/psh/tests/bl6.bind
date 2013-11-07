@@ -28,6 +28,8 @@ fc4     fortran()	scheme()	python()
 fc5     fortran()	scheme()	python()
 fc6     fortran()	scheme()	python()
 fc7     fortran()	scheme()	python()
+fc8     fortran()	scheme()	python()
+fc9     fortran()	scheme()	python()
 
 fd1     python()
 fd2     python(nfd)

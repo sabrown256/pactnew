@@ -359,6 +359,63 @@ PyObject *_PY_fc7(PyObject *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void fc8(char *s1 ARG("abc",in), char **s2 ARG(["def"],in), char *s3 ARG([*],in), char **s4 ARG([*,*],in))| */
+
+PyObject *_PY_fc8(PyObject *self, PyObject *args, PyObject *kwds)
+   {int ok;
+    PyObject *_lo;
+    char _ls1;
+    char *_ls2;
+    char _ls3;
+    char *_ls4[2];
+    char *kw_list[] = {"s1", "s2", "s3", "s40", "s41", NULL};
+
+    ok = PyArg_ParseTupleAndKeywords(args, kwds,
+                                     "sssss:fc8_p",
+                                     kw_list,
+                                     &_ls1, &_ls2, &_ls3, &_ls4[0], &_ls4[1]);
+    if (ok == FALSE)
+       return(NULL);
+
+    fc8(&_ls1, &_ls2, &_ls3, _ls4);
+
+    Py_INCREF(Py_None);
+    _lo = Py_None;
+
+    return(_lo);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRAP |void fc9(char c1, char c2 ARG('a',in), char *c3 ARG(['b'],in), char *c4 ARG([*],in), char *c5 ARG([*,*],in))| */
+
+PyObject *_PY_fc9(PyObject *self, PyObject *args, PyObject *kwds)
+   {int ok;
+    PyObject *_lo;
+    char _lc1;
+    char _lc2;
+    char _lc3;
+    char _lc4;
+    char _lc5[2];
+    char *kw_list[] = {"c1", "c2", "c3", "c4", "c50", "c51", NULL};
+
+    ok = PyArg_ParseTupleAndKeywords(args, kwds,
+                                     "bbssss:fc9_p",
+                                     kw_list,
+                                     &_lc1, &_lc2, &_lc3, &_lc4, &_lc5[0], &_lc5[1]);
+    if (ok == FALSE)
+       return(NULL);
+
+    fc9(_lc1, _lc2, &_lc3, &_lc4, _lc5);
+
+    Py_INCREF(Py_None);
+    _lo = Py_None;
+
+    return(_lo);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* WRAP |void fd1(str *a ARG(,,cls), int b)| */
 
 PyObject *_PY_fd1(strO *self, PyObject *args, PyObject *kwds)
@@ -498,6 +555,10 @@ PyMethodDef
              "Procedure: fc6\n     Usage: fc6(a, b, c, d)"},
  _PYD_fc7 = {"fc7", (PyCFunction) _PY_fc7, METH_KEYWORDS,
              "Procedure: fc7\n     Usage: fc7(a, b, c, d)"},
+ _PYD_fc8 = {"fc8", (PyCFunction) _PY_fc8, METH_KEYWORDS,
+             "Procedure: fc8\n     Usage: fc8(s1, s2, s3, s4)"},
+ _PYD_fc9 = {"fc9", (PyCFunction) _PY_fc9, METH_KEYWORDS,
+             "Procedure: fc9\n     Usage: fc9(c1, c2, c3, c4, c5)"},
  _PYD_fd1 = {"fd1", (PyCFunction) _PY_fd1, METH_KEYWORDS,
              "Method: fd1\n     Usage: a.fd1(b)"},
  _PYD_fd2 = {"nfd", (PyCFunction) _PY_fd2, METH_KEYWORDS,
