@@ -92,6 +92,7 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
             LEH_TTY_CRNL^             \
             LEH_TTY_ECHO^             \
             LEH_TTY_VTIME^            \
+            LibM_Functions^           \
             MYSQL_SO^                 \
             PACT_CC_FAMILY^           \
             PACT_CC_VERSION^          \
@@ -371,6 +372,17 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
        endif
     endif
 
+    Note $STDOUT ""
+
+# function defines
+    set hlst = ( $LibM_Functions )
+    while ($#hlst > 0)
+       set m = $hlst[1]
+       set f = $hlst[2]
+       shift hlst
+       shift hlst
+       Note $STDOUT "#define $m  $f"
+    end
     Note $STDOUT ""
 
 # do some defines for IBM BG hardware

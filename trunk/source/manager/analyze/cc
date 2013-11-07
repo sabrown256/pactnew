@@ -454,6 +454,7 @@ ftee $ALog gexec $PSY_AnaDir/cc-line       @ \
                  $PSY_AnaDir/cc-noreturn   @ \
                  $PSY_AnaDir/cc-valist     @ \
                  $PSY_AnaDir/cc-float16    @ \
+                 $PSY_AnaDir/cc-func       @ \
                  $PSY_AnaDir/cc-complex    @ \
                  $PSY_AnaDir/cc-headers    @ \
                  $PSY_AnaDir/cc-glibc      @ \
