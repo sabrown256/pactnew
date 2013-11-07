@@ -1626,14 +1626,13 @@ static void init_fortran(statedes *st, bindes *bd)
 	fprintf(fp, " */\n");
 	fprintf(fp, "\n");
 
-#if 0
+#if 1
 	fprintf(fp, "#include \"cpyright.h\"\n");
 
 	snprintf(hf, BFLRG, "%s_int.h", pck);
+	fprintf(fp, "#include \"sx_int.h\"\n");
 	if (file_exists(hf) == TRUE)
 	   fprintf(fp, "#include \"%s\"\n", hf);
-	else
-	   fprintf(fp, "#include \"sx_int.h\"\n");
 #else
 	fprintf(fp, "#include \"cpyright.h\"\n");
 	fprintf(fp, "#include \"sx_int.h\"\n");

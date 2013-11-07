@@ -98,12 +98,12 @@ $cmd -c $file >&! $cres
 set bstatus = $status
 @  nlb = `cat $cres | wc -l`
 
-echo "crash status ................ $bstatus ($nlb)"
+echo "crash status ................ $bstatus ($nlb lines)"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-echo "finding fatal expressions ... "
+echo "finding bad expressions ..... "
 
 set base = $file:r
 set cf   = $file
@@ -137,7 +137,7 @@ while ($k < $na)
 
       if ($vrb == TRUE) then
          echo ""
-         echo "   $j> working with $cf ($nlc)"
+         echo "   $j> working with $cf ($nlc lines)"
       endif
 
 # inner loop tries to eliminate functions
@@ -148,14 +148,14 @@ while ($k < $na)
 
          elide -ns $j -ne $i -s ';' '{' '}' $cf >! $nf
          if ($vrb == TRUE) then
-            echo "      ${k}.${j}.${i}> elide -ns $j -ne $i -s ';' '{' '}' $cf -> $nf (`cat $nf | wc -l`)"
+            echo "      ${k}.${j}.${i}> elide -ns $j -ne $i -s ';' '{' '}' $cf -> $nf (`cat $nf | wc -l` lines)"
          endif
          grep '{' $nf >& /dev/null
          if ($status == 0) then
             $cmd -c $nf >&! $nres
             set xstatus = $status
             if ($vrb == TRUE) then
-               echo "      ${k}.${j}.${i}> $cmd -c $nf -> $xstatus (`cat $nres | wc -l`)"
+               echo "      ${k}.${j}.${i}> $cmd -c $nf -> $xstatus (`cat $nres | wc -l` lines)"
             endif
             if ($xstatus != $bstatus) then
                echo -n "o"
@@ -163,7 +163,8 @@ while ($k < $na)
             else
                @ nlr = `cat $nres | wc -l`
                diff $nres $cres >& /dev/null
-               if ($status != 0) then
+               set xstatus = $status
+               if ($xstatus != 0) then
                   echo -n "x"
                   set ok = FALSE
                endif
@@ -231,6 +232,16 @@ while ($k < $na)
 # if this iteration produced the same file as the previous one
 # take it as the result
    else
+      if (!(-f $nf)) then
+         @ j = $j - 1
+         if ($i < $j) then
+            @ i = $j
+         endif
+         set nf  = tmp-${base}-${k}-${j}.c
+         elide -ns $j -ne $i -s ';' '{' '}' $cf >! $nf
+         @ n = $n - $i + 1
+      endif
+
       set cf = $nf
       diff $lkf $cf >>& /dev/null
       if ($status == 0) then
@@ -258,13 +269,13 @@ if ($str == TRUE) then
    if ($vrb == TRUE) then
       echo -n "stripping comments ... "
    endif
-   elide '/*' '*/' $nf >&! $ff
+   elide '/*' '*/' $nf |& cat -s >&! $ff
    if ($vrb == TRUE) then
       echo "done"
    endif
    rm -f $nf
 else
-   mv $nf $ff
+   cat -s $nf >&! $ff
 endif
 
 #--------------------------------------------------------------------------
@@ -290,7 +301,7 @@ echo "$res"
 #--------------------------------------------------------------------------
 
 if ($err == 0) then
-   rm -f tmp-${base}-*.c *${base}*.c.res >& /dev/null
+   rm -f tmp-${base}-*.[co] *${base}*.c.res ${base}*.o >& /dev/null
 endif
 
 exit($err)
