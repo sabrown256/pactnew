@@ -30,76 +30,7 @@ void
 
 # include <fenv.h>
 
-# if defined(MACOSX)
-
 /*--------------------------------------------------------------------------*/
-
-/* _PM_ENABLE_FPE_ANSI - rotten MACOSX has non-standard declarations
- *                     - in some versions they are all void (e.g. 10.3.3)
- */
-
-void _PM_enable_fpe_ansi(int flg)
-   {int fe;
-    fexcept_t flag;
-
-    fe = FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW;
-
-    if (flg)
-
-/* fetch current FPU flags */
-       {fegetexceptflag(&flag, FE_ALL_EXCEPT);
-
-/* set FPU flags */
-	fesetexceptflag(&flag, fe);}
-
-    else
-       feclearexcept(fe);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PM_FPE_TRAPS - return and optionally print a report of
- *               - the FPEs that are being trapped
- */
-
-int _PM_fpe_traps(int pfl)
-   {int fe;
-    fexcept_t fs;
-
-/* setup to test the following FPE */
-    fe = FE_INVALID   |
-	 FE_DIVBYZERO |
-	 FE_OVERFLOW  |
-	 FE_UNDERFLOW |
-	 FE_INEXACT;
-
-/* fetch current FPU flags */
-    fegetexceptflag(&fs, FE_ALL_EXCEPT);
-
-    if (pfl)
-       {if (fs & FE_INVALID)
-	   PRINT(stdout, "invalid operations\n");
-
-	if (fs & FE_DIVBYZERO)
-	   PRINT(stdout, "division by zero\n");
-
-	if (fs & FE_OVERFLOW)
-	   PRINT(stdout, "overflows\n");
-
-	if (fs & FE_UNDERFLOW)
-	   PRINT(stdout, "underflows\n");
-
-	if (fs & FE_INEXACT)
-	   PRINT(stdout, "inexacts\n");};
-
-    return(fs);}
-
-/*--------------------------------------------------------------------------*/
-
-# else
-
 /*--------------------------------------------------------------------------*/
 
 /* _PM_ENABLE_FPE_ANSI - ANSI standard floating point handling */
@@ -132,52 +63,33 @@ void _PM_enable_fpe_ansi(int flg)
 
 int _PM_fpe_traps(int pfl)
    {int fe;
-    fexcept_t fs;
 
-/* setup to test the following FPE */
-    fe = FE_INVALID   |
-
-#ifdef __FE_DENORM
-         __FE_DENORM  |
-#endif
-
-	 FE_DIVBYZERO |
-	 FE_OVERFLOW  |
-	 FE_UNDERFLOW |
-	 FE_INEXACT;
-
-    SC_ASSERT(fe != 0);
-
-/* fetch current FPU flags */
-    fegetexceptflag(&fs, FE_ALL_EXCEPT);
+    fe = fetestexcept(FE_ALL_EXCEPT);
 
     if (pfl)
-       {if (fs & FE_INVALID)
+       {if (fe & FE_INVALID)
 	   PRINT(stdout, "invalid operations\n");
 
 #ifdef __FE_DENORM
-	if (fs & __FE_DENORM)
+	if (fe & __FE_DENORM)
 	   PRINT(stdout, "denormalized numbers\n");
 #endif
 
-	if (fs & FE_DIVBYZERO)
+	if (fe & FE_DIVBYZERO)
 	   PRINT(stdout, "division by zero\n");
 
-	if (fs & FE_OVERFLOW)
+	if (fe & FE_OVERFLOW)
 	   PRINT(stdout, "overflows\n");
 
-	if (fs & FE_UNDERFLOW)
+	if (fe & FE_UNDERFLOW)
 	   PRINT(stdout, "underflows\n");
 
-	if (fs & FE_INEXACT)
+	if (fe & FE_INEXACT)
 	   PRINT(stdout, "inexacts\n");};
 
-    return(fs);}
+    return(fe);}
 
 /*--------------------------------------------------------------------------*/
-
-# endif
-
 /*--------------------------------------------------------------------------*/
 
 /* _PM_FPU_STATUS - return and optionally print a report of
