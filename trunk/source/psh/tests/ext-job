@@ -141,7 +141,8 @@ foreach i (1 2 3 4 5 6 7 8 9 10 11 12)
          NoteD $Log -n "x"
          Note $Log "$id failed"
       else if (-f $ref) then
-         flog $Log ( diff $res $ref >&! $dif )
+         flog $Log ( grep -v ']:' $res >&! $res.no )
+         flog $Log ( diff $res.no $ref >&! $dif )
          if ($status == 0) then
             NoteD $Log -n "."
             Note $Log "$id passed"
@@ -152,6 +153,7 @@ foreach i (1 2 3 4 5 6 7 8 9 10 11 12)
             Note $Log "$id differed"
             flog $Log cat $dif
          endif
+         flog $Log rm -f $res.no
       else
          NoteD $Log -n "+"
          Note $Log "$id added"

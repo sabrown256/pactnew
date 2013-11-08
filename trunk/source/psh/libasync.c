@@ -294,6 +294,7 @@ process_group_state *get_process_group_state(void)
 void _dbg(unsigned int lvl, char *fmt, ...)
    {int pid;
     char s[BFLRG];
+    char *t;
     process_group_state *ps;
 
     ps = get_process_group_state();
@@ -304,7 +305,8 @@ void _dbg(unsigned int lvl, char *fmt, ...)
 
 	pid = getpid();
 
-	fprintf(stderr, "[%d/%d]: %s\n", pid, ps->dbg_level, s);};
+	t = subst(s, "\n", "\\n", -1);
+	fprintf(stderr, "[%d/%d]: %s\n", pid, ps->dbg_level, t);};
 
     return;}
 
@@ -608,7 +610,7 @@ static void _job_free(process *pp)
 
 static int _job_exec(process *cp, int *fds,
 		     char **argv, char **env, char *mode)
-   {int i, err, fg;
+   {int i, err, fg, st;
     int io[N_IO_CHANNELS];
 
     err = 0;
@@ -637,7 +639,10 @@ static int _job_exec(process *cp, int *fds,
 
 /* set the process stdin, stdout, and stderr to those from the pipe */
 	for (i = 0; i < N_IO_CHANNELS; i++)
-	    dup2(io[i], i);
+	    {st = dup2(io[i], i);
+	     if (st != i)
+	        fprintf(stderr, "DUP2 ERROR: '%s' - _JOB_EXEC",
+			strerror(errno));};
 
 /* release file descriptors that may have been opened for pipes */
 	if (fds != NULL)

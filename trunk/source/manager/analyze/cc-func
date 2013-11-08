@@ -12,16 +12,20 @@ Note $ALog "----- analyze/cc-func -----"
 Note $ALog "Analyze: C Library functions"
 Note $ALog ""
 
-dbmget $ALog CROSS_FE^        \
-             PACT_CC_VERSION
+dbmget $ALog LibM_Functions
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set flst = ""
-set flst = ( $flst POWL powl pow )
-set flst = ( $flst CREALL creall creal )
-set flst = ( $flst CIMAGL cimagl cimag )
+if ("$LibM_Functions" == "") then
+   set flst = ""
+   set flst = ( $flst POWL powl pow )
+   set flst = ( $flst CREALL creall creal )
+   set flst = ( $flst CIMAGL cimagl cimag )
+else
+   set flst = ( $LibM_Functions )
+endif
+
 set have = ""
 set hlst = ""
 
