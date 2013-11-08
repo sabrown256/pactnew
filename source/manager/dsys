@@ -292,7 +292,7 @@ switch ($Cmnd)
 
 # preliminary - generate headers in score needed by other packages
         flog $Log pushd ../score
-        flog $Log pact $Args gen
+        flog $Log pact $Args generate
         flog $Log popd
 
         if ("$Tgts" == "") then

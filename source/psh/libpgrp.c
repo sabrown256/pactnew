@@ -2494,9 +2494,9 @@ int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
        {fa = fcntl(0, F_DUPFD, fb);
 	close_safe(fa);
         if (fa == fb)
-	   _dbg(4, "no descriptors leaked\n");
+	   _dbg(4, "no descriptors leaked");
 	else
-	   _dbg(4, "leaked %d descriptors\n", fa-fb);};
+	   _dbg(4, "leaked %d descriptors", fa-fb);};
 
 /* be sure to leave with stdin in blocking mode */
     block_fd(0, TRUE);

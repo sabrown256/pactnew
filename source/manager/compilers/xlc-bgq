@@ -6,7 +6,7 @@
 
 Group OCV {
    CC      = mpixlc_r
-   CC_Warn = -qsuppress=1500-010:1506-1300:1506-1298:1506-383:1506-377
+   CC_Warn = -qsuppress=1500-010:1500-030:1506-1300:1506-1298:1506-383:1506-377
    CC_SMP  = mpixlc_r
    CXX     = xlc++
    FC      = mpixlf90_r

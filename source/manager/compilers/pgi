@@ -79,5 +79,11 @@ Group OpenMP {
    LD_Lib    =
 }
 
+Group LibM {
+   Functions  = "POWL pow pow"
+   Functions += "CREALL creall creal"
+   Functions += "CIMAGL cimagl cimag"
+}
+
 include cpp-rule
 include serial

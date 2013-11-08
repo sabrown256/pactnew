@@ -185,6 +185,9 @@ int main(int c, char **v, char **env)
        {db = getenv("PERDB_PATH");
 	s  = getenv("GEXEC_DEBUG_LEVEL");
 
+	setbuf(stdout, NULL);
+	setbuf(stderr, NULL);
+
 	ps->dbg_level   = (s == NULL) ? 0 : atol(s);
 	ps->status_mask = -1;
 
