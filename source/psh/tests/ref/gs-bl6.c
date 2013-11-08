@@ -382,26 +382,26 @@ static object *_SXI_fc7(SS_psides *si, object *argl)
 /* WRAP |void fc8(char *s1 ARG("abc",in), char **s2 ARG(["def"],in), char *s3 ARG([*],in), char **s4 ARG([*,*],in))| */
 
 static object *_SXI_fc8(SS_psides *si, object *argl)
-   {char _ls1;
-    char *_ls2;
-    char _ls3;
+   {char *_ls1;
+    char *_ls2[1];
+    char *_ls3;
     char *_ls4[2];
     object *_lo;
 
     _ls1       = "abc";
-    _ls2       = "def";
+    _ls2[0] = "def";
     _ls3       = '\0';
     _ls4[0] = NULL;
     _ls4[1] = NULL;
     SS_args(si, argl,
             SC_STRING_I, &_ls1,
-            SC_STRING_I, &_ls2,
+            SC_STRING_I, &_ls2[0],
             SC_STRING_I, &_ls3,
             SC_STRING_I, &_ls4[0],
             SC_STRING_I, &_ls4[1],
             0);
 
-    fc8(&_ls1, &_ls2, &_ls3, _ls4);
+    fc8(_ls1, _ls2, _ls3, _ls4);
     _lo = SS_f;
 
     return(_lo);}
@@ -414,8 +414,8 @@ static object *_SXI_fc8(SS_psides *si, object *argl)
 static object *_SXI_fc9(SS_psides *si, object *argl)
    {char _lc1;
     char _lc2;
-    char _lc3;
-    char _lc4;
+    char *_lc3;
+    char *_lc4;
     char _lc5[2];
     object *_lo;
 
@@ -434,7 +434,7 @@ static object *_SXI_fc9(SS_psides *si, object *argl)
             SC_STRING_I, &_lc5[1],
             0);
 
-    fc9(_lc1, _lc2, &_lc3, &_lc4, _lc5);
+    fc9(_lc1, _lc2, _lc3, _lc4, _lc5);
     _lo = SS_f;
 
     return(_lo);}
