@@ -503,13 +503,15 @@ static void id_fd_in_out(idecl *ip, char *ty, char *lty,
 
 static void id_fd_in(idecl *ip, char *ty, char *lty,
 		     char *nm, int arr, int nvl, char **vls)
-   {int l, drf;
+   {int l, drf, strp, sarr;
     char dty[BFLRG], lvl[BFLRG];
 
     drf = deref(dty, BFLRG, ty);
     ideref(lty);
 
-    if (nvl == 1)
+    strp = (strcmp(lty, "SC_STRING_I") == 0);
+    sarr = ((arr == TRUE) && (strp == TRUE) && (strcmp(ty, "char *") != 0));
+    if ((nvl == 1) && (sarr == FALSE))
        {get_def_value(lvl, BFLRG, vls[0], dty);
 
 	snprintf(ip->defa, BFLRG, "    _l%-8s = %s;\n", nm, lvl);
@@ -523,7 +525,7 @@ static void id_fd_in(idecl *ip, char *ty, char *lty,
  * difference looks like "a b c" is formally a scalar string
  * while [1] is formally an array of one element
  */
-	if ((drf == TRUE) &&
+	if ((drf == TRUE) && (strp == FALSE) &&
 	    ((is_ptr(ty) == FALSE) || (strcmp(vls[0], "NULL") != 0)))
 	   {snprintf(ip->decl, BFLRG, "%s _l%s;\n", dty, nm);
 	    snprintf(ip->argc, BFLRG, "&_l%s", nm);}
@@ -543,7 +545,6 @@ static void id_fd_in(idecl *ip, char *ty, char *lty,
 	     vstrcat(ip->argn, BFLRG, "\"%s%d\", ", nm, l);};
 
 	snprintf(ip->argc, BFLRG, "_l%s", nm);};
-
 
     return;}
 
@@ -661,6 +662,7 @@ static int process_qualifiers(farg *al, char *qual)
 	    else
 	       {arr = (strchr(val, '[') != NULL);
 		lst = tokenize(val, "[,]", 0);};
+
 	    al->arr = arr;
 	    al->val = lst;
 	    al->nv  = lst_length(lst);

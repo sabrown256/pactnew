@@ -364,20 +364,20 @@ PyObject *_PY_fc7(PyObject *self, PyObject *args, PyObject *kwds)
 PyObject *_PY_fc8(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
-    char _ls1;
-    char *_ls2;
-    char _ls3;
+    char *_ls1;
+    char *_ls2[1];
+    char *_ls3;
     char *_ls4[2];
-    char *kw_list[] = {"s1", "s2", "s3", "s40", "s41", NULL};
+    char *kw_list[] = {"s1", "s20", "s3", "s40", "s41", NULL};
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "sssss:fc8_p",
                                      kw_list,
-                                     &_ls1, &_ls2, &_ls3, &_ls4[0], &_ls4[1]);
+                                     &_ls1, &_ls2[0], &_ls3, &_ls4[0], &_ls4[1]);
     if (ok == FALSE)
        return(NULL);
 
-    fc8(&_ls1, &_ls2, &_ls3, _ls4);
+    fc8(_ls1, _ls2, _ls3, _ls4);
 
     Py_INCREF(Py_None);
     _lo = Py_None;
@@ -394,8 +394,8 @@ PyObject *_PY_fc9(PyObject *self, PyObject *args, PyObject *kwds)
     PyObject *_lo;
     char _lc1;
     char _lc2;
-    char _lc3;
-    char _lc4;
+    char *_lc3;
+    char *_lc4;
     char _lc5[2];
     char *kw_list[] = {"c1", "c2", "c3", "c4", "c50", "c51", NULL};
 
@@ -406,7 +406,7 @@ PyObject *_PY_fc9(PyObject *self, PyObject *args, PyObject *kwds)
     if (ok == FALSE)
        return(NULL);
 
-    fc9(_lc1, _lc2, &_lc3, &_lc4, _lc5);
+    fc9(_lc1, _lc2, _lc3, _lc4, _lc5);
 
     Py_INCREF(Py_None);
     _lo = Py_None;
