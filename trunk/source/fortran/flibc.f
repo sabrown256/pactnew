@@ -129,10 +129,14 @@
       character(*), intent(in) :: cp
 
 ! ... local variables
-      type(C_PTR) :: lcp
+      integer :: i
 
-      lcp = transfer(cp, lcp)
-      c_strlenf = transfer(strlen(lcp), c_strlenf)
+      do i = 1, len(cp)
+         if (cp(i:i) .eq. char(0)) then
+            c_strlenf = i - 1
+            exit
+         endif
+      enddo
 
       end function
 
