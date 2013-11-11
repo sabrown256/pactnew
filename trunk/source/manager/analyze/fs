@@ -1,0 +1,37 @@
+#!/bin/csh -f
+#
+# FS - analyze the filesystem in which we are working
+#    - Computes: HSY_FS_Type
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+if ($?Log == 0) then
+   setenv Log $ALog
+endif
+
+Note $ALog "----- analyze/fs -----"
+Note $ALog "Analyze: platform filesystem"
+Note $ALog ""
+
+set inf = ( `df -T . | tail -n 1` )
+
+setenv HSY_FS_Source $inf[1]
+setenv HSY_FS_Type   $inf[2]
+setenv HSY_FS_Mount  $inf[$#inf]
+
+unset inf
+
+# there are systems that put out garbage if this is on a single echo (AIX)
+NoteD $ALog "   File System: $HSY_FS_Type"
+
+# export results
+dbmset $ALog HSY_FS_Type   = $HSY_FS_Type^ \
+             HSY_FS_Source = $HSY_FS_Source^ \
+             HSY_FS_Mount  = $HSY_FS_Mount
+
+exit(0)
+

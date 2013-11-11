@@ -17,7 +17,7 @@ run analyze/rpath -i init
 # dynamically link dependent libraries by default
 include features/dld
 
-setenv ENV_GT "AF BFD CC Cfg CRAY CROSS CXX DB DO_RUN DP FC \
+setenv ENV_GT "AF BFD CC Cfg CRAY CROSS CXX DB DO_RUN DP FC FS \
                HDF HSY IBM JOBS JPEG LibM MAKE MDG MINGW MYSQL \
                OS PACT PNG PSY PY RF SQLITE3 TEST TRACKER"
 
