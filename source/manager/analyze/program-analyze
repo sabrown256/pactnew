@@ -22,6 +22,9 @@ Run {
 # operating system
    ../analyze/os
 
+# file system
+   ../analyze/fs
+
 # shells
    ../analyze/csh
    ../analyze/sh

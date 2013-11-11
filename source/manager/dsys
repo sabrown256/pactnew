@@ -2871,14 +2871,14 @@ CFG_DONE:
 # 3) git stash ; git pull ; git stash clear
 
         flog $Log $PSY_ScrDir/scs-update
-        set ErrStat = $status
+        set xstatus = $status
 
 # take care of conflicting changes
         flog $Log (awk '($1 == "C") && ($2 !~ /Makefile/) {print $2}' $Log > Confl)
         flog $Log set Confl = `cat Confl`
         foreach mod ($Confl)
            NoteD $Log "   C $mod      <-------"
-           set ErrStat = 10
+           set xstatus = 10
         end
 
         cat Confl >&! $ConflFile
@@ -2914,7 +2914,7 @@ CFG_DONE:
 
         flog $Log cd $Manager
 
-        set RStatus = $ErrStat
+        set RStatus = $xstatus
         breaksw
 
 #--------------------------------------------------------------------------
@@ -2989,14 +2989,14 @@ CFG_DONE:
 
         Separator $Log
         ftee $Log scs-sync $excl $rsrc,tmp $rdst,tmp
-        set ErrStat = $gstatus[1]
+        set xstatus = $gstatus[1]
 
         Separator $Log
         flog $Log cat log.sync
         flog $Log popd
         Separator $Log
 
-        if ($ErrStat == 0) then
+        if ($xstatus == 0) then
            NoteD $Log ""
            NoteD $Log "Repository $rdst updated"
            NoteD $Log "see $Log for details"
@@ -3006,7 +3006,7 @@ CFG_DONE:
 
         unset tmp
 
-        set RStatus = $ErrStat
+        set RStatus = $xstatus
         breaksw
 
 #--------------------------------------------------------------------------
@@ -3345,8 +3345,8 @@ CFG_DONE:
 # TICKET - run the ticket suite
 
    case ticket:
-        set Err = 0
         if ($HaveTicket == TRUE) then
+           set Err = 0
            while ($#argv > 0)
               switch ($1)
                  case close:
@@ -3432,7 +3432,7 @@ CFG_DONE:
            end
            echo " "
 
-           exit($Err)
+           set RStatus = $Err
         endif
         breaksw
 
