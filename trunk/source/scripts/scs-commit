@@ -168,4 +168,6 @@ switch ($scsi[1])
 
 endsw
 
+echo "leaving with exit status = $err" >>& $log
+
 exit($err)

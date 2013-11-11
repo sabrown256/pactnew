@@ -10,6 +10,8 @@
 
 unalias *
 
+@ err = 0
+
 set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
@@ -70,6 +72,7 @@ switch ($scsi[1])
            if ($xstatus == 0) then
               rm .log.sup
            else
+              @ err = $err + $xstatus
               cat .log.sup
            endif
 
@@ -80,7 +83,7 @@ switch ($scsi[1])
 # from git status
 # what is the difference between the two pulls?
            git pull >&! .log.sup
-           set xstatus = $status
+           @ err = $err + $status
 
 # report status of local changes
            if ("$scsi[3]" == ".") then
@@ -99,14 +102,18 @@ switch ($scsi[1])
         if ($unmngd == TRUE) then
 	   if ($sort == TRUE) then
               cvs update $cvsopt $args |& egrep '^\?' | sort -k 2
+              @ err = $err + $status
            else
               cvs update $cvsopt $args |& egrep '^\?'
+              @ err = $err + $status
            endif
         else
 	   if ($sort == TRUE) then
               cvs update $cvsopt $args |& egrep -v '^\?' |& grep -v 'cvs update' | sort -k 2
+              @ err = $err + $status
            else
               cvs update $cvsopt $args |& egrep -v '^\?' |& grep -v 'cvs update'
+              @ err = $err + $status
            endif
         endif
         breaksw
@@ -117,17 +124,21 @@ switch ($scsi[1])
         if ($unmngd == TRUE) then
 	   if ($sort == TRUE) then
               svn status $svnopt |& egrep '^\?' | sort -k 2
+              @ err = $err + $status
            else
               svn status $svnopt |& egrep '^\?'
+              @ err = $err + $status
            endif
         else
 	   if ($sort == TRUE) then
               svn status $svnopt |& egrep -v '^\?' | sed 's|+| |' | sort -k 2
+              @ err = $err + $status
            else
               svn status $svnopt |& egrep -v '^\?' | sed 's|+| |'
+              @ err = $err + $status
            endif
         endif
         breaksw
 endsw
 
-exit($status)
+exit($err)
