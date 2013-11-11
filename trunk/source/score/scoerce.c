@@ -71,19 +71,11 @@ static char
 	      "FLT_MAX", "DBL_MAX", "LDBL_MAX",
 	      "DBL_MAX", "LLONG_MAX" };
 
-#if defined(AIX) || defined(COMPILER_PGI)
+#define STRINGIFY(_x)    #_x
 
 static char
- *realp[] = { "crealf", "creal", "creal" },
- *imagp[] = { "cimagf", "cimag", "cimag" };
-
-#else
-
-static char
- *realp[] = { "crealf", "creal", "creall" },
- *imagp[] = { "cimagf", "cimag", "cimagl" };
-
-#endif
+ *realp[] = { "crealf", "creal", STRINGIFY(CREALL) },
+ *imagp[] = { "cimagf", "cimag", STRINGIFY(CIMAGL) };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
