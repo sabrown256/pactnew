@@ -540,7 +540,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 
     memset(s, ' ', LINE_SIZE);
 
-    pd  = PD_inquire_host_type(file, type);
+    pd = PD_inquire_host_type(file, type);
     if (pd == NULL)
        return(status);
 

@@ -936,6 +936,110 @@ void dprpio(char *tag, process *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _JOB_WAITR - do a waitpid and getrusage for finishing jobs
+ *            - tries to do with POSIX calls what the non-POSIX
+ *            - wait4 does
+ */
+
+int _job_waitr(int pid, int *pw, int opt, struct rusage *pr)
+   {int rv;
+
+#if 1
+    int st;
+    struct rusage ra;
+
+    st = getrusage(RUSAGE_CHILDREN, &ra);
+
+    rv = waitpid(pid, pw, WNOHANG);
+    if (rv == pid)
+       {st = getrusage(RUSAGE_CHILDREN, pr);
+	if (st == 0)
+	   {pr->ru_utime.tv_sec  -= ra.ru_utime.tv_sec;
+	    pr->ru_utime.tv_usec -= ra.ru_utime.tv_usec;
+	    pr->ru_stime.tv_sec  -= ra.ru_stime.tv_sec;
+	    pr->ru_stime.tv_usec -= ra.ru_stime.tv_usec;};};
+
+#else
+
+/* wait4 is not POSIX standard */
+
+    rv = wait4(pid, &w, WNOHANG, pr);
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* JOB_WAIT - check to update the process status */
+
+void job_wait(process *pp)
+   {int st, w, pid, sts, cnd;
+
+    if ((pp != NULL) && (pp->id != -1))
+       {pid = pp->id;
+
+	st = _job_waitr(pid, &w, WNOHANG, &pp->ru);
+
+	if (st == 0)
+	   pp->status = JOB_RUNNING;
+
+	else if (st == pid)
+	   {if (WIFEXITED(w))
+	       {cnd = JOB_EXITED;
+		sts = WEXITSTATUS(w);}
+
+	    else if (WIFSIGNALED(w))
+	       {cnd = JOB_SIGNALED;
+		sts = WTERMSIG(w);}
+
+	    else if (WIFSTOPPED(w))
+	       {cnd = JOB_STOPPED;
+		sts = WSTOPSIG(w);}
+
+	    else
+	       {cnd = -1;
+		sts = -1;};
+
+	    pp->stop_time = wall_clock_time();
+	    pp->status    = cnd;
+	    pp->reason    = sts;
+
+	    if (pp->wait != NULL)
+	       pp->wait(pp);}
+
+	else if ((st < 0) && (pp->status == JOB_RUNNING))
+	   pp->status = JOB_DEAD;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* JOB_SIGNAL - send signal SIG to the process associated with PP
+ *            - return TRUE iff successful
+ *            - return FALSE otherwise
+ */
+
+int job_signal(process *pp, int sig)
+   {int rv, st, pid;
+
+    rv = FALSE;
+
+    if ((job_running(pp) == TRUE) && (sig > 0))
+       {pid = pp->id;
+	st  = kill(pid, sig);
+        if (st == 0)
+	   {rv = TRUE;
+	    pp->status = JOB_SIGNALED;
+	    pp->reason = sig;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _JOB_SET_PROCESS_ENV - set environment variables for PP */
 
 static void _job_set_process_env(process *pp)
@@ -1181,7 +1285,21 @@ static int _job_parent_fork(process *pp, process *cp, int *fds, char *mode)
     if (ps->dbg_level & 2)
        dprpio("_job_parent_fork", pp);
 
+#if 1
+
+/* wait until the child starts running before returning */
+    for (i = 0; i < 1000; i++)
+        {job_wait(pp);
+	 if (pp->status == JOB_RUNNING)
+	    break;
+	 sched_yield();};
+
+#else
+
+/* yield and hope the child starts running before returning */
     sched_yield();
+
+#endif
 
     return(st);}
 
@@ -1610,110 +1728,6 @@ int job_response(process *pp, int to, char *fmt, ...)
 	       nl = -2;};};
 
     return(nl);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _JOB_WAITR - do a waitpid and getrusage for finishing jobs
- *            - tries to do with POSIX calls what the non-POSIX
- *            - wait4 does
- */
-
-int _job_waitr(int pid, int *pw, int opt, struct rusage *pr)
-   {int rv;
-
-#if 1
-    int st;
-    struct rusage ra;
-
-    st = getrusage(RUSAGE_CHILDREN, &ra);
-
-    rv = waitpid(pid, pw, WNOHANG);
-    if (rv == pid)
-       {st = getrusage(RUSAGE_CHILDREN, pr);
-	if (st == 0)
-	   {pr->ru_utime.tv_sec  -= ra.ru_utime.tv_sec;
-	    pr->ru_utime.tv_usec -= ra.ru_utime.tv_usec;
-	    pr->ru_stime.tv_sec  -= ra.ru_stime.tv_sec;
-	    pr->ru_stime.tv_usec -= ra.ru_stime.tv_usec;};};
-
-#else
-
-/* wait4 is not POSIX standard */
-
-    rv = wait4(pid, &w, WNOHANG, pr);
-
-#endif
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* JOB_WAIT - check to update the process status */
-
-void job_wait(process *pp)
-   {int st, w, pid, sts, cnd;
-
-    if ((pp != NULL) && (pp->id != -1))
-       {pid = pp->id;
-
-	st = _job_waitr(pid, &w, WNOHANG, &pp->ru);
-
-	if (st == 0)
-	   pp->status = JOB_RUNNING;
-
-	else if (st == pid)
-	   {if (WIFEXITED(w))
-	       {cnd = JOB_EXITED;
-		sts = WEXITSTATUS(w);}
-
-	    else if (WIFSIGNALED(w))
-	       {cnd = JOB_SIGNALED;
-		sts = WTERMSIG(w);}
-
-	    else if (WIFSTOPPED(w))
-	       {cnd = JOB_STOPPED;
-		sts = WSTOPSIG(w);}
-
-	    else
-	       {cnd = -1;
-		sts = -1;};
-
-	    pp->stop_time = wall_clock_time();
-	    pp->status    = cnd;
-	    pp->reason    = sts;
-
-	    if (pp->wait != NULL)
-	       pp->wait(pp);}
-
-	else if ((st < 0) && (pp->status == JOB_RUNNING))
-	   pp->status = JOB_DEAD;};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* JOB_SIGNAL - send signal SIG to the process associated with PP
- *            - return TRUE iff successful
- *            - return FALSE otherwise
- */
-
-int job_signal(process *pp, int sig)
-   {int rv, st, pid;
-
-    rv = FALSE;
-
-    if ((job_running(pp) == TRUE) && (sig > 0))
-       {pid = pp->id;
-	st  = kill(pid, sig);
-        if (st == 0)
-	   {rv = TRUE;
-	    pp->status = JOB_SIGNALED;
-	    pp->reason = sig;};};
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

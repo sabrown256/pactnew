@@ -79,10 +79,12 @@ Group OpenMP {
    LD_Lib    =
 }
 
+# PGI compilers do not do long double arithmetic
+# properly - they have the functions but they are broken
 Group LibM {
    Functions  = "POWL pow pow"
-   Functions += "CREALL creall creal"
-   Functions += "CIMAGL cimagl cimag"
+   Functions += "CREALL creal creal"
+   Functions += "CIMAGL cimag cimag"
 }
 
 include cpp-rule
