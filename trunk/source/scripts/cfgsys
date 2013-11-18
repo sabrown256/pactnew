@@ -124,9 +124,7 @@ else
       setenv PSY_Base    $basedir
    endif
 
-   if ($?PSY_Root == 0) then
-      setenv PSY_Root     $basedir/dev/${PSY_ID}
-   endif
+   setenv PSY_Root     $basedir/dev/${PSY_ID}
 
    if ($?PSY_AIRoot == 0) then
 
