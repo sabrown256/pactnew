@@ -13,9 +13,22 @@ unalias *
 set lbits = ""
 set lvers = ""
 set cpath = ""
+set vrb   = FALSE
 
 while ($#argv > 0)
    switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: use-compiler [-h] [-v] [bits #] [vers #] <cc>"
+           echo "   h     this help message"
+           echo "   v     verbose mode"
+           echo "   <cc>  compiler name or full path"
+           echo ""
+           echo ""
+           exit(1)
+      case -v:
+           set vrb = TRUE
+           breaksw
       case bits:
            shift
            set lbits = $1
@@ -377,6 +390,18 @@ else
 endif
 
 envexp PATH
+
+if ($vrb == TRUE) then
+   echo "   PACT_CC_FAMILY   = $pact_cc_family"
+   echo "   PACT_CC_VERSION  = $pact_cc_version"
+   echo "   PACT_CC_PATH     = $pact_cc_path"
+   echo "   PACT_CC_EXE      = $pact_cc_exe"
+   echo "   PACT_FC_FAMILY   = $pact_fc_family"
+   echo "   PACT_FC_VERSION  = $pact_fc_version"
+   echo "   PACT_FC_PATH     = $pact_fc_path"
+   echo "   PACT_FC_EXE      = $pact_fc_exe"
+   echo "   PATH             = $PATH"
+endif
 
 exit(0)
 
