@@ -504,7 +504,7 @@ FINISH:
    flog $Log touch $TmpFile
    flog $Log pwd
    if ($cwd =~ */manager/distribution) then
-      flog $Log $RM *
+      flog $Log $RM $cwd/*
    endif
 
    NoteD $Log "Distribution for PACT version $VersionID made"
