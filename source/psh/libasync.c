@@ -249,7 +249,8 @@ struct s_process_stack
 #ifndef S_SPLINT_S
 struct process_group_state
    {int n_sig_block;
-    int dbg_level;
+    int dbg_level;             /* debug level */
+    int to_sec;                /* timeout in seconds */
     uint64_t status_mask;
     shell_option ofmt;
     io_device medium;
@@ -275,7 +276,7 @@ struct process_group_state
 
 process_group_state *get_process_group_state(void)
    {process_group_state *ps;
-    static process_group_state st = { 0, 0, (uint64_t) -1,
+    static process_group_state st = { 0, 0, -1, (uint64_t) -1,
 				      GEX_CSH_EV, IO_DEV_PIPE,
 				      { 0, 0, 0, 0, 3,
 					(POLLIN | POLLPRI),

@@ -271,9 +271,9 @@ switch ($Cmnd)
         setenv PSY_ID   `$PSY_CfgMan -d ../dev use`
         setenv PSY_Root $DevDir/$PSY_ID
 
-        set BinDir  = $PSY_Root/bin
-        set EtcDir  = $PSY_Root/etc
-        set LogDir  = $PSY_Root/log
+        set BinDir = $PSY_Root/bin
+        set EtcDir = $PSY_Root/etc
+        set LogDir = $PSY_Root/log
 
         InitLog Log $LogDir/build
 
