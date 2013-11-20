@@ -264,10 +264,24 @@ GET_REPO_SOURCE:
    flog $Log $PSY_ScrDir/scs-lock status
    Note $Log " " 
 
+   if ($xstatus != 0) then
+      NoteD $Log ""      
+      NoteD $Log "Repository check out failed - exiting"
+      NoteD $Log ""      
+      exit(1)
+   endif
+
    flog $Log pushd pact
    if ($xstatus == 0) then
       set mngd = ( `find . -type d -name manager` )
       set root = $mngd:h
+      if ("$root" == "") then
+         NoteD $Log ""      
+         NoteD $Log "Checked out source is bad - exiting"
+         NoteD $Log ""      
+         exit(1)
+      endif
+
       flog $Log mv $root/* $root/.[a-zA-Z].* .
       flog $Log $RMDir pact
       Note $Log "Sources checked out" 

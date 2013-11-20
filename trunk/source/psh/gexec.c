@@ -150,7 +150,7 @@ static int help(void)
 
     printf("\n");
     printf("Usage: gexec [-cev] [-csv] [-d #] [-h] [-nv] [-p] [-s]\n");
-    printf("             [-sev] [-ssv] [-st #] [-t] <cmd>\n");
+    printf("             [-sev] [-ssv] [-st #] [-t] [-to #] <cmd>\n");
     printf("   cev    output status as environment variable in CSH form\n");
     printf("   csv    output status as shell variable in CSH form\n");
     printf("   d      debug level\n");
@@ -162,6 +162,7 @@ static int help(void)
     printf("   ssv    output status as shell variable in SH form\n");
     printf("   st     set exit status bit mask\n");
     printf("   t      use PTY's between processes (not available yet)\n");
+    printf("   to     timeout after # seconds (default -1 infinite)\n");
     printf("   <cmd>  see gexec man page for details\n");
     printf("\n");
 
@@ -226,6 +227,9 @@ int main(int c, char **v, char **env)
 
 	     else if (strcmp(v[i], "-t") == 0)
 	        ps->medium = IO_DEV_PTY;
+
+	     else if (strcmp(v[i], "-to") == 0)
+	        ps->to_sec = atol(v[++i]);
 
 	     else
 	        {rv = gexeca(db, c-i, v+i, env, maps);

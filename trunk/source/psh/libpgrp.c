@@ -2140,7 +2140,7 @@ static int run_pgrp(statement *s)
 	     ps->stck.fd[i].revents = 0;};
 
 /* wait for the work to complete - _pgrp_work does the work */
-	tc = await(-1, 1, "commands", _pgrp_tty, _pgrp_work, s);
+	tc = await(ps->to_sec, 1, "commands", _pgrp_tty, _pgrp_work, s);
 	ASSERT(tc >= 0);
 
 /* close out the jobs */

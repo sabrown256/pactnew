@@ -14,7 +14,7 @@ set PERDB = perdb
 
 set db  = TRUE
 set lst = ""
-set opt = ""
+set opt = ( -to 10 )
 
 Note $Log "Args: $argv"
 
