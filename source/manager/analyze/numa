@@ -8,8 +8,8 @@
 # include "cpyright.h"
 #
 
-dbmget /dev/null SMP_NUMA =\? ""^     \
-                 PACT_CC_FAMILY
+dbmget $ALog SMP_NUMA =\? ""^     \
+             PACT_CC_FAMILY
 
 if ($PACT_CC_FAMILY == PGI) then
    /bin/ls /usr/lib*/libnuma*.so >& /dev/null

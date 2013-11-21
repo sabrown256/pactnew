@@ -3,17 +3,32 @@
 # BUILD-SPOKES - configure and compile the TRANSLATION spokes
 #
 
+@ err = 0
+
+unalias *
+
 cd spokes
+@ err = $err + $status
 
 # make sure there is a spoke and build it
+@ ns = 0
+@ np = 0
 foreach entry (*)
    if ((-d $entry) && ($entry != CVS)) then
       echo "          Building $entry spoke"
+      @ np = $np + 1
       pushd $entry >>& /dev/null
       pact spoke
+      if ($status == 0) then
+         @ ns = $ns + 1
+      else
+         @ err = $err + 1
+      endif
       popd >>& /dev/null
    endif
 end
 
-exit($status)
+echo "   Built $ns out of $np spokes"
+
+exit($err)
 

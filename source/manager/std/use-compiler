@@ -46,17 +46,11 @@ while ($#argv > 0)
    shift
 end
 
-if ("$cpath" == "") then
-   echo "No compiler specified - exiting"
-   exit(1)
+if (($?PSY_ID == 1) && ($?PSY_Base == 1)) then
+   setenv ALog $PSY_Base/dev/$PSY_ID/log/analyze.use-compiler
+else
+   setenv ALog /dev/null
 endif
-set cname = $cpath:t
-if ($cpath == $cname) then
-   set cpath = ""
-endif
-
-set Sed = `which sed`
-set Awk = `which awk`
 
 # find and source functions-pact.csh
 if (-f ../scripts/functions-pact.csh) then
@@ -77,8 +71,25 @@ else
    eval `sys-site -dc`
 endif
 
-# default compiler and query info
+if ("$cpath" == "") then
+   NoteD $ALog "No compiler specified - exiting"
+   exit(1)
+endif
+set cname = $cpath:t
+if ($cpath == $cname) then
+   set cpath = ""
+endif
+
+set Sed = `which sed`
+set Awk = `which awk`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP - get default compiler and query basic info
+
 set cc = ( `which $cname` )
+
 switch ($cname)
 
 # ABSOFT
@@ -202,6 +213,22 @@ switch ($cname)
         set fname = gfortran
         breaksw
 endsw
+
+Note $ALog "Info derived from ${cname}:"
+Note $ALog "   pact_cc_family  = $pact_cc_family"
+Note $ALog "   pact_fc_family  = $pact_fc_family"
+Note $ALog "   cname           = $cname"
+Note $ALog "   fname           = $fname"
+Note $ALog "   Version option  = $opt"
+Note $ALog "   Version pattern = $pat"
+Note $ALog "   Version awk     = $prog"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPILER - get detailed compiler info
+
+Separator $ALog
 
 set cc     = none
 set fc     = none
@@ -367,14 +394,21 @@ if ($pact_cc_family == PATHSCALE) then
    set pact_fc_path = $pact_fc_path/lib/$lfvers
 endif
 
-dbmset /dev/null PACT_CC_FAMILY   = $pact_cc_family^   \
-                 PACT_CC_VERSION  = $pact_cc_version^  \
-                 PACT_CC_PATH     = $pact_cc_path^     \
-                 PACT_CC_EXE      = $pact_cc_exe^      \
-                 PACT_FC_FAMILY   = $pact_fc_family^   \
-                 PACT_FC_VERSION  = $pact_fc_version^  \
-                 PACT_FC_PATH     = $pact_fc_path^     \
-                 PACT_FC_EXE      = $pact_fc_exe
+dbmset $ALog PACT_CC_FAMILY   = $pact_cc_family^   \
+             PACT_CC_VERSION  = $pact_cc_version^  \
+             PACT_CC_PATH     = $pact_cc_path^     \
+             PACT_CC_EXE      = $pact_cc_exe^      \
+             PACT_FC_FAMILY   = $pact_fc_family^   \
+             PACT_FC_VERSION  = $pact_fc_version^  \
+             PACT_FC_PATH     = $pact_fc_path^     \
+             PACT_FC_EXE      = $pact_fc_exe
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# NUMA - get numa info
+
+Separator $ALog
 
 source analyze/numa
 
@@ -391,16 +425,19 @@ endif
 
 envexp PATH
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 if ($vrb == TRUE) then
-   echo "   PACT_CC_FAMILY   = $pact_cc_family"
-   echo "   PACT_CC_VERSION  = $pact_cc_version"
-   echo "   PACT_CC_PATH     = $pact_cc_path"
-   echo "   PACT_CC_EXE      = $pact_cc_exe"
-   echo "   PACT_FC_FAMILY   = $pact_fc_family"
-   echo "   PACT_FC_VERSION  = $pact_fc_version"
-   echo "   PACT_FC_PATH     = $pact_fc_path"
-   echo "   PACT_FC_EXE      = $pact_fc_exe"
-   echo "   PATH             = $PATH"
+   NoteD $ALog "   PACT_CC_FAMILY   = $pact_cc_family"
+   NoteD $ALog "   PACT_CC_VERSION  = $pact_cc_version"
+   NoteD $ALog "   PACT_CC_PATH     = $pact_cc_path"
+   NoteD $ALog "   PACT_CC_EXE      = $pact_cc_exe"
+   NoteD $ALog "   PACT_FC_FAMILY   = $pact_fc_family"
+   NoteD $ALog "   PACT_FC_VERSION  = $pact_fc_version"
+   NoteD $ALog "   PACT_FC_PATH     = $pact_fc_path"
+   NoteD $ALog "   PACT_FC_EXE      = $pact_fc_exe"
+   NoteD $ALog "   PATH             = $PATH"
 endif
 
 exit(0)
