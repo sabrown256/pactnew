@@ -2403,8 +2403,9 @@ CFG_DONE:
 
         set DevDir  = $PSY_Base/dev
 
-        setenv PSY_ID    `$PSY_CfgMan -d ../dev use`
-        setenv PSY_Root  $DevDir/$PSY_ID
+        setenv PSY_ID     `$PSY_CfgMan -d ../dev use`
+        setenv PSY_Root   $DevDir/$PSY_ID
+        setenv PSY_TmpDir ${PSY_Prefix}${PSY_ID}
 
         set BinDir  = $PSY_Root/bin
         set IncDir  = $PSY_Root/include
