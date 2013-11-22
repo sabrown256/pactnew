@@ -361,8 +361,8 @@ int SC_so_config(char *fname)
 		 name  = NULL;
 		 argl  = NULL;}
 
-/* ignore improper expression '<key> =' */
-	     else if (val == NULL)
+/* ignore expressions with key or val NULL */
+	     else if ((key == NULL) && (val == NULL))
 	        continue;
 
 	     else if (strcmp(key, "kind") == 0)

@@ -103,6 +103,7 @@ int main(int c, char **v)
     nb = pow(2.0, 32.0);
     rc = 1.0/pow(2.0, 20.0);
 
+    fb = 100000.0;
     for (i = 1; i < c; i++)
         fb = SC_stof(v[i]);
 

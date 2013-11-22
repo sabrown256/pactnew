@@ -1170,6 +1170,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 
 /*  >!  ->  O_WRONLY | O_CREAT | O_TRUNC */
 			 case 'w' :
+			 default  :
 			      md = O_WRONLY | O_CREAT | O_TRUNC;
 			      break;
 
@@ -1326,6 +1327,8 @@ static SC_process_group *_SC_setup_process_group(char **argv, char **envp,
     pa = CMAKE_N(PROCESS *, n);
     ca = CMAKE_N(PROCESS *, n);
 
+    to = -1;
+
 /* setup each process in the process_group */
     for (i = 0; i < n; i++)
         {al = pg[i].argf;
@@ -1393,6 +1396,8 @@ static PROCESS *_SC_launch_process_group(SC_process_group *pgr)
     ca   = pgr->children;
     md   = pgr->mode;
     rcpu = pgr->rcpu;
+
+    pp = NULL;
 
 /* launch each process in the process_group */
     for (i = 0; i < n; i++)
@@ -1862,6 +1867,7 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
 	    default :
 	         break;};
 
+/* set the files */
 	switch (knd)
 	   {case SC_IO_STD_IN :
 	         fd[ifd].file = nm;
@@ -1878,6 +1884,7 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
 	    default :
 	         break;};
 
+/* set the flags */
 	switch (knd)
 	   {case SC_IO_STD_IN :
 		 fd[ifd].flag = fl;
@@ -1889,7 +1896,6 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
 		 fd[2].flag = fl;
 	         break;
 	    case SC_IO_STD_BOND :
-		 fd[2].file = nm;
 		 fd[1].flag = fl;
 		 fd[2].flag = fl;
 	         break;
