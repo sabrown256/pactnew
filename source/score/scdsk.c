@@ -45,7 +45,7 @@ int64_t SC_dsk_space(char *dir, int64_t nbx)
 	 if (no >= nb)
 	    {nw = write(fd, " ", 1);
 	     if (nw < 0)
-	        io_error(err, "write of 1 byte on %d failed", fd);
+	        io_error(errno, "write of 1 byte on %d failed", fd);
 	     if (nw == 1)
 	        ok = TRUE;};};
 

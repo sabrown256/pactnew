@@ -194,8 +194,6 @@ static int interrupt_mode(info *facts)
    {int rv;
     PROCESS *pp;
 
-    rv = 0;
-
     pp = facts->pp;
 
     SC_unblock(pp);

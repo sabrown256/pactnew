@@ -431,9 +431,9 @@ static exedes *_SC_exe_open(char *ename, char *sname, char *tgt,
 	   {if (bfd_check_format(et, bfd_archive) != 0)
 	       {ok = FALSE;
 	        snprintf(st->err, MAXLINE,
-			 "%s: cannot get addresses from archive", ename);};
-
-	    ok = _SC_exe_check_formats(et);};
+			 "%s: cannot get addresses from archive", ename);}
+	    else
+	       ok = _SC_exe_check_formats(et);};
 
 	es = NULL;
 	if (sname != NULL)

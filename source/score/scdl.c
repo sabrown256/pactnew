@@ -140,11 +140,7 @@ int SC_so_release(void)
 /* _SC_SO_PARSE_FLAGS - parse the flags for dlsym from SE */
 
 static int _SC_so_parse_flags(sodes *se)
-   {int flag;
-
-    flag = -1;
-
-    int is, ns;
+   {int flag, is, ns;
     char s[MAXLINE];
     char **sa;
 
@@ -351,7 +347,7 @@ int SC_so_config(char *fname)
 	     oper = SC_strtok(NULL, " \t\n", p);
 	     val  = SC_strtok(NULL, " \t\n", p);
 
-	     if (strchr(oper, '{') != NULL)
+	     if ((oper != NULL) && (strchr(oper, '{') != NULL))
 	        name = CSTRSAVE(key);
 
 	     else if (strchr(key, '}') != NULL)
@@ -364,6 +360,10 @@ int SC_so_config(char *fname)
 		 rv    = NULL;
 		 name  = NULL;
 		 argl  = NULL;}
+
+/* ignore improper expression '<key> =' */
+	     else if (val == NULL)
+	        continue;
 
 	     else if (strcmp(key, "kind") == 0)
 	        {if (strcmp(val, "function") == 0)

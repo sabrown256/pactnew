@@ -311,7 +311,7 @@ mode_t SC_get_umask(void)
     o = umask(n);
 
 /* restore the original value */
-    n = umask(o);
+    umask(o);
 
     return(o);}
  

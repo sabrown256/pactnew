@@ -61,12 +61,15 @@ foreach c ($lst)
    NoteD $log "File: $c"
    NoteD $log ""
 
+# sed '$!N; /^\(.*\)\n\1$/!P; D' thegeekstuff.txt
+
    if ($PACT_CC_FAMILY == CLANG) then
-      gtee $log clang --analyze -I../dev/$psy_id/include -I. $c
+      ftee $log clang --analyze -I../dev/$psy_id/include -I. $c
+#      gtee $log clang --analyze -I../dev/$psy_id/include -I. $c
       @ err = $err + $gstatus[1]
    else
-#      ftee $log splint $opt -I../dev/$psy_id/include -I. $c
-      gtee $log splint $opt -I../dev/$psy_id/include -I. $c
+      ftee $log splint $opt -I../dev/$psy_id/include -I. $c
+#      gtee $log splint $opt -I../dev/$psy_id/include -I. $c
       @ err = $err + $gstatus[1]
    endif
 end

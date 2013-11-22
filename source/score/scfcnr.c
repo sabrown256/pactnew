@@ -250,7 +250,6 @@ void SC_list_fcontainer(FILE *f, fcontainer *cf, int full)
    {int i;
     char **ret;
     
-    i   = 0;
     ret = NULL;
 
     if (cf != NULL)

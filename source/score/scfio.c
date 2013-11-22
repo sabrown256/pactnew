@@ -3122,7 +3122,7 @@ char *SC_dgets(char *bf, int *pnc, FILE *fp)
 
 	io_seek(fp, ad + nb, SEEK_SET);
 
-	zsp = SC_zero_space_n(zsp, -1);};
+	SC_zero_space_n(zsp, -1);};
 
     *pnc = nn;
 
