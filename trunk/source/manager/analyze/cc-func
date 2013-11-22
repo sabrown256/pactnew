@@ -12,7 +12,7 @@ Note $ALog "----- analyze/cc-func -----"
 Note $ALog "Analyze: C Library functions"
 Note $ALog ""
 
-dbmget $ALog LibM_Functions
+dbmget $ALog LibM_Functions =\? ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
