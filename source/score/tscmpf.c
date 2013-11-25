@@ -443,6 +443,9 @@ int core(int nir, PFTest tst, char *s, double *pdt)
     double tf, nif, nmby, dt;
     char *r;
 
+    tf  = -1.0;
+    nif = 1.0;
+
     SC_mem_statb(&ab, &fb, &db, &mb);
 
     err = (*tst)(&tf, &nif, nir);

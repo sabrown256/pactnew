@@ -1280,6 +1280,12 @@ int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
 
 int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
    {int rv;
+    int pw, ph, cw, ch;
+
+    pw = -1;
+    ph = -1;
+    cw = -1;
+    ch = -1;
 
 #if defined(MACOSX)
 
@@ -1288,7 +1294,6 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 #else
 
     int fd, bg, act, p;
-    int pw, ph, cw, ch;
     char *name, *s;
     TERMINAL_STATE *ts;
 
@@ -1320,39 +1325,23 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 /* send the code to report the pixel height and width of
  * the terminal window: ESC[14t
  */
-	    pw = -1;
-	    ph = -1;
 	    if ((ppr != NULL) || (ppc != NULL))
 	       {s = SC_dsnprintf(TRUE, "%c[14t", SC_ESC_CHAR);
 		SC_write_sigsafe(fd, s, strlen(s));
                 CFREE(s);
 
 		_SC_get_term_resp(fd, 't', &pw, &ph);
-		if (ppr != NULL)
-		   *ppr = ph;
-
-		if (ppc != NULL)
-		   *ppc = pw;
-
 		rv = TRUE;};
 
 /* send the code to report the character height and width of
  * the terminal text area: ESC[18t
  */
-	    cw = -1;
-	    ch = -1;
 	    if ((pcr != NULL) || (pcc != NULL))
 	       {s = SC_dsnprintf(TRUE, "%c[18t", SC_ESC_CHAR);
 		SC_write_sigsafe(fd, s, strlen(s));
                 CFREE(s);
 
 		_SC_get_term_resp(fd, 't', &cw, &ch);
-		if (pcr != NULL)
-		   *pcr = ch;
-
-		if (pcc != NULL)
-		   *pcc = cw;
-
 		rv = TRUE;};
 
 /* close the terminal */
@@ -1360,6 +1349,18 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 	    SC_close_safe(fd);};};
 
 #endif
+
+    if (ppr != NULL)
+       *ppr = ph;
+
+    if (ppc != NULL)
+       *ppc = pw;
+
+    if (pcr != NULL)
+       *pcr = ch;
+
+    if (pcc != NULL)
+       *pcc = cw;
 
     return(rv);}
 

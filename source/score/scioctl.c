@@ -184,24 +184,34 @@ int SC_register_event_loop_callback(SC_evlpdes *pe, int type, void *p,
    {int rv, fd;
     SC_poll_desc pd;
 
-    if (type == SC_PROCESS_I)
-       fd = ((PROCESS *) p)->io[0];
+    rv = FALSE;
 
-    else if (type == SC_FILE_I)
-       fd = fileno((FILE *) p);
+    if (p != NULL)
+       {fd = -1;
 
-    else
-       fd = *(int *) p;
+	if (type == SC_PROCESS_I)
+	   {int *io;
 
-    pd.fd      = fd;
-    pd.events  = pe->maccpt;
-    pd.revents = 0;
+	    io = ((PROCESS *) p)->io;
+	    if (io != NULL)
+	       fd = io[0];}
 
-    SC_array_push(pe->fd, &pd);
-    SC_array_push(pe->faccpt, &acc);
-    SC_array_push(pe->frejct, &rej);
+        else if (type == SC_FILE_I)
+	   fd = fileno((FILE *) p);
 
-    rv = SC_set_fd_async(fd, TRUE, pid);
+	else
+	   fd = *(int *) p;
+
+	if (fd != -1)
+	   {pd.fd      = fd;
+	    pd.events  = pe->maccpt;
+	    pd.revents = 0;
+
+	    SC_array_push(pe->fd, &pd);
+	    SC_array_push(pe->faccpt, &acc);
+	    SC_array_push(pe->frejct, &rej);
+
+	    rv = SC_set_fd_async(fd, TRUE, pid);};};
 
     return(rv);}
 

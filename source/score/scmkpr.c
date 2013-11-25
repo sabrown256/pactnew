@@ -1126,8 +1126,9 @@ int SC_parse_makefile(anadep *state, char *fname)
 		        SC_error(-1, "syntax error on line %d: %s\n", i, s);
 		     SC_ptr_arr_len(na, sa);
 
-		     if ((strchr(sa[0], '=') != NULL) ||
-			 ((na > 1) && (sa[1][0] == '=')))
+		     if ((sa != NULL) && (sa[0] != NULL) &&
+			 ((strchr(sa[0], '=') != NULL) ||
+			  ((na > 1) && (sa[1][0] == '='))))
 		        ok = UEQ;
 		     else if ((na > 1) && (strcmp(sa[1], "?=") == 0))
 		        ok = CEQ;

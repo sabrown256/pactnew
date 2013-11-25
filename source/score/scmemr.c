@@ -35,7 +35,8 @@ void *calloc(size_t ni, size_t bpi)
 
     _SC_mem_exhausted(p == NULL);
 
-    memset(p, 0, nb);
+    if (p != NULL)
+       memset(p, 0, nb);
 
     return(p);}
 

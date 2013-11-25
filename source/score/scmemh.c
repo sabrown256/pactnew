@@ -59,16 +59,16 @@ static void _SC_mem_history(int act, void *a)
     nh = ph->nh;
 
     hst = &ph->ring[ih++];
-
-    hst->ncall++;
-    hst->action = act;
-    hst->time   = dt;
-    hst->space  = desc;
-    hst->nb     = desc->length;
-    if (act == SC_MEM_ALLOC)
-       hst->name = (char *) desc->desc.info.pfunc;
-    else
-       hst->name = NULL;
+    if (hst != NULL)
+       {hst->ncall++;
+	hst->action = act;
+	hst->time   = dt;
+	hst->space  = desc;
+	hst->nb     = desc->length;
+	if (act == SC_MEM_ALLOC)
+	   hst->name = (char *) desc->desc.info.pfunc;
+	else
+	   hst->name = NULL;};
 
     ph->ih = ih % nh;
 

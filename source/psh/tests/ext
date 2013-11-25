@@ -8,6 +8,11 @@ source ../../tests/common
 set msg = "GEXEC Test ....................."
 
 #setenv GEXEC_DEBUG_LEVEL 7
+if ($?PSY_SITE == 1) then
+   if ($PSY_SITE == LC) then
+      setenv TEST_ADVISORY ${TEST_ADVISORY}:psh_gexec
+   endif
+endif
 
 set GEXEC = gexec
 set PERDB = perdb

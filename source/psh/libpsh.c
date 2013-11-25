@@ -945,8 +945,10 @@ void free_strings(char **lst)
 int last_char(char *s)
    {int nc;
 
-    nc = strlen(s) - 1;
-    nc = max(0, nc);
+    nc = 0;
+    if (s != NULL)
+       {nc = strlen(s) - 1;
+	nc = max(0, nc);};
 
     return(nc);}
 

@@ -276,6 +276,7 @@ if (-f $hdr) then
    unset cpp1
 
 else
+   NoteD $log "   no file '$hdr'"
    flog $log @ nerr = $nerr + 2
 endif
 

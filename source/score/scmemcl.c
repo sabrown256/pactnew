@@ -103,7 +103,8 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
 	ph->major_block_list = pm;};
 
 /* add the new major block */
-    ph->major_block_list[ph->n_major_blocks++] = mbl;
+    if (ph->major_block_list != NULL)
+       ph->major_block_list[ph->n_major_blocks++] = mbl;
 
 /* expand the major block list if necessary */
     if (ph->n_major_blocks >= ph->nx_major_blocks)
@@ -125,16 +126,16 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
     nu--;
     for (i = 0; i < nu; i++, pn += us)
         {ths = (mem_descriptor *) pn;
-	 _SC_deassign_block(ph, ths, pn + us);
-         ths->prev = NULL;
-	 ths->next = NULL;};
+	 if (ths != NULL)
+	    {_SC_deassign_block(ph, ths, pn + us);
+	     ths->prev = NULL;
+	     ths->next = NULL;};};
 
     ths = (mem_descriptor *) pn;
-
-    _SC_deassign_block(ph, ths, NULL);
-
-    ths->prev = NULL;
-    ths->next = NULL;
+    if (ths != NULL)
+       {_SC_deassign_block(ph, ths, NULL);
+	ths->prev = NULL;
+	ths->next = NULL;};
 
     return(md);}
 
@@ -189,7 +190,9 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
 	    md = (mem_descriptor *) p;
 
 	    info = &md->desc.info;
-	    info->initialized = TRUE;}
+	    if (info != NULL)
+	       info->initialized = TRUE;}
+
         else
            {p = _SC_ALLOC((size_t) (nbp + sizeof(double)));
 
@@ -198,7 +201,8 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
 	    md = (mem_descriptor *) p;
 
 	    info = &md->desc.info;
-	    info->initialized = FALSE;};};
+	    if (info != NULL)
+	       info->initialized = FALSE;};};
 
     return(p);}
 
