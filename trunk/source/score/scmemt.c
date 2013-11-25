@@ -206,14 +206,16 @@ static void _SC_grow_thread_data(int nt, int ne)
 
         _SC_mem_exhausted(t == NULL);
 
-        memset(t, 0, nbn);
+	if (t != NULL)
+	   memset(t, 0, nbn);
 
         if (st.data != NULL)
            {for (it = 0; it < nto; it++)
 	        {for (ie = 0; ie < neo; ie++)
 		     {io = it*neo + ie;
 		      in = it*st.nex + ie;
-		      t[in] = st.data[io];};};
+		      if (st.data != NULL)
+			 t[in] = st.data[io];};};
 
 	    free(st.data);};
 
@@ -225,7 +227,7 @@ static void _SC_grow_thread_data(int nt, int ne)
     for (it = 0; it < st.nt; it++)
         {for (ie = 0; ie < st.ne; ie++)
              {i = it*st.nex + ie;
-	      if (st.data[i] == NULL)
+	      if ((st.data != NULL) && (st.data[i] == NULL))
 		 {pt = st.mreg + ie;
 		  if (pt != NULL)
 		     {bpi = pt->bpi;
@@ -236,7 +238,8 @@ static void _SC_grow_thread_data(int nt, int ne)
 
 		      _SC_mem_exhausted(d == NULL);
 
-		      memset(d, 0, nb);
+		      if (d != NULL)
+			 memset(d, 0, nb);
 
 		      st.data[i] = d;
 
@@ -344,16 +347,18 @@ void *SC_get_thread_element_nl(int *pit, int ie, int lck)
     if ((st.ntx <= it) || (st.nex <= ie))
        _SC_grow_thread_data(it, ie);
 
-    i  = it*st.nex + ie;
-    rv = st.data[i];
+    i = it*st.nex + ie;
+    if (st.data != NULL)
+       {rv = st.data[i];
 
-    if (rv == NULL)
-       _SC_grow_thread_data(it, ie);
+	if (rv == NULL)
+	   _SC_grow_thread_data(it, ie);
 
-    rv = st.data[i];
-    if (rv == NULL)
-       fprintf(stdout, "ERROR: no state for thread %d %d (%s) - SC_GET_THREAD_ELEMENT_NL\n",
-	       it, ie, st.mreg[ie].name);
+	rv = st.data[i];
+	if (rv == NULL)
+	   fprintf(stdout,
+		   "ERROR: no state for thread %d %d (%s) - SC_GET_THREAD_ELEMENT_NL\n",
+		   it, ie, st.mreg[ie].name);};
 
     *pit = it;
 

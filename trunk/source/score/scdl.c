@@ -350,7 +350,7 @@ int SC_so_config(char *fname)
 	     if ((oper != NULL) && (strchr(oper, '{') != NULL))
 	        name = CSTRSAVE(key);
 
-	     else if (strchr(key, '}') != NULL)
+	     else if ((key != NULL) && (strchr(key, '}') != NULL))
 	        {ok  &= SC_so_register_func(kind, lib, name,
 					    path, flags, rv, argl);
 		 kind  = OBJ_FUNC;
@@ -362,7 +362,7 @@ int SC_so_config(char *fname)
 		 argl  = NULL;}
 
 /* ignore expressions with key or val NULL */
-	     else if ((key == NULL) && (val == NULL))
+	     else if ((key == NULL) || (val == NULL))
 	        continue;
 
 	     else if (strcmp(key, "kind") == 0)

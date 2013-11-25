@@ -239,8 +239,9 @@ void SC_rl_hash_table(HASHTAB *self)
     if (SC_safe_to_free(self))
        {SC_hash_clr(self);
 
-        CFREE(self->key_type);
-        CFREE(self->table);};
+	if (self != NULL)
+	   {CFREE(self->key_type);
+	    CFREE(self->table);};};
 
     CFREE(self);
 

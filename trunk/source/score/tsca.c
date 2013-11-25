@@ -75,11 +75,8 @@ static int test_1_hash(void)
     ta = (char *) SC_hasharr_def_lookup(tab, "a");
     tb = (char *) SC_hasharr_def_lookup(tab, "b");
 
-    err += (ta == NULL);
-    err += (tb == NULL);
-
-    err += (strcmp(sa, ta) != 0);
-    err += (strcmp(sb, tb) != 0);
+    err += ((ta == NULL) || (strcmp(sa, ta) != 0));
+    err += ((tb == NULL) || (strcmp(sb, tb) != 0));
 
     err += (SC_hasharr_remove(tab, "a") != TRUE);
     err += (SC_hasharr_remove(tab, "b") != TRUE);
@@ -118,11 +115,8 @@ static int test_1_ha(void)
     ta = (char *) SC_hasharr_def_lookup(ha, "a");
     tb = (char *) SC_hasharr_def_lookup(ha, "b");
 
-    err += (ta == NULL);
-    err += (tb == NULL);
-
-    err += (strcmp(sa, ta) != 0);
-    err += (strcmp(sb, tb) != 0);
+    err += ((ta == NULL) || (strcmp(sa, ta) != 0));
+    err += ((tb == NULL) || (strcmp(sb, tb) != 0));
 
     err += (SC_hasharr_remove(ha, "a") != TRUE);
     err += (SC_hasharr_remove(ha, "b") != TRUE);
@@ -157,8 +151,8 @@ static int test_1_al(void)
     
     ta = (char *) SC_assoc(lsb, "a");
     tb = (char *) SC_assoc(lsb, "b");
-    err += (strcmp(sa, ta) != 0);
-    err += (strcmp(sb, tb) != 0);
+    err += ((ta == NULL) || (strcmp(sa, ta) != 0));
+    err += ((tb == NULL) || (strcmp(sb, tb) != 0));
 
     lsb = SC_rem_alist(lsb, "a");
     lsb = SC_rem_alist(lsb, "b");

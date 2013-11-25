@@ -308,6 +308,8 @@ int main(int c, char **v)
     ip.delim[1] = "";
     ip.subst    = "";
 
+    rv = TRUE;
+
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-h") == 0)
             {printf("Usage: elide [-d] [-h] [-ns #] [-ne #] [-q] [-s <text>] <start> <stop> <file>*\n");

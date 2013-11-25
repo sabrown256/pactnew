@@ -659,7 +659,8 @@ static void write_perl(client *cl, state *st, char *dbname)
     ta = _db_clnt_ex(cl, FALSE, "save:");
     na = lst_length(ta);
     na--;
-    FREE(ta[na]);
+    if ((ta != NULL) && (na > 0))
+       FREE(ta[na]);
 
     rv = write_class_perl(cl, out, st->def_tools, "Tool",
 			  "   ", ta, na, NULL, 0);
@@ -802,7 +803,9 @@ static void add_spec_env_vars(client *cl,
 		      vl = strchr(vr, '=');
 		      if (vl != NULL)
 			 *vl++ = '\0';
-		      if ((strpbrk(vl, " \t()") != NULL) && (vl[0] != '"'))
+		      if ((vl != NULL) &&
+			  (strpbrk(vl, " \t()") != NULL) &&
+			  (vl[0] != '"'))
 			 {snprintf(s, BFLRG, "\"%s\"", vl);
 			  vl = s;};
 		      env_out(fsh, fcsh, fdk, fmd, vr, vl);}
@@ -825,7 +828,7 @@ static void add_spec_env_vars(client *cl,
 	     {v = va[iv];
 	      ok &= (strncmp(v, sa[i], strlen(v)) != 0);};
 
-	 if (ok == TRUE)
+	 if ((n > 0) && (ok == TRUE))
 	    {p = dbget(cl, TRUE, v);
 	     if ((IS_NULL(p) == FALSE) || (blank == TRUE))
 	        env_out(fsh, fcsh, fdk, fmd, v, p);};};

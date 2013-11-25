@@ -592,6 +592,7 @@ static void help(void)
 
 int main(int c, char **v)
    {int i, ln, nt, rv, tgt;
+    char tmpf[BFLRG];
     char *inf, *outf;
     FILE *fi, *fo;
     template *t, *tl[NMAX];
@@ -639,7 +640,13 @@ int main(int c, char **v)
 	     tl[nt] = t;};};
 
     if (outf != NULL)
-       fo = fopen_safe(outf, "w");
+       {snprintf(tmpf, BFLRG, "%s.%d", outf, getpid());
+
+/* write a temporary file then rename it at the end
+ * so that if the file currently exists it can be used
+ * and there will be no gap when it does not exist or is empty
+ */
+	fo = fopen_safe(tmpf, "w");}
     else
        fo = stdout;
 
@@ -675,7 +682,8 @@ int main(int c, char **v)
     write_trailer(fo, inf);
 
     if (outf != NULL)
-       fclose_safe(fo);
+       {fclose_safe(fo);
+	rename(tmpf, outf);};
 
     log_safe("dump", 0, NULL, NULL);
 

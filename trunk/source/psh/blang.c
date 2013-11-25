@@ -882,7 +882,8 @@ static int find_proto(fdecl *dcl, char **cpr, char *f)
             if (p != NULL)
 	       *p++ = '\0';
 	    pa = p;
-	    LAST_CHAR(pa) = '\0';
+	    if (pa != NULL)
+	       LAST_CHAR(pa) = '\0';
 
 /* get the return type */
 	    ok = split_decl(&dcl->proto, pf, FALSE);
@@ -900,7 +901,11 @@ static int find_proto(fdecl *dcl, char **cpr, char *f)
 
 /* get the args */
 		args = split_args(pa);
-		for (na = 0; IS_NULL(args[na]) == FALSE; na++);
+		if (args != NULL)
+		   for (na = 0; IS_NULL(args[na]) == FALSE; na++);
+		else
+		   na = 0;
+
 		dcl->na    = na;
 		dcl->args  = args;
 		dcl->voida = TRUE;
@@ -2270,7 +2275,7 @@ static int mc_need_ptr(fdecl *dcl)
        ok |= ((strcmp(cty, "C_PTR") == 0) ||
 	      (strcmp(cty, "C_FUNPTR") == 0));
 
-    if ((na > 0) && (voida == FALSE))
+    if ((na > 0) && (al != NULL) && (voida == FALSE))
        {for (i = 0; i < na; i++)
 	    {mc_type(BFLRG, NULL, cty, NULL, al+i);
 	     if (al[i].knd != FP_VARARG)
@@ -2692,6 +2697,8 @@ static int bind_module(bindes *bd)
 	fwr  = st->fwr;
 	dcls = st->dcl;
 	ndcl = st->ndcl;
+
+	dcl = NULL;
 
 /* make simple external declaration for variable argument functions */
 	fprintf(fp, "! ... external declarations for generated wrappers\n");

@@ -84,7 +84,8 @@ void *_SC_alloc_ns(long ni, long bpi, void *arg)
 
 		desc = (mem_descriptor *) p;
 		info = &desc->desc.info;
-		info->initialized = TRUE;}
+		if (info != NULL)
+		   info->initialized = TRUE;}
 	    else
 	       {p = _SC_ALLOC((size_t) (nbp + sizeof(double)));
 
@@ -92,7 +93,8 @@ void *_SC_alloc_ns(long ni, long bpi, void *arg)
 
 		desc = (mem_descriptor *) p;
 		info = &desc->desc.info;
-		info->initialized = FALSE;};};
+		if (info != NULL)
+		   info->initialized = FALSE;};};
 
 	space = (mem_header *) desc;
 	if (space != NULL)
