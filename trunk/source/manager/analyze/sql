@@ -260,9 +260,17 @@ EOF
       if (($RF_Linking == dynamic) && ($?lSO == 1)) then
          flog $ALog setenv SQLITE3_SO    $lSO
       else
-         if ("$PckLib" !~ *$libl*) then
+         set ok = TRUE
+         foreach l ($libl)
+            if ("$PckLib" =~ *$l*) then
+               set ok = FALSE
+               break
+            endif
+         end
+         if ($ok == TRUE) then
             set libl = ( $libl $PckLib )
          endif
+         unset ok
       endif
 
       flog $ALog setenv HAVE_SQLITE_V2 TRUE
