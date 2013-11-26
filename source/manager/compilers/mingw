@@ -5,18 +5,13 @@
 #
 
 Group OCV {
-   CC      = [ _env_ = Bits ;                 # compiler version
-               32    = i586-mingw32msvc-gcc ;
-               64    = i686-w64-mingw32-gcc ]
-   CXX     = [ _env_ = Bits ;                 # compiler version
-               32    = i586-mingw32msvc-g++ ;
-               64    = i686-w64-mingw32-g++ ]
-   FC      = [ _env_ = Bits ;                 # compiler version
-               32    = i586-mingw32msvc-gfortran ;
-               64    = i686-w64-mingw32-gfortran ]
-   LD      = [ _env_ = Bits ;                 # linker version
-               32    = i586-mingw32msvc-ld ;
-               64    = i686-w64-mingw32-ld ]
+   MINGW   = [ _env_ = Bits ;
+               32    = i586-mingw32msvc ;
+               64    = i686-w64-mingw32 ]
+   CC      = ${OCV_MINGW}-gcc
+   CXX     = ${OCV_MINGW}-g++
+   FC      = ${OCV_MINGW}-gfortran
+   LD      = ${OCV_MINGW}-ld
    Bits    =
    PIC     =
    RPath   = -Wl,-rpath,@
@@ -28,7 +23,7 @@ Group OCV {
    OMP_Lib = -lgomp
 }
 
-run analyze/rpath gnu
+run analyze/rpath -a /usr/${OCV_MINGW}/lib
 
 include compilers/gnu
 
@@ -37,11 +32,11 @@ Tool MAKE {
 }
 
 Tool Ranlib {
-   Exe = i686-w64-mingw32-ranlib
+   Exe = ${OCV_MINGW}-ranlib
 }
 
 Tool NM {
-   Exe = /usr/bin/i686-w64-mingw32-nm
+   Exe = /usr/bin/${OCV_MINGW}-nm
    Cmd = $NM_Exe
 }
 
