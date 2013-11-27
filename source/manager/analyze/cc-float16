@@ -51,28 +51,35 @@ int main(int c, char **v)
     return(rv);}
 EOF
 
-set ok = FALSE
-
 flog $ALog cat $Tmp.c
+
+# no long double support at all
+flog $ALog setenv AF_LONG_DOUBLE 0
 
 flog $ALog $lCC $Tmp.c -o $Tmp -lm
 if ($status == 0) then
+
+# compiler thinks we have long double support (PGI gets here)
+   flog $ALog setenv AF_LONG_DOUBLE 1
    fexec $ALog $CROSS_FE $Tmp @o2 @e3 fa:$ALog @ vw:HAVE_ANSI_FLOAT16
    if ($gstatus[1] == 0) then
-      set ok = TRUE
+
+# we have working long double support (PGI does not get here)
+      flog $ALog setenv AF_LONG_DOUBLE 2
    endif
 endif
 
 rm -f $Tmp $Tmp.c $Tmp.o
 
-if ($ok == TRUE) then
+if ($AF_LONG_DOUBLE == 2) then
    NoteD $ALog "      has long double support"
+else if ($AF_LONG_DOUBLE == 1) then
+   NoteD $ALog "      has broken long double support"
 else
    NoteD $ALog "      no long double support"
 endif
 
-unset ok
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+dbexp AF_LONG_DOUBLE

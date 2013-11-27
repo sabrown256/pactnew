@@ -30,7 +30,7 @@ Tool CC {
 
 Tool FC {
    Exe      = openf90
-   Flags    = -freeform
+   Flags    = -freeform -funderscoring
    Flags   += [ _env_ = Bits ;                 # address bit size
                 *     = -m* ]
    Debug    = -g3 -O0 -Wall
