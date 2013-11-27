@@ -655,7 +655,7 @@ switch ($Cmnd)
               case -a:
                    shift
                    setenv SESSION_CONFIG $1
-                   $PSY_CfgMan add $1 >& /dev/null
+#                   $PSY_CfgMan add $1 >& /dev/null
                    breaksw
               case -as:
                    set PArgs = ( $PArgs "-as" )
@@ -1260,11 +1260,12 @@ switch ($Cmnd)
 # restore configuration
            if ($?SESSION_CONFIG == 1) then
               flog $Log set sid = $SESSION_CONFIG
+              flog $Log unsetenv SESSION_CONFIG
            else
               flog $Log set sid = $PSY_ID
            endif
-           flog $Log unsetenv SESSION_CONFIG
            flog $Log $PSY_CfgMan add $sid
+           unset sid
 
         else
            if (!(-f $PERDB_PATH.db)) then

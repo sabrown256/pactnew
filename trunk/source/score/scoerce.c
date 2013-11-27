@@ -677,18 +677,22 @@ static void _SC_write_complex(FILE *fp, int id)
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
 
-#if defined(COMPILER_PGI)
+#if (AF_LONG_DOUBLE != 2)
     fprintf(fp, "\n");
     fprintf(fp, "    {char *p;\n");
     fprintf(fp, "     for (p = fmt; *p != \'\\0\'; p++)\n");
     fprintf(fp, "         if (*p == \'L\')\n");
     fprintf(fp, "            *p++ = \'l\';};\n");
     fprintf(fp, "\n");
+
+    eid = min(eid, 1);
 #endif
 
-    fprintf(fp, "    z  = pv[n];\n");
-    fprintf(fp, "    nb = snprintf(t, nc, fmt, %s(z), %s(z));\n",
-	    realp[eid], imagp[eid]);
+    fprintf(fp, "    {%s pr, pi;\n", kind[eid]);
+    fprintf(fp, "     z  = pv[n];\n");
+    fprintf(fp, "     pr = %s(z);\n", realp[eid]);
+    fprintf(fp, "     pi = %s(z);\n", imagp[eid]);
+    fprintf(fp, "     nb = snprintf(t, nc, fmt, pr, pi);};\n");
 
     fprintf(fp, "    if (nb < 0)\n");
     fprintf(fp, "       t = NULL;\n");
