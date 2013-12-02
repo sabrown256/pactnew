@@ -2065,7 +2065,7 @@ char *SC_ftos(char *s, int nc, long double f, char *fmt)
     if (fmt == NULL)
        fmt = "%16.8Le";
 
-#if defined(COMPILER_PGI)
+#if (AF_LONG_DOUBLE_IO == 1)
 
     char frm[MAXLINE];
 

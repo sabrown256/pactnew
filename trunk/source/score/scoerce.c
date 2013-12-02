@@ -22,7 +22,22 @@
 #define I_FLOAT       (I_FIX+N_PRIMITIVE_FP)     /* last floating point type */
 #define I_COMPLEX     (I_FLOAT+N_PRIMITIVE_CPX)  /* last complex floating point type */
 #define I_QUATERNION  (I_COMPLEX+1)
-#define I_POINTER     (I_QUATERNION+1)
+#define I_POINTER     (I_QUATERNION+3)
+
+#undef IS_CHAR
+#undef IS_FIX
+#undef IS_FLOAT
+#undef IS_REAL
+#undef IS_COMPLEX
+#undef IS_QUATERNION
+#undef IS_POINTER
+#define IS_CHAR(_i)         ((I_BOOL < _i) && (_i <= I_CHAR))
+#define IS_FIX(_i)          ((I_CHAR < _i) && (_i <= I_FIX))
+#define IS_FLOAT(_i)        ((I_FIX < _i) && (_i <= I_FLOAT))
+#define IS_REAL(_i)         (_i <= I_FLOAT)
+#define IS_COMPLEX(_i)      ((I_FLOAT < _i) && (_i <= I_COMPLEX))
+#define IS_QUATERNION(_i)   ((I_COMPLEX < _i) && (_i <= I_QUATERNION))
+#define IS_POINTER(_i)      ((I_QUATERNION < _i) && (_i <= I_POINTER))
 
 #ifdef SC_FAST_TRUNC
 #define CONVERT  _SC_write_n_to_n_fast
@@ -50,14 +65,16 @@ static char
 	      "int8", "shrt", "int", "lng", "ll",
 	      "flt", "dbl", "ldbl",
 	      "fcx", "dcx", "ldcx",
-	      "qut", "ptr", NULL, "str" },
+	      "qut",
+              "ptr", NULL, "str" },
  *types[] = { NULL, NULL, "bool",
 	      "char", "wchar_t",
 	      "int8_t", "short", "int", "long", "long long",
 	      "float", "double", "long double",
 	      "float _Complex", "double _Complex",
 	      "long double _Complex",
-	      "quaternion", "void *", NULL, "char *" },
+	      "quaternion",
+              "void *", NULL, "char *" },
  *mn[]    = { NULL, NULL, "BOOL_MIN",
 	      "CHAR_MIN", "WCHAR_MIN",
 	      "INT8_MIN", "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
@@ -571,46 +588,41 @@ static void write_converters(FILE *fp)
 		     _SC_write_n_to_n_fast(fp, i, j);
 
 /* complex to real conversions */
-		  else if ((i <= I_FLOAT) &&
-			   (I_FLOAT < j) && (j <= I_COMPLEX))
+		  else if (IS_REAL(i) && IS_COMPLEX(j))
 		     _SC_write_c_to_r(fp, i, j);
 
 /* complex to complex conversions */
-		  else if ((I_FLOAT < i) && (i <= I_COMPLEX) &&
-			   (I_FLOAT < j) && (j <= I_COMPLEX))
+		  else if (IS_COMPLEX(i) && IS_COMPLEX(j))
 		     C_TO_C(fp, i, j);
 
 /* quaternion to real conversions */
-		  else if ((i <= I_FLOAT) && (j == I_QUATERNION))
+		  else if (IS_REAL(i) && IS_QUATERNION(j))
 		     _SC_write_q_to_r(fp, i, j);
 
 /* quaternion to complex conversions */
-		  else if ((I_FLOAT < i) && (i <= I_COMPLEX) &&
-			   (j == I_QUATERNION))
+		  else if (IS_COMPLEX(i) && IS_QUATERNION(j))
 		     _SC_write_q_to_c(fp, i, j);
 
 /* quaternion to pointer conversions */
-		  else if ((i == I_POINTER) && (j == I_QUATERNION))
+		  else if (IS_POINTER(i) && IS_QUATERNION(j))
 		     _SC_write_q_to_p(fp, i, j);
 
 /* real to quaternion conversions */
-		  else if ((i == I_QUATERNION) && (j <= I_FLOAT))
+		  else if (IS_QUATERNION(i) && IS_REAL(j))
 		     _SC_write_r_to_q(fp, i, j);
 
 /* complex to quaternion conversions */
-		  else if ((i == I_QUATERNION) &&
-			   (I_FLOAT < j) && (j <= I_COMPLEX))
+		  else if (IS_QUATERNION(i) && IS_COMPLEX(j))
 		     _SC_write_c_to_q(fp, i, j);
 
 /* pointer to quaternion conversions */
-		  else if ((i == I_QUATERNION) &&
-			   (j == I_POINTER))
+		  else if (IS_QUATERNION(i) && IS_POINTER(j))
 		     _SC_write_p_to_q(fp, i, j);
 
-		  else if (j == I_POINTER)
+		  else if (IS_POINTER(j))
 		     _SC_write_p_to_n(fp, i, j);
 
-		  else if (i == I_POINTER)
+		  else if (IS_POINTER(i))
 		     _SC_write_n_to_p(fp, i, j);
 
 		  else
@@ -677,7 +689,7 @@ static void _SC_write_complex(FILE *fp, int id)
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
 
-#if (AF_LONG_DOUBLE != 2)
+#if (AF_LONG_DOUBLE_IO == 1)
     fprintf(fp, "\n");
     fprintf(fp, "    {char *p;\n");
     fprintf(fp, "     for (p = fmt; *p != \'\\0\'; p++)\n");
@@ -743,23 +755,95 @@ static void _SC_write_ntos(FILE *fp, int id)
 
     fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
 	    names[id]);
-    fprintf(fp, "   {int nb;\n");
+    fprintf(fp, "   {int nld, nb;\n");
     fprintf(fp, "    char *fmt;\n");
     fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
 
+    fprintf(fp, "    nld = 0;\n");
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
 
-#if defined(COMPILER_PGI)
+/* non-standard long double I/O */
+#if (AF_LONG_DOUBLE_IO == 1)
     fprintf(fp, "\n");
     fprintf(fp, "    {char *p;\n");
     fprintf(fp, "     for (p = fmt; *p != \'\\0\'; p++)\n");
     fprintf(fp, "         if (*p == \'L\')\n");
     fprintf(fp, "            *p++ = \'l\';};\n");
     fprintf(fp, "\n");
+
+/* no long double I/O */
+#elif (AF_LONG_DOUBLE_IO == 0)
+    fprintf(fp, "\n");
+    fprintf(fp, "    {char c, *s, *d;\n");
+    fprintf(fp, "     for (s = fmt, d = fmt; *s != \'\\0\'; s++)\n");
+    fprintf(fp, "         {c = *s;\n");
+    fprintf(fp, "          if (c != \'L\')\n");
+    fprintf(fp, "             *d++ = c;\n");
+    fprintf(fp, "          else\n");
+    fprintf(fp, "             nld = 1;};\n");
+    fprintf(fp, "     *d = \'\\0\';};\n");
+    fprintf(fp, "\n");
 #endif
 
-    fprintf(fp, "    nb  = snprintf(t, nc, fmt, pv[n]);\n");
+    fprintf(fp, "    if (nld == 1)\n");
+    fprintf(fp, "       nb  = snprintf(t, nc, fmt, (double) pv[n]);\n");
+    fprintf(fp, "    else\n");
+    fprintf(fp, "       nb  = snprintf(t, nc, fmt, pv[n]);\n");
+
+    fprintf(fp, "    if (nb < 0)\n");
+    fprintf(fp, "       t = NULL;\n");
+
+    fprintf(fp, "    return(t);}\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_WRITE_PTR - write the rendering function for pointer type ID */
+
+static void _SC_write_ptr(FILE *fp, int id)
+   {
+
+    fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
+	    names[id]);
+    fprintf(fp, "   {int nld, nb;\n");
+    fprintf(fp, "    char *fmt;\n");
+    fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
+
+    fprintf(fp, "    nld = 0;\n");
+    fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
+	    id, id);
+
+/* non-standard long double I/O */
+#if (AF_LONG_DOUBLE_IO == 1)
+    fprintf(fp, "\n");
+    fprintf(fp, "    {char *p;\n");
+    fprintf(fp, "     for (p = fmt; *p != \'\\0\'; p++)\n");
+    fprintf(fp, "         if (*p == \'L\')\n");
+    fprintf(fp, "            *p++ = \'l\';};\n");
+    fprintf(fp, "\n");
+
+/* no long double I/O */
+#elif (AF_LONG_DOUBLE_IO == 0)
+    fprintf(fp, "\n");
+    fprintf(fp, "    {char c, *s, *d;\n");
+    fprintf(fp, "     for (s = fmt, d = fmt; *s != \'\\0\'; s++)\n");
+    fprintf(fp, "         {c = *s;\n");
+    fprintf(fp, "          if (c != \'L\')\n");
+    fprintf(fp, "             *d++ = c;\n");
+    fprintf(fp, "          else\n");
+    fprintf(fp, "             nld = 1;};\n");
+    fprintf(fp, "     *d = \'\\0\';};\n");
+    fprintf(fp, "\n");
+#endif
+
+    fprintf(fp, "    if (nld == 1)\n");
+    fprintf(fp, "       nb  = snprintf(t, nc, fmt, *(double *) pv[n]);\n");
+    fprintf(fp, "    else\n");
+    fprintf(fp, "       nb  = snprintf(t, nc, fmt, pv[n]);\n");
 
     fprintf(fp, "    if (nb < 0)\n");
     fprintf(fp, "       t = NULL;\n");
@@ -815,10 +899,12 @@ static void write_str(FILE *fp)
 	{if (types[i] != NULL)
 	    {if (i == I_BOOL)
 	        _SC_write_bool(fp, i);
-	     else if ((I_FLOAT < i) && (i <= I_COMPLEX))
+	     else if (IS_COMPLEX(i))
 	        _SC_write_complex(fp, i);
-	     else if (i == I_QUATERNION)
+	     else if (IS_QUATERNION(i))
 	        _SC_write_quaternion(fp, i);
+	     else if (IS_POINTER(i))
+	        _SC_write_ptr(fp, i);
 	     else
 	        _SC_write_ntos(fp, i);};};
 
