@@ -25,7 +25,7 @@ Note $Log ""
 
 dbmget $Log AF_ALT_LARGE_FILE^        \
             AF_LONG8^                 \
-            AF_LONG_DOUBLE^           \
+            AF_LONG_DOUBLE_IO^        \
             AF_SOCKOPT_TYPE^          \
             AF_VERSION_OSX^           \
             BFD_Version^              \
@@ -206,8 +206,8 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
        Note $STDOUT "#define AF_LONG8"
     endif
 
-    if ("$AF_LONG_DOUBLE" != "") then
-       Note $STDOUT "#define AF_LONG_DOUBLE $AF_LONG_DOUBLE"
+    if ("$AF_LONG_DOUBLE_IO" != "") then
+       Note $STDOUT "#define AF_LONG_DOUBLE_IO $AF_LONG_DOUBLE_IO"
     endif
 
     if ("$FC_INTEGER_C" != "unknown") then

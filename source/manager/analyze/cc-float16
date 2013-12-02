@@ -21,6 +21,10 @@ dbmget $ALog CROSS_FE^        \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# detect long double support
+
+Separator $ALog
+
 cat << EOF >! $Tmp.c
 #include <float.h>
 #include <limits.h>
@@ -29,21 +33,17 @@ cat << EOF >! $Tmp.c
 #include <string.h>
 int main(int c, char **v)
    {int rv;
-    double x, y;
-    long double a, b;
+    double y;
+    long double b, d;
     char s[100];
-    a = 1.23e34l;
     b = sqrtl(2.0);
-    x = 1.23e34;
     y = sqrt(2.0);
+    d = fabsl(b - y);
     printf("max = %50.42Le\n", LDBL_MAX);
-    printf("a = %44.34Le\n", a/b);
-    printf("x = %26.16e\n", x/y);
     printf("b = %44.34Le\n", b);
-    printf("y = %26.16e\n", y);
-    snprintf(s, 100, "%44.34Le", b);
-    if (strstr(s, "1.4142135623730") != NULL)
-       {rv = 0;
+    printf("d = %44.34Le\n", d);
+    if ((1.414 < b) && (b < 1.415) && (1.0e-18 < d) && (d < 1.0e-14))
+       {rv = 2;
         fprintf(stderr, "TRUE\n");}
     else
        {rv = 1;
@@ -53,33 +53,84 @@ EOF
 
 flog $ALog cat $Tmp.c
 
+# AF_LONG_DOUBLE
+#   0 - no long double support
+#   1 - have non-standard long double support
+#   2 - have standard long double support
+
 # no long double support at all
-flog $ALog setenv AF_LONG_DOUBLE 0
+setenv AF_LONG_DOUBLE 0
+set ld = "no long double support"
 
 flog $ALog $lCC $Tmp.c -o $Tmp -lm
 if ($status == 0) then
-
-# compiler thinks we have long double support (PGI gets here)
-   flog $ALog setenv AF_LONG_DOUBLE 1
    fexec $ALog $CROSS_FE $Tmp @o2 @e3 fa:$ALog @ vw:HAVE_ANSI_FLOAT16
-   if ($gstatus[1] == 0) then
-
-# we have working long double support (PGI does not get here)
-      flog $ALog setenv AF_LONG_DOUBLE 2
+   flog $ALog setenv AF_LONG_DOUBLE $gstatus[1]
+   if ($AF_LONG_DOUBLE == 2) then
+      set ld = "has long double support"
+   else
+      set ld = "has broken long double support"
    endif
 endif
 
 rm -f $Tmp $Tmp.c $Tmp.o
 
-if ($AF_LONG_DOUBLE == 2) then
-   NoteD $ALog "      has long double support"
-else if ($AF_LONG_DOUBLE == 1) then
-   NoteD $ALog "      has broken long double support"
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# detect long double I/O issues
+
+Separator $ALog
+
+cat << EOF >! $Tmp.c
+#include <float.h>
+#include <limits.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+int main(int c, char **v)
+   {int rv;
+    long double b;
+    char s1[100],  s2[100];
+    b = sqrt(2.0);
+    snprintf(s1, 100, "%50.42Le", b);
+    snprintf(s2, 100, "%50.42le", b);
+    if (strstr(s1, "1.4142135623730") != NULL)
+       {rv = 2;
+        printf("standard long double I/O\n");}
+    else if (strstr(s2, "1.4142135623730") != NULL)
+       {rv = 1;
+        printf("non-standard long double I/O\n");}
+    else
+       {rv = 0;
+        printf("no long double I/O\n");}
+    return(rv);}
+EOF
+
+flog $ALog cat $Tmp.c
+
+# AF_LONG_DOUBLE_IO
+#   0 - no long double I/O
+#   1 - have non-standard long double I/O (%le instead of %Le)
+#   2 - have standard long double I/O (%Le)
+
+flog $ALog $lCC $Tmp.c -o $Tmp -lm
+if ($status == 0) then
+   fexvars $ALog ldio $CROSS_FE $Tmp
+   flog $ALog setenv AF_LONG_DOUBLE_IO $gstatus[1]
 else
-   NoteD $ALog "      no long double support"
+   flog $ALog set ldio = "no long double I/O"
+   flog $ALog setenv AF_LONG_DOUBLE_IO 0
 endif
 
+rm -f $Tmp $Tmp.c $Tmp.o
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-dbexp AF_LONG_DOUBLE
+Separator $ALog
+
+NoteD $ALog "      $ld ($ldio)"
+
+dbmset $ALog AF_LONG_DOUBLE    = $AF_LONG_DOUBLE^              \
+             AF_LONG_DOUBLE_IO = $AF_LONG_DOUBLE_IO
