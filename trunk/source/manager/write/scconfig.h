@@ -96,6 +96,7 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
             LEH_TTY_VTIME^            \
             LibM_Functions^           \
             MYSQL_SO^                 \
+            OpenMP_OVER_SCHED^        \
             PACT_CC_FAMILY^           \
             PACT_CC_VERSION^          \
             PACT_SO_CACHE^            \
@@ -254,6 +255,7 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
     set lhave = ( $lhave HAVE_DYNAMIC_LINKER      none )
     set lhave = ( $lhave HAVE_BFD                 none )
     set lhave = ( $lhave HAVE_DEMANGLE            none )
+    set lhave = ( $lhave OpenMP_OVER_SCHED        none )
     set lhave = ( $lhave RF_DEBUG                 none )
     set lhave = ( $lhave RF_OPTIMIZE              none )
     set lhave = ( $lhave RF_PROFILE               none )

@@ -259,7 +259,8 @@ Group OCV {
 
 # Open MP group
 Group OpenMP {
-   SharedFnc = no
+   SharedFnc  = no
+   OVER_SCHED = TRUE
 }
 
 Group OS {

@@ -246,8 +246,7 @@ int main(int c, char **v)
 	    {help();
 	     return(1);};};
 
-/* NOTE: PGI OpenMP is bad overscheduling threads */
-#ifdef COMPILER_PGI
+#ifndef OpenMP_OVER_SCHED
     {int ncpu;
 
      ncpu = SC_get_ncpu();

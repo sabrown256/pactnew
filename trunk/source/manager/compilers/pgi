@@ -73,10 +73,12 @@ Group PThread {
    LD_Lib = -lpthread 
 }
 
+# NOTE: PGI OpenMP is bad overscheduling threads
 Group OpenMP {
-   CC_Flags += -mp
-   LD_Flags += -mp
-   LD_Lib    =
+   CC_Flags  += -mp
+   LD_Flags  += -mp
+   LD_Lib     =
+   OVER_SCHED = FALSE
 }
 
 # PGI compilers do not do long double arithmetic

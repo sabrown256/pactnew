@@ -54,12 +54,14 @@ void SC_reset_terminal(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_DETHREAD - work around PGI failure wrt OpenMP */
+/* _SC_DETHREAD - work around OpenMP implementations that are bad
+ *              - at over-scheduling threads
+ */
 
 void _SC_dethread(void)
    {
 
-#if defined(SMP_OpenMP) && defined(COMPILER_PGI)
+#if defined(SMP_OpenMP) && !defined(OpenMP_OVER_SCHED)
     omp_set_num_threads(1);
 #endif
 
