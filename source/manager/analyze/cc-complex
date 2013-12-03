@@ -16,11 +16,19 @@ Note $ALog "Analyze: C90 complex"
 Note $ALog ""
 
 dbmget $ALog HAVE_ANSI_C9X_COMPLEX =\?  TRUE^  \
+             HAVE_COMPLEX_VA_ARG   =\? FALSE^  \
              PACT_CC_VERSION
 
 Note $ALog "HAVE_ANSI_C9X_COMPLEX = $HAVE_ANSI_C9X_COMPLEX"
 
 if ($HAVE_ANSI_C9X_COMPLEX == TRUE) then
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# determine whether there is C99 complex support
+
+   Separator $ALog
 
    cat << EOF >! $Tmp.c
 #include <complex.h>
@@ -34,19 +42,74 @@ int main(int c, char **v)
     }
 EOF
 
+   flog $ALog cat $Tmp.c
+
    flog $ALog $lCC -c $Tmp.c -o $Tmp.o
    if ($status == 0) then
       NoteD $ALog "      has C99 complex support"
    else
-      setenv HAVE_ANSI_C9X_COMPLEX FALSE
+      flog $ALog setenv HAVE_ANSI_C9X_COMPLEX FALSE
       NoteD $ALog "      no C99 complex support"
    endif
 
-   rm -f $Tmp $Tmp.c $Tmp.o
+   flog $ALog rm -f $Tmp $Tmp.c $Tmp.o
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# determine whether the compiler supports complex in va_arg
+
+   Separator $ALog
+
+   cat << EOF >! $Tmp.c
+#include <math.h>
+#include <complex.h>
+#include <stdarg.h>
+#undef complex
+#define complex      double _Complex 
+int f(int n, ...)
+   {int rv;
+    complex y, z;
+    y = 1.0 + 2.0*I;
+    va_list __a__;
+    va_start(__a__, n);
+    z = va_arg(__a__, complex);
+    va_end(__a__);
+    rv = (z == y);
+    return(rv);}
+int main(int c, char **v)
+   {int rv;
+    complex z;
+    z = 1.0 + 2.0*I;
+    rv = f(1, z);
+    return(rv);}
+EOF
+
+   flog $ALog cat $Tmp.c
+
+   set msg = "no complex in va_arg"
+
+   flog $ALog $lCC -c $Tmp.c -o $Tmp
+   if ($status == 0) then
+      flog $ALog $Tmp
+      if ($status == 1) then
+         flog $ALog setenv HAVE_COMPLEX_VA_ARG TRUE
+         set msg = "has complex in va_arg"
+      endif
+   endif
+
+   NoteD $ALog "      $msg"
+
+   flog $ALog rm -f $Tmp $Tmp.c $Tmp
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 else
    NoteD $ALog "      no C99 complex support (by request)"
 endif
 
 # export the result
-dbexp HAVE_ANSI_C9X_COMPLEX
+dbmset $ALog HAVE_ANSI_C9X_COMPLEX = $HAVE_ANSI_C9X_COMPLEX^ \
+             HAVE_COMPLEX_VA_ARG   = $HAVE_COMPLEX_VA_ARG
 
