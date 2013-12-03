@@ -50,6 +50,7 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
             HAVE_ANSI_FLOAT16^        \
             HAVE_ANSI_C9X_COMPLEX^    \
             HAVE_ANSI_C9X_FENV^       \
+            HAVE_COMPLEX_VA_ARG^      \
             HAVE_GNU_FENV^            \
             HAVE_VA_COPY^             \
             HAVE_VA_LIST^             \
@@ -222,6 +223,7 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
     set lhave = ( $lhave HAVE_ANSI_FLOAT16        none )
     set lhave = ( $lhave HAVE_ANSI_C9X_COMPLEX    none )
     set lhave = ( $lhave HAVE_ANSI_C9X_FENV       none )
+    set lhave = ( $lhave HAVE_COMPLEX_VA_ARG      none )
     set lhave = ( $lhave HAVE_GNU_FENV            none )
     set lhave = ( $lhave HAVE_VA_COPY             none )
     set lhave = ( $lhave HAVE_PYTHON              none )

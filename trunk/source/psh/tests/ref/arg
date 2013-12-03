@@ -12,7 +12,7 @@
 
 #include "cpyright.h"
 
-#ifdef COMPILER_PATHSCALE
+#ifdef HAVE_COMPLEX_VA_ARG
 #define SC_VA_ARG_ID(_id, _d, _n)                    \
    {int _lid;                                        \
     if (_id == SC_STRING_I)                          \
@@ -65,6 +65,18 @@
        case 12:                                    \
             {long double *_pv = (long double *) (_d);                \
              _pv[_n] = va_arg(__a__, long double);};        \
+            break;                                 \
+       case 13:                                    \
+            {float _Complex *_pv = (float _Complex *) (_d);                \
+             _pv[_n] = va_arg(__a__, float _Complex);};        \
+            break;                                 \
+       case 14:                                    \
+            {double _Complex *_pv = (double _Complex *) (_d);                \
+             _pv[_n] = va_arg(__a__, double _Complex);};        \
+            break;                                 \
+       case 15:                                    \
+            {long double _Complex *_pv = (long double _Complex *) (_d);                \
+             _pv[_n] = va_arg(__a__, long double _Complex);};        \
             break;                                 \
        case 16:                                    \
             {quaternion *_pv = (quaternion *) (_d);                \
@@ -133,18 +145,6 @@
        case 12:                                    \
             {long double *_pv = (long double *) (_d);                \
              _pv[_n] = va_arg(__a__, long double);};        \
-            break;                                 \
-       case 13:                                    \
-            {float _Complex *_pv = (float _Complex *) (_d);                \
-             _pv[_n] = va_arg(__a__, float _Complex);};        \
-            break;                                 \
-       case 14:                                    \
-            {double _Complex *_pv = (double _Complex *) (_d);                \
-             _pv[_n] = va_arg(__a__, double _Complex);};        \
-            break;                                 \
-       case 15:                                    \
-            {long double _Complex *_pv = (long double _Complex *) (_d);                \
-             _pv[_n] = va_arg(__a__, long double _Complex);};        \
             break;                                 \
        case 16:                                    \
             {quaternion *_pv = (quaternion *) (_d);                \
