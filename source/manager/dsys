@@ -1288,7 +1288,7 @@ switch ($Cmnd)
 
         if ($platform == FALSE) then
            NoteD $Log ""
-           NoteD $Log "Configuration for version $PACTVer complete"
+           NoteD $Log "Configuration for version $PACTVer complete (`$PSY_CfgMan use`)"
            NoteD $Log ""
 
            echo $cwd
