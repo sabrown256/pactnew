@@ -3125,13 +3125,9 @@ static void interrupt(int sig)
    {int nsp;
     char *sect;
     hfspec *sp;
-    void (*ohnd)(int sig);
 
    if (state.inintr == FALSE)
       {state.inintr = TRUE;
-
-       ohnd = signal(SIGINT, interrupt);
-       ASSERT(ohnd == 0);
 
 /* the watch option process does not have Log defined and
  * does not need to cleanup
@@ -3435,7 +3431,7 @@ int main(int c, char **v)
     char host[BFLRG], uhost[BFLRG], exe[BFLRG];
     char *p;
 
-    signal(SIGINT, interrupt);
+    nsigaction(NULL, SIGINT, interrupt, SA_RESTART, -1);
 
     umask(002);
 

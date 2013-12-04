@@ -3294,11 +3294,11 @@ int main(int c, char **v, char **env)
     setbuf(stdout, NULL);
     setbuf(stderr, NULL);
 
-    signal(SIGSEGV, sigdone);
-    signal(SIGBUS,  sigdone);
-    signal(SIGFPE,  sigdone);
-    signal(SIGTERM, sigdone);
-    signal(SIGINT,  sigdone);
+    nsigaction(NULL, SIGSEGV, sigdone, SA_RESTART, -1);
+    nsigaction(NULL, SIGBUS,  sigdone, SA_RESTART, -1);
+    nsigaction(NULL, SIGFPE,  sigdone, SA_RESTART, -1);
+    nsigaction(NULL, SIGTERM, sigdone, SA_RESTART, -1);
+    nsigaction(NULL, SIGINT,  sigdone, SA_RESTART, -1);
 
     ok = reset_env(c, v);
     if (ok == -1)

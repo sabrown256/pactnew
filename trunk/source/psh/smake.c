@@ -31,7 +31,6 @@ int system();
 int atoi();
 char *getcwd();
 char *getenv();
-void (*signal())();
 void exit(int status);
 
 /*--------------------------------------------------------------------------*/
@@ -421,7 +420,7 @@ int main(int c, char **v)
     static char *default_pmname = "pre-Make";
     struct stat sbf;
 
-    signal(2, handler);
+    nsigaction(NULL, SIGINT, handler, SA_RESTART, -1);
 
     pmname = default_pmname;
 

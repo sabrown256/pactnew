@@ -1386,7 +1386,7 @@ int main(int c, char **v)
     if (ok == TRUE)
        prune_env("pact", v[0]);
 
-    signal(SIGINT, interrupt);
+    nsigaction(NULL, SIGINT, interrupt, SA_RESTART, -1);
 
     memset(&state, 0, sizeof(rundes));
 

@@ -2349,13 +2349,22 @@ process_session *init_session(void)
 	   kill(-pgid, SIGTTIN);};
      
 /* ignore interactive and job-control signals */
+#if 0
 	signal(SIGINT,  SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
 	signal(SIGTSTP, SIG_IGN);
 	signal(SIGTTIN, SIG_IGN);
 	signal(SIGTTOU, SIG_IGN);
 	signal(SIGCHLD, SIG_IGN);
-     
+#else
+	nsigaction(NULL, SIGINT,  SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGQUIT, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTSTP, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTIN, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTOU, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGCHLD, SIG_IGN, SA_RESTART, -1);
+#endif
+
 /* put the current process in its own group */
 	pgid = getpid();
 	if (setpgid(pgid, pgid) < 0)
