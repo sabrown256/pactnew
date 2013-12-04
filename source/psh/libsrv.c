@@ -140,6 +140,7 @@ static int _comm_read_wrk(client *cl, char *t, int nt, int to)
    {int nb;
 
 #ifdef IO_ALARM
+/*    nsigaction(NULL, SIGALRM, sigtimeout, SA_RESTART, -1); */
     signal(SIGALRM, sigtimeout);
 
     alarm(to);
@@ -165,6 +166,7 @@ static int _comm_write_wrk(client *cl, char *t, int nt, int to)
    {int nb;
 
 #ifdef IO_ALARM
+/*    nsigaction(NULL, SIGALRM, sigtimeout, SA_RESTART, -1); */
     signal(SIGALRM, sigtimeout);
 
     alarm(to);

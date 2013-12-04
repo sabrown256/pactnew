@@ -625,12 +625,21 @@ static int _job_exec(process *cp, int *fds,
 	_job_grp_attr(cp, TRUE, fg);
 
 /* reset the signal handlers for the child */
-	signal(SIGINT, SIG_DFL);
+#if 0
+	signal(SIGINT,  SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	signal(SIGTSTP, SIG_DFL);
 	signal(SIGTTIN, SIG_DFL);
 	signal(SIGTTOU, SIG_DFL);
 	signal(SIGCHLD, SIG_DFL);
+#else
+	nsigaction(NULL, SIGINT,  SIG_DFL, SA_RESTART, -1);
+	nsigaction(NULL, SIGQUIT, SIG_DFL, SA_RESTART, -1);
+	nsigaction(NULL, SIGTSTP, SIG_DFL, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTIN, SIG_DFL, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTOU, SIG_DFL, SA_RESTART, -1);
+	nsigaction(NULL, SIGCHLD, SIG_DFL, SA_RESTART, -1);
+#endif
 
 /* setup the I/O descriptors */
 	for (i = 0; i < N_IO_CHANNELS; i++)
@@ -1510,9 +1519,8 @@ static void _timeout_error(int sig)
  */
 
 static void _job_timeout(int to)
-   {int ns;
+   {int ns, st;
     static PFSIGHand lst = (PFSIGHand) -1;
-    static PFSIGHand err = SIG_DFL;
 
 /* since alarms do not nest (without much more logic than we have here)
  * do nothing if there is an active handler going
@@ -1520,11 +1528,11 @@ static void _job_timeout(int to)
     if ((lst == (PFSIGHand) -1) || (lst == _timeout_error))
 
 /* set the handler and the alarm */
-       {err = signal(SIGALRM, _timeout_error);
-	ns  = alarm(to);
+       {st = nsigaction(NULL, SIGALRM, _timeout_error, SA_RESTART, -1);
+	ns = alarm(to);
 	ASSERT(ns == 0);
 
-	if (err == SIG_ERR)
+	if (st == -1)
 	   fprintf(stderr, "Setting SIGALRM failed\n");
 
 /* set lst appropriately */

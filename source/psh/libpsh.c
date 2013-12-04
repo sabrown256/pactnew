@@ -2956,6 +2956,67 @@ int is_running(int pid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* NSIGACTION - portable wrapper for sigaction semantics
+ *            - set FNC to handle SIG signals
+ *            - FLAGS modifies the signal handling process
+ *            - any remaining non-negative arguments are
+ *            - taken to be signals that are to be blocked during
+ *            - the execution of FNC
+ *            - terminate the list with negative integer
+ *            - return the old action in OA if non-NULL
+ *            - return 0 iff successful otherwise -1
+ */
+
+int nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
+	       int flags, ...)
+   {int is, rv;
+    struct sigaction na, ta;
+    sigset_t *set;
+    void (*fo)(int sig);
+    static int nsx = -1;
+
+    rv = -1;
+
+    if (nsx == -1)
+       nsx = 8*sizeof(sigset_t);
+
+    if ((0 < sig) && (sig < nsx) &&
+	(sig != SIGKILL) && (sig != SIGSTOP))
+       {if (oa == NULL)
+	   oa = &ta;
+
+	memset(oa, 0, sizeof(struct sigaction));
+
+	if (sigaction(sig, NULL, oa) == 0)
+	   fo = oa->sa_handler;
+	else
+	   fo = NULL;
+
+/* if the handler differs from the one already in place */
+	if (fo != fn)
+	   {na.sa_flags   = flags;
+	    na.sa_handler = fn;
+
+	    set = &na.sa_mask;
+	    sigemptyset(set);
+
+	    VA_START(flags);
+
+	    while (TRUE)
+	       {is = VA_ARG(int);
+		if (is < 0)
+		   break;
+		sigaddset(set, is);};
+
+	    VA_END;
+
+	    rv = sigaction(sig, &na, NULL);};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* LOG_ACTIVITY - log messages to FLOG */
 
 void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)

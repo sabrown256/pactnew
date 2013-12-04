@@ -633,9 +633,9 @@ static int server(char *root, int init, int dmn)
     rv = FALSE;
 
     if ((dmn == FALSE) || (demonize() == TRUE))
-       {signal(SIGTERM, sigdone);
-	signal(SIGINT, sigdone);
-	signal(SIGHUP, sigrestart);
+       {nsigaction(NULL, SIGTERM, sigdone,    SA_RESTART, -1);
+	nsigaction(NULL, SIGINT,  sigdone,    SA_RESTART, -1);
+	nsigaction(NULL, SIGHUP,  sigrestart, SA_RESTART, -1);
 
 	cl     = make_client(SERVER, DB_PORT, svs.auth,
 			     root, cl_logger, verifyx);
