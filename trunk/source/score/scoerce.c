@@ -755,11 +755,11 @@ static void _SC_write_ntos(FILE *fp, int id)
 
     fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
 	    names[id]);
-    fprintf(fp, "   {int nld, nb;\n");
+    fprintf(fp, "   {int nb;\n");
     fprintf(fp, "    char *fmt;\n");
+    fprintf(fp, "    static int nld = 0;\n");
     fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
 
-    fprintf(fp, "    nld = 0;\n");
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
 
