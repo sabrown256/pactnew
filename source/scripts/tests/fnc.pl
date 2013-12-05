@@ -94,6 +94,5 @@ fexec($log, 'echo "foo" @b cat -n');
 Note($log, "gstatus = $gstatus");
 
 flog($log, "perdb quit:");
-flog($log, "rm -f fnc-pl.*");
 
 exit($err)

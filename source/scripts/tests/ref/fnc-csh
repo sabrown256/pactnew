@@ -1,3 +1,7 @@
+Test NoteD
+"Test ftee"
+echo Test ftty
+parent Foo(the quick brown fox)
 
 --------------------------------------------------------------------------
 
@@ -48,4 +52,3 @@ Command: gexec echo foo @b cat -n
 gstatus = 0 0
 Command: perdb quit:
 done
-Command: rm -f fnc-csh.*
