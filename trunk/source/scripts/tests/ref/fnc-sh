@@ -52,4 +52,3 @@ Command: gexec echo foo @b cat -n
 gstatus = 0 0
 Command: perdb quit:
 done
-Command: rm -f fnc-sh.*

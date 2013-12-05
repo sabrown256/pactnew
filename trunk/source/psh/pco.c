@@ -2423,18 +2423,18 @@ static void parse_features(char *t, int nc, int np, char *ft)
 /*--------------------------------------------------------------------------*/
 
 /* DO_PLATFORM - process a platform command
- *             - syntax: platform <cfg> <alias> <PSY_InstRoot> [<args>*]
+ *             - syntax: platform <cfg> <PSY_InstRoot> [<args>*]
  */
 
 static void do_platform(client *cl, char *oper, char *value)
    {int i;
-    char t[BFLRG], cfg[BFSML];
-    char *p, *sid, *sib, **spec;
+    char t[BFLRG], cfg[BFSML], sid[BFSML];
+    char *p, *sib, **spec;
 
     st.np++;
 
     spec = tokenize(value, " \t\n\r", 0);
-    sid  = spec[0];
+    snprintf(sid, BFSML, "%s.%d", st.psy_id, st.np);
 
 /* determine appropriate features */
     if (st.features[0] != '\0')
