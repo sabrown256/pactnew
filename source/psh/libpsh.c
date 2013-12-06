@@ -2956,19 +2956,19 @@ int is_running(int pid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* NSIGACTION - portable wrapper for sigaction semantics
- *            - set FNC to handle SIG signals
- *            - FLAGS modifies the signal handling process
- *            - any remaining non-negative arguments are
- *            - taken to be signals that are to be blocked during
- *            - the execution of FNC
- *            - terminate the list with negative integer
- *            - return the old action in OA if non-NULL
- *            - return 0 iff successful otherwise -1
+/* _NSIGACTION - portable wrapper for sigaction semantics
+ *             - set FNC to handle SIG signals
+ *             - FLAGS modifies the signal handling process
+ *             - any remaining non-negative arguments are
+ *             - taken to be signals that are to be blocked during
+ *             - the execution of FNC
+ *             - terminate the list with negative integer
+ *             - return the old action in OA if non-NULL
+ *             - return 0 iff successful otherwise -1
  */
 
-int nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
-	       int flags, ...)
+int _nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
+		int flags, va_list __a__)
    {int is, rv;
     struct sigaction na, ta;
     sigset_t *set;
@@ -3000,17 +3000,37 @@ int nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
 	    set = &na.sa_mask;
 	    sigemptyset(set);
 
-	    VA_START(flags);
-
 	    while (TRUE)
 	       {is = VA_ARG(int);
 		if (is < 0)
 		   break;
 		sigaddset(set, is);};
 
-	    VA_END;
-
 	    rv = sigaction(sig, &na, NULL);};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* NSIGACTION - portable wrapper for sigaction semantics
+ *            - set FNC to handle SIG signals
+ *            - FLAGS modifies the signal handling process
+ *            - any remaining non-negative arguments are
+ *            - taken to be signals that are to be blocked during
+ *            - the execution of FNC
+ *            - terminate the list with negative integer
+ *            - return the old action in OA if non-NULL
+ *            - return 0 iff successful otherwise -1
+ */
+
+int nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
+	       int flags, ...)
+   {int rv;
+
+    VA_START(flags);
+    rv = _nsigaction(oa, sig, fn, flags, __a__);
+    VA_END;
 
     return(rv);}
 

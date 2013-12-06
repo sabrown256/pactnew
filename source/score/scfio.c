@@ -2728,31 +2728,7 @@ int64_t SC_filelen(FILE *fp)
 FILE *SC_fopen_safe(const char *path, const char *mode)
    {FILE *rv;
 
-#if 1
     rv = PS_fopen_safe(path, mode);
-#else
-    int ok, ev;
-
-    for (ok = TRUE; ok == TRUE; )
-        {rv = fopen(path, mode);
-	 ev = errno;
-	 if (rv != NULL)
-	    ok = FALSE;
-	 else
-	    {switch (ev)
-	        {
-
-/* these errors have a chance of being temporary */
-		 case EINTR :
-		 case EWOULDBLOCK :
-		 case ENOSPC :
-		 case ETXTBSY :
-		      ok = TRUE;
-		      break;
-		 default :
-		      ok = FALSE;
-		      break;};};};
-#endif
 
     return(rv);}
 
@@ -2766,31 +2742,7 @@ FILE *SC_fopen_safe(const char *path, const char *mode)
 int SC_open_safe(const char *path, int flags, mode_t mode)
    {int rv;
 
-#if 1
     rv = PS_open_safe(path, flags, mode);
-#else
-    int ok, ev;
-
-    for (ok = TRUE; ok == TRUE; )
-        {rv = open(path, flags, mode);
-	 ev = errno;
-	 if (rv != -1)
-	    ok = FALSE;
-	 else
-	    {switch (ev)
-	        {
-
-/* these errors have a chance of being temporary */
-		 case EINTR :
-		 case EWOULDBLOCK :
-		 case ENOSPC :
-		 case ETXTBSY :
-		      ok = TRUE;
-		      break;
-		 default :
-		      ok = FALSE;
-		      break;};};};
-#endif
 
     return(rv);}
 
@@ -2858,40 +2810,7 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 
 #endif
 
-#if 1
     rv = PS_read_safe(fd, bf, n, TRUE);
-#else
-    int blk;
-    long nbo, nbr;
-    char *pbf;
-
-    blk = SC_isblocked_fd(fd);
-
-/* non-blocking read or terminal - take what you get */
-    if ((blk == FALSE) || (isatty(fd) == TRUE))
-       {rv = read(fd, bf, n);
-	if (rv < 0)
-	   io_error(errno, "read of %s bytes on %d failed",
-		    SC_itos(NULL, 0, n, NULL), fd);}
-
-/* blocking read - insist on the specified number of bytes or an error */
-    else
-       {nbo = n;
-	nbr = -1;
-	pbf = bf;
-	rv  = 0;
-
-	while ((nbo > 0) && (nbr != 0))
-	   {nbr = read(fd, pbf, nbo);
-	    if (nbr < 0)
-	       {io_error(errno, "read of %s on %d failed",
-			 SC_itos(NULL, 0, nbo, NULL), fd);
-                rv = nbr;
-		break;};
-	    pbf += nbr;
-	    nbo -= nbr;
-	    rv  += nbr;};};
-#endif
 
 #ifdef AIX
 
@@ -2916,41 +2835,7 @@ ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
    {long nbw;
     ssize_t rv;
 
-#if 1
     nbw = PS_write_safe(fd, bf, n);
-#else
-    int err;
-    long nbo, zc;
-    char *pbf;
-
-    nbo = n;
-    nbw = 0;
-    pbf = bf;
-    zc  = 0;
-
-    while ((nbo > 0) && (zc < 10))
-       {nbw = write(fd, pbf, nbo);
-	if (nbw < 0)
-	   {err = errno;
-
-/* if EAGAIN/EWOULDBLOCK try sleeping 10 ms to let the system catch up
- * limit the number of attempts to 10
- */
-	    io_error(err, "write of %s bytes on %d failed",
-		     SC_itos(NULL, 0, nbo, NULL), fd);
-
-	    if (err == EAGAIN)
-               {SC_sleep(10);
-                zc++;
-		continue;}
-	    else
-	       break;}
-	else
-	   zc = 0;
-
-	pbf += nbw;
-	nbo -= nbw;};
-#endif
 
     rv = (nbw < 0) ? nbw : n;
 
@@ -2964,30 +2849,7 @@ ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
 static size_t _SC_fread_safe(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t nr;
 
-#if 1
     nr = PS_fread_safe(s, bpi, ni, fp, TRUE);
-#else
-    size_t zc, n, ns;
-    char *ps;
-
-    zc = 0;
-    ns = ni;
-    nr = 0;
-    ps = (char *) s;
-    while ((ns > 0) && (zc < 10))
-       {n = fread(ps, bpi, ns, fp);
-	if (ferror(fp) != 0)
-	   {io_error(errno, "fread of %s bytes failed",
-		     SC_itos(NULL, 0, bpi*ns, NULL));
-	    clearerr(fp);
-	    SC_sleep(10);};
-
-	zc = (n == 0) ? zc + 1 : 0;
-
-	ps += bpi*n;
-	ns -= n;
-        nr += n;};
-#endif
 
     return(nr);}
  
@@ -3036,33 +2898,7 @@ size_t SC_fread_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
 size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t nw;
 
-#if 1
     nw = PS_fwrite_safe(s, bpi, ni, fp);
-#else
-    size_t zc, n, ns;
-    char *ps;
-
-    zc = 0;
-    ns = ni;
-    nw = 0;
-    ps = (char *) s;
-    while ((ns > 0) && (zc < 10))
-       {n = fwrite(ps, bpi, ns, fp);
-	if (ferror(fp) != 0)
-	   {io_error(errno, "fwrite of %s bytes failed",
-		     SC_itos(NULL, 0, bpi*ns, NULL));
-	    clearerr(fp);
-	    SC_sleep(10);};
-
-	zc = (n == 0) ? zc + 1 : 0;
-
-        if (n < ns)
-           SC_fflush_safe(fp);
-
-	ps += bpi*n;
-	ns -= n;
-        nw += n;};
-#endif
 
     return(nw);}
  
