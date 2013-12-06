@@ -98,8 +98,20 @@ SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
 
 #ifdef HAVE_POSIX_SIGNALS
 
+    struct sigaction oa;
+
+# if 1
+
+    SC_VA_START(flags);
+
+    _PS_nsigaction(&oa, sig, fn, flags, __a__);
+
+    SC_VA_END;
+
+# else
+
     int is;
-    struct sigaction na, oa;
+    struct sigaction na;
     sigset_t *set;
 
     fo = NULL;
@@ -130,6 +142,8 @@ SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
 	    SC_VA_END;
 
 	    sigaction(sig, &na, NULL);};};
+
+# endif
 
 #else
 

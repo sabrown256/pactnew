@@ -39,6 +39,7 @@
 #include <io.h>
 #include <direct.h>
 #include <process.h>
+#include <signal.h>
 
 #include <windows.h>
 
@@ -83,7 +84,6 @@
 #define SIGQUIT		 3
 #define SIGILL		 4
 #define SIGTRAP		 5
-#define SIGABRT		 6
 #define SIGIOT		 6
 #define SIGBUS		 7
 #define SIGFPE		 8
@@ -112,6 +112,17 @@
 #define SIGPWR		30
 #define SIGSYS		31
 #define	SIGUNUSED	31
+
+#define SA_NOCLDSTOP	0x00000001
+#define SA_NOCLDWAIT	0x00000002
+#define SA_SIGINFO	0x00000004
+#define SA_ONSTACK	0x08000000
+#define SA_RESTART	0x10000000
+#define SA_NODEFER	0x40000000
+#define SA_RESETHAND	0x80000000
+
+#define SA_NOMASK	SA_NODEFER
+#define SA_ONESHOT	SA_RESETHAND
 
 /* permission bits
  * special owner group other 
@@ -455,11 +466,25 @@ typedef unsigned long long  u_int64_t;
 
 typedef int uid_t;
 typedef int gid_t;
-typedef int sigset_t;
+typedef long sigset_t;
 
 typedef unsigned long nfds_t;
 
 typedef jmp_buf sigjmp_buf;
+
+typedef struct siginfo siginfo_t;
+
+struct siginfo
+   {int si_signo;
+    int si_errno;
+    int si_code;};
+
+struct sigaction
+   {void     (*sa_handler)(int sig);
+    void     (*sa_sigaction)(int sig, siginfo_t *f, void *a);
+    sigset_t sa_mask;
+    int      sa_flags;
+    void     (*sa_restorer)(void);};
 
 struct pollfd
    {int fd;
@@ -944,6 +969,21 @@ unsigned int alarm(unsigned int seconds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SIGACTION - sigaction for MSW */
+
+int sigaction(int sig, const struct sigaction *na, struct sigaction *oa)
+   {int rv;
+    void (*fn)(int sig), (*fo)(int sig);
+
+    fn = na->sa_handler;
+    fo = signal(sig, fn);
+    rv = (fo == NULL) ? -1 : 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SIGSETJMP - sigsetjmp for MSW */
 
 int sigsetjmp(sigjmp_buf env, int savesigs)
@@ -983,6 +1023,18 @@ int sigemptyset(sigset_t *set)
 /* SIGFILLSET - for MSW */
 
 int sigfillset(sigset_t *set)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SIGADDSET - sigaddset for MSW */
+
+int sigaddset(sigset_t *set, int sig)
    {int rv;
 
     rv = -1;

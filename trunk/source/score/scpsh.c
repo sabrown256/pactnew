@@ -43,6 +43,7 @@
 #define _job_waitr 		_PS_job_waitr
 #define _kind_io 		_PS_kind_io
 #define _name_io 		_PS_name_io
+#define _nsigaction 		_PS_nsigaction
 #define _pgrp_accept 		_PS_pgrp_accept
 #define _pgrp_data_child 	_PS_pgrp_data_child
 #define _pgrp_fan_in 		_PS_pgrp_fan_in

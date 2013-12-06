@@ -291,6 +291,8 @@ extern void
  PS_log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...);
 
 extern int
+ _PS_nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
+		int flags, va_list __a__),
  PS_lst_length(char **lst),
  PS_last_char(char *s),
  PS_strcntc(char *s, int c, int ex),
