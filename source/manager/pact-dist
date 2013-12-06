@@ -385,7 +385,11 @@ PREP_TREE:
 
    if (-d pact) then
       flog $Log pushd pact
-      flog $Log ( $PSY_ScrDir/scs-meta -d |& xargs rm -rf )
+      flog $Log ( find . -type d -name CVS -o -name .svn -o -name .git |& xargs rm -rf )
+# GOTCHA: this is problematic since some SVN checkouts will not have
+# a .svn directory at the top level which causes scs-meta to fall back
+# to the working checked out source and disaster
+#      flog $Log ( $PSY_ScrDir/scs-meta -d |& xargs rm -rf )
 
       flog $Log mkdir -p $cwd/$Manager
       flog $Log ( echo $DName > $Manager/.pact-date )
