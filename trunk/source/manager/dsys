@@ -947,25 +947,25 @@ switch ($Cmnd)
 # figure out from where configuration info is coming
         set gdir = gen/$PSY_Arch
         if (!(-d $gdir)) then
-           mkdir -p $gdir >& /dev/null
+           flog $Log mkdir -p $gdir
         endif
         if ($reconfig == FALSE) then
-           rm -f $gdir/$Configuration >& /dev/null
+           flog $Log rm -f $gdir/$Configuration
         endif
 
 # if using a database do the location/generation steps
         if ("$dbcfg" != "") then
-           echo "Using database $dbcfg to configure this PACT installation."
+           NoteD $Log "Using database $dbcfg to configure this PACT installation."
 
            if (-f $dbcfg) then
               set ndbcfg = $cwd/$gdir/$PSY_ID.cfg
               if ($dbcfg != $ndbcfg) then
-                 cp $dbcfg $ndbcfg
+                 flog $Log cp $dbcfg $ndbcfg
               endif
-              set dbcfg = $ndbcfg
+              flog $Log set dbcfg = $ndbcfg
               unset ndbcfg
            else
-              echo "No such database '$dbcfg' - exiting"
+              NoteD $Log "No such database '$dbcfg' - exiting"
               exit(1)
            endif
 
@@ -975,15 +975,15 @@ switch ($Cmnd)
 # if no configuration is specified - generate from scratch
            if ("$Configuration" == "") then
               call GEN_CONFIG()
-              set cmod = "command line options"
-              set ucfg = $gdir/$Configuration
-              set dir  = $gdir
+              flog $Log set cmod = "command line options"
+              flog $Log set ucfg = $gdir/$Configuration
+              flog $Log set dir  = $gdir
 
 # if file exists as is use it
            else if (-f $Configuration) then
-              set cmod = "full path file"
-              set ucfg = $gdir/$Configuration
-              set dir  = $gdir
+              flog $Log set cmod = "full path file"
+              flog $Log set ucfg = $gdir/$Configuration
+              flog $Log set dir  = $gdir
 
 # otherwise look in the configs directories
            else
@@ -993,9 +993,9 @@ switch ($Cmnd)
                  set flst  = ( $flst $inf[2-] )
               endif
               if ($croot == none) then
-                 set cmod = "existing file"
-                 set ucfg = $gdir/$Configuration
-                 set dir  = $gdir
+                 flog $Log set cmod = "existing file"
+                 flog $Log set ucfg = $gdir/$Configuration
+                 flog $Log set dir  = $gdir
               endif
               unset inf
               unset croot
@@ -1003,9 +1003,9 @@ switch ($Cmnd)
    
 # if there still is no config file - generate from what we know
            if ("$ucfg" == "") then
-              set cmod = "generated file"
-              set ucfg = `gen-cfg $Configuration`
-              set dir  = $gdir
+              flog $Log set cmod = "generated file"
+              flog $Log set ucfg = `gen-cfg $Configuration`
+              flog $Log set dir  = $gdir
            endif
            echo ""
            echo "Configuring from $ucfg ($cmod)"
@@ -1016,50 +1016,50 @@ switch ($Cmnd)
         setenv HSY_OS_Name  `uname -s`
         set psy_instroot  = $DevDir/$PSY_ID
         if (!(-d $DevDir)) then
-           mkdir $DevDir
+           flog $Log mkdir $DevDir
         endif
         if (!(-d $psy_instroot)) then
-           mkdir $psy_instroot
+           flog $Log mkdir $psy_instroot
         endif
         if (!(-d $psy_instroot/bin)) then
-           mkdir $psy_instroot/bin
+           flog $Log mkdir $psy_instroot/bin
         endif
         if (!(-d $psy_instroot/lib)) then
-           mkdir $psy_instroot/lib
+           flog $Log mkdir $psy_instroot/lib
         endif
         if (!(-d $psy_instroot/include)) then
-           mkdir $psy_instroot/include
+           flog $Log mkdir $psy_instroot/include
         endif
         if (!(-d $psy_instroot/include/shell)) then
-           mkdir $psy_instroot/include/shell
+           flog $Log mkdir $psy_instroot/include/shell
         endif
         if (!(-d $psy_instroot/etc)) then
-           mkdir $psy_instroot/etc
+           flog $Log mkdir $psy_instroot/etc
         endif
         if (!(-d $psy_instroot/man)) then
-           mkdir $psy_instroot/man
+           flog $Log mkdir $psy_instroot/man
         endif
         if (!(-d $psy_instroot/man/man1)) then
-           mkdir $psy_instroot/man/man1
+           flog $Log mkdir $psy_instroot/man/man1
         endif
         if (!(-d $psy_instroot/man/man3)) then
-           mkdir $psy_instroot/man/man3
+           flog $Log mkdir $psy_instroot/man/man3
         endif
         if (!(-d $psy_instroot/scheme)) then
-           mkdir $psy_instroot/scheme
+           flog $Log mkdir $psy_instroot/scheme
         endif
         if (!(-d $psy_instroot/scheme/extensions)) then
-           mkdir $psy_instroot/scheme/extensions
+           flog $Log mkdir $psy_instroot/scheme/extensions
         endif
         if (!(-d $psy_instroot/log)) then
-           mkdir $psy_instroot/log
+           flog $Log mkdir $psy_instroot/log
         endif
         unset psy_instroot
 
         set RStatus = 0
 
         flog $Log pushd ../psh
-        unsetenv LD_LIBRARY_PATH
+        flog $Log unsetenv LD_LIBRARY_PATH
         flog $Log ./ccw -g pco.c -o $BinDir/pco
         if ($status == 0) then
            flog $Log ./ccw -g -DPSY_Prefix=\"${PSY_Prefix}\" do-run.c -o $BinDir/do-run
