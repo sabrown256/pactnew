@@ -1,0 +1,9 @@
+#
+# OPEN64-LNX - define Open64 compiler for Linux
+#
+# include "cpyright.h"
+#
+
+include compilers/open64
+include os/lnx
+

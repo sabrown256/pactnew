@@ -165,6 +165,10 @@
               case *icc:
                    set lcfam = icc-lnx
                    breaksw
+              case *open64:
+              case *opencc:
+                   set lcfam = open64-lnx
+                   breaksw
               case *path:
               case *pathcc:
                    set lcfam = path
@@ -211,6 +215,7 @@
               case mp-gnu-bgp:
               case mp-gnu-bgq:
               case mp-gnu-cxe:
+              case mp-gnu-win-64:
               case mp-pgi-cxe:
               case mp-xlc-bgl:
               case mp-xlc-bgp:
@@ -222,6 +227,7 @@
               case clang:
               case *intel:
               case *icc:
+              case *opencc:
               case *path:
               case *pathcc:
               case *pgi:
