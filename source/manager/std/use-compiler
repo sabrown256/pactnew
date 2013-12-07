@@ -114,16 +114,21 @@ switch ($cname)
         breaksw
 
 # INTEL
+   case intel*:
+        set cname = icc
    case icc*:
+        set fname = ifort
         set pact_cc_family = INTEL
         set pact_fc_family = INTEL
         set opt   = ( -v )
         set pat   = ( Version )
         set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
-        set fname = ifort
         breaksw
 
 # OPEN64
+   case open64*:
+        set cname = opencc
+        set fname = openf90
    case opencc*:
         set pact_cc_family = OPEN64
         set pact_fc_family = OPEN64
@@ -134,13 +139,15 @@ switch ($cname)
         breaksw
 
 # PATHSCALE
+   case pathscale*:
+        set cname = pathcc
    case pathcc*:
+        set fname = pathf90
         set pact_cc_family = PATHSCALE
         set pact_fc_family = PATHSCALE
         set opt   = ( -v )
         set pat   = ( Compiler Suite: Version )
         set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
-        set fname = pathf90
         breaksw
 
 # PCC
@@ -154,6 +161,9 @@ switch ($cname)
         breaksw
 
 # PGI
+   cae pgi*
+        set cname = pgcc
+        set fname = pgf90
    case pgcc*:
         set pact_cc_family = PGI
         set pact_fc_family = PGI

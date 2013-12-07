@@ -32,6 +32,9 @@ if (!(-x "$cc")) then
       case mingw*:
            exit($err)
            breaksw
+      case open64:
+           set cc = `which opencc`
+           breaksw
       case path:
            set cc = `which pathcc`
            breaksw
