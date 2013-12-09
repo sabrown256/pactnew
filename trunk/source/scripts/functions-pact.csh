@@ -92,6 +92,7 @@ endif
 
 alias get_line  'set \!\!:1 = `awk "NR == \!\!:3 { print ; exit }" \!\!:2`'
 alias flog      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias ftrace    'echo "Command: strace -f \!\!:2-$" >>& \!\!:1 ; strace -f \!\!:2-$ >>& \!\!:1'
 alias ftty      'echo "Command: \!\!:2-$" >>& \!\!:1 ; echo "\!\!:2-$" ; \!\!:2-$ >>& \!\!:1'
 alias Note      'echo \!\!:2-$ >>& \!\!:1'
 alias NoteD     'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
