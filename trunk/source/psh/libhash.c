@@ -340,11 +340,17 @@ int hash_foreach(hashtab *tab, int (*fnc)(hashen *hp, void *a), void *a)
 
 /* HASH_DUMP - return an array of pointers whose values point to the
  *           - keys of the elements in the given hash table
+ *           - FLAGS it a bit array for controls:
+ *           -    1  sort results if on
+ *           -    2  result items are <key>=<value> if on
+ *           -       otherwise just <key>
  */
 
-char **hash_dump(hashtab *tab, char *patt, char *type, int sort)
+char **hash_dump(hashtab *tab, char *patt, char *type, int flags)
    {int i, sz, ns;
-    char **sa;
+    int full, sort;
+    char s[BFLRG], t[BFLRG];
+    char **sa, *vr, *vl;
     hashen *hp, **tb;
 
     if (tab == NULL)
@@ -360,15 +366,29 @@ char **hash_dump(hashtab *tab, char *patt, char *type, int sort)
     sz = tab->size;
     tb = tab->table;
 
-    ns = 0;
+    ns   = 0;
+    full = ((flags & 2) != 0);
+    sort = ((flags & 1) != 0);
 
     for (i = 0; i < sz; i++)
         {for (hp = tb[i]; hp != NULL; hp = hp->next)
              {if ((type == NULL) || (strcmp(type, hp->type) == 0))
                  {if (patt == NULL)
-                     sa[ns++] = hp->name;
+                     vr = hp->name;
                   else if (match(hp->name, patt))
-                     sa[ns++] = hp->name;};};};
+                     vr = hp->name;
+                  else
+                     continue;
+                  if ((full == TRUE) && (strcmp(hp->type, "char *") == 0))
+		     {vl = (char *) hp->def;
+		      if (vl != NULL)
+			 {if ((vl[0] != '"') && (strpbrk(vl, " \t") != NULL))
+			     {snprintf(s, BFLRG, "\"%s\"", vl);
+			      vl = s;};
+		      snprintf(t, BFLRG, "%s=%s", vr, vl);
+		      sa[ns++] = STRSAVE(t);};}
+                  else
+		     sa[ns++] = s;};};};
 
 /* check that the number of names found is what is expected */
     if (ns > tab->ne)
@@ -382,7 +402,7 @@ char **hash_dump(hashtab *tab, char *patt, char *type, int sort)
 /* sort the names
  * GOTCHA: hashtab should maintain a sort function pointer
  */
-	    if (sort)
+	    if (sort == TRUE)
 	       string_sort(sa, ns);};};
 
     return(sa);}

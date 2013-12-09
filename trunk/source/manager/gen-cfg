@@ -156,7 +156,16 @@ else
    endif
 
    rm -f $Tmp
-   cp $croot $Tmp
+   switch ($bits)
+      case 32:
+      case 64:
+           echo "include $bits-bit" >& $Tmp
+           breaksw
+      default:
+           touch $Tmp
+           breaksw
+   endsw
+   cat $croot >>& $Tmp
 endif
 
 #--------------------------------------------------------------------------

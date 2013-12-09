@@ -1,9 +1,0 @@
-#
-# MP-GNU-WIN-64 - multi-platform GNU and MINGW Windows build
-#
-# include "cpyright.h"
-#
-
-include auto-gnu-64
-include cross-win-64
-

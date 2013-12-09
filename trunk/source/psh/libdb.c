@@ -554,6 +554,9 @@ char *get_db(database *db, char *var)
     return(val);}
 
 /*--------------------------------------------------------------------------*/
+
+#if 0
+
 /*--------------------------------------------------------------------------*/
 
 /* _SHOW_VAR - show variable VR value */
@@ -620,23 +623,80 @@ static int _save_var(hashen *hp, void *a)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
+/*--------------------------------------------------------------------------*/
+
+/* _EMIT_VAR - show variable VR value */
+
+static int _emit_var(database *db, FILE *fp, const char *fmt,
+		     char *vr, char **vars)
+   {int l, ok;
+    char s[BFLRG];
+    char *vl;
+
+    vl    = strchr(vr, '=');
+    *vl++ = '\0';
+
+/* check whether VR is one of VARS */
+    if (vars != NULL)
+       {ok = FALSE;
+	for (l = 0; vars[l] != NULL; l++)
+	    {if (strcmp(vars[l], vr) == 0)
+	        {ok = TRUE;
+		 break;};};}
+    else
+       ok = TRUE;
+
+    if (ok == TRUE)
+       {if (fmt == NULL)
+	   snprintf(s, BFLRG, "%s=%s", vr, vl);
+        else
+	   snprintf(s, BFLRG, fmt, vr, vl);
+
+/* write to the communicator if FP is NULL */
+	if (fp == NULL)
+	   comm_write(db->cl, s, 0, 10);
+	else
+	   fprintf(fp, "%s\n", s);};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SAVE_DB - save variable VAR to FP */
 
 int save_db(database *db, char **vars, FILE *fp, const char *fmt)
    {int rv;
-    vardes pv;
 
     rv = FALSE;
 
     if (db != NULL)
-       {pv.fmt  = (char *) fmt;
+       {
+#if 1
+        int is, ns;
+	char **sa;
+
+	sa = hash_dump(db->tab, NULL, NULL, 3);
+	ns = lst_length(sa);
+
+	for (is = 0; is < ns; is++)
+	    _emit_var(db, fp, fmt, sa[is], vars);
+
+	free_strings(sa);
+
+#else
+        vardes pv;
+
+	pv.fmt  = (char *) fmt;
 	pv.db   = db;
 	pv.fp   = fp;
 	pv.vars = vars;
 
         hash_foreach(db->tab, _save_var, &pv);
+#endif
 
 	rv = TRUE;};
 

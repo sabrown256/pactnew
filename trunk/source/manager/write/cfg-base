@@ -29,6 +29,9 @@
       case intel:
            set lcc = icc
            breaksw
+      case open64:
+           set lcc = opencc
+           breaksw
       case path:
            set lcc = pathcc
            breaksw
@@ -43,6 +46,12 @@
 # build the config off the operating system
    echo "include spokes" >>& $Tmp
    switch ($los)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ONE_OF - handle OSes with only one compiler option
+
       case aix:
            set cfg = "$cfg-$Bits"
            echo "include ${Bits}-bit" >>& $Tmp
@@ -105,6 +114,11 @@
            echo "}" >>& $Tmp
            breaksw
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DARWIN - multi-compiler OS
+
       case darwin:
 
 # get the main compiler family
@@ -153,6 +167,11 @@
            unset ladv
            breaksw
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LINUX - multi-compiler OS
+
       default:
       case linux:
 
@@ -164,6 +183,9 @@
               case *intel:
               case *icc:
                    set lcfam = icc-lnx
+                   breaksw
+              case *mingw*:
+                   set lcfam = mingw-lnx
                    breaksw
               case *open64:
               case *opencc:
@@ -193,8 +215,9 @@
 
 # build the config off the compiler and compiler family
            switch ($lcc)
-              case mingw*:
-                   echo "include auto-win-64" >>& $Tmp
+              case *mingw*:
+                   echo "include ${Bits}-bit" >>& $Tmp
+                   echo "include auto-win" >>& $Tmp
                    breaksw
 
 	      case *sun:
@@ -215,7 +238,7 @@
               case mp-gnu-bgp:
               case mp-gnu-bgq:
               case mp-gnu-cxe:
-              case mp-gnu-win-64:
+              case mp-gnu-win:
               case mp-pgi-cxe:
               case mp-xlc-bgl:
               case mp-xlc-bgp:
@@ -235,8 +258,8 @@
               case *gnu:
               case *gcc:
               case *xlc*:
-                   echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
+                   echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include compilers/$lcfam" >>& $Tmp
                    unset lcc
                    breaksw
