@@ -13,6 +13,8 @@ HAVE_SUBROUTINES
 
 set Code    = pact
 set Builder = manager
+set ltrace   = FALSE
+#set ltrace   = TRUE
 
 set RSYNC = `where rsync |& head -n 1`
 if (-x "$RSYNC")  then
@@ -317,10 +319,10 @@ switch ($Phase)
 #--------------------------------------------------------------------------
 
 # on each local host do the builds with specified options
-
         set EnvCsh = $EtcDir/env-pact.csh
         if (-e $EnvCsh) then
            source $EnvCsh
+           source $EtcDir/functions-pact.csh
         endif
         if ($MultiConfig == yes) then
            Note $LogHost "   Using MultiConfig with SESSION_CONFIG = |$SESSION_CONFIG|"
@@ -366,9 +368,16 @@ switch ($Phase)
               if (($IErr == 0) && ($TestOnly == no)) then
                  Separator $LogHost
                  Note $LogHost "Removing"
+flog $LogHost alias
                  echo -n "   Removing ... "
-                 flog $LogHost ./dsys remove -cfg
-                 if ($status != 0) then
+                 if ($ltrace == FALSE) then
+                    flog $LogHost ./dsys remove -cfg
+                    set xstatus = $status
+                 else
+                    ftrace $LogHost ./dsys remove -cfg
+                    set xstatus = 0
+                 endif
+                 if ($xstatus != 0) then
                     echo "Failed"
                     set IErr = 2
                  else
@@ -415,11 +424,21 @@ switch ($Phase)
                  echo "   Configuring source tag $PTag from $CfgQual using $dbgopt $Alias"
 
                  if ($Cfg == none) then
-                    flog $LogHost ./dsys config $Opt $Alias
-                    set xstatus = $status
+                    if ($ltrace == FALSE) then
+                       flog $LogHost ./dsys config $Opt $Alias
+                       set xstatus = $status
+                    else
+                       ftrace $LogHost ./dsys config $Opt $Alias
+                       set xstatus = 0
+                    endif
                  else
-                    flog $LogHost ./dsys config $dbgopt $Where $CfgQual $Alias
-                    set xstatus = $status
+                    if ($ltrace == FALSE) then
+                       flog $LogHost ./dsys config $dbgopt $Where $CfgQual $Alias
+                       set xstatus = $status
+                    else
+                       ftrace $LogHost ./dsys config $dbgopt $Where $CfgQual $Alias
+                       set xstatus = 0
+                    endif
                  endif
                  if ($xstatus != 0) then
                     echo "   Failed to configure"
@@ -496,8 +515,13 @@ switch ($Phase)
 
                  set UTime = `$TIMER -r`
 
-                 flog $LogHost ./dsys build -na 3 $ParOpt
-                 set ErrStat = $status
+                 if ($ltrace == FALSE) then
+                    flog $LogHost ./dsys build -na 3 $ParOpt
+                    set ErrStat = $status
+                 else
+                    ftrace $LogHost ./dsys build -na 3 $ParOpt
+                    set ErrStat = 0
+                 endif
 
                  set ETime = `$TIMER -b $UTime`
 
@@ -579,8 +603,13 @@ switch ($Phase)
 
                  set UTime = `$TIMER -r`
 
-                 flog $LogHost ./dsys test -na 3 -r $ParOpt
-                 set ErrStat = $status
+                 if ($ltrace == FALSE) then
+                    flog $LogHost ./dsys test -na 3 -r $ParOpt
+                    set ErrStat = $status
+                 else
+                    ftrace $LogHost ./dsys test -na 3 -r $ParOpt
+                    set ErrStat = 0
+                 endif
 
                  set ETime = `$TIMER -b $UTime`
 
