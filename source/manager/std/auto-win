@@ -1,10 +1,10 @@
 #
-# AUTO-WIN-64 - 64 bit MINGW configuration
+# AUTO-WIN - MINGW configuration
 #
 
-include 64-bit
+run std/use-compiler vers any i686-w64-mingw32-gcc
 
-include compilers/mingw
+include compilers/mingw-lnx
 include cross-win
 
 include spokes

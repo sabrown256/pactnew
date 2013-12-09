@@ -2,5 +2,5 @@
 # CROSS-WIN-64 - add WIN-64 as a CROSS-COMPILEd second platform 
 #
 
-platform auto-win-64  ${PSY_InstRoot}/../win64
+platform auto-win  ${PSY_InstRoot}/../win64
 

@@ -1,0 +1,15 @@
+#
+# AUTO-GNU - LINUX configuration with GCC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run std/use-compiler vers any gcc
+
+#run analyze/locate-mpi mpich any gnu
+
+include compilers/gnu-lnx
+

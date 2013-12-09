@@ -1,0 +1,9 @@
+#
+# MP-GNU-WIN - multi-platform GNU and MINGW Windows build
+#
+# include "cpyright.h"
+#
+
+include auto-gnu
+include cross-gnu-win
+

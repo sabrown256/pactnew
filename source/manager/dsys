@@ -924,94 +924,6 @@ switch ($Cmnd)
 # set up some items in the working environment
         set path = ( . $BinDir $PSY_ScrDir $path )
 
-# make sure the log directory is there - do not wait for later
-        if (!(-d $LogDir)) then
-           mkdir -p $LogDir
-        endif
-
-        InitLog Log $LogDir/config
-
-        Note $Log "Args            = $nargs"
-        if ($?SESSION_CONFIG == 1) then
-           Note $Log "SESSION_CONFIG  = $SESSION_CONFIG"
-        endif
-        Note $Log "PSY_ID          = $PSY_ID"
-        Note $Log "PSY_Root        = $PSY_Root"
-        Note $Log "PSY_CONFIG_PATH = $PSY_CONFIG_PATH"
-
-        flog $Log umask
-
-        flog $Log $RM *.core *~
-        flog $Log $RM $LogDir/analyze*
-
-# figure out from where configuration info is coming
-        set gdir = gen/$PSY_Arch
-        if (!(-d $gdir)) then
-           flog $Log mkdir -p $gdir
-        endif
-        if ($reconfig == FALSE) then
-           flog $Log rm -f $gdir/$Configuration
-        endif
-
-# if using a database do the location/generation steps
-        if ("$dbcfg" != "") then
-           NoteD $Log "Using database $dbcfg to configure this PACT installation."
-
-           if (-f $dbcfg) then
-              set ndbcfg = $cwd/$gdir/$PSY_ID.cfg
-              if ($dbcfg != $ndbcfg) then
-                 flog $Log cp $dbcfg $ndbcfg
-              endif
-              flog $Log set dbcfg = $ndbcfg
-              unset ndbcfg
-           else
-              NoteD $Log "No such database '$dbcfg' - exiting"
-              exit(1)
-           endif
-
-# if using a file or generated config
-        else
-
-# if no configuration is specified - generate from scratch
-           if ("$Configuration" == "") then
-              call GEN_CONFIG()
-              flog $Log set cmod = "command line options"
-              flog $Log set ucfg = $gdir/$Configuration
-              flog $Log set dir  = $gdir
-
-# if file exists as is use it
-           else if (-f $Configuration) then
-              flog $Log set cmod = "full path file"
-              flog $Log set ucfg = $gdir/$Configuration
-              flog $Log set dir  = $gdir
-
-# otherwise look in the configs directories
-           else
-              set inf   = ( `gen-cfg-root -r $Configuration` )
-              set croot = $inf[1]
-              if ($#inf > 1) then
-                 set flst  = ( $flst $inf[2-] )
-              endif
-              if ($croot == none) then
-                 flog $Log set cmod = "existing file"
-                 flog $Log set ucfg = $gdir/$Configuration
-                 flog $Log set dir  = $gdir
-              endif
-              unset inf
-              unset croot
-           endif
-   
-# if there still is no config file - generate from what we know
-           if ("$ucfg" == "") then
-              flog $Log set cmod = "generated file"
-              flog $Log set ucfg = `gen-cfg $Configuration`
-              flog $Log set dir  = $gdir
-           endif
-           echo ""
-           echo "Configuring from $ucfg ($cmod)"
-           unset gdir
-        endif
-
 # make sure that the installation directories exist
         setenv HSY_OS_Name  `uname -s`
         set psy_instroot  = $DevDir/$PSY_ID
@@ -1055,6 +967,120 @@ switch ($Cmnd)
            flog $Log mkdir $psy_instroot/log
         endif
         unset psy_instroot
+
+# make sure the log directory is there - do not wait for later
+        if (!(-d $LogDir)) then
+           mkdir -p $LogDir
+        endif
+
+        InitLog Log $LogDir/config
+
+        Note $Log "Args            = $nargs"
+        if ($?SESSION_CONFIG == 1) then
+           Note $Log "SESSION_CONFIG  = $SESSION_CONFIG"
+        endif
+        Note $Log "PSY_ID          = $PSY_ID"
+        Note $Log "PSY_Root        = $PSY_Root"
+        Note $Log "PSY_CONFIG_PATH = $PSY_CONFIG_PATH"
+
+        flog $Log umask
+
+        flog $Log $RM *.core *~
+        flog $Log $RM $LogDir/analyze*
+
+# figure out from where configuration info is coming
+        set gdir = gen/$PSY_Arch
+        if (!(-d $gdir)) then
+           flog $Log mkdir -p $gdir
+        endif
+        if ($reconfig == FALSE) then
+           flog $Log rm -f $gdir/$Configuration
+        endif
+
+# if using a database do the location/generation steps
+        if ("$dbcfg" != "") then
+           NoteD $Log "Using database $dbcfg to configure this PACT installation."
+
+           if (-f $dbcfg) then
+#              set ndbcfg = $cwd/$gdir/$PSY_ID.cfg
+              flog $Log set ndbcfg = $EtcDir/$PSY_ID.cfg
+              if ($dbcfg != $ndbcfg) then
+                 flog $Log cp $dbcfg $ndbcfg
+              endif
+              flog $Log set dbcfg = $ndbcfg
+              unset ndbcfg
+           else
+              NoteD $Log "No such database '$dbcfg' - exiting"
+              exit(1)
+           endif
+
+# if using a file or generated config
+        else
+           Note $Log "Original feature list: $flst"
+           Note $Log "Original config file: $Configuration"
+
+# if no configuration is specified - generate from scratch
+           if ("$Configuration" == "") then
+              call GEN_CONFIG()
+              flog $Log set cmod = "command line options"
+              flog $Log set ucfg = $gdir/$Configuration
+              flog $Log set dir  = $gdir
+
+# if file exists as is use it
+           else if (-f $Configuration) then
+              flog $Log set cmod = "full path file"
+              flog $Log set ucfg = $gdir/$Configuration
+              flog $Log set dir  = $gdir
+
+# otherwise look in the configs directories for the root and build it
+           else
+              set inf   = ( `gen-cfg-root -r $Configuration` )
+              set croot = $inf[1]
+              if ($#inf > 1) then
+                 set flst  = ( $flst $inf[2-] )
+              endif
+              if ($croot == none) then
+                 flog $Log set cmod = "existing file"
+                 flog $Log set ucfg = $gdir/$Configuration
+                 flog $Log set dir  = $gdir
+              endif
+              unset inf
+              unset croot
+           endif
+   
+# remove duplicate features and take care of Bits
+           set nflst = ""
+           foreach f ($flst)
+              if (($f == 64) || ($f == 32)) then
+                 flog $Log setenv Bits $f
+              else
+                 set ok = TRUE
+                 foreach l ($nflst)
+                    if ($f == $l) then
+                       set ok = FALSE
+                       break
+                    endif
+                 end
+                 if ($ok == TRUE) then
+                    set nflst = ( $nflst $f )
+                 endif
+              endif
+           end
+           set flst = ( $nflst )
+           unset ok
+
+           Note $Log "Final feature list: $flst"
+
+# if there still is no config file - generate from what we know
+           if ("$ucfg" == "") then
+              flog $Log set cmod = "generated file"
+              flog $Log set ucfg = `gen-cfg $Configuration`
+              flog $Log set dir  = $gdir
+           endif
+           NoteD $Log ""
+           NoteD $Log "Configuring from $ucfg ($cmod)"
+           unset gdir
+        endif
 
         set RStatus = 0
 
