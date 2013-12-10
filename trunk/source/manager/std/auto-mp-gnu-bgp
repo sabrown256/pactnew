@@ -7,9 +7,5 @@
 # include "cpyright.h"
 #
 
-include auto-gnu-32-py
+include auto-gnu-py
 include cross-gnu-bgp
-
-#platform auto-gnu-32-py    bgpgs   ${PSY_InstRoot}
-#platform auto-gnu-bgp-mpi  bgpg    ${PSY_InstRoot}-mpi
-

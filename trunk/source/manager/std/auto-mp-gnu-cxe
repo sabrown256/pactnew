@@ -4,9 +4,6 @@
 # include "cpyright.h"
 #
 
-include auto-gnu-64-py
+include auto-gnu-py
 include cross-gnu-cxe
-
-#platform auto-gnu-64        cxegs  ${PSY_InstRoot}
-#platform auto-gnu-cxe-mpi   cxeg   ${PSY_InstRoot}-mpi
 

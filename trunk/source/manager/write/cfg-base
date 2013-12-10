@@ -82,7 +82,13 @@
            echo "include compilers/gnu-freebsd" >>& $Tmp
            echo "include features/no-sql" >>& $Tmp
            breaksw
+      case gnu:
+           echo "run std/use-compiler $lcc" >>& $Tmp
+           echo "include ${Bits}-bit" >>& $Tmp
+           echo "include compilers/gnu-hurd" >>& $Tmp
+           breaksw
       case hp-ux*:
+           echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/hpux" >>& $Tmp
            breaksw
       case irix*:
@@ -91,12 +97,14 @@
            echo "include compilers/irix" >>& $Tmp
            breaksw
       case osf1:
+           echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/osf" >>& $Tmp
            breaksw
       case sunos:
            set CCSys = `where cc |& head -n 1`
            set CCRoot = $CCSys:h
            set CCRoot = $CCRoot:h
+           echo "include ${Bits}-bit" >>& $Tmp
            echo "Group PACT {" >>& $Tmp
            echo "   CC_PATH = $CCRoot" >>& $Tmp
            echo "   FC_PATH = $CCRoot" >>& $Tmp
@@ -150,6 +158,7 @@
               case *pgi:
               case *pgcc*:
               case *gcc*:
+                   echo "include ${Bits}-bit" >>& $Tmp
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include compilers/$lcfam" >>& $Tmp
                    echo "include no-opengl" >>& $Tmp
@@ -220,12 +229,6 @@
                    echo "include auto-win" >>& $Tmp
                    breaksw
 
-	      case *sun:
-	      case *suncc:
-                   echo "run std/use-compiler $lcc" >>& $Tmp
-		   echo "include compilers/$lcfam" >>& $Tmp
-                   breaksw
-
               case gnu-bgl:
               case gnu-bgp:
               case gnu-bgq:
@@ -243,11 +246,14 @@
               case mp-xlc-bgl:
               case mp-xlc-bgp:
               case mp-xlc-bgq:
+                   echo "include ${Bits}-bit" >>& $Tmp
                    echo "include auto-$lcc" >>& $Tmp
                    breaksw
 
               default:
               case clang:
+              case *gnu:
+              case *gcc:
               case *intel:
               case *icc:
               case *opencc:
@@ -255,12 +261,12 @@
               case *pathcc:
               case *pgi:
               case *pgcc:
-              case *gnu:
-              case *gcc:
+	      case *sun:
+	      case *suncc:
               case *xlc*:
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "run std/use-compiler $lcc" >>& $Tmp
-                   echo "include compilers/$lcfam" >>& $Tmp
+		   echo "include compilers/$lcfam" >>& $Tmp
                    unset lcc
                    breaksw
            endsw

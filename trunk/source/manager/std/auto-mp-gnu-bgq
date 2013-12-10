@@ -7,9 +7,6 @@
 # include "cpyright.h"
 #
 
-include auto-gnu-64-py
+include auto-gnu-py
 include cross-gnu-bgq
-
-#platform auto-gnu-64-py    bgqgs   ${PSY_InstRoot}
-#platform auto-gnu-bgq-mpi  bgqg    ${PSY_InstRoot}-mpi
 

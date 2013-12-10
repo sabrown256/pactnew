@@ -1,5 +1,5 @@
 #
-# AUTO-XLC-BGQ - 32-bit BG/Q back end configuration with XLC
+# AUTO-XLC-BGQ - BG/Q back end configuration with XLC
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -21,7 +21,6 @@ Group HSY {
    RootInc = /opt/ibmcmp/vac/bg/12.1/include
 }
 
-include 64-bit
 include compilers/xlc-bgq
 
 include features/c99

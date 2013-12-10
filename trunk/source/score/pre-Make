@@ -94,7 +94,7 @@ targets :
 Hdrs = scstd.h scapi.h scunix.h scwin32.h scbgl.h \
        scgnu.h scpcc.h schpux.h scirix.h \
        sclnx.h scosx.h sccyg.h scbsd.h \
-       scaix.h scsol.h scbeos.h \
+       scaix.h scsol.h scbeos.h schurd.h \
        score.h score_int.h score_old.h \
        scope_hash.h scope_typeh.h scope_io.h scope_array.h \
        scope_dl.h

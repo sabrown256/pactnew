@@ -1,0 +1,24 @@
+#
+# GNU-HURD - define GNU compiler for Hurd
+#
+# include "cpyright.h"
+#
+
+Group OCV {
+   Bits   = [ _env_ = Bits ;              # address bit size
+              *     = -m* ]
+   PIC   ?= [ _env_ = Bits ;
+              64    = -fPIC ]
+   RPath  = -Wl,-rpath,@
+   LD     = -rdynamic
+   LD    += -Wl,--disable-new-dtags       # save us from RUN_PATH
+   LD_Lib = -lc
+   Sh     = -shared
+   ShLb   = 
+}
+
+include compilers/gnu
+include os/hurd
+
+run analyze/rpath -a /usr/${LIB}
+

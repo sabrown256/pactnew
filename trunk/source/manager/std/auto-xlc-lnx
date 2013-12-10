@@ -1,0 +1,9 @@
+#
+# AUTO-XLC - XLC on Linux
+#
+# include "cpyright.h"
+#
+
+include compilers/xlc-lnx
+
+

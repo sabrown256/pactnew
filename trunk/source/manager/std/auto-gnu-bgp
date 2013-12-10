@@ -31,7 +31,6 @@ Group BFD {
    Flags = -Wl,-dynamic
 }
 
-include 32-bit
 include compilers/gnu-bgp
 include no-x11
 include no-sql
