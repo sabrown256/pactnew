@@ -36,10 +36,17 @@ set psy_mngdir = $cwd
 setenv PSY_Base   $psy_mngdir:h
 setenv PSY_ScrDir $PSY_Base/scripts
 
-if (-f extensions/sys-site) then
-   eval `extensions/sys-site`
+# unset these in case they are set to nonsense
+# GOTCHA: what do we do if these are set to necessary good values
+unsetenv PSY_TYPE
+unsetenv PSY_SITE
+unsetenv PSY_AIRoot
+unsetenv PSY_ASRoot
+
+if (-f $psy_mngdir/extensions/sys-site) then
+   eval `$psy_mngdir/extensions/sys-site`
 else
-   eval `../scripts/sys-site -du -f local/site-signature`
+   eval `$PSY_ScrDir/sys-site -du -f $psy_mngdir/local/site-signature`
 endif
 
 source $PSY_ScrDir/functions-pact.csh
@@ -127,7 +134,16 @@ endif
 
 if ((-e $EnvCsh) && ("$Cmnd" != config) && ("$Cmnd" != reconfig)) then
    source $EnvCsh
+
+# remove any pact version from the path
+   eval `$PSY_ScrDir/simplify-path -p pact`
+
 endif
+
+# remove any potential to change results by looking elsewhere
+# than the builds and tests want to look
+unsetenv SCHEME
+unsetenv ULTRA
 
 set RStatus = 0
 
@@ -980,6 +996,9 @@ switch ($Cmnd)
            Note $Log "SESSION_CONFIG  = $SESSION_CONFIG"
         endif
         Note $Log "PSY_ID          = $PSY_ID"
+        Note $Log "PSY_SITE        = $PSY_SITE"
+        Note $Log "PSY_AIRoot      = $PSY_AIRoot"
+        Note $Log "PSY_ASRoot      = $PSY_ASRoot"
         Note $Log "PSY_Root        = $PSY_Root"
         Note $Log "PSY_CONFIG_PATH = $PSY_CONFIG_PATH"
 
@@ -1238,6 +1257,9 @@ switch ($Cmnd)
 
 # now that PCO made us one, source it        
         source $EnvCsh
+
+# remove any pact version from the path
+        eval `$PSY_ScrDir/simplify-path -p pact`
         
 # cleanup path so as not to tax wimpy OSs such as Solaris
         eval `$PSY_ScrDir/simplify-path`
