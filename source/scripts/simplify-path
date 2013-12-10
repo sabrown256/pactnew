@@ -8,29 +8,40 @@
 
 unalias *
 
-set Synt = csh
-set Var  = PATH
+set synt = csh
+set var  = PATH
+set elst = ""
+set vrb  = FALSE
 
 while ($#argv > 0)
    switch ($1)
       case -csh:
-           set Synt = csh
+           set synt = csh
            breaksw
       case -h:
            echo ""
-           echo "Usage: simplify-path -h [-sh] [<var>]"
+           echo "Usage: simplify-path [-csh] -h [-p <exe>]* [-sh] [-v] [<var>]"
            echo "    csh    emit result in C Shell syntax (default)"
            echo "    h      this help message"
+           echo "    p      eliminate all but first directory with <exe>"
            echo "    sh     emit result in Bourne Shell syntax"
+           echo "    v      verbose mode"
            echo "    <var>  variable to simplify, e.g. PATH or MANPATH"
            echo "           default is PATH"
            echo ""
            exit(1)
+      case -p:
+           shift
+           set elst = ( $elst $1 )
+           breaksw
+      case -v:
+           set vrb = TRUE
+           breaksw
       case -sh:
-           set Synt = sh
+           set synt = sh
            breaksw
       default:
-           set Var = $1
+           set var = $1
            breaksw
    endsw
    shift
@@ -38,13 +49,15 @@ end
 
 # get the variable value in list form
 # substitute '+@-@+' for ' ' before converting ':' to ' '
-set val = ( `printenv $Var | sed 's| |+@-@+|g' | sed 's/^:/--:/' | sed 's/:$/:--/' | sed 's/:/ /g'` )
+# this permits handling directories names with spaces
+set val = ( `printenv $var | sed 's| |+@-@+|g' | sed 's/^:/--:/' | sed 's/:$/:--/' | sed 's/:/ /g'` )
 
 # compute a new val in list form
+# entries will now be unique
 set nval = ""
-foreach i ($val)
+foreach i ( $val )
    set ok = TRUE
-   foreach j ($nval)
+   foreach j ( $nval )
       if ($j == $i) then
          set ok = FALSE
          break
@@ -52,12 +65,43 @@ foreach i ($val)
    end
    if ($ok == TRUE) then
       set nval = ( $nval $i )
+   else if ($vrb == TRUE) then
+      echo "  -d  $i"
    endif
 end
+if ($vrb == TRUE) then
+   echo "entries after duplicate entry removal: $#nval"
+endif
+
+# remove directories after the first with items from elst
+foreach e ( $elst )
+   set first = TRUE
+   set tval  = ( $nval )
+   set nval  = ""
+   foreach i ( $tval )
+      set ir = ( `echo $i | sed 's/--//g' | sed 's|+@-@+| |g'` )
+      set ok = TRUE
+      if (-e $ir/$e) then
+         if ($first == TRUE) then
+            set first = FALSE
+         else
+            set ok = FALSE
+         endif
+      endif
+      if ($ok == TRUE) then
+         set nval = ( $nval $i )
+      else if ($vrb == TRUE) then
+         echo "  -e  $i"
+      endif
+   end
+end
+if ($vrb == TRUE) then
+   echo "entries after duplicate executable removal: $#nval"
+endif
 
 # convert to back to environment valiable form
 setenv NVAL ""
-foreach i ($nval)
+foreach i ( $nval )
    if ("$NVAL" == "") then
       setenv NVAL ${i}
    else
@@ -69,10 +113,10 @@ end
 setenv NVAL `echo $NVAL | sed 's/--//g' | sed 's|+@-@+| |g'`
 
 # print the new val
-if ($Synt == csh) then
-   echo "setenv $Var $NVAL"
+if ($synt == csh) then
+   echo "setenv $var $NVAL"
 else
-   echo "export $Var=$NVAL"
+   echo "export $var=$NVAL"
 endif
 
 exit($status)

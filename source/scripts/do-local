@@ -635,7 +635,10 @@ INITLOG:
 
    set CurrUMask = `umask`
 
-   if ("$Phase" != "-setup") then
+   if ("$Phase" == "-setup") then
+      $RM $LogHost
+      touch $LogHost
+   else
 
 # make LogHost a full path name
       if (`expr "$LogHost" : '/.*'` < 1) then
@@ -671,10 +674,6 @@ INITLOG:
       endif
 
       mv $tLogHost $LogHost
-
-   else
-      $RM $LogHost
-      touch $LogHost
    endif
 
    Note $LogHost "Base directory: $PSY_Base"
