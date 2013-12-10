@@ -122,7 +122,7 @@ typedef int socklen_t;
 # ifdef GETSOCKNAME_LONG
 typedef unsigned long socklen_t;
 # else
-#  if !defined(SGI) && !defined(BEOS)
+#  if !defined(SGI) && !defined(BEOS) && !defined(__gnu_hurd__)
 typedef int socklen_t;
 #  endif
 # endif

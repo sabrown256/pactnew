@@ -4,9 +4,6 @@
 # include "cpyright.h"
 #
 
-include auto-xlc-lnx-32
+include auto-xlc-lnx
 include cross-xlc-bgl
-
-#platform auto-xlc-lnx-32       bglxs  ${PSY_InstRoot}
-#platform auto-xlc-bgl-32-mpi   bglx   ${PSY_InstRoot}-mpi
 

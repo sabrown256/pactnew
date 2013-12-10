@@ -4,9 +4,6 @@
 # include "cpyright.h"
 #
 
-include auto-pgi-64
+include auto-pgi
 include cross-pgi-cxe
-
-#platform auto-pgi-64        cxeps  ${PSY_InstRoot}
-#platform auto-pgi-cxe-mpi   cxep   ${PSY_InstRoot}-mpi
 

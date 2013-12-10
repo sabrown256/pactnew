@@ -1,5 +1,5 @@
 #
-# AUTO-GNU-CXE - 64-bit CRAY XE6 back end configuration with GCC
+# AUTO-GNU-CXE - CRAY XE6 back end configuration with GCC
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -9,7 +9,6 @@
 
 run analyze/locate-mpi mpich any gnu
 
-include 64-bit
 include compilers/gnu-lnx
 
 #run std/module-cray env 3.1.37G mpi 5.2.0.7 gnu 4.5.2

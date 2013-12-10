@@ -1,5 +1,5 @@
 #
-# AUTO-GNU-BGQ - 64-bit BG/Q back end configuration with GCC
+# AUTO-GNU-BGQ - BG/Q back end configuration with GCC
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -23,7 +23,6 @@ Group HSY {
    RootInc = /bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/sys-include
 }
 
-include 64-bit
 include compilers/gnu-bgp
 
 include features/c99
