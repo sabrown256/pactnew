@@ -5,9 +5,10 @@
 #
 
 Group OCV {
-   MINGW   = [ _env_ = Bits ;
-               32    = i586-mingw32msvc ;
-               64    = i686-w64-mingw32 ]
+#   MINGW   = [ _env_ = Bits ;
+#               32    = i586-mingw32msvc ;
+#               64    = i686-w64-mingw32 ]
+   MINGW   = i686-w64-mingw32
    CC      = ${OCV_MINGW}-gcc
    CXX     = ${OCV_MINGW}-g++
    FC      = ${OCV_MINGW}-gfortran
@@ -21,9 +22,11 @@ Group OCV {
    Sh      = -shared
    ShLb    =
    OMP_Lib = -lgomp
+   StackP  = 
 }
 
 run analyze/rpath -a /usr/${OCV_MINGW}/lib
+run analyze/rpath -a /usr/lib/gcc/${OCV_MINGW}/4.6
 
 include compilers/gnu
 

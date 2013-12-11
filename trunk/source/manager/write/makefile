@@ -23,7 +23,8 @@ Separator $Log
 NoteD $Log "   Distribution Makefile - Makefile"
 Note $Log ""
 
-dbmget $Log BinDir^         \
+dbmget $Log Bits^           \
+            BinDir^         \
             EtcDir^         \
             PSY_Root^       \
             PSY_ID^         \
