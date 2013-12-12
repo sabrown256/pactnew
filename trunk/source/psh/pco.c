@@ -2560,6 +2560,7 @@ static int do_run_work(client *cl, int il, char *oper, char *value)
 	nc = strlen(cmd);
 	cmd[nc-3] = '\0';
 
+	CLOG(cl, 1, "pco: async %s", cmd);
 	db = cgetenv(TRUE, "PERDB_PATH");
         rv = gexecs(db, cmd, NULL, NULL);}
 
@@ -2569,7 +2570,8 @@ static int do_run_work(client *cl, int il, char *oper, char *value)
              if (t[0] == '}')
 	        ok = FALSE;
 	     else
-	        rv |= system(echo(FALSE, t));};};
+	        {CLOG(cl, 1, "pco: run-group %s", t);
+	         rv |= system(echo(FALSE, t));};};};
 
     return(rv);}
 
@@ -2627,6 +2629,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     memset(ldepth, ' ', 3*n);
 	     ldepth[3*n] = '\0';
 
+	     CLOG(cl, 1, "pco: %s", line);
 	     path = push_file(oper, STACK_FILE);
 	     note(Log, TRUE, "");
 	     noted(Log, "%sincluding %s", ldepth, path);}
@@ -2640,6 +2643,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     memset(ldepth, ' ', 3*n);
 	     ldepth[3*n] = '\0';
 
+	     CLOG(cl, 1, "pco: %s", line);
 	     path = push_file(line+4, STACK_PROCESS);
 	     note(Log, TRUE, "");
 	     if (st.phase == PHASE_READ)
@@ -3324,9 +3328,6 @@ int main(int c, char **v, char **env)
     st.features[0] = '\0';
     st.have_db = launch_perdb(c, v);
 
-/* technically this is set by 'dsys config' */
-    cinitenv("DbgOpt", "-g");
-
 /* NOTE: because of OSX's nefarious automounter we have to get the current
  * directory this way (rather than via the getcwd library call) so that
  * we get the same value that shell scripts get in other parts of the
@@ -3353,9 +3354,10 @@ int main(int c, char **v, char **env)
             st.async = TRUE;
 
          else if (strcmp(v[i], "-db") == 0)
-	    {full_path(d, BFLRG, NULL, v[++i]);
-             if (file_exists(d) == FALSE)
-	        {noted(Log, "No such database '%s' - exiting\n", d);
+	    {nstrncpy(d, BFLRG, "db:", -1);
+	     full_path(d+3, BFLRG-3, NULL, v[++i]);
+             if (file_exists(d+3) == FALSE)
+	        {noted(Log, "No such database '%s' - exiting\n", d+3);
 		 if (st.have_db == TRUE)
 		    kill_perdb();
 		 return(1);};

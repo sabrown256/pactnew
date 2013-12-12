@@ -264,15 +264,15 @@ switch ($Phase)
 
 # convert options to control representation
         set DOList = ""
-        while ("$DbgOpt" != "")
-           switch ($DbgOpt)
+        while ("$DOFlags" != "")
+           switch ($DOFlags)
               case g*:
-                   set DOList = ( $DOList "-g" )
-                   set DbgOpt = `echo $DbgOpt | sed 's+g++'`
+                   set DOList  = ( $DOList "-g" )
+                   set DOFlags = `echo $DOFlags | sed 's+g++'`
                    breaksw
               case o*:
-                   set DOList = ( $DOList "-O" )
-                   set DbgOpt = `echo $DbgOpt | sed 's+o++'`
+                   set DOList  = ( $DOList "-O" )
+                   set DOFlags = `echo $DOFlags | sed 's+o++'`
                    breaksw
            endsw
         end
@@ -337,11 +337,12 @@ switch ($Phase)
 
         foreach spopt ($SPList)
 
-           foreach dbgopt ($DOList)
+# ldof is the debug/optimize option flag for this build
+           foreach ldof ($DOList)
 
               set IErr = 0
-              set dbgchar = `echo $dbgopt | sed 's/-//' | tr "[A-Z]" "[a-z]"`
-              set Opt     = ( $CfgOptions "$dbgopt" )
+              set dbgchar = `echo $ldof | sed 's/-//' | tr "[A-Z]" "[a-z]"`
+              set Opt     = ( $CfgOptions "$ldof" )
 
 # sequential
               if ("$spopt" == "-none") then
@@ -406,7 +407,7 @@ flog $LogHost alias
                  endif
 
 # add standard config/option message to enable do-net watch option
-                 NoteNT "configure $CfgQual option $dbgopt $UseTmp"
+                 NoteNT "configure $CfgQual option $ldof $UseTmp"
 
                  if (-f $PSY_MngDir/.pact-version-tag) then
                     set PTag = `cat $PSY_MngDir/.pact-version-tag`
@@ -417,14 +418,14 @@ flog $LogHost alias
                  Separator $LogHost
                  if ($?SESSION_CONFIG == 0) then
                     set Alias = ""
-                    Note $LogHost "Configuring source tag $PTag from $CfgQual using $dbgopt"
+                    Note $LogHost "Configuring source tag $PTag from $CfgQual using $ldof"
                  else
                     set Alias = "-a $SESSION_CONFIG"
-                    Note $LogHost "Configuring source tag $PTag from $CfgQual using $dbgopt ($SESSION_CONFIG)"
+                    Note $LogHost "Configuring source tag $PTag from $CfgQual using $ldof ($SESSION_CONFIG)"
                  endif
 
                  Note $LogHost `date`
-                 echo "   Configuring source tag $PTag from $CfgQual using $dbgopt $Alias"
+                 echo "   Configuring source tag $PTag from $CfgQual using $ldof $Alias"
 
                  if ($Cfg == none) then
                     if ($ltrace == FALSE) then
@@ -436,10 +437,10 @@ flog $LogHost alias
                     endif
                  else
                     if ($ltrace == FALSE) then
-                       flog $LogHost $PSY_MngDir/dsys config $dbgopt $Where $CfgQual $Alias
+                       flog $LogHost $PSY_MngDir/dsys config $ldof $Where $CfgQual $Alias
                        set xstatus = $status
                     else
-                       ftrace $LogHost $PSY_MngDir/dsys config $dbgopt $Where $CfgQual $Alias
+                       ftrace $LogHost $PSY_MngDir/dsys config $ldof $Where $CfgQual $Alias
                        set xstatus = 0
                     endif
                  endif
@@ -906,7 +907,7 @@ GET_HOST_ARG:
     flog $lFile setenv SysID    none
     flog $lFile setenv WrkDir   none
     flog $lFile set UseTmp       = no
-    flog $lFile set DbgOpt       = g
+    flog $lFile set DOFlags      = g
     flog $lFile set SerPar       = s
     flog $lFile set Cfg          = none
     flog $lFile set ParN         = ""
@@ -942,7 +943,7 @@ GET_HOST_ARG:
                flog $lFile setenv WrkDir $1
                shift
                if ($#argv == 0) break
-               flog $lFile set DbgOpt = $1
+               flog $lFile set DOFlags = $1
                shift
                if ($#argv == 0) break
                flog $lFile set SerPar = $1
@@ -1111,7 +1112,7 @@ FROMTMP:
 
 # NOTE: IErr == 1 is config failure so do not wipe out the evidence
       if ($IErr != 1) then
-         flog $LogHost $PSY_MngDir/dsys config $dbgopt $Where $CfgQual
+         flog $LogHost $PSY_MngDir/dsys config $ldof $Where $CfgQual
       endif
 
       flog $LogHost popd

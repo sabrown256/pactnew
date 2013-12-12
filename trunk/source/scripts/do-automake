@@ -204,15 +204,15 @@ switch ($Phase)
 
 # convert options to control representation
         set DOList = ""
-        while ("$DbgOpt" != "")
-           switch ($DbgOpt)
+        while ("$DOFlags" != "")
+           switch ($DOFlags)
               case g*:
-                   set DOList = ( $DOList "-g" )
-                   set DbgOpt = `echo $DbgOpt | sed 's+g++'`
+                   set DOList  = ( $DOList "-g" )
+                   set DOFlags = `echo $DOFlags | sed 's+g++'`
                    breaksw
               case o*:
-                   set DOList = ( $DOList "-o" )
-                   set DbgOpt = `echo $DbgOpt | sed 's+o++'`
+                   set DOList  = ( $DOList "-o" )
+                   set DOFlags = `echo $DOFlags | sed 's+o++'`
                    breaksw
            endsw
         end
@@ -224,10 +224,11 @@ switch ($Phase)
 
         set LineCnt = `wc -l $LogHost | awk '{ print $1 }'`
 
-        foreach dbgopt ($DOList)
+# ldof is the debug/optimize flag for this build
+        foreach ldof ($DOList)
 
            set IErr = 0
-           set dbgchar = `echo $dbgopt | sed 's/-//' | tr "[A-Z]" "[a-z]"`
+           set dbgchar = `echo $ldof | sed 's/-//' | tr "[A-Z]" "[a-z]"`
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -291,13 +292,13 @@ switch ($Phase)
 # configure
            if ($IErr == 0) then
               Separator $LogHost
-              Note $LogHost "Configuring source using $dbgopt"
+              Note $LogHost "Configuring source using $ldof"
               Note $LogHost `date`
               Note $LogHost `system-id`
-              echo "   Configuring using $dbgopt"
+              echo "   Configuring using $ldof"
 
 # add standard config/option message to enable do-net watch option
-              NoteNT "configure automake option $dbgopt"
+              NoteNT "configure automake option $ldof"
 
               InitLog CnfLog $DevDir/log/config.$Code
 
@@ -585,7 +586,7 @@ GET_HOST_ARG:
 
 # set default values
     Note $lFile "Set default values for get_host_arg"
-    flog $lFile set DbgOpt  = g
+    flog $lFile set DOFlags = g
     flog $lFile set ConfOpt = ""
     flog $lFile setenv SysID     none
     flog $lFile setenv WrkDir    none
@@ -614,7 +615,7 @@ GET_HOST_ARG:
                shift
                flog $lFile setenv WrkDir $1
                shift
-               flog $lFile set DbgOpt = $1
+               flog $lFile set DOFlags = $1
                shift
                while ($#argv > 0)
                   if ($1 =~ --*) then

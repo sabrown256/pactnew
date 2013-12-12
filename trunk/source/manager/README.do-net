@@ -162,7 +162,7 @@ The gross structure of the local script is as follows:
                       shift
                       set WrkDir = $1
                       shift
-                      set DbgOpt = $1
+                      set DOFlags = $1
                       shift
                       break
                       breaksw

@@ -359,7 +359,7 @@ GET_HOST_ARG:
     Note $lFile "Set default values for get_host_arg"
     flog $lFile set WrkDir      = none
     flog $lFile set UseTmp      = no
-    flog $lFile set DbgOpt      = g
+    flog $lFile set DOFlags     = g
     flog $lFile set SerPar      = s
     flog $lFile set Cfg         = none
     flog $lFile set CStat        = ""
@@ -394,7 +394,7 @@ GET_HOST_ARG:
                flog $lFile set UseTmp = $1
                shift
                if ($#argv == 0) break
-               flog $lFile set DbgOpt = $1
+               flog $lFile set DOFlags = $1
                shift
                if ($#argv == 0) break
                flog $lFile set SerPar = $1

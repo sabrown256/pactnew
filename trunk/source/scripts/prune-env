@@ -22,7 +22,7 @@ set noglob
 set tgt = ""
 set pat = ""
 set db  = ""
-set exc = ( MANPATH PATH PERDB_PATH PSY_TYPE )
+set exc = ( MANPATH PATH PERDB GEXEC PERDB_PATH PSY_TYPE USER )
 
 while ($#argv > 0)
    switch ($1)
