@@ -25,32 +25,32 @@ Separator $Log
 NoteD $Log "   Site Dependent MAKE Configuration - make-def"
 Note $Log ""
 
-dbmget $Log AR_IFlag^               \
+dbmget $Log ACC_Debug_Default^      \
+            ACC_Optimize_Default^   \
+            AFC_Debug_Default^      \
+            AFC_Optimize_Default^   \
+            AR_IFlag^               \
             AR_XFlag^               \
             ArW32Objs^              \
             Bits^                   \
             CC_Debug_Default^       \
             CC_Optimize_Default^    \
-            ACC_Debug_Default^      \
-            ACC_Optimize_Default^   \
             Cfg_CC_Exe^             \
             Cfg_CC_Flags^           \
             Cfg_CC_Inc^             \
-            RF_SPOKES_C^            \
+            ConfigVars^             \
             CROSS_FE^               \
-            SHELL_Default^          \
             DP_BE^                  \
             DP_METHOD^              \
             EtcDir^                 \
             FC_MOD_FLAG^            \
             FC_Debug_Default^       \
             FC_Optimize_Default^    \
-            AFC_Debug_Default^      \
-            AFC_Optimize_Default^   \
-            HAVE_GOOD_OMP_PRAGMAS^  \
+            Globals^                \
             GRAPHICS_Devices^       \
             GRAPHICS_Flags^         \
             GRAPHICS_Windows^       \
+            HAVE_GOOD_OMP_PRAGMAS^  \
             HAVE_PYTHON^            \
             HSY_OS_Name^            \
             HSY_OS_Type^            \
@@ -73,14 +73,6 @@ dbmget $Log AR_IFlag^               \
             PACT_FC_VERSION^        \
             PACT_FC_PATH^           \
             PACT_FC_EXE^            \
-            PY_CC^                  \
-            PY_Cfg^                 \
-            PY_Exe^                 \
-            PY_Inc^                 \
-            PY_Vers^                \
-            Ranlib_Exe^             \
-            RPATH^                  \
-            STD_IPC^                \
             PSY_Base^               \
             PSY_Cfg^                \
             PSY_Root^               \
@@ -91,7 +83,17 @@ dbmget $Log AR_IFlag^               \
 	    PSY_CfgDir^             \
             PSY_MngDir^             \
 	    PSY_TmpDir^             \
+            PY_CC^                  \
+            PY_Cfg^                 \
+            PY_Exe^                 \
+            PY_Inc^                 \
+            PY_Vers^                \
+            Ranlib_Exe^             \
+            RF_SPOKES_C^            \
+            RPATH^                  \
+            SHELL_Default^          \
             SMP_LibExt^             \
+            STD_IPC^                \
             URFile^                 \
             Yacc_Exe^               \
             Yacc_Flags

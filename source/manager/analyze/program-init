@@ -284,6 +284,7 @@ Group PACT {
 #   PSY_Cfg          the system config file
 #   PSY_CfgMan       full path to the cfgman utility
 #   PSY_CONFIG_PATH  list of directories where config files may be found
+#   PSY_Dbg_Opt      the debug/optimize option for this build
 #   PSY_ID           the system ID as defined by 'cfgman use'
 #   PSY_Prefix       the temporary directory prefix, e.g. "z-"
 #   PSY_TYPE         the system type as defined by 'site-signature'
@@ -309,6 +310,7 @@ Group PSY {
    Cfg         = ""
    CfgMan      = ${PSY_CfgMan}
    CONFIG_PATH = ${PSY_CONFIG_PATH}
+   Dbg_Opt     = ${PSY_Dbg_Opt}
    OMIT_INTERP = FALSE
 
    ID          = ${PSY_ID}

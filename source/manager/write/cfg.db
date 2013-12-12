@@ -29,6 +29,11 @@ Note $Log ""
 
 flog $Log ls -l ${PERDB_PATH}*
 
+# dbunset ALog
+# dbunset Log
+# dbunset ldio
+# dbunset si
+
 flog $Log $PERDB -l save:db:
 
 #--------------------------------------------------------------------------

@@ -52,28 +52,41 @@ end
 # this permits handling directories names with spaces
 set val = ( `printenv $var | sed 's| |+@-@+|g' | sed 's/^:/--:/' | sed 's/:$/:--/' | sed 's/:/ /g'` )
 
-# compute a new val in list form
-# entries will now be unique
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# UNIQUE - compute a new val in list form
+#        - entries will now be unique
+
 set nval = ""
+
 foreach i ( $val )
-   set ok = TRUE
-   foreach j ( $nval )
-      if ($j == $i) then
-         set ok = FALSE
-         break
+   if (-d "$i") then
+      set ok = TRUE
+      foreach j ( $nval )
+         if ($j == $i) then
+            set ok = FALSE
+            break
+         endif
+      end
+      if ($ok == TRUE) then
+         set nval = ( $nval $i )
+      else if ($vrb == TRUE) then
+         echo "  -d  $i"
       endif
-   end
-   if ($ok == TRUE) then
-      set nval = ( $nval $i )
-   else if ($vrb == TRUE) then
-      echo "  -d  $i"
    endif
 end
+
 if ($vrb == TRUE) then
    echo "entries after duplicate entry removal: $#nval"
 endif
 
-# remove directories after the first with items from elst
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ONE-ENTRY - foreach executable in ELST remove all directories
+#           - from the list which contain it except the first
+
 foreach e ( $elst )
    set first = TRUE
    set tval  = ( $nval )
@@ -99,7 +112,11 @@ if ($vrb == TRUE) then
    echo "entries after duplicate executable removal: $#nval"
 endif
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # convert to back to environment valiable form
+
 setenv NVAL ""
 foreach i ( $nval )
    if ("$NVAL" == "") then
@@ -108,6 +125,9 @@ foreach i ( $nval )
       setenv NVAL ${NVAL}:${i}
    endif
 end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 # substitute ' ' for '+@-@+'
 setenv NVAL `echo $NVAL | sed 's/--//g' | sed 's|+@-@+| |g'`

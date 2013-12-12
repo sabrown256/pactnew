@@ -65,8 +65,8 @@ if ($?Valgrind == 0) then
    setenv Valgrind ""
 endif
 
-set DbgOpt = `pact -info DbgOpt`
-switch ($DbgOpt)
+set ldof = `pact -info PSY_Dbg_Opt`
+switch ($ldof)
    case debug:
         setenv LogSfx  g
         breaksw
@@ -78,6 +78,7 @@ switch ($DbgOpt)
         setenv LogSfx  O
         breaksw
 endsw
+unset ldof
 
 # tests run concurrently with the DISPLAY environment variable
 # set, may result in X11 connection failures on some systems

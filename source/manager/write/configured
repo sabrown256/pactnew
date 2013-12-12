@@ -24,16 +24,16 @@ Separator $Log
 NoteD $Log "   Configuration record - configured"
 Note $Log ""
 
-dbmget $Log EtcDir^           \
+dbmget $Log AF_PATTERN_WARN^  \
+            AF_PATTERN_ERR^   \
+            EtcDir^           \
             HSY_Host^         \
             HSY_OS_Name^      \
+            MAKE_Shared_Libs^ \
+            PSY_Dbg_Opt^      \
             PSY_FltDir^       \
-            HAVE_JPEGLIB^     \
-            HAVE_PNGLIB^      \
-            AF_PATTERN_WARN^  \
-            AF_PATTERN_ERR^   \
-            USE_TmpDir^       \
-            USER
+            RF_PROFILE^       \
+            USE_TmpDir
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -43,34 +43,17 @@ dbmget $Log EtcDir^           \
     flog $Log $RM $STDOUT
     flog $Log touch $STDOUT
 
-    Note $STDOUT "Config       = $lCfg"
-    Note $STDOUT "DbgOpt       = $DbgOpt"
-    Note $STDOUT "Date         = `date`"
-    if ("$HAVE_JPEGLIB" == "") then
-       Note $STDOUT "JPEG         = no"
-    else
-       Note $STDOUT "JPEG         = yes"
-    endif
+    Note $STDOUT "Date            = `date`"
+    Note $STDOUT "Host            = $HSY_Host ($HSY_OS_Name)"
+    Note $STDOUT "Config          = $lCfg"
+    Note $STDOUT "Dbg/Opt         = $PSY_Dbg_Opt"
+    Note $STDOUT "Profiled        = $RF_PROFILE"
+    Note $STDOUT "Shared          = $MAKE_Shared_Libs"
 
-    if ("$HAVE_PNGLIB" == "") then
-       Note $STDOUT "PNG          = no"
-    else
-       Note $STDOUT "PNG          = yes"
-    endif
-
-    if (-f $lCfg) then
-       set Shared = `grep Shared $lCfg`
-       if ("$Shared" == "") then
-          Note $STDOUT "Shared       = no"
-       else
-          Note $STDOUT "Shared       = yes"
-       endif
-    endif
-
-    Note $STDOUT "USE_TmpDir      = $USE_TmpDir"
-    Note $STDOUT "PSY_FltDir      = $PSY_FltDir"
-    Note $STDOUT "AF_PATTERN_WARN = $AF_PATTERN_WARN"
-    Note $STDOUT "AF_PATTERN_ERR  = $AF_PATTERN_ERR"
+    Note $STDOUT "Warning pattern = $AF_PATTERN_WARN"
+    Note $STDOUT "Error pattern   = $AF_PATTERN_ERR"
+    Note $STDOUT "Filter dir      = $PSY_FltDir"
+    Note $STDOUT "Using temp dir  = $USE_TmpDir"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

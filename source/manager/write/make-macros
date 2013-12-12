@@ -25,12 +25,13 @@ Note $Log ""
 
 dbmget $Log Bits^              \
             CROSS_COMPILE^     \
-            MAKE_Shared_Libs^  \
-            MAKE_Strategy^     \
             EtcDir^            \
             IncDir^            \
+            FPE_Exe^           \
             HSY_FPU^           \
             HAVE_GNU_FENV^     \
+            MAKE_Shared_Libs^  \
+            MAKE_Strategy^     \
             Ranlib_Exe^        \
             PSY_Cfg^           \
             PSY_TYPE^          \

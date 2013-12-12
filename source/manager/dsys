@@ -595,7 +595,7 @@ switch ($Cmnd)
            endif
         endif
 
-        setenv DbgOpt  partial
+        set ldof = partial
 
         set DoingConfig = TRUE
 
@@ -722,7 +722,7 @@ switch ($Cmnd)
                    set flst = ( $flst $1 )
                    breaksw
               case -g:
-                   setenv DbgOpt  debug
+                   set ldof  = debug
                    set PArgs = ( $PArgs "-g" )
                    breaksw
               case -gsys:
@@ -856,10 +856,10 @@ switch ($Cmnd)
                    set mpi = TRUE
                    breaksw
               case -O:
-                   setenv DbgOpt  mixed
+                   set ldof = mixed
                    breaksw
               case -o:
-                   setenv DbgOpt  optimize
+                   set ldof  = optimize
                    set PArgs = ( $PArgs "-o" )
                    breaksw
               case -p:
@@ -916,12 +916,11 @@ switch ($Cmnd)
         setenv PSY_Root  $DevDir/$PSY_ID
 
 # now that we have the system, reset the variables that depend on it
+        set LogDir  = $PSY_Root/log
         set IncDir  = $PSY_Root/include
         set EtcDir  = $PSY_Root/etc
         set BinDir  = $PSY_Root/bin
         set LibDir  = $PSY_Root/lib
-        set ScmDir  = $PSY_Root/scheme
-        set LogDir  = $PSY_Root/log
         set PACT    = $BinDir/pact
 
         setenv PERDB  $BinDir/perdb
@@ -940,53 +939,14 @@ switch ($Cmnd)
 # set up some items in the working environment
         set path = ( . $BinDir $PSY_ScrDir $path )
 
-# make sure that the installation directories exist
         setenv HSY_OS_Name  `uname -s`
-        set psy_instroot  = $DevDir/$PSY_ID
-        if (!(-d $DevDir)) then
-           flog $Log mkdir $DevDir
-        endif
-        if (!(-d $psy_instroot)) then
-           flog $Log mkdir $psy_instroot
-        endif
-        if (!(-d $psy_instroot/bin)) then
-           flog $Log mkdir $psy_instroot/bin
-        endif
-        if (!(-d $psy_instroot/lib)) then
-           flog $Log mkdir $psy_instroot/lib
-        endif
-        if (!(-d $psy_instroot/include)) then
-           flog $Log mkdir $psy_instroot/include
-        endif
-        if (!(-d $psy_instroot/include/shell)) then
-           flog $Log mkdir $psy_instroot/include/shell
-        endif
-        if (!(-d $psy_instroot/etc)) then
-           flog $Log mkdir $psy_instroot/etc
-        endif
-        if (!(-d $psy_instroot/man)) then
-           flog $Log mkdir $psy_instroot/man
-        endif
-        if (!(-d $psy_instroot/man/man1)) then
-           flog $Log mkdir $psy_instroot/man/man1
-        endif
-        if (!(-d $psy_instroot/man/man3)) then
-           flog $Log mkdir $psy_instroot/man/man3
-        endif
-        if (!(-d $psy_instroot/scheme)) then
-           flog $Log mkdir $psy_instroot/scheme
-        endif
-        if (!(-d $psy_instroot/scheme/extensions)) then
-           flog $Log mkdir $psy_instroot/scheme/extensions
-        endif
-        if (!(-d $psy_instroot/log)) then
-           flog $Log mkdir $psy_instroot/log
-        endif
-        unset psy_instroot
 
 # make sure the log directory is there - do not wait for later
         if (!(-d $LogDir)) then
            mkdir -p $LogDir
+        endif
+        if (!(-d $PSY_Root/log)) then
+           flog $Log mkdir $PSY_Root/log
         endif
 
         InitLog Log $LogDir/config
@@ -1003,6 +963,44 @@ switch ($Cmnd)
         Note $Log "PSY_CONFIG_PATH = $PSY_CONFIG_PATH"
 
         flog $Log umask
+
+# make sure that the installation directories exist
+        if (!(-d $DevDir)) then
+           flog $Log mkdir $DevDir
+        endif
+        if (!(-d $PSY_Root)) then
+           flog $Log mkdir $PSY_Root
+        endif
+        if (!(-d $PSY_Root/bin)) then
+           flog $Log mkdir $PSY_Root/bin
+        endif
+        if (!(-d $PSY_Root/lib)) then
+           flog $Log mkdir $PSY_Root/lib
+        endif
+        if (!(-d $PSY_Root/include)) then
+           flog $Log mkdir $PSY_Root/include
+        endif
+        if (!(-d $PSY_Root/include/shell)) then
+           flog $Log mkdir $PSY_Root/include/shell
+        endif
+        if (!(-d $PSY_Root/etc)) then
+           flog $Log mkdir $PSY_Root/etc
+        endif
+        if (!(-d $PSY_Root/man)) then
+           flog $Log mkdir $PSY_Root/man
+        endif
+        if (!(-d $PSY_Root/man/man1)) then
+           flog $Log mkdir $PSY_Root/man/man1
+        endif
+        if (!(-d $PSY_Root/man/man3)) then
+           flog $Log mkdir $PSY_Root/man/man3
+        endif
+        if (!(-d $PSY_Root/scheme)) then
+           flog $Log mkdir $PSY_Root/scheme
+        endif
+        if (!(-d $PSY_Root/scheme/extensions)) then
+           flog $Log mkdir $PSY_Root/scheme/extensions
+        endif
 
         flog $Log $RM *.core *~
         flog $Log $RM $LogDir/analyze*
@@ -1179,9 +1177,10 @@ switch ($Cmnd)
         flog $Log set PCO = ( $BinDir/pco $dbopt -env $PSY_MngDir/pact.env -l )
 
         Separator $Log
-        flog $Log $PERDB PACT_VERSION=$PACTVer
+        dbset PSY_Dbg_Opt  $ldof
+        dbset PACT_VERSION $PACTVer
 	if ($platform == TRUE) then
-           flog $Log $PERDB CROSS_REF=$cross_ref
+           dbset CROSS_REF $cross_ref
         endif
 
 # start the env files
@@ -1258,11 +1257,9 @@ switch ($Cmnd)
 # now that PCO made us one, source it        
         source $EnvCsh
 
-# remove any pact version from the path
-        eval `$PSY_ScrDir/simplify-path -p pact`
-        
 # cleanup path so as not to tax wimpy OSs such as Solaris
-        eval `$PSY_ScrDir/simplify-path`
+# and remove any extra pact version from the path
+        eval `$PSY_ScrDir/simplify-path -p pact`
 
         flog $Log chmod a+x code-date
         flog $Log pwd

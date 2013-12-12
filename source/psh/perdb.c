@@ -171,7 +171,8 @@ static char *srv_save_db(database *db, char *fname,
 /* SRV_LOAD_DB - load the database */
 
 static char *srv_load_db(client *cl, char *fname, char *var)
-   {char s[BFLRG];
+   {int nva, nvb;
+    char s[BFLRG];
     char *root;
     FILE *fp;
     database *db;
@@ -196,18 +197,22 @@ static char *srv_load_db(client *cl, char *fname, char *var)
 	    return(t);};
         fname = path_tail(s);};
 	   
+    nvb = (db->tab != NULL) ? db->tab->ne : 0;
+
     load_db(db, var, fp);
+
+    nva = (db->tab != NULL) ? db->tab->ne : 0;
 
     if (fname == NULL)
        {if (var == NULL)
-	   snprintf(t, BFLRG, "loaded database");
+	   snprintf(t, BFLRG, "loaded database (%d vars)", nva-nvb);
         else
 	   snprintf(t, BFLRG, "loaded %s", var);}
 
     else
        {if (var == NULL)
-	   snprintf(t, BFLRG, "loaded database from %s",
-		    fname);
+	   snprintf(t, BFLRG, "loaded database from %s (%d vars)",
+		    fname, nva-nvb);
 	else
 	   snprintf(t, BFLRG, "loaded %s from %s",
 		    var, fname);};
@@ -393,7 +398,7 @@ static char *do_save(database *db, char *s)
  *         -    <inf>    := stdin | stdout | stderr | <db> | <file>
  *         -    <db>     := <identifier>
  *         -    <file>   := <full-path>
- *         -     <var>   := variable name to be saved
+ *         -    <var>    := variable name to be loaded
  *         - if <inf> is stdin load from that device
  *         - else if <inf> is full path load from specified file
  *         - otherwise database will be named <root>.<db>.db
