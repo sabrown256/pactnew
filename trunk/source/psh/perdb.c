@@ -528,6 +528,23 @@ static char *do_set_get(database *db, char *s, char *fmt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DO_DEL - handle variable remove operations */
+
+static char *do_del(database *db, char *s)
+   {char *var, *val;
+    static char t[BFLRG];
+
+    key_val(&var, &val, s, "= \t\n");
+
+    delete_db(db, var);
+
+    snprintf(t, BFLRG, "%s deleted", var);
+
+    return(t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DO_VAR_ACC - handle variable access: set, get, condi, defd */
 
 static char **do_var_acc(database *db, char *s)
@@ -568,10 +585,14 @@ static char **do_var_acc(database *db, char *s)
 
 	 if (strncmp(t, "fmt:", 4) == 0)
 	    {fmt = STRSAVE(t+4);
-	     continue;}
+	     continue;};
+
+/* variable delete */
+	 if (strncmp(t, "del:", 4) == 0)
+	    val = lst_push(val, do_del(db, t+4));
 
 /* variable conditional init */
-	 if (strstr(t, "=\?") != NULL)
+	 else if (strstr(t, "=\?") != NULL)
 	    val = lst_push(val, do_cond_init(db, t, fmt));
 
 /* variable defined? */

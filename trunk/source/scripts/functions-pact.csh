@@ -123,6 +123,16 @@ alias dbsets    'set \!\!:1 = ( `$PERDB -e \!\!:1 = \!\!:2-$` )'
 alias dbget     'setenv \!\!:1 `$PERDB -e \!\!:1`'
 alias dbgets    'set \!\!:1 = ( `$PERDB -e \!\!:1` )'
 
+# dbunset remove a database variable from the database
+# and the current environment
+# use dbunset instead of unsetenv
+# matches C call dbunset
+# usage: dbunset <var>
+#        echo $<var>
+
+alias dbunset     '$PERDB del:\!\!:1 ; unsetenv \!\!:1'
+alias dbunsets    '$PERDB del:\!\!:1 ; unset \!\!:1'
+
 # dbdef queries database for existence of a variable
 # matches C call dbdef
 # usage: dbdef <var>

@@ -16,4 +16,11 @@ v2 ? defined
 v2=abc
 saved variables
 -----------------------------------
+-----------------------------------
+v2 deleted
+v2 ? undefined
+
+v1=abc
+saved database
+-----------------------------------
 done
