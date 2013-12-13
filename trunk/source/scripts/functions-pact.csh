@@ -130,8 +130,8 @@ alias dbgets    'set \!\!:1 = ( `$PERDB -e \!\!:1` )'
 # usage: dbunset <var>
 #        echo $<var>
 
-alias dbunset     '$PERDB del:\!\!:1 ; unsetenv \!\!:1'
-alias dbunsets    '$PERDB del:\!\!:1 ; unset \!\!:1'
+alias dbunset     '$PERDB del:\!\!:1 >& /dev/null ; unsetenv \!\!:1'
+alias dbunsets    '$PERDB del:\!\!:1 >& /dev/null  ; unset \!\!:1'
 
 # dbdef queries database for existence of a variable
 # matches C call dbdef

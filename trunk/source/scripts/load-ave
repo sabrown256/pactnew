@@ -1,0 +1,106 @@
+#!/bin/csh -f
+#
+# LOAD-AVE - report the load averages portably
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+# add the path to here iff you are able to verify it
+set exe = $0
+if ($exe !~ /*) then
+   set exe = $cwd/$exe
+endif
+if (-x "$exe") then
+   set path = ( $exe:h $path )
+endif
+
+set cnt  = FALSE
+set allh = FALSE
+set vrb  = TRUE
+set SSH  = 'ssh -q -x -o BatchMode=yes -o StrictHostKeyChecking=no'
+
+set HostFile = $HOME/.all-hosts
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           set allh = TRUE
+           breaksw
+
+      case -c:
+           set cnt = TRUE
+           breaksw
+
+      case -f:
+           shift
+           set HostFile = $1
+           breaksw
+
+      case -h:
+           echo ""
+           echo "Usage:  load-ave [-a] [-c] [-f <file>] [-h] [-q]"
+           echo "   a  all hosts"
+           echo "   c  run continuously"
+           echo "   f  use file to define hosts"
+           echo "   h  this help message"
+           echo "   q  quiet mode"
+           echo ""
+           exit(1)
+           breaksw
+
+      case -q:
+           set vrb = FALSE
+           breaksw
+
+   endsw
+   shift
+end
+
+if (($allh == TRUE) && (-e $HostFile)) then
+   set Hosts = `awk '$1 !~ /#/ { print }' $HostFile`
+else
+   set Hosts = "this-host"
+endif
+
+set lda = `which w`
+if (!(-x "$lda")) then
+   set lda = `which uptime`
+endif
+if (!(-x "$lda")) then
+   echo "No means to get load averages - exiting"
+   exit(1)
+endif
+
+if ($cnt == TRUE) then
+   clear
+endif
+if ($vrb == TRUE) then
+   echo "Load Averages:"
+endif
+
+while (1)
+
+   if ("$Hosts" == this-host) then
+      set inf = ( `$lda | head -n 1 | sed 's|^.*:||' | sed 's|,| |g'` )
+      printf "   %5.2f\t%5.2f\t%5.2f\t\n" $inf[1] $inf[2] $inf[3]
+   else
+      foreach i ($Hosts)
+         set inf = ( `dmnz -i 5 -n 1 $SSH $i $exe | sed 's|^.*:||'` )
+         if ($#inf > 2) then
+            printf "   %-25s: %5.2f\t%5.2f\t%5.2f\t\n" $i $inf[1] $inf[2] $inf[3]
+         endif
+      end
+   endif
+
+# move the cursor back up
+   if ($cnt == TRUE) then
+      echo "[H"
+   else
+      echo " "
+      break
+   endif
+end
+
+exit($status)

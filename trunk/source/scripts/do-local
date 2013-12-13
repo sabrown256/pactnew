@@ -718,10 +718,14 @@ INITLOG:
    Note $LogHost ""
    Note $LogHost "----- SYSTEM -----"
    Note $LogHost ""
-# uptime gives errors on some systems
-#   flog $LogHost uptime
-# this works everywhere
-   w | head -n 1 >>& $LogHost
+   set lda = `which load-ave`
+   if (-x "$lda") then
+      $lda >>& $LogHost
+   else
+# GOTCHA: w is not everywhere - use load-ave to work it out
+# but we will have to copy load-ave down as well as timer, ...
+      w | head -n 1 >>& $LogHost
+   endif
 
    set TmpFile = ~/.do-local-tmp-$hsy_uhost-$$
    $RM $TmpFile
