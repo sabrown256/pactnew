@@ -157,7 +157,7 @@ while ($i < $ne)
    printenv $nn >& /dev/null
    if ($status == 0) then
       set nv = ( `printenv $nn` )
-      if (($#nv > 1) || ($nn == SHELL_Cont))then
+      if (($#nv > 1) || ("$nv" =~ *'[ 	\]'*)) then
          printf 'setenv %-24s "%s"\n' $on "$nv" >>& $envcsh
          printf 'export %s="%s"\n' $on "$nv" >>& $envsh
          printf 'dk_setenv %-24s "%s"\n' $on "$nv" >>& $envdk

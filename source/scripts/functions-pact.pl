@@ -126,6 +126,22 @@ sub dbsets {
     ${$var} = `$PERDB $var = $val`;
 }
 
+# dbunset removes a variable from the database and the current environment
+# use dbunset instead of unsetenv
+# matches C call dbunset
+# usage: dbunset <var>
+
+sub dbunset {
+    my $var = shift;
+    `$PERDB del:$var`;
+    $ENV{$var} = "";
+}
+
+sub dbunsets {
+    my $var = shift;
+    `$PERDB del:$var`;
+}
+
 # dbget imports a database variable into the current environment
 # use dbget before referencing the variable
 # matches C call dbget

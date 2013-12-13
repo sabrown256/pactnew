@@ -151,6 +151,23 @@ dbgets () {
    eval "$var='`$PERDB -e $var`'"
 }
 
+# dbunset removes a variable from the database and the current environment
+# use dbunset instead of unsetenv
+# matches C call dbunset
+# usage: dbunset <var>
+
+dbunset () {
+   var=$1
+   $PERDB del:$var
+   unset $var
+}
+
+dbunsets () {
+   var=$1
+   $PERDB del:$var
+   unset -f $var
+}
+
 # dbdef queries database for existence of a variable
 # matches C call dbdef
 # usage: dbdef <var>
