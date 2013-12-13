@@ -38,7 +38,6 @@ dbmget $Log ACC_Debug_Default^      \
             Cfg_CC_Exe^             \
             Cfg_CC_Flags^           \
             Cfg_CC_Inc^             \
-            ConfigVars^             \
             CROSS_FE^               \
             DP_BE^                  \
             DP_METHOD^              \
@@ -73,6 +72,7 @@ dbmget $Log ACC_Debug_Default^      \
             PACT_FC_VERSION^        \
             PACT_FC_PATH^           \
             PACT_FC_EXE^            \
+            PCO_UseVars^            \
             PSY_Base^               \
             PSY_Cfg^                \
             PSY_Root^               \
@@ -338,7 +338,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     foreach g (Std Cfg Cfe Ser Shared)
        Note $STDOUT ""
        Note $STDOUT "# group ${g}"
-       foreach v ($ConfigVars)
+       foreach v ($PCO_UseVars)
           DEFD_VAR ${g}_${v}
           if ("$ok" == "") then
              Note $STDOUT "${g}_${v} = `printenv ${v}`"

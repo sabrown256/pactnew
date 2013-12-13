@@ -19,7 +19,7 @@ include features/dld
 
 setenv ENV_GT "AF BFD CC Cfg CRAY CROSS CXX DB DO_RUN DP FC FS \
                HDF HSY IBM JOBS JPEG LibM MAKE MDG MINGW MYSQL \
-               OS PACT PNG PSY PY RF SQLITE3 TEST TRACKER"
+               OS PACT PNG PCO PSY PY RF SQLITE3 TEST TRACKER"
 
 setenv ENV_VARS "Bits LIB \
                  HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
@@ -277,6 +277,24 @@ Group PACT {
    CC_VERSION = ""
    FC_FAMILY  = generic
    FC_VERSION = ""
+}
+
+# PCO SYstem group
+#   PCO_UseVars      variables cloned by Use statement
+
+Group PCO {
+   RemDup  =  "DP_Inc MDG_Inc MD_Inc CC_Inc"
+   RemDup  =+ "DP_Lib MD_Lib LD_Lib"
+
+# NOTE: for OSX this would reduce -framework FOO -framework BAR
+# to -framework FOO BAR which is not legal
+#   RemDup  =+ "MDG_Lib"
+
+   RemDup  =+ "DP_Path"
+
+   UseVars =  "CC_Exe CC_Linker CC_Flags CC_Debug CC_Optimize CC_Inc"
+   UseVars =+ "FC_Exe FC_Linker FC_Flags FC_Debug FC_Optimize"
+   UseVars =+ "LD_Exe LD_RPath LD_Flags LD_Lib"
 }
 
 # PACT SYstem group

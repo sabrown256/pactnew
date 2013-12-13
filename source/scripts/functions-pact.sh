@@ -158,13 +158,13 @@ dbgets () {
 
 dbunset () {
    var=$1
-   $PERDB del:$var
+   $PERDB del:$var > /dev/null 
    unset $var
 }
 
 dbunsets () {
    var=$1
-   $PERDB del:$var
+   $PERDB del:$var > /dev/null 
    unset -f $var
 }
 

@@ -66,7 +66,7 @@ scm slice.scm movie.scm
 
 script do-local do-automake do-stats iopr iocl nbit
 script nfsmon timer rmalbut px sinstall ls-jobs ls-all
-script run-all load-all mall sign gcc-info system-id cfgman
+script run-all load-ave mall sign gcc-info system-id cfgman
 script update-sys update-watch plock cleanup-jobs fix-group
 script herd cover find-fnc diff-code diff-tree descend bckgr
 script broadcast check-hosts check-service all-service dot-silent

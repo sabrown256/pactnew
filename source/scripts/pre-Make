@@ -11,7 +11,7 @@ TGTCScr = do-net atdbg
 TGTScr = do-local do-stats do-automake distribute \
          cfgsys cfgman system-id sys-site nbit plock \
          iopr iocl nfsmon timer px \
-         ls-jobs ls-jobs-cygwin ls-all running run-all load-all \
+         ls-jobs ls-jobs-cygwin ls-all running run-all load-ave \
          rmalbut sign cleanup-jobs remod mem-stats \
          herd cover find-fnc diff-code label-ps bckgr \
          broadcast descend dot-silent no-op dargs fix-group \

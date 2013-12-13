@@ -11,9 +11,12 @@
 unalias *
 
 # add the path to here iff you are able to verify it
-set Exe = `dirname $0`
-if (-x "$Exe/ls-jobs") then
-   set path = ( $Exe $path )
+set exe = $0
+if ($exe !~ /*) then
+   set exe = $cwd/$exe
+endif
+if (-x "$exe") then
+   set path = ( $exe:h $path )
 endif
 
 set OSType     = `uname -s`
@@ -131,7 +134,7 @@ if ($OSType == SunOS) then
    set path = ( /usr/xpg4/bin $path )
 endif
 
-set LOADAVE = w
+set LOADAVE = ( load-ave -q )
 set CLEAR   = clear
 
 if (($OSType == "Darwin") || ($OSType == "FreeBSD")) then
@@ -153,7 +156,6 @@ else if ($OSType =~ CYGWIN*) then
    set PS      = "/bin/ps -elf"
    set CED     = "[2J"    # clear all
    set Home    = "[1;1H"
-   set LOADAVE = ( echo "No load info available" )
    set CLEAR   = ( echo $CED$Home )
 
 # BeOS has nonstandard ps
@@ -161,7 +163,6 @@ else if ($OSType =~ Haiku*) then
    set PS      = "/bin/ps"
    set CED     = "[2J"    # clear all
    set Home    = "[1;1H"
-   set LOADAVE = ( echo "No load info available" )
    set CLEAR   = ( echo $CED$Home )
 
 else
@@ -239,7 +240,7 @@ endif
 if ($Continuous == TRUE) then
    $CLEAR
    echo ""
-   $LOADAVE | head -n 1
+   $LOADAVE
    echo ""
 endif
 

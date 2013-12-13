@@ -139,7 +139,6 @@ struct s_state
     char cfgf[BFLRG];          /* config file name */
     char logf[BFLRG];          /* log file name */
 
-    char cfgv[BFLRG];          /* config variables */
     char def_tools[BFLRG];     /* default tools */
     char def_groups[BFLRG];    /* defaults groups */
     char toolv[BFLRG];         /* tool variables */
@@ -486,8 +485,9 @@ static void write_pco(client *cl, state *st, char *dbname)
 			 "Tool", NULL, NULL, "");
     ASSERT(rv == 0);
 
-    rv = write_class_pco(cl, out, st->def_groups,
-			 "Group", st->def_tools, "Tool", "");
+    rv = write_class_pco(cl, out,
+			 st->def_groups, "Group",
+			 st->def_tools, "Tool", "");
     ASSERT(rv == 0);
 
     fclose_safe(out);
@@ -693,8 +693,8 @@ static int pco_save_db(client *cl, char *dbname)
 
     rv = TRUE;
 
-    dbset(cl, "Tools",  st.def_tools);
-    dbset(cl, "Groups", st.def_groups);
+    dbset(cl, "PCO_Tools",  st.def_tools);
+    dbset(cl, "PCO_Groups", st.def_groups);
 
 /* save the persistent database */
     if (dbname == NULL)
@@ -1509,7 +1509,9 @@ static void setup_analyze_env(client *cl, char *base)
  */
 
 static void setup_output_env(client *cl, char *base)
-   {
+   {int i, nv;
+    char dlst[BFLRG];
+    char **sa;
 
 /* close any open intermediate files and export their names */
     dbset(cl, "DPFile", st.aux.dpfn);
@@ -1529,6 +1531,14 @@ static void setup_output_env(client *cl, char *base)
        fclose_safe(st.aux.URF);
 
 /* remove duplicate tokens in selected lists */
+    nstrncpy(dlst, BFLRG, dbget(cl, FALSE, "PCO_RemDup"), -1);
+    sa = tokenize(dlst, " \t", 0);
+    nv = lst_length(sa);
+    for (i = 0; i < nv; i++)
+       dbset(cl, sa[i], unique(dbget(cl, FALSE, sa[i]), FALSE, ' '));
+    free_strings(sa);
+
+#if 0
     dbset(cl, "DP_Inc",  unique(dbget(cl, FALSE, "DP_Inc"),  FALSE, ' '));
     dbset(cl, "MDG_Inc", unique(dbget(cl, FALSE, "MDG_Inc"), FALSE, ' '));
     dbset(cl, "MD_Inc",  unique(dbget(cl, FALSE, "MD_Inc"),  FALSE, ' '));
@@ -1545,6 +1555,7 @@ static void setup_output_env(client *cl, char *base)
  */
     if (strcmp(st.os, "Darwin") != 0)
        dbset(cl, "MDG_Lib", unique(dbget(cl, FALSE, "MDG_Lib"), FALSE, ' '));
+#endif
 
     dbset(cl, "PSY_CfgDir",  st.dir.cfg);
 
@@ -1554,7 +1565,6 @@ static void setup_output_env(client *cl, char *base)
 
     dbset(cl, "Load",        st.loadp ? "TRUE" : "FALSE");
     dbset(cl, "NoExe",       st.exep ? "TRUE" : "FALSE");
-    dbset(cl, "ConfigVars",  st.cfgv);
     dbset(cl, "DefGroups",   st.def_groups);
     dbset(cl, "CONFIG_FILE", st.cfgf);
 
@@ -1617,24 +1627,6 @@ static void default_var(client *cl, char *base)
     push_tok(st.toolv, BFLRG, ' ', "RPath");
     push_tok(st.toolv, BFLRG, ' ', "IFlag");
     push_tok(st.toolv, BFLRG, ' ', "XFlag");
-
-/* define and initialize the (special) config variables */
-    st.cfgv[0] = '\0';
-    push_tok(st.cfgv, BFLRG, ' ', "CC_Exe");
-    push_tok(st.cfgv, BFLRG, ' ', "CC_Linker");
-    push_tok(st.cfgv, BFLRG, ' ', "CC_Flags");
-    push_tok(st.cfgv, BFLRG, ' ', "CC_Debug");
-    push_tok(st.cfgv, BFLRG, ' ', "CC_Optimize");
-    push_tok(st.cfgv, BFLRG, ' ', "CC_Inc");
-    push_tok(st.cfgv, BFLRG, ' ', "FC_Exe");
-    push_tok(st.cfgv, BFLRG, ' ', "FC_Linker");
-    push_tok(st.cfgv, BFLRG, ' ', "FC_Flags");
-    push_tok(st.cfgv, BFLRG, ' ', "FC_Debug");
-    push_tok(st.cfgv, BFLRG, ' ', "FC_Optimize");
-    push_tok(st.cfgv, BFLRG, ' ', "LD_Exe");
-    push_tok(st.cfgv, BFLRG, ' ', "LD_RPath");
-    push_tok(st.cfgv, BFLRG, ' ', "LD_Flags");
-    push_tok(st.cfgv, BFLRG, ' ', "LD_Lib");
 
     strcpy(st.psy_cfg, path_tail(st.cfgf));
 
@@ -1704,8 +1696,8 @@ static void reset_make_vars(void)
     if (st.aux.MVF == NULL)
        st.aux.MVF = open_file("w", st.aux.mvfn);
 
-    nstrncpy(st.def_tools, BFLRG, cgetenv(FALSE, "Tools"), -1);
-    nstrncpy(st.def_groups, BFLRG, cgetenv(FALSE, "Groups"), -1);
+    nstrncpy(st.def_tools, BFLRG, cgetenv(FALSE, "PCO_Tools"), -1);
+    nstrncpy(st.def_groups, BFLRG, cgetenv(FALSE, "PCO_Groups"), -1);
 
     ta = cenv(FALSE, NULL);
     if (ta != NULL)
@@ -2309,7 +2301,7 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 
 static void process_use(client *cl, char *sg, char *oper)
    {int whch;
-    char nvr[BFLRG];
+    char nvr[BFLRG], ulst[BFLRG];
     char *val;
 
     whch = -1;
@@ -2334,7 +2326,8 @@ static void process_use(client *cl, char *sg, char *oper)
        {case STACK_GROUP:
              note(Log, TRUE, "Use group %s to fill group %s",
 		  sg, dbget(cl, FALSE, "CurrGrp"));
-             FOREACH(var, st.cfgv, " ")
+             snprintf(ulst, BFLRG, "%s", dbget(cl, FALSE, "PCO_UseVars"));
+             FOREACH(var, ulst, " ")
                 snprintf(nvr, BFLRG, "%s_%s", sg, var);
                 if (dbdef(cl, nvr) == TRUE)
                    {val = dbget(cl, TRUE, nvr);

@@ -47,6 +47,8 @@ while ($#argv > 0)
 end
 
 if (($?PSY_ID == 1) && ($?PSY_Base == 1)) then
+echo "-->> PSY_Base = |$PSY_Base|"
+echo "-->> PSY_ID   = |$PSY_ID|"
    setenv ALog $PSY_Base/dev/$PSY_ID/log/analyze.use-compiler
 else
    setenv ALog /dev/null

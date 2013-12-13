@@ -133,13 +133,13 @@ sub dbsets {
 
 sub dbunset {
     my $var = shift;
-    `$PERDB del:$var`;
+    my $inf = `$PERDB del:$var`;
     $ENV{$var} = "";
 }
 
 sub dbunsets {
     my $var = shift;
-    `$PERDB del:$var`;
+    my $inf = `$PERDB del:$var`;
 }
 
 # dbget imports a database variable into the current environment
