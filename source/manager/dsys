@@ -365,7 +365,7 @@ switch ($Cmnd)
            NoteD $Log ""
            Separator $Log
            NoteD $Log "Cross compile fixes"
-           set srcb = $PSY_Base/dev/$CROSS_REF/bin
+           set srcb = $CROSS_REF/bin
 	   if ($srcb != $BinDir) then
               set CrossFix = ( hserve mpi-io-wrap )
 #              set CrossFix = ( $CrossFix ps-diff png-diff )

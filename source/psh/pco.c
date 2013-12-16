@@ -2088,7 +2088,7 @@ static void env_subst(client *cl, char *refvar, char *nt)
 	   {nv = lst_length(ta);
 	    for (i = 0; i < nv; i++)
 	        {vr = ta[i];
-		 if (vr != NULL)
+		 if ((vr != NULL) && (strncmp(vr, "CROSS_REF=", 10) != 0))
 		    {vl = strchr(vr, '=');
 		     if (vl != NULL)
 		        {*vl++ = '\0';
@@ -2420,7 +2420,7 @@ static void do_platform(client *cl, char *oper, char *value)
     note(Log, TRUE, "");
 
 /* assemble the config command line */
-    snprintf(t, BFLRG, "./dsys config -plt %s", st.psy_id);
+    snprintf(t, BFLRG, "./dsys config -plt %s", st.dir.root);
 
 /* add options affecting all platforms */
     if (st.abs_deb == TRUE)
