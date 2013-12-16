@@ -240,7 +240,7 @@ endif
 if ($Continuous == TRUE) then
    $CLEAR
    echo ""
-   $LOADAVE
+   echo "Load averages: `$LOADAVE`"
    echo ""
 endif
 
