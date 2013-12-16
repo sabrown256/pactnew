@@ -1538,25 +1538,6 @@ static void setup_output_env(client *cl, char *base)
        dbset(cl, sa[i], unique(dbget(cl, FALSE, sa[i]), FALSE, ' '));
     free_strings(sa);
 
-#if 0
-    dbset(cl, "DP_Inc",  unique(dbget(cl, FALSE, "DP_Inc"),  FALSE, ' '));
-    dbset(cl, "MDG_Inc", unique(dbget(cl, FALSE, "MDG_Inc"), FALSE, ' '));
-    dbset(cl, "MD_Inc",  unique(dbget(cl, FALSE, "MD_Inc"),  FALSE, ' '));
-    dbset(cl, "CC_Inc",  unique(dbget(cl, FALSE, "CC_Inc"),  FALSE, ' '));
-
-    dbset(cl, "DP_Lib",  unique(dbget(cl, FALSE, "DP_Lib"),  FALSE, ' '));
-    dbset(cl, "MD_Lib",  unique(dbget(cl, FALSE, "MD_Lib"),  FALSE, ' '));
-    dbset(cl, "LD_Lib",  unique(dbget(cl, FALSE, "LD_Lib"),  FALSE, ' '));
-
-    dbset(cl, "DP_Path", unique(dbget(cl, FALSE, "DP_Path"), FALSE, ' '));
-
-/* NOTE: for OSX this would reduce -framework FOO -framework BAR
- * to -framework FOO BAR which is not legal
- */
-    if (strcmp(st.os, "Darwin") != 0)
-       dbset(cl, "MDG_Lib", unique(dbget(cl, FALSE, "MDG_Lib"), FALSE, ' '));
-#endif
-
     dbset(cl, "PSY_CfgDir",  st.dir.cfg);
 
     dbset(cl, "BinDir",  st.dir.bin);
