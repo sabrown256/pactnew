@@ -80,10 +80,10 @@ dbmget $Log CROSS_COMPILE^               \
        Note $Log "   BinDir    = |$BinDir|"
        Note $Log "   CROSS_REF = |$CROSS_REF|"
 
-       set srcb = $PSY_Base/dev/$CROSS_REF/bin
-       set dm   = $srcb/dmake
+       set srcb = $CROSS_REF/bin
 
-       Note $Log "   dm        = |$dm|"
+       set dm = $srcb/dmake
+       Note $Log "   dmake     = |$dm|"
        if (-x "$dm") then
           flog $Log cp $dm ${BinDir}/dmake
           flog $Log set err = 0
@@ -91,7 +91,7 @@ dbmget $Log CROSS_COMPILE^               \
 # try pact if no dmake found
        else
           set dm = $srcb/pact
-          Note $Log "   dm        = |$dm|"
+          Note $Log "   pact      = |$dm|"
           if (-x "$dm") then
              flog $Log cp $dm ${BinDir}/dmake
              flog $Log set err = 0

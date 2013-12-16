@@ -130,7 +130,7 @@ foreach g (Cfg Cfe Ser Std Shared)
    end
 
 # linker
-   foreach f (Exe Lib RPath)
+   foreach f (Exe Lib RPath Flags)
       set vl = ( $vl ${g}_LD_${f} )
    end
 end
