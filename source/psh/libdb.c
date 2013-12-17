@@ -177,7 +177,7 @@ int dbset(client *cl, char *var, char *fmt, ...)
  */
 	    err = putenv(t);
 
-	    note(Log, TRUE, "setenv %s %s", var, s);
+	    note(NULL, "setenv %s %s\n", var, s);
 
 	    lst_free(ta);};};
 

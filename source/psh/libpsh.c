@@ -14,6 +14,7 @@
 # define LIBPSH
 
 # include "libfio.c"
+# include "liblog.c"
 
 /*--------------------------------------------------------------------------*/
 
@@ -48,9 +49,6 @@ struct s_dir_stack
 static char
  epath[BFLRG],
  lpath[BFLRG];
-
-static FILE
- *Log;
 
 static dir_stack
  dstck;
@@ -1157,33 +1155,6 @@ char *subst(char *s, char *a, char *b, size_t n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CAT - add NCAT lines FNAME to OUT
- *     - skip the first NSKIP lines
- *     - a value of -1 for NCAT becomes INT_MAX which is the whole file
- */
-
-void cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...)
-   {int i;
-    char fname[BFLRG], s[BFLRG];
-    FILE *in;
-
-    VA_START(fmt);
-    VSNPRINTF(fname, BFLRG, fmt);
-    VA_END;
-
-    in = fopen_safe(fname, "r");
-    if (in != NULL)
-       {for (i = 0; fgets(s, BFLRG, in) != NULL; i++)
-            {if ((nskip <= i) && (i < ncat))
-	        fputs(s, out);};
-
-	fclose_safe(in);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* COPY - copy the file IN to OUT */
 
 void copy(char *out, char *fmt, ...)
@@ -1548,8 +1519,8 @@ char *run(int echo, char *fmt, ...)
     VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
-    if ((Log != NULL) && (echo & CMD_LINE))
-       fprintf(Log, "Command: %s\n", s);
+    if (echo & CMD_LINE)
+       note(NULL, "Command: %s\n", s);
 
     snprintf(cmd, BFLRG, "PATH=.:%s:%s ; %s", epath, lpath, s);
 
@@ -1567,8 +1538,8 @@ char *run(int echo, char *fmt, ...)
 
     LAST_CHAR(bf) = '\0';
 
-    if ((Log != NULL) && (echo & CMD_OUT))
-       fprintf(Log, "%s\n", bf);
+    if (echo & CMD_OUT)
+       note(NULL, "%s\n", bf);
 
     return(bf);}
 
@@ -1658,61 +1629,6 @@ void nsleep(int ms)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SEPARATOR - write a line of dashes to FP */
-
-void separator(FILE *fp)
-   {
-
-    if (fp != NULL)
-       fprintf(fp, "--------------------------------------------------------------------------\n\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NOTE - write to FP only */
-
-void note(FILE *fp, int nl, char *fmt, ...)
-   {char bf[BFMG];
-
-    if (fp != NULL)
-       {VA_START(fmt);
-	VSNPRINTF(bf, BFMG, fmt);
-	VA_END;
-
-	fputs(bf, fp);
-	if (nl == TRUE)
-	   fprintf(fp, "\n");};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NOTED - write to FP and to TTY */
-
-void noted(FILE *fp, int nl, char *fmt, ...)
-   {char bf[BFMG];
-
-    VA_START(fmt);
-    VSNPRINTF(bf, BFMG, fmt);
-    VA_END;
-
-    if (fp != NULL)
-       {fputs(bf, fp);
-	if (nl == TRUE)
-	   fprintf(fp, "\n");};
-
-    fputs(bf, stdout);
-    if (nl == TRUE)
-       printf("\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PRINT_TEXT - do the required text printing with \n and \t handled
  *            - properly (some csh's print them literally instead of the
  *            - C way)
@@ -1796,7 +1712,7 @@ int csetenv(char *var, char *fmt, ...)
        {snprintf(t, nc, "%s=%s", var, s);
 	err = putenv(t);
 
-	note(Log, TRUE, "setenv %s %s", var, s);};
+	note(NULL, "setenv %s %s\n", var, s);};
 
     return(err);}
 

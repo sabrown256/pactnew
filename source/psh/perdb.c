@@ -293,7 +293,7 @@ static void srv_setup(srvdes *sv, int *ptmax, int *pdt)
  *                -    <inf>    := stdin | stdout | stderr | <db> | <file>
  *                -    <db>     := <identifier>
  *                -    <file>   := <full-path>
- *                -    <var>    := variable name to be saved
+ *                -    <var>    := variable name (or pattern) to be saved
  */
 
 static void _parse_db_spec(char *s, char **pp, char **pfname, char **pfmt,

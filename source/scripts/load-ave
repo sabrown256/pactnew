@@ -8,13 +8,15 @@
 unalias *
 
 # add the path to here iff you are able to verify it
-set exe = $0
-if ($exe !~ /*) then
-   set exe = $cwd/$exe
-endif
-if (-x "$exe") then
-   set path = ( $exe:h $path )
-endif
+#set exe = $0
+#if ($exe !~ /*) then
+#   set exe = $cwd/$exe
+#endif
+#if (-x "$exe") then
+#   set path = ( $exe:h $path )
+#endif
+# NOTE: for -a option to work - it just has to be on your path
+set exe = load-ave
 
 set cnt  = FALSE
 set allh = FALSE
@@ -76,18 +78,22 @@ endif
 if ($cnt == TRUE) then
    clear
 endif
-if ($vrb == TRUE) then
-   echo "Load Averages:"
-endif
 
 while (1)
 
    if ("$Hosts" == this-host) then
       set inf = ( `$lda | head -n 1 | sed 's|^.*:||' | sed 's|,| |g'` )
-      printf "   %5.2f\t%5.2f\t%5.2f\t\n" $inf[1] $inf[2] $inf[3]
+      if ($vrb == TRUE) then
+         printf "Load Averages: %5.2f %5.2f %5.2f\t\n" $inf[1] $inf[2] $inf[3]
+      else
+         printf "%5.2f\t%5.2f\t%5.2f\t\n" $inf[1] $inf[2] $inf[3]
+      endif
    else
+      if ($vrb == TRUE) then
+         printf "Load Averages:\n"
+      endif
       foreach i ($Hosts)
-         set inf = ( `dmnz -i 5 -n 1 $SSH $i $exe | sed 's|^.*:||'` )
+         set inf = ( `dmnz -i 5 -n 1 $SSH $i $exe -q | sed 's|^.*:||'` )
          if ($#inf > 2) then
             printf "   %-25s: %5.2f\t%5.2f\t%5.2f\t\n" $i $inf[1] $inf[2] $inf[3]
          endif
@@ -98,7 +104,6 @@ while (1)
    if ($cnt == TRUE) then
       echo "[H"
    else
-      echo " "
       break
    endif
 end

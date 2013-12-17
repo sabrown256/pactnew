@@ -7,10 +7,10 @@
 # include "cpyright.h"
 #
 
-DPEnvironment
-   MP_NODES    1
-   MP_PROCS    1
-   MP_RMPOOL   0
-   MP_LABELIO  no
-end
+Group DPEnv {
+   MP_NODES    = 1
+   MP_PROCS    = 1
+   MP_RMPOOL   = 0
+   MP_LABELIO  = no
+}
 
