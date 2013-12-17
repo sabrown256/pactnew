@@ -217,7 +217,7 @@ static char *push_file(char *s, int itype)
 		 ok = file_exists("%s/%s", st.dir.mng, lfile);};};
 
 	if (ok == FALSE)
-	   {noted(Log, "***> Cannot find file '%s'\n", s);
+	   {noted(Log, TRUE, "***> Cannot find file '%s'\n", s);
 	    ok = FALSE;};}
 
     else if (itype == STACK_PROCESS)
@@ -945,7 +945,7 @@ static void write_envf(client *cl, int lnotice)
 
     separator(Log);
     if (lnotice == TRUE)
-       noted(Log, "   Environment setup files - env-pact (csh, sh, dk, and mdl)");
+       noted(Log, TRUE, "   Environment setup files - env-pact (csh, sh, dk, and mdl)");
     else
        note(Log, TRUE, "   Environment setup files - env-pact (csh, sh, dk, and mdl)");
     note(Log, TRUE, "");
@@ -1074,9 +1074,9 @@ static int check_cross(client *cl)
     if (strcmp(s, "FALSE") != 0)
        {s = cgetenv(TRUE, "DB_RUN_SIGNATURE");
 	if (file_exists(s) == FALSE)
-	   {noted(Log, "");
-	    noted(Log, "Cross compiling without a run_signature database - exiting");
-	    noted(Log, "");
+	   {noted(Log, TRUE, "");
+	    noted(Log, TRUE, "Cross compiling without a run_signature database - exiting");
+	    noted(Log, TRUE, "");
 	    rv = FALSE;}
 	else
 	   {dbset(cl, "DB_RUN_SIGNATURE", s);
@@ -1112,13 +1112,13 @@ static void check_dir(client *cl)
                      push_tok(Created, BFLRG, ' ', "%s/%s", sib, dir);};};};
 
         if (IS_NULL(Created) == FALSE)
-           {noted(Log, "");
-            noted(Log, "Directories:");
+           {noted(Log, TRUE, "");
+            noted(Log, TRUE, "Directories:");
             FOREACH(dir, Created, " ")
-               noted(Log, "   %s", dir);
+               noted(Log, TRUE, "   %s", dir);
             ENDFOR
-            noted(Log, "have been created as requested");
-            noted(Log, "");};}
+            noted(Log, TRUE, "have been created as requested");
+            noted(Log, TRUE, "");};}
 
     else
        {Missing[0] = '\0';
@@ -1129,16 +1129,16 @@ static void check_dir(client *cl)
                     {push_tok(Missing, BFLRG, ' ', "%s/%s", sib, dir);};};};
 
         if (IS_NULL(Missing) == FALSE)
-           {noted(Log, "");
-            noted(Log, "You have asked that PACT be installed in the following");
-            noted(Log, "missing directories:");
+           {noted(Log, TRUE, "");
+            noted(Log, TRUE, "You have asked that PACT be installed in the following");
+            noted(Log, TRUE, "missing directories:");
             FOREACH (dir, Missing, " ")
-               noted(Log, "   %s", dir);
+               noted(Log, TRUE, "   %s", dir);
             ENDFOR
-            noted(Log, "You must either use the -c option to create these");
-            noted(Log, "directories, choose another place to install PACT,");
-            noted(Log, "or specify -i none for no installation");
-            noted(Log, "");
+            noted(Log, TRUE, "You must either use the -c option to create these");
+            noted(Log, TRUE, "directories, choose another place to install PACT,");
+            noted(Log, TRUE, "or specify -i none for no installation");
+            noted(Log, TRUE, "");
 
             exit(2);};};
 
@@ -1188,7 +1188,7 @@ static void read_line(char *s, int nc)
 /* toss blank and comment lines */
 	if (blank_line(s) == TRUE)
            {if (st.verbose == TRUE)
-	       noted(Log, "%s line %d ignored: %s",
+	       noted(Log, TRUE, "%s line %d ignored: %s",
 		     se->name, se->iline, s);
 	    s[0] = '\0';};}
     else
@@ -2271,7 +2271,7 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 	    FREE(t);};}
 
     else
-       noted(Log, "Bad operator '%s' in SET_VAR", oper);
+       noted(Log, TRUE, "Bad operator '%s' in SET_VAR", oper);
 
     return;}
 
@@ -2470,18 +2470,18 @@ static void config_platforms(void)
    {int i, ok;
     char *cmd, *cfg;
 
-    noted(Log, "");
+    noted(Log, TRUE, "");
 
     for (i = 0; i < st.np; i++)
         {cmd = st.pltfcmd[i];
 	 cfg = st.pltfcfg[i];
 
-	 noted(Log, "----------------------------------------------");
+	 noted(Log, TRUE, "----------------------------------------------");
 
 /* run the config for this platform */
 	 ok = system(cmd);
 	 if (ok != 0)
-	    {noted(Log, "Configuration of platform %s failed - exiting",
+	    {noted(Log, TRUE, "Configuration of platform %s failed - exiting",
 		   cfg);
 	     exit(1);}
 	 else
@@ -2489,7 +2489,7 @@ static void config_platforms(void)
 		 cfg);};
 
     if (st.np > 0)
-       noted(Log, "----------------------------------------------");
+       noted(Log, TRUE, "----------------------------------------------");
 
     free_strings(st.pltfcmd);
     free_strings(st.pltfcfg);
@@ -2564,8 +2564,8 @@ static void read_config(client *cl, char *cfg, int quiet)
        {note(Log, TRUE, "");
 	note(Log, TRUE, "Reading configuration file %s", cfg);}
     else
-       {noted(Log, "");
-	noted(Log, "Reading configuration file %s", cfg);};
+       {noted(Log, TRUE, "");
+	noted(Log, TRUE, "Reading configuration file %s", cfg);};
     note(Log, TRUE, "");
 
     note(Log, TRUE, "");
@@ -2578,7 +2578,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 /* toplevel loop over the input to define configuration parameters */
     for (il = 0; TRUE; il++)
         {if (dbdef(cl, "STOP") == TRUE)
-	    {noted(Log, " ");
+	    {noted(Log, TRUE, " ");
 	     exit(1);};
 
 	 read_line(line, BFLRG);
@@ -2606,7 +2606,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     CLOG(cl, 1, "pco: %s", line);
 	     path = push_file(oper, STACK_FILE);
 	     note(Log, TRUE, "");
-	     noted(Log, "%sincluding %s", ldepth, path);}
+	     noted(Log, TRUE, "%sincluding %s", ldepth, path);}
 
 /* handle run directives */
 	 else if (strcmp(key, "run") == 0)
@@ -2621,7 +2621,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     path = push_file(line+4, STACK_PROCESS);
 	     note(Log, TRUE, "");
 	     if (st.phase == PHASE_READ)
-	        noted(Log, "%srunning %s", ldepth, path);}
+	        noted(Log, TRUE, "%srunning %s", ldepth, path);}
 
 /* handle definition of the distributed parallel environment */
 	 else if (strcmp(key, "DPEnvironment") == 0)
@@ -2709,67 +2709,67 @@ static void read_config(client *cl, char *cfg, int quiet)
 	 else if (strcmp(key, ".c.i:") == 0)
 	    {parse_rule(st.rules.ccp, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .c.i rule:\n%s\n", st.rules.ccp);}
+	        noted(Log, TRUE, "Redefining .c.i rule:\n%s\n", st.rules.ccp);}
 
 /* .c.o rule handler */
 	 else if (strcmp(key, ".c.o:") == 0)
 	    {parse_rule(st.rules.co, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .c.o rule:\n%s\n", st.rules.co);}
+	        noted(Log, TRUE, "Redefining .c.o rule:\n%s\n", st.rules.co);}
 
 /* .c.a rule handler */
 	 else if (strcmp(key, ".c.a:") == 0)
 	    {parse_rule(st.rules.ca, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .c.a rule:\n%s\n", st.rules.ca);}
+	        noted(Log, TRUE, "Redefining .c.a rule:\n%s\n", st.rules.ca);}
 
 /* .f.o rule handler */
 	 else if (strcmp(key, ".f.o:") == 0)
 	    {parse_rule(st.rules.fo, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .f.o rule:\n%s\n", st.rules.fo);}
+	        noted(Log, TRUE, "Redefining .f.o rule:\n%s\n", st.rules.fo);}
 
 /* .f.a rule handler */
 	 else if (strcmp(key, ".f.a:") == 0)
 	    {parse_rule(st.rules.fa, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .f.a rule:\n%s\n", st.rules.fa);}
+	        noted(Log, TRUE, "Redefining .f.a rule:\n%s\n", st.rules.fa);}
 
 /* .l.o rule handler */
 	 else if (strcmp(key, ".l.o:") == 0)
 	    {parse_rule(st.rules.lo, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .l.o rule:\n%s\n", st.rules.lo);}
+	        noted(Log, TRUE, "Redefining .l.o rule:\n%s\n", st.rules.lo);}
 
 /* .l.a rule handler */
 	 else if (strcmp(key, ".l.a:") == 0)
 	    {parse_rule(st.rules.la, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .l.a rule:\n%s\n", st.rules.la);}
+	        noted(Log, TRUE, "Redefining .l.a rule:\n%s\n", st.rules.la);}
 
 /* .l.c rule handler */
 	 else if (strcmp(key, ".l.c:") == 0)
 	    {parse_rule(st.rules.lc, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .l.c rule:\n%s\n", st.rules.lc);}
+	        noted(Log, TRUE, "Redefining .l.c rule:\n%s\n", st.rules.lc);}
 
 /* .y.o rule handler */
 	 else if (strcmp(key, ".y.c:") == 0)
 	    {parse_rule(st.rules.yo, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .y.o rule:\n%s\n", st.rules.yo);}
+	        noted(Log, TRUE, "Redefining .y.o rule:\n%s\n", st.rules.yo);}
 
 /* .y.a rule handler */
 	 else if (strcmp(key, ".y.a:") == 0)
 	    {parse_rule(st.rules.ya, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .y.a rule:\n%s\n", st.rules.ya);}
+	        noted(Log, TRUE, "Redefining .y.a rule:\n%s\n", st.rules.ya);}
 
 /* .y.c rule handler */
 	 else if (strcmp(key, ".y.c:") == 0)
 	    {parse_rule(st.rules.yc, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, "Redefining .y.c rule:\n%s\n", st.rules.yc);}
+	        noted(Log, TRUE, "Redefining .y.c rule:\n%s\n", st.rules.yc);}
 
 /* gather unknown specifications during read phase */
 	 else if (st.phase == PHASE_READ)
@@ -3049,7 +3049,7 @@ static void analyze_config(client *cl, char *base)
     st.phase = PHASE_ANALYZE;
 
     separator(Log);
-    noted(Log, "Analyzing %s on %s", st.psy_id, st.host);
+    noted(Log, TRUE, "Analyzing %s on %s", st.psy_id, st.host);
     note(Log, TRUE, "");
 
     dt = wall_clock_time();
@@ -3073,7 +3073,7 @@ static void analyze_config(client *cl, char *base)
 	  time_string(ts, BFSML, TIME_HMS, dt));
     separator(Log);
 
-    noted(Log, "");
+    noted(Log, TRUE, "");
 
     return;}
 
@@ -3108,7 +3108,7 @@ static void finish_config(client *cl, char *base)
     snprintf(st.dir.bin, BFLRG, "%s/bin",     st.dir.root);
 
     separator(Log);
-    noted(Log, "Writing system dependent files for %s", st.psy_id);
+    noted(Log, TRUE, "Writing system dependent files for %s", st.psy_id);
     note(Log, TRUE, "");
 
     dt = wall_clock_time();
@@ -3331,7 +3331,7 @@ int main(int c, char **v, char **env)
 	    {nstrncpy(d, BFLRG, "db:", -1);
 	     full_path(d+3, BFLRG-3, NULL, v[++i]);
              if (file_exists(d+3) == FALSE)
-	        {noted(Log, "No such database '%s' - exiting\n", d+3);
+	        {noted(Log, TRUE, "No such database '%s' - exiting\n", d+3);
 		 if (st.have_db == TRUE)
 		    kill_perdb();
 		 return(1);};
@@ -3432,7 +3432,7 @@ int main(int c, char **v, char **env)
 
 	pco_save_db(cl, "inp");
 
-	noted(Log, "");
+	noted(Log, TRUE, "");
 
 	check_dir(cl);
 

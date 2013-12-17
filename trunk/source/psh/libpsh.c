@@ -1692,7 +1692,7 @@ void note(FILE *fp, int nl, char *fmt, ...)
 
 /* NOTED - write to FP and to TTY */
 
-void noted(FILE *fp, char *fmt, ...)
+void noted(FILE *fp, int nl, char *fmt, ...)
    {char bf[BFMG];
 
     VA_START(fmt);
@@ -1701,9 +1701,12 @@ void noted(FILE *fp, char *fmt, ...)
 
     if (fp != NULL)
        {fputs(bf, fp);
-	fprintf(fp, "\n");};
+	if (nl == TRUE)
+	   fprintf(fp, "\n");};
 
-    puts(bf);
+    fputs(bf, stdout);
+    if (nl == TRUE)
+       printf("\n");
 
     return;}
 
