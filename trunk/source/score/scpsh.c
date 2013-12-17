@@ -70,6 +70,13 @@
 #define unlink_safe 		PS_unlink_safe
 #define write_safe              PS_write_safe
 
+#define finlog			PS_finlog
+#define initlog			PS_initlog
+#define note 			PS_note
+#define noted 			PS_noted
+#define cat 			PS_cat
+#define separator 		PS_separator
+
 #define acheck 			PS_acheck
 #define afin 			PS_afin
 #define alaunch 		PS_alaunch
@@ -84,7 +91,6 @@
 #define block_fd 		PS_block_fd
 #define build_makefile 		PS_build_makefile
 #define build_path 		PS_build_path
-#define cat 			PS_cat
 #define cclearenv 		PS_cclearenv
 #define cdefenv 		PS_cdefenv
 #define cenv 			PS_cenv
@@ -190,8 +196,6 @@
 #define name_db 		PS_name_db
 #define name_log 		PS_name_log
 #define name_conn 		PS_name_conn
-#define note 			PS_note
-#define noted 			PS_noted
 #define nsleep 			PS_nsleep
 #define nstrcat 		PS_nstrcat
 #define nstrncpy 		PS_nstrncpy
@@ -226,7 +230,6 @@
 #define ring_ready 		PS_ring_ready
 #define run 			PS_run
 #define save_db 		PS_save_db
-#define separator 		PS_separator
 #define splice_out_path 	PS_splice_out_path
 #define strclean 		PS_strclean
 #define strcntc                 PS_strcntc
@@ -280,6 +283,7 @@
 #undef SCOPE_SCORE_PREPROC
 #undef LIBIO
 #undef LIBFIO
+#undef LIBLOG
 #undef LIBPSH
 #undef LIBHASH
 #undef LIBTIME

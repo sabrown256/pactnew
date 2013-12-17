@@ -20,8 +20,8 @@
 #define STACK_TOOL      3
 #define STACK_GROUP     4
 
-#define LOG_ON      {Log = open_file("a", st.logf); setbuf(Log, NULL);}
-#define LOG_OFF     {fclose_safe(Log); Log = NULL;}
+#define LOG_ON      initlog("a", st.logf)
+#define LOG_OFF     finlog()
 
 enum e_phase_id
    { PHASE_READ = 10, PHASE_ANALYZE, PHASE_WRITE };
@@ -217,7 +217,7 @@ static char *push_file(char *s, int itype)
 		 ok = file_exists("%s/%s", st.dir.mng, lfile);};};
 
 	if (ok == FALSE)
-	   {noted(Log, TRUE, "***> Cannot find file '%s'\n", s);
+	   {noted(NULL, "***> Cannot find file '%s'\n\n", s);
 	    ok = FALSE;};}
 
     else if (itype == STACK_PROCESS)
@@ -329,7 +329,7 @@ static void pop_struct(client *cl)
     dbset(cl, "CurrGrp", ge->item);
     dbset(cl, "CurrTool", "");
 
-    note(Log, TRUE, "--- end");
+    note(NULL, "--- end\n");
 
     return;}
 
@@ -722,20 +722,20 @@ static int pco_load_db(client *cl, char *dbname)
 
     rv = dbrestore(cl, dbname);
 
-    separator(Log);
+    separator(NULL);
 
-    note(Log, FALSE, "Restored database variables:\n");
+    note(NULL, "Restored database variables:\n");
 
     ta = cenv(TRUE, NULL);
     if (ta != NULL)
        {nv = lst_length(ta);
 	for (i = 0; i < nv; i++)
-	    note(Log, FALSE, "   %s\n", ta[i]);
+	    note(NULL, "   %s\n", ta[i]);
 
-        note(Log, FALSE, "%d variables total\n", i);
+        note(NULL, "%d variables total\n", i);
 	free_strings(ta);};
 
-    separator(Log);
+    separator(NULL);
 
     return(rv);}
 
@@ -755,10 +755,10 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
     nstrncpy(s, BFLRG, val, -1);
     vl = trim(expand(s, BFLRG, NULL, FALSE), BOTH, " \t");
 
-    note(fsh,  TRUE, "export %s=%s",    var, vl);
-    note(fcsh, TRUE, "setenv %s %s",    var, vl);
-    note(fdk,  TRUE, "dk_setenv %s %s", var, vl);
-    note(fmd,  TRUE, "setenv %s %s;",   var, vl);
+    note(fsh, "export %s=%s\n",    var, vl);
+    note(fcsh, "setenv %s %s\n",    var, vl);
+    note(fdk, "dk_setenv %s %s\n", var, vl);
+    note(fmd, "setenv %s %s;\n",   var, vl);
 
     return;}
 
@@ -943,12 +943,12 @@ static void write_envf(client *cl, int lnotice)
     char *sfx[]  = { "csh", "sh", "dk", "mdl" };
     FILE *fcsh, *fsh, *fdk, *fmd;
 
-    separator(Log);
+    separator(NULL);
     if (lnotice == TRUE)
-       noted(Log, TRUE, "   Environment setup files - env-pact (csh, sh, dk, and mdl)");
+       noted(NULL, "   Environment setup files - env-pact (csh, sh, dk, and mdl)\n");
     else
-       note(Log, TRUE, "   Environment setup files - env-pact (csh, sh, dk, and mdl)");
-    note(Log, TRUE, "");
+       note(NULL, "   Environment setup files - env-pact (csh, sh, dk, and mdl)\n");
+    note(NULL, "\n");
 
     fcsh = open_file("w", "%s/env-pact.csh", st.dir.etc);
     fsh  = open_file("w", "%s/env-pact.sh",  st.dir.etc);
@@ -956,22 +956,22 @@ static void write_envf(client *cl, int lnotice)
     fmd  = open_file("w", "%s/env-pact.mdl", st.dir.etc);
 
 /* initialize module with boilerplate */
-    note(fmd, TRUE,  "#%%Module1.0");
-    note(fmd, TRUE,  "#");
-    note(fmd, TRUE,  "# pact modulefile");
-    note(fmd, TRUE,  "# vi:set filetype=tcl:");
-    note(fmd, TRUE,  "#");
-    note(fmd, TRUE,  "");
-    note(fmd, TRUE,  "# module whatis");
-    note(fmd, TRUE,  "module-whatis \"PACT Environment\";");
-    note(fmd, TRUE,  "");
-    note(fmd, TRUE,  "# module help");
-    note(fmd, TRUE,  "proc ModulesHelp { } {");
-    note(fmd, TRUE,  "   global version;");
-    note(fmd, TRUE,  "");
-    note(fmd, TRUE,  "   puts stderr \"\\tThis module sets your environment to use PACT\\n\";");
-    note(fmd, TRUE,  "}");
-    note(fmd, TRUE, "");
+    note(fmd,  "#%%Module1.0\n");
+    note(fmd,  "#\n");
+    note(fmd,  "# pact modulefile\n");
+    note(fmd,  "# vi:set filetype=tcl:\n");
+    note(fmd,  "#\n");
+    note(fmd,  "\n");
+    note(fmd,  "# module whatis\n");
+    note(fmd,  "module-whatis \"PACT Environment\";\n");
+    note(fmd,  "\n");
+    note(fmd,  "# module help\n");
+    note(fmd,  "proc ModulesHelp { } {\n");
+    note(fmd,  "   global version;\n");
+    note(fmd,  "\n");
+    note(fmd,  "   puts stderr \"\\tThis module sets your environment to use PACT\\n\";\n");
+    note(fmd,  "}\n");
+    note(fmd, "\n");
 
 /* make a temporary approximation to st.env_csh
  * NOTE: used the C Shell to expand and print unique environment variable settings
@@ -986,62 +986,62 @@ static void write_envf(client *cl, int lnotice)
     else
        add_set_db(fcsh, fsh, fdk, fmd);
 
-    note(fcsh, TRUE, "");
-    note(fsh, TRUE, "");
-    note(fdk, TRUE, "");
-    note(fmd, TRUE, "");
+    note(fcsh, "\n");
+    note(fsh, "\n");
+    note(fdk, "\n");
+    note(fmd, "\n");
 
 /* emit MANPATH settings */
-    note(fcsh, TRUE, "if ($?MANPATH == 1) then");
-    note(fcsh, TRUE, "   setenv MANPATH %s/man:$MANPATH", st.dir.root);
-    note(fcsh, TRUE, "else");
-    note(fcsh, TRUE, "   setenv MANPATH %s/man:", st.dir.root);
-    note(fcsh, TRUE, "endif");
-    note(fcsh, TRUE, "");
+    note(fcsh, "if ($?MANPATH == 1) then\n");
+    note(fcsh, "   setenv MANPATH %s/man:$MANPATH\n", st.dir.root);
+    note(fcsh, "else\n");
+    note(fcsh, "   setenv MANPATH %s/man:\n", st.dir.root);
+    note(fcsh, "endif\n");
+    note(fcsh, "\n");
 
-    note(fsh, TRUE, "if [ \"$MANPATH\" != \"\" ]; then");
-    note(fsh, TRUE, "   export MANPATH=%s/man:$MANPATH", st.dir.root);
-    note(fsh, TRUE, "else");
-    note(fsh, TRUE, "   export MANPATH=%s/man", st.dir.root);
-    note(fsh, TRUE, "fi");
-    note(fsh, TRUE, "");
+    note(fsh, "if [ \"$MANPATH\" != \"\" ]; then\n");
+    note(fsh, "   export MANPATH=%s/man:$MANPATH\n", st.dir.root);
+    note(fsh, "else\n");
+    note(fsh, "   export MANPATH=%s/man\n", st.dir.root);
+    note(fsh, "fi\n");
+    note(fsh, "\n");
 
-    note(fdk, TRUE, "dk_alter MANPATH %s/man", st.dir.root);
-    note(fmd, TRUE, "prepend-path MANPATH %s/man;", echo(FALSE, st.dir.root));
+    note(fdk, "dk_alter MANPATH %s/man\n", st.dir.root);
+    note(fmd, "prepend-path MANPATH %s/man;\n", echo(FALSE, st.dir.root));
 
 /* emit PATH settings */
     if (IS_NULL(epath) == FALSE)
        {FOREACH(u, epath, ":\n")
-	   note(fdk, TRUE, "dk_alter PATH %s", u);
-	   note(fmd, TRUE, "prepend-path PATH    %s;", echo(FALSE, u));
+	   note(fdk, "dk_alter PATH %s\n", u);
+	   note(fmd, "prepend-path PATH    %s;\n", echo(FALSE, u));
 	ENDFOR
-        note(fcsh, TRUE, "setenv PATH    %s/bin:%s:$PATH", st.dir.root, epath);
-        note(fsh, TRUE,  "export PATH=%s/bin:%s:$PATH", st.dir.root, epath);}
+        note(fcsh, "setenv PATH    %s/bin:%s:$PATH\n", st.dir.root, epath);
+        note(fsh,  "export PATH=%s/bin:%s:$PATH\n", st.dir.root, epath);}
     else
-       {note(fcsh, TRUE, "setenv PATH    %s/bin:$PATH", st.dir.root);
-        note(fsh, TRUE, "export PATH=%s/bin:$PATH", st.dir.root);};
+       {note(fcsh, "setenv PATH    %s/bin:$PATH\n", st.dir.root);
+        note(fsh, "export PATH=%s/bin:$PATH\n", st.dir.root);};
 
-    note(fdk, TRUE, "dk_alter PATH    %s/bin", st.dir.root);
-    note(fmd, TRUE, "prepend-path PATH    %s/bin;", echo(FALSE, st.dir.root));
-    note(fdk, TRUE, "");
-    note(fmd, TRUE, "");
+    note(fdk, "dk_alter PATH    %s/bin\n", st.dir.root);
+    note(fmd, "prepend-path PATH    %s/bin;\n", echo(FALSE, st.dir.root));
+    note(fdk, "\n");
+    note(fmd, "\n");
 
 /* write the CSH version like this because PCSH scripts like
  * PDBView need to get the users SCHEME variable if defined
  */
-    note(fcsh, TRUE, "if ($?SCHEME == 1) then");
-    note(fcsh, TRUE, "   setenv SCHEME  ${SCHEME}:%s/scheme", st.dir.root);
-    note(fcsh, TRUE, "else");
-    note(fcsh, TRUE, "   setenv SCHEME  %s/scheme", st.dir.root);
-    note(fcsh, TRUE, "endif");
-    note(fcsh, TRUE, "setenv ULTRA   %s/scheme", st.dir.root);
+    note(fcsh, "if ($?SCHEME == 1) then\n");
+    note(fcsh, "   setenv SCHEME  ${SCHEME}:%s/scheme\n", st.dir.root);
+    note(fcsh, "else\n");
+    note(fcsh, "   setenv SCHEME  %s/scheme\n", st.dir.root);
+    note(fcsh, "endif\n");
+    note(fcsh, "setenv ULTRA   %s/scheme\n", st.dir.root);
 
-    note(fsh, TRUE, "export SCHEME=%s/scheme", st.dir.root);
-    note(fsh, TRUE, "export ULTRA=%s/scheme", st.dir.root);
-    note(fdk, TRUE, "dk_setenv SCHEME  %s/scheme", st.dir.root);
-    note(fdk, TRUE, "dk_setenv ULTRA   %s/scheme", st.dir.root);
-    note(fmd, TRUE, "setenv SCHEME  %s/scheme;", st.dir.root);
-    note(fmd, TRUE, "setenv ULTRA   %s/scheme;", st.dir.root);
+    note(fsh, "export SCHEME=%s/scheme\n", st.dir.root);
+    note(fsh, "export ULTRA=%s/scheme\n", st.dir.root);
+    note(fdk, "dk_setenv SCHEME  %s/scheme\n", st.dir.root);
+    note(fdk, "dk_setenv ULTRA   %s/scheme\n", st.dir.root);
+    note(fmd, "setenv SCHEME  %s/scheme;\n", st.dir.root);
+    note(fmd, "setenv ULTRA   %s/scheme;\n", st.dir.root);
 
     fclose_safe(fcsh);
     fclose_safe(fsh);
@@ -1051,9 +1051,9 @@ static void write_envf(client *cl, int lnotice)
 /* log the results */
     n = sizeof(sfx)/sizeof(char *);
     for (i = 0; i < n; i++)
-        {note(Log, TRUE, "----- env-pact.%s -----", sfx[i]);
-	 cat(Log, 0, -1, "%s/env-pact.%s", st.dir.etc, sfx[i]);
-         note(Log, TRUE, " ");};
+        {note(NULL, "----- env-pact.%s -----\n", sfx[i]);
+	 cat(NULL, 0, -1, "%s/env-pact.%s", st.dir.etc, sfx[i]);
+         note(NULL, "\n");};
 
     return;}
 
@@ -1074,16 +1074,15 @@ static int check_cross(client *cl)
     if (strcmp(s, "FALSE") != 0)
        {s = cgetenv(TRUE, "DB_RUN_SIGNATURE");
 	if (file_exists(s) == FALSE)
-	   {noted(Log, TRUE, "");
-	    noted(Log, TRUE, "Cross compiling without a run_signature database - exiting");
-	    noted(Log, TRUE, "");
+	   {noted(NULL, "\n");
+	    noted(NULL, "Cross compiling without a run_signature database - exiting\n");
+	    noted(NULL, "\n");
 	    rv = FALSE;}
 	else
 	   {dbset(cl, "DB_RUN_SIGNATURE", s);
-	    note(Log, TRUE, "");
-	    note(Log, TRUE, "Cross compiling with run_signature database %s",
-		 s);
-	    note(Log, TRUE, "");};};
+	    note(NULL, "\n");
+	    note(NULL, "Cross compiling with run_signature database %s\n", s);
+	    note(NULL, "\n");};};
 
     return(rv);}
 
@@ -1112,13 +1111,13 @@ static void check_dir(client *cl)
                      push_tok(Created, BFLRG, ' ', "%s/%s", sib, dir);};};};
 
         if (IS_NULL(Created) == FALSE)
-           {noted(Log, TRUE, "");
-            noted(Log, TRUE, "Directories:");
+           {noted(NULL, "\n");
+            noted(NULL, "Directories:\n");
             FOREACH(dir, Created, " ")
-               noted(Log, TRUE, "   %s", dir);
+               noted(NULL, "   %s\n", dir);
             ENDFOR
-            noted(Log, TRUE, "have been created as requested");
-            noted(Log, TRUE, "");};}
+            noted(NULL, "have been created as requested\n");
+            noted(NULL, "\n");};}
 
     else
        {Missing[0] = '\0';
@@ -1129,16 +1128,16 @@ static void check_dir(client *cl)
                     {push_tok(Missing, BFLRG, ' ', "%s/%s", sib, dir);};};};
 
         if (IS_NULL(Missing) == FALSE)
-           {noted(Log, TRUE, "");
-            noted(Log, TRUE, "You have asked that PACT be installed in the following");
-            noted(Log, TRUE, "missing directories:");
+           {noted(NULL, "\n");
+            noted(NULL, "You have asked that PACT be installed in the following\n");
+            noted(NULL, "missing directories:\n");
             FOREACH (dir, Missing, " ")
-               noted(Log, TRUE, "   %s", dir);
+               noted(NULL, "   %s\n", dir);
             ENDFOR
-            noted(Log, TRUE, "You must either use the -c option to create these");
-            noted(Log, TRUE, "directories, choose another place to install PACT,");
-            noted(Log, TRUE, "or specify -i none for no installation");
-            noted(Log, TRUE, "");
+            noted(NULL, "You must either use the -c option to create these\n");
+            noted(NULL, "directories, choose another place to install PACT,\n");
+            noted(NULL, "or specify -i none for no installation\n");
+            noted(NULL, "\n");
 
             exit(2);};};
 
@@ -1188,8 +1187,8 @@ static void read_line(char *s, int nc)
 /* toss blank and comment lines */
 	if (blank_line(s) == TRUE)
            {if (st.verbose == TRUE)
-	       noted(Log, TRUE, "%s line %d ignored: %s",
-		     se->name, se->iline, s);
+	       noted(NULL, "%s line %d ignored: %s\n",
+		      se->name, se->iline, s);
 	    s[0] = '\0';};}
     else
        {pop_file();
@@ -1197,7 +1196,7 @@ static void read_line(char *s, int nc)
 	   s[0] = '\0';
 	else
 	   strcpy(s, "++end++");
-	note(Log, TRUE, "");};
+	note(NULL, "\n");};
 
     return;}
 
@@ -1400,7 +1399,7 @@ static void dp_define(void)
        {read_line(line, BFLRG);
 
 	if ((strcmp(line, "end") == 0) || (IS_NULL(line) == TRUE))
-	   {note(st.aux.DPF, TRUE, "");
+	   {note(st.aux.DPF, "\n");
 	    break;};
     
 	print_text(st.aux.DPF, "setenv %s \"\"", line);};
@@ -1421,7 +1420,7 @@ static void setup_analyze_env(client *cl, char *base)
 /* setup the analyze log file */
     snprintf(alog, BFLRG, "%s/log/analyze",  st.dir.root);
     out = open_file("w", alog);
-    note(out, TRUE, "%s", get_date());
+    note(out, "%s\n", get_date());
     fclose_safe(out);
 
     dbset(cl, "HSY_Host",       st.host);
@@ -1593,7 +1592,7 @@ static void default_var(client *cl, char *base)
     sa = cenv(TRUE, NULL);
     n  = lst_length(sa);
     for (i = 0; i < n; i++)
-        note(Log, TRUE, "%s", sa[i]);
+        note(NULL, "%s\n", sa[i]);
     free_strings(sa);
 
 /* define the set of specifications which define a tool */
@@ -1695,14 +1694,14 @@ static void reset_make_vars(void)
 		 FOREACH (t, st.def_tools, " ")
 		    nc = strlen(t);
 		    if ((strncmp(t, vr, nc) == 0) && (vr[nc] == '_'))
-		       note(st.aux.MVF, TRUE, "%s = %s", vr, vl);
+		       note(st.aux.MVF, "%s = %s\n", vr, vl);
 		 ENDFOR
 
 /* write Group vars */
 		 FOREACH (t, st.def_groups, " ")
 		    nc = strlen(t);
 		    if ((strncmp(t, vr, nc) == 0) && (vr[nc] == '_'))
-		       note(st.aux.MVF, TRUE, "%s = %s", vr, vl);
+		       note(st.aux.MVF, "%s = %s\n", vr, vl);
 		 ENDFOR;};};
 
 	free_strings(ta);};
@@ -2132,8 +2131,8 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 
     if ((strcmp(oper, "+=") == 0) || (strcmp(oper, "=+") == 0))
        {if (dbdef(cl, fvar) == FALSE)
-           {note(Log, TRUE, "Variable %s does not exist changing %s to =",
-                 fvar, oper);
+           {note(NULL, "Variable %s does not exist changing %s to =\n",
+		  fvar, oper);
             oper = "=";};};
 
 /* set variable */
@@ -2145,7 +2144,7 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 	       {if (st.aux.MVF == NULL)
 		   st.aux.MVF = open_file("w", st.aux.mvfn);
 
-		note(st.aux.MVF, TRUE, "%s = %s", fvar, nval);};
+		note(st.aux.MVF, "%s = %s\n", fvar, nval);};
 
             dbset(cl, fvar, nval);}
 
@@ -2169,18 +2168,18 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 	    if (p != NULL)
 	       {nstrncpy(nval, BFLRG, p, -1);
 		FREE(p);};
-            note(Log, TRUE, "Change    |%s|", fvar);
-            note(Log, TRUE, "Prepend   |%s|", lval);
-            note(Log, TRUE, "Old value |%s|", nval);
+            note(NULL, "Change    |%s|\n", fvar);
+            note(NULL, "Prepend   |%s|\n", lval);
+            note(NULL, "Old value |%s|\n", nval);
 
             snprintf(mval, BFLRG, "%s %s", lval, nval);
-            note(Log, TRUE, "New value |%s|", mval);
+            note(NULL, "New value |%s|\n", mval);
 
-            note(Log, TRUE, "Change expression |setenv %s %s|", fvar, mval);
+            note(NULL, "Change expression |setenv %s %s|\n", fvar, mval);
             dbset(cl, fvar, mval);}
         else
-           note(Log, TRUE, "   += not changing %s - no value for |%s|",
-		fvar, val);
+           note(NULL, "   += not changing %s - no value for |%s|\n",
+		 fvar, val);
 
 	FREE(t);}
 
@@ -2198,18 +2197,18 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 	    if (p != NULL)
 	       {nstrncpy(nval, BFLRG, p, -1);
 		FREE(p);};
-            note(Log, TRUE, "Change    |%s|", fvar);
-            note(Log, TRUE, "Append    |%s|", lval);
-            note(Log, TRUE, "Old value |%s|", nval);
+            note(NULL, "Change    |%s|\n", fvar);
+            note(NULL, "Append    |%s|\n", lval);
+            note(NULL, "Old value |%s|\n", nval);
 
             snprintf(mval, BFLRG, "%s %s", nval, lval);
-            note(Log, TRUE, "New value |%s|", mval);
+            note(NULL, "New value |%s|\n", mval);
 
-            note(Log, TRUE, "Change expression |setenv %s %s|", fvar, mval);
+            note(NULL, "Change expression |setenv %s %s|\n", fvar, mval);
             dbset(cl, fvar, mval);}
          else
-            note(Log, TRUE, "   =+ not changing %s - no value for |%s|",
-		 fvar, val);
+            note(NULL, "   =+ not changing %s - no value for |%s|\n",
+		  fvar, val);
 
 	FREE(t);}
 
@@ -2218,22 +2217,22 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
        {t = echo(FALSE, "$%s", fvar);
 	if (IS_NULL(t) == FALSE)
 	   {nstrncpy(nval, BFLRG, t, -1);
-	    note(Log, TRUE, "Change    |%s|", fvar);
-	    note(Log, TRUE, "Remove    |%s|", val);
-	    note(Log, TRUE, "Old value |%s|", nval);
+	    note(NULL, "Change    |%s|\n", fvar);
+	    note(NULL, "Remove    |%s|\n", val);
+	    note(NULL, "Old value |%s|\n", nval);
 
 	    p = echo(FALSE, "%s | sed 's|%s||'", nval, val);
 	    if (p != NULL)
 	       {nstrncpy(nval, BFLRG, p, -1);
 		FREE(p);};
 
-	    note(Log, TRUE, "New value |%s|", nval);
+	    note(NULL, "New value |%s|\n", nval);
 
-	    note(Log, TRUE, "Change expression |setenv %s %s|", fvar, nval);
+	    note(NULL, "Change expression |setenv %s %s|\n", fvar, nval);
 	    dbset(cl, fvar, nval);}
          else
-            note(Log, TRUE, "   -= not changing %s - no value for |%s|",
-		 fvar, val);
+            note(NULL, "   -= not changing %s - no value for |%s|\n",
+		  fvar, val);
 
 	FREE(t);}
 
@@ -2248,8 +2247,8 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
         if (IS_NULL(t) == FALSE)
 	   dbset(cl, fvar, t);
         else
-           note(Log, TRUE, "   =? not changing %s - no value for |%s|",
-		fvar, val);
+           note(NULL, "   =? not changing %s - no value for |%s|\n",
+		 fvar, val);
 
 	FREE(t);}
 
@@ -2265,13 +2264,13 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
 	    if (IS_NULL(t) == FALSE)
 	       dbset(cl, fvar, t);
 	    else
-	       note(Log, TRUE, "   ?= not changing %s - no value for |%s|",
-		    fvar, val);
+	       note(NULL, "   ?= not changing %s - no value for |%s|\n",
+		     fvar, val);
 
 	    FREE(t);};}
 
     else
-       noted(Log, TRUE, "Bad operator '%s' in SET_VAR", oper);
+       noted(NULL, "Bad operator '%s' in SET_VAR\n", oper);
 
     return;}
 
@@ -2305,8 +2304,8 @@ static void process_use(client *cl, char *sg, char *oper)
 
 /* fill out a group */
        {case STACK_GROUP:
-             note(Log, TRUE, "Use group %s to fill group %s",
-		  sg, dbget(cl, FALSE, "CurrGrp"));
+             note(NULL, "Use group %s to fill group %s\n",
+		   sg, dbget(cl, FALSE, "CurrGrp"));
              snprintf(ulst, BFLRG, "%s", dbget(cl, FALSE, "PCO_UseVars"));
              FOREACH(var, ulst, " ")
                 snprintf(nvr, BFLRG, "%s_%s", sg, var);
@@ -2322,8 +2321,8 @@ static void process_use(client *cl, char *sg, char *oper)
 /* fill out a tool */
         case STACK_TOOL:
              if (dbcmp(cl, "CurrTool", "") == 0)
-                {note(Log, TRUE, "Use tool %s to fill group %s",
-		      sg, dbget(cl, FALSE, "CurrGrp"));
+                {note(NULL, "Use tool %s to fill group %s\n",
+		       sg, dbget(cl, FALSE, "CurrGrp"));
                  FOREACH(var, st.toolv, " ")
                     snprintf(nvr, BFLRG, "%s_%s", sg, var);
                     if (dbdef(cl, nvr) == TRUE)
@@ -2331,8 +2330,8 @@ static void process_use(client *cl, char *sg, char *oper)
                         set_var(cl, FALSE, nvr, oper, val);};
                  ENDFOR}
              else
-                {note(Log, TRUE, "Use tool %s to fill tool %s",
-		      sg, dbget(cl, FALSE, "CurrTool"));
+                {note(NULL, "Use tool %s to fill tool %s\n",
+		       sg, dbget(cl, FALSE, "CurrTool"));
                  FOREACH(var, st.toolv, " ")
                     snprintf(nvr, BFLRG, "%s_%s", sg, var);
                     if (dbdef(cl, nvr) == TRUE)
@@ -2418,7 +2417,7 @@ static void do_platform(client *cl, char *oper, char *value)
     else
        nstrncpy(cfg, BFSML, oper, -1);
 
-    note(Log, TRUE, "");
+    note(NULL, "\n");
 
 /* assemble the config command line */
     snprintf(t, BFLRG, "./dsys config -plt %s", st.dir.root);
@@ -2471,26 +2470,26 @@ static void config_platforms(void)
    {int i, ok;
     char *cmd, *cfg;
 
-    noted(Log, TRUE, "");
+    noted(NULL, "\n");
 
     for (i = 0; i < st.np; i++)
         {cmd = st.pltfcmd[i];
 	 cfg = st.pltfcfg[i];
 
-	 noted(Log, TRUE, "----------------------------------------------");
+	 noted(NULL, "----------------------------------------------\n");
 
 /* run the config for this platform */
 	 ok = system(cmd);
 	 if (ok != 0)
-	    {noted(Log, TRUE, "Configuration of platform %s failed - exiting",
-		   cfg);
+	    {noted(NULL, "Configuration of platform %s failed - exiting\n",
+		    cfg);
 	     exit(1);}
 	 else
-	    note(Log, TRUE, "Configuration of platform %s succeeded",
-		 cfg);};
+	    note(NULL, "Configuration of platform %s succeeded\n",
+		  cfg);};
 
     if (st.np > 0)
-       noted(Log, TRUE, "----------------------------------------------");
+       noted(NULL, "----------------------------------------------\n");
 
     free_strings(st.pltfcmd);
     free_strings(st.pltfcfg);
@@ -2560,26 +2559,24 @@ static void read_config(client *cl, char *cfg, int quiet)
     char line[BFLRG], key[BFLRG], oper[BFLRG], value[BFLRG];
     char *path;
 
-    separator(Log);
+    separator(NULL);
     if (quiet == TRUE)
-       {note(Log, TRUE, "");
-	note(Log, TRUE, "Reading configuration file %s", cfg);}
+       {note(NULL, "\n");
+	note(NULL, "Reading configuration file %s\n", cfg);}
     else
-       {noted(Log, TRUE, "");
-	noted(Log, TRUE, "Reading configuration file %s", cfg);};
-    note(Log, TRUE, "");
+       {noted(NULL, "\n");
+	noted(NULL, "Reading configuration file %s\n", cfg);};
+    note(NULL, "\n");
 
-    note(Log, TRUE, "");
-    note(Log, TRUE, "Strict checking level is %s", dbget(cl, TRUE, "RF_STRICT"));
-    note(Log, TRUE, "");
-    separator(Log);
+    note(NULL, "\nStrict checking level is %s\n\n", dbget(cl, TRUE, "RF_STRICT"));
+    separator(NULL);
 
     path = push_file(cfg, STACK_FILE);
 
 /* toplevel loop over the input to define configuration parameters */
     for (il = 0; TRUE; il++)
         {if (dbdef(cl, "STOP") == TRUE)
-	    {noted(Log, TRUE, " ");
+	    {noted(NULL, " \n");
 	     exit(1);};
 
 	 read_line(line, BFLRG);
@@ -2606,8 +2603,8 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 	     CLOG(cl, 1, "pco: %s", line);
 	     path = push_file(oper, STACK_FILE);
-	     note(Log, TRUE, "");
-	     noted(Log, TRUE, "%sincluding %s", ldepth, path);}
+	     note(NULL, "\n");
+	     noted(NULL, "%sincluding %s\n", ldepth, path);}
 
 /* handle run directives */
 	 else if (strcmp(key, "run") == 0)
@@ -2620,9 +2617,9 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 	     CLOG(cl, 1, "pco: %s", line);
 	     path = push_file(line+4, STACK_PROCESS);
-	     note(Log, TRUE, "");
+	     note(NULL, "\n");
 	     if (st.phase == PHASE_READ)
-	        noted(Log, TRUE, "%srunning %s", ldepth, path);}
+	        noted(NULL, "%srunning %s\n", ldepth, path);}
 
 /* handle definition of the distributed parallel environment */
 	 else if (strcmp(key, "DPEnvironment") == 0)
@@ -2641,11 +2638,11 @@ static void read_config(client *cl, char *cfg, int quiet)
 	 else if (strcmp(key, "define") == 0)
 	    {if (st.aux.CEF == NULL)
 	        st.aux.CEF = open_file("w", st.aux.cefn);
-	     note(st.aux.CEF, TRUE, "#define %s %s", oper, value);}
+	     note(st.aux.CEF, "#define %s %s\n", oper, value);}
 
 	 else if (strcmp(key, "setenv") == 0)
 	    {char *s;
-	     note(st.aux.SEF, TRUE, "%s %s", oper, value);
+	     note(st.aux.SEF, "%s %s\n", oper, value);
 	     if (strcmp(oper, "PATH") == 0)
                 push_path(P_APPEND, epath, value);
 	     s = echo(FALSE, value);
@@ -2666,8 +2663,8 @@ static void read_config(client *cl, char *cfg, int quiet)
 	        dbset(cl, var, val);
 
 /*	     if (st.phase == PHASE_READ) */
-	        note(st.aux.SEF, TRUE, "%s \"%s\"", var, val);
-	     note(Log, TRUE, "Command: setenv %s %s", var, val);}
+	        note(st.aux.SEF, "%s \"%s\"", var, val);
+	     note(NULL, "Command: setenv %s %s\n", var, val);}
 
 /* handle Note specifications */
 	 else if (strcmp(key, "Note") == 0)
@@ -2679,14 +2676,14 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 /* handle Tool specifications */
 	 else if (strcmp(key, "Tool") == 0)
-	    {note(Log, TRUE, "--- tool %s", oper);
+	    {note(NULL, "--- tool %s\n", oper);
 	     dbset(cl, "CurrTool", oper);
-	     note(Log, TRUE, "Defining tool %s", oper);
+	     note(NULL, "Defining tool %s\n", oper);
 	     push_struct(oper, st.def_tools, STACK_TOOL);}
 
 /* handle Group specifications */
 	 else if (strcmp(key, "Group") == 0)
-	    {note(Log, TRUE, "--- group %s", oper);
+	    {note(NULL, "--- group %s\n", oper);
 	     dbset(cl, "CurrGrp", oper);
 	     push_struct(oper, st.def_groups, STACK_GROUP);}
 
@@ -2710,67 +2707,67 @@ static void read_config(client *cl, char *cfg, int quiet)
 	 else if (strcmp(key, ".c.i:") == 0)
 	    {parse_rule(st.rules.ccp, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .c.i rule:\n%s\n", st.rules.ccp);}
+	        noted(NULL, "Redefining .c.i rule:\n%s\n\n", st.rules.ccp);}
 
 /* .c.o rule handler */
 	 else if (strcmp(key, ".c.o:") == 0)
 	    {parse_rule(st.rules.co, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .c.o rule:\n%s\n", st.rules.co);}
+	        noted(NULL, "Redefining .c.o rule:\n%s\n\n", st.rules.co);}
 
 /* .c.a rule handler */
 	 else if (strcmp(key, ".c.a:") == 0)
 	    {parse_rule(st.rules.ca, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .c.a rule:\n%s\n", st.rules.ca);}
+	        noted(NULL, "Redefining .c.a rule:\n%s\n\n", st.rules.ca);}
 
 /* .f.o rule handler */
 	 else if (strcmp(key, ".f.o:") == 0)
 	    {parse_rule(st.rules.fo, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .f.o rule:\n%s\n", st.rules.fo);}
+	        noted(NULL, "Redefining .f.o rule:\n%s\n\n", st.rules.fo);}
 
 /* .f.a rule handler */
 	 else if (strcmp(key, ".f.a:") == 0)
 	    {parse_rule(st.rules.fa, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .f.a rule:\n%s\n", st.rules.fa);}
+	        noted(NULL, "Redefining .f.a rule:\n%s\n\n", st.rules.fa);}
 
 /* .l.o rule handler */
 	 else if (strcmp(key, ".l.o:") == 0)
 	    {parse_rule(st.rules.lo, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .l.o rule:\n%s\n", st.rules.lo);}
+	        noted(NULL, "Redefining .l.o rule:\n%s\n\n", st.rules.lo);}
 
 /* .l.a rule handler */
 	 else if (strcmp(key, ".l.a:") == 0)
 	    {parse_rule(st.rules.la, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .l.a rule:\n%s\n", st.rules.la);}
+	        noted(NULL, "Redefining .l.a rule:\n%s\n\n", st.rules.la);}
 
 /* .l.c rule handler */
 	 else if (strcmp(key, ".l.c:") == 0)
 	    {parse_rule(st.rules.lc, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .l.c rule:\n%s\n", st.rules.lc);}
+	        noted(NULL, "Redefining .l.c rule:\n%s\n\n", st.rules.lc);}
 
 /* .y.o rule handler */
 	 else if (strcmp(key, ".y.c:") == 0)
 	    {parse_rule(st.rules.yo, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .y.o rule:\n%s\n", st.rules.yo);}
+	        noted(NULL, "Redefining .y.o rule:\n%s\n\n", st.rules.yo);}
 
 /* .y.a rule handler */
 	 else if (strcmp(key, ".y.a:") == 0)
 	    {parse_rule(st.rules.ya, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .y.a rule:\n%s\n", st.rules.ya);}
+	        noted(NULL, "Redefining .y.a rule:\n%s\n\n", st.rules.ya);}
 
 /* .y.c rule handler */
 	 else if (strcmp(key, ".y.c:") == 0)
 	    {parse_rule(st.rules.yc, BFLRG);
 	     if (st.verbose == TRUE)
-	        noted(Log, TRUE, "Redefining .y.c rule:\n%s\n", st.rules.yc);}
+	        noted(NULL, "Redefining .y.c rule:\n%s\n\n", st.rules.yc);}
 
 /* gather unknown specifications during read phase */
 	 else if (st.phase == PHASE_READ)
@@ -2805,7 +2802,7 @@ static void add_do_run(FILE *fl, FILE *fp, char *lf)
     fprintf(fp, "\n");
     fprintf(fp, "#-------------------------------------------------------------------------\n");
 
-    note(fl, TRUE, "Using %s", lf);
+    note(fl, "Using %s\n", lf);
 
     return;}
 
@@ -2849,13 +2846,13 @@ static void write_do_run_db(client *cl, state *st)
 
     getcwd(s, BFLRG);
 
-    note(fl, TRUE, "");
+    note(fl, "\n");
     separator(fl);
-    note(fl, TRUE, "Command: pco/write_do_run_db");
-    note(fl, TRUE, "Current: %s", s);
-    note(fl, TRUE, "Date: %s", get_date());
-    note(fl, TRUE, "Manager directory: %s", dbget(cl, FALSE, "PSY_MngDir"));
-    note(fl, TRUE, "");
+    note(fl, "Command: pco/write_do_run_db\n");
+    note(fl, "Current: %s\n", s);
+    note(fl, "Date: %s\n", get_date());
+    note(fl, "Manager directory: %s\n", dbget(cl, FALSE, "PSY_MngDir"));
+    note(fl, "\n");
 
     p = cgetenv(TRUE, "PSY_CONFIG_PATH");
     if (IS_NULL(p) == TRUE)
@@ -2867,13 +2864,13 @@ static void write_do_run_db(client *cl, state *st)
     nstrncpy(lcrs, BFLRG, dbget(cl, TRUE, "DO_RUN_CROSS"), -1);
 
     separator(fl);
-    note(fl, TRUE, "   PSY_CONFIG_PATH     = %s", cfg);
-    note(fl, TRUE, "   DO_RUN_DBG    = %s", ldbg);
-    note(fl, TRUE, "   DO_RUN_MPI    = %s", lmpi);
-    note(fl, TRUE, "   DO_RUN_CROSS  = %s", lcrs);
+    note(fl, "   PSY_CONFIG_PATH     = %s\n", cfg);
+    note(fl, "   DO_RUN_DBG    = %s\n", ldbg);
+    note(fl, "   DO_RUN_MPI    = %s\n", lmpi);
+    note(fl, "   DO_RUN_CROSS  = %s\n", lcrs);
 
 /* initialize the database file */
-    note(fl, TRUE, "   Do-run signature database - do-run-db");
+    note(fl, "   Do-run signature database - do-run-db\n");
 
     snprintf(db, BFLRG, "%s/do-run-db", st->dir.etc);
 
@@ -2886,12 +2883,12 @@ static void write_do_run_db(client *cl, state *st)
 
 /* copy the do-run database */
     if (ok == TRUE)
-       {note(fl, TRUE, "      copying %s", p);
+       {note(fl, "      copying %s\n", p);
         copy(db, p);}
 
 /* write the do-run database */
     else
-       {note(fl, TRUE, "      generating %s", db);
+       {note(fl, "      generating %s\n", db);
 
 	fp = fopen_safe(db, "w");
 
@@ -2905,7 +2902,7 @@ static void write_do_run_db(client *cl, state *st)
 	if ((IS_NULL(ldbg) == FALSE) && (strcmp(ldbg, "none") != 0))
 	   {cnd = lst_push(cnd, ldbg);
 	    p   = path_base(ldbg);
-            note(fl, TRUE, "default DBG %s\n", p);
+            note(fl, "default DBG %s\n\n", p);
 	    fprintf(fp, "default DBG %s\n", p);}
 	else
 	   {cnd = lst_push(cnd, "gdb");
@@ -2920,7 +2917,7 @@ static void write_do_run_db(client *cl, state *st)
 	if ((IS_NULL(lmpi) == FALSE) && (strcmp(lmpi, "none") != 0))
 	   {cnd = lst_push(cnd, lmpi);
 	    p   = path_base(lmpi);
-            note(fl, TRUE, "default MPI %s\n", p);
+            note(fl, "default MPI %s\n\n", p);
 	    fprintf(fp, "default MPI %s\n", p);}
 	else
 	   {cnd = lst_push(cnd, "poe");
@@ -2933,10 +2930,10 @@ static void write_do_run_db(client *cl, state *st)
 	   {if ((IS_NULL(lmpi) == FALSE) && (strcmp(lcrs, lmpi) != 0))
 	       {cnd = lst_push(cnd, lcrs);
 		p   = path_base(lcrs);
-		note(fl, TRUE, "default CROSS %s\n", p);
+		note(fl, "default CROSS %s\n\n", p);
 		fprintf(fp, "default CROSS %s\n", p);}
 	    else
-	       note(fl, TRUE, "default CROSS same as default MPI\n");}
+	       note(fl, "default CROSS same as default MPI\n\n");}
 	else
 	   cnd = lst_push(cnd, "submit");
 
@@ -2953,18 +2950,18 @@ static void write_do_run_db(client *cl, state *st)
 
 /* process the specs in CND */
 	for (i = 0; cnd[i] != NULL; i++)
-	    {note(fl, TRUE, "Checking %s", cnd[i]);
+	    {note(fl, "Checking %s\n", cnd[i]);
 
 	     file = do_run_spec(cfg, cnd[i]);
 	     if (IS_NULL(file) == TRUE)
 	        {nm++;
-		 note(fl, TRUE, "   missing do-run config = |%s|", file);}
+		 note(fl, "   missing do-run config = |%s|\n", file);}
 
 	     else
-	        {note(fl, TRUE, "   using do-run config = |%s|", file);
+	        {note(fl, "   using do-run config = |%s|\n", file);
 
 		 exe = cwhich(path_base(cnd[i]));
-		 note(fl, TRUE, "   candidate for %s name = |%s|",
+		 note(fl, "   candidate for %s name = |%s|\n",
 		      cnd[i], exe);
 		 if (file_executable(exe) == TRUE)
 		    {add_do_run(fl, fp, file);
@@ -2979,7 +2976,7 @@ static void write_do_run_db(client *cl, state *st)
 			      if (exe[0] != '/')
 				 exe = cwhich(exe);
 			      
-			      note(fl, TRUE, "   candidate for %s file = |%s|",
+			      note(fl, "   candidate for %s file = |%s|\n",
 				   cnd[i], exe);
 			      if (file_executable(exe) == TRUE)
 				 {add_do_run(fl, fp, file);
@@ -3016,8 +3013,8 @@ static void read_config_files(client *cl)
    {double dt;
     char ts[BFSML];
 
-    separator(Log);
-    note(Log, TRUE, "Reading config files for %s on %s", st.psy_id, st.host);
+    separator(NULL);
+    note(NULL, "Reading config files for %s on %s\n", st.psy_id, st.host);
 
     dt = wall_clock_time();
 
@@ -3031,10 +3028,10 @@ static void read_config_files(client *cl)
     read_config(cl, st.cfgf, FALSE);
 
     dt = wall_clock_time() - dt;
-    note(Log, TRUE, "Completed - config files read (%s)",
+    note(NULL, "Completed - config files read (%s)\n",
 	  time_string(ts, BFSML, TIME_HMS, dt));
 
-    separator(Log);
+    separator(NULL);
 
     return;}
 
@@ -3049,9 +3046,9 @@ static void analyze_config(client *cl, char *base)
 
     st.phase = PHASE_ANALYZE;
 
-    separator(Log);
-    noted(Log, TRUE, "Analyzing %s on %s", st.psy_id, st.host);
-    note(Log, TRUE, "");
+    separator(NULL);
+    noted(NULL, "Analyzing %s on %s\n", st.psy_id, st.host);
+    note(NULL, "\n");
 
     dt = wall_clock_time();
 
@@ -3070,11 +3067,11 @@ static void analyze_config(client *cl, char *base)
     pop_dir();
 
     dt = wall_clock_time() - dt;
-    note(Log, TRUE, "Completed - analysis done (%s)",
+    note(NULL, "Completed - analysis done (%s)\n",
 	  time_string(ts, BFSML, TIME_HMS, dt));
-    separator(Log);
+    separator(NULL);
 
-    noted(Log, TRUE, "");
+    noted(NULL, "\n");
 
     return;}
 
@@ -3108,9 +3105,9 @@ static void finish_config(client *cl, char *base)
     snprintf(st.dir.lib, BFLRG, "%s/lib",     st.dir.root);
     snprintf(st.dir.bin, BFLRG, "%s/bin",     st.dir.root);
 
-    separator(Log);
-    noted(Log, TRUE, "Writing system dependent files for %s", st.psy_id);
-    note(Log, TRUE, "");
+    separator(NULL);
+    noted(NULL, "Writing system dependent files for %s\n", st.psy_id);
+    note(NULL, "\n");
 
     dt = wall_clock_time();
 
@@ -3127,11 +3124,11 @@ static void finish_config(client *cl, char *base)
     LOG_ON;
 
     dt = wall_clock_time() - dt;
-    note(Log, TRUE, "Completed - files written (%s)",
+    note(NULL, "Completed - files written (%s)\n",
 	  time_string(ts, BFSML, TIME_HMS, dt));
-    separator(Log);
+    separator(NULL);
 
-    note(Log, TRUE, "");
+    note(NULL, "\n");
 
     return;}
 
@@ -3332,7 +3329,7 @@ int main(int c, char **v, char **env)
 	    {nstrncpy(d, BFLRG, "db:", -1);
 	     full_path(d+3, BFLRG-3, NULL, v[++i]);
              if (file_exists(d+3) == FALSE)
-	        {noted(Log, TRUE, "No such database '%s' - exiting\n", d+3);
+	        {noted(NULL, "No such database '%s' - exiting\n\n", d+3);
 		 if (st.have_db == TRUE)
 		    kill_perdb();
 		 return(1);};
@@ -3433,7 +3430,7 @@ int main(int c, char **v, char **env)
 
 	pco_save_db(cl, "inp");
 
-	noted(Log, TRUE, "");
+	noted(NULL, "\n");
 
 	check_dir(cl);
 
@@ -3490,7 +3487,7 @@ int main(int c, char **v, char **env)
 /* configure added platforms */
     config_platforms();
 
-    separator(Log);
+    separator(NULL);
     run(BOTH, "rm -rf %s", st.dir.cfg);
 
     LOG_OFF;

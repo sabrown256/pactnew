@@ -399,8 +399,6 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
        Note $STDOUT "#define IBM_$IBM_HW"
     endif
             
-    endsw
-
     if (-f $CEFile) then
        flog $Log cat $CEFile
        cat $CEFile >>& $STDOUT

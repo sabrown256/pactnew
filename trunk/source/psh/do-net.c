@@ -177,10 +177,9 @@ static void
 void separatorv(FILE *fp)
    {
 
-    if (fp != NULL)
-       {fprintf(fp, "DO-NET: \n");
-	fprintf(fp, "DO-NET: %s\n", state.separator);
-	fprintf(fp, "DO-NET: \n");};
+    note(fp, "DO-NET: \n");
+    note(fp, "DO-NET: %s\n", state.separator);
+    note(fp, "DO-NET: \n");
 
     return;}
 
@@ -200,7 +199,7 @@ void notet(FILE *fp, char *tag, char *fmt, ...)
 	    VSNPRINTF(bf, BFLRG, fmt);
 	    VA_END;
 
-	    fprintf(fp, "DO-NET: (%s) %s\n", tag, bf);};};
+	    note(fp, "DO-NET: (%s) %s\n", tag, bf);};};
 
     return;}
 
@@ -215,12 +214,11 @@ void noten(FILE *fp, int vrb, char *fmt, ...)
    {char bf[BFLRG];
 
     if (vrb == TRUE)
-       {if (fp != NULL)
-	   {VA_START(fmt);
-	    VSNPRINTF(bf, BFLRG, fmt);
-	    VA_END;
+       {VA_START(fmt);
+	VSNPRINTF(bf, BFLRG, fmt);
+	VA_END;
 
-	    fprintf(fp, "DO-NET: %s\n", bf);};};
+	note(fp, "DO-NET: %s\n", bf);};
 
     return;}
 
@@ -248,10 +246,10 @@ static void notej(process *pp, char *fmt, ...)
 	mn = (ti - 3600*hr) / 60;
 	sc = tc - 60*(mn + 60*hr);
 
-	fprintf(Log, "DO-NET: [Job %06d/%02d:%02d:%06.3f] %s(%s) %s\n",
-		pp->id, hr, mn, sc,
-		sp->delim, (sp->host != NULL) ? sp->host : sp->rawh,
-		bf);};
+	note(NULL, "DO-NET: [Job %06d/%02d:%02d:%06.3f] %s(%s) %s\n",
+	      pp->id, hr, mn, sc,
+	      sp->delim, (sp->host != NULL) ? sp->host : sp->rawh,
+	      bf);};
 
     return;}
 
@@ -388,9 +386,9 @@ static char *lrun(FILE *f1, int tag, char *fmt, ...)
     VA_END;
 
     if (tag == FLOG)
-       fprintf(f1, "Command: %s\n", s);
+       note(f1, "Command: %s\n", s);
     else if ((state.verbose == TRUE) || (tag != VLOG))
-       fprintf(f1, "DO-NET: %s\n", s);
+       note(f1, "DO-NET: %s\n", s);
 
     snprintf(cmd, BFLRG, "PATH=.:%s ; %s", lpath, s);
 
@@ -410,7 +408,7 @@ static char *lrun(FILE *f1, int tag, char *fmt, ...)
 
 /* handle output to log */
     if (tag != QLOG)
-       fputs(bf, f1);
+       noted(f1, bf);
 
     return(bf);}
 
@@ -606,8 +604,8 @@ static process *arun(hfspec *sp, char *fnm, void *a, char *fmt, ...)
     VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
-    if ((state.verbose == TRUE) && (Log != NULL))
-       fprintf(Log, "DO-NET: %s\n", s);
+    if (state.verbose == TRUE)
+       note(NULL, "DO-NET: %s\n", s);
 
     snprintf(cmd, BFLRG, "%s", s);
 
@@ -650,7 +648,7 @@ static void brun(FILE *fo, char *fmt, ...)
     VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
-    fprintf(fo, "DO-NET: %s\n", s);
+    note(fo, "DO-NET: %s\n", s);
 
     snprintf(cmd, BFLRG, "PATH=.:%s ; %s", lpath, s);
 
@@ -758,11 +756,11 @@ static void print_list(hfspec *sp, int nsp, int rptcfg, int run, int ex)
              ok = ((rptcfg == TRUE) && (IS_NULL(lsp->config) == FALSE));
 	     s  = (ok == TRUE) ? lsp->config : lsp->host;
 	     if (j % 4 == 0)
-	        note(Log, FALSE, "\n   %-16s", s);
+	        note(NULL, "\n   %-16s", s);
 	     else
-	        note(Log, FALSE, "   %-16s", s);};};
+	        note(NULL, "   %-16s", s);};};
 
-    note(Log, TRUE, "");
+    note(NULL, "\n");
 
     return;}
 
@@ -823,9 +821,9 @@ static int make_report(donetdes *st, hfspec *sp, int nsp, int rpt)
 /* report passed */
        {if (np != 0)
 	   {if ((nl == 0) && (nt == 0) && (nf == 0))
-	       note(Log, TRUE, "Succeeded %s ALL %s:", prep, noun);
+	       note(NULL, "Succeeded %s ALL %s:\n", prep, noun);
 	    else
-	       note(Log, TRUE, "Succeeded %s %s:", prep, noun);
+	       note(NULL, "Succeeded %s %s:\n", prep, noun);
 
 	    print_list(sp, nsp, rptcfg, DONE, PASSED);};
 
@@ -835,20 +833,20 @@ static int make_report(donetdes *st, hfspec *sp, int nsp, int rpt)
 	       {ok               = (np + nt == nsp);
 		st->havetimeouts = TRUE;};
 
-	    note(Log, TRUE, "Timed out %s %s:", prep, noun);
+	    note(NULL, "Timed out %s %s:\n", prep, noun);
 	    print_list(sp, nsp, rptcfg, DONE, TIMEDOUT);};
 
 /* report failed */
         if (nf != 0)
-	   {note(Log, TRUE, "Failed %s %s:", prep, noun);
+	   {note(NULL, "Failed %s %s:\n", prep, noun);
 	    print_list(sp, nsp, rptcfg, DONE, FAILED);};
 
 /* report lost */
 	if (nl != 0)
-	   {note(Log, TRUE, "Lost %s:", noun);
+	   {note(NULL, "Lost %s:\n", noun);
 	    print_list(sp, nsp, rptcfg, RUNNING, WAITING);};
 
-	note(Log, TRUE, "");};
+	note(NULL, "\n");};
 
     return(ok);}
 
@@ -873,7 +871,7 @@ static void waitup(int cyc, char *sect, void *a,
        {pcl += 5;
 	if (state.silent == FALSE)
 	   printf(".");
-	noten(Log, state.verbose,
+	noten(NULL, state.verbose,
 	      "Jobs %3d of %3d  and  time %5d of %5d sec",
 	      nd, np, tc, tf);};
 
@@ -904,7 +902,7 @@ static void cwait(donetdes *st, hfspec *sp, int nsp, char *sect, int tf)
        printf("   %s .", sect);
 
 /* log the start */
-    noten(Log, st->verbose, "Waiting on %s: Jobs %d  and  time %d sec",
+    noten(NULL, st->verbose, "Waiting on %s: Jobs %d  and  time %d sec",
 	  sect, nsp, tf);
 
 /* check the jobs until they are all done, or time is exhausted,
@@ -916,7 +914,7 @@ static void cwait(donetdes *st, hfspec *sp, int nsp, char *sect, int tf)
     afin(finup);
 
 /* log the end */
-    noten(Log, st->verbose,
+    noten(NULL, st->verbose,
 	  "Waiting done on %s: %5d sec", sect, tc);
 
     if (st->silent == FALSE)
@@ -1321,31 +1319,30 @@ static void watch_header(donetdes *st, int ip, FILE *repf, char *file,
        tlft = "00:00";
 
 /* setup the header of the watch page */
-    note(repf,
-	 TRUE, "%s Phase      Hosts  Time Left  Time Stamp   Host File%s",
+    note(repf, "%s Phase      Hosts  Time Left  Time Stamp   Host File%s\n",
 	 shm, ehm);
     if (visual != TRUE)
-       note(repf, TRUE, " -----   -----  ---------  ----------   ---------");
+       note(repf, " -----   -----  ---------  ----------   ---------\n");
 
-    note(repf, TRUE, " %-12s %3d   %8s  %-11s  %s",
+    note(repf, " %-12s %3d   %8s  %-11s  %s\n",
 	 sect, nsp, tlft, st->stamp, file);
-    note(repf, TRUE, "");
+    note(repf, "\n");
 
     if (strcmp(sect, "build") == 0)
-       {note(repf, TRUE,
-	     "%s Host         Config                D/O Remove Build   Time   Test    Time   Final   Time%s",
+       {note(repf,
+	     "%s Host         Config                D/O Remove Build   Time   Test    Time   Final   Time%s\n",
 	     shm, ehm);
 	if (visual != TRUE)
-	   note(repf, TRUE, " ----         ------                --- ------ ------------   ------------   ------------");}
+	   note(repf, " ----         ------                --- ------ ------------   ------------   ------------\n");}
 
     else
-       {note(repf, TRUE, "%s Host             %s     Time%s", shm, sect, ehm);
+       {note(repf, "%s Host             %s     Time%s\n", shm, sect, ehm);
 
 	charset(blanks,  BFLRG, ' ', strlen(sect)-3);
 	charset(hyphens, BFLRG, '-', strlen(sect)-7);
 
 	if (visual != TRUE)
-	  note(repf, TRUE, " ----       %s", hyphens);};
+	  note(repf, " ----       %s\n", hyphens);};
 
     return;}
 
@@ -1366,12 +1363,12 @@ static void watch_emit(donetdes *st, char *repfn, char *file,
 
     else if (st->watchout == HTML)
        {htmlf = open_file("w", "%s/%s.html", st->shared, path_tail(file));
-	note(htmlf, TRUE,  "<html>");
-	note(htmlf, TRUE,  "<head>");
-	note(htmlf, TRUE,  "<title>DO-NET %s</title>", path_tail(file));
-	note(htmlf, TRUE,  "</head>");
-	note(htmlf, TRUE,  "<body>");
-	note(htmlf, TRUE,  "<pre>");
+	note(htmlf,  "<html>\n");
+	note(htmlf,  "<head>\n");
+	note(htmlf,  "<title>DO-NET %s</title>\n", path_tail(file));
+	note(htmlf,  "</head>\n");
+	note(htmlf,  "<body>\n");
+	note(htmlf,  "<pre>\n");
 
 	fp = fopen_safe(repfn, "r");
 	if (fp == NULL)
@@ -1394,12 +1391,12 @@ static void watch_emit(donetdes *st, char *repfn, char *file,
 		if (pc != NULL)
 		   subst(s, clr, "", -1);
 
-		note(htmlf, FALSE, s);};};
+		note(htmlf, s);};};
 	fclose_safe(fp);
 
-	note(htmlf, TRUE,  "</pre>");
-	note(htmlf, TRUE,  "</body>");
-	note(htmlf, TRUE,  "</html>");
+	note(htmlf,  "</pre>\n");
+	note(htmlf,  "</body>\n");
+	note(htmlf,  "</html>\n");
 	fclose_safe(htmlf);};
 
     return;}
@@ -1455,10 +1452,10 @@ static int watch(donetdes *st, int c, char **v)
     snprintf(dir, BFLRG, "%s/%s", st->logdir, st->stamp);
     chdir(dir);
 
-    Log = open_file("w", "watch");
+    initlog("w", "watch");
 
-    note(Log, TRUE, "Starting do-net watch using %s", file);
-    note(Log, TRUE, "Timer is %s", st->aux[2].proper);
+    note(NULL, "Starting do-net watch using %s\n", file);
+    note(NULL, "Timer is %s\n", st->aux[2].proper);
 
     if (st->send == TRUE)
        ip = PH_SETUP;
@@ -1546,7 +1543,7 @@ static int watch(donetdes *st, int c, char **v)
 	    tr -= 1;};};
 
     if (st->watchout == TEXT)
-       {note(Log, TRUE, "Continuing do-net watch until killed");
+       {note(NULL, "Continuing do-net watch until killed\n");
 	while (1);};
 
     return(0);}
@@ -1561,10 +1558,10 @@ static void start_watch(donetdes *st, char *exe)
     char *title, *geometry;
     FILE *fp;
 
-    separatorv(Log);
-    noten(Log, TRUE, "Start_watch");
-    noten(Log, TRUE, "Launching watch process");
-    noten(Log, TRUE, "Using xterm %s", cwhich("xterm"));
+    separatorv(NULL);
+    noten(NULL, TRUE, "Start_watch");
+    noten(NULL, TRUE, "Launching watch process");
+    noten(NULL, TRUE, "Using xterm %s", cwhich("xterm"));
 
     title    = "DO-NET-WATCH";
     geometry = "90x15-10+10";
@@ -1588,21 +1585,21 @@ static void start_watch(donetdes *st, char *exe)
     snprintf(fn, BFLRG, "%s/.do-watch-%s", st->shared, st->stamp);
     fp = open_file("w", fn);
 
-    note(fp, TRUE, "#!/bin/csh -f");
-    note(fp, TRUE, "%s %s %s %s", exe, wargs, st->hostfile, st->stamp);
-    note(fp, TRUE, "rm -f %s", fn);
-    note(fp, TRUE, "exit($status)");
+    note(fp, "#!/bin/csh -f\n");
+    note(fp, "%s %s %s %s\n", exe, wargs, st->hostfile, st->stamp);
+    note(fp, "rm -f %s\n", fn);
+    note(fp, "exit($status)\n");
 
     fclose_safe(fp);
 
     chmod(fn, 0700);
 
     if (st->watchout == TEXT)
-       brun(Log, "( xterm -geometry %s -T %s +sb -e %s & )",
+       brun(NULL, "( xterm -geometry %s -T %s +sb -e %s & )",
 	    geometry, title, fn);
 
     else if (st->watchout == HTML)
-       brun(Log, "( %s & )", fn);
+       brun(NULL, "( %s & )", fn);
 
     return;}
 
@@ -1689,14 +1686,14 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
 /* launch the jobs */
     for (i = 0, lsp = sp; i < nsp; i++, lsp++)
         {hst = lsp->rawh;
-	 separatorv(Log);
-	 noten(Log, st->verbose, "Verify %s", hst);
+	 separatorv(NULL);
+	 noten(NULL, st->verbose, "Verify %s", hst);
 	 arun(lsp, NULL, lsp, "%s -m %s", hserve, hst);};
 
-    separatorv(Log);
+    separatorv(NULL);
 
 /* log the start */
-    noten(Log, st->verbose, "Waiting on verify: Jobs %d  and  time %d sec",
+    noten(NULL, st->verbose, "Waiting on verify: Jobs %d  and  time %d sec",
 	  nsp, st->vfyt);
 
 /* wait for the work to complete */
@@ -1707,7 +1704,7 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
     nd = afin(finup);
 
 /* log the end */
-    noten(Log, st->verbose,
+    noten(NULL, st->verbose,
 	  "Waiting done on verify: %d in %5d sec", nd, tc);
 
     stop_time(dt, 16, tdi);
@@ -1716,7 +1713,7 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
     no = 0;
     ng = 0;
     for (i = 0; i < nsp; i++)
-        {noten(Log, st->verbose, "   %3d  (%3d,%3d) (%3d,%3d,%8d,%d) |%s|\t|%s|",
+        {noten(NULL, st->verbose, "   %3d  (%3d,%3d) (%3d,%3d,%8d,%d) |%s|\t|%s|",
 	       i+1, sp[i].running, sp[i].exit,
 	       sp[i].proc->status, sp[i].proc->io[0].fd,
 	       sp[i].proc->id, job_running(sp[i].proc),
@@ -1734,7 +1731,7 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
 	 else
 	    ng++;};
 
-    noten(Log, st->verbose, "Verify found: ok(%d) ng(%d) out of %d",
+    noten(NULL, st->verbose, "Verify found: ok(%d) ng(%d) out of %d",
 	  no, ng, nsp);
 
 /* now squeeze out missing hosts */
@@ -1745,7 +1742,7 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
              nsp--;
 	     i--;};};
 
-    noten(Log, st->verbose, "Verify final: %d hosts", nsp);
+    noten(NULL, st->verbose, "Verify final: %d hosts", nsp);
 
     return(nsp);}
 
@@ -1815,8 +1812,8 @@ static void checkhosts(donetdes *st)
     if (st->inacc != NULL)
        {if (st->silent == FALSE)
 	   printf("      %s (inaccessible)\n", st->inacc);
-	note(Log, TRUE, "");
-	note(Log, TRUE, "Inaccessible systems: %s", st->inacc);};
+	note(NULL, "\n");
+	note(NULL, "Inaccessible systems: %s\n", st->inacc);};
 
     return;}
 
@@ -2192,15 +2189,12 @@ static void readhost(donetdes *st, int log)
        {getcwd(t, BFLRG);
 	snprintf(st->lnetfn, BFLRG, "%s/.log.do-net", t);};
 
-    Log = open_file("w+", st->lnetfn);
-    if (Log == NULL)
+    if (initlog("w+", st->lnetfn) == NULL)
        {printf("\n");
 	printf("Cannot open log file %s - exiting\n", st->lnetfn);
 	printf("\n");
 	exit(7);};
        
-    setbuf(Log, NULL);
-
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -2212,8 +2206,8 @@ static void init(donetdes *st, int *purepo, double *gti, char *uhost)
    {int smin, bmin, imin;
     char *rv;
 
-    separatorv(Log);
-    noten(Log, TRUE, "Init");
+    separatorv(NULL);
+    noten(NULL, TRUE, "Init");
 
     *gti = start_time();
 
@@ -2233,57 +2227,57 @@ static void init(donetdes *st, int *purepo, double *gti, char *uhost)
 	st->cargs = append_tok(st->cargs, ' ', st->repo);
 	st->cargs = append_tok(st->cargs, ' ', st->tag);}
     else if (st->send == TRUE)
-       {note(Log, TRUE, "No means to get sources defined");
+       {note(NULL, "No means to get sources defined\n");
 	exit(2);};
 
-    note(Log, TRUE, "");
-    note(Log, TRUE, "Updating %s from %s according to %s",
+    note(NULL, "\n");
+    note(NULL, "Updating %s from %s according to %s\n",
 	 st->system, uhost, st->hostfile);
     if (st->clargs != NULL)
-       note(Log, TRUE, "Command line args: %s", st->clargs);
+       note(NULL, "Command line args: %s\n", st->clargs);
 
     if (st->localinstall == TRUE)
-       note(Log, TRUE, "Installs will be done on hosts which pass tests");
+       note(NULL, "Installs will be done on hosts which pass tests\n");
 
-    note(Log, TRUE, "User: %s   Date: %s   Tag: %s",
+    note(NULL, "User: %s   Date: %s   Tag: %s\n",
 	 cgetenv(TRUE, "USER"), run(FALSE, "date"), st->stamp);
 
-    note(Log, FALSE, "Time limits in minutes are: ");
+    note(NULL, "Time limits in minutes are: ");
     smin = st->phases[PH_SETUP].tlimit / 60;
-    note(Log, FALSE, "%d setup; ", smin);
+    note(NULL, "%d setup; ", smin);
 
     bmin = st->phases[PH_BUILD].tlimit / 60;
-    note(Log, FALSE, "%d build; ", bmin);
+    note(NULL, "%d build; ", bmin);
 
     imin = st->phases[PH_HOSTINSTALL].tlimit / 60;
-    note(Log, TRUE, "%d install", imin);
+    note(NULL, "%d install\n", imin);
 
-    noten(Log, TRUE, "state.dist           = |%s|", st->dist);
-    noten(Log, TRUE, "state.check          = |%d|", st->check);
-    noten(Log, TRUE, "state.send           = |%d|", st->send);
-    noten(Log, TRUE, "state.build          = |%d|", st->build);
-    noten(Log, TRUE, "state.install        = |%d|", st->install);
-    noten(Log, TRUE, "state.installwdh     = |%d|", st->installwdh);
-    noten(Log, TRUE, "state.verbose        = |%d|", st->verbose);
-    noten(Log, TRUE, "state.silent         = |%d|", st->silent);
-    noten(Log, TRUE, "state.clearout       = |%d|", st->clearout);
-    noten(Log, TRUE, "state.reportprogress = |%d|", st->reportprogress);
-    noten(Log, TRUE, "state.watchprogress  = |%d|", st->watchprogress);
-    noten(Log, TRUE, "state.localinstall   = |%d|", st->localinstall);
-    noten(Log, TRUE, "state.testhost       = |%d|", st->testhost);
-    noten(Log, TRUE, "state.watch          = |%d|", st->watch);
-    noten(Log, TRUE, "state.hostfile       = |%s|", st->hostfile);
-    noten(Log, TRUE, "state.do_code        = |%s|", st->do_code);
-    noten(Log, TRUE, "state.tag            = |%s|", st->tag);
+    noten(NULL, TRUE, "state.dist           = |%s|", st->dist);
+    noten(NULL, TRUE, "state.check          = |%d|", st->check);
+    noten(NULL, TRUE, "state.send           = |%d|", st->send);
+    noten(NULL, TRUE, "state.build          = |%d|", st->build);
+    noten(NULL, TRUE, "state.install        = |%d|", st->install);
+    noten(NULL, TRUE, "state.installwdh     = |%d|", st->installwdh);
+    noten(NULL, TRUE, "state.verbose        = |%d|", st->verbose);
+    noten(NULL, TRUE, "state.silent         = |%d|", st->silent);
+    noten(NULL, TRUE, "state.clearout       = |%d|", st->clearout);
+    noten(NULL, TRUE, "state.reportprogress = |%d|", st->reportprogress);
+    noten(NULL, TRUE, "state.watchprogress  = |%d|", st->watchprogress);
+    noten(NULL, TRUE, "state.localinstall   = |%d|", st->localinstall);
+    noten(NULL, TRUE, "state.testhost       = |%d|", st->testhost);
+    noten(NULL, TRUE, "state.watch          = |%d|", st->watch);
+    noten(NULL, TRUE, "state.hostfile       = |%s|", st->hostfile);
+    noten(NULL, TRUE, "state.do_code        = |%s|", st->do_code);
+    noten(NULL, TRUE, "state.tag            = |%s|", st->tag);
 
-    noten(Log, TRUE, "PATH = %s", cgetenv(FALSE, "PATH"));
+    noten(NULL, TRUE, "PATH = %s", cgetenv(FALSE, "PATH"));
 
 /* dump the environment */
-    rv = lrun(Log, QLOG, "/usr/bin/env");
+    rv = lrun(NULL, QLOG, "/usr/bin/env");
     if (rv != NULL)
-       {noten(Log, TRUE, "Environment:");
+       {noten(NULL, TRUE, "Environment:");
 	FOREACH(s, rv, "\n")
-	   noten(Log, TRUE, "   %s", s);
+	   noten(NULL, TRUE, "   %s", s);
 	ENDFOR;};   
 
     return;}
@@ -2308,26 +2302,26 @@ static int transmit_script(donetdes *st, char *host, char *csm)
 	exit(8);};
 
     for (ia = 0; (ia < na) && (ns != N_AUX); ia++)
-        {lrun(Log, NLOG, "scp %s %s:", st->scripts, host);
+        {lrun(NULL, NLOG, "scp %s %s:", st->scripts, host);
 
 /* list the remote files */
-	 rv = lrun(Log, QLOG, "ssh %s ls -l .do-*.%s", host, st->stamp);
+	 rv = lrun(NULL, QLOG, "ssh %s ls -l .do-*.%s", host, st->stamp);
 	 if (rv == NULL)
-	    noten(Log, TRUE, "Cannot list remote files");
+	    noten(NULL, TRUE, "Cannot list remote files");
          else
-	    {noten(Log, TRUE, "%s files:", host);
+	    {noten(NULL, TRUE, "%s files:", host);
 	     FOREACH(s, rv, "\n")
-	        noten(Log, TRUE, "   %s", s);
+	        noten(NULL, TRUE, "   %s", s);
 	     ENDFOR;};   
 
 /* verify that they arrived in working shape */
-	 rv = lrun(Log, QLOG, "ssh %s md5sum .do-*.%s", host, st->stamp);
+	 rv = lrun(NULL, QLOG, "ssh %s md5sum .do-*.%s", host, st->stamp);
 	 if (rv == NULL)
-	    noten(Log, TRUE, "Cannot checksum remote files");
+	    noten(NULL, TRUE, "Cannot checksum remote files");
 	 else
-	    {noten(Log, TRUE, "Checksum %s files:",  host);
+	    {noten(NULL, TRUE, "Checksum %s files:",  host);
 	     FOREACH(s, rv, "\n")
-	        noten(Log, TRUE, "   %s", s);
+	        noten(NULL, TRUE, "   %s", s);
 	     ENDFOR;
 
 /* NOTE: CYGWIN md5sum prepends a '*' to the file names */
@@ -2342,7 +2336,7 @@ static int transmit_script(donetdes *st, char *host, char *csm)
        {printf("\n");
 	printf("Unable to send scripts to %s - exiting", host);
 	printf("\n");
-	noten(Log, TRUE, "Unable to send scripts to %s - exiting", host);
+	noten(NULL, TRUE, "Unable to send scripts to %s - exiting", host);
 	ok = FALSE;};
 
     return(ok);}
@@ -2358,8 +2352,8 @@ static int sendscript(donetdes *st, char *host)
     char *dst, *rv;
     auxdes *pa;
 
-    separatorv(Log);
-    noten(Log, TRUE, "Sendscript");
+    separatorv(NULL);
+    noten(NULL, TRUE, "Sendscript");
 
     nstrncpy(bin, BFLRG, path_head(cwhich("do-net")), -1);
 
@@ -2376,23 +2370,23 @@ static int sendscript(donetdes *st, char *host)
 	 chmod(dst, pa[is].permi);};
 
 /* list the local files */
-    rv = lrun(Log, QLOG, "ls -l .do-*.%s", st->stamp);
+    rv = lrun(NULL, QLOG, "ls -l .do-*.%s", st->stamp);
     if (rv == NULL)
-       noten(Log, TRUE, "Cannot list remote files");
+       noten(NULL, TRUE, "Cannot list remote files");
     else
-       {noten(Log, TRUE, "Local files:");
+       {noten(NULL, TRUE, "Local files:");
 	FOREACH(s, rv, "\n")
-	   noten(Log, TRUE, "   %s", s);
+	   noten(NULL, TRUE, "   %s", s);
 	ENDFOR;};   
 
 /* checksum the local files */
-    rv = lrun(Log, QLOG, "md5sum .do-*.%s", st->stamp);
+    rv = lrun(NULL, QLOG, "md5sum .do-*.%s", st->stamp);
     if (rv == NULL)
-       noten(Log, TRUE, "Cannot checksum local files");
+       noten(NULL, TRUE, "Cannot checksum local files");
     else
-       {noten(Log, TRUE, "Checksum local files:");
+       {noten(NULL, TRUE, "Checksum local files:");
 	FOREACH(s, rv, "\n")
-	   noten(Log, TRUE, "   %s", s);
+	   noten(NULL, TRUE, "   %s", s);
 	ENDFOR;};   
     nstrncpy(csm, BFLRG, rv, -1);
 
@@ -2426,8 +2420,8 @@ static void report(donetdes *st)
     char *p;
     FILE *fin, *fout, *frpt;
 
-    separatorv(Log);
-    noten(Log, TRUE, "Report");
+    separatorv(NULL);
+    noten(NULL, TRUE, "Report");
 
     snprintf(rpt,  BFLRG, "%s/report", st->uplog);
     snprintf(tlog, BFLRG, "%s.tmp",    st->lnetfn);
@@ -2435,7 +2429,7 @@ static void report(donetdes *st)
     run(FALSE, "mv -f %s %s", st->lnetfn, tlog);
 
 /* close the log while we operate on its contents */
-    fclose_safe(Log);
+    finlog();
 
 /* filter junk out of net log and write report */
     fin  = open_file("r", tlog);
@@ -2475,10 +2469,10 @@ static void report(donetdes *st)
     unlink_safe(tlog);
 
 /* reopen the log for remaining activities */
-    Log = open_file("a", st->lnetfn);
+    initlog("a", st->lnetfn);
 
     if ((st->mailer != NULL) && (st->maillist != NULL))
-       lrun(Log, VLOG, "( %s -s \"%s auto build log (%s)\" %s < %s )",
+       lrun(NULL, VLOG, "( %s -s \"%s auto build log (%s)\" %s < %s )",
 	    st->mailer, st->system, path_tail(st->hostfile),
 	    st->maillist, rpt);
 
@@ -2508,11 +2502,11 @@ static void lockout(donetdes *st, char *host, char *uhost)
 		      path_head(wdir), st->system, tdir);
 
 	     if (file_exists(lock) == TRUE)
-	        {noted(Log, TRUE, "");
-		 noted(Log, TRUE, "Another do-net is running in directory %s", wdir);
-		 noted(Log, TRUE, "");
+	        {noted(NULL, "\n");
+		 noted(NULL, "Another do-net is running in directory %s\n", wdir);
+		 noted(NULL, "\n");
 		 run(BOTH, "cat %s", lock);
-		 noted(Log, TRUE, "");
+		 noted(NULL, "\n");
 
 		 report(st);
 
@@ -2520,10 +2514,10 @@ static void lockout(donetdes *st, char *host, char *uhost)
 
 	     lf = fopen_safe(lock, "w");
 	     if (lf != NULL)
-	        {note(lf, TRUE, "Host file = %s", st->hostfile);
-		 note(lf, TRUE, "Command line arguments = %s", st->clargs);
-		 note(lf, TRUE, "Date = %s", run(FALSE, "date"));
-		 note(lf, TRUE, "User = %s", cgetenv(TRUE, "USER"));
+	        {note(lf, "Host file = %s\n", st->hostfile);
+		 note(lf, "Command line arguments = %s\n", st->clargs);
+		 note(lf, "Date = %s\n", run(FALSE, "date"));
+		 note(lf, "User = %s\n", cgetenv(TRUE, "USER"));
 		 fclose_safe(lf);};};};
 
     return;}
@@ -2538,9 +2532,9 @@ static void recommend(donetdes *st)
     char rs[BFLRG], cmd[BFLRG];
     char **v;
 
-    note(Log, TRUE, "");
-    note(Log, TRUE, "Making recommendations for follow up action");
-    note(Log, TRUE, "");
+    note(NULL, "\n");
+    note(NULL, "Making recommendations for follow up action\n");
+    note(NULL, "\n");
 
 /* look for retry hints */
     nstrncpy(rs, BFLRG,
@@ -2556,17 +2550,17 @@ static void recommend(donetdes *st)
 
    if (IS_NULL(rs) == FALSE)
       {if (st->silent == FALSE)
-	  {noted(Log, TRUE, "");
-	   noted(Log, TRUE, "Some hosts failed to complete their work successfully.");
-	   noted(Log, TRUE, "You may want to retry those hosts as follows:");
-	   noted(Log, TRUE, "    %s -o %s", cmd, rs);
-	   noted(Log, TRUE, "");}
+	  {noted(NULL, "\n");
+	   noted(NULL, "Some hosts failed to complete their work successfully.\n");
+	   noted(NULL, "You may want to retry those hosts as follows:\n");
+	   noted(NULL, "    %s -o %s\n", cmd, rs);
+	   noted(NULL, "\n");}
        else
-          {note(Log, TRUE, "");
-	   note(Log, TRUE, "Some hosts failed to complete their work successfully.");
-	   note(Log, TRUE, "You may want to retry those hosts as follows:");
-	   note(Log, TRUE, "    %s -o %s", cmd, rs);
-	   note(Log, TRUE, "");};};
+          {note(NULL, "\n");
+	   note(NULL, "Some hosts failed to complete their work successfully.\n");
+	   note(NULL, "You may want to retry those hosts as follows:\n");
+	   note(NULL, "    %s -o %s\n", cmd, rs);
+	   note(NULL, "\n");};};
 
     return;}
 
@@ -2612,15 +2606,15 @@ static int work(donetdes *st, hfspec *sp, int nsp, int ip, int rpt)
 
 	     snprintf(fnm, BFLRG, "%s/%s.%s.%d", st->uplog, phase, host, i+1);
 
-	     separatorv(Log);
+	     separatorv(NULL);
 
-	     noten(Log, st->verbose, "Dispatching %s on %s", phase, host);
+	     noten(NULL, st->verbose, "Dispatching %s on %s", phase, host);
 	     arun(lsp, fnm, lsp,
 		  "%s %s %s -%s %s -time_limit %d -host_vars %s -host_fields %s",
 		  st->ssh, host, st->run, phase, st->cargs, nsec,
 		  st->varspecs, fields);};
 
-	separatorv(Log);
+	separatorv(NULL);
 
 /* wait for the work to complete */
 	cwait(st, sp, nsp, phase, nsec);
@@ -2650,15 +2644,15 @@ static void setup(donetdes *st, int ip, int urepo)
     nsp = st->n_nets;
 
     if (sp != NULL)
-       {note(Log, FALSE, "For source setup using");
+       {note(NULL, "For source setup using");
 	if (urepo == FALSE)
-	   {note(Log, TRUE, " distribution:");
-	    note(Log, TRUE, "    %s", st->dist);}
+	   {note(NULL, " distribution:\n");
+	    note(NULL, "    %s\n", st->dist);}
 	else
-           {note(Log, TRUE, " repository:");
-	    note(Log, TRUE, "    %s (tag %s)", st->repo, st->tag);};
+           {note(NULL, " repository:\n");
+	    note(NULL, "    %s (tag %s)\n", st->repo, st->tag);};
 
-	note(Log, TRUE, " ");
+	note(NULL, " \n");
 
 /* if no repo we better have a distribution file which we need to
  * send to all the net hosts now
@@ -2667,7 +2661,7 @@ static void setup(donetdes *st, int ip, int urepo)
 	   {if (file_exists(st->dist) == TRUE)
 	       {chmod(st->dist, 0770);
 		getcwd(t, BFLRG);
-		noten(Log, st->verbose, "Current directory: %s", t);
+		noten(NULL, st->verbose, "Current directory: %s", t);
 
 		for (i = 0, lsp = sp; i < nsp; i++, lsp++)
 		    {host = lsp->host;
@@ -2676,13 +2670,13 @@ static void setup(donetdes *st, int ip, int urepo)
  * NOTE: see earlier note about KSH and SCP
  */
 		     if (st->usescp == TRUE)
-		        lrun(Log, QLOG, "scp %s %s:%s",
+		        lrun(NULL, QLOG, "scp %s %s:%s",
 			     st->dist, host, path_tail(st->dist));
 		     else
-		        lrun(Log, QLOG, "( (sleep 2 ; cat %s) | ssh %s 'cat >| '%s )",
+		        lrun(NULL, QLOG, "( (sleep 2 ; cat %s) | ssh %s 'cat >| '%s )",
 			     st->dist, host, path_tail(st->dist));};}
 	    else
-	       {noten(Log, st->verbose, "Distribution file %s does not exist",
+	       {noten(NULL, st->verbose, "Distribution file %s does not exist",
 		      st->dist);
 		ok = FALSE;};};};
 
@@ -2770,14 +2764,14 @@ static void clean(donetdes *st, hfspec *sp, int nsp, int ip, double *gti)
     ok = work(st, sp, nsp, ip, TRUE);
     ASSERT(ok == TRUE);
 
-    noten(Log, st->verbose, "   All jobs completed");
+    noten(NULL, st->verbose, "   All jobs completed");
 
 /* if we were not already finishing up do so now */
    if (st->finishing == FALSE)
-      {noten(Log, st->verbose, "   st->finishing");
+      {noten(NULL, st->verbose, "   st->finishing");
        finish(st, ti);};
 
-    noten(Log, st->verbose, "Leaving clean");
+    noten(NULL, st->verbose, "Leaving clean");
 
     return;}
 
@@ -2825,19 +2819,19 @@ static int session(donetdes *st, char *exe, char *host, char *uhost)
     if (st->check == TRUE)
        checkhosts(st);
 
-    separatorv(Log);
-    noten(Log, TRUE, "Session");
+    separatorv(NULL);
+    noten(NULL, TRUE, "Session");
 
-    note(Log, TRUE, "");
+    note(NULL, "\n");
 
 /* report the following when verbose */
-    noten(Log, st->verbose, "");
-    noten(Log, st->verbose, "state.mailer    = |%s|",
+    noten(NULL, st->verbose, "");
+    noten(NULL, st->verbose, "state.mailer    = |%s|",
 	  (st->mailer != NULL) ? st->mailer : "none");
-    noten(Log, st->verbose, "state.maillist  = |%s|",
+    noten(NULL, st->verbose, "state.maillist  = |%s|",
 	  (st->maillist != NULL) ? st->maillist : "none");
     if (st->inacc != NULL)
-       noten(Log, st->verbose, "state.inacc     = |%s|", st->inacc);
+       noten(NULL, st->verbose, "state.inacc     = |%s|", st->inacc);
 
 /* lock out any competitors */
     lockout(st, host, uhost);
@@ -2940,16 +2934,16 @@ static int debug(donetdes *st)
 	if (rv == TRUE)
 	   {get_fields(fields, BFLRG, lsp);
 
-	    noted(Log, TRUE, "Dispatching %s on %s", phase, host);
+	    noted(NULL, "Dispatching %s on %s\n", phase, host);
 
 	    t = run(TRUE,
 		    "%s %s csh -vx %s -%s %s -time_limit %d -host_vars %s -host_fields %s",
 		    st->ssh, host, st->run, phase, st->cargs, nsec,
 		    st->varspecs, fields);
 
-	    noted(Log, TRUE, "");
-	    noted(Log, TRUE, "%s", t);
-	    noted(Log, TRUE, "");
+	    noted(NULL, "\n");
+	    noted(NULL, "%s\n", t);
+	    noted(NULL, "\n");
 
 	    run(TRUE, "%s %s rm -f %s", st->ssh, host, st->scripts);};};
 
@@ -2990,13 +2984,13 @@ static void fin_sect(donetdes *st, hfspec *sp, int nsp,
 			   ((strncmp(s, "Succeeded ", 10) != 0) &&
 			    (strncmp(s, "Failed ", 7) != 0)))
 		     {if (nl == 0)
-		         {note(Log, TRUE, "%s\n", st->separator);
+		         {separator(NULL);
 			  if (bld == FALSE)
-			     note(Log, TRUE, "Starting %s", sect);}
+			     note(NULL, "Starting %s\n", sect);}
 		      else if ((l == 0) && (bld == TRUE))
-		         {note(Log, TRUE, "");
-			  note(Log, TRUE, "%s\n", st->separator);};
-		      fputs(s, Log);
+		         {note(NULL, "\n");
+			  separator(NULL);};
+		      note(NULL, s);
 		      nl++;};};
 
 	     fclose_safe(elog);
@@ -3004,12 +2998,12 @@ static void fin_sect(donetdes *st, hfspec *sp, int nsp,
 	     unlink_safe(file);};};
 
     if ((nl > 0) && (bld == FALSE))
-       {note(Log, TRUE, "Done with %s (%s)", sect, etm);
+       {note(NULL, "Done with %s (%s)\n", sect, etm);
 	if ((strcmp(sect, "setup") == 0) ||
 	    (strcmp(sect, "hostinstall") == 0) ||
 	    (strcmp(sect, "netinstall") == 0))
-	   {notet(Log, "STAT", "%s (%s)", sect, etm);
-	    note(Log, TRUE, " ");}
+	   {notet(NULL, "STAT", "%s (%s)", sect, etm);
+	    note(NULL, " \n");}
 	else
 	   run(FALSE, "rm -f %s/%s.*", st->uplog, sect);};
 
@@ -3032,7 +3026,7 @@ static void finish(donetdes *st, double gti)
 
 /* cleanup if there were timeouts */
     if (st->havetimeouts == TRUE)
-       {note(Log, TRUE, "Some host timed out - cleaning up");
+       {note(NULL, "Some host timed out - cleaning up\n");
 
 	st->havetimeouts = FALSE;
 
@@ -3048,19 +3042,19 @@ static void finish(donetdes *st, double gti)
  */
     stop_time(etm, BFLRG, gti);
 
-    note(Log, TRUE, "Total time to completion %s", etm);
+    note(NULL, "Total time to completion %s\n", etm);
 
 /* report do-stat version, domain (seconds since 1/1/2000), and total time */
-    notet(Log, "STAT", "Version 5");
-    notet(Log, "STAT", "Domain %s", run(FALSE, "%s -p 0", ptime));
-    notet(Log, "STAT", "total (%s)", etm);
+    notet(NULL, "STAT", "Version 5");
+    notet(NULL, "STAT", "Domain %s", run(FALSE, "%s -p 0", ptime));
+    notet(NULL, "STAT", "total (%s)", etm);
 
-    note(Log, TRUE, "");
+    note(NULL, "\n");
 
 /* NOTE: /bin/bash will succeed at this while /bin/dash will fail
  * so to avoid the vagueries of the system explicitly run it with /bin/csh
  */
-    lrun(Log, NLOG, "/bin/csh -c '( rm -f %s/log.* >& /dev/null )'",
+    lrun(NULL, NLOG, "/bin/csh -c '( rm -f %s/log.* >& /dev/null )'",
 	 st->logdir);
 
     slog = open_file("a", "%s/stat", st->uplog);
@@ -3082,7 +3076,7 @@ static void finish(donetdes *st, double gti)
 /* remove empty <stamp>.stat files */
     run(FALSE, "find . -size 0c -name \"*.stat\" -exec rm {} \\;");
 
-    note(Log, TRUE, "%s\n", st->separator);
+    separator(NULL);
 
     if (st->silent == FALSE)
        printf(" done\n");
@@ -3112,7 +3106,7 @@ static void finish(donetdes *st, double gti)
 	     printf("\n");
 	     exit(11);};
 
-	 lrun(Log, QLOG, "%s %s rm -f %s", st->ssh, host, st->scripts);};
+	 lrun(NULL, QLOG, "%s %s rm -f %s", st->ssh, host, st->scripts);};
 
     return;}
 
@@ -3132,11 +3126,11 @@ static void interrupt(int sig)
 /* the watch option process does not have Log defined and
  * does not need to cleanup
  */
-       if ((Log != NULL) && (current_phase != NULL))
+       if (current_phase != NULL)
 	  {sect = current_phase->name;
 	   sp   = current_phase->sp;
 	   nsp  = current_phase->nsp;
-	   noted(Log, TRUE, "\n>>> interrupted in %s", sect);
+	   noted(NULL, "\n>>> interrupted in %s\n", sect);
 	   clean(&state, sp, nsp, PH_CLEAN, NULL);};};
 
     exit(1);}
@@ -3576,8 +3570,7 @@ int main(int c, char **v)
     else
        rv = session(&state, exe, host, uhost);
 
-    if (Log != NULL)
-       fclose_safe(Log);
+    finlog();
 
     cleanup(&state);
 

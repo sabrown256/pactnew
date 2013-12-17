@@ -36,7 +36,7 @@ StdHdrs   = ${POSIXHdrs} ${ANSIHdrs} ${NETWHdrs}
 
 LibFiles = libpsh.c libasync.c libpgrp.c libeval.c libtime.c \
            libfifo.c libsock.c libdb.c libsrv.c libhash.c \
-           libfio.c libio.c libinfo.c
+           libfio.c libio.c liblog.c libinfo.c
 IncFiles = common.h nonstd.h ${LibFiles}
 
 InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \

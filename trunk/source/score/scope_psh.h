@@ -211,6 +211,20 @@ extern int
  PS_ring_pop(io_ring *ring, char *s, int nc, unsigned int ls);
 
 
+/* LIBLOG.C declarations */
+
+extern void
+ _PS_cat(FILE *out, size_t nskip, size_t ncat, char *fname),
+ PS_separator(FILE *fp),
+ PS_note(FILE *fp, char *fmt, ...),
+ PS_noted(FILE *fp, char *fmt, ...),
+ PS_cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...),
+ PS_finlog(void);
+
+extern FILE
+ *PS_initlog(char *mode, char *fmt, ...);
+
+
 /* LIBPGRP.C declarations */
 
 extern void
@@ -275,12 +289,8 @@ extern void
  PS_string_sort(char **v, int n),
  PS_lst_free(char **lst),
  PS_free_strings(char **lst),
- PS_cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...),
  PS_copy(char *out, char *fmt, ...),
  PS_nsleep(int ms),
- PS_separator(FILE *fp),
- PS_note(FILE *fp, int nl, char *fmt, ...),
- PS_noted(FILE *fp, int nl, char *fmt, ...),
  PS_print_text(FILE *fp, char *fmt, ...),
  PS_clean_space(char *s),
  PS_splice_out_path(char *path),
