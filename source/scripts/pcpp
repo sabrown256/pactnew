@@ -219,7 +219,7 @@ if (-f $th) then
    endif
    unset cpp1
 
-   rm -f $th*
+   rm -f $th* >& /dev/null
    if (($stdout == TRUE) || ($nerr != 0)) then
       rm -f $fo >& /dev/null
    endif
