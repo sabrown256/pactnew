@@ -2401,12 +2401,13 @@ static void parse_features(char *t, int nc, int np, char *ft)
  */
 
 static void do_platform(client *cl, char *oper, char *value)
-   {int i;
+   {int is;
     char t[BFLRG], cfg[BFSML], sid[BFSML];
     char *p, *sib, **spec;
 
     st.np++;
 
+    is   = 0;
     spec = tokenize(value, " \t\n\r", 0);
     snprintf(sid, BFSML, "%s.%d", st.psy_id, st.np);
 
@@ -2436,11 +2437,11 @@ static void do_platform(client *cl, char *oper, char *value)
 /* add PSY_InstRoot */
     sib = dbget(cl, TRUE, "PSY_InstRoot");
     if ((IS_NULL(sib) == FALSE) && (strcmp(sib, "none") != 0))
-       vstrcat(t, BFLRG, " -i %s", spec[1]);
+       vstrcat(t, BFLRG, " -i %s", spec[is++]);
 
 /* add other options for this platform */
-    for (i = 2; spec[i] != NULL; i++)
-        vstrcat(t, BFLRG, " %s", spec[i]);
+    for ( ; spec[is] != NULL; is++)
+        vstrcat(t, BFLRG, " %s", spec[is]);
 
 /* finish up with config file */
     if (strcmp(cfg, "none") != 0)
