@@ -280,7 +280,7 @@ extern void
  PS_nsleep(int ms),
  PS_separator(FILE *fp),
  PS_note(FILE *fp, int nl, char *fmt, ...),
- PS_noted(FILE *fp, char *fmt, ...),
+ PS_noted(FILE *fp, int nl, char *fmt, ...),
  PS_print_text(FILE *fp, char *fmt, ...),
  PS_clean_space(char *s),
  PS_splice_out_path(char *path),

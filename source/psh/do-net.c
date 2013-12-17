@@ -2508,11 +2508,11 @@ static void lockout(donetdes *st, char *host, char *uhost)
 		      path_head(wdir), st->system, tdir);
 
 	     if (file_exists(lock) == TRUE)
-	        {noted(Log, "");
-		 noted(Log, "Another do-net is running in directory %s", wdir);
-		 noted(Log, "");
+	        {noted(Log, TRUE, "");
+		 noted(Log, TRUE, "Another do-net is running in directory %s", wdir);
+		 noted(Log, TRUE, "");
 		 run(BOTH, "cat %s", lock);
-		 noted(Log, "");
+		 noted(Log, TRUE, "");
 
 		 report(st);
 
@@ -2556,11 +2556,11 @@ static void recommend(donetdes *st)
 
    if (IS_NULL(rs) == FALSE)
       {if (st->silent == FALSE)
-	  {noted(Log, "");
-	   noted(Log, "Some hosts failed to complete their work successfully.");
-	   noted(Log, "You may want to retry those hosts as follows:");
-	   noted(Log, "    %s -o %s", cmd, rs);
-	   noted(Log, "");}
+	  {noted(Log, TRUE, "");
+	   noted(Log, TRUE, "Some hosts failed to complete their work successfully.");
+	   noted(Log, TRUE, "You may want to retry those hosts as follows:");
+	   noted(Log, TRUE, "    %s -o %s", cmd, rs);
+	   noted(Log, TRUE, "");}
        else
           {note(Log, TRUE, "");
 	   note(Log, TRUE, "Some hosts failed to complete their work successfully.");
@@ -2940,16 +2940,16 @@ static int debug(donetdes *st)
 	if (rv == TRUE)
 	   {get_fields(fields, BFLRG, lsp);
 
-	    noted(Log, "Dispatching %s on %s", phase, host);
+	    noted(Log, TRUE, "Dispatching %s on %s", phase, host);
 
 	    t = run(TRUE,
 		    "%s %s csh -vx %s -%s %s -time_limit %d -host_vars %s -host_fields %s",
 		    st->ssh, host, st->run, phase, st->cargs, nsec,
 		    st->varspecs, fields);
 
-	    noted(Log, "");
-	    noted(Log, "%s", t);
-	    noted(Log, "");
+	    noted(Log, TRUE, "");
+	    noted(Log, TRUE, "%s", t);
+	    noted(Log, TRUE, "");
 
 	    run(TRUE, "%s %s rm -f %s", st->ssh, host, st->scripts);};};
 
@@ -3136,7 +3136,7 @@ static void interrupt(int sig)
 	  {sect = current_phase->name;
 	   sp   = current_phase->sp;
 	   nsp  = current_phase->nsp;
-	   noted(Log, "\n>>> interrupted in %s", sect);
+	   noted(Log, TRUE, "\n>>> interrupted in %s", sect);
 	   clean(&state, sp, nsp, PH_CLEAN, NULL);};};
 
     exit(1);}
