@@ -335,6 +335,8 @@ Group PSY {
    Prefix      = ${PSY_Prefix}
    TYPE        = ""
    SITE        = ""
+   NoExe       = FALSE
+   Load        = FALSE
 
    Base        = ${PSY_Base}
    Root        = ${PSY_Root}

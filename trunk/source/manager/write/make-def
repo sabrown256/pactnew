@@ -59,7 +59,6 @@ dbmget $Log ACC_Debug_Default^      \
             Lex_Exe^                \
             Lex_Flags^              \
             LIB^                    \
-            Load^                   \
             MAKE_Strategy^          \
             MAKE_SUFFIXES^          \
             MAKE_UseGNU^            \
@@ -78,6 +77,7 @@ dbmget $Log ACC_Debug_Default^      \
             PSY_Root^               \
 	    PSY_ID^                 \
             PSY_InstRoot^           \
+            PSY_Load^               \
             PSY_PubLib^             \
             PSY_PubInc^             \
 	    PSY_CfgDir^             \
@@ -615,7 +615,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "ARXOpt   = ${AR_Flags} ${AR_XFlag}"
     Note $STDOUT ""
 
-    if ($Load == TRUE) then
+    if ($PSY_Load == TRUE) then
        Note $STDOUT 'Load           = ${CCmpLdr}'
     else
        Note $STDOUT 'Load           = echo'
