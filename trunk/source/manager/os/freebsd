@@ -15,5 +15,8 @@ Group TEST {
    ADVISORY = ${TEST_ADVISORY}:pgs_axis
 }
 
-define FREEBSD
+Group Cdefine {
+   FREEBSD = TRUE
+}
+
 

@@ -40,7 +40,6 @@ typedef struct s_gt_entry gt_entry;
 typedef struct s_state state;
 typedef struct s_dirdes dirdes;
 typedef struct s_ruledes ruledes;
-typedef struct s_auxfdes auxfdes;
 
 struct s_file_entry
    {int itype;
@@ -91,10 +90,6 @@ struct s_ruledes
     char yo_bp[BFLRG];
     char ya_bp[BFLRG];};
 
-struct s_auxfdes
-   {char cefn[BFLRG];       /* config defines for C */
-    FILE *CEF;};
-
 struct s_state
    {int abs_deb;
     int abs_opt;
@@ -127,7 +122,6 @@ struct s_state
     gt_stack gstck;
     dirdes dir;
     ruledes rules;
-    auxfdes aux;
 
     char cfgf[BFLRG];          /* config file name */
     char logf[BFLRG];          /* log file name */
@@ -1426,11 +1420,6 @@ static void setup_output_env(client *cl, char *base)
     char dlst[BFLRG];
     char **sa;
 
-/* close any open intermediate files and export their names */
-    dbset(cl, "CEFile", st.aux.cefn);
-    if (st.aux.CEF != NULL)
-       fclose_safe(st.aux.CEF);
-
 /* remove duplicate tokens in selected lists */
     nstrncpy(dlst, BFLRG, dbget(cl, FALSE, "PCO_RemDup"), -1);
     sa = tokenize(dlst, " \t", 0);
@@ -1558,24 +1547,6 @@ static void default_var(client *cl, char *base)
     strcpy(st.def_tools, "");
 
     push_struct("Glb", st.def_groups, STACK_GROUP);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DEFAULT_FILES - setup the various work files */
-
-static void default_files(int append)
-   {
-
-    snprintf(st.logf, BFLRG, "%s/log/config", st.dir.root);
-    if (append == FALSE)
-       unlink_safe(st.logf);
-    LOG_ON;
-
-    snprintf(st.aux.cefn, BFLRG, "%s/log/file.ce", st.dir.root);
-    st.aux.CEF = NULL;
 
     return;}
 
@@ -1883,8 +1854,11 @@ static void init_pco_session(client *cl, char *base, int append)
     default_rules();
     bad_pragma_rules();
 
-/* setup work files */
-    default_files(append);
+/* setup the log file */
+    snprintf(st.logf, BFLRG, "%s/log/config", st.dir.root);
+    if (append == FALSE)
+       unlink_safe(st.logf);
+    LOG_ON;
 
     printf("\n");
 
@@ -2466,11 +2440,6 @@ static void read_config(client *cl, char *cfg, int quiet)
 	 else if (strcmp(key, "exep") == 0)
 	    {st.exep  = TRUE;
 	     st.loadp = FALSE;}
-
-	 else if (strcmp(key, "define") == 0)
-	    {if (st.aux.CEF == NULL)
-	        st.aux.CEF = open_file("w", st.aux.cefn);
-	     note(st.aux.CEF, "#define %s %s\n", oper, value);}
 
 	 else if (strcmp(key, "setenv") == 0)
 	    {char *s;

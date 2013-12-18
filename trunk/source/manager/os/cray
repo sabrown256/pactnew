@@ -12,5 +12,7 @@ Group CRAY {
    XE = TRUE
 }
 
-define CRAY_XE
+Group Cdefine {
+   CRAY_XE = TRUE
+}
 

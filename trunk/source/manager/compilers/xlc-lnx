@@ -38,7 +38,9 @@ include compilers/xlc
 include os/lnx
 include cpp-rule
 
-define GETSOCKNAME_LONG
+Group Cdefine {
+   GETSOCKNAME_LONG = TRUE
+}
 
 # NOTE: despite debug flags no symbol info so undebuggable
 Group TEST {

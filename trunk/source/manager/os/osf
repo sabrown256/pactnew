@@ -4,5 +4,7 @@
 # include "cpyright.h"
 #
 
-define OSF
+Group Cdefine {
+   OSF = TRUE
+}
 

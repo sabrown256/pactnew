@@ -500,16 +500,33 @@ static char *do_defd(database *db, char *s, char *fmt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO_GET_MATCH - handle multiple gets via pattern matching */
+/* DO_SET_GET - handle variable set or get operations */
 
-static char **do_get_match(database *db, char **lst, char *s, char *fmt)
+static char **do_set_get(database *db, char **lst, char *s, char *fmt)
    {int is, ns;
-    char t[BFLRG];
     char *var, *val, **sa;
     hashtab *tb;
+    static char t[BFLRG];
 
-    tb = db->tab;
-    sa = hash_dump(tb, trim(s, BOTH, " \t"), NULL, 3);
+    key_val(&var, &val, s, "= \t\n");
+
+/* make a list of variables with values */
+    sa = NULL;
+    if (strpbrk(var, "*?[]") != NULL)
+       {tb = db->tab;
+	sa = hash_dump(tb, trim(s, BOTH, " \t"), NULL, 3);}
+
+    else
+       {if (val == NULL)
+	   val = get_db(db, var);
+
+	else
+	   {val = trim(val, BACK, " \t");
+	    val = put_db(db, var, val);};
+
+	sa = lst_push(sa, "%s=%s", var, val);};
+
+/* add the variables to the return list */
     ns = lst_length(sa);
     for (is = 0; is < ns; is++)
         {var = sa[is];
@@ -522,39 +539,11 @@ static char **do_get_match(database *db, char **lst, char *s, char *fmt)
 	    {snprintf(t, BFLRG, "\"%s\"", val);
 	     val = t;};
 
-	 lst = lst_push(lst, render_val(var, val, fmt));};
+	 lst = lst_add(lst, render_val(var, val, fmt));};
 
     free_strings(sa);
 
     return(lst);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO_SET_GET - handle variable set or get operations */
-
-static char *do_set_get(database *db, char *s, char *fmt)
-   {char *var, *val;
-    static char t[BFLRG];
-
-    key_val(&var, &val, s, "= \t\n");
-
-    if (val == NULL)
-       val = get_db(db, var);
-
-    else
-       {val = trim(val, BACK, " \t");
-	val = put_db(db, var, val);};
-
-    if ((val != NULL) &&
-	(strchr("'\"(", val[0]) == NULL) && 
-	(strpbrk(val, " \t") != NULL))
-       {snprintf(t, BFLRG, "\"%s\"", val);
-	val = t;};
-
-    val = render_val(var, val, fmt);
-
-    return(val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -626,13 +615,15 @@ static char **do_var_acc(database *db, char *s)
 	 else if (strstr(t, "=\?") != NULL)
 	    val = lst_push(val, do_cond_init(db, t, fmt));
 
-/* variable defined? */
-	 else if (strchr(t, '?') != NULL)
+/* variable defined? if no format specified
+ * otherwise format implies display and ? taken as regular expression
+ */
+	 else if ((strchr(t, '?') != NULL) && (fmt == NULL))
 	    val = lst_push(val, do_defd(db, t, fmt));
 
 /* variable set/get */
 	 else
-	    val = lst_push(val, do_set_get(db, t, fmt));};
+	    val = do_set_get(db, val, t, fmt);};
 
     FREE(fmt);
     free_strings(sa);

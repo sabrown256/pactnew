@@ -66,9 +66,11 @@ Group OpenMP {
    SharedFnc = yes
 }
 
-define HAVE_NO_SIGFPE
-define HYPOT PM_hypot
-#define STRTOD_FUNCTION _SC_strtod
+Group Cdefine {
+   HAVE_NO_SIGFPE = TRUE
+   HYPOT PM_hypot = TRUE
+#   STRTOD_FUNCTION = _SC_strtod
+}
 
 include cpp-rule
 include serial

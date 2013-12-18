@@ -30,7 +30,7 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
             AF_VERSION_OSX^           \
             BFD_Version^              \
             CC_Exe^                   \
-            CEFile^                   \
+            'Cdefine*'^               \
             DP_Lib^                   \
             DP_Inc^                   \
             FC_ID_CASE^               \
@@ -399,12 +399,15 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
        Note $STDOUT "#define IBM_$IBM_HW"
     endif
             
-    if (-f $CEFile) then
-       flog $Log cat $CEFile
-       cat $CEFile >>& $STDOUT
-       flog $Log $RM $CEFile
-       Note $STDOUT ""
-    endif
+# find and write out the C #defines
+flog $Log ( env | grep Cdefine_ )
+    foreach v (`env | grep Cdefine_`)
+       set inf = ( `echo "$v" | sed 's|^Cdefine_||' | sed 's|=| |'` )
+       flog $Log set var = $inf[1]
+       flog $Log set val = ( $inf[2-] )
+       Note $Log "#define $var $val"
+       Note $STDOUT "#define $var $val"
+    end
 
     if ("$FC_ID_CASE" == "upper") then
        if ("$FC_ID_UNDERSCORE" == "") then

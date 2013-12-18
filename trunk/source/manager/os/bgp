@@ -26,7 +26,9 @@ Group IBM {
    HW = BGP
 }
 
-define GETSOCKNAME_LONG
+Group Cdefine {
+   GETSOCKNAME_LONG = TRUE
+}
 
 setenv HAVE_MPI_GOOD_IO   TRUE
 setenv OBJECT_MODE        ${Bits}

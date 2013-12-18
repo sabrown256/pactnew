@@ -5,8 +5,6 @@
 # include "cpyright.h"
 #
 
-define BAD_COMPLEX_INITIALIZER
-
 Tool CC {
    Exe      = opencc
    Flags    = -Wno-unknown-pragmas
@@ -71,6 +69,10 @@ Tool Lex {
    Flags  = -w
    Flags += [ _env_ = Bits ;                # address bit size
               *     = -m* ]
+}
+
+Group Cdefine {
+   BAD_COMPLEX_INITIALIZER = TRUE
 }
 
 Group AF {

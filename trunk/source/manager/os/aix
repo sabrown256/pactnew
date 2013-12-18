@@ -14,8 +14,10 @@ Group IBM {
    HW  = PPC
 }
 
-define GETSOCKNAME_LONG
-define HAVE_THREAD_SAFE_MPI
+Group Cdefine {
+   GETSOCKNAME_LONG     = TRUE
+   HAVE_THREAD_SAFE_MPI = TRUE
+}
 
 setenv OBJECT_MODE  ${Bits}
 

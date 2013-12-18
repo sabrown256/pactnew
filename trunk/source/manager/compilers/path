@@ -10,8 +10,6 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath path
 
-define BAD_COMPLEX_INITIALIZER
-
 Tool CC {
    Exe       = pathcc
    Flags    += [ _env_ = STD_C ;                # C standard flags
@@ -61,6 +59,10 @@ Tool Lex {
 
 Tool OpenMP_Lex {
    Flags = -mp
+}
+
+Group Cdefine {
+   BAD_COMPLEX_INITIALIZER = TRUE
 }
 
 Group AF {
