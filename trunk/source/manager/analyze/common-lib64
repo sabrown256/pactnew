@@ -19,8 +19,13 @@ foreach dir ($lroot/lib64 $lroot/lib)
    if ($status == 0) then
       set objs = ( `ls $dir/*.o` )
       foreach o ($objs)
-         if (-f $o) then
-            set lbits = `file $o`
+         if (-l $o) then
+            set ob = ( `ls -l $o | sed 's|^.*->||'` )
+         else
+            set ob = $o
+         endif
+         if (-f $ob) then
+            set lbits = `file $ob`
             set ldir  = $dir:t
             break
          endif

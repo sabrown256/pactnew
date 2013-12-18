@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/socket -----"
 Note $ALog "Analyze: socket handling"
@@ -51,6 +51,8 @@ flog $ALog rm -f $Tmp.c $Tmp
 # export the results
 dbmset $ALog HAVE_SOCKETS    = $HAVE_SOCKETS^    \
              AF_SOCKOPT_TYPE = $AF_SOCKOPT_TYPE
+
+source $Me:h/post-common
 
 exit(0)
 

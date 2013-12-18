@@ -76,7 +76,6 @@
            unset ladv
            breaksw
       case freebsd:
-           echo "define FREEBSD" >>& $Tmp
            echo "run std/use-compiler $lcc" >>& $Tmp
            echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/gnu-freebsd" >>& $Tmp

@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/strerror_r -----"
 Note $ALog "Analyze: strerror_r"
@@ -105,6 +105,8 @@ endif
 # export the results
 dbmset $ALog HAVE_GNU_STRERROR   = $HAVE_GNU_STRERROR^   \
              HAVE_POSIX_STRERROR = $HAVE_POSIX_STRERROR
+
+source $Me:h/post-common
 
 exit(0)
 

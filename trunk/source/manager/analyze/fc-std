@@ -9,14 +9,14 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/fc-std -----"
 Note $ALog "Analyze: Fortran compiler standard"
 Note $ALog ""
 
-dbmget $ALog FC_Exe           =\? "f90"^        \
-             FC_Flags         =\? ""
+dbmget $ALog FC_Exe   =\? "f90"^        \
+             FC_Flags =\? ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -66,6 +66,8 @@ EOF
 
 # export the results
    dbmset $ALog STD_F = $STD_F
+
+   source $Me:h/post-common
 
    exit(0)
 

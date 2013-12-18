@@ -6,7 +6,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/fc-id -----"
 Note $ALog "Analyze: identifier handling"
@@ -86,6 +86,8 @@ DONE:
 # export the results
    dbmset $ALog FC_ID_UNDERSCORE = $FC_ID_UNDERSCORE^ \
                 FC_ID_CASE       = $FC_ID_CASE
+
+   source $Me:h/post-common
 
    exit(0)
 

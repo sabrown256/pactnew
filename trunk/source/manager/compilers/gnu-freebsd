@@ -21,7 +21,7 @@ Group OCV {
 }
 
 include compilers/gnu
-include os/bsd
+include os/freebsd
 
 run analyze/rpath -a /usr/${LIB}
 

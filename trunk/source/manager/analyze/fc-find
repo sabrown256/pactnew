@@ -10,7 +10,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 set af_ansi = TRUE
 set Verbose = FALSE
@@ -114,6 +114,8 @@ if ($af_ansi == TRUE) then
 else
    echo "$allfc"
 endif
+
+source $Me:h/post-common
 
 exit(0)
 

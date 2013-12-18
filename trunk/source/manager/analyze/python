@@ -17,7 +17,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/python -----"
 Note $ALog "Analyze: python"
@@ -117,7 +117,7 @@ if (-d ../../python) then
                set lpy_cc   = ""
 
                @ ok = 0
-               set inf = ( `$lpy_exe ../../python/python-info.py` )
+               set inf = ( `$lpy_exe ../../python/python-info.py |& cat` )
                if ($inf[1] == "Version:") then
                   flog $ALog set lpy_vers = $inf[2]
                   @ ok = $ok + 1
@@ -307,6 +307,8 @@ if (-d ../../python) then
 endif
 
 dbmset $ALog HAVE_PYTHON = "$HAVE_PYTHON"
+
+source $Me:h/post-common
 
 exit(0)
 

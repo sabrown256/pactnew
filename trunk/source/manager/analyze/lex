@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/lex -----"
 Note $ALog "Analyze: lex utility"
@@ -66,6 +66,8 @@ dbmset $ALog Lex_Exe           = $Lex_Exe^           \
              Cfg_Lex_Flags     = $Cfg_Lex_Flags^     \
              Cfe_Lex_Flags     = $Cfe_Lex_Flags^     \
              HAVE_FLEX_SCANNER = $HAVE_FLEX_SCANNER
+
+source $Me:h/post-common
 
 exit(0)
 

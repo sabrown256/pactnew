@@ -749,10 +749,10 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
     nstrncpy(s, BFLRG, val, -1);
     vl = trim(expand(s, BFLRG, NULL, FALSE), BOTH, " \t");
 
-    note(fsh, "export %s=%s\n",    var, vl);
+    note(fsh,  "export %s=%s\n",    var, vl);
     note(fcsh, "setenv %s %s\n",    var, vl);
-    note(fdk, "dk_setenv %s %s\n", var, vl);
-    note(fmd, "setenv %s %s;\n",   var, vl);
+    note(fdk,  "dk_setenv %s %s\n", var, vl);
+    note(fmd,  "setenv %s %s;\n",   var, vl);
 
     return;}
 
@@ -2555,7 +2555,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     else
 	        dbset(cl, var, val);
 
-	     note(st.aux.SEF, "%s \"%s\"", var, val);
+	     note(st.aux.SEF, "%s \"%s\"\n", var, val);
 	     note(NULL, "Command: setenv %s %s\n", var, val);}
 
 /* handle Note specifications */

@@ -6,7 +6,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/ranlib -----"
 Note $ALog "Analyze: ranlib utility"
@@ -130,6 +130,8 @@ dbmset $ALog AR_Exe     = $AR_Exe^       \
              AR_IFlag   = $AR_IFlag^     \
              AR_XFlag   = $AR_XFlag^     \
              Ranlib_Exe = $Ranlib_Exe
+
+source $Me:h/post-common
 
 exit(0)
 

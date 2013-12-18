@@ -7,6 +7,25 @@
 # include "cpyright.h"
 #
 
+# turn off echo and/or verbose mode
+
+if ($?echo == 1) then
+   unset echo
+   set re_echo = TRUE
+else
+   set re_echo = FALSE
+endif
+
+if ($?verbose == 1) then
+   unset verbose
+   set re_verbose = TRUE
+else
+   set re_verbose = FALSE
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # SUBROUTINE STATE
 #
 #  FIRST_    TRUE until the first use of 'call'
@@ -84,4 +103,19 @@ if (($FIRST_ == FALSE) && ("$SUBR_" != "")) then
 else
    set DISP_ = "CSH_SUBR_NO_LABEL"
 endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# restore echo and/or verbose mode
+
+if ($re_echo == TRUE) then
+   set echo
+endif
+unset re_echo
+
+if ($re_verbose == TRUE) then
+   set verbose
+endif
+unset re_verbose
 

@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/png -----"
 Note $ALog "Analyze: png"
@@ -135,6 +135,8 @@ EOF
 endif
 
 dbexp HAVE_PNGLIB
+
+source $Me:h/post-common
 
 exit(0)
 

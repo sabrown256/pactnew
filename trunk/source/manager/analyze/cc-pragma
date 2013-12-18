@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/cc-pragma -----"
 Note $ALog "Analyze: pragma handling"
@@ -44,6 +44,8 @@ flog $ALog rm -f $Tmp.c $Tmp
 
 # export the results
 dbexp HAVE_GOOD_OMP_PRAGMAS
+
+source $Me:h/post-common
 
 exit(0)
 

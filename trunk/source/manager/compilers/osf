@@ -67,6 +67,6 @@ Group RF {
    STATIC_LINKING = TRUE
 }
 
-define OSF
-
 include serial
+include os/osf
+

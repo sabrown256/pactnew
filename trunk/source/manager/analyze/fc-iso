@@ -12,7 +12,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/fc-iso -----"
 Note $ALog "Analyze: iso_c_binding module"
@@ -65,6 +65,8 @@ EOF
                 Cfg_FC_Flags       = $Cfg_FC_Flags^        \
                 Cfe_FC_Exe         = $Cfe_FC_Exe^          \
                 Cfe_FC_Flags       = $Cfe_FC_Flags
+
+   source $Me:h/post-common
 
    exit($err)
 

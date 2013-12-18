@@ -7,7 +7,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 if ($?Log == 0) then
    setenv Log $ALog
@@ -32,6 +32,8 @@ NoteD $ALog "   File System: $HSY_FS_Type"
 dbmset $ALog HSY_FS_Type   = $HSY_FS_Type^ \
              HSY_FS_Source = $HSY_FS_Source^ \
              HSY_FS_Mount  = $HSY_FS_Mount
+
+source $Me:h/post-common
 
 exit(0)
 

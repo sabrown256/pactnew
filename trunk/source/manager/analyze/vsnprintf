@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "Analyze: vsnprinft"
 
@@ -39,6 +39,8 @@ flog $ALog rm -f $Tmp $Tmp.c $Tmp.o
 
 # export the results
 dbexp HAVE_VSNPRINTF
+
+source $Me:h/post-common
 
 exit(0)
 

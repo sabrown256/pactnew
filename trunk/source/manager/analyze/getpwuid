@@ -10,7 +10,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "Analyze: getpwuid"
 
@@ -42,6 +42,8 @@ if ($HAVE_GETPWUID == FALSE) then
 endif
 
 dbexp HAVE_GETPWUID
+
+source $Me:h/post-common
 
 exit(0)
 

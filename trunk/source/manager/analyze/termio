@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "Analyze: termio"
 
@@ -147,6 +147,8 @@ dbmset $ALog HAVE_TERMINAL = $have_terminal
 #--------------------------------------------------------------------------
 
 ftee $ALog gexec $PSY_AnaDir/tty
+
+source $Me:h/post-common
 
 exit(0)
 

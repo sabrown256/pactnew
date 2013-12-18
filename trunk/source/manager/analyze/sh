@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/sh -----"
 Note $ALog "Analyze: Bourne shell"
@@ -36,5 +36,7 @@ foreach i ($path /usr/bin /bin)
 end
 
 dbexp SHELL_Default
+
+source $Me:h/post-common
 
 exit(1)

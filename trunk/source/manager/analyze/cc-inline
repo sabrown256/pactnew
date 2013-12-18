@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/cc-inline -----"
 Note $ALog "Analyze: inline handling"
@@ -42,5 +42,7 @@ rm -f $Tmp $Tmp.c $Tmp.o
 
 # export the result
 dbexp HAVE_INLINE
+
+source $Me:h/post-common
 
 exit(0)

@@ -9,90 +9,90 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-dbmget $Log HAVE_FORTRAN^     \
-            HAVE_PYTHON^      \
-            HAVE_PY_NUMERIC^  \
-            HAVE_PY_NUMPY^    \
-            MAKE_Exe^         \
-            MAKE_Shared_Libs^ \
-            PSY_Base^         \
-            PSY_Root^         \
-            PSY_ID^           \
-            PY_Exe^           \
-            PY_Ext^           \
-            PY_DirPy^         \
-            PY_DirSrc^        \
-            PY_DirDst^        \
-            USE_TmpDir^       \
-            CC_Exe^           \
-            Cfe_CC_Exe^       \
-            FC_Exe^           \
-            FC_Flags^         \
-            Cfe_FC_Exe^       \
-            Cfe_FC_Flags^     \
-            Yacc_Exe
+dbmget $ALog HAVE_FORTRAN^     \
+             HAVE_PYTHON^      \
+             HAVE_PY_NUMERIC^  \
+             HAVE_PY_NUMPY^    \
+             MAKE_Exe^         \
+             MAKE_Shared_Libs^ \
+             PSY_Base^         \
+             PSY_Root^         \
+             PSY_ID^           \
+             PY_Exe^           \
+             PY_Ext^           \
+             PY_DirPy^         \
+             PY_DirSrc^        \
+             PY_DirDst^        \
+             USE_TmpDir^       \
+             CC_Exe^           \
+             Cfe_CC_Exe^       \
+             FC_Exe^           \
+             FC_Flags^         \
+             Cfe_FC_Exe^       \
+             Cfe_FC_Flags^     \
+             Yacc_Exe
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    NoteD $Log "Configuration Summary for $PSY_ID"
+    NoteD $ALog "Configuration Summary for $PSY_ID"
 
     if (($?Cfe_CC_Exe == 0) || ("$Cfe_CC_Exe" == "none") || ("$Cfe_CC_Exe" == "")) then
-       NoteD $Log "   ERROR: No C compiler available - check your system or your path"
-       NoteD $Log ""
+       NoteD $ALog "   ERROR: No C compiler available - check your system or your path"
+       NoteD $ALog ""
        exit(1)
     else
        set UCC = `where $CC_Exe |& head -n 1`
-       NoteD $Log "   C Compiler used is $UCC"
+       NoteD $ALog "   C Compiler used is $UCC"
     endif
 
     if ($HAVE_FORTRAN == FALSE) then
        if (($?Cfe_FC_Exe == 0) || ("$Cfe_FC_Exe" == "none")) then
-          NoteD $Log "   No Fortran compiler found"
+          NoteD $ALog "   No Fortran compiler found"
        else
-          NoteD $Log "   Not building Fortran bindings"
+          NoteD $ALog "   Not building Fortran bindings"
        endif
     else if ("$Cfe_FC_Exe" == "") then
-       NoteD $Log "   ERROR: No Fortran compiler available - check your system or your path"
-       NoteD $Log ""
+       NoteD $ALog "   ERROR: No Fortran compiler available - check your system or your path"
+       NoteD $ALog ""
     else
        set UFC = `where $FC_Exe |& head -n 1`
        if (-x "$UFC") then
-          NoteD $Log "   Fortran Compiler used is $UFC"
+          NoteD $ALog "   Fortran Compiler used is $UFC"
        else
-          NoteD $Log "   Fortran Compiler requested is $Cfe_FC_Exe (not available)"
+          NoteD $ALog "   Fortran Compiler requested is $Cfe_FC_Exe (not available)"
        endif
     endif
 
     if ("$Bits" != "") then
-       NoteD $Log "   Building for $Bits bit pointers"
+       NoteD $ALog "   Building for $Bits bit pointers"
     endif
 
     if ($CROSS_COMPILE != "FALSE") then
-       NoteD $Log "   Cross compiling for target $CROSS_COMPILE"
+       NoteD $ALog "   Cross compiling for target $CROSS_COMPILE"
     endif
 
     if ($MAKE_Shared_Libs == TRUE) then
-       NoteD $Log "   Building shared libraries"
+       NoteD $ALog "   Building shared libraries"
     else
-       NoteD $Log "   Building static libraries"
+       NoteD $ALog "   Building static libraries"
     endif
 
-    Note $Log "   Cfg C Compiler used is $Cfe_CC_Exe"
-    Note $Log "   Cfg Fortran Compiler used is $Cfe_FC_Exe"
+    Note $ALog "   Cfg C Compiler used is $Cfe_CC_Exe"
+    Note $ALog "   Cfg Fortran Compiler used is $Cfe_FC_Exe"
 
     if ($RF_DEBUG == TRUE) then
-       NoteD $Log "   Building absolutely debuggable version"
+       NoteD $ALog "   Building absolutely debuggable version"
     endif
 
     if ($RF_OPTIMIZE == TRUE) then
-       NoteD $Log "   Building absolutely optimized version"
+       NoteD $ALog "   Building absolutely optimized version"
     endif
 
     if ($RF_PROFILE == TRUE) then
-       NoteD $Log "   Building profiling version"
+       NoteD $ALog "   Building profiling version"
     endif
        
 # PY_Exe     the full path to the python executable
@@ -105,7 +105,7 @@ dbmget $Log HAVE_FORTRAN^     \
 # PY_DirPy   python  lib/pythond.d/site-packages  (install into)
 
     if (("$HAVE_PYTHON" =~ *TRUE*) && ($MAKE_Shared_Libs == TRUE)) then
-       NoteD $Log "   Python bindings will be built in:"
+       NoteD $ALog "   Python bindings will be built in:"
        set lhave_python = ( $HAVE_PYTHON )
        set lpy_ext      = ( $PY_Ext )
        set lpy_dirpy    = ( $PY_DirPy )
@@ -124,14 +124,14 @@ dbmget $Log HAVE_FORTRAN^     \
 
              flog $ALog mkdir -p $ldp
 
-             NoteD $Log "      $lex -> $lds"
+             NoteD $ALog "      $lex -> $lds"
              if ("$PSY_InstRoot" != none) then
-                NoteD $Log "   Python bindings will be installed in:"
-                NoteD $Log "      $ldd"
+                NoteD $ALog "   Python bindings will be installed in:"
+                NoteD $ALog "      $ldd"
                 if (-d $ldp) then
-                   NoteD $Log "      $ldp"
+                   NoteD $ALog "      $ldp"
                 else
-                   NoteD $Log "      $ldp (no permissions)"
+                   NoteD $ALog "      $ldp (no permissions)"
                 endif
              endif
           endif
@@ -145,26 +145,26 @@ dbmget $Log HAVE_FORTRAN^     \
        unset lhave_python
 
     else if ($MAKE_Shared_Libs == FALSE) then
-       NoteD $Log "   Python bindings will not be built (need shared library option)"
+       NoteD $ALog "   Python bindings will not be built (need shared library option)"
     else if ("$PY_Exe" == "wrong-cc") then
-       NoteD $Log "   Python bindings will not be built (wrong compiler)"
+       NoteD $ALog "   Python bindings will not be built (wrong compiler)"
     else if ("$PY_Exe" == "no-numeric") then
-       NoteD $Log "   Python bindings will not be built (no numeric extensions)"
+       NoteD $ALog "   Python bindings will not be built (no numeric extensions)"
     else if ("$PY_Exe" == "") then
-       NoteD $Log "   Python bindings will not be built (no python)"
+       NoteD $ALog "   Python bindings will not be built (no python)"
     endif
 
     if ("$Yacc_Exe" == "") then
-       NoteD $Log "   Scheme syntax modes will not be built (no yacc or bison)"
+       NoteD $ALog "   Scheme syntax modes will not be built (no yacc or bison)"
     endif
 
     if ($USE_TmpDir == TRUE) then
-       NoteD $Log "   Doing fast builds using /tmp"
+       NoteD $ALog "   Doing fast builds using /tmp"
     endif
 
-    NoteD $Log "   Building into $cwd:h/dev/$PSY_ID"
+    NoteD $ALog "   Building into $cwd:h/dev/$PSY_ID"
 
-    NoteD $Log ""
+    NoteD $ALog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -176,14 +176,18 @@ dbmget $Log HAVE_FORTRAN^     \
 # before the write scripts are invoked
 # some of them include these files
 
-Note $Log "Install shell includes from psh"
+Note $ALog "Install shell includes from psh"
 
-flog $Log pushd $PSY_Base/psh
-flog $Log $MAKE_Exe IncDir=$PSY_Root/include -f pre-Make mkinstall
-flog $Log popd
+flog $ALog pushd $PSY_Base/psh
+flog $ALog $MAKE_Exe IncDir=$PSY_Root/include -f pre-Make mkinstall
+flog $ALog popd
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
+
+Separator $Log
 
 exit(0)
 

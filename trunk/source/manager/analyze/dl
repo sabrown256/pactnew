@@ -10,7 +10,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/dl -----"
 Note $ALog "Analyze: dynamic linker"
@@ -92,6 +92,8 @@ dbmset $ALog PACT_SO_CACHE       = $PACT_SO_CACHE^         \
              HAVE_DYNAMIC_LINKER = $HAVE_DYNAMIC_LINKER
 
 Separator $ALog
+
+source $Me:h/post-common
 
 exit(0)
 

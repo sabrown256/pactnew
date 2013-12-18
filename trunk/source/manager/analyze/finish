@@ -9,10 +9,13 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Separator $Log
-Note $Log "Analyze: finish"
+Note $ALog "Analyze: finish"
+
+Note $ALog "----- analyze/finish -----"
+Note $ALog "Analyze: Complete the analysis"
+Note $ALog ""
 
 dbmget $ALog CC_Exe^                   \
              CC_Flags^                 \
@@ -315,26 +318,26 @@ dbmget $ALog CC_Exe^                   \
    set tmp = ($Save_CFLAGS)
    flog $ALog setenv CC_Flags "$tmp"
 
-   flog $Log setenv CC_Optimize_Default "$CC_Optimize"
-   flog $Log setenv CC_Debug_Default    "$CC_Debug"
-   flog $Log setenv FC_Optimize_Default "$FC_Optimize"
-   flog $Log setenv FC_Debug_Default    "$FC_Debug"
+   flog $ALog setenv CC_Optimize_Default "$CC_Optimize"
+   flog $ALog setenv CC_Debug_Default    "$CC_Debug"
+   flog $ALog setenv FC_Optimize_Default "$FC_Optimize"
+   flog $ALog setenv FC_Debug_Default    "$FC_Debug"
 
-   flog $Log setenv ACC_Optimize_Default "-aO"
-   flog $Log setenv ACC_Debug_Default    "-ag"
-   flog $Log setenv AFC_Optimize_Default "-aO"
-   flog $Log setenv AFC_Debug_Default    "-ag"
+   flog $ALog setenv ACC_Optimize_Default "-aO"
+   flog $ALog setenv ACC_Debug_Default    "-ag"
+   flog $ALog setenv AFC_Optimize_Default "-aO"
+   flog $ALog setenv AFC_Debug_Default    "-ag"
 
    if ($RF_DEBUG == TRUE) then
-      flog $Log setenv CC_Optimize_Default  "$CC_Debug"
-      flog $Log setenv FC_Optimize_Default  "$FC_Debug"
-      flog $Log setenv ACC_Optimize_Default "-ag"
-      flog $Log setenv AFC_Optimize_Default "-ag"
+      flog $ALog setenv CC_Optimize_Default  "$CC_Debug"
+      flog $ALog setenv FC_Optimize_Default  "$FC_Debug"
+      flog $ALog setenv ACC_Optimize_Default "-ag"
+      flog $ALog setenv AFC_Optimize_Default "-ag"
    else if ($RF_OPTIMIZE == TRUE) then
-      flog $Log setenv CC_Debug_Default     "$CC_Optimize"
-      flog $Log setenv FC_Debug_Default     "$FC_Optimize"
-      flog $Log setenv ACC_Optimize_Default "-aO"
-      flog $Log setenv AFC_Optimize_Default "-aO"
+      flog $ALog setenv CC_Debug_Default     "$CC_Optimize"
+      flog $ALog setenv FC_Debug_Default     "$FC_Optimize"
+      flog $ALog setenv ACC_Optimize_Default "-aO"
+      flog $ALog setenv AFC_Optimize_Default "-aO"
    endif
 
 #--------------------------------------------------------------------------
@@ -366,6 +369,8 @@ dbmset $ALog CC_Exe               = $CC_Exe^               \
              MDI_Pck              = $MDI_Pck^              \
              MDE_Lib              = $MDE_Lib^              \
              RPATH                = $RPATH
+
+source $Me:h/post-common
 
 exit(0)
 

@@ -8,7 +8,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/install -----"
 Note $ALog "Analyze: install utility"
@@ -28,6 +28,8 @@ NoteD $ALog "   Install: $MINSTALL"
 
 # export the results
 dbmset $ALog INSTALL_Exe = $MINSTALL
+
+source $Me:h/post-common
 
 exit(0)
 

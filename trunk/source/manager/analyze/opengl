@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/opengl -----"
 Note $ALog "Analyze: opengl"
@@ -107,6 +107,8 @@ EOF
 endif
 
 dbexp Std_UseOGL
+
+source $Me:h/post-common
 
 exit(0)
 

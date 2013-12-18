@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "Analyze: pty"
 
@@ -52,6 +52,8 @@ rm -f $Tmp.c $Tmp
 
 # export the results
 dbexp HAVE_UNIX98_PTY
+
+source $Me:h/post-common
 
 exit(0)
 

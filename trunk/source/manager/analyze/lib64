@@ -10,7 +10,7 @@
 
 set lme   = $0
 set lbase = $lme:h
-source $lbase/common
+source $lbase/pre-common
 
 unalias file
 
@@ -37,6 +37,8 @@ endif
 
 # export the results
 dbexp LIB
+
+source $lbase/post-common
 
 exit(0)
 

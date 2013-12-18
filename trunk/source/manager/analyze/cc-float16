@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/cc-float16 -----"
 Note $ALog "Analyze: C90 long double support"
@@ -134,3 +134,7 @@ NoteD $ALog "      $ld ($ldio)"
 
 dbmset $ALog AF_LONG_DOUBLE    = $AF_LONG_DOUBLE^              \
              AF_LONG_DOUBLE_IO = $AF_LONG_DOUBLE_IO
+
+source $Me:h/post-common
+
+exit(0)

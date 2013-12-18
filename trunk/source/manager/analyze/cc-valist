@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/cc-valist -----"
 Note $ALog "Analyze: VA_LIST handling"
@@ -74,3 +74,6 @@ rm -f $Tmp $Tmp.c $Tmp.o
 dbmset $ALog HAVE_VA_LIST = $HAVE_VA_LIST^  \
              HAVE_VA_COPY = $HAVE_VA_COPY
 
+source $Me:h/post-common
+
+exit(0)
