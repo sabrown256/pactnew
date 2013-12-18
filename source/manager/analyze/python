@@ -105,10 +105,11 @@ if (-d ../../python) then
          Note $ALog "Search Dirs = |$lDirs|"
          flog $ALog set found = FALSE
          foreach i ($lDirs)
-            if (-x $i/$py) then
+            set lpy_exe = $i/$py
+            if (-x $lpy_exe) then
+
                Note $ALog ""
-               Note $ALog "Checking $i/$py"
-               set lpy_exe = $i/$py
+               Note $ALog "Checking $lpy_exe"
 
                set lpy_vers = ""
                set lpy_inc  = ""
@@ -118,33 +119,37 @@ if (-d ../../python) then
 
                @ ok = 0
                set inf = ( `$lpy_exe ../../python/python-info.py |& cat` )
-               if ($inf[1] == "Version:") then
-                  flog $ALog set lpy_vers = $inf[2]
-                  @ ok = $ok + 1
-               endif
-               if ($inf[3] == "IncDir:") then
-                  flog $ALog set lpy_inc = $inf[4]
-                  @ ok = $ok + 1
-               endif
-               if ($inf[5] == "LibDir:") then
-                  flog $ALog set lpy_lib = $inf[6]
-                  @ ok = $ok + 1
-               endif
-               if ($inf[7] == "CfgDir:") then
-                  flog $ALog set lpy_cfg = $inf[8]
-                  @ ok = $ok + 1
-               endif
-               if ($inf[9] == "Compiler:") then
-                  flog $ALog set lpy_cc =  $inf[10]
-                  @ ok = $ok + 1
+               if ($#inf > 9) then
+                  if ($inf[1] == "Version:") then
+                     flog $ALog set lpy_vers = $inf[2]
+                     @ ok = $ok + 1
+                  endif
+                  if ($inf[3] == "IncDir:") then
+                     flog $ALog set lpy_inc = $inf[4]
+                     @ ok = $ok + 1
+                  endif
+                  if ($inf[5] == "LibDir:") then
+                     flog $ALog set lpy_lib = $inf[6]
+                     @ ok = $ok + 1
+                  endif
+                  if ($inf[7] == "CfgDir:") then
+                     flog $ALog set lpy_cfg = $inf[8]
+                     @ ok = $ok + 1
+                  endif
+                  if ($inf[9] == "Compiler:") then
+                     flog $ALog set lpy_cc =  $inf[10]
+                     @ ok = $ok + 1
 
 # get the compiler python was built with
-                  if ((($HSY_OS_Name == "Linux")    || \
-                       ($HSY_OS_Name == "Darwin")   || \
-                       ($HSY_OS_Name == "FreeBSD")) && \
-                      ($lpy_cc == cc)) then
-                     flog $ALog set lpy_cc = Python_CC_Exe
+                     if ((($HSY_OS_Name == "Linux")    || \
+                          ($HSY_OS_Name == "Darwin")   || \
+                          ($HSY_OS_Name == "FreeBSD")) && \
+                         ($lpy_cc == cc)) then
+                        flog $ALog set lpy_cc = Python_CC_Exe
+                     endif
                   endif
+               else
+                  Note $ALog "Bad information for $lpy_exe - version ignored"
                endif
 
 # if we have all 5 pieces of info then we have a usable python
