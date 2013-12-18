@@ -93,8 +93,7 @@ struct s_ruledes
 
 struct s_auxfdes
    {char cefn[BFLRG];       /* config defines for C */
-    FILE *CEF;
-    FILE *SEF;};
+    FILE *CEF;};
 
 struct s_state
    {int abs_deb;
@@ -760,13 +759,14 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
 /*--------------------------------------------------------------------------*/
 
 /* ADD_SPEC_ENV_VARS - add variables specified in the environment
- *                   - variable ENV_VARS to the environment files
+ *                   - variables ENV_GT and ENV_VARS
+ *                   - to the environment files
  */
 
-static void add_spec_env_vars(client *cl,
-			      FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd,
-			      int n, char **sa, int blank)
-   {int i, iv, nv, ok;
+static void add_spec_env_vars(client *cl, int blank,
+			      FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
+			      
+   {int iv, nv;
     char g[BFSML], s[BFLRG];
     char *p, *v, *var, **gt, **va;
 
@@ -789,11 +789,10 @@ static void add_spec_env_vars(client *cl,
 	for (iv = 0; iv < nv; iv++)
 	    {snprintf(g, BFSML, "%s_", gt[iv]);
 	     nc = strlen(g);
-	     for (ok = FALSE; ia < na; ia++)
+	     for ( ; ia < na; ia++)
 	         {eq = strncmp(g, ta[ia], nc);
 		  if (eq == 0)
-		     {ok = TRUE;
-		      vr = ta[ia];
+		     {vr = ta[ia];
 		      vl = strchr(vr, '=');
 		      if (vl != NULL)
 			 *vl++ = '\0';
@@ -815,69 +814,12 @@ static void add_spec_env_vars(client *cl,
     va  = tokenize(var, " :", 0);
     nv  = (va != NULL) ? lst_length(va) : 0;
     for (iv = 0; iv < nv; iv++)
-
-/* see if S is also in the list SA */
-        {ok = TRUE;
-	 for (i = 0; (i < n) && (ok == TRUE); i++)
-	     {v = va[iv];
-	      ok &= (strncmp(v, sa[i], strlen(v)) != 0);};
-
-	 if ((n > 0) && (ok == TRUE))
-	    {p = dbget(cl, TRUE, v);
-	     if ((IS_NULL(p) == FALSE) || (blank == TRUE))
-	        env_out(fsh, fcsh, fdk, fmd, v, p);};};
+        {v = va[iv];
+	 p = dbget(cl, TRUE, v);
+	 if ((IS_NULL(p) == FALSE) || (blank == TRUE))
+	    env_out(fsh, fcsh, fdk, fmd, v, p);};
 
     free_strings(va);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* ADD_SET_CFG - add variables set in config files */
-
-static void add_set_cfg(client *cl,
-			FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
-   {int i, j, n, nc, ok;
-    char *var, *val, *p, **sa;
-
-    fflush_safe(st.aux.SEF);
-    sa = file_text(TRUE, "%s/log/file.se", st.dir.root);
-    n  = (sa != NULL) ? lst_length(sa) : 0;
-
-    add_spec_env_vars(cl, fcsh, fsh, fdk, fmd, n, sa, TRUE);
-
-/* add all the setenv'd variables */
-    if (sa != NULL)
-       {for (i = 0; i < n; i++)
-	    {p = sa[i];
-
-	     var = strtok(p, " ");
-	     if (var != NULL)
-	        {nc  = strlen(var);
-		 val = strtok(NULL, "\n");
-		    
-		 if ((strcmp(var, "ENV_VARS") == 0) ||
-		     (strcmp(var, "ENV_GT") == 0))
-		    continue;
-
-/* handle PATH specially - just gather everything that is
- * not $PATH or ${PATH}
- */
-	         else if (strcmp(var, "PATH") == 0)
-		    push_path(P_APPEND, epath, val);
-
-/* weed out duplicates - taking only the last setting */
-		else
-		   {ok = FALSE;
-		    for (j = i+1; (j < n) && (ok == FALSE); j++)
-		        ok = ((strncmp(var, sa[j], nc) == 0) &&
-			      (sa[j][nc] == ' '));
-		     
-		    if (ok == FALSE)
-		       env_out(fsh, fcsh, fdk, fmd, var, val);};};};
-
-	free_strings(sa);};
 
     return;}
 
@@ -976,7 +918,7 @@ static void write_envf(client *cl, int lnotice)
 	for (i = 0; i < n; i++)
 	    env_out(fsh, fcsh, fdk, fmd, site[i], dbget(cl, TRUE, site[i]));
 
-	add_set_cfg(cl, fcsh, fsh, fdk, fmd);}
+	add_spec_env_vars(cl, TRUE, fcsh, fsh, fdk, fmd);}
     else
        add_set_db(fcsh, fsh, fdk, fmd);
 
@@ -1631,8 +1573,6 @@ static void default_files(int append)
     if (append == FALSE)
        unlink_safe(st.logf);
     LOG_ON;
-
-    st.aux.SEF = open_file("w+", "%s/log/file.se", st.dir.root);
 
     snprintf(st.aux.cefn, BFLRG, "%s/log/file.ce", st.dir.root);
     st.aux.CEF = NULL;
@@ -2535,7 +2475,6 @@ static void read_config(client *cl, char *cfg, int quiet)
 	 else if (strcmp(key, "setenv") == 0)
 	    {char *s;
 
-	     note(st.aux.SEF, "%s %s\n", oper, value);
 	     if (strcmp(oper, "PATH") == 0)
                 push_path(P_APPEND, epath, value);
 	     s = echo(FALSE, value);
@@ -2555,7 +2494,6 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     else
 	        dbset(cl, var, val);
 
-	     note(st.aux.SEF, "%s \"%s\"\n", var, val);
 	     note(NULL, "Command: setenv %s %s\n", var, val);}
 
 /* handle Note specifications */
