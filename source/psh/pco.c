@@ -1434,8 +1434,10 @@ static void setup_output_env(client *cl, char *base)
     dbset(cl, "IncDir",  st.dir.inc);
     dbset(cl, "EtcDir",  st.dir.etc);
 
-    dbset(cl, "Load",        st.loadp ? "TRUE" : "FALSE");
-    dbset(cl, "NoExe",       st.exep ? "TRUE" : "FALSE");
+#if 0
+    dbset(cl, "PSY_Load",        st.loadp ? "TRUE" : "FALSE");
+    dbset(cl, "PSY_NoExe",       st.exep ? "TRUE" : "FALSE");
+#endif
     dbset(cl, "DefGroups",   st.def_groups);
     dbset(cl, "CONFIG_FILE", st.cfgf);
 
@@ -1672,9 +1674,6 @@ static void default_rules(void)
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#if 1
-
 /*--------------------------------------------------------------------------*/
 
 /* BAD_PRAGMA_RULES - setup the rules for CC, Lex, Yacc, and FC
@@ -1752,94 +1751,6 @@ static void bad_pragma_rules(void)
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#else
-
-/*--------------------------------------------------------------------------*/
-
-/* BAD_PRAGMA_RULES - setup the rules for CC, Lex, Yacc, and FC
- *                  - allowing for bad handling of _Pragma
- */
-
-static void bad_pragma_rules(void)
-   {char *ar, *cd, *le, *ye, *rm, *tc;
-
-    le  = "sed \"s|lex.yy.c|$*.c|\" lex.yy.c | sed \"s|yy|$*_|g\" > $*.c";
-    ye  = "sed \"s|y.tab.c|$*.c|\" y.tab.c | sed \"s|yy|$*_|g\" > $*.c";
-    ar  = "${AR} ${AROpt} ${TGTLib} $*.o 2>> errlog";
-    rm  = "${RM} errlog";
-    cd  = "cd ${PACTTmpDir}";
-    tc  = "touch errlog";
-
-/* C rules */
-    snprintf(st.rules.co_bp, BFLRG,
-             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
-	     "echo \"${CCAnnounce} -c $<\"",
-	     "px -c \"test -s $*.int.c\" \"${CC} -E $< -o $@ > $*.int.c\"",
-	     "( ${CC} -c $*.int.c -o $@ ) || frnsic -e 1 $< $*.int.c $@",
-	     "${RM} $*.int.c");
-
-    snprintf(st.rules.ca_bp, BFLRG,
-             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
-	     "echo \"${CCAnnounce} -c $<\"",
-	     cd, rm, tc,
-	     "( px -c \"test -s $*.int.c\" \"${CC} -E ${PACTSrcDir}/$< > $*.int.c\") || frnsic -e 1 ${PACTSrcDir}/$< $*.int.c",
-	     "( ${CC} -c $*.int.c -o $*.o ) || frnsic -e 1 ${PACTSrcDir}/$< $*.int.c $*.o",
-	     ar,
-	     "${RM} $*.int.c $*.o 2>> errlog");
-
-/* lex rules */
-    snprintf(st.rules.lo_bp, BFLRG,
-             "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
-             "echo \"lex $<\"",
-	     rm, tc,
-	     "${LEX} $< 2>> errlog",
-	     le,
-	     "px -c \"test -s $*.int.c\" \"${LX} -E $*.c > $*.int.c\"",
-	     "( ${LX} -c $*.int.c ) || frnsic -e 1 $*.int.c lex.yy.c $*.c",
-	     "${RM} lex.yy.c $*.int.c $*.c");
-
-    snprintf(st.rules.la_bp, BFLRG,
-	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
-	     "echo \"lex $<\"",
-	     cd, rm, tc,
-	     "${LEX} -t ${PACTSrcDir}/$< 1> lex.yy.c 2>> errlog",
-	     le,
-	     "echo \"${LXAnnounce} -c $*.c\"",
-	     "px -c \"test -s $*.int.c\" \"${LX} -E $*.c > $*.int.c\"",
-	     "( ${LX} -c $*.int.c -o $*.o ) || frnsic -e 1 $*.int.c $*.c $*.o",
-	     ar,
-	     "${RM} lex.yy.c $*.int.c $*.c");
-
-/* yacc rules */
-    snprintf(st.rules.yo_bp, BFLRG,
-	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
-	     "echo \"yacc $<\"",
-	     cd, rm, tc,
-	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
-	     ye,
-	     "px -c \"test -s $*.int.c\" \"${YC} -E $*.c > $*.int.c\"",
-	     "( ${YC} -c $*.int.c -o $*.o ) || frnsic -e 1 $*.int.c $*.c $*.o",
-	     "${RM} $*.int.c $*.c");
-
-    snprintf(st.rules.ya_bp, BFLRG,
-	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
-	     "echo \"yacc $<\"",
-	     cd, rm, tc,
-	     "${YACC} ${PACTSrcDir}/$< 2>> errlog",
-	     ye,
-	     "echo \"${YCAnnounce} -c $*.c\"",
-	     "px -c \"test -s $*.int.c\" \"${YC} -E $*.c > $*.int.c\"",
-	     "( ${YC} -c $*.int.c -o $*.o ) || frnsic -e 1 $*.int.c $*.c $*.o",
-	     ar,
-	     "${RM} $*.c $*.int.c $*.o");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* INIT_PCO_SESSION - initialize the state of the config session */
@@ -2436,11 +2347,11 @@ static void read_config(client *cl, char *cfg, int quiet)
 	        {dbset(cl, "PSY_InstRoot", value);
 		 dbset(cl, "PSY_PubInc",   "%s/include", value);
 		 dbset(cl, "PSY_PubLib",   "%s/lib", value);};}
-
+#if 0
 	 else if (strcmp(key, "exep") == 0)
 	    {st.exep  = TRUE;
 	     st.loadp = FALSE;}
-
+#endif
 	 else if (strcmp(key, "setenv") == 0)
 	    {char *s;
 
@@ -2449,6 +2360,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     s = echo(FALSE, value);
 	     dbset(cl, oper, s);}
 
+#if 0
 	 else if (strcmp(key, "parent") == 0)
 	    {char *s, *var, *val;
 
@@ -2464,6 +2376,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	        dbset(cl, var, val);
 
 	     note(NULL, "Command: setenv %s %s\n", var, val);}
+#endif
 
 /* handle Note specifications */
 	 else if (strcmp(key, "Note") == 0)

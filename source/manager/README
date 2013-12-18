@@ -751,14 +751,6 @@ STD_IPC
    force a choice here.  Current choices are: POSIX or NOIPC. The
    default is POSIX.
 
-NoExe
-   On some systems (particularly parallel machines) the target codes
-   are cross-compiled and must be run in a special way by the front
-   end machine. In this situation it may be pointless to build the
-   PACT executables but necessary to build the libraries.  If this
-   is TRUE then no executables will be linked and installed (e.g.
-   no ULTRA or SX).  Default is "FALSE".
-
 DP_FE
    On some parallel systems target codes must be run in a special way.
    This is used to execute the target appropriately.  Default is "".

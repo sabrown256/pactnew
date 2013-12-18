@@ -35,7 +35,7 @@ dbmget $Log Bits^              \
             Ranlib_Exe^        \
             PSY_Cfg^           \
             PSY_TYPE^          \
-            NoExe
+            PSY_NoExe
 
 set LibVers = 1
 
@@ -105,7 +105,7 @@ set LibVers = 1
     Note $STDOUT 'devlib : ${TGTLib}'
     Note $STDOUT ''
 
-    if ($NoExe == TRUE) then
+    if ($PSY_NoExe == TRUE) then
        Note $STDOUT '#'
        Note $STDOUT '# make place-holder for executable'
        Note $STDOUT '#'
