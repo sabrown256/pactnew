@@ -94,7 +94,6 @@ dbmget $Log ACC_Debug_Default^      \
             SHELL_Default^          \
             SMP_LibExt^             \
             STD_IPC^                \
-            URFile^                 \
             Yacc_Exe^               \
             Yacc_Flags
 
@@ -215,23 +214,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'TGTMan3 = noman'
     Note $STDOUT 'LibName = noname'
     Note $STDOUT ""
-
-# GOTCHA: when this goes remove reset_make_vars in pco.c
-#    if (-f $MVFile) then
-#       Note $STDOUT "#"
-#       Note $STDOUT "# variables defined in config file"
-#       Note $STDOUT "#"
-#       sort $MVFile >>& $STDOUT
-#       $RM $MVFile
-#       Note $STDOUT ""
-#    endif
-
-#    if ("$MAKE_UseGNU" == "-DUSE_GNU_MAKE") then
-#       Note $STDOUT "HaveGMake = TRUE"
-#    else
-#       Note $STDOUT "HaveGMake = FALSE"
-#    endif
-#    Note $STDOUT ""
 
 # Compiler info
     gexec ../scripts/gcc-info $CC_Exe @o2 @e3 vw:GCCInfo @ fa:/dev/null
@@ -681,21 +663,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     call PrintRule(".f.a:", FCArc)
 
     Note $STDOUT ""
-
-# add the user defined rules here
-    if (-f $URFile) then
-       set ln   = ( `wc -l $URFile` )
-       @ nlines = $ln[1]
-       if ($nlines > 0) then
-          Note $STDOUT "#"
-          Note $STDOUT "# Configuration defined rules"
-          Note $STDOUT "#"
-          Note $STDOUT ""
-          cat $URFile >>& $STDOUT
-          $RM $URFile
-          Note $STDOUT ""
-       endif
-    endif
 
     exit(0)
 

@@ -500,6 +500,37 @@ static char *do_defd(database *db, char *s, char *fmt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DO_GET_MATCH - handle multiple gets via pattern matching */
+
+static char **do_get_match(database *db, char **lst, char *s, char *fmt)
+   {int is, ns;
+    char t[BFLRG];
+    char *var, *val, **sa;
+    hashtab *tb;
+
+    tb = db->tab;
+    sa = hash_dump(tb, trim(s, BOTH, " \t"), NULL, 3);
+    ns = lst_length(sa);
+    for (is = 0; is < ns; is++)
+        {var = sa[is];
+	 val = strchr(var, '=');
+	 if (val != NULL)
+	    *val++ = '\0';
+
+	 if ((strchr("'\"(", val[0]) == NULL) && 
+	     (strpbrk(val, " \t") != NULL))
+	    {snprintf(t, BFLRG, "\"%s\"", val);
+	     val = t;};
+
+	 lst = lst_push(lst, render_val(var, val, fmt));};
+
+    free_strings(sa);
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DO_SET_GET - handle variable set or get operations */
 
 static char *do_set_get(database *db, char *s, char *fmt)

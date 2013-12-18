@@ -235,7 +235,7 @@ Note $Log "Test environment"
 
 Note $Log ""
 Note $Log "Directories:"
-Note $Log "PSY_Base    = |$PSY_Base|"
+Note $Log "PSY_Base   = |$PSY_Base|"
 Note $Log "PSY_ID     = |$PSY_ID|"
 Note $Log "PSY_Root   = |$PSY_Root|"
 Note $Log "SrcDir     = |$SrcDir|"

@@ -24,6 +24,7 @@
 #include <tar.h>
 #include <termios.h>
 #include <poll.h>
+#include <fnmatch.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/select.h>
