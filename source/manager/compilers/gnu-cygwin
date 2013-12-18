@@ -16,7 +16,9 @@ run analyze/rpath init
 
 include compilers/gnu-lnx
 
-define CYGWIN
+Group Cdefine {
+   CYGWIN = TRUE
+}
 
 Group PACT {
    CC_PATH =

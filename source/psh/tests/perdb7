@@ -13,30 +13,53 @@ setenv PERDB_PATH $db
 
 echo "-----------------------------------"
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# multiple sets
+
+# multiple defines
 perdb ,v1=1, v2=2
 
+# multiple defines and queries
 echo "----------------"
 perdb ,v1=\?a,v2=\?"",v3=\?c
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# formatted multiple gets
+
+# multiple gets with CSH format
 echo "----------------"
 echo "perdb ,fmt:csh,v1,v2,v3"
 perdb ,fmt:csh,v1,v2,v3
 
+# multiple gets with SH format
 echo "----------------"
 echo "perdb ,fmt:sh,v1,v2,v3"
 perdb ,fmt:sh,v1,v2,v3
 
+# multiple gets with PERL format
 echo "----------------"
 echo "perdb ,fmt:pl,v1,v2,v3"
 perdb ,fmt:pl,v1,v2,v3
 
+# multiple gets with DB format
 echo "----------------"
 echo "perdb ,fmt:db,v1,v2,v3"
 perdb ,fmt:db,v1,v2,v3
 
+# multiple gets with no format
 echo "----------------"
 echo "perdb ,v1,v2,v3"
 perdb ,v1,v2,v3
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# verifying multiple gets with CSH format
+# by eval'ing the results
 
 echo "----------------"
 echo "eval perdb ,fmt:csh,v1,v2,v3"
@@ -45,9 +68,29 @@ echo "v1 = $v1"
 echo "v2 = $v2"
 echo "v3 = $v3"
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# delimiter syntax test
+
 echo "----------------"
 echo "perdb dlm:xya v1=axyav2=bxyav3=c"
 perdb dlm:xya v1=axyav2=bxyav3=c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# multiple gets with regular expressions
+
+echo "----------------"
+perdb ,wa=x, wb=y
+
+perdb ,fmt:csh,'v*'
+perdb ,fmt:csh,'v?'
+perdb ,fmt:csh,'v[12],w*'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 echo "-----------------------------------"
 

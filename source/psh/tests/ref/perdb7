@@ -40,5 +40,18 @@ perdb dlm:xya v1=axyav2=bxyav3=c
 a
 b
 c
+----------------
+x
+y
+setenv v1 "a" ; 
+setenv v2 "2" ; 
+setenv v3 "c" ; 
+setenv v1 "a" ; 
+setenv v2 "2" ; 
+setenv v3 "c" ; 
+setenv v1 "a" ; 
+setenv v2 "2" ; 
+setenv wa "x" ; 
+setenv wb "y" ; 
 -----------------------------------
 done

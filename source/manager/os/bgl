@@ -21,7 +21,9 @@ Group IBM {
    HW = BGL
 }
 
-define GETSOCKNAME_LONG
+Group Cdefine {
+   GETSOCKNAME_LONG = TRUE
+}
 
 setenv OBJECT_MODE ${Bits}
 

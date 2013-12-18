@@ -83,5 +83,7 @@ Group OpenMP {
 include cpp-rule
 include serial
 
-define NON_INTEGER_ENUM
+Group Cdefine {
+   NON_INTEGER_ENUM = TRUE
+}
 
