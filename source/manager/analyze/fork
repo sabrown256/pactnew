@@ -10,7 +10,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "Analyze: fork/exec"
 
@@ -62,6 +62,8 @@ else
 endif
 
 unset ok
+
+source $Me:h/post-common
 
 exit(0)
 

@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "Analyze: fc"
 
@@ -208,6 +208,8 @@ ftee $ALog gexec $PSY_AnaDir/fc-id    @ \
                  $PSY_AnaDir/fc-types @ \
                  $PSY_AnaDir/fc-int   @ \
                  $PSY_AnaDir/fc-iso
+
+source $Me:h/post-common
 
 exit(0)
 

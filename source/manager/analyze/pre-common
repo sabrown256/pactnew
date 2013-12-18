@@ -1,5 +1,5 @@
 #
-# COMMON - common setup for programs in analyze
+# PRE-COMMON - common setup for programs in analyze
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -53,6 +53,7 @@ else
 endif
 unset lalog
 
+# write prolog of analyze.<cmd>
 Note $ALog ""
 Separator $ALog
 Note $ALog "Command: $Cmd"
@@ -68,6 +69,9 @@ dbmget $ALog AF_CList =\? ""^           \
              DP_FE    =\? "do-run -m"
 
 envini PSY_MngDir     $cwd
+
+# announcement to config log
+Note $Log "Doing analyze/$Cmd:t"
 
 Note $ALog ""
 Separator $ALog

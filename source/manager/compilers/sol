@@ -39,10 +39,6 @@ Group Cfg {
    Use += LD
 }
 
-Group MDG {
-   Lib += /usr/openwin/lib/libX11.so /usr/openwin/lib/libXext.so
-}
-
 Group Shared {
    LD_Exe   = cc
    CC_Flags = -KPIC
@@ -53,13 +49,8 @@ Group PThread {
    LD_Lib = -lpthread 
 }
 
-Group X11 {
-   Path = /usr/openwin
-}
-
-define SOLARIS
-
 # NOTE: the Solaris linker does NOT support any kind of -rpath option
 setenv LD_LIBRARY_PATH ${RPATH}
 
 include serial
+include os/solaris

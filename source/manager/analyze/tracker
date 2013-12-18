@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/tracker -----"
 Note $ALog "Analyze: job tracker"
@@ -39,6 +39,8 @@ end
 # export the results
 dbmset $ALog HAVE_TRACKER = $HAVE_TRACKER^   \
              TRACKER_Exe  = $TRACKER_Exe
+
+source $Me:h/post-common
 
 exit(0)
 

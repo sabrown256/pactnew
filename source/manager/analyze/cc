@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "Analyze: cc"
 
@@ -459,6 +459,8 @@ ftee $ALog gexec $PSY_AnaDir/cc-line       @ \
                  $PSY_AnaDir/cc-headers    @ \
                  $PSY_AnaDir/cc-glibc      @ \
                  $PSY_AnaDir/cc-size
+
+source $Me:h/post-common
 
 exit(0)
 

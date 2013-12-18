@@ -10,7 +10,7 @@
 
 set lme   = $0
 set lbase = $lme:h
-source $lbase/common
+source $lbase/pre-common
 
 Note $ALog "----- analyze/mpi -----"
 Note $ALog "Analyze: mpi"
@@ -253,6 +253,8 @@ dbmset $ALog HAVE_OPENMPI       = $HAVE_OPENMPI^        \
              DP_RPath           = $DP_RPath^            \
              STD_MPI            = $vrs^                 \
              USE_MPI            = $USE_MPI
+
+source $lbase/post-common
 
 exit(0)
 

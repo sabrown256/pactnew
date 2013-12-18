@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "Analyze: libm"
 
@@ -85,6 +85,8 @@ dbmset $ALog IMF_Path   = $IMF_Path^   \
              LibM_RPath = $LibM_RPath^ \
              Cfg_RPATH  = $Cfg_RPATH^  \
              RPATH      = $RPATH
+
+source $Me:h/post-common
 
 exit(0)
 

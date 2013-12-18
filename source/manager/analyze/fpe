@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "Analyze: fpe"
 
@@ -68,6 +68,8 @@ endif
 
 dbmset $ALog HAVE_ANSI_C9X_FENV = $HAVE_ANSI_C9X_FENV^ \
              HAVE_GNU_FENV      = $HAVE_GNU_FENV
+
+source $Me:h/post-common
 
 exit(0)
 

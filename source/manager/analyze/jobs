@@ -6,7 +6,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/jobs -----"
 Note $ALog "Analyze: job scheduler"
@@ -63,6 +63,8 @@ endif
    dbmset $ALog JOBS_System = $JOBS_System^         \
                 JOBS_Exe    = $JOBS_Exe^            \
                 JOBS_Path   = $JOBS_Path
+
+source $Me:h/post-common
 
 exit(0)
 

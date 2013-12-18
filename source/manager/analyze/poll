@@ -10,7 +10,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/poll -----"
 Note $ALog "Analyze: select/poll"
@@ -132,5 +132,7 @@ dbmset $ALog HAVE_STREAMS = $HAVE_STREAMS^   \
              HAVE_SELECT  = $HAVE_SELECT
 
 exit(0)
+source $Me:h/post-common
+
 
 

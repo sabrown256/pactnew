@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/openmp -----"
 Note $ALog "Analyze: OpenMP"
@@ -198,6 +198,8 @@ endif
 # export the results
 dbmset $ALog HAVE_OPENMP = $HAVE_OPENMP^            \
              STD_OPENMP  = $STD_OPENMP
+
+source $Me:h/post-common
 
 exit(0)
 

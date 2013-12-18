@@ -10,7 +10,7 @@
 
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/cc-noreturn -----"
 Note $ALog "Analyze: C11 _Noreturn handling"
@@ -37,5 +37,9 @@ endif
 rm -f $Tmp $Tmp.c $Tmp.o
 
 # export the result
+
 dbexp HAVE_NORETURN
 
+source $Me:h/post-common
+
+exit(0)

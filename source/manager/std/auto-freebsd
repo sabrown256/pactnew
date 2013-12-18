@@ -7,8 +7,6 @@
 # include "cpyright.h"
 #
 
-define FREEBSD
-
 include spokes
-include compilers/gnu-lnx
+include compilers/gnu-freebsd
 

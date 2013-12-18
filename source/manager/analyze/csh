@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/csh -----"
 Note $ALog "Analyze: C shell"
@@ -32,5 +32,7 @@ else
 endif
 
 dbexp SHELL_Cont
+
+source $Me:h/post-common
 
 exit(0)

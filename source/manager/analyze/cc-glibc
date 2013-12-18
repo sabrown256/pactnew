@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/cc-glibc -----"
 Note $ALog "Analyze: glibc version"
@@ -70,5 +70,8 @@ endif
 dbmset $ALog HAVE_GNU_LIBC_6  = $HAVE_GNU_LIBC_6^  \
              AF_VERSION_GLIBC = $AF_VERSION_GLIBC
 
+source $Me:h/post-common
+
+exit(0)
 
 

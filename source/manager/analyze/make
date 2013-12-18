@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/make -----"
 Note $ALog "Analyze: make utility"
@@ -71,6 +71,8 @@ flog $ALog rm -f $Tmp.make
 dbmset $ALog MAKE_Exe      = $MAKE_Exe^          \
              MAKE_Strategy = $MAKE_Strategy^     \
              MAKE_UseGNU   = $MAKE_UseGNU
+
+source $Me:h/post-common
 
 exit(0)
 

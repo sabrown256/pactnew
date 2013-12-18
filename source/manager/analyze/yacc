@@ -10,7 +10,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/yacc -----"
 Note $ALog "Analyze: yacc utility"
@@ -61,6 +61,8 @@ endif
 # export the results
 dbmset $ALog Yacc_Exe   = $Yacc_Exe^    \
              Yacc_Flags = $Yacc_Flags
+
+source $Me:h/post-common
 
 exit(0)
 

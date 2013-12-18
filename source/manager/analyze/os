@@ -10,7 +10,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 if ($?Log == 0) then
    setenv Log $ALog
@@ -73,6 +73,8 @@ setenv HSY_OS_Type USE_$HSY_OS_Type
 dbmset $ALog HSY_OS_Type     = $HSY_OS_Type^      \
              HSY_OS_Release  = $HSY_OS_Release^   \
              HSY_OS_Name     = $HSY_OS_Name
+
+source $Me:h/post-common
 
 exit(0)
 

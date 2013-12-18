@@ -4,6 +4,8 @@
 # include "cpyright.h"
 #
 
+define SOLARIS
+
 Group MDG {
    Lib += /usr/openwin/lib/libX11.so /usr/openwin/lib/libXext.so
 }

@@ -9,7 +9,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/x11 -----"
 Note $ALog "Analyze: x11"
@@ -215,6 +215,8 @@ endif
                 X11_RPath = $X11_RPath^          \
                 X11_Path  = $X11_Path^           \
                 Std_UseX  = $Std_UseX
+
+source $Me:h/post-common
 
 exit(0)
 

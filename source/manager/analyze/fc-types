@@ -6,7 +6,7 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 Note $ALog "----- analyze/fc-types -----"
 Note $ALog "Analyze: Fortran types"
@@ -103,6 +103,8 @@ endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 
