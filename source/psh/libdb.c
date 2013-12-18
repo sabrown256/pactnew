@@ -673,7 +673,8 @@ static int _emit_var(database *db, FILE *fp, const char *fmt,
     if (vars != NULL)
        {ok = FALSE;
 	for (l = 0; vars[l] != NULL; l++)
-	    {if (strcmp(vars[l], vr) == 0)
+	    {if ((strcmp(vars[l], vr) == 0) ||
+		 (fnmatch(vars[l], vr, 0) == 0))
 	        {ok = TRUE;
 		 break;};};}
     else

@@ -94,12 +94,6 @@ struct s_ruledes
 struct s_auxfdes
    {char cefn[BFLRG];       /* config defines for C */
     FILE *CEF;
-    char dpfn[BFLRG];       /* config variable for distributed parallel */
-    FILE *DPF;
-    char mvfn[BFLRG];       /* config variables for make */
-    FILE *MVF;
-    char urfn[BFLRG];       /* config rules for make */
-    FILE *URF;
     FILE *SEF;};
 
 struct s_state
@@ -1387,28 +1381,6 @@ static void parse_rule(char *var, int nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DP_DEFINE - gather DP defines */
-
-static void dp_define(void)
-   {char line[BFLRG];
-
-    if (st.aux.DPF == NULL)
-       st.aux.DPF = open_file("w", st.aux.dpfn);
-
-    while (TRUE)
-       {read_line(line, BFLRG);
-
-	if ((strcmp(line, "end") == 0) || (IS_NULL(line) == TRUE))
-	   {note(st.aux.DPF, "\n");
-	    break;};
-    
-	print_text(st.aux.DPF, "setenv %s \"\"", line);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SETUP_ANALYZE_ENV - setup the environment for programs which analyze
  *                   - features
  */
@@ -1513,21 +1485,9 @@ static void setup_output_env(client *cl, char *base)
     char **sa;
 
 /* close any open intermediate files and export their names */
-    dbset(cl, "DPFile", st.aux.dpfn);
-    if (st.aux.DPF != NULL)
-       fclose_safe(st.aux.DPF);
-
     dbset(cl, "CEFile", st.aux.cefn);
     if (st.aux.CEF != NULL)
        fclose_safe(st.aux.CEF);
-
-    dbset(cl, "MVFile", st.aux.mvfn);
-    if (st.aux.MVF != NULL)
-       fclose_safe(st.aux.MVF);
-
-    dbset(cl, "URFile", st.aux.urfn);
-    if (st.aux.URF != NULL)
-       fclose_safe(st.aux.URF);
 
 /* remove duplicate tokens in selected lists */
     nstrncpy(dlst, BFLRG, dbget(cl, FALSE, "PCO_RemDup"), -1);
@@ -1662,55 +1622,6 @@ static void default_var(client *cl, char *base)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* RESET_MAKE_VARS - save the Group and Tool variables
- *                 - needed in the make-def file
- *                 - GOTCHA: if we do not need $MVFile then
- *                 - we do not need this routine (see write/make-def)
- */
-
-static void reset_make_vars(void)
-   {int i, nc;
-    char vr[BFLRG];
-    char *vl, **ta;
-
-    if (st.aux.MVF == NULL)
-       st.aux.MVF = open_file("w", st.aux.mvfn);
-
-    nstrncpy(st.def_tools, BFLRG, cgetenv(FALSE, "PCO_Tools"), -1);
-    nstrncpy(st.def_groups, BFLRG, cgetenv(FALSE, "PCO_Groups"), -1);
-
-    ta = cenv(FALSE, NULL);
-    if (ta != NULL)
-       {for (i = 0; ta[i] != NULL; i++)
-	    {nstrncpy(vr, BFLRG, ta[i], -1);
-	     vl = strchr(vr, '=');
-	     if (vl != NULL)
-	        {*vl++ = '\0';
-
-		 if (IS_NULL(vl) == TRUE)
-		    continue;
-
-/* write Tool vars */
-		 FOREACH (t, st.def_tools, " ")
-		    nc = strlen(t);
-		    if ((strncmp(t, vr, nc) == 0) && (vr[nc] == '_'))
-		       note(st.aux.MVF, "%s = %s\n", vr, vl);
-		 ENDFOR
-
-/* write Group vars */
-		 FOREACH (t, st.def_groups, " ")
-		    nc = strlen(t);
-		    if ((strncmp(t, vr, nc) == 0) && (vr[nc] == '_'))
-		       note(st.aux.MVF, "%s = %s\n", vr, vl);
-		 ENDFOR;};};
-
-	free_strings(ta);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* DEFAULT_FILES - setup the various work files */
 
 static void default_files(int append)
@@ -1723,17 +1634,8 @@ static void default_files(int append)
 
     st.aux.SEF = open_file("w+", "%s/log/file.se", st.dir.root);
 
-    snprintf(st.aux.mvfn, BFLRG, "%s/log/file.mv", st.dir.root);
-    st.aux.MVF = NULL;
-
     snprintf(st.aux.cefn, BFLRG, "%s/log/file.ce", st.dir.root);
     st.aux.CEF = NULL;
-
-    snprintf(st.aux.urfn, BFLRG, "%s/log/file.ur", st.dir.root);
-    st.aux.URF = NULL;
-
-    snprintf(st.aux.dpfn, BFLRG, "%s/log/file.dpe", st.dir.root);
-    st.aux.DPF = NULL;
 
     return;}
 
@@ -2109,7 +2011,7 @@ static void env_subst(client *cl, char *refvar, char *nt)
 
 /* SET_VAR - set a variable as directed */
 
-static void set_var(client *cl, int rep, char *var, char *oper, char *val)
+static void set_var(client *cl, char *var, char *oper, char *val)
    {char fvar[BFLRG], nval[BFLRG], mval[BFLRG], lval[BFLRG];
     char s[BFLRG+1];
     char *prfx, *t, *p;
@@ -2140,12 +2042,6 @@ static void set_var(client *cl, int rep, char *var, char *oper, char *val)
        {t = echo(FALSE, val);
         if (IS_NULL(t) == FALSE)
            {nstrncpy(nval, BFLRG, t, -1);
-            if (rep == TRUE)
-	       {if (st.aux.MVF == NULL)
-		   st.aux.MVF = open_file("w", st.aux.mvfn);
-
-		note(st.aux.MVF, "%s = %s\n", fvar, nval);};
-
             dbset(cl, fvar, nval);}
 
         else
@@ -2312,9 +2208,9 @@ static void process_use(client *cl, char *sg, char *oper)
                 if (dbdef(cl, nvr) == TRUE)
                    {val = dbget(cl, TRUE, nvr);
                     if (strcmp(var, "Exe") == 0)
-                       set_var(cl, FALSE, var, "=", val);
+                       set_var(cl, var, "=", val);
                     else
-                       set_var(cl, FALSE, var, oper, val);};
+                       set_var(cl, var, oper, val);};
              ENDFOR
              break;
 
@@ -2327,7 +2223,7 @@ static void process_use(client *cl, char *sg, char *oper)
                     snprintf(nvr, BFLRG, "%s_%s", sg, var);
                     if (dbdef(cl, nvr) == TRUE)
                        {val = dbget(cl, TRUE, nvr);
-                        set_var(cl, FALSE, nvr, oper, val);};
+                        set_var(cl, nvr, oper, val);};
                  ENDFOR}
              else
                 {note(NULL, "Use tool %s to fill tool %s\n",
@@ -2336,7 +2232,7 @@ static void process_use(client *cl, char *sg, char *oper)
                     snprintf(nvr, BFLRG, "%s_%s", sg, var);
                     if (dbdef(cl, nvr) == TRUE)
                        {val = dbget(cl, TRUE, nvr);
-                        set_var(cl, FALSE, var, oper, val);};
+                        set_var(cl, var, oper, val);};
                  ENDFOR};
              break;};
 
@@ -2621,10 +2517,6 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     if (st.phase == PHASE_READ)
 	        noted(NULL, "%srunning %s\n", ldepth, path);}
 
-/* handle definition of the distributed parallel environment */
-	 else if (strcmp(key, "DPEnvironment") == 0)
-	    dp_define();
-
 	 else if (strcmp(key, "PSY_InstRoot") == 0)
 	    {if (st.installp == FALSE)
 	        {dbset(cl, "PSY_InstRoot", value);
@@ -2642,6 +2534,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 	 else if (strcmp(key, "setenv") == 0)
 	    {char *s;
+
 	     note(st.aux.SEF, "%s %s\n", oper, value);
 	     if (strcmp(oper, "PATH") == 0)
                 push_path(P_APPEND, epath, value);
@@ -2662,8 +2555,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	     else
 	        dbset(cl, var, val);
 
-/*	     if (st.phase == PHASE_READ) */
-	        note(st.aux.SEF, "%s \"%s\"", var, val);
+	     note(st.aux.SEF, "%s \"%s\"", var, val);
 	     note(NULL, "Command: setenv %s %s\n", var, val);}
 
 /* handle Note specifications */
@@ -2701,7 +2593,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 		  (strcmp(oper, "-=") == 0) ||
 		  (strcmp(oper, "=?") == 0) ||
 		  (strcmp(oper, "?=") == 0))
-	    set_var(cl, TRUE, key, oper, value);
+	    set_var(cl, key, oper, value);
 
 /* .c.i rule handler */
 	 else if (strcmp(key, ".c.i:") == 0)
@@ -2768,13 +2660,6 @@ static void read_config(client *cl, char *cfg, int quiet)
 	    {parse_rule(st.rules.yc, BFLRG);
 	     if (st.verbose == TRUE)
 	        noted(NULL, "Redefining .y.c rule:\n%s\n\n", st.rules.yc);}
-
-/* gather unknown specifications during read phase */
-	 else if (st.phase == PHASE_READ)
-	    {if (st.aux.URF == NULL)
-	        st.aux.URF = open_file("w", st.aux.urfn);
-
-	     fputs(line, st.aux.URF);}
 
 /* print unknown specifications during any non-read phase */
 	 else
@@ -3472,9 +3357,6 @@ int main(int c, char **v, char **env)
 	snprintf(st.rules.la_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "LexArc_BP"));
 	snprintf(st.rules.yo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "YaccObj_BP"));
 	snprintf(st.rules.ya_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "YaccArc_BP"));
-
-/* place the make variables */
-        reset_make_vars();
 
 	check_dir(cl);};
 

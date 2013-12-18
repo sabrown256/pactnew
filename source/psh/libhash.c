@@ -373,12 +373,12 @@ char **hash_dump(hashtab *tab, char *patt, char *type, int flags)
     for (i = 0; i < sz; i++)
         {for (hp = tb[i]; hp != NULL; hp = hp->next)
              {if ((type == NULL) || (strcmp(type, hp->type) == 0))
-                 {if (patt == NULL)
-                     vr = hp->name;
-                  else if (match(hp->name, patt))
+                 {if ((patt == NULL) ||
+		      (fnmatch(patt, hp->name, 0) == 0))
                      vr = hp->name;
                   else
                      continue;
+
                   if ((full == TRUE) && (strcmp(hp->type, "char *") == 0))
 		     {vl = (char *) hp->def;
 		      if (vl != NULL)
@@ -388,7 +388,7 @@ char **hash_dump(hashtab *tab, char *patt, char *type, int flags)
 		      snprintf(t, BFLRG, "%s=%s", vr, vl);
 		      sa[ns++] = STRSAVE(t);};}
                   else
-		     sa[ns++] = s;};};};
+		     sa[ns++] = STRSAVE(vr);};};};
 
 /* check that the number of names found is what is expected */
     if (ns > tab->ne)

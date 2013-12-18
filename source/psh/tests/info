@@ -76,6 +76,8 @@ endif
       set dp = $cwd/info-diff
 
       @ lerr = 0
+      @ dta  = 0
+      @ dtb  = 0
       foreach t (make $lst)
          Separator $Log
 
@@ -84,15 +86,27 @@ endif
          $RM $pa $pi
          touch $pa $pi
 
+         set t0 = `timer -r`
+         @ ta   = `timer -t $t0`
+
          flog $pa pact -info $t
          flog $pa pact +info $t
          flog $pa pact +l -info $t
          flog $pa pact +l +info $t
 
+         set t0 = `timer -r`
+         @ tb   = `timer -t $t0`
+
          flog $pi pact-info $t
          flog $pi pact-info -f $t
          flog $pi pact-info -l $t
          flog $pi pact-info -l -f $t
+
+         set t0 = `timer -r`
+         @ tc   = `timer -t $t0`
+
+         @ dta = $dta + ( $tb - $ta )
+         @ dtb = $dtb + ( $tc - $tb )
 
          flog $Log cat $pi
 
@@ -110,6 +124,9 @@ endif
          $RM $pa.1 $pi.1
 
       end
+
+      Note $Log "pact time      = `timer -t $dta`"
+      Note $Log "pact-info time = `timer -t $dtb`"
 
       @ nerr = $nerr + $lerr
 
@@ -133,6 +150,8 @@ endif
    set dp = $cwd/info-diff
 
    @ lerr = 0
+   @ dta  = 0
+   @ dtb  = 0
    foreach t ($lst)
       Separator $Log
 
@@ -141,9 +160,22 @@ endif
       $RM $pa $pi
       touch $pa $pi
 
+      set t0 = `timer -r`
+      @ ta   = `timer -t $t0`
+
       flog $pa pact -info $t
 #      flog $pa pact +l -info $t
+
+      set t0 = `timer -r`
+      @ tb   = `timer -t $t0`
+
       flog $pi $PERDB $t
+
+      set t0 = `timer -r`
+      @ tc   = `timer -t $t0`
+
+      @ dta = $dta + ( $tb - $ta )
+      @ dtb = $dtb + ( $tc - $tb )
 
       flog $Log cat $pi
 
@@ -163,6 +195,9 @@ endif
 
       @ lerr = $lerr + $status
    end
+
+   Note $Log "pact time      = `timer -t $dta`"
+   Note $Log "pact-info time = `timer -t $dtb`"
 
    @ nerr = $nerr + $lerr
 
