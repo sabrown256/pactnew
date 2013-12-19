@@ -9,33 +9,33 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/make-macros -----"
-Note $Log "Write: make-macros"
-Note $Log ""
+Note $WLog "----- write/make-macros -----"
+Note $WLog "Write: make-macros"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   System Dependent MAKE Macros - make-macros"
-Note $Log ""
+NoteD $WLog "   System Dependent MAKE Macros - make-macros"
+Note $WLog ""
 
-dbmget $Log Bits^              \
-            CROSS_COMPILE^     \
-            EtcDir^            \
-            IncDir^            \
-            FPE_Exe^           \
-            HSY_FPU^           \
-            HAVE_GNU_FENV^     \
-            MAKE_Shared_Libs^  \
-            MAKE_Strategy^     \
-            Ranlib_Exe^        \
-            PSY_Cfg^           \
-            PSY_TYPE^          \
-            PSY_NoExe
+dbmget $WLog Bits^              \
+             CROSS_COMPILE^     \
+             EtcDir^            \
+             IncDir^            \
+             FPE_Exe^           \
+             HSY_FPU^           \
+             HAVE_GNU_FENV^     \
+             MAKE_Shared_Libs^  \
+             MAKE_Strategy^     \
+             Ranlib_Exe^        \
+             PSY_Cfg^           \
+             PSY_TYPE^          \
+             PSY_NoExe
 
 set LibVers = 1
 
@@ -49,8 +49,8 @@ set LibVers = 1
 
     set STDOUT = $EtcDir/make-macros
 
-    flog $Log $RM $STDOUT
-    flog $Log touch $STDOUT
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
 
     Note $STDOUT '#'
     Note $STDOUT '# MAKE-MACROS - PACT Makefile macros for '$PSY_Cfg
@@ -321,6 +321,8 @@ set LibVers = 1
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 

@@ -9,126 +9,126 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/scconfig.h -----"
-Note $Log "Write: scconfig.h"
-Note $Log ""
+Note $WLog "----- write/scconfig.h -----"
+Note $WLog "Write: scconfig.h"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   C Environment Configuration - scconfig.h"
-Note $Log ""
+NoteD $WLog "   C Environment Configuration - scconfig.h"
+Note $WLog ""
 
-dbmget $Log AF_ALT_LARGE_FILE^        \
-            AF_LONG8^                 \
-            AF_LONG_DOUBLE_IO^        \
-            AF_SOCKOPT_TYPE^          \
-            AF_VERSION_OSX^           \
-            BFD_Version^              \
-            CC_Exe^                   \
-            'Cdefine*'^               \
-            DP_Lib^                   \
-            DP_Inc^                   \
-            FC_ID_CASE^               \
-            FC_ID_UNDERSCORE^         \
-            FC_INT_PTR_DIFFER^        \
-            FC_INTEGER_C^             \
-            HAVE_MPI_STDIN_ALL^       \
-            HAVE_MPI_GOOD_IO^         \
-            HAVE_LONG_LONG^           \
-            HAVE_BAD_LINE_DIRECTIVES^ \
-            HAVE_INLINE^              \
-            HAVE_NORETURN^            \
-            HAVE_OPENMP^              \
-            HAVE_OPENMPI^             \
-            HAVE_SOCKETS^             \
-            HAVE_TRACKER^             \
-            HAVE_ANSI_FLOAT16^        \
-            HAVE_ANSI_C9X_COMPLEX^    \
-            HAVE_ANSI_C9X_FENV^       \
-            HAVE_COMPLEX_VA_ARG^      \
-            HAVE_GNU_FENV^            \
-            HAVE_VA_COPY^             \
-            HAVE_VA_LIST^             \
-            HAVE_PYTHON^              \
-            HAVE_PY_NUMERIC^          \
-            HAVE_PY_NUMPY^            \
-            HAVE_FLEX_SCANNER^        \
-            HAVE_READLINE^            \
-            HAVE_HDF5^                \
-            HAVE_SQL^                 \
-            HAVE_MYSQL^               \
-            HAVE_SQLITE^              \
-            HAVE_SQLITE_V2^           \
-            HAVE_JPEGLIB^             \
-            HAVE_PNGLIB^              \
-            HAVE_FORK_EXEC^           \
-            HAVE_GETHOSTBYNAME^       \
-            HAVE_RESOURCE_USAGE^      \
-            HAVE_GETPWUID^            \
-            HAVE_MMAP^                \
-            HAVE_VSNPRINTF^           \
-            HAVE_ASYNC_STREAMS^       \
-            HAVE_POSIX_SIGNALS^       \
-            HAVE_STREAMS^             \
-            HAVE_SELECT^              \
-            HAVE_UNIX98_PTY^          \
-            HAVE_POSIX_STRERROR^      \
-            HAVE_GNU_STRERROR^        \
-            HAVE_GNU_LIBC_6^          \
-            HAVE_DYNAMIC_LINKER^      \
-            HAVE_BFD^                 \
-            HAVE_DEMANGLE^            \
-            HDF5_SO^                  \
-            HSY_OS_Name^              \
-            HSY_OS_Release^           \
-            HSY_OS_Type^              \
-            HSY_CPU^                  \
-            HSY_FPU^                  \
-            IBM_HW^                   \
-            IncDir^                   \
-            LEH_TTY_CRNL^             \
-            LEH_TTY_ECHO^             \
-            LEH_TTY_VTIME^            \
-            LibM_Functions^           \
-            MYSQL_SO^                 \
-            OpenMP_OVER_SCHED^        \
-            PACT_CC_FAMILY^           \
-            PACT_CC_VERSION^          \
-            PACT_SO_CACHE^            \
-            PSY_Arch^                 \
-            PSY_Cfg^                  \
-            PSY_FltDir^               \
-            PSY_MngDir^               \
-            PSY_ID^                   \
-            PSY_TYPE^                 \
-            PSY_Prefix^               \
-            PSY_TmpDir^               \
-            RF_DEBUG^                 \
-            RF_OPTIMIZE^              \
-            RF_PROFILE^               \
-            RF_Linking^               \
-            SHELL_Default^            \
-            SMP_Pthread^              \
-            SQLITE3_SO^               \
-            Std_UseX^                 \
-            Std_UseOGL^               \
-            Std_UseQD^                \
-            STD_IPC^                  \
-            TRACKER_Exe^              \
-            USE_FULL_MM
+dbmget $WLog AF_ALT_LARGE_FILE^        \
+             AF_LONG8^                 \
+             AF_LONG_DOUBLE_IO^        \
+             AF_SOCKOPT_TYPE^          \
+             AF_VERSION_OSX^           \
+             BFD_Version^              \
+             CC_Exe^                   \
+             'Cdefine*'^               \
+             DP_Lib^                   \
+             DP_Inc^                   \
+             FC_ID_CASE^               \
+             FC_ID_UNDERSCORE^         \
+             FC_INT_PTR_DIFFER^        \
+             FC_INTEGER_C^             \
+             HAVE_MPI_STDIN_ALL^       \
+             HAVE_MPI_GOOD_IO^         \
+             HAVE_LONG_LONG^           \
+             HAVE_BAD_LINE_DIRECTIVES^ \
+             HAVE_INLINE^              \
+             HAVE_NORETURN^            \
+             HAVE_OPENMP^              \
+             HAVE_OPENMPI^             \
+             HAVE_SOCKETS^             \
+             HAVE_TRACKER^             \
+             HAVE_ANSI_FLOAT16^        \
+             HAVE_ANSI_C9X_COMPLEX^    \
+             HAVE_ANSI_C9X_FENV^       \
+             HAVE_COMPLEX_VA_ARG^      \
+             HAVE_GNU_FENV^            \
+             HAVE_VA_COPY^             \
+             HAVE_VA_LIST^             \
+             HAVE_PYTHON^              \
+             HAVE_PY_NUMERIC^          \
+             HAVE_PY_NUMPY^            \
+             HAVE_FLEX_SCANNER^        \
+             HAVE_READLINE^            \
+             HAVE_HDF5^                \
+             HAVE_SQL^                 \
+             HAVE_MYSQL^               \
+             HAVE_SQLITE^              \
+             HAVE_SQLITE_V2^           \
+             HAVE_JPEGLIB^             \
+             HAVE_PNGLIB^              \
+             HAVE_FORK_EXEC^           \
+             HAVE_GETHOSTBYNAME^       \
+             HAVE_RESOURCE_USAGE^      \
+             HAVE_GETPWUID^            \
+             HAVE_MMAP^                \
+             HAVE_VSNPRINTF^           \
+             HAVE_ASYNC_STREAMS^       \
+             HAVE_POSIX_SIGNALS^       \
+             HAVE_STREAMS^             \
+             HAVE_SELECT^              \
+             HAVE_UNIX98_PTY^          \
+             HAVE_POSIX_STRERROR^      \
+             HAVE_GNU_STRERROR^        \
+             HAVE_GNU_LIBC_6^          \
+             HAVE_DYNAMIC_LINKER^      \
+             HAVE_BFD^                 \
+             HAVE_DEMANGLE^            \
+             HDF5_SO^                  \
+             HSY_OS_Name^              \
+             HSY_OS_Release^           \
+             HSY_OS_Type^              \
+             HSY_CPU^                  \
+             HSY_FPU^                  \
+             IBM_HW^                   \
+             IncDir^                   \
+             LEH_TTY_CRNL^             \
+             LEH_TTY_ECHO^             \
+             LEH_TTY_VTIME^            \
+             LibM_Functions^           \
+             MYSQL_SO^                 \
+             OpenMP_OVER_SCHED^        \
+             PACT_CC_FAMILY^           \
+             PACT_CC_VERSION^          \
+             PACT_SO_CACHE^            \
+             PSY_Arch^                 \
+             PSY_Cfg^                  \
+             PSY_FltDir^               \
+             PSY_MngDir^               \
+             PSY_ID^                   \
+             PSY_TYPE^                 \
+             PSY_Prefix^               \
+             PSY_TmpDir^               \
+             RF_DEBUG^                 \
+             RF_OPTIMIZE^              \
+             RF_PROFILE^               \
+             RF_Linking^               \
+             SHELL_Default^            \
+             SMP_Pthread^              \
+             SQLITE3_SO^               \
+             Std_UseX^                 \
+             Std_UseOGL^               \
+             Std_UseQD^                \
+             STD_IPC^                  \
+             TRACKER_Exe^              \
+             USE_FULL_MM
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
     set STDOUT = $IncDir/scconfig.h
 
-    flog $Log $RM $STDOUT
-    flog $Log touch $STDOUT
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
 
     Note $STDOUT "/*"
     Note $STDOUT " * SCCONFIG.H - configuration defined by $PSY_Cfg"
@@ -337,7 +337,7 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
     endif
 
     if ($STD_IPC != "NOIPC") then
-       flog $Log $RM $IncDir/noipc
+       flog $WLog $RM $IncDir/noipc
        Note $STDOUT "#define HAVE_PROCESS_CONTROL"
        if ($HAVE_SOCKETS != "FALSE") then
           set sty = ( `echo $AF_SOCKOPT_TYPE | sed 's|\"||g'` )
@@ -345,7 +345,7 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
           Note $STDOUT "typedef $sty SOCKOPT_T;"
        endif
     else
-       flog $Log touch $IncDir/noipc
+       flog $WLog touch $IncDir/noipc
     endif
 
     if (("$AF_ALT_LARGE_FILE" == "TRUE") && ($HSY_OS_Name != FreeBSD)) then
@@ -400,12 +400,12 @@ dbmget $Log AF_ALT_LARGE_FILE^        \
     endif
             
 # find and write out the C #defines
-flog $Log ( env | grep Cdefine_ )
+flog $WLog ( env | grep Cdefine_ )
     foreach v (`env | grep Cdefine_`)
        set inf = ( `echo "$v" | sed 's|^Cdefine_||' | sed 's|=| |'` )
-       flog $Log set var = $inf[1]
-       flog $Log set val = ( $inf[2-] )
-       Note $Log "#define $var $val"
+       flog $WLog set var = $inf[1]
+       flog $WLog set val = ( $inf[2-] )
+       Note $WLog "#define $var $val"
        Note $STDOUT "#define $var $val"
     end
 
@@ -459,6 +459,8 @@ flog $Log ( env | grep Cdefine_ )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 

@@ -9,35 +9,35 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/iso-c.h -----"
-Note $Log "Write: iso-c.h"
-Note $Log ""
+Note $WLog "----- write/iso-c.h -----"
+Note $WLog "Write: iso-c.h"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   C Standards Configuration - iso-c.h"
-Note $Log ""
+NoteD $WLog "   C Standards Configuration - iso-c.h"
+Note $WLog ""
 
-dbmget $Log AF_VERSION_GLIBC^  \
-            HSY_OS_Name^       \
-            IncDir^            \
-            PSY_Cfg^           \
-            STD_C^             \
-            STD_POSIX^         \
-            STD_XOPEN
+dbmget $WLog AF_VERSION_GLIBC^  \
+             HSY_OS_Name^       \
+             IncDir^            \
+             PSY_Cfg^           \
+             STD_C^             \
+             STD_POSIX^         \
+             STD_XOPEN
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
     set STDOUT = $IncDir/iso-c.h
 
-    flog $Log $RM $STDOUT
-    flog $Log touch $STDOUT
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
 
     Note $STDOUT '/*'
     Note $STDOUT " * ISO-C.H - configuration defined by $PSY_Cfg"
@@ -231,6 +231,8 @@ dbmget $Log AF_VERSION_GLIBC^  \
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 

@@ -73,7 +73,7 @@ flog $ALog set path = ( $PSY_ScrDir $path )
 envini PSY_MngDir     $cwd
 
 # announcement to config log
-Note $Log "Doing analyze/$Cmd:t"
+Note $Log "analyze> Doing $Exe"
 
 Note $ALog ""
 Separator $ALog

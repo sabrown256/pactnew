@@ -9,46 +9,46 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/smake -----"
-Note $Log "Write: smake"
-Note $Log ""
+Note $WLog "----- write/smake -----"
+Note $WLog "Write: smake"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-Note $Log "   System make wrapper - smake"
-Note $Log ""
+Note $WLog "   System make wrapper - smake"
+Note $WLog ""
 
-dbmget $Log PSY_CfgDir^       \
-            PSY_MngDir^       \
-            PSY_Root^         \
-            PSY_ID^           \
-            PSY_InstRoot^     \
-            PSY_Prefix^       \
-            MAKE_UseGNU^      \
-            IncDir^           \
-            EtcDir^           \
-            BinDir^           \
-            Cfg_CC_Exe^       \
-            Cfg_CC_Flags^     \
-            Cfg_Lex_Flags^    \
-            Cfg_LD_Flags^     \
-            Cfg_LD_RPath^     \
-            PACT_CC_VERSION^  \
-            USE_TmpDir
+dbmget $WLog PSY_CfgDir^       \
+             PSY_MngDir^       \
+             PSY_Root^         \
+             PSY_ID^           \
+             PSY_InstRoot^     \
+             PSY_Prefix^       \
+             MAKE_UseGNU^      \
+             IncDir^           \
+             EtcDir^           \
+             BinDir^           \
+             Cfg_CC_Exe^       \
+             Cfg_CC_Flags^     \
+             Cfg_Lex_Flags^    \
+             Cfg_LD_Flags^     \
+             Cfg_LD_RPath^     \
+             PACT_CC_VERSION^  \
+             USE_TmpDir
 
 set lpactver = `cat $PSY_MngDir/.pact-version`
 
-Note $Log "   lpactver      = |$lpactver|"
+Note $WLog "   lpactver      = |$lpactver|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    flog $Log pushd $PSY_CfgDir
+    flog $WLog pushd $PSY_CfgDir
 
     set InstOld = instold
 
@@ -59,29 +59,29 @@ Note $Log "   lpactver      = |$lpactver|"
 # backup the public files
     if ($PSY_InstRoot != "none") then
        if (-d $InstOld) then
-          flog $Log $RMDir $InstOld
+          flog $WLog $RMDir $InstOld
        endif
-       flog $Log mkdir $InstOld
+       flog $WLog mkdir $InstOld
 
        if (-e $PSY_InstRoot/bin/pact) then
-          flog $Log cp $PSY_InstRoot/bin/pact $InstOld
+          flog $WLog cp $PSY_InstRoot/bin/pact $InstOld
        endif
        if (-e $PSY_InstRoot/etc/make-def) then
-          flog $Log cp $PSY_InstRoot/etc/make-def $InstOld
+          flog $WLog cp $PSY_InstRoot/etc/make-def $InstOld
        endif
        if (-e $PSY_InstRoot/etc/make-macros) then
-          flog $Log cp $PSY_InstRoot/etc/make-macros $InstOld
+          flog $WLog cp $PSY_InstRoot/etc/make-macros $InstOld
        endif
 
        if (-d $PSY_InstRoot/include) then
           sed "s|$PSY_Root|$PSY_InstRoot|" $EtcDir/make-def > $PSY_InstRoot/etc/make-def
-          flog $Log cp $EtcDir/make-macros $PSY_InstRoot/etc/make-macros
+          flog $WLog cp $EtcDir/make-macros $PSY_InstRoot/etc/make-macros
        endif
     endif
 
 # write a test Makefile
-    flog $Log $RM $TMAKEF
-    flog $Log touch $TMAKEF pre-Make
+    flog $WLog $RM $TMAKEF
+    flog $WLog touch $TMAKEF pre-Make
 
 cat << EOF >! $TMAKEF
 b:
@@ -92,7 +92,7 @@ a:
 
 EOF
 
-    flog $Log cat $TMAKEF
+    flog $WLog cat $TMAKEF
 
 # build the small version of the PACT program - smake
     set mkopt = ""
@@ -108,12 +108,12 @@ EOF
        set RootOpt = ( $RootOpt -DUSE_TMP_DIR )
     endif
 
-    flog $Log set direct = FALSE
+    flog $WLog set direct = FALSE
 
     set ok = FALSE
     foreach n ( 1 2 )
-       Note $Log "--------  Pass $n ---------"
-       flog $Log ${RM} $BinDir/smake
+       Note $WLog "--------  Pass $n ---------"
+       flog $WLog ${RM} $BinDir/smake
 
        if ($n == 2) then
           set RootOpt = ( $RootOpt -DSTUPID_MAKE )
@@ -124,55 +124,57 @@ EOF
           set opt = ( $opt $RootOpt $Cfg_CC_Flags $Cfg_Lex_Flags )
           set opt = ( $opt $Cfg_LD_Flags $Cfg_LD_RPath )
 
-          flog $Log $Cfg_CC_Exe $opt ../../psh/smake.c -o $BinDir/smake
+          flog $WLog $Cfg_CC_Exe $opt ../../psh/smake.c -o $BinDir/smake
        else
 
 # put path to compiler at the head of the path variable for ccw
           source $EtcDir/env-pact.csh
 
-          flog $Log pushd ../../psh
-          flog $Log ./ccw "$RootOpt" smake.c -o $BinDir/smake
-          flog $Log $BinDir/smake incinstall
-          flog $Log popd
+          flog $WLog pushd ../../psh
+          flog $WLog ./ccw "$RootOpt" smake.c -o $BinDir/smake
+          flog $WLog $BinDir/smake incinstall
+          flog $WLog popd
        endif
 
-       flog $Log ls -l $BinDir/smake
-       flog $Log $BinDir/smake -f $TMAKEF a
+       flog $WLog ls -l $BinDir/smake
+       flog $WLog $BinDir/smake -f $TMAKEF a
        set xstatus = $status
 
-       NoteD $Log -n "   System make wrapper - smake"
+       NoteD $WLog -n "   System make wrapper - smake"
        if ($xstatus == 0) then
           if ($n == 1) then
-             NoteD $Log " (Does use PATH)"
+             NoteD $WLog " (Does use PATH)"
           else
-             NoteD $Log " (Does NOT use PATH)"
+             NoteD $WLog " (Does NOT use PATH)"
           endif
           set ok = TRUE
           break
        endif
     end
-    Note $Log "--------  Pass $n ---------"
+    Note $WLog "--------  Pass $n ---------"
 
     if ($ok == FALSE) then
-       flog $Log ${RM} $BinDir/smake
-       NoteD $Log " "
-       NoteD $Log " "
-       NoteD $Log "ERROR: SERIOUS MAKE PROBLEM ON THIS PLATFORM"
-       NoteD $Log " "
+       flog $WLog ${RM} $BinDir/smake
+       NoteD $WLog " "
+       NoteD $WLog " "
+       NoteD $WLog "ERROR: SERIOUS MAKE PROBLEM ON THIS PLATFORM"
+       NoteD $WLog " "
        exit(1)
     endif
 
     unset opt
     unset ok
 
-    flog $Log $RMDir ${PSY_Prefix}*
-    flog $Log $RM `ls`
-    flog $Log popd
+    flog $WLog $RMDir ${PSY_Prefix}*
+    flog $WLog $RM `ls`
+    flog $WLog popd
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 unset lpactver
+
+source $Me:h/post-common
 
 exit(0)
 

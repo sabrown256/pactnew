@@ -23,7 +23,7 @@ if ($mode == 1) then
    set lt = `timer -r`
    eval `perdb save:csh:stdout: $vl`
    set lt = `timer -b $lt`
-   Note $Log "Import variables en masse in $lt seconds:"
+   Note $WLog "Import variables en masse in $lt seconds:"
 
 # otherwise
 else
@@ -32,14 +32,14 @@ else
       dbget $v
    end
    set lt = `timer -b $lt`
-   Note $Log "Import variables individually in $lt seconds:"
+   Note $WLog "Import variables individually in $lt seconds:"
 endif
 
 # list variables and values
 foreach v ($vl)
-   Note $Log "   $v = `printenv $v`"
+   Note $WLog "   $v = `printenv $v`"
 end
-Note $Log ""
+Note $WLog ""
 
 unset vl
 unset mode

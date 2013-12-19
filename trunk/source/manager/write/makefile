@@ -9,27 +9,27 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/makefile -----"
-Note $Log "Write: makefile"
-Note $Log ""
+Note $WLog "----- write/makefile -----"
+Note $WLog "Write: makefile"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   Distribution Makefile - Makefile"
-Note $Log ""
+NoteD $WLog "   Distribution Makefile - Makefile"
+Note $WLog ""
 
-dbmget $Log Bits^           \
-            BinDir^         \
-            EtcDir^         \
-            PSY_Root^       \
-            PSY_ID^         \
-            PSY_Platforms^  \
-            Pck
+dbmget $WLog Bits^           \
+             BinDir^         \
+             EtcDir^         \
+             PSY_Root^       \
+             PSY_ID^         \
+             PSY_Platforms^  \
+             Pck
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -37,8 +37,8 @@ dbmget $Log Bits^           \
    set inf = ( base $PSY_ID )
    set inf = ( $inf `echo "$PSY_Platforms" | sed 's|[:()]| |g'` )
    @ ni = $#inf
-   Note $Log "Added platform components ($ni):"
-   Note $Log "   $inf"
+   Note $WLog "Added platform components ($ni):"
+   Note $WLog "   $inf"
 
    set base = $PSY_Root:h
 
@@ -47,12 +47,12 @@ dbmget $Log Bits^           \
 
     set STDOUT = $EtcDir/Makefile
 
-    flog $Log $RM $STDOUT
-    flog $Log touch $STDOUT
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
 
     set Pck = `cat $EtcDir/package`
 
-    Note $Log "Packages: $Pck"
+    Note $WLog "Packages: $Pck"
 
     Note $STDOUT "#"
     Note $STDOUT "# MAKEFILE - operate on this distribution"
@@ -295,6 +295,8 @@ dbmget $Log Bits^           \
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 

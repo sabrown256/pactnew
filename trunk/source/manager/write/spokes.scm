@@ -9,26 +9,26 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/spokes.scm -----"
-Note $Log "Write: spokes.scm"
-Note $Log ""
+Note $WLog "----- write/spokes.scm -----"
+Note $WLog "Write: spokes.scm"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   Binary File Translation Spokes Loader - spokes.scm"
-Note $Log ""
+NoteD $WLog "   Binary File Translation Spokes Loader - spokes.scm"
+Note $WLog ""
 
-dbmget $Log RF_SPOKES_C^         \
-            RF_SPOKES_SCHEME^    \
-            SHELL_Cont^          \
-            PSY_Base^            \
-            PSY_Root^            \
-            PSY_Cfg
+dbmget $WLog RF_SPOKES_C^         \
+             RF_SPOKES_SCHEME^    \
+             SHELL_Cont^          \
+             PSY_Base^            \
+             PSY_Root^            \
+             PSY_Cfg
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -37,8 +37,8 @@ if (-d $PSY_Base/sx/applications) then
 
     set STDOUT = $PSY_Root/scheme/spokes.scm
 
-    flog $Log $RM $STDOUT
-    flog $Log touch $STDOUT
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
 
     Note $STDOUT ";"
     Note $STDOUT "; SPOKES.SCM - initialization of SX translation spokes for $PSY_Cfg"
@@ -50,18 +50,18 @@ if (-d $PSY_Base/sx/applications) then
     Note $STDOUT '      (printf nil "Cannot find %s'$SHELL_Cont'n" file)))'
     Note $STDOUT ""
 
-    flog $Log set lspokes = ( `echo $RF_SPOKES_SCHEME` )
-    flog $Log set nspokes = $#lspokes
-    flog $Log set ispoke  = 0
+    flog $WLog set lspokes = ( `echo $RF_SPOKES_SCHEME` )
+    flog $WLog set nspokes = $#lspokes
+    flog $WLog set ispoke  = 0
     while (`expr $ispoke \< $nspokes`)
        set ispoke = `expr $ispoke + 1`
        set tspoke = $lspokes[$ispoke]
        Note $STDOUT "(safe-load" '"'$tspoke".scm"'"'")"
     end
 
-    flog $Log set lspokes = ( `echo $RF_SPOKES_C` )
-    flog $Log set nspokes = $#lspokes
-    flog $Log set ispoke  = 0
+    flog $WLog set lspokes = ( `echo $RF_SPOKES_C` )
+    flog $WLog set nspokes = $#lspokes
+    flog $WLog set ispoke  = 0
     while (`expr $ispoke \< $nspokes`)
        set ispoke = `expr $ispoke + 1`
        set tspoke = $lspokes[$ispoke]
@@ -73,6 +73,8 @@ endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 

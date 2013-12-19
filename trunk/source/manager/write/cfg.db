@@ -9,35 +9,37 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/cfg.db -----"
-Note $Log "Write: cfg.db"
-Note $Log ""
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-Separator $Log
-
-NoteD $Log "   Write configuration database - cfg.db"
-Note $Log ""
-
+Note $WLog "----- write/cfg.db -----"
+Note $WLog "Write: cfg.db"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-flog $Log ls -l ${PERDB_PATH}*
+Separator $WLog
+
+NoteD $WLog "   Write configuration database - cfg.db"
+Note $WLog ""
+
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+flog $WLog ls -l ${PERDB_PATH}*
 
 dbunset ALog
 #dbunset Log
 dbunset ldio
 dbunset si
 
-flog $Log $PERDB -l save:db:
+flog $WLog $PERDB -l save:db:
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 

@@ -6,36 +6,36 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/dmake -----"
-Note $Log "Write: dmake"
-Note $Log ""
+Note $WLog "----- write/dmake -----"
+Note $WLog "Write: dmake"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   Persistent Portable Parallel Make - dmake"
-Note $Log ""
+NoteD $WLog "   Persistent Portable Parallel Make - dmake"
+Note $WLog ""
 
-dbmget $Log CROSS_COMPILE^               \
-            CROSS_REF       =\?  "none"^ \
-            PACT_CC_EXE^                 \
-            PACT_CC_FAMILY^              \
-            PACT_CC_PATH^                \
-            PACT_CC_VERSION^             \
-            BinDir^                      \
-            LibDir^                      \
-            PSY_ID^                      \
-            PSY_Base^                    \
-            PSY_MngDir
+dbmget $WLog CROSS_COMPILE^               \
+             CROSS_REF       =\?  "none"^ \
+             PACT_CC_EXE^                 \
+             PACT_CC_FAMILY^              \
+             PACT_CC_PATH^                \
+             PACT_CC_VERSION^             \
+             BinDir^                      \
+             LibDir^                      \
+             PSY_ID^                      \
+             PSY_Base^                    \
+             PSY_MngDir
 
-    flog $Log set DSYS = $PSY_MngDir/dsys
-    flog $Log set MAKE = $BinDir/smake
-    flog $Log set opt  = smake
-    flog $Log set path = ( $BinDir $path )
+    flog $WLog set DSYS = $PSY_MngDir/dsys
+    flog $WLog set MAKE = $BinDir/smake
+    flog $WLog set opt  = smake
+    flog $WLog set path = ( $BinDir $path )
 
     set err = 1
 
@@ -46,27 +46,27 @@ dbmget $Log CROSS_COMPILE^               \
 
     if ($CROSS_COMPILE == "FALSE") then
 
-       Note $Log "Build local dmake"
+       Note $WLog "Build local dmake"
 
-       flog $Log pushd $PSY_Base/score
+       flog $WLog pushd $PSY_Base/score
 
 # always remove and start clean in case there is toxic rubble
 # left over from a failed build
 # NOTE: the pact link may not be in place so remove may not invoke
 # clean - therefore do both separately
-       flog $Log $MAKE -i -na 1 clean
-       flog $Log $MAKE -i -na 1 remove
+       flog $WLog $MAKE -i -na 1 clean
+       flog $WLog $MAKE -i -na 1 remove
 
-       flog $Log ls -l ${PERDB_PATH}*
+       flog $WLog ls -l ${PERDB_PATH}*
 
-       flog $Log $MAKE dmake
+       flog $WLog $MAKE dmake
        set err = $status
        if ($err == 0) then
-          Note $Log "Build of dmake succeeded"
+          Note $WLog "Build of dmake succeeded"
        else
-          Note $Log "Build of dmake failed"
+          Note $WLog "Build of dmake failed"
        endif
-       flog $Log popd
+       flog $WLog popd
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -75,28 +75,28 @@ dbmget $Log CROSS_COMPILE^               \
 
     else
 
-       Note $Log "Find dmake for CROSS_COMPILE"
-       Note $Log "   PSY_ID    = |$PSY_ID|"
-       Note $Log "   BinDir    = |$BinDir|"
-       Note $Log "   CROSS_REF = |$CROSS_REF|"
+       Note $WLog "Find dmake for CROSS_COMPILE"
+       Note $WLog "   PSY_ID    = |$PSY_ID|"
+       Note $WLog "   BinDir    = |$BinDir|"
+       Note $WLog "   CROSS_REF = |$CROSS_REF|"
 
        set srcb = $CROSS_REF/bin
 
        set dm = $srcb/dmake
-       Note $Log "   dmake     = |$dm|"
+       Note $WLog "   dmake     = |$dm|"
        if (-x "$dm") then
-          flog $Log cp $dm ${BinDir}/dmake
-          flog $Log set err = 0
+          flog $WLog cp $dm ${BinDir}/dmake
+          flog $WLog set err = 0
 
 # try pact if no dmake found
        else
           set dm = $srcb/pact
-          Note $Log "   pact      = |$dm|"
+          Note $WLog "   pact      = |$dm|"
           if (-x "$dm") then
-             flog $Log cp $dm ${BinDir}/dmake
-             flog $Log set err = 0
+             flog $WLog cp $dm ${BinDir}/dmake
+             flog $WLog set err = 0
           else
-             Note $Log "No dmake found for bootstrap CROSS_COMPILE"
+             Note $WLog "No dmake found for bootstrap CROSS_COMPILE"
           endif
        endif
        unset dm
@@ -108,15 +108,17 @@ dbmget $Log CROSS_COMPILE^               \
 
 # decide whether to use smake or dmake
     if ($err == 0) then
-       flog $Log ${BinDir}/dmake -v
+       flog $WLog ${BinDir}/dmake -v
        if ($status == 0) then
-          flog $Log set opt = dmake
+          flog $WLog set opt = dmake
        endif
     endif
 
-    flog $Log setenv SESSION_CONFIG $PSY_ID
-    ftee $Log $DSYS pact $opt
+    flog $WLog setenv SESSION_CONFIG $PSY_ID
+    ftee $WLog $DSYS pact $opt
     unset opt
+
+source $Me:h/post-common
 
 exit($err)
 

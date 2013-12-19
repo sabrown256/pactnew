@@ -5,5 +5,5 @@
 #
 
 # announcement to config log
-Note $Log "      done"
+Note $Log "analyze> done with $Exe"
 

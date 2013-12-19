@@ -1,0 +1,9 @@
+#
+# POST-COMMON - common finish for programs in write
+#
+# include "cpyright.h"
+#
+
+# announcement to config log
+Note $Log "write> done with $Exe"
+
