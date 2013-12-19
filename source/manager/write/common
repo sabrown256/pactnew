@@ -41,6 +41,10 @@ if ($?FirstCommon == 0) then
    Note $Log "Date: `date`"
    Note $Log "Manager directory: $psy_mngdir"
    Note $Log ""
+
+   dbmget $Log PATH
+   flog $Log set path = ( $psy_scrdir $path )
+
 endif
 
 
