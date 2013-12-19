@@ -33,9 +33,15 @@ Tool AR {
 }
 
 Tool CC {
+   Version = 
+   Inc     = 
+   Flags   = 
 }
 
 Tool CXX {
+   Version = 
+   Inc     = 
+   Flags   = 
 }
 
 Tool DL {
@@ -48,6 +54,8 @@ Tool DO_RUN {
 }
 
 Tool FC {
+   Version  = 
+   Flags    = 
    MOD_FLAG = -I
 }
 
@@ -59,6 +67,9 @@ Tool INSTALL {
 }
 
 Tool LD {
+   Libk        =
+   RPath       =
+   Flags       =
    SpokeDepLib =
 }
 
@@ -155,6 +166,8 @@ Group DB {
 
 # Distributed Parallel processing group
 Group DP {
+   BE    = ""
+   FE    = "${PSY_Root}/bin/do-run -m"
    Inc   = ""
    Lib   = ""
    RPath = /usr/lib
@@ -172,6 +185,9 @@ Group GSL {
 }
 
 Group GRAPHICS {
+   Devices = "PS CGM MPG PNG JPG"
+   Flags   = 
+   Windows = 
 }
 
 # the HAVE group contains features that have been requested, verified to
@@ -197,6 +213,8 @@ Group HDF {
 #   HSY_RootLib      the standard /usr/lib equivalent for the host
 
 Group HSY {
+   CPU        = "unknown"
+   FPU        = "unknown"
    Host       = ${HSY_Host}
    OS_Name    = ${HSY_OS_Name}
    OS_Type    =
