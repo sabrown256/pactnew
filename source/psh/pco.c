@@ -1335,13 +1335,17 @@ static void setup_analyze_env(client *cl, char *base)
     dbset(cl, "HSY_OS_Name",    st.os);
     dbset(cl, "HSY_OS_Release", st.osrel);
 
+#if 0
     dbset(cl, "PSY_Arch",   st.arch);
     dbset(cl, "PSY_ID",     st.psy_id);
     dbset(cl, "PSY_Root",   st.dir.root);
+#endif
     dbset(cl, "PSY_Cfg",    st.psy_cfg);
+#if 0
     dbset(cl, "PSY_Base",   base);
     dbset(cl, "PSY_AnaDir", "%s/analyze", st.dir.mng);
     dbset(cl, "PSY_ScrDir", st.dir.scr);
+#endif
 
     dbset(cl, "RF_DEBUG",    st.abs_deb ? "TRUE" : "FALSE");
     dbset(cl, "RF_OPTIMIZE", st.abs_opt ? "TRUE" : "FALSE");
@@ -1358,8 +1362,6 @@ static void setup_analyze_env(client *cl, char *base)
        dbset(cl, "AF_CDecls", "TRUE");
     else
        dbset(cl, "AF_CDecls", "FALSE");
-
-    dbset(cl, "AF_ANSI",   "ANSI");
 
 /* cross compile front end */
     if (dbcmp(cl, "CROSS_COMPILE", "FALSE") != 0)
