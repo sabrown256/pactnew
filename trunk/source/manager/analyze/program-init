@@ -17,14 +17,6 @@ run analyze/rpath -i init
 # dynamically link dependent libraries by default
 include features/dld
 
-setenv ENV_GT "AF BFD CC Cfg CRAY CROSS CXX DB DO_RUN DP FC FS \
-               HDF HSY IBM JOBS JPEG LibM MAKE MDG MINGW MYSQL \
-               OS PACT PNG PCO PSY PY RF SQLITE3 TEST TRACKER"
-
-setenv ENV_VARS "Bits LIB \
-                 HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY \
-                 HAVE_OPENMP"
-
 LIB = lib
 
 #--------------------------------------------------------------------------
@@ -148,6 +140,8 @@ Group CRAY {
 
 # cross compiling group
 Group CROSS {
+   COMPILE = FALSE
+   REF     = none
 }
 
 # database group
@@ -280,9 +274,23 @@ Group PACT {
 }
 
 # PCO SYstem group
+#   PCO_EnvGroups    groups all of whose variables go into env-pact.*
+#   PCO_EnvVars      variables which go into env-pact.*
+#   PCO_Globals      list of variables not in a specific group
+#   PCO_RemDup       variables which must be cleaned of duplicates
 #   PCO_UseVars      variables cloned by Use statement
 
 Group PCO {
+   EnvGroups =  "AF BFD CC Cfg CRAY CROSS CXX DB DO_RUN DP FC FS"
+   EnvGroups =+ "HDF HSY IBM JOBS JPEG LibM MAKE MDG MINGW MYSQL"
+   EnvGroups =+ "OS PACT PNG PCO PSY PY RF SQLITE3 TEST TRACKER"
+
+   EnvVars =  "Bits LIB"
+   EnvVars =+ "HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY"
+   EnvVars =+ "HAVE_OPENMP"
+
+   Globals   =
+
    RemDup  =  "DP_Inc MDG_Inc MD_Inc CC_Inc"
    RemDup  =+ "DP_Lib MD_Lib LD_Lib"
 
