@@ -69,14 +69,14 @@ dbmget $ALog CC_Exe^                   \
              GRAPHICS_Windows =\? ""^  \
              GRAPHICS_Devices =\? ""^  \
              GRAPHICS_Flags   =\? ""^  \
+             GRAPHICS_UseOGL^          \
+             GRAPHICS_UseQD^           \
+             GRAPHICS_UseX^            \
    	     HAVE_PNGLIB^              \
    	     HAVE_JPEGLIB^             \
              RF_DEBUG^                 \
              HSY_OS_Name^              \
              HSY_Rootinc^              \
-             Std_UseOGL^               \
-             Std_UseQD^                \
-             Std_UseX^                 \
              RPATH
 
 #--------------------------------------------------------------------------
@@ -99,13 +99,13 @@ dbmget $ALog CC_Exe^                   \
 
    flog $ALog setenv MDG_Lib "$MDG_Lib $OGL_Lib $X11_Lib $PNG_Lib $JPEG_Lib"
 
-   if ($Std_UseQD == TRUE) then
+   if ($GRAPHICS_UseQD == TRUE) then
       flog $ALog setenv MDG_Pck            "$MDG_Pck QD"
       flog $ALog setenv GRAPHICS_Windows   "QD"
       flog $ALog setenv GRAPHICS_Devices   "$GRAPHICS_Devices QD"
       flog $ALog setenv GRAPHICS_Flags     "$GRAPHICS_Flags -framework Carbon"
    endif
-   if ($Std_UseOGL == TRUE) then
+   if ($GRAPHICS_UseOGL == TRUE) then
       if (($HSY_OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
          Note $ALog "Have GL on MAC OS X"
          flog $ALog setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
@@ -115,7 +115,7 @@ dbmget $ALog CC_Exe^                   \
       flog $ALog setenv GRAPHICS_Devices   "$GRAPHICS_Devices OGL"
       flog $ALog setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DOGL"
    endif
-   if ($Std_UseX == TRUE) then
+   if ($GRAPHICS_UseX == TRUE) then
       flog $ALog setenv MDG_Pck            "$MDG_Pck X11"
       flog $ALog setenv GRAPHICS_Windows   "X"
       flog $ALog setenv GRAPHICS_Devices   "$GRAPHICS_Devices X"
@@ -131,26 +131,26 @@ dbmget $ALog CC_Exe^                   \
       flog $ALog setenv MDG_Pck          "$MDG_Pck JPEG"
    endif
 
-   if ($Std_UseX == FALSE) then
+   if ($GRAPHICS_UseX == FALSE) then
 
 # have OpenGL
-      if ($Std_UseOGL == "TRUE") then
+      if ($GRAPHICS_UseOGL == "TRUE") then
          flog $ALog setenv GRAPHICS_Windows OGL
 
 # have Quickdraw
-      else if ($Std_UseQD == "TRUE") then
+      else if ($GRAPHICS_UseQD == "TRUE") then
          flog $ALog setenv GRAPHICS_Windows QD
 
 # no screen graphics
       else
          flog $ALog setenv GRAPHICS_Windows       ""
-         flog $ALog setenv Std_UseX   FALSE
-         flog $ALog setenv Std_UseOGL FALSE
-         flog $ALog setenv Std_UseQD  FALSE
+         flog $ALog setenv GRAPHICS_UseX   FALSE
+         flog $ALog setenv GRAPHICS_UseOGL FALSE
+         flog $ALog setenv GRAPHICS_UseQD  FALSE
 
-         dbmset $ALog Std_UseX   = $Std_UseX^    \
-                      Std_UseOGL = $Std_UseOGL^  \
-                      Std_UseQD  = $Std_UseQD
+         dbmset $ALog GRAPHICS_UseX   = $GRAPHICS_UseX^    \
+                      GRAPHICS_UseOGL = $GRAPHICS_UseOGL^  \
+                      GRAPHICS_UseQD  = $GRAPHICS_UseQD
       endif
 
       dbexp GRAPHICS_Windows

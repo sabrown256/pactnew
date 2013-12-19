@@ -187,6 +187,9 @@ Group GSL {
 Group GRAPHICS {
    Devices = "PS CGM MPG PNG JPG"
    Flags   = 
+   UseOGL  = FALSE
+   UseQD   = FALSE
+   UseX    = FALSE
    Windows = 
 }
 

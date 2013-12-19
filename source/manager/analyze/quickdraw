@@ -22,7 +22,7 @@ dbmget $ALog HSY_RootInc^                        \
              QD_Lib           =\? ""^            \
              QD_RPath         =\? $HSY_RootLib^  \
              QD_Path          =\? /usr^          \
-             Std_UseQD        =\? FALSE^         \
+             GRAPHICS_UseQD   =\? FALSE^         \
              Cfg_CC_Exe       =\? cc^            \
              CC_Exe^                             \
              LD_Flags^                           \
@@ -59,7 +59,7 @@ EOF
    flog $ALog $Cfg_CC_Exe $Tmp.c -o $Tmp $opt
    set xstatus = $status
    if ($xstatus == 0) then
-      if ($Std_UseQD == TRUE) then
+      if ($GRAPHICS_UseQD == TRUE) then
          NoteD $ALog "      has Quickdraw (Carbon)"
 
          setenv QD_Inc           "-framework Carbon"
@@ -71,7 +71,7 @@ EOF
       endif
    else
       NoteD $ALog "      no Quickdraw"
-      setenv Std_UseQD   FALSE
+      setenv GRAPHICS_UseQD   FALSE
    endif
 
    set ETime = `timer -b $UTime`
@@ -89,7 +89,7 @@ EOF
 
 endif
 
-dbexp Std_UseQD
+dbexp GRAPHICS_UseQD
 
 source $Me:h/post-common
 
