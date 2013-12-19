@@ -7,26 +7,26 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/aranlib -----"
-Note $Log "Write: aranlib"
-Note $Log ""
+Note $WLog "----- write/aranlib -----"
+Note $WLog "Write: aranlib"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   Abstract ranlib wrapper - aranlib"
-Note $Log ""
+NoteD $WLog "   Abstract ranlib wrapper - aranlib"
+Note $WLog ""
 
-dbmget $Log BinDir^            \
-            Ranlib_Exe
+dbmget $WLog BinDir^            \
+             Ranlib_Exe
 
-flog $Log set STDOUT = $BinDir/aranlib
-flog $Log $RM $STDOUT
-flog $Log touch $STDOUT
+flog $WLog set STDOUT = $BinDir/aranlib
+flog $WLog $RM $STDOUT
+flog $WLog touch $STDOUT
 
 Note $STDOUT '#\!/bin/csh -f'
 Note $STDOUT '#'
@@ -86,9 +86,11 @@ Note $STDOUT 'exit($nerr)'
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-flog $Log chmod a+x $STDOUT
-flog $Log ls -l $STDOUT
-flog $Log cat $STDOUT
+flog $WLog chmod a+x $STDOUT
+flog $WLog ls -l $STDOUT
+flog $WLog cat $STDOUT
+
+source $Me:h/post-common
 
 exit(0)
 

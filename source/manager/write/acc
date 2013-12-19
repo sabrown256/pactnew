@@ -15,39 +15,39 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/acc -----"
-Note $Log "Write: acc"
-Note $Log ""
+Note $WLog "----- write/acc -----"
+Note $WLog "Write: acc"
+Note $WLog ""
 
 HAVE_SUBROUTINES
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   Abstract compiler wrapper - acc"
-Note $Log ""
+NoteD $WLog "   Abstract compiler wrapper - acc"
+Note $WLog ""
 
-dbmget $Log BinDir^             \
-            EtcDir^             \
-            CC_Debug^           \
-            CC_Optimize^        \
-            CC_Profile^         \
-            PACT_CC_FAMILY^     \
-            PACT_CC_VERSION^    \
-            PACT_CC_PATH^       \
-            PACT_CC_EXE^        \
-            PSY_Arch
+dbmget $WLog BinDir^             \
+             EtcDir^             \
+             CC_Debug^           \
+             CC_Optimize^        \
+             CC_Profile^         \
+             PACT_CC_FAMILY^     \
+             PACT_CC_VERSION^    \
+             PACT_CC_PATH^       \
+             PACT_CC_EXE^        \
+             PSY_Arch
             
-flog $Log set exe    = $PACT_CC_EXE
-flog $Log set vers   = $PACT_CC_VERSION
-flog $Log set comp   = $exe:t
-flog $Log set STDOUT = $BinDir/acc
-flog $Log $RM $STDOUT
-flog $Log touch $STDOUT
+flog $WLog set exe    = $PACT_CC_EXE
+flog $WLog set vers   = $PACT_CC_VERSION
+flog $WLog set comp   = $exe:t
+flog $WLog set STDOUT = $BinDir/acc
+flog $WLog $RM $STDOUT
+flog $WLog touch $STDOUT
 
 # dbmget chokes getting this one
 set CPP = ( `$BinDir/perdb -f $EtcDir/cfg CCP` )
@@ -55,8 +55,8 @@ set CPP = ( `$BinDir/perdb -f $EtcDir/cfg CCP` )
 # typical value for CPP is '${CC} -E $< > $*.i'
 set lcpp = ( `echo "$CPP" | sed 's|$<|$inf|' | sed 's|$\*.i|+out+|'` )
 
-Note $Log "CPP  = |$CPP|"
-Note $Log "lcpp = |$lcpp|"
+Note $WLog "CPP  = |$CPP|"
+Note $WLog "lcpp = |$lcpp|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -352,7 +352,9 @@ Note $STDOUT 'exit($err)'
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-flog $Log chmod a+x $STDOUT
+flog $WLog chmod a+x $STDOUT
+
+source $Me:h/post-common
 
 exit(0)
 

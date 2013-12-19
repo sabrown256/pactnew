@@ -9,33 +9,33 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/syntax.h -----"
-Note $Log "Write: syntax.h"
-Note $Log ""
+Note $WLog "----- write/syntax.h -----"
+Note $WLog "Write: syntax.h"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   Interpeter Syntax Mode Configuration - syntax.h"
-Note $Log ""
+NoteD $WLog "   Interpeter Syntax Mode Configuration - syntax.h"
+Note $WLog ""
 
-dbmget $Log IncDir^     \
-            SHELL_Cont^ \
-            Yacc_Exe^   \
-            PSY_Base^   \
-            PSY_Cfg
+dbmget $WLog IncDir^     \
+             SHELL_Cont^ \
+             Yacc_Exe^   \
+             PSY_Base^   \
+             PSY_Cfg
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
     set STDOUT = $IncDir/syntax.h
 
-    flog $Log $RM $STDOUT
-    flog $Log touch $STDOUT
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
 
     Note $STDOUT "/*"
     Note $STDOUT " * SYNTAX.H - Configure SCHEME Syntax Modes for $PSY_Cfg"
@@ -51,11 +51,11 @@ dbmget $Log IncDir^     \
     set lsm   = ""
     @ nsyntxs = 0
     if ("$Yacc_Exe" != "") then
-       flog $Log pushd $PSY_Base/scheme
+       flog $WLog pushd $PSY_Base/scheme
        if (!(-d syntax)) then
-          flog $Log mkdir syntax
+          flog $WLog mkdir syntax
        endif
-       flog $Log cd syntax
+       flog $WLog cd syntax
        set scsd = `scs-meta -n`
        set Dirs = `ls`
        foreach dir ($Dirs)
@@ -66,7 +66,7 @@ dbmget $Log IncDir^     \
              endif
           endif
        end
-       flog $Log popd
+       flog $WLog popd
     endif
 
     if ($nsyntxs != 0) then
@@ -119,6 +119,8 @@ dbmget $Log IncDir^     \
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 

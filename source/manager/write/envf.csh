@@ -20,29 +20,29 @@ set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
 source $ldir/functions-pact.csh
 
-dbmget $Log MDG_Pck^        \
-            HAVE_OPENMP^    \
-            HAVE_READLINE^  \
-            HAVE_PYTHON^    \
-            PY_Vers^        \
-            PSY_Root^       \
-            PSY_SITE^       \
-            PSY_TYPE^       \
-            PSY_ASRoot^     \
-            PSY_AIRoot
+dbmget $WLog MDG_Pck^        \
+             HAVE_OPENMP^    \
+             HAVE_READLINE^  \
+             HAVE_PYTHON^    \
+             PY_Vers^        \
+             PSY_Root^       \
+             PSY_SITE^       \
+             PSY_TYPE^       \
+             PSY_ASRoot^     \
+             PSY_AIRoot
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
     set lnotice = $1
 
-    Separator $Log
+    Separator $WLog
     if ($lnotice == TRUE) then
-       NoteD $Log "   Environment setup files - env-pact"
+       NoteD $WLog "   Environment setup files - env-pact"
     else
-       Note $Log "   Environment setup files - env-pact"
+       Note $WLog "   Environment setup files - env-pact"
     endif
-    Note $Log " "
+    Note $WLog " "
 
     set tmpF = $SEFile.tmp
     $RM $tmpF
@@ -73,7 +73,7 @@ dbmget $Log MDG_Pck^        \
     unset tmpF
 
 # do special handling for PATH and RPATH
-    flog $Log set EPath = ""
+    flog $WLog set EPath = ""
     set length = `wc -l $SEFile`
     @ nl = $length[1]
     @ il = 1
@@ -157,12 +157,12 @@ dbmget $Log MDG_Pck^        \
     Note $EnvDk "dk_setenv SCHEME  $PSY_Root/scheme"
     Note $EnvDk "dk_setenv ULTRA   $PSY_Root/scheme"
 
-    flog $Log cat $EnvCsh
-    flog $Log cat $EnvSh
-    flog $Log cat $EnvDk
+    flog $WLog cat $EnvCsh
+    flog $WLog cat $EnvSh
+    flog $WLog cat $EnvDk
 
 # source this now before trying to compile smake in WriteMAKEM
-    Note $Log "Sourcing $EnvCsh"
+    Note $WLog "Sourcing $EnvCsh"
     source $EnvCsh
 
 #--------------------------------------------------------------------------

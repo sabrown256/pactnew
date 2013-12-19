@@ -9,37 +9,37 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/package -----"
-Note $Log "Write: package"
-Note $Log ""
+Note $WLog "----- write/package -----"
+Note $WLog "Write: package"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   C Environment Configuration - scdecls.h"
-Note $Log ""
+NoteD $WLog "   C Environment Configuration - scdecls.h"
+Note $WLog ""
 
-dbmget $Log Cfe_CC_Exe^      \
-            Cfe_CC_Flags^    \
-            Cfe_LD_Flags^    \
-            Cfe_LD_RPath^    \
-            CROSS_FE^        \
-            IncDir^          \
-            PSY_Base^        \
-            PSY_CfgDir^      \
-            PACT_CC_VERSION
+dbmget $WLog Cfe_CC_Exe^      \
+             Cfe_CC_Flags^    \
+             Cfe_LD_Flags^    \
+             Cfe_LD_RPath^    \
+             CROSS_FE^        \
+             IncDir^          \
+             PSY_Base^        \
+             PSY_CfgDir^      \
+             PACT_CC_VERSION
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
     set STDOUT = $IncDir/scdecls.h
 
-    flog $Log $RM $STDOUT
-    flog $Log touch $STDOUT
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
 
     Note $STDOUT "/*"
     Note $STDOUT " * SCDECLS.H - define and declares things missing from the system headers"
@@ -47,7 +47,7 @@ dbmget $Log Cfe_CC_Exe^      \
     Note $STDOUT " */"
     Note $STDOUT ""
 
-    flog $Log pushd $PSY_Base/score
+    flog $WLog pushd $PSY_Base/score
 
     set opt = ""
     set opt = ( $opt $Cfe_CC_Flags )
@@ -57,35 +57,37 @@ dbmget $Log Cfe_CC_Exe^      \
     set inc = ""
     set inc = ( $inc -I.. -I../../psh -I$IncDir )
 
-    flog $Log mkdir $PSY_CfgDir
-    flog $Log cd $PSY_CfgDir
-    flog $Log $Cfe_CC_Exe -DMM_CONFIG $inc ../scmemi.c -o score-config $opt
+    flog $WLog mkdir $PSY_CfgDir
+    flog $WLog cd $PSY_CfgDir
+    flog $WLog $Cfe_CC_Exe -DMM_CONFIG $inc ../scmemi.c -o score-config $opt
     if ($status == 0) then
 
 # NOTE: coded this way to throw away message to stderr
 # which may come from CROSS_FE instead of score-config
-       flog $Log ( ( $CROSS_FE ./score-config >> $STDOUT ) >& /dev/null )
+       flog $WLog ( ( $CROSS_FE ./score-config >> $STDOUT ) >& /dev/null )
        if ($status == 0) then
-          flog $Log $RM ./score-config
-          Note $Log "score-config execution succeeded"
+          flog $WLog $RM ./score-config
+          Note $WLog "score-config execution succeeded"
        else
-          Note $Log "score-config execution failed"
+          Note $WLog "score-config execution failed"
        endif
 
 # if score-config fails choose largest possible value for N_DOUBLES_MD
 # so the build can proceed successfully (if non-optimally)
     else
-       NoteD $Log "Failed to correctly configure the SCORE Memory Manager"
+       NoteD $WLog "Failed to correctly configure the SCORE Memory Manager"
        Note $STDOUT "#define N_DOUBLES_MD 8"
     endif
-    flog $Log cd ..
-    flog $Log $RMDir $PSY_CfgDir
+    flog $WLog cd ..
+    flog $WLog $RMDir $PSY_CfgDir
 
-    flog $Log popd
+    flog $WLog popd
     Note $STDOUT ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 

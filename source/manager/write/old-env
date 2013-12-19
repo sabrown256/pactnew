@@ -9,25 +9,25 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/old-env -----"
-Note $Log "Write: old-env"
-Note $Log ""
+Note $WLog "----- write/old-env -----"
+Note $WLog "Write: old-env"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
-NoteD $Log "   Adding backward compatibility variable bindings"
-Note $Log ""
+Separator $WLog
+NoteD $WLog "   Adding backward compatibility variable bindings"
+Note $WLog ""
 
-dbmget $Log EtcDir
+dbmget $WLog EtcDir
 
-flog $Log set envcsh = $EtcDir/env-pact.csh
-flog $Log set envsh  = $EtcDir/env-pact.sh
-flog $Log set envdk  = $EtcDir/env-pact.dk
-flog $Log set envmd  = $EtcDir/env-pact.mod
+flog $WLog set envcsh = $EtcDir/env-pact.csh
+flog $WLog set envsh  = $EtcDir/env-pact.sh
+flog $WLog set envdk  = $EtcDir/env-pact.dk
+flog $WLog set envmd  = $EtcDir/env-pact.mod
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -120,7 +120,7 @@ set lst = ( $lst DEFAULT_SHELL        SHELL_Default )
 
 @ ne = $#lst
 
-Note $Log "lst = ($ne) $lst"
+Note $WLog "lst = ($ne) $lst"
 
 source $envcsh
 
@@ -171,6 +171,8 @@ end
 
 #--------------------------------------------------------------------------0
 #--------------------------------------------------------------------------0
+
+source $Me:h/post-common
 
 exit($err)
 

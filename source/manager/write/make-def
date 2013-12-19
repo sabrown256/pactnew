@@ -9,93 +9,93 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
-Note $Log "----- write/make-def -----"
-Note $Log "Write: make-def"
-Note $Log ""
+Note $WLog "----- write/make-def -----"
+Note $WLog "Write: make-def"
+Note $WLog ""
 
 HAVE_SUBROUTINES
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
+Separator $WLog
 
-NoteD $Log "   Site Dependent MAKE Configuration - make-def"
-Note $Log ""
+NoteD $WLog "   Site Dependent MAKE Configuration - make-def"
+Note $WLog ""
 
-dbmget $Log ACC_Debug_Default^      \
-            ACC_Optimize_Default^   \
-            AFC_Debug_Default^      \
-            AFC_Optimize_Default^   \
-            AR_IFlag^               \
-            AR_XFlag^               \
-            ArW32Objs^              \
-            Bits^                   \
-            CC_Debug_Default^       \
-            CC_Optimize_Default^    \
-            Cfg_CC_Exe^             \
-            Cfg_CC_Flags^           \
-            Cfg_CC_Inc^             \
-            CROSS_FE^               \
-            DP_BE^                  \
-            DP_METHOD^              \
-            EtcDir^                 \
-            FC_MOD_FLAG^            \
-            FC_Debug_Default^       \
-            FC_Optimize_Default^    \
-            Globals^                \
-            GRAPHICS_Devices^       \
-            GRAPHICS_Flags^         \
-            GRAPHICS_Windows^       \
-            HAVE_GOOD_OMP_PRAGMAS^  \
-            HAVE_PYTHON^            \
-            HSY_OS_Name^            \
-            HSY_OS_Type^            \
-            IncDir^                 \
-            INSTALL_Exe^            \
-            JOBS_System^            \
-            Lex_Exe^                \
-            Lex_Flags^              \
-            LIB^                    \
-            MAKE_Strategy^          \
-            MAKE_SUFFIXES^          \
-            MAKE_UseGNU^            \
-            OW32Objs^               \
-            PACT_CC_FAMILY^         \
-            PACT_CC_VERSION^        \
-            PACT_CC_PATH^           \
-            PACT_CC_EXE^            \
-            PACT_FC_FAMILY^         \
-            PACT_FC_VERSION^        \
-            PACT_FC_PATH^           \
-            PACT_FC_EXE^            \
-            PCO_UseVars^            \
-            PSY_Base^               \
-            PSY_Cfg^                \
-            PSY_Root^               \
-	    PSY_ID^                 \
-            PSY_InstRoot^           \
-            PSY_Load^               \
-            PSY_PubLib^             \
-            PSY_PubInc^             \
-	    PSY_CfgDir^             \
-            PSY_MngDir^             \
-	    PSY_TmpDir^             \
-            PY_CC^                  \
-            PY_Cfg^                 \
-            PY_Exe^                 \
-            PY_Inc^                 \
-            PY_Vers^                \
-            Ranlib_Exe^             \
-            RF_SPOKES_C^            \
-            RPATH^                  \
-            SHELL_Default^          \
-            SMP_LibExt^             \
-            STD_IPC^                \
-            Yacc_Exe^               \
-            Yacc_Flags
+dbmget $WLog ACC_Debug_Default^      \
+             ACC_Optimize_Default^   \
+             AFC_Debug_Default^      \
+             AFC_Optimize_Default^   \
+             AR_IFlag^               \
+             AR_XFlag^               \
+             ArW32Objs^              \
+             Bits^                   \
+             CC_Debug_Default^       \
+             CC_Optimize_Default^    \
+             Cfg_CC_Exe^             \
+             Cfg_CC_Flags^           \
+             Cfg_CC_Inc^             \
+             CROSS_FE^               \
+             DP_BE^                  \
+             DP_METHOD^              \
+             EtcDir^                 \
+             FC_MOD_FLAG^            \
+             FC_Debug_Default^       \
+             FC_Optimize_Default^    \
+             Globals^                \
+             GRAPHICS_Devices^       \
+             GRAPHICS_Flags^         \
+             GRAPHICS_Windows^       \
+             HAVE_GOOD_OMP_PRAGMAS^  \
+             HAVE_PYTHON^            \
+             HSY_OS_Name^            \
+             HSY_OS_Type^            \
+             IncDir^                 \
+             INSTALL_Exe^            \
+             JOBS_System^            \
+             Lex_Exe^                \
+             Lex_Flags^              \
+             LIB^                    \
+             MAKE_Strategy^          \
+             MAKE_SUFFIXES^          \
+             MAKE_UseGNU^            \
+             OW32Objs^               \
+             PACT_CC_FAMILY^         \
+             PACT_CC_VERSION^        \
+             PACT_CC_PATH^           \
+             PACT_CC_EXE^            \
+             PACT_FC_FAMILY^         \
+             PACT_FC_VERSION^        \
+             PACT_FC_PATH^           \
+             PACT_FC_EXE^            \
+             PCO_UseVars^            \
+             PSY_Base^               \
+             PSY_Cfg^                \
+             PSY_Root^               \
+             PSY_ID^                 \
+             PSY_InstRoot^           \
+             PSY_Load^               \
+             PSY_PubLib^             \
+             PSY_PubInc^             \
+             PSY_CfgDir^             \
+             PSY_MngDir^             \
+             PSY_TmpDir^             \
+             PY_CC^                  \
+             PY_Cfg^                 \
+             PY_Exe^                 \
+             PY_Inc^                 \
+             PY_Vers^                \
+             Ranlib_Exe^             \
+             RF_SPOKES_C^            \
+             RPATH^                  \
+             SHELL_Default^          \
+             SMP_LibExt^             \
+             STD_IPC^                \
+             Yacc_Exe^               \
+             Yacc_Flags
 
 set vl = ""
 
@@ -161,12 +161,12 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 #--------------------------------------------------------------------------
 
 # add DP_Inc to CC_Inc
-    flog $Log setenv CC_Inc  "$CC_Inc $DP_Inc"
+    flog $WLog setenv CC_Inc  "$CC_Inc $DP_Inc"
 
     set STDOUT = $EtcDir/make-def
 
-    flog $Log $RM $STDOUT
-    flog $Log touch $STDOUT
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
 
     Note $STDOUT "#"
     Note $STDOUT "# MAKE-DEF - installation dependent definitions for $PSY_Cfg"
@@ -184,7 +184,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     if (!(-x "$mk")) then
        set mk = `where make |& head -n 1`
     endif
-    Note $Log "Using '$mk' for system make"
+    Note $WLog "Using '$mk' for system make"
     Note $STDOUT "UMake      = $mk"
     unset mk
 
@@ -233,17 +233,17 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT -n "OSSupport ="
     if ($lostd == UNIX) then
        if ($MAKE_Strategy == "SpaceSaving") then
-	  Note $STDOUT -n ' ${ArUnxObjs}'
+          Note $STDOUT -n ' ${ArUnxObjs}'
        else
-	  Note $STDOUT -n ' ${OUnxObjs'}'
+          Note $STDOUT -n ' ${OUnxObjs'}'
        endif
 
 # cannot ever get here but it shows how the abstraction works
     else if ($lostd == WIN32) then
        if ($MAKE_Strategy == "SpaceSaving") then
-	  Note $STDOUT -n ' ${ArW32Objs}'
+          Note $STDOUT -n ' ${ArW32Objs}'
        else
-	  Note $STDOUT -n ' ${OW32Objs'}'
+          Note $STDOUT -n ' ${OW32Objs'}'
        endif
     endif
     Note $STDOUT ""
@@ -260,9 +260,9 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT -n "GRAPHICS_Devices ="
     foreach dev ($GRAPHICS_Devices)
        if ($MAKE_Strategy == "SpaceSaving") then
-	  Note $STDOUT -n ' ${Ar'$dev'}'
+          Note $STDOUT -n ' ${Ar'$dev'}'
        else
-	  Note $STDOUT -n ' ${O'$dev'}'
+          Note $STDOUT -n ' ${O'$dev'}'
        endif
     end
     Note $STDOUT ""
@@ -280,21 +280,21 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT -n "SyntaxModes  ="
     if ("$Yacc_Exe" != "") then
        set scsd = `scs-meta -n`
-       Note $Log "scsd = $scsd"
-       flog $Log pushd $PSY_Base/scheme/syntax
+       Note $WLog "scsd = $scsd"
+       flog $WLog pushd $PSY_Base/scheme/syntax
        foreach mod (*)
           if (-d $mod) then
              if ($mod != "$scsd") then
-                flog $Log set SynSCM = ( $SynSCM applications/${mod}synt.scm )
+                flog $WLog set SynSCM = ( $SynSCM applications/${mod}synt.scm )
                 if ($MAKE_Strategy == "SpaceSaving") then
-   	           Note $STDOUT -n ' ${Ar'$mod'}'
+                   Note $STDOUT -n ' ${Ar'$mod'}'
                 else
-	           Note $STDOUT -n ' ${O'$mod'}'
+                   Note $STDOUT -n ' ${O'$mod'}'
                 endif
              endif
           endif
        end
-       flog $Log popd
+       flog $WLog popd
     endif
     Note $STDOUT ""
     Note $STDOUT "SyntaxScheme = $SynSCM"
@@ -469,11 +469,11 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
 # get the entries for RPATH
     set npath = `analyze/rpath -o link`
-    Note $Log "analyze/rpath -o link => |$npath|"
+    Note $WLog "analyze/rpath -o link => |$npath|"
     Note $STDOUT "LDPath     = $npath"
 
     set lrpath  = `analyze/rpath -o rpath`
-    Note $Log "analyze/rpath -o rpath => |$npath|"
+    Note $WLog "analyze/rpath -o rpath => |$npath|"
     Note $STDOUT "LDRPath    = $lrpath"
 
     Note $STDOUT "LDFLAGS    = ${LD_Flags}"' ${LDRPath} ${LDPath}'
@@ -681,10 +681,13 @@ PrintRule:
 
     echo '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }' >> $STDOUT
 
-    fexec $Log printenv $Val @o sed 's/\\n/\n/g' @o sed 's/\\t/\t/g' @o fa:$STDOUT
+    fexec $WLog printenv $Val @o sed 's/\\n/\n/g' @o sed 's/\\t/\t/g' @o fa:$STDOUT
 
     return
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+source $Me:h/post-common
+
+exit(0)

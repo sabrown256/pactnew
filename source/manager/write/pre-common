@@ -1,5 +1,5 @@
 #
-# COMMON - common setup for programs in write
+# PRE-COMMON - common setup for programs in write
 #
 # include "cpyright.h"
 #
@@ -31,19 +31,21 @@ if ($?FirstCommon == 0) then
 
    setenv FirstCommon FALSE
 
-   InitLog Log $llog:h/write.$0:t
+   InitLog WLog $llog:h/write.$0:t
    unset llog
 
-   Note $Log ""
-   Separator $Log
-   Note $Log "Command: $Cmd"
-   Note $Log "Current: $cwd"
-   Note $Log "Date: `date`"
-   Note $Log "Manager directory: $psy_mngdir"
-   Note $Log ""
+   Note $WLog ""
+   Separator $WLog
+   Note $WLog "Command: $Cmd"
+   Note $WLog "Current: $cwd"
+   Note $WLog "Date: `date`"
+   Note $WLog "Manager directory: $psy_mngdir"
+   Note $WLog ""
 
-   dbmget $Log PATH
-   flog $Log set path = ( $psy_scrdir $path )
+   dbmget $WLog PATH
+   flog $WLog set path = ( $psy_scrdir $path )
+
+   Note $Log "write> doing $Exe"
 
 endif
 

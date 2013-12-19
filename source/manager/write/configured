@@ -9,39 +9,39 @@
 #
 
 set Me = $0
-source $Me:h/common
+source $Me:h/pre-common
 
 set lCfg = $3
 
-Note $Log "----- write/configured -----"
-Note $Log "Write: configured"
-Note $Log ""
+Note $WLog "----- write/configured -----"
+Note $WLog "Write: configured"
+Note $WLog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
-NoteD $Log "   Configuration record - configured"
-Note $Log ""
+Separator $WLog
+NoteD $WLog "   Configuration record - configured"
+Note $WLog ""
 
-dbmget $Log AF_PATTERN_WARN^  \
-            AF_PATTERN_ERR^   \
-            EtcDir^           \
-            HSY_Host^         \
-            HSY_OS_Name^      \
-            MAKE_Shared_Libs^ \
-            PSY_Dbg_Opt^      \
-            PSY_FltDir^       \
-            RF_PROFILE^       \
-            USE_TmpDir
+dbmget $WLog AF_PATTERN_WARN^  \
+             AF_PATTERN_ERR^   \
+             EtcDir^           \
+             HSY_Host^         \
+             HSY_OS_Name^      \
+             MAKE_Shared_Libs^ \
+             PSY_Dbg_Opt^      \
+             PSY_FltDir^       \
+             RF_PROFILE^       \
+             USE_TmpDir
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
     set STDOUT = $EtcDir/configured
 
-    flog $Log $RM $STDOUT
-    flog $Log touch $STDOUT
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
 
     Note $STDOUT "Date            = `date`"
     Note $STDOUT "Host            = $HSY_Host ($HSY_OS_Name)"
@@ -57,6 +57,8 @@ dbmget $Log AF_PATTERN_WARN^  \
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+source $Me:h/post-common
 
 exit(0)
 
