@@ -157,7 +157,6 @@ alias envini    'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
 # usage: dbexp <var>
 
 alias dbexp     'set t_ = ( `$PERDB -l \!\!:1 = $\!\!:1` )'
-alias envexp    'echo "parent \!\!:1($\!\!:1)"'
 
 # fexec logs the gexec command, runs it, and
 # gets gstatus out as a shell variable

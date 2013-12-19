@@ -216,12 +216,6 @@ dbexp () {
    unset t_
 }
 
-envexp () {
-   var=$1
-   val=`printenv $var`
-   echo "parent $var($val)"
-}
-
 # fexec logs the gexec command, runs it, and
 # gets gstatus out as a shell variable
 # usage: fexec $log <gexec-specs>
