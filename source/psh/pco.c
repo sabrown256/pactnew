@@ -390,7 +390,7 @@ static int write_class_pco(client *cl, FILE *out, char *clss, char *ctype,
 	 global = (strcmp(c, "Glb") == 0);
 
 	 if (global == TRUE)
-	    {t  = dbget(cl, FALSE, "Globals");
+	    {t  = dbget(cl, FALSE, "PCO_Globals");
 	     sa = tokenize(t, " \t\n\r", 0);}
          else
 	    {fprintf(out, "%s%s %s {\n", ind, ctype, c);
@@ -629,8 +629,8 @@ static void write_perl(client *cl, state *st, char *dbname)
     char t[BFLRG];
     char **ta;
     FILE *out;
-    char *exc[] = { "Globals", "CurrGrp", "CurrTool",
-		    "ENV_GT", "ENV_VARS", "Save_CC", "Save_CFLAGS",
+    char *exc[] = { "PCO_Globals", "CurrGrp", "CurrTool",
+		    "PCO_EnvGroups", "PCO_EnvVars", "Save_CC", "Save_CFLAGS",
 		    "gstatus", "t" };
 
     ne = sizeof(exc)/sizeof(char *);
@@ -753,7 +753,7 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
 /*--------------------------------------------------------------------------*/
 
 /* ADD_SPEC_ENV_VARS - add variables specified in the environment
- *                   - variables ENV_GT and ENV_VARS
+ *                   - variables PCO_EnvGroups and PCO_EnvVars
  *                   - to the environment files
  */
 
@@ -765,7 +765,7 @@ static void add_spec_env_vars(client *cl, int blank,
     char *p, *v, *var, **gt, **va;
 
 /* check for Groups and Tools to add */
-    var = cgetenv(TRUE, "ENV_GT");
+    var = cgetenv(TRUE, "PCO_EnvGroups");
     gt  = tokenize(var, " :", 0);
     nv  = (gt != NULL) ? lst_length(gt) : 0;
     if (nv > 0)
@@ -804,7 +804,7 @@ static void add_spec_env_vars(client *cl, int blank,
     free_strings(gt);
 
 /* check for individual variables */
-    var = cgetenv(TRUE, "ENV_VARS");
+    var = cgetenv(TRUE, "PCO_EnvVars");
     va  = tokenize(var, " :", 0);
     nv  = (va != NULL) ? lst_length(va) : 0;
     for (iv = 0; iv < nv; iv++)
@@ -1524,14 +1524,11 @@ static void default_var(client *cl, char *base)
 
     dbset(cl, "PACT_CFG_ID", st.psy_id);
 
-    dbinitv(cl, "Globals",       "");
     dbinitv(cl, "PSY_CfgMan",    "%s/cfgman", st.dir.scr);
     dbinitv(cl, "PSY_MngDir",    st.dir.mng);
     dbinitv(cl, "PSY_InstRoot",  "none");
     dbinitv(cl, "PSY_PubInc",    "");
     dbinitv(cl, "PSY_PubLib",    "");
-    dbinitv(cl, "CROSS_COMPILE", "FALSE");
-    dbinitv(cl, "CROSS_REF",     "none");
 
 /* global variables */
     snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.psy_id);
@@ -1847,9 +1844,9 @@ static void set_var(client *cl, char *var, char *oper, char *val)
 
 /* attach the current group suffix */
     if (strcmp(prfx, "Glb") == 0)
-       {t = dbget(cl, FALSE, "Globals");
+       {t = dbget(cl, FALSE, "PCO_Globals");
 	snprintf(s, BFLRG, "%s %s", t, var);
-	dbset(cl, "Globals", unique(s, FALSE, ' '));
+	dbset(cl, "PCO_Globals", unique(s, FALSE, ' '));
 	nstrncpy(fvar, BFLRG, var, -1);}
     else
        snprintf(fvar, BFLRG, "%s_%s", prfx, var);
