@@ -1367,11 +1367,6 @@ static void setup_analyze_env(client *cl, char *base)
     else
        dbinitv(cl, "CROSS_FE", "");
 
-/* initialization of graphics flags - there is NO default system */
-    dbinitv(cl, "Std_UseX",         "FALSE");
-    dbinitv(cl, "Std_UseOGL",       "FALSE");
-    dbinitv(cl, "Std_UseQD",        "FALSE");
-
 /* initialize Cfg group flags */
     dbinitv(cl, "Cfg_CC_Flags",  dbget(cl, FALSE, "CC_Flags"));
     dbinitv(cl, "Cfg_CC_Inc",    dbget(cl, FALSE, "CC_Inc"));
