@@ -2355,11 +2355,10 @@ static void read_config(client *cl, char *cfg, int quiet)
                 push_path(P_APPEND, epath, value);
 	     s = echo(FALSE, value);
 	     dbset(cl, oper, s);}
-#if 0
+
 /* handle Note specifications */
 	 else if (strcmp(key, "Note") == 0)
             printf("%s\n", trim(line+5, BOTH, "\""));
-#endif
 
 /* handle Run specifications */
 	 else if (strcmp(key, "Run") == 0)
@@ -2983,6 +2982,8 @@ int main(int c, char **v, char **env)
 
     st.features[0] = '\0';
     st.have_db = launch_perdb(c, v);
+
+    dbset(cl, "PATH", cgetenv(TRUE, "PATH"));
 
 /* NOTE: because of OSX's nefarious automounter we have to get the current
  * directory this way (rather than via the getcwd library call) so that

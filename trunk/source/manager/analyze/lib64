@@ -24,7 +24,8 @@ while ($#argv > 0)
    shift
 end
 
-dbmget $ALog Bits
+dbmget $ALog Bits^   \
+             PATH
 
 set lroot = /usr
 source $lbase/common-lib64

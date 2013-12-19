@@ -81,10 +81,11 @@ while ($#argv > 0)
    shift
 end
 
-dbmget /dev/null LIB^          \
-                 RPATH^        \
-                 Cfg_RPATH^    \
-                 PACT_CC_PATH
+dbmget /dev/null Cfg_RPATH^    \
+                 LIB^          \
+                 PACT_CC_PATH^ \
+                 PATH^         \
+                 RPATH
 
 switch ($Tgt)
 
