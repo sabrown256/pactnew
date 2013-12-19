@@ -22,7 +22,7 @@ dbmget $ALog HSY_RootInc^                        \
              X11_Lib          =\? ""^            \
              X11_RPath        =\? $HSY_RootLib^  \
              X11_Path         =\? /usr^          \
-             Std_UseX         =\? FALSE^         \
+             GRAPHICS_UseX    =\? FALSE^         \
              Cfe_CC_Exe^                         \
              Cfe_CC_Flags^                       \
              Cfe_LD_Flags^                       \
@@ -33,7 +33,7 @@ dbmget $ALog HSY_RootInc^                        \
              RPATH
 
 set msg = "no X11"
-flog $ALog setenv Std_UseX    FALSE
+flog $ALog setenv GRAPHICS_UseX    FALSE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -134,7 +134,7 @@ EOF
 
    if ("$PckLib" != "") then
       set msg = "has X11 ($PckLib)"
-      flog $ALog setenv Std_UseX    TRUE
+      flog $ALog setenv GRAPHICS_UseX    TRUE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -179,7 +179,7 @@ EOF
             set msg = "$msg has fonts"
          else
             set msg = "$msg no fonts"
-            flog $ALog setenv Std_UseX    FALSE
+            flog $ALog setenv GRAPHICS_UseX    FALSE
          endif
       endif
 
@@ -210,11 +210,11 @@ endif
    NoteD $ALog "      $msg"
 
 # export the results
-   dbmset $ALog X11_Inc   = $X11_Inc^            \
-                X11_Lib   = $X11_Lib^            \
-                X11_RPath = $X11_RPath^          \
-                X11_Path  = $X11_Path^           \
-                Std_UseX  = $Std_UseX
+   dbmset $ALog X11_Inc       = $X11_Inc^            \
+                X11_Lib       = $X11_Lib^            \
+                X11_RPath     = $X11_RPath^          \
+                X11_Path      = $X11_Path^           \
+                GRAPHICS_UseX = $GRAPHICS_UseX
 
 source $Me:h/post-common
 

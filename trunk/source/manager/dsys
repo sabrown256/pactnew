@@ -729,13 +729,13 @@ switch ($Cmnd)
                    shift
                    switch ("$1")
                       case gl:
-                           setenv Std_UseOGL TRUE
+                           setenv GRAPHICS_UseOGL TRUE
                            breaksw
                       case qd:
-                           setenv Std_UseQD  TRUE
+                           setenv GRAPHICS_UseQD  TRUE
                            breaksw
                       case x11:
-                           setenv Std_UseX  TRUE
+                           setenv GRAPHICS_UseX  TRUE
                            breaksw
                    endsw
                    breaksw

@@ -37,6 +37,9 @@ dbmget $WLog AF_ALT_LARGE_FILE^        \
              FC_ID_UNDERSCORE^         \
              FC_INT_PTR_DIFFER^        \
              FC_INTEGER_C^             \
+             GRAPHICS_UseX^            \
+             GRAPHICS_UseOGL^          \
+             GRAPHICS_UseQD^           \
              HAVE_MPI_STDIN_ALL^       \
              HAVE_MPI_GOOD_IO^         \
              HAVE_LONG_LONG^           \
@@ -115,9 +118,6 @@ dbmget $WLog AF_ALT_LARGE_FILE^        \
              SHELL_Default^            \
              SMP_Pthread^              \
              SQLITE3_SO^               \
-             Std_UseX^                 \
-             Std_UseOGL^               \
-             Std_UseQD^                \
              STD_IPC^                  \
              TRACKER_Exe^              \
              USE_FULL_MM
@@ -264,9 +264,9 @@ dbmget $WLog AF_ALT_LARGE_FILE^        \
 
 # these involve the HAVE/USE dichotomy
     set lhave = ( $lhave HAVE_FLEX_SCANNER        USE_FLEX )
-    set lhave = ( $lhave Std_UseX                 HAVE_X11 )
-    set lhave = ( $lhave Std_UseOGL               HAVE_OGL )
-    set lhave = ( $lhave Std_UseQD                HAVE_QUICKDRAW )
+    set lhave = ( $lhave GRAPHICS_UseX            HAVE_X11 )
+    set lhave = ( $lhave GRAPHICS_UseOGL          HAVE_OGL )
+    set lhave = ( $lhave GRAPHICS_UseQD           HAVE_QUICKDRAW )
 
 # termios TTY controls
     set lhave = ( $lhave LEH_TTY_CRNL             none )

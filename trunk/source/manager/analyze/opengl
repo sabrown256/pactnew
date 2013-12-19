@@ -22,7 +22,7 @@ dbmget $ALog HSY_RootInc^                        \
              OGL_Lib          =\? ""^            \
              OGL_RPath        =\? $HSY_RootLib^  \
              OGL_Path         =\? /usr^          \
-             Std_UseOGL       =\? FALSE^         \
+             GRAPHICS_UseOGL  =\? FALSE^         \
              Cfe_CC_Exe^                         \
              Cfe_CC_Flags^                       \
              Cfe_LD_Flags^                       \
@@ -35,7 +35,7 @@ dbmget $ALog HSY_RootInc^                        \
 # do NOT detect it
 if ("$OGL_Path" == none) then
    NoteD $ALog "      no OpenGL (by request)"
-   setenv Std_UseOGL FALSE
+   setenv GRAPHICS_UseOGL FALSE
 
 else
 
@@ -78,10 +78,10 @@ EOF
       NoteD $ALog "      has OpenGL ($PckLib)"
       Note $ALog "Include = |$PckInc|"
 
-      flog $ALog setenv Std_UseOGL TRUE
+      flog $ALog setenv GRAPHICS_UseOGL TRUE
    else
       NoteD $ALog "      no OpenGL"
-      flog $ALog setenv Std_UseOGL FALSE
+      flog $ALog setenv GRAPHICS_UseOGL FALSE
    endif
 
    setenv OGL_Inc   "$PckInc"
@@ -95,7 +95,7 @@ EOF
 
    set ETime = `timer -b $UTime`
 
-   if ($Std_UseOGL == TRUE) then
+   if ($GRAPHICS_UseOGL == TRUE) then
 
 # export the results
       dbmset $ALog OGL_Inc          = $OGL_Inc^            \
@@ -106,7 +106,7 @@ EOF
 
 endif
 
-dbexp Std_UseOGL
+dbexp GRAPHICS_UseOGL
 
 source $Me:h/post-common
 
