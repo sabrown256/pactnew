@@ -201,12 +201,6 @@ sub dbexp {
     `$PERDB -l $var = $val`;
 }
 
-sub envexp {
-    my $var = shift;
-    my $val = $ENV{$var};
-    print "parent $var($val)\n";
-}
-
 # fexec logs the gexec command, runs it, and
 # gets gstatus out as a shell variable
 # usage: fexec $log <gexec-specs>

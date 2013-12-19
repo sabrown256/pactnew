@@ -87,10 +87,6 @@ flog $log unset baz
 
 dbexp HOME
 
-Foo="the quick brown fox"
-export Foo
-envexp Foo
-
 fexec $log echo "foo" @b cat -n
 Note $log gstatus = $gstatus
 

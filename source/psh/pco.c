@@ -2347,11 +2347,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	        {dbset(cl, "PSY_InstRoot", value);
 		 dbset(cl, "PSY_PubInc",   "%s/include", value);
 		 dbset(cl, "PSY_PubLib",   "%s/lib", value);};}
-#if 0
-	 else if (strcmp(key, "exep") == 0)
-	    {st.exep  = TRUE;
-	     st.loadp = FALSE;}
-#endif
+
 	 else if (strcmp(key, "setenv") == 0)
 	    {char *s;
 
@@ -2359,28 +2355,11 @@ static void read_config(client *cl, char *cfg, int quiet)
                 push_path(P_APPEND, epath, value);
 	     s = echo(FALSE, value);
 	     dbset(cl, oper, s);}
-
 #if 0
-	 else if (strcmp(key, "parent") == 0)
-	    {char *s, *var, *val;
-
-	     s   = line + 7;
-	     var = s + strspn(s, " \t");
-	     val = delimited(var, "(", ")");
-
-	     if (strcmp(var, "PATH") == 0)
-	        {push_path(P_APPEND, epath, val);
-		 s = echo(FALSE, val);
-		 dbset(cl, var, s);}
-	     else
-	        dbset(cl, var, val);
-
-	     note(NULL, "Command: setenv %s %s\n", var, val);}
-#endif
-
 /* handle Note specifications */
 	 else if (strcmp(key, "Note") == 0)
             printf("%s\n", trim(line+5, BOTH, "\""));
+#endif
 
 /* handle Run specifications */
 	 else if (strcmp(key, "Run") == 0)

@@ -88,9 +88,6 @@ flog $log unsetenv baz
 
 dbexp HOME
 
-setenv Foo "the quick brown fox"
-envexp Foo
-
 fexec $log echo "foo" @b cat -n
 Note $log gstatus = $gstatus
 
