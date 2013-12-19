@@ -128,6 +128,7 @@ Tool TRACKER {
 # analyzed features - detected, defined, or computed - post analyze
 
 Group AF {
+   ANSI         = ANSI
    PATTERN_WARN =
    PATTERN_ERR  =
 }
@@ -368,7 +369,7 @@ Group PSY {
    Load        = FALSE
 
    Base        = ${PSY_Base}
-   Root        = ${PSY_Root}
+   Root        = ${PSY_Base}/dev/${PSY_ID}
    AIRoot      = ${PSY_AIRoot}
    ASRoot      = ${PSY_ASRoot}
    InstRoot    = ${PSY_InstRoot}
