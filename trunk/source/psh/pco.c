@@ -1361,22 +1361,6 @@ static void setup_analyze_env(client *cl, char *base)
 
     dbset(cl, "AF_ANSI",   "ANSI");
 
-/* initialization of non-graphics flags */
-    dbinitv(cl, "CC_Version",  "");
-    dbinitv(cl, "FC_Version",  "");
-    dbinitv(cl, "LD_Version",  "");
-
-    dbinitv(cl, "CC_Inc",    "");
-    dbinitv(cl, "CC_Flags",  "");
-    dbinitv(cl, "LD_Lib",    "");
-    dbinitv(cl, "LD_RPath",  "");
-    dbinitv(cl, "LD_Flags",  "");
-
-    dbinitv(cl, "HSY_CPU",   "unknown");
-    dbinitv(cl, "HSY_FPU",   "unknown");
-    dbinitv(cl, "DP_BE",     "");
-    dbinitv(cl, "DP_FE",     "%s/do-run -m", st.dir.bin);
-
 /* cross compile front end */
     if (dbcmp(cl, "CROSS_COMPILE", "FALSE") != 0)
        dbinitv(cl, "CROSS_FE", "%s/do-run -m", st.dir.bin);
@@ -1384,20 +1368,9 @@ static void setup_analyze_env(client *cl, char *base)
        dbinitv(cl, "CROSS_FE", "");
 
 /* initialization of graphics flags - there is NO default system */
-    dbinitv(cl, "GRAPHICS_Windows", "");
     dbinitv(cl, "Std_UseX",         "FALSE");
     dbinitv(cl, "Std_UseOGL",       "FALSE");
     dbinitv(cl, "Std_UseQD",        "FALSE");
-
-    dbinitv(cl, "DP_Inc",          "");
-    dbinitv(cl, "DP_Lib",          "");
-    dbinitv(cl, "DP_Path",         "");
-    dbinitv(cl, "MDG_Inc",         "");
-    dbinitv(cl, "MDG_Lib",         "");
-    dbinitv(cl, "MD_Inc",          "");
-    dbinitv(cl, "MD_Lib",          "");
-    dbinitv(cl, "GRAPHICS_Devices", "PS CGM MPG PNG JPG");
-    dbinitv(cl, "GRAPHICS_Flags",    "");
 
 /* initialize Cfg group flags */
     dbinitv(cl, "Cfg_CC_Flags",  dbget(cl, FALSE, "CC_Flags"));
@@ -1434,10 +1407,6 @@ static void setup_output_env(client *cl, char *base)
     dbset(cl, "IncDir",  st.dir.inc);
     dbset(cl, "EtcDir",  st.dir.etc);
 
-#if 0
-    dbset(cl, "PSY_Load",        st.loadp ? "TRUE" : "FALSE");
-    dbset(cl, "PSY_NoExe",       st.exep ? "TRUE" : "FALSE");
-#endif
     dbset(cl, "DefGroups",   st.def_groups);
     dbset(cl, "CONFIG_FILE", st.cfgf);
 
@@ -1525,10 +1494,6 @@ static void default_var(client *cl, char *base)
     dbset(cl, "PACT_CFG_ID", st.psy_id);
 
     dbinitv(cl, "PSY_CfgMan",    "%s/cfgman", st.dir.scr);
-    dbinitv(cl, "PSY_MngDir",    st.dir.mng);
-    dbinitv(cl, "PSY_InstRoot",  "none");
-    dbinitv(cl, "PSY_PubInc",    "");
-    dbinitv(cl, "PSY_PubLib",    "");
 
 /* global variables */
     snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.psy_id);
