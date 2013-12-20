@@ -827,13 +827,13 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
     char s[BFLRG];
     char *var, *val, **sa;
     static char *rej[] = { "Log", "ALog",
-			   "CCP", "CCObj", "CCArc",
-			   "CCObj_BP", "CCArc_BP", 
-			   "LexObj", "LexArc", "LexC",
-			   "LexObj_BP", "LexArc_BP", 
-			   "YaccObj", "YaccArc", "YaccC",
-			   "YaccObj_BP", "YaccArc_BP", 
-			   "FCObj", "FCArc", "TemplH", NULL };
+			   "IRules_CCP", "IRules_CCObj", "IRules_CCArc",
+			   "IRules_CCObj_BP", "IRules_CCArc_BP", 
+			   "IRules_LexObj", "IRules_LexArc", "IRules_LexC",
+			   "IRules_LexObj_BP", "IRules_LexArc_BP", 
+			   "IRules_YaccObj", "IRules_YaccArc", "IRules_YaccC",
+			   "IRules_YaccObj_BP", "IRules_YaccArc_BP", 
+			   "IRules_FCObj", "IRules_FCArc", "TemplH", NULL };
 
     sa = cenv(TRUE, rej);
     if (sa != NULL)
@@ -1370,11 +1370,13 @@ static void setup_analyze_env(client *cl, char *base)
        dbinitv(cl, "CROSS_FE", "");
 
 /* initialize Cfg group flags */
+#if 0
     dbinitv(cl, "Cfg_CC_Flags",  dbget(cl, FALSE, "CC_Flags"));
     dbinitv(cl, "Cfg_CC_Inc",    dbget(cl, FALSE, "CC_Inc"));
     dbinitv(cl, "Cfg_LD_RPath",  dbget(cl, FALSE, "LD_RPath"));
     dbinitv(cl, "Cfg_LD_Flags",  dbget(cl, FALSE, "LD_Flags"));
     dbinitv(cl, "Cfg_LD_Lib",    dbget(cl, FALSE, "LD_Lib"));
+#endif
 
     return;}
 
@@ -1407,25 +1409,25 @@ static void setup_output_env(client *cl, char *base)
     dbset(cl, "DefGroups",   st.def_groups);
     dbset(cl, "CONFIG_FILE", st.cfgf);
 
-    dbset(cl, "CCP",     st.rules.ccp);
-    dbset(cl, "CCObj",   st.rules.co);
-    dbset(cl, "CCArc",   st.rules.ca);
-    dbset(cl, "LexObj",  st.rules.lo);
-    dbset(cl, "LexArc",  st.rules.la);
-    dbset(cl, "LexC",    st.rules.lc);
-    dbset(cl, "YaccObj", st.rules.yo);
-    dbset(cl, "YaccArc", st.rules.ya);
-    dbset(cl, "YaccC",   st.rules.yc);
-    dbset(cl, "FCObj",   st.rules.fo);
-    dbset(cl, "FCArc",   st.rules.fa);
-    dbset(cl, "TemplH",  st.rules.th);
+    dbset(cl, "IRules_CCP",     st.rules.ccp);
+    dbset(cl, "IRules_CCObj",   st.rules.co);
+    dbset(cl, "IRules_CCArc",   st.rules.ca);
+    dbset(cl, "IRules_LexObj",  st.rules.lo);
+    dbset(cl, "IRules_LexArc",  st.rules.la);
+    dbset(cl, "IRules_LexC",    st.rules.lc);
+    dbset(cl, "IRules_YaccObj", st.rules.yo);
+    dbset(cl, "IRules_YaccArc", st.rules.ya);
+    dbset(cl, "IRules_YaccC",   st.rules.yc);
+    dbset(cl, "IRules_FCObj",   st.rules.fo);
+    dbset(cl, "IRules_FCArc",   st.rules.fa);
+    dbset(cl, "IRules_TemplH",  st.rules.th);
 
-    dbset(cl, "CCObj_BP",   st.rules.co_bp);
-    dbset(cl, "CCArc_BP",   st.rules.ca_bp);
-    dbset(cl, "LexObj_BP",  st.rules.lo_bp);
-    dbset(cl, "LexArc_BP",  st.rules.la_bp);
-    dbset(cl, "YaccObj_BP", st.rules.yo_bp);
-    dbset(cl, "YaccArc_BP", st.rules.ya_bp);
+    dbset(cl, "IRules_CCObj_BP",   st.rules.co_bp);
+    dbset(cl, "IRules_CCArc_BP",   st.rules.ca_bp);
+    dbset(cl, "IRules_LexObj_BP",  st.rules.lo_bp);
+    dbset(cl, "IRules_LexArc_BP",  st.rules.la_bp);
+    dbset(cl, "IRules_YaccObj_BP", st.rules.yo_bp);
+    dbset(cl, "IRules_YaccArc_BP", st.rules.ya_bp);
 
     return;}
 
@@ -3097,25 +3099,25 @@ int main(int c, char **v, char **env)
 	nstrncpy(st.cfgf,    BFLRG, cgetenv(FALSE, "CONFIG_FILE"), -1);
 
 /* reset the rules */
-	snprintf(st.rules.ccp, BFLRG, "\t%s\n", cgetenv(FALSE, "CCP"));
-	snprintf(st.rules.co,  BFLRG, "\t%s\n", cgetenv(FALSE, "CCObj"));
-	snprintf(st.rules.ca,  BFLRG, "\t%s\n", cgetenv(FALSE, "CCArc"));
-	snprintf(st.rules.lo,  BFLRG, "\t%s\n", cgetenv(FALSE, "LexObj"));
-	snprintf(st.rules.la,  BFLRG, "\t%s\n", cgetenv(FALSE, "LexArc"));
-	snprintf(st.rules.lc,  BFLRG, "\t%s\n", cgetenv(FALSE, "LexC"));
-	snprintf(st.rules.yo,  BFLRG, "\t%s\n", cgetenv(FALSE, "YaccObj"));
-	snprintf(st.rules.ya,  BFLRG, "\t%s\n", cgetenv(FALSE, "YaccArc"));
-	snprintf(st.rules.yc,  BFLRG, "\t%s\n", cgetenv(FALSE, "YaccC"));
-	snprintf(st.rules.fo,  BFLRG, "\t%s\n", cgetenv(FALSE, "FCObj"));
-	snprintf(st.rules.fa,  BFLRG, "\t%s\n", cgetenv(FALSE, "FCArc"));
-	snprintf(st.rules.th,  BFLRG, "\t%s\n", cgetenv(FALSE, "TemplH"));
+	snprintf(st.rules.ccp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCP"));
+	snprintf(st.rules.co,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCObj"));
+	snprintf(st.rules.ca,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCArc"));
+	snprintf(st.rules.lo,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexObj"));
+	snprintf(st.rules.la,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexArc"));
+	snprintf(st.rules.lc,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexC"));
+	snprintf(st.rules.yo,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccObj"));
+	snprintf(st.rules.ya,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccArc"));
+	snprintf(st.rules.yc,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccC"));
+	snprintf(st.rules.fo,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_FCObj"));
+	snprintf(st.rules.fa,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_FCArc"));
+	snprintf(st.rules.th,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_TemplH"));
 
-	snprintf(st.rules.co_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "CCObj_BP"));
-	snprintf(st.rules.ca_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "CCArc_BP"));
-	snprintf(st.rules.lo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "LexObj_BP"));
-	snprintf(st.rules.la_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "LexArc_BP"));
-	snprintf(st.rules.yo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "YaccObj_BP"));
-	snprintf(st.rules.ya_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "YaccArc_BP"));
+	snprintf(st.rules.co_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCObj_BP"));
+	snprintf(st.rules.ca_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCArc_BP"));
+	snprintf(st.rules.lo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexObj_BP"));
+	snprintf(st.rules.la_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexArc_BP"));
+	snprintf(st.rules.yo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccObj_BP"));
+	snprintf(st.rules.ya_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccArc_BP"));
 
 	check_dir(cl);};
 
