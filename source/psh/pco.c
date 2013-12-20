@@ -58,6 +58,8 @@ struct s_gt_entry
 
 struct s_gt_stack
    {int n;
+    char curr_grp[BFSML];
+    char curr_tool[BFSML];
     gt_entry st[N_STACK];};
 
 struct s_dirdes
@@ -313,8 +315,8 @@ static void pop_struct(client *cl)
     n  = st.gstck.n - 1;
     ge = st.gstck.st + n;
 
-    dbset(cl, "CurrGrp", ge->item);
-    dbset(cl, "CurrTool", "");
+    nstrncpy(st.gstck.curr_grp,  BFSML, ge->item, -1);
+    st.gstck.curr_tool[0] = '\0';
 
     note(NULL, "--- end\n");
 
@@ -629,7 +631,7 @@ static void write_perl(client *cl, state *st, char *dbname)
     char t[BFLRG];
     char **ta;
     FILE *out;
-    char *exc[] = { "PCO_Globals", "CurrGrp", "CurrTool",
+    char *exc[] = { "PCO_Globals",
 		    "PCO_EnvGroups", "PCO_EnvVars", "Save_CC", "Save_CFLAGS",
 		    "gstatus", "t" };
 
@@ -1964,7 +1966,7 @@ static void set_var(client *cl, char *var, char *oper, char *val)
 static void process_use(client *cl, char *sg, char *oper)
    {int whch;
     char nvr[BFLRG], ulst[BFLRG];
-    char *val;
+    char *val, *currg, *currt;
 
     whch = -1;
 
@@ -1982,12 +1984,16 @@ static void process_use(client *cl, char *sg, char *oper)
            break;};
     ENDFOR
 
+    currg = st.gstck.curr_grp;
+    currt = st.gstck.curr_tool;
+
     switch (whch)
 
 /* fill out a group */
        {case STACK_GROUP:
              note(NULL, "Use group %s to fill group %s\n",
-		   sg, dbget(cl, FALSE, "CurrGrp"));
+		   sg, currg);
+
              snprintf(ulst, BFLRG, "%s", dbget(cl, FALSE, "PCO_UseVars"));
              FOREACH(var, ulst, " ")
                 snprintf(nvr, BFLRG, "%s_%s", sg, var);
@@ -2002,9 +2008,10 @@ static void process_use(client *cl, char *sg, char *oper)
 
 /* fill out a tool */
         case STACK_TOOL:
-             if (dbcmp(cl, "CurrTool", "") == 0)
+             if (IS_NULL(currt) == TRUE)
                 {note(NULL, "Use tool %s to fill group %s\n",
-		       sg, dbget(cl, FALSE, "CurrGrp"));
+		       sg, currg);
+
                  FOREACH(var, st.toolv, " ")
                     snprintf(nvr, BFLRG, "%s_%s", sg, var);
                     if (dbdef(cl, nvr) == TRUE)
@@ -2013,7 +2020,7 @@ static void process_use(client *cl, char *sg, char *oper)
                  ENDFOR}
              else
                 {note(NULL, "Use tool %s to fill tool %s\n",
-		       sg, dbget(cl, FALSE, "CurrTool"));
+		       sg, currt);
                  FOREACH(var, st.toolv, " ")
                     snprintf(nvr, BFLRG, "%s_%s", sg, var);
                     if (dbdef(cl, nvr) == TRUE)
@@ -2328,14 +2335,14 @@ static void read_config(client *cl, char *cfg, int quiet)
 /* handle Tool specifications */
 	 else if (strcmp(key, "Tool") == 0)
 	    {note(NULL, "--- tool %s\n", oper);
-	     dbset(cl, "CurrTool", oper);
+	     nstrncpy(st.gstck.curr_tool, BFSML, oper, -1);
 	     note(NULL, "Defining tool %s\n", oper);
 	     push_struct(oper, st.def_tools, STACK_TOOL);}
 
 /* handle Group specifications */
 	 else if (strcmp(key, "Group") == 0)
 	    {note(NULL, "--- group %s\n", oper);
-	     dbset(cl, "CurrGrp", oper);
+	     nstrncpy(st.gstck.curr_grp, BFSML, oper, -1);
 	     push_struct(oper, st.def_groups, STACK_GROUP);}
 
 /* handle Use specifications */

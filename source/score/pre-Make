@@ -39,7 +39,7 @@ SaveFiles = *.c *.h *.r
 CleanFiles  = scf77lr.c
 RemoveFiles = ${BinDir}/ptime ${BinDir}/ncpu \
               ${BinDir}/ps-diff ${BinDir}/mpi-io-wrap \
-              ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve \
+              ${BinDir}/dmnz ${BinDir}/hserve \
               ${BinDir}/fcscan
 
 #
@@ -270,13 +270,6 @@ fcscan : ${BinDir}/fcscan
 ${BinDir}/fcscan : ${TGTLib} scfcsc.c
 	@(echo "${CCAnnounce} scfcsc.c -o ${BinDir}/fcscan" ; \
 	  ${CLD} ${LdFlags} scfcsc.c -o ${BinDir}/fcscan ${Libs})
-
-#
-# RPATH
-#
-${BinDir}/rpath : ${TGTLib} scrp.c
-	@(echo "${CCAnnounce} scrp.c -o ${BinDir}/rpath" ; \
-	  ${CLD} ${LdFlags} scrp.c -o ${BinDir}/rpath ${Libs})
 
 #
 # PTIME
@@ -567,7 +560,7 @@ dmt : ${hdrf}
 #
 link: ${InstallDep} ${BinDir}/ps-diff ${BinDir}/ptime \
       ${BinDir}/ncpu ${BinDir}/propr ${BinDir}/dmnz \
-      ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/latency \
+      ${BinDir}/hserve ${BinDir}/latency \
       ${BinDir}/mpi-io-wrap ${BinDir}/fcscan
 	pact man3install
 

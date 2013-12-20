@@ -40,7 +40,7 @@ LibFiles = libpsh.c libasync.c libpgrp.c libeval.c libtime.c \
 IncFiles = common.h nonstd.h ${LibFiles}
 
 InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
-             ${BinDir}/atdbg ${BinDir}/pcsh \
+             ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/rpath \
              ${BinDir}/gexec ${BinDir}/perdb  \
              ${BinDir}/elide ${BinDir}/blang                 \
              ${BinDir}/smake ${BinDir}/pact-info \
@@ -115,6 +115,12 @@ blang : ${BinDir}/blang
 ${BinDir}/blang : blang.c ${LibFiles}
 	@(echo "${PCAnnounce} blang.c -o ${BinDir}/blang" ; \
 	  ${PCC} blang.c -o ${BinDir}/blang)
+
+rpath : ${BinDir}/rpath
+
+${BinDir}/rpath : rpath.c libpsh.c
+	@(echo "${PCAnnounce} rpath.c -o ${BinDir}/rpath" ; \
+	  ${PCC} rpath.c -o ${BinDir}/rpath)
 
 osrc : ${BinDir}/osrc
 
