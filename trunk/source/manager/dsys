@@ -1110,6 +1110,7 @@ switch ($Cmnd)
            flog $Log ./ccw -g gexec.c -o $BinDir/gexec
            flog $Log ./ccw -g elide.c -o $BinDir/elide
            flog $Log ./ccw -g blang.c -o $BinDir/blang
+           flog $Log ./ccw -g rpath.c -o $BinDir/rpath
            flog $Log ./ccw -g -I../score -I../manager template.c -o $BinDir/template
         else
            NoteD $Log ""
@@ -2505,7 +2506,7 @@ CFG_DONE:
         if ($strict == FALSE) then
            set BinFiles = ( $BinFiles smake dmake acc aranlib pact template )
            set BinFiles = ( $BinFiles timer px frnsic )
-           set BinFiles = ( $BinFiles do-run elide blang gexec perdb )
+           set BinFiles = ( $BinFiles do-run elide blang rpath gexec perdb )
            set BinFiles = ( $BinFiles make-syntax )
            set BinFiles = ( $BinFiles import-api pcpp )
            set BinFiles = ( $BinFiles sinstall install-pact install-ext )

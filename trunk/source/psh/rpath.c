@@ -1,14 +1,12 @@
 /*
- * SCRP.C - standalone wrapper for realpath function
+ * RPATH.C - standalone wrapper for realpath function
  *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
+ * include "cpyright.h"
  *
  */
 
-#include "cpyright.h"
-
-#include "score.h"
+#include "common.h"
+#include "libpsh.c"
 
 extern char
  *realpath(const char *fn, char *rn);
@@ -40,7 +38,7 @@ static void help(void)
 
 /* EXPAND - print expanded path name to stdout */
 
-static int expand(char *name, int full_path, int nt, int dt, int rv)
+static int expand(char *name, int fullp, int nt, int dt, int rv)
    {int i, nc, ok;
     char *fname;
     char pname[PATH_MAX], rname[PATH_MAX+1];
@@ -48,8 +46,8 @@ static int expand(char *name, int full_path, int nt, int dt, int rv)
     nc = PATH_MAX - 1;
 
     ok = 1;
-    if (full_path)
-       {ok = SC_full_path(name, pname, nc);
+    if (fullp == TRUE)
+       {ok = full_path(pname, nc, NULL, name);
 	if (ok != 0)
 	   rv |= 1;};
     if (ok != 0)
@@ -107,14 +105,14 @@ int main(int c, char **v)
 	    break;};
 
     if (i >= c)
-       {tname = CMAKE_N(char, PATH_MAX);
+       {tname = MAKE_N(char, PATH_MAX);
 	nc = PATH_MAX - 1;
 	snprintf(fmt, 80, "%%%ds", nc);
 
         while (scanf(fmt, tname) == 1)
            rv = expand(tname, full_path, nt, dt, rv);
 
-        CFREE(tname);}
+        FREE(tname);}
 
     else
        for ( ; i < c; i++)
