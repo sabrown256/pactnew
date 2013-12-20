@@ -32,13 +32,14 @@ dbmget $WLog IncDir^     \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    set STDOUT = $IncDir/syntax.h
+    set STDOUT  = $IncDir/syntax.h
+    set psy_cfg = $PSY_Cfg:t
 
     flog $WLog $RM $STDOUT
     flog $WLog touch $STDOUT
 
     Note $STDOUT "/*"
-    Note $STDOUT " * SYNTAX.H - Configure SCHEME Syntax Modes for $PSY_Cfg"
+    Note $STDOUT " * SYNTAX.H - Configure SCHEME Syntax Modes for $psy_cfg"
     Note $STDOUT " *"
     Note $STDOUT " * Source Version: 5.0"
     Note $STDOUT " * Software Release #: LLNL-CODE-422942"

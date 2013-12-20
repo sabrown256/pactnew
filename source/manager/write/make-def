@@ -97,6 +97,7 @@ dbmget $WLog ACC_Debug_Default^      \
              Yacc_Exe^               \
              Yacc_Flags
 
+set psy_cfg = $PSY_Cfg:t
 set vl = ""
 
 # compiler tools
@@ -169,7 +170,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     flog $WLog touch $STDOUT
 
     Note $STDOUT "#"
-    Note $STDOUT "# MAKE-DEF - installation dependent definitions for $PSY_Cfg"
+    Note $STDOUT "# MAKE-DEF - installation dependent definitions for $psy_cfg"
     Note $STDOUT "#"
     Note $STDOUT ""
     Note $STDOUT "PSY_ID     = $PSY_ID"
@@ -316,7 +317,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "#"
 
 # emit items from the defined groups
-#    foreach g ($DefGroups)
     foreach g (Std Cfg Cfe Ser Shared)
        Note $STDOUT ""
        Note $STDOUT "# group ${g}"

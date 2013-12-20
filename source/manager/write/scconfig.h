@@ -125,13 +125,14 @@ dbmget $WLog AF_ALT_LARGE_FILE^        \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    set STDOUT = $IncDir/scconfig.h
+    set STDOUT  = $IncDir/scconfig.h
+    set psy_cfg = $PSY_Cfg:t
 
     flog $WLog $RM $STDOUT
     flog $WLog touch $STDOUT
 
     Note $STDOUT "/*"
-    Note $STDOUT " * SCCONFIG.H - configuration defined by $PSY_Cfg"
+    Note $STDOUT " * SCCONFIG.H - configuration defined by $psy_cfg"
     Note $STDOUT " *            - defines the following configuration parameters for PACT"
     Note $STDOUT " *"
     Note $STDOUT " * Source Version: 3.0"

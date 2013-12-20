@@ -34,13 +34,14 @@ dbmget $WLog AF_VERSION_GLIBC^  \
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    set STDOUT = $IncDir/iso-c.h
+    set STDOUT  = $IncDir/iso-c.h
+    set psy_cfg = $PSY_Cfg:t
 
     flog $WLog $RM $STDOUT
     flog $WLog touch $STDOUT
 
     Note $STDOUT '/*'
-    Note $STDOUT " * ISO-C.H - configuration defined by $PSY_Cfg"
+    Note $STDOUT " * ISO-C.H - configuration defined by $psy_cfg"
     Note $STDOUT ' *         - defines the ISO C, POSIX and XOPEN compliance expected'
     Note $STDOUT ' *'
     Note $STDOUT ' * Source Version: 3.0'

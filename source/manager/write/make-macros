@@ -38,6 +38,7 @@ dbmget $WLog Bits^              \
              PSY_NoExe
 
 set LibVers = 1
+set psy_cfg = $PSY_Cfg:t
 
 # GOTCHA: several of the lock tests come too late to prevent certain
 # kinds of damage to public installs
@@ -52,9 +53,9 @@ set LibVers = 1
     flog $WLog $RM $STDOUT
     flog $WLog touch $STDOUT
 
-    Note $STDOUT '#'
-    Note $STDOUT '# MAKE-MACROS - PACT Makefile macros for '$PSY_Cfg
-    Note $STDOUT '#'
+    Note $STDOUT "#"
+    Note $STDOUT "# MAKE-MACROS - PACT Makefile macros for $psy_cfg"
+    Note $STDOUT "#"
     Note $STDOUT ""
 
     if ($MAKE_Shared_Libs == TRUE) then

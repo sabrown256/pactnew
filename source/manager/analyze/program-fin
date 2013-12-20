@@ -18,7 +18,7 @@ Run {
 }
 
 Run {
-   write/configured      $Log $PSY_ScrDir $CONFIG_FILE
+   write/configured      $Log $PSY_ScrDir
    write/make-def        $Log $PSY_ScrDir
    write/make-macros     $Log $PSY_ScrDir
    write/makefile        $Log $PSY_ScrDir

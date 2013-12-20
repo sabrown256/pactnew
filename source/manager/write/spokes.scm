@@ -35,13 +35,14 @@ dbmget $WLog RF_SPOKES_C^         \
 
 if (-d $PSY_Base/sx/applications) then
 
-    set STDOUT = $PSY_Root/scheme/spokes.scm
+    set STDOUT  = $PSY_Root/scheme/spokes.scm
+    set psy_cfg = $PSY_Cfg:t
 
     flog $WLog $RM $STDOUT
     flog $WLog touch $STDOUT
 
     Note $STDOUT ";"
-    Note $STDOUT "; SPOKES.SCM - initialization of SX translation spokes for $PSY_Cfg"
+    Note $STDOUT "; SPOKES.SCM - initialization of SX translation spokes for $psy_cfg"
     Note $STDOUT ";"
     Note $STDOUT ""
     Note $STDOUT '(define (safe-load file)'

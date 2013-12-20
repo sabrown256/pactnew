@@ -1397,6 +1397,7 @@ CFG_DONE:
                    set cfg = ( `grep PSY_Cfg= $db | sed 's/^PSY_Cfg=//'` )
                    set inf = ( `$PSY_CfgMan list` )
                    set cur = ( `$PSY_CfgMan use` )
+                   set cfg = $cfg:t
                    echo "Configuration list:    $inf"
                    echo "Current configuration: $cur"
                    echo "Current config file:   $cfg"
@@ -2340,6 +2341,7 @@ CFG_DONE:
            set inf  = ( `pact +l -info RF_CONFIG_METHOD` )
            set meth = $inf[1]
            set cfg  = ( `grep PSY_Cfg= $db |& sed 's/^PSY_Cfg=//'` )
+           set cfg  = $cfg:t
         else
            set meth = file
            set inf  = ( `awk '($1 == "Config") { print $3 }' $EtcDir/configured` )
