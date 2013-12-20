@@ -1408,8 +1408,7 @@ static void setup_output_env(client *cl, char *base)
     dbset(cl, "IncDir",  st.dir.inc);
     dbset(cl, "EtcDir",  st.dir.etc);
 
-    dbset(cl, "DefGroups",   st.def_groups);
-    dbset(cl, "CONFIG_FILE", st.cfgf);
+    dbset(cl, "PSY_Cfg", st.cfgf);
 
     dbset(cl, "IRules_CCP",     st.rules.ccp);
     dbset(cl, "IRules_CCObj",   st.rules.co);
@@ -2987,7 +2986,6 @@ int main(int c, char **v, char **env)
 		    kill_perdb();
 		 return(1);};
 	     st.db = d;
-             dbset(cl, "PACT_CFG_FILE", "db");
 	     dbset(cl, "RF_CONFIG_METHOD", "database");}
  
 /* this was handled in reset_env */
@@ -3053,7 +3051,6 @@ int main(int c, char **v, char **env)
 
          else
 	    {nstrncpy(st.cfgf, BFLRG, v[i], -1);
-             dbset(cl, "PACT_CFG_FILE", st.cfgf);
 	     dbset(cl, "RF_CONFIG_METHOD", "file");};};
 
     set_inst_base(cl, ib);
@@ -3103,7 +3100,7 @@ int main(int c, char **v, char **env)
         env_subst(cl, "RF_CONFIG_METHOD", "database");
 
 	snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.psy_id);
-	nstrncpy(st.cfgf,    BFLRG, cgetenv(FALSE, "CONFIG_FILE"), -1);
+	nstrncpy(st.cfgf,    BFLRG, cgetenv(FALSE, "PSY_Cfg"), -1);
 
 /* reset the rules */
 	snprintf(st.rules.ccp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCP"));

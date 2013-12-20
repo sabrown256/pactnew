@@ -11,8 +11,6 @@
 set Me = $0
 source $Me:h/pre-common
 
-set lCfg = $3
-
 Note $WLog "----- write/configured -----"
 Note $WLog "Write: configured"
 Note $WLog ""
@@ -30,6 +28,7 @@ dbmget $WLog AF_PATTERN_WARN^  \
              HSY_Host^         \
              HSY_OS_Name^      \
              MAKE_Shared_Libs^ \
+             PSY_Cfg^          \
              PSY_Dbg_Opt^      \
              PSY_FltDir^       \
              RF_PROFILE^       \
@@ -45,7 +44,7 @@ dbmget $WLog AF_PATTERN_WARN^  \
 
     Note $STDOUT "Date            = `date`"
     Note $STDOUT "Host            = $HSY_Host ($HSY_OS_Name)"
-    Note $STDOUT "Config          = $lCfg"
+    Note $STDOUT "Config          = $PSY_Cfg"
     Note $STDOUT "Dbg/Opt         = $PSY_Dbg_Opt"
     Note $STDOUT "Profiled        = $RF_PROFILE"
     Note $STDOUT "Shared          = $MAKE_Shared_Libs"
