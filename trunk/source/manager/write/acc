@@ -50,7 +50,7 @@ flog $WLog $RM $STDOUT
 flog $WLog touch $STDOUT
 
 # dbmget chokes getting this one
-set CPP = ( `$BinDir/perdb -f $EtcDir/cfg CCP` )
+set CPP = ( `$BinDir/perdb -f $EtcDir/cfg IRules_CCP` )
 
 # typical value for CPP is '${CC} -E $< > $*.i'
 set lcpp = ( `echo "$CPP" | sed 's|$<|$inf|' | sed 's|$\*.i|+out+|'` )

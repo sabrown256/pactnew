@@ -637,30 +637,30 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     endif
 
 # write the default make rules
-    call PrintRule(".c.i:", CCP)
+    call PrintRule(".c.i:", IRules_CCP)
 
     if ($HAVE_GOOD_OMP_PRAGMAS == TRUE) then
-       call PrintRule(".c.o:", CCObj)
-       call PrintRule(".c.a:", CCArc)
-       call PrintRule(".l.o:", LexObj)
-       call PrintRule(".l.a:", LexArc)
+       call PrintRule(".c.o:", IRules_CCObj)
+       call PrintRule(".c.a:", IRules_CCArc)
+       call PrintRule(".l.o:", IRules_LexObj)
+       call PrintRule(".l.a:", IRules_LexArc)
     else
-       call PrintRule(".c.o:", CCObj_BP)
-       call PrintRule(".c.a:", CCArc_BP)
-       call PrintRule(".l.o:", LexObj_BP)
-       call PrintRule(".l.a:", LexArc_BP)
+       call PrintRule(".c.o:", IRules_CCObj_BP)
+       call PrintRule(".c.a:", IRules_CCArc_BP)
+       call PrintRule(".l.o:", IRules_LexObj_BP)
+       call PrintRule(".l.a:", IRules_LexArc_BP)
     endif
-    call PrintRule(".l.c:", LexC)
+    call PrintRule(".l.c:", IRules_LexC)
     if ($HAVE_GOOD_OMP_PRAGMAS == TRUE) then
-       call PrintRule(".y.o:", YaccObj)
-       call PrintRule(".y.a:", YaccArc)
+       call PrintRule(".y.o:", IRules_YaccObj)
+       call PrintRule(".y.a:", IRules_YaccArc)
     else
-       call PrintRule(".y.o:", YaccObj_BP)
-       call PrintRule(".y.a:", YaccArc_BP)
+       call PrintRule(".y.o:", IRules_YaccObj_BP)
+       call PrintRule(".y.a:", IRules_YaccArc_BP)
     endif
-    call PrintRule(".y.c:", YaccC)
-    call PrintRule(".f.o:", FCObj)
-    call PrintRule(".f.a:", FCArc)
+    call PrintRule(".y.c:", IRules_YaccC)
+    call PrintRule(".f.o:", IRules_FCObj)
+    call PrintRule(".f.a:", IRules_FCArc)
 
     Note $STDOUT ""
 

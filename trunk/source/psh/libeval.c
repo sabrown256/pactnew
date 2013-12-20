@@ -115,18 +115,18 @@ void prune_env(char *tgt, char *info)
 
 /* remove make rule variables */
        {int i, nr;
-	static char *rnames[] = { "CCP", "CCObj", "CCArc",
-				  "LexObj", "LexArc", "LexC",
-				  "YaccObj", "YaccArc", "YaccC",
-				  "FCObj", "FCArc", "TemplH",
-				  "CCObj_BP", "CCArc_BP",
-				  "LexObj_BP", "LexArc_BP",
-				  "YaccObj_BP", "YaccArc_BP" };
+	static char *rnames[] = { "IRules_CCP", "IRules_CCObj", "IRules_CCArc",
+				  "IRules_LexObj", "IRules_LexArc", "IRules_LexC",
+				  "IRules_YaccObj", "IRules_YaccArc", "IRules_YaccC",
+				  "IRules_FCObj", "IRules_FCArc", "IRules_TemplH",
+				  "IRules_CCObj_BP", "IRules_CCArc_BP",
+				  "IRules_LexObj_BP", "IRules_LexArc_BP",
+				  "IRules_YaccObj_BP", "IRules_YaccArc_BP" };
 
 	if (strcmp(tgt, "rules") == 0)
 	   {nr = sizeof(rnames)/sizeof(char *);
 	    for (i = 0; i < nr; i++)
-	        cunsetenv(rnames[i]);}
+		cunsetenv(rnames[i]);}
 
 /* remove PACT config variables */
         else if (strcmp(tgt, "pact") == 0)

@@ -73,11 +73,14 @@ switch ($tgt)
 # remove implicit make rule variables
    case rules:
         set rules = ""
-        set rules = ( $rules CCP CCObj CCArc CCObj_BP CCArc_BP )
-        set rules = ( $rules FCObj FCArc )
-        set rules = ( $rules LexC LexObj LexObj_BP LexArc LexArc_BP )
-        set rules = ( $rules YaccC YaccObj YaccObj_BP YaccArc YaccArc_BP )
-        set rules = ( $rules TemplH )
+        set rules = ( $rules IRules_CCP IRules_CCObj IRules_CCArc )
+        set rules = ( $rules IRules_FCObj IRules_FCArc )
+        set rules = ( $rules IRules_LexC IRules_LexObj IRules_LexArc )
+        set rules = ( $rules IRules_YaccC IRules_YaccObj IRules_YaccArc )
+        set rules = ( $rules IRules_TemplH )
+        set rules = ( $rules IRules_CCObj_BP IRules_CCArc_BP )
+        set rules = ( $rules IRules_LexObj_BP IRules_LexArc_BP )
+        set rules = ( $rules IRules_YaccObj_BP IRules_YaccArc_BP )
         foreach i ($rules)
            echo "unsetenv $i ; "
         end

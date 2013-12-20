@@ -102,7 +102,7 @@ set noglob
 # NOTE: parallel builds have too hard a time with multiple PERDB
 # instances so just go straight to the database
 set db       = ${lperdb_path}.db
-set CPPF     = ( `grep -w CCP      $db | grep CCP=      | sed 's|^CCP=||' | sed 's| \$.*$||' | sed 's|${CC}||'` )
+set CPPF     = ( `grep -w IRules_CCP $db | grep IRules_CCP= | sed 's|^IRules_CCP=||' | sed 's| \$.*$||' | sed 's|${CC}||'` )
 set CC_Exe   = ( `grep -w CC_Exe   $db | grep CC_Exe=   | sed 's|^CC_Exe=||'` )
 set CC_Flags = ( `grep -w CC_Flags $db | grep CC_Flags= | sed 's|^CC_Flags=||'` )
 unset lperdb_path

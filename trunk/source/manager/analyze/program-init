@@ -232,6 +232,30 @@ Group IBM {
    HW = PPC
 }
 
+# group of implicit make rules for PACT
+# as opposed to controls for the MAKE Tool
+# NOTE:these cannot go into the MAKE Tool without disastrous effect
+Group IRules {
+#   CCP         =
+#   CCObj       =
+#   CCArc       =
+#   LexObj      =
+#   LexArc      =
+#   LexC        =
+#   YaccObj     =
+#   YaccArc     =
+#   YaccC       =
+#   FCObj       =
+#   FCArc       =
+#   CCObj_BP    =
+#   CCArc_BP    =
+#   LexObj_BP   =
+#   LexArc_BP   =
+#   YaccObj_BP  =
+#   YaccArc_BP  =
+#   TemplH      =
+}
+
 Group LEH {
    TTY_ECHO  = TRUE
    TTY_CRNL  = TRUE
@@ -311,7 +335,7 @@ Group PCO {
    EnvVars =+ "HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY"
    EnvVars =+ "HAVE_OPENMP"
 
-   Globals   =
+   Globals =
 
    RemDup  =  "DP_Inc MDG_Inc MD_Inc CC_Inc"
    RemDup  =+ "DP_Lib MD_Lib LD_Lib"
