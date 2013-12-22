@@ -10,6 +10,8 @@
 
 unalias *
 
+@ err = 0
+
 # add the path to here iff you are able to verify it
 set exe = $0
 if ($exe !~ /*) then
@@ -258,12 +260,14 @@ loop:
          awk "$Prog"    |\
          $Sort          |\
          head -n $TOP
+         @ err = $err + $status
       else
          $PS            |\
          cut -b 1-256   |\
          awk "$Prog"    |\
          $Sort          |\
          head -n $TOP
+         @ err = $err + $status
       endif
 
 # for named user processes
@@ -282,6 +286,7 @@ loop:
             awk "$Prog"      |\
             $Sort            |\
             head -n $TOP
+            @ err = $err + $status
          else
             $PS              |\
             cut -b 1-256     |\
@@ -289,12 +294,14 @@ loop:
             awk "$Prog"      |\
             $Sort            |\
             head -n $TOP
+            @ err = $err + $status
          endif
          echo ""
       end
    endif
 
    if ($Continuous == TRUE) then
+      @ err = 0
 
 # check for messages from the tty
 # NOTE: this will be expanded into another layer of control
@@ -338,4 +345,4 @@ loop:
 
 unset noglob
 
-exit($status)
+exit($err)

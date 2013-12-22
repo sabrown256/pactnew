@@ -39,9 +39,12 @@ endif
 
 while ($#argv > 0)
    switch ($1)
+
+# NOTE: useful for root user only
       case -a:
-           set Opt = ( $Opt -rn none- )
+           set Opt = ( $Opt -a )
            breaksw
+
       case -h:
            set Help = TRUE
            break
@@ -51,6 +54,10 @@ while ($#argv > 0)
            breaksw
       case -q:
            set Quiet = TRUE
+           breaksw
+
+      case -rn:
+           set Opt = ( $Opt -rn none- )
            breaksw
 
 # NOTE: this is stupid on the face of it but on some systems ps reports
@@ -77,17 +84,22 @@ end
 
 if ($Help == TRUE) then
         echo ''
-        echo 'Usage:  sign [-a] [-h] [-n] [-v] sig [name]*'
+        echo 'Usage:  sign [-a] [-h] [-n] [-rn] [-v] sig [name]*'
         echo ''
         echo 'Signal jobs by name or command line pattern and'
         echo 'by user.  This is guaranteed to run the same way'
         echo 'on all platforms and different versions of PS.'
         echo 'Unlike killall it is available everywhere.'
+        echo 'Arguments are consistent with ls-jobs.'
         echo ''
-        echo '        a    - consider all jobs owned by user'
+
+# NOTE: useful for root user only
+        echo '        a    - consider all jobs on system'
+
         echo '        h    - this help message'
         echo '        n    - tell but do not signal'
         echo '        q    - quiet flag'
+        echo '        rn   - consider all jobs owned by user'
         echo '        v    - verbose flag'
         echo '        sig  - signal to be sent (e.g. -9)'
         echo '        name - executable name or command line pattern'

@@ -13,6 +13,39 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_STRING_LIST - return a list of derived from string S */
+
+object *_SS_string_list(SS_psides *si, char *s)
+   {int i, n;
+    char *t, **sa;
+    object *o, *lst;
+
+    sa = SC_tokenize(s, " \t");
+    SC_ptr_arr_len(n, sa);
+
+    lst = SS_null;
+    for (i = 0; i < n; i++)
+        {t = sa[i];
+	 if (SC_intstrp(t, SC_gs.radix))
+	    o = SS_mk_integer(si, SC_stol(t));
+	 else if (SC_fltstrp(t))
+	    o = SS_mk_float(si, SC_stof(t));
+	 else if (SC_cmplxstrp(t))
+	    o = SS_mk_complex(si, SC_stoc(t));
+	 else
+	    o = SS_mk_string(si, t);
+
+	 lst = SS_mk_cons(si, o, lst);};
+	 
+    SC_free_strings(sa);
+
+    lst = SS_reverse(si, lst);
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_DESCAPE_STRING - convert sequences such as '\\' 'n' to '\n' */
 
 static int _SS_descape_string(char *dst, char *src)

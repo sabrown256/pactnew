@@ -2312,7 +2312,29 @@ char **ls(char *opt, char *fmt, ...)
        return(1);}
 
 int match(char *s, char *patt)
-   {int b, c, rv;
+   {int rv;
+
+#if 0
+    int flags;
+
+    flags = 0;
+
+/* flags:
+ *   FNM_NOESCAPE treat backslash as an ordinary character,
+ *                instead of an escape character
+ *   FNM_PATHNAME match a slash in string only with a slash
+ *                in pattern and not by an asterisk or a question mark
+ *                metacharacter, nor by a bracket expression ([])
+ *                containing a slash
+ *   FNM_PERIOD   a leading period in string has to be matched exactly
+ *                by a period in pattern
+ *                a period is considered to be leading if it is the
+ *                first character in string, or if both
+ */
+    rv = fnmatch(patt, s, flags);
+
+#else
+    int b, c;
     char *ps, *pp;
 
     ps = s;
@@ -2366,6 +2388,7 @@ int match(char *s, char *patt)
 
 	if (*ps == '\0')
 	   rv = -1;};
+#endif
 
     return(rv);}
 

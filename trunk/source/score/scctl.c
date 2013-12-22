@@ -433,7 +433,15 @@ void SC_interrupt_handler(int sig)
  */
 
 int SC_regx_match(char *s, char *patt)
-   {int c, rv;
+   {int rv;
+
+#if 0
+
+    rv = fnmatch(patt, s, 0);
+
+#else
+
+    int c;
     char *ps, *pp;
 
     if (patt == NULL)
@@ -471,6 +479,7 @@ int SC_regx_match(char *s, char *patt)
 	       return(FALSE);};
 
 	rv = (*ps == '\0');};
+#endif
 
     return(rv);}
 

@@ -338,6 +338,9 @@ extern object
 
 /* SHSTRG.C declarations */
 
+extern object
+ *_SS_string_list(SS_psides *si, char *s);
+
 extern void
  _SS_inst_str(SS_psides *si);
 
