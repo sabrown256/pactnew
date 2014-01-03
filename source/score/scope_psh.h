@@ -31,6 +31,7 @@
 #include <shell/libeval.c>
 #include <shell/libsock.c>
 #include <shell/libsrv.c>
+#include <shell/libsubst.c>
 #include <shell/libdb.c>
 #include <shell/libpgrp.c>
 #include <shell/libinfo.c>
@@ -422,6 +423,19 @@ extern client
 		 int (*cauth)(client *cl, int nc, char *ans, char *res));
 
 
+/* LIBSUBST.C declarations */
+
+extern substdes
+ *PS_make_substdes(void);
+
+extern int
+ PS_polysubst_add(substdes *sd, char *key, char *val),
+ PS_polysubst(substdes *sd, char *s, int nc);
+
+extern char
+ *PS_polysubst_lookup(int *plev, substdes *sd, char *key);
+
+
 /* LIBTIME.C declarations */
 
 extern double
@@ -454,6 +468,7 @@ extern char
 #undef LIBPSH
 #undef LIBSOCK
 #undef LIBSRV
+#undef LIBSUBST
 #undef LIBTIME
 
 /*--------------------------------------------------------------------------*/

@@ -466,7 +466,7 @@ void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
 
 /* _SX_ISODD - return TRUE iff the given number is odd */
 
-static int _SX_isodd(int n)
+int _SX_isodd(int n)
    {int rv;
 
     rv = (2*(n/2) == n) ? FALSE : TRUE;
@@ -480,7 +480,7 @@ static int _SX_isodd(int n)
  *              - may have zero arguments
  */
 
-static int _SX_no_argsp(SS_psides *si, object *obj)
+int _SX_no_argsp(SS_psides *si, object *obj)
    {int ret;
     object *params;
     PFPHand hand;
