@@ -30,6 +30,33 @@ static void SS_clr_strm(object *str)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SSI_SET_SYNTAX - add an entry to the syntax table */
+
+static object *_SSI_set_syntax(SS_psides *si, object *argl)
+   {char *nm, *body;
+    object *rv;
+
+    nm   = NULL;
+    body = NULL;
+
+    SS_args(si, argl,
+            SC_STRING_I, &nm,
+            0);
+
+    if (_SS.sub == NULL)
+       _SS.sub = PS_make_substdes();
+
+    body = _SS_sprintf(si, "%s", SS_cdr(si, argl));
+
+    PS_polysubst_add(_SS.sub, nm, body);
+
+    rv = SS_f;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SSI_RD_LINE - read a line of text */
 
 static object *_SSI_rd_line(SS_psides *si, object *str)
@@ -340,10 +367,12 @@ static object *_SS_rd_str(SS_psides *si, object *str)
 
 static object *_SS_pr_read(SS_psides *si, object *str)
    {int c;
+    char *s;
     input_port *prt;
     object *rv;
 
     prt = SS_GET(input_port, str);
+    s   = SS_BUFFER(str);
 
     c = SS_get_ch(si, str, TRUE);
     switch (c)
@@ -717,6 +746,27 @@ PFPOprs SS_use_parser(SS_psides *si, char *sfx)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_LOOKUP_PARSER - lookup the parser under SFX and return it */
+
+PFPOprs _SS_lookup_parser(SS_psides *si, char *sfx)
+   {PFPOprs np;
+    SC_address ad;
+
+    np = NULL;
+
+    if (sfx != NULL)
+       {ad.memaddr = SC_hasharr_def_lookup(_SS.parser_tab, sfx);
+
+	np = (PFPOprs) ad.funcaddr;
+	if (np != NULL)
+	   {np(si);
+	    SS_set_parser(np);};};
+
+    return(np);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_CHANGE_PARSER - change the current read function to be consistent
  *                   - with the file being loaded
  *                   - return the current one so that it may be restored
@@ -726,7 +776,6 @@ PFPOprs SS_use_parser(SS_psides *si, char *sfx)
 static PFPOprs _SS_change_parser(SS_psides *si, object *fnm)
    {char *s, *t;
     PFPOprs np, op;
-    SC_address ad;
 
     op = NULL;
     s  = NULL;
@@ -738,20 +787,13 @@ static PFPOprs _SS_change_parser(SS_psides *si, object *fnm)
        SS_error(si, "BAD STRING TO SS_CHANGE_PARSER", fnm);
 
     else
-
-/* NOTE: unconditionally get the current parser in case the file
- * has no extension at all
- */
        {op = SS_get_parser(-1);
 
-	t = strchr(s, '.');
-	if (t != NULL)
-	   {ad.memaddr = SC_hasharr_def_lookup(_SS.parser_tab, t);
-
-	    np = (PFPOprs) ad.funcaddr;
-	    if (np != NULL)
-	       {np(si);
-		SS_set_parser(np);};};
+	t  = strchr(s, '.');
+	np = _SS_lookup_parser(si, t);
+	if (np != NULL)
+	   {np(si);
+	    SS_set_parser(np);};
 
 	CFREE(s);};
 
@@ -944,6 +986,11 @@ void _SS_inst_read(SS_psides *si)
                "Procedure: Read a line of text and return a string",
                SS_nargs,
                _SSI_rd_line, SS_PR_PROC);
+
+    SS_install(si, "set-syntax!",
+               "Add interpreter syntax: (set-syntax! <name> <body>)",
+               SS_nargs, 
+               _SSI_set_syntax, SS_UR_MACRO);
 
 #endif
 

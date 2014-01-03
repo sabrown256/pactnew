@@ -44,8 +44,8 @@ static INLINE int EOI(object *str)
  */
 
 static int _SS_get_input(SS_psides *si, object *str)
-   {int rv;
-    char *p;
+   {int rv, nm;
+    char *p, *s;
     FILE *fp;
 
     rv = 0;
@@ -58,21 +58,23 @@ static int _SS_get_input(SS_psides *si, object *str)
 #endif
 
     fp = SS_INSTREAM(str);
+    s  = SS_BUFFER(str);
 
     if (fp == NULL)
        rv = -1;
 
     if (fp == stdin)
-       {p = SC_prompt(_SS.pr_prompt, SS_BUFFER(str), MAXLINE);
+       {p = SC_prompt(_SS.pr_prompt, s, MAXLINE);
 	_SS.pr_prompt = NULL;}
     else
-       p = _SS.pr_gets(SS_BUFFER(str), MAXLINE, fp);
+       p = _SS.pr_gets(s, MAXLINE, fp);
 
     if (p == NULL)
        {*SS_PTR(str) = (char) EOF;
 	rv = -1;}
     else
-       SS_PTR(str) = SS_BUFFER(str);
+       {nm = PS_polysubst(_SS.sub, s, MAX_BFSZ);
+	SS_PTR(str) = s;};
 
     return(rv);}
 

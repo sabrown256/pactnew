@@ -239,6 +239,10 @@ extern void
  _SX_get_menu(SS_psides *si, g_file *po),
  _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type);
 
+extern int
+ _SX_isodd(int n),
+ _SX_no_argsp(SS_psides *si, object *obj);
+
 
 /* SXCRV.C declarations */
 

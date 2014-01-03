@@ -83,6 +83,7 @@ struct s_SS_scope_private
 
 /* SHREAD.C */
     hasharr *parser_tab;
+    substdes *sub;
 
 /* SHSYNT.C */
     int have_eof;
@@ -334,6 +335,9 @@ extern void
 
 extern object
  *_SSI_scheme_mode(SS_psides *si);
+
+extern PFPOprs
+ _SS_lookup_parser(SS_psides *si, char *sfx);
 
 
 /* SHSTRG.C declarations */

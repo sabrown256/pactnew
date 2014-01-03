@@ -18,6 +18,10 @@
 #define dprgio			_PS_dprgio
 
 /* non-API functions */
+
+#define _resize_subst           _PS_resize_subst
+#define _insert_key             _PS_insert_key
+
 #define _block_all_sig 		_PS_block_all_sig
 #define _db_clnt_ex 		_PS_db_clnt_ex
 #define _db_srv_launch 		_PS_db_srv_launch
@@ -76,6 +80,11 @@
 #define noted 			PS_noted
 #define cat 			PS_cat
 #define separator 		PS_separator
+
+#define make_substdes           PS_make_substdes
+#define polysubst_add           PS_polysubst_add
+#define polysubst_lookup        PS_polysubst_lookup
+#define polysubst               PS_polysubst
 
 #define acheck 			PS_acheck
 #define afin 			PS_afin
@@ -291,6 +300,7 @@
 #undef LIBEVAL
 #undef LIBSOCK
 #undef LIBSRV
+#undef LIBSUBST
 #undef LIBDB
 #undef LIBPGRP
 #undef LIBINFO
@@ -317,9 +327,13 @@
 #include <shell/libeval.c>
 #include <shell/libsock.c>
 #include <shell/libsrv.c>
+#include <shell/libsubst.c>
 #include <shell/libdb.c>
 #include <shell/libpgrp.c>
 #include <shell/libinfo.c>
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+
+
