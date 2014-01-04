@@ -286,7 +286,7 @@ int comm_write(client *cl, char *s, int nc, int to)
 
 /* _CHECK_FD - verify/log fd set in SV */
 
-static void _check_fd(srvdes *sv)
+void _check_fd(srvdes *sv)
    {int fd;
     char s[BFLRG];
     fd_set rfs;
@@ -330,7 +330,7 @@ static void add_fd(srvdes *sv, int fd)
 
 /* REMOVE_FD - add FD to the set in SV */
 
-static void remove_fd(srvdes *sv, int fd)
+void remove_fd(srvdes *sv, int fd)
    {client *cl;
     connection *srv;
 
@@ -349,7 +349,7 @@ static void remove_fd(srvdes *sv, int fd)
 
 /* _NEW_CONNECTION - make a new connection on SFD and add it to AFS */
 
-static void _new_connection(srvdes *sv)
+void _new_connection(srvdes *sv)
    {int fd;
     client *cl;
     connection *srv;
@@ -394,7 +394,7 @@ static void _term_connection(srvdes *sv)
  *               -         1 if otherwise successful
  */
 
-static int _process_act(srvdes *sv, int fd)
+int _process_act(srvdes *sv, int fd)
    {int rv, nb, to;
     char s[BFLRG];
     char **val;

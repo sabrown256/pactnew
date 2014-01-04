@@ -23,6 +23,7 @@
 #define _insert_key             _PS_insert_key
 
 #define _block_all_sig 		_PS_block_all_sig
+#define _check_fd 		_PS_check_fd
 #define _db_clnt_ex 		_PS_db_clnt_ex
 #define _db_srv_launch 		_PS_db_srv_launch
 #define _dbg 			_PS_dbg
@@ -47,7 +48,9 @@
 #define _job_waitr 		_PS_job_waitr
 #define _kind_io 		_PS_kind_io
 #define _name_io 		_PS_name_io
+#define _new_connection         _PS_new_connection
 #define _nsigaction 		_PS_nsigaction
+#define _permission_match       _PS_permission_match
 #define _pgrp_accept 		_PS_pgrp_accept
 #define _pgrp_data_child 	_PS_pgrp_data_child
 #define _pgrp_fan_in 		_PS_pgrp_fan_in
@@ -59,6 +62,7 @@
 #define _pgrp_wait 		_PS_pgrp_wait
 #define _pgrp_work 		_PS_pgrp_work
 #define _post_info 		_PS_post_info
+#define _process_act            _PS_process_act
 
 /* API functions */
 
@@ -136,6 +140,7 @@
 #define dbinitv 		PS_dbinitv
 #define dbrestore 		PS_dbrestore
 #define dbset 			PS_dbset
+#define delete_db 		PS_delete_db
 #define delimited 		PS_delimited
 #define demonize 		PS_demonize
 #define dir_exists 		PS_dir_exists
@@ -145,6 +150,7 @@
 #define expand 			PS_expand
 #define file_executable 	PS_file_executable
 #define file_exists 		PS_file_exists
+#define file_kind               PS_file_kind
 #define file_path 		PS_file_path
 #define file_script 		PS_file_script
 #define file_strings 		PS_file_strings
@@ -152,6 +158,7 @@
 #define file_text 		PS_file_text
 #define fill_string 		PS_fill_string
 #define fillin_pgrp 		PS_fillin_pgrp
+#define find_conn               PS_find_conn
 #define free_client 		PS_free_client
 #define free_db 		PS_free_db
 #define free_strings 		PS_free_strings
@@ -205,6 +212,7 @@
 #define name_db 		PS_name_db
 #define name_log 		PS_name_log
 #define name_conn 		PS_name_conn
+#define nsigaction 		PS_nsigaction
 #define nsleep 			PS_nsleep
 #define nstrcat 		PS_nstrcat
 #define nstrncpy 		PS_nstrncpy
@@ -230,6 +238,7 @@
 #define read_sock 		PS_read_sock
 #define redirect_io 		PS_redirect_io
 #define register_io_pgrp 	PS_register_io_pgrp
+#define remove_fd               PS_remove_fd
 #define report_info 		PS_report_info
 #define reset_db 		PS_reset_db
 #define ring_clear 		PS_ring_clear
