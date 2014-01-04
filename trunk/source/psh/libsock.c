@@ -247,7 +247,7 @@ int tcp_initiate_connection(sckades ad)
  *           - return the unique file name
  */
 
-static char *find_conn(char *root, int ch)
+char *find_conn(char *root, int ch)
    {char *rv;
     static char s[BFLRG];
 

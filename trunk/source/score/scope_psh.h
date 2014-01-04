@@ -108,6 +108,7 @@ extern process_group_state
 extern void
  PS_reset_db(database *db),
  PS_load_db(database *db, char *vr, FILE *fp),
+ PS_delete_db(database *db, char *var),
  PS_free_db(database *db),
  PS_db_srv_close(database *db);
 
@@ -304,6 +305,9 @@ extern void
 extern int
  _PS_nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
 		int flags, va_list __a__),
+ _PS_permission_match(struct stat bf, int md, int only),
+ PS_nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
+	       int flags, ...),
  PS_lst_length(char **lst),
  PS_last_char(char *s),
  PS_strcntc(char *s, int c, int ex),
@@ -311,6 +315,7 @@ extern int
  PS_strcpy_tok(char *d, size_t nd, char *s, size_t ns,
 	       char *b, char *e, int flags),
  PS_full_path(char *path, int nc, char *dir, char *name),
+ PS_file_kind(int knd, int md, char *fnm),
  PS_dir_exists(char *fmt, ...),
  PS_file_exists(char *fmt, ...),
  PS_file_executable(char *fmt, ...),
@@ -393,6 +398,7 @@ extern int
  PS_write_sock(client *cl, char *s, int nc);
 
 extern char
+ *PS_find_conn(char *root, int ch),
  **PS_parse_conn(char *root),
  **PS_get_connect_socket(client *cl);
 
@@ -403,10 +409,14 @@ extern sckades
 /* LIBSRV.C declarations */
 
 extern void
+ _PS_check_fd(srvdes *sv),
+ PS_remove_fd(srvdes *sv, int fd),
+ _PS_new_connection(srvdes *sv),
  PS_cl_logger(client *cl, int lvl, char *fmt, ...),
  PS_free_client(client *cl);
 
 extern int
+ _PS_process_act(srvdes *sv, int fd),
  PS_async_server(srvdes *sv),
  PS_verifyx(client *cl, char *ans, char *res),
  PS_comm_read(client *cl, char *s, int nc, int to),

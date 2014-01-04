@@ -73,7 +73,8 @@
 #define SS_HAELEM_I        SS_gs.tind[11]
 #define SS_HASHARR_I       SS_gs.tind[12]
 #define SS_PROCESS_I       SS_gs.tind[13]
-#define SS_N_TYPES         14
+#define SS_REFERENCE_I     SS_gs.tind[14]
+#define SS_N_TYPES         15
 
 
 #define SS_GET(_t, _o)          ((_t *) SS_OBJECT(_o))
@@ -123,6 +124,15 @@
 
 #define SS_VARIABLE_NAME(_o)     (((variable *) ((_o)->val))->name)
 #define SS_VARIABLE_VALUE(_o)    (((variable *) ((_o)->val))->value)
+
+/* REFERENCE ACCESSORS */
+
+#define SS_REFERENCE_NAME(_o)    (((reference *) ((_o)->val))->name)
+#define SS_REFERENCE_VALUE(_o)   (((reference *) ((_o)->val))->value)
+#define SS_REFERENCE_GET(_o)     (((reference *) ((_o)->val))->get)
+#define SS_REFERENCE_SET(_o)     (((reference *) ((_o)->val))->set)
+#define SS_REFERENCE_STATE(_o)   (((reference *) ((_o)->val))->a)
+
 
 /* BOOLEAN ACCESSORS */
 
@@ -254,6 +264,15 @@
  */
 
 #define SS_variablep(_o) (SC_arrtype(_o, -1) == SS_VARIABLE_I)
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_REFERENCEP - return TRUE if the object is of type REFERENCE
+ *               - return FALSE otherwise
+ */
+
+#define SS_referencep(_o) (SC_arrtype(_o, -1) == SS_REFERENCE_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -590,6 +609,7 @@ typedef struct s_SS_input_port input_port;
 typedef struct s_SS_output_port output_port;
 typedef struct s_SS_cons cons;
 typedef struct s_SS_variable variable;
+typedef struct s_SS_reference reference;
 typedef struct s_SS_boolean SS_boolean;
 typedef struct s_SS_string string;
 typedef struct s_SS_continuation continuation;
@@ -618,6 +638,9 @@ typedef int (*PFPrChIn)(object *str, int ign_ws);
 typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
 typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
 typedef object *(*PFPOprs)(SS_psides *si);
+
+typedef void (*PFREFGet)(SS_psides *si, object *vr, object *penv);
+typedef void (*PFREFSet)(SS_psides *si, object *vr, object *vl, object *penv);
 
 #define SS_DEFINE_OBJECT(_si)                                               \
    {defstr *dp;                                                             \
@@ -746,6 +769,25 @@ struct s_SS_variable
     PD_defstr(file, "variable",   \
               "char *name",       \
               "object *value",    \
+              LAST)
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_reference
+   {char *name;
+    object *value;
+    object *a;
+    void (*get)(SS_psides *si, object *vr, object *penv);
+    void (*set)(SS_psides *si, object *vr, object *vl, object *penv);};
+
+#define SS_DEFINE_REFERENCE        \
+    PD_defstr(file, "reference",   \
+              "char *name",        \
+              "object *value",     \
+              "object *a",         \
+              "function get",      \
+              "function set",      \
               LAST)
 
 /*--------------------------------------------------------------------------*/
@@ -888,7 +930,7 @@ extern char
 extern void
  SS_save_registers(SS_psides *si, int vp),
  SS_restore_registers(SS_psides *si, int vp),
- SS_set_var(SS_psides *si, object *vr, object *vl, object *penv),
+ SS_set_ref(SS_psides *si, object *vr, object *vl, object *penv),
  SS_def_var(SS_psides *si, object *vr, object *vl, object *penv),
  SS_env_vars(SS_psides *si, char **vrs, object *penv);
 
@@ -963,6 +1005,8 @@ extern object
 		  object *lam_exp, object *penv),
  *SS_mk_esc_proc(SS_psides *si, int err, int type),
  *SS_mk_variable(SS_psides *si, char *n, object *v),
+ *SS_mk_reference(SS_psides *si, char *n,
+		  PFREFGet get, PFREFSet set, void *a),
  *SS_mk_string(SS_psides *si, char *s),
  *SS_mk_inport(SS_psides *si, FILE *str, char *name),
  *SS_mk_outport(SS_psides *si, FILE *str, char *name),

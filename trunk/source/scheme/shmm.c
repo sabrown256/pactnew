@@ -304,6 +304,18 @@ static void _SS_rl_variable(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_RL_REFERENCE - release a reference object */
+
+static void _SS_rl_reference(SS_psides *si, object *obj)
+   {
+
+    SS_rl_object(si, obj);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_RL_CONS - release a CONS object
  *             - since this also SS_gc's lists be careful of
  *             - conses with multiple pointers
@@ -645,6 +657,28 @@ object *SS_mk_variable(SS_psides *si, char *n, object *v)
 
     op = SS_mk_object(si, vp, SS_VARIABLE_I, VAR_EV, vp->name,
 		      SS_wr_atm, _SS_rl_variable);
+
+    return(op);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_MK_REFERENCE - encapsulate a REFERENCE in an object */
+
+object *SS_mk_reference(SS_psides *si, char *n,
+			PFREFGet get, PFREFSet set, void *a)
+   {reference *rp;
+    object *op;
+
+    rp = CMAKE(reference);
+    rp->name  = CSTRSAVE(n);
+    rp->value = SS_null;
+    rp->get   = get;
+    rp->set   = set;
+    rp->a     = a;
+
+    op = SS_mk_object(si, rp, SS_REFERENCE_I, VAR_EV, rp->name,
+		      SS_wr_atm, _SS_rl_reference);
 
     return(op);}
 
@@ -1046,6 +1080,10 @@ void SS_register_types(void)
     SS_HAELEM_I      = SC_type_register("hash element", KIND_STRUCT, sizeof(haelem),  0);
 
 #endif
+
+    SS_REFERENCE_I   = SC_type_register("reference",    KIND_STRUCT, sizeof(reference),
+					SC_TYPE_FREE,  _SS_rl_reference,
+					0);
 
     SS_OBJECT_S  = CSTRSAVE("object");
     SS_POBJECT_S = CSTRSAVE("object *");

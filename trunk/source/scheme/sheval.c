@@ -211,9 +211,6 @@ ev_set:
     SS_assign(si, si->exn, SS_cadr(si, si->unev));
     SS_assign(si, si->unev, SS_car(si, si->unev));
 
-    if (!SS_variablep(si->unev))
-       SS_error(si, "CAN'T SET NON-VARIABLE OBJECT - SET", si->unev);
-
     SS_save(si, si->unev);
     SS_save(si, si->env);
     SS_set_cont(si, eval_disp, ev_seta);
@@ -221,7 +218,7 @@ ev_set:
 ev_seta:
     SS_restore(si, si->env);
     SS_restore(si, si->unev);
-    SS_set_var(si, si->unev, si->val, si->env);
+    SS_set_ref(si, si->unev, si->val, si->env);
     SS_assign(si, si->val, si->unev);
     SS_go_cont(si);
 
@@ -382,7 +379,7 @@ apply_dis:
 
         default :
 	     SS_error(si, "UNKNOWN PROCEDURE TYPE - APPLY-DISP",
-			si->fun);};
+		      si->fun);};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

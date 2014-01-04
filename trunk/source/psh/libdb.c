@@ -146,7 +146,7 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 
 int dbset(client *cl, char *var, char *fmt, ...)
    {int i, err, nc, nr, ok;
-    char s[BFLRG];
+    char val[BFLRG];
     char *t, **ta;
     static char *rej[] = { "PWD", "PERDB_PATH" };
 
@@ -160,13 +160,13 @@ int dbset(client *cl, char *var, char *fmt, ...)
 
     if (ok == TRUE)
        {VA_START(fmt);
-	VSNPRINTF(s, BFLRG, fmt);
+	VSNPRINTF(val, BFLRG, fmt);
 	VA_END;
 
-	nc  = strlen(var) + strlen(s) + 2;
+	nc  = strlen(var) + strlen(val) + 2;
 	t   = malloc(nc);
 	if (t != NULL)
-	   {snprintf(t, nc, "%s=%s", var, s);
+	   {snprintf(t, nc, "%s=%s", var, val);
 
 	    ta  = _db_clnt_ex(cl, TRUE, t);
 	    err = (ta != NULL);
@@ -177,7 +177,7 @@ int dbset(client *cl, char *var, char *fmt, ...)
  */
 	    err = putenv(t);
 
-	    note(NULL, "setenv %s %s\n", var, s);
+	    note(NULL, "setenv %s %s\n", var, val);
 
 	    lst_free(ta);};};
 

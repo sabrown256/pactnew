@@ -617,6 +617,37 @@ void SS_set_var(SS_psides *si, object *vr, object *vl, object *penv)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SS_SET_REF - set the specified reference to the given value
+ *            - in the specified environment
+ */
+
+void SS_set_ref(SS_psides *si, object *vr, object *vl, object *penv)
+   {object *expr;
+    PFREFSet set;
+
+    set = NULL;
+
+    if (SS_variablep(vr) == TRUE)
+       set = SS_set_var;
+    else if (SS_consp(vr) == TRUE)
+       {expr = SS_reverse(si, vr);
+	expr = SS_mk_cons(si, SS_t, expr);
+	expr = SS_reverse(si, expr);
+	vr = SS_exp_eval(si, expr);};
+
+    if (SS_referencep(vr) == TRUE)
+       set = SS_REFERENCE_SET(vr);
+
+    if (set != NULL)
+       set(si, vr, vl, penv);
+    else
+       SS_error(si, "OBJECT NOT VARIABLE OR REFERENCE - SS_SET_REF", vr);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_REM_VARC - remove the specified variable
  *              - in the specified environment
  *              - NOTE: this is used in the C syntax mode if nowhere else

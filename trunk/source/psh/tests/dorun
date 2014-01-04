@@ -69,14 +69,23 @@ InitLog Log $TestDir/log.dorun.$LogSfx
       flog $Log ($exe $opt run |& sed 's|1 \* 1|1|g' |& sed 's|\./||g' | grep -v "DBG   = " >&! $Res)
       set xstatus = $status
       flog $Log ls -l $Res
+      if ($xstatus != 0) then
+         flog $Log cat $Res
+      endif
 
 # get fiducial
       flog $Log ($exe $opt ans >&! $Ref)
       unset noglob
+      if ($xstatus != 0) then
+         flog $Log cat $Ref
+      endif
 
       if ("$Valgrind" == "") then
          flog $Log ( diff -w -b $Res $Ref >! $Res.diff )
          set xstatus = $status
+         if ($xstatus != 0) then
+            flog $Log cat $Res.diff
+         endif
 
          flog $Log ( grep "xstatus = 25" $Res.diff >& /dev/null )
          if ($status == 0) then

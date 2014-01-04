@@ -1226,6 +1226,9 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	else if (ityp == SS_VARIABLE_I)
 	   s = SS_VARIABLE_NAME(obj);
 
+	else if (ityp == SS_REFERENCE_I)
+	   s = SS_REFERENCE_NAME(obj);
+
 	else if (ityp == SS_NULL_I)
 	   strcpy(t, "()");
 
