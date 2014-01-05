@@ -36,9 +36,9 @@ static void help(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* EXPAND - print expanded path name to stdout */
+/* EXPAND_PATH - print expanded path name to stdout */
 
-static int expand(char *name, int fullp, int nt, int dt, int rv)
+static int expand_path(char *name, int fullp, int nt, int dt, int rv)
    {int i, nc, ok;
     char *fname;
     char pname[PATH_MAX], rname[PATH_MAX+1];
@@ -110,13 +110,13 @@ int main(int c, char **v)
 	snprintf(fmt, 80, "%%%ds", nc);
 
         while (scanf(fmt, tname) == 1)
-           rv = expand(tname, full_path, nt, dt, rv);
+           rv = expand_path(tname, full_path, nt, dt, rv);
 
         FREE(tname);}
 
     else
        for ( ; i < c; i++)
-           rv = expand(v[i], full_path, nt, dt, rv);
+           rv = expand_path(v[i], full_path, nt, dt, rv);
 
     return(rv);}
 

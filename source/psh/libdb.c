@@ -918,15 +918,19 @@ int _is_srv_running(client *cl)
 
     rv = 0;
 
-if (cl->fcon != NULL)
-   {int i;
-    char **sa;
-    CLOG(cl, 1, "_is_srv_running: 1 (%d) %s", file_exists(cl->fcon), cl->fcon);
-    sa = file_text(FALSE, cl->fcon);
-    if (sa != NULL)
-       {for (i = 0; sa[i] != NULL; i++)
-	    CLOG(cl, 1, "%d: %s", i+1, sa[i]);
-	free_strings(sa);};};
+    if (cl->fcon != NULL)
+       {int i;
+	char **sa;
+
+	CLOG(cl, 1, "_is_srv_running: 1 (%d) %s",
+	     file_exists(cl->fcon), cl->fcon);
+
+	sa = file_text(FALSE, cl->fcon);
+	if (sa != NULL)
+	  {for (i = 0; sa[i] != NULL; i++)
+	       CLOG(cl, 1, "%d: %s", i+1, sa[i]);
+
+	   free_strings(sa);};};
 
 /* if a server is already running there will be a PID file */
     pid = get_conn_client(cl);

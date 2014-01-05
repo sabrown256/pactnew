@@ -128,6 +128,7 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
     char t[MAXLINE];
     char *s, *db, **al;
     object *o;
+    process_group_state *ps;
     static client *cl = NULL;
 
     db = getenv("PERDB_PATH");
@@ -142,15 +143,14 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
 	auth = FALSE;
 	cl = PS_make_client(CLIENT, DB_PORT, auth, db, PS_cl_logger, NULL);};
 
-    PS_dbset(cl, "gstatus", "");
-
     n  = SS_length(si, argl);
     al = _SS_list_strings(si, argl);
 
+    ps = PS_get_process_group_state();
+
     PS_gexeca(db, n, al, NULL, _SS_maps);
 
-    s = PS_dbget(cl, FALSE, "gstatus");
-    o = _SS_string_list(si, s);
+    o = _SS_string_list(si, ps->gstatus);
 
     return(o);}
 

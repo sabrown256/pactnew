@@ -252,6 +252,10 @@ struct process_group_state
     int dbg_level;             /* debug level */
     int to_sec;                /* timeout in seconds */
     uint64_t status_mask;
+    int *gistat;               /* integer array with exit status of
+                                * each process in latest process group */
+    char *gstatus;             /* string with exit status of each process
+                                * in latest process group */
     shell_option ofmt;
     io_device medium;
     process_stack stck;
@@ -277,6 +281,7 @@ struct process_group_state
 process_group_state *get_process_group_state(void)
    {process_group_state *ps;
     static process_group_state st = { 0, 0, -1, (uint64_t) -1,
+				      NULL, NULL,
 				      GEX_CSH_EV, IO_DEV_PIPE,
 				      { 0, 0, 0, 0, 3,
 					(POLLIN | POLLPRI),
@@ -625,21 +630,12 @@ static int _job_exec(process *cp, int *fds,
 	_job_grp_attr(cp, TRUE, fg);
 
 /* reset the signal handlers for the child */
-#if 0
-	signal(SIGINT,  SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
-	signal(SIGTSTP, SIG_DFL);
-	signal(SIGTTIN, SIG_DFL);
-	signal(SIGTTOU, SIG_DFL);
-	signal(SIGCHLD, SIG_DFL);
-#else
 	nsigaction(NULL, SIGINT,  SIG_DFL, SA_RESTART, -1);
 	nsigaction(NULL, SIGQUIT, SIG_DFL, SA_RESTART, -1);
 	nsigaction(NULL, SIGTSTP, SIG_DFL, SA_RESTART, -1);
 	nsigaction(NULL, SIGTTIN, SIG_DFL, SA_RESTART, -1);
 	nsigaction(NULL, SIGTTOU, SIG_DFL, SA_RESTART, -1);
 	nsigaction(NULL, SIGCHLD, SIG_DFL, SA_RESTART, -1);
-#endif
 
 /* setup the I/O descriptors */
 	for (i = 0; i < N_IO_CHANNELS; i++)

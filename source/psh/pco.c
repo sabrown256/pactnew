@@ -742,7 +742,7 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
        val = "\"\"";
 
     nstrncpy(s, BFLRG, val, -1);
-    vl = trim(expand(s, BFLRG, NULL, FALSE), BOTH, " \t");
+    vl = trim(expand_env(s, BFLRG, NULL, FALSE), BOTH, " \t");
 
     note(fsh,  "export %s=%s\n",    var, vl);
     note(fcsh, "setenv %s %s\n",    var, vl);

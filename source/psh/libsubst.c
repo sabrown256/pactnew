@@ -194,6 +194,14 @@ int polysubst(substdes *sd, char *s, int nc)
 	     if (c == '\0')
 	        break;
 
+	     else if (c == '\'')
+	        {*pb++ = c;
+		 nb  = strcpy_tok(pb, nr, ps+1, -1,
+				  NULL, "\'", ADD_DELIMITER);
+		 pb += (nb+2);
+		 nr -= (nb+2);
+		 ps += (nb+2);}
+		 
 	     else if ((mn <= c) && (c <= mx))
 	        {ic = c - sd->lmt[0];
 		 sn = sd->lev[ic];
@@ -212,6 +220,7 @@ int polysubst(substdes *sd, char *s, int nc)
 		     nr -= nb;
 		     ps += (lev - 1);
 		     ns++;};}
+
 	     else
 	        {*pb++ = c;
 		  nr--;};};

@@ -13,6 +13,8 @@
 
 #undef LONGLONG_MAX
 
+/* GOTCHA: clean up this mess */
+
 #include "../psh/posix.h"
 
 #include "scstd.h"
@@ -20,6 +22,9 @@
 
 #undef LIBFIO
 #undef SCOPE_SCORE_PREPROC
+#define VA_START  SC_VA_START
+#define VSNPRINTF(s, n, f) vsnprintf(s, n, f, __a__)
+#define VA_END    SC_VA_END
 #include "../psh/libfio.c"
 
 #define DBFSZ                  512

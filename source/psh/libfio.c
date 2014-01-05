@@ -458,9 +458,14 @@ size_t fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
  *             - return 0 iff successful
  */
 
-int unlink_safe(char *s)
+int unlink_safe(char *fmt, ...)
    {int i, ev, rv, na;
+    char s[BFLRG];
     struct stat sb;
+
+    VA_START(fmt);
+    VSNPRINTF(s, BFLRG, fmt);
+    VA_END;
 
 /* maximum number of attempts */
     na = 100;

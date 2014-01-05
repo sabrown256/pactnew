@@ -1408,10 +1408,7 @@ static void parse_pgrp(statement *s)
     s->pg = pg;
 
 /* free string array allowing for NULL out entries */
-    for (i = 0; i < nc; i++)
-        {if (sa[i] != NULL)
-	    FREE(sa[i]);};
-    FREE(sa);
+    free_nstrings(sa, nc);
 
     return;}
 
@@ -2070,11 +2067,42 @@ void register_io_pgrp(process_group *pg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* GROUP_EXIT_STATUS - process the exit statuses of the statement S */
+
+int group_exit_status(int *st, int ne)
+   {int i, rv;
+    int *nst;
+    char vl[BFLRG];
+    process_group_state *ps;
+
+    ps = get_process_group_state();
+
+    rv    = 0;
+    vl[0] = '\0';
+    nst   = MAKE_N(int, ne);
+
+    for (i = 0; i < ne; i++)
+        {nst[i] = st[i];
+	 rv    += (((1 << i) & ps->status_mask) && (st[i] != 0));
+	 vstrcat(vl, BFLRG, "%d ", st[i]);};
+
+    LAST_CHAR(vl) = '\0';
+
+    FREE(ps->gstatus);
+    ps->gstatus = STRSAVE(vl);
+
+    FREE(ps->gistat);
+    ps->gistat = nst;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* RUN_PGRP - run the process group PG */
 
 static int run_pgrp(statement *s)
    {int i, io, ne, np, rv, tc, fd;
-    char vl[BFLRG];
     char *db;
     process *pp, *cp;
     process_group *pg;
@@ -2154,35 +2182,11 @@ static int run_pgrp(statement *s)
 	FREE(pg->children);
 
 /* process the exit statuses */
-	rv    = 0;
-	vl[0] = '\0';
-	for (i = 0; i < ne; i++)
-	    {rv += (((1 << i) & ps->status_mask) && (s->st[i] != 0));
-	     vstrcat(vl, BFLRG, "%d ", s->st[i]);};
-	LAST_CHAR(vl) = '\0';
+	rv = group_exit_status(s->st, ne);
 
 	db = getenv("PERDB_PATH");
 	if (IS_NULL(db) == FALSE)
-	   dbset(NULL, "gstatus", vl);
-	else
-	   {switch (ps->ofmt)
-               {case GEX_CSH_EV :
-                     printf("setenv gstatus \"%s\"\n", vl);
-		     break;
-                case GEX_CSH_SV :
-                     printf("set gstatus = ( %s )\n", vl);
-		     break;
-                case GEX_SH_EV :
-                     printf("gstatus=\"%s\" ; export %s\n", vl, vl);
-		     break;
-                case GEX_SH_SV :
-                     printf("gstatus=\"%s\"\n", vl);
-		     break;
-                case GEX_NONE :
-		     break;};
-	    fflush_safe(stdout);};
-
-        FREE(s->st);};
+	   dbset(NULL, "gstatus", ps->gstatus);};
 
     return(rv);}
 
