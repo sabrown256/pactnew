@@ -1334,26 +1334,138 @@ char *path_simplify(char *s, int dlm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PERMISSION_MATCH - return TRUE if the specified permissions MD
+ *                   - match those of the stat BF
+ *                   - special bits ignored currently
+ *
+ *           S_ISUID    0004000   set UID bit
+ *           S_ISGID    0002000   set-group-ID bit (see below)
+ *           S_ISVTX    0001000   sticky bit (see below)
+ *
+ *           S_IRUSR    0000400   owner has read permission
+ *           S_IWUSR    0000200   owner has write permission
+ *           S_IXUSR    0000100   owner has execute permission
+ *
+ *           S_IRGRP    0000040   group has read permission
+ *           S_IWGRP    0000020   group has write permission
+ *           S_IXGRP    0000010   group has execute permission
+ *
+ *           S_IROTH    0000004   others have read permission
+ *           S_IWOTH    0000002   others have write permission
+ *           S_IXOTH    0000001   others have execute permission
+ */
+
+#undef NGROUPX
+#ifdef NGROUPS_MAX
+# define NGROUPX NGROUPS_MAX
+#else
+# define NGROUPX 16
+#endif
+
+int _permission_match(struct stat bf, int md, int only)
+   {int i, rv, muid, mgid;
+    int ugo[3], id[3];
+
+/* given rwx replicate into rwxrwxrwx */
+    if (md > 8)
+       md = (md << 6) | (md << 3) | md;
+
+    for (i = 0; i < 3; i++)
+        ugo[i] = ((bf.st_mode & md) != 0);
+
+/* determine user identity match */
+    muid  = getuid();
+    id[0] = (muid == bf.st_uid);
+
+/* determine group identity match */
+    if (only == TRUE)
+       {mgid  = getgid();
+	id[1] = (mgid == bf.st_gid);}
+    else
+       {int ig, ng;
+	gid_t gl[NGROUPX+1];
+
+	ng    = getgroups(NGROUPX, gl);
+	id[1] = 0;
+	for (ig = 0; (id[1] == 0) && (ig < ng); ig++)
+	    id[1] |= (gl[ig] == bf.st_gid);};
+
+/* other identity match is automatic by definition */
+    id[2] = TRUE;
+
+/* determine whether we have permissions and identity match */
+    rv = FALSE;
+    for (i = 0; i < 3; i++)
+        rv |= (ugo[i] && id[i]);
+
+    return(rv);}
+
+#undef NGROUPX
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FILE_KIND - return TRUE iff the specified path is of type KND
+ *           - where KND is one of the POSIX file type flags
+ *           - S_IFDIR, S_IFREG, S_IFLNK, ...
+ *           - and if permissions match MD
+ *
+ *           S_IFMT     0170000   mask for file type
+ *           S_IFSOCK   0140000   socket
+ *           S_IFLNK    0120000   symbolic link
+ *           S_IFREG    0100000   regular file
+ *           S_IFBLK    0060000   block device
+ *           S_IFDIR    0040000   directory
+ *           S_IFCHR    0020000   character device
+ *           S_IFIFO    0010000   FIFO
+ */
+
+int file_kind(int knd, int md, char *fnm)
+   {int rv, st;
+    char err[BFLRG];
+    struct stat bf;
+
+    rv = FALSE;
+    st = stat(fnm, &bf);
+    if (st != 0)
+       nstrncpy(err, BFLRG, strerror(errno), -1);
+
+    else if ((bf.st_mode & knd) != 0)
+       rv = _permission_match(bf, md, FALSE);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DIR_EXISTS - return TRUE iff the named directory exists */
 
 int dir_exists(char *fmt, ...)
    {int rv;
     char s[BFLRG];
-    struct stat sb;
 
     VA_START(fmt);
     VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
-    rv = TRUE;
+    rv = file_kind(S_IFDIR, 7, s);
 
-    memset(&sb, 0, sizeof(sb));
+    return(rv);}
 
-    if (stat(s, &sb) != 0)
-       rv = FALSE;
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-    else if (!(sb.st_mode & S_IFDIR))
-       rv = FALSE;
+/* FILE_EXECUTABLE - return TRUE iff the named file is executable */
+
+int file_executable(char *fmt, ...)
+   {int rv;
+    char s[BFLRG];
+
+    VA_START(fmt);
+    VSNPRINTF(s, BFLRG, fmt);
+    VA_END;
+
+    rv = file_kind(S_IFREG, 0111, s);
 
     return(rv);}
 
@@ -1375,84 +1487,11 @@ int file_exists(char *fmt, ...)
 
     memset(&sb, 0, sizeof(sb));
 
+/* regular file or character device */
     if (stat(s, &sb) == 0)
-
-/* regular file */
-       {if (sb.st_mode & S_IFREG)
-	   rv = TRUE;
-
-/* character device */
-        else if (sb.st_mode & S_IFCHR)
-	   rv = TRUE;};
+       rv = ((sb.st_mode & (S_IFREG | S_IFCHR)) != 0);
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* FILE_EXECUTABLE - return TRUE iff the named file is executable */
-
-#undef NGROUPX
-#ifdef NGROUPS_MAX
-# define NGROUPX NGROUPS_MAX
-#else
-# define NGROUPX 16
-#endif
-
-int file_executable(char *fmt, ...)
-   {int rv, st, muid, mgid, fuid, fgid, only;
-    int usrx, grpx, othx, isusr, isgrp, isoth, file;
-    char s[BFLRG], err[BFLRG];
-    struct stat bf;
-
-    VA_START(fmt);
-    VSNPRINTF(s, BFLRG, fmt);
-    VA_END;
-
-    only = FALSE;
-
-    muid = getuid();
-    if (only == TRUE)
-       mgid = getgid();
-
-    rv = FALSE;
-    st = stat(s, &bf);
-    if (st != 0)
-       nstrncpy(err, BFLRG, strerror(errno), -1);
-    else
-       {int ig, ng;
-	gid_t gl[NGROUPX+1];
-
-	fuid = bf.st_uid;
-	fgid = bf.st_gid;
-	file = bf.st_mode & S_IFREG;
-
-	isusr = ((bf.st_mode & S_IXUSR) != 0);
-	isgrp = ((bf.st_mode & S_IXGRP) != 0);
-	isoth = ((bf.st_mode & S_IXOTH) != 0);
-
-/* determine whether we have user permissions */
-	usrx = ((muid == fuid) && isusr);
-
-/* determine whether we have group permissions */
-	if (only)
-	   grpx = (mgid == fgid);
-	else
-	   {ng   = getgroups(NGROUPX, gl);
-	    grpx = 0;
-	    for (ig = 0; (grpx == 0) && (ig < ng); ig++)
-	        grpx |= (gl[ig] == fgid);};
-	grpx &= isgrp;
-
-/* determine whether we have world permissions */
-	othx = isoth;
-
-	if (file && (usrx || grpx || othx))
-           rv = TRUE;};
-
-    return(rv);}
-
-#undef NGROUPX
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1468,7 +1507,7 @@ int file_script(char *fmt, ...)
     VSNPRINTF(s, BFLRG, fmt);
     VA_END;
 
-    rv = file_executable(s);
+    rv = file_kind(S_IFREG | S_IFCHR, 7, s);
     if (rv == TRUE)
        {fp = fopen_safe(s, "r");
 	if (fp != NULL)
