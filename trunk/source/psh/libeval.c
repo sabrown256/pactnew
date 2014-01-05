@@ -17,9 +17,47 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* EXPAND - expand all environment variables in EXPR */
+/* EXPAND_REGX - expand wild cards in S
+ *             - return the result in D
+ */
 
-char *expand(char *expr, int nc, char *varn, int rnull)
+char *expand_regx(char *d, int nd, char *s)
+   {int id, is, ne, ns, st;
+    char **da, **sa;
+    wordexp_t w;
+
+    d[0] = '\0';
+
+    sa = tokenize(s, " \t\n", 0);
+    ns = lst_length(sa);
+    for (is = 0; is < ns; is++)
+        {if (sa[is][0] == '\'')
+	    vstrcat(d, nd, "%s ", sa[is]);
+	 else
+	    {st = wordexp(sa[is], &w, 0);
+	     if (st == 0)
+	        {da = w.we_wordv;
+		 ne = w.we_wordc;
+
+		 for (id = 0; id < ne; id++)
+		     vstrcat(d, nd, "%s ", da[id]);
+
+		 wordfree(&w);}
+	     else
+	        vstrcat(d, nd, "%s ", sa[is]);};};
+
+    free_strings(sa);
+
+    LAST_CHAR(d) = '\0';
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* EXPAND_ENV - expand all environment variables in EXPR */
+
+char *expand_env(char *expr, int nc, char *varn, int rnull)
    {int i, n;
     char var[BFLRG], t[BFLRG];
     char *rv, *p, *val;
@@ -74,7 +112,7 @@ char *eval(char *expr, int nc, char *varn)
    {char *rv, *s;
     static char res[20];
 
-    rv = expand(expr, nc, varn, TRUE);
+    rv = expand_env(expr, nc, varn, TRUE);
 
     if (rv != NULL)
        s = strpbrk(rv, "`*+");

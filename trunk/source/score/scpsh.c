@@ -147,7 +147,8 @@
 #define downcase 		PS_downcase
 #define eval 			PS_eval
 #define execute 		PS_execute
-#define expand 			PS_expand
+#define expand_env		PS_expand_env
+#define expand_regx             PS_expand_regx
 #define file_executable 	PS_file_executable
 #define file_exists 		PS_file_exists
 #define file_kind               PS_file_kind

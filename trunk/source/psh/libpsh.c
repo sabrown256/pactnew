@@ -107,12 +107,8 @@ char *nstrcat(char *d, int nc, char *s)
        {nd = strlen(d);
 	ns = strlen(s);
 	n  = nc - 1 - nd;
-#if 1
 	n  = vlimit(n, 0, ns);
-#else
-	n  = min(n, ns);
-	n  = max(n, 0);
-#endif
+
 	nstrncpy(d+nd, n+1, s, -1);
 	d[nd+n] = '\0';};
 
@@ -455,12 +451,8 @@ static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
 
 	nc = strlen(s);
 	nc = min(nc, nd-1);
-#if 1
-	nc  = vlimit(nc, 0, ns);
-#else
-	nc = min(nc, ns);
-	nc = max(nc, 0);
-#endif
+	nc = vlimit(nc, 0, ns);
+
 	for (n = 0; n < nc; n++)
 	    {c = *s++;
 
@@ -680,12 +672,7 @@ static int _strcpy_bal(char *d, size_t nd, char *s, size_t ns,
 
 	nc = strlen(s);
 	nc = min(nc, nd-1);
-#if 1
-	nc  = vlimit(nc, 0, ns);
-#else
-	nc = min(nc, ns);
-	nc = max(nc, 0);
-#endif
+	nc = vlimit(nc, 0, ns);
 
 /* start lev properly
  *   "(a b c)" with b = "(" should have lev = 0
@@ -932,6 +919,25 @@ void free_strings(char **lst)
        {for (i = 0; lst[i] != NULL; i++)
 	    {FREE(lst[i]);};
         FREE(lst);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FREE_NSTRINGS - free the N strings in the array lst
+ *               - use this instead of free_strings if any of the
+ *               - strings have been NULL'd
+ */
+
+void free_nstrings(char **lst, int n)
+   {int i;
+
+    if (lst != NULL)
+       {for (i = 0; i < n; i++)
+	    {if (lst[i] != NULL)
+	        FREE(lst[i]);};
+	FREE(lst);}
 
     return;}
 

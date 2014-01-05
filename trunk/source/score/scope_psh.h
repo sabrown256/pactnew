@@ -143,7 +143,8 @@ extern void
  PS_prune_env(char *tgt, char *info);
 
 extern char
- *PS_expand(char *expr, int nc, char *varn, int rnull),
+ *PS_expand_regx(char *d, int nd, char *s),
+ *PS_expand_env(char *expr, int nc, char *varn, int rnull),
  *PS_eval(char *expr, int nc, char *varn);
 
 
@@ -158,7 +159,7 @@ extern int
  PS_fclose_safe(FILE *fp),
  PS_fflush_safe(FILE *fp),
  PS_block_fd(int fd, int on),
- PS_unlink_safe(char *s);
+ PS_unlink_safe(char *fmt, ...);
 
 extern ssize_t
  PS_read_safe(int fd, void *s, size_t nb, int req),
