@@ -175,7 +175,7 @@ char *polysubst_lookup(int *plev, substdes *sd, char *key)
  */
 
 int polysubst(substdes *sd, char *s, int nc)
-   {int i, ic, c, nb, nr, ns, mn, mx, lev;
+   {int ic, c, nb, nr, ns, mn, mx, lev;
     char bf[BFLRG];
     char *pb, *ps, *vn;
     substdes *sn;

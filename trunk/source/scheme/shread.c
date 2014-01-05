@@ -373,6 +373,7 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 
     prt = SS_GET(input_port, str);
     s   = SS_BUFFER(str);
+    SC_ASSERT(s != NULL);
 
     c = SS_get_ch(si, str, TRUE);
     switch (c)

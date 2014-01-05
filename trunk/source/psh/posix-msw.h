@@ -433,6 +433,11 @@
 
 #endif
 
+/* stat constants */
+
+#define S_IFSOCK   0140000
+#define S_IFLNK    0120000
+
 #define SIG_BLOCK          0
 #define SIG_UNBLOCK        1
 #define RLIMIT_CORE        4
@@ -519,6 +524,13 @@ typedef long int rlim_t;
 struct rlimit
    {rlim_t rlim_cur;     /* the current, soft limits */
     rlim_t rlim_max;};   /* the hard limits */
+
+typedef struct s_wordexp_t wordexp_t;
+
+struct s_wordexp_t
+   {size_t we_wordc;		/* number of tokens matching */
+    char **we_wordv;		/* array of expanded tokens */
+    size_t we_offs;};		/* empty values to reserve in we_wordv */
 
 /*--------------------------------------------------------------------------*/
 
@@ -1104,7 +1116,7 @@ int getrusage(int who, struct rusage *usage)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* STRERROR_r -  for MSW */
+/* STRERROR_R -  for MSW */
 
 int strerror_r(int errnum, char *buf, size_t buflen)
    {int rv;
@@ -1122,6 +1134,40 @@ void sync(void)
    {
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WORDEXP - wordexp for MSW */
+
+int wordexp(const char *s, wordexp_t *w, int flags)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WORDFREE - wordfree for MSW */
+
+void wordfree(wordexp_t *w)
+   {
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FNMATCH - fnmatch for MSW */
+
+int fnmatch(const char *pat, const char *s, int flags)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
