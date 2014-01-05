@@ -126,7 +126,7 @@ static PFPCAL _SS_maps(char *s)
 static object *_SSI_gexec(SS_psides *si, object *argl)
    {int n;
     char t[MAXLINE];
-    char *s, *db, **al;
+    char *db, **al;
     object *o;
     process_group_state *ps;
     static client *cl = NULL;

@@ -74,6 +74,7 @@ static int _SS_get_input(SS_psides *si, object *str)
 	rv = -1;}
     else
        {nm = PS_polysubst(_SS.sub, s, MAX_BFSZ);
+	SC_ASSERT(nm >= 0);
 	SS_PTR(str) = s;};
 
     return(rv);}
