@@ -20,6 +20,13 @@ popd >& /dev/null
 
 set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
+
+set VAR_LIST = `where var-list |& head -n 1`
+if (!(-x "$VAR_LIST")) then
+   echo "RPATH: var-list not found - exiting"
+   exit(1)
+endif
+
 source $ldir/functions-pact.csh
 source $ldir/csh-subroutines
 HAVE_SUBROUTINES
@@ -190,7 +197,7 @@ switch ($Tgt)
         breaksw
 
    case del:
-        set lrpath = ( `var-list -l $RPATH` )
+        set lrpath = ( `$VAR_LIST -l $RPATH` )
         set nrpath = ""
         foreach d ($lrpath)
            if ($d != $Dir) then
@@ -199,7 +206,7 @@ switch ($Tgt)
         end
         setenv RPATH $nrpath
 
-        set lrpath = ( `var-list -l $Cfg_RPATH` )
+        set lrpath = ( `$VAR_LIST -l $Cfg_RPATH` )
         set nrpath = ""
         foreach d ($lrpath)
            if ($d != $Dir) then
@@ -255,7 +262,7 @@ CLEAN_PATH:
     set npath = ""
     if ("$lval" != "") then
        set lpath = ( `printenv $lvar` )
-       set lpath = ( `var-list -l $lpath` )
+       set lpath = ( `$VAR_LIST -l $lpath` )
        foreach i ($lpath)
           if (-d $i) then
              set ok = TRUE
@@ -270,7 +277,7 @@ CLEAN_PATH:
              endif
           endif
        end
-       set lpath = ( `var-list -p $npath` )
+       set lpath = ( `$VAR_LIST -p $npath` )
        setenv $lvar $lpath
     endif
 

@@ -131,8 +131,6 @@ endif
 dbmset $ALog HAVE_STREAMS = $HAVE_STREAMS^   \
              HAVE_SELECT  = $HAVE_SELECT
 
-exit(0)
 source $Me:h/post-common
 
-
-
+exit(0)

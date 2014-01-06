@@ -22,6 +22,7 @@ dbmget $ALog LD_Exe        =\? ""^   \
              Cfe_LD_Lib    =\? ""^   \
              Cfe_LD_RPath  =\? ""^   \
              Cfg_LD_Flags  =\? ""^   \
+             Cfg_LD_Lib    =\? ""^   \
              Cfg_LD_RPath  =\? ""^   \
              DP_Lib        =\? ""^   \
              Cfe_CC_Exe^             \

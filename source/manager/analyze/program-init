@@ -123,6 +123,67 @@ Tool TRACKER {
 
 #--------------------------------------------------------------------------
 
+# initialze special groups first - so that other groups can use the variables
+
+# PACT SYstem group
+#   PSY_Arch         the system ID as defined by 'system-id'
+#   PSY_Cfg          the system config file
+#   PSY_CfgMan       full path to the cfgman utility
+#   PSY_CONFIG_PATH  list of directories where config files may be found
+#   PSY_Dbg_Opt      the debug/optimize option for this build
+#   PSY_ID           the system ID as defined by 'cfgman use'
+#   PSY_Prefix       the temporary directory prefix, e.g. "z-"
+#   PSY_TYPE         the system type as defined by 'site-signature'
+#   PSY_SITE         the site of the system as defined by 'site-signature'
+#
+#   PSY_Base         the base directory containing sources
+#   PSY_Root         the root dev directory for this PSY_ID
+#   PSY_AIRoot       the architecture independent root directory
+#   PSY_ASRoot       the architecture specific root directory
+#   PSY_InstRoot     the root installation directory
+#   PSY_PubInc       the public PACT installation include directory
+#   PSY_PubLib       the public PACT installation lib directory
+#
+#   PSY_AnaDir       the manager/analyze directory
+#   PSY_CfgDir       the temporary configuration directory
+#   PSY_FltDir       the directory containing filter files
+#   PSY_MngDir       the manager directory
+#   PSY_ScrDir       the scripts directory
+#   PSY_TmpDir       the temporary build/test directory
+
+Group PSY {
+   Arch        = ${PSY_Arch}
+   Cfg         = ""
+   CfgMan      = ${PSY_CfgMan}
+   CONFIG_PATH = ${PSY_CONFIG_PATH}
+   Dbg_Opt     = ${PSY_Dbg_Opt}
+   OMIT_INTERP = FALSE
+
+   ID          = ${PSY_ID}
+   Prefix      = ${PSY_Prefix}
+   TYPE        = ""
+   SITE        = ""
+   NoExe       = FALSE
+   Load        = FALSE
+
+   Base        = ${PSY_Base}
+   Root        = ${PSY_Base}/dev/${PSY_ID}
+   AIRoot      = ${PSY_AIRoot}
+   ASRoot      = ${PSY_ASRoot}
+   InstRoot    = ${PSY_InstRoot}
+   PubInc      = ${PSY_PubInc}
+   PubLib      = ${PSY_PubLib}
+
+   AnaDir      = ${PSY_Base}/manager/analyze
+   CfgDir      = cfg-${PSY_ID}
+   FltDir      = ""
+   MngDir      = ${PSY_Base}/manager
+   ScrDir      = ${PSY_Base}/scripts
+   TmpDir      = ${PSY_Prefix}${PSY_ID}
+}
+
+#--------------------------------------------------------------------------
+
 # initialize standard groups
 
 # analyzed features - detected, defined, or computed - post analyze
@@ -152,8 +213,8 @@ Group CRAY {
 
 # cross compiling group
 Group CROSS {
-   COMPILE = FALSE
-   REF     = none
+   COMPILE ?= FALSE
+   REF     ?= none
 }
 
 # database group
@@ -349,63 +410,6 @@ Group PCO {
    UseVars =  "CC_Exe CC_Linker CC_Flags CC_Debug CC_Optimize CC_Inc"
    UseVars =+ "FC_Exe FC_Linker FC_Flags FC_Debug FC_Optimize"
    UseVars =+ "LD_Exe LD_RPath LD_Flags LD_Lib"
-}
-
-# PACT SYstem group
-#   PSY_Arch         the system ID as defined by 'system-id'
-#   PSY_Cfg          the system config file
-#   PSY_CfgMan       full path to the cfgman utility
-#   PSY_CONFIG_PATH  list of directories where config files may be found
-#   PSY_Dbg_Opt      the debug/optimize option for this build
-#   PSY_ID           the system ID as defined by 'cfgman use'
-#   PSY_Prefix       the temporary directory prefix, e.g. "z-"
-#   PSY_TYPE         the system type as defined by 'site-signature'
-#   PSY_SITE         the site of the system as defined by 'site-signature'
-#
-#   PSY_Base         the base directory containing sources
-#   PSY_Root         the root dev directory for this PSY_ID
-#   PSY_AIRoot       the architecture independent root directory
-#   PSY_ASRoot       the architecture specific root directory
-#   PSY_InstRoot     the root installation directory
-#   PSY_PubInc       the public PACT installation include directory
-#   PSY_PubLib       the public PACT installation lib directory
-#
-#   PSY_AnaDir       the manager/analyze directory
-#   PSY_CfgDir       the temporary configuration directory
-#   PSY_FltDir       the directory containing filter files
-#   PSY_MngDir       the manager directory
-#   PSY_ScrDir       the scripts directory
-#   PSY_TmpDir       the temporary build/test directory
-
-Group PSY {
-   Arch        = ${PSY_Arch}
-   Cfg         = ""
-   CfgMan      = ${PSY_CfgMan}
-   CONFIG_PATH = ${PSY_CONFIG_PATH}
-   Dbg_Opt     = ${PSY_Dbg_Opt}
-   OMIT_INTERP = FALSE
-
-   ID          = ${PSY_ID}
-   Prefix      = ${PSY_Prefix}
-   TYPE        = ""
-   SITE        = ""
-   NoExe       = FALSE
-   Load        = FALSE
-
-   Base        = ${PSY_Base}
-   Root        = ${PSY_Base}/dev/${PSY_ID}
-   AIRoot      = ${PSY_AIRoot}
-   ASRoot      = ${PSY_ASRoot}
-   InstRoot    = ${PSY_InstRoot}
-   PubInc      = ${PSY_PubInc}
-   PubLib      = ${PSY_PubLib}
-
-   AnaDir      = ${PSY_Base}/manager/analyze
-   CfgDir      = cfg-${PSY_ID}
-   FltDir      = ""
-   MngDir      = ${PSY_Base}/manager
-   ScrDir      = ${PSY_Base}/scripts
-   TmpDir      = ${PSY_Prefix}${PSY_ID}
 }
 
 # requested features - pre-analyze

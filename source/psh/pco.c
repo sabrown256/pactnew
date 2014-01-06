@@ -1337,17 +1337,7 @@ static void setup_analyze_env(client *cl, char *base)
     dbset(cl, "HSY_OS_Name",    st.os);
     dbset(cl, "HSY_OS_Release", st.osrel);
 
-#if 0
-    dbset(cl, "PSY_Arch",   st.arch);
-    dbset(cl, "PSY_ID",     st.psy_id);
-    dbset(cl, "PSY_Root",   st.dir.root);
-#endif
     dbset(cl, "PSY_Cfg",    st.psy_cfg);
-#if 0
-    dbset(cl, "PSY_Base",   base);
-    dbset(cl, "PSY_AnaDir", "%s/analyze", st.dir.mng);
-    dbset(cl, "PSY_ScrDir", st.dir.scr);
-#endif
 
     dbset(cl, "RF_DEBUG",    st.abs_deb ? "TRUE" : "FALSE");
     dbset(cl, "RF_OPTIMIZE", st.abs_opt ? "TRUE" : "FALSE");
@@ -1370,15 +1360,6 @@ static void setup_analyze_env(client *cl, char *base)
        dbinitv(cl, "CROSS_FE", "%s/do-run -m", st.dir.bin);
     else
        dbinitv(cl, "CROSS_FE", "");
-
-/* initialize Cfg group flags */
-#if 0
-    dbinitv(cl, "Cfg_CC_Flags",  dbget(cl, FALSE, "CC_Flags"));
-    dbinitv(cl, "Cfg_CC_Inc",    dbget(cl, FALSE, "CC_Inc"));
-    dbinitv(cl, "Cfg_LD_RPath",  dbget(cl, FALSE, "LD_RPath"));
-    dbinitv(cl, "Cfg_LD_Flags",  dbget(cl, FALSE, "LD_Flags"));
-    dbinitv(cl, "Cfg_LD_Lib",    dbget(cl, FALSE, "LD_Lib"));
-#endif
 
     return;}
 
@@ -1919,7 +1900,7 @@ static void set_var(client *cl, char *var, char *oper, char *val)
 
 	FREE(t);}
 
-/* set value only if undefined */
+/* set variable to value only if value is defined and not empty */
     else if (strcmp(oper, "=?") == 0)
 
 /* check value of val
@@ -1935,14 +1916,11 @@ static void set_var(client *cl, char *var, char *oper, char *val)
 
 	FREE(t);}
 
-/* set variable only if undefined */
+/* set variable only if variable undefined and value is defined and not empty */
     else if (strcmp(oper, "?=") == 0)
-       {if (cdefenv(fvar) == FALSE)
+       {if (dbdef(cl, fvar) == FALSE)
 
-/* check value of val
- * we want things such as "foo =? $bar" to do nothing if
- * "$bar" is not defined
- */
+/* do same check on value as for '=?' case */
 	   {t = echo(FALSE, val);
 	    if (IS_NULL(t) == FALSE)
 	       dbset(cl, fvar, t);
@@ -1950,7 +1928,9 @@ static void set_var(client *cl, char *var, char *oper, char *val)
 	       note(NULL, "   ?= not changing %s - no value for |%s|\n",
 		     fvar, val);
 
-	    FREE(t);};}
+	    FREE(t);}
+	else
+	   note(NULL, "   ?= not changing %s - already exists\n", fvar);}
 
     else
        noted(NULL, "Bad operator '%s' in SET_VAR\n", oper);
@@ -2514,10 +2494,10 @@ static void write_do_run_db(client *cl, state *st)
     nstrncpy(lcrs, BFLRG, dbget(cl, TRUE, "DO_RUN_CROSS"), -1);
 
     separator(fl);
-    note(fl, "   PSY_CONFIG_PATH     = %s\n", cfg);
-    note(fl, "   DO_RUN_DBG    = %s\n", ldbg);
-    note(fl, "   DO_RUN_MPI    = %s\n", lmpi);
-    note(fl, "   DO_RUN_CROSS  = %s\n", lcrs);
+    note(fl, "   PSY_CONFIG_PATH = %s\n", cfg);
+    note(fl, "   DO_RUN_DBG      = %s\n", ldbg);
+    note(fl, "   DO_RUN_MPI      = %s\n", lmpi);
+    note(fl, "   DO_RUN_CROSS    = %s\n", lcrs);
 
 /* initialize the database file */
     note(fl, "   Do-run signature database - do-run-db\n");
