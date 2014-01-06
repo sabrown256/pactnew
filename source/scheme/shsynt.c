@@ -148,7 +148,7 @@ object *SS_mk_string_synt(SS_psides *si, char *s)
  *                  - this can be used for many but not all languages
  */
 
-void SS_name_map_synt(SS_psides *si, char *d, char *s)
+void SS_name_map_synt(SS_psides *si, char *d, int nd, char *s)
    {char *pd;
 
     strcpy(d, s);
