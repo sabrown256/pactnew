@@ -146,8 +146,8 @@ Group OpenMP {
 
 Group Python {
    CC_Exe      = ${OCV_CC}
-   CC_Debug    = -g
-   CC_Optimize = -g -O -Wunused
+   CC_Debug    = ${CC_Debug}
+   CC_Optimize = ${CC_Optimize}
 }
 
 include cpp-rule

@@ -10,16 +10,6 @@
 
 #include "fpact.h"
 
-#ifndef FC_INT_PTR_DIFFER
-
-# define _PD_append_aux(file, name, type, space, nd, dims)                   \
-    ((FIXNUM) PD_append_as_alt(file, name, type, space, nd, (long *) dims))
-
-# define _PD_defent_aux(file, name, type, nd, dims)                          \
-    ((FIXNUM) PD_defent_alt(file, name, type, nd, (long *) dims))
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 #ifdef FC_INT_PTR_DIFFER
@@ -119,29 +109,6 @@ static FIXNUM _PD_append_aux(PDBfile *file, char *name, char *type,
     return(ret);}
     
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_DEFENT_AUX - define a variable via PD_defent_alt but map the
- *                - indexing information to the correct type first
- */
-
-static FIXNUM _PD_defent_aux(PDBfile *file, char *name, char *type,
-			     FIXNUM nd, FIXNUM *dims)
-   {long i, ne, *pi;
-    syment *ep;
-
-    ne = 3*nd;
-    pi = CMAKE_N(long, ne);
-    for (i = 0; i < ne; i++)
-        pi[i] = dims[i];
-
-    ep = PD_defent_alt(file, name, type, nd, pi);
-
-    CFREE(pi);
-
-    return(ep != NULL);}
-    
-/*--------------------------------------------------------------------------*/
 
 #else
 
@@ -180,9 +147,38 @@ FIXNUM _PD_write_aux(PDBfile *file, char *name, char *typi, char *typo,
     return(ret);}
     
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+# define _PD_append_aux(file, name, type, space, nd, dims)                   \
+    ((FIXNUM) PD_append_as_alt(file, name, type, space, nd, (long *) dims))
+
+/*--------------------------------------------------------------------------*/
 
 #endif
 
+/*--------------------------------------------------------------------------*/
+
+/* _PD_DEFENT_AUX - define a variable via PD_defent_alt but map the
+ *                - indexing information to the correct type first
+ */
+
+static FIXNUM _PD_defent_aux(PDBfile *file, char *name, char *type,
+			     FIXNUM nd, FIXNUM *dims)
+   {long i, ne, *pi;
+    syment *ep;
+
+    ne = 3*nd;
+    pi = CMAKE_N(long, ne);
+    for (i = 0; i < ne; i++)
+        pi[i] = dims[i];
+
+    ep = PD_defent_alt(file, name, type, nd, pi);
+
+    CFREE(pi);
+
+    return(ep != NULL);}
+    
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PD_GET_LOCAL_SET_PARAMS - return a long version of ADP */

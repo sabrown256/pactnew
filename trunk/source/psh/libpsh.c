@@ -1373,7 +1373,7 @@ int _permission_match(struct stat bf, int md, int only)
     int ugo[3], id[3];
 
 /* given rwx replicate into rwxrwxrwx */
-    if (md > 8)
+    if (md < 8)
        md = (md << 6) | (md << 3) | md;
 
     for (i = 0; i < 3; i++)

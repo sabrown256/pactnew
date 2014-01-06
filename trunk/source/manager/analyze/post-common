@@ -4,6 +4,9 @@
 # include "cpyright.h"
 #
 
+# announcement to analyze log
+Note $ALog "analysis done with $Exe"
+
 # announcement to config log
 Note $Log "analyze> done with $Exe"
 

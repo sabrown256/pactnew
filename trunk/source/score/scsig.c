@@ -98,52 +98,15 @@ SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
 
 #ifdef HAVE_POSIX_SIGNALS
 
+    int st;
     struct sigaction oa;
-
-# if 1
 
     SC_VA_START(flags);
 
-    _PS_nsigaction(&oa, sig, fn, flags, __a__);
+    st = _PS_nsigaction(&oa, sig, fn, flags, __a__);
+    fo = (st == 0) ? oa.sa_handler : NULL;
 
     SC_VA_END;
-
-# else
-
-    int is;
-    struct sigaction na;
-    sigset_t *set;
-
-    fo = NULL;
-
-    if ((0 < sig) && (sig < SC_NSIG) &&
-	(sig != SIGKILL) && (sig != SIGSTOP))
-       {SC_MEM_INIT(struct sigaction, &oa);
-
-	if (sigaction(sig, NULL, &oa) == 0)
-	   fo = oa.sa_handler;
-
-/* do nothing if the handler is the same as what is already in place */
-	if (fo != fn)
-	   {na.sa_flags   = flags;
-	    na.sa_handler = fn;
-
-	    set = &na.sa_mask;
-	    sigemptyset(set);
-
-	    SC_VA_START(flags);
-
-	    while (TRUE)
-	       {is = SC_VA_ARG(int);
-		if (is < 0)
-		   break;
-		sigaddset(set, is);};
-
-	    SC_VA_END;
-
-	    sigaction(sig, &na, NULL);};};
-
-# endif
 
 #else
 

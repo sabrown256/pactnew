@@ -4,6 +4,9 @@
 # include "cpyright.h"
 #
 
+# announcement to write log
+Note $WLog "writing done with $Exe"
+
 # announcement to config log
 Note $Log "write> done with $Exe"
 

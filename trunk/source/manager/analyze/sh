@@ -22,6 +22,7 @@ foreach i ($path /usr/bin /bin)
       NoteD $ALog "   SH: $i/bash"
       setenv SHELL_Default $i/bash
       dbexp SHELL_Default
+      source $Me:h/post-common
       exit(0)
    endif
 end
@@ -31,6 +32,7 @@ foreach i ($path /usr/bin /bin)
       NoteD $ALog "   SH: $i/sh"
       setenv SHELL_Default $i/sh
       dbexp SHELL_Default
+      source $Me:h/post-common
       exit(0)
    endif
 end
