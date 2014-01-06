@@ -146,9 +146,9 @@ char *_SS_vdsnprintf(int cp, char *fmt, va_list __a__)
 /*--------------------------------------------------------------------------*/
 
 /* _SS_PRINTOUT - takes an object, produces a printable representation, and
- *             - leaves it in _SS.vbf for later use
- *             - this is used by _SS_xprintf to realize format specifications
- *             - such as "%10s"
+ *              - leaves it in _SS.vbf for later use
+ *              - this is used by _SS_xprintf to realize format specifications
+ *              - such as "%10s"
  */
 
 char *_SS_printout(SS_psides *si, char *fmt, object *obj)

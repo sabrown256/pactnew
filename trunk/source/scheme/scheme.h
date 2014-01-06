@@ -711,7 +711,7 @@ struct s_SS_psides
     int (*post_print)(SS_psides *si);
     void (*post_read)(SS_psides *si, object *fp);
     void (*post_eval)(SS_psides *si, object *fp);
-    void (*name_reproc)(SS_psides *si, char *s, char *name);
+    void (*name_reproc)(SS_psides *si, char *s, int sz, char *name);
     void (*get_arg)(SS_psides *si, object *obj, void *v, int type);
     object *(*read)(SS_psides *si, object *fp);
     object *(*call_arg)(SS_psides *si, int type, void *v);
@@ -1127,7 +1127,7 @@ extern int
 
 extern void
  SS_unput_synt(SS_psides *si, int c),
- SS_name_map_synt(SS_psides *si, char *d, char *s);
+ SS_name_map_synt(SS_psides *si, char *d, int nd, char *s);
 
 extern object
  *SS_lookup_variable(SS_psides *si, char *txt, int verbose),

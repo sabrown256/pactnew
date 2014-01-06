@@ -792,8 +792,8 @@ int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_ERROR_N - signal an error
- *            - create a higher level REPL and push on
+/* SS_ERROR - signal an error
+ *          - create a higher level REPL and push on
  */
 
 void SS_error(SS_psides *si, char *s, object *obj)
