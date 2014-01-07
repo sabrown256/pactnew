@@ -190,6 +190,7 @@ Group PSY {
 
 Group AF {
    ANSI         = ANSI
+   CDecls       = TRUE
    PATTERN_WARN =
    PATTERN_ERR  =
 }
@@ -406,6 +407,8 @@ Group PCO {
 #   RemDup  =+ "MDG_Lib"
 
    RemDup  =+ "DP_Path"
+
+   ToolVars = Exe Flags Version Debug Optimize Inc Lib RPath IFlag XFlag 
 
    UseVars =  "CC_Exe CC_Linker CC_Flags CC_Debug CC_Optimize CC_Inc"
    UseVars =+ "FC_Exe FC_Linker FC_Flags FC_Debug FC_Optimize"

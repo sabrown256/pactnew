@@ -170,7 +170,6 @@ if ($FC_Exe != "") then
       NoteD $ALog "      requested version $CmpVers"
    else if (("$CmpVers" != any) && ($RF_STRICT > 0)) then
       NoteD $ALog "      requested version $CmpVers (not found)"
-      setenv STOP ""
       dbexp STOP
       exit(0)
    else

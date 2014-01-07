@@ -233,8 +233,11 @@ int dbdef(client *cl, char *fmt, ...)
     VSNPRINTF(var, BFLRG, fmt);
     VA_END;
 
+    vstrcat(var, BFLRG, " ?");
+
     ta = _db_clnt_ex(cl, TRUE, var);
-    rv = ((ta != NULL) && (IS_NULL(ta[0]) == FALSE));
+    rv = ((ta != NULL) && (IS_NULL(ta[0]) == FALSE) &&
+	  (strcmp(ta[0], "defined{TRUE}") == 0));
 
     lst_free(ta);
 
