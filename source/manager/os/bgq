@@ -9,6 +9,7 @@
 
 Group CROSS
    COMPILE = BGQ
+   FE      = ${PSY_Root}/bin/do-run -m
 }
 
 Group PSY {

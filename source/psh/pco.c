@@ -130,7 +130,6 @@ struct s_state
 
     char def_tools[BFLRG];     /* default tools */
     char def_groups[BFLRG];    /* defaults groups */
-    char toolv[BFLRG];         /* tool variables */
 
     char env_csh[BFLRG];
     char env_sh[BFLRG];
@@ -161,6 +160,9 @@ static void
 
 /* ECHO - run echo command
  *      - only exec shell if necessary
+ *      - GOTCHA: this depends on the use of the environment
+ *      - we are potentially asking things like '$foo' to be expanded
+ *      - by the shell
  */
 
 static char *echo(int log, char *fmt, ...)
@@ -1349,17 +1351,12 @@ static void setup_analyze_env(client *cl, char *base)
 
     if (strncmp(st.os, "CYGWIN", 6) == 0)
        st.os[6] = '\0';
-
+#if 0
     if (strcmp(st.os, "Windows_NT") == 0)
        dbset(cl, "AF_CDecls", "TRUE");
     else
        dbset(cl, "AF_CDecls", "FALSE");
-
-/* cross compile front end */
-    if (dbcmp(cl, "CROSS_COMPILE", "FALSE") != 0)
-       dbinitv(cl, "CROSS_FE", "%s/do-run -m", st.dir.bin);
-    else
-       dbinitv(cl, "CROSS_FE", "");
+#endif
 
     return;}
 
@@ -1420,7 +1417,6 @@ static void setup_output_env(client *cl, char *base)
 
 static void default_var(client *cl, char *base)
    {int i, n;
-    char cmd[BFLRG];
     char **sa;
 
     if (cdefenv("USER") == FALSE)
@@ -1438,19 +1434,6 @@ static void default_var(client *cl, char *base)
         note(NULL, "%s\n", sa[i]);
     free_strings(sa);
 
-/* define the set of specifications which define a tool */
-    st.toolv[0] = '\0';
-    push_tok(st.toolv, BFLRG, ' ', "Exe");
-    push_tok(st.toolv, BFLRG, ' ', "Flags");
-    push_tok(st.toolv, BFLRG, ' ', "Version");
-    push_tok(st.toolv, BFLRG, ' ', "Debug");
-    push_tok(st.toolv, BFLRG, ' ', "Optimize");
-    push_tok(st.toolv, BFLRG, ' ', "Inc");
-    push_tok(st.toolv, BFLRG, ' ', "Lib");
-    push_tok(st.toolv, BFLRG, ' ', "RPath");
-    push_tok(st.toolv, BFLRG, ' ', "IFlag");
-    push_tok(st.toolv, BFLRG, ' ', "XFlag");
-
     strcpy(st.psy_cfg, path_tail(st.cfgf));
 
     unamef(st.host,  BFLRG, "n");
@@ -1464,15 +1447,12 @@ static void default_var(client *cl, char *base)
     free_strings(sa);
 
     snprintf(st.dir.scr, BFLRG, "%s/scripts", base);
-    snprintf(cmd, BFLRG, "%s/system-id", st.dir.scr);
-    nstrncpy(st.arch, BFLRG, run(BOTH, cmd), -1);
+    nstrncpy(st.arch, BFLRG, run(BOTH, "%s/system-id", st.dir.scr), -1);
 
 /* check variables which may have been initialized from the command line */
     if (IS_NULL(st.psy_id) == TRUE)
        nstrncpy(st.psy_id, BFLRG, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
     cinitenv("PSY_ID", st.psy_id);
-
-    dbset(cl, "PACT_CFG_ID", st.psy_id);
 
     dbinitv(cl, "PSY_CfgMan",    "%s/cfgman", st.dir.scr);
 
@@ -1777,6 +1757,30 @@ static void env_subst(client *cl, char *refvar, char *nt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DO_COND_SET - perform conditional assignment of VAL to VAR
+ *             - check value of VAL
+ *             - we want things such as "foo =? $bar" to do nothing if
+ *             - "$bar" is not defined
+ */
+
+void do_cond_set(client *cl, char *var, char *oper, char *val)
+   {char *t;
+
+    t = echo(FALSE, val);
+
+    if (IS_NULL(t) == FALSE)
+       dbset(cl, var, t);
+    else
+       note(NULL, "   %s not changing %s - no value for |%s|\n",
+	    oper, var, val);
+
+    FREE(t);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SET_VAR - set a variable as directed */
 
 static void set_var(client *cl, char *var, char *oper, char *val)
@@ -1902,33 +1906,12 @@ static void set_var(client *cl, char *var, char *oper, char *val)
 
 /* set variable to value only if value is defined and not empty */
     else if (strcmp(oper, "=?") == 0)
-
-/* check value of val
- * we want things such as "foo =? $bar" to do nothing if
- * "$bar" is not defined
- */
-       {t = echo(FALSE, val);
-        if (IS_NULL(t) == FALSE)
-	   dbset(cl, fvar, t);
-        else
-           note(NULL, "   =? not changing %s - no value for |%s|\n",
-		 fvar, val);
-
-	FREE(t);}
+       do_cond_set(cl, fvar, "=?", val);
 
 /* set variable only if variable undefined and value is defined and not empty */
     else if (strcmp(oper, "?=") == 0)
        {if (dbdef(cl, fvar) == FALSE)
-
-/* do same check on value as for '=?' case */
-	   {t = echo(FALSE, val);
-	    if (IS_NULL(t) == FALSE)
-	       dbset(cl, fvar, t);
-	    else
-	       note(NULL, "   ?= not changing %s - no value for |%s|\n",
-		     fvar, val);
-
-	    FREE(t);}
+	   do_cond_set(cl, fvar, "?=", val);
 	else
 	   note(NULL, "   ?= not changing %s - already exists\n", fvar);}
 
@@ -1943,9 +1926,9 @@ static void set_var(client *cl, char *var, char *oper, char *val)
 /* PROCESS_USE - do all the variable settings implied by a Use specification */
 
 static void process_use(client *cl, char *sg, char *oper)
-   {int whch;
+   {int is, whch;
     char nvr[BFLRG], ulst[BFLRG];
-    char *val, *currg, *currt;
+    char *val, *currg, *currt, **sa;
 
     whch = -1;
 
@@ -1987,25 +1970,25 @@ static void process_use(client *cl, char *sg, char *oper)
 
 /* fill out a tool */
         case STACK_TOOL:
-             if (IS_NULL(currt) == TRUE)
-                {note(NULL, "Use tool %s to fill group %s\n",
-		       sg, currg);
+	     sa = tokenize(dbget(cl, FALSE, "PCO_ToolVars"), " \t", 0);
 
-                 FOREACH(var, st.toolv, " ")
-                    snprintf(nvr, BFLRG, "%s_%s", sg, var);
-                    if (dbdef(cl, nvr) == TRUE)
-                       {val = dbget(cl, TRUE, nvr);
-                        set_var(cl, nvr, oper, val);};
-                 ENDFOR}
+             if (IS_NULL(currt) == TRUE)
+                {note(NULL, "Use tool %s to fill group %s\n", sg, currg);
+		 for (is = 0; sa[is] != NULL; is++)
+		     {snprintf(nvr, BFLRG, "%s_%s", sg, sa[is]);
+		      if (dbdef(cl, nvr) == TRUE)
+			 {val = dbget(cl, TRUE, nvr);
+			  set_var(cl, nvr, oper, val);};};}
+
              else
-                {note(NULL, "Use tool %s to fill tool %s\n",
-		       sg, currt);
-                 FOREACH(var, st.toolv, " ")
-                    snprintf(nvr, BFLRG, "%s_%s", sg, var);
-                    if (dbdef(cl, nvr) == TRUE)
-                       {val = dbget(cl, TRUE, nvr);
-                        set_var(cl, var, oper, val);};
-                 ENDFOR};
+                {note(NULL, "Use tool %s to fill tool %s\n", sg, currt);
+		 for (is = 0; sa[is] != NULL; is++)
+		     {snprintf(nvr, BFLRG, "%s_%s", sg, sa[is]);
+		      if (dbdef(cl, nvr) == TRUE)
+			 {val = dbget(cl, TRUE, nvr);
+			  set_var(cl, sa[is], oper, val);};};};
+
+             free_strings(sa);
              break;};
 
     return;}

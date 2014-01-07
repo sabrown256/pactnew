@@ -9,6 +9,7 @@
 
 Group CROSS {
    COMPILE = BGP
+   FE      = ${PSY_Root}/bin/do-run -m
 }
 
 Group PSY {
