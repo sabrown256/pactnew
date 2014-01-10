@@ -227,7 +227,7 @@ dbmget $WLog Bits^           \
 
    Note $STDOUT 'install:'
 
-   @ i = 2
+   @ i = 0
    while ($i < $ni)
       @ i = $i + 1
       set cfg = $inf[$i]
