@@ -94,13 +94,13 @@ foreach fc ($fclst)
       setenv LD_LIBRARY_PATH $libdir
 
       rm -f $Tmp.o
-      $fc -c $Tmp.f >& /dev/null
+      flog $ALog $fc -c $Tmp.f
       set xstatus = $status
 
       if (-f $Tmp.o) then
-         set allfc = ( $allfc $fc )
+         flog $ALog set allfc = ( $allfc $fc )
          if ($xstatus == 0) then
-            set ansifc = ( $ansifc $fc )
+            flog $ALog set ansifc = ( $ansifc $fc )
          endif
       endif
    endif
@@ -110,9 +110,11 @@ end
 #--------------------------------------------------------------------------
 
 if ($af_ansi == TRUE) then
-   echo "$ansifc"
+   Note $ALog -n "ANSI Fortran compilers: "
+   NoteD $ALog "$ansifc"
 else
-   echo "$allfc"
+   Note $ALog -n "All Fortran compilers: "
+   NoteD $ALog "$allfc"
 endif
 
 source $Me:h/post-common

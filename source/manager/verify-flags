@@ -1,0 +1,74 @@
+#!/bin/csh -f
+#
+# VERIFY-FLAGS - verify that the specified flags work
+#              - with the specified tool
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+@ err = 0
+
+set exe   = ""
+set args  = ""
+set flags = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           shift
+           set args = ( $args $1 )
+           breaksw
+      case -c:
+           shift
+           set exe = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: verify-flags [-a <args>]* [-h] -c <exe> <flags>*"
+           echo "   a        arguments to command"
+           echo "   c        command executable"
+           echo "   h        this help message"
+           echo "   <flags>  qualifying flags"
+           echo ""
+           exit(1)
+      default:
+           set flags = ( $flags $1 )
+           breaksw
+   endsw
+   shift
+end
+
+set lflg = ""
+@ nf = $#flags
+@ i  = 0
+while ($i < $nf)
+   @ i = $i + 1
+
+# check for '-<flag> <arg>' forms - <flag> and <arg> have no beginning '-'
+   set tfl = ""
+   if ($i < $nf) then
+      @ n = $i + 1
+      if ("$flags[$n]" !~ -*) then
+         set tfl = ( $flags[$i] $flags[$n] )
+         @ i = $i + 1
+      endif
+   endif
+
+# otherwise take the singleton flag
+   if ("$tfl" == "") then
+      set tfl = ( $flags[$i] )
+   endif
+
+   set lcc = ( `echo $exe $lflg $tfl | sed 's|\"||g'` )
+   $lcc $args >& /dev/null
+   if ($status == 0) then
+      set lflg = ( $lflg $tfl )
+   endif
+end
+
+echo "$lflg"
+
+exit($err)
+

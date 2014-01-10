@@ -61,10 +61,6 @@ while ($#argv > 0)
    shift
 end
 
-#if ($Verbose > 0) then
-#   echo "Initial list of compilers: $ncclst"
-#endif
-
 cat << EOF >! $Tmp.c
 #include <stdio.h>
 int main(int c, char **v)
@@ -134,22 +130,12 @@ foreach cc ($cclst)
       endif
 
       rm -f $Tmp
-      if ($Verbose > 1) then
-         echo "$cc $Tmp.c -o $Tmp"
-         $cc $Tmp.c -o $Tmp >>& /dev/null
-      else
-         $cc $Tmp.c -o $Tmp >>& /dev/null
-      endif
+      flog $ALog $cc $Tmp.c -o $Tmp
 
       if (-x $Tmp) then
-         if ($Verbose > 2) then
-            echo "$CROSS_FE $Tmp"
-            $CROSS_FE $Tmp
-	    set xstatus = $status
-         else
-            $CROSS_FE $Tmp >& /dev/null
-	    set xstatus = $status
-         endif
+         flog $ALog $CROSS_FE $Tmp
+         set xstatus = $status
+
          if ($xstatus == 0) then
             if ($FullPath == TRUE) then
                set tcc = $res
@@ -157,13 +143,12 @@ foreach cc ($cclst)
                set tcc = $cc
             endif
 
-            gexec $CROSS_FE $Tmp @b fw:/dev/null
-            dbgets gstatus
-            if ($gstatus[1] == 0) then
-               set allcc = ( $allcc $tcc )
-               set ansicc = ( $ansicc $tcc )
+            flog $ALog $CROSS_FE $Tmp
+            if ($status == 0) then
+               flog $ALog set allcc  = ( $allcc $tcc )
+               flog $ALog set ansicc = ( $ansicc $tcc )
             else
-               set allcc = ( $allcc $tcc )
+               flog $ALog set allcc = ( $allcc $tcc )
             endif
 
          else if ($Verbose > 0) then
@@ -177,12 +162,14 @@ end
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-rm -f $Tmp.c $Tmp
+flog $ALog rm -f $Tmp.c $Tmp
 
 if ($af_ansi == TRUE) then
-   echo "$ansicc"
+   Note $ALog -n "ANSI C Compilers: "
+   NoteD $ALog "$ansicc"
 else
-   echo "$allcc"
+   Note $ALog -n "All C Compilers: "
+   NoteD $ALog "$allcc"
 endif
 
 source $Me:h/post-common

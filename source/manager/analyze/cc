@@ -48,7 +48,9 @@ dbmget $ALog CC_Exe       =\? cc^      \
              PACT_CC_VERSION^          \
              PACT_CC_PATH^             \
              PACT_CC_EXE^              \
+             PSY_MngDir^               \
              RF_STRICT^                \
+             Ser_CC_Flags^             \
              USE_LDLibPath =\? ""
 
 
@@ -59,7 +61,8 @@ setenv AnsiCC     ""
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# remember the requested compiler or at least cc
+# PICK-COMPILER - remember the requested compiler or at least cc
+
 flog $ALog setenv Save_CC $CC_Exe
 
 set cclst = ""
@@ -118,62 +121,11 @@ foreach cc ( $CC_Exe $Cfg_CC_Exe)
    endif
 endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-#if ($CC_Linker != "") then
-#   flog $ALog setenv CC_Exe "$CC_Linker"
-#endif
-
-# make sure we have flags for configuration compiler
-if ($?Cfg_CC_Flags == 0) then
-   Note $ALog "Initialize Cfg_CC_Flags to be $Cfg_CC_Flags"
-   flog $ALog setenv Cfg_CC_Flags "$CC_Flags"
-   Note $ALog ""
-endif
-
-# remember the requested flags and setup for configuration purposes
-flog $ALog setenv Save_CFLAGS "$CC_Flags"
-Note $ALog ""
-
-if ("$Cfg_CC_Inc" != "") then
-   Note $ALog "Add config include flags to CC_Flags: $Cfg_CC_Inc"
-   flog $ALog setenv CC_Flags "$CC_Flags $Cfg_CC_Inc"
-   Note $ALog ""
-endif
-
-# temporarily add debug flags to compiler flags for config
-if ($?Cfg_CC_Debug == 1) then
-   Note $ALog "Add config debug flags to CC_Flags: $CC_Debug"
-   flog $ALog setenv CC_Flags "$CC_Flags $CC_Debug"
-   flog $ALog setenv Cfg_CC_Flags "$Cfg_CC_Flags $Cfg_CC_Debug"
-   Note $ALog ""
-endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
 if ($CROSS_COMPILE == "FALSE") then
    flog $ALog setenv Cfe_CC_Exe    $Cfg_CC_Exe
-   flog $ALog setenv Cfe_CC_Flags  "$Cfg_CC_Flags"
-   flog $ALog setenv Cfe_CC_Inc    "$Cfg_CC_Inc"
 else
    flog $ALog setenv Cfe_CC_Exe    $CC_Exe
-   flog $ALog setenv Cfe_CC_Flags  "$CC_Flags"
-   flog $ALog setenv Cfe_CC_Inc    "$CC_Inc"
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# NOTE: properly this is done in analyze/ld but we need to bootstrap
-# our way through compiler issues before getting to analyze/ld
-# so set this temporary
-set lrpath = `../analyze/rpath -o rpath`
-
-# set canonical compiler invocation for characterizing compiler
-# NOTE: lCC is used in the cc-xxx scripts which are executed below
-setenv lCC   `echo $Cfe_CC_Exe $Cfe_CC_Flags $lrpath | sed 's|\"||g'`
 
 # now lets look at this compiler
 if ($Cfg_CC_Exe != "") then
@@ -181,7 +133,104 @@ if ($Cfg_CC_Exe != "") then
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# COMPILER VERSION - check the compiler version
+# VERIFY-FLAGS - verify each compiler flag
+#              - man pages sometimes lie
+#              - gcc flags are particularly volatile
+
+   Note $ALog "Verify requested compiler flags"
+
+# NOTE: properly this is done in analyze/ld but we need to bootstrap
+# our way through compiler issues before getting to analyze/ld
+# so set this temporary
+   set lrpath = `../analyze/rpath -o rpath`
+
+   cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+{if (sizeof(int) != sizeof(char *))
+    printf("TRUE");
+ else
+    printf("FALSE");
+ return(0);}
+EOF
+
+   flog $ALog cat $Tmp.c
+
+# verify CC_Flags
+   Note $ALog ""
+   Note $ALog "Verifying '$CC_Flags' for $Cfg_CC_Exe"
+   set flgs = ( `$PSY_MngDir/verify-flags -c $Cfg_CC_Exe -a "$lrpath $Tmp.c -o $Tmp" $CC_Flags` )
+
+   flog $ALog setenv CC_Flags "$flgs"
+
+# verify Cfg_CC_Flags
+   Note $ALog ""
+   if ($?Cfg_CC_Flags == 1) then
+      Note $ALog "Verifying '$Cfg_CC_Flags' for $Cfg_CC_Exe"
+      set flgs = ( `$PSY_MngDir/verify-flags -c $Cfg_CC_Exe -a "$lrpath $Tmp.c -o $Tmp" $Cfg_CC_Flags` )
+
+      flog $ALog setenv Cfg_CC_Flags "$flgs"
+
+# make sure we have flags for configuration compiler
+   else
+      Note $ALog "Initialize Cfg_CC_Flags to be $Cfg_CC_Flags"
+      flog $ALog setenv Cfg_CC_Flags "$CC_Flags"
+   endif
+
+# verify Ser_CC_Flags
+   Note $ALog ""
+   if ($?Ser_CC_Flags == 1) then
+      Note $ALog "Verifying '$Ser_CC_Flags' for $Cfg_CC_Exe"
+      set flgs = ( `$PSY_MngDir/verify-flags -c $Cfg_CC_Exe -a "$lrpath $Tmp.c -o $Tmp" $Ser_CC_Flags` )
+
+      flog $ALog setenv Ser_CC_Flags "$flgs"
+   endif
+
+   unset flgs
+   unset lcc
+
+   Note $ALog ""
+
+# remember the requested flags and setup for configuration purposes
+   flog $ALog setenv Save_CFLAGS "$CC_Flags"
+   Note $ALog ""
+
+   if ("$Cfg_CC_Inc" != "") then
+      Note $ALog "Add config include flags to CC_Flags: $Cfg_CC_Inc"
+      flog $ALog setenv CC_Flags "$CC_Flags $Cfg_CC_Inc"
+      Note $ALog ""
+   endif
+
+# temporarily add debug flags to compiler flags for config
+   if ($?Cfg_CC_Debug == 1) then
+      Note $ALog "Add config debug flags to CC_Flags: $CC_Debug"
+      flog $ALog setenv CC_Flags "$CC_Flags $CC_Debug"
+      flog $ALog setenv Cfg_CC_Flags "$Cfg_CC_Flags $Cfg_CC_Debug"
+      Note $ALog ""
+   endif
+
+   if ($CROSS_COMPILE == "FALSE") then
+      flog $ALog setenv Cfe_CC_Flags  "$Cfg_CC_Flags"
+      flog $ALog setenv Cfe_CC_Inc    "$Cfg_CC_Inc"
+   else
+      flog $ALog setenv Cfe_CC_Flags  "$CC_Flags"
+      flog $ALog setenv Cfe_CC_Inc    "$CC_Inc"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CANONICAL-INVOCATION - set canonical compiler invocation
+#                      - for characterizing compiler
+#                      - NOTE: lCC is used in the cc-xxx scripts
+#                      - which are executed below
+
+   setenv lCC   `echo $Cfe_CC_Exe $Cfe_CC_Flags $lrpath | sed 's|\"||g'`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPILER-VERSION - check the compiler version
 
    Note $ALog ""
    Note $ALog "Check the version of the C compiler"
@@ -244,23 +293,12 @@ if ($Cfg_CC_Exe != "") then
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# FORTRAN INTEGER - check the relative size of Fortran integer and pointer
+# FORTRAN-INTEGER - check the relative size of Fortran integer and pointer
 
    Note $ALog "Determine whether a FORTRAN integer can hold a pointer"
 
    setenv FC_INT_PTR_DIFFER FALSE
 
-   cat << EOF >! $Tmp.c
-#include <stdio.h>
-int main(int c, char **v)
-{if (sizeof(int) != sizeof(char *))
-    printf("TRUE");
- else
-    printf("FALSE");
- return(0);}
-EOF
-
-   flog $ALog cat $Tmp.c
    flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
 
@@ -269,21 +307,13 @@ EOF
          NoteD $ALog "      pointer size differs from Fortran INTEGER size"
       endif
 
-   else
-      NoteD $ALog " "
-      NoteD $ALog " "
-      NoteD $ALog "One or more flags from:"
-      NoteD $ALog "   $Cfe_CC_Flags"
-      NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
-      dbexp STOP
-      exit(0)
    endif
    Note $ALog ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# SIZEOF LONG - look at size of long
+# SIZEOF-LONG - look at size of long
 
    Note $ALog "Determine whether long is 64 bits"
    cat << EOF >! $Tmp.c
@@ -314,7 +344,7 @@ EOF
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# SIZEOF SIZE_T - look at size of size_t
+# SIZEOF-SIZE_T - look at size of size_t
 
    Note $ALog "Determine whether size_t is 64 bits"
    cat << EOF >! $Tmp.c
@@ -345,7 +375,7 @@ EOF
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# OSX ARCH - check for -arch flag
+# OSX-ARCH - check for -arch flag
 
    if ("$HSY_OS_Name" == Darwin) then
 
@@ -434,6 +464,7 @@ dbmset $ALog CC_Exe              = $CC_Exe^              \
              Cfe_CC_Inc          = $Cfe_CC_Inc^          \
              Save_CC             = $Save_CC^             \
              Save_CFLAGS         = $Save_CFLAGS^         \
+             Ser_CC_Flags        = $Ser_CC_Flags^        \
              AF_CList            = $AF_CList^            \
              AF_LONG8            = $AF_LONG8^            \
              AF_ALT_LARGE_FILE   = $af_alt_large_file^   \
