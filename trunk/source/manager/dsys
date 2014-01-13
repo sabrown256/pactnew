@@ -2057,12 +2057,14 @@ CFG_DONE:
         setenv GEXEC   $BinDir/gexec
         setenv PATH    ${BinDir}:${PATH}
 
-        InitLog Log $LogDir/install
+        if ($?PACT_INSTALL_TOP == 0) then
+           InitLog Log $LogDir/install
+        endif
 
-# do install for multi-platform configuration
+# do additional installs for multi-platform configuration
         flog $Log setenv PERDB_PATH $EtcDir/cfg
         dbget PSY_Platforms
-        if ("$PSY_Platforms" != "") then
+        if (("$PSY_Platforms" != "") && ($?PACT_INSTALL_TOP == 0)) then
            set Args = ( $Args -f $EtcDir/Makefile )
 
            set inf = ( `echo "$PSY_Platforms" | sed 's|:| |g'` )
@@ -2071,10 +2073,18 @@ CFG_DONE:
 
            NoteD $Log ""
 
+           flog $Log setenv PACT_INSTALL_TOP  TRUE
+           Separator $Log
+           Note $Log "Multi-platform install for $PSY_ID"
            flog $Log pushd ..
            ftee $Log pact $Args install
            flog $Log popd
+           Separator $Log
+           flog $Log unsetenv PACT_INSTALL_TOP
+
         else
+           Separator $Log
+           Note $Log "Single platform install for $PSY_ID"
            ftee $Log install-pact
         endif
         set RStatus = $gstatus[1]
