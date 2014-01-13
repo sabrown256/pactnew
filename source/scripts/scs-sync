@@ -36,11 +36,11 @@ while ($#argv > 0)
    switch ($1)
       case -exclude:
            shift
-           set ignd = ( $ignd $1 )
+           set ignd = ( $ignd `echo $1 | sed 's|,| |g'` )
            breaksw
       case -h:
            echo ""
-           echo "Usage: scs-sync [-exclude <dir>]* [-h] <src> <dst>"
+           echo "Usage: scs-sync [-exclude <dir>[,<dir>]*]* [-h] <src> <dst>"
            echo "   exclude   rsync exclude specifications"
            echo "   h         this help message"
            echo "   <src>     a .tar file, .gz file, or a repository"
