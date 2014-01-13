@@ -704,6 +704,7 @@ extern void
  SC_set_banner(char *fmt, ...),
  SC_pause(void),
  SC_save_argv_env(int argc, char **argv, char **env),
+ SC_add_search_path(char *fmt, ...),
  SC_init_path(int nd, ...),
  SC_advance_name(char *s),
  SC_interrupt_handler(int sig),

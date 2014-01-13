@@ -472,6 +472,7 @@ char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
 			SC_STRING_I, fmt,
 			SS_OBJECT_I, obj,
 			0);
+    SS_mark(x);
     s = _SS_sprintf_guts(si, si->outdev, x);
     SS_gc(si, x);
 

@@ -790,7 +790,7 @@ static PFPOprs _SS_change_parser(SS_psides *si, object *fnm)
     else
        {op = SS_get_parser(-1);
 
-	t  = strchr(s, '.');
+	t  = strrchr(s, '.');
 	np = _SS_lookup_parser(si, t);
 	if (np != NULL)
 	   {np(si);

@@ -35,7 +35,7 @@ object *_SS_string_list(SS_psides *si, char *s)
 	 else
 	    o = SS_mk_string(si, t);
 
-	 lst = SS_mk_cons(si, o, lst);};
+	 SS_assign(si, lst, SS_mk_cons(si, o, lst));};
 	 
     SC_free_strings(sa);
 
