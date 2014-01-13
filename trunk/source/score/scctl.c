@@ -313,12 +313,48 @@ char *SC_pop_path(char *path)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_ADD_SEARCH_PATH - add DIR to the search path */
+
+void SC_add_search_path(char *fmt, ...)
+   {int is, ns, ne;
+    char d[BFLRG], delim[10];
+    char **sa;
+
+    if (d != NULL)
+       {if (_SC.path == NULL)
+	   {_SC.path = CMAKE_ARRAY(char *, NULL, 0);
+	    SC_array_string_add_copy(_SC.path, ".");};
+
+	SC_PATH_DELIMITER(delim);
+
+	SC_VA_START(fmt);
+	SC_VSNPRINTF(d, BFLRG, fmt);
+	SC_VA_END;
+
+	ne = SC_array_get_n(_SC.path);
+	if (ne > 1)
+	   SC_array_pop(_SC.path);
+
+	sa = PS_tokenize(d, delim, 0);
+	ns = PS_lst_length(sa);
+	for (is = 0; is < ns; is++)
+	    SC_array_string_add_copy(_SC.path, sa[is]);
+
+	PS_free_strings(sa);
+
+	SC_array_string_add(_SC.path, NULL);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_INIT_PATH - set up the search path */
 
 void SC_init_path(int nd, ...)
    {int j, ne;
     char delim[10];
-    char *bf, *ptr, *s, *var, *token;
+    char *ptr, *var;
 
     if (_SC.path == NULL)
        {_SC.path = CMAKE_ARRAY(char *, NULL, 0);
@@ -336,14 +372,7 @@ void SC_init_path(int nd, ...)
         {var = SC_VA_ARG(char *);
 	 ptr = getenv(var);
          if (ptr != NULL)
-            {bf  = CSTRSAVE(ptr);
-             ptr = bf;
-
-             while ((token = SC_strtok(ptr, delim, s)) != NULL)
-                {SC_array_string_add_copy(_SC.path, token);
-                 ptr = NULL;};
-
-	     CFREE(bf);};};
+	    SC_add_search_path(ptr);};
 
     SC_VA_END;
 

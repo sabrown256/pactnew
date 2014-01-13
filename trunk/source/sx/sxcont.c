@@ -951,44 +951,24 @@ void SX_register_devices(void)
  */
 
 void SX_load_rc(SS_psides *si, char *ffn, int ldrc, char *ifna, char *ifnb)
-   {char *s;
+   {int st;
 
 /* figure out the runtime file */
-    if (SC_query_file(ffn, "r", "ascii"))
-       s = CSTRSAVE(ffn);
-
-    else
-       {s = SC_search_file(NULL, ffn);
-	if (s == NULL)
-	   {PRINT(stderr, "Can't find %s\n", ffn);
-	    PRINT(stderr, "Check SCHEME environment variable\n\n");
-	    SX_quit(ABORT);};};
-
-/* load the runtime file */
-    SS_load_scm(si, s);
-
-    CFREE(s);
+    st = SS_load_scm(si, ffn);
+    if (st == FALSE)
+       {PRINT(stderr, "Can't find %s\n", ffn);
+	PRINT(stderr, "Check SCHEME environment variable\n\n");
+	SX_quit(ABORT);};
 
 /* figure out the init file */
     if (ldrc == TRUE)
-       {s = SC_search_file(NULL, ifna);
-	if ((s == NULL) || !SC_query_file(s, "r", "ascii"))
-	   {CFREE(s);
-
-	    s = SC_search_file(NULL, ifnb);
-	    if (s == NULL)
+       {st = SS_load_scm(si, ifna);
+	if (st == FALSE)
+	   {st = SS_load_scm(si, ifnb);
+	    if (st == FALSE)
 	       {PRINT(stderr, "Can't find %s or %s\n", ifna, ifnb);
 		PRINT(stderr, "Check SCHEME environment variable\n\n");
-		SX_quit(ABORT);};
-
-	    if (!SC_query_file(s, "r", "ascii"))
-	       {PRINT(stderr, "Can't open %s or %s\n", ifna, ifnb);
-		SX_quit(ABORT);};};
-
-/* load the init file */
-	SS_load_scm(si, s);
-
-	CFREE(s);};
+		SX_quit(ABORT);};};};
 
     return;}
 

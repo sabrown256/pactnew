@@ -816,12 +816,23 @@ static int _SS_load_scm(SS_psides *si)
 
 /* SS_LOAD_SCM - load a SCHEME file with error protection */
 
-int SS_load_scm(SS_psides *si, char *name)
+int SS_load_scm(SS_psides *si, char *fmt, ...)
    {int rv;
+    char fn[BFLRG];
+    char *s;
 
-    _SS_load_bf(name);
+    SC_VA_START(fmt);
+    SC_VSNPRINTF(fn, BFLRG, fmt);
+    SC_VA_END;
 
-    rv = SS_err_catch(si, _SS_load_scm, NULL);
+    s = SC_search_file(NULL, fn);
+    if ((s == NULL) || !SC_query_file(s, "r", "ascii"))
+       rv = FALSE;
+    else
+       {_SS_load_bf(s);
+	rv = SS_err_catch(si, _SS_load_scm, NULL);};
+
+    CFREE(s);
 
     return(rv);}
 

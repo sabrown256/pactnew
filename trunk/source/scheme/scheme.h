@@ -965,7 +965,7 @@ extern int
  SS_args(SS_psides *si, object *s, ...),
  SS_run(SS_psides *si, char *s),
  SS_text_data_filep(char *fname, int cmnt),
- SS_load_scm(SS_psides *si, char *name),
+ SS_load_scm(SS_psides *si, char *fmt, ...),
  SS_define_argv(SS_psides *si, int c, char **v, int go);
 
 extern void
