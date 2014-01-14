@@ -831,7 +831,7 @@ int main(int c, char **v)
     if (IS_NULL(r) == TRUE)
        snprintf(r, BFLRG, "%s/.perdb", cgetenv(TRUE, "HOME"));
 
-    full_path(root, BFLRG, NULL, r);
+    full_path(root, BFLRG, 0, NULL, r);
 
     rv = cclearenv(except);
 

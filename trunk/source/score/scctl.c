@@ -260,6 +260,11 @@ int SC_file_path(char *name, char *path, int nc, int full)
 
 int SC_full_path(char *name, char *path, int nc)
    {int n;
+
+#if 1
+    n = PS_full_path(path, nc, TRUE, NULL, name);
+#else
+
     char pathvar[PATH_MAX], fp[PATH_MAX];
     char *t, *p, *s;
 
@@ -289,6 +294,7 @@ int SC_full_path(char *name, char *path, int nc)
 		      if (n == 0)
 			 break;};};
              break;};
+#endif
 
     return(n);}
 

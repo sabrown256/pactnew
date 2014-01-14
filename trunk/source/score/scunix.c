@@ -81,45 +81,9 @@ static int _SC_query_mode_unix(char *name, char *mode)
 /* _SC_QUERY_EXEC_UNIX - return TRUE if the file PATH is executable */
 
 static int _SC_query_exec_unix(char *path)
-   {int muid, mgid, fuid, fgid, only, ret;
-    int usrx, grpx, othx, file;
-    int uex, gex, oex;
-    struct stat bf;
+   {int ret;
 
-    ret  = FALSE;
-    only = FALSE;
-    muid = getuid();
-    if (only == TRUE)
-       mgid = getgid();
-
-    if (stat(path, &bf) == 0)
-       {int ig, ng;
-	gid_t gl[NGROUPS_MAX+1];
-
-	fuid = bf.st_uid;
-	fgid = bf.st_gid;
-	file = bf.st_mode & S_IFREG;
-
-	uex = ((bf.st_mode & S_IXUSR) != 0);
-	gex = ((bf.st_mode & S_IXGRP) != 0);
-	oex = ((bf.st_mode & S_IXOTH) != 0);
-
-/* determine whether we have user permissions */
-	usrx = ((muid == fuid) && (uex == TRUE));
-
-/* determine whether we have group permissions */
-	if (only)
-	   grpx = ((mgid == fgid) && (gex == TRUE));
-	else
-	   {ng   = getgroups(NGROUPS_MAX, gl);
-	    grpx = 0;
-	    for (ig = 0; (grpx == 0) && (ig < ng); ig++)
-	        grpx |= (gl[ig] == fgid);
-	    grpx &= (gex == TRUE);};
-
-/* determine whether we have world permissions */
-	othx = oex;
-	ret  = ((file && (usrx || grpx || othx)) != 0);};
+    ret = PS_file_kind(S_IFREG, 0111, path);
 
     return(ret);}
 

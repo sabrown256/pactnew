@@ -47,7 +47,7 @@ static int expand_path(char *name, int fullp, int nt, int dt, int rv)
 
     ok = 1;
     if (fullp == TRUE)
-       {ok = full_path(pname, nc, NULL, name);
+       {ok = full_path(pname, nc, 1, NULL, name);
 	if (ok != 0)
 	   rv |= 1;};
     if (ok != 0)

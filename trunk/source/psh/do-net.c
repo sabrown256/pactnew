@@ -1415,7 +1415,7 @@ static int watch(donetdes *st, int c, char **v)
     char **plog, **files;
     FILE *repf;
 
-    full_path(file, BFLRG, NULL, v[1]);
+    full_path(file, BFLRG, 0, NULL, v[1]);
 
 /* find out the time stamp */
     if (c > 2)
@@ -1944,7 +1944,7 @@ static hfspec *speclist(char *delim, char *specs)
 	   NEXT(s, " \n");
 	   if (s != NULL)
 	      {nstrncpy(hs[i].rawwork, BFLRG, s, -1);
-	       full_path(t, BFLRG, cgetenv(FALSE, "HOME"), s);
+	       full_path(t, BFLRG, 0, cgetenv(FALSE, "HOME"), s);
 	       nstrncpy(hs[i].workdir, BFLRG, t, -1);};
 
 	   for (j = 0; TRUE; j++)
@@ -2151,7 +2151,7 @@ static void readhost(donetdes *st, int log)
 
     if (IS_NULL(st->logdir) == TRUE)
        nstrncpy(st->logdir, BFLRG, cgetenv(TRUE, "HOME"), -1);
-    full_path(st->logdir, BFLRG, cgetenv(FALSE, "HOME"), st->logdir);
+    full_path(st->logdir, BFLRG, 0, cgetenv(FALSE, "HOME"), st->logdir);
 
     if (dir_exists(st->logdir) == FALSE)
        {printf("\n");
@@ -2180,7 +2180,7 @@ static void readhost(donetdes *st, int log)
 
 /* setup the log files names */
     snprintf(st->uplog, BFLRG, "%s/%s", st->logdir, st->stamp);
-    full_path(st->uplog, BFLRG, NULL, st->uplog);
+    full_path(st->uplog, BFLRG, 0, NULL, st->uplog);
 
     if (log == TRUE)
        {mkdir(st->uplog, 0770);
@@ -3147,7 +3147,7 @@ static void init_aux(donetdes *st)
     nstrncpy(bin, BFLRG, path_head(cwhich("do-net")), -1);
 
 /* make sure do_code is henceforth a full, absolute path */
-    full_path(st->do_code, BFLRG, st->shared, st->do_code);
+    full_path(st->do_code, BFLRG, 0, st->shared, st->do_code);
 
     pa = st->aux;
 
@@ -3319,7 +3319,7 @@ static int process_args(donetdes *st, int c, char **v)
 		      break;
 
 		 case 'd':
-		      full_path(st->dist, BFLRG, NULL, v[++i]);
+		      full_path(st->dist, BFLRG, 0, NULL, v[++i]);
 		      break;
 		 case 'e':
 		      nstrncpy(st->do_code, BFLRG, v[++i], -1);
@@ -3391,7 +3391,7 @@ static int process_args(donetdes *st, int c, char **v)
 		      break;};}
 
 	 else if (IS_NULL(st->hostfile) == TRUE)
-            full_path(st->hostfile, BFLRG, NULL, v[i]);
+            full_path(st->hostfile, BFLRG, 0, NULL, v[i]);
 
 	 else
 	    nstrncpy(st->stamp, BFLRG, v[i], -1);};

@@ -1273,43 +1273,6 @@ char *path_suffix(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* FULL_PATH - make a full path out of NAME
- *           - without reference to the PATH environment variable
- */
-
-int full_path(char *path, int nc, char *dir, char *name)
-   {int rv;
-    char d[BFLRG], s[BFLRG];
-    char *pn;
-
-    rv = TRUE;
-
-    if (name[0] == '/')
-       nstrncpy(s, nc, name, -1);
-
-    else if (dir != NULL)
-       snprintf(s, nc, "%s/%s", dir, name);
-      
-    else
-       {getcwd(d, BFLRG);
-        for (pn = name; TRUE; )
-	    {if (strncmp(pn, "../", 3) == 0)
-	        {pn += 3;
-		 nstrncpy(d, BFLRG, path_head(d), -1);}
-	     else if (strncmp(pn, "./", 2) == 0)
-	        pn += 2;
-	     else
-	        break;};
-	snprintf(s, nc, "%s/%s", d, pn);};
-
-    nstrncpy(path, nc-1, s, -1);
-/*    path[nc-1] = '\0'; */
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PATH_SIMPLIFY - remove redundant entries from path type string S */
 
 char *path_simplify(char *s, int dlm)
@@ -2302,6 +2265,77 @@ int file_path(char *name, char *path, int nc)
              break;};
 
     return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FULL_PATH - make a full path out of DIR and NAME
+ *           - with reference to the PATH environment variable if FL is TRUE
+ *           - otherwise without
+ *           - this is essentially the shell 'which' command if FL is TRUE
+ *           - input is the NAME, output is the PATH which is
+ *           - at most NC chars long
+ *           - return:
+ *           -    0 on success
+ *           -   -1 if FL is TRUE and not on your PATH
+ *           -    n if NC is too small to contain the full path
+ */
+
+int full_path(char *path, int nc, int fl, char *dir, char *name)
+   {int rv, st;
+    int is, ns, nx;
+    char d[BFLRG], s[BFLRG];
+    char **sa, *p;
+
+    rv = 0;
+
+    if (name[0] == '/')
+       nstrncpy(s, BFLRG, name, -1);
+
+    else if (dir != NULL)
+       snprintf(s, BFLRG, "%s/%s", dir, name);
+
+    else if (fl == TRUE)
+       {sa = tokenize(cgetenv(TRUE, "PATH"), ":", 0);
+	ns = lst_length(sa);
+	for (is = 0; is < ns; is++)
+	    {snprintf(s, BFLRG, "%s/%s", sa[is], name);
+	     st = file_kind(S_IFREG, 0111, s);
+	     if (st == TRUE)
+	        break;};
+
+	if (is >= ns)
+	   {rv = -1;
+	    nstrncpy(s, BFLRG, name, -1);};
+
+	free_strings(sa);}
+
+    else
+       nstrncpy(s, BFLRG, name, -1);
+
+/* make it an absolute path */
+    if (s[0] != '/')
+       {getcwd(d, BFLRG);
+	snprintf(path, nc, "%s/%s", d, s);
+	nstrncpy(s, BFLRG, path, -1);};
+
+/* remove ../ and ./ from s */
+    sa = tokenize(s, "/", 0);
+    ns = lst_length(sa);
+    path[0] = '\0';
+    for (is = 0; is < ns; is++)
+        {if (strcmp(sa[is], "..") == 0)
+	    {p = strrchr(path, '/');
+	     *p = '\0';}
+	 else if (sa[is][0] != '.')
+	    vstrcat(path, nc, "/%s", sa[is]);};
+
+/* compute the return value */
+    if (rv == 0)
+       {nx = strlen(path);
+	rv = (nx < nc) ? 0 : nx;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
