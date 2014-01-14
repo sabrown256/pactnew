@@ -91,7 +91,7 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
        {char lpath[BFLRG];
 
 /* use full path for PCSH_TMP_ variable */
-	full_path(lpath, BFLRG, NULL, fname);
+	full_path(lpath, BFLRG, 0, NULL, fname);
 
 	fprintf(fo, "#!%s %s\n", shell, args);
 	fprintf(fo, "setenv PCSH_TMP_ %s\n", lpath);
@@ -694,10 +694,10 @@ static void fix_env(char *prog)
    {char exe[BFLRG], s[BFLRG];
 
 /* add the path to here iff you are able to verify it */
-    full_path(exe, BFLRG, NULL, path_head(prog));
+    full_path(exe, BFLRG, 0, NULL, path_head(prog));
     csetenv("PATH", "%s:%s", exe, cgetenv(TRUE, "PATH"));
 
-    full_path(exe, BFLRG, NULL, cwhich("pact"));
+    full_path(exe, BFLRG, 0, NULL, cwhich("pact"));
     if (file_executable(exe) == TRUE)
        {nstrncpy(s, BFLRG, path_head(exe), -1);
         nstrncpy(s, BFLRG, path_head(s), -1);
@@ -791,7 +791,7 @@ int main(int c, char **v)
 
 /* rework shell script invocation */
     if (k > 0)
-       {full_path(s, BFLRG, NULL, v[k]);
+       {full_path(s, BFLRG, 0, NULL, v[k]);
 	scr = s;
 	invoke_script(vo, shell, pact, v, k, c);}
 

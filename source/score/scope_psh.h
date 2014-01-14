@@ -315,7 +315,7 @@ extern int
  PS_strcnts(char *s, char *r, int ex),
  PS_strcpy_tok(char *d, size_t nd, char *s, size_t ns,
 	       char *b, char *e, int flags),
- PS_full_path(char *path, int nc, char *dir, char *name),
+ PS_full_path(char *path, int nc, int fl, char *dir, char *name),
  PS_file_kind(int knd, int md, char *fnm),
  PS_dir_exists(char *fmt, ...),
  PS_file_exists(char *fmt, ...),

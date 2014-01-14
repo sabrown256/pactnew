@@ -2942,7 +2942,7 @@ int main(int c, char **v, char **env)
 
          else if (strcmp(v[i], "-db") == 0)
 	    {nstrncpy(d, BFLRG, "db:", -1);
-	     full_path(d+3, BFLRG-3, NULL, v[++i]);
+	     full_path(d+3, BFLRG-3, 0, NULL, v[++i]);
              if (file_exists(d+3) == FALSE)
 	        {noted(NULL, "No such database '%s' - exiting\n\n", d+3);
 		 if (st.have_db == TRUE)
