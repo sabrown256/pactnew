@@ -1943,47 +1943,6 @@ int cclearenv(char **except)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CWHICH - check the path for EXE */
-
-char *cwhich(char *fmt, ...)
-   {int ok;
-    char prg[BFLRG], d[BFLRG];
-    char *path;
-    static char exe[BFLRG];
-
-    VA_START(fmt);
-    VSNPRINTF(prg, BFLRG, fmt);
-    VA_END;
-
-    if (prg[0] == '/')
-       snprintf(exe, BFLRG, "%s", prg);
-       
-    else if (strncmp(prg, "./", 2) == 0)
-       {getcwd(d, BFLRG);
-	snprintf(exe, BFLRG, "%s/%s", d, prg+2);}
-       
-    else if (strncmp(prg, "../", 3) == 0)
-       {getcwd(d, BFLRG);
-	snprintf(exe, BFLRG, "%s/%s", path_head(d), prg+3);}
-       
-    else
-       {ok   = FALSE;
-	path = cgetenv(TRUE, "PATH");
-	FOREACH(dir, path, " :\n")
-	   snprintf(exe, BFLRG, "%s/%s", dir, prg);
-	   if (file_executable(exe) == TRUE)
-	      {ok = TRUE;
-	       break;};
-	ENDFOR;
-
-	if (ok == FALSE)
-	   nstrncpy(exe, BFLRG, "none", -1);};
-
-    return(exe);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* OPEN_FILE - open the specified file */
 
 FILE *open_file(char *mode, char *fmt, ...)
@@ -2336,6 +2295,53 @@ int full_path(char *path, int nc, int fl, char *dir, char *name)
 	rv = (nx < nc) ? 0 : nx;};
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CWHICH - check the path for EXE */
+
+char *cwhich(char *fmt, ...)
+   {char prg[BFLRG];
+    static char exe[BFLRG];
+
+    VA_START(fmt);
+    VSNPRINTF(prg, BFLRG, fmt);
+    VA_END;
+
+#if 0
+    int ok;
+    char d[BFLRG];
+    char *path;
+
+    if (prg[0] == '/')
+       snprintf(exe, BFLRG, "%s", prg);
+       
+    else if (strncmp(prg, "./", 2) == 0)
+       {getcwd(d, BFLRG);
+	snprintf(exe, BFLRG, "%s/%s", d, prg+2);}
+       
+    else if (strncmp(prg, "../", 3) == 0)
+       {getcwd(d, BFLRG);
+	snprintf(exe, BFLRG, "%s/%s", path_head(d), prg+3);}
+       
+    else
+       {ok   = FALSE;
+	path = cgetenv(TRUE, "PATH");
+	FOREACH(dir, path, " :\n")
+	   snprintf(exe, BFLRG, "%s/%s", dir, prg);
+	   if (file_executable(exe) == TRUE)
+	      {ok = TRUE;
+	       break;};
+	ENDFOR;
+
+	if (ok == FALSE)
+	   nstrncpy(exe, BFLRG, "none", -1);};
+#else
+    full_path(exe, BFLRG, TRUE, NULL, prg);
+#endif
+
+    return(exe);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

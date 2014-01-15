@@ -1175,7 +1175,7 @@ switch ($Cmnd)
         sleep 1
         flog $Log ls -l ${PERDB_PATH}*
 
-        flog $Log set PCO = ( $BinDir/pco $dbopt -env $PSY_MngDir/pact.env -l )
+        flog $Log set PCO = ( $BinDir/pco $dbopt -pact -env $PSY_MngDir/pact.env -l )
 
         Separator $Log
         dbset PSY_Dbg_Opt  $ldof

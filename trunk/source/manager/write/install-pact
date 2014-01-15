@@ -24,7 +24,6 @@ NoteD $WLog "   PACT Installer Script - install-pact"
 Note $WLog ""
 
 dbmget $WLog Ranlib_Exe^   \
-             BinDir^       \
              HAVE_PYTHON^  \
              PY_Vers^      \
              PY_DirPy^     \
@@ -32,7 +31,10 @@ dbmget $WLog Ranlib_Exe^   \
              PY_DirSrc^    \
              PSY_Arch^     \
              PSY_CfgMan^   \
-             PSY_InstRoot
+             PSY_InstRoot^ \
+             PSY_Root
+            
+    setenv BinDir  $PSY_Root/bin
             
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

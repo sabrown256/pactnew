@@ -26,11 +26,12 @@ dbmget $WLog CROSS_COMPILE^               \
              PACT_CC_FAMILY^              \
              PACT_CC_PATH^                \
              PACT_CC_VERSION^             \
-             BinDir^                      \
-             LibDir^                      \
              PSY_ID^                      \
              PSY_Base^                    \
-             PSY_MngDir
+             PSY_MngDir^                  \
+             PSY_Root
+            
+    setenv BinDir  $PSY_Root/bin
 
     flog $WLog set DSYS = $PSY_MngDir/dsys
     flog $WLog set MAKE = $BinDir/smake

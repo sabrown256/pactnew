@@ -31,17 +31,19 @@ Separator $WLog
 NoteD $WLog "   Abstract compiler wrapper - acc"
 Note $WLog ""
 
-dbmget $WLog BinDir^             \
-             EtcDir^             \
-             CC_Debug^           \
+dbmget $WLog CC_Debug^           \
              CC_Optimize^        \
              CC_Profile^         \
              PACT_CC_FAMILY^     \
              PACT_CC_VERSION^    \
              PACT_CC_PATH^       \
              PACT_CC_EXE^        \
-             PSY_Arch
+             PSY_Arch^           \
+             PSY_Root
             
+setenv BinDir  $PSY_Root/bin
+setenv EtcDir  $PSY_Root/etc
+             
 flog $WLog set exe    = $PACT_CC_EXE
 flog $WLog set vers   = $PACT_CC_VERSION
 flog $WLog set comp   = $exe:t

@@ -23,24 +23,24 @@ Separator $WLog
 Note $WLog "   System make wrapper - smake"
 Note $WLog ""
 
-dbmget $WLog PSY_CfgDir^       \
+dbmget $WLog Cfg_CC_Exe^       \
+             Cfg_CC_Flags^     \
+             Cfg_Lex_Flags^    \
+             Cfg_LD_Flags^     \
+             Cfg_LD_RPath^     \
+             MAKE_UseGNU^      \
+             PACT_CC_VERSION^  \
+             PSY_CfgDir^       \
              PSY_MngDir^       \
              PSY_Root^         \
              PSY_ID^           \
              PSY_InstRoot^     \
              PSY_Prefix^       \
-             MAKE_UseGNU^      \
-             IncDir^           \
-             EtcDir^           \
-             BinDir^           \
-             Cfg_CC_Exe^       \
-             Cfg_CC_Flags^     \
-             Cfg_Lex_Flags^    \
-             Cfg_LD_Flags^     \
-             Cfg_LD_RPath^     \
-             PACT_CC_VERSION^  \
              USE_TmpDir
 
+setenv BinDir  $PSY_Root/bin
+setenv EtcDir  $PSY_Root/etc
+setenv IncDir  $PSY_Root/include
 set lpactver = `cat $PSY_MngDir/.pact-version`
 
 Note $WLog "   lpactver      = |$lpactver|"

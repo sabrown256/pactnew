@@ -25,11 +25,13 @@ Note $WLog ""
 
 dbmget $WLog AF_VERSION_GLIBC^  \
              HSY_OS_Name^       \
-             IncDir^            \
              PSY_Cfg^           \
+             PSY_Root^          \
              STD_C^             \
              STD_POSIX^         \
              STD_XOPEN
+
+setenv IncDir  $PSY_Root/include
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -93,7 +93,6 @@ dbmget $WLog AF_ALT_LARGE_FILE^        \
              HSY_CPU^                  \
              HSY_FPU^                  \
              IBM_HW^                   \
-             IncDir^                   \
              LEH_TTY_CRNL^             \
              LEH_TTY_ECHO^             \
              LEH_TTY_VTIME^            \
@@ -108,6 +107,7 @@ dbmget $WLog AF_ALT_LARGE_FILE^        \
              PSY_FltDir^               \
              PSY_MngDir^               \
              PSY_ID^                   \
+             PSY_Root^                 \
              PSY_TYPE^                 \
              PSY_Prefix^               \
              PSY_TmpDir^               \
@@ -121,6 +121,8 @@ dbmget $WLog AF_ALT_LARGE_FILE^        \
              STD_IPC^                  \
              TRACKER_Exe^              \
              USE_FULL_MM
+
+setenv IncDir  $PSY_Root/include
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

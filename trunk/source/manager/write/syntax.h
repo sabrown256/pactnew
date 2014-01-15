@@ -23,11 +23,13 @@ Separator $WLog
 NoteD $WLog "   Interpeter Syntax Mode Configuration - syntax.h"
 Note $WLog ""
 
-dbmget $WLog IncDir^     \
-             SHELL_Cont^ \
+dbmget $WLog SHELL_Cont^ \
              Yacc_Exe^   \
              PSY_Base^   \
-             PSY_Cfg
+             PSY_Cfg^    \
+             PSY_Root
+
+setenv IncDir  $PSY_Root/include
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

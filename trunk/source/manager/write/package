@@ -22,11 +22,13 @@ Separator $WLog
 NoteD $WLog "   Package List - package"
 Note $WLog ""
 
-dbmget $WLog EtcDir^           \
-             HAVE_FORTRAN^     \
+dbmget $WLog HAVE_FORTRAN^     \
              HAVE_PYTHON^      \
              HAVE_PY_NUMPY^    \
-             HAVE_PY_NUMERIC
+             HAVE_PY_NUMERIC^  \
+             PSY_Root
+
+    setenv EtcDir  $PSY_Root/etc
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

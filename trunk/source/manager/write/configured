@@ -24,15 +24,17 @@ Note $WLog ""
 
 dbmget $WLog AF_PATTERN_WARN^  \
              AF_PATTERN_ERR^   \
-             EtcDir^           \
              HSY_Host^         \
              HSY_OS_Name^      \
              MAKE_Shared_Libs^ \
              PSY_Cfg^          \
              PSY_Dbg_Opt^      \
              PSY_FltDir^       \
+             PSY_Root^         \
              RF_PROFILE^       \
              USE_TmpDir
+
+setenv EtcDir  $PSY_Root/etc
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

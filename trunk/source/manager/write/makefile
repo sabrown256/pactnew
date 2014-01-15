@@ -24,12 +24,12 @@ NoteD $WLog "   Distribution Makefile - Makefile"
 Note $WLog ""
 
 dbmget $WLog Bits^           \
-             BinDir^         \
-             EtcDir^         \
              PSY_Root^       \
              PSY_ID^         \
              PSY_Platforms^  \
              Pck
+
+setenv EtcDir  $PSY_Root/etc
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

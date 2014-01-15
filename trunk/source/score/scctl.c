@@ -114,33 +114,6 @@ char *SC_get_banner(void)
 
 /*--------------------------------------------------------------------------*/
 
-/* _SC_IS_EXECUTABLE_FILE - auxilliary helper for SC_full_path
- *                        - if PATH is the name of an executable file
- *                        - and if the length of path is <= NCX
- *                        - copy it into FP and return the length
- *                        - return -1 if the file is not executable
- *                        - return 0 if it is executable and the name
- *                        - fits in FP
- *                        - otherwise return the length FP has to be
- *                        - to hold the path
- */
-
-static int _SC_is_executable_file(char *fp, char *path, int ncx)
-   {int n, ok;
-
-    ok = SC_QUERY_EXEC(path);
-    n  = -1;
-    if (ok == TRUE)
-       {n = strlen(path);
-	if (n <= ncx)
-	   {strcpy(fp, path);
-	    n = 0;};};
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SC_HANDLE_PATH_DOT - auxilliary helper for SC_full_path
  *                     - given a directory DIR and path NAME
  *                     - resolve out ./ and ../ elements of NAME
@@ -261,40 +234,7 @@ int SC_file_path(char *name, char *path, int nc, int full)
 int SC_full_path(char *name, char *path, int nc)
    {int n;
 
-#if 1
     n = PS_full_path(path, nc, TRUE, NULL, name);
-#else
-
-    char pathvar[PATH_MAX], fp[PATH_MAX];
-    char *t, *p, *s;
-
-    n = -1;
-    switch (name[0])
-       {case '/' :
-	     n = _SC_is_executable_file(path, name, nc);
-             break;
-
-        case '.' :
-	     t = SC_getcwd();
-             _SC_handle_path_dot(fp, t, name);
-	     CFREE(t);
-	     n = _SC_is_executable_file(path, fp, nc);
-             break;
-
-        default:
-	     p = getenv("PATH");
-	     if (p != NULL)
-	        {SC_strncpy(pathvar, PATH_MAX, p, PATH_MAX);
-
-		 for (t = SC_strtok(pathvar, ":", s);
-		      t != NULL;
-		      t = SC_strtok(NULL, ":", s))
-		     {_SC_handle_path_dot(fp, t, name);
-		      n = _SC_is_executable_file(path, fp, nc);
-		      if (n == 0)
-			 break;};};
-             break;};
-#endif
 
     return(n);}
 
