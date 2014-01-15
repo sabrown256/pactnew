@@ -246,7 +246,8 @@ if ($Continuous == TRUE) then
    echo ""
 endif
 
-loop:
+set ok = TRUE
+while ($ok == TRUE)
    if ($Verbose == TRUE) then
       echo "Processes owned by $USER"
    endif
@@ -338,10 +339,12 @@ loop:
       sleep 5
       $CLEAR
       echo ""
-      $LOADAVE | head -n 1
+      $LOADAVE
       echo ""
-      goto loop
+   else
+      set ok = FALSE
    endif
+end
 
 unset noglob
 

@@ -907,6 +907,25 @@ static void write_envf(client *cl, int lnotice)
     note(fmd,  "}\n");
     note(fmd, "\n");
 
+/* add debugging aid to beginning of env-pact.csh */
+    note(fcsh, "\n");
+    note(fcsh, "# turn off echo and/or verbose mode\n");
+    note(fcsh, "\n");
+    note(fcsh, "if ($?echo == 1) then\n");
+    note(fcsh, "unset echo\n");
+    note(fcsh, "set re_echo = TRUE\n");
+    note(fcsh, "else\n");
+    note(fcsh, "   set re_echo = FALSE\n");
+    note(fcsh, "endif\n");
+    note(fcsh, "\n");
+    note(fcsh, "if ($?verbose == 1) then\n");
+    note(fcsh, "   unset verbose\n");
+    note(fcsh, "   set re_verbose = TRUE\n");
+    note(fcsh, "else\n");
+    note(fcsh, "   set re_verbose = FALSE\n");
+    note(fcsh, "endif\n");
+    note(fcsh, "\n");
+
 /* make a temporary approximation to st.env_csh
  * NOTE: used the C Shell to expand and print unique environment variable settings
  * in Bourne Shell syntax in the past
@@ -976,6 +995,21 @@ static void write_envf(client *cl, int lnotice)
     note(fdk, "dk_setenv ULTRA   %s/scheme\n", st.dir.root);
     note(fmd, "setenv SCHEME  %s/scheme;\n", st.dir.root);
     note(fmd, "setenv ULTRA   %s/scheme;\n", st.dir.root);
+
+/* add debugging aid to end of env-pact.csh */
+    note(fcsh, "\n");
+    note(fcsh, "# restore echo and/or verbose mode\n");
+    note(fcsh, "\n");
+    note(fcsh, "if ($re_echo == TRUE) then\n");
+    note(fcsh, "   set echo\n");
+    note(fcsh, "endif\n");
+    note(fcsh, "unset re_echo\n");
+    note(fcsh, "\n");
+    note(fcsh, "if ($re_verbose == TRUE) then\n");
+    note(fcsh, "   set verbose\n");
+    note(fcsh, "endif\n");
+    note(fcsh, "unset re_verbose\n");
+    note(fcsh, "\n");
 
     fclose_safe(fcsh);
     fclose_safe(fsh);
