@@ -25,8 +25,6 @@ Note $WLog ""
 
 dbmget $WLog Bits^              \
              CROSS_COMPILE^     \
-             EtcDir^            \
-             IncDir^            \
              FPE_Exe^           \
              HSY_FPU^           \
              HAVE_GNU_FENV^     \
@@ -34,8 +32,12 @@ dbmget $WLog Bits^              \
              MAKE_Strategy^     \
              Ranlib_Exe^        \
              PSY_Cfg^           \
+             PSY_Root^          \
              PSY_TYPE^          \
              PSY_NoExe
+
+setenv EtcDir  $PSY_Root/etc
+setenv IncDir  $PSY_Root/include
 
 set LibVers = 1
 set psy_cfg = $PSY_Cfg:t

@@ -22,7 +22,9 @@ Separator $WLog
 NoteD $WLog "   Adding backward compatibility variable bindings"
 Note $WLog ""
 
-dbmget $WLog EtcDir
+dbmget $WLog PSY_Root
+
+setenv EtcDir  $PSY_Root/etc
 
 flog $WLog set envcsh = $EtcDir/env-pact.csh
 flog $WLog set envsh  = $EtcDir/env-pact.sh

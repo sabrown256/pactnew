@@ -63,12 +63,10 @@ struct s_gt_stack
     gt_entry st[N_STACK];};
 
 struct s_dirdes
-   {char root[BFLRG];
-    char bin[BFLRG];
+   {char base[BFLRG];
+    char root[BFLRG];
     char cfg[BFLRG];
-    char inc[BFLRG];
     char etc[BFLRG];
-    char lib[BFLRG];
     char mng[BFLRG];
     char scr[BFLRG];};
 
@@ -99,6 +97,7 @@ struct s_state
     int have_db;
     int async;
 
+    int cfg_pact;
     int installp;
     int loadp;
     int analyzep;
@@ -136,7 +135,6 @@ struct s_state
     char env_dk[BFLRG];
     char env_mdl[BFLRG];
 
-    char arch[BFLRG];
     char host[BFLRG];
     char os[BFLRG];
     char osrel[BFLRG];
@@ -147,7 +145,7 @@ struct s_state
 
 static state
  st = { FALSE, FALSE, FALSE, FALSE, FALSE,
-        TRUE, FALSE, TRUE, FALSE, FALSE,
+        FALSE, TRUE, FALSE, TRUE, FALSE, FALSE,
 	FALSE, FALSE, FALSE,
         PHASE_READ, 0, NULL, NULL,
         0, NULL, NULL, NULL, };
@@ -884,10 +882,10 @@ static void write_envf(client *cl, int lnotice)
        note(NULL, "   Environment setup files - env-pact (csh, sh, dk, and mdl)\n");
     note(NULL, "\n");
 
-    fcsh = open_file("w", "%s/env-pact.csh", st.dir.etc);
-    fsh  = open_file("w", "%s/env-pact.sh",  st.dir.etc);
-    fdk  = open_file("w", "%s/env-pact.dk",  st.dir.etc);
-    fmd  = open_file("w", "%s/env-pact.mdl", st.dir.etc);
+    fcsh = open_file("w", st.env_csh);
+    fsh  = open_file("w", st.env_sh);
+    fdk  = open_file("w", st.env_dk);
+    fmd  = open_file("w", st.env_mdl);
 
 /* initialize module with boilerplate */
     note(fmd,  "#%%Module1.0\n");
@@ -1359,7 +1357,7 @@ static void parse_rule(char *var, int nc)
  *                   - features
  */
 
-static void setup_analyze_env(client *cl, char *base)
+static void setup_analyze_env(client *cl)
    {char alog[BFLRG];
     FILE *out;
 
@@ -1385,12 +1383,6 @@ static void setup_analyze_env(client *cl, char *base)
 
     if (strncmp(st.os, "CYGWIN", 6) == 0)
        st.os[6] = '\0';
-#if 0
-    if (strcmp(st.os, "Windows_NT") == 0)
-       dbset(cl, "AF_CDecls", "TRUE");
-    else
-       dbset(cl, "AF_CDecls", "FALSE");
-#endif
 
     return;}
 
@@ -1401,7 +1393,7 @@ static void setup_analyze_env(client *cl, char *base)
  *                  - configured files
  */
 
-static void setup_output_env(client *cl, char *base)
+static void setup_output_env(client *cl)
    {int i, nv;
     char dlst[BFLRG];
     char **sa;
@@ -1415,10 +1407,6 @@ static void setup_output_env(client *cl, char *base)
     free_strings(sa);
 
     dbset(cl, "PSY_CfgDir",  st.dir.cfg);
-
-    dbset(cl, "BinDir",  st.dir.bin);
-    dbset(cl, "IncDir",  st.dir.inc);
-    dbset(cl, "EtcDir",  st.dir.etc);
 
     dbset(cl, "PSY_Cfg", st.cfgf);
 
@@ -1449,7 +1437,7 @@ static void setup_output_env(client *cl, char *base)
 
 /* DEFAULT_VAR - setup default variable values */
 
-static void default_var(client *cl, char *base)
+static void default_var(client *cl)
    {int i, n;
     char **sa;
 
@@ -1480,22 +1468,18 @@ static void default_var(client *cl, char *base)
     concatenate(st.osrel, BFLRG, sa, 0, -1, ",");
     free_strings(sa);
 
-    snprintf(st.dir.scr, BFLRG, "%s/scripts", base);
-    nstrncpy(st.arch, BFLRG, run(BOTH, "%s/system-id", st.dir.scr), -1);
+    dbinitv(cl, "PSY_CfgMan", cwhich("cfgman"));
 
 /* check variables which may have been initialized from the command line */
     if (IS_NULL(st.psy_id) == TRUE)
-       nstrncpy(st.psy_id, BFLRG, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
+       nstrncpy(st.psy_id, BFLRG,
+		run(BOTH, "%s use", dbget(cl, TRUE, "PSY_CfgMan")), -1);
     cinitenv("PSY_ID", st.psy_id);
 
-    dbinitv(cl, "PSY_CfgMan",    "%s/cfgman", st.dir.scr);
-
 /* global variables */
-    snprintf(st.dir.root, BFLRG, "%s/dev/%s",  base, st.psy_id);
-    snprintf(st.dir.inc,  BFLRG, "%s/include", st.dir.root);
+    snprintf(st.dir.scr,  BFLRG, "%s/scripts", st.dir.base);
+    snprintf(st.dir.root, BFLRG, "%s/dev/%s",  st.dir.base, st.psy_id);
     snprintf(st.dir.etc,  BFLRG, "%s/etc",     st.dir.root);
-    snprintf(st.dir.lib,  BFLRG, "%s/lib",     st.dir.root);
-    snprintf(st.dir.bin,  BFLRG, "%s/bin",     st.dir.root);
 
     snprintf(st.env_csh,  BFLRG, "%s/env-pact.csh", st.dir.etc);
     snprintf(st.env_sh,   BFLRG, "%s/env-pact.sh",  st.dir.etc);
@@ -1712,11 +1696,11 @@ static void bad_pragma_rules(void)
 
 /* INIT_PCO_SESSION - initialize the state of the config session */
 
-static void init_pco_session(client *cl, char *base, int append)
+static void init_pco_session(client *cl, int append)
    {
 
 /* setup default variable values */
-    default_var(cl, base);
+    default_var(cl);
 
 /* setup the default rules for CC, Lex, Yacc, and FC */
     default_rules();
@@ -2687,7 +2671,7 @@ static void read_config_files(client *cl)
 
 /* ANALYZE_CONFIG - analyze the system configuration */
 
-static void analyze_config(client *cl, char *base)
+static void analyze_config(client *cl)
    {double dt;
     char ts[BFSML];
 
@@ -2702,7 +2686,7 @@ static void analyze_config(client *cl, char *base)
     write_envf(cl, FALSE);
     
 /* setup the environment for programs which analyze features */
-    setup_analyze_env(cl, base);
+    setup_analyze_env(cl);
 
     push_dir(st.dir.cfg);
 
@@ -2740,17 +2724,11 @@ static void summarize_config(client *cl)
 
 /* FINISH_CONFIG - complete the configuration files */
 
-static void finish_config(client *cl, char *base)
+static void finish_config(client *cl)
    {double dt;
     char ts[BFSML];
 
     st.phase = PHASE_WRITE;
-
-/* these are finally determined by now and it is safe to define them */
-    snprintf(st.dir.inc, BFLRG, "%s/include", st.dir.root);
-    snprintf(st.dir.etc, BFLRG, "%s/etc",     st.dir.root);
-    snprintf(st.dir.lib, BFLRG, "%s/lib",     st.dir.root);
-    snprintf(st.dir.bin, BFLRG, "%s/bin",     st.dir.root);
 
     separator(NULL);
     noted(NULL, "Writing system dependent files for %s\n", st.psy_id);
@@ -2758,7 +2736,7 @@ static void finish_config(client *cl, char *base)
 
     dt = wall_clock_time();
 
-    setup_output_env(cl, base);
+    setup_output_env(cl);
 
 /* write the configured files for PACT */
     write_envf(cl, TRUE);
@@ -2906,7 +2884,7 @@ static void help(void)
 
 int main(int c, char **v, char **env)
    {int i, append, ok;
-    char base[BFLRG], ib[BFLRG], d[BFLRG];
+    char ib[BFLRG], d[BFLRG];
     char *root, *strct;
     client *cl;
 
@@ -2956,7 +2934,7 @@ int main(int c, char **v, char **env)
  */
     nstrncpy(st.dir.mng, BFLRG, run(BOTH, "pwd"), -1);
 
-    nstrncpy(base, BFLRG, path_head(st.dir.mng), -1);
+    nstrncpy(st.dir.base, BFLRG, path_head(st.dir.mng), -1);
     strcpy(st.cfgf, "DEFAULT");
 
     nstrncpy(ib, BFLRG, "none", -1);
@@ -2992,6 +2970,9 @@ int main(int c, char **v, char **env)
          else if (strcmp(v[i], "-ft") == 0)
 	    {nstrncpy(st.features, BFSML, v[++i], -1);
 	     dbset(cl, "RF_FEATURES", st.features);}
+
+         else if (strcmp(v[i], "-pact") == 0)
+	    st.cfg_pact = TRUE;
 
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
@@ -3052,7 +3033,7 @@ int main(int c, char **v, char **env)
 
     set_inst_base(cl, ib);
 
-    init_pco_session(cl, base, append);
+    init_pco_session(cl, append);
 
 /* make config directory */
     snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.psy_id);
@@ -3064,7 +3045,8 @@ int main(int c, char **v, char **env)
 
 	read_config_files(cl);
 
-        write_do_run_db(cl, &st);
+	if (st.cfg_pact == TRUE)
+	   write_do_run_db(cl, &st);
 
 	ok = check_cross(cl);
 	if (ok == FALSE)
@@ -3082,7 +3064,7 @@ int main(int c, char **v, char **env)
 	check_dir(cl);
 
 	if (st.analyzep == TRUE)
-	   analyze_config(cl, base);}
+	   analyze_config(cl);}
 
     else
        {pco_load_db(cl, st.db);
@@ -3090,7 +3072,7 @@ int main(int c, char **v, char **env)
         write_do_run_db(cl, &st);
 
 /* order matters crucially here */
-        env_subst(cl, "PSY_Base",         base);
+        env_subst(cl, "PSY_Base",         st.dir.base);
         env_subst(cl, "PSY_InstRoot",     ib);
         env_subst(cl, "PSY_Root",         st.dir.root);
         env_subst(cl, "PSY_ID",           st.psy_id);
@@ -3126,7 +3108,7 @@ int main(int c, char **v, char **env)
 
     pco_save_db(cl, NULL);
 
-    finish_config(cl, base);
+    finish_config(cl);
 
 /* configure added platforms */
     config_platforms();

@@ -21,8 +21,10 @@ Separator $WLog
 NoteD $WLog "   Abstract ranlib wrapper - aranlib"
 Note $WLog ""
 
-dbmget $WLog BinDir^            \
-             Ranlib_Exe
+dbmget $WLog Ranlib_Exe^     \
+             PSY_Root
+            
+setenv BinDir  $PSY_Root/bin
 
 flog $WLog set STDOUT = $BinDir/aranlib
 flog $WLog $RM $STDOUT

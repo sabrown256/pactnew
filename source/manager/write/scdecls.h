@@ -28,10 +28,12 @@ dbmget $WLog Cfe_CC_Exe^      \
              Cfe_LD_Flags^    \
              Cfe_LD_RPath^    \
              CROSS_FE^        \
-             IncDir^          \
              PSY_Base^        \
              PSY_CfgDir^      \
+             PSY_Root^        \
              PACT_CC_VERSION
+
+setenv IncDir  $PSY_Root/include
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

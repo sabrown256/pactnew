@@ -41,7 +41,6 @@ dbmget $WLog ACC_Debug_Default^      \
              CROSS_FE^               \
              DP_BE^                  \
              DP_METHOD^              \
-             EtcDir^                 \
              FC_MOD_FLAG^            \
              FC_Debug_Default^       \
              FC_Optimize_Default^    \
@@ -52,7 +51,6 @@ dbmget $WLog ACC_Debug_Default^      \
              HAVE_PYTHON^            \
              HSY_OS_Name^            \
              HSY_OS_Type^            \
-             IncDir^                 \
              INSTALL_Exe^            \
              JOBS_System^            \
              Lex_Exe^                \
@@ -96,6 +94,9 @@ dbmget $WLog ACC_Debug_Default^      \
              STD_IPC^                \
              Yacc_Exe^               \
              Yacc_Flags
+
+setenv EtcDir  $PSY_Root/etc
+setenv IncDir  $PSY_Root/include
 
 set psy_cfg = $PSY_Cfg:t
 set vl = ""
