@@ -621,6 +621,7 @@ DIRVAR:
    setenv ArgFile   $SHARED/.do-local-args.$hsy_uhost.$Stamp.$$
 
    setenv TIMER    "$SHARED/.do-timer.$Stamp"
+   setenv LOAD_AVE "$SHARED/.do-load-ave.$Stamp"
    setenv NFSMON   "$SHARED/.do-nfsmon.$Stamp"
    setenv IOPR     "$SHARED/.do-iopr.$Stamp"
 
@@ -718,13 +719,7 @@ INITLOG:
    Note $LogHost ""
    Note $LogHost "----- SYSTEM -----"
    Note $LogHost ""
-   set lda = `which load-ave`
-   if (-x "$lda") then
-      $lda >>& $LogHost
-   else
-# GOTCHA: w is not everywhere - use load-ave to work it out
-# but we will have to copy load-ave down as well as timer, ...
-      w | head -n 1 >>& $LogHost
+   $LOAD_AVE >>& $LogHost
    endif
 
    set TmpFile = ~/.do-local-tmp-$hsy_uhost-$$

@@ -21,8 +21,6 @@
 #define NLOG  2
 #define QLOG  3
 
-#define N_AUX 6
-
 #define INIT_PHASE(_p, _i, _s)                                               \
    {(_p)->id     = _i;                                                       \
     (_p)->name   = _s;                                                       \
@@ -121,13 +119,15 @@ struct s_donetdes
     int watch;
     int usescp;
     int interact;
+    int n_aux;              /* number of auxilliary scripts */
+    int n_aux_s;            /* number of special auxilliary scripts */
     int n_hosts;
     int n_nets;
     int vfyt;
     hfspec *hosts;
     hfspec *nets;
     phasedes phases[PH_N_PHASES];
-    auxdes aux[N_AUX];
+    auxdes *aux;
     char bindir[BFLRG];
     char incdir[BFLRG];
     char etcdir[BFLRG];
@@ -2288,11 +2288,15 @@ static void init(donetdes *st, int *purepo, double *gti, char *uhost)
 /* TRANSMIT_SCRIPT - send the scripts to HOST */
 
 static int transmit_script(donetdes *st, char *host, char *csm)
-   {int ia, na, ns, ok;
+   {int ia, na, ns, nx, ok;
     char *rv, *p;
+
+    nx = st->n_aux;
 
     ok = TRUE;
     ns = 0;
+
+/* number of attempts at sending */
     na = 3;
 
     if (IS_NULL(host) == TRUE)
@@ -2301,7 +2305,7 @@ static int transmit_script(donetdes *st, char *host, char *csm)
 	printf("\n");
 	exit(8);};
 
-    for (ia = 0; (ia < na) && (ns != N_AUX); ia++)
+    for (ia = 0; (ia < na) && (ns != nx); ia++)
         {lrun(NULL, NLOG, "scp %s %s:", st->scripts, host);
 
 /* list the remote files */
@@ -2328,11 +2332,11 @@ static int transmit_script(donetdes *st, char *host, char *csm)
 	     p = subst(rv, "*", " ", -1);
 
 	     if (strcmp(csm, p) == 0)
-	        {ns = N_AUX;
+	        {ns = nx;
 		 break;};};};
 
 /* if after NA attempts they are not there - it is an error */
-    if (ns != N_AUX)
+    if (ns != nx)
        {printf("\n");
 	printf("Unable to send scripts to %s - exiting", host);
 	printf("\n");
@@ -2347,7 +2351,7 @@ static int transmit_script(donetdes *st, char *host, char *csm)
 /* SENDSCRIPT - send the local script */
 
 static int sendscript(donetdes *st, char *host)
-   {int i, is, ok;
+   {int i, ia, na, ok;
     char bin[BFLRG], csm[BFLRG], t[BFLRG];
     char *dst, *rv;
     auxdes *pa;
@@ -2359,15 +2363,16 @@ static int sendscript(donetdes *st, char *host)
 
     ok = TRUE;
     pa = st->aux;
+    na = st->n_aux;
 
     st->scripts = NULL;
 
 /* prepare the auxilliary scripts */
-    for (is = 0; is < N_AUX; is++)
-        {dst = pa[is].work;
+    for (ia = 0; ia < na; ia++)
+        {dst = pa[ia].work;
 	 st->scripts = append_tok(st->scripts, ' ', dst);
-	 copy(dst, pa[is].proper);
-	 chmod(dst, pa[is].permi);};
+	 copy(dst, pa[ia].proper);
+	 chmod(dst, pa[ia].permi);};
 
 /* list the local files */
     rv = lrun(NULL, QLOG, "ls -l .do-*.%s", st->stamp);
@@ -3141,7 +3146,9 @@ static void interrupt(int sig)
 /* INIT_AUX - initialize the auxilliary script info */
 
 static void init_aux(donetdes *st)
-   {char bin[BFLRG];
+   {int is, ls, na, ns, nx;
+    char bin[BFLRG];
+    static char *scripts[] = { "timer", "load-ave", "nfsmon", "iopr" };
     auxdes *pa;
 
     nstrncpy(bin, BFLRG, path_head(cwhich("do-net")), -1);
@@ -3149,7 +3156,14 @@ static void init_aux(donetdes *st)
 /* make sure do_code is henceforth a full, absolute path */
     full_path(st->do_code, BFLRG, 0, st->shared, st->do_code);
 
-    pa = st->aux;
+    ns = sizeof(scripts)/sizeof(char *);
+    nx = 3;
+    na = ns + nx;
+    pa = MAKE_N(auxdes, na);
+
+    st->aux     = pa;
+    st->n_aux   = na;
+    st->n_aux_s = nx;
 
 /* prepare the do-local script */
     snprintf(pa[0].proper, BFLRG, "%s/do-local", bin);
@@ -3163,29 +3177,19 @@ static void init_aux(donetdes *st)
     nstrncpy(pa[1].perms, 10, "-rw-------", -1);
     pa[1].permi = 0600;
 
-/* prepare the timer script */
-    nstrncpy(pa[2].proper, BFLRG, cwhich("timer"), -1);
-    snprintf(pa[2].work, BFLRG, ".do-timer.%s", st->stamp);
-    nstrncpy(pa[2].perms, 10, "-rwx------", -1);
-    pa[2].permi = 0700;
-
-/* prepare the nfsmon script */
-    nstrncpy(pa[3].proper, BFLRG, cwhich("nfsmon"), -1);
-    snprintf(pa[3].work, BFLRG, ".do-nfsmon.%s", st->stamp);
-    nstrncpy(pa[3].perms, 10, "-rwx------", -1);
-    pa[3].permi = 0700;
-
-/* prepare the iopr script */
-    nstrncpy(pa[4].proper, BFLRG, cwhich("iopr"), -1);
-    snprintf(pa[4].work, BFLRG, ".do-iopr.%s", st->stamp);
-    nstrncpy(pa[4].perms, 10, "-rwx------", -1);
-    pa[4].permi = 0700;
-
 /* prepare the csh-subr script */
-    snprintf(pa[5].proper, BFLRG, "%s/csh-subroutines", st->etcdir);
-    snprintf(pa[5].work, BFLRG, ".do-csh-subr.%s", st->stamp);
-    nstrncpy(pa[5].perms, 10, "-rw-------", -1);
-    pa[5].permi = 0600;
+    snprintf(pa[2].proper, BFLRG, "%s/csh-subroutines", st->etcdir);
+    snprintf(pa[2].work, BFLRG, ".do-csh-subr.%s", st->stamp);
+    nstrncpy(pa[2].perms, 10, "-rw-------", -1);
+    pa[2].permi = 0600;
+
+/* prepare the other auxilliary scripts */
+    for (is = nx; is < na; is++)
+        {ls = is - nx;
+	 nstrncpy(pa[is].proper, BFLRG, cwhich(scripts[ls]), -1);
+	 snprintf(pa[is].work, BFLRG, ".do-%s.%s", scripts[ls], st->stamp);
+	 nstrncpy(pa[is].perms, 10, "-rwx------", -1);
+	 pa[is].permi = 0700;};
 
 /* setup the do_code and run state variables */
     findrun(st);
