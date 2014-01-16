@@ -18,10 +18,15 @@ Note $ALog "Analyze: platform filesystem"
 Note $ALog ""
 
 set inf = ( `df -T . | tail -n 1` )
-
-setenv HSY_FS_Source $inf[1]
-setenv HSY_FS_Type   $inf[2]
-setenv HSY_FS_Mount  $inf[$#inf]
+if ($#inf > 2) then
+   setenv HSY_FS_Source $inf[1]
+   setenv HSY_FS_Type   $inf[2]
+   setenv HSY_FS_Mount  $inf[$#inf]
+else
+   setenv HSY_FS_Source unknown
+   setenv HSY_FS_Type   unknown
+   setenv HSY_FS_Mount  unknown
+endif
 
 unset inf
 

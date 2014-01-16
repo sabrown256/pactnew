@@ -2265,34 +2265,36 @@ int full_path(char *path, int nc, int fl, char *dir, char *name)
 
 	if (is >= ns)
 	   {rv = -1;
-	    nstrncpy(s, BFLRG, name, -1);};
+	    s[0] = '\0';};
 
 	free_strings(sa);}
 
     else
        nstrncpy(s, BFLRG, name, -1);
 
+    if (rv == 0)
+
 /* make it an absolute path */
-    if (s[0] != '/')
-       {getcwd(d, BFLRG);
-	snprintf(path, nc, "%s/%s", d, s);
-	nstrncpy(s, BFLRG, path, -1);};
+       {if (s[0] != '/')
+	   {getcwd(d, BFLRG);
+	    snprintf(path, nc, "%s/%s", d, s);
+	    nstrncpy(s, BFLRG, path, -1);};
 
 /* remove ../ and ./ from s */
-    sa = tokenize(s, "/", 0);
-    ns = lst_length(sa);
-    path[0] = '\0';
-    for (is = 0; is < ns; is++)
-        {if (strcmp(sa[is], "..") == 0)
-	    {p = strrchr(path, '/');
-	     *p = '\0';}
-	 else if (sa[is][0] != '.')
-	    vstrcat(path, nc, "/%s", sa[is]);};
+	sa = tokenize(s, "/", 0);
+	ns = lst_length(sa);
+	path[0] = '\0';
+	for (is = 0; is < ns; is++)
+	    {if (strcmp(sa[is], "..") == 0)
+	        {p = strrchr(path, '/');
+		 *p = '\0';}
+	     else if (sa[is][0] != '.')
+	        vstrcat(path, nc, "/%s", sa[is]);};
 
 /* compute the return value */
-    if (rv == 0)
-       {nx = strlen(path);
-	rv = (nx < nc) ? 0 : nx;};
+	if (rv == 0)
+	   {nx = strlen(path);
+	    rv = (nx < nc) ? 0 : nx;};};
 
     return(rv);}
 
@@ -2302,7 +2304,8 @@ int full_path(char *path, int nc, int fl, char *dir, char *name)
 /* CWHICH - check the path for EXE */
 
 char *cwhich(char *fmt, ...)
-   {char prg[BFLRG];
+   {int st;
+    char prg[BFLRG];
     static char exe[BFLRG];
 
     VA_START(fmt);
@@ -2338,7 +2341,9 @@ char *cwhich(char *fmt, ...)
 	if (ok == FALSE)
 	   nstrncpy(exe, BFLRG, "none", -1);};
 #else
-    full_path(exe, BFLRG, TRUE, NULL, prg);
+    st = full_path(exe, BFLRG, TRUE, NULL, prg);
+    if (st != 0)
+       exe[0] = '\0';
 #endif
 
     return(exe);}
