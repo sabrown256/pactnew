@@ -930,6 +930,7 @@ static void write_envf(client *cl, int lnotice)
  * NOTE: used the C Shell to expand and print unique environment variable settings
  * in Bourne Shell syntax in the past
  */
+    CLOG(cl, 1, "pco: start write_envf");
     if (st.db == NULL)
        {n = sizeof(site)/sizeof(char *);
 	for (i = 0; i < n; i++)
@@ -938,6 +939,8 @@ static void write_envf(client *cl, int lnotice)
 	add_spec_env_vars(cl, TRUE, fcsh, fsh, fdk, fmd);}
     else
        add_set_db(fcsh, fsh, fdk, fmd);
+
+    CLOG(cl, 1, "pco: finish write_envf");
 
     note(fcsh, "\n");
     note(fsh, "\n");
@@ -2655,7 +2658,7 @@ static void read_config_files(client *cl)
     strcpy(st.cfgf, st.fstck.file[st.fstck.n-1].name);
     pop_file();
 
-    if (file_exists("analyze/program-init") == TRUE)
+    if (file_exists("std/program-init") == TRUE)
        read_config(cl, "program-init", TRUE);
 
     read_config(cl, st.cfgf, FALSE);
@@ -2693,7 +2696,7 @@ static void analyze_config(client *cl)
     push_dir(st.dir.cfg);
 
 /* read the file which does the analysis */
-    if (file_exists("../analyze/program-analyze") == TRUE)
+    if (file_exists("../std/program-analyze") == TRUE)
        read_config(cl, "program-analyze", TRUE);
 
     run(BOTH, "rm * > /dev/null 2>&1");
@@ -2716,8 +2719,8 @@ static void analyze_config(client *cl)
 static void summarize_config(client *cl)
    {
 
-    if (file_executable("analyze/summary") == TRUE)
-       printf("%s\n", run(BOTH, "analyze/summary"));
+    if (file_executable("std/program-summary") == TRUE)
+       printf("%s\n", run(BOTH, "std/program-summary"));
 
     return;}
 
@@ -2745,7 +2748,7 @@ static void finish_config(client *cl)
 
     LOG_OFF;
 
-    if (file_exists("analyze/program-fin") == TRUE)
+    if (file_exists("std/program-fin") == TRUE)
        read_config(cl, "program-fin", TRUE);
 
     LOG_ON;

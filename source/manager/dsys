@@ -1003,7 +1003,7 @@ switch ($Cmnd)
         endif
 
         flog $Log $RM *.core *~
-        flog $Log $RM $LogDir/analyze*
+        flog $Log $RM $LogDir/analyze* $LogDir/write*
 
 # figure out from where configuration info is coming
         set gdir = gen/$PSY_Arch
