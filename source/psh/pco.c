@@ -124,6 +124,8 @@ struct s_state
     dirdes dir;
     ruledes rules;
 
+    char code[BFLRG];          /* code name */
+    char CODE[BFLRG];          /* upper case code name */
     char cfgf[BFLRG];          /* config file name */
     char logf[BFLRG];          /* log file name */
 
@@ -643,7 +645,7 @@ static void write_perl(client *cl, state *st, char *dbname)
        snprintf(t, BFLRG, "%s.pl", cgetenv(FALSE, "PERDB_PATH"));
     out = open_file("w", t);
 
-    fprintf(out, "$PACT = {\n");
+    fprintf(out, "$%s = {\n", st->CODE);
 
     ta = _db_clnt_ex(cl, FALSE, "save:");
     na = lst_length(ta);
@@ -877,9 +879,9 @@ static void write_envf(client *cl, int lnotice)
 
     separator(NULL);
     if (lnotice == TRUE)
-       noted(NULL, "   Environment setup files - env-pact (csh, sh, dk, and mdl)\n");
+       noted(NULL, "   Environment setup files - env-%s (csh, sh, dk, and mdl)\n", st.code);
     else
-       note(NULL, "   Environment setup files - env-pact (csh, sh, dk, and mdl)\n");
+       note(NULL, "   Environment setup files - env-%s (csh, sh, dk, and mdl)\n", st.code);
     note(NULL, "\n");
 
     fcsh = open_file("w", st.env_csh);
@@ -890,22 +892,22 @@ static void write_envf(client *cl, int lnotice)
 /* initialize module with boilerplate */
     note(fmd,  "#%%Module1.0\n");
     note(fmd,  "#\n");
-    note(fmd,  "# pact modulefile\n");
+    note(fmd,  "# %s modulefile\n", st.code);
     note(fmd,  "# vi:set filetype=tcl:\n");
     note(fmd,  "#\n");
     note(fmd,  "\n");
     note(fmd,  "# module whatis\n");
-    note(fmd,  "module-whatis \"PACT Environment\";\n");
+    note(fmd,  "module-whatis \"%s Environment\";\n", st.CODE);
     note(fmd,  "\n");
     note(fmd,  "# module help\n");
     note(fmd,  "proc ModulesHelp { } {\n");
     note(fmd,  "   global version;\n");
     note(fmd,  "\n");
-    note(fmd,  "   puts stderr \"\\tThis module sets your environment to use PACT\\n\";\n");
+    note(fmd,  "   puts stderr \"\\tThis module sets your environment to use %s\\n\";\n", st.CODE);
     note(fmd,  "}\n");
     note(fmd, "\n");
 
-/* add debugging aid to beginning of env-pact.csh */
+/* add debugging aid to beginning of env-<code>.csh */
     note(fcsh, "\n");
     note(fcsh, "# turn off echo and/or verbose mode\n");
     note(fcsh, "\n");
@@ -994,7 +996,7 @@ static void write_envf(client *cl, int lnotice)
     note(fmd, "setenv SCHEME  %s/scheme;\n", st.dir.root);
     note(fmd, "setenv ULTRA   %s/scheme;\n", st.dir.root);
 
-/* add debugging aid to end of env-pact.csh */
+/* add debugging aid to end of env-<code>.csh */
     note(fcsh, "\n");
     note(fcsh, "# restore echo and/or verbose mode\n");
     note(fcsh, "\n");
@@ -1017,8 +1019,8 @@ static void write_envf(client *cl, int lnotice)
 /* log the results */
     n = sizeof(sfx)/sizeof(char *);
     for (i = 0; i < n; i++)
-        {note(NULL, "----- env-pact.%s -----\n", sfx[i]);
-	 cat(NULL, 0, -1, "%s/env-pact.%s", st.dir.etc, sfx[i]);
+        {note(NULL, "----- env-%s.%s -----\n", st.code, sfx[i]);
+	 cat(NULL, 0, -1, "%s/env-%s.%s", st.dir.etc, st.code, sfx[i]);
          note(NULL, "\n");};
 
     return;}
@@ -1095,13 +1097,13 @@ static void check_dir(client *cl)
 
         if (IS_NULL(Missing) == FALSE)
            {noted(NULL, "\n");
-            noted(NULL, "You have asked that PACT be installed in the following\n");
+            noted(NULL, "You have asked that %s be installed in the following\n", st.CODE);
             noted(NULL, "missing directories:\n");
             FOREACH (dir, Missing, " ")
                noted(NULL, "   %s\n", dir);
             ENDFOR
             noted(NULL, "You must either use the -c option to create these\n");
-            noted(NULL, "directories, choose another place to install PACT,\n");
+            noted(NULL, "directories, choose another place to install %s,\n", st.CODE);
             noted(NULL, "or specify -i none for no installation\n");
             noted(NULL, "\n");
 
@@ -1481,10 +1483,10 @@ static void default_var(client *cl)
     snprintf(st.dir.root, BFLRG, "%s/dev/%s",  st.dir.base, st.psy_id);
     snprintf(st.dir.etc,  BFLRG, "%s/etc",     st.dir.root);
 
-    snprintf(st.env_csh,  BFLRG, "%s/env-pact.csh", st.dir.etc);
-    snprintf(st.env_sh,   BFLRG, "%s/env-pact.sh",  st.dir.etc);
-    snprintf(st.env_dk,   BFLRG, "%s/env-pact.dk",  st.dir.etc);
-    snprintf(st.env_mdl,  BFLRG, "%s/env-pact.mdl", st.dir.etc);
+    snprintf(st.env_csh,  BFLRG, "%s/env-%s.csh", st.dir.etc, st.code);
+    snprintf(st.env_sh,   BFLRG, "%s/env-%s.sh",  st.dir.etc, st.code);
+    snprintf(st.env_dk,   BFLRG, "%s/env-%s.dk",  st.dir.etc, st.code);
+    snprintf(st.env_mdl,  BFLRG, "%s/env-%s.mdl", st.dir.etc, st.code);
 
 /* variable defaults */
     strcpy(st.def_tools, "");
@@ -2738,7 +2740,7 @@ static void finish_config(client *cl)
 
     setup_output_env(cl);
 
-/* write the configured files for PACT */
+/* write the env files */
     write_envf(cl, TRUE);
 
     LOG_OFF;
@@ -2858,7 +2860,7 @@ static void help(void)
     printf("\n");
     printf("Usage: pco [-a] [-c] [-db <db>] [-f <path>] [-F] [-ft <features>] [-g] [-i <directory>] [-l] [-o] [-p] [-s <sysid>] [-v] | <cfg>\n");
     printf("\n");
-    printf("             -a      do NOT perform PACT-ANALYZE step\n");
+    printf("             -a      do NOT perform ANALYZE step\n");
     printf("             -c      create missing directories for -i option\n");
     printf("             -db     configure using database <db>\n");
     printf("             -f      path to database\n");
@@ -2919,11 +2921,11 @@ int main(int c, char **v, char **env)
  */
     csetenv("PERDB_IDLE_TIMEOUT", "600");
 
-    root = cgetenv(TRUE, "PERDB_PATH");
-    cl   = make_client(CLIENT, DB_PORT, FALSE, root, cl_logger, NULL);
-
     st.features[0] = '\0';
     st.have_db = launch_perdb(c, v);
+
+    root = cgetenv(TRUE, "PERDB_PATH");
+    cl   = make_client(CLIENT, DB_PORT, FALSE, root, cl_logger, NULL);
 
     dbset(cl, "PATH", cgetenv(TRUE, "PATH"));
 
@@ -2951,6 +2953,9 @@ int main(int c, char **v, char **env)
 
          else if (strcmp(v[i], "-as") == 0)
             st.async = TRUE;
+
+         else if (strcmp(v[i], "-code") == 0)
+	    nstrncpy(st.code, BFLRG, v[++i], -1);
 
          else if (strcmp(v[i], "-db") == 0)
 	    {nstrncpy(d, BFLRG, "db:", -1);
@@ -3030,6 +3035,11 @@ int main(int c, char **v, char **env)
          else
 	    {nstrncpy(st.cfgf, BFLRG, v[i], -1);
 	     dbset(cl, "RF_CONFIG_METHOD", "file");};};
+
+    if (IS_NULL(st.code) == TRUE)
+       nstrncpy(st.code, BFLRG, "pact", -1);
+    nstrncpy(st.CODE, BFLRG, st.code, -1);
+    upcase(st.CODE);
 
     set_inst_base(cl, ib);
 
