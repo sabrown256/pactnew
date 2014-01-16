@@ -210,7 +210,7 @@ source $PSY_MngDir/pact-scs
 
 # do everything with full option
 if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then
-   NoteD $Log -n "   Syncing sources ... "
+   NoteD $Log -n "   Syncing sources ..... "
    flog $Log ./dsys sync
    flog $Log set xstatus = $status
    flog $Log @ err = $err + $xstatus
@@ -242,7 +242,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
       endif
    endif
 
-   NoteD $Log -n "   Building ... "
+   NoteD $Log -n "   Building ............ "
    flog $Log ./dsys build $Args
    flog $Log set xstatus = $status
    flog $Log @ err = $err + $xstatus
@@ -290,7 +290,7 @@ Note $Lock $Message
 #
 if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then
 
-   Note $Lock -n "Testing ................... "
+   Note $Lock -n "Testing ................ "
 
    ftee $Log ./dsys test $Args
    flog $Log @ err = $err + $gstatus[1]
