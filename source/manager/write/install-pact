@@ -284,6 +284,7 @@ dbmget $WLog Ranlib_Exe^   \
 
 # NOTE: temporarily link to certain etc files
 # this can go after about 12/2012
+if (0) then
        Note $STDOUT 'pushd $DestDir >& /dev/null'
        Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod functions-pact.csh csh-subroutines cfg.db)'
        Note $STDOUT '   rm -f $file'
@@ -291,6 +292,7 @@ dbmget $WLog Ranlib_Exe^   \
        Note $STDOUT 'end'
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
