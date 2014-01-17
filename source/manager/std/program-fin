@@ -7,6 +7,12 @@
 # include "cpyright.h"
 #
 
+# display the summary before writing
+run write/summary        $Log $PSY_ScrDir
+
+Note ""
+Note "Writing system dependent files"
+
 # add old environment variable name bindings
 run write/old-env        $Log $PSY_ScrDir
 
