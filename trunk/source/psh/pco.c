@@ -878,10 +878,7 @@ static void write_envf(client *cl, int lnotice)
     FILE *fcsh, *fsh, *fdk, *fmd;
 
     separator(NULL);
-    if (lnotice == TRUE)
-       noted(NULL, "   Environment setup files - env-%s (csh, sh, dk, and mdl)\n", st.code);
-    else
-       note(NULL, "   Environment setup files - env-%s (csh, sh, dk, and mdl)\n", st.code);
+    note(NULL, "   Environment setup files - env-%s (csh, sh, dk, and mdl)\n", st.code);
     note(NULL, "\n");
 
     fcsh = open_file("w", st.env_csh);
@@ -2714,19 +2711,6 @@ static void analyze_config(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SUMMARIZE_CONFIG - make a summary report of the configuration */
-
-static void summarize_config(client *cl)
-   {
-
-    if (file_executable("std/program-summary") == TRUE)
-       printf("%s\n", run(BOTH, "std/program-summary"));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* FINISH_CONFIG - complete the configuration files */
 
 static void finish_config(client *cl)
@@ -2736,7 +2720,7 @@ static void finish_config(client *cl)
     st.phase = PHASE_WRITE;
 
     separator(NULL);
-    noted(NULL, "Writing system dependent files for %s\n", st.psy_id);
+    note(NULL, "Writing system dependent files for %s\n", st.psy_id);
     note(NULL, "\n");
 
     dt = wall_clock_time();
@@ -3116,8 +3100,6 @@ int main(int c, char **v, char **env)
 	snprintf(st.rules.ya_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccArc_BP"));
 
 	check_dir(cl);};
-
-    summarize_config(cl);
 
     pco_save_db(cl, NULL);
 

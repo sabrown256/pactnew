@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# PROGRAM-SUMMARY - summarize important PACT configuration information
+# SUMMARY - summarize important PACT configuration information
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -9,10 +9,17 @@
 #
 
 set Me = $0
-set There = $Me:h/../analyze
-source $There/pre-common
+source $Me:h/pre-common
 
-dbmget $ALog HAVE_FORTRAN^     \
+dbmget $ALog Bits^             \
+             CC_Exe^           \
+             Cfe_CC_Exe^       \
+             Cfe_FC_Exe^       \
+             Cfe_FC_Flags^     \
+             CROSS_COMPILE^    \
+             FC_Exe^           \
+             FC_Flags^         \
+             HAVE_FORTRAN^     \
              HAVE_PYTHON^      \
              HAVE_PY_NUMERIC^  \
              HAVE_PY_NUMPY^    \
@@ -21,18 +28,16 @@ dbmget $ALog HAVE_FORTRAN^     \
              PSY_Base^         \
              PSY_Root^         \
              PSY_ID^           \
+             PSY_InstRoot^     \
              PY_Exe^           \
              PY_Ext^           \
              PY_DirPy^         \
              PY_DirSrc^        \
              PY_DirDst^        \
+             RF_DEBUG^         \
+             RF_OPTIMIZE^      \
+             RF_PROFILE^       \
              USE_TmpDir^       \
-             CC_Exe^           \
-             Cfe_CC_Exe^       \
-             FC_Exe^           \
-             FC_Flags^         \
-             Cfe_FC_Exe^       \
-             Cfe_FC_Flags^     \
              Yacc_Exe
 
 #--------------------------------------------------------------------------
@@ -186,7 +191,7 @@ flog $ALog popd
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-source $There/post-common
+source $Me:h/post-common
 
 Separator $Log
 
