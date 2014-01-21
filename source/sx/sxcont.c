@@ -488,8 +488,9 @@ int _SX_no_argsp(SS_psides *si, object *obj)
     ret = FALSE;
 
     switch (SS_PROCEDURE_TYPE(obj))
-       {case SS_MACRO : 
-        case SS_PROC  :
+       {case SS_MACRO_EV : 
+        case SS_MACRO    : 
+        case SS_PROC     :
 	     params = SS_params(si, obj);
 	     ret    = (!SS_consp(params) || (params == SS_null));
 	     break;
@@ -696,9 +697,19 @@ int SX_expand_expr(char *s)
  *                  - return FALSE if there are no more commands
  */
 
-int SX_split_command(char *cmd, char *lst)
-   {int ok, rv;
+int SX_split_command(char *cmd, int nc, char *lst)
+   {int rv;
     char *pc, *pl;
+
+#if 1
+    int nb;
+
+    nb = PS_strcpy_tok(cmd, nc, lst, -1, NULL, ";", 0);
+    for (pc = lst, pl = pc+nb; (*pc++ = *pl++) != '\0'; );
+    rv = (nb != 0);
+
+#else
+    int ok;
 
     ok = FALSE;
     rv = FALSE;
@@ -727,7 +738,7 @@ int SX_split_command(char *cmd, char *lst)
 
              default :
 	          break;};};
-
+#endif
     return(rv);}
 
 /*--------------------------------------------------------------------------*/

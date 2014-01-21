@@ -60,8 +60,8 @@ static object *_SSI_set_syntax(SS_psides *si, object *argl)
 /* _SSI_RD_LINE - read a line of text */
 
 static object *_SSI_rd_line(SS_psides *si, object *str)
-   {FILE *s;
-    char *t, *p;
+   {char *t, *p;
+    FILE *fp;
     object *ret;
 
     if (SS_nullobjp(str))
@@ -69,11 +69,11 @@ static object *_SSI_rd_line(SS_psides *si, object *str)
     else if (!SS_inportp(str = SS_car(si, str)))
        SS_error(si, "ARGUMENT NOT INPUT-PORT - READ-LINE", str);
 
-    s = SS_INSTREAM(str);
-    t = SS_BUFFER(str);
+    fp = SS_INSTREAM(str);
+    t  = SS_BUFFER(str);
     SS_PTR(str) = t;
 
-    if (GETLN(t, MAXLINE, s) == NULL)
+    if (GETLN(t, MAXLINE, fp) == NULL)
        ret = SS_eof;
 
     else
@@ -91,8 +91,8 @@ static object *_SSI_rd_line(SS_psides *si, object *str)
 
 /* _SS_RD_LST - read a list or cons */
 
-static object *_SS_rd_lst(SS_psides *si, object *str)
-   {int c, ok;
+static object *_SS_rd_lst(SS_psides *si, object *str, int c)
+   {int ok;
     object *frst, *ths, *nxt, *o;
 
     frst = SS_null;
@@ -142,7 +142,7 @@ static object *_SS_rd_lst(SS_psides *si, object *str)
 static object *_SS_rd_vct(SS_psides *si, object *str)
    {object *lst, *vct;
 
-    lst = _SS_rd_lst(si, str);
+    lst = _SS_rd_lst(si, str, 0);
     SS_mark(lst);
     vct = SS_lstvct(si, lst);
     SS_gc(si, lst);
@@ -314,8 +314,8 @@ static object *_SS_rd_atm(SS_psides *si, object *str)
 
 /* _SS_RD_STR - read and make an string object */
 
-static object *_SS_rd_str(SS_psides *si, object *str)
-   {int i, c, nc, bfsz;
+static object *_SS_rd_str(SS_psides *si, object *str, int c)
+   {int i, nc, bfsz;
     int delta;
     char *pt, *bf;
     object *ret;
@@ -363,6 +363,162 @@ static object *_SS_rd_str(SS_psides *si, object *str)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_CHR_EOF - process an EOF */
+
+static object *_SS_chr_eof(SS_psides *si, object *str, int c)
+   {object *rv;
+
+    rv = SS_eof;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_CHR_QUOTE - read from a ' */
+
+static object *_SS_chr_quote(SS_psides *si, object *str, int c)
+   {object *rv;
+
+    rv = SS_mk_cons(si, SS_quoteproc,
+		    SS_mk_cons(si, READ_EXPR(str),
+			       SS_null));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_CHR_QUASIQUOTE - read from a ` */
+
+static object *_SS_chr_quasiquote(SS_psides *si, object *str, int c)
+   {object *rv;
+
+    rv = SS_mk_cons(si, SS_quasiproc,
+		    SS_mk_cons(si, READ_EXPR(str),
+			       SS_null));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_CHR_UNQUOTE - read from a , */
+
+static object *_SS_chr_unquote(SS_psides *si, object *str, int c)
+   {object *rv;
+
+    c = SS_get_ch(si, str, TRUE);
+    if (c == '@')
+       rv = SS_mk_cons(si, SS_unqspproc,
+		       SS_mk_cons(si, READ_EXPR(str),
+				  SS_null));
+    else
+       {PUSH_CHAR(c, str);
+	rv = SS_mk_cons(si, SS_unqproc,
+			SS_mk_cons(si, READ_EXPR(str),
+				   SS_null));};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_CHR_ERROR - you have an error if you get a ')' */
+
+static object *_SS_chr_error(SS_psides *si, object *str, int c)
+   {object *rv;
+    input_port *prt;
+
+    rv = SS_f;
+
+    prt = SS_GET(input_port, str);
+
+    PRINT(stdout, "SYNTAX ERROR: '%c' on line %d char %d in file %s\n",
+	  c, prt->iln, prt->ichr-1, prt->name);
+
+    SS_error(si, "BAILING OUT ON READ - _SS_CHR_ERROR", NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_CHR_ATOM - read an atom */
+
+static object *_SS_chr_atom(SS_psides *si, object *str, int c)
+   {object *rv;
+
+    PUSH_CHAR(c, str);
+    rv = _SS_rd_atm(si, str);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_CHR_BLOCK - read a C block */
+
+static object *_SS_chr_block(SS_psides *si, object *str, int c)
+   {object *rv;
+    extern object *SS_syntax_c(SS_psides *si, object *str);
+
+    PUSH_CHAR(c, str);
+    rv = SS_syntax_c(si, str);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_CHR_POUND - read an object beginning with '#' */
+
+static object *_SS_chr_pound(SS_psides *si, object *str, int c)
+   {object *rv;
+
+    c = SS_get_ch(si, str, FALSE);
+    if (c == '(')
+       rv = _SS_rd_vct(si, str);
+    else
+       {PUSH_CHAR(c, str);
+	PUSH_CHAR('#', str);
+	rv = _SS_rd_atm(si, str);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_SET_CHAR_MAP - setup the character map for the C level reader */
+
+void _SS_set_char_map(void)
+   {int i;
+
+    for (i = 0; i < 256; i++)
+        _SS.chr_tab[i] = _SS_chr_atom;
+
+    _SS.chr_tab[EOF]  = _SS_chr_eof;
+    _SS.chr_tab['(']  = _SS_rd_lst;
+    _SS.chr_tab['\"'] = _SS_rd_str;
+    _SS.chr_tab['\''] = _SS_chr_quote;
+    _SS.chr_tab['`']  = _SS_chr_quasiquote;
+    _SS.chr_tab[',']  = _SS_chr_unquote;
+    _SS.chr_tab[')']  = _SS_chr_error;
+
+
+#ifdef HAVE_C_SYNTAX
+    _SS.chr_tab['{']  = _SS_chr_block;
+#endif
+
+#ifdef LARGE
+    _SS.chr_tab['#']  = _SS_chr_pound;
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_PR_READ - the C level reader */
 
 static object *_SS_pr_read(SS_psides *si, object *str)
@@ -392,11 +548,11 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 #endif
 
         case '(' :
-	     rv = _SS_rd_lst(si, str);
+	     rv = _SS_rd_lst(si, str, c);
 	     break;
 
         case '\"':
-	     rv = _SS_rd_str(si, str);
+	     rv = _SS_rd_str(si, str, c);
 	     break;
 
         case '\'':
