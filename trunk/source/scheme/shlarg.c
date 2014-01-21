@@ -240,10 +240,14 @@ object *_SSI_define_global(SS_psides *si, object *argl)
 		t = SS_params(si, val);};};}
 
     else
-       SS_error(si, "CAN'T DEFINE NON-VARIABLE OBJECT - _SSI_DEFINE_GLOBAL", argl);
+       SS_error(si, "CAN'T DEFINE NON-VARIABLE OBJECT - _SSI_DEFINE_GLOBAL",
+		argl);
 
-    if (strcmp(SS_PROCEDURE_NAME(si->fun), "define-global-macro") == 0)
+    s = SS_PROCEDURE_NAME(si->fun);
+    if (strcmp(s, "define-global-macro") == 0)
        SS_PROCEDURE_TYPE(val) = SS_MACRO;
+    else if (strcmp(s, "define-global-macro-ev") == 0)
+       SS_PROCEDURE_TYPE(val) = SS_MACRO_EV;
 
     SS_def_var(si, argl, val, si->global_env);
 
@@ -795,6 +799,11 @@ void _SS_inst_lrg(SS_psides *si)
                _SSI_define_global, SS_UE_MACRO);
 
     SS_install(si, "define-global-macro",
+               "Special Form: defines variables and procedures in the global environment",
+               SS_nargs,
+               _SSI_define_global, SS_UE_MACRO);
+
+    SS_install(si, "define-global-macro-ev",
                "Special Form: defines variables and procedures in the global environment",
                SS_nargs,
                _SSI_define_global, SS_UE_MACRO);

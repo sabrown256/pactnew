@@ -152,7 +152,7 @@ static void _SX_expand_prefix(char *s, int nc)
 static char *_SX_reproc_in(SS_psides *si, char *line)
    {char *rv;
 
-    if (!SX_split_command(_SX.command, line))
+    if (!SX_split_command(_SX.command, MAXLINE, line))
        rv = NULL;
 
     else

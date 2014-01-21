@@ -214,7 +214,7 @@ static char *_UL_reproc_in(SS_psides *si, char *line)
 
     rv = NULL;
 
-    if (SX_split_command(command, line))
+    if (SX_split_command(command, MAXLINE, line))
        {if (!SX_expand_expr(command))
            SS_error(si, "SYNTAX ERROR - _UL_REPROC_IN", SS_null);
 

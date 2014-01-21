@@ -394,6 +394,7 @@ int strcnts(char *s, char *r, int ex)
 
 /* _STRCPY_NEXT - copy S into D upto the first unescaped occurence of
  *              - any character in R
+ *              - return number of characters copied
  *              - features:
  *              -   1) copy no more than min of ND and NS characters
  *              -   2) do not check delimiters in quoted substrings

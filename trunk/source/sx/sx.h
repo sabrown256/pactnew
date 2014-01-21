@@ -705,7 +705,7 @@ extern int
 /* SXCONT.C declarations */
 
 extern int
- SX_split_command(char *cmd, char *lst),
+ SX_split_command(char *cmd, int nc, char *lst),
  SX_expand_expr(char *s);
 
 extern char

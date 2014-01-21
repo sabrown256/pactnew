@@ -38,6 +38,7 @@
 
 typedef struct s_SS_scope_private SS_scope_private;
 typedef struct s_SS_smp_state SS_smp_state;
+typedef object *(*PFSRead)(SS_psides *si, object *str, int c);
 
 struct s_SS_scope_private
    {
@@ -84,6 +85,7 @@ struct s_SS_scope_private
 /* SHREAD.C */
     hasharr *parser_tab;
     substdes *sub;
+    PFSRead chr_tab[256];
 
 /* SHSYNT.C */
     int have_eof;
@@ -331,6 +333,7 @@ extern void
 /* SHREAD.C declarations */
 
 extern void
+ _SS_set_char_map(void),
  _SS_inst_read(SS_psides *si);
 
 extern object
