@@ -158,75 +158,86 @@ if (-f "$signf") then
 
 else if ($deflt == TRUE) then
 
-   set lsys = `$bindir/system-id`
+   set lsys = `system-id`
 
 # unconditionally set these
    if ($ucnd == TRUE) then
-      if ($osh == csh) then
-         echo "setenv PSY_SITE LONER ; "
-      else if ($osh == sh) then
-         echo "PSY_SITE=LONER ; export PSY_SITE ; "
-      endif
-      if ($osh == csh) then
-         echo "setenv PSY_TYPE $lsys ; "
-      else if ($osh == sh) then
-         echo "PSY_TYPE=$lsys ; export PSY_TYPE ; "
-      endif
-      if ($osh == csh) then
-         echo "setenv PSY_AIRoot /usr/local ; "
-      else if ($osh == sh) then
-         echo "PSY_AIRoot=/usr/local ; export PSY_AIRoot ; "
-      endif
-      if ($osh == csh) then
-         echo "setenv PSY_ASRoot /usr/share ; "
-      else if ($osh == sh) then
-         echo "PSY_ASRoot=/usr/share ; export PSY_ASRoot ; "
-      endif
+      setenv PSY_SITE LONER
+      setenv PSY_TYPE $lsys
+      setenv PSY_AIRoot /usr/local
+      setenv PSY_ASRoot /usr/share
 
 # set these only if not already set
    else
       set inf = ( `printenv PSY_SITE` )
       if ("$inf" == "") then
-         if ($osh == csh) then
-            echo "setenv PSY_SITE LONER ; "
-         else if ($osh == sh) then
-            echo "PSY_SITE=LONER ; export PSY_SITE ; "
-         endif
+         setenv PSY_SITE LONER
       endif
 
       set inf = ( `printenv PSY_TYPE` )
       if ("$inf" == "") then
-         if ($osh == csh) then
-            echo "setenv PSY_TYPE $lsys ; "
-         else if ($osh == sh) then
-            echo "PSY_TYPE=$lsys ; export PSY_TYPE ; "
-         endif
+         setenv PSY_TYPE $lsys
       endif
 
       set inf = ( `printenv PSY_AIRoot` )
       if ("$inf" == "") then
-         if ($osh == csh) then
-            echo "setenv PSY_AIRoot /usr/local ; "
-         else if ($osh == sh) then
-            echo "PSY_AIRoot=/usr/local ; export PSY_AIRoot ; "
-         endif
+         setenv PSY_AIRoot /usr/local
       endif
 
       set inf = ( `printenv PSY_ASRoot` )
       if ("$inf" == "") then
-         if ($osh == csh) then
-            echo "setenv PSY_ASRoot /usr/share ; "
-         else if ($osh == sh) then
-            echo "PSY_ASRoot=/usr/share ; export PSY_ASRoot ; "
-         endif
+         setenv PSY_ASRoot /usr/share
       endif
       unset inf
    endif
 
-   echo "$bindir/no-op"
-
    unset lsys
    
+   if ($osh == csh) then
+      echo "setenv PSY_SITE $PSY_SITE ; "
+   else if ($osh == sh) then
+      echo "PSY_SITE=$PSY_SITE ; export PSY_SITE ; "
+   endif
+   if ($osh == csh) then
+      echo "setenv PSY_TYPE $PSY_TYPE ; "
+   else if ($osh == sh) then
+      echo "PSY_TYPE=$PSY_TYPE ; export PSY_TYPE ; "
+   endif
+   if ($osh == csh) then
+      echo "setenv PSY_AIRoot $PSY_AIRoot ; "
+   else if ($osh == sh) then
+      echo "PSY_AIRoot=$PSY_AIRoot ; export PSY_AIRoot ; "
+   endif
+   if ($osh == csh) then
+      echo "setenv PSY_ASRoot $PSY_ASRoot ; "
+   else if ($osh == sh) then
+      echo "PSY_ASRoot=$PSY_ASRoot ; export PSY_ASRoot ; "
+   endif
+
+# emit the old ones for awhile
+   if ($osh == csh) then
+      echo "setenv SYS_SITE $PSY_SITE ; "
+   else if ($osh == sh) then
+      echo "SYS_SITE=$PSY_SITE ; export SYS_SITE ; "
+   endif
+   if ($osh == csh) then
+      echo "setenv SYS_TYPE $PSY_TYPE ; "
+   else if ($osh == sh) then
+      echo "SYS_TYPE=$PSY_TYPE ; export SYS_TYPE ; "
+   endif
+   if ($osh == csh) then
+      echo "setenv DAI_ROOT $PSY_AIRoot ; "
+   else if ($osh == sh) then
+      echo "DAI_ROOT=$PSY_AIRoot ; export DAI_ROOT ; "
+   endif
+   if ($osh == csh) then
+      echo "setenv DAS_ROOT $PSY_ASRoot ; "
+   else if ($osh == sh) then
+      echo "DAS_ROOT=$PSY_ASRoot ; export DAS_ROOT ; "
+   endif
+
+   echo "$bindir/no-op"
+
 endif
 
 unset noglob
