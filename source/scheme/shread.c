@@ -493,11 +493,12 @@ static object *_SS_chr_pound(SS_psides *si, object *str, int c)
 
 void _SS_set_char_map(void)
    {int i;
+    unsigned char leof = EOF;
 
     for (i = 0; i < 256; i++)
         _SS.chr_tab[i] = _SS_chr_atom;
 
-    _SS.chr_tab[EOF]  = _SS_chr_eof;
+    _SS.chr_tab[leof] = _SS_chr_eof;
     _SS.chr_tab['(']  = _SS_rd_lst;
     _SS.chr_tab['\"'] = _SS_rd_str;
     _SS.chr_tab['\''] = _SS_chr_quote;
@@ -523,15 +524,21 @@ void _SS_set_char_map(void)
 
 static object *_SS_pr_read(SS_psides *si, object *str)
    {int c;
-    char *s;
-    input_port *prt;
     object *rv;
 
-    prt = SS_GET(input_port, str);
-    s   = SS_BUFFER(str);
+    c = SS_get_ch(si, str, TRUE);
+
+#if 1
+    unsigned char uc;
+
+    uc = (unsigned char) c;
+    rv = _SS.chr_tab[uc](si, str, c);
+#else
+    char *s;
+
+    s = SS_BUFFER(str);
     SC_ASSERT(s != NULL);
 
-    c = SS_get_ch(si, str, TRUE);
     switch (c)
        {case EOF :
 	     rv = SS_eof;
@@ -590,6 +597,9 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 #endif
 
 	case ')' :
+	     input_port *prt;
+
+	     prt = SS_GET(input_port, str);
              PRINT(stdout, "SYNTAX ERROR: '%c' on line %d char %d in file %s\n",
 		   c, prt->iln, prt->ichr-1, prt->name);
 	     SS_error(si, "BAILING OUT ON READ - _SS_PR_READ", NULL);
@@ -598,6 +608,7 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 	     PUSH_CHAR(c, str);
 	     rv = _SS_rd_atm(si, str);
 	     break;};
+#endif
 
     return(rv);}
 
@@ -1086,6 +1097,8 @@ object *SS_load(SS_psides *si, object *argl)
 
 void _SS_inst_read(SS_psides *si)
    {
+
+    _SS_set_char_map();
 
     SS_install(si, "close-input-file",
                "Procedure: Close the specified input port and release the IN_PORT object",
