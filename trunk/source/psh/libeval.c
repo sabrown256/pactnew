@@ -22,7 +22,7 @@
  */
 
 char *expand_regx(char *d, int nd, char *s)
-   {int id, is, ne, ns, st;
+   {int id, is, ne, ns, st, qu;
     char **da, **sa;
     wordexp_t w;
 
@@ -34,13 +34,20 @@ char *expand_regx(char *d, int nd, char *s)
         {if (sa[is][0] == '\'')
 	    vstrcat(d, nd, "%s ", sa[is]);
 	 else
-	    {st = wordexp(sa[is], &w, 0);
+	    {qu = (sa[is][0] == '"');
+	     st = wordexp(sa[is], &w, 0);
 	     if (st == 0)
 	        {da = w.we_wordv;
 		 ne = w.we_wordc;
 
+		 if (qu == TRUE)
+		    vstrcat(d, nd, "\"");
+
 		 for (id = 0; id < ne; id++)
 		     vstrcat(d, nd, "%s ", da[id]);
+
+		 if (qu == TRUE)
+		    vstrcat(d, nd, "\"");
 
 		 wordfree(&w);}
 	     else
