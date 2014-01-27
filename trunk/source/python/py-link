@@ -219,7 +219,7 @@ NoteD $Log -n "   Python import ... "
 Note $Log ""
 
 # finish up
-flog $Log cp ../pact/{pgs.py,pdb.py} $lpy_pact
+flog $Log cp ../{pgs.py,pdb.py} $lpy_pact
 flog $Log touch $lpy_pact/__init__.py
 
 flog $Log $lpy_exe -c 'import compileall;compileall.main()' $lpy_pact

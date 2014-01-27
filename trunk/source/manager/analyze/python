@@ -177,11 +177,11 @@ if (-d ../../python) then
                   endif
 
                   if (($lpy_vers =~ 2*) && ($lhave_py_numeric == TRUE)) then
-                     flog $ALog set lpy_ext = 2.numeric
+                     flog $ALog set lpy_ext = 2_numeric
                   else if (($lpy_vers =~ 2*) && ($lhave_py_numpy == TRUE)) then
-                     flog $ALog set lpy_ext = 2.numpy
+                     flog $ALog set lpy_ext = 2_numpy
                   else if (($lpy_vers =~ 3*) && ($lhave_py_numpy == TRUE)) then
-                     flog $ALog set lpy_ext = 3.numpy
+                     flog $ALog set lpy_ext = 3_numpy
                   else
                      flog $ALog set lpy_ext = none
                   endif
