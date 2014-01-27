@@ -102,7 +102,7 @@ dbmget $ALog Bits^             \
     endif
        
 # PY_Exe     the full path to the python executable
-# PY_Ext     the extension/wrapper set name (e.g. 2.numpy)
+# PY_Ext     the extension/wrapper set name (e.g. 2_numpy)
 # PY_Vers    the version of the python executable
 # PY_Path    addition to path in order to find python executable
 #            this comes from config files only
