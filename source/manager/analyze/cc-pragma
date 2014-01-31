@@ -32,10 +32,14 @@ int main(int c, char **v)
 EOF
 
 flog $ALog $lCC $Tmp.c -o $Tmp
-if ($status == 0) then
+set xstatus = $status
+if ($xstatus == 0) then
    setenv HAVE_GOOD_OMP_PRAGMAS  TRUE
    NoteD $ALog "      proper pragma handling"
 else
+   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp"
+   flog $ALog cat $Tmp.c
+
    setenv HAVE_GOOD_OMP_PRAGMAS  FALSE
    NoteD $ALog "      bad pragma handling"
 endif

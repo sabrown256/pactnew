@@ -489,6 +489,29 @@ static object *_SS_chr_pound(SS_psides *si, object *str, int c)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_CHR_COMMENT - parse out a comment
+ *                 - return #t if we hit a newline
+ *                 - and #f if we hit EOF
+ */
+
+static object *_SS_chr_comment(SS_psides *si, object *str, int c)
+   {object *rv;
+
+    rv = SS_t;
+
+    while ((rv == SS_t) && ((c = *SS_PTR(str)++) != '\0'))
+       {if (c == EOF)
+	   rv = SS_f;
+        else if ((c == '\n') || (c == '\r'))
+	   {SS_LINE_NUMBER(str)++;
+	    SS_CHAR_INDEX(str) = 1;
+	    break;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_SET_CHAR_MAP - setup the character map for the C level reader */
 
 void _SS_set_char_map(void)
@@ -505,6 +528,7 @@ void _SS_set_char_map(void)
     _SS.chr_tab['`']  = _SS_chr_quasiquote;
     _SS.chr_tab[',']  = _SS_chr_unquote;
     _SS.chr_tab[')']  = _SS_chr_error;
+    _SS.chr_tab[';']  = _SS_chr_comment;
 
 
 #ifdef HAVE_C_SYNTAX
@@ -524,91 +548,12 @@ void _SS_set_char_map(void)
 
 static object *_SS_pr_read(SS_psides *si, object *str)
    {int c;
+    unsigned char uc;
     object *rv;
 
-    c = SS_get_ch(si, str, TRUE);
-
-#if 1
-    unsigned char uc;
-
+    c  = SS_get_ch(si, str, TRUE);
     uc = (unsigned char) c;
     rv = _SS.chr_tab[uc](si, str, c);
-#else
-    char *s;
-
-    s = SS_BUFFER(str);
-    SC_ASSERT(s != NULL);
-
-    switch (c)
-       {case EOF :
-	     rv = SS_eof;
-	     break;
-
-#ifdef HAVE_C_SYNTAX
-        case '{' :
-	     {extern object *SS_syntax_c(SS_psides *si, object *str);
-
-	      PUSH_CHAR(c, str);
-
-	      rv = SS_syntax_c(si, str);};
-	     break;
-#endif
-
-        case '(' :
-	     rv = _SS_rd_lst(si, str, c);
-	     break;
-
-        case '\"':
-	     rv = _SS_rd_str(si, str, c);
-	     break;
-
-        case '\'':
-	     rv = SS_mk_cons(si, SS_quoteproc,
-			     SS_mk_cons(si, READ_EXPR(str),
-					SS_null));
-	     break;
-        case '`' :
-	     rv = SS_mk_cons(si, SS_quasiproc,
-			     SS_mk_cons(si, READ_EXPR(str),
-					SS_null));
-	     break;
-        case ',' :
-	     c = SS_get_ch(si, str, TRUE);
-	     if (c == '@')
-	        rv = SS_mk_cons(si, SS_unqspproc,
-				SS_mk_cons(si, READ_EXPR(str),
-					   SS_null));
-	     else
-	        {PUSH_CHAR(c, str);
-		 rv = SS_mk_cons(si, SS_unqproc,
-				 SS_mk_cons(si, READ_EXPR(str),
-					    SS_null));};
-	     break;
-#ifdef LARGE
-        case '#' :
-	     c = SS_get_ch(si, str, FALSE);
-	     if (c == '(')
-	        rv = _SS_rd_vct(si, str);
-	     else
-	        {PUSH_CHAR(c, str);
-		 PUSH_CHAR('#', str);
-		 rv = _SS_rd_atm(si, str);};
-	     break;
-#endif
-
-	case ')' :
-	     input_port *prt;
-
-	     prt = SS_GET(input_port, str);
-             PRINT(stdout, "SYNTAX ERROR: '%c' on line %d char %d in file %s\n",
-		   c, prt->iln, prt->ichr-1, prt->name);
-	     SS_error(si, "BAILING OUT ON READ - _SS_PR_READ", NULL);
-
-        default :
-	     PUSH_CHAR(c, str);
-	     rv = _SS_rd_atm(si, str);
-	     break;};
-#endif
 
     return(rv);}
 

@@ -30,10 +30,14 @@ int main(int c, char **v)
 EOF
 
 flog $ALog $lCC $Tmp.c -o $Tmp
-if ($status == 0) then
+set xstatus = $status
+if ($xstatus == 0) then
    setenv HAVE_INLINE TRUE
    NoteD $ALog "      has inline support"
 else
+   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp"
+   flog $ALog cat $Tmp.c
+
    setenv HAVE_INLINE FALSE
    NoteD $ALog "      no inline support"
 endif

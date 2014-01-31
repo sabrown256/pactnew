@@ -52,11 +52,15 @@ if ($HAVE_FORTRAN == TRUE) then
 EOF
 
       flog $ALog $lFC $Tmp.f -o $Tmp
-      if ($status != 0) then
-         @ si = 0
-      else
+      set xstatus = $status
+      if ($xstatus == 0) then
          fexec $ALog $CROSS_FE $Tmp @o vw:si
          @ si = ( `$PERDB -e si` )
+      else
+         Note $ALog "Failed ($xstatus): $lFC $Tmp.f -o $Tmp"
+         flog $ALog cat $Tmp.f
+
+         @ si = 0
       endif
       Note $ALog "Fortran integer size = |$si|"
 
@@ -80,7 +84,13 @@ EOF
 
       if ($si > 0) then
          flog $ALog $lCC $Tmp.c -o $Tmp
-         fexvar $ALog FC_INTEGER_C $CROSS_FE $Tmp $si
+         set xstatus = $status
+         if ($xstatus == 0) then
+            fexvar $ALog FC_INTEGER_C $CROSS_FE $Tmp $si
+         else
+            Note $ALog "Failed ($xstatus): $lCC $Tmp.c -o $Tmp"
+            flog $ALog cat $Tmp.c
+         endif
       endif
 
       flog $ALog $RM $Tmp*

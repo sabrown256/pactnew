@@ -39,11 +39,15 @@ EOF
    Note $ALog "Verify working iso_c_binding module"
    flog $ALog cat ${Tmp}_iso.f
    flog $ALog $FC_Exe ${Tmp}_iso.f -c $FC_Flags
-   if ($status == 0) then
+   set xstatus = $status
+   if ($xstatus == 0) then
       setenv HAVE_ISO_C_BINDING TRUE
       NoteD $ALog "      has iso_c_binding module"
       @ err = 0
    else
+      Note $ALog "Failed ($xstatus): $FC_Exe ${Tmp}_iso.f -c $FC_Flags"
+      flog $ALog cat $Tmp.f
+
       setenv HAVE_ISO_C_BINDING FALSE
       NoteD $ALog "      no iso_c_binding module"
       flog $ALog setenv FC_Exe        none

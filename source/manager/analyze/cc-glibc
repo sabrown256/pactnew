@@ -35,7 +35,7 @@ int main(int c, char **v)
 EOF
 
    flog $ALog gcc $Tmp.c -o $Tmp -lc
-   
+   set xstatus = $status   
    set ok = FALSE
    if (-x $Tmp) then
       set lvers = `$Tmp`
@@ -54,6 +54,9 @@ EOF
       unset t
       unset lvers
    else
+      Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp -lc"
+      flog $ALog cat $Tmp.c
+
       NoteD $ALog "      no GNU LibC version"
    endif
 

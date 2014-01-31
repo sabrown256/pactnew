@@ -26,7 +26,7 @@ static INLINE int EOI(object *str)
 /* NOTE: we were doing this for years
     rv = (((p != s) && (*(p - 1) == '\n')) || (*p == '\0'));
  *
- * but is was found using a 'here' document in a shell script that
+ * but it was found using a 'here' document in a shell script that
  * the case of multiple expressions separated by '\n' requires
  * this:
  */
@@ -88,6 +88,8 @@ static int _SS_get_input(SS_psides *si, object *str)
 
 int SS_get_ch(SS_psides *si, object *str, int ign_ws)
    {int c, ok, st;
+    unsigned char uc;
+    object *o;
 
     if (si->pr_gets == NULL)
        si->pr_gets = _SS_get_input;
@@ -119,6 +121,10 @@ int SS_get_ch(SS_psides *si, object *str, int ign_ws)
                  case ' ' :
 		      break;
                  case ';' :
+		      uc = (unsigned char) c;
+		      o  = _SS.chr_tab[uc](si, str, c);
+		      ok = (o == SS_t);
+#if 0
 		      while ((ok == TRUE) && ((c = *SS_PTR(str)++) != '\0'))
 		         {if (c == EOF)
 			     ok = FALSE;
@@ -126,6 +132,7 @@ int SS_get_ch(SS_psides *si, object *str, int ign_ws)
 			     {SS_LINE_NUMBER(str)++;
 			      SS_CHAR_INDEX(str) = 1;
 			      break;};};
+#endif
 		      break;
 
                  default :
