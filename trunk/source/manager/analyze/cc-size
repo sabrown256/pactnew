@@ -33,9 +33,13 @@ int main(int c, char **v)
 EOF
 
 flog $ALog $lCC $Tmp.c -o $Tmp
-if ($status != 0) then
+set xstatus = $status
+if ($xstatus == 0) then
    setenv HAVE_LONG_LONG FALSE
 else
+   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp"
+   flog $ALog cat $Tmp.c
+
    setenv HAVE_LONG_LONG TRUE
 endif
 
@@ -60,8 +64,11 @@ return(0);}
 EOF
 
 flog $ALog $lCC $Tmp.c -o $Tmp
-if ($status == 0) then
+set xstatus = $status
+if ($xstatus == 0) then
    fexec $ALog $CROSS_FE $Tmp @o2 @e3 vw:AF_INT4 @ fw:/dev/null
+else
+   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp"
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -128,8 +135,12 @@ EOF
 COMPILE:
 
 flog $ALog $lCC $Tmp.c -o $Tmp
-if ($status == 0) then
+set xstatus = $status
+if ($xstatus == 0) then
    fexec $ALog $CROSS_FE $Tmp @o2 @e3 vw:AF_INT8 @ fw:/dev/null
+else
+   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp"
+   flog $ALog cat $Tmp.c
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp

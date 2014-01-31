@@ -40,14 +40,18 @@ if ($HAVE_FORTRAN == TRUE) then
       Note $ALog ""
       Note $ALog "Compile getkinds.f"
       flog $ALog $lFC $lsdir/getkinds.f -o getkinds
-      if ($status != 0) then
-         Note $ALog "      Cannot compile getkinds.f"
-      else
+      set xstatus = $status
+      if ($xstatus == 0) then
          flog $ALog ($CROSS_FE ./getkinds >&! getbytes.f)
          if ($status != 0) then
             NoteD $ALog "      Cannot determine Fortran kinds"
             flog $ALog cat getbytes.f
          endif
+      else
+         Note $ALog "Failed ($xstatus): $lFC $lsdir/getkinds.f -o getkinds"
+         flog $ALog cat $Tmp.f
+
+         Note $ALog "      Cannot compile getkinds.f"
       endif
 
 # compile and link getbytes
@@ -57,14 +61,22 @@ if ($HAVE_FORTRAN == TRUE) then
       Note $ALog ""
       Note $ALog "Compile csizer.c"
       flog $ALog $lCC -I../.. -c $lsdir/csizer.c -o csizer.o
-      if ($status != 0) then
+      set xstatus = $status
+      if ($xstatus != 0) then
+         Note $ALog "Failed ($xstatus): $lCC -I../.. -c $lsdir/csizer.c -o csizer.o"
+         flog $ALog cat $Tmp.c
+
          Note $ALog "      Cannot compile csizer.c"
       endif
 
       Note $ALog ""
       Note $ALog "Compile getbytes.f"
       flog $ALog $lFC getbytes.f csizer.o -o getbytes
-      if ($status != 0) then
+      set xstatus = $status
+      if ($xstatus != 0) then
+         Note $ALog "Failed ($xstatus): $lFC getbytes.f csizer.o -o getbytes"
+         flog $ALog cat $Tmp.f
+
          Note $ALog "      Cannot compile getbytes.f"
       endif
 
@@ -84,7 +96,11 @@ if ($HAVE_FORTRAN == TRUE) then
       Note $ALog ""
       Note $ALog "Compiler genfiles.c"
       flog $ALog $lCC -I../.. $lsdir/genfiles.c -o genfiles
-      if ($status != 0) then
+      set xstatus = $status
+      if ($xstatus != 0) then
+         Note $ALog "Failed ($xstatus): $lCC -I../.. $lsdir/genfiles.c -o genfiles"
+         flog $ALog cat $Tmp.c
+
          Note $ALog "      Cannot compile genfiles.c"
       else
          flog $ALog $CROSS_FE ./genfiles

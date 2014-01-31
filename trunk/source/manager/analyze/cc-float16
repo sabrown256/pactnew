@@ -51,8 +51,6 @@ int main(int c, char **v)
     return(rv);}
 EOF
 
-flog $ALog cat $Tmp.c
-
 # AF_LONG_DOUBLE
 #   0 - no long double support
 #   1 - have non-standard long double support
@@ -63,7 +61,8 @@ setenv AF_LONG_DOUBLE 0
 set ld = "no long double support"
 
 flog $ALog $lCC $Tmp.c -o $Tmp -lm
-if ($status == 0) then
+set xstatus = $status
+if ($xstatus == 0) then
    fexec $ALog $CROSS_FE $Tmp @o2 @e3 fa:$ALog @ vw:HAVE_ANSI_FLOAT16
    flog $ALog setenv AF_LONG_DOUBLE $gstatus[1]
    if ($AF_LONG_DOUBLE == 2) then
@@ -71,6 +70,9 @@ if ($status == 0) then
    else
       set ld = "has broken long double support"
    endif
+else
+   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp -lm"
+   flog $ALog cat $Tmp.c
 endif
 
 rm -f $Tmp $Tmp.c $Tmp.o
@@ -107,18 +109,20 @@ int main(int c, char **v)
     return(rv);}
 EOF
 
-flog $ALog cat $Tmp.c
-
 # AF_LONG_DOUBLE_IO
 #   0 - no long double I/O
 #   1 - have non-standard long double I/O (%le instead of %Le)
 #   2 - have standard long double I/O (%Le)
 
 flog $ALog $lCC $Tmp.c -o $Tmp -lm
-if ($status == 0) then
+set xstatus = $status
+if ($xstatus == 0) then
    fexvars $ALog ldio $CROSS_FE $Tmp
    flog $ALog setenv AF_LONG_DOUBLE_IO $gstatus[1]
 else
+   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp -lm"
+   flog $ALog cat $Tmp.c
+
    flog $ALog set ldio = "no long double I/O"
    flog $ALog setenv AF_LONG_DOUBLE_IO 0
 endif

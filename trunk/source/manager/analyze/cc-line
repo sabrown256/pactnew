@@ -34,10 +34,14 @@ cat << EOF >! $BC
 EOF
 
 flog $ALog $Cfe_CC_Exe -c $AC -o $AO
-if ($status == 0) then
+set xstatus = $status
+if ($xstatus == 0) then
    setenv HAVE_BAD_LINE_DIRECTIVES FALSE
    NoteD $ALog "      proper line directive handling"
 else
+   Note $ALog "Failed ($xstatus): $Cfe_CC_Exe -c $AC -o $AO"
+   flog $ALog cat $Tmp.c
+
    setenv HAVE_BAD_LINE_DIRECTIVES TRUE
    NoteD $ALog "      bad line directive handling"
 endif
