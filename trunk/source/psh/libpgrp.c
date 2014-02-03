@@ -381,6 +381,138 @@ void dprgio(char *tag, int n, process **pa, process **ca)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+  
+/* INIT_SESSION - initialize a process session instance
+ *              - setup OS level process group properly
+ *              - make sure the session is running interactively
+ *              - as the foreground job before proceeding
+ */
+     
+process_session *init_session(void)
+   {int pgid, tid, fin, iact;
+    struct termios attr;
+    process_session *ps;
+     
+    ps   = NULL;
+    fin  = STDIN_FILENO;
+    iact = isatty(fin);
+     
+    if (iact == TRUE)
+
+/* make sure we are in the foreground */
+       {while (TRUE)
+	  {pgid = getpgrp();
+	   tid  = tcgetpgrp(fin);
+	   if (tid == pgid)
+	      break;
+	   kill(-pgid, SIGTTIN);};
+     
+/* ignore interactive and job-control signals */
+#if 0
+	signal(SIGINT,  SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
+	signal(SIGTTIN, SIG_IGN);
+	signal(SIGTTOU, SIG_IGN);
+	signal(SIGCHLD, SIG_IGN);
+#else
+	nsigaction(NULL, SIGINT,  SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGQUIT, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTSTP, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTIN, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTOU, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGCHLD, SIG_IGN, SA_RESTART, -1);
+#endif
+
+/* put the current process in its own group */
+	pgid = getpid();
+	if (setpgid(pgid, pgid) < 0)
+	   _dbg(-1, "Couldn't put the session in its own process group");
+
+	else
+     
+/* take control of the terminal */
+	   {tcsetpgrp(fin, pgid);
+     
+/* save default terminal attributes for session */
+	    tcgetattr(fin, &attr);
+
+	    ps = MAKE(process_session);
+	    if (ps != NULL)
+	       {ps->pgid        = pgid;
+		ps->terminal    = fin;
+		ps->interactive = iact;
+		ps->foreground  = TRUE;
+		ps->attr        = attr;};};};
+
+    return(ps);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* JOB_FOREGROUND - put PP in the foreground
+ *                - if cont is TRUE restore the saved terminal modes and
+ *                - send the process group a SIGCONT signal to
+ *                - wake it up before we block
+ */
+     
+void job_foreground(process_session *ps, process *pp, int cont)
+   {int pgid, st;
+    struct termios attr;
+
+/*    attr = pp->trm_attr; */
+
+/* put the job into the foreground  */
+    tcsetpgrp(ps->terminal, pp->pgid);
+     
+/* send the job a continue signal, if necessary */
+    if (cont == TRUE)
+       {pgid = pp->pgid;
+	st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
+	st = kill(-pgid, SIGCONT);
+	if (st < 0)
+	   perror("SIGCONT");};
+     
+/* wait for it to report */
+    job_wait(pp);
+     
+/* put the shell back in the foreground */
+    tcsetpgrp(ps->terminal, ps->pgid);
+     
+/* restore the shell's terminal modes */
+    tcgetattr(ps->terminal, &attr);
+    tcsetattr(ps->terminal, TCSADRAIN, &ps->attr);
+
+    ps->foreground = TRUE;
+
+/*    pp->trm_attr = attr; */
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* JOB_BACKGROUND - put PP in the background
+ *                - if CONT is TRUE send the process group
+ *                - a SIGCONT signal to wake it up
+ */
+     
+void job_background(process_group *pg, process *pp, int cont)
+   {int pgid, st;
+
+/* send the job a continue signal */
+    if (cont == TRUE)
+       {pgid = pp->pgid;
+	st = kill(-pgid, SIGCONT);
+        if (st < 0)
+           perror("SIGCONT");};
+
+    pg->fg = FALSE;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                               GROUP ROUTINES                             */
 
@@ -1305,7 +1437,7 @@ char **subst_syntax(char **sa)
 /* PARSE_PGRP - parse out specifications in S to initialize PG */
 
 static void parse_pgrp(statement *s)
-   {int i, j, it, nc, dosh, doif, term;
+   {int i, j, it, nc, fg, dosh, doif, term;
     char *t, *shell;
     char **sa, **ta, **env, **ios;
     process **pa, **ca;
@@ -1326,6 +1458,13 @@ static void parse_pgrp(statement *s)
     sa = subst_syntax(sa);
     nc = lst_length(sa);
 
+/* if the final token is "&" then run the process group in the
+ * background
+ */
+    fg = (strcmp(sa[nc-1], "&") != 0);
+    if (fg == FALSE)
+       nc--;
+
 /* maximum number of process would be the number of tokens */
     pa = MAKE_N(process *, nc);
     ca = MAKE_N(process *, nc);
@@ -1334,6 +1473,7 @@ static void parse_pgrp(statement *s)
     if (pg != NULL)
        {pg->np       = 0;
 	pg->to       = 0;
+	pg->fg       = fg;
 	pg->mode     = NULL;
 	pg->shell    = shell;
 	pg->env      = env;
@@ -2099,11 +2239,63 @@ int group_exit_status(int *st, int ne)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WAIT_PGRP - wait for process group to complete
+ *           - return status
+ *           - this will need to be called at some point even
+ *           - for background process groups
+ */
+
+int wait_pgrp(process_group_state *ps, statement *s)
+   {int i, ne, np, rv, fd, tc;
+    char *db;
+    process *pp;
+    process_group *pg;
+
+    rv = -1;
+    pg = s->pg;
+    ne = s->ne;
+    np = s->np;
+
+/* load up the process stack */
+    for (i = 0; i < np; i++)
+        {pp = pg->parents[i];
+	 fd = pp->io[0].fd;
+
+	 ps->stck.proc[i]       = pp;
+	 ps->stck.fd[i].fd      = fd;
+	 ps->stck.fd[i].events  = ps->stck.mask_acc;
+	 ps->stck.fd[i].revents = 0;};
+
+/* wait for the work to complete - _pgrp_work does the work */
+    tc = await(ps->to_sec, 1, "commands", _pgrp_tty, _pgrp_work, s);
+    ASSERT(tc >= 0);
+
+/* close out the jobs */
+    afin(_pgrp_fin);
+
+/* free up the process memory */
+    for (i = 0; i < np; i++)
+        {FREE(pg->parents[i]);
+	 FREE(pg->children[i]);};
+    FREE(pg->parents);
+    FREE(pg->children);
+
+/* process the exit statuses */
+    rv = group_exit_status(s->st, ne);
+
+    db = getenv("PERDB_PATH");
+    if (IS_NULL(db) == FALSE)
+       dbset(NULL, "gstatus", ps->gstatus);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* RUN_PGRP - run the process group PG */
 
 static int run_pgrp(statement *s)
-   {int i, io, ne, np, rv, tc, fd;
-    char *db;
+   {int i, io, ne, rv, fg;
     process *pp, *cp;
     process_group *pg;
     process_group_state *ps;
@@ -2115,6 +2307,7 @@ static int run_pgrp(statement *s)
     if ((s != NULL) && (ps != NULL))
        {pg = s->pg;
 	ne = s->ne;
+	fg = pg->fg;
 
 	s->st = MAKE_N(int, ne);
 
@@ -2124,8 +2317,6 @@ static int run_pgrp(statement *s)
 	        s->nf++;
 	     else
 	        s->np++;};
-
-	np = s->np;
 
 	asetup(ne, 1);
 
@@ -2149,6 +2340,9 @@ static int run_pgrp(statement *s)
 		 for (io = 0; io < N_IO_CHANNELS; io++)
  		     _io_file_ptr(pp, io);};
 
+	     if (fg == FALSE)
+	        job_background(pg, pp, FALSE);
+
 	     pp->accept   = _pgrp_accept;
 	     pp->reject   = _pgrp_reject;
 	     pp->wait     = _pgrp_wait;
@@ -2157,36 +2351,8 @@ static int run_pgrp(statement *s)
 
 	     ASSERT(rv == 0);};
 
-/* load up the process stack */
-	for (i = 0; i < np; i++)
-	    {pp = pg->parents[i];
-	     fd = pp->io[0].fd;
-
-	     ps->stck.proc[i]       = pp;
-	     ps->stck.fd[i].fd      = fd;
-	     ps->stck.fd[i].events  = ps->stck.mask_acc;
-	     ps->stck.fd[i].revents = 0;};
-
-/* wait for the work to complete - _pgrp_work does the work */
-	tc = await(ps->to_sec, 1, "commands", _pgrp_tty, _pgrp_work, s);
-	ASSERT(tc >= 0);
-
-/* close out the jobs */
-	afin(_pgrp_fin);
-
-/* free up the process memory */
-	for (i = 0; i < np; i++)
-	    {FREE(pg->parents[i]);
-	     FREE(pg->children[i]);};
-	FREE(pg->parents);
-	FREE(pg->children);
-
-/* process the exit statuses */
-	rv = group_exit_status(s->st, ne);
-
-	db = getenv("PERDB_PATH");
-	if (IS_NULL(db) == FALSE)
-	   dbset(NULL, "gstatus", ps->gstatus);};
+	if (fg == TRUE)
+           rv = wait_pgrp(ps, s);};
 
     return(rv);}
 
@@ -2323,138 +2489,6 @@ statement *parse_statement(char *s, char **env, char *shell,
 	FREE(t);};
 
     return(sa);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-  
-/* INIT_SESSION - initialize a process session instance
- *              - setup OS level process group properly
- *              - make sure the session is running interactively
- *              - as the foreground job before proceeding
- */
-     
-process_session *init_session(void)
-   {int pgid, tid, fin, iact;
-    struct termios attr;
-    process_session *ps;
-     
-    ps   = NULL;
-    fin  = STDIN_FILENO;
-    iact = isatty(fin);
-     
-    if (iact == TRUE)
-
-/* make sure we are in the foreground */
-       {while (TRUE)
-	  {pgid = getpgrp();
-	   tid  = tcgetpgrp(fin);
-	   if (tid == pgid)
-	      break;
-	   kill(-pgid, SIGTTIN);};
-     
-/* ignore interactive and job-control signals */
-#if 0
-	signal(SIGINT,  SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGTSTP, SIG_IGN);
-	signal(SIGTTIN, SIG_IGN);
-	signal(SIGTTOU, SIG_IGN);
-	signal(SIGCHLD, SIG_IGN);
-#else
-	nsigaction(NULL, SIGINT,  SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGQUIT, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGTSTP, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGTTIN, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGTTOU, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGCHLD, SIG_IGN, SA_RESTART, -1);
-#endif
-
-/* put the current process in its own group */
-	pgid = getpid();
-	if (setpgid(pgid, pgid) < 0)
-	   _dbg(-1, "Couldn't put the session in its own process group");
-
-	else
-     
-/* take control of the terminal */
-	   {tcsetpgrp(fin, pgid);
-     
-/* save default terminal attributes for session */
-	    tcgetattr(fin, &attr);
-
-	    ps = MAKE(process_session);
-	    if (ps != NULL)
-	       {ps->pgid        = pgid;
-		ps->terminal    = fin;
-		ps->interactive = iact;
-		ps->foreground  = TRUE;
-		ps->attr        = attr;};};};
-
-    return(ps);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* JOB_FOREGROUND - put PP in the foreground
- *                - if cont is TRUE restore the saved terminal modes and
- *                - send the process group a SIGCONT signal to
- *                - wake it up before we block
- */
-     
-void job_foreground(process_session *ps, process *pp, int cont)
-   {int pgid, st;
-    struct termios attr;
-
-/*    attr = pp->trm_attr; */
-
-/* put the job into the foreground  */
-    tcsetpgrp(ps->terminal, pp->pgid);
-     
-/* send the job a continue signal, if necessary */
-    if (cont == TRUE)
-       {pgid = pp->pgid;
-	st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
-	st = kill(-pgid, SIGCONT);
-	if (st < 0)
-	   perror("SIGCONT");};
-     
-/* wait for it to report */
-    job_wait(pp);
-     
-/* put the shell back in the foreground */
-    tcsetpgrp(ps->terminal, ps->pgid);
-     
-/* restore the shell's terminal modes */
-    tcgetattr(ps->terminal, &attr);
-    tcsetattr(ps->terminal, TCSADRAIN, &ps->attr);
-
-    ps->foreground = TRUE;
-
-/*    pp->trm_attr = attr; */
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* JOB_BACKGROUND - put PP in the background
- *                - if CONT is TRUE send the process group
- *                - a SIGCONT signal to wake it up
- */
-     
-void job_background(process_session *ps, process *pp, int cont)
-   {int pgid, st;
-
-/* send the job a continue signal */
-    if (cont == TRUE)
-       {pgid = pp->pgid;
-	st = kill(-pgid, SIGCONT);
-        if (st < 0)
-           perror("SIGCONT");};
-
-    ps->foreground = FALSE;
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

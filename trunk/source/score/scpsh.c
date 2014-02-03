@@ -94,6 +94,7 @@
 #define afin 			PS_afin
 #define alaunch 		PS_alaunch
 #define amap 			PS_amap
+#define anotify			PS_anotify
 #define apoll 			PS_apoll
 #define append_tok 		PS_append_tok
 #define arelaunch 		PS_arelaunch
