@@ -60,6 +60,7 @@ extern void
  _PS_job_child_prelim(process *pp),
  PS_job_wait(process *pp),
  PS_asetup(int n, int na),
+ PS_anotify(void),
  PS_amap(void (*f)(process *pp, void *a));
 
 extern int
@@ -244,7 +245,7 @@ extern void
  _PS_pgrp_fin(process *pp, void *a),
  PS_register_io_pgrp(process_group *pg),
  PS_job_foreground(process_session *ps, process *pp, int cont),
- PS_job_background(process_session *ps, process *pp, int cont);
+ PS_job_background(process_group *pg, process *pp, int cont);
 
 extern int
  _PS_kind_io(io_kind k),

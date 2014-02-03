@@ -226,6 +226,7 @@ struct s_process
 struct s_process_group
    {int np;                 /* number of processes in group */
     int to;                 /* group time out */
+    int fg;                 /* foreground process group iff TRUE */
     char *mode;             /* IPC mode */
     char *shell;
     char **env;
@@ -2132,6 +2133,43 @@ int apoll(int to)
 	        nrdy = _apoll_child(ps, i, nrdy);};};
 
     return(nrdy);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ANOTIFY - print status of asynchronous jobs on the stack
+ *         - for purposes of notifying users
+ */
+
+void anotify(void)
+   {int ip, np;
+    char *msg;
+    process *pp;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
+
+    np = ps->stck.np;
+
+    for (ip = 0; ip < np; ip++)
+        {pp = ps->stck.proc[ip];
+	 switch (pp->status)
+	    {case JOB_STOPPED :
+                  msg = "stopped";
+	          break;
+	     case JOB_EXITED :
+                  msg = "completed";
+	          break;
+	     case JOB_SIGNALED :
+                  msg = "signaled";
+	          break;
+	     default :
+                  msg = "running";
+	          break;};
+
+	 printf("%d %-10s: %s\n", pp->id, msg, pp->cmd);};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
