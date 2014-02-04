@@ -61,6 +61,30 @@
 #define VA_END                                                               \
     va_end(__a__);}
 
+
+/* NOTE: the compcert compiler does not support variable args
+ * so emulate the calls to get through the compiler
+ * it will not run but the warnings will be useful
+ */
+
+#ifdef __COMPCERT__
+
+#define __builtin_va_start(a, b) _junk_va_start(a, &b)
+#define __builtin_va_end(a)      _junk_va_end(a)
+#define __builtin_va_arg(a, b)   *(b *) _junk_va_arg(a, #b)
+
+void _junk_va_start(va_list a, void *b)
+   {return;}
+
+void _junk_va_end(va_list a)
+   {return;}
+
+void *_junk_va_arg(va_list a, char *b)
+   {return((void *) 0);}
+
+#endif
+
+
 #define IS_NULL(_s)  (((_s) == NULL) || ((_s)[0] == '\0'))
 
 extern int

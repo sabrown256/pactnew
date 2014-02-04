@@ -225,7 +225,14 @@ EOF
 #                      - NOTE: lCC is used in the cc-xxx scripts
 #                      - which are executed below
 
-   setenv lCC   `echo $Cfe_CC_Exe $Cfe_CC_Flags $lrpath | sed 's|\"||g'`
+   set lcc = `which $Cfe_CC_Exe`
+   if ("$lcc" =~ $PSY_AIRoot/pact/scripts/*) then
+      setenv lCC   `echo $Cfe_CC_Exe -cwvrb $Cfe_CC_Flags $lrpath | sed 's|\"||g'`
+   else
+      setenv lCC   `echo $Cfe_CC_Exe $Cfe_CC_Flags $lrpath | sed 's|\"||g'`
+   endif
+   Note $ALog "lCC = $lCC"
+   unset lcc
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
