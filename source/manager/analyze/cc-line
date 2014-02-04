@@ -40,7 +40,8 @@ if ($xstatus == 0) then
    NoteD $ALog "      proper line directive handling"
 else
    Note $ALog "Failed ($xstatus): $Cfe_CC_Exe -c $AC -o $AO"
-   flog $ALog cat $Tmp.c
+   flog $ALog cat $BC
+   flog $ALog cat $AC
 
    setenv HAVE_BAD_LINE_DIRECTIVES TRUE
    NoteD $ALog "      bad line directive handling"

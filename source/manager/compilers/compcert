@@ -1,0 +1,119 @@
+#
+# COMPCERT - define COMPCERT compiler
+#
+# include "cpyright.h"
+#
+
+run analyze/rpath compcert
+
+Group OCV {
+   CC      ?= ccomp
+   CXX     ?= g++
+   FC      ?= gfortran
+   LD      ?= 
+   CC_Cfg  ?= gcc
+   FC_Cfg  ?= gfortran
+   FC_Ext  ?= 
+}
+
+Tool CC {
+   Exe       = ${OCV_CC}
+   Flags     = -flongdouble -fvararg-calls
+   Debug     = -g
+   Optimize  = 
+   Profile   = 
+   Version   = 
+}
+
+Tool FC {
+   Exe       = ${OCV_FC}
+   Flags     = -ffloat-store -ffree-form
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                 4.*   = -fsignaling-nans ;
+                 4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
+   Flags    += ${OCV_FC_Ext}
+   Flags    += ${OCV_Bits}
+   Flags    += ${OCV_PIC}
+   Flags    += [ _cmd_ = -p ;                   # profiling
+                 on    = $FC_Profile ]
+   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
+                 on    = -fprofile-arcs -ftest-coverage ]
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Profile   = -pg
+   Version   = -v
+}
+
+Tool CXX {
+   Exe       = ${OCV_CXX}
+   Flags     = 
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
+Tool LD {
+   Exe      = ${OCV_LD}
+   RPath    = ${OCV_RPath}
+   Flags   += ${OCV_LD}
+#   Flags   += [ _env_ = PACT_CC_VERSION ;        # memory and thread checks
+#                4.8.* >= -pie ]
+   Flags   += [ _cmd_ = -p ;                      # profiling
+                on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;                    # coverage analysis
+                on    = -lgcov ]
+   Lib      = ${OCV_LD_Lib}
+}
+
+Tool Lex {
+   Flags  = -w
+   Flags += ${OCV_Bits}
+   Flags += ${OCV_PIC}
+}
+
+Group AF {
+   PATTERN_WARN = ":+sp+warning:"
+   PATTERN_ERR  = ":+sp+error:"
+}
+
+Group Std {
+   CC_Flags = ${CC_Flags}
+   FC_Flags = ${FC_Flags}
+   LD_Flags = ${LD_Flags}
+}
+
+Group Cfg {
+   Use    = Std
+   CC_Exe = ${OCV_CC_Cfg}
+   FC_Exe = ${OCV_FC_Cfg}
+}
+
+Group Shared {
+   LD_Exe   = ${OCV_CC}
+   CC_Flags = 
+   LD_Flags = ${OCV_Sh}
+   LD_Lib   = ${OCV_ShLb}
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Flags  = 
+   LD_Flags  = 
+   LD_Lib    = 
+   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                4.6.0  <  yes ;
+                4.6.0  >= no ]
+}
+
+Group Python {
+   CC_Exe      = ${OCV_CC}
+   CC_Debug    = ${CC_Debug}
+   CC_Optimize = ${CC_Optimize}
+}
+
+include cpp-rule
+include serial
+

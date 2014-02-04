@@ -87,8 +87,6 @@ int main(int c, char **v)
     return(rv);}
 EOF
 
-   flog $ALog cat $Tmp.c
-
    set msg = "no complex in va_arg"
 
    flog $ALog $lCC -c $Tmp.c -o $Tmp
@@ -101,6 +99,7 @@ EOF
       endif
    else
       Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp.o"
+      flog $ALog cat $Tmp.c
    endif
 
    NoteD $ALog "      $msg"
