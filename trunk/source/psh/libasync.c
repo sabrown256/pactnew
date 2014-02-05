@@ -99,6 +99,7 @@
 # include "common.h"
 # include "posix.h"
 # include "network.h"
+# include "libstack.c"
 
 /*--------------------------------------------------------------------------*/
 
@@ -170,13 +171,16 @@ enum e_shell_option
 
 typedef enum e_shell_option shell_option;
 
+typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp,
+		      char *name, int c, char **v);
+
 typedef struct pollfd apollfd;
 typedef struct s_process process;
 typedef struct s_process_group process_group;
 typedef struct s_process_stack process_stack;
 typedef struct s_iodes iodes;
 typedef struct process_group_state process_group_state;
-
+typedef struct s_process_session process_session;
 
 /* NOTE: one of the difficulties in managing the connections between
  * processes is keeping track of which elements are about the connection
@@ -223,16 +227,25 @@ struct s_process
     struct rusage ru;
     void *a;};                 /* external data associated with the process */
 
+struct s_process_session
+   {pid_t pgid;                     /* OS process group id */
+    int terminal;                   /* file descriptor of stdin */
+    int interactive;                /* TRUE iff interactive session */
+    int foreground;                 /* TRUE iff current job is foreground */
+    struct termios attr;};          /* terminal attributes */
+
 struct s_process_group
    {int np;                 /* number of processes in group */
     int to;                 /* group time out */
-    int fg;                 /* foreground process group iff TRUE */
+    int *st;                /* exit statuses of group members */
     char *mode;             /* IPC mode */
     char *shell;
     char **env;
     process *terminal;      /* terminal process */
     process **parents;      /* parent process array */
-    process **children;};   /* child process array */
+    process **children;     /* child process array */
+    process_session sess;
+    PFPCAL (*map)(char *nm);};
 
 struct s_process_stack
    {int ip;
@@ -260,6 +273,7 @@ struct process_group_state
     shell_option ofmt;
     io_device medium;
     process_stack stck;
+    vstack *pg;
     sigjmp_buf cpu;};
 #endif
 
@@ -290,6 +304,8 @@ process_group_state *get_process_group_state(void)
 					NULL, NULL, NULL, NULL}, };
 
     ps = &st;
+    if (ps->pg == NULL)
+       ps->pg = make_stk("process_group *", 4);
 
     return(ps);}
 
@@ -1094,6 +1110,8 @@ int _do_rlimit(char *vr)
 	vl++;
 
 	op = -1;
+
+        memset(&rl, 0, sizeof(struct rlimit));
 
 /* maximum core file size */
 	if (strcmp(vr, "core") == 0)

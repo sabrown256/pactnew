@@ -57,6 +57,9 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
+#define PROC_BACKGROUND    -100
+#define PROC_FOREGROUND    -101
+
 #define CHECK_FAN(_x, _n)                                                    \
    {_n = _x;                                                                 \
     if (_n < 2)                                                              \
@@ -64,9 +67,6 @@
     _x = _n;}
 
 typedef struct s_statement statement;
-typedef struct s_process_session process_session;
-typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp,
-		      char *name, int c, char **v);
 
 struct s_statement
    {int np;                 /* number of processes in group */
@@ -76,16 +76,8 @@ struct s_statement
     char *text;             /* text of group */
     char *shell;            /* shell which runs the individual processes */
     char **env;
-    int *st;                /* exit status array */
     process_group *pg;
     PFPCAL (*map)(char *nm);};
-
-struct s_process_session
-   {pid_t pgid;                     /* OS process group id */
-    int terminal;                   /* file descriptor of stdin */
-    int interactive;                /* TRUE iff interactive session */
-    int foreground;                 /* TRUE iff current job is foreground */
-    struct termios attr;};          /* terminal attributes */
 
 typedef struct s_process_constants process_constants;
 
@@ -409,21 +401,12 @@ process_session *init_session(void)
 	   kill(-pgid, SIGTTIN);};
      
 /* ignore interactive and job-control signals */
-#if 0
-	signal(SIGINT,  SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGTSTP, SIG_IGN);
-	signal(SIGTTIN, SIG_IGN);
-	signal(SIGTTOU, SIG_IGN);
-	signal(SIGCHLD, SIG_IGN);
-#else
 	nsigaction(NULL, SIGINT,  SIG_IGN, SA_RESTART, -1);
 	nsigaction(NULL, SIGQUIT, SIG_IGN, SA_RESTART, -1);
 	nsigaction(NULL, SIGTSTP, SIG_IGN, SA_RESTART, -1);
 	nsigaction(NULL, SIGTTIN, SIG_IGN, SA_RESTART, -1);
 	nsigaction(NULL, SIGTTOU, SIG_IGN, SA_RESTART, -1);
 	nsigaction(NULL, SIGCHLD, SIG_IGN, SA_RESTART, -1);
-#endif
 
 /* put the current process in its own group */
 	pgid = getpid();
@@ -451,31 +434,41 @@ process_session *init_session(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* JOB_FOREGROUND - put PP in the foreground
+/* JOB_FOREGROUND - run process group PG in the foreground
  *                - if cont is TRUE restore the saved terminal modes and
  *                - send the process group a SIGCONT signal to
  *                - wake it up before we block
  */
      
-void job_foreground(process_session *ps, process *pp, int cont)
-   {int pgid, st;
+int job_foreground(process_group *pg, int cont)
+   {int ip, np, pgid, st, rv;
     struct termios attr;
+    process *pp, **pa;
+    process_session *ps;
+
+    ps = &pg->sess;
 
 /*    attr = pp->trm_attr; */
 
+    np = pg->np;
+    pa = pg->parents;
+
+    for (ip = 0; ip < np; ip++)
+        {pp = pa[ip];
+
 /* put the job into the foreground  */
-    tcsetpgrp(ps->terminal, pp->pgid);
+	 tcsetpgrp(ps->terminal, pp->pgid);
      
 /* send the job a continue signal, if necessary */
-    if (cont == TRUE)
-       {pgid = pp->pgid;
-	st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
-	st = kill(-pgid, SIGCONT);
-	if (st < 0)
-	   perror("SIGCONT");};
+	 if (cont == TRUE)
+	    {pgid = pp->pgid;
+	     st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
+	     st = kill(-pgid, SIGCONT);
+	     if (st < 0)
+	        perror("SIGCONT");};
      
 /* wait for it to report */
-    job_wait(pp);
+	 job_wait(pp);};
      
 /* put the shell back in the foreground */
     tcsetpgrp(ps->terminal, ps->pgid);
@@ -485,32 +478,44 @@ void job_foreground(process_session *ps, process *pp, int cont)
     tcsetattr(ps->terminal, TCSADRAIN, &ps->attr);
 
     ps->foreground = TRUE;
+    rv             = PROC_FOREGROUND;
 
 /*    pp->trm_attr = attr; */
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* JOB_BACKGROUND - put PP in the background
+/* JOB_BACKGROUND - run process group PG in the background
  *                - if CONT is TRUE send the process group
  *                - a SIGCONT signal to wake it up
  */
      
-void job_background(process_group *pg, process *pp, int cont)
-   {int pgid, st;
+int job_background(process_group *pg, int cont)
+   {int ip, np, pgid, st, rv;
+    process *pp, **pa;
+    process_session *ps;
+
+    ps = &pg->sess;
+
+    np = pg->np;
+    pa = pg->parents;
+
+    for (ip = 0; ip < np; ip++)
+        {pp = pa[ip];
 
 /* send the job a continue signal */
-    if (cont == TRUE)
-       {pgid = pp->pgid;
-	st = kill(-pgid, SIGCONT);
-        if (st < 0)
-           perror("SIGCONT");};
+	 if (cont == TRUE)
+	    {pgid = pp->pgid;
+	     st = kill(-pgid, SIGCONT);
+	     if (st < 0)
+	        perror("SIGCONT");};};
 
-    pg->fg = FALSE;
+    ps->foreground = FALSE;
+    rv             = PROC_BACKGROUND;
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -1473,13 +1478,13 @@ static void parse_pgrp(statement *s)
     if (pg != NULL)
        {pg->np       = 0;
 	pg->to       = 0;
-	pg->fg       = fg;
 	pg->mode     = NULL;
 	pg->shell    = shell;
 	pg->env      = env;
 	pg->terminal = NULL;
 	pg->parents  = pa;
-	pg->children = ca;};
+	pg->children = ca;
+	pg->sess.foreground = fg;};
 
     for (i = 0; i < nc; i++)
         {t   = sa[i];
@@ -1549,6 +1554,19 @@ static void parse_pgrp(statement *s)
 
 /* free string array allowing for NULL out entries */
     free_nstrings(sa, nc);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FREE_PGRP - free the process group PG */
+
+static void free_pgrp(process_group *pg)
+   {
+
+    FREE(pg->st);
+    FREE(pg);
 
     return;}
 
@@ -2094,17 +2112,15 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
     iodes *pio;
     char *ms, *db, *fn, **v;
     FILE *fp[3];
-    statement *s;
     process_group *pg;
     process *pp, **pa;
     PFPCAL f;
     PFPCAL (*map)(char *nm);
 
-    s   = (statement *) a;
-    map = s->map;
+    pg  = (process_group *) a;
+    map = pg->map;
     if (map != NULL)
-       {pg = s->pg;
-        ne = s->ne;
+       {ne = pg->np;
 	db = getenv("PERDB_PATH");
 
         pa = pg->parents;
@@ -2171,11 +2187,11 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 void _pgrp_fin(process *pp, void *a)
    {int i;
     int *st;
-    statement *s;
+    process_group *pg;
 
     i  = pp->ip;
-    s  = (statement *) a;
-    st = s->st;
+    pg = pp->pg;
+    st = pg->st;
     st[i] = pp->reason;
 
     job_done(pp, SIGKILL);
@@ -2245,29 +2261,18 @@ int group_exit_status(int *st, int ne)
  *           - for background process groups
  */
 
-int wait_pgrp(process_group_state *ps, statement *s)
-   {int i, ne, np, rv, fd, tc;
+int wait_pgrp(process_group *pg)
+   {int i, np, rv, tc;
     char *db;
-    process *pp;
-    process_group *pg;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
     rv = -1;
-    pg = s->pg;
-    ne = s->ne;
-    np = s->np;
-
-/* load up the process stack */
-    for (i = 0; i < np; i++)
-        {pp = pg->parents[i];
-	 fd = pp->io[0].fd;
-
-	 ps->stck.proc[i]       = pp;
-	 ps->stck.fd[i].fd      = fd;
-	 ps->stck.fd[i].events  = ps->stck.mask_acc;
-	 ps->stck.fd[i].revents = 0;};
+    np = pg->np;
 
 /* wait for the work to complete - _pgrp_work does the work */
-    tc = await(ps->to_sec, 1, "commands", _pgrp_tty, _pgrp_work, s);
+    tc = await(ps->to_sec, 1, "commands", _pgrp_tty, _pgrp_work, pg);
     ASSERT(tc >= 0);
 
 /* close out the jobs */
@@ -2281,7 +2286,10 @@ int wait_pgrp(process_group_state *ps, statement *s)
     FREE(pg->children);
 
 /* process the exit statuses */
-    rv = group_exit_status(s->st, ne);
+    rv = group_exit_status(pg->st, np);
+
+    stk_remove(ps->pg, pg);
+    free_pgrp(pg);
 
     db = getenv("PERDB_PATH");
     if (IS_NULL(db) == FALSE)
@@ -2295,7 +2303,7 @@ int wait_pgrp(process_group_state *ps, statement *s)
 /* RUN_PGRP - run the process group PG */
 
 static int run_pgrp(statement *s)
-   {int i, io, ne, rv, fg;
+   {int i, io, ne, np, rv, fd, fg;
     process *pp, *cp;
     process_group *pg;
     process_group_state *ps;
@@ -2307,9 +2315,10 @@ static int run_pgrp(statement *s)
     if ((s != NULL) && (ps != NULL))
        {pg = s->pg;
 	ne = s->ne;
-	fg = pg->fg;
+	fg = pg->sess.foreground;
 
-	s->st = MAKE_N(int, ne);
+	pg->st  = MAKE_N(int, pg->np);
+	pg->map = s->map;
 
 	for (i = 0; i < ne; i++)
 	    {pp = pg->parents[i];
@@ -2340,9 +2349,6 @@ static int run_pgrp(statement *s)
 		 for (io = 0; io < N_IO_CHANNELS; io++)
  		     _io_file_ptr(pp, io);};
 
-	     if (fg == FALSE)
-	        job_background(pg, pp, FALSE);
-
 	     pp->accept   = _pgrp_accept;
 	     pp->reject   = _pgrp_reject;
 	     pp->wait     = _pgrp_wait;
@@ -2351,22 +2357,26 @@ static int run_pgrp(statement *s)
 
 	     ASSERT(rv == 0);};
 
-	if (fg == TRUE)
-           rv = wait_pgrp(ps, s);};
+/* load up the process stack */
+	np = s->np;
+	for (i = 0; i < np; i++)
+	    {pp = pg->parents[i];
+	     fd = pp->io[0].fd;
+
+	     ps->stck.proc[i]       = pp;
+	     ps->stck.fd[i].fd      = fd;
+	     ps->stck.fd[i].events  = ps->stck.mask_acc;
+	     ps->stck.fd[i].revents = 0;};
+
+	stk_push(ps->pg, pg);
+
+	if (fg == FALSE)
+	   rv = job_background(pg, FALSE);
+
+	else
+           rv = wait_pgrp(pg);};
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* FREE_PGRP - free the process group PG */
-
-static void free_pgrp(process_group *pg, int np)
-   {
-
-    FREE(pg);
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -2392,10 +2402,9 @@ static void free_statements(statement *sl)
    {int n;
 
     for (n = 0; sl[n].text != NULL; n++)
-        {FREE(sl[n].text);
-	 FREE(sl[n].shell);
-	 FREE(sl[n].st);
-	 free_pgrp(sl[n].pg, sl[n].ne);};
+        {sl[n].pg = NULL;
+	 FREE(sl[n].text);
+	 FREE(sl[n].shell);};
 
     FREE(sl);
 
@@ -2480,7 +2489,6 @@ statement *parse_statement(char *s, char **env, char *shell,
 		 sa[i].text       = STRSAVE(trim(pt, BOTH, " \t\n\r\f"));
 		 sa[i].shell      = STRSAVE(shell);
 		 sa[i].env        = env;
-		 sa[i].st         = NULL;
 		 sa[i].map        = map;
 		 i++;};
 
@@ -2521,18 +2529,19 @@ int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
 
 /* execute each process group */
     st = 0;
-    rv = 1;
-    for (i = 0; (i < nc) && (rv == 1); i++)
+    rv = TRUE;
+    for (i = 0; (i < nc) && (rv == TRUE); i++)
         {st = run_pgrp(sl+i);
-	 switch (sl[i].terminator)
-	    {case ST_AND :
-	          rv = (st == 0);
-	          break;
-	     case ST_OR :
-	          rv = (st != 0);
-	          break;
-	     default :
-	          break;};};
+         if (st != PROC_BACKGROUND)
+	    {switch (sl[i].terminator)
+	        {case ST_AND :
+		      rv = (st == 0);
+		      break;
+		 case ST_OR :
+		      rv = (st != 0);
+		      break;
+		 default :
+		      break;};};};
 
     free_statements(sl);
 

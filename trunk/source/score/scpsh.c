@@ -90,6 +90,15 @@
 #define polysubst_lookup        PS_polysubst_lookup
 #define polysubst               PS_polysubst
 
+#define make_stk                PS_make_stk
+#define stk_copy                PS_stk_copy
+#define stk_length              PS_stk_length
+#define stk_push                PS_stk_push
+#define stk_pop                 PS_stk_pop
+#define stk_free                PS_stk_free
+#define stk_uniq                PS_stk_uniq
+#define stk_remove              PS_stk_remove
+
 #define acheck 			PS_acheck
 #define afin 			PS_afin
 #define alaunch 		PS_alaunch
@@ -279,6 +288,7 @@
 #define upcase 			PS_upcase
 #define verifyx 		PS_verifyx
 #define vstrcat 		PS_vstrcat
+#define wait_pgrp               PS_wait_pgrp
 #define wall_clock_time 	PS_wall_clock_time
 #define write_sock 		PS_write_sock
 
@@ -306,6 +316,7 @@
 #undef LIBLOG
 #undef LIBPSH
 #undef LIBHASH
+#undef LIBSTACK
 #undef LIBTIME
 #undef LIBASYNC
 #undef LIBEVAL
@@ -333,6 +344,7 @@
 #include <shell/libfio.c>
 #include <shell/libpsh.c>
 #include <shell/libhash.c>
+#include <shell/libstack.c>
 #include <shell/libtime.c>
 #include <shell/libasync.c>
 #include <shell/libeval.c>
