@@ -26,6 +26,7 @@
 #include <shell/libfio.c>
 #include <shell/libpsh.c>
 #include <shell/libhash.c>
+#include <shell/libstack.c>
 #include <shell/libtime.c>
 #include <shell/libasync.c>
 #include <shell/libeval.c>
@@ -243,9 +244,7 @@ extern void
  _PS_pgrp_wait(process *pp),
  _PS_pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf),
  _PS_pgrp_fin(process *pp, void *a),
- PS_register_io_pgrp(process_group *pg),
- PS_job_foreground(process_session *ps, process *pp, int cont),
- PS_job_background(process_group *pg, process *pp, int cont);
+ PS_register_io_pgrp(process_group *pg);
 
 extern int
  _PS_kind_io(io_kind k),
@@ -267,6 +266,9 @@ extern int
  _PS_deref_io(process *pp),
  _PS_pgrp_tty(char *tag),
  _PS_fnc_wait(process_group *pg, int ip, int st),
+ PS_job_foreground(process_group *pg, int cont),
+ PS_job_background(process_group *pg, int cont),
+ PS_wait_pgrp(process_group *pg),
  PS_gexeca(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s)),
  PS_gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s)),
  PS_transfer_ff(FILE *fi, FILE *fo),
@@ -435,6 +437,23 @@ extern client
 		 int (*cauth)(client *cl, int nc, char *ans, char *res));
 
 
+/* LIBSTACK.C declarations */
+
+extern vstack
+ *PS_make_stk(char *type, int n),
+ *PS_stk_copy(vstack *stk);
+
+extern int
+ PS_stk_length(vstack *stk),
+ PS_stk_push(vstack *stk, void *a);
+
+extern void
+ *PS_stk_pop(vstack *stk),
+ PS_stk_free(vstack *stk),
+ PS_stk_uniq(vstack *stk),
+ PS_stk_remove(vstack *stk, void *a);
+
+
 /* LIBSUBST.C declarations */
 
 extern substdes
@@ -474,6 +493,7 @@ extern char
 #undef LIBEVAL
 #undef LIBFIFO
 #undef LIBHASH
+#undef LIBSTACK
 #undef LIBINFO
 #undef LIBIO
 #undef LIBPGRP
