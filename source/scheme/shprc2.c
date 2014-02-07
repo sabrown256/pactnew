@@ -128,7 +128,7 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
     char t[MAXLINE];
     char *db, **al;
     object *o;
-    process_group_state *ps;
+    process_state *ps;
     static client *cl = NULL;
 
     db = getenv("PERDB_PATH");
@@ -146,7 +146,7 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
     n  = SS_length(si, argl);
     al = _SS_list_strings(si, argl);
 
-    ps = PS_get_process_group_state();
+    ps = PS_get_process_state();
 
     PS_gexeca(db, n, al, NULL, _SS_maps);
 
@@ -160,9 +160,9 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
 /* _SS_INST_PGRP - install the primitives for process group control */
 
 void _SS_inst_pgrp(SS_psides *si)
-   {process_group_state *ps;
+   {process_state *ps;
 
-    ps = PS_get_process_group_state();
+    ps = PS_get_process_state();
 
     SS_install_cf(si, "process-group-debug",
 		  "Variable: Flag controlling level of diagnostic output for gexec",

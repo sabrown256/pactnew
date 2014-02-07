@@ -92,12 +92,13 @@
 
 #define make_stk                PS_make_stk
 #define stk_copy                PS_stk_copy
-#define stk_length              PS_stk_length
-#define stk_push                PS_stk_push
-#define stk_pop                 PS_stk_pop
 #define stk_free                PS_stk_free
-#define stk_uniq                PS_stk_uniq
+#define stk_get                 PS_stk_get
+#define stk_length              PS_stk_length
+#define stk_pop                 PS_stk_pop
+#define stk_push                PS_stk_push
 #define stk_remove              PS_stk_remove
+#define stk_uniq                PS_stk_uniq
 
 #define acheck 			PS_acheck
 #define afin 			PS_afin
@@ -178,7 +179,7 @@
 #define get_date 		PS_get_date
 #define get_db 			PS_get_db
 #define get_multi_line 		PS_get_multi_line
-#define get_process_group_state PS_get_process_group_state
+#define get_process_state       PS_get_process_state
 #define gexeca 			PS_gexeca
 #define gexecs			PS_gexecs
 #define gexec_file 		PS_gexec_file
@@ -194,7 +195,7 @@
 #define hash_install		PS_hash_install
 #define hash_foreach		PS_hash_foreach
 #define hash_dump		PS_hash_dump
-#define init_session 		PS_init_session
+#define make_session 		PS_make_session
 #define is_running 		PS_is_running
 #define job_background 		PS_job_background
 #define job_done 		PS_job_done
@@ -259,6 +260,7 @@
 #define ring_ready 		PS_ring_ready
 #define run 			PS_run
 #define save_db 		PS_save_db
+#define show_pgrp               PS_show_pgrp
 #define splice_out_path 	PS_splice_out_path
 #define strclean 		PS_strclean
 #define strcntc                 PS_strcntc
