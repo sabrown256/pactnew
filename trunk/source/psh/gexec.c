@@ -178,10 +178,10 @@ static int help(void)
 int main(int c, char **v, char **env)
    {int i, rv;
     char *db, *s;
-    process_group_state *ps;
+    process_state *ps;
 
     rv = 0;
-    ps = get_process_group_state();
+    ps = get_process_state();
     if (ps != NULL)
        {db = getenv("PERDB_PATH");
 	s  = getenv("GEXEC_DEBUG_LEVEL");

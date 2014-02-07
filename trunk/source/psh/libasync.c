@@ -179,7 +179,7 @@ typedef struct s_process process;
 typedef struct s_process_group process_group;
 typedef struct s_process_stack process_stack;
 typedef struct s_iodes iodes;
-typedef struct process_group_state process_group_state;
+typedef struct process_state process_state;
 typedef struct s_process_session process_session;
 
 /* NOTE: one of the difficulties in managing the connections between
@@ -261,7 +261,7 @@ struct s_process_stack
     process **proc;};
 
 #ifndef S_SPLINT_S
-struct process_group_state
+struct process_state
    {int n_sig_block;
     int dbg_level;             /* debug level */
     int to_sec;                /* timeout in seconds */
@@ -288,14 +288,74 @@ struct process_group_state
 /*                              INFRASTRUCTURE                              */
 
 /*--------------------------------------------------------------------------*/
+  
+/* MAKE_SESSION - initialize a process session instance
+ *              - setup OS level process group properly
+ *              - make sure the session is running interactively
+ *              - as the foreground job before proceeding
+ */
+     
+process_session *make_session(void)
+   {int pgid, tid, fin, iact;
+    struct termios attr;
+    process_session *ps;
+     
+    ps   = NULL;
+    fin  = STDIN_FILENO;
+    iact = isatty(fin);
+     
+    if (iact == TRUE)
 
-/* GET_PROCESS_GROUP_STATE - return a pointer to the global state
+/* make sure we are in the foreground */
+       {while (TRUE)
+	  {pgid = getpgrp();
+	   tid  = tcgetpgrp(fin);
+	   if (tid == pgid)
+	      break;
+	   kill(-pgid, SIGTTIN);};
+     
+/* ignore interactive and job-control signals */
+	nsigaction(NULL, SIGINT,  SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGQUIT, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTSTP, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTIN, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTOU, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGCHLD, SIG_IGN, SA_RESTART, -1);
+
+/* put the current process in its own group */
+	pgid = getpid();
+	if (setpgid(pgid, pgid) < 0)
+	   fprintf(stderr, "[%d/%d]: %s\n", pgid, 0,
+		   "Couldn't put the session in its own process group");
+
+	else
+     
+/* take control of the terminal */
+	   {tcsetpgrp(fin, pgid);
+     
+/* save default terminal attributes for session */
+	    tcgetattr(fin, &attr);
+
+	    ps = MAKE(process_session);
+	    if (ps != NULL)
+	       {ps->pgid        = pgid;
+		ps->terminal    = fin;
+		ps->interactive = iact;
+		ps->foreground  = TRUE;
+		ps->attr        = attr;};};};
+
+    return(ps);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GET_PROCESS_STATE - return a pointer to the global state
  *                         - for managing process_groups
  */
 
-process_group_state *get_process_group_state(void)
-   {process_group_state *ps;
-    static process_group_state st = { 0, 0, -1, (uint64_t) -1,
+process_state *get_process_state(void)
+   {process_state *ps;
+    static process_state st = { 0, 0, -1, (uint64_t) -1,
 				      NULL, NULL,
 				      GEX_CSH_EV, IO_DEV_PIPE,
 				      { 0, 0, 0, 0, 3,
@@ -318,9 +378,9 @@ void _dbg(unsigned int lvl, char *fmt, ...)
    {int pid;
     char s[BFLRG];
     char *t;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
     if (lvl & ps->dbg_level)
        {VA_START(fmt);
 	VSNPRINTF(s, BFLRG, fmt);
@@ -405,9 +465,9 @@ FILE *_io_file_ptr(process *pp, io_kind knd)
 sigset_t _block_all_sig(int wh)
    {int rv;
     sigset_t ns, os;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     memset(&os, 0, sizeof(os));
 
@@ -759,9 +819,9 @@ int _ioc_fd(int fd, io_kind k)
 io_device _ioc_pair(int *fds, int id)
    {int st;
     io_device medium, rv;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     medium = ps->medium;
 
@@ -1260,9 +1320,9 @@ void _job_child_prelim(process *pp)
 static void _job_child_fork(process *pp, process *cp, int *fds, char *mode)
    {int rv;
     extern char **environ;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     _job_child_prelim(pp);
 
@@ -1289,9 +1349,9 @@ static void _job_child_fork(process *pp, process *cp, int *fds, char *mode)
 
 static int _job_parent_fork(process *pp, process *cp, int *fds, char *mode)
    {int i, st;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
    
     st = TRUE;
 
@@ -1519,9 +1579,9 @@ static process *_job_fork(process *pp, process *cp,
 /* _TIMEOUT_ERROR - tell somebody that we timed out and exit */
 
 static void _timeout_error(int sig)
-   {process_group_state *ps;
+   {process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     siglongjmp(ps->cpu, 1);}
 
@@ -1659,9 +1719,9 @@ int job_write(process *pp, char *fmt, ...)
 int job_poll(process *pp, int to)
    {int n, ok;
     apollfd fds;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     n = 0;
     if (job_running(pp))
@@ -1691,9 +1751,9 @@ int job_response(process *pp, int to, char *fmt, ...)
     char *p;
     FILE *fi, *fo;
     int (*rsp)(int fd, process *pp, char *s);
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     VA_START(fmt);
 
@@ -1789,10 +1849,10 @@ int job_done(process *pp, int sig)
 
 void asetup(int n, int na)
    {int m;
-    process_group_state *ps;
+    process_state *ps;
     process_stack *st;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
     st = &ps->stck;
 
 /* per process members */
@@ -1834,10 +1894,10 @@ void asetup(int n, int na)
 
 static int _awatch_push_fd(process *pp, int fd)
    {int ip, ifd;
-    process_group_state *ps;
+    process_state *ps;
     process_stack *st;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
     st = &ps->stck;
 
     ip = pp->ip;
@@ -1863,10 +1923,10 @@ static int _awatch_push_fd(process *pp, int fd)
 
 void _awatch_pop_fd(process *pp)
    {int ip, ifd, np, nfd;
-    process_group_state *ps;
+    process_state *ps;
     process_stack *st;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
     st = &ps->stck;
 
 /* remove the process */
@@ -1898,9 +1958,9 @@ void _awatch_pop_fd(process *pp)
 
 static int _awatch_fd(process *pp, io_kind knd, int sip)
    {int ip, fd;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
 /* handle the process */
     if (pp->isfunc == TRUE)
@@ -1938,9 +1998,9 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
 
 static void _afinish(void)
    {int i, np;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     np = ps->stck.np;
 
@@ -1993,9 +2053,9 @@ process *alaunch(int sip, char *cmd, char *mode, void *a,
 
 process *arelaunch(process *pp)
    {process *npp;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     if ((pp != NULL) && (pp->nattempt <= ps->stck.nattempt))
        {if (pp->ip < 0)
@@ -2020,7 +2080,7 @@ process *arelaunch(process *pp)
  *            - the child processes
  */
 
-static int _apoll_tty(process_group_state *ps, int i, int nrdy)
+static int _apoll_tty(process_state *ps, int i, int nrdy)
    {int io, ip, is, np, fd;
     short rev;
     char **sa;
@@ -2065,7 +2125,7 @@ static int _apoll_tty(process_group_state *ps, int i, int nrdy)
 
 /* _APOLL_CHILD - process messages between the child processes */
 
-static int _apoll_child(process_group_state *ps, int i, int nrdy)
+static int _apoll_child(process_state *ps, int i, int nrdy)
    {int ip, ifd, nfd, fd, np;
     int *map, *io;
     short rev;
@@ -2110,9 +2170,9 @@ int apoll(int to)
     int *map, *io;
     process *pp;
     apollfd *fds;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     np  = ps->stck.np;
     nfd = ps->stck.ifd;
@@ -2163,9 +2223,9 @@ void anotify(void)
    {int ip, np;
     char *msg;
     process *pp;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     np = ps->stck.np;
 
@@ -2199,9 +2259,9 @@ void anotify(void)
 int acheck(void)
    {int ip, np, nf;
     process *pp;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     np = ps->stck.np;
 
@@ -2236,9 +2296,9 @@ int await(unsigned int tf, int dt, char *tag,
 	  void (*f)(int i, char *tag, void *a, int nd, int np, int tc, int tf),
 	  void *a)
    {int i, nd, np, st, ti, tc;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     np = ps->stck.np;
     nd = -1;
@@ -2269,9 +2329,9 @@ void amap(void (*f)(process *pp, void *a))
    {int i, np;
     process *pp;
     void *a;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     np = ps->stck.np;
 

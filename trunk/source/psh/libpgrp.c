@@ -374,62 +374,32 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-  
-/* INIT_SESSION - initialize a process session instance
- *              - setup OS level process group properly
- *              - make sure the session is running interactively
- *              - as the foreground job before proceeding
- */
-     
-process_session *init_session(void)
-   {int pgid, tid, fin, iact;
-    struct termios attr;
-    process_session *ps;
-     
-    ps   = NULL;
-    fin  = STDIN_FILENO;
-    iact = isatty(fin);
-     
-    if (iact == TRUE)
 
-/* make sure we are in the foreground */
-       {while (TRUE)
-	  {pgid = getpgrp();
-	   tid  = tcgetpgrp(fin);
-	   if (tid == pgid)
-	      break;
-	   kill(-pgid, SIGTTIN);};
-     
-/* ignore interactive and job-control signals */
-	nsigaction(NULL, SIGINT,  SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGQUIT, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGTSTP, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGTTIN, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGTTOU, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGCHLD, SIG_IGN, SA_RESTART, -1);
+/* MAKE_PGRP - initialize and return a process_group instance */
 
-/* put the current process in its own group */
-	pgid = getpid();
-	if (setpgid(pgid, pgid) < 0)
-	   _dbg(-1, "Couldn't put the session in its own process group");
+process_group *make_pgrp(process **pa, process **ca, char **env,
+			 char *shell, int fg, process_session *ss)
+   {process_group *pg;
+    process_state *ps;
 
-	else
-     
-/* take control of the terminal */
-	   {tcsetpgrp(fin, pgid);
-     
-/* save default terminal attributes for session */
-	    tcgetattr(fin, &attr);
+    pg = MAKE(process_group);
+    if (pg != NULL)
+       {if (ss == NULL)
+	   {ps = get_process_state();
+/*	    ss = ps->ss;*/};
 
-	    ps = MAKE(process_session);
-	    if (ps != NULL)
-	       {ps->pgid        = pgid;
-		ps->terminal    = fin;
-		ps->interactive = iact;
-		ps->foreground  = TRUE;
-		ps->attr        = attr;};};};
+	pg->np       = 0;
+	pg->to       = 0;
+	pg->mode     = NULL;
+	pg->shell    = shell;
+	pg->env      = env;
+	pg->terminal = NULL;
+	pg->parents  = pa;
+	pg->children = ca;
+/*	pg->ss       = ss; */
+	pg->sess.foreground = fg;};
 
-    return(ps);}
+    return(pg);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1227,9 +1197,9 @@ static void reconnect_pgrp(process_group *pg)
    {int i, nm, n, tci;
     process *pp, *cp;
     process **pa, **ca;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     n  = pg->np;
     pa = pg->parents;
@@ -1447,6 +1417,10 @@ static void parse_pgrp(statement *s)
     char **sa, **ta, **env, **ios;
     process **pa, **ca;
     process_group *pg;
+    process_session *ps;
+
+/*    ps = s->session; */
+    ps = NULL;
 
     it    = 0;
     doif  = FALSE;
@@ -1474,17 +1448,7 @@ static void parse_pgrp(statement *s)
     pa = MAKE_N(process *, nc);
     ca = MAKE_N(process *, nc);
 
-    pg = MAKE(process_group);
-    if (pg != NULL)
-       {pg->np       = 0;
-	pg->to       = 0;
-	pg->mode     = NULL;
-	pg->shell    = shell;
-	pg->env      = env;
-	pg->terminal = NULL;
-	pg->parents  = pa;
-	pg->children = ca;
-	pg->sess.foreground = fg;};
+    pg = make_pgrp(pa, ca, env, shell, fg, ps);
 
     for (i = 0; i < nc; i++)
         {t   = sa[i];
@@ -1586,10 +1550,10 @@ int gpoll(int to)
     int *map, *io;
     process *pp;
     apollfd *fds;
-    process_group_state *ps;
+    process_state *ps;
 
     ok = FALSE;
-    ps = get_process_group_state();
+    ps = get_process_state();
     if (ps != NULL)
        {np  = ps->stck.np;
 	nfd = ps->stck.ifd;
@@ -1854,9 +1818,9 @@ int _pgrp_accept(int fd, process *pp, char *s)
 
 int _pgrp_reject(int fd, process *pp, char *s)
    {int rv;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
     if (ps != NULL)
        {rv = TRUE;
 
@@ -1958,9 +1922,9 @@ void _post_info(process *pp)
 
 void _pgrp_wait(process *pp)
    {int rv;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
     if (ps != NULL)
        {if (ps->dbg_level & 2)
 	   {char *st;
@@ -2023,10 +1987,10 @@ void _pgrp_wait(process *pp)
 
 int _pgrp_tty(char *tag)
    {int nf, np, rv;
-    process_group_state *ps;
+    process_state *ps;
 
     rv = FALSE;
-    ps = get_process_group_state();
+    ps = get_process_state();
     np = (ps != NULL) ? ps->stck.np : -1;
 
     nf = acheck();
@@ -2229,9 +2193,9 @@ int group_exit_status(int *st, int ne)
    {int i, rv;
     int *nst;
     char vl[BFLRG];
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     rv    = 0;
     vl[0] = '\0';
@@ -2255,6 +2219,38 @@ int group_exit_status(int *st, int ne)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SHOW_PGRP - print the list of process groups
+ *           - mostly in the background
+ */
+
+int show_pgrp(process_group *pg)
+   {int i, n;
+    process_session *ss;
+    process_state *ps;
+
+    if (pg == NULL)
+       {ps = get_process_state();
+	n  = stk_length(ps->pg);
+	for (i = 0; i < n; i++)
+	    {pg = stk_get(ps->pg, i);
+	     ss = &pg->sess;
+	     printf("%3d : %s %s %6d\n", i+1,
+		    (ss->interactive == TRUE) ? "i" : "n",
+		    (ss->foreground == TRUE) ? "fg" : "bg",
+		    ss->pgid);};}
+    else
+       {n  = 1;
+	ss = &pg->sess;
+	printf("%3d : %s %s %6d\n", 0,
+	       (ss->interactive == TRUE) ? "i" : "n",
+	       (ss->foreground == TRUE) ? "fg" : "bg",
+	       ss->pgid);};
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* WAIT_PGRP - wait for process group to complete
  *           - return status
  *           - this will need to be called at some point even
@@ -2264,9 +2260,9 @@ int group_exit_status(int *st, int ne)
 int wait_pgrp(process_group *pg)
    {int i, np, rv, tc;
     char *db;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     rv = -1;
     np = pg->np;
@@ -2306,11 +2302,11 @@ static int run_pgrp(statement *s)
    {int i, io, ne, np, rv, fd, fg;
     process *pp, *cp;
     process_group *pg;
-    process_group_state *ps;
+    process_state *ps;
 
     rv = -1;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     if ((s != NULL) && (ps != NULL))
        {pg = s->pg;
@@ -2508,9 +2504,9 @@ int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
     int fa, fb;
     char *shell;
     statement *sl;
-    process_group_state *ps;
+    process_state *ps;
 
-    ps = get_process_group_state();
+    ps = get_process_state();
 
     shell = "/bin/csh";
 

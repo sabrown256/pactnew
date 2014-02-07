@@ -101,8 +101,8 @@ extern process
 	     void (*wt)(process *pp)),
  *PS_arelaunch(process *pp);
 
-extern process_group_state
- *PS_get_process_group_state(void);
+extern process_state
+ *PS_get_process_state(void);
 
 
 /* LIBDB.C declarations */
@@ -269,6 +269,7 @@ extern int
  PS_job_foreground(process_group *pg, int cont),
  PS_job_background(process_group *pg, int cont),
  PS_wait_pgrp(process_group *pg),
+ PS_show_pgrp(process_group *pg),
  PS_gexeca(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s)),
  PS_gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s)),
  PS_transfer_ff(FILE *fi, FILE *fo),
@@ -286,7 +287,7 @@ extern statement
 		     PFPCAL (*map)(char *s));
 
 extern process_session
- *PS_init_session(void);
+ *PS_make_session(void);
 
 
 /* LIBPSH.C declarations */
@@ -448,6 +449,7 @@ extern int
  PS_stk_push(vstack *stk, void *a);
 
 extern void
+ *PS_stk_get(vstack *stk, int i),
  *PS_stk_pop(vstack *stk),
  PS_stk_free(vstack *stk),
  PS_stk_uniq(vstack *stk),

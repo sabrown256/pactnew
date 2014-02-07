@@ -585,7 +585,11 @@ SC_proc_info *_SC_get_cygwin_processes(char *cmd, int uid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_GET_UNIX_PROCESSES - get process info for a UNIX process */
+/* _SC_GET_UNIX_PROCESSES - get process info for a UNIX process
+ *                        - run CMD to get the list of all processes
+ *                        - and return those matching UID or
+ *                        - all if UID == -1
+ */
 
 SC_proc_info *_SC_get_unix_processes(char *cmd, int uid)
    {int i, j, m, n, nc, st;

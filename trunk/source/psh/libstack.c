@@ -127,6 +127,34 @@ void *stk_pop(vstack *stk)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* STK_GET - for positive I get the Ith element of stack STK
+ *         - for negative I get the (N-I)th element of the stack STK
+ */
+
+void *stk_get(vstack *stk, int i)
+   {int n, m;
+    void *rv;
+
+    rv = NULL;
+
+    if (stk != NULL)
+       {n = stk->n;
+
+/* for positive I index from the beginning */
+	if ((0 <= i) && (i < n))
+	   m = i;
+
+/* for negative I index from the end */
+	else if ((1 <= -i) && (-i < n))
+	   m = n - i;
+
+	rv = stk->stk[m];};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* STK_COPY - return a copy of STK */
 
 vstack *stk_copy(vstack *stk)
