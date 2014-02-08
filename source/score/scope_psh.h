@@ -266,8 +266,6 @@ extern int
  _PS_deref_io(process *pp),
  _PS_pgrp_tty(char *tag),
  _PS_fnc_wait(process_group *pg, int ip, int st),
- PS_job_foreground(process_group *pg, int cont),
- PS_job_background(process_group *pg, int cont),
  PS_wait_pgrp(process_group *pg),
  PS_show_pgrp(process_group *pg),
  PS_gexeca(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s)),
@@ -278,6 +276,10 @@ extern int
  PS_gexec_file(char *db, io_mode md, FILE **fio,
 	       char *name, int c, char **v);
 
+extern proc_bf
+ PS_job_foreground(process_group *pg, proc_bf cont),
+ PS_job_background(process_group *pg, proc_bf cont);
+
 extern char
  *_PS_name_io(io_kind k),
  **PS_subst_syntax(char **sa);
@@ -287,7 +289,7 @@ extern statement
 		     PFPCAL (*map)(char *s));
 
 extern process_session
- *PS_make_session(int pgid, int fin, int iact, int fg),
+ *PS_make_session(int pgid, int fin, int iact, proc_bf fg),
  *PS_init_session(void);
 
 

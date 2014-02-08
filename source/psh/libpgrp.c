@@ -57,9 +57,6 @@
 
 # ifndef SCOPE_SCORE_COMPILE
 
-#define PROC_BACKGROUND    -100
-#define PROC_FOREGROUND    -101
-
 #define CHECK_FAN(_x, _n)                                                    \
    {_n = _x;                                                                 \
     if (_n < 2)                                                              \
@@ -378,7 +375,7 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 /* MAKE_PGRP - initialize and return a process_group instance */
 
 process_group *make_pgrp(process **pa, process **ca, char **env,
-			 char *shell, int fg, process_session *ss)
+			 char *shell, proc_bf fg, process_session *ss)
    {process_group *pg;
     process_state *ps;
 
@@ -386,18 +383,18 @@ process_group *make_pgrp(process **pa, process **ca, char **env,
     if (pg != NULL)
        {if (ss == NULL)
 	   {ps = get_process_state();
-/*	    ss = ps->ss;*/};
+	    ss = ps->ss;};
 
 	pg->np       = 0;
 	pg->to       = 0;
+	pg->fg       = fg;
 	pg->mode     = NULL;
 	pg->shell    = shell;
 	pg->env      = env;
 	pg->terminal = NULL;
 	pg->parents  = pa;
 	pg->children = ca;
-/*	pg->ss       = ss; */
-	pg->sess.foreground = fg;};
+	pg->ss       = ss;};
 
     return(pg);}
 
@@ -405,85 +402,92 @@ process_group *make_pgrp(process **pa, process **ca, char **env,
 /*--------------------------------------------------------------------------*/
 
 /* JOB_FOREGROUND - run process group PG in the foreground
- *                - if cont is TRUE restore the saved terminal modes and
+ *                - if BF is TRUE restore the saved terminal modes and
  *                - send the process group a SIGCONT signal to
  *                - wake it up before we block
  */
      
-int job_foreground(process_group *pg, int cont)
-   {int ip, np, pgid, st, rv;
+proc_bf job_foreground(process_group *pg, proc_bf bf)
+   {int ip, np, pgid, st;
+    proc_bf rv;
     struct termios attr;
     process *pp, **pa;
     process_session *ps;
 
-    ps = &pg->sess;
+    rv = PROC_BF_NONE;
+
+    if ((bf == PROC_FG_SUSP) || (bf == PROC_FG_RUN))
+       {ps = pg->ss;
 
 /*    attr = pp->trm_attr; */
 
-    np = pg->np;
-    pa = pg->parents;
+	np = pg->np;
+	pa = pg->parents;
 
-    for (ip = 0; ip < np; ip++)
-        {pp = pa[ip];
+	for (ip = 0; ip < np; ip++)
+	    {pp = pa[ip];
 
 /* put the job into the foreground  */
-	 tcsetpgrp(ps->terminal, pp->pgid);
+	     tcsetpgrp(ps->terminal, pp->pgid);
      
 /* send the job a continue signal, if necessary */
-	 if (cont == TRUE)
-	    {pgid = pp->pgid;
-	     st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
-	     st = kill(-pgid, SIGCONT);
-	     if (st < 0)
-	        perror("SIGCONT");};
+	     if (bf == TRUE)
+	        {pgid = pp->pgid;
+		 st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
+		 st = kill(-pgid, SIGCONT);
+		 if (st < 0)
+		    perror("SIGCONT");};
      
 /* wait for it to report */
-	 job_wait(pp);};
+	     job_wait(pp);};
      
 /* put the shell back in the foreground */
-    tcsetpgrp(ps->terminal, ps->pgid);
+	tcsetpgrp(ps->terminal, ps->pgid);
      
 /* restore the shell's terminal modes */
-    tcgetattr(ps->terminal, &attr);
-    tcsetattr(ps->terminal, TCSADRAIN, &ps->attr);
+	tcgetattr(ps->terminal, &attr);
+	tcsetattr(ps->terminal, TCSADRAIN, &ps->attr);
 
-    ps->foreground = TRUE;
-    rv             = PROC_FOREGROUND;
+	pg->fg = bf;
+	rv     = bf;
 
 /*    pp->trm_attr = attr; */
+	};
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* JOB_BACKGROUND - run process group PG in the background
- *                - if CONT is TRUE send the process group
+/* JOB_BACKGROUND - put process group PG in the background
+ *                - if BF is PROC_BG_RUN send the process group
  *                - a SIGCONT signal to wake it up
  */
      
-int job_background(process_group *pg, int cont)
-   {int ip, np, pgid, st, rv;
+proc_bf job_background(process_group *pg, proc_bf bf)
+   {int ip, np, pgid, st;
+    proc_bf rv;
     process *pp, **pa;
-    process_session *ps;
 
-    ps = &pg->sess;
+    rv = PROC_BF_NONE;
 
-    np = pg->np;
-    pa = pg->parents;
+    if ((bf == PROC_BG_SUSP) || (bf == PROC_BG_RUN))
+       {np = pg->np;
+	pa = pg->parents;
 
-    for (ip = 0; ip < np; ip++)
-        {pp = pa[ip];
+/* GOTCHA: crap - rewrite */
+	for (ip = 0; ip < np; ip++)
+	    {pp = pa[ip];
 
-/* send the job a continue signal */
-	 if (cont == TRUE)
-	    {pgid = pp->pgid;
-	     st = kill(-pgid, SIGCONT);
-	     if (st < 0)
-	        perror("SIGCONT");};};
+/* send the job a continue signal to run in the background */
+	     if (bf == PROC_BG_RUN)
+	        {pgid = pp->pgid;
+		 st = kill(-pgid, SIGCONT);
+		 if (st < 0)
+		    perror("SIGCONT");};};
 
-    ps->foreground = FALSE;
-    rv             = PROC_BACKGROUND;
+	pg->fg = bf;
+	rv     = bf;};
 
     return(rv);}
 
@@ -1412,7 +1416,8 @@ char **subst_syntax(char **sa)
 /* PARSE_PGRP - parse out specifications in S to initialize PG */
 
 static void parse_pgrp(statement *s)
-   {int i, j, it, nc, fg, dosh, doif, term;
+   {int i, j, it, nc, dosh, doif, term;
+    proc_bf fg;
     char *t, *shell;
     char **sa, **ta, **env, **ios;
     process **pa, **ca;
@@ -1437,12 +1442,12 @@ static void parse_pgrp(statement *s)
     sa = subst_syntax(sa);
     nc = lst_length(sa);
 
-/* if the final token is "&" then run the process group in the
- * background
- */
-    fg = (strcmp(sa[nc-1], "&") != 0);
-    if (fg == FALSE)
-       nc--;
+/* if the final token is "&" then run the process group in the background */
+    if (strcmp(sa[nc-1], "&") == 0)
+       {fg = PROC_BG_RUN;
+        nc--;}
+    else
+       fg = PROC_FG_RUN;
 
 /* maximum number of process would be the number of tokens */
     pa = MAKE_N(process *, nc);
@@ -2219,13 +2224,50 @@ int group_exit_status(int *st, int ne)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PRINT_PG - print the process_group status for SHOW_PGRP */
+
+static void _print_pg(process_group *pg, int i)
+   {char *bf, *rs, *aint;
+    process_session *ss;
+
+    ss   = pg->ss;
+    aint = (ss->interactive == TRUE) ? "i" : "n";
+
+    switch (pg->fg)
+       {case PROC_BG_SUSP :
+	     bf = "bg";
+	     rs = "sus";
+             break;
+        case PROC_BG_RUN :
+	     bf = "bg";
+	     rs = "run";
+             break;
+        case PROC_FG_SUSP :
+	     bf = "fg";
+	     rs = "sus";
+             break;
+        case PROC_FG_RUN :
+	     bf = "fg";
+	     rs = "run";
+             break;
+        default :
+	     bf = "  ";
+	     rs = "   ";
+             break;};
+
+    printf("%3d : %s %s %s %6d\n", i+1, aint, bf, rs, ss->pgid);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SHOW_PGRP - print the list of process groups
  *           - mostly in the background
  */
 
 int show_pgrp(process_group *pg)
    {int i, n;
-    process_session *ss;
     process_state *ps;
 
     if (pg == NULL)
@@ -2233,18 +2275,11 @@ int show_pgrp(process_group *pg)
 	n  = stk_length(ps->pg);
 	for (i = 0; i < n; i++)
 	    {pg = stk_get(ps->pg, i);
-	     ss = &pg->sess;
-	     printf("%3d : %s %s %6d\n", i+1,
-		    (ss->interactive == TRUE) ? "i" : "n",
-		    (ss->foreground == TRUE) ? "fg" : "bg",
-		    ss->pgid);};}
+             _print_pg(pg, i);};}
+
     else
-       {n  = 1;
-	ss = &pg->sess;
-	printf("%3d : %s %s %6d\n", 0,
-	       (ss->interactive == TRUE) ? "i" : "n",
-	       (ss->foreground == TRUE) ? "fg" : "bg",
-	       ss->pgid);};
+       {n = 1;
+	_print_pg(pg, 0);};
 
     return(n);}
 
@@ -2298,20 +2333,21 @@ int wait_pgrp(process_group *pg)
 
 /* RUN_PGRP - run the process group PG */
 
-static int run_pgrp(statement *s)
-   {int i, io, ne, np, rv, fd, fg;
+static proc_bf run_pgrp(statement *s)
+   {int i, io, ne, np, fd;
+    proc_bf fg;
     process *pp, *cp;
     process_group *pg;
     process_state *ps;
 
-    rv = -1;
+    fg = PROC_BF_NONE;
 
     ps = get_process_state();
 
     if ((s != NULL) && (ps != NULL))
        {pg = s->pg;
 	ne = s->ne;
-	fg = pg->sess.foreground;
+	fg = pg->fg;
 
 	pg->st  = MAKE_N(int, pg->np);
 	pg->map = s->map;
@@ -2349,9 +2385,7 @@ static int run_pgrp(statement *s)
 	     pp->reject   = _pgrp_reject;
 	     pp->wait     = _pgrp_wait;
 	     pp->nattempt = 1;
-	     pp->ip       = i;
-
-	     ASSERT(rv == 0);};
+	     pp->ip       = i;};
 
 /* load up the process stack */
 	np = s->np;
@@ -2364,15 +2398,9 @@ static int run_pgrp(statement *s)
 	     ps->stck.fd[i].events  = ps->stck.mask_acc;
 	     ps->stck.fd[i].revents = 0;};
 
-	stk_push(ps->pg, pg);
+	stk_push(ps->pg, pg);};
 
-	if (fg == FALSE)
-	   rv = job_background(pg, FALSE);
-
-	else
-           rv = wait_pgrp(pg);};
-
-    return(rv);}
+    return(fg);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -2552,8 +2580,10 @@ process_session *init_session(void)
 int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
    {int i, nc, rv, st;
     int fa, fb;
+    proc_bf fg;
     char *shell;
     statement *sl;
+    process_group *pg;
     process_state *ps;
 
     ps = get_process_state();
@@ -2577,17 +2607,28 @@ int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
     st = 0;
     rv = TRUE;
     for (i = 0; (i < nc) && (rv == TRUE); i++)
-        {st = run_pgrp(sl+i);
-         if (st != PROC_BACKGROUND)
-	    {switch (sl[i].terminator)
-	        {case ST_AND :
-		      rv = (st == 0);
-		      break;
-		 case ST_OR :
-		      rv = (st != 0);
-		      break;
-		 default :
-		      break;};};};
+        {fg = run_pgrp(sl+i);
+	 pg = sl[i].pg;
+
+	 switch (fg)
+	    {case PROC_BG_SUSP :
+	     case PROC_BG_RUN :
+	          job_background(pg, fg);
+                  break;
+	     case PROC_FG_SUSP :
+                  break;
+	     default :
+	          rv = wait_pgrp(pg);
+		  switch (sl[i].terminator)
+		     {case ST_AND :
+			   rv = (st == 0);
+			   break;
+		      case ST_OR :
+			   rv = (st != 0);
+			   break;
+		      default :
+			   break;};
+                  break;};};
 
     free_statements(sl);
 
