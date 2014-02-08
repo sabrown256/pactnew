@@ -479,6 +479,7 @@ int main(int c, char **v)
 /* ignore dmake options taking no argument */
 	 else if ((strcmp(v[i], "-dbg") == 0) ||
 		  (strcmp(v[i], "-dmp") == 0) ||
+		  (strcmp(v[i], "-rcr") == 0) ||
 		  (strcmp(v[i], "-srv") == 0) ||
 		  (strcmp(v[i], "-vrb") == 0))
             {printf("smake: option %s ignored\n", v[i]);

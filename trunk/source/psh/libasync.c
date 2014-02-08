@@ -171,6 +171,11 @@ enum e_shell_option
 
 typedef enum e_shell_option shell_option;
 
+enum e_proc_bf
+   {PROC_BG_SUSP, PROC_BG_RUN, PROC_FG_SUSP, PROC_FG_RUN, PROC_BF_NONE};
+
+typedef enum e_proc_bf proc_bf;
+
 typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp,
 		      char *name, int c, char **v);
 
@@ -227,17 +232,10 @@ struct s_process
     struct rusage ru;
     void *a;};                 /* external data associated with the process */
 
-struct s_process_session
-   {pid_t pgid;                     /* OS process group id */
-    int terminal;                   /* file descriptor of stdin */
-    int interactive;                /* TRUE iff interactive session */
-    int foreground;                 /* TRUE iff current job is foreground */
-    struct termios attr;            /* terminal attributes */
-    vstack *pg;};                   /* process groups for the session */
-
 struct s_process_group
    {int np;                 /* number of processes in group */
     int to;                 /* group time out */
+    proc_bf fg;             /* the foreground/background run state */
     int *st;                /* exit statuses of group members */
     char *mode;             /* IPC mode */
     char *shell;
@@ -246,8 +244,14 @@ struct s_process_group
     process **parents;      /* parent process array */
     process **children;     /* child process array */
     process_session *ss;    /* process session of the group */
-    process_session sess;   /* deprecated */
     PFPCAL (*map)(char *nm);};
+
+struct s_process_session
+   {pid_t pgid;                     /* OS process group id */
+    int terminal;                   /* file descriptor of stdin */
+    int interactive;                /* TRUE iff interactive session */
+    struct termios attr;            /* terminal attributes */
+    vstack *pg;};                   /* process groups for the session */
 
 struct s_process_stack
    {int ip;
@@ -294,7 +298,7 @@ struct process_state
 
 /* MAKE_SESSION - initialize and return a process_session instance */
 
-process_session *make_session(int pgid, int fin, int iact, int fg)
+process_session *make_session(int pgid, int fin, int iact, proc_bf fg)
    {process_session *ps;
 
     ps = MAKE(process_session);
@@ -309,7 +313,6 @@ process_session *make_session(int pgid, int fin, int iact, int fg)
 	ps->pgid        = pgid;
 	ps->terminal    = fin;
 	ps->interactive = iact;
-	ps->foreground  = fg;
 	ps->pg          = make_stk("process_group *", 4);
 	tcgetattr(fin, &ps->attr);};
 
