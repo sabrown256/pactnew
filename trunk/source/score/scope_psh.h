@@ -287,7 +287,8 @@ extern statement
 		     PFPCAL (*map)(char *s));
 
 extern process_session
- *PS_make_session(void);
+ *PS_make_session(int pgid, int fin, int iact, int fg),
+ *PS_init_session(void);
 
 
 /* LIBPSH.C declarations */

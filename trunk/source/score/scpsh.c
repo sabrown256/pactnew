@@ -195,6 +195,7 @@
 #define hash_install		PS_hash_install
 #define hash_foreach		PS_hash_foreach
 #define hash_dump		PS_hash_dump
+#define init_session 		PS_init_session
 #define make_session 		PS_make_session
 #define is_running 		PS_is_running
 #define job_background 		PS_job_background

@@ -2496,6 +2496,56 @@ statement *parse_statement(char *s, char **env, char *shell,
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+  
+/* INIT_SESSION - initialize a process session instance
+ *              - setup OS level process group properly
+ *              - make sure the session is running interactively
+ *              - as the foreground job before proceeding
+ */
+     
+process_session *init_session(void)
+   {int pgid, tid, fin, iact;
+    process_session *ps;
+     
+    ps   = NULL;
+    fin  = STDIN_FILENO;
+    iact = isatty(fin);
+     
+    if (iact == TRUE)
+
+/* make sure we are in the foreground */
+       {while (TRUE)
+	  {pgid = getpgrp();
+	   tid  = tcgetpgrp(fin);
+	   if (tid == pgid)
+	      break;
+	   kill(-pgid, SIGTTIN);};
+     
+/* ignore interactive and job-control signals */
+	nsigaction(NULL, SIGINT,  SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGQUIT, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTSTP, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTIN, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGTTOU, SIG_IGN, SA_RESTART, -1);
+	nsigaction(NULL, SIGCHLD, SIG_IGN, SA_RESTART, -1);
+
+/* put the current process in its own group */
+	pgid = getpid();
+	if (setpgid(pgid, pgid) < 0)
+	   fprintf(stderr, "[%d/%d]: %s\n", pgid, 0,
+		   "Couldn't put the session in its own process group");
+
+	else
+     
+/* take control of the terminal */
+	   {tcsetpgrp(fin, pgid);
+     
+	    ps = make_session(pgid, fin, iact, TRUE);};};
+
+    return(ps);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* GEXECS - execute a process group specified by the string S */
 
