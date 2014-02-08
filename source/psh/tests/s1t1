@@ -10,7 +10,7 @@
 
 set exe = do-run
 set tgt = ans
-set opt = ( -level 2 -dr -mpi foo -s run.s1 s1t1 '"a ; b"' )
+set opt = ( -level 2 -dr -mpi foo -s run.s1 $cwd/s1t1 '"a ; b"' )
 set io  = none
 
 while ($#argv > 0)
@@ -48,7 +48,7 @@ else
    echo 'Leaving section MPI'
    echo 'Skipping DBG section bar'
    echo 'Skipping DBG section baz'
-   echo '  foorun  -p 1 s1t1 \"a \; b\"'
+   echo '  foorun  -p 1 '$cwd/'s1t1 \"a \; b\"'
    set xstatus = 0
 endif
 

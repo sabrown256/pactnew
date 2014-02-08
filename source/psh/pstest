@@ -23,8 +23,8 @@ while ($#argv > 0)
            echo "Usage: pstest [-h] [<test>*]"
            echo "  h  this help message"
            echo ""
-#           echo "Tests: info ext do-net elide blang templ regx pcsh perdb dorun pco verify"
-           echo "Tests: info ext do-net elide blang templ regx pcsh perdb dorun verify"
+#           echo "Tests: ext do-net elide blang templ regx pcsh perdb info dorun pco verify"
+           echo "Tests: ext do-net elide blang templ regx pcsh perdb info dorun verify"
            echo ""
            exit(1);
       case -*:
@@ -61,9 +61,9 @@ else
 
    if ("$Tests" == "") then
       set Tests = ""
-      set Tests = ($Tests info ext)
-      set Tests = ($Tests do-net elide blang templ)
-      set Tests = ($Tests regx pcsh perdb dorun verify)
+      set Tests = ($Tests ext perdb)
+      set Tests = ($Tests info do-net elide blang templ)
+      set Tests = ($Tests regx pcsh dorun verify)
 #      set Tests = ($Tests pco)
    endif
 

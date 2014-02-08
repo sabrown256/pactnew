@@ -232,7 +232,8 @@ struct s_process_session
     int terminal;                   /* file descriptor of stdin */
     int interactive;                /* TRUE iff interactive session */
     int foreground;                 /* TRUE iff current job is foreground */
-    struct termios attr;};          /* terminal attributes */
+    struct termios attr;            /* terminal attributes */
+    vstack *pg;};                   /* process groups for the session */
 
 struct s_process_group
    {int np;                 /* number of processes in group */
@@ -244,7 +245,8 @@ struct s_process_group
     process *terminal;      /* terminal process */
     process **parents;      /* parent process array */
     process **children;     /* child process array */
-    process_session sess;
+    process_session *ss;    /* process session of the group */
+    process_session sess;   /* deprecated */
     PFPCAL (*map)(char *nm);};
 
 struct s_process_stack
@@ -273,6 +275,7 @@ struct process_state
     shell_option ofmt;
     io_device medium;
     process_stack stck;
+    process_session *ss;       /* the process session in state */
     vstack *pg;
     sigjmp_buf cpu;};
 #endif
@@ -288,61 +291,27 @@ struct process_state
 /*                              INFRASTRUCTURE                              */
 
 /*--------------------------------------------------------------------------*/
-  
-/* MAKE_SESSION - initialize a process session instance
- *              - setup OS level process group properly
- *              - make sure the session is running interactively
- *              - as the foreground job before proceeding
- */
-     
-process_session *make_session(void)
-   {int pgid, tid, fin, iact;
-    struct termios attr;
-    process_session *ps;
-     
-    ps   = NULL;
-    fin  = STDIN_FILENO;
-    iact = isatty(fin);
-     
-    if (iact == TRUE)
 
-/* make sure we are in the foreground */
-       {while (TRUE)
-	  {pgid = getpgrp();
-	   tid  = tcgetpgrp(fin);
-	   if (tid == pgid)
-	      break;
-	   kill(-pgid, SIGTTIN);};
-     
-/* ignore interactive and job-control signals */
-	nsigaction(NULL, SIGINT,  SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGQUIT, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGTSTP, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGTTIN, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGTTOU, SIG_IGN, SA_RESTART, -1);
-	nsigaction(NULL, SIGCHLD, SIG_IGN, SA_RESTART, -1);
+/* MAKE_SESSION - initialize and return a process_session instance */
 
-/* put the current process in its own group */
-	pgid = getpid();
-	if (setpgid(pgid, pgid) < 0)
-	   fprintf(stderr, "[%d/%d]: %s\n", pgid, 0,
-		   "Couldn't put the session in its own process group");
+process_session *make_session(int pgid, int fin, int iact, int fg)
+   {process_session *ps;
 
-	else
-     
-/* take control of the terminal */
-	   {tcsetpgrp(fin, pgid);
-     
-/* save default terminal attributes for session */
-	    tcgetattr(fin, &attr);
+    ps = MAKE(process_session);
+    if (ps != NULL)
+       {if (fin < 0)
+	   {fin  = STDIN_FILENO;
+	    iact = isatty(fin);};
 
-	    ps = MAKE(process_session);
-	    if (ps != NULL)
-	       {ps->pgid        = pgid;
-		ps->terminal    = fin;
-		ps->interactive = iact;
-		ps->foreground  = TRUE;
-		ps->attr        = attr;};};};
+	if (pgid == 0)
+	   pgid = getpid();
+
+	ps->pgid        = pgid;
+	ps->terminal    = fin;
+	ps->interactive = iact;
+	ps->foreground  = fg;
+	ps->pg          = make_stk("process_group *", 4);
+	tcgetattr(fin, &ps->attr);};
 
     return(ps);}
 
@@ -356,16 +325,19 @@ process_session *make_session(void)
 process_state *get_process_state(void)
    {process_state *ps;
     static process_state st = { 0, 0, -1, (uint64_t) -1,
-				      NULL, NULL,
-				      GEX_CSH_EV, IO_DEV_PIPE,
-				      { 0, 0, 0, 0, 3,
-					(POLLIN | POLLPRI),
-					(POLLERR | POLLHUP | POLLNVAL),
-					NULL, NULL, NULL, NULL}, };
+				NULL, NULL,
+				GEX_CSH_EV, IO_DEV_PIPE,
+				{ 0, 0, 0, 0, 3,
+				  (POLLIN | POLLPRI),
+				  (POLLERR | POLLHUP | POLLNVAL),
+				  NULL, NULL, NULL, NULL}, };
 
     ps = &st;
     if (ps->pg == NULL)
        ps->pg = make_stk("process_group *", 4);
+
+    if (ps->ss == NULL)
+       ps->ss = make_session(0, -1, 0, TRUE);
 
     return(ps);}
 
