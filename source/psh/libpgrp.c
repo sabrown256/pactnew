@@ -374,8 +374,9 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 
 /* MAKE_PGRP - initialize and return a process_group instance */
 
-process_group *make_pgrp(process **pa, process **ca, char **env,
-			 char *shell, proc_bf fg, process_session *ss)
+process_group *make_pgrp(int np, char **env, char *shell,
+                         proc_bf fg, process_session *ss,
+			 PFPCAL (*map)(char *nm))
    {process_group *pg;
     process_state *ps;
 
@@ -385,15 +386,17 @@ process_group *make_pgrp(process **pa, process **ca, char **env,
 	   {ps = get_process_state();
 	    ss = ps->ss;};
 
-	pg->np       = 0;
+	pg->np       = np;
 	pg->to       = 0;
 	pg->fg       = fg;
 	pg->mode     = NULL;
 	pg->shell    = shell;
 	pg->env      = env;
 	pg->terminal = NULL;
-	pg->parents  = pa;
-	pg->children = ca;
+	pg->st       = MAKE_N(int, np);
+	pg->parents  = MAKE_N(process *, np);
+	pg->children = MAKE_N(process *, np);
+	pg->map      = map;
 	pg->ss       = ss;};
 
     return(pg);}
@@ -1420,12 +1423,8 @@ static void parse_pgrp(statement *s)
     proc_bf fg;
     char *t, *shell;
     char **sa, **ta, **env, **ios;
-    process **pa, **ca;
+    process **pa, *pp;
     process_group *pg;
-    process_session *ps;
-
-/*    ps = s->session; */
-    ps = NULL;
 
     it    = 0;
     doif  = FALSE;
@@ -1450,10 +1449,9 @@ static void parse_pgrp(statement *s)
        fg = PROC_FG_RUN;
 
 /* maximum number of process would be the number of tokens */
-    pa = MAKE_N(process *, nc);
-    ca = MAKE_N(process *, nc);
+    pg = make_pgrp(nc, env, shell, fg, NULL, s->map);
 
-    pg = make_pgrp(pa, ca, env, shell, fg, ps);
+    pa = pg->parents;
 
     for (i = 0; i < nc; i++)
         {t   = sa[i];
@@ -1521,6 +1519,14 @@ static void parse_pgrp(statement *s)
     s->ne = it;
     s->pg = pg;
 
+/* count functions and programs */
+    for (i = 0; i < it; i++)
+        {pp = pg->parents[i];
+	 if (pp->isfunc == TRUE)
+	    s->nf++;
+	 else
+	    s->np++;};
+
 /* free string array allowing for NULL out entries */
     free_nstrings(sa, nc);
 
@@ -1532,7 +1538,15 @@ static void parse_pgrp(statement *s)
 /* FREE_PGRP - free the process group PG */
 
 static void free_pgrp(process_group *pg)
-   {
+   {int i, np;
+
+    np = pg->np;
+
+    for (i = 0; i < np; i++)
+        {FREE(pg->parents[i]);
+	 FREE(pg->children[i]);};
+    FREE(pg->parents);
+    FREE(pg->children);
 
     FREE(pg->st);
     FREE(pg);
@@ -2192,21 +2206,24 @@ void register_io_pgrp(process_group *pg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* GROUP_EXIT_STATUS - process the exit statuses of the statement S */
+/* GROUP_EXIT_STATUS - process the exit statuses of PG */
 
-int group_exit_status(int *st, int ne)
-   {int i, rv;
-    int *nst;
+int group_exit_status(process_group *pg)
+   {int i, np, rv;
+    int *nst, *st;
     char vl[BFLRG];
     process_state *ps;
+
+    st = pg->st;
+    np = pg->np;
 
     ps = get_process_state();
 
     rv    = 0;
     vl[0] = '\0';
-    nst   = MAKE_N(int, ne);
+    nst   = MAKE_N(int, np);
 
-    for (i = 0; i < ne; i++)
+    for (i = 0; i < np; i++)
         {nst[i] = st[i];
 	 rv    += (((1 << i) & ps->status_mask) && (st[i] != 0));
 	 vstrcat(vl, BFLRG, "%d ", st[i]);};
@@ -2293,14 +2310,13 @@ int show_pgrp(process_group *pg)
  */
 
 int wait_pgrp(process_group *pg)
-   {int i, np, rv, tc;
+   {int rv, tc;
     char *db;
     process_state *ps;
 
     ps = get_process_state();
 
     rv = -1;
-    np = pg->np;
 
 /* wait for the work to complete - _pgrp_work does the work */
     tc = await(ps->to_sec, 1, "commands", _pgrp_tty, _pgrp_work, pg);
@@ -2309,17 +2325,12 @@ int wait_pgrp(process_group *pg)
 /* close out the jobs */
     afin(_pgrp_fin);
 
-/* free up the process memory */
-    for (i = 0; i < np; i++)
-        {FREE(pg->parents[i]);
-	 FREE(pg->children[i]);};
-    FREE(pg->parents);
-    FREE(pg->children);
-
 /* process the exit statuses */
-    rv = group_exit_status(pg->st, np);
+    rv = group_exit_status(pg);
 
     stk_remove(ps->pg, pg);
+
+/* free up the process memory */
     free_pgrp(pg);
 
     db = getenv("PERDB_PATH");
@@ -2334,9 +2345,10 @@ int wait_pgrp(process_group *pg)
 /* RUN_PGRP - run the process group PG */
 
 static proc_bf run_pgrp(statement *s)
-   {int i, io, ne, np, fd;
+   {int i, io, np, fd;
     proc_bf fg;
     process *pp, *cp;
+    process_stack *pk;
     process_group *pg;
     process_state *ps;
 
@@ -2346,37 +2358,27 @@ static proc_bf run_pgrp(statement *s)
 
     if ((s != NULL) && (ps != NULL))
        {pg = s->pg;
-	ne = s->ne;
+	np = pg->np;
 	fg = pg->fg;
 
-	pg->st  = MAKE_N(int, pg->np);
-	pg->map = s->map;
-
-	for (i = 0; i < ne; i++)
-	    {pp = pg->parents[i];
-	     if (pp->isfunc == TRUE)
-	        s->nf++;
-	     else
-	        s->np++;};
-
-	asetup(ne, 1);
+	asetup(np, 1);
 
 	register_io_pgrp(pg);
 
 /* launch the jobs - io_data passed to accept, reject, and wait methods */
-	for (i = 0; i < ne; i++)
+	for (i = 0; i < np; i++)
 	    {pp = pg->parents[i];
 	     cp = pg->children[i];
 
 	     if (pp->isfunc == FALSE)
-	        {pp = _job_fork(pp, cp, "rw", s);
+	        {pp = _job_fork(pp, cp, "rw", NULL);
 
 		 _dbg(2, "launch %d (%d,%d,%d)       %s",
 		      pp->id,
 		      pp->io[0].fd, pp->io[1].fd, pp->io[2].fd,
 		      pp->cmd);}
  	     else
- 	        {pp->a = s;
+ 	        {pp->a = NULL;
 		 _awatch_fd(pp, IO_STD_NONE, -1);
 		 for (io = 0; io < N_IO_CHANNELS; io++)
  		     _io_file_ptr(pp, io);};
@@ -2388,15 +2390,15 @@ static proc_bf run_pgrp(statement *s)
 	     pp->ip       = i;};
 
 /* load up the process stack */
-	np = s->np;
+	pk = &ps->stck;
 	for (i = 0; i < np; i++)
 	    {pp = pg->parents[i];
 	     fd = pp->io[0].fd;
 
-	     ps->stck.proc[i]       = pp;
-	     ps->stck.fd[i].fd      = fd;
-	     ps->stck.fd[i].events  = ps->stck.mask_acc;
-	     ps->stck.fd[i].revents = 0;};
+	     pk->proc[i]       = pp;
+	     pk->fd[i].fd      = fd;
+	     pk->fd[i].events  = pk->mask_acc;
+	     pk->fd[i].revents = 0;};
 
 	stk_push(ps->pg, pg);};
 
