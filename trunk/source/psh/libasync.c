@@ -1505,8 +1505,7 @@ int *list_fds(process_group *pg)
 
 /* _JOB_FORK - fork PP/CP and exec the command in CP with AL */
 
-static process *_job_fork(process *pp, process *cp,
-			  char *mode, void *a)
+static process *_job_fork(process *pp, process *cp, char *mode, void *a)
    {int st, pid;
     int *fds;
 
