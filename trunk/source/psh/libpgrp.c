@@ -2534,7 +2534,7 @@ statement *parse_statement(char *s, char **env, char *shell,
  */
      
 process_session *init_session(void)
-   {int pgid, tid, fin, iact;
+   {int i, pgid, tid, fin, iact;
     process_session *ps;
      
     ps   = NULL;
@@ -2542,15 +2542,18 @@ process_session *init_session(void)
     iact = isatty(fin);
      
     if (iact == TRUE)
+       {
 
-/* make sure we are in the foreground */
-       {while (TRUE)
-	  {pgid = getpgrp();
-	   tid  = tcgetpgrp(fin);
-	   if (tid == pgid)
-	      break;
-	   kill(-pgid, SIGTTIN);};
-     
+#if 0
+/* make sure we are in the foreground - if possible */
+        for (i = 0; i < 8; i++)
+	    {pgid = getpgrp();
+	     tid  = tcgetpgrp(fin);
+	     if (tid == pgid)
+	        break;
+	     kill(-pgid, SIGTTIN);};
+#endif
+
 /* ignore interactive and job-control signals */
 	nsigaction(NULL, SIGINT,  SIG_IGN, SA_RESTART, -1);
 	nsigaction(NULL, SIGQUIT, SIG_IGN, SA_RESTART, -1);
