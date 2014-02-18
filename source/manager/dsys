@@ -1184,8 +1184,10 @@ switch ($Cmnd)
            dbset CROSS_REF $cross_ref
         endif
 
-        if ("$nargs[1]" == "-r") then
-           shift nargs
+        if ("$nargs" != "") then
+           if ("$nargs[1]" == "-r") then
+              shift nargs
+           endif
         endif
         dbset PSY_CfgCmd "$nargs"
 
