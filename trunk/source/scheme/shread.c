@@ -617,7 +617,7 @@ static object *_SSI_read(SS_psides *si, object *args)
 
     o = SS_null;
 
-    if (SS_nullobjp(fp))
+    if ((fp == NULL) || (SS_nullobjp(fp)))
        o = SS_read(si, si->indev);
 
     else if (SS_inportp(fp))
