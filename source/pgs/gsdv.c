@@ -563,10 +563,12 @@ void PG_setup_ctrls_glb(char *s)
     if (s == NULL)
        s = _PG_gcont.default_window_device;
 
-    _PG_gcont.get_event    = NULL;
-    _PG_gcont.event_device = NULL;
-    _PG_gcont.open_console = NULL;
-    _PG_gcont.setup_window = NULL;
+    ONCE_SAFE(TRUE, NULL)
+       _PG_gcont.get_event    = NULL;
+       _PG_gcont.event_device = NULL;
+       _PG_gcont.open_console = NULL;
+       _PG_gcont.setup_window = NULL;
+    END_SAFE;
 
 #if defined(HAVE_QD)
     if (strcmp(s, "QD") == 0)

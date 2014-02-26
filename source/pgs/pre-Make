@@ -178,6 +178,16 @@ ${BinDir}/tgsa : tgsa.c ${TGTLib}
 	  ${CLD} ${LdFlags} tgsa.c -o ${BinDir}/tgsa ${Libs})
 
 #
+# query event utility
+#
+
+query : ${BinDir}/quev
+
+${BinDir}/quev : ${TGTLib} quev.c
+	@(echo "${CCAnnounce} quev.c -o ${BinDir}/quev" ; \
+	  ${CLD} ${LdFlags} quev.c -o ${BinDir}/quev ${Libs})
+
+#
 # event handling test
 #
 
