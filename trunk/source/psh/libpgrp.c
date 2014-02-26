@@ -2534,7 +2534,7 @@ statement *parse_statement(char *s, char **env, char *shell,
  */
      
 process_session *init_session(void)
-   {int i, pgid, tid, fin, iact;
+   {int pgid, fin, iact;
     process_session *ps;
      
     ps   = NULL;
@@ -2546,6 +2546,7 @@ process_session *init_session(void)
 
 #if 0
 /* make sure we are in the foreground - if possible */
+        int i, tid;
         for (i = 0; i < 8; i++)
 	    {pgid = getpgrp();
 	     tid  = tcgetpgrp(fin);
