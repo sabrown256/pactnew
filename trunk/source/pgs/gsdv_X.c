@@ -1985,3 +1985,25 @@ void PG_X_setup_ctrls_glb(void)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PG_X_GRAB_MOUSE - take over the mouse */
+
+int PG_X_grab_mouse(PG_device *dev)
+   {int rv;
+    Display *disp;
+
+    if (dev == NULL)
+       disp = _PG_X_display;
+    else
+       disp = dev->display;
+
+    rv = XGrabPointer(disp, XDefaultRootWindow(disp),
+		      False, ButtonPressMask, GrabModeAsync, 
+		      GrabModeAsync, None, None, CurrentTime);
+
+    rv = (rv == GrabSuccess);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
