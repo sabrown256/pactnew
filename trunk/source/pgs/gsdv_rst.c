@@ -652,6 +652,30 @@ static void _PG_rst_query_pointer(PG_device *dev, int *ir, int *pb, int *pq)
     return;}
  
 /*--------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_RST_GRAB_POINTER - take over the pointer */
+
+static int _PG_rst_grab_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_RST_RELEASE_POINTER - release the pointer */
+
+static int _PG_rst_release_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PG_RST_SET_DEV_PROP - set some RASTER device characteristics */
@@ -722,6 +746,8 @@ int PG_setup_raster_device(PG_device *d)
 
     d->events_pending          = NULL;
     d->query_pointer           = _PG_rst_query_pointer;
+    d->grab_pointer            = _PG_rst_grab_pointer;
+    d->release_pointer         = _PG_rst_release_pointer;
     d->mouse_event_info        = NULL;
     d->key_event_info          = NULL;
     d->clear_page              = _PG_rst_clear_page;

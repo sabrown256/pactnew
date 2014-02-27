@@ -633,6 +633,30 @@ static void _PG_CGM_query_pointer(PG_device *dev,
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_CGM_GRAB_POINTER - take over the pointer */
+
+static int _PG_CGM_grab_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_CGM_RELEASE_POINTER - release the pointer */
+
+static int _PG_CGM_release_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
 /* PG_SETUP_CGM_DEVICE - do the device dependent device initialization
@@ -647,6 +671,8 @@ int PG_setup_cgm_device(PG_device *d)
 
     d->events_pending          = NULL;
     d->query_pointer           = _PG_CGM_query_pointer;
+    d->grab_pointer            = _PG_CGM_grab_pointer;
+    d->release_pointer         = _PG_CGM_release_pointer;
     d->mouse_event_info        = NULL;
     d->key_event_info          = NULL;
     d->clear_page              = _PG_CGM_clear_page;

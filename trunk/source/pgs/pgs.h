@@ -935,6 +935,8 @@ struct s_PG_device
     void (*draw_to_rel)(PG_device *dev, double x, double y);
     void (*expose_device)(PG_device *dev);
     void (*finish_plot)(PG_device *dev);
+    int (*grab_pointer)(PG_device *dev);
+    int (*release_pointer)(PG_device *dev);
     int (*get_char)(PG_device *dev);
     void (*get_image)(PG_device *dev, unsigned char *bf, int ix, int iy,
 		      int nx, int ny);
@@ -1145,6 +1147,8 @@ extern int
  PG_fset_text_color(PG_device *dev, int clr, int mapped),
  PG_fget_fill_color(PG_device *dev),
  PG_fset_fill_color(PG_device *dev, int clr, int mapped),
+ PG_grab_pointer(PG_device *dev),
+ PG_release_pointer(PG_device *dev),
  PG_white_background(PG_device *dev, int t),
  PG_turn_grid(PG_device *dev, int t),
  PG_turn_data_id(PG_device *dev, int t),

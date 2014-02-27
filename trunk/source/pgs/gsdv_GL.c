@@ -1550,6 +1550,48 @@ static void _PG_GL_query_pointer(PG_device *dev, int *ir, int *pb, int *pq)
 /*------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------*/
 
+/* _PG_GL_GRAB_POINTER - take over the pointer */
+
+static int _PG_GL_grab_pointer(PG_device *dev)
+   {int rv;
+    Display *disp;
+
+    if (dev == NULL)
+       disp = _PG_X_display;
+    else
+       disp = dev->display;
+
+    rv = XGrabPointer(disp, XDefaultRootWindow(disp),
+		      False, ButtonPressMask, GrabModeAsync, 
+		      GrabModeAsync, None, None, CurrentTime);
+
+    rv = (rv == GrabSuccess);
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_GL_RELEASE_POINTER - release the pointer */
+
+static int _PG_GL_release_pointer(PG_device *dev)
+   {int rv;
+    Display *disp;
+
+    if (dev == NULL)
+       disp = _PG_X_display;
+    else
+       disp = dev->display;
+
+    rv = XUnGrabPointer(disp, CurrentTime);
+
+    rv = (rv == GrabSuccess);
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
 /* _PG_GL_MOUSE_EVENT_INFO - return mouse event info for GL */
 
 static void _PG_GL_mouse_event_info(PG_device *dev, PG_event *ev,
@@ -1650,6 +1692,9 @@ int PG_setup_gl_device(PG_device *d)
     d->is_visible   = TRUE;
 
     d->events_pending         = _PG_GL_events_pending;
+    d->query_pointer          = _PG_GL_query_pointer;
+    d->grab_pointer           = _PG_GL_grab_pointer;
+    d->release_pointer        = _PG_GL_release_pointer;
     d->query_pointer          = _PG_GL_query_pointer;
     d->mouse_event_info       = _PG_GL_mouse_event_info;
     d->key_event_info         = _PG_GL_key_event_info;

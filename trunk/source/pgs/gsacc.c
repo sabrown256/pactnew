@@ -1583,6 +1583,42 @@ void PG_query_pointer(PG_device *dev ARG(,in,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PG_GRAB_POINTER - grab the pointer
+ *
+ * #bind PG_grab_pointer fortran() scheme() python()
+ */
+
+int PG_grab_pointer(PG_device *dev ARG(,in,cls))
+   {int rv;
+
+    rv = FALSE;
+
+    if ((dev != NULL) && (dev->grab_pointer != NULL))
+       rv = dev->grab_pointer(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_RELEASE_POINTER - ungrab the pointer
+ *
+ * #bind PG_release_pointer fortran() scheme() python()
+ */
+
+int PG_release_pointer(PG_device *dev ARG(,in,cls))
+   {int rv;
+
+    rv = FALSE;
+
+    if ((dev != NULL) && (dev->release_pointer != NULL))
+       rv = dev->release_pointer(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PG_MOUSE_EVENT_INFO - return info on mouse events
  *
  * #bind PG_mouse_event_info fortran() scheme() python()
