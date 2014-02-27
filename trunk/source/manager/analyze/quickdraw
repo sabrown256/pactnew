@@ -24,6 +24,7 @@ dbmget $ALog HSY_RootInc^                        \
              QD_Path          =\? /usr^          \
              GRAPHICS_UseQD   =\? FALSE^         \
              Cfg_CC_Exe       =\? cc^            \
+             Cfg_LD_Lib       =\? ""^            \
              CC_Exe^                             \
              LD_Flags^                           \
              PACT_CC_VERSION

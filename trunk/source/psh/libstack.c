@@ -139,6 +139,7 @@ void *stk_get(vstack *stk, int i)
 
     if (stk != NULL)
        {n = stk->n;
+        m = -1;
 
 /* for positive I index from the beginning */
 	if ((0 <= i) && (i < n))
@@ -148,7 +149,8 @@ void *stk_get(vstack *stk, int i)
 	else if ((1 <= -i) && (-i < n))
 	   m = n - i;
 
-	rv = stk->stk[m];};
+	if ((0 <= m) && (m < n))
+	   rv = stk->stk[m];};
 
     return(rv);}
 

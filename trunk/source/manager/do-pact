@@ -322,11 +322,8 @@ switch ($Phase)
 #--------------------------------------------------------------------------
 
 # on each local host do the builds with specified options
-        set EnvCsh = $EtcDir/env-pact.csh
-        if (-e $EnvCsh) then
-           source $EnvCsh
-           source $PSY_ScrDir/functions-pact.csh
-        endif
+        source $PSY_ScrDir/functions-pact.csh
+
         if ($MultiConfig == yes) then
            Note $LogHost "   Using MultiConfig with SESSION_CONFIG = |$SESSION_CONFIG|"
         endif
@@ -372,7 +369,7 @@ switch ($Phase)
               if (($IErr == 0) && ($TestOnly == no)) then
                  Separator $LogHost
                  Note $LogHost "Removing"
-flog $LogHost alias
+
                  echo -n "   Removing ... "
                  if ($ltrace == FALSE) then
                     flog $LogHost $PSY_MngDir/dsys remove -cfg
@@ -456,12 +453,20 @@ flog $LogHost alias
 # send config log to update file
                  tlog "(LOG)" cat $DevDir/log/config
 
-                 if (-e $EnvCsh) then
-                    Note $LogHost "source $EnvCsh"
-                    source $EnvCsh
-                 else
-                    Note $LogHost "$EnvCsh not found"
+# NOTE: you cannot include env-pact.csh any earlier than here
+# because a broken relic from a prior build can destroy the build
+# you must wait until the 'dsys config' above successfully completes
+                 if ($IErr == 0) then
+                    set EnvCsh = $EtcDir/env-pact.csh
+                    if (-e $EnvCsh) then
+                       Note $LogHost "source $EnvCsh"
+                       source $EnvCsh
+                    else
+                       Note $LogHost "$EnvCsh not found"
+                    endif
+                    unset EnvCsh
                  endif
+
                  flog $LogHost ( where pact |& head -n 1 )
               endif
    
