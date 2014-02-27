@@ -991,6 +991,30 @@ void _PG_qd_query_pointer(PG_device *dev, int *ir, int *pb, int *pq)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_QD_GRAB_POINTER - take over the pointer */
+
+static int _PG_qd_grab_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_QD_RELEASE_POINTER - release the pointer */
+
+static int _PG_qd_release_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PG_QD_MOUSE_EVENT_INFO - return mouse event info for QD */
@@ -1809,6 +1833,8 @@ int PG_setup_qd_device(PG_device *d)
 
     d->events_pending         = NULL;
     d->query_pointer          = _PG_qd_query_pointer;
+    d->grab_pointer           = _PG_qd_grab_pointer;
+    d->release_pointer        = _PG_qd_release_pointer;
     d->mouse_event_info       = _PG_qd_mouse_event_info;
     d->key_event_info         = _PG_qd_key_event_info;
     d->clear_page             = _PG_qd_clear_page;

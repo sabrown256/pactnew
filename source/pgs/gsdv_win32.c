@@ -604,6 +604,30 @@ static void _PG_win32_query_pointer(PG_device *dev, int *ir,
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_WIN32_GRAB_POINTER - take over the pointer */
+
+static int _PG_win32_grab_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_WIN32_RELEASE_POINTER - release the pointer */
+
+static int _PG_win32_release_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PG_WIN32_MOUSE_EVENT_INFO - return mouse event info for WIN32 */
@@ -963,6 +987,8 @@ int PG_setup_win32_device(PG_device *d)
 
     d->events_pending         = NULL;
     d->query_pointer          = _PG_win32_query_pointer;
+    d->grab_pointer           = _PG_win32_grab_pointer;
+    d->release_pointer        = _PG_win32_release_pointer;
     d->mouse_event_info       = _PG_win32_mouse_event_info;
     d->key_event_info         = _PG_win32_key_event_info;
     d->clear_page             = _PG_win32_clear_page;

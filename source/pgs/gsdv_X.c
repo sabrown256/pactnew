@@ -1807,6 +1807,48 @@ static void _PG_X_query_pointer(PG_device *dev, int *ir, int *pb, int *pq)
 /*------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------*/
 
+/* _PG_X_GRAB_POINTER - take over the pointer */
+
+static int _PG_X_grab_pointer(PG_device *dev)
+   {int rv;
+    Display *disp;
+
+    if (dev == NULL)
+       disp = _PG_X_display;
+    else
+       disp = dev->display;
+
+    rv = XGrabPointer(disp, XDefaultRootWindow(disp),
+		      False, ButtonPressMask, GrabModeAsync, 
+		      GrabModeAsync, None, None, CurrentTime);
+
+    rv = (rv == GrabSuccess);
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_X_RELEASE_POINTER - release the pointer */
+
+static int _PG_X_release_pointer(PG_device *dev)
+   {int rv;
+    Display *disp;
+
+    if (dev == NULL)
+       disp = _PG_X_display;
+    else
+       disp = dev->display;
+
+    rv = XUngrabPointer(disp, CurrentTime);
+
+    rv = (rv == GrabSuccess);
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
 /* _PG_X_MOUSE_EVENT_INFO - return mouse event info for X */
 
 static void _PG_X_mouse_event_info(PG_device *dev, PG_event *ev,
@@ -1914,6 +1956,8 @@ int PG_setup_x11_device(PG_device *d)
 
     d->events_pending         = _PG_X_events_pending;
     d->query_pointer          = _PG_X_query_pointer;
+    d->grab_pointer           = _PG_X_grab_pointer;
+    d->release_pointer        = _PG_X_release_pointer;
     d->mouse_event_info       = _PG_X_mouse_event_info;
     d->key_event_info         = _PG_X_key_event_info;
     d->clear_page             = _PG_X_clear_page;
@@ -1982,28 +2026,6 @@ void PG_X_setup_ctrls_glb(void)
     _PG_gcont.setup_window = PG_setup_x11_device;
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_X_GRAB_MOUSE - take over the mouse */
-
-int PG_X_grab_mouse(PG_device *dev)
-   {int rv;
-    Display *disp;
-
-    if (dev == NULL)
-       disp = _PG_X_display;
-    else
-       disp = dev->display;
-
-    rv = XGrabPointer(disp, XDefaultRootWindow(disp),
-		      False, ButtonPressMask, GrabModeAsync, 
-		      GrabModeAsync, None, None, CurrentTime);
-
-    rv = (rv == GrabSuccess);
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

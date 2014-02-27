@@ -770,6 +770,30 @@ static void _PG_PS_query_pointer(PG_device *dev, int *ir,
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_PS_GRAB_POINTER - take over the pointer */
+
+static int _PG_PS_grab_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
+
+/* _PG_PS_RELEASE_POINTER - release the pointer */
+
+static int _PG_PS_release_pointer(PG_device *dev)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
 /* PG_SETUP_PS_DEVICE - do the device dependent device initialization
@@ -784,6 +808,8 @@ int PG_setup_ps_device(PG_device *d)
 
     d->events_pending          = NULL;
     d->query_pointer           = _PG_PS_query_pointer;
+    d->grab_pointer            = _PG_PS_grab_pointer;
+    d->release_pointer         = _PG_PS_release_pointer;
     d->mouse_event_info        = NULL;
     d->key_event_info          = NULL;
     d->clear_page              = _PG_PS_clear_page;

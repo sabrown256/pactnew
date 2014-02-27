@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     dev = PG_make_device("WINDOW", "COLOR", "QUEV");
     PG_query_screen_n(dev, dx, &nc);
 
-    st = PG_X_grab_mouse(dev);
+    st = PG_grab_pointer(dev);
     if (st == TRUE)
        {for (ip = 0; ip < np; ip++)
 	    {lev = iev[ip];
@@ -90,6 +90,8 @@ int main(int argc, char *argv[])
 		     default :
 			  sm[ip] = "";
 			  break;};};};
+
+	st = PG_release_pointer(dev);
 
 	if (np == 2)
 	   {int ul[PG_SPACEDM], lr[PG_SPACEDM];
