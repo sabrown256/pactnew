@@ -15,6 +15,7 @@ Note $ALog "Analyze: libm"
 
 dbmget $ALog IMF_Lib     =\? -limf^  \
              IMF_Path    =\? ""^     \
+             IMF_Version =\? ""^     \
              USE_IMF     =\? FALSE^  \
              LibM_Lib    =\? "-lm"^  \
              LibM_RPath  =\? ""^     \
@@ -35,6 +36,9 @@ if (-d "$IMF_Path") then
 # for INTEL compiler use libimf that comes with compiler
    if (($PACT_CC_FAMILY == INTEL) && ("$PACT_CC_PATH" =~ */icc*)) then
       flog $ALog set t = $PACT_CC_PATH/lib/libimf.a
+
+   else if ("$IMF_Version" != "") then
+      fexvars $ALog t ls $IMF_Path/ic*${IMF_Version}/lib/libimf.a
 
 # for other compiler find "best" libimf
    else

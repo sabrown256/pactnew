@@ -68,8 +68,8 @@ alias _end_source_      'exit(0)'
 alias call              'set FIRST_ = FALSE ; set SUBR_ = ( \!\!:1 $SUBR_ ) ; setenv ARGL_ "\!\!:2-$" ; if ($Trace == TRUE) echo "Calling $SUBR_[1] with $ARGL_" ; source $SRC_[1] ; _terminate_ ("$QUIT_" != "CSH_SUBR_CONTINUE")'
 alias return            'if ($Trace == TRUE) echo "Returning from $SUBR_[1]" ; shift SUBR_ ; unsetenv ARGL_ ; _end_source_'
 alias quit              'set QUIT_ = \!* ; _terminate_ ("$SUBR_" == "") && _end_source_'
-alias include           'set FIRST_ = TRUE ; set SRC_ = ( \!\!:1 $SRC_ ) ; source $SRC_[1]'
-alias endinclude        'if ($#SRC_ > 0) shift SRC_ ; _end_source_ ; echo \!* >>& /dev/null'
+alias include           'set FIRST_ = TRUE ; set SRC_ = ( \!\!:1 $SRC_ ) ; if ($Trace == TRUE) echo "Including $SRC_[1]" ; source $SRC_[1]'
+alias endinclude        'if ($Trace == TRUE) echo "Done with include $SRC_[1]" ; if ($#SRC_ > 0) shift SRC_ ; _end_source_ ; echo \!* >>& /dev/null'
 alias HAVE_SUBROUTINES  'if ($DISP_ != "CSH_SUBR_NO_LABEL") goto $DISP_'
 
 # if a shell script is starting up SUBR_ will not be defined
