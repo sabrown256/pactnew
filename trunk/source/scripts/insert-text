@@ -1,0 +1,119 @@
+#!/bin/csh -f
+#
+# INSERT-TEXT - insert text into a file
+#             - as opposed to cat'ing to the beginning or end
+#
+# Examples:
+#   echo "foo bar baz" | insert-text -al 8 file.txt
+#   cat foo.bar | insert-text -bl 8 file.txt
+#   echo "foo bar baz" | insert-text -at "this line here" file.txt
+#   cat foo.bar | insert-text -at "this line here" file.txt
+#   echo "foo bar baz" | insert-text -bt "this line here" file.txt
+#   cat foo.bar | insert-text -bt "this line here" file.txt
+#
+# include cpyright.h
+#
+
+unalias *
+
+@ err = 0
+
+set file = ""
+set tgt  = none
+set txt  = ""
+@ nth = 1
+@ ln  = -1
+
+while ($#argv > 0)
+   switch ($1)
+      case -al:
+           shift
+           set tgt = above
+           @ ln  = $1
+           breaksw
+      case -at:
+           shift
+           set tgt = above
+           set txt = "$1"
+           breaksw
+      case -bl:
+           shift
+           set tgt = below
+           @ ln  = $1
+           breaksw
+      case -bt:
+           shift
+           set tgt = below
+           set txt = "$1"
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: insert-text [-al #] [-at <txt>] [-bl #] [-bt <txt>] [-h] [-n #] <file>"
+           echo "   al  insert text in above line #"
+           echo "   at  insert text in above line containing <txt>"
+           echo "   bl  insert text in below line #"
+           echo "   bt  insert text in below line containing <txt>"
+           echo "   h   this help message"
+           echo "   n   nth occurence for text matches (default 1)"
+           echo ""
+           echo ""
+           exit(1)
+      default:
+           set file = $1
+           breaksw
+   endsw
+   shift
+end
+
+set exe    = `which pact`
+set bindir = $exe:h
+set etcdir = $bindir:h/etc
+
+source $etcdir/env-pact.csh
+source $etcdir/functions-pact.csh
+
+if ("$file" == "") then
+   echo "No file specified - exiting"
+   exit(1)
+endif
+
+if ("$txt" != "") then
+   set inf = ( `grep -n "$txt" $file |& head -n $nth | tail -n 1 | sed 's|:| |g'` )
+   @ ln = $inf[1]
+endif
+
+@ nl = `cat $file | wc -l`
+
+# capture the text to be inserted
+rm -f tmp-i.$$
+touch tmp-i.$$
+while (1)
+   set inp = ( $< )
+   if ("$inp" == "") break
+   echo "$inp" >>& tmp-i.$$
+end
+
+# split the file and insert the text
+switch ($tgt)
+   case above:
+        @ tl = $ln - 1
+        @ na = $nl - $tl
+        head -n $tl $file >&! tmp-a.$$
+        tail -n $na $file >&! tmp-b.$$
+        cat tmp-a.$$ tmp-i.$$ tmp-b.$$
+        rm -f tmp-[abi].$$
+        breaksw
+   case below:
+        @ tl = $ln
+        @ na = $nl - $tl
+        head -n $tl $file >&! tmp-a.$$
+        tail -n $na $file >&! tmp-b.$$
+        cat tmp-a.$$ tmp-i.$$ tmp-b.$$
+        rm -f tmp-[abi].$$
+        breaksw
+   default:
+        echo "Unknown case '$tgt' - ignored"
+        breaksw
+endsw
+
+exit($err)
