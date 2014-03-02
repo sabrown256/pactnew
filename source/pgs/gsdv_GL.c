@@ -1583,7 +1583,7 @@ static int _PG_GL_release_pointer(PG_device *dev)
     else
        disp = dev->display;
 
-    rv = XUnGrabPointer(disp, CurrentTime);
+    rv = XUngrabPointer(disp, CurrentTime);
 
     rv = (rv == GrabSuccess);
 

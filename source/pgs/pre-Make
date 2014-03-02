@@ -152,6 +152,7 @@ IncAction = @pact generate
 # link 
 #
 link: ${InstallDep}
+	pact query
 	pact man3install
 
 #

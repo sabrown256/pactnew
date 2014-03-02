@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     else
        printf("Failed to grab mouse - exiting\n");
 
-    PG_close_device(dev);
+    CFREE(dev);
 
     rv = (st != TRUE);
 
