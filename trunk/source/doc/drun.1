@@ -1,0 +1,161 @@
+.\"
+.\" include cpyright.h
+.\"
+
+.TH DRUN 1 "1 March 2014"
+.SH NAME
+drun \- run multiple interactive jobs with facilities to compare
+their results
+.SH SYNOPSIS
+.B drun [--help] [--vrb] <cmd>*
+.SH DESCRIPTION
+
+When you have complex interactive programs that get unexpected
+results it is helpful to be able to run some number of versions
+side by side to see where their state diverges.
+.PP
+Drun is a PDBView script which launches and runs multiple jobs.
+You can send commands to specific jobs or to all jobs.  You can
+add your own functions to gather information from each job and
+present it in any way you need in order to help sift through
+their respective states.  The idea is to allow you to wade through
+potentially large amounts of information to zero in on key
+differences.
+.PP
+.SH OPTIONS
+.TP
+.B --help
+A brief help message showing command line options.
+.TP
+.B --vrb
+Run in verbose mode.
+.TP
+.B <cmd>
+Command line for a job to be run.  It must be enclosed in
+double quotes if there is any whitespace.
+.PP
+.SH BUILT-IN FUNCTIONS
+.PP
+Each job is assigned an integer number starting with 1 and
+increasing in the order in which they are launched.
+Job <n> will have functions p<n> and r<n> defined for it
+when it is launched.
+.PP
+.TP
+.B p<n>
+takes a command for
+job <n> as its argument, sends it to job <n>, gets the
+response from job <n>, and prints it.
+.PP
+.TP
+.B r<n>
+takes a command for
+job <n> as its argument, sends it to job <n>, gets the
+response from job <n>, and returns it as a string value.
+This can be used by user supplied functions to process the
+output of the job.
+.PP
+.TP
+.B pa
+takes a command, sends it to all jobs, and prints the
+immediate results.
+.PP
+.TP
+.B pw
+takes a command, sends it to all jobs, waits for all
+the jobs to complete the command, and prints the
+results.
+.PP
+.TP
+.B pf
+flushes the output of all jobs.
+.PP
+.TP
+.B done
+kills any remaining jobs and ends the drun session.
+.PP
+.SH RETURN VALUE
+.PP
+Exit status of 0.
+.PP
+.SH EXAMPLE SESSION
+.PP
+In this sample session we run the PACT Scheme and SX interpreters
+side by side. SX has the same core as Scheme but also has
+add on extensions.  So they will have the same results for some
+commands and different ones for others.  The drun prompt is
+"drun> " and the shell prompt here is "#> ".
+Explanatory comments here are given in a C style syntax.
+.PP
+ /* start the session */
+ #> drun "scheme -q" "sx -q"
+
+ /* set the output of the both interpreters to a reasonable
+  * level of verbosity
+  */
+ drun> pa (stats-toggle)
+ 1 | (0): #f
+ 1 | 
+ 2 | (0): #f
+ 2 | 
+
+ /* have both interpreters describe the 'pd-open' function
+  * only SX has this function
+  */
+ drun> pa (describe 'pd-open)
+ 1 | (0): #f
+ 1 | 
+ 2 |      Procedure: pd-open
+ 2 |      Usage: (pd-open name mode)
+ 2 | (0): #f
+ 2 | 
+
+ /* have just the Scheme interpreter print a sum */
+ drun> p1 (+ 1 1 2 3 5 8)
+ 1 | (0): 20
+ 1 | 
+
+ /* have just the SX interpreter print the same sum */
+ drun> p2 (+ 1 1 2 3 5 8)
+ 2 | (0): 20
+ 2 | 
+
+ /* have both interpreters print the sum */
+ drun> pa (+ 1 1 2 3 5 8)
+ 1 | (0): 20
+ 1 | 
+ 2 | (0): 20
+ 2 | 
+
+ /* have the Scheme interpreter compute a sum but return
+  * the text as a string value for the variable txt1
+  */
+ drun> define txt1 (r1 (+ 1 2 3))
+
+ /* have the SX interpreter compute a different sum but return
+  * the text as a string value for the variable txt2
+  */
+ drun> define txt2 (r2 (+ 2 3 4))
+
+ /* have the top level drun session print the two results */
+ drun> printf nil "t1: %s\nt2: %s\n" txt1 txt2
+ t1: (0): 6
+ 
+ 
+ t2: (0): 9
+ 
+ 
+ /* end the session and terminate all the jobs */
+ drun> done
+
+/* back to the shell prompt */
+ #> 
+.PP
+.SH SEE ALSO
+.PP
+.B do-run(1)
+.PP
+.SH BUGS
+.TP 
+.B None known.
+

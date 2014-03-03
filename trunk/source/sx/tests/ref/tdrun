@@ -1,0 +1,20 @@
+1 | 
+2 | 
+3 | 
+4 | 
+5 | 
+6 | 
+7 | 
+Command: (pa (stats-toggle))
+Command: (pa (describe (quote pd-open)))
+Command: (p1 (+ 1 1 2 3 5 8))
+Command: (p2 (+ 1 1 2 3 5 8))
+Command: (pa (+ 1 1 2 3 5 8))
+Command: (define-global txt1 (r1 (+ 1 2 3)))
+Command: (define-global txt2 (r2 (+ 2 3 4)))
+Command: (printf () t1: %s\nt2: %s\n txt1 txt2)
+t1: 
+t2: 
+Command: (pa (quit))
+Command: (done)
+
