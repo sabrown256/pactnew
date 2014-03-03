@@ -145,10 +145,16 @@
     (let* ((cmd (apply sprintf (cons fmt x)))
            (job (process-open "a" (list cmd) poll-read poll-write))
 	   (jn  (job-number nil))
-	   (jnm (string->symbol (sprintf "p%d" jn)))
 	   (jb  (job-make jn job nil ""))
+	   (jpr (string->symbol (sprintf "p%d" jn)))
+	   (jrs (string->symbol (sprintf "r%d" jn)))
 
-  	   (msn (eval `(define-global-macro ,(list jnm 'msg)
+  	   (mpr (eval `(define-global-macro ,(list jpr 'msg)
+			   (job-send-cmd (quote ,jb)
+					     (sprintf "\"%s\"" msg))
+			   (job-get-response (quote ,jb) #f #t))))
+
+  	   (mrs (eval `(define-global-macro ,(list jrs 'msg)
 			   (job-send-cmd (quote ,jb)
 					     (sprintf "\"%s\"" msg))
 			   (job-get-response (quote ,jb) #t #f)))))
@@ -375,7 +381,7 @@
 
 (define (help)
    (printf nil "\n")
-   (printf nil "Usage: drun [--help] [--vrb] <cmd>*\n")
+   (printf nil "Usage: drun [--help] [--vrb] [--load <file>]* <cmd>*\n")
    (printf nil "   help  this help message\n")
    (printf nil "   vrb   run more verbosely\n")
    (printf nil "   <cmd> job command line\n")

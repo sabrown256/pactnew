@@ -1,0 +1,38 @@
+#!/bin/csh -f
+#
+# DRUN - test the DRUN applications
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "DRUN Test ...................."
+set exe = $BinDir/drun
+set opt = ( -e -r -s --load $FilesDir/tdrun.scm \"scheme -q\" \"sx -q\" )
+set io  = tdrun.res
+
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
+
+   flog $Log set res = tdrun.res
+   flog $Log set ref = $FilesDir/ref/tdrun
+
+   source ../../../scripts/test-run
+
+   if (($xstatus == 0) && ("$Valgrind" == "")) then
+      if (-f $ref) then
+         flog $Log (diff $res $ref > $res.diff)
+         set xstatus = $status
+      else
+         flog $Log cp $res $ref
+         set xstatus = $status
+      endif
+   endif
+
+   set rpf = ( $rpf $res $res.diff )
+
+$TEST_CHECK part -a drun -e $xstatus -dt $dt -rpf "$rpf" none
+
+exit($status)
