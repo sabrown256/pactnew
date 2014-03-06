@@ -309,11 +309,18 @@ EOF
    flog $ALog $lCC $Tmp.c -o $Tmp
    if ($status == 0) then
 
+      flog $ALog $CROSS_FE $Tmp $DP_BE
       fexvar $ALog FC_INT_PTR_DIFFER $CROSS_FE $Tmp $DP_BE
       if ("$FC_INT_PTR_DIFFER" == TRUE) then
          NoteD $ALog "      pointer size differs from Fortran INTEGER size"
       endif
 
+   else
+      Note $ALog ""
+      Note $ALog "--Compilation failed--"
+      Note $ALog "/* $lCC $Tmp.c -o $Tmp */
+      cat $Tmp.c >>& $ALog
+      Note $ALog ""
    endif
    Note $ALog ""
 

@@ -19,9 +19,11 @@ if ($1 == run) then
 # print the fiducial answers
 else
    echo "Calling foo with ( )"
+   echo "Including subr4.inc"
    echo "Calling bar with ( )"
    echo "here"
    echo "Returning from bar"
+   echo "Done with include subr4.inc"
    echo "Returning from foo"
 endif
 
