@@ -20,12 +20,12 @@ Group OCV {
    CC_Sh   ?= -fPIC
    OMP_Lib ?= -lgomp
    StackP  ?= [ _env_ = PACT_CC_VERSION ;      # stack checking
-               4.2.* >= -fstack-protector ]
+               4.2.* >= -fstack-protector -Wformat-security -Wl,-z,relro -Wl,-z,now ]
 }
 
 Tool CC {
    Exe       = ${OCV_CC}
-   Flags     = -ffloat-store
+   Flags     = -pipe -ffloat-store
    Flags    += [ _env_ = STD_C ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
@@ -43,6 +43,7 @@ Tool CC {
                  4.8.3 >= -fsanitize=address ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # thread checks
                  4.8.* >= -fsanitize=thread -pie ]
+#   Flags    += -Wl,-O1 -Wl,--discard-all -Wl,--no-undefined -Wl,--build-id=sha1
    Flags    += ${OCV_StackP}
    Flags    += ${OCV_Bits}
    Flags    += ${OCV_PIC}
@@ -51,7 +52,15 @@ Tool CC {
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
                  on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
-#   Debug    += -Wno-unused-function -Wno-missing-declarations -Wno-inline
+##   Debug    += -Wno-unused-function -Wno-missing-declarations -Wno-inline
+#   Debug     += -fno-exceptions -fvisibility=internal
+#   Debug     += -Werror
+#   Debug     += -W -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
+#   Debug     += -Wformat -Wmultichar -Wformat-nonliteral
+#   Debug     += -Wreturn-type -Wsign-compare
+#   Debug     += -Wpointer-arith
+#   Debug     += -Winit-self -Wuninitialized
+#   Debug     += -Wno-deprecated
    Optimize  = [ _env_ = PACT_CC_VERSION ;      # optimization level
                  4.1.2 = -g -O0 -Wall ;         # 4.1.2 crashes on mlcfnc.c with -O
                  *.*   = -g -O -Wunused ]
