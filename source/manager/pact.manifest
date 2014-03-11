@@ -14,7 +14,8 @@ pkg scheme panacea fortran ultra ppc scc
 
 bin atdbg do-net detect pcexec ps-diff ncpu scheme sx
 bin toul ultra mpi-io-wrap ptime dmnz propr rpath
-bin hserve fcscan pcsh do-run gexec perdb blang
+bin hserve fcscan pco pcsh do-run gexec perdb blang
+bin pact-info
 
 lib libpanacea.a libpdb.a libpgs.a libpml.a libppc.a
 lib libpsmm.a libscheme.a libscore.a libsx.a libfpact.a

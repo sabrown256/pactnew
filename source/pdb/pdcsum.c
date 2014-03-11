@@ -325,7 +325,7 @@ int _PD_cksum_file_write(PDBfile *file)
 
 	addr = _PD_locate_checksum(file);
         if (addr != -1)
-           {if (lio_write(dig, 1, PD_CKSUM_LEN-1, fp) == -1) 
+           {if (lio_write(dig, 1, PD_CKSUM_LEN-1, fp) <= 0) 
 	       PD_error("WRITE OF CHECKSUM FAILED - _PD_CKSUM_FILE_WRITE",
 			PD_WRITE);
 

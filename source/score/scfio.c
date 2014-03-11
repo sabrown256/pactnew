@@ -1134,7 +1134,8 @@ static size_t _SC_rread(void *s, size_t nbi, size_t ni, FILE *stream)
        rv = io_read(s, nbi, ni, (FILE *) fp->pp);
 
     else
-       {int nir, nbw, nbr, nbt;
+       {int nir, nbr, nbt;
+	unsigned int nbw;
         char *ps;
 
         pp = fp->pp;
@@ -2832,7 +2833,7 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
  */
 
 ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
-   {long nbw;
+   {unsigned long nbw;
     ssize_t rv;
 
     nbw = PS_write_safe(fd, bf, n);

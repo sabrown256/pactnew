@@ -396,7 +396,8 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
  */
 
 static int _PD_rd_chrt_iii(PDBfile *file)
-   {long sz, nbc, ncast, icast, bsz;
+   {long sz, ncast, icast, bsz;
+    u_int64_t nbc;
     char **pl;
     char type[MAXLINE];
     char *nxt, *bf, *p, *local, *member, *modf;
@@ -1279,7 +1280,7 @@ static int _PD_wr_fmt_iii(PDBfile *file)
  */
 
 static int _PD_open_iii(PDBfile *file)
-   {int nb;
+   {unsigned int nb;
     char str[MAXLINE], key[MAXLINE];
     char *acc, *rej, *s, *ps;
     FILE *fp;
