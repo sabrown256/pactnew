@@ -1192,20 +1192,20 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	      SC_vstrcat(t, MAXLINE, "+%gi", i);}
 
 	else if (ityp == SC_QUATERNION_I)
-          {double s, i, j, k;
+          {double d, i, j, k;
 	   quaternion q;
 
 	   q = SS_QUATERNION_VALUE(obj);
-	   s = q.s;
+	   d = q.s;
 	   i = q.i;
 	   j = q.j;
 	   k = q.k;
 
 	   t[0] = '\0';
-	   if ((s == 0.0) && (i == 0.0) && (j == 0.0) && (k == 0.0))
+	   if ((d == 0.0) && (i == 0.0) && (j == 0.0) && (k == 0.0))
 	      snprintf(t, MAXLINE, "0.0");
-	   if (s != 0.0)
-	      snprintf(t, MAXLINE, "%g", s);
+	   if (d != 0.0)
+	      snprintf(t, MAXLINE, "%g", d);
 	   if (i < 0.0)
 	      SC_vstrcat(t, MAXLINE, "%gi", i);
 	   else if (i > 0.0)

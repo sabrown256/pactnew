@@ -97,7 +97,7 @@ void _SC_diagnostic(char *fmt, ...)
 
 /* _SC_EXEC_TEST - test the exec system call */
 
-void _SC_exec_test(char **argv, char **envp, char *mode)
+NORETURN void _SC_exec_test(char **argv, char **envp, char *mode)
    {int i;
     PROCESS *pp;
 
@@ -2064,7 +2064,7 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
 		   {exitf = SC_VA_ARG(PFProcExit);
 		    exita = SC_VA_ARG(void *);}
 		else if (strcmp(key, "IO-DES") == 0)
-		   {int ifd, nfd;
+		   {int nfd;
 		    SC_iodes *pfd;
 
 		    pfd = SC_VA_ARG(SC_iodes *);

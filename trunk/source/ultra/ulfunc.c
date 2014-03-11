@@ -727,7 +727,7 @@ static object *_ULI_close_device(SS_psides *si, object *arg)
 
 /* _UL_QUIT - gracefully exit from Ultra */
 
-void _UL_quit(SS_psides *si, int sts)
+NORETURN void _UL_quit(SS_psides *si, int sts)
    {int i;
     out_device *out;
 

@@ -27,18 +27,18 @@ static PA_domain_spec
 /* PA_GET_DOMAIN_LIST - manage a static domain list */
 
 PA_domain_spec *PA_get_domain_list(void)
-   {static PA_domain_spec *domain_list = NULL;
+   {static PA_domain_spec *dl = NULL;
 
-    if (domain_list == NULL)
-       {domain_list = CMAKE_N(PA_domain_spec, 10);
+    if (dl == NULL)
+       {dl = CMAKE_N(PA_domain_spec, 10);
         _PA.n_domains   = 0;
         _PA.max_domains = 10;};
 
     if (_PA.n_domains >= _PA.max_domains)
        {_PA.max_domains += 10;
-	CREMAKE(domain_list, PA_domain_spec, _PA.max_domains);};
+	CREMAKE(dl, PA_domain_spec, _PA.max_domains);};
 
-    return(domain_list);}
+    return(dl);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -71,21 +71,21 @@ int _PG_get_fill_contour_color(PG_device *dev, int l, int n)
  * #bind PG_contour_levels fortran() scheme() python()
  */
 
-int PG_contour_levels(double *lev, int nlev, double fmin, double fmax,
+int PG_contour_levels(double *lev, int nlev, double fmn, double fmx,
 		      double ratio)
    {int i;
     double delta, levn;
 
     if (nlev == 1)
-       lev[0] = 0.5*(fmin + fmax);
+       lev[0] = 0.5*(fmn + fmx);
 
     else
-       {lev[0] = fmin;
+       {lev[0] = fmn;
 	levn   = nlev - 1.0;
 	if (ratio == 1.0)
-	   delta = (fmax - fmin)/levn;
+	   delta = (fmx - fmn)/levn;
 	else
-	   delta = (fmax - fmin)*(1.0 - ratio)/
+	   delta = (fmx - fmn)*(1.0 - ratio)/
 	           (ratio*(1.0 - POW(ratio, levn)));
 
 	for (i = 1; i < nlev; i++)
@@ -452,8 +452,7 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
     int *maxes, *mcnt, *mark;
     long sides[5];
     double xpt[10], ypt[10];
-    double *x1, *x2, *x3, *x4;
-    double *y1, *y2, *y3, *y4;
+    double *x1[2], *x2[2], *x3[2], *x4[2];
     double *a1, *a2, *a3, *a4;
     double px[4], py[4], pa[4];
     char *emap;
@@ -469,8 +468,8 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
 
     emap = PM_check_emap(&eflag, alist, nmap);
 
-    PM_LOGICAL_ZONE(x[0], x1, x2, x3, x4, imx);
-    PM_LOGICAL_ZONE(x[1], y1, y2, y3, y4, imx);
+    PM_LOGICAL_ZONE(x[0], x1[0], x2[0], x3[0], x4[0], imx);
+    PM_LOGICAL_ZONE(x[1], x1[1], x2[1], x3[1], x4[1], imx);
     PM_LOGICAL_ZONE(a,    a1, a2, a3, a4, imx);
 
     mark = CMAKE_N(int, nlev);
@@ -490,15 +489,15 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
 	     if (emap[l1] == 0)
 	        continue;
 
-	     px[0] = x1[l];
-	     px[1] = x2[l];
-	     px[2] = x3[l];
-	     px[3] = x4[l];
+	     px[0] = x1[0][l];
+	     px[1] = x2[0][l];
+	     px[2] = x3[0][l];
+	     px[3] = x4[0][l];
 
-	     py[0] = y1[l];
-	     py[1] = y2[l];
-	     py[2] = y3[l];
-	     py[3] = y4[l];
+	     py[0] = x1[1][l];
+	     py[1] = x2[1][l];
+	     py[2] = x3[1][l];
+	     py[3] = x4[1][l];
 
 	     pa[0] = a1[l];
 	     pa[1] = a2[l];

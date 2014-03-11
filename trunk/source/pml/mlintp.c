@@ -959,8 +959,6 @@ coefficient *PM_alloc_vertices(PM_lagrangian_mesh *grid)
    {int n_v;
     coefficient *vertices;
 
-    grid = NULL;
-
     vertices = CMAKE(coefficient);
 
     vertices->n_points = n_v = 4;

@@ -141,14 +141,14 @@ struct s_SS_smp_state
  */
 
 #define SS_end_cons_macro(_si, _frst, _ths, _nxt)                            \
-    {object *_x;                                                             \
-     _x = _nxt;                                                              \
+    {object *_y;                                                             \
+     _y = _nxt;                                                              \
      if (SS_nullobjp(_frst))                                                 \
-        {_frst = SS_mk_cons(_si, _x, SS_null);                               \
+        {_frst = SS_mk_cons(_si, _y, SS_null);                               \
          SS_mark(_frst);                                                     \
          SS_assign(_si, _ths, _frst);}                                       \
      else                                                                    \
-        {SS_setcdr(_si, _ths, SS_mk_cons(_si, _x, SS_null));                 \
+        {SS_setcdr(_si, _ths, SS_mk_cons(_si, _y, SS_null));                 \
          SS_assign(_si, _ths, SS_cdr(_si, _ths));};}
 
 /*--------------------------------------------------------------------------*/

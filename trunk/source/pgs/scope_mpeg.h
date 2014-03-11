@@ -1460,8 +1460,8 @@ void EncodeCDC _ANSI_ARGS_((int32 dc_term, int32 *pred_term, BitBucket *bb));
  * flat block fb exists
  */
 #define	GEN_I_BLOCK(frameType, frame, bb, mbAI, qscale)	{                   \
-	boolean overflow, overflowChange=FALSE;                             \
-        int overflowValue = 0;                                              \
+	boolean overflow, _overflchg=FALSE;                                 \
+        int _overflval = 0;                                                 \
         do {                                                                \
 	  overflow =  Mpost_QuantZigBlock(dct[y][x], fb[0],                 \
 			 qscale, TRUE)==MPOST_OVERFLOW;                     \
@@ -1476,7 +1476,7 @@ void EncodeCDC _ANSI_ARGS_((int32 dc_term, int32 *pred_term, BitBucket *bb));
 	  overflow |= Mpost_QuantZigBlock(dctr[y >> 1][x >> 1],             \
 			 fb[5], qscale, TRUE)==MPOST_OVERFLOW;              \
           if ((overflow) && (qscale!=31)) {                                 \
-           overflowChange = TRUE; overflowValue++;                          \
+           _overflchg = TRUE; _overflval++;                                 \
 	   qscale++;                                                        \
 	   } else overflow = FALSE;                                         \
 	} while (overflow);                                                 \
@@ -1508,7 +1508,7 @@ void EncodeCDC _ANSI_ARGS_((int32 dc_term, int32 *pred_term, BitBucket *bb));
 	/* CR block */							    \
 	EncodeCDC(fb[5][0], &cr_dc_pred, bb);				    \
 	Mpost_RLEHuffIBlock(fb[5], bb);					    \
-	if (overflowChange) qscale -= overflowValue;                        \
+	if (_overflchg) qscale -= _overflval;                               \
     }
 
 #define	BLOCK_TO_FRAME_COORD(bx1, bx2, x1, x2) {    \

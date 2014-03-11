@@ -1904,9 +1904,9 @@ static void _PG_X_key_event_info(PG_device *dev, PG_event *ev,
 				 int *iev, char *bf, int n, int *peq)
    {int et, eq;
     KeySym key;
-    XComposeStatus stat;
+    XComposeStatus st;
 
-    XLookupString(&ev->xkey, bf, n, &key, &stat);
+    XLookupString(&ev->xkey, bf, n, &key, &st);
 
 /* location */
     iev[0] = ev->xkey.x;

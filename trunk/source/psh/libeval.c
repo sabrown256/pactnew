@@ -175,8 +175,7 @@ void prune_env(char *tgt, char *info)
 
 /* remove PACT config variables */
         else if (strcmp(tgt, "pact") == 0)
-	   {int i;
-	    char s[BFLRG], env[BFLRG];
+	   {char s[BFLRG], env[BFLRG];
 	    char **sa, *p;
 
 	    nstrncpy(s, BFLRG, path_head(cwhich(info)), -1);

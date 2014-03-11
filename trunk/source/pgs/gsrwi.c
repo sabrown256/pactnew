@@ -165,15 +165,15 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
 
 	name = iob->action_name;
         if (strcmp(name, "toggle") == 0)
-	   {char *type;
+	   {char *lty;
             PG_interface_object *trans;
 
-            type = iob->type;
-	    if (strcmp(type, PG_BUTTON_OBJECT_S) == 0)
+            lty = iob->type;
+	    if (strcmp(lty, PG_BUTTON_OBJECT_S) == 0)
 	       {trans = (PG_interface_object *) iob->obj;
 		PRINT(fp, " ACT(toggle,%s)", trans->name);}
 
-	    else if (strcmp(type, PG_VARIABLE_OBJECT_S) == 0)
+	    else if (strcmp(lty, PG_VARIABLE_OBJECT_S) == 0)
 	       PRINT(fp, " ACT(toggle)");}
 
         else

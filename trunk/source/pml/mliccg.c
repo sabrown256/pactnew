@@ -805,7 +805,6 @@ double PM_iccg(int km, int lm, double eps, int ks, int maxit,
 #ifdef CRAY
     rv = _PM_iccg_v(km, lm, eps, ks, maxit, a0, a1, b0, b1, bm1, x, y);
 #else
-    ks = 0;
     rv = _PM_iccg_s(km, lm, eps, maxit, a0, a1, b0, b1, bm1, x, y, km*lm, 0);
 #endif
 

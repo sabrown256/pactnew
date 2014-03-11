@@ -814,12 +814,11 @@ io_device _ioc_pair(int *fds, int id)
 
 #if !defined(_WIN32)
 	     {int err;
-	      char *ps;
 	      static int fdl[2] = {-1, -1};
+	      static int lid = -1;
 	      extern char *ptsname(int fd);
 	      extern int grantpt(int fd);
 	      extern int unlockpt(int fd);
-	      static int lid = -1;
 
 	      st = -1;
 
@@ -830,9 +829,11 @@ io_device _ioc_pair(int *fds, int id)
 		  if (err != 0)
 		     fdl[0] = -1;
 		  else
-		     {lid = id;
-		      ps  = ptsname(fdl[0]);
-		      fdl[1] = open_safe(ps, O_RDWR, 0);};};
+		     {char *pn;
+
+		      lid = id;
+		      pn  = ptsname(fdl[0]);
+		      fdl[1] = open_safe(pn, O_RDWR, 0);};};
 
 	      if (fdl[0] >= 0)
 		 {fds[0] = fcntl(fdl[0], F_DUPFD, fdl[0]);

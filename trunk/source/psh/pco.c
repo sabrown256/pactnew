@@ -20,7 +20,7 @@
 #define STACK_TOOL      3
 #define STACK_GROUP     4
 
-#define LOG_ON      initlog("a", st.logf)
+#define LOG_ON      initlog("a", gst.logf)
 #define LOG_OFF     finlog()
 
 enum e_phase_id
@@ -146,11 +146,11 @@ struct s_state
     char features[BFSML];};
 
 static state
- st = { FALSE, FALSE, FALSE, FALSE, FALSE,
-        FALSE, TRUE, FALSE, TRUE, FALSE, FALSE,
-	FALSE, FALSE, FALSE,
-        PHASE_READ, 0, NULL, NULL,
-        0, NULL, NULL, NULL, };
+ gst = { FALSE, FALSE, FALSE, FALSE, FALSE,
+         FALSE, TRUE, FALSE, TRUE, FALSE, FALSE,
+	 FALSE, FALSE, FALSE,
+         PHASE_READ, 0, NULL, NULL,
+         0, NULL, NULL, NULL, };
 
 static void
  parse_line(client *cl, char *s, char *key, char *oper, char *value, int nc);
@@ -165,7 +165,7 @@ static void
  *      - by the shell
  */
 
-static char *echo(int log, char *fmt, ...)
+static char *echo(int lg, char *fmt, ...)
    {char s[BFLRG];
     char *rv;
 
@@ -192,8 +192,8 @@ static char *push_file(char *s, int itype)
     static char *places[] = { NULL, "local", "std", "features",
 			      "compilers", "analyze", "." };
 
-    n  = st.fstck.n++;
-    se = st.fstck.file + n;
+    n  = gst.fstck.n++;
+    se = gst.fstck.file + n;
 
     ok = TRUE;
     if (itype == STACK_FILE)
@@ -205,7 +205,7 @@ static char *push_file(char *s, int itype)
 		 ok = file_exists(lfile);}
 	     else
 	        {snprintf(lfile, BFLRG, "%s/%s", places[id], s);
-		 ok = file_exists("%s/%s", st.dir.mng, lfile);};};
+		 ok = file_exists("%s/%s", gst.dir.mng, lfile);};};
 
 	if (ok == FALSE)
 	   {noted(NULL, "***> Cannot find file '%s'\n\n", s);
@@ -229,7 +229,7 @@ static char *push_file(char *s, int itype)
 
 	if (itype == STACK_FILE)
 	   {if (lfile[0] != '/')
-               snprintf(t, BFLRG, "%s/%s", st.dir.mng, lfile);
+               snprintf(t, BFLRG, "%s/%s", gst.dir.mng, lfile);
 	    else
 	       nstrncpy(t, BFLRG, lfile, -1);
 	    se->fp = fopen_safe(t, "r");}
@@ -248,10 +248,10 @@ static void pop_file(void)
    {int n;
     file_entry *se;
 
-    st.fstck.n--;
+    gst.fstck.n--;
 
-    n  = st.fstck.n;
-    se = st.fstck.file + n;
+    n  = gst.fstck.n;
+    se = gst.fstck.file + n;
 
     if (se->itype == STACK_FILE)
        fclose_safe(se->fp);
@@ -290,8 +290,8 @@ static void push_struct(char *item, char *collection, int itype)
 
     strcpy(collection, t);
 
-    n  = st.gstck.n++;
-    ge = st.gstck.st + n;
+    n  = gst.gstck.n++;
+    ge = gst.gstck.st + n;
     ge->item  = STRSAVE(item);
     ge->itype = itype;
     ge->opt   = NULL;
@@ -308,17 +308,17 @@ static void pop_struct(client *cl)
     gt_entry *ge;
 
 /* release the current stack entry */
-    n  = --st.gstck.n;
-    ge = st.gstck.st + n;
+    n  = --gst.gstck.n;
+    ge = gst.gstck.st + n;
 
     FREE(ge->item);
 
 /* reset the current group or tool */
-    n  = st.gstck.n - 1;
-    ge = st.gstck.st + n;
+    n  = gst.gstck.n - 1;
+    ge = gst.gstck.st + n;
 
-    nstrncpy(st.gstck.curr_grp,  BFSML, ge->item, -1);
-    st.gstck.curr_tool[0] = '\0';
+    nstrncpy(gst.gstck.curr_grp,  BFSML, ge->item, -1);
+    gst.gstck.curr_tool[0] = '\0';
 
     note(NULL, "--- end\n");
 
@@ -684,8 +684,8 @@ static int pco_save_db(client *cl, char *dbname)
 
     rv = TRUE;
 
-    dbset(cl, "PCO_Tools",  st.def_tools);
-    dbset(cl, "PCO_Groups", st.def_groups);
+    dbset(cl, "PCO_Tools",  gst.def_tools);
+    dbset(cl, "PCO_Groups", gst.def_groups);
 
 /* save the persistent database */
     if (dbname == NULL)
@@ -695,10 +695,10 @@ static int pco_save_db(client *cl, char *dbname)
     dbcmd(cl, t);
 
 /* write the input form of the database - to be read back in by pco */
-    write_pco(cl, &st, dbname);
+    write_pco(cl, &gst, dbname);
 
 /* write the perl form of the database - to be read back in by mio */
-    write_perl(cl, &st, dbname);
+    write_perl(cl, &gst, dbname);
 
     return(rv);}
 
@@ -878,29 +878,29 @@ static void write_envf(client *cl, int lnotice)
     FILE *fcsh, *fsh, *fdk, *fmd;
 
     separator(NULL);
-    note(NULL, "   Environment setup files - env-%s (csh, sh, dk, and mdl)\n", st.code);
+    note(NULL, "   Environment setup files - env-%s (csh, sh, dk, and mdl)\n", gst.code);
     note(NULL, "\n");
 
-    fcsh = open_file("w", st.env_csh);
-    fsh  = open_file("w", st.env_sh);
-    fdk  = open_file("w", st.env_dk);
-    fmd  = open_file("w", st.env_mdl);
+    fcsh = open_file("w", gst.env_csh);
+    fsh  = open_file("w", gst.env_sh);
+    fdk  = open_file("w", gst.env_dk);
+    fmd  = open_file("w", gst.env_mdl);
 
 /* initialize module with boilerplate */
     note(fmd,  "#%%Module1.0\n");
     note(fmd,  "#\n");
-    note(fmd,  "# %s modulefile\n", st.code);
+    note(fmd,  "# %s modulefile\n", gst.code);
     note(fmd,  "# vi:set filetype=tcl:\n");
     note(fmd,  "#\n");
     note(fmd,  "\n");
     note(fmd,  "# module whatis\n");
-    note(fmd,  "module-whatis \"%s Environment\";\n", st.CODE);
+    note(fmd,  "module-whatis \"%s Environment\";\n", gst.CODE);
     note(fmd,  "\n");
     note(fmd,  "# module help\n");
     note(fmd,  "proc ModulesHelp { } {\n");
     note(fmd,  "   global version;\n");
     note(fmd,  "\n");
-    note(fmd,  "   puts stderr \"\\tThis module sets your environment to use %s\\n\";\n", st.CODE);
+    note(fmd,  "   puts stderr \"\\tThis module sets your environment to use %s\\n\";\n", gst.CODE);
     note(fmd,  "}\n");
     note(fmd, "\n");
 
@@ -923,12 +923,12 @@ static void write_envf(client *cl, int lnotice)
     note(fcsh, "endif\n");
     note(fcsh, "\n");
 
-/* make a temporary approximation to st.env_csh
+/* make a temporary approximation to gst.env_csh
  * NOTE: used the C Shell to expand and print unique environment variable settings
  * in Bourne Shell syntax in the past
  */
     CLOG(cl, 1, "pco: start write_envf");
-    if (st.db == NULL)
+    if (gst.db == NULL)
        {n = sizeof(site)/sizeof(char *);
 	for (i = 0; i < n; i++)
 	    env_out(fsh, fcsh, fdk, fmd, site[i], dbget(cl, TRUE, site[i]));
@@ -946,21 +946,21 @@ static void write_envf(client *cl, int lnotice)
 
 /* emit MANPATH settings */
     note(fcsh, "if ($?MANPATH == 1) then\n");
-    note(fcsh, "   setenv MANPATH %s/man:$MANPATH\n", st.dir.root);
+    note(fcsh, "   setenv MANPATH %s/man:$MANPATH\n", gst.dir.root);
     note(fcsh, "else\n");
-    note(fcsh, "   setenv MANPATH %s/man:\n", st.dir.root);
+    note(fcsh, "   setenv MANPATH %s/man:\n", gst.dir.root);
     note(fcsh, "endif\n");
     note(fcsh, "\n");
 
     note(fsh, "if [ \"$MANPATH\" != \"\" ]; then\n");
-    note(fsh, "   export MANPATH=%s/man:$MANPATH\n", st.dir.root);
+    note(fsh, "   export MANPATH=%s/man:$MANPATH\n", gst.dir.root);
     note(fsh, "else\n");
-    note(fsh, "   export MANPATH=%s/man\n", st.dir.root);
+    note(fsh, "   export MANPATH=%s/man\n", gst.dir.root);
     note(fsh, "fi\n");
     note(fsh, "\n");
 
-    note(fdk, "dk_alter MANPATH %s/man\n", st.dir.root);
-    note(fmd, "prepend-path MANPATH %s/man;\n", echo(FALSE, st.dir.root));
+    note(fdk, "dk_alter MANPATH %s/man\n", gst.dir.root);
+    note(fmd, "prepend-path MANPATH %s/man;\n", echo(FALSE, gst.dir.root));
 
 /* emit PATH settings */
     if (IS_NULL(epath) == FALSE)
@@ -968,14 +968,14 @@ static void write_envf(client *cl, int lnotice)
 	   note(fdk, "dk_alter PATH %s\n", u);
 	   note(fmd, "prepend-path PATH    %s;\n", echo(FALSE, u));
 	ENDFOR
-        note(fcsh, "setenv PATH    %s/bin:%s:$PATH\n", st.dir.root, epath);
-        note(fsh,  "export PATH=%s/bin:%s:$PATH\n", st.dir.root, epath);}
+        note(fcsh, "setenv PATH    %s/bin:%s:$PATH\n", gst.dir.root, epath);
+        note(fsh,  "export PATH=%s/bin:%s:$PATH\n", gst.dir.root, epath);}
     else
-       {note(fcsh, "setenv PATH    %s/bin:$PATH\n", st.dir.root);
-        note(fsh, "export PATH=%s/bin:$PATH\n", st.dir.root);};
+       {note(fcsh, "setenv PATH    %s/bin:$PATH\n", gst.dir.root);
+        note(fsh, "export PATH=%s/bin:$PATH\n", gst.dir.root);};
 
-    note(fdk, "dk_alter PATH    %s/bin\n", st.dir.root);
-    note(fmd, "prepend-path PATH    %s/bin;\n", echo(FALSE, st.dir.root));
+    note(fdk, "dk_alter PATH    %s/bin\n", gst.dir.root);
+    note(fmd, "prepend-path PATH    %s/bin;\n", echo(FALSE, gst.dir.root));
     note(fdk, "\n");
     note(fmd, "\n");
 
@@ -983,18 +983,18 @@ static void write_envf(client *cl, int lnotice)
  * PDBView need to get the users SCHEME variable if defined
  */
     note(fcsh, "if ($?SCHEME == 1) then\n");
-    note(fcsh, "   setenv SCHEME  ${SCHEME}:%s/scheme\n", st.dir.root);
+    note(fcsh, "   setenv SCHEME  ${SCHEME}:%s/scheme\n", gst.dir.root);
     note(fcsh, "else\n");
-    note(fcsh, "   setenv SCHEME  %s/scheme\n", st.dir.root);
+    note(fcsh, "   setenv SCHEME  %s/scheme\n", gst.dir.root);
     note(fcsh, "endif\n");
-    note(fcsh, "setenv ULTRA   %s/scheme\n", st.dir.root);
+    note(fcsh, "setenv ULTRA   %s/scheme\n", gst.dir.root);
 
-    note(fsh, "export SCHEME=%s/scheme\n", st.dir.root);
-    note(fsh, "export ULTRA=%s/scheme\n", st.dir.root);
-    note(fdk, "dk_setenv SCHEME  %s/scheme\n", st.dir.root);
-    note(fdk, "dk_setenv ULTRA   %s/scheme\n", st.dir.root);
-    note(fmd, "setenv SCHEME  %s/scheme;\n", st.dir.root);
-    note(fmd, "setenv ULTRA   %s/scheme;\n", st.dir.root);
+    note(fsh, "export SCHEME=%s/scheme\n", gst.dir.root);
+    note(fsh, "export ULTRA=%s/scheme\n", gst.dir.root);
+    note(fdk, "dk_setenv SCHEME  %s/scheme\n", gst.dir.root);
+    note(fdk, "dk_setenv ULTRA   %s/scheme\n", gst.dir.root);
+    note(fmd, "setenv SCHEME  %s/scheme;\n", gst.dir.root);
+    note(fmd, "setenv ULTRA   %s/scheme;\n", gst.dir.root);
 
 /* add debugging aid to end of env-<code>.csh */
     note(fcsh, "\n");
@@ -1019,8 +1019,8 @@ static void write_envf(client *cl, int lnotice)
 /* log the results */
     n = sizeof(sfx)/sizeof(char *);
     for (i = 0; i < n; i++)
-        {note(NULL, "----- env-%s.%s -----\n", st.code, sfx[i]);
-	 cat(NULL, 0, -1, "%s/env-%s.%s", st.dir.etc, st.code, sfx[i]);
+        {note(NULL, "----- env-%s.%s -----\n", gst.code, sfx[i]);
+	 cat(NULL, 0, -1, "%s/env-%s.%s", gst.dir.etc, gst.code, sfx[i]);
          note(NULL, "\n");};
 
     return;}
@@ -1069,7 +1069,7 @@ static void check_dir(client *cl)
     n   = sizeof(dlst)/sizeof(char *);
     sib = dbget(cl, TRUE, "PSY_InstRoot");
 
-    if (st.create_dirs == TRUE)
+    if (gst.create_dirs == TRUE)
        {Created[0] = '\0';
         if ((IS_NULL(sib) == FALSE) && (strcmp(sib, "none") != 0))
            {for (i = 0; i < n; i++)
@@ -1081,8 +1081,8 @@ static void check_dir(client *cl)
         if (IS_NULL(Created) == FALSE)
            {noted(NULL, "\n");
             noted(NULL, "Directories:\n");
-            FOREACH(dir, Created, " ")
-               noted(NULL, "   %s\n", dir);
+            FOREACH(d, Created, " ")
+               noted(NULL, "   %s\n", d);
             ENDFOR
             noted(NULL, "have been created as requested\n");
             noted(NULL, "\n");};}
@@ -1097,13 +1097,13 @@ static void check_dir(client *cl)
 
         if (IS_NULL(Missing) == FALSE)
            {noted(NULL, "\n");
-            noted(NULL, "You have asked that %s be installed in the following\n", st.CODE);
+            noted(NULL, "You have asked that %s be installed in the following\n", gst.CODE);
             noted(NULL, "missing directories:\n");
-            FOREACH (dir, Missing, " ")
-               noted(NULL, "   %s\n", dir);
+            FOREACH (d, Missing, " ")
+               noted(NULL, "   %s\n", d);
             ENDFOR
             noted(NULL, "You must either use the -c option to create these\n");
-            noted(NULL, "directories, choose another place to install %s,\n", st.CODE);
+            noted(NULL, "directories, choose another place to install %s,\n", gst.CODE);
             noted(NULL, "or specify -i none for no installation\n");
             noted(NULL, "\n");
 
@@ -1122,7 +1122,7 @@ static void read_line(char *s, int nc)
     char *p, *pc;
     file_entry *se;
 
-    se = &st.fstck.file[st.fstck.n-1];
+    se = &gst.fstck.file[gst.fstck.n-1];
 
     p = fgets(s, nc-1, se->fp);
     if (p != NULL)
@@ -1154,13 +1154,13 @@ static void read_line(char *s, int nc)
 
 /* toss blank and comment lines */
 	if (blank_line(s) == TRUE)
-           {if (st.verbose == TRUE)
+           {if (gst.verbose == TRUE)
 	       noted(NULL, "%s line %d ignored: %s\n",
 		      se->name, se->iline, s);
 	    s[0] = '\0';};}
     else
        {pop_file();
-	if (st.fstck.n > 0)
+	if (gst.fstck.n > 0)
 	   s[0] = '\0';
 	else
 	   strcpy(s, "++end++");
@@ -1216,12 +1216,12 @@ static void parse_opt(client *cl, char *s, int nc)
 	        {opt = strchr(arg, '@');
 		 if (opt != NULL)
 		    opt[-1] = '\0';
-		 for (i = 0; i < st.na; i++)
-		     {if (strcmp(st.args[i], arg) == 0)
+		 for (i = 0; i < gst.na; i++)
+		     {if (strcmp(gst.args[i], arg) == 0)
 			 {if ((opt == NULL) || (strchr(opt, '@') == NULL))
 			     avl = "on";
 			  else
-			     avl = st.args[++i];
+			     avl = gst.args[++i];
 			  break;};};}
 
 /* parse the _env_ key */
@@ -1364,27 +1364,27 @@ static void setup_analyze_env(client *cl)
     FILE *out;
 
 /* setup the analyze log file */
-    snprintf(alog, BFLRG, "%s/log/analyze",  st.dir.root);
+    snprintf(alog, BFLRG, "%s/log/analyze",  gst.dir.root);
     out = open_file("w", alog);
     note(out, "%s\n", get_date());
     fclose_safe(out);
 
-    dbset(cl, "HSY_Host",       st.host);
-    dbset(cl, "HSY_OS_Name",    st.os);
-    dbset(cl, "HSY_OS_Release", st.osrel);
+    dbset(cl, "HSY_Host",       gst.host);
+    dbset(cl, "HSY_OS_Name",    gst.os);
+    dbset(cl, "HSY_OS_Release", gst.osrel);
 
-    dbset(cl, "PSY_Cfg",    st.psy_cfg);
+    dbset(cl, "PSY_Cfg",    gst.psy_cfg);
 
-    dbset(cl, "RF_DEBUG",    st.abs_deb ? "TRUE" : "FALSE");
-    dbset(cl, "RF_OPTIMIZE", st.abs_opt ? "TRUE" : "FALSE");
-    dbset(cl, "RF_PROFILE",  st.profilep ? "TRUE" : "FALSE");
-    dbset(cl, "USE_TmpDir",  st.tmp_dirp ? "TRUE" : "FALSE");
+    dbset(cl, "RF_DEBUG",    gst.abs_deb ? "TRUE" : "FALSE");
+    dbset(cl, "RF_OPTIMIZE", gst.abs_opt ? "TRUE" : "FALSE");
+    dbset(cl, "RF_PROFILE",  gst.profilep ? "TRUE" : "FALSE");
+    dbset(cl, "USE_TmpDir",  gst.tmp_dirp ? "TRUE" : "FALSE");
 
-    dbset(cl, "Log",        st.logf);
+    dbset(cl, "Log",        gst.logf);
     dbset(cl, "ALog",       alog);
 
-    if (strncmp(st.os, "CYGWIN", 6) == 0)
-       st.os[6] = '\0';
+    if (strncmp(gst.os, "CYGWIN", 6) == 0)
+       gst.os[6] = '\0';
 
     return;}
 
@@ -1408,29 +1408,29 @@ static void setup_output_env(client *cl)
        dbset(cl, sa[i], unique(dbget(cl, FALSE, sa[i]), FALSE, ' '));
     free_strings(sa);
 
-    dbset(cl, "PSY_CfgDir",  st.dir.cfg);
+    dbset(cl, "PSY_CfgDir",  gst.dir.cfg);
 
-    dbset(cl, "PSY_Cfg", st.cfgf);
+    dbset(cl, "PSY_Cfg", gst.cfgf);
 
-    dbset(cl, "IRules_CCP",     st.rules.ccp);
-    dbset(cl, "IRules_CCObj",   st.rules.co);
-    dbset(cl, "IRules_CCArc",   st.rules.ca);
-    dbset(cl, "IRules_LexObj",  st.rules.lo);
-    dbset(cl, "IRules_LexArc",  st.rules.la);
-    dbset(cl, "IRules_LexC",    st.rules.lc);
-    dbset(cl, "IRules_YaccObj", st.rules.yo);
-    dbset(cl, "IRules_YaccArc", st.rules.ya);
-    dbset(cl, "IRules_YaccC",   st.rules.yc);
-    dbset(cl, "IRules_FCObj",   st.rules.fo);
-    dbset(cl, "IRules_FCArc",   st.rules.fa);
-    dbset(cl, "IRules_TemplH",  st.rules.th);
+    dbset(cl, "IRules_CCP",     gst.rules.ccp);
+    dbset(cl, "IRules_CCObj",   gst.rules.co);
+    dbset(cl, "IRules_CCArc",   gst.rules.ca);
+    dbset(cl, "IRules_LexObj",  gst.rules.lo);
+    dbset(cl, "IRules_LexArc",  gst.rules.la);
+    dbset(cl, "IRules_LexC",    gst.rules.lc);
+    dbset(cl, "IRules_YaccObj", gst.rules.yo);
+    dbset(cl, "IRules_YaccArc", gst.rules.ya);
+    dbset(cl, "IRules_YaccC",   gst.rules.yc);
+    dbset(cl, "IRules_FCObj",   gst.rules.fo);
+    dbset(cl, "IRules_FCArc",   gst.rules.fa);
+    dbset(cl, "IRules_TemplH",  gst.rules.th);
 
-    dbset(cl, "IRules_CCObj_BP",   st.rules.co_bp);
-    dbset(cl, "IRules_CCArc_BP",   st.rules.ca_bp);
-    dbset(cl, "IRules_LexObj_BP",  st.rules.lo_bp);
-    dbset(cl, "IRules_LexArc_BP",  st.rules.la_bp);
-    dbset(cl, "IRules_YaccObj_BP", st.rules.yo_bp);
-    dbset(cl, "IRules_YaccArc_BP", st.rules.ya_bp);
+    dbset(cl, "IRules_CCObj_BP",   gst.rules.co_bp);
+    dbset(cl, "IRules_CCArc_BP",   gst.rules.ca_bp);
+    dbset(cl, "IRules_LexObj_BP",  gst.rules.lo_bp);
+    dbset(cl, "IRules_LexArc_BP",  gst.rules.la_bp);
+    dbset(cl, "IRules_YaccObj_BP", gst.rules.yo_bp);
+    dbset(cl, "IRules_YaccArc_BP", gst.rules.ya_bp);
 
     return;}
 
@@ -1449,7 +1449,7 @@ static void default_var(client *cl)
         else
 	   dbset(cl, "USER", cgetenv(TRUE, "LOGNAME"));};
 
-    csetenv("PATH", "%s:%s", st.dir.mng, cgetenv(TRUE, "PATH"));
+    csetenv("PATH", "%s:%s", gst.dir.mng, cgetenv(TRUE, "PATH"));
 
 /* log the current environment */
     sa = cenv(TRUE, NULL);
@@ -1458,40 +1458,40 @@ static void default_var(client *cl)
         note(NULL, "%s\n", sa[i]);
     free_strings(sa);
 
-    strcpy(st.psy_cfg, path_tail(st.cfgf));
+    strcpy(gst.psy_cfg, path_tail(gst.cfgf));
 
-    unamef(st.host,  BFLRG, "n");
-    unamef(st.os,    BFLRG, "s");
-    unamef(st.osrel, BFLRG, "r");
-    unamef(st.hw,    BFLRG, "m");
+    unamef(gst.host,  BFLRG, "n");
+    unamef(gst.os,    BFLRG, "s");
+    unamef(gst.osrel, BFLRG, "r");
+    unamef(gst.hw,    BFLRG, "m");
 
 /* remove parens from osrel - it is bad for the shells later on */
-    sa = tokenize(st.osrel, "()", 0);
-    concatenate(st.osrel, BFLRG, sa, 0, -1, ",");
+    sa = tokenize(gst.osrel, "()", 0);
+    concatenate(gst.osrel, BFLRG, sa, 0, -1, ",");
     free_strings(sa);
 
     dbinitv(cl, "PSY_CfgMan", cwhich("cfgman"));
 
 /* check variables which may have been initialized from the command line */
-    if (IS_NULL(st.psy_id) == TRUE)
-       nstrncpy(st.psy_id, BFLRG,
+    if (IS_NULL(gst.psy_id) == TRUE)
+       nstrncpy(gst.psy_id, BFLRG,
 		run(BOTH, "%s use", dbget(cl, TRUE, "PSY_CfgMan")), -1);
-    cinitenv("PSY_ID", st.psy_id);
+    cinitenv("PSY_ID", gst.psy_id);
 
 /* global variables */
-    snprintf(st.dir.scr,  BFLRG, "%s/scripts", st.dir.base);
-    snprintf(st.dir.root, BFLRG, "%s/dev/%s",  st.dir.base, st.psy_id);
-    snprintf(st.dir.etc,  BFLRG, "%s/etc",     st.dir.root);
+    snprintf(gst.dir.scr,  BFLRG, "%s/scripts", gst.dir.base);
+    snprintf(gst.dir.root, BFLRG, "%s/dev/%s",  gst.dir.base, gst.psy_id);
+    snprintf(gst.dir.etc,  BFLRG, "%s/etc",     gst.dir.root);
 
-    snprintf(st.env_csh,  BFLRG, "%s/env-%s.csh", st.dir.etc, st.code);
-    snprintf(st.env_sh,   BFLRG, "%s/env-%s.sh",  st.dir.etc, st.code);
-    snprintf(st.env_dk,   BFLRG, "%s/env-%s.dk",  st.dir.etc, st.code);
-    snprintf(st.env_mdl,  BFLRG, "%s/env-%s.mdl", st.dir.etc, st.code);
+    snprintf(gst.env_csh,  BFLRG, "%s/env-%s.csh", gst.dir.etc, gst.code);
+    snprintf(gst.env_sh,   BFLRG, "%s/env-%s.sh",  gst.dir.etc, gst.code);
+    snprintf(gst.env_dk,   BFLRG, "%s/env-%s.dk",  gst.dir.etc, gst.code);
+    snprintf(gst.env_mdl,  BFLRG, "%s/env-%s.mdl", gst.dir.etc, gst.code);
 
 /* variable defaults */
-    strcpy(st.def_tools, "");
+    strcpy(gst.def_tools, "");
 
-    push_struct("Glb", st.def_groups, STACK_GROUP);
+    push_struct("Glb", gst.def_groups, STACK_GROUP);
 
     return;}
 
@@ -1511,16 +1511,16 @@ static void default_rules(void)
     tc  = "touch errlog";
 
 /* C rules */
-    snprintf(st.rules.ccp,   BFLRG,
+    snprintf(gst.rules.ccp,   BFLRG,
              "\t%s\n",
 	     "${CC} -E $<");
 
-    snprintf(st.rules.co, BFLRG,
+    snprintf(gst.rules.co, BFLRG,
              "\t@(%s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     "( ${CC} -c $< -o $@ ) || frnsic -e 1 $< $@");
 
-    snprintf(st.rules.ca, BFLRG,
+    snprintf(gst.rules.ca, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${CCAnnounce} -c $<\"",
 	     cd, rm, tc,
@@ -1529,7 +1529,7 @@ static void default_rules(void)
 	     "${RM} $*.o 2>> errlog");
 
 /* lex rules */
-    snprintf(st.rules.lo, BFLRG,
+    snprintf(gst.rules.lo, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
              "echo \"lex $<\"",
 	     rm, tc,
@@ -1538,7 +1538,7 @@ static void default_rules(void)
 	     "( ${LX} -c $*.c ) || frnsic -e 1 $*.c",
 	     "${RM} lex.yy.c $*.c");
 
-    snprintf(st.rules.la, BFLRG,
+    snprintf(gst.rules.la, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"lex $<\"",
 	     cd, rm, tc,
@@ -1549,7 +1549,7 @@ static void default_rules(void)
 	     ar,
 	     "${RM} lex.yy.c $*.c");
 
-    snprintf(st.rules.lc, BFLRG,
+    snprintf(gst.rules.lc, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"lex $<\"",
 	     cd, rm, tc,
@@ -1558,7 +1558,7 @@ static void default_rules(void)
 	     "${RM} lex.yy.c");
 
 /* yacc rules */
-    snprintf(st.rules.yo, BFLRG,
+    snprintf(gst.rules.yo, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1567,7 +1567,7 @@ static void default_rules(void)
 	     "( ${YC} -c $*.c -o $*.o ) || frnsic -e 1 $*.c $*.o",
 	     "${RM} $*.c");
 
-    snprintf(st.rules.ya, BFLRG,
+    snprintf(gst.rules.ya, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1578,7 +1578,7 @@ static void default_rules(void)
 	     ar,
 	     "${RM} $*.c $*.o");
 
-    snprintf(st.rules.yc, BFLRG,
+    snprintf(gst.rules.yc, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1587,7 +1587,7 @@ static void default_rules(void)
 	     "mv $*.c ${PACTSrcDir}");
       
 /* Fortran rules */
-    snprintf(st.rules.fo, BFLRG,
+    snprintf(gst.rules.fo, BFLRG,
 	     "\t%s \\\n\t%s \\\n\t%s \\\n\t%s \\\n\t%s \\\n\t%s\n",
 	     "@if [ ${FC_Exe} == none ]; then",
 	     "   echo \"No Fortran compiler for $<\" ;",
@@ -1596,7 +1596,7 @@ static void default_rules(void)
 	     "   ( ${FC} -c $< -o $@ ) || frnsic -e 1 $< $@ ;",
 	     "fi");
 
-    snprintf(st.rules.fa, BFLRG,
+    snprintf(gst.rules.fa, BFLRG,
 	     "\t%s \\\n\t%s \\\n\t%s \\\n\t%s \\\n\t     %s ; \\\n\t     %s ; \\\n\t     %s ; \\\n\t%s \\\n\t     %s ; \\\n\t%s \\\n\t%s\n",
 	     "@if [ ${FC_Exe} == none ]; then",
 	     "   echo \"No Fortran compiler for $<\" ;",
@@ -1609,7 +1609,7 @@ static void default_rules(void)
 	     "fi");
 
 /* template rules */
-    snprintf(st.rules.th, BFLRG,
+    snprintf(gst.rules.th, BFLRG,
 	     "\t@(%s ; \\\n          %s)\n",
 	     "echo \"${Template} $< -o ${IncDir}/$*.h\"",
 	     "${BinDir}/${Template} $< -o ${IncDir}/$*.h");
@@ -1634,12 +1634,12 @@ static void bad_pragma_rules(void)
     tc  = "touch errlog";
 
 /* C rules */
-    snprintf(st.rules.co_bp, BFLRG,
+    snprintf(gst.rules.co_bp, BFLRG,
              "\t@(%s ; \\\n          %s)\n",
 	     "echo \"${ACCAnnounce} -c $<\"",
 	     "${ACC} -c $< -ao $@");
 
-    snprintf(st.rules.ca_bp, BFLRG,
+    snprintf(gst.rules.ca_bp, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${ACCAnnounce} -c $<\"",
 	     cd, rm, tc,
@@ -1648,7 +1648,7 @@ static void bad_pragma_rules(void)
 	     "${RM} $*.o 2>> errlog");
 
 /* lex rules */
-    snprintf(st.rules.lo_bp, BFLRG,
+    snprintf(gst.rules.lo_bp, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
              "echo \"lex $<\"",
 	     rm, tc,
@@ -1658,7 +1658,7 @@ static void bad_pragma_rules(void)
 	     "${ALX} -c $*.c -ao $*.o",
 	     "${RM} lex.yy.c $*.c");
 
-    snprintf(st.rules.la_bp, BFLRG,
+    snprintf(gst.rules.la_bp, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"lex $<\"",
 	     cd, rm, tc,
@@ -1670,7 +1670,7 @@ static void bad_pragma_rules(void)
 	     "${RM} lex.yy.c $*.c");
 
 /* yacc rules */
-    snprintf(st.rules.yo_bp, BFLRG,
+    snprintf(gst.rules.yo_bp, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1680,7 +1680,7 @@ static void bad_pragma_rules(void)
 	     "${ALX} -c $.c -ao $*.o",
 	     "${RM} $*.c");
 
-    snprintf(st.rules.ya_bp, BFLRG,
+    snprintf(gst.rules.ya_bp, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1709,9 +1709,9 @@ static void init_pco_session(client *cl, int append)
     bad_pragma_rules();
 
 /* setup the log file */
-    snprintf(st.logf, BFLRG, "%s/log/config", st.dir.root);
+    snprintf(gst.logf, BFLRG, "%s/log/config", gst.dir.root);
     if (append == FALSE)
-       unlink_safe(st.logf);
+       unlink_safe(gst.logf);
     LOG_ON;
 
     printf("\n");
@@ -1730,7 +1730,7 @@ static void set_inst_base(client *cl, char *ib)
        {if (LAST_CHAR(ib) == '/')
 	   LAST_CHAR(ib) = '\0';
 
-	st.installp = TRUE;};
+	gst.installp = TRUE;};
 
     dbset(cl, "PSY_InstRoot", ib);
     dbset(cl, "PSY_PubInc",   "%s/include", ib);
@@ -1809,7 +1809,7 @@ static void set_var(client *cl, char *var, char *oper, char *val)
     char *prfx, *t, *p;
     gt_entry *ge;
 
-    ge   = st.gstck.st + st.gstck.n - 1;
+    ge   = gst.gstck.st + gst.gstck.n - 1;
     prfx = ge->item;
 
 /* attach the current group suffix */
@@ -1953,21 +1953,21 @@ static void process_use(client *cl, char *sg, char *oper)
     whch = -1;
 
 /* determine whether or not it is a tool we are filling */
-    FOREACH (t, st.def_tools, " ")
+    FOREACH (t, gst.def_tools, " ")
        if (strcmp(t, sg) == 0)
           {whch = STACK_TOOL;
            break;};
     ENDFOR
 
 /* determine whether or not it is a group we are filling */
-    FOREACH (t, st.def_groups, " ")
+    FOREACH (t, gst.def_groups, " ")
        if (strcmp(t, sg) == 0)
           {whch = STACK_GROUP;
            break;};
     ENDFOR
 
-    currg = st.gstck.curr_grp;
-    currt = st.gstck.curr_tool;
+    currg = gst.gstck.curr_grp;
+    currt = gst.gstck.curr_tool;
 
     switch (whch)
 
@@ -2075,15 +2075,15 @@ static void do_platform(client *cl, char *oper, char *value)
     char t[BFLRG], cfg[BFSML], sid[BFSML];
     char *p, *sib, **spec;
 
-    st.np++;
+    gst.np++;
 
     is   = 0;
     spec = tokenize(value, " \t\n\r", 0);
-    snprintf(sid, BFSML, "%s.%d", st.psy_id, st.np);
+    snprintf(sid, BFSML, "%s.%d", gst.psy_id, gst.np);
 
 /* determine appropriate features */
-    if (st.features[0] != '\0')
-       {parse_features(t, BFLRG, st.np, st.features);
+    if (gst.features[0] != '\0')
+       {parse_features(t, BFLRG, gst.np, gst.features);
 	snprintf(cfg, BFSML, "%s%s", oper, t);}
     else
        nstrncpy(cfg, BFSML, oper, -1);
@@ -2091,14 +2091,14 @@ static void do_platform(client *cl, char *oper, char *value)
     note(NULL, "\n");
 
 /* assemble the config command line */
-    snprintf(t, BFLRG, "./dsys config -plt %s", st.dir.root);
+    snprintf(t, BFLRG, "./dsys config -plt %s", gst.dir.root);
 
 /* add options affecting all platforms */
-    if (st.abs_deb == TRUE)
+    if (gst.abs_deb == TRUE)
        vstrcat(t, BFLRG, " -g");
-    if (st.abs_opt == TRUE)
+    if (gst.abs_opt == TRUE)
        vstrcat(t, BFLRG, " -o");
-    if (st.create_dirs == TRUE)
+    if (gst.create_dirs == TRUE)
        vstrcat(t, BFLRG, " -c");
 
 /* add alias */
@@ -2118,8 +2118,8 @@ static void do_platform(client *cl, char *oper, char *value)
        vstrcat(t, BFLRG, " %s", cfg);
 
 /* add this command to the list */
-    st.pltfcmd = lst_push(st.pltfcmd, t);
-    st.pltfcfg = lst_push(st.pltfcfg, cfg);
+    gst.pltfcmd = lst_push(gst.pltfcmd, t);
+    gst.pltfcfg = lst_push(gst.pltfcfg, cfg);
 
 /* add this platform to the list */
     p = dbget(cl, FALSE, "PSY_Platforms");
@@ -2143,9 +2143,9 @@ static void config_platforms(void)
 
     noted(NULL, "\n");
 
-    for (i = 0; i < st.np; i++)
-        {cmd = st.pltfcmd[i];
-	 cfg = st.pltfcfg[i];
+    for (i = 0; i < gst.np; i++)
+        {cmd = gst.pltfcmd[i];
+	 cfg = gst.pltfcfg[i];
 
 	 noted(NULL, "----------------------------------------------\n");
 
@@ -2159,11 +2159,11 @@ static void config_platforms(void)
 	    note(NULL, "Configuration of platform %s succeeded\n",
 		  cfg);};
 
-    if (st.np > 0)
+    if (gst.np > 0)
        noted(NULL, "----------------------------------------------\n");
 
-    free_strings(st.pltfcmd);
-    free_strings(st.pltfcfg);
+    free_strings(gst.pltfcmd);
+    free_strings(gst.pltfcfg);
 
     return;}
 
@@ -2192,7 +2192,7 @@ static int do_run_work(client *cl, int il, char *oper, char *value)
        fprintf(stderr, "Syntax error on line %d: '%s %s'\n",
 	       il, oper, value);
 
-    else if (st.async == TRUE)
+    else if (gst.async == TRUE)
        {cmd[0] = '\0';
 
 	for (i = 0, ok = TRUE; ok == TRUE; i++)
@@ -2268,7 +2268,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 	    {int n;
 	     char ldepth[BFLRG];
 
-	     n = st.fstck.n;
+	     n = gst.fstck.n;
 	     memset(ldepth, ' ', 3*n);
 	     ldepth[3*n] = '\0';
 
@@ -2282,18 +2282,18 @@ static void read_config(client *cl, char *cfg, int quiet)
 	    {int n;
 	     char ldepth[BFLRG];
 
-	     n = st.fstck.n;
+	     n = gst.fstck.n;
 	     memset(ldepth, ' ', 3*n);
 	     ldepth[3*n] = '\0';
 
 	     CLOG(cl, 1, "pco: %s", line);
 	     path = push_file(line+4, STACK_PROCESS);
 	     note(NULL, "\n");
-	     if (st.phase == PHASE_READ)
+	     if (gst.phase == PHASE_READ)
 	        noted(NULL, "%srunning %s\n", ldepth, path);}
 
 	 else if (strcmp(key, "PSY_InstRoot") == 0)
-	    {if (st.installp == FALSE)
+	    {if (gst.installp == FALSE)
 	        {dbset(cl, "PSY_InstRoot", value);
 		 dbset(cl, "PSY_PubInc",   "%s/include", value);
 		 dbset(cl, "PSY_PubLib",   "%s/lib", value);};}
@@ -2317,15 +2317,15 @@ static void read_config(client *cl, char *cfg, int quiet)
 /* handle Tool specifications */
 	 else if (strcmp(key, "Tool") == 0)
 	    {note(NULL, "--- tool %s\n", oper);
-	     nstrncpy(st.gstck.curr_tool, BFSML, oper, -1);
+	     nstrncpy(gst.gstck.curr_tool, BFSML, oper, -1);
 	     note(NULL, "Defining tool %s\n", oper);
-	     push_struct(oper, st.def_tools, STACK_TOOL);}
+	     push_struct(oper, gst.def_tools, STACK_TOOL);}
 
 /* handle Group specifications */
 	 else if (strcmp(key, "Group") == 0)
 	    {note(NULL, "--- group %s\n", oper);
-	     nstrncpy(st.gstck.curr_grp, BFSML, oper, -1);
-	     push_struct(oper, st.def_groups, STACK_GROUP);}
+	     nstrncpy(gst.gstck.curr_grp, BFSML, oper, -1);
+	     push_struct(oper, gst.def_groups, STACK_GROUP);}
 
 /* handle Use specifications */
 	 else if (strcmp(key, "Use") == 0)
@@ -2345,69 +2345,69 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 /* .c.i rule handler */
 	 else if (strcmp(key, ".c.i:") == 0)
-	    {parse_rule(st.rules.ccp, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .c.i rule:\n%s\n\n", st.rules.ccp);}
+	    {parse_rule(gst.rules.ccp, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .c.i rule:\n%s\n\n", gst.rules.ccp);}
 
 /* .c.o rule handler */
 	 else if (strcmp(key, ".c.o:") == 0)
-	    {parse_rule(st.rules.co, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .c.o rule:\n%s\n\n", st.rules.co);}
+	    {parse_rule(gst.rules.co, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .c.o rule:\n%s\n\n", gst.rules.co);}
 
 /* .c.a rule handler */
 	 else if (strcmp(key, ".c.a:") == 0)
-	    {parse_rule(st.rules.ca, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .c.a rule:\n%s\n\n", st.rules.ca);}
+	    {parse_rule(gst.rules.ca, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .c.a rule:\n%s\n\n", gst.rules.ca);}
 
 /* .f.o rule handler */
 	 else if (strcmp(key, ".f.o:") == 0)
-	    {parse_rule(st.rules.fo, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .f.o rule:\n%s\n\n", st.rules.fo);}
+	    {parse_rule(gst.rules.fo, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .f.o rule:\n%s\n\n", gst.rules.fo);}
 
 /* .f.a rule handler */
 	 else if (strcmp(key, ".f.a:") == 0)
-	    {parse_rule(st.rules.fa, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .f.a rule:\n%s\n\n", st.rules.fa);}
+	    {parse_rule(gst.rules.fa, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .f.a rule:\n%s\n\n", gst.rules.fa);}
 
 /* .l.o rule handler */
 	 else if (strcmp(key, ".l.o:") == 0)
-	    {parse_rule(st.rules.lo, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .l.o rule:\n%s\n\n", st.rules.lo);}
+	    {parse_rule(gst.rules.lo, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .l.o rule:\n%s\n\n", gst.rules.lo);}
 
 /* .l.a rule handler */
 	 else if (strcmp(key, ".l.a:") == 0)
-	    {parse_rule(st.rules.la, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .l.a rule:\n%s\n\n", st.rules.la);}
+	    {parse_rule(gst.rules.la, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .l.a rule:\n%s\n\n", gst.rules.la);}
 
 /* .l.c rule handler */
 	 else if (strcmp(key, ".l.c:") == 0)
-	    {parse_rule(st.rules.lc, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .l.c rule:\n%s\n\n", st.rules.lc);}
+	    {parse_rule(gst.rules.lc, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .l.c rule:\n%s\n\n", gst.rules.lc);}
 
 /* .y.o rule handler */
 	 else if (strcmp(key, ".y.c:") == 0)
-	    {parse_rule(st.rules.yo, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .y.o rule:\n%s\n\n", st.rules.yo);}
+	    {parse_rule(gst.rules.yo, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .y.o rule:\n%s\n\n", gst.rules.yo);}
 
 /* .y.a rule handler */
 	 else if (strcmp(key, ".y.a:") == 0)
-	    {parse_rule(st.rules.ya, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .y.a rule:\n%s\n\n", st.rules.ya);}
+	    {parse_rule(gst.rules.ya, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .y.a rule:\n%s\n\n", gst.rules.ya);}
 
 /* .y.c rule handler */
 	 else if (strcmp(key, ".y.c:") == 0)
-	    {parse_rule(st.rules.yc, BFLRG);
-	     if (st.verbose == TRUE)
-	        noted(NULL, "Redefining .y.c rule:\n%s\n\n", st.rules.yc);}
+	    {parse_rule(gst.rules.yc, BFLRG);
+	     if (gst.verbose == TRUE)
+	        noted(NULL, "Redefining .y.c rule:\n%s\n\n", gst.rules.yc);}
 
 /* print unknown specifications during any non-read phase */
 	 else
@@ -2647,18 +2647,18 @@ static void read_config_files(client *cl)
     char ts[BFSML];
 
     separator(NULL);
-    note(NULL, "Reading config files for %s on %s\n", st.psy_id, st.host);
+    note(NULL, "Reading config files for %s on %s\n", gst.psy_id, gst.host);
 
     dt = wall_clock_time();
 
-    push_file(st.cfgf, STACK_FILE);
-    strcpy(st.cfgf, st.fstck.file[st.fstck.n-1].name);
+    push_file(gst.cfgf, STACK_FILE);
+    strcpy(gst.cfgf, gst.fstck.file[gst.fstck.n-1].name);
     pop_file();
 
     if (file_exists("std/program-init") == TRUE)
        read_config(cl, "program-init", TRUE);
 
-    read_config(cl, st.cfgf, FALSE);
+    read_config(cl, gst.cfgf, FALSE);
 
     dt = wall_clock_time() - dt;
     note(NULL, "Completed - config files read (%s)\n",
@@ -2677,10 +2677,10 @@ static void analyze_config(client *cl)
    {double dt;
     char ts[BFSML];
 
-    st.phase = PHASE_ANALYZE;
+    gst.phase = PHASE_ANALYZE;
 
     separator(NULL);
-    noted(NULL, "Analyzing %s on %s\n", st.psy_id, st.host);
+    noted(NULL, "Analyzing %s on %s\n", gst.psy_id, gst.host);
     note(NULL, "\n");
 
     dt = wall_clock_time();
@@ -2690,7 +2690,7 @@ static void analyze_config(client *cl)
 /* setup the environment for programs which analyze features */
     setup_analyze_env(cl);
 
-    push_dir(st.dir.cfg);
+    push_dir(gst.dir.cfg);
 
 /* read the file which does the analysis */
     if (file_exists("../std/program-analyze") == TRUE)
@@ -2717,10 +2717,10 @@ static void finish_config(client *cl)
    {double dt;
     char ts[BFSML];
 
-    st.phase = PHASE_WRITE;
+    gst.phase = PHASE_WRITE;
 
     separator(NULL);
-    note(NULL, "Writing system dependent files for %s\n", st.psy_id);
+    note(NULL, "Writing system dependent files for %s\n", gst.psy_id);
     note(NULL, "\n");
 
     dt = wall_clock_time();
@@ -2759,7 +2759,7 @@ int launch_perdb(int c, char **v)
 
     ok = FALSE;
 
-    st.launched = FALSE;
+    gst.launched = FALSE;
 
     if (cdefenv("PERDB_PATH") == FALSE)
        {n = sizeof(sfx)/sizeof(char *);
@@ -2780,7 +2780,7 @@ int launch_perdb(int c, char **v)
 /* give the server some time to initialize */
 	nsleep(100);
 
-	st.launched = ok;};
+	gst.launched = ok;};
 
     return(ok);}
  
@@ -2794,7 +2794,7 @@ int kill_perdb(void)
     char *db, *bf;
 
     ok = TRUE;
-    if (st.launched == TRUE)
+    if (gst.launched == TRUE)
        {db = cgetenv(FALSE, "PERDB_PATH");
 	if (IS_NULL(db) == FALSE)
 	   {bf = run(TRUE, "perdb -f %s -l quit:", db);
@@ -2810,7 +2810,7 @@ int kill_perdb(void)
 static void sigdone(int sig)
    {
 
-    if (st.have_db == TRUE)
+    if (gst.have_db == TRUE)
        kill_perdb();
 
     exit(sig);
@@ -2908,8 +2908,8 @@ int main(int c, char **v, char **env)
  */
     csetenv("PERDB_IDLE_TIMEOUT", "600");
 
-    st.features[0] = '\0';
-    st.have_db = launch_perdb(c, v);
+    gst.features[0] = '\0';
+    gst.have_db = launch_perdb(c, v);
 
     root = cgetenv(TRUE, "PERDB_PATH");
     cl   = make_client(CLIENT, DB_PORT, FALSE, root, cl_logger, NULL);
@@ -2921,38 +2921,38 @@ int main(int c, char **v, char **env)
  * we get the same value that shell scripts get in other parts of the
  * config process - and consistency is essential
  */
-    nstrncpy(st.dir.mng, BFLRG, run(BOTH, "pwd"), -1);
+    nstrncpy(gst.dir.mng, BFLRG, run(BOTH, "pwd"), -1);
 
-    nstrncpy(st.dir.base, BFLRG, path_head(st.dir.mng), -1);
-    strcpy(st.cfgf, "DEFAULT");
+    nstrncpy(gst.dir.base, BFLRG, path_head(gst.dir.mng), -1);
+    strcpy(gst.cfgf, "DEFAULT");
 
     nstrncpy(ib, BFLRG, "none", -1);
     strct  = "0";
     append = FALSE;
 
-    st.na   = c - 1;
-    st.args = v + 1;
-    st.env  = env;
+    gst.na   = c - 1;
+    gst.args = v + 1;
+    gst.env  = env;
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-strict") == 0)
 	    strct = v[++i];
 
          else if (strcmp(v[i], "-as") == 0)
-            st.async = TRUE;
+            gst.async = TRUE;
 
          else if (strcmp(v[i], "-code") == 0)
-	    nstrncpy(st.code, BFLRG, v[++i], -1);
+	    nstrncpy(gst.code, BFLRG, v[++i], -1);
 
          else if (strcmp(v[i], "-db") == 0)
 	    {nstrncpy(d, BFLRG, "db:", -1);
 	     full_path(d+3, BFLRG-3, 0, NULL, v[++i]);
              if (file_exists(d+3) == FALSE)
 	        {noted(NULL, "No such database '%s' - exiting\n\n", d+3);
-		 if (st.have_db == TRUE)
+		 if (gst.have_db == TRUE)
 		    kill_perdb();
 		 return(1);};
-	     st.db = d;
+	     gst.db = d;
 	     dbset(cl, "RF_CONFIG_METHOD", "database");}
  
 /* this was handled in reset_env */
@@ -2960,20 +2960,20 @@ int main(int c, char **v, char **env)
             i++;
  
          else if (strcmp(v[i], "-ft") == 0)
-	    {nstrncpy(st.features, BFSML, v[++i], -1);
-	     dbset(cl, "RF_FEATURES", st.features);}
+	    {nstrncpy(gst.features, BFSML, v[++i], -1);
+	     dbset(cl, "RF_FEATURES", gst.features);}
 
          else if (strcmp(v[i], "-pact") == 0)
-	    st.cfg_pact = TRUE;
+	    gst.cfg_pact = TRUE;
 
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'a':
-		       st.analyzep = FALSE;
+		       gst.analyzep = FALSE;
                        break;
 
                  case 'c':
-                      st.create_dirs = TRUE;
+                      gst.create_dirs = TRUE;
                       break;
  
 /* this was handled in launch_perdb */
@@ -2982,11 +2982,11 @@ int main(int c, char **v, char **env)
                       break;
  
                  case 'F':
-                      st.tmp_dirp = FALSE;
+                      gst.tmp_dirp = FALSE;
                       break;
  
                  case 'g':
-                      st.abs_deb = TRUE;
+                      gst.abs_deb = TRUE;
                       break;
  
                  case 'i':
@@ -2999,57 +2999,57 @@ int main(int c, char **v, char **env)
                       break;
  
                  case 'o':
-                      st.abs_opt = TRUE;
+                      gst.abs_opt = TRUE;
                       break;
  
                  case 'p':
-                      st.profilep = TRUE;
+                      gst.profilep = TRUE;
                       break;
  
                  case 's':
-                      nstrncpy(st.psy_id, BFLRG, v[++i], -1);
+                      nstrncpy(gst.psy_id, BFLRG, v[++i], -1);
                       break;
  
                  case 'v':
-                      st.verbose = TRUE;
+                      gst.verbose = TRUE;
                       break;};}
          else if (v[i][0] == '+')
             {switch (v[i][1])
                 {case 'F':
-                      st.tmp_dirp = TRUE;
+                      gst.tmp_dirp = TRUE;
                       break;};}
 
          else
-	    {nstrncpy(st.cfgf, BFLRG, v[i], -1);
+	    {nstrncpy(gst.cfgf, BFLRG, v[i], -1);
 	     dbset(cl, "RF_CONFIG_METHOD", "file");};};
 
-    if (IS_NULL(st.code) == TRUE)
-       nstrncpy(st.code, BFLRG, "pact", -1);
-    nstrncpy(st.CODE, BFLRG, st.code, -1);
-    upcase(st.CODE);
+    if (IS_NULL(gst.code) == TRUE)
+       nstrncpy(gst.code, BFLRG, "pact", -1);
+    nstrncpy(gst.CODE, BFLRG, gst.code, -1);
+    upcase(gst.CODE);
 
     set_inst_base(cl, ib);
 
     init_pco_session(cl, append);
 
 /* make config directory */
-    snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.psy_id);
-    run(BOTH, "rm -rf %s", st.dir.cfg);
-    run(BOTH, "mkdir %s", st.dir.cfg);
+    snprintf(gst.dir.cfg, BFLRG, "cfg-%s", gst.psy_id);
+    run(BOTH, "rm -rf %s", gst.dir.cfg);
+    run(BOTH, "mkdir %s", gst.dir.cfg);
 
-    if (st.db == NULL)
+    if (gst.db == NULL)
        {dbset(cl, "RF_STRICT", strct);
 
 	read_config_files(cl);
 
-	if (st.cfg_pact == TRUE)
-	   write_do_run_db(cl, &st);
+	if (gst.cfg_pact == TRUE)
+	   write_do_run_db(cl, &gst);
 
 	ok = check_cross(cl);
 	if (ok == FALSE)
 	   {free_client(cl);
 
-	    if (st.have_db == TRUE)
+	    if (gst.have_db == TRUE)
 	       kill_perdb();
 
 	    return(2);};
@@ -3060,44 +3060,44 @@ int main(int c, char **v, char **env)
 
 	check_dir(cl);
 
-	if (st.analyzep == TRUE)
+	if (gst.analyzep == TRUE)
 	   analyze_config(cl);}
 
     else
-       {pco_load_db(cl, st.db);
+       {pco_load_db(cl, gst.db);
 
-        write_do_run_db(cl, &st);
+        write_do_run_db(cl, &gst);
 
 /* order matters crucially here */
-        env_subst(cl, "PSY_Base",         st.dir.base);
+        env_subst(cl, "PSY_Base",         gst.dir.base);
         env_subst(cl, "PSY_InstRoot",     ib);
-        env_subst(cl, "PSY_Root",         st.dir.root);
-        env_subst(cl, "PSY_ID",           st.psy_id);
+        env_subst(cl, "PSY_Root",         gst.dir.root);
+        env_subst(cl, "PSY_ID",           gst.psy_id);
         env_subst(cl, "RF_CONFIG_METHOD", "database");
 
-	snprintf(st.dir.cfg, BFLRG, "cfg-%s", st.psy_id);
-	nstrncpy(st.cfgf,    BFLRG, cgetenv(FALSE, "PSY_Cfg"), -1);
+	snprintf(gst.dir.cfg, BFLRG, "cfg-%s", gst.psy_id);
+	nstrncpy(gst.cfgf,    BFLRG, cgetenv(FALSE, "PSY_Cfg"), -1);
 
 /* reset the rules */
-	snprintf(st.rules.ccp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCP"));
-	snprintf(st.rules.co,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCObj"));
-	snprintf(st.rules.ca,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCArc"));
-	snprintf(st.rules.lo,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexObj"));
-	snprintf(st.rules.la,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexArc"));
-	snprintf(st.rules.lc,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexC"));
-	snprintf(st.rules.yo,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccObj"));
-	snprintf(st.rules.ya,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccArc"));
-	snprintf(st.rules.yc,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccC"));
-	snprintf(st.rules.fo,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_FCObj"));
-	snprintf(st.rules.fa,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_FCArc"));
-	snprintf(st.rules.th,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_TemplH"));
+	snprintf(gst.rules.ccp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCP"));
+	snprintf(gst.rules.co,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCObj"));
+	snprintf(gst.rules.ca,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCArc"));
+	snprintf(gst.rules.lo,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexObj"));
+	snprintf(gst.rules.la,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexArc"));
+	snprintf(gst.rules.lc,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexC"));
+	snprintf(gst.rules.yo,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccObj"));
+	snprintf(gst.rules.ya,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccArc"));
+	snprintf(gst.rules.yc,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccC"));
+	snprintf(gst.rules.fo,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_FCObj"));
+	snprintf(gst.rules.fa,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_FCArc"));
+	snprintf(gst.rules.th,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_TemplH"));
 
-	snprintf(st.rules.co_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCObj_BP"));
-	snprintf(st.rules.ca_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCArc_BP"));
-	snprintf(st.rules.lo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexObj_BP"));
-	snprintf(st.rules.la_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexArc_BP"));
-	snprintf(st.rules.yo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccObj_BP"));
-	snprintf(st.rules.ya_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccArc_BP"));
+	snprintf(gst.rules.co_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCObj_BP"));
+	snprintf(gst.rules.ca_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCArc_BP"));
+	snprintf(gst.rules.lo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexObj_BP"));
+	snprintf(gst.rules.la_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexArc_BP"));
+	snprintf(gst.rules.yo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccObj_BP"));
+	snprintf(gst.rules.ya_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccArc_BP"));
 
 	check_dir(cl);};
 
@@ -3109,13 +3109,13 @@ int main(int c, char **v, char **env)
     config_platforms();
 
     separator(NULL);
-    run(BOTH, "rm -rf %s", st.dir.cfg);
+    run(BOTH, "rm -rf %s", gst.dir.cfg);
 
     LOG_OFF;
 
     free_client(cl);
 
-    if (st.have_db == TRUE)
+    if (gst.have_db == TRUE)
        kill_perdb();
 
     log_safe("dump", 0, NULL, NULL);

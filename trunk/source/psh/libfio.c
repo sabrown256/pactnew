@@ -281,7 +281,7 @@ int block_fd(int fd, int on)
  */
 
 ssize_t read_safe(int fd, void *s, size_t nb, int req)
-   {int ev, blk, zc, nz, wait;
+   {int ev, blk, zc, nz, lwait;
     size_t ns;
     ssize_t n, nr;
     char *ps;
@@ -294,11 +294,11 @@ ssize_t read_safe(int fd, void *s, size_t nb, int req)
  * retry on errors but do not wait (i.e. sleep) for the bytes
  */
     if ((blk == FALSE) || (isatty(fd) == TRUE))
-       wait = FALSE;
+       lwait = FALSE;
 
 /* blocking read - insist on the specified number of bytes or an error */
     else
-       wait = TRUE;
+       lwait = TRUE;
 
     ns = nb;
     nr = 0;
@@ -313,7 +313,7 @@ ssize_t read_safe(int fd, void *s, size_t nb, int req)
 	    {if ((ev == EAGAIN) ||
 		 (ev == EWOULDBLOCK) ||
 		 (ev == EINTR))
-	        {if ((zc < nz-1) && (wait == TRUE))
+	        {if ((zc < nz-1) && (lwait == TRUE))
 		    {log_safe("read", ev, "int *", &fd);
 		     sleep(1);};}
 

@@ -667,13 +667,13 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
    {int i, n, nm, ic, in, rv;
     double x1[PM_SPACEDM], x2[PM_SPACEDM];
     double **xi;
-    PM_polygon *pt;
+    PM_polygon *pyt;
 
     n = py->nn;
 
 /* initialize a triangle template */
-    pt = PM_init_polygon(2, 4);
-    pt->nn = 4;
+    pyt = PM_init_polygon(2, 4);
+    pyt->nn = 4;
 
     rv = TRUE;
     if (iy != NULL)
@@ -697,7 +697,7 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
  * stop immediately in that case to save flops
  * NOTE: use the polygon vectors temporarily
  */
-    xi = pt->x;
+    xi = pyt->x;
     PM_vector_put_point(2, xc, xi, 2);
     PM_vector_copy_point(2, xi, 0, py->x, 0);
     for (i = 1; (i < n) && (rv == TRUE); i++)
@@ -712,8 +712,8 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
  * means we get to loop from 2 to n-1 instead of 1 to n
  */
     if (rv == TRUE)
-       {PM_polygon_put_point(x1, pt, 0);
-	PM_polygon_put_point(x1, pt, 3);
+       {PM_polygon_put_point(x1, pyt, 0);
+	PM_polygon_put_point(x1, pyt, 3);
 
 /* count the number of test triangles containing the point */
 	ic = 0;
@@ -726,10 +726,10 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
 	     if (PM_array_equal(x1, x2, 2, -1.0) == FALSE)
 
 /* complete the test triangle containing one side of the polygon */
-	        {PM_polygon_put_point(x1, pt, 1);
-		 PM_polygon_put_point(x2, pt, 2);
+	        {PM_polygon_put_point(x1, pyt, 1);
+		 PM_polygon_put_point(x2, pyt, 2);
 
-		 in = PM_convex_contains_2d(xc, pt);
+		 in = PM_convex_contains_2d(xc, pyt);
 		 ic += in;};};
 
 	ic >>= 1;
@@ -737,7 +737,7 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
 /* if IC is odd the point is inside of Py */
 	rv = (ic & 1) ? 1 : -1;};
 
-    PM_free_polygon(pt);
+    PM_free_polygon(pyt);
 
     return(rv);}
 

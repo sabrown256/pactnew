@@ -566,7 +566,7 @@ static int _PG_rst_image_text(PG_device *dev, FILE *fp, char *s)
 /* _PG_RST_STROKE_TEXT - write out text to the appropriate device */
  
 static int _PG_rst_stroke_text(PG_device *dev, FILE *fp, char *s)
-   {int i, index, savlinclr, ncharin;
+   {int i, ind, savlinclr, ncharin;
     double savlwd, lwd, dx;
     double x[PG_SPACEDM];
     double *r[PG_SPACEDM];
@@ -594,13 +594,13 @@ static int _PG_rst_stroke_text(PG_device *dev, FILE *fp, char *s)
 	for (i = 0; i < ncharin; i++)
 	    {target = strchr(_PG_rst_char_list, (int)s[i]);
 	     if (target != NULL)
-	        {index = target - _PG_rst_char_list;
+	        {ind = target - _PG_rst_char_list;
 		 x[0] = dev->tcur[0];
 		 x[1] = dev->tcur[1];
 
 		 PG_lin_point(dev, 2, x);
 		 PG_draw_markers_n(dev, 2, WORLDC, 1, r,
-				   _PG.rst_current_font[index]);} 
+				   _PG.rst_current_font[ind]);} 
 
 /* need to calculate new x and y positions based upon character size
  * and path.  For now, just for testing, wing it

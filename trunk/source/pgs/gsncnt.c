@@ -1367,29 +1367,29 @@ static int _PG_surface_contained(int *js, itf_array *ifs, int ic, int id,
 static void _PG_add_surf_seg(int id, int nc, int nd, int *js, double **xn,
 			     long **b1d, int *b1c, int *b1p, double **x1,
 			     int nex, int pty)
-   {int ic1, ic2, jn, me;
+   {int ic1, ic2, ln, me;
     long *p1;
     double *px1, *pxn;
 
     ic1 = js[0];
     ic2 = js[1];
 
-    jn = b1c[0];
+    ln = b1c[0];
     me = b1c[1]*b1p[1];
 
 /* copy the topology information over */
     p1 = SIZED(long, b1d[1], me, nex);
 
-    p1[me++] = jn;
-    p1[me++] = jn + 1;
+    p1[me++] = ln;
+    p1[me++] = ln + 1;
 
 /* copy the coordinates over */
     for (id = 0; id < nd; id++)
         {pxn = xn[id];
-	 px1 = SIZED(double, x1[id], jn, nex);
+	 px1 = SIZED(double, x1[id], ln, nex);
 
-	 px1[jn]   = pxn[ic1];
-	 px1[jn+1] = pxn[ic2];};
+	 px1[ln]   = pxn[ic1];
+	 px1[ln+1] = pxn[ic2];};
 
     b1c[1]++;
     b1c[0] += 2;
@@ -1404,7 +1404,7 @@ static void _PG_add_surf_seg(int id, int nc, int nd, int *js, double **xn,
 static void _PG_add_surf_facet(int id, int nc, int nd, int *js, double **xn,
 			       long **b1d, int *b1c, int *b1p, double **x1,
 			       int nex, int pty)
-   {int ie, in, je, jn;
+   {int ie, in, je, ln;
     int mc, me, mn;
     long *p1;
     double or[3], om;
@@ -1419,21 +1419,21 @@ static void _PG_add_surf_facet(int id, int nc, int nd, int *js, double **xn,
     p1[mc++] = me;
     p1[mc]   = me + nc;
 
-    for (ie = 0, jn = b1c[0], je = b1c[1];
+    for (ie = 0, ln = b1c[0], je = b1c[1];
 	 ie < nc;
-	 ie++, jn++, je++)
+	 ie++, ln++, je++)
         {p1     = SIZED(long, b1d[1], me, nex);
-	 p1[je] = (ie == nc-1) ? b1c[0] : jn;};
+	 p1[je] = (ie == nc-1) ? b1c[0] : ln;};
 
     _PG_fix_orientation(js, 0, p1+b1c[1], xn, nd);
 
 /* copy the points */
-    for (in = 0, jn = b1c[0]; in < nd; in++, jn++)
+    for (in = 0, ln = b1c[0]; in < nd; in++, ln++)
         {for (id = 0; id < nd; id++)
 	     {pxn = xn[id];
-	      px1 = SIZED(double, x1[id], jn, nex);
+	      px1 = SIZED(double, x1[id], ln, nex);
 
-	      px1[jn] = pxn[js[in]];};};
+	      px1[ln] = pxn[js[in]];};};
 
 /* compute the surface normal */
     om = _PG_compute_oriented_face(or, x1, mn, mn+1, mn+2);
@@ -1489,7 +1489,7 @@ static void _PG_add_surf_perim(int count, int last, int *nlst,
 			       int id, int nc, int nd, int *js, double **xn,
 			       long **b1d, int *b1c, int *b1p, double **x1,
 			       int nex, int pty)
-   {int ie, in, je, jn;
+   {int ie, in, je, ln;
     int mc, me;
     long *p1;
     double *px1, *pxn;
@@ -1507,19 +1507,19 @@ static void _PG_add_surf_perim(int count, int last, int *nlst,
 	p1[mc++] = me;
 	p1[mc]   = me + nc;
 
-	for (ie = 0, jn = b1c[0], je = b1c[1];
+	for (ie = 0, ln = b1c[0], je = b1c[1];
 	     ie < nc;
-	     ie++, jn++, je++)
+	     ie++, ln++, je++)
 	    {p1     = SIZED(long, b1d[1], me, nex);
-	     p1[je] = (ie == nc-1) ? b1c[0] : jn;};
+	     p1[je] = (ie == nc-1) ? b1c[0] : ln;};
 
 /* copy the points */
-	for (in = 0, jn = b1c[0]; in < count; in++, jn++)
+	for (in = 0, ln = b1c[0]; in < count; in++, ln++)
 	    {for (id = 0; id < nd; id++)
 	         {pxn = xn[id];
-		  px1 = SIZED(double, x1[id], jn, nex);
+		  px1 = SIZED(double, x1[id], ln, nex);
 
-		  px1[jn] = pxn[nlst[2*in]];};};
+		  px1[ln] = pxn[nlst[2*in]];};};
 
 	b1c[2]++;
 	b1c[1] += nc;

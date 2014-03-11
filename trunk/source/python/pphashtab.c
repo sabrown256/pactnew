@@ -157,7 +157,7 @@ void _PP_hashtab_entry(PP_file *fileinfo)
  *   Note: hashtabs also support the dictionary protocol.
  */
 
-int PP_update_hashtab(hasharr *hashtab, PyObject *dict)
+int PP_update_hashtab(hasharr *htab, PyObject *dict)
 {
     int i;
     int nkeys;
@@ -203,7 +203,7 @@ int PP_update_hashtab(hasharr *hashtab, PyObject *dict)
         }
 
         /* SC_hasharr_install will SC_mark vr */
-        entry = SC_hasharr_install(hashtab, keyname, vr, ptype, 3, -1);
+        entry = SC_hasharr_install(htab, keyname, vr, ptype, 3, -1);
         if (entry == NULL) {
             err = -1;
             break;

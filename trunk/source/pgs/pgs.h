@@ -188,9 +188,9 @@
 /* PG_PUSH_CHILD_IOB - add a child interface object to a parent's list */
 
 #define PG_PUSH_CHILD_IOB(par, chld)                                         \
-   {PG_interface_object *piob;                                               \
-    piob = (par);                                                            \
-    SC_array_push(piob->children, &chld);}
+   {PG_interface_object *_piob;                                              \
+    _piob = (par);                                                           \
+    SC_array_push(_piob->children, &chld);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

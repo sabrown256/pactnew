@@ -88,13 +88,13 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
 /* initialize the repackaged version */
     fo = fopen_safe(fname, "w");
     if (fo != NULL)
-       {char lpath[BFLRG];
+       {char lpth[BFLRG];
 
 /* use full path for PCSH_TMP_ variable */
-	full_path(lpath, BFLRG, 0, NULL, fname);
+	full_path(lpth, BFLRG, 0, NULL, fname);
 
 	fprintf(fo, "#!%s %s\n", shell, args);
-	fprintf(fo, "setenv PCSH_TMP_ %s\n", lpath);
+	fprintf(fo, "setenv PCSH_TMP_ %s\n", lpth);
 
 	script_env(fo, pact);
 

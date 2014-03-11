@@ -1562,7 +1562,6 @@ void SX_close_open_files(void)
 
              case SC_PDB :
 	          {PDBfile *file;
-                   FILE *fp;
 
 		   ppi = (pdb_info *) SX_gs.dataset[i].file_info;
 		   if (SC_safe_to_free(ppi) == TRUE)

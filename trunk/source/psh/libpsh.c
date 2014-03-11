@@ -3074,16 +3074,16 @@ int nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
 
 void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
    {char msg[BFLRG];
-    FILE *log;
+    FILE *lg;
 
     if ((ilog == TRUE) && (flog != NULL) && (ilev <= db_log_level))
-       {log = fopen_safe(flog, "a");
-	if (log != NULL)
+       {lg = fopen_safe(flog, "a");
+	if (lg != NULL)
 	   {VA_START(fmt);
 	    VSNPRINTF(msg, BFLRG, fmt);
 	    VA_END;
-	    fprintf(log, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
-	    fclose_safe(log);};};
+	    fprintf(lg, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
+	    fclose_safe(lg);};};
 
     return;}
 

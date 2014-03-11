@@ -15,7 +15,7 @@
 
 /* CC_END_SCC - gracefully exit from SCC */
 
-void CC_end_scc(int val)
+NORETURN void CC_end_scc(int val)
    {int ev;
 
     ev = val;

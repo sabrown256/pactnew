@@ -17,12 +17,12 @@
 /* _ACCESS_LOG_FILE - wrap this accessor function around the log file */
 
 FILE *_access_log_file(int set, FILE *in)
-   {static FILE *log = NULL;
+   {static FILE *lg = NULL;
 
     if (set == TRUE)
-       log = in;
+       lg = in;
 
-    return(log);}
+    return(lg);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
