@@ -6,26 +6,6 @@
 #
 # include "cpyright.h"
 #
-# -Wall turns on the following warning flags:
-#    -Waddress -Warray-bounds (only with -O2) -Wc++0x-compat
-#    -Wchar-subscripts -Wenum-compare (in C/Objc; this is on by default
-#    in C++) -Wimplicit-int (C and Objective-C only)
-#    -Wimplicit-function-declaration (C and Objective-C only) -Wcomment
-#    -Wformat -Wmain (only for C/ObjC and unless -ffreestanding)
-#    -Wmissing-braces -Wnonnull -Wparentheses -Wpointer-sign -Wreorder
-#    -Wreturn-type -Wsequence-point -Wsign-compare (only in C++)
-#    -Wstrict-aliasing -Wstrict-overflow=1 -Wswitch -Wtrigraphs
-#    -Wuninitialized -Wunknown-pragmas -Wunused-function -Wunused-label
-#    -Wunused-value -Wunused-variable -Wvolatile-register-var
-#
-# -Wextra turns on the following warning flags:
-#    -Wclobbered -Wempty-body -Wignored-qualifiers
-#    -Wmissing-field-initializers -Wmissing-parameter-type (C only)
-#    -Wold-style-declaration (C only) -Woverride-init -Wsign-compare
-#    -Wtype-limits -Wuninitialized -Wunused-parameter (only with
-#    -Wunused or -Wall) -Wunused-but-set-parameter (only with -Wunused
-#    or -Wall)
-#
 
 run analyze/rpath gnu
 
@@ -72,19 +52,42 @@ Tool CC {
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
                  on    = -fprofile-arcs -ftest-coverage ]
    Flags    += -fno-exceptions -fvisibility=hidden
-   Flags    += -Wformat -Wmultichar
-   Flags    += -Wreturn-type
-   Flags    += -Wpointer-arith
-   Flags    += -Wuninitialized -Winit-self
-#   Flags    += -Wsign-compare
+   Flags    += -Wno-inline
 #   Flags    += -Wformat-nonliteral
 #   Flags    += -Wno-deprecated
+
+# -Wall turns on the following warning flags:
+#    -Waddress -Warray-bounds (only with -O2) -Wc++0x-compat
+#    -Wchar-subscripts -Wenum-compare (in C/Objc; this is on by default
+#    in C++) -Wimplicit-int (C and Objective-C only)
+#    -Wimplicit-function-declaration (C and Objective-C only) -Wcomment
+#    -Wformat -Wmain (only for C/ObjC and unless -ffreestanding)
+#    -Wmissing-braces -Wnonnull -Wparentheses -Wpointer-sign -Wreorder
+#    -Wreturn-type -Wsequence-point -Wsign-compare (only in C++)
+#    -Wstrict-aliasing -Wstrict-overflow=1 -Wswitch -Wtrigraphs
+#    -Wuninitialized -Wunknown-pragmas -Wunused-function -Wunused-label
+#    -Wunused-value -Wunused-variable -Wvolatile-register-var
+#
    Debug     = -g -O0 -Wall
 #   Debug    += -Werror
+   Flags    += -Wmultichar
+   Flags    += -Wpointer-arith
+   Flags    += -Winit-self
+
+#
+# -Wextra turns on the following warning flags:
+#    -Wclobbered -Wempty-body -Wignored-qualifiers
+#    -Wmissing-field-initializers -Wmissing-parameter-type (C only)
+#    -Wold-style-declaration (C only) -Woverride-init -Wsign-compare
+#    -Wtype-limits -Wuninitialized -Wunused-parameter (only with
+#    -Wunused or -Wall) -Wunused-but-set-parameter (only with -Wunused
+#    or -Wall)
+#
    Debug    += -Wextra
    Debug    += -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
-   Debug    += -Wno-missing-field-initializers
-   Debug    += -Wno-missing-declarations -Wno-inline
+   Debug    += -Wno-missing-declarations
+#   Flags    += -Wsign-compare
+
    Optimize  = [ _env_ = PACT_CC_VERSION ;      # optimization level
                  4.1.2 = -g -O0 -Wall ;         # 4.1.2 crashes on mlcfnc.c with -O
                  *.*   = -g -O -Wunused ]
