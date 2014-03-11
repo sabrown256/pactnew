@@ -908,7 +908,7 @@ void PA_wrrstrth(void)
 
 /* PA_DONE - gracefully leave the generator */
 
-void PA_done(void)
+NORETURN void PA_done(void)
    {
 
     PC_close_member(PA_gs.pp);

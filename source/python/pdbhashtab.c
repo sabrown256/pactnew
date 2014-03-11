@@ -416,7 +416,7 @@ PP_hashtab_mp_subscript(PyObject *_self, PyObject *key)
 /* DO-NOT-DELETE splicer.begin(pdb.hashtab.as_mapping.subscript) */
     char *name;
     haelem *hp;
-    hasharr *hashtab;
+    hasharr *htab;
     PyObject *rv;
     PP_hashtabObject *self = (PP_hashtabObject *) _self;
 
@@ -426,14 +426,14 @@ PP_hashtab_mp_subscript(PyObject *_self, PyObject *key)
     }
     name = PY_STRING_AS_STRING(key);
 
-    hashtab = self->data;
-    if (hashtab == NULL) {
+    htab = self->data;
+    if (htab == NULL) {
         PP_error_set(PP_error_internal,
                      (PyObject *) self, "hashtab is NULL");
         return NULL;
     }
 
-    hp = SC_hasharr_lookup(hashtab, name);
+    hp = SC_hasharr_lookup(htab, name);
     if (hp == NULL) {
         PyErr_SetObject(PyExc_KeyError, key);
         return NULL;
@@ -451,7 +451,7 @@ PP_hashtab_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
 /* DO-NOT-DELETE splicer.begin(pdb.hashtab.as_mapping.ass_subscript) */
     int ok;
     char *name, *ptype;
-    hasharr *hashtab;
+    hasharr *htab;
     PP_hashtabObject *self = (PP_hashtabObject *) _self;
     
     if (!PY_STRING_CHECK(key)) {
@@ -460,15 +460,15 @@ PP_hashtab_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
     }
     name = PY_STRING_AS_STRING(key);
 
-    hashtab = self->data;
-    if (hashtab == NULL) {
+    htab = self->data;
+    if (htab == NULL) {
         PP_error_set(PP_error_internal,
                      (PyObject *) self, "hashtab is NULL");
         return -1;
     }
 
     if (v == NULL) {
-        ok = SC_hasharr_remove(hashtab, name);
+        ok = SC_hasharr_remove(htab, name);
         /* XXX - remove data too */
         if (ok != TRUE) {
             PP_error_set(PP_error_internal, NULL, "error removing object");
@@ -496,7 +496,7 @@ PP_hashtab_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
         if (ptype == NULL)
             return -1;
 
-        hp = SC_hasharr_install(hashtab, name, vr, ptype, 3, -1);
+        hp = SC_hasharr_install(htab, name, vr, ptype, 3, -1);
 
         /* XXX release vr as well */
         _PP_rl_descr(descr);

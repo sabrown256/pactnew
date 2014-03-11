@@ -232,8 +232,8 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
     double wc[PG_BOXSZ];
     double x1c[PG_SPACEDM], x2c[PG_SPACEDM];
     double x3c[PG_SPACEDM], x4c[PG_SPACEDM];
-    double *x1, *x2, *x3, *x4;
-    double *y1, *y2, *y3, *y4;
+    double *x1[PG_SPACEDM], *x2[PG_SPACEDM];
+    double *x3[PG_SPACEDM], *x4[PG_SPACEDM];
     double *x, *y;
     char *emap;
     void *cnnct, *rv;
@@ -266,8 +266,8 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
 
     emap = PM_check_emap(&eflag, alist, nmap);
 
-    PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
-    PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);
+    PM_LOGICAL_ZONE(x, x1[0], x2[0], x3[0], x4[0], kmax);
+    PM_LOGICAL_ZONE(y, x1[1], x2[1], x3[1], x4[1], kmax);
 
     PG_get_viewspace(dev, WORLDC, wc);
 
@@ -307,15 +307,15 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
 	     a3c = (k == 0) ? -1 : a3[iz];
 	     a4c = (l == 0) ? -1 : a4[iz];
 
-	     x1c[0] = x1[in];
-	     x2c[0] = x2[in];
-	     x3c[0] = x3[in];
-	     x4c[0] = x4[in];
+	     x1c[0] = x1[0][in];
+	     x2c[0] = x2[0][in];
+	     x3c[0] = x3[0][in];
+	     x4c[0] = x4[0][in];
 
-	     x1c[1] = y1[in];
-	     x2c[1] = y2[in];
-	     x3c[1] = y3[in];
-	     x4c[1] = y4[in];
+	     x1c[1] = x1[1][in];
+	     x2c[1] = x2[1][in];
+	     x3c[1] = x3[1][in];
+	     x4c[1] = x4[1][in];
 
 	     if (a0c != a1c)
 	        PG_draw_line_n(dev, 2, WORLDC, x1c, x2c, dev->clipping);

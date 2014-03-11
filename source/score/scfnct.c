@@ -406,7 +406,7 @@ void SC_timeout(int to, PFSignal_handler fnc, void *a)
 
 /* _SC_TIMEOUT_CONT - handle timeouts for SC_time_allow */
 
-void _SC_timeout_cont(int sig)
+NORETURN void _SC_timeout_cont(int sig)
    {JMP_BUF *cpu;
 
 /* io_printf(stdout, "Timeout %d\n", sig); */

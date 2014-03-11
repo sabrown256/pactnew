@@ -643,9 +643,7 @@ void _PG_PS_put_image(PG_device *dev, unsigned char *bf,
     true_cm      = pal->true_colormap;
 
     if ((n_dev_colors < n_pal_colors) && (pseudo_cm != NULL))
-       {unsigned char *pbf;
-
-        pbf = bf;
+       {pbf = bf;
         PM_random(-1);
         for (l = 0; l < ny; l++)
             for (k = 0; k < nx; k++)

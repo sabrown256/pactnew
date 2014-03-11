@@ -2007,7 +2007,7 @@ Bitio_Flush(BitBucket *bbPtr)
  *
  *===========================================================================*/
 void
-Bitio_WriteToSocket(BitBucket *bbPtr, int socket)
+Bitio_WriteToSocket(BitBucket *bbPtr, int sck)
 {
     struct bitBucket *ptr, *tempPtr;
     u_int32_t buffer[WORDS_PER_BUCKET];
@@ -2038,7 +2038,7 @@ Bitio_WriteToSocket(BitBucket *bbPtr, int socket)
 		buffer[i] = htonl(ptr->bits[i]);
 	    }
 
-	    nitems = write(socket, buffer, numWords * sizeof(u_int32_t));
+	    nitems = write(sck, buffer, numWords * sizeof(u_int32_t));
 	    if (nitems != numWords*sizeof(u_int32_t)) {
 		io_printf(stderr, "Whoa!  Trouble writing %d bytes (got %d bytes)!  Game over, dude!\n",
 			(int)(numWords*sizeof(u_int32_t)), nitems);
@@ -2060,7 +2060,7 @@ Bitio_WriteToSocket(BitBucket *bbPtr, int socket)
 	    while ( bitsLeft > 0 ) {
 		charBuf[0] = (lastWord >> 24);
 		charBuf[0] &= lower_mask[8];
-		if ( write(socket, charBuf, 1) != 1 ) {
+		if ( write(sck, charBuf, 1) != 1 ) {
 		    io_printf(stderr, "ERROR:  write of lastPtr bits\n");
 		    exit(1);
 		}
@@ -4552,9 +4552,9 @@ static void	AppendFile _ANSI_ARGS_((FILE *outputFile, FILE *inputFile));
  *
  *===========================================================================*/
 void
-GOPStoMPEG(numGOPS, outputFileName, outputFilePtr)
+GOPStoMPEG(numGOPS, outfnm, outputFilePtr)
     int numGOPS;
-    char *outputFileName;
+    char *outfnm;
     FILE *outputFilePtr;
 {
     register int ind;
@@ -4611,7 +4611,7 @@ GOPStoMPEG(numGOPS, outputFileName, outputFilePtr)
     } else {
 	ind = 0;
 	while ( TRUE ) {
-	    snprintf(fileName, 1024, "%s.gop.%d", outputFileName, ind);
+	    snprintf(fileName, 1024, "%s.gop.%d", outfnm, ind);
 
 	    if ( (inputFile = _PG_fopen(fileName, "rb")) == NULL ) {
 		break;
@@ -4653,11 +4653,7 @@ GOPStoMPEG(numGOPS, outputFileName, outputFilePtr)
  *
  *===========================================================================*/
 void
-FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
-    int numFrames;
-    char *outputFileName;
-    FILE *outputFile;
-    boolean parallel;
+FramesToMPEG(int nfr, char *outfnm, FILE *outputFile, boolean parallel)
 {
     register int ind;
     BitBucket *bb;
@@ -4696,8 +4692,8 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
     currentGOP = gopSize;
     totalFramesSent = 0;
 
-    if ( numFrames > 0 ) {
-	for ( ind = 0; ind < numFrames; ind++ ) {
+    if ( nfr > 0 ) {
+	for ( ind = 0; ind < nfr; ind++ ) {
 	    if ( FRAME_TYPE(ind) == 'b' ) {
 		continue;
 	    }
@@ -4735,7 +4731,7 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
 
 	    if ( parallel ) {
 		WaitForOutputFile(ind);
-		snprintf(fileName, 1024, "%s.frame.%d", outputFileName, ind);
+		snprintf(fileName, 1024, "%s.frame.%d", outfnm, ind);
 	    } else {
 		GetNthInputFileName(inputFileName, ind);
 		snprintf(fileName, 1024, "%s/%s", currentFramePath, inputFileName);
@@ -4767,7 +4763,7 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
 		for ( bNum = pastRefNum+1; bNum < futureRefNum; bNum++ ) {
 		    if ( parallel ) {
 			WaitForOutputFile(bNum);
-			snprintf(fileName, 1024, "%s.frame.%d", outputFileName, bNum);
+			snprintf(fileName, 1024, "%s.frame.%d", outfnm, bNum);
 		    } else {
 			GetNthInputFileName(inputFileName, bNum);
 			snprintf(fileName, 1024, "%s/%s", currentFramePath, inputFileName);
@@ -4838,7 +4834,7 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
 		currentGOP -= gopSize;
 	    }
 
-	    snprintf(fileName, 1024, "%s.frame.%d", outputFileName, ind);
+	    snprintf(fileName, 1024, "%s.frame.%d", outfnm, ind);
 
 	    if ( (inputFile = _PG_fopen(fileName, "rb")) == NULL ) {
 		break;
@@ -4857,7 +4853,7 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
 		register int bNum;
 
 		for ( bNum = pastRefNum+1; bNum < futureRefNum; bNum++ ) {
-		    snprintf(fileName, 1024, "%s.frame.%d", outputFileName, bNum);
+		    snprintf(fileName, 1024, "%s.frame.%d", outfnm, bNum);
 
 		    for (q = 0;   q < READ_ATTEMPTS;  ++q ) {
 		      if ( (inputFile = _PG_fopen(fileName, "rb")) != NULL ) break;
@@ -5315,20 +5311,20 @@ int out_total;
  *
  *===========================================================================*/
 
-void Frame_Init(MpegFrame **frameMemory)
+void Frame_Init(MpegFrame **frmry)
    {register int idx;
 
     for (idx = 0; idx < 3; idx++)
-        {frameMemory[idx] = CMAKE(MpegFrame);
+        {frmry[idx] = CMAKE(MpegFrame);
 
-	 frameMemory[idx]->inUse     = FALSE;
-	 frameMemory[idx]->ppm_data  = NULL;
-	 frameMemory[idx]->rgb_data  = NULL;
-	 frameMemory[idx]->orig_y    = NULL;   /* if NULL, then orig_cr, orig_cb invalid */
-	 frameMemory[idx]->y_blocks  = NULL;   /* if NULL, then cr_blocks, cb_blocks invalid */
-	 frameMemory[idx]->decoded_y = NULL;   /* if NULL, then blah blah */
-	 frameMemory[idx]->halfX     = NULL;
-	 frameMemory[idx]->next      = NULL;};
+	 frmry[idx]->inUse     = FALSE;
+	 frmry[idx]->ppm_data  = NULL;
+	 frmry[idx]->rgb_data  = NULL;
+	 frmry[idx]->orig_y    = NULL;   /* if NULL, then orig_cr, orig_cb invalid */
+	 frmry[idx]->y_blocks  = NULL;   /* if NULL, then cr_blocks, cb_blocks invalid */
+	 frmry[idx]->decoded_y = NULL;   /* if NULL, then blah blah */
+	 frmry[idx]->halfX     = NULL;
+	 frmry[idx]->next      = NULL;};
 
 #ifdef BLEAH
     io_printf(stderr, "%d frames allocated.\n", numOfFrames);
@@ -5348,11 +5344,11 @@ void Frame_Init(MpegFrame **frameMemory)
  *
  *===========================================================================*/
 
-void Frame_Exit(MpegFrame **frameMemory)
+void Frame_Exit(MpegFrame **frmry)
    {register int idx;
 
     for (idx = 0; idx < 3; idx++)
-	FreeFrame(frameMemory[idx]);
+	FreeFrame(frmry[idx]);
 
     return;}
 
@@ -5387,10 +5383,10 @@ void Frame_Free(MpegFrame *frame)
  *
  *===========================================================================*/
 
-MpegFrame *Frame_New(int id, int type, MpegFrame **frameMemory)
+MpegFrame *Frame_New(int id, int type, MpegFrame **frmry)
    {MpegFrame *frame;
 
-    frame = GetUnusedFrame(frameMemory);
+    frame = GetUnusedFrame(frmry);
     if (frame != NULL)
        ResetFrame(id, type, frame);
 
@@ -5629,13 +5625,13 @@ void Frame_AllocDecoded(MpegFrame *frame, boolean makeReference)
  *
  *===========================================================================*/
 
-static MpegFrame *GetUnusedFrame(MpegFrame **frameMemory)
+static MpegFrame *GetUnusedFrame(MpegFrame **frmry)
    {register int idx;
 
     for (idx = 0; idx < 3; idx++)
-        {if (!frameMemory[idx]->inUse)
-	    {frameMemory[idx]->inUse = TRUE;
-	     return(frameMemory[idx]);};};
+        {if (!frmry[idx]->inUse)
+	    {frmry[idx]->inUse = TRUE;
+	     return(frmry[idx]);};};
 
     io_printf(stderr, "ERROR:  No unused frames!!!\n");
     io_printf(stderr, "        If you are using stdin for input, it is likely that you have too many\n");
@@ -5889,18 +5885,18 @@ int
 FType_FutureRef(currFrameNum)
     int currFrameNum;
 {
-    int	    index;
+    int	    ind;
     int	    futureIndex;
     int	    result;
 
     if (use_cache) {
       return(frameTable[currFrameNum].next->number);
     } else {
-      index = currFrameNum % framePatternLen;
-      futureIndex = frameTable[index].next->number;
+      ind = currFrameNum % framePatternLen;
+      futureIndex = frameTable[ind].next->number;
       
       result = currFrameNum +
-	(((futureIndex-index)+framePatternLen) % framePatternLen);
+	(((futureIndex-ind)+framePatternLen) % framePatternLen);
       
       if ( (result >= numInputFiles) && forceEncodeLast ) {
 	return(numInputFiles-1);
@@ -5926,17 +5922,17 @@ int
 FType_PastRef(currFrameNum)
     int currFrameNum;
 {
-    int	    index;
+    int	    ind;
     int	    pastIndex;
 
     if (use_cache) {
       return(frameTable[currFrameNum].prev->number);
     } else {
-      index = currFrameNum % framePatternLen;
-      pastIndex = frameTable[index].prev->number;
+      ind = currFrameNum % framePatternLen;
+      pastIndex = frameTable[ind].prev->number;
       
       return(currFrameNum -
-	(((index-pastIndex)+framePatternLen) % framePatternLen));
+	(((ind-pastIndex)+framePatternLen) % framePatternLen));
     }
 }
 
@@ -5957,7 +5953,7 @@ void
 SetFramePattern(pattern)
     char *pattern;
 {
-    int index, len;
+    int ind, len;
     char *buf;
 
     if ( ! pattern ) {
@@ -5968,11 +5964,11 @@ SetFramePattern(pattern)
     len = strlen(pattern);
 
     if ( SIMPLE_ASCII_UPPER(pattern[0]) != 'I' ) {
-      for (index=0; index < len; index++) {
+      for (ind=0; ind < len; ind++) {
 
-	if (SIMPLE_ASCII_UPPER(pattern[index]) == 'I') {
+	if (SIMPLE_ASCII_UPPER(pattern[ind]) == 'I') {
 	  break;
-	} else if (SIMPLE_ASCII_UPPER(pattern[index]) == 'P') {
+	} else if (SIMPLE_ASCII_UPPER(pattern[ind]) == 'P') {
 	  io_printf(stderr, "first reference frame must be 'i'\n");
 	  exit(1);
 	}
@@ -5983,20 +5979,20 @@ SetFramePattern(pattern)
     ERRCHK(buf, "malloc");
 
     firstI = -1;
-    for ( index = 0; index < len; index++ ) {
-      switch( SIMPLE_ASCII_UPPER(pattern[index]) ) {
+    for ( ind = 0; ind < len; ind++ ) {
+      switch( SIMPLE_ASCII_UPPER(pattern[ind]) ) {
       case 'I':	
-	buf[index] = 'i';
-	if (firstI == -1) firstI = index;
+	buf[ind] = 'i';
+	if (firstI == -1) firstI = ind;
 	break;
       case 'P':	
-	buf[index] = 'p'; 
+	buf[ind] = 'p'; 
 	break;
       case 'B':	
-	buf[index] = 'b';
+	buf[ind] = 'b';
 	break;
       default:
-	io_printf(stderr, "Frame type '%c' not supported.\n", pattern[index]);
+	io_printf(stderr, "Frame type '%c' not supported.\n", pattern[ind]);
 	exit(1);
       }
     }
@@ -6028,7 +6024,7 @@ SetFramePattern(pattern)
 void
 ComputeFrameTable()
 {
-    register int index;
+    register int ind;
     FrameTable *lastIP, *firstB, *secondIP;
     FrameTable *ptr;
     char typ;
@@ -6046,60 +6042,60 @@ ComputeFrameTable()
     lastIP = NULL;
     firstB = NULL;
     secondIP = NULL;
-    for ( index = 0; index < table_size; index++ ) {
-	frameTable[index].number = index;
-	typ = FType_Type(index);
-	frameTable[index].typ = typ;
+    for ( ind = 0; ind < table_size; ind++ ) {
+	frameTable[ind].number = ind;
+	typ = FType_Type(ind);
+	frameTable[ind].typ = typ;
 	switch( typ ) {
 	    case 'i':
 		ptr = firstB;
 		while ( ptr != NULL ) {
-		    ptr->next = &(frameTable[index]);
+		    ptr->next = &(frameTable[ind]);
 		    ptr = ptr->nextOutput;
 		}
-		frameTable[index].nextOutput = firstB;
-		frameTable[index].prev = lastIP;	/* for freeing */
+		frameTable[ind].nextOutput = firstB;
+		frameTable[ind].prev = lastIP;	/* for freeing */
 		if ( lastIP != NULL ) {
-		    lastIP->next = &(frameTable[index]);
+		    lastIP->next = &(frameTable[ind]);
 		    if ( secondIP == NULL ) {
-			secondIP = &(frameTable[index]);
+			secondIP = &(frameTable[ind]);
 		    }
 		}
-		lastIP = &(frameTable[index]);
+		lastIP = &(frameTable[ind]);
 		firstB = NULL;
 		break;
 	    case 'p':
 		ptr = firstB;
 		while ( ptr != NULL ) {
-		    ptr->next = &(frameTable[index]);
+		    ptr->next = &(frameTable[ind]);
 		    ptr = ptr->nextOutput;
 		}
-		frameTable[index].nextOutput = firstB;
-		frameTable[index].prev = lastIP;
+		frameTable[ind].nextOutput = firstB;
+		frameTable[ind].prev = lastIP;
 		if ( lastIP != NULL ) {
-		    lastIP->next = &(frameTable[index]);
+		    lastIP->next = &(frameTable[ind]);
 		    if ( secondIP == NULL ) {
-			secondIP = &(frameTable[index]);
+			secondIP = &(frameTable[ind]);
 		    }
 		}
-		lastIP = &(frameTable[index]);
+		lastIP = &(frameTable[ind]);
 		firstB = NULL;
 		break;
 	    case 'b':
-		if ( (index+1 == framePatternLen) ||
-		     (FType_Type(index+1) != 'b') ) {
-		    frameTable[index].nextOutput = NULL;
+		if ( (ind+1 == framePatternLen) ||
+		     (FType_Type(ind+1) != 'b') ) {
+		    frameTable[ind].nextOutput = NULL;
 		} else {
-		    frameTable[index].nextOutput = &(frameTable[index+1]);
+		    frameTable[ind].nextOutput = &(frameTable[ind+1]);
 		}
-		frameTable[index].prev = lastIP;
+		frameTable[ind].prev = lastIP;
 		if ( firstB == NULL ) {
-		    firstB = &(frameTable[index]);
+		    firstB = &(frameTable[ind]);
 		}
 		break;
 	    default:
 	        io_printf(stderr, "Programmer Error in ComputeFrameTable (%d)\n",
-			framePattern[index]);
+			framePattern[ind]);
 	        exit(1);
 	        break;
 	}
@@ -6646,7 +6642,7 @@ GenIFrame(bb, current)
      MpegFrame *current;
 {
     register int x, y;
-    register int index;
+    register int ind;
     FlatBlock	 fb[6];
     Block 	 dec[6];
     int32 y_dc_pred, cr_dc_pred, cb_dc_pred;
@@ -6794,15 +6790,15 @@ GenIFrame(bb, current)
 	if ( decodeRefFrames ) {
 	  /* now, reverse the DCT transform */
 	  LaplaceCnum = 0;
-	  for ( index = 0; index < 6; index++ ) {
+	  for ( ind = 0; ind < 6; ind++ ) {
 	    if (!DoLaplace) {
-	      Mpost_UnQuantZigBlock(fb[index], dec[index], QScale, TRUE);
+	      Mpost_UnQuantZigBlock(fb[ind], dec[ind], QScale, TRUE);
 	    } else {
-	      if (index == 4) {LaplaceCnum = 1;}
-	      if (index == 5) {LaplaceCnum = 2;}
-	      Mpost_UnQuantZigBlockLaplace(fb[index], dec[index], QScale, TRUE);
+	      if (ind == 4) {LaplaceCnum = 1;}
+	      if (ind == 5) {LaplaceCnum = 2;}
+	      Mpost_UnQuantZigBlockLaplace(fb[ind], dec[ind], QScale, TRUE);
 	    }
-	    mpeg_jrevdct((int16 *)dec[index]);		
+	    mpeg_jrevdct((int16 *)dec[ind]);		
 	    }
 	  
 	  /* now, unblockify */
@@ -7235,8 +7231,7 @@ WriteDecodedFrame(frame)
 }
 
 
-void
-PrintItoIBitRate(int numBits, int frameNum)
+void PrintItoIBitRate(int nbt, int frameNum)
 {
     if ( ( ! childProcess) && showBitRatePerFrame ) {
 	/* ASSUMES 30 FRAMES PER SECOND */
@@ -7244,13 +7239,13 @@ PrintItoIBitRate(int numBits, int frameNum)
 	if (! realQuiet) {
 	io_printf(stdout, "I-to-I (frames %5d to %5d) bitrate:  %8d\n",
 		lastIFrame, frameNum-1,
-		((numBits-lastNumBits)*30)/
+		((nbt-lastNumBits)*30)/
 		(frameNum-lastIFrame));
         }
 
 	io_printf(bitRateFile, "I-to-I (frames %5d to %5d) bitrate:  %8d\n",
 		lastIFrame, frameNum-1,
-		((numBits-lastNumBits)*30)/
+		((nbt-lastNumBits)*30)/
 		(frameNum-lastIFrame));
     }
 }
@@ -8623,14 +8618,14 @@ static double itrans_coef[8][8];
 
 void init_idctref(void)
 {
-  int freq, time;
+  int freq, ltim;
   double scale;
 
   for (freq=0; freq < 8; freq++)
   {
     scale = (freq == 0) ? sqrt(0.125) : 0.5;
-    for (time=0; time<8; time++)
-      itrans_coef[freq][time] = scale*cos((PI/8.0)*freq*(time + 0.5));
+    for (ltim=0; ltim<8; ltim++)
+      itrans_coef[freq][ltim] = scale*cos((PI/8.0)*freq*(ltim + 0.5));
   }
 }
 
@@ -11043,11 +11038,11 @@ static void	GenBlockPattern _ANSI_ARGS_((BitBucket *bb,
  *
  *===========================================================================*/
 void
-SetGOPStartTime(index)
-    int index;
+SetGOPStartTime(ind)
+    int ind;
 {
     lastGOPStart = gopStartFrame;
-    gopStartFrame = index;
+    gopStartFrame = ind;
 }
 
 
@@ -11103,23 +11098,12 @@ Mhead_GenPictureHeader(bbPtr, frameType, pictCount, f_code)
  *
  *===========================================================================*/
 void
-Mhead_GenSequenceHeader(bbPtr, hsize, vsize, pratio, pict_rate, bit_rate,
-			buf_size, c_param_flag, iq_matrix, niq_matrix,
-			ext_data, ext_data_size, user_data, user_data_size)
-    BitBucket *bbPtr;
-    u_int32_t hsize;
-    u_int32_t vsize;
-    int32 pratio;
-    int32 pict_rate;
-    int32 bit_rate;
-    int32 buf_size;
-    int32 c_param_flag;
-    int32 *iq_matrix;
-    int32 *niq_matrix;
-    u_int8_t *ext_data;
-    int32 ext_data_size;
-    char *user_data; /*NOTE: changed "unit8" to "char" NOTE*/
-    int32 user_data_size;
+Mhead_GenSequenceHeader(BitBucket *bbPtr, u_int32_t hsize, u_int32_t vsize,
+			int32 pratio, int32 pict_rate, int32 bitr, int32 bfsz,
+			int32 c_param_flag, int32 *iq_matrix, int32 *niq_matrix,
+			u_int8_t *ext_data, int32 ext_data_size,
+			char *user_data, /*NOTE: changed "unit8" to "char" NOTE*/
+			int32 user_data_size)
 {
     extern int ZAG[];
     int i;
@@ -11158,33 +11142,33 @@ io_printf(stdout, "hsize, vsize = %d, %d\n", hsize, vsize);
 
     /* Write bit rate, negative values default to variable. */
 
-    if (bit_rate < 0) {
-	bit_rate = -1;
+    if (bitr < 0) {
+	bitr = -1;
     } else {
-	bit_rate = bit_rate / 400;
+	bitr = bitr / 400;
     }
 
-    Bitio_Write(bbPtr, bit_rate, 18);
+    Bitio_Write(bbPtr, bitr, 18);
 
     /* Marker bit. */
     Bitio_Write(bbPtr, 0x1, 1);
 
     /* Write VBV buffer size. Negative values default to zero. */
-    if (buf_size < 0) {
-	buf_size = 0;
+    if (bfsz < 0) {
+	bfsz = 0;
     }
 
-    buf_size = (buf_size + (16*1024 - 1)) / (16*1024);
-    if (buf_size>=0x400) buf_size=0x3ff;
-    Bitio_Write(bbPtr, buf_size, 10);
+    bfsz = (bfsz + (16*1024 - 1)) / (16*1024);
+    if (bfsz>=0x400) bfsz=0x3ff;
+    Bitio_Write(bbPtr, bfsz, 10);
 
     /* Write constrained parameter flag. */
     {
       int num_mb = ((hsize+15)/16) * ((vsize+15)/16);
       /* At present we cheat on buffer size */
-      c_param_flag = ((bit_rate <= 4640) &&
-                    (bit_rate >0) &&
-                    (buf_size <= 20) &&
+      c_param_flag = ((bitr <= 4640) &&
+                    (bitr >0) &&
+                    (bfsz <= 20) &&
                     (pict_rate >= 1) &&
                     (pict_rate <= 5) &&
                     (hsize <= 768) &&
@@ -11282,21 +11266,11 @@ Mhead_GenSequenceEnder(bbPtr)
  *
  *===========================================================================*/
 void
-Mhead_GenGOPHeader(bbPtr, drop_frame_flag, tc_hrs, tc_min, tc_sec, tc_pict,
-		   closed_gop, broken_link, ext_data, ext_data_size,
-		   user_data, user_data_size)
-    BitBucket *bbPtr;
-    int32 drop_frame_flag;
-    int32 tc_hrs;
-    int32 tc_min;
-    int32 tc_sec;
-    int32 tc_pict;
-    int32 closed_gop;
-    int32 broken_link;
-    u_int8_t *ext_data;
-    int32 ext_data_size;
-    u_int8_t *user_data;
-    int32 user_data_size;
+Mhead_GenGOPHeader(BitBucket *bbPtr, int32 drop_frame_flag,
+		   int32 thrs, int32 tmin, int32 tsec,
+		   int32 tpict, int32 closed_gop, int32 broken_link,
+		   u_int8_t *ext_data, int32 ext_data_size, u_int8_t *user_data,
+		   int32 user_data_size)
 {
     int i;
 
@@ -11313,19 +11287,19 @@ Mhead_GenGOPHeader(bbPtr, drop_frame_flag, tc_hrs, tc_min, tc_sec, tc_pict,
     }
 
     /* Time code hours. */
-    Bitio_Write(bbPtr, tc_hrs, 5);
+    Bitio_Write(bbPtr, thrs, 5);
 
     /* Time code minutes. */
-    Bitio_Write(bbPtr, tc_min, 6);
+    Bitio_Write(bbPtr, tmin, 6);
 
     /* Marker bit. */
     Bitio_Write(bbPtr, 0x01, 1);
 
     /* Time code seconds. */
-    Bitio_Write(bbPtr, tc_sec, 6);
+    Bitio_Write(bbPtr, tsec, 6);
 
     /* Time code pictures. */
-    Bitio_Write(bbPtr, tc_pict, 6);
+    Bitio_Write(bbPtr, tpict, 6);
 
 
     /* Closed gop flag. */
@@ -12150,7 +12124,7 @@ static void	PrintEndStats _ANSI_ARGS_((int inputFrameBits, long totalBits));
 static void	ProcessRefFrame _ANSI_ARGS_((MpegFrame *frame,
 					      BitBucket *bb, int lastFrame,
 					      char *outputFileName,
-					      MpegFrame **frameMemory));
+					      MpegFrame **frmry));
 static void	OpenBitRateFile _ANSI_ARGS_((void));
 static void	CloseBitRateFile _ANSI_ARGS_((void));
 
@@ -12211,29 +12185,29 @@ void SetBitRateFileName(char *fileName)
  *
  *===========================================================================*/
 
-int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
-		    int32 *qtable, int32 *niqtable, int numFrames,
-		    FILE *ofp, char *outputFileName)
+int32 GenMPEGStream(int whgop, int frameStart, int frameEnd,
+		    int32 *qtab, int32 *niqtab, int nfr,
+		    FILE *ofp, char *outfnm)
    {
     int i, firstFrame, lastFrame, inputFrameBits;
     int32 bitstreamMode;
-    long numBits;
+    long nbt;
     char inputFileName[1024], frameType;
     boolean firstFrameDone;
     time_t tempTimeStart, tempTimeEnd;
     BitBucket *bb;
     MpegFrame *frame, *tempFrame;
 /*
-    MpegFrame **frameMemory;
+    MpegFrame **frmry;
 */
-    extern void        PrintItoIBitRate _ANSI_ARGS_((int numBits, int frameNum));
+    extern void        PrintItoIBitRate _ANSI_ARGS_((int nbt, int frameNum));
 
     inputFrameBits = 0;
     firstFrameDone = FALSE;
     frame          = NULL;
 
-    if ((whichGOP == -1) && (frameStart == -1) &&
-	(!stdinUsed) && (FType_Type(numFrames-1) == 'b'))
+    if ((whgop == -1) && (frameStart == -1) &&
+	(!stdinUsed) && (FType_Type(nfr-1) == 'b'))
        {io_printf(stderr, "\n");
         io_printf(stderr, "WARNING:  One or more B-frames at end will not be encoded.\n");
         io_printf(stderr, "          See FORCE_ENCODE_LAST_FRAME option in man page.\n");
@@ -12256,8 +12230,8 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
     else
        SetFileType(inputConversion);
 
-    if (whichGOP != -1)
-       {ComputeGOPFrames(whichGOP, &firstFrame, &lastFrame, numFrames);
+    if (whgop != -1)
+       {ComputeGOPFrames(whgop, &firstFrame, &lastFrame, nfr);
 
         realStart = firstFrame;
         realEnd   = lastFrame;
@@ -12300,7 +12274,7 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
             IOtime += (tempTimeEnd-tempTimeStart);};}
 
     else if (frameStart != -1)
-       {if (frameEnd > numFrames-1)
+       {if (frameEnd > nfr-1)
 	   {io_printf(stderr, "ERROR:  Specified last frame is out of bounds\n");
             exit(1);};
 
@@ -12322,7 +12296,7 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
             firstFrame = FType_PastRef(firstFrame);};
 
 /* if last frame is B, need to read in P or I frame after it */
-        if ((FType_Type(lastFrame) == 'b') && (lastFrame != numFrames-1))
+        if ((FType_Type(lastFrame) == 'b') && (lastFrame != nfr-1))
 
 /* can't find the next reference frame interactively */
 	   {if (stdinUsed)
@@ -12332,17 +12306,17 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
 
             lastFrame = FType_FutureRef(lastFrame);};
 
-        if (lastFrame > numFrames-1)            /* can't go last frame! */
-	   lastFrame = numFrames-1;}
+        if (lastFrame > nfr-1)            /* can't go last frame! */
+	   lastFrame = nfr-1;}
 
     else
        {firstFrame = 0;
-        lastFrame  = numFrames-1;
+        lastFrame  = nfr-1;
 
         realStart = 0;
-        realEnd   = numFrames-1;
+        realEnd   = nfr-1;
 
-        if (numFrames == 0)
+        if (nfr == 0)
 	   {io_printf(stderr, "ERROR:  No frames selected!\n");
             exit(1);};};
 
@@ -12514,7 +12488,7 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
 	     inputFrameBits = 24*Fsize_x*Fsize_y;
 	     SetBlocksPerSlice();
           
-	     if ((whichGOP == -1) && (frameStart == -1))
+	     if ((whgop == -1) && (frameStart == -1))
 	        {DBG_PRINT(("Generating sequence header\n"));
 		 bitstreamMode = getRateMode();
 		 if (bitstreamMode == FIXED_RATE)
@@ -12568,7 +12542,7 @@ write:
 					 aspectRatio,
 					 frameRate, bit_rate,
 					 buf_size, 1,
-					 qtable, niqtable,
+					 qtab, niqtab,
 					 NULL, 0,
 					 userData, userDataSize);
 
@@ -12576,13 +12550,13 @@ write:
           
 	     firstFrameDone = TRUE;};
         
-	 ProcessRefFrame(frame, bb, lastFrame, outputFileName, frameMemory);};
+	 ProcessRefFrame(frame, bb, lastFrame, outfnm, frameMemory);};
 
     if (frame != NULL)
        Frame_Free(frame);
 
 /* SEQUENCE END CODE */
-    if ((whichGOP == -1) && (frameStart == -1))
+    if ((whgop == -1) && (frameStart == -1))
        Mhead_GenSequenceEnder(bb);
 
     if (frameStart == -1)
@@ -12590,15 +12564,15 @@ write:
 /* I think this is right, since (bb == NULL) if (frameStart != -1).
  * See above where "bb" is initialized
  */
-       numBits = bb->cumulativeBits;
+       nbt = bb->cumulativeBits;
 
     else
 
-/* what should the correct value be?  Most likely 1.  "numBits" is
+/* what should the correct value be?  Most likely 1.  "nbt" is
  * used below, so we need to make sure it's properly initialized 
  * to somthing (anything)
  */
-       numBits = 1;
+       nbt = 1;
 
     if (frameStart == -1)
        {Bitio_Flush(bb);
@@ -12609,7 +12583,7 @@ write:
         diffTime = (int32) (timeEnd-timeStart);
 
         if (!childProcess)
-	   PrintEndStats(inputFrameBits, numBits);}
+	   PrintEndStats(inputFrameBits, nbt);}
 
     else
        {time(&timeEnd);
@@ -12619,7 +12593,7 @@ write:
 	   PrintEndStats(inputFrameBits, 1);};
 
     if (FType_Type(realEnd) != 'i')
-       PrintItoIBitRate(numBits, realEnd+1);
+       PrintItoIBitRate(nbt, realEnd+1);
 
     if ((!childProcess) && showBitRatePerFrame)
        CloseBitRateFile();
@@ -12990,17 +12964,17 @@ ComputeDHMSTime(someTime, timeText)
  *
  *===========================================================================*/
 static void
-ComputeGOPFrames(whichGOP, firstFrame, lastFrame, numFrames)
-    int whichGOP;
+ComputeGOPFrames(whgop, firstFrame, lastFrame, nfr)
+    int whgop;
     int *firstFrame;
     int *lastFrame;
-    int numFrames;
+    int nfr;
 {
     int	    passedB;
     int	    currGOP;
     int	    gopNum, frameNum;
 
-    /* calculate first, last frames of whichGOP GOP */
+    /* calculate first, last frames of whgop GOP */
 
     *firstFrame = -1;
     *lastFrame = -1;
@@ -13009,7 +12983,7 @@ ComputeGOPFrames(whichGOP, firstFrame, lastFrame, numFrames)
     passedB = 0;
     currGOP = 0;
     while ( *lastFrame == -1 ) {
-	if ( frameNum >= numFrames ) {
+	if ( frameNum >= nfr ) {
 	    io_printf(stderr, "ERROR:  There aren't that many GOPs!\n");
 	    exit(1);
 	}
@@ -13020,7 +12994,7 @@ io_printf(stdout, "GOP STARTS AT %d\n", frameNum-passedB);
 }
 #endif
 
-	if ( gopNum == whichGOP ) {
+	if ( gopNum == whgop ) {
 	    *firstFrame = frameNum;
 	}
 
@@ -13032,16 +13006,16 @@ io_printf(stdout, "GOP STARTS AT %d\n", frameNum-passedB);
 	    frameNum++;
 
 	    passedB = 0;
-	    while ( (frameNum < numFrames) && (FType_Type(frameNum) == 'b') ) {
+	    while ( (frameNum < nfr) && (FType_Type(frameNum) == 'b') ) {
 		frameNum++;
 		passedB++;
 	    }
-	} while ( (frameNum < numFrames) && 
+	} while ( (frameNum < nfr) && 
 		  ((FType_Type(frameNum) != 'i') || (currGOP < gopSize)) );
 
 	currGOP -= gopSize;
 
-	if ( gopNum == whichGOP ) {
+	if ( gopNum == whgop ) {
 	    *lastFrame = (frameNum-passedB-1);
 	}
 
@@ -13149,7 +13123,7 @@ PrintEndStats(inputFrameBits, totalBits)
  *===========================================================================*/
 
 static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
-			    char *outputFileName, MpegFrame **frameMemory)
+			    char *outfnm, MpegFrame **frmry)
    {int id;
     boolean separateFiles;
     char fileName[1024];
@@ -13168,7 +13142,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
        {if (remoteIO)
 	   bb = Bitio_New(NULL);
         else
-	   {snprintf(fileName, 1024, "%s.frame.%d", outputFileName, frame->id);
+	   {snprintf(fileName, 1024, "%s.frame.%d", outfnm, frame->id);
 	    if ((fpointer = _PG_fopen(fileName, "wb")) == NULL)
 	       {io_printf(stderr, "ERROR:  Could not open output file(1):  %s\n",
 			  fileName);
@@ -13282,7 +13256,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 	        continue;
 	
 	     if (!stdinUsed)
-	        {bFrame = Frame_New(id, 'b', frameMemory);
+	        {bFrame = Frame_New(id, 'b', frmry);
 		 if (bFrame == NULL)
 		    {CFREE(bb);
 		     return;};
@@ -13318,7 +13292,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 		        free(bb);
 		     bb = Bitio_New(NULL);}
 	         else
-		    {snprintf(fileName, 1024, "%s.frame.%d", outputFileName, 
+		    {snprintf(fileName, 1024, "%s.frame.%d", outfnm, 
 			      bFrame->id);
 		     if ( (fpointer = _PG_fopen(fileName, "wb")) == NULL )
 		        {io_printf(stderr, "ERROR:  Could not open output file(2):  %s\n",
@@ -13354,7 +13328,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 	        continue;
 
 	     if (!stdinUsed)
-	        {bFrame = Frame_New(id, 'b', frameMemory);
+	        {bFrame = Frame_New(id, 'b', frmry);
 		 if (bFrame == NULL)
 		    return;
 
@@ -13391,7 +13365,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 		 if (remoteIO)
 		    bb = Bitio_New(NULL);
 	         else
-		    {snprintf(fileName, 1024, "%s.frame.%d", outputFileName, 
+		    {snprintf(fileName, 1024, "%s.frame.%d", outfnm, 
 			      (bFrame != NULL) ? bFrame->id : -1);
 		     fpointer = _PG_fopen(fileName, "wb");
 		     if (fpointer == NULL)
@@ -13655,12 +13629,11 @@ CloseBitRateFile()
  * set of JFIF compatible JPEG images. It works for all image            *
  * sizes and qualities.                                                  *
  ************************************************************************/
-void
-JMovie2JPEG(infilename,obase,start,end)
-    char *infilename;       /* input filename string */
-    char *obase;            /* output filename base string=>obase##.jpg */ 
-    int start;              /* first frame to be extracted */
-    int end;                /* last frame to be extracted */
+
+void JMovie2JPEG(char *infilename,  /* input filename string */
+		 char *obase,       /* output filename base string=>obase##.jpg */ 
+		 int start,         /* first frame to be extracted */
+		 int end)           /* last frame to be extracted */
 {
     io_printf(stderr, "ERROR:  This has not been compiled with JPEG support\n");
     exit(1);
@@ -13698,10 +13671,8 @@ JMovie2JPEG(infilename,obase,start,end)
  *      release JPEG decompression object
  *
  */
-void
-ReadJPEG(mf, fp)
-    MpegFrame *mf;
-    FILE *fp;
+
+void ReadJPEG(MpegFrame *mf, FILE *fp)
 {
     io_printf(stderr, "ERROR:  This has not been compiled with JPEG support\n");
     exit(1);
@@ -13840,8 +13811,8 @@ SetRemoteShell(shell)
 /* StartIOServer
  */ 
 void
-StartIOServer(numInputFiles, parallelHostName, portNum)
-    int numInputFiles;
+StartIOServer(ninf, parallelHostName, portNum)
+    int ninf;
     char *parallelHostName;
     int portNum;
 {
@@ -13851,9 +13822,9 @@ StartIOServer(numInputFiles, parallelHostName, portNum)
 
 
 void
-StartCombineServer(numInputFiles, outputFileName, parallelHostName, portNum)
-    int numInputFiles;
-    char *outputFileName;
+StartCombineServer(ninf, outfnm, parallelHostName, portNum)
+    int ninf;
+    char *outfnm;
     char *parallelHostName;
     int portNum;
 {
@@ -13912,10 +13883,10 @@ WaitForOutputFile(number)
 /* StartMasterServer
  */
 void
-StartMasterServer(numInputFiles, paramFile, outputFileName)
-    int numInputFiles;
+StartMasterServer(ninf, paramFile, outfnm)
+    int ninf;
     char *paramFile;
-    char *outputFileName;
+    char *outfnm;
 {
     io_printf(stdout, "ERROR:  (StartMasterServer) This machine can NOT run parallel version\n");
     exit(1);
@@ -13925,11 +13896,11 @@ StartMasterServer(numInputFiles, paramFile, outputFileName)
 /* NotifyMasterDone
  */
 boolean
-NotifyMasterDone(hostName, portNum, machineNumber, seconds, frameStart,
+NotifyMasterDone(hostName, portNum, machn, seconds, frameStart,
 		 frameEnd)
     char *hostName;
     int portNum;
-    int machineNumber;
+    int machn;
     int seconds;
     int *frameStart;
     int *frameEnd;
@@ -13940,8 +13911,8 @@ NotifyMasterDone(hostName, portNum, machineNumber, seconds, frameStart,
 
 
 void
-StartDecodeServer(numInputFiles, decodeFileName, parallelHostName, portNum)
-    int numInputFiles;
+StartDecodeServer(ninf, decodeFileName, parallelHostName, portNum)
+    int ninf;
     char *decodeFileName;
     char *parallelHostName;
     int portNum;
@@ -14416,7 +14387,7 @@ Mpost_UnQuantZigBlockLaplace(in, out, qscale, iblock)
     int qscale;
     boolean iblock;
 {
-    register int index;
+    register int ind;
     int	    position;
     register int	    qentry;
     int	    level, coeff;
@@ -14426,9 +14397,9 @@ Mpost_UnQuantZigBlockLaplace(in, out, qscale, iblock)
     /* qtable[0] must be 8 */
     out[0][0] = (int16)(in[0] * 8);
     
-    for ( index = 1;  index < DCTSIZE_SQ;  index++ ) {
-      position = ZAG[index];
-      level = in[index];
+    for ( ind = 1;  ind < DCTSIZE_SQ;  ind++ ) {
+      position = ZAG[ind];
+      level = in[ind];
       
       if (level == 0) {
 	((int16 *)out)[position] = 0;
@@ -14506,13 +14477,13 @@ char *charPtr;
 int mse(blk1, blk2)
 Block blk1, blk2;
 {
-  register int index, error, tmp;
+  register int ind, error, tmp;
   int16 *bp1, *bp2;
 
   bp1 = (int16 *)blk1;
   bp2 = (int16 *)blk2;
   error = 0;
-  for ( index = 0;  index < DCTSIZE_SQ;  index++ ) {
+  for ( ind = 0;  ind < DCTSIZE_SQ;  ind++ ) {
     tmp = *bp1++ - *bp2++;
     error += tmp*tmp;
   }
@@ -14859,7 +14830,7 @@ boolean ReadParamFile(char *fileName, int function)
 					       "OUTPUT", "RANGE", "PSEARCH_ALG", "IQSCALE", "INPUT_DIR",
                                                "INPUT_CONVERT", "INPUT", "BQSCALE", "BASE_FILE_FORMAT",
                                                "SLICES_PER_FRAME", "BSEARCH_ALG", "REFERENCE_FRAME"};
-    register int index;
+    register int ind;
     register int row, col;
 
     fpointer = _PG_fopen(fileName, "r");
@@ -14881,30 +14852,30 @@ boolean ReadParamFile(char *fileName, int function)
 
     switch (function)
        {case ENCODE_FRAMES:
-	     for (index = FIRST_OPTION; index <= LAST_OPTION; index++)
-	         optionSeen[index] = FALSE;
+	     for (ind = FIRST_OPTION; ind <= LAST_OPTION; ind++)
+	         optionSeen[ind] = FALSE;
 
 	     optionSeen[OPTION_IO_CONVERT]    = FALSE;
 	     optionSeen[OPTION_SLAVE_CONVERT] = FALSE;
 	     break;
 
 	case COMBINE_GOPS:
-	     for (index = FIRST_OPTION; index <= LAST_OPTION; index++)
-	         optionSeen[index] = TRUE;
+	     for (ind = FIRST_OPTION; ind <= LAST_OPTION; ind++)
+	         optionSeen[ind] = TRUE;
 
 	     optionSeen[OPTION_OUTPUT] = FALSE;
 	     break;
 
 	case COMBINE_FRAMES:
-	     for (index = FIRST_OPTION; index <= LAST_OPTION; index++)
-	         optionSeen[index] = TRUE;
+	     for (ind = FIRST_OPTION; ind <= LAST_OPTION; ind++)
+	         optionSeen[ind] = TRUE;
 
 	     optionSeen[OPTION_GOP]    = FALSE;
 	     optionSeen[OPTION_OUTPUT] = FALSE;
 	     break;};
 
-    for (index = LAST_OPTION+1; index <= NUM_OPTIONS; index++)
-        optionSeen[index] = FALSE;
+    for (ind = LAST_OPTION+1; ind <= NUM_OPTIONS; ind++)
+        optionSeen[ind] = FALSE;
 
     while (io_gets(input, 256, fpointer) != NULL)
 
@@ -15308,14 +15279,14 @@ boolean ReadParamFile(char *fileName, int function)
 
     io_close(fpointer);
 
-    for (index = FIRST_OPTION; index <= LAST_OPTION; index++)
-        {if (!optionSeen[index])
+    for (ind = FIRST_OPTION; ind <= LAST_OPTION; ind++)
+        {if (!optionSeen[ind])
 
 /* INPUT unnecessary when stdin is used */
-	    {if ((index == OPTION_INPUT) && stdinUsed)
+	    {if ((ind == OPTION_INPUT) && stdinUsed)
 	        continue;
 
-	     io_printf(stderr, "ERROR:  Missing option '%s'\n", optionText[index]);
+	     io_printf(stderr, "ERROR:  Missing option '%s'\n", optionText[ind]);
 	     exit(1);};};
 
 /* error checking */
@@ -15379,7 +15350,7 @@ int n;
 {
   static int	lastN = 0, lastMapN = 0, lastSoFar = 0;
   int	    mapN;
-  register int index;
+  register int ind;
   int	    soFar;
   int	    loop;
   int	    numPadding;
@@ -15393,26 +15364,26 @@ int n;
 
   if ( n >= lastN) {
     soFar = lastSoFar;
-    index = lastMapN;
+    ind = lastMapN;
   } else {
     soFar = 0;
-    index = 0;
+    ind = 0;
   }
 
-  while ( soFar + inputFileEntries[index]->numFiles <= n) {
-    soFar +=  inputFileEntries[index]->numFiles;
-    index++;
+  while ( soFar + inputFileEntries[ind]->numFiles <= n) {
+    soFar +=  inputFileEntries[ind]->numFiles;
+    ind++;
   }
 
-  mapN = index;
+  mapN = ind;
 
-  index = inputFileEntries[mapN]->startID +
+  ind = inputFileEntries[mapN]->startID +
     inputFileEntries[mapN]->skip*(n-soFar);
 
   numPadding = inputFileEntries[mapN]->numPadding;
 
   if ( numPadding != -1) {
-    snprintf(numBuffer, 33, "%32d", index);
+    snprintf(numBuffer, 33, "%32d", ind);
     for ( loop = 32-numPadding; loop < 32; loop++) {
       if ( numBuffer[loop] != ' ') {
         break;
@@ -15433,7 +15404,7 @@ int n;
     if (inputFileEntries[mapN]->repeat != TRUE) {
       sprintf(fileName, "%s%d%s",
 	      inputFileEntries[mapN]->left,
-	      index,
+	      ind,
 	      inputFileEntries[mapN]->right);
     } else {
       sprintf(fileName, "%s", inputFileEntries[mapN]->left);
@@ -16123,11 +16094,8 @@ static void	ComputeAndPrintPframeMAD _ANSI_ARGS_((LumBlock currentBlock,
  * SIDE EFFECTS:    none
  *
  *===========================================================================*/
-void
-  GenPFrame(bb, current, prev)
-BitBucket *bb;
-MpegFrame *current;
-MpegFrame *prev;
+
+void GenPFrame(BitBucket *bb, MpegFrame *current, MpegFrame *prev)
 {
   extern int **pmvHistogram;
   FlatBlock fba[6], fb[6];
@@ -16158,7 +16126,7 @@ MpegFrame *prev;
   register int ix, iy;
   int	mbAddress;
   int slicePos;
-  register int index;
+  register int ind;
   float   snr[3], psnr[3];
   int QScale;
   BlockMV *info;
@@ -16390,8 +16358,8 @@ MpegFrame *prev;
 	  Mpost_UnQuantZigBlock(fb[5], dec[5], QScale, TRUE);
 
 	  /* now, reverse the DCT transform */
-	  for ( index = 0; index < 6; index++) {
-	    mpeg_jrevdct((int16 *)dec[index]);
+	  for ( ind = 0; ind < 6; ind++) {
+	    mpeg_jrevdct((int16 *)dec[ind]);
 	  }
 
 	  /* now, unblockify */
@@ -16457,12 +16425,12 @@ MpegFrame *prev;
 	  DoQuant(0x01, dctr[y>>1][x>>1], fba[5]);
 
 	if ( decodeRefFrames) {
-	  for ( index = 0; index < 6; index++) {
-	    if ( pattern & (1 << (5-index))) {
-	      Mpost_UnQuantZigBlock(fba[index], dec[index], QScale, FALSE);
-	      mpeg_jrevdct((int16 *)dec[index]);
+	  for ( ind = 0; ind < 6; ind++) {
+	    if ( pattern & (1 << (5-ind))) {
+	      Mpost_UnQuantZigBlock(fba[ind], dec[ind], QScale, FALSE);
+	      mpeg_jrevdct((int16 *)dec[ind]);
 	    } else {
-	      memset((char *)dec[index], 0, sizeof(Block));
+	      memset((char *)dec[ind], 0, sizeof(Block));
 	    }
 	  }
 
@@ -17217,7 +17185,7 @@ Mpost_UnQuantZigBlock(in, out, qscale, iblock)
     int qscale;
     boolean iblock;
 {
-    register int index;
+    register int ind;
     int	    start;
     int	    position;
     register int	    qentry;
@@ -17234,9 +17202,9 @@ Mpost_UnQuantZigBlock(in, out, qscale, iblock)
 	start = 0;
     }
 
-    for ( index = start;  index < DCTSIZE_SQ;  index++) {
-	position = ZAG[index];
-	level = in[index];
+    for ( ind = start;  ind < DCTSIZE_SQ;  ind++) {
+	position = ZAG[ind];
+	level = in[ind];
 
 	if (level == 0) {
 	  ((int16 *)out)[position] = 0;
@@ -17930,7 +17898,7 @@ PSearchName()
  *===========================================================================*/
 
 void SetSearchRange(int pixelsP, int pixelsB)
-   {register int index;
+   {register int ind;
     int na, nl;
 
     searchRangeP = 2*pixelsP;	/* +/- 'pixels' pixels */
@@ -17953,19 +17921,19 @@ void SetSearchRange(int pixelsP, int pixelsB)
 	na = 2*searchRangeP + 3;
 	pmvHistogram = CMAKE_N(int *, na);
 	if (pmvHistogram != NULL)
-	   {for (index = 0; index < nl; index++)
-	        pmvHistogram[index] = (int *) calloc(na, sizeof(int));};
+	   {for (ind = 0; ind < nl; ind++)
+	        pmvHistogram[ind] = (int *) calloc(na, sizeof(int));};
 
 	na = 2*searchRangeB + 3;
 	bbmvHistogram = CMAKE_N(int *, na);
 	if (bbmvHistogram != NULL)
-	   {for (index = 0; index < 2*nl; index++)
-	        bbmvHistogram[index] = (int *) calloc(na, sizeof(int));};
+	   {for (ind = 0; ind < 2*nl; ind++)
+	        bbmvHistogram[ind] = (int *) calloc(na, sizeof(int));};
 
 	bfmvHistogram = CMAKE_N(int *, na);
 	if (bfmvHistogram != NULL)
-	   {for (index = 0; index < 2*nl; index++)
-	        bfmvHistogram[index] = (int *) calloc(na, sizeof(int));};};
+	   {for (ind = 0; ind < 2*nl; ind++)
+	        bfmvHistogram[ind] = (int *) calloc(na, sizeof(int));};};
 
     return;}
 
@@ -18923,7 +18891,7 @@ int initGOPRateControl _ANSI_ARGS_((void));
      int
        initRateControl()
 {
-  int index;
+  int ind;
   int result;
   
   DBG_PRINT(("\tInitializing Allocation Data\n"));
@@ -18940,8 +18908,8 @@ int initGOPRateControl _ANSI_ARGS_((void));
   
   /*  Initialize Pattern info */
   GOP_X = framePatternLen;
-  for ( index = 0; index < framePatternLen; index++) {
-    switch( framePattern[index]) {
+  for ( ind = 0; ind < framePatternLen; ind++) {
+    switch( framePattern[ind]) {
     case 'i':
       GOP_I++;
       break;
@@ -20948,20 +20916,20 @@ PNMtoYUV(frame)
     static float mult41869[1024], mult08131[1024];
 
     if ( first) {
-        register int index;
+        register int ind;
 	register int maxValue;
 
 	maxValue = frame->rgb_maxval;
 
-        for ( index = 0; index <= maxValue; index++) {
-	    mult299[index] = index*0.29900;
-	    mult587[index] = index*0.58700;
-	    mult114[index] = index*0.11400;
-	    mult16874[index] = -0.16874*index;
-	    mult33126[index] = -0.33126*index;
-	    mult5[index] = index*0.50000;
-	    mult41869[index] = -0.41869*index;
-	    mult08131[index] = -0.08131*index;
+        for ( ind = 0; ind <= maxValue; ind++) {
+	    mult299[ind] = ind*0.29900;
+	    mult587[ind] = ind*0.58700;
+	    mult114[ind] = ind*0.11400;
+	    mult16874[ind] = -0.16874*ind;
+	    mult33126[ind] = -0.33126*ind;
+	    mult5[ind] = ind*0.50000;
+	    mult41869[ind] = -0.41869*ind;
+	    mult08131[ind] = -0.08131*ind;
 	}
 	
 	first = FALSE;
@@ -21146,20 +21114,20 @@ PPMtoYUV(frame)
     static float mult41869[1024], mult08131[1024];
 
     if ( first) {
-        register int index;
+        register int ind;
 	register int maxValue;
 
 	maxValue = frame->rgb_maxval;
 
-        for ( index = 0; index <= maxValue; index++) {
-	    mult299[index] = index*0.29900;
-	    mult587[index] = index*0.58700;
-	    mult114[index] = index*0.11400;
-	    mult16874[index] = -0.16874*index;
-	    mult33126[index] = -0.33126*index;
-	    mult5[index] = index*0.50000;
-	    mult41869[index] = -0.41869*index;
-	    mult08131[index] = -0.08131*index;
+        for ( ind = 0; ind <= maxValue; ind++) {
+	    mult299[ind] = ind*0.29900;
+	    mult587[ind] = ind*0.58700;
+	    mult114[ind] = ind*0.11400;
+	    mult16874[ind] = -0.16874*ind;
+	    mult33126[ind] = -0.33126*ind;
+	    mult5[ind] = ind*0.50000;
+	    mult41869[ind] = -0.41869*ind;
+	    mult08131[ind] = -0.08131*ind;
 	}
 	
 	first = FALSE;

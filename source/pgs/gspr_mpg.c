@@ -534,7 +534,7 @@ void save_image2file(PG_device *dev)
    {int bitstreamMode;
     BitBucket *bbPtr;
     int frameType;
-    int FrameId;
+    int frid;
     PG_RAST_device *mdv;
     MpegDevInfo *MpegDev;
 
@@ -544,21 +544,21 @@ void save_image2file(PG_device *dev)
 
     futureRefFrame = MpegDev->futureRefFrame;
     bbPtr          = MpegDev->bbPtr;
-    FrameId        = MpegDev->FrameId;
+    frid           = MpegDev->FrameId;
     Fsize_x        = MpegDev->Fsize_x;
     Fsize_y        = MpegDev->Fsize_y;
 
     /* frame type is I-Frame */
     frameType = 'i';
-    FrameId++;
+    frid++;
 
     pastRefFrame = futureRefFrame;
-    futureRefFrame = Frame_New(FrameId, frameType, MpegDev->frameMemory);
+    futureRefFrame = Frame_New(frid, frameType, MpegDev->frameMemory);
     if (!futureRefFrame)
        {PRINT(stderr, "No New Frame Available\n");
 	exit(1);}
 
-    /* copy mdv->frame to frame */
+/* copy mdv->frame to frame */
     GET_RAST_DEVICE(dev, mdv);
     CopyImage2Frame(mdv, futureRefFrame);
 
@@ -598,7 +598,7 @@ void save_image2file(PG_device *dev)
     MpegDev->futureRefFrame = futureRefFrame;
     ProcessRefFrame(MpegDev, lastFrame, mdv->out_fname);
 
-    MpegDev->FrameId        = FrameId;
+    MpegDev->FrameId        = frid;
     MpegDev->Fsize_x        = Fsize_x;
     MpegDev->Fsize_y        = Fsize_y;
     MpegDev->framesOutput   = framesOutput;
@@ -725,8 +725,7 @@ static void CopyImage2Frame(PG_RAST_device *mdv, MpegFrame *mf)
  *                 - and process any B frames that we can now
  */
 
-static void ProcessRefFrame(MpegDevInfo *MpegDev, int lastFrame,
-                            char *outputFileName)
+static void ProcessRefFrame(MpegDevInfo *MpegDev, int lfr, char *ofnm)
    {MpegFrame *mfr;
     BitBucket *bb;
 
@@ -745,7 +744,7 @@ static void ProcessRefFrame(MpegDevInfo *MpegDev, int lastFrame,
        {if (remoteIO)
 	   {bb = Bitio_New(NULL);}
         else
-	   {snprintf(fileName, 1024, "%s.frame.%d", outputFileName, mfr->id);
+	   {snprintf(fileName, 1024, "%s.frame.%d", ofnm, mfr->id);
             if ((fpointer = _PG_fopen(fileName, "wb")) == NULL)
 	       {fprintf(stderr, 
 			"ERROR:  Could not open output file(1):  %s\n",
@@ -865,7 +864,7 @@ static void ProcessRefFrame(MpegDevInfo *MpegDev, int lastFrame,
     if (pastRefFrame != NULL)
        Frame_Free(pastRefFrame);
 
-    /* note, we may still not free last frame if lastFrame is incorrect
+    /* note, we may still not free last frame if lfr is incorrect
      * (if the last frames are B frames, they aren't output!)
      */
 

@@ -762,8 +762,11 @@ void SC_file_access(int log)
                  break;
 
             case SC_FSETVBUF :
-                 {int ptype, type = -1, size;
-                  char *bf = NULL;
+                 {int ptype, type, size;
+                  char *lbf;
+
+		  type = -1;
+                  lbf  = NULL;
 
                   ptype = SC_stol(SC_strtok(s+2, ",\n", t));
                   size  = SC_stol(SC_strtok(NULL, ",\n", t));
@@ -771,21 +774,21 @@ void SC_file_access(int log)
 		  switch (ptype)
 		     {case 1 :
 		 	   type = _IOFBF;
-			   bf   = CMAKE_N(char, size);
+			   lbf  = CMAKE_N(char, size);
 			   break;
 		      case 2 :
 			   type = _IOLBF;
-			   bf   = CMAKE_N(char, size);
+			   lbf  = CMAKE_N(char, size);
 			   break;
 		      case 3 :
 			   type = _IONBF;
-			   bf   = NULL;
+			   lbf  = NULL;
 			   break;
 		      default :
 			   
                            break;};
 
-		  REPLY(SETVBUF_MSG, _SC_setvbuf(fp, bf, type, size));};
+		  REPLY(SETVBUF_MSG, _SC_setvbuf(fp, lbf, type, size));};
 
                  break;
 
@@ -870,19 +873,19 @@ void SC_file_access(int log)
                  break;
 
             case SC_FGETS :
-                 {char *ret;
-                  int nc;
+                 {int nc;
+		  char *rv;
 
                   nc = SC_stol(SC_strtok(s+2, ",\n", t));
 
                   bf = CMAKE_N(char, nc+1);
                   memset(bf, '\n', nc);
 		  bf[nc] = '\0';
-                  ret = SC_fgets(bf, nc, fp);
+                  rv = SC_fgets(bf, nc, fp);
                   printf("%s", bf);
                   CFREE(bf);
 
-                  REPLY(GETS_MSG, ((ret == NULL) ? -1 : 1));};
+                  REPLY(GETS_MSG, ((rv == NULL) ? -1 : 1));};
 
                  break;
 

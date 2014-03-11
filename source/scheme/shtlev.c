@@ -230,7 +230,7 @@ static object *_SSI_repl(SS_psides *si, object *arg)
 
 /* SS_END_SCHEME - gracefully exit from Scheme */
 
-void SS_end_scheme(SS_psides *si, int val)
+NORETURN void SS_end_scheme(SS_psides *si, int val)
    {int ev;
 
     if (!SS_nullobjp(si->histdev))

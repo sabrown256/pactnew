@@ -2062,17 +2062,17 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
  * also problem for IEEE 96 bit float - fixed by Dave Munro
  */
     if (hmbo != 0)
-       {int j, mask;
+       {int ja, lmsk;
 
-	mask = (1 << (7 - bo_mant % 8));
+	lmsk = (1 << (7 - bo_mant % 8));
 
         indxout = outfor[5]/8;
         rout    = (unsigned char *) *out;
         for (i = 0L; i < ni; i++, rout += bpio)
-            {for (j = 0; j < bpio; j++)
-                 if ((j == indxout) ? (rout[j] != mask) : rout[j])
+            {for (ja = 0; ja < bpio; ja++)
+                 if ((ja == indxout) ? (rout[ja] != lmsk) : rout[ja])
                     break;
-             if (j == bpio)
+             if (ja == bpio)
                 rout[indxout] = 0;};};
 
     if (*in == freorder)

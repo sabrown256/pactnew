@@ -743,13 +743,13 @@ static int check_tty(char *sect)
  *            - so that they fit nicely on lines
  */
 
-static void print_list(hfspec *sp, int nsp, int rptcfg, int run, int ex)
+static void print_list(hfspec *sp, int nsp, int rptcfg, int irun, int ex)
    {int i, j, ok;
     char *s;
     hfspec *lsp;
 
     for (i = 0, j = 0, lsp = sp; i < nsp; i++, lsp++)
-        {if (((run == RUNNING) &&
+        {if (((irun == RUNNING) &&
 	      (IDLE < lsp->running) && (lsp->running < DONE)) ||
 	     (lsp->exit == ex))
 	    {j++;
@@ -2006,7 +2006,7 @@ static void process_var(donetdes *st, char *s)
 
 /* READHOST - read the host file */
 
-static void readhost(donetdes *st, int log)
+static void readhost(donetdes *st, int ilg)
    {int tl;
     char linst[BFLRG], lssh[BFLRG], t[BFLRG], code[BFLRG];
     char hlst[BFMG], nlst[BFLRG];
@@ -2182,7 +2182,7 @@ static void readhost(donetdes *st, int log)
     snprintf(st->uplog, BFLRG, "%s/%s", st->logdir, st->stamp);
     full_path(st->uplog, BFLRG, 0, NULL, st->uplog);
 
-    if (log == TRUE)
+    if (ilg == TRUE)
        {mkdir(st->uplog, 0770);
 	snprintf(st->lnetfn, BFLRG, "%s/update", st->uplog);}
     else
@@ -3022,7 +3022,7 @@ static void fin_sect(donetdes *st, hfspec *sp, int nsp,
 static void finish(donetdes *st, double gti)
    {int i, ip, np, nsp;
     char etm[BFLRG], lock[BFLRG], ptime[BFLRG];
-    char *host, *wdir, *sect, *time;
+    char *host, *wdir, *sect, *ltim;
     hfspec *sp;
     FILE *slog;
 
@@ -3069,9 +3069,9 @@ static void finish(donetdes *st, double gti)
         {sect = st->phases[ip].name;
 	 sp   = st->phases[ip].sp;
 	 nsp  = st->phases[ip].nsp;
-	 time = st->phases[ip].time;
+	 ltim = st->phases[ip].time;
 
-	 fin_sect(st, sp, nsp, slog, sect, time);};
+	 fin_sect(st, sp, nsp, slog, sect, ltim);};
 
     fclose_safe(slog);
 
@@ -3425,7 +3425,7 @@ static void cleanup(donetdes *st)
 /* MAIN - start it out here */
 
 int main(int c, char **v)
-   {int l, logf, rv;
+   {int l, lgf, rv;
     char host[BFLRG], uhost[BFLRG], exe[BFLRG];
     char *p;
 
@@ -3524,11 +3524,11 @@ int main(int c, char **v)
 
     l = process_args(&state, c, v);
 
-    logf = ((state.reportprogress != TRUE) &&
-	    (state.watchprogress != TRUE) &&
-	    (state.testhost != TRUE) &&
-	    (state.debug == NULL));
-    readhost(&state, logf);
+    lgf = ((state.reportprogress != TRUE) &&
+	   (state.watchprogress != TRUE) &&
+	   (state.testhost != TRUE) &&
+	   (state.debug == NULL));
+    readhost(&state, lgf);
 
     init_aux(&state);
 

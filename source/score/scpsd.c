@@ -469,7 +469,7 @@ static int diff_line(char *bfa, char *bfb, pixdes *pd, int verbose,
     int ia, ib, di, na, bpp;
     double da, db, dd, toler;
     char tba[MAXLINE], tbb[MAXLINE];
-    char *ta, *tb, *pa, *pb;
+    char *ta, *tb, *lpa, *lpb;
 
     errl = 0;
 
@@ -507,20 +507,20 @@ static int diff_line(char *bfa, char *bfb, pixdes *pd, int verbose,
 	       {SC_strncpy(tba, MAXLINE, bfa, pl);
 
 		strcpy(bfa, bfa+pl);
-		pa = tba;
+		lpa = tba;
 
 		SC_strncpy(tbb, MAXLINE, bfb, pl);
 
 		strcpy(bfb, bfb+pl);
-		pb = tbb;}
+		lpb = tbb;}
 	    else
-	       {pa   = bfa;
-		pb   = bfb;
+	       {lpa   = bfa;
+		lpb   = bfb;
 		more = FALSE;};
 
 	    while (errl == 0)
-	       {ta = SC_firsttok(pa, " \t\n\f\r()");
-		tb = SC_firsttok(pb, " \t\n\f\r()");
+	       {ta = SC_firsttok(lpa, " \t\n\f\r()");
+		tb = SC_firsttok(lpb, " \t\n\f\r()");
 		if ((ta == NULL) && (tb == NULL))
 		   break;
 
@@ -738,7 +738,7 @@ static int diff_frac(char *bfa, char *bfb, diff_stat *ds,
     double da, db, dd;
     double ddmn, ddmx, dav, ddf;
     char tba[MAXLINE], tbb[MAXLINE];
-    char *ta, *tb, *pa, *pb;
+    char *ta, *tb, *ua, *ub;
 
     ddmn = ds->fdmn;
     ddmx = ds->fdmx;
@@ -762,22 +762,22 @@ static int diff_frac(char *bfa, char *bfb, diff_stat *ds,
 	       {SC_strncpy(tba, MAXLINE, bfa, pl);
 
 		strcpy(bfa, bfa+pl);
-		pa = tba;
+		ua = tba;
 
 		SC_strncpy(tbb, MAXLINE, bfb, pl);
 
 		strcpy(bfb, bfb+pl);
-		pb = tbb;}
+		ub = tbb;}
 	    else
-	       {pa   = bfa;
-		pb   = bfb;
+	       {ua   = bfa;
+		ub   = bfb;
 		more = FALSE;};
 
 	    
 	    dntok = FALSE;
 	    while (dntok == 0)
-	       {ta = SC_firsttok(pa, " \t\n\f\r()");
-		tb = SC_firsttok(pb, " \t\n\f\r()");
+	       {ta = SC_firsttok(ua, " \t\n\f\r()");
+		tb = SC_firsttok(ub, " \t\n\f\r()");
 		if (((ta != NULL) && (tb == NULL)) ||
 		    ((ta == NULL) && (tb != NULL)))
 		   {dntok = TRUE;

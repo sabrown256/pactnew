@@ -149,15 +149,15 @@ void PG_set_window(PG_device *dev,
 /* PG_SET_FRAME - set the frame for the device */
  
 void PG_set_frame(PG_device *dev,
-                  double x1, double x2, double y1, double y2)
+                  double xa, double xb, double ya, double yb)
    {double frm[PG_BOXSZ];
 
     DEPRECATED(2009-10-08);
 
-    frm[0] = x1;
-    frm[1] = x2;
-    frm[2] = y1;
-    frm[3] = y2;
+    frm[0] = xa;
+    frm[1] = xb;
+    frm[2] = ya;
+    frm[3] = yb;
 
     PG_set_viewspace(dev, 2, FRAMEC, frm);
 
@@ -174,15 +174,15 @@ void PG_set_frame(PG_device *dev,
  */
  
 void PG_set_viewport(PG_device *dev,
-                     double x1, double x2, double y1, double y2)
+                     double xa, double xb, double ya, double yb)
    {double ndc[PG_BOXSZ];
 
     DEPRECATED(2009-10-08);
 
-    ndc[0] = x1;
-    ndc[1] = x2;
-    ndc[2] = y1;
-    ndc[3] = y2;
+    ndc[0] = xa;
+    ndc[1] = xb;
+    ndc[2] = ya;
+    ndc[3] = yb;
 
     PG_set_viewspace(dev, 2, NORMC, ndc);
  
@@ -197,20 +197,20 @@ void PG_set_viewport(PG_device *dev,
  */
  
 void PG_draw_line(PG_device *dev,
-                  double x1, double y1, double x2, double y2)
-   {double p1[PG_SPACEDM], p2[PG_SPACEDM];
+                  double xa, double ya, double xb, double yb)
+   {double pa[PG_SPACEDM], pb[PG_SPACEDM];
 
     DEPRECATED(2009-10-08);
 
     if (dev != NULL)
-       {p1[0] = x1;
-	p1[1] = y1;
-	p2[0] = x2;
-	p2[1] = y2;
+       {pa[0] = xa;
+	pa[1] = ya;
+	pb[0] = xb;
+	pb[1] = yb;
 
-	if (PG_clip_line_seg(dev, p1, p2))
-	   {PG_move_gr_abs_n(dev, p1);
-	    PG_draw_to_abs_n(dev, p2);};};
+	if (PG_clip_line_seg(dev, pa, pb))
+	   {PG_move_gr_abs_n(dev, pa);
+	    PG_draw_to_abs_n(dev, pb);};};
  
     return;}
  
@@ -424,9 +424,9 @@ PG_image *PG_make_image(char *label, char *type, void *z,
 
 /* PG_DRAW_AXIS - draw and label a plot axis */
 
-PG_axis_def *PG_draw_axis(PG_device *dev, double x1, double y1,
-			  double x2, double y2,
-			  double t1, double t2, double v1, double v2,
+PG_axis_def *PG_draw_axis(PG_device *dev, double xa, double ya,
+			  double xb, double yb,
+			  double ta, double tb, double va, double vb,
 			  double sc, char *format,
 			  int tick_type, int label_type,
 			  int flag)
@@ -436,14 +436,14 @@ PG_axis_def *PG_draw_axis(PG_device *dev, double x1, double y1,
 
     DEPRECATED(2009-10-08);
 
-    xl[0] = x1;
-    xl[1] = y1;
-    xr[0] = x2;
-    xr[1] = y2;
-    tn[0] = t1;
-    tn[1] = t2;
-    vw[0] = v1;
-    vw[1] = v2;
+    xl[0] = xa;
+    xl[1] = ya;
+    xr[0] = xb;
+    xr[1] = yb;
+    tn[0] = ta;
+    tn[1] = tb;
+    vw[0] = va;
+    vw[1] = vb;
 
     ad = PG_draw_axis_n(dev, xl, xr, tn, vw, sc, format,
 			tick_type, label_type, flag, 0);

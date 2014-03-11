@@ -1180,7 +1180,7 @@ static void PG_scan_convert_lr(PG_device *dev, PG_scan_line_data *par,
 
 static void PG_scan_convert_ac(PG_device *dev, PG_scan_line_data *par,
 			       int *ip, int indx, int sweep)
-   {int j, j0, is, os, iz, oz, is1, is2, in1, in2;
+   {int j, ja, is, os, iz, oz, is1, is2, in1, in2;
     int nd, color, mesh, iline;
     int ix[PG_SPACEDM], iy[PG_SPACEDM], ofs, ofz;
     int *nc, nz, *np, nzp, nsp;
@@ -1232,7 +1232,7 @@ static void PG_scan_convert_ac(PG_device *dev, PG_scan_line_data *par,
 
     v = PM_make_vectors(3, nd);
 
-    j0 = (nd < 2) ? 0 : 1;
+    ja = (nd < 2) ? 0 : 1;
 
     ofz = (nzp < 2);
     ofs = (nsp < 2);
@@ -1244,14 +1244,14 @@ static void PG_scan_convert_ac(PG_device *dev, PG_scan_line_data *par,
          if (nzp >= CENTER_CELL)
             {in1  = zones[oz + CENTER_CELL];
              u[0] = ir[2][in1];
-	     for (j = j0; j < nd; j++)
+	     for (j = ja; j < nd; j++)
 	         {ft    = f[j];
 		  v[0][j] = ft[in1];};
 	     ix[0] = ir[0][in1];
 	     iy[0] = ir[1][in1];}
          else
   	    {u[0] = 0.0;
-	     for (j = j0; j < nd; j++)
+	     for (j = ja; j < nd; j++)
   	         v[0][j] = 0.0;
 
 	     ix[0] = 0;
@@ -1262,13 +1262,13 @@ static void PG_scan_convert_ac(PG_device *dev, PG_scan_line_data *par,
                   ix[0] += ir[0][in1];
                   iy[0] += ir[1][in1];
 		  u[0]  += ir[2][in1];
-		  for (j = j0; j < nd; j++)
+		  for (j = ja; j < nd; j++)
 		      {ft     = f[j];
 		       v[0][j] += ft[in1];};};
 
              norm  = 1.0/(is2 - is1 + 1);
 	     u[0] *= norm;
-	     for (j = j0; j < nd; j++)
+	     for (j = ja; j < nd; j++)
 	         {ft     = f[j];
 		  v[0][j] *= norm;};
 	     ix[0] *= norm;
@@ -1281,7 +1281,7 @@ static void PG_scan_convert_ac(PG_device *dev, PG_scan_line_data *par,
 
 	      u[1] = ir[2][in1];
 	      u[2] = ir[2][in2];
-	      for (j = j0; j < nd; j++)
+	      for (j = ja; j < nd; j++)
 		  {ft    = f[j];
 		   v[1][j] = ft[in1];
 		   v[2][j] = ft[in2];};

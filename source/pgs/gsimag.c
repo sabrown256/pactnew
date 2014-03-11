@@ -100,7 +100,7 @@ void PG_invert_image(PG_image *im)
 /* PG_IMAGE_HAND - image plot handler */
 
 static void PG_image_hand(PG_device *dev, PG_graph *g,
-			  double fmin, double fmax,
+			  double fmn, double fmx,
 			  PFImgZC fnc_zc, PFImgNC fnc_nc)
    {int npts, autodomain;
     char *name;
@@ -144,8 +144,8 @@ static void PG_image_hand(PG_device *dev, PG_graph *g,
 				      "DRAW-PALETTE", SC_INT_I, FALSE, FALSE,
 				      NULL);
 
-	 wc[4] = fmin;
-	 wc[5] = fmax;
+	 wc[4] = fmn;
+	 wc[5] = fmx;
 
 /* this is done consistently with PG_draw_vector */
 	 switch (centering)

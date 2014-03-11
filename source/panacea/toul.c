@@ -163,10 +163,10 @@ int main(int argc, char **argv)
        {if (use_family)
 	   root = names[0];
 	else
-	   {char *s;
+	   {char *ls;
 
 	    strcpy(t, names[0]);
-	    root = SC_strtok(t, ".", s);};
+	    root = SC_strtok(t, ".", ls);};
 
         snprintf(s, MAXLINE, "m%s", root);
 

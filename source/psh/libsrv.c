@@ -75,7 +75,7 @@ char *name_conn(char *root)
 
 char *name_log(char *root)
    {char *p;
-    static char log[BFLRG];
+    static char lg[BFLRG];
 
     p = NULL;
 
@@ -83,8 +83,8 @@ char *name_log(char *root)
        root = cgetenv(TRUE, "PERDB_PATH");
 
     if (root != NULL)
-       {snprintf(log, BFLRG, "%s.log", root);
-	p = log;};
+       {snprintf(lg, BFLRG, "%s.log", root);
+	p = lg;};
 
     return(p);}
 

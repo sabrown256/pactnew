@@ -1631,7 +1631,7 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
 					      double ang,
                                               PG_curve *crv,
                                               int *flags, int fc, int bc,
-                                              char *select, char *draw, char *action,
+                                              char *slct, char *draw, char *action,
                                               PG_interface_object *parent)
    {PG_interface_object *iob;
     PFVoid fnc;
@@ -1694,9 +1694,9 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
     else
        iob->draw = _PG_draw_button_object;
 
-    if (select != NULL)
-       {iob->select_name = CSTRSAVE(select);
-        iob->select      = (PFIobSelect) PG_lookup_callback(select);};
+    if (slct != NULL)
+       {iob->select_name = CSTRSAVE(slct);
+        iob->select      = (PFIobSelect) PG_lookup_callback(slct);};
 
     if (iob->select == NULL)
        {if (strcmp(type, PG_CONTAINER_OBJECT_S) == 0)

@@ -55,7 +55,7 @@ double compose(double a, int i)
 
 /* SX_QUIT - gracefully exit from PDBView */
 
-void SX_quit(int i)
+NORETURN void SX_quit(int i)
    {
 
     SC_block_file(stdin);

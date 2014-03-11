@@ -75,14 +75,14 @@ static int expand_path(char *name, int fullp, int nt, int dt, int rv)
 /* MAIN */
 
 int main(int c, char **v)
-   {int i, dt, rv, nt, nc, full_path;
+   {int i, dt, rv, nt, nc, fullpth;
     char fmt[80];
     char *tname;
 
-    rv        = 0;
-    dt        = 0;
-    nt        = 1;
-    full_path = TRUE;
+    rv      = 0;
+    dt      = 0;
+    nt      = 1;
+    fullpth = TRUE;
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -99,7 +99,7 @@ int main(int c, char **v)
                       break;
 
                  case 'w':
-                      full_path = FALSE;
+                      fullpth = FALSE;
                       break;};}
 	 else
 	    break;};
@@ -110,13 +110,13 @@ int main(int c, char **v)
 	snprintf(fmt, 80, "%%%ds", nc);
 
         while (scanf(fmt, tname) == 1)
-           rv = expand_path(tname, full_path, nt, dt, rv);
+           rv = expand_path(tname, fullpth, nt, dt, rv);
 
         FREE(tname);}
 
     else
        for ( ; i < c; i++)
-           rv = expand_path(v[i], full_path, nt, dt, rv);
+           rv = expand_path(v[i], fullpth, nt, dt, rv);
 
     return(rv);}
 

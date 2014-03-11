@@ -528,7 +528,7 @@ static void PG_draw_data_ids_alt(PG_device *dev, double *x, double *y,
  
 void PG_draw_data_ids(PG_device *dev, double *x, double *y,
 		      int n, int label, pcons *info)
-   {int i, j, k, j0, m, scatter, irev;
+   {int i, j, k, ja, m, scatter, irev;
     char mark[10];
     double r, dx, x0;
     double xa[PG_SPACEDM], xb[PG_SPACEDM];
@@ -653,11 +653,11 @@ void PG_draw_data_ids(PG_device *dev, double *x, double *y,
        {double tc, rc, xc[PG_SPACEDM];
 
 	k  = n/m;
-	j0 = ((double) k)*r;
-	j0 = abs(j0);
+	ja = ((double) k)*r;
+	ja = abs(ja);
 
         for (i = 0; i < m; i++)
-            {j  = j0 + k*i;
+            {j  = ja + k*i;
              tc = x[j];
              rc = y[j];
              xc[0] = rc*cos(tc);
@@ -682,7 +682,7 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
                           int l, pcons *info)
    {int i, tn;
     double *px, *py;
-    double x0, x1, x2, y0, y1, y2, dx, dy;
+    double x0[PG_SPACEDM], x1[PG_SPACEDM], x2[PG_SPACEDM], dx[PG_SPACEDM];
     double wc[PG_BOXSZ];
     double *r[PG_SPACEDM];
     double *xp[PG_SPACEDM], *xm[PG_SPACEDM], **t;
@@ -720,62 +720,62 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
        xm[1] = xp[1];
 
     PG_get_viewspace(dev, WORLDC, wc);
-    dx = _PG_gattrs.error_cap_size*(wc[1] - wc[0]);
-    dy = _PG_gattrs.error_cap_size*(wc[3] - wc[2]);
+    dx[0] = _PG_gattrs.error_cap_size*(wc[1] - wc[0]);
+    dx[1] = _PG_gattrs.error_cap_size*(wc[3] - wc[2]);
 
     px = t[0];
     py = t[1];
     for (i = 0, tn = 0; i < n; i++)
-        {x0 = x[0][i];
-         y0 = x[1][i];
+        {x0[0] = x[0][i];
+         x0[1] = x[1][i];
          if (xp[0] != NULL)
-	    {x1 = x0 - xm[0][i];
-	     x2 = x0 + xp[0][i];
+	    {x1[0] = x0[0] - xm[0][i];
+	     x2[0] = x0[0] + xp[0][i];
 
-	     *px++ = x1;
-	     *py++ = y0;
-	     *px++ = x2;
-	     *py++ = y0;
+	     *px++ = x1[0];
+	     *py++ = x0[1];
+	     *px++ = x2[0];
+	     *py++ = x0[1];
              tn++;
              if (_PG_gattrs.error_cap_size > 0.0)
-                {y1 = y0 + dy;
-                 y2 = y0 - dy;
+                {x1[1] = x0[1] + dx[1];
+                 x2[1] = x0[1] - dx[1];
 
-		 *px++ = x1;
-		 *py++ = y1;
-		 *px++ = x1;
-		 *py++ = y2;
+		 *px++ = x1[0];
+		 *py++ = x1[1];
+		 *px++ = x1[0];
+		 *py++ = x2[1];
 		 tn++;
 
-		 *px++ = x2;
-		 *py++ = y1;
-		 *px++ = x2;
-		 *py++ = y2;
+		 *px++ = x2[0];
+		 *py++ = x1[1];
+		 *px++ = x2[0];
+		 *py++ = x2[1];
 		 tn++;};};
 
 	 if (xp[1] != NULL)
-	    {y1 = y0 - xm[1][i];
-	     y2 = y0 + xp[1][i];
+	    {x1[1] = x0[1] - xm[1][i];
+	     x2[1] = x0[1] + xp[1][i];
 
-	     *px++ = x0;
-	     *py++ = y1;
-	     *px++ = x0;
-	     *py++ = y2;
+	     *px++ = x0[0];
+	     *py++ = x1[1];
+	     *px++ = x0[0];
+	     *py++ = x2[1];
              tn++;
              if (_PG_gattrs.error_cap_size > 0.0)
-                {x1 = x0 + dx;
-                 x2 = x0 - dx;
+                {x1[0] = x0[0] + dx[0];
+                 x2[0] = x0[0] - dx[0];
 
-		 *px++ = x1;
-		 *py++ = y1;
-		 *px++ = x2;
-		 *py++ = y1;
+		 *px++ = x1[0];
+		 *py++ = x1[1];
+		 *px++ = x2[0];
+		 *py++ = x1[1];
 		 tn++;
 
-		 *px++ = x1;
-		 *py++ = y2;
-		 *px++ = x2;
-		 *py++ = y2;
+		 *px++ = x1[0];
+		 *py++ = x2[1];
+		 *px++ = x2[0];
+		 *py++ = x2[1];
 		 tn++;};};};
 
     PG_draw_disjoint_polyline_n(dev, 2, WORLDC, tn, t, FALSE);

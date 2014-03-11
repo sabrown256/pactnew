@@ -660,9 +660,7 @@ void _PG_CGM_put_image(PG_device *dev, unsigned char *bf,
 	    *pbf++ += 8;};
 
     if ((n_dev_colors < n_pal_colors) && (pseudo_cm != NULL))
-       {unsigned char *pbf;
-
-        pbf = bf;
+       {pbf = bf;
         PM_random(-1);
         for (l = 0; l < ny; l++)
             for (k = 0; k < nx; k++)

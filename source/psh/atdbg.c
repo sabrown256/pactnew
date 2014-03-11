@@ -503,7 +503,7 @@ static int session(atdbgdes *st)
     char fname[BFLRG], names[BFLRG];
     char *name, *pl, *lst[33];
     atproc *al, *pal;
-    FILE *log;
+    FILE *lg;
 
     rv = TRUE;
 
@@ -514,10 +514,10 @@ static int session(atdbgdes *st)
 /* open the log file if requested */
     if (IS_NULL(st->logname) == FALSE)
        {snprintf(fname, BFLRG, "%s.%d", st->logname, (int) getpid());
-	log = fopen_safe(fname, "w");
-	if (log != NULL)
-	   setbuf(log, NULL);
-	st->log = log;};
+	lg = fopen_safe(fname, "w");
+	if (lg != NULL)
+	   setbuf(lg, NULL);
+	st->log = lg;};
 
     if (st->quiet == FALSE)
        printf("\n");

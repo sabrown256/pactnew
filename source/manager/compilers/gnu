@@ -20,41 +20,48 @@ Group OCV {
    CC_Sh   ?= -fPIC
    OMP_Lib ?= -lgomp
    StackP  ?= [ _env_ = PACT_CC_VERSION ;      # stack checking
-               4.2.* >= -fstack-protector -Wformat-security -Wl,-z,relro -Wl,-z,now ]
+               4.2.* >= -fstack-protector -Wl,-z,relro -Wl,-z,now ]
 }
 
 Tool CC {
    Exe       = ${OCV_CC}
    Flags     = -pipe -ffloat-store
-   Flags    += [ _env_ = STD_C ;                # C standard flags
+   Flags    =+ [ _env_ = STD_C ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
                  C11   = -std=c11 ;
                  X89   = -std=gnu89 ;           # gcc default
                  X99   = -std=gnu99 ;
                  X11   = -std=gnu11 ]
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                  4.*   = -fsignaling-nans ]
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # pragma warning flags
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;      # pragma warning flags
                  4.*  >= -Wno-unknown-pragmas ]
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # unused return value
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;      # unused return value
                  4.4.* > -Wunused-result ]
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # memory checks
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;      # memory checks
                  4.8.3 >= -fsanitize=address ]
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # thread checks
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;      # thread checks
                  4.8.* >= -fsanitize=thread -pie ]
-   Flags    += -Wl,-O1 -Wl,--discard-all -Wl,--no-undefined -Wl,--build-id=sha1
-   Flags    += ${OCV_StackP}
-   Flags    += ${OCV_Bits}
-   Flags    += ${OCV_PIC}
-   Flags    += [ _cmd_ = -p ;                   # profiling
+   Flags    =+ -Wl,-O1 -Wl,--discard-all -Wl,--no-undefined -Wl,--build-id=sha1
+   Flags    =+ ${OCV_StackP}
+   Flags    =+ ${OCV_Bits}
+   Flags    =+ ${OCV_PIC}
+   Flags    =+ [ _cmd_ = -p ;                   # profiling
                  on    = $CC_Profile ]
-   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
+   Flags    =+ [ _cmd_ = -cov ;                 # coverage analysis
                  on    = -fprofile-arcs -ftest-coverage ]
-   Flags    += -fno-exceptions -fvisibility=hidden
-   Flags    += -Wno-inline
-#   Flags    += -Wformat-nonliteral
-#   Flags    += -Wno-deprecated
+   Flags    =+ -fno-exceptions
+
+# this currently kills the SO for python bindings
+# it should be reworked to function
+# that would help with other OS's
+#   Flags    =+ -fvisibility=hidden
+
+# explicitly set the sign of the char type
+   Flags    =+ -funsigned-char
+# because INT_MAX + 1 == INT_MIN is often used but is undefined behavior
+   Flags    =+ -fwrapv
 
 # -Wall turns on the following warning flags:
 #    -Waddress -Warray-bounds (only with -O2) -Wc++0x-compat
@@ -69,12 +76,12 @@ Tool CC {
 #    -Wunused-value -Wunused-variable -Wvolatile-register-var
 #
    Debug     = -g -O0 -Wall
-#   Flags    += -Werror
-   Flags    += -Wmultichar
-   Flags    += -Wpointer-arith
-   Flags    += -Winit-self
+#   Flags    =+ -Werror
+   Flags    =+ -Wformat -Wformat-security
+   Flags    =+ -Wmultichar
+   Flags    =+ -Wpointer-arith
+   Flags    =+ -Winit-self
 
-#
 # -Wextra turns on the following warning flags:
 #    -Wclobbered -Wempty-body -Wignored-qualifiers
 #    -Wmissing-field-initializers -Wmissing-parameter-type (C only)
@@ -83,17 +90,29 @@ Tool CC {
 #    -Wunused or -Wall) -Wunused-but-set-parameter (only with -Wunused
 #    or -Wall)
 #
-   Flags    += -Wextra
-   Flags    += -Wno-sign-compare
-   Flags    += -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
-   Flags    += -Wno-missing-field-initializers
-   Flags    += -Wno-missing-declarations
-#   Flags    += -Wsign-compare
+   Flags    =+ -Wextra
+   Flags    =+ -Wno-sign-compare
+   Flags    =+ -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
+   Flags    =+ -Wno-missing-field-initializers -Wno-missing-declarations
+
+# even more warnings
+   Flags    =+ -Wno-inline
+   Flags    =+ -Wmissing-format-attribute
+   Flags    =+ -Wshadow
+   Flags    =+ -Wenum-compare
+   Flags    =+ -Wlogical-op
+#   Flags    =+ -Wsuggest-attribute=noreturn -Wno-missing-format-attribute
+
+# these would really bring the pain
+# but are not quite right for the way PACT is designed
+#   Flags    =+ -Wwrite-strings
+#   Flags    =+ -Wformat-nonliteral
+#   Flags    =+ -Wno-deprecated
 
    Optimize  = [ _env_ = PACT_CC_VERSION ;      # optimization level
                  4.1.2 = -g -O0 -Wall ;         # 4.1.2 crashes on mlcfnc.c with -O
-                 *.*   = -g -O -Wunused ]
-   Optimize += [ _cmd_ = -tune @ ;              # optimization tuning
+                 *.*   = -g -O -Wunused -Wno-uninitialized]
+   Optimize =+ [ _cmd_ = -tune @ ;              # optimization tuning
                  *     = -mtune=* ]
    Profile   = -pg
    Version   = -v
@@ -102,15 +121,15 @@ Tool CC {
 Tool FC {
    Exe       = ${OCV_FC}
    Flags     = -ffloat-store -ffree-form
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                  4.*   = -fsignaling-nans ;
                  4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
-   Flags    += ${OCV_FC_Ext}
-   Flags    += ${OCV_Bits}
-   Flags    += ${OCV_PIC}
-   Flags    += [ _cmd_ = -p ;                   # profiling
+   Flags    =+ ${OCV_FC_Ext}
+   Flags    =+ ${OCV_Bits}
+   Flags    =+ ${OCV_PIC}
+   Flags    =+ [ _cmd_ = -p ;                   # profiling
                  on    = $FC_Profile ]
-   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
+   Flags    =+ [ _cmd_ = -cov ;                 # coverage analysis
                  on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
@@ -129,20 +148,20 @@ Tool CXX {
 Tool LD {
    Exe      = ${OCV_LD}
    RPath    = ${OCV_RPath}
-   Flags   += ${OCV_LD}
-#   Flags   += [ _env_ = PACT_CC_VERSION ;        # memory and thread checks
+   Flags   =+ ${OCV_LD}
+#   Flags   =+ [ _env_ = PACT_CC_VERSION ;        # memory and thread checks
 #                4.8.* >= -pie ]
-   Flags   += [ _cmd_ = -p ;                      # profiling
+   Flags   =+ [ _cmd_ = -p ;                      # profiling
                 on    = -pg ]
-   Flags   += [ _cmd_ = -cov ;                    # coverage analysis
+   Flags   =+ [ _cmd_ = -cov ;                    # coverage analysis
                 on    = -lgcov ]
    Lib      = ${OCV_LD_Lib}
 }
 
 Tool Lex {
    Flags  = -w
-   Flags += ${OCV_Bits}
-   Flags += ${OCV_PIC}
+   Flags =+ ${OCV_Bits}
+   Flags =+ ${OCV_PIC}
 }
 
 Group AF {
