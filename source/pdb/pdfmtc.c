@@ -1280,7 +1280,7 @@ static int _PD_wr_fmt_iii(PDBfile *file)
  */
 
 static int _PD_open_iii(PDBfile *file)
-   {unsigned int nb;
+   {int nb;
     char str[MAXLINE], key[MAXLINE];
     char *acc, *rej, *s, *ps;
     FILE *fp;

@@ -232,7 +232,7 @@ static void _SC_bfr_mark(bio_frame *fr, bio_kind rw, int fl)
 
 /* _SC_BFR_INIT - initialize a buffered io frame */
 
-static void _SC_bfr_init(bio_frame *fr, int64_t addr, size_t bfsz)
+static void _SC_bfr_init(bio_frame *fr, int64_t addr, int64_t bfsz)
    {
 
     if (fr != NULL)
@@ -257,7 +257,7 @@ static void _SC_bfr_init(bio_frame *fr, int64_t addr, size_t bfsz)
 
 /* _SC_BFR_ALLOC - initialize a buffered io frame */
 
-static bio_frame *_SC_bfr_alloc(int64_t addr, size_t bfsz)
+static bio_frame *_SC_bfr_alloc(int64_t addr, int64_t bfsz)
    {bio_frame *fr;
 
     fr = CMAKE(bio_frame);
@@ -273,7 +273,7 @@ static bio_frame *_SC_bfr_alloc(int64_t addr, size_t bfsz)
 
 /* _SC_BIO_BUFFER - initialize buffering */
 
-static void _SC_bio_buffer(bio_desc *bid, size_t bfsz)
+static void _SC_bio_buffer(bio_desc *bid, int64_t bfsz)
    {
 
     if (bfsz < 1)

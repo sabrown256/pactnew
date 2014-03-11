@@ -2624,7 +2624,7 @@ int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
 	     case PROC_FG_SUSP :
                   break;
 	     default :
-	          rv = wait_pgrp(pg);
+	          st = wait_pgrp(pg);
 		  switch (sl[i].terminator)
 		     {case ST_AND :
 			   rv = (st == 0);
