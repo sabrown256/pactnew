@@ -69,7 +69,7 @@ Tool CC {
 #    -Wunused-value -Wunused-variable -Wvolatile-register-var
 #
    Debug     = -g -O0 -Wall
-#   Debug    += -Werror
+#   Flags    += -Werror
    Flags    += -Wmultichar
    Flags    += -Wpointer-arith
    Flags    += -Winit-self
@@ -83,9 +83,11 @@ Tool CC {
 #    -Wunused or -Wall) -Wunused-but-set-parameter (only with -Wunused
 #    or -Wall)
 #
-   Debug    += -Wextra
-   Debug    += -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
-   Debug    += -Wno-missing-declarations
+   Flags    += -Wextra
+   Flags    += -Wno-sign-compare
+   Flags    += -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
+   Flags    += -Wno-missing-field-initializers
+   Flags    += -Wno-missing-declarations
 #   Flags    += -Wsign-compare
 
    Optimize  = [ _env_ = PACT_CC_VERSION ;      # optimization level

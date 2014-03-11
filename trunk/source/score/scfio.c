@@ -2833,12 +2833,11 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
  */
 
 ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
-   {unsigned long nbw;
-    ssize_t rv;
+   {ssize_t nbw, rv;
 
     nbw = PS_write_safe(fd, bf, n);
 
-    rv = (nbw < 0) ? nbw : n;
+    rv = (nbw < 0) ? nbw : (ssize_t) n;
 
     return(rv);}
 

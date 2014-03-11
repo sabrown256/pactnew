@@ -1097,7 +1097,7 @@ static char *_SC_leh_raw(lehloc *lp)
 
     else
        {st = SC_change_term_state(fd, SC_TERM_LEH_RAW, TRUE, NULL);
-        if (_SC.term == SC_TERM_LEH_RAW);
+        if (_SC.term == SC_TERM_LEH_RAW)
 	   {rv = _SC_leh_gets(lp);
 	    st = SC_change_term_state(fd, st, TRUE, NULL);
 	    printf("\n");};};
