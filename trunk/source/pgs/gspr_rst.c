@@ -812,9 +812,10 @@ void _PG_rst_fill_curve(PG_device *dev, PG_curve *crv)
 
 void _PG_rst_put_image(PG_device *dev, unsigned char *bf,
                        int ix, int iy, int nx, int ny)
-   {int bpp, l, k, m, dx, dy, sz, rgb, pc;
+   {int bpp, l, k, m, dx, dy, sz, rgb;
     int color, red_fl, green_fl, blue_fl, ok;
     int ir[PG_SPACEDM];
+    unsigned int pc;
     unsigned long *pv;
     unsigned char *pbf, *r, *g, *b;
     double scale;

@@ -202,7 +202,7 @@ void _PD_set_io_buffer(SC_udl *pu)
 
     pa = _PD_get_state(-1);
     sz = pa->buffer_size;
-    if (pa->buffer_size != -1)
+    if (pa->buffer_size > 0)
        {fp = pu->stream;
 	bf = CMAKE_N(char, sz);
 

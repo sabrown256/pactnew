@@ -591,7 +591,7 @@ static int diff_line(char *bfa, char *bfb, pixdes *pd, int verbose,
  */
 
 static int ps_diff_a(char *f1, char *f2, pixdes *pd, int verbose)
-   {int err, la, lb, st;
+   {int err, la, lb, st, nc;
     char *ea, *eb, *ecnt, *bfa, *bfb, *cmnd;
     FILE *fd;
     static int n = BFSZ;
@@ -615,7 +615,7 @@ static int ps_diff_a(char *f1, char *f2, pixdes *pd, int verbose)
     bfb  = NULL;
 
     while (TRUE)
-       {s = SC_dgets(s, &n, fd);
+        {s = SC_dgets(s, &n, fd);
 	if (s == NULL)
            {io_close(fd);
 	    SC_remove("__tmp__");
@@ -650,7 +650,8 @@ static int ps_diff_a(char *f1, char *f2, pixdes *pd, int verbose)
 	else
 	   ecnt = SC_dstrcpy(ecnt, s);
 
-	if (strlen(s) > (n >> 1))
+	nc = strlen(s);
+	if (nc > (n >> 1))
            {n <<= 1;
 	    CREMAKE(s, char, n);};};
 

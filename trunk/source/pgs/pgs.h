@@ -1545,8 +1545,9 @@ extern void
 		 PG_rendering pty),
  PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 		    char **labels, char **files,
-		    int *dataid, int *modified, int *clr, double *extr, char *ctg,
-		    int llf, int lcf, int slf, int lts);
+		    int *dataid, int *modified, int *clr,
+		    double *extr, char *ctg,
+		    unsigned int llf, int lcf, int slf, int lts);
 
 extern int
  PG_clip_line_seg(PG_device *dev, double *x1, double *x2),

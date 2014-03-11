@@ -162,9 +162,10 @@ static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
  */
 
 static int _PD_rd_fmt_ii(PDBfile *file)
-   {int i, j, n, id;
+   {int i, id;
     int *order;
     long *format;
+    u_int64_t j, n;
     char infor[MAXLINE], *p, *s, *pi;
     data_standard *std;
     
@@ -416,7 +417,8 @@ static void _PD_rd_blocks_ii(PDBfile *file)
  */
 
 int _PD_rd_chrt_ii(PDBfile *file)
-   {long sz, chrt_sz, bsz;
+   {long sz, bsz;
+    u_int64_t chrt_sz;
     char *nxt, type[MAXLINE], *pbf, *local;
     FILE *fp;
     memdes *desc, *lst, *prev;
@@ -1462,7 +1464,7 @@ static int _PD_open_ii(PDBfile *file)
  */
 
 static int _PD_create_ii(PDBfile *file, int mst)
-   {int nstr;
+   {u_int64_t nstr;
     char str[MAXLINE];
     char *nht;
     FILE *fp;

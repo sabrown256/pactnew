@@ -63,7 +63,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 			char **labels, char **files,
 			int *dataid, int *modified, int *clr,
 			double *extr, char *ctg,
-		        int llf, int lcf, int slf, int lts)
+		        unsigned int llf, int lcf, int slf, int lts)
    {int i, color, size, id, md, clp;
     int ne, tc, hcd;
     int oflg[PG_SPACEDM], nflg[PG_SPACEDM];
