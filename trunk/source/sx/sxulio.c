@@ -338,7 +338,7 @@ object *_SXI_valid_ultra_filep(SS_psides *si, object *obj)
 /* _SX_READ_BIN - read a binary file */
 
 static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
-   {int n, nc, len, j, i, icurve;
+   {int n, nc, nr, len, j, i, icurve;
     double wc[PG_BOXSZ];
     char c, bf[MAXLINE];
     bin_info *pbi;
@@ -351,7 +351,8 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
        {j = SX_next_space(si);
         read_int(len, fp);
 	nc = min(len, MAXLINE);
-        if (io_read(bf, sizeof(char), nc, fp) != len)
+        nr = io_read(bf, sizeof(char), nc, fp);
+        if (nr != len)
            break;
         bf[len] = '\0';
 
@@ -376,11 +377,13 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
 
 	SC_mark(pbi, 1);
 
-        if (io_read((char *) SX_gs.dataset[j].x[0], sizeof(double), n, fp) != n)
+        nr = io_read((char *) SX_gs.dataset[j].x[0], sizeof(double), n, fp);
+        if (nr != n)
            {PRINT(stdout, "WARNING: INCOMPLETE CURVE %d IN BINARY FILE",
                           icurve + 1);
             break;};
-        if (io_read((char *) SX_gs.dataset[j].x[1], sizeof(double), n, fp) != n)
+        nr = io_read((char *) SX_gs.dataset[j].x[1], sizeof(double), n, fp);
+        if (nr != n)
            {PRINT(stdout, "WARNING: INCOMPLETE CURVE %d IN BINARY FILE",
                           icurve + 1);
             break;};

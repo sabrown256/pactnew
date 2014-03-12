@@ -232,7 +232,7 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
 				   char *pva, char *pvb, char *indx, 
 				   inti ni, char *type, dimdes *dims, 
 				   int mjr)
-   {int id, nn, def_off, samen, lna, lnb;
+   {int id, nn, nt, def_off, samen, lna, lnb;
     inti i;
     long isz, msz;
     char sa[MAXLINE], sb[MAXLINE];
@@ -288,7 +288,9 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
 		 SC_ntos(sb, MAXLINE, id, pvb, i, 1);
 		 snprintf(tmp, LINE_SIZE, ":   %s   %s", sa, sb);
 
-		 memcpy(&bf[nn], tmp, min(LINE_SIZE - nn, strlen(tmp) + 1));
+		 nt = strlen(tmp);
+		 nt = min(LINE_SIZE - nn, nt + 1);
+		 memcpy(&bf[nn], tmp, nt);
 		 PRINT(stdout, "%s\n", bf);
 		 memset(bf, ' ', LINE_SIZE);};};};
 
@@ -626,7 +628,7 @@ static int _SX_diff_structs(SS_psides *si,
 static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype, 
 			 inti ni, intb bpi, char *outtype)
    {int cnv, rv;
-    inti i, n, nrd, nib;
+    inti i, n, nrd, nr, nib;
     int64_t addr;
     char *buf, *vbuf, *svr;
     defstr *dpf;
@@ -663,7 +665,8 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype,
     nrd = 0L;
     for (i = 0; i < n; i++)
         {nib = _PD_entry_get_number(ep, i);
-	 if (lio_read(buf, (size_t) bpi, (size_t) nib, fp) != nib)
+	 nr  = lio_read(buf, (size_t) bpi, (size_t) nib, fp);
+	 if (nr != nib)
             break;
          nrd += nib;
          if ((i+1) < n) 

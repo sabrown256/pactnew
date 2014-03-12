@@ -351,7 +351,7 @@ static object *_SSI_strlen(SS_psides *si, object *str)
 /* _SSI_STRREF - string-ref in Scheme */
 
 static object *_SSI_strref(SS_psides *si, object *argl)
-   {int c, n;
+   {int c, n, ns;
     char *s;
     object *rv;
 
@@ -362,7 +362,8 @@ static object *_SSI_strref(SS_psides *si, object *argl)
             SC_INT_I, &n,
             0);
 
-    if (n > strlen(s))
+    ns = strlen(s);
+    if (n > ns)
        SS_error(si, "INDEX PAST END OF STRING - STRING-REF", argl);
 
     c  = s[n];
