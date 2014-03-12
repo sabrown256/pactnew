@@ -1280,7 +1280,7 @@ static int _PD_wr_fmt_iii(PDBfile *file)
  */
 
 static int _PD_open_iii(PDBfile *file)
-   {int nb;
+   {int nb, ns;
     char str[MAXLINE], key[MAXLINE];
     char *acc, *rej, *s, *ps;
     FILE *fp;
@@ -1303,8 +1303,9 @@ static int _PD_open_iii(PDBfile *file)
     str[nb] = '\0';
 
 /* checksums can have NULL characters so try getting past them */
-    if (strlen(str) < nb)
-       ps = str + strlen(str) + 1;
+    ns = strlen(str);
+    if (ns < nb)
+       ps = str + ns + 1;
     else
        ps = str;
 
