@@ -303,7 +303,8 @@ void lst_free(char **lst)
 
 char *concatenate(char *s, int nc, char **sa,
 		  unsigned int mn, unsigned int mx, char *dlm)
-   {int i, ns, nd, n;
+   {int ns, nd, n;
+    unsigned int i;
 
     if ((s != NULL) && (nc > 0))
        {memset(s, 0, nc);
@@ -434,7 +435,8 @@ int strcnts(char *s, char *r, int ex)
 
 static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
 			char *r, int flags)
-   {int ins, ind, n, nc, c, ex, ad, tr, rq;
+   {int ins, ind, c, ex, ad, tr, rq;
+    size_t n, nc;
 
     n = 0;
 
@@ -541,7 +543,8 @@ static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
  */
 
 int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
-   {int ins, ind, n, nc, nr, c, ex, ad, tr, rq, sq;
+   {int ins, ind, c, ex, ad, tr, rq, sq;
+    size_t n, nc, nr;
 
     n = 0;
 
@@ -654,7 +657,8 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 
 static int _strcpy_bal(char *d, size_t nd, char *s, size_t ns,
 		       char *b, char *e, int flags)
-   {int ins, ind, lev, n, nc, c, ex, ad, tr, rq;
+   {int ins, ind, lev, c, ex, ad, tr, rq;
+    size_t n, nc;
 
     n = 0;
 
@@ -1046,8 +1050,7 @@ char *fill_string(char *s, int n)
  */
 
 char *strclean(char *d, size_t nd, char *s, size_t ns)
-   {int i, j;
-    unsigned int c;
+   {size_t i, j, c;
     char t[10];
         
     if ((d != NULL) && (s != NULL))
@@ -1070,7 +1073,7 @@ char *strclean(char *d, size_t nd, char *s, size_t ns)
 		          break;};}
 	     else if (c > '~')
 	        {d[j++] = '[';
-                 snprintf(t, 10, "%03o", c - 128);
+                 snprintf(t, 10, "%03lo", c - 128);
 		 d[j++] = t[0];
 		 d[j++] = t[1];
 		 d[j++] = t[2];}
@@ -1124,7 +1127,7 @@ char *strstri(char *string1, char *string2)
  */
 
 char *subst(char *s, char *a, char *b, size_t n)
-   {int i, o;
+   {size_t i, o;
     char *p, *pr, *ps, *pa, *pb, *r;
     static char bfa[1024*BFLRG], bfb[1024*BFLRG];
 
@@ -1333,7 +1336,8 @@ char *path_simplify(char *s, int dlm)
 #endif
 
 int _permission_match(struct stat bf, int md, int only)
-   {int i, rv, muid, mgid;
+   {int i, rv;
+    unsigned int muid, mgid;
     int ugo[3], id[3];
 
 /* given rwx replicate into rwxrwxrwx */

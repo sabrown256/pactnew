@@ -356,7 +356,7 @@ static char *stop_time(char *et, int nc, double ti)
 /* COUNT_SPECS - return the number of specs */
 
 static int count_specs(hfspec *specs, size_t nsp)
-   {int n;
+   {size_t n;
 
     for (n = 0; (n < nsp) && (specs[n].running != UNLAUNCHED); n++);
 

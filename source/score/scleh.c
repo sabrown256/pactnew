@@ -262,7 +262,8 @@ static int _SC_leh_put_prompt(lehloc *lp)
 
 static void _SC_leh_refresh(lehloc *lp)
    {int fd, dp, err;
-    size_t nw, len, np, pos, cols;
+    size_t len, np, pos, cols;
+    ssize_t nw;
     char seq[64];
     char *bf;
 

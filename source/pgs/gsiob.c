@@ -1668,9 +1668,12 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
 
 	b = PG_open_text_rect(dev, "IOB", FALSE, NULL, crv, 0.0, TRUE);
 	if (b != NULL)
-	   {CFREE(b->text_buffer[0]);
+	   {int nn;
+
+	    CFREE(b->text_buffer[0]);
+	    nn = strlen(name);
 	    b->text_buffer[0] = CSTRSAVE(name);
-	    b->n_chars_line = max(b->n_chars_line, strlen(name));
+	    b->n_chars_line = max(b->n_chars_line, nn);
 	    b->align        = align;
 	    b->angle        = ang;
 	    b->foreground   = fc;

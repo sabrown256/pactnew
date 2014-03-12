@@ -1661,7 +1661,7 @@ int _SC_mf_flush(FILE *fp)
 #ifdef HAVE_MMAP
 
     int nbp;
-    int64_t len;
+    uint64_t len;
     char *p;
     SC_mapped_file *mf;
 

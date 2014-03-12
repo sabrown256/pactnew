@@ -105,9 +105,8 @@ int ring_ready(io_ring *ring, unsigned char ls)
  *              - receive NC bytes
  */
 
-static void _ring_adjust(io_ring *ring, int nc)
-   {int i;
-    unsigned int ib, ob, ab, db, mb, nb, nnb;
+static void _ring_adjust(io_ring *ring, unsigned int nc)
+   {unsigned int i, ib, ob, ab, db, mb, nb, nnb;
     unsigned char *bf, *po, *pn;
 
     ib = ring->ib_in;

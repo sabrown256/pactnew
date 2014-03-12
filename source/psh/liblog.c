@@ -91,7 +91,7 @@ void separator(FILE *fp)
  */
 
 void cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...)
-   {int i;
+   {size_t i;
     char fname[BFLRG], s[BFLRG];
     FILE *in;
 
