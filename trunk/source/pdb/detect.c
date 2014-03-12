@@ -666,7 +666,7 @@ int derive_complex_format(int *fc, int *dc, int *lc)
 /* PRINT_HTML - organize the detect output in the form of a web page */
 
 void print_html(FILE *fp)
-   {int mfields;
+   {int mfields, nt;
     char lmx[MAXLINE], lmn[MAXLINE], t[MAXLINE];
     char dmx[MAXLINE], dmn[MAXLINE];
 
@@ -684,7 +684,8 @@ void print_html(FILE *fp)
 #endif
 
      snprintf(t, MAXLINE, "%3.8g", DBL_MAX);
-     mfields = max(mfields, strlen(t));
+     nt = strlen(t);
+     mfields = max(mfields, nt);
      mfields += 2;
 
 /* dump the output page */

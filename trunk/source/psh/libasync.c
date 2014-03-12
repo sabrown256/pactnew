@@ -2270,7 +2270,8 @@ int await(unsigned int tf, int dt, char *tag,
 	  int (*tty)(char *tag),
 	  void (*f)(int i, char *tag, void *a, int nd, int np, int tc, int tf),
 	  void *a)
-   {int i, nd, np, st, ti, tc;
+   {int i, nd, np, st, ti;
+    unsigned int tc;
     process_state *ps;
 
     ps = get_process_state();

@@ -21,16 +21,18 @@ Tool CC {
                  X89   = -std=gnu89 ;           # gcc default
                  X99   = -std=gnu99 ]
 
-   Flags    += -Wbool-conversion -Wempty-body
-   Flags    += -Wloop-analysis
-   Flags    += -Wsizeof-array-argument
-   Flags    += -Wstring-conversion
-   Flags    += -Wparentheses
-   Flags    += -Wduplicate-enum
-   Flags    += -Wheader-guard
-   Flags    += -Wlogical-not-parentheses
+   Flags    =+ -fno-exceptions
 
-#   Debug     = -g -O0 -Wall -Wno-unused-value
+# this currently kills the SO for python bindings
+# it should be reworked to function
+# that would help with other OS's
+#   Flags    =+ -fvisibility=hidden
+
+# explicitly set the sign of the char type
+   Flags    =+ -funsigned-char
+# because INT_MAX + 1 == INT_MIN is often used but is undefined behavior
+   Flags    =+ -fwrapv
+
 # -Wall turns on the following warning flags:
 #    -Waddress -Warray-bounds (only with -O2) -Wc++0x-compat
 #    -Wchar-subscripts -Wenum-compare (in C/Objc; this is on by default
@@ -44,13 +46,12 @@ Tool CC {
 #    -Wunused-value -Wunused-variable -Wvolatile-register-var
 #
    Debug     = -g -O0 -Wall
-   Flags    += -Wno-unused-value
-#   Flags    += -Werror
-   Flags    += -Wmultichar
-   Flags    += -Wpointer-arith
-   Flags    += -Winit-self
+#   Flags    =+ -Werror
+   Flags    =+ -Wformat -Wformat-security
+   Flags    =+ -Wmultichar
+   Flags    =+ -Wpointer-arith
+   Flags    =+ -Winit-self
 
-#
 # -Wextra turns on the following warning flags:
 #    -Wclobbered -Wempty-body -Wignored-qualifiers
 #    -Wmissing-field-initializers -Wmissing-parameter-type (C only)
@@ -59,12 +60,32 @@ Tool CC {
 #    -Wunused or -Wall) -Wunused-but-set-parameter (only with -Wunused
 #    or -Wall)
 #
-#   Flags    += -Wextra
-#   Flags    += -Wno-sign-compare
-#   Flags    += -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
-#   Flags    += -Wno-missing-field-initializers
-#   Flags    += -Wno-missing-declarations
-#   Flags    += -Wsign-compare
+   Flags    =+ -Wextra
+#   Flags    =+ -Wno-sign-compare
+   Flags    =+ -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
+   Flags    =+ -Wno-missing-field-initializers -Wno-missing-declarations
+
+# even more warnings
+   Flags    =+ -Wno-inline
+   Flags    =+ -Wmissing-format-attribute
+   Flags    =+ -Wshadow
+   Flags    =+ -Wenum-compare
+   Flags    =+ -Wbool-conversion
+   Flags    =+ -Wloop-analysis
+   Flags    =+ -Wsizeof-array-argument
+   Flags    =+ -Wstring-conversion
+   Flags    =+ -Wparentheses
+   Flags    =+ -Wduplicate-enum
+   Flags    =+ -Wheader-guard
+   Flags    =+ -Wlogical-not-parentheses
+#   Flags    =+ -Wsuggest-attribute=noreturn -Wno-missing-format-attribute
+
+# these would really bring the pain
+# but are not quite right for the way PACT is designed
+#   Flags    =+ -Wwrite-strings
+#   Flags    =+ -Wformat-nonliteral
+#   Flags    =+ -Wno-deprecated
+#   Flags    =+ -Wno-unused-value
 
    Optimize  = -g -O2
    Version   = -v
