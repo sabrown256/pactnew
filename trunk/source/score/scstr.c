@@ -145,14 +145,15 @@ char *SC_strsavec(char *s, int memfl,
  */
 
 unsigned int SC_char_index(char *s, int n)
-    {unsigned int nc, rv;
+    {unsigned int nc, nu, rv;
 
      nc = strlen(s);
 
      if (n < 0)
         n += nc;
 
-     rv = min(n, nc);
+     nu = n;
+     rv = min(nu, nc);
 
      return(rv);}
 
@@ -411,7 +412,7 @@ char *SC_squeeze_chars(char *s, char *q)
  */
 
 char *SC_dstrsubst(char *s, char *a, char *b, size_t n)
-   {int i, o;
+   {size_t i, o;
     char *p, *pr, *ps, *pa, *pt;
 
     ps = SC_dstrcpy(NULL, s);
@@ -1444,7 +1445,7 @@ char *SC_concatenate(char *s, int nc, char **a,
 
 char *SC_dconcatenate(char **a, unsigned int mn, unsigned int mx,
 		      char *delim)
-   {int i, nc, nd;
+   {unsigned int i, nc, nd;
     char *rv;
     char *s;
 
@@ -1669,7 +1670,8 @@ int SC_fltstrp(char *s)
 /* SC_CMPLXSTRP - tests to see if a string is a complex number */
 
 int SC_cmplxstrp(char *s)
-   {int n, rv;
+   {int rv;
+    size_t n;
 
     if (s == NULL)
        rv = FALSE;
@@ -2185,7 +2187,8 @@ char *SC_dsnprintf(int cp, char *fmt, ...)
  */
 
 int SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list __a__)
-   {int i, c, nd;
+   {int i, ln, c;
+    size_t nd;
     char s[MAXLINE], local[MAXLINE+1], chr[2], ce;
     char *le, *lb, *t;
     void *p;
@@ -2225,9 +2228,11 @@ int SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list __a__)
         switch (ce)
            {case 's' :
 	         t  = SC_VA_ARG(char *);
-		 nd = _SC_fmt_strcat(dst, nc, nd, local, t);
-		 if (nd == -1)
+		 ln = _SC_fmt_strcat(dst, nc, nd, local, t);
+		 if (ln == -1)
 		    return(-1);
+		 else
+		    nd = ln;
                  break;
 
             case 'c' :

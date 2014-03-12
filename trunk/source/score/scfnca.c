@@ -156,10 +156,11 @@ void SC_type_container(char *dtype, char *stype)
 int SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx)
    {int i, rv;
     int64_t imn, imx, uimx;
+    static int nbi = sizeof(int64_t);
 
     rv = FALSE;
 
-    if (nb <= sizeof(int64_t))
+    if (nb <= nbi)
 
 /* do the min limits */
        {for (imn = 0x80, i = 1; i < nb; i++)
@@ -173,7 +174,7 @@ int SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx)
 	for (uimx = 0xff, i = 1; i < nb; i++)
 	    uimx = (uimx << 8) + 0xff;
 
-	if (nb < sizeof(int64_t))
+	if (nb < nbi)
 	   imn = -imn;
 
 	if (pmn != NULL)

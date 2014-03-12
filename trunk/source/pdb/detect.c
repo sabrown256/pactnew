@@ -899,21 +899,23 @@ static void print_flt_type(char *type, int sz, int aln,
 /* PRINT_HUMAN - organize the detect output for human consumption */
 
 void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
-    {char bf[DBFSZ], t[MAXLINE];
+    {int nt, mfields, offset;
+     int tfield, sfield, afield;
+     char bf[DBFSZ], t[MAXLINE];
      char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
 /* sizes of the fields in the output table */
-     int mfields, offset;
-     int tfield = 12;
-     int sfield = 14;
-     int afield = 11;
+     tfield = 12;
+     sfield = 14;
+     afield = 11;
 
 /* determine the size of the min and max fields */     
      snprintf(t, MAXLINE, LL_FMT, (long long) LLONG_MAX);
      mfields = strlen(t);
 
      snprintf(t, MAXLINE, "%3.8g", DBL_MAX);
-     mfields = max(mfields, strlen(t));
+     nt = strlen(t);
+     mfields = max(mfields, nt);
      mfields += 2;
 
 /* pointers to the beginning of each of the fields */     

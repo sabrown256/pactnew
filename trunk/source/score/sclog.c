@@ -140,7 +140,8 @@ int SC_close_log(SC_logfile log)
    {int status, global_log;
     char bf[MAXLINE];
     char *fname;
-    size_t nbr, nbw;
+    size_t nbr;
+    ssize_t nbw;
     struct flock lock; 
 
     status = 0;
