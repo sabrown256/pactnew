@@ -9116,25 +9116,11 @@ pgm_readpgminitrest(FILE* file, int* colsP, int* rowsP, gray* maxvalP)
   return(0);
 }
 
-#if __STDC__
-static int
-  pgm_readpgmrow( FILE* file, gray* grayrow, int cols, gray maxval, int format )
-#else /*__STDC__*/
-static int
-  pgm_readpgmrow( file, grayrow, cols, maxval, format )
-FILE* file;
-gray* grayrow;
-int cols;
-gray maxval;
-int format;
-#endif /*__STDC__*/
-{
+static int pgm_readpgmrow(FILE *file, gray *grayrow, int cols,
+			  gray maxval, int format)
+   {int nr;
   register int col, val;
-  register gray* gP;
-  /*
-    bit* bitrow;
-    register bit* bP;
-    */
+  register gray *gP;
 
   switch ( format )
     {
@@ -9149,7 +9135,8 @@ int format;
       break;
 	
     case RPGM_FORMAT:
-      if ( io_read( grayrow, 1, cols, file ) != cols )
+      nr = io_read(grayrow, 1, cols, file);
+      if (nr != cols )
 	{
 	  (void) io_printf( stderr, "%s: EOF / read error\n", progname );
 	  return(-1);
@@ -9163,17 +9150,8 @@ int format;
   return(0);
 }
 
-#if __STDC__
-static void
-  pgm_writepgminit( FILE* file, int cols, int rows, gray maxval, int forceplain )
-#else /*__STDC__*/
-static void
-  pgm_writepgminit( file, cols, rows, maxval, forceplain )
-FILE* file;
-int cols, rows;
-gray maxval;
-int forceplain;
-#endif /*__STDC__*/
+static void pgm_writepgminit(FILE* file, int cols, int rows,
+			     gray maxval, int forceplain)
 {
   if ( !forceplain )
     io_printf(
@@ -9185,18 +9163,19 @@ int forceplain;
 	    cols, rows, maxval );
 }
 
-static void
-putus(unsigned short n, FILE* file)
+static void putus(unsigned short n, FILE* file)
 {
   if ( n >= 10 )
     putus( n / 10, file );
   putc( n % 10 + '0', file );
 }
 
-static int
-pgm_writepgmrowraw(FILE* file, gray* grayrow, int cols, gray maxval)
-{
-  if ( io_write( grayrow, 1, cols, file ) != cols )
+static int pgm_writepgmrowraw(FILE* file, gray* grayrow,
+			      int cols, gray maxval)
+   {int nw;
+
+    nw = io_write(grayrow, 1, cols, file);
+    if (nw != cols)
     {
       (void) io_printf( stderr, "%s: write error\n", progname );
       return(-1);
@@ -9274,27 +9253,14 @@ ppm_readppminitrest(FILE* file, int* colsP, int* rowsP, pixval* maxvalP)
   return(0);
 }
 
-#if __STDC__
-static int
-  ppm_readppmrow( FILE* file, pixel* pixelrow, int cols, pixval maxval, int format )
-#else /*__STDC__*/
-static int
-  ppm_readppmrow( file, pixelrow, cols, maxval, format )
-FILE* file;
-pixel* pixelrow;
-int cols, format;
-pixval maxval;
-#endif /*__STDC__*/
-{
+static int ppm_readppmrow(FILE* file, pixel* pixelrow, int cols,
+			  pixval maxval, int format )
+   {int nr;
   register int col;
   register pixel* pP;
   register int r, g, b;
   gray* grayrow;
   register gray* gP;
-  /*
-    bit* bitrow;
-    register bit* bP;
-    */
 
   switch ( format )
     {
@@ -9314,7 +9280,8 @@ pixval maxval;
       grayrow = pgm_allocrow( 3 * cols );
       if ( grayrow == (gray*) 0 )
 	return(-1);
-      if ( io_read( grayrow, 1, 3 * cols, file ) != 3 * cols )
+      nr = io_read(grayrow, 1, 3 * cols, file);
+      if (nr != 3 * cols )
 	{
 	  (void) io_printf( stderr, "%s: EOF / read error\n", progname );
 	  return(-1);
@@ -9358,9 +9325,9 @@ int forceplain;
 	    cols, rows, maxval );
 }
 
-static int
-ppm_writeppmrowraw(FILE* file, pixel* pixelrow, int cols, pixval maxval)
-{
+static int ppm_writeppmrowraw(FILE* file, pixel* pixelrow, int cols,
+			      pixval maxval)
+   {int nw;
   register int col;
   register pixel* pP;
   gray* grayrow;
@@ -9375,7 +9342,8 @@ ppm_writeppmrowraw(FILE* file, pixel* pixelrow, int cols, pixval maxval)
       *gP++ = PPM_GETG( *pP );
       *gP++ = PPM_GETB( *pP );
     }
-  if ( io_write( grayrow, 1, 3 * cols, file ) != 3 * cols )
+  nw = io_write(grayrow, 1, 3 * cols, file );
+  if (nw != 3 * cols)
     {
       (void) io_printf( stderr, "%s: write error\n", progname );
       return(-1);
@@ -9384,8 +9352,8 @@ ppm_writeppmrowraw(FILE* file, pixel* pixelrow, int cols, pixval maxval)
   return(0);
 }
 
-static int
-ppm_writeppmrowplain(FILE* file, pixel* pixelrow, int cols, pixval maxval)
+static int ppm_writeppmrowplain(FILE* file, pixel* pixelrow, int cols,
+				pixval maxval)
 {
   register int col, charcount;
   register pixel* pP;
@@ -11353,25 +11321,19 @@ Mhead_GenGOPHeader(BitBucket *bbPtr, int32 drop_frame_flag,
  * SIDE EFFECTS:    none
  *
  *===========================================================================*/
-void
-Mhead_GenSliceHeader(bbPtr, verticalPos, qscale, extra_info, extra_info_size)
-    BitBucket *bbPtr;
-    u_int32_t verticalPos;
-    u_int32_t qscale;
-    u_int8_t *extra_info;
-    u_int32_t extra_info_size;
-{
-    int i;
+void Mhead_GenSliceHeader(BitBucket *bbPtr, u_int32_t verticalPos,
+			  u_int32_t qscale, u_int8_t *extra_info,
+			  u_int32_t extra_info_size)
+   {u_int32_t i;
 
-    /* Write slice start code. */
+/* write slice start code */
     Bitio_Write(bbPtr, (SLICE_BASE_CODE + verticalPos), 32);
 
-    /* Quant. scale. */
+/* quant scale */
     Bitio_Write(bbPtr, qscale, 5);
     lastQSSet = qscale;
 
-    /* Extra bit slice info. */
-
+/* extra bit slice info */
     if (extra_info != NULL) {
 	for (i = 0; i < extra_info_size; i++) {
 	    Bitio_Write(bbPtr, 0x01, 1);
@@ -11379,7 +11341,7 @@ Mhead_GenSliceHeader(bbPtr, verticalPos, qscale, extra_info, extra_info_size)
 	}
     }
 
-    /* extra_bit_slice */
+/* extra_bit_slice */
     Bitio_Write(bbPtr, 0x00, 1);
 }
 
@@ -11416,34 +11378,19 @@ Mhead_GenSliceEnder(bbPtr)
  * SIDE EFFECTS:    none
  *
  *===========================================================================*/
-void
-Mhead_GenMBHeader(bbPtr, pict_code_type, addr_incr, q_scale,
-		  forw_f_code, back_f_code, horiz_forw_r, vert_forw_r,
-		  horiz_back_r, vert_back_r, motion_forw, m_horiz_forw,
-		  m_vert_forw, motion_back, m_horiz_back, m_vert_back,
-		  mb_pattern, mb_intra)
-    BitBucket *bbPtr;
-    u_int32_t pict_code_type;
-    u_int32_t addr_incr;
-    u_int32_t q_scale;
-    u_int32_t forw_f_code;
-    u_int32_t back_f_code;
-    u_int32_t horiz_forw_r;
-    u_int32_t vert_forw_r;
-    u_int32_t horiz_back_r;
-    u_int32_t vert_back_r;
-    int32 motion_forw;
-    int32 m_horiz_forw;
-    int32 m_vert_forw;
-    int32 motion_back;
-    int32 m_horiz_back;
-    int32 m_vert_back;
-    u_int32_t mb_pattern;
-    u_int32_t mb_intra;
-{
+void Mhead_GenMBHeader(BitBucket *bbPtr, u_int32_t pict_code_type,
+		       u_int32_t addr_incr, u_int32_t q_scale,
+		       u_int32_t forw_f_code, u_int32_t back_f_code,
+		       u_int32_t horiz_forw_r, u_int32_t vert_forw_r,
+		       u_int32_t horiz_back_r, u_int32_t vert_back_r,
+		       int32 motion_forw, int32 m_horiz_forw,
+		       int32 m_vert_forw, int32 motion_back,
+		       int32 m_horiz_back, int32 m_vert_back,
+		       u_int32_t mb_pattern, u_int32_t mb_intra)
+   {int qs;
     u_int32_t mb_quant;
 
-    /* MB escape sequences if necessary. */
+/* MB escape sequences if necessary */
 
 #ifdef BLEAH
 if ( addr_incr != 1 )
@@ -11455,26 +11402,27 @@ if ( addr_incr != 1 )
 	addr_incr -= 33;
     }
 
-    /* Generate addr incr code. */
+/* generate addr incr code */
     GenMBAddrIncr(bbPtr, addr_incr);
 
-    /* Determine mb_quant  (true if change in q scale) */
-    if ((q_scale != lastQSSet) && ((mb_pattern != 0) || (mb_intra == TRUE))) {
+/* determine mb_quant  (true if change in q scale) */
+    qs = q_scale;
+    if ((qs != lastQSSet) && ((mb_pattern != 0) || (mb_intra == TRUE))) {
       mb_quant = TRUE;
       lastQSSet = q_scale;
     } else {
       mb_quant = FALSE;
     }
 
-    /* Generate mb type code. */
+/* generate mb type code. */
     GenMBType(bbPtr, pict_code_type, mb_quant, motion_forw, motion_back, mb_pattern, mb_intra);
 
-    /* MB quant. */
+/* MB quant. */
     if (mb_quant) {
 	Bitio_Write(bbPtr, q_scale, 5);
     }
-    /* Forward predictive vector stuff. */
 
+/* forward predictive vector stuff. */
     if (motion_forw) {
 	int forw_f, forw_r_size;
 
@@ -11497,8 +11445,8 @@ if ( addr_incr != 1 )
 	    Bitio_Write(bbPtr, vert_forw_r, forw_r_size);
 	}
     }
-    /* Back predicted vector stuff. */
 
+/* back predicted vector stuff. */
     if (motion_back) {
 	int back_f, back_r_size;
 
@@ -11523,8 +11471,8 @@ if ( addr_incr != 1 )
 	    Bitio_Write(bbPtr, vert_back_r, back_r_size);
 	}
     }
-    /* MB pattern. */
 
+/* MB pattern. */
     if (mb_pattern) {
 	GenBlockPattern(bbPtr, mb_pattern);
     }
@@ -11778,35 +11726,23 @@ GenMBAddrIncr(bbPtr, addr_incr)
  * SIDE EFFECTS:    none
  *
  *===========================================================================*/
-static void
-GenPictHead(bbPtr, temp_ref, code_type, vbv_delay, full_pel_forw_flag,
-	    forw_f_code, full_pel_back_flag, back_f_code, extra_info,
-	    extra_info_size, ext_data, ext_data_size, user_data,
-	    user_data_size)
-    BitBucket *bbPtr;
-    u_int32_t temp_ref;
-    u_int32_t code_type;
-    u_int32_t vbv_delay;
-    int32 full_pel_forw_flag;
-    u_int32_t forw_f_code;
-    int32 full_pel_back_flag;
-    u_int32_t back_f_code;
-    u_int8_t *extra_info;
-    u_int32_t extra_info_size;
-    u_int8_t *ext_data;
-    u_int32_t ext_data_size;
-    u_int8_t *user_data;
-    u_int32_t user_data_size;
-{
-    int i;
 
-    /* Write picture start code. */
+static void GenPictHead(BitBucket *bbPtr, u_int32_t temp_ref,
+			u_int32_t code_type, u_int32_t vbv_delay,
+			int32 full_pel_forw_flag, u_int32_t forw_f_code,
+			int32 full_pel_back_flag, u_int32_t back_f_code,
+			u_int8_t *extra_info, u_int32_t extra_info_size,
+			u_int8_t *ext_data, u_int32_t ext_data_size,
+			u_int8_t *user_data, u_int32_t user_data_size)
+   {u_int32_t i;
+
+/* write picture start code */
     Bitio_Write(bbPtr, PICT_START_CODE, 32);
 
-    /* Temp reference. */
+/* temp reference */
     Bitio_Write(bbPtr, temp_ref, 10);
 
-    /* Code_type. */
+/* code_type */
     if (code_type == 0) {
 	code_type = 1;
     }
@@ -11844,8 +11780,8 @@ GenPictHead(bbPtr, temp_ref, code_type, vbv_delay, full_pel_forw_flag,
 
 	Bitio_Write(bbPtr, back_f_code, 3);
     }
-    /* Extra bit picture info. */
 
+/* extra bit picture info. */
     if (extra_info != NULL) {
 	for (i = 0; i < extra_info_size; i++) {
 	    Bitio_Write(bbPtr, 0x01, 1);
@@ -12188,7 +12124,7 @@ void SetBitRateFileName(char *fileName)
 int32 GenMPEGStream(int whgop, int frameStart, int frameEnd,
 		    int32 *qtab, int32 *niqtab, int nfr,
 		    FILE *ofp, char *outfnm)
-   {
+   {int nr;
     int i, firstFrame, lastFrame, inputFrameBits;
     int32 bitstreamMode;
     long nbt;
@@ -12515,7 +12451,8 @@ int32 GenMPEGStream(int whgop, int frameStart, int frameEnd,
 			 userDataSize = 0;
 			 goto write;};
 
-		     if (io_read(userData, 1, userDataSize, fp) != userDataSize)
+		     nr = io_read(userData, 1, userDataSize, fp);
+		     if (nr != userDataSize)
 		        {io_printf(stderr,
 				   "Could not read %d bytes from userdata file-%s.\n",
 				   userDataSize, userDataFileName);
@@ -13466,14 +13403,11 @@ ShowRemainingTime()
 }
 
 
-void
-ReadDecodedRefFrame(frame, frameNumber)
-    MpegFrame *frame;
-    int frameNumber;
-{
+void ReadDecodedRefFrame(MpegFrame *frame, int frameNumber)
+   {int nr;
+    int	width, height;
     FILE    *fpointer;
     char    fileName[256];
-    int	width, height;
     register int y;
 
     width = Fsize_x;
@@ -13495,19 +13429,22 @@ ReadDecodedRefFrame(frame, frameNumber)
     Frame_AllocDecoded(frame, TRUE);
     
     for ( y = 0; y < height; y++ ) {
-      if (io_read(frame->decoded_y[y], 1, width, fpointer) != width) {
+      nr = io_read(frame->decoded_y[y], 1, width, fpointer);
+      if (nr != width) {
 	io_printf(stderr, "Could not read enough bytes from %s\n", fileName);
       }
     }
     
     for (y = 0; y < (height >> 1); y++) {			/* U */
-      if (io_read(frame->decoded_cb[y], 1, width >> 1, fpointer) != (width>>1)) {
+      nr = io_read(frame->decoded_cb[y], 1, width >> 1, fpointer);
+      if (nr != (width>>1)) {
 	io_printf(stderr, "Could not read enough bytes from %s\n", fileName);
       }
     }
     
     for (y = 0; y < (height >> 1); y++) {			/* V */
-      if (io_read(frame->decoded_cr[y], 1, width >> 1, fpointer) != (width>>1)) {
+      nr = io_read(frame->decoded_cr[y], 1, width >> 1, fpointer);
+      if (nr != (width>>1)) {
 	io_printf(stderr, "Could not read enough bytes from %s\n", fileName);
       }
     }
@@ -13516,8 +13453,7 @@ ReadDecodedRefFrame(frame, frameNumber)
 }
 
 
-static void
-OpenBitRateFile()
+static void OpenBitRateFile(void)
 {
     bitRateFile = _PG_fopen(bitRateFileName, "w");
     if ( bitRateFile == NULL ) {

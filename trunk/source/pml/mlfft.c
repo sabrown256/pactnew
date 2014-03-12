@@ -293,9 +293,8 @@ static int _PM_fft_sc_real_hsp(double *f, int n, int sgn)
  */
 
 int PM_fft_sc_complex(complex *x, int n, int flag)
-   {int m, mmax, istep;
+   {int i, j, m, mmax, istep;
     complex temp, w, dw;
-    unsigned int i, j;
     double nrm, dth, th0;
 
     m = PM_next_exp_two(n);

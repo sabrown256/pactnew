@@ -486,7 +486,7 @@ static int _NAC_close(PDBfile *file)
 /* _NAC_OPEN - open an existing NAC File */
 
 static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
-   {int numdir, numatt, numdim;
+   {int nr, numdir, numatt, numdim;
     long tptlen, tptaddr, dftaddr, dftlen, ntaddr, ntlen;
     long dtaddr, dtlen, aftaddr, aftlen, ataddr, atlen;
     long dmftaddr, dmftlen, dmaddr, dmlen;
@@ -544,7 +544,8 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	if (lio_seek(fp, tptaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND TABLE POINTER TABLE - _NAC_OPEN", PD_OPEN);
 
-	if (lio_read(bf, CRAY_BYTES_WORD, tptlen, fp) != tptlen)
+	nr = lio_read(bf, CRAY_BYTES_WORD, tptlen, fp);
+	if (nr != tptlen)
 	   PD_error("FAILED TO READ TABLE POINTER TABLE - _NAC_OPEN", PD_OPEN);
 
 	_PD_conv_in(file, tp, bf, SC_LONG_S, (long) tptlen);
@@ -558,7 +559,8 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	if (lio_seek(fp, dftaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND DIRECTORY FIELD TABLE - _NAC_OPEN", PD_OPEN);
 
-	if (lio_read(idf, CRAY_BYTES_WORD, dftlen, fp) != dftlen)
+	nr = lio_read(idf, CRAY_BYTES_WORD, dftlen, fp);
+	if (nr != dftlen)
 	   PD_error("FAILED TO READ DIRECTORY FIELD TABLE - _NAC_OPEN", PD_OPEN);
 
 /* get the directory table */
@@ -569,7 +571,8 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	if (lio_seek(fp, dtaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND DIRECTORY TABLE - _NAC_OPEN", PD_OPEN);
 
-	if (lio_read(ifd, CRAY_BYTES_WORD, dtlen, fp) != dtlen)
+	nr = lio_read(ifd, CRAY_BYTES_WORD, dtlen, fp);
+	if (nr != dtlen)
 	   PD_error("FAILED TO READ DIRECTORY TABLE - _NAC_OPEN", PD_OPEN);
 
 /* get the attribute field table */
@@ -580,7 +583,8 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	if (lio_seek(fp, aftaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND ATTRIBUTE FIELD TABLE - _NAC_OPEN", PD_OPEN);
 
-	if (lio_read(iaf, CRAY_BYTES_WORD, aftlen, fp) != aftlen)
+	nr = lio_read(iaf, CRAY_BYTES_WORD, aftlen, fp);
+	if (nr != aftlen)
 	   PD_error("FAILED TO READ ATTRIBUTE FIELD TABLE - _NAC_OPEN", PD_OPEN);
 
 /* get the attribute table */
@@ -591,7 +595,8 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	if (lio_seek(fp, ataddr, SEEK_SET))
 	   PD_error("FAILED TO FIND ATTRIBUTE TABLE - _NAC_OPEN", PD_OPEN);
 
-	if (lio_read(ifa, CRAY_BYTES_WORD, atlen, fp) != atlen)
+	nr = lio_read(ifa, CRAY_BYTES_WORD, atlen, fp);
+	if (nr != atlen)
 	   PD_error("FAILED TO READ ATTRIBUTE TABLE - _NAC_OPEN", PD_OPEN);
 
 	ofd = _NAC_unpack_table(file, idf, ifd, dftlen, dtlen, &numdir);
@@ -605,7 +610,8 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	if (lio_seek(fp, dmftaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND DIMENSIONALITY FIELD TABLE - _NAC_OPEN", PD_OPEN);
 
-	if (lio_read(idmf, CRAY_BYTES_WORD, dmftlen, fp) != dmftlen)
+	nr = lio_read(idmf, CRAY_BYTES_WORD, dmftlen, fp);
+	if (nr != dmftlen)
 	   PD_error("FAILED TO READ DIMENSIONALITY FIELD TABLE - _NAC_OPEN", PD_OPEN);
 
 /* get the dimensionality table if there is one */
@@ -617,7 +623,8 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	    if (lio_seek(fp, dmaddr, SEEK_SET))
 	       PD_error("FAILED TO FIND DIMENSIONALITY TABLE - _NAC_OPEN", PD_OPEN);
 
-	    if (lio_read(ifdm, CRAY_BYTES_WORD, dmlen, fp) != dmlen)
+	    nr = lio_read(ifdm, CRAY_BYTES_WORD, dmlen, fp);
+	    if (nr != dmlen)
 	       PD_error("FAILED TO READ DIMENSIONALITY TABLE - _NAC_OPEN", PD_OPEN);
 	    ofm = _NAC_unpack_table(file, idmf, ifdm, dmftlen, dmlen, &numdim);};
 
@@ -630,7 +637,8 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	    if (lio_seek(fp, ntaddr, SEEK_SET))
 	       PD_error("FAILED TO FIND NAME TABLE - _NAC_OPEN", PD_OPEN);
 
-	    if (lio_read(names, 1, ntlen, fp) != ntlen)
+	    nr = lio_read(names, 1, ntlen, fp);
+	    if (nr != ntlen)
 	       PD_error("FAILED TO READ NAME TABLE - _NAC_OPEN", PD_OPEN);
 
 	    _NAC_build_name_table(file, names, ofd, ofa, ofm, tp[6],
