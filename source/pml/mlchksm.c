@@ -370,8 +370,7 @@ static void _PM_md5_final(unsigned char *dig, PM_MD5_CTX *mc)
  
 void PM_md5_checksum_array(void *arr, u_int64_t ni, u_int64_t bpi,
 			   unsigned char *dig)
-   {int64_t sz, ln;
-    u_int64_t ib, nb;
+   {u_int64_t ib, nb, sz, ln;
     unsigned char *p;
     PM_MD5_CTX mc;
     

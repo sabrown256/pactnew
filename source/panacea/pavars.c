@@ -91,8 +91,9 @@ void PA_sub_select(PA_variable *pp, C_array *arr, long *pitems,
 void PA_general_select(PA_variable *pp, C_array *arr, unsigned long *pitems,
 		       unsigned long *pdims, unsigned long *poffs,
 		       unsigned long *pstr, unsigned long *pmax)
-   {unsigned long i, n;
-    unsigned long size, partst, offset, dims, nd;
+   {long nd;
+    unsigned long i, n;
+    unsigned long size, partst, offset, dims;
     PA_set_index *dmap;
     PA_dimens *pv;
 
