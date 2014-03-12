@@ -912,7 +912,7 @@ char *_SC_format_loc(char *d, int nc, SC_srcloc *loc, int sf, int tail)
        snprintf(d, nc, "%s(%s:%d)", loc->pfunc, t, loc->line);
 
     else if (loc->pfunc != NULL)
-       {if (loc->line != -1)
+       {if (loc->line != (unsigned int) -1)
 	   snprintf(d, nc, "%s (%d)", loc->pfunc, loc->line);
 	else
 	   SC_strncpy(d, nc, (char *) loc->pfunc, -1);}
