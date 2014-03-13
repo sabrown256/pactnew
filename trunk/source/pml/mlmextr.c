@@ -166,7 +166,7 @@ static void _PM_load_hier_tridi(PM_sp_lin_sys *axb, int i, int na,
 				double **x, int n, double *av,
 				int *unt, int *str)
    {int im, j, k, m, io, ih, ihm, jo, no, nr;
-    double lij, y0;
+    double lij, ya;
     double *px, *py, *pb;
 
     im = i - 1;
@@ -181,7 +181,7 @@ static void _PM_load_hier_tridi(PM_sp_lin_sys *axb, int i, int na,
 	 py = axb->x[k];
 
 	 m  = PM_element(n_map, i, ih+1);
-	 y0 = (m >= 0) ? px[m] : 0.0;
+	 ya = (m >= 0) ? px[m] : 0.0;
 
 	 lij = 0.0;
 	 jo  = 0;
@@ -193,7 +193,7 @@ static void _PM_load_hier_tridi(PM_sp_lin_sys *axb, int i, int na,
 		  if (jo == no)
 		     {ihm = (ih << 1) - j;
 		      m   = PM_element(n_map, i, ihm+1);
-		      y0  = 2.0*y0 - px[m];};}
+		      ya  = 2.0*ya - px[m];};}
 
 /* sum up the contributions from the known points for the RHS */
 	      else
@@ -202,7 +202,7 @@ static void _PM_load_hier_tridi(PM_sp_lin_sys *axb, int i, int na,
 		     lij -= (av[j]*px[m]);};};
 
 	 pb[im] = lij;
-         py[im] = y0;};
+         py[im] = ya;};
 
 /* place the contributions to A */
     m  = 0;

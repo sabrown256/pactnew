@@ -303,7 +303,7 @@ static int _PM_fit_neg(PM_side *base, double a, double b, double c)
 
 static int _PM_fit_curve(PM_side *base)
    {double axx, ayy, axy, ax, ay;
-    double x1, y1, x2, y2;
+    double x1[2], x2[2];
     double apxx, apyy, apxy, apy;
     double s, ssq, ct, ctsq, st, stsq;
     double a, b, c;
@@ -311,11 +311,11 @@ static int _PM_fit_curve(PM_side *base)
     double ts2, ts3, ts4, ts5, ts6, ts7, ts8;
     PM_conic_curve *cur;
 
-    x1 = base->x;
-    y1 = base->y;
-    x2 = base->next->x;
-    y2 = base->next->y;
-    cur = base->crve;
+    x1[0] = base->x;
+    x1[1] = base->y;
+    x2[0] = base->next->x;
+    x2[1] = base->next->y;
+    cur   = base->crve;
 
 /*
  * shift so that (x1, y1) is at (0, 0) 
@@ -323,13 +323,13 @@ static int _PM_fit_curve(PM_side *base)
  * rescale so that (x2, y2) is at (1, 0)
  *
  */
-    ssq = (y1-y2)*(y1-y2)+(x1-x2)*(x1-x2);
-    s = sqrt(ssq);
+    ssq = (x1[1]-x2[1])*(x1[1]-x2[1])+(x1[0]-x2[0])*(x1[0]-x2[0]);
+    s   = sqrt(ssq);
     base->scale = s;
 
-    ct = (x2-x1)/s;
+    ct   = (x2[0]-x1[0])/s;
     ctsq = ct*ct;
-    st = (y2-y1)/s;
+    st   = (x2[1]-x1[1])/s;
     stsq = st*st;
     base->cosine = ct;
     base->sine = st;
@@ -338,14 +338,14 @@ static int _PM_fit_curve(PM_side *base)
     axx = cur->xx;
     axy = cur->xy;
     ayy = cur->yy;
-    ax = cur->x;
-    ay = cur->y;
+    ax  = cur->x;
+    ay  = cur->y;
 
     apyy = ssq*(axx*stsq-axy*ct*st+ayy*ctsq);
     apxy = ssq*(-axy*stsq+(2*ayy-2*axx)*ct*st+axy*ctsq);
     apxx = ssq*(ayy*stsq+axy*ct*st+axx*ctsq);
-    apy = s*((2*ayy*ct-axy*st)*y1+(axy*ct-2*axx*st)*x1-ax*st+ay*ct);
-/*    apx = s*((2*ayy*st+axy*ct)*y1+(axy*st+2*axx*ct)*x1+ay*st+ax*ct); */
+    apy  = s*((2*ayy*ct-axy*st)*x1[1]+(axy*ct-2*axx*st)*x1[0]-ax*st+ay*ct);
+/*    apx  = s*((2*ayy*st+axy*ct)*x1[1]+(axy*st+2*axx*ct)*x1[0]+ay*st+ax*ct); */
 
 /* case checking on types of equations */
     if (apyy != 0.0)
@@ -403,24 +403,26 @@ static int _PM_fit_curve(PM_side *base)
  */
 
 static double _PM_arc_len(PM_side *base, double x, double y)
-   {double t, x1, y1, c0, c1, c2, c3;
-    double s, ct, st;
+   {double t, x1[2], c0, c1, c2, c3;
+    double s, ct, st, rv;
 
     c0 = base->c0;
     c1 = base->c1;
     c2 = base->c2;
     c3 = base->c3;
 
-    x1 = base->x;
-    y1 = base->y;
+    x1[0] = base->x;
+    x1[1] = base->y;
 
     s  = base->scale;
     ct = base->cosine;
     st = base->sine;
 
-    t = ((x-x1)*ct - (y-y1)*st)/s;
+    t = ((x-x1[0])*ct - (y-x1[1])*st)/s;
 
-    return(t*(c0+t*(c1+t*(c2+t*c3))));}
+    rv = t*(c0 + t*(c1 + t*(c2 + t*c3)));
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -477,29 +479,29 @@ static int _PM_chck_curves(PM_part *ipart, hasharr *curves)
    {PM_conic_curve *cp;
     PM_side *ib;
     char *s;
-    double x1, y1, x2, y2, dx, dy, ax, ay, ac;
+    double x1[2], x2[2], dx[2], ax[2], ac;
 
     for (ib = ipart->leg; TRUE; )
         {if (ib->crve == NULL)
-            {x1 = ib->x;
-             y1 = ib->y;
-             x2 = ib->next->x;
-             y2 = ib->next->y;
-             dx = x2 - x1;
-             dy = y2 - y1;
-             if (dx == 0.0)
-                {ay = 0.0;
-                 ax = 1.0;
-                 ac = -(ib->x);}
+            {x1[0] = ib->x;
+             x1[1] = ib->y;
+             x2[0] = ib->next->x;
+             x2[1] = ib->next->y;
+             dx[0] = x2[0] - x1[0];
+             dx[1] = x2[1] - x1[1];
+             if (dx[0] == 0.0)
+                {ax[1] = 0.0;
+                 ax[0] = 1.0;
+                 ac    = -(ib->x);}
              else
-                {ay = 1.0;
-                 ax = dy/dx;
-                 ac = -y1 + ax*x1;};
+                {ax[1] = 1.0;
+                 ax[0] = dx[1]/dx[0];
+                 ac    = -x1[1] + ax[0]*x1[0];};
 
-             cp = _PM_exist_cp(0.0, 0.0, 0.0, ax, ay, ac, curves);
+             cp = _PM_exist_cp(0.0, 0.0, 0.0, ax[0], ax[1], ac, curves);
              if (cp == NULL)
                 {s = _PM_nxt_name();
-                 cp = PM_mk_cline(s, 0.0, 0.0, 0.0, ax, ay, ac);
+                 cp = PM_mk_cline(s, 0.0, 0.0, 0.0, ax[0], ax[1], ac);
                  SC_hasharr_install(curves, s, cp, "PM_conic_curve", 3, -1);};
              ib->crve = cp;};
 
@@ -749,8 +751,7 @@ static int _PM_cross_cp(PM_side *basea, PM_side *baseb)
 
 static int _PM_match(PM_part *parta, PM_part *partb,
 		     PM_side *basea, PM_side *baseb)
-   {double x1, x2, x3, x4;
-    double y1, y2, y3, y4;
+   {double x1[2], x2[2], x3[2], x4[2];
     double t, s;
     PM_conic_curve *curvea, *curveb;
 
@@ -763,54 +764,54 @@ static int _PM_match(PM_part *parta, PM_part *partb,
     curvea = basea->crve;
     curveb = baseb->crve;
 
-    x1 = basea->x;
-    y1 = basea->y;
-    x2 = basea->next->x;
-    y2 = basea->next->y;
-    x3 = baseb->x;
-    y3 = baseb->y;
-    x4 = baseb->next->x;
-    y4 = baseb->next->y;
+    x1[0] = basea->x;
+    x1[1] = basea->y;
+    x2[0] = basea->next->x;
+    x2[1] = basea->next->y;
+    x3[0] = baseb->x;
+    x3[1] = baseb->y;
+    x4[0] = baseb->next->x;
+    x4[1] = baseb->next->y;
 
     if (_PM_same_cp(curvea, curveb))
-       {if (SAME(x2, y2, x3, y3) && SAME(x1, y1, x4, y4))
+       {if (SAME(x2[0], x2[1], x3[0], x3[1]) && SAME(x1[0], x1[1], x4[0], x4[1]))
            {MATCH_SIDE(basea, baseb);
             return(TRUE);};
 
-        s = _PM_wherein(basea, x3, y3);
-        t = _PM_wherein(basea, x4, y4);
+        s = _PM_wherein(basea, x3[0], x3[1]);
+        t = _PM_wherein(basea, x4[0], x4[1]);
 
 /* case (  I) 1-4-2-3 */
         if ((-1.0e-10 <= t) && (t <= 0.9999999999) && (0.9999999999 < s))
            {CHCK_ORIENT;
-            _PM_split_side(parta, basea, x4, y4);
-            _PM_split_side(partb, baseb, x2, y2);
+            _PM_split_side(parta, basea, x4[0], x4[1]);
+            _PM_split_side(partb, baseb, x2[0], x2[1]);
             _PM_match_int(INTERSECT, basea, baseb);
-            if (!SAME(x1, y1, x4, y4))
+            if (!SAME(x1[0], x1[1], x4[0], x4[1]))
                ADVANCE(basea);
-            if (!SAME(x2, y2, x3, y3))
+            if (!SAME(x2[0], x2[1], x3[0], x3[1]))
                ADVANCE(baseb);
             MATCH_SIDE(basea, baseb);}
 
 /* case ( II) 4-1-3-2 */
         else if ((t < 1.0e-10) && (1.0e-10 <= s) && (s <= 1.0000000001))
            {CHCK_ORIENT;
-            _PM_split_side(parta, basea, x3, y3);
-            _PM_split_side(partb, baseb, x1, y1);
+            _PM_split_side(parta, basea, x3[0], x3[1]);
+            _PM_split_side(partb, baseb, x1[0], x1[1]);
             _PM_match_int(INTERSECT, baseb, basea);
             MATCH_SIDE(basea, baseb);
-            if (!SAME(x1, y1, x4, y4))
+            if (!SAME(x1[0], x1[1], x4[0], x4[1]))
                ADVANCE(basea);
-            if (!SAME(x2, y2, x3, y3))
+            if (!SAME(x2[0], x2[1], x3[0], x3[1]))
                ADVANCE(baseb);}
 
 /* case (III) 1-4-3-2 */
         else if ((1.0e-10 <= t) && (t <= 0.9999999999) &&
                  (1.0e-10 <= s) && (s <= 0.9999999999))
            {CHCK_ORIENT;
-            _PM_split_side(parta, basea, x4, y4);
+            _PM_split_side(parta, basea, x4[0], x4[1]);
             ADVANCE(basea);
-            _PM_split_side(parta, basea, x3, y3);
+            _PM_split_side(parta, basea, x3[0], x3[1]);
             _PM_match_int(CONTAINED, baseb, basea);
             MATCH_SIDE(basea, baseb);
             ADVANCE(basea);}
@@ -818,9 +819,9 @@ static int _PM_match(PM_part *parta, PM_part *partb,
 /* case ( IV) 4-1-2-3 */
         else if ((-1.0e-10 > t) && (1.0000000001 < s))
            {CHCK_ORIENT;
-            _PM_split_side(partb, baseb, x2, y2);
+            _PM_split_side(partb, baseb, x2[0], x2[1]);
             ADVANCE(baseb);
-            _PM_split_side(partb, baseb, x1, y1);
+            _PM_split_side(partb, baseb, x1[0], x1[1]);
             _PM_match_int(CONTAINED, basea, baseb);
             MATCH_SIDE(basea, baseb);
             ADVANCE(baseb);};
@@ -1219,33 +1220,33 @@ static void _PM_find_points(double *xp, double *yp, PM_mesh *mesh,
 			    int m, double t, double *f, int *indx, int n,
 			    PM_conic_curve *crv)
    {int i, j, l;
-    double p, ps, ds, x1, x2, y1, y2, dx, dy, rt;
+    double p, ps, ds, x1[2], x2[2], dx[2], rt;
     double *rx, *ry;
 
     rx = mesh->rx;
     ry = mesh->ry;
 
     ps = 0;
-    x1 = xp[0];
-    y1 = yp[0];
+    x1[0] = xp[0];
+    x1[1] = yp[0];
     l  = 1;
     for (i = 0; i < n; i++)
         {j = indx[i];
          p = f[i]*t;
          for (; l < m; l++)
-             {x2 = xp[l];
-              y2 = yp[l];
-              dx = x2 - x1;
-              dy = y2 - y1;
-              ds = sqrt(dx*dx + dy*dy);
+             {x2[0] = xp[l];
+              x2[1] = yp[l];
+              dx[0] = x2[0] - x1[0];
+              dx[1] = x2[1] - x1[1];
+              ds = sqrt(dx[0]*dx[0] + dx[1]*dx[1]);
               if ((ps <= p) && (p <= (ps+ds)))
                  {rt    = (p - ps)/ds;
-                  rx[j] = x1 + rt*(x2 - x1);
-                  ry[j] = y1 + rt*(y2 - y1);
+                  rx[j] = x1[0] + rt*(x2[0] - x1[0]);
+                  ry[j] = x1[1] + rt*(x2[1] - x1[1]);
                   break;};
               ps += ds;
-              x1  = x2;
-              y1  = y2;};};
+              x1[0]  = x2[0];
+              x1[1]  = x2[1];};};
 
     return;}
 
@@ -1258,8 +1259,8 @@ static void _PM_find_points(double *xp, double *yp, PM_mesh *mesh,
  *                    - the requested points
  */
 
-static void _PM_compute_points(PM_mesh *mesh, double x1, double y1,
-			       double x2, double y2, double *f,
+static void _PM_compute_points(PM_mesh *mesh, double px1, double py1,
+			       double px2, double py2, double *f,
 			       int *indx, int n, int dir,
 			       PM_conic_curve *crv)
    {int i, j, m;
@@ -1281,8 +1282,8 @@ static void _PM_compute_points(PM_mesh *mesh, double x1, double y1,
     if ((axx == 0.0) && (ayy == 0.0) && (axy == 0.0))
        {for (i = 0; i < n; i++)
             {j     = indx[i];
-             rx[j] = x1 + f[i]*(x2 - x1);
-             ry[j] = y1 + f[i]*(y2 - y1);};}
+             rx[j] = px1 + f[i]*(px2 - px1);
+             ry[j] = py1 + f[i]*(py2 - py1);};}
     else
        {m  = 40*n;
         xp = CMAKE_N(double, m);
@@ -1296,8 +1297,8 @@ static void _PM_compute_points(PM_mesh *mesh, double x1, double y1,
         iax = 1.0/axx;
         iay = 1.0/ayy;
 
-        x = x1;
-        y = y1;
+        x = px1;
+        y = py1;
         t = 0.0;
         for (i = 0; i < m; i++)
             {ty = 2.0*axx*x + axy*y + ax;
@@ -1342,8 +1343,8 @@ static void _PM_compute_points(PM_mesh *mesh, double x1, double y1,
                      cy = (axx*x + ax)*x + ac;
                      y  = -cy/by;};};
 
-             tx  = x - x2;
-             ty  = y - y2;
+             tx  = x - px2;
+             ty  = y - py2;
              dsa = sqrt(tx*tx + ty*ty);
 
              tx = x - xp[i];
@@ -1351,12 +1352,12 @@ static void _PM_compute_points(PM_mesh *mesh, double x1, double y1,
              ds = sqrt(tx*tx + ty*ty);
 
              if (dsa <= ds)
-                {tx  = xp[i] - x2;
-                 ty  = yp[i] - y2;
+                {tx  = xp[i] - px2;
+                 ty  = yp[i] - py2;
                  dsa = sqrt(tx*tx + ty*ty);
                  i++;
-                 xp[i] = x2;
-                 yp[i] = y2;
+                 xp[i] = px2;
+                 yp[i] = py2;
                  t    += dsa;
                  break;};
                 

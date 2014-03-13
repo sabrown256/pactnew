@@ -351,8 +351,7 @@ static void *_PG_fill_chunk_zc_lr(void *arg)
     int *maxes, *glyph;
     double wc[PG_BOXSZ];
     double rx[5], ry[5], *vl;
-    double *x1, *x2, *x3, *x4;
-    double *y1, *y2, *y3, *y4;
+    double *x1[2], *x2[2], *x3[2], *x4[2];
     double **a, *x, *y, *aext;
     char *emap;
     void *cnnct, *rv;
@@ -386,8 +385,8 @@ static void *_PG_fill_chunk_zc_lr(void *arg)
 
     emap = PM_check_emap(&eflag, alist, nmap);
 
-    PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
-    PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);
+    PM_LOGICAL_ZONE(x, x1[0], x2[0], x3[0], x4[0], kmax);
+    PM_LOGICAL_ZONE(y, x1[1], x2[1], x3[1], x4[1], kmax);
 
     PG_get_viewspace(dev, WORLDC, wc);
 
@@ -412,21 +411,21 @@ static void *_PG_fill_chunk_zc_lr(void *arg)
 	     PG_SET_WITH_CLIP_INIT(xok, xso);
 	     PG_SET_WITH_CLIP_INIT(yok, yso);
 
-	     PG_SET_WITH_CLIP(rx[0], x1[in], xok, xso, wc[0], wc[1]);
-	     PG_SET_WITH_CLIP(ry[0], y1[in], yok, yso, wc[2], wc[3]);
+	     PG_SET_WITH_CLIP(rx[0], x1[0][in], xok, xso, wc[0], wc[1]);
+	     PG_SET_WITH_CLIP(ry[0], x1[1][in], yok, yso, wc[2], wc[3]);
 
-	     PG_SET_WITH_CLIP(rx[1], x2[in], xok, xso, wc[0], wc[1]);
-	     PG_SET_WITH_CLIP(ry[1], y2[in], yok, yso, wc[2], wc[3]);
+	     PG_SET_WITH_CLIP(rx[1], x2[0][in], xok, xso, wc[0], wc[1]);
+	     PG_SET_WITH_CLIP(ry[1], x2[1][in], yok, yso, wc[2], wc[3]);
 
-	     PG_SET_WITH_CLIP(rx[2], x3[in], xok, xso, wc[0], wc[1]);
-	     PG_SET_WITH_CLIP(ry[2], y3[in], yok, yso, wc[2], wc[3]);
+	     PG_SET_WITH_CLIP(rx[2], x3[0][in], xok, xso, wc[0], wc[1]);
+	     PG_SET_WITH_CLIP(ry[2], x3[1][in], yok, yso, wc[2], wc[3]);
 
-	     PG_SET_WITH_CLIP(rx[3], x4[in], xok, xso, wc[0], wc[1]);
-	     PG_SET_WITH_CLIP(ry[3], y4[in], yok, yso, wc[2], wc[3]);
+	     PG_SET_WITH_CLIP(rx[3], x4[0][in], xok, xso, wc[0], wc[1]);
+	     PG_SET_WITH_CLIP(ry[3], x4[1][in], yok, yso, wc[2], wc[3]);
 
 	     if (xok && yok)
-	        {rx[4] = x1[in];
-		 ry[4] = y1[in];
+	        {rx[4] = x1[0][in];
+		 ry[4] = x1[1][in];
 
 		 for (j = 0; j < nd; j++)
 		     vl[j] = a[j][iz];
@@ -460,8 +459,7 @@ void PG_fill_poly_zc_lr(PG_device *dev, int nd, double **a,
     int xok, yok, xso, yso;
     double wc[PG_BOXSZ];
     double rx[5], ry[5];
-    double *x1, *x2, *x3, *x4;
-    double *y1, *y2, *y3, *y4;
+    double *x1[2], *x2[2], *x3[2], *x4[2];
     double *r[PG_SPACEDM];
     int *maxes, kmax, lmax, eflag;
     char *emap;
@@ -485,8 +483,8 @@ void PG_fill_poly_zc_lr(PG_device *dev, int nd, double **a,
 
     emap = PM_check_emap(&eflag, alist, nmap);
 
-    PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
-    PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);
+    PM_LOGICAL_ZONE(x, x1[0], x2[0], x3[0], x4[0], kmax);
+    PM_LOGICAL_ZONE(y, x1[1], x2[1], x3[1], x4[1], kmax);
 
     PG_get_viewspace(dev, WORLDC, wc);
 
@@ -517,21 +515,21 @@ void PG_fill_poly_zc_lr(PG_device *dev, int nd, double **a,
 		 PG_SET_WITH_CLIP_INIT(xok, xso);
 		 PG_SET_WITH_CLIP_INIT(yok, yso);
 
-		 PG_SET_WITH_CLIP(rx[0], x1[in], xok, xso, wc[0], wc[1]);
-		 PG_SET_WITH_CLIP(ry[0], y1[in], yok, yso, wc[2], wc[3]);
+		 PG_SET_WITH_CLIP(rx[0], x1[0][in], xok, xso, wc[0], wc[1]);
+		 PG_SET_WITH_CLIP(ry[0], x1[1][in], yok, yso, wc[2], wc[3]);
 
-		 PG_SET_WITH_CLIP(rx[1], x2[in], xok, xso, wc[0], wc[1]);
-		 PG_SET_WITH_CLIP(ry[1], y2[in], yok, yso, wc[2], wc[3]);
+		 PG_SET_WITH_CLIP(rx[1], x2[0][in], xok, xso, wc[0], wc[1]);
+		 PG_SET_WITH_CLIP(ry[1], x2[1][in], yok, yso, wc[2], wc[3]);
 
-		 PG_SET_WITH_CLIP(rx[2], x3[in], xok, xso, wc[0], wc[1]);
-		 PG_SET_WITH_CLIP(ry[2], y3[in], yok, yso, wc[2], wc[3]);
+		 PG_SET_WITH_CLIP(rx[2], x3[0][in], xok, xso, wc[0], wc[1]);
+		 PG_SET_WITH_CLIP(ry[2], x3[1][in], yok, yso, wc[2], wc[3]);
 
-		 PG_SET_WITH_CLIP(rx[3], x4[in], xok, xso, wc[0], wc[1]);
-		 PG_SET_WITH_CLIP(ry[3], y4[in], yok, yso, wc[2], wc[3]);
+		 PG_SET_WITH_CLIP(rx[3], x4[0][in], xok, xso, wc[0], wc[1]);
+		 PG_SET_WITH_CLIP(ry[3], x4[1][in], yok, yso, wc[2], wc[3]);
 
 		 if (xok && yok)
-		    {rx[4] = x1[in];
-		     ry[4] = y1[in];
+		    {rx[4] = x1[0][in];
+		     ry[4] = x1[1][in];
 
 		     PG_draw_polyline_n(dev, 2, WORLDC, 5, r, TRUE);};};};
 
@@ -552,8 +550,7 @@ static void *_PG_fill_chunk_nc_lr(void *arg)
     int *maxes, kmax, lmax, eflag;
     double wc[PG_BOXSZ];
     double rx[5], ry[5], *vl, *at;
-    double *x1, *x2, *x3, *x4;
-    double *y1, *y2, *y3, *y4;
+    double *x1[2], *x2[2], *x3[2], *x4[2];
     double **a, *x, *y, *aext;
     char *emap;
     void *cnnct, *rv;
@@ -585,8 +582,8 @@ static void *_PG_fill_chunk_nc_lr(void *arg)
 
     emap = PM_check_emap(&eflag, alist, nmap);
 
-    PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
-    PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);
+    PM_LOGICAL_ZONE(x, x1[0], x2[0], x3[0], x4[0], kmax);
+    PM_LOGICAL_ZONE(y, x1[1], x2[1], x3[1], x4[1], kmax);
 
     PG_get_viewspace(dev, WORLDC, wc);
 
@@ -604,21 +601,21 @@ static void *_PG_fill_chunk_nc_lr(void *arg)
 	     PG_SET_WITH_CLIP_INIT(xok, xso);
 	     PG_SET_WITH_CLIP_INIT(yok, yso);
 
-	     PG_SET_WITH_CLIP(rx[0], x1[i], xok, xso, wc[0], wc[1]);
-	     PG_SET_WITH_CLIP(ry[0], y1[i], yok, yso, wc[2], wc[3]);
+	     PG_SET_WITH_CLIP(rx[0], x1[0][i], xok, xso, wc[0], wc[1]);
+	     PG_SET_WITH_CLIP(ry[0], x1[1][i], yok, yso, wc[2], wc[3]);
 
-	     PG_SET_WITH_CLIP(rx[1], x2[i], xok, xso, wc[0], wc[1]);
-	     PG_SET_WITH_CLIP(ry[1], y2[i], yok, yso, wc[2], wc[3]);
+	     PG_SET_WITH_CLIP(rx[1], x2[0][i], xok, xso, wc[0], wc[1]);
+	     PG_SET_WITH_CLIP(ry[1], x2[1][i], yok, yso, wc[2], wc[3]);
 
-	     PG_SET_WITH_CLIP(rx[2], x3[i], xok, xso, wc[0], wc[1]);
-	     PG_SET_WITH_CLIP(ry[2], y3[i], yok, yso, wc[2], wc[3]);
+	     PG_SET_WITH_CLIP(rx[2], x3[0][i], xok, xso, wc[0], wc[1]);
+	     PG_SET_WITH_CLIP(ry[2], x3[1][i], yok, yso, wc[2], wc[3]);
 
-	     PG_SET_WITH_CLIP(rx[3], x4[i], xok, xso, wc[0], wc[1]);
-	     PG_SET_WITH_CLIP(ry[3], y4[i], yok, yso, wc[2], wc[3]);
+	     PG_SET_WITH_CLIP(rx[3], x4[0][i], xok, xso, wc[0], wc[1]);
+	     PG_SET_WITH_CLIP(ry[3], x4[1][i], yok, yso, wc[2], wc[3]);
 
 	     if (xok && yok)
-	        {rx[4] = x1[i];
-		 ry[4] = y1[i];
+	        {rx[4] = x1[0][i];
+		 ry[4] = x1[1][i];
 
 		 for (j = 0; j < nd; j++)
 		     {at    = a[j];
@@ -650,8 +647,7 @@ void PG_fill_poly_nc_lr(PG_device *dev, int nd, double **a,
     int *maxes, kmax, lmax, eflag;
     double wc[PG_BOXSZ];
     double rx[5], ry[5];
-    double *x1, *x2, *x3, *x4;
-    double *y1, *y2, *y3, *y4;
+    double *x1[2], *x2[2], *x3[2], *x4[2];
     double *r[PG_SPACEDM];
     char *emap;
     PG_poly_fill_data par;
@@ -672,8 +668,8 @@ void PG_fill_poly_nc_lr(PG_device *dev, int nd, double **a,
 
     emap = PM_check_emap(&eflag, alist, nmap);
 
-    PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
-    PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);
+    PM_LOGICAL_ZONE(x, x1[0], x2[0], x3[0], x4[0], kmax);
+    PM_LOGICAL_ZONE(y, x1[1], x2[1], x3[1], x4[1], kmax);
 
     PG_get_viewspace(dev, WORLDC, wc);
 
@@ -703,21 +699,21 @@ void PG_fill_poly_nc_lr(PG_device *dev, int nd, double **a,
 		 PG_SET_WITH_CLIP_INIT(xok, xso);
 		 PG_SET_WITH_CLIP_INIT(yok, yso);
 
-		 PG_SET_WITH_CLIP(rx[0], x1[i], xok, xso, wc[0], wc[1]);
-		 PG_SET_WITH_CLIP(ry[0], y1[i], yok, yso, wc[2], wc[3]);
+		 PG_SET_WITH_CLIP(rx[0], x1[0][i], xok, xso, wc[0], wc[1]);
+		 PG_SET_WITH_CLIP(ry[0], x1[1][i], yok, yso, wc[2], wc[3]);
 
-		 PG_SET_WITH_CLIP(rx[1], x2[i], xok, xso, wc[0], wc[1]);
-		 PG_SET_WITH_CLIP(ry[1], y2[i], yok, yso, wc[2], wc[3]);
+		 PG_SET_WITH_CLIP(rx[1], x2[0][i], xok, xso, wc[0], wc[1]);
+		 PG_SET_WITH_CLIP(ry[1], x2[1][i], yok, yso, wc[2], wc[3]);
 
-		 PG_SET_WITH_CLIP(rx[2], x3[i], xok, xso, wc[0], wc[1]);
-		 PG_SET_WITH_CLIP(ry[2], y3[i], yok, yso, wc[2], wc[3]);
+		 PG_SET_WITH_CLIP(rx[2], x3[0][i], xok, xso, wc[0], wc[1]);
+		 PG_SET_WITH_CLIP(ry[2], x3[1][i], yok, yso, wc[2], wc[3]);
 
-		 PG_SET_WITH_CLIP(rx[3], x4[i], xok, xso, wc[0], wc[1]);
-		 PG_SET_WITH_CLIP(ry[3], y4[i], yok, yso, wc[2], wc[3]);
+		 PG_SET_WITH_CLIP(rx[3], x4[0][i], xok, xso, wc[0], wc[1]);
+		 PG_SET_WITH_CLIP(ry[3], x4[1][i], yok, yso, wc[2], wc[3]);
 
 		 if (xok && yok)
-		    {rx[4] = x1[i];
-		     ry[4] = y1[i];
+		    {rx[4] = x1[0][i];
+		     ry[4] = x1[1][i];
 
 		     PG_draw_polyline_n(dev, 2, WORLDC, 5, r, TRUE);};};};
 

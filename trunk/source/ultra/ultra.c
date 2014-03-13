@@ -166,7 +166,7 @@ static void _UL_args(SS_psides *si, object *obj, void *v, int type)
  */
 
 static void _UL_expand_prefix(char *s)
-   {int flag, index;
+   {int flag, lind;
     char t[MAXLINE], token[MAXLINE];
     char *sp, *tp, *rp;
 
@@ -180,13 +180,13 @@ static void _UL_expand_prefix(char *s)
            {if ((rp = strchr(tp+2, ')')))
                *rp = '\0';
             if ((flag = SC_intstrp(tp+2, 10)))
-               index = atoi(tp+2);
+               lind = atoi(tp+2);
             if (rp)
                *rp = ')';
             if (flag && rp)
-               snprintf(token, MAXLINE, "(pre %c %d))", *tp, index);
+               snprintf(token, MAXLINE, "(pre %c %d))", *tp, lind);
             else if (flag)
-               snprintf(token, MAXLINE, "(pre %c %d)", *tp, index);
+               snprintf(token, MAXLINE, "(pre %c %d)", *tp, lind);
             else
                strcpy(token, tp);}
         else

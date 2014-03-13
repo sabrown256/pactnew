@@ -297,20 +297,20 @@ int differ_bit(int n, int k, int *fb, long *ff,
 
 int find_exp(int *fb, long *ff, unsigned char *a)
    {int i, l, nbits, sbyte, ebyte;
-    long exp;
+    long lexp;
 
     sbyte = ff[4]/8;
     ebyte = ff[5]/8;
-    exp   = 0L;
+    lexp  = 0L;
     for (i = sbyte; i <= ebyte; i++)
         {l = fb[i] - 1;
-         exp <<= 8;
-         exp |= a[l];};
+         lexp <<= 8;
+         lexp |= a[l];};
 
-    nbits = (ebyte + 1)*8 - ff[5];
-    exp >>= nbits;
+    nbits  = (ebyte + 1)*8 - ff[5];
+    lexp >>= nbits;
 
-    ff[7] = exp;
+    ff[7] = lexp;
 
     return(1);}
 

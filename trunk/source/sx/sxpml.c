@@ -401,7 +401,7 @@ static object *_SXI_num_arr_extr(SS_psides *si, object *arg)
     char *type;
     void *data;
     object *lst, *obj;
-    double fmin, fmax;
+    double fmn, fmx;
     double *d;
 
     if (!SX_NUMERIC_ARRAYP(arg))
@@ -413,7 +413,7 @@ static object *_SXI_num_arr_extr(SS_psides *si, object *arg)
 
     d = PM_array_real(type, data, n, NULL);
 
-    PM_minmax(d, n, &fmin, &fmax, &imin, &imax);
+    PM_minmax(d, n, &fmn, &fmx, &imin, &imax);
 
     CFREE(d);
 
@@ -422,9 +422,9 @@ static object *_SXI_num_arr_extr(SS_psides *si, object *arg)
     lst = SS_mk_cons(si, obj, lst);
     obj = SS_mk_integer(si, imin);
     lst = SS_mk_cons(si, obj, lst);
-    obj = SS_mk_float(si, fmax);
+    obj = SS_mk_float(si, fmx);
     lst = SS_mk_cons(si, obj, lst);
-    obj = SS_mk_float(si, fmin);
+    obj = SS_mk_float(si, fmn);
     lst = SS_mk_cons(si, obj, lst);
 
     return(lst);}
@@ -1568,7 +1568,7 @@ object *SX_mk_C_array(SS_psides *si, C_array *arr)
 
 PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
 		     int n_nodes, int n_zones, int *zones)
-   {int iz, j, j1, j2, incr;
+   {int iz, j, ja, jb, incr;
     int n_sides, *nc, *nbp, *pzone;
     double **elem;
     PM_set *s;
@@ -1609,10 +1609,10 @@ PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
          while (pzone[incr] != -1)
             incr++;
          for (j = 0; j < incr; j++)
-             {j1 = j;
-	      j2 = (j + 1) % incr;
-	      pcell[BND_CELL_MIN] = pzone[j1];
-	      pcell[BND_CELL_MAX] = pzone[j2];
+             {ja = j;
+	      jb = (j + 1) % incr;
+	      pcell[BND_CELL_MIN] = pzone[ja];
+	      pcell[BND_CELL_MAX] = pzone[jb];
               pcell += 2;};
          pzone   += incr + 1;};
 

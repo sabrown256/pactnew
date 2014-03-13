@@ -183,22 +183,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_DAX - compute the volume contribution of a face of a tetrahedron
- *        - NOTE: use Green's theorem to integrate dV*div(X) - this
- *        - gives a sum of dA.X terms - (X1 x X3).(X4 - X2)
- */
-
-#define PM_DAX(a, b, c, d)                                                   \
-   PM_DAXR(x ## a, y ## a, z ## a, x ## b, y ## b, z ## b,                   \
-           x ## c, y ## c, z ## c, x ## d, y ## d, z ## d)
-
-#define PM_DAXR(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4)              \
-    0.16666666667*((z1*y3 - y1*z3)*(x4-x2) +                                 \
-		   (x1*z3 - z1*x3)*(y4-y2) +                                 \
-                   (y1*x3 - x1*y3)*(z4-z2))
-
-/*--------------------------------------------------------------------------*/
-
 #define PM_copy_point(_nd, _xd, _xs)                                         \
     {int _ld;                                                                \
      for (_ld = 0; _ld < _nd; _ld++)                                         \

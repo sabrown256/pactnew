@@ -720,7 +720,6 @@ INITLOG:
    Note $LogHost "----- SYSTEM -----"
    Note $LogHost ""
    $LOAD_AVE >>& $LogHost
-   endif
 
    set TmpFile = ~/.do-local-tmp-$hsy_uhost-$$
    $RM $TmpFile

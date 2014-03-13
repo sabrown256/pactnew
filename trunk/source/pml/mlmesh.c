@@ -679,7 +679,7 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
 			  double ask, double xsk, double aek, double xek,
 			  double asl, double xsl, double ael, double xel,
 			  int constr)
-   {int j, j0, k, l;
+   {int j, ja, k, l;
     int kbnd, lbnd, nz;
     double u, dk, dl, dkl;
     double *x1, *x2, *x3, *x4, *s, *t;
@@ -732,7 +732,7 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
 
     vecset4(lra, x1, x2, x3, x4);
     for (l = lmn+1; l <= lmx; l++)
-        {j0 = NODE_OF(kmx, l, kbnd);
+        {ja = NODE_OF(kmx, l, kbnd);
 
          if (constr)
 
@@ -758,7 +758,7 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
 
          for (k = kmn+1; k <= kmx; k++)
              {j      = NODE_OF(k, l, kbnd);
-              apl[j] = 0.5*(s[j] + t[j]) + apl[j0];};};
+              apl[j] = 0.5*(s[j] + t[j]) + apl[ja];};};
 
 /* compute apk */
     PM_array_set(s, nz, 0.0);
@@ -766,7 +766,7 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
 
     vecset4(kra, x1, x2, x3, x4);
     for (k = kmn+1; k <= kmx; k++)
-        {j0 = NODE_OF(k, lmx, kbnd);
+        {ja = NODE_OF(k, lmx, kbnd);
 
          if (constr)
 
@@ -792,7 +792,7 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
 
          for (l = lmn+1; l <= lmx; l++)
              {j   = NODE_OF(k, l, kbnd);
-              apk[j] = 0.5*(s[j] + t[j]) + apk[j0];};};
+              apk[j] = 0.5*(s[j] + t[j]) + apk[ja];};};
 
     CFREE(s);
     CFREE(t);

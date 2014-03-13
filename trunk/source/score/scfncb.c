@@ -109,17 +109,17 @@ double _SC_mem_real(char *s, int n, char *delim)
  *             - to seconds
  */
 
-int _SC_ps_time(char *time)
+int _SC_ps_time(char *ltim)
    {int n, day, hr, mn, sec;
     int in[3];
     char sp[MAXLINE];
     char *t, *p;
 
     sec = 0;
-    if (time != NULL)
+    if (ltim != NULL)
        {memset(in, 0, sizeof(in));
 
-	strcpy(sp, time);
+	strcpy(sp, ltim);
 	t = strchr(sp, '-');
 	if (t != NULL)
 	   {*t++ = '0';

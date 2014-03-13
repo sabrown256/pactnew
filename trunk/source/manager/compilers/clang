@@ -47,10 +47,8 @@ Tool CC {
 #
    Debug     = -g -O0 -Wall
 #   Flags    =+ -Werror
-   Flags    =+ -Wformat -Wformat-security
-   Flags    =+ -Wmultichar
-   Flags    =+ -Wpointer-arith
-   Flags    =+ -Winit-self
+   Flags    =+ -Wformat -Wformat-security -Wmultichar
+   Flags    =+ -Wpointer-arith -Winit-self
 
 # -Wextra turns on the following warning flags:
 #    -Wclobbered -Wempty-body -Wignored-qualifiers
@@ -61,31 +59,25 @@ Tool CC {
 #    or -Wall)
 #
    Flags    =+ -Wextra
-#   Flags    =+ -Wno-sign-compare
    Flags    =+ -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
    Flags    =+ -Wno-missing-field-initializers -Wno-missing-declarations
 
 # even more warnings
-   Flags    =+ -Wno-inline
-   Flags    =+ -Wmissing-format-attribute
-   Flags    =+ -Wshadow
+   Flags    =+ -Wshadow -Wno-inline -Wparentheses -Wloop-analysis
+   Flags    =+ -Wbool-conversion -Wsizeof-array-argument
+   Flags    =+ -Wstring-conversion -Wmissing-format-attribute
    Flags    =+ -Wenum-compare
-   Flags    =+ -Wbool-conversion
-   Flags    =+ -Wloop-analysis
-   Flags    =+ -Wsizeof-array-argument
-   Flags    =+ -Wstring-conversion
-   Flags    =+ -Wparentheses
-   Flags    =+ -Wduplicate-enum
-   Flags    =+ -Wheader-guard
-   Flags    =+ -Wlogical-not-parentheses
-#   Flags    =+ -Wsuggest-attribute=noreturn -Wno-missing-format-attribute
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;
+                 3.3  >= -Wduplicate-enum ]
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;
+                 3.4  >= -Wheader-guard -Wlogical-not-parentheses ]
 
 # these would really bring the pain
 # but are not quite right for the way PACT is designed
+#   Flags    =+ -Wsuggest-attribute=noreturn
 #   Flags    =+ -Wwrite-strings
 #   Flags    =+ -Wformat-nonliteral
 #   Flags    =+ -Wno-deprecated
-#   Flags    =+ -Wno-unused-value
 
    Optimize  = -g -O2
    Version   = -v

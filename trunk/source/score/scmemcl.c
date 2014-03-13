@@ -434,14 +434,14 @@ void *_SC_realloc_nl(void *p, long ni, long bpi, void *arg)
 	       space->block.prev = space;}
 
 	else
-	   {int jo, jn, dn;
+	   {int jo, ja, dn;
 
-	    jn = _SC_bin_index(nb);
+	    ja = _SC_bin_index(nb);
 	    jo = _SC_bin_index(ob);
 	    dn = 1;
 
-	    if ((jo-dn >= jn) || (jn > jo) ||
-		(jo >= _SC_ms.n_bins) || (jn >= _SC_ms.n_bins))
+	    if ((jo-dn >= ja) || (ja > jo) ||
+		(jo >= _SC_ms.n_bins) || (ja >= _SC_ms.n_bins))
 	       {tmp = (mem_header *) _SC_prim_alloc((size_t) nbp, ph, zsp);
 		if (tmp == NULL)
 		   space = NULL;

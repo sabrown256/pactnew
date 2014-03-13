@@ -77,10 +77,8 @@ Tool CC {
 #
    Debug     = -g -O0 -Wall
 #   Flags    =+ -Werror
-   Flags    =+ -Wformat -Wformat-security
-   Flags    =+ -Wmultichar
-   Flags    =+ -Wpointer-arith
-   Flags    =+ -Winit-self
+   Flags    =+ -Wformat -Wformat-security -Wmultichar
+   Flags    =+ -Wpointer-arith -Winit-self
 
 # -Wextra turns on the following warning flags:
 #    -Wclobbered -Wempty-body -Wignored-qualifiers
@@ -95,16 +93,15 @@ Tool CC {
    Flags    =+ -Wno-missing-field-initializers -Wno-missing-declarations
 
 # even more warnings
-   Flags    =+ -Wno-inline
-   Flags    =+ -Wmissing-format-attribute
-   Flags    =+ -Wshadow
-   Flags    =+ -Wenum-compare
+   Flags    =+ -Wshadow -Wno-inline
    Flags    =+ -Wlogical-op
-#   Flags    =+ -Wsuggest-attribute=noreturn
-   Flags    =+ -Wno-suggest-attribute=format -Wno-missing-format-attribute
+   Flags    =+ -Wno-missing-format-attribute
+   Flags    =+ [ _env_  = PACT_CC_VERSION ;
+                 4.8.0 >= -Wenum-compare -Wno-suggest-attribute=format ]
 
 # these would really bring the pain
 # but are not quite right for the way PACT is designed
+#   Flags    =+ -Wsuggest-attribute=noreturn
 #   Flags    =+ -Wwrite-strings
 #   Flags    =+ -Wformat-nonliteral
 #   Flags    =+ -Wno-deprecated

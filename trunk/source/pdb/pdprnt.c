@@ -977,11 +977,11 @@ void _PD_set_digits(PDBfile *file)
    {int i, d, dig;
     int *fix_pre;
     long *f;
-    double log2;
+    double lg2;
     data_standard *std;
     precisionfp *fp_pre;
 
-    log2 = log10(2.0);
+    lg2 = log10(2.0);
 
     fix_pre = _SC.types.fix_precision;
     fp_pre  = _SC.types.fp_precision;
@@ -994,7 +994,7 @@ void _PD_set_digits(PDBfile *file)
 	    d = -std->fx[i].bpi;
 	 else
 	    d = 8*std->fx[i].bpi;
-	 fix_pre[i] = log2*d + 1;};
+	 fix_pre[i] = lg2*d + 1;};
 
     for (i = 0; i < N_PRIMITIVE_FP; i++)
         {f = std->fp[i].format;
@@ -1003,7 +1003,7 @@ void _PD_set_digits(PDBfile *file)
 	 else
 	    d = dig;
 	 fp_pre[i].tolerance = POWL(2.0L, -((long double) d));
-	 fp_pre[i].digits    = log2*d + 1;};
+	 fp_pre[i].digits    = lg2*d + 1;};
 
     return;}
 
@@ -1018,11 +1018,11 @@ void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
    {int i, nmb, da, db, dig;
     int *fix_pre;
     long *fa, *fb;
-    double log2;
+    double lg2;
     data_standard *stda, *stdb;
     precisionfp *fp_pre;
 
-    log2 = log10(2.0);
+    lg2 = log10(2.0);
 
     fix_pre = _SC.types.fix_precision;
     fp_pre  = _SC.types.fp_precision;
@@ -1041,7 +1041,7 @@ void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
 	 else
 	    db = 8*stdb->fx[i].bpi;
 	 nmb = max(da, db);
-	 fix_pre[i] = log2*nmb + 1;};
+	 fix_pre[i] = lg2*nmb + 1;};
 
     for (i = 0; i < N_PRIMITIVE_FP; i++)
         {fa  = stda->fp[i].format;
@@ -1049,7 +1049,7 @@ void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
 	 nmb = max(fa[2], fb[2]);
 	 nmb = min(nmb, dig);
 	 fp_pre[i].tolerance = POWL(2.0L, -((long double) nmb));
-	 fp_pre[i].digits    = log2*nmb + 1;};
+	 fp_pre[i].digits    = lg2*nmb + 1;};
 
     return;}
 

@@ -241,7 +241,7 @@ int PD_wrt_map_ran(PDBfile *file ARG(,,cls), char *dname,
     int rv;
     char s[MAXLINE], name[MAXLINE];
     PM_centering cent, *pcent;
-    PM_mapping *f, *link, *pm;
+    PM_mapping *f, *lnk, *pm;
     PM_set *range, *bs;
     pcons *alst;
 
@@ -261,7 +261,7 @@ int PD_wrt_map_ran(PDBfile *file ARG(,,cls), char *dname,
 /* disconnect the function pointers or undefined structs/members */
     f->range->opers = NULL;
 
-    link = f;
+    lnk = f;
     if (info != NULL)
 
 /* check for mappings to overlay */
@@ -272,8 +272,8 @@ int PD_wrt_map_ran(PDBfile *file ARG(,,cls), char *dname,
 	        break;
 
 	     else
-	        {link->next = pm;
-		 link       = pm;
+	        {lnk->next = pm;
+		 lnk       = pm;
 		 SC_mark(pm, 1);
 
 		 info = SC_rem_alist(info, name);};};
@@ -289,8 +289,8 @@ int PD_wrt_map_ran(PDBfile *file ARG(,,cls), char *dname,
 	        {pm = PM_make_mapping(name, PM_AC_S, bs, NULL,
 				      N_CENT, NULL);
 
-		 link->next = pm;
-		 link       = pm;
+		 lnk->next = pm;
+		 lnk       = pm;
 		 SC_mark(pm, 1);
 
 		 info = SC_rem_alist(info, name);};};

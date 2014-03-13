@@ -1110,7 +1110,7 @@ static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
  */
 
 static void _SC_set_io_spec(subtask *pg, int n, int id,
-			    SC_io_kind kind, char *link)
+			    SC_io_kind kind, char *lnk)
    {int fd, gid, nc, md, prm, excl;
     SC_io_device dev;
     SC_iodes ios, iod;
@@ -1125,7 +1125,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 	gid = -1;
 	dev = SC_IO_DEV_NONE;
 
-	SC_strncpy(s, MAXLINE, link, -1);
+	SC_strncpy(s, MAXLINE, lnk, -1);
 	nc  = strlen(s);
 	_SC_io_kind(&ios, s);
 	_SC_io_kind(&iod, s + nc - 1);

@@ -73,7 +73,7 @@ static void _SC_event_loop_handler(int sig)
 
 SC_evlpdes *SC_make_event_loop(PFSignal_handler sigio, PFSignal_handler sigchld,
 			       int (*ex)(int *rv, void *a),
-			       int wait, short accept, short reject)
+			       int lwait, short acc, short rej)
    {int nfd;
     SC_evlpdes *pe;
 
@@ -93,10 +93,10 @@ SC_evlpdes *SC_make_event_loop(PFSignal_handler sigio, PFSignal_handler sigchld,
     SC_array_resize(pe->faccpt, nfd, -1.0);
     SC_array_resize(pe->frejct, nfd, -1.0);
 
-    pe->wait    = wait;
+    pe->wait    = lwait;
     pe->raw     = FALSE;
-    pe->maccpt  = (accept == -1) ? (POLLIN | POLLPRI) : accept;
-    pe->mrejct  = (reject == -1) ? (POLLERR | POLLHUP | POLLNVAL) : reject;
+    pe->maccpt  = (acc == -1) ? (POLLIN | POLLPRI) : acc;
+    pe->mrejct  = (rej == -1) ? (POLLERR | POLLHUP | POLLNVAL) : rej;
     pe->exitf   = ex;
     pe->sigio   = (sigio == NULL) ? _SC_event_loop_handler : sigio;
     pe->sigchld = sigchld;
@@ -141,30 +141,30 @@ SC_evlpdes *SC_make_event_loop_current(SC_evlpdes *pe)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_EVENT_LOOP_SET_MASKS - set the value of the ACCEPT and REJECT mask for
+/* SC_EVENT_LOOP_SET_MASKS - set the value of the ACC and REJ mask for
  *                         - the given event loop descriptor
  */
 
-void SC_event_loop_set_masks(SC_evlpdes *pe, int accept, int reject)
+void SC_event_loop_set_masks(SC_evlpdes *pe, int acc, int rej)
    {
 
-    pe->maccpt = accept;
-    pe->mrejct = reject;
+    pe->maccpt = acc;
+    pe->mrejct = rej;
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_EVENT_LOOP_GET_MASKS - get the value of the ACCEPT and REJECT mask for
+/* SC_EVENT_LOOP_GET_MASKS - get the value of the ACC and REJ mask for
  *                         - the given event loop descriptor
  */
 
-void SC_event_loop_get_masks(SC_evlpdes *pe, int *paccept, int *preject)
+void SC_event_loop_get_masks(SC_evlpdes *pe, int *pacc, int *prej)
    {
 
-    *paccept = pe->maccpt;
-    *preject = pe->mrejct;
+    *pacc = pe->maccpt;
+    *prej = pe->mrejct;
 
     return;}
 
@@ -1233,30 +1233,30 @@ void SC_catch_io_interrupts(int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_SET_POLL_MASKS - set the value of the ACCEPT and REJECT mask for
+/* SC_SET_POLL_MASKS - set the value of the ACC and REJ mask for
  *                   - SC_poll_descriptors
  */
 
-void SC_set_poll_masks(int accept, int reject)
+void SC_set_poll_masks(int acc, int rej)
    {
 
-    _SC.evloop->maccpt = accept;
-    _SC.evloop->mrejct = reject;
+    _SC.evloop->maccpt = acc;
+    _SC.evloop->mrejct = rej;
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_GET_POLL_MASKS - get the value of the ACCEPT and REJECT mask for
+/* SC_GET_POLL_MASKS - get the value of the ACC and REJ mask for
  *                   - SC_poll_descriptors
  */
 
-void SC_get_poll_masks(int *paccept, int *preject)
+void SC_get_poll_masks(int *pacc, int *prej)
    {
 
-    *paccept = _SC.evloop->maccpt;
-    *preject = _SC.evloop->mrejct;
+    *pacc = _SC.evloop->maccpt;
+    *prej = _SC.evloop->mrejct;
 
     return;}
 

@@ -375,8 +375,8 @@ char *_SC_shell_no_rc_cmd(char *shell)
 int SC_exec_async(char *shell, char **cmnds, char **dirs,
 		  char *consh, char **conenv, int nc,
 		  char *lname, char *fname,
-		  int na, int show, int ignore, int log)
-   {int is, id, nd, ns, jn, st, sig;
+		  int na, int show, int ignore, int lg)
+   {int is, id, nd, ns, ja, st, sig;
     int nhst, reset, ioi;
     char *ldir[1];
     fspec *filter;
@@ -440,9 +440,9 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
 		     reset = TRUE;}
 		 
 		 else
-		    {jn = SC_launch_pool_job(cp, na, reset, shell,
+		    {ja = SC_launch_pool_job(cp, na, reset, shell,
 					     dirs[id], cmnds[is]);
-		     if (jn < 0)
+		     if (ja < 0)
 		        {LONGJMP(cp->cpu, SC_EXIT_BAD);};
 
 		     reset = FALSE;};};
@@ -455,7 +455,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
 
     st = SC_connection_pool_status(cp);
 
-    if (log == TRUE)
+    if (lg == TRUE)
        {SC_close_connection_pool(cp, -1, TRUE);
 	as->to_stdout = FALSE;}
     else

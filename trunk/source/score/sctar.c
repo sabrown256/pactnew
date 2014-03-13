@@ -108,7 +108,7 @@ static fcdes *_SC_make_tarfile(char *name, FILE *fp, hasharr *tab)
 
 /* _SC_MAKE_TAR_ENTRY - allocate and initialize a file container entry */
 
-static fcent *_SC_make_tar_entry(FILE *fp, int round,
+static fcent *_SC_make_tar_entry(FILE *fp, int rnd,
 				 char *name, char *date,
 				 char *uid, char *gid,
 				 char *size, char *mode)
@@ -117,7 +117,7 @@ static fcent *_SC_make_tar_entry(FILE *fp, int round,
     fcent *ae;
 
     sz = SC_strtol(size, &p, 8);
-    if (round == TRUE)
+    if (rnd == TRUE)
        {pos = sz + 1;
 	pos = (pos >> 1) << 1;}
     else

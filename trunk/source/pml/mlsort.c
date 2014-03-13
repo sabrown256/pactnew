@@ -15,12 +15,12 @@
 
 /* _PM_COMP - compare the values and return their relative order */
 
-static int _PM_comp(double x1, double x2)
+static int _PM_comp(double xa, double xb)
    {int rv;
 
-    if (x1 < x2)
+    if (xa < xb)
        rv = -1;
-    else if (x1 > x2)
+    else if (xa > xb)
        rv = 1;
     else
        rv = 0;
@@ -32,11 +32,11 @@ static int _PM_comp(double x1, double x2)
 
 /* _PM_EXCH - exchange two (x, y) pairs */
 
-static void _PM_exch(double *x1, double *y1, double *x2, double *y2)
+static void _PM_exch(double *xa, double *ya, double *xb, double *yb)
    {
 
-    SC_SWAP_VALUE(double, *x1, *x2);
-    SC_SWAP_VALUE(double, *y1, *y2);
+    SC_SWAP_VALUE(double, *xa, *xb);
+    SC_SWAP_VALUE(double, *ya, *yb);
 
     return;}
 
@@ -75,26 +75,26 @@ void PM_val_sort(int n, double *xp, double *yp)
 int *PM_t_sort(int *in, int n_dep, int n_pts, int *ord)
    {int i, n, *pin, *out, *pout, *q;
     int r, f, ind, dep;
-    sort_link *link, *nln;
+    sort_link *lnk, *nln;
 
-    link = CMAKE_N(sort_link, n_dep+n_pts+1);
-    q    = CMAKE_N(int, n_pts+1);
+    lnk = CMAKE_N(sort_link, n_dep+n_pts+1);
+    q   = CMAKE_N(int, n_pts+1);
 
 /* map the partial ordering into a structured list to do the sort */
-    nln = link + n_pts + 1;
+    nln = lnk + n_pts + 1;
     pin = in;
     for (i = 0; i < n_dep; i++)
         {ind = *pin++;
          dep = *pin++;
          nln->count = dep;
-         nln->next  = link[ind].next;
-         link[dep].count++;
-         link[ind].next = nln++;};
+         nln->next  = lnk[ind].next;
+         lnk[dep].count++;
+         lnk[ind].next = nln++;};
 
 /* initialize the output queue */
     r = 0;
     for (i = 1; i <= n_pts; i++)
-        if (link[i].count == 0)
+        if (lnk[i].count == 0)
            {q[r] = i;
             r    = i;};
 
@@ -112,14 +112,14 @@ int *PM_t_sort(int *in, int n_dep, int n_pts, int *ord)
         n--;
 
 /* remove relations of the form "f < k" for some k of the system */
-        for (nln = link[f].next; nln != NULL; nln = nln->next)
-            if (--link[nln->count].count == 0)
+        for (nln = lnk[f].next; nln != NULL; nln = nln->next)
+            if (--lnk[nln->count].count == 0)
                {q[r] = nln->count;
                 r    = nln->count;};
 
         f = q[f];};
 
-    CFREE(link);
+    CFREE(lnk);
     CFREE(q);
 
 /* if n is non-zero there was a loop in the topology */

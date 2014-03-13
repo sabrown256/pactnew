@@ -280,7 +280,7 @@ static void _PM_svd_u(double *a, double *w, int m, int n)
 
 int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
    {int flag, i, its, j, jp, k, l, nm;
-    int ji, jj, jn, jk;
+    int ji, jj, jm, jk;
     double c, f, h, s, x, y, z;
     double anrm, g, wc;
     double *rv1;
@@ -332,11 +332,11 @@ int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
 			    c = g*h;
 			    s = -f*h;
 			    for (j = 0; j < m; j++)
-			        {jn = INDEX(j, nm, n);
+			        {jm = INDEX(j, nm, n);
 				 ji = INDEX(j, i, n);
-				 y  = a[jn];
+				 y  = a[jm];
 				 z  = a[ji];
-				 a[jn] = y*c + z*s;
+				 a[jm] = y*c + z*s;
 				 a[ji] = z*c - y*s;};};};};
 
 /* convergence */

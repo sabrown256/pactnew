@@ -563,12 +563,12 @@ void SX_parse(SS_psides *si,
 
 /* SX_WRAP_PAREN - enclose second arg by first and third args */
 
-char *SX_wrap_paren(char *open, char *form, char *close, size_t ln)
+char *SX_wrap_paren(char *opn, char *form, char *cls, size_t ln)
    {char tmp[MAXLINE];
 
    strcpy(tmp, form);
 
-   snprintf(form, ln, "%s%s%s", open, tmp, close);
+   snprintf(form, ln, "%s%s%s", opn, tmp, cls);
 
    return(form);}
 
@@ -912,7 +912,7 @@ void SX_init_device_vars(int idev, double *xf, double *dxf)
 
 void SX_register_devices(void)
    {int i, nd;
-    char lname[MAXLINE], uname[MAXLINE];
+    char lnm[MAXLINE], unm[MAXLINE];
     double xf[PG_SPACEDM], dxf[PG_SPACEDM];
     PG_device *dev;
     out_device *out;
@@ -927,14 +927,14 @@ void SX_register_devices(void)
     for (i = 0; i < nd; i++)
         {out = SX_get_device(i);
 
-	 strcpy(lname, devs[i]);
-	 strcpy(uname, devs[i]);
-	 SC_str_upper(uname);
+	 strcpy(lnm, devs[i]);
+	 strcpy(unm, devs[i]);
+	 SC_str_upper(unm);
 
-	 out->dname = CSTRDUP(lname, 3);
-	 out->dupp  = CSTRDUP(uname, 3);
+	 out->dname = CSTRDUP(lnm, 3);
+	 out->dupp  = CSTRDUP(unm, 3);
 
-	 dev = PG_make_device(uname, "COLOR", "tmp");
+	 dev = PG_make_device(unm, "COLOR", "tmp");
 	 out->exist = (dev != NULL);
 	 PG_close_device(dev);
 

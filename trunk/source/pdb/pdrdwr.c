@@ -532,7 +532,7 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
     inti ind[3];
     syment *ep;
     dimdes *dims, *pd;
-    char s[MAXLINE], lname[MAXLINE], index[MAXLINE];
+    char s[MAXLINE], lname[MAXLINE], lndx[MAXLINE];
     char *t, *rv;
 
     strcpy(s, name);
@@ -564,7 +564,7 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
     s[nc] = '\0';
 
     err = FALSE;
-    strcpy(index, "[");
+    strcpy(lndx, "[");
     for (pd = dims; pd != NULL; pd = pd->next)
         {t = SC_firsttok(s, " ,()[]\n\r");
 	 if (t == NULL)
@@ -575,14 +575,14 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 	    {err = TRUE;
 	     break;};
 
-	 _PD_index_str(index, MAXLINE, ind);};
+	 _PD_index_str(lndx, MAXLINE, ind);};
     
     _PD_rl_syment_d(ep);
 
     rv = NULL;
     if (err == 0)
-       {SC_LAST_CHAR(index) = ']';
-        snprintf(s, MAXLINE, "%s%s", lname, index);
+       {SC_LAST_CHAR(lndx) = ']';
+        snprintf(s, MAXLINE, "%s%s", lname, lndx);
         rv = CSTRSAVE(s);};
 
     return(rv);}
@@ -1465,7 +1465,7 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
                         int nd, long *ind, syment *ep)
    {int i, j, err;
     inti indl[3];
-    char index[MAXLINE], hname[MAXLINE];
+    char lndx[MAXLINE], hname[MAXLINE];
     PD_smp_state *pa;
 
     err = 0;
@@ -1481,16 +1481,16 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
 	     memset(pa->err, 0, MAXLINE);
 	     break;};
 
-    strcpy(index, "(");
+    strcpy(lndx, "(");
     for (i = 0; i < nd; i++)
         {for (j = 0; j < 3; j++)
 	     indl[j] = *ind++;
 
-	 _PD_index_str(index, MAXLINE, indl);};
+	 _PD_index_str(lndx, MAXLINE, indl);};
 
-    if (strlen(index) > 1)
-       {SC_LAST_CHAR(index) = ')';
-        snprintf(hname, MAXLINE, "%s%s", fullpath, index);}
+    if (strlen(lndx) > 1)
+       {SC_LAST_CHAR(lndx) = ')';
+        snprintf(hname, MAXLINE, "%s%s", fullpath, lndx);}
 
     else
        strcpy(hname, fullpath);

@@ -400,7 +400,7 @@ static int _PD_rd_chrt_iii(PDBfile *file)
     u_int64_t nbc;
     char **pl;
     char type[MAXLINE];
-    char *nxt, *bf, *p, *local, *member, *modf;
+    char *nxt, *bf, *p, *local, *member, *lmod;
     memdes *desc, *lst, *prev;
     FILE *fp;
     PD_smp_state *pa;
@@ -471,21 +471,21 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 		   nxt++;
 
 		member = SC_strtok(nxt, "<;\n", p);
-		modf   = SC_strtok(NULL, ";\n", p);
+		lmod   = SC_strtok(NULL, ";\n", p);
 		nxt    = SC_strtok(NULL, ";", p);
 
 		member = SC_trim_right(member, " \t");
 		member = SC_trim_left(member, " \t");
-		if (modf != NULL)
-		   modf = SC_trim_left(modf, "-= \t");
+		if (lmod != NULL)
+		   lmod = SC_trim_left(lmod, "-= \t");
 
 		desc = _PD_mk_descriptor(member, file->default_offset);
-		if ((modf == NULL) ||  (*modf == '}'))
-		   nxt = modf;
+		if ((lmod == NULL) ||  (*lmod == '}'))
+		   nxt = lmod;
 		else
 		   {pl[icast]   = CSTRSAVE(type);
 		    pl[icast+1] = CSTRSAVE(member);
-		    pl[icast+2] = CSTRSAVE(modf);
+		    pl[icast+2] = CSTRSAVE(lmod);
 		    icast += 3;
 		    if (icast >= ncast)
 		       {ncast += N_CASTS_INCR;

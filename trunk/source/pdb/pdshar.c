@@ -24,28 +24,28 @@ extern int
  */
 
 int _PD_register(char *type, char *fmt, PFBinType hook,
-		 PFBinCreate create, PFBinOpen open, PFBinClose close,
-		 PFBinWrite write, PFBinRead read)
+		 PFBinCreate crt, PFBinOpen opn, PFBinClose cls,
+		 PFBinWrite wrt, PFBinRead rd)
    {int n;
     tr_layer tr;
 		 
     if (_PD_file_types == NULL)
        _PD_file_types = CMAKE_ARRAY(tr_layer, NULL, 3);
 
-    if (write == NULL)
-       write = _PD_write;
+    if (wrt == NULL)
+       wrt = _PD_write;
 
-    if (read == NULL)
-       read = (PFBinRead) _PD_read;
+    if (rd == NULL)
+       rd = (PFBinRead) _PD_read;
 
     tr.type    = type;
     tr.fmt     = fmt;
     tr.gettype = hook;
-    tr.create  = create;
-    tr.open    = open;
-    tr.close   = close;
-    tr.write   = write;
-    tr.read    = read;
+    tr.create  = crt;
+    tr.open    = opn;
+    tr.close   = cls;
+    tr.write   = wrt;
+    tr.read    = rd;
 
     SC_array_push(_PD_file_types, &tr);
     n = SC_array_get_n(_PD_file_types) - 1;
@@ -219,31 +219,31 @@ int PD_register_pdb(void)
 static PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
 				 tr_layer *tr, void *a)
    {PDBfile *file;
-    PFBinOpen open;
-    PFBinCreate create;
+    PFBinOpen opn;
+    PFBinCreate crt;
 
-    open   = tr->open;
-    create = tr->create;
-    file   = NULL;
+    opn  = tr->open;
+    crt  = tr->create;
+    file = NULL;
 
 /* create the file */
     if (*mode == 'w')
-       {if (create != NULL)
+       {if (crt != NULL)
 	   {if (pu != NULL)
-	       file = create(tr, pu, name, a);};}
+	       file = crt(tr, pu, name, a);};}
 
 /* open an existing file */
-    else if (open != NULL)
+    else if (opn != NULL)
 
 /* if we have an open C level file try to open a PDB level file */
        {if (_PD_data_source(pu) != NULL)
-	   file = open(tr, pu, name, mode, a);
+	   file = opn(tr, pu, name, mode, a);
 
 /* if we cannot open existing file and it does not exist
  * try creating file
  */
 	if ((file == NULL) && (SC_isfile(pu->path) == FALSE))
-	   {if ((*mode == 'a') && (create != NULL) && (tr->type == PDBFILE_S))
+	   {if ((*mode == 'a') && (crt != NULL) && (tr->type == PDBFILE_S))
 	       {_SC_rel_udl(pu);
 	        file = _PD_open_bin_aux(pu, name, "w", tr, a);};};};
 

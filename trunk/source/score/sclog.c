@@ -33,7 +33,7 @@ SC_thread_lock
  *          Returns -1 on error, otherwise 0.
  */
 
-int SC_log(SC_logfile log, char *format, ...)
+int SC_log(SC_logfile lg, char *format, ...)
    {int status;
     va_list p_arg;
     char timestamp[MAXLINE];
@@ -51,13 +51,13 @@ int SC_log(SC_logfile log, char *format, ...)
        {SC_LAST_CHAR(pt) = '\0';
 
 /* log to the tmp file */
-	fprintf(log.file, "[%d:%d | %s]: ", (int)(log.pid), log.entry, pt);
+	fprintf(lg.file, "[%d:%d | %s]: ", (int)(lg.pid), lg.entry, pt);
 
 	va_start(p_arg, format);
-	vfprintf(log.file, format, p_arg);
+	vfprintf(lg.file, format, p_arg);
 	va_end(p_arg);
 
-	fprintf(log.file, "\n");};
+	fprintf(lg.file, "\n");};
 
     return(status);}
 
@@ -77,16 +77,16 @@ int SC_log(SC_logfile log, char *format, ...)
  */
 
 SC_logfile SC_open_log(void)
-   {char hostname[HOSTNAME_MAX], uname[MAXLINE];
+   {char hostnm[HOSTNAME_MAX], unm[MAXLINE];
     char *uf;
-    SC_logfile log;
+    SC_logfile lg;
 
-    log.file  = NULL;
-    log.entry = 0;
+    lg.file  = NULL;
+    lg.entry = 0;
 
 /* get a unique name for this log file: prefix-hostname-pid-num */
-    log.pid = getpid();
-    gethostname(hostname, HOSTNAME_MAX);
+    lg.pid = getpid();
+    gethostname(hostnm, HOSTNAME_MAX);
 
 /* make sure everyone who gets a tmp log file, gets their own unique file
  * so we do not have to worry about locking during SC_log() calls
@@ -94,20 +94,20 @@ SC_logfile SC_open_log(void)
     SC_LOCKON(_SC_log_lock);
 
     uf = SC_dsnprintf(FALSE, "%s/%s-%s-%d-%d",
-		      TMP_DIR, LOGNAME_PREFIX, hostname, (int) log.pid,
+		      TMP_DIR, LOGNAME_PREFIX, hostnm, (int) lg.pid,
 		      _SC.nlog);
   
 /* truncate this file and open it for writing/reading */ 
-    log.file = SC_fopen_safe(uf, "w+");
+    lg.file = SC_fopen_safe(uf, "w+");
 
 /* if successful: print initial log and setup tmp log to delete on close */
-    if (log.file != NULL)
-       {SC_get_uname(uname, MAXLINE, -1);
-        log.entry = _SC.nlog;
+    if (lg.file != NULL)
+       {SC_get_uname(unm, MAXLINE, -1);
+        lg.entry = _SC.nlog;
         _SC.nlog++; 
 
-        fprintf(log.file, "\n");
-        SC_log(log, "opened by '%s' on %s", uname, hostname, _SC.nlog); 
+        fprintf(lg.file, "\n");
+        SC_log(lg, "opened by '%s' on %s", unm, hostnm, _SC.nlog); 
 
 /* this just makes the link counter on the inode zero
  * the file will not actually be deleted until it is closed
@@ -116,7 +116,7 @@ SC_logfile SC_open_log(void)
 
     SC_LOCKOFF(_SC_log_lock);
 
-    return(log);}
+    return(lg);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -136,7 +136,7 @@ SC_logfile SC_open_log(void)
  *                Returns -1 on error, otherwise 0.
  */
 
-int SC_close_log(SC_logfile log)
+int SC_close_log(SC_logfile lg)
    {int status, global_log;
     char bf[MAXLINE];
     char *fname;
@@ -147,7 +147,7 @@ int SC_close_log(SC_logfile log)
     status = 0;
 
 /* ignore requests to close non-existant tmp logs */
-    if (log.file == NULL) 
+    if (lg.file == NULL) 
        return(-1);
 
 /* get a handle to the global log */
@@ -160,7 +160,7 @@ int SC_close_log(SC_logfile log)
     if (global_log == -1)
        {status = -1;}
     else 
-       {SC_log(log, "closed");
+       {SC_log(lg, "closed");
 
 /* get an exclusive write lock for the global log */
         lock.l_type   = F_WRLCK;
@@ -180,15 +180,15 @@ int SC_close_log(SC_logfile log)
 /* LOCK HELD: No returns allowed until lock released */
 
 /* coax buffers bound for the tmp log to disk */
-        SC_fflush_safe(log.file);  
+        SC_fflush_safe(lg.file);  
         sync(); 
 
 /* append tmp log to global log */
-        rewind(log.file);
-        nbr = SC_fread_sigsafe(bf, (size_t) 1, (size_t) MAXLINE, log.file);
+        rewind(lg.file);
+        nbr = SC_fread_sigsafe(bf, (size_t) 1, (size_t) MAXLINE, lg.file);
             
 /* while we've read bytes and didn't get an error: continue copy */
-        while ((nbr > 0) && (ferror(log.file) == 0))
+        while ((nbr > 0) && (ferror(lg.file) == 0))
            {nbw = SC_write_sigsafe(global_log, bf, nbr);
   
 /* if we have a write failure: punt */ 
@@ -196,9 +196,9 @@ int SC_close_log(SC_logfile log)
 	       {perror("write"); 
 		nbr = -1;}
 	    else
-	       nbr = SC_fread_sigsafe(bf, 1, MAXLINE, log.file);};
+	       nbr = SC_fread_sigsafe(bf, 1, MAXLINE, lg.file);};
         
-        if (ferror(log.file))
+        if (ferror(lg.file))
            perror("fread");
     
 /* coax the buffers bound for the global log to disk */
@@ -217,8 +217,8 @@ int SC_close_log(SC_logfile log)
         SC_close_safe(global_log);};
 
 /* and finally, close the tmp log, deleting it in the process */
-    if (log.file != NULL)
-       SC_fclose_safe(log.file);
+    if (lg.file != NULL)
+       SC_fclose_safe(lg.file);
 
     return(status);}
 
