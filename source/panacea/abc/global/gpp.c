@@ -52,10 +52,12 @@ void LR_init_io(PA_package *pck, PFPreMap func)
  *                  - given plot request and return a pointer to it
  */
 
-PM_mapping *LR_build_mapping(PA_plot_request *pr, double t)
-   {
+PM_mapping *LR_build_mapping(PA_plot_request *pr, double lt)
+   {PM_mapping *rv;
 
-    return(PA_build_mapping(pr, _LR_get_n_set, t));}
+    rv = PA_build_mapping(pr, _LR_get_n_set, lt);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -66,10 +68,12 @@ PM_mapping *LR_build_mapping(PA_plot_request *pr, double t)
  *                         - packages
  */
 
-PM_mapping *LR_build_pseudo_mapping(PA_plot_request *pr, double t)
-   {
+PM_mapping *LR_build_pseudo_mapping(PA_plot_request *pr, double lt)
+   {PM_mapping *rv;
 
-    return(PA_build_mapping(pr, _LR_get_pseudo_set, t));}
+    rv = PA_build_mapping(pr, _LR_get_pseudo_set, lt);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -360,7 +364,7 @@ void LR_expand_plot_data(PA_plot_request *pr, int ni)
  *                 - may fail here but will be correctly handled later)
  */
 
-PM_set *LR_build_domain(char *base_name, C_array *arr, double t)
+PM_set *LR_build_domain(char *base_name, C_array *arr, double lt)
    {int i, n, nd, ne, nde, ist;
     int *maxes, *pm;
     double **elem;
@@ -373,7 +377,7 @@ PM_set *LR_build_domain(char *base_name, C_array *arr, double t)
     dmap = (PA_set_index *) arr->data;
 
 /* build the domain name */
-    snprintf(dname, MAXLINE, "{t=%.2e,%s", t, &base_name[1]);
+    snprintf(dname, MAXLINE, "{t=%.2e,%s", lt, &base_name[1]);
     PD_process_set_name(dname);
 
     nd = 0;

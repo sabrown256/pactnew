@@ -70,11 +70,11 @@ static void SRC_strarg(PA_command *cp)
 /* NEXT_NAME - make a new variable name */
 
 char *next_name(void)
-   {static int n = 0;
+   {static int ln = 0;
     char *s;
 
     s = CMAKE_N(char, 10);
-    snprintf(s, 10, "var%d", n++);
+    snprintf(s, 10, "var%d", ln++);
 
     return(s);}
 
@@ -83,13 +83,13 @@ char *next_name(void)
 
 /* MK_SOURCE_RECORD - make a new source_record and return a pointer to it */
 
-static source_record *mk_source_record(double time, double *data)
+static source_record *mk_source_record(double time, double *ldata)
    {source_record *sp;
 
     sp       = CMAKE(source_record);
     sp->time = time;
     sp->name = next_name();
-    sp->data = data;
+    sp->data = ldata;
 
     return(sp);}
 
@@ -115,13 +115,13 @@ static time_list *mk_time_list(void)
 
 /* WRITE_VAR - write out source file variables */
 
-static int write_var(PDBfile *pdsf, char *name, double *tp, double **dp,
+static int write_var(PDBfile *lpdsf, char *name, double *tp, double **dp,
 		     int sz)
    {int i, szd;
     long ind[3];
     double *vdata;
     char svname[MAXLINE], title[MAXLINE];
-    static int count = 0;
+    static int lcount = 0;
 
     PA_gs.n_variables++;
 
@@ -132,10 +132,10 @@ static int write_var(PDBfile *pdsf, char *name, double *tp, double **dp,
  * header format :
  *           <var-name>|<num-times>|<time-array-name>
  */
-    snprintf(title, MAXLINE, "src%d", count);
-    snprintf(svname, MAXLINE, "%s|%d|st%d", name, sz, count);
+    snprintf(title, MAXLINE, "src%d", lcount);
+    snprintf(svname, MAXLINE, "%s|%d|st%d", name, sz, lcount);
     ind[1] = strlen(svname);
-    PD_write_alt(pdsf, title, "char", svname, 1, ind);
+    PD_write_alt(lpdsf, title, "char", svname, 1, ind);
 
 /* write out the data arrays one at a time */
 
@@ -144,15 +144,15 @@ static int write_var(PDBfile *pdsf, char *name, double *tp, double **dp,
         {snprintf(svname, MAXLINE, "%s:%d", title, i);
          vdata  = dp[i];
          ind[1] = szd - 1;
-         PD_write_alt(pdsf, svname, "double", vdata, 1, ind);};
+         PD_write_alt(lpdsf, svname, "double", vdata, 1, ind);};
 
 /* now write out the time array */
-    snprintf(title, MAXLINE, "st%d", count);
+    snprintf(title, MAXLINE, "st%d", lcount);
     ind[1] = sz - 1;
-    PD_write_alt(pdsf, title, "double", tp, 1, ind);
+    PD_write_alt(lpdsf, title, "double", tp, 1, ind);
 
 /* increment the variable counter */
-    count++;
+    lcount++;
 
     return(TRUE);}
 
@@ -168,7 +168,7 @@ static int write_var(PDBfile *pdsf, char *name, double *tp, double **dp,
 
 static void makeh(void)
    {int i, j, l, sz, change, N_var;
-    double t1, t2, *tt, **td, *pd, *time, **data;
+    double t1, t2, *tt, **td, *pd, *time, **ldata;
     haelem **tab, *hp;
     source_record *sp;
     time_list *tp;
@@ -185,7 +185,7 @@ static void makeh(void)
 
 /* copy the list into arrays */
              tt = time = CMAKE_N(double, l);
-             td = data = CMAKE_N(double *, l);
+             td = ldata = CMAKE_N(double *, l);
              for (pp = tp->list; pp != NULL; pp = pn)
                  {sp = (source_record *) pp->car;
                   *(tt++) = sp->time;
@@ -202,20 +202,20 @@ static void makeh(void)
                      {t1 = time[j-1];
                       t2 = time[j];
                       if (t2 < t1)
-                         {pd        = data[j-1];
-                          data[j-1] = data[j];
-                          data[j]   = pd;
-                          time[j]   = t1;
-                          time[j-1] = t2;
-                          change    = TRUE;};};};
+                         {pd         = ldata[j-1];
+                          ldata[j-1] = ldata[j];
+                          ldata[j]   = pd;
+                          time[j]    = t1;
+                          time[j-1]  = t2;
+                          change     = TRUE;};};};
 
 /* write the variable and source_record array out */
-             write_var(pdsf, hp->name, time, data, l);
+             write_var(pdsf, hp->name, time, ldata, l);
              N_var++;
 
 /* release the temporary storage for this variable */
              CFREE(time);
-             CFREE(data);};
+             CFREE(ldata);};
 
 /* finish up */
     PD_write(pdsf, "n_variables", "integer", &N_var);
@@ -233,7 +233,7 @@ static void makeh(void)
  *              - in the PDB source file
  */
 
-static void record_entry(char *name, double time, double *data)
+static void record_entry(char *name, double time, double *ldata)
    {haelem *hp;
     pcons *fp;
     source_record *sp;
@@ -249,7 +249,7 @@ static void record_entry(char *name, double time, double *data)
 
 /* cons the new time onto the list of times */
     tp       = (time_list *) (hp->def);
-    sp       = mk_source_record(time, data);
+    sp       = mk_source_record(time, ldata);
     fp       = SC_mk_pcons("source record *", (byte *) sp,
 			   "time_list *", (byte *) (tp->list));
     tp->list = fp;
@@ -307,12 +307,12 @@ static void varh(PA_variable *pp)
 
 /* SH - default handler for data values */
 
-static void sh(char *t)
+static void sh(char *u)
    {char *s;
 
 /* save the first token which is passed in as an argument */
     count++;
-    *(data++) = conversion_s*SC_stof(t);
+    *(data++) = conversion_s*SC_stof(u);
 
 /* read the remaining tokens from the input line */
     while ((s = PA_get_field("SPECIFICATION", "VALUE", OPTL)) != NULL)
@@ -337,17 +337,16 @@ void readh(char *str)
     PA_command *cp;
     haelem *hp;
     PA_variable *pp;
-    FILE *strm;
+    FILE *fp;
 
     strcpy(in_deck, str);
-    strm = fopen(str, "r");
-    PA_ERR((strm == NULL),
-           "COULDN'T OPEN FILE %s", str);
+    fp = fopen(str, "r");
+    PA_ERR((fp == NULL), "COULDN'T OPEN FILE %s", str);
 
 /* dispatch on commands from the deck */
     while (TRUE)
-       {if (GETLN(s, MAXLINE, strm) == NULL)
-           {fclose(strm);
+       {if (GETLN(s, MAXLINE, fp) == NULL)
+           {fclose(fp);
             break;};
 
         if (SC_blankp(s, "c;#"))

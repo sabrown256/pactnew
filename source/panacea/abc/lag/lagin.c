@@ -51,7 +51,7 @@ double
 
 /* FIX_BCW - enforce the boundary conditions */
 
-static int fix_bcw(double *rx, double *ry, double *dvxdt, double *dvydt)
+static int fix_bcw(double *lrx, double *lry, double *ldvxdt, double *ldvydt)
    {int k, l, i;
     int k1, k2, l1, l2;
     double *iv_data;
@@ -60,12 +60,12 @@ static int fix_bcw(double *rx, double *ry, double *dvxdt, double *dvydt)
 
 /* zero out all quantities (implicit bc) */
     for (i = 0; i < N_nodes; i++)
-        {dvxdt[i] *= node[i];
-	 dvydt[i] *= node[i];
-	 rx[i]    *= node[i];
-	 ry[i]    *= node[i];
-	 vx[i]    *= node[i];
-	 vy[i]    *= node[i];};
+        {ldvxdt[i] *= node[i];
+	 ldvydt[i] *= node[i];
+	 lrx[i]    *= node[i];
+	 lry[i]    *= node[i];
+	 vx[i]     *= node[i];
+	 vy[i]     *= node[i];};
 
 /* NOTE: here is where applications access initial value specifications
  * which PANACEA has gathered without any knowledge of the semantics.
@@ -83,17 +83,17 @@ static int fix_bcw(double *rx, double *ry, double *dvxdt, double *dvydt)
          if (strcmp(iv_name, "constant-vx") == 0)
             for (l = l1; l <= l2; l++)
                 for (k = k1; k <= k2; k++)
-                    dvxdt[NODE_OF(k, l)] = 0.0;
+                    ldvxdt[NODE_OF(k, l)] = 0.0;
          else if (strcmp(iv_name, "constant-vy") == 0)
             for (l = l1; l <= l2; l++)
                 for (k = k1; k <= k2; k++)
-                    dvydt[NODE_OF(k, l)] = 0.0;
+                    ldvydt[NODE_OF(k, l)] = 0.0;
          else if (strcmp(iv_name, "fixed") == 0)
             for (l = l1; l <= l2; l++)
                 for (k = k1; k <= k2; k++)
                     {i = NODE_OF(k, l);
-                     dvxdt[i] = 0.0;
-                     dvydt[i] = 0.0;};};
+                     ldvxdt[i] = 0.0;
+                     ldvydt[i] = 0.0;};};
 
     return(TRUE);}
 
@@ -148,8 +148,9 @@ static void *awc(void *arg)
 
 /* FW - move the mesh */
 
-static int fw(double *p, double *rx, double *ry, double *rxn, double *ryn,
-	      double *vx, double *vy, double *vxn, double *vyn, double dts)
+static int fw(double *lp, double *lrx, double *lry,
+	      double *rxn, double *ryn,
+	      double *lvx, double *lvy, double *vxn, double *vyn, double dts)
    {int i;
 
     for (i = 0; i < N_nodes; i++)
@@ -159,15 +160,15 @@ static int fw(double *p, double *rx, double *ry, double *rxn, double *ryn,
 /* NOTE: do the work of awc using SMP parallelism */
     SC_chunk_loop(awc, frz, lrz, TRUE, NULL);
 
-    fix_bcw(rx, ry, dvxdt, dvydt);
+    fix_bcw(lrx, lry, dvxdt, dvydt);
 
     for (i = frn; i <= lrn; i++)
-        {vxn[i] = vx[i] + dts*dvxdt[i];
-         vyn[i] = vy[i] + dts*dvydt[i];};
+        {vxn[i] = lvx[i] + dts*dvxdt[i];
+         vyn[i] = lvy[i] + dts*dvydt[i];};
 
     for (i = frn; i <= lrn; i++)
-        {rxn[i] = rx[i] + dts*vx[i];
-         ryn[i] = ry[i] + dts*vy[i];};
+        {rxn[i] = lrx[i] + dts*vx[i];
+         ryn[i] = lry[i] + dts*vy[i];};
 
     return(TRUE);}
 
@@ -316,7 +317,7 @@ static void *areaw(void *arg)
 
 /* DAREADT - calculate the projected quadrant volume change */
 
-static double dareadt(double *rx, double *ry, double *vx, double *vy)
+static double dareadt(double *lrx, double *lry, double *lvx, double *lvy)
    {int j;
     double *rx1, *rx2, *rx3, *rx4;
     double *ry1, *ry2, *ry3, *ry4;
@@ -325,10 +326,10 @@ static double dareadt(double *rx, double *ry, double *vx, double *vy)
     double da, dainv, dta, dtav;
     double mdtv;
 
-    vecset4(rx, rx1, rx2, rx3, rx4);
-    vecset4(ry, ry1, ry2, ry3, ry4);
-    vecset4(vx, vx1, vx2, vx3, vx4);
-    vecset4(vy, vy1, vy2, vy3, vy4);
+    vecset4(lrx, rx1, rx2, rx3, rx4);
+    vecset4(lry, ry1, ry2, ry3, ry4);
+    vecset4(lvx, vx1, vx2, vx3, vx4);
+    vecset4(lvy, vy1, vy2, vy3, vy4);
 
     mdtv = PARAM[5];
     dta  = HUGE;
@@ -353,28 +354,28 @@ static double dareadt(double *rx, double *ry, double *vx, double *vy)
  *         - each for the nodes
  */
 
-static int volfrac(double *volq, double *rx, double *ry)
+static int volfrac(double *volq, double *lrx, double *lry)
    {int i, io, k, l;
     double *rxa, *rxb, *rxc, *rxd, *rxe, *rxf, *rxg, *rxh, *rxi;
     double *rya, *ryb, *ryc, *ryd, *rye, *ryf, *ryg, *ryh, *ryi;
 
-    rxa = rx;
-    rxb = rx + 1;
-    rxf = rx - 1;
-    rxd = rx + kbnd;
+    rxa = lrx;
+    rxb = lrx + 1;
+    rxf = lrx - 1;
+    rxd = lrx + kbnd;
     rxc = rxd + 1;
     rxe = rxd - 1;
-    rxh = rx - kbnd;
+    rxh = lrx - kbnd;
     rxi = rxh + 1;
     rxg = rxh - 1;
 
-    rya = ry;
-    ryb = ry + 1;
-    ryf = ry - 1;
-    ryd = ry + kbnd;
+    rya = lry;
+    ryb = lry + 1;
+    ryf = lry - 1;
+    ryd = lry + kbnd;
     ryc = ryd + 1;
     rye = ryd - 1;
-    ryh = ry - kbnd;
+    ryh = lry - kbnd;
     ryi = ryh + 1;
     ryg = ryh - 1;
 
@@ -465,12 +466,12 @@ static void *nmw(void *arg)
  *            - for the zones initially
  */
 
-int node_massw(double *mass, double *rho, double *rx, double *ry)
+int node_massw(double *mass, double *lrho, double *lrx, double *lry)
    {double *volq;
     par_nm pn;
 
     volq = CMAKE_N(double, 4*N_nodes);
-    volfrac(volq, rx, ry);
+    volfrac(volq, lrx, lry);
 
     PA_array_set(mass, N_nodes, 0.0);
 
@@ -522,7 +523,7 @@ static void *cwc(void *arg)
 
 /* CW - compute the timestep for next cycle */
 
-static double cw(double *csp)
+static double cw(double *lcsp)
    {int j;
     double dtc;
 
@@ -770,20 +771,20 @@ int init_cycle(void)
 
 /* CSPEED - compute CSP */
 
-int cspeed(double *csp, double *p, double *rho)
+int cspeed(double *lcsp, double *lp, double *lrho)
    {int j;
 
-    PA_array_set(csp, N_zones, 0.0);
+    PA_array_set(lcsp, N_zones, 0.0);
 
     for (j = frz; j <= lrz; j++)
-        csp[j] = 2.0*p[j]/(rho[j] + SMALL);
+        lcsp[j] = 2.0*lp[j]/(lrho[j] + SMALL);
 
     for (j = frz; j <= lrz; j++)
-        if (csp[j] < csmin)
-           csp[j] = csmin;
+        if (lcsp[j] < csmin)
+           lcsp[j] = csmin;
 
     for (j = frz; j <= lrz; j++)
-        csp[j] = sqrt(csp[j]);
+        lcsp[j] = sqrt(lcsp[j]);
 
     return(TRUE);}
 

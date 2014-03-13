@@ -37,20 +37,20 @@ double
  *             - material
  */
 
-static material *mk_material(char *s, double rho, double n, double a,
-			     double z, double tm, double p)
+static material *mk_material(char *s, double lrho, double ln, double a,
+			     double z, double ltm, double lp)
    {material *mat;
 
     mat = CMAKE(material);
 
     mat->index       = 0;
     mat->name        = CSTRSAVE(s);
-    mat->rho         = rho;
-    mat->n           = n;
+    mat->rho         = lrho;
+    mat->n           = ln;
     mat->a           = a;
     mat->z           = z;
-    mat->tm          = tm;
-    mat->p           = p;
+    mat->tm          = ltm;
+    mat->p           = lp;
     mat->composition = NULL;
 
     return(mat);}
@@ -205,18 +205,18 @@ int init_misc(PA_package *pck)
 void materialh(void)
    {char *s;
     material *mat;
-    double rho, n, a, z, tm, p;
+    double lrho, ln, a, z, ltm, lp;
     PM_part *parta;
 
-    s   = PA_get_field("PART", "MATERIAL", REQU);
-    rho = PA_get_num_field("DENSITY", "MATERIAL", REQU);
-    n   = PA_get_num_field("ION DENSITY", "MATERIAL", OPTL);
-    a   = PA_get_num_field("AVERAGE A", "MATERIAL", OPTL);
-    z   = PA_get_num_field("AVERAGE Z", "MATERIAL", OPTL);
-    tm  = PA_get_num_field("TEMPERATURE", "MATERIAL", OPTL);
-    p   = PA_get_num_field("PRESSURE", "MATERIAL", OPTL);
+    s    = PA_get_field("PART", "MATERIAL", REQU);
+    lrho = PA_get_num_field("DENSITY", "MATERIAL", REQU);
+    ln   = PA_get_num_field("ION DENSITY", "MATERIAL", OPTL);
+    a    = PA_get_num_field("AVERAGE A", "MATERIAL", OPTL);
+    z    = PA_get_num_field("AVERAGE Z", "MATERIAL", OPTL);
+    ltm  = PA_get_num_field("TEMPERATURE", "MATERIAL", OPTL);
+    lp   = PA_get_num_field("PRESSURE", "MATERIAL", OPTL);
 
-    mat      = mk_material(s, rho, n, a, z, tm, p);
+    mat      = mk_material(s, lrho, ln, a, z, ltm, lp);
     cur_mat  = mat;
     cur_comp = NULL;
 
@@ -226,7 +226,7 @@ void materialh(void)
            {parta->comp = (byte *) mat;
             return;};
 
-    PA_ERR(TRUE, "NO PART FOR THIS MATERIAL\n-> %s %g", s, rho);
+    PA_ERR(TRUE, "NO PART FOR THIS MATERIAL\n-> %s %g", s, lrho);
 
     return;}
 
