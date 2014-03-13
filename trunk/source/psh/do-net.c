@@ -743,7 +743,8 @@ static int check_tty(char *sect)
  *            - so that they fit nicely on lines
  */
 
-static void print_list(hfspec *sp, int nsp, int rptcfg, int irun, int ex)
+static void print_list(hfspec *sp, int nsp, int rptcfg, int irun,
+		       unsigned int ex)
    {int i, j, ok;
     char *s;
     hfspec *lsp;
