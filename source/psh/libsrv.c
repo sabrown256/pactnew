@@ -568,7 +568,7 @@ static void sigtimeout(int sig)
 /* MAKE_CLIENT - initialize and return a client connection instance */
 
 client *make_client(ckind type, int port, int auth, char *root, 
-		    void (*clog)(client *cl, int lvl, char *fmt, ...),
+		    void (*clg)(client *cl, int lvl, char *fmt, ...),
                     int (*cauth)(client *cl, int nc, char *ans, char *res))
    {char *fcon, *t;
     client *cl;
@@ -589,7 +589,7 @@ client *make_client(ckind type, int port, int auth, char *root,
 	cl->type   = type;
         cl->a      = NULL;
 	cl->scon   = &global_srv;
-        cl->clog   = clog;
+        cl->clog   = clg;
         cl->cauth  = cauth;
 
 	ring_init(&cl->ior, BFVLG);

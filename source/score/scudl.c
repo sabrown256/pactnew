@@ -51,12 +51,12 @@ int _SC_udlp(char *s)
  *                   - container only iff TRUNC is TRUE
  */
 
-char *_SC_udl_container(char *s, int trunc)
+char *_SC_udl_container(char *s, int trnc)
    {char *fc;
 
     fc = SC_strstr(s, "~");
     if (fc != NULL)
-       {if (trunc == TRUE)
+       {if (trnc == TRUE)
 	   *fc = '\0';
 	fc++;};
 

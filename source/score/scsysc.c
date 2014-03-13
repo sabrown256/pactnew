@@ -566,7 +566,7 @@ char *_SC_put_command(SC_array *out, char *s, int show)
 int _SC_decide_retry(asyncstate *as, jobinfo *inf, tasklst *tl, int st)
    {int rv, ts, warn;
     int ia, na, it;
-    char *cmd, *time, *stmsg, *cmmsg;
+    char *cmd, *ltm, *stmsg, *cmmsg;
     subtask *sub;
 
     ia = inf->ia;
@@ -575,7 +575,7 @@ int _SC_decide_retry(asyncstate *as, jobinfo *inf, tasklst *tl, int st)
     warn = FALSE;
 
     if (st != 0)
-       {time = SC_datef();
+       {ltm = SC_datef();
 
 	rv = -1;
 	if (ia < na)
@@ -588,7 +588,7 @@ int _SC_decide_retry(asyncstate *as, jobinfo *inf, tasklst *tl, int st)
 
 	    stmsg = SC_dsnprintf(TRUE,
 				 "***> failed (%d) [%s] - attempt %d in %.2f seconds\n",
-				 st, time, ia + 1, ts/1000.0);
+				 st, ltm, ia + 1, ts/1000.0);
 
 	    SC_sleep(ts);}
 
@@ -596,19 +596,19 @@ int _SC_decide_retry(asyncstate *as, jobinfo *inf, tasklst *tl, int st)
 	   {warn  = TRUE;
 	    stmsg = SC_dsnprintf(TRUE,
 				 "***> failed (%d) [%s] - quitting after %d attempts\n",
-				 st, time, na);};
+				 st, ltm, na);};
 
-	CFREE(time);}
+	CFREE(ltm);}
 
     else
        {if ((ia > 1) && (na > 1))
 	   {warn  = TRUE;
-	    time  = SC_datef();
+	    ltm   = SC_datef();
 	    stmsg = SC_dsnprintf(TRUE,
 				 "***> succeeded [%s] - on attempt %d\n",
-				 time, ia);
+				 ltm, ia);
 
-	    CFREE(time);};
+	    CFREE(ltm);};
 
 	rv = 0;};
 

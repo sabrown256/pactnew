@@ -763,7 +763,7 @@ static void parse_assgn(rundes *st, char *sect,
 static int set_target(rundes *st)
    {int i, rv;
     char *p, *var, **sa;
-    char *cat, *lst;
+    char *ctg, *lst;
 
     rv = TRUE;
 
@@ -782,16 +782,16 @@ static int set_target(rundes *st)
 
 	     var = strtok(p, " \t");
 	     if (strcmp(var, "default") == 0)
-	        {cat = strtok(NULL, " \t");
+	        {ctg = strtok(NULL, " \t");
 		 lst = strtok(NULL, "\n");
 
-		 if ((strcmp(cat, "DBG") == 0) && (IS_NULL(st->dbgtgt) == TRUE))
+		 if ((strcmp(ctg, "DBG") == 0) && (IS_NULL(st->dbgtgt) == TRUE))
 		    load_target(st->dbgtgt, BFMED, lst);
 
-		 else if ((strcmp(cat, "MPI") == 0) && (IS_NULL(st->mpitgt) == TRUE))
+		 else if ((strcmp(ctg, "MPI") == 0) && (IS_NULL(st->mpitgt) == TRUE))
 		    load_target(st->mpitgt, BFMED, lst);
 
-		 else if ((strcmp(cat, "CROSS") == 0) && (IS_NULL(st->crosstgt) == TRUE))
+		 else if ((strcmp(ctg, "CROSS") == 0) && (IS_NULL(st->crosstgt) == TRUE))
 		    load_target(st->crosstgt, BFMED, lst);};};
 
 	free_strings(sa);};

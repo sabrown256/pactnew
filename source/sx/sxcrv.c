@@ -488,7 +488,7 @@ object *SX_rl_curve(int j)
  */
 
 object *SX_set_crv_id(int j, char *id)
-   {int jn, i;
+   {int i, ja;
     object *obj, *v;
 
 /* get the correct entry in SX_gs.dataset for the
@@ -498,12 +498,12 @@ object *SX_set_crv_id(int j, char *id)
 
 /* compute the index of the new id in SX_gs.data_index */
     if (id[0] == '@')
-       jn = SC_stoi(id+1) - 1;
+       ja = SC_stoi(id+1) - 1;
     else
-       jn = id[0] - 'A';
+       ja = id[0] - 'A';
 
-    jn = max(jn, 0);
-    jn = min(jn, SX_gs.n_curves-1);
+    ja = max(ja, 0);
+    ja = min(ja, SX_gs.n_curves-1);
 
 /* sever the connection with the old id using J */
     obj = SX_get_curve_obj(j);
@@ -512,10 +512,10 @@ object *SX_set_crv_id(int j, char *id)
     SS_VARIABLE_NAME(obj)  = SS_VARIABLE_NAME(v);
     SX_gs.data_index[j]  = -1;
 
-/* make the connection with the new id using JN */
-    SX_gs.dataset[i].id  = jn + 'A';
+/* make the connection with the new id using JA */
+    SX_gs.dataset[i].id  = ja + 'A';
     obj               = SX_mk_curve_proc(i);
-    SX_gs.data_index[jn] = i;
+    SX_gs.data_index[ja] = i;
 
     return(obj);}
 

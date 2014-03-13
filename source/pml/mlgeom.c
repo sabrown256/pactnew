@@ -18,6 +18,21 @@
     else                                                                     \
        _rv = (_cp < 0) ? -1 : 1;}
 
+
+/* PM_DAX - compute the volume contribution of a face of a tetrahedron
+ *        - NOTE: use Green's theorem to integrate dV*div(X) - this
+ *        - gives a sum of dA.X terms - (X1 x X3).(X4 - X2)
+ */
+
+#define PM_DAX(a, b, c, d)                                                   \
+   PM_DAXR(x ## a[0], x ## a[1], x ## a[2], x ## b[0], x ## b[1], x ## b[2], \
+           x ## c[0], x ## c[1], x ## c[2], x ## d[0], x ## d[1], x ## d[2])
+
+#define PM_DAXR(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4)              \
+    0.16666666667*((z1*y3 - y1*z3)*(x4-x2) +                                 \
+		   (x1*z3 - z1*x3)*(y4-y2) +                                 \
+                   (y1*x3 - x1*y3)*(z4-z2))
+
 typedef struct s_pt pt;
 typedef struct s_polywalk polywalk;
 
@@ -1650,8 +1665,8 @@ void PM_compute_hex_volume(double *vol, int nc, int *indx, double **x)
     int *ri;
     double vca;
     double v1, v2, v3, v4, v5, v6;
-    double x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4;
-    double x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8;
+    double x1[3], x2[3], x3[3], x4[3];
+    double x5[3], x6[3], x7[3], x8[3];
     double *rx, *ry, *rz;
 
     PM_array_set(vol, nc, 0.0);
@@ -1665,32 +1680,32 @@ void PM_compute_hex_volume(double *vol, int nc, int *indx, double **x)
     for (i = 0; i < nc; i++)
         {ri += 8;
 
-         x1 = rx[1];
-	 x2 = rx[2];
-	 x3 = rx[3];
-	 x4 = rx[4];
-	 x5 = rx[5];
-	 x6 = rx[6];
-	 x7 = rx[7];
-	 x8 = rx[8];
+         x1[0] = rx[1];
+	 x2[0] = rx[2];
+	 x3[0] = rx[3];
+	 x4[0] = rx[4];
+	 x5[0] = rx[5];
+	 x6[0] = rx[6];
+	 x7[0] = rx[7];
+	 x8[0] = rx[8];
 
-         y1 = ry[1];
-	 y2 = ry[2];
-	 y3 = ry[3];
-	 y4 = ry[4];
-	 y5 = ry[5];
-	 y6 = ry[6];
-	 y7 = ry[7];
-	 y8 = ry[8];
+         x1[1] = ry[1];
+	 x2[1] = ry[2];
+	 x3[1] = ry[3];
+	 x4[1] = ry[4];
+	 x5[1] = ry[5];
+	 x6[1] = ry[6];
+	 x7[1] = ry[7];
+	 x8[1] = ry[8];
 
-         z1 = rz[1];
-	 z2 = rz[2];
-	 z3 = rz[3];
-	 z4 = rz[4];
-	 z5 = rz[5];
-	 z6 = rz[6];
-	 z7 = rz[7];
-	 z8 = rz[8];
+         x1[2] = rz[1];
+	 x2[2] = rz[2];
+	 x3[2] = rz[3];
+	 x4[2] = rz[4];
+	 x5[2] = rz[5];
+	 x6[2] = rz[6];
+	 x7[2] = rz[7];
+	 x8[2] = rz[8];
 
 	 v1 = PM_DAX(1, 4, 3, 2);
 	 v2 = PM_DAX(1, 2, 6, 5);

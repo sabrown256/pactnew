@@ -1066,7 +1066,7 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
 		    void *vr, int nd, long *ind)
    {int i, new, appnd, ret, nc;
     long start, stop, step, leng;
-    char index[MAXLINE], hname[MAXLINE], fullpath[MAXLINE];
+    char lndx[MAXLINE], hname[MAXLINE], fullpath[MAXLINE];
     dimdes *dims, *next, *prev;
     syment *ep;
     PD_smp_state *pa;
@@ -1076,7 +1076,7 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
     prev = NULL;
     dims = NULL;
 
-    strcpy(index, "(");
+    strcpy(lndx, "(");
 
     for (i = 0; i < nd; i++)
         {start = ind[0];
@@ -1084,7 +1084,7 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
          step  = ind[2];
          ind += 3;
 
-         SC_vstrcat(index, MAXLINE, "%ld:%ld:%ld,", start, stop, step);
+         SC_vstrcat(lndx, MAXLINE, "%ld:%ld:%ld,", start, stop, step);
 
          leng = stop - start + 1L;
          next = _PD_mk_dimensions(start, leng);
@@ -1096,10 +1096,10 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
 
          prev = next;};
 
-    nc = strlen(index);
+    nc = strlen(lndx);
     if (nc > 1)
-       {index[nc-1] = ')';
-        snprintf(hname, MAXLINE, "%s%s", name, index);}
+       {lndx[nc-1] = ')';
+        snprintf(hname, MAXLINE, "%s%s", name, lndx);}
     else
        strcpy(hname, name);
 

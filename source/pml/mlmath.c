@@ -461,13 +461,13 @@ void PM_hasharr_stats(hasharr *ha,
  */
 
 double PM_romberg(double (*func)(double x), double x0, double x1, double tol)
-   {double y0, toln, h, x;
+   {double ly0, toln, h, x;
     double a[16], b[16];
     int i, n, in;
 
-    h  = x1 - x0;
-    x  = x0;
-    y0 = 0.0;
+    h   = x1 - x0;
+    x   = x0;
+    ly0 = 0.0;
 
     a[0] = h*((*func)(x0) + (*func)(x1))/2.0;
     toln = 2.0*tol;
@@ -484,14 +484,14 @@ double PM_romberg(double (*func)(double x), double x0, double x1, double tol)
          for (i = 1; i < n; i++)
              b[i] = (POW(4.0, i)*b[i-1] - a[i-1])/(POW(4.0, i) - 1.0);
 
-         y0 = b[n-1];
+         ly0 = b[n-1];
 
-         toln = ABS((y0 - b[n-2])/y0);
+         toln = ABS((ly0 - b[n-2])/ly0);
          if (toln > tol)
             for (i = 0; i < n; i++)
                 a[i] = b[i];};
 
-    return(y0);}
+    return(ly0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -558,21 +558,21 @@ double PM_integrate_tzr(double xmn, double xmx, int *pn,
 
 void PM_derivative(int n, double *fncx, double *fncy, double *derx, double *dery)
    {int i;
-    double x1, x2, y1, y2, yt;
+    double x1[2], x2[2], yt;
 
-    x1 = *fncx++;
-    y1 = *fncy++;
+    x1[0] = *fncx++;
+    x1[1] = *fncy++;
     for (i = 1; i < n; i++)
-        {x2 = *fncx++;
-         y2 = *fncy++;
-         *derx++ = 0.5*(x1 + x2);
-         if (x2 != x1)
-            *dery++ = (y2 - y1)/(x2 - x1);
+        {x2[0] = *fncx++;
+         x2[1] = *fncy++;
+         *derx++ = 0.5*(x1[0] + x2[0]);
+         if (x2[0] != x1[0])
+            *dery++ = (x2[1] - x1[1])/(x2[0] - x1[0]);
          else
 	    {yt = dery[-1];
 	     *dery++ = yt;};
-         x1 = x2;
-         y1 = y2;};
+         x1[0] = x2[0];
+         x1[1] = x2[1];};
 
     return;}
 
@@ -588,50 +588,50 @@ void PM_derivative(int n, double *fncx, double *fncy, double *derx, double *dery
 int PM_thin_1d_der(int n, double *fncx, double *fncy, double *thnx, double *thny,
 		   double toler)
    {int i, i0, j;
-    double x1, x2, y1, y2, xt, dydx, odydx;
+    double x1[2], x2[2], xt, dydx, odydx;
 
     if (toler == HUGE)
        {toler = 10.0/((double) n);
         toler = min(toler, 0.1);};
 
-    x1 = *fncx++;
-    y1 = *fncy++;
-    x2 = x1;
-    y2 = y1;
+    x1[0] = *fncx++;
+    x1[1] = *fncy++;
+    x2[0] = x1[0];
+    x2[1] = x1[1];
 
     j  = 0;
     i0 = -1;
 
     odydx = -HUGE;
     for (i = 1; i < n; i++)
-        {x2 = *fncx++;
-         y2 = *fncy++;
+        {x2[0] = *fncx++;
+         x2[1] = *fncy++;
 
-         if (x2 != x1)
-            dydx = (y2 - y1)/(x2 - x1);
+         if (x2[0] != x1[0])
+            dydx = (x2[1] - x1[1])/(x2[0] - x1[0]);
          else
-	    dydx = y2 > y1 ? HUGE : -HUGE;
+	    dydx = x2[1] > x1[1] ? HUGE : -HUGE;
 
          xt = 0.5*ABS(dydx - odydx)/(ABS(dydx) + ABS(odydx) + SMALL);
          if (xt > toler)
             {if (i0 < i-1)
-                {thnx[j] = x1;
-                 thny[j] = y1;
+                {thnx[j] = x1[0];
+                 thny[j] = x1[1];
                  j++;};
 
 	     odydx = dydx;
              i0    = i;
 
-             thnx[j] = x2;
-             thny[j] = y2;
+             thnx[j] = x2[0];
+             thny[j] = x2[1];
              j++;};
 
-         x1 = x2;
-         y1 = y2;};
+         x1[0] = x2[0];
+         x1[1] = x2[1];};
 
-    if (x2 != thnx[j-1])
-       {thnx[j] = x2;
-        thny[j] = y2;
+    if (x2[0] != thnx[j-1])
+       {thnx[j] = x2[0];
+        thny[j] = x2[1];
         j++;};
 
     return(j);}
@@ -745,8 +745,8 @@ int PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny
  */
 
 int PM_filter_coeff(double *y, int n, double *coef, int nc)
-   {int i, j, nh, nm, nu, jn, jx;
-    double *ny, *py, *pc, yn;
+   {int i, k, nh, nm, nu, kn, kx;
+    double *ny, *py, *pc, lyn;
 
     nh = nc >> 1;
     nm = nh*(3*nh + 1) >> 1;
@@ -754,32 +754,32 @@ int PM_filter_coeff(double *y, int n, double *coef, int nc)
 
     ny = CMAKE_N(double, n);
 
-    jn = 0;
-    jx = 0;
+    kn = 0;
+    kx = 0;
     for (i = 0; i < n; i++)
         {if (i < nh)
-	    {jx = nh + i + 1;
-             pc = coef + jn;
-             py = y;
-             jn += jx;}
+	    {kx  = nh + i + 1;
+             pc  = coef + kn;
+             py  = y;
+             kn += kx;}
 
          else if (i < nu)
-	    {jx = nc;
-             pc = coef + jn;
+	    {kx = nc;
+             pc = coef + kn;
              py = y + i - nh;
-	     jn = nm;}
+	     kn = nm;}
 
 	 else
-            {jn += jx;
-	     jx = nh + n - i;
-             pc = coef + jn;
-             py = y + n - jx;};
+            {kn += kx;
+	     kx = nh + n - i;
+             pc = coef + kn;
+             py = y + n - kx;};
 
-         yn = 0.0;
-         for (j = 0; j < jx; j++)
-             yn += (*py++)*(*pc++);
+         lyn = 0.0;
+         for (k = 0; k < kx; k++)
+             lyn += (*py++)*(*pc++);
 
-         ny[i] = yn;};
+         ny[i] = lyn;};
 
     memcpy(y, ny, n*sizeof(double));
     CFREE(ny);
@@ -795,8 +795,8 @@ int PM_filter_coeff(double *y, int n, double *coef, int nc)
  */
 
 int PM_smooth_int_ave(double *x, double *y, int n, int pts)
-   {int i, j, jn, jx, nh, nt;
-    double dx, Dx, ya, xo, xn, yo, yn;
+   {int i, k, kn, kx, nh, nt;
+    double dx, Dx, ya, xo, xn, yo, lyn;
     double *nx, *ny, *px, *py;
 
     pts = max(pts, 3);
@@ -808,30 +808,30 @@ int PM_smooth_int_ave(double *x, double *y, int n, int pts)
     ny = CMAKE_N(double, n);
 
     for (i = 0; i < n; i++)
-        {jn = i - nh;
-         jn = max(0, jn);
+        {kn = i - nh;
+         kn = max(0, kn);
 
-         jx = i + nh;
-         jx = min(nt, jx);
+         kx = i + nh;
+         kx = min(nt, kx);
 
-         px = x + jn;
+         px = x + kn;
          xo = *px++;
-         py = y + jn;
+         py = y + kn;
          yo = *py++;
          ya = 0.0;
          Dx = SMALL;
-         for (j = jn; j < jx; j++)
+         for (k = kn; k < kx; k++)
              {xn  = *px++;
               dx  = ABS(xn - xo);
               Dx += dx;
               xo  = xn;
 
-              yn  = *py++;
-              ya += 0.5*(yn + yo)*dx;
-              yo  = yn;};
+              lyn = *py++;
+              ya += 0.5*(lyn + yo)*dx;
+              yo  = lyn;};
 
          ny[i] = ya/Dx;
-         nx[i] = ((jx - i)*x[jn] + (i - jn)*x[jx])/(jx - jn);};
+         nx[i] = ((kx - i)*x[kn] + (i - kn)*x[kx])/(kx - kn);};
 
     n *= sizeof(double);
     memcpy(x, nx, n);
@@ -951,7 +951,7 @@ void PM_smooth_filter(complex *z, int n, double pts)
 int _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
 	     double *xb, double *yb, double **pxf, double **pyf)
    {int i, j, ja, jb, nf, nm, nmn, nt;
-    double *xf, *yf, *yn;
+    double *xf, *yf, *lyn;
     double Dxa, Dxb, dxa, dxb, xt, yt, xmn, xmx;
 
     Dxa = xa[na-1] - xa[0];
@@ -987,7 +987,7 @@ int _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
 
          nm = max(nm, nt);};
 
-    yn = CMAKE_N(double, nm);
+    lyn = CMAKE_N(double, nm);
 
     dxb *= 0.5;
     for (xt = xmn, i = 0; i < nf; i++, xt += dxa)
@@ -1010,17 +1010,17 @@ int _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
              jb = (i < (nb - 1)) ? (nb - 1 - i) : 0;}
 
          for (j = 0; j < nt; j++)
-             yn[j] = ya[j + ja]*yb[j + jb];
+             lyn[j] = ya[j + ja]*yb[j + jb];
 
 /* integrate the product function */
          yt = 0.0;
          for (j = 1; j < nt; j++)
-             yt += dxb*(yn[j] + yn[j-1]);
+             yt += dxb*(lyn[j] + lyn[j-1]);
 
 /* stash the value */
          yf[i] = yt;};
 
-    CFREE(yn);
+    CFREE(lyn);
 
     return(nf);}
 

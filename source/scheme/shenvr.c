@@ -964,16 +964,16 @@ static void _SS_sig_handler(int sig)
  */
 
 static object *_SS_get_ext_ref(SS_psides *si, char *name)
-   {char uname[MAXLINE];
+   {char unm[MAXLINE];
     haelem *hp;
     object *o;
 
     hp = SC_hasharr_lookup(si->symtab, name);
 
     if (hp == NULL)
-       {strcpy(uname, name);
-	SC_str_upper(uname);
-	PRINT(ERRDEV, "Error initializing %s\n", uname);
+       {strcpy(unm, name);
+	SC_str_upper(unm);
+	PRINT(ERRDEV, "Error initializing %s\n", unm);
         LONGJMP(SC_gs.cpu, ABORT);};  
 
     o = (object *) hp->def;

@@ -93,7 +93,7 @@ static void SX_set_graphics_state(PG_device *d)
  */
 
 static void _SX_expand_prefix(char *s, int nc)
-   {int ns, index, more_tokens;
+   {int ns, lind, more_tokens;
     char t[MAXLINE], bf[MAXLINE], token[MAXLINE];
     char *tp, *fp, *ip, *pt;
 
@@ -127,9 +127,9 @@ static void _SX_expand_prefix(char *s, int nc)
 	        if ((fp != NULL) && (*(token + strlen(fp)) == '.'))
 	           {ip = SC_strtok(NULL, "()[]", pt);
 	            if ((ip != NULL) && (SC_intstrp(ip, 10)))
-	               {index = ATOL(ip);
+	               {lind = ATOL(ip);
 		        snprintf(token, MAXLINE, "(data-reference %d %s)%s",
-				 index, fp,
+				 lind, fp,
 				 tp + strlen(fp) + 1 + strlen(ip));};};}
 
 	    snprintf(s+ns, nc-ns, "%s ", token);

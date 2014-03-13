@@ -530,7 +530,7 @@ static void _PD_reorder(char *arr, inti ni, intb bpi, int *ord)
 
 static void _PD_byte_align(char *out, char *in, inti ni,
 			   long *infor, int *inord, intb boffs)
-   {intb chunk1, chunk2, outbytes, remainder, nbitsin;
+   {intb chunk1, chunk2, outbytes, rmndr, nbitsin;
     inti i, inrem;
     unsigned char *inptr, *outptr;
     unsigned char mask1, mask2;
@@ -545,7 +545,7 @@ static void _PD_byte_align(char *out, char *in, inti ni,
     inptr  = (unsigned char *) in;
     outptr = (unsigned char *) out;
     inrem  = nbitsin * ni;
-    remainder = nbitsin % 8;
+    rmndr  = nbitsin % 8;
 
     chunk1  = min(8, nbitsin);
     chunk1 -= boffs;
@@ -558,12 +558,12 @@ static void _PD_byte_align(char *out, char *in, inti ni,
 	    {*outptr = ((*inptr & mask1) << chunk2) |    
 		       ((*(inptr + 1)  >> chunk1) & mask2);};
            
-	if (remainder <= chunk1)
+	if (rmndr <= chunk1)
 	   {*outptr++ = (*inptr << chunk2) & 
-	                (((1 << remainder) - 1)  << (8 - remainder));
-	    if (remainder == chunk1)
+	                (((1 << rmndr) - 1)  << (8 - rmndr));
+	    if (rmndr == chunk1)
 	       inptr++;
-	    chunk1 -= remainder;
+	    chunk1 -= rmndr;
 	    if (chunk1 == 0)
 	       chunk1 = 8;
 	    chunk2  = 8 - chunk1;}
@@ -572,13 +572,13 @@ static void _PD_byte_align(char *out, char *in, inti ni,
 	   {*outptr =    ((*inptr << chunk2) &
 			  (((1 << chunk1) - 1) << chunk2));
 	    *outptr++ |= ((*(++inptr) >> chunk1) &
-			  (((1 << (remainder - chunk1)) - 1) << (8 - (remainder - chunk1) - chunk1)));
-	    chunk1 = 8 - (remainder - chunk1);
+			  (((1 << (rmndr - chunk1)) - 1) << (8 - (rmndr - chunk1) - chunk1)));
+	    chunk1 = 8 - (rmndr - chunk1);
 	    chunk2 = 8 - chunk1;};
 
 	mask1 = (1 << chunk1) - 1;
 	mask2 = (1 << chunk2) - 1;
-	inrem -= remainder;};
+	inrem -= rmndr;};
     
     return;}
 
@@ -1580,7 +1580,7 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
     intb hmbyt, mbyti, mbyto;
     intb sbit, ebit, hmbit, dhmb, dmbit, rshift;
     intb sbyt, ebyt;
-    intb nb_mant_rem, remainder, k;
+    intb nb_mant_rem, rmndr, k;
     long emax;
     long esave[MBLOCKS], tformat[8];
     char mask, mask1, mask2, cmask;
@@ -1906,63 +1906,63 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 /* fill in the rest of the first output byte with the first
  * part of the second input byte
  */
-	     numleft   = dmbit;
-	     remainder = 0;
+	     numleft = dmbit;
+	     rmndr   = 0;
 	     if (numleft > 0)
-	        {mask      = (1 << numleft) - 1;
-		 pin       = ++pmbi;
-		 pout      = pmbo;
-		 remainder = 8 - numleft;
+	        {mask  = (1 << numleft) - 1;
+		 pin   = ++pmbi;
+		 pout  = pmbo;
+		 rmndr = 8 - numleft;
 		 if (loverflow || lunderflow)
 		    {if (onescmp)
 		        {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 			     {if ((0 < esave[i]) && (esave[i] < emax))
 				 {if (ssave[i])
-				     *pout |= ~(pin[0] >> remainder) & mask;
+				     *pout |= ~(pin[0] >> rmndr) & mask;
 				  else
-				     *pout |=  (pin[0] >> remainder) & mask;};};}
+				     *pout |=  (pin[0] >> rmndr) & mask;};};}
 		     else
 		        {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 			     {if ((0 < esave[i]) && (esave[i] < emax))
-				 *pout |= (pin[0] >> remainder) & mask;};};}
+				 *pout |= (pin[0] >> rmndr) & mask;};};}
 		 else 
 		    {if (onescmp)
 		        {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 			     {if (ssave[i])
-				 *pout |= ~(pin[0] >> remainder) & mask;
+				 *pout |= ~(pin[0] >> rmndr) & mask;
 			      else
-				 *pout |=  (pin[0] >> remainder) & mask;};}
+				 *pout |=  (pin[0] >> rmndr) & mask;};}
 		     else
 		        {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-			     *pout |= (pin[0] >> remainder) & mask;};};};}
+			     *pout |= (pin[0] >> rmndr) & mask;};};};}
 
 /* mbiti < mbito */
 	 else
 
 /* no it won't fit */
-	    {remainder = mbito - mbiti; 
+	    {rmndr = mbito - mbiti; 
 	     if (loverflow || lunderflow)
 	        {if (onescmp)
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		         {if ((0 < esave[i]) && (esave[i] < emax))
 			     {if (ssave[i])
-				 *pout |= ~(pin[0] >> remainder) & mask;
+				 *pout |= ~(pin[0] >> rmndr) & mask;
 			      else
-				 *pout |=  (pin[0] >> remainder) & mask;};};}
+				 *pout |=  (pin[0] >> rmndr) & mask;};};}
 		 else
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		         {if ((0 < esave[i]) && (esave[i] < emax))
-			     *pout |= (pin[0] >> remainder) & mask;};};}
+			     *pout |= (pin[0] >> rmndr) & mask;};};}
 	     else
 	        {if (onescmp)
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		         {if (ssave[i])
-			     *pout |= ~(pin[0] >> remainder) & mask;
+			     *pout |= ~(pin[0] >> rmndr) & mask;
 			  else
-			     *pout |=  (pin[0] >> remainder) & mask;};}
+			     *pout |=  (pin[0] >> rmndr) & mask;};}
 		 else
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-		         *pout |= (pin[0] >> remainder) & mask;};};};
+		         *pout |= (pin[0] >> rmndr) & mask;};};};
 
 	 inrem  -= nbitsout;
 	 outrem -= nbitsout;          
@@ -1976,8 +1976,8 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 /* how many full bytes of mantissa left? */
 	 nb_mant_rem = inrem >> 3;
 	 nb_mant_rem = min(nb_mant_rem, outrem >> 3);
-	 mask1 = (1 << remainder) -1;
-	 mask2 = (1 << (8 - remainder)) -1;
+	 mask1 = (1 << rmndr) -1;
+	 mask2 = (1 << (8 - rmndr)) -1;
        
 	 for (k = 0; k < nb_mant_rem; k++)
 	     {pout = pmbo + k;
@@ -1989,35 +1989,35 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		          {if ((0 < esave[i]) && (esave[i] < emax))
 			      {if (ssave[i])
-				  *pout = ((~pin[0] & mask1) << (8 - remainder)) |
-				            (~(pin[1] >> remainder) & mask2);
+				  *pout = ((~pin[0] & mask1) << (8 - rmndr)) |
+				            (~(pin[1] >> rmndr) & mask2);
 			       else
-				  *pout = ((pin[0] & mask1) << (8 - remainder)) |
-				            ((pin[1] >> remainder) & mask2);};};}
+				  *pout = ((pin[0] & mask1) << (8 - rmndr)) |
+				            ((pin[1] >> rmndr) & mask2);};};}
 
 /* move the mantissa over bytewise */
 		  else
 		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		          {if ((0 < esave[i]) && (esave[i] < emax))
-			      *pout = ((pin[0] & mask1) << (8 - remainder)) |
-				        ((pin[1] >> remainder) & mask2);};};}
+			      *pout = ((pin[0] & mask1) << (8 - rmndr)) |
+				        ((pin[1] >> rmndr) & mask2);};};}
 	      else
 		 {if (onescmp)
 
 /* move the mantissa over bytewise */
 		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		          {if (ssave[i])
-			      *pout = ((~pin[0] & mask1) << (8 - remainder)) |
-			                (~(pin[1] >> remainder) & mask2);
+			      *pout = ((~pin[0] & mask1) << (8 - rmndr)) |
+			                (~(pin[1] >> rmndr) & mask2);
 			   else
-			      *pout = ((pin[0] & mask1) << (8 - remainder)) |
-			                ((pin[1] >> remainder) & mask2);};}
+			      *pout = ((pin[0] & mask1) << (8 - rmndr)) |
+			                ((pin[1] >> rmndr) & mask2);};}
 		  else
 
 /* move the mantissa over bytewise */
 		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-		          {*pout = ((pin[0] & mask1) << (8 - remainder)) |
-			             ((pin[1] >> remainder) & mask2);};};};}
+		          {*pout = ((pin[0] & mask1) << (8 - rmndr)) |
+			             ((pin[1] >> rmndr) & mask2);};};};}
 
 	 pmbo    += nb_mant_rem;
 	 pmbi    += nb_mant_rem;
@@ -2036,23 +2036,23 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		         {if ((0 < esave[i]) && (esave[i] < emax))
 			     {if (ssave[i])
-				 *pout = ~(pin[0] << (8 - remainder)) & mask;
+				 *pout = ~(pin[0] << (8 - rmndr)) & mask;
 			      else
-				 *pout =  (pin[0] << (8 - remainder)) & mask;};};}
+				 *pout =  (pin[0] << (8 - rmndr)) & mask;};};}
 		 else
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		         {if ((0 < esave[i]) && (esave[i] < emax))
-			     *pout = (pin[0] << (8 - remainder)) & mask;};};}
+			     *pout = (pin[0] << (8 - rmndr)) & mask;};};}
 	     else
 	        {if (onescmp)
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		         {if (ssave[i])
-			     *pout = ~(pin[0] << (8 - remainder)) & mask;
+			     *pout = ~(pin[0] << (8 - rmndr)) & mask;
 			  else
-			     *pout = (pin[0] << (8 - remainder)) & mask;};}
+			     *pout = (pin[0] << (8 - rmndr)) & mask;};}
 		 else
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-		         *pout = (pin[0] << (8 - remainder)) & mask;};};};
+		         *pout = (pin[0] << (8 - rmndr)) & mask;};};};
 
 	 l += le - ls;
 	 le = min(ni-l, MBLOCKS);};

@@ -120,32 +120,32 @@ static object *_SXI_clear_region(SS_psides *si, object *argl)
 
 static object *_SXI_def_mrk(SS_psides *si, object *argl)
    {int i, ns, indx;
-    double *x1, *y1, *x2, *y2;
+    double *x1[2], *x2[2];
     object *obj;
 
     ns = SS_length(si, argl) >> 2;
 
-    x1 = CMAKE_N(double, ns);
-    y1 = CMAKE_N(double, ns);
-    x2 = CMAKE_N(double, ns);
-    y2 = CMAKE_N(double, ns);
+    x1[0] = CMAKE_N(double, ns);
+    x1[1] = CMAKE_N(double, ns);
+    x2[0] = CMAKE_N(double, ns);
+    x2[1] = CMAKE_N(double, ns);
 
     for (i = 0; i < ns; i++)
-        {SX_GET_FLOAT_FROM_LIST(si, x1[i], argl,
+        {SX_GET_FLOAT_FROM_LIST(si, x1[0][i], argl,
 	                        "CAN'T GET FIRST X VALUE - _SXI_DEF_MRK");
-         SX_GET_FLOAT_FROM_LIST(si, y1[i], argl,
+         SX_GET_FLOAT_FROM_LIST(si, x1[1][i], argl,
 	                        "CAN'T GET FIRST Y VALUE - _SXI_DEF_MRK");
-         SX_GET_FLOAT_FROM_LIST(si, x2[i], argl,
+         SX_GET_FLOAT_FROM_LIST(si, x2[0][i], argl,
 	                        "CAN'T GET SECOND X VALUE - _SXI_DEF_MRK");
-         SX_GET_FLOAT_FROM_LIST(si, y2[i], argl,
+         SX_GET_FLOAT_FROM_LIST(si, x2[1][i], argl,
 	                        "CAN'T GET SECOND Y VALUE - _SXI_DEF_MRK");};
 
-    indx = PG_def_marker(ns, x1, y1, x2, y2);
+    indx = PG_def_marker(ns, x1[0], x1[1], x2[0], x2[1]);
 
-    CFREE(x1);
-    CFREE(y1);
-    CFREE(x2);
-    CFREE(y2);
+    CFREE(x1[0]);
+    CFREE(x1[1]);
+    CFREE(x2[0]);
+    CFREE(x2[1]);
 
     obj = SS_mk_integer(si, indx);
 

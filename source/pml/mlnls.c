@@ -17,11 +17,11 @@
 /* _PM_SETTOL - set the tolerances */
 
 static void _PM_settol(int neqns, double *tol, double *x,
-		       double atol, double rtol)
+		       double latol, double lrtol)
    {int i;
 
     for (i = 0; i < neqns; i++)
-        tol[i] = 1.0 / (atol + rtol*ABS(x[i]));
+        tol[i] = 1.0 / (latol + lrtol*ABS(x[i]));
 
     return;}
 
@@ -48,7 +48,7 @@ static double _PM_wvnorm(int neqns, double *x, double *tol)
  *             - by Alpal-generated codes.  This uses Newton's method to
  *             - solve f(Y)=0, with Y an array of length NEQNS.  On input,
  *             - NEQNS and the maximum number of iterations MAXITER need to
- *             - be set along with ATOL and RTOL which are the absolute and
+ *             - be set along with LATOL and LRTOL which are the absolute and
  *             - relative error tolerance parameters (good values are 1.0e-4
  *             - and 1.0e-3 respectively).  Initial y values come in through Y
  *             - and the solution values are returned in Y.
@@ -66,14 +66,14 @@ static double _PM_wvnorm(int neqns, double *x, double *tol)
  *             - Returns 0 iff we converged.
  *             - The convergence criterion is simple minded:
  *             -
- *             -     Norm(dy)/(atol + rtol*abs(y2[i])) < 1
+ *             -     Norm(dy)/(latol + lrtol*abs(y2[i])) < 1
  *             -
  *             - where, dy is the correction to the solution found in
  *             - the last iteration.
  */
 
 double PM_newtondl(int neqns, double *y, double *dy, double *tol,
-		   int maxiter, double atol, double rtol,
+		   int maxiter, double latol, double lrtol,
                    void (*linsolv)(int neqns, double *dy, double *y, int iter, void *arg),
 		   void *arg)
    {int i, n, iter, rv;
@@ -95,7 +95,7 @@ double PM_newtondl(int neqns, double *y, double *dy, double *tol,
         for (i = 0; i < neqns; i++)
             y[i] += dy[i];
 
-        _PM_settol(neqns, tol, y, atol, rtol);
+        _PM_settol(neqns, tol, y, latol, lrtol);
 
         err = _PM_wvnorm(neqns, dy, tol);};
 
@@ -110,17 +110,17 @@ double PM_newtondl(int neqns, double *y, double *dy, double *tol,
  *             - by Alpal-generated codes.  This uses Newton's method to
  *             - solve f(Y)=0, with Y an array of length NEQNS.  On input,
  *             - NEQNS and the maximum number of iterations MAXITER need to
- *             - be set along with ATOL and RTOL which are the absolute and
+ *             - be set along with LATOL and LRTOL which are the absolute and
  *             - relative error tolerance parameters (good values are 1.0e-4
- *             - and 1.0e-3 respectively).  Initial y values come in through Y2
- *             - and the solution values are returned in Y2.
+ *             - and 1.0e-3 respectively).  Initial y values come in through YB
+ *             - and the solution values are returned in YB.
  *             - One subroutine must be passed in through LINSOLV.
  *             - LINSOLV(x, y, iter) computes the Jacobian and the right-hand
  *             - side in the equation:
  *             -
- *             -     J.y2 = J.y1 - f(y1)   where J = (df/dy) at y1
- *             -     y1 = y[iter-1]
- *             -     y2 = y[iter]
+ *             -     J.yb = J.ya - f(ya)   where J = (df/dy) at ya
+ *             -     ya = y[iter-1]
+ *             -     yb = y[iter]
  *             -
  *             - and returns the solution of the equation.  Iter is the Newton
  *             - iteration index. 
@@ -128,14 +128,14 @@ double PM_newtondl(int neqns, double *y, double *dy, double *tol,
  *             - Returns 0 iff we converged.
  *             - The convergence criterion is simple minded:
  *             -
- *             -     Norm(delta - y1[i])/(atol + rtol*abs(y2[i])) < 1
+ *             -     Norm(delta - ya[i])/(latol + lrtol*abs(yb[i])) < 1
  *             -
- *             - where, delta - y1 is the correction to the solution found in
+ *             - where, delta - ya is the correction to the solution found in
  *             - the last iteration.
  */
 
-double PM_newtonul(int neqns, double *y2, double *y1, double *tol, int maxiter,
-		   double atol, double rtol,
+double PM_newtonul(int neqns, double *yb, double *ya, double *tol, int maxiter,
+		   double latol, double lrtol,
                    void (*linsolv)(int neqns, double *dy, double *y, int iter, void *arg),
                    void *arg)
    {int i, iter, n;
@@ -148,26 +148,26 @@ double PM_newtonul(int neqns, double *y2, double *y1, double *tol, int maxiter,
     while ((err > 1.0) && (iter++ < maxiter))
 
 /* initial iterate */
-       {memset(y1, 0, n);
+       {memset(ya, 0, n);
 
-/* solve J.y1 = -f(y2) */
-        linsolv(neqns, y1, y2, iter, arg);
+/* solve J.ya = -f(yb) */
+        linsolv(neqns, ya, yb, iter, arg);
 
-/* update y2 and set y1 to the correction made in this iteration
+/* update yb and set ya to the correction made in this iteration
  * use tol for temporary storage to allow vectorization
  */
         for (i = 0; i < neqns; i++)
-            tol[i] = y1[i] - y2[i];
+            tol[i] = ya[i] - yb[i];
 
         for (i = 0; i < neqns; i++)
-            y2[i] = y1[i];
+            yb[i] = ya[i];
 
         for (i = 0; i < neqns; i++)
-            y1[i] = tol[i];
+            ya[i] = tol[i];
 
-        _PM_settol(neqns, tol, y2, atol, rtol);
+        _PM_settol(neqns, tol, yb, latol, lrtol);
 
-        err = _PM_wvnorm(neqns, y1, tol);};
+        err = _PM_wvnorm(neqns, ya, tol);};
 
     rv = (err <= 1.0) ? 0.0 : err;
 
@@ -183,10 +183,10 @@ double PM_newtonul(int neqns, double *y2, double *y1, double *tol, int maxiter,
  *                      - non-linear iteration
  */
 
-static double _PM_compute_jacobian(double xm, double x1, double xp,
-				   double ym, double y1, double yp,
+static double _PM_compute_jacobian(double xm, double xa, double xp,
+				   double ym, double ya, double yp,
 				   int meth)
-   {double da, db, dc, b, c, dsc, xs, x1s;
+   {double da, db, dc, b, c, dsc, xs, xas;
     double ep, em, up, um, uep, uem, ie;
     double jsn, rat;
 
@@ -196,10 +196,10 @@ static double _PM_compute_jacobian(double xm, double x1, double xp,
     uep = 0.0;
     uem = 0.0;
 
-    ep = xp - x1;
-    em = xm - x1;
-    up = yp - y1;
-    um = ym - y1;
+    ep = xp - xa;
+    em = xm - xa;
+    up = yp - ya;
+    um = ym - ya;
 	
     if ((ep == 0.0) || (em == 0.0) || (em == ep))
        meth = 0;
@@ -229,17 +229,17 @@ static double _PM_compute_jacobian(double xm, double x1, double xp,
 	   {case 1 :
 	         da = (uem - uep)*ie;
 		 db = 2.0/jsn;
-		 dc = 2.0*y1;
+		 dc = 2.0*ya;
 		 break;
 
 /* fit quadratic to the three points */
 	    case 2 :
-		 x1s = x1*x1;
+		 xas = xa*xa;
 		 b   = (ep*uem - em*uep)*ie;
 
 		 da = (uep - uem)*ie;
-		 db = b - 2*da*x1;
-		 dc = y1 + da*x1s - b*x1;
+		 db = b - 2*da*xa;
+		 dc = ya + da*xas - b*xa;
 
 		 break;};
 
@@ -256,7 +256,7 @@ static double _PM_compute_jacobian(double xm, double x1, double xp,
 		if ((xs < xm) || (xp < xs))
 		   xs = -b + dsc;
 
-		jsn = -(xs - x1)/y1;};};};
+		jsn = -(xs - xa)/ya;};};};
 
     return(jsn);}
 
@@ -320,8 +320,8 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
 		     double (*fnc)(double x, void *data), void *arg)
    {int it, itx;
     double err, yerr, xerr, jsn;
-    double xt, dx, dxa, x1, y1;
-    double rat, x2, y2, iasymm, fltol;
+    double xt, dx, dxa, x1[2], x2[2];
+    double rat, iasymm, fltol;
 
     yerr = 0.0;
     xerr = 0.0;
@@ -329,14 +329,14 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
     if (_PM.precision == -1.0)
        _PM.precision = PM_machine_precision();
 
-    x1  = *px;
-    y1  = *py;
-    itx = *pitx;
+    x1[0] = *px;
+    x1[1] = *py;
+    itx   = *pitx;
 
     iasymm = 1.0/asymm;
     fltol  = 10.0*_PM.precision;
-    if (ABS(x1) > 1.0)
-       fltol *= ABS(x1);
+    if (ABS(x1[0]) > 1.0)
+       fltol *= ABS(x1[0]);
 
     fltol = max(fltol, xtol);
 
@@ -347,47 +347,47 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
        yp = (*fnc)(xp, arg);
 
 /* if we happen to have nailed it on the plus side we're done */
-    if ((yp < ytol) && (yp == y1))
-       {y1   = yp;
-	x1   = xp;
-	it   = 0;
-        yerr = yp;}
+    if ((yp < ytol) && (yp == x1[1]))
+       {x1[1] = yp;
+	x1[0] = xp;
+	it    = 0;
+        yerr  = yp;}
 
 /* if we happen to have nailed it on the minus side we're done */
-    else if ((-ym < ytol) && (ym == y1))
-       {y1   = ym;
-	x1   = xm;
-	it   = 0;
-	yerr = -ym;}
+    else if ((-ym < ytol) && (ym == x1[1]))
+       {x1[1] = ym;
+	x1[0] = xm;
+	it    = 0;
+	yerr  = -ym;}
 
 /* iterate it we must */
     else
        {dx = _PM.mlt*(xp - xm);
-	dx = (x1 == xm) ? dx : -dx;
+	dx = (x1[0] == xm) ? dx : -dx;
 
 /* do a first pass with the linear method 
  * with luck this gets a second good point on the other
- * side of 0 from x1 - convergence goes ultra fast then
+ * side of 0 from x1[0] - convergence goes ultra fast then
  */
-	x1 += dx;
-	y1  = (*fnc)(x1, arg);
-	jsn = _PM_compute_jacobian(xm, x1, xp, ym, y1, yp, 0);
+	x1[0] += dx;
+	x1[1]  = (*fnc)(x1[0], arg);
+	jsn    = _PM_compute_jacobian(xm, x1[0], xp, ym, x1[1], yp, 0);
 
-	dx = -y1*jsn;
-	xt = x1 + dx;
+	dx = -x1[1]*jsn;
+	xt = x1[0] + dx;
 	if ((xt <= xm) || (xp <= xt))
-	   dx = (yp*xm - ym*xp)/(yp - ym) - x1;
+	   dx = (yp*xm - ym*xp)/(yp - ym) - x1[0];
 
 	if (ABS(dx) < _PM.precision)
 	   {it   = -1;
 	    itx  = 0;
-	    yerr = ABS(y1);};
+	    yerr = ABS(x1[1]);};
 
 	for (it = 1; it < itx; it++)
-	    {x1 += dx;
-	     y1 = (*fnc)(x1, arg);
+	    {x1[0] += dx;
+	     x1[1]  = (*fnc)(x1[0], arg);
 
-	     yerr = ABS(y1);
+	     yerr = ABS(x1[1]);
 	     xerr = ABS(dx);
 	     if ((yerr < ytol) || (xerr < fltol))
 	        break;
@@ -403,44 +403,44 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
  * in magnitude since this situation slows convergence
  * considerably
  */
-	     rat = (ym == y1) ? 1.0 : (yp - y1)/(y1 - ym);
+	     rat = (ym == x1[1]) ? 1.0 : (yp - x1[1])/(x1[1] - ym);
 
 /* if ym is closer to zero by a lot than yp
  * iteratively chop the way too high side down
  */
-	     if ((rat > asymm) && (y1 < 0.0))
+	     if ((rat > asymm) && (x1[1] < 0.0))
                 {for (; it < itx; it++)
-		     {x2 = x1 + 0.1*(xp - x1);
-		      dx = x2 - x1;
+		     {x2[0] = x1[0] + 0.1*(xp - x1[0]);
+		      dx    = x2[0] - x1[0];
 		      if (ABS(dx) < fltol)
 			 break;
 
-		      y2 = (*fnc)(x2, arg);
-		      if (y2 > 0.0)
-		         {xp = x2;
-			  yp = y2;}
+		      x2[1] = (*fnc)(x2[0], arg);
+		      if (x2[1] > 0.0)
+		         {xp = x2[0];
+			  yp = x2[1];}
 		      else
-		         {x1 = x2;
-			  y1 = y2;
+		         {x1[0] = x2[0];
+			  x1[1] = x2[1];
 			  break;};};}
 
 /* yp is closer to zero by a lot than ym
  * iteratively chop the way too low side down
  */
-	     else if ((rat < iasymm) && (y1 > 0.0))
+	     else if ((rat < iasymm) && (x1[1] > 0.0))
                 {for (; it < itx; it++)
-		     {x2 = x1 - 0.1*(x1 - xm);
-		      dx = x2 - x1;
+		     {x2[0] = x1[0] - 0.1*(x1[0] - xm);
+		      dx    = x2[0] - x1[0];
 		      if (ABS(dx) < fltol)
 			 break;
 
-		      y2 = (*fnc)(x2, arg);
-		      if (y2 < 0.0)
-		         {xm = x2;
-			  ym = y2;}
+		      x2[1] = (*fnc)(x2[0], arg);
+		      if (x2[1] < 0.0)
+		         {xm = x2[0];
+			  ym = x2[1];}
 		      else
-		         {x1 = x2;
-			  y1 = y2;
+		         {x1[0] = x2[0];
+			  x1[1] = x2[1];
 			  break;};};};
 	       
 /* Case #2
@@ -448,69 +448,69 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
  */
 
 /* if we have a dip/flat on the low side move past it */
-	     if ((ym >= y1) && (xm != x1))
+	     if ((ym >= x1[1]) && (xm != x1[0]))
                 {for (; it < itx; it++)
-		     {x2 = 0.5*(x1 + xp);
-		      dx = x2 - x1;
+		     {x2[0] = 0.5*(x1[0] + xp);
+		      dx    = x2[0] - x1[0];
 		      if (ABS(dx) < fltol)
 			 break;
 
-		      y2 = (*fnc)(x2, arg);
-		      if (y2 <= ym)
-		         {x1 = x2;
-			  y1 = y2;}
-		      else if (y2 > 0.0)
-		         {xp = x2;
-			  yp = y2;}
+		      x2[1] = (*fnc)(x2[0], arg);
+		      if (x2[1] <= ym)
+		         {x1[0] = x2[0];
+			  x1[1] = x2[1];}
+		      else if (x2[1] > 0.0)
+		         {xp = x2[0];
+			  yp = x2[1];}
 		      else
-		         {x1 = x2;
-			  y1 = y2;
+		         {x1[0] = x2[0];
+			  x1[1] = x2[1];
 			  break;};};}
 
 /* if we have a bump/flat on the high side move past it */
-	     else if ((yp <= y1) && (xp != x1))
+	     else if ((yp <= x1[1]) && (xp != x1[0]))
                 {for (; it < itx; it++)
-		     {x2 = 0.5*(x1 + xm);
-		      dx = x2 - x1;
+		     {x2[0] = 0.5*(x1[0] + xm);
+		      dx    = x2[0] - x1[0];
 		      if (ABS(dx) < fltol)
 			 break;
 
-		      y2 = (*fnc)(x2, arg);
-		      if (y2 >= yp)
-		         {x1 = x2;
-			  y1 = y2;}
-		      else if (y2 < 0.0)
-		         {xm = x2;
-			  ym = y2;}
+		      x2[1] = (*fnc)(x2[0], arg);
+		      if (x2[1] >= yp)
+		         {x1[0] = x2[0];
+			  x1[1] = x2[1];}
+		      else if (x2[1] < 0.0)
+		         {xm = x2[0];
+			  ym = x2[1];}
 		      else
-		         {x1 = x2;
-			  y1 = y2;
+		         {x1[0] = x2[0];
+			  x1[1] = x2[1];
 			  break;};};}
 
-	     yerr = ABS(y1);
+	     yerr = ABS(x1[1]);
 	     xerr = ABS(dx);
 	     if ((yerr < ytol) || (xerr < fltol))
 	        break;
 
-	     jsn = _PM_compute_jacobian(xm, x1, xp, ym, y1, yp, meth);
+	     jsn = _PM_compute_jacobian(xm, x1[0], xp, ym, x1[1], yp, meth);
 
 /* improve the bracketed interval on the top or bottom */
-	     if (y1 < 0.0)
-	        {xm = x1;
-		 ym = y1;}
+	     if (x1[1] < 0.0)
+	        {xm = x1[0];
+		 ym = x1[1];}
 	     else
-	        {xp = x1;
-		 yp = y1;};
+	        {xp = x1[0];
+		 yp = x1[1];};
 
 /* compute the change in x for the next iteration */
-	     dx = -y1*jsn;
-	     xt = x1 + dx;
+	     dx = -x1[1]*jsn;
+	     xt = x1[0] + dx;
 
 /* if the slope takes us outside of the known interval
  * interpolate between the interval limits
  */
 	     if ((xt <= xm) || (xp <= xt))
-	        dx = (yp*xm - ym*xp)/(yp - ym) - x1;
+	        dx = (yp*xm - ym*xp)/(yp - ym) - x1[0];
 
 /* if we aren't changing stop */
 	     dxa = 2.0*dx/(xp + xm);
@@ -528,8 +528,8 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
     else
        err = -xerr;
 
-    *py   = y1;
-    *px   = x1;
+    *py   = x1[1];
+    *px   = x1[0];
     *perr = err;
     *pitx = it;
 

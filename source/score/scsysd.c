@@ -2371,27 +2371,27 @@ int SC_connection_pool_anomalies(conpool *cp)
  *                          - client side routine
  */
 
-void SC_close_connection_pool(conpool *cp, int log, int sum)
+void SC_close_connection_pool(conpool *cp, int lg, int sum)
    {int ic, ih, nc, nh, nr;
-    char **hsts, *logf;
+    char **hsts, *lgf;
     asyncstate *as;
 
     as = cp->as;
 
 /* if log file requested by environment variable only use it */
-    logf = getenv("SC_EXEC_LOG_FILE");
-    if ((logf != NULL) && (as->log == NULL))
-       as->log = io_open(logf, "w");
+    lgf = getenv("SC_EXEC_LOG_FILE");
+    if ((lgf != NULL) && (as->log == NULL))
+       as->log = io_open(lgf, "w");
 
 /* if there are any anomalies then force log info out */
     if (SC_connection_pool_anomalies(cp) == TRUE)
-       log = -1;
+       lg = -1;
 
 /* decide about full log info */
-    if ((log != 0) && (log != SIGINT))
+    if ((lg != 0) && (lg != SIGINT))
        {SC_show_pool_stats(cp, -1, TRUE);
 	SC_show_pool_logs(cp, -1);
-        if (log == -1)
+        if (lg == -1)
 	   _SC_show_server_logs(cp, -1);
 	SC_connection_pool_net(cp);}
 

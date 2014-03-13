@@ -162,8 +162,8 @@ static double *_PM_interp_nodes_lr(double *f, double *x, double *y,
     double w1, w2, w3, w4;
     double *fp, *fp1, *fp2, *fp3, *fp4;
     double *ip, *ip1, *ip2, *ip3, *ip4;
-    double *x1, *x2, *x3, *x4;
-    double *y1, *y2, *y3, *y4;
+    double *lx1, *lx2, *lx3, *lx4;
+    double *ly1, *ly2, *ly3, *ly4;
 
     nn    = kmax*lmax;
     eflag = (emap == NULL);
@@ -178,8 +178,8 @@ static double *_PM_interp_nodes_lr(double *f, double *x, double *y,
 	PM_array_set(fp, nn, 0.0);};
 
     PM_LOGICAL_ZONE(fp, fp1, fp2, fp3, fp4, kmax);
-    PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
-    PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);
+    PM_LOGICAL_ZONE(x, lx1, lx2, lx3, lx4, kmax);
+    PM_LOGICAL_ZONE(y, ly1, ly2, ly3, ly4, kmax);
     PM_LOGICAL_ZONE(ip, ip1, ip2, ip3, ip4, kmax);
 
     dm = 1.0e-20;
@@ -192,15 +192,15 @@ static double *_PM_interp_nodes_lr(double *f, double *x, double *y,
 
 	     val = f[j];
 
-	     x1c = x1[i];
-	     x2c = x2[i];
-	     x3c = x3[i];
-	     x4c = x4[i];
+	     x1c = lx1[i];
+	     x2c = lx2[i];
+	     x3c = lx3[i];
+	     x4c = lx4[i];
 
-	     y1c = y1[i];
-	     y2c = y2[i];
-	     y3c = y3[i];
-	     y4c = y4[i];
+	     y1c = ly1[i];
+	     y2c = ly2[i];
+	     y3c = ly3[i];
+	     y4c = ly4[i];
 
 	     xc = 0.25*(x1c + x2c + x3c + x4c);
 	     yc = 0.25*(y1c + y2c + y3c + y4c);
@@ -565,23 +565,23 @@ double *PM_node_zone_ac_2d(double *f, void *cnnct, pcons *alist)
 void PM_zone_centered_mesh_2d(double **px, double **py, double *rx, double *ry,
                               int kmax, int lmax)
    {int i, n;
-    double *xc, *x1, *x2, *x3, *x4;
-    double *yc, *y1, *y2, *y3, *y4;
+    double *lxc, *lx1, *lx2, *lx3, *lx4;
+    double *lyc, *ly1, *ly2, *ly3, *ly4;
 
     n = kmax*lmax;
 
-    xc = CMAKE_N(double, n);
-    yc = CMAKE_N(double, n);
+    lxc = CMAKE_N(double, n);
+    lyc = CMAKE_N(double, n);
 
-    PM_LOGICAL_ZONE(rx, x1, x2, x3, x4, kmax);
-    PM_LOGICAL_ZONE(ry, y1, y2, y3, y4, kmax);
+    PM_LOGICAL_ZONE(rx, lx1, lx2, lx3, lx4, kmax);
+    PM_LOGICAL_ZONE(ry, ly1, ly2, ly3, ly4, kmax);
 
     for (i = 0; i < n; i++)
-        {xc[i] = 0.25*(x1[i] + x2[i] + x3[i] + x4[i]);
-         yc[i] = 0.25*(y1[i] + y2[i] + y3[i] + y4[i]);};
+        {lxc[i] = 0.25*(lx1[i] + lx2[i] + lx3[i] + lx4[i]);
+         lyc[i] = 0.25*(ly1[i] + ly2[i] + ly3[i] + ly4[i]);};
 
-    *px = xc;
-    *py = yc;
+    *px = lxc;
+    *py = lyc;
 
     return;}
 
@@ -688,19 +688,19 @@ static PM_set *_PM_shift_center_lr(PM_set *s)
 
 static void _PM_average_cell_pt(double *xc, int *pnc, int nd, int id,
 				long **bnd, int *bnp,
-				int j1, int j2, double **x)
+				int lj1, int lj2, double **x)
    {int ib, jd, i1, i2, l1, l2;
     int np;
 
     if (id <= 1)
        {for (jd = 0; jd < nd; jd++)
-	    {xc[jd] += x[jd][j1];
-	     xc[jd] += x[jd][j2];};
+	    {xc[jd] += x[jd][lj1];
+	     xc[jd] += x[jd][lj2];};
 	*pnc += 2;}
 
     else
-       {i1 = bnd[id][j1];
-	i2 = bnd[id][j2];
+       {i1 = bnd[id][lj1];
+	i2 = bnd[id][lj2];
 
 	id--;
 

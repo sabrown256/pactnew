@@ -285,11 +285,11 @@ static void _PM_md5_init(PM_MD5_CTX *mc)
 
 static void _PM_md5_update(PM_MD5_CTX *mc, unsigned char *in,
 			   unsigned int inl) 
-   {unsigned int i, index, pln;
+   {unsigned int i, lind, pln;
     unsigned char *pin;
 
 /* compute number of bytes mod 64 */
-    index = (unsigned int) ((mc->count[0] >> 3) & 0x3F);
+    lind = (unsigned int) ((mc->count[0] >> 3) & 0x3F);
 
 /* update number of bits */
     if ((mc->count[0] += ((u_int32_t) inl << 3)) < ((u_int32_t) inl << 3))
@@ -297,24 +297,24 @@ static void _PM_md5_update(PM_MD5_CTX *mc, unsigned char *in,
 
     mc->count[1] += ((u_int32_t) inl >> 29);
 
-    pln = 64 - index;
+    pln = 64 - lind;
 
 /* transform as many times as possible */
     if (inl >= pln) 
-       {memcpy(&mc->buffer[index], in, (size_t) pln);
+       {memcpy(&mc->buffer[lind], in, (size_t) pln);
         _PM_md5_transform(mc->state, mc->buffer);
 
         for (i = pln; i + 63 < inl; i += 64)
 	    {pin = in + i;
 	     _PM_md5_transform(mc->state, pin);};
 
-        index = 0;}
+        lind = 0;}
 
     else 
        i = 0;
 
 /* buffer remaining input */
-    memcpy(&mc->buffer[index], &in[i], (size_t) inl-i);
+    memcpy(&mc->buffer[lind], &in[i], (size_t) inl-i);
 
     return;}
 
@@ -332,14 +332,14 @@ static void _PM_md5_final(unsigned char *dig, PM_MD5_CTX *mc)
     char s[MAXLINE];
     char *p;
     unsigned char bits[8];
-    unsigned int index, pln;
+    unsigned int lind, pln;
 
 /* save number of bits */
     _PM_md5_encode(bits, mc->count, 8);
 
 /* pad out to 56 mod 64 */
-    index = (unsigned int)((mc->count[0] >> 3) & 0x3f);
-    pln   = (index < 56) ? (56 - index) : (120 - index);
+    lind = (unsigned int)((mc->count[0] >> 3) & 0x3f);
+    pln   = (lind < 56) ? (56 - lind) : (120 - lind);
     _PM_md5_update(mc, PM_MD5_PADDING, pln);
 
 /* append length (before padding) */

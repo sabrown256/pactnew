@@ -674,7 +674,7 @@ static int64_t _SC_get_cmd_resp(PROCESS *pp, char *msg)
  *                - the command codes are defined in the SC_file_oper enum
  */
 
-void SC_file_access(int log)
+void SC_file_access(int lg)
    {int code, cfd, indx, ret;
     char s[MAXLINE], *bf, *t;
     FILE *file[MAX_FILES], *fp;
@@ -684,7 +684,7 @@ void SC_file_access(int log)
 
     SC_MEM_INIT_N(FILE *, file, MAX_FILES);
 
-    ps->debug = log;
+    ps->debug = lg;
 
     if (ps->debug)
        ps->diag = SC_fopen_safe("SC_fs.log", "w");
@@ -1388,7 +1388,7 @@ static int _SC_rungetc(int c, FILE *stream)
 
 static FILE *_SC_ropen(char *name, char *mode)
    {char s[MAXLINE], host[MAXLINE], fname[MAXLINE], *t;
-    int rsp, type, get_data_line, log;
+    int rsp, type, get_data_line, lg;
     int64_t len;
     PROCESS *pp;
     REMOTE_FILE *fp;
@@ -1400,7 +1400,7 @@ static FILE *_SC_ropen(char *name, char *mode)
        return(NULL);
 
     ret = NULL;
-    log = FALSE;
+    lg  = FALSE;
 
 /* if no host table initialize it */
     if (_SC.hosts == NULL)
@@ -1430,10 +1430,10 @@ static FILE *_SC_ropen(char *name, char *mode)
             argv[0] = s;
             argv[1] = "-f";
 
-/* NOTE: log should be turned on under the debugger to see the
+/* NOTE: lg should be turned on under the debugger to see the
  * transaction file from the server end
  */
-	    if (log)
+	    if (lg)
                {argv[2] = "-l";
                 argv[3] = NULL;}
 	    else

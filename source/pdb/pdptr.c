@@ -700,7 +700,7 @@ static PD_address *_PD_ptr_install_addr(adloc *al, int64_t addr, int lck)
  */
 
 static PD_address *_PD_ptr_install_ptr(adloc *al, char *vr,
-				       int write, int lck)
+				       int wrt, int lck)
    {long i;
     void *key;
     PD_address *ad;
@@ -717,7 +717,7 @@ static PD_address *_PD_ptr_install_ptr(adloc *al, char *vr,
 	i = SC_array_get_n(ap);
 
 	ad = _PD_make_addr(i, -1, vr, NULL);
-	ad->written = write;
+	ad->written = wrt;
 
 /* hasharr */
 	key = (vr == NULL) ? NULL_ADDR : vr;
@@ -1156,7 +1156,7 @@ void _PD_ptr_remove_entry(PDBfile *file, syment *ep, int lck)
  */
 
 PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr,
-			      PD_data_location *ploc, int write, int lck)
+			      PD_data_location *ploc, int wrt, int lck)
    {PD_data_location loc;
     PD_address *ad;
     adloc *al;
@@ -1174,17 +1174,17 @@ PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr,
     if (file->track_pointers == FALSE)
        {loc = LOC_HERE;
 
-        if ((ad == NULL) || (write == FALSE))
-	   ad = _PD_ptr_install_ptr(al, vr, write, FALSE);
+        if ((ad == NULL) || (wrt == FALSE))
+	   ad = _PD_ptr_install_ptr(al, vr, wrt, FALSE);
 
         else
             {ad = _PD_ptr_find_next(al, ad, vr);
-	     ad->written = write;};}                 
+	     ad->written = wrt;};}                 
 
 /* add a new pointer */
     else if (ad == NULL)
        {loc = LOC_HERE;
-	ad  = _PD_ptr_install_ptr(al, vr, write, FALSE);}
+	ad  = _PD_ptr_install_ptr(al, vr, wrt, FALSE);}
 
     else if (ad->addr == -1)
        loc = LOC_HERE;

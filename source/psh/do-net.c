@@ -3147,7 +3147,7 @@ static void interrupt(int sig)
 /* INIT_AUX - initialize the auxilliary script info */
 
 static void init_aux(donetdes *st)
-   {int is, ls, na, ns, nx;
+   {int is, ms, na, ns, nx;
     char bin[BFLRG];
     static char *scripts[] = { "timer", "load-ave", "nfsmon", "iopr" };
     auxdes *pa;
@@ -3186,9 +3186,9 @@ static void init_aux(donetdes *st)
 
 /* prepare the other auxilliary scripts */
     for (is = nx; is < na; is++)
-        {ls = is - nx;
-	 nstrncpy(pa[is].proper, BFLRG, cwhich(scripts[ls]), -1);
-	 snprintf(pa[is].work, BFLRG, ".do-%s.%s", scripts[ls], st->stamp);
+        {ms = is - nx;
+	 nstrncpy(pa[is].proper, BFLRG, cwhich(scripts[ms]), -1);
+	 snprintf(pa[is].work, BFLRG, ".do-%s.%s", scripts[ms], st->stamp);
 	 nstrncpy(pa[is].perms, 10, "-rwx------", -1);
 	 pa[is].permi = 0700;};
 

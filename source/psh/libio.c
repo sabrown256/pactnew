@@ -81,7 +81,7 @@ int ring_clear(io_ring *ring)
  *            - in the PROCESS ring buffer
  */
 
-int ring_ready(io_ring *ring, unsigned char ls)
+int ring_ready(io_ring *ring, unsigned char lc)
    {int ok;
     unsigned int nb, ob;
     unsigned char c;
@@ -93,7 +93,7 @@ int ring_ready(io_ring *ring, unsigned char ls)
 
     for (ok = FALSE; (ok == FALSE) && ((c = bf[ob]) != '\0'); )
         {ob = (ob + 1) % nb;
-         if ((c == ls) || (c == (unsigned char) EOF))
+         if ((c == lc) || (c == (unsigned char) EOF))
 	    ok = TRUE;};
 
     return(ok);}
@@ -186,10 +186,10 @@ int ring_push(io_ring *ring, char *s, int nc)
 
 /* RING_POP - return the oldest message from the ring in
  *          - S which is NC bytes long
- *          - LS is the message delimiter character
+ *          - LC is the message delimiter character
  */
 
-int ring_pop(io_ring *ring, char *s, int nc, unsigned int ls)
+int ring_pop(io_ring *ring, char *s, int nc, unsigned int lc)
    {int i, ok;
     unsigned int ib, nb, ob;
     unsigned char c;
@@ -211,7 +211,7 @@ int ring_pop(io_ring *ring, char *s, int nc, unsigned int ls)
 
 	 *ps++ = c;
 
-	 if (c == ls)
+	 if (c == lc)
 	    ok = FALSE;};
 
 /* null terminate unless the character count maxed out */

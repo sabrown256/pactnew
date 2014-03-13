@@ -1662,7 +1662,7 @@ FIXNUM FF_ID(pfwmap, PFWMAP)(FIXNUM *sfid, char *dname,
 
 FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
 			     char *rname, FIXNUM *arp, double *arm,
-			     FIXNUM *sinf, FIXNUM *sim)
+			     FIXNUM *slinf, FIXNUM *sim)
    {int lsm;
     FIXNUM rv;
     int *lrp;
@@ -1671,10 +1671,10 @@ FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
     PDBfile *file;
 
     file = SC_GET_POINTER(PDBfile, *sfid);
-    if (sinf == NULL)
+    if (slinf == NULL)
        info = NULL;
     else
-       info = SC_GET_POINTER(pcons, *sinf);
+       info = SC_GET_POINTER(pcons, *slinf);
 
     SC_FORTRAN_STR_C(d, dname, *sncd);
     SC_FORTRAN_STR_C(r, rname, arp[0]);

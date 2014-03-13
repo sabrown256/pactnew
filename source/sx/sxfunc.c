@@ -568,7 +568,7 @@ static PM_mapping *_SXI_copy_mapping(SS_psides *si, PM_mapping *h)
 
 static void _SX_integrate_mapping(PM_mapping *f)
    {PM_set *domain, *range;
-    int i, j, jn, jc, is, ndd, nde, ned, ndr;
+    int i, j, ja, jc, is, ndd, nde, ned, ndr;
     int id, lne, dj, ix;
     int *dmx;
     long step, npts;
@@ -609,8 +609,8 @@ static void _SX_integrate_mapping(PM_mapping *f)
 	lne = ned;
 	for (j = ndd-1; j >= 0; j--)
 	    {npts = 1L;
-	     for (jn = 0; jn <= j; jn++)
-	         npts *= dmx[jn];
+	     for (ja = 0; ja <= j; ja++)
+	         npts *= dmx[ja];
 
 	     dj   = dmx[j];
 	     step = lne;

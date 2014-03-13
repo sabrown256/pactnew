@@ -155,7 +155,7 @@ static int poll_mode(descriptors *pd)
 
 static int interrupt_mode(descriptors *pd)
    {int pi, rv;
-    int accept, reject;
+    int acc, rej;
     SC_evlpdes *pe;
     PROCESS *pp;
 
@@ -168,9 +168,9 @@ static int interrupt_mode(descriptors *pd)
     pe->raw = (pp->medium == USE_PTYS);
 
 /* adjust the polling masks */
-    SC_event_loop_get_masks(pe, &accept, &reject);
-    reject |= POLLHUP;
-    SC_event_loop_set_masks(pe, accept, reject);
+    SC_event_loop_get_masks(pe, &acc, &rej);
+    rej |= POLLHUP;
+    SC_event_loop_set_masks(pe, acc, rej);
 
 /* register the I/O channels for the event loop to monitor */
     pi  = SC_register_event_loop_callback(pe, SC_FILE_I, stdin,
@@ -271,7 +271,7 @@ static void usage(void)
 /* MAIN - test PPC */
 
 int main(int argc, char **argv)
-   {int i, interrupts, ret, quiet, access_file, log, parallel, to, info;
+   {int i, interrupts, ret, quiet, access_file, lg, parallel, to, info;
     char mode[5];
     PROCESS *pp;
     descriptors d;
@@ -281,7 +281,7 @@ int main(int argc, char **argv)
     interrupts  = TRUE;
     parallel    = FALSE;
     access_file = FALSE;
-    log         = FALSE;
+    lg          = FALSE;
     info        = FALSE;
     to          = 1000000;
     strcpy(mode, "w");
@@ -309,7 +309,7 @@ int main(int argc, char **argv)
 		      interrupts = FALSE;
 		      break;
                  case 'l' :
-		      log = TRUE;
+		      lg = TRUE;
 		      break;
                  case 'r' :
 		      parallel = TRUE;
@@ -344,7 +344,7 @@ int main(int argc, char **argv)
     ret = 0;
 
     if (access_file)
-       SC_file_access(log);
+       SC_file_access(lg);
 
     else if (parallel)
        ret = PC_process_access(argv, "rsb+");

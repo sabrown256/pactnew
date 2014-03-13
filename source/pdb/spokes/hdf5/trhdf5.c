@@ -92,6 +92,7 @@ static sys_layer
 
 static char *_H5_is_registered(PDBfile *file, hid_t dtid)
    {int i, matches;
+    long hoff;
     char *verdict, *mname;
     compound_desc *iter;
     compound_member_info *info;
@@ -123,8 +124,9 @@ static char *_H5_is_registered(PDBfile *file, hid_t dtid)
 	    for (i = 0 ; i < iter->num_members ; i++)
                 {mname = H5Tget_member_name(dtid, i);
                 
+		 hoff = H5Tget_member_offset(dtid, i);
 		 if ((strcmp(info->member_name, mname) != 0) ||
-                     (info->member_offset != H5Tget_member_offset(dtid, i)))
+                     (info->member_offset != hoff))
                     {matches = FALSE; 
 		     free(mname);
 		     break;}; 

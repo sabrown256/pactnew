@@ -37,7 +37,7 @@ static fcdes *_SC_make_archive(char *name, FILE *fp, int nb, hasharr *tab)
  *                   - are silenced by removing the static declaration
  */
 
-fcent *_SC_make_ar_entry(FILE *fp, int round,
+fcent *_SC_make_ar_entry(FILE *fp, int rnd,
 			 char *name, char *date,
 			 char *uid, char *gid,
 			 char *size, char *mode,
@@ -46,7 +46,7 @@ fcent *_SC_make_ar_entry(FILE *fp, int round,
     fcent *ae;
 
     sz = SC_stol(size);
-    if (round == TRUE)
+    if (rnd == TRUE)
        {pos = sz + 1;
 	pos = (pos >> 1) << 1;}
     else
@@ -324,7 +324,7 @@ fcdes *SC_scan_archive(char *arf)
  */
 
 fcdes *SC_scan_archive(char *arf)
-   {int i, nr, nb, nc, ne, na, round, st;
+   {int i, nr, nb, nc, ne, na, rnd, st;
     int64_t pos;
     char s[MAXLINE], lname[MAXLINE];
     FILE *fp;
@@ -346,9 +346,9 @@ fcdes *SC_scan_archive(char *arf)
 	   io_error(errno, "fread of 8 bytes failed");
 
 #ifdef FREEBSD
-	round = TRUE;
+	rnd = TRUE;
 #else
-	round = FALSE;
+	rnd = FALSE;
 #endif
 
 	if (nr == 8)
@@ -380,7 +380,7 @@ fcdes *SC_scan_archive(char *arf)
 		     SC_trim_right(lname, " /");
 		     name = lname;};
 
-		 ae = _SC_make_ar_entry(fp, round, name, hdr.ar_date,
+		 ae = _SC_make_ar_entry(fp, rnd, name, hdr.ar_date,
 					hdr.ar_uid, hdr.ar_gid,
 					hdr.ar_size, hdr.ar_mode,
 					&pos);
