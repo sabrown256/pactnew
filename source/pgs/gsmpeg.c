@@ -2012,7 +2012,7 @@ Bitio_WriteToSocket(BitBucket *bbPtr, int sck)
     struct bitBucket *ptr, *tempPtr;
     u_int32_t buffer[WORDS_PER_BUCKET];
     u_int32_t  lastWord;
-    int i, nitems;
+    int i, nitems, nby;
     int	    bitsWritten = 0;
     int	    bitsLeft;
     int	    numWords;
@@ -2039,7 +2039,8 @@ Bitio_WriteToSocket(BitBucket *bbPtr, int sck)
 	    }
 
 	    nitems = write(sck, buffer, numWords * sizeof(u_int32_t));
-	    if (nitems != numWords*sizeof(u_int32_t)) {
+	    nby    = numWords*sizeof(u_int32_t);
+	    if (nitems != nby) {
 		io_printf(stderr, "Whoa!  Trouble writing %d bytes (got %d bytes)!  Game over, dude!\n",
 			(int)(numWords*sizeof(u_int32_t)), nitems);
 		exit(1);

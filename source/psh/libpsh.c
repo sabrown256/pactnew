@@ -454,7 +454,7 @@ static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
 
 	nc = strlen(s);
 	nc = min(nc, nd-1);
-	nc = vlimit(nc, 0, ns);
+	nc = min(nc, ns);
 
 	for (n = 0; n < nc; n++)
 	    {c = *s++;
@@ -564,7 +564,7 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
 	nr = strlen(r);
 	nc = strlen(s);
 	nc = min(nc, nd-1);
-	nc = vlimit(nc, 0, ns);
+	nc = min(nc, ns);
 
 	for (n = 0; n < nc; n++)
 	    {c = *s++;
@@ -677,7 +677,7 @@ static int _strcpy_bal(char *d, size_t nd, char *s, size_t ns,
 
 	nc = strlen(s);
 	nc = min(nc, nd-1);
-	nc = vlimit(nc, 0, ns);
+	nc = min(nc, ns);
 
 /* start lev properly
  *   "(a b c)" with b = "(" should have lev = 0

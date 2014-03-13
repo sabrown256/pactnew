@@ -2614,7 +2614,7 @@ void PG_rgb_color(RGB_color_map *clr, int lc, int rgb,
         else
 	   {scale = ((double) nc)/((double) MAXPIX);
 
-	    clr->red = (pv != NULL) ? pv[lc] : lc;};};
+	    clr->red = (pv != NULL) ? pv[lc] : (unsigned long) lc;};};
 
     return;}
 
