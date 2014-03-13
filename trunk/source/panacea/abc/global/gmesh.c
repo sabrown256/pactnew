@@ -111,7 +111,7 @@ mesh_quality *compute_mesh_quality(void)
     double *y1, *y2, *y3, *y4;
     double dx1, dx2, dy1, dy2, dx13, dy13, dx24, dy24;
     double dxtb, dytb, dxrl, dyrl, pot;
-    double skew, jac, orth, jt, ot, st, vol;
+    double skew, jac, orth, jt, ot, st, lvol;
     mesh_quality *mq;
 
     pot = PI/2.0;
@@ -141,8 +141,8 @@ mesh_quality *compute_mesh_quality(void)
          dxtb = 0.5*(x2[j] + x3[j] - x1[j] - x4[j]);
          dytb = 0.5*(y2[j] + y3[j] - y1[j] - y4[j]);
 
-         vol   = 0.5*(dx13*dy24 - dx24*dy13);
-         jt    = vol/(ABS(dxrl*dytb) + ABS(dxtb*dyrl) + SMALL);
+         lvol  = 0.5*(dx13*dy24 - dx24*dy13);
+         jt    = lvol/(ABS(dxrl*dytb) + ABS(dxtb*dyrl) + SMALL);
          jac  += jt*jt;
 
          dx1   = sqrt(dx13*dx13 + dy13*dy13);
@@ -306,19 +306,19 @@ int inside(double xx, double yy, double x1, double y1,
 
 /* VOLUMEW - compute the zone volumes */
 
-int volumew(double *vol, double *rx, double *ry)
+int volumew(double *lvol, double *lrx, double *lry)
    {int j;
     double r;
     double *rx1, *rx2, *rx3, *rx4;
     double *ry1, *ry2, *ry3, *ry4;
  
-    vecset4(rx, rx1, rx2, rx3, rx4);
-    vecset4(ry, ry1, ry2, ry3, ry4);
+    vecset4(lrx, rx1, rx2, rx3, rx4);
+    vecset4(lry, ry1, ry2, ry3, ry4);
  
     for (j = frz; j <= lrz; j++)
-        {r      = zone[j];
-	 vol[j] = r*VOLR(rx1[j], rx2[j], rx3[j], rx4[j],
-			 ry1[j], ry2[j], ry3[j], ry4[j]);};
+        {r       = zone[j];
+	 lvol[j] = r*VOLR(rx1[j], rx2[j], rx3[j], rx4[j],
+			  ry1[j], ry2[j], ry3[j], ry4[j]);};
 
     return(TRUE);}
 
@@ -327,7 +327,7 @@ int volumew(double *vol, double *rx, double *ry)
 
 /* GEN_DUMPW - dump the mesh coordinate arrays at generation time */
 
-int gen_dumpw(hasharr *curves)
+int gen_dumpw(hasharr *crv)
    {int i, j, k, l, sz;
     double length;
     char *edname;
@@ -344,8 +344,8 @@ int gen_dumpw(hasharr *curves)
 
     PRINT(fp, "GENERATION TIME MESH DUMP\n\n\n");
 
-    sz = curves->size;
-    tb = curves->table;
+    sz = crv->size;
+    tb = crv->table;
     PRINT(fp, "\nCURVES\n\n");
     for (i = 0; i < sz; i++)
         for (np = *(tb+i); np != NULL; np = np->next)
@@ -763,7 +763,7 @@ PM_conic_curve *atocur(char *s)
 
 int what_axis(char *s, char **sub)
    {int zon;
-    char bfi[MAXLINE], bfo[MAXLINE], t[MAXLINE];
+    char bfi[MAXLINE], bfo[MAXLINE], u[MAXLINE];
     char *xrs, *yrs, *rest, *pt;
 
 /* copy the name part into the output buffer */
@@ -778,15 +778,15 @@ int what_axis(char *s, char **sub)
        {PA_ERR(((yrs = SC_strtok(NULL, ",)", pt)) == NULL),
                "BAD COORDINATE FOR PLOT: %s", s);
         zon = containsw(SC_stof(xrs), SC_stof(yrs));
-        snprintf(t, MAXLINE, "(%d", zon);
-        SC_strcat(bfo, MAXLINE, t);
+        snprintf(u, MAXLINE, "(%d", zon);
+        SC_strcat(bfo, MAXLINE, u);
 
 /* complete the reformatted request axis specification */
         if ((rest = SC_strtok(NULL, ")", pt)) == NULL)
            SC_strcat(bfo, MAXLINE, ")");
         else
-           {snprintf(t, MAXLINE, ",%s)", rest);
-            SC_strcat(bfo, MAXLINE, t);};
+           {snprintf(u, MAXLINE, ",%s)", rest);
+            SC_strcat(bfo, MAXLINE, u);};
 
 /* reassign the axis specification to a fresh copy of the output buffer */
         *sub = CSTRSAVE(bfo);};

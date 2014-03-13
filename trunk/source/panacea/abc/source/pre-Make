@@ -35,7 +35,7 @@ LdFlags = -L${DevLib} -L${LibDir} ${LDFLAGS}
 PactLibs = ${LSX} ${LSCHEME} ${LPANACEA} ${LPGS} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLibs}
 SysLibs  = -lmesh -llag \
            -lmisc
-Libs     = ${TGTLib} ${SysLibs} ${PactLibs} ${MDGLib} ${MDLib} -lm
+Libs     = ${TGTLib} ${SysLibs} ${PactLibs} ${MDGLib} ${MDLib} ${MDE_Lib}
 
 #
 # Files to remove in directory clean (make clean)

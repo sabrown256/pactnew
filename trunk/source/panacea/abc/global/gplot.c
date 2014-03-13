@@ -153,7 +153,7 @@ int plotw(dev, new, name)
 /* NEWFRAMEW - make a new frame, i.e. draw it */
 
 int newframew(PG_device *dev, int new)
-   {double dt;
+   {double ldt;
     char label[MAXLINE];
     mesh_quality *mq;
     static int first = TRUE;
@@ -176,11 +176,11 @@ int newframew(PG_device *dev, int new)
 
 /* print some useful problem information around the mesh plot */
         PG_set_clipping(dev, FALSE);
-        dt = PA_gs.units[SEC]*PARAM[4]*(PARAM[3] - PARAM[2]);
+        ldt = PA_gs.units[SEC]*PARAM[4]*(PARAM[3] - PARAM[2]);
         PG_write_abs(dev, 0.20, 0.92, "%s", NAME[8]);
         PG_write_abs(dev, 0.55, 0.92, "Time = %9.2e", PA_gs.units[SEC]*PARAM[1]);
         PG_write_abs(dev, 0.20, 0.88, "Cycle = %d", SWTCH[3]);
-        PG_write_abs(dev, 0.55, 0.88, "Dt = %9.2e", dt);
+        PG_write_abs(dev, 0.55, 0.88, "Dt = %9.2e", ldt);
 
         mq = compute_mesh_quality();
         PG_write_abs(dev, 0.20, 0.84,
@@ -437,15 +437,14 @@ int make_frame()
 
 /* GLOBAL_END_GRAPHICS - shutdown the graphics system */
 
-void global_end_graphics(err)
-   int err;
-   {if (mesh_display != NULL)
+void global_end_graphics(int err)
+   {
+
+    if (mesh_display != NULL)
        PG_close_device(mesh_display);
 
     if (mesh_PS_display != NULL)
        PG_close_device(mesh_PS_display);
-
-    err = TRUE;
 
     return;}
 
@@ -454,8 +453,10 @@ void global_end_graphics(err)
 
 /* MESH_INIT_GRAPHICS_STATE - initialize the graphics state of the mesh */
 
-int mesh_init_graphics_state()
-   {mesh_scatter    = OFF;
+int mesh_init_graphics_state(void)
+   {
+
+    mesh_scatter    = OFF;
     mesh_grid       = OFF;
 
     mesh_leftspace  = 0.01;
@@ -482,8 +483,7 @@ int mesh_init_graphics_state()
  *                         - specified device
  */
 
-int mesh_set_graphics_state(d)
-   PG_device *d;
+int mesh_set_graphics_state(PG_device *d)
    {PG_dev_geometry *g;
 
     g = &d->g;
@@ -520,7 +520,7 @@ int mesh_set_graphics_state(d)
 
 /* TURN - toggle the specified switch in the frame */
 
-void turn()
+void turn(void)
    {char *token, *sval;
     int val, *pvr;
 
@@ -582,7 +582,7 @@ void turn()
 
 /* VIEWH - handle the view command */
 
-void viewh()
+void viewh(void)
    {char *s;
 
     s = SC_strtok(NULL, "\n", PA_gs.strtok_p);
@@ -595,9 +595,7 @@ void viewh()
 
 /* PLOT - make a new plot */
 
-void plot(new, name)
-   int new;
-   char *name;
+void plot(int new, char *name)
    {static int tv_flag = FALSE;
 
     mesh_plot_phys = TRUE;
@@ -620,7 +618,7 @@ void plot(new, name)
 
 /* PRINTH - handle the print command */
 
-void printh()
+void printh(void)
    {char *s;
 
     s = SC_strtok(NULL, "\n", PA_gs.strtok_p);
@@ -633,9 +631,7 @@ void printh()
 
 /* PRINTSCR - dump the screen to the printer */
 
-void printscr(new, name)
-   int new;
-   char *name;
+void printscr(int new, char *name)
    {PG_device *dev;
     char bf[MAXLINE];
 
@@ -660,7 +656,7 @@ void printscr(new, name)
 
 /* MESHLMT - compute mesh limits xmx, xmn, ymx, and ymn */
 
-int meshlmt()
+int meshlmt(void)
    {int k, l;
     int nofirst, i;
     double dx, dy;
