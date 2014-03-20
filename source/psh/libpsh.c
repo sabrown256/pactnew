@@ -3043,7 +3043,9 @@ int _nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
 		   break;
 		sigaddset(set, is);};
 
-	    rv = sigaction(sig, &na, NULL);};};
+	    rv = sigaction(sig, &na, NULL);}
+	else
+	   rv = 0;};
 
     return(rv);}
 

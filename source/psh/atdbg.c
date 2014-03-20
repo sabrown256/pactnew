@@ -13,6 +13,14 @@
 #include "libtime.c"
 #include "libasync.c"
 
+#if 0
+/* TV_CLI_1 refers to the CLI language used before about TV 8.11 */
+#define HAVE_TV_CLI_1
+#endif
+
+/* TV_CLI_2 refers to the CLI language used from TV 8.11 to present */
+#define HAVE_TV_CLI_2
+
 #define ATTACH 10
 #define TRACE  11
 
@@ -91,8 +99,9 @@ static atproc *candidate_proc(atdbgdes *st, char *name)
 		 pl = NULL;
 		 t = strtok(pl, " \n");
 		 if (t != NULL)
-		    nstrncpy(al[i].name, BFLRG,
-			     run(FALSE, "rpath %s", t), -1);
+		    file_path(t, al[i].name, BFLRG);
+/*		    nstrncpy(al[i].name, BFLRG,
+			     run(FALSE, "rpath %s", t), -1); */
 		 else
 		    break;
 
@@ -133,12 +142,12 @@ static atproc *select_pid(atdbgdes *st, atproc *al)
 	     ok = (resp[0] == 'y');};
 
 	 if (ok == TRUE)
-	    break;
-
-       if (st->verbose == TRUE)
-	  {printf("Debugger:   %s", st->dbg);
-	   printf("Executable: %s", pal->name);
-	   printf("PID:        %d", pal->pid);};};
+	    {if (st->verbose == TRUE)
+	        {printf("\n");
+		 printf("Debugger:   %s\n", st->dbg);
+		 printf("Executable: %s\n", pal->name);
+		 printf("PID:        %d\n", pal->pid);};
+	     break;};};
 
     if (ok == FALSE)
        pal = NULL;
@@ -331,12 +340,15 @@ static int use_totalview(atdbgdes *st, atproc *al)
 	    pp->a      = &gr;
 
 	    send_msg(pp, 0, NULL);
-	    send_msg(pp, 0, "dset LINES_PER_SCREEN 0");
-	    send_msg(pp, 0, "dattach -no_attach_parallel %s %d", al->name, al->pid);
-	    send_msg(pp, 0, "dhalt");
-/*	      send_msg(pp, 0, "dwait"); */
-	    send_msg(pp, QTHREAD, "f p1 TV::thread get -all id");
 
+#if defined(HAVE_TV_CLI_1)
+/* TV versions < 8.11.0 */
+	    send_msg(pp, 0, "dset LINES_PER_SCREEN 0");
+	    send_msg(pp, 0, "dattach -no_attach_parallel %s %d",
+		     al->name, al->pid);
+	    send_msg(pp, 0, "dhalt");
+
+	    send_msg(pp, QTHREAD, "dfocus p1 TV::thread get -all id");
 	    FOREACH(thr, gr.result, " \n");
 	       snprintf(s, BFLRG,
 			"\n   ---------------- Thread %s ----------------\n", thr);
@@ -344,9 +356,23 @@ static int use_totalview(atdbgdes *st, atproc *al)
 	       send_msg(pp, BTRACE, "dfocus %s {dwhere -a}", thr);
 	    ENDFOR;
 
-/*           send_msg(pp, 0, "ddetach"); */
+	    nl = send_msg(pp, 0, "exit -force");
+
+#elif defined(HAVE_TV_CLI_2)
+
+/* TV version >= 8.11.0 */
+	    send_msg(pp, 0, "dattach %s %d", al->name, al->pid);
+	    send_msg(pp, QTHREAD, "dfocus p1 TV::focus_threads");
+
+	    FOREACH(thr, gr.result, " \n");
+	       snprintf(s, BFLRG,
+			"\n   ---------------- Thread %s ----------------\n", thr);
+	       cache_rsp(st, s);
+	       send_msg(pp, BTRACE, "dfocus %s {dhalt ; dwhere -a}", thr);
+	    ENDFOR;
 
 	    nl = send_msg(pp, 0, "exit -force");
+#endif
 
 	    sig = (nl == -1) ? SIGKILL : -1;
 	    job_done(pp, sig);};}

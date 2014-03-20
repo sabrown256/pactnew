@@ -318,7 +318,7 @@ EOF
    else
       Note $ALog ""
       Note $ALog "--Compilation failed--"
-      Note $ALog "/* $lCC $Tmp.c -o $Tmp */
+      Note $ALog "/* $lCC $Tmp.c -o $Tmp */"
       cat $Tmp.c >>& $ALog
       Note $ALog ""
    endif
