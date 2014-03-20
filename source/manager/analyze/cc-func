@@ -59,8 +59,10 @@ EOF
       set have = ( $have $f )
       set hlst = ( $hlst $m $f )
    else
-      Note $ALog "Failed '$f' ($xstatus): $lCC -c $Tmp.c -o $Tmp -lm"
-      flog $ALog cat $Tmp.c
+      Note $ALog ""
+      Note $ALog "--Compilation failed--"
+      Note $ALog "/* $lCC $Tmp.c -o $Tmp -lm */"
+      cat $Tmp.c >>& $ALog
 
       set have = ( $have $a )
       set hlst = ( $hlst $m $a )

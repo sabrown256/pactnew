@@ -343,6 +343,13 @@ EOF
    if ($status == 0) then
       set AF_LONG8 = `$CROSS_FE $Tmp $DP_BE`
    else
+
+      Note $ALog ""
+      Note $ALog "--Compilation failed--"
+      Note $ALog "/* $lCC $Tmp.c -o $Tmp */"
+      cat $Tmp.c >>& $ALog
+      Note $ALog ""
+
       NoteD $ALog " "
       NoteD $ALog " "
       NoteD $ALog "One or more flags from:"
@@ -374,6 +381,13 @@ EOF
    if ($status == 0) then
       set af_alt_large_file = `$CROSS_FE $Tmp $DP_BE`
    else
+
+      Note $ALog ""
+      Note $ALog "--Compilation failed--"
+      Note $ALog "/* $lCC $Tmp.c -o $Tmp */"
+      cat $Tmp.c >>& $ALog
+      Note $ALog ""
+
       NoteD $ALog " "
       NoteD $ALog " "
       NoteD $ALog "One or more flags from:"
@@ -420,6 +434,12 @@ EOF
 #            setenv Cfe_CC_Flags "$Cfe_CC_Flags -arch $hw"               
             NoteD $ALog "      adding -arch $hw"
          endif
+      else
+         Note $ALog ""
+         Note $ALog "--Compilation failed--"
+         Note $ALog "/* $lCC -arch $hw $Tmp.c -o $Tmp */"
+         cat $Tmp.c >>& $ALog
+         Note $ALog ""
       endif
       unset hw
       Note $ALog ""

@@ -37,8 +37,10 @@ if ($xstatus == 0) then
    setenv HAVE_GOOD_OMP_PRAGMAS  TRUE
    NoteD $ALog "      proper pragma handling"
 else
-   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp"
-   flog $ALog cat $Tmp.c
+   Note $ALog ""
+   Note $ALog "--Compilation failed--"
+   Note $ALog "/* $lCC $Tmp.c -o $Tmp */"
+   cat $Tmp.c >>& $ALog
 
    setenv HAVE_GOOD_OMP_PRAGMAS  FALSE
    NoteD $ALog "      bad pragma handling"
