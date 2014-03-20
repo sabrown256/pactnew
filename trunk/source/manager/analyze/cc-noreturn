@@ -31,8 +31,10 @@ if ($xstatus == 0) then
    setenv HAVE_NORETURN TRUE
    NoteD $ALog "      has _Noreturn support"
 else
-   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp"
-   flog $ALog cat $Tmp.c
+   Note $ALog ""
+   Note $ALog "--Compilation failed--"
+   Note $ALog "/* $lCC $Tmp.c -o $Tmp */"
+   cat $Tmp.c >>& $ALog
 
    setenv HAVE_NORETURN FALSE
    NoteD $ALog "      no _Noreturn support"

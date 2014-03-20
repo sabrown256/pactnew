@@ -57,8 +57,10 @@ EOF
          fexec $ALog $CROSS_FE $Tmp @o vw:si
          @ si = ( `$PERDB -e si` )
       else
-         Note $ALog "Failed ($xstatus): $lFC $Tmp.f -o $Tmp"
-         flog $ALog cat $Tmp.f
+         Note $ALog ""
+         Note $ALog "--Compilation failed--"
+         Note $ALog "! $lFC $lFC $Tmp.f -o $Tmp"
+         cat $Tmp.f >>& $ALog
 
          @ si = 0
       endif
@@ -88,8 +90,10 @@ EOF
          if ($xstatus == 0) then
             fexvar $ALog FC_INTEGER_C $CROSS_FE $Tmp $si
          else
-            Note $ALog "Failed ($xstatus): $lCC $Tmp.c -o $Tmp"
-            flog $ALog cat $Tmp.c
+            Note $ALog ""
+            Note $ALog "--Compilation failed--"
+            Note $ALog "/* $lCC $Tmp.c -o $Tmp */"
+            cat $Tmp.c >>& $ALog
          endif
       endif
 

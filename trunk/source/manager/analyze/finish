@@ -77,7 +77,42 @@ dbmget $ALog CC_Exe^                   \
              RF_DEBUG^                 \
              HSY_OS_Name^              \
              HSY_Rootinc^              \
+             PSY_MngDir^               \
+             PSY_Root^                 \
              RPATH
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIND-FAILURES - find analyze scripts that failed
+   
+   Separator $ALog
+   Note $ALog "Searching for failed analyses:"
+
+   set LogDir = $PSY_Root/log
+
+   set failed = ""
+   foreach i ($PSY_MngDir/analyze/*)
+      set f = $i:t
+      set l = $LogDir/analyze.$f 
+      if (($f != finish) && (-f $l)) then
+         grep "analysis done with $f" $l >>& /dev/null
+         if ($status != 0) then
+            Note $ALog "   $l"
+            set failed = ( $failed $l )
+         endif
+      endif
+   end
+
+   if ("$failed" != "") then
+      Note $Log "Failed analyses:"
+      foreach i ($failed)
+         Note $Log "   $i"
+      end
+   else
+      Note $ALog "All analyses succeeded"
+      Note $Log "All analyses succeeded"
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

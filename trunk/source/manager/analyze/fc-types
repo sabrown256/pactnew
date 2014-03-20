@@ -48,8 +48,10 @@ if ($HAVE_FORTRAN == TRUE) then
             flog $ALog cat getbytes.f
          endif
       else
-         Note $ALog "Failed ($xstatus): $lFC $lsdir/getkinds.f -o getkinds"
-         flog $ALog cat $Tmp.f
+         Note $ALog ""
+         Note $ALog "--Compilation failed--"
+         Note $ALog "! $lFC $lsdir/getkinds.f -o getkinds"
+         cat $Tmp.f >>& $ALog
 
          Note $ALog "      Cannot compile getkinds.f"
       endif
@@ -63,8 +65,10 @@ if ($HAVE_FORTRAN == TRUE) then
       flog $ALog $lCC -I../.. -c $lsdir/csizer.c -o csizer.o
       set xstatus = $status
       if ($xstatus != 0) then
-         Note $ALog "Failed ($xstatus): $lCC -I../.. -c $lsdir/csizer.c -o csizer.o"
-         flog $ALog cat $Tmp.c
+         Note $ALog ""
+         Note $ALog "--Compilation failed--"
+         Note $ALog "/* $lCC -I../.. -c $lsdir/csizer.c -o csizer.o */
+         cat $Tmp.c >>& $ALog
 
          Note $ALog "      Cannot compile csizer.c"
       endif
@@ -74,8 +78,10 @@ if ($HAVE_FORTRAN == TRUE) then
       flog $ALog $lFC getbytes.f csizer.o -o getbytes
       set xstatus = $status
       if ($xstatus != 0) then
-         Note $ALog "Failed ($xstatus): $lFC getbytes.f csizer.o -o getbytes"
-         flog $ALog cat $Tmp.f
+         Note $ALog ""
+         Note $ALog "--Compilation failed--"
+         Note $ALog "! $lFC getbytes.f csizer.o -o getbytes"
+         cat $Tmp.f >>& $ALog
 
          Note $ALog "      Cannot compile getbytes.f"
       endif
@@ -98,8 +104,10 @@ if ($HAVE_FORTRAN == TRUE) then
       flog $ALog $lCC -I../.. $lsdir/genfiles.c -o genfiles
       set xstatus = $status
       if ($xstatus != 0) then
-         Note $ALog "Failed ($xstatus): $lCC -I../.. $lsdir/genfiles.c -o genfiles"
-         flog $ALog cat $Tmp.c
+         Note $ALog ""
+         Note $ALog "--Compilation failed--"
+         Note $ALog "/* $lCC -I../.. $lsdir/genfiles.c -o genfiles */
+         cat $Tmp.c >>& $ALog
 
          Note $ALog "      Cannot compile genfiles.c"
       else

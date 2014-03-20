@@ -47,8 +47,11 @@ EOF
    if ($xstatus == 0) then
       NoteD $ALog "      has C99 complex support"
    else
-      Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp.o"
-      flog $ALog cat $Tmp.c
+      Note $ALog ""
+      Note $ALog "--Compilation failed--"
+      Note $ALog "/* $lCC -c $Tmp.c -o $Tmp */"
+      cat $Tmp.c >>& $ALog
+      Note $ALog ""
 
       flog $ALog setenv HAVE_ANSI_C9X_COMPLEX FALSE
       NoteD $ALog "      no C99 complex support"
@@ -98,8 +101,10 @@ EOF
          set msg = "has complex in va_arg"
       endif
    else
-      Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp.o"
-      flog $ALog cat $Tmp.c
+      Note $ALog ""
+      Note $ALog "--Compilation failed--"
+      Note $ALog "/* $lCC -c $Tmp.c -o $Tmp */"
+      cat $Tmp.c >>& $ALog
    endif
 
    NoteD $ALog "      $msg"

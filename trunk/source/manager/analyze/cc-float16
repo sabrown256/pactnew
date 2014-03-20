@@ -71,8 +71,10 @@ if ($xstatus == 0) then
       set ld = "has broken long double support"
    endif
 else
-   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp -lm"
-   flog $ALog cat $Tmp.c
+   Note $ALog ""
+   Note $ALog "--Compilation failed--"
+   Note $ALog "/* $lCC $Tmp.c -o $Tmp -lm */"
+   cat $Tmp.c >>& $ALog
 endif
 
 rm -f $Tmp $Tmp.c $Tmp.o
@@ -120,8 +122,10 @@ if ($xstatus == 0) then
    fexvars $ALog ldio $CROSS_FE $Tmp
    flog $ALog setenv AF_LONG_DOUBLE_IO $gstatus[1]
 else
-   Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp -lm"
-   flog $ALog cat $Tmp.c
+   Note $ALog ""
+   Note $ALog "--Compilation failed--"
+   Note $ALog "/* $lCC $Tmp.c -o $Tmp -lm */"
+   cat $Tmp.c >>& $ALog
 
    flog $ALog set ldio = "no long double I/O"
    flog $ALog setenv AF_LONG_DOUBLE_IO 0

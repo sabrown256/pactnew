@@ -54,8 +54,10 @@ EOF
       unset t
       unset lvers
    else
-      Note $ALog "Failed ($xstatus): $lCC -c $Tmp.c -o $Tmp -lc"
-      flog $ALog cat $Tmp.c
+      Note $ALog ""
+      Note $ALog "--Compilation failed--"
+      Note $ALog "/* $lCC $Tmp.c -o $Tmp -lc */"
+      cat $Tmp.c >>& $ALog
 
       NoteD $ALog "      no GNU LibC version"
    endif
