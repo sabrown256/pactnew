@@ -603,7 +603,7 @@ static process *_job_mk_process(int child, char **arg,
 
 	_init_process(pp);
 
-	pp->pgid    = getpgrp();
+/*	pp->pgid    = getpgrp(); */
 	pp->ischild = child;
 	pp->isfunc  = FALSE;
 	pp->ios     = NULL;
@@ -667,18 +667,17 @@ static void _job_free(process *pp)
  */
 
 static int _job_exec(process *cp, int *fds,
-		     char **argv, char **env, char *mode)
+		     char **argv, char **env, char *mode, int pgid)
    {int i, err, fg, st;
     int io[N_IO_CHANNELS];
 
     err = 0;
 
     if (cp != NULL)
-
-/* put the process into the process group and
- * give the process group the terminal
- */
        {fg = TRUE;
+#if 0
+	cp->pgid = pgid;
+#endif
 	_job_grp_attr(cp, TRUE, fg);
 
 /* reset the signal handlers for the child */
@@ -1293,7 +1292,8 @@ void _job_child_prelim(process *pp)
  *                 - it will never return
  */
 
-static void _job_child_fork(process *pp, process *cp, int *fds, char *mode)
+static void _job_child_fork(process *pp, process *cp, int *fds,
+			    char *mode, int pgid)
    {int rv;
     extern char **environ;
     process_state *ps;
@@ -1314,7 +1314,7 @@ static void _job_child_fork(process *pp, process *cp, int *fds, char *mode)
     if (ps->dbg_level & 2)
        dprpio("_job_child_fork", cp);
 
-    rv = _job_exec(cp, fds, cp->arg, environ, mode);
+    rv = _job_exec(cp, fds, cp->arg, environ, mode, pgid);
 
     exit(rv);}
 
@@ -1506,7 +1506,8 @@ int *list_fds(process_group *pg)
 
 /* _JOB_FORK - fork PP/CP and exec the command in CP with AL */
 
-static process *_job_fork(process *pp, process *cp, char *mode, void *a)
+static process *_job_fork(process *pp, process *cp, char *mode,
+			  void *a, int pgid)
    {int st, pid;
     int *fds;
 
@@ -1532,7 +1533,7 @@ static process *_job_fork(process *pp, process *cp, char *mode, void *a)
 
 /* the child process comes here and if successful will never return */
 	 case 0 :
-	      _job_child_fork(pp, cp, fds, mode);
+	      _job_child_fork(pp, cp, fds, mode, pgid);
 	      break;
 
 /* the parent process comes here */
@@ -1540,6 +1541,8 @@ static process *_job_fork(process *pp, process *cp, char *mode, void *a)
 	      st = _job_parent_fork(pp, cp, fds, mode);
 	      if (st == FALSE)
 		 _job_free(pp);
+	      else
+		 pp->pgid = getpgid(pp->id);
 	      break;};
 
     FREE(fds);
@@ -1612,7 +1615,7 @@ process *job_launch(char *cmd, char *mode, void *a)
     argv = tokenize(cmd, " \t", 0);
     if (argv != NULL)
        {_job_setup_proc(&pp, &cp, argv, NULL, NULL);
-	pp = _job_fork(pp, cp, mode, a);
+	pp = _job_fork(pp, cp, mode, a, 0);
 
 	free_strings(argv);};
 

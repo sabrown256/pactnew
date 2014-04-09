@@ -2241,6 +2241,59 @@ int group_exit_status(process_group *pg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SETPGID_PGRP - set the PGID for each process in process group PG */
+
+static void setpgid_pgrp(process_group *pg)
+   {int i, np;
+    pid_t pid, pgid;
+    process *pp;
+
+    if (pg != NULL)
+       {pgid = 0;
+	np   = pg->np;
+	for (i = 0; i < np; i++)
+	    {pp = pg->parents[i];
+
+	     if (pp->isfunc == FALSE)
+	        {pid = pp->id;
+		 if (i == 0)
+		    pgid = pid;
+
+/* the first time PGID is zero, then it gets set to the
+ * PGID of the first process
+ * after that all processes get that same PGID
+ */
+		 setpgid(pid, pgid);
+		 pp->pgid = pgid;
+
+		 _dbg(2, "setpgid %d (%d,%d,%d)       %d",
+		      pid,
+		      pp->io[0].fd, pp->io[1].fd, pp->io[2].fd,
+		      pgid);};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DGETPGID - show the PGIDs for the process group PG */
+
+static void dgetpgid(process_group *pg)
+   {int i, np;
+    process *pp;
+
+    if (pg != NULL)
+       {np = pg->np;
+	for (i = 0; i < np; i++)
+	    {pp = pg->parents[i];
+	     if (pp->isfunc == FALSE)
+	        printf("%4d %6d %8d\n", i, pp->id, pp->pgid);};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PRINT_PG - print the process_group status for SHOW_PGRP */
 
 static void _print_pg(process_group *pg, int i)
@@ -2345,7 +2398,7 @@ int wait_pgrp(process_group *pg)
 /* RUN_PGRP - run the process group PG */
 
 static proc_bf run_pgrp(statement *s)
-   {int i, io, np, fd;
+   {int i, io, np, fd, pgid;
     proc_bf fg;
     process *pp, *cp;
     process_stack *pk;
@@ -2366,15 +2419,21 @@ static proc_bf run_pgrp(statement *s)
 	register_io_pgrp(pg);
 
 /* launch the jobs - io_data passed to accept, reject, and wait methods */
+	pgid = 0;
 	for (i = 0; i < np; i++)
 	    {pp = pg->parents[i];
 	     cp = pg->children[i];
 
 	     if (pp->isfunc == FALSE)
-	        {pp = _job_fork(pp, cp, "rw", NULL);
 
-		 _dbg(2, "launch %d (%d,%d,%d)       %s",
-		      pp->id,
+/* the first process get PGID of 0 and becomes the process group leader
+ * the other processes get PGID of the first
+ */
+	        {pp   = _job_fork(pp, cp, "rw", NULL, pgid);
+		 pgid = pp->pgid;
+
+		 _dbg(2, "launch %d/%d (%d,%d,%d)       %s",
+		      pp->id, pp->pgid,
 		      pp->io[0].fd, pp->io[1].fd, pp->io[2].fd,
 		      pp->cmd);}
  	     else
