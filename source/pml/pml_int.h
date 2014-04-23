@@ -84,6 +84,8 @@ struct s_PM_scope_private
     int ncv;
     JMP_BUF mesh_err;};
 
+/* per thread private state */
+
 struct s_PM_smp_state
    {long last;
 

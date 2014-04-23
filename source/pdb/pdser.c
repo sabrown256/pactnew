@@ -470,7 +470,7 @@ PD_smp_state *_PD_get_state(int id)
 /*--------------------------------------------------------------------------*/
 
 /* _PD_RL_PFILE - release a PD_Pfile
- *              - In the MP world I think the PD_close will end up
+ *              - in the MP world I think the PD_close will end up
  *              - freeing the files resources on the master process
  */
 
