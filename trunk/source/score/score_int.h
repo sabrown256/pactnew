@@ -141,6 +141,7 @@
 
 typedef struct s_SC_oscapdes SC_oscapdes;
 typedef struct s_SC_scope_private SC_scope_private;
+typedef struct s_SC_smp_state SC_smp_state;
 
 struct s_SC_oscapdes
    {void (*path_delimiter)(char *delim);
@@ -176,6 +177,9 @@ struct s_SC_scope_private
 /* SCMEMH.C */
     double t0[2];
 
+/* SCPAR.C */
+   int ita;
+
 /* SCSYSB.C */
     int elapsed;
 
@@ -196,7 +200,6 @@ struct s_SC_scope_private
 /* initializes to 0 bytes */
 
 /* SCCNTX.C */
-
    hasharr *context_table;
 
 /* SCFIA.C */
@@ -290,6 +293,18 @@ struct s_SC_scope_private
 /* SCEXE.C */
    exe_apides exe;};
 
+
+/* per thread private state */
+
+struct s_SC_smp_state
+   {int dummy;
+
+/* SCCNTX.C */
+    hasharr *context_table;
+
+    };
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -371,6 +386,12 @@ extern emu_thread_info
 
 extern SC_evlpdes
  **_SC_get_ev_loop(int id);
+
+
+/* SCPAR.C declarations */
+
+extern SC_smp_state
+ *_SC_get_state(int id);
 
 
 /* SCSTR.C declarations */

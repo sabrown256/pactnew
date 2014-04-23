@@ -23,12 +23,17 @@
 /* _SC_INIT_CONTEXT_TABLE - setup and return the context table */
 
 static hasharr *_SC_init_context_table(void)
-   {
+   {hasharr *tb;
+    SC_smp_state *pa;
 
-    if (_SC.context_table == NULL)
-       _SC.context_table = SC_make_hasharr(HSZSMINT, NODOC, SC_HA_ADDR_KEY, 3);
+    pa = _SC_get_state(-1);
 
-    return(_SC.context_table);}
+    if (pa->context_table == NULL)
+       pa->context_table = SC_make_hasharr(HSZSMINT, NODOC, SC_HA_ADDR_KEY, 3);
+
+    tb = pa->context_table;
+
+    return(tb);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

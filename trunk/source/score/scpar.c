@@ -303,6 +303,42 @@ static void _SC_set_omp_num_threads(int nt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_INIT_THREAD - init state PA for thread ID */
+
+static void _SC_init_thread(SC_smp_state *pa, int id)
+   {
+
+    pa->context_table = NULL;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_GET_STATE - return the SC state for thread ID
+ *               - use current thread if ID == -1
+ */
+
+SC_smp_state *_SC_get_state(int id)
+   {int64_t bpi;
+    SC_smp_state *pa;
+
+    if (_SC.ita < 0)
+       {bpi     = sizeof(SC_smp_state);
+	_SC.ita = SC_register_thread_data("score-state", "SC_smp_state",
+					  1, bpi,
+					  (PFTinit) _SC_init_thread);};
+
+    if (id < 0)
+       id = SC_current_thread();
+
+    pa = (SC_smp_state *) SC_get_thread_element(id, _SC.ita);
+
+    return(pa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_INIT_THREADS - initialize SCORE threads
  *                 - return the number of threads initialized in this call or
  *                 - the number of threads originally initialized

@@ -766,23 +766,23 @@ static void _SC_write_ntos(FILE *fp, int id)
 /* non-standard long double I/O */
 #if (AF_LONG_DOUBLE_IO == 1)
     fprintf(fp, "\n");
-    fprintf(fp, "    {char *p;\n");
-    fprintf(fp, "     for (p = fmt; *p != \'\\0\'; p++)\n");
-    fprintf(fp, "         if (*p == \'L\')\n");
-    fprintf(fp, "            *p++ = \'l\';};\n");
+    fprintf(fp, "    {char *lp;\n");
+    fprintf(fp, "     for (lp = fmt; *lp != \'\\0\'; lp++)\n");
+    fprintf(fp, "         if (*lp == \'L\')\n");
+    fprintf(fp, "            *lp++ = \'l\';};\n");
     fprintf(fp, "\n");
 
 /* no long double I/O */
 #elif (AF_LONG_DOUBLE_IO == 0)
     fprintf(fp, "\n");
-    fprintf(fp, "    {char c, *s, *d;\n");
-    fprintf(fp, "     for (s = fmt, d = fmt; *s != \'\\0\'; s++)\n");
-    fprintf(fp, "         {c = *s;\n");
-    fprintf(fp, "          if (c != \'L\')\n");
-    fprintf(fp, "             *d++ = c;\n");
+    fprintf(fp, "    {char lc, *ls, *ld;\n");
+    fprintf(fp, "     for (ls = fmt, ld = fmt; *ls != \'\\0\'; ls++)\n");
+    fprintf(fp, "         {lc = *ls;\n");
+    fprintf(fp, "          if (lc != \'L\')\n");
+    fprintf(fp, "             *ld++ = lc;\n");
     fprintf(fp, "          else\n");
     fprintf(fp, "             nld = 1;};\n");
-    fprintf(fp, "     *d = \'\\0\';};\n");
+    fprintf(fp, "     *ld = \'\\0\';};\n");
     fprintf(fp, "\n");
 #endif
 
@@ -820,23 +820,23 @@ static void _SC_write_ptr(FILE *fp, int id)
 /* non-standard long double I/O */
 #if (AF_LONG_DOUBLE_IO == 1)
     fprintf(fp, "\n");
-    fprintf(fp, "    {char *p;\n");
-    fprintf(fp, "     for (p = fmt; *p != \'\\0\'; p++)\n");
-    fprintf(fp, "         if (*p == \'L\')\n");
-    fprintf(fp, "            *p++ = \'l\';};\n");
+    fprintf(fp, "    {char *lp;\n");
+    fprintf(fp, "     for (lp = fmt; *lp != \'\\0\'; lp++)\n");
+    fprintf(fp, "         if (*lp == \'L\')\n");
+    fprintf(fp, "            *lp++ = \'l\';};\n");
     fprintf(fp, "\n");
 
 /* no long double I/O */
 #elif (AF_LONG_DOUBLE_IO == 0)
     fprintf(fp, "\n");
-    fprintf(fp, "    {char c, *s, *d;\n");
-    fprintf(fp, "     for (s = fmt, d = fmt; *s != \'\\0\'; s++)\n");
-    fprintf(fp, "         {c = *s;\n");
-    fprintf(fp, "          if (c != \'L\')\n");
-    fprintf(fp, "             *d++ = c;\n");
+    fprintf(fp, "    {char lc, *ls, *ld;\n");
+    fprintf(fp, "     for (ls = fmt, ld = fmt; *ls != \'\\0\'; ls++)\n");
+    fprintf(fp, "         {lc = *ls;\n");
+    fprintf(fp, "          if (lc != \'L\')\n");
+    fprintf(fp, "             *ld++ = lc;\n");
     fprintf(fp, "          else\n");
     fprintf(fp, "             nld = 1;};\n");
-    fprintf(fp, "     *d = \'\\0\';};\n");
+    fprintf(fp, "     *ld = \'\\0\';};\n");
     fprintf(fp, "\n");
 #endif
 

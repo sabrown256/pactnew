@@ -65,7 +65,7 @@ SC_scope_public
 SC_scope_private
  _SC = {-1, TRUE, -1,
         malloc, realloc, free,
-	{-1.0, -1.0}, -1, -1, SC_TERM_UNKNOWN,
+	{-1.0, -1.0}, -1, -1, -1, SC_TERM_UNKNOWN,
 	(PFSignal_handler) -1, {SIG_DFL, NULL}, -1,
         _SC_TYPE_STATE_INIT_};
 

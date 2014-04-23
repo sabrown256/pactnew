@@ -826,6 +826,63 @@ struct s_PD_image
     int bits_pixel;
     char *palette;};
 
+struct s_PD_pfm_fnc
+   {PFfopen open_hook;
+    FILE *(*setup_pseudo_file)(BF_FILE *fp);
+    FILE *(*get_file_stream)(PDBfile *file);
+    BF_FILE *(*get_file_ptr)(FILE *file);
+    int (*flush_file)(PDBfile *file);
+    int (*extend_file)(PDBfile *file, long nb);
+    int (*serial_flush)(FILE *fp, int _t_index);
+    int (*set_eod)(PDBfile *file, int64_t addr, long nb);
+    int (*is_dp_init)(void);
+    int (*is_smp_init)(void);
+    int (*is_null_fp)(void *fp);
+    int (*is_sequential)(void);
+    int (*is_master)(PDBfile *file);
+    int64_t (*get_file_size)(PDBfile *fp);
+    int64_t (*getspace)(PDBfile *file, size_t nbytes, int rflag, int colf);
+    int64_t (*next_address)(PDBfile *file, char *type, long number,
+			  void *vr, int seekf, int tellf, int colf);
+    void (*setup_mp_file)(PDBfile *file, SC_communicator comm);
+    void (*init)(void);
+    void (*add_file)(PDBfile *file, int64_t start_addr);
+    void (*remove_file)(FILE *file);
+    void (*mark_as_flushed)(PDBfile *file, int wh);
+    void (*set_address)(PDBfile *file, int64_t addr);};
+
+struct s_PD_scope_public
+   {int nthreads;
+    int format_fields;
+    int default_format_version;
+    int buffer_size;
+    int host_order;
+
+    long print_ctrl[10];
+
+    char err[MAXLINE];
+    char *tnames[PD_N_TYPES];
+
+    PDBfile *vif;
+    PFPDBwrite write;                    /* semi-obsolete read/write hooks */
+    PFPDBread read;
+
+    data_standard *int_standard;
+    data_standard *req_standard;
+    data_standard standards[PD_N_STANDARDS];
+
+    data_alignment *int_alignment;
+    data_alignment *req_alignment;
+    data_alignment alignments[PD_N_ALIGNMENTS];
+
+/* NOTE: these next two members are deprecated - do not use */
+    data_standard *std_standards[PD_N_STANDARDS + 1];
+    data_alignment *std_alignments[PD_N_ALIGNMENTS + 1];
+
+    PD_pfm_fnc par;};
+
+/* per thread private state */
+
 struct s_PD_smp_state
    {int append_flag;                  /* PDB state */
     FILE *ofp;
@@ -908,61 +965,6 @@ struct s_PD_smp_state
     JMP_BUF trace_err;
     JMP_BUF close_err;
     JMP_BUF create_err;};
-
-struct s_PD_pfm_fnc
-   {PFfopen open_hook;
-    FILE *(*setup_pseudo_file)(BF_FILE *fp);
-    FILE *(*get_file_stream)(PDBfile *file);
-    BF_FILE *(*get_file_ptr)(FILE *file);
-    int (*flush_file)(PDBfile *file);
-    int (*extend_file)(PDBfile *file, long nb);
-    int (*serial_flush)(FILE *fp, int _t_index);
-    int (*set_eod)(PDBfile *file, int64_t addr, long nb);
-    int (*is_dp_init)(void);
-    int (*is_smp_init)(void);
-    int (*is_null_fp)(void *fp);
-    int (*is_sequential)(void);
-    int (*is_master)(PDBfile *file);
-    int64_t (*get_file_size)(PDBfile *fp);
-    int64_t (*getspace)(PDBfile *file, size_t nbytes, int rflag, int colf);
-    int64_t (*next_address)(PDBfile *file, char *type, long number,
-			  void *vr, int seekf, int tellf, int colf);
-    void (*setup_mp_file)(PDBfile *file, SC_communicator comm);
-    void (*init)(void);
-    void (*add_file)(PDBfile *file, int64_t start_addr);
-    void (*remove_file)(FILE *file);
-    void (*mark_as_flushed)(PDBfile *file, int wh);
-    void (*set_address)(PDBfile *file, int64_t addr);};
-
-struct s_PD_scope_public
-   {int nthreads;
-    int format_fields;
-    int default_format_version;
-    int buffer_size;
-    int host_order;
-
-    long print_ctrl[10];
-
-    char err[MAXLINE];
-    char *tnames[PD_N_TYPES];
-
-    PDBfile *vif;
-    PFPDBwrite write;                    /* semi-obsolete read/write hooks */
-    PFPDBread read;
-
-    data_standard *int_standard;
-    data_standard *req_standard;
-    data_standard standards[PD_N_STANDARDS];
-
-    data_alignment *int_alignment;
-    data_alignment *req_alignment;
-    data_alignment alignments[PD_N_ALIGNMENTS];
-
-/* NOTE: these next two members are deprecated - do not use */
-    data_standard *std_standards[PD_N_STANDARDS + 1];
-    data_alignment *std_alignments[PD_N_ALIGNMENTS + 1];
-
-    PD_pfm_fnc par;};
 
 #ifdef __cplusplus
 extern "C" {
