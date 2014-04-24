@@ -187,6 +187,33 @@ void _SC_init_thr_processes(SC_thread_proc *ps, int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_GET_THR_PROCESSES - return the process list for thread ID
+ *                       - use current thread if ID == -1
+ */
+
+SC_thread_proc *_SC_get_thr_processes(int id)
+   {SC_thread_proc *ps;
+    SC_smp_state *pa;
+
+    pa = _SC_get_state(id);
+    ps = pa->proc;
+
+#if 0
+#if 0
+       SC_register_thread_data("processes", "SC_thread_proc", 1,
+			       sizeof(SC_thread_proc),
+			       (PFTinit) _SC_init_thr_processes);
+#endif
+
+/* error stacks are registered as per thread state */
+    ps = (SC_thread_proc *) SC_get_thread_element(id, SC_THR_PROCESSES);
+#endif
+
+    return(ps);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_FIN_THR_PROCESSES - cleanup the SC_thread_proc instances */
 
 void _SC_fin_thr_processes(void)

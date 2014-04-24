@@ -297,10 +297,22 @@ struct s_SC_scope_private
 /* per thread private state */
 
 struct s_SC_smp_state
-   {int dummy;
+   {
 
 /* SCCNTX.C */
     hasharr *context_table;
+
+/* SCERR.C */
+    SC_array *err;
+
+/* SCIOCTL.C */
+    SC_evlpdes **ev;
+
+/* SCFNCT.C */
+    JMP_BUF time_out;
+
+/* SCPMAN.C */
+    void *proc;
 
     };
 
@@ -337,12 +349,6 @@ extern char
  *_SC_search_file(char **path, char *name, char *mode, char *type);
 
 
-/* SCERR.C declarations */
-
-extern void
- _SC_init_error_stack(SC_array *err, int id);
-
-
 /* SCEXE.C declarations */
 
 extern char
@@ -375,17 +381,11 @@ extern PFInt
 
 /* SCMEMT.C declarations */
 
-extern SC_array
- *_SC_get_error_stack(int id);
-
 extern JMP_BUF
  *_SC_get_to_buf(int id);
 
 extern emu_thread_info
  *_SC_get_thread_info(int id);
-
-extern SC_evlpdes
- **_SC_get_ev_loop(int id);
 
 
 /* SCPAR.C declarations */

@@ -9,6 +9,7 @@
 #include "cpyright.h"
 
 #include "score_int.h"
+#include "scope_proc.h"
 
 typedef struct s_thread_work thread_work;
 typedef struct s_thread_queue thread_queue;
@@ -309,6 +310,13 @@ static void _SC_init_thread(SC_smp_state *pa, int id)
    {
 
     pa->context_table = NULL;
+
+    pa->err = CMAKE_ARRAY(SC_errdes, NULL, 3);
+
+    pa->ev  = NULL;
+
+    pa->proc = CMAKE(SC_thread_proc);
+    _SC_init_thr_processes(pa->proc, id);
 
     return;}
 

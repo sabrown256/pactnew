@@ -27,14 +27,18 @@ void _SC_assert(int t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_INIT_ERROR_STACK - initialize error stack for thread ID */
+/* _SC_GET_ERROR_STACK - return the error stack for thread ID
+ *                     - use current thread if ID == -1
+ */
 
-void _SC_init_error_stack(SC_array *err, int id)
-   {
+static SC_array *_SC_get_error_stack(int id)
+   {SC_array *arr;
+    SC_smp_state *pa;
 
-    CINIT_ARRAY(err, SC_errdes, NULL, 3);
+    pa  = _SC_get_state(id);
+    arr = pa->err;
 
-    return;}
+    return(arr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

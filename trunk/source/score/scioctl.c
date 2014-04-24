@@ -42,6 +42,22 @@ void SC_catch_event_loop_interrupts(SC_evlpdes *pe, int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_GET_EV_LOOP - return the event loop for thread ID
+ *                 - use current thread if ID == -1
+ */
+
+static SC_evlpdes **_SC_get_ev_loop(int id)
+   {SC_evlpdes **ev;
+    SC_smp_state *pa;
+
+    pa = _SC_get_state(id);
+    ev = pa->ev;
+
+    return(ev);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_EVENT_LOOP_HANDLER - respond to an input available interrupt */
 
 static void _SC_event_loop_handler(int sig)

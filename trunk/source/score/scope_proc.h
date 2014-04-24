@@ -563,15 +563,10 @@ extern PROCESS
  *SC_get_terminal_process(void);
 
 
-/* SCMEMT.C declarations */
-
-extern SC_thread_proc
- *_SC_get_thr_processes(int id);
-
-
 /* SCPMAN.C declarations */
 
 extern SC_thread_proc
+ *_SC_get_thr_processes(int id),
  *_SC_tid_proc(void);
 
 extern PROCESS
