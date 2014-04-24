@@ -18,11 +18,7 @@
 
 enum e_SC_thread_private
    { SC_THR_HEAPS = 0,
-     SC_THR_THREADS,
-     SC_THR_PROCESSES,
-     SC_THR_TIMEOUTS,
-     SC_THR_EVENTS,
-     SC_THR_ERRORS };
+     SC_THR_THREADS };
 
 typedef enum e_SC_thread_private SC_thread_private;
 
@@ -77,66 +73,6 @@ emu_thread_info *_SC_get_thread_info(int id)
     ti = (emu_thread_info *) SC_get_thread_element(id, SC_THR_THREADS);
 
     return(ti);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_GET_TO_BUF - return the JMP_BUF for timeouts for thread ID
- *                - use current thread if ID == -1
- */
-
-JMP_BUF *_SC_get_to_buf(int id)
-   {JMP_BUF *bf;
-
-/* timeouts are registered as per thread state */
-    bf = (JMP_BUF *) SC_get_thread_element(id, SC_THR_TIMEOUTS);
-
-    return(bf);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_GET_EV_LOOP - return the event loop for thread ID
- *                 - use current thread if ID == -1
- */
-
-SC_evlpdes **_SC_get_ev_loop(int id)
-   {SC_evlpdes **ev;
-
-/* event loops are registered as per thread state */
-    ev = (SC_evlpdes **) SC_get_thread_element(id, SC_THR_EVENTS);
-
-    return(ev);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_GET_ERROR_STACK - return the error stack for thread ID
- *                     - use current thread if ID == -1
- */
-
-SC_array *_SC_get_error_stack(int id)
-   {SC_array *arr;
-
-/* error stacks are registered as per thread state */
-    arr = (SC_array *) SC_get_thread_element(id, SC_THR_ERRORS);
-
-    return(arr);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_GET_THR_PROCESSES - return the process list for thread ID
- *                       - use current thread if ID == -1
- */
-
-SC_thread_proc *_SC_get_thr_processes(int id)
-   {SC_thread_proc *ps;
-
-/* error stacks are registered as per thread state */
-    ps = (SC_thread_proc *) SC_get_thread_element(id, SC_THR_PROCESSES);
-
-    return(ps);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -306,22 +242,6 @@ void SC_register_thread_state(void)
        SC_register_thread_data("threads", "emu_thread_info", 1,
 			       sizeof(emu_thread_info),
 			       (PFTinit) _SC_eth_init_thread);
-
-       SC_register_thread_data("processes", "SC_thread_proc", 1,
-			       sizeof(SC_thread_proc),
-			       (PFTinit) _SC_init_thr_processes);
-
-       SC_register_thread_data("timeouts", "JMP_BUF", 1,
-			       sizeof(JMP_BUF),
-			       NULL);
-
-       SC_register_thread_data("events", "SC_evlpdes *", 1,
-			       sizeof(SC_evlpdes *),
-			       NULL);
-
-       SC_register_thread_data("errors", "SC_array", 1,
-			       sizeof(SC_array),
-			       (PFTinit) _SC_init_error_stack);
 
        st.init = TRUE;
 

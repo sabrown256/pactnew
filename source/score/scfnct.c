@@ -328,6 +328,22 @@ void SC_sec_str(double t, char *d)
 
 /*--------------------------------------------------------------------------*/
 
+/* _SC_GET_TO_BUF - return the JMP_BUF for timeouts for thread ID
+ *                - use current thread if ID == -1
+ */
+
+JMP_BUF *_SC_get_to_buf(int id)
+   {JMP_BUF *bf;
+    SC_smp_state *pa;
+
+    pa = _SC_get_state(id);
+    bf = &pa->time_out;
+
+    return(bf);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_TIMEOUT_ERROR - tell somebody that we timed out and exit */
 
 static void _SC_timeout_error(int sig)
