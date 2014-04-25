@@ -236,6 +236,7 @@ struct s_process_group
    {int np;                 /* number of processes in group */
     int to;                 /* group time out */
     proc_bf fg;             /* the foreground/background run state */
+    int jctl;               /* TRUE for job control */
     int *st;                /* exit statuses of group members */
     char *mode;             /* IPC mode */
     char *shell;
@@ -475,17 +476,34 @@ sigset_t _block_all_sig(int wh)
  *               - iff T is TRUE
  */
 
-void _job_grp_attr(process *pp, int g, int t)
-   {int pid, pgid;
+void _job_grp_attr(process *pp, int g, int jctl, int t)
+   {int st, pid, pgid;
 
+    st   = 0;
     pid  = pp->id;
     pgid = pp->pgid;
 
     if (g == TRUE)
-       setpgid(pid, pgid);
+       {st = setpgid(pid, pgid);
+#if 0
+        if (st == -1)
+	   perror("_JOB_GRP_ATTR:setpgid");
+#endif
+#if 0
+        if (jctl == TRUE)
+	   pgid = getpgid(pid);
+#endif
+        };
 
     if (t == TRUE)
-       tcsetpgrp(STDIN_FILENO, pgid);
+       {st = tcsetpgrp(STDIN_FILENO, pgid);
+#if 0
+        if (st == -1)
+	   perror("_JOB_GRP_ATTR:tcsetpgrp");
+#endif
+       };
+
+    ASSERT(st == 0);
 
     return;}
 
@@ -667,7 +685,8 @@ static void _job_free(process *pp)
  */
 
 static int _job_exec(process *cp, int *fds,
-		     char **argv, char **env, char *mode, int pgid)
+		     char **argv, char **env, char *mode, int pgid,
+		     int jctl)
    {int i, err, fg, st;
     int io[N_IO_CHANNELS];
 
@@ -675,10 +694,10 @@ static int _job_exec(process *cp, int *fds,
 
     if (cp != NULL)
        {fg = TRUE;
-#if 0
-	cp->pgid = pgid;
-#endif
-	_job_grp_attr(cp, TRUE, fg);
+        if (jctl == TRUE)
+	   cp->pgid = pgid;
+
+	_job_grp_attr(cp, TRUE, jctl, fg);
 
 /* reset the signal handlers for the child */
 	nsigaction(NULL, SIGINT,  SIG_DFL, SA_RESTART, -1);
@@ -1293,7 +1312,7 @@ void _job_child_prelim(process *pp)
  */
 
 static void _job_child_fork(process *pp, process *cp, int *fds,
-			    char *mode, int pgid)
+			    char *mode, int pgid, int jctl)
    {int rv;
     extern char **environ;
     process_state *ps;
@@ -1314,7 +1333,7 @@ static void _job_child_fork(process *pp, process *cp, int *fds,
     if (ps->dbg_level & 2)
        dprpio("_job_child_fork", cp);
 
-    rv = _job_exec(cp, fds, cp->arg, environ, mode, pgid);
+    rv = _job_exec(cp, fds, cp->arg, environ, mode, pgid, jctl);
 
     exit(rv);}
 
@@ -1332,7 +1351,7 @@ static int _job_parent_fork(process *pp, process *cp, int *fds, char *mode)
     st = TRUE;
 
 /* take the controlling terminal */
-    _job_grp_attr(pp, isatty(STDIN_FILENO), FALSE);
+    _job_grp_attr(pp, isatty(STDIN_FILENO), FALSE, FALSE);
 
     pp->id         = cp->id;
     pp->start_time = wall_clock_time();
@@ -1507,7 +1526,7 @@ int *list_fds(process_group *pg)
 /* _JOB_FORK - fork PP/CP and exec the command in CP with AL */
 
 static process *_job_fork(process *pp, process *cp, char *mode,
-			  void *a, int pgid)
+			  void *a, int pgid, int jctl)
    {int st, pid;
     int *fds;
 
@@ -1533,7 +1552,7 @@ static process *_job_fork(process *pp, process *cp, char *mode,
 
 /* the child process comes here and if successful will never return */
 	 case 0 :
-	      _job_child_fork(pp, cp, fds, mode, pgid);
+	      _job_child_fork(pp, cp, fds, mode, pgid, jctl);
 	      break;
 
 /* the parent process comes here */
@@ -1615,7 +1634,7 @@ process *job_launch(char *cmd, char *mode, void *a)
     argv = tokenize(cmd, " \t", 0);
     if (argv != NULL)
        {_job_setup_proc(&pp, &cp, argv, NULL, NULL);
-	pp = _job_fork(pp, cp, mode, a, 0);
+	pp = _job_fork(pp, cp, mode, a, 0, FALSE);
 
 	free_strings(argv);};
 

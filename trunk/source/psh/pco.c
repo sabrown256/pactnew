@@ -2207,7 +2207,7 @@ static int do_run_work(client *cl, int il, char *oper, char *value)
 
 	CLOG(cl, 1, "pco: async %s", cmd);
 	db = cgetenv(TRUE, "PERDB_PATH");
-        rv = gexecs(db, cmd, NULL, NULL);}
+        rv = gexecs(db, cmd, NULL, FALSE, NULL);}
 
     else
        {for (i = 0, ok = TRUE; ok == TRUE; i++)

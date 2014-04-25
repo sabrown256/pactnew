@@ -375,7 +375,7 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 /* MAKE_PGRP - initialize and return a process_group instance */
 
 process_group *make_pgrp(int np, char **env, char *shell,
-                         proc_bf fg, process_session *ss,
+                         proc_bf fg, int jctl, process_session *ss,
 			 PFPCAL (*map)(char *nm))
    {process_group *pg;
     process_state *ps;
@@ -389,6 +389,7 @@ process_group *make_pgrp(int np, char **env, char *shell,
 	pg->np       = np;
 	pg->to       = 0;
 	pg->fg       = fg;
+        pg->jctl     = jctl;
 	pg->mode     = NULL;
 	pg->shell    = shell;
 	pg->env      = env;
@@ -1418,7 +1419,7 @@ char **subst_syntax(char **sa)
 
 /* PARSE_PGRP - parse out specifications in S to initialize PG */
 
-static void parse_pgrp(statement *s)
+static void parse_pgrp(statement *s, int jctl)
    {int i, j, it, nc, dosh, doif, term;
     proc_bf fg;
     char *t, *shell;
@@ -1449,7 +1450,7 @@ static void parse_pgrp(statement *s)
        fg = PROC_FG_RUN;
 
 /* maximum number of process would be the number of tokens */
-    pg = make_pgrp(nc, env, shell, fg, NULL, s->map);
+    pg = make_pgrp(nc, env, shell, fg, jctl, NULL, s->map);
 
     pa = pg->parents;
 
@@ -2429,7 +2430,7 @@ static proc_bf run_pgrp(statement *s)
 /* the first process get PGID of 0 and becomes the process group leader
  * the other processes get PGID of the first
  */
-	        {pp   = _job_fork(pp, cp, "rw", NULL, pgid);
+	        {pp   = _job_fork(pp, cp, "rw", NULL, pgid, pg->jctl);
 		 pgid = pp->pgid;
 
 		 _dbg(2, "launch %d/%d (%d,%d,%d)       %s",
@@ -2642,7 +2643,7 @@ process_session *init_session(void)
 
 /* GEXECS - execute a process group specified by the string S */
 
-int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
+int gexecs(char *db, char *s, char **env, int jctl, PFPCAL (*map)(char *s))
    {int i, nc, rv, st;
     int fa, fb;
     proc_bf fg;
@@ -2666,7 +2667,7 @@ int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
 
 /* parse each statement into process groups */
     for (i = 0; i < nc; i++)
-        parse_pgrp(sl+i);
+        parse_pgrp(sl+i, jctl);
 
 /* execute each process group */
     st = 0;
@@ -2716,7 +2717,8 @@ int gexecs(char *db, char *s, char **env, PFPCAL (*map)(char *s))
 
 /* GEXECA - execute a process group specified by C and V */
 
-int gexeca(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
+int gexeca(char *db, int c, char **v, char **env,
+	   int jctl, PFPCAL (*map)(char *s))
    {int i, rv;
     char *s;
 
@@ -2730,7 +2732,7 @@ int gexeca(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 	 else
 	    s = append_tok(s, ' ', "\"%s\"", v[i]);};
 
-    rv = gexecs(db, s, env, map);
+    rv = gexecs(db, s, env, jctl, map);
 
     FREE(s);
 

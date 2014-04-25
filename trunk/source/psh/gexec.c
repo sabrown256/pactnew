@@ -232,7 +232,7 @@ int main(int c, char **v, char **env)
 	        ps->to_sec = atol(v[++i]);
 
 	     else
-	        {rv = gexeca(db, c-i, v+i, env, maps);
+	        {rv = gexeca(db, c-i, v+i, env, FALSE, maps);
 		 break;};};};
 
     log_safe("dump", 0, NULL, NULL);
