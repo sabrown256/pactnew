@@ -148,7 +148,7 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
 
     ps = PS_get_process_state();
 
-    PS_gexeca(db, n, al, NULL, _SS_maps);
+    PS_gexeca(db, n, al, NULL, FALSE, _SS_maps);
 
     o = _SS_string_list(si, ps->gstatus);
 
