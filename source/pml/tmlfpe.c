@@ -259,7 +259,7 @@ int main(int c, char **v)
     int *prv;
 
     verbose = FALSE;
-    nt      = 0;
+    nt      = 1;
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-h") == 0)
@@ -274,6 +274,8 @@ int main(int c, char **v)
             nt = SC_stoi(v[++i]);
 	 else if (strcmp(v[i], "-v") == 0)
             verbose = TRUE;};
+
+    nt = max(nt, 1);
 
     if (verbose == TRUE)
        PM_fpe_traps(TRUE);
