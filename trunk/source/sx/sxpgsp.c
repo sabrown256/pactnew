@@ -1663,7 +1663,7 @@ static object *_SX_get_attrs_alist(SS_psides *si, pcons *alst, object *argl)
 
 	 SC_strncpy(t, MAXLINE, pc->cdr_type, -1);
 	 typ = PD_dereference(t);
-	 o   = _SS_numtype_to_object(si, typ, pc->cdr, 1);
+	 o   = _SS_numtype_to_object(si, typ, pc->cdr, 0);
 	 rv  = SS_mk_cons(si, o, rv);
 
 	 CFREE(name);};

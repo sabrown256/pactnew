@@ -20,6 +20,7 @@
 #define PY_pdb_H
 
 #include <Python.h>
+#undef HAVE_GETHOSTBYNAME
 #include <pdb_int.h>
 #include <pputil.h>
 
