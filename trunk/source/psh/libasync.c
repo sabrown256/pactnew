@@ -483,25 +483,22 @@ void _job_grp_attr(process *pp, int g, int jctl, int t)
     pid  = pp->id;
     pgid = pp->pgid;
 
-    if (g == TRUE)
+    if ((g == TRUE) && (pgid >= 0))
        {st = setpgid(pid, pgid);
-#if 0
         if (st == -1)
-	   perror("_JOB_GRP_ATTR:setpgid");
-#endif
-#if 0
-        if (jctl == TRUE)
-	   pgid = getpgid(pid);
-#endif
-        };
+           fprintf(stderr, "_JOB_GRP_ATTR: setpgid(%d,%d) returned %d (%s)\n",
+		   pid, pgid, st,
+		   strerror(errno));};
 
-    if (t == TRUE)
+    if (jctl == TRUE)
+       pgid = getpgid(0);
+
+    if ((t == TRUE) && (pgid > 0))
        {st = tcsetpgrp(STDIN_FILENO, pgid);
-#if 0
         if (st == -1)
-	   perror("_JOB_GRP_ATTR:tcsetpgrp");
-#endif
-       };
+           fprintf(stderr, "_JOB_GRP_ATTR: tcsetpgrp(%d,%d) returned %d (%s)\n",
+		   STDIN_FILENO, pgid, st,
+		   strerror(errno));};
 
     ASSERT(st == 0);
 
@@ -730,9 +727,9 @@ static int _job_exec(process *cp, int *fds,
 
 /* if we get here the exec failed */
     if (err == -1)
-       fprintf(stderr, "EXECVP ERROR: '%s' - _JOB_EXEC", argv[0]);
+       fprintf(stderr, "EXECVP ERROR: '%s' - _JOB_EXEC\n", argv[0]);
     else
-       fprintf(stderr, "EXECVP RETURNED: '%s' - _JOB_EXEC", argv[0]);
+       fprintf(stderr, "EXECVP RETURNED: '%s' - _JOB_EXEC\n", argv[0]);
 
     return(err);}
 
