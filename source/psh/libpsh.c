@@ -87,7 +87,10 @@ char *nstrsave(char *s)
 char *nstrncpy(char *d, size_t nd, char *s, size_t ns)
    {size_t nc;
         
-    if ((s != NULL) && (d != NULL))
+    if (d != NULL)
+       d[0] = '\0';
+
+    if ((IS_NULL(s) == FALSE) && (d != NULL))
        {nc = min(ns, nd-1);
 	nc = max(nc, 0);
 	strncpy(d, s, nc);
@@ -1192,7 +1195,10 @@ char *path_tail(char *s)
     char *pd;
     static char d[BFLRG];
 
-    nstrncpy(d, BFLRG, s, -1);
+/* handle case of path_tail(path_tail(s)) */
+    if (s != d)
+       nstrncpy(d, BFLRG, s, -1);
+
     nc = strlen(d);
     if (nc >= BFLRG)
        nc = BFLRG;
@@ -1217,7 +1223,10 @@ char *path_head(char *s)
     char *pd;
     static char d[BFLRG];
 
-    nstrncpy(d, BFLRG, s, -1);
+/* handle case of path_head(path_head(s)) */
+    if (s != d)
+       nstrncpy(d, BFLRG, s, -1);
+
     nc = strlen(d);
     if (nc >= BFLRG)
        nc = BFLRG;
@@ -1241,7 +1250,10 @@ char *path_base(char *s)
     char *pd;
     static char d[BFLRG];
 
-    nstrncpy(d, BFLRG, s, -1);
+/* handle case of path_base(path_base(s)) */
+    if (s != d)
+       nstrncpy(d, BFLRG, s, -1);
+
     nc = strlen(d);
     nc = vlimit(nc, 1, BFLRG);
 
@@ -2313,9 +2325,12 @@ char *cwhich(char *fmt, ...)
     char prg[BFLRG];
     static char exe[BFLRG];
 
-    VA_START(fmt);
-    VSNPRINTF(prg, BFLRG, fmt);
-    VA_END;
+    if (fmt != NULL)
+       {VA_START(fmt);
+	VSNPRINTF(prg, BFLRG, fmt);
+	VA_END;}
+    else
+       prg[0] = '\0';
 
 #if 0
     int ok;
