@@ -506,12 +506,12 @@ static int diff_line(char *bfa, char *bfb, pixdes *pd, int verbose,
 	    if (n > MAXLINE)
 	       {SC_strncpy(tba, MAXLINE, bfa, pl);
 
-		strcpy(bfa, bfa+pl);
+		memmove(bfa, bfa+pl, n-pl+1);
 		lpa = tba;
 
 		SC_strncpy(tbb, MAXLINE, bfb, pl);
 
-		strcpy(bfb, bfb+pl);
+		memmove(bfb, bfb+pl, strlen(bfb+pl)+1);
 		lpb = tbb;}
 	    else
 	       {lpa   = bfa;
@@ -691,7 +691,6 @@ static int ps_diff_b(char *f1, char *f2, pixdes *pd, int verbose)
     for (i = 0; TRUE; i++)
         {sa = SC_dgets(sa, &na, fda);
 	 sb = SC_dgets(sb, &nb, fdb);
-
 	 if ((sa == NULL) || (sb == NULL))
             {io_close(fda);
 	     io_close(fdb);
