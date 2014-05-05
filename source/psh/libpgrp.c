@@ -2244,7 +2244,7 @@ int group_exit_status(process_group *pg)
 
 /* SETPGID_PGRP - set the PGID for each process in process group PG */
 
-static void setpgid_pgrp(process_group *pg)
+void setpgid_pgrp(process_group *pg)
    {int i, np;
     pid_t pid, pgid;
     process *pp;
@@ -2279,7 +2279,7 @@ static void setpgid_pgrp(process_group *pg)
 
 /* DGETPGID - show the PGIDs for the process group PG */
 
-static void dgetpgid(process_group *pg)
+void dgetpgid(process_group *pg)
    {int i, np;
     process *pp;
 
