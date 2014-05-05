@@ -39,8 +39,8 @@ Tool CC {
                  4.*  >= -Wno-unknown-pragmas ]
    Flags    =+ [ _env_ = PACT_CC_VERSION ;      # unused return value
                  4.4.* > -Wunused-result ]
-   Flags    =+ [ _env_ = PACT_CC_VERSION ;      # memory checks
-                 4.8.3 >= -fsanitize=address ]
+#   Flags    =+ [ _env_ = PACT_CC_VERSION ;      # memory checks
+#                 4.9.* >= -fsanitize=address ]
    Flags    =+ [ _env_ = PACT_CC_VERSION ;      # thread checks
                  4.8.* >= -fsanitize=thread -pie ]
    Flags    =+ -Wl,-O1 -Wl,--discard-all -Wl,--no-undefined -Wl,--build-id=sha1
