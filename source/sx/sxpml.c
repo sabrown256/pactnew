@@ -928,7 +928,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
     if (mn == NULL)
        {_SX_get_menu(si, po);
         for (i = 0; TRUE; i++)
-            {name = SC_dsnprintf(FALSE, "Mapping%ld", i);
+            {name = SC_dsnprintf(FALSE, "/Mapping%ld", i);
              if (PD_inquire_entry(file, name, TRUE, NULL) == NULL)
                 break;};}
     else

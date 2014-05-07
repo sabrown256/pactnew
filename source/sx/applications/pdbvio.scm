@@ -375,7 +375,8 @@
 
 		(define (rep-vp-one x)
 		  (let* ((things (window-manager "vget-args" x)))
-		        (rep-file-out (caar things) (cdar things))))
+		        (if (pair? (car things))
+			    (rep-file-out (caar things) (cdar things)))))
 
 		(define (cm-seq fnc x)
 		  (if (fnc x)
