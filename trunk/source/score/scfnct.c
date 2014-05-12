@@ -374,12 +374,12 @@ static void _SC_timeout_error(int sig)
  *            - if FNC is NULL the process will exit on timeout
  */
 
-void SC_timeout(int to, PFSignal_handler fnc, void *a)
+void SC_timeout(int to, PFSignal_handler fnc, void *a, int nb)
    {
 
 #if defined(HAVE_POSIX_SYS)
 
-    int ns;
+    int nn, ns;
     void *an;
     PFSignal_handler fn;
 
@@ -391,16 +391,19 @@ void SC_timeout(int to, PFSignal_handler fnc, void *a)
 /* settle on the handler */
        {fn = fnc;
 	an = a;
+	nn = nb;
 	if (fnc == NULL)
 	   {if (to > 0)
 	       {fn = _SC_timeout_error;
-		an = a;}
+		an = a;
+	        nn = -1;}
 	    else
 	       {fn = _SC.to_err.f;
-		an = _SC.to_err.a;};};
+		an = _SC.to_err.a;
+	        nn = _SC.to_err.nb;};};
 
 /* set the handler and the alarm */
-	_SC.to_err = SC_signal_n(SIGALRM, fn, an);
+	_SC.to_err = SC_signal_n(SIGALRM, fn, an, nn);
 	ns         = ALARM(to);
 	SC_ASSERT(ns >= 0);
 
@@ -426,7 +429,7 @@ NORETURN void _SC_timeout_cont(int sig)
    {JMP_BUF *cpu;
 
 /* io_printf(stdout, "Timeout %d\n", sig); */
-    SC_timeout(0, _SC_timeout_cont, NULL);
+    SC_timeout(0, _SC_timeout_cont, NULL, 0);
     
     cpu = _SC_get_to_buf(-1);
 

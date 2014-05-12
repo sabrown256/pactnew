@@ -87,7 +87,7 @@ void PA_interrupt_handler(int sig)
     double tcon, t, dt;
     PA_package *pck;
 
-    SC_signal_n(SIGINT, PA_interrupt_handler, NULL);
+    SC_signal_n(SIGINT, PA_interrupt_handler, NULL, 0);
 
     PRINT(stdout, "\n\nInterrupt:\n");
     PRINT(stdout, "  c     - Enter a command loop\n");

@@ -895,7 +895,7 @@ static int change_test_5_data(PDBfile *strm)
 /* READ_TEST_5_DATA - read in bits and pieces of data from the PDB file */
 
 static int read_test_5_data(PDBfile *strm)
-   {int err, st;
+   {int err, lst;
     int ia_a[2];
 
     ia_a[0] = -1;
@@ -903,12 +903,12 @@ static int read_test_5_data(PDBfile *strm)
 
     err = 0;
 
-    st = PD_read(strm, "ia(3)", ia_a);
-    if (st == 0)
+    lst = PD_read(strm, "ia(3)", ia_a);
+    if (lst == 0)
        err++;
 
-    st = PD_read(strm, "ia(9:10)", ia_a);
-    if (st == 0)
+    lst = PD_read(strm, "ia(9:10)", ia_a);
+    if (lst == 0)
        err++;
 
     return(err);}

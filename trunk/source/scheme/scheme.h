@@ -548,9 +548,10 @@ extern "C" {
     if (_sh == TRUE)                                                         \
        {_lsf = _sf;                                                          \
         if (_lsf != NULL)                                                    \
-           SC_signal_n(SIGINT, _lsf, _si);                                   \
+           SC_signal_n(SIGINT, _lsf, _si, sizeof(SS_psides));                \
         else                                                                 \
-           SC_signal_n(SIGINT, SC_interrupt_handler, _si);};                 \
+           SC_signal_n(SIGINT, SC_interrupt_handler,                         \
+                       _si, sizeof(SS_psides));};                            \
     if (_bh == TRUE)                                                         \
        {if ((_bf == NULL) || (_bsz <= 0))                                    \
            {SC_setbuf(stdout, NULL);}                                        \

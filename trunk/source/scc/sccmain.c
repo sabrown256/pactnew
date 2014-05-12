@@ -30,7 +30,7 @@ NORETURN void CC_end_scc(int val)
 void CC_interrupt_handler(int sig)
    {
 
-    SC_signal_n(SIGINT, CC_interrupt_handler, NULL);
+    SC_signal_n(SIGINT, CC_interrupt_handler, NULL, 0);
 
     exit(1);
 
@@ -70,7 +70,7 @@ int main(int c, char **v, char **env)
     char *cmp, **args, **files;
 
     SC_init("Aborting with error", CC_end_scc,
-            TRUE, CC_interrupt_handler, NULL,
+            TRUE, CC_interrupt_handler, NULL, 0,
             TRUE, NULL, 0);
 
 /* find memory check option early */

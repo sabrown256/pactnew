@@ -112,7 +112,7 @@
  */
 
 #define SC_time_allow(to)                                                    \
-   (SC_timeout(to, _SC_timeout_cont, NULL),                                  \
+   (SC_timeout(to, _SC_timeout_cont, NULL, 0),                               \
     (to > 0) ? SETJMP(*_SC_get_to_buf(-1)) : TRUE)
 
 /*--------------------------------------------------------------------------*/

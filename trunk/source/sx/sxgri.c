@@ -480,7 +480,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 
 	PG_set_mouse_down_event_handler(_SX.gri, _SX_mouse_event_handler);
 
-	SC_REGISTER_CONTEXT(_SX_mouse_event_handler, si);
+	SC_REGISTER_CONTEXT(_SX_mouse_event_handler, SS_psides, si);
 
 	PG_register_callback("Edit", _SX_set_edit_mode);
 	PG_register_callback("End", SX_end_prog);

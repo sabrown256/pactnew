@@ -66,7 +66,7 @@ SC_scope_private
  _SC = {-1, TRUE, -1,
         malloc, realloc, free,
 	{-1.0, -1.0}, -1, -1, -1, SC_TERM_UNKNOWN,
-	(PFSignal_handler) -1, {SIG_DFL, NULL}, -1,
+	(PFSignal_handler) -1, {SIG_DFL, 0, NULL}, -1,
         _SC_TYPE_STATE_INIT_};
 
 /*--------------------------------------------------------------------------*/
@@ -391,7 +391,7 @@ void SC_interrupt_handler(int sig)
 	     io_printf(stdout, "Exiting program\n\n");
 	     exit(SC_EXIT_SELF);};
 
-    SC_signal_n(SIGINT, SC_interrupt_handler, NULL);
+    SC_signal_n(SIGINT, SC_interrupt_handler, NULL, 0);
 
     return;}
 

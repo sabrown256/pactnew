@@ -713,6 +713,8 @@ int main(int c, char **v)
 
     io_printf(STDOUT, "\n");
 
+    SC_free_context_table();
+
     sc = SC_mem_monitor(sc, debug, "A", msg);
 
     return(err);}

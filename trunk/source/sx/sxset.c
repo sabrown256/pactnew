@@ -123,7 +123,7 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
 
 /* PDB initializations */
     PD_gs.write = _SX_hash_hook;
-    SC_REGISTER_CONTEXT(_SX_hash_hook, si);
+    SC_REGISTER_CONTEXT(_SX_hash_hook, SS_psides, si);
 
     if ((SX_gs.vif != NULL) && (SX_gs.gvif != NULL))
        {_SX_init_hash_objects(si, SX_gs.vif);
@@ -167,7 +167,7 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
     SC_gs.strtod         = SC_strtod;
     SC_gs.type_container = _SX_type_container;
 
-    SC_REGISTER_CONTEXT(_SX_type_container, si);
+    SC_REGISTER_CONTEXT(_SX_type_container, SS_psides, si);
 
     _SX.file_exist_action = FAIL;
 

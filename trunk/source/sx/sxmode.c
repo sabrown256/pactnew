@@ -477,11 +477,11 @@ object *SX_mode_graphics(SS_psides *si)
 	    PG_set_update_event_handler(SX_gs.graphics_device,
 					SX_update_event_handler);
 
-	    SC_REGISTER_CONTEXT(SX_default_event_handler, si);
-	    SC_REGISTER_CONTEXT(SX_motion_event_handler,  si);
-	    SC_REGISTER_CONTEXT(SX_mouse_event_handler,   si);
-	    SC_REGISTER_CONTEXT(SX_expose_event_handler,  si);
-	    SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
+	    SC_REGISTER_CONTEXT(SX_default_event_handler, SS_psides, si);
+	    SC_REGISTER_CONTEXT(SX_motion_event_handler,  SS_psides, si);
+	    SC_REGISTER_CONTEXT(SX_mouse_event_handler,   SS_psides, si);
+	    SC_REGISTER_CONTEXT(SX_expose_event_handler,  SS_psides, si);
+	    SC_REGISTER_CONTEXT(SX_update_event_handler,  SS_psides, si);
 
 /* remember the window size and position in pixels */
 	    SX_gs.window_dx_P[0] = PG_window_width(SX_gs.graphics_device);

@@ -400,7 +400,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
 /* save old interrupt state */
     hnd = SC_which_signal_handler(SC_SIGIO);
     ioi = SC_set_io_interrupts(FALSE);
-    SC_signal_n(SC_SIGIO, SIG_IGN, NULL);
+    SC_signal_n(SC_SIGIO, SIG_IGN, NULL, 0);
 
     filter = _SC_read_filter(fname);
     shell  = SC_get_shell(shell);
@@ -469,7 +469,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
 
 /* restore old interrupt state */
     SC_set_io_interrupts(ioi);
-    SC_signal_n(SC_SIGIO, hnd.f, hnd.a);
+    SC_restore_signal_n(SC_SIGIO, hnd);
 
     if (sig == SC_EXIT_BAD)
        st = sig;
@@ -533,7 +533,7 @@ int SC_exec_async_s(char *shell, char **env,
 /* save old interrupt state */
     hnd = SC_which_signal_handler(SC_SIGIO);
     ioi = SC_set_io_interrupts(FALSE);
-    SC_signal_n(SC_SIGIO, SIG_IGN, NULL);
+    SC_signal_n(SC_SIGIO, SIG_IGN, NULL, 0);
 
     state.time_limit = to;
     state.tstart     = SC_wall_clock_time();
@@ -589,7 +589,7 @@ int SC_exec_async_s(char *shell, char **env,
 
 /* restore old interrupt state */
     SC_set_io_interrupts(ioi);
-    SC_signal_n(SC_SIGIO, hnd.f, hnd.a);
+    SC_restore_signal_n(SC_SIGIO, hnd);
 
     return(st);}
 
@@ -655,7 +655,7 @@ int SC_exec_async_h(char *shell, char **env,
 /* save old interrupt state */
     hnd = SC_which_signal_handler(SC_SIGIO);
     ioi = SC_set_io_interrupts(FALSE);
-    SC_signal_n(SC_SIGIO, SIG_IGN, NULL);
+    SC_signal_n(SC_SIGIO, SIG_IGN, NULL, 0);
 
     state.time_limit = to;
     state.tstart     = SC_wall_clock_time();
@@ -707,7 +707,7 @@ int SC_exec_async_h(char *shell, char **env,
 
 /* restore old interrupt state */
     SC_set_io_interrupts(ioi);
-    SC_signal_n(SC_SIGIO, hnd.f, hnd.a);
+    SC_restore_signal_n(SC_SIGIO, hnd);
 
     return(st);}
 
@@ -760,7 +760,7 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
 
 /* save old interrupt state */
     ioi = SC_set_io_interrupts(FALSE);
-    osi = SC_signal_n(SC_SIGIO, SIG_IGN, NULL);
+    osi = SC_signal_n(SC_SIGIO, SIG_IGN, NULL, 0);
 
     rv = FALSE;
 
@@ -823,7 +823,7 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
 
 /* restore old interrupt state */
     SC_set_io_interrupts(ioi);
-    SC_signal_n(SC_SIGIO, osi.f, osi.a);
+    SC_restore_signal_n(SC_SIGIO, osi);
 
     cs->pool      = cpo;
     cs->to_stdout = sto;

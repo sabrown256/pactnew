@@ -23,7 +23,7 @@ SC_THREAD_LOCK(tlock);
 static void sig_handler(int sig)
    {int err;
 
-    SC_setup_sig_handlers(sig_handler, NULL, FALSE);
+    SC_setup_sig_handlers(sig_handler, NULL, 0, FALSE);
 
     SC_LOCKON(tlock);
 
@@ -131,7 +131,7 @@ int main(int c, char **v, char **env)
     nt   = min(nt, ntmx);
     nt   = max(nt, 1);
 
-    SC_setup_sig_handlers(sig_handler, NULL, TRUE);
+    SC_setup_sig_handlers(sig_handler, NULL, 0, TRUE);
 
     if (SETJMP(cpu) == 0)
        rv = driver(nt);

@@ -1092,11 +1092,11 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
 	PG_set_expose_event_handler(dev, SX_expose_event_handler);
 	PG_set_update_event_handler(dev, SX_update_event_handler);
 
-	SC_REGISTER_CONTEXT(SX_mouse_event_handler,   si);
-	SC_REGISTER_CONTEXT(SX_motion_event_handler,  si);
-	SC_REGISTER_CONTEXT(SX_expose_event_handler,  si);
-	SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
-	SC_REGISTER_CONTEXT(SX_default_event_handler, si);};
+	SC_REGISTER_CONTEXT(SX_mouse_event_handler,   SS_psides, si);
+	SC_REGISTER_CONTEXT(SX_motion_event_handler,  SS_psides, si);
+	SC_REGISTER_CONTEXT(SX_expose_event_handler,  SS_psides, si);
+	SC_REGISTER_CONTEXT(SX_update_event_handler,  SS_psides, si);
+	SC_REGISTER_CONTEXT(SX_default_event_handler, SS_psides, si);};
 
     return(SS_t);}
 

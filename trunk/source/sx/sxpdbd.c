@@ -876,7 +876,7 @@ static int _SX_diff_var(SS_psides *si, PDBfile *pfa, PDBfile *pfb,
 	     memset(PD_gs.err, 0, MAXLINE);
 	     break;};
 
-    oh = SC_signal_n(SIGFPE, _SX_diff_signal, &de);
+    oh = SC_signal_n(SIGFPE, _SX_diff_signal, &de, sizeof(de));
 
     strcpy(fullpatha, _PD_fixname(pfa, nma));
     s = _PD_expand_hyper_name(pfa, fullpatha);
@@ -946,7 +946,7 @@ static int _SX_diff_var(SS_psides *si, PDBfile *pfa, PDBfile *pfb,
        {ret     = BAD_NUMBERS;
 	de.fpe = FALSE;};
 
-    SC_signal_n(SIGFPE, oh.f, oh.a);
+    SC_restore_signal_n(SIGFPE, oh);
 
     return(ret);}
 

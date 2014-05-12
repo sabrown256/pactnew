@@ -861,7 +861,7 @@ static int run_test(char *name, PG_device *dev, int nt, gtest *tst)
    {int i, j, nd, np, err, nerr;
     double nl[PG_SPACEDM], wl[PG_SPACEDM];
     double ndc[PG_BOXSZ], wc[PG_BOXSZ];
-    gtest t;
+    gtest lt;
 
     err = 0;
 
@@ -876,8 +876,8 @@ static int run_test(char *name, PG_device *dev, int nt, gtest *tst)
     printf("        %-8s", name);
 
     for (i = 0; i < nt; i++)
-        {t = tst[i];
-	 if (t != NULL)
+        {lt = tst[i];
+	 if (lt != NULL)
 	    {nerr = 0;
 	     for (nd = 1; nd < PG_SPACEDM; nd++)
 	         {for (j = 0; j < N; j++)
@@ -900,7 +900,7 @@ static int run_test(char *name, PG_device *dev, int nt, gtest *tst)
 		       PG_set_viewspace(dev, nd, NORMC, ndc);
 		       PG_set_viewspace(dev, nd, WORLDC, wc);
 
-		       nerr += (*t)(dev, nd, np, j);};};
+		       nerr += (*lt)(dev, nd, np, j);};};
 
 	     printf(" %5d", nerr);
 
@@ -1142,7 +1142,7 @@ void help(void)
 static void sig_handler(int sig)
    {
 
-    SC_setup_sig_handlers(sig_handler, NULL, FALSE);
+    SC_setup_sig_handlers(sig_handler, NULL, 0, FALSE);
 
     SC_retrace_exe(NULL, -1, 60000);
 
@@ -1164,7 +1164,7 @@ int main(int c, char **v)
     dtest dev[N_DEV];
     testdes a;
 
-    SC_setup_sig_handlers(sig_handler, NULL, TRUE);
+    SC_setup_sig_handlers(sig_handler, NULL, 0, TRUE);
 
 /* let's hear it for non-ANSI compilers */
     tst[0]  = test_1;

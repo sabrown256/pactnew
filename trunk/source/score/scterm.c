@@ -840,7 +840,7 @@ int SC_term_set_state(int fd, void *a)
     SC_contextdes oh;
 
     rv = FALSE;
-    oh = SC_signal_n(SIGTTOU, SIG_IGN, NULL);
+    oh = SC_signal_n(SIGTTOU, SIG_IGN, NULL, 0);
 
 #ifdef TERMINAL
     int st;
@@ -880,7 +880,7 @@ int SC_term_set_state(int fd, void *a)
 
 #endif
 
-    SC_signal_n(SIGTTOU, oh.f, oh.a);
+    SC_restore_signal_n(SIGTTOU, oh);
 
     return(rv);}
 
@@ -1157,7 +1157,7 @@ static void _SC_get_term_timeout(int sig)
  */
 
 void _SC_get_term_resp(int fd, int c, int *pw, int *ph)
-   {int i, w, h, nc;
+   {int i, w, h, nc, sz;
     char s[MAXLINE];
     char *t;
     JMP_BUF cpu;
@@ -1166,7 +1166,8 @@ void _SC_get_term_resp(int fd, int c, int *pw, int *ph)
     w = -1;
 
 /* we will wait one second to hear back from the terminal */
-    SC_timeout(2, _SC_get_term_timeout, &cpu);
+    sz = sizeof(JMP_BUF);
+    SC_timeout(2, _SC_get_term_timeout, &cpu, sz);
 
     if (SETJMP(cpu) == 0)
 
@@ -1189,7 +1190,7 @@ void _SC_get_term_resp(int fd, int c, int *pw, int *ph)
 	w = SC_stoi(t);};
 
 /* cancel the timer */
-    SC_timeout(0, _SC_get_term_timeout, NULL);
+    SC_timeout(0, _SC_get_term_timeout, NULL, 0);
 
     if (pw != NULL)
        *pw = w;
@@ -1476,7 +1477,7 @@ int SC_is_background_process(int pid)
 /* set bit 1 if we cannot write to the
  * controlling terminal without getting SIGTTOU
  */
-    oh = SC_signal_n(SIGTTOU, _SC_is_background, NULL);
+    oh = SC_signal_n(SIGTTOU, _SC_is_background, NULL, 0);
 
     if (SETJMP(_SC.btt) == 0)
        {fd = fileno(stdout);
@@ -1485,7 +1486,7 @@ int SC_is_background_process(int pid)
     else
        rv |= 1;
 
-    SC_signal_n(SIGTTOU, oh.f, oh.a);
+    SC_restore_signal_n(SIGTTOU, oh);
 
     return(rv);}
 

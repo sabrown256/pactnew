@@ -579,7 +579,7 @@ static void _SC_child_fork(PROCESS *pp, PROCESS *cp, int to,
     ALARM(0);
 
 /* set all signal handlers to their default state */
-    SC_set_signal_handlers(SIG_DFL, NULL, 0, SC_NSIG);
+    SC_set_signal_handlers(SIG_DFL, NULL, 0, 0, SC_NSIG);
 
 /* free the parent state which the child does not need */
     pp->release(pp);
@@ -1680,7 +1680,7 @@ char *SC_gets(char *bf, int len, PROCESS *pp)
     SC_contextdes oph;
 
     pbf = NULL;
-    oph = SC_signal_n(SIGPIPE, _SC_handle_sigpipe, NULL);
+    oph = SC_signal_n(SIGPIPE, _SC_handle_sigpipe, NULL, 0);
 
     ok = SC_ERR_TRAP();
     if (ok == 0)
@@ -1696,7 +1696,7 @@ char *SC_gets(char *bf, int len, PROCESS *pp)
 
     SC_ERR_UNTRAP();
 
-    SC_signal_n(SIGPIPE, oph.f, oph.a);
+    SC_restore_signal_n(SIGPIPE, oph);
 
 #else
 
@@ -1718,7 +1718,7 @@ int SC_printf(PROCESS *pp, char *fmt, ...)
     SC_contextdes oph;
 
     ret = FALSE;
-    oph = SC_signal_n(SIGPIPE, _SC_handle_sigpipe, NULL);
+    oph = SC_signal_n(SIGPIPE, _SC_handle_sigpipe, NULL, 0);
 
     ok = SC_ERR_TRAP();
     if (ok == 0)
@@ -1741,7 +1741,7 @@ int SC_printf(PROCESS *pp, char *fmt, ...)
 
     SC_ERR_UNTRAP();
 
-    SC_signal_n(SIGPIPE, oph.f, oph.a);
+    SC_restore_signal_n(SIGPIPE, oph);
 
     return(ret);}
 

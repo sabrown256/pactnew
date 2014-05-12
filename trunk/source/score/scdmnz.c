@@ -213,7 +213,7 @@ static int run_command(info *facts, char **cmnd, int to, int na)
    {int rv;
     PROCESS *pp;
 
-    SC_timeout(to, timeout_handler, facts);
+    SC_timeout(to, timeout_handler, facts, sizeof(info));
 
     pp = SC_open(cmnd, NULL, "apo", NULL);
     if (SC_process_alive(pp))
@@ -258,13 +258,14 @@ static void show_help(void)
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int i, ia, na;
+   {int i, ia, na, sz;
     int ti, tc, tr, rv;
     char **cmnd, *lf;
     info facts;
     FILE *fp;
 
-    memset(&facts, 0, sizeof(facts));
+    sz = sizeof(facts);
+    memset(&facts, 0, sz);
 
     rv = 0;
     ti = 60;
@@ -319,9 +320,9 @@ int main(int c, char **v)
 
     cmnd = v + i;
 
-    SC_signal_n(SIGINT, interrupt_handler, &facts);
-    SC_signal_n(SIGUSR1, report_handler, &facts);
-    SC_signal_n(SC_SIGIO, io_handler, &facts);
+    SC_signal_n(SIGINT, interrupt_handler, &facts, sz);
+    SC_signal_n(SIGUSR1, report_handler, &facts, sz);
+    SC_signal_n(SC_SIGIO, io_handler, &facts, sz);
 
     SC_setbuf(stdout, NULL);
 

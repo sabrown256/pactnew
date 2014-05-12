@@ -132,6 +132,8 @@ int test(int n, int strategy)
 	fn[0] = test_wrk;};
 
     switch (strategy)
+
+/* low pthread level calls */
        {case 0 :
 
 	     if (!silent)
@@ -177,6 +179,7 @@ int test(int n, int strategy)
 	     CFREE(indices);
 	     break;
 
+/* high level SMP new thread */
 	case 1 :
 
 	     if (!silent)
@@ -188,6 +191,7 @@ int test(int n, int strategy)
 
 	     break;
 
+/* high level SMP pool */
 	case 2 :
 
 	     if (!silent)
@@ -271,7 +275,7 @@ int main(argc, argv)
 		     strategy = 1;
 		     break;};};
 
-    SC_timeout(to, NULL, NULL);
+    SC_timeout(to, NULL, NULL, 0);
 
     m   = 8/n;
     m   = max(m, 1);
@@ -279,7 +283,7 @@ int main(argc, argv)
     for (i = 0; i < m; i++)
         bad |= test(n, strategy);
 
-    SC_timeout(0, NULL, NULL);
+    SC_timeout(0, NULL, NULL, 0);
 
     return(bad);}
 

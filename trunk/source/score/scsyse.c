@@ -89,7 +89,7 @@ static void _SC_signal_relay(int sig)
     if (SC_process_status(pp) == SC_RUNNING)
        SC_send_signal(pp->id, sig);
 
-    SC_signal_n(sig, _SC_signal_relay, pp);
+    SC_signal_n(sig, _SC_signal_relay, pp, sizeof(PROCESS));
 
     return;}
 
@@ -109,7 +109,7 @@ static void _SC_ex_int_hnd(int sig)
 
     _SC_signal_relay(sig);
 
-    SC_signal_n(sig, _SC_ex_int_hnd, pp);
+    SC_signal_n(sig, _SC_ex_int_hnd, pp, sizeof(PROCESS));
 
     return;}
 
@@ -138,22 +138,24 @@ static void _SC_ex_io_hnd(int sig)
  */
 
 static void _SC_setup_relay(PROCESS *pp)
-   {
+   {int sz;
 
-    SC_signal_n(SIGHUP,  _SC_signal_relay, pp);
-    SC_signal_n(SIGINT,  _SC_signal_relay, pp);
-    SC_signal_n(SIGQUIT, _SC_signal_relay, pp);
+    sz = sizeof(PROCESS);
+
+    SC_signal_n(SIGHUP,  _SC_signal_relay, pp, sz);
+    SC_signal_n(SIGINT,  _SC_signal_relay, pp, sz);
+    SC_signal_n(SIGQUIT, _SC_signal_relay, pp, sz);
 #ifdef SIGIOT
-    SC_signal_n(SIGIOT,  _SC_signal_relay, pp);
+    SC_signal_n(SIGIOT,  _SC_signal_relay, pp, sz);
 #endif
-    SC_signal_n(SIGUSR1, _SC_signal_relay, pp);
-    SC_signal_n(SIGUSR2, _SC_signal_relay, pp);
-    SC_signal_n(SIGALRM, _SC_signal_relay, pp);
-    SC_signal_n(SIGTERM, _SC_signal_relay, pp);
-    SC_signal_n(SIGCONT, _SC_signal_relay, pp);
+    SC_signal_n(SIGUSR1, _SC_signal_relay, pp, sz);
+    SC_signal_n(SIGUSR2, _SC_signal_relay, pp, sz);
+    SC_signal_n(SIGALRM, _SC_signal_relay, pp, sz);
+    SC_signal_n(SIGTERM, _SC_signal_relay, pp, sz);
+    SC_signal_n(SIGCONT, _SC_signal_relay, pp, sz);
 
-    SC_signal_n(SIGINT,   _SC_ex_int_hnd, pp);
-    SC_signal_n(SC_SIGIO, _SC_ex_io_hnd, pp);
+    SC_signal_n(SIGINT,   _SC_ex_int_hnd, pp, sz);
+    SC_signal_n(SC_SIGIO, _SC_ex_io_hnd,  pp, sz);
 
     return;}
 
