@@ -246,7 +246,7 @@ void _PM_enable_fpe(int flg, PFSignal_handler hnd)
     PM_detect_fpu(NULL, &mask);
 
 /* set the X87 FPU */
-    if (flg)
+    if (flg != 0)
        cw = 0x1372;
     else
        cw = 0x137f;
@@ -254,7 +254,7 @@ void _PM_enable_fpe(int flg, PFSignal_handler hnd)
     __asm__("fldcw %0" : : "m" (cw));
 
 /* set the SSE unit */
-    if (flg)
+    if (flg != 0)
        {if (mask != 0)
 	   {mxcsr = 0x9940 & mask;
 
