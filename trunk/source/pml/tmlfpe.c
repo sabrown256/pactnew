@@ -25,6 +25,29 @@ struct s_testdes
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DFPU - diagnostic print of FPU state */
+
+typedef union u_fpu_state fpu_state;
+
+union u_fpu_state
+   {double a;
+    char b[512];};
+extern fpu_state *PM_save_fpu_x86(void);
+
+void dfpu(void)
+   {int16_t *ps;
+    fpu_state fs;
+
+    fs = *PM_save_fpu_x86();
+    ps = (int16_t *) fs.b;
+
+    printf("fpu  %d   0x%x  0x%x\n", SC_current_thread(), ps[0], ps[1]);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MSG_OUT - thread safe message output */
 
 static void msg_out(char *fmt, ...)
@@ -47,20 +70,44 @@ static void msg_out(char *fmt, ...)
 
 /* HANDLER - handle SIGFPE */
 
+#include <fenv.h>
+
 static void handler(int sig)
    {JMP_BUF *cpu;
 
     cpu = SC_GET_CONTEXT(handler);
 
-    PM_enable_fpe_n(-1, handler, cpu);
-
-    msg_out(">>> Caught signal %d", sig);
     PM_fpu_status(TRUE);
 
-    PM_fpu_status(TRUE);
     PM_clear_fpu();
 
+    PM_enable_fpe_n(-1, handler, cpu);
+    msg_out(">>> Caught signal %d", sig);
+
     LONGJMP(*cpu, 1);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SHOW_HND - print SIGFPE hander for diagnostic purposes */
+
+void show_hnd(char *msg)
+   {SC_contextdes cd;
+
+    cd = SC_which_signal_handler(SIGFPE);
+    if (cd.f == SIG_DFL)
+       msg_out("SIG_DFL - %s", msg);
+
+    else if (cd.f == SIG_IGN)
+       msg_out("SIG_IGN - %s", msg);
+
+    else if (cd.f == handler)
+       msg_out("handler - %s", msg);
+
+    else
+       msg_out("unknow %p - %s", cd.f, msg);
 
     return;}
 
@@ -237,6 +284,7 @@ int work_ser(testdes *st)
 
 int work_omp(testdes *st)
    {int rv, nt;
+    char msg[MAXLINE];
 
     rv = SUCCESS;
     nt = st->nt;
@@ -244,7 +292,6 @@ int work_omp(testdes *st)
 #ifdef SMP_OpenMP
 
     int *prv;
-    char msg[MAXLINE];
 
     snprintf(msg, MAXLINE, "\nOpenMP with %d threads\n", nt);
     write(1, msg, strlen(msg));

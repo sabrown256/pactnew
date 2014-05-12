@@ -240,7 +240,7 @@ static void dmake_sig_handler(int sig)
    {int i, rv;
     char s[MAXLINE];
 
-    SC_setup_sig_handlers(dmake_sig_handler, NULL, FALSE);
+    SC_setup_sig_handlers(dmake_sig_handler, NULL, 0, FALSE);
 
     SC_signal(SIGCHLD, SIG_IGN);
     SC_signal(SC_SIGIO, SIG_IGN);
@@ -286,7 +286,7 @@ static void dmake_sig_handler(int sig)
     if (rv == TRUE)
        exit(sig);
 
-    SC_setup_sig_handlers(dmake_sig_handler, NULL, TRUE);
+    SC_setup_sig_handlers(dmake_sig_handler, NULL, 0, TRUE);
 
     return;}
 
@@ -395,7 +395,7 @@ int main(int c, char **v, char **env)
     SC_get_resource_limits(&rmem, &rcpu, &rfsz, &rnfd, &rnprc);
     SC_set_resource_limits(-1, -1, -1, -1, -1);
 
-    SC_setup_sig_handlers(dmake_sig_handler, NULL, TRUE);
+    SC_setup_sig_handlers(dmake_sig_handler, NULL, 0, TRUE);
 
     state = SC_make_state();
 
