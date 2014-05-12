@@ -33,9 +33,10 @@ void SC_catch_event_loop_interrupts(SC_evlpdes *pe, int flag)
        flag = ioi;
 
     if ((pe != NULL) && flag && ioi)
-       SC_signal_action_n(SC_SIGIO, pe->sigio, NULL, 0, BLOCK_WITH_SIGIO, -1);
+       SC_signal_action_n(SC_SIGIO, pe->sigio, NULL, 0,
+			  0, BLOCK_WITH_SIGIO, -1);
     else
-       SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
+       SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, 0, -1);
 
     return;}
 
@@ -450,7 +451,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 /* use the SIGCHLD handler specified for the loop */
     sc = pe->sigchld;
     if (sc != NULL)
-       hnd = SC_signal_n(SIGCHLD, sc, NULL);
+       hnd = SC_signal_n(SIGCHLD, sc, NULL, 0);
 
 /* reassert raw mode */
     if (pe->raw == TRUE)
@@ -466,7 +467,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 
 /* restore the original SIGCHLD handler */
     if (sc != NULL)
-       SC_signal_n(SIGCHLD, hnd.f, hnd.a);
+       SC_restore_signal_n(SIGCHLD, hnd);
 
     if (nrdy > 0)
        {nacc = 0;
@@ -520,7 +521,7 @@ int SC_event_loop(SC_evlpdes *pe, void *a, int to)
     if (pe == NULL)
        pe = _SC.evloop;
 
-    osi = SC_signal_action_n(SC_SIGIO, pe->sigio, NULL,
+    osi = SC_signal_action_n(SC_SIGIO, pe->sigio, NULL, 0,
 			     0, BLOCK_WITH_SIGIO, -1);
 
     exitf = pe->exitf;
@@ -543,7 +544,7 @@ int SC_event_loop(SC_evlpdes *pe, void *a, int to)
 	if (err < 0)
 	   rv = err;};
 
-    SC_signal_action_n(SC_SIGIO, osi.f, osi.a, 0, -1);
+    SC_signal_action_n(SC_SIGIO, osi.f, osi.a, osi.nb, 0, -1);
 
     return(rv);}
 
@@ -1236,12 +1237,12 @@ void SC_catch_io_interrupts(int flag)
        SC_catch_event_loop_interrupts(_SC.evloop, flag);
 
     else if ((flag == TRUE) && (ioi == TRUE))
-       SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
+       SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL, 0,
 			  0, BLOCK_WITH_SIGIO, -1);
     else
-       SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
+       SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, 0, -1);
 #else
-    SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
+    SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, 0, -1);
 #endif
 
     return;}

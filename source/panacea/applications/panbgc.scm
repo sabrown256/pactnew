@@ -89,9 +89,9 @@
     
       (printf file "    SC_zero_space_n(1, -2);\n")
 
-      (printf file "    SC_init(\"%s: Exit with error\", %s,\n"
+      (printf file "    SC_init(\"%s: Exit with error\", %s, TRUE,\n"
 	      (up-case codename) exit-hook)
-      (printf file "            TRUE, (PFSignal_handler) %s, NULL,\n"
+      (printf file "            (PFSignal_handler) %s, NULL, 0,\n"
 	      intr-handler-hook)
       (printf file "            TRUE, NULL, 0);\n")
       (printf file "\n")

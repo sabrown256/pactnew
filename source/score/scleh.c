@@ -813,7 +813,7 @@ static int _SC_leh_suspend(lehloc *lp)
     SC_change_term_state(STDIN_FILENO, SC_TERM_COOKED, TRUE, NULL);
 
 /* put handler on SIGCONT */
-    SC_signal_n(SIGCONT, _SC_leh_resume, NULL);
+    SC_signal_n(SIGCONT, _SC_leh_resume, NULL, 0);
 
 /* send ourselves a STOP */
     kill(getpid(), SIGSTOP);

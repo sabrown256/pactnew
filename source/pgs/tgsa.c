@@ -1272,7 +1272,7 @@ static int run_test(PG_device *dev, int nt, gtest *tst)
 
 /* TEST_CHECK - begin/end memory checks for each test */
 
-static long test_check(char *name, long which, int debug_mode)
+static long test_check(char *name, long which, int ldbg)
    {long rv;
     int64_t bytaa, bytfa;
     char msg[MAXLINE];
@@ -1280,7 +1280,7 @@ static long test_check(char *name, long which, int debug_mode)
 
     rv = 0;
 
-    if (debug_mode)
+    if (ldbg)
        rv = SC_mem_monitor(which, 2, "G", msg);
 
     if (which == -1L)
@@ -1323,7 +1323,7 @@ static void register_devices(void)
 
 /* SCR_TEST - test the SCREEN device */
 
-static int scr_test(char *name, int color, int debug_mode, int nt,
+static int scr_test(char *name, int color, int ldbg, int nt,
 		    gtest *tst)
    {int ok;
     long sc;
@@ -1331,7 +1331,7 @@ static int scr_test(char *name, int color, int debug_mode, int nt,
 
     ok = TRUE;
 
-    sc = test_check(name, -1L, debug_mode);
+    sc = test_check(name, -1L, ldbg);
 
     register_devices();
 
@@ -1348,7 +1348,7 @@ static int scr_test(char *name, int color, int debug_mode, int nt,
 
     PG_rl_all();
 
-    sc = test_check(name, 1L, debug_mode);
+    sc = test_check(name, 1L, ldbg);
     SC_ASSERT(sc == TRUE);
 
     return(ok);}
@@ -1358,7 +1358,7 @@ static int scr_test(char *name, int color, int debug_mode, int nt,
 
 /* PS_TEST - test the PostScript device */
 
-static int ps_test(char *name, int color, int debug_mode, int nt,
+static int ps_test(char *name, int color, int ldbg, int nt,
 		   gtest *tst)
    {int ok;
     long sc;
@@ -1366,7 +1366,7 @@ static int ps_test(char *name, int color, int debug_mode, int nt,
 
     ok = TRUE;
 
-    sc = test_check(name, -1L, debug_mode);
+    sc = test_check(name, -1L, ldbg);
 
     register_devices();
 
@@ -1389,7 +1389,7 @@ static int ps_test(char *name, int color, int debug_mode, int nt,
 
     PG_rl_all();
 
-    sc = test_check(name, 1L, debug_mode);
+    sc = test_check(name, 1L, ldbg);
     SC_ASSERT(sc == TRUE);
 
     return(ok);}
@@ -1399,7 +1399,7 @@ static int ps_test(char *name, int color, int debug_mode, int nt,
 
 /* CGM_TEST - test the CGM device */
 
-static int cgm_test(char *name, int color, int debug_mode, int nt,
+static int cgm_test(char *name, int color, int ldbg, int nt,
 		    gtest *tst)
    {int ok;
     long sc;
@@ -1407,7 +1407,7 @@ static int cgm_test(char *name, int color, int debug_mode, int nt,
 
     ok = TRUE;
 
-    sc = test_check(name, -1L, debug_mode);
+    sc = test_check(name, -1L, ldbg);
 
     register_devices();
 
@@ -1424,7 +1424,7 @@ static int cgm_test(char *name, int color, int debug_mode, int nt,
 
     PG_rl_all();
 
-    sc = test_check(name, 1L, debug_mode);
+    sc = test_check(name, 1L, ldbg);
     SC_ASSERT(sc == TRUE);
 
     return(ok);}
@@ -1434,14 +1434,14 @@ static int cgm_test(char *name, int color, int debug_mode, int nt,
 
 /* JPEG_TEST - test the JPEG device */
 
-static int jpeg_test(char *name, int color, int debug_mode, int nt,
+static int jpeg_test(char *name, int color, int ldbg, int nt,
 		     gtest *tst)
    {int ok;
     long sc;
     PG_device *dev;
 
     ok = TRUE;
-    sc = test_check(name, -1L, debug_mode);
+    sc = test_check(name, -1L, ldbg);
 
     register_devices();
 
@@ -1459,7 +1459,7 @@ static int jpeg_test(char *name, int color, int debug_mode, int nt,
 
 	PG_rl_all();
 
-	sc = test_check(name, 1L, debug_mode);
+	sc = test_check(name, 1L, ldbg);
 	SC_ASSERT(sc == TRUE);};
 
     return(ok);}
@@ -1469,14 +1469,14 @@ static int jpeg_test(char *name, int color, int debug_mode, int nt,
 
 /* PNG_TEST - test the PNG device */
 
-static int png_test(char *name, int color, int debug_mode, int nt,
+static int png_test(char *name, int color, int ldbg, int nt,
 		    gtest *tst)
    {int ok;
     long sc;
     PG_device *dev;
 
     ok = TRUE;
-    sc = test_check(name, -1L, debug_mode);
+    sc = test_check(name, -1L, ldbg);
 
     register_devices();
 
@@ -1494,7 +1494,7 @@ static int png_test(char *name, int color, int debug_mode, int nt,
 
 	PG_rl_all();
 
-	sc = test_check(name, 1L, debug_mode);
+	sc = test_check(name, 1L, ldbg);
 	SC_ASSERT(sc == TRUE);};
 
     return(ok);}
@@ -1504,7 +1504,7 @@ static int png_test(char *name, int color, int debug_mode, int nt,
 
 /* IMAGE_TEST - test the IMAGE device */
 
-static int image_test(char *name, int color,int debug_mode,int nt,
+static int image_test(char *name, int color,int ldbg,int nt,
 		      gtest *tst)
    {int ok, np;
     long sc;
@@ -1513,7 +1513,7 @@ static int image_test(char *name, int color,int debug_mode,int nt,
     ok = TRUE;
     np = PG_get_number_processors();
     if (np == 1)
-       {sc = test_check(name, -1L, debug_mode);
+       {sc = test_check(name, -1L, ldbg);
 
 	register_devices();
 
@@ -1531,7 +1531,7 @@ static int image_test(char *name, int color,int debug_mode,int nt,
 
 	    PG_rl_all();
 
-	    sc = test_check(name, 1L, debug_mode);
+	    sc = test_check(name, 1L, ldbg);
 	    SC_ASSERT(sc == TRUE);};};
 
     return(ok);}
@@ -1583,7 +1583,7 @@ void help(void)
 /* INIT_PARALLEL - do all the parallel initializations now */
 
 static int init_parallel(int c, char **v)
-   {int i, nth, trm;
+   {int i, nth, ltrm;
 
 /* must find number of threads first */
     nth = 1;
@@ -1604,9 +1604,9 @@ static int init_parallel(int c, char **v)
 	    SC_init_threads(nth, NULL);};};
 
 /* now we can initialize distributed parallel */
-    trm = PG_init_parallel(v, NULL);
+    ltrm = PG_init_parallel(v, NULL);
 
-    return(trm);}
+    return(ltrm);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1635,7 +1635,7 @@ static void fin_parallel(int sig)
     to = TIMEOUT_FIN_PARALLEL;
 
 /* set the alarm */
-    SC_timeout(to, timeout_finpar, NULL);
+    SC_timeout(to, timeout_finpar, NULL, 0);
 
     if (strategy == 1)
        SC_fin_tpool();
@@ -1643,7 +1643,7 @@ static void fin_parallel(int sig)
     PG_fin_parallel(sig);
 
 /* reset the alarm */
-    SC_timeout(0, timeout_finpar, NULL);
+    SC_timeout(0, timeout_finpar, NULL, 0);
 
     return;}
 
@@ -1674,7 +1674,7 @@ static void timeout_graphics(int sig)
 static void sig_handler(int sig)
    {
 
-    SC_setup_sig_handlers(sig_handler, NULL, FALSE);
+    SC_setup_sig_handlers(sig_handler, NULL, 0, FALSE);
 
     SC_retrace_exe(NULL, -1, 60000);
 
@@ -1695,7 +1695,7 @@ int main(int c, char **v)
     dtest dev[N_DEV];
     char *name[N_DEV];
 
-    SC_setup_sig_handlers(sig_handler, NULL, TRUE);
+    SC_setup_sig_handlers(sig_handler, NULL, 0, TRUE);
 
 /* let's hear it for non-ANSI compilers */
     tst[0]  = test_1;
@@ -1808,7 +1808,7 @@ int main(int c, char **v)
 			 break;};};};
 
 /* set the alarm */
-    SC_timeout(to, timeout_graphics, NULL);
+    SC_timeout(to, timeout_graphics, NULL, 0);
 
     for (i = 0; i < nd; i++)
         {d = dev[i];
@@ -1817,7 +1817,7 @@ int main(int c, char **v)
 	    (*d)(n, color, debug_mode, nt, tst);};
 
 /* reset the alarm */
-    SC_timeout(0, timeout_graphics, NULL);
+    SC_timeout(0, timeout_graphics, NULL, 0);
 
     fin_parallel(trm);
 

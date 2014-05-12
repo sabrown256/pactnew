@@ -76,10 +76,12 @@ int test_1(int nir, int nim)
 
 static void sigh_2(int sig)
    {statedes *st;
+    SC_contextdes cd;
 
-    st = SC_GET_CONTEXT(sigh_2);
+    cd = SC_LOOKUP_CONTEXT(sigh_2);
+    st = cd.a;
 
-    SC_signal_n(SIGSEGV, sigh_2, st);
+    SC_restore_signal_n(SIGSEGV, cd);
 
     st->golp = FALSE;
 
@@ -110,7 +112,7 @@ int test_2(int nir, int nim)
     for (i = 0; i < nir; i++)
         {jmx = (i == 3) ? nim+10 : nim;
 
-	 SC_signal_n(SIGSEGV, sigh_2, &st);
+	 SC_signal_n(SIGSEGV, sigh_2, &st, sizeof(st));
 
 	 if (SETJMP(st.cpu) == 0)
 	    {a[i] = CMAKE_N(double, nim);
@@ -286,10 +288,12 @@ int test_3(int nir, int nim)
 
 static void sigh_4(int sig)
    {statedes *st;
+    SC_contextdes cd;
 
-    st = SC_GET_CONTEXT(sigh_4);
+    cd = SC_LOOKUP_CONTEXT(sigh_4);
+    st = cd.a;
 
-    SC_signal_n(SIGSEGV, sigh_4, st);
+    SC_restore_signal_n(SIGSEGV, cd);
 
     st->golp = FALSE;
 
@@ -361,8 +365,8 @@ int test_4(int nir, int nim)
 /* test over and under indexing the space */
      a = CMAKE_N(double, ne);
 
-     SC_signal_n(SIGSEGV, sigh_4, &st);
-     SC_signal_n(SIGBUS,  sigh_4, &st);
+     SC_signal_n(SIGSEGV, sigh_4, &st, sizeof(st));
+     SC_signal_n(SIGBUS,  sigh_4, &st, sizeof(st));
 
      if (SETJMP(st.cpu) == 0)
         {st.golp = TRUE;
@@ -372,8 +376,8 @@ int test_4(int nir, int nim)
 /* NOTE: curiously FREEBSD will get a SIGBUS instead of a SIGSEGV
  * in the next loop so put the handler on both signals
  */
-     SC_signal_n(SIGSEGV, sigh_4, &st);
-     SC_signal_n(SIGBUS,  sigh_4, &st);
+     SC_signal_n(SIGSEGV, sigh_4, &st, sizeof(st));
+     SC_signal_n(SIGBUS,  sigh_4, &st, sizeof(st));
 
      if (SETJMP(st.cpu) == 0)
         {st.golp = TRUE;
@@ -385,8 +389,8 @@ int test_4(int nir, int nim)
  * and we are through with the signal handler now
  * so revert to default signal handler
  */
-     SC_signal_n(SIGSEGV, SIG_DFL, NULL);
-     SC_signal_n(SIGBUS,  SIG_DFL, NULL);
+     SC_signal_n(SIGSEGV, SIG_DFL, NULL, 0);
+     SC_signal_n(SIGBUS,  SIG_DFL, NULL, 0);
 
 /* do not use io_printf because it may allocate memory and the heap
  * has been corrupted with overwrites

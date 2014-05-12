@@ -358,18 +358,20 @@ static void _SC_segv_handler(int signo)
  */
 
 int SC_pointer_ok(void *p)
-   {int ok;
+   {int ok, sz;
     char *s;
     volatile char c;
     JMP_BUF cpu;
     SC_contextdes osegv, obus, oill;
 
+    sz = sizeof(JMP_BUF);
+
     if (p != NULL)
-       {osegv = SC_signal_n(SIGSEGV, _SC_segv_handler, &cpu);
+       {osegv = SC_signal_n(SIGSEGV, _SC_segv_handler, &cpu, sz);
 #ifdef SIGBUS
-        obus  = SC_signal_n(SIGBUS, _SC_segv_handler, &cpu);
+        obus  = SC_signal_n(SIGBUS, _SC_segv_handler, &cpu, sz);
 #endif
-        oill  = SC_signal_n(SIGILL, _SC_segv_handler, &cpu);
+        oill  = SC_signal_n(SIGILL, _SC_segv_handler, &cpu, sz);
 
         if (SETJMP(cpu) == 0)
            {s = (char *) p;
@@ -380,11 +382,11 @@ int SC_pointer_ok(void *p)
         else
             ok = FALSE;
 
-        SC_signal_n(SIGSEGV, osegv.f, osegv.a);
+	SC_restore_signal_n(SIGSEGV, osegv);
 #ifdef SIGBUS
-        SC_signal_n(SIGBUS, obus.f, obus.a);
+	SC_restore_signal_n(SIGBUS, obus);
 #endif
-        SC_signal_n(SIGILL, oill.f, oill.a);}
+	SC_restore_signal_n(SIGILL, oill);}
  
     else
        ok = TRUE; 

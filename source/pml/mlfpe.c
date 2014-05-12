@@ -19,6 +19,9 @@
 void
  _PM_enable_fpe(int flg, PFSignal_handler hnd);
 
+SC_thread_lock
+ PM_fpe_lock = SC_LOCK_INIT_STATE;
+
 /*--------------------------------------------------------------------------*/
 
 #if defined(HAVE_ANSI_C9X_FENV)
@@ -227,21 +230,73 @@ void PM_detect_fpu(unsigned int *pf, unsigned int *pm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_ENABLE_FPE_N - enable software trapping of floating point exceptions */
+/* PM_ENABLE_FPE_N - enable software trapping of floating point exceptions
+ *                 - sets the FPE handler on current thread
+ */
 
 void PM_enable_fpe_n(int flg, PFSignal_handler hnd, void *a)
    {
 
-/* assign the signal handler to SIGFPE */
-    if ((flg == TRUE) && (hnd != NULL))
-       SC_signal_n(SIGFPE, hnd, a);
-    else
-       SC_signal_n(SIGFPE, SIG_DFL, NULL);
+/* assign the signal handler to SIGFPE on each thread */
+    switch (flg)
+       {case TRUE :
+	     if (hnd != NULL)
+	        SC_signal_action_n(SIGFPE, hnd, a, -1, -1);
+	     break;
+	case FALSE :
+	     SC_signal_action_n(SIGFPE, SIG_DFL, NULL, 0, -1);
+	     break;
+	default :
+	     break;};
 
-/* set the exceptions which should raise SIGFPE */
+    SC_LOCKON(PM_fpe_lock);
+
+/* set the exceptions which should raise SIGFPE
+ * does this have to be done on each thread?
+ * seems like doing it once for the CPU/FPU as a whole is the right thing
+ */
     _PM_enable_fpe(flg, hnd);
 
-    _PM.fpe_enabled = flg;
+    _PM.fpe_enabled = (flg != FALSE);
+
+    SC_LOCKOFF(PM_fpe_lock);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_ENABLE_FPE_T - enable software trapping of floating point exceptions
+ *                 - threaded version of PM_enable_fpe_n which
+ *                 - sets the FPE handler on all threads
+ */
+
+void PM_enable_fpe_t(int flg, PFSignal_handler hnd, void *a, int nb)
+   {
+
+/* assign the signal handler to SIGFPE on each thread */
+    switch (flg)
+       {case TRUE :
+	     if (hnd != NULL)
+	        SC_signal_action_t(SIGFPE, hnd, a, nb, 0, -1);
+	     break;
+	case FALSE :
+	     SC_signal_action_t(SIGFPE, SIG_DFL, NULL, 0, 0, -1);
+	     break;
+	default :
+	     break;};
+
+    SC_LOCKON(PM_fpe_lock);
+
+/* set the exceptions which should raise SIGFPE
+ * does this have to be done on each thread?
+ * seems like doing it once for the CPU/FPU as a whole is the right thing
+ */
+    _PM_enable_fpe(flg, hnd);
+
+    _PM.fpe_enabled = (flg != FALSE);
+
+    SC_LOCKOFF(PM_fpe_lock);
 
     return;}
 

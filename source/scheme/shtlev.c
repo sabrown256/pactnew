@@ -31,7 +31,7 @@ void SS_set_put_string(SS_psides *si, PFfputs ps)
    {
     
     SC_set_put_string(ps);
-    SC_REGISTER_CONTEXT(ps, si);
+    SC_REGISTER_CONTEXT(ps, SS_psides, si);
 
     return;}
 
@@ -46,7 +46,7 @@ void SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, char *fmt, ...))
    {
     
     SC_set_put_line(pf);
-    SC_REGISTER_CONTEXT(pf, si);
+    SC_REGISTER_CONTEXT(pf, SS_psides, si);
 
     return;}
 
@@ -697,7 +697,7 @@ void SS_interrupt_handler(int sig)
 
     si = SC_GET_CONTEXT(SS_interrupt_handler);
 
-    SC_signal_n(SIGINT, SS_interrupt_handler, si);
+    SC_signal_n(SIGINT, SS_interrupt_handler, si, sizeof(SS_psides));
 
     PRINT(stdout, "\n\nInterrupt (%d frames):\n", si->errlev - 1);
     PRINT(stdout, "  a     - Reset to starting frame\n");

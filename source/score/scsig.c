@@ -11,6 +11,16 @@
 #include "score_int.h"
 #include "scope_proc.h"
 
+typedef struct s_SC_thrsig SC_thrsig;
+
+struct s_SC_thrsig
+   {int sig;          /* signal number */
+    int flg;          /* signal flagss */
+    int nb;           /* size in bytes of space pointed to by ARG */
+    PFSignal_handler hnd;
+    void *arg;        /* argument for HND */
+    va_list *va;};    /* arg list for sigaction place holder */
+
 /* NOTE: Linux defines NSIG as the highest signal number (32)
  *       Nobody else seems to but the idea is very nice
  */
@@ -40,37 +50,37 @@ int SC_send_signal(int pid, int sig)
  *             - return the old context
  */
 
-SC_contextdes SC_signal_n(int sig, PFSignal_handler fn, void *a)
+SC_contextdes SC_signal_n(int sig, PFSignal_handler fn, void *a, int nb)
    {PFSignal_handler fo;
     SC_contextdes rv;
 
-    rv.a = SC_GET_CONTEXT(fn);
+    fo = NULL;
+
+    if ((0 < sig) && (sig < SC_NSIG) &&
+	(sig != SIGKILL) && (sig != SIGSTOP))
+       {
 
 #ifdef HAVE_POSIX_SIGNALS
 
-    {struct sigaction na, oa;
+	struct sigaction na, oa;
      
-     fo = NULL;
+        na.sa_flags   = SA_RESTART;
+	na.sa_handler = fn;
+	sigemptyset(&na.sa_mask);
 
-     if ((0 < sig) && (sig < SC_NSIG) &&
-	 (sig != SIGKILL) && (sig != SIGSTOP))
-        {/* memset(&na, 0, sizeof(na)); */
-	 na.sa_flags   = SA_RESTART;
-	 na.sa_handler = fn;
-	 sigemptyset(&na.sa_mask);
-
-	 if (sigaction(sig, &na, &oa) != -1)
-	    fo = oa.sa_handler;};}
+	if (sigaction(sig, &na, &oa) != -1)
+	   fo = oa.sa_handler;
 
 #else
 
-    fo = signal(sig, fn);
+	fo = signal(sig, fn);
 
 #endif
+	};
 
-    rv.f = fo;
+    rv = SC_LOOKUP_CONTEXT(fo);
 
-    SC_REGISTER_CONTEXT(fn, a);
+    SC_register_context((void *) fn, a, nb);
 
     return(rv);}
 
@@ -78,23 +88,22 @@ SC_contextdes SC_signal_n(int sig, PFSignal_handler fn, void *a)
 /*--------------------------------------------------------------------------*/
 
 /* SC_SIGNAL_ACTION_N - portable wrapper for sigaction semantics
- *                    - set FNC to handle SIG signals
- *                    - register context A with FNC so that it can
- *                    - be looked up when FNC is called
+ *                    - set FN to handle SIG signals
+ *                    - register context A with FN so that it can
+ *                    - be looked up when FN is called
  *                    - FLAGS modifies the signal handling process
  *                    - any remaining non-negative arguments are
  *                    - taken to be signals that are to be blocked during
- *                    - the execution of FNC
+ *                    - the execution of FN
  *                    - terminate the list with negative integer
- *                    - return the old context
+ *                    - return the old context of FN
  */
 
-SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
+SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn,
+				 void *a, int nb,
 				 int flags, ...)
    {PFSignal_handler fo;
     SC_contextdes rv;
-
-    rv.a = SC_GET_CONTEXT(fn);
 
 #ifdef HAVE_POSIX_SIGNALS
 
@@ -114,9 +123,109 @@ SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
 
 #endif
 
-    rv.f = fo;
+    rv = SC_LOOKUP_CONTEXT(fo);
 
-    SC_REGISTER_CONTEXT(fn, a);
+    SC_register_context((void *) fn, a, nb);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_RESTORE_SIGNAL_N - restore all signal handlers from SS */
+
+void SC_restore_signal_n(int sig, SC_contextdes cd)
+   {
+
+    SC_signal_n(sig, cd.f, cd.a, cd.nb);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SIGNAL_ACTION_T - per thread worker for SMP _SC_signal_action_t */
+
+void *_SC_signal_action_t(void *a)
+   {int sig, flg, st, nb;
+    void *arg;
+    va_list *va;
+    struct sigaction oa;
+    PFSignal_handler fo, fn;
+    SC_thrsig *at;
+
+    at = (SC_thrsig *) a;
+
+    sig = at->sig;
+    fn  = at->hnd;
+    nb  = at->nb;
+    flg = at->flg;
+    va  = at->va;
+
+    if (nb > 0)
+       {arg = CMAKE_N(char, nb);
+	memcpy(arg, at->arg, nb);}
+    else
+       arg = NULL;
+
+    st = _PS_nsigaction(&oa, sig, fn, flg, *va);
+    fo = (st == 0) ? oa.sa_handler : NULL;
+
+/* set the context for this thread */
+    SC_register_context((void *) fn, arg, nb);
+
+    return(fo);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SIGNAL_ACTION_T - portable wrapper for sigaction semantics
+ *                    - do the following on each thread:
+ *                    - set FN to handle SIG signals
+ *                    - FLAGS modifies the signal handling process
+ *                    - any remaining non-negative arguments are
+ *                    - taken to be signals that are to be blocked during
+ *                    - the execution of FN
+ *                    - terminate the list with negative integer
+ *                    - do the following globally:
+ *                    - register context A with FN so that it can
+ *                    - save byte size of space pointed to by A so that
+ *                    - it may be copied in the threads
+ *                    - be looked up when FN is called
+ *                    - return the old context of FN
+ */
+
+SC_contextdes SC_signal_action_t(int sig, PFSignal_handler fn,
+				 void *a, int nb,
+				 int flags, ...)
+   {int n;
+    void *pa[1], *rt[1];
+    PFPVoidAPV pf[1];
+    SC_thrsig at;
+    SC_contextdes rv;
+
+    SC_VA_START(flags);
+
+    at.sig = sig;
+    at.hnd = fn;
+    at.arg = a;
+    at.nb  = nb;
+    at.flg = flags;
+    at.va  = &SC_VA_VAR;
+
+    n     = SC_n_threads;
+    pa[0] = &at;
+    pf[0] = _SC_signal_action_t;
+
+    SC_do_threads(1, &n, pf, pa, rt);
+
+    SC_VA_END;
+
+/* get the context for thread 0 */
+    rv = SC_LOOKUP_CONTEXT(rt[1]);
+
+/* set the context for thread 0 */
+    SC_register_context((void *) fn, a, nb);
 
     return(rv);}
 
@@ -277,11 +386,31 @@ void dsigact(int sig)
  */
 
 SC_contextdes SC_which_signal_handler(int sig)
-   {SC_contextdes rv;
+   {PFSignal_handler fo;
+    SC_contextdes rv;
 
-    rv = SC_signal_n(sig, SIG_IGN, NULL);
+    fo = NULL;
 
-    SC_signal_n(sig, rv.f, rv.a);
+    if ((0 < sig) && (sig < SC_NSIG) &&
+	(sig != SIGKILL) && (sig != SIGSTOP))
+       {
+
+#ifdef HAVE_POSIX_SIGNALS
+
+	struct sigaction oa;
+     
+	if (sigaction(sig, NULL, &oa) != -1)
+	   fo = oa.sa_handler;
+
+#else
+
+	fo = signal(sig, SIG_IGN);
+	fo = signal(sig, fo);
+
+#endif
+	};
+
+    rv = SC_LOOKUP_CONTEXT(fo);
 
     return(rv);}
 
@@ -384,9 +513,9 @@ void dsighnd(int sigmn, int sigmx)
 
     for (i = sigmn; i <= sigmx; i++)
         {sn  = SC_signal_name(i);
-	 hnd = SC_signal_n(i, SIG_IGN, NULL);
+	 hnd = SC_signal_n(i, SIG_IGN, NULL, 0);
 	 if (hnd.f != SIG_ERR)
-	    SC_signal_n(i, hnd.f, hnd.a);
+	    SC_restore_signal_n(i, hnd);
 
 	 if (hnd.f == SIG_IGN)
 	    io_printf(stdout, "%12s(%2d) ignore     (SIG_IGN)\n", sn, i);
@@ -442,9 +571,9 @@ SC_sigstate *SC_save_signal_handlers(int sigmn, int sigmx)
 	 ss->hnd[i].a = NULL;};
       
     for (i = sigmn; i <= sigmx; i++)
-        {hnd = SC_signal_n(i, SIG_IGN, NULL);
+        {hnd = SC_signal_n(i, SIG_IGN, NULL, 0);
 	 if (hnd.f != SIG_ERR)
-	    SC_signal_n(i, hnd.f, hnd.a);
+	    SC_restore_signal_n(i, hnd);
 
 	 ss->hnd[i] = hnd;};
 
@@ -464,7 +593,7 @@ void SC_restore_signal_handlers(SC_sigstate *ss, int rel)
 
     for (i = mn; i <= mx; i++)
         {hnd = ss->hnd[i];
-	 SC_signal_n(i, hnd.f, hnd.a);};
+	 SC_restore_signal_n(i, hnd);};
 
     if (rel == TRUE)
        {CFREE(ss);};
@@ -476,11 +605,12 @@ void SC_restore_signal_handlers(SC_sigstate *ss, int rel)
 
 /* SC_SET_SIGNAL_HANDLERS - restore all signal handlers from SS */
 
-void SC_set_signal_handlers(PFSignal_handler f, void *a, int mn, int mx)
+void SC_set_signal_handlers(PFSignal_handler f, void *a, int nb,
+			    int mn, int mx)
    {int i;
 
     for (i = mn; i <= mx; i++)
-        SC_signal_n(i, f, a);
+        SC_signal_n(i, f, a, nb);
 
     return;}
 
@@ -489,7 +619,7 @@ void SC_set_signal_handlers(PFSignal_handler f, void *a, int mn, int mx)
 
 /* SC_SETUP_SIG_HANDLERS - setup to handle a variety of signals */
 
-void SC_setup_sig_handlers(PFSignal_handler hand, void *a, int fl)
+void SC_setup_sig_handlers(PFSignal_handler hand, void *a, int nb, int fl)
    {PFSignal_handler hnd;
 
     if (fl == TRUE)
@@ -497,30 +627,30 @@ void SC_setup_sig_handlers(PFSignal_handler hand, void *a, int fl)
     else
        hnd = SIG_IGN;
 
-    SC_signal_n(SIGSEGV, hnd, a);
-    SC_signal_n(SIGBUS,  hnd, a);
-    SC_signal_n(SIGFPE,  hnd, a);
-    SC_signal_n(SIGILL,  hnd, a);
+    SC_signal_n(SIGSEGV, hnd, a, nb);
+    SC_signal_n(SIGBUS,  hnd, a, nb);
+    SC_signal_n(SIGFPE,  hnd, a, nb);
+    SC_signal_n(SIGILL,  hnd, a, nb);
 
-    SC_signal_n(SIGINT,  hnd, a);
-    SC_signal_n(SIGHUP,  hnd, a);
-    SC_signal_n(SIGQUIT, hnd, a);
-    SC_signal_n(SIGTERM, hnd, a);
+    SC_signal_n(SIGINT,  hnd, a, nb);
+    SC_signal_n(SIGHUP,  hnd, a, nb);
+    SC_signal_n(SIGQUIT, hnd, a, nb);
+    SC_signal_n(SIGTERM, hnd, a, nb);
 
-    SC_signal_n(SIGALRM, hnd, a);
+    SC_signal_n(SIGALRM, hnd, a, nb);
 
-    SC_signal_n(SIGTRAP, hnd, a);
-    SC_signal_n(SIGABRT, hnd, a);
+    SC_signal_n(SIGTRAP, hnd, a, nb);
+    SC_signal_n(SIGABRT, hnd, a, nb);
 
 #ifdef SIGIOT
-    SC_signal_n(SIGIOT,  hnd, a);
+    SC_signal_n(SIGIOT,  hnd, a, nb);
 #endif
 
-    SC_signal_n(SIGPIPE, hnd, a);
-    SC_signal_n(SIGSYS,  hnd, a);
+    SC_signal_n(SIGPIPE, hnd, a, nb);
+    SC_signal_n(SIGSYS,  hnd, a, nb);
 
-    SC_signal_n(SIGUSR1, hnd, a);
-    SC_signal_n(SIGUSR2, hnd, a);
+    SC_signal_n(SIGUSR1, hnd, a, nb);
+    SC_signal_n(SIGUSR2, hnd, a, nb);
 
     return;}
 

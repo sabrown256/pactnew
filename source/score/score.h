@@ -168,7 +168,7 @@
  *         -   int _bsz;
  */
 
-#define SC_init(_msg, _ef, _sh, _sf, _sa, _bh, _bf, _bsz)                    \
+#define SC_init(_msg, _ef, _sh, _sf, _sa, _nb, _bh, _bf, _bsz)               \
    {void (*_lsf)(int sig);                                                   \
     static void (*_lef)(int err) = NULL;                                     \
     switch (SETJMP(SC_gs.cpu))                                               \
@@ -187,9 +187,9 @@
     if (_sh == TRUE)                                                         \
        {_lsf = _sf;                                                          \
         if (_lsf != NULL)                                                    \
-           SC_signal_n(SIGINT, _lsf, _sa);                                   \
+           SC_signal_n(SIGINT, _lsf, _sa, _nb);                              \
         else                                                                 \
-           SC_signal_n(SIGINT, SC_interrupt_handler, NULL);};                \
+           SC_signal_n(SIGINT, SC_interrupt_handler, NULL, 0);};             \
     if (_bh == TRUE)                                                         \
        {if ((_bf == NULL) || (_bsz <= 0))                                    \
            {SC_setbuf(stdout, NULL);}                                        \
@@ -209,11 +209,11 @@
 
 /* SC_SWAP_VALUE - exchange two values */
 
-#define SC_SWAP_VALUE(_t, v1, v2)                                           \
-   {_t t;                                                                   \
-    t    = (v1);                                                            \
-    (v1) = (v2);                                                            \
-    (v2) = t;}
+#define SC_SWAP_VALUE(_t, _v1, _v2)                                         \
+   {_t _v;                                                                  \
+    _v  = _v1;                                                              \
+    _v1 = _v2;                                                              \
+    _v2 = _v;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -336,7 +336,11 @@
 #endif
 
 #define SC_GET_CONTEXT(_f)             SC_get_context((void *) (_f))
-#define SC_REGISTER_CONTEXT(_f, _a)    SC_register_context((void *) (_f), _a)
+
+#define SC_LOOKUP_CONTEXT(_f)          SC_lookup_context((void *) (_f))
+
+#define SC_REGISTER_CONTEXT(_f, _t, _a)                                      \
+    SC_register_context((void *) (_f), _a, sizeof(_t))
 
 /*--------------------------------------------------------------------------*/
 
@@ -562,6 +566,7 @@ struct s_SC_evlpdes
 
 struct s_SC_contextdes
    {PFSignal_handler f;         /* function member */
+    int nb;                     /* byte size of space pointed to by A */
     void *a;};                  /* context member */
 
 struct s_SC_sigstate
@@ -690,10 +695,14 @@ extern int
 /* SCCNTX.C declarations */
 
 extern int
- SC_register_context(void *f, void *a);
+ SC_register_context(void *f, void *a, int nb);
 
 extern void
+ SC_free_context_table(void),
  *SC_get_context(void *f);
+
+extern SC_contextdes
+ SC_lookup_context(void *f);
 
 
 /* SCCTL.C declarations */
@@ -825,7 +834,7 @@ extern struct tm
 
 extern void
  SC_get_time(double *psec, double *pmusec),
- SC_timeout(int to, PFSignal_handler fnc, void *a),
+ SC_timeout(int to, PFSignal_handler fnc, void *a, int nb),
  SC_time_str(unsigned long t, char *d),
  SC_sec_str(double t, char *d);
 
@@ -1206,9 +1215,16 @@ extern void
 
 /* SCSIG.C declarations */
 
+extern void
+ SC_restore_signal_n(int sig, SC_contextdes cd);
+
 extern SC_contextdes
- SC_signal_n(int sig, PFSignal_handler fnc, void *a),
- SC_signal_action_n(int sig, PFSignal_handler fnc, void *a,
+ SC_signal_n(int sig, PFSignal_handler fnc, void *a, int nb),
+ SC_signal_action_n(int sig, PFSignal_handler fnc,
+		    void *a, int nb,
+		    int flags, ...),
+ SC_signal_action_t(int sig, PFSignal_handler fn,
+		    void *a, int nb,
 		    int flags, ...),
  SC_which_signal_handler(int sig);
 
@@ -1225,8 +1241,9 @@ extern char
 
 extern void
  SC_restore_signal_handlers(SC_sigstate *ss, int rel),
- SC_set_signal_handlers(PFSignal_handler f, void *a, int mn, int mx),
- SC_setup_sig_handlers(PFSignal_handler hand, void *a, int fl);
+ SC_set_signal_handlers(PFSignal_handler f, void *a, int nb,
+			int mn, int mx),
+ SC_setup_sig_handlers(PFSignal_handler hand, void *a, int nb, int fl);
 
 
 /* SCSYSA.C declarations */

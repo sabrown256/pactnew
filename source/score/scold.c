@@ -362,7 +362,7 @@ PFSignal_handler SC_signal(int sig, PFSignal_handler fnc)
 
     DEPRECATED(2011-01-01);
 
-    rv = SC_signal_n(sig, fnc, NULL);
+    rv = SC_signal_n(sig, fnc, NULL, 0);
 
     return(rv.f);}
 

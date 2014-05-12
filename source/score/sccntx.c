@@ -38,22 +38,69 @@ static hasharr *_SC_init_context_table(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_FREE_CONTEXT_TABLE - release the context table */
+
+void SC_free_context_table(void)
+   {SC_smp_state *pa;
+
+    pa = _SC_get_state(-1);
+
+    if (pa->context_table != NULL)
+       {SC_free_hasharr(pa->context_table, NULL, NULL);
+	pa->context_table = NULL;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_REGISTER_CONTEXT - register context A with function F
  *                     - when F is called it will lookup A
  *                     - by hashing on its own address
  */
 
-int SC_register_context(void *f, void *a)
+int SC_register_context(void *f, void *a, int nb)
    {int rv;
     hasharr *ha;
     haelem *hp;
+    SC_contextdes *cd;
 
     rv = FALSE;
     ha = _SC_init_context_table();
 
-    hp = SC_hasharr_install(ha, f, a, SC_POINTER_S, 2, -1);
-    if (hp != NULL)
-       rv = TRUE;
+    if (f != NULL)
+       {hp = SC_hasharr_lookup(ha, f);
+	if (hp != NULL)
+	   cd = hp->def;
+	else
+	   {cd = CMAKE(SC_contextdes);
+	    if (cd != NULL)
+	       {cd->f  = f;
+		cd->a  = a;
+	    cd->nb = nb;};};
+
+	hp = SC_hasharr_install(ha, f, cd, SC_POINTER_S, 2, -1);
+	if (hp != NULL)
+	   rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LOOKUP_CONTEXT - return the context of F */
+
+SC_contextdes SC_lookup_context(void *f)
+   {SC_contextdes rv, *prv;
+    hasharr *ha;
+
+    ha = _SC_init_context_table();
+
+    prv = (SC_contextdes *) SC_hasharr_def_lookup(ha, f);
+    if (prv != NULL)
+       rv = *prv;
+    else
+       memset(&rv, 0, sizeof(SC_contextdes));
 
     return(rv);}
 
@@ -64,11 +111,10 @@ int SC_register_context(void *f, void *a)
 
 void *SC_get_context(void *f)
    {void *rv;
-    hasharr *ha;
+    SC_contextdes cd;
 
-    ha = _SC_init_context_table();
-
-    rv = SC_hasharr_def_lookup(ha, f);
+    cd = SC_lookup_context(f);
+    rv = cd.a;
 
     return(rv);}
 

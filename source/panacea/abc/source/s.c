@@ -98,8 +98,8 @@ int main(int c, char **v)
 
 #endif
 
-    SC_init("S: Exit with error", NULL,
-            TRUE, PA_interrupt_handler, NULL,
+    SC_init("S: Exit with error", NULL, TRUE,
+	    PA_interrupt_handler, NULL, 0,
             TRUE, NULL, 0);
 
 /* print the banner */

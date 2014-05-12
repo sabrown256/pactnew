@@ -806,6 +806,7 @@ extern void
  PM_restore_fpu(void *a),
  PM_detect_fpu(unsigned int *pf, unsigned int *pm),
  PM_enable_fpe_n(int flg, PFSignal_handler hnd, void *a),
+ PM_enable_fpe_t(int flg, PFSignal_handler hnd, void *a, int nb),
  PM_enable_fpe(int flg, PFSignal_handler hand),
  PM_clear_fpu(void);
 

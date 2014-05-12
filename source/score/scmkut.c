@@ -381,7 +381,7 @@ int main(int c, char **v, char **env)
     _SC_setup_dmake_threads(c, v);
 
     SC_init("PACT: Exit with error", NULL,
-            TRUE, NULL, NULL,
+            TRUE, NULL, NULL, 0,
             TRUE, NULL, 0);
 
     argv = v;

@@ -69,9 +69,9 @@
     
       (comment file "set the error return catch")
 
-      (printf file "    SC_init(\"%s: Exit with error\", %s,\n"
+      (printf file "    SC_init(\"%s: Exit with error\", %s, TRUE,\n"
 	      (up-case codename) term-hook)
-      (printf file "            TRUE, (PFSignal_handler) %s, NULL,\n"
+      (printf file "            (PFSignal_handler) %s, NULL, 0,\n"
 	      intr-handler-hook)
       (printf file "            TRUE, NULL, 0);\n")
       (printf file "\n")
