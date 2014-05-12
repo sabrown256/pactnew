@@ -234,6 +234,7 @@ struct s_threades
 struct s_SC_scope_thread
    {int init_emu;
     int n_threads;
+    int in_thread_region;
     SC_thread_lock lock;
     SC_thread_attr detached;
     SC_thread_attr attached;

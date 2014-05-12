@@ -1226,24 +1226,7 @@ int SC_set_io_interrupts(int flag)
 void SC_catch_io_interrupts(int flag)
    {
 
-#if 0
-    int ioi;
-
-    ioi = SC_set_io_interrupts(-1);
-    if (flag == -1)
-       flag = ioi;
-
-    if (_SC.evloop != NULL)
-       SC_catch_event_loop_interrupts(_SC.evloop, flag);
-
-    else if ((flag == TRUE) && (ioi == TRUE))
-       SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL, 0,
-			  0, BLOCK_WITH_SIGIO, -1);
-    else
-       SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, 0, -1);
-#else
     SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, 0, -1);
-#endif
 
     return;}
 

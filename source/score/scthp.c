@@ -215,7 +215,7 @@ static int _SC_pth_rand(unsigned int *seed)
 /*--------------------------------------------------------------------------*/
 
 SC_scope_thread
- _SC_ts = { FALSE, 0, SC_LOCK_INIT_STATE,
+ _SC_ts = { FALSE, 0, FALSE, SC_LOCK_INIT_STATE,
             { "detached",
 	      _SC_pth_attr_init,
 	      SC_CREATE_DETACHED,
