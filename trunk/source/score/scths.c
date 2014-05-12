@@ -366,7 +366,7 @@ static int _SC_sproc_rand(unsigned int *seed)
 /*--------------------------------------------------------------------------*/
 
 SC_scope_thread
- _SC_ts = { FALSE, 0, SC_LOCK_INIT_STATE, 0, 1,
+ _SC_ts = { FALSE, 0, FALSE, SC_LOCK_INIT_STATE, 0, 1,
             { _SC_sproc_init,
 	      _SC_sproc_thread_self,
 	      _SC_sproc_thread_equal,

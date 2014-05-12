@@ -186,7 +186,7 @@ static void *work(void *a)
     st = (testdes *) a;
 
     if (st->method == 1)
-       PM_enable_fpe_n(TRUE, handler, &cpu);
+       PM_enable_fpe_t(TRUE, handler, &cpu, sizeof(JMP_BUF));
 
     et = st->et;
     rv  = 0;

@@ -112,7 +112,7 @@ SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn,
 
     SC_VA_START(flags);
 
-    st = _PS_nsigaction(&oa, sig, fn, flags, __a__);
+    st = _PS_nsigaction(&oa, sig, fn, flags, SC_VA_VAR);
     fo = (st == 0) ? oa.sa_handler : NULL;
 
     SC_VA_END;
@@ -198,31 +198,46 @@ void *_SC_signal_action_t(void *a)
 SC_contextdes SC_signal_action_t(int sig, PFSignal_handler fn,
 				 void *a, int nb,
 				 int flags, ...)
-   {int n;
+   {int n, id;
     void *pa[1], *rt[1];
     PFPVoidAPV pf[1];
+    PFSignal_handler fo;
     SC_thrsig at;
     SC_contextdes rv;
 
+    id = SC_current_thread();
+
     SC_VA_START(flags);
 
-    at.sig = sig;
-    at.hnd = fn;
-    at.arg = a;
-    at.nb  = nb;
-    at.flg = flags;
-    at.va  = &SC_VA_VAR;
+/* set the handler for all threads only from the master thread */
+    if ((id == 0) && (SC_in_threaded_region(-1) == FALSE))
+       {at.sig = sig;
+	at.hnd = fn;
+	at.arg = a;
+	at.nb  = nb;
+	at.flg = flags;
+	at.va  = &SC_VA_VAR;
 
-    n     = SC_n_threads;
-    pa[0] = &at;
-    pf[0] = _SC_signal_action_t;
+	n     = SC_n_threads;
+	pa[0] = &at;
+	pf[0] = _SC_signal_action_t;
 
-    SC_do_threads(1, &n, pf, pa, rt);
+	SC_do_threads(1, &n, pf, pa, rt);
+
+	fo = rt[1];}
+
+/* set the handler for this thread only if not the master thread */
+    else
+       {int st;
+	struct sigaction oa;
+
+	st = _PS_nsigaction(&oa, sig, fn, flags, SC_VA_VAR);
+	fo = (st == 0) ? oa.sa_handler : NULL;};
 
     SC_VA_END;
 
 /* get the context for thread 0 */
-    rv = SC_LOOKUP_CONTEXT(rt[1]);
+    rv = SC_LOOKUP_CONTEXT(fo);
 
 /* set the context for thread 0 */
     SC_register_context((void *) fn, a, nb);

@@ -1093,6 +1093,7 @@ extern void
  SC_do_tasks_f(PFInt fnc, void **pa, int *pnp, int *poff, int *pon);
 
 extern int
+ SC_in_threaded_region(int nw),
  SC_init_threads(int np, PFTid tid), 
  SC_init_omp(int c, char **v),
  SC_using_tpool(void),

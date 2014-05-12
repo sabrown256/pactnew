@@ -2810,7 +2810,7 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 /* turn off SIGIO handler */
     ioi = SC_set_io_interrupts(-1);
     if (ioi == TRUE)
-       oh = SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
+       oh = SC_signal_action_t(SC_SIGIO, SIG_IGN, NULL, 0, -1);
 
 #endif
 
@@ -2820,7 +2820,7 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 
 /* turn on SIGIO handler */
     if (ioi == TRUE)
-       SC_signal_action_n(SC_SIGIO, oh, NULL, 0, BLOCK_WITH_SIGIO, -1);
+       SC_signal_action_t(SC_SIGIO, oh, NULL, 0, BLOCK_WITH_SIGIO, -1);
  
 #endif
 
@@ -2873,13 +2873,13 @@ size_t SC_fread_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
 /* turn off SIGIO handler */
     ioi = SC_set_io_interrupts(-1);
     if (ioi == TRUE)
-       oh = SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
+       oh = SC_signal_action_t(SC_SIGIO, SIG_IGN, NULL, 0, -1);
 
     rv = _SC_fread_safe(s, bpi, ni, fp);
 
 /* turn on SIGIO handler */
     if (ioi == TRUE)
-       SC_signal_action_n(SC_SIGIO, oh, NULL, 0, BLOCK_WITH_SIGIO, -1);
+       SC_signal_action_t(SC_SIGIO, oh, NULL, 0, BLOCK_WITH_SIGIO, -1);
  
 #else
 

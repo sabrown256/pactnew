@@ -110,6 +110,23 @@ int SC_current_thread(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_IN_THREADED_REGION - set _SC_ts.in_thread_region to NW
+ *                       - if NW is not -1
+ *                       - return old value
+ */
+
+int SC_in_threaded_region(int nw)
+   {int rv;
+
+    rv = _SC_ts.in_thread_region;
+    if (nw != -1)
+       _SC_ts.in_thread_region = nw;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_USING_TPOOL - return value of _SC_ts.oper.use_pool */
 
 int SC_using_tpool(void)
@@ -983,7 +1000,9 @@ void SC_fin_tpool(void)
  */
 
 static void _SC_do_threads(int n, thread_work *tw)
-   {
+   {int ov;
+
+    ov = SC_in_threaded_region(TRUE);
 
 /* there is no work to do if n <= 0 */
     if (n > 0)
@@ -995,6 +1014,8 @@ static void _SC_do_threads(int n, thread_work *tw)
 
 	else
 	   _SC_do_new_threads(n, tw);};
+
+    SC_in_threaded_region(ov);
 
     return;}
 
