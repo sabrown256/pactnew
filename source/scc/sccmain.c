@@ -69,8 +69,8 @@ int main(int c, char **v, char **env)
     char msg[MAXLINE];
     char *cmp, **args, **files;
 
-    SC_init("Aborting with error", CC_end_scc,
-            TRUE, CC_interrupt_handler, NULL, 0,
+    SC_init("Aborting with error", CC_end_scc, TRUE,
+	    CC_interrupt_handler, NULL, 0,
             TRUE, NULL, 0);
 
 /* find memory check option early */

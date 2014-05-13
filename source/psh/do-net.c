@@ -1181,6 +1181,10 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 	       {fns[0] = '\0';
 		fnt[0] = '\0';};};
    
+/* force truncate strings */
+        hst[12] = '\0';
+        cfg[22] = '\0';
+
 	fprintf(repf, " %-12s %-22s %-3s  %-4s ", hst, cfg, dbop, rms);
 	fprintf(repf, "%-4s %7s   ", bls, trim(blt, BOTH, " ()"));
 	fprintf(repf, "%-4s %7s   ", tss, trim(tst, BOTH, " ()"));

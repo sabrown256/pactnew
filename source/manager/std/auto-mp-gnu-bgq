@@ -7,6 +7,6 @@
 # include "cpyright.h"
 #
 
-include auto-gnu-py
+include auto-gnu
 include cross-gnu-bgq
 
