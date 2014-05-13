@@ -902,8 +902,8 @@ int main(int c, char **v)
 
     SC_zero_space_n(0, -2);
 
-    SC_init("TPATH: Exit with error", NULL,
-            TRUE, NULL, NULL, 0,
+    SC_init("TPATH: Exit with error", NULL, TRUE,
+	    NULL, NULL, 0,
             TRUE, NULL, 0);
  
     debug_mode    = FALSE;

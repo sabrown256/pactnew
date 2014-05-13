@@ -27,16 +27,18 @@ struct s_testdes
 
 /* DFPU - diagnostic print of FPU state */
 
+#if 0
+
 typedef union u_fpu_state fpu_state;
 
 union u_fpu_state
    {double a;
     char b[512];};
-extern fpu_state *PM_save_fpu_x86(void);
 
 void dfpu(void)
    {int16_t *ps;
     fpu_state fs;
+    extern fpu_state *PM_save_fpu_x86(void);
 
     fs = *PM_save_fpu_x86();
     ps = (int16_t *) fs.b;
@@ -44,6 +46,8 @@ void dfpu(void)
     printf("fpu  %d   0x%x  0x%x\n", SC_current_thread(), ps[0], ps[1]);
 
     return;}
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

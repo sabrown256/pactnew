@@ -15,7 +15,10 @@ set exe = $BinDir/tscrtr
 set opt = ""
 set io  = flog
 
-if (($CROSS_COMPILE == FALSE) && ("$Valgrind" == "")) then
+# do not do this test if cross compiling, using valgrind, or running OSX
+# technically OSX 10.8 is bad, but OSX policy changes make debugging
+# problematic - codesigning, admin privileges required to use ptrace
+if (($CROSS_COMPILE == FALSE) && ($HSY_OS_Name != Darwin ) && ("$Valgrind" == "")) then
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"

@@ -38,6 +38,7 @@ dbmget $WLog ACC_Debug_Default^      \
              Cfg_CC_Exe^             \
              Cfg_CC_Flags^           \
              Cfg_CC_Inc^             \
+             CROSS_COMPILE^          \
              CROSS_FE^               \
              DP_BE^                  \
              DP_METHOD^              \

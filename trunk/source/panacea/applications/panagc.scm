@@ -51,10 +51,10 @@
     
       (comment file "set the error return catch")
 
-      (printf file "    SC_init(\"%s: Exit with error\", %s, NULL,\n"
+      (printf file "    SC_init(\"%s: Exit with error\", %s, TRUE,\n"
 	      codename term-hook)
-      (printf file "          %s, NULL, 0,\n" intr-handler-hook)
-      (printf file "          TRUE, NULL, 0);\n")
+      (printf file "            %s, NULL, 0,\n" intr-handler-hook)
+      (printf file "            TRUE, NULL, 0);\n")
       (printf file "\n")
     
       (if (and init-par (not (strcmp? init-par 'NULL)))

@@ -122,8 +122,8 @@ int main(int argc, char **argv)
     if ((!do_xpose) && (!do_merge))
        do_xpose = TRUE;
 
-    SC_init("TOUL: Exit with error", NULL,
-            TRUE, NULL, NULL, 0,
+    SC_init("TOUL: Exit with error", NULL, TRUE,
+	    NULL, NULL, 0,
             TRUE, NULL, 0);
 
 /* print the banner */

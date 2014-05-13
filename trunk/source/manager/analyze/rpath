@@ -243,7 +243,19 @@ switch ($Out)
    case link:
         set nlink = ""
         foreach l ($npath)
-           set nlink = ( $nlink -L$l )
+
+# NOTE: assume that cross compile libraries are not in /usr/local/lib*
+# and do not add such a path to the load line
+# this is to save us from helper scripts out of our control which try
+# to prevent this from occuring by dying when they are encountered
+# for example in IBM BG/x machines
+           if ($CROSS_COMPILE != FALSE) then
+              if ($l !~ /usr/local/lib*) then
+                 set nlink = ( $nlink -L$l )
+              endif
+           else
+              set nlink = ( $nlink -L$l )
+           endif
         end
         echo $nlink
         breaksw
