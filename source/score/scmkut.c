@@ -374,7 +374,7 @@ int main(int c, char **v, char **env)
     int64_t rmem, rcpu, rfsz;
     char mkfile[MAXLINE], s[MAXLINE], server[MAXLINE], srvna[MAXLINE];
     char msg[MAXLINE];
-    char **cmnds, *mkname, *log, *flt, *tgt, *shell, *dpdir, *dpsys;
+    char **cmnds, *mkname, *lgf, *flt, *tgt, *shell, *dpdir, *dpsys;
     char *err, *p;
     anadep *state;
 
@@ -434,7 +434,7 @@ int main(int c, char **v, char **env)
 
     dpdir  = NULL;
     dpsys  = NULL;
-    log    = NULL;
+    lgf    = NULL;
     mkname = NULL;
     tgt    = NULL;
 
@@ -496,7 +496,7 @@ int main(int c, char **v, char **env)
 			    LINK, NULL);
 	     return(0);}
          else if (strcmp(v[i], "-log") == 0)
-	    log = v[++i];
+	    lgf = v[++i];
          else if (strcmp(v[i], "-mem") == 0)
 	    mem = TRUE;
          else if (strcmp(v[i], "-n") == 0)
@@ -653,11 +653,11 @@ int main(int c, char **v, char **env)
 	    else if (async == TRUE)
 	       st = SC_exec_async(shell, cmnds, NULL,
 				  server, env, nconn,
-				  log, flt, na, show, ignore, dmp);
+				  lgf, flt, na, show, ignore, dmp);
 
 	    else
 	       st = SC_exec_commands(shell, cmnds, env, -1,
-				     log, flt, na, show, ignore, dmp);}
+				     lgf, flt, na, show, ignore, dmp);}
 
 	else
 	   io_printf(stdout, "Nothing to be done for '%s'\n", tgt);

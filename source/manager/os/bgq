@@ -39,7 +39,7 @@ Group RF {
 }
 
 Group TEST {
-   ADVISORY    = ${TEST_ADVISORY}:pgs_rendlr:pgs_rendac
+   ADVISORY    = ${TEST_ADVISORY}:pgs_rendlr:pgs_rendac:pml_fpe
 #   MAX_THREADS = 2
 }
 
