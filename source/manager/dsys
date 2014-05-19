@@ -366,7 +366,7 @@ switch ($Cmnd)
            Separator $Log
            NoteD $Log "Cross compile fixes"
            set srcb = $CROSS_REF/bin
-	   if ($srcb != $BinDir) then
+           if ($srcb != $BinDir) then
               set CrossFix = ( hserve mpi-io-wrap )
 #              set CrossFix = ( $CrossFix ps-diff png-diff )
               foreach i ( $CrossFix )
@@ -377,7 +377,7 @@ switch ($Cmnd)
                  endif
               end
            endif
-	   unset srcb
+           unset srcb
            NoteD $Log "done"
         endif
 
@@ -631,7 +631,7 @@ switch ($Cmnd)
         endif
         setenv PSY_CONFIG_PATH  "$PSY_CONFIG_PATH local std"
 
-	setenv USE_LDLibPath ""
+        setenv USE_LDLibPath ""
 
         setenv CCompiler  gnu
 
@@ -772,8 +772,12 @@ switch ($Cmnd)
                    echo "                   the default is determined by the platform defaults"
                    echo "        -cc        specify the compiler set to be used (default gnu)"
                    echo "                   use only when compilers from multiple vendors are"
-                   echo "                   available on your system"
-                   echo "                   use your PATH variable to select among multiple"
+                   echo "                   available on your system."
+                   echo "                   For a multi-platform config a colon delimited list"
+                   echo "                   compilers may be specified with the order matching"
+                   echo "                   the individual configurations (usually frontend first
+                   echo "                   then backend)."
+                   echo "                   Use your PATH variable to select among multiple"
                    echo "                   installed versions of a single vendors compilers"
                    echo "                   a partial list of available compilers/platforms:"
                    echo "                      clang       CLANG compilers"
@@ -783,7 +787,7 @@ switch ($Cmnd)
                    echo "                      path        PathScale compilers"
                    echo "                      pgi         PGI compilers"
                    echo "                      sun         SUN compilers"
-                   echo "                   the following are multi-platform configurations for"
+                   echo "                   The following are multi-platform configurations for"
                    echo "                   cross build situations and are safe:"
                    echo "                      mp-gnu-bgl    GNU for IBM BG/L frontend and backend"
                    echo "                      mp-gnu-bgp    GNU for IBM BG/P frontend and backend"
@@ -794,7 +798,7 @@ switch ($Cmnd)
                    echo "                      mp-xlc-bgl    XLC for IBM BG/L frontend and backend"
                    echo "                      mp-xlc-bgp    XLC for IBM BG/P frontend and backend"
                    echo "                      mp-xlc-bgq    XLC for IBM BG/Q frontend and backend"
-                   echo "                   the following are risky since they may refer to a frontend"
+                   echo "                   The following are risky since they may refer to a frontend"
                    echo "                   build you do not have or control:"
                    echo "                      gnu-bgl     GNU for IBM BG/L backend only"
                    echo "                      gnu-bgp     GNU for IBM BG/P backend only"
@@ -1134,130 +1138,12 @@ switch ($Cmnd)
            endsw
         end
 
-        Separator $Log
+# setup PERDB and the config database
+        call DB_CONFIG()
 
-# setup for PERDB session
-        flog $Log setenv PERDB_IDLE_TIMEOUT 600
-        flog $Log setenv PERDB_IDLE_INTERVAL 10
-        flog $Log setenv PERDB_PATH $EtcDir/cfg
-        flog $Log set dbopt = ( -f $PERDB_PATH )
+# run PCO
+        call PCO_CONFIG()
 
-# NOTE: a dsys reconfig will launch a server so kill any running
-# servers and do dsys config with a clean slate
-# perdb quit: can hang if the connection is already gone so avoid this
-# perdb will quit if the connection goes but it may take awhile so
-# lags are a problem
-        if (0) then
-           flog $Log $PERDB -l quit:
-           while (-f $PERDB_PATH.conn)
-              sleep 1
-           end
-        else
-           flog $Log ls -l ${PERDB_PATH}*
-           Note $Log "Checking for running perdb servers"
-           if (-f $PERDB_PATH.conn) then
-              set linf = ( `cat $PERDB_PATH.conn |& sed 's|[^a-zA-Z0-9]|x|g'` )
-              set lpid = "$linf[$#linf]"
-              Note $Log "   pid = $lpid"
-              flog $Log (ps -ef | grep $lpid | grep perdb)
-              if ($status == 0) then
-                 flog $Log kill -9 $lpid
-              endif
-              unset lpid
-              unset linf
-           else
-              Note $Log "   none found"
-           endif
-        endif
-        flog $Log $RM ${PERDB_PATH}*
-        sleep 1
-        flog $Log $PERDB -l -c -s
-        sleep 1
-        flog $Log ls -l ${PERDB_PATH}*
-
-        flog $Log set PCO = ( $BinDir/pco $dbopt -pact -env $PSY_MngDir/pact.env -l )
-
-        Separator $Log
-        dbset PSY_Dbg_Opt  $ldof
-        dbset PACT_VERSION $PACTVer
-	if ($platform == TRUE) then
-           dbset CROSS_REF $cross_ref
-        endif
-
-        if ("$nargs" != "") then
-           if ("$nargs[1]" == "-r") then
-              shift nargs
-           endif
-        endif
-        dbset PSY_CfgCmd "$nargs"
-
-# start the env files
-        $RM $EnvCsh
-        touch $EnvCsh
-        Note $EnvCsh ""
-        Note $EnvCsh "setenv PSY_ID $PSY_ID"
-        Note $EnvCsh "set path   = ( . $DevDir/"'$PSY_ID/bin $path )'
-        Note $EnvCsh ""
-
-        $RM $EnvSh
-        touch $EnvSh
-        Note $EnvSh ""
-        Note $EnvSh "export PSY_ID=$PSY_ID"
-        Note $EnvSh "export PATH=.:$DevDir/"'$PSY_ID/bin:$PATH'
-        Note $EnvSh ""
-
-# remove files we are about to generate in include
-# so that if generation fails we are not left with ghosts from old configs
-        set GenFiles = ""
-        set GenFiles = ( $GenFiles f90-interface )
-        set GenFiles = ( $GenFiles iso-c.h scconfig.h scdecls.h syntax.h)
-        set GenFiles = ( $GenFiles spokes.scm )
-        foreach i ( $GenFiles )
-           flog $Log $RM $IncDir/$i
-        end
-
-# remove files we are about to generate in etc
-# so that if generation fails we are not left with ghosts from old configs
-        set GenFiles = ""
-        set GenFiles = ( $GenFiles package configured )
-        set GenFiles = ( $GenFiles make-def make-macros Makefile )
-        foreach i ( $GenFiles )
-           flog $Log $RM $EtcDir/$i
-        end
-
-# remove files we are about to generate in bin
-# so that if generation fails we are not left with ghosts from old configs
-        set GenFiles = ""
-        set GenFiles = ( $GenFiles install-pact )
-        foreach i ( $GenFiles )
-           flog $Log $RM $BinDir/$i
-        end
-
-# must have cpyright.h available during configuration
-        flog $Log cp cpyright.h $IncDir
-
-	if ("$flst" != "") then
-           set PArgs = ( $PArgs -ft `echo $flst | sed 's| |-|g'` )
-        endif
-
-# do the main configuration work
-        if ("$ucfg" != "") then
-           Note $Log "Command: $PCO $PArgs -s $PSY_ID $ucfg"
-           $PCO -s $PSY_ID $PArgs $ucfg
-           set RStatus = $status
-
-        else if ("$dbcfg" != "") then
-           Note $Log "Command: $PCO -s $PSY_ID $PArgs -db $dbcfg"
-           $PCO -s $PSY_ID $PArgs -db $dbcfg
-           set RStatus = $status
-           unset dbcfg
-
-        else
-           NoteD $Log "There is no $Configuration in $PSY_CONFIG_PATH"
-           set RStatus = 3
-        endif
-
-        unset dir
         if ($RStatus != 0) then
            goto CFG_DONE
         endif
@@ -1280,105 +1166,20 @@ switch ($Cmnd)
            goto CFG_DONE
         endif
 
-# settle on smake or dmake
         Separator $Log
 
-# check for multi-platform build
+# check for multi-platform config
         dbget PSY_Platforms
         if ("$PSY_Platforms" != "") then
-           set inf = ( `echo "$PSY_Platforms" | sed 's|:| |g'` )
-           @ np = $#inf
-           Note $Log "$np added platforms"
+           call MP_CONFIG()
 
-           set lpact = ${BinDir}/pact
-           set inf   = ( `echo "$inf" | sed 's|[()]| |g'` )
-
-           @ ni = $#inf
-           @ i  = 0
-           while ($i < $ni)
-              @ i = $i + 1
-              set cfg = $inf[$i]
-              @ i = $i + 1
-              set sid = $inf[$i]
-
-              set bind = $DevDir/$sid/bin
-
-# set the main pact link to the first platform pact
-              flog $Log pushd ${bind}
-              flog $Log mv pact pact.cfg
-              flog $Log ln -s $lpact pact
-              flog $Log popd
-           end
-           unset lpact
-           unset bind
-           unset inf
-
-# restore configuration
-           if ($?SESSION_CONFIG == 1) then
-              flog $Log set sid = $SESSION_CONFIG
-              flog $Log unsetenv SESSION_CONFIG
-           else
-              flog $Log set sid = $PSY_ID
-           endif
-           flog $Log $PSY_CfgMan add $sid
-           unset sid
-
+# single platform config
         else
-           if (!(-f $PERDB_PATH.db)) then
-              NoteD $Log ""
-              NoteD $Log "No configuration database '$PERDB_PATH.db' - fatal"
-              NoteD $Log ""
-              exit(1)
-           else if (-z $PERDB_PATH.db) then
-              NoteD $Log ""
-              NoteD $Log "Zero length configuration database '$PERDB_PATH.db' - fatal"
-              NoteD $Log ""
-              exit(1)
-           endif
+           call SP_CONFIG()
         endif
 
 # wrap it up
-        Separator $Log
-
-        flog $Log $PERDB -l quit:
-
-        if ($platform == FALSE) then
-           NoteD $Log ""
-           NoteD $Log "Configuration for version $PACTVer complete (`$PSY_CfgMan use`)"
-           NoteD $Log ""
-
-           echo $cwd
-           rehash
-
-# create empty extensions directories if they don't exist already
-           set ExtDirs = ( $PSY_Base/sx/applications/extensions $PSY_Base/ultra/applications/extensions )
-           foreach d ($ExtDirs)
-              if (-d $d:h) then
-                 if (!(-d $d)) then
-                    flog $Log mkdir $d
-                 endif
-              endif
-           end
-
-# figure out which shell you are using
-           NoteD $Log ""
-           NoteD $Log "Your shell is $CURR_SH.  Consequently, you should do:"
-           NoteD $Log ""
-           if (($CURR_SH != csh) && ($CURR_SH != tcsh)) then
-              NoteD $Log "   . $EnvSh"
-           else
-              NoteD $Log "   source $EnvCsh"
-           endif
-           NoteD $Log ""
-           NoteD $Log "into your current environment before proceeding to do work"
-           NoteD $Log "on the PACT system not covered by the installation process."
-
-           set ETime = `$TIMER -b $BeginTime`
-
-           NoteD $Log ""
-           NoteD $Log "PACT configured ($RStatus/$ETime)"
-           NoteD $Log ""
-        endif
+        call FIN_CONFIG()
 
 CFG_DONE:
         unset dbopt
@@ -3786,6 +3587,271 @@ GEN_CONFIG:
    set Configuration = $cfg
 
    unset Tmp
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DB_CONFIG - do PERDB phase of config
+
+DB_CONFIG:
+
+   Separator $Log
+
+# setup for PERDB session
+   flog $Log setenv PERDB_IDLE_TIMEOUT 600
+   flog $Log setenv PERDB_IDLE_INTERVAL 10
+   flog $Log setenv PERDB_PATH $EtcDir/cfg
+   flog $Log set dbopt = ( -f $PERDB_PATH )
+
+# NOTE: a dsys reconfig will launch a server so kill any running
+# servers and do dsys config with a clean slate
+# perdb quit: can hang if the connection is already gone so avoid this
+# perdb will quit if the connection goes but it may take awhile so
+# lags are a problem
+   if (0) then
+      flog $Log $PERDB -l quit:
+      while (-f $PERDB_PATH.conn)
+         sleep 1
+      end
+   else
+      flog $Log ls -l ${PERDB_PATH}*
+      Note $Log "Checking for running perdb servers"
+      if (-f $PERDB_PATH.conn) then
+         set linf = ( `cat $PERDB_PATH.conn |& sed 's|[^a-zA-Z0-9]|x|g'` )
+         set lpid = "$linf[$#linf]"
+         Note $Log "   pid = $lpid"
+         flog $Log (ps -ef | grep $lpid | grep perdb)
+         if ($status == 0) then
+            flog $Log kill -9 $lpid
+         endif
+         unset lpid
+         unset linf
+      else
+         Note $Log "   none found"
+      endif
+   endif
+   flog $Log $RM ${PERDB_PATH}*
+   sleep 1
+   flog $Log $PERDB -l -c -s
+   sleep 1
+   flog $Log ls -l ${PERDB_PATH}*
+
+   Separator $Log
+   dbset PSY_Dbg_Opt  $ldof
+   dbset PACT_VERSION $PACTVer
+   if ($platform == TRUE) then
+      dbset CROSS_REF $cross_ref
+   endif
+
+   if ("$nargs" != "") then
+      if ("$nargs[1]" == "-r") then
+         shift nargs
+      endif
+   endif
+   dbset PSY_CfgCmd "$nargs"
+
+   set mp_cc = ( `echo $CCompiler | sed 's|:| |g'` )
+   dbset PSY_Platform_Compilers "$mp_cc"
+   unset mp_cc
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PCO_CONFIG - do PCO phase of config
+
+PCO_CONFIG:
+
+   flog $Log set PCO = ( $BinDir/pco $dbopt -pact -env $PSY_MngDir/pact.env -l )
+
+# start the env files
+   $RM $EnvCsh
+   touch $EnvCsh
+   Note $EnvCsh ""
+   Note $EnvCsh "setenv PSY_ID $PSY_ID"
+   Note $EnvCsh "set path   = ( . $DevDir/"'$PSY_ID/bin $path )'
+   Note $EnvCsh ""
+
+   $RM $EnvSh
+   touch $EnvSh
+   Note $EnvSh ""
+   Note $EnvSh "export PSY_ID=$PSY_ID"
+   Note $EnvSh "export PATH=.:$DevDir/"'$PSY_ID/bin:$PATH'
+   Note $EnvSh ""
+
+# remove files we are about to generate in include
+# so that if generation fails we are not left with ghosts from old configs
+   set GenFiles = ""
+   set GenFiles = ( $GenFiles f90-interface )
+   set GenFiles = ( $GenFiles iso-c.h scconfig.h scdecls.h syntax.h)
+   set GenFiles = ( $GenFiles spokes.scm )
+   foreach i ( $GenFiles )
+      flog $Log $RM $IncDir/$i
+   end
+
+# remove files we are about to generate in etc
+# so that if generation fails we are not left with ghosts from old configs
+   set GenFiles = ""
+   set GenFiles = ( $GenFiles package configured )
+   set GenFiles = ( $GenFiles make-def make-macros Makefile )
+   foreach i ( $GenFiles )
+      flog $Log $RM $EtcDir/$i
+   end
+
+# remove files we are about to generate in bin
+# so that if generation fails we are not left with ghosts from old configs
+   set GenFiles = ""
+   set GenFiles = ( $GenFiles install-pact )
+   foreach i ( $GenFiles )
+      flog $Log $RM $BinDir/$i
+   end
+
+# must have cpyright.h available during configuration
+   flog $Log cp cpyright.h $IncDir
+
+   if ("$flst" != "") then
+      set PArgs = ( $PArgs -ft `echo $flst | sed 's| |-|g'` )
+   endif
+
+# do the main configuration work
+   if ("$ucfg" != "") then
+      Note $Log "Command: $PCO $PArgs -s $PSY_ID $ucfg"
+      $PCO -s $PSY_ID $PArgs $ucfg
+      set RStatus = $status
+
+   else if ("$dbcfg" != "") then
+      Note $Log "Command: $PCO -s $PSY_ID $PArgs -db $dbcfg"
+      $PCO -s $PSY_ID $PArgs -db $dbcfg
+      set RStatus = $status
+      unset dbcfg
+
+   else
+      NoteD $Log "There is no $Configuration in $PSY_CONFIG_PATH"
+      set RStatus = 3
+   endif
+
+   unset dir
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SP_CONFIG - do single platform config chores
+
+SP_CONFIG:
+
+   if (!(-f $PERDB_PATH.db)) then
+      NoteD $Log ""
+      NoteD $Log "No configuration database '$PERDB_PATH.db' - fatal"
+      NoteD $Log ""
+      exit(1)
+   else if (-z $PERDB_PATH.db) then
+      NoteD $Log ""
+      NoteD $Log "Zero length configuration database '$PERDB_PATH.db' - fatal"
+      NoteD $Log ""
+      exit(1)
+   endif
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MP_CONFIG - do multi-platform config chores
+
+MP_CONFIG:
+
+   set inf = ( `echo "$PSY_Platforms" | sed 's|:| |g'` )
+   @ np = $#inf
+   Note $Log "$np added platforms"
+
+   set lpact = ${BinDir}/pact
+   set inf   = ( `echo "$inf" | sed 's|[()]| |g'` )
+
+   @ ni = $#inf
+   @ i  = 0
+   while ($i < $ni)
+      @ i = $i + 1
+      set cfg = $inf[$i]
+      @ i = $i + 1
+      set sid = $inf[$i]
+
+      set bind = $DevDir/$sid/bin
+
+# set the main pact link to the first platform pact
+      flog $Log pushd ${bind}
+      flog $Log mv pact pact.cfg
+      flog $Log ln -s $lpact pact
+      flog $Log popd
+   end
+   unset lpact
+   unset bind
+   unset inf
+
+# restore configuration
+   if ($?SESSION_CONFIG == 1) then
+      flog $Log set sid = $SESSION_CONFIG
+      flog $Log unsetenv SESSION_CONFIG
+   else
+      flog $Log set sid = $PSY_ID
+   endif
+   flog $Log $PSY_CfgMan add $sid
+   unset sid
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIN_CONFIG - complete config work
+
+FIN_CONFIG:
+
+   Separator $Log
+
+   flog $Log $PERDB -l quit:
+
+   if ($platform == FALSE) then
+      NoteD $Log ""
+      NoteD $Log "Configuration for version $PACTVer complete (`$PSY_CfgMan use`)"
+      NoteD $Log ""
+
+      echo $cwd
+      rehash
+
+# create empty extensions directories if they don't exist already
+      set ExtDirs = ( $PSY_Base/sx/applications/extensions $PSY_Base/ultra/applications/extensions )
+      foreach d ($ExtDirs)
+         if (-d $d:h) then
+            if (!(-d $d)) then
+               flog $Log mkdir $d
+            endif
+         endif
+      end
+
+# figure out which shell you are using
+      NoteD $Log ""
+      NoteD $Log "Your shell is $CURR_SH.  Consequently, you should do:"
+      NoteD $Log ""
+      if (($CURR_SH != csh) && ($CURR_SH != tcsh)) then
+         NoteD $Log "   . $EnvSh"
+      else
+         NoteD $Log "   source $EnvCsh"
+      endif
+      NoteD $Log ""
+      NoteD $Log "into your current environment before proceeding to do work"
+      NoteD $Log "on the PACT system not covered by the installation process."
+
+      set ETime = `$TIMER -b $BeginTime`
+
+      NoteD $Log ""
+      NoteD $Log "PACT configured ($RStatus/$ETime)"
+      NoteD $Log ""
+   endif
 
    return
 

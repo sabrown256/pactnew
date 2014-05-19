@@ -18,7 +18,9 @@
    rm -f $Tmp
    touch $Tmp
 
-   set lcc = $CCompiler
+   set lcl = ( `echo "$CCompiler" | sed 's|:| |g'` )
+   set lcc = $lcl[1]
+   unset lcl
    switch ($lcc)
       case clang:
            set lcc = clang
