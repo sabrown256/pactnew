@@ -2071,9 +2071,9 @@ static void parse_features(char *t, int nc, int np, char *ft)
  */
 
 static void do_platform(client *cl, char *oper, char *value)
-   {int is;
+   {int is, ncc;
     char t[BFLRG], cfg[BFSML], sid[BFSML];
-    char *p, *sib, **spec;
+    char *p, *ccl, *sib, **cca, **spec;
 
     gst.np++;
 
@@ -2113,6 +2113,15 @@ static void do_platform(client *cl, char *oper, char *value)
     for ( ; spec[is] != NULL; is++)
         vstrcat(t, BFLRG, " %s", spec[is]);
 
+/* see if PSY_Platform_Compilers has a specified compiler
+ * the base config will have been taken care of earlier
+ */
+    ccl = dbget(cl, TRUE, "PSY_Platform_Compilers");
+    cca = tokenize(ccl, " \t\n\r", 0);
+    ncc = lst_length(cca);
+    if (gst.np < ncc)
+       vstrcat(t, BFLRG, " -cc %s", cca[gst.np]);
+
 /* finish up with config file */
     if (strcmp(cfg, "none") != 0)
        vstrcat(t, BFLRG, " %s", cfg);
@@ -2129,6 +2138,7 @@ static void do_platform(client *cl, char *oper, char *value)
        dbset(cl, "PSY_Platforms", "%s:%s(%s)", p, cfg, sid);
 
     free_strings(spec);
+    free_strings(cca);
 
     return;}
 
