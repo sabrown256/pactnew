@@ -19,257 +19,258 @@
    touch $Tmp
 
    set lcl = ( `echo "$CCompiler" | sed 's|:| |g'` )
-   set lcc = $lcl[1]
-   unset lcl
-   switch ($lcc)
-      case clang:
-           set lcc = clang
-           breaksw
-      case gnu:
-           set lcc = gcc
-           breaksw
-      case intel:
-           set lcc = icc
-           breaksw
-      case open64:
-           set lcc = opencc
-           breaksw
-      case path:
-           set lcc = pathcc
-           breaksw
-      case pgi:
-           set lcc = pgcc
-           breaksw
-      case sun:
-           set lcc = suncc
-           breaksw
-   endsw
+   foreach lcc ($lcl)
+
+      switch ($lcc)
+         case clang:
+              set lcc = clang
+              breaksw
+         case gnu:
+              set lcc = gcc
+              breaksw
+         case intel:
+              set lcc = icc
+              breaksw
+         case open64:
+              set lcc = opencc
+              breaksw
+         case path:
+              set lcc = pathcc
+              breaksw
+         case pgi:
+              set lcc = pgcc
+              breaksw
+         case sun:
+              set lcc = suncc
+              breaksw
+      endsw
 
 # build the config off the operating system
-   echo "include spokes" >>& $Tmp
-   switch ($los)
+      echo "include spokes" >>& $Tmp
+      switch ($los)
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # ONE_OF - handle OSes with only one compiler option
 
-      case aix:
-           set cfg = "$cfg-$Bits"
-           echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/xlc-aix" >>& $Tmp
-           breaksw
-      case beos:
-      case haiku:
-           set cfg = "$cfg-$Bits"
-           echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/gnu-lnx" >>& $Tmp
-           breaksw
-      case cygwin*:
-           set ladv = ""
-           set ladv = ${ladv}:psh_dorun:psh_verify
-           set ladv = ${ladv}:score_mpi:score_error
-           set ladv = ${ladv}:pml_perf:pml_nan:pml_fpe:pml_interp
-           echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/gnu-cygwin" >>& $Tmp
-           echo "Group TEST {" >>& $Tmp
-           echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
-           echo "}" >>& $Tmp
-           unset ladv
-           breaksw
-      case freebsd:
-           echo "run std/use-compiler $lcc" >>& $Tmp
-           echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/gnu-freebsd" >>& $Tmp
-           echo "include features/no-sql" >>& $Tmp
-           breaksw
-      case gnu:
-           echo "run std/use-compiler $lcc" >>& $Tmp
-           echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/gnu-hurd" >>& $Tmp
-           breaksw
-      case hp-ux*:
-           echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/hpux" >>& $Tmp
-           breaksw
-      case irix*:
-           echo "include ${Bits}-bit" >>& $Tmp
-           echo "include cpp-rule" >>& $Tmp
-           echo "include compilers/irix" >>& $Tmp
-           breaksw
-      case osf1:
-           echo "include ${Bits}-bit" >>& $Tmp
-           echo "include compilers/osf" >>& $Tmp
-           breaksw
-      case sunos:
-           set CCSys = `where cc |& head -n 1`
-           set CCRoot = $CCSys:h
-           set CCRoot = $CCRoot:h
-           echo "include ${Bits}-bit" >>& $Tmp
-           echo "Group PACT {" >>& $Tmp
-           echo "   CC_PATH = $CCRoot" >>& $Tmp
-           echo "   FC_PATH = $CCRoot" >>& $Tmp
-           echo "}" >>& $Tmp
-           if (-x "$CCSys") then
-              $CCSys -v |& grep gcc >& /dev/null
-              if ($status == 0) then
-                 echo "include compilers/gnu-sol" >>& $Tmp
-              else
-                 echo "include compilers/sol" >>& $Tmp
+         case aix:
+              set cfg = "$cfg-$Bits"
+              echo "include ${Bits}-bit" >>& $Tmp
+              echo "include compilers/xlc-aix" >>& $Tmp
+              breaksw
+         case beos:
+         case haiku:
+              set cfg = "$cfg-$Bits"
+              echo "include ${Bits}-bit" >>& $Tmp
+              echo "include compilers/gnu-lnx" >>& $Tmp
+              breaksw
+         case cygwin*:
+              set ladv = ""
+              set ladv = ${ladv}:psh_dorun:psh_verify
+              set ladv = ${ladv}:score_mpi:score_error
+              set ladv = ${ladv}:pml_perf:pml_nan:pml_fpe:pml_interp
+              echo "include ${Bits}-bit" >>& $Tmp
+              echo "include compilers/gnu-cygwin" >>& $Tmp
+              echo "Group TEST {" >>& $Tmp
+              echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+              echo "}" >>& $Tmp
+              unset ladv
+              breaksw
+         case freebsd:
+              echo "run std/use-compiler $lcc" >>& $Tmp
+              echo "include ${Bits}-bit" >>& $Tmp
+              echo "include compilers/gnu-freebsd" >>& $Tmp
+              echo "include features/no-sql" >>& $Tmp
+              breaksw
+         case gnu:
+              echo "run std/use-compiler $lcc" >>& $Tmp
+              echo "include ${Bits}-bit" >>& $Tmp
+              echo "include compilers/gnu-hurd" >>& $Tmp
+              breaksw
+         case hp-ux*:
+              echo "include ${Bits}-bit" >>& $Tmp
+              echo "include compilers/hpux" >>& $Tmp
+              breaksw
+         case irix*:
+              echo "include ${Bits}-bit" >>& $Tmp
+              echo "include cpp-rule" >>& $Tmp
+              echo "include compilers/irix" >>& $Tmp
+              breaksw
+         case osf1:
+              echo "include ${Bits}-bit" >>& $Tmp
+              echo "include compilers/osf" >>& $Tmp
+              breaksw
+         case sunos:
+              set CCSys = `where cc |& head -n 1`
+              set CCRoot = $CCSys:h
+              set CCRoot = $CCRoot:h
+              echo "include ${Bits}-bit" >>& $Tmp
+              echo "Group PACT {" >>& $Tmp
+              echo "   CC_PATH = $CCRoot" >>& $Tmp
+              echo "   FC_PATH = $CCRoot" >>& $Tmp
+              echo "}" >>& $Tmp
+              if (-x "$CCSys") then
+                 $CCSys -v |& grep gcc >& /dev/null
+                 if ($status == 0) then
+                    echo "include compilers/gnu-sol" >>& $Tmp
+                 else
+                    echo "include compilers/sol" >>& $Tmp
+                 endif
               endif
-           endif
-           echo "Group TEST {" >>& $Tmp
-           echo '   ADVISORY = ${TEST_ADVISORY}:score_mpi' >>& $Tmp
-           echo "}" >>& $Tmp
-           breaksw
+              echo "Group TEST {" >>& $Tmp
+              echo '   ADVISORY = ${TEST_ADVISORY}:score_mpi' >>& $Tmp
+              echo "}" >>& $Tmp
+              breaksw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # DARWIN - multi-compiler OS
 
-      case darwin:
+         case darwin:
 
 # get the main compiler family
-           switch ($lcc)
-              case clang:
-                   set lcfam = clang-osx
-                   breaksw
-              case *intel:
-              case *icc*:
-                   set lcfam = icc-osx
-                   breaksw
-              case *pgi:
-              case *pgcc*:
-                   set lcfam = pgi-osx
-                   breaksw
-              default:
-              case *gnu:
-              case *gcc*:
-                   set lcfam = gnu-osx
-                   breaksw
-           endsw
+              switch ($lcc)
+                 case clang:
+                      set lcfam = clang-osx
+                      breaksw
+                 case *intel:
+                 case *icc*:
+                      set lcfam = icc-osx
+                      breaksw
+                 case *pgi:
+                 case *pgcc*:
+                      set lcfam = pgi-osx
+                      breaksw
+                 default:
+                 case *gnu:
+                 case *gcc*:
+                      set lcfam = gnu-osx
+                      breaksw
+              endsw
 
 # build the config off the compiler and compiler family
-           switch ($lcc)
-              default:
-              case clang:
-              case *intel:
-              case *icc*:
-              case *pgi:
-              case *pgcc*:
-              case *gcc*:
-                   echo "include ${Bits}-bit" >>& $Tmp
-                   echo "run std/use-compiler $lcc" >>& $Tmp
-                   echo "include compilers/$lcfam" >>& $Tmp
-                   echo "include no-opengl" >>& $Tmp
-                   breaksw
-           endsw
+              switch ($lcc)
+                 default:
+                 case clang:
+                 case *intel:
+                 case *icc*:
+                 case *pgi:
+                 case *pgcc*:
+                 case *gcc*:
+                      echo "include ${Bits}-bit" >>& $Tmp
+                      echo "run std/use-compiler $lcc" >>& $Tmp
+                      echo "include compilers/$lcfam" >>& $Tmp
+                      echo "include no-opengl" >>& $Tmp
+                      breaksw
+              endsw
 
-           set ladv = ""
-           set ladv = ${ladv}:score_mpi:score_mk_async
-           set ladv = ${ladv}:pml_perf
-           set ladv = ${ladv}:ppc_pty_interrupt
-           set ladv = ${ladv}:sx_hdf
-           echo "Group TEST {" >>& $Tmp
-           echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
-           echo "}" >>& $Tmp
-           unset ladv
-           breaksw
+              set ladv = ""
+              set ladv = ${ladv}:score_mpi:score_mk_async
+              set ladv = ${ladv}:pml_perf
+              set ladv = ${ladv}:ppc_pty_interrupt
+              set ladv = ${ladv}:sx_hdf
+              echo "Group TEST {" >>& $Tmp
+              echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+              echo "}" >>& $Tmp
+              unset ladv
+              breaksw
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # LINUX - multi-compiler OS
 
-      default:
-      case linux:
+         default:
+         case linux:
 
 # get the main compiler family
-           switch ($lcc)
-              case clang:
-                   set lcfam = clang-lnx
-                   breaksw
-              case *intel:
-              case *icc:
-                   set lcfam = icc-lnx
-                   breaksw
-              case *mingw*:
-                   set lcfam = mingw-lnx
-                   breaksw
-              case *open64:
-              case *opencc:
-                   set lcfam = open64-lnx
-                   breaksw
-              case *path:
-              case *pathcc:
-                   set lcfam = path
-                   breaksw
-              case *pgi:
-              case *pgcc:
-                   set lcfam = pgi-lnx
-                   breaksw
-	      case *sun:
-	      case *suncc:
-                   set lcfam = sun
-                   breaksw
-	      case *xlc*:
-                   set lcfam = xlc-lnx
-                   breaksw
-              default:
-              case *gnu:
-              case *gcc:
-                   set lcfam = gnu-lnx
-                   breaksw
-           endsw
+              switch ($lcc)
+                 case clang:
+                      set lcfam = clang-lnx
+                      breaksw
+                 case *intel:
+                 case *icc:
+                      set lcfam = icc-lnx
+                      breaksw
+                 case *mingw*:
+                      set lcfam = mingw-lnx
+                      breaksw
+                 case *open64:
+                 case *opencc:
+                      set lcfam = open64-lnx
+                      breaksw
+                 case *path:
+                 case *pathcc:
+                      set lcfam = path
+                      breaksw
+                 case *pgi:
+                 case *pgcc:
+                      set lcfam = pgi-lnx
+                      breaksw
+                 case *sun:
+                 case *suncc:
+                      set lcfam = sun
+                      breaksw
+                 case *xlc*:
+                      set lcfam = xlc-lnx
+                      breaksw
+                 default:
+                 case *gnu:
+                 case *gcc:
+                      set lcfam = gnu-lnx
+                      breaksw
+              endsw
 
 # build the config off the compiler and compiler family
-           switch ($lcc)
-              case *mingw*:
-                   echo "include ${Bits}-bit" >>& $Tmp
-                   echo "include auto-win" >>& $Tmp
-                   breaksw
+              switch ($lcc)
+                 case *mingw*:
+                      echo "include ${Bits}-bit" >>& $Tmp
+                      echo "include auto-win" >>& $Tmp
+                      breaksw
 
-              case gnu-bgl:
-              case gnu-bgp:
-              case gnu-bgq:
-              case gnu-cxe:
-              case pgi-cxe:
-              case xlc-bgl:
-              case xlc-bgp:
-              case xlc-bgq:
-              case mp-gnu-bgl:
-              case mp-gnu-bgp:
-              case mp-gnu-bgq:
-              case mp-gnu-cxe:
-              case mp-gnu-win:
-              case mp-pgi-cxe:
-              case mp-xlc-bgl:
-              case mp-xlc-bgp:
-              case mp-xlc-bgq:
-                   echo "include ${Bits}-bit" >>& $Tmp
-                   echo "include auto-$lcc" >>& $Tmp
-                   breaksw
+                 case gnu-bgl:
+                 case gnu-bgp:
+                 case gnu-bgq:
+                 case gnu-cxe:
+                 case pgi-cxe:
+                 case xlc-bgl:
+                 case xlc-bgp:
+                 case xlc-bgq:
+                 case mp-gnu-bgl:
+                 case mp-gnu-bgp:
+                 case mp-gnu-bgq:
+                 case mp-gnu-cxe:
+                 case mp-gnu-win:
+                 case mp-pgi-cxe:
+                 case mp-xlc-bgl:
+                 case mp-xlc-bgp:
+                 case mp-xlc-bgq:
+                      echo "include ${Bits}-bit" >>& $Tmp
+                      echo "include auto-$lcc" >>& $Tmp
+                      breaksw
 
-              default:
-              case clang:
-              case *gnu:
-              case *gcc:
-              case *intel:
-              case *icc:
-              case *opencc:
-              case *path:
-              case *pathcc:
-              case *pgi:
-              case *pgcc:
-	      case *sun:
-	      case *suncc:
-              case *xlc*:
-                   echo "include ${Bits}-bit" >>& $Tmp
-                   echo "run std/use-compiler $lcc" >>& $Tmp
-		   echo "include compilers/$lcfam" >>& $Tmp
-                   unset lcc
-                   breaksw
-           endsw
-           breaksw
-   endsw
+                 default:
+                 case clang:
+                 case *gnu:
+                 case *gcc:
+                 case *intel:
+                 case *icc:
+                 case *opencc:
+                 case *path:
+                 case *pathcc:
+                 case *pgi:
+                 case *pgcc:
+                 case *sun:
+                 case *suncc:
+                 case *xlc*:
+                      echo "include ${Bits}-bit" >>& $Tmp
+                      echo "run std/use-compiler $lcc" >>& $Tmp
+                      echo "include compilers/$lcfam" >>& $Tmp
+                      unset lcc
+                      breaksw
+              endsw
+              breaksw
+      endsw
+   end

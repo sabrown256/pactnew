@@ -152,11 +152,11 @@ static void _SX_expand_prefix(char *s, int nc)
 static char *_SX_reproc_in(SS_psides *si, char *line)
    {char *rv;
 
-    if (!SX_split_command(_SX.command, MAXLINE, line))
-       rv = NULL;
+    rv = NULL;
 
-    else
-       {if (!SX_expand_expr(_SX.command))
+    if (line != NULL)
+       {SC_strncpy(_SX.command, MAXLINE, line, -1);
+	if (!SX_expand_expr(_SX.command))
            SS_error(si, "SYNTAX ERROR - _SX_REPROC_IN", SS_null);
 
         _SX_expand_prefix(_SX.command, MAXLINE);

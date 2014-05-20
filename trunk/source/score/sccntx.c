@@ -16,6 +16,7 @@
 
 #include "score_int.h"
 #include "scope_proc.h"
+#include "scope_mem.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -73,10 +74,10 @@ int SC_register_context(void *f, void *a, int nb)
 	if (hp != NULL)
 	   cd = hp->def;
 	else
-	   {cd = CMAKE(SC_contextdes);
+	   {cd = CPMAKE(SC_contextdes, 3);
 	    if (cd != NULL)
-	       {cd->f  = f;
-		cd->a  = a;
+	       {cd->f = f;
+		cd->a = a;
 	    cd->nb = nb;};};
 
 	hp = SC_hasharr_install(ha, f, cd, SC_POINTER_S, 2, -1);
