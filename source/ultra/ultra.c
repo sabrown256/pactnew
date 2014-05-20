@@ -210,26 +210,24 @@ static void _UL_expand_prefix(char *s)
 
 static char *_UL_reproc_in(SS_psides *si, char *line)
    {char *rv;
-    static char command[MAXLINE];
 
     rv = NULL;
 
-    if (SX_split_command(command, MAXLINE, line))
-       {if (!SX_expand_expr(command))
-           SS_error(si, "SYNTAX ERROR - _UL_REPROC_IN", SS_null);
+    if (!SX_expand_expr(line))
+       SS_error(si, "SYNTAX ERROR - _UL_REPROC_IN", SS_null);
 
-        _UL_expand_prefix(command);
+    _UL_expand_prefix(line);
 
 /* if it's already a list tell the parser to do nothing - it's already
  * done everything necessary
  */
-        if (command[0] != '(')
-	   {SX_wrap_paren("(", command, ")", MAXLINE);
+    if (line[0] != '(')
+       {SX_wrap_paren("(", line, ")", MAXLINE);
 
-	    if (SX_gs.command_log != NULL)
-	       PRINT(SX_gs.command_log, "%s\n", command);
+	if (SX_gs.command_log != NULL)
+	   PRINT(SX_gs.command_log, "%s\n", line);
 
-	    rv = command;};};
+	rv = line;};
 
     return(rv);}
 

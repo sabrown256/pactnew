@@ -523,7 +523,9 @@ void SX_parse(SS_psides *si,
 	      object *(*replot)(SS_psides *si),
 	      char *(*reproc)(SS_psides *si, char *s),
 	      object *strm)
-   {char *t, s[MAXLINE], line[MAXLINE], *ptr;
+   {int i, nl;
+    char s[MAXLINE];
+    char *t, *ptr, **sa;
     
     if (SS_procedurep(si->evobj))
        {strcpy(s, SS_PP(si->evobj, name));
@@ -534,15 +536,20 @@ void SX_parse(SS_psides *si,
                 *SS_BUFFER(strm) = '\0';
                 SS_PTR(strm) = SS_BUFFER(strm);}
             else
-               {strcpy(line, ptr);
-                while ((t = (*reproc)(si, line)) != NULL)
-                  {strcpy(ptr, t);
-                   SS_PTR(strm) = SS_BUFFER(strm);
-                   SS_assign(si, si->rdobj, SS_read(si, strm));
-                   si->interactive = ON;
-                   SX_gs.plot_flag = TRUE;
-                   SS_assign(si, si->evobj, SS_eval(si, si->rdobj));
-                   si->interactive = OFF;};
+	       {sa = PS_tokenize(ptr, ";\n", 0);
+		nl = PS_lst_length(sa);
+		for (i = 0; i < nl; i++)
+		    {t = (*reproc)(si, sa[i]);
+		     if (t != NULL)
+		        {strcpy(ptr, t);
+			 SS_PTR(strm) = SS_BUFFER(strm);
+			 SS_assign(si, si->rdobj, SS_read(si, strm));
+			 si->interactive = ON;
+			 SX_gs.plot_flag = TRUE;
+			 SS_assign(si, si->evobj, SS_eval(si, si->rdobj));
+			 si->interactive = OFF;};};
+		    
+		PS_free_strings(sa);
 
                 if (SX_gs.plot_flag && (strcmp(s, "replot") != 0) &&
                     (SX_gs.autoplot == ON) &&
@@ -552,7 +559,6 @@ void SX_parse(SS_psides *si,
     if (PG_gs.console != NULL)
        PG_gs.console->gprint_flag = TRUE;
 
-/*    for (t = SS_BUFFER(strm); *t; t++); */
     for (t = SS_PTR(strm); *t == '\n'; t++);
     SS_PTR(strm) = t;
 

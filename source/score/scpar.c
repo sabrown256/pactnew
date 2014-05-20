@@ -332,7 +332,7 @@ static void _SC_init_thread(SC_smp_state *pa, int id)
 
     pa->ev  = NULL;
 
-    pa->proc = CMAKE(SC_thread_proc);
+    pa->proc = CPMAKE(SC_thread_proc, 3);
     _SC_init_thr_processes(pa->proc, id);
 
     return;}
