@@ -1,3 +1,4 @@
+#!/bin/csh -f
 #
 # CFG-BASE - common code to generate the main part of a config
 #          - from OS, Compiler, and bits
@@ -8,18 +9,86 @@
 # include "cpyright.h"
 #
 
+unalias *
+
+@ err = 0
+
+set lbts = ""
+set cf   = /dev/stdout
+set clst = ""
+set ilst = ""
+set gdir = $cwd
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: cfg-base [-bits <bits>] [-gdir <dir>] [-h] [-i <inst>] [-o <outfile>] <cc>"
+           echo "   bits   number of bits in address"
+           echo "   h      this help message"
+           echo "   o      the output config file name"
+           echo "   <cc>   := <compiler>[:<compiler>]*"
+           echo "   <inst> := <instdir>[:<instdir>]*"
+           echo ""
+           exit(1)
+      case -bits:
+           shift
+           set lbts = $1
+           breaksw
+      case -gdir:
+           shift
+           set gdir = $1
+           breaksw
+      case -i:
+           shift
+           set ilst = ( $ilst `echo $1 | sed 's|:| |g'` )
+           breaksw
+      case -o:
+           shift
+           set cf = $1
+           breaksw
+      default:
+           set clst = ( $clst `echo $1 | sed 's|:| |g'` )
+           breaksw
+   endsw
+   shift
+end
+
+if ("$clst" == "") then
+   set clst = gnu
+endif
+
 # NOTE: use node name for config file base
 # if multiple hosts have the same PSY_TYPE there will be contention
 # over the file - the node name is truly host specific
-   set cfg = `uname -n | tr "[A-Z]" "[a-z]" | sed 's/\..*\..*$//'`
    set los = `uname -s | tr "[A-Z]" "[a-z]"`
    set lhw = `uname -m | tr "[A-Z]" "[a-z]"`
 
-   rm -f $Tmp
-   touch $Tmp
+   set instb = none
+   if ("$ilst" == "") then
+      @ ni = 0
+   else
+      @ ni = $#ilst
+   endif
 
-   set lcl = ( `echo "$CCompiler" | sed 's|:| |g'` )
-   foreach lcc ($lcl)
+   @ ic = 0
+   @ nc = $#clst
+   while ($ic < $nc)
+      @ ic = $ic + 1
+
+      set lcc = $clst[$ic]
+
+# get the installation base directory name
+      if ("$ilst" == "") then
+         set instb = none
+      else if ($ic <= $ni) then
+         set instb = $ilst[$ic]
+      else if ($ic == 1) then
+         set instb = $ilst[1]
+      else if ("$instb" != none) then
+         @ ii = $ic - 1
+         set instb = `echo $instb:r.$ii | sed 's| ||g'`
+      endif
 
       switch ($lcc)
          case clang:
@@ -45,8 +114,20 @@
               breaksw
       endsw
 
+      if ($cf != /dev/stdout) then
+         rm -f $cf
+         touch $cf
+      endif
+
+      if ($ic > 1) then
+         set pf = $gdir/$cf:t.$ic
+         echo "platform $pf $instb -cc $lcc" >>& $cf
+      else
+         set pf = $cf
+      endif
+
 # build the config off the operating system
-      echo "include spokes" >>& $Tmp
+      echo "include spokes" >>& $pf
       switch ($los)
 
 #--------------------------------------------------------------------------
@@ -55,72 +136,88 @@
 # ONE_OF - handle OSes with only one compiler option
 
          case aix:
-              set cfg = "$cfg-$Bits"
-              echo "include ${Bits}-bit" >>& $Tmp
-              echo "include compilers/xlc-aix" >>& $Tmp
+              if ("$lbts" != "") then
+                 echo "include ${lbts}-bit" >>& $pf
+              endif
+              echo "include compilers/xlc-aix" >>& $pf
               breaksw
          case beos:
          case haiku:
-              set cfg = "$cfg-$Bits"
-              echo "include ${Bits}-bit" >>& $Tmp
-              echo "include compilers/gnu-lnx" >>& $Tmp
+              if ("$lbts" != "") then
+                 echo "include ${lbts}-bit" >>& $pf
+              endif
+              echo "include compilers/gnu-lnx" >>& $pf
               breaksw
          case cygwin*:
               set ladv = ""
               set ladv = ${ladv}:psh_dorun:psh_verify
               set ladv = ${ladv}:score_mpi:score_error
               set ladv = ${ladv}:pml_perf:pml_nan:pml_fpe:pml_interp
-              echo "include ${Bits}-bit" >>& $Tmp
-              echo "include compilers/gnu-cygwin" >>& $Tmp
-              echo "Group TEST {" >>& $Tmp
-              echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
-              echo "}" >>& $Tmp
+              if ("$lbts" != "") then
+                 echo "include ${lbts}-bit" >>& $pf
+              endif
+              echo "include compilers/gnu-cygwin" >>& $pf
+              echo "Group TEST {" >>& $pf
+              echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $pf
+              echo "}" >>& $pf
               unset ladv
               breaksw
          case freebsd:
-              echo "run std/use-compiler $lcc" >>& $Tmp
-              echo "include ${Bits}-bit" >>& $Tmp
-              echo "include compilers/gnu-freebsd" >>& $Tmp
-              echo "include features/no-sql" >>& $Tmp
+              echo "run std/use-compiler $lcc" >>& $pf
+              if ("$lbts" != "") then
+                 echo "include ${lbts}-bit" >>& $pf
+              endif
+              echo "include compilers/gnu-freebsd" >>& $pf
+              echo "include features/no-sql" >>& $pf
               breaksw
          case gnu:
-              echo "run std/use-compiler $lcc" >>& $Tmp
-              echo "include ${Bits}-bit" >>& $Tmp
-              echo "include compilers/gnu-hurd" >>& $Tmp
+              echo "run std/use-compiler $lcc" >>& $pf
+              if ("$lbts" != "") then
+                 echo "include ${lbts}-bit" >>& $pf
+              endif
+              echo "include compilers/gnu-hurd" >>& $pf
               breaksw
          case hp-ux*:
-              echo "include ${Bits}-bit" >>& $Tmp
-              echo "include compilers/hpux" >>& $Tmp
+              if ("$lbts" != "") then
+                 echo "include ${lbts}-bit" >>& $pf
+              endif
+              echo "include compilers/hpux" >>& $pf
               breaksw
          case irix*:
-              echo "include ${Bits}-bit" >>& $Tmp
-              echo "include cpp-rule" >>& $Tmp
-              echo "include compilers/irix" >>& $Tmp
+              if ("$lbts" != "") then
+                 echo "include ${lbts}-bit" >>& $pf
+              endif
+              echo "include cpp-rule" >>& $pf
+              echo "include compilers/irix" >>& $pf
               breaksw
          case osf1:
-              echo "include ${Bits}-bit" >>& $Tmp
-              echo "include compilers/osf" >>& $Tmp
+              if ("$lbts" != "") then
+                 echo "include ${lbts}-bit" >>& $pf
+              endif
+              echo "include compilers/osf" >>& $pf
               breaksw
          case sunos:
-              set CCSys = `where cc |& head -n 1`
-              set CCRoot = $CCSys:h
-              set CCRoot = $CCRoot:h
-              echo "include ${Bits}-bit" >>& $Tmp
-              echo "Group PACT {" >>& $Tmp
-              echo "   CC_PATH = $CCRoot" >>& $Tmp
-              echo "   FC_PATH = $CCRoot" >>& $Tmp
-              echo "}" >>& $Tmp
-              if (-x "$CCSys") then
-                 $CCSys -v |& grep gcc >& /dev/null
+              set lccsys  = `where cc |& head -n 1`
+              set lccroot = $lccsys:h
+              set lccroot = $lccroot:h
+              if ("$lbts" != "") then
+                 echo "include ${lbts}-bit" >>& $pf
+              endif
+              echo "Group PACT {" >>& $pf
+              echo "   CC_PATH = $lccroot" >>& $pf
+              echo "   FC_PATH = $lccroot" >>& $pf
+              echo "}" >>& $pf
+              if (-x "$lccsys") then
+                 $lccsys -v |& grep gcc >& /dev/null
                  if ($status == 0) then
-                    echo "include compilers/gnu-sol" >>& $Tmp
+                    echo "include compilers/gnu-sol" >>& $pf
                  else
-                    echo "include compilers/sol" >>& $Tmp
+                    echo "include compilers/sol" >>& $pf
                  endif
               endif
-              echo "Group TEST {" >>& $Tmp
-              echo '   ADVISORY = ${TEST_ADVISORY}:score_mpi' >>& $Tmp
-              echo "}" >>& $Tmp
+              echo "Group TEST {" >>& $pf
+              echo '   ADVISORY = ${TEST_ADVISORY}:score_mpi' >>& $pf
+              echo "}" >>& $pf
               breaksw
 
 #--------------------------------------------------------------------------
@@ -159,10 +256,12 @@
                  case *pgi:
                  case *pgcc*:
                  case *gcc*:
-                      echo "include ${Bits}-bit" >>& $Tmp
-                      echo "run std/use-compiler $lcc" >>& $Tmp
-                      echo "include compilers/$lcfam" >>& $Tmp
-                      echo "include no-opengl" >>& $Tmp
+                      if ("$lbts" != "") then
+                         echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      echo "run std/use-compiler $lcc" >>& $pf
+                      echo "include compilers/$lcfam" >>& $pf
+                      echo "include no-opengl" >>& $pf
                       breaksw
               endsw
 
@@ -171,9 +270,9 @@
               set ladv = ${ladv}:pml_perf
               set ladv = ${ladv}:ppc_pty_interrupt
               set ladv = ${ladv}:sx_hdf
-              echo "Group TEST {" >>& $Tmp
-              echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
-              echo "}" >>& $Tmp
+              echo "Group TEST {" >>& $pf
+              echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $pf
+              echo "}" >>& $pf
               unset ladv
               breaksw
 
@@ -189,6 +288,22 @@
               switch ($lcc)
                  case clang:
                       set lcfam = clang-lnx
+                      breaksw
+                 case *mpicc*:
+                      if ("$lbts" != "") then
+                         echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      echo "run std/use-compiler $lcc" >>& $pf
+                      echo "include features/gnu-bgq-set" >>& $pf
+                      set lcc = none
+                      breaksw
+                 case *mpgcc*:
+                      if ("$lbts" != "") then
+                         echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      echo "run std/use-compiler $lcc" >>& $pf
+                      echo "include features/gnu-bgl-set" >>& $pf
+                      set lcc = none
                       breaksw
                  case *intel:
                  case *icc:
@@ -225,9 +340,13 @@
 
 # build the config off the compiler and compiler family
               switch ($lcc)
+                 case none:
+                      breaksw
                  case *mingw*:
-                      echo "include ${Bits}-bit" >>& $Tmp
-                      echo "include auto-win" >>& $Tmp
+                      if ("$lbts" != "") then
+                         echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      echo "include auto-win" >>& $pf
                       breaksw
 
                  case gnu-bgl:
@@ -247,8 +366,10 @@
                  case mp-xlc-bgl:
                  case mp-xlc-bgp:
                  case mp-xlc-bgq:
-                      echo "include ${Bits}-bit" >>& $Tmp
-                      echo "include auto-$lcc" >>& $Tmp
+                      if ("$lbts" != "") then
+                         echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      echo "include auto-$lcc" >>& $pf
                       breaksw
 
                  default:
@@ -265,12 +386,16 @@
                  case *sun:
                  case *suncc:
                  case *xlc*:
-                      echo "include ${Bits}-bit" >>& $Tmp
-                      echo "run std/use-compiler $lcc" >>& $Tmp
-                      echo "include compilers/$lcfam" >>& $Tmp
+                      if ("$lbts" != "") then
+                         echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      echo "run std/use-compiler $lcc" >>& $pf
+                      echo "include compilers/$lcfam" >>& $pf
                       unset lcc
                       breaksw
               endsw
               breaksw
       endsw
    end
+
+exit($err)

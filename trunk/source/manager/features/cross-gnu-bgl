@@ -1,5 +1,5 @@
 #
-# CROSS-GNU-BGP - add GNU-BGP as a CROSS-COMPILEd second platform 
+# CROSS-GNU-BGL - add GNU-BGL as a CROSS-COMPILEd second platform 
 #
 
 platform auto-gnu-bgp-mpi  ${PSY_InstRoot}-mpi

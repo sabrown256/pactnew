@@ -1,3 +1,4 @@
+#!/bin/csh -f
 #
 # CFG-FEATURES - common code to generate the feature list of a config
 #
@@ -7,19 +8,87 @@
 # include "cpyright.h"
 #
 
+unalias *
+
+@ err = 0
+
+set flst    = ""
+set cfg     = gen
+set mpi     = FALSE
+set pydir   = ""
+set pyexe   = "python"
+set python  = FALSE
+set openmp  = FALSE
+set shared  = FALSE
+set pthread = FALSE
+set outf    = /dev/stdout
+set vrb     = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -bits:
+           shift
+           set bits = $1
+           breaksw
+      case -c:
+           shift
+           set cfg = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: cfg-features [-h] [-o <file>] <features>*"
+           echo "   h   this help message"
+           echo "   o   append results to config file <file>"
+           echo ""
+           exit(1)
+           breaksw
+      case -epy:
+           shift
+           set pyexe  = $1
+           set python = TRUE
+           breaksw
+      case -o:
+           shift
+           set outf = $1
+           breaksw
+      case -mpi:
+           set mpi = TRUE
+           breaksw
+      case -py:
+           set python = TRUE
+           breaksw
+      case -s:
+           set openmp = TRUE
+           breaksw
+      case -sl:
+           set shared = TRUE
+           breaksw
+      case -t:
+           set pthread = TRUE
+           breaksw
+      case -v:
+           set vrb = TRUE
+           breaksw
+      default:
+           set flst = ( $flst $1 )
+           breaksw
+   endsw
+   shift
+end
+
 # expand delimiters to spaces
 set flst = ( `echo $flst | sed 's/,/ /g'` )
 
 foreach f ($flst)
    if (-f features/$f) then
-      echo "include features/$f" >> $Tmp
+      echo "include features/$f" >> $outf
    else if ($vrb == TRUE) then
       echo "unknown feature $f - ignored"
    endif
 end
 
 if ($mpi == TRUE) then
-   echo "include mpi" >> $Tmp
+   echo "include mpi" >> $outf
    set cfg = "$cfg-mpi"
    if ($vrb == TRUE) then
       echo "   add mpi"
@@ -28,16 +97,16 @@ endif
 
 if ($python == TRUE) then
    if (("$pyexe" != "") || ("$pydir" != "")) then
-      echo "Group Python {" >> $Tmp
+      echo "Group Python {" >> $outf
       if ("$pyexe" != "") then
-         echo "   Exe  = $pyexe" >> $Tmp
+         echo "   Exe  = $pyexe" >> $outf
       endif
       if ("$pydir" != "") then
-         echo "   Path = $pydir" >> $Tmp
+         echo "   Path = $pydir" >> $outf
       endif
-      echo "}" >> $Tmp
+      echo "}" >> $outf
    endif
-   echo "include python" >> $Tmp
+   echo "include python" >> $outf
    set cfg = "$cfg-py"
    if ($vrb == TRUE) then
       echo "   add python"
@@ -45,7 +114,7 @@ if ($python == TRUE) then
 endif
 
 if (($shared == TRUE) && ($python == FALSE)) then
-   echo "include shared" >> $Tmp
+   echo "include shared" >> $outf
    set cfg = "$cfg-sl"
    if ($vrb == TRUE) then
       echo "   add shared library support"
@@ -53,7 +122,7 @@ if (($shared == TRUE) && ($python == FALSE)) then
 endif
 
 if (($pthread == TRUE) && ($openmp == FALSE)) then
-   echo "include pthread" >> $Tmp
+   echo "include pthread" >> $outf
    set cfg = "$cfg-t"
    if ($vrb == TRUE) then
       echo "   add pthread"
@@ -61,10 +130,13 @@ if (($pthread == TRUE) && ($openmp == FALSE)) then
 endif
 
 if (($openmp == TRUE) && ($pthread == FALSE)) then
-   echo "include openmp" >> $Tmp
+   echo "include openmp" >> $outf
    set cfg = "$cfg-s"
    if ($vrb == TRUE) then
       echo "   add openmp"
    endif
 endif
 
+echo "$cfg"
+
+exit($err)

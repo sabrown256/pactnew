@@ -1,0 +1,13 @@
+#
+# GNU-BGL-SET - feature set for 32 bit BG/L configuration with GNU
+#
+# include "cpyright.h"
+#
+
+run analyze/locate-mpi ibm bgl
+
+include compilers/gnu-bgl
+include no-jpeg
+include no-png
+include no-libz
+

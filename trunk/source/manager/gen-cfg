@@ -14,22 +14,30 @@ set Err  = 0
 set cfg  = ""
 set vrb  = FALSE
 set flst = ""
+set clst = ""
+set blst = ""
 
 while ($#argv > 0)
    switch ($1)
+      case -cc:
+           shift
+           set clst = ( $clst $1 )
+           breaksw
       case -f:
            shift
            set flst = ( $flst $1 )
            breaksw
       case -h:
            echo ""
-           echo "Usage: gen-cfg [-f <feature>[,<feature>]*] [-h] [-v] <name>"
+           echo "Usage: gen-cfg [-cc [<cc>[:<cc>]*] [-f <feature>[,<feature>]*] [-h] [-v] <name>"
+           echo "  cc  compilers for which to generate configs"
            echo "  h   this help message"
            echo "  v   verbose mode"
            echo ""
            exit(1)
       case -v:
-           set vrb = TRUE
+           set vrb  = TRUE
+           set flst = ( $flst -v )
            breaksw
       default:
            set cfg = $1
@@ -38,8 +46,8 @@ while ($#argv > 0)
    shift
 end
 
-if ($?CCompiler == 0) then
-   setenv CCompiler  gnu
+if ("$clst" == "") then
+   set clst = gnu
 endif
 
 set flst = ( `echo "$flst" | sed 's/,/ /g'` )
@@ -84,21 +92,27 @@ foreach i ($features)
       case 32:
       case 64:
            setenv bits $i
-           breaksw
-      case t:
-           set pthread = TRUE
-           breaksw
-      case s:
-           set openmp = TRUE
-           breaksw
-      case sl:
-           set shared = TRUE
+           set blst = ( -bits $bits )
            breaksw
       case mpi:
-           set mpi = TRUE
+           set mpi  = TRUE
+           set flst = ( $flst -mpi )
            breaksw
       case py:
            set python = TRUE
+           set flst   = ( $flst -py )
+           breaksw
+      case s:
+           set openmp = TRUE
+           set flst   = ( $flst -s )
+           breaksw
+      case sl:
+           set shared = TRUE
+           set flst   = ( $flst -sl )
+           breaksw
+      case t:
+           set pthread = TRUE
+           set flst    = ( $flst -t )
            breaksw
    endsw
 end
@@ -117,7 +131,7 @@ if (!(-d $gdir)) then
    mkdir -p $gdir
 endif
 
-set Tmp = $gdir/$cfg
+set ltmp = $gdir/$cfg
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -130,7 +144,7 @@ if ("$croot" == "") then
       echo "Generate from scratch"
    endif
 
-   source write/cfg-base
+   write/cfg-base -gdir $gdir -o $ltmp $blst $clst
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -143,7 +157,7 @@ else if ("$features" == "") then
       echo "Use existing config $croot"
    endif
 
-   set Tmp = $croot
+   set ltmp = $croot
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -154,18 +168,7 @@ else
    if ($vrb == TRUE) then
       echo "Start with existing config $croot"
    endif
-
-   rm -f $Tmp
-   switch ($bits)
-      case 32:
-      case 64:
-           echo "include $bits-bit" >& $Tmp
-           breaksw
-      default:
-           touch $Tmp
-           breaksw
-   endsw
-   cat $croot >>& $Tmp
+   cp $croot $ltmp
 endif
 
 #--------------------------------------------------------------------------
@@ -173,12 +176,12 @@ endif
 
 unset features
 
-source write/cfg-features
+write/cfg-features -c $cfg -o $ltmp $blst $flst > /dev/null
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-echo "$Tmp"
+echo "$ltmp"
 
 exit($Err)
 

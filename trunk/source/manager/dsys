@@ -708,6 +708,7 @@ switch ($Cmnd)
                    shift
                    set pyexe  = $1
                    set python = TRUE
+                   set flst   = ( $flst -epy $pyexe )
                    breaksw
               case -f:
                    shift
@@ -847,6 +848,7 @@ switch ($Cmnd)
                    shift
                    set pydir  = $1
                    set python = TRUE
+                   set flst   = ( $flst -ipy $pydir )
                    breaksw
               case -llp:
                    shift
@@ -857,7 +859,8 @@ switch ($Cmnd)
                    set method = $1
                    breaksw
               case -mpi:
-                   set mpi = TRUE
+                   set mpi  = TRUE
+                   set flst = ( $flst -mpi )
                    breaksw
               case -O:
                    set ldof = mixed
@@ -876,15 +879,18 @@ switch ($Cmnd)
                    breaksw
               case -py:
                    set python = TRUE
+                   set flst   = ( $flst -py )
                    breaksw
               case -r:
                    set reconfig = TRUE
                    breaksw
               case -s:
                    set openmp = TRUE
+                   set flst   = ( $flst -s )
                    breaksw
               case -sl:
                    set shared = TRUE
+                   set flst   = ( $flst -sl )
                    breaksw
               case -strict:
                    shift
@@ -892,6 +898,7 @@ switch ($Cmnd)
                    breaksw
               case -t:
                    set pthread = TRUE
+                   set flst    = ( $flst -t )
                    breaksw
               case -v*:
                    source pact-scs
@@ -3580,8 +3587,8 @@ GEN_CONFIG:
 
    set Tmp = $gdir/tmp.$$
 
-   source write/cfg-base
-   source write/cfg-features
+   write/cfg-base -b $Bits -gdir $gdir -o $Tmp $CCompiler
+   set cfg = `write/cfg-features $flst -c $cfg -o $Tmp`
  
    mv $Tmp $gdir/$cfg
    set Configuration = $cfg
