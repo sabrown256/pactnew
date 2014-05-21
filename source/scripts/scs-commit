@@ -159,6 +159,12 @@ switch ($scsi[1])
 #--------------------------------------------------------------------------
 
    case svn:
+
+# to add executable permissions
+#       svn propset svn:executable "*" $files
+# to remove executable permissions
+#       svn propdel svn:executable "*" $files
+
         ( svn commit $args -m "$msg" ; exit($status) ) |& tee -a $log
         @ err = $status
         breaksw
