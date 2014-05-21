@@ -11,32 +11,4 @@ setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
 
 run std/use-compiler /usr/local/tools/compilers/ibm/mpicc-4.3.2
 
-# specify DP group directly for BG/P since there is no variation
-Group DP {
-   Inc   = -I/bgsys/drivers/ppcfloor/comm/include
-   Lib   = -lmpich.cnk
-   RPath = /bgsys/drivers/ppcfloor/comm/lib
-   Path  = /bgsys/drivers/ppcfloor/comm/bin
-}
-
-Group HSY {
-   RootInc = /bgsys/drivers/ppctoolchain.gomp/gnu-linux/powerpc-bgp-linux/sys-include
-}
-
-Group TEST {
-   MAX_THREADS = 2
-}
-
-Group BFD {
-   Flags = -Wl,-dynamic
-}
-
-include compilers/gnu-bgp
-include no-x11
-include no-sql
-include no-jpeg
-include no-png
-include no-libz
-
-
-
+include features/gnu-bgp-set

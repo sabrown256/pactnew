@@ -1,0 +1,30 @@
+#
+# GNU-BGQ-SET - feature set for BG/Q back end configuration with GCC
+#
+# include "cpyright.h"
+#
+
+setenv PATH  ${PATH}:/bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/bin
+
+# specify DP group directly for BG/Q since there is no variation
+Group DP {
+   Inc   = -I/bgsys/drivers/ppcfloor/comm/gcc/include
+   Lib   = -lmpich
+   RPath = /bgsys/drivers/ppcfloor/comm/gcc/lib
+   Path  = /bgsys/drivers/ppcfloor/comm/gcc/bin
+}
+
+Group HSY {
+   RootInc = /bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/sys-include
+}
+
+include compilers/gnu-bgq
+
+include features/c99
+
+include no-x11
+include no-sql
+include no-jpeg
+include no-png
+include no-libz
+

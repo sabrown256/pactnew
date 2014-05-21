@@ -11,10 +11,4 @@ setenv PATH  ${PATH}:/usr/local/bin
 
 run std/use-compiler mpgcc
 
-run analyze/locate-mpi ibm bgl
-
-include compilers/gnu-bgl
-include no-jpeg
-include no-png
-include no-libz
-
+include features/gnu-bgl-set
