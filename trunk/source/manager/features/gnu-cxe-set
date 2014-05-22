@@ -1,0 +1,23 @@
+#
+# GNU-CXE-SET - feature set for CRAY XE6 back end configuration with GCC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run analyze/locate-mpi mpich any gnu
+
+include compilers/gnu-lnx
+
+run analyze/rpath -a /opt/gcc/mpc/0.8.1/lib:/opt/gcc/mpfr/2.4.2/lib:/opt/gcc/gmp/4.3.2/lib:/opt/gcc/4.7.2/snos/lib64
+
+include os/cray
+include no-opengl
+include no-sql
+
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:fortran_pdb_manual 
+}
+

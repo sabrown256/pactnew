@@ -60,6 +60,19 @@ set psy_cfg = $PSY_Cfg:t
     Note $STDOUT "#"
     Note $STDOUT ""
 
+    Note $STDOUT 'compilers :'
+    Note $STDOUT '	@echo "Principal C compiler is $PACT_CC_EXE"'
+    Note $STDOUT '	@which ${CCompiler}'
+    Note $STDOUT '	@echo "Std C compiler is ${Std_CC_Exe}"'
+    Note $STDOUT '	@echo "Cfg C compiler is ${Cfg_CC_Exe}"'
+    Note $STDOUT '	@echo "Cfe C compiler is ${Cfe_CC_Exe}"'
+    Note $STDOUT '	@echo "Principal Fortran compiler is $PACT_FC_EXE"'
+    Note $STDOUT '	@which ${FCompiler}'
+    Note $STDOUT '	@echo "Std Fortran compiler is ${Std_FC_Exe}"'
+    Note $STDOUT '	@echo "Cfg Fortran compiler is ${Cfg_FC_Exe}"'
+    Note $STDOUT '	@echo "Cfe Fortran compiler is ${Cfe_FC_Exe}"'
+    Note $STDOUT ''
+
     if ($MAKE_Shared_Libs == TRUE) then
        Note $STDOUT '#'
        Note $STDOUT '# make shared library'

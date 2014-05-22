@@ -13,7 +13,7 @@ unalias *
 @ err = 0
 
 set flst    = ""
-set cfg     = gen
+set cfg     = ""
 set mpi     = FALSE
 set pydir   = ""
 set pyexe   = "python"
@@ -21,7 +21,6 @@ set python  = FALSE
 set openmp  = FALSE
 set shared  = FALSE
 set pthread = FALSE
-set outf    = /dev/stdout
 set vrb     = FALSE
 
 while ($#argv > 0)
@@ -36,9 +35,9 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: cfg-features [-h] [-o <file>] <features>*"
+           echo "Usage: cfg-features [-c <cfg>] [-h] <features>*"
+           echo "   c   append specifictions to <cfg>"
            echo "   h   this help message"
-           echo "   o   append results to config file <file>"
            echo ""
            exit(1)
            breaksw
@@ -46,10 +45,6 @@ while ($#argv > 0)
            shift
            set pyexe  = $1
            set python = TRUE
-           breaksw
-      case -o:
-           shift
-           set outf = $1
            breaksw
       case -mpi:
            set mpi = TRUE
@@ -75,6 +70,12 @@ while ($#argv > 0)
    endsw
    shift
 end
+
+if ("$cfg" == "") then
+   set outf = /dev/stdout
+else
+   set outf = $cfg
+endif
 
 # expand delimiters to spaces
 set flst = ( `echo $flst | sed 's/,/ /g'` )

@@ -60,7 +60,8 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set features = ( `gen-cfg-root $cfg` )
+set cfgt     = $cfg:t
+set features = ( `gen-cfg-root $cfgt` )
 set croot    = $features[1]
 shift features
 
@@ -114,6 +115,9 @@ foreach i ($features)
            set pthread = TRUE
            set flst    = ( $flst -t )
            breaksw
+      default:
+           set flst = ( $flst $i )
+           breaksw
    endsw
 end
 
@@ -144,7 +148,8 @@ if ("$croot" == "") then
       echo "Generate from scratch"
    endif
 
-   write/cfg-base -gdir $gdir -o $ltmp $blst $clst
+   set cfga = `write/cfg-base -gdir $gdir $blst $clst`
+   mv $cfga $ltmp
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -176,7 +181,8 @@ endif
 
 unset features
 
-write/cfg-features -c $cfg -o $ltmp $blst $flst > /dev/null
+echo "write/cfg-features -c |$ltmp| |$blst| |$flst|"
+write/cfg-features -c $ltmp $blst $flst > /dev/null
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

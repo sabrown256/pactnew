@@ -82,6 +82,26 @@ setenv EtcDir  $PSY_Root/etc
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# compilers target
+
+   Note $STDOUT 'compilers:'
+   @ i = 0
+   @ n = 0
+   while ($i < $ni)
+      @ n = $n + 1
+      @ i = $i + 1
+      set cfg = $inf[$i]
+      @ i = $i + 1
+      set sid = $inf[$i]
+
+      Note $STDOUT '	@(cd score ; printf "\nreport cc for %s\n" '$sid' ; ${PACT'$n'} -a '$sid' compilers)'
+   end
+
+    Note $STDOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # build target
 
     Note $STDOUT 'build:'

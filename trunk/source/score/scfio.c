@@ -35,7 +35,9 @@
 #define IO_OPER_START_TIME(_f)                                               \
    {double _to;                                                              \
     if (fid->gather == TRUE)                                                 \
-       _to = SC_wall_clock_time()
+       _to = SC_wall_clock_time();                                           \
+    else                                                                     \
+       _to = 0.0
 
 #define IO_OPER_ACCUM_TIME(_f, _o)                                           \
     if (fid->gather == TRUE)                                                 \

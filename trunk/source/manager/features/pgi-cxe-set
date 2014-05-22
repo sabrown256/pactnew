@@ -1,0 +1,16 @@
+#
+# PGI-CXE-SET - feature set for CRAY XE6 back end configuration with GCC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run analyze/locate-mpi mpich any pgi
+
+include compilers/pgi-lnx
+
+include os/cray
+include no-opengl
+include no-sql

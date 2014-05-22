@@ -2659,7 +2659,9 @@ int gexecs(char *db, char *s, char **env, int jctl, PFPCAL (*map)(char *s))
 /* diagnostic for leaked descriptors */
     if ((ps != NULL) && (ps->dbg_level & 4))
        {fb = fcntl(0, F_DUPFD, 2);
-	close_safe(fb);};
+	close_safe(fb);}
+    else
+       fb = -1;
 
 /* parse command to list of statements - ;, &&, or || */
     sl = parse_statement(s, env, shell, map);
