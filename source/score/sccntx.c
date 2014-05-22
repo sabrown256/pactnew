@@ -76,7 +76,7 @@ int SC_register_context(void *f, void *a, int nb)
 	else
 	   {cd = CPMAKE(SC_contextdes, 3);
 	    if (cd != NULL)
-	       {cd->f = f;
+	       {cd->f = (PFSignal_handler) f;
 		cd->a = a;
 	    cd->nb = nb;};};
 

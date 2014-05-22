@@ -9,24 +9,4 @@
 
 run std/use-compiler mpixlc
 
-# specify DP group directly for BG/Q since there is no variation
-Group DP {
-   Inc   = -I/bgsys/drivers/ppcfloor/comm/xl/include
-   Lib   = -lmpich
-   RPath = /bgsys/drivers/ppcfloor/comm/xl/lib
-   Path  = /bgsys/drivers/ppcfloor/comm/xl/bin
-}
-
-Group HSY {
-   RootInc = /opt/ibmcmp/vac/bg/12.1/include
-}
-
-include compilers/xlc-bgq
-
-include features/c99
-
-include no-x11
-include no-sql
-include no-jpeg
-include no-png
-include no-libz
+include features/xlc-bgq-set

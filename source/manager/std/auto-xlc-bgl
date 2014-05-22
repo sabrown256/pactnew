@@ -7,14 +7,7 @@
 # include "cpyright.h"
 #
 
-setenv PATH  ${PATH}:/usr/local/bin
-
 run std/use-compiler mpxlc
 
-run analyze/locate-mpi ibm bgl
-
-include compilers/xlc-bgl
-include no-jpeg
-include no-png
-include no-libz
+include features/xlc-bgl-set
 

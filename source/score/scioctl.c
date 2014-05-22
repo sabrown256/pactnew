@@ -425,7 +425,8 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 
     SC_LOCKON(SC_poll_lock);
 
-    ev = _SC_get_ev_loop(-1);
+    old = NULL;
+    ev  = _SC_get_ev_loop(-1);
 
     pe->state = a;
 

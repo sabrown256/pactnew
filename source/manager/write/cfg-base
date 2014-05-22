@@ -14,19 +14,18 @@ unalias *
 @ err = 0
 
 set lbts = ""
-set cf   = /dev/stdout
 set clst = ""
 set ilst = ""
-set gdir = $cwd
+set gdir = ""
+set cfg  = `uname -n | tr "[A-Z]" "[a-z]" | sed 's/\..*\..*$//'`
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: cfg-base [-bits <bits>] [-gdir <dir>] [-h] [-i <inst>] [-o <outfile>] <cc>"
+           echo "Usage: cfg-base [-bits <bits>] [-gdir <dir>] [-h] [-i <inst>] <cc>"
            echo "   bits   number of bits in address"
            echo "   h      this help message"
-           echo "   o      the output config file name"
            echo "   <cc>   := <compiler>[:<compiler>]*"
            echo "   <inst> := <instdir>[:<instdir>]*"
            echo ""
@@ -43,10 +42,6 @@ while ($#argv > 0)
            shift
            set ilst = ( $ilst `echo $1 | sed 's|:| |g'` )
            breaksw
-      case -o:
-           shift
-           set cf = $1
-           breaksw
       default:
            set clst = ( $clst `echo $1 | sed 's|:| |g'` )
            breaksw
@@ -56,6 +51,19 @@ end
 
 if ("$clst" == "") then
    set clst = gnu
+endif
+
+# if a directory is specified, files are generated there
+# if not the main config goes to /dev/stdout and the
+# platform configs come to the current directory
+if ("$gdir" == "") then
+   set gdir = $cwd
+   set cf   = /dev/stdout
+else
+   set cf = $gdir/$cfg
+   rm -f $cf $cf.* >& /dev/null
+   touch $cf
+   echo "$cf"
 endif
 
 # NOTE: use node name for config file base
@@ -90,6 +98,7 @@ endif
          set instb = `echo $instb:r.$ii | sed 's| ||g'`
       endif
 
+# map vendor or generic references to actual executable name
       switch ($lcc)
          case clang:
               set lcc = clang
@@ -114,13 +123,8 @@ endif
               breaksw
       endsw
 
-      if ($cf != /dev/stdout) then
-         rm -f $cf
-         touch $cf
-      endif
-
       if ($ic > 1) then
-         set pf = $gdir/$cf:t.$ic
+         set pf = $gdir/$cfg.$ic
          echo "platform $pf $instb -cc $lcc" >>& $cf
       else
          set pf = $cf
@@ -293,6 +297,11 @@ endif
                       if ("$lbts" != "") then
                          echo "include ${lbts}-bit" >>& $pf
                       endif
+                      if ($lcc =~ /*) then
+                         set lcdir = $lcc:h
+                         echo "setenv PATH  ${lcdir}:"'${PATH}' >>& $pf
+                         unset lcdir
+                      endif
                       echo "run std/use-compiler $lcc" >>& $pf
                       echo "include features/gnu-bgq-set" >>& $pf
                       set lcc = none
@@ -300,6 +309,11 @@ endif
                  case *mpgcc*:
                       if ("$lbts" != "") then
                          echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      if ($lcc =~ /*) then
+                         set lcdir = $lcc:h
+                         echo "setenv PATH  ${lcdir}:"'${PATH}' >>& $pf
+                         unset lcdir
                       endif
                       echo "run std/use-compiler $lcc" >>& $pf
                       echo "include features/gnu-bgl-set" >>& $pf
@@ -390,6 +404,10 @@ endif
                          echo "include ${lbts}-bit" >>& $pf
                       endif
                       echo "run std/use-compiler $lcc" >>& $pf
+                      echo 'Group OCV {' >>& $pf
+                      echo "   CC     = $lcc:t" >>& $pf
+                      echo "   CC_Cfg = $lcc:t" >>& $pf
+                      echo '}' >>& $pf
                       echo "include compilers/$lcfam" >>& $pf
                       unset lcc
                       breaksw

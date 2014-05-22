@@ -63,6 +63,21 @@ else
    set features = ( $features[$i-] )
 endif
 
+# reassemble no-xxx type features
+set nf = ""
+while ($#features > 0)
+   set f = $features[1]
+   shift features
+   if ($f == "no") then
+      set f = "no-$features[1]"
+      shift features
+   endif
+   set nf = ( $nf $f )
+end
+set features = ( $nf )
+unset nf
+unset f
+
 unset i
 unset ok
 unset lname

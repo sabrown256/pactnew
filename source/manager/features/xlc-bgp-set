@@ -1,0 +1,32 @@
+#
+# XLC-BGP-SET - feature set for 32-bit BGP back end configuration with XLC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
+
+# specify DP group directly for BG/P since there is no variation
+Group DP {
+   Inc   = -I/bgsys/drivers/ppcfloor/comm/include
+   Lib   = -lmpich.cnk
+   RPath = /bgsys/drivers/ppcfloor/comm/lib
+   Path  = /bgsys/drivers/ppcfloor/comm/bin
+}
+
+Group HSY {
+   RootInc = /opt/ibmcmp/vac/bg/9.0/include
+}
+
+include compilers/xlc-bgp
+
+include no-x11
+include no-sql
+include no-jpeg
+include no-png
+include no-libz
+
+

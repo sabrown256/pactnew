@@ -1,0 +1,18 @@
+#
+# XLC-BGL-SET - feature set for 32 bit BG/L configuration with XLC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PATH  ${PATH}:/usr/local/bin
+
+run analyze/locate-mpi ibm bgl
+
+include compilers/xlc-bgl
+include no-jpeg
+include no-png
+include no-libz
+

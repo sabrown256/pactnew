@@ -148,7 +148,7 @@ void SC_restore_signal_n(int sig, SC_contextdes cd)
 
 void *_SC_signal_action_t(void *a)
    {int sig, flg, st, nb;
-    void *arg;
+    void *arg, *rv;
     va_list *va;
     struct sigaction oa;
     PFSignal_handler fo, fn;
@@ -174,7 +174,9 @@ void *_SC_signal_action_t(void *a)
 /* set the context for this thread */
     SC_register_context((void *) fn, arg, nb);
 
-    return(fo);}
+    rv = (PFSignal_handler) fo;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -224,7 +226,7 @@ SC_contextdes SC_signal_action_t(int sig, PFSignal_handler fn,
 
 	SC_do_threads(1, &n, pf, pa, rt);
 
-	fo = rt[1];}
+	fo = (PFSignal_handler) rt[0];}
 
 /* set the handler for this thread only if not the master thread */
     else

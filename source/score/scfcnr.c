@@ -105,7 +105,9 @@ fcdes *_SC_unknown_container(char *name)
     fcdes *fc;
     FILE *fp;
 
-    fc = NULL;
+    fc  = NULL;
+    sad = -1;
+    ead = -1;
 
     SC_strncpy(s, MAXLINE, name, -1);
     ta = SC_tokenize(s, "~:");
