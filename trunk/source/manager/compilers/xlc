@@ -20,7 +20,8 @@ Tool CC {
                  *     = -q* ]
    Flags    += [ _cmd_ = -p ;                # profiling
 	         on    = -qpdf1 ]
-   Debug     = -g -O0
+#   Debug     = -g -O0
+   Debug     = -g -O0 -qmaxmem=-1
    Optimize  = -g -O -qmaxmem=32768
    Version   = -qversion
 }
