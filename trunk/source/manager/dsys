@@ -315,12 +315,6 @@ switch ($Cmnd)
            NoteD $Log "Building PACT for $PSY_ID ($Msg) ..."
            NoteD $Log "Using C Compiler $PACT_CC_EXE ($PACT_CC_FAMILY)"
            Note $Log "PATH = $PATH"
-           Note $Log "PACT_CC_EXE    = $PACT_CC_EXE"
-           Note $Log "PACT_CC_PATH   = $PACT_CC_PATH"
-           Note $Log "PACT_CC_FAMILY = $PACT_CC_FAMILY"
-           Note $Log "PACT_FC_EXE    = $PACT_FC_EXE"
-           Note $Log "PACT_FC_PATH   = $PACT_FC_PATH"
-           Note $Log "PACT_FC_FAMILY = $PACT_FC_FAMILY"
 
            flog $Log $DSYS linstall
            flog $Log pushd ..
@@ -1114,17 +1108,17 @@ switch ($Cmnd)
               unset inf
               unset croot
            endif
-   
+
 # remove duplicate features and take care of Bits
            Note $Log "First pass feature list: $flst"
            set nflst = ""
            foreach f ($flst)
-              if (($f == 64) || ($f == 32)) then
+              if (("$f" == 64) || ("$f" == 32)) then
                  flog $Log setenv Bits $f
               else
                  set ok = TRUE
                  foreach l ($nflst)
-                    if ($f == $l) then
+                    if ("$f" == $l) then
                        set ok = FALSE
                        break
                     endif

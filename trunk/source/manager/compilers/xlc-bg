@@ -1,5 +1,5 @@
 #
-# XLC-BG - define XLC compiler for generic BlueGene system
+# XLC-BG - define XLC compiler for BlueGene backend generically6
 #
 # include "cpyright.h"
 #
