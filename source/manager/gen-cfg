@@ -181,7 +181,6 @@ endif
 
 unset features
 
-echo "write/cfg-features -c |$ltmp| |$blst| |$flst|"
 write/cfg-features -c $ltmp $blst $flst > /dev/null
 
 #--------------------------------------------------------------------------

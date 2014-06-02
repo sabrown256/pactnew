@@ -873,12 +873,29 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 
 static void write_envf(client *cl, int lnotice)
    {int i, n;
+    char t[BFLRG];
+    char *s;
+    char *cmp[]  = { "CC", "CX", "FC" };
     char *site[] = { "RF_CONFIG_METHOD" };
     char *sfx[]  = { "csh", "sh", "dk", "mdl" };
     FILE *fcsh, *fsh, *fdk, *fmd;
 
+/* get the compiler paths at the head of PATH
+ * mostly needed for generated config files when
+ * compiler comes from command line
+ */
+    s = dbget(cl, TRUE, "FORCE_COMPILER_PATH");
+    if (strcmp(s, "TRUE") == 0)
+       {n = sizeof(cmp)/sizeof(char *);
+	for (i = 0; i < n; i++)
+	    {s = dbget(cl, FALSE, "PACT_%s_EXE", cmp[i]);
+	     nstrncpy(t, BFLRG, path_head(s), -1);
+	     if (dir_exists(t) == TRUE)
+	        push_path(P_PREPEND, epath, t);};};
+
     separator(NULL);
-    note(NULL, "   Environment setup files - env-%s (csh, sh, dk, and mdl)\n", gst.code);
+    note(NULL, "   Environment setup files - env-%s (csh, sh, dk, and mdl)\n",
+	 gst.code);
     note(NULL, "\n");
 
     fcsh = open_file("w", gst.env_csh);
@@ -944,6 +961,25 @@ static void write_envf(client *cl, int lnotice)
     note(fdk, "\n");
     note(fmd, "\n");
 
+/* emit PATH settings */
+    if (IS_NULL(epath) == FALSE)
+       {FOREACH(u, epath, ":\n")
+	   note(fdk, "dk_alter PATH %s\n", u);
+	   note(fmd, "prepend-path PATH    %s;\n", echo(FALSE, u));
+	ENDFOR
+        note(fcsh, "setenv PATH    %s/bin:%s:$PATH\n", gst.dir.root, epath);
+        note(fsh,  "export PATH=%s/bin:%s:$PATH\n", gst.dir.root, epath);}
+    else
+       {note(fcsh, "setenv PATH    %s/bin:$PATH\n", gst.dir.root);
+        note(fsh, "export PATH=%s/bin:$PATH\n", gst.dir.root);};
+
+    note(fdk, "dk_alter PATH    %s/bin\n", gst.dir.root);
+    note(fmd, "prepend-path PATH    %s/bin;\n", echo(FALSE, gst.dir.root));
+    note(fsh, "\n");
+    note(fcsh, "\n");
+    note(fdk, "\n");
+    note(fmd, "\n");
+
 /* emit MANPATH settings */
     note(fcsh, "if ($?MANPATH == 1) then\n");
     note(fcsh, "   setenv MANPATH %s/man:$MANPATH\n", gst.dir.root);
@@ -961,23 +997,6 @@ static void write_envf(client *cl, int lnotice)
 
     note(fdk, "dk_alter MANPATH %s/man\n", gst.dir.root);
     note(fmd, "prepend-path MANPATH %s/man;\n", echo(FALSE, gst.dir.root));
-
-/* emit PATH settings */
-    if (IS_NULL(epath) == FALSE)
-       {FOREACH(u, epath, ":\n")
-	   note(fdk, "dk_alter PATH %s\n", u);
-	   note(fmd, "prepend-path PATH    %s;\n", echo(FALSE, u));
-	ENDFOR
-        note(fcsh, "setenv PATH    %s/bin:%s:$PATH\n", gst.dir.root, epath);
-        note(fsh,  "export PATH=%s/bin:%s:$PATH\n", gst.dir.root, epath);}
-    else
-       {note(fcsh, "setenv PATH    %s/bin:$PATH\n", gst.dir.root);
-        note(fsh, "export PATH=%s/bin:$PATH\n", gst.dir.root);};
-
-    note(fdk, "dk_alter PATH    %s/bin\n", gst.dir.root);
-    note(fmd, "prepend-path PATH    %s/bin;\n", echo(FALSE, gst.dir.root));
-    note(fdk, "\n");
-    note(fmd, "\n");
 
 /* write the CSH version like this because PCSH scripts like
  * PDBView need to get the users SCHEME variable if defined

@@ -294,6 +294,7 @@ endif
                       set lcfam = clang-lnx
                       breaksw
                  case *mpicc*:
+                      echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
                       if ("$lbts" != "") then
                          echo "include ${lbts}-bit" >>& $pf
                       endif
@@ -307,6 +308,7 @@ endif
                       set lcc = none
                       breaksw
                  case *mpgcc*:
+                      echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
                       if ("$lbts" != "") then
                          echo "include ${lbts}-bit" >>& $pf
                       endif
@@ -380,6 +382,7 @@ endif
                  case mp-xlc-bgl:
                  case mp-xlc-bgp:
                  case mp-xlc-bgq:
+                      echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
                       if ("$lbts" != "") then
                          echo "include ${lbts}-bit" >>& $pf
                       endif
@@ -400,6 +403,16 @@ endif
                  case *sun:
                  case *suncc:
                  case *xlc*:
+
+# NOTE: generated configs do not give the user the opportunity to
+# fiddle with compiler paths that hand written ones do
+# in this situation you are also unlikely to have the ccomp script
+# to help out
+# finally, the multi-platform configs force you to deal with more
+# than one compiler
+# so have the generated configs tell PCO to force the compiler
+# paths onto the PATH variable in the configured env-pact.xxx
+                      echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
                       if ("$lbts" != "") then
                          echo "include ${lbts}-bit" >>& $pf
                       endif
