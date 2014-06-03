@@ -20,6 +20,7 @@
 #define PY_pgs_H
 
 #include <Python.h>
+#undef HAVE_GETHOSTBYNAME
 #include <pgs_int.h>
 #include <pputil.h>
 #include "utilpgs.h"

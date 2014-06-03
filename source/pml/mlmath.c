@@ -402,7 +402,8 @@ void PM_stats_mean(int n, double *x, double *pmn, double *pmdn,
 		      xt[j] = xt[nt];
 		      j--;};};};
 		 
-	nx = -1;
+	nx  = -1;
+	xcx = 0.0;
 	for (i = 0; i < nt; i++)
             {if (ni[i] > nx)
 	        {nx  = ni[i];
@@ -469,6 +470,7 @@ double PM_romberg(double (*func)(double x), double x0, double x1, double tol)
     x   = x0;
     ly0 = 0.0;
 
+    memset(a, 0, sizeof(a));
     a[0] = h*((*func)(x0) + (*func)(x1))/2.0;
     toln = 2.0*tol;
 

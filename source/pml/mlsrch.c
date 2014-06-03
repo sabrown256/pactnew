@@ -294,7 +294,7 @@ long _PM_hyper_indices(long *dims, long *reg, long **pstart, long *chunk)
 
 	CFREE(strtind);};
  
-    if (*pstart != NULL)
+    if ((pstart != NULL) && (*pstart != NULL))
        *pstart = start;
     else
        CFREE(start);
