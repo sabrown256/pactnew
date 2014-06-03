@@ -516,7 +516,7 @@ static object *_SS_chr_comment(SS_psides *si, object *str, int c)
 
 void _SS_set_char_map(void)
    {int i;
-    unsigned char leof = EOF;
+    unsigned char leof = (unsigned char) EOF;
 
     for (i = 0; i < 256; i++)
         _SS.chr_tab[i] = _SS_chr_atom;

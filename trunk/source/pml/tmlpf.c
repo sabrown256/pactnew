@@ -45,7 +45,7 @@ static void timeout(int sig)
 static int unary_test(char *name, int to,
 		      double (*fd)(double x), long double (*fl)(long double x),
 		      double amn, double amx)
-   {int n, id, il, ok;
+   {int n, id, il, ok, sz;
     double ad, xd, da, rd, rl;
     long double al, xl;
     JMP_BUF cpu;
@@ -54,10 +54,11 @@ static int unary_test(char *name, int to,
 
     n  = 1000000000;
     da = (amx - amn)/((double) n);
+    sz = sizeof(cpu);
 
 /* do as many iterations as possible in TO seconds */
     if (SETJMP(cpu) == 0)
-       {SC_timeout(to, timeout, &cpu);
+       {SC_timeout(to, timeout, &cpu, sz);
 
 	for (id = 0; TRUE; id++)
 	    {for (ad = amn; ad <= amx; ad += da, id++)
@@ -67,7 +68,7 @@ static int unary_test(char *name, int to,
 
 /* do as many iterations as possible in TO seconds */
     if (SETJMP(cpu) == 0)
-       {SC_timeout(to, timeout, &cpu);
+       {SC_timeout(to, timeout, &cpu, sz);
 
 	for (il = 0; TRUE; il++)
 	    {for (al = amn; al <= amx; al += da, il++)

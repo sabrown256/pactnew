@@ -967,7 +967,7 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
 		     PG_rendering ptyp, int bndp, int cbnd, int sbnd,
 		     double wbnd, int mshp, int cmsh, int smsh,
 		     double wmsh)
-   {int fls, axs;
+   {int lfls, laxs;
     int fin, save_pt;
     pcons *inf, *alst;
     PM_mapping *pf, *nxt;
@@ -982,8 +982,8 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
        return;
 
 /* save device attributes */
-    fls = PG_fget_fill_bound(dev);
-    axs = _PG_gattrs.axis_on;
+    lfls = PG_fget_fill_bound(dev);
+    laxs = _PG_gattrs.axis_on;
 
 /* set device attributes */
     if (f != NULL)
@@ -1094,8 +1094,8 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
     dev->supress_setup = FALSE;
 
 /* restore device attributes */
-    PG_fset_fill_bound(dev, fls);
-    _PG_gattrs.axis_on = axs;
+    PG_fset_fill_bound(dev, lfls);
+    _PG_gattrs.axis_on = laxs;
 
     _PG_gattrs.plot_title = save_pt;
 
