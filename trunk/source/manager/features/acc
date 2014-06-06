@@ -1,0 +1,12 @@
+#
+# ACC - use abstract compilers
+#
+# include "cpyright.h"
+#
+
+Group USE {
+   ACC = TRUE
+}
+
+
+

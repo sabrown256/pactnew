@@ -139,7 +139,7 @@ switch ($OS[1])
         breaksw
 
    case "freebsd*" :
-        set Concise = `expr "$RL" : '\(.*\)-RELEASE'`
+        set Concise = `echo "$RL" | sed 's|-.*$||'`
 
         set HW = `uname -m | tr "[A-Z]" "[a-z]"`
         switch ($HW)

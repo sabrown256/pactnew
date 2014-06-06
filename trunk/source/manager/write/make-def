@@ -527,10 +527,10 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     if ($USE_ACC == TRUE) then
-       Note $STDOUT "CXCompiler     = ${CXX_Exe}"
-       Note $STDOUT "CXCmpLdr       = ${CXX_Linker}"
-       Note $STDOUT "CXDefDebug     = ${CC_Debug_Default}"
-       Note $STDOUT "CXDefOptimize  = ${CC_Optimize_Default}"
+       Note $STDOUT "CXCompiler     = a++"
+       Note $STDOUT "CXCmpLdr       = a++"
+       Note $STDOUT "CXDefDebug     = ${ACC_Debug_Default}"
+       Note $STDOUT "CXDefOptimize  = ${ACC_Optimize_Default}"
     else
        Note $STDOUT "CXCompiler     = ${CXX_Exe}"
        Note $STDOUT "CXCmpLdr       = ${CXX_Linker}"
@@ -543,7 +543,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     if ($USE_ACC == TRUE) then
-       Note $STDOUT "FCompiler      = ${FC_Exe}"
+       Note $STDOUT "FCompiler      = afc"
        Note $STDOUT "FDefDebug      = ${AFC_Debug_Default}"
        Note $STDOUT "FDefOptimize   = ${AFC_Optimize_Default}"
     else
@@ -629,25 +629,13 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 # write the default make rules
     call PrintRule(".c.i:", IRules_CCP)
 
-#    if ($USE_ACC == FALSE) then
-       call PrintRule(".c.o:", IRules_CCObj)
-       call PrintRule(".c.a:", IRules_CCArc)
-       call PrintRule(".l.o:", IRules_LexObj)
-       call PrintRule(".l.a:", IRules_LexArc)
-#    else
-#       call PrintRule(".c.o:", IRules_CCObj_AC)
-#       call PrintRule(".c.a:", IRules_CCArc_AC)
-#       call PrintRule(".l.o:", IRules_LexObj_AC)
-#       call PrintRule(".l.a:", IRules_LexArc_AC)
-#    endif
+    call PrintRule(".c.o:", IRules_CCObj)
+    call PrintRule(".c.a:", IRules_CCArc)
+    call PrintRule(".l.o:", IRules_LexObj)
+    call PrintRule(".l.a:", IRules_LexArc)
     call PrintRule(".l.c:", IRules_LexC)
-#    if ($USE_ACC == FALSE) then
-       call PrintRule(".y.o:", IRules_YaccObj)
-       call PrintRule(".y.a:", IRules_YaccArc)
-#    else
-#       call PrintRule(".y.o:", IRules_YaccObj_AC)
-#       call PrintRule(".y.a:", IRules_YaccArc_AC)
-#    endif
+    call PrintRule(".y.o:", IRules_YaccObj)
+    call PrintRule(".y.a:", IRules_YaccArc)
     call PrintRule(".y.c:", IRules_YaccC)
     call PrintRule(".f.o:", IRules_FCObj)
     call PrintRule(".f.a:", IRules_FCArc)
