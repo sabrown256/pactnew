@@ -85,6 +85,7 @@ Note $STDOUT ""
 Note $STDOUT "set exe  = $exe"
 Note $STDOUT 'set dbg  = FALSE'
 Note $STDOUT 'set opt  = FALSE'
+Note $STDOUT 'set lib  = ""'
 Note $STDOUT 'set prf  = FALSE'
 Note $STDOUT 'set vrb  = FALSE'
 Note $STDOUT 'set inf  = ""'
@@ -129,8 +130,13 @@ Note $STDOUT '           breaksw'
 Note $STDOUT '      case -avrb:'
 Note $STDOUT '           set vrb = TRUE'
 Note $STDOUT '           breaksw'
+Note $STDOUT '      case -l*:'
+Note $STDOUT '           set lib = ( $lib "$1" )'
+Note $STDOUT '           breaksw'
 Note $STDOUT '      default:'
-Note $STDOUT '           if (-f "$1") then'
+Note $STDOUT '           if ("$lib" != "") then'
+Note $STDOUT '              set lib = ( $lib "$1" )'
+Note $STDOUT '           else if (-f "$1") then'
 Note $STDOUT '              set inf = ( $inf "$1" )'
 Note $STDOUT '           else'
 Note $STDOUT '              set args = ( $args "$1" )'
@@ -335,7 +341,7 @@ Note $STDOUT 'unsetenv PACT_CC_PATH'
 Note $STDOUT ""
 
 Note $STDOUT 'rm -f $outf'
-Note $STDOUT 'set cmd = ( $CC -o $outf $inf )'
+Note $STDOUT 'set cmd = ( $CC -o $outf $inf $lib )'
 
 # verbose mode diagnostic for debugging
 Note $STDOUT 'if ($vrb == TRUE) then'
