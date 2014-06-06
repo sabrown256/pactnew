@@ -584,17 +584,31 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
  
 # other invocations
-    Note $STDOUT 'CLD            = ${CCmpLdr} ${ODC} ${CFLAGS} ${CcFlags}'
-    Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${ODC} ${Cfg_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
-    Note $STDOUT 'FCCfg          = ${Cfg_FC_Exe} ${ODF} ${Cfg_FC_Flags} ${FcFlags}'
+    if ($USE_ACC == TRUE) then
+       Note $STDOUT 'CLD            = acc ${ODC} ${CFLAGS} ${CcFlags}'
+       Note $STDOUT 'CCCfg          = acc ${ODC} ${Cfg_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCCfg          = afc ${ODF} ${Cfg_FC_Flags} ${FcFlags}'
 
-    Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${ODC} ${Ser_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
-    Note $STDOUT 'FCSer          = ${Ser_FC_Exe} ${ODF} ${Ser_FC_Flags} ${FcFlags}'
+       Note $STDOUT 'CCSer          = acc ${ODC} ${Ser_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCSer          = afc ${ODF} ${Ser_FC_Flags} ${FcFlags}'
 
-    Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${ODC} ${Cfe_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
-    Note $STDOUT 'FCCfe          = ${Cfe_FC_Exe} ${ODF} ${Cfe_FC_Flags} ${FcFlags}'
-    Note $STDOUT 'CCCfe_LD_Flags = ${Cfe_LD_Flags}'
-    Note $STDOUT 'CCCfe_LD_Lib   = ${Cfe_LD_Lib}'
+       Note $STDOUT 'CCCfe          = acc ${ODC} ${Cfe_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCCfe          = afc ${ODF} ${Cfe_FC_Flags} ${FcFlags}'
+       Note $STDOUT 'CCCfe_LD_Flags = ${Cfe_LD_Flags}'
+       Note $STDOUT 'CCCfe_LD_Lib   = ${Cfe_LD_Lib}'
+    else
+       Note $STDOUT 'CLD            = ${CCmpLdr} ${ODC} ${CFLAGS} ${CcFlags}'
+       Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${ODC} ${Cfg_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCCfg          = ${Cfg_FC_Exe} ${ODF} ${Cfg_FC_Flags} ${FcFlags}'
+
+       Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${ODC} ${Ser_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCSer          = ${Ser_FC_Exe} ${ODF} ${Ser_FC_Flags} ${FcFlags}'
+
+       Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${ODC} ${Cfe_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCCfe          = ${Cfe_FC_Exe} ${ODF} ${Cfe_FC_Flags} ${FcFlags}'
+       Note $STDOUT 'CCCfe_LD_Flags = ${Cfe_LD_Flags}'
+       Note $STDOUT 'CCCfe_LD_Lib   = ${Cfe_LD_Lib}'
+    endif
     Note $STDOUT ""
 
 # other tool invocations
