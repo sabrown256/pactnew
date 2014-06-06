@@ -309,12 +309,12 @@ Group IRules {
 #   YaccC       =
 #   FCObj       =
 #   FCArc       =
-#   CCObj_BP    =
-#   CCArc_BP    =
-#   LexObj_BP   =
-#   LexArc_BP   =
-#   YaccObj_BP  =
-#   YaccArc_BP  =
+#   CCObj_AC    =
+#   CCArc_AC    =
+#   LexObj_AC   =
+#   LexArc_AC   =
+#   YaccObj_AC  =
+#   YaccArc_AC  =
 #   TemplH      =
 }
 
@@ -468,6 +468,7 @@ Group TEST {
 # this group clarifies the intention (see HAVE group)
 
 Group USE {
+   ACC       = FALSE
    IMF       = FALSE
    MPI       = FALSE
    LDLibPath = ${USE_LDLibPath}

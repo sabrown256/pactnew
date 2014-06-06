@@ -83,12 +83,12 @@ struct s_ruledes
     char ya[BFLRG];             /* .y -> .a */
     char yc[BFLRG];             /* .y -> .c */
     char th[BFLRG];             /* .t -> .h */
-    char co_bp[BFLRG];          /* bad pragma versions */
-    char ca_bp[BFLRG];
-    char lo_bp[BFLRG];
-    char la_bp[BFLRG];
-    char yo_bp[BFLRG];
-    char ya_bp[BFLRG];};
+    char co_ac[BFLRG];          /* abstract compiler versions */
+    char ca_ac[BFLRG];
+    char lo_ac[BFLRG];
+    char la_ac[BFLRG];
+    char yo_ac[BFLRG];
+    char ya_ac[BFLRG];};
 
 struct s_state
    {int abs_deb;
@@ -832,11 +832,11 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
     char *var, *val, **sa;
     static char *rej[] = { "Log", "ALog",
 			   "IRules_CCP", "IRules_CCObj", "IRules_CCArc",
-			   "IRules_CCObj_BP", "IRules_CCArc_BP", 
+			   "IRules_CCObj_AC", "IRules_CCArc_AC", 
 			   "IRules_LexObj", "IRules_LexArc", "IRules_LexC",
-			   "IRules_LexObj_BP", "IRules_LexArc_BP", 
+			   "IRules_LexObj_AC", "IRules_LexArc_AC", 
 			   "IRules_YaccObj", "IRules_YaccArc", "IRules_YaccC",
-			   "IRules_YaccObj_BP", "IRules_YaccArc_BP", 
+			   "IRules_YaccObj_AC", "IRules_YaccArc_AC", 
 			   "IRules_FCObj", "IRules_FCArc", "TemplH", NULL };
 
     sa = cenv(TRUE, rej);
@@ -1444,12 +1444,12 @@ static void setup_output_env(client *cl)
     dbset(cl, "IRules_FCArc",   gst.rules.fa);
     dbset(cl, "IRules_TemplH",  gst.rules.th);
 
-    dbset(cl, "IRules_CCObj_BP",   gst.rules.co_bp);
-    dbset(cl, "IRules_CCArc_BP",   gst.rules.ca_bp);
-    dbset(cl, "IRules_LexObj_BP",  gst.rules.lo_bp);
-    dbset(cl, "IRules_LexArc_BP",  gst.rules.la_bp);
-    dbset(cl, "IRules_YaccObj_BP", gst.rules.yo_bp);
-    dbset(cl, "IRules_YaccArc_BP", gst.rules.ya_bp);
+    dbset(cl, "IRules_CCObj_AC",   gst.rules.co_ac);
+    dbset(cl, "IRules_CCArc_AC",   gst.rules.ca_ac);
+    dbset(cl, "IRules_LexObj_AC",  gst.rules.lo_ac);
+    dbset(cl, "IRules_LexArc_AC",  gst.rules.la_ac);
+    dbset(cl, "IRules_YaccObj_AC", gst.rules.yo_ac);
+    dbset(cl, "IRules_YaccArc_AC", gst.rules.ya_ac);
 
     return;}
 
@@ -1638,11 +1638,11 @@ static void default_rules(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* BAD_PRAGMA_RULES - setup the rules for CC, Lex, Yacc, and FC
- *                  - allowing for bad handling of _Pragma
+/* ACC_RULES - setup the rules for CC, Lex, Yacc, and FC
+ *           - using the abstract compilers
  */
 
-static void bad_pragma_rules(void)
+static void acc_rules(void)
    {char *ar, *cd, *le, *ye, *rm, *tc;
 
     le  = "sed \"s|lex.yy.c|$*.c|\" lex.yy.c | sed \"s|yy|$*_|g\" > $*.c";
@@ -1653,12 +1653,12 @@ static void bad_pragma_rules(void)
     tc  = "touch errlog";
 
 /* C rules */
-    snprintf(gst.rules.co_bp, BFLRG,
+    snprintf(gst.rules.co_ac, BFLRG,
              "\t@(%s ; \\\n          %s)\n",
 	     "echo \"${ACCAnnounce} -c $<\"",
 	     "${ACC} -c $< -ao $@");
 
-    snprintf(gst.rules.ca_bp, BFLRG,
+    snprintf(gst.rules.ca_ac, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"${ACCAnnounce} -c $<\"",
 	     cd, rm, tc,
@@ -1667,7 +1667,7 @@ static void bad_pragma_rules(void)
 	     "${RM} $*.o 2>> errlog");
 
 /* lex rules */
-    snprintf(gst.rules.lo_bp, BFLRG,
+    snprintf(gst.rules.lo_ac, BFLRG,
              "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
              "echo \"lex $<\"",
 	     rm, tc,
@@ -1677,7 +1677,7 @@ static void bad_pragma_rules(void)
 	     "${ALX} -c $*.c -ao $*.o",
 	     "${RM} lex.yy.c $*.c");
 
-    snprintf(gst.rules.la_bp, BFLRG,
+    snprintf(gst.rules.la_ac, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"lex $<\"",
 	     cd, rm, tc,
@@ -1689,7 +1689,7 @@ static void bad_pragma_rules(void)
 	     "${RM} lex.yy.c $*.c");
 
 /* yacc rules */
-    snprintf(gst.rules.yo_bp, BFLRG,
+    snprintf(gst.rules.yo_ac, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1699,7 +1699,7 @@ static void bad_pragma_rules(void)
 	     "${ALX} -c $.c -ao $*.o",
 	     "${RM} $*.c");
 
-    snprintf(gst.rules.ya_bp, BFLRG,
+    snprintf(gst.rules.ya_ac, BFLRG,
 	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
 	     "echo \"yacc $<\"",
 	     cd, rm, tc,
@@ -1725,7 +1725,7 @@ static void init_pco_session(client *cl, int append)
 
 /* setup the default rules for CC, Lex, Yacc, and FC */
     default_rules();
-    bad_pragma_rules();
+    acc_rules();
 
 /* setup the log file */
     snprintf(gst.logf, BFLRG, "%s/log/config", gst.dir.root);
@@ -3121,12 +3121,12 @@ int main(int c, char **v, char **env)
 	snprintf(gst.rules.fa,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_FCArc"));
 	snprintf(gst.rules.th,  BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_TemplH"));
 
-	snprintf(gst.rules.co_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCObj_BP"));
-	snprintf(gst.rules.ca_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCArc_BP"));
-	snprintf(gst.rules.lo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexObj_BP"));
-	snprintf(gst.rules.la_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexArc_BP"));
-	snprintf(gst.rules.yo_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccObj_BP"));
-	snprintf(gst.rules.ya_bp, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccArc_BP"));
+	snprintf(gst.rules.co_ac, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCObj_AC"));
+	snprintf(gst.rules.ca_ac, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_CCArc_AC"));
+	snprintf(gst.rules.lo_ac, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexObj_AC"));
+	snprintf(gst.rules.la_ac, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_LexArc_AC"));
+	snprintf(gst.rules.yo_ac, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccObj_AC"));
+	snprintf(gst.rules.ya_ac, BFLRG, "\t%s\n", cgetenv(FALSE, "IRules_YaccArc_AC"));
 
 	check_dir(cl);};
 

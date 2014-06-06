@@ -173,7 +173,7 @@ while ($#argv > 0)
               echo "               available on your system."
               echo "               For a multi-platform config a colon delimited list"
               echo "               compilers may be specified with the order matching"
-              echo "               the individual configurations (usually frontend first
+              echo "               the individual configurations (usually frontend first"
               echo "               then backend)."
               echo "               Use your PATH variable to select among multiple"
               echo "               installed versions of a single vendors compilers."

@@ -48,7 +48,6 @@ dbmget $WLog ACC_Debug_Default^      \
              GRAPHICS_Devices^       \
              GRAPHICS_Flags^         \
              GRAPHICS_Windows^       \
-             HAVE_GOOD_OMP_PRAGMAS^  \
              HAVE_PYTHON^            \
              HSY_OS_Name^            \
              HSY_OS_Type^            \
@@ -93,6 +92,7 @@ dbmget $WLog ACC_Debug_Default^      \
              SHELL_Default^          \
              SMP_LibExt^             \
              STD_IPC^                \
+             USE_ACC^                \
              Yacc_Exe^               \
              Yacc_Flags
 
@@ -509,31 +509,52 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
 # compiler invocations
-    Note $STDOUT "CCompiler      = ${CC_Exe}"
-    Note $STDOUT "CCmpLdr        = ${CC_Linker}"
-    Note $STDOUT "CFLAGS         = ${CC_Flags}"
-    Note $STDOUT "CDebug         = ${CC_Debug}"
-    Note $STDOUT "COptimize      = ${CC_Optimize}"
-    Note $STDOUT "CDefDebug      = ${CC_Debug_Default}"
-    Note $STDOUT "CDefOptimize   = ${CC_Optimize_Default}"
+    if ($USE_ACC == TRUE) then
+       Note $STDOUT "CCompiler      = acc"
+       Note $STDOUT "CCmpLdr        = acc"
+       Note $STDOUT "CDefDebug      = ${ACC_Debug_Default}"
+       Note $STDOUT "CDefOptimize   = ${ACC_Optimize_Default}"
+    else
+       Note $STDOUT "CCompiler      = ${CC_Exe}"
+       Note $STDOUT "CCmpLdr        = ${CC_Linker}"
+       Note $STDOUT "CDefDebug      = ${CC_Debug_Default}"
+       Note $STDOUT "CDefOptimize   = ${CC_Optimize_Default}"
+    endif
     Note $STDOUT 'ODC            = ${C${${OD}}}'
-
-    Note $STDOUT "CXCompiler     = ${CXX_Exe}"
-    Note $STDOUT "CXCmpLdr       = ${CXX_Linker}"
-    Note $STDOUT "CXFLAGS        = ${CXX_Flags}"
-    Note $STDOUT "CXDebug        = ${CXX_Debug}"
-    Note $STDOUT "CXOptimize     = ${CXX_Optimize}"
-    Note $STDOUT "CXDefDebug     = ${CC_Debug_Default}"
-    Note $STDOUT "CXDefOptimize  = ${CC_Optimize_Default}"
+    Note $STDOUT "CFLAGS         = ${CC_Flags}"
+    Note $STDOUT 'CDebug         = ${CCDefDebug}'
+    Note $STDOUT 'COptimize      = ${CCDefOptimize}'
     Note $STDOUT ""
 
-    Note $STDOUT "FCompiler      = ${FC_Exe}"
-    Note $STDOUT "FFLAGS         = ${FC_Flags}"
-    Note $STDOUT "FDebug         = ${FC_Debug}"
-    Note $STDOUT "FOptimize      = ${FC_Optimize}"
-    Note $STDOUT "FDefDebug      = ${FC_Debug_Default}"
-    Note $STDOUT "FDefOptimize   = ${FC_Optimize_Default}"
+    if ($USE_ACC == TRUE) then
+       Note $STDOUT "CXCompiler     = ${CXX_Exe}"
+       Note $STDOUT "CXCmpLdr       = ${CXX_Linker}"
+       Note $STDOUT "CXDefDebug     = ${CC_Debug_Default}"
+       Note $STDOUT "CXDefOptimize  = ${CC_Optimize_Default}"
+    else
+       Note $STDOUT "CXCompiler     = ${CXX_Exe}"
+       Note $STDOUT "CXCmpLdr       = ${CXX_Linker}"
+       Note $STDOUT "CXDefDebug     = ${CC_Debug_Default}"
+       Note $STDOUT "CXDefOptimize  = ${CC_Optimize_Default}"
+    endif
+    Note $STDOUT "CXFLAGS        = ${CXX_Flags}"
+    Note $STDOUT 'CXDebug        = ${CXXDefDebug}'
+    Note $STDOUT 'CXOptimize     = ${CXXDefOptimize}'
+    Note $STDOUT ""
+
+    if ($USE_ACC == TRUE) then
+       Note $STDOUT "FCompiler      = ${FC_Exe}"
+       Note $STDOUT "FDefDebug      = ${AFC_Debug_Default}"
+       Note $STDOUT "FDefOptimize   = ${AFC_Optimize_Default}"
+    else
+       Note $STDOUT "FCompiler      = ${FC_Exe}"
+       Note $STDOUT "FDefDebug      = ${FC_Debug_Default}"
+       Note $STDOUT "FDefOptimize   = ${FC_Optimize_Default}"
+    endif
     Note $STDOUT 'ODF            = ${F${${OD}}}'
+    Note $STDOUT "FFLAGS         = ${FC_Flags}"
+    Note $STDOUT 'FDebug         = ${FCDefDebug}'
+    Note $STDOUT 'FOptimize      = ${FCDefOptimize}'
     Note $STDOUT ""
 
     Note $STDOUT 'CCAnnounceFull = ${CC}'
@@ -562,49 +583,16 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'LD  = ${Linker} ${LdFlags}'
     Note $STDOUT ""
  
-# abstract compiler invocations
-    Note $STDOUT "ACDefDebug     = ${ACC_Debug_Default}"
-    Note $STDOUT "ACDefOptimize  = ${ACC_Optimize_Default}"
-    Note $STDOUT 'AODC           = ${AC${${OD}}}'
-    Note $STDOUT "AFDefDebug     = ${AFC_Debug_Default}"
-    Note $STDOUT "AFDefOptimize  = ${AFC_Optimize_Default}"
-    Note $STDOUT 'AODF           = ${AF${${OD}}}'
-    Note $STDOUT ""
-
-    Note $STDOUT 'ACCAnnounceFull = acc ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}'
-    Note $STDOUT 'AFCAnnounceFull = afc ${AODF} ${FFLAGS} ${FcFlags}'
-    Note $STDOUT 'ALXAnnounceFull = acc ${AODC} ${LXFLAGS} ${CcFlags}'
-    Note $STDOUT 'AYCAnnounceFull = acc ${AODC} ${LXFLAGS} ${CcFlags}'
-    Note $STDOUT ""
-
-    Note $STDOUT 'ACCAnnounceAbrv = acc ${AODC}'
-    Note $STDOUT 'AFCAnnounceAbrv = afc ${AODF}'
-    Note $STDOUT 'ALXAnnounceAbrv = acc ${AODC}'
-    Note $STDOUT 'AYCAnnounceAbrv = acc ${AODC}'
-    Note $STDOUT ""
-
-    Note $STDOUT 'ACCAnnounce     = ${ACCAnnounce${SFL_}}'
-    Note $STDOUT 'AFCAnnounce     = ${AFCAnnounce${SFL_}}'
-    Note $STDOUT 'ALXAnnounce     = ${ALXAnnounce${SFL_}}'
-    Note $STDOUT 'AYCAnnounce     = ${AYCAnnounce${SFL_}}'
-    Note $STDOUT ""
-
-    Note $STDOUT 'ACC = acc ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}'
-    Note $STDOUT 'AFC = afc ${AODF} ${FFLAGS} ${Shared_FC_Flags} ${FcFlags}'
-    Note $STDOUT 'ALX = acc ${AODC} ${LXFLAGS} ${CcFlags}'
-    Note $STDOUT 'AYC = acc ${AODC} ${LXFLAGS} ${CcFlags}'
-    Note $STDOUT ""
-
 # other invocations
-    Note $STDOUT 'CLD            = ${CCmpLdr} ${CFLAGS} ${ODC} ${CcFlags}'
-    Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${Cfg_CC_Flags} ${Shared_CC_Flags} ${ODC} ${CcFlags}'
-    Note $STDOUT 'FCCfg          = ${Cfg_FC_Exe} ${Cfg_FC_Flags} ${ODF} ${FcFlags}'
+    Note $STDOUT 'CLD            = ${CCmpLdr} ${ODC} ${CFLAGS} ${CcFlags}'
+    Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${ODC} ${Cfg_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+    Note $STDOUT 'FCCfg          = ${Cfg_FC_Exe} ${ODF} ${Cfg_FC_Flags} ${FcFlags}'
 
-    Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${Ser_CC_Flags} ${Shared_CC_Flags} ${ODC} ${CcFlags}'
-    Note $STDOUT 'FCSer          = ${Ser_FC_Exe} ${Ser_FC_Flags} ${ODF} ${FcFlags}'
+    Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${ODC} ${Ser_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+    Note $STDOUT 'FCSer          = ${Ser_FC_Exe} ${ODF} ${Ser_FC_Flags} ${FcFlags}'
 
-    Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${Cfe_CC_Flags} ${Shared_CC_Flags} ${ODC} ${CcFlags}'
-    Note $STDOUT 'FCCfe          = ${Cfe_FC_Exe} ${Cfe_FC_Flags} ${ODF} ${FcFlags}'
+    Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${ODC} ${Cfe_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+    Note $STDOUT 'FCCfe          = ${Cfe_FC_Exe} ${ODF} ${Cfe_FC_Flags} ${FcFlags}'
     Note $STDOUT 'CCCfe_LD_Flags = ${Cfe_LD_Flags}'
     Note $STDOUT 'CCCfe_LD_Lib   = ${Cfe_LD_Lib}'
     Note $STDOUT ""
@@ -641,25 +629,25 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 # write the default make rules
     call PrintRule(".c.i:", IRules_CCP)
 
-    if ($HAVE_GOOD_OMP_PRAGMAS == TRUE) then
+#    if ($USE_ACC == FALSE) then
        call PrintRule(".c.o:", IRules_CCObj)
        call PrintRule(".c.a:", IRules_CCArc)
        call PrintRule(".l.o:", IRules_LexObj)
        call PrintRule(".l.a:", IRules_LexArc)
-    else
-       call PrintRule(".c.o:", IRules_CCObj_BP)
-       call PrintRule(".c.a:", IRules_CCArc_BP)
-       call PrintRule(".l.o:", IRules_LexObj_BP)
-       call PrintRule(".l.a:", IRules_LexArc_BP)
-    endif
+#    else
+#       call PrintRule(".c.o:", IRules_CCObj_AC)
+#       call PrintRule(".c.a:", IRules_CCArc_AC)
+#       call PrintRule(".l.o:", IRules_LexObj_AC)
+#       call PrintRule(".l.a:", IRules_LexArc_AC)
+#    endif
     call PrintRule(".l.c:", IRules_LexC)
-    if ($HAVE_GOOD_OMP_PRAGMAS == TRUE) then
+#    if ($USE_ACC == FALSE) then
        call PrintRule(".y.o:", IRules_YaccObj)
        call PrintRule(".y.a:", IRules_YaccArc)
-    else
-       call PrintRule(".y.o:", IRules_YaccObj_BP)
-       call PrintRule(".y.a:", IRules_YaccArc_BP)
-    endif
+#    else
+#       call PrintRule(".y.o:", IRules_YaccObj_AC)
+#       call PrintRule(".y.a:", IRules_YaccArc_AC)
+#    endif
     call PrintRule(".y.c:", IRules_YaccC)
     call PrintRule(".f.o:", IRules_FCObj)
     call PrintRule(".f.a:", IRules_FCArc)

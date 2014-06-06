@@ -15,7 +15,8 @@ Note $ALog "----- analyze/cc-pragma -----"
 Note $ALog "Analyze: pragma handling"
 Note $ALog ""
 
-dbmget $ALog PACT_CC_VERSION
+dbmget $ALog USE_ACC   =\? FALSE^   \
+             PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
 #define LOCKON(_l)         \
@@ -43,13 +44,15 @@ else
    cat $Tmp.c >>& $ALog
 
    setenv HAVE_GOOD_OMP_PRAGMAS  FALSE
+   setenv USE_ACC                TRUE
    NoteD $ALog "      bad pragma handling"
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
 
 # export the results
-dbexp HAVE_GOOD_OMP_PRAGMAS
+dbmset $ALog HAVE_GOOD_OMP_PRAGMAS = $HAVE_GOOD_OMP_PRAGMAS^   \
+             USE_ACC               = $USE_ACC
 
 source $Me:h/post-common
 
