@@ -33,6 +33,8 @@ Run {
    write/spokes.scm      $Log $PSY_ScrDir
    write/install-pact    $Log $PSY_ScrDir
    write/acc             $Log $PSY_ScrDir
+   write/afc             $Log $PSY_ScrDir
+   write/a++             $Log $PSY_ScrDir
    write/aranlib         $Log $PSY_ScrDir
    write/smake           $Log $PSY_ScrDir
    write/dmake           $Log $PSY_ScrDir

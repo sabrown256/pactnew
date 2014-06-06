@@ -36,7 +36,7 @@ else
 
 # CVS/SVN
 
-   if (!(-d .git) && ((-d CVS) || (-d ../CVS) || (-d .svn) || (-d ../.svn))) then
+   if (!(-d .git) && ((-d CVS) || (-d ../CVS) || (-d .svn) || (-d ../.svn) || (-d ../../.svn))) then
       if ((-d CVS) || (-d ../CVS)) then
          set t = CVS
          set k = cvs

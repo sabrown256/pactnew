@@ -145,7 +145,7 @@ if (-d ../../python) then
                           ($HSY_OS_Name == "Darwin")   || \
                           ($HSY_OS_Name == "FreeBSD")) && \
                          ($lpy_cc == cc)) then
-                        flog $ALog set lpy_cc = Python_CC_Exe
+                        flog $ALog set lpy_cc = $Python_CC_Exe
                      endif
                   endif
                else

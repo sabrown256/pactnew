@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# ACC - abstract C compiler wrapper
+# AFC - abstract Fortran compiler wrapper
 #     - thicker wrapper than manager/ccomp
 #     - rationale:
 #     -   1) manage abstract compilation options
@@ -11,7 +11,6 @@
 #     -   2) better solution for environment variables + binary exe
 #     -      e.g. 'module' system users
 #     -   3) may use special knowledge of buggy compilers
-#     -      e.g. pgcc _Pragma handling problem
 #
 # include "cpyright.h"
 #
@@ -19,8 +18,8 @@
 set Me = $0
 source $Me:h/pre-common
 
-Note $WLog "----- write/acc -----"
-Note $WLog "Write: acc"
+Note $WLog "----- write/afc -----"
+Note $WLog "Write: afc"
 Note $WLog ""
 
 HAVE_SUBROUTINES
@@ -30,44 +29,35 @@ HAVE_SUBROUTINES
 
 Separator $WLog
 
-NoteD $WLog "   Abstract C compiler wrapper - acc"
+NoteD $WLog "   Abstract Fortran compiler wrapper - afc"
 Note $WLog ""
 
-dbmget $WLog CC_Debug^           \
-             CC_Optimize^        \
-             CC_Profile^         \
-             PACT_CC_FAMILY^     \
-             PACT_CC_VERSION^    \
-             PACT_CC_PATH^       \
-             PACT_CC_EXE^        \
+dbmget $WLog FC_Debug^           \
+             FC_Optimize^        \
+             FC_Profile^         \
+             PACT_FC_FAMILY^     \
+             PACT_FC_VERSION^    \
+             PACT_FC_PATH^       \
+             PACT_FC_EXE^        \
              PSY_Arch^           \
              PSY_Root
             
 setenv BinDir  $PSY_Root/bin
 setenv EtcDir  $PSY_Root/etc
              
-flog $WLog set exe    = $PACT_CC_EXE
-flog $WLog set vers   = $PACT_CC_VERSION
+flog $WLog set exe    = $PACT_FC_EXE
+flog $WLog set vers   = $PACT_FC_VERSION
 flog $WLog set comp   = $exe:t
-flog $WLog set STDOUT = $BinDir/acc
+flog $WLog set STDOUT = $BinDir/afc
 flog $WLog $RM $STDOUT
 flog $WLog touch $STDOUT
-
-# dbmget chokes getting this one
-set CPP = ( `$BinDir/perdb -f $EtcDir/cfg IRules_CCP` )
-
-# typical value for CPP is '${CC} -E $< > $*.i'
-set lcpp = ( `echo "$CPP" | sed 's|$<|$inf|' | sed 's|$\*.i|+out+|'` )
-
-Note $WLog "CPP  = |$CPP|"
-Note $WLog "lcpp = |$lcpp|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 Note $STDOUT '#\!/bin/csh -f'
 Note $STDOUT '#'
-Note $STDOUT "# ACC - abstract compiler wrapper for $PACT_CC_EXE"
+Note $STDOUT "# AFC - abstract compiler wrapper for $PACT_FC_EXE"
 Note $STDOUT '#'
 Note $STDOUT '# include "cpyright.h"'
 Note $STDOUT '#'
@@ -100,7 +90,7 @@ Note $STDOUT '           set opt = FALSE'
 Note $STDOUT '           breaksw'
 Note $STDOUT '      case -ahelp:'
 Note $STDOUT '           echo ""'
-Note $STDOUT '           echo "Usage: acc [-ag] [-ahelp] [-aO] [-apre <file>] [-aprf] [-avrb] -ao <outf> <args>*"'
+Note $STDOUT '           echo "Usage: afc [-ag] [-ahelp] [-aO] [-apre <file>] [-aprf] [-avrb] -ao <outf> <args>*"'
 Note $STDOUT '           echo "   ag      compile debuggable"'
 Note $STDOUT '           echo "   ahelp   this help message"'
 Note $STDOUT '           echo "   aO      compile optimized"'
@@ -153,8 +143,7 @@ Note $STDOUT '   exit(1)'
 Note $STDOUT 'endif'
 Note $STDOUT ""
 
-Note $STDOUT 'set CC  = ( $exe $args )'
-Note $STDOUT "set cpp = $lcpp"
+Note $STDOUT 'set FC  = ( $exe $args )'
 Note $STDOUT ""
 
 #--------------------------------------------------------------------------'
@@ -221,27 +210,16 @@ Note $STDOUT ""
 # check abstract options
 
 Note $STDOUT 'if ($dbg == TRUE) then'
-Note $STDOUT '   set args = ( '$CC_Debug' $args )'
+Note $STDOUT '   set args = ( '$FC_Debug' $args )'
 Note $STDOUT 'else if ($opt == TRUE) then'
-Note $STDOUT '   set args = ( '$CC_Optimize' $args )'
+Note $STDOUT '   set args = ( '$FC_Optimize' $args )'
 Note $STDOUT 'endif'
 Note $STDOUT ""
 
 Note $STDOUT 'if ($prf == TRUE) then'
-Note $STDOUT '   set args = ( '$CC_Profile' $args )'
+Note $STDOUT '   set args = ( '$FC_Profile' $args )'
 Note $STDOUT 'endif'
 Note $STDOUT 'unset linf'
-Note $STDOUT ""
-
-Note $STDOUT 'if ("$pref" != "") then'
-Note $STDOUT '   set CPP = ( `echo "$cpp" | sed "s|+out+|$pref|"` )'
-Note $STDOUT '   if ($vrb == TRUE) then'
-Note $STDOUT '      echo "   Preprocess: $CPP"'
-Note $STDOUT '   endif'
-Note $STDOUT '   rm -f $pref'
-Note $STDOUT '   eval $CPP'
-Note $STDOUT '   exit($status)'
-Note $STDOUT 'endif'
 Note $STDOUT ""
 
 #--------------------------------------------------------------------------
@@ -252,8 +230,6 @@ switch ($comp)
 # NOTE: newest GNU compilers require this to run because
 # for some reason they were not built with -rpath
 # this is not for the compiled executables but the compiler
-   case gcc:
-   case g++:
    case gfortran:
         Note $STDOUT 'set root = $exe:h'
         Note $STDOUT 'set root = $root:h'
@@ -266,8 +242,6 @@ switch ($comp)
         Note $STDOUT 'unset root'
         breaksw
 
-   case pathcc:
-   case pathCC:
    case pathf90:
         Note $STDOUT 'set root  = $exe:h'
         Note $STDOUT 'set root  = $root:h'
@@ -281,45 +255,7 @@ switch ($comp)
         Note $STDOUT 'unset root'
         breaksw
 
-   case pgcc:
-        Note $STDOUT 'set pref = $inf:r.int.c'
-        Note $STDOUT 'set CPP  = ( `echo "$cpp" | sed "s|+out+|$pref|"` )'
-        Note $STDOUT 'if ($vrb == TRUE) then'
-        Note $STDOUT '   echo "   Preprocess: $CPP"'
-        Note $STDOUT 'endif'
-
-# try preprocessing until the preprocessed file is at least as big
-# as the unpreprocessed file and the exit status is 0
-        Note $STDOUT '@ lerr = 1'
-        Note $STDOUT '@ dt  = 0'
-        Note $STDOUT '@ ia  = 0'
-        Note $STDOUT '@ nli = `cat $inf | wc -l`'
-        Note $STDOUT 'while ($ia < $na)'
-        Note $STDOUT '   @ ia = $ia + 1'
-        Note $STDOUT '   rm -f $pref'
-        Note $STDOUT '   eval $CPP'
-        Note $STDOUT '   set xstatus = $status'
-        Note $STDOUT '   if (-f $pref) then'
-        Note $STDOUT '      @ nlp = `cat $pref | wc -l`'
-        Note $STDOUT '      if (($xstatus == 0) && ($nli <= $nlp)) then'
-        Note $STDOUT '         @ lerr = 0'
-        Note $STDOUT '         break'
-        Note $STDOUT '      endif'
-        Note $STDOUT '   endif'
-        Note $STDOUT '   echo "***> preprocessing '"'"'$inf'"'"' failed on attempt $ia - retrying"'
-        Note $STDOUT '   @ dt = $dt + 1'
-        Note $STDOUT '   sleep $dt'
-        Note $STDOUT 'end'
-        Note $STDOUT 'if ($lerr == 1) then'
-        Note $STDOUT '   echo "***> preprocessing '"'"'$inf'"'"' failed after $na attempts - exiting"'
-        Note $STDOUT '   exit(1)'
-        Note $STDOUT 'else if ($ia > 1) then'
-        Note $STDOUT '   echo "***> preprocessing '"'"'$inf'"'"' succeeded"'
-        Note $STDOUT 'endif'
-
-        Note $STDOUT 'set inf    = $pref'
-        Note $STDOUT 'set action = ( rm -f $inf )'
-
+   case pgf90:
         breaksw
 endsw
 Note $STDOUT ""
@@ -329,13 +265,13 @@ Note $STDOUT ""
 
 # these are variables which may be used elsewhere
 # we are done with them - so unset them
-Note $STDOUT 'unsetenv PACT_CC_FAMILY'
-Note $STDOUT 'unsetenv PACT_CC_VERSION'
-Note $STDOUT 'unsetenv PACT_CC_PATH'
+Note $STDOUT 'unsetenv PACT_FC_FAMILY'
+Note $STDOUT 'unsetenv PACT_FC_VERSION'
+Note $STDOUT 'unsetenv PACT_FC_PATH'
 Note $STDOUT ""
 
 Note $STDOUT 'rm -f $outf'
-Note $STDOUT 'set cmd = ( $CC -o $outf $inf )'
+Note $STDOUT 'set cmd = ( $FC -o $outf $inf )'
 
 # verbose mode diagnostic for debugging
 Note $STDOUT 'if ($vrb == TRUE) then'
