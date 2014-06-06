@@ -365,20 +365,29 @@ endif
                       echo "include auto-win" >>& $pf
                       breaksw
 
+# all known examples of Cray XE machines use modules to
+# control environment in which compiler runs
+# since PACT shuns such environment control use ACC to
+# control compiler runtime environment
+                 case gnu-cxe:
+                 case pgi-cxe:
+                 case mp-gnu-cxe:
+                 case mp-pgi-cxe:
+                      echo "USE_ACC = TRUE" >>& $pf
+
+# all known examples of BG/X machines use scripts to
+# control environment in which compiler runs
+# since PACT uses those scripts we do not need to use ACC
                  case gnu-bgl:
                  case gnu-bgp:
                  case gnu-bgq:
-                 case gnu-cxe:
-                 case pgi-cxe:
                  case xlc-bgl:
                  case xlc-bgp:
                  case xlc-bgq:
                  case mp-gnu-bgl:
                  case mp-gnu-bgp:
                  case mp-gnu-bgq:
-                 case mp-gnu-cxe:
                  case mp-gnu-win:
-                 case mp-pgi-cxe:
                  case mp-xlc-bgl:
                  case mp-xlc-bgp:
                  case mp-xlc-bgq:
