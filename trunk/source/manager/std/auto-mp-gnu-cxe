@@ -4,8 +4,6 @@
 # include "cpyright.h"
 #
 
-USE_ACC = TRUE
-
 include auto-gnu
 include cross-gnu-cxe
-
+include features/acc
