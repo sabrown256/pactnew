@@ -1,5 +1,5 @@
 #
-# CRAY - config elements for CRAY
+# CRAY - config elements for CRAY XE
 #
 # include "cpyright.h"
 #
@@ -16,3 +16,4 @@ Group Cdefine {
    CRAY_XE = TRUE
 }
 
+include features/acc
