@@ -2365,7 +2365,8 @@ CFG_DONE:
 # save the files in BinDir
         set BinFiles = ""
         if ($strict == FALSE) then
-           set BinFiles = ( $BinFiles smake dmake acc aranlib pact template )
+           set BinFiles = ( $BinFiles smake dmake pact template )
+           set BinFiles = ( $BinFiles acc afc a++ aranlib )
            set BinFiles = ( $BinFiles timer px frnsic )
            set BinFiles = ( $BinFiles do-run elide blang rpath gexec perdb )
            set BinFiles = ( $BinFiles make-syntax )

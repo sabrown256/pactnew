@@ -134,13 +134,33 @@ Note $STDOUT '      case -l*:'
 Note $STDOUT '           set lib = ( $lib "$1" )'
 Note $STDOUT '           breaksw'
 Note $STDOUT '      default:'
-Note $STDOUT '           if ("$lib" != "") then'
+
+# literal foo.a, foo.so, or foo.so.2 goes into lib
+Note $STDOUT '           if (("$1" =~ *.a) || ("$1" =~ *.so*)) then'
 Note $STDOUT '              set lib = ( $lib "$1" )'
-Note $STDOUT '           else if (-f "$1") then'
+
+# the first argument which is an existing file goes into inf
+Note $STDOUT '           else if (("$inf" == "") && (-f "$1")) then'
 Note $STDOUT '              set inf = ( $inf "$1" )'
+
+# everything goes into lib once lib has anything
+# otherwise it goes into args
 Note $STDOUT '           else'
-Note $STDOUT '              set args = ( $args "$1" )'
+Note $STDOUT '              if ("$lib" != "") then'
+Note $STDOUT '                 set lib = ( $lib "$1" )'
+Note $STDOUT '              else'
+Note $STDOUT '                 set args = ( $args `echo "$1" | sed '"'"'s|"|+++|g'"'"'` )'
+Note $STDOUT '              endif'
 Note $STDOUT '           endif'
+
+#Note $STDOUT '           if ("$lib" != "") then'
+#Note $STDOUT '              set lib = ( $lib "$1" )'
+#Note $STDOUT '           else if (-f "$1") then'
+#Note $STDOUT '              set inf = ( $inf "$1" )'
+#Note $STDOUT '           else'
+#Note $STDOUT '              set args = ( $args "$1" )'
+#Note $STDOUT '           endif'
+
 Note $STDOUT '           breaksw'
 Note $STDOUT '   endsw'
 Note $STDOUT '   shift'
@@ -240,7 +260,7 @@ Note $STDOUT 'unset linf'
 Note $STDOUT ""
 
 Note $STDOUT 'if ("$pref" != "") then'
-Note $STDOUT '   set CPP = ( `echo "$cpp" | sed "s|+out+|$pref|"` )'
+Note $STDOUT '   set CPP = ( `echo "$cpp" | sed "s|+out+|$pref|" | sed '"'"'s|+++|\"|g'"'"'` )'
 Note $STDOUT '   if ($vrb == TRUE) then'
 Note $STDOUT '      echo "   Preprocess: $CPP"'
 Note $STDOUT '   endif'
@@ -288,43 +308,45 @@ switch ($comp)
         breaksw
 
    case pgcc:
-        Note $STDOUT 'set pref = $inf:r.int.c'
-        Note $STDOUT 'set CPP  = ( `echo "$cpp" | sed "s|+out+|$pref|"` )'
-        Note $STDOUT 'if ($vrb == TRUE) then'
-        Note $STDOUT '   echo "   Preprocess: $CPP"'
-        Note $STDOUT 'endif'
+        Note $STDOUT 'if ("$inf" !~ *.o) then'
+        Note $STDOUT '   set pref = $inf:r.int.c'
+        Note $STDOUT '   set CPP  = ( `echo "$cpp" | sed "s|+out+|$pref|" | sed '"'"'s|+++|\"|g'"'"'` )'
+        Note $STDOUT '   if ($vrb == TRUE) then'
+        Note $STDOUT '      echo "   Preprocess: $CPP"'
+        Note $STDOUT '   endif'
 
 # try preprocessing until the preprocessed file is at least as big
 # as the unpreprocessed file and the exit status is 0
-        Note $STDOUT '@ lerr = 1'
-        Note $STDOUT '@ dt  = 0'
-        Note $STDOUT '@ ia  = 0'
-        Note $STDOUT '@ nli = `cat $inf | wc -l`'
-        Note $STDOUT 'while ($ia < $na)'
-        Note $STDOUT '   @ ia = $ia + 1'
-        Note $STDOUT '   rm -f $pref'
-        Note $STDOUT '   eval $CPP'
-        Note $STDOUT '   set xstatus = $status'
-        Note $STDOUT '   if (-f $pref) then'
-        Note $STDOUT '      @ nlp = `cat $pref | wc -l`'
-        Note $STDOUT '      if (($xstatus == 0) && ($nli <= $nlp)) then'
-        Note $STDOUT '         @ lerr = 0'
-        Note $STDOUT '         break'
+        Note $STDOUT '   @ lerr = 1'
+        Note $STDOUT '   @ dt  = 0'
+        Note $STDOUT '   @ ia  = 0'
+        Note $STDOUT '   @ nli = `cat $inf | wc -l`'
+        Note $STDOUT '   while ($ia < $na)'
+        Note $STDOUT '      @ ia = $ia + 1'
+        Note $STDOUT '      rm -f $pref'
+        Note $STDOUT '      eval $CPP'
+        Note $STDOUT '      set xstatus = $status'
+        Note $STDOUT '      if (-f $pref) then'
+        Note $STDOUT '         @ nlp = `cat $pref | wc -l`'
+        Note $STDOUT '         if (($xstatus == 0) && ($nli <= $nlp)) then'
+        Note $STDOUT '            @ lerr = 0'
+        Note $STDOUT '            break'
+        Note $STDOUT '         endif'
         Note $STDOUT '      endif'
+        Note $STDOUT '      echo "***> preprocessing '"'"'$inf'"'"' failed on attempt $ia - retrying"'
+        Note $STDOUT '      @ dt = $dt + 1'
+        Note $STDOUT '      sleep $dt'
+        Note $STDOUT '   end'
+        Note $STDOUT '   if ($lerr == 1) then'
+        Note $STDOUT '      echo "***> preprocessing '"'"'$inf'"'"' failed after $na attempts - exiting"'
+        Note $STDOUT '      exit(1)'
+        Note $STDOUT '   else if ($ia > 1) then'
+        Note $STDOUT '      echo "***> preprocessing '"'"'$inf'"'"' succeeded"'
         Note $STDOUT '   endif'
-        Note $STDOUT '   echo "***> preprocessing '"'"'$inf'"'"' failed on attempt $ia - retrying"'
-        Note $STDOUT '   @ dt = $dt + 1'
-        Note $STDOUT '   sleep $dt'
-        Note $STDOUT 'end'
-        Note $STDOUT 'if ($lerr == 1) then'
-        Note $STDOUT '   echo "***> preprocessing '"'"'$inf'"'"' failed after $na attempts - exiting"'
-        Note $STDOUT '   exit(1)'
-        Note $STDOUT 'else if ($ia > 1) then'
-        Note $STDOUT '   echo "***> preprocessing '"'"'$inf'"'"' succeeded"'
-        Note $STDOUT 'endif'
 
-        Note $STDOUT 'set inf    = $pref'
-        Note $STDOUT 'set action = ( rm -f $inf )'
+        Note $STDOUT '   set inf    = $pref'
+        Note $STDOUT '   set action = ( rm -f $inf )'
+        Note $STDOUT 'endif'
 
         breaksw
 endsw
@@ -341,7 +363,7 @@ Note $STDOUT 'unsetenv PACT_CC_PATH'
 Note $STDOUT ""
 
 Note $STDOUT 'rm -f $outf'
-Note $STDOUT 'set cmd = ( $CC -o $outf $inf $lib )'
+Note $STDOUT 'set cmd = ( `echo "$CC -o $outf $inf $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
 
 # verbose mode diagnostic for debugging
 Note $STDOUT 'if ($vrb == TRUE) then'

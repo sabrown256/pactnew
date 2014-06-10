@@ -124,12 +124,23 @@ Note $STDOUT '      case -l*:'
 Note $STDOUT '           set lib = ( $lib "$1" )'
 Note $STDOUT '           breaksw'
 Note $STDOUT '      default:'
-Note $STDOUT '           if ("$lib" != "") then'
+
+# literal foo.a, foo.so, or foo.so.2 goes into lib
+Note $STDOUT '           if (("$1" =~ *.a) || ("$1" =~ *.so*)) then'
 Note $STDOUT '              set lib = ( $lib "$1" )'
-Note $STDOUT '           else if (-f "$1") then'
+
+# the first argument which is an existing file goes into inf
+Note $STDOUT '           else if (("$inf" == "") && (-f "$1")) then'
 Note $STDOUT '              set inf = ( $inf "$1" )'
+
+# everything goes into lib once lib has anything
+# otherwise it goes into args
 Note $STDOUT '           else'
-Note $STDOUT '              set args = ( $args "$1" )'
+Note $STDOUT '              if ("$lib" != "") then'
+Note $STDOUT '                 set lib = ( $lib "$1" )'
+Note $STDOUT '              else'
+Note $STDOUT '                 set args = ( $args "$1" )'
+Note $STDOUT '              endif'
 Note $STDOUT '           endif'
 Note $STDOUT '           breaksw'
 Note $STDOUT '   endsw'
