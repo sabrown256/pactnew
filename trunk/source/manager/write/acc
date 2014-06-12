@@ -41,7 +41,8 @@ dbmget $WLog CC_Debug^           \
              PACT_CC_PATH^       \
              PACT_CC_EXE^        \
              PSY_Arch^           \
-             PSY_Root
+             PSY_Root^           \
+             RPATH
             
 setenv BinDir  $PSY_Root/bin
 setenv EtcDir  $PSY_Root/etc
@@ -188,45 +189,65 @@ Note $STDOUT ""
 
 # check the compilers database for needed environment variables
 # such as license file, directory paths
+# NOTE: the compilers database is a hand written database
+# and distributions builds do not have this
 
-   set wexe = `which $comp`
-   if (-x "$wexe") then
-      set compilers = $wexe:h/compilers
-   else
-      set compilers = no.file
+set wexe = `which $comp`
+if (-x "$wexe") then
+   set compilers = $wexe:h/compilers
+else
+   set compilers = no.file
+endif
+if (-f $compilers) then
+
+   set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") && ($3 == "'$vers'") {print}' $compilers` )
+   if ($#linf < 4) then
+      set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") {print}' $compilers | tail -n 1` )
    endif
-   if (-f $compilers) then
 
-      set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") && ($3 == "'$vers'") {print}' $compilers` )
-      if ($#linf < 4) then
-         set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") {print}' $compilers | tail -n 1` )
-      endif
-
-      if ($#linf > 4) then
-         shift linf
-         shift linf
-         shift linf
-         shift linf
+   if ($#linf > 4) then
+      shift linf
+      shift linf
+      shift linf
+      shift linf
 
 # get other key,value pairs
 # useful for setting compiler license variables
-         while ($#linf > 1)
-            set var = $linf[1]
-            set val = $linf[2]
-            shift linf
-            shift linf
-            Note $STDOUT 'if ($vrb == TRUE) then'
-            Note $STDOUT '   echo "   setenv '$var $val'"'
-            Note $STDOUT 'endif'
-            Note $STDOUT "setenv $var $val"
-         end
-      endif
-
-      unset linf
-      unset sys
+      while ($#linf > 1)
+         set var = $linf[1]
+         set val = $linf[2]
+         shift linf
+         shift linf
+         Note $STDOUT 'if ($vrb == TRUE) then'
+         Note $STDOUT '   echo "   setenv '$var $val'"'
+         Note $STDOUT 'endif'
+         Note $STDOUT "setenv $var $val"
+      end
    endif
-   unset wexe
-   unset compilers
+
+   unset linf
+   unset sys
+endif
+unset wexe
+unset compilers
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# add to LD_LIBRARY PATH
+# NOTE: at config time we know RPATH and it may have dirs needed
+# in LD_LIBRARY_PATH at compile time
+# for example, recent poorly built GNU compilers which will not
+# run without LD_LIBRARY_PATH being set
+
+if ("$RPATH" != "") then
+   Note $STDOUT 'if ($?LD_LIBRARY_PATH == 1) then'
+   Note $STDOUT '   setenv LD_LIBRARY_PATH '$RPATH':$LD_LIBRARY_PATH'
+   Note $STDOUT 'else'
+   Note $STDOUT '   setenv LD_LIBRARY_PATH '$RPATH
+   Note $STDOUT 'endif'
+   Note $STDOUT ""
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
