@@ -118,7 +118,7 @@ else
 
    $NETSTAT -s >& /dev/null
    if ($status != 0) then
-      exit(3)
+#      exit(3)
    endif
 endif
 
