@@ -39,7 +39,8 @@ set CPP  = ( $PACT_CC_EXE $CC_Flags )
 
 # get CPP flags - dbmget chokes getting this one
 set CPPF = ( `$BinDir/perdb -f $EtcDir/cfg IRules_CCP` )
-set CPPF = ( `echo "$CPPF" | sed 's|$CC||'` )
+#set CPPF = ( `echo "$CPPF" | sed 's|$CC||'` )
+set CPPF = ( -E )
 
 Note $WLog "CPP  = |$CPP|"
 Note $WLog "CPPF = |$CPPF|"
@@ -210,7 +211,7 @@ Note $outf '   awk '"'"'$NF ~ /\\/ { printf("%s ", $0); }               \'
 Note $outf '        $NF \!~ /\\/ { printf("%s\n", $0); }'"'         |  \"
 Note $outf "   sed 's/\\/ /g'                                    |  \"
 Note $outf "   grep -v '#'                                       |  \"
-Note $outf '   sed "/^ *$/d"                                     |  \'
+Note $outf '   sed '"'"'/^ *$/d'"'                                     |  \"
 Note $outf "   sed 's/  */ /g'                                   |  \"
 Note $outf "   awk '"'$0 ~ /, *$/   { printf("%s", $0) }              \'
 Note $outf '        $0 \!~ /, *$/  { printf("%s\n", $0) }'"'        |  \"
@@ -227,7 +228,7 @@ Note $outf "   sed 's/} ;/};/g'                                  |  \"
 Note $outf "   sed 's/;/;@/g'                                    |  \"
 Note $outf "   tr '@' '\n'                                       |  \"
 Note $outf "   sed 's/\* */\*/g'                                 |  \"
-Note $outf '   sed "/^; *$/d"                                    |  \'
+Note $outf '   sed '"'"'/^; *$/d'"'                                    |  \"
 Note $outf "   sed 's/^ *//'                                     |  \"
 Note $outf '   cat >&\! $fo'
 Note $outf ''

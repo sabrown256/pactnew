@@ -19,10 +19,10 @@ int a;
 
 EOF
 
-   pcpp -o - $tmp.h >&! $tmp.1
+   acpp -o - $tmp.h >&! $tmp.1
    @ xstatus = $xstatus + $status
 
-   pcpp -o $tmp.2 $tmp.h
+   acpp -o $tmp.2 $tmp.h
    @ xstatus = $xstatus + $status
 
    diff -b -B -w $tmp.1 $tmp.2 >& /dev/null
