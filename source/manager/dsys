@@ -103,8 +103,9 @@ if (-x $BugTck) then
    set HaveTicket = TRUE
 endif
 
-setenv PERDB   $BinDir/perdb
-setenv GEXEC   $BinDir/gexec
+setenv GEXEC      $BinDir/gexec
+setenv PERDB      $BinDir/perdb
+setenv PERDB_LOG  "-l"
 
 if ($PSY_Arch !~ cygwin*) then
    limit stacksize unlimited >& /dev/null
@@ -426,7 +427,7 @@ switch ($Cmnd)
                    breaksw
               case -h :
                    echo ""
-                   echo "Usage: dsys build [-a] [-h] [-na #] [-p #] [-s] [-u] [tgts]*"
+                   echo "Usage: dsys load [-a] [-h] [-na #] [-p #] [-s] [-u] [tgts]*"
                    echo ""
                    echo "     a  - build all current configurations"
                    echo "     h  - this help message"
@@ -769,7 +770,7 @@ switch ($Cmnd)
                    echo ""
                    echo "Usage: dsys config [-a <sid>] [-as] [-b 32 | 64] [-c] [-db <db>]"
                    echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
-                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp <path>] [-o] [-O]"
+                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp <path>] [-nolog] [-o] [-O]"
                    echo "                   [-p] [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
                    echo ""
                    echo "        -a         set the system id for this config"
@@ -786,6 +787,7 @@ switch ($Cmnd)
                    echo "                   to omit installation use "-i none""
                    echo "        -llp       use <path> for LD_LIBRARY_PATH when analyzing compilers"
                    echo "                   special value '.' for path computed from compiler location (old default)"
+                   echo "        -nolog     do not log perdb transactions"
                    echo "        -o         build an absolutely optimizied version"
                    echo "        -O         build an mixed debuggable/optimizied version"
                    echo "        -p         build a profiling version"
@@ -878,6 +880,9 @@ switch ($Cmnd)
               case -llp:
                    shift
                    setenv USE_LDLibPath "-l $1"
+                   breaksw
+              case -nolog:
+                   setenv PERDB_LOG ""
                    breaksw
               case -md:
                    shift
@@ -3663,7 +3668,7 @@ DB_CONFIG:
 # perdb will quit if the connection goes but it may take awhile so
 # lags are a problem
    if (0) then
-      flog $Log $PERDB -l quit:
+      flog $Log $PERDB $PERDB_LOG quit:
       while (-f $PERDB_PATH.conn)
          sleep 1
       end
@@ -3686,7 +3691,7 @@ DB_CONFIG:
    endif
    flog $Log $RM ${PERDB_PATH}*
    sleep 1
-   flog $Log $PERDB -l -c -s
+   flog $Log $PERDB $PERDB_LOG -c -s
    sleep 1
    flog $Log ls -l ${PERDB_PATH}*
 
@@ -3721,7 +3726,7 @@ PCO_CONFIG:
    Separator $Log
    Note $Log "Entering PCO_CONFIG"
 
-   flog $Log set PCO = ( $BinDir/pco $dbopt -pact -env $PSY_MngDir/pact.env -l )
+   flog $Log set PCO = ( $BinDir/pco $dbopt -pact -env $PSY_MngDir/pact.env $PERDB_LOG )
 
 # start the env files
    $RM $EnvCsh
@@ -3882,7 +3887,7 @@ FIN_CONFIG:
    Separator $Log
    Note $Log "Entering FIN_CONFIG"
 
-   flog $Log $PERDB -l quit:
+   flog $Log $PERDB $PERDB_LOG quit:
 
    if ($platform == FALSE) then
       NoteD $Log ""
