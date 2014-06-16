@@ -1,0 +1,273 @@
+#!/bin/csh -f
+#
+# ACPP - abstract CPP wrapper
+#      - rationale:
+#      -   1) manage cpp for configured compiler
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/pre-common
+
+Note $WLog "----- write/acpp -----"
+Note $WLog "Write: acpp"
+Note $WLog ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $WLog
+
+NoteD $WLog "   Abstract C preprocessor wrapper - acpp"
+Note $WLog ""
+
+dbmget $WLog CC_Flags^           \
+             PACT_CC_EXE^        \
+             PSY_Arch^           \
+             PSY_Root
+            
+setenv BinDir  $PSY_Root/bin
+setenv EtcDir  $PSY_Root/etc
+             
+flog $WLog set outf = $BinDir/acpp
+flog $WLog $RM $outf
+flog $WLog touch $outf
+
+# work out the C preprocessor invocation
+set CPP  = ( $PACT_CC_EXE $CC_Flags )
+
+# get CPP flags - dbmget chokes getting this one
+set CPPF = ( `$BinDir/perdb -f $EtcDir/cfg IRules_CCP` )
+set CPPF = ( `echo "$CPPF" | sed 's|$CC||'` )
+
+Note $WLog "CPP  = |$CPP|"
+Note $WLog "CPPF = |$CPPF|"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Note $outf '#\!/bin/csh -f'
+Note $outf '#'
+Note $outf '# ACPP - abstract CPP portability wrapper for $PACT_CC_EXE'
+Note $outf '#'
+Note $outf '# include "cpyright.h"'
+Note $outf '#'
+Note $outf ''
+Note $outf 'unalias *'
+Note $outf ''
+Note $outf 'set pact   = `which perdb`'
+Note $outf 'set bindir = $pact:h'
+Note $outf 'set lbase  = $bindir:h'
+Note $outf 'unset bindir'
+Note $outf ''
+Note $outf 'if (-d ../scripts) then'
+Note $outf '   source ../scripts/functions-pact.csh'
+Note $outf 'else'
+Note $outf '   source $lbase/etc/functions-pact.csh'
+Note $outf 'endif'
+Note $outf ''
+Note $outf 'set lperdb_path = $lbase/etc/cfg'
+Note $outf ''
+Note $outf 'unset lbase'
+Note $outf ''
+Note $outf '@ nerr = 0'
+Note $outf ''
+Note $outf 'set fi     = ""'
+Note $outf 'set fo     = ""'
+Note $outf 'set fatal  = 0'
+Note $outf 'set keep   = FALSE'
+Note $outf 'set noinc  = FALSE'
+Note $outf ''
+Note $outf 'while ($#argv > 0)'
+Note $outf '   switch ($1)'
+Note $outf '      case -f:'
+Note $outf '           set fatal = 1'
+Note $outf '           breaksw'
+Note $outf '      case -h:'
+Note $outf '           echo ""'
+Note $outf '           echo "Usage: pcpp [-f] [-h] [-i] [-k] [-o <file>] <file>"'
+Note $outf '           echo "   f      make errors fatal (exit with 1 instead of 0)"'
+Note $outf '           echo "   h      this help message"'
+Note $outf '           echo "   i      do not expand dependent includes"'
+Note $outf '           echo "   k      keep prototypes file"'
+Note $outf '           echo "   o      name of output file"'
+Note $outf '           echo "   <file> input file"'
+Note $outf '           echo ""'
+Note $outf '           exit(1)'
+Note $outf '      case -i:'
+Note $outf '           set noinc = TRUE'
+Note $outf '           breaksw'
+Note $outf '      case -k:'
+Note $outf '           set keep = TRUE'
+Note $outf '           breaksw'
+Note $outf '      case -o:'
+Note $outf '           shift'
+Note $outf '           set fo = $1'
+Note $outf '           breaksw'
+Note $outf '      default:'
+Note $outf '           set fi = $1'
+Note $outf '           breaksw'
+Note $outf '   endsw'
+Note $outf '   shift'
+Note $outf 'end'
+Note $outf ''
+Note $outf 'if ("$fi" == "") then'
+Note $outf '   echo "No file specified - exiting"'
+Note $outf '   exit($fatal)'
+Note $outf 'endif'
+Note $outf 'if (\!(-f "$fi")) then'
+Note $outf '   echo "File $fi does not exist - exiting"'
+Note $outf '   exit($fatal)'
+Note $outf 'endif'
+Note $outf ''
+Note $outf 'set tf = $fi:t'
+Note $outf 'set td = $fi:h'
+Note $outf 'if ("$tf" == "$td") then'
+Note $outf '   set td = .'
+Note $outf 'endif'
+Note $outf 'set tfi = $tf:r.i'
+Note $outf ''
+Note $outf 'set outft = FALSE'
+Note $outf 'if ("$fo" == "") then'
+Note $outf '   set fo = $cwd/$tfi'
+Note $outf 'else if ("$fo" == "-") then'
+Note $outf '   set outft = TRUE'
+Note $outf ''
+
+# try to put the temporary file in a parallel-safe place
+Note $outf '   if ($?TMP == 1) then'
+Note $outf '      set fo = $TMP/$tfi'
+Note $outf '   else if ($?TMPDIR == 1) then'
+Note $outf '      set fo = $TMPDIR/$tfi'
+Note $outf '   else'
+Note $outf '      set fo = $cwd/$tfi'
+Note $outf '   endif'
+Note $outf 'endif'
+Note $outf ''
+
+set noglob
+Note $outf 'set CPP  = ( '$CPP' -I$td '`echo $CPPF | sed 's|\"||g'`' )'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PROCESS_PACKAGE_HEADER - make a clean list of functions, variables, and
+#                        - typedefs defined by the package header
+#   elide '/*' '*/' -                           remove comments
+#   tr "\t" " "                                 remove tabs (BSD brain damage)
+#   awk '$NF ~ /\\/ { printf("%s ", $0); }      merge lines ending in \
+#        $NF !~ /\\/ { printf("%s\n", $0); }'
+#   sed 's/\\/ /g'                              remove embedded \
+#   grep -v '#   '                              remove # line directives
+#   sed '/^ *$/d'                               remove blank lines
+#   sed 's/  */ /g'                             compress whitespace
+#   awk '$0 ~ /, *$/   { printf("%s", $0) }     combines ending in ,
+#        $0 !~ /, *$/  { printf("%s\n", $0) }'
+#   tr -d '\n'                                  delete newlines
+#   sed 's/ *; */;/g'                           remove whitespace around
+#   sed 's/ *( */(/g'                           ; ( ) { } [ ]
+#   sed 's/ *) */)/g'
+#   sed 's/ *{ */{/g'
+#   sed 's/ *} */}/g'
+#   sed 's/ *\[ */\[/g'
+#   sed 's/ *\] */\]/g'
+#   sed 's/(\*/ (\*/g'                          change 'int(*f)' to 'int (*f)'
+#   sed 's/} ;/};/g'                            change '} ;' to '};'
+#   sed 's/;/;@/g'                              replace ; with ;\n
+#   tr '@' '\n'                                 (broken BSD forces two step)
+#   sed 's/\* */\*/g'                           change '* foo' to '*foo'
+#   sed '/^; *$/d'                              remove lines with only ;
+#   sed 's/^ *//'                               remove leading whitespace
+#
+
+# make a local copy ending with .c because
+# some preprocessors want to write intermediate files in the same directory
+# some preprocessors will not work with .h (e.g. PathScale)
+Note $outf 'set th = /tmp/$tf:r.c'
+Note $outf ''
+
+Note $outf 'if ($noinc == TRUE) then'
+Note $outf '   grep -v include $fi >&\! $th'
+Note $outf 'else'
+Note $outf '   cp $fi $th'
+Note $outf 'endif'
+Note $outf ''
+
+Note $outf 'if (-f $th) then'
+Note $outf '   if ($?PERDB_PATH == 0) then'
+Note $outf '      setenv PERDB_PATH /tmp/$$'
+Note $outf '      set clean = TRUE'
+Note $outf '   else'
+Note $outf '      set clean = FALSE'
+Note $outf '   endif'
+Note $outf ''
+
+Note $outf '   ( $CPP $th ; perdb cpp1=$status >& /dev/null )    |& \'
+Note $outf '   elide '"'/*' '*/'"' -                                 |  \'
+Note $outf '   tr "\t" " "                                       |  \'
+Note $outf '   awk '"'"'$NF ~ /\\/ { printf("%s ", $0); }               \'
+Note $outf '        $NF \!~ /\\/ { printf("%s\n", $0); }'"'         |  \"
+Note $outf "   sed 's/\\/ /g'                                    |  \"
+Note $outf "   grep -v '#'                                       |  \"
+Note $outf '   sed "/^ *$/d"                                     |  \'
+Note $outf "   sed 's/  */ /g'                                   |  \"
+Note $outf "   awk '"'$0 ~ /, *$/   { printf("%s", $0) }              \'
+Note $outf '        $0 \!~ /, *$/  { printf("%s\n", $0) }'"'        |  \"
+Note $outf "   tr -d '\n'                                        |  \"
+Note $outf "   sed 's/ *; */;/g'                                 |  \"
+Note $outf "   sed 's/ *( */(/g'                                 |  \"
+Note $outf "   sed 's/ *) */)/g'                                 |  \"
+Note $outf "   sed 's/ *{ */ {/g'                                |  \"
+Note $outf "   sed 's/ *} */} /g'                                |  \"
+Note $outf "   sed 's/ *\[ */\[/g'                               |  \"
+Note $outf "   sed 's/ *\] */\]/g'                               |  \"
+Note $outf "   sed 's/(\*/ (\*/g'                                |  \"
+Note $outf "   sed 's/} ;/};/g'                                  |  \"
+Note $outf "   sed 's/;/;@/g'                                    |  \"
+Note $outf "   tr '@' '\n'                                       |  \"
+Note $outf "   sed 's/\* */\*/g'                                 |  \"
+Note $outf '   sed "/^; *$/d"                                    |  \'
+Note $outf "   sed 's/^ *//'                                     |  \"
+Note $outf '   cat >&\! $fo'
+Note $outf ''
+Note $outf '   set cpp1 = `perdb cpp1`'
+Note $outf '   if ($clean == TRUE) then'
+Note $outf '      perdb quit: >& /dev/null'
+Note $outf '      rm -f ${PERDB_PATH}.* >& /dev/null'
+Note $outf '      unsetenv PERDB_PATH'
+Note $outf '   endif'
+Note $outf '   unset clean'
+Note $outf ''
+Note $outf '   if ($cpp1 \!= 0) then'
+Note $outf '      @ nerr = $nerr + 2'
+Note $outf '   else if (\!(-f $fo) || (-z $fo)) then'
+Note $outf '      @ nerr = $nerr + 4'
+Note $outf '   else'
+Note $outf '      if (($outft == TRUE) && (-f $fo)) then'
+Note $outf '         cat $fo'
+Note $outf '      endif'
+Note $outf '   endif'
+Note $outf '   unset cpp1'
+Note $outf ''
+Note $outf '   rm -f $th* >& /dev/null'
+Note $outf '   if (($outft == TRUE) || ($nerr \!= 0)) then'
+Note $outf '      rm -f $fo >& /dev/null'
+Note $outf '   endif'
+Note $outf ''
+Note $outf 'else'
+Note $outf '   @ nerr = $nerr + 8'
+Note $outf 'endif'
+Note $outf ''
+
+Note $outf 'exit($nerr)'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+flog $WLog chmod a+x $outf
+
+source $Me:h/post-common
+
+exit(0)
+
