@@ -20,7 +20,7 @@ TGTScr = do-local do-stats do-automake distribute \
          cdlog which-cfg mpi-info diff-tree use-tcsh \
          simplify-path simplify-list gcc-info sinstall fill-string \
          mall png-diff sunrace cross-info find-comments \
-         pcpp import-api import-so prune-env measure-env \
+         import-api import-so prune-env measure-env \
          which-scs scs-update scs-commit scs-co scs-history scs-meta \
          scs-add scs-remove scs-lock scs-diff scs-move scs-tag \
          scs-sync scs-revert scs-init \

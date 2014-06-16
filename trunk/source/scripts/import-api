@@ -240,9 +240,9 @@ if (-f $hdr) then
       flog $log set clean = FALSE
    endif
 
-   Note $log "PCPP ... "
+   Note $log "ACPP ... "
 
-   ( pcpp -o - $hdr ; perdb cpp2=$status >& /dev/null )    |& \
+   ( acpp -o - $hdr ; perdb cpp2=$status >& /dev/null )    |& \
    elide '{' '}' -                                         |  \
    sed 's/extern//g'                                       |  \
    grep -v typedef                                         |  \
@@ -258,17 +258,17 @@ if (-f $hdr) then
    unset clean
 
    if (($cpp2 != 0) || ($cpp1 != 0)) then
-      Note $log "PCPP ... ng ($cpp2/$cpp1)"
+      Note $log "ACPP ... ng ($cpp2/$cpp1)"
       flog $log @ nerr = $nerr + 2
       flog $log rm -rf $ppf
       exit($nerr)
    else if (-z $ppf) then
-      Note $log "PCPP ... ng (zero length file)"
+      Note $log "ACPP ... ng (zero length file)"
       flog $log @ nerr = $nerr + 2
       flog $log rm -rf $ppf
       exit($nerr)
    else
-      Note $log "PCPP ... ok"
+      Note $log "ACPP ... ok"
       flog $log ls -l $ppf
       flog $log cat $ppf
    endif

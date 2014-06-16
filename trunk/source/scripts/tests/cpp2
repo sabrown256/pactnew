@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# CPP2 - basic test of pcpp with error
+# CPP2 - basic test of acpp with error
 #      - should have no output on error
 #
 # Source Version: 3.0
@@ -24,7 +24,7 @@ int a;
 
 EOF
 
-   pcpp -o - $tmp.h
+   acpp -o - $tmp.h
    if ($status == 0) then
       set xstatus = 1
    else

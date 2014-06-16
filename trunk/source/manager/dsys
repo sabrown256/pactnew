@@ -1953,7 +1953,7 @@ CFG_DONE:
         set InstF = ""
         set InstF = ( $InstF pact-update code-date )
         set InstF = ( $InstF install-ext )
-        set InstF = ( $InstF ../scripts/{import-api,pcpp,px,frnsic,sinstall} )
+        set InstF = ( $InstF ../scripts/{import-api,px,frnsic,sinstall} )
 
 # requiring pact-dist to be run from manager - no need to install
 #        set InstF = ( $InstF pact-dist )
@@ -2370,7 +2370,7 @@ CFG_DONE:
            set BinFiles = ( $BinFiles timer px frnsic )
            set BinFiles = ( $BinFiles do-run elide blang rpath gexec perdb )
            set BinFiles = ( $BinFiles make-syntax )
-           set BinFiles = ( $BinFiles import-api pcpp )
+           set BinFiles = ( $BinFiles import-api )
            set BinFiles = ( $BinFiles sinstall install-pact install-ext )
         endif
         Note $Log "BinFiles = $BinFiles"

@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# CPP1 - basic test of pcpp
+# CPP1 - basic test of acpp
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -23,7 +23,7 @@ int a;
 
 EOF
 
-   pcpp -o - $tmp.h
+   acpp -o - $tmp.h
    set xstatus = $status
 
 

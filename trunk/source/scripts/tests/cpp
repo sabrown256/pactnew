@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# CPP - test pcpp
+# CPP - test acpp
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -10,13 +10,13 @@
 
 source ../../tests/common
 
-set msg = "PCPP Test ......................"
+set msg = "ACPP Test ......................"
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: pcpp [-h]"
+           echo "Usage: cpp [-h]"
            echo "  h  this help message"
            echo ""
            exit(1);
@@ -29,7 +29,7 @@ end
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# CPP - test pcpp
+# CPP - test acpp
 
 NoteD $Log "                    $msg"
 
@@ -67,6 +67,6 @@ end
 
 set rpf = ( $rpf cpp* cpp*.h )
 
-$TEST_CHECK part -a pcpp -e $nerr -rpf "$rpf" "$msg"
+$TEST_CHECK part -a acpp -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)

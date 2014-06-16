@@ -156,13 +156,13 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# PROTO - make the PROTO file using pcpp
+# PROTO - make the PROTO file using acpp
 
 if (!(-f $proto)) then
 
    Separator $log
 
-   pcpp $hdr -o -                                  |& \
+   acpp $hdr -o -                                  |& \
    sed 's/extern//g'                               |  \
    sed 's/unsigned//g'                             |  \
    sed 's/const//g'                                |  \
