@@ -25,7 +25,8 @@ Note $WLog ""
 dbmget $WLog CC_Flags^           \
              PACT_CC_EXE^        \
              PSY_Arch^           \
-             PSY_Root
+             PSY_Root^           \
+             RPATH
             
 setenv BinDir  $PSY_Root/bin
 setenv EtcDir  $PSY_Root/etc
@@ -57,21 +58,6 @@ Note $outf '#'
 Note $outf ''
 Note $outf 'unalias *'
 Note $outf ''
-Note $outf 'set pact   = `which perdb`'
-Note $outf 'set bindir = $pact:h'
-Note $outf 'set lbase  = $bindir:h'
-Note $outf 'unset bindir'
-Note $outf ''
-Note $outf 'if (-d ../scripts) then'
-Note $outf '   source ../scripts/functions-pact.csh'
-Note $outf 'else'
-Note $outf '   source $lbase/etc/functions-pact.csh'
-Note $outf 'endif'
-Note $outf ''
-Note $outf 'set lperdb_path = $lbase/etc/cfg'
-Note $outf ''
-Note $outf 'unset lbase'
-Note $outf ''
 Note $outf '@ nerr = 0'
 Note $outf ''
 Note $outf 'set fi     = ""'
@@ -87,7 +73,7 @@ Note $outf '           set fatal = 1'
 Note $outf '           breaksw'
 Note $outf '      case -h:'
 Note $outf '           echo ""'
-Note $outf '           echo "Usage: pcpp [-f] [-h] [-i] [-k] [-o <file>] <file>"'
+Note $outf '           echo "Usage: acpp [-f] [-h] [-i] [-k] [-o <file>] <file>"'
 Note $outf '           echo "   f      make errors fatal (exit with 1 instead of 0)"'
 Note $outf '           echo "   h      this help message"'
 Note $outf '           echo "   i      do not expand dependent includes"'
@@ -149,6 +135,24 @@ Note $outf ''
 
 set noglob
 Note $outf 'set CPP  = ( '$CPP' -I$td '`echo $CPPF | sed 's|\"||g'`' )'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# add to LD_LIBRARY PATH
+# NOTE: at config time we know RPATH and it may have dirs needed
+# in LD_LIBRARY_PATH at compile time
+# for example, recent poorly built GNU compilers which will not
+# run without LD_LIBRARY_PATH being set
+
+if ("$RPATH" != "") then
+   Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
+   Note $outf '   setenv LD_LIBRARY_PATH '$RPATH':$LD_LIBRARY_PATH'
+   Note $outf 'else'
+   Note $outf '   setenv LD_LIBRARY_PATH '$RPATH
+   Note $outf 'endif'
+   Note $outf ""
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

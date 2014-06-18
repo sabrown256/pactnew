@@ -1,0 +1,14 @@
+#
+# ACCFPE - use abstract compilers even for patch-fpe
+#
+# include "cpyright.h"
+#
+
+Group USE {
+   ACC = TRUE
+}
+
+Group FPE {
+   Exe = acc
+}
+
