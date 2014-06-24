@@ -44,35 +44,40 @@ static void _PG_comp_tick_spacings(PG_axis_def *ad)
     double drl, divs, sp, isp, dv, dt;
 
     dv = ad->vo[1] - ad->vo[0];
+    if (dv > 0.0)
 
 /* find the integral points (10**sp) */
-    sp = log10(dv);
+       {sp = log10(dv);
 
-    isp = 0.0;
-    if (sp < 0.0)
-       isp = PM_fix(sp - (1.0 + EPSILON));
+	isp = 0.0;
+	if (sp < 0.0)
+	   isp = PM_fix(sp - (1.0 + EPSILON));
 
-    else if (sp > 0.0)
-       isp = PM_fix(sp + EPSILON);
+	else if (sp > 0.0)
+	   isp = PM_fix(sp + EPSILON);
 
 /* find the number of integral points in the interval */
-    drl = (1.0 - TOLERANCE)*POW(10.0, isp);
-    nt  = PM_fix(dv/drl);
+	drl = (1.0 - TOLERANCE)*POW(10.0, isp);
+	nt  = PM_fix(dv/drl);
 
-    if (nt <= 2)
-       {drl *= 0.1;
-        nt  *= 10;};
+	if (nt <= 2)
+	   {drl *= 0.1;
+	    nt  *= 10;};
 
-    while (nt >= _PG_gattrs.axis_max_major_ticks)
-       {n5 = nt/5;
-        n2 = nt/2;
-        dt = (5.0*n5 - 2.0*n2);
-        if (dt >= -TOLERANCE)
-           {nt   = n5;
-            drl *= 5.0;}
-	else
-           {nt   = n2;
-            drl *= 2.0;};};
+	while (nt >= _PG_gattrs.axis_max_major_ticks)
+	   {n5 = nt/5;
+	    n2 = nt/2;
+	    dt = (5.0*n5 - 2.0*n2);
+	    if (dt >= -TOLERANCE)
+	       {nt   = n5;
+		drl *= 5.0;}
+	    else
+	       {nt   = n2;
+		drl *= 2.0;};};}
+
+    else
+       {drl = (1.0 - TOLERANCE);
+	nt  = 1;};
 
     if (nt <= 2)
        divs = 20.0;
