@@ -40,6 +40,7 @@ set datest = `date`
 set TTY    = ""
 set pool   = ""
 set quiet  = FALSE
+set atime  = ""
 set info   = ""
 set tdir   = $cwd
 set tgt    = batch
@@ -64,6 +65,10 @@ while ($#argv > 0)
            shift
            set cmnd = ( $cmnd $1 )
            breaksw
+      case -at:
+           shift
+           set atime = $1
+           breaksw
       case -d:
            shift
            set tdir = $1
@@ -87,12 +92,13 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: do-batch [-a <args>] [-d <dir>] [-dt #] [-e <var> <value>]"
+           echo "Usage: do-batch [-a <args>] [-at <time>] [-d <dir>] [-dt #] [-e <var> <value>]"
            echo "                [-f <file>] [-g] [-h] [-H <host>] [-m] [-o <file>]"
            echo "                [-p #] [-prt <queue>] [-q] [-t #] [-w] [-x]"
            echo ""
            echo "Options:"
            echo "     a   - quoted string with arguments for the command"
+           echo "     at  - run after <time> in [[[YY]MM]DD]hhmm form"
            echo "     d   - temporary file directory"
            echo "     dt  - time limit in S or M:S or H:M:S form"
            echo "     e   - add environment variables to the batch script"
@@ -289,6 +295,11 @@ case batch:
    touch $scr
 
    set bopt = ""
+
+# setup start time
+   if ("$atime" != "") then
+      set bopt = ( $bopt -a $atime )
+   endif
 
    Note $scr '#\!/bin/csh'
 
