@@ -379,7 +379,7 @@
 			    (rep-file-out (caar things) (cdar things)))))
 
 		(define (cm-seq fnc x)
-		  (if (fnc x)
+		  (if (fnc (list x))
 		      (cm-seq fnc (+ x 1))))
 
 		(if (equal? (file-type fp) "PDBfile")
