@@ -121,10 +121,6 @@ Tool Lex {
    Flags  = -w
 }
 
-Tool MAKE {
-   UseGNU = TRUE
-}
-
 Group AF {
    PATTERN_WARN = ":+sp+warning:"
    PATTERN_ERR  = ":+sp+error:"

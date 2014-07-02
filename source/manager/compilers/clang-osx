@@ -21,6 +21,10 @@ Group OCV {
 include compilers/clang
 include os/osx
 
+Tool MAKE {
+   UseGNU = TRUE
+}
+
 Tool Ranlib {
    Exe = ranlib
 }

@@ -1,5 +1,5 @@
 #
-# CLANG-LNX - define clang compiler for Linux
+# CLANG-BSD - define clang compiler for FreeBSD
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -15,9 +15,5 @@ Group OCV {
 }
 
 include compilers/clang
-include os/lnx
-
-Tool MAKE {
-   UseGNU = TRUE
-}
+include os/freebsd
 
