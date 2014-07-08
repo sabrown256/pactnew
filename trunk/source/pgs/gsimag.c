@@ -51,7 +51,7 @@ static void _PG_map_type_image(PG_device *dev, char *type, unsigned char *bf,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_INVERT_IMAGE_DATA - flip the image throught the y direction */
+/* PG_INVERT_IMAGE_DATA - flip the image through the y axis */
 
 void PG_invert_image_data(unsigned char *bf, int kx, int lx, int bpi)
    {int i, l, lm, lh, bc;
@@ -76,7 +76,7 @@ void PG_invert_image_data(unsigned char *bf, int kx, int lx, int bpi)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_INVERT_IMAGE - flip the image throught the y direction */
+/* PG_INVERT_IMAGE - flip the image through the y axis */
 
 void PG_invert_image(PG_image *im)
    {int kx, lx;

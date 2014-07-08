@@ -70,7 +70,7 @@ Note $STDOUT ""
 Note $STDOUT '@ err = 0'
 Note $STDOUT ""
 
-if (-x "$comp) then
+if (-x "$comp") then
 
    Note $STDOUT "source $EtcDir/env-pact.csh"
    Note $STDOUT ""
