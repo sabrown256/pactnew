@@ -985,7 +985,8 @@ static object *_SSI_time(SS_psides *si)
 
 /* make the month right */
     if (loct != NULL)
-       {loct->tm_mon++;
+       {loct->tm_year -= 100;
+	loct->tm_mon++;
 
 	o = SS_make_list(si, SC_INT_I, &loct->tm_year,
 			 SC_INT_I, &loct->tm_mon,

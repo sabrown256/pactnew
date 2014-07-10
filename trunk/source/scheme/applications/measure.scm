@@ -74,6 +74,37 @@
 
 ;--------------------------------------------------------------------------
 
+; MEASURE-TIME - report the time it takes to evaluate FNC
+;              - return the time as (<hour> <minute> <second>)
+
+(define (second-timer)
+   (let* ((ti (time))
+          (hr (list-ref ti 3))
+          (mn (list-ref ti 4))
+          (sc (list-ref ti 5))
+	  (dt (+ sc (* 60 (+ mn (* 60 hr))))))
+         dt))
+
+(define (time-diff tf ti)
+   (let* ((dt (truncate (abs (- tf ti))))
+          (sc (remainder dt 60))
+	  (tm (quotient dt 60))
+	  (mn (remainder tm 60))
+	  (hr (quotient tm 60)))
+         (list hr mn sc)))
+
+(define-macro (measure-time fnc msg)
+   (if msg
+       (printf nil "   %s ... " msg))
+   (let* ((ti (second-timer))
+	  tf dt)
+         (eval fnc)
+	 (set! tf (second-timer))
+	 (set! dt (time-diff tf ti))
+	 (if msg
+	     (printf nil "(%d:%02d)\n" (list-ref dt 1) (list-ref dt 2)))
+	 dt))
+		       
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
