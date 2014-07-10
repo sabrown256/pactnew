@@ -149,8 +149,8 @@
 #define SS_PROCEDURE_TYPE(_o)    (((procedure *) ((_o)->val))->type)
 #define SS_PROCEDURE_NAME(_o)    (((procedure *) ((_o)->val))->name)
 #define SS_PROCEDURE_DOC(_o)     (((procedure *) ((_o)->val))->doc)
-#define SS_PROCEDURE_TRACEDP(_o) (((procedure *) ((_o)->val))->trace)
 #define SS_PROCEDURE_PROC(_o)    (((procedure *) ((_o)->val))->proc)
+#define SS_PROCEDURE_TRACEDP(_o) (((procedure *) ((_o)->val))->trace)
 
 /* C PROCEDURE ACCESSORS */
 
@@ -496,7 +496,8 @@ extern void
 
 /* SS_TRACEDP - returns the trace field in the procedure struct */
 
-#define SS_tracedp(_o) (SS_GET(procedure, _o)->trace)
+#define SS_tracedp(_o)                                                       \
+   ((SS_GET(procedure, _o)->trace) || (SS_gs.trace_all == TRUE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -723,7 +724,8 @@ struct s_SS_psides
     JMP_BUF cpu;};
 
 struct s_SS_scope_public
- {int tind[SS_N_TYPES];
+ {int trace_all;
+  int tind[SS_N_TYPES];
   char *tnames[2];
   object *objs[SS_N_SPECIAL];};
   
