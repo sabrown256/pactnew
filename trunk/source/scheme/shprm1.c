@@ -627,6 +627,18 @@ static object *_SSI_unwatch(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SSI_TRACE_ALL - set the global var SS_gs.trace_all */
+
+static object *_SSI_trace_all(SS_psides *si, object *arg)
+   {
+
+    SS_gs.trace_all = SS_true(arg);
+
+    return(arg);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SSI_TRACE - set the trace field in the procedure structs to TRUE */
 
 static object *_SSI_trace(SS_psides *si, object *argl)
@@ -801,54 +813,58 @@ static void _SS_do_watch(SS_psides *si, object *pfun, char *msg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_PROCEDURE_KIND - return the kind of procedure that F is */
+
+static char *_SS_procedure_kind(object *f)
+   {static char *kind;
+
+    switch (SS_PROCEDURE_TYPE(f))
+       {case SS_PROC     :
+	case SS_EE_MACRO :
+	case SS_PR_PROC  :
+             kind = "procedure";
+		 break;
+
+	case SS_MACRO_EV :
+             kind = "macro-ev";
+		 break;
+
+	case SS_BEGIN    :
+	case SS_COND     :
+	case SS_IF       :
+	case SS_AND      :
+	case SS_OR       : 
+	case SS_DEFINE   :
+	case SS_MACRO    :
+	case SS_UE_MACRO :
+	case SS_UR_MACRO :
+             kind = "macro";
+		 break;
+
+	default :
+             kind = NULL;
+	     break;};
+
+    return(kind);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_BGN_TRACE - start a trace if the procedure is to be traced */
 
 void _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl)
-   {
+   {char *kind;
 
     _SS_do_watch(si, pfun, "entering");
 
-    switch (SS_PROCEDURE_TYPE(pfun))
-       {case SS_PROC     :
-        case SS_EE_MACRO :
-        case SS_PR_PROC  :
-	     if (SS_tracedp(pfun))
-	        {PRINT(SS_OUTSTREAM(si->outdev),
-		       "Entering procedure %s with:\n  ",
-		       SS_PROCEDURE_NAME(pfun));
-		 SS_print(si, si->outdev, pargl, "", "\n");
-		 SS_assign(si, si->continue_int[si->cont_ptr].signal,
-			   pfun);};
-	     break;
-
-        case SS_MACRO_EV :
-	     if (SS_tracedp(pfun))
-	        {PRINT(SS_OUTSTREAM(si->outdev),
-		       "Entering macro-ev %s with:\n  ",
-		       SS_PROCEDURE_NAME(pfun));
-		 SS_print(si, si->outdev, pargl, "", "\n");
-		 SS_assign(si, si->continue_int[si->cont_ptr].signal,
-			   pfun);};
-	     break;
-
-        case SS_BEGIN    :
-        case SS_COND     :
-        case SS_IF       :
-        case SS_AND      :
-        case SS_OR       : 
-        case SS_DEFINE   :
-        case SS_MACRO    :
-        case SS_UE_MACRO :
-        case SS_UR_MACRO :
-	     if (SS_tracedp(pfun))
-	        {PRINT(SS_OUTSTREAM(si->outdev),
-		       "Entering macro %s with:\n  ",
-		       SS_PROCEDURE_NAME(pfun));
-		 SS_print(si, si->outdev, pargl, "", "\n");
-		 SS_assign(si, si->continue_int[si->cont_ptr].signal,
-			   pfun);};
-	default :
-	     break;};
+    kind = _SS_procedure_kind(pfun);
+    if ((kind != NULL) && (SS_tracedp(pfun)))
+       {PRINT(SS_OUTSTREAM(si->outdev),
+	      "Entering %s %s with:\n  ",
+	      kind, SS_PROCEDURE_NAME(pfun));
+	 SS_print(si, si->outdev, pargl, "", "\n");
+	 SS_assign(si, si->continue_int[si->cont_ptr].signal,
+		   pfun);};
 
     return;}
 
@@ -858,51 +874,22 @@ void _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl)
 /* _SS_END_TRACE - check a continuation on return for a traced procedure */
 
 void _SS_end_trace(SS_psides *si)
-   {object *pfun;
+   {char *kind;
+    object *pfun;
 
     pfun = si->continue_int[si->cont_ptr].signal;
 
     _SS_do_watch(si, pfun, "leaving");
 
-    if (SS_procedurep(pfun))
-       {switch (SS_PROCEDURE_TYPE(pfun))
-            {case SS_PROC     :
-             case SS_EE_MACRO :
-             case SS_PR_PROC  :
-	          if (SS_tracedp(pfun))
-		     {PRINT(SS_OUTSTREAM(si->outdev),
-			    "Leaving procedure %s with:\n  ",
-			    SS_PROCEDURE_NAME(pfun));
-		      SS_print(si, si->outdev, si->val, "", "\n");};
-		  break;
+    kind = _SS_procedure_kind(pfun);
+    if (kind != NULL)
+       {if (SS_tracedp(pfun))
+	   {PRINT(SS_OUTSTREAM(si->outdev),
+		  "Leaving %s %s with:\n  ",
+		  kind, SS_PROCEDURE_NAME(pfun));
+	    SS_print(si, si->outdev, si->val, "", "\n");};
 
-	     case SS_MACRO_EV :
-	          if (SS_tracedp(pfun))
-		     {PRINT(SS_OUTSTREAM(si->outdev),
-			    "Leaving macro-ev %s with:\n  ",
-			    SS_PROCEDURE_NAME(pfun));
-		      SS_print(si, si->outdev, si->val, "", "\n");};
-		  break;
-
-             case SS_BEGIN    :
-             case SS_COND     :
-             case SS_IF       :
-             case SS_AND      :
-             case SS_OR       :
-             case SS_DEFINE   :
-             case SS_MACRO    :
-             case SS_UE_MACRO :
-             case SS_UR_MACRO :
-	          if (SS_tracedp(pfun))
-		     {PRINT(SS_OUTSTREAM(si->outdev),
-			    "Leaving macro %s with:\n  ",
-			    SS_PROCEDURE_NAME(pfun));
-		      SS_print(si, si->outdev, si->val, "", "\n");};
-
-	     default :
-	          break;};
-
-        SS_assign(si, si->continue_int[si->cont_ptr].signal, SS_null);};
+	SS_assign(si, si->continue_int[si->cont_ptr].signal, SS_null);};
 
     return;}
 
@@ -1193,6 +1180,11 @@ void _SS_inst_prm1(SS_psides *si)
                "Procedure: 'trace's calls to the procedures in the list of arguments",
                SS_nargs,
                _SSI_trace, SS_PR_PROC);
+
+    SS_install(si, "trace-all",
+               "Procedure: trace all procedure calls iff TRUE",
+               SS_sargs,
+               _SSI_trace_all, SS_PR_PROC);
 
     SS_install(si, "unlink",
                "Procedure: remove or unlink the named file",

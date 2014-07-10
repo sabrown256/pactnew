@@ -190,9 +190,9 @@
 ;-----------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; PROCESS-LOOP-INITS - helper for looping constructs
+; FOR-LOOP-INITS - helper for FOR looping construct
 
-(define-global (process-loop-inits int)
+(define-global (for-loop-inits int)
     (if int
 	(if (pair? (car int))
 	    (append int '((loop)))
@@ -202,10 +202,10 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; PROCESS-LOOP-CLAUSE - helper for looping constructs
+; FOR-LOOP-CLAUSE - helper for FOR looping construct
 
-(define-global (process-loop-clause cls)
-    (if cls
+(define-global (for-loop-clause cls)
+     (if cls
 	(if (pair? (car cls))
 	    (append cls '((loop)))
 	    (cons cls '((loop))))
@@ -214,9 +214,9 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; PROCESS-LOOP-BODY - helper for looping constructs
+; FW-LOOP-BODY - helper for FOR/WHILE looping constructs
 
-(define-global (process-loop-body body expr)
+(define-global (fw-loop-body body expr)
     (let* ((frst  (list-ref body 0))
 	   (scnd  (list-ref body 1))
 	   (forms (list-tail body 2)))
@@ -229,12 +229,13 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; FOR - handle the for loop
+; FOR - implement a FOR loop
+;     - this does not work and is not used anywhere
 
 (define-macro-ev (for inits tests repeats body)
-    (let* ((rpts  (process-loop-clause repeats))
-	   (ints  (process-loop-clause inits))
-	   (forms (process-loop-body body #t))
+    (let* ((rpts  (for-loop-clause repeats))
+	   (ints  (for-loop-clause inits))
+	   (forms (fw-loop-body body #t))
 	   (tsts  (if tests tests #t)))
           `((lambda ()
 	            (define (loop)
@@ -250,9 +251,10 @@
 ; WHILE - handle the while loop
 ;       - the WHICH arg is #f for a while () {}
 ;       - the WHICH arg is #t for a do {} while ()
+;       - this is not used anywhere
 
 (define-macro-ev (while which tests body)
-    (let* ((forms (process-loop-body body '(loop))))
+    (let* ((forms (fw-loop-body body '(loop))))
           (if which
 
 ; handle do while
