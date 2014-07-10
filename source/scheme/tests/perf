@@ -1,0 +1,42 @@
+#!/bin/csh -f
+#
+# PERF - SCHEME performance tests
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "SCHEME Performance Test ......"
+set exe = $BinDir/scheme
+set io  = flog
+
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
+   Note $Log ""
+
+   flog $Log pwd
+
+#--------------------------------------------------------------------------
+
+#                              MAIN PERFORMANCE TESTS
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log -n "                       scalar fp ................."
+   Note $Log ""
+   set rpf = none
+   set opt = ( $shopt -l $FilesDir/iperf.scm )
+
+   source ../../../scripts/test-run
+
+   $TEST_CHECK part -a iperf_sfp -e $xstatus -l -dt $dt -rpf "$rpf" none
+
+   @ nerr = $nerr + $status
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK part -a iperf -e $nerr "$msg"
+
+exit($status)
