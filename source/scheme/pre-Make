@@ -15,7 +15,7 @@ TGTInc = scheme.h scheme_int.h
 
 TGTScm = applications/runt.scm applications/lang.scm \
          applications/exec.scm applications/host-server.scm \
-         applications/rmath.scm \
+         applications/rmath.scm applications/measure.scm \
          ${SyntaxScheme}
 
 OD = DefaultO
