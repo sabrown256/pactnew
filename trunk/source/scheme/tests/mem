@@ -12,20 +12,59 @@ source ../../tests/common
 
 set msg = "SCHEME Memory Test ..........."
 set exe = $BinDir/scheme
-set opt = ( $shopt -l $FilesDir/mmtst.scm )
 set io  = flog
 
    NoteD $Log ""
-   NoteD $Log -n "                    $msg"
+   NoteD $Log "                    $msg"
    Note $Log ""
 
    flog $Log pwd
+
+#--------------------------------------------------------------------------
+
+#                              MAIN MEMORY TESTS
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log -n "                       built ins ................."
+   Note $Log ""
+   set rpf = none
+   set opt = ( $shopt -l $FilesDir/mmtst.scm )
+
    flog $Log cp $FilesDir/mmtst.scm .
 
    source ../../../scripts/test-run
 
    set rpf = ( $rpf '#tmp#' mmtst.scm )
 
-$TEST_CHECK part -a mem -e $xstatus -dt $dt -rpf "$rpf" none
+   $TEST_CHECK part -a mem_main -e $xstatus -l -dt $dt -rpf "$rpf" none
+
+   @ nerr = $nerr + $status
+
+#--------------------------------------------------------------------------
+
+#                        TAIL RECURSION MEMORY TESTS
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log -n "                       tail recursion ............"
+   Note $Log ""
+   set rpf = none
+   set opt = ( $shopt -l $FilesDir/tailr.scm )
+
+   flog $Log cp $FilesDir/tailr.scm .
+
+   source ../../../scripts/test-run
+
+   set rpf = ( $rpf '#tmp#' tailr.scm )
+
+   $TEST_CHECK part -a mem_tailr -e $xstatus -l -dt $dt -rpf "$rpf" none
+
+   @ nerr = $nerr + $status
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK part -a mem -e $nerr "$msg"
 
 exit($status)

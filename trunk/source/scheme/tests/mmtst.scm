@@ -1,53 +1,13 @@
 #!/usr/bin/env scheme
 ;
-; Source Version: 3.0
-; Software Release #: LLNL-CODE-422942
+; MMTST.SCM - test garbage collection
 ;
 ; include "cpyright.h"
 ;
 
-; this holds the net memory leaked
-(define loss 0)
+(load "measure.scm")
 
-; this holds the size of the temporary cons between start and stop
-(define delta-1 nil)
-
-; this holds the size of memory tied up in the memory-usage calls themselves
-(define delta-2 nil)
-
-; this tells us whether it is the first call to measure
-(define first #t)
-
-(define-macro (measure expr)
-    (let* (start stop dloss)
-        (if first
-	    (begin (set! start (memory-usage))
-		   (eval #t)
-		   (set! stop (memory-usage))
-		   (set! delta-1 (- (list-ref stop 1) (list-ref start 1)))
-		   (set! delta-2 (- (list-ref stop 2) (list-ref start 2)))
-                   (printf nil "\n  Memory Usage\n")
-                   (printf nil "Alloc  Free  Diff     Expression\n")))
-	(set! start (memory-usage))
-	(eval expr)
-	(set! stop (memory-usage))
-        (if first
-            (begin
-                (set! dloss (- (list-ref stop 2) (list-ref start 2)))
-                (printf nil "%5ld %5ld %5ld  :  %s\n"
-			(- (list-ref stop 0) (list-ref start 0) delta-1 delta-2)
-			(- (list-ref stop 1) (list-ref start 1) delta-1 delta-2)
-			(- (list-ref stop 2) (list-ref start 2))
-			expr))
-            (begin
-                (set! dloss (- (list-ref stop 2) (list-ref start 2) delta-2))
-                (printf nil "%5ld %5ld %5ld  :  %s\n"
-			(- (list-ref stop 0) (list-ref start 0) delta-1 delta-2)
-			(- (list-ref stop 1) (list-ref start 1) delta-1)
-			dloss
-			expr)))
-        (set! loss (+ loss dloss))
-        (set! first #f)))
+(define measure measure-memory)
 
 ;
 ; these should come and go with no net evaulation cost
@@ -152,5 +112,6 @@
 ;(measure (define foo 3))
 ;(measure (define (foo x) x))
 
+(define loss (net-memory-loss))
 (printf nil "\nNet memory loss: %d bytes\n\n" loss)
 (quit loss)
