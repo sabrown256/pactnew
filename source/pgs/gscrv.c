@@ -796,7 +796,7 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
 void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
                   double lnwid, int lnsty, int scatter, int marker, int l)
    {int tn, clp, st;
-    double wd;
+    double wd, ymn;
     double *r[PG_SPACEDM];
     double **t;
     
@@ -831,12 +831,17 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 
 /* if not closed - close it */
 	if ((t[0][0] != t[0][n-1]) || (t[1][0] != t[1][n-1]))
-	   {t[0][np] = t[0][np-1];
-	    t[1][np] = 0.0;
+	   {if (dev->g.iflog[1] == FALSE)
+	       ymn = 0.0;
+	    else
+	       ymn = dev->g.wc[3]*POW(10.0, -_PG_gattrs.axis_n_decades);
+
+	    t[0][np] = t[0][np-1];
+	    t[1][np] = ymn;
 	    np++;
 
 	    t[0][np] = t[0][0];
-	    t[1][np] = 0.0;
+	    t[1][np] = ymn;
 	    np++;
 
 	    t[0][np] = t[0][0];
@@ -886,10 +891,10 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
                        double lnwid, int lnsty, int scatter, int marker,
                        int start, int l)
-   {int i, j, nl, nm, tn;
-    double p[PG_SPACEDM];
+   {int i, j, nl, nm, ocl;
+    double ymn;
     double *r[PG_SPACEDM];
-    double **xl, *py, **t;
+    double **xl, *py;
 
     if (dev == NULL)
        return;
@@ -911,14 +916,21 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
  
 /* transform data to histogram form */
     nm = n - 1;
-    nl = 2*n - 2;
+    nl = 2*n;
     xl = PM_make_vectors(2, nl);
+	
+    ymn = dev->g.wc[2];
+
+/* start with beginning curve point */
+    xl[0][0] = x[0];
+    xl[1][0] = ymn;
 
     if (start < 2)
-       {py    = y + start;
-        xl[0][0] = x[0];
-        xl[1][0] = py[0];
-        for (i = 1, j = 1; i < nm; i++, j += 2)
+       {py = y + start;
+
+        xl[0][1] = x[0];
+        xl[1][1] = py[0];
+        for (i = 1, j = 2; i < nm; i++, j += 2)
             {xl[0][j] = x[i];
              xl[1][j] = xl[1][j-1];
 
@@ -928,10 +940,11 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
         xl[1][j] = py[i-1];}
 
     else if (start == 2)
-       {py    = y + 1;
-        xl[0][0] = x[0];
-        xl[1][0] = 0.5*(y[0] + y[1]);
-        for (i = 1, j = 1; i < nm; i++, j += 2)
+       {py = y + 1;
+
+        xl[0][1] = x[0];
+        xl[1][1] = 0.5*(y[0] + y[1]);
+        for (i = 1, j = 2; i < nm; i++, j += 2)
             {xl[0][j] = x[i];
              xl[1][j] = 0.5*(y[i-1] + y[i]);
 
@@ -940,25 +953,18 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
         xl[0][j] = x[i];
         xl[1][j] = 0.5*(y[i-1] + y[i]);};
 
-/* Worst case scenario is every line between adjacent points
- * intersects viewport boundary rectangle twice.
- */
-    tn = 2*nl;
-    t  = PM_make_vectors(2, tn);
+/* finish with ending curve point */
+    xl[0][j+1] = x[i];
+    xl[1][j+1] = ymn;
 
-    PG_clip_data(dev, t[0], t[1], &tn, xl[0], xl[1], nl);
+    ocl = dev->clipping;
+    dev->clipping = FALSE;
 
-/* plot lines unless scatter set */
-    p[0] = t[0][0];
-    p[1] = t[1][0];
-    PG_move_gr_abs_n(dev, p);
+    PG_rect_plot(dev, xl[0], xl[1], nl, lncol,
+                 lnwid, lnsty, scatter, marker, l);
 
-    if (scatter != 1)
-       PG_draw_polyline_n(dev, 2, WORLDC, tn, t, FALSE);
-    else
-       PG_draw_markers_n(dev, 2, WORLDC, tn, t, marker);
- 
-    PM_free_vectors(2, t);
+    dev->clipping = ocl;
+
     PM_free_vectors(2, xl);
 
     PG_fset_clipping(dev, FALSE);

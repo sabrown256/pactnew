@@ -571,6 +571,7 @@ void _PG_PS_shade_poly(PG_device *dev, int nd, int n, double **r)
 	x[0] = r[0][0];
 	x[1] = r[1][0];
 
+	PG_log_point(dev, 2, x);
 	PG_trans_point(dev, 2, WORLDC, x, PIXELC, ix);
 
 	io_printf(dev->file, "newpath\n");
@@ -579,6 +580,8 @@ void _PG_PS_shade_poly(PG_device *dev, int nd, int n, double **r)
 	for (i = 1; i < n; i++)
 	    {x[0] = r[0][i];
 	     x[1] = r[1][i];
+
+	     PG_log_point(dev, 2, x);
 	     PG_trans_point(dev, 2, WORLDC, x, PIXELC, ix);
 
 	     io_printf(dev->file, "%d %d L\n", (int) ix[0], (int) ix[1]);};

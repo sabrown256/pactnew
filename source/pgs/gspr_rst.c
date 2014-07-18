@@ -721,10 +721,12 @@ void _PG_rst_shade_poly(PG_device *dev, int nd, int n, double **r)
        {PM_maxmin(r[1], &x1[1], &x2[1], n);
 
 	x1[0] = 0.0;
+	PG_log_point(dev, 2, x1);
 	PG_trans_point(dev, 2, WORLDC, x1, PIXELC, x1);
 	iymn = x1[1];
 
 	x2[0] = 0.0;
+	PG_log_point(dev, 2, x2);
 	PG_trans_point(dev, 2, WORLDC, x2, PIXELC, x2);
 	iymx = x2[1];
 

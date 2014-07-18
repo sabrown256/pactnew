@@ -1097,7 +1097,9 @@ static void _PG_X_close_device(PG_device *dev)
        SC_free_array(_PG_X_point_list, NULL);
 
 /* clean up the device */
+/* NOTE: _PG_remove_device called this already
     PG_rl_device(dev);
+ */
 
     return;}
 

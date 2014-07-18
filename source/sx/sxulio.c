@@ -1575,8 +1575,9 @@ void SX_close_open_files(void)
 			      SX_remove_file(fp);
 			   PD_close(file);
 			   if (file == _SX.cache_file)
-			      _SX.cache_file = NULL;};
-		       CFREE(ppi->file);
+			      _SX.cache_file = NULL;}
+		       else
+			  CFREE(ppi->file);
 		       CFREE(ppi->curve_name);};
 		   CFREE(ppi);};
 
