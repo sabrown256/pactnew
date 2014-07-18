@@ -590,6 +590,7 @@ void _PG_win32_shade_poly(PG_device *dev, int nd, int n, double **r)
 	    {x[0] = r[0][i];
 	     x[1] = r[1][i];
        
+	     PG_log_point(dev, 2, x);
 	     PG_trans_point(dev, 2, WORLDC, x, PIXELC, x);
 
 	     PG_QUAD_FOUR_POINT(dev, x);

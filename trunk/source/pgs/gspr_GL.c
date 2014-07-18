@@ -552,6 +552,7 @@ void _PG_GL_shade_poly(PG_device *dev, int nd, int n, double **r)
 	    {ix[0] = r[0][i];
 	     ix[1] = r[1][i];
 
+	     PG_log_point(dev, 2, ix);
 	     PG_trans_point(dev, 2, WORLDC, ix, NORMC, ix);
 
 	     v[0] = ix[0];

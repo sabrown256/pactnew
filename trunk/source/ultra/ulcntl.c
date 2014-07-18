@@ -369,7 +369,8 @@ static void UL_draw_plot(PG_device *dev)
                      b->align    = pb->align;
                      b->angle    = pb->angle;
                      b->standoff = pb->standoff;
-                     if ((b->n_lines  != pb->n_lines) || (b->n_chars_line != pb->n_chars_line))
+                     if ((b->n_lines  != pb->n_lines) ||
+			 (b->n_chars_line != pb->n_chars_line))
                         _UL_fix_text_buf(b, pb);};};
 
 	    PG_draw_interface_objects(dev);};}
