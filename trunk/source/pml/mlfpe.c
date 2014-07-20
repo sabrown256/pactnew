@@ -241,10 +241,10 @@ void PM_enable_fpe_n(int flg, PFSignal_handler hnd, void *a)
     switch (flg)
        {case TRUE :
 	     if (hnd != NULL)
-	        SC_signal_action_n(SIGFPE, hnd, a, -1, -1);
+	        SC_signal_action_n(SIGFPE, hnd, a, -1, 0, -1);
 	     break;
 	case FALSE :
-	     SC_signal_action_n(SIGFPE, SIG_DFL, NULL, 0, -1);
+	     SC_signal_action_n(SIGFPE, SIG_DFL, NULL, 0, 0, -1);
 	     break;
 	default :
 	     break;};

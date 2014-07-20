@@ -70,7 +70,8 @@ Note $STDOUT ""
 Note $STDOUT '@ err = 0'
 Note $STDOUT ""
 
-if (-x "$comp") then
+set wexe = `which $comp`
+if (-x "$wexe") then
 
    Note $STDOUT "source $EtcDir/env-pact.csh"
    Note $STDOUT ""
@@ -174,7 +175,6 @@ if (-x "$comp") then
 # NOTE: the compilers database is a hand written database
 # and distributions builds do not have this
 
-   set wexe = `which $comp`
    if (-x "$wexe") then
       set compilers = $wexe:h/compilers
    else
