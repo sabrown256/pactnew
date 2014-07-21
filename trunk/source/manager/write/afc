@@ -49,6 +49,10 @@ setenv EtcDir  $PSY_Root/etc
 flog $WLog set exe    = $PACT_FC_EXE
 flog $WLog set vers   = $PACT_FC_VERSION
 flog $WLog set comp   = $exe:t
+if ("$comp" == "") then
+   flog $WLog set comp = f90
+endif
+
 flog $WLog set STDOUT = $BinDir/afc
 flog $WLog $RM $STDOUT
 flog $WLog touch $STDOUT
