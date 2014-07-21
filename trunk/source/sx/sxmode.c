@@ -149,24 +149,27 @@ static void _SX_expand_prefix(char *s, int nc)
  *               - the buffer
  */
 
-static char *_SX_reproc_in(SS_psides *si, char *line)
-   {char *rv;
+static char *_SX_reproc_in(SX_reparsed *pd, char *line)
+   {char *rv, *bf;
+    SS_psides *si;
 
     rv = NULL;
+    si = pd->si;
+    bf = pd->bf;
 
     if (line != NULL)
-       {SC_strncpy(_SX.command, MAXLINE, line, -1);
-	if (!SX_expand_expr(_SX.command))
+       {SC_strncpy(bf, BFLRG, line, -1);
+	if (!SX_expand_expr(bf, BFLRG))
            SS_error(si, "SYNTAX ERROR - _SX_REPROC_IN", SS_null);
 
-        _SX_expand_prefix(_SX.command, MAXLINE);
+        _SX_expand_prefix(bf, BFLRG);
 
-        SX_wrap_paren("(", _SX.command, ")", MAXLINE);
+        SX_wrap_paren("(", bf, ")", BFLRG);
 
         if (SX_gs.command_log != NULL)
-           PRINT(SX_gs.command_log, "%s\n", _SX.command);
+           PRINT(SX_gs.command_log, "%s\n", bf);
 
-        rv = _SX.command;};
+        rv = bf;};
 
     return(rv);}
 
@@ -195,9 +198,13 @@ object *SX_plot(SS_psides *si)
  */
 
 static void _SX_parse(SS_psides *si, object *strm)
-   {
+   {SX_reparsed pd;
 
-    SX_parse(si, SX_plot, _SX_reproc_in, strm);
+    pd.si     = si;
+    pd.reproc = _SX_reproc_in;
+    pd.replot = SX_plot;
+
+    SX_parse(&pd, strm);
 
     return;}
 
