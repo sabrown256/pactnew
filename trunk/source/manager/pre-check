@@ -36,6 +36,17 @@ if ("$Missing" != "") then
    @ Err = $Err + 2
 endif
 
+# check for /bin/csh
+set HaveCsh = FALSE
+if (-x /bin/csh)
+   set HaveCsh = TRUE
+else
+   echo ""
+   echo "WARNING: Your system is missing /bin/csh."
+   echo "Some systems have csh installed in other directories."
+   @ Err = $Err + 1
+endif
+
 # check for lex/flex
 set HaveLex = FALSE
 if (-x `where lex |& head -n 1`) then
