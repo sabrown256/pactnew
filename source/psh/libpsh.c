@@ -2305,7 +2305,7 @@ int full_path(char *path, int nc, int fl, char *dir, char *name)
 	    {if (strcmp(sa[is], "..") == 0)
 	        {p = strrchr(path, '/');
 		 *p = '\0';}
-	     else if (sa[is][0] != '.')
+	     else if (strcmp(sa[is], ".") != 0)
 	        vstrcat(path, nc, "/%s", sa[is]);};
 
 /* compute the return value */
