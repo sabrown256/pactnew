@@ -208,26 +208,31 @@ static void _UL_expand_prefix(char *s)
  *               - the buffer
  */
 
-static char *_UL_reproc_in(SS_psides *si, char *line)
-   {char *rv;
+static char *_UL_reproc_in(SX_reparsed *pd, char *line)
+   {char *rv, *bf;
+    SS_psides *si;
 
     rv = NULL;
+    si = pd->si;
+    bf = pd->bf;
 
-    if (!SX_expand_expr(line))
+    SC_strncpy(bf, BFLRG, line, -1);
+
+    if (!SX_expand_expr(bf, BFLRG))
        SS_error(si, "SYNTAX ERROR - _UL_REPROC_IN", SS_null);
 
-    _UL_expand_prefix(line);
+    _UL_expand_prefix(bf);
 
 /* if it's already a list tell the parser to do nothing - it's already
  * done everything necessary
  */
-    if (line[0] != '(')
-       {SX_wrap_paren("(", line, ")", MAXLINE);
+    if (bf[0] != '(')
+       {SX_wrap_paren("(", bf, ")", BFLRG);
 
 	if (SX_gs.command_log != NULL)
-	   PRINT(SX_gs.command_log, "%s\n", line);
+	   PRINT(SX_gs.command_log, "%s\n", bf);
 
-	rv = line;};
+	rv = bf;};
 
     return(rv);}
 
@@ -333,8 +338,13 @@ static void _UL_del_intermediate(SS_psides *si, object *cla, ...)
 
 static void _UL_parse(SS_psides *si, object *strm)
    {int na, nb, nr;
+    SX_reparsed pd;
 
-    SX_parse(si, UL_plot, _UL_reproc_in, strm);
+    pd.si     = si;
+    pd.reproc = _UL_reproc_in;
+    pd.replot = UL_plot;
+
+    SX_parse(&pd, strm);
 
 /* get the list of curves after evaluating the latest expression */
     SS_assign(si, _UL.crva, UL_get_crv_list(si));

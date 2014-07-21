@@ -516,6 +516,7 @@ typedef enum e_SX_session_mode SX_session_mode;
 typedef struct s_g_pdbdata g_pdbdata;
 typedef struct s_SX_object SX_object;
 typedef struct s_SX_menu_item SX_menu_item;
+typedef struct s_SX_reparsed SX_reparsed;
 typedef struct s_g_file g_file;
 typedef struct s_out_device out_device;
 typedef struct s_SX_scope_public SX_scope_public;
@@ -543,6 +544,12 @@ struct s_SX_menu_item
    {char *vname;
     char *label;
     char *type;};
+
+struct s_SX_reparsed
+   {char bf[BFLRG];
+    SS_psides *si;
+    char *(*reproc)(SX_reparsed *pd, char *s);
+    object *(*replot)(SS_psides *si);};
 
 struct s_g_file
    {char *name;
@@ -706,7 +713,7 @@ extern int
 
 extern int
  SX_split_command(char *cmd, int nc, char *lst),
- SX_expand_expr(char *s);
+ SX_expand_expr(char *s, int nb);
 
 extern char
  *SX_wrap_paren(char *open, char *form, char *close, size_t ln);
@@ -714,10 +721,7 @@ extern char
 extern void
  SX_register_devices(void),
  SX_load_rc(SS_psides *si, char *ffn, int ldrc, char *ifna, char *ifnb),
- SX_parse(SS_psides *si,
-	  object *(*replot)(SS_psides *si),
-	  char *(*reproc)(SS_psides *si, char *s),
-	  object *strm),
+ SX_parse(SX_reparsed *pd, object *strm),
  SX_init_device_vars(int idev, double *xf, double *dxf),
  SX_install_global_vars(SS_psides *si);
 

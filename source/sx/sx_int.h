@@ -207,7 +207,6 @@ struct s_SX_scope_private
     char *table_name;
 
     out_device output_devices[N_OUTPUT_DEVICES];
-    char command[MAXLINE];
     char line[MAX_BFSZ];
 
     };

@@ -519,13 +519,14 @@ int _SX_no_argsp(SS_psides *si, object *obj)
  *          - respective object
  */
 
-void SX_parse(SS_psides *si,
-	      object *(*replot)(SS_psides *si),
-	      char *(*reproc)(SS_psides *si, char *s),
+void SX_parse(SX_reparsed *pd,
 	      object *strm)
    {int i, nl;
     char s[MAXLINE];
     char *t, *ptr, **sa;
+    SS_psides *si;
+
+    si = pd->si;
     
     if (SS_procedurep(si->evobj))
        {strcpy(s, SS_PP(si->evobj, name));
@@ -539,7 +540,7 @@ void SX_parse(SS_psides *si,
 	       {sa = PS_tokenize(ptr, ";\n", 0);
 		nl = PS_lst_length(sa);
 		for (i = 0; i < nl; i++)
-		    {t = (*reproc)(si, sa[i]);
+		    {t = pd->reproc(pd, sa[i]);
 		     if (t != NULL)
 		        {strcpy(ptr, t);
 			 SS_PTR(strm) = SS_BUFFER(strm);
@@ -552,9 +553,8 @@ void SX_parse(SS_psides *si,
 		PS_free_strings(sa);
 
                 if (SX_gs.plot_flag && (strcmp(s, "replot") != 0) &&
-                    (SX_gs.autoplot == ON) &&
-                    (replot != NULL))
-                   replot(si);};};};
+                    (SX_gs.autoplot == ON) && (pd->replot != NULL))
+                   pd->replot(si);};};};
 
     if (PG_gs.console != NULL)
        PG_gs.console->gprint_flag = TRUE;
@@ -671,9 +671,9 @@ static char *_SX_expand_first(char *s, char *sp)
  *                - which means all object from x through y inclusive
  */
 
-int SX_expand_expr(char *s)
-   {char *sp;
-    int ret;
+int SX_expand_expr(char *s, int nb)
+   {int ret;
+    char *sp;
 
 /* something wrong in input if s is NULL */
     if (s == NULL)
@@ -691,7 +691,7 @@ int SX_expand_expr(char *s)
        {s = _SX_expand_first(s, sp);
 
 /* loop through to find any more instances */
-        ret = SX_expand_expr(s);};
+        ret = SX_expand_expr(s, nb);};
 
     return(ret);}
 
