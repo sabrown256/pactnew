@@ -16,6 +16,15 @@ static char
                    "*-r-*-13-*",
                    "*-r-*-14-*"};
 
+extern int
+ _PG_X_init_palette(PG_device *dev, int ndvc, unsigned long *fbc),
+ _PG_X_setup_geom(PG_device *dev, double *xf, double *dxf,
+		  int *dx, int *wx, int *wdx);
+
+extern GC
+ _PG_X_open_window(PG_device *dev, int *wx, int *wdx,
+		   unsigned long *fbc, int map);
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -107,147 +116,76 @@ static int _PG_X_txt_setup_font(PG_device *dev, char *bf)
  
 /* _PG_X_TXT_OPEN_SCREEN - initialize a drawable for doing text */
  
-static PG_device *_PG_X_txt_open_screen(PG_device *dev, double dxf, double dyf)
-   {unsigned long bck_color, for_color, valuemask;
-    unsigned int depth;
-    int i, Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int Xargc, screen, win_x, win_y, win_width, win_height;
-    int display_width, display_height, min_dim;
-    int n_dev_colors, npc;
-    char **Xargv, *window_name;
-    double intensity;
-    XSetWindowAttributes setwindattr;
-    XWindowAttributes windowattr;
-    XTextProperty wintp;
-    XSizeHints size_hints;
-    XGCValues values;
-    GC xgc;
+static PG_device *_PG_X_txt_open_screen(PG_device *dev,
+					double dxfo, double dyfo)
+   {int i, ndvc;
+    int dx[PG_SPACEDM], wx[PG_SPACEDM], wdx[PG_SPACEDM];
+    unsigned long fbc[2];
+    double xf[PG_SPACEDM], dxf[PG_SPACEDM];
     PG_font_family *ff;
-    PG_dev_geometry *g;
+    XWindowAttributes windowattr;
 
     if (dev == NULL)
        return(NULL);
 
-    g = &dev->g;
-
     dev->type_index = GRAPHIC_WINDOW_DEVICE;
     dev->quadrant   = QUAD_FOUR;
-
-    valuemask = 0;
-
-    _PG_X_txt_query_screen(dev, &display_width, &display_height, &n_dev_colors);
-    if ((display_width == 0) && (display_height == 0) &&
-        (n_dev_colors == 0))
-       return(NULL);
-
-    if (dev->display == NULL)
-       return(NULL);
- 
-    screen = DefaultScreen(dev->display);
-    depth  = XDefaultDepth(dev->display, screen);
-
-/* set device pixel coordinate limits */
-    dev->g.cpc[0] = -16383 + display_width;
-    dev->g.cpc[1] =  16383 - display_width;
-    dev->g.cpc[2] = -16383 + display_height;
-    dev->g.cpc[3] =  16383 - display_height;
-    dev->g.cpc[4] = -16383;
-    dev->g.cpc[5] =  16383;
- 
-/* get the window shape in NDC */
-    min_dim = min(display_width, display_height);
-
-    win_x = 0;
-    win_y = 0;
-
-    win_width  = dxf*min_dim;
-    win_height = dyf*min_dim;
-
-/* size hints */
-    size_hints.flags      = USPosition | USSize | PMinSize;
-    size_hints.x          = win_x;
-    size_hints.y          = win_y;
-    size_hints.width      = win_width;
-    size_hints.height     = win_height;
-    size_hints.min_width  = 0.25*win_width;
-    size_hints.min_height = 0.25*win_height;
- 
-    window_name = dev->title;
-
-    Xargc = 0;
-    Xargv = NULL;
- 
-/* decide on the overall color layout and choose WHITE or BLACK background */
-    dev->absolute_n_color = n_dev_colors;
-    intensity = dev->max_intensity*MAXPIX;
-
-    if (n_dev_colors == 2)
-       {Color_Map(dev, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-	dev->ncolor = 2;}
-    else
-       {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
-		  10, 11, 12, 13, 14, 15);
-	dev->ncolor = N_COLORS;};
-    Lightest   = 0;
-    Light      = intensity;
-    Light_Gray = 0.8*intensity;
-    Dark_Gray  = 0.5*intensity;
-    Dark       = 0;
-    Darkest    = intensity;
-    bck_color  = WhitePixel(dev->display, screen);
-    for_color  = BlackPixel(dev->display, screen);
-
-/* create the window and map it to the screen */
-    dev->window = XCreateSimpleWindow(dev->display,
-                                      RootWindow(dev->display, screen), 
-                                      win_x, win_y,
-                                      win_width, win_height,
-                                      dev->border_width, 
-                                      for_color,
-                                      bck_color);
-
-/* turn on backing store */
-    setwindattr.backing_store = WhenMapped;
-    XChangeWindowAttributes(dev->display, dev->window,
-                            CWBackingStore, &setwindattr);
-
-    XStringListToTextProperty(&window_name, 1, &wintp);
-    XSetWMProperties(dev->display, dev->window, &wintp, &wintp,
-		     Xargv, Xargc, &size_hints, NULL, NULL);
-
-    XSelectInput(dev->display, dev->window,
-                 StructureNotifyMask |
-                 ExposureMask |
-                 PointerMotionMask |
-                 KeyPressMask |
-                 KeyReleaseMask |
-                 ButtonPressMask |
-                 ButtonReleaseMask);
-
-    dev->pixmap = XCreatePixmap(dev->display, dev->window,
-				win_width, win_height, depth);
 
 /* kind of by definition this must be TRUE - it is not always set
  * by default especially in applications using the non-C bindings
  */
     dev->use_pixmap = TRUE;
 
+    _PG_X_txt_query_screen(dev, &dx[0], &dx[1], &ndvc);
+    if ((dx[0] == 0) && (dx[1] == 0) && (ndvc == 0))
+       return(NULL);
+
+    if (dev->display == NULL)
+       return(NULL);
+ 
+    xf[0] = 1.0e-8;
+    xf[1] = 1.0e-8;
+
+    dxf[0] = dxfo;
+    dxf[1] = dyfo;
+
+    _PG_X_setup_geom(dev, xf, dxf, dx, NULL, wdx);
+
+    _PG_X_init_palette(dev, ndvc, fbc);
+
+    dev->gc = _PG_X_open_window(dev, wx, wdx, fbc, FALSE);
+
+/* the rest is like _PG_X_init_window - merge? */
+    PG_dev_geometry *g;
+
+    g = &dev->g;
+
+    if (dev->use_pixmap)
+       {int screen;
+	unsigned int depth;
+
+	screen = DefaultScreen(dev->display);
+	depth  = XDefaultDepth(dev->display, screen);
+
+	dev->pixmap = XCreatePixmap(dev->display, dev->window,
+				    wdx[0], wdx[1], depth);};
+
 /* compute the view port */
     _PG_default_viewspace(dev, TRUE);
 
     PG_init_viewspace(dev, TRUE);
  
-/* create graphics context */
-    xgc = XCreateGC(dev->display, dev->window, valuemask, &values);
-
-    XSetForeground(dev->display, xgc, for_color);
-    XSetBackground(dev->display, xgc, bck_color);
-
-    dev->gc = xgc;
-
 /* get window width */
     XGetWindowAttributes(dev->display, dev->window, &windowattr);
  
+/* set device pixel coordinate limits */
+    g->cpc[0] = -16383 + dx[0];
+    g->cpc[1] =  16383 - dx[0];
+    g->cpc[2] = -16383 + dx[1];
+    g->cpc[3] =  16383 - dx[1];
+    g->cpc[4] = -16383;
+    g->cpc[5] =  16383;
+
 /* change the devices idea of window shape from NDC to pixels */
     g->hwin[0] = 0;
     g->hwin[1] = windowattr.width;
@@ -266,18 +204,11 @@ static PG_device *_PG_X_txt_open_screen(PG_device *dev, double dxf, double dyf)
     dev->font_family = ff;
 
     PG_fset_font(dev, "helvetica", "medium", 12);
+
     for (i = 0; dev->font_info == NULL; i++)
         {if (i > 3)
 	    return(NULL);
 	 _PG_X_txt_setup_font(dev, backup_font[i]);};
-
-    npc = (n_dev_colors == 256) ? 64 : _PG_gattrs.max_color_factor;
-
-/* put in the default palettes */
-    PG_setup_standard_palettes(dev, npc,
-			       Light, Dark,
-			       Light_Gray, Dark_Gray,
-			       Lightest, Darkest);
 
     return(dev);}
 

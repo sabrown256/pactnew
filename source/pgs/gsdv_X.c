@@ -16,12 +16,6 @@ static Display
 static char
  _PG_X_display_name[MAXLINE] = "";
 
-static char
- *backup_font[] = {"*-medium-r-*", "*-r-*", "*-r-*", "*-r-*"};
-
-static int
- backup_size[] = { 12, 12, 13, 14 };
-
 SC_array
  *_PG_X_point_list;
 
@@ -257,53 +251,80 @@ static int _PG_X_setup_font(PG_device *dev, char *face, int size)
     XFontStruct *xf;
     Display *disp;
 
-    ret  = FALSE;
-    disp = dev->display;
-    if (disp == NULL)
-       return(ret);
+    ret = FALSE;
+    if ((dev != NULL) && (dev->display != NULL))
+       {disp = dev->display;
 
 /* allow the oddball fonts */
-    if (size < 4)
-       snprintf(bf, MAXLINE, "*%s*", face);
-    else
-       snprintf(bf, MAXLINE, "*%s*-*-*", face);
+        if (size < 4)
+	   snprintf(bf, MAXLINE, "*%s*", face);
+        else if (face[0] == '*')
+	   snprintf(bf, MAXLINE, "%s-*-*", face);
+        else
+	   snprintf(bf, MAXLINE, "*%s*-*-*", face);
 
-    names = XListFonts(disp, bf, 1024, &nf);
-    lsz   = -100;
-    for (i = 0; i < nf; i++)
-        {_PG_X_get_font_field(p, names[i], 7);
-	 fsz = SC_stoi(p);
-	 if (fsz < size)
-	    lsz = fsz;
-	 else
-	    {if (size-lsz < fsz-size)
-	        i--;
-	     break;};};
-    if (i >= nf)
-       i = nf-1;
+	names = XListFonts(disp, bf, 1024, &nf);
+
+/* GOTCHA: the fonts are not even sorted anymore so this
+ * is not going to do anything useful
+ */
+	lsz   = -100;
+	for (i = 0; i < nf; i++)
+	    {_PG_X_get_font_field(p, names[i], 7);
+	     fsz = SC_stoi(p);
+	     if (fsz < size)
+	        lsz = fsz;
+	     else
+	        {if (size-lsz < fsz-size)
+		    i--;
+		 break;};};
+	if (i >= nf)
+	   i = nf-1;
          
-    if ((0 <= i) && (i < nf))
-       {xf = XLoadQueryFont(disp, names[i]);
-	if (xf != NULL)
-	   {XSetFont(disp, dev->gc, xf->fid);
+	if ((0 <= i) && (i < nf))
+	   {xf = XLoadQueryFont(disp, names[i]);
+	    if (xf != NULL)
+	       {XSetFont(disp, dev->gc, xf->fid);
 
-	    if (dev->font_info != NULL)
-	       XFreeFont(disp, dev->font_info);
+		if (dev->font_info != NULL)
+		   XFreeFont(disp, dev->font_info);
 
-	    dev->font_info = xf;
+		dev->font_info = xf;
 	
-	    ret = TRUE;};};
+		ret = TRUE;};};
 
-    XFreeFontNames(names);
+	XFreeFontNames(names);};
 
     return(ret);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PG_X_SET_DEFAULT_FONT - set the default font and
+ *                        - initialize the backup fonts
+ */
+
+int _PG_X_set_default_font(PG_device *dev)
+   {int i, nf;
+    static int bpsz[]   = { 12, 12, 13, 14 };
+    static char *bfnt[] = {"*-medium-r-*", "*-r-*", "*-r-*", "*-r-*"};
+
+    PG_fset_font(dev, "helvetica", "medium", 12);
+
+    nf = 0;
+    for (i = 0; dev->font_info == NULL; i++)
+        {if (i > 3)
+	    break;
+	 nf += _PG_X_setup_font(dev, bfnt[i], bpsz[i]);};
+
+    return(nf);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PG_X_SELECT_EVENTS - setup the event handling for DEV */
 
-static void _PG_X_select_events(PG_device *dev)
+void _PG_X_select_events(PG_device *dev)
    {
 
     XSelectInput(dev->display, dev->window,
@@ -332,7 +353,7 @@ static void _PG_X_select_events(PG_device *dev)
 
 /* _PG_X_INIT_PALETTE - initialize the palettes for DEV */
 
-static int _PG_X_init_palette(PG_device *dev, int ndc, unsigned long *fbc)
+int _PG_X_init_palette(PG_device *dev, int ndvc, unsigned long *fbc)
    {int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     int screen, ok;
     unsigned long for_color, bck_color;
@@ -343,10 +364,10 @@ static int _PG_X_init_palette(PG_device *dev, int ndc, unsigned long *fbc)
     ok = TRUE;
 
 /* decide on the overall color layout and choose WHITE or BLACK background */
-    dev->absolute_n_color = ndc;
+    dev->absolute_n_color = ndvc;
     intensity = dev->max_intensity*MAXPIX;
     if (dev->background_color_white)
-       {if (ndc == 2)
+       {if (ndvc == 2)
            {Color_Map(dev, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
             dev->ncolor = 2;}
         else
@@ -362,7 +383,7 @@ static int _PG_X_init_palette(PG_device *dev, int ndc, unsigned long *fbc)
         bck_color  = WhitePixel(dev->display, screen);
         for_color  = BlackPixel(dev->display, screen);}
     else
-       {if (ndc == 2)
+       {if (ndvc == 2)
            {Color_Map(dev, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
             dev->ncolor = 2;}
         else
@@ -403,8 +424,8 @@ static int _PG_X_init_palette(PG_device *dev, int ndc, unsigned long *fbc)
 
 /* _PG_X_SETUP_GEOM - do some common setup for DEV */
 
-static int _PG_X_setup_geom(PG_device *dev, double *xf, double *dxf,
-			    int *dx, int *wx, int *wdx)
+int _PG_X_setup_geom(PG_device *dev, double *xf, double *dxf,
+		     int *dx, int *wx, int *wdx)
    {int i, min_dim;
 
 /* get the window shape in NDC */
@@ -429,7 +450,8 @@ static int _PG_X_setup_geom(PG_device *dev, double *xf, double *dxf,
     for (i = 0; i < 2; i++)
         {if (wx != NULL)
 	    wx[i]  = xf[i]*min_dim;
-	 wdx[i] = dxf[i]*min_dim;};
+	 if (wdx != NULL)
+	    wdx[i] = dxf[i]*min_dim;};
 
     if (_PG_X_point_list == NULL)
        _PG_X_point_list = CMAKE_ARRAY(XPoint, NULL, 3);
@@ -440,15 +462,14 @@ static int _PG_X_setup_geom(PG_device *dev, double *xf, double *dxf,
 /*--------------------------------------------------------------------------*/
 
 /* _PG_X_INIT_WINDOW - complete the initialization of DEV
- *                   - regarding fonts, palettes, ...
+ *                   - regarding fonts, ...
  *                   - return bit array of failed initializations
  *                   -   1  fonts
- *                   -   2  palettes
  */
 
-static int _PG_X_init_window(PG_device *dev, double *xf, int *dx, int *wdx,
-			     int min_dim)
-   {int i, rv;
+int _PG_X_init_window(PG_device *dev, double *xf, int *dx, int *wdx,
+		      int min_dim)
+   {int nf, rv;
     PG_font_family *ff;
     PG_dev_geometry *g;
     XWindowAttributes windowattr;
@@ -471,7 +492,7 @@ static int _PG_X_init_window(PG_device *dev, double *xf, int *dx, int *wdx,
     _PG_default_viewspace(dev, TRUE);
 
     PG_init_viewspace(dev, TRUE);
- 
+
 /* get window width */
     XGetWindowAttributes(dev->display, dev->window, &windowattr);
  
@@ -512,12 +533,9 @@ static int _PG_X_init_window(PG_device *dev, double *xf, int *dx, int *wdx,
 
     dev->font_family = ff;
 
-    PG_fset_font(dev, "helvetica", "medium", 12);
-    for (i = 0; dev->font_info == NULL; i++)
-        {if (i > 3)
-	    {rv |= 1;
-	     break;};
-	 _PG_X_setup_font(dev, backup_font[i], backup_size[i]);};
+    nf = _PG_X_set_default_font(dev);
+    if (nf == 0)
+       rv |= 1;
 
 /* remember this device for event handling purposes */
     _PG_push_device(dev);
@@ -536,8 +554,8 @@ static int _PG_X_init_window(PG_device *dev, double *xf, int *dx, int *wdx,
 
 /* _PG_X_OPEN_WINDOW - create and map the X window for DEV */
 
-static GC _PG_X_open_window(PG_device *dev, int *wx, int *wdx,
-			    unsigned long *fbc)
+GC _PG_X_open_window(PG_device *dev, int *wx, int *wdx,
+		     unsigned long *fbc, int map, int glx)
    {int Xargc, screen;
     unsigned long valuemask;
     char **Xargv, *window_name;
@@ -581,14 +599,38 @@ static GC _PG_X_open_window(PG_device *dev, int *wx, int *wdx,
     XChangeWindowAttributes(dev->display, dev->window,
                             CWBackingStore, &setwindattr);
 
-    XStringListToTextProperty(&window_name, 1, &wintp);
-    XSetWMProperties(dev->display, dev->window, &wintp, &wintp,
-		     Xargv, Xargc, &size_hints, NULL, NULL);
+    if (glx == FALSE)
+       {XStringListToTextProperty(&window_name, 1, &wintp);
+	XSetWMProperties(dev->display, dev->window, &wintp, &wintp,
+			 Xargv, Xargc, &size_hints, NULL, NULL);}
+
+    else
+       {unsigned int ix[PG_SPACEDM];
+	char *iname;
+	Pixmap ipixmap;
+	static unsigned char
+	  star_bits[] = {0x00, 0x00, 0x80, 0x00, 0x80, 0x00, 0x88, 0x08,
+                         0x90, 0x04, 0xa0, 0x02, 0x40, 0x01, 0x3e, 0x3e,
+                         0x40, 0x01, 0xa0, 0x02, 0x90, 0x04, 0x88, 0x08, 
+                         0x80, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+        ix[0] = 16;
+	ix[1] = 16;
+	ipixmap = XCreateBitmapFromData(dev->display, 
+					    RootWindow(dev->display, screen),
+					    (char *) star_bits, 
+					    ix[0], ix[1]);
+
+	iname = window_name;
+	XSetStandardProperties(dev->display, dev->window,
+			       window_name, iname, 
+			       ipixmap, Xargv, Xargc, &size_hints);};
 
     _PG_X_select_events(dev);
 
-    XMapWindow(dev->display, dev->window);
-    XNextEvent(dev->display, &report);
+    if (map == TRUE)
+       {XMapWindow(dev->display, dev->window);
+	XNextEvent(dev->display, &report);};
  
 /* create graphics context */
     valuemask = 0;
@@ -608,7 +650,7 @@ PG_device *_PG_X_open_imbedded_screen(PG_device *dev, Display *display,
 				      Window window, GC gc,
 				      double xfo, double yfo,
 				      double dxfo, double dyfo)
-   {int min_dim, ok, ndc;
+   {int min_dim, ok, ndvc;
     int dx[PG_SPACEDM], wdx[PG_SPACEDM];
     double xf[PG_SPACEDM], dxf[PG_SPACEDM];
 
@@ -627,8 +669,8 @@ PG_device *_PG_X_open_imbedded_screen(PG_device *dev, Display *display,
     dev->type_index = GRAPHIC_WINDOW_DEVICE;
     dev->quadrant   = QUAD_FOUR;
 
-    PG_query_screen_n(dev, dx, &ndc);
-    if ((dx[0] == 0) && (dx[1] == 0) && (ndc == 0))
+    PG_query_screen_n(dev, dx, &ndvc);
+    if ((dx[0] == 0) && (dx[1] == 0) && (ndvc == 0))
        return(NULL);
 
     xf[0] = xfo;
@@ -639,7 +681,7 @@ PG_device *_PG_X_open_imbedded_screen(PG_device *dev, Display *display,
 
     min_dim = _PG_X_setup_geom(dev, xf, dxf, dx, NULL, wdx);
 
-    _PG_X_init_palette(dev, ndc, NULL);
+    _PG_X_init_palette(dev, ndvc, NULL);
 
 /* attach the window */
     dev->window = window;
@@ -663,7 +705,7 @@ PG_device *_PG_X_open_imbedded_screen(PG_device *dev, Display *display,
 static PG_device *_PG_X_open_screen(PG_device *dev,
 				    double xfo, double yfo,
 				    double dxfo, double dyfo)
-   {int min_dim, ok, ndc;
+   {int min_dim, ok, ndvc;
     int dx[PG_SPACEDM], wx[PG_SPACEDM], wdx[PG_SPACEDM];
     unsigned long fbc[2];
     double xf[PG_SPACEDM], dxf[PG_SPACEDM];
@@ -677,8 +719,8 @@ static PG_device *_PG_X_open_screen(PG_device *dev,
     dev->type_index = GRAPHIC_WINDOW_DEVICE;
     dev->quadrant   = QUAD_FOUR;
 
-    PG_query_screen_n(dev, dx, &ndc);
-    if ((dx[0] == 0) && (dx[1] == 0) && (ndc == 0))
+    PG_query_screen_n(dev, dx, &ndvc);
+    if ((dx[0] == 0) && (dx[1] == 0) && (ndvc == 0))
        return(NULL);
 
     if (dev->display == NULL)
@@ -692,9 +734,9 @@ static PG_device *_PG_X_open_screen(PG_device *dev,
 
     min_dim = _PG_X_setup_geom(dev, xf, dxf, dx, wx, wdx);
 
-    _PG_X_init_palette(dev, ndc, fbc);
+    _PG_X_init_palette(dev, ndvc, fbc);
 
-    dev->gc = _PG_X_open_window(dev, wx, wdx, fbc);
+    dev->gc = _PG_X_open_window(dev, wx, wdx, fbc, TRUE, FALSE);
 
     ok = _PG_X_init_window(dev, xf, dx, wdx, min_dim);
     if (ok != 0)
@@ -884,7 +926,7 @@ static void _PG_X_map_to_color_table(PG_device *dev, PG_palette *pal)
 /* this is the right thing to do when you want more colors than
  * the device supports and have to use the pseudo_cm
  *
-    for (j = 0, i = 0; i < ndc; i++)
+    for (j = 0, i = 0; i < ndvc; i++)
         {pixcolor.red   = true_cm[i].red;
          pixcolor.green = true_cm[i].green;
          pixcolor.blue  = true_cm[i].blue;
