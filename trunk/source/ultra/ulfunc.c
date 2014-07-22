@@ -405,20 +405,18 @@ static object *_ULI_hist(SS_psides *si, object *obj, object *flag)
 
     fl = SS_INTEGER_VALUE(flag);
     if (fl == HIST_LEFT)
-       {pty  = PLOT_HISTOGRAM;
-        side = 0;}
+       pty = PLOT_HISTOGRAM;
 
     else if (fl == HIST_RIGHT)
-       {pty  = PLOT_HISTOGRAM;
-        side = 1;}
+       pty = PLOT_HISTOGRAM;
 
     else if (fl == HIST_CENTER)
-       {pty  = PLOT_HISTOGRAM;
-        side = 2;}
+       pty = PLOT_HISTOGRAM;
 
     else
-       {pty  = PLOT_CARTESIAN;
-        side = 0;}
+       pty = PLOT_CARTESIAN;
+
+    side = fl;
 
     i = SX_get_crv_index_i(obj);
 
