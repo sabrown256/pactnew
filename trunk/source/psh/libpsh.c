@@ -2172,7 +2172,7 @@ static int is_executable_file(char *fp, char *path, int ncx)
  *                 - DIR may be destroyed in this process
  */
 
-static void handle_path_dot(char *path, char *dir, char *name)
+static void handle_path_dot(char *path, long nb, char *dir, char *name)
    {char *s;
 
     if (dir != NULL)
@@ -2187,7 +2187,7 @@ static void handle_path_dot(char *path, char *dir, char *name)
 	       s += 2;};
 
 /* construct the candidate path */
-	sprintf(path, "%s/%s", dir, s);};
+	snprintf(path, nb, "%s/%s", dir, s);};
 
     return;}
 
@@ -2221,7 +2221,7 @@ int file_path(char *name, char *path, int nc)
 
         case '.' :
              t = getcwd(pathvar, nb);
-             handle_path_dot(fp, t, name);
+             handle_path_dot(fp, BFLRG, t, name);
 	     n = is_executable_file(path, fp, nc);
              break;
 
@@ -2234,7 +2234,7 @@ int file_path(char *name, char *path, int nc)
 		 for (t = strtok(pathvar, ":");
 		      t != NULL;
 		      t = strtok(NULL, ":"))
-		     {handle_path_dot(fp, t, name);
+		     {handle_path_dot(fp, BFLRG, t, name);
 		      n = is_executable_file(path, fp, nc);
 		      if (n == 0)
 			 break;};};

@@ -55,9 +55,11 @@ void manage_tmp_dir(statedes *st, int start)
         if (strncmp(st->cwd, "/tmp/pact_make_", 15) == 0)
 	   strcpy(st->tmpdir, st->cwd);
         else
-	    sprintf(st->tmpdir, "/tmp/pact_make_%d", (int) getpid());
+	    snprintf(st->tmpdir, BFLRG, "/tmp/pact_make_%d",
+		     (int) getpid());
 #else
-	sprintf(st->tmpdir, "%s/%s%s/obj", st->cwd, PSY_Prefix, st->sys);
+	snprintf(st->tmpdir, BFLRG, "%s/%s%s/obj",
+		 st->cwd, PSY_Prefix, st->sys);
 #endif
 
 	snprintf(cmd, BFLRG, "test -d %s/", st->tmpdir);
@@ -366,7 +368,7 @@ static int setup_env(statedes *st, char *src)
 	else
 	   strcpy(st->sys, PSY_ID);};
 
-    sprintf(st->arch, "%s%s", PSY_Prefix, st->sys);
+    snprintf(st->arch, BFLRG, "%s%s", PSY_Prefix, st->sys);
 
     return(TRUE);}
 
@@ -459,7 +461,7 @@ int main(int c, char **v)
 	    st.show = 1;
 
 	 else if (strcmp(v[i], "-sys") == 0)
-	    sprintf(st.arch, "%s", v[++i]);
+	    snprintf(st.arch, BFLRG, "%s", v[++i]);
 
 /* get dmake options taking the next argument later */
 	 else if ((strcmp(v[i], "-async") == 0) ||

@@ -45,20 +45,20 @@ static void show_time(char *s, int nc, SC_rusedes *ru, int tmod, int label)
 
 	switch (tmod)
 	   {case 1:
-	         SC_sec_str(vut, ut);
+	         SC_sec_str(vut, ut, MAXLINE);
 	         snprintf(s, nc, "%10s", ut);
 	         break;
 	    case 2:
-		 SC_sec_str(vst, st);
+		 SC_sec_str(vst, st, MAXLINE);
 	         snprintf(s, nc, "%10s", st);
 	         break;
 	    case 3:
-		 SC_sec_str(vct, ut);
+		 SC_sec_str(vct, ut, MAXLINE);
 	         snprintf(s, nc, "%10s", ut);
 	         break;
 	    case 4:
-	         SC_sec_str(vut, ut);
-		 SC_sec_str(vst, st);
+	         SC_sec_str(vut, ut, MAXLINE);
+		 SC_sec_str(vst, st, MAXLINE);
 	         snprintf(s, nc, "%10s %10s", ut, st);
 	         break;};};
 

@@ -121,7 +121,7 @@ char *SC_get_banner(void)
  *                     - DIR may be destroyed in this process
  */
 
-static void _SC_handle_path_dot(char *path, char *dir, char *name)
+static void _SC_handle_path_dot(char *path, long nb, char *dir, char *name)
    {char *s;
 
     if (dir != NULL)
@@ -136,7 +136,7 @@ static void _SC_handle_path_dot(char *path, char *dir, char *name)
 	       s += 2;};
 
 /* construct the candidate path */
-	sprintf(path, "%s/%s", dir, s);};
+	snprintf(path, nb, "%s/%s", dir, s);};
 
     return;}
 
@@ -200,7 +200,7 @@ int SC_file_path(char *name, char *path, int nc, int full)
 
         case '.' :
 	     t = SC_getcwd();
-             _SC_handle_path_dot(fp, t, name);
+             _SC_handle_path_dot(fp, PATH_MAX, t, name);
 	     CFREE(t);
 
              n = strlen(fp);

@@ -376,8 +376,6 @@ struct s_quaternion
 
 #define SC_VA_ARG(x)      va_arg(__a__, x)
 
-#define SC_VSPRINTF(s, f) vsprintf(s, f, __a__)
-
 #define SC_VSNPRINTF(s, n, f) (*SC_vsnprintf_hook)(s, n, f, __a__)
 
 #define SC_VFPRINTF(s, f) vfprintf(s, f, __a__)
