@@ -165,13 +165,14 @@ static void _UL_args(SS_psides *si, object *obj, void *v, int type)
  *                   - if range expansion were moved to the handlers.
  */
 
-static void _UL_expand_prefix(char *s)
-   {int flag, lind;
+static void _UL_expand_prefix(char *s, int nb)
+   {int flag, lind, nc, nr;
     char t[MAXLINE], token[MAXLINE];
     char *sp, *tp, *rp;
 
-    strcpy(t, s);
+    SC_strncpy(t, MAXLINE, s, -1);
     sp  = s;
+    nr  = nb;
 
     while ((tp = SC_firsttokq(t, " \t\n\r","\"")) != NULL)
        {if ((*tp >= 'a') && (*tp <= 'z')
@@ -192,8 +193,9 @@ static void _UL_expand_prefix(char *s)
         else
            strcpy(token, tp);
 
-        sprintf(sp, "%s ", token);
-        sp += strlen(token) + 1;}
+        nc  = snprintf(sp, nr, "%s ", token);
+        sp += nc;
+        nr -= nc;}
 
     *(sp - 1) = '\0';
 
@@ -221,7 +223,7 @@ static char *_UL_reproc_in(SX_reparsed *pd, char *line)
     if (!SX_expand_expr(bf, BFLRG))
        SS_error(si, "SYNTAX ERROR - _UL_REPROC_IN", SS_null);
 
-    _UL_expand_prefix(bf);
+    _UL_expand_prefix(bf, BFLRG);
 
 /* if it's already a list tell the parser to do nothing - it's already
  * done everything necessary

@@ -609,60 +609,60 @@ static char *_SX_isthrough(char *s)
 
 /* _SX_EXPAND_FIRST - expand the first missing menu/lst object */
 
-static char *_SX_expand_first(char *s, char *sp)
-   {char s1[MAXLINE], s2[MAXLINE], temp[MAXLINE];
-    char *tp, *lexpr, *rexpr;
-    int unbalanced;
+static char *_SX_expand_first(char *d, int nb, char *sp)
+   {int np;
+    char s1[MAXLINE], s2[MAXLINE], t[MAXLINE];
+    char *tp, *lp, *rp;
 
     *sp = '\0';
 
 /* break the portion of the command before the colon into two strings:
- * the expression immediately preceding the colon (lexpr) and the rest.
+ * the expression immediately preceding the colon (lp) and the rest.
  */
-    strcpy(s1, s);
-    for (tp = s1 + (sp - s) - 1; *tp == ' '; tp--);
+    SC_strncpy(s1, MAXLINE, d, -1);
+    for (tp = s1 + (sp - d) - 1; *tp == ' '; tp--);
 
     if (*tp == ')')
-       {*(tp + 2) = '\0';
-        *(tp + 1) = ')';
-        for (unbalanced = 1; unbalanced; tp--)
+       {tp[2] = '\0';
+        tp[1] = ')';
+        for (np = 1; np != 0; tp--)
             {*tp = *(tp - 1);
              if (*tp == ')')
-                unbalanced++;
+                np++;
              else if (*tp == '(')
-                unbalanced--;}
+                np--;}
         *tp = '\0';
-        lexpr = tp + 1;}
+        lp = tp + 1;}
     else
-       lexpr = SC_lasttok(s1, " ,");
+       lp = SC_lasttok(s1, " ,");
 
 /* break the portion of the command after the colon into two strings:
- * the expression immediately following the colon (rexpr) and the rest.
+ * the expression immediately following the colon (rp) and the rest.
  */
     for (tp = sp + 1; *tp == ' '; tp++);
-    strcpy(s2, tp);
+    SC_strncpy(s2, MAXLINE, tp, -1);
 
     if (*tp == '(')
-       {rexpr = tp++;
-        strcpy(temp, rexpr);
-        rexpr = temp;
-        for (unbalanced = 1; unbalanced; tp++)
+       {rp = tp++;
+        SC_strncpy(t, MAXLINE, rp, -1);
+        rp = t;
+        for (np = 1; np != 0; tp++)
             {if (*tp == '(')
-                unbalanced++;
+                np++;
              else if (*tp == ')')
-                unbalanced--;}
-        strcpy(s2, tp);
+                np--;}
+        SC_strncpy(s2, MAXLINE, tp, -1);
         *tp = '\0';}
     else
-       rexpr = SC_firsttok(s2, " ,");
+       rp = SC_firsttok(s2, " ,");
 
 /* build a new expanded command from all the parts.
  * removing the blank after the ')' causes multiple ranges to give an error.
  * the blank before the '(' improves the aesthetics of command log output.
  */
-    sprintf(s, "%s (thru %s %s) %s", s1, lexpr, rexpr, s2);
+    snprintf(d, nb, "%s (thru %s %s) %s", s1, lp, rp, s2);
 
-    return(s);}
+    return(d);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -688,7 +688,7 @@ int SX_expand_expr(char *s, int nb)
     else
 
 /* expand the first missing object */
-       {s = _SX_expand_first(s, sp);
+       {s = _SX_expand_first(s, nb, sp);
 
 /* loop through to find any more instances */
         ret = SX_expand_expr(s, nb);};
@@ -1129,7 +1129,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "answer-prompt",
                   "Variable: A string printed before the return value\n     Usage: answer-prompt <string>",
                   SS_acc_string,
-                  si->ans_prompt);
+                  si->ans_prompt, MAXLINE);
 
     SS_install_cf(si, "ascii-output-format",
                   "Variable: Controls format for ASCII output of floating point numbers\n     Usage: ascii-output-format <format>",
@@ -1301,7 +1301,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "data-directory",
                   "Variable: Sets the default data directory\n     Usage: data-directory <path-name>",
                   SS_acc_string,
-                  SX_gs.data_directory);
+                  SX_gs.data_directory, MAXLINE);
 
     SS_install_cf(si, "data-id",
                   "Variable: Controls display of curve identifiers on graph\n     Usage: data-id on | off",
@@ -1577,7 +1577,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "prompt",
                   "Variable: The prompt\n     Usage: prompt <string>",
                   SS_acc_string,
-                  si->prompt);
+                  si->prompt, MAXLINE);
 
     SS_install_cf(si, "promotion-type",
                   "Variable: Data type for promotion of sets and arrays (default none)\n     Usage: promotion-type <string>",
