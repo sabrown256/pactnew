@@ -156,9 +156,9 @@ boolean Default_Init(void)
     /* should set defaults */
     numInputFiles = 0;
     numMachines = 0;
-    sprintf(currentPath, ".");
-    sprintf(currentGOPPath, ".");
-    sprintf(currentFramePath, ".");
+    snprintf(currentPath, MAXPATHLEN, ".");
+    snprintf(currentGOPPath, MAXPATHLEN, ".");
+    snprintf(currentFramePath, MAXPATHLEN, ".");
 #ifdef HPUX
     SetRemoteShell("remsh");
 #else

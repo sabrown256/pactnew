@@ -2288,7 +2288,7 @@ extern boolean    frameRateInteger;
  *===============================*/
 
 boolean	ReadParamFile _ANSI_ARGS_((char *fileName, int function));
-void	GetNthInputFileName _ANSI_ARGS_((char *fileName, int n));
+void	GetNthInputFileName _ANSI_ARGS_((char *fileName, long nc, int n));
 extern void    JM2JPEG _ANSI_ARGS_((void));
 
 

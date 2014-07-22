@@ -4588,7 +4588,7 @@ GOPStoMPEG(numGOPS, outfnm, outputFilePtr)
 
     if ( numGOPS > 0 ) {
 	for ( ind = 0; ind < numGOPS; ind++ ) {
-	    GetNthInputFileName(inputFileName, ind);
+	    GetNthInputFileName(inputFileName, 1024, ind);
 	    snprintf(fileName, 1024, "%s/%s", currentGOPPath, inputFileName);
 
 	    for (q = 0;   q < READ_ATTEMPTS;  ++q ) {
@@ -4734,7 +4734,7 @@ FramesToMPEG(int nfr, char *outfnm, FILE *outputFile, boolean parallel)
 		WaitForOutputFile(ind);
 		snprintf(fileName, 1024, "%s.frame.%d", outfnm, ind);
 	    } else {
-		GetNthInputFileName(inputFileName, ind);
+		GetNthInputFileName(inputFileName, 1024, ind);
 		snprintf(fileName, 1024, "%s/%s", currentFramePath, inputFileName);
 	    }
 
@@ -4766,7 +4766,7 @@ FramesToMPEG(int nfr, char *outfnm, FILE *outputFile, boolean parallel)
 			WaitForOutputFile(bNum);
 			snprintf(fileName, 1024, "%s.frame.%d", outfnm, bNum);
 		    } else {
-			GetNthInputFileName(inputFileName, bNum);
+			GetNthInputFileName(inputFileName, 1024, bNum);
 			snprintf(fileName, 1024, "%s/%s", currentFramePath, inputFileName);
 		    }
 
@@ -12054,7 +12054,7 @@ int32 bit_rate, buf_size;
  *===============================*/
 
 static void	ShowRemainingTime _ANSI_ARGS_((void));
-static void	ComputeDHMSTime _ANSI_ARGS_((int32 someTime, char *timeText));
+static void	ComputeDHMSTime _ANSI_ARGS_((int32 someTime, char *timeText, long nc));
 static void	ComputeGOPFrames _ANSI_ARGS_((int whichGOP, int *firstFrame,
 					      int *lastFrame, int numFrames));
 static void	PrintEndStats _ANSI_ARGS_((int inputFrameBits, long totalBits));
@@ -12198,7 +12198,7 @@ int32 GenMPEGStream(int whgop, int frameStart, int frameEnd,
 	       {if (remoteIO)
 		   GetRemoteFrame(frame, firstFrame-1);
 	        else
-		   {GetNthInputFileName(inputFileName, firstFrame-1);
+		   {GetNthInputFileName(inputFileName, 1024, firstFrame-1);
 
                     if (childProcess && separateConversion)
 		       ReadFrame(frame, inputFileName, slaveConversion, TRUE);
@@ -12404,7 +12404,7 @@ int32 GenMPEGStream(int whgop, int frameStart, int frameEnd,
 	    {if (remoteIO)
                 GetRemoteFrame(frame, i);
 	     else
-	        {GetNthInputFileName(inputFileName, i);
+	        {GetNthInputFileName(inputFileName, 1024, i);
 		 if (childProcess && separateConversion)
                     ReadFrame(frame, inputFileName, slaveConversion, TRUE);
 		 else
@@ -12700,9 +12700,9 @@ PrintStartStats(firstFrame, lastFrame)
 	if ( firstFrame == -1 ) {
 	    io_printf(fpointer, "OUTPUT:  %s\n", outputFileName);
 	} else if ( ! stdinUsed ) {
-	    GetNthInputFileName(inputFileName, firstFrame);
+	    GetNthInputFileName(inputFileName, 1024, firstFrame);
 	    io_printf(fpointer, "FIRST FILE:  %s/%s\n", currentPath, inputFileName);
-	    GetNthInputFileName(inputFileName, lastFrame);
+	    GetNthInputFileName(inputFileName, 1024, lastFrame);
 	    io_printf(fpointer, "LAST FILE:  %s/%s\n", currentPath,
 		    inputFileName);
 	}
@@ -12865,9 +12865,7 @@ SetFrameRate()
  *
  *===========================================================================*/
 static void
-ComputeDHMSTime(someTime, timeText)
-    int32 someTime;
-    char *timeText;
+ComputeDHMSTime(int32 someTime, char *timeText, long nc)
 {
     int	    days, hours, mins, secs;
 
@@ -12879,13 +12877,17 @@ ComputeDHMSTime(someTime, timeText)
     secs = someTime - mins*60;
 
     if ( days > 0 ) {
-        sprintf(timeText, "Total time:  %d days and %d hours", days, hours);
+        snprintf(timeText, nc,
+		 "Total time:  %d days and %d hours", days, hours);
     } else if ( hours > 0 ) {
-        sprintf(timeText, "Total time:  %d hours and %d minutes", hours, mins);
+        snprintf(timeText, nc,
+		 "Total time:  %d hours and %d minutes", hours, mins);
     } else if ( mins > 0 ) {
-        sprintf(timeText, "Total time:  %d minutes and %d seconds", mins, secs);
+        snprintf(timeText, nc,
+		 "Total time:  %d minutes and %d seconds", mins, secs);
     } else {
-	sprintf(timeText, "Total time:  %d seconds", secs);
+	snprintf(timeText, nc,
+		 "Total time:  %d seconds", secs);
     }
 }
 
@@ -12993,7 +12995,7 @@ PrintEndStats(inputFrameBits, totalBits)
     	io_printf(stdout, "\n\n");
     }
 
-    ComputeDHMSTime(diffTime, timeText);
+    ComputeDHMSTime(diffTime, timeText, 256);
 
     for ( i = 0; i < 2; i++ ) {
 	if ( ( i == 0 ) && (! realQuiet) ) {
@@ -13205,7 +13207,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 		 if (remoteIO)
 		    GetRemoteFrame(bFrame, bFrame->id);
 		 else
-		    {GetNthInputFileName(inputFileName, id);
+		    {GetNthInputFileName(inputFileName, 1024, id);
 		     if (childProcess && separateConversion )
 		        ReadFrame(bFrame, inputFileName, slaveConversion, TRUE);
 		     else
@@ -13276,7 +13278,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 		 if (remoteIO)
 		    GetRemoteFrame(bFrame, bFrame->id);
 		 else
-		    {GetNthInputFileName(inputFileName, id);
+		    {GetNthInputFileName(inputFileName, 1024, id);
 		     if (childProcess && separateConversion)
 		        ReadFrame(bFrame, inputFileName, slaveConversion, TRUE);
 		     else
@@ -14778,9 +14780,9 @@ boolean ReadParamFile(char *fileName, int function)
 /* should set defaults */
     numInputFiles = 0;
     numMachines   = 0;
-    sprintf(currentPath, ".");
-    sprintf(currentGOPPath, ".");
-    sprintf(currentFramePath, ".");
+    snprintf(currentPath, MAXPATHLEN, ".");
+    snprintf(currentGOPPath, MAXPATHLEN, ".");
+    snprintf(currentFramePath, MAXPATHLEN, ".");
 #ifndef HPUX
     SetRemoteShell("rsh");
 #else
@@ -15046,9 +15048,9 @@ boolean ReadParamFile(char *fileName, int function)
 		  if (strncmp(input, "OUTPUT", 6) == 0)
 		     {charPtr = SkipSpacesTabs(&input[6]);
 		      if (whichGOP == -1)
-			 strcpy(outputFileName, charPtr);
+			 SC_strncpy(outputFileName, 256, charPtr, -1);
 		      else
-			 sprintf(outputFileName, "%s.gop.%d",
+			 snprintf(outputFileName, 256, "%s.gop.%d",
 				 charPtr, whichGOP);
 
 		      optionSeen[OPTION_OUTPUT] = TRUE;};
@@ -15280,10 +15282,7 @@ boolean ReadParamFile(char *fileName, int function)
  * SIDE EFFECTS:    none
  *
  *===========================================================================*/
-void
-  GetNthInputFileName(fileName, n)
-char *fileName;
-int n;
+void GetNthInputFileName(char *fileName, long nc, int n)
 {
   static int	lastN = 0, lastMapN = 0, lastSoFar = 0;
   int	    mapN;
@@ -15330,21 +15329,21 @@ int n;
     }
 
     if (inputFileEntries[mapN]->repeat != TRUE) {
-      sprintf(fileName, "%s%s%s",
+      snprintf(fileName, nc, "%s%s%s",
 	      inputFileEntries[mapN]->left,
 	      &numBuffer[32-numPadding],
 	      inputFileEntries[mapN]->right);
     } else {
-      sprintf(fileName, "%s", inputFileEntries[mapN]->left);
+      snprintf(fileName, nc, "%s", inputFileEntries[mapN]->left);
     }
   } else {
     if (inputFileEntries[mapN]->repeat != TRUE) {
-      sprintf(fileName, "%s%d%s",
+      snprintf(fileName, nc, "%s%d%s",
 	      inputFileEntries[mapN]->left,
 	      ind,
 	      inputFileEntries[mapN]->right);
     } else {
-      sprintf(fileName, "%s", inputFileEntries[mapN]->left);
+      snprintf(fileName, nc, "%s", inputFileEntries[mapN]->left);
     }
   }
 

@@ -118,7 +118,7 @@ void PA_cpp_add_group(char *name, int itype, char *type)
  *             so the pointer must not be changed.
  */
 
-static void *_PA_cpp_data(int alloc, char *name0, char *group,
+static void *_PA_cpp_data(int alloc, char *name0, long nb, char *group,
                           int itype, va_list *input)
    {char bf[MAXLINE], v[MAX_PRSZ];
     void *data;
@@ -130,7 +130,7 @@ static void *_PA_cpp_data(int alloc, char *name0, char *group,
     SC_VA_ARG_ID(itype, v, 0);
     SC_ntos(bf, MAXLINE, itype, v, 0, 1);
 
-    sprintf(name0, "%s-%s", group, bf);
+    snprintf(name0, nb, "%s-%s", group, bf);
 
     if (alloc == TRUE)
        {if (SC_is_type_ptr(itype) == TRUE)
@@ -168,7 +168,8 @@ void PA_cpp_add_name(char *name, char *group, ...)
 
 /* get a pointer to the data and name of cross reference */
     SC_VA_START(group);
-    node->data = _PA_cpp_data(1, name0, group, g_node->itype, &SC_VA_VAR);
+    node->data = _PA_cpp_data(1, name0, MAXLINE,
+			      group, g_node->itype, &SC_VA_VAR);
     SC_VA_END;
 
 /* install into hash table */
@@ -234,7 +235,7 @@ char *PA_cpp_value_to_name(char *group, ...)
 
     if (g_node != NULL)
        {SC_VA_START(group);
-	_PA_cpp_data(0, name0, group, g_node->itype, &SC_VA_VAR);
+	_PA_cpp_data(0, name0, MAXLINE, group, g_node->itype, &SC_VA_VAR);
 	SC_VA_END;
 
 /* look up value */
