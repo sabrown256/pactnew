@@ -1627,11 +1627,12 @@ PG_interface_object *PG_get_object_event(PG_device *dev, PG_event *ev)
 PG_interface_object *PG_make_interface_object(PG_device *dev,
                                               char *name, char *type,
 					      void *obj,
-					      PG_text_alignment align,
+					      PM_direction align,
 					      double ang,
                                               PG_curve *crv,
                                               int *flags, int fc, int bc,
-                                              char *slct, char *draw, char *action,
+                                              char *slct, char *draw,
+					      char *action,
                                               PG_interface_object *parent)
    {PG_interface_object *iob;
     PFVoid fnc;
@@ -1840,7 +1841,7 @@ void PG_add_text_obj(PG_device *dev, double *obx, char *s)
 
 	tcrv = PG_make_box_curve(dev, NORMC, co, tbx);
 	tiob = PG_make_interface_object(dev, s, PG_TEXT_OBJECT_S, NULL,
-					CENTER, 0.0, tcrv, flags,
+					DIR_CENTER, 0.0, tcrv, flags,
 					dev->DARK_BLUE, -1,
 					NULL, "draw-text", NULL,
 					NULL);
@@ -1886,7 +1887,7 @@ void PG_add_button(PG_device *dev, double *obx, char *s, PFEvCallback fnc)
 
     tcrv = PG_make_box_curve(dev, NORMC, co, tbx);
     biob = PG_make_interface_object(dev, "BUTTON", PG_BUTTON_OBJECT_S, s,
-				    CENTER, 0.0, bcrv, flags,
+				    DIR_CENTER, 0.0, bcrv, flags,
 				    dev->BLACK, dev->GRAY,
 				    NULL, "draw-button", s,
                                     NULL);
@@ -1896,7 +1897,7 @@ void PG_add_button(PG_device *dev, double *obx, char *s, PFEvCallback fnc)
     flags[2] = FALSE;
 
     tiob = PG_make_interface_object(dev, s, PG_TEXT_OBJECT_S, NULL,
-				    CENTER, 0.0, tcrv, flags,
+				    DIR_CENTER, 0.0, tcrv, flags,
 				    dev->DARK_BLUE, -1,
 				    NULL, "draw-text", NULL,
                                     biob);

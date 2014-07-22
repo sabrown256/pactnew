@@ -612,7 +612,8 @@ void PG_draw_data_ids(PG_device *dev, double *x, double *y,
 		       "PLOT-TYPE", SC_INT_I, &pty,     PLOT_CARTESIAN,
 		       NULL);
 
-    if ((pty == PLOT_CARTESIAN) || (pty == PLOT_SCATTER) || (pty == PLOT_HISTOGRAM))
+    if ((pty == PLOT_CARTESIAN) || (pty == PLOT_SCATTER) ||
+	(pty == PLOT_HISTOGRAM))
        {for (i = 0; i < m; i++)
             {if (g->iflog[0])
                 xp[0] = x0*POW(dx, i);
@@ -890,8 +891,8 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 
 void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
                        double lnwid, int lnsty, int scatter, int marker,
-                       int start, int l)
-   {int i, j, nl, nm, ocl;
+                       PM_direction start, int l)
+   {int i, j, nl, nm, ocl, offs;
     double ymn;
     double *r[PG_SPACEDM];
     double **xl, *py;
@@ -925,34 +926,43 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     xl[0][0] = x[0];
     xl[1][0] = ymn;
 
-    start--;
-    if (start < 2)
-       {py = y + start;
+    offs = 0;
+    switch (start)
+       {case DIR_RIGHT :
+             offs++;
+	case DIR_LEFT :
+	     py = y + offs;
 
-        xl[0][1] = x[0];
-        xl[1][1] = py[0];
-        for (i = 1, j = 2; i < nm; i++, j += 2)
-            {xl[0][j] = x[i];
-             xl[1][j] = xl[1][j-1];
+	     xl[0][1] = x[0];
+	     xl[1][1] = py[0];
+	     for (i = 1, j = 2; i < nm; i++, j += 2)
+	         {xl[0][j] = x[i];
+		  xl[1][j] = xl[1][j-1];
 
-             xl[0][j+1] = x[i];
-             xl[1][j+1] = py[i];};
-        xl[0][j] = x[i];
-        xl[1][j] = py[i-1];}
+		  xl[0][j+1] = x[i];
+		  xl[1][j+1] = py[i];};
+	     xl[0][j] = x[i];
+	     xl[1][j] = py[i-1];
+	     break;
 
-    else if (start == 2)
-       {py = y + 1;
+	case DIR_CENTER :
+	     py = y + 1;
 
-        xl[0][1] = x[0];
-        xl[1][1] = 0.5*(y[0] + y[1]);
-        for (i = 1, j = 2; i < nm; i++, j += 2)
-            {xl[0][j] = x[i];
-             xl[1][j] = 0.5*(y[i-1] + y[i]);
+	     xl[0][1] = x[0];
+	     xl[1][1] = 0.5*(y[0] + y[1]);
+	     for (i = 1, j = 2; i < nm; i++, j += 2)
+	         {xl[0][j] = x[i];
+		  xl[1][j] = 0.5*(y[i-1] + y[i]);
 
-             xl[0][j+1] = x[i];
-             xl[1][j+1] = 0.5*(y[i] + y[i+1]);};
-        xl[0][j] = x[i];
-        xl[1][j] = 0.5*(y[i-1] + y[i]);};
+		  xl[0][j+1] = x[i];
+		  xl[1][j+1] = 0.5*(y[i] + y[i+1]);};
+	     xl[0][j] = x[i];
+	     xl[1][j] = 0.5*(y[i-1] + y[i]);
+	     break;
+
+	default :
+             return;
+	     break;};
 
 /* finish with ending curve point */
     xl[0][j+1] = x[i];

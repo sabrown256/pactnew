@@ -425,13 +425,6 @@ enum e_PG_PS_primitive
 
 typedef enum e_PG_PS_primitive PG_PS_primitive;
 
-enum e_PG_text_alignment
-   {LEFT,
-    RIGHT,
-    CENTER};
-
-typedef enum e_PG_text_alignment PG_text_alignment;
-
 enum e_PG_text_window_attr
    {MORE_WINDOW              = -1,
     SCROLLING_WINDOW         = -2,
@@ -689,7 +682,7 @@ struct s_PG_text_box
     int line;
     int col;
     int mode;
-    PG_text_alignment align;
+    PM_direction align;
     double angle;
     int background;
     int foreground;
@@ -1520,7 +1513,7 @@ extern void
 	      double lnwid, int lnsty, int scatter, int marker, int l),
  PG_histogram_plot(PG_device *dev, double *x, double *y, int n,
 		   int lncol, double lnwid, int lnsty,
-		   int scatter, int marker, int start, int l),
+		   int scatter, int marker, PM_direction start, int l),
  PG_insel_plot(PG_device *dev, double *x, double *y, int n,
 	       int lncol, double lnwid, int lnsty, int l),
  PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
@@ -1661,7 +1654,7 @@ extern PG_font_family
 
 extern PG_interface_object
  *PG_make_interface_object(PG_device *dev, char *name, char *type, void *obj,
-			   PG_text_alignment align, double ang,
+			   PM_direction align, double ang,
 			   PG_curve *crv, int *flags,
 			   int fc, int bc,
 			   char *select, char *draw, char *action,
@@ -1676,7 +1669,7 @@ extern PG_curve
 extern pcons
  *PG_set_line_info(pcons *info, PG_rendering pty, int axis_type,
 		   int style, int scatter, int marker,
-		   int color, int start, double width),
+		   int color, PM_direction start, double width),
  *PG_set_tds_info(pcons *info, PG_rendering type, int axis_type,
 		  int style, int color, int nlev, double ratio,
 		  double width, double theta, double phi, double chi,

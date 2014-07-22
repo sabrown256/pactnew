@@ -263,6 +263,26 @@ enum e_PM_centering
 
 typedef enum e_PM_centering PM_centering;
 
+/*
+ * PM_DIRECTION - relative position indicators for
+ *              - centering in boxes, text justification,
+ *              - histograms, ...
+ *
+ * #bind derived PM_direction integer SC_ENUM_I SC_ENUM_I DIR_NONE
+ */
+
+enum e_PM_direction
+   {DIR_NONE = 0,
+    DIR_LEFT,
+    DIR_RIGHT,
+    DIR_CENTER,
+    DIR_UP,
+    DIR_DOWN,
+    DIR_FRONT,
+    DIR_BACK};
+
+typedef enum e_PM_direction PM_direction;
+
 struct s_PM_lagrangian_mesh
    {double *x;
     double *y;

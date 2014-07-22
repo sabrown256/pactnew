@@ -100,7 +100,7 @@ static void print_axis_description(PG_axis_def *ad,
 
 /* SHOW_DIR - show the direction that the axis vector points */
 
-static void show_dir(PG_device *dev, int k)
+static void show_dir(PG_device *dev, PM_direction k)
    {int id;
     int nflg[PG_SPACEDM];
     double va, dv;
@@ -118,29 +118,32 @@ static void show_dir(PG_device *dev, int k)
     va = 0.5;
 	
     switch (k)
-       {case 1 :
+       {case DIR_RIGHT :
 	     vbx[2] = 0.65;
 	     vbx[3] = 0.0;
 	     vbx[0] = va - dv;
 	     vbx[1] = 2.0*dv;
 	     break;
-        case 2 :
+        case DIR_UP :
 	     vbx[0] = 0.35;
 	     vbx[1] = 0.0;
 	     vbx[2] = va - dv;
 	     vbx[3] = 2.0*dv;
 	     break;
-	case 3 :
+	case DIR_LEFT :
 	     vbx[2] = 0.35;
 	     vbx[3] = 0.0;
 	     vbx[0] = va + dv;
 	     vbx[1] = -2.0*dv;
 	     break;
-        case 4 :
+        case DIR_DOWN :
 	     vbx[0] = 0.65;
 	     vbx[1] = 0.0;
 	     vbx[2] = va + dv;
 	     vbx[3] = -2.0*dv;
+	     break;
+	default :
+             return;
 	     break;};
 
     x[0] = &vbx[0];
@@ -199,7 +202,7 @@ static void test_axis(PG_device *dev, int ticks, int rev,
 
 /* AXIS_CORE - core test routine */
 
-static void axis_core(PG_device *dev, int k, int l, FILE *fp,
+static void axis_core(PG_device *dev, PM_direction dir, int l, FILE *fp,
 		      double t1i, double t2i,
 		      int lax, int ticks, int pause)
    {int i, j, id;
@@ -257,42 +260,48 @@ static void axis_core(PG_device *dev, int k, int l, FILE *fp,
 	 ndc[1] = ndc[0] + sdx;
 	 ndc[2] = 0.1 + j*sdy;
 	 ndc[3] = ndc[2] + sdy;
-	 switch (k)
-	    {case 1:           /* increasing to the right */
-	     case 3:           /* increasing to the left */
+	 switch (dir)
+	    {case DIR_RIGHT :           /* increasing to the right */
+	     case DIR_LEFT :            /* increasing to the left */
 	          ndc[0] = 0.1;
 		  ndc[1] = 0.9;
 		  break;
-	     case 2:           /* increasing upward */
-	     case 4:           /* increasing downward */
+	     case DIR_UP :              /* increasing upward */
+	     case DIR_DOWN :            /* increasing downward */
 		  ndc[2] = 0.1;
 		  ndc[3] = 0.9;
+		  break;
+	     default :
+	          return;
 		  break;};
 
 	 PG_set_viewspace(dev, 2, NORMC, ndc);
 
-         show_dir(dev, k);
+         show_dir(dev, dir);
 
 /* set the world coordinates */
 	 for (id = 0; id < 2; id++)
 	     nflg[id] = FALSE;
 
-	 switch (k)
-	    {case 1:           /* increasing to the right */
-	     case 3:           /* increasing to the left */
+	 switch (dir)
+	    {case DIR_RIGHT :           /* increasing to the right */
+	     case DIR_LEFT :            /* increasing to the left */
 	          wc[0] = amin;
 		  wc[1] = amax;
 		  wc[2] = 0.0;
 		  wc[3] = 1.0;
 		  nflg[0] = lax;
 		  break;
-	     case 2:           /* increasing upward */
-	     case 4:           /* increasing downward */
+	     case DIR_UP :              /* increasing upward */
+	     case DIR_DOWN :            /* increasing downward */
 		  wc[0] = 0.0;
 		  wc[1] = 1.0;
 		  wc[2] = amin;
 		  wc[3] = amax;
 		  nflg[1] = lax;
+		  break;
+	     default :
+	          return;
 		  break;};
 
 	 PG_fset_axis_log_scale(dev, 2, nflg);
@@ -304,22 +313,25 @@ static void axis_core(PG_device *dev, int k, int l, FILE *fp,
 	 axmx = 0.5;
 	 aymn = 0.5;
 	 aymx = 0.5;
-	 switch (k)
-	    {case 1:           /* increasing to the right */
+	 switch (dir)
+	    {case DIR_RIGHT :           /* increasing to the right */
 	          axmn = amin;
 		  axmx = amax;
 		  break;
-	     case 2:           /* increasing upward */
+	     case DIR_UP :              /* increasing upward */
 		  aymn = amin;
 		  aymx = amax;
 		  break;
-	     case 3:           /* increasing to the left */
+	     case DIR_LEFT :            /* increasing to the left */
 		  axmn = amax;
 		  axmx = amin;
 		  break;
-	     case 4:           /* increasing downward */
+	     case DIR_DOWN :            /* increasing downward */
 		  aymn = amax;
 		  aymx = amin;
+		  break;
+	     default :
+	          return;
 		  break;};
 
 	 switch (l)
@@ -376,6 +388,7 @@ int main(int c, char **v)
     char s[MAXLINE], f[MAXLINE], *t, *p;
     PG_device *tdev;
     FILE *fp;
+    PM_direction dirs[] = { DIR_RIGHT, DIR_UP, DIR_LEFT, DIR_DOWN };
 
     SC_zero_space_n(0, -2);
     debug_mode = FALSE;
@@ -463,9 +476,11 @@ int main(int c, char **v)
 		     "axis-major-tick-size", 0.075,
 		     NULL);
 
+    dir--;
+
     for (l = 0; l < 2; l++)
-        for (k = dir; k < 5; k += dd)
-            axis_core(tdev, k, l, fp, t1, t2, lax, ticks, pause);
+        for (k = dir; k < 4; k += dd)
+            axis_core(tdev, dirs[k], l, fp, t1, t2, lax, ticks, pause);
 
     PRINT(STDOUT, "\n");
 

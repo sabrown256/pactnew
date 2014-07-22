@@ -10,9 +10,6 @@
 
 #include "pgs.h"
 
-#define HIST_LEFT   1
-#define HIST_RIGHT  2
-
 #define TIMEOUT_GRAPHICS      180
 #define TIMEOUT_FIN_PARALLEL  10
 
@@ -371,7 +368,7 @@ static int test_1(PG_device *dev)
 
     data->info = (void *) PG_set_line_info(data->info, PLOT_HISTOGRAM, CARTESIAN_2D,
 					   LINE_SOLID, FALSE, 0, dev->WHITE,
-					   HIST_LEFT, 0.0);
+					   DIR_LEFT, 0.0);
     PG_draw_graph(dev, data);
 
     PG_rl_graph(data, TRUE, TRUE);
@@ -426,7 +423,7 @@ static int test_2(PG_device *dev)
 
     data->info = (void *) PG_set_line_info(data->info, PLOT_HISTOGRAM, CARTESIAN_2D,
 					   LINE_SOLID, FALSE, 0, dev->MAGENTA,
-					   HIST_RIGHT, 0.0);
+					   DIR_RIGHT, 0.0);
     PG_draw_graph(dev, data);
 
     data->info = (void *) PG_set_line_info(data->info, PLOT_POLAR, POLAR,

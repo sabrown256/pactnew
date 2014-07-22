@@ -4663,12 +4663,12 @@ The following constants are defined in the PG_quadrant enumeration:
 
 <h4>Text Alignment Constants</hr>
 
-The following constants are defined in the PG_text_alignment enumeration:
+The following constants are defined in the PM_direction enumeration:
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD>LEFT</TD><TD>Left justify text</TD></TR>
-<TR><TD>RIGHT</TD><TD>Right justify text</TD></TR>
-<TR><TD>CENTER</TD><TD>Center text</TD></TR>
+<TR><TD>DIR_LEFT</TD><TD>Left justify text</TD></TR>
+<TR><TD>DIR_RIGHT</TD><TD>Right justify text</TD></TR>
+<TR><TD>DIR_CENTER</TD><TD>Center text</TD></TR>
 </TABLE>
 </BLOCKQUOTE>
 

@@ -30,8 +30,9 @@ void register_to(PG_device *dev, double *bx, char *s)
     xo[1] = bx[2];
     crv   = PG_make_box_curve(dev, NORMC, xo, bx);
 
-    iob = PG_make_interface_object(dev, "TEXT", PG_TEXT_OBJECT_S, s, CENTER,
-				   0.0, crv, flags, dev->WHITE, dev->CYAN,
+    iob = PG_make_interface_object(dev, "TEXT", PG_TEXT_OBJECT_S, s,
+				   DIR_CENTER, 0.0, crv, flags,
+				   dev->WHITE, dev->CYAN,
                                    NULL, "draw-text", "return-text",
                                    NULL);
 
