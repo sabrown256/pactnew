@@ -917,22 +917,23 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
  *             - arguments are the same as for sprintf
  */
 
-static void _PG_sprintf(char *string, char *format, double value, double tol)
-   {char temp[40], *token, *s;
+static void _PG_sprintf(char *string, long nc,
+			char *format, double value, double tol)
+   {char t[40], *token, *s;
 
     if (ABS(value) < tol)
        value = 0.0;
 
     if (strchr(format, 'd') != NULL)
-       snprintf(temp, 40, format, (int) value);
+       snprintf(t, 40, format, (int) value);
     else
-       snprintf(temp, 40, format, value);
+       snprintf(t, 40, format, value);
 
-    SC_strsubst(temp, 40, temp, "e-00", "e+00", -1);
+    SC_strsubst(t, 40, t, "e-00", "e+00", -1);
 
-    token = SC_strtok(temp, " ", s);
+    token = SC_strtok(t, " ", s);
     if (token != NULL)
-       strcpy(string, token);
+       SC_strncpy(string, nc, token, -1);
 
     return;}
 
@@ -988,7 +989,7 @@ static void _PG_axis_label_fmt(PG_device *dev,
     for (i = 0; i < n; i++)
         {db = dx[i];
          ls = vo[0] + db*dv;
-	 _PG_sprintf(s, format, ls, tol);
+	 _PG_sprintf(s, 20, format, ls, tol);
          PG_get_text_ext_n(dev, 2, WORLDC, s, tdx);
          ld[0] = max(ld[0], tdx[0]);
          ld[1] = max(ld[1], tdx[1]);};
@@ -1017,9 +1018,9 @@ static void _PG_write_label(PG_device *dev, char *format,
 
     if (flg)
        {s[0] = flg;
-        _PG_sprintf(s+1, format, lss, tol);}
+        _PG_sprintf(s+1, 80, format, lss, tol);}
     else
-       _PG_sprintf(s, format, lss, tol);
+       _PG_sprintf(s, 80, format, lss, tol);
     
     ps = SC_dstrsubst(s, "e-00", "e+00", -1);
 

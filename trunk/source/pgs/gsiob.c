@@ -270,7 +270,7 @@ static int _PG_value_string(int ityp, haelem *hp, char *s, int nc)
        SC_ntos(s, nc, ityp, pv, 0, 1);
 
     else if (ityp == SC_STRING_I)
-       sprintf(s, "%s", **(char ***) hp->def);
+       snprintf(s, nc, "%s", **(char ***) hp->def);
 
     else
        match = FALSE;

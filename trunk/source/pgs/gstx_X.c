@@ -293,9 +293,9 @@ static int _PG_X_txt_set_font(PG_device *dev, char *face, char *style, int size)
 
 /* allow the oddball fonts */
     if (size < 4)
-      sprintf(bf, "*%s*", font_name);
+      snprintf(bf, MAXLINE, "*%s*", font_name);
     else
-      sprintf(bf, "*%s*-*-*", font_name);
+      snprintf(bf, MAXLINE, "*%s*-*-*", font_name);
 
 /* setup the font */
     ret  = FALSE;

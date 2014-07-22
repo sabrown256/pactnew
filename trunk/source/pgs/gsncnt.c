@@ -1189,7 +1189,7 @@ static PM_set *_PG_make_surface_set(itf_array *ifs, int no, int it)
     mts = PM_make_topology(md, bsp, bsc, bsd);
 
 /* allow space in the coordinate arrays and the mesh topology */
-    sprintf(t, "level[%d]", no);
+    snprintf(t, MAXLINE, "level[%d]", no);
     surface = PM_make_ac_set(t, SC_DOUBLE_S,
 			     FALSE, mts, nd, xs[0], xs[1], xs[2]);
 
