@@ -279,7 +279,7 @@ double SC_str_time(char *d)
  *             -    yy/mm/dd hh:mm:ss
  */
 
-void SC_time_str(unsigned long t, char *d)
+void SC_time_str(unsigned long t, char *d, long nb)
    {struct tm tc, safe, *ptc;
     time_t ti;
 
@@ -287,9 +287,9 @@ void SC_time_str(unsigned long t, char *d)
     ptc = SC_localtime(&ti, &safe);
     if (ptc != NULL)
        {tc = *ptc;
-	sprintf(d, "%4d/%02d/%02d %02d:%02d:%02d",
-		1900+tc.tm_year, tc.tm_mon+1, tc.tm_mday,
-		tc.tm_hour, tc.tm_min, tc.tm_sec);};
+	snprintf(d, nb, "%4d/%02d/%02d %02d:%02d:%02d",
+		 1900+tc.tm_year, tc.tm_mon+1, tc.tm_mday,
+		 tc.tm_hour, tc.tm_min, tc.tm_sec);};
 
     return;}
 
@@ -301,7 +301,7 @@ void SC_time_str(unsigned long t, char *d)
  *            -    hh:mm:ss
  */
 
-void SC_sec_str(double t, char *d)
+void SC_sec_str(double t, char *d, long nb)
    {int ft, sc, mn, hr;
 
     sc = (int) t;
@@ -314,11 +314,11 @@ void SC_sec_str(double t, char *d)
     mn = mn % 60;
 
     if (hr != 0)
-       sprintf(d, "%d:%02d:%02d", hr, mn, sc);
+       snprintf(d, nb, "%d:%02d:%02d", hr, mn, sc);
     else if (mn != 0)
-       sprintf(d, "%d:%02d.%02d", mn, sc, ft);
+       snprintf(d, nb, "%d:%02d.%02d", mn, sc, ft);
     else
-       sprintf(d, "%d.%02d", sc, ft);
+       snprintf(d, nb, "%d.%02d", sc, ft);
 
     return;}
 

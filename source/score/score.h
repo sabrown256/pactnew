@@ -835,8 +835,8 @@ extern struct tm
 extern void
  SC_get_time(double *psec, double *pmusec),
  SC_timeout(int to, PFSignal_handler fnc, void *a, int nb),
- SC_time_str(unsigned long t, char *d),
- SC_sec_str(double t, char *d);
+ SC_time_str(unsigned long t, char *d, long nb),
+ SC_sec_str(double t, char *d, long nb);
 
 extern double
  SC_cpu_time(void),

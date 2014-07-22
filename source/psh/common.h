@@ -55,7 +55,6 @@
 
 #define VA_ARG(x)      va_arg(__a__, x)
 
-/* #define VSNPRINTF(_s, _n, _f) vsprintf(_s, _f, __a__) */
 #define VSNPRINTF(_s, _n, _f) vsnprintf(_s, _n, _f, __a__)
 
 #define VA_END                                                               \
