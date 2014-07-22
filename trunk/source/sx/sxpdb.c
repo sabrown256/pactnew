@@ -2020,8 +2020,9 @@ static object *_SXI_write_defstr(SS_psides *si, object *argl)
  */
  
 static object *_SXI_make_defstr(SS_psides *si, object *argl)
-   {char *name, *mname, *type, *memtemp;
+   {int nc, nr;
     char member[MAXLINE];
+    char *name, *mname, *type, *t;
     memdes *desc, *lst, *prev;
     dimdes *dims, *dim0;
     object *member_obj, *dim_obj, *o;
@@ -2060,23 +2061,27 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
 	 dim_obj = SS_cddr(si, member_obj);
 	 if (!SS_nullobjp(dim_obj))
 	    {dims = _SX_make_dims_dimdes(si, file, dim_obj);
-	     memtemp = member + strlen(member);
-	     *memtemp++ = '(';
+	     nc = strlen(member);
+	     t  = member + nc;
+	     nr = MAXLINE - nc;
+	     *t++ = '(';
 	     for (; dims != NULL; dims = dim0)
 	         {if (dims->index_min == file->default_offset)
-		     {sprintf(memtemp, "%ld", dims->number);
-		      memtemp += strlen(memtemp);}
+		     {nc = snprintf(t, nr, "%ld", dims->number);
+		      t  += nc;
+		      nr -= nc;}
 		  else
-		     {sprintf(memtemp, "%ld:%ld",
-			      dims->index_min, dims->index_max);
-		      memtemp += strlen(memtemp);};
+		     {nc = snprintf(t, nr, "%ld:%ld",
+				    dims->index_min, dims->index_max);
+		      t  += nc;
+		      nr -= nc;};
 
 		  dim0 = dims->next;
 		  if (dim0 != NULL)
-		     *memtemp++ = ',';
+		     *t++ = ',';
 		  CFREE(dims);};
-	     *memtemp++ = ')';
-	     *memtemp = '\000';};
+	     *t++ = ')';
+	     *t = '\0';};
  
 	 desc = _PD_mk_descriptor(member, file->default_offset);
 

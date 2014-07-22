@@ -76,14 +76,15 @@ static object *_SS_exa_var(SS_psides *si, void *vr, int type)
 
 /* _SS_SET_VAR - set the value of VR to the value of VL */
 
-static object *_SS_set_var(SS_psides *si, void *vr, object *vl, int type)
+static object *_SS_set_var(SS_psides *si, void *vr, long nb,
+			   object *vl, int type)
    {int ok;
 
     ok = _SS_object_to_numtype_id(type, vr, 0, vl);
     if (ok == FALSE)
-       {char *sv, bf[MAXLINE];
-	long lv;
+       {long nc, lv;
 	double dv;
+	char *sv, bf[MAXLINE];
 
 	lv = -HUGE_INT;
 	dv = -HUGE;
@@ -99,26 +100,37 @@ static object *_SS_set_var(SS_psides *si, void *vr, object *vl, int type)
 	   sv = SS_get_string(vl);
 
 	if (type == SC_STRING_I)
-	   {if (sv != NULL)
-	       strcpy((char *) vr, sv);
+	   {char *d;
+
+	    d = (char *) vr;
+	    if (sv != NULL)
+	       {SC_strncpy(d, nb, sv, -1);
+		nc = strlen(d);}
 
 	    else if (lv != -HUGE_INT)
-	       sprintf((char *) vr, "%ld", lv);
+	       nc = snprintf(d, nb, "%ld", lv);
 
 	    else if (dv != -HUGE)
-	       sprintf((char *) vr, "%g", dv);}
+	       nc = snprintf(d, nb, "%g", dv);
+
+	    if (nc >= nb)
+	       SS_error(si, "STRING OVERFLOW - _SS_SET_VAR", vl);}
 
 	else if (type == SC_POINTER_I)
-	   {if (sv != NULL)
-	       *((char **) vr) = CSTRSAVE(sv);
+	   {char **d;
+
+	    d = (char **) vr;
+	    if (sv != NULL)
+	       {*d = CSTRSAVE(sv);
+		nc = strlen(*d);}
 
 	    else if (lv != -HUGE_INT)
-	       {snprintf(bf, MAXLINE, "%ld", lv);
-		*((char **) vr) = CSTRSAVE(bf);}
+	       {nc = snprintf(bf, MAXLINE, "%ld", lv);
+		*d = CSTRSAVE(bf);}
 
 	    else if (dv != -HUGE)
-	       {snprintf(bf, MAXLINE, "%g", dv);
-		*((char **) vr) = CSTRSAVE(bf);};}
+	       {nc = snprintf(bf, MAXLINE, "%g", dv);
+		*d = CSTRSAVE(bf);};}
 
 	else
 	   SS_error(si, "OBJECT HAS INCORRECT TYPE - _SS_SET_VAR", vl);};
@@ -145,18 +157,23 @@ static object *_SS_set_var(SS_psides *si, void *vr, object *vl, int type)
  */
 
 object *SS_install_cf(SS_psides *si, char *name, char *doc, ...)
-   {object *op, *vp;
+   {long nb;
+    object *op, *vp;
     PFPHand handler;
     PFVoid fnc;
     C_procedure *cp;
     procedure *pp;
 
+    nb = 0L;
+
     SC_VA_START(doc);
     handler = SC_VA_ARG(PFPHand);
     fnc     = SC_VA_ARG(PFVoid);
+    if (handler == SS_acc_string)
+       nb = SC_VA_ARG(long);
     SC_VA_END;
 
-    cp = _SS_mk_C_proc_va(handler, 1, fnc);
+    cp = _SS_mk_C_proc_va(handler, 2, fnc, nb);
     pp = _SS_mk_scheme_proc(name, doc, SS_PR_PROC, cp);
 
     op = SS_mk_proc_object(si, pp);
@@ -244,17 +261,22 @@ object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
 
 static object *_SS_acc_var(SS_psides *si, C_procedure *cp,
 			   object *argl, int type)
-   {object *vl, *ret;
+   {long nb;
+    object *vl, *ret;
     SC_address ad;
 
     ad.funcaddr = (PFInt) cp->proc[0];
+    if (cp->n > 1)
+       nb = (long) cp->proc[1];
+    else
+       nb = 0L;
 
     if (SS_nullobjp(argl))
        ret = _SS_exa_var(si, ad.memaddr, type);
 
     else
        {vl = SS_car(si, argl);
-        ret = _SS_set_var(si, ad.memaddr, vl, type);};
+        ret = _SS_set_var(si, ad.memaddr, nb, vl, type);};
 
     return(ret);}
 
