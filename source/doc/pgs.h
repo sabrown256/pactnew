@@ -3217,7 +3217,7 @@ This routine prints a text string, label, on the specified device and centered h
 <BR><I>Fortran Binding: </I>integer pgwrta(integer devid, REAL x, REAL y, integer nc, char *txt)
 <BR><I>SX Binding: </I>(pg-draw-text dev nd, cs, x y txt)
 <P>
-This routine does an sprintf style print to the specified device, dev,
+This routine does an snprintf style print to the specified device, dev,
 and at the point, in CS, specified by X.<p>
 
 <p>

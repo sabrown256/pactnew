@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 08/13/2012
+MOD: 07/22/2014
 
 <CENTER>
 <P>
@@ -4650,7 +4650,7 @@ static object *mk_array(argl)
 
     arr = CMAKE(array);
 
-    sprintf(ltype, "%s *", type);
+    snprintf(ltype, MAXLINE, "%s *", type);
 
     arr->type   = CSTRSAVE(ltype);
     arr->length = size;

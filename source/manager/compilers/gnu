@@ -93,7 +93,7 @@ Tool CC {
    Flags    =+ -Wno-missing-field-initializers -Wno-missing-declarations
 
 # even more warnings
-   Flags    =+ -Wshadow -Wno-inline
+#   Flags    =+ -Wshadow -Wno-inline
    Flags    =+ -Wlogical-op
    Flags    =+ -Wno-missing-format-attribute
    Flags    =+ [ _env_  = PACT_CC_VERSION ;

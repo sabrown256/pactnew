@@ -107,7 +107,7 @@ void FF_ID(scsttk, SCSTTK)(FIXNUM *sncs, char *d, char *s,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCSPNT - FORTRAN version of sprintf
+/* SCSPNT - FORTRAN version of snprintf
  *        - PNC is the length of the character array D
  *        - and is taken to be the character array length of any strings
  *        - implied in the argument list

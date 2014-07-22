@@ -530,7 +530,7 @@ static object *_SSI_fprintf(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_PUSH_CHARS - do an sprintf on the tailing arg and push
+/* _SS_PUSH_CHARS - do an snprintf on the tailing arg and push
  *                - them onto the first arg resizing if neceassary
  *                - NOTE: fp NULL should be fine, in fact it is crucial
  *                - to make formatted output specifications such as
@@ -1159,7 +1159,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	PUTS(s, str);}
 
 /* everyone else can use PRINT
- * NOTE: use sprintf then PRINT rather than direct PRINT to get
+ * NOTE: use snprintf then PRINT rather than direct PRINT to get
  * around SUN compiler bug regarding va_args
  */
     else

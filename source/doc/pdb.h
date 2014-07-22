@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 03/01/2013
+MOD: 07/22/2014
 
 <CENTER>
 <P>
@@ -2397,16 +2397,16 @@ and
  #include "pdb.h"
  
 void test_target(char *tgt, char *base, int n,
-		 char *fname, char *datfile)
+		 char *fname, char *datfile, long nb)
     {int rv;
 
      if (tgt != NULL)
         {rv = PD_target_platform(tgt);
-         sprintf(fname, "%s-%s.rs%d", base, tgt, n);
-         sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
+         snprintf(fname, nb, "%s-%s.rs%d", base, tgt, n);
+         snprintf(datfile, nb, "%s-%s.db%d", base, tgt, n);}
      else
-        {sprintf(fname, "%s-nat.rs%d", base, n);
-         sprintf(datfile, "%s-nat.db%d", base, n);};
+        {snprintf(fname, nb, "%s-nat.rs%d", base, n);
+         snprintf(datfile, nb, "%s-nat.db%d", base, n);};
  
      return;}
 </pre>
@@ -11614,7 +11614,7 @@ void *writeit(arg)
     strcpy(sname3, "mypl_wr1b"); 
 
     for (n = 0; n < n_iter; n++)    
-        {sprintf(suffix, "%d", n);
+        {snprintf(suffix, 10, "%d", n);
 
          strcpy(sname1+9, suffix);
          strcpy(sname2+8, suffix);
@@ -11665,7 +11665,7 @@ void *writeit2(arg)
     strcpy(sname2, "xpl_wr2a"); 
 
     for (n = 0; n < n_iter; n++)
-        {sprintf(suffix, "%d", n);
+        {snprintf(suffix, 10, "%d", n);
 
          strcpy(sname1+9, suffix);
          strcpy(sname2+8, suffix);
@@ -11712,7 +11712,7 @@ void *readit(arg)
     strcpy(sname3, "mypl_wr1b"); 
 
     for (n = 0; n < n_iter; n++)    
-        {sprintf(suffix, "%d", n);
+        {snprintf(suffix, 10, "%d", n);
 
          strcpy(sname1+9, suffix);
          strcpy(sname2+8, suffix);
@@ -11785,7 +11785,7 @@ void *readit2(arg)
     strcpy(sname2, "xpl_wr2a"); 
 
     for (n = 0; n < n_iter; n++)
-        {sprintf(suffix, "%d", n);
+        {snprintf(suffix, 10, "%d", n);
 
          strcpy(sname1+9, suffix);
          strcpy(sname2+8, suffix);
@@ -12085,7 +12085,7 @@ static void write_data(path, rank, size, comm)
     if (comm != SC_COMM_SELF)
        strcat(name, "test_mult.pdb");
     else
-       {sprintf(temp, "test_single%d.pdb", rank);
+       {snprintf(temp, MAXLINE, "test_single%d.pdb", rank);
         strcat(name, temp);}
 
 /* create the output file */
@@ -12102,8 +12102,8 @@ static void write_data(path, rank, size, comm)
               "float y_max",
               LAST);
 
-    sprintf(sx_axis, "float x_axis(%d)", N_PTS);
-    sprintf(sy_axis, "float y_axis(%d)", N_PTS);
+    snprintf(sx_axis, MAXLINE, "float x_axis(%d)", N_PTS);
+    snprintf(sy_axis, MAXLINE, "float y_axis(%d)", N_PTS);
 
     PD_defstr(file, "myplot",
               sx_axis,
@@ -12127,18 +12127,18 @@ static void write_data(path, rank, size, comm)
         mypl.x_axis[i] = mypl.y_axis[i] = (float)i;
 
 /* write a struct */
-    sprintf(name, "myplot_%d", rank);
+    snprintf(name, MAXLINE, "myplot_%d", rank);
     if (!PD_write(file, name, "myplot", &amp;mypl))
        {printf("Error writing mypl: process %d\n", rank);}
 
 /* write an integer */
-    sprintf(name, "rank_%d", rank);
+    snprintf(name, MAXLINE, "rank_%d", rank);
     if (!PD_write(file, name, "integer", &amp;rank))
        {printf("Error writing rank: process %d\n", rank);}
 
 /* write a float */
     frank = rank;
-    sprintf(name, "frank_%d", rank);
+    snprintf(name, MAXLINE, "frank_%d", rank);
     if (!PD_write(file, name, "float", &amp;frank))
        {printf("Error writing frank: process %d\n", rank);}
 
@@ -12149,7 +12149,7 @@ static void write_data(path, rank, size, comm)
         exit(1);}
     for (i = 0; i < N_INT; i++)
         pi1[i] = rank * i;
-    sprintf(name, "pi1_%d", rank);
+    snprintf(name, MAXLINE, "pi1_%d", rank);
     if (!PD_write(file, name, "int *", &amp;pi1))
        {printf("Error writing pi1: process %d\n", rank);}
 
@@ -12160,7 +12160,7 @@ static void write_data(path, rank, size, comm)
         exit(1);}
     for (i = 0; i < N_FLOAT; i++)
         pf1[i] = (float)(rank * i);
-    sprintf(name, "pf1_%d", rank);
+    snprintf(name, MAXLINE, "pf1_%d", rank);
     if (!PD_write(file, name, "float *", &amp;pf1))
        {printf("Error writing pf1: process %d\n", rank);}
 
@@ -12174,7 +12174,7 @@ static void write_data(path, rank, size, comm)
         x[i] = (float)rank;
 
     if (comm != SC_COMM_SELF)
-       sprintf(name, "x[%d:%d]", rank*nwrite, (rank+1)*nwrite - 1);
+       snprintf(name, MAXLINE, "x[%d:%d]", rank*nwrite, (rank+1)*nwrite - 1);
     else
        strcpy(name, "x[0:99]");
 
@@ -12204,18 +12204,17 @@ static void read_data(path, rank, size, comm)
     if (comm != SC_COMM_SELF)
        strcat(name, "test_mult.pdb");
     else
-       {sprintf(temp, "test_single%d.pdb", rank);
+       {snprintf(temp, MAXLINE, "test_single%d.pdb", rank);
         strcat(name, temp);}
 
 /* open the input file */
-    if ((file = PD_mp_open(name, "r", comm))
-         == NULL)
+    if ((file = PD_mp_open(name, "r", comm)) == NULL)
        {printf("Error opening %s, rank: %d\n", name, rank);
         TEST_TYPE(comm); 
 	return;};
 
 /* read a struct */
-    sprintf(name, "myplot_%d", rank);
+    snprintf(name, MAXLINE, "myplot_%d", rank);
     if (!PD_read(file, name, &amp;myplr))
        {printf("Error reading mypl: process %d\n", rank);
         TEST_TYPE(comm);}
@@ -12223,7 +12222,7 @@ static void read_data(path, rank, size, comm)
     check_myplot1(mypl, myplr, comm);
 
 /* read an integer */
-    sprintf(name, "rank_%d", rank);
+    snprintf(name, MAXLINE, "rank_%d", rank);
     if (!PD_read(file, name, &amp;rankr))
        {printf("Error reading rank: process %d\n", rank);
         TEST_TYPE(comm);}
@@ -12233,7 +12232,7 @@ static void read_data(path, rank, size, comm)
         TEST_TYPE(comm);}
 
 /* read a float */
-    sprintf(name, "frank_%d", rank);
+    snprintf(name, MAXLINE, "frank_%d", rank);
     if (!PD_read(file, name, &amp;frank))
        {printf("Error reading frank: process %d\n", rank);
         TEST_TYPE(comm);}
@@ -12243,7 +12242,7 @@ static void read_data(path, rank, size, comm)
         TEST_TYPE(comm);}
 
 /* read an int *array */
-    sprintf(name, "pi1_%d", rank);
+    snprintf(name, MAXLINE, "pi1_%d", rank);
     if (!PD_read(file, name, &amp;pi1r))
        {printf("Error reading pi1r: process %d\n", rank);
         TEST_TYPE(comm);}
@@ -12257,7 +12256,7 @@ static void read_data(path, rank, size, comm)
             break;}
 
 /* read a float array */
-    sprintf(name, "pf1_%d", rank);
+    snprintf(name, MAXLINE, "pf1_%d", rank);
     if (!PD_read(file, name, &amp;pf1r))
        {printf("Error reading pf1: process %d\n", rank);}
 
