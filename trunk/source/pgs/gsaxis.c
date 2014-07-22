@@ -914,7 +914,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 
 /* _PG_SPRINTF - converts a number to a character string
  *             - and removes additional spaces
- *             - arguments are the same as for sprintf
+ *             - arguments are the same as for snprintf
  */
 
 static void _PG_sprintf(char *string, long nc,
