@@ -84,7 +84,7 @@ int test_1(char *base, char *tgt, int n)
     rv = TRUE;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     file = PD_open(datfile, "w"); 
 
@@ -171,7 +171,7 @@ int test_2(char *base, char *tgt, int n)
     rv = TRUE;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
 /* write data */
     file = PD_open(datfile, "w");
@@ -272,7 +272,7 @@ int test_3(char *base, char *tgt, int n)
     rv = TRUE;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
 /* open file for writing */
     file = PD_open(datfile, "w");
@@ -392,7 +392,7 @@ int test_4(char *base, char *tgt, int n)
     rv = TRUE;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
 /* write data */
     file = PD_open(datfile, "w");

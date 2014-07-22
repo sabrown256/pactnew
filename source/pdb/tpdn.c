@@ -557,7 +557,7 @@ static int test_1(char *base, char *tgt, int n)
     FILE *fp;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -903,7 +903,7 @@ static int test_2(char *base, char *tgt, int n)
     FILE *fp;
 
 /* target the file is asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -1149,7 +1149,7 @@ static int test_3(char *base, char *tgt, int n)
     FILE *fp;
 
 /* target the file is asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -1468,7 +1468,7 @@ static int test_4(char *base, char *tgt, int n)
     FILE *fp;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 

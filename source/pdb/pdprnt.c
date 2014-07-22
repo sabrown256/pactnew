@@ -150,9 +150,9 @@ static void _PD_disp_mode_3(PD_printdes *prnt, void *x, inti ni, int tid)
     j = 0L;
     if (PD_gs.print_ctrl[5] == 0)
        {PRINT(fp, "%s%s%s\n", prnt->prefix, prnt->before, prnt->nodename);
-        sprintf(s, "  (%s)                              ",
-		PD_index_to_expr(bf, j,
-				 prnt->dims, prnt->mjr, prnt->def_off));
+        snprintf(s, MAXLINE, "  (%s)                              ",
+		 PD_index_to_expr(bf, j,
+				  prnt->dims, prnt->mjr, prnt->def_off));
 	s[nn] = '\0';
         PRINT(fp, "%s", s);}
     else
@@ -161,9 +161,9 @@ static void _PD_disp_mode_3(PD_printdes *prnt, void *x, inti ni, int tid)
     for (k = 0; i < ni; i++, j += prnt->offset, k++)
         {if (k >= PD_gs.print_ctrl[4])
             {if (PD_gs.print_ctrl[5] == 0)
-                {sprintf(s, "  (%s)                              ",
-                         PD_index_to_expr(bf, j,
-					  prnt->dims, prnt->mjr, prnt->def_off));
+                {snprintf(s, MAXLINE, "  (%s)                              ",
+			  PD_index_to_expr(bf, j,
+					   prnt->dims, prnt->mjr, prnt->def_off));
 		 s[nn] = '\0';
                  PRINT(fp, "\n%s", s);}
 	     else
@@ -711,9 +711,8 @@ static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after,
 static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 				 inti ni, char *type,
                                  int irecursion, int n, long *ind)
-   {int min_index, status;
-    int def_off;
-    inti i, ditems;
+   {int min_index, status, def_off;
+    inti i, ditems, nc, nr;
     char field[80], bf[MAXLINE];
     char *dtype, *s;
     char *prefix, *before, *after, *nodename;
@@ -732,8 +731,10 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 
     dtype = PD_dereference(CSTRSAVE(type));
 
-    strcpy(field, nodename);
-    s = field + strlen(field);
+    SC_strncpy(field, 80, nodename, -1);
+    nc = strlen(field);
+    s  = field + nc;
+    nr = 80 - nc;
 
     if (dims != NULL)
        min_index = dims->index_min;
@@ -742,7 +743,7 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 
     for (i = 0L; i < ni; i++, vr++)
         {if (ni > 1)
-            sprintf(s, "(%s)", SC_itos(NULL, 0, i + min_index, NULL));
+            snprintf(s, nr, "(%s)", SC_itos(NULL, 0, i + min_index, NULL));
 
          ditems = _PD_number_refd(NULL, NULL, NULL, DEREF(vr),
 				  dtype, file->host_chart);
@@ -790,11 +791,11 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 static int _PD_print_member(FILE *f0, char *prefix,
 			    char *mbefore, char *mafter,  
 			    PDBfile *file, char *svr, char *type,
-			    memdes *desc, char *mfield,
+			    memdes *desc, char *mfield, long nb,
 			    int mjr, int def_off, 
 			    int *pirec, int n, long *ind)
    {int irecursion, status;
-    long mitems;
+    long mitems, nc, nr;
     char *mvr, *mtype, *s1;
     defstr *ldp;
     dimdes *mdims;
@@ -823,19 +824,21 @@ static int _PD_print_member(FILE *f0, char *prefix,
 			       n, ind);
     else
        {if (_PD_test_recursion(type, mtype))
-	   {s1 = mfield + strlen(mfield);
-	    sprintf(s1,"<%d>", irecursion);
+	   {nc = strlen(mfield);
+	    s1 = mfield + nc;
+	    nr = nb - nc;
+	    snprintf(s1, nr, "<%d>", irecursion);
 	    status = _PD_print_data(f0, prefix, mbefore, blank, mfield,
 				    file, mvr, mitems,
 				    mtype, mdims,
 				    mjr, def_off, ++irecursion,
 				    n, ind);}
         else
-	   {status = _PD_print_data(f0, prefix, mbefore, mafter, mfield,
-				    file, mvr, mitems,
-				    mtype, mdims,
-				    mjr, def_off, 0,
-				    n, ind);};};
+	   status = _PD_print_data(f0, prefix, mbefore, mafter, mfield,
+				   file, mvr, mitems,
+				   mtype, mdims,
+				   mjr, def_off, 0,
+				   n, ind);};
 
     *pirec = irecursion;
 
@@ -857,6 +860,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
     char *prefix, *before, *after, *nodename;
     char *s, *s2, *svr;
     char *mbefore, *mafter;
+    char *sm;
     defstr *defp;
     dimdes *dims;
     memdes *desc, *mem_lst, *next;
@@ -942,17 +946,19 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
 
              strcpy(s, after);
 
+	     sm = _SC.types.suppress_member;
+
              for (desc = mem_lst; desc != NULL; desc = desc->next)
                  {if (PD_gs.print_ctrl[1] == 0)
                      strcpy(mfield, desc->name);
                   else
                      strcpy(mfield, desc->member);
 
-		  if ((_SC.types.suppress_member == NULL) ||
-		      ((_SC.types.suppress_member != NULL) &&
-		       (SC_regx_match(mfield, _SC.types.suppress_member) == FALSE)))
+		  if ((sm == NULL) ||
+		      ((sm != NULL) && (SC_regx_match(mfield, sm) == FALSE)))
 		     status &= _PD_print_member(f0, prefix, mbefore, mafter,
-						file, svr, type, desc, mfield,
+						file, svr, type, desc,
+						mfield, 80,
 						mjr, def_off,
 						&irecursion, n, ind);
 
