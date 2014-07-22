@@ -31,7 +31,7 @@
  * constants can be used for both
  */
 enum e_UL_hist_mode
-   {HIST_LEFT,
+   {HIST_LEFT = 1,
     HIST_RIGHT,
     HIST_CENTER};
 

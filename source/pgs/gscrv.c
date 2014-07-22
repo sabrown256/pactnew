@@ -925,6 +925,7 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     xl[0][0] = x[0];
     xl[1][0] = ymn;
 
+    start--;
     if (start < 2)
        {py = y + start;
 

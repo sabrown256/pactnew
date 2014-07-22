@@ -133,9 +133,10 @@
       (define triangle 2)))
 
 ; text and histogram alignment
-(define left     0)
-(define right    1)
-(define center   2)
+; NOTE: need 0 for histogram off
+(define left     1)
+(define right    2)
+(define center   3)
 
 ; tick placement
 (define right-of-axis  113)
