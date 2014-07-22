@@ -181,9 +181,10 @@ PG_graph *PG_make_graph_r3_r1(int id, char *label, int cp,
  *                  - render line plots
  */
 
-pcons *PG_set_line_info(pcons *info, PG_rendering pty, int axis_type, int style,
-			int scatter, int marker, int color, int start,
-			double width)
+pcons *PG_set_line_info(pcons *info, PG_rendering pty,
+			int axis_type, int style,
+			int scatter, int marker, int color,
+			PM_direction start, double width)
    {
 
     info = PG_set_plot_type(info, pty, axis_type);
@@ -196,6 +197,7 @@ pcons *PG_set_line_info(pcons *info, PG_rendering pty, int axis_type, int style,
 			      "LINE-STYLE",   SC_INT_I,    FALSE, style,
 			      "LINE-WIDTH",   SC_DOUBLE_I, FALSE, width,
 			      NULL);
+
     return(info);}
 
 /*--------------------------------------------------------------------------*/
@@ -205,7 +207,8 @@ pcons *PG_set_line_info(pcons *info, PG_rendering pty, int axis_type, int style,
  *                 - render 2D scalar plots
  */
 
-pcons *PG_set_tds_info(pcons *info, PG_rendering pty, int axis_type, int style,
+pcons *PG_set_tds_info(pcons *info, PG_rendering pty,
+		       int axis_type, int style,
 		       int color, int nlev, double ratio, double width,
 		       double theta, double phi, double chi, double d)
    {

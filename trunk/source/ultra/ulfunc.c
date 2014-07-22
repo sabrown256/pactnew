@@ -10,12 +10,8 @@
  
 #include "ultra.h"
 
-#define UL_COPY_CURVE(_si, _x)  UL_copy_curve(_si, SX_get_crv_index_i(_x))
-#define advance(j)           (j < (SX_gs.dataset[l].n-1)) ? j++ : j 
-
-#ifndef TOO_MANY_POINTS
-# define TOO_MANY_POINTS 1000000
-#endif
+#define UL_COPY_CURVE(_si, _x)   UL_copy_curve(_si, SX_get_crv_index_i(_x))
+#define advance(j)               (j < (SX_gs.dataset[l].n-1)) ? j++ : j 
 
 /*--------------------------------------------------------------------------*/
 
@@ -404,13 +400,13 @@ static object *_ULI_hist(SS_psides *si, object *obj, object *flag)
     PG_rendering pty;
 
     fl = SS_INTEGER_VALUE(flag);
-    if (fl == HIST_LEFT)
+    if (fl == DIR_LEFT)
        pty = PLOT_HISTOGRAM;
 
-    else if (fl == HIST_RIGHT)
+    else if (fl == DIR_RIGHT)
        pty = PLOT_HISTOGRAM;
 
-    else if (fl == HIST_CENTER)
+    else if (fl == DIR_CENTER)
        pty = PLOT_HISTOGRAM;
 
     else

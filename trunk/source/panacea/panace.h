@@ -128,7 +128,9 @@ typedef enum e_PA_persist_kind PA_persist_kind;
 #define PERSIST   'c'
 
 
-/* CENTER and centerings are alread defined */
+/* CENTER - centering is already defined */
+
+#define CENTER   'd'
 
 /*
  * #bind derived PA_allocation_kind integer SC_ENUM_I SC_ENUM_I REL

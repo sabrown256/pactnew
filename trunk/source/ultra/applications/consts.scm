@@ -132,11 +132,15 @@
       (define star     1)
       (define triangle 2)))
 
-; text and histogram alignment
-; NOTE: need 0 for histogram off
+; relative position indicators
+; used for text alignment, histograms, ...
 (define left     1)
 (define right    2)
 (define center   3)
+(define up       4)
+(define down     5)
+(define front    6)
+(define back     7)
 
 ; tick placement
 (define right-of-axis  113)

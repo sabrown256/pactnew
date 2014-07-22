@@ -284,17 +284,17 @@ static void _PG_move_to(PG_text_box *b, int c, int l)
 
 	switch (b->align)
 	   {default   :
-	    case LEFT :
+	    case DIR_LEFT :
 	         ix[0] = xo[0] + cos(ang)*so;
 	         ix[1] = xo[1] + sign*sin(ang)*so;
 	         break;
 
-	    case CENTER :
+	    case DIR_CENTER :
                  ix[0] = xo[0] + cos(ang)*0.5*(xr - xl - dx);
 	         ix[1] = xo[1] + sign*sin(ang)*0.5*(ABS(yr - yl) - dx);
 	         break;
 
-	    case RIGHT :
+	    case DIR_RIGHT :
 	         ix[0] = xo[0] + xr - xl - cos(ang)*(so + dx);
 	         ix[1] = xo[1] + sign*sin(ang)*(ABS(yr - yl) - dx - so);
 	         break;};
@@ -1062,7 +1062,7 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
     b->bnd          = crv;
     b->line         = 0;
     b->col          = 0;
-    b->align        = LEFT;
+    b->align        = DIR_LEFT;
     b->angle        = 0.0;
     b->mode         = TEXT_INSERT;
     b->foreground   = dev->WHITE;

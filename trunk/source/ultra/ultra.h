@@ -27,16 +27,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* use the same values at PG_text_alignment so the SCHEME left, right, center
- * constants can be used for both
- */
-enum e_UL_hist_mode
-   {HIST_LEFT = 1,
-    HIST_RIGHT,
-    HIST_CENTER};
-
-typedef enum e_UL_hist_mode UL_hist_mode;
-
 typedef struct s_UL_scope_public UL_scope_public;
 
 struct s_UL_scope_public

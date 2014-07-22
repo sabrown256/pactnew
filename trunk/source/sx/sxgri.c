@@ -205,7 +205,7 @@ static void SX_annot_action(void *d, PG_event *ev)
 
 static PG_interface_object *SX_add_text_ann(PG_device *dev, double *ndc,
                                             char *s, int clr,
-					    PG_text_alignment align,
+					    PM_direction align,
                                             double ang)
    {int flags[3];
     double xo[PG_SPACEDM];
@@ -288,7 +288,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
    {int clr;
     char *s;
     double ndc[PG_BOXSZ], ang;
-    PG_text_alignment aln;
+    PM_direction aln;
     PG_interface_object *iob;
     PG_device *dev;
     object *rv;
@@ -299,18 +299,18 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
     dev = NULL;
     s   = NULL;
     clr = 5;
-    aln = CENTER;
+    aln = DIR_CENTER;
     ang = 0.0;
     SS_args(si, argl,
-            G_DEVICE,     &dev,
-            SC_STRING_I,  &s,
-	    SC_INT_I, &clr,
-	    SC_DOUBLE_I,  &ndc[0],
-	    SC_DOUBLE_I,  &ndc[1],
-	    SC_DOUBLE_I,  &ndc[2],
-	    SC_DOUBLE_I,  &ndc[3],
-	    SC_ENUM_I,    &aln,
-	    SC_DOUBLE_I,  &ang,
+            G_DEVICE,    &dev,
+            SC_STRING_I, &s,
+	    SC_INT_I,    &clr,
+	    SC_DOUBLE_I, &ndc[0],
+	    SC_DOUBLE_I, &ndc[1],
+	    SC_DOUBLE_I, &ndc[2],
+	    SC_DOUBLE_I, &ndc[3],
+	    SC_ENUM_I,   &aln,
+	    SC_DOUBLE_I, &ang,
             0);
 
     if (dev == NULL)
