@@ -48,11 +48,12 @@ extern long _PD_lookup_size(char *s, hasharr *tab);
 
 /* TEST_TARGET - set up the target for the data file */
 
-static void test_target(char *base, int n, char *fname, char *datfile)
+static void test_target(char *base, int n, char *fname, char *datfile,
+			long nc)
    {
 
-    sprintf(fname, "%s-nat.rs%d", base, n);
-    sprintf(datfile, "%s-nat.db%d", base, n);
+    snprintf(fname, nc, "%s-nat.rs%d", base, n);
+    snprintf(datfile, nc, "%s-nat.db%d", base, n);
 
     return;}
 
@@ -268,7 +269,7 @@ static int test_1(statedes *st, char *base, char *tgt, int n, int na)
     show_stat(st, NULL, na);
 
 /* target the file as asked */
-    test_target(base, n, fname, datfile);
+    test_target(base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 

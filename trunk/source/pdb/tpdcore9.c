@@ -27,7 +27,7 @@ int test_9(char *base, char *tgt, int n)
     var = 42;
   
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 

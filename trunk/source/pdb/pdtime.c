@@ -98,7 +98,7 @@ int main(int c, char **v)
     setvbuf(stdout, NULL, _IONBF, 0);
 
     if (c < 3)
-       {print_help()
+       {print_help();
         exit(0);};
 
 #ifdef PDB_TIME

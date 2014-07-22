@@ -154,7 +154,7 @@ int test_10(char *base, char *tgt, int n)
     FILE *fp;
 
 /* target the file as asked */
-    test_target(tgt, base, 100+n, fname, datfile);
+    test_target(tgt, base, 100+n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 

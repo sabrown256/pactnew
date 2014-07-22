@@ -35,19 +35,19 @@ int
 /* TEST_TARGET - set up the target for the data file */
 
 static void test_target(char *tgt, char *base, int n,
-		        char *fname, char *datfile)
+		        char *fname, char *datfile, long nc)
    {int rv;
 
     if (tgt != NULL)
        {rv = PD_target_platform(tgt);
 	SC_ASSERT(rv == TRUE);
 
-        sprintf(fname, "%s-%s.rs%d", base, tgt, n);
-        sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
+        snprintf(fname, nc, "%s-%s.rs%d", base, tgt, n);
+        snprintf(datfile, nc, "%s-%s.db%d", base, tgt, n);}
 
     else
-       {sprintf(fname, "%s-nat.rs%d", base, n);
-        sprintf(datfile, "%s-nat.db%d", base, n);};
+       {snprintf(fname, nc, "%s-nat.rs%d", base, n);
+        snprintf(datfile, nc, "%s-nat.db%d", base, n);};
 
     return;}
 

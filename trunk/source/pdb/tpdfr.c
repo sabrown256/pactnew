@@ -59,25 +59,6 @@ static char
 
 /*--------------------------------------------------------------------------*/
 
-/*                         GENERAL PURPOSE ROUTINES                         */
-
-/*--------------------------------------------------------------------------*/
-
-#if 0
-/* TEST_TARGET - set up the target for the data file */
-
-static void test_target(char *tgt, char *base, int n,
-		        char *fname, char *datfile)
-   {
-
-    sprintf(fname, "%s-nat.rs%d", base, n);
-    sprintf(datfile, "%s-nat.db%d", base, n);
-
-    return;}
-#endif
-
-/*--------------------------------------------------------------------------*/
-
 /*                            TEST #2 ROUTINES                              */
 
 /*--------------------------------------------------------------------------*/
@@ -254,7 +235,7 @@ static int test_1(char *base, char *tgt, int n)
     FILE *fp;
 
 /* target the file is asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 

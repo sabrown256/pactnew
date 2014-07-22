@@ -259,7 +259,7 @@ int test_1(char *base, char *tgt, fltdes *fl, int n)
     FILE *fp;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -367,7 +367,7 @@ int test_2(char *base, char *tgt, fltdes *fl, int n)
     FILE *fp;
 
 /* target the file is asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -456,7 +456,7 @@ int test_3(char *base, char *tgt, fltdes *fl, int n)
     FILE *fp;
 
 /* target the file is asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -553,7 +553,7 @@ int test_4(char *base, char *tgt, fltdes *fl, int n)
     FILE *fp;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -637,7 +637,7 @@ int test_5(char *base, char *tgt, fltdes *fl, int n)
     FILE *fp;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -714,7 +714,7 @@ int test_6(char *base, char *tgt, fltdes *fl, int n)
     FILE *fp;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -793,7 +793,7 @@ int test_7(char *base, char *tgt, fltdes *fl, int n)
     FILE *fp;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -870,7 +870,7 @@ int test_8(char *base, char *tgt, fltdes *fl, int n)
     FILE *fp;
 
 /* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
+    test_target(tgt, base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
