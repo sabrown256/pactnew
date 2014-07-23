@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 07/22/2014
+MOD: 07/23/2014
 
 <CENTER>
 <P>
@@ -916,7 +916,7 @@ handled by PDBLib. Note: The function <tt>CSTRSAVE</tt> invokes the
     s = CMAKE_N(char *, 2);
 
 /* fill statically and dynamically allocated arrays */
-    strcpy(c, "bar");
+    strncpy(c, "bar", 10);
     a = CSTRSAVE("foo");
 
 /* fill statically and dynamically allocated arrays of pointers */
@@ -11112,17 +11112,14 @@ their contents.
  /*-----------------------------------------------------------------*/
  /*-----------------------------------------------------------------*/
  
- myread(file, name, var, offset, number)
-    PDBfile *file;
-    char *name;
-    void *var;
-    long offset, number;
+ myread(PDBfile *file, char *name, void *var,
+	long offset, long number)
     {long addr, num;
      char *token, *type, memb[MAXLINE];
      dimdes *dims;
      syment *ep;
  
-     strcpy(memb, name);
+     strncpy(memb, name, MAXLINE);
      token = strtok(memb, ".([");
  
  /* look up the variable name */
@@ -11145,11 +11142,7 @@ their contents.
  /*-----------------------------------------------------------------*/
  /*-----------------------------------------------------------------*/
  
- _PD_wr_leaf(file, var, nitems, type)
-    PDBfile *file;
-    char *var;
-    long nitems;
-    char *type;
+ _PD_wr_leaf(PDBfile *file, char *var, long nitems, char *type)
     {char *svar;
      int size;
      FILE *fp;
@@ -11584,14 +11577,13 @@ void *readit(void *x);
 void *readit2(void *x);
 void print_help();
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------    */
-
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+ 
 /* Write variables to the already opened file.  The number of variables written */
 /* is a function of the number of iterations specified.                         */
 
-void *writeit(arg)
-   void *arg;
+void *writeit(void *arg)
    {int i, n;
     myplot *xp;
     char sname1[100], sname2[100], sname3[100], suffix[10];
@@ -11609,16 +11601,16 @@ void *writeit(arg)
     for (i = 0; i < 10; i++)
         xp->x_axis[i] = xp->y_axis[i] = (float)i * 4.0;
          
-    strcpy(sname1, "mypl_wr1a"); 
-    strcpy(sname2, "xpl_wr1a"); 
-    strcpy(sname3, "mypl_wr1b"); 
+    strncpy(sname1, "mypl_wr1a", 100); 
+    strncpy(sname2, "xpl_wr1a", 100); 
+    strncpy(sname3, "mypl_wr1b", 100); 
 
     for (n = 0; n < n_iter; n++)    
         {snprintf(suffix, 10, "%d", n);
 
-         strcpy(sname1+9, suffix);
-         strcpy(sname2+8, suffix);
-         strcpy(sname3+9, suffix);
+         strncpy(sname1+9, suffix, 91);
+         strncpy(sname2+8, suffix, 92);
+         strncpy(sname3+9, suffix, 91);
 
         if (!PD_write(file, sname1, "myplot", &amp;mypl))
            {printf("Error writing %s-exiting\n", sname1);
@@ -11640,11 +11632,10 @@ void *writeit(arg)
 
     return(NULL);}
      
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-void *writeit2(arg)
-   void *arg;
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+ 
+void *writeit2(void *arg)
    {int i, n;
     char sname1[100], sname2[100], suffix[100];
     myplot xplot;
@@ -11661,14 +11652,14 @@ void *writeit2(arg)
     for (i = 0; i < 10; i++)
         xplot.x_axis[i] = xplot.y_axis[i] = (float)i;
 
-    strcpy(sname1, "mypl_wr2a"); 
-    strcpy(sname2, "xpl_wr2a"); 
+    strncpy(sname1, "mypl_wr2a", 100); 
+    strncpy(sname2, "xpl_wr2a", 100); 
 
     for (n = 0; n < n_iter; n++)
         {snprintf(suffix, 10, "%d", n);
 
-         strcpy(sname1+9, suffix);
-         strcpy(sname2+8, suffix);
+         strncpy(sname1+9, suffix, 91);
+         strncpy(sname2+8, suffix, 92);
 
          if (!PD_write(file, sname1, "myplot", &amp;xplot))
             {printf("Error writing %s-exiting\n", sname1);
@@ -11685,11 +11676,10 @@ void *writeit2(arg)
  
     return NULL;}
      
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-void *readit(arg)
-   void *arg;
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+ 
+void *readit(void *arg)
    {int i, n;
     myplot *xp, *rxp, rmypl;
     char sname1[100], sname2[100], sname3[100], suffix[10];
@@ -11707,16 +11697,16 @@ void *readit(arg)
     for (i = 0; i < 10; i++)
         xp->x_axis[i] = xp->y_axis[i] = (float)i * 4.0;
 
-    strcpy(sname1, "mypl_wr1a"); 
-    strcpy(sname2, "xpl_wr1a"); 
-    strcpy(sname3, "mypl_wr1b"); 
+    strncpy(sname1, "mypl_wr1a", 100); 
+    strncpy(sname2, "xpl_wr1a", 100); 
+    strncpy(sname3, "mypl_wr1b", 100); 
 
     for (n = 0; n < n_iter; n++)    
         {snprintf(suffix, 10, "%d", n);
 
-         strcpy(sname1+9, suffix);
-         strcpy(sname2+8, suffix);
-         strcpy(sname3+9, suffix);
+         strnpy(sname1+9, suffix, 91);
+         strncpy(sname2+8, suffix, 92);
+         strncpy(sname3+9, suffix, 91);
 
         if (!PD_read(file, sname1, &amp;rmypl))
            {printf("Error writing %s-exiting\n", sname1);
@@ -11760,11 +11750,10 @@ void *readit(arg)
 
     return NULL;}
      
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-void *readit2(arg)
-   void *arg;
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+ 
+void *readit2(void *arg)
    {int i, n;
     char sname1[100], sname2[100], suffix[100];
     myplot xplot, rxplot;
@@ -11781,14 +11770,14 @@ void *readit2(arg)
     for (i = 0; i < 10; i++)
         xplot.x_axis[i] = xplot.y_axis[i] = (float)i;
 
-    strcpy(sname1, "mypl_wr2a"); 
-    strcpy(sname2, "xpl_wr2a"); 
+    strncpy(sname1, "mypl_wr2a", 100); 
+    strncpy(sname2, "xpl_wr2a", 100); 
 
     for (n = 0; n < n_iter; n++)
         {snprintf(suffix, 10, "%d", n);
 
-         strcpy(sname1+9, suffix);
-         strcpy(sname2+8, suffix);
+         strncpy(sname1+9, suffix, 91);
+         strncpy(sname2+8, suffix, 92);
 
          if (!PD_read(file, sname1, &amp;rxplot))
             {printf("Error writing %s-exiting\n", sname1);
@@ -11819,12 +11808,12 @@ void *readit2(arg)
  
     return(NULL);}
      
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+ 
 /* PRINT_HELP - print a help message */
 
-void print_help()
+void print_help(void)
    {
 
     PRINT(STDOUT, "\nPDSMP - run basic PDB smp test\n\n");
@@ -11836,12 +11825,10 @@ void print_help()
 
     return;}
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-main(argc, argv)
-   int argc;
-   char **argv;
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+ 
+int main(int argc, char **argv)
    {int nthreads;
     int i;
     int nt[2];
@@ -12025,9 +12012,7 @@ static myplot mypl, myplr;
 static void write_data(char *path, int rank, int size, MPI_Comm comm);
 static void read_data(char *path, int rank, int size, MPI_Comm comm);
 
-main(argc, argv)
-   int argc;
-   char **argv;
+int main(int argc, char **argv)
    {int rank, size;
     char path[MAXLINE];
     PDBfile *file;
@@ -12041,9 +12026,9 @@ main(argc, argv)
  * to write in
  */
     if (argc > 1)
-       strcpy(path, argv[1]);
+       strncpy(path, argv[1], MAXLINE);
     else
-       strcpy(path, "/home/foo");
+       strncpy(path, "/home/foo", MAXLINE);
        
 /* initialize PDBLib for MPI 
  * master process:    0
@@ -12066,27 +12051,24 @@ main(argc, argv)
 
     return(0);}
 
-/*--------------------------------------------------------------------------    */
-/*--------------------------------------------------------------------------*/
-
-static void write_data(path, rank, size, comm)
-   char *path;
-   int rank, size;
-   MPI_Comm comm;
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+ 
+static void write_data(char *path, int rank, int size, MPI_Comm comm)
    {char name[MAXLINE], temp[MAXLINE];
     char sx_axis[MAXLINE], sy_axis[MAXLINE];
     PDBfile *file;
     float frank;
     int i, nwrite;
 
-    strcpy(name, path);
-    strcat(name, "/");
+    strncpy(name, path, MAXLINE);
+    strncat(name, "/", MAXLINE);
 
     if (comm != SC_COMM_SELF)
-       strcat(name, "test_mult.pdb");
+       strncat(name, "test_mult.pdb", MAXLINE);
     else
        {snprintf(temp, MAXLINE, "test_single%d.pdb", rank);
-        strcat(name, temp);}
+        strncat(name, temp, MAXLINE);}
 
 /* create the output file */
     if ((file = PD_mp_create(name, comm))
@@ -12176,7 +12158,7 @@ static void write_data(path, rank, size, comm)
     if (comm != SC_COMM_SELF)
        snprintf(name, MAXLINE, "x[%d:%d]", rank*nwrite, (rank+1)*nwrite - 1);
     else
-       strcpy(name, "x[0:99]");
+       strncpy(name, "x[0:99]", MAXLINE);
 
     if (!PD_write(file, name, "float", x))
        {printf("Error writing x, process %d\n", rank);}
@@ -12185,27 +12167,25 @@ static void write_data(path, rank, size, comm)
     PD_close(file);
     
     return;}
-/*--------------------------------------------------------------------------    */
-/*--------------------------------------------------------------------------*/
 
-static void read_data(path, rank, size, comm)
-   char *path;
-   int rank, size;
-   MPI_Comm comm;
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+ 
+static void read_data(char *path, int rank, int size, MPI_Comm comm)
    {char name[MAXLINE], temp[MAXLINE];
     PDBfile *file;
     int rankr;
     float frank;
     int i, nread;
 
-    strcpy(name, path);
-    strcat(name, "/");
+    strncpy(name, path, MAXLINE);
+    strncat(name, "/", MAXLINE);
 
     if (comm != SC_COMM_SELF)
-       strcat(name, "test_mult.pdb");
+       strncat(name, "test_mult.pdb", MAXLINE);
     else
        {snprintf(temp, MAXLINE, "test_single%d.pdb", rank);
-        strcat(name, temp);}
+        strncat(name, temp, MAXLINE);}
 
 /* open the input file */
     if ((file = PD_mp_open(name, "r", comm)) == NULL)
@@ -12270,7 +12250,7 @@ static void read_data(path, rank, size, comm)
 
 /* read the PD_defented array */
     nread = 100;
-    strcpy(name, "x[0:99]");
+    strncpy(name, "x[0:99]", MAXLINE);
 
     if (!PD_read(file, name, xr))
        {printf("Error reading x, process %d\n", rank);

@@ -145,33 +145,33 @@ object *_ULI_printscr(SS_psides *si)
 /*--------------------------------------------------------------------------*/
  
 /* _UL_FIX_TEXT_BUF - fix discrepancy in text buffer size between
- *                  - screen device and output file
+ *                  - screen box, SBX, and output file box, FBX
  */
 
-static void _UL_fix_text_buf(PG_text_box *fileBox, PG_text_box *screenBox)
-   {int n_lines, n_chars, i;
+static void _UL_fix_text_buf(PG_text_box *fbx, PG_text_box *sbx)
+   {int i, nl, nc;
     char **bf;
 
-    n_lines = (fileBox->n_lines > screenBox->n_lines) ?
-               fileBox->n_lines : screenBox->n_lines;
-    n_chars = (fileBox->n_chars_line > screenBox->n_chars_line) ?
-               fileBox->n_chars_line : screenBox->n_chars_line;
+    nl = (fbx->n_lines > sbx->n_lines) ?
+         fbx->n_lines : sbx->n_lines;
+    nc = (fbx->n_chars_line > sbx->n_chars_line) ?
+         fbx->n_chars_line : sbx->n_chars_line;
 
 /* allocate the space */
-    bf = CMAKE_N(char *, n_lines);
-    for (i = 0; i < n_lines; i++)
-        bf[i] = CMAKE_N(char, n_chars);
+    bf = CMAKE_N(char *, nl);
+    for (i = 0; i < nl; i++)
+        bf[i] = CMAKE_N(char, nc);
 
 /* copy the contents
  * don't copy more strings than we've got; free up old string space
  */
-    for (i = 0; i < fileBox->n_lines; i++)
-        {strcpy(bf[i], fileBox->text_buffer[i]);
-	 CFREE(fileBox->text_buffer[i]);}
+    for (i = 0; i < fbx->n_lines; i++)
+        {SC_strncpy(bf[i], nc, fbx->text_buffer[i], -1);
+	 CFREE(fbx->text_buffer[i]);}
 
-    fileBox->text_buffer  = bf;
-    fileBox->n_lines      = n_lines;
-    fileBox->n_chars_line = n_chars;
+    fbx->text_buffer  = bf;
+    fbx->n_lines      = nl;
+    fbx->n_chars_line = nc;
 
     return;}
 
