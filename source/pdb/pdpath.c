@@ -147,25 +147,25 @@ void dpstack(int tid, int n)
     for (i = 1; i <= n; i++)
         {switch (FRAME(stack)[i].cmmnd)
             {case GOTO_C :
-                  strcpy(cmmnds, "GOTO");
+                  SC_strncpy(cmmnds, MAXLINE, "GOTO", -1);
                   break;
              case MEMBER_C :
-                  strcpy(cmmnds, "MEMBER");
+                  SC_strncpy(cmmnds, MAXLINE, "MEMBER", -1);
                   break;
              case INDEX_C :
-                  strcpy(cmmnds, "INDEX");
+                  SC_strncpy(cmmnds, MAXLINE, "INDEX", -1);
                   break;
              case DEREF_C :
-                  strcpy(cmmnds, "DEREF");
+                  SC_strncpy(cmmnds, MAXLINE, "DEREF", -1);
                   break;
              case CAST_C :
-                  strcpy(cmmnds, "CAST");
+                  SC_strncpy(cmmnds, MAXLINE, "CAST", -1);
                   break;
              case RESULT_C :
-                  strcpy(cmmnds, "RESULT");
+                  SC_strncpy(cmmnds, MAXLINE, "RESULT", -1);
                   break;
              default :
-                  strcpy(cmmnds, "UNKNOWN");
+                  SC_strncpy(cmmnds, MAXLINE, "UNKNOWN", -1);
                   break;};
 
         PRINT(stdout, "%16s %8lx %4ld ",
@@ -1336,7 +1336,7 @@ static void _PD_do_deref(PD_smp_state *pa)
 
     file = FILE_S;
 
-    strcpy(t, CURRENT(intype));
+    SC_strncpy(t, MAXLINE, CURRENT(intype), -1);
 
     if (file->virtual_internal)
        {SC_address ad;
@@ -1524,7 +1524,7 @@ static void _PD_do_index(PD_smp_state *pa, char *expr)
 
 #endif
 
-        strcpy(t, CURRENT(intype));
+        SC_strncpy(t, MAXLINE, CURRENT(intype), -1);
         indr = TRUE;}
 
     else
@@ -1574,7 +1574,7 @@ static void _PD_do_cast(PD_smp_state *pa, char *type)
     bl = CURRENT(blocks);
     dm = CURRENT(dims);
 
-    strcpy(s, CURRENT(intype));
+    SC_strncpy(s, MAXLINE, CURRENT(intype), -1);
 
     _PD_shift(pa, "", s, dm, bl, n, da, in, CAST_C);
 
@@ -1597,7 +1597,7 @@ static long _PD_do_digress(PD_smp_state *pa, char *expr)
 /* save the path
  * NOTE: this doesn't support more than one level of recursion!!
  */
-    strcpy(t, FRAME(path));
+    SC_strncpy(t, MAXLINE, FRAME(path), -1);
 
     if (file->use_itags == TRUE)
        val = _PD_itag_reduce(pa);

@@ -767,7 +767,7 @@ int what_axis(char *s, char **sub)
     char *xrs, *yrs, *rest, *pt;
 
 /* copy the name part into the output buffer */
-    strcpy(bfi, s);
+    SC_strncpy(bfi, MAXLINE, s, -1);
     snprintf(bfo, MAXLINE, "%s", SC_strtok(bfi, "(", pt));
 
 /* the first index or two are the zone specification */

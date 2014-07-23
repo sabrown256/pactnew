@@ -239,7 +239,7 @@ static void record_entry(char *name, double time, double *ldata)
     source_record *sp;
     time_list *tp;
 
-    strcpy(varname, name);
+    SC_strncpy(varname, MAXLINE, name, -1);
 
 /* lookup the variable and install it if this is the first time */
     hp = SC_hasharr_lookup(srctab, name);
@@ -284,7 +284,7 @@ static void varh(PA_variable *pp)
 
 /* cat the variable name and the indexes together to make a unique label */
     first = TRUE;
-    strcpy(bf, pname);
+    SC_strncpy(bf, MAXLINE, pname, -1);
     while ((s = PA_get_field("INDEX", "VARIABLE", OPTL)) != NULL)
        {if (!first)
            SC_strcat(bf, MAXLINE, ",");
@@ -339,7 +339,7 @@ void readh(char *str)
     PA_variable *pp;
     FILE *fp;
 
-    strcpy(in_deck, str);
+    SC_strncpy(in_deck, MAXLINE, str, -1);
     fp = fopen(str, "r");
     PA_ERR((fp == NULL), "COULDN'T OPEN FILE %s", str);
 

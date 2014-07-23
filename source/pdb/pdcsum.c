@@ -141,7 +141,7 @@ int _PD_cksum_var_write(PDBfile *file, char *name, syment *ef)
 /* if requested, add an MD5 checksum for this var */
     if ((ef != NULL) && (file->cksum.use & PD_MD5_RW))
        {if (strpbrk(name, ".[(") != NULL)
-	   {strcpy(bf, name);
+	   {SC_strncpy(bf, MAXLINE, name, -1);
 	    name = SC_strtok(bf, ".[(", s);};
 
 	ep = PD_inquire_entry(file, name, FALSE, NULL);

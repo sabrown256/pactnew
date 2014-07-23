@@ -542,7 +542,7 @@ void SX_parse(SX_reparsed *pd,
 		for (i = 0; i < nl; i++)
 		    {t = pd->reproc(pd, sa[i]);
 		     if (t != NULL)
-		        {strcpy(ptr, t);
+		        {SC_strncpy(ptr, MAXLINE, t, -1);
 			 SS_PTR(strm) = SS_BUFFER(strm);
 			 SS_assign(si, si->rdobj, SS_read(si, strm));
 			 si->interactive = ON;

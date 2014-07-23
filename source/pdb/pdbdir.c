@@ -47,9 +47,9 @@ int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
         return(FALSE);};
      
     if (dirname == NULL)
-       strcpy(name, "/");
+       SC_strncpy(name, MAXLINE, "/", -1);
     else
-       {strcpy(name, _PD_fixname(file, dirname));
+       {SC_strncpy(name, MAXLINE, _PD_fixname(file, dirname), -1);
         if (SC_LAST_CHAR(name) != '/')
            SC_strcat(name, MAXLINE, "/");};
 
@@ -127,10 +127,10 @@ int PD_ln(PDBfile *file ARG(,,cls), char *oldname, char *newname)
      
     nname = _PD_var_namef(file, newname, newpath, MAXLINE);
     if (nname != NULL)
-       {strcpy(oldpath, _PD_fixname(file, oldname));
+       {SC_strncpy(oldpath, MAXLINE, _PD_fixname(file, oldname), -1);
 
 /* make sure the directory in newname already exists */
-	strcpy(dirname, nname);
+	SC_strncpy(dirname, MAXLINE, nname, -1);
 	s = strrchr(dirname, '/');
 	if ((s != NULL) && (PD_has_directories(file)))
 	   {s[1] = '\0';
@@ -179,7 +179,7 @@ static int _PD_setup_flags(char *flags)
 
     iflags = 0;
 
-    strcpy(csave, flags);
+    SC_strncpy(csave, MAXLINE, flags, -1);
 
     token = SC_strtok(csave, " \t", t);
     while (token != NULL)
@@ -286,11 +286,11 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
        {has_dirs = (all == FALSE);
         if (path == NULL)
            {if (strcmp(PD_pwd(file), "/") == 0)
-               strcpy(pattern, "/*");
+               SC_strncpy(pattern, MAXLINE, "/*", -1);
             else
                snprintf(pattern, MAXLINE, "%s/*", PD_pwd(file));}
         else
-           {strcpy(pattern, _PD_fixname(file, path));
+           {SC_strncpy(pattern, MAXLINE, _PD_fixname(file, path), -1);
             ep = PD_inquire_entry(file, pattern, FALSE, NULL);
             if ((ep != NULL) && (strcmp(ep->type, "Directory") == 0))
                {if (SC_LAST_CHAR(pattern) == '/')
@@ -315,9 +315,9 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
     else
        {has_dirs = FALSE;
         if (path == NULL)
-           strcpy(pattern, "*");
+           SC_strncpy(pattern, MAXLINE, "*", -1);
         else
-           strcpy(pattern, path);};
+           SC_strncpy(pattern, MAXLINE, path, -1);};
      
 /* generate the list of matching names. Note that this returns items which
  * are in the requested directory AND items which are in sub-directories of
@@ -525,7 +525,7 @@ static int _PD_exist_path(PDBfile *file, char *path)
 
     ret = TRUE;
 
-    strcpy(head, path);
+    SC_strncpy(head, MAXLINE, path, -1);
     SC_LAST_CHAR(head) = '\0';
 
     s = strrchr(head, '/');
@@ -569,7 +569,7 @@ int PD_isdir(PDBfile *file ARG(,,cls), char *dir)
     else
 
 /* build an absolute pathname */
-       {strcpy(name, _PD_fixname(file, dir));
+       {SC_strncpy(name, MAXLINE, _PD_fixname(file, dir), -1);
 	if (SC_LAST_CHAR(name) != '/')
 	   SC_strcat(name, MAXLINE, "/");
 
@@ -607,7 +607,7 @@ int PD_mkdir(PDBfile *file ARG(,,cls), char *dir)
     else
 
 /* build an absolute pathname */
-       {strcpy(name, _PD_fixname(file, dir));
+       {SC_strncpy(name, MAXLINE, _PD_fixname(file, dir), -1);
 	if (SC_LAST_CHAR(name) != '/')
 	   SC_strcat(name, MAXLINE, "/");
 
@@ -681,12 +681,12 @@ char *_PD_fixname(PDBfile *file, char *inname)
        return(NULL);
 
     out = pa->outname;
-    strcpy(out, "/");
+    SC_strncpy(out, MAXLINE, "/", -1);
 
     if (!PD_has_directories(file))
 
 /* if no directories, just copy verbatim */
-       strcpy(out, inname);
+       SC_strncpy(out, MAXLINE, inname, -1);
 
     else
           
@@ -695,9 +695,9 @@ char *_PD_fixname(PDBfile *file, char *inname)
  * NOTE: all of this code is to eliminate . or .. in paths
  */
        {if (inname[0] != '/')
-           strcpy(out, PD_pwd(file));
+           SC_strncpy(out, MAXLINE, PD_pwd(file), -1);
 
-        strcpy(tmpstr, inname);
+        SC_strncpy(tmpstr, MAXLINE, inname, -1);
         node = SC_strtok(tmpstr, "/", s);
           
         while (node != NULL)

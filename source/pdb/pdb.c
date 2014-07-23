@@ -101,7 +101,7 @@ PDBfile *PD_family(PDBfile *of ARG(,,cls), int flag)
 
     nf = of;
     if (msz < csz)
-       {strcpy(name, of->name);
+       {SC_strncpy(name, MAXLINE, of->name, -1);
         SC_advance_name(name);
 
 /* create the new file - being sure to get the target right */
@@ -497,7 +497,7 @@ int PD_read_as_dwim(PDBfile *file ARG(,,cls), char *name,
 	data_standard *std;
 	hasharr *chrt;
 
-	strcpy(s, intype);
+	SC_strncpy(s, MAXLINE, intype, -1);
 	PD_dereference(s);
 	bpi = _PD_lookup_size(s, file->host_chart);
 
@@ -808,7 +808,7 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 
 /* append a new block to an existing entry if TRUE */
     if (appnd)
-       {strcpy(bf, name);
+       {SC_strncpy(bf, MAXLINE, name, -1);
 
 /* do this so that things such as a[20:20].b work properly
  * NOTE: this also implies that a[20:20].b.c works while
@@ -994,13 +994,13 @@ int PD_write_as(PDBfile *file ARG(,,cls), char *name,
 
         if (PD_has_directories(file))
 	   {lname = _PD_fixname(file, name);
-	    strcpy(fullpath, lname);
+	    SC_strncpy(fullpath, MAXLINE, lname, -1);
 	    t = strchr(lname, '.');
 	    if (t != NULL)
 	       *t = '\0';
 	    s = fullpath;}
         else
-	   {strcpy(fullpath, name);
+	   {SC_strncpy(fullpath, MAXLINE, name, -1);
 	    lname = fullpath;
 	    t = strchr(fullpath, '.');
 	    if (t != NULL)
@@ -1076,7 +1076,7 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
     prev = NULL;
     dims = NULL;
 
-    strcpy(lndx, "(");
+    SC_strncpy(lndx, MAXLINE, "(", -1);
 
     for (i = 0; i < nd; i++)
         {start = ind[0];
@@ -1101,7 +1101,7 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
        {lndx[nc-1] = ')';
         snprintf(hname, MAXLINE, "%s%s", name, lndx);}
     else
-       strcpy(hname, name);
+       SC_strncpy(hname, MAXLINE, name, -1);
 
     if (intype != NULL)
        SC_trim_right(intype, " \t");
@@ -1109,7 +1109,7 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
        SC_trim_right(outtype, " \t");
 
     appnd = pa->append_flag;
-    strcpy(fullpath, _PD_fixname(file, hname));
+    SC_strncpy(fullpath, MAXLINE, _PD_fixname(file, hname), -1);
     ep = file->tr->write(file, fullpath, intype, outtype,
 			 vr, dims, pa->append_flag, &new);
 

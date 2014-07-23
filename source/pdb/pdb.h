@@ -208,7 +208,7 @@
 
 #define PD_hyper_refp(name, commnd)                                          \
    {char c, s[MAXLINE];                                                      \
-    strcpy(s, name);                                                         \
+    SC_strncpy(s, MAXLINE, name, -1);                                        \
     c = SC_LAST_CHAR(s);                                                     \
     if ((c == ')') || (c == ']'))                                            \
        (commnd);}

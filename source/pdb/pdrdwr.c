@@ -214,7 +214,7 @@ static void _PD_init_dimind(dimind *pi, long offset, long stride, char *expr)
     inti start, stop, step;
 
     if (expr != NULL)
-       strcpy(s, expr);
+       SC_strncpy(s, MAXLINE, expr, -1);
     else
        s[0] = '\0';
 
@@ -394,7 +394,7 @@ int64_t _PD_hyper_number(PDBfile *file, char *indxpr,
     char s[MAXLINE];
     dimind *pi;
 
-    strcpy(s, indxpr);
+    SC_strncpy(s, MAXLINE, indxpr, -1);
     pi = _PD_compute_hyper_strides(file, s, dims, &nd);
 
     offs = 0L;
@@ -429,7 +429,7 @@ long PD_hyper_number(PDBfile *file ARG(,,cls), char *name, syment *ep)
 /* if name is of the form a[...] strip off the name part
  * by design _PD_hyper_number can't handle anything but the index part
  */
-    strcpy(s, name);
+    SC_strncpy(s, MAXLINE, name, -1);
     c = s[0];
     if (strchr("0123456789-.", c) == NULL)
        SC_firsttok(s, "([");
@@ -490,7 +490,7 @@ dimdes *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims)
 
     ndims = NULL;
 
-    strcpy(s, name);
+    SC_strncpy(s, MAXLINE, name, -1);
     t = SC_lasttok(s, "[]()");
     if (t != NULL)
        {nc = strlen(t);
@@ -535,13 +535,13 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
     char s[MAXLINE], lname[MAXLINE], lndx[MAXLINE];
     char *t, *rv;
 
-    strcpy(s, name);
+    SC_strncpy(s, MAXLINE, name, -1);
     if (SC_LAST_CHAR(s) != ']')
        return(CSTRSAVE(s));
     if (SC_NTH_LAST_CHAR(s, 1) == '[')
        return(NULL);
 
-    strcpy(lname, s);
+    SC_strncpy(lname, MAXLINE, s, -1);
     t = strrchr(lname, '[');
     if (t != NULL)
        t[0] = '\0';
@@ -564,7 +564,7 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
     s[nc] = '\0';
 
     err = FALSE;
-    strcpy(lndx, "[");
+    SC_strncpy(lndx, MAXLINE, "[", -1);
     for (pd = dims; pd != NULL; pd = pd->next)
         {t = SC_firsttok(s, " ,()[]\n\r");
 	 if (t == NULL)
@@ -1133,7 +1133,7 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
     rv = TRUE;
 
     dims = PD_entry_dimensions(ep);
-    strcpy(s, name);
+    SC_strncpy(s, MAXLINE, name, -1);
     c = SC_LAST_CHAR(s);
 
     if (((c != ')') && (c != ']')) || (dims == NULL))
@@ -1481,7 +1481,7 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
 	     memset(pa->err, 0, MAXLINE);
 	     break;};
 
-    strcpy(lndx, "(");
+    SC_strncpy(lndx, MAXLINE, "(", -1);
     for (i = 0; i < nd; i++)
         {for (j = 0; j < 3; j++)
 	     indl[j] = *ind++;
@@ -1493,7 +1493,7 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
         snprintf(hname, MAXLINE, "%s%s", fullpath, lndx);}
 
     else
-       strcpy(hname, fullpath);
+       SC_strncpy(hname, MAXLINE, fullpath, -1);
 
     _PD_rl_syment_d(ep);
     ep = _PD_effective_ep(file, hname, TRUE, fullpath);
@@ -1553,7 +1553,7 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
 
     else
        {dims = PD_entry_dimensions(ep);
-	strcpy(s, name);
+	SC_strncpy(s, MAXLINE, name, -1);
 	c = SC_LAST_CHAR(s);
 	if (((c != ')') && (c != ']')) || (dims == NULL))
 	   {if (_PD_cksum_block_read(file, name, ep, 0) == FALSE)

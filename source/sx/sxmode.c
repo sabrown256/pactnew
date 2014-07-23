@@ -272,7 +272,7 @@ static void _SX_read(SS_psides *si, object *strm)
 	       bf = SC_dsnprintf(FALSE, "vardef %s", t);};
 
 	if (bf != NULL)
-	   {strcpy(t, bf);
+	   {SC_strncpy(t, MAXLINE, bf, -1);
 	    SS_PTR(strm) = t;
 	    SS_assign(si, si->rdobj, SS_read(si, strm));};
 

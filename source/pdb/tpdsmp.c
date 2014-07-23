@@ -233,16 +233,16 @@ static void *writeitd(void *arg)
 
     xp = make_plot();
          
-    strcpy(sname1, "mypl_wr1a"); 
-    strcpy(sname2, "xpl_wr1a"); 
-    strcpy(sname3, "mypl_wr1b"); 
+    SC_strncpy(sname1, 100, "mypl_wr1a", -1); 
+    SC_strncpy(sname2, 100, "xpl_wr1a", -1); 
+    SC_strncpy(sname3, 100, "mypl_wr1b", -1); 
 
     for (n = 0; n < n_iter; n++)    
         {snprintf(suffix, 10, "%d", n);
 
-         strcpy(sname1+9, suffix);
-         strcpy(sname2+8, suffix);
-         strcpy(sname3+9, suffix);
+         SC_strncpy(sname1+9, 91, suffix, -1);
+         SC_strncpy(sname2+8, 92, suffix, -1);
+         SC_strncpy(sname3+9, 91, suffix, -1);
 
         if (!PD_write(file, sname1, "myplot", &mypl))
            {PRINT(stdout, "Error writing %s - exiting\n", sname1);
@@ -279,14 +279,14 @@ static void *writeits(void *arg)
 
     setup_plot(&xplot, 1);
 
-    strcpy(sname1, "mypl_wr2a"); 
-    strcpy(sname2, "xpl_wr2a"); 
+    SC_strncpy(sname1, 100, "mypl_wr2a", -1); 
+    SC_strncpy(sname2, 100, "xpl_wr2a", -1); 
 
     for (n = 0; n < n_iter; n++)
         {snprintf(suffix, MAXLINE, "%d", n);
 
-         strcpy(sname1+9, suffix);
-         strcpy(sname2+8, suffix);
+         SC_strncpy(sname1+9, 91, suffix, -1);
+         SC_strncpy(sname2+8, 92, suffix, -1);
 
          if (!PD_write(file, sname1, "myplot", &xplot))
             {PRINT(stdout, "Error writing %s - exiting\n", sname1);
@@ -320,18 +320,18 @@ void *readitd(void *arg)
 
     xp = make_plot();
 
-    strcpy(sname1, "mypl_wr1a"); 
-    strcpy(sname2, "xpl_wr1a"); 
-    strcpy(sname3, "mypl_wr1b"); 
+    SC_strncpy(sname1, 100, "mypl_wr1a", -1); 
+    SC_strncpy(sname2, 100, "xpl_wr1a", -1); 
+    SC_strncpy(sname3, 100, "mypl_wr1b", -1); 
 
     err = TRUE;
 
     for (n = 0; n < n_iter; n++)
         {snprintf(suffix, 10, "%d", n);
 
-         strcpy(sname1+9, suffix);
-         strcpy(sname2+8, suffix);
-         strcpy(sname3+9, suffix);
+         SC_strncpy(sname1+9, 91, suffix, -1);
+         SC_strncpy(sname2+8, 92, suffix, -1);
+         SC_strncpy(sname3+9, 91, suffix, -1);
 
          if (!PD_read(file, sname1, &rmypl))
             {PRINT(stdout, "Error reading %s - exiting\n", sname1);
@@ -390,16 +390,16 @@ void *readits(void *arg)
 
     setup_plot(&xplot, 1);
 
-    strcpy(sname1, "mypl_wr2a"); 
-    strcpy(sname2, "xpl_wr2a"); 
+    SC_strncpy(sname1, 100, "mypl_wr2a", -1); 
+    SC_strncpy(sname2, 100, "xpl_wr2a", -1); 
 
     err = TRUE;
 
     for (n = 0; n < n_iter; n++)
         {snprintf(suffix, MAXLINE, "%d", n);
 
-         strcpy(sname1+9, suffix);
-         strcpy(sname2+8, suffix);
+         SC_strncpy(sname1+9, 91, suffix, -1);
+         SC_strncpy(sname2+8, 92, suffix, -1);
 
          if (!PD_read(file, sname1, &rxplot))
             {PRINT(stdout, "Error reading %s - exiting\n", sname1);

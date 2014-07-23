@@ -278,7 +278,7 @@ static void prep_test_1_data(void)
          da_r[i] = 0.0;};
 
 /* set strings */
-    strcpy(ca_w, "Hi there!");
+    SC_strncpy(ca_w, N_CHAR, "Hi there!", -1);
     len = strlen(ca_w) + 1;
 
     cap_w[0] = CSTRSAVE("lev1");

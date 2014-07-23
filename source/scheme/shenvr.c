@@ -488,14 +488,15 @@ object *SS_bound_name(SS_psides *si, char *name)
  */
 
 static object *_SS_bound_var(SS_psides *si, char *name,
-			     hasharr *tab, char *under)
+			     hasharr *tab, char *under, long nb)
    {char s[MAXLINE], t[MAXLINE];
     object *b;
 
     if (under == NULL)
-       under = t;
+       {under = t;
+	nb    = MAXLINE;};
 
-    strcpy(under, name);
+    SC_strncpy(under, nb, name, -1);
     b = (object *) SC_hasharr_def_lookup(tab, under);
 
 /* NOTE: get a second chance if one of the syntax modes has defined a
@@ -505,8 +506,8 @@ static object *_SS_bound_var(SS_psides *si, char *name,
  * so a C mode define of foo_bar could replace an existing foo-bar
  */
     if ((b == NULL) && (si->name_reproc != NULL))
-       {(*si->name_reproc)(si, s, MAXLINE, name);
-	strcpy(under, s);
+       {si->name_reproc(si, s, MAXLINE, name);
+	SC_strncpy(under, nb, s, -1);
 	b = (object *) SC_hasharr_def_lookup(tab, under);};
 
     return(b);}
@@ -552,7 +553,7 @@ object *_SS_get_variable(SS_psides *si, char *name, object *penv)
  */
 
 static object *_SS_search_frames(SS_psides *si, char *name, object *penv,
-				 char *under, hasharr **ptab)
+				 char *under, long nb, hasharr **ptab)
    {int i;
     char *fname;
     hasharr *tab;
@@ -566,7 +567,7 @@ static object *_SS_search_frames(SS_psides *si, char *name, object *penv,
     if (name != NULL)
        {for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(si, penv), i++)
 	    {GET_FRAME(fname, tab, penv);
-	     b = _SS_bound_var(si, name, tab, under);
+	     b = _SS_bound_var(si, name, tab, under, nb);
 	     if (b != NULL)
 	        {if (ptab != NULL)
 		    *ptab = tab;
@@ -584,7 +585,7 @@ static object *_SS_search_frames(SS_psides *si, char *name, object *penv,
 object *_SS_bind_envc(SS_psides *si, char *name, object *penv)
    {object *b;
 
-    b = _SS_search_frames(si, name, penv, NULL, NULL);
+    b = _SS_search_frames(si, name, penv, NULL, 0L, NULL);
 
     return(b);}
 
@@ -603,7 +604,7 @@ void SS_set_var(SS_psides *si, object *vr, object *vl, object *penv)
 
     name = SS_VARIABLE_NAME(vr);
 
-    b = _SS_search_frames(si, name, penv, under, &tab);
+    b = _SS_search_frames(si, name, penv, under, MAXLINE, &tab);
 
     if (b != NULL)
        {SS_gc(si, b);
@@ -658,7 +659,7 @@ void _SS_rem_varc(SS_psides *si, char *name, object *penv)
     hasharr *tab;
     object *b;
 
-    b = _SS_search_frames(si, name, penv, under, &tab);
+    b = _SS_search_frames(si, name, penv, under, MAXLINE, &tab);
 
     if (b != NULL)
        {SC_mark(b, 1);
@@ -679,7 +680,7 @@ static void _SS_def_varc(SS_psides *si, char *name, object *vl, object *penv)
     object *b;
     hasharr *tab;
 
-    b = _SS_search_frames(si, name, penv, under, &tab);
+    b = _SS_search_frames(si, name, penv, under, MAXLINE, &tab);
 
     if (b != NULL)
        {SS_gc(si, b);
@@ -767,7 +768,7 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
  * for_each into for-each and do the lookup
  */
     if ((obj == NULL) && (si->name_reproc != NULL))
-       {(*si->name_reproc)(si, s, MAXLINE, name);
+       {si->name_reproc(si, s, MAXLINE, name);
 	obj = _SS_lk_var_valc(si, s, penv);};
 
 /* if there is no variable complain */

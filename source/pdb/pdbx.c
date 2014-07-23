@@ -1029,7 +1029,7 @@ int PD_put_image(PDBfile *file ARG(,,cls), void *f, int image)
 int PD_put_set(PDBfile *file ARG(,,cls), PM_set *s)
    {char t[MAXLINE];
 
-    strcpy(t, s->name);
+    SC_strncpy(t, MAXLINE, s->name, -1);
     PD_process_set_name(t);
 
     if (!PD_write(file, t, "PM_set *", &s))

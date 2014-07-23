@@ -121,7 +121,7 @@ int main(int c, char **v)
     PA_gs.source = CSTRSAVE("source");
  
 /* create the pdb file */
-    strcpy(s, fname);
+    SC_strncpy(s, MAXLINE, fname, -1);
     SC_strcat(s, MAXLINE, ".src");
     pdsf = PD_create(s);
     if (pdsf == NULL)

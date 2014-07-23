@@ -449,7 +449,7 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 
 	nxt = SC_strtok(local, " \t", p);
 	if (nxt != NULL)
-	   strcpy(type, nxt);
+	   SC_strncpy(type, MAXLINE, nxt, -1);
 
         nxt = SC_strtok(NULL, " \t()", p);
 	if (nxt != NULL)
@@ -1309,13 +1309,13 @@ static int _PD_open_iii(PDBfile *file)
     else
        ps = str;
 
-    strcpy(key, "StructureChartAddress:");
+    SC_strncpy(key, MAXLINE, "StructureChartAddress:", -1);
     s = SC_strstr(ps, key);
     if (s == NULL)
        PD_error("FAILED TO MATCH STRUCTURE CHART - _PD_OPEN_III", PD_OPEN);
     file->chrtaddr = SC_stol(s + strlen(key));
 
-    strcpy(key, "SymbolTableAddress:");
+    SC_strncpy(key, MAXLINE, "SymbolTableAddress:", -1);
     s = SC_strstr(ps, key);
     if (s == NULL)
        PD_error("FAILED TO MATCH SYMBOL TABLE - _PD_OPEN_III", PD_OPEN);
