@@ -345,7 +345,7 @@ void PD_write_defstr(FILE *f0, defstr *dp)
    {memdes *lst, *nxt;
     char bg[80];
 
-    strcpy(bg, "Members: {");
+    SC_strncpy(bg, 80, "Members: {", -1);
 
     PRINT(f0, "Type: %s\n", dp->type);
     PRINT(f0, "Alignment: %d\n", dp->alignment);
@@ -364,7 +364,7 @@ void PD_write_defstr(FILE *f0, defstr *dp)
                  else
                     PRINT(f0, "%s%s;  (cast by %s)\n",
                           bg, lst->member, lst->cast_memb);};
-             strcpy(bg, "          ");};};
+             SC_strncpy(bg, 80, "          ", -1);};};
 
     PRINT(f0, "Size in bytes: %ld\n", dp->size);
 
@@ -614,7 +614,7 @@ int PD_write_entry(FILE *f0, PDBfile *file ARG(,,cls),
 		   char *name, void *vr,
 		   syment *ep, int n, long *ind)
    {int status;
-    char prefix[80], pathname[180];
+    char prefix[80], pathname[MAXLINE];
     char before[2], after[2];
     PD_smp_state *pa;
 
@@ -638,7 +638,7 @@ int PD_write_entry(FILE *f0, PDBfile *file ARG(,,cls),
     _SC_set_format_defaults();
     _SC_set_user_formats();
 
-    strcpy(pathname, name);
+    SC_strncpy(pathname, MAXLINE, name, -1);
     *prefix = '\0';
     *before = '\0';
     *after  = '\0';
@@ -918,7 +918,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
                  snprintf(field, 80, "%s(%s)",
 			  nodename, SC_itos(NULL, 0, ii + min_index, NULL));}
              else
-                strcpy(field, nodename);
+                SC_strncpy(field, 80, nodename, -1);
 
 /* compute prefix */
 	     mbefore = NULL;
@@ -950,9 +950,9 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
 
              for (desc = mem_lst; desc != NULL; desc = desc->next)
                  {if (PD_gs.print_ctrl[1] == 0)
-                     strcpy(mfield, desc->name);
+                     SC_strncpy(mfield, 80, desc->name, -1);
                   else
-                     strcpy(mfield, desc->member);
+                     SC_strncpy(mfield, 80, desc->member, -1);
 
 		  if ((sm == NULL) ||
 		      ((sm != NULL) && (SC_regx_match(mfield, sm) == FALSE)))

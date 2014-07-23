@@ -59,7 +59,7 @@ int init_problem_b(int c, char **v)
          else if (v[i][0] != '(')
             fname = v[i];
          else
-           {strcpy(commnd, " ");
+           {SC_strncpy(commnd, MAXLINE, " ", -1);
             for ( ; i < c; i++)
                 {SC_strcat(commnd, MAXLINE, v[i]);
                  SC_strcat(commnd, MAXLINE, " ");};};
@@ -493,7 +493,7 @@ void B_init(void)
     SX_gs.pan_data_hook = (PFInt) LR_get_data;
 
     PRINT(stdout, "\n");
-    strcpy(si->prompt, "B-> ");
+    SC_strncpy(si->prompt, MAXLINE, "B-> ", -1);
 
     return;}
 

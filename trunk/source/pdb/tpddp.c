@@ -746,7 +746,7 @@ int main(int c, char **v)
     int64_t bsz;
     char path[MAXLINE], msg[MAXLINE];
 
-    strcpy(path, ".");
+    SC_strncpy(path, MAXLINE, ".", -1);
     debug = FALSE;
 
     bsz = SC_OPT_BFSZ;
@@ -761,7 +761,7 @@ int main(int c, char **v)
 		      debug = TRUE;
 		      break;
                  case 'p' :
-                      strcpy(path, v[++i]);
+                      SC_strncpy(path, MAXLINE, v[++i], -1);
                       break;
                  case 'v' :
                       PD_set_fmt_version(SC_stoi(v[++i]));

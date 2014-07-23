@@ -77,7 +77,7 @@ int plotw(dev, new, name)
     if (name != NULL)
        {window_init = TRUE;
 
-        strcpy(s, name);
+        SC_strncpy(s, MAXLINE, name, -1);
         elem  = CMAKE_N(double *, 10);
         token = SC_firsttok(s, " \t,;");
         nde   = 0;

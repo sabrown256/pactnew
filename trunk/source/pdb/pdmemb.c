@@ -24,7 +24,7 @@
 char *_PD_member_type(char *s)
    {char *t, *p, c, bf[MAXLINE], *pt;
 
-    strcpy(bf, s);
+    SC_strncpy(bf, MAXLINE, s, -1);
 
 /* find a pointer to the last '*' in the string */
     for (p = bf, t = bf; (c = *t) != '\0'; t++)
@@ -52,7 +52,7 @@ char *_PD_member_base_type(char *s)
    {char bf[MAXLINE];
     char *token, *p;
 
-    strcpy(bf, s);
+    SC_strncpy(bf, MAXLINE, s, -1);
     token = SC_strtok(bf, " *", p);
 
     p = CSTRSAVE(token);
@@ -83,14 +83,14 @@ char *_PD_member_name(char *s)
    {char bf[MAXLINE], t[MAXLINE];
     char *pt, *token, *p;
 
-    strcpy(bf, s);
+    SC_strncpy(bf, MAXLINE, s, -1);
 
 /* shave off the type part */
     token = SC_strtok(bf, " *(", p);
     token = SC_strtok(NULL, "\n", p);
 
     if (token != NULL)
-       {strcpy(t, token);
+       {SC_strncpy(t, MAXLINE, token, -1);
 
 /* creep up to the name */
 	for (pt = t; strchr(" \t*(", *pt) != NULL; pt++);
@@ -116,7 +116,7 @@ char *_PD_var_name(char *s)
    {char bf[MAXLINE];
     char *token, *p;
 
-    strcpy(bf, s);
+    SC_strncpy(bf, MAXLINE, s, -1);
     token = SC_strtok(bf, "([", p);
 
     p = CSTRSAVE(token);
@@ -175,7 +175,7 @@ dimdes *_PD_ex_dims(char *memb, int defoff, int *pde)
 
     prev = NULL;
     dims = NULL;
-    strcpy(bf, memb);
+    SC_strncpy(bf, MAXLINE, memb, -1);
     token = SC_firsttok(bf, "([\001\n");
     for (ne = 0; 
 	 (token = SC_firsttok(bf, ",)[] ")) != NULL;
@@ -235,13 +235,13 @@ int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
     expr2[0] = '\0';
     dims     = ep->dimensions;
 
-    strcpy(bf, name);
+    SC_strncpy(bf, MAXLINE, name, -1);
     SC_strncpy(head, MAXLINE, SC_firsttok(bf, "([\001\n"), -1);
     tail[0] = '\0';
 
     for (id = 0; (token = SC_firsttok(bf, ",)] ")) != NULL; id++)
         {if (token[0] == '.')
-	    {strcpy(tail, token);
+	    {SC_strncpy(tail, MAXLINE, token, -1);
 	     break;};
 	 smax = strchr(token, ':');
 	 if (smax == NULL)
@@ -274,7 +274,7 @@ int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
 	 snprintf(expr, MAXLINE, "%s%s:%s:%s,",
 		  expr2, t[0], t[2], t[1]);
 
-	 strcpy(expr2, expr);
+	 SC_strncpy(expr2, MAXLINE, expr, -1);
 
 	 dims = dims->next;};
 
@@ -299,7 +299,7 @@ long _PD_member_items(char *s)
    {char *token, bf[MAXLINE], *t;
     long acc;
 
-    strcpy(bf, s);
+    SC_strncpy(bf, MAXLINE, s, -1);
     token = SC_strtok(bf, "(\001\n", t);
     acc = 1L;
     while ((token = SC_strtok(NULL, ",) ", t)) != NULL)
@@ -447,9 +447,9 @@ static defstr *_PD_lookup_type(char *s, hasharr *tab)
 
 /* if it's a POINTER handle it now */
     if (strchr(s, '*') != NULL)
-       strcpy(bf, "*");
+       SC_strncpy(bf, MAXLINE, "*", -1);
     else
-       strcpy(bf, s);
+       SC_strncpy(bf, MAXLINE, s, -1);
 
     token = SC_strtok(bf, " ", t);
     dp    = PD_inquire_table_type(tab, token);
@@ -531,9 +531,9 @@ long _PD_lookup_size(char *s, hasharr *tab)
 
 /* if it's a POINTER handle it now */
     if (strchr(s, '*') != NULL)
-       strcpy(bf, "*");
+       SC_strncpy(bf, MAXLINE, "*", -1);
     else
-       strcpy(bf, s);
+       SC_strncpy(bf, MAXLINE, s, -1);
 
     token = SC_strtok(bf, " ", t);
     dp    = PD_inquire_table_type(tab, token);
@@ -560,7 +560,7 @@ int64_t _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc)
     memdes *desc, *nxt;
 
     if ((s != NULL) && (tab != NULL) && (dp != NULL))
-       {strcpy(name, s);
+       {SC_strncpy(name, MAXLINE, s, -1);
 	token = SC_firsttok(name, ".\001");
 
 	for (addr = 0, desc = dp->members; desc != NULL; desc = nxt)
@@ -595,9 +595,9 @@ haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
     hp = NULL;
     if (name != NULL)
        {if (flag)
-	   strcpy(s, _PD_fixname(file, name));
+	   SC_strncpy(s, MAXLINE, _PD_fixname(file, name), -1);
 	else
-	   strcpy(s, name);
+	   SC_strncpy(s, MAXLINE, name, -1);
 
 	if (fullname != NULL)
 	   strcpy(fullname, s);

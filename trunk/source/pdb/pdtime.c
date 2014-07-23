@@ -107,12 +107,12 @@ int main(int c, char **v)
         {snprintf(s, 20, "f%d-%d(%d)", len, i, len);
 	 names[i] = CSTRSAVE(s);};
     SC_zero_space_n(1, -2);
-    strcpy(filename, "time.pdb");
+    SC_strncpy(filename, 20, "time.pdb", 01);
     if ((pdbf = PD_open(filename, "w")) == NULL)
        {printf("Time couldn't create PDB file %s\r\n", filename);
         exit(1);};
 #else
-    strcpy(filename, "time.bin");
+    SC_strncpy(filename, 20, "time.bin", -1);
     if ((binf = io_open(filename, BINARY_MODE_W)) == NULL)
        {printf("Time couldn't create binary file %s\r\n", filename);
 	exit(1);};

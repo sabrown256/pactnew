@@ -1849,8 +1849,8 @@ pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
 		G_NUM_ARRAY, &arr,
 		0);
 
-	strcpy(dtype, type);
-	strcpy(stype, arr->type);
+	SC_strncpy(dtype, MAXLINE, type, -1);
+	SC_strncpy(stype, MAXLINE, arr->type, -1);
 	SC_dereference(dtype);
 	SC_dereference(stype);
 	sid = SC_type_id(stype, FALSE);

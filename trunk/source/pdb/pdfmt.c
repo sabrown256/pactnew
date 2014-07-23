@@ -290,7 +290,7 @@ char *_PD_get_tbuffer(void)
     nc  = strlen(bf) + 1;
     ret = CMAKE_N(char, nc);
 
-    strcpy(ret, bf);
+    SC_strncpy(ret, nc, bf, -1);
 
     return(ret);}
 
@@ -306,7 +306,7 @@ char *_PD_header_token(int which)
    {
 
     if (which < 2)
-       strcpy(_PD.id_token, OldHeadTok);
+       SC_strncpy(_PD.id_token, MAXLINE, OldHeadTok, -1);
 
     else if (which == 2)
        snprintf(_PD.id_token, MAXLINE, "%s%s>>!", NewHeadTok, "II");

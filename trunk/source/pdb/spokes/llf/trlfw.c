@@ -39,7 +39,7 @@ mcd_header
  headmcd;
 
 char
- namefile[512];   /* name of current link file */
+ namefile[MAXLINE];   /* name of current link file */
 
 int
  lenfile,		   /* maximum length of file in 64 bit words */
@@ -129,7 +129,16 @@ void LB_addvlb(double *vlb, int nwdvlb)
 void LB_file_init(char *nf, int lenfil)
    {
 
-    strcpy(namefile, nf);
+    SC_strncpy(namefile../panacea/abc/global/ginit.c:           {strcpy(commnd, " ");
+../panacea/abc/global/ginit.c:    strcpy(si->prompt, "B-> ");
+../panacea/abc/global/gmesh.c:    strcpy(bfi, s);
+../panacea/abc/global/gplot.c:        strcpy(s, name);
+../panacea/abc/source/s.c:    strcpy(s, fname);
+../panacea/abc/source/scmd.c:    strcpy(varname, name);
+../panacea/abc/source/scmd.c:    strcpy(bf, pname);
+../panacea/abc/source/scmd.c:    strcpy(in_deck, str);
+
+, nf, -1);
     lenfile  = lenfil;
     lenrec   = 0;
 

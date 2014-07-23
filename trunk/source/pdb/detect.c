@@ -812,7 +812,7 @@ static void print_fix_type(char *type, int sz, int aln,
     strncpy(mnptr, t, strlen(t));
 
     snprintf(t, MAXLINE, "%*s", mfields, lmx);
-    strcpy(mxptr, t);
+    strncpy(mxptr, t, MAXLINE);
 
     puts(bf);
 
@@ -1250,9 +1250,9 @@ int main(int c, char **v)
 
 	bo.i[0] = 1;
 	if (bo.c[0] == 1)
-	   strcpy(int_order, "REVERSE_ORDER");
+	   strncpy(int_order, "REVERSE_ORDER", 80);
 	else
-	   strcpy(int_order, "NORMAL_ORDER");
+	   strncpy(int_order, "NORMAL_ORDER", 80);
 
 	derive_fp_format(fb, db, ldb, ff, df, ldf);
 	derive_complex_format(fc, dc, lc);
