@@ -797,7 +797,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
     xa[0] = xp1;
     xa[1] = yp1;
     af = NULL;
-    strcpy(pbf2, lbl);
+    SC_strncpy(pbf2, MAXLINE, lbl, -1);
     
     for ( ; SS_consp(t); t = SS_cdr(si, t))
         {s = SS_car(si, t);
@@ -811,18 +811,20 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
              for (yp1 = xa[1], ic = 0; ic < na; yp1++, ic++)
                  *yp1 = fun(*yp1, value);
              lbl = SC_dsnprintf(FALSE, "%s %g", pbf2, value);
-             strcpy(pbf2, lbl);}
+             SC_strncpy(pbf2, MAXLINE, lbl, -1);}
 
 /* combine a curve with the accumulator */
          else if (SX_curvep_a(s))
             {j = SX_get_crv_index_i(s);
              if ((SX_gs.dataset[i].id >= 'A') &&
                  (SX_gs.dataset[i].id <= 'Z'))
-                {lbl = SC_dsnprintf(FALSE, "%s %c", pbf2, SX_gs.dataset[j].id);}
+                {lbl = SC_dsnprintf(FALSE, "%s %c",
+				    pbf2, SX_gs.dataset[j].id);}
              else
-                {lbl = SC_dsnprintf(FALSE, "%s @%d", pbf2, SX_gs.dataset[j].id);}
+                {lbl = SC_dsnprintf(FALSE, "%s @%d",
+				    pbf2, SX_gs.dataset[j].id);}
 
-             strcpy(pbf2, lbl);
+             SC_strncpy(pbf2, MAXLINE, lbl, -1);
 
              xp2 = SX_gs.dataset[j].x[0];
              yp2 = SX_gs.dataset[j].x[1];
@@ -918,7 +920,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
          UL_gs.bfa[1][j] = x[1][j];};
     x[0] = UL_gs.bfa[0];
     x[1] = UL_gs.bfa[1];
-    strcpy(local2, local);
+    SC_strncpy(local2, MAXLINE, local, -1);
 
     for (t = SS_cdr(si, argl); SS_consp(t); t = SS_cdr(si, t))
         {s = SS_car(si, t);
@@ -931,7 +933,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
          else
             {snprintf(local, MAXLINE, "%s @%d", local2, SX_gs.dataset[i].id);}
 
-         strcpy(local2, local);
+         SC_strncpy(local2, MAXLINE, local, -1);
 
          for (j = 0; j < n; j++)
              {x[1][j] = fun(x[1][j], i);};};

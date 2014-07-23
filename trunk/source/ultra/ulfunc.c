@@ -148,7 +148,7 @@ static object *_ULI_menui(SS_psides *si, object *s)
 	    f[0] = '\0';
 
 	    if (SX_gs.dataset[i].file != NULL)
-	       strcpy(f, SX_gs.dataset[i].file);
+	       SC_strncpy(f, MAXLINE, SX_gs.dataset[i].file, -1);
 
 	    id = SX_gs.dataset[i].id;
 	    md = SX_gs.dataset[i].modified;
@@ -814,7 +814,7 @@ static object *UL_print_labels(SS_psides *si, int *indx, int nc,
              md = SX_gs.dataset[i].modified;
              s  = SX_gs.dataset[i].text;
              if (SX_gs.dataset[i].file != NULL)
-                strcpy(f, SX_gs.dataset[i].file);
+                SC_strncpy(f, MAXLINE, SX_gs.dataset[i].file, -1);
              else
                 f[0] = '\0';
              if (regx != NULL)
@@ -901,7 +901,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
     if (SS_consp(argl))
        {arg1  = SS_car(si, argl);
         argl = SS_cdr(si, argl);
-        strcpy(prefix, SS_get_string(arg1));
+        SC_strncpy(prefix, MAXLINE, SS_get_string(arg1), -1);
         if (strlen(prefix) != 1)
            SS_error(si, "BAD PREFIX - _ULI_PREFIX", arg1);
 
@@ -1342,7 +1342,7 @@ static object *_ULI_average(SS_psides *si, object *s)
 static object *_ULI_system(SS_psides *si, object *s)
    {char local[MAXLINE];
    
-    strcpy(local, SS_get_string(s));
+    SC_strncpy(local, MAXLINE, SS_get_string(s), -1);
     SYSTEM(local);
 
     UL_pause(si, FALSE);
@@ -1360,14 +1360,15 @@ static object *_ULI_syscmnd(SS_psides *si, object *s)
     char **output = NULL;
     object *lst;
    
-    strcpy(local, SS_get_string(s));
+    SC_strncpy(local, MAXLINE, SS_get_string(s), -1);
     output = SC_syscmnd(local);
     lst = SS_null;
 
     if (output != NULL)
        {i = 0;
         while (output[i] != NULL)
-           {SS_assign(si, lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));
+           {SS_assign(si, lst,
+		      SS_mk_cons(si, SS_mk_string(si, output[i]), lst));
             CFREE(output[i]);
             i++;}
         SS_assign(si, lst, SS_reverse(si, lst));
@@ -1780,7 +1781,7 @@ static object *_ULI_append(SS_psides *si, object *argl)
     if (!SX_curvep_a(acc))
        SS_error(si, "BAD FIRST CURVE -  _ULI_APPEND", acc);
 
-    strcpy(local, "Append");
+    SC_strncpy(local, MAXLINE, "Append", -1);
 
     target = UL_COPY_CURVE(si, acc);
     acc    = UL_COPY_CURVE(si, acc);

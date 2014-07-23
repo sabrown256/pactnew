@@ -42,7 +42,7 @@ static int _UL_rd_scm(SS_psides *si)
 static int UL_rd_scm(SS_psides *si, char *name)
    {int rv;
 
-    strcpy(_UL.bf, name);
+    SC_strncpy(_UL.bf, MAXLINE, name, 1);
 
     rv = SS_err_catch(si, _UL_rd_scm, NULL);
 
@@ -189,9 +189,9 @@ static void _UL_expand_prefix(char *s, int nb)
             else if (flag)
                snprintf(token, MAXLINE, "(pre %c %d)", *tp, lind);
             else
-               strcpy(token, tp);}
+               SC_strncpy(token, MAXLINE, tp, -1);}
         else
-           strcpy(token, tp);
+	   SC_strncpy(token, MAXLINE, tp, -1);
 
         nc  = snprintf(sp, nr, "%s ", token);
         sp += nc;
@@ -455,8 +455,10 @@ char *_UL_next_dataid(char *id, int inc)
        {temp = SC_stoi(id+1) + inc;
         if (temp >= 0)
            snprintf(ret, MAXLINE, "@%d", temp);}
+
     else if ((id[0] == 'Z') && (inc > 0))
-        strcpy(ret, "@27");
+        SC_strncpy(ret, MAXLINE, "@27", -1);
+
     else if (!((id[0] == 'A') && (inc < 0)))
        {int ic = (int)id[0];
         ret[0] = (char)(ic + 1);
@@ -487,16 +489,16 @@ object *_UL_dataid_seq(SS_psides *si, char *first, char *last)
     SS_assign(si, ret, SS_mk_cons(si,
 			      SX_get_curve_obj(ifirst),
 			      ret));
-    strcpy(prev, first);
+    SC_strncpy(prev, MAXLINE, first, -1);
 
     for (i = 1; i < num; i++)
-        {strcpy(next, _UL_next_dataid(prev, inc));
+        {SC_strncpy(next, MAXLINE, _UL_next_dataid(prev, inc), -1);
          if (SX_curvep(next))
             {icur = SX_get_curve_id(next);
              SS_assign(si, ret, SS_mk_cons(si,
 				       SX_get_curve_obj(icur),
 				       ret));}
-         strcpy(prev, next);}
+         SC_strncpy(prev, MAXLINE, next, -1);}
 
     return(ret);}
 
@@ -910,7 +912,7 @@ object *UL_mode_graphics(SS_psides *si)
 
     if (SX_gs.graphics_device == NULL)
        {SS_set_prompt(si, "U-> ");
-        strcpy(si->ans_prompt, "");
+        SC_strncpy(si->ans_prompt, MAXLINE, "", -1);
 
         si->post_read  = _UL_read;
         si->post_eval  = _UL_parse;
@@ -924,8 +926,9 @@ object *UL_mode_graphics(SS_psides *si)
 	   SC_set_get_line(PG_wind_fgets);
 
         SX_gs.gr_mode         = TRUE;
-        SX_gs.graphics_device = PG_make_device(SX_gs.display_name, SX_gs.display_type,
-                                            SX_gs.display_title);
+        SX_gs.graphics_device = PG_make_device(SX_gs.display_name,
+					       SX_gs.display_type,
+					       SX_gs.display_title);
 
 	if (SX_gs.graphics_device != NULL)
 	   {if (scrwin == NULL)
@@ -1221,7 +1224,7 @@ int main(int c, char **v, char **env)
 
         else if (v[i][0] == '(')
            {commnd_flag = TRUE;
-            strcpy(commnd, " ");
+            SC_strncpy(commnd, MAXLINE, " ", -1);
 	    SC_concatenate(commnd, MAXLINE, v+i, 0, c-i, " ", TRUE);};
 
 #ifndef NO_SHELL
