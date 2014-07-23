@@ -156,6 +156,9 @@ struct s_SX_scope_private
 /* ULCNTL.C */
     double last_state;
 
+/* SXCMD.C */
+    char bf[MAXLINE];
+
 /* SXCRV.C */
     int next_avail;
     object **crv_obj;

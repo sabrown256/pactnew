@@ -181,7 +181,7 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, char *fname,
 	set->info           = (void *) info;
 	set->next           = next;
     
-	strcpy(bf, type);
+	SC_strncpy(bf, MAXLINE, type, -1);
 	SC_strtok(bf, " *", s);
 	if (bf != NULL)
 	   {bpi = 0;
@@ -249,7 +249,7 @@ FIXNUM FF_ID(pmaset, PMASET)(FIXNUM *siset, FIXNUM *sie, void *ax)
 	void *nv;
         char bf[MAXLINE], *type;
 
-	strcpy(bf, set->es_type);
+	SC_strncpy(bf, MAXLINE, set->es_type, -1);
 	type = SC_strtok(bf, " *", s);
         bpi  = SIZEOF(type);
 	ne   = set->n_elements;

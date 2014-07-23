@@ -138,7 +138,7 @@ object *_SXI_find_types(SS_psides *si, object *arg)
 
 /* create a hash table to put all of these types in */
     tytab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
-    strcpy(TYPE, "type");
+    SC_strncpy(TYPE, 10, "type", -1);
 
 /* fill the hash table with the types */
     _SX_find_data(si, tytab, file, vr, ni, type);

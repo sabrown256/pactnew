@@ -580,13 +580,13 @@ FIXNUM FF_ID(pgsrat, PGSRAT)(FIXNUM *sgid,
     id = SC_type_id(ltype, FALSE);
 
     if (id == SC_INT_I)
-       {strcpy(ltype, SC_INT_P_S);
+       {SC_strncpy(ltype, MAXLINE, SC_INT_P_S, -1);
         n = sizeof(int);}
     else if (strcmp(ltype, "real") == 0)
-       {strcpy(ltype, SC_DOUBLE_P_S);
+       {SC_strncpy(ltype, MAXLINE, SC_DOUBLE_P_S, -1);
         n = sizeof(double);}
     else if (strcmp(ltype, "string") == 0)
-       {strcpy(ltype, "char **");
+       {SC_strncpy(ltype, MAXLINE, "char **", -1);
         n = sizeof(char *);}
     else
        return((FIXNUM) FALSE);

@@ -236,7 +236,7 @@ static object *_SXI_array_ref(SS_psides *si, object *argl)
        {char type[MAXLINE];
 
 /* get the array type and dereference indirections down to a base type */
-        strcpy(type, arr->type);
+        SC_strncpy(type, MAXLINE, arr->type, -1);
 	while (_PD_indirection(type))
 	   PD_dereference(type);
 
@@ -246,7 +246,7 @@ static object *_SXI_array_ref(SS_psides *si, object *argl)
 
             dp = PD_inquire_host_type(SX_gs.vif, type);
             if (dp != NULL)
-               strcpy(type, dp->type);};
+               SC_strncpy(type, MAXLINE, dp->type, -1);};
 
 	o = _SS_numtype_to_object(si, type, arr->data, n);};
 
@@ -275,13 +275,13 @@ static object *_SXI_array_set(SS_psides *si, object *argl)
     if (arr != NULL)
        {char type[MAXLINE];
 
-        strcpy(type, arr->type);
+        SC_strncpy(type, MAXLINE, arr->type, -1);
         if (SX_gs.vif != NULL)
            {defstr *dp;
 
             dp = PD_inquire_host_type(SX_gs.vif, type);
             if (dp != NULL)
-               strcpy(type, dp->type);};
+               SC_strncpy(type, MAXLINE, dp->type, -1);};
 
 	while (_PD_indirection(type))
 	   PD_dereference(type);
@@ -464,9 +464,9 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
        SS_error(si, "BAD FILE - _SXI_SET_PDBDATA", argl);
 
     if (mn == NULL)
-       strcpy(set_name, s->name);
+       SC_strncpy(set_name, MAXLINE, s->name, -1);
     else
-       {strcpy(set_name, mn);
+       {SC_strncpy(set_name, MAXLINE, mn, -1);
         CFREE(mn);};
 
     if (s == NULL)
@@ -1012,7 +1012,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
     f = (PM_mapping *) data.memaddr;
     if (f != NULL)
        {if (f->domain == NULL)
-	   {strcpy(dname, f->name);
+	   {SC_strncpy(dname, MAXLINE, f->name, -1);
 	    PD_process_set_name(dname);
 
 	    if (!PD_read(file, dname, &data.memaddr))
@@ -1145,7 +1145,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
     if (!SX_NUMERIC_ARRAYP(lst))
        SS_error(si, "OBJECT NOT NUMERIC ARRAY - _SXI_ARRAYS_SET", lst);
 
-    strcpy(type, NUMERIC_ARRAY_TYPE(lst));
+    SC_strncpy(type, MAXLINE, NUMERIC_ARRAY_TYPE(lst), -1);
     PD_dereference(type);
     sid = SC_type_id(type, FALSE);
 
@@ -1460,7 +1460,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
         CFREE(mn);};
 
     if (arr != NULL)
-       {strcpy(type, arr->type);
+       {SC_strncpy(type, MAXLINE, arr->type, -1);
 	pt = SC_firsttok(type, " *");
 	x  = arr->data;
 

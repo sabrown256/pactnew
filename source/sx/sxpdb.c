@@ -809,12 +809,12 @@ static object *_SXI_open_pdbfile(SS_psides *si, object *argl)
    {char mode[10], *md;
     object *obj, *o;
 
-    strcpy(mode, "r");
+    SC_strncpy(mode, 10, "r", -1);
     if (SS_consp(argl))
        {obj  = SS_car(si, argl);
         argl = SS_cdr(si, argl);
         if (SS_consp(argl))
-           {md      = SS_get_string(SS_car(si, argl));
+           {md = SS_get_string(SS_car(si, argl));
 	    SC_strncpy(mode, 10, md, -1);};}
     else
        obj = argl;
@@ -2376,9 +2376,9 @@ static SC_array *_SX_make_blocks(SS_psides *si, object *alst, long numb)
  */
 
 static object *_SXI_wr_syment(SS_psides *si, object *argl)
-   {char *name, *type;
+   {long n;
+    char *name, *type;
     char s[MAXLINE];
-    long n;
     g_file *po;
     PDBfile *file;
     syment *ep;
@@ -2409,7 +2409,7 @@ static object *_SXI_wr_syment(SS_psides *si, object *argl)
     n    = _PD_comp_num(dims);
     bl   = _SX_make_blocks(si, alst, n);
     ep   = _PD_mk_syment(type, n, 0L, NULL, dims);
-    strcpy(s, _PD_fixname(file, name));
+    SC_strncpy(s, MAXLINE, _PD_fixname(file, name), -1);
 
     _PD_e_install(file, s, ep, TRUE);
 
@@ -2473,7 +2473,7 @@ static void _SX_setup_filedata_vif(PDBfile **pfp, int *pwrfl,
     else
        {_PD_rl_syment(et);
 
-	strcpy(bf, fullpath);
+	SC_strncpy(bf, MAXLINE, fullpath, -1);
 	t  = SC_firsttok(bf, "[]() ");
 	eo = PD_inquire_entry(file, t, TRUE, NULL);
 
@@ -2561,7 +2561,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
 
 /* get the name of the variable */
     namo = SS_car(si, argl);
-    strcpy(fullpath, _PD_fixname(file, SS_get_string(namo)));
+    SC_strncpy(fullpath, MAXLINE, _PD_fixname(file, SS_get_string(namo)), -1);
 
     argl = SS_cdr(si, argl);
 
@@ -2768,7 +2768,7 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
 
 /* get the name of the variable */
     namo = SS_car(si, argl);
-    strcpy(fullpath, _PD_fixname(file, SS_get_string(namo)));
+    SC_strncpy(fullpath, MAXLINE, _PD_fixname(file, SS_get_string(namo)), -1);
     argl     = SS_cdr(si, argl);
 
 /* if no other arguments its an error */
@@ -3295,14 +3295,14 @@ static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
 
 object *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
 			   char *name, char *type, void *vr, int flag)
-   {syment *ep;
+   {int new;
+    char fullpath[MAXLINE];
+    syment *ep;
     SC_address data;
     object *ret;
-    char fullpath[MAXLINE];
-    int new;
 
     data.memaddr = (char *) vr;
-    strcpy(fullpath, _PD_fixname(file, name));
+    SC_strncpy(fullpath, MAXLINE, _PD_fixname(file, name), -1);
 
     if (file == NULL)
        ep = NULL;

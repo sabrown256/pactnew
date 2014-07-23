@@ -776,7 +776,7 @@ FIXNUM FF_ID(pfqmbr, PFQMBR)(FIXNUM *sfid, FIXNUM *snct, char *type,
     PD_smp_state *pa;
 
     err = (FIXNUM) FALSE;
-    strcpy(errmsg, "ERROR: ");
+    SC_strncpy(errmsg, MAXLINE, "ERROR: ", -1);
 
     SC_FORTRAN_STR_C(s, type, *snct);
 
@@ -978,7 +978,7 @@ FIXNUM FF_ID(pfrptr, PFRPTR)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 
 	    rv = _PD_hyper_read(file, fullpath, type, ep, &vr);
 
-	    strcpy(s, type);
+	    SC_strncpy(s, MAXLINE, type, -1);
 	    PD_dereference(s);
 	    bpi = _PD_lookup_size(s, file->host_chart);
 	    nis = (*sni)*bpi;

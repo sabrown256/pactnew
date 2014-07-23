@@ -278,7 +278,7 @@ object *_SXI_valid_ultra_filep(SS_psides *si, object *obj)
 
     ret = SS_f;
 
-    strcpy(fname, SS_get_string(obj));
+    SC_strncpy(fname, MAXLINE, SS_get_string(obj), -1);
     path = SC_search_file(NULL, fname);
     if (path != NULL)
 
@@ -308,7 +308,7 @@ object *_SXI_valid_ultra_filep(SS_psides *si, object *obj)
 	    PD_close(pfp);}
 
 /* test for other file types
- * remake the name first because a strcpy in PD_open clobbers it
+ * remake the name first because a SC_strncpy in PD_open clobbers it
  */
 	else
 	   {fp = _SX_open_for_reading(si, path, BINARY_MODE_R);
@@ -535,7 +535,7 @@ object *SX_read_ver1(SS_psides *si, object *obj)
 
     j = _SX_next_number(si, FALSE);
 
-    strcpy(fname, SS_get_string(obj));
+    SC_strncpy(fname, MAXLINE, SS_get_string(obj), -1);
     path = SC_search_file(NULL, fname);
     if (path == NULL)
        SS_error(si, "CAN'T FIND FILE - SX_READ_VER1", obj);
@@ -628,7 +628,7 @@ object *SX_read_data(SS_psides *si, object *obj)
     PDBfile *pfp;
     object *rv;
 
-    strcpy(fname, SS_get_string(obj));
+    SC_strncpy(fname, MAXLINE, SS_get_string(obj), -1);
     path = SC_search_file(NULL, fname);
     if (path == NULL)
        SS_error(si, "CAN'T FIND FILE - SX_READ_DATA", obj);
@@ -649,7 +649,7 @@ object *SX_read_data(SS_psides *si, object *obj)
     else
 
 /* test for other file types
- * remake the name first because a strcpy in PD_open clobbers it
+ * remake the name first because a SC_strncpy in PD_open clobbers it
  */
        {fp = _SX_open_for_reading(si, path, BINARY_MODE_R);
 
@@ -688,7 +688,7 @@ object *SX_crv_file_info(SS_psides *si, object *obj)
     PDBfile *pfp;
     object *o;
 
-    strcpy(fname, SS_get_string(obj));
+    SC_strncpy(fname, MAXLINE, SS_get_string(obj), -1);
     path = SC_search_file(NULL, fname);
     if (path == NULL)
        SS_error(si, "CAN'T FIND FILE - SX_CRV_FILE_INFO", obj);
