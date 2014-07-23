@@ -167,7 +167,7 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
     char type[MAXLINE];
     char *s;
 
-    strcpy(type, t);
+    SC_strncpy(type, MAXLINE, t, -1);
     SC_strtok(type, " *", s);
     did = SC_type_id(type, FALSE);
 

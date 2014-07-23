@@ -401,7 +401,7 @@ void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
 
     mitem.type = type;
 
-    strcpy(s, _PD_fixname(file, name));
+    SC_strncpy(s, MAXLINE, _PD_fixname(file, name), -1);
     mitem.vname = CSTRSAVE(s);
 
 /* get mapping label */
@@ -434,7 +434,7 @@ void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
             u = (u == NULL) ? s : u + 1;
             strcpy(u, lb);}
         else
-           strcpy(s, lb);
+           SC_strncpy(s, MAXLINE, lb, -1);
 
         if (!PD_read(file, s, t))
            SS_error(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
@@ -529,7 +529,7 @@ void SX_parse(SX_reparsed *pd,
     si = pd->si;
     
     if (SS_procedurep(si->evobj))
-       {strcpy(s, SS_PP(si->evobj, name));
+       {SC_strncpy(s, MAXLINE, SS_PP(si->evobj, name), -1);
         if (_SX_no_argsp(si, si->evobj) || !EOE(strm))
            {ptr = SS_BUFFER(strm);
             if (_SX_isodd(SC_char_count(ptr, '\"')))
@@ -572,7 +572,7 @@ void SX_parse(SX_reparsed *pd,
 char *SX_wrap_paren(char *opn, char *form, char *cls, size_t ln)
    {char tmp[MAXLINE];
 
-   strcpy(tmp, form);
+   SC_strncpy(tmp, MAXLINE, form, -1);
 
    snprintf(form, ln, "%s%s%s", opn, tmp, cls);
 
@@ -819,7 +819,7 @@ static void _SX_install_device_vars(SS_psides *si)
 	    continue;
     
 	 dname = out->dname;
-	 strcpy(dupp, dname);
+	 SC_strncpy(dupp, MAXLINE, dname, -1);
 	 SC_str_upper(dupp);
 
 	 if (out->exist)
@@ -933,8 +933,8 @@ void SX_register_devices(void)
     for (i = 0; i < nd; i++)
         {out = SX_get_device(i);
 
-	 strcpy(lnm, devs[i]);
-	 strcpy(unm, devs[i]);
+	 SC_strncpy(lnm, MAXLINE, devs[i], -1);
+	 SC_strncpy(unm, MAXLINE, devs[i], -1);
 	 SC_str_upper(unm);
 
 	 out->dname = CSTRDUP(lnm, 3);

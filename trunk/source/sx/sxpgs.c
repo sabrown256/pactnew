@@ -132,13 +132,13 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
     range  = f->range;
     if (domain == NULL)
        {if (PD_has_directories(file))
-           {strcpy(dname, name);
+           {SC_strncpy(dname, MAXLINE, name, -1);
             tail = strrchr(dname, '/');
             tail = (tail == NULL) ? dname : tail + 1;
             strcpy(tail, f->name);
             PD_process_set_name(tail);}
         else
-           {strcpy(dname, f->name);
+           {SC_strncpy(dname, MAXLINE, f->name, -1);
             PD_process_set_name(dname);};
 
         if (!PD_read(file, dname, &data.memaddr))
@@ -431,7 +431,7 @@ static object *_SXI_menu_item_type(SS_psides *si, object *argl)
        rv = SS_null;
 
     else
-       {strcpy(bf, mi->type + 3);
+       {SC_strncpy(bf, MAXLINE, mi->type + 3, -1);
 	rv = SS_mk_string(si, SC_strtok(bf, " *", s));};
 
     return(rv);}

@@ -703,7 +703,8 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
                   SC_strncpy(bf, MAXLINE, pc, nc);
 
                   pc += nc;
-                  strcpy(_PG_gattrs.axis_label_x_format, bf);
+		  CFREE(_PG_gattrs.axis_label_x_format);
+		  _PG_gattrs.axis_label_x_format = CSTRSAVE(bf);
                   break;
 
              case AXIS_Y_FORMAT :
@@ -711,7 +712,8 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
                   SC_strncpy(bf, MAXLINE, pc, nc);
 
                   pc += nc;
-                  strcpy(_PG_gattrs.axis_label_y_format, bf);
+		  CFREE(_PG_gattrs.axis_label_y_format);
+		  _PG_gattrs.axis_label_y_format = CSTRSAVE(bf);
                   break;
 
              default :

@@ -15,12 +15,6 @@
 
 #define PCODE "PDBView 2.0"
 
-C_procedure
- *Mapping_Proc;
-
-static char
- _SX_bf[MAXLINE];
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -62,7 +56,7 @@ static int _SX_rd_scm(SS_psides *si)
    {
 
     SS_call_scheme(si, "cf",
-                   SC_STRING_I, _SX_bf,
+                   SC_STRING_I, _SX.bf,
                    0);
 
     return(TRUE);}
@@ -75,7 +69,7 @@ static int _SX_rd_scm(SS_psides *si)
 int SX_rd_scm(SS_psides *si, char *name)
    {int rv;
 
-    strcpy(_SX_bf, name);
+    SC_strncpy(_SX.bf, MAXLINE, name, -1);
 
     rv = SS_err_catch(si, _SX_rd_scm, NULL);
 

@@ -97,7 +97,7 @@ static void _SX_expand_prefix(char *s, int nc)
     char t[MAXLINE], bf[MAXLINE], token[MAXLINE];
     char *tp, *fp, *ip, *pt;
 
-    strcpy(t, s);
+    SC_strncpy(t, MAXLINE, s, -1);
     ns = 0;
 
     more_tokens = TRUE;
@@ -112,17 +112,17 @@ static void _SX_expand_prefix(char *s, int nc)
 		token[2] = '\0';}
 	    else
 	       {token[0] = '\"';
-		strcpy(token + 1, tp);
+		SC_strncpy(token + 1, MAXLINE, tp, -1);
 		SC_strcat(token, MAXLINE, "\"");};}
 
         else if ((tp = SC_firsttok(t, " \t\n\r")) != NULL)
-	   strcpy(token, tp);
+	   SC_strncpy(token, MAXLINE, tp, -1);
 	else
 	   more_tokens = FALSE;
 
         if (strlen(token) > 0)
            {if ((tp != NULL) && isalpha((int) *tp))
-               {strcpy(bf, tp);
+               {SC_strncpy(bf, MAXLINE, tp, -1);
                 fp = SC_strtok(bf, ".()[]", pt);
 	        if ((fp != NULL) && (*(token + strlen(fp)) == '.'))
 	           {ip = SC_strtok(NULL, "()[]", pt);
@@ -438,7 +438,7 @@ object *SX_mode_graphics(SS_psides *si)
 
     if (SX_gs.graphics_device == NULL)
        {SS_set_prompt(si, "\n-> ");
-        strcpy(si->ans_prompt, "");
+        SC_strncpy(si->ans_prompt, MAXLINE, "", -1);
 
         si->post_read  = _SX_read;
         si->post_eval  = _SX_parse;

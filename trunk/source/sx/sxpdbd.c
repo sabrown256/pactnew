@@ -878,18 +878,18 @@ static int _SX_diff_var(SS_psides *si, PDBfile *pfa, PDBfile *pfb,
 
     oh = SC_signal_n(SIGFPE, _SX_diff_signal, &de, sizeof(de));
 
-    strcpy(fullpatha, _PD_fixname(pfa, nma));
+    SC_strncpy(fullpatha, MAXLINE, _PD_fixname(pfa, nma), -1);
     s = _PD_expand_hyper_name(pfa, fullpatha);
     if (s == NULL)
        return(NOT_PRESENT);
-    strcpy(fullpatha, s);
+    SC_strncpy(fullpatha, MAXLINE, s, -1);
     CFREE(s);
 
-    strcpy(fullpathb, _PD_fixname(pfb, nmb));
+    SC_strncpy(fullpathb, MAXLINE, _PD_fixname(pfb, nmb), -1);
     s = _PD_expand_hyper_name(pfb, fullpathb);
     if (s == NULL)
        return(NOT_PRESENT);
-    strcpy(fullpathb, s);
+    SC_strncpy(fullpathb, MAXLINE, s, -1);
     CFREE(s);
 
     epa = _PD_effective_ep(pfa, fullpatha, FALSE, NULL);

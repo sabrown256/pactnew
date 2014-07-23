@@ -34,7 +34,7 @@ object *SX_print(SS_psides *si, object *argl)
     format = SS_car(si, argl);
     if (!SS_stringp(format))
        SS_error(si, "BAD FORMAT - PRINT", format);
-    strcpy(forms, SS_STRING_TEXT(format));
+    SC_strncpy(forms, MAXLINE, SS_STRING_TEXT(format), -1);
     fmt = forms;
 
     while (TRUE)

@@ -113,7 +113,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
     if (atr == NULL)
        return(SS_f);
 
-    strcpy(attr_type, atr->type);
+    SC_strncpy(attr_type, MAXLINE, atr->type, -1);
     PD_dereference(attr_type);
     PD_dereference(attr_type);
 
@@ -217,7 +217,7 @@ static object *_SXI_get_attr_val(SS_psides *si, object *argl)
     if (atr == NULL)
        return(SS_f);
 
-    strcpy(attr_type, atr->type);
+    SC_strncpy(attr_type, MAXLINE, atr->type, -1);
     PD_dereference(attr_type);
     PD_dereference(attr_type);
 

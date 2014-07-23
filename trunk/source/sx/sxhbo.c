@@ -205,7 +205,7 @@ static PM_set *_SX_build_common_domain(PM_mapping *h)
          if (ph == ph->next)
             break;};
 
-    strcpy(bf, sd->element_type);
+    SC_strncpy(bf, MAXLINE, sd->element_type, -1);
     type = SC_strtok(bf, " *", s);
     domain = PM_make_lr_index_domain("Domain", type,
 				     sd->dimension, sd->dimension_elem,
@@ -445,7 +445,7 @@ static PM_mapping *_SX_build_accumulator_mapping(SS_psides *si,
     range = h->range;
 
 /* get the number of bytes per component of a range element */
-    strcpy(label, range->es_type);
+    SC_strncpy(label, MAXLINE, range->es_type, -1);
     PD_dereference(label);
     nbe = SIZEOF(label);
 
