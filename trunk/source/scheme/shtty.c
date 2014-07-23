@@ -294,7 +294,7 @@ char *SS_get_string(object *obj)
        _SS.str[0] = '\0';
 
     else if (obj->print_name != NULL)
-       strcpy(_SS.str, obj->print_name);
+       SC_strncpy(_SS.str, MAXLINE, obj->print_name, -1);
       
     else if (SS_integerp(obj))
        SC_itos(_SS.str, MAXLINE, SS_INTEGER_VALUE(obj), NULL);
@@ -303,13 +303,13 @@ char *SS_get_string(object *obj)
        SC_ftos(_SS.str, MAXLINE, SS_FLOAT_VALUE(obj), "%Lg");
 
     else if (SS_nullobjp(obj))
-        strcpy(_SS.str, "nil");
+        SC_strncpy(_SS.str, MAXLINE, "nil", -1);
 
     else if (obj == NULL)
-        strcpy(_SS.str, "nil");
+        SC_strncpy(_SS.str, MAXLINE, "nil", -1);
 
     else
-        strcpy(_SS.str, "-none-");
+        SC_strncpy(_SS.str, MAXLINE, "-none-", -1);
 
     return(_SS.str);}
 

@@ -762,7 +762,7 @@ static object *_SSI_strprt(SS_psides *si, object *arg)
        SS_error(si, "BAD STRING TO STRING->PORT", arg);
 
     port = SS_mk_inport(si, NULL, "string");
-    strcpy(SS_BUFFER(port), SS_STRING_TEXT(arg));
+    SC_strncpy(SS_BUFFER(port), MAXLINE, SS_STRING_TEXT(arg), -1);
     SS_PTR(port) = SS_BUFFER(port);
 
     return(port);}

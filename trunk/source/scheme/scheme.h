@@ -1157,7 +1157,7 @@ extern int
  SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf);
 
 extern char
- *SS_object_type_name(object *o, char *atype);
+ *SS_object_type_name(object *o, char *atype, long nb);
 
 extern void
  SS_set_put_string(SS_psides *si, PFfputs ps),

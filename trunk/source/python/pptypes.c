@@ -630,12 +630,6 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
 -                    return(NULL);
 -                }
 -            }
--#if 0
--            strcpy(ts, type);
--	    SC_strcat(ts, MAXLINE, "**");
--            CFREE(type);
--            type = CSTRSAVE(ts);
--#endif
 -        } else {
 -            char *nextdescr;
 -
@@ -654,14 +648,8 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
 -                    return(NULL);
 -                }
 -            }
--#if 0
--            strcpy(ts, type);
--	    SC_strcat(ts, MAXLINE, "*");
--            CFREE(type);
--            type = CSTRSAVE(ts);
--#endif
 -        }
--        strcpy(ts, type);
+-        SC_strncpy(ts, MAXLINE, type, -1);
 -	SC_strcat(ts, MAXLINE, "*");
 -        CFREE(type);
 -        type = CSTRSAVE(ts);
@@ -731,7 +719,7 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
 -    char ts[MAXLINE];
 -
 -    type = get_sequence_object_type(obj);
--    strcpy(ts, type);
+-    SC_strncpy(ts, MAXLINE, type, -1);
 -    SC_strcat(ts, MAXLINE, "*");
 -    CFREE(type);
 -    type = CSTRSAVE(ts);
@@ -2229,12 +2217,6 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type)
 -                    return(NULL);
 -                }
 -            }
--#if 0
--            strcpy(ts, type);
--	    SC_strcat(ts, MAXLINE, "**");
--            CFREE(type);
--            type = CSTRSAVE(ts);
--#endif
 -        } else {
 -            char *nextdescr;
 -
@@ -2253,14 +2235,8 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type)
 -                    return(NULL);
 -                }
 -            }
--#if 0
--            strcpy(ts, type);
--	    SC_strcat(ts, MAXLINE, "*");
--            CFREE(type);
--            type = CSTRSAVE(ts);
--#endif
 -        }
--        strcpy(ts, type);
+-        SC_strncpy(ts, MAXLINE, type, -1);
 -	SC_strcat(ts, MAXLINE, "*");
 -        CFREE(type);
 -        type = CSTRSAVE(ts);

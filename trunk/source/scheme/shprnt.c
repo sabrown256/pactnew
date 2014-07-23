@@ -293,7 +293,7 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
     format = SS_car(si, argl);
     if (!SS_stringp(format))
        SS_error(si, "BAD FORMAT - _SS_XPRINTF", format);
-    strcpy(forms, SS_STRING_TEXT(format));
+    SC_strncpy(forms, MAXLINE, SS_STRING_TEXT(format), -1);
     fmt = forms;
 
     _SS.bf = NULL;
@@ -1231,7 +1231,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	   s = SS_REFERENCE_NAME(obj);
 
 	else if (ityp == SS_NULL_I)
-	   strcpy(t, "()");
+	   SC_strncpy(t, MAXLINE, "()", -1);
 
 	else if ((ityp == SS_EOF_I) || (ityp == SC_BOOL_I))
 	   snprintf(t, MAXLINE, "%s", SS_BOOLEAN_NAME(obj));

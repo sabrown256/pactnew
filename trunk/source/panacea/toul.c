@@ -165,7 +165,7 @@ int main(int argc, char **argv)
 	else
 	   {char *ls;
 
-	    strcpy(t, names[0]);
+	    SC_strncpy(t, MAXLINE, names[0], -1);
 	    root = SC_strtok(t, ".", ls);};
 
         snprintf(s, MAXLINE, "m%s", root);

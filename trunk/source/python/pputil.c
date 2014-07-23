@@ -202,7 +202,7 @@ char *PP_add_indirection(char *type, int n)
     }
     
     if (n == 0)
-        strcpy(ptype, type);
+        SC_strncpy(ptype, sz, type, -1);
     else if (_PD_indirection(type))
         snprintf(ptype, sz, "%s%.*s", type, n, "********");
     else

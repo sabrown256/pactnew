@@ -154,7 +154,7 @@ PA_src_variable *PA_get_source(char *s, int start_flag)
          if (svp == NULL)
             continue;
 
-	 strcpy(bf, svp->name);
+	 SC_strncpy(bf, MAXLINE, svp->name, -1);
 	 pb = SC_firsttok(bf, "()");
 
          if ((pb != NULL) && (strcmp(s, pb) == 0))
@@ -227,7 +227,7 @@ void _PA_init_queue(PA_src_variable *svp, double t, double dt)
 /* lookup up the PA_variable that this PA_src_variable is controlling
  * and set the conversion from CGS units to INTERNAL units
  */
-    strcpy(var_name, svp->name);
+    SC_strncpy(var_name, MAXLINE, svp->name, -1);
     token = SC_strtok(var_name, "(", s);
 
     pp = PA_inquire_variable(token);
