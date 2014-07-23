@@ -453,7 +453,7 @@ void _PA_install_var(char *vname, PA_variable *pp)
         name = pck->name;
 	snprintf(s, MAXLINE, "%s-%s", name, vname);}
     else
-       strcpy(s, vname);
+       SC_strncpy(s, MAXLINE, vname, -1);
 
     SC_hasharr_install(PA_gs.variable_tab, s, pp, PA_gs.variable, 3, -1);
 
@@ -477,7 +477,7 @@ void *_PA_pdb_read(PDBfile *file, char *name, syment **psp, long *indx)
 
     vr = NULL;
 
-    strcpy(memb, name);
+    SC_strncpy(memb, MAXLINE, name, -1);
     token = SC_strtok(memb, ".([", s);
     if (token != NULL)
 
@@ -787,10 +787,10 @@ void _PA_rdrstrt(char *fname, int conv_flag)
 
 /* set the rsname to this name to be able to CONNECT DeMaND variables */
     _PA.rsname = fname;
-    strcpy(bf, fname);
+    SC_strncpy(bf, MAXLINE, fname, -1);
     tok = SC_strtok(bf, ". \r\n\t", s);
     if (tok != NULL)
-       strcpy(_PA.base_name, tok);
+       SC_strncpy(_PA.base_name, MAXLINE, tok, -1);
 
     if (PA_gs.vif == NULL)
        PA_gs.vif = PA_open("vif", "w+", TRUE);

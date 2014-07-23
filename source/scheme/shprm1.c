@@ -688,7 +688,7 @@ static void _SS_check_all_objects(char *name, char *addr,
 	if (on == NULL)
 	   on = "none";
 
-	p = SS_object_type_name(o, atype);
+	p = SS_object_type_name(o, atype, MAXLINE);
 	if (p == NULL)
 	   snprintf(atype, MAXLINE, "%d", type);
 
@@ -718,7 +718,7 @@ static void _SS_check_bad_names(char *name, char *addr,
 	
 	if (on != NULL)
 	   {if (!SS_stringp(o) && !SC_print_charsp(on, FALSE))
-	       {p = SS_object_type_name(o, atype);
+	       {p = SS_object_type_name(o, atype, MAXLINE);
 		if (p == NULL)
 		   snprintf(atype, MAXLINE, "%d", type);
 

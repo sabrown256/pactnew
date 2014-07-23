@@ -338,40 +338,11 @@ PyObject *_PP_wr_syment(PP_file *fileinfo,
 #endif
 
         /* XXXX - handle form->want_pdbdata here? */
-#if 0
-        if (form->want_pdbdata) {
-            strcpy(basetype, litype);
-            strtok(basetype, " *");
-            entry = PP_inquire_type(fileinfo, basetype);
-            if (entry == NULL) {
-#if 0
-                if (DEREF(pv) == NULL) {
-                    nitems = 0L;
-                } else {
-                    nitems =
-                        _PD_number_refd(mem_lst, svr, desc, DEREF(pv),
-					litype, file->host_chart);
-                }
-#endif
-                RESTORE_S(litype);
-                obj =
-                    (PyObject *) PP_scoredata_New(pv, litype, nitems, dims,
-                                                  file);
-                if (obj == NULL)
-                    return NULL;
-                DEBUG_WR("INDIRECT", litype, 0, obj);
-                GO_CONT;
-            }
-        }
-#endif
         if (need_array) {
             obj1 = PyList_New(nitems);      /* new reference */
         } else {
             obj1 = NULL;
         }
-#if 0
-        need_array = TRUE;
-#endif
         entry = PP_inquire_type(fileinfo, litype);
         SAVE_P(pv);
         lvr = (char **) pv;

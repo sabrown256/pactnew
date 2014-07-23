@@ -704,7 +704,7 @@ void PA_get_range_info(PA_plot_request *pr)
     offs   = 0L;
     stride = 1L;
     if (ps->next == NULL)
-       {strcpy(rname, ps->var_name);
+       {SC_strncpy(rname, MAXLINE, ps->var_name, -1);
         vr = ps->var_name;
         pp = PA_inquire_variable(vr);
         if (pp != NULL)
@@ -721,7 +721,7 @@ void PA_get_range_info(PA_plot_request *pr)
                   "VARIABLE %s NOT IN DATABASE - PA_GET_RANGE_INFO", vr);}
 
     else
-       {strcpy(rname, "{");
+       {SC_strncpy(rname, MAXLINE, "{", -1);
         for (pi = ps; pi != NULL; pi = pi->next)
             {vr = pi->var_name; 
 	     SC_vstrcat(rname, MAXLINE, "%s,", vr);
@@ -1050,7 +1050,7 @@ static void _PA_connect_domain(PM_mapping *f)
            "NO DOMAINS TO CONNECT - _PA_CONNECT_DOMAIN");
 
 /* extract the domain name from the mapping name */
-    strcpy(dname, f->name);
+    SC_strncpy(dname, MAXLINE, f->name, -1);
     PD_process_set_name(dname);
 
     for (i = 0; i < _PA.n_domains; i++)

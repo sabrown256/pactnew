@@ -78,7 +78,7 @@ void PA_transpose_pp(char *ppname, int ntp, int nuv)
                ppname);};
 
 /* name the first edit file */
-    strcpy(s, ppname);
+    SC_strncpy(s, MAXLINE, ppname, -1);
     ps = strchr(s, '.');
     if (ps != NULL)
        ps[1] = 'u';
@@ -136,7 +136,7 @@ static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
     crve     = CMAKE_N(double *, n_arrays);
     stripe   = CMAKE_N(double, n_arrays);
 
-    strcpy(type, SC_DOUBLE_S);
+    SC_strncpy(type, 10, SC_DOUBLE_S, -1);
 
 /* find the maximum possible curve length */
     nptm = _PA.last_cycle - _PA.first_cycle + 1;

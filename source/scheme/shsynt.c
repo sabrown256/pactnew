@@ -151,7 +151,7 @@ object *SS_mk_string_synt(SS_psides *si, char *s)
 void SS_name_map_synt(SS_psides *si, char *d, int nd, char *s)
    {char *pd;
 
-    strcpy(d, s);
+    SC_strncpy(d, nd, s, -1);
 
     pd = d;
     for (pd = d; *pd != '\0'; pd++)

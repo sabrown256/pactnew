@@ -673,7 +673,12 @@ PrintRule:
 
     echo '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }' >> $STDOUT
 
-    fexec $WLog printenv $Val @o sed 's/\\n/\n/g' @o sed 's/\\t/\t/g' @o fa:$STDOUT
+    if ($HSY_OS_Name == "FreeBSD") then
+#       printenv $Val |& sed 's/\\n/\n/g' >>& $STDOUT
+       fexec $WLog printenv $Val @o fa:$STDOUT
+    else
+       fexec $WLog printenv $Val @o sed 's/\\n/\n/g' @o sed 's/\\t/\t/g' @o fa:$STDOUT
+    endif
 
     return
 

@@ -347,7 +347,7 @@ static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
     else
        {PRINT(str, "(%d):  ERROR: %s\n      BAD OBJECT (", si->errlev, s);
 
-	p = SS_object_type_name(obj, atype);
+	p = SS_object_type_name(obj, atype, MAXLINE);
 	if (p == NULL)
 	   {switch (SC_arrtype(obj, -1))
 	       {default :
@@ -842,7 +842,7 @@ void SS_error(SS_psides *si, char *s, object *obj)
  *                     - the specified object O
  */
 
-char *SS_object_type_name(object *o, char *atype)
+char *SS_object_type_name(object *o, char *atype, long nb)
    {int itype;
     char *p;
 
@@ -850,55 +850,55 @@ char *SS_object_type_name(object *o, char *atype)
     p     = atype;
 
     if (itype == SC_INT_I)
-       strcpy(atype, SC_INT_S);
+       SC_strncpy(atype, nb, SC_INT_S, -1);
 
     else if (itype == SC_FLOAT_I)
-       strcpy(atype, SC_FLOAT_S);
+       SC_strncpy(atype, nb, SC_FLOAT_S, -1);
 
     else if (itype == SC_STRING_I)
-       strcpy(atype, "string");
+       SC_strncpy(atype, nb, "string", -1);
 
     else if (itype == SS_CONS_I)
-       strcpy(atype, "pair");
+       SC_strncpy(atype, nb, "pair", -1);
 
     else if (itype == SS_VARIABLE_I)
-       strcpy(atype, "variable");
+       SC_strncpy(atype, nb, "variable", -1);
 
     else if (itype == SS_PROCEDURE_I)
-       strcpy(atype, "procedure");
+       SC_strncpy(atype, nb, "procedure", -1);
 
     else if (itype == SC_BOOL_I)
-       strcpy(atype, "boolean");
+       SC_strncpy(atype, nb, "boolean", -1);
 
     else if (itype == SS_INPUT_PORT_I)
-       strcpy(atype, "input port");
+       SC_strncpy(atype, nb, "input port", -1);
 
     else if (itype == SS_OUTPUT_PORT_I)
-       strcpy(atype, "output port");
+       SC_strncpy(atype, nb, "output port", -1);
 
     else if (itype == SS_EOF_I)
-       strcpy(atype, "eof");
+       SC_strncpy(atype, nb, "eof", -1);
 
     else if (itype == SS_NULL_I)
-       strcpy(atype, "nil");
+       SC_strncpy(atype, nb, "nil", -1);
 
     else if (itype == SS_VECTOR_I)
-       strcpy(atype, "vector");
+       SC_strncpy(atype, nb, "vector", -1);
 
     else if (itype == SS_CHARACTER_I)
-       strcpy(atype, SC_CHAR_S);
+       SC_strncpy(atype, nb, SC_CHAR_S, -1);
 
     else if (itype == SS_HAELEM_I)
-       strcpy(atype, "hash element");
+       SC_strncpy(atype, nb, "hash element", -1);
 
     else if (itype == SS_HASHARR_I)
-       strcpy(atype, "hash array");
+       SC_strncpy(atype, nb, "hash array", -1);
 
     else if (itype == SS_PROCESS_I)
-       strcpy(atype, "process");
+       SC_strncpy(atype, nb, "process", -1);
 
     else if (itype == SS_ERROR_I)
-       strcpy(atype, "error object");
+       SC_strncpy(atype, nb, "error object", -1);
 
     else
        p = NULL;

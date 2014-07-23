@@ -538,7 +538,7 @@ static object *_SSI_strapp(SS_psides *si, object *argl)
          if (SS_stringp(ths))
             {n += SS_STRING_LENGTH(ths);
              s  = CMAKE_N(char, n);
-             strcpy(s, t);
+             SC_strncpy(s, n, t, -1);
              SC_strcat(s, n, SS_STRING_TEXT(ths));
              CFREE(t);
              t = s;};};
@@ -955,7 +955,7 @@ static object *_SS_strtok(SS_psides *si, object *argl,
        text = SS_STRING_TEXT(str);
 
     if (SS_true(flag))
-       {strcpy(t, text);
+       {SC_strncpy(t, MAXLINE, text, -1);
         text = t;};
 
 /* convert sequences such as '\\' 'n' to '\n' */

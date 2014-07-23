@@ -384,7 +384,7 @@ void PA_read_file(char *str, int sfl)
        PA_control_set("global");
 
 /* get the base names set up */
-    strcpy(s, str);
+    SC_strncpy(s, MAXLINE, str, -1);
     SC_strtok(s, ".", t);
     hook = PA_GET_FUNCTION(PFBaseName, "base_name");
     if (hook != NULL)
@@ -437,9 +437,9 @@ void PA_get_commands(FILE *fp, PFGenErr errfnc)
     old_stream          = _PA.input_stream;
     _PA.input_stream = fp;
     if (PA_gs.input_prompt == NULL)
-       strcpy(prompt, "-> ");
+       SC_strncpy(prompt, MAXLINE, "-> ", -1);
     else
-       strcpy(prompt, PA_gs.input_prompt);
+       SC_strncpy(prompt, MAXLINE, PA_gs.input_prompt, -1);
 
 /* dispatch on commands from the deck */
     while (TRUE)
@@ -675,7 +675,7 @@ void PA_nploth(void)
 
     spec = SC_strtok(NULL, "\n", PA_gs.strtok_p);
     if (spec != NULL)
-       strcpy(text, spec);
+       SC_strncpy(text, MAXLINE, spec, -1);
 
     ran = SC_strtok(spec, "{(", PA_gs.strtok_p);
     dom = SC_strtok(NULL, "\n", PA_gs.strtok_p);
@@ -779,7 +779,7 @@ int PA_function_form(char *t, PA_set_spec *spec)
     ps = strchr(s, '(');
     if (ps != NULL)
        {if (*s == '(')
-           strcpy(fnc, "limit");
+           SC_strncpy(fnc, MAXLINE, "limit", -1);
 	else
 	   SC_strncpy(fnc, MAXLINE, SC_firsttok(s, " \t()"), -1);
 
@@ -826,7 +826,7 @@ PA_set_spec *_PA_proc_set_spec(char *s, PA_set_spec *lst)
     double vc;
     PA_set_spec *spec;
 
-    strcpy(t, s);
+    SC_strncpy(t, MAXLINE, s, -1);
 
     spec = CMAKE(PA_set_spec);
 
@@ -922,7 +922,7 @@ NORETURN void PA_done(void)
 
 void PA_name_files(char *base_name, char **ped, char **prs,
 		   char **ppp, char **pgf)
-   {char s[50], t[50], *token, *pt;
+   {char s[50], t[MAXLINE], *token, *pt;
 
 /* silence compilers that warn about uninitialized variables */
     pt = NULL;
@@ -930,10 +930,10 @@ void PA_name_files(char *base_name, char **ped, char **prs,
 /* strip off any directory names */
     token = SC_strtok(base_name, "/\\:", pt);
     if (token != NULL)
-       strcpy(t, token);
+       SC_strncpy(t, MAXLINE, token, -1);
 
     while ((token = SC_strtok(NULL, "/\\:", pt)) != NULL)
-       strcpy(t, token);
+       SC_strncpy(t, MAXLINE, token, -1);
 
 /* name the first edit file */
     if (ped != NULL)

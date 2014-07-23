@@ -27,7 +27,7 @@ void PA_print_var_dim(PA_dimens *vdims)
        printf("NULL\n");
 
     else
-       {strcpy(s, "[");
+       {SC_strncpy(s, MAXLINE, "[", -1);
 	for (pvd = vdims; pvd != NULL; pvd = pvd->next)
 	    {if (pvd->index_max != NULL)
 	        maxi = pvd->index_max;
