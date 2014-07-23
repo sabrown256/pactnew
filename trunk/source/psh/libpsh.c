@@ -1076,7 +1076,7 @@ char *strclean(char *d, size_t nd, char *s, size_t ns)
 		          break;};}
 	     else if (c > '~')
 	        {d[j++] = '[';
-                 snprintf(t, 10, "%03lo", c - 128);
+                 snprintf(t, 10, "%03lo", (unsigned long) (c - 128));
 		 d[j++] = t[0];
 		 d[j++] = t[1];
 		 d[j++] = t[2];}

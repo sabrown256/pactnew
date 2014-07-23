@@ -2326,7 +2326,7 @@ static void _print_pg(process_group *pg, int i)
 	     rs = "   ";
              break;};
 
-    printf("%3d : %s %s %s %6d\n", i+1, aint, bf, rs, ss->pgid);
+    printf("%3d : %s %s %s %6ld\n", i+1, aint, bf, rs, (long) ss->pgid);
 
     return;}
 

@@ -814,7 +814,7 @@ static char *_PD_wr_hyper_index(PDBfile *file, char *name,
  *                 - data tree walkers
  */
 
-static void INLINE _PD_init_stacks(long t, long d)
+INLINE static void _PD_init_stacks(long t, long d)
    {int64_t a, f;
     PD_smp_state *pa;
 

@@ -43,7 +43,9 @@ Tool CC {
 #                 4.9.* >= -fsanitize=address ]
    Flags    =+ [ _env_ = PACT_CC_VERSION ;      # thread checks
                  4.8.* >= -fsanitize=thread -pie ]
-   Flags    =+ -Wl,-O1 -Wl,--discard-all -Wl,--no-undefined -Wl,--build-id=sha1
+   Flags    =+ -Wl,-O1 -Wl,--discard-all -Wl,--build-id=sha1
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;
+                 4.0.* >= -Wl,--no-undefined ]
    Flags    =+ ${OCV_StackP}
    Flags    =+ ${OCV_Bits}
    Flags    =+ ${OCV_PIC}
@@ -90,10 +92,13 @@ Tool CC {
 #
    Flags    =+ -Wextra
    Flags    =+ -Wno-unused-parameter -Wno-unused-function -Wno-unused-label
-   Flags    =+ -Wno-missing-field-initializers -Wno-missing-declarations
+   Flags    =+ -Wno-missing-declarations
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;
+                 4.0.0 >= -Wno-missing-field-initializers ]
 
 # even more warnings
-#   Flags    =+ -Wshadow -Wno-inline
+   Flags    =+ [ _env_ = PACT_CC_VERSION ;
+                 4.0.0 >= -Wshadow -Wno-inline ]
    Flags    =+ -Wlogical-op
    Flags    =+ -Wno-missing-format-attribute
    Flags    =+ [ _env_  = PACT_CC_VERSION ;

@@ -1474,7 +1474,7 @@ void PG_fset_axis_log_scale(PG_device *dev ARG(,,cls), int nd, int *iflg)
  *                   - and almost nobody else should use this routine
  */
  
-static void INLINE _PG_set_space_BND(PG_device *dev, int nd, double *bnd)
+INLINE static void _PG_set_space_BND(PG_device *dev, int nd, double *bnd)
    {int l, n;
     PG_dev_geometry *g;
 
