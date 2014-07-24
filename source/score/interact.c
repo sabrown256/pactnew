@@ -78,7 +78,8 @@ int tSC_banner(void)
    {int bfail = 0;
     char reply[MAXLINE], bstr[MAXLINE];
 
-    strcpy(bstr, "This message is brought to you by SC_banner.");
+    SC_strncpy(bstr, MAXLINE,
+	       "This message is brought to you by SC_banner.", -1);
 
     io_printf(STDOUT, "\n\n***** This is the test for SC_banner ***** \n");
     io_printf(STDOUT, "You should see the message:\n %s \n", bstr);

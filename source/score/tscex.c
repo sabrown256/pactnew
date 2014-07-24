@@ -145,7 +145,7 @@ int main(int argc, char **argv, char **envp)
     to  = DEFAULT_TIMEOUT;
     opt = 1;
 
-    strcpy(mode, "ap");
+    SC_strncpy(mode, 5, "ap", -1);
     for (i = 1; i < argc; i++)
         {if (argv[i][0] == '-')
             {switch (argv[i][1])
@@ -170,13 +170,13 @@ int main(int argc, char **argv, char **envp)
                       return(st);
 		      break;
                  case 'p' :
-                      strcpy(mode, "ap");
+                      SC_strncpy(mode, 5, "ap", -1);
 		      break;
                  case 's' :
-                      strcpy(mode, "as");
+                      SC_strncpy(mode, 5, "as", -1);
 		      break;
                  case 't' :
-                      strcpy(mode, "at");
+                      SC_strncpy(mode, 5, "at", -1);
 		      break;};}
          else
             break;};

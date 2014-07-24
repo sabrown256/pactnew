@@ -247,19 +247,19 @@ static void dmake_sig_handler(int sig)
 
     switch (phase)
        {case 0 :
-             strcpy(s, "initializing");
+             SC_strncpy(s, MAXLINE, "initializing", -1);
 	     break;
         case 1 :
-             strcpy(s, "parsing input");
+             SC_strncpy(s, MAXLINE, "parsing input", -1);
 	     break;
         case 2 :
-             strcpy(s, "analyzing dependencies");
+             SC_strncpy(s, MAXLINE, "analyzing dependencies", -1);
 	     break;
         case 3 :
-             strcpy(s, "executing commands");
+             SC_strncpy(s, MAXLINE, "executing commands", -1);
 	     break;
         case 4 :
-             strcpy(s, "cleaning up");
+             SC_strncpy(s, MAXLINE, "cleaning up", -1);
 	     break;};
 
     io_printf(stdout, "PACT: signal %s (%d) to PID %d while %s for\n",

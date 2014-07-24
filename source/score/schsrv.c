@@ -126,8 +126,8 @@ static int _SC_unpingable(char *type, char *pnglst)
 
     rv = FALSE;
     if ((type != NULL) && (pnglst != NULL))
-       {strcpy(t, type);
-	strcpy(lst, pnglst);
+       {SC_strncpy(t, MAXLINE, type, -1);
+	SC_strncpy(lst, MAXLINE, pnglst, -1);
 
 /* get the net suffix */
 	SC_firsttok(t, "@");
@@ -433,7 +433,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 
         SC_VDSNPRINTF(FALSE, req, fmt);
 
-	strcpy(s, req);
+	SC_strncpy(s, MAXLINE, req, -1);
 	t = SC_strtok(s, "\n", p);
 	if (t == NULL)
 	   rv = FALSE;
@@ -709,7 +709,7 @@ int SC_get_sys_length_max(int local, int full)
 	        {if (strs[i] == NULL)
 		    break;
 
-		 strcpy(t, strs[i]);
+		 SC_strncpy(t, MAXLINE, strs[i], -1);
 		 if (full == FALSE)
 		    {p = strchr(t, '@');
 		     if (p != NULL)

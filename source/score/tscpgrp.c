@@ -180,7 +180,7 @@ int main(int c, char **v, char **envp)
     for (i = 0; i < 10; i++)
         ton[i] = TRUE;
 
-    strcpy(mode, "ap");
+    SC_strncpy(mode, 5, "ap", -1);
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -200,13 +200,13 @@ int main(int c, char **v, char **envp)
 		      exit(1);
 
                  case 'p' :
-                      strcpy(mode, "ap");
+                      SC_strncpy(mode, 5, "ap", -1);
 		      break;
                  case 's' :
-                      strcpy(mode, "as");
+                      SC_strncpy(mode, 5, "as", -1);
 		      break;
                  case 't' :
-                      strcpy(mode, "at");
+                      SC_strncpy(mode, 5, "at", -1);
 		      break;
                  default:
                       n = -SC_stoi(v[i]);

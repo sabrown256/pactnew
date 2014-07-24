@@ -40,7 +40,7 @@ int tSC_regx_match(void)
     int retval;                       /* actual result */
     int fail, failsum = 0;
 
-    strcpy(name, "regxfil");
+    SC_strncpy(name, MAX, "regxfil", -1);
 
 /* process input file */
     fp = SC_fopen_safe(name, "r");
@@ -104,7 +104,7 @@ int tSC_xxxstrp(void)
     ffailsum = 0;
 
 /* process input file of integers */
-    strcpy(name, "intfil");
+    SC_strncpy(name, MAX, "intfil", -1);
     fp = SC_fopen_safe(name, "r");
     if (fp != NULL)
        {io_printf(STDOUT, "\nString\tBase\tExpect\tMeasured Status\n");
@@ -124,7 +124,7 @@ int tSC_xxxstrp(void)
 		 ifailsum, ((ifailsum > 1) ? "s" : ""));
 
 /* process input file of floats */
-    strcpy(name, "fltfil");
+    SC_strncpy(name, MAX, "fltfil", -1);
     fp = SC_fopen_safe(name, "r");
 
     if (fp != NULL)

@@ -1729,7 +1729,7 @@ static void _SC_pool_connection_env(connectdes *pc)
 /* get the current dmake to be the one used on remote hosts
  * to do this send the PATH that we need
  */
-    strcpy(pth, pc->shell);
+    SC_strncpy(pth, MAXLINE, pc->shell, -1);
     t = strpbrk(pth, " \t");
     if (t != NULL)
        *t = '\0';
