@@ -175,7 +175,7 @@ static PG_device *_PG_CGM_open(PG_device *dev,
     if (token != NULL)
        _PG_gattrs.cgm_text_mag = SC_stof(token);
 
-    PG_device_filename(fname, dev->title, ".cgm");
+    PG_device_filename(fname, MAXLINE, dev->title, ".cgm");
 
     cgm_fp = _PG_fopen(fname, "wb");
     if (cgm_fp == NULL)

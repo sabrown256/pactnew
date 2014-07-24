@@ -109,7 +109,7 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
 
 static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
 				 char *name, syment *ep)
-   {int ndd, ndr, clr, ret;
+   {int ndd, ndr, nc, clr, ret;
     char dname[MAXLINE];
     char *info_type, *tail;
     void *info;
@@ -134,8 +134,14 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
        {if (PD_has_directories(file))
            {SC_strncpy(dname, MAXLINE, name, -1);
             tail = strrchr(dname, '/');
-            tail = (tail == NULL) ? dname : tail + 1;
-            strcpy(tail, f->name);
+	    if (tail == NULL)
+	       {tail = dname;
+		nc   = MAXLINE;}
+            else
+	       {tail++;
+		nc = MAXLINE - (tail - dname);};
+
+            SC_strncpy(tail, nc, f->name, -1);
             PD_process_set_name(tail);}
         else
            {SC_strncpy(dname, MAXLINE, f->name, -1);

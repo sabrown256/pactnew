@@ -392,7 +392,8 @@ void _SX_get_menu(SS_psides *si, g_file *po)
 /* _SX_PUSH_MENU_ITEM - add the given symbol table entry to the file menu */
 
 void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
-   {char s[MAXLINE];
+   {int nc;
+    char s[MAXLINE];
     char *var, *lb;
     PDBfile *file;
     SX_menu_item mitem;
@@ -431,8 +432,14 @@ void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
 /* get the label */
         else if (PD_has_directories(file))
            {u = strrchr(s, '/');
-            u = (u == NULL) ? s : u + 1;
-            strcpy(u, lb);}
+	    if (u == NULL)
+	       {u  = s;
+		nc = MAXLINE;}
+	    else
+	       {u++;
+		nc = MAXLINE - (u - s);};
+            SC_strncpy(u, nc, lb, -1);}
+
         else
            SC_strncpy(s, MAXLINE, lb, -1);
 

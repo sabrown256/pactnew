@@ -1350,7 +1350,7 @@ extern void
 extern void
  PG_setup_input(char *s, int nc, size_t nr),
  PG_reset_input(void),
- PG_device_filename(char *fname, char *raw, char *ext),
+ PG_device_filename(char *fname, long nc, char *raw, char *ext),
  PG_query_device(PG_device *dev, int *pdx, int *pdy, int *pnc),
  PG_query_window(PG_device *dev, int *pdx, int *pdy),
  PG_register_range_extrema(PG_device *dev, int nd, double *extr),

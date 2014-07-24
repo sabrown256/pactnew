@@ -1130,7 +1130,7 @@ char *strstri(char *string1, char *string2)
  */
 
 char *subst(char *s, char *a, char *b, size_t n)
-   {size_t i, o;
+   {size_t i, o, nc;
     char *p, *pr, *ps, *pa, *pb, *r;
     static char bfa[1024*BFLRG], bfb[1024*BFLRG];
 
@@ -1144,9 +1144,10 @@ char *subst(char *s, char *a, char *b, size_t n)
     ps = pa;
 	
     if ((s != NULL) && (IS_NULL(a) == FALSE) && (b != NULL))
+       {nc = 1024*BFLRG;
 
 /* make sure s is not bfa to avoid buffer overlap errors */
-       {strcpy(ps, s);
+	nstrncpy(ps, nc, s, -1);
 
 	o = 0;
 	for (i = 0; i < n; i++)
@@ -1155,10 +1156,10 @@ char *subst(char *s, char *a, char *b, size_t n)
 	        {pr = p + strlen(a);
 		 *p = '\0';
 		 r  = (i & 1) ? pa : pb;
-		 strcpy(r, ps);
-		 strcat(r, b);
+		 nstrncpy(r, nc, ps, -1);
+		 nstrcat(r, nc, b);
 		 o = strlen(r);
-		 strcat(r, pr);
+		 nstrcat(r, nc, pr);
 		 ps = r;}
 	     else
 	        break;};};
@@ -1579,7 +1580,7 @@ char *run(int echo, char *fmt, ...)
  */
 
 char *grep(FILE *fp, char *name, char *fmt, ...)
-   {int i, clf, err;
+   {int i, nc, clf, err;
     char t[BFLRG], s[BFLRG];
     char *p;
     static char r[1024*BFLRG];
@@ -1597,7 +1598,9 @@ char *grep(FILE *fp, char *name, char *fmt, ...)
        clf = FALSE;
 
     if (fp != NULL)
-       {fseek(fp, 0, SEEK_SET);
+       {nc = 1024*BFLRG;
+
+	fseek(fp, 0, SEEK_SET);
 
 	for (i = 0; TRUE; i++)
 	    {p = fgets(t, BFLRG, fp);
@@ -1606,7 +1609,7 @@ char *grep(FILE *fp, char *name, char *fmt, ...)
 
 	     p = strstr(t, s);
 	     if (p != NULL)
-	        strcat(r, t);};
+	        nstrcat(r, nc, t);};
 
 	if (clf == TRUE)
 	   err = fclose_safe(fp);
@@ -2035,8 +2038,8 @@ char *append_tok(char *s, int dlm, char *fmt, ...)
 	p  = MAKE_N(char, nc);
 	if (p != NULL)
 	   {nstrncpy(p, nc, s, -1);
-	    strcat(p, delim);
-	    strcat(p, t);};
+	    nstrcat(p, nc, delim);
+	    nstrcat(p, nc, t);};
 	FREE(s);}
 
     else

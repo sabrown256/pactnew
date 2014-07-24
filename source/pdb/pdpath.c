@@ -130,7 +130,7 @@ struct s_parse_frame
     int index;};
 
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* DPSTACK - print the locator stack for debug purposes */
@@ -190,8 +190,8 @@ void dpstack(int tid, int n)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* DSTCKTR - debugging aid */
 
@@ -229,8 +229,8 @@ static void dstcktr(int cmnd, int i, int64_t addr, long numb, int end)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_RL_FRAME_BLOCKS - release blocks on the locator stack between
  *                     - NMN and NMX except for NE
@@ -250,8 +250,8 @@ static void _PD_rl_frame_blocks(PD_smp_state *pa, int nmn, int nmx, long ne)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_RL_FRAMES - free the set parse frames */
 
@@ -264,8 +264,8 @@ static void _PD_rl_frames(PD_smp_state *pa)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_SAVE_STACK - save the state of the current parse */
 
@@ -281,8 +281,8 @@ static void _PD_save_stack(PD_smp_state *pa)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_RESTORE_STACK - restore the state of the previous parse */
 
@@ -295,8 +295,8 @@ static void _PD_restore_stack(PD_smp_state *pa)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_NUM_INDIRECTS - count up the number of members of the given
  *                   - structure with indirect references
@@ -322,8 +322,8 @@ intb _PD_num_indirects(char *type, hasharr *tab)
 
     return(rv);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_BLOCK_DEREF_ADDR - handle block manipulations
  *                      - for deref_addr variants
@@ -354,8 +354,8 @@ static void _PD_block_deref_addr(PD_smp_state *pa, PDBfile *file,
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_BLOCK_INDEX_DEREF - handle block manipulations
  *                       - for index_deref variants
@@ -432,11 +432,11 @@ static SC_array *_PD_block_index_deref(locator *stck, long n,
 
     return(nbl);}
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-/*                           ITAG REDUCE ROUTINES                            */
+/*                          ITAG REDUCE ROUTINES                            */
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_SKIP_OVER - given a number of units, skip over that many units
  *               - including subunits referenced by the top level units
@@ -499,7 +499,7 @@ int64_t _PD_skip_over(PDBfile *file, long skip, int noind)
     return(addr);}
 
 /*--------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_ITAG_DEREF_ADDR - dereference a pointer and return the correct address
  *                     - of the pointee
@@ -559,8 +559,8 @@ static int64_t _PD_itag_deref_addr(PD_smp_state *pa, int n)
 
     return(addr);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_ITAG_INDEX_DEREF - handle indexing where a pointered type was just
  *                      - dereferenced this will mean skipping over itags
@@ -700,8 +700,8 @@ static int64_t _PD_itag_index_deref(PD_smp_state *pa, int n,
 
     return(addr);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_ITAG_MEMBER_DEREF - find the member where a pointered type was just
  *                       - dereferenced this will mean skipping over itags
@@ -772,8 +772,8 @@ static int64_t _PD_itag_member_deref(PD_smp_state *pa, int n)
 
     return(addr);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_ITAG_REDUCE - reduce the parse tree
  *                 - this means looping over the locator stack thru the
@@ -875,7 +875,7 @@ static long _PD_itag_reduce(PD_smp_state *pa)
     else
        {/* dpstack(pa, nmx); */
 
-        strcpy(CURRENT(intype), type);
+        SC_strncpy(CURRENT(intype), MAXLINE, type, -1);
 
         CURRENT(number)      = numb;
         CURRENT(ad.diskaddr) = addr;
@@ -886,11 +886,11 @@ static long _PD_itag_reduce(PD_smp_state *pa)
 
     return(val);}
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-/*                         ITAGLESS REDUCE ROUTINES                          */
+/*                        ITAGLESS REDUCE ROUTINES                          */
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_DEREF_ADDR - dereference a pointer and return the correct address
  *                    - of the pointee
@@ -937,8 +937,8 @@ static int64_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
 
     return(addr);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_INDEX_DEREF - handle indexing where a pointered type was just
  *                     - dereferenced this will mean skipping over itags
@@ -995,8 +995,8 @@ static int64_t _PD_ptr_index_deref(PD_smp_state *pa, int n,
 
     return(addr);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_MEMBER_DEREF - find the member where a pointered type was just
  *                      - dereferenced this will mean skipping over itags
@@ -1026,8 +1026,8 @@ static int64_t _PD_ptr_member_deref(PD_smp_state *pa, int n)
 
     return(addr);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_REDUCE - reduce the parse tree
  *                - this means looping over the locator stack thru the
@@ -1134,7 +1134,7 @@ static long _PD_ptr_reduce(PD_smp_state *pa)
     else
        {/* dpstack(pa, nmx); */
 
-        strcpy(CURRENT(intype), type);
+        SC_strncpy(CURRENT(intype), MAXLINE, type, -1);
 
         CURRENT(number)      = numb;
         CURRENT(ad.diskaddr) = addr;
@@ -1145,11 +1145,11 @@ static long _PD_ptr_reduce(PD_smp_state *pa)
 
     return(val);}
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-/*                               PARSE ROUTINES                              */
+/*                              PARSE ROUTINES                              */
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_SHIFT - perform a SHIFT operation by
  *           - pushing the input info onto the stack
@@ -1175,7 +1175,7 @@ static void _PD_shift(PD_smp_state *pa, char *name, char *type,
 
     SC_MEM_INIT(locator, FRAME(stack)+FRAME(n));
 
-    strcpy(CURRENT(intype), type);
+    SC_strncpy(CURRENT(intype), MAXLINE, type, -1);
 
     CURRENT(number)      = numb;
     CURRENT(ad.diskaddr) = addr;
@@ -1186,8 +1186,8 @@ static void _PD_shift(PD_smp_state *pa, char *name, char *type,
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_DO_GOTO - carry out a GOTO command
  *             - this should be starting out with something which is
@@ -1238,8 +1238,8 @@ static void _PD_do_goto(PD_smp_state *pa, char *name)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_IS_MEMBER - determine whether or not the given member is the
  *               - named member and return TRUE iff it is
@@ -1263,8 +1263,8 @@ static int _PD_is_member(char *name, memdes *desc, hasharr *tab, long *pns)
 
     return(rv);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_GET_TYPE_MEMBER - get the true type of the member
  *                     - handle any casts
@@ -1305,7 +1305,7 @@ static char *_PD_get_type_member(PDBfile *file, PD_smp_state *pa,
             int i;
 
 /* build the path of the member which points to the real type */
-	    strcpy(s, path_name);
+	    SC_strncpy(s, MAXLINE, path_name, -1);
             for (i = strlen(s) - 1; i >= 0; i--)
 	        {c = s[i];
 		 if ((c == '>') || (c == '.'))
@@ -1324,8 +1324,8 @@ static char *_PD_get_type_member(PDBfile *file, PD_smp_state *pa,
 
     return(mtype);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_DO_DEREF - carry out a DEREF command */
 
@@ -1355,8 +1355,8 @@ static void _PD_do_deref(PD_smp_state *pa)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_DO_MEMBER - carry out a MEMBER command */
 
@@ -1388,7 +1388,7 @@ static void _PD_do_member(PD_smp_state *pa, char *name, int deref_flag)
     else
        snprintf(t, MAXLINE, "%s.%s", FRAME(path), name);
 
-    strcpy(FRAME(path), t);
+    SC_strncpy(FRAME(path), MAXLINE, t, -1);
 
 /* NOTE: we had better be properly dereferenced at this point!!!!!!!
  * DO NOT IMAGINE THAT ANYTHING DIFFERENT CAN BE DONE!!!!!!
@@ -1439,8 +1439,8 @@ static void _PD_do_member(PD_smp_state *pa, char *name, int deref_flag)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_DO_INDEX - carry out a INDEX command
  *              - this must always set the current location
@@ -1468,7 +1468,7 @@ static void _PD_do_index(PD_smp_state *pa, char *expr)
 
 /* update the path */
     snprintf(t, MAXLINE, "%s[%s]", FRAME(path), expr);
-    strcpy(FRAME(path), t);
+    SC_strncpy(FRAME(path), MAXLINE, t, -1);
 
     dims = CURRENT(dims);
     type = CURRENT(intype);
@@ -1551,8 +1551,8 @@ static void _PD_do_index(PD_smp_state *pa, char *expr)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_DO_CAST - carry out a CAST command */
 
@@ -1566,7 +1566,7 @@ static void _PD_do_cast(PD_smp_state *pa, char *type)
 
 /* update the path */
     snprintf(t, MAXLINE, "(%s) %s", type, FRAME(path));
-    strcpy(FRAME(path), t);
+    SC_strncpy(FRAME(path), MAXLINE, t, -1);
 
     da = CURRENT(ad.diskaddr);
     in = CURRENT(indirect);
@@ -1578,12 +1578,12 @@ static void _PD_do_cast(PD_smp_state *pa, char *type)
 
     _PD_shift(pa, "", s, dm, bl, n, da, in, CAST_C);
 
-    strcpy(OUTTYPE, type);
+    SC_strncpy(OUTTYPE, MAXLINE, type, -1);
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_DO_DIGRESS - carry out a DIGRESS command */
 
@@ -1605,15 +1605,15 @@ static long _PD_do_digress(PD_smp_state *pa, char *expr)
        val = _PD_ptr_reduce(pa);
 
 /* restore the path */
-    strcpy(FRAME(path), t);
+    SC_strncpy(FRAME(path), MAXLINE, t, -1);
 
     return(val);}
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-/*                           LEXICAL SCANNER ROUTINES                        */
+/*                          LEXICAL SCANNER ROUTINES                        */
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_NEXT_TOKEN - figure out whether the specified token is an
  *                - IDENTIFIER or an INTEGER
@@ -1632,7 +1632,7 @@ static int _PD_next_token(PD_smp_state *pa, int start)
  */
     tok = SC_strtok(s, " \t\f\n\r", t);
     if (tok != NULL)
-       {strcpy(TEXT, tok);
+       {SC_strncpy(TEXT, MAXLINE, tok, -1);
 
 	NUM_VAL = SC_strtol(TEXT, &end, 0);
 	tok     = TEXT + strlen(TEXT);
@@ -1913,8 +1913,8 @@ static void _PD_disp_rules(PD_smp_state *pa, int rule, char **pvt)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_PARSE - parse an expression which is in the lexical buffer of
  *           - the current parse frame
@@ -2073,11 +2073,11 @@ static void _PD_parse(PD_smp_state *pa)
 	 lps    = FRAME(ps);
 	 lstate = FRAME(state);};}
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-/*                            EXTERNAL ROUTINES                              */
+/*                           EXTERNAL ROUTINES                              */
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _PD_EFFECTIVE_EP - look up the symbol table entry for the named quantity
  *                  - return an effective symbol table entry which contains
@@ -2197,5 +2197,5 @@ syment *_PD_effective_ep(PDBfile *file, char *name, int flag, char *fullname)
 
     return(ep);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

@@ -101,11 +101,11 @@ PG_device *PG_open_device(PG_device *dev ARG(,,cls),
 
 /* PG_DEVICE_FILENAME - make a good file name for a device */
 
-void PG_device_filename(char *fname, char *raw, char *ext)
+void PG_device_filename(char *fname, long nc, char *raw, char *ext)
    {char *s, *pf;
 
     if (fname != NULL)
-       {strcpy(fname, raw);
+       {SC_strncpy(fname, nc, raw, -1);
 
 	SC_strtok(fname, " \t\n\r\\?~,;:<>/'`\"[]{}()=+|!@#$%^&*", s);
 
@@ -114,7 +114,7 @@ void PG_device_filename(char *fname, char *raw, char *ext)
 /* if the file name already has the extension don't cat it on again */
 	   {pf = fname + (strlen(fname) - strlen(ext));
 	    if (strcmp(pf, ext) != 0)
-	       strcat(fname, ext);};};
+	       SC_strcat(fname, nc, ext);};};
 
     return;}
 
