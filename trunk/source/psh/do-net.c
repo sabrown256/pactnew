@@ -1030,8 +1030,8 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 
     running   = TRUE;
     cfgfail   = FALSE;
-    strcpy(hst, "--- pending ---");
-    strcpy(cfg, "---");
+    nstrncpy(hst, BFLRG, "--- pending ---", -1);
+    nstrncpy(cfg, BFLRG, "---", -1);
     rmh[0]    = '\0';
     dbop[0]   = '\0';
     usetmp[0] = '\0';
@@ -1097,7 +1097,7 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 	   else if (strcmp(p, "DO-NET:") == 0)
 	      {p = pop_tok(NULL, 1, " \t\n");
                if ((p != NULL) && (strcmp(p, "Exec") == 0))
-		  strcpy(hst, "--- started ---");
+		  nstrncpy(hst, BFLRG, "--- started ---", -1);
 	       if ((p != NULL) && (strcmp(p, "configure") == 0))
 		  {o = pop_tok(NULL, 1, " \t\n");
 		   p = pop_tok(NULL, 1, " \t\n");
@@ -2149,7 +2149,7 @@ static void readhost(donetdes *st, int ilg)
        st->system = STRSAVE("code");
 
     if (IS_NULL(st->handtout) == TRUE)
-       strcpy(st->handtout, "pass");
+       nstrncpy(st->handtout, BFLRG, "pass", -1);
 
     if ((strcmp(linst, "yes") == 0) && (st->install == TRUE))
        st->localinstall = TRUE;
@@ -3396,7 +3396,7 @@ static int process_args(donetdes *st, int c, char **v)
 		      st->install = FALSE;
 		      break;
 		 case 'x':
-		      strcpy(st->ssh, "ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no");
+		      nstrncpy(st->ssh, BFLRG, "ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no", -1);
 		      break;};}
 
 	 else if (IS_NULL(st->hostfile) == TRUE)
@@ -3506,10 +3506,10 @@ int main(int c, char **v)
     state.tag            = "none";
     state.separator      = "-----------------------------------------------------------------";
 
-    strcpy(state.stamp, run(FALSE, "date +%%m_%%d_%%H_%%M"));
+    nstrncpy(state.stamp, BFLRG, run(FALSE, "date +%%m_%%d_%%H_%%M"), -1);
     unamef(host, BFLRG, "n");
 
-    strcpy(uhost, host);
+    nstrncpy(uhost, BFLRG, host, -1);
     p = strchr(uhost, '.');
     if (p != NULL)
        *p = '\0';
@@ -3518,7 +3518,7 @@ int main(int c, char **v)
     state.havetimeouts = FALSE;
     state.inintr       = FALSE;
 
-    strcpy(state.handtout, "pass");
+    nstrncpy(state.handtout, BFLRG, "pass", -1);
 
     state.cargs = append_tok(state.cargs, ' ', "-v");
     state.cargs = append_tok(state.cargs, ' ', "-t");

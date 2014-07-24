@@ -1393,7 +1393,7 @@ expr *CC_parse_string_c()
 	s  = CMAKE_N(char, ns);
 	memset(s, 0, ns);};
 
-    strcpy(s, "\"");
+    SC_strncpy(s, ns, "\"", -1);
     in   = TRUE;
     done = FALSE;
     for (i = 1; (done == FALSE) && (i < ns); i++)

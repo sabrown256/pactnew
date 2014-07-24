@@ -1728,7 +1728,7 @@ object *SS_parse_string_c(SS_psides *si)
 	s  = CPMAKE_N(char, ns, 3);
 	memset(s, 0, ns);};
 
-    strcpy(s, "\"");
+    SC_strncpy(s, ns, "\"", -1);
     in   = TRUE;
     done = FALSE;
     for (i = 1; (done == FALSE) && (i < ns); i++)

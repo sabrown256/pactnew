@@ -616,7 +616,7 @@ static int init(atdbgdes *st)
     rv = TRUE;
 
     unamef(st->os, BFLRG, "s");
-    strcpy(st->opt, "-q");
+    nstrncpy(st->opt, BFLRG, "-q", -1);
     st->pname[0] = '\0';
     st->exe[0]   = '\0';
     st->dbg[0]   = '\0';
@@ -747,8 +747,8 @@ int main(int c, char **v)
     atdbgdes state;
 
 /* find the directory with atdbg */
-    strcpy(exe, cwhich(v[0]));
-    strcpy(bindir, path_head(exe));
+    nstrncpy(exe, BFLRG, cwhich(v[0]), -1);
+    nstrncpy(bindir, BFLRG, path_head(exe), -1);
 
 /* locate the tools needed for subshells */
     build_path(NULL,

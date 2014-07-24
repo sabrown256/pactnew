@@ -1630,7 +1630,7 @@ char *get_date(void)
     p = NULL;
     t = time(NULL);
     if (t > 0)
-       {strcpy(s, ctime(&t));
+       {nstrncpy(s, BFLRG, ctime(&t), -1);
 	LAST_CHAR(s) = '\0';
 	p = s;};
 
