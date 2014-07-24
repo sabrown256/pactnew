@@ -51,7 +51,7 @@ static int expand_path(char *name, int fullp, int nt, int dt, int rv)
 	if (ok != 0)
 	   rv |= 1;};
     if (ok != 0)
-       strcpy(pname, name);
+       nstrncpy(pname, PATH_MAX, name, -1);
 
     fname = NULL;
     for (i = 0; i < nt; i++)

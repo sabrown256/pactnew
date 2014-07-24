@@ -136,9 +136,9 @@ char *eval(char *expr, int nc, char *varn)
         else if ((strstr(rv, "=~") != NULL) || (strstr(rv, "!~") != NULL))
 	   {rv = run(FALSE, "csh -f -c '(set noglob ; if %s echo yes)'", rv);
 	    if (strcmp(rv, "yes") == 0)
-	       strcpy(res, "1 -eq 1");
+	       nstrncpy(res, 20, "1 -eq 1", -1);
 	    else
-	       strcpy(res, "1 -eq 0");
+	       nstrncpy(res, 20, "1 -eq 0", -1);
 
 	    rv = res;}
 

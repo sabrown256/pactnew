@@ -269,8 +269,8 @@ static void push_struct(char *item, char *collection, int itype)
     char *p, *ps;
     gt_entry *ge;
 
-    strcpy(t, item);
-    strcpy(lst, collection);
+    nstrncpy(t, BFLRG, item, -1);
+    nstrncpy(lst, BFLRG, collection, -1);
 
     ps = lst;
     while (TRUE)
@@ -1310,7 +1310,7 @@ static void parse_line(client *cl, char *s,
    {char t[BFLRG];
     char *p;
 
-    strcpy(t, s);
+    nstrncpy(t, BFLRG, s, -1);
 
     p = strtok(t, " \t");
     if (p != NULL)
@@ -1461,7 +1461,7 @@ static void default_var(client *cl)
         note(NULL, "%s\n", sa[i]);
     free_strings(sa);
 
-    strcpy(gst.psy_cfg, path_tail(gst.cfgf));
+    nstrncpy(gst.psy_cfg, BFLRG, path_tail(gst.cfgf), -1);
 
     unamef(gst.host,  BFLRG, "n");
     unamef(gst.os,    BFLRG, "s");
@@ -1492,7 +1492,7 @@ static void default_var(client *cl)
     snprintf(gst.env_mdl,  BFLRG, "%s/env-%s.mdl", gst.dir.etc, gst.code);
 
 /* variable defaults */
-    strcpy(gst.def_tools, "");
+    nstrncpy(gst.def_tools, BFLRG, "", -1);
 
     push_struct("Glb", gst.def_groups, STACK_GROUP);
 
@@ -2587,7 +2587,7 @@ static void read_config_files(client *cl)
     dt = wall_clock_time();
 
     push_file(gst.cfgf, STACK_FILE);
-    strcpy(gst.cfgf, gst.fstck.file[gst.fstck.n-1].name);
+    nstrncpy(gst.cfgf, BFLRG, gst.fstck.file[gst.fstck.n-1].name, -1);
     pop_file();
 
     if (file_exists("std/program-init") == TRUE)
@@ -2859,7 +2859,7 @@ int main(int c, char **v, char **env)
     nstrncpy(gst.dir.mng, BFLRG, run(BOTH, "pwd"), -1);
 
     nstrncpy(gst.dir.base, BFLRG, path_head(gst.dir.mng), -1);
-    strcpy(gst.cfgf, "DEFAULT");
+    nstrncpy(gst.cfgf, BFLRG, "DEFAULT", -1);
 
     nstrncpy(ib, BFLRG, "none", -1);
     strct  = "0";

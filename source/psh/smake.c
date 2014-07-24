@@ -49,11 +49,11 @@ void manage_tmp_dir(statedes *st, int start)
 
 /* do this at the beginning */
     if (start == TRUE)
-       {strcpy(st->srcdir, st->cwd);
+       {nstrncpy(st->srcdir, BFLRG, st->cwd, -1);
 
 #ifdef USE_TMP_DIR
         if (strncmp(st->cwd, "/tmp/pact_make_", 15) == 0)
-	   strcpy(st->tmpdir, st->cwd);
+	   nstrncpy(st->tmpdir, BFLRG, st->cwd, -1);
         else
 	    snprintf(st->tmpdir, BFLRG, "/tmp/pact_make_%d",
 		     (int) getpid());
@@ -197,7 +197,7 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
     manage_tmp_dir(st, TRUE);
 
 /* write the command line */
-    strcpy(cmd, "(");
+    nstrncpy(cmd, BFLRG, "(", -1);
 	
     i = strlen(st->cwd) - 7;
     i = max(i, 0);
@@ -355,18 +355,18 @@ static int setup_env(statedes *st, char *src)
 	st->sys[BFLRG-1] = '\0';}
 
     else
-       {strcpy(s, st->root);
+       {nstrncpy(s, BFLRG, st->root, -1);
 
 	ps = pop_path(s);
 	p  = pop_path(s);
 
 /* if root is of the form /.../dev/<PSY_id> use <PSY_id> */
 	if (strcmp(p, "dev") == 0)
-	   strcpy(st->sys, ps);
+	   nstrncpy(st->sys, BFLRG, ps, -1);
 
 /* otherwise use the configured PSY_ID */
 	else
-	   strcpy(st->sys, PSY_ID);};
+	   nstrncpy(st->sys, BFLRG, PSY_ID, -1);};
 
     snprintf(st->arch, BFLRG, "%s%s", PSY_Prefix, st->sys);
 

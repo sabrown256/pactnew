@@ -965,17 +965,17 @@ void dprdio(char *tag, iodes *pio)
 	src = pio->fanto[IO_FAN_OUT];
 
 	if (dst == -1)
-	   strcpy(sdst, "   ");
+	   nstrncpy(sdst, BFLRG, "   ", -1);
 	else
 	   snprintf(sdst, BFLRG, "%3d", dst);
 
 	if (src == -1)
-	   strcpy(ssrc, "   ");
+	   nstrncpy(ssrc, BFLRG, "   ", -1);
 	else
 	   snprintf(ssrc, BFLRG, "%3d", src);
 
 	if (nc == -1)
-	   strcpy(snc, "    ");
+	   nstrncpy(snc, BFLRG, "    ", -1);
 	else
 	   snprintf(snc, BFLRG, "(%2d)", nc);
 
@@ -1530,7 +1530,7 @@ static process *_job_fork(process *pp, process *cp, char *mode,
     pp->a = a;
     if (pp->cmd == NULL)
        pp->cmd = _job_command_str(pp->arg);
-    strcpy(pp->mode, mode);
+    nstrncpy(pp->mode, 10, mode, -1);
 
     fds = list_fds(pp->pg);
 
