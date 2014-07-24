@@ -270,7 +270,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 	     PG_fset_text_color(dev, tc, TRUE);};
 
 /* prep the label text */
-	 strcpy(label, s);
+	 SC_strncpy(label, MAXLINE, s, -1);
 	 if (slf)
 	    SC_squeeze_blanks(label);
 	 if (strlen(label) > llf)

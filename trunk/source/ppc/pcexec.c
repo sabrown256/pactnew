@@ -284,7 +284,7 @@ int main(int argc, char **argv)
     lg          = FALSE;
     info        = FALSE;
     to          = 1000000;
-    strcpy(mode, "w");
+    SC_strncpy(mode, 5, "w", -1);
     if (argc < 2)
        {usage();
         return(1);};
@@ -316,16 +316,16 @@ int main(int argc, char **argv)
 		      i++;
 		      break;
                  case 'p' :
-		      strcpy(mode, "wp");
+		      SC_strncpy(mode, 5, "wp", -1);
 		      break;
                  case 'q' :
 		      quiet = TRUE;
 		      break;
                  case 's' :
-		      strcpy(mode, "ws");
+		      SC_strncpy(mode, 5, "ws", -1);
 		      break;
                  case 't' :
-		      strcpy(mode, "wt");
+		      SC_strncpy(mode, 5, "wt",  -1);
 		      break;};}
          else
             break;};

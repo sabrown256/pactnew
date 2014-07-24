@@ -242,7 +242,7 @@ boolean Default_Init(void)
 
     /* INPUT_CONVERT */
     /* inputConversion = string;      (default: "") */
-    strcpy(inputConversion, "*");     /* our default */
+    strncpy(inputConversion, "*", 1024);     /* our default */
 
     /* IO_SERVER_CONVERT */
     /* ioConversion = string;         (default: "") */
@@ -259,7 +259,7 @@ boolean Default_Init(void)
 
     /* OUTPUT */
     /* outputFileName = filename;     (default: "") */
-    strcpy(outputFileName, "plots.mpg"); /* our default */
+    strncpy(outputFileName, "plots.mpg", 256); /* our default */
 
     /* PATTERN */
     /* framePattern = string;         (default: NULL)
@@ -267,7 +267,7 @@ boolean Default_Init(void)
      */
     framePattern = (char *)malloc(sizeof(char)*2);
     if (framePattern != NULL)
-       strcpy(framePattern, "i");     /* our default */
+       strncpy(framePattern, "i", 2);     /* our default */
     framePatternLen = 1;              /* our default */
 
     /* PIXEL */

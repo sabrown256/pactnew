@@ -600,7 +600,7 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
     if (_PG.device_table == NULL)
        PG_register_device(NULL, NULL);
 
-    strcpy(bf, name);
+    SC_strncpy(bf, MAXLINE, name, -1);
     pname = SC_firsttok(bf, " \t\r\n");
     fnc   = SC_HASHARR_LOOKUP_FUNCTION(_PG.device_table, PFRDev, pname);
     ok    = FALSE;

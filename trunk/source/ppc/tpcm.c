@@ -263,7 +263,7 @@ int main(int argc, char **argv, char **envp)
     interrupts  = TRUE;
     n           = 2;
     to          = DEFAULT_TIMEOUT;
-    strcpy(mode, "wp");
+    SC_strncpy(mode, 5, "wp", -1);
     for (i = 1; i < argc; i++)
         {if (argv[i][0] == '-')
             {switch (argv[i][1])
@@ -290,13 +290,13 @@ int main(int argc, char **argv, char **envp)
                       n = SC_stoi(argv[++i]);
 		      break;
                  case 'p' :
-                      strcpy(mode, "wp");
+                      SC_strncpy(mode, 5, "wp", -1);
 		      break;
                  case 's' :
-                      strcpy(mode, "ws");
+                      SC_strncpy(mode, 5, "ws", -1);
 		      break;
                  case 't' :
-                      strcpy(mode, "wt");
+                      SC_strncpy(mode, 5, "wt", -1);
 		      break;};}
          else
             break;};

@@ -31,7 +31,7 @@ int PM_set_opers(PM_set *set)
     if (set != NULL)
        {ret = TRUE;
 
-	strcpy(type, set->element_type);
+	SC_strncpy(type, MAXLINE, set->element_type, -1);
 	token = SC_strtok(type, " (*", s);
 
 	if (token == NULL)

@@ -301,7 +301,7 @@ static void test_3d_new(void)
 	     ps = strtok(s, "\n");
 	     if ((ps == NULL) || (ps[0] == '\0'))
 	        break;
-	     strcpy(s, ps);
+	     SC_strncpy(s, MAXLINE, ps, -1);
 
 	     switch (s[0])
 	        {case 'a':

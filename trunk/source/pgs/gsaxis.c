@@ -736,11 +736,13 @@ int PG_set_axis_attributes(PG_device *dev, ...)
 		 break;
 
             case AXIS_X_FORMAT :
-	         strcpy(_PG_gattrs.axis_label_x_format, SC_VA_ARG(char *));
+	         CFREE(_PG_gattrs.axis_label_x_format);
+		 _PG_gattrs.axis_label_x_format = CSTRSAVE(SC_VA_ARG(char *));
 		 break;
 
             case AXIS_Y_FORMAT :
-	         strcpy(_PG_gattrs.axis_label_y_format, SC_VA_ARG(char *));
+	         CFREE(_PG_gattrs.axis_label_y_format);
+		 _PG_gattrs.axis_label_y_format = CSTRSAVE(SC_VA_ARG(char *));
 		 break;
 
             default :
@@ -944,8 +946,8 @@ static void _PG_sprintf(char *string, long nc,
  *                    - since 'g' format is a dog
  */
 
-static void _PG_axis_label_fmt(PG_device *dev,
-			       char *format, double *pdx, double *pdy,
+static void _PG_axis_label_fmt(PG_device *dev, char *format, long nc,
+			       double *pdx, double *pdy,
 			       double *ptol, char *fmt,
 			       PG_axis_tick_def *td)
    {int i, n, ti;
@@ -958,7 +960,7 @@ static void _PG_axis_label_fmt(PG_device *dev,
 
     g = &dev->g;
 
-    strcpy(format, fmt);
+    SC_strncpy(format, nc, fmt, -1);
 
     dx = td->dx;
     n  = td->n;
@@ -1093,7 +1095,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
     inc = 1;
 
 /* determine whether to use 'e' or 'f' format since 'g' format is a dog */
-    _PG_axis_label_fmt(dev, format, &ldx[0], &ldx[1], &tol, fmt, td);
+    _PG_axis_label_fmt(dev, format, 10, &ldx[0], &ldx[1], &tol, fmt, td);
 
     switch (lt)
        {case AXIS_TICK_LEFT :

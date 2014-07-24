@@ -807,7 +807,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 /* NOTE: temporary for diagnostics */
     PM_vector_extrema(3, n, r, box);
 
-    strcpy(ltype, type);
+    SC_strncpy(ltype, MAXLINE, type, -1);
     SC_strtok(ltype, " *", s);
     if (ltype != NULL)
        {id = SC_type_id(ltype, FALSE);

@@ -185,7 +185,7 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
     h      = g->f;
     domain = h->domain;
 
-    strcpy(bf, domain->element_type);
+    SC_strncpy(bf, MAXLINE, domain->element_type, -1);
     mtype   = SC_strtok(bf, " *", s);
     npts    = domain->n_elements;
     r       = (double **) domain->elements;
@@ -208,7 +208,7 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
     if (range == NULL)
        return;
 
-    strcpy(bf, range->element_type);
+    SC_strncpy(bf, MAXLINE, range->element_type, -1);
     npts  = range->n_elements;
     nd    = range->dimension_elem;
     mtype = SC_strtok(bf, " *", s);
