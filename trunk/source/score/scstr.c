@@ -130,7 +130,7 @@ char *SC_strsavec(char *s, int memfl,
 
 	p = _SC_ALLOC_N(sz, sizeof(char), &opt);
 	if (p != NULL)
-	   {strcpy(p, s);
+	   {SC_strncpy(p, sz, s, -1);
 	    p[sz-1] = '\0';};};
 
     return(p);}
@@ -261,7 +261,7 @@ char *SC_dstrcpy(char *dst, char *src)
        {ld = 2*ls;
 	CREMAKE(dst, char, ld);};
 
-    s = strcpy(dst, src);
+    s = SC_strncpy(dst, ld, src, -1);
 
     return(s);}
 
@@ -343,11 +343,12 @@ char *SC_strstri(char *string1, char *string2)
 /* SC_STRREV - copy the string onto itself in reverse order */
 
 char *SC_strrev(char *s)
-   {int i;
+   {int i, nc;
     char *t, *p;
 
+    nc = strlen(s) + 1;
     p = s;
-    i = strlen(s) + 1;
+    i = nc;
     t = CMAKE_N(char, i);
 
     if (t == NULL)
@@ -357,7 +358,7 @@ char *SC_strrev(char *s)
     while (*p)
        t[--i] = *p++;
 
-    strcpy(s, t);
+    SC_strncpy(s, nc, t, -1);
     CFREE(t);
 
     return(s);}
@@ -526,8 +527,8 @@ int SC_str_icmp(char *s, char *t)
     rv = 0;
 
     if ((s != NULL) && (t != NULL))
-       {strcpy(p, s);
-	strcpy(q, t);
+       {SC_strncpy(p, MAXLINE, s, -1);
+	SC_strncpy(q, MAXLINE, t, -1);
 	SC_str_upper(p);
 	SC_str_upper(q);
 
@@ -767,7 +768,7 @@ int SC_isspace(int c)
  */
 
 char *SC_firsttok(char *s, char *delim)
-   {int nb;
+   {int nb, nc;
     char *t, *r, *tb;
         
     if (*s == '\0')
@@ -790,20 +791,21 @@ char *SC_firsttok(char *s, char *delim)
        {*r++ = '\0';
 
 /* copy the token into a temporary */
-        strcpy(tb, t);
+        SC_strncpy(tb, nb, t, -1);
 
 /* copy the remainder down into the original string */
-        memmove(s, r, strlen(r)+1);
+	nc = strlen(r) + 1;
+        memmove(s, r, nc);
 
 /* copy the token in the space left over */
-        t = s + strlen(s) + 1;
+        t = s + nc;
         strcpy(t, tb);}
 
 /* if we are at the end of the string we may overindex the string
  * by adding one more character (sigh)
  */
     else
-       {strcpy(tb, t);
+       {SC_strncpy(tb, nb, t, -1);
         *s = '\0';
         t  = s + 1;
         strcpy(t, tb);};
@@ -838,7 +840,7 @@ char *_SC_quoted_tok(char *s, char *qdelim)
 
 /* copy the quoted token into a temporary
  * t is the pointer to the matching quote */
-    strcpy(tokbuffer, (t-1));
+    SC_strncpy(tokbuffer, MAXLINE, t-1, -1);
     t = strchr((tokbuffer+1), qmatch);
     if (t != NULL)
        t[1] = '\0';
@@ -898,7 +900,7 @@ char *SC_firsttokq(char *s, char *delim, char *quotes)
        rv = SC_firsttok(s, delim);
 
     else
-       {strcpy(tokbuffer, s+k);
+       {SC_strncpy(tokbuffer, MAXLINE, s+k, -1);
 	tokbuffer[1] = '\0';
 	kmatch = strcspn(s+k+1, tokbuffer);
 
@@ -929,7 +931,7 @@ char *_SC_pr_tok(char *s, char *delim)
 
     else
        {s[i] = '\0';
-	strcpy(tokbuffer, s);
+	SC_strncpy(tokbuffer, MAXLINE, s, -1);
 
 /* take care of last token in string */
 	if (i == j)
@@ -1282,7 +1284,7 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
 
 /* treat ';' specially - it must be its own token */
         {if (c == ';')
-	    {strcpy(w, ";");
+	    {SC_strncpy(w, 2, ";", -1);
 	     ni = 1;}
 
 	 else
@@ -1306,7 +1308,7 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
 	     if ((w[0] != ';') && (SC_LAST_CHAR(w) == ';'))
 	        {SC_LAST_CHAR(w) = '\n';
 		 SC_array_string_add_copy(arr, w);
-		 strcpy(w, ";\n");}
+		 SC_strncpy(w, 2, ";\n", -1);}
 	     else
 	        SC_strcat(w, nw, "\n");
 	     SC_array_string_add_copy(arr, w);};};

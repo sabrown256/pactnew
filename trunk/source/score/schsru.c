@@ -311,7 +311,7 @@ static int _SC_sys_host(char *lst, int vrb)
 
     else
        {ps = s;
-	strcpy(s, lst);
+	SC_strncpy(s, MAXLINE, lst, -1);
 	for (n = 0; TRUE; n++)
 	    {t = SC_strtok(ps, ",", p);
 	     if (t == NULL)

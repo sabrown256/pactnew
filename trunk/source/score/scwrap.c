@@ -92,13 +92,13 @@ int main(int c, char **v)
     switch (comm)
        {case 'p' :
         default :
-             strcpy(mode, "apo");
+             SC_strncpy(mode, 10, "apo", -1);
 	     break;
 	case 's' :
-             strcpy(mode, "aso");
+             SC_strncpy(mode, 10, "aso", -1);
 	     break;
 	case 't' :
-             strcpy(mode, "aTo");
+             SC_strncpy(mode, 10, "aTo", -1);
 	     break;};
 
     rv = SC_exec_job(argl, mode, flags, NULL, NULL, NULL, NULL);

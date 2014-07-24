@@ -44,19 +44,19 @@ void drproc(int ev, int pid, int tid)
 
     switch (ev)
        {case SC_PROC_EXEC :
-	     strcpy(st, "exec of");
+	     SC_strncpy(st, 80, "exec of", -1);
 	     break;
 	case SC_PROC_SIG :
-	     strcpy(st, "signal to");
+	     SC_strncpy(st, 80, "signal to", -1);
 	     break;
 	case SC_PROC_IO :
-	     strcpy(st, "close io to");
+	     SC_strncpy(st, 80, "close io to", -1);
 	     break;
 	case SC_PROC_RM :
-	     strcpy(st, "interrupt from");
+	     SC_strncpy(st, 80, "interrupt from", -1);
 	     break;
         default :
-	     strcpy(st, "unknown");
+	     SC_strncpy(st, 80, "unknown", -1);
 	     break;};
 
     io_printf(stdout, "Managed process list after %s %d (%d/%d)\n",

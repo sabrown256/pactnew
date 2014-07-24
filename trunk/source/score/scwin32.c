@@ -43,7 +43,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 static void _SC_path_delimiter_win32(char *delim)
    {
     
-    strcpy(delim, ";");
+    SC_strncpy(delim, 2, ";", -1);
 
     return;}
 

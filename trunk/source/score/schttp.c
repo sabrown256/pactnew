@@ -51,7 +51,7 @@ void SC_split_http(char *url, char *host, char *page)
        ps = url;
 
     ps += (*ps == '/');
-    strcpy(s, ps);
+    SC_strncpy(s, MAXLINE, ps, -1);
 
     t = strtok(s, "/\n");
     if (t != NULL)
@@ -134,9 +134,9 @@ int SC_http_url_file(char *url, char *file, char *vrs)
     err = FALSE;
 
     if (vrs == NULL)
-       strcpy(vers, "1.1");
+       SC_strncpy(vers, MAXLINE, "1.1", -1);
     else
-       strcpy(vers, vrs);
+       SC_strncpy(vers, MAXLINE, vrs, -1);
 
     SC_split_http(url, host, page);
 

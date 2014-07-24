@@ -22,7 +22,7 @@ extern void
 static void _SC_path_delimiter_unix(char *delim)
    {
     
-    strcpy(delim, ":");
+    SC_strncpy(delim, 2, ":", -1);
 
     return;}
 

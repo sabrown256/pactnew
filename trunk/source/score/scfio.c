@@ -1408,8 +1408,8 @@ static FILE *_SC_ropen(char *name, char *mode)
     if (_SC.hosts == NULL)
        _SC.hosts = SC_make_hasharr(HSZSMALL, FALSE, SC_HA_NAME_KEY, 0);
 
-    strcpy(host, "local");
-    strcpy(fname, name);
+    SC_strncpy(host, MAXLINE, "local", -1);
+    SC_strncpy(fname, MAXLINE, name, -1);
     type = SC_LOCAL;
 
     fp = CMAKE(REMOTE_FILE);

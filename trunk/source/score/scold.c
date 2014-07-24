@@ -252,7 +252,7 @@ char *SC_strsave(char *s)
        {sz = strlen(s) + 2;
 	p  = CMAKE_N(char, sz);
 	if (p != NULL)
-	   {strcpy(p, s);
+	   {SC_strncpy(p, sz, s, -1);
 	    p[sz-1] = '\0';};};
 
     return(p);}
@@ -277,7 +277,7 @@ char *SC_strsavef(char *s, char *name)
        {sz = strlen(s) + 2;
 	p  = CMAKE_N(char, sz);
 	if (p != NULL)
-	   {strcpy(p, s);
+	   {SC_strncpy(p, sz, s, -1);
 	    p[sz-1] = '\0';};};
 
     return(p);}
@@ -312,7 +312,7 @@ char *SC_strsaven(char *s, char *name)
 
 	p = _SC_ALLOC_N(sz, 1, &opt);
 	if (p != NULL)
-	   {strcpy(p, s);
+	   {SC_strncpy(p, sz, s, -1);
 	    p[sz-1] = '\0';};};
 
     return(p);}

@@ -327,7 +327,7 @@ static void _PM_md5_update(PM_MD5_CTX *mc, unsigned char *in,
  *               - and zeroing out the context
  */
 
-static void _PM_md5_final(unsigned char *dig, PM_MD5_CTX *mc) 
+static void _PM_md5_final(unsigned char *dig, int nc, PM_MD5_CTX *mc) 
    {int i;
     char s[MAXLINE];
     char *p;
@@ -338,8 +338,8 @@ static void _PM_md5_final(unsigned char *dig, PM_MD5_CTX *mc)
     _PM_md5_encode(bits, mc->count, 8);
 
 /* pad out to 56 mod 64 */
-    lind = (unsigned int)((mc->count[0] >> 3) & 0x3f);
-    pln   = (lind < 56) ? (56 - lind) : (120 - lind);
+    lind = (unsigned int) ((mc->count[0] >> 3) & 0x3f);
+    pln  = (lind < 56) ? (56 - lind) : (120 - lind);
     _PM_md5_update(mc, PM_MD5_PADDING, pln);
 
 /* append length (before padding) */
@@ -351,7 +351,8 @@ static void _PM_md5_final(unsigned char *dig, PM_MD5_CTX *mc)
     p = s;
     for (i = 0; i < 16; i++, p += 2)
         snprintf(p, MAXLINE - 2*i, "%02x", dig[i]);
-    strcpy((char *) dig, s);
+
+    SC_strncpy((char *) dig, nc, s, -1);
 
 /* zero out sensitive information */
     memset(mc, 0, sizeof(*mc));
@@ -394,7 +395,7 @@ void PM_md5_checksum_array(void *arr, u_int64_t ni, u_int64_t bpi,
 	 ib -= ln;
 	 p  += ln;};
 
-    _PM_md5_final(dig, &mc);
+    _PM_md5_final(dig, 33, &mc);
     
 #if 0
     t0   = SC_wall_clock_time() - t0;
@@ -460,7 +461,7 @@ printf("\n");};
 	 else
 	    break;};
 
-    _PM_md5_final(dig, &mc); 
+    _PM_md5_final(dig, 33, &mc); 
 
 #if 0
     t0   = SC_wall_clock_time() - t0;

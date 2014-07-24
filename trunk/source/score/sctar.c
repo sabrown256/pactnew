@@ -177,7 +177,7 @@ fcent *_SC_process_tarhdr(FILE *fp, tarhdr *p)
 
 /* set up the name */
        {if (p->name[99] == '\0')
-           strcpy(name, p->name);
+           SC_strncpy(name, 256, p->name, -1);
         else
            {SC_strncpy(name, 256, p->name, 100);
             if (strlen(p->prefix) > 0)            /* filenames > 100 chars */

@@ -208,7 +208,7 @@ int SC_file_path(char *name, char *path, int nc, int full)
              break;};
 
     if (n <= nc)
-       {strcpy(path, p);
+       {SC_strncpy(path, nc, p, -1);
 	n = 0;};
 
     return(n);}
@@ -605,7 +605,7 @@ char *_SC_search_file(char **path, char *name, char *mode, char *type)
 
 	    if ((output != NULL) &&
 		(output[0] != NULL))
-	       {strcpy(pth, output[0]);
+	       {SC_strncpy(pth, MAXLINE, output[0], -1);
 		CFREE(output[0]);
 		CFREE(output);}
 
@@ -758,7 +758,7 @@ int SC_query_file(char *name, char *mode, char *type)
 /* type may be const char * and will die when SC_str_lower
  * attempts to change values
  */
-            strcpy(bf, type);
+            SC_strncpy(bf, MAX_BFSZ+1, type, -1);
             SC_str_lower(bf);
             if (strcmp(bf, "ascii") == 0)
                {fp = io_open(name, "r");

@@ -792,7 +792,7 @@ static int _SC_parse_redirect(SC_iodes *pio, subtask *ps, int i, char *p,
 /* msh syntax */
 	if (t[0] == SC_PROCESS_DELIM)
 	   {fn = t + 3;
-	    strcpy(file, t+3);}
+	    SC_strncpy(file, MAXLINE, t+3, -1);}
 
 /* conventional UNIX shell syntax */
 	else

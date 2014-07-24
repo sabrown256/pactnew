@@ -172,7 +172,7 @@ static int process_output(PROCESS *pp)
     t[0] = '\0';
 
     while (SC_gets(s, MAXLINE, pp) != NULL)
-       strcpy(t, s);
+       SC_strncpy(t, MAXLINE, s, -1);
 
     rv = (t[0] != '\0');
 

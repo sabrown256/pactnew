@@ -130,7 +130,7 @@ fcdes *SC_scan_archive(char *arf)
 		    if (nr != 1)
 		       break;
 
-		    strcpy(s, hdr._ar_name.ar_name);
+		    SC_strncpy(s, MAXLINE, hdr._ar_name.ar_name, -1);
 		    nc = SC_stol(hdr.ar_namlen);
 		    nr = fread(s+2, nc, 1, fp);
 		    if (nr < 0)
@@ -138,7 +138,7 @@ fcdes *SC_scan_archive(char *arf)
 				SC_itos(NULL, 0, nc, NULL));
 
                     if (strncmp(s, "`\n", 2) == 0)
-		       {strcpy(s, ".SYMTAB");
+		       {SC_strncpy(s, MAXLINE, ".SYMTAB", -1);
 			p = s;}
 		    else
 		       p = strtok(s, "`\n");
@@ -178,7 +178,7 @@ fcdes *SC_scan_archive(char *arf)
 		    if (nr != 1)
 		       break;
 
-		    strcpy(s, hdr._ar_name.ar_name);
+		    SC_strncpy(s, MAXLINE, hdr._ar_name.ar_name, -1);
 		    nc = SC_stol(hdr.ar_namlen);
 		    nr = fread(s+2, nc, 1, fp);
 		    if (nr < 0)
@@ -186,7 +186,7 @@ fcdes *SC_scan_archive(char *arf)
 				SC_itos(NULL, 0, nc, NULL));
 
                     if (strncmp(s, "`\n", 2) == 0)
-		       {strcpy(s, ".SYMTAB");
+		       {SC_strncpy(s, MAXLINE, ".SYMTAB", -1);
 			p = s;}
 		    else
 		       p = strtok(s, "`\n");
@@ -261,7 +261,7 @@ fcdes *SC_scan_archive(char *arf)
 		   break;
 
 		if (strncmp(hdr.ar_name, "ARFILENAMES/", 12) == 0)
-		   {strcpy(lname, ".EXTENDED");
+		   {SC_strncpy(lname, MAXLINE, ".EXTENDED", -1);
 		    name = lname;
 		    ext  = ftell(fp);
 		    if (ext < 0)
@@ -473,14 +473,14 @@ fcdes *SC_scan_archive(char *arf)
 		   break;
 
 		if (strncmp(hdr.ar_name, "//", 2) == 0)
-		   {strcpy(lname, ".EXTENDED");
+		   {SC_strncpy(lname, MAXLINE, ".EXTENDED", -1);
 		    name = lname;
 		    ext  = ftell(fp);
 		    if (ext < 0)
 		       io_error(errno, "ftell failed");}
 
 		else if (strncmp(hdr.ar_name, "/ ", 2) == 0)
-		   {strcpy(lname, ".SYMTAB");
+		   {SC_strncpy(lname, MAXLINE, ".SYMTAB", -1);
 		    name = lname;}
 
 		else if (hdr.ar_name[0] == '/')
