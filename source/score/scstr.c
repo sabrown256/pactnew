@@ -29,7 +29,7 @@
     if (_ns > 0)                                                            \
        {if (_n + _ns >= _nd)                                                \
            return(-1);                                                      \
-        strcat(_d, _s);                                                     \
+        SC_strcat(_d, _nd, _s);                                             \
         _n = strlen(_d);};}
 
 #define PAD(_d, _nd, _ln, _m)                                               \
@@ -218,7 +218,7 @@ char *SC_dstrcat(char *dst, char *src)
        {ln = 2*(ls + ld);
 	CREMAKE(dst, char, ln);};
 
-    s = strcat(dst, src);
+    s = SC_strcat(dst, ld+ls+1, src);
 
     return(s);}
 

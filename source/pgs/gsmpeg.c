@@ -15629,8 +15629,8 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 		strncpy(full_path, currentPath, MAXPATHLEN + 256);
     
 		if (!stdinUsed)
-		   {strcat(full_path, "/");
-		    strcat(full_path, input);
+		   {SC_strcat(full_path, MAXPATHLEN + 256, "/");
+		    SC_strcat(full_path, MAXPATHLEN + 256, input);
 		    jmovie = _PG_fopen(input, "rb"); 
 
 		    if (jmovie == NULL)
@@ -15807,8 +15807,8 @@ JM2JPEG()
     strncpy(full_path, currentPath, MAXPATHLEN + 256);
     
     if (! stdinUsed) {
-      strcat(full_path, "/");
-      strcat(full_path, inputFileEntries[ci]->left);
+      SC_strcat(full_path, MAXPATHLEN + 256, "/");
+      SC_strcat(full_path, MAXPATHLEN + 256, inputFileEntries[ci]->left);
       strncpy(inter_file,full_path, MAXPATHLEN + 256);
     
       if (! realQuiet) {

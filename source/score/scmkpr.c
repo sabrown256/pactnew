@@ -170,7 +170,7 @@ static void _SC_add_rule(ruledef *a, char *s)
 
     for (p = s; SC_is_print_char(*p, 3) != FALSE; p++);
 
-    strcat(a->text, p);
+    SC_strcat(a->text, a->nc, p);
 
     return;}
 

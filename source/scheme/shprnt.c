@@ -552,7 +552,7 @@ static int _SS_push_chars(FILE *fp, char *fmt, ...)
     if ((ns + nb + 2) >= SC_arrlen(_SS.bf))
        CREMAKE(_SS.bf, char, ns+nb+MAXLINE);
 
-    strcat(_SS.bf, bf);
+    SC_strcat(_SS.bf, MAXLINE, bf);
 
     return(FALSE);}
 
@@ -577,11 +577,11 @@ static int _SS_push_string(const char *s, FILE *fp)
        CREMAKE(_SS.bf, char, ns+nb+MAXLINE);
 
     if (_SS.disp_flag == TRUE)
-       strcat(_SS.bf, s);
+       SC_strcat(_SS.bf, MAXLINE, (char *) s);
     else
-       {strcat(_SS.bf, "\"");
-	strcat(_SS.bf, s);
-        strcat(_SS.bf, "\"");};
+       {SC_strcat(_SS.bf, MAXLINE, "\"");
+	SC_strcat(_SS.bf, MAXLINE, (char *) s);
+        SC_strcat(_SS.bf, MAXLINE, "\"");};
 
     return(FALSE);}
 

@@ -119,10 +119,10 @@ static void _SQLITE_gather_row(SC_array *out, char **in,
     for (i = 0; i < nf; i++)
         {l = (ir + 1)*nf + i;
 	 if (in[l][0] == '\0')
-	    strcat(s, "NULL");
+	    SC_strcat(s, MAX_BFSZ, "NULL");
          else
-	    strcat(s, in[l]);
-	 strcat(s, "|");};
+	    SC_strcat(s, MAX_BFSZ, in[l]);
+	 SC_strcat(s, MAX_BFSZ, "|");};
 
     SC_LAST_CHAR(s) = '\0';
 

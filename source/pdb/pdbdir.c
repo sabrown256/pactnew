@@ -716,14 +716,14 @@ char *_PD_fixname(PDBfile *file, char *inname)
 /* append to end of current path */
             else
                {if (SC_LAST_CHAR(out) != '/')
-                   strcat(out, "/");
-                strcat(out, node);}
+                   SC_strcat(out, MAXLINE, "/");
+                SC_strcat(out, MAXLINE, node);}
 
             node = SC_strtok(NULL, "/", s);};
 
         if ((SC_LAST_CHAR(inname) == '/') &&
             (SC_LAST_CHAR(out) != '/'))
-           strcat(out, "/");};
+           SC_strcat(out, MAXLINE, "/");};
 
     return(out);}
 

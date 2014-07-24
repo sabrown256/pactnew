@@ -1311,7 +1311,7 @@ static char *_PD_get_type_member(PDBfile *file, PD_smp_state *pa,
 		 if ((c == '>') || (c == '.'))
 		    break;}
 	    s[i+1] = '\0';
-	    strcat(s, desc->cast_memb);
+	    SC_strcat(s, MAXLINE, desc->cast_memb);
 
             _PD_save_stack(pa);
 
