@@ -447,7 +447,7 @@ int main(int c, char **v)
 		 default :
 		      break;};}
          else
-            {strcpy(f, v[i]);
+            {SC_strncpy(f, MAXLINE, v[i], -1);
 	     fp = io_open(f, "r");
              break;};};
 

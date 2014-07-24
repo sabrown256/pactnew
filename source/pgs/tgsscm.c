@@ -49,7 +49,7 @@ int main(int c, char **v)
     wbck = TRUE;
     nc   = 16;
     mode = MAKE_PAL;
-    strcpy(device, "WINDOW");
+    SC_strncpy(device, MAXLINE, "WINDOW", -1);
 
     for (i = 1; v[i] != NULL; i++)
         {if (v[i][0] == '-')
@@ -59,7 +59,7 @@ int main(int c, char **v)
 		      break;
 
                  case 'c' :
-		      strcpy(device, "CGM");
+		      SC_strncpy(device, MAXLINE, "CGM", -1);
 		      break;
 
                  case 'd' :
@@ -80,7 +80,7 @@ int main(int c, char **v)
 		      break;
 
                  case 's' :
-		      strcpy(device, "PS");
+		      SC_strncpy(device, MAXLINE, "PS", -1);
 		      break;
 
                  case 't' :

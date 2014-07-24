@@ -61,7 +61,7 @@ static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
 		     NULL);
 
 /* draw the vertical axis */
-    strcpy(format, "%10.2g");
+    SC_strncpy(format, 20, "%10.2g", -1);
     PG_fset_line_width(dev, 0.0);
 
     xl[0] = wc[0];

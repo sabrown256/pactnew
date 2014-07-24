@@ -493,11 +493,11 @@ int PM_conv_array(C_array *dst, C_array *src, int rel)
     if ((dst != NULL) && (src != NULL))
        {n  = dst->length;
 	da = dst->data;
-	strcpy(t, dst->type);
+	SC_strncpy(t, MAXLINE, dst->type, -1);
 	did = SC_type_id(strtok(t, " *"), FALSE);
 
 	sa = src->data;
-	strcpy(t, src->type);
+	SC_strncpy(t, MAXLINE, src->type, -1);
 	sid = SC_type_id(strtok(t, " *"), FALSE);
 	
 	if ((did != -1) && (sid != -1))

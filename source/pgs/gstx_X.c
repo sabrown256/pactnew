@@ -306,7 +306,7 @@ static int _PG_X_txt_set_font(PG_device *dev, char *face, char *style, int size)
 	for (i = 0; i < nf; i++)
 	    {pm = SC_strstr(names[i], "--");
 	     if (pm != NULL)
-	        {strcpy(p, pm);
+	        {SC_strncpy(p, MAXLINE, pm, -1);
 		 fsz = SC_stoi(strtok(p, "- \t\n"));
 		 if (fsz < size)
 		    lsz = fsz;

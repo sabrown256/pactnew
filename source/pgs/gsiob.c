@@ -905,7 +905,7 @@ static void _PG_draw_variable_object(PG_interface_object *iob)
 
 	         else if (strcmp(ch->type, PG_TEXT_OBJECT_S) == 0)
                     {b = (PG_text_box *) ch->obj;
-		     strcpy(s, b->text_buffer[0]);
+		     SC_strncpy(s, MAXLINE, b->text_buffer[0], -1);
 		     if (_PG_value_string(ityp, hp, s, MAXLINE))
 		        strcpy(b->text_buffer[0], s);};};};};
 

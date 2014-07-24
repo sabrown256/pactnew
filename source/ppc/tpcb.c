@@ -33,7 +33,7 @@ static void process_binary(PROCESS *pp)
 	   {printf("P> Binary data receive failed: no data\n");
 	    return;};
 
-	strcpy(type, msg);
+	SC_strncpy(type, 80, msg, -1);
 	ni = SC_stol(SC_strtok(NULL, " \n", t));
 
 	space = _PD_alloc_entry(file, type, ni);

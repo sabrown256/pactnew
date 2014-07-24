@@ -122,7 +122,7 @@ static PG_device *_PG_PS_open(PG_device *dev,
     dev->hard_copy_device = TRUE;
     dev->print_labels     = TRUE;
 
-    strcpy(ltype, dev->type);
+    SC_strncpy(ltype, MAXLINE, dev->type, -1);
     type = SC_strtok(ltype, " \t\n\r", s);
     if ((type != NULL) && (strcmp(type, "COLOR") == 0))
        dev->ps_color = TRUE;
@@ -135,7 +135,7 @@ static PG_device *_PG_PS_open(PG_device *dev,
 
     dev->window_orientation = mode;
 
-    strcpy(lname, dev->title);
+    SC_strncpy(lname, MAXLINE, dev->title, -1);
     name = SC_strtok(lname, " \t\n\r", s);
 
 /* decide on the PostScript level */
@@ -677,7 +677,7 @@ static void _PG_PS_expose_device(PG_device *dev)
 /* _PG_PS_WRITE_TEXT - write out text to the appropriate device */
  
 static void _PG_PS_write_text(PG_device *dev, FILE *fp, char *s)
-   {int nlrp, fl;
+   {int nlrp, fl, nc;
     int xd[PG_SPACEDM];
     double x[PG_SPACEDM];
     char *t;
@@ -693,8 +693,9 @@ static void _PG_PS_write_text(PG_device *dev, FILE *fp, char *s)
 
     nlrp = SC_char_count(s, '(') + SC_char_count(s, ')');
     if (nlrp > 0)
-       {t = CMAKE_N(char, strlen(s) + nlrp + 1);
-        strcpy(t, s);
+       {nc = strlen(s) + nlrp + 1;
+        t  = CMAKE_N(char, nc);
+        SC_strncpy(t, nc, s, -1);
         SC_str_replace(t, "(", "\\(");
         SC_str_replace(t, ")", "\\)");}
 

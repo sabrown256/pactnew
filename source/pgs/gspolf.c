@@ -151,7 +151,7 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 	 range = h->range;
 	 npts  = range->n_elements;
 	 nd    = range->dimension_elem;
-	 strcpy(bf, range->element_type);
+	 SC_strncpy(bf, MAXLINE, range->element_type, -1);
 	 mtype = SC_strtok(bf, " *", s);
 	 sid   = SC_type_id(mtype, FALSE);
 

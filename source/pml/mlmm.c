@@ -1148,7 +1148,7 @@ int PM_resolve_type(char *ltyp, char *ntyp, char *btyp)
        ret = FALSE;
        
     else if (strcmp(ntyp, "nearest") == 0)
-       {strcpy(type, btyp);
+       {SC_strncpy(type, MAXLINE, btyp, -1);
 	if (strchr(type, '*') == NULL)
 	   t = type;
 	else
@@ -1182,7 +1182,7 @@ void PM_promote_set(PM_set *s, char *ntyp, int flag)
 
     elt = s->element_type;
     est = s->es_type;
-    strcpy(otyp, est);
+    SC_strncpy(otyp, MAXLINE, est, -1);
     if (strchr(otyp, '*') == NULL)
        ot = otyp;
     else
@@ -1619,7 +1619,7 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
 		    break;};
 
             if (asc != NULL)
-               {strcpy(bf, asc->cdr_type);
+               {SC_strncpy(bf, MAXLINE, asc->cdr_type, -1);
 		SC_dereference(bf);
 
 		id = SC_type_id(bf, FALSE);

@@ -31,13 +31,13 @@ int main(c, v)
     char *url;
 
     url = NULL;
-    strcpy(vers, "1.1");
+    SC_strncpy(vers, MAXLINE, "1.1", -1);
 
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'v' :
-		      strcpy(vers, v[++i]);
+		      SC_strncpy(vers, MAXLINE, v[++i], -1);
 		      break;};}
          else
             url = v[i];};

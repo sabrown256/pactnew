@@ -12101,7 +12101,7 @@ void SetReferenceFrameType(char *type)
 void SetBitRateFileName(char *fileName)
    {
 
-    strcpy(bitRateFileName, fileName);
+    strncpy(bitRateFileName, fileName, 256);
 
     return;}
 
@@ -12615,7 +12615,7 @@ void
 SetStatFileName(fileName)
     char *fileName;
 {
-    strcpy(statFileName, fileName);
+    strncpy(statFileName, fileName, 256);
 }
 
 
@@ -14880,13 +14880,13 @@ boolean ReadParamFile(char *fileName, int function)
 	    case 'C':
 		 if (strncmp(input, "CDL_FILE", 8) == 0)
 		    {charPtr = SkipSpacesTabs(&input[8]);
-		     strcpy(specificsFile, charPtr);
+		     strncpy(specificsFile, charPtr, 256);
 		     specificsOn = TRUE;
 		     optionSeen[OPTION_SPECIFICS] = TRUE;}
 
 		 else if (strncmp(input, "CDL_DEFINES", 11) == 0)
 		    {charPtr = SkipSpacesTabs(&input[11]);
-		     strcpy(specificsDefines, charPtr);
+		     strncpy(specificsDefines, charPtr, 1024);
 		     optionSeen[OPTION_DEFS_SPECIFICS] = TRUE;};
 		 break;
 
@@ -14899,7 +14899,7 @@ boolean ReadParamFile(char *fileName, int function)
 			 numInputFiles       = MAXINT;
 			 numInputFileEntries = 1;};
 
-		     strcpy(currentFramePath, charPtr);}
+		     strncpy(currentFramePath, charPtr, MAXPATHLEN);}
 
 		 else if (strncmp(input, "FRAME_INPUT", 11) == 0)
 		    {if (function == COMBINE_FRAMES)
@@ -14937,7 +14937,7 @@ boolean ReadParamFile(char *fileName, int function)
 			 numInputFiles       = MAXINT;
 			 numInputFileEntries = 1;};
 
-		     strcpy(currentGOPPath, charPtr);}
+		     strncpy(currentGOPPath, charPtr, MAXPATHLEN);}
 
 		 else if (strncmp(input, "GOP_INPUT", 9) == 0)
 		    {if (function == COMBINE_GOPS)
@@ -14964,12 +14964,12 @@ boolean ReadParamFile(char *fileName, int function)
 			 numInputFiles       = MAXINT;
 			 numInputFileEntries = 1;};
 
-		     strcpy(currentPath, charPtr);
+		     strncpy(currentPath, charPtr, MAXPATHLEN);
 		     optionSeen[OPTION_INPUT_DIR] = TRUE;}
 
 		 else if (strncmp(input, "INPUT_CONVERT", 13) == 0)
 		    {charPtr = SkipSpacesTabs(&input[13]);
-		     strcpy(inputConversion, charPtr);
+		     strncpy(inputConversion, charPtr, 1024);
 		     optionSeen[OPTION_INPUT_CONVERT] = TRUE;}
 
 		 else if (strcmp(input, "INPUT") == 0)
@@ -14979,7 +14979,7 @@ boolean ReadParamFile(char *fileName, int function)
 
 		 else if (strncmp(input, "IO_SERVER_CONVERT", 17) == 0)
 		    {charPtr = SkipSpacesTabs(&input[17]);
-		     strcpy(ioConversion, charPtr);
+		     strncpy(ioConversion, charPtr, 1024);
 		     optionSeen[OPTION_IO_CONVERT] = TRUE;}
 
 		 else if (strncmp(input, "IQTABLE", 7) == 0)
@@ -15152,18 +15152,18 @@ boolean ReadParamFile(char *fileName, int function)
 
 		 else if (strncmp(input, "SLAVE_CONVERT", 13) == 0)
 		    {charPtr = SkipSpacesTabs(&input[13]);
-		     strcpy(slaveConversion, charPtr);
+		     strncpy(slaveConversion, charPtr, 1024);
 		     optionSeen[OPTION_SLAVE_CONVERT] = TRUE;}
 
 		 else if (strncmp(input, "SPECIFICS_FILE", 14) == 0)
 		    {charPtr = SkipSpacesTabs(&input[14]);
-		     strcpy(specificsFile, charPtr);
+		     strncpy(specificsFile, charPtr, 256);
 		     specificsOn = TRUE;
 		     optionSeen[OPTION_SPECIFICS] = TRUE;}
 
 		 else if (strncmp(input, "SPECIFICS_DEFINES", 16) == 0)
 		    {charPtr = SkipSpacesTabs(&input[17]);
-		     strcpy(specificsDefines, charPtr);
+		     strncpy(specificsDefines, charPtr, 1024);
 		     optionSeen[OPTION_DEFS_SPECIFICS] = TRUE;}
 
 		 else if (strncmp(input, "SEQUENCE_SIZE", 13) == 0)
@@ -15189,7 +15189,7 @@ boolean ReadParamFile(char *fileName, int function)
 	    case 'U':
 		 if (strncmp(input, "USER_DATA", 9) == 0)
 		    {charPtr = SkipSpacesTabs(&input[9]);
-		     strcpy(userDataFileName, charPtr);
+		     strncpy(userDataFileName, charPtr, 256);
 		     optionSeen[OPTION_USER_DATA] = TRUE;};
 		 break;
 
@@ -15212,7 +15212,7 @@ boolean ReadParamFile(char *fileName, int function)
 
 		  else if (strncmp(input, "YUV_FORMAT", 10) == 0)
 		     {charPtr = SkipSpacesTabs(&input[10]);
-		      strcpy(yuvConversion, charPtr);
+		      strncpy(yuvConversion, charPtr, 256);
 		      optionSeen[OPTION_YUV_FORMAT] = TRUE;};
 		 break;};};
 
@@ -15235,7 +15235,7 @@ boolean ReadParamFile(char *fileName, int function)
 	    exit(1);};
 
 	if (!optionSeen[OPTION_YUV_FORMAT])
-	   {strcpy(yuvConversion, "EYUV");
+	   {strncpy(yuvConversion, "EYUV", 256);
 	    io_printf(stderr,
 		      "WARNING:  YUV format not specified; defaulting to Berkeley YUV (EYUV)\n\n");};};
 
@@ -15457,7 +15457,7 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 	    if (optionSeen[OPTION_INPUT_DIR] == TRUE)
 	       snprintf(cdcmd, 110, "cd %s;",currentPath);
 	    else
-	       strcpy(cdcmd,"");
+	       strncpy(cdcmd,"", 110);
 
 	    SC_strncpy(tmp, 300, start, end-start+1);
 	    snprintf(cmd, 300, "(%s %s)", cdcmd, tmp);
@@ -15613,8 +15613,8 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 	    inputFileEntries[numInputFileEntries]->skip     = skipNum;
 	    inputFileEntries[numInputFileEntries]->numFiles = (rightNum-leftNum+1)/skipNum;
 
-	    strcpy(inputFileEntries[numInputFileEntries]->left, left);
-	    strcpy(inputFileEntries[numInputFileEntries]->right, right);
+	    strncpy(inputFileEntries[numInputFileEntries]->left, left, 256);
+	    strncpy(inputFileEntries[numInputFileEntries]->right, right, 256);
 
 	    if (padding)
 	       inputFileEntries[numInputFileEntries]->numPadding = numPadding;
@@ -15622,11 +15622,11 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 	       inputFileEntries[numInputFileEntries]->numPadding = -1;}
 
 	else
-	   {strcpy(inputFileEntries[numInputFileEntries]->left, input);
+	   {strncpy(inputFileEntries[numInputFileEntries]->left, input, 256);
 	    if (baseFormat == JMOVIE_FILE_TYPE)
 	       {inputFileEntries[numInputFileEntries]->glob = TRUE;
 		full_path[0] = '\0';
-		strcpy(full_path, currentPath);
+		strncpy(full_path, currentPath, MAXPATHLEN + 256);
     
 		if (!stdinUsed)
 		   {strcat(full_path, "/");
@@ -15647,7 +15647,7 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 
 		    io_close(jmovie);};
 
-		strcpy(inputFileEntries[numInputFileEntries]->right,".jpg");
+		strncpy(inputFileEntries[numInputFileEntries]->right,".jpg", 256);
 		inputFileEntries[numInputFileEntries]->numPadding = -1;
 		inputFileEntries[numInputFileEntries]->startID    = 1;
 		inputFileEntries[numInputFileEntries]->endID      = (inputFileEntries[numInputFileEntries]->numFiles-1);
@@ -15665,7 +15665,7 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 		inputFileEntries[numInputFileEntries]->numPadding = 0;
 
 /* fixes a bug from version 1.4 */
-		strcpy(inputFileEntries[numInputFileEntries]->right,"\0");
+		strncpy(inputFileEntries[numInputFileEntries]->right,"\0", 256);
 		inputFileEntries[numInputFileEntries]->startID = 0;
 		inputFileEntries[numInputFileEntries]->endID   = 0;
 		inputFileEntries[numInputFileEntries]->skip    = 0;};};
@@ -15804,12 +15804,12 @@ JM2JPEG()
   for(ci = 0; ci < numInputFileEntries; ci++) {
     inter_file[0] = '\0';
     full_path[0] = '\0';
-    strcpy(full_path, currentPath);
+    strncpy(full_path, currentPath, MAXPATHLEN + 256);
     
     if (! stdinUsed) {
       strcat(full_path, "/");
       strcat(full_path, inputFileEntries[ci]->left);
-      strcpy(inter_file,full_path);
+      strncpy(inter_file,full_path, MAXPATHLEN + 256);
     
       if (! realQuiet) {
         io_printf(stdout, "Extracting JPEG's in the JMOVIE from %s\n",full_path);
@@ -20448,12 +20448,12 @@ int width;
   
   /* shorthand for UYVY */
   if (strncmp(yuvConversion, "ABEKAS", 6) == 0) {
-    strcpy(yuvConversion, "UYVY");
+    strncpy(yuvConversion, "UYVY", 256);
     
     /* shorthand for YUYV */
   } else if ((strncmp(yuvConversion, "PHILLIPS", 8) == 0) || 
 	     (strncmp(yuvConversion, "PHILIPS", 7) == 0)) {
-    strcpy(yuvConversion, "YUYV");
+    strncpy(yuvConversion, "YUYV", 256);
   }
   
   length = strlen (yuvConversion);

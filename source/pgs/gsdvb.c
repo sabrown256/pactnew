@@ -141,7 +141,7 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 
 	 range = h->range;
 	 npts  = range->n_elements;
-	 strcpy(bf, range->element_type);
+	 SC_strncpy(bf, MAXLINE, range->element_type, -1);
 	 mtype = SC_strtok(bf, " *", s);
 	 sid   = SC_type_id(mtype, FALSE);
 

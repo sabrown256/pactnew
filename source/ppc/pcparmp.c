@@ -40,7 +40,7 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
     tok = SC_strtok(t, ":", s);
     if (strcmp(tok, "HOST") == 0)
        {u = SC_strtok(NULL, ",\n", s);
-        strcpy(srvr, t);
+        SC_strncpy(srvr, MAXLINE, t, -1);
 	u    = SC_strtok(NULL, ",\n", s);
 	port = SC_stoi(u);
         argv[argc] = NULL;};

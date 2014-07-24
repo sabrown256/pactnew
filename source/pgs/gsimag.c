@@ -83,7 +83,7 @@ void PG_invert_image(PG_image *im)
     unsigned char *pb;
     char type[MAXLINE];
 
-    strcpy(type, im->element_type);
+    SC_strncpy(type, MAXLINE, im->element_type, -1);
     PD_dereference(type);
 
     kx = im->kmax;
@@ -1016,7 +1016,7 @@ void PG_draw_palette_n(PG_device *dev ARG(,,cls),
     dev->current_palette = dev->palettes;
 
     PG_fset_line_color(dev, dev->WHITE, TRUE);
-    strcpy(format, "%10.2g");
+    SC_strncpy(format, 20, "%10.2g", -1);
 
 /* NOTE: this value is chosen to avoid problems with coordinate conversions
  *       and clipping for arbitrary size windows
@@ -1119,7 +1119,7 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
     dev->current_palette = dev->palettes;
 
     PG_fset_line_color(dev, dev->WHITE, TRUE);
-    strcpy(format, "%10.2g");
+    SC_strncpy(format, 20, "%10.2g", -1);
 
 /* NOTE: this value is chosen to avoid problems with coordinate conversions
  *       and clipping for arbitrary size windows

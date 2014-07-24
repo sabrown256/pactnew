@@ -424,7 +424,7 @@ static void _PG_display_image(PG_device *dev, PG_image *pim)
            {labl = pri->label;
             bpp  = im->bits_pixel;
         
-            strcpy(type, im->element_type);
+            SC_strncpy(type, MAXLINE, im->element_type, -1);
             PD_dereference(type);
 
 /* get the single image specs */

@@ -264,7 +264,7 @@ int PC_open_group(char **argv, int *pn)
 
 	p = SC_strtok(s, ",", t);
 	if (p != NULL)
-	   strcpy(_PC.server, p);
+	   SC_strncpy(_PC.server, MAXLINE, p, -1);
 
 	_PC.server_port = SC_stoi(SC_strtok(NULL, ",\n", t));
 	_PC.n_nodes  = SC_stoi(SC_strtok(NULL, ",\n", t));
@@ -312,7 +312,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
     if ((tok != NULL) && (strcmp(tok, "HOST") == 0))
        {p = SC_strtok(NULL, ",\n", s);
 	if (p != NULL)
-	   strcpy(srvr, p);
+	   SC_strncpy(srvr, MAXLINE, p, -1);
 
 	p = SC_strtok(NULL, ",\n", s);
 	port = (p != NULL) ? SC_stoi(p) : 0;
@@ -326,7 +326,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
        {if ((srvr[0] == '\0') || (port < 0))
 	   {PC_open_group(argv, pnn);
 
-	    strcpy(srvr, _PC.server);
+	    SC_strncpy(srvr, MAXLINE, _PC.server, -1);
 	    port = _PC.server_port;
 
 	    pp->io[0] = _PC.server_link->io[0];
@@ -571,7 +571,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 
     bf = CMAKE_N(char, nb);
 
-    strcpy(types, type);
+    SC_strncpy(types, MAXLINE, type, -1);
 
     if (block)
        PC_block(pp);
