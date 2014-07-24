@@ -225,7 +225,7 @@ void SC_warn(char *fmt, ...)
 
     SC_VDSNPRINTF(TRUE, err, fmt);
 
-    strcat(s, err);
+    SC_strcat(s, MAXLINE, err);
 
     CFREE(err);
 
@@ -247,7 +247,7 @@ void SC_error(int st, char *fmt, ...)
 
     SC_VDSNPRINTF(TRUE, err, fmt);
 
-    strcat(s, err);
+    SC_strcat(s, MAXLINE, err);
 
     CFREE(err);
 

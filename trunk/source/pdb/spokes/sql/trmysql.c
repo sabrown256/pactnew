@@ -83,8 +83,8 @@ static void _MYSQL_gather_row(SC_array *out, MYSQL_ROW in,
     for (i = 0; i < nf; i++)
         {if (in[i][0] == '\0')
 	    break;
-         strcat(s, in[i]);
-	 strcat(s, delim);};
+         SC_strcat(s, MAX_BFSZ, in[i]);
+	 SC_strcat(s, MAX_BFSZ, delim);};
 
     SC_LAST_CHAR(s) = '\0';
 

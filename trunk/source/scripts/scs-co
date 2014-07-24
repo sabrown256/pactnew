@@ -82,7 +82,7 @@ end
 
 
 if ("$srcdate" != "") then
-   set srcdate = `date --rfc-3339=date -d "$srcdate"
+   set srcdate = ( `date --rfc-3339=date -d "$srcdate"` )
 endif
 
 #--------------------------------------------------------------------------

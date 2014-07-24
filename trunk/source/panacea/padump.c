@@ -571,7 +571,7 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
         {v     = pi->values;
 	 start = (v == NULL) ? -HUGE : v[0];
 
-	 strcat(dname, pi->var_name);
+	 SC_strcat(dname, nc, pi->var_name);
 	 if (pi->function != NULL)
             SC_vstrcat(dname, nc, "= %s,", pi->function);
             

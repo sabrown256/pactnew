@@ -62,7 +62,8 @@ else
    if ("$Tests" == "") then
       set Tests = ""
       set Tests = ($Tests ext perdb)
-      set Tests = ($Tests info do-net elide blang templ)
+      set Tests = ($Tests do-net elide blang templ)
+#      set Tests = ($Tests info do-net elide blang templ)
       set Tests = ($Tests regx pcsh dorun verify)
 #      set Tests = ($Tests pco)
    endif

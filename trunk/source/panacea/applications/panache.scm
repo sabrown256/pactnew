@@ -483,7 +483,7 @@
       (printf file "\n")
 
       (comment file "transpose the time history files")
-      (printf file "    strcpy(nm, %s);\n", ppname-var)
+      (printf file "    SC_strncpy(nm, MAXLINE, %s, -1);\n", ppname-var)
       (printf file "    pnm = strtok(nm, \".\");\n")
       (printf file "    PA_th_transpose(pnm, 1000);\n")
       (printf file "\n")
