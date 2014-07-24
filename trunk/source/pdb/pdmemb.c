@@ -687,13 +687,14 @@ syment *PD_effective_entry(PDBfile *file ARG(,,cls), char *name,
  *                    - assume ROW_MAJOR_ORDER
  */
 
-static char *_PD_row_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
+static char *_PD_row_major_expr(char *bf, int nb,
+				dimdes *pd, inti indx, int def_off)
    {char tmp[MAXLINE];
     inti ix, m, stride;
     dimdes *pt;
 
     if (pd == NULL)
-       SC_itos(bf, MAXLINE, indx + def_off, NULL);
+       SC_itos(bf, nb, indx + def_off, NULL);
 
     else
        {bf[0] = '\0';
@@ -709,7 +710,7 @@ static char *_PD_row_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
             ix = m + pd->index_min;
 
             snprintf(tmp, MAXLINE, "%s,", SC_itos(NULL, 0, ix, NULL));
-            strcat(bf, tmp);
+            SC_strcat(bf, nb, tmp);
 
             indx -= m*stride;
             pd    = pd->next;};
@@ -728,12 +729,13 @@ static char *_PD_row_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
  *                    - assume COLUMN_MAJOR_ORDER
  */
 
-static char *_PD_col_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
+static char *_PD_col_major_expr(char *bf, long nb,
+				dimdes *pd, inti indx, int def_off)
    {char tmp[MAXLINE];
     inti ix, m, stride;
 
     if (pd == NULL)
-       SC_itos(bf, MAXLINE, indx + def_off, NULL);
+       SC_itos(bf, nb, indx + def_off, NULL);
     else
        {bf[0] = '\0';
 
@@ -742,7 +744,7 @@ static char *_PD_col_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
             m  = indx - (indx/stride)*stride;
             ix = m + pd->index_min;
             snprintf(tmp, MAXLINE, "%s,", SC_itos(NULL, 0, ix, NULL));
-            strcat(bf, tmp);
+            SC_strcat(bf, nb, tmp);
 
             indx = (indx - m)/stride;
             pd = pd->next;};
@@ -768,10 +770,10 @@ char *PD_index_to_expr(char *bf, long indx, dimdes *dim,
 
     p = NULL;
     if (major_order == COLUMN_MAJOR_ORDER)
-       p = _PD_col_major_expr(bf, dim, indx, def_off);
+       p = _PD_col_major_expr(bf, MAXLINE, dim, indx, def_off);
 
     else if (major_order == ROW_MAJOR_ORDER)
-       p = _PD_row_major_expr(bf, dim, indx, def_off);
+       p = _PD_row_major_expr(bf, MAXLINE, dim, indx, def_off);
 
     return(p);}
 

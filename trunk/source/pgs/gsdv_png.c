@@ -194,7 +194,7 @@ static PG_device *_PG_PNG_open(PG_device *dev,
 
     _PG_rst_set_dev_prop(dev, (int) dxf, (int) dyf, N_RAST_COLOR);
 
-    PG_device_filename(fname, dev->title, ".png");
+    PG_device_filename(fname, MAXLINE, dev->title, ".png");
 
     mdv = PG_make_raster_device((int) dxf, (int) dyf, fname,
 				NULL, TRUE, NULL);

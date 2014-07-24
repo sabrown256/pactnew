@@ -154,9 +154,9 @@ static PG_device *_PG_PS_open(PG_device *dev,
     pstransp = dev->ps_transparent;
 
     if (name != NULL)
-       PG_device_filename(fname, name, ".ps");
+       PG_device_filename(fname, MAXLINE, name, ".ps");
     else
-       PG_device_filename(fname, "default", ".ps");
+       PG_device_filename(fname, MAXLINE, "default", ".ps");
 
     ps_fp = _PG_fopen(fname, "w");
     if (ps_fp == NULL)
