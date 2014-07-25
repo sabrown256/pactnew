@@ -282,7 +282,7 @@ static void push_struct(char *item, char *collection, int itype)
 	    nstrcat(t, BFLRG, p);};
 	ps = NULL;};
 
-    strcpy(collection, t);
+    nstrncpy(collection, BFLRG, t, -1);
 
     n  = gst.gstck.n++;
     ge = gst.gstck.st + n;
@@ -1173,7 +1173,7 @@ static void read_line(char *s, int nc)
 	if (gst.fstck.n > 0)
 	   s[0] = '\0';
 	else
-	   strcpy(s, "++end++");
+	   nstrncpy(s, nc, "++end++", -1);
 	note(NULL, "\n");};
 
     return;}
@@ -1262,32 +1262,32 @@ static void parse_opt(client *cl, char *s, int nc)
 		    switch (oper)
 		       {case PEQ :
 		             if (mt == 0)
-			        {strcpy(s, arg);
+			        {nstrncpy(s, nc, arg, -1);
 				 ok = TRUE;};
 			     break;
 			case PLT :
 			     if (mt < 0)
-			        {strcpy(s, arg);
+			        {nstrncpy(s, nc, arg, -1);
 				 ok = TRUE;};
 			     break;
 			case PLE :
 			     if (mt < 1)
-			        {strcpy(s, arg);
+			        {nstrncpy(s, nc, arg, -1);
 				 ok = TRUE;};
 			     break;
 			case PGT :
 			     if (mt > 0)
-			        {strcpy(s, arg);
+			        {nstrncpy(s, nc, arg, -1);
 				 ok = TRUE;};
 			     break;
 			case PGE :
 			     if (mt > -1)
-			        {strcpy(s, arg);
+			        {nstrncpy(s, nc, arg, -1);
 				 ok = TRUE;};
 			     break;
 			case PNE :
 			     if (mt != 0)
-			        {strcpy(s, arg);
+			        {nstrncpy(s, nc, arg, -1);
 				 ok = TRUE;};
 			     break;
 			default :
