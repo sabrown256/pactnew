@@ -64,11 +64,13 @@ struct s_SC_lexical_token
     SC_token_value val;};
 
 struct s_SC_lexical_stream
-   {char *name;
-    FILE *file;
-    int i_token;
+   {int i_token;
     int n_tokens;
     int n_tokens_max;
+    int nbo;                  /* in_bf and out_bf size */
+    int nbs;                  /* str_bf size */
+    char *name;
+    FILE *file;
     SC_lexical_token *tokens;
     char *in_bf;
     char *in_ptr;

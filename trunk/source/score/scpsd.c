@@ -730,10 +730,10 @@ static int ps_diff_b(char *f1, char *f2, pixdes *pd, int verbose)
 
 /* DIFF_FRAC - compare a line of difference fractionally */
 
-static int diff_frac(char *bfa, char *bfb, diff_stat *ds,
+static int diff_frac(char *bfa, long na, char *bfb, long nb, diff_stat *ds,
 		     pixdes *pd, int verbose, char *ecnt, char *ea, char *eb)
    {int n, errl, more, dntok;
-    int na, pl;
+    int nc, pl;
     double da, db, dd;
     double ddmn, ddmx, dav, ddf;
     char tba[MAXLINE], tbb[MAXLINE];
@@ -760,12 +760,12 @@ static int diff_frac(char *bfa, char *bfb, diff_stat *ds,
 	    if (n > MAXLINE)
 	       {SC_strncpy(tba, MAXLINE, bfa, pl);
 
-		strcpy(bfa, bfa+pl);
+		SC_strncpy(bfa, na, bfa+pl, -1);
 		ua = tba;
 
 		SC_strncpy(tbb, MAXLINE, bfb, pl);
 
-		strcpy(bfb, bfb+pl);
+		SC_strncpy(bfb, nb, bfb+pl, -1);
 		ub = tbb;}
 	    else
 	       {ua   = bfa;
@@ -794,8 +794,8 @@ static int diff_frac(char *bfa, char *bfb, diff_stat *ds,
  *       very long word
  *       check that no byte differs by more than one
  */
-		na = strlen(ta);
-		if ((na > 60) && (na == ((na >> 1) << 1)))
+		nc = strlen(ta);
+		if ((nc > 60) && (nc == ((nc >> 1) << 1)))
 		   {if (imav == TRUE)
 		       errl = check_image_ave(ta, tb, pd);
 		    else
@@ -907,7 +907,8 @@ static int ps_diff_frac(char *f1, char *f2, pixdes *pd, int verbose)
 
 /* now process the actual differences in this line */
 	 if ((la != 0) && (lb != 0))
-	    err |= diff_frac(sa, sb, &ds, pd, verbose, ecnt, ea, eb);
+	    err |= diff_frac(sa, na, sb, nb,
+			     &ds, pd, verbose, ecnt, ea, eb);
 
 	 CFREE(ea);
 	 CFREE(eb);
