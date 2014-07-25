@@ -287,17 +287,17 @@ static run_state transition(process *pp, run_state new)
  *               - is of the form [<host>:]<file>
  */
 
-static void get_host_file(char *host, char *file, char *s)
+static void get_host_file(char *host, char *file, long nc, char *s)
    {char *p;
 
-    strcpy(host, s);
+    nstrncpy(host, nc, s, -1);
     p = strchr(host, ':');
     if (p == NULL)
-       {strcpy(file, host);
+       {nstrncpy(file, nc, host, -1);
 	host[0] = '\0';}
     else
        {*p++ = '\0';
-	strcpy(file, p);};
+	nstrncpy(file, nc, p, -1);};
 
     return;}
 
@@ -1625,7 +1625,7 @@ static int progress(donetdes *st)
     static char *phase[] = {"setup", "build", "netinstall",
 			    "hostinstall", "interrupt"};
 
-    get_host_file(host, file, st->hostfile);
+    get_host_file(host, file, BFLRG, st->hostfile);
 
     if (IS_NULL(host) == FALSE)
        run(FALSE, "%s %s do-net -p %s %s", st->ssh, host, st->stamp, file);
@@ -1869,7 +1869,7 @@ static int testhosts(donetdes *st, int c, char **v)
          else
 	    hfile = v[i];};
 
-    get_host_file(host, file, hfile);
+    get_host_file(host, file, BFLRG, hfile);
 
     if (IS_NULL(host) == FALSE)
        run(FALSE, "%s %s do-net -g %s %s", st->ssh, host, file, args);
@@ -2796,7 +2796,7 @@ static void clean(donetdes *st, hfspec *sp, int nsp, int ip, double *gti)
 static int clearout(donetdes *st)
    {char host[BFLRG], file[BFLRG];
 
-    get_host_file(host, file, st->hostfile);
+    get_host_file(host, file, BFLRG, st->hostfile);
 
     if (IS_NULL(host) == FALSE)
        run(FALSE, "%s %s do-net -c %s %s", st->ssh, host, st->stamp, file);
