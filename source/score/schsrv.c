@@ -956,7 +956,7 @@ int SC_hostname(char *s, int nc)
 
     st = gethostname(chst, MAXLINE);
     if (st == 0)
-       {strcpy(s, chst);
+       {SC_strncpy(s, nc, chst, -1);
 	p = strchr(s, '.');
 	if (p != NULL)
 	   *p = '\0';}
@@ -966,7 +966,7 @@ int SC_hostname(char *s, int nc)
        {struct utsname uts;
 
         uname(&uts);
-	strncpy(s, uts.nodename, nc);
+	SC_strncpy(s, nc, uts.nodename, -1);
         st = 0;};
 #endif
 

@@ -181,7 +181,7 @@ fspec *_SC_read_filter(char *fname)
 /* whack leading white space off of txt */
 		for (; strchr(" \t", *txt) != NULL; txt++);
 
-		strcpy(filter[n].text, txt);
+		SC_strncpy(filter[n].text, MAXLINE, txt, -1);
 		n++;};};
 
 	filter[n].text[0] = '\0';
@@ -2111,15 +2111,15 @@ static int _SC_close_job_process(taskdesc *job, int setst)
 
 	    p = SC_datef();
 	    if (p != NULL)
-	       {strcpy(inf->stop_time, p);
+	       {SC_strncpy(inf->stop_time, 32, p, -1);
 		CFREE(p);}
 	    else
-	       strcpy(inf->stop_time, "0");
+	       SC_strncpy(inf->stop_time, 32, "0", -1);
 
 	    pp = job->pp;
 	    if (SC_process_alive(pp))
 	       {if (pp->stop_time != NULL)
-		   strcpy(inf->stop_time, pp->stop_time);
+		   SC_strncpy(inf->stop_time, 32, pp->stop_time, -1);
 
 		rtry = job->done(job, setst);
 

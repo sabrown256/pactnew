@@ -13,7 +13,7 @@
 SC_lexical_stream
  *SC_current_lexical_stream = NULL;
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SC_LEX_PUTC - a function to attach to the lexical scanner output macro */
@@ -91,10 +91,12 @@ static int _SC_lex_wrap(void)
 SC_lexical_stream *SC_open_lexical_stream(char *name, int inbfsz,
 					  int strbfsz,
 					  PFInt scan, PFInt input,
-					  int (*output)(int c), int (*unput)(int c),
+					  int (*output)(int c),
+					  int (*unput)(int c),
 					  PFInt wrap, PFInt more,
 					  PFInt less)
-   {SC_lexical_stream *str;
+   {int nbs, nbo;
+    SC_lexical_stream *str;
 
     str = CMAKE(SC_lexical_stream);
 
@@ -112,21 +114,19 @@ SC_lexical_stream *SC_open_lexical_stream(char *name, int inbfsz,
     str->tokens       = CMAKE_N(SC_lexical_token, 50);
 
 /* allocate the buffers */
-    if (inbfsz != 0)
-       {str->in_bf  = CMAKE_N(char, inbfsz);
-        str->out_bf = CMAKE_N(char, inbfsz);}
-    else
-       {str->in_bf  = CMAKE_N(char, MAXLINE);
-        str->out_bf = CMAKE_N(char, MAXLINE);}
+    nbo = (inbfsz != 0) ? inbfsz : MAXLINE;
 
-    if (strbfsz != 0)
-       str->str_bf = CMAKE_N(char, strbfsz);
-    else
-       str->str_bf = CMAKE_N(char, MAX_BFSZ);
-
-    str->str_ptr = str->str_bf;
+    str->nbo     = nbo;
+    str->in_bf   = CMAKE_N(char, nbo);
+    str->out_bf  = CMAKE_N(char, nbo);
     str->in_ptr  = str->in_bf;
     str->out_ptr = str->out_bf;
+
+    nbs = (strbfsz != 0) ? strbfsz : MAX_BFSZ;
+
+    str->nbs     = nbs;
+    str->str_bf  = CMAKE_N(char, nbs);
+    str->str_ptr = str->str_bf;
 
 /* set up the assocaited functions */
     str->scan = scan;
@@ -280,7 +280,7 @@ void SC_lex_push_token(int type, ...)
         case SC_WSPC_TOK   :
         case SC_HOLLER_TOK :
              s = SC_VA_ARG(char *);
-	     strcpy(str->str_ptr, s);
+	     SC_strncpy(str->str_ptr, str->nbs, s, -1);
              str->tokens[indx].val.s = str->str_ptr;
 	     str->str_ptr += strlen(s) + 1;
              break;
