@@ -42,7 +42,7 @@ static int _UL_rd_scm(SS_psides *si)
 static int UL_rd_scm(SS_psides *si, char *name)
    {int rv;
 
-    SC_strncpy(_UL.bf, MAXLINE, name, 1);
+    SC_strncpy(_UL.bf, MAXLINE, name, -1);
 
     rv = SS_err_catch(si, _UL_rd_scm, NULL);
 

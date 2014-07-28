@@ -18,6 +18,10 @@ if ($?psy_mngdir == 0) then
    set psy_scrdir = $psy_base/scripts
 endif
 
+if ($?SCSOpt == 0) then
+   set SCSOpt = ""
+endif
+
 source $psy_scrdir/functions-pact.csh
 source $psy_scrdir/csh-subroutines
 HAVE_SUBROUTINES
@@ -47,7 +51,7 @@ set TmpFile       = tmp-file
 set TmpDir        = tmp-dir
 set OS            = `uname -s | tr "[A-Z]" "[a-z]"`
 
-set LLNL             = FALSE
+set Site             = FALSE
 set KEEP             = FALSE
 set Extn             = FALSE
 set UseRepo          = TRUE
@@ -78,7 +82,7 @@ while ($#argv >= 1)
            echo "    +v    get the distribution as of the given date mm/dd/yy_hh:mm:ss"
            echo "    -T    get the distribution for revision Tag Tyy_mm_dd_hh_mm_ss"
            echo "          (for tag use 'dsys info -c' or 'dsys info -t')"
-           echo "    -l    prepare a distribution for LLNL"
+           echo "    -l    keep site specific files"
            echo "    -x    put the extensions in a separate tar file (with -l only)"
            echo "    -r    export to remote source repository"
            echo "    -k    keep the source directory"
@@ -89,7 +93,7 @@ while ($#argv >= 1)
            set KEEP = TRUE
            breaksw
       case -l:
-           set LLNL = TRUE
+           set Site = TRUE
            breaksw
       case -r:
            set RepositoryExport = TRUE
@@ -102,9 +106,11 @@ while ($#argv >= 1)
       case -T:
            shift
            set raw     = ( `date -d "$1" '+%Y_%m_%d %H:%M'` )
-           set SRCDate = ( -D "$raw" )
            set DTag    = ( `echo $raw[1] | sed 's/^20//'` )
            set DName   = "pact$DTag"
+           set raw     = ( `date -d "$1" '+%Y-%m-%d %H:%M'` )
+           set SRCDate = ( -D "$raw" )
+           set SCSOPT  = ( $SCSOpt $SRCDate )
            breaksw
       case -x:
            set Extn = TRUE
@@ -136,12 +142,12 @@ Note $Log "Source tag: $SRCDate[2]"
    call PREP_TREE()
 
 # handle the extensions before later phases get rid of them
-   if (($Extn == "TRUE") && ($LLNL == "TRUE")) then
+   if (($Extn == "TRUE") && ($Site == "TRUE")) then
       call SAVE_EXT()
    endif
 
 # remove the local extensions directories
-   if ($LLNL != "TRUE") then
+   if ($Site != "TRUE") then
       flog $Log pwd
       flog $Log (find . -type d -name extensions -exec $RMDir {} \;)
    endif
@@ -153,8 +159,8 @@ Note $Log "Source tag: $SRCDate[2]"
    else
       call UNIX_DIST()
 
-# handle the LLNL specific material
-      if ($LLNL != "TRUE") then
+# handle the Site specific material
+      if ($Site != "TRUE") then
          call REMOVE_LOCAL()
       endif
    endif
@@ -202,8 +208,8 @@ INIT:
 
    NoteD $Log "PACT Distribution for UNIX platforms"
 
-   if ($LLNL == "TRUE") then
-      NoteD $Log "   LLNL specific material included"
+   if ($Site == "TRUE") then
+      NoteD $Log "   Site specific sources included"
    endif
 
    if ($KEEP == "TRUE") then
@@ -436,7 +442,7 @@ UNIX_DIST:
    NoteD $Log "Setting up UNIX distribution"
 
    set NoGoDirs = ( "manager/mac" "scheme/runtime" )
-   if ($LLNL != "TRUE") then
+   if ($Site != "TRUE") then
       flog $Log set NoGoDirs = ( $NoGoDirs manager/local manager/hosts )
    endif
 
@@ -512,8 +518,8 @@ FINISH:
       flog $Log chmod a+x pact-src
 
       flog $Log $RM pact.tar.gz
-      if ($LLNL == "TRUE") then
-         flog $Log $MV pact-src ../$DName-llnl-src
+      if ($Site == "TRUE") then
+         flog $Log $MV pact-src ../$DName-local-src
       else
          flog $Log $MV pact-src ../$DName-src
       endif
