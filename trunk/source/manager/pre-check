@@ -38,7 +38,7 @@ endif
 
 # check for /bin/csh
 set HaveCsh = FALSE
-if (-x /bin/csh)
+if (-x /bin/csh) then
    set HaveCsh = TRUE
 else
    echo ""
