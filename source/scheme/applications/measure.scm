@@ -30,34 +30,34 @@
 ;               - returns #f
 
 (define-macro (measure-memory expr)
-    (let* (start stop dloss)
+    (let* (mb ma dm)
         (if :mmem-first
-	    (begin (set! start (memory-usage))
+	    (begin (set! mb (memory-usage))
 		   (eval #t)
-		   (set! stop (memory-usage))
-		   (set! :mmem-dm1 (- (list-ref stop 1) (list-ref start 1)))
-		   (set! :mmem-dm2 (- (list-ref stop 2) (list-ref start 2)))
+		   (set! ma (memory-usage))
+		   (set! :mmem-dm1 (- (list-ref ma 1) (list-ref mb 1)))
+		   (set! :mmem-dm2 (- (list-ref ma 2) (list-ref mb 2)))
                    (printf nil "\n  Memory Usage\n")
                    (printf nil "Alloc  Free  Diff     Expression\n")))
-	(set! start (memory-usage))
+	(set! mb (memory-usage))
 	(eval expr)
-	(set! stop (memory-usage))
+	(set! ma (memory-usage))
         (if :mmem-first
             (begin
-                (set! dloss (- (list-ref stop 2) (list-ref start 2)))
+                (set! dm (- (list-ref ma 2) (list-ref mb 2)))
                 (printf nil "%5ld %5ld %5ld  :  %s\n"
-			(- (list-ref stop 0) (list-ref start 0) :mmem-dm1 :mmem-dm2)
-			(- (list-ref stop 1) (list-ref start 1) :mmem-dm1 :mmem-dm2)
-			(- (list-ref stop 2) (list-ref start 2))
+			(- (list-ref ma 0) (list-ref mb 0) :mmem-dm1 :mmem-dm2)
+			(- (list-ref ma 1) (list-ref mb 1) :mmem-dm1 :mmem-dm2)
+			(- (list-ref ma 2) (list-ref mb 2))
 			expr))
             (begin
-                (set! dloss (- (list-ref stop 2) (list-ref start 2) :mmem-dm2))
+                (set! dm (- (list-ref ma 2) (list-ref mb 2) :mmem-dm2))
                 (printf nil "%5ld %5ld %5ld  :  %s\n"
-			(- (list-ref stop 0) (list-ref start 0) :mmem-dm1 :mmem-dm2)
-			(- (list-ref stop 1) (list-ref start 1) :mmem-dm1)
-			dloss
+			(- (list-ref ma 0) (list-ref mb 0) :mmem-dm1 :mmem-dm2)
+			(- (list-ref ma 1) (list-ref mb 1) :mmem-dm1)
+			dm
 			expr)))
-        (set! :mmem-loss (+ :mmem-loss dloss))
+        (set! :mmem-loss (+ :mmem-loss dm))
         (set! :mmem-first #f)))
 
 ;--------------------------------------------------------------------------

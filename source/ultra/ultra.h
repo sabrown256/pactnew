@@ -98,6 +98,9 @@ extern void
  UL_plot_limits(PG_device *dev, int pflg, double *wc),
  UL_pause(SS_psides *si, int pf);
 
+extern char
+ *_UL_id_str(int i, int j);
+
 extern object
  *_ULI_describe(SS_psides *si, object *obj),
  *_ULI_apropos(SS_psides *si, object *obj);
