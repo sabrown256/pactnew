@@ -1055,11 +1055,7 @@ static object *UL_derivative(SS_psides *si, int j)
 
     PM_derivative(n, x[0], x[1], UL_gs.bfa[0], UL_gs.bfa[1]);
 
-    if ((SX_gs.dataset[j].id >= 'A') &&
-        (SX_gs.dataset[j].id <= 'Z'))
-       {lbl = SC_dsnprintf(FALSE, "Derivative %c", SX_gs.dataset[j].id);}
-    else
-       {lbl = SC_dsnprintf(FALSE, "Derivative @%d", SX_gs.dataset[j].id);}
+    lbl = SC_dsnprintf(FALSE, "Derivative %s", _UL_id_str(j, j));
 
     if (n == 2)
        {n = 3;
@@ -1108,11 +1104,7 @@ static object *_ULI_thin(SS_psides *si, int j, object *argl)
     if (m < 1)
        SS_error(si, "THIN FAILED - _ULI_THIN", argl);
 
-    if ((SX_gs.dataset[j].id >= 'A') &&
-        (SX_gs.dataset[j].id <= 'Z'))
-        {lbl = SC_dsnprintf(FALSE, "Thinned %c", SX_gs.dataset[j].id);}
-    else
-        {lbl = SC_dsnprintf(FALSE, "Thinned @%d", SX_gs.dataset[j].id);}
+    lbl = SC_dsnprintf(FALSE, "Thinned %s", _UL_id_str(j, j));
 
     ch = SX_mk_curve(si, m, UL_gs.bfa, lbl, NULL, UL_plot);
 
@@ -1218,11 +1210,7 @@ static object *_ULI_integrate(SS_psides *si, int j, double d1, double d2)
 
     PM_integrate_tzr(d1, d2, &n, x[0], x[1], UL_gs.bfa[0], UL_gs.bfa[1]);
 
-    if ((SX_gs.dataset[j].id >= 'A') &&
-        (SX_gs.dataset[j].id <= 'Z'))
-        {lbl = SC_dsnprintf(FALSE, "Integrate %c", SX_gs.dataset[j].id);}
-    else
-        {lbl = SC_dsnprintf(FALSE, "Integrate @%d", SX_gs.dataset[j].id);}
+    lbl = SC_dsnprintf(FALSE, "Integrate %s", _UL_id_str(j, j));
 
     ch = SX_mk_curve(si, n, UL_gs.bfa, lbl, NULL, UL_plot);
 
@@ -1422,7 +1410,8 @@ static object *_ULI_xmm(SS_psides *si, int j, double d1, double d2)
        {while ((x[0][i] <= d1) && (i < SX_gs.dataset[j].n))
            ++i;
         UL_gs.bfa[0][k] = d1;
-        PM_interp(UL_gs.bfa[1][k++], d1, x[0][i-1], x[1][i-1], x[0][i], x[1][i]);};
+        PM_interp(UL_gs.bfa[1][k++], d1,
+		  x[0][i-1], x[1][i-1], x[0][i], x[1][i]);};
 
 /* all the rest */
     while ((i < SX_gs.dataset[j].n) && (x[0][i] < d2))
@@ -1432,13 +1421,10 @@ static object *_ULI_xmm(SS_psides *si, int j, double d1, double d2)
 
     if ((d2 <= x[0][i]) && (i < SX_gs.dataset[j].n))
        {UL_gs.bfa[0][k] = d2;
-        PM_interp(UL_gs.bfa[1][k++], d2, x[0][i-1], x[1][i-1], x[0][i], x[1][i]);};
+        PM_interp(UL_gs.bfa[1][k++], d2,
+		  x[0][i-1], x[1][i-1], x[0][i], x[1][i]);};
 
-    if ((SX_gs.dataset[j].id >= 'A') &&
-        (SX_gs.dataset[j].id <= 'Z'))
-        {lbl = SC_dsnprintf(FALSE, "Extract %c", SX_gs.dataset[j].id);}
-    else
-        {lbl = SC_dsnprintf(FALSE, "Extract @%d", SX_gs.dataset[j].id);}
+    lbl = SC_dsnprintf(FALSE, "Extract %s", _UL_id_str(j, j));
 
 /* reverse points if decreasing */
     if (decreasing)
@@ -1613,6 +1599,7 @@ object *UL_sort(SS_psides *si, int k)
 static object *UL_smp_append(SS_psides *si, object *a, object *b)
    {int i, j, n, na, nb, l;
     double *x[PG_SPACEDM];
+    char ca[80], cb[80];
     char *lbl;
     object *c;
 
@@ -1640,11 +1627,9 @@ static object *UL_smp_append(SS_psides *si, object *a, object *b)
         {UL_gs.bfa[0][n] = *x[0]++;
 	 UL_gs.bfa[1][n] = *x[1]++;};
 
-    if ((SX_gs.dataset[i].id >= 'A') &&
-        (SX_gs.dataset[i].id <= 'Z'))
-       {lbl = SC_dsnprintf(FALSE, "Append %c %c", SX_gs.dataset[i].id, SX_gs.dataset[j].id);}
-    else
-       {lbl = SC_dsnprintf(FALSE, "Append @%d @%d", SX_gs.dataset[i].id, SX_gs.dataset[j].id);}
+    SC_strncpy(ca, 80, _UL_id_str(i, i), -1);
+    SC_strncpy(cb, 80, _UL_id_str(i, j), -1);
+    lbl = SC_dsnprintf(FALSE, "Append %s %s", ca, cb);
 
     c = SX_mk_curve(si, n, UL_gs.bfa, lbl, NULL, UL_plot);
 
@@ -1665,6 +1650,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
    {int i, j, k, n, na, nb, nc, l;
     double xmn, xmx, xv, yv;
     double *x[PG_SPACEDM];
+    char ca[80], cb[80];
     char *lbl;
     object *c, *tmp;
 
@@ -1739,11 +1725,9 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
 
     UL_delete(si, c);
 
-    if ((SX_gs.dataset[i].id >= 'A') &&
-        (SX_gs.dataset[i].id <= 'Z'))
-       {lbl = SC_dsnprintf(FALSE, "Append %c %c", SX_gs.dataset[i].id, SX_gs.dataset[j].id);}
-    else
-       {lbl = SC_dsnprintf(FALSE, "Append @%d @%d", SX_gs.dataset[i].id, SX_gs.dataset[j].id);}
+    SC_strncpy(ca, 80, _UL_id_str(i, i), -1);
+    SC_strncpy(cb, 80, _UL_id_str(i, j), -1);
+    lbl = SC_dsnprintf(FALSE, "Append %s %s", ca, cb);
 
     c = SX_mk_curve(si, n, UL_gs.bfa, lbl, NULL, UL_plot);
 
@@ -1761,7 +1745,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
  */
 
 static object *_ULI_append(SS_psides *si, object *argl)
-   {int i, id;
+   {int i;
     char local[MAXLINE];
     char *lbl;
     object *b, *acc, *target, *tmp;
@@ -1792,11 +1776,9 @@ static object *_ULI_append(SS_psides *si, object *argl)
     for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
         {b = SS_car(si, argl);
 
-         id = SX_gs.dataset[SX_get_crv_index_i(b)].id;
-         if ((id >= 'A') && (id <= 'Z'))
-            lbl = SC_dsnprintf(FALSE, "%s %c", local, id);
-         else
-	    lbl = SC_dsnprintf(FALSE, "%s @%d", local, id);
+	 i = SX_get_crv_index_i(b);
+
+	 lbl = SC_dsnprintf(FALSE, "%s %s", local, _UL_id_str(i, i));
 
          if (SX_curvep_a(b))
             {if (UL_gs.simple_append == TRUE)

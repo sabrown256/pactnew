@@ -437,11 +437,7 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
 
 /* display coefficients and cons up the return list */
        {if (si->interactive == ON)
-	   {if ((SX_gs.dataset[j].id >= 'A') &&
-		(SX_gs.dataset[j].id <= 'Z'))
-	       PRINT(stdout, "\nCurve %c\n", SX_gs.dataset[j].id);
-	    else
-	       PRINT(stdout, "\nCurve @%d\n", SX_gs.dataset[j].id);};
+	   PRINT(stdout, "\nCurve %s\n", _UL_id_str(j, j));
 
 	ret = SS_null;
 	sgn = (order < 0) ? -1 : 1;
@@ -455,13 +451,7 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
 /* create curve of fit */
 	p = PM_lsq_polynomial(SX_gs.default_npts, order, cf, wc);
 
-	if ((SX_gs.dataset[i].id >= 'A') &&
-	    (SX_gs.dataset[i].id <= 'Z'))
-	   lbl = SC_dsnprintf(FALSE, "Fit %c %d",
-			      SX_gs.dataset[j].id, order);
-	else
-	   lbl = SC_dsnprintf(FALSE, "Fit @%d %d",
-			      SX_gs.dataset[j].id, order);
+	lbl = SC_dsnprintf(FALSE, "Fit %s %d", _UL_id_str(i, j), order);
 
 	ret = SS_mk_cons(si, SS_reverse(si, ret),
 			 SX_mk_curve(si, SX_gs.default_npts, p,
@@ -535,10 +525,7 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
 		    (SX_gs.dataset[i].id <= 'Z'));
 
 	if (si->interactive == ON)
-	   {if (alpha_id)
-	       PRINT(stdout, "Fit to curve %c\n\n", id);
-	    else
-	       PRINT(stdout, "Fit to curve @%d\n\n", id);};
+	   PRINT(stdout, "Fit to curve %s\n\n", _UL_id_str(i, j));
 
 	if (alpha_id)
 	   snprintf(local, MAXLINE, "Fit(%c ;", id);
@@ -553,15 +540,9 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
 	        {PRINT(stdout, "    ");
 		 PRINT(stdout, SX_gs.text_output_format,
 		       PM_element(solution, i, 1));
-		 if (alpha_id)
-		    PRINT(stdout, " * curve %c\n", id);
-		 else
-		    PRINT(stdout, " * curve @%d\n", id);};
+		 PRINT(stdout, " * curve %s\n", _UL_id_str(i, j));};
 
-	     if (alpha_id)
-	        SC_vstrcat(local, MAXLINE, " %c", id);
-	     else
-	        SC_vstrcat(local, MAXLINE, " @%d", id);};
+	     SC_vstrcat(local, MAXLINE, " %s", _UL_id_str(i, j));};
 
 	SC_strcat(local, MAXLINE, ")");
 
@@ -862,10 +843,7 @@ object *UL_dupx(SS_psides *si, int j)
 
     ds = SX_gs.dataset + j;
 
-    if ((ds->id >= 'A') && (ds->id <= 'Z'))
-       lbl = SC_dsnprintf(FALSE, "Dupx %c", ds->id);
-    else
-       lbl = SC_dsnprintf(FALSE, "Dupx @%d", ds->id);
+    lbl = SC_dsnprintf(FALSE, "Dupx %s", _UL_id_str(j, j));
 
     x[0] = ds->x[0];
     x[1] = ds->x[0];
@@ -885,11 +863,7 @@ static object *_UL_stat(SS_psides *si, int j)
     object *ret;
 
     if (si->interactive == ON)
-       {if ((SX_gs.dataset[j].id >= 'A') &&
-            (SX_gs.dataset[j].id <= 'Z'))
-           {PRINT(stdout, "\nCurve %c\n", SX_gs.dataset[j].id);}
-        else
-           {PRINT(stdout, "\nCurve @%d\n", SX_gs.dataset[j].id);};}
+       PRINT(stdout, "\nCurve %s\n", _UL_id_str(j, j));
 
     n = SX_gs.dataset[j].n;
     PM_stats_mean(n, SX_gs.dataset[j].x[0], &xmean, NULL, NULL, &xstd);
@@ -954,11 +928,8 @@ static object *_ULI_disp(SS_psides *si, int j, double xmin, double xmax)
     x[1]   = SX_gs.dataset[j].x[1];
     n    = SX_gs.dataset[j].n;
 
-    if ((SX_gs.dataset[j].id >= 'A') &&
-        (SX_gs.dataset[j].id <= 'Z'))
-       {PRINT(stdout, "\n Curve %c (%s) from ", SX_gs.dataset[j].id, SX_gs.dataset[j].text);}
-    else
-       {PRINT(stdout, "\n Curve @%d (%s) from ", SX_gs.dataset[j].id, SX_gs.dataset[j].text);}
+    PRINT(stdout, "\n Curve %s (%s) from ",
+	  _UL_id_str(j, j), SX_gs.dataset[j].text);
 
     PRINT(stdout, SX_gs.text_output_format, xmin);
     PRINT(stdout, " to ");

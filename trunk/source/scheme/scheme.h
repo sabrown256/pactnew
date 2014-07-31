@@ -82,12 +82,12 @@
 
 /* OBJECT ACCESSORS */
 
-#define SS_OBJECT_GC(_o)           SC_ref_count(_o)
-#define SS_UNCOLLECT(_o)           SC_permanent(_o)
-#define SS_OBJECT_TYPE(_o)         SC_arrtype(_o, -1)
-#define SS_OBJECT_NAME(_o)         ((_o)->print_name)
-#define SS_OBJECT(_o)              ((_o)->val)
-#define SS_OBJECT_ETYPE(_o)        ((_o)->eval_type)
+#define SS_OBJECT_GC(_o)              SC_ref_count(_o)
+#define SS_UNCOLLECT(_o)              SC_permanent(_o)
+#define SS_OBJECT_TYPE(_o)            SC_arrtype(_o, -1)
+#define SS_OBJECT_NAME(_o)            ((_o)->print_name)
+#define SS_OBJECT(_o)                 ((_o)->val)
+#define SS_OBJECT_ETYPE(_o)           ((_o)->eval_type)
 #define SS_OBJECT_FREE(_si, _o)       (*((_o)->release))(_si, _o)
 #define SS_OBJECT_PRINT(_si, _o, _s)  (*((_o)->print))(_si, _o, _s)
 

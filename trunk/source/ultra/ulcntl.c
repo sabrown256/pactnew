@@ -17,6 +17,21 @@ static void
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _UL_ID_STR - return a string representation of data-id for curve I */
+
+char *_UL_id_str(int i, int j)
+   {static char idstr[80];
+
+    if ((SX_gs.dataset[i].id >= 'A') &&	(SX_gs.dataset[i].id <= 'Z'))
+       snprintf(idstr, 80, "%c", SX_gs.dataset[j].id);
+    else
+       snprintf(idstr, 80, "@%d", SX_gs.dataset[j].id);
+
+    return(idstr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* UL_INIT_HASH - set up the Ultra hash table */
 
 void UL_init_hash(void)
