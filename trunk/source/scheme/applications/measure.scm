@@ -29,8 +29,12 @@
 ; MEASUE-MEMORY - measure the net memory cost of evaluating EXPR
 ;               - returns #f
 
-(define-macro (measure-memory expr)
-    (let* (mb ma dm)
+(define-macro (measure-memory expr . flags)
+    (let* ((dmp (if (null? flags)
+		    0
+		    (list-ref flags 0)))
+	   (cs -1)
+	   mb ma dm)
         (if :mmem-first
 	    (begin (set! mb (memory-usage))
 		   (eval #t)
@@ -39,9 +43,16 @@
 		   (set! :mmem-dm2 (- (list-ref ma 2) (list-ref mb 2)))
                    (printf nil "\n  Memory Usage\n")
                    (printf nil "Alloc  Free  Diff     Expression\n")))
+
+	(if (= dmp 1)
+	    (set! cs (memory-monitor cs 2 "Measure-memory")))
 	(set! mb (memory-usage))
 	(eval expr)
+
+	(if (= dmp 1)
+	    (set! cs (memory-monitor cs 2 "Measure-memory")))
 	(set! ma (memory-usage))
+
         (if :mmem-first
             (begin
                 (set! dm (- (list-ref ma 2) (list-ref mb 2)))
