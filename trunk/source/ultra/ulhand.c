@@ -23,6 +23,53 @@ typedef object *(*PFPObjectoo)(SS_psides *si, object *s, object *tok);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_ARGL_ARRAY - return an array of objects in POL corresponding
+ *                - to the linked list of object LST
+ */
+
+static void _SS_argl_array(SS_psides *si, object ***pol, int *pnl,
+			   object *lst)
+   {int il, nl;
+    object *s, **ol;
+
+    nl = SS_length(si, lst);
+    ol = CMAKE_N(object *, nl);
+
+    for (s = lst, il = 0; il < nl; il++, s = SS_cdr(si, s))
+        ol[il] = SS_car(si, s);
+
+    *pol = ol;
+    *pnl = nl;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _UL_FIND_CURVE_DOMAIN - return the union domain of the curves from OL
+ *                       - in DM
+ */
+
+static void _UL_find_curve_domain(double *dm, object **ol, int nl)
+   {int i, id, il;
+    double xt;
+    object *s;
+
+    dm[0] =  HUGE;
+    dm[1] = -HUGE;
+    for (il = 0; il < nl; il++)
+        {s = ol[il];
+	 if (SX_curvep_a(s))
+	    {i = SX_get_crv_index_i(s);
+	     for (id = 0; id < 2; id++)
+	         {xt     = SX_gs.dataset[i].wc[id];
+		  dm[id] = min(dm[id], xt);};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* UL_LMT - find the min and max of a double array */
 
 void UL_lmt(double *pt, int n, double *mymin, double *mymax)
@@ -583,6 +630,71 @@ object *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _UL_BC_LOAD_OPER - load operand curve I into X */
+
+static int _UL_bc_load_oper(SS_psides *si, int i, double **x,
+			    char *bf, int nc, int cpy)
+   {int l, id, n;
+    double *xt[PG_SPACEDM];
+
+    n = SX_gs.dataset[i].n;
+    for (id = 0; id < 2; id++)
+        xt[id] = SX_gs.dataset[i].x[id];
+
+    UL_check_order(si, xt[0], n, i);
+
+    for (id = 0; id < 2; id++)
+        {if (cpy == TRUE)
+	    {UL_gs.bfa[id] = CMAKE_N(double, n);
+	     x[id] = UL_gs.bfa[id];
+	     for (l = 0; l < n; l++)
+	         x[id][l] = xt[id][l];}
+
+	 else
+	    x[id] = xt[id];};
+
+    if (cpy == FALSE)
+       {
+#if 0
+    SC_vstrcat(bf, nc, " %s", _UL_id_str(i, i));
+#else
+    char *lbl;
+
+    lbl = SC_dsnprintf(FALSE, "%s %s", bf, _UL_id_str(i, i));
+    SC_strncpy(bf, MAXLINE, lbl, -1);
+#endif
+    };
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _UL_BC_SWITCH_ACC - exchange XA and XB thus resetting the accumulator */
+
+static double *_UL_bc_switch_acc(double **xa, double **xb,
+				 int nn, double *af)
+   {int id;
+
+    if (af == UL_gs.bfb[0])
+       {for (id = 0; id < 2; id++)
+	    {xb[id] = UL_gs.bfb[id];
+	     CREMAKE(UL_gs.bfa[id], double, nn);
+	     xa[id] = UL_gs.bfa[id];};}
+
+    else
+       {for (id = 0; id < 2; id++)
+	    {xb[id] = UL_gs.bfa[id];
+	     CREMAKE(UL_gs.bfb[id], double, nn);
+	     xa[id] = UL_gs.bfb[id];};};
+
+    af = xa[0];
+
+    return(af);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _UL_BC_ACC_NUMBER - accumulate a numerical value from S int XA */
 
 static void _UL_bc_acc_number(PFDoubleRR f, double **xa, int na,
@@ -688,48 +800,43 @@ static int _UL_bc_operate(PFVoid basicf, double **xa,
 static object *_UL_bc_multi(SS_psides *si, C_procedure *cp,
 			    object **ol, int nl)
    {int i, j, id, il;
-    int na, n1, n2;
-    double xt, yvl;
+    int na, no;
+    double yvl;
     double gxext[PG_SPACEDM];
     double *xp1[PG_SPACEDM], *xp2[PG_SPACEDM];
     double *xa[PG_SPACEDM], *af;                /* pointers for accumulator */
     char bf[MAXLINE];
-    char *lbl;
-    object *ch, *s, *tc;
+    object *ch, *cn, *cr, *s, *tc;
     PFDoubleRR fun;
 
     fun = (PFDoubleRR) cp->proc[0];
     i   = 0;
-    tc  = NULL;
+    tc  = SS_null;
 
     bf[0] = '\0';
 
 /* search all curves in the list for the domain
  * this way it is not necessary that the screen be active
  */
-    gxext[0] =  HUGE;
-    gxext[1] = -HUGE;
-    for (il = 0; il < nl; il++)
-        {s = ol[il];
-	 if (SX_curvep_a(s))
-	    {i = SX_get_crv_index_i(s);
-	     for (id = 0; id < 2; id++)
-	         {xt        = SX_gs.dataset[i].wc[id];
-		  gxext[id] = min(gxext[id], xt);};};};
-            
-    ch = SS_null;
+    _UL_find_curve_domain(gxext, ol, nl);
+
+    cn = SS_null;
+    cr = SS_null;
 
 /* find the first curve in the list */
     for (il = 0; il < nl; )
         {s = ol[il];
 	 if (SS_numbp(s))
-	    {ch = SS_mk_cons(si, s, ch);
+	    {SS_assign(si, cn, SS_mk_cons(si, s, cn));
 	     il++;}
 
 /* the first non-number in the arg list */
 	 else
-	    {if (!SS_nullobjp(ch))
-	        {s = SS_binary_homogeneous(si, cp, SS_reverse(si, ch));
+	    {if (!SS_nullobjp(cn))
+	        {SS_assign(si, cr, SS_reverse(si, cn));
+		 s = SS_binary_homogeneous(si, cp, cr);
+		 SS_assign(si, cr, SS_null);
+
 		 if (SS_integerp(s))
 		    yvl = (double) SS_INTEGER_VALUE(s);
 		 else if (SS_floatp(s))
@@ -737,17 +844,16 @@ static object *_UL_bc_multi(SS_psides *si, C_procedure *cp,
 		 else
 		    yvl = 0.0;
 
-		 tc  = _UL_make_ln(si, 0.0, yvl, gxext[0], gxext[1],
-				   SX_gs.default_npts);
-		 i   = SX_get_crv_index_i(tc);
-		 lbl = SC_dsnprintf(FALSE, "%s %g",
-				    SS_get_string(si->fun), yvl);}
+		 tc = _UL_make_ln(si, 0.0, yvl, gxext[0], gxext[1],
+				  SX_gs.default_npts);
+		 i = SX_get_crv_index_i(tc);
+		 SC_vstrcat(bf, MAXLINE, "%s %g",
+			    SS_get_string(si->fun), yvl);}
 
 	     else if (SX_curvep_a(s))
-	        {i   = SX_get_crv_index_i(s);
-		 lbl = SC_dsnprintf(FALSE, "%s %s",
-				    SS_get_string(si->fun),
-				    _UL_id_str(i, i));
+	        {i = SX_get_crv_index_i(s);
+		 SC_vstrcat(bf, MAXLINE, "%s %s",
+			    SS_get_string(si->fun), _UL_id_str(i, i));
 		 il++;}
 
 	     else
@@ -756,36 +862,25 @@ static object *_UL_bc_multi(SS_psides *si, C_procedure *cp,
 	     break;};};
 
 /* if we reached the end of the list it was all numbers */
+    ch = SS_null;
     if (il == nl)
-       {if (SS_nullobjp(ch))
-	   ch = SS_null;
-        else
-	   ch = SS_binary_homogeneous(si, cp, SS_reverse(si, ch));}
+       {if (!SS_nullobjp(cn))
+	   {SS_assign(si, cr, SS_reverse(si, cn));
+	    ch = SS_binary_homogeneous(si, cp, cr);
+	    SS_assign(si, cr, SS_null);};}
 
 /* otherwise it is curves and numbers */
     else
 
-/* load the first operand into XP1 */
-       {n1 = SX_gs.dataset[i].n;
-	for (id = 0; id < 2; id++)
-	    {xp2[id] = SX_gs.dataset[i].x[id];
+/* load the first operand into the accumulator XA */
+       {na = _UL_bc_load_oper(si, i, xa, bf, MAXLINE, TRUE);
 
-	     if (id == 0)
-	        UL_check_order(si, xp2[0], n1, i);
-
-	     UL_gs.bfa[id] = CMAKE_N(double, n1);
-	     xp1[id] = UL_gs.bfa[id];
-	     for (j = 0; j < n1; j++)
-	         xp1[id][j] = xp2[id][j];};
-        
-	na = n1;
 	for (id = 0; id < 2; id++)
-	    {UL_gs.bfb[id] = CMAKE_N(double, 1);
-	     xa[id] = xp1[id];};
+	    UL_gs.bfb[id] = CMAKE_N(double, 1);
 
 	af = NULL;
-	SC_strncpy(bf, MAXLINE, lbl, -1);
     
+/* loop over the remaining operands */
 	for ( ; il < nl; il++)
 	    {s = ol[il];
 
@@ -795,46 +890,25 @@ static object *_UL_bc_multi(SS_psides *si, C_procedure *cp,
 
 /* combine a curve with the accumulator */
 	     else if (SX_curvep_a(s))
+	        {j = SX_get_crv_index_i(s);
 
 /* load the next operand into XP2 */
-	        {j  = SX_get_crv_index_i(s);
-		 n2 = SX_gs.dataset[j].n;
-		 for (id = 0; id < 2; id++)
-		     xp2[id] = SX_gs.dataset[j].x[id];
+		 no = _UL_bc_load_oper(si, j, xp2, bf, MAXLINE, FALSE);
 
-		 UL_check_order(si, xp2[0], n2, j);
+/* exchange the accumulator and XP1 */
+		 af = _UL_bc_switch_acc(xa, xp1, na+no+2, af);
 
-		 lbl = SC_dsnprintf(FALSE, "%s %s", bf, _UL_id_str(i, j));
-		 SC_strncpy(bf, MAXLINE, lbl, -1);
-
-/* set/reset the accumulator */
-		 n1 = na;
-		 if (af == UL_gs.bfb[0])
-		    {for (id = 0; id < 2; id++)
-		         {xp1[id] = UL_gs.bfb[id];
-			  CREMAKE(UL_gs.bfa[id], double, n1+2+n2);
-			  xa[id] = UL_gs.bfa[id];};}
-
-		 else
-		    {for (id = 0; id < 2; id++)
-		         {xp1[id] = UL_gs.bfa[id];
-			  CREMAKE(UL_gs.bfb[id], double, n1+2+n2);
-			  xa[id] = UL_gs.bfb[id];};};
-
-		 af = xa[0];
-
-		 na = _UL_bc_operate(cp->proc[0], xa, xp1, xp2, n1, n2);
+		 na = _UL_bc_operate(cp->proc[0], xa, xp1, xp2, na, no);
 		 if (na == -1)
-		    {ch = SS_f;
-		     break;};};};
+		    break;};};
 
 /* delete the temporary curve if allocated */
-	if (tc != NULL)
+	if (tc != SS_null)
 	   UL_delete(si, tc);
 
 /* create new curve with data in the accumulator */
-	if (ch != SS_f)
-	   ch = SX_mk_curve(si, na, xa, lbl, NULL, UL_plot);
+	if (na != -1)
+	   ch = SX_mk_curve(si, na, xa, bf, NULL, UL_plot);
 
 	for (id = 0; id < 2; id++)
 	    {CFREE(UL_gs.bfa[id]);
@@ -850,16 +924,13 @@ static object *_UL_bc_multi(SS_psides *si, C_procedure *cp,
  */
 
 object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
-   {int il, nl;
-    object *ch, *s, **ol;
+   {int nl;
+    object *ch, **ol;
 
 /* set up initial pointers */
     SX_prep_arg(si, argl);
 
-    nl = SS_length(si, argl);
-    ol = CMAKE_N(object *, nl);
-    for (s = argl, il = 0; il < nl; il++, s = SS_cdr(si, s))
-        ol[il] = SS_car(si, s);
+    _SS_argl_array(si, &ol, &nl, argl);
 
 /* set plot flag on so that for example (+ (lst) red) causes replot */
     SX_gs.plot_flag = TRUE;
@@ -892,7 +963,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
 object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
    {int i, j, n, id;
     double *x[PG_SPACEDM];
-    char local[MAXLINE], local2[MAXLINE];
+    char bf[MAXLINE];
     char *lbl;
     object *s, *ch, *t;
     PFDoubleRi fun;
@@ -916,7 +987,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
     for (id = 0; id < 2; id++)
         x[id] = SX_gs.dataset[i].x[id];
 
-    SC_strncpy(local, MAXLINE, _UL_id_str(i, i), -1);
+    SC_strncpy(bf, MAXLINE, _UL_id_str(i, i), -1);
 
 /* copy to accumulator */
     for (id = 0; id < 2; id++)
@@ -926,22 +997,18 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
 
 	 x[id] = UL_gs.bfa[id];};
 
-    SC_strncpy(local2, MAXLINE, local, -1);
-
     for (t = SS_cdr(si, argl); SS_consp(t); t = SS_cdr(si, t))
         {s = SS_car(si, t);
          if (!SX_curvep_a(s))
             SS_error(si, "BAD ARGUMENT - UL_BCXL", s);
          i = SX_get_crv_index_i(s);
-	 snprintf(local, MAXLINE, "%s %s", local2, _UL_id_str(i, i));
-
-         SC_strncpy(local2, MAXLINE, local, -1);
+	 SC_vstrcat(bf, MAXLINE, " %s", _UL_id_str(i, i));
 
          for (j = 0; j < n; j++)
              {x[1][j] = fun(x[1][j], i);};};
 
     lbl = SC_dsnprintf(FALSE, "%s %s",
-		       SS_get_string(si->fun), SC_strrev(local));
+		       SS_get_string(si->fun), SC_strrev(bf));
     ch = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
 
     SS_assign(si, argl, SS_null);

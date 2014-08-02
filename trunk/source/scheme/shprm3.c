@@ -393,19 +393,22 @@ static object *_SSI_last(SS_psides *si, object *obj)
 object *SS_reverse(SS_psides *si, object *obj)
    {object *ths, *nxt, *prv;
 
-    if (SS_nullobjp(obj))
-       return(obj);
+    ths = SS_null;
 
-    if (!SS_consp(obj))
+    if (SS_nullobjp(obj))
+       ths = obj;
+
+    else if (!SS_consp(obj))
        SS_error(si, "BAD LIST TO REVERSE", obj);
 
-    for (ths = SS_null, nxt = obj; SS_consp(nxt); )
-         {prv = ths;
-          ths = nxt;
-          nxt = SS_cdr(si, nxt);
-          SS_CDR_MACRO(ths) = prv;
-          SS_mark(prv);
-          SC_mark(nxt, -1);};
+    else
+       {for (ths = SS_null, nxt = obj; SS_consp(nxt); )
+	    {prv = ths;
+	     ths = nxt;
+	     nxt = SS_cdr(si, nxt);
+	     SS_CDR_MACRO(ths) = prv;
+	     SS_mark(prv);
+	     SC_mark(nxt, -1);};};
 
     return(ths);}
 
