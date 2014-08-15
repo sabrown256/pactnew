@@ -576,7 +576,6 @@ struct s_SX_scope_public
 
 /* non-zero default value */
    {int default_npts;
-    int default_color;
 
     int n_curves;               /* curve controls */
     int n_curves_read;

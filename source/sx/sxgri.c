@@ -396,9 +396,11 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
    {int i, flag, nc;
     int sdx[PG_SPACEDM];
     int *clrmd, *nlev, *mrki, *labcf, *labln, *labts;
+    int *lnclr, *lnsty;
     double ndc[PG_BOXSZ];
     double *axsca, *axslw, *axsmts, *axsmjt, *axsmnt;
     double *axson, *axndec, *cntrat, *labsp, *mrks;
+    double *lnwid;
     char *s, *name, **axstf, **axslxf, **axslyf;
     out_device *out;
 
@@ -429,6 +431,9 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	labln  = PG_ptr_attr_glb("label-length");
 	labsp  = PG_ptr_attr_glb("label-space");
 	labts  = PG_ptr_attr_glb("label-type-size");
+	lnclr  = PG_ptr_attr_glb("line-color");
+	lnsty  = PG_ptr_attr_glb("line-style");
+	lnwid  = PG_ptr_attr_glb("line-width");
 	mrki   = PG_ptr_attr_glb("marker-index");
 	mrks   = PG_ptr_attr_glb("marker-scale");
 
@@ -588,7 +593,13 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_variable("Theta", SC_DOUBLE_S,
 			     &SX_gs.view_angle[0], &_SX.ea_mn[0], &_SX.ea_mx[0]);
 	PG_register_variable("Default Color", SC_INT_S,
-			     &SX_gs.default_color, NULL, NULL);
+			     lnclr, NULL, NULL);
+
+	PG_register_variable("Default Style", SC_INT_S,
+			     lnsty, NULL, NULL);
+
+	PG_register_variable("Default Width", SC_DOUBLE_S,
+			     lnwid, NULL, NULL);
 
 /* window controls */
 	PG_register_variable("Border Width", SC_INT_S,

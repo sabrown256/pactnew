@@ -1021,6 +1021,9 @@ void SX_install_global_vars(SS_psides *si)
 
     PG_setup_attrs_glb();
 
+/* change default color to rotating */
+    PG_set_attrs_glb(TRUE, "line-color", ROTATING, NULL);
+
     axsca     = PG_ptr_attr_glb("axis-char-angle");
     axscs     = PG_ptr_attr_glb("axis-char-size");
     axsgs     = PG_ptr_attr_glb("axis-grid-style");
@@ -1088,7 +1091,6 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.border_width           = 2;
     SX_gs.view_angle[2]          = 0.0;
     SX_gs.data_id                = TRUE,
-    SX_gs.default_color          = -1;
     SX_gs.gri_x[0]               = 0.5;
     SX_gs.gri_x[1]               = 0.01;
     SX_gs.gri_dx[0]              = 0.0;
@@ -1314,11 +1316,6 @@ void SX_install_global_vars(SS_psides *si)
                   "Variable: Controls display of curve identifiers on graph\n     Usage: data-id on | off",
                   SS_acc_int,
                   &SX_gs.data_id);
-
-    SS_install_cf(si, "default-color",
-                  "Variable: The default line color\n     Usage: default-color <color>",
-                  SS_acc_int,
-                  &SX_gs.default_color);
 
     SS_install_cf(si, "default-npts",
                   "Variable: The default number of points used to make new curves.\n     Used by SPAN, LINE, etc.",
