@@ -275,6 +275,14 @@ enum e_PG_dev_type
 
 typedef enum e_PG_dev_type PG_dev_type;
 
+enum e_PG_color
+   {ROTATING = -1,
+    WHITE, BLACK, GRAY, DARK_GRAY,
+    BLUE, GREEN, CYAN, RED, MAGENTA, BROWN,
+    DARK_BLUE, DARK_GREEN, DARK_CYAN, DARK_RED, YELLOW, DARK_MAGENTA};
+
+typedef enum e_PG_color PG_color;
+
 /*
  * #bind derived PG_rendering integer SC_ENUM_I SC_ENUM_I PLOT_NONE
  */
@@ -1286,7 +1294,8 @@ extern void
  PG_show_palettes(PG_device *sdev, char *type, int wbck),
  PG_show_colormap(char *type, int wbck),
  PG_dump_colormap(char *type, char *file),
- PG_rgb_color(RGB_color_map *clr, int lc, int rgb, PG_palette *pal);
+ PG_rgb_color(RGB_color_map *clr, int lc, int rgb, PG_palette *pal),
+ PG_color_map(PG_device *dev, int mono, int fix, PG_color b, PG_color w);
 
 extern PG_palette
  *PG_mk_palette(PG_device *dev, char *name, int nclr),

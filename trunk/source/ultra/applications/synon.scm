@@ -13,6 +13,8 @@
 (synonym derivative der)
 (synonym integrate int)
 
+(synonym line-color default-color)
+
 (if (defined? ultra)
     (begin
       (synonym erase era)

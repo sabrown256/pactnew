@@ -1112,13 +1112,15 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
 /* SX_NEXT_COLOR - return the next available color */
 
 int SX_next_color(PG_device *dev)
-   {int rv;
+   {int clr, rv;
 
-    if (SX_gs.default_color != -1)
+    PG_get_attrs_glb(TRUE, "line-color", &clr, NULL);
+
+    if (clr != -1)
        {if (dev == NULL)
-           rv = _PG_trans_color(PG_gs.console, SX_gs.default_color);
+           rv = _PG_trans_color(PG_gs.console, clr);
         else
-           rv = _PG_trans_color(dev, SX_gs.default_color);}
+           rv = _PG_trans_color(dev, clr);}
 
     else
        {_SX.color = max(_SX.color + 1, 1);

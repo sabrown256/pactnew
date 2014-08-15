@@ -2685,3 +2685,47 @@ int _PG_trans_color(PG_device *dev, int color)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PG_COLOR_MAP - setup the color members of DEV
+ *              - MONO is TRUE only for black and white
+ *              - FIX is TRUE only when the multi-color layout
+ *              - is independent of dev->background_color_white
+ *              - WH determines color map details
+ *              - WH = 0 device has black background (pixel off is black)
+ *              - WH = 1 device has white background (pixel off is white)
+ *              - WH = 2 device is black and white only
+ */
+
+void PG_color_map(PG_device *dev, int mono, int fix, PG_color b, PG_color w)
+   {
+
+    if (dev->background_color_white == TRUE)
+       {if (mono == TRUE)
+	   {Color_Map(dev, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		      1, 1, 1, 1, 1, 1);
+	    dev->ncolor = 2;}
+	else
+	   {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
+		      10, 11, 12, 13, 14, 15);
+	    dev->ncolor = N_COLORS;};}
+    else
+       {if (mono == TRUE)
+	   {Color_Map(dev, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		      0, 0, 0, 0, 0, 0);
+	    dev->ncolor = 2;}
+
+	else if (fix == FALSE)
+	   {Color_Map(dev, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+		      10, 11, 12, 13, 14, 15);
+	    dev->ncolor = N_COLORS;}
+
+/* CGM, maybe IM */
+	else if (fix == TRUE)
+           {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
+                           10, 11, 12, 13, 14, 15);
+	    dev->ncolor = N_COLORS;};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

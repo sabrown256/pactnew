@@ -21,7 +21,7 @@ SX_scope_private
          TRUE, };
 
 SX_scope_public
- SX_gs = {100, -1,
+ SX_gs = {100,
           0, 0, 1,
 #if 0
           0,                     /* default to IWD interpolation */
