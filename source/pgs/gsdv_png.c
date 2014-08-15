@@ -172,8 +172,7 @@ static void _PG_PNG_finish_plot(PG_device *dev)
 static PG_device *_PG_PNG_open(PG_device *dev,
 			       double xf, double yf, double dxf, double dyf)
    {int n_colors;
-    int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int dx[PG_SPACEDM];
+    int dx[PG_SPACEDM], gs[6];
     char fname[MAXLINE];
     double intensity;
     PG_RAST_device *mdv;
@@ -235,22 +234,8 @@ static PG_device *_PG_PNG_open(PG_device *dev,
     dev->ncolor           = N_RAST_COLOR;
     dev->absolute_n_color = N_RAST_COLOR;
     intensity  = dev->max_intensity*MAXPIX;
-    PG_color_map(dev, FALSE, FALSE, BLACK, WHITE);
-    if (dev->background_color_white == TRUE)
-       {Lightest   = 0;
-	Light      = intensity;
-	Light_Gray = 0.8*intensity;
-	Dark_Gray  = 0.5*intensity;
-	Dark       = 0;
-	Darkest    = intensity;}
-
-    else
-       {Lightest   = intensity;
-        Light      = intensity;
-	Light_Gray = 0.8*intensity;
-	Dark_Gray  = 0.5*intensity;
-        Dark       = 0;
-        Darkest    = 0;};
+    PG_color_map(dev, FALSE, FALSE);
+    PG_gray_map(dev, 6, gs, intensity);
 
 /* compute the view port */
     _PG_default_viewspace(dev, FALSE);
@@ -281,10 +266,7 @@ static PG_device *_PG_PNG_open(PG_device *dev,
     PG_fset_font(dev, "helvetica", "medium", 12);
 
 /* put in the default palettes */
-    PG_setup_standard_palettes(dev, 64,
-			       Light, Dark,
-			       Light_Gray, Dark_Gray,
-			       Lightest, Darkest);
+    PG_setup_standard_palettes(dev, 64, gs);
 
     SC_set_get_line(io_gets);
     SC_set_put_line(io_printf);

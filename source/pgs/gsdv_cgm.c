@@ -104,8 +104,8 @@ static void _PG_CGM_query(PG_device *dev,
 static PG_device *_PG_CGM_open(PG_device *dev,
 			       double xf, double yf, double dxf, double dyf)
    {int i, h, w, nt, nfonts, mono;
-    int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     int display_width, display_height, n_colors, lst[20];
+    int gs[6];
     double intensity;
     char **font_name, **fs, *token, *name, *date, *s;
     char lname[MAXLINE], fname[MAXLINE], description[MAXLINE];
@@ -217,21 +217,8 @@ static PG_device *_PG_CGM_open(PG_device *dev,
 /* decide on the overall color layout */
     intensity = dev->max_intensity*MAXPIX;
     mono      = (strcmp(dev->type, "MONOCHROME") == 0);
-    PG_color_map(dev, mono, TRUE, BLACK, WHITE);
-    if (dev->background_color_white == TRUE)
-       {Lightest   = 0;
-        Light      = intensity;
-        Light_Gray = 0.8*intensity;
-        Dark_Gray  = 0.5*intensity;
-        Dark       = 0;
-        Darkest    = intensity;}
-    else
-       {Lightest   = intensity;
-        Light      = intensity;
-        Light_Gray = 0.8*intensity;
-        Dark_Gray  = 0.5*intensity;
-        Dark       = 0;
-        Darkest    = 0;};
+    PG_color_map(dev, mono, TRUE);
+    PG_gray_map(dev, 6, gs, intensity);
 
     dev->ncolor = n_colors;
     dev->absolute_n_color = 256;
@@ -305,10 +292,7 @@ static PG_device *_PG_CGM_open(PG_device *dev,
     PG_fset_font(dev, "helvetica", "medium", 12);
 
 /* put in the default palettes */
-    PG_setup_standard_palettes(dev, 64,
-			       Light, Dark,
-			       Light_Gray, Dark_Gray,
-			       Lightest, Darkest);
+    PG_setup_standard_palettes(dev, 64, gs);
 
     return(dev);}
 

@@ -100,8 +100,7 @@ static void _PG_PS_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
 static PG_device *_PG_PS_open(PG_device *dev,
 			      double xf, double yf, double dxf, double dyf)
    {int n_colors, mode, mono;
-    int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int xscr[PG_SPACEDM], xdsp[PG_SPACEDM];
+    int xscr[PG_SPACEDM], xdsp[PG_SPACEDM], gs[6];
     char ltype[MAXLINE], fname[MAXLINE], lname[MAXLINE];
     char *name, *token, *type, *modes, *date, *s;
     double intensity, scale, dpis;
@@ -235,9 +234,12 @@ static PG_device *_PG_PS_open(PG_device *dev,
     dev->file = ps_fp;
 
 /* decide on the overall color layout */
-    mono = (dev->ps_color == FALSE);
+    intensity = dev->max_intensity*MAXPIX;
+    mono      = (dev->ps_color == FALSE);
+    dev->background_color_white = TRUE;
+    PG_gray_map(dev, 6, gs, intensity);
     dev->background_color_white = FALSE;
-    PG_color_map(dev, mono, TRUE, BLACK, WHITE);
+    PG_color_map(dev, mono, TRUE);
 
 /* for MONOCHROME the DARK_MAGENTA maxes the palette
  * as is needed for annotations
@@ -509,18 +511,7 @@ static PG_device *_PG_PS_open(PG_device *dev,
     PG_fset_font(dev, "helvetica", "medium", 12);
 
 /* put in the default palettes */
-    intensity  = dev->max_intensity*MAXPIX;
-    Lightest   = 0;
-    Light      = intensity;
-    Light_Gray = 0.8*intensity;
-    Dark_Gray  = 0.5*intensity;
-    Dark       = 0;
-    Darkest    = intensity;
-
-    PG_setup_standard_palettes(dev, 64,
-			       Light, Dark,
-			       Light_Gray, Dark_Gray,
-			       Lightest, Darkest);
+    PG_setup_standard_palettes(dev, 64, gs);
 
     return(dev);}
 

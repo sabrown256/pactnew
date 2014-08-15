@@ -80,8 +80,8 @@ void
 PG_device *_PG_qd_open_screen(PG_device *dev, double xf, double yf,
 			      double dxf, double dyf)
    {int bck_color, for_color, idx, idy, mono;
+    int gs[6];
     double intensity;
-    unsigned int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     PG_font_family *ff;
     Rect physical_screen_shape;
 
@@ -115,21 +115,8 @@ PG_device *_PG_qd_open_screen(PG_device *dev, double xf, double yf,
 
     intensity = dev->max_intensity*MAXPIX;
     mono      = (dev->ncolor == 2);
-    PG_color_map(dev, mono, FALSE, BLACK, WHITE);
-    if (dev->background_color_white == TRUE)
-       {Lightest   = 0;
-        Light      = intensity;
-        Light_Gray = 0.8*intensity;
-        Dark_Gray  = 0.5*intensity;
-        Dark       = 0;
-        Darkest    = intensity;}
-    else
-       {Lightest   = intensity;
-        Light      = intensity;
-        Light_Gray = 0.8*intensity;
-        Dark_Gray  = 0.5*intensity;
-        Dark       = 0;
-        Darkest    = 0;};
+    PG_color_map(dev, mono, FALSE);
+    PG_gray_map(dev, 6, gs, intensity);
 
     bck_color = dev->BLACK;
     for_color = dev->WHITE;
@@ -175,10 +162,7 @@ PG_device *_PG_qd_open_screen(PG_device *dev, double xf, double yf,
 #ifdef MAC_COLOR
 
 /* put in the default palettes */
-    PG_setup_standard_palettes(dev, 64,
-                   Light, Dark,
-                   Light_Gray, Dark_Gray,
-                   Lightest, Darkest);
+    PG_setup_standard_palettes(dev, 64, gs);
 
     colormap = dev->current_palette->true_colormap;
     RGBBackColor(&colormap[bck_color]);
