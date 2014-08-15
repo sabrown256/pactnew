@@ -816,9 +816,8 @@ static PG_device *_PG_win32_open_screen(PG_device *dev,
 					double xf, double yf,
 					double dxf, double dyf)
    {int bck_color, for_color;
-    int dx[PG_SPACEDM];
+    int dx[PG_SPACEDM], gs[6];
     double intensity;
-    unsigned int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     PG_font_family *ff;
 
     if (dev == NULL)
@@ -849,24 +848,11 @@ static PG_device *_PG_win32_open_screen(PG_device *dev,
 
     intensity = dev->max_intensity*MAXPIX;
     mono      = (dev->ncolor == 2);
-    PG_color_map(dev, mono, FALSE, BLACK, WHITE);
-    if (dev->background_color_white == TRUE)
-       {Lightest   = 0;
-        Light      = intensity;
-        Light_Gray = 0.8*intensity;
-        Dark_Gray  = 0.5*intensity;
-        Dark       = 0;
-        Darkest    = intensity;}
-    else
-       {Lightest   = intensity;
-        Light      = intensity;
-        Light_Gray = 0.8*intensity;
-        Dark_Gray  = 0.5*intensity;
-        Dark       = 0;
-        Darkest    = 0;};
+    PG_color_map(dev, mono, FALSE);
+    PG_gray_map(dev, 6, gs, intensity);
 
-    bck_color  = dev->BLACK;
-    for_color  = dev->WHITE;
+    bck_color = dev->BLACK;
+    for_color = dev->WHITE;
 
 /* compute the view port */
     _PG_default_viewspace(dev, TRUE);
@@ -902,10 +888,7 @@ static PG_device *_PG_win32_open_screen(PG_device *dev,
     PG_fset_font(dev, "helvetica", "medium", 10);
 
 /* put in the default palettes */
-    PG_setup_standard_palettes(dev, 64,
-                   Light, Dark,
-                   Light_Gray, Dark_Gray,
-                   Lightest, Darkest);
+    PG_setup_standard_palettes(dev, 64, gs);
 
 #if 0
 /* Mac coding */

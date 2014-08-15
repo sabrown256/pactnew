@@ -718,33 +718,6 @@ static PG_palette *_PG_bw_palette(PG_device *dev, PG_palette *pal,
          if (pv != NULL)
             pv[i] = i + off + 2;};
 
-#if 0
-    int n_pal_colors, n_dev_colors;
-    int white, black;
-    RGB_color_map *pseudo_cm;
-
-    pseudo_cm    = pal->pseudo_colormap;
-    n_dev_colors = pal->n_dev_colors;
-    if (n_dev_colors < nc)
-       {switch (n_dev_colors)
-           {case  2: white      = 1;
-                     black      = 0;
-                     break;
-            case  4: white      = 2;
-                     black      = 0;
-                     break;
-            default: white      = 7;
-                     black      = 0;};
-
-        for (i = 0; i < nc; i++)
-            {pseudo_cm[i].red   = pal->max_red_intensity*
-                                  ((double) i)/((double) nc);
-             pseudo_cm[i].green = pal->max_green_intensity*white;
-             pseudo_cm[i].blue  = pal->max_blue_intensity*black;};
-
-        pal->pseudo_colormap = pseudo_cm;};
-#endif
-
     if (reg)
        PG_register_palette(dev, pal, FALSE);
 
@@ -1268,10 +1241,7 @@ static PG_palette *_PG_clr_contrast_palette(PG_device *dev, PG_palette *pal,
 /* _PG_STANDARD_PALETTE - set up a standard color palette for dev */
 
 static PG_palette *_PG_standard_palette(PG_device *dev, PG_palette *pal,
-                                        int off, int nc,
-                                        int Light, int Dark, int Light_Gray,
-                                        int Dark_Gray, int Lightest,
-                                        int Darkest)
+                                        int off, int nc, int *gs)
    {int i, reg;
     unsigned long *pv;
     RGB_color_map *true_cm;
@@ -1283,73 +1253,73 @@ static PG_palette *_PG_standard_palette(PG_device *dev, PG_palette *pal,
     true_cm = pal->true_colormap + off;
 
 /* compute the color maps */
-    true_cm[dev->RED].red            = pal->max_red_intensity*Light;
-    true_cm[dev->RED].green          = pal->max_green_intensity*Dark;
-    true_cm[dev->RED].blue           = pal->max_blue_intensity*Dark;
+    true_cm[dev->RED].red            = pal->max_red_intensity*gs[0];
+    true_cm[dev->RED].green          = pal->max_green_intensity*gs[1];
+    true_cm[dev->RED].blue           = pal->max_blue_intensity*gs[1];
     
-    true_cm[dev->YELLOW].red         = pal->max_red_intensity*Light_Gray;
-    true_cm[dev->YELLOW].green       = pal->max_green_intensity*Light_Gray;
-    true_cm[dev->YELLOW].blue        = pal->max_blue_intensity*Dark;
+    true_cm[dev->YELLOW].red         = pal->max_red_intensity*gs[2];
+    true_cm[dev->YELLOW].green       = pal->max_green_intensity*gs[2];
+    true_cm[dev->YELLOW].blue        = pal->max_blue_intensity*gs[1];
     
-    true_cm[dev->GREEN].red          = pal->max_red_intensity*Dark;
-    true_cm[dev->GREEN].green        = pal->max_green_intensity*Light;
-    true_cm[dev->GREEN].blue         = pal->max_blue_intensity*Dark;
+    true_cm[dev->GREEN].red          = pal->max_red_intensity*gs[1];
+    true_cm[dev->GREEN].green        = pal->max_green_intensity*gs[0];
+    true_cm[dev->GREEN].blue         = pal->max_blue_intensity*gs[1];
     
-    true_cm[dev->CYAN].red           = pal->max_red_intensity*Dark;
-    true_cm[dev->CYAN].green         = pal->max_green_intensity*Light;
-    true_cm[dev->CYAN].blue          = pal->max_blue_intensity*Light;
+    true_cm[dev->CYAN].red           = pal->max_red_intensity*gs[1];
+    true_cm[dev->CYAN].green         = pal->max_green_intensity*gs[0];
+    true_cm[dev->CYAN].blue          = pal->max_blue_intensity*gs[0];
     
-    true_cm[dev->BLUE].red           = pal->max_red_intensity*Dark;
-    true_cm[dev->BLUE].green         = pal->max_green_intensity*Dark;
-    true_cm[dev->BLUE].blue          = pal->max_blue_intensity*Light;
+    true_cm[dev->BLUE].red           = pal->max_red_intensity*gs[1];
+    true_cm[dev->BLUE].green         = pal->max_green_intensity*gs[1];
+    true_cm[dev->BLUE].blue          = pal->max_blue_intensity*gs[0];
     
-    true_cm[dev->MAGENTA].red        = pal->max_red_intensity*Light;
-    true_cm[dev->MAGENTA].green      = pal->max_green_intensity*Dark;
-    true_cm[dev->MAGENTA].blue       = pal->max_blue_intensity*Light;
+    true_cm[dev->MAGENTA].red        = pal->max_red_intensity*gs[0];
+    true_cm[dev->MAGENTA].green      = pal->max_green_intensity*gs[1];
+    true_cm[dev->MAGENTA].blue       = pal->max_blue_intensity*gs[0];
     
-    true_cm[dev->DARK_RED].red       = pal->max_red_intensity*Light_Gray;
-    true_cm[dev->DARK_RED].green     = pal->max_green_intensity*Dark;
-    true_cm[dev->DARK_RED].blue      = pal->max_blue_intensity*Dark;
+    true_cm[dev->DARK_RED].red       = pal->max_red_intensity*gs[2];
+    true_cm[dev->DARK_RED].green     = pal->max_green_intensity*gs[1];
+    true_cm[dev->DARK_RED].blue      = pal->max_blue_intensity*gs[1];
     
-    true_cm[dev->BROWN].red          = pal->max_red_intensity*Light_Gray;
-    true_cm[dev->BROWN].green        = pal->max_green_intensity*Dark_Gray;
-    true_cm[dev->BROWN].blue         = pal->max_blue_intensity*Dark;
+    true_cm[dev->BROWN].red          = pal->max_red_intensity*gs[2];
+    true_cm[dev->BROWN].green        = pal->max_green_intensity*gs[3];
+    true_cm[dev->BROWN].blue         = pal->max_blue_intensity*gs[1];
     
-    true_cm[dev->DARK_GREEN].red     = pal->max_red_intensity*Dark;
-    true_cm[dev->DARK_GREEN].green   = pal->max_green_intensity*Light_Gray;
-    true_cm[dev->DARK_GREEN].blue    = pal->max_blue_intensity*Dark;
+    true_cm[dev->DARK_GREEN].red     = pal->max_red_intensity*gs[1];
+    true_cm[dev->DARK_GREEN].green   = pal->max_green_intensity*gs[2];
+    true_cm[dev->DARK_GREEN].blue    = pal->max_blue_intensity*gs[1];
     
-    true_cm[dev->DARK_CYAN].red      = pal->max_red_intensity*Dark;
-    true_cm[dev->DARK_CYAN].green    = pal->max_green_intensity*Light_Gray;
-    true_cm[dev->DARK_CYAN].blue     = pal->max_blue_intensity*Light_Gray;
+    true_cm[dev->DARK_CYAN].red      = pal->max_red_intensity*gs[1];
+    true_cm[dev->DARK_CYAN].green    = pal->max_green_intensity*gs[2];
+    true_cm[dev->DARK_CYAN].blue     = pal->max_blue_intensity*gs[2];
     
-    true_cm[dev->DARK_BLUE].red      = pal->max_red_intensity*Dark;
-    true_cm[dev->DARK_BLUE].green    = pal->max_green_intensity*Dark;
-    true_cm[dev->DARK_BLUE].blue     = pal->max_blue_intensity*Light_Gray;
+    true_cm[dev->DARK_BLUE].red      = pal->max_red_intensity*gs[1];
+    true_cm[dev->DARK_BLUE].green    = pal->max_green_intensity*gs[1];
+    true_cm[dev->DARK_BLUE].blue     = pal->max_blue_intensity*gs[2];
     
-    true_cm[dev->DARK_MAGENTA].red   = pal->max_red_intensity*Light_Gray;
-    true_cm[dev->DARK_MAGENTA].green = pal->max_green_intensity*Dark;
-    true_cm[dev->DARK_MAGENTA].blue  = pal->max_blue_intensity*Dark_Gray;
+    true_cm[dev->DARK_MAGENTA].red   = pal->max_red_intensity*gs[2];
+    true_cm[dev->DARK_MAGENTA].green = pal->max_green_intensity*gs[1];
+    true_cm[dev->DARK_MAGENTA].blue  = pal->max_blue_intensity*gs[3];
 
-    true_cm[dev->GRAY].red           = pal->max_red_intensity*Light_Gray;
-    true_cm[dev->GRAY].green         = pal->max_green_intensity*Light_Gray;
-    true_cm[dev->GRAY].blue          = pal->max_blue_intensity*Light_Gray;
+    true_cm[dev->GRAY].red           = pal->max_red_intensity*gs[2];
+    true_cm[dev->GRAY].green         = pal->max_green_intensity*gs[2];
+    true_cm[dev->GRAY].blue          = pal->max_blue_intensity*gs[2];
     
-    true_cm[dev->DARK_GRAY].red      = pal->max_red_intensity*Dark_Gray;
-    true_cm[dev->DARK_GRAY].green    = pal->max_green_intensity*Dark_Gray;
-    true_cm[dev->DARK_GRAY].blue     = pal->max_blue_intensity*Dark_Gray;
+    true_cm[dev->DARK_GRAY].red      = pal->max_red_intensity*gs[3];
+    true_cm[dev->DARK_GRAY].green    = pal->max_green_intensity*gs[3];
+    true_cm[dev->DARK_GRAY].blue     = pal->max_blue_intensity*gs[3];
     
 /* these MUST be assigned last in case all dev->RED, etc have the same
  * value!!!
  */
     if (off == 0)
-       {true_cm[dev->BLACK].red   = pal->max_red_intensity*Darkest;
-        true_cm[dev->BLACK].green = pal->max_green_intensity*Darkest;
-        true_cm[dev->BLACK].blue  = pal->max_blue_intensity*Darkest;
+       {true_cm[dev->BLACK].red   = pal->max_red_intensity*gs[5];
+        true_cm[dev->BLACK].green = pal->max_green_intensity*gs[5];
+        true_cm[dev->BLACK].blue  = pal->max_blue_intensity*gs[5];
 
-        true_cm[dev->WHITE].red   = pal->max_red_intensity*Lightest;
-        true_cm[dev->WHITE].green = pal->max_green_intensity*Lightest;
-        true_cm[dev->WHITE].blue  = pal->max_blue_intensity*Lightest;}
+        true_cm[dev->WHITE].red   = pal->max_red_intensity*gs[4];
+        true_cm[dev->WHITE].green = pal->max_green_intensity*gs[4];
+        true_cm[dev->WHITE].blue  = pal->max_blue_intensity*gs[4];}
 
     pv = pal->pixel_value;
     if (pv != NULL)
@@ -1465,8 +1435,7 @@ void _PG_match_rgb_colors(PG_device *dev, PG_palette *pal)
  *                            - in the other palettes
  */
 
-void PG_setup_standard_palettes(PG_device *dev, int nc, int l1, int l2,
-                                int l3, int l4, int l5, int l6)
+void PG_setup_standard_palettes(PG_device *dev, int nc, int *gs)
    {int nbw, nsp, nrb, ntc;
     PG_palette *root_pal;
 
@@ -1482,16 +1451,15 @@ void PG_setup_standard_palettes(PG_device *dev, int nc, int l1, int l2,
 	_PG_bw_palette(dev, root_pal, 0, nbw);
 	_PG_spectrum_palette(dev, root_pal, nbw, nsp);
 	_PG_rainbow_palette(dev, root_pal, nbw+nsp, nrb);
-	_PG_standard_palette(dev, root_pal, nbw+nsp+nrb, 14,
-			     l1, l2, l3, l4, l5, l6);
+	_PG_standard_palette(dev, root_pal, nbw+nsp+nrb, 14, gs);
 
 	PG_map_to_color_table(dev, root_pal);
 
 	dev->color_table = root_pal;
 
 /* make and register the standard palettes */
-	dev->current_palette = _PG_standard_palette(dev, (PG_palette *) NULL, 0,
-						    14, l1, l2, l3, l4, l5, l6);
+	dev->current_palette = _PG_standard_palette(dev, NULL, 0, 14, gs);
+
 	_PG_spectrum_palette(dev, (PG_palette *) NULL, 0, nsp);
 	_PG_clr_contrast_palette(dev, (PG_palette *) NULL, 0, nsp);
 	_PG_rainbow_palette(dev, (PG_palette *) NULL, 0, nrb);
@@ -2700,31 +2668,31 @@ int _PG_trans_color(PG_device *dev, int color)
  *              - is 0 shows as WHITE (PS)
  */
 
-void PG_color_map(PG_device *dev, int mono, int fix, PG_color b, PG_color w)
+void PG_color_map(PG_device *dev, int mono, int fix)
    {
 
     if (dev->background_color_white == TRUE)
        {if (mono == TRUE)
-	   {dev->BLACK        = w;
-	    dev->WHITE        = b;
-	    dev->GRAY         = b;
-	    dev->DARK_GRAY    = b;
-	    dev->BLUE         = b;
-	    dev->GREEN        = b;
-	    dev->CYAN         = b;
-	    dev->RED          = b;
-	    dev->MAGENTA      = b;
-	    dev->BROWN        = b;
-	    dev->DARK_BLUE    = b;
-	    dev->DARK_GREEN   = b;
-	    dev->DARK_CYAN    = b;
-	    dev->DARK_RED     = b;
-	    dev->YELLOW       = b;
-	    dev->DARK_MAGENTA = b;
+	   {dev->BLACK        = WHITE;
+	    dev->WHITE        = BLACK;
+	    dev->GRAY         = BLACK;
+	    dev->DARK_GRAY    = BLACK;
+	    dev->BLUE         = BLACK;
+	    dev->GREEN        = BLACK;
+	    dev->CYAN         = BLACK;
+	    dev->RED          = BLACK;
+	    dev->MAGENTA      = BLACK;
+	    dev->BROWN        = BLACK;
+	    dev->DARK_BLUE    = BLACK;
+	    dev->DARK_GREEN   = BLACK;
+	    dev->DARK_CYAN    = BLACK;
+	    dev->DARK_RED     = BLACK;
+	    dev->YELLOW       = BLACK;
+	    dev->DARK_MAGENTA = BLACK;
 	    dev->ncolor       = 2;}
 	else
-	   {dev->BLACK        = b;
-	    dev->WHITE        = w;
+	   {dev->BLACK        = BLACK;
+	    dev->WHITE        = WHITE;
 	    dev->GRAY         = GRAY;
 	    dev->DARK_GRAY    = DARK_GRAY;
 	    dev->BLUE         = BLUE;
@@ -2742,27 +2710,27 @@ void PG_color_map(PG_device *dev, int mono, int fix, PG_color b, PG_color w)
 	    dev->ncolor       = N_COLORS;};}
     else
        {if (mono == TRUE)
-	   {dev->BLACK        = b;
-	    dev->WHITE        = w;
-	    dev->GRAY         = w;
-	    dev->DARK_GRAY    = w;
-	    dev->BLUE         = w;
-	    dev->GREEN        = w;
-	    dev->CYAN         = w;
-	    dev->RED          = w;
-	    dev->MAGENTA      = w;
-	    dev->BROWN        = w;
-	    dev->DARK_BLUE    = w;
-	    dev->DARK_GREEN   = w;
-	    dev->DARK_CYAN    = w;
-	    dev->DARK_RED     = w;
-	    dev->YELLOW       = w;
-	    dev->DARK_MAGENTA = w;
+	   {dev->BLACK        = BLACK;
+	    dev->WHITE        = WHITE;
+	    dev->GRAY         = WHITE;
+	    dev->DARK_GRAY    = WHITE;
+	    dev->BLUE         = WHITE;
+	    dev->GREEN        = WHITE;
+	    dev->CYAN         = WHITE;
+	    dev->RED          = WHITE;
+	    dev->MAGENTA      = WHITE;
+	    dev->BROWN        = WHITE;
+	    dev->DARK_BLUE    = WHITE;
+	    dev->DARK_GREEN   = WHITE;
+	    dev->DARK_CYAN    = WHITE;
+	    dev->DARK_RED     = WHITE;
+	    dev->YELLOW       = WHITE;
+	    dev->DARK_MAGENTA = WHITE;
 	    dev->ncolor       = 2;}
 
 	else if (fix == FALSE)
-	   {dev->BLACK        = w;
-	    dev->WHITE        = b;
+	   {dev->BLACK        = WHITE;
+	    dev->WHITE        = BLACK;
 	    dev->GRAY         = GRAY;
 	    dev->DARK_GRAY    = DARK_GRAY;
 	    dev->BLUE         = BLUE;
@@ -2781,8 +2749,8 @@ void PG_color_map(PG_device *dev, int mono, int fix, PG_color b, PG_color w)
 
 /* CGM and IM */
 	else if (fix == TRUE)
-           {dev->BLACK        = b;
-	    dev->WHITE        = w;
+           {dev->BLACK        = BLACK;
+	    dev->WHITE        = WHITE;
 	    dev->GRAY         = GRAY;
 	    dev->DARK_GRAY    = DARK_GRAY;
 	    dev->BLUE         = BLUE;
@@ -2798,6 +2766,30 @@ void PG_color_map(PG_device *dev, int mono, int fix, PG_color b, PG_color w)
 	    dev->YELLOW       = YELLOW;
 	    dev->DARK_MAGENTA = DARK_MAGENTA;
 	    dev->ncolor       = N_COLORS;};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_GRAY_MAP - setup the gray scale map GS for DEV based on
+ *             - the maximum intensity IMX
+ */
+
+void PG_gray_map(PG_device *dev, int ng, int *gs, double imx)
+   {
+
+    gs[0] = imx;
+    gs[1] = 0;
+    gs[2] = 0.8*imx;
+    gs[3] = 0.5*imx;
+        
+    if (dev->background_color_white == TRUE)
+       {gs[4] = 0;
+        gs[5] = imx;}
+    else
+       {gs[4] = imx;
+        gs[5] = 0;};
 
     return;}
 

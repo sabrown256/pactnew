@@ -356,8 +356,8 @@ void _PG_X_select_events(PG_device *dev)
 /* _PG_X_INIT_PALETTE - initialize the palettes for DEV */
 
 int _PG_X_init_palette(PG_device *dev, int ndvc, unsigned long *fbc)
-   {int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int mono, screen, ok;
+   {int mono, screen, ok;
+    int gs[6];
     unsigned long for_color, bck_color;
     double intensity;
 
@@ -369,24 +369,13 @@ int _PG_X_init_palette(PG_device *dev, int ndvc, unsigned long *fbc)
     dev->absolute_n_color = ndvc;
     intensity = dev->max_intensity*MAXPIX;
     mono      = (ndvc == 2);
-    PG_color_map(dev, mono, FALSE, BLACK, WHITE);
+    PG_color_map(dev, mono, FALSE);
+    PG_gray_map(dev, 6, gs, intensity);
     if (dev->background_color_white == TRUE)
-       {Lightest   = 0;
-        Light      = intensity;
-        Light_Gray = 0.8*intensity;
-        Dark_Gray  = 0.5*intensity;
-        Dark       = 0;
-        Darkest    = intensity;
-        bck_color  = WhitePixel(dev->display, screen);
+       {bck_color  = WhitePixel(dev->display, screen);
         for_color  = BlackPixel(dev->display, screen);}
     else
-       {Lightest   = intensity;
-        Light      = intensity;
-        Light_Gray = 0.8*intensity;
-        Dark_Gray  = 0.5*intensity;
-        Dark       = 0;
-        Darkest    = 0;
-        bck_color  = BlackPixel(dev->display, screen);
+       {bck_color  = BlackPixel(dev->display, screen);
         for_color  = WhitePixel(dev->display, screen);};
 
     SC_ASSERT(for_color != bck_color);
@@ -398,10 +387,7 @@ int _PG_X_init_palette(PG_device *dev, int ndvc, unsigned long *fbc)
     dev->xor_parity = (bck_color == 0);
 
 /* put in the default palettes */
-    PG_setup_standard_palettes(dev, 64,
-			       Light, Dark,
-			       Light_Gray, Dark_Gray,
-			       Lightest, Darkest);
+    PG_setup_standard_palettes(dev, 64, gs);
 
     if (fbc != NULL)
        {fbc[0] = for_color;

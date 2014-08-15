@@ -1264,15 +1264,14 @@ extern int
 
 extern void
  PG_register_palette(PG_device *dev, PG_palette *pal, int map),
- PG_setup_standard_palettes(PG_device *dev, int nc, int l1,
-			    int l2, int l3, int l4,
-			    int l5, int l6),
+ PG_setup_standard_palettes(PG_device *dev, int nc, int *gs),
  PG_rl_palette(PG_palette *pal),
  PG_show_palettes(PG_device *sdev, char *type, int wbck),
  PG_show_colormap(char *type, int wbck),
  PG_dump_colormap(char *type, char *file),
  PG_rgb_color(RGB_color_map *clr, int lc, int rgb, PG_palette *pal),
- PG_color_map(PG_device *dev, int mono, int fix, PG_color b, PG_color w);
+ PG_color_map(PG_device *dev, int mono, int fix),
+ PG_gray_map(PG_device *dev, int ng, int *gs, double imx);
 
 extern PG_palette
  *PG_mk_palette(PG_device *dev, char *name, int nclr),
