@@ -893,7 +893,7 @@ void _PG_PS_set_dev_color(PG_device *dev, int prim, int check)
  * to mean black on white NOT a grayscale
  * (we've gotten user complaints about that)
  * this test is specifically checking for the standard palette
- * and that the colors have been setup via Color_Map for the MONOCHROME
+ * and that the colors have been setup via PG_color_map for the MONOCHROME
  * case
  */
 	if (strcmp(pal->name, "standard") == 0)

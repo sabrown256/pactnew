@@ -148,7 +148,8 @@ static PG_device *_PG_MP_open(PG_device *dev,
     dev->window_x[0] = g->hwin[0];
     dev->window_x[2] = g->hwin[2];
 
-    Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+    dev->background_color_white = TRUE;
+    PG_color_map(dev, FALSE, FALSE, BLACK, WHITE);
 
     dev->ncolor = N_RAST_COLOR;
     dev->absolute_n_color = N_RAST_COLOR;

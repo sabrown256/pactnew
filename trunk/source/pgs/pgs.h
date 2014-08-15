@@ -108,29 +108,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* COLOR_MAP - set up values for the 16 most common colors */
-
-#define Color_Map(dev, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)       \
-    dev->BLACK        = a;                                                   \
-    dev->WHITE        = b;                                                   \
-    dev->GRAY         = c;                                                   \
-    dev->DARK_GRAY    = d;                                                   \
-    dev->BLUE         = e;                                                   \
-    dev->GREEN        = f;                                                   \
-    dev->CYAN         = g;                                                   \
-    dev->RED          = h;                                                   \
-    dev->MAGENTA      = i;                                                   \
-    dev->BROWN        = j;                                                   \
-    dev->DARK_BLUE    = k;                                                   \
-    dev->DARK_GREEN   = l;                                                   \
-    dev->DARK_CYAN    = m;                                                   \
-    dev->DARK_RED     = n;                                                   \
-    dev->YELLOW       = o;                                                   \
-    dev->DARK_MAGENTA = p
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PG_CALL_HANDLER - call the registered event handler with language
  *                   appropriate arguments
  */
@@ -276,7 +253,7 @@ enum e_PG_dev_type
 typedef enum e_PG_dev_type PG_dev_type;
 
 enum e_PG_color
-   {ROTATING = -1,
+   {CLEAR = -2, ROTATING = -1,
     WHITE, BLACK, GRAY, DARK_GRAY,
     BLUE, GREEN, CYAN, RED, MAGENTA, BROWN,
     DARK_BLUE, DARK_GREEN, DARK_CYAN, DARK_RED, YELLOW, DARK_MAGENTA};

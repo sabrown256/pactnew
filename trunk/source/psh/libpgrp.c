@@ -435,7 +435,7 @@ proc_bf job_foreground(process_group *pg, proc_bf bf)
 	     tcsetpgrp(ps->terminal, pp->pgid);
      
 /* send the job a continue signal, if necessary */
-	     if (bf == TRUE)
+	     if (bf == PROC_FG_RUN)
 	        {pgid = pp->pgid;
 		 st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
 		 st = kill(-pgid, SIGCONT);

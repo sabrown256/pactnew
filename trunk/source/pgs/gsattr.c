@@ -422,7 +422,7 @@ void PG_setup_attrs_glb(void)
 	_PG_gattrs.label_color_flag      = FALSE;
 	_PG_gattrs.label_length          = 25;
 	_PG_gattrs.label_type_size       = 8;
-	_PG_gattrs.line_color            = 1;
+	_PG_gattrs.line_color            = BLACK;
 	_PG_gattrs.line_style            = LINE_SOLID;
 	_PG_gattrs.logical_plot          = FALSE;
 	_PG_gattrs.marker_index          = 0;

@@ -55,7 +55,7 @@ extern "C" {
 extern void
  _PS_dbg(unsigned int lvl, char *fmt, ...),
  _PS_job_io_close(process *pp, io_kind knd),
- _PS_job_grp_attr(process *pp, int g, int jctl, int t),
+ _PS_job_grp_attr(int pid, int pgid, int jctl, int g, int t),
  _PS_default_iodes(iodes *pio),
  _PS_init_process(process *pp),
  _PS_job_child_prelim(process *pp),

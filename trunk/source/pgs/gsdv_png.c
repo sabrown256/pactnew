@@ -235,9 +235,9 @@ static PG_device *_PG_PNG_open(PG_device *dev,
     dev->ncolor           = N_RAST_COLOR;
     dev->absolute_n_color = N_RAST_COLOR;
     intensity  = dev->max_intensity*MAXPIX;
-    if (dev->background_color_white)
-       {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-	Lightest   = 0;
+    PG_color_map(dev, FALSE, FALSE, BLACK, WHITE);
+    if (dev->background_color_white == TRUE)
+       {Lightest   = 0;
 	Light      = intensity;
 	Light_Gray = 0.8*intensity;
 	Dark_Gray  = 0.5*intensity;
@@ -245,8 +245,7 @@ static PG_device *_PG_PNG_open(PG_device *dev,
 	Darkest    = intensity;}
 
     else
-       {Color_Map(dev, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-        Lightest   = intensity;
+       {Lightest   = intensity;
         Light      = intensity;
 	Light_Gray = 0.8*intensity;
 	Dark_Gray  = 0.5*intensity;

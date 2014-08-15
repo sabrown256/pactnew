@@ -2689,10 +2689,15 @@ int _PG_trans_color(PG_device *dev, int color)
  *              - MONO is TRUE only for black and white
  *              - FIX is TRUE only when the multi-color layout
  *              - is independent of dev->background_color_white
- *              - WH determines color map details
- *              - WH = 0 device has black background (pixel off is black)
- *              - WH = 1 device has white background (pixel off is white)
- *              - WH = 2 device is black and white only
+ *              - Note: about BLACK and WHITE
+ *              -   dev->WHITE is the logical background color
+ *              -   dev->BLACK is the opposite of dev->WHITE
+ *              -   BLACK is what the eye sees as black
+ *              -   WHITE is what the eye sees as white
+ *              - the confusion comes in that for some devices
+ *              - the pixel whose value is 0 shows as BLACK (X window)
+ *              - whereas for other devices the pixel whose value
+ *              - is 0 shows as WHITE (PS)
  */
 
 void PG_color_map(PG_device *dev, int mono, int fix, PG_color b, PG_color w)
@@ -2700,29 +2705,99 @@ void PG_color_map(PG_device *dev, int mono, int fix, PG_color b, PG_color w)
 
     if (dev->background_color_white == TRUE)
        {if (mono == TRUE)
-	   {Color_Map(dev, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		      1, 1, 1, 1, 1, 1);
-	    dev->ncolor = 2;}
+	   {dev->BLACK        = w;
+	    dev->WHITE        = b;
+	    dev->GRAY         = b;
+	    dev->DARK_GRAY    = b;
+	    dev->BLUE         = b;
+	    dev->GREEN        = b;
+	    dev->CYAN         = b;
+	    dev->RED          = b;
+	    dev->MAGENTA      = b;
+	    dev->BROWN        = b;
+	    dev->DARK_BLUE    = b;
+	    dev->DARK_GREEN   = b;
+	    dev->DARK_CYAN    = b;
+	    dev->DARK_RED     = b;
+	    dev->YELLOW       = b;
+	    dev->DARK_MAGENTA = b;
+	    dev->ncolor       = 2;}
 	else
-	   {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
-		      10, 11, 12, 13, 14, 15);
-	    dev->ncolor = N_COLORS;};}
+	   {dev->BLACK        = b;
+	    dev->WHITE        = w;
+	    dev->GRAY         = GRAY;
+	    dev->DARK_GRAY    = DARK_GRAY;
+	    dev->BLUE         = BLUE;
+	    dev->GREEN        = GREEN;
+	    dev->CYAN         = CYAN;
+	    dev->RED          = RED;
+	    dev->MAGENTA      = MAGENTA;
+	    dev->BROWN        = BROWN;
+	    dev->DARK_BLUE    = DARK_BLUE;
+	    dev->DARK_GREEN   = DARK_GREEN;
+	    dev->DARK_CYAN    = DARK_CYAN;
+	    dev->DARK_RED     = DARK_RED;
+	    dev->YELLOW       = YELLOW;
+	    dev->DARK_MAGENTA = DARK_MAGENTA;
+	    dev->ncolor       = N_COLORS;};}
     else
        {if (mono == TRUE)
-	   {Color_Map(dev, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		      0, 0, 0, 0, 0, 0);
-	    dev->ncolor = 2;}
+	   {dev->BLACK        = b;
+	    dev->WHITE        = w;
+	    dev->GRAY         = w;
+	    dev->DARK_GRAY    = w;
+	    dev->BLUE         = w;
+	    dev->GREEN        = w;
+	    dev->CYAN         = w;
+	    dev->RED          = w;
+	    dev->MAGENTA      = w;
+	    dev->BROWN        = w;
+	    dev->DARK_BLUE    = w;
+	    dev->DARK_GREEN   = w;
+	    dev->DARK_CYAN    = w;
+	    dev->DARK_RED     = w;
+	    dev->YELLOW       = w;
+	    dev->DARK_MAGENTA = w;
+	    dev->ncolor       = 2;}
 
 	else if (fix == FALSE)
-	   {Color_Map(dev, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-		      10, 11, 12, 13, 14, 15);
-	    dev->ncolor = N_COLORS;}
+	   {dev->BLACK        = w;
+	    dev->WHITE        = b;
+	    dev->GRAY         = GRAY;
+	    dev->DARK_GRAY    = DARK_GRAY;
+	    dev->BLUE         = BLUE;
+	    dev->GREEN        = GREEN;
+	    dev->CYAN         = CYAN;
+	    dev->RED          = RED;
+	    dev->MAGENTA      = MAGENTA;
+	    dev->BROWN        = BROWN;
+	    dev->DARK_BLUE    = DARK_BLUE;
+	    dev->DARK_GREEN   = DARK_GREEN;
+	    dev->DARK_CYAN    = DARK_CYAN;
+	    dev->DARK_RED     = DARK_RED;
+	    dev->YELLOW       = YELLOW;
+	    dev->DARK_MAGENTA = DARK_MAGENTA;
+	    dev->ncolor       = N_COLORS;}
 
-/* CGM, maybe IM */
+/* CGM and IM */
 	else if (fix == TRUE)
-           {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
-                           10, 11, 12, 13, 14, 15);
-	    dev->ncolor = N_COLORS;};};
+           {dev->BLACK        = b;
+	    dev->WHITE        = w;
+	    dev->GRAY         = GRAY;
+	    dev->DARK_GRAY    = DARK_GRAY;
+	    dev->BLUE         = BLUE;
+	    dev->GREEN        = GREEN;
+	    dev->CYAN         = CYAN;
+	    dev->RED          = RED;
+	    dev->MAGENTA      = MAGENTA;
+	    dev->BROWN        = BROWN;
+	    dev->DARK_BLUE    = DARK_BLUE;
+	    dev->DARK_GREEN   = DARK_GREEN;
+	    dev->DARK_CYAN    = DARK_CYAN;
+	    dev->DARK_RED     = DARK_RED;
+	    dev->YELLOW       = YELLOW;
+	    dev->DARK_MAGENTA = DARK_MAGENTA;
+	    dev->ncolor       = N_COLORS;};};
 
     return;}
 

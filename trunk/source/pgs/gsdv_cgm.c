@@ -103,7 +103,7 @@ static void _PG_CGM_query(PG_device *dev,
  
 static PG_device *_PG_CGM_open(PG_device *dev,
 			       double xf, double yf, double dxf, double dyf)
-   {int i, h, w, nt, nfonts;
+   {int i, h, w, nt, nfonts, mono;
     int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     int display_width, display_height, n_colors, lst[20];
     double intensity;
@@ -216,26 +216,17 @@ static PG_device *_PG_CGM_open(PG_device *dev,
 
 /* decide on the overall color layout */
     intensity = dev->max_intensity*MAXPIX;
-    if (dev->background_color_white)
-       {if (strcmp(dev->type, "MONOCHROME") == 0)
-           {Color_Map(dev, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);}
-        else
-           {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
-                           10, 11, 12, 13, 14, 15);};
-        Lightest   = 0;
+    mono      = (strcmp(dev->type, "MONOCHROME") == 0);
+    PG_color_map(dev, mono, TRUE, BLACK, WHITE);
+    if (dev->background_color_white == TRUE)
+       {Lightest   = 0;
         Light      = intensity;
         Light_Gray = 0.8*intensity;
         Dark_Gray  = 0.5*intensity;
         Dark       = 0;
         Darkest    = intensity;}
     else
-       {if (strcmp(dev->type, "MONOCHROME") == 0)
-/*           {Color_Map(dev, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);} */
-           {Color_Map(dev, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);}
-        else
-           {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
-                           10, 11, 12, 13, 14, 15);};
-        Lightest   = intensity;
+       {Lightest   = intensity;
         Light      = intensity;
         Light_Gray = 0.8*intensity;
         Dark_Gray  = 0.5*intensity;

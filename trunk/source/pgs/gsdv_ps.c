@@ -99,7 +99,7 @@ static void _PG_PS_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
  
 static PG_device *_PG_PS_open(PG_device *dev,
 			      double xf, double yf, double dxf, double dyf)
-   {int n_colors, mode;
+   {int n_colors, mode, mono;
     int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     int xscr[PG_SPACEDM], xdsp[PG_SPACEDM];
     char ltype[MAXLINE], fname[MAXLINE], lname[MAXLINE];
@@ -234,13 +234,16 @@ static PG_device *_PG_PS_open(PG_device *dev,
 
     dev->file = ps_fp;
 
-/* decide on the overall color layout
- * for MONOCHROME the 15 maxes the palette as need for annotations
+/* decide on the overall color layout */
+    mono = (dev->ps_color == FALSE);
+    dev->background_color_white = FALSE;
+    PG_color_map(dev, mono, TRUE, BLACK, WHITE);
+
+/* for MONOCHROME the DARK_MAGENTA maxes the palette
+ * as is needed for annotations
  */
-    if (dev->ps_color == FALSE)
-       {Color_Map(dev, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);}
-    else
-       {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);};
+    if (mono == TRUE)
+       dev->BLACK = DARK_MAGENTA;
 
     dev->ncolor = max(16, n_colors);
     dev->absolute_n_color = 256;

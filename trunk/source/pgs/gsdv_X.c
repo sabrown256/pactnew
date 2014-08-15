@@ -357,7 +357,7 @@ void _PG_X_select_events(PG_device *dev)
 
 int _PG_X_init_palette(PG_device *dev, int ndvc, unsigned long *fbc)
    {int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int screen, ok;
+    int mono, screen, ok;
     unsigned long for_color, bck_color;
     double intensity;
 
@@ -368,15 +368,10 @@ int _PG_X_init_palette(PG_device *dev, int ndvc, unsigned long *fbc)
 /* decide on the overall color layout and choose WHITE or BLACK background */
     dev->absolute_n_color = ndvc;
     intensity = dev->max_intensity*MAXPIX;
-    if (dev->background_color_white)
-       {if (ndvc == 2)
-           {Color_Map(dev, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-            dev->ncolor = 2;}
-        else
-           {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
-                           10, 11, 12, 13, 14, 15);
-            dev->ncolor = N_COLORS;};
-        Lightest   = 0;
+    mono      = (ndvc == 2);
+    PG_color_map(dev, mono, FALSE, BLACK, WHITE);
+    if (dev->background_color_white == TRUE)
+       {Lightest   = 0;
         Light      = intensity;
         Light_Gray = 0.8*intensity;
         Dark_Gray  = 0.5*intensity;
@@ -385,14 +380,7 @@ int _PG_X_init_palette(PG_device *dev, int ndvc, unsigned long *fbc)
         bck_color  = WhitePixel(dev->display, screen);
         for_color  = BlackPixel(dev->display, screen);}
     else
-       {if (ndvc == 2)
-           {Color_Map(dev, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-            dev->ncolor = 2;}
-        else
-           {Color_Map(dev, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-                           10, 11, 12, 13, 14, 15);
-            dev->ncolor = N_COLORS;};
-        Lightest   = intensity;
+       {Lightest   = intensity;
         Light      = intensity;
         Light_Gray = 0.8*intensity;
         Dark_Gray  = 0.5*intensity;

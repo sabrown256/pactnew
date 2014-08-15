@@ -79,7 +79,7 @@ void
  
 PG_device *_PG_qd_open_screen(PG_device *dev, double xf, double yf,
 			      double dxf, double dyf)
-   {int bck_color, for_color, idx, idy;
+   {int bck_color, for_color, idx, idy, mono;
     double intensity;
     unsigned int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     PG_font_family *ff;
@@ -114,33 +114,25 @@ PG_device *_PG_qd_open_screen(PG_device *dev, double xf, double yf,
        _PG_qd_open_graphics_window(dev, xf, yf, dxf, dyf);
 
     intensity = dev->max_intensity*MAXPIX;
-    if (dev->background_color_white)
-       {if (dev->ncolor == 2)
-           {Color_Map(dev, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);}
-        else
-           {Color_Map(dev, 1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
-                           10, 11, 12, 13, 14, 15);};
-        Lightest   = 0;
+    mono      = (dev->ncolor == 2);
+    PG_color_map(dev, mono, FALSE, BLACK, WHITE);
+    if (dev->background_color_white == TRUE)
+       {Lightest   = 0;
         Light      = intensity;
         Light_Gray = 0.8*intensity;
         Dark_Gray  = 0.5*intensity;
         Dark       = 0;
         Darkest    = intensity;}
     else
-       {if (dev->ncolor == 2)
-           {Color_Map(dev, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);}
-        else
-           {Color_Map(dev, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-                           10, 11, 12, 13, 14, 15);};
-        Lightest   = intensity;
+       {Lightest   = intensity;
         Light      = intensity;
         Light_Gray = 0.8*intensity;
         Dark_Gray  = 0.5*intensity;
         Dark       = 0;
         Darkest    = 0;};
 
-    bck_color  = dev->BLACK;
-    for_color  = dev->WHITE;
+    bck_color = dev->BLACK;
+    for_color = dev->WHITE;
 
 /* compute the view port */
     _PG_default_viewspace(dev, TRUE);
