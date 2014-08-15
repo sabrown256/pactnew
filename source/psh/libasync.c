@@ -471,17 +471,18 @@ sigset_t _block_all_sig(int wh)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _JOB_GRP_ATTR - add PP to the process group if G is TRUE
- *               - have PP take the controlling terminal
+/* _JOB_GRP_ATTR - add PID to the process group if G is TRUE
+ *               - have PGID take the controlling terminal
  *               - iff T is TRUE
  */
 
-void _job_grp_attr(process *pp, int g, int jctl, int t)
-   {int st, pid, pgid;
+void _job_grp_attr(int pid, int pgid, int jctl, int g, int t)
+   {int st;
 
-    st   = 0;
-    pid  = pp->id;
-    pgid = pp->pgid;
+    st = 0;
+
+    if (jctl == TRUE)
+       pgid = getpgid(0);
 
     if ((g == TRUE) && (pgid >= 0))
        {st = setpgid(pid, pgid);
@@ -489,9 +490,6 @@ void _job_grp_attr(process *pp, int g, int jctl, int t)
            fprintf(stderr, "_JOB_GRP_ATTR: setpgid(%d,%d) returned %d (%s)\n",
 		   pid, pgid, st,
 		   strerror(errno));};
-
-    if (jctl == TRUE)
-       pgid = getpgid(0);
 
     if ((t == TRUE) && (pgid > 0))
        {st = tcsetpgrp(STDIN_FILENO, pgid);
@@ -694,7 +692,7 @@ static int _job_exec(process *cp, int *fds,
         if (jctl == TRUE)
 	   cp->pgid = pgid;
 
-	_job_grp_attr(cp, TRUE, jctl, fg);
+	_job_grp_attr(cp->id, cp->pgid, jctl, TRUE, fg);
 
 /* reset the signal handlers for the child */
 	nsigaction(NULL, SIGINT,  SIG_DFL, SA_RESTART, -1);
@@ -1348,7 +1346,7 @@ static int _job_parent_fork(process *pp, process *cp, int *fds, char *mode)
     st = TRUE;
 
 /* take the controlling terminal */
-    _job_grp_attr(pp, isatty(STDIN_FILENO), FALSE, FALSE);
+    _job_grp_attr(pp->id, pp->pgid, FALSE, isatty(STDIN_FILENO), FALSE);
 
     pp->id         = cp->id;
     pp->start_time = wall_clock_time();
