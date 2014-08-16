@@ -437,12 +437,12 @@ void PG_setup_attrs_glb(void)
 	_PG_gattrs.parallel_graphics     = FALSE;
 	_PG_gattrs.parallel_simulate     = FALSE;
 	_PG_gattrs.plot_title            = TRUE;
-	_PG_gattrs.ref_mesh_color        = 0;
+	_PG_gattrs.ref_mesh_color        = WHITE;
 	_PG_gattrs.ref_mesh              = FALSE;
 	_PG_gattrs.restore_viewport      = TRUE;
 	_PG_gattrs.scatter_plot          = FALSE;
 	_PG_gattrs.squeeze_labels        = FALSE;
-	_PG_gattrs.text_color            = 1;
+	_PG_gattrs.text_color            = BLACK;
 	_PG_gattrs.use_pixmap            = TRUE;
 
 #ifdef HAVE_X11

@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 07/22/2014
+MOD: 08/15/2014
 
 <CENTER>
 <P>
@@ -4220,8 +4220,6 @@ level routines to be used by the interpreter.<p>
 <TD>	flag controlling white backgrounds for CGM </TD></TR>
 <TR><TD>SX_cgm_flag</TD>
 <TD>	CGM flag </TD></TR>
-<TR><TD>SX_gs.default_color</TD>
-<TD>	default color to use </TD></TR>
 <TR><TD>SX_gs.grid</TD>
 <TD>	flag controlling grids on plots </TD></TR>
 <TR><TD>SX_label_length</TD>
