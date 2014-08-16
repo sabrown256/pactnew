@@ -11,7 +11,7 @@
 #include "pgs_int.h"
 
 int
- _PG_bnd_color = 0,
+ _PG_bnd_color = WHITE,
  _PG_bnd_style = LINE_SOLID;
 
 double

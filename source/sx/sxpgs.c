@@ -1163,7 +1163,7 @@ static object *_SXI_make_pgs_graph(SS_psides *si, object *argl)
     PG_graph *g;
     object *o;
 
-    color     = 1;
+    color     = BLACK;
     style     = LINE_SOLID;
     centering = U_CENT;
     width     = 0.0;

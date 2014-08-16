@@ -50,6 +50,7 @@
 (define mouse-up         5)
 
 ; colors
+(define rotating   -1)
 (define black       0)
 (define white       1)
 (define gray        2)

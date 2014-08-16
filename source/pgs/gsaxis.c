@@ -665,8 +665,8 @@ int PG_set_axis_attributes(PG_device *dev, ...)
        {linecolor = dev->WHITE;
 	txtcolor  = dev->WHITE;}
     else
-       {linecolor = 4;
-	txtcolor  = 4;};
+       {linecolor = BLUE;
+	txtcolor  = BLUE;};
 
     prec = TEXT_CHARACTER_PRECISION;
 

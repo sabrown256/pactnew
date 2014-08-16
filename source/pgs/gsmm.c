@@ -491,7 +491,7 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
     d->data_id                 = 0;
     d->draw_fill_bound         = FALSE;
     d->file                    = NULL;
-    d->fill_color              = 0;
+    d->fill_color              = WHITE;
     d->finished                = TRUE;
 
     d->font_family             = NULL;
