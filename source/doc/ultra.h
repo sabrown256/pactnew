@@ -1,5 +1,5 @@
 TXT: ULTRA User's Manual
-MOD: 2/1/2012
+MOD: 8/15/2014
 
 <CENTER>
 <P>
@@ -2502,6 +2502,15 @@ INTEGER - line style of axis grid lines.
 <I>Default: </I>dotted
 <P>
 
+<BR><B>axis-line-color</B><BR>
+INTEGER - line color of axis lines. The argument may be an 
+integer or any of the color constants, e.g. black, red, blue.
+<P>
+<I>Usage: </I>axis-line-color integer
+<P>
+<I>Default: </I>black
+<P>
+
 <BR><B>axis-line-style</B><BR>
 INTEGER - line style of axis lines.
 <P>
@@ -2515,7 +2524,7 @@ REAL - line width of axis lines.
 <P>
 <I>Usage: </I>axis-line-width real
 <P>
-<I>Default: </I>.1
+<I>Default: </I>0.1
 <P>
 
 <BR><B>axis-max-major-ticks</B><BR>
@@ -2700,16 +2709,6 @@ STRING - console window type. Enclose literal strings in double quotes.
 <I>Default: </I>&#147;monochrome&#148;
 <P>
 
-<BR><B>default-color</B><BR>
-INTEGER - the default line color. With a value of -1 ULTRA rotates sequentially 
-through the available colors of the current palette. The argument may be an 
-integer or any of the color constants, e.g. black, red, blue.
-<P>
-<I>Usage: </I>default-color integer
-<P>
-<I>Default: </I>-1
-<P>
-
 <BR><B>default-npts</B><BR>
 INTEGER - the default number of points used to make new curves (used by span, line, 
 etc.). Takes effect for the next curve creation.
@@ -2811,6 +2810,32 @@ REAL - fractional space at left of plot, i.e. between curves and axes.
 <I>Usage: </I>leftspace real
 <P>
 <I>Default: </I>.01
+<P>
+
+<BR><B>line-color</B><BR>
+INTEGER - the default line color. With a value of 'rotating' ULTRA rotates sequentially 
+through the available colors of the current palette. The argument may be an 
+integer or any of the color constants, e.g. rotating, black, red, blue.
+<P>
+<I>Usage: </I>line-color integer
+<P>
+<I>Default: </I>rotating
+<P>
+
+<BR><B>line-style</B><BR>
+INTEGER - the default line style.
+<P>
+<I>Usage: </I>line-style solid | dotted | dashed | dotdashed
+<P>
+<I>Default: </I>solid
+<P>
+
+<BR><B>line-width</B><BR>
+REAL - the default line width.
+<P>
+<I>Usage: </I>line-width real
+<P>
+<I>Default: </I>0.1
 <P>
 
 <BR><B>lines-page</B><BR>
