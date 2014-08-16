@@ -384,7 +384,8 @@ object *SX_mk_curve(SS_psides *si, int na, double **x,
 		    char *label, char *filename,
 		    object *(*plt)(SS_psides *si))
    {int i, j, id, nd, ng;
-    double tmp;
+    int lnc, lns;
+    double lnw, tmp;
     double wc[PG_BOXSZ];
     double *xi[PG_SPACEDM];
     curve *ds;
@@ -438,9 +439,15 @@ object *SX_mk_curve(SS_psides *si, int na, double **x,
 
     ds->n = na;
 
+/* get the default line attributes */
+    PG_get_attrs_glb(TRUE,
+		     "line-style", &lns,
+		     "line-width", &lnw,
+		     NULL);
+    lnc = SX_next_color(SX_gs.graphics_device);
+
     PG_set_line_info(ds->info, PLOT_CARTESIAN, CARTESIAN_2D,
-		     LINE_SOLID,
-		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
+		     lns, FALSE, 0, lnc, 0, lnw);
 
     o = SX_mk_curve_proc(i);
 

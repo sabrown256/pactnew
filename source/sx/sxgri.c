@@ -396,7 +396,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
    {int i, flag, nc;
     int sdx[PG_SPACEDM];
     int *clrmd, *nlev, *mrki, *labcf, *labln, *labts;
-    int *lnclr, *lnsty;
+    int *axslc, *axsls, *lnclr, *lnsty;
     double ndc[PG_BOXSZ];
     double *axsca, *axslw, *axsmts, *axsmjt, *axsmnt;
     double *axson, *axndec, *cntrat, *labsp, *mrks;
@@ -417,6 +417,8 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	axsca  = PG_ptr_attr_glb("axis-char-angle");
 	axslxf = PG_ptr_attr_glb("axis-label-x-format");
 	axslyf = PG_ptr_attr_glb("axis-label-y-format");
+	axslc  = PG_ptr_attr_glb("axis-line-color");
+	axsls  = PG_ptr_attr_glb("axis-line-style");
 	axslw  = PG_ptr_attr_glb("axis-line-width");
 	axsmts = PG_ptr_attr_glb("axis-major-tick-size");
 	axsmjt = PG_ptr_attr_glb("axis-max-major-ticks");
@@ -505,6 +507,10 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 			     axndec, NULL, NULL);
 	PG_register_variable("axis_char_angle", SC_DOUBLE_S,
 			     axsca, NULL, NULL);
+	PG_register_variable("Line Color", SC_INT_S,
+			     axslc, NULL, NULL);
+	PG_register_variable("Line Style", SC_INT_S,
+			     axsls, NULL, NULL);
 	PG_register_variable("Line Width", SC_DOUBLE_S,
 			     axslw, NULL, NULL);
 	PG_register_variable("Tick Size", SC_DOUBLE_S,

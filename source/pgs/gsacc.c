@@ -542,7 +542,7 @@ PG_logical_operation PG_fset_logical_op(PG_device *dev ARG(,in,cls),
 /*--------------------------------------------------------------------------*/
 
 /* PG_FGET_LINE_STYLE - return the device line style
- *                    - default is LINE_SOLID
+ *                    - default is 'line-style' which starts at LINE_SOLID
  *
  * #bind PG_fget_line_style fortran() scheme(pg-get-line-style) python()
  */
@@ -553,7 +553,7 @@ int PG_fget_line_style(PG_device *dev ARG(,in,cls))
     if (dev != NULL)
        st = dev->line_style;
     else
-       st = LINE_SOLID;
+       PG_get_attrs_glb(TRUE, "line-style", &st, NULL);
 
     return(st);}
 
@@ -574,7 +574,7 @@ int PG_fset_line_style(PG_device *dev ARG(,in,cls),
        {rv = dev->line_style;
 	dev->set_line_style(dev, st);}
     else
-       rv = LINE_SOLID;
+       PG_get_attrs_glb(TRUE, "line-style", &rv, NULL);
 
     return(rv);}
 
@@ -582,7 +582,7 @@ int PG_fset_line_style(PG_device *dev ARG(,in,cls),
 /*--------------------------------------------------------------------------*/
 
 /* PG_FGET_LINE_WIDTH - return the device line width
- *                    - default is 0.1
+ *                    - default is 'line-width' which starts at 0.1
  *
  * #bind PG_fget_line_width fortran() scheme(pg-get-line-width) python()
  */
@@ -593,7 +593,7 @@ double PG_fget_line_width(PG_device *dev ARG(,in,cls))
     if (dev != NULL)
        wd = dev->line_width;
     else
-       wd = 0.1;
+       PG_get_attrs_glb(TRUE, "line-width", &wd, NULL);
 
     return(wd);}
 
@@ -1182,6 +1182,7 @@ void PG_fset_viewport_shape(PG_device *dev ARG(,in,cls),
 /*--------------------------------------------------------------------------*/
 
 /* PG_FGET_LINE_COLOR - inquire about the current line color
+ *                    - the default is 'line-color' which starts at BLACK
  *
  * #bind PG_fget_line_color fortran() scheme(pg-get-line-color) python()
  */
@@ -1189,7 +1190,10 @@ void PG_fset_viewport_shape(PG_device *dev ARG(,in,cls),
 int PG_fget_line_color(PG_device *dev ARG(,in,cls))
    {int rv;
 
-    rv = dev->line_color;
+    if (dev != NULL)
+       rv = dev->line_color;
+    else
+       PG_get_attrs_glb(TRUE, "line-color", &rv, NULL);
 
     return(rv);}
 

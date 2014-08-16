@@ -483,6 +483,7 @@ void PG_setup_attrs_glb(void)
 	ATTR_INT("axis-grid-on",          &_PG_gattrs.axis_grid_on);
 	ATTR_INT("axis-grid-style",       &_PG_gattrs.axis_grid_style);
 	ATTR_INT("axis-labels",           &_PG_gattrs.axis_labels);
+	ATTR_INT("axis-line-color",       &_PG_gattrs.axis_line_color);
 	ATTR_INT("axis-line-style",       &_PG_gattrs.axis_line_style);
 	ATTR_INT("axis-max-major-ticks",  &_PG_gattrs.axis_max_major_ticks);
 	ATTR_INT("axis-n-minor-ticks",    &_PG_gattrs.axis_n_minor_ticks);

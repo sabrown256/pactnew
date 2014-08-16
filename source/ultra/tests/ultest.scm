@@ -331,7 +331,7 @@
 
 ;(printf nil " Curve Inquiry Command - Tests\n")
 (disp c 0.0 0.5)
-(exception (not (equal? (get-attributes c) (list -1 0. 1))) "GET-ATTRIBUTES")
+(exception (not (equal? (get-attributes c) (list -1 0.1 1))) "GET-ATTRIBUTES")
 (exception (> (abs (- (car (get-domain c))  0.)) 1.e-13) "GET-DOMAIN #1")
 (exception (> (abs (- (cdr (get-domain c)) 10.)) 2.e-13) "GET-DOMAIN #2")
 (exception (not (equal? (get-label c) "compose A B")) "GET-LABEL")
