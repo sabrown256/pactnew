@@ -1006,13 +1006,14 @@ void SX_load_rc(SS_psides *si, char *ffn, int ldrc, char *ifna, char *ifnb)
 
 void SX_install_global_vars(SS_psides *si)
    {int i;
+    int *axslc, *axsls;
     int *sqzlab, *refm, *refmc, *hider;
     int *hsts, *nlev, *scat, *cmtex, *intf, *mrki;
     int *lgcp, *ndi, *pltlb, *plttl, *pltdt, *palor;
     int *labcf, *labts, *labln, *lnclr, *lnsty, *txclr;
     int *rstvp;
     double *axsca, *axscs, *axsgs, *axslb;
-    double *axsls, *axslw, *axsmts, *axsmjt, *axsmnt, *axndec;
+    double *axslw, *axsmts, *axsmjt, *axsmnt, *axndec;
     double *axsmxt, *axsmyt, *axson, *axstt, *axsty;
     double *cntrat, *psdpi, *lnwid;
     double *errcsz, *labsp, *labyo, *mrks;
@@ -1030,6 +1031,7 @@ void SX_install_global_vars(SS_psides *si)
     axslb     = PG_ptr_attr_glb("axis-labels");
     axslxf    = PG_ptr_attr_glb("axis-label-x-format");
     axslyf    = PG_ptr_attr_glb("axis-label-y-format");
+    axslc     = PG_ptr_attr_glb("axis-line-color");
     axsls     = PG_ptr_attr_glb("axis-line-style");
     axslw     = PG_ptr_attr_glb("axis-line-width");
     axsmts    = PG_ptr_attr_glb("axis-major-tick-size");
@@ -1206,7 +1208,7 @@ void SX_install_global_vars(SS_psides *si)
 		  axsca);
 
     SS_install_cf(si, "axis-grid-style",
-                  "Variable: Controls line style for the axis grid\n     Usage: axis-grid-style solid | dotted | dashed | dotdashed ",
+                  "Variable: Controls line style for the axis grid\n     Usage: axis-grid-style [solid | dotted | dashed | dotdashed]",
                   SS_acc_int,
 		  axsgs);
 
@@ -1215,8 +1217,13 @@ void SX_install_global_vars(SS_psides *si)
                   SS_acc_int,
 		  axslb);
 
+    SS_install_cf(si, "axis-line-color",
+                  "Variable: Controls line color for the axes\n     Usage: axis-line-color [<integer>]",
+                  SS_acc_int,
+		  axslc);
+
     SS_install_cf(si, "axis-line-style",
-                  "Variable: Controls line style for the axes\n     Usage: axis-line-style solid | dotted | dashed | dotdashed ",
+                  "Variable: Controls line style for the axes\n     Usage: axis-line-style [solid | dotted | dashed | dotdashed]",
                   SS_acc_int,
 		  axsls);
 

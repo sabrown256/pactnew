@@ -169,6 +169,7 @@ struct s_gattrdes
     int axis_grid_on;
     int axis_grid_style;
     int axis_labels;
+    int axis_line_color;
     int axis_line_style;
     int axis_max_major_ticks;
     int axis_n_minor_ticks;
