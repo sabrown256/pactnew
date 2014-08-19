@@ -759,17 +759,19 @@ int _PD_rd_ext_ii(PDBfile *file)
  */
 
 static int64_t _PD_wr_symt_ii(PDBfile *file)
-   {int n, flag;
+   {int n, flag, ok;
     long i, stride;
     inti nb, ni, nt;
     int64_t addr, ad;
     char t[2][MAXLINE];
-    char *ty, *nm;
+    char *ty, *nm, *acc, *rej;
     syment *ep;
     dimdes *dms;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
+
+    _PD_symt_delay_rules(file, 0, &acc, &rej);
 
     if (file == NULL)
        return(-1);
@@ -788,39 +790,42 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
 
 	 nt = PD_entry_number(ep);
 	 ty = PD_entry_type(ep);
-	 ad = PD_entry_address(ep);
-	 nb = _PD_entry_get_number(ep, 0);
-	 if (nb == 0)
-	    {if (_PD_n_blocks(ep) == 1)
-	        nb = nt;
-	     else
-	        {PD_error("BAD BLOCK LIST - _PD_WR_SYMT_II", PD_GENERIC);
-		 return(-1L);};};
 
-	 SC_itos(t[0], MAXLINE, nb, NULL);
-	 SC_itos(t[1], MAXLINE, ad, NULL);
+         ok = _PD_symatch(file, TRUE, nm, ty, acc, rej);
+	 if (ok == TRUE)
+	    {ad = PD_entry_address(ep);
+	     nb = _PD_entry_get_number(ep, 0);
+	     if (nb == 0)
+	        {if (_PD_n_blocks(ep) == 1)
+		    nb = nt;
+		 else
+		    {PD_error("BAD BLOCK LIST - _PD_WR_SYMT_II", PD_GENERIC);
+		     return(-1L);};};
 
-	 _PD_put_string(n++, 
-			"%s\001%s\001%s\001%s\001",
-			nm, ty, t[0], t[1]);
+	     SC_itos(t[0], MAXLINE, nb, NULL);
+	     SC_itos(t[1], MAXLINE, ad, NULL);
+
+	     _PD_put_string(n++, 
+			    "%s\001%s\001%s\001%s\001",
+			    nm, ty, t[0], t[1]);
 
 /* adjust the slowest varying dimension to reflect only the first block */
-	 flag = PD_get_major_order(file);
-	 for (dms = PD_entry_dimensions(ep); dms != NULL; dms = dms->next)
-	     {if ((flag == ROW_MAJOR_ORDER) ||
-		  ((flag == COLUMN_MAJOR_ORDER) && (dms->next == NULL)))
-		 {stride = nt/(dms->number);
-		  stride = (stride == 0) ? 1 : stride;
-		  ni     = nb/stride;
-		  flag   = FALSE;}
-	      else
-		 ni = dms->number;
+	     flag = PD_get_major_order(file);
+	     for (dms = PD_entry_dimensions(ep); dms != NULL; dms = dms->next)
+	         {if ((flag == ROW_MAJOR_ORDER) ||
+		      ((flag == COLUMN_MAJOR_ORDER) && (dms->next == NULL)))
+		     {stride = nt/(dms->number);
+		      stride = (stride == 0) ? 1 : stride;
+		      ni     = nb/stride;
+		      flag   = FALSE;}
+		  else
+		     ni = dms->number;
 
-	      SC_itos(t[0], MAXLINE, ni, NULL);
-	      _PD_put_string(n++, "%ld\001%s\001",
-			     dms->index_min, t[0]);};
+		  SC_itos(t[0], MAXLINE, ni, NULL);
+		  _PD_put_string(n++, "%ld\001%s\001",
+				 dms->index_min, t[0]);};
 
-	 _PD_put_string(n++, "\n");};
+	     _PD_put_string(n++, "\n");};};
 
 /* pad an extra newline to mark the end of the symbol table for _PD_rd_symt */
     _PD_put_string(n++, "\n");

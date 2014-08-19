@@ -519,8 +519,10 @@ struct s_tr_layer
    {char *type;                       /* file type - e.g. PDBfile*/
     char *fmt;                        /* format name - e.g. pdb */
     int (*gettype)(char *type);
-    PDBfile *(*create)(tr_layer *tr, SC_udl *pu, char *name, void *a);
-    PDBfile *(*open)(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a);
+    PDBfile *(*create)(tr_layer *tr, SC_udl *pu,
+		       char *name, char *mode, void *a);
+    PDBfile *(*open)(tr_layer *tr, SC_udl *pu,
+		     char *name, char *mode, void *a);
     int64_t (*close)(PDBfile *file);
     int (*read)(PDBfile *file, char *path, char *ty,
 		syment *ep, void *vr, int nd, long *ind);
