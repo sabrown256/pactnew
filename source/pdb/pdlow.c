@@ -1334,7 +1334,7 @@ void _PD_set_standard(PDBfile *file, data_standard *std, data_alignment *algn)
  *            - if successful else NULL
  */
 
-PDBfile *_PD_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
+PDBfile *_PD_create(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
    {int ok;
     FILE *fp;
     PDBfile *file;
@@ -1350,6 +1350,8 @@ PDBfile *_PD_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     if (file != NULL)
        {file->mode = PD_CREATE;
     
+	_PD_symt_set_delay_mode(file, mode);
+
 	if (a != NULL)
 	   _PD_SETUP_MP_FILE(file, *(SC_communicator *) a);
 

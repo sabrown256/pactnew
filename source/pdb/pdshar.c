@@ -230,7 +230,7 @@ static PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
     if (*mode == 'w')
        {if (crt != NULL)
 	   {if (pu != NULL)
-	       file = crt(tr, pu, name, a);};}
+	       file = crt(tr, pu, name, mode, a);};}
 
 /* open an existing file */
     else if (opn != NULL)

@@ -111,9 +111,10 @@ typedef int64_t inti;
 typedef int32_t intb;
 
 typedef int (*PFBinType)(char *type);
-typedef PDBfile *(*PFBinCreate)(tr_layer *tr, SC_udl *pu, char *name, void *a);
-typedef PDBfile *(*PFBinOpen)(tr_layer *tr, SC_udl *pu, char *name,
-			      char *mode, void *a);
+typedef PDBfile *(*PFBinCreate)(tr_layer *tr, SC_udl *pu,
+				char *name, char *mode, void *a);
+typedef PDBfile *(*PFBinOpen)(tr_layer *tr, SC_udl *pu,
+			      char *name, char *mode, void *a);
 typedef int64_t (*PFBinClose)(PDBfile *file);
 typedef syment *(*PFBinWrite)(PDBfile *file, char *path,
 			      char *inty, char *outty,
@@ -558,7 +559,7 @@ extern defstr
  *_PD_type_container(PDBfile *file, defstr *dp);
 
 extern PDBfile
- *_PD_create(tr_layer *tr, SC_udl *pu, char *name, void *a),
+ *_PD_create(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a),
  *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a);
 
 extern FILE

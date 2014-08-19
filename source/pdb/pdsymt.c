@@ -40,8 +40,33 @@ int _PD_is_var_in_dir(char *var, char *dir)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADD_SYM_PTRP - return TRUE iff pointer
- *                  - NAME should be added to the symbol table
+/* _PD_ADD_SYM_PTRN - return TRUE iff NAME is not a pointer
+ *                  - if TRUE NAME should be added to the symbol table
+ *                  - if AD is TRUE decide whether or not to add
+ *                  - if AD if FALSE decide whether to remove
+ */
+
+int _PD_add_sym_ptrn(PDBfile *file, int ad, char *name, char *type,
+		     char *acc, char *rej)
+   {int ok;
+
+    if (name == NULL)
+       ok = FALSE;
+
+    else if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
+       ok = FALSE;
+
+    else
+       ok = (ad == TRUE);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_ADD_SYM_PTRP - return TRUE iff NAME is not a pointer
+ *                  - or it is not in the current directory
+ *                  - if TRUE NAME should be added to the symbol table
  *                  - if AD is TRUE decide whether or not to add
  *                  - if AD if FALSE decide whether to remove
  */
@@ -67,21 +92,18 @@ int _PD_add_sym_ptrp(PDBfile *file, int ad, char *name, char *type,
 	   {s++;
 	    ok = _PD_is_var_in_dir(s, p);};}
 
-    else if (ad == TRUE)
-       ok = TRUE;
-
     else
-       ok = FALSE;
+       ok = (ad == TRUE);
 
     return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADD_SYM_ANCP - return TRUE iff
- *                  - NAME is in the current directory or it ancestors
- *                  - that is, toward root
- *                  - and should be added to the symbol table
+/* _PD_ADD_SYM_ANCP - return TRUE iff NAME is not a pointer or
+ *                  - it is a pointer in the current directory
+ *                  - or its ancestors -  that is, toward root
+ *                  - if TRUE NAME should be added to the symbol table
  *                  - if AD is TRUE decide whether or not to add
  *                  - if AD if FALSE decide whether to remove
  */
@@ -134,10 +156,10 @@ int _PD_add_sym_ancp(PDBfile *file, int ad, char *name, char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADD_SYM_DESP - return TRUE iff
- *                  - NAME is in the current directory or it descendants
- *                  - that is, away from root
- *                  - and should be added to the symbol table
+/* _PD_ADD_SYM_DESP - return TRUE iff NAME is not a pointer or
+ *                  - it is a pointer in the current directory
+ *                  - or it descendants - that is, away from root
+ *                  - if TRUE NAME should be added to the symbol table
  *                  - if AD is TRUE decide whether or not to add
  *                  - if AD if FALSE decide whether to remove
  */
@@ -182,9 +204,9 @@ int _PD_add_sym_desp(PDBfile *file, int ad, char *name, char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADD_SYM_CURRP - return TRUE iff
- *                   - NAME is in the current directory only
- *                   - and should be added to the symbol table
+/* _PD_ADD_SYM_CURRP - return TRUE iff NAME is not a pointer or
+ *                   - it is a pointer in the current directory only
+ *                   - if TRUE NAME should be added to the symbol table
  *                   - if AD is TRUE decide whether or not to add
  *                   - if AD if FALSE decide whether to remove
  */
@@ -291,22 +313,47 @@ PD_delay_mode _PD_symt_set_delay_mode(PDBfile *file, char *mode)
     if (file != NULL)
        {ov = file->delay_sym;
 
-/* if file mode is "rp" use delay pointer mode */
-	if (strchr(mode, 'p') != NULL)
+/* if file mode is "rnp" or "wnp" do not read/write pointers
+ * rely on itags solely
+ * saves memory needed for pointers in symbol table
+ * both in RAM and on disk
+ */
+	if ((strstr(mode, "np") != NULL) && (file->use_itags == TRUE))
+	   {file->delay_sym = PD_DELAY_PTRS;
+	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_ptrn);}
+
+/* if file mode is "rp" use delay pointer mode
+ * saves memory in symbol table by only
+ * bringing in pointers as you cd to the directory in which
+ * they reside
+ */
+	else if (strchr(mode, 'p') != NULL)
 	   {file->delay_sym = PD_DELAY_PTRS;
 	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_ptrp);}
 
-/* if file mode is "rsa" use delay all mode */
+/* if file mode is "rsa" use delay all mode
+ * saves memory in symbol table by only
+ * bringing in entries as you cd to the directory in which
+ * they reside or in ancestors of that directory
+ */
 	else if (strstr(mode, "sa") != NULL)
 	   {file->delay_sym = PD_DELAY_ALL;
 	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_ancp);}
 
-/* if file mode is "rsd" use delay all mode */
+/* if file mode is "rsd" use delay all mode
+ * saves memory in symbol table by only
+ * bringing in entries as you cd to the directory in which
+ * they reside or in descendants of that directory
+ */
 	else if (strstr(mode, "sd") != NULL)
 	   {file->delay_sym = PD_DELAY_ALL;
 	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_desp);}
 
-/* if file mode is "rsc" use delay all mode */
+/* if file mode is "rsc" use delay all mode
+ * saves memory in symbol table by only
+ * bringing in entries as you cd to the directory in which
+ * they reside
+ */
 	else if (strstr(mode, "sc") != NULL)
 	   {file->delay_sym = PD_DELAY_ALL;
 	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_currp);}
@@ -336,12 +383,9 @@ PFSymDelay _PD_symt_set_delay_method(PDBfile *file, char *mode,
     if (file != NULL)
        {rv = file->symatch;
 
-/* if file mode is "rp" use delay pointer mode */
-	if (strchr(mode, 'p') != NULL)
-	   file->symatch = mth;
-
-/* if file mode is "rs" use delay all mode */
-	else if (strchr(mode, 's') != NULL)
+/* if file mode is "rp", "rnp", "wnp", "rsx" use a delay mode */
+	if ((strchr(mode, 'p') != NULL) ||
+	    (strchr(mode, 's') != NULL))
 	   file->symatch = mth;};
 
     return(rv);}
