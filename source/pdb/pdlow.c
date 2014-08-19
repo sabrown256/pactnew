@@ -1359,7 +1359,7 @@ PDBfile *_PD_create(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
 
 	pa->cfp = fp;
 
-	ok = (*file->create)(file, _PD_IS_MASTER(file));
+	ok = (*file->create)(file, mode, _PD_IS_MASTER(file));
 	if (ok != TRUE)
 	   PD_error("FAILED TO CREATE FILE - _PD_CREATE", PD_CREATE);};
 
@@ -1475,7 +1475,7 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
     if (ok == TRUE)
        {vers = _PD_identify_file(file);
 	if (vers > 0)
-	   {ok = (*file->open)(file);
+	   {ok = (*file->open)(file, mode);
 	    if (ok != TRUE)
 	       PD_error("CANNOT OPEN FILE - _PD_OPEN", PD_OPEN);};};
 

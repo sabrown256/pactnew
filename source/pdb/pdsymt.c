@@ -318,8 +318,13 @@ PD_delay_mode _PD_symt_set_delay_mode(PDBfile *file, char *mode)
  * saves memory needed for pointers in symbol table
  * both in RAM and on disk
  */
-	if ((strstr(mode, "np") != NULL) && (file->use_itags == TRUE))
+	if (strstr(mode, "np") != NULL)
 	   {file->delay_sym = PD_DELAY_PTRS;
+
+/* if no-pointer mode is requested force format_version 2 */
+	    if (strstr(mode, "np") != NULL)
+	       _PD_format_version(file, 2);
+
 	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_ptrn);}
 
 /* if file mode is "rp" use delay pointer mode

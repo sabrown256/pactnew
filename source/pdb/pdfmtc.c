@@ -26,12 +26,6 @@
 #define PRIMITIVE_TYPE_TAG   "\nPrimitiveTypes:\n"
 #define COMPOUND_TYPE_TAG    "\nCompoundTypes:\n"
 
-#if 1
-#define ITAGS    FALSE
-#else
-#define ITAGS    TRUE
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /*                               ITAG ROUTINES                              */
@@ -1279,7 +1273,7 @@ static int _PD_wr_fmt_iii(PDBfile *file)
  *              - if successful else NULL
  */
 
-static int _PD_open_iii(PDBfile *file)
+static int _PD_open_iii(PDBfile *file, char *mode)
    {int nb, ns;
     char str[MAXLINE], key[MAXLINE];
     char *acc, *rej, *s, *ps;
@@ -1289,8 +1283,6 @@ static int _PD_open_iii(PDBfile *file)
     pa = _PD_get_state(-1);
 
     fp = pa->ofp;
-
-    file->use_itags = ITAGS;
 
     _PD_symt_delay_rules(file, 0, &acc, &rej);
 
@@ -1370,7 +1362,7 @@ static int _PD_open_iii(PDBfile *file)
  *                - if successful else NULL
  */
 
-static int _PD_create_iii(PDBfile *file, int mst)
+static int _PD_create_iii(PDBfile *file, char *mode, int mst)
    {FILE *fp;
     PD_smp_state *pa;
 
@@ -1384,8 +1376,6 @@ static int _PD_create_iii(PDBfile *file, int mst)
 
 /* initialize the pdb system defs and structure chart */
     _PD_init_chrt(file, TRUE);
-
-    file->use_itags = ITAGS;
 
     if (mst == TRUE)
        {if (lio_seek(fp, file->chrtaddr, SEEK_SET))
@@ -1531,7 +1521,8 @@ int _PD_set_format_iii(PDBfile *file)
     file->rd_itag       = _PD_rd_itag_iii;
 
     file->format_version = 3;
-
+    file->use_itags      = FALSE;
+	    
     return(TRUE);}
 
 /*--------------------------------------------------------------------------*/
