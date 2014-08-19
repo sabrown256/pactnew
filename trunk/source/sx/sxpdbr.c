@@ -233,7 +233,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
             lio_seek(fp, PD_entry_address(cp), SEEK_SET);
 
 /* GOTCHA: need itagless version of this */
-	    (*file->rd_itag)(file, NULL, &itag);
+	    _PD_rd_itag(file, NULL, &itag);
 	    sz = itag.nitems;};};
 
     arr = PM_make_array(dtype, sz, addr.memaddr);

@@ -621,10 +621,9 @@ struct s_PDBfile
     int (*wr_prim_types)(FILE *fp, hasharr *tab);
     int (*rd_prim_types)(PDBfile *file, char *bf);
 
-    int (*wr_itag)(PDBfile *file, char *name, PD_address *ad,
-		   int64_t ni, char *type,
+    int (*wr_itag)(char *s, int nc, char *type, int64_t ni,
 		   int64_t addr, PD_data_location loc);
-    int (*rd_itag)(PDBfile *file, char *p, PD_itag *pi);
+    char **(*rd_itag)(char *bf);
 
     int (*wr_fmt)(PDBfile *file);};
 

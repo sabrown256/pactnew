@@ -1054,6 +1054,53 @@ static void _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_RD_ITAG - fill an itag from the file */
+
+int _PD_rd_itag(PDBfile *file, char *p, PD_itag *pi)
+   {int na, ok;
+    char s[MAXLINE];
+    char **ta, *bf;
+    FILE *fp;
+    PD_smp_state *pa;
+
+    fp = file->stream;
+    pa = _PD_get_state(-1);
+    bf = pa->tmbf;
+	
+    if (file->use_itags == TRUE)
+       {if (file->format_version > 2)
+	   _PD_rfgets(bf, MAXLINE, fp);
+	_PD_rfgets(bf, MAXLINE, fp);
+
+/* parse the itag */
+	ta = file->rd_itag(bf);
+	na = PS_lst_length(ta);
+	if (na < 2)
+	   return(FALSE);
+	else
+	   {pi->type   = ta[0];
+	    pi->nitems = SC_stol(ta[1]);
+	    pi->addr   = (na < 3) ? -1 : SC_stol(ta[2]);
+	    pi->flag   = (na < 4) ? TRUE : SC_stol(ta[3]);};
+
+	SC_strncpy(bf, MAXLINE, pi->type, -1);
+	pi->type = bf;
+
+	pi->length = file->wr_itag(s, MAXLINE,
+				   pi->type, pi->nitems,
+				   pi->addr, pi->flag);
+
+	PS_free_strings(ta);}
+
+    else
+       {ok = _PD_ptr_entry_itag(file, pi, p);
+	SC_ASSERT(ok == TRUE);};
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_PTR_RD_ITAGS - read itags and setup the read of an indirection
  *                  - return TRUE iff there is indirect data to be read
  */
@@ -1064,7 +1111,7 @@ int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
 
     frst = FALSE;
     if (vr != NULL)
-       {if ((*file->rd_itag)(file, *vr, pi) == FALSE)
+       {if (_PD_rd_itag(file, *vr, pi) == FALSE)
 	   PD_error("BAD ITAG - _PD_PTR_RD_ITAGS", PD_READ);
 
 /* handle NULL pointer case */
@@ -1227,6 +1274,41 @@ void _PD_ptr_wr_syment(PDBfile *file, char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_WR_ITAG - write an itag to the file
+ *             - for a NULL pointer do:
+ *             -     _PD_wr_itag(file, name, -1L, 0L, type, -1L, LOC_OTHER)
+ *             - for a pointer to data elsewhere do:
+ *             -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_OTHER)
+ *             - for a pointer to data here do:
+ *             -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_HERE)
+ *             - for a pointer to discontiguous data do:
+ *             -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_BLOCK)
+ *             -     then addr is interpreted as the address of the next
+ *             -     block of data
+ */
+
+int _PD_wr_itag(PDBfile *file, char *name,
+		PD_address *ad, inti ni, char *type,
+		int64_t addr, PD_data_location loc)
+   {char s[MAXLINE];
+    FILE *fp;
+
+    if (file->virtual_internal == FALSE)
+       {if (file->use_itags == TRUE)
+	   {fp = file->stream;
+
+	    file->wr_itag(s, MAXLINE, type, ni, addr, loc);
+
+	    lio_printf(fp, s);};
+
+	if ((ni > 0) && (loc == LOC_HERE))
+	   _PD_ptr_wr_syment(file, name, ad, type, ni, addr);};
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_PTR_WR_ITAGS - handle the memory of pointers and write the itags
  *                  - correctly
  */
@@ -1270,7 +1352,7 @@ int _PD_ptr_wr_itags(PDBfile *file, char *name, void *vr, inti ni, char *type)
 	ad = _PD_ptr_get_ad(al, n);};
 
 /* write the itag to the file */
-    (*file->wr_itag)(file, name, ad, ni, type, addr, loc);
+    _PD_wr_itag(file, name, ad, ni, type, addr, loc);
 
     SC_LOCKOFF(PD_ptr_lock);
 

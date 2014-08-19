@@ -675,7 +675,11 @@ extern void
 extern int
  _PD_ptr_reset(PDBfile *file, char *vr),
  _PD_ptr_entry_itag(PDBfile *file, PD_itag *pi, char *p),
+ _PD_wr_itag(PDBfile *file, char *name,
+	     PD_address *ad, inti ni, char *type,
+	     int64_t addr, PD_data_location loc),
  _PD_ptr_wr_itags(PDBfile *file, char *name, void *vr, inti ni, char *type),
+ _PD_rd_itag(PDBfile *file, char *p, PD_itag *pi),
  _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi),
  _PD_ptr_register_entry(PDBfile *fp, char *name, syment *ep);
 
