@@ -32,100 +32,32 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* _PD_WR_ITAG_III - write an itag to the file
- *                 - for a NULL pointer do:
- *                 -     _PD_wr_itag(file, name, -1L, 0L, type, -1L, LOC_OTHER)
- *                 - for a pointer to data elsewhere do:
- *                 -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_OTHER)
- *                 - for a pointer to data here do:
- *                 -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_HERE)
- *                 - for a pointer to discontiguous data do:
- *                 -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_BLOCK)
- *                 -     then addr is interpreted as the address of the next
- *                 -     block of data
- */
+/* _PD_WR_ITAG_III - format and write an itag to S */
 
-static int _PD_wr_itag_iii(PDBfile *file, char *name,
-			   PD_address *ad, inti ni, char *type,
+static int _PD_wr_itag_iii(char *s, int nc, char *type, int64_t ni,
 			   int64_t addr, PD_data_location loc)
-   {char s[MAXLINE], t[2][MAXLINE];
-    FILE *fp;
+   {int rv;
+    char t[2][MAXLINE];
 
-    if (file->virtual_internal == FALSE)
-       {fp = file->stream;
+    SC_itos(t[0], MAXLINE, ni, NULL);
+    SC_itos(t[1], MAXLINE, addr, "%32lld");
 
-	if (file->use_itags == TRUE)
+    rv = snprintf(s, MAXLINE, "\n%s(%s) %32s %d;\n",
+		  type, t[0], t[1], loc);
 
-/* must have a definite large number of digits in address field
- * in order to support relocation
- */
-	   {SC_itos(t[0], MAXLINE, ni, NULL);
-	    SC_itos(t[1], MAXLINE, addr, "%32lld");
-	    snprintf(s, MAXLINE, "\n%s(%s) %32s %d;\n",
-		     type, t[0], t[1], loc);
-
-	    lio_printf(fp, s);};
-
-	if (loc == LOC_HERE)
-	   _PD_ptr_wr_syment(file, name, ad, type, ni, addr);};
-
-    return(TRUE);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PD_RD_ITAG_III - fill an itag from the file */
 
-static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
-   {int ok;
-    char t[3][MAXLINE];
-    char *token, *s, *bf;
-    FILE *fp;
-    PD_smp_state *pa;
+static char **_PD_rd_itag_iii(char *bf)
+   {char **ta;
 
-    fp = file->stream;
-    pa = _PD_get_state(-1);
-    bf = pa->tmbf;
-	
-    if (file->use_itags == TRUE)
-       {_PD_rfgets(bf, MAXLINE, fp);
-	_PD_rfgets(bf, MAXLINE, fp);
+    ta = PS_tokenize(bf, "() \n", 0);
 
-	token = SC_strtok(bf, "(", s);
-	if (token == NULL)
-	   return(FALSE);
-	pi->type = token;
-
-	token = SC_strtok(NULL, ") \n", s);
-	if (token == NULL)
-	   return(FALSE);
-	pi->nitems = atol(token);
-
-	token = SC_strtok(NULL, " \n", s);
-	if (token == NULL)
-	   {pi->addr = -1;
-	    pi->flag = TRUE;}
-	else
-	   {pi->addr = SC_stol(token);
-	    token    = SC_strtok(NULL, " \n", s);
-	    if (token == NULL)
-	       pi->flag = TRUE;
-	    else
-	       pi->flag = atoi(token);};
-
-	SC_itos(t[0], MAXLINE, pi->nitems, NULL);
-	SC_itos(t[1], MAXLINE, pi->addr, "%32lld");
-
-	snprintf(t[2], MAXLINE, "\n%s %s %32s %d;\n",
-		 t[0], pi->type, t[1], pi->flag);
-
-	pi->length = strlen(t[2]);}
-
-    else
-       {ok = _PD_ptr_entry_itag(file, pi, p);
-	SC_ASSERT(ok == TRUE);};
-
-    return(TRUE);}
+    return(ta);}
 
 /*--------------------------------------------------------------------------*/
 

@@ -54,90 +54,34 @@ static void _PD_regen_std(PDBfile *file, char *type,
 
 /*--------------------------------------------------------------------------*/
 
-/* _PD_WR_ITAG_II - write an itag to the file
- *                - for a NULL pointer do:
- *                -     _PD_wr_itag(file, name, -1L, 0L, type, -1L, LOC_OTHER)
- *                - for a pointer to data elsewhere do:
- *                -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_OTHER)
- *                - for a pointer to data here do:
- *                -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_HERE)
- *                - for a pointer to discontiguous data do:
- *                -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_BLOCK)
- *                -     then addr is interpreted as the address of the next
- *                -     block of data
- */
+/* _PD_WR_ITAG_II - format and write an itag int S */
 
-static int _PD_wr_itag_ii(PDBfile *file, char *name,
-			  PD_address *ad, inti ni, char *type,
+static int _PD_wr_itag_ii(char *s, int nc, char *type, int64_t ni,
 			  int64_t addr, PD_data_location loc)
-   {char s[MAXLINE], t[2][MAXLINE];
-    FILE *fp;
+   {int rv;
+    char t[2][MAXLINE];
 
-    if (file->virtual_internal == FALSE)
-       {fp = file->stream;
+    SC_itos(t[0], MAXLINE, ni, NULL);
+    SC_itos(t[1], MAXLINE, addr, "%32lld");
 
-/* must have a definite large number of digits in address field
- * in order to support relocation
- */
-	SC_itos(t[0], MAXLINE, ni, NULL);
-	SC_itos(t[1], MAXLINE, addr, "%32lld");
-	snprintf(s, MAXLINE, "%s\001%s\001%32s\001%d\001\n",
-		 t[0], type, t[1], loc);
+    rv = snprintf(s, nc, "%s\001%s\001%32s\001%d\001\n",
+		  t[0], type, t[1], loc);
 
-	lio_printf(fp, s);
-
-	if ((ni > 0) && (loc == LOC_HERE))
-	   _PD_ptr_wr_syment(file, name, ad, type, ni, addr);};
-
-    return(TRUE);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PD_RD_ITAG_II - fill an itag from the file */
 
-static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
-   {char t[3][MAXLINE];
-    char *token, *s, *bf;
-    FILE *fp;
-    PD_smp_state *pa;
+static char **_PD_rd_itag_ii(char *bf)
+   {char **ta;
 
-    fp = file->stream;
-    pa = _PD_get_state(-1);
-    bf = pa->tmbf;
+    ta = PS_tokenize(bf, "\001\n", 0);
 
-    _PD_rfgets(bf, MAXLINE, fp);
+    SC_SWAP_VALUE(char *, ta[0], ta[1]);
 
-    token = SC_strtok(bf, "\001", s);
-    if (token == NULL)
-       return(FALSE);
-    pi->nitems = atol(token);
-
-    pi->type = SC_strtok(NULL, "\001\n", s);
-    if (pi->type == NULL)
-       return(FALSE);
-
-    token = SC_strtok(NULL, "\001\n", s);
-    if (token == NULL)
-       {pi->addr = -1;
-        pi->flag = TRUE;}
-    else
-       {pi->addr = SC_stol(token);
-        token    = SC_strtok(NULL, "\001\n", s);
-        if (token == NULL)
-           pi->flag = TRUE;
-        else
-           pi->flag = atoi(token);};
-
-    SC_itos(t[0], MAXLINE, pi->nitems, NULL);
-    SC_itos(t[1], MAXLINE, pi->addr, "%32lld");
-
-    snprintf(t[2], MAXLINE, "%s\001%s\001%32s\001%d\001\n",
-	     t[0], pi->type, t[1], pi->flag);
-
-    pi->length = strlen(t[2]);
-
-    return(TRUE);}
+    return(ta);}
 
 /*--------------------------------------------------------------------------*/
 

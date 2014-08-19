@@ -453,7 +453,7 @@ int64_t _PD_skip_over(PDBfile *file, long skip, int noind)
     tab = file->chart;
 
     while (skip-- > 0L)
-       {(*file->rd_itag)(file, NULL, &itag);
+       {_PD_rd_itag(file, NULL, &itag);
 
 /* note whether this is an indirection */
         indir = _PD_indirection(itag.type);
@@ -477,7 +477,7 @@ int64_t _PD_skip_over(PDBfile *file, long skip, int noind)
         if ((itag.addr != -1) && (itag.nitems != 0L))
            {if ((itag.flag == LOC_OTHER) && (skip == -1))
 	       {_PD_set_current_address(file, itag.addr, SEEK_SET, PD_TRACE);
-		(*file->rd_itag)(file, NULL, &itag);};
+		_PD_rd_itag(file, NULL, &itag);};
 
 /* layered indirects have no "data" bytes written out to be skipped over */
             if (indir == 0)
@@ -547,7 +547,7 @@ static int64_t _PD_itag_deref_addr(PD_smp_state *pa, int n)
 
 	_PD_set_current_address(file, addr, SEEK_SET, PD_TRACE);
 
-	(*file->rd_itag)(file, NULL, &itag);
+	_PD_rd_itag(file, NULL, &itag);
 
 	addr = _PD_get_current_address(file, PD_TRACE);
         numb = itag.nitems;
@@ -662,10 +662,10 @@ static int64_t _PD_itag_index_deref(PD_smp_state *pa, int n,
 		   naitems = indx*max(1, numb);
 		   addr    = _PD_skip_over(file, naitems, FALSE);
 
-		   (*file->rd_itag)(file, NULL, &itag);
+		   _PD_rd_itag(file, NULL, &itag);
 		   if (!itag.flag)
 		      {_PD_set_current_address(file, addr, SEEK_SET, PD_TRACE);
-		       (*file->rd_itag)(file, NULL, &itag);};
+		       _PD_rd_itag(file, NULL, &itag);};
 
 		   numb   = itag.nitems;
 		   *pnumb = numb;
