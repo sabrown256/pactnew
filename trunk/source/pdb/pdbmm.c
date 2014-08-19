@@ -151,27 +151,23 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->name       = CSTRSAVE(name);
 	file->type       = NULL;
 
-	file->symtab            = SC_make_hasharr(_PD.ninc, NODOC, SC_HA_NAME_KEY, 0);
-#if 0
-	file->symtab->hash      = PM_md5_hash;
-#endif
-	file->chart             = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
-	file->host_chart        = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
-	file->attrtab           = NULL;
-	file->mode              = PD_UNINIT;
-	file->file_mode         = CSTRSAVE(md);
+	file->symtab     = SC_make_hasharr(_PD.ninc, NODOC, SC_HA_NAME_KEY, 0);
+	file->chart      = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
+	file->host_chart = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
+	file->attrtab    = NULL;
+	file->mode       = PD_UNINIT;
+	file->file_mode  = CSTRSAVE(md);
 
-	file->maximum_size     = _PD.maxfsize;                   /* family info */
+	file->maximum_size     = _PD.maxfsize;                /* family info */
 	file->previous_file    = NULL;
 
-	file->virtual_internal = FALSE;                 /* disk file by default */
-	file->current_prefix   = NULL;       /* read/write variable name prefix */
+	file->virtual_internal = FALSE;              /* disk file by default */
+	file->current_prefix   = NULL;    /* read/write variable name prefix */
 	file->ptr_base         = CSTRSAVE("/&ptrs/ia_");
 
-	file->default_offset = 0;           /* default offset for array indexes */
+	file->default_offset = 0;        /* default offset for array indexes */
 	file->major_order    = ROW_MAJOR_ORDER;
 
-	file->use_itags      = TRUE;
 	file->track_pointers = TRUE;
 	file->delay_sym      = PD_DELAY_NONE;
 
@@ -181,10 +177,8 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->host_align = _PD_copy_alignment(pa->int_align);
 
 	file->n_dyn_spaces = 0L;
-#if 0
-	file->free_list = NULL;
-#endif
-	file->mpi_mode = 0;              /* 1: serial, 0: parallel */
+
+	file->mpi_mode = 0;                        /* 1: serial, 0: parallel */
 	file->mpi_file = FALSE;
 
 	file->req.oper      = PD_OPEN;

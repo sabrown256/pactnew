@@ -1375,7 +1375,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
  *             - if successful else NULL
  */
 
-static int _PD_open_ii(PDBfile *file)
+static int _PD_open_ii(PDBfile *file, char *mode)
    {char str[MAXLINE];
     char *acc, *rej, *token, *s;
     FILE *fp;
@@ -1384,8 +1384,6 @@ static int _PD_open_ii(PDBfile *file)
     pa = _PD_get_state(-1);
 
     fp = pa->ofp;
-
-    file->use_itags = TRUE;
 
     _PD_symt_delay_rules(file, 0, &acc, &rej);
 
@@ -1468,7 +1466,7 @@ static int _PD_open_ii(PDBfile *file)
  *               - return TRUE iff successful
  */
 
-static int _PD_create_ii(PDBfile *file, int mst)
+static int _PD_create_ii(PDBfile *file, char *mode, int mst)
    {u_int64_t nstr;
     char str[MAXLINE];
     char *nht;
@@ -1508,8 +1506,6 @@ static int _PD_create_ii(PDBfile *file, int mst)
 
 /* initialize the pdb system defs and structure chart */
     _PD_init_chrt(file, TRUE);
-
-    file->use_itags = TRUE;
 
     if (mst == TRUE)
        {if (lio_seek(fp, file->chrtaddr, SEEK_SET))
@@ -1660,6 +1656,7 @@ int _PD_set_format_ii(PDBfile *file)
     file->rd_itag       = _PD_rd_itag_ii;
 
     file->format_version = 2;
+    file->use_itags      = TRUE;
 
     return(TRUE);}
 

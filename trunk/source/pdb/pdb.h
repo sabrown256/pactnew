@@ -609,8 +609,8 @@ struct s_PDBfile
 		   char *acc, char *rej);
 
 /* the db_layer methods */
-    int (*create)(PDBfile *file, int mst);
-    int (*open)(PDBfile *file);
+    int (*create)(PDBfile *file, char *mode, int mst);
+    int (*open)(PDBfile *file, char *mode);
     int (*flush)(PDBfile *file);
 
     int64_t (*wr_symt)(PDBfile *file);

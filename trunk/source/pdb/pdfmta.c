@@ -47,7 +47,7 @@ extern int
  *            - if successful else NULL
  */
 
-static int _PD_open_i(PDBfile *file)
+static int _PD_open_i(PDBfile *file, char *mode)
    {char str[MAXLINE];
     char *token, *s;
     FILE *fp;
@@ -177,7 +177,7 @@ static int _PD_open_i(PDBfile *file)
  *              - no new format I files will be created
  */
 
-static int _PD_create_i(PDBfile *file, int mst)
+static int _PD_create_i(PDBfile *file, char *mode, int mst)
    {
 
     return(FALSE);}
@@ -236,6 +236,7 @@ int _PD_set_format_i(PDBfile *file)
     file->wr_fmt  = _PD_wr_fmt_i;
 
     file->format_version = 1;
+    file->use_itags      = TRUE;
 
     return(TRUE);}
 
