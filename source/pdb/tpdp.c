@@ -64,11 +64,11 @@ static void test_target(char *base, int n, char *fname, char *datfile,
 
 static void show_stat(statedes *st, char *tag, int na)
    {int64_t nba, nbf, dna, dnf, sz, ov;
-    double time, dt, dnb, dsz;
+    double ltm, dt, dnb, dsz;
     static int first = TRUE;
 
     SC_mem_statr(&nba, &nbf, NULL, NULL, &sz, &ov);
-    time = SC_wall_clock_time();
+    ltm = SC_wall_clock_time();
 
     if (first == TRUE)
        {first = FALSE;
@@ -83,7 +83,7 @@ static void show_stat(statedes *st, char *tag, int na)
 	dnf   = nbf  - st->nbf0;
 	dnb   = 1.0e-3*(dna - dnf);
 	dsz   = 1.0e-3*(sz  - st->sz0);
-	dt    = time - st->time0;
+	dt    = ltm - st->time0;
 
 /* memory in kBytes */
 	PRINT(STDOUT,
@@ -93,7 +93,7 @@ static void show_stat(statedes *st, char *tag, int na)
     st->nba0  = nba;
     st->nbf0  = nbf;
     st->sz0   = sz;
-    st->time0 = time;
+    st->time0 = ltm;
 
     return;}
 

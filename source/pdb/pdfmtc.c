@@ -53,9 +53,23 @@ static int _PD_wr_itag_iii(char *s, int nc, char *type, int64_t ni,
 /* _PD_RD_ITAG_III - fill an itag from the file */
 
 static char **_PD_rd_itag_iii(char *bf)
-   {char **ta;
+   {int i, na;
+    char a[MAXLINE];
+    char **ta;
 
     ta = PS_tokenize(bf, "() \n", 0);
+
+/* check for mis-parse of "char *" into "char" and "*" */
+    if (ta[1][0] == '*')
+       {na = PS_lst_length(ta);
+	snprintf(a, MAXLINE, "%s %s", ta[0], ta[1]);
+	CFREE(ta[0]);
+	CFREE(ta[1]);
+	ta[0] = CSTRSAVE(a);
+
+/* move the other strings down the list */
+	for (i = 2; i <= na; i++)
+	    ta[i-1] = ta[i];};
 
     return(ta);}
 
@@ -1216,6 +1230,8 @@ static int _PD_open_iii(PDBfile *file, char *mode)
 
     fp = pa->ofp;
 
+    file->use_itags = FALSE;
+
     _PD_symt_delay_rules(file, 0, &acc, &rej);
 
 /* read the trailer */
@@ -1308,6 +1324,8 @@ static int _PD_create_iii(PDBfile *file, char *mode, int mst)
 
 /* initialize the pdb system defs and structure chart */
     _PD_init_chrt(file, TRUE);
+
+    file->use_itags = FALSE;
 
     if (mst == TRUE)
        {if (lio_seek(fp, file->chrtaddr, SEEK_SET))
@@ -1453,7 +1471,12 @@ int _PD_set_format_iii(PDBfile *file)
     file->rd_itag       = _PD_rd_itag_iii;
 
     file->format_version = 3;
-    file->use_itags      = FALSE;
+
+/* NOTE: an interaction with PDBNet requires this to be
+ * TRUE now even though it will be set to FALSE when a file
+ * is opened or created
+ */
+    file->use_itags = TRUE;
 	    
     return(TRUE);}
 

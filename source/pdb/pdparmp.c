@@ -1025,7 +1025,7 @@ static int64_t _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
     char *mpbuf;
     PD_MP_GETSPACE_req space_req;
     MPI_Comm comm;
-    MPI_Status stat;
+    MPI_Status stl;
     
     DBG("+ _PD_pfm_getspace_aux");
 
@@ -1055,7 +1055,7 @@ static int64_t _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
                  PD_MP_GETSPACE, comm);
         MPI_Recv(&rv, sizeof(int64_t), 
                  MPI_BYTE, _PD.mp_master_proc,
-                 PD_MP_GETSPACE, comm, &stat);
+                 PD_MP_GETSPACE, comm, &stl);
 
         CFREE(mpbuf);}
 
@@ -1139,26 +1139,26 @@ static int64_t _PD_pfm_getspace_d(PDBfile *file, size_t nbytes,
  */
 
 static int _PD_pfm_get_msg(char **buf, int *length, int *sender)
-   {MPI_Status stat;
+   {MPI_Status stl;
     MPI_Comm comm;
 
     DBG("+ _PD_pfm_get_msg");
 
     comm = (MPI_Comm) _PD.mp_comm;
 
-    MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &stat);
-    MPI_Get_count(&stat, MPI_BYTE, length);
+    MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &stl);
+    MPI_Get_count(&stl, MPI_BYTE, length);
 
     *buf = CMAKE_N(char, *length);
 
     MPI_Recv(*buf, *length, MPI_BYTE, MPI_ANY_SOURCE, MPI_ANY_TAG,
-             comm, &stat);
+             comm, &stl);
 
-    *sender = stat.MPI_SOURCE;
+    *sender = stl.MPI_SOURCE;
 
     DBG("- _PD_pfm_get_msg");
 
-    return(stat.MPI_TAG);}
+    return(stl.MPI_TAG);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1251,21 +1251,22 @@ static int _PD_pfm_remote_flush(char *buf)
  */
 
 static int _PD_pfm_complete_request(PD_MP_request req, MPI_Comm comm)
-   {int rv, id, done, shutdown;
-    int64_t space;
-    MPI_Request request;
+   {int rv, id, done, lstp, nc;
+    int64_t a;
+    MPI_Request requ;
 
-    done     = 0;
-    shutdown = 1;
-    rv       = 0;
+    done = 0;
+    lstp = 1;
+    rv   = 0;
 
     DBG("+ _PD_pfm_complete_request");
 
     switch (req.type)
        {case PD_MP_GETSPACE :
              DBG("of type PD_MP_GETSPACE");
-             space = _PD_pfm_remote_getspace(req.buf);
-             MPI_Send(&space, sizeof(int64_t), MPI_BYTE, req.sender, PD_MP_GETSPACE, comm);
+             a  = _PD_pfm_remote_getspace(req.buf);
+	     nc = sizeof(int64_t);
+             MPI_Send(&a, nc, MPI_BYTE, req.sender, PD_MP_GETSPACE, comm);
              break; 
              
         case PD_MP_FLUSH :
@@ -1289,7 +1290,7 @@ static int _PD_pfm_complete_request(PD_MP_request req, MPI_Comm comm)
 /* clean up and shut down the master process */
              DBG("of type PD_MP_SHUTDOWN");
              rv = _PD_pfm_remote_shutdown();
-             MPI_Isend(&shutdown, 1, MPI_INT, req.sender, PD_MP_SHUTDOWN, comm, &request);
+             MPI_Isend(&lstp, 1, MPI_INT, req.sender, PD_MP_SHUTDOWN, comm, &requ);
 
              if (++_PD.nterminated == (_PD.mp_size - 1))
                 rv = PFM_TERM_MASTER;
@@ -1568,7 +1569,7 @@ static int _PD_mp_flush(PDBfile *file)
     PD_Pfile *pf;
     PD_MP_FLUSH_req flush_req;
     MPI_Comm mcomm, fcomm;
-    MPI_Status stat;
+    MPI_Status lst;
     FILE *fp;
 
     DBG("+ _PD_mp_flush");
@@ -1611,11 +1612,11 @@ static int _PD_mp_flush(PDBfile *file)
            PD_error("FLUSH FAILED - _PD_MP_FLUSH", PD_WRITE);
 
         MPI_Recv(&rv, 1, MPI_INT, _PD.mp_master_proc, PD_MP_FLUSH,
-		 mcomm, &stat);
+		 mcomm, &lst);
 
 /* sync the in-memory symbol table amongst all processes */
         MPI_Recv(&len, 1, MPI_INT, _PD.mp_master_proc, PD_MP_SYNC,
-		 mcomm, &stat);
+		 mcomm, &lst);
         symtab_buf = CMAKE_N(char, len); 
 
         MPI_Bcast(symtab_buf, len, MPI_BYTE, _PD.mp_master_proc, mcomm);
@@ -1893,7 +1894,7 @@ void PD_term_mpi(void)
 
 #ifdef USE_THREAD_SAFE_MPI 
     {int done, rv;
-     MPI_Status stat;
+     MPI_Status lst;
      MPI_Comm mcomm;
 
      mcomm = (MPI_Comm) _PD.mp_comm;
@@ -1904,7 +1905,7 @@ void PD_term_mpi(void)
 	 MPI_Send(&done, 1, MPI_INT, _PD.mp_master_proc,
 		  PD_MP_SHUTDOWN, mcomm);
 	 MPI_Recv(&rv, 1, MPI_INT, _PD.mp_master_proc,
-		  MPI_ANY_TAG, mcomm, &stat);}
+		  MPI_ANY_TAG, mcomm, &lst);}
    
 /* wait until everyone finished before returning */
      MPI_Barrier(mcomm);};
