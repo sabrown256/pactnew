@@ -7,7 +7,8 @@
 # include "cpyright.h"
 #
 
-run std/module-cray env 4.1.40 mpi 5.6.4 gnu 4.7.2
+#run std/module-cray env 4.1.40 mpi 5.6.4 gnu 4.7.2
+run std/module-cray env 4.2.34 mpi 5.6.4 gnu 4.8.2
 run std/use-compiler gcc
 
 include features/gnu-cxe-set

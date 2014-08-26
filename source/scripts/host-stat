@@ -1,0 +1,52 @@
+#!/bin/csh -f
+#
+# HOST-STAT - sketch the status of the specified host
+#
+# include cpyright.h
+#
+
+unalias *
+
+@ err = 0
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: host-stat [-h]"
+           echo "   h   this help message"
+           echo ""
+           echo ""
+           exit(1)
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+# get uname info
+set hst = `uname -n`
+set os  = `uname -s`
+set rel = `uname -r`
+set hw  = `uname -m`
+
+echo "Host:  $hst"
+echo "Hw:    $hw"
+echo "OS:    $os ($rel)"
+echo ""
+
+# get uptime info
+set inf = ( `uptime` )
+set up  = ( `echo $inf | sed 's|,.*users,.*$||' | sed 's|^.*up||'` )
+set ld  = ( `echo $inf | sed 's|^.*average:||'` )
+set nu  = ( `echo $inf | sed 's|users,.*$||'` )
+set nu  = $nu[$#nu]
+
+echo "Up:    $up"
+echo "Load:  $ld"
+echo "Users: $nu"
+echo ""
+
+# get ifconfig info?
+
+exit($err)

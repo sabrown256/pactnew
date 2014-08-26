@@ -7,7 +7,8 @@
 # include "cpyright.h"
 #
 
-run std/module-cray env 4.1.40 mpi 5.6.4 pgi 13.6.0
+#run std/module-cray env 4.1.40 mpi 5.6.4 pgi 13.6.0
+run std/module-cray env 4.2.34 mpi 5.6.4 pgi 14.3.0
 run std/use-compiler pgcc
 
 include features/pgi-cxe-set
