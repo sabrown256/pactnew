@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 07/23/2014
+MOD: 08/15/2014
 
 <CENTER>
 <P>
@@ -1039,6 +1039,9 @@ you call PD_cd to enter a directory.  There are special built in
 modes:
 <p>
 <pre>
+    np    for format version 2 files only
+          do not read in, "rnp", or write out, "wnp" the pointer
+          entries from the symbol table
     sa    accept all entries for the current directory and its
           ancestors (i.e. towards the root directory)
     sc    accept all entries for the current directory only

@@ -174,6 +174,7 @@ switch ($Cmnd)
         echo "                          tags - list revision tags"
         echo "                          space - find size of bins, libs, and includes"
         echo "          install       - install the system codes in public"
+        echo "          monitor       - monitor the progress of a net-update"
         echo "          net-update    - run a do-net without some bootstrapping problems"
         echo "          pact          - control the pact link to either smake or dmake"
         echo "          reconfig      - re-configure according to last configuration"
@@ -1985,6 +1986,63 @@ CFG_DONE:
         unset lerr
 
         echo ""
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MONITOR - monitor a do-net build
+
+   case monitor:
+        shift
+
+        set HostF  = ""
+        set Window = FALSE
+        while ($#argv > 0)
+           switch ($1)
+              case -h:
+                   echo ""
+                   echo "MONITOR - monitor a net update"
+                   echo ""
+                   echo "Usage: dsys monitor [-h] [-x] <hostfile>"
+                   echo ""
+                   echo "Options:"
+                   echo "   h    this help message"
+                   echo "   x    run the monitor in its own window"
+                   echo ""
+                   exit(1)
+              case -x:
+                   set Window = TRUE
+                   breaksw
+              default:
+                   if (-f $1) then
+                      set HostF = $1
+                   else if (-f hosts/$1) then
+                      set HostF = $cwd/hosts/$1
+                   else
+                      echo "Cannot fine host file '$1' - exiting"
+                      exit(1)
+                   endif
+                   breaksw
+           endsw
+           shift
+        end
+
+        if ("$HostF" == "") then
+           echo "No host file specified - exiting"
+           exit(1)
+        endif
+
+        if ($Window == TRUE) then
+           set Geometry = ( 90x15-10+10 )
+           set Title    = "Net-Update-Monitor"
+           xterm -geometry $Geometry -T $Title xterm +sb -e do-net +watch $HostF &
+           @ Err = $status
+        else
+           do-net +watch $HostF
+           @ Err = $status
+        endif
+
         breaksw
 
 #--------------------------------------------------------------------------
