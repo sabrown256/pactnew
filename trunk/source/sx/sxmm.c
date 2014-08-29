@@ -275,12 +275,22 @@ object *SX_mk_gfile(SS_psides *si, g_file *po)
  */
 
 g_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
-   {PDBfile *file;
+   {char nm[MAXLINE];
+    char *pnm;
+    PDBfile *file;
     object *obj;
     g_file *po;
+    tr_layer *tr;
+
+    pnm = name;
+    if (*mode == 'w')
+       {tr = _PD_lookup_fn(name);
+	if (tr != NULL)
+	   {snprintf(nm, MAXLINE, "%s,fmt=%s", name, tr->fmt);
+	    pnm = nm;};};
 
 /* open the file */
-    file = PD_open(name, mode);
+    file = PD_open(pnm, mode);
 
 /* if append or write mode open failed then try read-only mode */
     if ((file == NULL) && (strcmp(mode, "r") != 0))
@@ -301,7 +311,7 @@ g_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
 
 /* if file does not exist then create it */
         else
-           {file = PD_open(name, "w");
+           {file = PD_open(pnm, "w");
             if (file == NULL)
                SS_error(si, "CAN'T OPEN FILE - _SX_MK_OPEN_FILE", 
                         SS_mk_string(si, name));};};

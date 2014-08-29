@@ -615,7 +615,9 @@ extern int
  _PD_pdbfilep(char *type);
 
 extern tr_layer
- *_PD_lookup(char *type);
+ *_PD_lookup(char *type),
+ *_PD_lookup_fmt(char *fmt),
+ *_PD_lookup_fn(char *fn);
 
 extern void
  _PD_install_funcs(void),

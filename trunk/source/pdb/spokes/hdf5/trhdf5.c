@@ -1437,6 +1437,14 @@ static int _H5_filep(char *type)
 
 static int _H5_close(PDBfile *file)
    {FILE *fp;
+    herr_t st;
+    hdf_state *hst;
+
+    hst = file->meta;
+    if (hst != NULL)
+       {st = H5Fclose(hst->hf);
+	if (st < 0)
+	   PD_error("H5Fclose FAILED - _H5_CLOSE", PD_CLOSE);};
 
     CFREE(file->meta);
 
