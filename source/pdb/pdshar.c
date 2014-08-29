@@ -77,6 +77,50 @@ tr_layer *_PD_lookup(char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_LOOKUP_FMT - lookup and return a translation layer named by FMT */
+
+tr_layer *_PD_lookup_fmt(char *fmt)
+   {int i, n;
+    tr_layer *tr, *ptr;
+		 
+    _PD_register_spokes();
+
+    n  = SC_array_get_n(_PD_file_types);
+
+    ptr = NULL;
+    for (i = 0; i < n; i++)
+        {tr = SC_array_get(_PD_file_types, i);
+         if (strcmp(tr->fmt, fmt) == 0)
+	    {ptr = tr;
+	     break;};};
+
+    return(ptr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_LOOKUP_FN - lookup and return a translation layer named by
+ *               - the filename, FN, suffux
+ */
+
+tr_layer *_PD_lookup_fn(char *fn)
+   {int ns;
+    char **sa;
+    tr_layer *ptr;
+		 
+    ptr = NULL;
+
+    sa = SC_tokenize(fn, ".");
+    if (sa != NULL)
+       {ns  = PS_lst_length(sa);
+	ptr = _PD_lookup_fmt(sa[ns-1]);
+	SC_free_strings(sa);};
+
+    return(ptr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_CONV_IN - convert some data to internal format */
 
 void _PD_conv_in(PDBfile *file, void *out, void *in, char *type, inti ni)
