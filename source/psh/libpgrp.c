@@ -53,6 +53,8 @@
 # include "libtime.c"
 # include "libasync.c"
 
+/* #define NEWWAY */
+
 /*--------------------------------------------------------------------------*/
 
 # ifndef SCOPE_SCORE_COMPILE
@@ -412,7 +414,7 @@ process_group *make_pgrp(int np, char **env, char *shell,
  */
      
 proc_bf job_foreground(process_group *pg, proc_bf bf)
-   {int ip, np, pgid, st;
+   {int ip, np, pgid;
     proc_bf rv;
     struct termios attr;
     process *pp, **pa;
@@ -437,10 +439,18 @@ proc_bf job_foreground(process_group *pg, proc_bf bf)
 /* send the job a continue signal, if necessary */
 	     if (bf == PROC_FG_RUN)
 	        {pgid = pp->pgid;
+#if defined(NEWWAY)
+		 job_in_fg(ps, pgid, FALSE);
+		 job_suspend(ps, pgid, TRUE, FALSE);
+#else
+		 int st;
+
 		 st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
 		 st = kill(-pgid, SIGCONT);
 		 if (st < 0)
-		    perror("SIGCONT");};
+		    perror("SIGCONT");
+#endif
+	        };
      
 /* wait for it to report */
 	     job_wait(pp);};
@@ -469,15 +479,17 @@ proc_bf job_foreground(process_group *pg, proc_bf bf)
  */
      
 proc_bf job_background(process_group *pg, proc_bf bf)
-   {int ip, np, pgid, st;
+   {int ip, np, pgid;
     proc_bf rv;
     process *pp, **pa;
+    process_session *ps;
 
     rv = PROC_BF_NONE;
 
     if ((bf == PROC_BG_SUSP) || (bf == PROC_BG_RUN))
        {np = pg->np;
 	pa = pg->parents;
+	ps = pg->ss;
 
 /* GOTCHA: crap - rewrite */
 	for (ip = 0; ip < np; ip++)
@@ -486,9 +498,16 @@ proc_bf job_background(process_group *pg, proc_bf bf)
 /* send the job a continue signal to run in the background */
 	     if (bf == PROC_BG_RUN)
 	        {pgid = pp->pgid;
+#if defined(NEWWAY)
+		 job_suspend(ps, pgid, TRUE, FALSE);
+#else
+		 int st;
+
 		 st = kill(-pgid, SIGCONT);
 		 if (st < 0)
-		    perror("SIGCONT");};};
+		    perror("SIGCONT");
+#endif
+	         };};
 
 	pg->fg = bf;
 	rv     = bf;};

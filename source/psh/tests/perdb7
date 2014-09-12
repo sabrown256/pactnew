@@ -4,6 +4,10 @@
 #        - no FIFO
 #
 
+unalias *
+
+@ err = 0
+
 set opt = "-l"
 set db  = ./db7
 
@@ -20,10 +24,12 @@ echo "-----------------------------------"
 
 # multiple defines
 perdb ,v1=1, v2=2
+@ err = $err + $status
 
 # multiple defines and queries
 echo "----------------"
 perdb ,v1=\?a,v2=\?"",v3=\?c
+@ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -34,26 +40,31 @@ perdb ,v1=\?a,v2=\?"",v3=\?c
 echo "----------------"
 echo "perdb ,fmt:csh,v1,v2,v3"
 perdb ,fmt:csh,v1,v2,v3
+@ err = $err + $status
 
 # multiple gets with SH format
 echo "----------------"
 echo "perdb ,fmt:sh,v1,v2,v3"
 perdb ,fmt:sh,v1,v2,v3
+@ err = $err + $status
 
 # multiple gets with PERL format
 echo "----------------"
 echo "perdb ,fmt:pl,v1,v2,v3"
 perdb ,fmt:pl,v1,v2,v3
+@ err = $err + $status
 
 # multiple gets with DB format
 echo "----------------"
 echo "perdb ,fmt:db,v1,v2,v3"
 perdb ,fmt:db,v1,v2,v3
+@ err = $err + $status
 
 # multiple gets with no format
 echo "----------------"
 echo "perdb ,v1,v2,v3"
 perdb ,v1,v2,v3
+@ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -64,6 +75,7 @@ perdb ,v1,v2,v3
 echo "----------------"
 echo "eval perdb ,fmt:csh,v1,v2,v3"
 eval `perdb ,fmt:csh,v1,v2,v3`
+@ err = $err + $status
 echo "v1 = $v1"
 echo "v2 = $v2"
 echo "v3 = $v3"
@@ -76,6 +88,7 @@ echo "v3 = $v3"
 echo "----------------"
 echo "perdb dlm:xya v1=axyav2=bxyav3=c"
 perdb dlm:xya v1=axyav2=bxyav3=c
+@ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -84,10 +97,14 @@ perdb dlm:xya v1=axyav2=bxyav3=c
 
 echo "----------------"
 perdb ,wa=x, wb=y
+@ err = $err + $status
 
 perdb ,fmt:csh,'v*'
+@ err = $err + $status
 perdb ,fmt:csh,'v?'
+@ err = $err + $status
 perdb ,fmt:csh,'v[12],w*'
+@ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -95,5 +112,6 @@ perdb ,fmt:csh,'v[12],w*'
 echo "-----------------------------------"
 
 perdb $opt quit:
+@ err = $err + $status
 
-exit($status)
+exit($err)

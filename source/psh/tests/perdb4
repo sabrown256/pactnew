@@ -5,6 +5,10 @@
 #        - no FIFO
 #
 
+unalias *
+
+@ err = 0
+
 set opt = "-l"
 set db  = ./db3
 
@@ -18,27 +22,35 @@ setenv PERDB_PATH $db
 echo "-----------------------------------"
 echo "-----------------------------------"
 perdb $opt save:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:db:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:db: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:csh:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:csh: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:sh:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:sh: v1
+@ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -48,27 +60,35 @@ perdb $opt save:sh: v1
 echo "-----------------------------------"
 echo "-----------------------------------"
 perdb $opt save:dba:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:dbb: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:db:dba:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:db:dba: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:csh:dba:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:csh:dba: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:sh:dbb:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:sh:dbb: v1
+@ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -78,29 +98,38 @@ perdb $opt save:sh:dbb: v1
 echo "-----------------------------------"
 echo "-----------------------------------"
 perdb $opt save:$cwd/fa:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:$cwd/fb: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:db:$cwd/fa:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:db:$cwd/fa: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:csh:$cwd/fa:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:csh:$cwd/fa: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:sh:$cwd/fb:
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt save:sh:$cwd/fb: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt quit:
+@ err = $err + $status
 
-exit($status)
+exit($err)

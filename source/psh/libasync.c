@@ -248,7 +248,9 @@ struct s_process_group
     PFPCAL (*map)(char *nm);};
 
 struct s_process_session
-   {pid_t pgid;                     /* OS process group id */
+   {pid_t pid;                      /* process id of parent shell */
+    proc_bf fg;                     /* foreground or background for PID */
+    pid_t pgid;                     /* OS process group id */
     int terminal;                   /* file descriptor of stdin */
     int interactive;                /* TRUE iff interactive session */
     struct termios attr;            /* terminal attributes */
@@ -311,9 +313,11 @@ process_session *make_session(int pgid, int fin, int iact, proc_bf fg)
 	if (pgid == 0)
 	   pgid = getpid();
 
+	ps->pid         = getpid();
 	ps->pgid        = pgid;
 	ps->terminal    = fin;
 	ps->interactive = iact;
+	ps->fg          = PROC_FG_RUN;
 	ps->pg          = make_stk("process_group *", 4);
 	tcgetattr(fin, &ps->attr);};
 
@@ -1085,6 +1089,63 @@ void job_wait(process *pp)
 	   pp->status = JOB_DEAD;};
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* JOB_IN_FG - make PID the foreground job */
+
+int job_in_fg(process_session *ps, pid_t pid, int force)
+   {int rv, ok;
+
+    ok = ((pid != ps->pid) || (ps->fg != PROC_FG_RUN) || (force == TRUE));
+
+    rv = FALSE;
+
+    if (ok == TRUE)
+       {rv |= tcsetattr(ps->terminal, TCSADRAIN, &ps->attr);
+	rv |= tcsetpgrp(ps->terminal, pid);
+
+	if (rv == FALSE)
+	   ps->fg = PROC_FG_RUN;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* JOB_SUSPEND - suspend execution of job PID if WH is TRUE
+ *             - continue execution of PID if WH is FALSE
+ */
+
+int job_suspend(process_session *ps, pid_t pid, int all, int wh)
+   {int rv, ispar;
+
+    rv    = FALSE;
+    ispar = (pid == ps->pid);
+
+    if (all == TRUE)
+       pid = -pid;
+
+    if (wh == TRUE)
+       rv |= kill(pid, SIGTSTP);
+    else
+       rv |= kill(pid, SIGCONT);
+
+    if ((rv == FALSE) && (ispar == TRUE))
+       {switch (ps->fg)
+           {case PROC_BG_SUSP :
+            case PROC_BG_RUN :
+	         ps->fg = (wh == TRUE) ? PROC_BG_SUSP : PROC_BG_RUN; 
+                 break;
+            case PROC_FG_SUSP :
+            case PROC_FG_RUN :
+	         ps->fg = (wh == TRUE) ? PROC_FG_SUSP : PROC_FG_RUN; 
+                 break;
+            case PROC_BF_NONE :
+                 break;};};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
