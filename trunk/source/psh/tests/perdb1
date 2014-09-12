@@ -5,71 +5,91 @@
 #        - test atomic set and get
 #
 
+unalias *
+
+@ err = 0
+
 set opt = "-l"
 set db  = ./db1
 
 perdb -f $db $opt -c -s
+@ err = $err + $status
 
 echo "-----------------------------------"
 
 echo "set v1 - single token value"
 perdb -f $db $opt v1=1
+@ err = $err + $status
 
 echo "set v2 - two token, single line list"
 perdb -f $db $opt v2="baz blat"
+@ err = $err + $status
 
 echo "set v3 - angle bracket, multi-line list"
 perdb -f $db $opt v3="<	foo ;\
  bar >\
 "
+@ err = $err + $status
 
 echo "set v4 = double quoted, parenthesized, multi-line list"
 perdb -f $db $opt v4="(	foo ;\
  bar )\
 "
+@ err = $err + $status
 
 echo "set v5 = single quoted, parenthesized, multi-line list"
 perdb -f $db $opt v5='(	foo ;\
  bar )\
 '
+@ err = $err + $status
 
 echo "set v6 = single quoted, curly bracket, multi-line list"
 perdb -f $db $opt v6='{	foo ;\
  bar }\
 '
+@ err = $err + $status
 
 echo "set v7 = single quoted, double quoted, multi-line list"
 perdb -f $db $opt v7='"	foo ;\
  bar "\
 '
+@ err = $err + $status
 
 echo "-----------------------------------"
 
 echo "get v1"
 perdb -f $db $opt v1
+@ err = $err + $status
 
 echo "get v2"
 perdb -f $db $opt v2
+@ err = $err + $status
 
 echo "get v3"
 perdb -f $db $opt v3
+@ err = $err + $status
 
 echo "get v4"
 perdb -f $db $opt v4
+@ err = $err + $status
 
 echo "get v5"
 perdb -f $db $opt v5
+@ err = $err + $status
 
 echo "get v6"
 perdb -f $db $opt v6
+@ err = $err + $status
 
 echo "get v7"
 perdb -f $db $opt v7
+@ err = $err + $status
 
 echo "-----------------------------------"
 
 perdb -f $db $opt quit:
+@ err = $err + $status
 
 echo "-----------------------------------" >>& $db.log
 
-exit($status)
+exit($err)

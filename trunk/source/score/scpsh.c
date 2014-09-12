@@ -76,6 +76,7 @@
 #define open_safe 		PS_open_safe
 #define read_safe               PS_read_safe
 #define unlink_safe 		PS_unlink_safe
+#define wait_fs                 PS_wait_fs
 #define write_safe              PS_write_safe
 
 #define finlog			PS_finlog

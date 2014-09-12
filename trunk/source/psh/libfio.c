@@ -503,6 +503,39 @@ int unlink_safe(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WAIT_FS - wait for the file system to catch up and
+ *         - flush the file FN to at least the expected length LN
+ *         - make NA attempts
+ *         - return the file size found
+ */
+
+int64_t wait_fs(char *fn, int64_t ln, int na)
+   {int i;
+    int64_t fsz;
+    struct stat sbf;
+
+/* maximum number of attempts */
+    if (na < 1)
+       na = 100;
+
+    fsz = 0;
+    for (i = 0; (fsz <= ln) && (i < na); i++)
+        {if (stat(fn, &sbf) == 0)
+	    fsz = sbf.st_size;
+	 else
+	    fprintf(stderr, "PARSE_CONN: Stat of %s failed - %s (%d)",
+		    fn, strerror(errno), errno);
+	 if (i > 0)
+	    sleep(1);};
+
+    if (fsz == 0)
+       fprintf(stderr, "PARSE_CONN: Zero length conn %s\n", fn);
+
+    return(fsz);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* undefine when passing out of SCOPE_SCORE_COMPILE */
 
 #undef UNDEFINED

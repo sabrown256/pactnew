@@ -4,6 +4,10 @@
 #        - no FIFO
 #
 
+unalias *
+
+@ err = 0
+
 set opt = "-l"
 set db  = ./db5
 
@@ -27,6 +31,7 @@ echo "v3 = `printenv 'v3'`"
 
 echo ""
 perdb $opt save:dba:
+@ err = $err + $status
 
 echo "-----------------------------------"
 
@@ -44,11 +49,14 @@ echo "v5 = `printenv 'v5'`"
 
 echo ""
 perdb $opt save:dbb:
+@ err = $err + $status
 
 echo "-----------------------------------"
 
 perdb $opt reset:
+@ err = $err + $status
 perdb $opt load:dba:
+@ err = $err + $status
 
 dbget v2
 echo "v2 : |$v2|"
@@ -62,21 +70,26 @@ echo "v4 : |$v4|"
 echo "-----------------------------------"
 
 perdb $opt save:csh:stdout:
+@ err = $err + $status
 
 echo "-----------------------------------"
 
 perdb $opt save:csh:stdout: v1 v3 v5
+@ err = $err + $status
 
 echo "-----------------------------------"
 
 perdb $opt save:sh:stdout:
+@ err = $err + $status
 
 echo "-----------------------------------"
 
 perdb $opt save:sh:stdout: v1
+@ err = $err + $status
 
 echo "-----------------------------------"
 
 perdb $opt quit:
+@ err = $err + $status
 
-exit($status)
+exit($err)

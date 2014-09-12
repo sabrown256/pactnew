@@ -106,23 +106,28 @@ int tcp_set_port(sckades ad, int port)
  */
 
 sckades tcp_get_address(char *host, int port, in_addr_t haddr)
-   {socklen_t sasz;
+   {int mon;
+    socklen_t sasz;
     in_addr_t nad;
     sckades ad;
 
     ad.in = NULL;
     SOCKADDR_SIZE(sasz);
 
+    mon = 0;
+
 /* work out a valid host address */
     if (haddr == INADDR_NONE)
-       {haddr = inet_addr(host);
+       {mon  |= 0x1;
+	haddr = inet_addr(host);
 
 	if (haddr == INADDR_NONE)
 	   {struct hostent *hn, *ha;
 
 	    hn = gethostbyname(host);
 	    if (hn != NULL)
-	       {nad = *(in_addr_t *) hn->h_addr_list[0];
+	       {mon |= 0x2;
+		nad  = *(in_addr_t *) hn->h_addr_list[0];
 
 /* verify that host associated with the address matches the specified host
  * things like OpenDNS give you a special address for unknown hosts
@@ -130,19 +135,31 @@ sckades tcp_get_address(char *host, int port, in_addr_t haddr)
  */
 		ha = gethostbyaddr(&nad, sizeof(nad), AF_INET);
 		if ((ha != NULL) && (strcmp(ha->h_name, hn->h_name) == 0))
-		   haddr = nad;};};};
+		   {mon  |= 0x4;
+		    haddr = nad;};};};};
 
 /* initialize the socket address */
     if (haddr != INADDR_NONE)
        {ad.in = MAKE(struct sockaddr_in);
 	if (ad.in != NULL)
-	   {memset(ad.in, 0, sasz);
+	   {mon |= 0x8;
+	    memset(ad.in, 0, sasz);
 	    ad.in->sin_family = PF_INET;
 	    if (haddr == INADDR_ANY)
 	       ad.in->sin_addr.s_addr = htonl(haddr);
 	    else
-	       {tcp_set_port(ad, port);
+	       {mon |= 0xa;
+	        tcp_set_port(ad, port);
 		memcpy(&ad.in->sin_addr, &haddr, sizeof(in_addr_t));};};};
+
+    if (mon == 0)
+       fprintf(stderr, "TCP_GET_ADDRESS: Failed to get address for %s@%d -> %d - 0x%x\n",
+	       host, port, haddr, mon);
+#if 0
+    else
+       fprintf(stderr, "Got address for %s@%d -> %d - 0x%x\n",
+	       host, port, haddr, mon);
+#endif
 
     return(ad);}
 
@@ -229,9 +246,16 @@ int tcp_initiate_connection(sckades ad)
 	    {sleep(ia);
 	     rv = connect(fd, ad.uq, sasz);
 	     if (rv >= 0)
-	        break;};
+	        break;
+	     else
+	        fprintf(stderr, "TCP_INITIATE_CONNECTION: Failed to connect %d to %p - %s (%d)\n",
+			fd, ad.uq, strerror(errno), errno);};
 
-	fd = (rv == 0) ? fd : -1;};
+	fd = (rv == 0) ? fd : -1;}
+
+    else
+       fprintf(stderr, "TCP_INITIATE_CONNECTION: Failed to open socket - %s (%d)\n",
+	       strerror(errno), errno);
 
     return(fd);}
 
@@ -354,6 +378,7 @@ static int make_server_conn(client *cl, int auth, char *host, int port)
 	    fprintf(fp, "%s\n", key);
 	    fprintf(fp, "%ld\n", pid);
 
+
 	    fclose_safe(fp);
 
 /* set the file permission */
@@ -383,13 +408,27 @@ static int make_server_conn(client *cl, int auth, char *host, int port)
  */
 
 char **parse_conn(char *root)
-   {char *res, **rv;
+   {int64_t fsz;
+    char *res, **rv;
 
     rv = NULL;
 
     res = find_conn(root, -1);
     if (res != NULL)
-       rv = file_text(FALSE, res);
+       {fsz = wait_fs(res, 0, -1);
+	if (fsz <= 0)
+	   fprintf(stderr, "PARSE_CONN: Zero length conn %s\n", res);
+
+	rv = file_text(FALSE, res);
+	if (rv != NULL)
+	   {if (IS_NULL(rv[CONN_NAME]) == TRUE)
+	       fprintf(stderr, "PARSE_CONN: No name found\n");
+	    if (IS_NULL(rv[CONN_PORT]) == TRUE)
+	       fprintf(stderr, "PARSE_CONN: No port found\n");
+	    if (IS_NULL(rv[CONN_IP]) == TRUE)
+	       fprintf(stderr, "PARSE_CONN: No IP found\n");};}
+    else
+       fprintf(stderr, "PARSE_CONN: Failed to find %s\n", root);
 
     return(rv);}
 
@@ -436,7 +475,10 @@ static int init_server(client *cl, int auth)
 	srv->sfd = socket(PF_INET, SOCK_STREAM, 0);
 	if (srv->sfd > 0)
 	   {srv->sck = tcp_get_address(NULL, 0, INADDR_ANY);
-	    port     = tcp_bind_port(srv->sfd, srv->sck, -1, cl->port);};
+	    port     = tcp_bind_port(srv->sfd, srv->sck, -1, cl->port);}
+	else
+	   fprintf(stderr, "INIT_SERVER: Failed to open socket - %s (%d)\n",
+		   strerror(errno), errno);
 
 	srv->port = port;
 	if (srv->port >= 0)
@@ -512,7 +554,16 @@ char **get_connect_socket(client *cl)
 		port  = atoi(sa[CONN_PORT]);
 		haddr = atol(sa[CONN_IP]);
 
-		srv->sck = tcp_get_address(host, port, haddr);};};}
+		srv->sck = tcp_get_address(host, port, haddr);}
+	    else
+	       fprintf(stderr, "GET_CONNECT_SOCKET: Failed to parse %s\n",
+		       root);}
+#if 0
+	else
+	   fprintf(stderr, "GET_CONNECT_SOCKET: Failed to find %s\n",
+		   root);
+#endif
+        };
 
     return(sa);}
 
@@ -556,7 +607,7 @@ static int connect_client(client *cl)
     char *key, **ta;
     connection *srv;
 
-    fd  = -1;
+    fd = -1;
     if (cl != NULL)
        {srv = cl->scon;
 

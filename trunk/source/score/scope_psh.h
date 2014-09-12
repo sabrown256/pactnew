@@ -163,6 +163,9 @@ extern int
  PS_block_fd(int fd, int on),
  PS_unlink_safe(char *fmt, ...);
 
+extern int64_t
+ PS_wait_fs(char *fn, int64_t ln, int na);
+
 extern ssize_t
  PS_read_safe(int fd, void *s, size_t nb, int req),
  PS_write_safe(int fd, const void *s, size_t nb);

@@ -4,6 +4,10 @@
 #        - no FIFO
 #
 
+unalias *
+
+@ err = 0
+
 set opt = "-l"
 set db  = ./db6
 
@@ -80,6 +84,7 @@ dbdef v2
 
 echo ""
 perdb $opt save:
+@ err = $err + $status
 
 echo "-----------------------------------"
 
@@ -87,5 +92,6 @@ echo "-----------------------------------"
 #--------------------------------------------------------------------------
 
 perdb $opt quit:
+@ err = $err + $status
 
-exit($status)
+exit($err)

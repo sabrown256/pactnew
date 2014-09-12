@@ -3,12 +3,14 @@
 # PERDB8 - test authentication
 #
 
+unalias *
+
+@ err = 0
+
 set opt = "-l"
 set db  = ./db8
 
 setenv PERDB_PATH $db
-
-@ err = 0
 
 set lst = ( 1 2 3 4 )
 #set lst = ( 1 )
@@ -53,6 +55,8 @@ foreach i ($lst)
 #   ls-jobs -q | grep bin/perdb
 
    perdb $opt $as v1=$i
+   @ err = $err + $status
+
    ls -l $db.conn | awk '{printf("   %s  %s\n", $1, $NF);}'
 
    set v1 = ( `perdb $opt $ac v1` )

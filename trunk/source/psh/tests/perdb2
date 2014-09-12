@@ -6,6 +6,10 @@
 #        - test suitability for environment variable
 #
 
+unalias *
+
+@ err = 0
+
 set opt = "-l"
 set db  = ./db1
 
@@ -14,15 +18,23 @@ alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
 setenv PERDB_PATH $db
 
 perdb $opt -s
+@ err = $err + $status
 
 echo "-----------------------------------"
 perdb $opt v1
+@ err = $err + $status
 perdb $opt v2
+@ err = $err + $status
 perdb $opt v3
+@ err = $err + $status
 perdb $opt v4
+@ err = $err + $status
 perdb $opt v5
+@ err = $err + $status
 perdb $opt v6
+@ err = $err + $status
 perdb $opt v7
+@ err = $err + $status
 
 echo "-----------------------------------"
 dbget v1
@@ -54,5 +66,6 @@ echo "v7 : |$v7|"
 
 echo "-----------------------------------"
 perdb $opt quit:
+@ err = $err + $status
 
-exit($status)
+exit($err)

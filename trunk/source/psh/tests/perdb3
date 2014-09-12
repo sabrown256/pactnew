@@ -7,6 +7,10 @@
 #        - no FIFO
 #
 
+unalias *
+
+@ err = 0
+
 set opt = "-l"
 set db  = ./db3
 
@@ -21,7 +25,9 @@ dbset v2 "baz blat"
 echo "-----------------------------------"
 
 perdb $opt v1
+@ err = $err + $status
 perdb $opt v2
+@ err = $err + $status
 
 echo "-----------------------------------"
 
@@ -36,7 +42,8 @@ echo "v2 : |$v2|"
 echo "-----------------------------------"
 
 perdb $opt quit:
+@ err = $err + $status
 
 echo "-----------------------------------" >>& $db.log
 
-exit($status)
+exit($err)
