@@ -72,10 +72,9 @@ static void PG_CGM_defaults(PG_device *dev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_CGM_QUERY - query some CGM device characteristics */
+/* _PG_CGM_QUERY_SCREEN - query some CGM device characteristics */
 
-static void _PG_CGM_query(PG_device *dev,
-			  int *pdx, int *pdy, int *pnc)
+static void _PG_CGM_query_screen(PG_device *dev, int *pdx, int *pnc)
    {int id, dx[PG_SPACEDM], nc;
 
     for (id = 0; id < 2; id++)
@@ -91,8 +90,9 @@ static void _PG_CGM_query(PG_device *dev,
 
     dev->phys_n_colors = nc;
 
-    *pdx = dx[0];
-    *pdy = dx[1];
+    for (id = 0; id < 2; id++)
+        pdx[id] = dx[id];
+
     *pnc = nc;
 
     return;}
@@ -136,7 +136,7 @@ static PG_device *_PG_CGM_open(PG_device *dev,
        {dxf = 0.8;
         dyf = 0.8;};
 
-    _PG_CGM_query(dev, &dx[0], &dx[1], &n_colors);
+    PG_query_screen_n(dev, dx, &n_colors);
 
     _PG_CGM_x_point_list = CMAKE_ARRAY(double, NULL, 0);
     _PG_CGM_y_point_list = CMAKE_ARRAY(double, NULL, 0);
@@ -677,7 +677,7 @@ int PG_setup_cgm_device(PG_device *d)
     d->next_line               = _PG_CGM_next_line;
     d->open_screen             = _PG_CGM_open;
     d->put_image               = _PG_CGM_put_image;
-    d->query_screen            = _PG_CGM_query;
+    d->query_screen            = _PG_CGM_query_screen;
     d->release_current_device  = _PG_CGM_release_current_device;
     d->resolution_scale_factor = 64;
     d->set_clipping            = _PG_CGM_set_clipping;

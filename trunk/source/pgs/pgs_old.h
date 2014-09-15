@@ -22,8 +22,10 @@
 
 #define PG_query_screen(d, pdx, pdy, pnc)                                    \
     if ((d) != NULL)                                                         \
-       {if ((d)->query_screen != NULL)                                       \
-           (*(d)->query_screen)(d, pdx, pdy, pnc);}
+       {int _dx[2];                                                          \
+        PG_query_screen_n(d, _dx, pnc);                                      \
+	pdx = _dx[0];							     \
+	pdy = _dx[1];};}
 
 /*--------------------------------------------------------------------------*/
 

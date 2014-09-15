@@ -238,7 +238,7 @@ void _PG_set_text_size_win32(PG_device *dev, int size_index, int flag)
 
 /* _PG_WIN32_QUERY_SCREEN - query some physical device characteristics */
 
-static void _PG_win32_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
+static void _PG_win32_query_screen(PG_device *dev, int *pdx, int *pnc)
    {int id, nc, dx[PG_SPACEDM];
     int nplanes, bitspixel;
     HDC hdc;
@@ -259,8 +259,9 @@ static void _PG_win32_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
 
 	dev->phys_n_colors = nc;};
 
-    *pdx = dev->phys_dx[0];
-    *pdy = dev->phys_dx[1];
+    for (id = 0; id < 2; id++)
+        pdx[id] = dev->phys_dx[id];
+
     *pnc = dev->phys_n_colors;
 
     return;}

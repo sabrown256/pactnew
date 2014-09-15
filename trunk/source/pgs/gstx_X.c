@@ -55,9 +55,9 @@ static void _PG_X_txt_connect_server(PG_device *dev)
 
 /* _PG_X_TXT_QUERY_SCREEN - query some physical device characteristics */
 
-static void _PG_X_txt_query_screen(PG_device *dev, int *pdx, int *pdy,
-				   int *pnc)
-   {int screen, n_planes;
+static void _PG_X_txt_query_screen(PG_device *dev, int *pdx, int *pnc)
+   {int id, nc, screen, n_planes;
+    int dx[PG_SPACEDM];
 
 /* connect to X server once only */
     _PG_X_txt_connect_server(dev);
@@ -68,14 +68,19 @@ static void _PG_X_txt_query_screen(PG_device *dev, int *pdx, int *pdy,
 	screen   = DefaultScreen(_PG_X_txt_display);
 	n_planes = DisplayPlanes(_PG_X_txt_display, screen);
 
-	*pdx = DisplayWidth(_PG_X_txt_display, screen);
-	*pdy = DisplayHeight(_PG_X_txt_display, screen);
-	*pnc = 1 << n_planes;}
+	dx[0] = DisplayWidth(_PG_X_txt_display, screen);
+	dx[1] = DisplayHeight(_PG_X_txt_display, screen);
+	nc    = 1 << n_planes;}
 
     else
-       {*pdx = 0;
-	*pdy = 0;
-	*pnc = 0;};
+       {dx[0] = 0;
+	dx[1] = 0;
+	nc    = 0;};
+
+    for (id = 0; id < 2; id++)
+        pdx[id] = dx[id];
+
+    *pnc = nc;
 
     return;}
 
@@ -136,7 +141,7 @@ static PG_device *_PG_X_txt_open_screen(PG_device *dev,
  */
     dev->use_pixmap = TRUE;
 
-    _PG_X_txt_query_screen(dev, &dx[0], &dx[1], &ndvc);
+    PG_query_screen_n(dev, dx, &ndvc);
     if ((dx[0] == 0) && (dx[1] == 0) && (ndvc == 0))
        return(NULL);
 

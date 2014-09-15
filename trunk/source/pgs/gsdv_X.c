@@ -983,7 +983,7 @@ static void _PG_X_connect_server(PG_device *dev)
 
 /* _PG_X_QUERY_SCREEN - query some physical device characteristics */
 
-static void _PG_X_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
+static void _PG_X_query_screen(PG_device *dev, int *pdx, int *pnc)
    {int id, screen, n_planes, nc;
     int dx[PG_SPACEDM];
 
@@ -1012,8 +1012,9 @@ static void _PG_X_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
 
 	dev->phys_n_colors = nc;};
 
-    *pdx = dev->g.phys_dx[0];
-    *pdy = dev->g.phys_dx[1];
+    for (id = 0; id < 2; id++)
+        pdx[id] = dev->g.phys_dx[id];
+
     *pnc = dev->phys_n_colors;
 
     return;}

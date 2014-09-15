@@ -697,9 +697,9 @@ void _PG_rst_set_dev_prop(PG_device *dev, int dx, int dy, int nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_RST_QUERY - query some MPEG device characteristics */
+/* _PG_RST_QUERY_SCREEN - query some MPEG device characteristics */
 
-static void _PG_rst_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
+static void _PG_rst_query_screen(PG_device *dev, int *pdx, int *pnc)
    {int id, dx[PG_SPACEDM], nc;
     PG_dev_geometry *g;
 
@@ -715,8 +715,9 @@ static void _PG_rst_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
 
     dev->phys_n_colors = nc;
 
-    *pdx = dx[0];
-    *pdy = dx[1];
+    for (id = 0; id < 2; id++)
+        pdx[id] = dx[id];
+
     *pnc = nc;
 
     return;}
@@ -778,7 +779,7 @@ int PG_setup_raster_device(PG_device *d)
     d->next_line               = _PG_rst_next_line;
     d->open_screen             = NULL;   /* device specific */
     d->put_image               = _PG_rst_put_image;
-    d->query_screen            = _PG_rst_query;
+    d->query_screen            = _PG_rst_query_screen;
     d->release_current_device  = _PG_rst_release_current_device;
     d->resolution_scale_factor = 1;
     d->set_clipping            = _PG_rst_set_clipping;
