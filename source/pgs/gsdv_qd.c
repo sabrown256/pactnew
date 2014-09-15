@@ -178,30 +178,31 @@ PG_device *_PG_qd_open_screen(PG_device *dev, double xf, double yf,
 /* _PG_QD_QUERY_SCREEN - query some physical device characteristics */
 
 void _PG_qd_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
-   {int dx, dy, nc;
+   {int id, dx[PG_SPACEDM], nc;
     Rect physical_screen_shape;
     PG_dev_geometry *g;
 
     g = &dev->g;
 
-    if (g->phys_width == -1)
+    if (g->phys_dx[0] == -1)
        {physical_screen_shape = SCREEN_BITS.bounds;
 
-	dx = physical_screen_shape.right - physical_screen_shape.left;
-	dy = physical_screen_shape.bottom - physical_screen_shape.top -
-	     MENU_HEIGHT;
+	dx[0] = physical_screen_shape.right - physical_screen_shape.left;
+	dx[1] = physical_screen_shape.bottom - physical_screen_shape.top -
+	        MENU_HEIGHT;
 
 	if (strcmp(dev->type, "MONOCHROME") == 0)
 	   nc = 2;
 	else
 	   nc = 256;
         
-	g->phys_width    = dx;
-	g->phys_height   = dy;
+	for (id = 0; id < 2; id++)
+	    g->phys_dx[id] = dx[id];
+
 	dev->phys_n_colors = nc;};
 
-    *pdx = g->phys_width;
-    *pdy = g->phys_height;
+    *pdx = g->phys_dx[0];
+    *pdy = g->phys_dx[1];
     *pnc = dev->phys_n_colors;
 
     return;}

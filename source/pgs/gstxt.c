@@ -1093,9 +1093,9 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
     b->text_buffer  = bf = CMAKE_N(char *, n_lines);
 
     td = &b->desc;
-    td->color   = dev->WHITE;
-    td->align   = DIR_LEFT;
-    td->angle   = 0.0;
+    td->color = dev->WHITE;
+    td->align = DIR_LEFT;
+    td->angle = 0.0;
 
     for (i = 0; i < n_lines; i++)
         bf[i] = CMAKE_N(char, n_chars);

@@ -1688,12 +1688,10 @@ void PG_open_screen(PG_device *dev ARG(,in,cls), double *ndc)
 
 void PG_query_screen_n(PG_device *dev ARG(,in,cls),
 		       int *dx, int *pnc)
-   {int ldx, ldy;
+   {
 
     if ((dev != NULL) && (dev->query_screen != NULL))
-       {dev->query_screen(dev, &ldx, &ldy, pnc);
-	dx[0] = ldx;
-	dx[1] = ldy;};
+       dev->query_screen(dev, &dx[0], &dx[1], pnc);
 
     return;}
 

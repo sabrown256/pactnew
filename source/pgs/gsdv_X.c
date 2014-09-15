@@ -271,18 +271,19 @@ int _PG_X_font_size(char *fn)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* This routine is passed a scalable font name and a point size.  It returns
- * an XFontStruct for the given font scaled to the specified size and the
- * exact resolution of the screen.  The font name is assumed to be a
- * well-formed XLFD name, and to have pixel size, point size, and average
- * width fields of "0" and arbitrary x-resolution and y-resolution fields.
- * Size is specified in tenths of points.  Returns NULL if the name is
- * malformed or no such font exists.
+/* _PG_X_FIND_SCALABLE_FONT - given NAME and SIZE return the 14 part
+ *                          - X11 font name in NFN which is NC long
+ *                          - the font name is assumed to be a
+ *                          - well-formed XLFD name, and to have pixel size,
+ *                          - point size, and average width fields of "0"
+ *                          - and arbitrary x-res and y-res fields
+ *                          - size is specified in tenths of points
+ *                          - return NULL if the name is malformed
  */
 
-char *_PG_X_find_scalable_font(PG_device *dev,
-			       char *nfn, int nc,
-			       char *name, int size)
+static char *_PG_X_find_scalable_font(PG_device *dev,
+				      char *nfn, int nc,
+				      char *name, int size)
    {int i,j, field, screen;
     int dx[PG_SPACEDM], sx[PG_SPACEDM];
     double sf;
@@ -301,13 +302,11 @@ char *_PG_X_find_scalable_font(PG_device *dev,
 /* calculate our screen resolution in dots per inch - 25.4mm = 1 inch */
     sx[0] = DisplayWidthMM(disp, screen);
     sx[1] = DisplayHeightMM(disp, screen);
-    dx[0] = dev->g.phys_width;
-    dx[1] = dev->g.phys_height;
 
     sf = 25.4;
     sf = 300;
     for (i = 0; i < 2; i++)
-        dx[i] *= (sf/sx[i]);
+        dx[i] = sf*dev->g.phys_dx[i]/sx[i];
 
 /* copy the font name, changing the scalable fields as we do so */
     for (i = j = field = 0; name[i] != '\0' && field <= 14; i++)
@@ -315,36 +314,29 @@ char *_PG_X_find_scalable_font(PG_device *dev,
 	 if (name[i] == '-')
 	    {field++;
 	     switch (field)
-/* pixel size */
-	        {case 7:
-/* average width */
-		 case 12:
 
 /* change from "-0-" to "-*-" */
+	        {case 7  :    /* pixel size */
+		 case 12 :    /* average width */
 		      nfn[j] = '*';
 		      j++;
 		      if (name[i+1] != '\0')
 			 i++;
 		      break;
 
-/* point size */
-		 case 8:
-
 /* change from "-0-" to "-<size>-" */
+		 case 8 :     /* point size */
 		      sprintf(&nfn[j], "%d", size);
 		      while (nfn[j] != '\0')
 			 j++;
 		      if (name[i+1] != '\0')
 			 i++;
 		      break;
-/* x-resolution */
-		 case 9:
-/* y-resolution */
-		 case 10:
 
 /* change from an unspecified resolution to dx[0] or dx[1] */
-		      sprintf(&nfn[j], "%d",
-			      (field == 9) ? dx[0] : dx[1]);
+		 case 9 :    /* x-resolution */
+		 case 10 :   /* y-resolution */
+		      sprintf(nfn+j, "%d", (field == 9) ? dx[0] : dx[1]);
 		      while (nfn[j] != '\0')
 			 j++;
 		      while ((name[i+1] != '-') && (name[i+1] != '\0'))
@@ -364,6 +356,22 @@ char *_PG_X_find_scalable_font(PG_device *dev,
 
 /* _PG_X_FIND_FONT - given the font FACE and SIZE return the
  *                 - X11 name for the font in FN which is NC long
+ *                 - the X11 font name has 14 field separated by '-'
+ *                 - in order they are:
+ *                 -    1) foundry
+ *                 -    2) family
+ *                 -    3) weight
+ *                 -    4) slant
+ *                 -    5) set width
+ *                 -    6) adstyl
+ *                 -    7) pixel size
+ *                 -    8) point size in tenths of a point
+ *                 -    9) horizontal res in dpi
+ *                 -    10) vertical res in dpi
+ *                 -    11) spacing
+ *                 -    12) average width in tenths of a pixel
+ *                 -    13) registry
+ *                 -    14) encoding
  *                 - return NULL on failure
  */
 
@@ -371,10 +379,11 @@ static char *_PG_X_find_font(PG_device *dev, char *fn, int nc,
 			     char *face, int size)
    {int i, nf;
     int fsz, lsz;
-    char **names, *lfn, *rv;
+    char **names, *lfn;
     Display *disp;
 
-    rv = NULL;
+    lfn = NULL;
+
     if ((dev != NULL) && (dev->display != NULL))
        {disp = dev->display;
 
@@ -392,7 +401,6 @@ static char *_PG_X_find_font(PG_device *dev, char *fn, int nc,
  * hope they are scalable or this will not work properly
  */
 	lsz = -100;
-	lfn = NULL;
 	for (i = 0; (i < nf) && (lfn == NULL); i++)
 	    {fsz = _PG_X_font_size(names[i]);
 
@@ -408,16 +416,15 @@ static char *_PG_X_find_font(PG_device *dev, char *fn, int nc,
 	     else
 	        {if (size-lsz < fsz-size)
 		    i--;
-		 lfn = names[i];};};
+		 SC_strncpy(fn, nc, names[i], -1);
+		 lfn = fn;};};
          
-	if (lfn != NULL)
-	   rv = fn;
-	else
+	if (lfn == NULL)
 	   memset(fn, 0, nc);
 
 	XFreeFontNames(names);};
 
-    return(rv);}
+    return(lfn);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -977,16 +984,17 @@ static void _PG_X_connect_server(PG_device *dev)
 /* _PG_X_QUERY_SCREEN - query some physical device characteristics */
 
 static void _PG_X_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
-   {int dx, dy, nc;
-    int screen, n_planes;
+   {int id, screen, n_planes, nc;
+    int dx[PG_SPACEDM];
 
-    if (dev->g.phys_width == -1)
+    if (dev->g.phys_dx[0] == -1)
 
 /* connect to X server once only */
        {_PG_X_connect_server(dev);
 
-	dx = 0;
-	dy = 0;
+	for (id = 0; id < 2; id++)
+	    dx[id] = 0;
+
 	nc = 0;
 	if (_PG_X_display != NULL)
 	   {dev->display = _PG_X_display;
@@ -994,16 +1002,18 @@ static void _PG_X_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
 	    screen   = DefaultScreen(_PG_X_display);
 	    n_planes = DisplayPlanes(_PG_X_display, screen);
 
-	    dx = DisplayWidth(_PG_X_display, screen);
-	    dy = DisplayHeight(_PG_X_display, screen);
+	    dx[0] = DisplayWidth(_PG_X_display, screen);
+	    dx[1] = DisplayHeight(_PG_X_display, screen);
+
 	    nc = 1 << n_planes;};
 
-	dev->g.phys_width  = dx;
-	dev->g.phys_height = dy;
+	for (id = 0; id < 2; id++)
+	    dev->g.phys_dx[id] = dx[id];
+
 	dev->phys_n_colors = nc;};
 
-    *pdx = dev->g.phys_width;
-    *pdy = dev->g.phys_height;
+    *pdx = dev->g.phys_dx[0];
+    *pdy = dev->g.phys_dx[1];
     *pnc = dev->phys_n_colors;
 
     return;}

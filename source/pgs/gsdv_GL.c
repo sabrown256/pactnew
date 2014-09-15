@@ -341,9 +341,9 @@ static void _PG_GL_connect_server(PG_device *dev)
 /* _PG_GL_QUERY_SCREEN - query some physical device characteristics */
 
 static void _PG_GL_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
-   {int screen, n_planes;
+   {int id, screen, n_planes;
 
-    if (dev->g.phys_width == -1)
+    if (dev->g.phys_dx[0] == -1)
 
 /* connect to server once only */
        {_PG_GL_connect_server(dev);
@@ -354,17 +354,18 @@ static void _PG_GL_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
 	    screen   = DefaultScreen(_PG_X_display);
 	    n_planes = DisplayPlanes(_PG_X_display, screen);
 
-	    dev->g.phys_width  = DisplayWidth(_PG_X_display, screen);
-	    dev->g.phys_height = DisplayHeight(_PG_X_display, screen);
+	    dev->g.phys_dx[0]  = DisplayWidth(_PG_X_display, screen);
+	    dev->g.phys_dx[1]  = DisplayHeight(_PG_X_display, screen);
 	    dev->phys_n_colors = 1 << n_planes;}
 
 	else
-	   {dev->g.phys_width  = 0;
-	    dev->g.phys_height = 0;
+	   {for (id = 0; id < 2; id++)
+	        dev->g.phys_dx[id] = 0;
+
 	    dev->phys_n_colors = 0;};};
 
-    *pdx = dev->g.phys_width;
-    *pdy = dev->g.phys_height;
+    *pdx = dev->g.phys_dx[0];
+    *pdy = dev->g.phys_dx[1];
     *pnc = dev->phys_n_colors;
 
     return;}

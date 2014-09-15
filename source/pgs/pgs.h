@@ -540,7 +540,8 @@ struct s_PG_textdes
     char *style;            /* style - bold, italic, ... */
     char *face;             /* font name */
     double angle;           /* angle from horizontal */
-    PM_direction align;};   /* alignment within text_box */
+    PM_direction align;     /* alignment within text_box */
+    char *other;};          /* any system dependent info */
 
 /*--------------------------------------------------------------------------*/
 
@@ -704,8 +705,7 @@ struct s_PG_event_handler
 /*--------------------------------------------------------------------------*/
 
 struct s_PG_dev_geometry
-   {int phys_height;          /* physical device properties in PIXELS */
-    int phys_width;
+   {int phys_dx[PG_SPACEDM];  /* physical device size in PIXELS */
     int hwin[4];              /* 2D window shape on device in PIXELS */
     int iflog[PG_SPACEDM];    /* log space for dimensions */
     int cpc[PG_BOXSZ];        /* conversion limits in PC */
