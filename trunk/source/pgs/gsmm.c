@@ -426,8 +426,8 @@ static void PG_init_device_geometry(PG_dev_geometry *g)
         g->view_angle[id] = 0.0;
 
 /* physical device properties */
-    g->phys_height = -1;
-    g->phys_width  = -1;
+    for (id = 0; id < PG_SPACEDM; id++)
+        g->phys_dx[id] = -1;
 
     return;}
 

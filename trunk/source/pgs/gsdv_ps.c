@@ -71,7 +71,7 @@ static void _PG_PS_release_current_device(PG_device *dev)
 /* _PG_PS_QUERY - query some PostScript device characteristics */
 
 static void _PG_PS_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
-   {int nc;
+   {int id, nc;
     int dx[PG_SPACEDM];
 
     if (dev->ps_color)
@@ -82,8 +82,9 @@ static void _PG_PS_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
     dx[0] = (int) (8.5*_PG_gattrs.ps_dots_inch);
     dx[1] = (int) (11.0*_PG_gattrs.ps_dots_inch);
 
-    dev->g.phys_width  = dx[0];
-    dev->g.phys_height = dx[1];
+    for (id = 0; id < 2; id++)
+	dev->g.phys_dx[id] = dx[id];
+
     dev->phys_n_colors = nc;
 
     *pdx = dx[0];
@@ -181,11 +182,11 @@ static PG_device *_PG_PS_open(PG_device *dev,
     dpis = _PG_gattrs.ps_dots_inch/600.0;
 
 /* set device pixel coordinate limits */
+    _PG_PS_query(dev, &xdsp[0], &xdsp[1], &n_colors);
+
     switch (mode)
        {default :
 	case PORTRAIT_MODE :
-	     _PG_PS_query(dev, &xdsp[0], &xdsp[1], &n_colors);
-
 	     xscr[0] = xdsp[0]*dxf;
 	     xscr[1] = xdsp[0]*dyf;
 
@@ -209,7 +210,7 @@ static PG_device *_PG_PS_open(PG_device *dev,
 	     break;
 
 	case LANDSCAPE_MODE :
-	     _PG_PS_query(dev, &xdsp[1], &xdsp[0], &n_colors);
+	     SC_SWAP_VALUE(int, xdsp[0], xdsp[1]);
 
 	     xscr[0] = xdsp[0]*dxf;
 	     xscr[1] = xdsp[0]*dyf;

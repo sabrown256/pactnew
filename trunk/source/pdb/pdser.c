@@ -523,16 +523,15 @@ int PD_init_threads(int nthreads, PFTid tid)
 
     ret = TRUE;
 
+/* check whether SCORE level has been initialized */
+    if (SC_n_threads == -1)
+       {SC_configure_mm(128L, 2000000L, 65536L, 1.2);
+	PD_gs.nthreads = max(0L, nthreads);
+	SC_init_threads(PD_gs.nthreads, tid);};
+
     ONCE_SAFE(TRUE, NULL)
 
-/* check whether SCORE level has been initialized */
-       if (SC_n_threads == -1)
-	  {SC_configure_mm(128L, 2000000L, 65536L, 1.2);
-	   PD_gs.nthreads = max(0L, nthreads);
-	   SC_init_threads(PD_gs.nthreads, tid);}
-
-       else
-	  PD_gs.nthreads = SC_n_threads;
+      PD_gs.nthreads = SC_n_threads;
 
        ret = _PD_init_state(TRUE);
 

@@ -700,22 +700,23 @@ void _PG_rst_set_dev_prop(PG_device *dev, int dx, int dy, int nc)
 /* _PG_RST_QUERY - query some MPEG device characteristics */
 
 static void _PG_rst_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
-   {int dx, dy, nc;
+   {int id, dx[PG_SPACEDM], nc;
     PG_dev_geometry *g;
 
     g = &dev->g;
 
-    dx = PG_window_width(dev);
-    dy = PG_window_height(dev);
+    dx[0] = PG_window_width(dev);
+    dx[1] = PG_window_height(dev);
 
     nc = dev->absolute_n_color;
 
-    g->phys_width  = dx;
-    g->phys_height = dy;
+    for (id = 0; id < 2; id++)
+        g->phys_dx[id] = dx[id];
+
     dev->phys_n_colors = nc;
 
-    *pdx = dx;
-    *pdy = dy;
+    *pdx = dx[0];
+    *pdy = dx[1];
     *pnc = nc;
 
     return;}

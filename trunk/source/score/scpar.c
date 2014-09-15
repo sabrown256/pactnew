@@ -383,8 +383,9 @@ int SC_init_threads(int nt, PFTid tid)
 
     _SC_set_omp_num_threads(nt);
 
+    SC_n_threads = nt;
+
     ONCE_SAFE(TRUE, NULL)
-        SC_n_threads = nt;
 
         ti = _SC_get_thread_info(-1);
 

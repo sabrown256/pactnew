@@ -1348,7 +1348,7 @@ PG_axis_def *PG_draw_axis_n(PG_device *dev ARG(,,cls),
 	ad = _PG_mk_axis_def(_PG_gattrs.axis_type, tick_type, label_type,
 			     xl, xr, tn, vo, sc, g->iflog);
 
-	majorsz = _PG_gattrs.axis_major_tick_size*dev->g.phys_width;
+	majorsz = _PG_gattrs.axis_major_tick_size*dev->g.phys_dx[0];
 	minorsz = majorsz/2.0;
 
 	SC_VA_START(flag);

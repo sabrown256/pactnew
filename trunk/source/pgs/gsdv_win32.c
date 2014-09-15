@@ -239,27 +239,28 @@ void _PG_set_text_size_win32(PG_device *dev, int size_index, int flag)
 /* _PG_WIN32_QUERY_SCREEN - query some physical device characteristics */
 
 static void _PG_win32_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
-   {int dx, dy, nc;
+   {int id, nc, dx[PG_SPACEDM];
     int nplanes, bitspixel;
     HDC hdc;
 
-    if (dev->phys_width == -1)
+    if (dev->phys_dx[0] == -1)
        {hdc = GetDC(dev->window);
     
-	dx        = GetDeviceCaps(hdc, HORZRES);
-	dy        = GetDeviceCaps(hdc, VERTRES);
+	dx[0]     = GetDeviceCaps(hdc, HORZRES);
+	dx[1]     = GetDeviceCaps(hdc, VERTRES);
 	nplanes   = GetDeviceCaps(hdc, PLANES);
 	bitspixel = GetDeviceCaps(hdc, BITSPIXEL);
 	nc        = 1 << (nplanes * bitspixel);
 
 	ReleaseDC(dev->window, hdc);
         
-	dev->phys_width    = dx;
-	dev->phys_height   = dy;
+	for (id = 0; id < 2; id++)
+	    dev->phys_dx[id] = dx[id];
+
 	dev->phys_n_colors = nc;};
 
-    *pdx = dev->phys_width;
-    *pdy = dev->phys_height;
+    *pdx = dev->phys_dx[0];
+    *pdy = dev->phys_dx[1];
     *pnc = dev->phys_n_colors;
 
     return;}

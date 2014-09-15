@@ -140,7 +140,7 @@ double _PG_axis_place(PG_device *dev, double *dx,
  * alignment is horizontal and vertical centering
  */
     else if (tick & AXIS_TICK_LABEL)
-       {tdx[0]  = _PG_gattrs.axis_major_tick_size*dev->g.phys_width +
+       {tdx[0]  = _PG_gattrs.axis_major_tick_size*dev->g.phys_dx[0] +
 	       _PG.axis_label_standoff_pc;
 	tdx[1]  = tdx[0];
 	tdx[0] += ((_PG_gattrs.axis_tick_type == AXIS_TICK_LEFT) ? 

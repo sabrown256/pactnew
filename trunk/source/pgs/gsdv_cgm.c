@@ -76,22 +76,23 @@ static void PG_CGM_defaults(PG_device *dev)
 
 static void _PG_CGM_query(PG_device *dev,
 			  int *pdx, int *pdy, int *pnc)
-   {int dx, dy, nc;
+   {int id, dx[PG_SPACEDM], nc;
 
-    dx = 32767;
-    dy = 32767;
+    for (id = 0; id < 2; id++)
+        dx[id] = 32767;
 
     if (strcmp(dev->type, "MONOCHROME") == 0)
        nc = 16;
     else
        nc = 256;
         
-    dev->g.phys_width  = dx;
-    dev->g.phys_height = dy;
+    for (id = 0; id < 2; id++)
+        dev->g.phys_dx[id] = dx[id];
+
     dev->phys_n_colors = nc;
 
-    *pdx = dx;
-    *pdy = dy;
+    *pdx = dx[0];
+    *pdy = dx[1];
     *pnc = nc;
 
     return;}
@@ -103,9 +104,8 @@ static void _PG_CGM_query(PG_device *dev,
  
 static PG_device *_PG_CGM_open(PG_device *dev,
 			       double xf, double yf, double dxf, double dyf)
-   {int i, h, w, nt, nfonts, mono;
-    int display_width, display_height, n_colors, lst[20];
-    int gs[6];
+   {int i, nt, nfonts, mono, n_colors;
+    int dx[PG_SPACEDM], w[PG_SPACEDM], lst[20], gs[6];
     double intensity;
     char **font_name, **fs, *token, *name, *date, *s;
     char lname[MAXLINE], fname[MAXLINE], description[MAXLINE];
@@ -136,33 +136,33 @@ static PG_device *_PG_CGM_open(PG_device *dev,
        {dxf = 0.8;
         dyf = 0.8;};
 
-    _PG_CGM_query(dev, &display_width, &display_height, &n_colors);
+    _PG_CGM_query(dev, &dx[0], &dx[1], &n_colors);
 
     _PG_CGM_x_point_list = CMAKE_ARRAY(double, NULL, 0);
     _PG_CGM_y_point_list = CMAKE_ARRAY(double, NULL, 0);
 
-    w = display_width*dxf;
-    h = display_width*dyf;
+    w[0] = dx[0]*dxf;
+    w[1] = dx[0]*dyf;
 
 /* GOTCHA: the following pixel coordinate limits may be incorrect
  * set device pixel coordinate limits
  */
-    g->cpc[0] = INT_MIN + display_width;
-    g->cpc[1] = INT_MAX - display_width;
-    g->cpc[2] = INT_MIN + display_height;
-    g->cpc[3] = INT_MAX - display_height;
+    g->cpc[0] = INT_MIN + dx[0];
+    g->cpc[1] = INT_MAX - dx[0];
+    g->cpc[2] = INT_MIN + dx[1];
+    g->cpc[3] = INT_MAX - dx[1];
     g->cpc[4] = INT_MIN;
     g->cpc[5] = INT_MAX;
 
-    g->hwin[0] = display_width*xf;
-    g->hwin[1] = g->hwin[0] + w;
-    g->hwin[2] = display_height*(1.0 - yf);
-    g->hwin[3] = g->hwin[2] + h;
+    g->hwin[0] = dx[0]*xf;
+    g->hwin[1] = g->hwin[0] + w[0];
+    g->hwin[2] = dx[1]*(1.0 - yf);
+    g->hwin[3] = g->hwin[2] + w[1];
 
     SET_PC_FROM_HWIN(g);
 
     dev->window_x[0] = g->hwin[0];
-    dev->window_x[2] = g->hwin[2] - h;
+    dev->window_x[2] = g->hwin[2] - w[1];
 
     SC_strncpy(lname, MAXLINE, dev->title, MAXLINE);
     name = SC_strtok(lname, " \t\n\r", s);

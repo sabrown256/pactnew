@@ -211,40 +211,41 @@ static PG_interface_object *_SX_add_text_ann(PG_device *dev, double *ndc,
     PG_curve *crv;
     PG_text_box *b;
 
-    if (dev == NULL)
-       return(NULL);
+    iob = NULL;
 
-    ONCE_SAFE(TRUE, NULL)
-       PG_register_callback("SX_annot_action", SX_annot_action);
-    END_SAFE;
+    if (dev != NULL)
+       {ONCE_SAFE(TRUE, NULL)
+	   PG_register_callback("SX_annot_action", SX_annot_action);
+	END_SAFE;
 
 /* make them visible, selectable, and active */
-    flags[0] = TRUE;
-    flags[1] = TRUE;
-    flags[2] = TRUE;
+	flags[0] = TRUE;
+	flags[1] = TRUE;
+	flags[2] = TRUE;
 
-    if (s == NULL)
-       s = CSTRSAVE("                        ");
+	if (s == NULL)
+	   s = CSTRSAVE("                        ");
 
-    xo[0] = ndc[0];
-    xo[1] = ndc[2];
+	xo[0] = ndc[0];
+	xo[1] = ndc[2];
 
-    crv = PG_make_box_curve(dev, NORMC, xo, ndc);
+	crv = PG_make_box_curve(dev, NORMC, xo, ndc);
 
 /* make sure color is visible */
-    clr = _PG_trans_color(dev, td->color);
+	clr = _PG_trans_color(dev, td->color);
 
-    iob = PG_make_interface_object_n(dev, s, PG_TEXT_OBJECT_S, NULL,
-				     crv, flags, clr, dev->BLACK,
-				     td, NULL, NULL, "SX_annot_action", NULL);
+	iob = PG_make_interface_object_n(dev, s, PG_TEXT_OBJECT_S, NULL,
+					 crv, flags, clr, dev->BLACK,
+					 td, NULL, NULL,
+					 "SX_annot_action", NULL);
 
-    PG_register_interface_object(dev, iob);
+	PG_register_interface_object(dev, iob);
 
-    b = (PG_text_box *) iob->obj;
-    b->border = 0.0;
+	b = (PG_text_box *) iob->obj;
+	b->border = 0.0;
 
-    PG_draw_interface_object(iob);
-    PG_update_vs(dev);
+	PG_draw_interface_object(iob);
+	PG_update_vs(dev);};
 
     return(iob);}
 
@@ -297,6 +298,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
     td.face  = NULL;
     td.angle = 0.0;
     td.align = DIR_CENTER;
+    td.other = NULL;
 
     rv  = SS_null;
     dev = NULL;
@@ -314,6 +316,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
 	    SC_INT_I,    &td.size,
 	    SC_STRING_I, &td.style,
 	    SC_STRING_I, &td.face,
+	    SC_STRING_I, &td.other,
             0);
 
     if (dev == NULL)
