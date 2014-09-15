@@ -204,6 +204,7 @@ typedef struct s_PG_axis_def PG_axis_def;
 typedef struct s_PG_graph PG_graph;
 typedef PG_graph *(*PFPPG_graph)(void);
 typedef struct s_PG_marker PG_marker;
+typedef struct s_PG_textdes PG_textdes;
 typedef struct s_PG_font_family PG_font_family;
 typedef struct s_PG_curve PG_curve;
 typedef struct s_PG_interface_object PG_interface_object;
@@ -531,6 +532,18 @@ struct s_PG_marker
 
 /*--------------------------------------------------------------------------*/
 
+/* TEXTDES - describe text with font, color, alignment, and so on */
+
+struct s_PG_textdes
+   {int color;              /* text color */
+    int size;               /* point size */
+    char *style;            /* style - bold, italic, ... */
+    char *face;             /* font name */
+    double angle;           /* angle from horizontal */
+    PM_direction align;};   /* alignment within text_box */
+
+/*--------------------------------------------------------------------------*/
+
 /* FONT_FAMILY - info for a family of fonts
  *             - the canonical set of styles is (in order):
  *             -
@@ -543,8 +556,8 @@ struct s_PG_marker
  */
 
 struct s_PG_font_family
-   {char *type_face;
-    int n_styles;
+   {int n_styles;
+    char *type_face;
     char **type_styles;
     struct s_PG_font_family *next;};
 
@@ -667,13 +680,11 @@ struct s_PG_text_box
     int line;
     int col;
     int mode;
-    PM_direction align;
-    double angle;
     int background;
-    int foreground;
     double border;
     int standoff;
     char **text_buffer;
+    PG_textdes desc;
     PFKeymap *keymap;
     PG_text_box *next;
 
@@ -1638,12 +1649,12 @@ extern PG_font_family
 		      PG_font_family *next, int n, ...);
 
 extern PG_interface_object
- *PG_make_interface_object(PG_device *dev, char *name, char *type, void *obj,
-			   PM_direction align, double ang,
-			   PG_curve *crv, int *flags,
-			   int fc, int bc,
-			   char *select, char *draw, char *action,
-			   PG_interface_object *parent);
+ *PG_make_interface_object_n(PG_device *dev, char *name, char *type,
+			     void *obj, PG_curve *crv,
+			     int *flags, int fc, int bc,
+			     PG_textdes *ptd,
+			     char *slct, char *draw, char *action,
+			     PG_interface_object *parent);
 
 extern PG_curve
  *PG_make_curve(PG_device *dev, PG_coord_sys cs, int closed, int n,

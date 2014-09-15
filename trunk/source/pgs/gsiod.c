@@ -72,9 +72,9 @@ PG_interface_object *PG_iob_make_container(PG_device *dev, char *name,
     bc = dev->BLACK;
 
     crv = _PG_make_iob_box(dev, bx);
-    cnt = PG_make_interface_object(dev, name, "Container", NULL,
-				   DIR_CENTER, 0.0, crv, flags, fc, bc,
-                                   NULL, NULL, NULL, NULL);
+    cnt = PG_make_interface_object_n(dev, name, "Container", NULL,
+				     crv, flags, fc, bc,
+				     NULL, NULL, NULL, NULL, NULL);
 
     return(cnt);}
 
@@ -206,9 +206,9 @@ PG_interface_object *PG_add_iob(PG_device *dev,
     SC_VA_END;
 
     crv = _PG_make_iob_box(dev, bx);
-    iob = PG_make_interface_object(dev, name, type, obj,
-				   DIR_CENTER, 0.0, crv, flags, fc, bc,
-                                   fsel, fdrw, fact, cnt);
+    iob = PG_make_interface_object_n(dev, name, type, obj,
+				     crv, flags, fc, bc,
+				     NULL, fsel, fdrw, fact, cnt);
 
     if (cnt != NULL)
        {PG_PUSH_CHILD_IOB(cnt, iob);};

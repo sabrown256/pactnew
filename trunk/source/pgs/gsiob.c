@@ -831,12 +831,14 @@ static int _PG_set_text_background_color(PG_interface_object *iob, int flag)
 	if (strcmp(iob->type, PG_TEXT_OBJECT_S) == 0)
 	   {b   = (PG_text_box *) iob->obj;
 	    clr = flag ? -1 : b->background;
-	    for (piob = iob; (piob != NULL) && (clr == -1); piob = piob->parent)
+	    for (piob = iob;
+		 (piob != NULL) && (clr == -1);
+		 piob = piob->parent)
 	        clr = piob->background;
 
 	    b->background = clr;};}
     else
-       clr = 4;
+       clr = BLUE;
 
     return(clr);}
 
@@ -847,16 +849,18 @@ static int _PG_set_text_background_color(PG_interface_object *iob, int flag)
 
 static void _PG_draw_text_object(PG_interface_object *iob)
    {PG_text_box *b;
+    PG_textdes *td;
 
     if ((strcmp(iob->type, PG_TEXT_OBJECT_S) != 0) || !iob->is_visible)
        return;
 
-    b = (PG_text_box *) iob->obj;
+    b  = (PG_text_box *) iob->obj;
+    td = &b->desc;
 
     b->dev = iob->device;
 
     _PG_set_text_background_color(iob, TRUE);
-    if (b->foreground != b->background)
+    if (td->color != b->background)
        PG_refresh_text_box(b);
 
     return;}
@@ -1620,20 +1624,18 @@ PG_interface_object *PG_get_object_event(PG_device *dev, PG_event *ev)
 
 /*--------------------------------------------------------------------------*/
 
-/* PG_MAKE_INTERFACE_OBJECT - create and return an graphical interface
- *                          - object
+/* PG_MAKE_INTERFACE_OBJECT_N - create and return an graphical interface
+ *                            - object
  */
 
-PG_interface_object *PG_make_interface_object(PG_device *dev,
-                                              char *name, char *type,
-					      void *obj,
-					      PM_direction align,
-					      double ang,
-                                              PG_curve *crv,
-                                              int *flags, int fc, int bc,
-                                              char *slct, char *draw,
-					      char *action,
-                                              PG_interface_object *parent)
+PG_interface_object *PG_make_interface_object_n(PG_device *dev,
+						char *name, char *type,
+						void *obj, PG_curve *crv,
+						int *flags, int fc, int bc,
+						PG_textdes *ptd,
+						char *slct, char *draw,
+						char *action,
+						PG_interface_object *parent)
    {PG_interface_object *iob;
     PFVoid fnc;
 
@@ -1666,19 +1668,26 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
 
     if (strcmp(type, PG_TEXT_OBJECT_S) == 0)
        {PG_text_box *b;
+	PG_textdes *td;
 
 	b = PG_open_text_rect(dev, "IOB", FALSE, NULL, crv, 0.0, TRUE);
 	if (b != NULL)
 	   {int nn;
 
+	    td = &b->desc;
+
 	    CFREE(b->text_buffer[0]);
 	    nn = strlen(name);
 	    b->text_buffer[0] = CSTRSAVE(name);
-	    b->n_chars_line = max(b->n_chars_line, nn);
-	    b->align        = align;
-	    b->angle        = ang;
-	    b->foreground   = fc;
-	    b->background   = bc;
+	    b->n_chars_line   = max(b->n_chars_line, nn);
+	    b->background     = bc;
+
+	    if (ptd != NULL)
+	       *td = *ptd;
+	    else
+	       {td->color = fc;
+		td->align = DIR_CENTER;
+		td->angle = 0.0;};
 
 	    if (b->n_lines > 2)
 	       b->type = SCROLLING_WINDOW;
@@ -1822,6 +1831,7 @@ void PG_add_text_obj(PG_device *dev, double *obx, char *s)
    {int flags[3];
     double dx[PG_SPACEDM], co[PG_SPACEDM], tbx[PG_BOXSZ];
     PG_curve *tcrv;
+    PG_textdes td;
     PG_interface_object *tiob;
 
     if (dev != NULL)
@@ -1839,12 +1849,15 @@ void PG_add_text_obj(PG_device *dev, double *obx, char *s)
 	flags[1] = FALSE;
 	flags[2] = FALSE;
 
+	memset(&td, 0, sizeof(PG_textdes));
+	td.align = DIR_CENTER;
+	td.angle = 0.0;
+	td.color = dev->DARK_BLUE;
+
 	tcrv = PG_make_box_curve(dev, NORMC, co, tbx);
-	tiob = PG_make_interface_object(dev, s, PG_TEXT_OBJECT_S, NULL,
-					DIR_CENTER, 0.0, tcrv, flags,
-					dev->DARK_BLUE, -1,
-					NULL, "draw-text", NULL,
-					NULL);
+	tiob = PG_make_interface_object_n(dev, s, PG_TEXT_OBJECT_S, NULL,
+					  tcrv, flags, dev->DARK_BLUE, -1,
+					  &td, NULL, "draw-text", NULL, NULL);
 
 	PG_register_interface_object(dev, tiob);};
 
@@ -1858,6 +1871,7 @@ void PG_add_text_obj(PG_device *dev, double *obx, char *s)
 void PG_add_button(PG_device *dev, double *obx, char *s, PFEvCallback fnc)
    {int flags[3];
     double dx[PG_SPACEDM], co[PG_SPACEDM], tbx[PG_BOXSZ];
+    PG_textdes td;
     PG_interface_object *tiob, *biob;
     PG_curve *bcrv, *tcrv;
 
@@ -1886,21 +1900,22 @@ void PG_add_button(PG_device *dev, double *obx, char *s, PFEvCallback fnc)
     flags[2] = FALSE;
 
     tcrv = PG_make_box_curve(dev, NORMC, co, tbx);
-    biob = PG_make_interface_object(dev, "BUTTON", PG_BUTTON_OBJECT_S, s,
-				    DIR_CENTER, 0.0, bcrv, flags,
-				    dev->BLACK, dev->GRAY,
-				    NULL, "draw-button", s,
-                                    NULL);
+    biob = PG_make_interface_object_n(dev, "BUTTON", PG_BUTTON_OBJECT_S, s,
+				      bcrv, flags, dev->BLACK, dev->GRAY,
+				      NULL, NULL, "draw-button", s, NULL);
 
     flags[0] = TRUE;
     flags[1] = FALSE;
     flags[2] = FALSE;
 
-    tiob = PG_make_interface_object(dev, s, PG_TEXT_OBJECT_S, NULL,
-				    DIR_CENTER, 0.0, tcrv, flags,
-				    dev->DARK_BLUE, -1,
-				    NULL, "draw-text", NULL,
-                                    biob);
+    memset(&td, 0, sizeof(PG_textdes));
+    td.align = DIR_CENTER;
+    td.angle = 0.0;
+    td.color = dev->DARK_BLUE;
+
+    tiob = PG_make_interface_object_n(dev, s, PG_TEXT_OBJECT_S, NULL,
+				      tcrv, flags, dev->DARK_BLUE, -1,
+				      &td, NULL, "draw-text", NULL, biob);
 
     PG_PUSH_CHILD_IOB(biob, tiob);
 

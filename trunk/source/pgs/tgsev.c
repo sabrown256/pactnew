@@ -16,11 +16,12 @@
 /* REGISTER_TO - register a TEXT interface object with the device */
 
 void register_to(PG_device *dev, double *bx, char *s)
-   {PG_interface_object *iob;
+   {int flags[3];
+    double xo[PG_SPACEDM];
+    PG_textdes td;
+    PG_interface_object *iob;
     PG_curve *crv;
     PG_text_box *b;
-    double xo[PG_SPACEDM];
-    int flags[3];
 
     flags[0] = TRUE;
     flags[1] = FALSE;
@@ -30,11 +31,15 @@ void register_to(PG_device *dev, double *bx, char *s)
     xo[1] = bx[2];
     crv   = PG_make_box_curve(dev, NORMC, xo, bx);
 
-    iob = PG_make_interface_object(dev, "TEXT", PG_TEXT_OBJECT_S, s,
-				   DIR_CENTER, 0.0, crv, flags,
-				   dev->WHITE, dev->CYAN,
-                                   NULL, "draw-text", "return-text",
-                                   NULL);
+    memset(&td, 0, sizeof(PG_textdes));
+    td.align = DIR_CENTER;
+    td.angle = 0.0;
+    td.color = dev->WHITE;
+
+    iob = PG_make_interface_object_n(dev, "TEXT", PG_TEXT_OBJECT_S, s,
+				     crv, flags, dev->WHITE, dev->CYAN,
+				     &td, NULL, "draw-text", "return-text",
+				     NULL);
 
     PG_register_interface_object(dev, iob);
 

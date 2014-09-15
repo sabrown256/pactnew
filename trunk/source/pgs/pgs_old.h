@@ -411,6 +411,17 @@ extern void
  PG_get_fill_color(PG_device *dev, int *pcl);
 
 
+/* GSIOB.C declarations */
+
+extern PG_interface_object
+ *PG_make_interface_object(PG_device *dev,
+			   char *name, char *type, void *obj,
+			   PM_direction align, double ang,
+			   PG_curve *crv, int *flags, int fc, int bc,
+			   char *slct, char *draw, char *action,
+			   PG_interface_object *parent);
+
+
 /* GSPR.C declarations */
 
 extern void

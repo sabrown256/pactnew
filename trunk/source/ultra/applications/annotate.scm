@@ -20,11 +20,14 @@
 ;       -              the text block (NDC)
 ;       -    [ang]   - angle along which to write text
 ;       -    [aln]   - text alignment
+;       -    [psz]   - text point size
+;       -    [style] - text style - bold, etc
+;       -    [font]  - text font name
 
 (define (annot txt . rest)
     "Procedure: annotate a plot writing text at a point specified in
      normalized coordinates.
-     Usage: annot <text> [<color> [<xmin> <xmax> <ymin> <ymax> [<ang> [<aln>]]]]"
+     Usage: annot <text> [<color> [<xmin> <xmax> <ymin> <ymax> [<ang> [<aln> [psz [style [font]]]]]]]"
     (let* ((in  (if rest (length rest) 0))
 	   (clr (if (> in 0) (list-ref rest 0) white))
 	   (x1  (if (> in 1) (list-ref rest 1) 0.0))
@@ -32,10 +35,14 @@
 	   (y1  (if (> in 3) (list-ref rest 3) 0.0))
 	   (y2  (if (> in 4) (list-ref rest 4) 0.0))
 	   (ang (if (> in 5) (list-ref rest 5) 0.0))
-	   (aln (if (> in 5) (list-ref rest 6) center)))
+	   (aln (if (> in 5) (list-ref rest 6) center))
+	   (psz (if (> in 6) (list-ref rest 7) -1))
+	   (sty (if (> in 7) (list-ref rest 8) nil))
+	   (fnt (if (> in 8) (list-ref rest 9) nil)))
 
       (if (defined? screen-window)
-	  (add-annotation screen-window txt clr x1 x2 y1 y2 aln ang))))
+	  (add-annotation screen-window txt clr x1 x2 y1 y2
+			  aln ang psz sty fnt))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

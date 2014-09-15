@@ -1,5 +1,5 @@
 TXT: PGS User's Manual
-MOD: 06/14/2011
+MOD: 09/12/2014
 
 <CENTER>
 <P>
@@ -808,7 +808,7 @@ contains the following information and methods:<p>
 <P>
 
 Each PG_device has a tree of interface objects associated with it. Interface
-objects are created by calls to PG_make_interface_object. These objects
+objects are created by calls to PG_make_interface_object_n. These objects
 individually and by virtue of their relationship in a hierarchy allow one to
 define the conventional graphical interface tools such as buttons, slider
 bars, and text boxes. The mechanism is very open ended and extensible. By
