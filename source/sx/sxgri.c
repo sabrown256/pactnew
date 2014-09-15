@@ -199,15 +199,13 @@ static void SX_annot_action(void *d, PG_event *ev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_ADD_TEXT_ANN - register a TEXT interface object with the device
- *                 - this is intended for annotations of plots
+/* _SX_ADD_TEXT_ANN - register a TEXT interface object with the device
+ *                  - this is intended for annotations of plots
  */
 
-static PG_interface_object *SX_add_text_ann(PG_device *dev, double *ndc,
-                                            char *s, int clr,
-					    PM_direction align,
-                                            double ang)
-   {int flags[3];
+static PG_interface_object *_SX_add_text_ann(PG_device *dev, double *ndc,
+					     char *s, PG_textdes *td)
+   {int clr, flags[3];
     double xo[PG_SPACEDM];
     PG_interface_object *iob;
     PG_curve *crv;
@@ -234,12 +232,11 @@ static PG_interface_object *SX_add_text_ann(PG_device *dev, double *ndc,
     crv = PG_make_box_curve(dev, NORMC, xo, ndc);
 
 /* make sure color is visible */
-    clr = _PG_trans_color(dev, clr);
+    clr = _PG_trans_color(dev, td->color);
 
-    iob = PG_make_interface_object(dev, s, PG_TEXT_OBJECT_S, NULL, align, ang,
-				   crv, flags, clr, dev->BLACK,
-                                   NULL, NULL, "SX_annot_action",
-                                   NULL);
+    iob = PG_make_interface_object_n(dev, s, PG_TEXT_OBJECT_S, NULL,
+				     crv, flags, clr, dev->BLACK,
+				     td, NULL, NULL, "SX_annot_action", NULL);
 
     PG_register_interface_object(dev, iob);
 
@@ -285,32 +282,38 @@ static object *_SXI_copy_iob(SS_psides *si, object *argl)
 /* _SXI_ADD_ANNOT - add an annotation to the given device */
 
 static object *_SXI_add_annot(SS_psides *si, object *argl)
-   {int clr;
-    char *s;
-    double ndc[PG_BOXSZ], ang;
-    PM_direction aln;
+   {char *s;
+    double ndc[PG_BOXSZ];
+    PG_textdes td;
     PG_interface_object *iob;
     PG_device *dev;
     object *rv;
 
     PG_box_init(2, ndc, 0.0, 0.0);
 
+    td.color = GREEN;
+    td.size  = 12;
+    td.style = NULL;
+    td.face  = NULL;
+    td.angle = 0.0;
+    td.align = DIR_CENTER;
+
     rv  = SS_null;
     dev = NULL;
     s   = NULL;
-    clr = 5;
-    aln = DIR_CENTER;
-    ang = 0.0;
     SS_args(si, argl,
             G_DEVICE,    &dev,
             SC_STRING_I, &s,
-	    SC_INT_I,    &clr,
+	    SC_INT_I,    &td.color,
 	    SC_DOUBLE_I, &ndc[0],
 	    SC_DOUBLE_I, &ndc[1],
 	    SC_DOUBLE_I, &ndc[2],
 	    SC_DOUBLE_I, &ndc[3],
-	    SC_ENUM_I,   &aln,
-	    SC_DOUBLE_I, &ang,
+	    SC_ENUM_I,   &td.align,
+	    SC_DOUBLE_I, &td.angle,
+	    SC_INT_I,    &td.size,
+	    SC_STRING_I, &td.style,
+	    SC_STRING_I, &td.face,
             0);
 
     if (dev == NULL)
@@ -322,7 +325,9 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
     if ((SS_length(si, argl) < 7) || (ndc[0] == ndc[1]))
        PG_define_region(dev, NORMC, ndc);
 
-    iob = SX_add_text_ann(dev, ndc, s, clr, aln, ang*DEG_RAD);
+    td.angle *= DEG_RAD;
+
+    iob = _SX_add_text_ann(dev, ndc, s, &td);
 
     if (iob != NULL)
        rv = _SX_mk_iob(si, iob);

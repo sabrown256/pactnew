@@ -241,50 +241,204 @@ char *_PG_X_get_font_field(char *d, char *s, int n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_X_SETUP_FONT - load the named font for X if it exists
- *                  - return TRUE iff successful
+/* _PG_X_FONT_SIZE - return the size of the X11 font named by FN
+ *                 - return 0 if the font is scalable
+ *                 - return -1 on error
  */
 
-static int _PG_X_setup_font(PG_device *dev, char *face, int size)
-   {int i, nf, ret;
-    int fsz, lsz;
-    char **names;
-    char bf[MAXLINE], p[MAXLINE];
-    XFontStruct *xf;
+int _PG_X_font_size(char *fn)
+   {int sz;
+    int spec[3];
+    char p[MAXLINE];
+    char *s;
+
+    s = _PG_X_get_font_field(p, fn, 7);
+    spec[0] = SC_stoi(s);
+    s = _PG_X_get_font_field(p, fn, 8);
+    spec[1] = SC_stoi(s);
+    s = _PG_X_get_font_field(p, fn, 12);
+    spec[2] = SC_stoi(s);
+
+    if ((spec[0] == 0) && (spec[1] == 0) && (spec[2] == 0))
+       sz = 0;
+    else if (spec[0] != 0)
+       sz = spec[0];
+    else
+       sz = -1;
+
+    return(sz);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* This routine is passed a scalable font name and a point size.  It returns
+ * an XFontStruct for the given font scaled to the specified size and the
+ * exact resolution of the screen.  The font name is assumed to be a
+ * well-formed XLFD name, and to have pixel size, point size, and average
+ * width fields of "0" and arbitrary x-resolution and y-resolution fields.
+ * Size is specified in tenths of points.  Returns NULL if the name is
+ * malformed or no such font exists.
+ */
+
+char *_PG_X_find_scalable_font(PG_device *dev,
+			       char *nfn, int nc,
+			       char *name, int size)
+   {int i,j, field, screen;
+    int dx[PG_SPACEDM], sx[PG_SPACEDM];
+    double sf;
+    char *rv;
     Display *disp;
 
-    ret = FALSE;
+    rv = NULL;
+
+/* catch obvious errors */
+    if ((name == NULL) || (name[0] != '-'))
+       return(rv);
+
+    disp   = dev->display;
+    screen = DefaultScreen(dev->display);
+
+/* calculate our screen resolution in dots per inch - 25.4mm = 1 inch */
+    sx[0] = DisplayWidthMM(disp, screen);
+    sx[1] = DisplayHeightMM(disp, screen);
+    dx[0] = dev->g.phys_width;
+    dx[1] = dev->g.phys_height;
+
+    sf = 25.4;
+    sf = 300;
+    for (i = 0; i < 2; i++)
+        dx[i] *= (sf/sx[i]);
+
+/* copy the font name, changing the scalable fields as we do so */
+    for (i = j = field = 0; name[i] != '\0' && field <= 14; i++)
+        {nfn[j++] = name[i];
+	 if (name[i] == '-')
+	    {field++;
+	     switch (field)
+/* pixel size */
+	        {case 7:
+/* average width */
+		 case 12:
+
+/* change from "-0-" to "-*-" */
+		      nfn[j] = '*';
+		      j++;
+		      if (name[i+1] != '\0')
+			 i++;
+		      break;
+
+/* point size */
+		 case 8:
+
+/* change from "-0-" to "-<size>-" */
+		      sprintf(&nfn[j], "%d", size);
+		      while (nfn[j] != '\0')
+			 j++;
+		      if (name[i+1] != '\0')
+			 i++;
+		      break;
+/* x-resolution */
+		 case 9:
+/* y-resolution */
+		 case 10:
+
+/* change from an unspecified resolution to dx[0] or dx[1] */
+		      sprintf(&nfn[j], "%d",
+			      (field == 9) ? dx[0] : dx[1]);
+		      while (nfn[j] != '\0')
+			 j++;
+		      while ((name[i+1] != '-') && (name[i+1] != '\0'))
+			 i++;
+		      break;};};};
+
+    nfn[j] = '\0';
+
+/* if there aren't 14 hyphens, it isn't a well formed name */
+    if (field == 14)
+       rv = nfn;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PG_X_FIND_FONT - given the font FACE and SIZE return the
+ *                 - X11 name for the font in FN which is NC long
+ *                 - return NULL on failure
+ */
+
+static char *_PG_X_find_font(PG_device *dev, char *fn, int nc,
+			     char *face, int size)
+   {int i, nf;
+    int fsz, lsz;
+    char **names, *lfn, *rv;
+    Display *disp;
+
+    rv = NULL;
     if ((dev != NULL) && (dev->display != NULL))
        {disp = dev->display;
 
 /* allow the oddball fonts */
         if (size < 4)
-	   snprintf(bf, MAXLINE, "*%s*", face);
+	   snprintf(fn, nc, "*%s*", face);
         else if (face[0] == '*')
-	   snprintf(bf, MAXLINE, "%s-*-*", face);
+	   snprintf(fn, nc, "%s-*-*", face);
         else
-	   snprintf(bf, MAXLINE, "*%s*-*-*", face);
+	   snprintf(fn, nc, "*%s*-*-*", face);
 
-	names = XListFonts(disp, bf, 1024, &nf);
+	names = XListFonts(disp, fn, 1024, &nf);
 
-/* GOTCHA: the fonts are not even sorted anymore so this
- * is not going to do anything useful
+/* NOTE: if the fonts are not sorted by size you have to
+ * hope they are scalable or this will not work properly
  */
-	lsz   = -100;
-	for (i = 0; i < nf; i++)
-	    {_PG_X_get_font_field(p, names[i], 7);
-	     fsz = SC_stoi(p);
-	     if (fsz < size)
+	lsz = -100;
+	lfn = NULL;
+	for (i = 0; (i < nf) && (lfn == NULL); i++)
+	    {fsz = _PG_X_font_size(names[i]);
+
+/* accept the font if it is scalable */
+	     if (fsz == 0)
+	        lfn = _PG_X_find_scalable_font(dev, fn, nc, names[i], size);
+
+/* keep going to find the largest unscalable font less than size */
+	     else if (fsz < size)
 	        lsz = fsz;
+
+/* found the largest unscalable font less than size */
 	     else
 	        {if (size-lsz < fsz-size)
 		    i--;
-		 break;};};
-	if (i >= nf)
-	   i = nf-1;
+		 lfn = names[i];};};
          
-	if ((0 <= i) && (i < nf))
-	   {xf = XLoadQueryFont(disp, names[i]);
+	if (lfn != NULL)
+	   rv = fn;
+	else
+	   memset(fn, 0, nc);
+
+	XFreeFontNames(names);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PG_X_SETUP_FONT - load the named font for X if it exists
+ *                  - return TRUE iff successful
+ */
+
+static int _PG_X_setup_font(PG_device *dev, char *face, int size)
+   {int ret;
+    char *p;
+    char fn[MAXLINE];
+    XFontStruct *xf;
+    Display *disp;
+
+    ret = FALSE;
+    if ((dev != NULL) && (dev->display != NULL))
+       {p = _PG_X_find_font(dev, fn, MAXLINE, face, size);
+	if (p != NULL)
+	   {disp = dev->display;
+	    xf   = XLoadQueryFont(disp, fn);
 	    if (xf != NULL)
 	       {XSetFont(disp, dev->gc, xf->fid);
 
@@ -293,9 +447,7 @@ static int _PG_X_setup_font(PG_device *dev, char *face, int size)
 
 		dev->font_info = xf;
 	
-		ret = TRUE;};};
-
-	XFreeFontNames(names);};
+		ret = TRUE;};};};
 
     return(ret);}
 

@@ -390,14 +390,38 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; ANNOT - add annotation
+; ANNOT - add an annotation to the screen
+;       - arguments:
+;       -    txt     - the text of the annotation
+;       -    [color] - the color of the annotation text
+;       -    [x, y]  - the location of the lower left insertion point of
+;       -              the text block (NDC)
+;       -    [ang]   - angle along which to write text
+;       -    [aln]   - text alignment
+;       -    [psz]   - text point size
+;       -    [style] - text style - bold, etc
+;       -    [font]  - text font name
 
-(define (annot labl clr xmn xmx ymn ymx)
-   "ANNOT - add an annotation to the current windos
-    Usage: annot <label> <color> <xmin> <xmax> <ymin> <ymax>
-    Example: annot \"look here\" blue 0.4 0.6 0.95 0.98"
-    (let* ((dev (window-device current-window)))
-      (add-annotation dev labl clr xmn xmx ymn ymx)))
+(define (annot labl . rest)
+    "ANNOT - add an annotation by writing text at a point specified in
+     normalized coordinates.
+     Usage: annot <text> [<color> [<xmin> <xmax> <ymin> <ymax> [<ang> [<aln> [psz [style [font]]]]]]]
+     Example: annot \"look here\" blue 0.4 0.6 0.95 0.98"
+    (let* ((dev (window-device current-window))
+           (in  (if rest (length rest) 0))
+	   (clr (if (> in 0) (list-ref rest 0) white))
+	   (x1  (if (> in 1) (list-ref rest 1) 0.0))
+	   (x2  (if (> in 2) (list-ref rest 2) 0.0))
+	   (y1  (if (> in 3) (list-ref rest 3) 0.0))
+	   (y2  (if (> in 4) (list-ref rest 4) 0.0))
+	   (aln (if (> in 5) (list-ref rest 5) center))
+	   (ang (if (> in 6) (list-ref rest 6) 0.0))
+	   (psz (if (> in 7) (list-ref rest 7) -1))
+	   (sty (if (> in 8) (list-ref rest 8) nil))
+	   (fnt (if (> in 9) (list-ref rest 9) nil)))
+
+          (add-annotation dev labl clr x1 x2 y1 y2
+			  aln ang psz sty fnt)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

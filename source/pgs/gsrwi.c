@@ -620,9 +620,9 @@ static PG_interface_object *_PG_read_interface_object(PG_device *dev, FILE *fp,
     r[1]  = yd;
 
     crv = PG_make_curve(dev, NORMC, TRUE, npt, xo, r);
-    iob = PG_make_interface_object(dev, name, type, obj,
-				   DIR_CENTER, 0.0, crv, flags, fc, bc,
-                                   fsel, fdrw, fact, parent);
+    iob = PG_make_interface_object_n(dev, name, type, obj,
+				     crv, flags, fc, bc,
+				     NULL, fsel, fdrw, fact, parent);
 
     return(iob);}
 

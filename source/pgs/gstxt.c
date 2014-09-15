@@ -250,15 +250,18 @@ static void _PG_move_to(PG_text_box *b, int c, int l)
     char *bf;
     PG_device *dev;
     PG_curve *bnd;
+    PG_textdes *td;
 
     if ((b != NULL) && (b->active))
        {dev = b->dev;
 	if (dev == NULL)
 	   return;
 
+	td = &b->desc;
+
 	sign = 1.0;
-	ang  = b->angle;
 	bf   = b->text_buffer[l];
+	ang  = td->angle;
 
 	PG_get_text_ext_n(dev, 2, NORMC, bf, dxe);
 	PG_get_text_ext_n(dev, 2, NORMC, bf+c, dxp);
@@ -282,7 +285,7 @@ static void _PG_move_to(PG_text_box *b, int c, int l)
 	else
 	   xo[1] = bnd->y_origin + yr - 0.8*sign*dxe[1]*PG_window_height(dev);
 
-	switch (b->align)
+	switch (td->align)
 	   {default   :
 	    case DIR_LEFT :
 	         ix[0] = xo[0] + cos(ang)*so;
@@ -319,21 +322,24 @@ static void _PG_move_to(PG_text_box *b, int c, int l)
  */
 
 void PG_refresh_text_box(PG_text_box *b)
-   {int i, ln;
-    char **bf;
+   {int i, ln, sz;
     double ang, bwid;
     double x[PG_SPACEDM], o[PG_SPACEDM], dc[PG_SPACEDM];
+    char *face, *sty, *tfc, **bf;
     PG_device *dev;
     PG_curve *crv;
     PG_palette *pl;
+    PG_textdes *td;
 
     if ((b != NULL) && (b->active))
        {dev = b->dev;
 	if (dev == NULL)
 	   return;
 
+	td = &b->desc;
+
 	crv = b->bnd;
-	ang = b->angle;
+	ang = td->angle;
 	if (ang != 0)
 	   b->n_lines = 1;
 
@@ -366,21 +372,29 @@ void PG_refresh_text_box(PG_text_box *b)
 
 	    wid = PG_fget_line_width(dev);
 	    PG_fset_line_width(dev, bwid);
-	    (*dev->set_line_color)(dev, b->foreground, FALSE);
+	    (*dev->set_line_color)(dev, td->color, FALSE);
 
 	    PG_draw_curve(dev, crv, FALSE);
 
 	    PG_fset_line_width(dev, wid);};
 
 	PG_fget_char_path(dev, x);
+	PG_fget_font(dev, &face, &sty, &sz);
+
+        tfc = td->face;
+	if ((tfc == NULL) || (strcmp(tfc, "nil") == 0))
+	   tfc = face;
+
 	PG_fset_char_path(dev, dc);
-	PG_fset_text_color(dev, b->foreground, FALSE);
+	PG_fset_font(dev, tfc, td->style, td->size);
+	PG_fset_text_color(dev, td->color, FALSE);
 
 	for (i = 0; i < ln; i++)
 	    {_PG_move_to(b, 0, i);
 	     PG_write_text(dev, PG_gs.stdscr, bf[i]);};
 
 	PG_fset_char_path(dev, x);
+	PG_fset_font(dev, face, sty, sz);
 
 	dev->current_palette = pl;};
 
@@ -458,6 +472,7 @@ void _PG_draw_cursor(PG_text_box *b, int inv)
     char *bf, crsr[2];
     PG_curve *crv;
     PG_device *dev;
+    PG_textdes *td;
 
     if ((b != NULL) && (b->active))
 
@@ -471,7 +486,8 @@ void _PG_draw_cursor(PG_text_box *b, int inv)
 	c = b->col;
 	l = b->line;
 
-	bf  = b->text_buffer[l];
+	td = &b->desc;
+	bf = b->text_buffer[l];
 
 	crsr[0] = bf[c];
 	crsr[1] = '\0';
@@ -501,11 +517,11 @@ void _PG_draw_cursor(PG_text_box *b, int inv)
 	crv = PG_make_box_curve(dev, NORMC, xo, ndc);
 
 	if (inv)
-	   {fc = b->foreground;
+	   {fc = td->color;
 	    bc = b->background;}
 	else
 	   {fc = b->background;
-	    bc = b->foreground;};
+	    bc = td->color;};
 
 	PG_fset_fill_color(dev, fc, TRUE);
 	PG_fill_curve(dev, crv);
@@ -526,15 +542,17 @@ void _PG_draw_cursor(PG_text_box *b, int inv)
 static void _PG_redraw_text_line(PG_text_box *b, int c, int l, int flag)
    {char *bf;
     PG_device *dev;
+    PG_textdes *td;
 
     if ((b != NULL) && (b->active))
        {dev = b->dev;
 	if (dev != NULL)
-	   {bf  = b->text_buffer[l];
+	   {td = &b->desc;
+	    bf = b->text_buffer[l];
 
 	    _PG_clear_line(b, l);
 	    _PG_move_to(b, 0, l);
-	    PG_fset_text_color(dev, b->foreground, FALSE);
+	    PG_fset_text_color(dev, td->color, FALSE);
 	    PG_write_text(dev, PG_gs.stdscr, bf);};};
 
     return;}
@@ -574,7 +592,7 @@ static void _PG_write_text(PG_text_box *b, char *s)
 		  col -= ncpl, ln++, fl = TRUE)
                  _PG_redraw_text_line(b, 0, ln, fl);
 
-	     b->col  = col;
+	     b->col = col;
              if (ln < lmx)
 	        {_PG_redraw_text_line(b, col, ln, TRUE);
 		 b->line = ln;};
@@ -611,8 +629,10 @@ static void _PG_newline(PG_text_box *b)
    {int i, line, nl, nc;
     char *p0, *p, **bf;
     PG_device *dev;
+    PG_textdes *td;
 
     dev  = b->dev;
+    td   = &b->desc;
     line = b->line++;
     bf   = b->text_buffer;
     nl   = b->n_lines_page - 2;
@@ -648,7 +668,7 @@ static void _PG_newline(PG_text_box *b)
 	       {PG_fset_fill_color(dev, b->background, TRUE);
 		PG_fill_curve(dev, b->bnd);
 
-		PG_fset_fill_color(dev, b->foreground, TRUE);};
+		PG_fset_fill_color(dev, td->color, TRUE);};
 
 	    for (i = 0; i < line; i++)
 	        {_PG_move_to(b, 0, i);
@@ -1009,6 +1029,7 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
     char **bf;
     double line_frac;
     double dx[PG_SPACEDM], bx[PG_BOXSZ];
+    PG_textdes *td;
     PG_text_box *b;
 
     if (dev == NULL)
@@ -1062,10 +1083,7 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
     b->bnd          = crv;
     b->line         = 0;
     b->col          = 0;
-    b->align        = DIR_LEFT;
-    b->angle        = 0.0;
     b->mode         = TEXT_INSERT;
-    b->foreground   = dev->WHITE;
     b->background   = dev->BLACK;
     b->border       = brd;
     b->standoff     = 5;
@@ -1073,6 +1091,11 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
     b->n_chars_line = n_chars;
     b->n_lines_page = n_linep;
     b->text_buffer  = bf = CMAKE_N(char *, n_lines);
+
+    td = &b->desc;
+    td->color   = dev->WHITE;
+    td->align   = DIR_LEFT;
+    td->angle   = 0.0;
 
     for (i = 0; i < n_lines; i++)
         bf[i] = CMAKE_N(char, n_chars);
@@ -1121,13 +1144,12 @@ PG_text_box *PG_copy_text_object(PG_text_box *ib,
     if (ob != NULL)
        {ob->line         = ib->line;
 	ob->col          = ib->col;
-	ob->align        = ib->align;
-	ob->angle        = ib->angle;
 	ob->mode         = ib->mode;
-	ob->foreground   = ib->foreground;
 	ob->background   = ib->background;
 	ob->standoff     = ib->standoff;
 	ob->n_chars_line = nc;
+
+	ob->desc = ib->desc;
 
 /* copy the strings from the input buffer */
 	bfo = ob->text_buffer;

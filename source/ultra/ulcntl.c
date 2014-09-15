@@ -381,9 +381,9 @@ static void UL_draw_plot(PG_device *dev)
 		    {b  = (PG_text_box *) iob->obj;
                      pb = (PG_text_box *) piob->obj;
                      b->border   = pb->border;
-                     b->align    = pb->align;
-                     b->angle    = pb->angle;
                      b->standoff = pb->standoff;
+                     b->desc.align = pb->desc.align;
+                     b->desc.angle = pb->desc.angle;
                      if ((b->n_lines  != pb->n_lines) ||
 			 (b->n_chars_line != pb->n_chars_line))
                         _UL_fix_text_buf(b, pb);};};

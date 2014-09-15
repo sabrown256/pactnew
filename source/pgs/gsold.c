@@ -896,3 +896,36 @@ void PG_get_fill_color(PG_device *dev, int *pcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PG_MAKE_INTERFACE_OBJECT - create and return an graphical interface
+ *                          - object
+ */
+
+PG_interface_object *PG_make_interface_object(PG_device *dev,
+                                              char *name, char *type,
+					      void *obj,
+					      PM_direction align,
+					      double ang,
+                                              PG_curve *crv,
+                                              int *flags, int fc, int bc,
+                                              char *slct, char *draw,
+					      char *action,
+                                              PG_interface_object *parent)
+   {PG_textdes td;
+    PG_interface_object *iob;
+
+    memset(&td, 0, sizeof(PG_textdes));
+
+    td.align = align;
+    td.angle = ang;
+    td.color = fc;
+
+    iob = PG_make_interface_object_n(dev, name, type, obj, crv,
+				     flags, fc, bc, &td,
+				     slct, draw, action, parent);
+
+    return(iob);}
+    
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
