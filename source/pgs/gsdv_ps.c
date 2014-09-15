@@ -68,9 +68,9 @@ static void _PG_PS_release_current_device(PG_device *dev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_PS_QUERY - query some PostScript device characteristics */
+/* _PG_PS_QUERY_SCREEN - query some PostScript device characteristics */
 
-static void _PG_PS_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
+static void _PG_PS_query_screen(PG_device *dev, int *pdx, int *pnc)
    {int id, nc;
     int dx[PG_SPACEDM];
 
@@ -87,8 +87,9 @@ static void _PG_PS_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
 
     dev->phys_n_colors = nc;
 
-    *pdx = dx[0];
-    *pdy = dx[1];
+    for (id = 0; id < 2; id++)
+        pdx[id] = dx[id];
+
     *pnc = nc;
 
     return;}
@@ -182,7 +183,7 @@ static PG_device *_PG_PS_open(PG_device *dev,
     dpis = _PG_gattrs.ps_dots_inch/600.0;
 
 /* set device pixel coordinate limits */
-    _PG_PS_query(dev, &xdsp[0], &xdsp[1], &n_colors);
+    PG_query_screen_n(dev, xdsp, &n_colors);
 
     switch (mode)
        {default :
@@ -835,7 +836,7 @@ int PG_setup_ps_device(PG_device *d)
     d->next_line               = _PG_PS_next_line;
     d->open_screen             = _PG_PS_open;
     d->put_image               = _PG_PS_put_image;
-    d->query_screen            = _PG_PS_query;
+    d->query_screen            = _PG_PS_query_screen;
     d->release_current_device  = _PG_PS_release_current_device;
     d->resolution_scale_factor = 4;
     d->set_clipping            = _PG_PS_set_clipping;

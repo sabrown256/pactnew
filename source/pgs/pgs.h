@@ -961,7 +961,7 @@ struct s_PG_device
 			      double dxf, double dyf);
     void (*put_image)(PG_device *dev, unsigned char *bf, int ix, int iy,
 		      int nx, int ny);
-    void (*query_screen)(PG_device *dev, int *pdx, int *pdy, int *pnc);
+    void (*query_screen)(PG_device *dev, int *pdx, int *pnc);
     void (*release_current_device)(PG_device *dev);
     void (*update_vs)(PG_device *dev);
     void (*write_text)(PG_device *dev, FILE *fp, char *s);

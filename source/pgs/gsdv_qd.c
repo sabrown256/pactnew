@@ -177,7 +177,7 @@ PG_device *_PG_qd_open_screen(PG_device *dev, double xf, double yf,
 
 /* _PG_QD_QUERY_SCREEN - query some physical device characteristics */
 
-void _PG_qd_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
+void _PG_qd_query_screen(PG_device *dev, int *pdx, int *pnc)
    {int id, dx[PG_SPACEDM], nc;
     Rect physical_screen_shape;
     PG_dev_geometry *g;
@@ -201,8 +201,9 @@ void _PG_qd_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
 
 	dev->phys_n_colors = nc;};
 
-    *pdx = g->phys_dx[0];
-    *pdy = g->phys_dx[1];
+    for (id = 0; id < 2; id++)
+        pdx[id] = g->phys_dx[id];
+
     *pnc = dev->phys_n_colors;
 
     return;}

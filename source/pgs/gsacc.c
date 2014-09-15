@@ -1691,7 +1691,7 @@ void PG_query_screen_n(PG_device *dev ARG(,in,cls),
    {
 
     if ((dev != NULL) && (dev->query_screen != NULL))
-       dev->query_screen(dev, &dx[0], &dx[1], pnc);
+       dev->query_screen(dev, dx, pnc);
 
     return;}
 
