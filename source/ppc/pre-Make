@@ -71,20 +71,14 @@ Objs = ${MPassDevices} ${IPCDevices} ${ObjsA}
 
 ${Objs} : ${Hdrs}
 
-OMPSC  = pcmpsc.o
-OLMPS  = pclmps.o
-OPARC  = pcparc.o pcparmp.o
-
+OPARC  = pcparc.o pcmpi.o
 ONOIPC = pcnil.o
 
 ArObjs = ${MPassDevices} ${IPCDevices}       \
          ${TGTLib}(ppc.o) ${TGTLib}(pcbin.o) \
          ${TGTLib}(pcpio.o)
 
-ArMPSC = ${TGTLib}(pcmpsc.o)
-ArLMPS = ${TGTLib}(pclmps.o)
-ArPARC = ${TGTLib}(pcparc.o) ${TGTLib}(pcparmp.o)
-
+ArPARC  = ${TGTLib}(pcparc.o) ${TGTLib}(pcmpi.o)
 ArNOIPC = ${TGTLib}(pcnil.o)
 
 ${LibDep} : ${hdrf} ${Hdrs}
@@ -104,8 +98,6 @@ Cstd : ${BinDir}/pcexec ${BinDir}/tpcm \
        ${BinDir}/tpcb ${BinDir}/tpcc
 
 parallel : ${BinDir}/tpcp ${BinDir}/pcexec
-
-web : ${BinDir}/pcweb
 
 #
 # binary data tests
@@ -130,12 +122,6 @@ ${BinDir}/tpcm : ${TGTLib} tpcm.c
 ${BinDir}/tpcp : ${TGTLib} tpcp.c
 	@(echo "${CCAnnounce} tpcp.c -o ${BinDir}/tpcp" ; \
 	  ${CLD} ${LdFlags} tpcp.c -o ${BinDir}/tpcp ${Libs})
-#
-# http reader
-#
-${BinDir}/pcweb : ${TGTLib} pcweb.c
-	@(echo "${CCAnnounce} pcweb.c -o ${BinDir}/pcweb" ; \
-	  ${CLD} ${LdFlags} pcweb.c -o ${BinDir}/pcweb ${Libs})
 
 #
 # process report

@@ -34,7 +34,7 @@ int PG_get_number_processors(void)
    {int np;
 
     if (_PG_gattrs.parallel_graphics == TRUE)
-       np = PC_get_number_processors();
+       np = SC_get_number_processors();
 
     else
        np = 1;
@@ -52,7 +52,7 @@ int PG_get_processor_number(void)
    {int ip;
 
     if (_PG_gattrs.parallel_graphics == TRUE)
-       ip = PC_get_processor_number();
+       ip = SC_get_processor_number();
 
     else
        ip = 0;

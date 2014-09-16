@@ -45,21 +45,22 @@ void SC_split_http(char *url, char *host, char *page)
    {char s[MAXLINE];
     char *ps, *t;
 
-    if (strncmp(url, "http://", 7) == 0)
-       ps  = url + 7;
-    else
-       ps = url;
+    if (url != NULL)
+       {if (strncmp(url, "http://", 7) == 0)
+	   ps  = url + 7;
+        else
+	   ps = url;
 
-    ps += (*ps == '/');
-    SC_strncpy(s, MAXLINE, ps, -1);
+	ps += (*ps == '/');
+	SC_strncpy(s, MAXLINE, ps, -1);
 
-    t = strtok(s, "/\n");
-    if (t != NULL)
-       strcpy(host, t);
+	t = strtok(s, "/\n");
+	if (t != NULL)
+	   strcpy(host, t);
 
-    t = strtok(NULL, "\n");
-    if (t != NULL)
-       strcpy(page, t);
+	t = strtok(NULL, "\n");
+	if (t != NULL)
+	   strcpy(page, t);};
 
     return;}
 

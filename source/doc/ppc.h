@@ -1,5 +1,5 @@
 TXT: PPC User's Manual
-MOD: 03/29/2012
+MOD: 09/15/2014
 
 <CENTER>
 <H1><font color="#ff0000">$TXT</font></H1>
@@ -128,7 +128,7 @@ These give a call compatible interface to the major portion of the standard
 C file I/O library. It also provides a simple way for an application to supply
 its own functions to make variations on the functionality. In particular, PPC
 supplies a set of functions to access files on remote hosts. The function
-PC_io_connect toggles between the default set of functions and the remote
+SC_io_connect toggles between the default set of functions and the remote
 access versions.<p>
 
 <a name="PPCaccess"></a>
@@ -294,7 +294,7 @@ which will handle the input.</TD></TR>
 </DL>
 
 <P>
-<BR><B>int PC_io_connect(int flag)
+<BR><B>int SC_io_connect(int flag)
 </B><BR>
 <DL><DD>If flag is PC_REMOTE set the I/O hooks (see File I/O Interface section)
 to the functions for remote file access and if flag is PC_LOCAL set them to the
@@ -732,7 +732,7 @@ Options:<p>
 <BLOCKQUOTE>
 <TABLE>
 <TR><TD>i  </TD><TD>Poll explicitly instead of using system call</TD></TR>
-<TR><TD>l  </TD><TD>When acting as file server, log transactions to PC_fs.log in home directory</TD></TR>
+<TR><TD>l  </TD><TD>When acting as file server, log transactions to log file in your home directory</TD></TR>
 <TR><TD>q  </TD><TD>Print only messages from the child</TD></TR>
 <TR><TD>p  </TD><TD>Use pipes for communications (default for local processes)</TD></TR>
 <TR><TD>s  </TD><TD>Use sockets for communications (only mode for remote processes)</TD></TR>

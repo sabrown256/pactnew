@@ -1,21 +1,18 @@
 /*
- * PCWEB.C - HTTP routines test driver
- *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
+ * SCWEB.C - HTTP routines test driver
  *
  */
 
 #include "cpyright.h"
 
-#include "ppc.h"
+#include "score.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* MAIN - get and print a web page
  *      -
- *      - Usage: pcweb <url>
+ *      - Usage: scweb <url>
  *      -
  *      - where <url> is a Uniform Resource Locator
  *      -
@@ -46,7 +43,7 @@ int main(c, v)
 
     fd = SC_open_http(host, -1);
     if (fd < 1)
-       {PRINT(stdout, "%s\n", PC_err);
+       {PRINT(stdout, "%s\n", SC_error_msg());
 	PRINT(stdout, "CAN'T CONNECT TO %s\n", host);}
 
     else
