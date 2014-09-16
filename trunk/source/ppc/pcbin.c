@@ -30,14 +30,14 @@ int PC_recv_formats(PROCESS *pp)
 
 	file = pp->vif;
 
-	PC_block(pp);
-	PC_set_attr(pp, SC_LINE, TRUE);
+	SC_block(pp);
+	SC_set_attr(pp, SC_LINE, TRUE);
 
-	if (PC_status(pp) == SC_RUNNING)
+	if (SC_status(pp) == SC_RUNNING)
 	   {for (nc = 0; nc < MAX_BFSZ; nc = strlen(s))
 	        {nr = MAX_BFSZ - nc;
 		 ps = s + nc;
-		 PC_gets(ps, nr, pp);
+		 SC_gets(ps, nr, pp);
 		 if (strcmp(ps, "END FORMATS\n") == 0)
 		    break;};}
 	else
@@ -46,7 +46,7 @@ int PC_recv_formats(PROCESS *pp)
 	 
 	(*file->rd_prim_types)(file, s);
 
-	PC_unblock(pp);
+	SC_unblock(pp);
 
 	SC_ERR_UNTRAP();};
 

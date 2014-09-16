@@ -25,11 +25,11 @@ struct s_REMOTE_FILE
 
 typedef struct s_REMOTE_FILE REMOTE_FILE;
 
-#define MESSAGES(x)         PC_procs.m[(x)].msg
-#define MESSAGE_TYPES(x)    PC_procs.m[(x)].type
-#define MESSAGE_LENGTHS(x)  PC_procs.m[(x)].ni
-#define N_MESSAGES(x)       PC_procs.m[(x)].n
-#define MAX_MESSAGES(x)     PC_procs.m[(x)].nx
+#define MESSAGES(x)         PD_procs.m[(x)].msg
+#define MESSAGE_TYPES(x)    PD_procs.m[(x)].type
+#define MESSAGE_LENGTHS(x)  PD_procs.m[(x)].ni
+#define N_MESSAGES(x)       PD_procs.m[(x)].n
+#define MAX_MESSAGES(x)     PD_procs.m[(x)].nx
 
 struct s_NODE_LIST
    {int n;
@@ -41,7 +41,7 @@ struct s_NODE_LIST
 typedef struct s_NODE_LIST NODE_LIST;
 
 static NODE_LIST
- PC_procs = {0, 0, NULL, NULL};
+ PD_procs = {0, 0, NULL, NULL};
 
 /*--------------------------------------------------------------------------*/
 
@@ -58,30 +58,30 @@ static int _PC_register_proc(PROCESS *pp, int i)
     if (pp != NULL)
        {memset(&pd, 0, sizeof(pd));
 
-	n  = PC_procs.n;
-	nx = PC_procs.nx;
-	if (PC_procs.p == NULL)
+	n  = PD_procs.n;
+	nx = PD_procs.nx;
+	if (PD_procs.p == NULL)
 	   {nx = i + 8;
-	    PC_procs.p  = CMAKE_N(PROCESS *, nx);
-	    PC_procs.m  = CMAKE_N(SC_message, nx);
-	    PC_procs.fd = CMAKE_N(SC_poll_desc, nx);};
+	    PD_procs.p  = CMAKE_N(PROCESS *, nx);
+	    PD_procs.m  = CMAKE_N(SC_message, nx);
+	    PD_procs.fd = CMAKE_N(SC_poll_desc, nx);};
 
 	if (i >= nx)
 	   {nx = i + 8;
-	    CREMAKE(PC_procs.p, PROCESS *, nx);
-	    CREMAKE(PC_procs.m, SC_message, nx);
-	    CREMAKE(PC_procs.fd, SC_poll_desc, nx);};
+	    CREMAKE(PD_procs.p, PROCESS *, nx);
+	    CREMAKE(PD_procs.m, SC_message, nx);
+	    CREMAKE(PD_procs.fd, SC_poll_desc, nx);};
 
 	pd.fd     = pp->io[0];
 	pd.events = POLLIN | POLLPRI;
 
-	PC_procs.p[i]  = pp;
-	PC_procs.fd[i] = pd;
+	PD_procs.p[i]  = pp;
+	PD_procs.fd[i] = pd;
 
-	PC_procs.n  = max(n, i) + 1;
-	PC_procs.nx = nx;
+	PD_procs.n  = max(n, i) + 1;
+	PD_procs.nx = nx;
 
-	PC_unblock(pp);};
+	SC_unblock(pp);};
 
     return(TRUE);}
 
@@ -159,12 +159,12 @@ static int _PC_setup_children(char **argv, char *mode)
 	    pp->acpu  = which;
 
 /* this goes to PC_open_group */
-	    PC_printf(pp, "%s,%d,%d,%d\n", host, port, n, ps->debug);
+	    SC_printf(pp, "%s,%d,%d,%d\n", host, port, n, ps->debug);
 
 /* this goes to PC_open_member */
-	    PC_printf(pp, "%d,%d,%d\n", which, n, ps->debug);
-	    PC_block(pp);
-	    PC_gets(s, MAXLINE, pp);
+	    SC_printf(pp, "%d,%d,%d\n", which, n, ps->debug);
+	    SC_block(pp);
+	    SC_gets(s, MAXLINE, pp);
 	    if ((ps->debug) && (ps->diag != NULL))
 	       {fprintf(ps->diag, "Latch up with parent: %s", s);
 		SC_fflush_safe(ps->diag);};
@@ -211,11 +211,11 @@ static int _PC_setup_children(char **argv, char *mode)
 	     SC_fflush_safe(ps->diag);};
 
 	 if (pp != NULL)
-	    {PC_printf(pp, "%d,%d,%d\n", i, n, ps->debug);
+	    {SC_printf(pp, "%d,%d,%d\n", i, n, ps->debug);
 	     pp->acpu = i;
 
-	     PC_block(pp);
-	     PC_gets(s, MAXLINE, pp);
+	     SC_block(pp);
+	     SC_gets(s, MAXLINE, pp);
 	     if ((ps->debug) && (ps->diag != NULL))
 	        {fprintf(ps->diag, "Latch up with child: %s", s);
 	         fprintf(ps->diag, "Get data socket for node #%d\n", i);
@@ -261,7 +261,7 @@ static int _PC_get_msg(int i)
     msg = MESSAGES(i);
     typ = MESSAGE_TYPES(i);
     nis = MESSAGE_LENGTHS(i);
-    pi  = PC_procs.p[i];
+    pi  = PD_procs.p[i];
     pf  = (PDBfile *) pi->vif;
 
     ps = pi->tstate;
@@ -276,7 +276,7 @@ static int _PC_get_msg(int i)
 	       {fprintf(ps->diag, "   Read");
 		SC_fflush_safe(ps->diag);};
 
-	    PC_printf(pi, "%s,%s\n", SC_itos(NULL, 0, ni, NULL), type);
+	    SC_printf(pi, "%s,%s\n", SC_itos(NULL, 0, ni, NULL), type);
 
 	    if (ps->debug)
 	       {fprintf(ps->diag, " Put(%s,%s)",
@@ -307,7 +307,7 @@ static int _PC_get_msg(int i)
 
 	    return(TRUE);};};
 
-    PC_printf(pi, "0,none\n");
+    SC_printf(pi, "0,none\n");
 
     return(FALSE);}
 
@@ -339,14 +339,14 @@ static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
 	nbt = PC_buffer_data_out(pi, bf, nbi, TRUE);
 	nir = nbt/bpi;
 
-	PC_push_message(PC_procs.m + indx, indx, ni, type, bf);
+	PC_push_message(PD_procs.m + indx, indx, ni, type, bf);
 
 	if (ps->debug)
 	   {fprintf(ps->diag, " Recv(%s,%s,%d)\n",
 		    SC_itos(NULL, 0, nir, NULL), type, indx);
 	    SC_fflush_safe(ps->diag);};
 
-	PC_printf(pi, "%d,%s,%d\n", nir, type, indx);};
+	SC_printf(pi, "%d,%s,%d\n", nir, type, indx);};
 
     return(TRUE);}
 
@@ -361,14 +361,14 @@ static int _PC_get_message(int i)
     PROCESS *pi;
     SC_thread_proc *ps;
 
-    pi = PC_procs.p[i];
+    pi = PD_procs.p[i];
     if (pi == NULL)
        return(FALSE);
 
     ps = pi->tstate;
 
     s[0] = '\0';
-    if (PC_gets(s, MAXLINE, pi) == NULL)
+    if (SC_gets(s, MAXLINE, pi) == NULL)
        return(FALSE);
 
     c = s[0];
@@ -466,18 +466,18 @@ int PC_process_access(char **argv, char *mode)
     _PC_setup_children(argv, mode);
             
     while (TRUE)
-       {n = PC_poll(PC_procs.fd, PC_procs.n, -1);
+       {n = SC_poll(PD_procs.fd, PD_procs.n, -1);
 	if (n > 0)
 	   {do {msgs = FALSE;
-		for (i = 0; i < PC_procs.n; i++)
-		    {rev = PC_procs.fd[i].revents;
+		for (i = 0; i < PD_procs.n; i++)
+		    {rev = PD_procs.fd[i].revents;
 		     if ((rev & POLLIN) || (rev & POLLPRI))
 		        {msgs |= _PC_get_message(i);};};
 
 /* for anybody who may be doing a blocking read and there is a message
  * available let it through before another poll
  */
-		for (i = 0; i < PC_procs.n; i++)
+		for (i = 0; i < PD_procs.n; i++)
 		    {nim = MESSAGE_LENGTHS(i);
 		     if (nim != NULL)
 		        _PC_get_msg(i);};}
@@ -575,7 +575,7 @@ int PC_buffer_data_in(PROCESS *pp)
 	nb = 0L;
 	bf = CMAKE_N(char, nx);};
 
-    PC_unblock_fd(fd);
+    SC_unblock_fd(fd);
 
     nbs = 0;
     while (TRUE)
@@ -624,9 +624,9 @@ int PC_buffer_data_out(PROCESS *pp, char *bf, int nbi, int block_state)
         pp->nb_data = 0;
 
         if (block_state)
-	   PC_block_fd(fd);
+	   SC_block_fd(fd);
         else
-	   PC_unblock_fd(fd);
+	   SC_unblock_fd(fd);
 	    
 	while (nbi > 0)
 	   {nbe = SC_read_sigsafe(fd, pbf, nbi);

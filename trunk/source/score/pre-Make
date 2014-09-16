@@ -488,6 +488,15 @@ ${BinDir}/tscoff : ${TGTLib} tscoff.c
 	  ${CLD} ${LdFlags} tscoff.c -o ${BinDir}/tscoff ${Libs})
 
 #
+# http reader
+#
+web : ${BinDir}/scweb
+
+${BinDir}/scweb : ${TGTLib} scweb.c
+	@(echo "${CCAnnounce} scweb.c -o ${BinDir}/scweb" ; \
+	  ${CLD} ${LdFlags} scweb.c -o ${BinDir}/scweb ${Libs})
+
+#
 # memory manager overhead
 #
 mmov : ${BinDir}/tscmov

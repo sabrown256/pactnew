@@ -34,18 +34,6 @@ PROCESS *PC_open(char **argv, char **envp, char *mode)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_IO_CONNECT - connect the PDB io hooks for remote access */
-
-int PC_io_connect(int flag)
-   {int ret;
-
-    ret = SC_io_connect(flag);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PC_MK_PROCESS - initialize and return a PROCESS */
 
 PROCESS *PC_mk_process(char **argv, char *mode, int type)

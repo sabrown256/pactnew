@@ -33,7 +33,7 @@ static void child_has_txt(int fd, int mask, void *a)
     pd = (descriptors *) a;
     pp = pd->pp;
 
-    while (PC_gets(s, MAXLINE, pp) != NULL)
+    while (SC_gets(s, MAXLINE, pp) != NULL)
        PRINT(stdout, "%s", s);
 
     return;}
@@ -54,7 +54,7 @@ static void tty_has_txt(int fd, int mask, void *a)
     SC_change_term_state(STDIN_FILENO, SC_TERM_RAW, FALSE, NULL);
 
     if (SC_fgets(s, MAX_BFSZ, stdin) != NULL)
-       PC_printf(pp, "%s", s);
+       SC_printf(pp, "%s", s);
 
     return;}
 
@@ -62,7 +62,7 @@ static void tty_has_txt(int fd, int mask, void *a)
 /*--------------------------------------------------------------------------*/
 
 /* PROCESS_END - return TRUE if the process has ended
- *             - do the PC_close now since the TTY may be in
+ *             - do the SC_close now since the TTY may be in
  *             - RAW mode and we want the output to
  *             - look nice (PTY's do this)
  */
@@ -81,7 +81,7 @@ static int process_end(int *prv, void *a)
     SC_check_children();
 
     ex = FALSE;
-    if ((pp != NULL) && (PC_status(pp) != SC_RUNNING))
+    if ((pp != NULL) && (SC_status(pp) != SC_RUNNING))
        {status = pp->status;
         reason = pp->reason;
 
@@ -92,7 +92,7 @@ static int process_end(int *prv, void *a)
 /* get anything remaining from the child */
         child_has_txt(pp->io[0], 0, a);
 
-        rv = PC_close(pp);
+        rv = SC_close(pp);
 	if (rv == FALSE)
 	   CFREE(pp);
 
@@ -123,7 +123,7 @@ static int poll_mode(descriptors *pd)
        {ok = SC_process_status(pp);
 	SC_ASSERT(ok == TRUE);
 
-	while (PC_gets(s, MAX_BFSZ, pp) != NULL)
+	while (SC_gets(s, MAX_BFSZ, pp) != NULL)
            PRINT(stdout, "%s", s);
 
         if (process_end(NULL, pd))
@@ -133,7 +133,7 @@ static int poll_mode(descriptors *pd)
         t = SC_fgets(s, MAX_BFSZ, stdin);
         SC_block_file(stdin);
         if (t != NULL)
-           PC_printf(pp, "%s", s);
+           SC_printf(pp, "%s", s);
 
 	msg = SC_error_msg();
         if (msg[0] != '\0')
@@ -141,7 +141,7 @@ static int poll_mode(descriptors *pd)
 /* close now since the TTY may be in RAW mode and we want the output to
  * look nice (PTY's do this)
  */
-           {PC_close(pp);
+           {SC_close(pp);
 	    if (!quiet)
                PRINT(stdout, "%s\n\n", msg);
             break;};};
@@ -204,7 +204,7 @@ static void error_handler(int sig)
 
     SC_reset_terminal();
 
-    err = PC_block_file(stdin);
+    err = SC_block_file(stdin);
     SC_ASSERT(err == TRUE);
 
     if (sig == SIGALRM)
@@ -256,7 +256,7 @@ static void usage(void)
     printf("      h    - this help message\n");
     printf("      i    - poll explicitly instead of using system call\n");
     printf("      l    - when acting as a file server, log transactions to\n");
-    printf("             PC_fs.log in your home directory\n");
+    printf("             log file in your home directory\n");
     printf("      p    - use pipes for communications\n");
     printf("      q    - print only messages from the child\n");
     printf("      s    - use sockets for communications\n");

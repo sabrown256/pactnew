@@ -242,9 +242,6 @@ extern PROCESS
  *PC_open(char **argv, char **envp, char *mode),
  *PC_mk_process(char **argv, char *mode, int type);
 
-extern int
- PC_io_connect(int flag);
-
 
 /* PCPARC.C declarations */
 
