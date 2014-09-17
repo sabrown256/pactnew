@@ -1140,7 +1140,8 @@
 	   (finfo  (cons device (pg-text-font orig)))
 	   (vports (if window
 		       (window-viewports window)
-		       #f)))
+		       #f))
+	   (res    (pg-get-resolution-scale-factor device)))
 
 ; copy annotations to the hardcopy device
       (copy-interface-objects device orig #t)
