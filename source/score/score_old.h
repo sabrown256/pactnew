@@ -153,7 +153,8 @@ typedef char *F77_string;
 
 #define SC_FORTRAN_STR_C(_cstr, _fstr, _nc)                                  \
    {strncpy(_cstr, (char *) (_fstr), _nc);                                   \
-    _cstr[_nc] = '\0';}
+    _cstr[_nc] = '\0';                                                       \
+    SC_trim_right(_cstr, " \t\n");}
 
 /*--------------------------------------------------------------------------*/
 

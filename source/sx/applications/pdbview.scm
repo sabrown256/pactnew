@@ -222,6 +222,7 @@
 ;--------------------------------------------------------------------------
 
 (safe-load "consts.scm")     ; load the constants
+(safe-load "hardcopy.scm")   ; load the hardcopy commands
 (safe-load "pdbvio.scm")     ; load the I/O commands
 (safe-load "pdbvcmd.scm")    ; load the non-I/O commands
 (safe-load "pdbvar.scm")     ; load the user level variable commands
@@ -230,4 +231,4 @@
 (safe-load "ezn.scm")        ; load the Basis EZN interface
 (safe-load "spokes.scm")     ; load the translation spokes support
 
-;(autoload 'annot         "annotate.scm")
+(autoload* 'annot          "annotate.scm" #f)

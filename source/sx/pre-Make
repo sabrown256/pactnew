@@ -21,6 +21,7 @@ TGTScm = applications/sxview.scm applications/sxcomp.scm applications/sxdm.scm \
          applications/pdbview.scm applications/pdbvplt.scm \
          applications/pdbvthemes.scm applications/binedit.scm \
          applications/pdbvdemo.scm applications/pdbvbatch.scm \
+         applications/hardcopy.scm \
          applications/pdbvxmpl.scm applications/pdbview.pui \
          applications/gcel.scm applications/vcel.scm applications/nature.scm \
          applications/netcdf.scm applications/ezn.scm

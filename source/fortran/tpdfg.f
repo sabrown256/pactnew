@@ -393,13 +393,13 @@
 
 ! ... set and get and verify major order
       order = 102
-      if (pd_set_major_order_f(fileid, order) .ne. 101) &
+      if (pd_set_major_order_f(fileid, order) .ne. 102) &
          call errproc
       order = pd_get_major_order_f(fileid)
 
 ! ... set and get and verify default offset
       offset = 1
-      if (pd_set_offset_f(fileid, offset) .ne. 0) &
+      if (pd_set_offset_f(fileid, offset) .ne. 1) &
          call errproc
       offset = pd_get_offset_f(fileid)
 

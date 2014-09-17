@@ -249,6 +249,9 @@ extern PD_scope_private
 
 /* PDB.C declarations */
 
+extern PDBfile
+ *PD_open_f(char *name, char *mode);
+
 extern syment
  *_PD_defent(PDBfile *file, char *name, char *outtype,
 	     inti number, dimdes *dims);
