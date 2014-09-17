@@ -1451,15 +1451,12 @@ FIXNUM FF_ID(pfopen, PFOPEN)(FIXNUM *sncn, char *name, char *mode)
     SC_FORTRAN_STR_C(s, name, *sncn);
     SC_FORTRAN_STR_C(t, mode, 1);
 
-    file = PD_open(s, t);
+    file = PD_open_f(s, t);
     if (file == NULL)
        rv = 0;
 
     else
-       {file->major_order    = COLUMN_MAJOR_ORDER;
-        file->default_offset = 1;
-
-        rv = SC_ADD_POINTER(file);};
+       rv = SC_ADD_POINTER(file);
 
     return(rv);}
     

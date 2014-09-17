@@ -8,6 +8,7 @@
 
 #include "cpyright.h"
 #include "iso-c.h"
+#include "scconfig.h"
 
 int
  PG_png_quality = 100;

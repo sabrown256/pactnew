@@ -12,6 +12,7 @@
 (load "runt.scm" #t)
 (load "consts.scm" #t)
 (load "func.scm" #t)
+(load "hardcopy.scm" #t)
 (load "slice.scm" #t)
 (load "movie.scm" #t)
 (load "synon.scm" #t)

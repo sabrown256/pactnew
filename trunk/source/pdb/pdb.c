@@ -49,7 +49,7 @@ PDBfile *PD_create(char *name)
  *         - structure chart, and return a pointer to the PDB file
  *         - if successful else NULL
  *
- * #bind PD_open fortran() scheme() python()
+ * #bind PD_open scheme() python()
  */
 
 PDBfile *PD_open(char *name, char *mode)
@@ -66,6 +66,25 @@ PDBfile *PD_open(char *name, char *mode)
 
     return(file);}
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_OPEN_F - open a PDBfile, set the major_order and default_offset
+ *           - appropriately for Fortran
+ *
+ * #bind PD_open_f fortran(pd_open_f)
+ */
+
+PDBfile *PD_open_f(char *name, char *mode)
+   {PDBfile *file;
+
+    file = PD_open(name, mode);
+    if (file != NULL)
+       {file->major_order    = COLUMN_MAJOR_ORDER;
+        file->default_offset = 1;};
+
+    return(file);}
+    
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

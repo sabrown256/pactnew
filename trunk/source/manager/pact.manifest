@@ -53,7 +53,8 @@ f90 types_score.mod types_pml.mod types_pdb.mod types_ppc.mod
 f90 types_pgs.mod types_panacea.mod types_scheme.mod types_fortran.mod
 f90 parameters_pdb.mod
 
-scm annotate.scm binedit.scm compare.scm consts.scm csynt.scm
+scm annotate.scm hardcopy.scm
+scm binedit.scm compare.scm consts.scm csynt.scm
 scm fsynt.scm func.scm exec.scm help.scm lang.scm
 scm msynt.scm netcdf.scm panabgc.scm
 scm panache.scm panagc.scm panbgc.scm panint.scm panpgc.scm
