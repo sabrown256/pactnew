@@ -5,9 +5,165 @@
 ; 
 
 ;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; MAKE-HC-DEVICE - return a list describing a hardcopy device
+
+(define (make-hc-device dev mode res)
+    (let* ((pr (pg-device-properties dev))
+	   (nm (list-ref pr 0))
+	   (rc (list-ref pr 1))
+	   (clr (if (string=? rc "RGB") "COLOR" rc)))
+          (list nm dev clr mode res)))
+
+(define (hc-device-name dev)
+    (list-ref dev 0))
+
+(define (hc-device-dev dev)
+    (list-ref dev 1))
+
+(define (hc-device-attrs dev)
+    (list-tail dev 2))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; ACTIVE-DEVICES - return a list of active hardcopy devices
+
+(define (active-devices color mode res)
+    (let* ((devs nil)
+	   (type (sprintf "%s %s" color mode)))
+
+      (if (= (jpeg-flag) 1)
+	  (begin (if (not jpeg-device)
+		     (begin (set! jpeg-device
+				  (pg-make-device "JPEG" type))
+			    (pg-open-device jpeg-device
+					    (window-origin-x-jpeg)
+					    (window-origin-y-jpeg)
+					    (window-width-jpeg)
+					    (window-height-jpeg))))
+		 (set! devs (cons (make-hc-device jpeg-device mode res)
+				  devs))))
+
+      (if (= (png-flag) 1)
+	  (begin (if (not png-device)
+		     (begin (set! png-device
+				  (pg-make-device "PNG" type))
+			    (pg-open-device png-device
+					    (window-origin-x-png)
+					    (window-origin-y-png)
+					    (window-width-png)
+					    (window-height-png))))
+		 (set! devs (cons (make-hc-device png-device mode res)
+				  devs))))
+
+      (if (= (ps-flag) 1)
+	  (begin (if (not ps-device)
+		     (begin (set! ps-device
+				  (pg-make-device "PS" type))
+			    (if (equal? color "COLOR")
+				(pg-set-color-type! ps-device "PS" color))
+			    (pg-open-device ps-device
+					    (window-origin-x-ps)
+					    (window-origin-y-ps)
+					    (window-width-ps)
+					    (window-height-ps))))
+		 (set! devs (cons (make-hc-device ps-device mode res)
+				  devs))))
+
+      (if (= (mpeg-flag) 1)
+	  (begin (if (not mpeg-device)
+		     (begin (set! mpeg-device
+				  (pg-make-device "MPEG" type))
+			    (pg-open-device mpeg-device
+					    (window-origin-x-mpeg)
+					    (window-origin-y-mpeg)
+					    (window-width-mpeg)
+					    (window-height-mpeg))))
+		 (set! devs (cons (make-hc-device mpeg-device mode res)
+				  devs))))
+
+      (if (= (cgm-flag) 1)
+	  (begin (if (not cgm-device)
+		     (begin (set! cgm-device
+				  (pg-make-device "CGM" color))
+			    (pg-open-device cgm-device
+					    (window-origin-x-cgm)
+					    (window-origin-y-cgm)
+					    (window-width-cgm)
+					    (window-height-cgm))))
+		 (set! devs (cons (make-hc-device cgm-device mode res)
+				  devs))))
+
+      devs))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; DO-HC-SETUP-VP - do hardcopy-viewport setup for DEV
+
+(define (do-hc-setup-vp dev)
+    (pg-set-palette! (hc-device-dev dev) (pg-current-palette WIN-device)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; DO-HC-PRINT-VP - do the hardcopy-viewport output for DEV
+
+(define (do-hc-print-vp dev)
+    (let* ((dv  (hc-device-dev dev))
+	   (at  (hc-device-attrs dev))
+	   (res (list-ref at 2)))
+	  (window-manager "vhardcopy" dv res)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; DO-HC-SETUP-WIN - do hardcopy-window setup for DEV
+
+(define (do-hc-setup-win dev)
+    (let* ((dv  (hc-device-dev dev)))
+	  (pg-set-palette! dv (pg-current-palette WIN-device))
+	  (pg-set-data-id-flag! dv (cond ((boolean? data-id-save)
+					  0)
+					 ((integer? data-id-save)
+					  data-id-save)
+					 (else
+					  1)))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; DO-HC-PRINT-WIN - do the hardcopy-window output for DEV
+
+(define (do-hc-print-win dev)
+    (let* ((dv  (hc-device-dev dev))
+	   (at  (hc-device-attrs dev))
+	   (res (list-ref at 2)))
+	  (window-manager "whardcopy" dv res current-window)))
+
+;--------------------------------------------------------------------------
 
 ;                           PDBVIEW ROUTINES
 
+;--------------------------------------------------------------------------
+
+; PROCESS-HC-ARGS - process the arguments to an HC command and make
+;                 - a uniform return list of values containing
+;                 - (color mode res)
+
+(define (process-hc-args args)
+   (if args
+       (let* ((color (memv 'color args))
+	      (land (memv 'landscape args))
+	      (res (list-ref args (- (length args) 1))))
+	 (list (if color "COLOR" "MONOCHROME")
+	       (if land  "LANDSCAPE" "PORTRAIT")
+	       (if (number? res) res 0)))
+       (list "MONOCHROME" "PORTRAIT" 0)))
+
+;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ; HARDCOPY-VIEWPORT - send the current graph to current hard copy devices
@@ -24,100 +180,17 @@
                hardcopy-viewport color
                hardcopy-viewport color 8"
     (interactive off)
-    (let* ((psflag (ps-flag))
-	   (cgmflag (cgm-flag))
-	   (mpegflag (mpeg-flag))
-	   (jpegflag (jpeg-flag))
-	   (pngflag (png-flag))
-	   (args (process-hc-args rest))
+    (let* ((args  (process-hc-args rest))
 	   (color (list-ref args 0))
-	   (mode (list-ref args 1))
-	   (res (list-ref args 2))
-	   (type (sprintf "%s %s" color mode)))
+	   (mode  (list-ref args 1))
+	   (res   (list-ref args 2))
+	   (type  (sprintf "%s %s" color mode))
+	   (devs  (active-devices color mode)))
 
-      (if (= jpegflag 1)
-	  (begin
-	    (if (not jpeg-device)
-		(begin
-		  (set! jpeg-device
-			(pg-make-device "JPEG"
-					type))
-		  (pg-open-device jpeg-device
-				  (window-origin-x-jpeg) (window-origin-y-jpeg)
-				  (window-width-jpeg) (window-height-jpeg))))
-	    (pg-set-palette! jpeg-device (pg-current-palette WIN-device))
-	    (window-manager "vhardcopy" jpeg-device res)))
+      (for-each do-hc-setup-vp devs)
+      (for-each do-hc-print-vp devs)
 
-      (if (= pngflag 1)
-	  (begin
-	    (if (not png-device)
-		(begin
-		  (set! png-device
-			(pg-make-device "PNG"
-					type))
-		  (pg-open-device png-device
-				  (window-origin-x-png) (window-origin-y-png)
-				  (window-width-png) (window-height-png))))
-	    (pg-set-palette! png-device (pg-current-palette WIN-device))
-	    (window-manager "vhardcopy" png-device res)))
-
-      (if (= psflag 1)
-	  (begin
-	    (if (not ps-device)
-		(begin
-		  (set! ps-device
-			(pg-make-device "PS"
-					type))
-		  (if (equal? color "COLOR")
-		      (pg-set-color-type! ps-device "PS" color))
-		  (pg-open-device ps-device
-				  (window-origin-x-ps) (window-origin-y-ps)
-				  (window-width-ps) (window-height-ps))))
-	    (pg-set-palette! ps-device (pg-current-palette WIN-device))
-	    (window-manager "vhardcopy" ps-device res)))
-
-      (if (= mpegflag 1)
-	  (begin
-	    (if (not mpeg-device)
-		(begin
-		  (set! mpeg-device
-			(pg-make-device "MPEG"
-					type))
-		  (pg-open-device mpeg-device
-				  (window-origin-x-mpeg) (window-origin-y-mpeg)
-				  (window-width-mpeg) (window-height-mpeg))))
-	    (pg-set-palette! mpeg-device (pg-current-palette WIN-device))
-	    (window-manager "vhardcopy" mpeg-device res)))
-
-      (if (= cgmflag 1)
-	  (begin
-	    (if (not cgm-device)
-		(begin
-		  (set! cgm-device
-			(pg-make-device "CGM"
-					color))
-		  (pg-open-device cgm-device
-				  (window-origin-x-cgm) (window-origin-y-cgm)
-				  (window-width-cgm) (window-height-cgm))))
-	    (pg-set-palette! cgm-device (pg-current-palette WIN-device))
-	    (window-manager "vhardcopy" cgm-device res)))))
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-; PROCESS-HC-ARGS - process the arguments to an HC command and make
-;                 - a uniform return list of values containing
-;                 - (color mode res)
-
-(define (process-hc-args args)
-   (if args
-       (let* ((color (memv 'color args))
-	      (land (memv 'landscape args))
-	      (res (list-ref args (- (length args) 1))))
-	 (list (if color "COLOR" "MONOCHROME")
-	       (if land  "LANDSCAPE" "PORTRAIT")
-	       (if (number? res) res 0)))
-       (list "MONOCHROME" "PORTRAIT" 0)))
+      #f))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -138,116 +211,17 @@
                hc color 8"
 
     (interactive off)
-    (let* ((psflag (ps-flag))
-	   (cgmflag (cgm-flag))
-	   (mpegflag (mpeg-flag))
-	   (jpegflag (jpeg-flag))
-	   (pngflag (png-flag))
-	   (args (process-hc-args rest))
+    (let* ((args  (process-hc-args rest))
 	   (color (list-ref args 0))
-	   (mode (list-ref args 1))
-	   (res (list-ref args 2))
-	   (type (sprintf "%s %s" color mode)))
+	   (mode  (list-ref args 1))
+	   (res   (list-ref args 2))
+	   (type  (sprintf "%s %s" color mode))
+	   (devs  (active-devices color mode)))
 
-      (if (= jpegflag 1)
-	  (begin
-	    (if (not jpeg-device)
-		(begin
-		  (set! jpeg-device
-			(pg-make-device "JPEG"
-					type))
-		  (pg-open-device jpeg-device
-				  (window-origin-x-jpeg) (window-origin-y-jpeg)
-				  (window-width-jpeg) (window-height-jpeg))))
-	    (pg-set-palette! jpeg-device (pg-current-palette WIN-device))  
-            (pg-set-data-id-flag! jpeg-device (cond ((boolean? data-id-save)
-							     0)
-							    ((integer? data-id-save)
-							     data-id-save)
-							    (else
-							     1)))
-	    (window-manager "whardcopy"
-			    jpeg-device res current-window)))
+      (for-each do-hc-setup-win devs)
+      (for-each do-hc-print-win devs)
 
-      (if (= pngflag 1)
-	  (begin
-	    (if (not png-device)
-		(begin
-		  (set! png-device
-			(pg-make-device "PNG"
-					type))
-		  (pg-open-device png-device
-				  (window-origin-x-png) (window-origin-y-png)
-				  (window-width-png) (window-height-png))))
-	    (pg-set-palette! png-device (pg-current-palette WIN-device))  
-            (pg-set-data-id-flag! png-device (cond ((boolean? data-id-save)
-							     0)
-							    ((integer? data-id-save)
-							     data-id-save)
-							    (else
-							     1)))
-	    (window-manager "whardcopy"
-			    png-device res current-window)))
-
-      (if (= psflag 1)
-	  (begin
-	    (if (not ps-device)
-		(begin
-		  (set! ps-device
-			(pg-make-device "PS"
-					type))
-		  (if (equal? color "COLOR")
-		      (pg-set-color-type! ps-device "PS" color))
-		  (pg-open-device ps-device
-				  (window-origin-x-ps) (window-origin-y-ps)
-				  (window-width-ps) (window-height-ps))))
-	    (pg-set-palette! ps-device (pg-current-palette WIN-device))
-            (pg-set-data-id-flag! ps-device (cond ((boolean? data-id-save)
-							     0)
-							    ((integer? data-id-save)
-							     data-id-save)
-							    (else
-							     1)))
-	    (window-manager "whardcopy"
-			    ps-device res current-window)))
-      (if (= mpegflag 1)
-	  (begin
-	    (if (not mpeg-device)
-		(begin
-		  (set! mpeg-device
-			(pg-make-device "MPEG"
-					type))
-		  (pg-open-device mpeg-device
-				  (window-origin-x-mpeg) (window-origin-y-mpeg)
-				  (window-width-mpeg) (window-height-mpeg))))
-	    (pg-set-palette! mpeg-device (pg-current-palette WIN-device))
-            (pg-set-data-id-flag! mpeg-device (cond ((boolean? data-id-save)
-							     0)
-							    ((integer? data-id-save)
-							     data-id-save)
-							    (else
-							     1)))
-	    (window-manager "whardcopy"
-			    mpeg-device res current-window)))
-      (if (= cgmflag 1)
-	  (begin
-	    (if (not cgm-device)
-		(begin
-		  (set! cgm-device
-			(pg-make-device "CGM"
-					color))
-		  (pg-open-device cgm-device
-				  (window-origin-x-cgm) (window-origin-y-cgm)
-				  (window-width-cgm) (window-height-cgm))))
-	    (pg-set-palette! cgm-device (pg-current-palette WIN-device))
-            (pg-set-data-id-flag! cgm-device (cond ((boolean? data-id-save)
-							     0)
-							    ((integer? data-id-save)
-							     data-id-save)
-							    (else
-							     1)))
-	    (window-manager "whardcopy"
-			    cgm-device res current-window)))))
+      #f))
 
 ;--------------------------------------------------------------------------
 

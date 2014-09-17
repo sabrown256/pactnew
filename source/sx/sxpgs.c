@@ -774,7 +774,7 @@ static object *_SXI_dev_attributesp(SS_psides *si, object *obj)
 /* _SXI_MAKE_DEVICE - SX level interface to PG_make_device */
 
 static object *_SXI_make_device(SS_psides *si, object *argl)
-   {int i;
+   {int i, ok;
     char *name, *type, *title;
     PG_device *dev;
     out_device *out;
@@ -794,6 +794,7 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
 /* NOTE: this logic is a little bit strange
  * why should making a device be related to any of the output devices?
  */
+    ok = TRUE;
     if (title == NULL)
        {for (i = 0; i < N_OUTPUT_DEVICES; i++)
 	    {out = SX_get_device(i);
@@ -801,6 +802,7 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
 	        {if (strcmp(out->dupp, name) == 0)
 		    {title = out->fname;
 		     type  = out->type;
+		     ok = FALSE;
 		     break;};};};
 
         if (title == NULL)
@@ -813,8 +815,9 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
 	o = SX_mk_graphics_device(si, dev);};
 
     CFREE(name);
-    CFREE(type);
-    CFREE(title);
+    if (ok == TRUE)
+       {CFREE(type);
+	CFREE(title);};
 
     return(o);}
 

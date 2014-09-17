@@ -104,7 +104,8 @@ int SS_set_display_flag(int flg)
  *          - prints it
  */
 
-void SS_print(SS_psides *si, object *strm, object *obj, char *begin, char *end)
+void SS_print(SS_psides *si, object *strm, object *obj,
+	      char *begin, char *end)
    {FILE *str;
 
     if (obj != NULL)
@@ -1118,24 +1119,28 @@ static object *_SSI_apropos(SS_psides *si, object *argl)
 /* SS_WR_LST - print a list */
 
 void SS_wr_lst(SS_psides *si, object *obj, object *strm)
-   {FILE *str;
-    object *cd;
+   {int i, ok;
+    FILE *str;
+    object *ca, *cd;
 
     str = SS_OUTSTREAM(strm);
     PRINT(str, "(");
 
-    while (TRUE)
-       {SS_print(si, strm, SS_car(si, obj), "", "");
+    for (i = 0, ok = TRUE; ok == TRUE; i++)
+        {ca = SS_car(si, obj);
+	 cd = SS_cdr(si, obj);
 
-        if (SS_nullobjp(cd = SS_cdr(si, obj)))
-           {PRINT(str, ")");
-            break;}
-        else if (SS_consp(cd))
-           {obj = cd;
-            PRINT(str, " ");}
-        else
-           {SS_print(si, strm, cd, " . ", ")");
-            break;};};
+	 SS_print(si, strm, ca, "", "");
+
+	 if (SS_nullobjp(cd))
+            {PRINT(str, ")");
+	     ok = FALSE;}
+	 else if (SS_consp(cd))
+            {obj = cd;
+             PRINT(str, " ");}
+	 else
+            {SS_print(si, strm, cd, " . ", ")");
+             ok = FALSE;};};
 
     return;}
 

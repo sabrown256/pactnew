@@ -614,6 +614,12 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
 
     PG_init_device_geometry(&d->g);
 
+    SC_mark(d->name, 1);
+    SC_mark(d->title, 1);
+    SC_mark(d->type, 1);
+    SC_mark(d->type_face, 1);
+    SC_mark(d->type_style, 1);
+
     if (ok == FALSE)
        {PG_rl_device(d);
 	d = NULL;}

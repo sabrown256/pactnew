@@ -1570,7 +1570,7 @@ static object *_SXI_set_color_type(SS_psides *si, object *argl)
     for (i = 0; i < N_OUTPUT_DEVICES; i++)
         {out = SX_get_device(i);
 	 if (out->exist && out->active)
-	    {if (strcmp(out->type, color) != 0)
+	    {if ((out->type == NULL) || (strcmp(out->type, color) != 0))
 	        {CFREE(out->type);
 		 out->type = CSTRSAVE(color);};};};
 
