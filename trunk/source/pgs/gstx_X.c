@@ -287,14 +287,11 @@ static void _PG_X_txt_clear_window(PG_device *dev, int clr)
 
 static int _PG_X_txt_set_font(PG_device *dev, char *face,
 			      char *style, int size)
-   {int ret, nfont, nstyle;
-    char *font_name;
-    extern int _PG_X_setup_font(PG_device *dev, char *face, int size);
+   {int ret;
+    extern int _PG_X_set_font(PG_device *dev,
+			      char *face, char *style, int size);
 
-    ret = FALSE;
-
-    if (PG_setup_font(dev, face, style, size, &font_name, &nfont, &nstyle))
-       ret = _PG_X_setup_font(dev, face, size);
+    ret = _PG_X_set_font(dev, face, style, size);
 
     return(ret);}
 

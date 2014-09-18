@@ -376,7 +376,7 @@ static char *_PG_X_find_scalable_font(PG_device *dev,
  */
 
 static char *_PG_X_find_font(PG_device *dev, char *fn, int nc,
-			     char *face, int size)
+			     char *face, char *style, int size)
    {int i, nf;
     int fsz, lsz;
     char **names, *lfn;
@@ -433,7 +433,7 @@ static char *_PG_X_find_font(PG_device *dev, char *fn, int nc,
  *                  - return TRUE iff successful
  */
 
-int _PG_X_setup_font(PG_device *dev, char *face, int size)
+static int _PG_X_setup_font(PG_device *dev, char *face, char *style, int size)
    {int ret;
     char *p;
     char fn[MAXLINE];
@@ -442,7 +442,7 @@ int _PG_X_setup_font(PG_device *dev, char *face, int size)
 
     ret = FALSE;
     if ((dev != NULL) && (dev->display != NULL))
-       {p = _PG_X_find_font(dev, fn, MAXLINE, face, size);
+       {p = _PG_X_find_font(dev, fn, MAXLINE, face, style, size);
 	if (p != NULL)
 	   {disp = dev->display;
 	    xf   = XLoadQueryFont(disp, fn);
@@ -469,14 +469,15 @@ int _PG_X_set_default_font(PG_device *dev)
    {int i, ni, nf;
     static int bpsz[]   = { 12, 12, 13, 14 };
     static char *bfnt[] = {"*-medium-r-*", "*-r-*", "*-r-*", "*-r-*"};
+    static char *sty = "medium";
 
     ni = sizeof(bpsz)/sizeof(int);
 
-    PG_fset_font(dev, "helvetica", "medium", 12);
+    PG_fset_font(dev, "helvetica", sty, 12);
     nf = (dev->font_info != NULL);
 
     for (i = 0; (i < ni) && (dev->font_info == NULL); i++)
-        nf += _PG_X_setup_font(dev, bfnt[i], bpsz[i]);
+        nf += _PG_X_setup_font(dev, bfnt[i], sty, bpsz[i]);
 
     return(nf);}
 
@@ -1118,14 +1119,14 @@ static void _PG_X_match_rgb_colors(PG_device *dev, PG_palette *pal)
  *                - return TRUE iff successful
  */
 
-static int _PG_X_set_font(PG_device *dev, char *face, char *style, int size)
+int _PG_X_set_font(PG_device *dev, char *face, char *style, int size)
    {int nfont, nstyle, rv, ok;
     char *font_name;
 
     rv = FALSE;
     ok = PG_setup_font(dev, face, style, size, &font_name, &nfont, &nstyle);
     if (ok == TRUE)
-       rv = _PG_X_setup_font(dev, font_name, size);
+       rv = _PG_X_setup_font(dev, font_name, style, size);
 
     return(rv);}
 
