@@ -20,11 +20,6 @@
 
 (define current-window nil)
 (define WIN-device #f)
-(define ps-device #f)
-(define cgm-device #f)
-(define mpeg-device #f)
-(define jpeg-device #f)
-(define png-device #f)
 
 ; IMPORTANT NOTE
 ; Used by hardcopy? predicate to determine if a device is a hardcopy device.

@@ -554,9 +554,11 @@ static object *_SSI_foreach(SS_psides *si, object *obj)
     for (exf = FALSE; !exf; )
         {SS_assign(si, vl, _SS_lst_map(si, argl, &exf));
          if (SS_consp(SS_caar(si, vl)))
-            {SS_assign(si, args, SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
-             SS_assign(si, expr, SS_mk_cons(si, proc,
-					SS_mk_cons(si, args, SS_null)));}
+            {SS_assign(si, args,
+		       SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
+             SS_assign(si, expr,
+		       SS_mk_cons(si, proc,
+				  SS_mk_cons(si, args, SS_null)));}
          else
             {SS_assign(si, args, SS_car(si, vl));
              SS_assign(si, expr, SS_mk_cons(si, proc, args));};
