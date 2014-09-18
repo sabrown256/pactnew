@@ -433,7 +433,7 @@ static char *_PG_X_find_font(PG_device *dev, char *fn, int nc,
  *                  - return TRUE iff successful
  */
 
-static int _PG_X_setup_font(PG_device *dev, char *face, int size)
+int _PG_X_setup_font(PG_device *dev, char *face, int size)
    {int ret;
     char *p;
     char fn[MAXLINE];
