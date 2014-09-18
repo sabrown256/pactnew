@@ -729,6 +729,8 @@ object *SX_plane(SS_psides *si, object *argl)
     name = SC_dsnprintf(FALSE, "%s->%s", dom->name, ran->name);
     f    = PM_make_mapping(name, PM_LR_S, dom, ran, N_CENT, NULL);
 
+    SX_gs.plot_flag = TRUE;
+
     mo = SX_mk_mapping(si, f);
     if (plf)
        mo = SX_display_map(si, mo);

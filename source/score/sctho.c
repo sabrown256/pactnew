@@ -138,7 +138,15 @@ static void _SC_omp_lockon(SC_thread_lock *lock)
 
 	_SC_omp_init_lock(sys);
 
-	omp_set_lock(lck);};
+/* NOTE: not only is a lock unnecessary with only a single thread
+ * but this partially works around a defect in the OpenMP standard
+ * on the subject of threads in child processes which the Intel
+ * compiler sometimes treats catastrophically (since 12.1.339)
+ * this will let unthreaded apps spawn unthreaded children without
+ * dying in the lock
+ */
+	if (SC_n_threads > 1)
+	   omp_set_lock(lck);};
 
     return;}
 
@@ -157,7 +165,15 @@ static void _SC_omp_lockoff(SC_thread_lock *lock)
 
 	_SC_omp_init_lock(sys);
 
-	omp_unset_lock(lck);};
+/* NOTE: not only is a lock unnecessary with only a single thread
+ * but this partially works around a defect in the OpenMP standard
+ * on the subject of threads in child processes which the Intel
+ * compiler sometimes treats catastrophically (since 12.1.339)
+ * this will let unthreaded apps spawn unthreaded children without
+ * dying in the lock
+ */
+	if (SC_n_threads > 1)
+	   omp_unset_lock(lck);};
 
     return;}
 
