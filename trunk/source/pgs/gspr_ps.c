@@ -47,27 +47,27 @@ void _PG_PS_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, doubl
 int _PG_PS_set_font(PG_device *dev, char *face, char *style, int size)
    {int nfont, nstyle, nc, rv;
     int dx[PG_SPACEDM];
-    double sx, sy, sd, sc;
-    char *font_name;
+    double sx[PG_SPACEDM], sd, sc;
+    char *fnt;
 
     rv = FALSE;
 
     if ((dev != NULL) &&
-	PG_setup_font(dev, face, style, size, &font_name, &nfont, &nstyle))
+	PG_setup_font(dev, face, style, size, &fnt, &nfont, &nstyle))
        {PG_query_screen_n(dev, dx, &nc);
 
-	sx = PG_window_width(dev)/((double) dx[0]);
-	sy = PG_window_height(dev)/((double) dx[1]);
-	sd = _PG_gattrs.ps_dots_inch/600.0;
+	sx[0] = PG_window_width(dev)/((double) dx[0]);
+	sx[1] = PG_window_height(dev)/((double) dx[1]);
+	sd    = _PG_gattrs.ps_dots_inch/600.0;
 
-	dev->char_width_s  = size/(612*sx*sd);
-	dev->char_height_s = size/(792*sy*sd);
+	dev->char_width_s  = size/(612*sx[0]*sd);
+	dev->char_height_s = size/(792*sx[1]*sd);
 
 	sc = (100.0*size)/(3.0*dx[0]);
 	_PG_set_raster_text_scale(dev, sc);
 
 	nc = (int) (size*_PG_gattrs.ps_dots_inch/72.0);
-	io_printf(dev->file, "%d /%s SF\n", nc, font_name);
+	io_printf(dev->file, "%d /%s SF\n", nc, fnt);
 
 	rv = TRUE;};
 

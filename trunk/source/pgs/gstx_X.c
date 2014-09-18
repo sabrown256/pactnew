@@ -285,55 +285,16 @@ static void _PG_X_txt_clear_window(PG_device *dev, int clr)
 
 /* _PG_X_TXT_SET_FONT - set the character font */
 
-static int _PG_X_txt_set_font(PG_device *dev, char *face, char *style, int size)
-   {int i, nf, ret, nfont, nstyle;
-    int fsz, lsz;
-    char *pm, *font_name, **names;
-    char bf[MAXLINE], p[MAXLINE];
-    XFontStruct *xf;
-    Display *disp;
+static int _PG_X_txt_set_font(PG_device *dev, char *face,
+			      char *style, int size)
+   {int ret, nfont, nstyle;
+    char *font_name;
+    extern int _PG_X_setup_font(PG_device *dev, char *face, int size);
 
-    if (!PG_setup_font(dev, face, style, size, &font_name, &nfont, &nstyle))
-       return(FALSE);
+    ret = FALSE;
 
-/* allow the oddball fonts */
-    if (size < 4)
-      snprintf(bf, MAXLINE, "*%s*", font_name);
-    else
-      snprintf(bf, MAXLINE, "*%s*-*-*", font_name);
-
-/* setup the font */
-    ret  = FALSE;
-    disp = dev->display;
-    if (disp != NULL)
-       {names = XListFonts(disp, bf, 1024, &nf);
-	lsz   = -100;
-	for (i = 0; i < nf; i++)
-	    {pm = SC_strstr(names[i], "--");
-	     if (pm != NULL)
-	        {SC_strncpy(p, MAXLINE, pm, -1);
-		 fsz = SC_stoi(strtok(p, "- \t\n"));
-		 if (fsz < size)
-		    lsz = fsz;
-		 else
-		    {if (size-lsz < fsz-size)
-		        i--;
-		     break;};};};
-	if (i >= nf)
-	   i = nf-1;
-         
-	xf = XLoadQueryFont(disp, names[i]);
-	if (xf != NULL)
-	   {XSetFont(disp, dev->gc, xf->fid);
-
-	    if (dev->font_info != NULL)
-	       XFreeFont(disp, dev->font_info);
-
-	    dev->font_info = xf;
-	
-	    ret = TRUE;};
-
-	XFreeFontNames(names);};
+    if (PG_setup_font(dev, face, style, size, &font_name, &nfont, &nstyle))
+       ret = _PG_X_setup_font(dev, face, size);
 
     return(ret);}
 
