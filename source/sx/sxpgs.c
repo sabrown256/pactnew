@@ -802,7 +802,7 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
 	        {if (strcmp(out->dupp, name) == 0)
 		    {title = out->fname;
 		     type  = out->type;
-		     ok = FALSE;
+		     ok    = FALSE;
 		     break;};};};
 
         if (title == NULL)

@@ -4,17 +4,35 @@
 ; #include <cpyright.h>
 ; 
 
+(define ps-device #f)
+(define cgm-device #f)
+(define mpeg-device #f)
+(define jpeg-device #f)
+(define png-device #f)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; HC-INIT-DEVICE - do the appropriate device initialization for
+;                - ULTRA or PDBView
+
+(define (hc-init-device kind type file)
+    (pg-make-device kind type))
+
+(define (hc-open-device dev xmn ymn dx dy)
+    (pg-open-device dev xmn ymn dx dy))
+
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ; MAKE-HC-DEVICE - return a list describing a hardcopy device
 
-(define (make-hc-device dev mode res)
+(define (make-hc-device dev fbase mode res)
     (let* ((pr (pg-device-properties dev))
 	   (nm (list-ref pr 0))
 	   (rc (list-ref pr 1))
 	   (clr (if (string=? rc "RGB") "COLOR" rc)))
-          (list nm dev clr mode res)))
+          (list nm dev fbase clr mode res)))
 
 (define (hc-device-name dev)
     (list-ref dev 0))
@@ -22,8 +40,11 @@
 (define (hc-device-dev dev)
     (list-ref dev 1))
 
+(define (hc-device-file dev)
+    (list-ref dev 2))
+
 (define (hc-device-attrs dev)
-    (list-tail dev 2))
+    (list-tail dev 3))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -35,66 +56,71 @@
 	   (type (sprintf "%s %s" color mode)))
 
       (if (= (jpeg-flag) 1)
-	  (begin (if (not jpeg-device)
-		     (begin (set! jpeg-device
-				  (pg-make-device "JPEG" type))
-			    (pg-open-device jpeg-device
-					    (window-origin-x-jpeg)
-					    (window-origin-y-jpeg)
-					    (window-width-jpeg)
-					    (window-height-jpeg))))
-		 (set! devs (cons (make-hc-device jpeg-device mode res)
-				  devs))))
+	  (let* ((fbase (jpeg-name)))
+	        (if (not jpeg-device)
+		    (begin (set! jpeg-device
+				 (hc-init-device "JPEG" type fbase))
+			   (hc-open-device jpeg-device
+					   (window-origin-x-jpeg)
+					   (window-origin-y-jpeg)
+					   (window-width-jpeg)
+					   (window-height-jpeg))))
+		(set! devs (cons (make-hc-device jpeg-device fbase mode res)
+				 devs))))
 
       (if (= (png-flag) 1)
-	  (begin (if (not png-device)
-		     (begin (set! png-device
-				  (pg-make-device "PNG" type))
-			    (pg-open-device png-device
-					    (window-origin-x-png)
-					    (window-origin-y-png)
-					    (window-width-png)
-					    (window-height-png))))
-		 (set! devs (cons (make-hc-device png-device mode res)
-				  devs))))
+	  (let* ((fbase (png-name)))
+	        (if (not png-device)
+		    (begin (set! png-device
+				 (hc-init-device "PNG" type fbase))
+			   (hc-open-device png-device
+					   (window-origin-x-png)
+					   (window-origin-y-png)
+					   (window-width-png)
+					   (window-height-png))))
+		(set! devs (cons (make-hc-device png-device fbase mode res)
+				 devs))))
 
       (if (= (ps-flag) 1)
-	  (begin (if (not ps-device)
-		     (begin (set! ps-device
-				  (pg-make-device "PS" type))
-			    (if (equal? color "COLOR")
-				(pg-set-color-type! ps-device "PS" color))
-			    (pg-open-device ps-device
-					    (window-origin-x-ps)
-					    (window-origin-y-ps)
-					    (window-width-ps)
-					    (window-height-ps))))
-		 (set! devs (cons (make-hc-device ps-device mode res)
-				  devs))))
+	  (let* ((fbase (ps-name)))
+	        (if (not ps-device)
+		    (begin (set! ps-device
+				 (hc-init-device "PS" type fbase))
+			   (if (equal? color "COLOR")
+			       (pg-set-color-type! ps-device "PS" color))
+			   (hc-open-device ps-device
+					   (window-origin-x-ps)
+					   (window-origin-y-ps)
+					   (window-width-ps)
+					   (window-height-ps))))
+		(set! devs (cons (make-hc-device ps-device fbase mode res)
+				 devs))))
 
       (if (= (mpeg-flag) 1)
-	  (begin (if (not mpeg-device)
-		     (begin (set! mpeg-device
-				  (pg-make-device "MPEG" type))
-			    (pg-open-device mpeg-device
-					    (window-origin-x-mpeg)
-					    (window-origin-y-mpeg)
-					    (window-width-mpeg)
-					    (window-height-mpeg))))
-		 (set! devs (cons (make-hc-device mpeg-device mode res)
-				  devs))))
+	  (let* ((fbase (ps-name)))
+	        (if (not mpeg-device)
+		    (begin (set! mpeg-device
+				 (hc-init-device "MPEG" type fbase))
+			   (hc-open-device mpeg-device
+					   (window-origin-x-mpeg)
+					   (window-origin-y-mpeg)
+					   (window-width-mpeg)
+					   (window-height-mpeg))))
+		(set! devs (cons (make-hc-device mpeg-device fbase mode res)
+				 devs))))
 
       (if (= (cgm-flag) 1)
-	  (begin (if (not cgm-device)
-		     (begin (set! cgm-device
-				  (pg-make-device "CGM" color))
-			    (pg-open-device cgm-device
-					    (window-origin-x-cgm)
-					    (window-origin-y-cgm)
-					    (window-width-cgm)
-					    (window-height-cgm))))
-		 (set! devs (cons (make-hc-device cgm-device mode res)
-				  devs))))
+	  (let* ((fbase (ps-name)))
+	        (if (not cgm-device)
+		    (begin (set! cgm-device
+				 (hc-init-device "CGM" color fbase))
+			   (hc-open-device cgm-device
+					   (window-origin-x-cgm)
+					   (window-origin-y-cgm)
+					   (window-width-cgm)
+					   (window-height-cgm))))
+		(set! devs (cons (make-hc-device cgm-device fbase mode res)
+				 devs))))
 
       devs))
 
@@ -142,6 +168,20 @@
 	   (at  (hc-device-attrs dev))
 	   (res (list-ref at 2)))
 	  (window-manager "whardcopy" dv res current-window)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; DO-HC-SETUP-ULTRA - do the ULTRA hardcopy setup for DEV
+
+(define (do-hc-setup-ultra dev)
+    (let* ((dv  (hc-device-dev dev))
+	   (nm  (hc-device-name dev))
+;	   (typ (hc-device-type dev))
+)
+
+;          (open-device* nm typ jpeg-root)
+))
 
 ;--------------------------------------------------------------------------
 
@@ -229,8 +269,81 @@
 
 ;--------------------------------------------------------------------------
 
-; HARDCOPY - send list of curves to hardcopy devices
+; HC-ULTRA-SCREEN - make a hardcopy of what is on the screen
 
+(define (hc-ultra-screen)
+    (if (= (jpeg-flag) 1)
+	(begin (set! jpeg-count (+ jpeg-count 1))
+	       (open-device* "jpeg"
+			     jpeg-type1
+			     (sprintf "%s%d" jpeg-root jpeg-count))))
+    (print))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; HC-ULTRA-CURVE - make a hardcopy of each curve one per plot
+
+(define (hc-ultra-curve rest)
+
+    (define (do-one nc)
+        (if (and (integer? nc) (> nc 0) (<= nc (n-curves-read)))
+	    (begin (erase)
+		   (select nc)
+		   (if (= (jpeg-flag) 1)
+		       (begin (close-device "jpeg")
+			      (set! jpeg-count (+ jpeg-count 1))
+			      (open-device* "jpeg" jpeg-type1
+					    (sprintf "%s%d"
+						     jpeg-root
+						     jpeg-count))))
+		   (print))))
+
+    (define (do-hardcopy nc)
+        (cond ((integer? nc)
+	       (do-one nc))
+	      ((eqv? 'thru (car nc))
+	       (map do-one (eval nc)))))
+
+    (if (eqv? 'all (car rest))
+	(set! rest (sequence 1 (n-curves-read) 1)))
+
+    (map do-hardcopy rest))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; HC-N - send list of curves to hardcopy devices
+;      - eventual replacement for old hardcopy
+;      - this is more like PDBView version which plots
+;      - to ALL active hardcopy devices
+;      - hardcopy only does PS and maybe JPEG
+;
+; Usage:    hc-n
+;
+; Examples: hc-n
+;
+
+(define-macro (hc-n . rest)
+  "Macro: Send list of curves to hardcopy devices.
+     Usage: hc-n"
+
+    (interactive off)
+    (let* ((args  (process-hc-args rest))
+	   (color (list-ref args 0))
+	   (mode  (list-ref args 1))
+	   (devs  (active-devices color mode)))
+
+      (for-each do-hc-setup-ultra devs)
+      (print)
+
+      #f))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; HARDCOPY - send list of curves to hardcopy devices
+;
 ; Send the current plot or specified list of curves to open hardcopy devices.
 ; If no argument is specified, send out current plot.
 ; If argument is `all', send out all curves, one curve per plot.
@@ -238,9 +351,9 @@
 ; Lists refer to the curve numbers displayed in the menu.
 ; Lists may contain individual curve numbers and curve ranges.
 ; A curve range is a space delimited hyphen between two curve numbers.
-
+;
 ; Usage:    hardcopy [all | <curve-number-list>]
-
+;
 ; Examples: hardcopy
 ;           hardcopy all
 ;           hardcopy 1 3 5:10 14
@@ -249,47 +362,25 @@
   "Macro: Send list of curves to hardcopy devices.
      Usage: hardcopy [all | <curve-number-list>]"
 
-  (interactive off)
+    (interactive off)
+    (let* ((args  (process-hc-args rest))
+	   (color (list-ref args 0))
+	   (mode  (list-ref args 1))
+	   (devs  (active-devices color mode)))
 
-  (if (and (= (jpeg-flag) 1) (jpeg-name))
-      (begin
-	(set! jpeg-count 0)
-	(set! jpeg-type1 (jpeg-type))
-	(set! jpeg-root (jpeg-name))))
+      (if (and (= (jpeg-flag) 1) (jpeg-name))
+	  (begin (set! jpeg-count 0)
+		 (set! jpeg-type1 (jpeg-type))
+		 (set! jpeg-root (jpeg-name))))
 
-;  (define (sequence start length step) 
-;    (if (> length 0) (cons start (sequence (+ start step) (- length 1) step)) nil))
+      (if (null? rest)
+	  (hc-ultra-screen)
+	  (hc-ultra-curve rest))
 
-  (define (do-hardcopy nc)
-    (if (and (integer? nc) (> nc 0) (<= nc (n-curves-read)))
-	(begin
-	  (erase)
-	  (select nc)
-	  (if (= (jpeg-flag) 1)
-	      (begin
-		(close-device "jpeg")
-		(set! jpeg-count (+ jpeg-count 1))
-		(open-device* "jpeg" jpeg-type1 (sprintf "%s%d" jpeg-root jpeg-count))))
-	  (print))))
+      (if (= (jpeg-flag) 1)
+	  (close-device "jpeg"))
 
-  (define (do-hardcopy0 nc)
-    (cond ((integer? nc) (do-hardcopy nc))
-	  ((eqv? 'thru (car nc)) (map do-hardcopy (eval nc)))))
-
-  (if (null? rest)
-      (begin
-	(if (= (jpeg-flag) 1)
-	    (begin
-	      (set! jpeg-count (+ jpeg-count 1))
-	      (open-device* "jpeg" jpeg-type1 (sprintf "%s%d" jpeg-root jpeg-count))))
-	(print))
-      (begin
-	(if (eqv? 'all (car rest))
-	    (set! rest (sequence 1 (n-curves-read) 1)))
-	(map do-hardcopy0 rest)))
-
-  (if (= (jpeg-flag) 1)
-      (close-device "jpeg")))
+      #f))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

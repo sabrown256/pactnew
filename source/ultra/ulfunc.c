@@ -2004,7 +2004,8 @@ void UL_install_scheme_funcs(SS_psides *si)
    {extern void _SX_install_pgs_primitives(SS_psides *si);
 
     SX_install_global_funcs(si);
-    _SX_install_pgs_primitives(si);
+    SX_install_pgs_funcs(si);
+/*    _SX_install_pgs_primitives(si); */
 
     SS_install(si, "curve->list",
                "Prodedure: Given a curve return a list of the lists of x and y values\n     Usage: curve->list <curve>",
