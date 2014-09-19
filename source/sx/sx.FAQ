@@ -1,11 +1,10 @@
 #
-# Source Version: 3.0
-# Software Release #: LLNL-CODE-422942
+# include "cpyright.h"
 #
 
 SX Frequently Asked Questions (FAQ)
 
-Last-Modified:  Fri May  9 10:36:16 PDT 2003
+Last-Modified:  09/18/2014
 
 
 Welcome to the FAQ for SX!
@@ -38,16 +37,13 @@ headers. If your experience with PACT is not absolute portability,
 we would like to hear from you so we can try to make it so. Please 
 direct all portability issues to:
 
-     brown50@llnl.gov
- or  minner1@llnl.gov
- or  smethells1@llnl.gov
-
+     sabrown256@gmail.com
 
 Thanks to all who have contributed to this FAQ.  Corrections and 
 contributions always welcome. Please e-mail comments, additions, 
 and corrections to:
 
-                  rodrigues2@llnl.gov 
+     sabrown256@gmail.com
 
 and use SUBJECT: SX FAQ
 
@@ -58,9 +54,10 @@ TABLE OF CONTENTS
 ----------------------------------------------------------------------
 
 1) What is SX?
-2) What is PACT?
-3) Where can I get the complete SX source and documentation?
-4) ???
+2) What is ULTRA?
+3) What is PACT?
+4) Where can I get the complete SX source and documentation?
+5) ???
 
 ----------------------------------------------------------------------
 1) What is SX?
@@ -76,32 +73,37 @@ TABLE OF CONTENTS
      e) Bindings of PANACEA (code tools) functions and structures
      f) Bindings of PML (math) functions and structures
 
-2) What is PACT?
+2) What is ULTRA?
+
+   ULTRA is a 1d data presentation, manipulation, and analysis tool.
+   Features include:
+
+     a) Data creation or file I/O
+     b) User extensible (via SCHEME)
+
+3) What is PACT?
 
    PACT stands for Portable Application Code Toolkit. It is a
    self-contained set of tools which support developing and
    using portable programs particularly scientific and engineering
    applications.  See the pact.FAQ
 
-3) Where can I get the complete SX source and documentation?
+4) Where can I get the complete SX source and documentation?
 
 Since SX is an intimate part of PACT, this will get the complete PACT 
 including SX. You may selectively install SX.
 
-Please use ftp to connect to: 
+You can check out PACT by doing the following:
 
-          ftp.llnl.gov
+   svn checkout http://pactnew.googlecode.com/svn/trunk/ pactnew-read-only
 
-log in as anonymous, using your email address for the password,
-cd pub/pact - to change directory,
-binary           - to set the transfer mode,
-get the three pact files (yy_mm_dd indicates the date):
-          pact-unix.README
-          pactyy_mm_dd-doc.tar.gz
-          pactyy_mm_dd-src
+In the base source directory do:
 
-The pact-unix.README file describes the PACT installation process. 
+   ./configure
+   make build
+   make check
+   make install
 
-4) ???
+5) ???
 
 

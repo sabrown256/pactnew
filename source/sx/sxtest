@@ -2,9 +2,6 @@
 #
 # SXTEST - test SX
 #
-# Source Version: 3.0
-# Software Release #: LLNL-CODE-422942
-#
 # include "cpyright.h"
 #
 
@@ -26,6 +23,9 @@ while ($#argv > 0)
            echo "                  text sqlite xml hdf vif"
            echo "                  pgs axis master exa iply shell copy mesh"
            echo "                  rund intp intp-df intrp ar diff ext"
+           echo "                  umaster umem uio"
+           echo "                  ufnc ufft ufill"
+           echo "                  uannot uenv"
            echo ""
            exit(1)
       case -t:
@@ -60,12 +60,20 @@ if ($RUN_TESTS == FALSE) then
 
 else if (-e $BinDir/sx) then
 
-# (Template of test on size of DIFF compare (i.e. 12 char date differs)
-#   set Files = `find . -name "sxpdb.res.diff" -size 12c -print`
-#   if ($#Files == 0) then....  compare fails!
+# NOTE: remove files here so that platforms lacking 'system' might work
+   set files = ""
+   set files = ( $files ultest.ps.diff ultest.err ultest.tmp )
+   set files = ( $files ultest.asc ultest.log )
+   set files = ( $files ultest.pdb ultest.pdb.chk )
+   set files = ( $files curves.a testt.cgm my.cgm )
+   set files = ( $files table1.tmp temp2.tmp ultest1.ps ultest2.ps temp2.tmp )
+   set files = ( $files _tmp.dat )
 
-   rm -f sxpdb.res sxpdba.res sxpdbi.res sxhash.res sxpgs.ps
-   rm -f sxpdb.res.diff sxpdba.res.diff sxpdbi.res.diff sxhash.res.diff sxpgs.ps.diff
+   set files = ( $files sxpdb.res sxpdba.res sxpdbi.res sxhash.res sxpgs.ps )
+   set files = ( $files sxpdb.res.diff sxpdba.res.diff sxpdbi.res.diff )
+   set files = ( $files sxhash.res.diff sxpgs.ps.diff )
+
+   flog $Log $RM $files
 
    NoteD $Log ""
    NoteD $Log "SX TEST ..."
@@ -81,6 +89,9 @@ else if (-e $BinDir/sx) then
       set Tests = ( $Tests pgs axis iply )
       set Tests = ( $Tests master exa shell copy mesh )
       set Tests = ( $Tests rund intp intp-df intrp ar diff ext )
+      set Tests = ( $Tests umaster uio ufnc ufft ufill uaxis uannot uenv )
+# GOTCHA: restore memory leak test
+#      set Tests = ( $Tests umaster umem uio ufnc ufft ufill uaxis uannot uenv )
    endif
 
    foreach i ($Tests)
@@ -88,7 +99,9 @@ else if (-e $BinDir/sx) then
       @ nerr = $nerr + $status
    end
 
-   $TEST_CHECK clean -n SX -e $nerr -raf "$Tmp"
+   set rpf = ( ultest.ps ultest.log ultest.pdb.chk ulmmt.log ulfft.log )
+
+   $TEST_CHECK clean -n SX -e $nerr -raf "$Tmp" -rpf "$rpf"
 
    set xstatus = $status
 

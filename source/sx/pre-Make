@@ -11,7 +11,9 @@ LibName=sx
 
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTExe = ${BinDir}/sx
-TGTInc = sx.h sx_int.h
+TGTInc = sx.h sx_int.h ultra.h
+
+UltraExe = ${BinDir}/ultra
 
 ExtDir = ${ScmDir}/extensions
 
@@ -24,7 +26,13 @@ TGTScm = applications/sxview.scm applications/sxcomp.scm applications/sxdm.scm \
          applications/hardcopy.scm \
          applications/pdbvxmpl.scm applications/pdbview.pui \
          applications/gcel.scm applications/vcel.scm applications/nature.scm \
-         applications/netcdf.scm applications/ezn.scm
+         applications/netcdf.scm applications/ezn.scm \
+         applications/ultra.scm applications/consts.scm applications/func.scm  \
+         applications/annotate.scm applications/compare.scm applications/trig.scm \
+         applications/slice.scm applications/movie.scm \
+         applications/help.scm applications/synon.scm applications/slib.scm \
+         applications/toolbox.scm applications/mouse.scm applications/ultra.pui
+
 TGTScr = applications/pdbview applications/pdbdiff \
          applications/pdbls applications/pdbcp applications/drun
 
@@ -59,9 +67,9 @@ DepLib = ${LibDir}/libscheme.a \
          ${LibDir}/libpml.a \
 	 ${LibDir}/libscore.a
 
-InstallDep = ${TGTLib} ${TGTExe} ${TGTScm} ${TGTScr}
-BinDep = ${Hdrs} ${TGTLib} sxmain.c ${DepLib}
-BinObj = ${LdFlags} sxmain.c
+InstallDep = ${TGTLib} ${TGTExe} ${UltraExe} ${TGTScm} ${TGTScr}
+BinDep = ${Hdrs} ${TGTLib} ${DepLib}
+BinObj = ${LdFlags}
 
 #
 # Required Libraries
@@ -90,9 +98,10 @@ ObjsB = sxpdb.o sxpdba.o sxpdbr.o sxpdbc.o sxpdbd.o sxpdbf.o sxpdbl.o
 ObjsC = sxpan.o sxpanw.o
 ObjsD = sxgri.o sxpgs.o sxpgsp.o sxgrot.o
 ObjsE = sxpml.o
+ObjsU = ulfunc.o ulauxf.o ulhand.o ulcntl.o
 ObjsY = sxshar.o
 ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
-Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ}
+Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ} ${ObjsU}
 
 gss = gs-score.c gs-pml.c gs-pdb.c   \
       gs-ppc.c gs-pgs.c gs-panacea.c \
@@ -106,6 +115,9 @@ gsa = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
       ${TGTLib}(gs-ppc.o) ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
       ${TGTLib}(gs-scheme.o)
 
+ArObjsU = ${TGTLib}(ulfunc.o) ${TGTLib}(ulauxf.o) \
+ 	  ${TGTLib}(ulhand.o) ${TGTLib}(ulcntl.o)
+
 ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
          ${TGTLib}(sxgc.o) ${TGTLib}(sxcmd.o) \
          ${TGTLib}(sxhand.o) ${TGTLib}(sxfunc.o) ${TGTLib}(sxhbo.o) \
@@ -116,9 +128,10 @@ ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
          ${TGTLib}(sxgri.o) ${TGTLib}(sxpgs.o) ${TGTLib}(sxpgsp.o) ${TGTLib}(sxgrot.o) \
          ${TGTLib}(sxshar.o) ${TGTLib}(sxset.o) ${TGTLib}(sxcont.o)  \
          ${TGTLib}(sxulio.o) ${TGTLib}(sxcrv.o) ${TGTLib}(sxtable.o) \
-         ${gsa}
+         ${ArObjsU} ${gsa}
 
 sxmain.o : ${Hdrs}
+ultra.o : ${Hdrs}
 ${ObjsY} : ${Hdrs}
 ${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs} ${hdrf}
@@ -145,9 +158,13 @@ LibAction = @(echo "build-ext" ; build-ext ; cd ${PACTTmpDir} ; echo "bindings" 
 #
 # make the executable
 #
-${TGTExe} : ${BinDep}
+${TGTExe} : ${BinDep} sxmain.c
 	@(echo "${CCAnnounce} sxmain.c -o ${TGTExe}" ; \
 	  ${CLD} ${LdFlags} sxmain.c -o ${TGTExe} ${Libs})
+
+${UltraExe} : ${BinDep} ultra.c
+	@(echo "${CCAnnounce} ultra.c -o ${UltraExe}" ; \
+	  ${CLD} ${LdFlags} ultra.c -o ${UltraExe} ${Libs})
 
 #
 # make the command test wrapper
@@ -163,6 +180,7 @@ command :
 # link 
 #
 link: ${InstallDep}
+	sinstall ultra.ini.user ${ScmDir}/ultra.ini
 	pact scminstall
 	pact scrinstall
 	@${BinDir}/install-ext ${PSY_Root} ${TGTScrX}

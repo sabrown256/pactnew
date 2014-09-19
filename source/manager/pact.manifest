@@ -10,7 +10,7 @@
 # for parallel load balancing
 pkg psh scripts
 pkg pgs score pdb pml sx python
-pkg scheme panacea fortran ultra ppc scc
+pkg scheme panacea fortran ppc scc
 
 bin atdbg do-net detect pcexec ps-diff ncpu scheme sx
 bin toul ultra mpi-io-wrap ptime dmnz propr rpath
