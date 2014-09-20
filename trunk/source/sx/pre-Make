@@ -98,7 +98,7 @@ ObjsB = sxpdb.o sxpdba.o sxpdbr.o sxpdbc.o sxpdbd.o sxpdbf.o sxpdbl.o
 ObjsC = sxpan.o sxpanw.o
 ObjsD = sxgri.o sxpgs.o sxpgsp.o sxgrot.o
 ObjsE = sxpml.o
-ObjsU = ulfunc.o ulauxf.o ulhand.o ulcntl.o
+ObjsU = ulcmd.o ulfunc.o ulauxf.o ulhand.o ulcntl.o
 ObjsY = sxshar.o
 ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
 Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ} ${ObjsU}
@@ -115,7 +115,7 @@ gsa = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
       ${TGTLib}(gs-ppc.o) ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
       ${TGTLib}(gs-scheme.o)
 
-ArObjsU = ${TGTLib}(ulfunc.o) ${TGTLib}(ulauxf.o) \
+ArObjsU = ${TGTLib}(ulcmd.o) ${TGTLib}(ulfunc.o) ${TGTLib}(ulauxf.o) \
  	  ${TGTLib}(ulhand.o) ${TGTLib}(ulcntl.o)
 
 ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \

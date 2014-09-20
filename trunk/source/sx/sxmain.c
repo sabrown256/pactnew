@@ -19,8 +19,8 @@
 
 int main(int c, char **v, char **env)
    {int i, n, commnd_flag, tflag, load_rc;
-    int load_init, n_files, ret, zsp, trap_error;
-    int upix, script_file;
+    int load_init, n_files, ret, zsp;
+    int upix, script_file, track;
     char *cmd;
     SIGNED char order[MAXLINE];
     double evalt;
@@ -47,45 +47,44 @@ int main(int c, char **v, char **env)
 
     SC_set_io_interrupts(FALSE);
 
-    cmd           = NULL;
-    commnd_flag   = FALSE;
-    script_file   = FALSE;
-    tflag         = FALSE;
-    load_init     = TRUE;
-    trap_error    = TRUE;
-    SX_gs.gr_mode = TRUE;
-    load_rc       = TRUE;
-    zsp           = 2;
-
-    upix = FALSE;
+    cmd         = NULL;
+    commnd_flag = FALSE;
+    script_file = FALSE;
+    tflag       = FALSE;
+    load_init   = TRUE;
+    load_rc     = TRUE;
+    track       = TRUE;
+    zsp         = 2;
+    upix        = FALSE;
 
 /* initialize the file order */
     n_files = 0;
 
-#ifndef NO_SHELL
+    SX_gs.gr_mode = TRUE;
+    SX_gs.qflag   = FALSE;
+
+    si->trap_error = TRUE;
 
 /* connect the I/O functions */
     SS_set_put_line(si, SS_printf);
     SS_set_put_string(si, SS_fputs);
     SC_set_get_line(io_gets);
 
-#ifndef AIX
-# ifndef linux
+#if !defined(AIX) && !defined(linux)
     SC_set_io_interrupts(TRUE);
-# endif
 #endif
 
     if (SS_exe_script(c, v) != NULL)
        {SX_gs.qflag = TRUE;
 	script_file = TRUE;
-	trap_error  = FALSE;};
+	si->trap_error = FALSE;};
 
 /* process the command line arguments */
     for (i = 1; i < c; i++)
         if (v[i][0] == '-')
 	   {switch (v[i][1])
                {case 'e' :
-		     trap_error = FALSE;
+		     si->trap_error = FALSE;
 		     break;
                 case 'i' :                       /* IO not interrupt driven */
 		     SC_set_io_interrupts(FALSE);
@@ -105,8 +104,7 @@ int main(int c, char **v, char **env)
 #endif
 		     SX_gs.sm = SX_MODE_PDBVIEW;
                      break;
-                case 'q' :               /* quite mode suppress version and */
-                                         /* cannot connect to display       */
+                case 'q' :                      /* don't display the banner */
                      SX_gs.qflag = TRUE;
                      break;
                 case 'r' :                    /* don't load .pdbviewrc file */
@@ -119,8 +117,16 @@ int main(int c, char **v, char **env)
                 case 't' :                                /* time the loads */
                      tflag = TRUE;
                      break;
+                case 'u' :                                    /* ULTRA mode */
+                     SX_gs.sm      = SX_MODE_ULTRA;
+                     SX_gs.gr_mode = TRUE;
+		     SC_set_io_interrupts(FALSE);
+                     break;
                 case 'w' :           /* use X window for drawing not pixmap */
 		     upix = FALSE;
+                     break;
+               case 'x' :
+                     track = FALSE;
                      break;
                 case 'z' :                              
                      zsp = SC_stoi(v[++i]);
@@ -141,28 +147,12 @@ int main(int c, char **v, char **env)
                 {cmd = SC_dstrcat(cmd, v[i]);
                  cmd = SC_dstrcat(cmd, " ");};};
 
-#else
-
-/* assume we always want PDBVIEW mode if there is no shell */
-    SX_gs.sm = SX_MODE_PDBVIEW;
-
-#endif
-
-    si->trap_error   = trap_error;
     si->bracket_flag = TRUE;
 
     SC_zero_space_n(zsp, -2);
 
     PG_fset_use_pixmap(upix);
 
-/* initialize SX
- * the following variables must be initialized before SX_init
- */
-    SX_gs.console_type           = CSTRSAVE("MONOCHROME");
-    SX_gs.console_x[0]           = 0.0;
-    SX_gs.console_x[1]           = 0.0;
-    SX_gs.console_dx[0]          = 0.33;
-    SX_gs.console_dx[1]          = 0.33;
     SX_gs.background_color_white = TRUE;
 
 /* run in PDBView mode */
@@ -171,15 +161,7 @@ int main(int c, char **v, char **env)
 
 /* run in vanilla SCHEME mode */
     else
-       {SC_set_banner(" %s  -  %s\n\n", SCODE, VERSION);
-	SS_load_scm(si, "nature.scm");};
-
-#ifdef NO_SHELL
-
-    if (SX_gs.gr_mode)
-        SS_banner(si, SS_mk_string(si, PCODE));
-
-#endif
+       {SS_load_scm(si, "nature.scm");};
 
 /* read the optionally specified data/scheme files in order */
     for (i = 0; i < n_files; i++)
@@ -196,11 +178,18 @@ int main(int c, char **v, char **env)
 		      "   %s load time: (%10.3e)\n",
 		      v[n], evalt);};};
 
+    si->nsave    = 0;
+    si->nrestore = 0;
+    si->nsetc    = 0;
+    si->ngoc     = 0;
+
+    SC_mem_stats_set(0L, 0L);
+
     if (commnd_flag)
        ret = !SS_run(si, cmd);
 
     else
-       {if ((SX_gs.gr_mode == TRUE) && (SX_gs.qflag == FALSE))
+       {if (SX_gs.qflag == FALSE)
 	   SS_banner(si, SS_mk_string(si, SCODE));
 
 	SS_repl(si);
