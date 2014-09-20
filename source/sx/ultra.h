@@ -74,6 +74,14 @@ extern UL_scope_private
 /*--------------------------------------------------------------------------*/
 
 
+/* ULCMD.C declarations */
+
+extern void
+ UL_init_curves(SS_psides *si),
+ UL_init_env(SS_psides *si),
+ SX_mode_ultra(SS_psides *si, int load_init, int load_rc, int track);
+
+
 /* ULAUXF.C declarations */
 
 extern object
@@ -169,8 +177,7 @@ extern object
 
 extern void
  UL_init_view(SS_psides *si),
- UL_set_graphics_state(PG_device *d),
- UL_print_banner(void);
+ UL_set_graphics_state(PG_device *d);
 
 
 #ifdef __cplusplus

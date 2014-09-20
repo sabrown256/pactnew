@@ -526,8 +526,7 @@ int _SX_no_argsp(SS_psides *si, object *obj)
  *          - respective object
  */
 
-void SX_parse(SX_reparsed *pd,
-	      object *strm)
+void SX_parse(SX_reparsed *pd, object *strm)
    {int i, nl;
     char s[MAXLINE];
     char *t, *ptr, **sa;

@@ -53,9 +53,11 @@ void SX_end(SS_psides *si, int val)
 /* _SX_RD_SCM - do a SCHEME level open with error protection */
 
 static int _SX_rd_scm(SS_psides *si)
-   {
+   {char *cmd;
 
-    SS_call_scheme(si, "cf",
+    cmd = (SX_gs.sm == SX_MODE_PDBVIEW) ? "cf" : "rd";
+
+    SS_call_scheme(si, cmd,
                    SC_STRING_I, _SX.bf,
                    0);
 

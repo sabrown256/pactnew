@@ -11,13 +11,17 @@ set vgdirs = ( scheme pgs score )
 source ../scripts/test-env
 
 set Tests = ""
+set ultra = TRUE
+set pdbv  = TRUE
 
 while ($#argv > 0)
    switch ($1)
       case -h:
-           echo "Usage: sxtest [-h] [-t #] [-vg] [<test>]*"
+           echo "Usage: sxtest [-h] [-s] [-t #] [-u] [-vg] [<test>]*"
            echo "  h       this help message"
+           echo "  s       run only the SX/PDBView tests"
            echo "  t       run tests with # threads"
+           echo "  u       run only the Ultra tests"
            echo "  vg      run tests under valgrind"
            echo "  <test>  one of: oper hash c99 pdb ptr dattr"
            echo "                  text sqlite xml hdf vif"
@@ -32,6 +36,12 @@ while ($#argv > 0)
            shift
            setenv OMP_NUM_THREADS $1
            echo "Running tests with $1 threads"
+           breaksw
+      case -s:
+           set ultra = FALSE
+           breaksw
+      case -u:
+           set pdbv = FALSE
            breaksw
       case -*:
            breaksw
@@ -62,16 +72,22 @@ else if (-e $BinDir/sx) then
 
 # NOTE: remove files here so that platforms lacking 'system' might work
    set files = ""
-   set files = ( $files ultest.ps.diff ultest.err ultest.tmp )
-   set files = ( $files ultest.asc ultest.log )
-   set files = ( $files ultest.pdb ultest.pdb.chk )
-   set files = ( $files curves.a testt.cgm my.cgm )
-   set files = ( $files table1.tmp temp2.tmp ultest1.ps ultest2.ps temp2.tmp )
-   set files = ( $files _tmp.dat )
 
-   set files = ( $files sxpdb.res sxpdba.res sxpdbi.res sxhash.res sxpgs.ps )
-   set files = ( $files sxpdb.res.diff sxpdba.res.diff sxpdbi.res.diff )
-   set files = ( $files sxhash.res.diff sxpgs.ps.diff )
+   if ($ultra == TRUE) then
+      set files = ( $files ultest.ps.diff ultest.err ultest.tmp )
+      set files = ( $files ultest.asc ultest.log )
+      set files = ( $files ultest.pdb ultest.pdb.chk )
+      set files = ( $files curves.a testt.cgm my.cgm )
+      set files = ( $files table1.tmp temp2.tmp ultest1.ps ultest2.ps temp2.tmp )
+      set files = ( $files _tmp.dat )
+   endif
+
+   if ($pdbv == TRUE) then
+      set files = ( $files sxpdb.res sxpdba.res sxpdbi.res )
+      set files = ( $files sxhash.res sxpgs.ps )
+      set files = ( $files sxpdb.res.diff sxpdba.res.diff sxpdbi.res.diff )
+      set files = ( $files sxhash.res.diff sxpgs.ps.diff )
+   endif
 
    flog $Log $RM $files
 
@@ -84,14 +100,20 @@ else if (-e $BinDir/sx) then
 # NOTE: tests like ar that depend on demo.d* must come after the
 # exa test which creates these files
       set Tests = ""
-      set Tests = ( $Tests oper hash c99 )
-      set Tests = ( $Tests pdb ptr dattr text sqlite xml hdf vif )
-      set Tests = ( $Tests pgs axis iply )
-      set Tests = ( $Tests master exa shell copy mesh )
-      set Tests = ( $Tests rund intp intp-df intrp ar diff ext )
-      set Tests = ( $Tests umaster uio ufnc ufft ufill uaxis uannot uenv )
+
+      if ($pdbv == TRUE) then
+         set Tests = ( $Tests oper hash c99 )
+         set Tests = ( $Tests pdb ptr dattr text sqlite xml hdf vif )
+         set Tests = ( $Tests pgs axis iply )
+         set Tests = ( $Tests master exa shell copy mesh )
+         set Tests = ( $Tests rund intp intp-df intrp ar diff ext )
+      endif
+
+      if ($ultra == TRUE) then
+         set Tests = ( $Tests umaster uio ufnc ufft ufill uaxis uannot uenv )
 # GOTCHA: restore memory leak test
-#      set Tests = ( $Tests umaster umem uio ufnc ufft ufill uaxis uannot uenv )
+#         set Tests = ( $Tests umem )
+      endif
    endif
 
    foreach i ($Tests)
