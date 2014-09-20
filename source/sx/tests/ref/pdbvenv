@@ -21,3 +21,4 @@ expect: ../../sxpdbd.c ../../sxpdbf.c
 -> (../../sxpdbd.c
  ../../sxpdbf.c
 )
+

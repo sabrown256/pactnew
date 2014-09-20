@@ -508,7 +508,7 @@ enum e_SX_object_type
 typedef enum e_SX_object_type SX_object_type;
 
 enum e_SX_session_mode
-   {SX_MODE_SCHEME = 0, SX_MODE_PDBVIEW, SX_MODE_ULTRA};
+   {SX_MODE_SCHEME = 0, SX_MODE_SX, SX_MODE_PDBVIEW, SX_MODE_ULTRA};
 
 typedef enum e_SX_session_mode SX_session_mode;
 
