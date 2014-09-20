@@ -1,0 +1,29 @@
+#!/usr/bin/env pcsh
+#OPT -f
+#
+# ULTRA - 1D analysis and presentation tool
+#
+# include "cpyright.h"
+#
+
+@ err = 0
+
+set VERSION = "5.0"
+
+# determine the bin directory path
+set BinDir = $PACT/bin
+
+# determine if sx is available
+if (!(-x $BinDir/sx)) then
+   echo ""
+   echo "No SX executable found in '$BinDir' derived from '$0'"
+   echo "Your path is: $PATH"
+   echo ""
+   exit(1)
+endif
+
+$CROSS_FE $BinDir/sx -u $argv
+@ err = $status;
+
+exit($err)
+

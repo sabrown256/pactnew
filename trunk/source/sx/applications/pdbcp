@@ -8,7 +8,7 @@
 ; include "cpyright.h"
 ;
 
-(load "pdbview.scm")
+;(load "pdbview.scm")
 
 (define inf #f)
 (define outf #f)

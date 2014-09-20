@@ -34,7 +34,8 @@ TGTScm = applications/sxview.scm applications/sxcomp.scm applications/sxdm.scm \
          applications/toolbox.scm applications/mouse.scm applications/ultra.pui
 
 TGTScr = applications/pdbview applications/pdbdiff \
-         applications/pdbls applications/pdbcp applications/drun
+         applications/pdbls applications/pdbcp applications/drun \
+         applications/ultra
 
 TGTScrX = tpu tzu
 
@@ -67,7 +68,7 @@ DepLib = ${LibDir}/libscheme.a \
          ${LibDir}/libpml.a \
 	 ${LibDir}/libscore.a
 
-InstallDep = ${TGTLib} ${TGTExe} ${UltraExe} ${TGTScm} ${TGTScr}
+InstallDep = ${TGTLib} ${TGTExe} ${TGTScm} ${TGTScr}
 BinDep = ${Hdrs} ${TGTLib} ${DepLib}
 BinObj = ${LdFlags}
 
@@ -165,6 +166,8 @@ ${TGTExe} : ${BinDep} sxmain.c
 ${UltraExe} : ${BinDep} ultra.c
 	@(echo "${CCAnnounce} ultra.c -o ${UltraExe}" ; \
 	  ${CLD} ${LdFlags} ultra.c -o ${UltraExe} ${Libs})
+
+ultra : ${UltraExe}
 
 #
 # make the command test wrapper

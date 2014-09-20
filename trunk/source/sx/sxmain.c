@@ -8,9 +8,31 @@
 
 #include "cpyright.h"
  
-#include "sx_int.h"
+#include "ultra.h"
 #include "scope_raster.h"
 #include "scope_proc.h"
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_WHICH_MODE - decide whether we are in SCHEME, SX,
+ *               - ULTRA, or PDBView mode
+ */
+
+SX_session_mode SX_which_mode(int c, char **v)
+   {int i;
+    SX_session_mode rv;
+
+    rv = SX_MODE_SCHEME;
+
+/* process the command line arguments */
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-p") == 0)
+	    rv = SX_MODE_PDBVIEW;
+	 else if (strcmp(v[i], "-u") == 0)
+	    rv = SX_MODE_ULTRA;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -21,7 +43,7 @@ int main(int c, char **v, char **env)
    {int i, n, commnd_flag, tflag, load_rc;
     int load_init, n_files, ret, zsp;
     int upix, script_file, track;
-    char *cmd;
+    char *cmd, *code;
     SIGNED char order[MAXLINE];
     double evalt;
     SS_psides *si;
@@ -31,11 +53,48 @@ int main(int c, char **v, char **env)
 
     PD_set_fmt_version(3);
 
-    si = SX_init(SCODE, VERSION, c, v, env);
+    SX_gs.sm = SX_which_mode(c, v);
 
-    SS_init(si, "Aborting with error", SX_end,
-            TRUE, SS_interrupt_handler,
-            TRUE, NULL, 0);
+    switch (SX_gs.sm)
+       {case SX_MODE_ULTRA :
+	     code = "ULTRA";
+	     SC_init_path(1, "ULTRA");
+	     si = SS_init_scheme(CODE, VERSION, c, v, env, TRUE);
+	     SS_init(si, "Aborting with error", _UL_quit,
+		     TRUE, SS_interrupt_handler,
+		     FALSE, NULL, 0);
+
+/* ULTRA initializations not depending on scheme */
+	     UL_init_view(si);
+	     UL_init_hash();
+	     UL_install_global_vars(si);
+	     UL_install_funcs(si);
+
+/* ULTRA initializations depending on scheme */
+	     UL_install_scheme_funcs(si);
+	     UL_init_curves(si);
+
+	     UL_init_env(si);
+
+	     break;
+
+        case SX_MODE_PDBVIEW :
+        case SX_MODE_SX :
+	     code = "PDBView";
+	     si = SX_init(SCODE, VERSION, c, v, env);
+	     SS_init(si, "Aborting with error", SX_end,
+		     TRUE, SS_interrupt_handler,
+		     TRUE, NULL, 0);
+	     break;
+
+        default :
+        case SX_MODE_SCHEME :
+	     code = "SX";
+	     si = SX_init(SCODE, VERSION, c, v, env);
+	     SS_init(si, "Aborting with error", SX_end,
+		     TRUE, SS_interrupt_handler,
+		     TRUE, NULL, 0);
+	     break;};
 
 /* NOTE: be able to access remote files
  * this MUST be set before the PD_init_threads uses the current
@@ -81,7 +140,10 @@ int main(int c, char **v, char **env)
 
 /* process the command line arguments */
     for (i = 1; i < c; i++)
-        if (v[i][0] == '-')
+        if (strcmp(v[i], "-pid") == 0)
+	   SX_cache_addpid();                     /* curves-PID.a */
+
+        else if (v[i][0] == '-')
 	   {switch (v[i][1])
                {case 'e' :
 		     si->trap_error = FALSE;
@@ -102,7 +164,6 @@ int main(int c, char **v, char **env)
 #ifdef AIX
                      SC_set_io_interrupts(TRUE);
 #endif
-		     SX_gs.sm = SX_MODE_PDBVIEW;
                      break;
                 case 'q' :                      /* don't display the banner */
                      SX_gs.qflag = TRUE;
@@ -118,14 +179,13 @@ int main(int c, char **v, char **env)
                      tflag = TRUE;
                      break;
                 case 'u' :                                    /* ULTRA mode */
-                     SX_gs.sm      = SX_MODE_ULTRA;
                      SX_gs.gr_mode = TRUE;
 		     SC_set_io_interrupts(FALSE);
                      break;
                 case 'w' :           /* use X window for drawing not pixmap */
 		     upix = FALSE;
                      break;
-               case 'x' :
+		case 'x' :
                      track = FALSE;
                      break;
                 case 'z' :                              
@@ -155,13 +215,16 @@ int main(int c, char **v, char **env)
 
     SX_gs.background_color_white = TRUE;
 
-/* run in PDBView mode */
-    if (SX_gs.sm == SX_MODE_PDBVIEW)
-       SX_mode_pdbview(si, load_init, load_rc);
-
-/* run in vanilla SCHEME mode */
-    else
-       {SS_load_scm(si, "nature.scm");};
+    switch (SX_gs.sm)
+       {case SX_MODE_ULTRA :
+	     SX_mode_ultra(si, load_init, load_rc, track);
+	     break;
+        case SX_MODE_PDBVIEW :
+	     SX_mode_pdbview(si, load_init, load_rc);
+	     break;
+        default :
+	     SS_load_scm(si, "nature.scm");
+	     break;};
 
 /* read the optionally specified data/scheme files in order */
     for (i = 0; i < n_files; i++)
@@ -190,7 +253,7 @@ int main(int c, char **v, char **env)
 
     else
        {if (SX_gs.qflag == FALSE)
-	   SS_banner(si, SS_mk_string(si, SCODE));
+	   SS_banner(si, SS_mk_string(si, code));
 
 	SS_repl(si);
 
