@@ -92,14 +92,15 @@ object *_ULI_apropos(SS_psides *si, object *obj)
 
 /*--------------------------------------------------------------------------*/
 
-/* _UL_PRINT_OUT_DEVICE - print to the specified output device */
+/* _UL_GET_OUT_DEVICE - return the output device IDEV
+ *                    - open it if necessary
+ */
 
-static void _UL_print_out_device(SS_psides *si, int idev)
-   {int dx[PG_SPACEDM];
-    PG_device *dev;
-    PG_dev_geometry *g;
+static PG_device *_UL_get_out_device(SS_psides *si, int idev)
+   {PG_device *dev;
     out_device *out;
 
+    dev = NULL;
     out = SX_get_device(idev);
 
     if (out->active)
@@ -107,11 +108,11 @@ static void _UL_print_out_device(SS_psides *si, int idev)
 	if (dev == NULL)
            {if ((out->fname == NULL) || (strlen(out->fname) == 0))
 	       SS_error(si,
-			  "OUTPUT FILE NAME IS NULL - _UL_PRINT_OUT_DEVICE",
+			  "OUTPUT FILE NAME IS NULL - _UL_GET_OUT_DEVICE",
 			  SS_null);
             if ((out->type == NULL) || (strlen(out->type) == 0))
                SS_error(si,
-			  "OUTPUT FILE TYPE IS NULL - _UL_PRINT_OUT_DEVICE",
+			  "OUTPUT FILE TYPE IS NULL - _UL_GET_OUT_DEVICE",
 			  SS_null);
             dev = PG_make_device(out->dupp, out->type, out->fname);
             UL_set_graphics_state(dev);
@@ -120,33 +121,47 @@ static void _UL_print_out_device(SS_psides *si, int idev)
 
             if (dev == NULL)
                SS_error(si,
-			  "CAN'T OPEN OUTPUT FILE - _UL_PRINT_OUT_DEVICE",
+			  "CAN'T OPEN OUTPUT FILE - _UL_GET_OUT_DEVICE",
 			  SS_null);
 
-	    out->dev = dev;};
+	    out->dev = dev;};};
+
+    return(dev);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _UL_PRINT_OUT_DEVICE - print to the specified output device */
+
+static void _UL_print_out_device(SS_psides *si, int idev)
+   {int dx[PG_SPACEDM];
+    PG_device *dev;
+    PG_dev_geometry *g;
+
+    dev = _UL_get_out_device(si, idev);
 
 /* the set graphics state operation is necessary after PG_open_device
  * because a set window is done then which overrides gymin, gymax, etc
  */
-	if (dev != NULL)
-	   {g = &dev->g;
+    if (dev != NULL)
+       {g = &dev->g;
 
-	    dx[0] = PG_window_width(dev);
-	    dx[1] = PG_window_height(dev);
+	dx[0] = PG_window_width(dev);
+	dx[1] = PG_window_height(dev);
 
-	    UL_set_graphics_state(dev);
+	UL_set_graphics_state(dev);
 
-	    g->hwin[1] = g->hwin[0] + dx[0];
-	    g->hwin[3] = g->hwin[2] + dx[1];
+	g->hwin[1] = g->hwin[0] + dx[0];
+	g->hwin[3] = g->hwin[2] + dx[1];
 
-	    UL_draw_plot(dev);};};
+	UL_draw_plot(dev);};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _ULI_PRINTSCR - dump the screen to the printer */
+/* _ULI_PRINTSCR - dump the screen to the list of hardcopy devices */
 
 object *_ULI_printscr(SS_psides *si)
    {int i;

@@ -20,6 +20,31 @@ UL_scope_private
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* UL_INIT - initialize ULTRA */
+
+SS_psides *UL_init(char *code, char *vers, int c, char **v, char **env)
+   {SS_psides *si;
+
+    SC_init_path(1, "ULTRA");
+    si = SS_init_scheme(code, VERSION, c, v, env, TRUE);
+
+/* ULTRA initializations not depending on scheme */
+    UL_init_view(si);
+    UL_init_hash();
+    UL_install_global_vars(si);
+    UL_install_funcs(si);
+
+/* ULTRA initializations depending on scheme */
+    UL_install_scheme_funcs(si);
+    UL_init_curves(si);
+
+    UL_init_env(si);
+
+    return(si);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* UL_INIT_VIEW - initialize the plot parameters */
 
 void UL_init_view(SS_psides *si)
@@ -809,6 +834,10 @@ void UL_init_env(SS_psides *si)
 object *UL_mode_text(SS_psides *si)
    {object *ret;
 
+#if 1
+    ret = SX_mode_text(si);
+#else
+
     if (PG_gs.console == NULL)
        PG_open_console("ULTRA II", SX_gs.console_type,
 		       SX_gs.background_color_white,
@@ -834,11 +863,6 @@ object *UL_mode_text(SS_psides *si)
     si->pr_ch_un   = SS_unget_ch;
     si->pr_ch_out  = SS_put_ch;
 
-#ifdef NO_SHELL
-    SS_set_put_line(si, SX_fprintf);
-    SS_set_put_string(si, SX_fputs);
-    SC_set_get_line(PG_wind_fgets);
-#else
     SS_set_put_line(si, SS_printf);
     SS_set_put_string(si, SS_fputs);
     SC_set_get_line(io_gets);
@@ -875,6 +899,7 @@ object *UL_mode_graphics(SS_psides *si)
         si->post_eval  = _UL_parse;
         si->post_print = _UL_print;
 	si->pr_gets    = _SX_get_input;
+
 	SS_set_put_line(si, SX_fprintf);
 	SS_set_put_string(si, SX_fputs);
 	if (PG_gs.console == NULL)
@@ -898,7 +923,8 @@ object *UL_mode_graphics(SS_psides *si)
 /* map the ultra graphics state onto the device */
 	    UL_set_graphics_state(SX_gs.graphics_device);
 
-	    SX_setup_viewspace(SX_gs.graphics_device, UL_gs.window_height_factor);
+	    SX_setup_viewspace(SX_gs.graphics_device,
+			       UL_gs.window_height_factor);
 
 /* open the device now */
 	    PG_open_device(SX_gs.graphics_device,
