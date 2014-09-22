@@ -807,6 +807,50 @@ static object *_SXI_get_window(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
+/* _SXI_TRANS_BOX - translate a box between coordinate systems */
+
+static object *_SXI_trans_box(SS_psides *si, object *argl)
+   {int nd;
+    PG_coord_sys ics, ocs;
+    double x[PG_BOXSZ];
+    PG_device *dev;
+    object *rv;
+
+    dev = NULL;
+    x[0] = 0.0;
+    x[1] = 0.0;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &nd,
+            SC_ENUM_I, &ics,
+            SC_ENUM_I, &ocs,
+            SC_DOUBLE_I, &x[0],
+            SC_DOUBLE_I, &x[1],
+            SC_DOUBLE_I, &x[2],
+            SC_DOUBLE_I, &x[3],
+            SC_DOUBLE_I, &x[4],
+            SC_DOUBLE_I, &x[5],
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_TRANS_BOX", SS_null);
+
+    else
+       PG_trans_box(dev, nd, ics, x, ocs, x);
+
+    rv = SS_make_list(si, SC_DOUBLE_I, &x[0],
+		      SC_DOUBLE_I, &x[1],
+		      SC_DOUBLE_I, &x[2],
+		      SC_DOUBLE_I, &x[3],
+		      SC_DOUBLE_I, &x[4],
+		      SC_DOUBLE_I, &x[5],
+		      0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
 /* _SXI_PTOS - convert from pixel to screen coordinates */
 
 static object *_SXI_ptos(SS_psides *si, object *argl)
@@ -2170,6 +2214,11 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Return a list of current font specifications on the given device",
                SS_nargs,
                _SXI_gtxf, SS_PR_PROC);
+
+    SS_install(si, "pg-trans-box",
+               "Return the given box in input coordinate system in output coordinate system",
+               SS_nargs,
+               _SXI_trans_box, SS_PR_PROC);
 
     SS_install(si, "pg-viewport",
                "Return a list of numbers defining the extent of the viewport in NDC",

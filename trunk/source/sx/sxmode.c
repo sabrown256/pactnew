@@ -315,26 +315,10 @@ object *SX_mode_text(SS_psides *si)
         PG_close_device(SX_gs.graphics_device);
         SX_gs.graphics_device = NULL;
 
-/* give default values to the lisp package interface variables */
-        si->post_read  = NULL;
-        si->post_eval  = NULL;
-        si->post_print = NULL;
 	si->pr_gets    = _SX_get_input;
-        si->pr_ch_un   = SS_unget_ch;
-        si->pr_ch_out  = SS_put_ch;
         si->post_read  = _SX_read;
         si->post_eval  = _SX_parse;
         si->post_print = _SX_print;
-
-#ifdef NO_SHELL
-        SS_set_put_line(si, SX_fprintf);
-        SS_set_put_string(si, SX_fputs);
-        SC_set_get_line(PG_wind_fgets);
-#else
-        SS_set_put_line(si, SS_printf);
-        SS_set_put_string(si, SS_fputs);
-        SC_set_get_line(io_gets);
-#endif
 
         SX_gs.gr_mode   = FALSE;
         SX_gs.plot_flag = FALSE;
@@ -342,6 +326,17 @@ object *SX_mode_text(SS_psides *si)
         ret = SS_t;}
     else
         ret = SS_f;
+
+/* give default values to the lisp package interface variables */
+    si->post_read  = NULL;
+    si->post_eval  = NULL;
+    si->post_print = NULL;
+    si->pr_ch_un   = SS_unget_ch;
+    si->pr_ch_out  = SS_put_ch;
+
+    SS_set_put_line(si, SS_printf);
+    SS_set_put_string(si, SS_fputs);
+    SC_set_get_line(io_gets);
 
     SS_set_prompt(si, "SX-> ");
 
@@ -453,8 +448,9 @@ object *SX_mode_graphics(SS_psides *si)
 	   SC_set_get_line(PG_wind_fgets);
 
         SX_gs.gr_mode         = TRUE;
-        SX_gs.graphics_device = PG_make_device(SX_gs.display_name, SX_gs.display_type,
-                                            SX_gs.display_title);
+        SX_gs.graphics_device = PG_make_device(SX_gs.display_name,
+					       SX_gs.display_type,
+					       SX_gs.display_title);
 
 /* map the PDBView graphics state onto the device */
 	if (SX_gs.graphics_device != NULL)

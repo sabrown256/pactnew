@@ -47,6 +47,7 @@ int main(int c, char **v, char **env)
     SIGNED char order[MAXLINE];
     double evalt;
     SS_psides *si;
+    void (*err)(SS_psides *si, int err);
 
     PD_register_sql();
     PD_register_hdf5();
@@ -58,43 +59,27 @@ int main(int c, char **v, char **env)
     switch (SX_gs.sm)
        {case SX_MODE_ULTRA :
 	     code = "ULTRA";
-	     SC_init_path(1, "ULTRA");
-	     si = SS_init_scheme(CODE, VERSION, c, v, env, TRUE);
-	     SS_init(si, "Aborting with error", _UL_quit,
-		     TRUE, SS_interrupt_handler,
-		     FALSE, NULL, 0);
-
-/* ULTRA initializations not depending on scheme */
-	     UL_init_view(si);
-	     UL_init_hash();
-	     UL_install_global_vars(si);
-	     UL_install_funcs(si);
-
-/* ULTRA initializations depending on scheme */
-	     UL_install_scheme_funcs(si);
-	     UL_init_curves(si);
-
-	     UL_init_env(si);
-
+	     err  = _UL_quit;
+	     si   = UL_init(code, VERSION, c, v, env);
 	     break;
 
         case SX_MODE_PDBVIEW :
         case SX_MODE_SX :
 	     code = "PDBView";
-	     si = SX_init(SCODE, VERSION, c, v, env);
-	     SS_init(si, "Aborting with error", SX_end,
-		     TRUE, SS_interrupt_handler,
-		     TRUE, NULL, 0);
+	     err  = SX_end;
+	     si   = SX_init(code, VERSION, c, v, env);
 	     break;
 
         default :
         case SX_MODE_SCHEME :
 	     code = "SX";
-	     si = SX_init(SCODE, VERSION, c, v, env);
-	     SS_init(si, "Aborting with error", SX_end,
-		     TRUE, SS_interrupt_handler,
-		     TRUE, NULL, 0);
+	     err  = SX_end;
+	     si   = SX_init(code, VERSION, c, v, env);
 	     break;};
+
+    SS_init(si, "Aborting with error", err,
+	    TRUE, SS_interrupt_handler,
+	    TRUE, NULL, 0);
 
 /* NOTE: be able to access remote files
  * this MUST be set before the PD_init_threads uses the current
