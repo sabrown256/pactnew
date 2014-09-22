@@ -181,7 +181,7 @@ int main(int c, char **v, char **env)
 		        printf("ERROR: Bad flag %s\n", v[i]);
                      break;};}
 
-        else if ((SX_gs.sm == SX_MODE_PDBVIEW) &&
+        else if (((SX_gs.sm == SX_MODE_PDBVIEW) || (SX_gs.sm == SX_MODE_ULTRA)) &&
 		 (v[i][0] != '(') && !commnd_flag)
            order[n_files++] = -i;
 
