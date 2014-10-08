@@ -10,23 +10,25 @@
 
 (plot-date off)
 
+(define dbg #f)
+(define mode 'batch)
+(ps-name "pdbvtbl")
+
 ; demo
-(define (display name x y dx dy)
-   (cw name "COLOR" "WINDOW" x y dx dy))
+(cond ((eqv? mode 'demo)
+;       (define (display name x y dx dy)
+;	   (cw name "COLOR" "WINDOW" x y dx dy))
 
-(define tag "DEMO")
-
+       (define tag "DEMO"))
 
 ; batch test
+      ((eqv? mode 'batch)
 
-;(define (display name x y dx dy)
-;   (cw name "COLOR" "PS" 0 0 1 1))
+;       (define (display name x y dx dy)
+;	   (cw name "COLOR" "PS" 0 0 1 1))
 
-; redefine pause as a no-op
-;(define (pause) #t)
-
-;(define tag "BATCH")
-;(define look "original")
+       (define tag "BATCH")
+       (define look "original")))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -35,8 +37,19 @@
     (printf nil "\n\n(%s) %s\n" tag first)
     (if rest
 	(for-each (lambda (x) (printf nil "       %s\n" x)) rest))
-;    (pause)
-    )
+    (if dbg
+	(pause)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (show)
+    (ref-mesh on)
+    (if (eqv? mode 'demo)
+	(begin (wu)
+	       (pause))
+	(hc))
+    (dl))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -49,7 +62,8 @@
 				    (list rname (list np) fi)
 				    node)))
 
-;	 (print-pdb nil (list (pm-mapping->pdbdata f) 4))
+         (if dbg
+	     (print-pdb nil (list (pm-mapping->pdbdata f) 4)))
 	 (display-mapping* f)))
 
 ;--------------------------------------------------------------------------
@@ -62,51 +76,47 @@
 				    (list rname (list imx jmx) fi)
 				    node)))
 
-;	 (print-pdb nil (list (pm-mapping->pdbdata f) 4))
+         (if dbg
+	     (print-pdb nil (list (pm-mapping->pdbdata f) 4)))
 	 (display-mapping* f)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 (if (or (not (file? "test_1.out"))
-	(not (file? "test_2.out"))
-	(not (file? "test_3.out"))
-	(not (file? "test_4.out"))
-	(not (file? "test_5.out")))
+	(not (file? "test_2.out")))
      (begin (remarks "Missing needed data files")
 	    (quit 1)))
 
-(define window-size 0.35)
+;(define window-size 0.35)
 (overlay on)
 
 ;--------------------------------------------------------------------------
+(trace plot-1d-table plot-2d-table wu hc dl)
+(trace wm-win-hardcopy vp-hardcopy)
+(remarks "Plot test #1 data")
 
-(remarks "Plot test #4 data")
-
-(plot-1d-table "test_4.out" 1 1 "x" 1 2 "f" 3)
-(plot-2d-table "test_4.out" 2 1 10 15 "xi" 2 3 "fi" 4)
+(plot-1d-table "test_1.out" 1 1 "x" 1 2 "f" 3)
+(plot-2d-table "test_1.out" 2 1 10 15 "xi" 2 3 "fi" 4)
 
 (lsv)
 (dr 1 (render fill-poly))
 (dr 2 (render scatter-plot))
-(ref-mesh on)
-(wu)
-(pause)
-(dl)
+(show)
 
 ;--------------------------------------------------------------------------
 
-(remarks "Plot test #5 data")
+; 2D table plots
 
-(plot-1d-table "test_5.out" 1 1 "x" 1 2 "f" 3)
-(plot-2d-table "test_5.out" 2 1 10 15 "xi" 2 3 "fi" 4)
+(remarks "Plot test #2 data")
+
+(plot-1d-table "test_2.out" 1 1 "x" 1 2 "f" 3)
+(plot-2d-table "test_2.out" 2 1 10 15 "xi" 2 3 "fi" 4)
 
 (lsv)
 (dr 1 (render fill-poly))
 (dr 2 (render scatter-plot))
-(ref-mesh on)
-(wu)
-(pause)
+(show)
 (lsv)
 (dl)
 

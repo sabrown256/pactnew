@@ -1954,6 +1954,24 @@ void PM_rotate_vectors(int nd, int n, double **x, double *x0, double *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_PROJECT_VECTORS - project N ND vectors onto the X-Y plane */
+
+double **PM_project_vectors(int nd, int n, double **x)
+   {int i, id;
+    double **t;
+
+    t = CMAKE_N(double *, 2);
+
+    for (id = 0; id < 2; id++)
+        {t[id] = CMAKE_N(double, n);
+	 for (i = 0; i < n; i++)
+	     t[id][i] = x[id][i];};
+
+    return(t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_CONVERT_VECTORS - convert N ND vectors X to type double */
 
 double **PM_convert_vectors(int nd, int n, void *v, char *typ)
