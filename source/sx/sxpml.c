@@ -827,38 +827,44 @@ static object *_SXI_get_text_set_name(SS_psides *si, object *set)
 static object *_SXI_set_attr_set(SS_psides *si, object *argl)
    {PM_set *s;
     char *name, *type;
-    object *val;
+    object *val, *o, *rv;
     pcons *inf;
 
+    rv = SS_f;
+
     s    = NULL;
+    o    = NULL;
     name = NULL;
     type = NULL;
     val  = SS_null;
     SS_args(si, argl,
-            G_SET, &s,
+            SS_OBJECT_I, &o,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
             SS_OBJECT_I, &val,
             0);
 
-    if ((s == NULL) || (name == NULL) || (type == NULL))
+    if ((o == NULL) || (name == NULL) || (type == NULL))
        SS_error(si, "INSUFFICIENT ARGUMENTS - _SXI_SET_ATTR_SET", argl);
 
-    else
+    else if (SX_SETP(o))
+       {s = SS_GET(PM_set, o);
 
 /* get the current list */
-       {if (s->info_type != NULL)
+	if (s->info_type != NULL)
 	   {if (strcmp(s->info_type, SC_PCONS_P_S) == 0)
 	       inf = (pcons *) s->info;
 	    else
 	       inf = NULL;}
-        else
+	else
 	   inf = NULL;
 
 	s->info      = SX_set_attr_alist(si, inf, name, type, val);
-	s->info_type = SC_PCONS_P_S;};
+	s->info_type = SC_PCONS_P_S;
 
-    return(SS_t);}
+	rv = SS_t;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

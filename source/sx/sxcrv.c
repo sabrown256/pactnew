@@ -111,6 +111,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
     char s[10], s1[10], t[10];
     procedure *pp;
     object *o, *v, *p;
+    curve *pc;
 
     nc = SX_gs.n_curves;
 
@@ -138,16 +139,23 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
 
 /* initialize the new curves */
     for (i = nc; i < SX_gs.n_curves; i++)
-        {SX_gs.dataset[i].id       = ' ';
-         SX_gs.dataset[i].obj      = (void *) SS_null;
-         SX_gs.dataset[i].n        = 0;
-         SX_gs.dataset[i].modified = FALSE;
-         SX_gs.dataset[i].info     = PG_set_line_info(NULL,
-						      PLOT_CARTESIAN,
-						      CARTESIAN_2D,
-						      LINE_SOLID,
-						      FALSE, 0, 0,
-						      0, 0.0);
+        {pc = SX_gs.dataset + i;
+
+	 pc->file_type = SC_NO_FILE;
+         pc->text      = NULL;
+	 pc->file_info = NULL;
+	 pc->file      = NULL;
+
+	 pc->id       = ' ';
+         pc->obj      = (void *) SS_null;
+         pc->n        = 0;
+         pc->modified = FALSE;
+         pc->info     = PG_set_line_info(NULL,
+					 PLOT_CARTESIAN,
+					 CARTESIAN_2D,
+					 LINE_SOLID,
+					 FALSE, 0, 0,
+					 0, 0.0);
          SX_gs.number[i]           = -1;
 	 SX_gs.data_index[i]       = -1;
 

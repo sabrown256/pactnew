@@ -2360,6 +2360,9 @@
 
     (file-manager "freplicate" "viewport" nil file args))
 
+(define (save-mapping* file . args)
+    (file-manager "freplicate" "viewport" nil file args))
+
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
