@@ -1667,7 +1667,8 @@
 	   (vr (viewport-rendering vp))
 	   (gr (viewport-graphs vp))
 	   (ms (viewport-meshes vp))
-	   (im (viewport-images vp)))
+	   (im (viewport-images vp))
+	   (rv nil))
 
       (define-macro (map-one x)
           (set! x (resolve-to-drawable current-file x))
@@ -1676,39 +1677,40 @@
 ; with first existing entry in gr, ms, or im (any one is enough).
 ; Among other things this may mean writing a pm-set-dimension.
 	  (let* ((y (make-drawable x)))
-	    (cond ((pg-graph? x)
-		   (if (or (not gr)
-			   (= (car (pm-mapping-dimension x))
-			      (car (pm-mapping-dimension
-				    (drawable-data (car gr))))))
-		       (set! gr (cons y gr))
-		       (printf nil "\nDimensions don't match previous mapping\n")))
-		  ((pg-image? x)
-		   (set! im (cons y im)))
-		  ((pm-set? x)
-		   (set! ms (cons y ms))))))
+	        (cond ((pg-graph? x)
+		       (if (or (not gr)
+			       (= (car (pm-mapping-dimension x))
+				  (car (pm-mapping-dimension
+					(drawable-data (car gr))))))
+			   (set! gr (cons y gr))
+			   (printf nil
+				   "\nDimensions don't match previous mapping\n")))
+		      ((pg-image? x)
+		       (set! im (cons y im)))
+		      ((pm-set? x)
+		       (set! ms (cons y ms)))))
+	  x)
 
       (if g
-	  (begin
-	    (plot-flag on)
-	    (for-each map-one g)
-	    (if gr
-		(begin (if overlay-flag
-			   (set-dr-from-vr 0 gr vp))
-		       (set-viewport-graphs! vp gr)))
-	    (if im
-		(begin (if overlay-flag
-			   (set-dr-from-vr 0 im vp))
-		       (set-viewport-images! vp im)))
-	    (if ms
-		(begin (if overlay-flag
-			   (set-dr-from-vr 0 ms vp))
-		       (set-viewport-meshes! vp ms)))))
+	  (begin (plot-flag on)
+		 (set! rv (map map-one g))
+		 (if gr
+		     (begin (if overlay-flag
+				(set-dr-from-vr 0 gr vp))
+			    (set-viewport-graphs! vp gr)))
+		 (if im
+		     (begin (if overlay-flag
+				(set-dr-from-vr 0 im vp))
+			    (set-viewport-images! vp im)))
+		 (if ms
+		     (begin (if overlay-flag
+				(set-dr-from-vr 0 ms vp))
+			    (set-viewport-meshes! vp ms)))))
 
       (if (and (not vr) default-vr)
 	  (set-viewport-rendering! vp (list default-vr)))
 
-      vp))
+      rv))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -1827,14 +1829,14 @@
 	   (gr     (viewport-graphs vp))
 	   (im     (viewport-images vp))
 	   (ms     (viewport-meshes vp))
-	   (grimms (append (append gr im) ms)))
+	   (grimms (append gr im ms)))
 
 ; The order gr, im, ms in grimms is required for consistency with wm-vp-list.
 
-      (define (gr-map-eqv? a b)
-	  (cond ((eqv? a b))
-		((mapping? a)
-		 (eqv? a (pg-drawable-info b "f")))))
+;      (define (gr-map-eqv? a b)
+;	  (cond ((eqv? a b))
+;		((mapping? a)
+;		 (eqv? a (pg-drawable-info b "f")))))
 
       (define (delete-one x)
 	(let* ((y (drawable-data x)))
