@@ -213,6 +213,56 @@ void PG_draw_polyline_n(PG_device *dev ARG(,,cls), int nd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PG_DRAW_PROJECTED_POLYLINE_N - rotate disjoint line segments
+ *                              - and draw the projection in the X-Y
+ *                              - plane
+ *                              - segments specified in CS coordinates
+ *                              - N is the number of segments hence half
+ *                              - the number of points
+ *                              - X[2*i] is one endpoint of the ith segment
+ *                              - and X[2*i+1] is the other endpoint
+ *                              - CLIP specifies wether the set is clipped
+ *                              - to the viewport limits
+ *
+ * #bind PG_draw_projected_polyline_n fortran() scheme() python()
+ */
+
+void PG_draw_projected_polyline_n(PG_device *dev ARG(,,cls), int nd,
+				  PG_coord_sys cs ARG(WORLDC),
+				  long n, double **x,
+				  int clip ARG(TRUE))
+   {int rel;
+    long np;
+    double **t;
+    void (*f)(PG_device *dev, double **r, long n,
+	      int clip, int coord);
+
+    if ((dev != NULL) && (dev->draw_dj_polyln_2 != NULL))
+       {f  = dev->draw_dj_polyln_2;
+	np = 2*n;
+
+	if (nd > 2)
+	   {PG_rotate_vectors(dev, nd, np, x);
+	    t   = PM_project_vectors(2, np, x);
+	    rel = TRUE;}
+	else
+	   {t   = x;
+	    rel = FALSE;};
+
+/* if auto ranging or domaining is on the data will control the WC system */
+	if (clip && (dev->autorange || dev->autodomain))
+	   PG_set_limits_n(dev, nd, cs, np, t, PLOT_CARTESIAN);
+
+	f(dev, t, n, clip, cs);
+
+	if (rel == TRUE)
+	   PM_free_vectors(2, t);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PG_DRAW_DISJOINT_POLYLINE_N - draws disjoint ND dimensional line
  *                             - segments specified in CS coordinates
  *                             - N is the number of segments hence half

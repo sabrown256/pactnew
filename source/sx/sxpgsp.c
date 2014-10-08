@@ -155,7 +155,7 @@ static object *_SXI_def_mrk(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
  
 /* _SXI_DRW_MRK - draw markers at the specified points
- *              - form (pg-draw-markers dev marker xlst ylst)
+ *              - form (pg-draw-markers dev nd cs marker xlst ylst)
  */
 
 static object *_SXI_drw_mrk(SS_psides *si, object *argl)
@@ -177,7 +177,7 @@ static object *_SXI_drw_mrk(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_DEVICE, &dev,
 	    SC_INT_I, &nd,
-	    SC_ENUM_I,    &cs,
+	    SC_ENUM_I, &cs,
 	    SC_INT_I, &mrk,
 	    SS_OBJECT_I,  &x[0],
 	    SS_OBJECT_I,  &x[1],
@@ -364,6 +364,49 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
     PG_fset_line_color(dev, dev->line_color, TRUE);
 
     PG_draw_disjoint_polyline_n(dev, nd, cs, (long) n/2, x, clip);
+
+    for (i = 0; i < nd; i++)
+        CFREE(x[i]);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_DPPN - project and draw a set of disjoint nd line segments */
+
+static object *_SXI_dppn(SS_psides *si, object *argl)
+   {int i, n, nd, clip;
+    double *x[PG_SPACEDM];
+    PG_coord_sys cs;
+    PG_device *dev;
+
+    dev  = NULL;
+    nd   = 0;
+    clip = TRUE;
+    cs   = WORLDC;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &nd,
+            SC_ENUM_I, &cs,
+            SC_INT_I, &clip,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_DPPN", SS_car(si, argl));
+
+    n = 0;
+    memset(x, 0, sizeof(x));
+
+    argl = SS_cddr(si, SS_cddr(si, argl));
+    if (nd == 2)
+       _SX_args_arr_2(si, argl, &n, &x[0], &x[1]);
+    else if (nd == 3)
+       _SX_args_arr_3(si, argl, &n, &x[0], &x[1], &x[2]);
+
+    PG_fset_line_color(dev, dev->line_color, TRUE);
+
+    PG_draw_projected_polyline_n(dev, nd, cs, (long) n/2, x, clip);
 
     for (i = 0; i < nd; i++)
         CFREE(x[i]);
@@ -2029,6 +2072,11 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Draw a set of disjoint ND line segments",
                SS_nargs,
                _SXI_ddpn, SS_PR_PROC);
+
+    SS_install(si, "pg-draw-projected-polyline-n",
+               "Project and draw a set of disjoint ND line segments",
+               SS_nargs,
+               _SXI_dppn, SS_PR_PROC);
 
     SS_install(si, "pg-draw-line",
                "Draw a line on the given device",

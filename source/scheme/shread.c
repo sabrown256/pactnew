@@ -123,10 +123,14 @@ static object *_SS_rd_lst(SS_psides *si, object *str, int c)
 		  nxt = READ_EXPR(str);
 		  if (SS_eofobjp(nxt))
 		     {if ((c = SS_get_ch(si, str, TRUE)) == EOF)
-			 {SS_clr_strm(str);
-			  SS_error(si,
-				     "UNEXPECTED END OF FILE - READ-LIST",
-				     SS_null);}
+			 {char s[MAXLINE];
+
+			  snprintf(s, MAXLINE, 
+				   "UNEXPECTED END OF FILE '%s' - READ-LIST",
+				   SS_IFILE_NAME(str));
+
+			  SS_clr_strm(str);
+			  SS_error(si, s, SS_null);}
 		      else
 			 PUSH_CHAR(c, str);};
 		  SS_end_cons(si, frst, ths, nxt);

@@ -882,6 +882,7 @@ extern void
 extern double
  PM_distance(int nd, double *x1, double *x2, double *g),
  PM_polygon_area(PM_polygon *py),
+ **PM_project_vectors(int nd, int n, double **x),
  **PM_convert_vectors(int nd, int n, void *v, char *typ);
 
 

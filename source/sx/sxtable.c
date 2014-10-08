@@ -12,6 +12,22 @@
 
 typedef struct s_tabdesc tabdesc;
 
+typedef struct s_tabinfo tabinfo;
+
+struct s_tabinfo
+   {int n;         /* table number */
+    int fn;        /* first num */
+    int nl;
+    int nr;        /* number of rows */
+    int nc;        /* number of columns */
+    int lsz;       /* size of linein and label */
+    int nlabel;
+    long addrt;    /* address of beginning of table */
+    long addrl;    /* address of table lable */
+    char *linein;
+    char *label;
+    FILE *fp;};
+
 struct s_tabdesc
    {int n;
     long ln;
@@ -127,12 +143,22 @@ static int _SX_setup_clabels(char *label, int nc, int linelen)
  * 
  */
 
-static int SX_find_text_table(FILE *fp, int n, int linelen, char *linein,
-			      int *pfn, int *pnr, int *pnc, int nl,
-			      long *paddrt, int nlab, long *paddrl)
-   {int i, j, nc, nr, nt, firstnum, nbefore, nafter, nlb, rv;
+static int SX_find_text_table(tabinfo *ti)
+   {int i, j, n, nl, nc, nr, nt, nlab;
+    int firstnum, nbefore, nafter, nlb, rv;
+    int linelen;
     long *addr, naddr, addrt, addrl;
-    char *token;
+    char *token, *linein;
+    FILE *fp;
+
+    rv = FALSE;
+
+    fp      = ti->fp;
+    n       = ti->n;
+    nl      = ti->nl;
+    nlab    = ti->nlabel;
+    linelen = ti->lsz;
+    linein  = ti->linein;
 
     addrl   = -1;
     nbefore = 0;
@@ -154,7 +180,7 @@ static int SX_find_text_table(FILE *fp, int n, int linelen, char *linein,
 	 if (nlb > nbefore)
 	    nlb = 0;
 	 if (GETLN(linein, linelen, fp) == NULL)
-            return(FALSE);};
+            return(rv);};
 
 /* loop over tables */
     for (j = 0; j < n; j++)
@@ -235,19 +261,82 @@ static int SX_find_text_table(FILE *fp, int n, int linelen, char *linein,
         for (i = 0; i < nafter; i++)
             {addrl = io_tell(fp);
              if (GETLN(linein, linelen, fp) == NULL)
-                return(FALSE);};};
+                return(rv);};};
 
     CFREE(addr);
 
     if ((j == n) && (nc > 0))
-       {*pfn    = firstnum;
-	*pnc    = nc;
-	*pnr    = nr;
-	*paddrt = addrt;
-	*paddrl = addrl;
-	rv = TRUE;}
+       {ti->fn    = firstnum;
+	ti->nc    = nc;
+	ti->nr    = nr;
+	ti->addrt = addrt;
+	ti->addrl = addrl;
+	rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_READ_TABLE - read the specified table into the current table */
+
+static object *_SX_read_table(SS_psides *si, tabinfo *ti)
+   {int ir, ic, nl, nr, nc, n, sz;
+    char *token;
+    FILE *fp;
+    object *rv;
+
+    n  = ti->n;
+    nl = ti->nl;
+    nr = ti->nr;
+    nc = ti->nc;
+    sz = ti->lsz;
+    fp = ti->fp;
+
+    _SX_table.current = PM_create(nr, nc);
+
+    if (ti->addrl != -1)
+       {if (io_seek(fp, ti->addrl, SEEK_SET))
+	   return(SS_f);
+
+	GETLN(ti->label, sz, fp);}
     else
-       rv = FALSE;
+        ti->label[0] = '\0';
+
+    if (io_seek(fp, ti->addrt, SEEK_SET))
+       return(SS_f);
+
+    for (ir = 1; ir <= nr; ir++)
+        {GETLN(ti->linein, sz, fp);
+
+         for (ic = 1; ic <= nc; ic++)
+             {token = SC_firsttok(ti->linein, " \t\n\r");
+              if ((ic == 1) && !ti->fn)
+                 token = SC_firsttok(ti->linein, " \t\n\r");
+
+              PM_element(_SX_table.current, ir, ic) = ATOF(token);};};
+
+    io_close(fp);
+
+/* store column labels if available */
+    _SX_setup_clabels(ti->label, nc, sz);
+
+    if (si->interactive == ON)
+       {if (ti->label[0] == '\0')
+           PRINT(stdout,
+                 "\n Table %d : %d rows and %d columns\n\n",
+                 n, nr, nc);
+        else
+           PRINT(stdout,
+                 "\n Table %d : %d rows and %d columns\n Label: %s\n\n",
+                 n, nr, nc, ti->label);};
+
+    _SX_table.n  = n;
+    _SX_table.ln = nl;
+
+    rv = SS_make_list(si, SC_INT_I, &nr,
+		      SC_INT_I, &nc,
+		      0);
 
     return(rv);}
 
@@ -257,26 +346,25 @@ static int SX_find_text_table(FILE *fp, int n, int linelen, char *linein,
 /* _SXI_READ_TEXT_TABLE - read a table of numbers from an  ASCII input file */
 
 static object *_SXI_read_text_table(SS_psides *si, object *argl)
-   {int i, j, n, nc, nr, nl, fn, nlabel, linelen;
-    long addrt, addrl;
-    char *name, *token;
-    char *label, *linein;
+   {int linelen;
+    char *name;
     FILE *fp;
     object *rv;
+    tabinfo ti;
 
     if (_SX_table.current != NULL)
        {PM_destroy(_SX_table.current);
         _SX_table.current = NULL;};
 
-    name   = NULL;
-    n      = 1;
-    nl     = 1;
-    nlabel = 0;
+    name      = NULL;
+    ti.n      = 1;
+    ti.nl     = 1;
+    ti.nlabel = 0;
     SS_args(si, argl,
             SC_STRING_I, &name,
-            SC_INT_I, &n,
-            SC_INT_I, &nlabel,
-            SC_INT_I, &nl,
+            SC_INT_I, &ti.n,
+            SC_INT_I, &ti.nlabel,
+            SC_INT_I, &ti.nl,
             0);
 
     _SX_table.name = CSTRSAVE(name);
@@ -294,69 +382,21 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
        SS_error(si, "CAN'T READ FILE - _SXI_READ_TEXT_TABLE", argl);
 
     linelen += 10;
-    label  = CMAKE_N(char, linelen);
-    linein = CMAKE_N(char, linelen);
 
-    memset(label, 0, linelen);
+    ti.fp     = fp;
+    ti.lsz    = linelen;
+    ti.label  = CMAKE_N(char, linelen);
+    ti.linein = CMAKE_N(char, linelen);
 
-    if (!SX_find_text_table(fp, n, linelen, linein, &fn, &nr, &nc,
-			    nl, &addrt, nlabel, &addrl))
-       {CFREE(linein);
-        CFREE(label);
-        SS_error(si, "REQUESTED TABLE NOT FOUND - _SXI_READ_TEXT_TABLE",
-		   argl);}
+    memset(ti.label, 0, linelen);
 
-    _SX_table.current = PM_create(nr, nc);
-
-    if (addrl != -1)
-       {if (io_seek(fp, addrl, SEEK_SET))
-	   {CFREE(linein);
-            CFREE(label);
-            return(FALSE);}
-
-	GETLN(label, linelen, fp);}
+    if (SX_find_text_table(&ti) == TRUE)
+       rv = _SX_read_table(si, &ti);
     else
-        label[0] = '\0';
+       rv = SS_f;
 
-    if (io_seek(fp, addrt, SEEK_SET))
-       {CFREE(linein);
-        CFREE(label);
-        return(FALSE);}
-
-    for (i = 1; i <= nr; i++)
-        {GETLN(linein, linelen, fp);
-
-         for (j = 1; j <= nc; j++)
-             {token = SC_firsttok(linein, " \t\n\r");
-              if ((j == 1) && !fn)
-                 token = SC_firsttok(linein, " \t\n\r");
-
-              PM_element(_SX_table.current, i, j) = ATOF(token);};};
-
-    io_close(fp);
-
-/* store column labels if available */
-    _SX_setup_clabels(label, nc, linelen);
-
-    if (si->interactive == ON)
-       {if (label[0] == '\0')
-           PRINT(stdout,
-                 "\n Table %d : %d rows and %d columns\n\n",
-                 n, nr, nc);
-        else
-           PRINT(stdout,
-                 "\n Table %d : %d rows and %d columns\n Label: %s\n\n",
-                 n, nr, nc, label);};
-
-    CFREE(linein);
-    CFREE(label);
-
-    _SX_table.n = n;
-    _SX_table.ln = nl;
-
-    rv = SS_make_list(si, SC_INT_I, &nr,
-		      SC_INT_I, &nc,
-		      0);
+    CFREE(ti.linein);
+    CFREE(ti.label);
 
     return(rv);}
 
