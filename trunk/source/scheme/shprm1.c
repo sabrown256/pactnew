@@ -472,17 +472,20 @@ static object *_SS_lst_map(SS_psides *si, object *argl, int *Ex_flag)
 
     for (args = SS_null, rest = SS_null; SS_consp(argl); argl = SS_cdr(si, argl))
         {lst = SS_car(si, argl);
+	 if (SS_nullobjp(lst) == FALSE)
+	    {o = SS_car(si, lst);
 
 /* taking the car of each arg LST make up the list of ARGS for proc */
-         SS_end_cons(si, args, arg_nxt, SS_car(si, lst));
+	     SS_end_cons(si, args, arg_nxt, o);
 
 /* cons up a list with the REST of the argument lists */
-         if (!SS_nullobjp(lst = SS_cdr(si, lst)))
-            {SS_end_cons(si, rest, rest_nxt, lst);};
+	     lst = SS_cdr(si, lst);
+	     if (SS_nullobjp(lst) == FALSE)
+	        {SS_end_cons(si, rest, rest_nxt, lst);};
 
 /* if we're at the end of any arg LST signal to exit the loop */
-         if (!SS_consp(lst))
-            *Ex_flag = TRUE;};
+	     if (SS_consp(lst) == FALSE)
+	        *Ex_flag = TRUE;};};
 
 /* if there are no more ARG Lists reset ARGL to the REST of the arguments */
     o = SS_mk_cons(si, args, rest);
@@ -547,31 +550,32 @@ static object *_SSI_foreach(SS_psides *si, object *obj)
     if (!SS_consp(argl))
        return(proc);
 
-    SS_mark(argl);
-    expr = SS_null;
-    vl   = SS_null;
-    args = SS_null;
-    for (exf = FALSE; !exf; )
-        {SS_assign(si, vl, _SS_lst_map(si, argl, &exf));
-         if (SS_consp(SS_caar(si, vl)))
-            {SS_assign(si, args,
-		       SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
-             SS_assign(si, expr,
-		       SS_mk_cons(si, proc,
-				  SS_mk_cons(si, args, SS_null)));}
-         else
-            {SS_assign(si, args, SS_car(si, vl));
-             SS_assign(si, expr, SS_mk_cons(si, proc, args));};
-         SS_assign(si, argl, SS_cdr(si, vl));
-         SS_save(si, si->env);
-         SS_exp_eval(si, expr);
-         SS_restore(si, si->env);};
+    if (SS_nullobjp(SS_car(si, argl)) == FALSE)
+       {SS_mark(argl);
+	expr = SS_null;
+	vl   = SS_null;
+	args = SS_null;
+	for (exf = FALSE; !exf; )
+	    {SS_assign(si, vl, _SS_lst_map(si, argl, &exf));
+	     if (SS_consp(SS_caar(si, vl)))
+	        {SS_assign(si, args,
+			   SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
+		 SS_assign(si, expr,
+			   SS_mk_cons(si, proc,
+				      SS_mk_cons(si, args, SS_null)));}
+	     else
+	        {SS_assign(si, args, SS_car(si, vl));
+		 SS_assign(si, expr, SS_mk_cons(si, proc, args));};
+	     SS_assign(si, argl, SS_cdr(si, vl));
+	     SS_save(si, si->env);
+	     SS_exp_eval(si, expr);
+	     SS_restore(si, si->env);};
 
 /* clean up the mess */
-    SS_gc(si, expr);
-    SS_gc(si, argl);
-    SS_gc(si, args);
-    SS_gc(si, vl);
+	SS_gc(si, expr);
+	SS_gc(si, argl);
+	SS_gc(si, args);
+	SS_gc(si, vl);};
 
     return(SS_t);}
 

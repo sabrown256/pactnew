@@ -15,42 +15,12 @@ set exe = $BinDir/sx
 set opt = ( $pvopt -l $FilesDir/pdbvtbl.scm )
 set io  = pdbvtbl.tmp
 
-if (!(-f test_1.out)) then
-   cat >&! test_1.out << EOF
-# table #1
-  1  1  1  1
-  1  2  3  4
-  2  1  6  8
-  2  2  8 12
-  3  1  9 16
-  3  2 12 20
-# table #2
-  1  1  1  1
-  3  1  2  4
-  6  2  1  8
-  8  2  2 12
-  9  3  1 16
- 12  3  2 20
-EOF
+if (!(-f test_4.out)) then
+   cp $PSY_Base/pml/tests/ref/test_4.out .
 endif
 
-if (!(-f test_2.out)) then
-   cat >&! test_2.out << EOF
-# table #1
-  1  1  1  1
-  1  2  3  4
-  2  1  6  8
-  2  2  8 12
-  3  1  9 16
-  3  2 12 20
-# table #2
-  1  1  1  1
-  3  1  2  4
-  6  2  1  8
-  8  2  2 12
-  9  3  1 16
- 12  3  2 20
-EOF
+if (!(-f test_5.out)) then
+   cp $PSY_Base/pml/tests/ref/test_5.out .
 endif
 
    NoteD $Log ""
@@ -69,6 +39,10 @@ endif
       else
          awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' pdbvtbl.ps > pdbvtbl.ps.tmp
          flog $Log mv pdbvtbl.ps.tmp pdbvtbl.ps
+
+         if (!(-f $FilesDir/ref/pdbvtbl.ps)) then
+            flog $Log cp pdbvtbl.ps $FilesDir/ref/pdbvtbl.ps
+         endif
 
          flog $Log $cross_fe $PSDIFF pdbvtbl.ps $FilesDir/ref/pdbvtbl.ps
          set xstatus = $status

@@ -26,7 +26,7 @@ while ($#argv > 0)
            echo "  <test>  one of: oper hash c99 pdb ptr dattr"
            echo "                  text sqlite xml hdf vif"
            echo "                  pgs axis master exa iply shell copy mesh"
-           echo "                  rund intp intp-df intrp ar diff ext"
+           echo "                  rund intp intp-df intrp ar diff table ext"
            echo "                  umaster umem uio"
            echo "                  ufnc ufft ufill"
            echo "                  uannot uenv"
@@ -106,7 +106,7 @@ else if (-e $BinDir/sx) then
          set Tests = ( $Tests pdb ptr dattr text sqlite xml hdf vif )
          set Tests = ( $Tests pgs axis iply )
          set Tests = ( $Tests master exa shell copy mesh )
-         set Tests = ( $Tests rund intp intp-df intrp ar diff ext )
+         set Tests = ( $Tests rund intp intp-df intrp ar diff table ext )
       endif
 
       if ($ultra == TRUE) then

@@ -1,4 +1,3 @@
-#!pdbview -l
 ;
 ; PDBVTBL.SCM - PDBView table tests
 ;
@@ -8,27 +7,31 @@
 ; include "cpyright.h"
 ;
 
+(define look "original")
+
 (plot-date off)
 
 (define dbg #f)
 (define mode 'batch)
-(ps-name "pdbvtbl")
 
 ; demo
 (cond ((eqv? mode 'demo)
-;       (define (display name x y dx dy)
-;	   (cw name "COLOR" "WINDOW" x y dx dy))
-
+       (data-id on)
+       (plot-title on)
+       (plot-labels on)
        (define tag "DEMO"))
 
 ; batch test
       ((eqv? mode 'batch)
+       (cw "pdbvtbl" "MONOCHROME" "MPEG" 0 0 256 256)
+       (mpeg-flag off)          ; prevents MPEG being used with HC
+       (data-id off)
+       (plot-title off)
+       (plot-labels off)
+       (define tag "BATCH")))
 
-;       (define (display name x y dx dy)
-;	   (cw name "COLOR" "PS" 0 0 1 1))
-
-       (define tag "BATCH")
-       (define look "original")))
+(ps-name "pdbvtbl")
+(ps-flag on)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -44,26 +47,23 @@
 ;--------------------------------------------------------------------------
 
 (define (show)
+    (overlay on)
     (ref-mesh on)
-    (if (eqv? mode 'demo)
-	(begin (wu)
-	       (pause))
-	(hc))
+    (wu)
+    (hc)
+    (lsv)
     (dl))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-(define (plot-1d-table fname ti ncl dname xi yi rname fi)
+(define (plot-1d-table fname ti ncl dname xi rname fi)
    (let* ((shape (read-table* fname ti ncl))
 	  (np    (list-ref shape 0))
 	  (f     (table->pm-mapping (sprintf "%s->%s" dname rname)
-				    (list dname (list np) xi yi)
+				    (list dname (list np) xi)
 				    (list rname (list np) fi)
 				    node)))
-
-         (if dbg
-	     (print-pdb nil (list (pm-mapping->pdbdata f) 4)))
 	 (display-mapping* f)))
 
 ;--------------------------------------------------------------------------
@@ -75,33 +75,22 @@
 				    (list dname (list imx jmx) xi yi)
 				    (list rname (list imx jmx) fi)
 				    node)))
-
-         (if dbg
-	     (print-pdb nil (list (pm-mapping->pdbdata f) 4)))
 	 (display-mapping* f)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-(if (or (not (file? "test_1.out"))
-	(not (file? "test_2.out")))
+(if (or (not (file? "test_4.out"))
+	(not (file? "test_5.out")))
      (begin (remarks "Missing needed data files")
 	    (quit 1)))
 
-;(define window-size 0.35)
-(overlay on)
-
 ;--------------------------------------------------------------------------
-(trace plot-1d-table plot-2d-table wu hc dl)
-(trace wm-win-hardcopy vp-hardcopy)
+
 (remarks "Plot test #1 data")
 
-(plot-1d-table "test_1.out" 1 1 "x" 1 2 "f" 3)
-(plot-2d-table "test_1.out" 2 1 10 15 "xi" 2 3 "fi" 4)
+(plot-1d-table "test_4.out" 1 1 "x" 1 "f" 3)
 
-(lsv)
-(dr 1 (render fill-poly))
-(dr 2 (render scatter-plot))
 (show)
 
 ;--------------------------------------------------------------------------
@@ -110,15 +99,11 @@
 
 (remarks "Plot test #2 data")
 
-(plot-1d-table "test_2.out" 1 1 "x" 1 2 "f" 3)
-(plot-2d-table "test_2.out" 2 1 10 15 "xi" 2 3 "fi" 4)
+(plot-2d-table "test_5.out" 2 1 10 15 "xi" 2 3 "fi" 4)
 
-(lsv)
 (dr 1 (render fill-poly))
-(dr 2 (render scatter-plot))
+
 (show)
-(lsv)
-(dl)
 
 ;--------------------------------------------------------------------------
 
