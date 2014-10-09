@@ -539,9 +539,12 @@ static PM_set *_SX_lr_zc_domain(char *name)
  *               - <set-list>  := (name <dims> <component-1> <component-2> ...)
  *               - <dims>      := (d1 d2 ...)
  *               - <component> := (start [n-pts] [stride])
+ *               -
+ *               - if WH is TRUE then ND must match NDE
+ *               -
  */
 
-static PM_set *_SX_table_set(SS_psides *si, object *specs)
+static PM_set *_SX_table_set(SS_psides *si, object *specs, int wh)
    {int i, nd, nde, dv;
     int *maxes;
     long start, step, ne, npts;
@@ -571,6 +574,10 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs)
 
 	comps = SS_cddr(si, specs);
 	nde   = SS_length(si, comps);
+	if ((wh == TRUE) && (nd != nde))
+	   SS_error(si, "DIMENSION AND DIMENSION ELEMENT MISMATCH - _SX_TABLE_SET",
+		    specs);
+
 	elem  = CMAKE_N(double *, nde);
 	ne    = 0;
 
@@ -613,7 +620,7 @@ static object *_SXI_table_set(SS_psides *si, object *specs)
    {object *rv;
     PM_set *set;
 
-    set = _SX_table_set(si, specs);
+    set = _SX_table_set(si, specs, FALSE);
     rv  = SX_mk_set(si, set);
 
     return(rv);}
@@ -647,11 +654,11 @@ static object *_SXI_table_map(SS_psides *si, object *argl)
             SC_INT_I, &centering,
             0);
 
-    domain = _SX_table_set(si, dmlst);
+    domain = _SX_table_set(si, dmlst, TRUE);
     if (SS_nullobjp(rnlst))
        range = NULL;
     else
-       range = _SX_table_set(si, rnlst);
+       range = _SX_table_set(si, rnlst, FALSE);
 
     if (name == NULL)
        {static int tm = 1;
