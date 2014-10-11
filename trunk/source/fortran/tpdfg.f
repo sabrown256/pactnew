@@ -214,13 +214,6 @@
 
       type(C_PTR) :: fileid
 
-! ... PGS centering options
-      integer, parameter :: Z_CENT = -1
-      integer, parameter :: N_CENT = -2
-      integer, parameter :: F_CENT = -3
-      integer, parameter :: E_CENT = -4
-      integer, parameter :: U_CENT = -5
-
 ! ... local variables
       integer :: i, st
       integer :: dp(5), rp(5), pim(1)
@@ -393,7 +386,7 @@
 
 ! ... set and get and verify major order
       order = 102
-      if (pd_set_major_order_f(fileid, order) .ne. 102) &
+      if (pd_set_major_order_f(fileid, order) .ne. COLUMN_MAJOR_ORDER) &
          call errproc
       order = pd_get_major_order_f(fileid)
 
@@ -760,7 +753,7 @@
          call errproc
 
 ! ... check file mode
-      if (pd_get_mode_f(fileid) .ne. 7) &
+      if (pd_get_mode_f(fileid) .ne. PD_APPEND) &
          call errproc
 
 ! ... retrieve and verify the value of an attribute

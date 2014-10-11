@@ -17,12 +17,6 @@
       type(C_PTR) :: dev
 
 ! ... local variables
-      integer, parameter :: WORLDC = 1
-      integer, parameter :: NORMC = 2
-      integer, parameter :: PIXELC = 3
-      integer, parameter :: BOUNDC = 4
-      integer, parameter :: FRAMEC = 5
-
       integer(8) :: np
 
       real*8 :: x1, y1, x2, y2

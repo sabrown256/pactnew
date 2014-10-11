@@ -94,6 +94,8 @@ Note $Log ""
 
 # PARSE - parse the pre-Make file and make a file list
 
+   Separator $Log
+
    set Cfiles = ""
    set Ffiles = ""
    set Hfiles = ""
@@ -114,6 +116,9 @@ Note $Log ""
       NoteD $Log "Generating prototypes for:"
       NoteD $Log "   $flst"
    endif
+
+   Note $Log "Target = $tgt"
+   Note $Log "File List = $Lst"
 
    foreach i ($Lst)
       set j = $i:r.c
@@ -159,6 +164,8 @@ Note $Log ""
 #   sed 's/^.*#bind *//'                remove the #bind token, anything
 #                                       preceeding it, and whitespace after
 
+   Separator $Log
+
    flog $Log set cbind = $dst/$d.bind
 
    if ("$Cfiles" != "") then
@@ -196,6 +203,8 @@ Note $Log ""
 #   sed '/; *$/d'                                  remove lines ending in ;
 #   grep -v '='                                    remove lines with assignments
 #
+
+   Separator $Log
 
    flog $Log set cproto = $dst/$d.protoc
 
@@ -265,6 +274,8 @@ Note $Log ""
 #
 #
 
+   Separator $Log
+
    flog $Log set cder = $dst/$d.derivedc
 
    flog $Log rm -f $cder
@@ -278,7 +289,7 @@ Note $Log ""
          Note $cder "#                    $k"
          Note $cder "#------------------------------------------------------"
          set kb = `echo $k | cut -c 1`
-         elide -q '/*' '*/' $Hfiles $Cfiles              | \
+         elide -q '/*' '*/' *.h $Cfiles                  | \
          grep -v typedef                                 | \
          grep -v extern                                  | \
          elide -r "$k ${kb}_" '}' -                      | \
@@ -307,6 +318,8 @@ Note $Log ""
 #--------------------------------------------------------------------------
 
 # FIND_FC_DECL - process the Fortran declarations
+
+   Separator $Log
 
    flog $Log set fproto = $dst/$d.protof
 
@@ -368,6 +381,8 @@ Note $Log ""
 #   sed 's/PF[^ ]* /external /g'          function pointer -> external
 #
 
+   Separator $Log
+
    flog $Log set fwrap = $dst/$d.wrapper
 
    if ("$Cfiles" != "") then
@@ -416,6 +431,8 @@ Note $Log ""
 
 # FIND_DOC - process the C files for comments with #bind directives
 
+   Separator $Log
+
    flog $Log set cdoc = $dst/$d.doc
 
    if ("$Cfiles" != "") then
@@ -436,6 +453,8 @@ Note $Log ""
 # FINISH - complete the job by running blang over the files
 #        - and putting files where they need to be
 
+   Separator $Log
+
    NoteD $Log "done"
 
 # only move generated files if DST equals ZDIR
@@ -443,7 +462,7 @@ Note $Log ""
    if ($dst == $zdir) then
       flog $Log pushd $zdir
 
-      flog $Log blang $opt -b $cbind:t -c $cproto:t -d $cdoc:t -f $fproto:t -w $fwrap:t
+      flog $Log blang $opt -b $cbind:t -c $cproto:t -dv $cder:t $cdoc:t -f $fproto:t -w $fwrap:t
       set xstatus = $status
 
 # move all fortran stuff to the fortran package
