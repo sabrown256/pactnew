@@ -399,16 +399,17 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     end
     Note $STDOUT ""
 
-    Note $STDOUT ""
-    Note $STDOUT "CROSS_FE   = $CROSS_FE"
-    Note $STDOUT "DP_BE      = $DP_BE"
+    Note $STDOUT "CROSS_FE    = $CROSS_FE"
+    Note $STDOUT "DP_BE       = $DP_BE"
 
     if ("$PSY_InstRoot" == "none") then
-       Note $STDOUT "PSY_PubLib = "
-       Note $STDOUT "PSY_PubInc = "
+       Note $STDOUT "PSY_PubLib  = "
+       Note $STDOUT "PSY_PubInc  = "
     else
-       Note $STDOUT "PSY_PubLib = -L$PSY_PubLib"
-       Note $STDOUT "PSY_PubInc = -I$PSY_PubInc"
+       set psy_pubroot = $PSY_PubLib:h
+       Note $STDOUT "PSY_PubRoot = $psy_pubroot"
+       Note $STDOUT "PSY_PubLib  = -L$PSY_PubLib"
+       Note $STDOUT "PSY_PubInc  = -I$PSY_PubInc"
     endif
     Note $STDOUT ""
 

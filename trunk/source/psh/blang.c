@@ -4542,7 +4542,7 @@ static void fin_basis(bindes *bd)
  */
 
 static int blang(char *pck, char *pth, int cfl, char *fbi,
-		 char *cdc, char *cpr, char *fpr, char *fwr,
+		 char *cdc, char *cdv, char *cpr, char *fpr, char *fwr,
 		 int *no)
    {int i, ib, nb, rv;
     char **sbi, **sdc, **scp, **sfp, **swr;
@@ -4647,13 +4647,14 @@ int main(int c, char **v)
    {int i, rv, cfl;
     int no[N_MODES];
     char pck[BFLRG], msg[BFLRG];
-    char *fbi, *cdc, *cpr, *fpr, *fwr, *pth;
+    char *fbi, *cdc, *cdv, *cpr, *fpr, *fwr, *pth;
 
     istrl = "int";
     pth   = ".";
     fbi   = "";
     cpr   = "";
     cdc   = "";
+    cdv   = "";
     fpr   = "";
     fwr   = "";
     cfl   = 3;
@@ -4667,13 +4668,16 @@ int main(int c, char **v)
 	    cpr = v[++i];
 	 else if (strcmp(v[i], "-d") == 0)
 	    cdc = v[++i];
+	 else if (strcmp(v[i], "-dv") == 0)
+	    cdv = v[++i];
 	 else if (strcmp(v[i], "-f") == 0)
 	    fpr = v[++i];
 	 else if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-l] [-nob] [-nod] [-nof] [-nop] [-nos] [-p <dir>] [-w <f-wrapper>] [-wr]\n");
+            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] -dv <c-der> [-f <f-proto>] [-h] [-l] [-nob] [-nod] [-nof] [-nop] [-nos] [-p <dir>] [-w <f-wrapper>] [-wr]\n");
              printf("   b    file containing binding specifications\n");
              printf("   c    file containing C prototypes\n");
              printf("   d    file containing documentation comments\n");
+             printf("   dv   file containing C enum,struct,union defs\n");
              printf("   f    file containing Fortran prototypes\n");
              printf("   h    this help message\n");
              printf("   l    use long for Fortran implicit arguments\n");
@@ -4716,7 +4720,7 @@ int main(int c, char **v)
 
     init_types();
 
-    rv = blang(pck, pth, cfl, fbi, cdc, cpr, fpr, fwr, no);
+    rv = blang(pck, pth, cfl, fbi, cdc, cdv, cpr, fpr, fwr, no);
     rv = (rv != TRUE);
 
     printf("done\n");

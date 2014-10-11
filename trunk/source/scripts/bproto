@@ -152,8 +152,8 @@ Note $Log ""
 #--------------------------------------------------------------------------
 
 # FIND_BIND - process the C files for #bind directives
+#           - the transformations are:
 #
-#              - the transformations are:
 #   grep '#bind'                        find the #bind directives
 #   tr "\t" " "                         remove tabs (BSD sed brain damage)
 #   sed 's/^.*#bind *//'                remove the #bind token, anything
@@ -179,8 +179,8 @@ Note $Log ""
 #--------------------------------------------------------------------------
 
 # FIND_CC_DECL - process the C declarations
-#
 #              - the transformations are:
+#
 #   elide -q '/*' '*/' $Cfiles                     remove C comments
 #   elide '{' '}' -                                remove compound statements
 #   awk '$NF ~ /\\/ { printf("%s ", $0); }         merge lines ending in  \
@@ -251,6 +251,56 @@ Note $Log ""
 
    if ($vrb == TRUE) then
       NoteD $Log "   C prototype file: $cproto"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIND_CC_DERIVED - process the C derived type specification:
+#                 - enum, struct, and union
+#                 - only get the ones using the PACT convention:
+#                 -   enum e_foo, struct s_foo, union u_foo
+#                 - elide is not smart enough to get any others reliably
+#                 - the transformations are:
+#
+#
+
+   flog $Log set cder = $dst/$d.derivedc
+
+   flog $Log rm -f $cder
+   flog $Log touch $cder
+
+   if ("$Cfiles" != "") then
+      Note $Log "target = $tgt"
+      set list = (enum struct union)
+      foreach k ($list)
+         Note $cder "#------------------------------------------------------"
+         Note $cder "#                    $k"
+         Note $cder "#------------------------------------------------------"
+         set kb = `echo $k | cut -c 1`
+         elide -q '/*' '*/' $Hfiles $Cfiles              | \
+         grep -v typedef                                 | \
+         grep -v extern                                  | \
+         elide -r "$k ${kb}_" '}' -                      | \
+         elide '#if' '#endif' -                          | \
+         tr "\t" " "                                     | \
+         sed 's/  */ /g'                                 | \
+         awk '$0 ~ /, *$/   { printf("%s", $0) }           \
+              $0 !~ /, *$/  { printf("%s\n", $0) }'      | \
+         awk '$0 ~ /; *$/   { printf("%s", $0) }           \
+              $0 !~ /; *$/  { printf("%s\n", $0) }'      | \
+         awk '$0 ~ /}; *$/  { printf("%s\n", $0) }         \
+              $0 !~ /}; *$/ { printf("%s", $0) }'        | \
+         grep -e "^$k "                                  | \
+         sed '/^ *$/d'                                   | \
+         cat >>& $cder
+         Note $cder ""
+      end
+      flog $Log wc -l $cder
+   endif
+
+   if ($vrb == TRUE) then
+      NoteD $Log "   C derived type file: $cder"
    endif
 
 #--------------------------------------------------------------------------
@@ -382,6 +432,9 @@ Note $Log ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+# FINISH - complete the job by running blang over the files
+#        - and putting files where they need to be
 
    NoteD $Log "done"
 

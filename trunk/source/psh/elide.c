@@ -20,6 +20,7 @@ struct s_parse
     int ne;                 /* number of expression sets passed */
     int depth;              /* delimiter depth */
     int keep;               /* keep the current set */
+    int rev;                /* delete text outside delimieters instead */
     int dquote;             /* delete text in quotes to simplify work */
     int dlen[2];            /* character length of delimiters */
     int range[2];           /* range of sets to elide */
@@ -125,6 +126,12 @@ static int delim_begin(parse *ip, char *d, int nd)
 	       {nstrcat(d, nd, ps);
 		rv = FALSE;};}
 
+/* keep if reverse sense */
+	else if (ip->rev == TRUE)
+	   {nstrcat(d, nd, ps);
+	    ta  = ps;
+	    nca = strlen(ps);}
+
 /* remove if in the range */
 	else
 	   {*ta = '\0';
@@ -165,11 +172,12 @@ static int delim_end(parse *ip, char *d, int nd)
     depth--;
     if (depth < 0)
        {depth++;
-	nstrcat(d, nd, ps);
+	if (ip->rev == FALSE)
+	   nstrcat(d, nd, ps);
 	ps = NULL;
 	rv = FALSE;}
 
-    else if (ip->keep == TRUE)
+    else if ((ip->keep == TRUE) || (ip->rev == TRUE))
        {nstrcat(d, nd, ps);
 	ps = NULL;}
 
@@ -187,9 +195,13 @@ static int delim_end(parse *ip, char *d, int nd)
 /* NON_DELIM_TEXT - handle text with no delimiters */
 
 static void non_delim_text(parse *ip, char *d, int nd)
-   {char *ps;
+   {int ok;
+    char *ps;
 
-    if ((ip->depth == 0) || (ip->keep == TRUE))
+    ok = ((ip->depth == 0) || (ip->keep == TRUE));
+
+    if (((ip->rev == TRUE) && (ok == FALSE)) ||
+	((ip->rev == FALSE) && (ok == TRUE)))
        {ps = ip->part[0];
 	nstrcat(d, nd, ps);};
 
@@ -278,7 +290,7 @@ int elide(char *fname, parse *ip)
 		 retained_text(s, BFLRG, p, ip);
 
 		 if ((ip->depth == 0) ||
-		     (ip->keep == TRUE) ||
+		     ((ip->keep == TRUE) || (ip->rev == TRUE)) ||
 		     ((IS_NULL(s) == FALSE) &&
 		      (IS_NULL(ip->subst) == FALSE)))
 		    puts(s);};
@@ -299,6 +311,7 @@ int main(int c, char **v)
 
     ip.ne       = 0;
     ip.keep     = FALSE;
+    ip.rev      = FALSE;
     ip.depth    = 0;
     ip.dquote   = FALSE;
     ip.fl       = 0;
@@ -318,6 +331,7 @@ int main(int c, char **v)
              printf("   ns         remove starting with this occurence\n");
              printf("   ne         do not remove after this occurence\n");
              printf("   q          ignore single quotes\n");
+             printf("   r          reverse sense - delete text outside deliminers\n");
              printf("   s          substitute <text> for each occurence\n");
              printf("   <text>     quoted text\n");
              printf("   <start>    starting pattern\n");
@@ -336,6 +350,8 @@ int main(int c, char **v)
 	     ip.range[1] = atol(v[++i]);
 	 else if (strcmp(v[i], "-q") == 0)
 	     ip.fl |= SINGLE_QUOTES;
+	 else if (strcmp(v[i], "-r") == 0)
+	     ip.rev = TRUE;
 	 else if (strcmp(v[i], "-s") == 0)
 	     ip.subst = v[++i];
 	 else
