@@ -52,7 +52,7 @@ struct s_haelem
     char *type;              /* type of def member */
     void *def;               /* actual object stored */
     int free;                /* whether def member was marked (SC_mark?) */
-    struct s_haelem *next;}; /* next haelem in linked list */
+    haelem *next;};          /* next haelem in linked list */
 
 #define PD_DEFINE_HAELEM(_f)                                       \
    {PD_defstr(_f, "haelem",                                        \
@@ -178,7 +178,7 @@ struct s_hashel
     char *type;
     void *def;
     int free;
-    struct s_hashel *next;};
+    hashel *next;};
 
 struct s_HASHTAB
    {int size;
