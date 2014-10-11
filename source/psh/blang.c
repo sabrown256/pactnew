@@ -102,6 +102,7 @@ struct s_statedes
     int nbi;                         /* number of bindings */
     int ncp;                         /* number of C prototype lines */
     int ndc;                         /* number of doc lines */
+    int ndv;                         /* number of C derived lines */
     int nfp;                         /* number of Fortran prototype lines */
     int nfw;                         /* number of Fortran wrapper lines */
     int ndcl;                        /* number of declarations */
@@ -109,6 +110,7 @@ struct s_statedes
     char *pck;                       /* name of package */
     char **sbi;
     char **cdc;
+    char **cdv;
     char **cpr;
     char **fpr;
     char **fwr;
@@ -1311,7 +1313,7 @@ static char *has_binding(fdecl *dcl, char *lang)
 /* SETUP_BINDER - initialize the data members of BD */
 
 static void setup_binder(statedes *st, char *pck, int cfl,
-			 char **sbi, char **cdc, char **cpr,
+			 char **sbi, char **cdv, char **cdc, char **cpr,
 			 char **fpr, char **fwr)
    {
 
@@ -1321,6 +1323,9 @@ static void setup_binder(statedes *st, char *pck, int cfl,
 
 	st->sbi = sbi;
 	st->nbi = lst_length(sbi);
+
+	st->cdv = cdv;
+	st->ndv = lst_length(cdv);
 
 	st->cdc = cdc;
 	st->ndc = lst_length(cdc);
@@ -2446,6 +2451,46 @@ static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MODULE_ENUM_DECL - write the Fortran interface C enums DV */
+
+static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
+   {int i;
+    char s[BFLRG];
+
+/* syntax:
+ *    enum, bind(C)
+ *       ENUMERATOR :: <e1> [ = <v1>], ...
+ *    end enum
+ */
+
+    if ((ta != NULL) && (strcmp(ta[0], "enum") == 0))
+       {fprintf(fp, "   enum, bind(C)\n");
+
+	s[0] = '\0';
+	for (i = 2; ta[i] != NULL; i++)
+	    vstrcat(s, BFLRG, "%s ", ta[i]);
+
+	fprintf(fp, "      ENUMERATOR :: %s\n", strtok(s, "{};"));
+	fprintf(fp, "   end enum\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MODULE_STRUCT_DECL - write the Fortran interface C structs DV */
+
+static void module_struct_decl(FILE *fp, char *dv, char **ta, char *pck)
+   {
+
+    if (ta != NULL)
+       {};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MODULE_PRE_WRAP_FULL - write the Fortran interface for hand written
  *                      - prototype PR
  *                      - for functions that can only be fully declared
@@ -2679,10 +2724,10 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
  */
 
 static int bind_module(bindes *bd)
-   {int ib, iw, rv, ndcl;
+   {int ib, id, iw, rv, ndcl;
     char t[BFLRG];
     char *ffn, *sb, *pck;
-    char **fpr, **fwr, **sa, **ta;;
+    char **fpr, **fwr, **cdv, **sa, **ta;;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
@@ -2696,6 +2741,7 @@ static int bind_module(bindes *bd)
 	fpr  = st->fpr;
 	fwr  = st->fwr;
 	dcls = st->dcl;
+	cdv  = st->cdv;
 	ndcl = st->ndcl;
 
 	dcl = NULL;
@@ -2709,6 +2755,49 @@ static int bind_module(bindes *bd)
 	        module_itf_wrap_ext(fp, dcl, pck, ffn);};
 
 	fprintf(fp, "\n");
+
+/* make declarations for enums */
+	if (cdv != NULL)
+	   {int nbi;
+	    char ps[BFLRG];
+	    char *te, **sbi;
+
+	    sbi = st->sbi;
+	    nbi = st->nbi;
+
+	    fprintf(fp, "! ... C enum declarations\n");
+            for (ib = 0; ib < nbi; ib++)
+	        {nstrncpy(ps, BFLRG, sbi[ib], -1);
+		 if ((strncmp(ps, "derived", 7) == 0) &&
+		     (strstr(ps, "SC_ENUM_I") != NULL))
+		    {te = strtok(ps, " ");
+		     te = strtok(NULL, " ");
+		     for (id = 0; cdv[id] != NULL; id++)
+		         {sb = cdv[id];
+			  if (blank_line(sb) == FALSE)
+			     {nstrncpy(t, BFLRG, sb, -1);
+			      ta = tokenize(t, " \t", 0);
+			      if (strcmp(ta[1]+2, te) == 0)
+				 module_enum_decl(fp, sb, ta, pck);
+			      free_strings(ta);};};};};
+	    fprintf(fp, "\n");
+
+	    fprintf(fp, "! ... C struct declarations\n");
+            for (ib = 0; ib < nbi; ib++)
+	        {nstrncpy(ps, BFLRG, sbi[ib], -1);
+		 if ((strncmp(ps, "derived", 7) == 0) &&
+		     (strstr(ps, "SC_ENUM_I") == NULL))
+		    {te = strtok(ps, " ");
+		     te = strtok(NULL, " ");
+		     for (id = 0; cdv[id] != NULL; id++)
+		         {sb = cdv[id];
+			  if (blank_line(sb) == FALSE)
+			     {nstrncpy(t, BFLRG, sb, -1);
+			      ta = tokenize(t, " \t", 0);
+			      if (strcmp(ta[1]+2, te) == 0)
+				 module_struct_decl(fp, sb, ta, pck);
+			      free_strings(ta);};};};};
+	    fprintf(fp, "\n");};
 
 /* make external declarations for variable argument pre-wrapped functions */
 	if (fwr != NULL)
@@ -4545,11 +4634,11 @@ static int blang(char *pck, char *pth, int cfl, char *fbi,
 		 char *cdc, char *cdv, char *cpr, char *fpr, char *fwr,
 		 int *no)
    {int i, ib, nb, rv;
-    char **sbi, **sdc, **scp, **sfp, **swr;
+    char **sbi, **sdc, **sdv, **scp, **sfp, **swr;
     bindes *pb;
-    statedes st = {0, 0, 0, 0, 0, 0, 0,
+    statedes st = {0, 0, 0, 0, 0, 0, 0, 0,
                    {FALSE, FALSE, FALSE, FALSE},
-		   NULL, NULL, NULL, NULL, NULL, NULL, NULL, };
+		   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, };
     bindes bd[] = { {&st, NULL, init_fortran, bind_fortran, fin_fortran},
 		    {&st, NULL, init_module, bind_module, fin_module},
 		    {&st, NULL, init_scheme, bind_scheme, fin_scheme},
@@ -4594,6 +4683,7 @@ static int blang(char *pck, char *pth, int cfl, char *fbi,
     if ((IS_NULL(cpr) == FALSE) && (IS_NULL(fbi) == FALSE))
        {sbi = file_text(FALSE, fbi);
 	sdc = file_text(FALSE, cdc);
+	sdv = file_text(FALSE, cdv);
 	scp = file_text(FALSE, cpr);
 	sfp = file_text(FALSE, fpr);
 	swr = file_text(FALSE, fwr);
@@ -4610,7 +4700,7 @@ static int blang(char *pck, char *pth, int cfl, char *fbi,
 	    if (scp != NULL)
 	       {nb = sizeof(bd)/sizeof(bindes);
 
-		setup_binder(&st, pck, cfl, sbi, sdc, scp, sfp, swr);
+		setup_binder(&st, pck, cfl, sbi, sdv, sdc, scp, sfp, swr);
 
 /* initialize the binding constructors */
 		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
