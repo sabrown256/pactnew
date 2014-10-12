@@ -16,11 +16,6 @@
 
 #define N_MODES  7
 
-enum e_langmode
-   {MODE_C = 1, MODE_F, MODE_S, MODE_P, MODE_B };
-
-typedef enum e_langmode langmode;
-
 enum e_fparam
    {FP_ANY = 0,
     FP_VARARG,
@@ -116,7 +111,13 @@ struct s_bindes
     void (*fin)(bindes *bd);};
 
 static int
- nbd = 0;
+ nbd = 0,
+ MODE_C,
+ MODE_DOC,
+ MODE_F,
+ MODE_S,
+ MODE_P,
+ MODE_B;
 
 static bindes
  gbd[N_MODES];
@@ -938,12 +939,29 @@ static void get_type_map(int *pn, mtype **pmap, int na)
 /* ADD_TYPE - add a type to the map */
 
 static void add_type(char *cty, char *fty, char *sty, char *pty, char *defv)
-   {int n;
+   {int n, ib;
+    bindes *pb;
     mtype *map;
 
     get_type_map(&n, &map, 1);
     if (map != NULL)
-       {n--;
+       {ib = MODE_C;
+	pb = gbd + ib;
+	pb->types = lst_add(pb->types, cty);
+
+	ib = MODE_F;
+	pb = gbd + ib;
+	pb->types = lst_add(pb->types, fty);
+
+	ib = MODE_S;
+	pb = gbd + ib;
+	pb->types = lst_add(pb->types, sty);
+
+	ib = MODE_P;
+	pb = gbd + ib;
+	pb->types = lst_add(pb->types, pty);
+
+	n--;
 	n = max(n, 0);
 
 	map[n].cty  = cty;
@@ -961,7 +979,7 @@ static void add_type(char *cty, char *fty, char *sty, char *pty, char *defv)
 
 static char *lookup_type(char ***val, char *ty, int ity, int oty)
    {int i, l, n;
-    char *rv, *dv, **lst;
+    char *rv, *dv, **lst, **ta;
     mtype *map;
 
     rv = NULL;
@@ -970,59 +988,70 @@ static char *lookup_type(char ***val, char *ty, int ity, int oty)
 
     l = -1;
     if (map != NULL)
-       {switch (ity)
-	   {case MODE_C :
-	         for (i = 0; i < n; i++)
-		     {if (strcmp(ty, map[i].cty) == 0)
-			 {l = i;
-			  break;};};
-		 break;
-	    case MODE_F :
-                 for (i = 0; i < n; i++)
-		     {if (strcmp(ty, map[i].fty) == 0)
-			 {l = i;
-			  break;};};
-		 break;
-	    case MODE_S :
-                 for (i = 0; i < n; i++)
-		     {if (strcmp(ty, map[i].sty) == 0)
-			 {l = i;
-			  break;};};
-		 break;
- 	    case MODE_P :
-	         for (i = 0; i < n; i++)
-		     {if (strcmp(ty, map[i].pty) == 0)
-			 {l = i;
-			  break;};};
-		 break;
- 	    case MODE_B :
-	         for (i = 0; i < n; i++)
-		     {if (strcmp(ty, map[i].bty) == 0)
-			 {l = i;
-			  break;};};
-		 break;};
+       {
+
+#if 0
+	ta = gbd[ity].types;
+	for (i = 0; ta[i] != NULL; i++)
+	    {if (strcmp(ty, ta[i]) == 0)
+	        {l = i;
+		 break;};};
 
 	dv = NO_DEFAULT_VALUE;
 	if (l != -1)
 	   {dv = map[l].defv;
-	    switch (oty)
-	       {case MODE_C :
-		     rv = map[l].cty;
-		     break;
-	        case MODE_F :
-		     rv = map[l].fty;
-		     break;
-	        case MODE_S :
-		     rv = map[l].sty;
-		     break;
-	        case MODE_P :
-		     rv = map[l].pty;
-		     break;
-	        case MODE_B :
-		     rv = map[l].bty;
-		     break;};}
+	    rv = gbd[oty].types[l];}
+
 	else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
 	   dv = "NULL";
+#else
+        if (ity == MODE_C)
+	   {for (i = 0; i < n; i++)
+	        {if (strcmp(ty, map[i].cty) == 0)
+		    {l = i;
+		     break;};};}
+
+	 else if (ity == MODE_F)
+	    {for (i = 0; i < n; i++)
+		 {if (strcmp(ty, map[i].fty) == 0)
+		     {l = i;
+		       break;};};}
+
+	 else if (ity == MODE_S)
+	    {for (i = 0; i < n; i++)
+		 {if (strcmp(ty, map[i].sty) == 0)
+		     {l = i;
+		      break;};};}
+
+	 else if (ity == MODE_S)
+	    {for (i = 0; i < n; i++)
+		 {if (strcmp(ty, map[i].pty) == 0)
+		     {l = i;
+		      break;};};}
+
+	 else if (ity == MODE_S)
+	    {for (i = 0; i < n; i++)
+		 {if (strcmp(ty, map[i].bty) == 0)
+		     {l = i;
+		      break;};};};
+
+	 dv = NO_DEFAULT_VALUE;
+	 if (l != -1)
+	    {dv = map[l].defv;
+	     if (oty == MODE_C)
+	        rv = map[l].cty;
+	     else if (oty == MODE_F)
+	        rv = map[l].fty;
+	     else if (oty == MODE_S)
+	        rv = map[l].sty;
+	     else if (oty == MODE_P)
+	        rv = map[l].pty;
+	     else if (oty == MODE_B)
+	        rv = map[l].bty;}
+
+	else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
+	   dv = "NULL";
+#endif
 
 	if (val != NULL)
 	   {lst = NULL;
@@ -1400,44 +1429,40 @@ static void c_proto(char *pr, int nc, fdecl *dcl)
 
 /*--------------------------------------------------------------------------*/
 
-/*                            FORTRAN ROUTINES                              */
+/*                        LANGUAGE BINDING ROUTINES                         */
 
 /*--------------------------------------------------------------------------*/
 
 #include "blang-f.c"
-
-/*--------------------------------------------------------------------------*/
-
-/*                             SCHEME ROUTINES                              */
-
-/*--------------------------------------------------------------------------*/
-
 #include "blang-scm.c"
-
-/*--------------------------------------------------------------------------*/
-
-/*                             PYTHON ROUTINES                              */
-
-/*--------------------------------------------------------------------------*/
-
 #include "blang-py.c"
-
-/*--------------------------------------------------------------------------*/
-
-/*                              DOC ROUTINES                                */
-
-/*--------------------------------------------------------------------------*/
-
 #include "blang-doc.c"
-
-/*--------------------------------------------------------------------------*/
-
-/*                              BASIS ROUTINES                              */
-
-/*--------------------------------------------------------------------------*/
-
 #include "blang-ba.c"
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* REGISTER_C - register C binding methods
+ *            - this is a dummy - crucial but empty
+ */
+
+static int register_c(int fl, statedes *st)
+   {int nb;
+    bindes *pb;
+
+    if (fl == TRUE)
+       {nb = nbd;
+
+	pb = gbd + nbd++;
+	pb->st   = st;
+	pb->fp   = NULL;
+	pb->init = NULL;
+	pb->bind = NULL;
+	pb->fin  = NULL;};
+
+    return(nb);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* BLANG - control the generation of language binding
@@ -1447,45 +1472,24 @@ static void c_proto(char *pr, int nc, fdecl *dcl)
 static int blang(char *pck, char *pth, int cfl, char *fbi,
 		 char *cdc, char *cdv, char *cpr, char *fpr, char *fwr,
 		 int *no)
-   {int i, ib, nb, rv;
+   {int i, ib, rv;
     char **sbi, **sdc, **sdv, **scp, **sfp, **swr;
     bindes *pb;
     statedes st = {0, 0, 0, 0, 0, 0, 0, 0,
                    {FALSE, FALSE, FALSE, FALSE},
 		   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, };
-    bindes bd[] = { {&st, NULL, NULL, init_fortran, bind_fortran, fin_fortran},
-		    {&st, NULL, NULL, init_module, bind_module, fin_module},
-		    {&st, NULL, NULL, init_scheme, bind_scheme, fin_scheme},
-		    {&st, NULL, NULL, init_python, bind_python, fin_python},
-		    {&st, NULL, NULL, init_doc, bind_doc, fin_doc},
-		    {&st, NULL, NULL, init_basis, bind_basis, fin_basis} };
 
-/* no documents */
-    if (no[0] == TRUE)
-       {bd[4].init = NULL;
-	bd[4].bind = NULL;
-	bd[4].fin  = NULL;};
+    nbd = 0;
 
-/* no fortran */
-    if (no[1] == TRUE)
-       {bd[0].init = NULL;
-	bd[0].bind = NULL;
-	bd[0].fin  = NULL;
-	bd[1].init = NULL;
-	bd[1].bind = NULL;
-	bd[1].fin  = NULL;};
+/* register the language bindings */
+    MODE_C   = register_c(TRUE, &st);
+    MODE_DOC = register_doc(no[0], &st);
+    MODE_F   = register_fortran(no[1], &st);
+    MODE_S   = register_scheme(no[2], &st);
+    MODE_P   = register_python(no[3], &st);
+    MODE_B   = register_basis(no[4], &st);
 
-/* no python */
-    if (no[2] == TRUE)
-       {bd[3].init = NULL;
-	bd[3].bind = NULL;
-	bd[3].fin  = NULL;};
-
-/* no scheme */
-    if (no[3] == TRUE)
-       {bd[2].init = NULL;
-	bd[2].bind = NULL;
-	bd[2].fin  = NULL;};
+    init_types();
 
     rv = FALSE;
 
@@ -1512,23 +1516,21 @@ static int blang(char *pck, char *pth, int cfl, char *fbi,
 	   {add_derived_types(sbi);
 
 	    if (scp != NULL)
-	       {nb = sizeof(bd)/sizeof(bindes);
-
-		setup_binder(&st, pck, cfl, sbi, sdv, sdc, scp, sfp, swr);
+	       {setup_binder(&st, pck, cfl, sbi, sdv, sdc, scp, sfp, swr);
 
 /* initialize the binding constructors */
-		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
+		for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
 		    {if (pb->init != NULL)
 		        pb->init(&st, pb);};
 
 /* make all the language bindings */
 		if (sbi != NULL)
-		   {for (pb = bd, ib = 0; ib < nb; ib++, pb++)
+		   {for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
 		        {if (pb->bind != NULL)
 			    pb->bind(pb);};};
 
 /* cleanup */
-		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
+		for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
 		    {if (pb->fin != NULL)
 		        pb->fin(pb);};
 
@@ -1563,7 +1565,8 @@ int main(int c, char **v)
     fwr   = "";
     cfl   = 3;
 
-    memset(no, 0, sizeof(no));
+    for (i = 0; i < N_MODES; i++)
+        no[i] = TRUE;
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-b") == 0)
@@ -1599,15 +1602,15 @@ int main(int c, char **v)
 	 else if (strcmp(v[i], "-l") == 0)
             istrl = "long";
 	 else if (strcmp(v[i], "-nob") == 0)
-	    no[4] = TRUE;
+	    no[4] = FALSE;
 	 else if (strcmp(v[i], "-nod") == 0)
-	    no[0] = TRUE;
+	    no[0] = FALSE;
 	 else if (strcmp(v[i], "-nof") == 0)
-	    no[1] = TRUE;
+	    no[1] = FALSE;
 	 else if (strcmp(v[i], "-nop") == 0)
-	    no[2] = TRUE;
+	    no[3] = FALSE;
 	 else if (strcmp(v[i], "-nos") == 0)
-	    no[3] = TRUE;
+	    no[2] = FALSE;
 	 else if (strcmp(v[i], "-o") == 0)
             cfl &= ~2;
 	 else if (strcmp(v[i], "-p") == 0)
@@ -1621,8 +1624,6 @@ int main(int c, char **v)
     snprintf(msg, BFLRG, "%s bindings", pck);
 
     printf("      %s ", fill_string(msg, 25));
-
-    init_types();
 
     rv = blang(pck, pth, cfl, fbi, cdc, cdv, cpr, fpr, fwr, no);
     rv = (rv != TRUE);
