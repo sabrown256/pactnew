@@ -710,3 +710,24 @@ static void fin_python(bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* REGISTER_PYTHON - register PYTHON binding methods */
+
+static int register_python(int fl, statedes *st)
+   {int nb;
+    bindes *pb;
+
+    if (fl == TRUE)
+       {nb = nbd;
+
+	pb = gbd + nbd++;
+	pb->st   = st;
+	pb->fp   = NULL;
+	pb->init = init_python;
+	pb->bind = bind_python;
+	pb->fin  = fin_python;};
+
+    return(nb);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

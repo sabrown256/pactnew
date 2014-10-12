@@ -2972,21 +2972,22 @@ char **file_text(int sort, char *fname, ...)
     VSNPRINTF(file, BFLRG, fname);
     VA_END;
 
-    if (sort == TRUE)
-       {run(FALSE, "rm -f %s.srt ; sort %s > %s.srt", file, file, file);
-	nstrcat(file, BFLRG, ".srt");};
-
     sa = NULL;
 	
-    in = fopen_safe(file, "r");
-    if (in != NULL)
-       {sa = file_strings(in);
-	fclose_safe(in);}
-    else
-       fprintf(stderr, "FILE_TEXT: Failed to open %s\n", file);
+    if (IS_NULL(file) == FALSE)
+       {if (sort == TRUE)
+	   {run(FALSE, "rm -f %s.srt ; sort %s > %s.srt", file, file, file);
+	    nstrcat(file, BFLRG, ".srt");};
 
-    if (sort == TRUE)
-       run(FALSE, "rm -f %s", file);
+	in = fopen_safe(file, "r");
+	if (in != NULL)
+	   {sa = file_strings(in);
+	    fclose_safe(in);}
+	else
+	   fprintf(stderr, "FILE_TEXT: Failed to open '%s'\n", file);
+
+	if (sort == TRUE)
+	   run(FALSE, "rm -f %s", file);};
 
     return(sa);}
 

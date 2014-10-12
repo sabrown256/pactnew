@@ -586,3 +586,24 @@ static void fin_scheme(bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* REGISTER_SCHEME - register SCHEME binding methods */
+
+static int register_scheme(int fl, statedes *st)
+   {int nb;
+    bindes *pb;
+
+    if (fl == TRUE)
+       {nb = nbd;
+
+	pb = gbd + nbd++;
+	pb->st   = st;
+	pb->fp   = NULL;
+	pb->init = init_scheme;
+	pb->bind = bind_scheme;
+	pb->fin  = fin_scheme;};
+
+    return(nb);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

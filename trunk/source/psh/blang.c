@@ -14,7 +14,7 @@
 /* #define NO_DEFAULT_VALUE "NULL" */
 #define NO_DEFAULT_VALUE "----"
 
-#define N_MODES  5
+#define N_MODES  7
 
 enum e_langmode
    {MODE_C = 1, MODE_F, MODE_S, MODE_P, MODE_B };
@@ -110,16 +110,23 @@ struct s_statedes
 struct s_bindes
    {statedes *st;
     FILE *fp;
+    char **types;
     void (*init)(statedes *st, bindes *bd);
     int (*bind)(bindes *bd);
     void (*fin)(bindes *bd);};
 
+static int
+ nbd = 0;
+
+static bindes
+ gbd[N_MODES];
+
 static char
- *lookup_type(char ***val, char *ty, langmode ity, langmode oty),
+ *lookup_type(char ***val, char *ty, int ity, int oty),
  **mc_proto_list(fdecl *dcl);
 
 static void
- fc_type(char *wty, int nc, farg *al, int afl, langmode mode),
+ fc_type(char *wty, int nc, farg *al, int afl, int mode),
  cs_type(char *a, int nc, farg *arg, int drf);
 
 static char
@@ -952,7 +959,7 @@ static void add_type(char *cty, char *fty, char *sty, char *pty, char *defv)
 
 /* LOOKUP_TYPE - lookup and return a type from the map */
 
-static char *lookup_type(char ***val, char *ty, langmode ity, langmode oty)
+static char *lookup_type(char ***val, char *ty, int ity, int oty)
    {int i, l, n;
     char *rv, *dv, **lst;
     mtype *map;
@@ -1101,7 +1108,9 @@ static void init_types(void)
 
     add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         NULL, "NULL");
     add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       NULL, "NULL");
-/*    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          NULL, "NULL"); */
+/*
+    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          NULL, "NULL");
+ */
     add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       NULL, "NULL");
 
     return;}
@@ -1444,12 +1453,12 @@ static int blang(char *pck, char *pth, int cfl, char *fbi,
     statedes st = {0, 0, 0, 0, 0, 0, 0, 0,
                    {FALSE, FALSE, FALSE, FALSE},
 		   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, };
-    bindes bd[] = { {&st, NULL, init_fortran, bind_fortran, fin_fortran},
-		    {&st, NULL, init_module, bind_module, fin_module},
-		    {&st, NULL, init_scheme, bind_scheme, fin_scheme},
-		    {&st, NULL, init_python, bind_python, fin_python},
-		    {&st, NULL, init_doc, bind_doc, fin_doc},
-		    {&st, NULL, init_basis, bind_basis, fin_basis} };
+    bindes bd[] = { {&st, NULL, NULL, init_fortran, bind_fortran, fin_fortran},
+		    {&st, NULL, NULL, init_module, bind_module, fin_module},
+		    {&st, NULL, NULL, init_scheme, bind_scheme, fin_scheme},
+		    {&st, NULL, NULL, init_python, bind_python, fin_python},
+		    {&st, NULL, NULL, init_doc, bind_doc, fin_doc},
+		    {&st, NULL, NULL, init_basis, bind_basis, fin_basis} };
 
 /* no documents */
     if (no[0] == TRUE)
