@@ -41,8 +41,8 @@ IncFiles = common.h nonstd.h ${LibFiles}
 
 InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
              ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/rpath \
-             ${BinDir}/gexec ${BinDir}/perdb  \
-             ${BinDir}/elide ${BinDir}/blang                 \
+             ${BinDir}/gexec ${BinDir}/perdb \
+             ${BinDir}/elide ${BinDir}/blang \
              ${BinDir}/smake ${BinDir}/pact-info \
              ${BinDir}/osrc
 
@@ -112,7 +112,9 @@ ${BinDir}/elide : elide.c ${LibFiles}
 
 blang : ${BinDir}/blang
 
-${BinDir}/blang : blang.c ${LibFiles}
+BLANG_Src = blang-ba.c blang-doc.c blang-f.c blang-py.c blang-scm.c blang.c
+
+${BinDir}/blang : ${BLANG_Src} ${LibFiles}
 	@(echo "${PCAnnounce} blang.c -o ${BinDir}/blang" ; \
 	  ${PCC} blang.c -o ${BinDir}/blang)
 
