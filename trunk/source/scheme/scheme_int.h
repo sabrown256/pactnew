@@ -82,6 +82,11 @@ struct s_SS_scope_private
     int n_tries;
     void (*io_callback)(PROCESS *pp, object *frd, object *fwr);
 
+/* SHPRM3.C */
+    object *(*assp_ext)(SS_psides *si,
+			int (*pred)(SS_psides *si, object *, object *),
+			object *obj, object *lst);
+
 /* SHREAD.C */
     hasharr *parser_tab;
     substdes *sub;

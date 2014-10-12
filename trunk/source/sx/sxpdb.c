@@ -3770,6 +3770,27 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_ASSP - hook for assoc, assq, assv to work on structs
+ *          - instead of lists
+ *          - example:
+ *          -   (assoc 'stream fp)
+ *          - would return the 'stream' member of the PDBfile fp
+ *          - this gives generic "get" access to struct members
+ *          - for structs with SCHEME bindings from blang
+ */
+
+static object *_SX_assp(SS_psides *si,
+			int (*pred)(SS_psides *si, object *, object *),
+			object *obj, object *lst)
+   {object *rv;
+
+    rv = SS_f;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                         PDB FUNCTION INSTALLATION                        */
 
@@ -3779,6 +3800,8 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
  
 void SX_install_pdb_funcs(SS_psides *si)
    {
+
+    _SS.assp_ext = _SX_assp;
 
     SS_install(si, "change-directory",
                "Change current working directory in a file",

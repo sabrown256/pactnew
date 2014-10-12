@@ -862,14 +862,14 @@ static object *_SSI_equal(SS_psides *si, object *obj)
 static object *_SS_memp(SS_psides *si,
 			int (*pred)(SS_psides *si, object *, object *),
 			object *obj, object *lst)
-   {object *tmp;
+   {object *o;
 
     while (TRUE)
        {if (!SS_consp(lst))
            break;
 
-        tmp = SS_car(si, lst);
-        if ((*pred)(si, obj, tmp))
+        o = SS_car(si, lst);
+        if ((*pred)(si, obj, o))
            return(lst);
 
         lst = SS_cdr(si, lst);};
@@ -929,14 +929,21 @@ static object *_SSI_member(SS_psides *si, object *argl)
 static object *_SS_assp(SS_psides *si,
 			int (*pred)(SS_psides *si, object *, object *),
 			object *obj, object *lst)
-   {object *tmp;
+   {object *o, *rv;
 
-    for ( ; SS_consp(lst); lst = SS_cdr(si, lst))
-        {tmp = SS_car(si, lst);
-         if ((*pred)(si, obj, SS_car(si, tmp)))
-            return(tmp);};
+    rv = SS_f;
 
-    return(SS_f);}
+    if (SS_consp(lst) == TRUE)
+       {for ( ; SS_consp(lst); lst = SS_cdr(si, lst))
+	    {o = SS_car(si, lst);
+	     if ((*pred)(si, obj, SS_car(si, o)))
+	        {rv = o;
+		 break;};};}
+
+    else if (_SS.assp_ext != NULL)
+       rv = _SS.assp_ext(si, pred, obj, lst);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
