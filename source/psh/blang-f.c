@@ -88,7 +88,7 @@ static void cf_type(char *a, int nc, char *ty)
  *         - return the kind of FORTRAN argument TY is
  */
 
-static void fc_type(char *wty, int nc, farg *al, int afl, langmode mode)
+static void fc_type(char *wty, int nc, farg *al, int afl, int mode)
    {fparam knd;
     char lty[BFLRG];
     char *pty, *arg, *ty;
@@ -1492,6 +1492,34 @@ static void fin_module(bindes *bd)
     bd->fp = NULL;
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* REGISTER_FORTRAN - register FORTRAN binding methods */
+
+static int register_fortran(int fl, statedes *st)
+   {int nb;
+    bindes *pb;
+
+    if (fl == TRUE)
+       {nb = nbd;
+
+	pb = gbd + nbd++;
+	pb->st   = st;
+	pb->fp   = NULL;
+	pb->init = init_fortran;
+	pb->bind = bind_fortran;
+	pb->fin  = fin_fortran;
+
+	pb = gbd + nbd++;
+	pb->st   = st;
+	pb->fp   = NULL;
+	pb->init = init_module;
+	pb->bind = bind_module;
+	pb->fin  = fin_module;};
+
+    return(nb);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -37,7 +37,11 @@ struct s_ioerrdes
 void log_safe(char *fnc, int err, char *type, void *a)
    {ioerrdes *pe;
     static ioerrdes errev[NERR];
-    static int ne = 0;
+    static int ne = -1;
+
+    if (ne == -1)
+       {memset(errev, 0, sizeof(errev));
+	ne = 0;};
 
 /* report errors */
     if (strcmp(fnc, "dump") == 0)

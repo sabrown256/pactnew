@@ -425,3 +425,24 @@ static void fin_doc(bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* REGISTER_DOC - register documentation methods */
+
+static int register_doc(int fl, statedes *st)
+   {int nb;
+    bindes *pb;
+
+    if (fl == TRUE)
+       {nb = nbd;
+
+	pb = gbd + nbd++;
+	pb->st   = st;
+	pb->fp   = NULL;
+	pb->init = init_doc;
+	pb->bind = bind_doc;
+	pb->fin  = fin_doc;};
+
+    return(nb);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

@@ -42,3 +42,24 @@ static void fin_basis(bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* REGISTER_BASIS - register BASIS binding methods */
+
+static int register_basis(int fl, statedes *st)
+   {int nb;
+    bindes *pb;
+
+    if (fl == TRUE)
+       {nb = nbd;
+
+	pb = gbd + nbd++;
+	pb->st   = st;
+	pb->fp   = NULL;
+	pb->init = init_basis;
+	pb->bind = bind_basis;
+	pb->fin  = fin_basis;};
+
+    return(nb);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
