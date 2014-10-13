@@ -421,6 +421,36 @@ static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SCHEME_ENUM_DEFS - write the SCHEME interface C enums DV */
+
+static void scheme_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
+   {
+
+/* syntax:
+ *    SS_install_cv(si, <Enamei>, <Evaluei>, SC_INT_I);
+ */
+
+    if ((ta != NULL) && (strcmp(ta[0], "enum") == 0))
+       {
+
+/*
+        int i;
+	char s[BFLRG];
+
+	s[0] = '\0';
+	for (i = 2; ta[i] != NULL; i++)
+	    vstrcat(s, BFLRG, "%s ", ta[i]);
+
+	fprintf(fp, "    SS_install_cv(si, %s, %s, SC_INT_I);\n",
+		enm, evl);
+*/
+	};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SCHEME_WRAP_INSTALL - add the installation of the function */
 
 static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
@@ -510,27 +540,37 @@ static char **scheme_wrap(FILE *fp, char **fl, fdecl *dcl,
 
 /* SCHEME_INSTALL - write the routine to install the bindings */
 
-static void scheme_install(FILE *fp, char *pck, char **fl)
-    {int i;
+static void scheme_install(bindes *bd, char **fl)
+   {int i;
+    FILE *fp;
+    char *pck;
+    statedes *st;
 
-     csep(fp);
+    fp  = bd->fp;
+    st  = bd->st;
+    pck = st->pck;
 
-     fprintf(fp, "\n");
-     fprintf(fp, "void SX_install_%s_bindings(SS_psides *si)\n", pck);
-     fprintf(fp, "   {\n");
-     fprintf(fp, "\n");
+    csep(fp);
 
-     if (fl != NULL)
-        {for (i = 0; fl[i] != NULL; i++)
-	     fputs(fl[i], fp);
+    fprintf(fp, "\n");
+    fprintf(fp, "void SX_install_%s_bindings(SS_psides *si)\n", pck);
+    fprintf(fp, "   {\n");
+    fprintf(fp, "\n");
 
-	 free_strings(fl);};
+/* make the list of enum constants to install */
+    emit_enum_defs(bd, scheme_enum_defs);
 
-     fprintf(fp, "   return;}\n");
-     fprintf(fp, "\n");
-     csep(fp);
+    if (fl != NULL)
+       {for (i = 0; fl[i] != NULL; i++)
+	    fputs(fl[i], fp);
 
-     return;}
+	free_strings(fl);};
+
+    fprintf(fp, "   return;}\n");
+    fprintf(fp, "\n");
+    csep(fp);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -541,20 +581,20 @@ static void scheme_install(FILE *fp, char *pck, char **fl)
 
 static int bind_scheme(bindes *bd)
    {int ib, ndcl, rv;
-    char *sfn, *pck, **fl;
+    char *sfn, **fl;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
 
     fp   = bd->fp;
     st   = bd->st;
-    pck  = st->pck;
     dcls = st->dcl;
     ndcl = st->ndcl;
 
     rv = TRUE;
     fl = NULL;
 
+/* make the list of function wrappers to install */
     for (ib = 0; ib < ndcl; ib++)
         {dcl = dcls + ib;
 	 sfn = has_binding(dcl, "scheme");
@@ -562,7 +602,7 @@ static int bind_scheme(bindes *bd)
 	    fl = scheme_wrap(fp, fl, dcl, sfn, NULL);};
 
 /* write the routine to install the bindings */
-    scheme_install(fp, pck, fl);
+    scheme_install(bd, fl);
 
     return(rv);}
 

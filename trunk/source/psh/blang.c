@@ -938,6 +938,86 @@ static void hsep(FILE *fp)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* EMIT_ENUM_DEFS - emit enum specifications via FEMIT */
+
+void emit_enum_defs(bindes *bd,
+		    void (*femit)(FILE *fp, char *dv, char **ta, char *pck))
+   {int ib, id, nbi;
+    char ps[BFLRG], t[BFLRG];
+    char *pck, *sb, *te, **cdv, **sbi, **ta;
+    FILE *fp;
+    statedes *st;
+
+    st  = bd->st;
+    cdv = st->cdv;
+    if (cdv != NULL)
+       {fp  = bd->fp;
+	pck = st->pck;
+	sbi = st->sbi;
+	nbi = st->nbi;
+
+	for (ib = 0; ib < nbi; ib++)
+	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
+	     if ((strncmp(ps, "derived", 7) == 0) &&
+		 (strstr(ps, "SC_ENUM_I") != NULL))
+	        {te = strtok(ps, " ");
+		 te = strtok(NULL, " ");
+		 for (id = 0; cdv[id] != NULL; id++)
+		     {sb = cdv[id];
+		      if (blank_line(sb) == FALSE)
+			 {nstrncpy(t, BFLRG, sb, -1);
+			  ta = tokenize(t, " \t", 0);
+			  if (strcmp(ta[1]+2, te) == 0)
+			     femit(fp, sb, ta, pck);
+			  free_strings(ta);};};};};
+
+	fprintf(fp, "\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* EMIT_STRUCT_DEFS - emit struct specifications via FEMIT */
+
+void emit_struct_defs(bindes *bd,
+		      void (*femit)(FILE *fp, char *dv, char **ta, char *pck))
+   {int ib, id, nbi;
+    char ps[BFLRG], t[BFLRG];
+    char *pck, *sb, *te, **cdv, **sbi, **ta;
+    FILE *fp;
+    statedes *st;
+
+    st  = bd->st;
+    cdv = st->cdv;
+    if (cdv != NULL)
+       {fp  = bd->fp;
+	pck = st->pck;
+	sbi = st->sbi;
+	nbi = st->nbi;
+
+	for (ib = 0; ib < nbi; ib++)
+	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
+	     if ((strncmp(ps, "derived", 7) == 0) &&
+		 (strstr(ps, "SC_ENUM_I") == NULL))
+	        {te = strtok(ps, " ");
+		 te = strtok(NULL, " ");
+		 for (id = 0; cdv[id] != NULL; id++)
+		     {sb = cdv[id];
+		      if (blank_line(sb) == FALSE)
+			 {nstrncpy(t, BFLRG, sb, -1);
+			  ta = tokenize(t, " \t", 0);
+			  if (strcmp(ta[1]+2, te) == 0)
+			     femit(fp, sb, ta, pck);
+			  free_strings(ta);};};};};
+
+       fprintf(fp, "\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                           TYPE MAP ROUTINES                              */
 
