@@ -1096,6 +1096,27 @@ static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
 static void module_struct_decl(FILE *fp, char *dv, char **ta, char *pck)
    {
 
+/* syntax:
+ *   type, bind(C) :: <Sname>
+ *      <ftype>(C_<CTYPE>) :: <Mname1>[(<Mdim1>)]
+ *               ...
+ *   end type <Sname>
+ *
+ * example:
+ *   struct s_foo
+ *      {int a;
+ *       double b;
+ *       char c[10];
+ *       void *d;};
+ *
+ *   type, bind(C) :: foo
+ *      integer(C_INT) :: a
+ *      double(C_DOUBLE) :: b
+ *      character(kind=C_CHAR) :: c(10)
+ *      type(C_PTR) :: d
+ *   end type foo
+ */
+
     if (ta != NULL)
        {};
 
