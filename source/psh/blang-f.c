@@ -1337,7 +1337,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
  */
 
 static int bind_module(bindes *bd)
-   {int ib, id, iw, rv, ndcl;
+   {int ib, iw, rv, ndcl;
     char t[BFLRG];
     char *ffn, *sb, *pck;
     char **fpr, **fwr, **cdv, **sa, **ta;;
@@ -1371,46 +1371,11 @@ static int bind_module(bindes *bd)
 
 /* make declarations for enums */
 	if (cdv != NULL)
-	   {int nbi;
-	    char ps[BFLRG];
-	    char *te, **sbi;
-
-	    sbi = st->sbi;
-	    nbi = st->nbi;
-
-	    fprintf(fp, "! ... C enum declarations\n");
-            for (ib = 0; ib < nbi; ib++)
-	        {nstrncpy(ps, BFLRG, sbi[ib], -1);
-		 if ((strncmp(ps, "derived", 7) == 0) &&
-		     (strstr(ps, "SC_ENUM_I") != NULL))
-		    {te = strtok(ps, " ");
-		     te = strtok(NULL, " ");
-		     for (id = 0; cdv[id] != NULL; id++)
-		         {sb = cdv[id];
-			  if (blank_line(sb) == FALSE)
-			     {nstrncpy(t, BFLRG, sb, -1);
-			      ta = tokenize(t, " \t", 0);
-			      if (strcmp(ta[1]+2, te) == 0)
-				 module_enum_decl(fp, sb, ta, pck);
-			      free_strings(ta);};};};};
-	    fprintf(fp, "\n");
+	   {fprintf(fp, "! ... C enum declarations\n");
+	    emit_enum_defs(bd, module_enum_decl);
 
 	    fprintf(fp, "! ... C struct declarations\n");
-            for (ib = 0; ib < nbi; ib++)
-	        {nstrncpy(ps, BFLRG, sbi[ib], -1);
-		 if ((strncmp(ps, "derived", 7) == 0) &&
-		     (strstr(ps, "SC_ENUM_I") == NULL))
-		    {te = strtok(ps, " ");
-		     te = strtok(NULL, " ");
-		     for (id = 0; cdv[id] != NULL; id++)
-		         {sb = cdv[id];
-			  if (blank_line(sb) == FALSE)
-			     {nstrncpy(t, BFLRG, sb, -1);
-			      ta = tokenize(t, " \t", 0);
-			      if (strcmp(ta[1]+2, te) == 0)
-				 module_struct_decl(fp, sb, ta, pck);
-			      free_strings(ta);};};};};
-	    fprintf(fp, "\n");};
+	    emit_struct_defs(bd, module_struct_decl);};
 
 /* make external declarations for variable argument pre-wrapped functions */
 	if (fwr != NULL)
