@@ -31,12 +31,17 @@ enum e_fdir
 
 typedef enum e_fdir fdir;
 
+typedef struct s_str_list str_list;
 typedef struct s_statedes statedes;
 typedef struct s_bindes bindes;
 typedef struct s_idecl idecl;
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
-typedef struct s_mtype mtype;
+
+struct s_str_list
+   {int n;
+    int nx;
+    char **arr;};
 
 struct s_idecl
    {char decl[BFLRG];    /* local variable declaration */
@@ -74,14 +79,6 @@ struct s_fdecl
     farg proto;                      /* farg representation of declaration */
     farg *al;};
 
-struct s_mtype
-   {char *cty;                       /* C types */
-    char *fty;                       /* Fortran types */
-    char *sty;                       /* Scheme types */
-    char *pty;                       /* Python types */
-    char *bty;                       /* Basis types */
-    char *defv;};
-
 struct s_statedes
    {int cfl;                         /* fortran wrappers/modules flag */
     int nbi;                         /* number of bindings */
@@ -100,12 +97,13 @@ struct s_statedes
     char **fpr;
     char **fwr;
     fdecl *dcl;
-    char path[BFLRG];};            /* path for output files */
+    char path[BFLRG];                /* path for output files */
+    str_list defv;};
 
 struct s_bindes
    {statedes *st;
     FILE *fp;
-    char **types;
+    str_list types;
     void (*init)(statedes *st, bindes *bd);
     int (*bind)(bindes *bd);
     void (*fin)(bindes *bd);};
@@ -229,6 +227,47 @@ static int ideref(char *s)
 	rv = TRUE;};
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STR_LST_ADD - add S to list SL */
+
+int str_lst_add(str_list *sl, char *s)
+   {int n, nx;
+    char **sa;
+
+    n  = sl->n;
+    nx = sl->nx;
+    sa = sl->arr;
+
+    if (sa == NULL)
+       {nx = 100;
+        sa = MAKE_N(char *, nx);
+	if (sa != NULL)
+	   memset(sa, 0, nx*sizeof(char *));
+        sl->nx  = nx;
+        sl->arr = sa;};
+
+    if (sa != NULL)
+       {if (n >= nx - 10)
+	   {nx += 100;
+	    REMAKE(sa, char *, nx);
+	    if (sa != NULL)
+	       memset(sa+n, 0, (nx - n)*sizeof(char *));
+	    sl->nx  = nx;
+	    sl->arr = sa;};
+
+	if (sa != NULL)
+	   {if (s == NULL)
+	       sa[n] = NULL;
+	    else
+	       sa[n] = STRSAVE(s);
+            n++;};
+
+        sl->n = n;};
+
+    return(n);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -904,160 +943,55 @@ static void hsep(FILE *fp)
 
 /*--------------------------------------------------------------------------*/
 
-/* GET_TYPE_MAP - return the type map
- *              - if NA > 0 add that many elements to the map
- *              - return the number of elements in the map via PN
- *              - return the map via PMAP
- */
-
-static void get_type_map(int *pn, mtype **pmap, int na)
-   {static int n = 0;
-    static int nx = 0;
-    static mtype *map = NULL;
-
-    if (map == NULL)
-       {nx = 50;
-        map = MAKE_N(mtype, nx);};
-
-    if (n+na+1 >= nx)
-       {nx += max(10, na);
-        REMAKE(map, mtype, nx);};
-
-    n += na;
-
-    if (pn != NULL)
-       *pn = n;
-
-    if (pmap != NULL)
-       *pmap = map;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* ADD_TYPE - add a type to the map */
 
 static void add_type(char *cty, char *fty, char *sty, char *pty, char *defv)
-   {int n, ib;
-    bindes *pb;
-    mtype *map;
+   {
 
-    get_type_map(&n, &map, 1);
-    if (map != NULL)
-       {ib = MODE_C;
-	pb = gbd + ib;
-	pb->types = lst_add(pb->types, cty);
+    str_lst_add(&gbd[MODE_C].types, cty);
 
-	ib = MODE_F;
-	pb = gbd + ib;
-	pb->types = lst_add(pb->types, fty);
+    str_lst_add(&gbd[MODE_F].types, fty);
 
-	ib = MODE_S;
-	pb = gbd + ib;
-	pb->types = lst_add(pb->types, sty);
+    str_lst_add(&gbd[MODE_S].types, sty);
 
-	ib = MODE_P;
-	pb = gbd + ib;
-	pb->types = lst_add(pb->types, pty);
+    str_lst_add(&gbd[MODE_P].types, pty);
 
-	n--;
-	n = max(n, 0);
-
-	map[n].cty  = cty;
-	map[n].fty  = fty;
-	map[n].sty  = sty;
-	map[n].pty  = pty;
-	map[n].defv = defv;};
+    str_lst_add(&gbd[0].st->defv, defv);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* LOOKUP_TYPE - lookup and return a type from the map */
+/* LOOKUP_TYPE - lookup and return a type from the type lists */
 
 static char *lookup_type(char ***val, char *ty, int ity, int oty)
-   {int i, l, n;
+   {int i, l;
     char *rv, *dv, **lst, **ta;
-    mtype *map;
 
     rv = NULL;
 
-    get_type_map(&n, &map, 0);
-
     l = -1;
-    if (map != NULL)
-       {
 
-#if 0
-	ta = gbd[ity].types;
-	for (i = 0; ta[i] != NULL; i++)
-	    {if (strcmp(ty, ta[i]) == 0)
-	        {l = i;
-		 break;};};
+    ta = gbd[ity].types.arr;
+    for (i = 0; ta[i] != NULL; i++)
+        {if (strcmp(ty, ta[i]) == 0)
+	    {l = i;
+	     break;};};
 
-	dv = NO_DEFAULT_VALUE;
-	if (l != -1)
-	   {dv = map[l].defv;
-	    rv = gbd[oty].types[l];}
+    dv = NO_DEFAULT_VALUE;
+    if (l != -1)
+       {dv = gbd[0].st->defv.arr[l];
+	rv = gbd[oty].types.arr[l];}
 
-	else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
-	   dv = "NULL";
-#else
-        if (ity == MODE_C)
-	   {for (i = 0; i < n; i++)
-	        {if (strcmp(ty, map[i].cty) == 0)
-		    {l = i;
-		     break;};};}
+    else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
+       dv = "NULL";
 
-	 else if (ity == MODE_F)
-	    {for (i = 0; i < n; i++)
-		 {if (strcmp(ty, map[i].fty) == 0)
-		     {l = i;
-		       break;};};}
-
-	 else if (ity == MODE_S)
-	    {for (i = 0; i < n; i++)
-		 {if (strcmp(ty, map[i].sty) == 0)
-		     {l = i;
-		      break;};};}
-
-	 else if (ity == MODE_S)
-	    {for (i = 0; i < n; i++)
-		 {if (strcmp(ty, map[i].pty) == 0)
-		     {l = i;
-		      break;};};}
-
-	 else if (ity == MODE_S)
-	    {for (i = 0; i < n; i++)
-		 {if (strcmp(ty, map[i].bty) == 0)
-		     {l = i;
-		      break;};};};
-
-	 dv = NO_DEFAULT_VALUE;
-	 if (l != -1)
-	    {dv = map[l].defv;
-	     if (oty == MODE_C)
-	        rv = map[l].cty;
-	     else if (oty == MODE_F)
-	        rv = map[l].fty;
-	     else if (oty == MODE_S)
-	        rv = map[l].sty;
-	     else if (oty == MODE_P)
-	        rv = map[l].pty;
-	     else if (oty == MODE_B)
-	        rv = map[l].bty;}
-
-	else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
-	   dv = "NULL";
-#endif
-
-	if (val != NULL)
-	   {lst = NULL;
-	    if (dv != NULL)
-	       lst = lst_push(lst, dv);
-	    *val = lst;};};
+    if (val != NULL)
+       {lst = NULL;
+	if (dv != NULL)
+	   lst = lst_push(lst, dv);
+	*val = lst;};
 
     return(rv);}
 
