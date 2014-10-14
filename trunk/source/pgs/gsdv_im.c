@@ -101,9 +101,9 @@ int PG_init_parallel(char **argv, PROCESS *pp)
     PDBfile *vif;
 
     if (pp == NULL)
-       {PC_init_communications(NULL);
+       {PN_init_communications(NULL);
 
-        _PG.pp_me = PC_open_member(argv, NULL);
+        _PG.pp_me = PN_open_member(argv, NULL);
 
         if (_PG.pp_me != NULL)
            {vif = _PG.pp_me->vif;
@@ -127,7 +127,7 @@ int PG_fin_parallel(int trm)
    {
 
     if (trm)
-       PC_close_member(_PG.pp_me);
+       PN_close_member(_PG.pp_me);
 
     return(trm);}
 
@@ -203,15 +203,15 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
             for (i = 0; i < np; i++)
                 {if (i != dp)
                     {sp[2] = i;
-                     PC_in(adc+i*ne, SC_DOUBLE_S, ne, pp, sp);};};}
+                     PN_in(adc+i*ne, SC_DOUBLE_S, ne, pp, sp);};};}
 
 /* post the sends */
         else
            {sp[2] = dp;
-            PC_out(dc, SC_DOUBLE_S, ne, pp, sp);};
+            PN_out(dc, SC_DOUBLE_S, ne, pp, sp);};
 
 /* wait for the data to move */
-        PC_wait(pp);
+        PN_wait(pp);
 
 /* find the global extrema */
         if (ip == dp)
@@ -252,13 +252,13 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
             for (i = 0; i < np; i++)
                 {if (i != dp)
                     {sp[2] = i;
-                     PC_out(dc, SC_DOUBLE_S, ne, pp, sp);};};}
+                     PN_out(dc, SC_DOUBLE_S, ne, pp, sp);};};}
 
         else
            {sp[2] = dp;
-            PC_in(dc, SC_DOUBLE_S, ne, pp, sp);};
+            PN_in(dc, SC_DOUBLE_S, ne, pp, sp);};
         
-        PC_wait(pp);
+        PN_wait(pp);
 
 /* compute what this node's piece of the global picture is */
         if (dfl)
@@ -373,7 +373,7 @@ static PG_image *_PG_transmit_images(PG_device *dev, PG_image *im)
             for (i = 0; i < np; i++)
                 {if ((i != dp) && (map[i] == TRUE))
                     {sp[2] = i;
-                     PC_in(pim+i, "PG_image", 1, pp, sp);};};
+                     PN_in(pim+i, "PG_image", 1, pp, sp);};};
 
             if (dfl)
                pim[dp] = *im;
@@ -387,9 +387,9 @@ static PG_image *_PG_transmit_images(PG_device *dev, PG_image *im)
            {pim         = NULL;
             im->palette = NULL;
             sp[2] = dp;
-            PC_out(im, "PG_image", 1, pp, sp);};
+            PN_out(im, "PG_image", 1, pp, sp);};
 
-        PC_wait(pp);};
+        PN_wait(pp);};
 
     return(pim);}
 

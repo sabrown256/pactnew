@@ -43,7 +43,7 @@ static void child_has_txt(int fd, int mask, void *a)
 	       break;};
 
     if (p != NULL)
-       while (PC_gets(s, MAXLINE, p) != NULL)
+       while (SC_gets(s, MAXLINE, p) != NULL)
           PRINT(stdout, "\n  From #%d | %s", i + 1, s);
 
     return;}
@@ -72,7 +72,7 @@ static void tty_has_txt(int fd, int mask, void *a)
 	    exit(1);};
 
 	t = SC_strtok(NULL, "", pt);
-	PC_printf(p, "%s", t);
+	SC_printf(p, "%s", t);
 
         PRINT(stdout, "\n  To   #%d | %s", i, t);};
 
@@ -82,7 +82,7 @@ static void tty_has_txt(int fd, int mask, void *a)
 /*--------------------------------------------------------------------------*/
 
 /* PROCESS_END - return the number of process which have ended
- *             - do the PC_close now since the TTY may be in
+ *             - do the SC_close now since the TTY may be in
  *             - RAW mode and we want the output to
  *             - look nice (PTY's do this)
  */
@@ -104,7 +104,7 @@ static int process_end(int *prv, void *a)
     for (i = 0; i < n; i++)
         {p = pp[i];
 	 if (p != NULL)
-	    if (PC_status(p) != SC_RUNNING)
+	    if (SC_status(p) != SC_RUNNING)
 	       {status = p->status;
 		reason = p->reason;
 
@@ -118,7 +118,7 @@ static int process_end(int *prv, void *a)
 		   PRINT(stdout, "\n    Child #%d (%d) terminated (%d %d)\n",
 			 i + 1, p->id, status, reason);
 
-		PC_close(p);
+		SC_close(p);
 		pp[i] = NULL;
 
 		ret++;};};
@@ -157,7 +157,7 @@ static int process_count(void *a)
 static void clean_up(int sig)
    {
 
-    PC_block_file(stdin);
+    SC_block_file(stdin);
 
     if (sig == SIGALRM)
        {PRINT(stdout, "Multiple child test timed out\n");
@@ -222,15 +222,15 @@ static int poll_mode(descriptors *pd)
        {for (i = 0; i < n; i++)
             {p = pp[i];
 	     if (p != NULL)
-	        while (PC_gets(s, MAX_BFSZ, p) != NULL)
+	        while (SC_gets(s, MAX_BFSZ, p) != NULL)
 		   PRINT(stdout, "\n  From #%d | %s", i + 1, s);};
 
         if (process_end(NULL, pd))
            continue;
 
-        PC_unblock_file(stdin);
+        SC_unblock_file(stdin);
         t = SC_fgets(s, MAX_BFSZ, stdin);
-        PC_block_file(stdin);
+        SC_block_file(stdin);
 
         if (t != NULL)
 	   {t = SC_strtok(s, " ", pt);
@@ -241,7 +241,7 @@ static int poll_mode(descriptors *pd)
 		exit(1);};
 
             t = SC_strtok(NULL, "", pt);
-	    PC_printf(p, "%s", t);
+	    SC_printf(p, "%s", t);
 
             PRINT(stdout, "\n  To   #%d | %s", i, t);
 	    sleep(1);};};
@@ -318,12 +318,12 @@ int main(int argc, char **argv, char **envp)
     if (to < DEFAULT_TIMEOUT)
        PRINT(stdout, "   Timing out in %d seconds\n", to);
 
-    PC_unblock_file(stdin);
+    SC_unblock_file(stdin);
 
     pp = CMAKE_N(PROCESS *, n);
 
     for (i = 0; i < n; i++)
-        {p = PC_open(argl, envp, mode);
+        {p = PN_open_process(argl, envp, mode);
 	 if (p == NULL)
 	    {PRINT(stdout, "\nError: failed to open copy #%d of %s\n\n",
 		   i + 1, prog);
@@ -332,7 +332,7 @@ int main(int argc, char **argv, char **envp)
 	 pp[i] = p;
 
 	 PRINT(stdout, "\n  Child #%d (%s) is %d", i + 1, prog, p->id);
-	 PC_unblock(p);};
+	 SC_unblock(p);};
 
     PRINT(stdout, "\n");
 
@@ -354,7 +354,7 @@ int main(int argc, char **argv, char **envp)
 
     PRINT(stdout, "\nProcess test %s ended\n\n", prog);
 
-    PC_block_file(stdin);
+    SC_block_file(stdin);
 
     return(ret);}
 

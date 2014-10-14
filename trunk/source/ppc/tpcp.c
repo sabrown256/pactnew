@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
     iter = 3;
 
-    pp = PC_open_member(argv, &nodes);
+    pp = PN_open_member(argv, &nodes);
     if (pp == NULL)
        return(1);
 
@@ -133,7 +133,7 @@ static void test_nb_read_patterned(pp)
     filt[1] = 1066;
     filt[2] = SC_MATCH_NODE;
     filt[3] = 1;
-    filt[5] = PC_BLOCK_STATE;
+    filt[5] = SC_BLOCK_STATE;
     filt[6] = FALSE;
 
     if (pid == 1)
@@ -143,7 +143,7 @@ static void test_nb_read_patterned(pp)
         nir = 0;
         pbf = buf2;
         while (nir < BSIZE)
-	   {n    = PC_in(pbf, SC_INT_S, BSIZE-nir, pp, filt);
+	   {n    = PN_in(pbf, SC_INT_S, BSIZE-nir, pp, filt);
 	    nir += n;
 	    pbf += n;
 	    sleep(1);
@@ -163,7 +163,7 @@ static void test_nb_read_patterned(pp)
 	sleep(2);
 	fill_buf(buf1, BSIZE);
 	filt[4] = 1;
-        PC_out(buf1, SC_INT_S, BSIZE, pp, filt);
+        PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
 
         PRINT(stdout, "Test done\n");};
 
@@ -192,7 +192,7 @@ static void test_ring_b(pp)
     filt[1] = 99;
     filt[2] = SC_MATCH_NODE;
     filt[3] = 1;
-    filt[5] = PC_BLOCK_STATE;
+    filt[5] = SC_BLOCK_STATE;
     filt[6] = TRUE;
     for (i = 0; i < iter; i++)
         {fill_buf(buf1, BSIZE);
@@ -201,16 +201,16 @@ static void test_ring_b(pp)
 /* odd nodes go one way */
 	 if (pid & 1)
 	    {filt[4] = next;
-	     PC_out(buf1, SC_INT_S, BSIZE, pp, filt);
+	     PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
 	     filt[4] = prev;
-	     PC_in(buf2, SC_INT_S, BSIZE, pp, filt);}
+	     PN_in(buf2, SC_INT_S, BSIZE, pp, filt);}
 
 /* even nodes go the other */
 	 else
 	    {filt[4] = prev;
-	     PC_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	     PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
 	     filt[4] = next;
-	     PC_out(buf1, SC_INT_S, BSIZE, pp, filt);};
+	     PN_out(buf1, SC_INT_S, BSIZE, pp, filt);};
 
 	 check_buf(buf2, BSIZE);};
     PRINT(stdout, "   %d iterations made\n", i);
@@ -245,24 +245,24 @@ static void test_ring_nb(pp)
     filt[1] = 99;
     filt[2] = SC_MATCH_NODE;
     filt[3] = 1;
-    filt[5] = PC_BLOCK_STATE;
+    filt[5] = SC_BLOCK_STATE;
     filt[6] = FALSE;
 
     filt[4] = next;
-    PC_out(buf1, SC_INT_S, BSIZE, pp, filt);
+    PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
     filt[4] = prev;
-    PC_in(buf2, SC_INT_S, BSIZE, pp, filt);
+    PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
 
     check_buf(buf2, BSIZE);
 
     PRINT(stdout, "Check mismatched messge sizes\n");
     if (pid == 0)
        {filt[4] = next;
-	PC_out(buf1, SC_INT_S, BSIZE/2, pp, filt);};
+	PN_out(buf1, SC_INT_S, BSIZE/2, pp, filt);};
 
     if (pid == 1)
        {filt[4] = prev;
-	rlen = PC_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	rlen = PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
 	if (rlen == BSIZE/2)
 	   PRINT(stdout, "Got right size OK\n");};
     
@@ -290,27 +290,27 @@ static void test_type_sel(pp)
     filt[0] = SC_MATCH_TAG;
     filt[2] = SC_MATCH_NODE;
     filt[3] = 1;
-    filt[5] = PC_BLOCK_STATE;
+    filt[5] = SC_BLOCK_STATE;
     filt[6] = TRUE;
 
     if (pid == 0)
        {filt[4] = next;
 	filt[1] = 66;
-	PC_out(buf1, SC_INT_S, BSIZE, pp, filt);
+	PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
 	filt[1] = 99;
-	PC_out(buf1, SC_INT_S, BSIZE, pp, filt);};
+	PN_out(buf1, SC_INT_S, BSIZE, pp, filt);};
 
     if (pid == 2)
        {filt[4] = prev;
 	filt[1] = 66;
-	PC_out(buf1, SC_INT_S, BSIZE, pp, filt);
+	PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
 	filt[1] = 99;
-	PC_out(buf1, SC_INT_S, BSIZE, pp, filt);};
+	PN_out(buf1, SC_INT_S, BSIZE, pp, filt);};
 
     if (pid == 1)
        {filt[4] = prev;
 	filt[1] = 99;
-	PC_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
 	PRINT(stdout,
 	      "   Got message from %d tag %d length %d\n",
 	      prev, 99, BSIZE);
@@ -318,7 +318,7 @@ static void test_type_sel(pp)
 
         filt[4] = next;
 	filt[1] = 99;
-	PC_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
 	PRINT(stdout,
 	      "   Got message from %d tag %d length %d\n",
 	      next, 99, BSIZE);
@@ -326,7 +326,7 @@ static void test_type_sel(pp)
 
         filt[4] = prev;
 	filt[1] = 66;
-	PC_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
 	PRINT(stdout,
 	      "   Got message from %d tag %d length %d\n",
 	      prev, 66, BSIZE);
@@ -334,7 +334,7 @@ static void test_type_sel(pp)
 
         filt[4] = next;
 	filt[1] = -1;
-	PC_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
 	PRINT(stdout,
 	      "   Got message from %d tag %d length %d\n",
 	      next, filt[1], BSIZE);
@@ -362,13 +362,13 @@ static void test_broadcast(pp)
     filt[1] = 99;
     filt[2] = SC_MATCH_NODE;
     filt[3] = -1;
-    filt[5] = PC_BLOCK_STATE;
+    filt[5] = SC_BLOCK_STATE;
     filt[6] = TRUE;
 
     for (i = 0; i < nodes; i++)
         {fill_buf(buf1, BSIZE);
 
-         PC_out(buf1, SC_INT_S, BSIZE, pp, filt);
+         PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
 
 	 PRINT(stdout, "   Node %d got message from %d\n", pid, i);
 	 check_buf(buf1, BSIZE); 
@@ -401,7 +401,7 @@ static void test_rates(pp)
     filt[1] = 0;
     filt[2] = SC_MATCH_NODE;
     filt[3] = 1;
-    filt[5] = PC_BLOCK_STATE;
+    filt[5] = SC_BLOCK_STATE;
     filt[6] = TRUE;
 
     if (pid == 0)
@@ -414,7 +414,7 @@ static void test_rates(pp)
 	     tstart = SC_wall_clock_time();
              filt[4] = 1;
 	     for (j = 0 ; j < reps; j++)
-                 PC_in(buf1, SC_INT_S, bytes[i] >> 2, pp, filt);
+                 PN_in(buf1, SC_INT_S, bytes[i] >> 2, pp, filt);
 
 	     tend = SC_wall_clock_time();
 	     secs = tend - tstart;
@@ -439,7 +439,7 @@ static void test_rates(pp)
              filt[4] = 0;
 	     rlen = bytes[i];
 	     for (j = 0 ; j < reps; j++)
-	         rlen = PC_out(buf2, "char", rlen, pp, filt);};};
+	         rlen = PN_out(buf2, "char", rlen, pp, filt);};};
 
     if (pid == 0)
        PRINT(stdout, "Test done\n");
@@ -465,7 +465,7 @@ static void test_error(pp)
 	filt[4] = -999;
 	filt[5] = 0;
 
-        PC_out(buf1, SC_INT_S, BSIZE, pp, filt);};
+        PN_out(buf1, SC_INT_S, BSIZE, pp, filt);};
 
     return;}
 

@@ -185,7 +185,7 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
 
     argv[i] = NULL;
 
-    pp = PC_open(argv, NULL, mode);
+    pp = PN_open_process(argv, NULL, mode);
     SC_block_file(stdin);   
     if (pp == NULL)
        SS_error(si, "CAN'T OPEN PROCESS - PROCESS-OPEN", obj);

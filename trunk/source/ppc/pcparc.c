@@ -1,9 +1,5 @@
 /*
- * PCPARC.C - parallel communications routines for PPC for distributed
- *          - or multitasked configuration
- *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
+ * PNPARC.C - parallel communications routines for PDBNet
  *
  */
 
@@ -20,9 +16,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_PUT_DATA - put the data out and return the confirmation info */
+/* _PN_PUT_DATA - put the data out and return the confirmation info */
 
-static int _PC_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
+static int _PN_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
 			int nb, int dn, long *pni, char *types, int nc,
 			int *pi)
    {int nbo, data;
@@ -32,12 +28,12 @@ static int _PC_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
 
     ps = pp->tstate;
 
-    PC_printf(pp, "%c,%s,%ld,%d\n", PC_FWRITE, type, ni, dn);
+    SC_printf(pp, "%c,%s,%ld,%d\n", SC_FWRITE, type, ni, dn);
 
     data = pp->data;
     pbf  = bf;
     while (nb > 0)
-       {PC_buffer_data_in(pp);
+       {PN_buffer_data_in(pp);
 	nbo = SC_write_sigsafe(data, pbf, nb);
 	if (nbo < 0)
 	   continue;
@@ -47,8 +43,8 @@ static int _PC_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
 	nb  -= nbo;
 	pbf += nbo;};
 
-    PC_block(pp);
-    PC_gets(reply, MAXLINE, pp);
+    SC_block(pp);
+    SC_gets(reply, MAXLINE, pp);
 
     snprintf(fmt, MAXLINE, "%%ld,%%%ds,%%d\n", nc);
     sscanf(reply, fmt, pni, types, pi);
@@ -58,11 +54,11 @@ static int _PC_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_EXTRACT_FILTER_INFO - extract the message description information
+/* _PN_EXTRACT_FILTER_INFO - extract the message description information
  *                         - from the message filter array
  */
 
-void _PC_extract_filter_info(int *filt, int *pti, int *pit,
+void _PN_extract_filter_info(int *filt, int *pti, int *pit,
 			     int *phn, int *pdn, int *pdi,
 			     int *pbs, int *pbz, int *pnn,
 			     int **pnl, int *pnp, int **ppl)
@@ -89,11 +85,11 @@ void _PC_extract_filter_info(int *filt, int *pti, int *pit,
 	   {switch (*p++)
 	       {case SC_MATCH_TYPE :
 		     ityp |= *p++;
-		     ityp |= ((type_index << 16) & PC_TYPE_MASK);
+		     ityp |= ((type_index << 16) & SC_TYPE_MASK);
 		     break;
 
 	        case SC_MATCH_TAG :
-		     ityp |= (*p++ & PC_TAG_MASK);
+		     ityp |= (*p++ & SC_TAG_MASK);
 		     break;
 
 	        case SC_MATCH_NODE :
@@ -108,11 +104,11 @@ void _PC_extract_filter_info(int *filt, int *pti, int *pit,
                      p += np;
 		     break;
 
-	        case PC_BLOCK_STATE :
+	        case SC_BLOCK_STATE :
                      block_state = *p++;
                      break;
 
-	        case PC_BUFFER_SIZE :
+	        case SC_BUFFER_SIZE :
                      buffer_size = *p++;
                      break;
 
@@ -146,9 +142,9 @@ void _PC_extract_filter_info(int *filt, int *pti, int *pit,
 
 /*--------------------------------------------------------------------------*/
 
-/* PC_PUSH_PENDING - push an I/O transaction onto the pending list */
+/* PN_PUSH_PENDING - push an I/O transaction onto the pending list */
 
-void PC_push_pending(PROCESS *pp, int op, char *bf, char *type,
+void PN_push_pending(PROCESS *pp, int op, char *bf, char *type,
 		     size_t ni, void *vr, void *req)
    {SC_pending_msg *pm;
 
@@ -170,10 +166,10 @@ void PC_push_pending(PROCESS *pp, int op, char *bf, char *type,
 
      requ = *(MPI_Request *) req;
 
-     if (_PC.reqs == NULL)
-        _PC.reqs = CMAKE_ARRAY(MPI_Request, NULL, 0);
+     if (_PN.reqs == NULL)
+        _PN.reqs = CMAKE_ARRAY(MPI_Request, NULL, 0);
 
-     SC_array_push(_PC.reqs, &requ);};
+     SC_array_push(_PN.reqs, &requ);};
 
 #endif
 
@@ -185,9 +181,9 @@ void PC_push_pending(PROCESS *pp, int op, char *bf, char *type,
 
 /*--------------------------------------------------------------------------*/
 
-/* PC_POP_PENDING - pop a completed pending message */
+/* PN_POP_PENDING - pop a completed pending message */
 
-void PC_pop_pending(PROCESS *pp, int *po, char **pbf, char **pty,
+void PN_pop_pending(PROCESS *pp, int *po, char **pbf, char **pty,
 		    size_t *pni, void **pvr)
    {SC_pending_msg *pm;
 
@@ -207,7 +203,7 @@ void PC_pop_pending(PROCESS *pp, int *po, char **pbf, char **pty,
 
 #ifdef HAVE_MPI
 
-    SC_array_pop(_PC.reqs);
+    SC_array_pop(_PN.reqs);
 
 #endif
 
@@ -216,9 +212,9 @@ void PC_pop_pending(PROCESS *pp, int *po, char **pbf, char **pty,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_SYNC_EXECUTION - synchronize the execution of the tasks */
+/* PN_SYNC_EXECUTION - synchronize the execution of the tasks */
 
-void PC_sync_execution(void)
+void PN_sync_execution(void)
    {
 
     return;}
@@ -226,11 +222,11 @@ void PC_sync_execution(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_OPEN_GROUP - open a copy of the named executable on each available
+/* PN_OPEN_GROUP - open a copy of the named executable on each available
  *               - node
  */
 
-int PC_open_group(char **argv, int *pn)
+int PN_open_group(char **argv, int *pn)
    {int i, argc, offs;
     char **args, s[MAXLINE], *t, *p;
     PROCESS *pp;
@@ -238,9 +234,9 @@ int PC_open_group(char **argv, int *pn)
 #if defined(HAVE_POSIX_SYS)
     SC_thread_proc *ps;
 
-    PC_init_communications(NULL);
+    PN_init_communications(NULL);
 
-    _PC.n_nodes = 0;
+    _PN.n_nodes = 0;
 
     offs = 3;
     argc = 0;
@@ -255,19 +251,19 @@ int PC_open_group(char **argv, int *pn)
     for (i = 0; i < argc; i++)
         args[i + offs] = argv[i];
 
-    pp = PC_open(args, NULL, "rb+");
+    pp = PN_open_process(args, NULL, "rb+");
     if (pp != NULL)
        {ps = pp->tstate;
 
-	PC_block(pp);
-	PC_gets(s, MAXLINE, pp);
+	SC_block(pp);
+	SC_gets(s, MAXLINE, pp);
 
 	p = SC_strtok(s, ",", t);
 	if (p != NULL)
-	   SC_strncpy(_PC.server, MAXLINE, p, -1);
+	   SC_strncpy(_PN.server, MAXLINE, p, -1);
 
-	_PC.server_port = SC_stoi(SC_strtok(NULL, ",\n", t));
-	_PC.n_nodes  = SC_stoi(SC_strtok(NULL, ",\n", t));
+	_PN.server_port = SC_stoi(SC_strtok(NULL, ",\n", t));
+	_PN.n_nodes  = SC_stoi(SC_strtok(NULL, ",\n", t));
 	ps->debug   = SC_stoi(SC_strtok(NULL, ",\n", t));
 
 	for (i = 0; i < offs; i++)
@@ -275,9 +271,9 @@ int PC_open_group(char **argv, int *pn)
 	CFREE(args);
 
 	if (pn != NULL)
-	   *pn = _PC.n_nodes;
+	   *pn = _PN.n_nodes;
 
-	_PC.server_link = pp;};
+	_PN.server_link = pp;};
 
 #endif
 
@@ -289,9 +285,9 @@ int PC_open_group(char **argv, int *pn)
 
 /*--------------------------------------------------------------------------*/
 
-/* _PC_OPEN_MEMBER_N - open a copy of the specified executable on this node */
+/* _PN_OPEN_MEMBER_N - open a copy of the specified executable on this node */
 
-static PROCESS *_PC_open_member_n(char **argv, int *pnn)
+static PROCESS *_PN_open_member_n(char **argv, int *pnn)
    {int port, argc;
     char *tok, t[MAXLINE], srvr[MAXLINE], *s, *p;
     PROCESS *pp;
@@ -319,38 +315,38 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 
         argv[argc] = NULL;};
 
-    pp = PC_mk_process(argv, "rb+", SC_CHILD);
+    pp = PN_mk_process(argv, "rb+", SC_CHILD);
     ps = pp->tstate;
 
     if (pnn != NULL)
        {if ((srvr[0] == '\0') || (port < 0))
-	   {PC_open_group(argv, pnn);
+	   {PN_open_group(argv, pnn);
 
-	    SC_strncpy(srvr, MAXLINE, _PC.server, -1);
-	    port = _PC.server_port;
+	    SC_strncpy(srvr, MAXLINE, _PN.server, -1);
+	    port = _PN.server_port;
 
-	    pp->io[0] = _PC.server_link->io[0];
-	    pp->io[1] = _PC.server_link->io[1];
-	    pp->io[2] = _PC.server_link->io[2];}
+	    pp->io[0] = _PN.server_link->io[0];
+	    pp->io[1] = _PN.server_link->io[1];
+	    pp->io[2] = _PN.server_link->io[2];}
 
        else
 	  {pp->io[0] = 0;
 	   pp->io[1] = 1;
 	   pp->io[2] = 2;};
 
-	PC_block(pp);
-	PC_gets(t, MAXLINE, pp);
+	SC_block(pp);
+	SC_gets(t, MAXLINE, pp);
 
 	sscanf(t, "%d,%d,%d\n", &pp->acpu, pnn, &ps->debug);
 
-	PC_printf(pp, "%s,%d,%d\n", srvr, port, (int) getpid());
-	pp->data = PC_init_client(srvr, port);
+	SC_printf(pp, "%s,%d,%d\n", srvr, port, (int) getpid());
+	pp->data = SC_init_client(srvr, port);
 
 	SC_gs.comm_size = *pnn;};
 
 /* conditional diagnostic messages */
     if (ps->debug)
-       {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) getpid());
+       {snprintf(t, MAXLINE, "PN_clnt_log.%d", (int) getpid());
 	ps->diag = SC_fopen_safe(t, "w");
 	if (ps->diag != NULL)
 	   {fprintf(ps->diag, "\n\n   Node #%d at %s:%d.%d\n",
@@ -366,15 +362,15 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_CLOSE_MEMBER_N - close the member process */
+/* _PN_CLOSE_MEMBER_N - close the member process */
 
-static void _PC_close_member_n(PROCESS *pp)
+static void _PN_close_member_n(PROCESS *pp)
    {
 
 #if defined(HAVE_POSIX_SYS)
     SC_thread_proc *ps;
 
-    PC_close(pp);
+    SC_close(pp);
 
 /* conditional diagnostic messages */
     if (pp != NULL)
@@ -389,14 +385,14 @@ static void _PC_close_member_n(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_SIZE_MESSAGE_N - return the number of items of the specified type
+/* _PN_SIZE_MESSAGE_N - return the number of items of the specified type
  *                    - in a message 
  *                    -   SP   - destination processor index
  *                    -   TYPE - type of items
  *                    -   TAG  - message tag
  */
 
-static long _PC_size_message_n(int sp, char *type, int tag)
+static long _PN_size_message_n(int sp, char *type, int tag)
    {int ni;
 
     ni = 0;
@@ -406,20 +402,20 @@ static long _PC_size_message_n(int sp, char *type, int tag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_GLMN_MESSAGE_N - return the global minimum of some quantity */
+/* _PN_GLMN_MESSAGE_N - return the global minimum of some quantity */
 
-static double _PC_glmn_message_n(double vi)
+static double _PN_glmn_message_n(double vi)
    {int i, ip, np;
     double vo, vt;
     static int sp[] = {SC_MATCH_NODE, -1,
 		       SC_MATCH_TAG, 0,
 		       0};
 
-    ip = PC_get_processor_number();
-    np = PC_get_number_processors();
+    ip = SC_get_processor_number();
+    np = SC_get_number_processors();
 
     sp[1] = -1;
-    PC_out(&vi, SC_DOUBLE_S, 1, NULL, sp);
+    PN_out(&vi, SC_DOUBLE_S, 1, NULL, sp);
 
     vo = vi;
     vt = 0.0;
@@ -429,7 +425,7 @@ static double _PC_glmn_message_n(double vi)
 	    continue;
 
 	 sp[1] = i;
-	 PC_in(&vt, SC_DOUBLE_S, 1, NULL, sp);
+	 PN_in(&vt, SC_DOUBLE_S, 1, NULL, sp);
 
 	 vo = min(vo, vt);};
 
@@ -438,12 +434,12 @@ static double _PC_glmn_message_n(double vi)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_OUT_N - write data out to the filtered list of nodes
+/* _PN_OUT_N - write data out to the filtered list of nodes
  *           - this does a message passing system's SEND command
  *           - or a LINDA-like PUT
  */
 
-static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
+static long _PN_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
    {int i, ityp, dn, nb, nbr, is, ok;
     int block, buf_siz;
     int type_index, default_node, default_id, host_node;
@@ -461,7 +457,7 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 
     vif = pp->vif;
 
-    _PC_extract_filter_info(filt,
+    _PN_extract_filter_info(filt,
 			    &type_index, &ityp,
 			    &host_node, &default_node, &default_id,
 			    &block, &buf_siz,
@@ -484,7 +480,7 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     nbr = PD_sizeof(vif, type, ni, vr);
     nb  = (buf_siz > 0) ? buf_siz : nbr;
     if (nb < nbr)
-       SC_error(-1, "SPECIFIED BUFFER SIZE TOO SMALL - PC_OUT");
+       SC_error(-1, "SPECIFIED BUFFER SIZE TOO SMALL - PN_OUT");
 
 /* allocate the buffer */
     bf = CMAKE_N(char, nb);
@@ -497,13 +493,13 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	PN_close(tf);};
 
 /* send the message now */
-    PC_unblock(pp);
-    while (PC_gets(reply, MAXLINE, pp) != NULL);
-    PC_block(pp);
+    SC_unblock(pp);
+    while (SC_gets(reply, MAXLINE, pp) != NULL);
+    SC_block(pp);
 
     if (nn == -1)
-       {for (dn = 0; dn < _PC.n_nodes; dn++)
-            _PC_put_data(pp, bf, type, ni, nb, dn, &nib,
+       {for (dn = 0; dn < _PN.n_nodes; dn++)
+            _PN_put_data(pp, bf, type, ni, nb, dn, &nib,
 			 types, MAXLINE, &is);}
 
     else
@@ -513,7 +509,7 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	     if (dn == SC_GROUP_LEADER)
   	        dn = host_node;
 
-             _PC_put_data(pp, bf, type, ni, nb, dn, &nib,
+             _PN_put_data(pp, bf, type, ni, nb, dn, &nib,
 			  types, MAXLINE, &is);};};
 
 /* conditional diagnostic messages */
@@ -528,13 +524,13 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_IN_N - read data in from the filtered list of nodes
+/* _PN_IN_N - read data in from the filtered list of nodes
  *          - this does a message passing system's RECV command
  *          - or a LINDA-like GET
  *          - return the number of items successfully read in
  */
 
-static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
+static long _PN_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
    {int ip, nis, ityp, nn, np, *nl, *pl;
     int type_index, block, buf_siz, bs;
     long nir, nb, nbt, nbr;
@@ -547,7 +543,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     vif = pp->vif;
     nir = ni;
 
-    _PC_extract_filter_info(filt,
+    _PN_extract_filter_info(filt,
 			    &type_index, &ityp,
 			    NULL, NULL, NULL,
 			    &block, &buf_siz,
@@ -567,21 +563,21 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     if (buf_siz > 0)
        nb = buf_siz;
     else
-       nb = PC_size_message(ip, type, ityp);
+       nb = PN_size_message(ip, type, ityp);
 
     bf = CMAKE_N(char, nb);
 
     SC_strncpy(types, MAXLINE, type, -1);
 
     if (block)
-       PC_block(pp);
+       SC_block(pp);
     else
-       PC_unblock(pp);
+       SC_unblock(pp);
 
     pbf = bf;
     nbr = nb;
     for (nbr = nb, bs = FALSE; nbr > 0; pbf += nbt, bs = block)
-        {nbt = PC_buffer_data_out(pp, pbf, nbr, bs);
+        {nbt = PN_buffer_data_out(pp, pbf, nbr, bs);
 	 if (nbt > 0)
 	    {if (ps->debug)
 	        {fprintf(ps->diag, " Recv(%ld,%s)", nbt, types);
@@ -589,10 +585,10 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 
          nbr -= nbt;
          if (nbr > 0)
-	    {PC_printf(pp, "%c,%s,%ld,%d\n", PC_FREAD,
+	    {SC_printf(pp, "%c,%s,%ld,%d\n", SC_FREAD,
 		       SC_CHAR_S, nbr, block);
 
-	     PC_gets(reply, MAXLINE, pp);
+	     SC_gets(reply, MAXLINE, pp);
 	     sscanf(reply, "%d,%254s\n", &nis, types);
 
 	     if (ps->debug && block && (nis > 0))
@@ -624,12 +620,12 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_WAIT_N - wait for all pending communications to finish
+/* _PN_WAIT_N - wait for all pending communications to finish
  *            - complete the work, free the buffers, and
  *            - return the number of pendings honored
  */
 
-static long _PC_wait_n(PROCESS *pp)
+static long _PN_wait_n(PROCESS *pp)
    {int i, np, oper;
     char *type, *bf;
     void *vr;
@@ -650,7 +646,7 @@ static long _PC_wait_n(PROCESS *pp)
 
 /* convert the message to the requested output data */
     for (i = 0; i < np; i++)
-        {PC_pop_pending(pp, &oper, &bf, &type, &ni, &vr);
+        {PN_pop_pending(pp, &oper, &bf, &type, &ni, &vr);
 
 	 if (oper == SC_READ_MSG)
 	    {tf = PN_open(vif, bf);
@@ -670,33 +666,33 @@ static long _PC_wait_n(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_INIT_N - init for function pointers */
+/* _PN_INIT_N - init for function pointers */
 
-static void _PC_init_n(PC_par_fnc *p)
+static void _PN_init_n(PN_par_fnc *p)
    {
 
-    p->open_member  = _PC_open_member_n;
-    p->close_member = _PC_close_member_n;
-    p->size_message = _PC_size_message_n;
-    p->glmn_message = _PC_glmn_message_n;
-    p->out          = _PC_out_n;
-    p->in           = _PC_in_n;
-    p->wait         = _PC_wait_n;
+    p->open_member  = _PN_open_member_n;
+    p->close_member = _PN_close_member_n;
+    p->size_message = _PN_size_message_n;
+    p->glmn_message = _PN_glmn_message_n;
+    p->out          = _PN_out_n;
+    p->in           = _PN_in_n;
+    p->wait         = _PN_wait_n;
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_INIT_COMMUNICATIONS - initialize inter processor communications */
+/* PN_INIT_COMMUNICATIONS - initialize inter processor communications */
 
-void PC_init_communications(void (*init)(PC_par_fnc *p))
+void PN_init_communications(void (*init)(PN_par_fnc *p))
    {
 
     if (init == NULL)
-       _PC_init_n(&PC_gs.oper);
+       _PN_init_n(&PN_gs.oper);
     else
-       (*init)(&PC_gs.oper);
+       (*init)(&PN_gs.oper);
 
     return;}
 

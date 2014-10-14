@@ -1193,7 +1193,7 @@ static void add_derived_types(char **sbi)
 static char *map_name(char *d, int nc, char *cf, char *lf,
 		      char *sfx, int cs, int us, int cls)
    {int i, n, ok;
-    static char *pre[] = { "SC_", "PM_", "PD_", "PC_", "PG_", "PA_" };
+    static char *pre[] = { "SC_", "PM_", "PD_", "PG_", "PA_" };
 
     n = sizeof(pre)/sizeof(char *);
     ok = FALSE;

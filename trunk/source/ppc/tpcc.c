@@ -36,7 +36,7 @@ static void send_binary(long ni, char *type)
         argv    = CMAKE_N(char *, 2);
         argv[0] = CSTRSAVE("VIF");
 
-        tty = PC_mk_process(argv, "ab", SC_CHILD);
+        tty = PN_mk_process(argv, "ab", SC_CHILD);
 	for (i = 0; i < SC_N_IO_CH; i++)
 	    tty->io[i] = i;};
 
@@ -52,7 +52,7 @@ static void send_binary(long ni, char *type)
 	space = SC_convert_id(did, NULL, 0, 1,
 			      SC_DOUBLE_I, src, 0, 1, ni, TRUE);
 
-	if (PC_write(space, type, ni, pp))
+	if (SC_write(space, type, ni, pp))
 	   printf("Binary data sent: %s %ld\n",
 		  type, ni);
 

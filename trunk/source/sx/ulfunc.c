@@ -753,7 +753,7 @@ NORETURN void _UL_quit(SS_psides *si, int sts)
 	    {PG_close_device(out->dev);
 	     out->dev = NULL;};};
 
-    PC_exit_all();
+    SC_exit_all();
 
     exit(sts);}
 

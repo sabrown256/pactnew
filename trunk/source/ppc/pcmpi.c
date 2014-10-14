@@ -1,9 +1,6 @@
 /*
- * PCPARMP.C - parallel communications routines for PPC for distributed
- *           - or multitasked configuration
- *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
+ * PNMPI.C - MPI parallel communications routines for distributed
+ *         - or multitasked configuration
  *
  */
 
@@ -18,9 +15,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_OPEN_MEMBER_D - open a copy of the specified executable on this node */
+/* _PN_OPEN_MEMBER_D - open a copy of the specified executable on this node */
 
-static PROCESS *_PC_open_member_d(char **argv, int *pnn)
+static PROCESS *_PN_open_member_d(char **argv, int *pnn)
    {int port, argc;
     char *tok, t[MAXLINE], srvr[MAXLINE], *s, *u;
     PROCESS *pp;
@@ -45,7 +42,7 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
 	port = SC_stoi(u);
         argv[argc] = NULL;};
 
-    pp = PC_mk_process(argv, "rb+", SC_CHILD);
+    pp = PN_mk_process(argv, "rb+", SC_CHILD);
 
 /* initialize MPI */
     MPI_Init(&argc, &argv);
@@ -54,7 +51,7 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
 
 /* conditional diagnostic messages */
     if (ps->debug)
-       {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) getpid());
+       {snprintf(t, MAXLINE, "PN_clnt_log.%d", (int) getpid());
 	ps->diag = SC_fopen_safe(t, "w");
 	fprintf(ps->diag, "\n\n   Node #%d at %s:%d.%d\n",
 		pp->acpu, srvr, port, pp->data);
@@ -65,15 +62,15 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_CLOSE_MEMBER_D - close the member process */
+/* _PN_CLOSE_MEMBER_D - close the member process */
 
-static void _PC_close_member_d(PROCESS *pp)
+static void _PN_close_member_d(PROCESS *pp)
    {SC_thread_proc *ps;
 
     ps = pp->tstate;
 
     MPI_Finalize();
-    PC_close(pp);
+    SC_close(pp);
 
 /* conditional diagnostic messages */
     if (ps->debug)
@@ -84,14 +81,14 @@ static void _PC_close_member_d(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_SIZE_MESSAGE_D - return the number of items of the specified type
+/* _PN_SIZE_MESSAGE_D - return the number of items of the specified type
  *                    - in a message 
  *                    -   SP   - destination processor index
  *                    -   TYPE - type of items
  *                    -   TAG  - message tag
  */
 
-static long _PC_size_message_d(int sp, char *type, int tag)
+static long _PN_size_message_d(int sp, char *type, int tag)
    {int ni;
 
     MPI_Status stat;
@@ -104,9 +101,9 @@ static long _PC_size_message_d(int sp, char *type, int tag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_GLMN_MESSAGE_D - return the global minimum of some quantity */
+/* _PN_GLMN_MESSAGE_D - return the global minimum of some quantity */
 
-static double _PC_glmn_message_d(double vi)
+static double _PN_glmn_message_d(double vi)
    {double vo;
 
     MPI_Allreduce(&vi, &vo, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
@@ -116,12 +113,12 @@ static double _PC_glmn_message_d(double vi)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_OUT_D - write data out to the filtered list of nodes
+/* _PN_OUT_D - write data out to the filtered list of nodes
  *           - this does a message passing system's SEND command
  *           - or a LINDA-like PUT
  */
 
-static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
+static long _PN_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
    {int i, ityp, dn, nb, nbr, ok;
     int block, buf_siz;
     int type_index, default_node, default_id, host_node;
@@ -139,7 +136,7 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 
     vif = pp->vif;
 
-    _PC_extract_filter_info(filt,
+    _PN_extract_filter_info(filt,
 			    &type_index, &ityp,
 			    &host_node, &default_node, &default_id,
 			    &block, &buf_siz,
@@ -162,15 +159,15 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     nbr = PD_sizeof(vif, type, ni, vr);
     nb  = (buf_siz > 0) ? buf_siz : nbr;
     if (nb < nbr)
-       SC_error(-1, "SPECIFIED BUFFER SIZE TOO SMALL - PC_OUT");
+       SC_error(-1, "SPECIFIED BUFFER SIZE TOO SMALL - PN_OUT");
 
 /* allocate the buffer */
     bf = CMAKE_N(char, nb);
 
 /* convert the data into a message buffer */
-    tf  = PN_open(vif, bf);
-    nis = PN_write(tf, type, ni, vr) ? ni : 0;
-    PN_close(tf);
+    tf  = PN_open_process(vif, bf);
+    nis = SC_write(tf, type, ni, vr) ? ni : 0;
+    SC_close(tf);
 
 /* send the message now */
    {MPI_Request requ;
@@ -179,7 +176,7 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
         {dn = *pnl++;
 
 	 if (dn == -1)
-	    {dn = PC_get_processor_number();
+	    {dn = SC_get_processor_number();
 	     MPI_Bcast(bf, nb, MPI_CHAR, dn, MPI_COMM_WORLD);
 	     break;}
 
@@ -192,7 +189,7 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	    {MPI_Isend(bf, nb, MPI_CHAR, dn, ityp,
 		       MPI_COMM_WORLD, &requ);
 
-	     PC_push_pending(pp, SC_WRITE_MSG,
+	     PN_push_pending(pp, SC_WRITE_MSG,
 			     bf, type, ni, vr, (void *) &requ);};};};
 
 /* conditional diagnostic messages */
@@ -207,13 +204,13 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_IN_D - read data in from the filtered list of nodes
+/* _PN_IN_D - read data in from the filtered list of nodes
  *          - this does a message passing system's RECV command
  *          - or a LINDA-like GET
  *          - return the number of items successfully read in
  */
 
-static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
+static long _PN_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
    {long nir, nb;
     int ip, ityp, nn, np, *nl, *pl;
     int type_index, block, buf_siz;
@@ -226,7 +223,7 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     vif = pp->vif;
     nir = ni;
 
-    _PC_extract_filter_info(filt,
+    _PN_extract_filter_info(filt,
 			    &type_index, &ityp,
 			    NULL, NULL, NULL,
 			    &block, &buf_siz,
@@ -246,7 +243,7 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     if (buf_siz > 0)
        nb = buf_siz;
     else
-       nb = PC_size_message(ip, type, ityp);
+       nb = PN_size_message(ip, type, ityp);
 
     bf = CMAKE_N(char, nb);
 
@@ -262,14 +259,14 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	MPI_Irecv(bf, nb, MPI_CHAR, ip, ityp,
 		  MPI_COMM_WORLD, &requ);
 
-	PC_push_pending(pp, SC_READ_MSG,
+	PN_push_pending(pp, SC_READ_MSG,
 			bf, type, ni, vr, (void *) &requ);};
 
 /* convert the message to the requested output data */
     if (block)
-       {tf  = PN_open(vif, bf);
-	nir = PN_read(tf, type, ni, vr);
-	PN_close(tf);
+       {tf  = PN_open_process(vif, bf);
+	nir = SC_read(tf, type, ni, vr);
+	SC_close(tf);
 
 	CFREE(bf);};
 
@@ -286,12 +283,12 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_WAIT_D - wait for all pending communications to finish
+/* _PN_WAIT_D - wait for all pending communications to finish
  *            - complete the work, free the buffers, and
  *            - return the number of pendings honored
  */
 
-static long _PC_wait_d(PROCESS *pp)
+static long _PN_wait_d(PROCESS *pp)
    {int i, np, oper;
     char *type, *bf;
     void *vr;
@@ -325,12 +322,12 @@ static long _PC_wait_d(PROCESS *pp)
 
 /* convert the message to the requested output data */
     for (i = 0; i < np; i++)
-        {PC_pop_pending(pp, &oper, &bf, &type, &ni, &vr);
+        {PN_pop_pending(pp, &oper, &bf, &type, &ni, &vr);
 
 	 if (oper == SC_READ_MSG)
-	    {tf = PN_open(vif, bf);
-	     PN_read(tf, type, ni, vr);
-	     PN_close(tf);};
+	    {tf = PN_open_process(vif, bf);
+	     SC_read(tf, type, ni, vr);
+	     SC_close(tf);};
 
 	 CFREE(type);
 	 CFREE(bf);};
@@ -344,18 +341,18 @@ static long _PC_wait_d(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_INIT_MPI - init for function pointers */
+/* PN_INIT_MPI - init for function pointers */
 
-void PC_init_mpi(PC_par_fnc *p)
+void PN_init_mpi(PN_par_fnc *p)
    {
 
-    p->open_member  = _PC_open_member_d;
-    p->close_member = _PC_close_member_d;
-    p->size_message = _PC_size_message_d;
-    p->glmn_message = _PC_glmn_message_d;
-    p->out          = _PC_out_d;
-    p->in           = _PC_in_d;
-    p->wait         = _PC_wait_d;
+    p->open_member  = _PN_open_member_d;
+    p->close_member = _PN_close_member_d;
+    p->size_message = _PN_size_message_d;
+    p->glmn_message = _PN_glmn_message_d;
+    p->out          = _PN_out_d;
+    p->in           = _PN_in_d;
+    p->wait         = _PN_wait_d;
 
     return;}
 
@@ -365,9 +362,9 @@ void PC_init_mpi(PC_par_fnc *p)
 
 /*--------------------------------------------------------------------------*/
 
-/* PC_INIT_MPI - init for function pointers */
+/* PN_INIT_MPI - init for function pointers */
 
-void PC_init_mpi(PC_par_fnc *p)
+void PN_init_mpi(PN_par_fnc *p)
    {
 
     p->open_member  = NULL;

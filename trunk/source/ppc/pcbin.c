@@ -1,8 +1,5 @@
 /*
- * PCBIN.C - binary IO for PPC
- *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
+ * PNBIN.C - binary IO for PDBNet
  *
  */
 
@@ -14,9 +11,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_RECV_FORMATS - receive binary formats from the given PROCESS */
+/* PN_RECV_FORMATS - receive binary formats from the given PROCESS */
 
-int PC_recv_formats(PROCESS *pp)
+int PN_recv_formats(PROCESS *pp)
    {int ok;
     long nc, nr;
     char s[MAX_BFSZ+2];
@@ -41,7 +38,7 @@ int PC_recv_formats(PROCESS *pp)
 		 if (strcmp(ps, "END FORMATS\n") == 0)
 		    break;};}
 	else
-	   SC_error(-1, "PROCESS NOT RUNNING %d %d - PC_RECV_FORMATS",
+	   SC_error(-1, "PROCESS NOT RUNNING %d %d - PN_RECV_FORMATS",
 		    pp->status, pp->reason);
 	 
 	(*file->rd_prim_types)(file, s);
@@ -55,11 +52,11 @@ int PC_recv_formats(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_SEND_FORMATS - send binary formats to the parent PROCESS connected
+/* PN_SEND_FORMATS - send binary formats to the parent PROCESS connected
  *                 - to standard in and out
  */
 
-int PC_send_formats(void)
+int PN_send_formats(void)
    {int rv;
     char *_PD_tbuffer;
     PDBfile *pf;
@@ -95,9 +92,9 @@ int PC_send_formats(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_BIN_READ - do binary read from a PROCESS */
+/* _PN_BIN_READ - do binary read from a PROCESS */
 
-int _PC_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp)
+int _PN_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp)
    {int nir;
     syment *ep;
     PDBfile *file;
@@ -124,9 +121,9 @@ int _PC_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_BIN_WRITE - do binary write to a PROCESS */
+/* _PN_BIN_WRITE - do binary write to a PROCESS */
 
-int _PC_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp)
+int _PN_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp)
    {int niw;
     char *name;
     PDBfile *file;

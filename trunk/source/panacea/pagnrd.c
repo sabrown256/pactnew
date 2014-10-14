@@ -416,7 +416,7 @@ void PA_readh(char *str)
    {
 
 /* by now verify/force the PPC hooks to be setup */
-    PC_init_communications(NULL);
+    PN_init_communications(NULL);
 
     PA_read_file(str, TRUE);
 
@@ -911,7 +911,7 @@ void PA_wrrstrth(void)
 NORETURN void PA_done(void)
    {
 
-    PC_close_member(PA_gs.pp);
+    PN_close_member(PA_gs.pp);
 
     LONGJMP(SC_gs.cpu, ERR_FREE);}
 
