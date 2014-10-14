@@ -1,0 +1,11 @@
+
+# shell builtin test
+echo "+foo+"
+
+# simple child test
+pcchld
+
+# tty test
+( stty -a |& grep rows |& grep -v stty |& sed 's/.*baud;//' |& sed 's/; line = .*//' )
+
+

@@ -1,0 +1,68 @@
+#!/bin/csh -f
+#
+# MULTI - PDBNet multiple child tests
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+# NOTE: the exec tests in SCORE are a much more thorough test that this
+# so save the time and do not do this
+# keep the coding around because of the interrupt driven I/O which often
+# fails here and is not tested in SCORE
+
+set msg = "PDBNet Multiple Test ..........."
+set exe = $BinDir/tpnm
+
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+Note $Log ""
+
+if (0) then
+
+      NoteD $Log -n "                       polling ....................."
+      set rpf = "none"
+
+      (echo "1 a" ; \
+       echo "2 b" ; \
+       echo "3 c" ; \
+       echo "3 end" ; \
+       echo "1 end" ; \
+       echo "2 d" ; \
+       echo "2 end" ) | $CROSS_FE $exe -c 30 -i -n 3 >&! tpnm.resp
+      set xstatus = $status
+      if ($xstatus == 123) then
+         set xstatus = 251
+      endif
+
+      $TEST_CHECK part -a multi_poll -e $xstatus -l -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
+      NoteD $Log -n "                       interrupt ..................."
+      set rpf = "none"
+
+      (echo "1 a" ; \
+       echo "2 b" ; \
+       echo "3 c" ; \
+       echo "3 end" ; \
+       echo "1 end" ; \
+       echo "2 d" ; \
+       echo "2 end" ) | $CROSS_FE $exe -c 30 -n 3 >&! tpnm.resi
+      set xstatus = $status
+      if ($xstatus == 123) then
+         set xstatus = 251
+      endif
+
+      $TEST_CHECK part -a multi_interrupt -e $xstatus -l -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
+   endif
+endif
+
+$TEST_CHECK part -a multi -e $nerr -x $exe none
+
+exit($status)
+

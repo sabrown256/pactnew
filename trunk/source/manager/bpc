@@ -21,7 +21,6 @@ char
  *dirs[] = { "pact/score",
 	     "pact/pml",
 	     "pact/pdb",
-	     "pact/ppc",
 	     "pact/pgs",
 	     "pact/panacea",
 	     "pact/scheme",

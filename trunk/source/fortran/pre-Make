@@ -58,7 +58,6 @@ targets :
 	@echo "   link         : link PFTN utilities for public use"
 	@echo "   panacea      : make PANACEA Fortran API tests"
 	@echo "   pdb          : make PDB Fortran API tests"
-	@echo "   ppc          : make PPC Fortran tests"
 	@echo "   scan         : make lexical scanner test"
 	@echo "   test         : run the PFTN test suite"
 
@@ -68,11 +67,11 @@ targets :
 Hdrs = fpact.h
 
 gfs = gf-score.c gf-pml.c gf-pdb.c   \
-      gf-ppc.c gf-pgs.c gf-panacea.c \
+      gf-pgs.c gf-panacea.c \
       gf-scheme.c gf-fortran.c
 
 gms = gm-score.f gm-pml.f gm-pdb.f   \
-      gm-ppc.f gm-pgs.f gm-panacea.f \
+      gm-pgs.f gm-panacea.f \
       gm-scheme.f gm-fortran.f
 
 #
@@ -80,11 +79,11 @@ gms = gm-score.f gm-pml.f gm-pdb.f   \
 #
 
 gfo = gf-score.o gf-pml.o gf-pdb.o   \
-      gf-ppc.o gf-pgs.o gf-panacea.o \
+      gf-pgs.o gf-panacea.o \
       gf-scheme.o gf-fortran.o
 
 gmo = gm-score.o gm-pml.o gm-pdb.o   \
-      gm-ppc.o gm-pgs.o gm-panacea.o \
+      gm-pgs.o gm-panacea.o \
       gm-scheme.o gm-fortran.o
 
 Objs = ${gmo} ${gfo} flibc.o \
@@ -94,11 +93,11 @@ Objs = ${gmo} ${gfo} flibc.o \
        fasxa.o
 
 gfa = ${TGTLib}(gf-score.o) ${TGTLib}(gf-pml.o) ${TGTLib}(gf-pdb.o)   \
-      ${TGTLib}(gf-ppc.o) ${TGTLib}(gf-pgs.o) ${TGTLib}(gf-panacea.o) \
+      ${TGTLib}(gf-pgs.o) ${TGTLib}(gf-panacea.o) \
       ${TGTLib}(gf-scheme.o) ${TGTLib}(gf-fortran.o)
 
 gma = ${TGTLib}(gm-score.o) ${TGTLib}(gm-pml.o) ${TGTLib}(gm-pdb.o)   \
-      ${TGTLib}(gm-ppc.o) ${TGTLib}(gm-pgs.o) ${TGTLib}(gm-panacea.o) \
+      ${TGTLib}(gm-pgs.o) ${TGTLib}(gm-panacea.o) \
       ${TGTLib}(gm-scheme.o) ${TGTLib}(gm-fortran.o)
 
 ArObjs = ${gma} ${gfa} ${TGTLib}(flibc.o) \
@@ -130,8 +129,8 @@ LibAction = @(cd ${PACTTmpDir} ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpD
 
 SLibs = ${DPLib} ${FLib} ${MDLib}
 #Libs = -lfpact ${LPDB} ${LPML} ${LSCORE} ${SLibs}
-Libs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
-NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
+Libs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
+NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
 
 #
 # SCORE tests
@@ -155,7 +154,8 @@ ${BinDir}/tscls : tscls.c ${InstallDep}
 
 # PDB tests
 
-pdb : ${BinDir}/tpdf ${BinDir}/tpdfw ${BinDir}/tpdfg ${BinDir}/tpdfhy
+pdb : ${BinDir}/tpdf ${BinDir}/tpdfw ${BinDir}/tpdfg ${BinDir}/tpdfhy \
+      ${BinDir}/tpcf
 
 ${BinDir}/tpdf : tpdf.f ${InstallDep}
 	${FC} ${LdFlags} tpdf.f -o ${BinDir}/tpdf ${Libs}
@@ -169,17 +169,14 @@ ${BinDir}/tpdfg : tpdfg.f ${InstallDep}
 ${BinDir}/tpdfhy : tpdfhy.f ${InstallDep}
 	${FC} ${LdFlags} tpdfhy.f -o ${BinDir}/tpdfhy ${Libs}
 
+${BinDir}/tpcf : tpcf.f ${InstallDep}
+	${FC} ${LdFlags} tpcf.f -o ${BinDir}/tpcf ${Libs}
+
 fdp : ${BinDir}/tpdfd
 
 ${BinDir}/tpdfd : tpdfd.f ${InstallDep}
 	${FC} ${LdFlags} tpdfd.f -o ${BinDir}/tpdfd ${Libs}
 
-# PPC tests
-
-ppc : ${BinDir}/tpcf
-
-${BinDir}/tpcf : tpcf.f ${InstallDep}
-	${FC} ${LdFlags} tpcf.f -o ${BinDir}/tpcf ${Libs}
 
 # PGS tests
 

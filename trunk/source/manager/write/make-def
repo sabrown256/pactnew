@@ -419,12 +419,10 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "LMM         = -lpsmm"
     Note $STDOUT "LPML        = -lpml"
     Note $STDOUT "LPDB        = -lpdb"
-    Note $STDOUT "LPPC        = -lppc"
     Note $STDOUT "LPGS        = -lpgs"
     Note $STDOUT "LPANACEA    = -lpanacea"
     Note $STDOUT "LSCHEME     = -lscheme"
     Note $STDOUT "LSX         = -lsx"
-    Note $STDOUT "LULTRA      = -lultra"
     Note $STDOUT ""
 
     Note $STDOUT "#"

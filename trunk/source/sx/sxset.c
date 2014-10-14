@@ -41,7 +41,6 @@ static void _SX_install_generated(SS_psides *si)
    {extern void SX_install_score_bindings(SS_psides *si);
     extern void SX_install_pml_bindings(SS_psides *si);
     extern void SX_install_pdb_bindings(SS_psides *si);
-    extern void SX_install_ppc_bindings(SS_psides *si);
     extern void SX_install_pgs_bindings(SS_psides *si);
     extern void SX_install_panacea_bindings(SS_psides *si);
     extern void SX_install_scheme_bindings(SS_psides *si);
@@ -49,7 +48,6 @@ static void _SX_install_generated(SS_psides *si)
     SX_install_score_bindings(si);
     SX_install_pml_bindings(si);
     SX_install_pdb_bindings(si);
-    SX_install_ppc_bindings(si);
     SX_install_pgs_bindings(si);
     SX_install_panacea_bindings(si);
     SX_install_scheme_bindings(si);

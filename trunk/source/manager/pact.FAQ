@@ -140,7 +140,6 @@ or the two Mac files:
      SCORE   - hash functions, string handling, environment leveling
      PML     - math routines, geometry, linear solvers, etc
      PDB     - portable binary data handling
-     PPC     - portable IPC, RPC, message passing
      PGS     - portable graphics and GUI tools
      PANACEA - simulation code services
      SCHEME  - a R3RS level SCHEME interpreter library

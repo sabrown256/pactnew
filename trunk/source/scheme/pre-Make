@@ -31,8 +31,7 @@ SaveFiles = *.c *.h *.scm
 CleanFiles = 
 
 # things upon which install depends (pact install)
-DepLib = ${LibDir}/libppc.a \
-         ${LibDir}/libpdb.a \
+DepLib = ${LibDir}/libpdb.a \
          ${LibDir}/libpml.a \
 	 ${LibDir}/libscore.a
 
@@ -41,7 +40,7 @@ BinDep = ${Hdrs} ${TGTLib} shmain.c ${DepLib}
 BinObj = ${LdFlags} shmain.c
 
 # required Libraries
-Libs = ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDE_Lib}
+Libs = ${LSCHEME} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDE_Lib}
 
 
 targets :

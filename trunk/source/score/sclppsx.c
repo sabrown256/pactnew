@@ -1,6 +1,5 @@
 /*
  * SCLPPSX.C - low level process control - POSIX routines
- *           - formerly part of PPC
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

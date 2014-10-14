@@ -11,8 +11,9 @@
 
 LibName=pdb
 
+TGTExe = ${BinDir}/pcexec
 TGTLib = ${LibDir}/lib${LibName}.a
-TGTInc = ${Hdrs}
+TGTInc = ${Hdrs} ppc.h
 
 OD = DefaultG
 
@@ -39,7 +40,7 @@ RemoveFiles = ${BinDir}/tpdb  ${BinDir}/tpda   ${BinDir}/tpdas      \
               ${BinDir}/tpdn  ${BinDir}/tpdsmp ${BinDir}/tpddp      \
               ${BinDir}/tpdrc ${BinDir}/tpdtd  ${BinDir}/tpdds      \
               ${BinDir}/tpdf  ${BinDir}/tpdxrd ${BinDir}/tpdxn      \
-              ${BinDir}/pdtime ${BinDir}/pdb2hdf                    \
+              ${BinDir}/pcexec ${BinDir}/pdtime ${BinDir}/pdb2hdf   \
               ${BinDir}/exambin ${BinDir}/exam
 
 #
@@ -82,16 +83,31 @@ targets :
 #
 # Headers Files
 #
-Hdrs = pdb.h pdb_int.h pdb_old.h
+Hdrs = pdb.h pdb_int.h pdb_old.h scope_dp.h
 
 #
 # Object Files
 #
-Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdsymt.o pdblk.o \
-       pdcast.o pdrdwr.o pdptr.o pdprnt.o pdmemb.o pdflt.o \
-       pdbmm.o pdconv.o pdpath.o pdbfc.o pdbnet.o pdshar.o \
-       pdcsum.o pdbx.o pdmap.o pdszof.o pdbdir.o pdpar.o pdcomm.o \
+ObjsA = pnet.o pnbin.o pnpio.o
+ObjsN = ${MPassDevices} ${IPCDevices} ${ObjsA}
+
+${ObjsN} : ${Hdrs}
+
+OPARC  = pnparc.o pnmpi.o
+ONOIPC = pnnil.o
+
+Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdsymt.o pdblk.o      \
+       pdcast.o pdrdwr.o pdptr.o pdprnt.o pdmemb.o pdflt.o          \
+       pdbmm.o pdconv.o pdpath.o pdbfc.o pdbnet.o pdshar.o          \
+       pdcsum.o pdbx.o pdmap.o pdszof.o pdbdir.o pdpar.o pdcomm.o   \
        pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o pdold.o
+
+ArObjsN = ${MPassDevices} ${IPCDevices}        \
+          ${TGTLib}(pnet.o) ${TGTLib}(pnbin.o) \
+          ${TGTLib}(pnpio.o)
+
+ArPARC  = ${TGTLib}(pnparc.o) ${TGTLib}(pnmpi.o)
+ArNOIPC = ${TGTLib}(pnnil.o)
 
 ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o) ${TGTLib}(pdcast.o)    \
          ${TGTLib}(pdfmt.o) ${TGTLib}(pdfmta.o)                      \
@@ -105,9 +121,10 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o) ${TGTLib}(pdcast.o)    \
          ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o) ${TGTLib}(pdtgt.o)  \
          ${TGTLib}(pdbx.o) ${TGTLib}(pdmap.o) ${TGTLib}(pdbdir.o)    \
          ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
-         ${TGTLib}(pdspoke.o) ${TGTLib}(pdold.o)
+         ${TGTLib}(pdspoke.o) ${TGTLib}(pdold.o)                     \
+         ${ArObjsN}
 
-${LibDep} : ${hdrf} ${Hdrs} pdspoke.c scope_formats.h
+${LibDep} : ${hdrf} ${Hdrs} pdspoke.c scope_formats.h scope_dp.h
 
 #
 # Generated code rules
@@ -141,12 +158,17 @@ IncAction = @pact generate
 # standard tests
 #
 
-Cstd : ${BinDir}/tpdb  ${BinDir}/tpdn  ${BinDir}/tpda  ${BinDir}/tpdas  \
+Cstd : ${TGTExe} \
+       ${BinDir}/tpdb  ${BinDir}/tpdn  ${BinDir}/tpda  ${BinDir}/tpdas  \
        ${BinDir}/tpdop ${BinDir}/tpdgs ${BinDir}/tpdls ${BinDir}/tpdnrm \
        ${BinDir}/tpdrc ${BinDir}/tpdtd ${BinDir}/tpdcs ${BinDir}/tpdap  \
        ${BinDir}/tpdfr ${BinDir}/tpdbf ${BinDir}/tpdfd ${BinDir}/tpdfc  \
        ${BinDir}/tpdc  ${BinDir}/tpdf  ${BinDir}/tpdp  ${BinDir}/tpdds  \
+       ${BinDir}/tpnm  ${BinDir}/tpnb  ${BinDir}/tpnc                   \
        ${DepLib}
+
+parallel : ${BinDir}/tpnp ${BinDir}/pcexec
+
 Apps : ${BinDir}/pdb2hdf
 
 Gst : ${BinDir}/tpdgs
@@ -216,6 +238,53 @@ ${BinDir}/tpdds : tpdds.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	@(echo "${CCAnnounce} tpdds.c -o ${BinDir}/tpdds" ; \
 	  ${CLD} ${LdFlags} tpdds.c -o ${BinDir}/tpdds ${Libs})
         
+#
+# binary data tests
+#
+${BinDir}/tpnb : ${TGTLib} tpnb.c
+	@(echo "${CCAnnounce} tpnb.c -o ${BinDir}/tpnb" ; \
+	  ${CLD} ${LdFlags} tpnb.c -o ${BinDir}/tpnb ${Libs})
+
+${BinDir}/tpnc : ${TGTLib} tpnc.c
+	@(echo "${CCAnnounce} tpnc.c -o ${BinDir}/tpnc" ; \
+	  ${CLD} ${LdFlags} tpnc.c -o ${BinDir}/tpnc ${Libs})
+
+#
+# multiple process tests
+#
+${BinDir}/tpnm : ${TGTLib} tpnm.c
+	@(echo "${CCAnnounce} tpnm.c -o ${BinDir}/tpnm" ; \
+	  ${CLD} ${LdFlags} tpnm.c -o ${BinDir}/tpnm ${Libs})
+#
+# parallel process tests
+#
+${BinDir}/tpnp : ${TGTLib} tpnp.c
+	@(echo "${CCAnnounce} tpnp.c -o ${BinDir}/tpnp" ; \
+	  ${CLD} ${LdFlags} tpnp.c -o ${BinDir}/tpnp ${Libs})
+
+#
+# process report
+#
+
+proc : ${BinDir}/tpnch
+
+${BinDir}/tpnch : ${TGTLib} tpnch.c
+	${CCCfe} ${LdFlags} tpnch.c -o ${BinDir}/tpnch ${Libs}
+
+#
+# make the executable
+#
+${TGTExe} : ${BinDep}
+	@(echo "${CCAnnounce} pcexec.c -o ${TGTExe}" ; \
+	  ${CLD} ${LdFlags} pcexec.c -o ${TGTExe} ${Libs})
+
+#
+# async - run the shell script pn-async in the resulting xterm 
+#       - run it twice and watch for pollable event type complaints
+#
+async : ${TGTExe}
+	csh -c 'xterm -geometry 60x20-0+0 -e csh'
+
 #
 # ascii vs binary performance
 #

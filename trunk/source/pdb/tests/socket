@@ -1,0 +1,67 @@
+#!/bin/csh -f
+#
+# SOCKET - PDBNet socket tests
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "PDBNet Socket Test ............."
+set exe = $BinDir/pcexec
+
+      NoteD $Log ""
+      NoteD $Log "                    $msg"
+
+      flog $Log rm -f pcexec.sockp pcexec.socki
+
+      NoteD $Log -n "                       polling ....................."
+      set rpf = "none"
+      set opt = ( -i -c 30 -s $TEST )
+      set io  = pcexec.sockp
+
+      source ../../../scripts/test-run
+
+      $TEST_CHECK part -a socket_poll -e $xstatus -dt $dt -l -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
+      NoteD $Log -n "                       interrupt ..................."
+      set rpf = "none"
+      set opt = ( -c 30 -s $TEST )
+      set io  = pcexec.socki
+
+      source ../../../scripts/test-run
+
+      $TEST_CHECK part -a socket_interrupt -e $xstatus -dt $dt -l -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
+      if ($xstatus != 0) then
+         if ("$Valgrind" == "") then
+            set Files = ""
+            if ((-f pcexec.refi) && (-f pcexec.socki)) then
+               diff pcexec.refi pcexec.socki > pcexec.diffi
+               set Files = `find . -name "pcexec.diffi" -size 0c -print`
+            endif
+            if ((-f pcexec.refp) && (-f pcexec.sockp)) then
+               diff pcexec.refp pcexec.sockp > pcexec.diffp
+               set Files = `find . -name "pcexec.diffp" -size 0c -print`
+            endif
+
+            touch pcexec.diff-foo pcexec.sock-foo
+            set rpf   = ( $rpf pcexec.diff* pcexec.sock* )
+            rm pcexec.diff-foo pcexec.sock-foo
+         else
+            set Files = 1
+         endif
+
+         if ($#Files == 0) then
+            @ nerr = $nerr + 1
+         endif
+      endif
+
+$TEST_CHECK part -a socket -e $nerr -rpf "$rpf" "$msg"
+
+exit($status)
+

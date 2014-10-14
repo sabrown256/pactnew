@@ -14,8 +14,9 @@
 
 #include "cpyright.h"
 #include "pgs_int.h"
-#include "ppc_int.h"
+#include "pdb_int.h"
 #include "scope_proc.h"
+#include "scope_dp.h"
 
 #define PG_DPMT_SETUP    105
 #define PG_DPMT_IMAGE     35

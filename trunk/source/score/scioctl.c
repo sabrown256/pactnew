@@ -1,6 +1,5 @@
 /*
  * SCIOCTL.C - IO Control for IP and FILE communication
- *           - formerly a part of PPC
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

@@ -13,22 +13,34 @@ setenv Test    ""
 set vgdirs = ( score pdb )
 source ../scripts/test-env
 
-set Tests = ""
+set TestF = ""
 set TestL = ""
+set TestN = ""
+
+set test_file = TRUE
+set test_net  = TRUE
 
 while ($#argv > 0)
    switch ($1)
       case -f:
            shift
-           set Tests = ( $1 )
+           set TestF = ( $1 )
            breaksw
       case -h:
            echo ""
-           echo "Usage: pdtest [-h] [-f #]"
+           echo "Usage: pdtest [-h] [-f #] [-n] [-o]"
            echo "  f  format version to use in tests"
+           echo "  n  do not do the PDBNet tests"
+           echo "  o  do not do the PDB file tests"
            echo "  h  this help message"
            echo ""
            exit(1);
+      case -n:
+           set test_net = FALSE
+           breaksw
+      case -o:
+           set test_file = FALSE
+           breaksw
       case -*:
            breaksw
       default:
@@ -80,56 +92,92 @@ else if (-e $SrcDir/pdb.h) then
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# MAIN
+# PDB tests
 
-      if ("$TestL" == "") then
-         set TestL = ""
-         set TestL = ($TestL master c99 perf)
-         set TestL = ($TestL bufa bufb appdef gatsca filter checksum)
-         set TestL = ($TestL usrtyp net fd hyper fixdnrm attr trans)
-         set TestL = ($TestL cast typdef browse free)
-         set TestL = ($TestL smp dp)
-      endif
+      if ($test_file == TRUE) then
+         if ("$TestL" == "") then
+            set TestL = ""
+            set TestL = ($TestL master c99 perf)
+            set TestL = ($TestL bufa bufb appdef gatsca filter checksum)
+            set TestL = ($TestL usrtyp net fd hyper fixdnrm attr trans)
+            set TestL = ($TestL cast typdef browse free)
+            set TestL = ($TestL smp dp)
+         endif
     
-      if ("$Tests" == "") then
+         if ("$TestF" == "") then
 
 # GOTCHA: OSX takes too long on this test so just do one
-         if ("$OS" == Darwin) then
-            set Tests = ( 3 )
+            if ("$OS" == Darwin) then
+               set TestF = ( 3 )
+            else
+               set TestF = ( 2 3 )
+            endif
+         endif
+
+         foreach vrs ($TestF)
+
+            if ($vrs == 2) then
+               set Vers = "II"
+            else
+               set Vers = "III"
+            endif
+            NoteD $Log "      Version $Vers Series"
+            set vtime = `$TIMER -r`
+
+            foreach i ($TestL)
+               $SrcDir/tests/$i $vrs
+               @ nerr = $nerr + $status
+            end
+
+            set vtime = `$TIMER -b $vtime`
+            NoteD $Log ""
+            if ($nerr == 0) then
+               NoteD $Log "      Version $Vers ... OK ($vtime)"
+            else
+               NoteD $Log "      Version $Vers ... FAIL ($vtime)"
+            endif
+            NoteD $Log ""
+         end
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PDBNet tests
+
+      if ($test_net == TRUE) then
+         setenv TEST "cat $SrcDir/DISCLAIMER"
+
+         if ("$TestN" == "") then
+            set TestN = ""
+            set TestN = ( $TestN pipe socket pty bg bin multi )
+         endif
+
+         NoteD $Log "      PDBNet Series"
+
+         set vtime = `$TIMER -r`
+         foreach i ($TestN)
+            $SrcDir/tests/$i
+            @ nerr = $nerr + $status
+         end
+         set vtime = `$TIMER -b $vtime`
+
+         if ($nerr == 0) then
+            NoteD $Log "      PDBNet Series ... OK ($vtime)"
          else
-            set Tests = ( 2 3 )
+            NoteD $Log "      PDBNet Series ... FAIL ($vtime)"
          endif
       endif
 
-      foreach vrs ($Tests)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-         if ($vrs == 2) then
-            set Vers = "II"
-         else
-            set Vers = "III"
-         endif
-         NoteD $Log "      Version $Vers Series"
-         set vtime = `$TIMER -r`
-
-         foreach i ($TestL)
-            $SrcDir/tests/$i $vrs
-            @ nerr = $nerr + $status
-         end
-
-         set vtime = `$TIMER -b $vtime`
-         NoteD $Log ""
-         if ($nerr == 0) then
-            NoteD $Log "      Version $Vers ... OK ($vtime)"
-         else
-            NoteD $Log "      Version $Vers ... FAIL ($vtime)"
-         endif
-         NoteD $Log ""
-      end
    endif
 
    $TEST_CHECK clean -n PDB -e $nerr -raf "$Tmp"
 
    set xstatus = $status
+
 endif
 
 $TEST_CHECK fin -e $xstatus

@@ -39,8 +39,7 @@ CleanFiles =
 #
 # Things upon which install depends (pact install)
 #
-DepLib = ${LibDir}/libppc.a \
-         ${LibDir}/libpdb.a \
+DepLib = ${LibDir}/libpdb.a \
          ${LibDir}/libpml.a \
 	 ${LibDir}/libscore.a
 
@@ -52,8 +51,8 @@ BinObj = ${LdFlags} toul.c
 # Required Libraries
 #
 # NOTE: building shared seems to require these:
-Libs   = ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
-NGLibs = ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+Libs   = ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+NGLibs = ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 # NOTE: building static seems to require only these:
 #Libs   = ${LPANACEA} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 #NGLibs = ${LPANACEA} ${LPDB} ${LPML} ${LSCORE} ${MDLib}

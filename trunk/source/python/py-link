@@ -176,7 +176,7 @@ Note $Log ""
 
 flog $Log $RM $lpy_pact/libpypgs.so $lpy_pact/libpypgs.so.1 _pgs.so
 
-set pyl = ( ${lpy_pact_lib}.a libscore.a libpml.a libpdb.a libppc.a libpgs.a )
+set pyl = ( ${lpy_pact_lib}.a libscore.a libpml.a libpdb.a libpgs.a )
 @ lerr = 0
 foreach l ($pyl)
    flog $Log px $AR ../../$l

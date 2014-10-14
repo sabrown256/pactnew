@@ -12,8 +12,9 @@
 
 #define PCK_PANACEA_INT
 
-#include "ppc_int.h"
 #include "pgs_int.h"
+#include "pdb_int.h"
+#include "scope_dp.h"
 #include "panace.h"
 
 /*--------------------------------------------------------------------------*/
