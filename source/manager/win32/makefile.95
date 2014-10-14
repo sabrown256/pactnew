@@ -11,12 +11,10 @@ pact :
         make score
         make pml
         make pdb
-        make ppc
         make pgs
         make panacea
         make scheme
         make sx
-        make ultra
         make install
         @echo Installation Complete
 
@@ -34,13 +32,6 @@ pml :
         make install
         cd ..\manager
         @echo PML installed
-ppc :
-        @echo Building Portable Process Control Library ...
-        cd ..\ppc
-        ..\manager\bmake
-        make install
-        cd ..\manager
-        @echo PPC installed
 pdb :
         @echo Building Portable Data Base Library ...
         cd ..\pdb
@@ -76,13 +67,6 @@ sx :
         make install
         cd ..\manager
         @echo SX installed
-ultra :
-        @echo Building ULTRA II ...
-        cd ..\ultra
-        ..\manager\bmake
-        make install
-        cd ..\manager
-        @echo ULTRA installed
 
 install:
         cp scconfig.h cpyright.h scdecls.h ${DevDir}\include

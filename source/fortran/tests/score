@@ -26,7 +26,7 @@ endif
 
 # check for compiled modules
 set inf = ( `ls -1 $IncDir/*.mod` )
-if ($#inf >= 17) then
+if ($#inf >= 16) then
    Note $Log "Expected number of modules present: $#inf"
    Note $Log " $inf"
    flog $Log @ xstatus = $xstatus + 0

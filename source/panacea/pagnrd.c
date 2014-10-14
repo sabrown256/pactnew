@@ -415,7 +415,7 @@ void PA_read_file(char *str, int sfl)
 void PA_readh(char *str)
    {
 
-/* by now verify/force the PPC hooks to be setup */
+/* by now verify/force the PDBNet hooks to be setup */
     PN_init_communications(NULL);
 
     PA_read_file(str, TRUE);

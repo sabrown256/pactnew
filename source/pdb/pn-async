@@ -1,0 +1,27 @@
+#!/bin/csh -f
+#
+# PN-ASYNC - test asynchronous I/O for uncaptured SIGIO events
+#          - these usually say something like: "pollable event occured"
+#
+# include "cpyright.h"
+#
+
+set TEST = "pwd"
+
+alias flog  'echo "Command: \!\!:1-$" ; \!\!:1-$'
+
+setenv MP_PROCS   1
+setenv MP_NODES   1
+setenv MP_RMPOOL  0
+setenv MP_LABELIO no
+
+echo "---------------------------"
+stty
+echo "---------------------------"
+
+flog pcexec -q -s $TEST
+set Err = $status
+
+echo ""
+
+exit($Err)

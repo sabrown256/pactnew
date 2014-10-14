@@ -10,14 +10,14 @@
 # for parallel load balancing
 pkg psh scripts
 pkg pgs score pdb pml sx python
-pkg scheme panacea fortran ppc scc
+pkg scheme panacea fortran scc
 
 bin atdbg do-net detect pcexec ps-diff ncpu scheme sx
 bin toul ultra mpi-io-wrap ptime dmnz propr rpath
 bin hserve fcscan pco pcsh do-run gexec perdb blang
 bin pact-info
 
-lib libpanacea.a libpdb.a libpgs.a libpml.a libppc.a
+lib libpanacea.a libpdb.a libpgs.a libpml.a
 lib libpsmm.a libscheme.a libscore.a libsx.a libfpact.a
 lib libpact.a libosmm.so
 
@@ -34,7 +34,7 @@ inc scope_make.h scope_mem.h scope_mpi.h scope_proc.h scope_psh.h
 inc scope_thread.h scope_term.h scope_typeh.h scarg.h
 inc scope_lex.h sclexan.h pml.h scope_complex.h scope_constants.h
 inc scope_exe.h scope_dl.h
-inc pdb.h pdb_old.h pdform.h
+inc pdb.h pdb_old.h pdform.h scope_dp.h
 inc scope_x11.h scope_cgm.h scope_raster.h ppc.h
 inc pgs.h pgs_old.h
 inc panace.h scheme.h syntax.h sx.h
@@ -46,10 +46,10 @@ etc functions-pact.csh functions-pact.sh functions-pact.pl
 f90 panacea.mod panaceatypes.mod pdb.mod pdbtypes.mod pgs.mod
 f90 pgstypes.mod pml.mod pmltypes.mod scheme.mod score.mod
 f90 scoretypes.mod sx.mod
-f90 pact_score.mod pact_pml.mod pact_pdb.mod pact_ppc.mod
+f90 pact_score.mod pact_pml.mod pact_pdb.mod
 f90 pact_pgs.mod pact_panacea.mod pact_scheme.mod pact_fortran.mod
 f90 pact_libc.mod
-f90 types_score.mod types_pml.mod types_pdb.mod types_ppc.mod
+f90 types_score.mod types_pml.mod types_pdb.mod
 f90 types_pgs.mod types_panacea.mod types_scheme.mod types_fortran.mod
 f90 parameters_pdb.mod
 
@@ -84,7 +84,7 @@ script var-list get-line
 
 doc pact.ps panacea.ps pdb.ps pdbdiff.ps pdbview.ps pgs.ps
 doc pml.ps ppc.ps score.ps sx.ps ultra.ps
-doc pact.FAQ panacea.FAQ pdb.FAQ pgs.FAQ pml.FAQ ppc.FAQ
+doc pact.FAQ panacea.FAQ pdb.FAQ pgs.FAQ pml.FAQ
 doc scheme.FAQ score.FAQ sx.FAQ ultra.FAQ
 
 mgr clib.fncs code-date compare-date pact-analyze pact-changes

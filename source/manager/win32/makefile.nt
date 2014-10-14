@@ -12,12 +12,10 @@ pact :
 	nmake score
 	nmake pml
 	nmake pdb
-#	nmake ppc
 #	nmake pgs
 #	nmake panacea
 #	nmake scheme
 #	nmake sx
-#	nmake ultra
 	nmake install
 	@echo Installation Complete
 
@@ -35,13 +33,6 @@ pml :
 	nmake install
 	chdir ..\manager
 	@echo PML installed
-ppc :
-	@echo Building Portable Process Control Library ...
-	chdir ..\ppc
-	..\manager\bmake
-	nmake install
-	chdir ..\manager
-	@echo PPC installed
 pdb :
 	@echo Building Portable Data Base Library ...
 	chdir ..\pdb
@@ -77,13 +68,6 @@ sx :
 	nmake install
 	chdir ..\manager
 	@echo SX installed
-ultra :
-	@echo Building ULTRA II ...
-	chdir ..\ultra
-	..\manager\bmake
-	nmake install
-	chdir ..\manager
-	@echo ULTRA installed
 
 install:
 	cp scdecls.h scconfig.h cpyright.h $(InstRoot)\include

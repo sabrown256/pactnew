@@ -88,15 +88,15 @@ OPGS = ${OPDBO} ${OPMLO} ${OPPO} ${OPGSO}
 Objs = ${OPGS}
 
 gps = gp-score.c gp-pml.c gp-pdb.c   \
-      gp-ppc.c gp-pgs.c gp-panacea.c \
+      gp-pgs.c gp-panacea.c \
       gp-scheme.c
 
 gpo = gp-score.o gp-pml.o gp-pdb.o   \
-      gp-ppc.o gp-pgs.o gp-panacea.o \
+      gp-pgs.o gp-panacea.o \
       gp-scheme.o
 
 gpa = ${TGTLib}(gp-score.o) ${TGTLib}(gp-pml.o) ${TGTLib}(gp-pdb.o)   \
-      ${TGTLib}(gp-ppc.o) ${TGTLib}(gp-pgs.o) ${TGTLib}(gp-panacea.o) \
+      ${TGTLib}(gp-pgs.o) ${TGTLib}(gp-panacea.o) \
       ${TGTLib}(gp-scheme.o)
 
 ArPDBO = ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbPDBfile.o) ${TGTLib}(pdbmemdes.o) \

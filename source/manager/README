@@ -438,7 +438,6 @@ PACT includes the following software libraries and applications:
    SCORE    - a low level, environment balancing library
    PML      - a portable math library
    PDB      - a portable binary data base management library
-   PPC      - a portable process control library
    PGS      - a portable graphics library
    PANACEA  - a portable numerical simulation code development system
    SCHEME   - a portable Scheme interpreter
@@ -462,7 +461,7 @@ Makefile.  The first part has site dependent information and this will be the
 same for all of the components of PACT.  This part is called make-def.
 The second part contains the specifics of the components and therefore each
 component of PACT has a separate file called pre-Make.  In pact/score,
-pact/pml, pact/ppc, and so on there are pre-Make files which contain
+pact/pml, and so on there are pre-Make files which contain
 dependencies particular to those parts of PACT.  The third part contains a
 number of macros and dependencies common to all of PACT but which depend on
 the operating system.  The utility PACT runs builds the Makefile from these

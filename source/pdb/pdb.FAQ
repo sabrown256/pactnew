@@ -67,7 +67,7 @@ TABLE OF CONTENTS
 1) What is PDB?
 
    PDB is a system for handling binary data in a portable way.
-   It can move data between files and memory and (with PPC) between
+   It can move data between files and memory and (with PDBNet) between
    processes. In contrast to other systems which aim at FORTRAN
    level functionality, PDB supports programmers in using natural
    C idioms (this also covers FORTRAN as a subset).

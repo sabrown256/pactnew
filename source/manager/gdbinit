@@ -5,7 +5,6 @@ directory ../../../pdb/spokes/sql
 directory ../../../pdb/spokes/xml
 directory ../../../pdb/spokes/nacf
 directory ../../../pdb/spokes/llf
-directory ../../../ppc
 directory ../../../pgs
 directory ../../../panacea
 directory ../../../scheme

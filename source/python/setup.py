@@ -136,7 +136,6 @@ if autotool:
   libdirs.append(os.path.join(builddir, 'pml/.libs'))
   libdirs.append(os.path.join(builddir, 'pdb/.libs'))
   libdirs.append(os.path.join(builddir, 'pgs/.libs'))
-  libdirs.append(os.path.join(builddir, 'ppc/.libs'))
   
 # INCLUDES
 if dsys:  
@@ -149,7 +148,6 @@ if autotool:
   incdirs.append(os.path.join(sourcedir, 'pml'))
   incdirs.append(os.path.join(sourcedir, 'pdb'))
   incdirs.append(os.path.join(sourcedir, 'pgs'))
-  incdirs.append(os.path.join(sourcedir, 'ppc'))
    
 # MACROS
 define_macros = []
@@ -292,7 +290,7 @@ setup(name = 'pypact',
                                  
                                  ],
                                 include_dirs=['.'],
-                                libraries=['pgs', 'ppc', 'pdb', 'pml', 'score'] + MDGLib
+                                libraries=['pgs', 'pdb', 'pml', 'score'] + MDGLib
 ###                                extra_objects=[MDGLib]
 ###                                extra_link_args=[MDGLib]
                                 ),

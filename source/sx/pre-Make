@@ -63,7 +63,6 @@ CleanFiles = ${hdrf} ${gso} *~ core
 DepLib = ${LibDir}/libscheme.a \
          ${LibDir}/libpanacea.a \
          ${LibDir}/libpgs.a \
-	 ${LibDir}/libppc.a \
          ${LibDir}/libpdb.a \
          ${LibDir}/libpml.a \
 	 ${LibDir}/libscore.a
@@ -75,8 +74,8 @@ BinObj = ${LdFlags}
 #
 # Required Libraries
 #
-#Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LMM} ${LSCORE} ${MDI_Lib} ${MDLib}
-Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDI_Lib} ${MDLib} ${MDE_Lib}
+#Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPDB} ${LPML} ${LMM} ${LSCORE} ${MDI_Lib} ${MDLib}
+Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPDB} ${LPML} ${LSCORE} ${MDI_Lib} ${MDLib} ${MDE_Lib}
 
 targets :
 	@echo "Targets for SX"
@@ -105,15 +104,15 @@ ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
 Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ} ${ObjsU}
 
 gss = gs-score.c gs-pml.c gs-pdb.c   \
-      gs-ppc.c gs-pgs.c gs-panacea.c \
+      gs-pgs.c gs-panacea.c \
       gs-scheme.c
 
 gso = gs-score.o gs-pml.o gs-pdb.o   \
-      gs-ppc.o gs-pgs.o gs-panacea.o \
+      gs-pgs.o gs-panacea.o \
       gs-scheme.o
 
 gsa = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
-      ${TGTLib}(gs-ppc.o) ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
+      ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
       ${TGTLib}(gs-scheme.o)
 
 ArObjsU = ${TGTLib}(ulcmd.o) ${TGTLib}(ulfunc.o) ${TGTLib}(ulauxf.o) \
