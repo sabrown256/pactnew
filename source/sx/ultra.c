@@ -71,7 +71,7 @@ int main(int c, char **v, char **env)
  * this MUST be set before the PD_init_threads uses the current
  * io hooks to initialize the pio hooks
  */
-    SC_io_connect(PC_REMOTE);
+    SC_io_connect(SC_REMOTE);
 
     PD_init_threads(0, NULL);
 

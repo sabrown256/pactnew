@@ -1,8 +1,6 @@
 /*
- * PCPIO.C - I/O hooks suitable for use with PDBLib and parallel communications
+ * PNPIO.C - I/O hooks suitable for use with PDBNet
  *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
  *
  */
 
@@ -49,9 +47,9 @@ static NODE_LIST
 
 /*--------------------------------------------------------------------------*/
 
-/* _PC_REGISTER_PROC - register a child process */
+/* _PN_REGISTER_PROC - register a child process */
 
-static int _PC_register_proc(PROCESS *pp, int i)
+static int _PN_register_proc(PROCESS *pp, int i)
    {int n, nx;
     SC_poll_desc pd;
 
@@ -88,9 +86,9 @@ static int _PC_register_proc(PROCESS *pp, int i)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_SETUP_CHILDREN - spawn the specified set of children */
+/* _PN_SETUP_CHILDREN - spawn the specified set of children */
 
-static int _PC_setup_children(char **argv, char *mode)
+static int _PN_setup_children(char **argv, char *mode)
    {int i, n, port, argc, which, cbk, off;
     long parentp;
     char **args, s[MAXLINE], host[MAXLINE];
@@ -102,7 +100,7 @@ static int _PC_setup_children(char **argv, char *mode)
     ps = _SC_get_thr_processes(-1);
 
     gethostname(host, MAXLINE);
-    port = PC_init_server(SC_GET_PORT, FALSE);
+    port = SC_init_server(SC_GET_PORT, FALSE);
     if (port == -1)
        return(FALSE);
 
@@ -133,7 +131,7 @@ static int _PC_setup_children(char **argv, char *mode)
     argv += off;
 
     if (ps->debug)
-       {snprintf(s, MAXLINE, "PC_srvr_log.%d", (int) getpid());
+       {snprintf(s, MAXLINE, "PN_srvr_log.%d", (int) getpid());
 	ps->diag = SC_fopen_safe(s, "w");
 	if (ps->diag != NULL)
 	   {fprintf(ps->diag, "\n   ------ Begin Setup ------\n\n");
@@ -147,7 +145,7 @@ static int _PC_setup_children(char **argv, char *mode)
  * master application or the first of an SPMD application
  * remember it as node specified by "which"
  */
-       {pp = PC_mk_process(argv, mode, SC_CHILD);
+       {pp = PN_mk_process(argv, mode, SC_CHILD);
 	if ((ps->debug) && (ps->diag != NULL))
 	   {fprintf(ps->diag, "Open node #%d (%p)\n", which, pp);
 	    SC_fflush_safe(ps->diag);};
@@ -158,10 +156,10 @@ static int _PC_setup_children(char **argv, char *mode)
 	    pp->io[2] = 2;
 	    pp->acpu  = which;
 
-/* this goes to PC_open_group */
+/* this goes to PN_open_group */
 	    SC_printf(pp, "%s,%d,%d,%d\n", host, port, n, ps->debug);
 
-/* this goes to PC_open_member */
+/* this goes to PN_open_member */
 	    SC_printf(pp, "%d,%d,%d\n", which, n, ps->debug);
 	    SC_block(pp);
 	    SC_gets(s, MAXLINE, pp);
@@ -173,13 +171,13 @@ static int _PC_setup_children(char **argv, char *mode)
 	       {fprintf(ps->diag, "Get data socket for node #%d\n",
 			which);
 		SC_fflush_safe(ps->diag);};
-	    pp->data = PC_init_server(SC_GET_CONNECTION, FALSE);
+	    pp->data = SC_init_server(SC_GET_CONNECTION, FALSE);
 	    if ((ps->debug) && (ps->diag != NULL))
 	       {fprintf(ps->diag, "Data socket for node #%d: %d\n",
 			which, pp->data);
 		SC_fflush_safe(ps->diag);};
 
-	    cbk = _PC_register_proc(pp, which);
+	    cbk = _PN_register_proc(pp, which);
 	    if ((ps->debug) && (ps->diag != NULL))
 	       {fprintf(ps->diag, "I/O interrupt: %d\n\n", cbk);
 		SC_fflush_safe(ps->diag);};};}
@@ -204,7 +202,7 @@ static int _PC_setup_children(char **argv, char *mode)
         {if (i == which)
             continue;
 
-         pp = PC_open(args, NULL, mode);
+         pp = PN_open_process(args, NULL, mode);
 
 	 if ((ps->debug) && (ps->diag != NULL))
 	    {fprintf(ps->diag, "Open node #%d (%p)\n", i, pp);
@@ -220,13 +218,13 @@ static int _PC_setup_children(char **argv, char *mode)
 	        {fprintf(ps->diag, "Latch up with child: %s", s);
 	         fprintf(ps->diag, "Get data socket for node #%d\n", i);
 		 SC_fflush_safe(ps->diag);};
-	     pp->data = PC_init_server(SC_GET_CONNECTION, FALSE);
+	     pp->data = SC_init_server(SC_GET_CONNECTION, FALSE);
 	     if ((ps->debug) && (ps->diag != NULL))
 	        {fprintf(ps->diag, "Data socket for node #%d: %d\n",
 			 i, pp->data);
 		 SC_fflush_safe(ps->diag);};
 
-	     cbk = _PC_register_proc(pp, i);
+	     cbk = _PN_register_proc(pp, i);
 	     if ((ps->debug) && (ps->diag != NULL))
 	        {fprintf(ps->diag, "I/O interrupt: %d\n\n", cbk);
 		 SC_fflush_safe(ps->diag);};};};
@@ -245,11 +243,11 @@ static int _PC_setup_children(char **argv, char *mode)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_GET_MSG - send the first message on the queue for the specified
+/* _PN_GET_MSG - send the first message on the queue for the specified
  *             - node
  */
 
-static int _PC_get_msg(int i)
+static int _PN_get_msg(int i)
    {inti ni, nbo, nbe;
     intb bpi;
     int *nis, data;
@@ -286,7 +284,7 @@ static int _PC_get_msg(int i)
 	    bpi = PN_sizeof(type, pf->host_chart);
 	    nbo = ni*bpi;
 	    while (nbo > 0)
- 	       {PC_buffer_data_in(pi);
+ 	       {PN_buffer_data_in(pi);
 		nbe = SC_write_sigsafe(data, pbf, nbo);
                 if (nbe < 0)
                    continue;
@@ -303,7 +301,7 @@ static int _PC_get_msg(int i)
 			type, i);
 		SC_fflush_safe(ps->diag);};
 
-            PC_pop_message(i);
+            PN_pop_message(i);
 
 	    return(TRUE);};};
 
@@ -314,9 +312,9 @@ static int _PC_get_msg(int i)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_PUT_MSG - get the message from the specified node */
+/* _PN_PUT_MSG - get the message from the specified node */
 
-static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
+static int _PN_put_msg(PROCESS *pi, char *type, inti ni, int indx)
    {inti nbi, nbt, nir;
     intb bpi;
     char *bf;
@@ -336,10 +334,10 @@ static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
 		    SC_itos(NULL, 0, ni, NULL), type, pi->acpu);
 	    SC_fflush_safe(ps->diag);};
 
-	nbt = PC_buffer_data_out(pi, bf, nbi, TRUE);
+	nbt = PN_buffer_data_out(pi, bf, nbi, TRUE);
 	nir = nbt/bpi;
 
-	PC_push_message(PD_procs.m + indx, indx, ni, type, bf);
+	PN_push_message(PD_procs.m + indx, indx, ni, type, bf);
 
 	if (ps->debug)
 	   {fprintf(ps->diag, " Recv(%s,%s,%d)\n",
@@ -353,9 +351,9 @@ static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PC_GET_MESSAGE - handle input from the specified child */
+/* _PN_GET_MESSAGE - handle input from the specified child */
 
-static int _PC_get_message(int i)
+static int _PN_get_message(int i)
    {int ni, code, indx, c;
     char s[MAXLINE], *type, *t;
     PROCESS *pi;
@@ -402,7 +400,7 @@ static int _PC_get_message(int i)
 /*	     blk  = SC_stol(SC_strtok(NULL, ",\n", t)); */
 	     SC_strtok(NULL, ",\n", t);
 
-	     _PC_get_msg(i);
+	     _PN_get_msg(i);
 
 	     break;
 
@@ -411,7 +409,7 @@ static int _PC_get_message(int i)
 	     ni   = SC_stol(SC_strtok(NULL, ",\n", t));
 	     indx = SC_stol(SC_strtok(NULL, ",\n", t));
 
-             _PC_put_msg(pi, type, ni, indx);
+             _PN_put_msg(pi, type, ni, indx);
 
 	     break;
 
@@ -438,7 +436,7 @@ static int _PC_get_message(int i)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_PROCESS_ACCESS - carry out file access commands on the named host
+/* PN_PROCESS_ACCESS - carry out file access commands on the named host
  *                   - this is the server end
  *                   - the command codes are:
  *                   -   SC_FOPEN
@@ -456,14 +454,14 @@ static int _PC_get_message(int i)
  *                   -   SC_NUM_NODES
  */
 
-int PC_process_access(char **argv, char *mode)
+int PN_process_access(char **argv, char *mode)
    {int rv = FALSE;
 
 #if defined(HAVE_POSIX_SYS)
 
     int i, n, rev, msgs, *nim;
 
-    _PC_setup_children(argv, mode);
+    _PN_setup_children(argv, mode);
             
     while (TRUE)
        {n = SC_poll(PD_procs.fd, PD_procs.n, -1);
@@ -472,7 +470,7 @@ int PC_process_access(char **argv, char *mode)
 		for (i = 0; i < PD_procs.n; i++)
 		    {rev = PD_procs.fd[i].revents;
 		     if ((rev & POLLIN) || (rev & POLLPRI))
-		        {msgs |= _PC_get_message(i);};};
+		        {msgs |= _PN_get_message(i);};};
 
 /* for anybody who may be doing a blocking read and there is a message
  * available let it through before another poll
@@ -480,7 +478,7 @@ int PC_process_access(char **argv, char *mode)
 		for (i = 0; i < PD_procs.n; i++)
 		    {nim = MESSAGE_LENGTHS(i);
 		     if (nim != NULL)
-		        _PC_get_msg(i);};}
+		        _PN_get_msg(i);};}
 
 	    while (msgs);};};
 
@@ -495,9 +493,9 @@ int PC_process_access(char **argv, char *mode)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_PUSH_MESSAGE - register a message for a node */
+/* PN_PUSH_MESSAGE - register a message for a node */
 
-int PC_push_message(SC_message *msg, int i, int ni, char *type, char *bf)
+int PN_push_message(SC_message *msg, int i, int ni, char *type, char *bf)
    {int n, nx;
 
     if (msg == NULL)
@@ -529,9 +527,9 @@ int PC_push_message(SC_message *msg, int i, int ni, char *type, char *bf)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_POP_MESSAGE - pop a message off the queue */
+/* PN_POP_MESSAGE - pop a message off the queue */
 
-void PC_pop_message(int i)
+void PN_pop_message(int i)
    {int j, n;
     int *nis;
     char **msg, **typ;
@@ -557,11 +555,11 @@ void PC_pop_message(int i)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_BUFFER_DATA_IN - read from the data connection of the PROCESS
+/* PN_BUFFER_DATA_IN - read from the data connection of the PROCESS
  *                   - and save them in an internal buffer
  */
 
-int PC_buffer_data_in(PROCESS *pp)
+int PN_buffer_data_in(PROCESS *pp)
    {int fd, nbr, nbs;
     unsigned long nb, nx, nbt;
     char s[DATA_BLOCK], *bf;
@@ -602,12 +600,12 @@ int PC_buffer_data_in(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PC_BUFFER_DATA_OUT - get data from the data connection of the given
+/* PN_BUFFER_DATA_OUT - get data from the data connection of the given
  *                    - process including any buffered data
  *                    - and put it NBI bytes in BF
  */
 
-int PC_buffer_data_out(PROCESS *pp, char *bf, int nbi, int block_state)
+int PN_buffer_data_out(PROCESS *pp, char *bf, int nbi, int block_state)
    {int nbe, nb0, fd;
     char *pbf, *dbf;
 

@@ -27,7 +27,7 @@ static void process_binary(PROCESS *pp)
 
 	printf("P> Processing binary transmission:\n");
 
-	PC_gets(s, MAXLINE, pp);
+	SC_gets(s, MAXLINE, pp);
 	msg = SC_strtok(s, " \n", t);
 	if (msg == NULL)
 	   {printf("P> Binary data receive failed: no data\n");
@@ -39,10 +39,10 @@ static void process_binary(PROCESS *pp)
 	space = _PD_alloc_entry(file, type, ni);
 
 	printf("P> Reading binary data ... ");
-	number = PC_read(space, type, ni, pp);
+	number = SC_read(space, type, ni, pp);
 	printf("done\n");
 
-	while (PC_gets(s, MAXLINE, pp) != NULL)
+	while (SC_gets(s, MAXLINE, pp) != NULL)
 	   printf("C> %s", s);
 
 	if (number == ni)
@@ -65,7 +65,7 @@ static void process_binary(PROCESS *pp)
 static void error_handler(int sig)
    {
 
-    PC_block_file(stdin);
+    SC_block_file(stdin);
 
     if (sig == SIGALRM)
        {PRINT(stdout, "Binary test timed out\n");
@@ -98,37 +98,37 @@ int main(int argc, char **argv)
 
     SC_setbuf(stdout, NULL);
 
-    pp = PC_open(argl, NULL, "wb");
+    pp = PN_open_process(argl, NULL, "wb");
     if (pp == NULL)
        {printf("\nFailed to open: %s\n\n", prog);
         return(1);};
 
     printf("\nRunning process: %s\n\n", prog);
 
-    PC_unblock_file(stdin);
+    SC_unblock_file(stdin);
 
-    PC_unblock(pp);
+    SC_unblock(pp);
 
 /* set the alarm */
     SC_timeout(to, error_handler, NULL, 0);
 
     while (TRUE)
-       {while (PC_gets(s, MAXLINE, pp) != NULL)
+       {while (SC_gets(s, MAXLINE, pp) != NULL)
            {if (strcmp(s, ":B\n") == 0)
-               {PC_set_attr(pp, SC_LINE, TRUE);
+               {SC_set_attr(pp, SC_LINE, TRUE);
                 process_binary(pp);}
             else if (strcmp(s, ":A\n") == 0)
-               PC_set_attr(pp, SC_LINE, FALSE);
+               SC_set_attr(pp, SC_LINE, FALSE);
             else
                printf("%s", s);};
 
-        if (PC_status(pp) != SC_RUNNING)
+        if (SC_status(pp) != SC_RUNNING)
            {printf("\nProcess %s terminated (%d %d)\n\n",
                    prog, pp->status, pp->reason);
             break;};
 
         if (SC_fgets(s, MAXLINE, stdin) != NULL)
-           PC_printf(pp, "%s", s);
+           SC_printf(pp, "%s", s);
 
 	msg = SC_error_msg();
         if (msg[0] != '\0')
@@ -138,9 +138,9 @@ int main(int argc, char **argv)
 /* reset the alarm */
     SC_timeout(0, error_handler, NULL, 0);
 
-    PC_block_file(stdin);
+    SC_block_file(stdin);
 
-    PC_close(pp);
+    SC_close(pp);
 
     printf("\nProcess test %s ended\n\n", prog);
 

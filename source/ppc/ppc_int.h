@@ -1,8 +1,5 @@
 /*
- * PPC_INT.H - internal header for Portable Process Control system
- *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
+ * PPC_INT.H - internal header for PDBNet system
  *
  */
 
@@ -23,9 +20,9 @@
 
 typedef void (*PFVAP)(void *);
 
-typedef struct s_PC_scope_private PC_scope_private;
+typedef struct s_PN_scope_private PN_scope_private;
 
-struct s_PC_scope_private
+struct s_PN_scope_private
    {
 
 /* initializes to non-zero values */
@@ -49,8 +46,8 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PC_scope_private
- _PC;
+extern PN_scope_private
+ _PN;
 
 /*--------------------------------------------------------------------------*/
 
@@ -59,17 +56,17 @@ extern PC_scope_private
 /*--------------------------------------------------------------------------*/
 
 
-/* PCBIN.C declarations */
+/* PNBIN.C declarations */
 
 extern int
- _PC_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp),
- _PC_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp);
+ _PN_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp),
+ _PN_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp);
 
 
-/* PCPARC.C declarations */
+/* PNPARC.C declarations */
 
 extern void
- _PC_extract_filter_info(int *filt, int *pti, int *pit,
+ _PN_extract_filter_info(int *filt, int *pti, int *pit,
 			 int *phn, int *pdn, int *pdi,
 			 int *pbs, int *pbz, int *pnn,
 			 int **pnl, int *pnp, int **ppl);

@@ -1,8 +1,5 @@
 /*
- * PCEXEC.C - Portable Process Control system exec utility
- *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
+ * PNEXEC.C - PDBNet system exec utility
  *
  */
 
@@ -347,7 +344,7 @@ int main(int argc, char **argv)
        SC_file_access(lg);
 
     else if (parallel)
-       ret = PC_process_access(argv, "rsb+");
+       ret = PN_process_access(argv, "rsb+");
 
     else
        {if ((strcmp(argv[i], "ftp") == 0) ||
@@ -364,7 +361,7 @@ int main(int argc, char **argv)
 /* set the alarm */
         SC_timeout(to, error_handler, NULL, 0);
 
-	pp = PC_open(argv+i, NULL, mode);
+	pp = PN_open_process(argv+i, NULL, mode);
 	if (pp == NULL)
 	   {if (!quiet)
 	       {PRINT(stdout, "%s\n", SC_error_msg());
