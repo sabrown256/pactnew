@@ -1,0 +1,37 @@
+#!/bin/csh -f
+#
+# MAKE-DEF - write the MAKE-DEF file
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/pre-common
+
+Note $WLog "----- write/make-def -----"
+Note $WLog "Write: make-def"
+Note $WLog ""
+
+dbget PSY_Root
+
+flog $WLog pwd
+flog $WLog set bindir = $PSY_Root/bin
+flog $WLog set mdexe  = $bindir/make-def.x
+
+flog $WLog ../psh/ccw -g -I../psh write/make-def.c -o $mdexe
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+flog $WLog $mdexe
+
+if ($status == 0) then
+#   flog $WLog rm -f $mdexe
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+source $Me:h/post-common
+
+exit(0)
