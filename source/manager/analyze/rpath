@@ -21,12 +21,6 @@ popd >& /dev/null
 set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
 
-set VAR_LIST = `where var-list |& head -n 1`
-if (!(-x "$VAR_LIST")) then
-   echo "RPATH: var-list not found - exiting"
-   exit(1)
-endif
-
 source $ldir/functions-pact.csh
 source $ldir/csh-subroutines
 HAVE_SUBROUTINES
@@ -87,6 +81,12 @@ while ($#argv > 0)
    endsw
    shift
 end
+
+set VAR_LIST = `where var-list |& head -n 1`
+if (!(-x "$VAR_LIST")) then
+   echo "RPATH: var-list not found - exiting"
+   exit(1)
+endif
 
 dbmget /dev/null Cfg_RPATH^    \
                  LIB^          \
