@@ -12,7 +12,8 @@
 
 #define PCK_PANACEA
 
-#include "ppc.h"
+#include "pdb.h"
+#include "scope_dp.h"
 #include "pgs.h"
     
 /*--------------------------------------------------------------------------*/

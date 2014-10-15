@@ -32,7 +32,7 @@ LdFlags = -L${DevLib} -L${LibDir} ${LDFLAGS}
 #
 # Things upon which install depends (pact install)
 #
-PACTLibs = -lsx -lscheme -lpanacea -lpgs -lppc -lpdb -lpml -lscore
+PACTLibs = -lsx -lscheme -lpanacea -lpgs -lpdb -lpml -lscore
 LDLibs   = ${PACTLibs} ${MDGLib} ${MDLib} ${MDE_Lib}
 
 LibGrp = -ls -lmisc -llag -lmesh  

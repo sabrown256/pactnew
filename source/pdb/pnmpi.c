@@ -91,11 +91,10 @@ static void _PN_close_member_d(PROCESS *pp)
 
 static long _PN_size_message_d(int sp, char *type, int tag)
    {int ni;
+    MPI_Status lst;
 
-    MPI_Status stat;
-
-    MPI_Probe(sp, tag, MPI_COMM_WORLD, &stat);
-    MPI_Get_count(&stat, MPI_CHAR, &ni);
+    MPI_Probe(sp, tag, MPI_COMM_WORLD, &lst);
+    MPI_Get_count(&lst, MPI_CHAR, &ni);
 
     return((long) ni);}
 
@@ -166,9 +165,9 @@ static long _PN_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     bf = CMAKE_N(char, nb);
 
 /* convert the data into a message buffer */
-    tf  = PN_open_process(vif, bf);
-    nis = SC_write(tf, type, ni, vr) ? ni : 0;
-    SC_close(tf);
+    tf  = PN_open(vif, bf);
+    nis = PN_write(tf, type, ni, vr) ? ni : 0;
+    PN_close(tf);
 
 /* send the message now */
    {MPI_Request requ;
@@ -249,10 +248,10 @@ static long _PN_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     bf = CMAKE_N(char, nb);
 
     if (block)
-       {MPI_Status stat;
+       {MPI_Status lst;
 
 	MPI_Recv(bf, nb, MPI_CHAR, ip, ityp,
-		 MPI_COMM_WORLD, &stat);}
+		 MPI_COMM_WORLD, &lst);}
 
     else
        {MPI_Request requ;
@@ -265,9 +264,9 @@ static long _PN_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 
 /* convert the message to the requested output data */
     if (block)
-       {tf  = PN_open_process(vif, bf);
-	nir = SC_read(tf, type, ni, vr);
-	SC_close(tf);
+       {tf  = PN_open(vif, bf);
+	nir = PN_read(tf, type, ni, vr);
+	PN_close(tf);
 
 	CFREE(bf);};
 
@@ -313,7 +312,7 @@ static long _PN_wait_d(PROCESS *pp)
 
     stats = CMAKE_N(MPI_Status, np);
 
-    reqs = SC_array_array(_PC.reqs);
+    reqs = SC_array_array(_PN.reqs);
 
     MPI_Waitall(np, reqs, stats);
 
@@ -326,9 +325,9 @@ static long _PN_wait_d(PROCESS *pp)
         {PN_pop_pending(pp, &oper, &bf, &type, &ni, &vr);
 
 	 if (oper == SC_READ_MSG)
-	    {tf = PN_open_process(vif, bf);
-	     SC_read(tf, type, ni, vr);
-	     SC_close(tf);};
+	    {tf = PN_open(vif, bf);
+	     PN_read(tf, type, ni, vr);
+	     PN_close(tf);};
 
 	 CFREE(type);
 	 CFREE(bf);};
