@@ -89,6 +89,7 @@ if (!(-x "$VAR_LIST")) then
 endif
 
 dbmget /dev/null Cfg_RPATH^    \
+                 LD_RPath^     \
                  LIB^          \
                  PACT_CC_PATH^ \
                  PATH^         \

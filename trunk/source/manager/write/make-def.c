@@ -16,6 +16,12 @@ source $Me:h/post-common
 exit(0)
 #endif
 
+typedef struct s_tgdes tgdes;
+
+struct s_tgdes
+   {char *name;
+    char **opt;};
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -30,14 +36,7 @@ void printrule(FILE *fp, client *cl, char *rule, char *var)
 
     fprintf(fp, "	@[ ! -f ${LibDir}/.lock ] || { echo \"${LibDir} is locked\" ; exit 1 ; }\n");
 
-#if 1
     fprintf(fp, "\t%s\n\n", dbget(cl, FALSE, var));
-#else
-    if ($HSY_OS_Name == "FreeBSD")
-       printenv $Val |& sed 's/\\n/\n/g' >>& $STDOUT
-    else
-       fexec $WLog printenv $Val @o sed 's/\\n/\n/g' @o sed 's/\\t/\t/g' @o fa:$STDOUT
-#endif
 
     return;}
 
@@ -48,23 +47,32 @@ void printrule(FILE *fp, client *cl, char *rule, char *var)
 
 int main(int c, char **v)
    {int i, rv;
-    int ig, ng, it, nt;
+    int ig, ng, it;
     char r[BFLRG], md[BFLRG], cc_inc[BFLRG];
     char *psy_root, *psy_base, *psy_cfg, *psy_load, *psy_inst;
     char *psy_publib;
     char *hsy_os_name, *hsy_os_type, *lostd;
     char *make_strategy, *make_usegnu, *dev, *use_acc;
     char *fc_ld_lib, *dp_inc, *have_py, *yacc_exe;
-    char *MPDev, *IPCDev, *scsd, *npath, *lrpath;
-    char *mod, *mk, *date, *dpm, *ipc, *osrc;
+    char *scsd, *npath, *lrpath;
+    char *mod, *mk, *tnm, *date, *osrc;
     char *g, *vr, *vl, **sa, **SynSCM;
     client *cl;
     FILE *fp, *wlog;
     char *grps[] = {"Std", "Cfg", "Cfe", "Ser", "Shared"};
-    char *tool_cc[] = {"Exe", "Flags", "Debug", "Optimize", "Shared Inc"};
-    char *tool_fc[] = {"Exe", "Flags", "Debug", "Optimize", "Shared"};
-    char *tool_ld[] = {"Exe", "Flags", "Shared", "Lib"};
-    char *tool_ar[] = {"Exe", "Flags", "IFlag", "XFlag"};
+    char *tool_cc[] = {"Exe", "Flags", "Debug", "Optimize",
+		       "Shared", "Inc", NULL};
+    char *tool_fc[] = {"Exe", "Flags", "Debug", "Optimize", "Shared", NULL};
+    char *tool_ld[] = {"Exe", "Flags", "Shared", "Lib", NULL};
+    char *tool_ar[] = {"Exe", "Flags", "IFlag", "XFlag", NULL};
+    char *tool_lx[] = {"Exe", "Flags", NULL};
+    char *tool_rl[] = {"Exe", NULL};
+    tgdes tools[] = {{"CC", tool_cc},
+		     {"FC", tool_fc},
+		     {"LD", tool_ld},
+		     {"Ar", tool_ar},
+		     {"Lex", tool_lx},
+		     {"Ranlib", tool_rl}};
 
     r[0] = '\0';
 
@@ -244,7 +252,7 @@ int main(int c, char **v)
     fprintf(fp, "# Site Dependent Syntax Modes\n");
     fprintf(fp, "#\n");
 
-    yacc_exe = dbget(cl, FALSE, "Yacc_Exe"),
+    yacc_exe = STRSAVE(dbget(cl, FALSE, "Yacc_Exe"));
 
     SynSCM = NULL;
     fprintf(fp, "SyntaxModes  =");
@@ -296,73 +304,27 @@ int main(int c, char **v)
 	     {vr = sa[i];
 	      vl = dbget(cl, FALSE, "%s_%s", g, vr);
 	      if (IS_NULL(vl) == TRUE)
-		 vl = cgetenv(TRUE, vr);
+		 vl = dbget(cl, FALSE, vr);
 	      fprintf(fp, "%s_%s = %s\n", g, vr, vl);};
 
 	 lst_free(sa);};
 
     fprintf(fp, "\n");
 
-/* CC tool */
-    fprintf(fp, "# tool CC\n");
-    nt = sizeof(tool_cc)/sizeof(char *);
+/* emit all the tool variables */
+    ng = sizeof(tools)/sizeof(tgdes);
+    for (ig = 0; ig < ng; ig++)
+        {tnm = tools[ig].name;
+	 sa  = tools[ig].opt;
+	 fprintf(fp, "# tool %s\n", tnm);
+	 for (it = 0; sa[it] != NULL; it++)
+	     {vr = sa[it];
+	      vl = dbget(cl, FALSE, "%s_%s", tnm, vr);
+	      if (IS_NULL(vl) == TRUE)
+		 vl = dbget(cl, FALSE, vr);
+	      fprintf(fp, "%s_%s = %s\n", tnm, vr, vl);};
 
-    for (it = 0; it < nt; it++)
-        {vr = tool_cc[it];
-	 vl = dbget(cl, FALSE, "CC_%s", vr);
-	 if (IS_NULL(vl) == TRUE)
-	    vl = cgetenv(TRUE, vr);
-	 fprintf(fp, "CC_%s = %s\n", vr, vl);};
-
-    fprintf(fp, "\n");
-
-/* FC tool */
-    fprintf(fp, "# tool FC\n");
-    nt = sizeof(tool_fc)/sizeof(char *);
-
-    for (it = 0; it < nt; it++)
-        {vr = tool_fc[it];
-	 vl = dbget(cl, FALSE, "FC_%s", vr);
-	 if (IS_NULL(vl) == TRUE)
-	    vl = cgetenv(TRUE, vr);
-	 fprintf(fp, "FC_%s = %s\n", vr, vl);};
-
-    fprintf(fp, "\n");
-
-/* LD tool */
-    fprintf(fp, "# tool LD\n");
-    nt = sizeof(tool_ld)/sizeof(char *);
-
-    for (it = 0; it < nt; it++)
-        {vr = tool_ld[it];
-	 vl = dbget(cl, FALSE, "LD_%s", vr);
-	 if (IS_NULL(vl) == TRUE)
-	    vl = cgetenv(TRUE, vr);
-	 fprintf(fp, "LD_%s = %s\n", vr, vl);};
-
-    fprintf(fp, "\n");
-
-/* AR tool */
-    fprintf(fp, "# tool AR\n");
-    nt = sizeof(tool_ar)/sizeof(char *);
-
-    for (it = 0; it < nt; it++)
-        {vr = tool_ar[it];
-	 vl = dbget(cl, FALSE, "Ar_%s", vr);
-	 if (IS_NULL(vl) == TRUE)
-	    vl = cgetenv(TRUE, vr);
-	 fprintf(fp, "Ar_%s = %s\n", vr, vl);};
-
-    fprintf(fp, "\n");
-
-    fprintf(fp, "# tool LEX\n");
-    fprintf(fp, "Lex_Exe   = %s\n", dbget(cl, FALSE, "Lex_Exe"));
-    fprintf(fp, "Lex_Flags = %s\n", dbget(cl, FALSE, "Lex_Flags"));
-    fprintf(fp, "\n");
-
-    fprintf(fp, "# tool RANLIB\n");
-    fprintf(fp, "Ranlib_Exe = %s\n", dbget(cl, FALSE, "Ranlib_Exe"));
-    fprintf(fp, "\n");
+	 fprintf(fp, "\n");};
 
 /* emit items from the Glb group */
     fprintf(fp, "# Global variables\n");
@@ -381,7 +343,7 @@ int main(int c, char **v)
        {fprintf(fp, "PSY_PubLib  = \n");
         fprintf(fp, "PSY_PubInc  = \n");}
     else
-       {psy_publib = dbget(cl, FALSE, "PSY_PubLib");
+       {psy_publib = dbget(cl, TRUE, "PSY_PubLib");
 	fprintf(fp, "PSY_PubRoot = %s\n", path_head(psy_publib));
 	fprintf(fp, "PSY_PubLib  = -L%s\n", psy_publib);
 	fprintf(fp, "PSY_PubInc  = -I%s\n", dbget(cl, FALSE, "PSY_PubInc"));};
@@ -404,10 +366,10 @@ int main(int c, char **v)
     fprintf(fp, "# System utilities\n");
     fprintf(fp, "#\n");
     fprintf(fp, "INSTALL    = %s\n", dbget(cl, FALSE, "INSTALL_Exe"));
-    fprintf(fp, "RM         = %s\n", dbget(cl, FALSE, "RM"));
+    fprintf(fp, "RM         = %s\n", cgetenv(FALSE, "RM"));
     fprintf(fp, "RANLIB     = aranlib\n");
 
-    have_py = dbget(cl, FALSE, "HAVE_PYTHON");
+    have_py = dbget(cl, TRUE, "HAVE_PYTHON");
     if (strstr(have_py, "TRUE") != NULL)
        {sa = tokenize(dbget(cl, FALSE, "PY_Exe"), " ", 0);
 
@@ -459,10 +421,12 @@ int main(int c, char **v)
     fprintf(fp, "MDInc      = %s %s\n",
 	    dbget(cl, FALSE, "MD_Inc"),
 	    cc_inc);
-    fprintf(fp, "MDLib      = %s %s %s\n",
-	    dbget(cl, FALSE, "MD_Lib"),
-	    dbget(cl, FALSE, "LD_Lib"),
-	    dbget(cl, FALSE, "LibM_Lib"));
+
+    fprintf(fp, "MDLib      =");
+    fprintf(fp, " %s", dbget(cl, FALSE, "MD_Lib"));
+    fprintf(fp, " %s", dbget(cl, FALSE, "LD_Lib"));
+    fprintf(fp, " %s", dbget(cl, FALSE, "LibM_Lib"));
+    fprintf(fp, "\n");
     fprintf(fp, "DPInc      = %s\n", dp_inc);
     fprintf(fp, "DPLib      = %s\n", dbget(cl, FALSE, "DP_Lib"));
     fprintf(fp, "MDI_Inc    = %s\n", dbget(cl, FALSE, "MDI_Inc"));
@@ -470,7 +434,6 @@ int main(int c, char **v)
     fprintf(fp, "MDE_Lib    = %s\n", dbget(cl, FALSE, "MDE_Lib"));
 
     fc_ld_lib = dbget(cl, FALSE, "FC_LD_Lib");
-/*    if ($?FC_LD_Lib == 1) */
     if (IS_NULL(fc_ld_lib) == FALSE)
        fprintf(fp, "FLib       = %s\n", fc_ld_lib);
     else
@@ -492,7 +455,7 @@ int main(int c, char **v)
     fprintf(fp, "\n");
 
 /* compiler invocations */
-    use_acc = dbget(cl, FALSE, "USE_ACC");
+    use_acc = dbget(cl, TRUE, "USE_ACC");
     if (strcmp(use_acc, "TRUE") == 0)
        {fprintf(fp, "CCompiler      = acc\n");
 	fprintf(fp, "CCmpLdr        = acc\n");
@@ -613,12 +576,16 @@ int main(int c, char **v)
 	    dbget(cl, FALSE, "Yacc_Flags"));
     fprintf(fp, "LEX      = %s\n", dbget(cl, FALSE, "Lex_Exe"));
     fprintf(fp, "AR       = %s\n", dbget(cl, FALSE, "AR_Exe"));
-    fprintf(fp, "AROpt    = %s %s\n",
-	    dbget(cl, FALSE, "AR_Flags"),
-	    dbget(cl, FALSE, "AR_IFlag"));
-    fprintf(fp, "ARXOpt   = %s %s\n",
-	    dbget(cl, FALSE, "AR_Flags"),
-	    dbget(cl, FALSE, "AR_XFlag"));
+
+    fprintf(fp, "AROpt    =");
+    fprintf(fp, " %s", dbget(cl, FALSE, "AR_Flags"));
+    fprintf(fp, " %s", dbget(cl, FALSE, "AR_IFlag"));
+    fprintf(fp, "\n");
+
+    fprintf(fp, "ARXOpt   =");
+    fprintf(fp, " %s", dbget(cl, FALSE, "AR_Flags"));
+    fprintf(fp, " %s", dbget(cl, FALSE, "AR_XFlag"));
+    fprintf(fp, "\n");
     fprintf(fp, "\n");
 
     if (strcmp(psy_load, "TRUE") == 0)

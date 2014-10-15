@@ -23,7 +23,7 @@ flog $WLog ../psh/ccw -g -I../psh write/make-def.c -o $mdexe
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-flog $WLog $mdexe
+ftee $WLog $mdexe
 
 if ($status == 0) then
 #   flog $WLog rm -f $mdexe
