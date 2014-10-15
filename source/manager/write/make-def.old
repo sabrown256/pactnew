@@ -1,0 +1,688 @@
+#!/bin/csh -f
+#
+# MAKE-DEF - write the MAKE-DEF file
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/pre-common
+
+Note $WLog "----- write/make-def -----"
+Note $WLog "Write: make-def"
+Note $WLog ""
+
+HAVE_SUBROUTINES
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $WLog
+
+NoteD $WLog "   Site Dependent MAKE Configuration - make-def"
+Note $WLog ""
+
+dbmget $WLog ACC_Debug_Default^      \
+             ACC_Optimize_Default^   \
+             AFC_Debug_Default^      \
+             AFC_Optimize_Default^   \
+             AR_IFlag^               \
+             AR_XFlag^               \
+             ArW32Objs^              \
+             Bits^                   \
+             CC_Debug_Default^       \
+             CC_Optimize_Default^    \
+             Cfg_CC_Exe^             \
+             Cfg_CC_Flags^           \
+             Cfg_CC_Inc^             \
+             CROSS_COMPILE^          \
+             CROSS_FE^               \
+             DP_BE^                  \
+             DP_METHOD^              \
+             FC_MOD_FLAG^            \
+             FC_Debug_Default^       \
+             FC_Optimize_Default^    \
+             GRAPHICS_Devices^       \
+             GRAPHICS_Flags^         \
+             GRAPHICS_Windows^       \
+             HAVE_PYTHON^            \
+             HSY_OS_Name^            \
+             HSY_OS_Type^            \
+             INSTALL_Exe^            \
+             JOBS_System^            \
+             Lex_Exe^                \
+             Lex_Flags^              \
+             LIB^                    \
+             MAKE_Strategy^          \
+             MAKE_SUFFIXES^          \
+             MAKE_UseGNU^            \
+             OW32Objs^               \
+             PACT_CC_FAMILY^         \
+             PACT_CC_VERSION^        \
+             PACT_CC_PATH^           \
+             PACT_CC_EXE^            \
+             PACT_FC_FAMILY^         \
+             PACT_FC_VERSION^        \
+             PACT_FC_PATH^           \
+             PACT_FC_EXE^            \
+             PCO_Globals^            \
+             PCO_UseVars^            \
+             PSY_Base^               \
+             PSY_Cfg^                \
+             PSY_Root^               \
+             PSY_ID^                 \
+             PSY_InstRoot^           \
+             PSY_Load^               \
+             PSY_PubLib^             \
+             PSY_PubInc^             \
+             PSY_CfgDir^             \
+             PSY_MngDir^             \
+             PSY_TmpDir^             \
+             PY_CC^                  \
+             PY_Cfg^                 \
+             PY_Exe^                 \
+             PY_Inc^                 \
+             PY_Vers^                \
+             Ranlib_Exe^             \
+             RF_SPOKES_C^            \
+             RPATH^                  \
+             SHELL_Default^          \
+             SMP_LibExt^             \
+             STD_IPC^                \
+             USE_ACC^                \
+             Yacc_Exe^               \
+             Yacc_Flags
+
+setenv EtcDir  $PSY_Root/etc
+setenv IncDir  $PSY_Root/include
+
+set psy_cfg = $PSY_Cfg:t
+set vl = ""
+
+# compiler tools
+foreach t (CC FC CXX)
+   foreach f (Debug Exe Flags Inc Linker Optimize)
+      set vl = ( $vl ${t}_${f} )
+   end
+end
+
+# linker tool
+foreach f (Exe Flags Lib RPath)
+   set vl = ( $vl LD_${f} )
+end
+
+# other tools
+foreach t (AR Lex Ranlib Yacc)
+   foreach f (Exe Flags)
+      set vl = ( $vl ${t}_${f} )
+   end
+end
+
+# groups
+foreach g (Cfg Cfe Ser Std Shared)
+
+# compilers
+   foreach t (CC FC CXX)
+      foreach f (Exe Flags Inc Linker)
+         set vl = ( $vl ${g}_${t}_${f} )
+      end
+   end
+
+# linker
+   foreach f (Exe Lib RPath Flags)
+      set vl = ( $vl ${g}_LD_${f} )
+   end
+end
+
+# others
+foreach t (MD MDE MDI MDG DP LibM)
+   foreach f (Inc Lib RPath Path)
+      set vl = ( $vl ${t}_${f} )
+   end
+end
+
+source $PSY_MngDir/write/import-db
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ("$HSY_OS_Type" == USE_MSW) then
+   set lostd = WIN32
+else
+   set lostd = UNIX
+endif
+
+alias RESET_VAR  'setenv \!\!:1_\!\!:2 \!\!:3-$'
+alias DEFD_VAR   'set ok = `env | grep \!\!:1`'
+alias VAR_VAL_SP 'set value = `printenv \!\!:1_\!\!:2 | sed "s^ ^+sp+^g"`'
+alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# add DP_Inc to CC_Inc
+    flog $WLog setenv CC_Inc  "$CC_Inc $DP_Inc"
+
+    set STDOUT = $EtcDir/make-def
+
+    flog $WLog $RM $STDOUT
+    flog $WLog touch $STDOUT
+
+    Note $STDOUT "#"
+    Note $STDOUT "# MAKE-DEF - installation dependent definitions for $psy_cfg"
+    Note $STDOUT "#"
+    Note $STDOUT ""
+    Note $STDOUT "PSY_ID     = $PSY_ID"
+    Note $STDOUT "PSY_CfgDir = $PSY_CfgDir"
+    Note $STDOUT "PSY_TmpDir = $PSY_TmpDir"
+    Note $STDOUT ""
+
+    set THE_DATE = `cat .pact-version`
+    Note $STDOUT "Version    = $THE_DATE"
+
+    set mk = `where gmake |& head -n 1`
+    if (!(-x "$mk")) then
+       set mk = `where make |& head -n 1`
+    endif
+    Note $WLog "Using '$mk' for system make"
+    Note $STDOUT "UMake      = $mk"
+    unset mk
+
+    Note $STDOUT 'tmpobj     = ${PSY_TmpDir}/obj'
+    Note $STDOUT "PSY_Base   = $PSY_Base"
+    Note $STDOUT "PSY_ScrDir = $PSY_Base/scripts"
+    Note $STDOUT "PSY_Root   = $PSY_Root"
+    Note $STDOUT 'ScmDir     = ${PSY_Root}/scheme'
+    Note $STDOUT 'BinDir     = ${PSY_Root}/bin'
+    Note $STDOUT 'LibDir     = ${PSY_Root}/lib'
+    Note $STDOUT 'IncDir     = ${PSY_Root}/include'
+    Note $STDOUT 'EtcDir     = ${PSY_Root}/etc'
+    Note $STDOUT 'Man1Dir    = ${PSY_Root}/man/man1'
+    Note $STDOUT 'Man3Dir    = ${PSY_Root}/man/man3'
+    Note $STDOUT ""
+
+    if ("$HSY_OS_Name" == "HP-UX") then
+       Note $STDOUT 'TGTLib  = nolib'
+    endif
+    Note $STDOUT 'TGTBin  = nobin'
+    Note $STDOUT 'TGTEtc  = noetc'
+    Note $STDOUT 'TGTInc  = noinc'
+    Note $STDOUT 'TGTScm  = noscm'
+    Note $STDOUT 'TGTScr  = noscr'
+    Note $STDOUT 'TGTScmX = noscmx'
+    Note $STDOUT 'TGTScrX = noscrx'
+    Note $STDOUT 'TGTMan3 = noman'
+    Note $STDOUT 'LibName = noname'
+    Note $STDOUT ""
+
+# Compiler info
+    gexec ../scripts/gcc-info $CC_Exe @o2 @e3 vw:GCCInfo @ fa:/dev/null
+    dbgets GCCInfo
+    if ($GCCInfo[2] == yes) then    
+       Note $STDOUT "#"
+       Note $STDOUT "# GCC Info"
+       Note $STDOUT "#"
+       Note $STDOUT "GCCLib = $GCCInfo[8]"
+       Note $STDOUT ""
+    endif
+
+# OS support
+    Note $STDOUT "#"
+    Note $STDOUT "# Site Dependent OS Support"
+    Note $STDOUT "#"
+    Note $STDOUT -n "OSSupport ="
+    if ($lostd == UNIX) then
+       if ($MAKE_Strategy == "SpaceSaving") then
+          Note $STDOUT -n ' ${ArUnxObjs}'
+       else
+          Note $STDOUT -n ' ${OUnxObjs'}'
+       endif
+
+# cannot ever get here but it shows how the abstraction works
+    else if ($lostd == WIN32) then
+       if ($MAKE_Strategy == "SpaceSaving") then
+          Note $STDOUT -n ' ${ArW32Objs}'
+       else
+          Note $STDOUT -n ' ${OW32Objs'}'
+       endif
+    endif
+    Note $STDOUT ""
+    Note $STDOUT ""
+
+# graphics devices
+    Note $STDOUT "#"
+    Note $STDOUT "# Site Dependent Graphics Information"
+    Note $STDOUT "#"
+    Note $STDOUT "GRAPHICS_Flags   = $GRAPHICS_Flags"
+    Note $STDOUT "MDGInc           = $MDG_Inc"
+    Note $STDOUT "MDGLib           = $MDG_Lib"
+
+    Note $STDOUT -n "GRAPHICS_Devices ="
+    foreach dev ($GRAPHICS_Devices)
+       if ($MAKE_Strategy == "SpaceSaving") then
+          Note $STDOUT -n ' ${Ar'$dev'}'
+       else
+          Note $STDOUT -n ' ${O'$dev'}'
+       endif
+    end
+    Note $STDOUT ""
+
+    Note $STDOUT ""
+    Note $STDOUT "GRAPHICS_Windows=$GRAPHICS_Windows"
+    Note $STDOUT ""
+
+# Syntax Modes
+    Note $STDOUT "#"
+    Note $STDOUT "# Site Dependent Syntax Modes"
+    Note $STDOUT "#"
+
+    set SynSCM = ""
+    Note $STDOUT -n "SyntaxModes  ="
+    if ("$Yacc_Exe" != "") then
+       set scsd = `scs-meta -n`
+       Note $WLog "scsd = $scsd"
+       flog $WLog pushd $PSY_Base/scheme/syntax
+       foreach mod (*)
+          if (-d $mod) then
+             if ($mod != "$scsd") then
+                flog $WLog set SynSCM = ( $SynSCM applications/${mod}synt.scm )
+                if ($MAKE_Strategy == "SpaceSaving") then
+                   Note $STDOUT -n ' ${Ar'$mod'}'
+                else
+                   Note $STDOUT -n ' ${O'$mod'}'
+                endif
+             endif
+          endif
+       end
+       flog $WLog popd
+    endif
+    Note $STDOUT ""
+    Note $STDOUT "SyntaxScheme = $SynSCM"
+
+# Parallel I/O
+    if ($MAKE_Strategy == "SpaceSaving") then
+       set MPDev  = '${Ar'$DP_METHOD'}'
+       set IPCDev = '${Ar'$STD_IPC'}'
+    else
+       set MPDev  = '${O'$DP_METHOD'}'
+       set IPCDev = '${O'$STD_IPC'}'
+    endif
+    Note $STDOUT "MPassDevices = $MPDev"
+    Note $STDOUT "IPCDevices   = $IPCDev"
+    Note $STDOUT ""
+
+    Note $STDOUT "#"
+    Note $STDOUT "# Compiler/Loader Options"
+    Note $STDOUT "#"
+
+# emit items from the defined groups
+    foreach g (Std Cfg Cfe Ser Shared)
+       Note $STDOUT ""
+       Note $STDOUT "# group ${g}"
+       foreach v ($PCO_UseVars)
+          DEFD_VAR ${g}_${v}
+          if ("$ok" == "") then
+             Note $STDOUT "${g}_${v} = `printenv ${v}`"
+          else
+             VAR_VALUE ${g} ${v}
+             Note $STDOUT "${g}_${v} = $value"
+          endif
+       end
+    end
+    Note $STDOUT ""
+
+    Note $STDOUT "# tool CC"
+    foreach v (Exe Flags Debug Optimize Shared Inc)
+       DEFD_VAR CC_${v}
+       if ("$ok" == "") then
+          Note $STDOUT "CC_${v} = `printenv ${v}`"
+       else
+          VAR_VALUE CC ${v}
+          Note $STDOUT "CC_${v} = $value"
+       endif
+    end
+    Note $STDOUT ""
+
+    Note $STDOUT "# tool FC"
+    foreach v (Exe Flags Debug Optimize Shared)
+       DEFD_VAR FC_${v}
+       if ("$ok" == "") then
+          Note $STDOUT "FC_${v} = `printenv ${v}`"
+       else
+          VAR_VALUE FC ${v}
+          Note $STDOUT "FC_${v} = $value"
+       endif
+    end
+    Note $STDOUT ""
+
+    Note $STDOUT "# tool LD"
+    foreach v (Exe Flags Shared Lib)
+       DEFD_VAR LD_${v}
+       if ("$ok" == "") then
+          Note $STDOUT "LD_${v} = `printenv ${v}`"
+       else
+          VAR_VALUE LD ${v}
+          Note $STDOUT "LD_${v} = $value"
+       endif
+    end
+    Note $STDOUT ""
+
+    Note $STDOUT "# tool AR"
+    foreach v (Exe Flags IFlag XFlag)
+       DEFD_VAR Ar_${v}
+       if ("$ok" == "") then
+          Note $STDOUT "Ar_${v} = `printenv ${v}`"
+       else
+          VAR_VALUE Ar ${v}
+          Note $STDOUT "Ar_${v} = $value"
+       endif
+    end
+    Note $STDOUT ""
+
+    Note $STDOUT "# tool LEX"
+    Note $STDOUT "Lex_Exe   = $Lex_Exe"
+    Note $STDOUT "Lex_Flags = $Lex_Flags"
+    Note $STDOUT ""
+
+    Note $STDOUT "# tool RANLIB"
+    Note $STDOUT "Ranlib_Exe = $Ranlib_Exe"
+    Note $STDOUT ""
+
+# emit items from the Glb group
+    Note $STDOUT "# Global variables"
+    foreach v ($PCO_Globals)
+       set value = `printenv $v`
+       Note $STDOUT "$v = $value"
+    end
+    Note $STDOUT ""
+
+    Note $STDOUT "CROSS_FE    = $CROSS_FE"
+    Note $STDOUT "DP_BE       = $DP_BE"
+
+    if ("$PSY_InstRoot" == "none") then
+       Note $STDOUT "PSY_PubLib  = "
+       Note $STDOUT "PSY_PubInc  = "
+    else
+       set psy_pubroot = $PSY_PubLib:h
+       Note $STDOUT "PSY_PubRoot = $psy_pubroot"
+       Note $STDOUT "PSY_PubLib  = -L$PSY_PubLib"
+       Note $STDOUT "PSY_PubInc  = -I$PSY_PubInc"
+    endif
+    Note $STDOUT ""
+
+# emit the load names for the libraries - cover threaded/nonthreaded
+    Note $STDOUT "SMP_LibExt=$SMP_LibExt"
+    Note $STDOUT "LSCORE      = -lscore"
+    Note $STDOUT "LMM         = -lpsmm"
+    Note $STDOUT "LPML        = -lpml"
+    Note $STDOUT "LPDB        = -lpdb"
+    Note $STDOUT "LPGS        = -lpgs"
+    Note $STDOUT "LPANACEA    = -lpanacea"
+    Note $STDOUT "LSCHEME     = -lscheme"
+    Note $STDOUT "LSX         = -lsx"
+    Note $STDOUT ""
+
+    Note $STDOUT "#"
+    Note $STDOUT "# System utilities"
+    Note $STDOUT "#"
+    Note $STDOUT "INSTALL    = $INSTALL_Exe"
+    Note $STDOUT "RM         = $RM"
+    Note $STDOUT "RANLIB     = aranlib"
+
+    if ("$HAVE_PYTHON" =~ *TRUE*) then
+# GOTCHA: what about the other python versions in the list
+       set lPython = ( $PY_Exe )
+       Note $STDOUT "PY_Vers    = $PY_Vers"
+       Note $STDOUT "PY_CC      = $PY_CC"
+       Note $STDOUT "PY_CfgDir  = $PY_Cfg"
+       Note $STDOUT "PY_IncDir  = $PY_Inc"
+       Note $STDOUT "PythonPath = $lPython[1]:h"
+    endif
+
+    Note $STDOUT ""
+    Note $STDOUT "#"
+    Note $STDOUT "# Space Saving Build"
+    Note $STDOUT '#     If you want that option do the following:'
+    Note $STDOUT '#                    LibDep = ${ArObjs}'
+    Note $STDOUT '#                    .PRECIOUS: ${TGTLib}'
+    Note $STDOUT '#     otherwise do:'
+    Note $STDOUT '#                    LibDep = ${Objs}'
+    Note $STDOUT "#"
+
+# MAKE_Strategy handler
+
+    if ($MAKE_Strategy == "SpaceSaving") then
+       Note $STDOUT 'LibDep = ${ArObjs}'
+       Note $STDOUT ""
+       Note $STDOUT '.PRECIOUS: ${TGTLib}'
+    else
+       Note $STDOUT 'LibDep = ${Objs}'
+    endif
+    Note $STDOUT ""
+
+    Note $STDOUT "SHELL   = $SHELL_Default"
+    Note $STDOUT "Manager = $PSY_MngDir"
+    Note $STDOUT 'DATE    = `./code-date`'
+    Note $STDOUT ""
+
+# get the entries for RPATH
+    set npath = `analyze/rpath -o link`
+    Note $WLog "analyze/rpath -o link => |$npath|"
+    Note $STDOUT "LDPath     = $npath"
+
+    set lrpath  = `analyze/rpath -o rpath`
+    Note $WLog "analyze/rpath -o rpath => |$npath|"
+    Note $STDOUT "LDRPath    = $lrpath"
+
+    Note $STDOUT "LDFLAGS    = ${LD_Flags}"' ${LDRPath} ${LDPath}'
+    Note $STDOUT "LXFLAGS    = ${Lex_Flags}"
+    Note $STDOUT "MDInc      = ${MD_Inc} ${CC_Inc}"
+    Note $STDOUT "MDLib      = ${MD_Lib} ${LD_Lib} ${LibM_Lib}"
+    Note $STDOUT "DPInc      = ${DP_Inc}"
+    Note $STDOUT "DPLib      = ${DP_Lib}"
+    Note $STDOUT "MDI_Inc    = ${MDI_Inc}"
+    Note $STDOUT "MDI_Lib    = ${MDI_Lib}"
+    Note $STDOUT "MDE_Lib    = ${MDE_Lib}"
+    if ($?FC_LD_Lib == 1) then
+       Note $STDOUT "FLib       = ${FC_LD_Lib}"
+    else
+       Note $STDOUT "FLib       = "
+    endif
+    Note $STDOUT ""
+
+    Note $STDOUT "FC_MOD_FLAG   = ${FC_MOD_FLAG}"
+    Note $STDOUT "Linker        = ${LD_Exe}"
+    Note $STDOUT "JOBS_System   = $JOBS_System"
+    Note $STDOUT ""
+
+# compiler control - debug/opt, show flags, ...
+    Note $STDOUT 'SFL_     = Abrv'
+    Note $STDOUT 'DefaultG = DefDebug'
+    Note $STDOUT 'DefaultO = DefOptimize'
+    Note $STDOUT 'g        = Debug'
+    Note $STDOUT 'o        = Optimize'
+    Note $STDOUT 'OD       = DefaultG'
+    Note $STDOUT ""
+
+# compiler invocations
+    if ($USE_ACC == TRUE) then
+       Note $STDOUT "CCompiler      = acc"
+       Note $STDOUT "CCmpLdr        = acc"
+       Note $STDOUT "CDefDebug      = ${ACC_Debug_Default}"
+       Note $STDOUT "CDefOptimize   = ${ACC_Optimize_Default}"
+    else
+       Note $STDOUT "CCompiler      = ${CC_Exe}"
+       Note $STDOUT "CCmpLdr        = ${CC_Linker}"
+       Note $STDOUT "CDefDebug      = ${CC_Debug_Default}"
+       Note $STDOUT "CDefOptimize   = ${CC_Optimize_Default}"
+    endif
+    Note $STDOUT 'ODC            = ${C${${OD}}}'
+    Note $STDOUT "CFLAGS         = ${CC_Flags}"
+    Note $STDOUT 'CDebug         = ${CCDefDebug}'
+    Note $STDOUT 'COptimize      = ${CCDefOptimize}'
+    Note $STDOUT ""
+
+    if ($USE_ACC == TRUE) then
+       Note $STDOUT "CXCompiler     = a++"
+       Note $STDOUT "CXCmpLdr       = a++"
+       Note $STDOUT "CXDefDebug     = ${ACC_Debug_Default}"
+       Note $STDOUT "CXDefOptimize  = ${ACC_Optimize_Default}"
+    else
+       Note $STDOUT "CXCompiler     = ${CXX_Exe}"
+       Note $STDOUT "CXCmpLdr       = ${CXX_Linker}"
+       Note $STDOUT "CXDefDebug     = ${CC_Debug_Default}"
+       Note $STDOUT "CXDefOptimize  = ${CC_Optimize_Default}"
+    endif
+    Note $STDOUT "CXFLAGS        = ${CXX_Flags}"
+    Note $STDOUT 'CXDebug        = ${CXXDefDebug}'
+    Note $STDOUT 'CXOptimize     = ${CXXDefOptimize}'
+    Note $STDOUT ""
+
+    if ($USE_ACC == TRUE) then
+       Note $STDOUT "FCompiler      = afc"
+       Note $STDOUT "FDefDebug      = ${AFC_Debug_Default}"
+       Note $STDOUT "FDefOptimize   = ${AFC_Optimize_Default}"
+    else
+       Note $STDOUT "FCompiler      = ${FC_Exe}"
+       Note $STDOUT "FDefDebug      = ${FC_Debug_Default}"
+       Note $STDOUT "FDefOptimize   = ${FC_Optimize_Default}"
+    endif
+    Note $STDOUT 'ODF            = ${F${${OD}}}'
+    Note $STDOUT "FFLAGS         = ${FC_Flags}"
+    Note $STDOUT 'FDebug         = ${FCDefDebug}'
+    Note $STDOUT 'FOptimize      = ${FCDefOptimize}'
+    Note $STDOUT ""
+
+    Note $STDOUT 'CCAnnounceFull = ${CC}'
+    Note $STDOUT 'FCAnnounceFull = ${FC}'
+    Note $STDOUT 'LXAnnounceFull = ${LX}'
+    Note $STDOUT 'YCAnnounceFull = ${YC}'
+    Note $STDOUT ""
+
+    Note $STDOUT 'CCAnnounceAbrv = ${CCompiler} ${ODC}'
+    Note $STDOUT 'FCAnnounceAbrv = ${FCompiler} ${ODF}'
+    Note $STDOUT 'LXAnnounceAbrv = ${CCompiler} ${ODC}'
+    Note $STDOUT 'YCAnnounceAbrv = ${CCompiler} ${ODC}'
+    Note $STDOUT ""
+
+    Note $STDOUT 'CCAnnounce     = ${CCAnnounce${SFL_}}'
+    Note $STDOUT 'FCAnnounce     = ${FCAnnounce${SFL_}}'
+    Note $STDOUT 'LXAnnounce     = ${LXAnnounce${SFL_}}'
+    Note $STDOUT 'YCAnnounce     = ${YCAnnounce${SFL_}}'
+    Note $STDOUT ""
+
+    Note $STDOUT 'CC  = ${CCompiler} ${ODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}'
+    Note $STDOUT 'CXX = ${CXCompiler} ${ODC} ${CXFLAGS} ${CxFlags}'
+    Note $STDOUT 'FC  = ${FCompiler} ${ODF} ${FFLAGS} ${FcFlags}'
+    Note $STDOUT 'LX  = ${CCompiler} ${ODC} ${LXFLAGS} ${CcFlags}'
+    Note $STDOUT 'YC  = ${CCompiler} ${ODC} ${LXFLAGS} ${CcFlags}'
+    Note $STDOUT 'LD  = ${Linker} ${LdFlags}'
+    Note $STDOUT ""
+ 
+# other invocations
+    if ($USE_ACC == TRUE) then
+       Note $STDOUT 'CLD            = acc ${ODC} ${CFLAGS} ${CcFlags}'
+       Note $STDOUT 'CCCfg          = acc ${ODC} ${Cfg_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCCfg          = afc ${ODF} ${Cfg_FC_Flags} ${FcFlags}'
+
+       Note $STDOUT 'CCSer          = acc ${ODC} ${Ser_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCSer          = afc ${ODF} ${Ser_FC_Flags} ${FcFlags}'
+
+       Note $STDOUT 'CCCfe          = acc ${ODC} ${Cfe_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCCfe          = afc ${ODF} ${Cfe_FC_Flags} ${FcFlags}'
+       Note $STDOUT 'CCCfe_LD_Flags = ${Cfe_LD_Flags}'
+       Note $STDOUT 'CCCfe_LD_Lib   = ${Cfe_LD_Lib}'
+    else
+       Note $STDOUT 'CLD            = ${CCmpLdr} ${ODC} ${CFLAGS} ${CcFlags}'
+       Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${ODC} ${Cfg_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCCfg          = ${Cfg_FC_Exe} ${ODF} ${Cfg_FC_Flags} ${FcFlags}'
+
+       Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${ODC} ${Ser_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCSer          = ${Ser_FC_Exe} ${ODF} ${Ser_FC_Flags} ${FcFlags}'
+
+       Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${ODC} ${Cfe_CC_Flags} ${CcFlags} ${Shared_CC_Flags}'
+       Note $STDOUT 'FCCfe          = ${Cfe_FC_Exe} ${ODF} ${Cfe_FC_Flags} ${FcFlags}'
+       Note $STDOUT 'CCCfe_LD_Flags = ${Cfe_LD_Flags}'
+       Note $STDOUT 'CCCfe_LD_Lib   = ${Cfe_LD_Lib}'
+    endif
+    Note $STDOUT ""
+
+# other tool invocations
+    Note $STDOUT "YACC     = $Yacc_Exe $Yacc_Flags"
+    Note $STDOUT "LEX      = $Lex_Exe"
+    Note $STDOUT "AR       = ${AR_Exe}"
+    Note $STDOUT "AROpt    = ${AR_Flags} ${AR_IFlag}"
+    Note $STDOUT "ARXOpt   = ${AR_Flags} ${AR_XFlag}"
+    Note $STDOUT ""
+
+    if ($PSY_Load == TRUE) then
+       Note $STDOUT 'Load           = ${CCmpLdr}'
+    else
+       Note $STDOUT 'Load           = echo'
+    endif
+    Note $STDOUT "BinAction      = "
+    Note $STDOUT "IncAction      = "
+    Note $STDOUT "LibAction      = "
+    Note $STDOUT "RemoveAction   = "
+    Note $STDOUT "CleanAction    = "
+    Note $STDOUT ""
+
+    Note $STDOUT ""
+    Note $STDOUT ".SUFFIXES: $MAKE_SUFFIXES"
+    Note $STDOUT ""
+
+    if ("$MAKE_UseGNU" == "-DUSE_GNU_MAKE") then
+       Note $STDOUT '(%): %'
+       Note $STDOUT ''
+    endif
+
+# write the default make rules
+    call PrintRule(".c.i:", IRules_CCP)
+
+    call PrintRule(".c.o:", IRules_CCObj)
+    call PrintRule(".c.a:", IRules_CCArc)
+    call PrintRule(".l.o:", IRules_LexObj)
+    call PrintRule(".l.a:", IRules_LexArc)
+    call PrintRule(".l.c:", IRules_LexC)
+    call PrintRule(".y.o:", IRules_YaccObj)
+    call PrintRule(".y.a:", IRules_YaccArc)
+    call PrintRule(".y.c:", IRules_YaccC)
+    call PrintRule(".f.o:", IRules_FCObj)
+    call PrintRule(".f.a:", IRules_FCArc)
+
+    Note $STDOUT ""
+
+    exit(0)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PRINTRULE - do the required rule printing with \n and \t handled
+#           - properly
+
+PrintRule:
+
+    set Rule = $args_[1]
+    set Val  = $args_[2]
+
+    echo "$Rule" >> $STDOUT
+
+    echo '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }' >> $STDOUT
+
+    if ($HSY_OS_Name == "FreeBSD") then
+       printenv $Val |& sed 's/\\n/\n/g' >>& $STDOUT
+    else
+       fexec $WLog printenv $Val @o sed 's/\\n/\n/g' @o sed 's/\\t/\t/g' @o fa:$STDOUT
+    endif
+
+    return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+source $Me:h/post-common
+
+exit(0)
