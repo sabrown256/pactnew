@@ -24,7 +24,8 @@
 #define LARGE
 
 #ifdef LARGE
-# include "ppc.h"
+# include "pdb.h"
+# include "scope_dp.h"
 #endif
 
 #if 1
