@@ -88,6 +88,49 @@ static void py_arg(char *arg, int nc, char *spec)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PYTHON_ENUM_DECL - write the Python interface C enums DV */
+
+static void python_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
+   {
+
+/* syntax:
+ *  To summarize adding enums to python, blang generates
+ *  a function that adds the names to a dictionary.
+ *  This function is then called by the module initialization instead
+ *  of using the #include method that is being used with methods.
+ *  
+ * int blang_generated(PyObject *d)
+ *    {if (PyDict_SetItemString(d, "enum", PyInt_FromLong(ENUM)) < 0)
+ *        return(-1);
+ *      ...
+ *     return(0);}
+ *
+ */
+
+    if ((ta != NULL) && (strcmp(ta[0], "enum") == 0))
+       {};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_STRUCT_DECL - write the Python interface C structs DV */
+
+static void python_struct_decl(FILE *fp, char *dv, char **ta, char *pck)
+   {
+
+/* syntax:
+ */
+
+    if (ta != NULL)
+       {};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PYTHON_DEF_STRUCTS - define local version of struct definitions */
 
 static void python_def_structs(FILE *fp, statedes *st)

@@ -19,6 +19,7 @@ Note $ALog ""
 dbmget $ALog PACT_CC_VERSION
 
 cat << EOF >! $Tmp.c
+#include <unistd.h>
 _Noreturn void b(void) {while (1) sleep(1);}
 int main(int c, char **v)
    {b();
