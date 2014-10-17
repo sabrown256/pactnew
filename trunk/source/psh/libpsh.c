@@ -361,6 +361,31 @@ int unsetenv(char *var)
 
 /*--------------------------------------------------------------------------*/
 
+/* TRIM - trim any characters contained in DELIM from the front or back
+ *      - of the string S
+ */
+
+char *trim(char *s, int dir, char *delim)
+   {int ic, nc, c;
+
+    if (s != NULL)
+       {if ((dir & FRONT) != 0)
+	   for (; (*s != '\0') && (strchr(delim, *s) != NULL); s++);
+
+/* do nothing with zero length strings */
+	if ((dir & BACK) != 0)
+	   {nc = strlen(s);
+	    for (ic = nc - 1; ic >= 0; ic--)
+	        {c = s[ic];
+		 if (strchr(delim, c) == NULL)
+		    break;
+		 s[ic] = '\0';};};};
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* STRCNTC - return the number of occurences of C in S
  *         - if EX is TRUE do not count escaped instances
  */
@@ -992,6 +1017,39 @@ int is_number(char *s, int knd)
            {errno = 0;
 	    strtold(s, &ps);
 	    rv |= (ps-s == nc);};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STOI - return the integer value of the string S
+ *      - take base into account
+ */
+
+int64_t stoi(char *s)
+   {int64_t rv;
+    char *t, *ps;
+
+    rv = 0;
+
+    if (s != NULL)
+       {t = trim(s, FRONT, "+- \t");
+
+/* octal numbers are: 0d* where d is [0-7] */
+	if (t[0] == '0')
+	   rv = strtoll(s, &ps, 8);
+
+/* hexidecimal numbers are: 0xd* where d is [0-9A-Fa-f] */
+	else if (strncmp(t, "0x", 2) == 0)
+	   rv = strtoll(s, &ps, 16);
+
+/* Clang/GCC extension for binary numbers are: 0bd* where d is [01] */
+	else if (strncmp(t, "0b", 2) == 0)
+	   rv = strtoll(s, &ps, 2);
+
+	else
+	   rv = strtoll(s, &ps, 10);};
 
     return(rv);}
 
@@ -2692,31 +2750,6 @@ int touch(char *fmt, ...)
        close_safe(fd);
 
     return(fd);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* TRIM - trim any characters contained in DELIM from the front or back
- *      - of the string S
- */
-
-char *trim(char *s, int dir, char *delim)
-   {int ic, nc, c;
-
-    if (s != NULL)
-       {if ((dir & FRONT) != 0)
-	   for (; (*s != '\0') && (strchr(delim, *s) != NULL); s++);
-
-/* do nothing with zero length strings */
-	if ((dir & BACK) != 0)
-	   {nc = strlen(s);
-	    for (ic = nc - 1; ic >= 0; ic--)
-	        {c = s[ic];
-		 if (strchr(delim, c) == NULL)
-		    break;
-		 s[ic] = '\0';};};};
-
-    return(s);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

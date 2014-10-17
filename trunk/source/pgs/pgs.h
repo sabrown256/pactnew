@@ -253,6 +253,10 @@ enum e_PG_dev_type
 
 typedef enum e_PG_dev_type PG_dev_type;
 
+/*
+ * #bind derived PG_color integer SC_ENUM_I SC_ENUM_I ROTATING
+ */
+
 enum e_PG_color
    {CLEAR = -2, ROTATING = -1,
     WHITE, BLACK, GRAY, DARK_GRAY,
@@ -287,6 +291,10 @@ enum e_PG_rendering
 
 typedef enum e_PG_rendering PG_rendering;
 
+/*
+ * #bind derived PG_axis_attr SC_ENUM_I SC_ENUM_I AXIS_LINESTYLE
+ */
+
 enum e_PG_axis_attr
    {AXIS_LINESTYLE = 100,
     AXIS_LINETHICK,
@@ -312,6 +320,10 @@ enum e_PG_axis_attr
 
 typedef enum e_PG_axis_attr PG_axis_attr;
 
+/*
+ * #bind derived PG_axis_type SC_ENUM_I SC_ENUM_I CARTESIAN_2D
+ */
+
 enum e_PG_axis_type
    {CARTESIAN_2D = -1,
     CARTESIAN_3D = -2,
@@ -327,6 +339,10 @@ enum e_PG_grid_attr
 
 typedef enum e_PG_grid_attr PG_grid_attr;
 
+/*
+ * #bind derived PG_line_attr SC_ENUM_I SC_ENUM_I LINE_SOLID
+ */
+
 enum e_PG_line_attr
    {LINE_SOLID = 1,
     LINE_DASHED,
@@ -335,6 +351,10 @@ enum e_PG_line_attr
     LINE_NONE};
 
 typedef enum e_PG_line_attr PG_line_attr;
+
+/*
+ * #bind derived PG_vector_attr SC_ENUM_I SC_ENUM_I VEC_SCALE
+ */
 
 enum e_PG_vector_attr
    {VEC_SCALE = 1,
@@ -349,6 +369,10 @@ enum e_PG_vector_attr
 
 typedef enum e_PG_vector_attr PG_vector_attr;
 
+/*
+ * #bind derived PG_mouse_button integer SC_ENUM_I SC_ENUM_I MOUSE_NONE
+ */
+
 enum e_PG_mouse_button
    {MOUSE_NONE       = 0,
     MOUSE_LEFT       = 1,
@@ -360,6 +384,10 @@ enum e_PG_mouse_button
     MOUSE_HARDWARE   = 11};
 
 typedef enum e_PG_mouse_button PG_mouse_button;
+
+/*
+ * #bind derived PG_key_modifier integer SC_ENUM_I SC_ENUM_I KEY_SHIFT
+ */
 
 enum e_PG_key_modifier
     {KEY_SHIFT = 0x10,

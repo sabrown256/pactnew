@@ -7,17 +7,8 @@
 ; include "cpyright.h"
 ;
 
-(define red  7)
-(define blue 4)
-
-(define AXIS_TICK_MINOR    1)
-(define AXIS_TICK_MAJOR    2)
-(define AXIS_TICK_LABEL    4)
-
-(define AXIS_TICK_RIGHT     113)
-(define AXIS_TICK_LEFT      114)
-(define AXIS_TICK_STRADDLE  115)
-(define AXIS_TICK_ENDS      116)
+(define red  RED)
+(define blue BLUE)
 
 (define MAJOR_MINOR        (+ AXIS_TICK_MAJOR AXIS_TICK_MINOR))
 (define MAJOR_LABEL        (+ AXIS_TICK_MAJOR AXIS_TICK_LABEL))

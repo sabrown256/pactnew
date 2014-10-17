@@ -1067,8 +1067,10 @@ static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 /* MODULE_ENUM_DECL - write the Fortran interface C enums DV */
 
 static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
-   {int i;
-    char s[BFLRG];
+   {int i, nc;
+    long vl;
+    char s[BFLRG], x[BFLRG];
+    char *vr;
 
 /* syntax:
  *    enum, bind(C)
@@ -1079,11 +1081,29 @@ static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
     if ((ta != NULL) && (strcmp(ta[0], "enum") == 0))
        {fprintf(fp, "   enum, bind(C)\n");
 
-	s[0] = '\0';
-	for (i = 2; ta[i] != NULL; i++)
-	    vstrcat(s, BFLRG, "%s ", ta[i]);
+	fprintf(fp, "      ENUMERATOR ::");
 
-	fprintf(fp, "      ENUMERATOR :: %s\n", strtok(s, "{};"));
+	s[0] = '\0';
+	nc   = 0;
+	for (i = 2; ta[i] != NULL; )
+            {vr = strtok(ta[i++], "{,;}");
+	     if ((ta[i] != NULL) && (ta[i][0] == '='))
+	        {i++;
+	         vl = stoi(ta[i++]);
+		 snprintf(x, BFLRG, " %s = %ld,", vr, vl);}
+	     else
+	        snprintf(x, BFLRG, " %s,", vr);
+
+	     if (nc > 45)
+	        {fprintf(fp, "%s &\n", s);
+		 snprintf(s, BFLRG, "                   ");
+		 nc = 0;};
+	        
+	     nc += strlen(x);
+	     vstrcat(s, BFLRG, " %s", x);};
+
+	LAST_CHAR(s) = '\0';
+	fprintf(fp, "%s\n", s);
 	fprintf(fp, "   end enum\n");};
 
     return;}

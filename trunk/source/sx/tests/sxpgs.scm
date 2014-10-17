@@ -9,11 +9,6 @@
 
 (load "consts.scm")
 
-(define blue 4)
-(define red 7)
-(define black 0)
-(define on    1)
-(define off   0)
 (define deg-rad (/ (acos 0.0) 90.0))
 
 ;--------------------------------------------------------------------------

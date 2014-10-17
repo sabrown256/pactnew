@@ -7,9 +7,9 @@
 ; include "cpyright.h"
 ;
 
-(define black 0)
-(define blue 4)
-(define red 7)
+(define black BLACK)
+(define blue  BLUE)
+(define red   RED)
 
 (define devn (pg-make-device "SCREEN" "COLOR" "Canonical Coordinates"))
 (pg-open-device devn 0.000001 0.000001 0.25 0.25)

@@ -37,7 +37,7 @@ SX_scope_public
 
 /* _SX_INSTALL_GENERATED - install the automatically generated wrappers */
 
-static void _SX_install_generated(SS_psides *si)
+void _SX_install_generated(SS_psides *si)
    {extern void SX_install_score_bindings(SS_psides *si);
     extern void SX_install_pml_bindings(SS_psides *si);
     extern void SX_install_pdb_bindings(SS_psides *si);

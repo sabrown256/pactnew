@@ -7,22 +7,22 @@
 ; include "cpyright.h"
 ;
 
-(define red  7)
-(define blue 4)
+(define red  RED)
+(define blue BLUE)
 
-(define MINOR              1)
-(define MAJOR              2)
-(define LABEL              4)
+(define MAJOR              AXIS_TICK_MAJOR)
+(define MINOR              AXIS_TICK_MINOR)
+(define LABEL              AXIS_TICK_LABEL)
 (define MAJOR_MINOR        3)
 (define MAJOR_LABEL        6)
 (define MINOR_LABEL        5)
 (define MAJOR_MINOR_LABEL  7)
-(define NO_TICKS           8)
+(define NO_TICKS           AXIS_TICK_NONE)
 
-(define RIGHT_OF_AXIS     17)
-(define LEFT_OF_AXIS      18)
-(define STRADDLE_AXIS     19)
-(define ENDS              20)
+(define RIGHT_OF_AXIS     AXIS_TICK_RIGHT)
+(define LEFT_OF_AXIS      AXIS_TICK_LEFT)
+(define STRADDLE_AXIS     AXIS_TICK_STRADDLE)
+(define ENDS              AXIS_TICK_ENDS)
 (define NOTHING_ON_AXIS   32)
 
 ;--------------------------------------------------------------------------

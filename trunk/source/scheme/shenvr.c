@@ -990,10 +990,29 @@ static object *_SS_get_ext_ref(SS_psides *si, char *name)
  *                      - get a reference at the C level
  */
 
-static object *_SS_make_ext_boolean(SS_psides *si, char *name, int val)
+object *_SS_make_ext_boolean(SS_psides *si, char *name, int val)
    {object *o;
 
     o = SS_mk_boolean(si, name, val);
+
+    SC_hasharr_install(si->symtab, name, o, SS_POBJECT_S, 3, -1);
+
+    SS_UNCOLLECT(o);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_MAKE_EXT_INT - install a int in the symbol table and
+ *                  - get a reference at the C level
+ *                  - used to register enumsw
+ */
+
+object *_SS_make_ext_int(SS_psides *si, char *name, long val)
+   {object *o;
+
+    o = SS_mk_integer(si, val);
 
     SC_hasharr_install(si->symtab, name, o, SS_POBJECT_S, 3, -1);
 

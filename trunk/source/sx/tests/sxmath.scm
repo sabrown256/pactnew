@@ -7,41 +7,11 @@
 ; include "cpyright.h"
 ;
  
-(define solid 1)
-(define dashed 2)
-(define dotted 3)
-(define dotdashed 4)
+; (ld const.scm)
 
-(define zone -1)
-(define node -2)
-(define face -3)
-
-(define black         0)
-(define blue          1)
-(define green         2)
-(define cyan          3)
-(define red           4)
-(define magenta       5)
-(define brown         6)
-(define white         7)
-(define gray          8)
-(define lght_blue     9)
-(define lght_green   10)
-(define lght_cyan    11)
-(define lght_red     12)
-(define yellow       13)
-(define lght_magenta 14)
-(define lght_white   15)
-
-(define cartesian -1)
-(define polar     -2)
-(define insel     -3)
-
-(define contour    11)
-(define image      12)
-(define wire-frame 13)
-(define shaded     14)
-(define vect       15)
+(define zone Z_CENT)
+(define node N_CENT)
+(define face F_CENT)
 
 (define rx1 (list->pm-array 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0))
 (define ry1 (list->pm-array 0.1 1.0 4.0 9.0 16.0 23.0 28.0 31.0 32.0 32.0))

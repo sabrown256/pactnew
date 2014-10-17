@@ -39,11 +39,6 @@
 (define font-size-nxm 10)
 (define data-id-save 1)
 
-(define PD_MD5_OFF   0)
-(define PD_MD5_FILE  1)
-(define	PD_MD5_RW    2)
-(define	PD_MD5_FULL  3)
-
 ;--------------------------------------------------------------------------
 
 ;                             AUXILLIARY FUNCTIONS

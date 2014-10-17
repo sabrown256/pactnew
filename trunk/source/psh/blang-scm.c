@@ -427,24 +427,25 @@ static void scheme_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
    {
 
 /* syntax:
- *    SS_install_cv(si, <Enamei>, <Evaluei>, SC_INT_I);
+ *    _SS_make_ext_int(si, <Enamei>, <Evaluei>);
  */
 
     if ((ta != NULL) && (strcmp(ta[0], "enum") == 0))
-       {
+       {int i;
+	long vl;
+	char *vr;
 
-/*
-        int i;
-	char s[BFLRG];
+	vl = 0;
+	for (i = 2; ta[i] != NULL; )
+            {vr = strtok(ta[i++], "{,;}");
+	     if ((ta[i] != NULL) && (ta[i][0] == '='))
+	        {i++;
+	         vl = stoi(ta[i++]);}
+	     else
+	        vl++;
 
-	s[0] = '\0';
-	for (i = 2; ta[i] != NULL; i++)
-	    vstrcat(s, BFLRG, "%s ", ta[i]);
-
-	fprintf(fp, "    SS_install_cv(si, %s, %s, SC_INT_I);\n",
-		enm, evl);
-*/
-	};
+	     fprintf(fp, "    _SS_make_ext_int(si, \"%s\", %ld);\n",
+	             vr, vl);};};
 
     return;}
 
