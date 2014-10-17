@@ -165,6 +165,7 @@ Note $Log ""
 #                                       preceeding it, and whitespace after
 
    Separator $Log
+   Note $Log "Process #bind directives"
 
    flog $Log set cbind = $dst/$d.bind
 
@@ -205,6 +206,7 @@ Note $Log ""
 #
 
    Separator $Log
+   Note $Log "Process C prototypes"
 
    flog $Log set cproto = $dst/$d.protoc
 
@@ -275,6 +277,7 @@ Note $Log ""
 #
 
    Separator $Log
+   Note $Log "Process C derived types"
 
    flog $Log set cder = $dst/$d.derivedc
 
@@ -283,13 +286,16 @@ Note $Log ""
 
    if ("$Cfiles" != "") then
       Note $Log "target = $tgt"
-      set list = (enum struct union)
+      set files = ( *.h $Cfiles )
+      set list  = (enum struct union)
+      Note $Log "Files searched for derived type info:"
+      Note $Log "   $files"
       foreach k ($list)
          Note $cder "#------------------------------------------------------"
          Note $cder "#                    $k"
          Note $cder "#------------------------------------------------------"
          set kb = `echo $k | cut -c 1`
-         elide -q '/*' '*/' *.h $Cfiles                  | \
+         elide -q '/*' '*/' $files                       | \
          grep -v typedef                                 | \
          grep -v extern                                  | \
          elide -r "$k ${kb}_" '}' -                      | \
@@ -320,6 +326,7 @@ Note $Log ""
 # FIND_FC_DECL - process the Fortran declarations
 
    Separator $Log
+   Note $Log "Process Fortran prototypes"
 
    flog $Log set fproto = $dst/$d.protof
 
@@ -382,6 +389,7 @@ Note $Log ""
 #
 
    Separator $Log
+   Note $Log "Process hand wrapped Fortran"
 
    flog $Log set fwrap = $dst/$d.wrapper
 
@@ -432,6 +440,7 @@ Note $Log ""
 # FIND_DOC - process the C files for comments with #bind directives
 
    Separator $Log
+   Note $Log "Process documentation"
 
    flog $Log set cdoc = $dst/$d.doc
 
@@ -454,6 +463,7 @@ Note $Log ""
 #        - and putting files where they need to be
 
    Separator $Log
+   Note $Log "Finish bproto session"
 
    NoteD $Log "done"
 

@@ -287,7 +287,7 @@ int comm_write(client *cl, char *s, int nc, int to)
 /* _CHECK_FD - verify/log fd set in SV */
 
 void _check_fd(srvdes *sv)
-   {int fd;
+   {int fd, nfd;
     char s[BFLRG];
     fd_set rfs;
     client *cl;
@@ -298,7 +298,8 @@ void _check_fd(srvdes *sv)
     rfs = srv->afs;
 
     s[0] = '\0';
-    for (fd = 0; fd < FD_SETSIZE; ++fd)
+    nfd = FD_SETSIZE;
+    for (fd = 0; fd < nfd; ++fd)
         {if (FD_ISSET(fd, &rfs))
             vstrcat(s, BFLRG, " %d", fd);};
 
@@ -458,7 +459,7 @@ int _process_act(srvdes *sv, int fd)
  */
 
 int async_server(srvdes *sv)
-   {int fd, nr, ok, rv;
+   {int fd, nr, nfd, ok, rv;
     fd_set rfs;
     client *cl;
     connection *srv;
@@ -494,7 +495,8 @@ int async_server(srvdes *sv)
 	     rfs = srv->afs;
 	     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, &t);
 	     if (nr > 0)
-	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == 1); ++fd)
+	        {nfd = FD_SETSIZE;
+		 for (fd = 0; (fd < nfd) && (ok == 1); ++fd)
 		     {if (FD_ISSET(fd, &rfs))
 			 {SLOG(sv, 4, "data available on %d (server %d)",
 			       fd, srv->sfd);

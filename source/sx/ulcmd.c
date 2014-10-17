@@ -28,6 +28,8 @@ SS_psides *UL_init(char *code, char *vers, int c, char **v, char **env)
     SC_init_path(1, "ULTRA");
     si = SS_init_scheme(code, VERSION, c, v, env, TRUE);
 
+    _SX_install_generated(si);
+
 /* ULTRA initializations not depending on scheme */
     UL_init_view(si);
     UL_init_hash();

@@ -70,6 +70,7 @@ Tool CC {
    Flags    =+ [ _env_ = PACT_CC_VERSION ;
                  3.3  >= -Wduplicate-enum ]
    Flags    =+ [ _env_ = PACT_CC_VERSION ;
+                 3.2  > -Wheader-hygiene ;
                  3.3  > -Wheader-guard -Wlogical-not-parentheses ]
 
 # these would really bring the pain

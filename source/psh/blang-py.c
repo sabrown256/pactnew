@@ -88,9 +88,9 @@ static void py_arg(char *arg, int nc, char *spec)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PYTHON_ENUM_DECL - write the Python interface C enums DV */
+/* PYTHON_ENUM_DEFS - write the Python interface C enums DV */
 
-static void python_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
+static void python_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
    {
 
 /* syntax:
@@ -115,9 +115,9 @@ static void python_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PYTHON_STRUCT_DECL - write the Python interface C structs DV */
+/* PYTHON_STRUCT_DEFS - write the Python interface C structs DV */
 
-static void python_struct_decl(FILE *fp, char *dv, char **ta, char *pck)
+static void python_struct_defs(FILE *fp, char *dv, char **ta, char *pck)
    {
 
 /* syntax:
@@ -676,6 +676,14 @@ static void python_install(bindes *bd)
     pck  = st->pck;
     dcls = st->dcl;
     ndcl = st->ndcl;
+
+    csep(fp);
+
+/* make the list of enum constants to install */
+    emit_enum_defs(bd, python_enum_defs);
+
+/* make the list of struct constants to install */
+    emit_struct_defs(bd, python_struct_defs);
 
     csep(fp);
 

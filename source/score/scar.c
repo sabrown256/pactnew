@@ -394,9 +394,9 @@ fcdes *SC_scan_archive(char *arf)
 		 st = fseek(fp, pos, SEEK_SET);
 		 if (st < 0)
 		    io_error(errno, "fseek to %s failed",
-			     SC_itos(NULL, 0, pos, NULL));};};
+			     SC_itos(NULL, 0, pos, NULL));};
 
-	fc = _SC_make_archive(arf, fp, nb, tab);};
+	    fc = _SC_make_archive(arf, fp, nb, tab);};};
 
     return(fc);}
 

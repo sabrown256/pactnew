@@ -15,6 +15,10 @@ Group TEST {
    ADVISORY = ${TEST_ADVISORY}:pgs_axis
 }
 
+Group MDI {
+   Inc = -I/usr/local/include
+}
+
 Group Cdefine {
    FREEBSD = TRUE
 }

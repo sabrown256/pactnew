@@ -429,6 +429,9 @@ extern object
 
 /* SXSET.C declarations */
 
+extern void
+ _SX_install_generated(SS_psides *si);
+
 extern int
  _SX_get_input(SS_psides *si, object *str);
 

@@ -92,6 +92,10 @@
 
 /*--------------------------------------------------------------------------*/
 
+/*
+ * #bind derived SC_termst SC_ENUM_I SC_ENUM_I SC_TERM_UNKNOWN
+ */
+
 enum e_SC_termst
    {SC_TERM_UNKNOWN, SC_TERM_COOKED,
     SC_TERM_RAW, SC_TERM_LEH_RAW, SC_TERM_CUSTOM};

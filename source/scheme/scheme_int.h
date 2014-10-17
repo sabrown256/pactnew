@@ -198,6 +198,8 @@ extern void
 /* SHENVR.C declarations */
 
 extern object
+ *_SS_make_ext_boolean(SS_psides *si, char *name, int val),
+ *_SS_make_ext_int(SS_psides *si, char *name, long val),
  *_SSI_defp(SS_psides *si, object *vr),
  *_SS_bind_envc(SS_psides *si, char *name, object *penv),
  *_SS_lk_var_valc(SS_psides *si, char *name, object *penv);
