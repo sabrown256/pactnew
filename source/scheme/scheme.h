@@ -727,6 +727,7 @@ struct s_SS_psides
 struct s_SS_scope_public
  {int trace_all;
   int tind[SS_N_TYPES];
+  char *fmts[4];            /* formats for numeric types */
   char *tnames[2];
   object *objs[SS_N_SPECIAL];};
   

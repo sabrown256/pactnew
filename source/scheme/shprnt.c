@@ -1147,6 +1147,26 @@ void SS_wr_lst(SS_psides *si, object *obj, object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_CMP_CAT - add component value VL with component name NM
+ *             - to output string T
+ *             - this is a helper for complex and quaternion number
+ */
+
+static void _SS_cmp_cat(char *t, int nc, char *fmt,
+			long double vl, char *nm, int first)
+   {
+
+    if ((vl >= 0.0) || (first == FALSE))
+       SC_vstrcat(t, nc, "+");
+
+    SC_vstrcat(t, nc, fmt, vl);
+    SC_vstrcat(t, nc, nm);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SS_WR_ATM - print an atom or string */
 
 void SS_wr_atm(SS_psides *si, object *obj, object *strm)
@@ -1174,7 +1194,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	   SC_itos(t, MAXLINE, SS_INTEGER_VALUE(obj), NULL);
 
 	else if (ityp == SC_FLOAT_I)
-	   SC_ftos(t, MAXLINE, SS_FLOAT_VALUE(obj), "%Lg");
+	   SC_ftos(t, MAXLINE, SS_FLOAT_VALUE(obj), SS_gs.fmts[1]);
 
 	else if (ityp == SC_DOUBLE_COMPLEX_I)
           {double r, i;
@@ -1188,13 +1208,9 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	   if ((r == 0.0) && (i == 0.0))
 	      snprintf(t, MAXLINE, "0.0");
 	   if (r != 0.0)
-	      snprintf(t, MAXLINE, "%g", r);
-	   if (i < 0.0)
-	      SC_vstrcat(t, MAXLINE, "%gi", i);
-	   else if (r == 0.0)
-	      SC_vstrcat(t, MAXLINE, "%gi", i);
-	   else if (i > 0.0)
-	      SC_vstrcat(t, MAXLINE, "+%gi", i);}
+	      snprintf(t, MAXLINE, SS_gs.fmts[2], r);
+
+	   _SS_cmp_cat(t, MAXLINE, SS_gs.fmts[2], i, "i", (r == 0.0));}
 
 	else if (ityp == SC_QUATERNION_I)
           {double d, i, j, k;
@@ -1210,19 +1226,13 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	   if ((d == 0.0) && (i == 0.0) && (j == 0.0) && (k == 0.0))
 	      snprintf(t, MAXLINE, "0.0");
 	   if (d != 0.0)
-	      snprintf(t, MAXLINE, "%g", d);
-	   if (i < 0.0)
-	      SC_vstrcat(t, MAXLINE, "%gi", i);
-	   else if (i > 0.0)
-	      SC_vstrcat(t, MAXLINE, "+%gi", i);
-	   if (j < 0.0)
-	      SC_vstrcat(t, MAXLINE, "%gj", j);
-	   else if (j > 0.0)
-	      SC_vstrcat(t, MAXLINE, "+%gj", j);
-	   if (k < 0.0)
-	      SC_vstrcat(t, MAXLINE, "%gk", k);
-	   else if (k > 0.0)
-	      SC_vstrcat(t, MAXLINE, "+%gk", k);}
+	      snprintf(t, MAXLINE, SS_gs.fmts[3], d);
+
+	   _SS_cmp_cat(t, MAXLINE, SS_gs.fmts[3], i, "i", (d == 0.0));
+	   _SS_cmp_cat(t, MAXLINE, SS_gs.fmts[3], j, "j",
+		       (d == 0.0) && (i == 0.0));
+	   _SS_cmp_cat(t, MAXLINE, SS_gs.fmts[3], k, "k",
+		       (d == 0.0) && (i == 0.0) && (j == 0.0));}
 
 #ifdef LARGE
 	else if (ityp == SS_CHARACTER_I)
@@ -1328,6 +1338,27 @@ void _SS_inst_print(SS_psides *si)
 		  "Variable: Suppress display of double quotes iff on\n     Usage: suppress-quote [0|1]",
 		  SS_acc_int,
 		  &_SS.disp_flag_ext);
+
+    SS_install_cf(si, "fix-output-format",
+                  "Variable: Controls format for ASCII output of fixed point numbers\n     Usage: fix-output-format <format>",
+                  SS_acc_ptr,
+                  &SS_gs.fmts[0]);
+
+    SS_install_cf(si, "float-output-format",
+                  "Variable: Controls format for ASCII output of floating point numbers\n     Usage: float-output-format <format>",
+                  SS_acc_ptr,
+                  &SS_gs.fmts[1]);
+
+    SS_install_cf(si, "complex-output-format",
+                  "Variable: Controls format for ASCII output of complex numbers\n     Usage: complex-output-format <format>",
+                  SS_acc_ptr,
+                  &SS_gs.fmts[2]);
+
+    SS_install_cf(si, "quaternion-output-format",
+                  "Variable: Controls format for ASCII output of quaternion numbers\n     Usage: quaternion-output-format <format>",
+                  SS_acc_ptr,
+                  &SS_gs.fmts[3]);
+
 
     SS_install(si, "apropos",
                "Procedure: searches the symbol table for documentation",
