@@ -393,7 +393,7 @@
 	    (sin (span 0 10))
 
 	    (answer-prompt "S-> ")
-	    (ascii-output-format "%25.15e")
+	    (float-output-format "%25.15Le")
 
 	    (axis on)
 

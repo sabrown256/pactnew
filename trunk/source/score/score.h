@@ -1163,7 +1163,7 @@ extern char
  *SC_vdsnprintf(int cp, const char *format, va_list lst),
  *SC_dsnprintf(int cp, char *fmt, ...),
  *SC_itos(char *s, int nc, long long n, char *fmt),
- *SC_ftos(char *s, int nc, long double f, char *fmt);
+ *SC_ftos(char *s, int nc, int cat, char *fmt, long double f);
 
 extern double
  SC_stof(char *s),

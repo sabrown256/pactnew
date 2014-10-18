@@ -452,6 +452,45 @@ static void scheme_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SCHEME_STRUCT_DEFS - write the SCHEME interface C structs DV */
+
+static void scheme_struct_defs(FILE *fp, char *dv, char **ta, char *pck)
+   {
+
+/* syntax:
+ *    PD_defstr(SX_vif, <Sname>,
+ *              "<Mtype1> <Mname1>",
+ *                    ...
+ *              "<Mtypen> <Mnamen>",
+ *              LAST);
+ */
+
+    if ((ta != NULL) && (strcmp(ta[0], "struct") == 0))
+       {int i;
+	char *p, *mbr;
+
+	p = trim(ta[0]+9, BOTH, " \t");
+	fprintf(fp, "    PD_defstr(SX_vif, \"%s\",\n", p);
+
+	for (i = 2; ta[i] != NULL; i++)
+	    {mbr = trim(ta[i], BOTH, " \t");
+
+/* function pointer */
+	     p = strstr(mbr, "(*");
+	     if (p != NULL)
+	        fprintf(fp, "              \"function %s\",\n",
+			strtok(p+2, ")"));
+	     else
+	        fprintf(fp, "              \"%s\",\n", mbr);};
+
+	fprintf(fp, "              LAST);\n");
+	fprintf(fp, "\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SCHEME_WRAP_INSTALL - add the installation of the function */
 
 static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
@@ -560,6 +599,9 @@ static void scheme_install(bindes *bd, char **fl)
 
 /* make the list of enum constants to install */
     emit_enum_defs(bd, scheme_enum_defs);
+
+/* make the list of structs to install */
+    emit_struct_defs(bd, scheme_struct_defs);
 
     if (fl != NULL)
        {for (i = 0; fl[i] != NULL; i++)

@@ -99,6 +99,9 @@ static void python_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
  *  This function is then called by the module initialization instead
  *  of using the #include method that is being used with methods.
  *  
+ *   if (PyModule_AddIntConstant(m, "TRUE", (long) TRUE) < 0)
+ *      PY_MOD_RETURN_ERR;
+ *
  * int blang_generated(PyObject *d)
  *    {if (PyDict_SetItemString(d, "enum", PyInt_FromLong(ENUM)) < 0)
  *        return(-1);

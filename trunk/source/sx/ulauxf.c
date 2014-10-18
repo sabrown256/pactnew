@@ -278,10 +278,14 @@ static object *_UL_get_value(SS_psides *si, double *sp, double *vp,
                  flag = 't';};};
          if (flag == 't')
             {if (si->interactive == ON)
-                {PRINT(stdout, "    ");
-                 PRINT(stdout, SX_gs.text_output_format, val);
+                {long double x[2];
+
+		 x[0] = val;
+		 x[1] = y;
+		 PRINT(stdout, "    ");
+                 PRINT(stdout, SS_gs.fmts[1], x[0]);
                  PRINT(stdout, "    ");
-                 PRINT(stdout, SX_gs.text_output_format, y);
+                 PRINT(stdout, SS_gs.fmts[1], x[1]);
                  PRINT(stdout, "\n");};
                  
              SS_assign(si, ret, SS_mk_cons(si, SS_mk_float(si, y), ret));};};
@@ -443,9 +447,13 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
 	sgn = (order < 0) ? -1 : 1;
 	for (i = 0 ; i < aord; i++)
 	    {if (si->interactive == ON)
-	        {PRINT(stdout, "    ");
-		 PRINT(stdout, SX_gs.text_output_format, cf[i]);
+                {long double xv;
+
+		 xv = cf[i];
+		 PRINT(stdout, "    ");
+		 PRINT(stdout, SS_gs.fmts[1], xv);
 		 PRINT(stdout, " *x^%d\n", sgn*i);};
+
 	     ret = SS_mk_cons(si, SS_mk_float(si, cf[i]), ret);};
         
 /* create curve of fit */
@@ -537,9 +545,11 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
 	     alpha_id = ((SX_gs.dataset[i].id >= 'A') &&
 			 (SX_gs.dataset[i].id <= 'Z'));
 	     if (si->interactive == ON)
-	        {PRINT(stdout, "    ");
-		 PRINT(stdout, SX_gs.text_output_format,
-		       PM_element(solution, i, 1));
+                {long double xv;
+
+		 xv = PM_element(solution, i, 1);
+		 PRINT(stdout, "    ");
+		 PRINT(stdout, SS_gs.fmts[1], xv);
 		 PRINT(stdout, " * curve %s\n", _UL_id_str(i, j));};
 
 	     SC_vstrcat(local, MAXLINE, " %s", _UL_id_str(i, j));};
@@ -876,14 +886,21 @@ static object *_UL_stat(SS_psides *si, int j)
                        0);
 
     if (si->interactive == ON)
-       {PRINT(stdout, "\nX Mean =               ");
-	PRINT(stdout, SX_gs.text_output_format, xmean);
+       {long double lxm, lxs, lym, lys;
+
+	lxm = xmean;
+	lxs = xstd;
+	lym = ymean;
+	lys = ystd;
+
+        PRINT(stdout, "\nX Mean =               ");
+	PRINT(stdout, SS_gs.fmts[1], lxm);
 	PRINT(stdout, "\nX Standard deviation = ");
-	PRINT(stdout, SX_gs.text_output_format, xstd);
+	PRINT(stdout, SS_gs.fmts[1], lxs);
 	PRINT(stdout, "\nY Mean =               ");
-	PRINT(stdout, SX_gs.text_output_format, ymean);
+	PRINT(stdout, SS_gs.fmts[1], lym);
 	PRINT(stdout, "\nY Standard deviation = ");
-	PRINT(stdout, SX_gs.text_output_format, ystd);};
+	PRINT(stdout, SS_gs.fmts[1], lys);};
 
     return(ret);}
 
@@ -921,6 +938,7 @@ static object *_ULI_stats(SS_psides *si, object *argl)
 
 static object *_ULI_disp(SS_psides *si, int j, double xmin, double xmax)
    {int n, i;
+    long double lx[2];
     double *x[PG_SPACEDM];
     object *o;
 
@@ -931,17 +949,23 @@ static object *_ULI_disp(SS_psides *si, int j, double xmin, double xmax)
     PRINT(stdout, "\n Curve %s (%s) from ",
 	  _UL_id_str(j, j), SX_gs.dataset[j].text);
 
-    PRINT(stdout, SX_gs.text_output_format, xmin);
+    lx[0] = xmin;
+    lx[1] = xmax;
+
+    PRINT(stdout, SS_gs.fmts[1], lx[0]);
     PRINT(stdout, " to ");
-    PRINT(stdout, SX_gs.text_output_format, xmax);
+    PRINT(stdout, SS_gs.fmts[1], lx[1]);
     PRINT(stdout, "\n\n");
 
     for (i = 0; i < n; i++)
         {if ((x[0][i] >= xmin) && (x[0][i] <= xmax))
-            {PRINT(stdout, "    ");
-             PRINT(stdout, SX_gs.text_output_format, x[0][i]);
+	    {lx[0] = x[0][i];
+	     lx[1] = x[1][i];
+
+	     PRINT(stdout, "    ");
+             PRINT(stdout, SS_gs.fmts[1], lx[0]);
              PRINT(stdout, " ");
-             PRINT(stdout, SX_gs.text_output_format, x[1][i]);
+             PRINT(stdout, SS_gs.fmts[1], lx[1]);
              PRINT(stdout, "\n");};};
 
     PRINT(stdout, "\n");
@@ -983,6 +1007,7 @@ static object *_ULI_crv_label(SS_psides *si, object *obj)
 
 static object *_ULI_crv_domain(SS_psides *si, object *obj)
    {int j;
+    long double x[2];
     object *o;
 
     j = -1;
@@ -993,10 +1018,13 @@ static object *_ULI_crv_domain(SS_psides *si, object *obj)
     o = SS_null;
     if (j != -1)
        {if (si->interactive == ON)
-           {PRINT(stdout, "\n Domain: (");
-            PRINT(stdout, SX_gs.text_output_format, SX_gs.dataset[j].wc[0]);
+           {x[0] = SX_gs.dataset[j].wc[0];
+	    x[1] = SX_gs.dataset[j].wc[1];
+
+	    PRINT(stdout, "\n Domain: (");
+            PRINT(stdout, SS_gs.fmts[1], x[0]);
             PRINT(stdout, " . ");
-            PRINT(stdout, SX_gs.text_output_format, SX_gs.dataset[j].wc[1]);
+            PRINT(stdout, SS_gs.fmts[1], x[1]);
             PRINT(stdout, ")\n\n");};
 
         o = SS_mk_cons(si, SS_mk_float(si, SX_gs.dataset[j].wc[0]),
@@ -1013,6 +1041,7 @@ static object *_ULI_crv_domain(SS_psides *si, object *obj)
 
 static object *_ULI_crv_range(SS_psides *si, object *obj)
    {int j;
+    long double x[2];
     object *o;
 
     j = -1;
@@ -1023,10 +1052,13 @@ static object *_ULI_crv_range(SS_psides *si, object *obj)
     o = SS_null;
     if (j != -1)
        {if (si->interactive == ON)
-           {PRINT(stdout, "\n Range: (");
-            PRINT(stdout, SX_gs.text_output_format, SX_gs.dataset[j].wc[2]);
+           {x[0] = SX_gs.dataset[j].wc[2];
+	    x[1] = SX_gs.dataset[j].wc[3];
+
+            PRINT(stdout, "\n Range: (");
+            PRINT(stdout, SS_gs.fmts[1], x[0]);
             PRINT(stdout, " . ");
-            PRINT(stdout, SX_gs.text_output_format, SX_gs.dataset[j].wc[3]);
+            PRINT(stdout, SS_gs.fmts[1], x[1]);
             PRINT(stdout, ")\n\n");};
 
         o = SS_mk_cons(si, SS_mk_float(si, SX_gs.dataset[j].wc[2]),
@@ -1089,8 +1121,12 @@ static object *_ULI_crv_attr(SS_psides *si, object *obj)
 			   NULL);
 
         if (si->interactive == ON)
-           {PRINT(stdout, "\n Color, width, style: (%ld ", lncol);
-            PRINT(stdout, SX_gs.text_output_format, lnwid);
+           {long double wd;
+
+	    wd = lnwid;
+
+	    PRINT(stdout, "\n Color, width, style: (%ld ", lncol);
+            PRINT(stdout, SS_gs.fmts[1], wd);
             PRINT(stdout, " %ld)\n\n", lnsty);};
 
         o = SS_make_list(si, SC_INT_I, &lncol,

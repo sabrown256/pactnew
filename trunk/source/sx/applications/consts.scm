@@ -7,8 +7,8 @@
 ; #include <cpyright.h>
 ;
 
-(define %pi 3.141592654)
-(define %e  2.718281828)
+(define %pi 3.14159265358979323)
+(define %e  2.71828182845904523)
 
 (define all   0)
 (define on    1)

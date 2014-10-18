@@ -746,6 +746,7 @@ static object *SX_wrt_text_table(SS_psides *si, object *argl)
 static object *SX_wrt_current_table(SS_psides *si, object *argl)
    {char *fname;
     int i, j, k, nr, nc;
+    long double xv;
     double *ap;
     FILE *fp;
 
@@ -786,7 +787,9 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
 	k = 0;
 	for (i = 0; i < nr; i++)
 	    for (j = 0; j < nc; j++)
-	        {io_printf(fp, SX_gs.text_output_format, ap[k++]);
+	        {xv = ap[k++];
+
+		 io_printf(fp, SS_gs.fmts[1], xv);
 		 if (j == (nc-1))
 		    io_printf(fp, "\n");
 		 else

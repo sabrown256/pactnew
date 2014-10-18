@@ -1141,10 +1141,12 @@ void SX_install_global_vars(SS_psides *si)
                   SS_acc_string,
                   si->ans_prompt, MAXLINE);
 
+#if 0
     SS_install_cf(si, "ascii-output-format",
                   "Variable: Controls format for ASCII output of floating point numbers\n     Usage: ascii-output-format <format>",
                   SS_acc_ptr,
-                  &SX_gs.text_output_format);
+                  &SS_gs.fmts[1]);
+#endif
 
     SS_install_cf(si, "autorange",
                   "Variable: Turns on or off autoranging\n     Usage: autorange on | off",

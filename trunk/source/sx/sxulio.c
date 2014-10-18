@@ -1197,7 +1197,9 @@ static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
             j = SX_get_crv_index_i(obj);
 
          if (j >= 0)
-            {n = SX_gs.dataset[j].n;
+	    {long double lx[2];
+
+	     n = SX_gs.dataset[j].n;
              x = SX_gs.dataset[j].x[0];
              y = SX_gs.dataset[j].x[1];
 
@@ -1206,9 +1208,12 @@ static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
 
              io_printf(fp, "%s\n", SX_gs.dataset[j].text);
              for (i = 0; i < n; i++)
-                 {io_printf(fp, SX_gs.text_output_format, x[i]);
+                 {lx[0] = x[i];
+		  lx[1] = y[i];
+
+		  io_printf(fp, SS_gs.fmts[1], lx[0]);
                   io_printf(fp, " ");
-                  io_printf(fp, SX_gs.text_output_format, y[i]);
+                  io_printf(fp, SS_gs.fmts[1], lx[1]);
                   io_printf(fp, "\n");};};
 
          if (uncached)
