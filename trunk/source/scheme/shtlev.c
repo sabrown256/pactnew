@@ -19,7 +19,7 @@ SS_scope_private
 SS_scope_public
  SS_gs = { FALSE,
 	   { 123, 124, 124, 125, 128, 129, 130,
-             131, 132, 133, 140, 134, 135, 136 }, };
+             131, 132, 133, 140, 134, 135, 136 },};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -386,6 +386,12 @@ SS_psides *SS_init_scheme(char *code, char *vers,
     SC_init_path(2, "HOME", "SCHEME");
 
     si = SS_get_current_scheme(-1);
+
+/* initialize number output formats */
+    SS_gs.fmts[0] = CSTRSAVE("%d");
+    SS_gs.fmts[1] = CSTRSAVE("%Lg");
+    SS_gs.fmts[2] = CSTRSAVE("%Lg");
+    SS_gs.fmts[3] = CSTRSAVE("%Lg");
 
 /* initialize the available syntax modes */
     DEF_SYNTAX_MODES(si);
