@@ -81,12 +81,12 @@ void UL_init_view(SS_psides *si)
     SX_gs.console_dx[0]  = 0.33;
     SX_gs.console_dx[1]  = 0.33;
 
-    SX_gs.console_type       = CSTRSAVE("MONOCHROME");
-    SX_gs.text_output_format = CSTRSAVE("%13.6e");
-
+    SX_gs.console_type  = CSTRSAVE("MONOCHROME");
     SX_gs.display_name  = CSTRSAVE("WINDOW");
     SX_gs.display_type  = CSTRSAVE("COLOR");
     SX_gs.display_title = CSTRSAVE("ULTRA II");
+
+    SS_gs.fmts[1]        = CSTRSAVE("%13.6Le");
 
     UL_gs.derivative_tolerance = 2.0e-2;
     UL_gs.window_height_factor = 1.0;

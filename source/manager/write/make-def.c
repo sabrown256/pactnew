@@ -365,9 +365,21 @@ int main(int c, char **v)
     fprintf(fp, "#\n");
     fprintf(fp, "# System utilities\n");
     fprintf(fp, "#\n");
-    fprintf(fp, "INSTALL    = %s\n", dbget(cl, FALSE, "INSTALL_Exe"));
-    fprintf(fp, "RM         = %s\n", cgetenv(FALSE, "RM"));
-    fprintf(fp, "RANLIB     = aranlib\n");
+
+    r[0] = '\0';
+    vstrcat(r, BFLRG, " %s", dbget(cl, FALSE, "INSTALL_Exe"));
+    vstrcat(r, BFLRG, " %s", dbget(cl, FALSE, "INSTALL_Flags"));
+    fprintf(fp, "INSTALL    =%s\n", r);
+
+    r[0] = '\0';
+    vstrcat(r, BFLRG, " %s", dbget(cl, FALSE, "RM_Exe"));
+    vstrcat(r, BFLRG, " %s", dbget(cl, FALSE, "RM_Flags"));
+    fprintf(fp, "RM         =%s\n", r);
+
+    r[0] = '\0';
+    vstrcat(r, BFLRG, " %s", dbget(cl, FALSE, "Ranlib_Exe"));
+    vstrcat(r, BFLRG, " %s", dbget(cl, FALSE, "Ranlib_Flags"));
+    fprintf(fp, "RANLIB     =%s\n", r);
 
     have_py = dbget(cl, TRUE, "HAVE_PYTHON");
     if (strstr(have_py, "TRUE") != NULL)

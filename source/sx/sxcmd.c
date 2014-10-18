@@ -113,11 +113,11 @@ void SX_init_view(SS_psides *si)
     SX_gs.window_dx_P[0]  = 1.0;
     SX_gs.window_dx_P[1]  = 1.0;
 
-    SX_gs.text_output_format = CSTRSAVE("%13.6e");
-
     SX_gs.display_name  = CSTRSAVE("WINDOW");
     SX_gs.display_type  = CSTRSAVE("COLOR");
     SX_gs.display_title = CSTRSAVE("PDBView");
+
+    SS_gs.fmts[1]       = CSTRSAVE("%13.6Le");
 
     si->interactive = FALSE;
     si->print_flag  = FALSE;

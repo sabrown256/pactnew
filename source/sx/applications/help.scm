@@ -134,7 +134,8 @@
 
 (define (help-var)
    (printf nil " Variables:\n")
-   (printf nil "   answer-prompt ascii-output-format axis-grid-style axis-line-style\n")
+   (printf nil "   answer-prompt fix-output-format float-output-format complex-output-format\n")
+   (printf nil "   axis-grid-style axis-line-style\n")
    (printf nil "   axis-line-width axis-max-major-ticks axis-n-decades axis-number-minor-ticks\n")
    (printf nil "   axis-number-minor-x-ticks axis-number-minor-y-ticks\n")
    (printf nil "   axis-tick-size axis-tick-type axis-type axis-x-format axis-y-format\n")

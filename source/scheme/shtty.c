@@ -300,7 +300,7 @@ char *SS_get_string(object *obj)
        SC_itos(_SS.str, MAXLINE, SS_INTEGER_VALUE(obj), NULL);
 
     else if (SS_floatp(obj))
-       SC_ftos(_SS.str, MAXLINE, SS_FLOAT_VALUE(obj), "%Lg");
+       SC_ftos(_SS.str, MAXLINE, FALSE, "%Lg", SS_FLOAT_VALUE(obj));
 
     else if (SS_nullobjp(obj))
         SC_strncpy(_SS.str, MAXLINE, "nil", -1);

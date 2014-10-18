@@ -546,7 +546,7 @@
 (sin (span 0 10))
 ;(printf nil " Variables:\n")
 (answer-prompt "U->")
-(ascii-output-format "%25.15e")
+(float-output-format "%25.15Le")
 
 (axis on)
 

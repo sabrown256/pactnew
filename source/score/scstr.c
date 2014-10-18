@@ -2059,29 +2059,45 @@ double SC_strtod(const char *nptr, char **endptr)
  *         - returns pointer to buffer holding the result
  */
 
-char *SC_ftos(char *s, int nc, long double f, char *fmt)
-   {static char bf[80];
+char *SC_ftos(char *s, int nc, int cat, char *fmt, long double f)
+   {char *p;
+    static char bf[BFSML];
 
     if (s == NULL)
        {s  = bf;
-	nc = 80;};
+	nc = BFSML;};
 
     if (fmt == NULL)
        fmt = "%16.8Le";
 
+    p = strchr(fmt, 'L');
+
+/* handle case of long double format */
+    if (p != NULL)
+       {
+
 #if (AF_LONG_DOUBLE_IO == 1)
+	char frm[MAXLINE];
 
-    char frm[MAXLINE];
-
-    fmt = SC_strsubst(frm, MAXLINE, fmt, "L", "", -1);
-
-    snprintf(s, nc, fmt, (double) f);
-
+	fmt = SC_strsubst(frm, MAXLINE, fmt, "L", "", -1);
+        SC_ftos(s, nc, cat, fmt, f);
 #else
-
-    snprintf(s, nc, fmt, f);
-
+        if (cat == TRUE)
+	   SC_vstrcat(s, nc, fmt, f);
+	else
+	   nc = snprintf(s, nc, fmt, f);
 #endif
+        }
+
+/* handle case of double format */
+    else
+       {if (cat == TRUE)
+	   SC_vstrcat(s, nc, fmt, (double) f);
+	else
+	   nc = snprintf(s, nc, fmt, (double) f);};
+
+    if (nc < 0)
+       s = NULL;
 
     return(s);}
 

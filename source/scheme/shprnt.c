@@ -281,7 +281,7 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
    {int c;
     char forms[MAXLINE], local[MAXLINE], ce;
     char *fmt, *le, *lb, *pt;
-    double dv;
+    long double dv;
     FILE *stream;
     object *obj, *format;
 
@@ -325,10 +325,13 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
 /* copy from the % to the type specifier to get the format descriptor for
  * this item
  */
-        le = strpbrk(fmt, "sdouxXfeEgGc%");
+        le = strpbrk(fmt, "sdouxXfeEgGcL%");
 	ce = (le != NULL) ? *le : '\0';
         local[0] = '%';
         for (lb = &local[1]; le != fmt; *lb++ = *fmt++);
+	if (ce == 'L')
+	   {*lb++ = *fmt++;
+	    ce    = *fmt;};
         fmt++;
         *lb++ = ce;
         *lb = '\0';
@@ -387,9 +390,9 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
 		    dv = SS_FLOAT_VALUE(obj);
 		 else
                     SS_error(si,
-			       "NON-NUMERIC VALUE FOR REAL FIELD - _SS_XPRINTF",
-			       obj);
-                 PRINT(stream, local, dv);
+			     "NON-NUMERIC VALUE FOR REAL FIELD - _SS_XPRINTF",
+			     obj);
+		 PRINT(stream, "%s", SC_ftos(NULL, -1, FALSE, local, dv));
                  break;
 
             case '%' :
@@ -1159,7 +1162,7 @@ static void _SS_cmp_cat(char *t, int nc, char *fmt,
     if ((vl >= 0.0) || (first == FALSE))
        SC_vstrcat(t, nc, "+");
 
-    SC_vstrcat(t, nc, fmt, vl);
+    SC_ftos(t, nc, TRUE, fmt, vl);
     SC_vstrcat(t, nc, nm);
 
     return;}
@@ -1194,7 +1197,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	   SC_itos(t, MAXLINE, SS_INTEGER_VALUE(obj), NULL);
 
 	else if (ityp == SC_FLOAT_I)
-	   SC_ftos(t, MAXLINE, SS_FLOAT_VALUE(obj), SS_gs.fmts[1]);
+	   SC_ftos(t, MAXLINE, FALSE, SS_gs.fmts[1], SS_FLOAT_VALUE(obj));
 
 	else if (ityp == SC_DOUBLE_COMPLEX_I)
           {double r, i;
@@ -1208,7 +1211,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	   if ((r == 0.0) && (i == 0.0))
 	      snprintf(t, MAXLINE, "0.0");
 	   if (r != 0.0)
-	      snprintf(t, MAXLINE, SS_gs.fmts[2], r);
+	      SC_ftos(t, MAXLINE, FALSE, SS_gs.fmts[2], r);
 
 	   _SS_cmp_cat(t, MAXLINE, SS_gs.fmts[2], i, "i", (r == 0.0));}
 
@@ -1226,7 +1229,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	   if ((d == 0.0) && (i == 0.0) && (j == 0.0) && (k == 0.0))
 	      snprintf(t, MAXLINE, "0.0");
 	   if (d != 0.0)
-	      snprintf(t, MAXLINE, SS_gs.fmts[3], d);
+	      SC_ftos(t, MAXLINE, FALSE, SS_gs.fmts[3], d);
 
 	   _SS_cmp_cat(t, MAXLINE, SS_gs.fmts[3], i, "i", (d == 0.0));
 	   _SS_cmp_cat(t, MAXLINE, SS_gs.fmts[3], j, "j",

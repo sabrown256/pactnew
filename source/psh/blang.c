@@ -970,7 +970,8 @@ void emit_enum_defs(bindes *bd,
 			 {nstrncpy(t, BFLRG, sb, -1);
 			  ta = tokenize(t, " \t", 0);
 			  if (strcmp(ta[1]+2, te) == 0)
-			     femit(fp, sb, ta, pck);
+			     {femit(fp, sb, ta, pck);
+			      break;};
 			  free_strings(ta);};};};};
 
 	fprintf(fp, "\n");};
@@ -984,7 +985,7 @@ void emit_enum_defs(bindes *bd,
 
 void emit_struct_defs(bindes *bd,
 		      void (*femit)(FILE *fp, char *dv, char **ta, char *pck))
-   {int ib, id, nbi;
+   {int ib, id, nbi, nc;
     char ps[BFLRG], t[BFLRG];
     char *pck, *sb, *te, **cdv, **sbi, **ta;
     FILE *fp;
@@ -1004,13 +1005,15 @@ void emit_struct_defs(bindes *bd,
 		 (strstr(ps, "SC_ENUM_I") == NULL))
 	        {te = strtok(ps, " ");
 		 te = strtok(NULL, " ");
+		 nc = strlen(te);
 		 for (id = 0; cdv[id] != NULL; id++)
 		     {sb = cdv[id];
 		      if (blank_line(sb) == FALSE)
 			 {nstrncpy(t, BFLRG, sb, -1);
-			  ta = tokenize(t, " \t", 0);
-			  if (strcmp(ta[1]+2, te) == 0)
-			     femit(fp, sb, ta, pck);
+			  ta = tokenize(t, "{;}", 0);
+			  if (strncmp(ta[0]+9, te, nc) == 0)
+			     {femit(fp, sb, ta, pck);
+			      break;};
 			  free_strings(ta);};};};};
 
        fprintf(fp, "\n");};

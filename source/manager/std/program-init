@@ -63,7 +63,8 @@ Tool IMF {
 }
 
 Tool INSTALL {
-   Exe = cp
+   Exe   = cp
+   Flags = 
 }
 
 Tool LD {
@@ -110,9 +111,16 @@ Tool PY {
 }
 
 Tool Ranlib {
+  Exe   = aranlib
+  Flags = 
 }
 
 Tool READLINE {
+}
+
+Tool RM {
+  Exe   = rm
+  Flags = -f
 }
 
 Tool SQLITE3 {
