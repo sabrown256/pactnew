@@ -430,7 +430,13 @@ static void scheme_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
  *    _SS_make_ext_int(si, <Enamei>, <Evaluei>);
  */
 
-    if ((ta != NULL) && (strcmp(ta[0], "enum") == 0))
+    if (ta == NULL)
+       {if (strcmp(dv, "begin") == 0)
+	   {}
+        else if (strcmp(dv, "end") == 0)
+	   fprintf(fp, "\n");}
+
+    else if (strcmp(ta[0], "enum") == 0)
        {int i;
 	long vl;
 	char *vr;
@@ -465,7 +471,13 @@ static void scheme_struct_defs(FILE *fp, char *dv, char **ta, char *pck)
  *              LAST);
  */
 
-    if ((ta != NULL) && (strcmp(ta[0], "struct") == 0))
+    if (ta == NULL)
+       {if (strcmp(dv, "begin") == 0)
+	   {}
+        else if (strcmp(dv, "end") == 0)
+	   fprintf(fp, "\n");}
+
+    else if (strcmp(ta[0], "struct") == 0)
        {int i;
 	char *p, *mbr;
 

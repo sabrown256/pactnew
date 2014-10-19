@@ -111,7 +111,7 @@ Tool PY {
 }
 
 Tool Ranlib {
-  Exe   = aranlib
+  Exe   = ranlib
   Flags = 
 }
 

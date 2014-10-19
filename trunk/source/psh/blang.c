@@ -958,6 +958,8 @@ void emit_enum_defs(bindes *bd,
 	sbi = st->sbi;
 	nbi = st->nbi;
 
+	femit(fp, "begin", NULL, pck);
+
 	for (ib = 0; ib < nbi; ib++)
 	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
 	     if ((strncmp(ps, "derived", 7) == 0) &&
@@ -974,7 +976,7 @@ void emit_enum_defs(bindes *bd,
 			      break;};
 			  free_strings(ta);};};};};
 
-	fprintf(fp, "\n");};
+	femit(fp, "end", NULL, pck);};
 
     return;}
 
@@ -999,6 +1001,8 @@ void emit_struct_defs(bindes *bd,
 	sbi = st->sbi;
 	nbi = st->nbi;
 
+	femit(fp, "begin", NULL, pck);
+
 	for (ib = 0; ib < nbi; ib++)
 	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
 	     if ((strncmp(ps, "derived", 7) == 0) &&
@@ -1016,7 +1020,7 @@ void emit_struct_defs(bindes *bd,
 			      break;};
 			  free_strings(ta);};};};};
 
-       fprintf(fp, "\n");};
+	femit(fp, "end", NULL, pck);};
 
     return;}
 

@@ -1310,6 +1310,29 @@ static PyMethodDef PP_methods[] = {
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PY_PGSMODULE_CONST - add BLANG generated constant bindings
+ *                     - for PGS module
+ */
+
+static int _PY_pgsmodule_const(PyObject *m)
+   {int ne;
+    extern int py_add_score_enum(PyObject *m);
+    extern int py_add_pml_enum(PyObject *m);
+    extern int py_add_pdb_enum(PyObject *m);
+    extern int py_add_pgs_enum(PyObject *m);
+
+    ne = 0;
+
+    ne += py_add_score_enum(m);
+    ne += py_add_pml_enum(m);
+    ne += py_add_pdb_enum(m);
+    ne += py_add_pgs_enum(m);
+
+    return(ne);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* INIT_PGS - initialization function for the module
  *          - NOTE: MUST be called init_pgs
  */
@@ -1319,143 +1342,19 @@ static char pgs_module_documentation[] =
 ;
 
 PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
-   {PyObject *d;
+   {int ne;
+    PyObject *d;
 
-    if (PyModule_AddIntConstant(m, "TRUE", (long) TRUE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "FALSE", (long) FALSE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "ON", (long) ON) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "OFF", (long) OFF) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddObject(m, "SMALL", PyFloat_FromDouble((double) SMALL)) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddObject(m, "HUGE", PyFloat_FromDouble((double) HUGE)) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "Z_CENT", (long) Z_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "N_CENT", (long) N_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "F_CENT", (long) F_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "E_CENT", (long) E_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "U_CENT", (long) U_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddObject(m, "TOLERANCE", PyFloat_FromDouble((double) TOLERANCE)) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "AC_S", PM_AC_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "LR_S", PM_LR_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MAP_INFO_P_S", PM_MAP_INFO_P_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MAPPING_P_S", PM_MAPPING_P_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "SET_P_S", PM_SET_P_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MAP_INFO_S", PM_MAP_INFO_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MAPPING_S", PM_MAPPING_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MESH_TOPOLOGY_S", PM_MESH_TOPOLOGY_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MESH_TOPOLOGY_P_S", PM_MESH_TOPOLOGY_P_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "SET_S", PM_SET_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "LINE_SOLID", (long) LINE_SOLID) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "LINE_DASHED", (long) LINE_DASHED) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "LINE_DOTTED", (long) LINE_DOTTED) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "LINE_DOTDASHED", (long) LINE_DOTDASHED) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_LINESTYLE", (long) AXIS_LINESTYLE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_LINETHICK", (long) AXIS_LINETHICK) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_LINECOLOR", (long) AXIS_LINECOLOR) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_LABELCOLOR", (long) AXIS_LABELCOLOR) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_LABELSIZE", (long) AXIS_LABELSIZE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_LABELFONT", (long) AXIS_LABELFONT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_LABELPREC", (long) AXIS_LABELPREC) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_X_FORMAT", (long) AXIS_X_FORMAT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_Y_FORMAT", (long) AXIS_Y_FORMAT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_TICKSIZE", (long) AXIS_TICKSIZE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_GRID_ON", (long) AXIS_GRID_ON) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AXIS_CHAR_ANGLE", (long) AXIS_CHAR_ANGLE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "GRID_LINESTYLE", (long) GRID_LINESTYLE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "GRID_LINETHICK", (long) GRID_LINETHICK) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "GRID_LINECOLOR", (long) GRID_LINECOLOR) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "VEC_SCALE", (long) VEC_SCALE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "VEC_ANGLE", (long) VEC_ANGLE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "VEC_HEADSIZE", (long) VEC_HEADSIZE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "VEC_FIXSIZE", (long) VEC_FIXSIZE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "VEC_MAXSIZE", (long) VEC_MAXSIZE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "VEC_LINESTYLE", (long) VEC_LINESTYLE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "VEC_LINETHICK", (long) VEC_LINETHICK) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "VEC_COLOR", (long) VEC_COLOR) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "VEC_FIXHEAD", (long) VEC_FIXHEAD) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_CARTESIAN", (long) PLOT_CARTESIAN) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_POLAR", (long) PLOT_POLAR) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_INSEL", (long) PLOT_INSEL) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_HISTOGRAM", (long) PLOT_HISTOGRAM) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_LOGICAL", (long) PLOT_LOGICAL) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "CARTESIAN_3D", (long) CARTESIAN_3D) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_CURVE", (long) PLOT_CURVE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_CONTOUR", (long) PLOT_CONTOUR) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_IMAGE", (long) PLOT_IMAGE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_WIRE_MESH", (long) PLOT_WIRE_MESH) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_SURFACE", (long) PLOT_SURFACE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_VECTOR", (long) PLOT_VECTOR) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_FILL_POLY", (long) PLOT_FILL_POLY) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_MESH", (long) PLOT_MESH) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_ERROR_BAR", (long) PLOT_ERROR_BAR) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_SCATTER", (long) PLOT_SCATTER) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_DV_BND", (long) PLOT_DV_BND) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "PLOT_DEFAULT", (long) PLOT_DEFAULT) < 0)
+    ne = _PY_pact_constants(m);
+    if (ne > 0)
+       PY_MOD_RETURN_ERR;
+
+    ne = _PY_pact_type_system(m);
+    if (ne > 0)
+       PY_MOD_RETURN_ERR;
+
+    ne = _PY_pgsmodule_const(m);
+    if (ne > 0)
        PY_MOD_RETURN_ERR;
 
     PP_field_Type.tp_new = PyType_GenericNew;

@@ -1078,7 +1078,13 @@ static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
  *    end enum
  */
 
-    if ((ta != NULL) && (strcmp(ta[0], "enum") == 0))
+    if (ta == NULL)
+       {if (strcmp(dv, "begin") == 0)
+	   {}
+        else if (strcmp(dv, "end") == 0)
+	   {};}
+
+    else if (strcmp(ta[0], "enum") == 0)
        {fprintf(fp, "   enum, bind(C)\n");
 
 	fprintf(fp, "      ENUMERATOR ::");
@@ -1137,7 +1143,13 @@ static void module_struct_decl(FILE *fp, char *dv, char **ta, char *pck)
  *   end type foo
  */
 
-    if (ta != NULL)
+    if (ta == NULL)
+       {if (strcmp(dv, "begin") == 0)
+	   {}
+        else if (strcmp(dv, "end") == 0)
+	   fprintf(fp, "\n");}
+
+    else if (strcmp(ta[0], "struct") == 0)
        {};
 
     return;}

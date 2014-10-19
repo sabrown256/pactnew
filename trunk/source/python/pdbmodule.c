@@ -1076,6 +1076,27 @@ static int _PP_extra_defstr_mark(haelem *hp, void *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PY_PDBMODULE_CONST - add BLANG generated constant bindings
+ *                     - for PDB module
+ */
+
+static int _PY_pdbmodule_const(PyObject *m)
+   {int ne;
+    extern int py_add_score_enum(PyObject *m);
+    extern int py_add_pml_enum(PyObject *m);
+    extern int py_add_pdb_enum(PyObject *m);
+
+    ne = 0;
+
+    ne += py_add_score_enum(m);
+    ne += py_add_pml_enum(m);
+    ne += py_add_pdb_enum(m);
+
+    return(ne);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* INIT_PDB - initialization function for the module
  *          - NOTE: MUST be called init_pdb
  */
@@ -1085,54 +1106,22 @@ static char pdb_module_documentation[] =
 ;
 
 PY_MOD_BEGIN(_pdb, pdb_module_documentation, PP_methods)
-   {PyObject *d;
+   {int ne;
+    PyObject *d;
 
 /* subtype pdbdata */
     PP_hashtab_Type.tp_base = &PP_pdbdata_Type;
 
-    if (PyModule_AddIntConstant(m, "TRUE", (long) TRUE) < 0)
+    ne = _PY_pact_constants(m);
+    if (ne > 0)
        PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "FALSE", (long) FALSE) < 0)
+
+    ne = _PY_pact_type_system(m);
+    if (ne > 0)
        PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "ON", (long) ON) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "OFF", (long) OFF) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddObject(m, "SMALL", PyFloat_FromDouble((double) SMALL)) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddObject(m, "HUGE", PyFloat_FromDouble((double) HUGE)) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "Z_CENT", (long) Z_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "N_CENT", (long) N_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "F_CENT", (long) F_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "E_CENT", (long) E_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "U_CENT", (long) U_CENT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddObject(m, "TOLERANCE", PyFloat_FromDouble((double) TOLERANCE)) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "AC_S", PM_AC_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "LR_S", PM_LR_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MAP_INFO_P_S", PM_MAP_INFO_P_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MAPPING_P_S", PM_MAPPING_P_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "SET_P_S", PM_SET_P_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MAP_INFO_S", PM_MAP_INFO_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MAPPING_S", PM_MAPPING_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MESH_TOPOLOGY_S", PM_MESH_TOPOLOGY_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "MESH_TOPOLOGY_P_S", PM_MESH_TOPOLOGY_P_S) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddStringConstant(m, "SET_S", PM_SET_S) < 0)
+
+    ne = _PY_pdbmodule_const(m);
+    if (ne > 0)
        PY_MOD_RETURN_ERR;
 
     PP_field_Type.tp_new = PyType_GenericNew;

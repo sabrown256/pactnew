@@ -332,6 +332,10 @@ enum e_PG_axis_type
 
 typedef enum e_PG_axis_type PG_axis_type;
 
+/*
+ * #bind derived PG_grid_attr SC_ENUM_I SC_ENUM_I GRID_LINESTYLE
+ */
+
 enum e_PG_grid_attr
    {GRID_LINESTYLE = 1,
     GRID_LINETHICK,
