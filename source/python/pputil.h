@@ -299,6 +299,10 @@ extern PyObject
 
 /* PPTYPES.C declarations */
 
+extern int
+ _PY_pact_constants(PyObject *m),
+ _PY_pact_type_system(PyObject *m);
+
 extern void
  _PP_rl_descr(PP_descr *descr),
  PP_register_type(PP_file *fileinfo, PP_type_entry *entry),

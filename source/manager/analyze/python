@@ -119,6 +119,7 @@ if (-d ../../python) then
 
                @ ok = 0
                set inf = ( `$lpy_exe ../../python/python-info.py |& cat` )
+               Note $ALog "Python info: |$inf|"
                if ($#inf > 9) then
                   if ($inf[1] == "Version:") then
                      flog $ALog set lpy_vers = $inf[2]
@@ -137,7 +138,13 @@ if (-d ../../python) then
                      @ ok = $ok + 1
                   endif
                   if ($inf[9] == "Compiler:") then
-                     flog $ALog set lpy_cc =  $inf[10]
+
+# lately the Python reports the compiler as 'x86_64-linux-gnu-gcc'
+# that is <hw>-<os>-<vndr>-<compiler>
+# for the compiler - just take the end
+                     set tcc = ( `echo $inf[10] | sed 's|-| |g'` )
+                     flog $ALog set lpy_cc =  $tcc[$#tcc]
+                     unset tcc
                      @ ok = $ok + 1
 
 # get the compiler python was built with

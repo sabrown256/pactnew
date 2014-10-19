@@ -110,8 +110,36 @@ static void python_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
  *
  */
 
-    if ((ta != NULL) && (strcmp(ta[0], "enum") == 0))
-       {};
+    if (ta == NULL)
+       {if (strcmp(dv, "begin") == 0)
+	   {fprintf(fp, "\n");
+	    fprintf(fp, "int py_add_%s_enum(PyObject *m)\n", pck);
+	    fprintf(fp, "   {int nerr;\n");
+	    fprintf(fp, "\n");
+	    fprintf(fp, "    nerr = 0;\n");}
+
+        else if (strcmp(dv, "end") == 0)
+	   {fprintf(fp, "    return(nerr);}\n");
+	    fprintf(fp, "\n");
+	    csep(fp);};}
+
+    else if (strcmp(ta[0], "enum") == 0)
+       {int i;
+	long vl;
+	char *vr;
+
+	vl = 0;
+	for (i = 2; ta[i] != NULL; )
+            {vr = strtok(ta[i++], "{,;}");
+	     if ((ta[i] != NULL) && (ta[i][0] == '='))
+	        {i++;
+	         vl = stoi(ta[i++]);}
+	     else
+	        vl++;
+
+	     fprintf(fp, "    nerr += (PyModule_AddIntConstant(m, \"%s\", %ld) < 0);\n",
+		     vr, vl);
+	     fprintf(fp, "\n");};};
 
     return;}
 
@@ -126,7 +154,13 @@ static void python_struct_defs(FILE *fp, char *dv, char **ta, char *pck)
 /* syntax:
  */
 
-    if (ta != NULL)
+    if (ta == NULL)
+       {if (strcmp(dv, "begin") == 0)
+	   {}
+        else if (strcmp(dv, "end") == 0)
+	   {};}
+
+    else if (strcmp(ta[0], "struct") == 0)
        {};
 
     return;}
@@ -154,7 +188,7 @@ static void python_def_structs(FILE *fp, statedes *st)
 	        {cty = sa[1];
 		 pty = sa[4];
 		 if ((IS_NULL(pty) == FALSE) &&
-		     (strcmp(pty, "SC_ENUM_I") != 0) &&
+		     (strcmp(sa[3], "SC_ENUM_I") != 0) &&
 		     (strcmp(pty, "PyObject") != 0))
 		    {fprintf(fp, "typedef struct s_%s *%sp;\n", pty, pty);
 		     fprintf(fp, "typedef struct s_%s %s;\n", pty, pty);
