@@ -21,6 +21,9 @@
 #define UL_CURVE_INDEX_J 502
 #define UL_DATA_ID_I     501   
 
+#define PRINT_DOUBLE(_x)                                                     \
+    PRINT(stdout, "%s", SC_ftos(NULL, -1, FALSE, SS_gs.fmts[1], _x))
+
 /*--------------------------------------------------------------------------*/
 
 /*                                 TYPEDEFS                                 */

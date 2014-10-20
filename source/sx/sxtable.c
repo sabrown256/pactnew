@@ -789,7 +789,7 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
 	    for (j = 0; j < nc; j++)
 	        {xv = ap[k++];
 
-		 io_printf(fp, SS_gs.fmts[1], xv);
+		 io_printf(fp, "%s", SC_ftos(NULL, -1, FALSE, SS_gs.fmts[1], xv));
 		 if (j == (nc-1))
 		    io_printf(fp, "\n");
 		 else

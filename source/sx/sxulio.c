@@ -1211,9 +1211,9 @@ static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
                  {lx[0] = x[i];
 		  lx[1] = y[i];
 
-		  io_printf(fp, SS_gs.fmts[1], lx[0]);
+		  io_printf(fp, "%s", SC_ftos(NULL, -1, FALSE, SS_gs.fmts[1], lx[0]));
                   io_printf(fp, " ");
-                  io_printf(fp, SS_gs.fmts[1], lx[1]);
+                  io_printf(fp, "%s", SC_ftos(NULL, -1, FALSE, SS_gs.fmts[1], lx[1]));
                   io_printf(fp, "\n");};};
 
          if (uncached)
