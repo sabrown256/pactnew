@@ -49,7 +49,7 @@
 
 /* _SC_GET_TYPE_ID - return type ID */
 
-static SC_type *_SC_get_type_id(int id)
+SC_type *_SC_get_type_id(int id)
    {int nt;
     haelem *hp;
     hasharr *ha;
@@ -426,6 +426,23 @@ char *SC_type_name(int id)
     name = (t != NULL) ? t->type : NULL;
 
     return(name);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_TYPE_INFO - given the type ID return the type info
+ *              - the return value should never be freed
+ *              - return NULL if type ID is unknown
+ */
+
+pcons *SC_type_info(int id)
+   {pcons *info;
+    SC_type *t;
+
+    t    = _SC_get_type_id(id);
+    info = (t != NULL) ? t->a : NULL;
+
+    return(info);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

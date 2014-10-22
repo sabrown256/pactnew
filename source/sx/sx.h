@@ -559,7 +559,7 @@ struct s_g_file
     void *file;
     object *file_object;
     SC_array *menu_lst;
-    struct s_g_file *next;};
+    g_file *next;};
     
 struct s_out_device
    {int exist;

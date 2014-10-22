@@ -15,42 +15,6 @@ typedef int (*PF_int_dd)(double, double);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_NUMERIC_ARRAYP - function version of SX_NUMERIC_ARRAYP macro */
-
-static object *_SXI_numeric_arrayp(SS_psides *si, object *obj)
-   {object *o;
-
-    o = SX_NUMERIC_ARRAYP(obj) ? SS_t : SS_f;
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_MAPPINGP - function version of SX_MAPPINGP macro */
-
-static object *_SXI_mappingp(SS_psides *si, object *obj)
-   {object *o;
-
-    o = SX_MAPPINGP(obj) ? SS_t : SS_f;
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_SETP - function version of SX_SETP macro */
-
-static object *_SXI_setp(SS_psides *si, object *obj)
-   {object *o;
-
-    o = SX_SETP(obj) ? SS_t : SS_f;
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SXI_MK_ARRAY - allocate and return a C_array
  *               - form: (pm-make-array <type> <size>)
  */
@@ -751,55 +715,6 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_WR_GSET - print a g_set */
-
-static void _SX_wr_gset(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<SET|%s,%s>",
-                              SET_NAME(obj),
-                              SET_ELEMENT_TYPE(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GSET - gc a set */
-
-static void _SX_rl_gset(SS_psides *si, object *obj)
-   {
-
-/* you don't know whether a mapping is pointing to this
-    PM_set *set;
-    set = SS_GET(PM_set, obj);
-
-    PM_rel_set(set, FALSE);
-*/
-
-    SS_rl_object(si, obj);;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_SET - encapsulate a PM_set as an object */
-
-object *SX_mk_set(SS_psides *si, PM_set *set)
-   {object *op;
-
-    if (set == NULL)
-       op = SS_null;
-    else
-       op = SS_mk_object(si, set, G_SET, SELF_EV, set->name,
-			 _SX_wr_gset, _SX_rl_gset);
-
-    return(op);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SXI_GET_TEXT_SET_NAME - given a file and reference to a set by
  *                        - name or menu number,
  *                        - return the set name as an object
@@ -1046,46 +961,6 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
 	rv = SX_mk_mapping(si, f);};
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GMAPPING - print a g_mapping */
-
-static void _SX_wr_gmapping(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<MAPPING|%s>", MAPPING_NAME(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GMAPPING - gc a mapping */
-
-static void _SX_rl_gmapping(SS_psides *si, object *obj)
-   {PM_mapping *f;
-
-    f = SS_GET(PM_mapping, obj);
-    PM_rel_mapping(f, TRUE, TRUE);
-
-    SS_rl_object(si, obj);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_MAPPING - encapsulate a PM_mapping as an object */
-
-object *SX_mk_mapping(SS_psides *si, PM_mapping *f)
-   {object *op;
-
-    op = SS_mk_object(si, f, G_MAPPING, SELF_EV, f->name,
-		      _SX_wr_gmapping, _SX_rl_gmapping);
-
-    return(op);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1516,55 +1391,6 @@ static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_WR_GNUM_ARRAY - print a g_num_array */
-
-static void _SX_wr_gnum_array(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<ARRAY|%s>", NUMERIC_ARRAY_TYPE(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GNUM_ARRAY - release g_num_array */
-
-static void _SX_rl_gnum_array(SS_psides *si, object *obj)
-   {C_array *arr;
-
-    arr = SS_GET(C_array, obj);
-
-/*  GOTCHA - it's currently possible that some PM_set may still be pointing
- *  at type and/or array even though the reference count doesn't reflect it
- *  CFREE(arr->type);
- *  CFREE(arr->data);
- */
-    CFREE(arr);
-    SS_rl_object(si, obj);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_C_ARRAY - encapsulate a C_array as an object */
-
-object *SX_mk_C_array(SS_psides *si, C_array *arr)
-   {object *op;
-
-    op = SS_mk_object(si, arr, G_NUM_ARRAY, SELF_EV, arr->type,
-		      _SX_wr_gnum_array, _SX_rl_gnum_array);
-
-    SC_mark(arr, 1);
-    SC_mark(arr->type, 1);
-    SC_mark(arr->data, 1);
-
-    return(op);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SX_REP_TO_AC - map a the given connectivity representation into
  *              - the PACT mesh topology representation
  *              - and return a domain set
@@ -1778,63 +1604,6 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
 
 /*                             POLYGON FUNCTIONS                            */
 
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_POLYGONP - function version of SX_POLYGONP macro */
-
-static object *_SXI_polygonp(SS_psides *si, object *obj)
-   {object *o;
-
-    o = SX_POLYGONP(obj) ? SS_t : SS_f;
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GPOLYGON - print a gpolygon */
-
-static void _SX_wr_gpolygon(SS_psides *si, object *obj, object *strm)
-   {PM_polygon *py;
-
-    py = SS_GET(PM_polygon, obj);
-
-    PRINT(SS_OUTSTREAM(strm), "<POLYGON|%ld>", py->nn);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GPOLYGON - release g_polygon */
-
-static void _SX_rl_gpolygon(SS_psides *si, object *obj)
-   {PM_polygon *py;
-
-    py = SS_GET(PM_polygon, obj);
-
-    PM_free_polygon(py);
-    SS_rl_object(si, obj);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_POLYGON - encapsulate a PM_polygon as an object */
-
-object *SX_mk_polygon(SS_psides *si, PM_polygon *py)
-   {object *op;
-
-    op = SS_mk_object(si, py, G_POLYGON, SELF_EV, "pm-polygon",
-		      _SX_wr_gpolygon, _SX_rl_gpolygon);
-
-    SC_mark(py, 1);
-    SC_mark(py->x, 1);
-
-    return(op);}
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SXI_MK_POLYGON - allocate and return a PM_polygon

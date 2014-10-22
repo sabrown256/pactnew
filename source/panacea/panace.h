@@ -573,7 +573,7 @@ struct s_PA_set_spec
     char *text;
     int n_values;
     double *values;
-    struct s_PA_set_spec *next;};
+    PA_set_spec *next;};
 
 /* PA_PLOT_REQUEST is PD_DEFSTR'd in PA_DEF_STR in PANACEA.C
  * so any changes here must be reflected there
@@ -599,7 +599,7 @@ struct s_PA_plot_request
     PM_set *data;           /* storage space for PSEUDO variables (range) */
     int data_index;                   /* index into the source data array */ 
     int data_type;
-    struct s_PA_plot_request *next;};
+    PA_plot_request *next;};
 
 
 struct s_PA_package
@@ -633,7 +633,7 @@ struct s_PA_package
     char *db_file;               /* name of text file defining the database */
     pcons *db_list;               /* list of the database names from a file */
     pcons *alist;                        /* list of package level functions */
-    struct s_PA_package *next;};               /* point to the next package */
+    PA_package *next;};                        /* point to the next package */
 
 
 /* added a pointer to the number of elements so that variables could be
@@ -711,7 +711,7 @@ struct s_PA_iv_specification
     int interpolate;       /* flag to indicate the need to interpolate data */
     pcons *spec;                    /* list of data read at generation time */
     double *data;                      /* runtime storage of data from spec */
-    struct s_PA_iv_specification *next;};
+    PA_iv_specification *next;};
 
 /* UNIT_SPEC - specify information for building units out of other
  *           - existing units
@@ -725,7 +725,7 @@ struct s_PA_unit_spec
     int *numerator;
     int n_den;
     int *denominator;
-    struct s_PA_unit_spec *next;};
+    PA_unit_spec *next;};
 
 /* SET_INDEX - aid to selecting elements out of PM_sets
  *           - this is PD_defstr'd in PANACEA.C changes must be reflected there!!!

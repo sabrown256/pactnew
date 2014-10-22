@@ -427,6 +427,25 @@ extern object
  *_SXI_list_array(SS_psides *si, object *argl);
 
 
+/* SXPMLG.C declarations */
+
+extern void
+ *_SX_arg_g_set(SS_psides *si, object *o),
+ *_SX_arg_g_mapping(SS_psides *si, object *o),
+ *_SX_arg_num_array(SS_psides *si, object *o),
+ *_SX_arg_pm_polygon(SS_psides *si, object *o);
+
+extern object
+ *SX_mk_set(SS_psides *si, PM_set *set),
+ *SX_mk_mapping(SS_psides *si, PM_mapping *f),
+ *SX_mk_C_array(SS_psides *si, C_array *arr),
+ *SX_mk_polygon(SS_psides *si, PM_polygon *py),
+ *_SXI_setp(SS_psides *si, object *obj),
+ *_SXI_mappingp(SS_psides *si, object *obj),
+ *_SXI_numeric_arrayp(SS_psides *si, object *obj),
+ *_SXI_polygonp(SS_psides *si, object *obj);
+
+
 /* SXSET.C declarations */
 
 extern void
