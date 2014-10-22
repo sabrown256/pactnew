@@ -330,7 +330,7 @@ extern char
 
 #ifdef LARGE
 
-/* SHPROC.C declarations */
+/* SHPRC1.C declarations */
 
 extern void
  _SS_rl_process(SS_psides *si, object *obj);

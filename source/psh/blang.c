@@ -16,6 +16,8 @@
 
 #define N_MODES  7
 
+#define NF 3
+
 enum e_fparam
    {FP_ANY = 0,
     FP_VARARG,
@@ -102,7 +104,7 @@ struct s_statedes
 
 struct s_bindes
    {statedes *st;
-    FILE *fp;
+    FILE *fp[NF];
     str_list types;
     void (*init)(statedes *st, bindes *bd);
     int (*bind)(bindes *bd);
@@ -943,11 +945,11 @@ static void hsep(FILE *fp)
 /* EMIT_ENUM_DEFS - emit enum specifications via FEMIT */
 
 void emit_enum_defs(bindes *bd,
-		    void (*femit)(FILE *fp, char *dv, char **ta, char *pck))
+		    void (*femit)(FILE **fp, char *dv, char **ta, char *pck))
    {int ib, id, nbi;
     char ps[BFLRG], t[BFLRG];
     char *pck, *sb, *te, **cdv, **sbi, **ta;
-    FILE *fp;
+    FILE **fp;
     statedes *st;
 
     st  = bd->st;
@@ -986,11 +988,11 @@ void emit_enum_defs(bindes *bd,
 /* EMIT_STRUCT_DEFS - emit struct specifications via FEMIT */
 
 void emit_struct_defs(bindes *bd,
-		      void (*femit)(FILE *fp, char *dv, char **ta, char *pck))
+		      void (*femit)(FILE **fp, char *dv, char **ta, char *pck))
    {int ib, id, nbi, nc;
     char ps[BFLRG], t[BFLRG];
     char *pck, *sb, *te, **cdv, **sbi, **ta;
-    FILE *fp;
+    FILE **fp;
     statedes *st;
 
     st  = bd->st;
@@ -1468,15 +1470,17 @@ static void c_proto(char *pr, int nc, fdecl *dcl)
  */
 
 static int register_c(int fl, statedes *st)
-   {int nb;
+   {int i, nb;
     bindes *pb;
 
     if (fl == TRUE)
        {nb = nbd;
 
 	pb = gbd + nbd++;
+	for (i = 0; i < NF; i++)
+	    pb->fp[i] = NULL;
+
 	pb->st   = st;
-	pb->fp   = NULL;
 	pb->init = NULL;
 	pb->bind = NULL;
 	pb->fin  = NULL;};

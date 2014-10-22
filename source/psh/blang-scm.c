@@ -105,22 +105,41 @@ static void init_scheme(statedes *st, bindes *bd)
 
     pck = st->pck;
 
+/* open C file */
     if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
        snprintf(fn, BFLRG, "gs-%s.c", pck);
     else
        snprintf(fn, BFLRG, "%s/gs-%s.c", st->path, pck);
 
     fp = open_file("w", fn);
+    bd->fp[0] = fp;
 
     fprintf(fp, "\n");
     fprintf(fp, "#include \"cpyright.h\"\n");
     fprintf(fp, "#include \"sx_int.h\"\n");
     fprintf(fp, "#include \"%s_int.h\"\n", pck);
+    fprintf(fp, "#include \"gs-%s.h\"\n", pck);
     fprintf(fp, "\n");
 
     csep(fp);
 
-    bd->fp = fp;
+/* open header file */
+    if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
+       snprintf(fn, BFLRG, "gs-%s.h", pck);
+    else
+       snprintf(fn, BFLRG, "%s/gs-%s.h", st->path, pck);
+
+    fp = open_file("w", fn);
+    bd->fp[1] = fp;
+
+    fprintf(fp, "\n");
+    fprintf(fp, "#include \"cpyright.h\"\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#ifndef GEN_%s_H\n", pck);
+    fprintf(fp, "#define GEN_%s_H\n", pck);
+    fprintf(fp, "\n");
+    fprintf(fp, "#include \"gs-%s.h\"\n", pck);
+    fprintf(fp, "\n");
 
     return;}
 
@@ -423,8 +442,10 @@ static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
 
 /* SCHEME_ENUM_DEFS - write the SCHEME interface C enums DV */
 
-static void scheme_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
-   {
+static void scheme_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
+   {FILE *fs;
+
+    fs = fp[0];
 
 /* syntax:
  *    _SS_make_ext_int(si, <Enamei>, <Evaluei>);
@@ -432,9 +453,17 @@ static void scheme_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
-	   {}
+	   {csep(fs);
+	    fprintf(fs, "\n");
+	    fprintf(fs, "static void _SX_install_%s_consts(SS_psides *si)\n",
+		    pck);
+	    fprintf(fs, "   {\n");
+	    fprintf(fs, "\n");}
         else if (strcmp(dv, "end") == 0)
-	   fprintf(fp, "\n");}
+	   {fprintf(fs, "\n");
+	    fprintf(fs, "    return;}\n");
+	    fprintf(fs, "\n");
+	    csep(fs);};}
 
     else if (strcmp(ta[0], "enum") == 0)
        {int i;
@@ -450,8 +479,112 @@ static void scheme_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
 	     else
 	        vl++;
 
-	     fprintf(fp, "    _SS_make_ext_int(si, \"%s\", %ld);\n",
+	     fprintf(fs, "    _SS_make_ext_int(si, \"%s\", %ld);\n",
 	             vr, vl);};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_HDR_STRUCT_DEF - emitter for struct defs info belonging
+ *                       - in the header file
+ */
+
+static void scheme_hdr_struct_def(FILE *fp, char *dv, char **ta, char *pck)
+   {int i;
+    char snm[BFSML], rnm[BFSML], lnm[BFSML], mnm[BFSML], unm[BFSML];
+    char *p, *mbr;
+
+/* get struct name */
+    p = trim(ta[0]+9, BOTH, " \t");
+    nstrncpy(snm, BFSML, p, -1);
+
+/* get root struct name */
+    if (p[2] == '_')
+       nstrncpy(rnm, BFSML, p+3, -1);
+    else
+       nstrncpy(rnm, BFSML, p, -1);
+    upcase(rnm);
+
+/* emit type check predicate macro */
+    fprintf(fp, "#undef SX_%sP\n", rnm);
+    fprintf(fp, "#define SX_%sP(_o)   (SS_OBJECT_TYPE(_o) == SX_%s_I)\n",
+	    rnm, rnm);
+    fprintf(fp, "\n");
+
+/* emit member accessor macros */
+    for (i = 1; ta[i] != NULL; i++)
+        {mbr = trim(ta[i], BOTH, " \t");
+	 if (IS_NULL(mbr) == FALSE)
+	    {nstrncpy(mnm, BFSML, mbr, -1);
+	     p = strtok(mnm, "* \t");
+	     p = strtok(NULL, "(*) \t");
+	     nstrncpy(lnm, BFSML, p, -1);
+	     nstrncpy(unm, BFSML, p, -1);
+	     upcase(unm);
+
+	     fprintf(fp, "#define %s_%s(_o)   \t(SS_GET(%s, _o)->%s)\n",
+		     rnm, unm, snm, lnm);};};
+    fprintf(fp, "\n");
+
+/* emit list extractor */
+    fprintf(fp, "#define SX_GET_%s_FROM_LIST(_si, _v, _a, _s)   \\\n", rnm);
+    fprintf(fp, "   {obj = SS_car(_si, _a);   \\\n");
+    fprintf(fp, "    _a = SS_cdr(_si, _a);   \\\n");
+    fprintf(fp, "    if (SX_%sP(obj))   \\\n", rnm);
+    fprintf(fp, "       _v = SS_GET(%s, obj);   \\\n", snm);
+    fprintf(fp, "    else   \\\n");
+    fprintf(fp, "       SS_error(_si, _s, obj);}\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_C_STRUCT_DEF - emitter for struct defs info belonging
+ *                     - in the C file
+ */
+
+static void scheme_c_struct_def(FILE *fp, char *dv, char **ta, char *pck)
+   {int i;
+    char snm[BFSML], rnm[BFSML];
+    char *p, *mbr;
+
+    p = trim(ta[0]+9, BOTH, " \t");
+    nstrncpy(snm, BFSML, p, -1);
+
+/* get root struct name */
+    if (p[2] == '_')
+       nstrncpy(rnm, BFSML, p+3, -1);
+    else
+       nstrncpy(rnm, BFSML, p, -1);
+    upcase(rnm);
+
+/* register with the SX VIF */
+    fprintf(fp, "    dp = PD_defstr(SX_gs.vif, \"%s\",\n", snm);
+
+    for (i = 2; ta[i] != NULL; i++)
+        {mbr = trim(ta[i], BOTH, " \t");
+
+/* function pointer */
+	 p = strstr(mbr, "(*");
+	 if (p != NULL)
+	    fprintf(fp, "                   \"function %s\",\n",
+		    strtok(p+2, ")"));
+	 else
+	    fprintf(fp, "                   \"%s\",\n", mbr);};
+
+    fprintf(fp, "                   LAST);\n");
+    fprintf(fp, "    nerr += (dp == NULL);\n");
+    fprintf(fp, "\n");
+
+/* register with the SCORE type system */
+    fprintf(fp, "    SX_%s_I = SC_type_register(\"%s\", KIND_STRUCT, sizeof(%s),\n", rnm, snm, snm);
+    fprintf(fp, "              SC_TYPE_FREE,  _SX_rl_g%s,\n", snm);
+    fprintf(fp, "              0);\n");
+    fprintf(fp, "\n");
 
     return;}
 
@@ -460,8 +593,11 @@ static void scheme_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
 
 /* SCHEME_STRUCT_DEFS - write the SCHEME interface C structs DV */
 
-static void scheme_struct_defs(FILE *fp, char *dv, char **ta, char *pck)
-   {
+static void scheme_struct_defs(FILE **fp, char *dv, char **ta, char *pck)
+   {FILE *fs, *fh;
+
+    fs = fp[0];
+    fh = fp[1];
 
 /* syntax:
  *    PD_defstr(SX_vif, <Sname>,
@@ -473,30 +609,140 @@ static void scheme_struct_defs(FILE *fp, char *dv, char **ta, char *pck)
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
-	   {}
+	   {csep(fs);
+	    fprintf(fs, "\n");
+	    fprintf(fs, "static int _SX_install_%s_derived(SS_psides *si)\n",
+		    pck);
+	    fprintf(fs, "   {int nerr;\n");
+	    fprintf(fs, "    defstr *dp;\n");
+	    fprintf(fs, "\n");
+	    fprintf(fs, "    nerr = 0;\n");
+	    fprintf(fs, "\n");}
         else if (strcmp(dv, "end") == 0)
-	   fprintf(fp, "\n");}
+	   {fprintf(fs, "    return(nerr);}\n");
+	    fprintf(fs, "\n");
+	    csep(fs);};}
 
-    else if (strcmp(ta[0], "struct") == 0)
-       {int i;
-	char *p, *mbr;
+    else if (strncmp(ta[0], "struct s_", 9) == 0)
+       {scheme_hdr_struct_def(fh, dv, ta, pck);
+	scheme_c_struct_def(fs, dv, ta, pck);};
 
-	p = trim(ta[0]+9, BOTH, " \t");
-	fprintf(fp, "    PD_defstr(SX_vif, \"%s\",\n", p);
+    return;}
 
-	for (i = 2; ta[i] != NULL; i++)
-	    {mbr = trim(ta[i], BOTH, " \t");
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-/* function pointer */
-	     p = strstr(mbr, "(*");
-	     if (p != NULL)
-	        fprintf(fp, "              \"function %s\",\n",
-			strtok(p+2, ")"));
-	     else
-	        fprintf(fp, "              \"%s\",\n", mbr);};
+/* SCHEME_OBJECT_DEFS - write the SCHEME interface to create
+ *                    - SCHEME object from C structs
+ */
 
-	fprintf(fp, "              LAST);\n");
-	fprintf(fp, "\n");};
+static void scheme_object_defs(FILE **fp, char *dv, char **ta, char *pck)
+   {int i, hnm;
+    char snm[BFSML], rnm[BFSML], inm[BFSML];
+    char *p, **sa;
+    FILE *fs;
+
+    fs = fp[0];
+
+    if (ta == NULL)
+       {if (strcmp(dv, "begin") == 0)
+	   csep(fs);
+        else if (strcmp(dv, "end") == 0)
+	   {};}
+
+    else if (strncmp(ta[0], "struct s_", 9) == 0)
+
+/* get struct name */
+       {p = trim(ta[0]+9, BOTH, " \t");
+	nstrncpy(snm, BFSML, p, -1);
+
+/* get root struct name */
+	if (p[2] == '_')
+	   nstrncpy(rnm, BFSML, p+3, -1);
+	else
+	   nstrncpy(rnm, BFSML, p, -1);
+	upcase(rnm);
+
+/* determine whether or not a member has been tagged with LBLI
+ * it must be 'char *' or 'char []'
+ */
+	hnm = FALSE;
+	for (i = 1; (ta[i] != NULL) && (hnm == FALSE); i++)
+	    {if (strstr(ta[i], "LBLI") != NULL)
+	        {sa = tokenize(ta[i], "* \t", 0);
+		 nstrncpy(inm, BFSML, sa[1], -1);
+		 lst_free(sa);
+		 hnm = TRUE;};};
+
+        fprintf(fs, "\n");
+	fprintf(fs, "static void _SX_wr_g%s(SS_psides *si, object *o, object *fp)\n",
+		snm);
+	fprintf(fs, "   {\n");
+	fprintf(fs, "\n");
+
+        if (hnm == TRUE)
+	   fprintf(fs, "    PRINT(SS_OUTSTREAM(fp), \"<%s|%%s>\", %s_%s(o));\n",
+		   rnm, rnm, upcase(inm));
+        else
+	   fprintf(fs, "    PRINT(SS_OUTSTREAM(fp), \"<%s|%%p>\", o);\n",
+		   rnm);
+
+	fprintf(fs, "\n");
+	fprintf(fs, "    return;}\n");
+
+        fprintf(fs, "\n");
+        csep(fs);
+        csep(fs);
+        fprintf(fs, "\n");
+
+	fprintf(fs, "static void _SX_rl_g%s(SS_psides *si, object *o)\n",
+		snm);
+	fprintf(fs, "   {\n");
+	fprintf(fs, "\n");
+	fprintf(fs, "    SS_rl_object(si, o);\n");
+	fprintf(fs, "\n");
+	fprintf(fs, "    return;}\n");
+	fprintf(fs, "\n");
+
+        csep(fs);
+        csep(fs);
+
+	fprintf(fs, "\n");
+	fprintf(fs, "int SX_%s_I;\n", rnm);
+
+	fprintf(fs, "\n");
+	fprintf(fs, "static object *_SXI_make_%s(SS_psides *si, object *argl)\n",
+		snm);
+	fprintf(fs, "   {%s *x;\n", snm);
+	fprintf(fs, "    object *rv;\n");
+	fprintf(fs, "\n");
+	fprintf(fs, "    x = CMAKE(%s);\n", snm);
+	fprintf(fs, "\n");
+	fprintf(fs, "    if (x == NULL)\n");
+	fprintf(fs, "       rv = SS_null;\n");
+	fprintf(fs, "    else\n");
+	fprintf(fs, "       rv = SS_mk_object(si, x, SX_%s_I, SELF_EV, \"%s\",\n",
+		rnm, snm);
+	fprintf(fs, "                         _SX_wr_g%s, _SX_rl_g%s);\n",
+		snm, snm);
+	fprintf(fs, "\n");
+	fprintf(fs, "    return(rv);}\n");
+
+	fprintf(fs, "\n");
+        csep(fs);
+        csep(fs);
+	fprintf(fs, "\n");
+
+	fprintf(fs, "static object *_SXI_%sp(SS_psides *si, object *o)\n",
+		snm);
+	fprintf(fs, "   {object *rv;\n");
+	fprintf(fs, "\n");
+	fprintf(fs, "    rv = SX_%sP(o) ? SS_t : SS_f;\n", rnm);
+	fprintf(fs, "\n");
+	fprintf(fs, "    return(rv);}\n");
+
+	fprintf(fs, "\n");
+        csep(fs);};
 
     return;}
 
@@ -598,9 +844,18 @@ static void scheme_install(bindes *bd, char **fl)
     char *pck;
     statedes *st;
 
-    fp  = bd->fp;
+    fp  = bd->fp[0];
     st  = bd->st;
     pck = st->pck;
+
+/* make the list of enum constants to install */
+    emit_enum_defs(bd, scheme_enum_defs);
+
+/* make the list of struct objects */
+    emit_struct_defs(bd, scheme_object_defs);
+
+/* make the list of structs to install */
+    emit_struct_defs(bd, scheme_struct_defs);
 
     csep(fp);
 
@@ -610,10 +865,12 @@ static void scheme_install(bindes *bd, char **fl)
     fprintf(fp, "\n");
 
 /* make the list of enum constants to install */
-    emit_enum_defs(bd, scheme_enum_defs);
+    fprintf(fp, "    _SX_install_%s_consts(si);\n", pck);
 
 /* make the list of structs to install */
-    emit_struct_defs(bd, scheme_struct_defs);
+    fprintf(fp, "    _SX_install_%s_derived(si);\n", pck);
+
+    fprintf(fp, "\n");
 
     if (fl != NULL)
        {for (i = 0; fl[i] != NULL; i++)
@@ -641,7 +898,7 @@ static int bind_scheme(bindes *bd)
     statedes *st;
     FILE *fp;
 
-    fp   = bd->fp;
+    fp   = bd->fp[0];
     st   = bd->st;
     dcls = st->dcl;
     ndcl = st->ndcl;
@@ -667,14 +924,23 @@ static int bind_scheme(bindes *bd)
 /* FIN_SCHEME - finalize Scheme file */
 
 static void fin_scheme(bindes *bd)
-   {FILE *fp;
+   {int i;
+    FILE *fp;
 
-    fp = bd->fp;
-
+/* finish of the C file */
+    fp = bd->fp[0];
     csep(fp);
-    fclose_safe(fp);
 
-    bd->fp = NULL;
+/* finish of the header file */
+    fp = bd->fp[1];
+    fprintf(fp, "#endif\n");
+    fprintf(fp, "\n");
+
+    for (i = 0; i < NF; i++)
+        {fp = bd->fp[i];
+	 if (fp != NULL)
+	    {fclose_safe(fp);
+	     bd->fp[i] = NULL;};};
 
     return;}
 
@@ -684,15 +950,17 @@ static void fin_scheme(bindes *bd)
 /* REGISTER_SCHEME - register SCHEME binding methods */
 
 static int register_scheme(int fl, statedes *st)
-   {int nb;
+   {int i, nb;
     bindes *pb;
 
     if (fl == TRUE)
        {nb = nbd;
 
 	pb = gbd + nbd++;
+	for (i = 0; i < NF; i++)
+	    pb->fp[i] = NULL;
+
 	pb->st   = st;
-	pb->fp   = NULL;
 	pb->init = init_scheme;
 	pb->bind = bind_scheme;
 	pb->fin  = fin_scheme;};

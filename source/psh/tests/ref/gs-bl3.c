@@ -2,6 +2,7 @@
 #include "cpyright.h"
 #include "sx_int.h"
 #include "bl3_int.h"
+#include "gs-bl3.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -69,6 +70,9 @@ static object *_SXI_fe2(SS_psides *si, object *argl)
 
 void SX_install_bl3_bindings(SS_psides *si)
    {
+
+    _SX_install_bl3_consts(si);
+    _SX_install_bl3_derived(si);
 
     SS_install(si, "fe1s",
                "Procedure: fe1s\n     Usage: (fe1s a1 a2)",

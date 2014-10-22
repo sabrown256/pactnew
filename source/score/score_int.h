@@ -62,19 +62,6 @@
 
 #endif
 
-/* helpers for bindings */
-
-/* variadic macro example:
- * #define eprintf(...) fprintf(stderr, __VA_ARGS__)
- */
-
-/* ARG - specify default value, in/out, etc
- *     - ignored by CC but parsed by BLANG
- */
-
-#undef ARG
-#define ARG(...)
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

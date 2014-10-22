@@ -45,6 +45,8 @@ void _SX_install_generated(SS_psides *si)
     extern void SX_install_panacea_bindings(SS_psides *si);
     extern void SX_install_scheme_bindings(SS_psides *si);
 
+    SX_gs.vif = PD_open_vif("SX_gs.vif");
+
     SX_install_score_bindings(si);
     SX_install_pml_bindings(si);
     SX_install_pdb_bindings(si);
@@ -115,7 +117,6 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
 /* SX initializations depending on scheme */
     SX_install_funcs(si);
 
-    SX_gs.vif  = PD_open_vif("SX_gs.vif");
     SX_gs.gvif = _SX_mk_file("virtual-internal", PDBFILE_S, SX_gs.vif);
     SX_gs.ovif = SX_mk_gfile(si, SX_gs.gvif);
 

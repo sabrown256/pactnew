@@ -557,7 +557,7 @@ struct s_PD_cksumdes
 
 struct s_PDBfile
    {FILE *stream;                     /* actual stream to the file */
-    char *name;                       /* filename such as: "temp.pdb" */
+    char *name LBLI;                  /* filename such as: "temp.pdb" */
     char *type;                       /* used by files masquerading as PDB */
     SC_udl *udl;
     hasharr *symtab;                  /* info about variables in a file */

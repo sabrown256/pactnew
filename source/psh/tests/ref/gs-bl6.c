@@ -2,6 +2,7 @@
 #include "cpyright.h"
 #include "sx_int.h"
 #include "bl6_int.h"
+#include "gs-bl6.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -444,6 +445,9 @@ static object *_SXI_fc9(SS_psides *si, object *argl)
 
 void SX_install_bl6_bindings(SS_psides *si)
    {
+
+    _SX_install_bl6_consts(si);
+    _SX_install_bl6_derived(si);
 
     SS_install(si, "fa1s",
                "Procedure: fa1s\n     Usage: (fa1s a)",

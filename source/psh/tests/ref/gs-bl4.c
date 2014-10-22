@@ -2,6 +2,7 @@
 #include "cpyright.h"
 #include "sx_int.h"
 #include "bl4_int.h"
+#include "gs-bl4.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -720,6 +721,9 @@ static object *_SXI_fp13(SS_psides *si, object *argl)
 
 void SX_install_bl4_bindings(SS_psides *si)
    {
+
+    _SX_install_bl4_consts(si);
+    _SX_install_bl4_derived(si);
 
     SS_install(si, "fb1",
                "Procedure: fb1\n     Usage: (fb1 a1 a2)",

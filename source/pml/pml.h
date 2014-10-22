@@ -340,13 +340,15 @@ struct s_PM_sp_lin_sys
     void (*cmp_Lr)(double *Lr, PM_sp_lin_sys *sls, double *r);};
 
 /* C_ARRAY - define an encapulated vector/array type
- *         - this is PD_defstr'd in PANACE.C changes must be reflected there!!!
+ *         - PD_defstr'd in PANACE.C - changes must be reflected there!!!
  *         - NOTE: the TYPE member is used for a PD_cast and as such must be
  *         - "T *" if the data is of type T
+ *
+ * #bind derived C_array character-A G_ARRAY PyObject NULL
  */
 
 struct s_C_array
-   {char *type;                                                /* data type */
+   {char *type LBLI;                                           /* data type */
     long length;                                      /* number of elements */
     void *data;};                                    /* pointer to the data */
 
@@ -619,7 +621,7 @@ struct s_PM_mesh_topology
  */
 
 struct s_PM_set
-   {char *name;
+   {char *name LBLI;
     char *element_type;
     int dimension;
     int *max_index;
@@ -661,7 +663,7 @@ struct s_PM_map_info
  */
 
 struct s_PM_mapping
-   {char *name;                                       /* the mapping's name */
+   {char *name LBLI;                                  /* the mapping's name */
     char *category;                /* the category to which mapping belongs */
     PM_set *domain;                                 /* the mapping's domain */
     PM_set *range;             /* a subset of the image of DOMAIN under MAP */

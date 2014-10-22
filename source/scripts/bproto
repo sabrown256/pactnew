@@ -495,13 +495,15 @@ Note $Log ""
 
 # move all scheme stuff to the sx package
       if ($d != sx) then
-         if (-f gs-$d.c) then
-            set ldst =  ../../../sx/$zdir
-            if (!(-d $ldst)) then
-               flog $Log mkdir -p $ldst
+         foreach s (c h)
+            if (-f gs-$d.$s) then
+               set ldst =  ../../../sx/$zdir
+               if (!(-d $ldst)) then
+                  flog $Log mkdir -p $ldst
+               endif
+               flog $Log mv gs-$d.$s $ldst
             endif
-            flog $Log mv gs-$d.c $ldst
-         endif
+         end
       endif
 
 # move all python stuff to the python package
