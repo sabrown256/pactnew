@@ -358,7 +358,7 @@ struct s_SC_type
     char *type;                /* type name */
     SC_kind kind;              /* type kind */
     int bpi;                   /* bytes per item */
-    pcons *a;                  /* application supplied type objects */
+    void *a;                   /* application supplied info */
     void (*init)(void *x);     /* function to initialize instance */
     void (*free)(void *x);};   /* function to free instance */
 
@@ -485,7 +485,7 @@ extern int
 extern size_t
  SC_copy_primitive(void *d, void *s, long n, int id);
 
-extern pcons
+extern void
  *SC_type_info(int id);
 
 extern char

@@ -688,7 +688,7 @@ switch ($Cmnd)
         set SRCDate       = ""
  
         set Opt   = "$HelpCode:t  $argv"
-        set PArgs = ""
+        set PArgs = "-l"
 
 # save a copy of the args for the log
         set nargs = ( $argv )

@@ -934,15 +934,18 @@ char *_SC_format_loc(char *d, int nc, SC_srcloc *loc, int sf, int tail)
 
 pcons *SC_assoc_entry(pcons *alist, char *s)
    {char *t;
-    pcons *pa, *c;
+    pcons *pa, *c, *rv;
 
-    for (pa = alist; pa != NULL; pa = (pcons *) pa->cdr)
-        {c = (pcons *) pa->car;
-         t = (char *) c->car;
-         if (strcmp(t, s) == 0)
-            return(c);};
+    rv = NULL;
 
-    return(NULL);}
+    if (s != NULL)
+       {for (pa = alist; (pa != NULL) && (rv == NULL); pa = (pcons *) pa->cdr)
+	    {c = (pcons *) pa->car;
+	     t = (char *) c->car;
+	     if (strcmp(t, s) == 0)
+	        rv = c;};};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -115,6 +115,7 @@ int SC_type_register(char *name, SC_kind kind, int bpi, ...)
 	t->type = CSTRDUP(name, 3);
 	t->kind = kind;
 	t->bpi  = bpi;
+	t->a    = NULL;
 
 	t->init = NULL;
 	t->free = NULL;
@@ -435,8 +436,8 @@ char *SC_type_name(int id)
  *              - return NULL if type ID is unknown
  */
 
-pcons *SC_type_info(int id)
-   {pcons *info;
+void *SC_type_info(int id)
+   {void *info;
     SC_type *t;
 
     t    = _SC_get_type_id(id);
