@@ -12,6 +12,26 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* helpers for bindings */
+
+/* variadic macro example:
+ * #define eprintf(...) fprintf(stderr, __VA_ARGS__)
+ */
+
+/* ARG - specify default value, in/out, etc
+ *     - ignored by CC but parsed by BLANG
+ */
+
+#undef ARG
+#define ARG(...)
+
+/* LBLI - use the struct member as a label for instances
+ *      - of the struct allocated in blang generated code
+ */
+
+#undef LBLI
+#define LBLI
+
 /* include the PSH files with SCOPE_SCORE_PREPROC to get in
  * macro definitions, function and variable declarations
  * this one time right here

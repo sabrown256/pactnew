@@ -2,6 +2,7 @@
 #include "cpyright.h"
 #include "sx_int.h"
 #include "bl2_int.h"
+#include "gs-bl2.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -101,6 +102,9 @@ static object *_SXI_fbmcr2(SS_psides *si, object *argl)
 
 void SX_install_bl2_bindings(SS_psides *si)
    {
+
+    _SX_install_bl2_consts(si);
+    _SX_install_bl2_derived(si);
 
     SS_install(si, "fbcv1s",
                "Procedure: fbcv1s\n     Usage: (fbcv1s a b c d e f)",

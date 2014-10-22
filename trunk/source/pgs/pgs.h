@@ -612,7 +612,7 @@ typedef struct s_RGB_color_map RGB_color_map;
  */
 
 struct s_PG_palette
-   {char *name;
+   {char *name LBLI;
     int max_pal_dims;                 /* number of different palette shapes */
     int **pal_dims;            /* shapes for 1, 2, ... dimensional palettes */
     int n_pal_colors;
@@ -878,7 +878,7 @@ struct s_PG_device
     int map_fill_color;
 
     int mode;                           /* _mode = -1 when graphics is off */
-    char *name;
+    char *name LBLI;
     int ncolor;
     int phys_n_colors;
     PG_par_rend_info *pri;              /* parallel rendering info */
@@ -1022,7 +1022,7 @@ struct s_PG_device
 
 struct s_PG_image
    {int version_id;    /* version id in case of change see PG_IMAGE_VERSION */
-    char *label;
+    char *label LBLI;
     double xmin;
     double xmax;
     double ymin;

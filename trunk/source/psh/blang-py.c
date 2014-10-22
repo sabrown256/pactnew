@@ -90,8 +90,10 @@ static void py_arg(char *arg, int nc, char *spec)
 
 /* PYTHON_ENUM_DEFS - write the Python interface C enums DV */
 
-static void python_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
-   {
+static void python_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
+   {FILE *fs;
+
+    fs = fp[0];
 
 /* syntax:
  *  To summarize adding enums to python, blang generates
@@ -112,16 +114,16 @@ static void python_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
-	   {fprintf(fp, "\n");
-	    fprintf(fp, "int py_add_%s_enum(PyObject *m)\n", pck);
-	    fprintf(fp, "   {int nerr;\n");
-	    fprintf(fp, "\n");
-	    fprintf(fp, "    nerr = 0;\n");}
+	   {fprintf(fs, "\n");
+	    fprintf(fs, "int py_add_%s_enum(PyObject *m)\n", pck);
+	    fprintf(fs, "   {int nerr;\n");
+	    fprintf(fs, "\n");
+	    fprintf(fs, "    nerr = 0;\n");}
 
         else if (strcmp(dv, "end") == 0)
-	   {fprintf(fp, "    return(nerr);}\n");
-	    fprintf(fp, "\n");
-	    csep(fp);};}
+	   {fprintf(fs, "    return(nerr);}\n");
+	    fprintf(fs, "\n");
+	    csep(fs);};}
 
     else if (strcmp(ta[0], "enum") == 0)
        {int i;
@@ -137,9 +139,9 @@ static void python_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
 	     else
 	        vl++;
 
-	     fprintf(fp, "    nerr += (PyModule_AddIntConstant(m, \"%s\", %ld) < 0);\n",
+	     fprintf(fs, "    nerr += (PyModule_AddIntConstant(m, \"%s\", %ld) < 0);\n",
 		     vr, vl);
-	     fprintf(fp, "\n");};};
+	     fprintf(fs, "\n");};};
 
     return;}
 
@@ -148,7 +150,7 @@ static void python_enum_defs(FILE *fp, char *dv, char **ta, char *pck)
 
 /* PYTHON_STRUCT_DEFS - write the Python interface C structs DV */
 
-static void python_struct_defs(FILE *fp, char *dv, char **ta, char *pck)
+static void python_struct_defs(FILE **fp, char *dv, char **ta, char *pck)
    {
 
 /* syntax:
@@ -214,12 +216,14 @@ static void init_python(statedes *st, bindes *bd)
 
     pck = st->pck;
 
+/* source C file */
     if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
        snprintf(fn, BFLRG, "gp-%s.c", pck);
     else
        snprintf(fn, BFLRG, "%s/gp-%s.c", st->path, pck);
 
     fp = open_file("w", fn);
+    bd->fp[0] = fp;
 
     fprintf(fp, "\n");
     fprintf(fp, "#include <Python.h>\n");
@@ -231,7 +235,7 @@ static void init_python(statedes *st, bindes *bd)
 
     csep(fp);
 
-    bd->fp = fp;
+    bd->fp[0] = fp;
 
     return;}
 
@@ -708,7 +712,7 @@ static void python_install(bindes *bd)
     statedes *st;
     FILE *fp;
 
-    fp   = bd->fp;
+    fp   = bd->fp[0];
     st   = bd->st;
     pck  = st->pck;
     dcls = st->dcl;
@@ -757,7 +761,7 @@ static int bind_python(bindes *bd)
     statedes *st;
     FILE *fp;
 
-    fp   = bd->fp;
+    fp   = bd->fp[0];
     st   = bd->st;
     dcls = st->dcl;
     ndcl = st->ndcl;
@@ -784,14 +788,17 @@ static int bind_python(bindes *bd)
 /* FIN_PYTHON - finalize Python file */
 
 static void fin_python(bindes *bd)
-   {FILE *fp;
+   {int i;
+    FILE *fp;
 
-    fp = bd->fp;
-
+    fp = bd->fp[0];
     csep(fp);
-    fclose_safe(fp);
 
-    bd->fp = NULL;
+    for (i = 0; i < NF; i++)
+        {fp = bd->fp[i];
+	 if (fp != NULL)
+	    {fclose_safe(fp);
+	     bd->fp[i] = NULL;};};
 
     return;}
 
@@ -801,15 +808,17 @@ static void fin_python(bindes *bd)
 /* REGISTER_PYTHON - register PYTHON binding methods */
 
 static int register_python(int fl, statedes *st)
-   {int nb;
+   {int i, nb;
     bindes *pb;
 
     if (fl == TRUE)
        {nb = nbd;
 
 	pb = gbd + nbd++;
+	for (i = 0; i < NF; i++)
+	    pb->fp[i] = NULL;
+
 	pb->st   = st;
-	pb->fp   = NULL;
 	pb->init = init_python;
 	pb->bind = bind_python;
 	pb->fin  = fin_python;};

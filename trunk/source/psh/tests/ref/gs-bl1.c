@@ -2,6 +2,7 @@
 #include "cpyright.h"
 #include "sx_int.h"
 #include "bl1_int.h"
+#include "gs-bl1.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -150,6 +151,9 @@ static object *_SXI_fav5(SS_psides *si, object *argl)
 
 void SX_install_bl1_bindings(SS_psides *si)
    {
+
+    _SX_install_bl1_consts(si);
+    _SX_install_bl1_derived(si);
 
     SS_install(si, "fav1s",
                "Procedure: fav1s\n     Usage: (fav1s)",

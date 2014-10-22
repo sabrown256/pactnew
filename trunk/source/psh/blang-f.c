@@ -267,7 +267,7 @@ static void init_fortran(statedes *st, bindes *bd)
 	fprintf(fp, "\n");
 	csep(fp);};
 
-    bd->fp = fp;
+    bd->fp[0] = fp;
 
     return;}
 
@@ -618,7 +618,7 @@ static int bind_fortran(bindes *bd)
     st = bd->st;
 
     if (st->cfl & 1)
-       {fp = bd->fp;
+       {fp = bd->fp[0];
 
 	dcls = st->dcl;
 	ndcl = st->ndcl;
@@ -636,14 +636,17 @@ static int bind_fortran(bindes *bd)
 /* FIN_FORTRAN - finalize Fortran file */
 
 static void fin_fortran(bindes *bd)
-   {FILE *fp;
+   {int i;
+    FILE *fp;
 
-    fp = bd->fp;
-
+    fp = bd->fp[0];
     csep(fp);
-    fclose_safe(fp);
 
-    bd->fp = NULL;
+    for (i = 0; i < NF; i++)
+        {fp = bd->fp[i];
+	 if (fp != NULL)
+	    {fclose_safe(fp);
+	     bd->fp[i] = NULL;};};
 
     return;}
 
@@ -977,7 +980,7 @@ static void init_module(statedes *st, bindes *bd)
 	fprintf(fp, "%s   use iso_c_binding\n", ind);
 	fprintf(fp, "\n");};
 
-    bd->fp = fp;
+    bd->fp[0] = fp;
 
     return;}
 
@@ -1066,11 +1069,14 @@ static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 
 /* MODULE_ENUM_DECL - write the Fortran interface C enums DV */
 
-static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
+static void module_enum_decl(FILE **fp, char *dv, char **ta, char *pck)
    {int i, nc;
     long vl;
     char s[BFLRG], x[BFLRG];
     char *vr;
+    FILE *fm;
+
+    fm = fp[0];
 
 /* syntax:
  *    enum, bind(C)
@@ -1085,9 +1091,9 @@ static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
 	   {};}
 
     else if (strcmp(ta[0], "enum") == 0)
-       {fprintf(fp, "   enum, bind(C)\n");
+       {fprintf(fm, "   enum, bind(C)\n");
 
-	fprintf(fp, "      ENUMERATOR ::");
+	fprintf(fm, "      ENUMERATOR ::");
 
 	s[0] = '\0';
 	nc   = 0;
@@ -1101,7 +1107,7 @@ static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
 	        snprintf(x, BFLRG, " %s,", vr);
 
 	     if (nc > 45)
-	        {fprintf(fp, "%s &\n", s);
+	        {fprintf(fm, "%s &\n", s);
 		 snprintf(s, BFLRG, "                   ");
 		 nc = 0;};
 	        
@@ -1109,8 +1115,8 @@ static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
 	     vstrcat(s, BFLRG, " %s", x);};
 
 	LAST_CHAR(s) = '\0';
-	fprintf(fp, "%s\n", s);
-	fprintf(fp, "   end enum\n");};
+	fprintf(fm, "%s\n", s);
+	fprintf(fm, "   end enum\n");};
 
     return;}
 
@@ -1119,8 +1125,10 @@ static void module_enum_decl(FILE *fp, char *dv, char **ta, char *pck)
 
 /* MODULE_STRUCT_DECL - write the Fortran interface C structs DV */
 
-static void module_struct_decl(FILE *fp, char *dv, char **ta, char *pck)
-   {
+static void module_struct_decl(FILE **fp, char *dv, char **ta, char *pck)
+   {FILE *fm;
+
+    fm = fp[0];
 
 /* syntax:
  *   type, bind(C) :: <Sname>
@@ -1147,7 +1155,7 @@ static void module_struct_decl(FILE *fp, char *dv, char **ta, char *pck)
        {if (strcmp(dv, "begin") == 0)
 	   {}
         else if (strcmp(dv, "end") == 0)
-	   fprintf(fp, "\n");}
+	   fprintf(fm, "\n");}
 
     else if (strcmp(ta[0], "struct") == 0)
        {};
@@ -1402,7 +1410,7 @@ static int bind_module(bindes *bd)
     st = bd->st;
 
     if (st->cfl & 2)
-       {fp   = bd->fp;
+       {fp   = bd->fp[0];
 	pck  = st->pck;
 	fpr  = st->fpr;
 	fwr  = st->fwr;
@@ -1494,20 +1502,23 @@ static int bind_module(bindes *bd)
 /* FIN_MODULE - finalize Fortran/C interoperability interface module file */
 
 static void fin_module(bindes *bd)
-   {char *pck;
+   {int i;
+    char *pck;
     statedes *st;
     FILE *fp;
 
-    fp  = bd->fp;
+    fp  = bd->fp[0];
     st  = bd->st;
     pck = st->pck;
 
     fprintf(fp, "%send module pact_%s\n", ind, pck);
     fprintf(fp, "\n");
 
-    fclose_safe(fp);
-
-    bd->fp = NULL;
+    for (i = 0; i < NF; i++)
+        {fp = bd->fp[i];
+	 if (fp != NULL)
+	    {fclose_safe(fp);
+	     bd->fp[i] = NULL;};};
 
     return;}
 
@@ -1517,22 +1528,28 @@ static void fin_module(bindes *bd)
 /* REGISTER_FORTRAN - register FORTRAN binding methods */
 
 static int register_fortran(int fl, statedes *st)
-   {int nb;
+   {int i, nb;
     bindes *pb;
 
     if (fl == TRUE)
        {nb = nbd;
 
+/* fortran wrappers */
 	pb = gbd + nbd++;
+	for (i = 0; i < NF; i++)
+	    pb->fp[i] = NULL;
+
 	pb->st   = st;
-	pb->fp   = NULL;
 	pb->init = init_fortran;
 	pb->bind = bind_fortran;
 	pb->fin  = fin_fortran;
 
+/* fortran modules */
 	pb = gbd + nbd++;
+	for (i = 0; i < NF; i++)
+	    pb->fp[i] = NULL;
+
 	pb->st   = st;
-	pb->fp   = NULL;
 	pb->init = init_module;
 	pb->bind = bind_module;
 	pb->fin  = fin_module;};

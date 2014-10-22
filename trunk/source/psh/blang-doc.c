@@ -28,7 +28,7 @@ static void init_doc(statedes *st, bindes *bd)
 
     hsep(fp);
 
-    bd->fp = fp;
+    bd->fp[0] = fp;
 
     return;}
 
@@ -369,8 +369,6 @@ static void man_wrap(statedes *st, fdecl *dcl,
 
     fprintf(fp, "\n");
 
-    fclose_safe(fp);
-
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -387,7 +385,7 @@ static int bind_doc(bindes *bd)
     statedes *st;
     FILE *fp;
 
-    fp   = bd->fp;
+    fp   = bd->fp[0];
     st   = bd->st;
     ndc  = st->ndc;
     cdc  = st->cdc;
@@ -411,14 +409,17 @@ static int bind_doc(bindes *bd)
 /* FIN_DOC - finalize Doc file */
 
 static void fin_doc(bindes *bd)
-   {FILE *fp;
+   {int i;
+    FILE *fp;
 
-    fp = bd->fp;
-
+    fp = bd->fp[0];
     hsep(fp);
-    fclose_safe(fp);
 
-    bd->fp = NULL;
+    for (i = 0; i < NF; i++)
+        {fp = bd->fp[i];
+	 if (fp != NULL)
+	    {fclose_safe(fp);
+	     bd->fp[i] = NULL;};};
 
     return;}
 
@@ -428,15 +429,17 @@ static void fin_doc(bindes *bd)
 /* REGISTER_DOC - register documentation methods */
 
 static int register_doc(int fl, statedes *st)
-   {int nb;
+   {int i, nb;
     bindes *pb;
 
     if (fl == TRUE)
        {nb = nbd;
 
 	pb = gbd + nbd++;
+	for (i = 0; i < NF; i++)
+	    pb->fp[i] = NULL;
+
 	pb->st   = st;
-	pb->fp   = NULL;
 	pb->init = init_doc;
 	pb->bind = bind_doc;
 	pb->fin  = fin_doc;};

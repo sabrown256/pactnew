@@ -469,6 +469,8 @@
 #define SX_NUMERIC_ARRAYP(_o)    (SS_OBJECT_TYPE(_o) == G_NUM_ARRAY)
 #define SX_POLYGONP(_o)          (SS_OBJECT_TYPE(_o) == G_POLYGON)
 #define SX_MAPPINGP(_o)          (SS_OBJECT_TYPE(_o) == G_MAPPING)
+
+#undef SX_SETP
 #define SX_SETP(_o)              (SS_OBJECT_TYPE(_o) == G_SET)
 
 /*--------------------------------------------------------------------------*/
