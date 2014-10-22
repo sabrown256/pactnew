@@ -639,7 +639,7 @@ struct s_PM_set
     void *topology;
     char *info_type;                  /* provide any additional information */
     void *info;
-    struct s_PM_set *next;};
+    PM_set *next;};
 
 
 /* PM_MAP_INFO - should tell how two sets (domain and range) are to
@@ -672,7 +672,7 @@ struct s_PM_mapping
     int file_type;                          /* file type ASCII, BINARY, PDB */
     void *file_info;           /* file info - cast to some struct with info */
     char *file;                                    /* file name for mapping */
-    struct s_PM_mapping *next;};
+    PM_mapping *next;};
 
 struct s_PM_mesh_map
    {int nd;          /* number of dimensions */
@@ -687,7 +687,7 @@ struct s_PM_mesh_map
 
 struct s_sort_link
    {int count;
-    struct s_sort_link *next;};
+    sort_link *next;};
 
 struct s_PM_scope_public
    {

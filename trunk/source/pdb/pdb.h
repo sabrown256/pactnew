@@ -648,7 +648,7 @@ struct s_dimdes
    {long index_min;
     long index_max;
     long number;
-    struct s_dimdes *next;};
+    dimdes *next;};
 
 #define PD_DEFINE_DIMDES(_f)        \
     PD_defstr(_f, "dimdes",         \
@@ -672,7 +672,7 @@ struct s_memdes
     char *name;
     dimdes *dimensions;
     long number;
-    struct s_memdes *next;};
+    memdes *next;};
 
 FUNCTION_POINTER(memdes, *(*PFPmemdes));
 
@@ -804,7 +804,7 @@ struct s_attribute
 struct s_attribute_value
    {attribute *attr;
     long indx;
-    struct s_attribute_value *next;};
+    attribute_value *next;};
 
 /* PD_IMAGE is a faithful shadow of the PG_image which is not defined yet
  * any changes to PG_image must be reflected here

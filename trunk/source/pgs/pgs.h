@@ -549,7 +549,7 @@ struct s_PG_graph
     int identifier;
     char *use;                          /* volatile communicator internally */
     void (*render)(PG_device *dev, PG_graph *data, ...);
-    struct s_PG_graph *next;};
+    PG_graph *next;};
 
 /*--------------------------------------------------------------------------*/
 
@@ -592,18 +592,18 @@ struct s_PG_font_family
    {int n_styles;
     char *type_face;
     char **type_styles;
-    struct s_PG_font_family *next;};
+    PG_font_family *next;};
 
 /*--------------------------------------------------------------------------*/
 
 /* declare RGB color map */
 
+typedef struct s_RGB_color_map RGB_color_map;
+
 struct s_RGB_color_map
    {double red;
     double green;
     double blue;};
-
-typedef struct s_RGB_color_map RGB_color_map;
 
 /*--------------------------------------------------------------------------*/
 
@@ -628,7 +628,7 @@ struct s_PG_palette
     PaletteHandle hpalette;
 #endif
 
-    struct s_PG_palette *next;};
+    PG_palette *next;};
 
 /*--------------------------------------------------------------------------*/
 
