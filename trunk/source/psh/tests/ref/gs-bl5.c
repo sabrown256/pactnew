@@ -1,3 +1,7 @@
+/*
+ * GS-BL5.C - generated support routines for BL5
+ *
+ */
 
 #include "cpyright.h"
 #include "sx_int.h"

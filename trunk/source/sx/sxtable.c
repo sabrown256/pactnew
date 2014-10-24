@@ -621,7 +621,7 @@ static object *_SXI_table_set(SS_psides *si, object *specs)
     PM_set *set;
 
     set = _SX_table_set(si, specs, FALSE);
-    rv  = SX_mk_set(si, set);
+    rv  = SX_make_pm_set(si, set);
 
     return(rv);}
 
@@ -668,7 +668,7 @@ static object *_SXI_table_map(SS_psides *si, object *argl)
 
     f = PM_make_mapping(name, PM_LR_S, domain, range, centering, NULL);
 
-    rv = SX_mk_mapping(si, f);
+    rv = SX_make_pm_mapping(si, f);
 
     return(rv);}
 
@@ -696,7 +696,7 @@ static object *SX_wrt_text_table(SS_psides *si, object *argl)
 
     for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
         {SS_args(si, argl,
-		 G_MAPPING, &f,
+		 SX_MAPPING_I, &f,
 		 0);
 
          domain = f->domain;
@@ -893,7 +893,7 @@ static object *SX_delete_column(SS_psides *si, object *argl)
 
     else
        {SS_args(si, argl,
-                G_NUM_ARRAY, &arr,
+                SX_C_ARRAY_I, &arr,
 		0);
 
         data = (long *)arr->data;

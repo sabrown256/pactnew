@@ -193,6 +193,11 @@
 
 #define PG_is_true_color(_c)   (((0x7f << 24) & (_c)) != 0)
 
+#define PG_zero_vector(_v)                                                   \
+   {int _i;                                                                  \
+    for (_i = 0; _i < PG_SPACEDM; _i++)                                      \
+        (_v)[_i] = 0;}
+
 /*--------------------------------------------------------------------------*/
  
 /*                        TYPEDEF'S AND STRUCT'S                            */
@@ -292,7 +297,7 @@ enum e_PG_rendering
 typedef enum e_PG_rendering PG_rendering;
 
 /*
- * #bind derived PG_axis_attr SC_ENUM_I SC_ENUM_I AXIS_LINESTYLE
+ * #bind derived PG_axis_attr integer SC_ENUM_I SC_ENUM_I AXIS_LINESTYLE
  */
 
 enum e_PG_axis_attr
@@ -321,7 +326,7 @@ enum e_PG_axis_attr
 typedef enum e_PG_axis_attr PG_axis_attr;
 
 /*
- * #bind derived PG_axis_type SC_ENUM_I SC_ENUM_I CARTESIAN_2D
+ * #bind derived PG_axis_type integer SC_ENUM_I SC_ENUM_I CARTESIAN_2D
  */
 
 enum e_PG_axis_type
@@ -333,7 +338,7 @@ enum e_PG_axis_type
 typedef enum e_PG_axis_type PG_axis_type;
 
 /*
- * #bind derived PG_grid_attr SC_ENUM_I SC_ENUM_I GRID_LINESTYLE
+ * #bind derived PG_grid_attr integer SC_ENUM_I SC_ENUM_I GRID_LINESTYLE
  */
 
 enum e_PG_grid_attr
@@ -344,7 +349,7 @@ enum e_PG_grid_attr
 typedef enum e_PG_grid_attr PG_grid_attr;
 
 /*
- * #bind derived PG_line_attr SC_ENUM_I SC_ENUM_I LINE_SOLID
+ * #bind derived PG_line_attr integer SC_ENUM_I SC_ENUM_I LINE_SOLID
  */
 
 enum e_PG_line_attr
@@ -357,7 +362,7 @@ enum e_PG_line_attr
 typedef enum e_PG_line_attr PG_line_attr;
 
 /*
- * #bind derived PG_vector_attr SC_ENUM_I SC_ENUM_I VEC_SCALE
+ * #bind derived PG_vector_attr integer SC_ENUM_I SC_ENUM_I VEC_SCALE
  */
 
 enum e_PG_vector_attr
@@ -612,7 +617,7 @@ struct s_RGB_color_map
  */
 
 struct s_PG_palette
-   {char *name LBLI;
+   {char *name;
     int max_pal_dims;                 /* number of different palette shapes */
     int **pal_dims;            /* shapes for 1, 2, ... dimensional palettes */
     int n_pal_colors;
@@ -756,7 +761,7 @@ struct s_PG_dev_geometry
 /*--------------------------------------------------------------------------*/
 
 /* PG_DEVICE - graphics device structure
- * #bind derived PG_device character-A G_DEVICE PP_deviceObject NULL
+ * #bind derived PG_device character-A SX_DEVICE_I PP_deviceObject NULL
  */
 
 struct s_PG_device
@@ -878,7 +883,7 @@ struct s_PG_device
     int map_fill_color;
 
     int mode;                           /* _mode = -1 when graphics is off */
-    char *name LBLI;
+    char *name;
     int ncolor;
     int phys_n_colors;
     PG_par_rend_info *pri;              /* parallel rendering info */
@@ -1017,12 +1022,12 @@ struct s_PG_device
 
 /* PG_IMAGE is PD_defstr'd in PDBX.C any changes here must be reflected
  * there!!
- * #bind derived PG_image character-A G_IMAGE PyObject NULL
+ * #bind derived PG_image character-A SX_IMAGE_I PyObject NULL
  */
 
 struct s_PG_image
    {int version_id;    /* version id in case of change see PG_IMAGE_VERSION */
-    char *label LBLI;
+    char *label;
     double xmin;
     double xmax;
     double ymin;

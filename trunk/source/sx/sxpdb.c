@@ -19,6 +19,80 @@ typedef int (*PDBFileRead)(PDBfile *fp, char *path, char *ty,
 			   syment *ep, void *vr);
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_HASHARR - handle BLANG binding related operations */
+
+void *_SX_opt_hasharr(hasharr *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_LABEL :
+	     break;
+
+        case BIND_ALLOC :
+	     break;
+
+        case BIND_FREE :
+	     break;
+
+        case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_HASHARRP(o))
+	        rv = (void *) SS_GET(hasharr, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PDBfile - handle BLANG binding related operations */
+
+void *_SX_opt_PDBfile(PDBfile *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_LABEL :
+	     break;
+
+        case BIND_ALLOC :
+	     break;
+
+        case BIND_FREE :
+	     break;
+
+        case BIND_ARG :
+	     o = (object *) a;
+	     if (SS_nullobjp(o) || SX_FILEP(o))
+	        {rv = (void *) SX_gs.gvif;
+		 if (!SS_nullobjp(o))
+		    {g_file *gf;
+             
+		     gf = (g_file *) SS_GET(g_file, o);
+		     if (gf != NULL)
+		        rv = (void *) gf->file;};}
+	     else if (SX_PDBFILEP(o))
+	        rv = (void *) SS_GET(PDBfile, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 #if 0
 
@@ -3000,8 +3074,8 @@ static object *_SXI_wrt_ultra_curve(SS_psides *si, object *argl)
     yarr = NULL;
     SS_args(si, argl,
             G_FILE, &po,
-            G_NUM_ARRAY, &xarr,
-            G_NUM_ARRAY, &yarr,
+            SX_C_ARRAY_I, &xarr,
+            SX_C_ARRAY_I, &yarr,
             SC_STRING_I, &labl,
             SC_INT_I, &npts,
             0);
@@ -3097,7 +3171,7 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
 	     iarr = NULL;
 	     SS_args(si, argl,
 		     SC_INT_I, &_SC.types.max_digits,
-		     G_NUM_ARRAY, &iarr,
+		     SX_C_ARRAY_I, &iarr,
 		     0);
 
 	     n   = 0;
@@ -3676,7 +3750,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
 
 	arr = PM_make_array(type, anumb, data);
 
-	rv = SX_mk_C_array(si, arr);};
+	rv = SX_make_c_array(si, arr);};
 
     return(rv);}
 

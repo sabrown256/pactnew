@@ -237,7 +237,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
 	    sz = itag.nitems;};};
 
     arr = PM_make_array(dtype, sz, addr.memaddr);
-    ret = SX_mk_C_array(si, arr);
+    ret = SX_make_c_array(si, arr);
 
     _PD_rl_syment_d(ep);
     _PD_rl_syment_d(cp);

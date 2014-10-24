@@ -44,7 +44,7 @@ OD = DefaultG
 #
 # Compiler/Loader Options
 #
-CcFlags = -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags = -I${IncDir} -I. ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 #
@@ -140,11 +140,20 @@ ${LibDep} : ${Hdrs} ${hdrf}
 # Generated code rules
 #
 
+GenInc = ${PACTTmpDir}/gs-score.h ${PACTTmpDir}/gs-pml.h \
+         ${PACTTmpDir}/gs-pdb.h ${PACTTmpDir}/gs-pgs.h \
+         ${PACTTmpDir}/gs-panacea.h
+
+${IncDir}/sx_gen.h : ${GenInc}
+	@echo "build sx_gen.h"
+	@rm -f ${IncDir}/sx_gen.h
+	@cat ${GenInc} > ${IncDir}/sx_gen.h
+
 ${IncDir}/sxpdbd.h : sxpdbd.t
 	@(echo "template sxpdbd.t -o ${IncDir}/sxpdbd.h" ;  \
 	  ${BinDir}/template sxpdbd.t -o ${IncDir}/sxpdbd.h)
 
-hdrf = ${IncDir}/sxpdbd.h
+hdrf = ${IncDir}/sxpdbd.h ${IncDir}/sx_gen.h
 
 # language bindings
 
@@ -160,13 +169,16 @@ LibAction = @(echo "build-ext" ; build-ext ; cd ${PACTTmpDir} ; echo "bindings" 
 #
 ${TGTExe} : ${BinDep} sxmain.c
 	@(echo "${CCAnnounce} sxmain.c -o ${TGTExe}" ; \
-	  ${CLD} ${LdFlags} sxmain.c -o ${TGTExe} ${Libs})
+	  ${CLD} -I${PACTTmpDir} ${LdFlags} sxmain.c -o ${TGTExe} ${Libs})
 
-${UltraExe} : ${BinDep} ultra.c
-	@(echo "${CCAnnounce} ultra.c -o ${UltraExe}" ; \
-	  ${CLD} ${LdFlags} ultra.c -o ${UltraExe} ${Libs})
-
-ultra : ${UltraExe}
+#
+# OLD BINARY EXE
+#
+#${UltraExe} : ${BinDep} ultra.c
+#	@(echo "${CCAnnounce} ultra.c -o ${UltraExe}" ; \
+#	  ${CLD} ${LdFlags} ultra.c -o ${UltraExe} ${Libs})
+#
+#ultra : ${UltraExe}
 
 #
 # make the command test wrapper

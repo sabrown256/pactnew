@@ -175,7 +175,7 @@
 	    (synonym pg-set-world-coordinate-system!    pg_set_world_coordinate_systemb)
 	    (synonym pg-world->normalized        pg_world_to_normalized)
 	    (synonym pg-set-color-type!          pg_set_color_typeb)
-	    (synonym pm-array?                   pm_arrayp)
+	    (synonym c-array?                    c_arrayp)
 	    (synonym list->pm-array              list_to_pm_array)
 	    (synonym pm-array->list              pm_array_to_list)
 	    (synonym pm-array-set!               pm_array_setb)

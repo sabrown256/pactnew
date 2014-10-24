@@ -1,3 +1,7 @@
+/*
+ * GS-BL4.C - generated support routines for BL4
+ *
+ */
 
 #include "cpyright.h"
 #include "sx_int.h"
@@ -476,7 +480,7 @@ static object *_SXI_fp1(SS_psides *si, object *argl)
     _rv = fp1(_la1);
     _sz = SC_arrlen(_rv)/sizeof(bool);
     _arr = PM_make_array("bool", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -520,7 +524,7 @@ static object *_SXI_fp3(SS_psides *si, object *argl)
     _rv = fp3(_la1);
     _sz = SC_arrlen(_rv)/sizeof(short);
     _arr = PM_make_array("short", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -544,7 +548,7 @@ static object *_SXI_fp4(SS_psides *si, object *argl)
     _rv = fp4(_la1);
     _sz = SC_arrlen(_rv)/sizeof(int);
     _arr = PM_make_array("int", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -568,7 +572,7 @@ static object *_SXI_fp5(SS_psides *si, object *argl)
     _rv = fp5(_la1);
     _sz = SC_arrlen(_rv)/sizeof(long);
     _arr = PM_make_array("long", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -592,7 +596,7 @@ static object *_SXI_fp6(SS_psides *si, object *argl)
     _rv = fp6(_la1);
     _sz = SC_arrlen(_rv)/sizeof(long long);
     _arr = PM_make_array("long long", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -616,7 +620,7 @@ static object *_SXI_fp7(SS_psides *si, object *argl)
     _rv = fp7(_la1);
     _sz = SC_arrlen(_rv)/sizeof(float);
     _arr = PM_make_array("float", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -640,7 +644,7 @@ static object *_SXI_fp8(SS_psides *si, object *argl)
     _rv = fp8(_la1);
     _sz = SC_arrlen(_rv)/sizeof(double);
     _arr = PM_make_array("double", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -664,7 +668,7 @@ static object *_SXI_fp10(SS_psides *si, object *argl)
     _rv = fp10(_la1);
     _sz = SC_arrlen(_rv)/sizeof(float _Complex);
     _arr = PM_make_array("float _Complex", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -688,7 +692,7 @@ static object *_SXI_fp11(SS_psides *si, object *argl)
     _rv = fp11(_la1);
     _sz = SC_arrlen(_rv)/sizeof(double _Complex);
     _arr = PM_make_array("double _Complex", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -712,7 +716,7 @@ static object *_SXI_fp13(SS_psides *si, object *argl)
     _rv = fp13(_la1);
     _sz = SC_arrlen(_rv)/sizeof(str);
     _arr = PM_make_array("str", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 

@@ -552,12 +552,12 @@ struct s_PD_cksumdes
     PD_checksum_mode file;};   /* file use of checksums */
 
 /*
- * #bind derived PDBfile character-A G_PDBFILE PP_PDBfileObject NULL
+ * #bind derived PDBfile character-A SX_PDBFILE_I PP_PDBfileObject NULL
  */
 
 struct s_PDBfile
    {FILE *stream;                     /* actual stream to the file */
-    char *name LBLI;                  /* filename such as: "temp.pdb" */
+    char *name;                       /* filename such as: "temp.pdb" */
     char *type;                       /* used by files masquerading as PDB */
     SC_udl *udl;
     hasharr *symtab;                  /* info about variables in a file */

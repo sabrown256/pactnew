@@ -1,3 +1,7 @@
+/*
+ * GS-BL1.C - generated support routines for BL1
+ *
+ */
 
 #include "cpyright.h"
 #include "sx_int.h"
@@ -75,7 +79,7 @@ static object *_SXI_favp1(SS_psides *si, object *argl)
     _rv = favp1();
     _sz = SC_arrlen(_rv);
     _arr = PM_make_array("char", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -93,7 +97,7 @@ static object *_SXI_favp2(SS_psides *si, object *argl)
     _rv = favp2();
     _sz = SC_arrlen(_rv)/sizeof(int);
     _arr = PM_make_array("int", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -111,7 +115,7 @@ static object *_SXI_favp3(SS_psides *si, object *argl)
     _rv = favp3();
     _sz = SC_arrlen(_rv)/sizeof(double);
     _arr = PM_make_array("double", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 
@@ -129,7 +133,7 @@ static object *_SXI_favp4(SS_psides *si, object *argl)
     _rv = favp4();
     _sz = SC_arrlen(_rv)/sizeof(str);
     _arr = PM_make_array("str", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 

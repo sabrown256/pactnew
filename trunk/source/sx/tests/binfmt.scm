@@ -23,7 +23,7 @@
 			  vals)
 			 ((char? vals)
 			  vals)
-			 ((pm-array? vals)
+			 ((c-array? vals)
 			  (pm-array->list vals))
 			 ((vector? vals)
 			  (vector->list vals)))))))

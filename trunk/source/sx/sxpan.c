@@ -803,7 +803,7 @@ static object *_SXI_db_numeric_data(SS_psides *si, object *obj)
 
 	    SC_convert_id(SC_DOUBLE_I, dp, 0, 1, id, pd, 0, 1, n, FALSE);};
 
-	rv = SX_mk_C_array(si, arr);};
+	rv = SX_make_c_array(si, arr);};
 
     return(rv);}
 

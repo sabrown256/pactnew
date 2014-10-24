@@ -228,10 +228,10 @@ object *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl)
 	   {obj  = _SX_resolve_mapping(si, argl);
 	    argl = SS_cdr(si, argl);
 	    set  = NULL;
-	    if (SX_NUMERIC_ARRAYP(obj))
-	       {pd   = (double *) NUMERIC_ARRAY_DATA(obj);
-		ne   = NUMERIC_ARRAY_LENGTH(obj);
-		type = NUMERIC_ARRAY_TYPE(obj);
+	    if (SX_C_ARRAYP(obj))
+	       {pd   = (double *) C_ARRAY_DATA(obj);
+		ne   = C_ARRAY_LENGTH(obj);
+		type = C_ARRAY_TYPE(obj);
 
 		_SX_unop(fn, type, (void *) pd, ne, NULL);
 
@@ -567,7 +567,7 @@ object *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl)
        {SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
             {h  = op(si, f, &argl);
-	     mo = SX_mk_mapping(si, h);
+	     mo = SX_make_pm_mapping(si, h);
 
 	     if (plf)
 	        mo = SX_display_map(si, mo);

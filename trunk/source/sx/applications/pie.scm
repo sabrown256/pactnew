@@ -67,7 +67,7 @@
 	      (let* ((vals (cddr (pdb->list data))))
 		(cond ((number? vals)
 		       vals)
-		      ((pm-array? vals)
+		      ((c-array? vals)
 		       (pm-array->list vals))
 		      ((vector? vals)
 		       (vector->list vals))))))))

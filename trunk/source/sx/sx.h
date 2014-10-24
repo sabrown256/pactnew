@@ -15,6 +15,7 @@
 
 #include "panace.h"
 #include "scheme.h"
+#include "sx_gen.h"
 
 /*--------------------------------------------------------------------------*/
 
@@ -88,21 +89,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_GET_ARRAY_FROM_LIST - extract a numeric array from the list
- *                        - and cdr the list
- */
-
-#define SX_GET_ARRAY_FROM_LIST(_si, _v, _a, _s)                              \
-   {obj = SS_car(_si, _a);                                                   \
-    _a = SS_cdr(_si, _a);                                                    \
-    if (SX_NUMERIC_ARRAYP(obj))                                              \
-       _v = NUMERIC_ARRAY_DATA(obj);                                         \
-    else                                                                     \
-       SS_error(_si, _s, obj);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SX_GET_GRAPH_FROM_LIST - extract a PG_graph from the list
  *                        - and cdr the list
  */
@@ -136,8 +122,10 @@
 /* SX_GET_MAPPING_FROM_LIST - extract a PM_mapping from the list
  *                          - and cdr the list
  *                          - if item is a graph extract the mapping from it
+ *                          - NOTE: generalization of generated macro
  */
 
+#undef SX_GET_MAPPING_FROM_LIST
 #define SX_GET_MAPPING_FROM_LIST(_si, _p, _a)                                \
     {PG_graph *_g;                                                           \
      object *_o;                                                             \
@@ -306,14 +294,6 @@
 #define IMAGE_NAME(_o)          (SS_GET(PG_image, _o)->label)
 #define IMAGE_DATA(_o)          (SS_GET(PG_image, _o)->bf)
 #define IMAGE_TYPE(_o)          (SS_GET(PG_image, _o)->element_type)
-#define IMAGE_KMAX(_o)          (SS_GET(PG_image, _o)->kmax)
-#define IMAGE_LMAX(_o)          (SS_GET(PG_image, _o)->lmax)
-#define IMAGE_XMAX(_o)          (SS_GET(PG_image, _o)->xmax)
-#define IMAGE_XMIN(_o)          (SS_GET(PG_image, _o)->xmin)
-#define IMAGE_YMAX(_o)          (SS_GET(PG_image, _o)->ymax)
-#define IMAGE_YMIN(_o)          (SS_GET(PG_image, _o)->ymin)
-#define IMAGE_ZMAX(_o)          (SS_GET(PG_image, _o)->zmax)
-#define IMAGE_ZMIN(_o)          (SS_GET(PG_image, _o)->ymin)
 
 #define DEV_ATTRIBUTES_CLIPPING(_o)        (SS_GET(PG_dev_attributes, _o)->clipping)
 #define DEV_ATTRIBUTES_CHAR_FONT(_o)       (SS_GET(PG_dev_attributes, _o)->char_font)
@@ -331,75 +311,10 @@
 #define DEV_ATTRIBUTES_LOGICAL_OP(_o)      (SS_GET(PG_dev_attributes, _o)->logical_op)
 #define DEV_ATTRIBUTES_TEXT_COLOR(_o)      (SS_GET(PG_dev_attributes, _o)->text_color)
 
-#ifdef DEVICE_TYPE
-# undef DEVICE_TYPE
-#endif
-
-#define DEVICE_AUTODOMAIN(_o)             (SS_GET(PG_device, _o)->autodomain)
-#define DEVICE_AUTOPLOT(_o)               (SS_GET(PG_device, _o)->autoplot)
-#define DEVICE_AUTORANGE(_o)              (SS_GET(PG_device, _o)->autorange)
-#define DEVICE_BACKGROUND_COLOR_WHITE(_o) (SS_GET(PG_device, _o)->background_color_white)
-#define DEVICE_BORDER_WIDTH(_o)           (SS_GET(PG_device, _o)->border_width)
-#define DEVICE_CHAR_FONT(_o)              (SS_GET(PG_device, _o)->char_font)
-#define DEVICE_CHAR_FRAC(_o)              (SS_GET(PG_device, _o)->char_frac)
-#define DEVICE_CHAR_HEIGHT(_o)            (SS_GET(PG_device, _o)->char_height)
-#define DEVICE_CHAR_HEIGHT_S(_o)          (SS_GET(PG_device, _o)->char_height_s)
-#define DEVICE_CHAR_PRECISION(_o)         (SS_GET(PG_device, _o)->char_precision)
-#define DEVICE_CHAR_SPACE(_o)             (SS_GET(PG_device, _o)->char_space)
-#define DEVICE_CHAR_SPACE_S(_o)           (SS_GET(PG_device, _o)->char_space_s)
-#define DEVICE_CHAR_UP_X(_o)              (SS_GET(PG_device, _o)->char_up_x)
-#define DEVICE_CHAR_UP_Y(_o)              (SS_GET(PG_device, _o)->char_up_y)
-#define DEVICE_CHAR_WIDTH(_o)             (SS_GET(PG_device, _o)->char_width)
-#define DEVICE_CHAR_WIDTH_S(_o)           (SS_GET(PG_device, _o)->char_width_s)
-#define DEVICE_CLIPPING(_o)               (SS_GET(PG_device, _o)->clipping)
-#define DEVICE_FILE(_o)                   (SS_GET(PG_device, _o)->file)
-#define DEVICE_FILL_COLOR(_o)             (SS_GET(PG_device, _o)->fill_color)
-#define DEVICE_GPRINT_FLAG(_o)            (SS_GET(PG_device, _o)->gprint_flag)
-#define DEVICE_GRID(_o)                   (SS_GET(PG_device, _o)->grid)
-#define DEVICE_HARD_COPY_DEVICE(_o)       (SS_GET(PG_device, _o)->hard_copy_device)
-#define DEVICE_LINE_STYLE(_o)             (SS_GET(PG_device, _o)->line_style)
-#define DEVICE_LINE_COLOR(_o)             (SS_GET(PG_device, _o)->line_color)
-#define DEVICE_TEXT_COLOR(_o)             (SS_GET(PG_device, _o)->text_color)
-#define DEVICE_LINE_WIDTH(_o)             (SS_GET(PG_device, _o)->line_width)
-#define DEVICE_LOGICAL_OP(_o)             (SS_GET(PG_device, _o)->logical_op)
-#define DEVICE_MARK(_o)                   (SS_GET(PG_device, _o)->mark)
-#define DEVICE_MARKER(_o)                 (SS_GET(PG_device, _o)->marker)
-#define DEVICE_MODE(_o)                   (SS_GET(PG_device, _o)->mode)
-#define DEVICE_NAME(_o)                   (SS_GET(PG_device, _o)->name)
-#define DEVICE_NCOLOR(_o)                 (SS_GET(PG_device, _o)->ncolor)
-#define DEVICE_N_LINES_PAGE(_o)           (SS_GET(PG_device, _o)->n_lines_page)
-#define DEVICE_NLINES(_o)                 (SS_GET(PG_device, _o)->nlines)
-#define DEVICE_PS_COLOR(_o)               (SS_GET(PG_device, _o)->ps_color)
-#define DEVICE_QUADRANT(_o)               (SS_GET(PG_device, _o)->quadrant)
-#define DEVICE_SCATTER(_o)                (SS_GET(PG_device, _o)->scatter)
-#define DEVICE_TITLE(_o)                  (SS_GET(PG_device, _o)->title)
-#define DEVICE_TYPE_INDEX(_o)             (SS_GET(PG_device, _o)->type_index)
-#define DEVICE_TXT_RATIO(_o)              (SS_GET(PG_device, _o)->txt_ratio)
-#define DEVICE_TYPE(_o)                   (SS_GET(PG_device, _o)->type)
-#define DEVICE_VIEW_HEIGHT(_o)            (SS_GET(PG_device, _o)->view_height)
-#define DEVICE_BLACK(_o)                  (SS_GET(PG_device, _o)->BLACK)
-#define DEVICE_WHITE(_o)                  (SS_GET(PG_device, _o)->WHITE)
-#define DEVICE_GRAY(_o)                   (SS_GET(PG_device, _o)->GRAY)
-#define DEVICE_DARK_GRAY(_o)              (SS_GET(PG_device, _o)->DARK_GRAY)
-#define DEVICE_BLUE(_o)                   (SS_GET(PG_device, _o)->BLUE)
-#define DEVICE_GREEN(_o)                  (SS_GET(PG_device, _o)->GREEN)
-#define DEVICE_CYAN(_o)                   (SS_GET(PG_device, _o)->CYAN)
-#define DEVICE_RED(_o)                    (SS_GET(PG_device, _o)->RED)
-#define DEVICE_MAGENTA(_o)                (SS_GET(PG_device, _o)->MAGENTA)
-#define DEVICE_BROWN(_o)                  (SS_GET(PG_device, _o)->BROWN)
-#define DEVICE_DARK_BLUE(_o)              (SS_GET(PG_device, _o)->DARK_BLUE)
-#define DEVICE_DARK_GREEN(_o)             (SS_GET(PG_device, _o)->DARK_GREEN)
-#define DEVICE_DARK_CYAN(_o)              (SS_GET(PG_device, _o)->DARK_CYAN)
-#define DEVICE_DARK_RED(_o)               (SS_GET(PG_device, _o)->DARK_RED)
-#define DEVICE_YELLOW(_o)                 (SS_GET(PG_device, _o)->YELLOW)
-#define DEVICE_DARK_MAGENTA(_o)           (SS_GET(PG_device, _o)->DARK_MAGENTA)
 
 /* PML Extensions */
 
-#define NUMERIC_ARRAY(_o)            (SS_GET(C_array, _o))
-#define NUMERIC_ARRAY_TYPE(_o)       (SS_GET(C_array, _o)->type)
-#define NUMERIC_ARRAY_LENGTH(_o)     (SS_GET(C_array, _o)->length)
-#define NUMERIC_ARRAY_DATA(_o)       (SS_GET(C_array, _o)->data)
+#define C_ARRAY(_o)                  (SS_GET(C_array, _o))
 
 #define SET_NAME(_o)                 (SS_GET(PM_set, _o)->name)
 #define SET_ELEMENT_TYPE(_o)         (SS_GET(PM_set, _o)->element_type)
@@ -459,19 +374,8 @@
 /* PGS Types */
 
 #define SX_GRAPHP(_o)            (SS_OBJECT_TYPE(_o) == G_GRAPH)
-#define SX_IMAGEP(_o)            (SS_OBJECT_TYPE(_o) == G_IMAGE)
 #define SX_INTERFACE_OBJECTP(_o) (SS_OBJECT_TYPE(_o) == G_INTERFACE_OBJECT)
-#define SX_DEVICEP(_o)           (SS_OBJECT_TYPE(_o) == G_DEVICE)
 #define SX_DEV_ATTRIBUTESP(_o)   (SS_OBJECT_TYPE(_o) == G_DEV_ATTRIBUTES)
-
-/* PML Types */
-
-#define SX_NUMERIC_ARRAYP(_o)    (SS_OBJECT_TYPE(_o) == G_NUM_ARRAY)
-#define SX_POLYGONP(_o)          (SS_OBJECT_TYPE(_o) == G_POLYGON)
-#define SX_MAPPINGP(_o)          (SS_OBJECT_TYPE(_o) == G_MAPPING)
-
-#undef SX_SETP
-#define SX_SETP(_o)              (SS_OBJECT_TYPE(_o) == G_SET)
 
 /*--------------------------------------------------------------------------*/
 
@@ -497,14 +401,8 @@ enum e_SX_object_type
     G_PLOT_MAP,
     G_PLT_CRV,
     G_GRAPH,
-    G_DEVICE,
     G_DEV_ATTRIBUTES,
-    G_NUM_ARRAY,
-    G_POLYGON,
-    G_MAPPING,
-    G_SET,
     G_FUNCTION,
-    G_IMAGE,
     G_INTERFACE_OBJECT};
 
 typedef enum e_SX_object_type SX_object_type;
@@ -885,8 +783,6 @@ extern void
 
 extern object
  *SX_mk_graph(SS_psides *si, PG_graph *g),
- *SX_mk_image(SS_psides *si, PG_image *im),
- *SX_mk_graphics_device(SS_psides *si, PG_device *dev),
  *SX_mk_dev_attributes(SS_psides *si, PG_dev_attributes *da),
  *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype);
 
@@ -913,10 +809,7 @@ extern void
 
 extern object
  *SX_setp(object *obj),
- *SX_list_array(SS_psides *si, object *argl),
- *SX_mk_set(SS_psides *si, PM_set *set),
- *SX_mk_mapping(SS_psides *si, PM_mapping *f),
- *SX_mk_C_array(SS_psides *si, C_array *arr);
+ *SX_list_array(SS_psides *si, object *argl);
 
 
 /* SXSET.C declarations */

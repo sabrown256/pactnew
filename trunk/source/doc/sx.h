@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 08/15/2014
+MOD: 10/23/2014
 
 <CENTER>
 <P>
@@ -3251,7 +3251,7 @@ other <a href="#SXdocs">PACT documentation</a>.<p>
 <BR><I>Procedure: </I>Return a numeric array built from a list of numbers.
 <P>
 <B>pm-array?</B>
-</B><BR><I>C Information: </I>SX_NUMERIC_ARRAYP
+</B><BR><I>C Information: </I>SX_C_ARRAYP
 <BR><I>Procedure: </I>Return #t if the object is a numeric array and #f otherwise.
 <P>
 <B>pm-array-&gt;list</B>
@@ -4098,12 +4098,12 @@ They are defined by the SX_object_type enumeration<p>
 <TR><TD>G_PLOT_REQUEST</TD><TD>PANACEA PA_plot_request object type</TD></TR>
 <TR><TD>G_PLT_CRV</TD><TD>PGS curve object type</TD></TR>
 <TR><TD>G_GRAPH</TD><TD>PGS PG_graph object type</TD></TR>
-<TR><TD>G_DEVICE</TD><TD>PGS PG_device object type</TD></TR>
+<TR><TD>SX_DEVICE_I</TD><TD>PGS PG_device object type</TD></TR>
 <TR><TD>G_DEV_ATTRIBUTES</TD><TD>PGS PG_dev_attributes object type</TD></TR>
-<TR><TD>G_NUM_ARRAY</TD><TD>PML C_array object type</TD></TR>
-<TR><TD>G_MAPPING</TD><TD>PML PM_mapping object type</TD></TR>
-<TR><TD>G_SET</TD><TD>PML PM_set object type</TD></TR>
-<TR><TD>G_IMAGE</TD><TD>PGS PG_image object type</TD></TR>
+<TR><TD>SX_C_ARRAY_I</TD><TD>PML C_array object type</TD></TR>
+<TR><TD>SX_MAPPING_I</TD><TD>PML PM_mapping object type</TD></TR>
+<TR><TD>SX_SET_I</TD><TD>PML PM_set object type</TD></TR>
+<TR><TD>SX_IMAGE_I</TD><TD>PGS PG_image object type</TD></TR>
 <TR><TD>G_INTERFACE_OBJECT</TD><TD>PGS PG_interface_object object type</TD></TR>
 </TABLE>
 </BLOCKQUOTE>
@@ -4190,7 +4190,7 @@ level routines to be used by the interpreter.<p>
 <B>PML Types</B>
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD>SX_NUMERIC_ARRAYP(x)</TD><TD>TRUE iff x is a C_array object</TD></TR>
+<TR><TD>SX_C_ARRAYP(x)</TD><TD>TRUE iff x is a C_array object</TD></TR>
 <TR><TD>SX_MAPPINGP(x)</TD><TD>TRUE iff x is a PM_mapping object</TD></TR>
 <TR><TD>SX_SETP(x)</TD><TD>TRUE iff x is a PM_set object</TD></TR>
 </TABLE>
@@ -4536,174 +4536,6 @@ functionality entirely in SCHEME.<p>
 
 <a name="539625"></a>
 <h3> Array Example</h3>
-
-Here is an example illustrating the above procedure.  This is very close to
-how SX handles the PML defined C_array structure (in fact this is a simplified
-version of that code).<p>
-
-<BLOCKQUOTE>
-<PRE>#include &lt;sx.h&gt;
-
-typedef struct s_array
-   {long length;
-    char *type;
-    void *data; array;
-
-/* this is the index from step #1 */
-#define G_NUM_ARRAY         1000
-
-/* this is the predicate mentioned in step #2 */
-#define ARRAYP(obj)         (SS_OBJECT_TYPE(obj) == G_NUM_ARRAY)
-
-/* these are macros suggested by step #3 */
-#define ARRAY(obj)          SS_GET(array, obj)
-#define ARRAY_TYPE(obj)     (SS_GET(array, obj)->type)
-#define ARRAY_LENGTH(obj)   (SS_GET(array, obj)->length)
-#define ARRAY_DATA(obj)     (SS_GET(array, obj)->data)
-
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-
-/* _WR_GNUM_ARRAY - print a g_num_array
- *                - this is the function invoked by SS_OBJECT_PRINT
- *                - this is part of step #4
- */
-
-static void _wr_gnum_array(obj, strm)
-   object *obj, *strm;
-   {PRINT(SS_OUTSTREAM(strm), "&lt;ARRAY|%s&gt;", ARRAY_TYPE(obj));
-
-    return;
-
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-
-/* _RL_GNUM_ARRAY - release a g_num_array
- *                - this is the function invoked by SS_OBJECT_RELEASE
- *                - this is part of step #4
- */
-
-static void _rl_gnum_array(obj)
-   object *obj;
-   {array *arr;
-
-    arr = ARRAY(obj);
-
-    CFREE(arr->data);
-    CFREE(arr);
-
-    SS_rl_object(obj);
-
-    return;
-
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-
-/* _MK_ARRAY - encapsulate an array as an object
- *           - this is part of step #4
- */
-
-object *_mk_array(arr)
-   array *arr;
-   {object *op;
-
-    op = SS_mk_object(arr, G_NUM_ARRAY, SELF_EV, arr->type);
-    op->print   = _wr_gnum_array;
-    op->release = _rl_gnum_array;;
-
-    return(op);
-
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-
-/* ARRAYP - function version of ARRAYP macro
- *        - this is the function mentioned in step #5
- */
-
-object *arrayp(obj)
-   object *obj;
-   {return(ARRAYP(obj) ? SS_t : SS_f);
-
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-
-/* MK_ARRAY - allocate and return a array
- *          - form: (make-array <type> <size> <bpi>)
- *          - this is a step #6 function
- */
-
-static object *mk_array(argl)
-   object *argl;
-   {array *arr;
-    long size, bpi;
-    char *type, ltype[MAXLINE];
-
-    type = NULL;
-    size = 0L;
-    SS_args(argl,
-            SC_STRING_I, &type,
-            SC_LONG_I, &size,
-            SC_LONG_I, &bpi,
-            0);
-
-    arr = CMAKE(array);
-
-    snprintf(ltype, MAXLINE, "%s *", type);
-
-    arr->type   = CSTRSAVE(ltype);
-    arr->length = size;
-    arr->data   = CMAKE_N(char, size*bpi);
-
-    return(_mk_array(arr));
-
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
- 
-/* INSTALL_ARRAY_FUNCS - install some array extensions to SX
- *                     - this is step #7
- */
- 
-void install_array_funcs()
-   {
-
-/* install the fundamental array operations */
-    SS_install("array?",
-               "Return #t if the object is a numeric array, and #f otherwise",
-               SS_sargs, arrayp, SS_PR_PROC);
-
-    SS_install("make-array",
-               "Allocate and return an array of the specified type and size",
-               SS_nargs, mk_array, SS_PR_PROC);
-
-/* suggestions for other SCHEME level operations with arrays */
-
-#if 0
-    SS_install("list->array",
-               "Return a numeric array built from a list of numbers",
-               SS_nargs, list_array, SS_PR_PROC);
-
-    SS_install("array->list",
-               "Return a list of numbers built from a numeric array",
-               SS_sargs, array_list, SS_PR_PROC);
-
-    SS_install("resize-array",
-               "Reallocate the given array to the specified size",
-               SS_nargs, resz_array, SS_PR_PROC);
-
-    SS_install("array-ref",
-               "Reference the nth element of an array",
-               SS_nargs, array_ref, SS_PR_PROC);
-
-    SS_install("array-set!",
-               "Set the nth element of an array",
-               SS_nargs, array_set, SS_PR_PROC);
-
-    SS_install("array-length",
-               "Return the length of the given numeric array",
-               SS_sargs, num_arr_len, SS_PR_PROC);
-#endif
-
-    return;
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/

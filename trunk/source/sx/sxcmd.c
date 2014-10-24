@@ -203,28 +203,6 @@ static object *SXI_mapping_ref(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_MK_MAPPING - the C level function that creates a new mapping object */
-
-object *_SX_mk_mapping(PM_mapping *f, g_file *po)
-   {
-
-/* be sure to make a copy of the data */
-
-    return(SS_null);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_RL_MAPPING - release a mapping object */
-
-object *SX_rl_mapping(char *s)
-   {
-
-    return(SS_null);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SX_INIT_MAPPINGS - initialize the mapping data and references */
 
 void SX_init_mappings(SS_psides *si)
