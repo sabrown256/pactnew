@@ -33,7 +33,7 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
         PRINT(stdout, "  Number of parameters: %d\n", pck->n_param);
         PRINT(stdout, "  Number of names: %d\n\n", pck->n_ascii);}
 
-    else if (SX_PANVARP(obj))
+    else if (SX_VARIABLEP(obj))
        {pp = SS_GET(PA_variable, obj);
         if (pp->data != NULL)
            {ep = pp->desc;
@@ -91,7 +91,7 @@ static object *_SX_desc_pan_variable(SS_psides *si, object *obj)
 
     pp = NULL;
     SS_args(si, obj,
-            G_PANVAR, &pp,
+            SX_VARIABLE_I, &pp,
             0);
 
     if (pp == NULL)
@@ -214,7 +214,7 @@ static object *_SX_desc_pan_package(SS_psides *si, object *obj)
 
     pck = NULL;
     SS_args(si, obj,
-            G_PACKAGE, &pck,
+            SX_PACKAGE_I, &pck,
             0);
 
     if (pck == NULL)
@@ -257,7 +257,7 @@ object *_SXI_desc_pan(SS_psides *si, object *obj)
     if (SX_PACKAGEP(obj))
        _SX_desc_pan_package(si, obj);
 
-    else if (SX_PANVARP(obj))
+    else if (SX_VARIABLEP(obj))
        _SX_desc_pan_variable(si, obj);
 
     else

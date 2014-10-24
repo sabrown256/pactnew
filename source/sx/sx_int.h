@@ -271,6 +271,7 @@ extern void
 /* SXGRI.C declarations */
 
 extern void
+ *_SX_opt_PG_interface_object(PG_interface_object *x, bind_opt wh, void *a),
  _SX_install_pgs_iob(SS_psides *si);
 
 
@@ -326,9 +327,7 @@ extern void
 
 extern object
  *_SX_mk_gpdbdata(SS_psides *si, char *name,
-		  void *data, syment *ep, PDBfile *file),
- *_SX_mk_gsyment(SS_psides *si, syment *ep),
- *_SX_mk_gdefstr(SS_psides *si, defstr *dp);
+		  void *data, syment *ep, PDBfile *file);
 
 extern g_file
  *_SX_mk_file(char *name, char *type, void *file),
@@ -340,6 +339,15 @@ extern g_pdbdata
 extern void
  _SX_free_menu(g_file *po, int re),
  _SX_rel_open_file(SS_psides *si, g_file *po);
+
+
+/* SXPAN.C declarations */
+
+extern void
+ *_SX_opt_PA_package(PA_package *x, bind_opt wh, void *a),
+ *_SX_opt_PA_variable(PA_variable *x, bind_opt wh, void *a),
+ *_SX_opt_PA_src_variable(PA_src_variable *x, bind_opt wh, void *a),
+ *_SX_opt_PA_iv_specification(PA_iv_specification *x, bind_opt wh, void *a);
 
 
 /* SXPANW.C declarations */
@@ -358,6 +366,8 @@ extern int
 extern void
  *_SX_opt_hasharr(hasharr *x, bind_opt wh, void *a),
  *_SX_opt_PDBfile(PDBfile *x, bind_opt wh, void *a),
+ *_SX_opt_syment(syment *x, bind_opt wh, void *a),
+ *_SX_opt_defstr(defstr *x, bind_opt wh, void *a),
  _SX_type_container(char *dtype, char *stype);
 
 extern object
@@ -422,7 +432,9 @@ extern SX_menu_item
 extern void
  *_SX_opt_PG_device(PG_device *x, bind_opt wh, void *a),
  *_SX_opt_PG_palette(PG_palette *x, bind_opt wh, void *a),
- *_SX_opt_PG_image(PG_image *x, bind_opt wh, void *a);
+ *_SX_opt_PG_image(PG_image *x, bind_opt wh, void *a),
+ *_SX_opt_PG_graph(PG_graph *x, bind_opt wh, void *a),
+ *_SX_opt_PG_dev_attributes(PG_dev_attributes *x, bind_opt wh, void *a);
 
 
 /* SXPML.C declarations */

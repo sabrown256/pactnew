@@ -29,16 +29,7 @@ void *_SX_opt_hasharr(hasharr *x, bind_opt wh, void *a)
 
     rv = NULL;
     switch (wh)
-       {case BIND_LABEL :
-	     break;
-
-        case BIND_ALLOC :
-	     break;
-
-        case BIND_FREE :
-	     break;
-
-        case BIND_ARG :
+       {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_HASHARRP(o))
 	        rv = (void *) SS_GET(hasharr, o);
@@ -46,7 +37,11 @@ void *_SX_opt_hasharr(hasharr *x, bind_opt wh, void *a)
 	        rv = _SX.unresolved;
 	     break;
 
-	default:
+	case BIND_LABEL :
+	case BIND_PRINT :
+        case BIND_ALLOC :
+        case BIND_FREE :
+        default:
 	     break;};
 
     return(rv);}
@@ -62,16 +57,7 @@ void *_SX_opt_PDBfile(PDBfile *x, bind_opt wh, void *a)
 
     rv = NULL;
     switch (wh)
-       {case BIND_LABEL :
-	     break;
-
-        case BIND_ALLOC :
-	     break;
-
-        case BIND_FREE :
-	     break;
-
-        case BIND_ARG :
+       {case BIND_ARG :
 	     o = (object *) a;
 	     if (SS_nullobjp(o) || SX_FILEP(o))
 	        {rv = (void *) SX_gs.gvif;
@@ -87,7 +73,76 @@ void *_SX_opt_PDBfile(PDBfile *x, bind_opt wh, void *a)
 	        rv = _SX.unresolved;
 	     break;
 
-	default:
+	case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+	     break;
+
+        case BIND_ALLOC :
+        case BIND_FREE :
+        default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_SYMENT - handle BLANG binding related operations */
+
+void *_SX_opt_syment(syment *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_SYMENTP(o))
+	        rv = (void *) SS_GET(syment, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->type;
+	     break;
+
+        case BIND_ALLOC :
+        case BIND_FREE :
+        default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_DEFSTR - handle BLANG binding related operations */
+
+void *_SX_opt_defstr(defstr *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_DEFSTRP(o))
+	        rv = (void *) SS_GET(defstr, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->type;
+	     break;
+
+        case BIND_ALLOC :
+        case BIND_FREE :
+        default:
 	     break;};
 
     return(rv);}
@@ -1409,31 +1464,29 @@ object *_SX_pdbdata_to_list(SS_psides *si, char *name, void *vr,
  */
 
 static object *_SXI_pdb_to_list(SS_psides *si, object *arg)
-   {object *obj;
+   {int ity;
+    object *obj;
     g_pdbdata *pp;
 
-    switch (SS_OBJECT_TYPE(arg))
-       {default     :
-        case G_FILE :
-	     if (SX_ipdbfilep(arg))
-	        obj = _SX_pdbfile_to_list(si, FILE_STREAM(PDBfile, arg));
-	     else
-	        obj = _SX_pdbfile_to_list(si, SX_gs.vif);
-	     break;
-        case G_DEFSTR :
-	     obj = _SX_defstr_to_list(si, SS_GET(defstr, arg));
-	     break;
-        case G_SYMENT :
-	     obj = _SX_syment_to_list(si, SS_GET(syment, arg));
-             break;
-        case G_MEMDES :
-	     obj = _SX_memdes_to_list(si, SS_GET(memdes, arg));
-             break;
-        case G_PDBDATA :
-	     pp = SS_GET(g_pdbdata, arg);
-	     obj = _SX_pdbdata_to_list(si, pp->name, pp->data,
-				       pp->ep, pp->file);
-             break;};
+    ity = SS_OBJECT_TYPE(arg);
+    if (ity == SX_SYMENT_I)
+       obj = _SX_syment_to_list(si, SS_GET(syment, arg));
+
+    else if (ity == SX_DEFSTR_I)
+       obj = _SX_defstr_to_list(si, SS_GET(defstr, arg));
+
+    else if (ity == G_MEMDES)
+       obj = _SX_memdes_to_list(si, SS_GET(memdes, arg));
+
+    else if (ity == G_PDBDATA)
+       {pp  = SS_GET(g_pdbdata, arg);
+	obj = _SX_pdbdata_to_list(si, pp->name, pp->data,
+				  pp->ep, pp->file);}
+    else if (SX_ipdbfilep(arg))
+       obj = _SX_pdbfile_to_list(si, FILE_STREAM(PDBfile, arg));
+
+    else
+       obj = _SX_pdbfile_to_list(si, SX_gs.vif);
 
     return(obj);}
 
@@ -1939,7 +1992,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
         dp = PD_defloat(file, name, bpi, align, ordr,
                         expb, mantb, sbs, sbe, sbm, hmb, bias);};
 
-    rv = _SX_mk_gdefstr(si, dp);
+    rv = SX_make_defstr(si, dp);
 
     return(rv);}
 
@@ -2032,7 +2085,7 @@ static object *_SXI_read_defstr(SS_psides *si, object *argl)
     if (dp == NULL)
        SS_error(si, "BAD TYPE - _SXI_READ_DEFSTR", argl);
 
-    o = _SX_mk_gdefstr(si, dp);
+    o = SX_make_defstr(si, dp);
 
     return(o);}
 
@@ -2053,7 +2106,7 @@ static object *_SXI_write_defstr(SS_psides *si, object *argl)
     dp = NULL;
     SS_args(si, argl,
             G_FILE, &po,
-            G_DEFSTR, &dp,
+            SX_DEFSTR_I, &dp,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -2167,7 +2220,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
 
     dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
 			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
-    o  = _SX_mk_gdefstr(si, dp);
+    o  = SX_make_defstr(si, dp);
 
     return(o);}
 
@@ -2199,7 +2252,7 @@ static object *_SXI_make_typedef(SS_psides *si, object *argl)
     else
        file = FILE_FILE(PDBfile, po);
 
-    o = _SX_mk_gdefstr(si, PD_typedef(file, otype, ntype));
+    o = SX_make_defstr(si, PD_typedef(file, otype, ntype));
 
     return(o);}
 
@@ -2383,7 +2436,7 @@ static object *_SXI_rd_syment(SS_psides *si, object *argl)
  *         the error case above does not count!
  */
 
-    o = _SX_mk_gsyment(si, ep);
+    o = SX_make_syment(si, ep);
 
     return(o);}
 
@@ -2489,7 +2542,7 @@ static object *_SXI_wr_syment(SS_psides *si, object *argl)
 
     _PD_block_switch(ep, bl);
 
-    o = _SX_mk_gsyment(si, ep);
+    o = SX_make_syment(si, ep);
 
     return(o);}
 
@@ -3134,7 +3187,7 @@ static object *_SXI_sizeof(SS_psides *si, object *argl)
 /* _SX_WRITE_PDB - display/write content of a pdb object */
 
 static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
-   {int n, sid;
+   {int n, sid, ity;
     char typ[MAXLINE];
     long *ind;
     void *d;
@@ -3149,44 +3202,39 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
        {obj  = argl;
 	argl = SS_null;};
 
-    switch (SS_OBJECT_TYPE(obj))
-       {default     :
-	case G_FILE :
-             if (SX_ipdbfilep(obj))
-                PD_write_extras(f0, FILE_STREAM(PDBfile, obj));
-	     else
-	        PD_write_extras(f0, SX_gs.vif);
-             break;
+    ity = SS_OBJECT_TYPE(obj);
+    if (ity == SX_SYMENT_I)
+       PD_write_syment(f0, SS_GET(syment, obj));
 
-        case G_DEFSTR :
-             PD_write_defstr(f0, SS_GET(defstr, obj));
-             break;
+    else if (ity == SX_DEFSTR_I)
+       PD_write_defstr(f0, SS_GET(defstr, obj));
 
-        case G_SYMENT :
-             PD_write_syment(f0, SS_GET(syment, obj));
-             break;
+    else if (ity == G_PDBDATA)
+       {pp   = SS_GET(g_pdbdata, obj);
+	iarr = NULL;
+	SS_args(si, argl,
+		SC_INT_I, &_SC.types.max_digits,
+		SX_C_ARRAY_I, &iarr,
+		0);
 
-        case G_PDBDATA :
-             pp   = SS_GET(g_pdbdata, obj);
-	     iarr = NULL;
-	     SS_args(si, argl,
-		     SC_INT_I, &_SC.types.max_digits,
-		     SX_C_ARRAY_I, &iarr,
-		     0);
+	n   = 0;
+	ind = NULL;
+	if (iarr != NULL)
+	   {PM_ARRAY_CONTENTS(iarr, void, n, typ, d);
+	    sid = SC_type_id(typ, FALSE);
+	    ind = SC_convert_id(SC_LONG_I, NULL, 0, 1,
+				sid, d, 0, 1, n, FALSE);};
 
-	     n   = 0;
-	     ind = NULL;
-	     if (iarr != NULL)
-	        {PM_ARRAY_CONTENTS(iarr, void, n, typ, d);
-		 sid = SC_type_id(typ, FALSE);
-		 ind = SC_convert_id(SC_LONG_I, NULL, 0, 1,
-				     sid, d, 0, 1, n, FALSE);};
+	PD_write_entry(f0,
+		       pp->file, pp->name,
+		       pp->data, pp->ep,
+		       n, ind);}
 
-             PD_write_entry(f0,
-                            pp->file, pp->name,
-                            pp->data, pp->ep,
-			    n, ind);
-             break;};
+    else if (SX_ipdbfilep(obj))
+       PD_write_extras(f0, FILE_STREAM(PDBfile, obj));
+
+    else
+       PD_write_extras(f0, SX_gs.vif);
 
     return(SS_f);}
 

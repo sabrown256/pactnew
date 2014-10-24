@@ -53,7 +53,7 @@ object *SX_display_map(SS_psides *si, object *mo)
 	g  = PG_make_graph_from_mapping(h,
 					SC_PCONS_P_S, NULL,
 					1, NULL);
-	mo = SX_mk_graph(si, g);
+	mo = SX_make_pg_graph(si, g);
 
 	SS_mark(mo);
 	SS_call_scheme(si, "display-mapping*",

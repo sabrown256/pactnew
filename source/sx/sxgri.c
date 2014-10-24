@@ -13,47 +13,36 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_WR_GIOB - print a g_interface_object */
+/* _SX_OPT_PG_INTERFACE_OBJECT - handle BLANG binding related operations */
 
-static void _SX_wr_giob(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<INTERFACE_OBJECT|%s>",
-                              INTERFACE_OBJECT_NAME(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GIOB - gc a interface_object */
-
-static void _SX_rl_giob(SS_psides *si, object *obj)
+void *_SX_opt_PG_interface_object(PG_interface_object *x, bind_opt wh, void *a)
    {int rc;
-    PG_interface_object *iob;
+    void *rv;
 
-    iob = INTERFACE_OBJECT(obj);
-    rc  = SC_mark(iob, -1);
-    if (rc < 1)
-       SX_rem_iob(iob, TRUE);
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     break;
 
-    SS_rl_object(si, obj);
+        case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+             break;
 
-    return;}
+        case BIND_FREE :
+	     rc = SC_mark(x, -1);
+	     if (rc < 1)
+	        SX_rem_iob(x, TRUE);
+             break;
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+        case BIND_ALLOC :
+	     SC_mark(x, 1);
+             break;
 
-/* _SX_MK_IOB - encapsulate a PG_interface_object as an object */
+	default:
+	     break;};
 
-static object *_SX_mk_iob(SS_psides *si, PG_interface_object *iob)
-   {object *op;
-
-    op = SS_mk_object(si, iob, G_INTERFACE_OBJECT, SELF_EV, iob->name,
-		      _SX_wr_giob, _SX_rl_giob);
-    SC_mark(iob, 1);
-
-    return(op);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -333,7 +322,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
     iob = _SX_add_text_ann(dev, ndc, s, &td);
 
     if (iob != NULL)
-       rv = _SX_mk_iob(si, iob);
+       rv = SX_make_pg_interface_object(si, iob);
 
     return(rv);}
 

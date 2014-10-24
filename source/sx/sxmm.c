@@ -92,62 +92,6 @@ object *_SX_mk_gpdbdata(SS_psides *si, char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_WR_GSYMENT - print a g_syment */
-
-static void _SX_wr_gsyment(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<SYMENT|%s>", SYMENT_TYPE(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_MK_GSYMENT - encapsulate a syment as an object */
-
-object *_SX_mk_gsyment(SS_psides *si, syment *ep)
-   {object *op;
-
-    if (ep == NULL)
-       return(SS_null);
-
-    op = SS_mk_object(si, ep, G_SYMENT, SELF_EV, ep->type,
-		      _SX_wr_gsyment, SS_rl_object);
-
-    return(op);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GDEFSTR - print a g_defstr */
-
-static void _SX_wr_gdefstr(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<DEFSTR|%s>", DEFSTR_TYPE(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_MK_GDEFSTR - encapsulate a defstr as an object */
-
-object *_SX_mk_gdefstr(SS_psides *si, defstr *dp)
-   {object *op;
-
-    if (dp == NULL)
-       return(SS_null);
-
-    op = SS_mk_object(si, dp, G_DEFSTR, SELF_EV, dp->type,
-		      _SX_wr_gdefstr, SS_rl_object);
-
-    return(op);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SX_WR_GFILE - print a g_file */
 
 static void _SX_wr_gfile(SS_psides *si, object *obj, object *strm)

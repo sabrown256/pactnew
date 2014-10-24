@@ -24,7 +24,6 @@ static char
 
 void _SX_args(SS_psides *si, object *obj, void *v, int type)
    {void **pv;
-    char *s;
     pcons *alst;
     void *(*f)(SS_psides *si, object *o);
 
@@ -41,89 +40,25 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
     if (f != NULL)
        *pv = f(si, obj);
 
-    else
-       {switch (type)
-
 /* G_FILE is for any file object wrapped in a g_file */
-	   {case G_FILE :
-	         if (!SS_nullobjp(obj) && !SX_FILEP(obj))
-		    SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
+    else if (type == G_FILE)
+       {if (!SS_nullobjp(obj) && !SX_FILEP(obj))
+	   SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
 
-		 if (SS_nullobjp(obj))
-		    *pv = (void *) SX_gs.gvif;
-		 else
-		    *pv = (void *) SS_GET(g_file, obj);
-		 break;
+	if (SS_nullobjp(obj))
+	   *pv = (void *) SX_gs.gvif;
+	else
+	   *pv = (void *) SS_GET(g_file, obj);}
 
-/* G_PDBFILE is specifically for a PDBfile - used in generated wrappers */
-	    case G_PDBFILE :
-	         if (!SS_nullobjp(obj) && !SX_FILEP(obj))
-		    SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
+    else if (type == G_PDBDATA)
+       {if (!SX_PDBDATAP(obj))
+	   SS_error(si, "NOT PDBDATA OBJECT - _SX_ARGS", obj);
 
-		 *pv = (void *) SX_gs.gvif;
-		 if (!SS_nullobjp(obj))
-		    {g_file *gf;
-             
-		      gf = (g_file *) SS_GET(g_file, obj);
-		      if (gf != NULL)
-			 *pv = (void *) gf->file;};
-		 break;
+	*pv = (void *) SS_GET(g_pdbdata, obj);}
 
-	    case G_GRAPH :
-	         if (SX_GRAPHP(obj))
-		    *pv = (void *) SS_GET(PG_graph, obj);
-		 else
-		    SS_error(si, "OBJECT NOT PG_GRAPH - _SX_ARGS", obj);
-		 break;
-
-	    case G_PACKAGE :
-	         if (!SX_PACKAGEP(obj))
-		    {s   = SS_get_string(obj);
-		     *pv = (void *) PA_INQUIRE_VARIABLE(s);
-		     if (pv == NULL)
-		        SS_error(si, "BAD PACKAGE - _SX_ARGS", obj);}
-		 else
-		    *pv = (void *) SS_GET(PA_package, obj);
-		 break;
-
-	    case G_PANVAR :
-	         if (!SX_PANVARP(obj))
-		    {s   = CSTRSAVE(SS_get_string(obj));
-		     *pv = (void *) PA_INQUIRE_VARIABLE(s);
-		     if (pv == NULL)
-		        SS_error(si, "NOT PANACEA VARIABLE - _SX_ARGS",
-				 obj);}
-		 else
-		    *pv = (void *) SS_GET(PA_variable, obj);
-		 break;
-
-	    case G_PDBDATA :
-	         if (!SX_PDBDATAP(obj))
-		    SS_error(si, "NOT PDBDATA OBJECT - _SX_ARGS", obj);
-
-		 *pv = (void *) SS_GET(g_pdbdata, obj);
-		 break;
-
-	    case G_DEFSTR :
-	         if (!SX_DEFSTRP(obj))
-		    SS_error(si, "NOT DEFSTR OBJECT - _SX_ARGS", obj);
-
-		 *pv = (void *) SS_GET(defstr, obj);
-		 break;
-
-	    case G_SYMENT   :
-	    case G_PLOT_MAP :
-	    case G_PLT_CRV  :
-	    case G_FUNCTION :
-
-	    case G_DEV_ATTRIBUTES   :
-	    case G_SOURCE_VARIABLE  :
-	    case G_IV_SPECIFICATION :
-	    case G_PLOT_REQUEST     :
-
-	    default :
-                 SS_error(si, "BAD TYPE - _SX_ARGS",
-			  SS_mk_integer(si, type));};};
+    else
+       SS_error(si, "BAD TYPE - _SX_ARGS",
+		SS_mk_integer(si, type));
 
     return;}
 
@@ -144,53 +79,15 @@ object *_SX_call_args(SS_psides *si, int type, void *v)
     if (f != NULL)
        obj = f(si, v);
 
+    else if (type == G_FILE)
+       {if (v == NULL)
+	   obj = SX_gs.ovif;
+	else
+	   obj = SX_mk_gfile(si, (g_file *) v);}
+
     else
-       {switch (type)
-	   {case G_FILE :
-	         if (v == NULL)
-		    obj = SX_gs.ovif;
-		 else
-		    obj = SX_mk_gfile(si, (g_file *) v);
-		 break;
-
-	    case G_GRAPH :
-	         if (v != NULL)
-		    obj = SX_mk_graph(si, (PG_graph *) v);
-		 break;
-
-	    case G_PACKAGE :
-	         if (v != NULL)
-		    obj = SX_mk_package(si, (PA_package *) v);
-		 break;
-
-	    case G_PANVAR :
-	         if (v != NULL)
-		    obj = SX_mk_variable(si, (PA_variable *) v);
-		 break;
-
-	    case G_DEFSTR :
-	         if (v != NULL)
-		    obj = _SX_mk_gdefstr(si, (defstr *) v);
-		 break;
-
-	    case G_SYMENT :
-	         if (v != NULL)
-		    obj = _SX_mk_gsyment(si, (syment *) v);
-		 break;
-
-	    case G_PDBDATA  :
-	    case G_PLOT_MAP :
-	    case G_PLT_CRV  :
-	    case G_FUNCTION :
-
-	    case G_DEV_ATTRIBUTES   :
-	    case G_SOURCE_VARIABLE  :
-	    case G_IV_SPECIFICATION :
-	    case G_PLOT_REQUEST     :
-
-	    default                 :
-                 SS_error(si, "BAD TYPE - _SX_CALL_ARGS",
-			  SS_mk_integer(si, type));};};
+       SS_error(si, "BAD TYPE - _SX_CALL_ARGS",
+		SS_mk_integer(si, type));
 
     return(obj);}
 

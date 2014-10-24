@@ -101,7 +101,7 @@
 		(synonym describe*               describe_))
 	    (synonym pa-iv-specification?        pa_iv_specificationp)
 	    (synonym pa-package?                 pa_packagep)
-	    (synonym pa-source-variable?         pa_source_variablep)
+	    (synonym pa-src-variable?            pa_src_variablep)
 	    (synonym pa-variable?                pa_variablep)
 	    (synonym pa-variable->pm-array       pa_variable_to_pm_array)
 	    (synonym defstr?                     defstrp)

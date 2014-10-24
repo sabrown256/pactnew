@@ -36,7 +36,15 @@ void *_SX_opt_PG_device(PG_device *x, bind_opt wh, void *a)
 
     rv = NULL;
     switch (wh)
-       {case BIND_LABEL :
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_DEVICEP(o))
+	        rv = (void *) SS_GET(PG_device, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+        case BIND_LABEL :
 	     snprintf(nm, BFSML, "%s,%s,%s", x->name, x->type, x->title);
 	     rv = CSTRSAVE(nm);
 	     break;
@@ -47,19 +55,7 @@ void *_SX_opt_PG_device(PG_device *x, bind_opt wh, void *a)
 	     break;
 
         case BIND_ALLOC :
-	     break;
-
         case BIND_FREE :
-	     break;
-
-        case BIND_ARG :
-	     o = (object *) a;
-	     if (SX_DEVICEP(o))
-	        rv = (void *) SS_GET(PG_device, o);
-	     else
-	        rv = _SX.unresolved;
-	     break;
-
 	default:
 	     break;};
 
@@ -76,18 +72,7 @@ void *_SX_opt_PG_image(PG_image *x, bind_opt wh, void *a)
 
     rv = NULL;
     switch (wh)
-       {case BIND_LABEL :
-        case BIND_PRINT :
-	     rv = x->label;
-	     break;
-
-        case BIND_ALLOC :
-	     break;
-
-        case BIND_FREE :
-	     break;
-
-        case BIND_ARG :
+       {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_IMAGEP(o))
 	        rv = (void *) SS_GET(PG_image, o);
@@ -95,6 +80,13 @@ void *_SX_opt_PG_image(PG_image *x, bind_opt wh, void *a)
 	        rv = _SX.unresolved;
 	     break;
 
+        case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->label;
+	     break;
+
+        case BIND_ALLOC :
+        case BIND_FREE :
 	default:
 	     break;};
 
@@ -111,16 +103,7 @@ void *_SX_opt_PG_palette(PG_palette *x, bind_opt wh, void *a)
 
     rv = NULL;
     switch (wh)
-       {case BIND_LABEL :
-	     break;
-
-        case BIND_ALLOC :
-	     break;
-
-        case BIND_FREE :
-	     break;
-
-        case BIND_ARG :
+       {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_PALETTEP(o))
 	        rv = (void *) SS_GET(PG_palette, o);
@@ -128,6 +111,79 @@ void *_SX_opt_PG_palette(PG_palette *x, bind_opt wh, void *a)
 	        rv = _SX.unresolved;
 	     break;
 
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_ALLOC :
+        case BIND_FREE :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PG_GRAPH - handle BLANG binding related operations */
+
+void *_SX_opt_PG_graph(PG_graph *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+    static char nm[BFSML];
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_GRAPHP(o))
+	        rv = SS_GET(PG_graph, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+        case BIND_LABEL :
+             snprintf(nm, BFSML, "%c", x->identifier);
+	     rv = CSTRSAVE(nm);
+	     break;
+
+        case BIND_PRINT :
+             snprintf(nm, BFSML, "%c", x->identifier);
+	     rv = nm;
+	     break;
+
+        case BIND_FREE :
+
+/* GOTCHA: don't know if it is safe to GC the mapping or its sets */
+	     if (x->info != NULL)
+	        CFREE(x->info);
+	     CFREE(x);
+	     break;
+
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PG_DEV_ATTRIBUTES - handle BLANG binding related operations */
+
+void *_SX_opt_PG_dev_attributes(PG_dev_attributes *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     break;
+
+        case BIND_FREE :
+	     CFREE(x);
+	     break;
+
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_ALLOC :
 	default:
 	     break;};
 
@@ -189,7 +245,7 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
     po   = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_GRAPH, &g,
+            SX_GRAPH_I, &g,
             G_FILE, &po,
             SC_STRING_I, &name,
             0);
@@ -317,7 +373,7 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
     if (_SX.ig > 'Z')
        _SX.ig = 'A';
 
-    o = SX_mk_graph(si, g);
+    o = SX_make_pg_graph(si, g);
 
     return(o);}
 
@@ -355,7 +411,7 @@ static object *_SX_pdbcurve_graph(SS_psides *si, PDBfile *file,
     if (_SX.icg > 1000)
        _SX.icg = 1;
 
-    o = SX_mk_graph(si, g);
+    o = SX_make_pg_graph(si, g);
 
     return(o);}
 
@@ -439,90 +495,6 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
                 SS_mk_string(si, name));
 
     return(SS_null);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GGRAPH - print a g_graph */
-
-static void _SX_wr_ggraph(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<GRAPH|%c>", GRAPH_IDENTIFIER(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GGRAPH - gc a graph */
-
-static void _SX_rl_ggraph(SS_psides *si, object *obj)
-   {PG_graph *g;
-
-    g = SS_GET(PG_graph, obj);
-    if (g->info != NULL)
-       CFREE(g->info);
-    CFREE(g);
-
-/* GOTCHA: don't know if it is safe to GC the mapping or its sets */
-
-    SS_rl_object(si, obj);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_GRAPH - encapsulate a PG_graph as an object */
-
-object *SX_mk_graph(SS_psides *si, PG_graph *g)
-   {object *op;
-
-    op = SS_mk_object(si, g, G_GRAPH, SELF_EV, g->f->name,
-		      _SX_wr_ggraph, _SX_rl_ggraph);
-
-    return(op);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GDEV_ATTR - print a g_dev_attributes */
-
-static void _SX_wr_gdev_attr(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<DEV_ATTRIBUTES>");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GDEV_ATTR - gc a dev_attributes */
-
-static void _SX_rl_gdev_attr(SS_psides *si, object *obj)
-   {PG_dev_attributes *da;
-
-    da = SS_GET(PG_dev_attributes, obj);
-    CFREE(da);
-
-    SS_rl_object(si, obj);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_DEV_ATTRIBUTES - encapsulate a PG_dev_attributes as an object */
-
-object *SX_mk_dev_attributes(SS_psides *si, PG_dev_attributes *da)
-   {object *op;
-
-    op = SS_mk_object(si, da, G_DEV_ATTRIBUTES, SELF_EV, NULL,
-		      _SX_wr_gdev_attr, _SX_rl_gdev_attr);
-
-    return(op);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1224,7 +1196,7 @@ static object *_SXI_make_pgs_graph(SS_psides *si, object *argl)
 			 "EXISTENCE", SC_CHAR_I, TRUE, emap,
 			 NULL);
 
-    o = SX_mk_graph(si, g);
+    o = SX_make_pg_graph(si, g);
 
     return(o);}
 
@@ -1924,7 +1896,7 @@ static object *_SXI_set_attr_graph(SS_psides *si, object *argl)
     type = NULL;
     val  = SS_null;
     SS_args(si, argl,
-            G_GRAPH, &g,
+            SX_GRAPH_I, &g,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
             SS_OBJECT_I, &val,
@@ -2616,10 +2588,10 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "next") == 0)
        {h = g->next;
 	if (val != NULL)
-           {SS_args(si, val, G_GRAPH, &h);
+           {SS_args(si, val, SX_GRAPH_I, &h);
 	    g->next = h;};
 
-	ret = SX_mk_graph(si, h);}
+	ret = SX_make_pg_graph(si, h);}
 
     else if (strcmp(name, "f") == 0)
        {f = g->f;

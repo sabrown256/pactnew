@@ -543,6 +543,8 @@ struct s_PG_axis_def
 
 /* GRAPH - contains the information necessary to display a list of functions
  *       - in some fashion
+ *
+ * #bind derived PG_graph character-A SX_GRAPH_I PyObject NULL
  */
 
 struct s_PG_graph
@@ -613,6 +615,7 @@ struct s_RGB_color_map
 /*--------------------------------------------------------------------------*/
 
 /* palette structure
+ *
  * #bind derived PG_palette character-A SC_STRING_I PyObject NULL
  */
 
@@ -680,6 +683,11 @@ struct s_PG_curve
     double ry_origin;};
 
 /*--------------------------------------------------------------------------*/
+
+/* PG_INTERFACE_OBJECT
+ *
+ * #bind derived PG_interface_object character-A SX_INTERFACE_OBJEC_I PyObject NULL
+ */
 
 struct s_PG_interface_object
    {PG_device *device;
@@ -1074,6 +1082,11 @@ struct s_PG_view_attributes
     double view_x[PG_BOXSZ];};
 
 /*--------------------------------------------------------------------------*/
+
+/* PG_DEV_ATTRIBUTES
+ *
+ * #bind derived PG_dev_attributes character-A SX_DEV_ATTRIBUTES_I PyObject NULL
+ */
 
 struct s_PG_dev_attributes
    {bool clipping;
