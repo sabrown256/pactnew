@@ -706,7 +706,11 @@ struct s_symindir
 	    "long arr_offs",              \
             LAST)
 
-/* symbol table entry */
+/* symbol table entry
+ *
+ * #bind derived syment character-A SX_SYMENT_I PyObject NULL
+ */
+
 struct s_syment
    {char *type;
     dimdes *dimensions;
@@ -725,7 +729,11 @@ struct s_syment
               "SC_array *blocks",          \
               LAST)
 
-/* structure chart entry */
+/* structure chart entry
+ *
+ * #bind derived defstr character-A SX_DEFSTR_I PyObject NULL
+ */
+
 struct s_defstr
    {char *type;
     PD_type_kind kind;

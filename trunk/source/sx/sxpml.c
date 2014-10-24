@@ -23,7 +23,17 @@ void *_SX_opt_C_array(C_array *x, bind_opt wh, void *a)
 
     rv = NULL;
     switch (wh)
-       {case BIND_LABEL :
+       {case BIND_ARG :
+	     o = (object *) a;
+             if (SS_nullobjp(o))
+                rv = NULL;
+	     else if (SX_C_ARRAYP(o))
+	        rv = (void *) SS_GET(C_array, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	case BIND_LABEL :
         case BIND_PRINT :
 	     rv = x->type;
 	     break;
@@ -44,17 +54,7 @@ void *_SX_opt_C_array(C_array *x, bind_opt wh, void *a)
  */
 	     break;
 
-        case BIND_ARG :
-	     o = (object *) a;
-             if (SS_nullobjp(o))
-                rv = NULL;
-	     else if (SX_C_ARRAYP(o))
-	        rv = (void *) SS_GET(C_array, o);
-	     else
-	        rv = _SX.unresolved;
-	     break;
-
-	default:
+        default:
 	     break;};
 
     return(rv);}
@@ -71,7 +71,15 @@ void *_SX_opt_PM_polygon(PM_polygon *x, bind_opt wh, void *a)
 
     rv = NULL;
     switch (wh)
-       {case BIND_LABEL :
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_POLYGONP(o))
+	        rv = SS_GET(PM_polygon, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	case BIND_LABEL :
              snprintf(nm, BFSML, "%ld", (long) x->nn);
 	     rv = CSTRSAVE(nm);
 	     break;
@@ -90,15 +98,7 @@ void *_SX_opt_PM_polygon(PM_polygon *x, bind_opt wh, void *a)
 	     PM_free_polygon(x);
 	     break;
 
-        case BIND_ARG :
-	     o = (object *) a;
-	     if (SX_POLYGONP(o))
-	        rv = (void *) SS_GET(PM_polygon, o);
-	     else
-	        rv = _SX.unresolved;
-	     break;
-
-	default:
+        default:
 	     break;};
 
     return(rv);}
@@ -114,18 +114,7 @@ void *_SX_opt_PM_set(PM_set *x, bind_opt wh, void *a)
 
     rv = NULL;
     switch (wh)
-       {case BIND_LABEL :
-        case BIND_PRINT :
-	     rv = x->name;
-	     break;
-
-        case BIND_ALLOC :
-	     break;
-
-        case BIND_FREE :
-	     break;
-
-        case BIND_ARG :
+       {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_SETP(o))
 	        rv = (void *) SS_GET(PM_set, o);
@@ -133,6 +122,13 @@ void *_SX_opt_PM_set(PM_set *x, bind_opt wh, void *a)
 	        rv = _SX.unresolved;
 	     break;
 
+        case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+	     break;
+
+        case BIND_ALLOC :
+        case BIND_FREE :
 	default:
 	     break;};
 
@@ -149,19 +145,7 @@ void *_SX_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
 
     rv = NULL;
     switch (wh)
-       {case BIND_LABEL :
-        case BIND_PRINT :
-	     rv = x->name;
-	     break;
-
-        case BIND_ALLOC :
-	     break;
-
-        case BIND_FREE :
-	     PM_rel_mapping(x, TRUE, TRUE);
-	     break;
-
-        case BIND_ARG :
+       {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_GRAPHP(o))
 	        rv = SS_GET(PG_graph, o)->f;
@@ -171,6 +155,16 @@ void *_SX_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
 	        rv = _SX.unresolved;
 	     break;
 
+        case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+	     break;
+
+        case BIND_FREE :
+	     PM_rel_mapping(x, TRUE, TRUE);
+	     break;
+
+        case BIND_ALLOC :
 	default:
 	     break;};
 

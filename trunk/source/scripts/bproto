@@ -137,7 +137,10 @@ Note $Log ""
       endif
    end
 
-   if (-f $d.h) then
+# GOTCHA: exception for panace.h - the only one whose
+# name is not the same as the package name
+# this can be fixed now - the reason is based on 8.3 file names
+   if ((-f $d.h) || (-f panace.h)) then
       set Hfiles = ( ../*/*.h )
    endif
 

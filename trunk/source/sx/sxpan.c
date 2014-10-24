@@ -13,160 +13,124 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_PACKAGEP - function version of SX_PACKAGEP macro */
+/* _SX_OPT_PA_PACKAGE - handle BLANG binding related operations */
 
-static object *_SXI_packagep(SS_psides *si, object *obj)
-   {object *o;
+void *_SX_opt_PA_package(PA_package *x, bind_opt wh, void *a)
+   {char *s;
+    void *rv;
+    object *o;
 
-    o = SX_PACKAGEP(obj) ? SS_t : SS_f;
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_PACKAGEP(o))
+	        rv = (void *) SS_GET(PA_package, o);
+	     else
+	        {s  = SS_get_string(o);
+		 rv = PA_INQUIRE_VARIABLE(s);
+		 if (rv == NULL)
+		    rv = _SX.unresolved;};
+	     break;
 
-    return(o);}
+        case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+	     break;
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
 
-/* _SXI_PANVARP - function version of SX_PANVARP macro */
-
-static object *_SXI_panvarp(SS_psides *si, object *obj)
-   {object *o;
-
-    o = SX_PANVARP(obj) ? SS_t : SS_f;
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_SRCVARP - function version of SX_SOURCE_VARIABLEP macro */
-
-static object *_SXI_srcvarp(SS_psides *si, object *obj)
-   {object *o;
-
-    o = SX_SOURCE_VARIABLEP(obj) ? SS_t : SS_f;
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_IV_SPECP - function version of SX_IV_SPECIFICATIONP macro */
-
-static object *_SXI_iv_specp(SS_psides *si, object *obj)
-   {object *o;
-
-    o = SX_IV_SPECIFICATIONP(obj) ? SS_t : SS_f;
-
-    return(o);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_WR_GPACKAGE - print a g_package */
+/* _SX_OPT_PA_VARIABLE - handle BLANG binding related operations */
 
-static void _SX_wr_gpackage(SS_psides *si, object *obj, object *strm)
-   {
+void *_SX_opt_PA_variable(PA_variable *x, bind_opt wh, void *a)
+   {char *s;
+    void *rv;
+    object *o;
 
-    PRINT(SS_OUTSTREAM(strm), "<PACKAGE|%s>", PACKAGE_NAME(obj));
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_VARIABLEP(o))
+	        rv = (void *) SS_GET(PA_variable, o);
+	     else
+	        {s  = CSTRSAVE(SS_get_string(o));
+		 rv = PA_INQUIRE_VARIABLE(s);
+		 if (rv == NULL)
+		    rv = _SX.unresolved;};
+	     break;
 
-    return;}
+        case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+	     break;
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
 
-/* SX_MK_PACKAGE - make and return a g_package */
-
-object *SX_mk_package(SS_psides *si, PA_package *pck)
-   {object *op;
-
-    op = SS_mk_object(si, pck, G_PACKAGE, SELF_EV, pck->name,
-		      _SX_wr_gpackage, SS_rl_object);
-
-    return(op);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GVARIABLE - print a g_variable */
-
-static void _SX_wr_gvariable(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<PANVAR|%s>", PANVAR_NAME(obj));
-
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_MK_VARIABLE - make and return a g_variable */
+/* _SX_OPT_PA_SRC_VARIABLE - handle BLANG binding related operations */
 
-object *SX_mk_variable(SS_psides *si, PA_variable *pp)
-   {object *op;
+void *_SX_opt_PA_src_variable(PA_src_variable *x, bind_opt wh, void *a)
+   {void *rv;
 
-    op = SS_mk_object(si, pp, G_PANVAR, SELF_EV, pp->name,
-		      _SX_wr_gvariable, SS_rl_object);
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     break;
 
-    return(op);}
+        case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+	     break;
 
-/*--------------------------------------------------------------------------*/
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
 
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GSOURCE_VARIABLE - print a g_source_variable */
-
-static void _SX_wr_gsource_variable(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<SOURCE_VARIABLE|%s>",
-                              SOURCE_VARIABLE_NAME(obj));
-
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_MK_SOURCE_VARIABLE - make and return a g_source_variable */
+/* _SX_OPT_PA_IV_SPECIFICATION - handle BLANG binding related operations */
 
-static object *SX_mk_source_variable(SS_psides *si, PA_src_variable *sv)
-   {object *op;
+void *_SX_opt_PA_iv_specification(PA_iv_specification *x, bind_opt wh, void *a)
+   {void *rv;
 
-    op = SS_mk_object(si, sv, G_SOURCE_VARIABLE, SELF_EV, sv->name,
-		      _SX_wr_gsource_variable, SS_rl_object);
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     break;
 
-    return(op);}
+        case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+	     break;
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
 
-/* _SX_WR_GIV_SPECIFICATION - print a g_iv_specification */
-
-static void _SX_wr_giv_specification(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<IV_SPECIFICATION|%s>",
-                              IV_SPECIFICATION_NAME(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_IV_SPECIFICATION - make and return a g_iv_specification */
-
-static object *SX_mk_iv_specification(SS_psides *si, PA_iv_specification *iv)
-   {object *op;
-
-    op = SS_mk_object(si, iv, G_IV_SPECIFICATION, SELF_EV, iv->name,
-		      _SX_wr_giv_specification, SS_rl_object);
-
-    return(op);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* _SXI_PACKAGE_NAME - return the package name */
@@ -250,7 +214,7 @@ static object *_SXI_run_package(SS_psides *si, object *argl)
     object *numdt, *zondt, *o;
 
     SS_args(si, argl,
-            G_PACKAGE, &pck,
+            SX_PACKAGE_I, &pck,
             SC_DOUBLE_I, &t,
             SC_DOUBLE_I, &dt,
             SC_INT_I, &cycle,
@@ -612,7 +576,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 
         PA_inst_c(vname, vaddr, itype, 0, (PFVoid) PA_pshand, PA_sargs);};
 
-    obj = SX_mk_variable(si, pp);
+    obj = SX_make_pa_variable(si, pp);
 
     return(obj);}
  
@@ -644,7 +608,7 @@ static object *_SXI_list_pan_pck(SS_psides *si)
  * evaluations
  */
          SS_def_var(si, obj,
-                    SX_mk_package(si, pck),
+                    SX_make_pa_package(si, pck),
                     si->global_env);
 
          SS_end_cons(si, lst, lst_nxt, obj);};
@@ -681,7 +645,7 @@ static object *_SXI_intern_packages(SS_psides *si)
  * evaluations
  */
          SS_def_var(si, obj,
-                    SX_mk_package(si, pck),
+                    SX_make_pa_package(si, pck),
                     si->global_env);
 
          SS_end_cons(si, lst, lst_nxt, obj);};
@@ -855,20 +819,10 @@ void SX_install_panacea_funcs(SS_psides *si)
                SS_zargs,
                _SXI_intern_packages, SS_PR_PROC);
 
-    SS_install(si, "pa-iv-specification?",
-               "Returns #t if the object is a PANACEA initial value specification, and #f otherwise",
-               SS_sargs,
-               _SXI_iv_specp, SS_PR_PROC);
-
     SS_install(si, "pa-list-packages",
                "List current panacea packages",
                SS_zargs,
                _SXI_list_pan_pck, SS_PR_PROC);
-
-    SS_install(si, "pa-package?",
-               "Returns #t if the object is a PANACEA package, and #f otherwise",
-               SS_sargs,
-               _SXI_packagep, SS_PR_PROC);
 
     SS_install(si, "pa-package-name",
                "Returns a the name of the PANACEA package",
@@ -889,16 +843,6 @@ void SX_install_panacea_funcs(SS_psides *si)
                "Runs a simulation from Ti to Tf",
                SS_nargs,
                _SXI_pan_simulate, SS_PR_PROC);
-
-    SS_install(si, "pa-source-variable?",
-               "Returns #t if the object is a PANACEA source variable, and #f otherwise",
-               SS_sargs,
-               _SXI_srcvarp, SS_PR_PROC);
-
-    SS_install(si, "pa-variable?",
-               "Returns #t if the object is a PANACEA variable, and #f otherwise",
-               SS_sargs,
-               _SXI_panvarp, SS_PR_PROC);
 
     SS_install(si, "pa-variable->pm-array",
                "Save the data for the output requests from this cycle",

@@ -1768,7 +1768,7 @@ static object *_SXI_gatgr(SS_psides *si, object *argl)
 
     g = NULL;
     SS_args(si, argl,
-	    G_GRAPH, &g,
+	    SX_GRAPH_I, &g,
 	    0);
     argl = SS_cdr(si, argl);
 
@@ -1981,7 +1981,7 @@ static object *_SXI_satgr(SS_psides *si, object *argl)
 
     g = NULL;
     SS_args(si, argl,
-	    G_GRAPH, &g,
+	    SX_GRAPH_I, &g,
 	    0);
     argl = SS_cdr(si, argl);
 

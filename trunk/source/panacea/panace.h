@@ -602,6 +602,11 @@ struct s_PA_plot_request
     PA_plot_request *next;};
 
 
+/* PANACEA package
+ *
+ * #bind derived PA_package character-A SX_PACKAGE_I PyObject NULL
+ */
+
 struct s_PA_package
    {char *name;                                             /* package name */
     int on;                                      /* on/off flag for package */
@@ -643,6 +648,11 @@ struct s_PA_package
  * *size when both are non-zero
  */
 
+/* PANACEA variable
+ *
+ * #bind derived PA_variable character-A SX_VARIABLE_I PyObject NULL
+ */
+
 struct s_PA_variable
    {char *name;                  /* name by which the variable is installed */
     PA_package *pck;                /* the package which owns this variable */
@@ -672,6 +682,11 @@ struct s_PA_variable
     char *cache_file;};
 
 
+/* PANACEA source variable
+ *
+ * #bind derived PA_src_variable character-A SX_SRC_VARIABLE_I PyObject NULL
+ */
+
 struct s_PA_src_variable
    {char *name;                             /* variable name (with indexes) */
     PA_variable *pp;                        /* associated database variable */
@@ -700,6 +715,8 @@ struct s_PA_thread_state
 
 /* IV_SPECIFICATION is PD_DEFSTR'd in PA_DEF_STR in PANACEA.C
  * so any changes here must be reflected there
+ *
+ * #bind derived PA_iv_specification character-A SX_IV_SPECIFICATION_I PyObject NULL
  */
 
 struct s_PA_iv_specification

@@ -177,59 +177,7 @@
 #define PDBDATA_EP(_o)       (SS_GET(g_pdbdata, _o)->ep)
 #define PDBDATA_FILE(_o)     (SS_GET(g_pdbdata, _o)->file)
 
-#define SYMENT_TYPE(_o)      PD_entry_type(SS_GET(syment, _o))
-#define SYMENT_DIMS(_o)      PD_entry_dimensions(SS_GET(syment, _o))
-#define SYMENT_NUM(_o)       PD_entry_number(SS_GET(syment, _o))
-#define SYMENT_ADDR(_o)      PD_entry_address(SS_GET(syment, _o))
-
-#define DEFSTR_TYPE(_o)      (SS_GET(defstr, _o)->type)
-#define DEFSTR_SIZE(_o)      (SS_GET(defstr, _o)->size)
-#define DEFSTR_ALIGN(_o)     (SS_GET(defstr, _o)->alignment)
-#define DEFSTR_MEMBERS(_o)   (SS_GET(defstr, _o)->members)
-
 /* PANACEA Types */
-
-#define PANVAR_NAME(_o)      (SS_GET(PA_variable, _o)->name)
-#define PANVAR_DATA(_o)      (SS_GET(PA_variable, _o)->data)
-#define PANVAR_SIZE(_o)      (SS_GET(PA_variable, _o)->size)
-#define PANVAR_RESTART(_o)   (SS_GET(PA_variable, _o)->restart)
-#define PANVAR_CLASS(_o)     (SS_GET(PA_variable, _o)->option)
-#define PANVAR_CONV(_o)      (SS_GET(PA_variable, _o)->conv)
-#define PANVAR_UNIT(_o)      (SS_GET(PA_variable, _o)->unit)
-#define PANVAR_DESC(_o)      (SS_GET(PA_variable, _o)->desc)
-
-#define PACKAGE_NAME(_o)     (SS_GET(PA_package, _o)->name)
-#define PACKAGE_TIME(_o)     (SS_GET(PA_package, _o)->time)
-#define PACKAGE_SPACE(_o)    (SS_GET(PA_package, _o)->space)
-#define PACKAGE_DT(_o)       (SS_GET(PA_package, _o)->dt)
-#define PACKAGE_GENCMD(_o)   (SS_GET(PA_package, _o)->gencmd)
-#define PACKAGE_DFSTRC(_o)   (SS_GET(PA_package, _o)->dfstrc)
-#define PACKAGE_INTRN(_o)    (SS_GET(PA_package, _o)->intrn)
-#define PACKAGE_DEFVAR(_o)   (SS_GET(PA_package, _o)->defvar)
-#define PACKAGE_DEFCNT(_o)   (SS_GET(PA_package, _o)->defcnt)
-#define PACKAGE_INIZER(_o)   (SS_GET(PA_package, _o)->inizer)
-#define PACKAGE_MAIN(_o)     (SS_GET(PA_package, _o)->main)
-#define PACKAGE_PPSOR(_o)    (SS_GET(PA_package, _o)->ppsor)
-#define PACKAGE_FINZER(_o)   (SS_GET(PA_package, _o)->finzer)
-#define PACKAGE_PPCMD(_o)    (SS_GET(PA_package, _o)->ppcmd)
-#define PACKAGE_N_SWTCH(_o)  (SS_GET(PA_package, _o)->n_swtch)
-#define PACKAGE_SWTCH(_o)    (SS_GET(PA_package, _o)->iswtch)
-#define PACKAGE_N_PARAM(_o)  (SS_GET(PA_package, _o)->n_param)
-#define PACKAGE_PARAM(_o)    (SS_GET(PA_package, _o)->rparam)
-#define PACKAGE_N_ASCII(_o)  (SS_GET(PA_package, _o)->n_ascii)
-#define PACKAGE_ASCII(_o)    (SS_GET(PA_package, _o)->ascii)
-#define PACKAGE_S(_o)        (SS_GET(PA_package, _o)->s)
-
-#define SOURCE_VARIABLE_NAME(_o)        (SS_GET(PA_src_variable, _o)->name)
-#define SOURCE_VARIABLE_VAR_INDEX(_o)   (SS_GET(PA_src_variable, _o)->var_index)
-#define SOURCE_VARIABLE_N_TIMEs(_o)     (SS_GET(PA_src_variable, _o)->n_times)
-#define SOURCE_VARIABLE_CONV(_o)        (SS_GET(PA_src_variable, _o)->conv)
-#define SOURCE_VARIABLE_TIMES(_o)       (SS_GET(PA_src_variable, _o)->times)
-#define SOURCE_VARIABLE_QUEUE(_o)       (SS_GET(PA_src_variable, _o)->queue)
-#define SOURCE_VARIABLE_QUEUE_TIMES(_o) (SS_GET(PA_src_variable, _o)->queue_times)
-#define SOURCE_VARIABLE_INDEX(_o)       (SS_GET(PA_src_variable, _o)->index)
-#define SOURCE_VARIABLE_SIZE(_o)        (SS_GET(PA_src_variable, _o)->size)
-#define SOURCE_VARIABLE_FILE(_o)        (SS_GET(PA_src_variable, _o)->file)
 
 /* IV_SPECIFICATION is PD_DEFSTR'd in DEF_STR in PANACEA.C
  * so any changes here must be reflected there
@@ -357,25 +305,13 @@
 
 /* PDBLib Types */
 
-#define SX_DEFSTRP(_o)           (SS_OBJECT_TYPE(_o) == G_DEFSTR)
-#define SX_SYMENTP(_o)           (SS_OBJECT_TYPE(_o) == G_SYMENT)
 #define SX_PDBDATAP(_o)          (SS_OBJECT_TYPE(_o) == G_PDBDATA)
 
 /* PANACEA Types */
 
-#define SX_PANVARP(_o)           (SS_OBJECT_TYPE(_o) == G_PANVAR)
-#define SX_PACKAGEP(_o)          (SS_OBJECT_TYPE(_o) == G_PACKAGE)
-#define SX_SOURCE_VARIABLEP(_o)  (SS_OBJECT_TYPE(_o) == G_SOURCE_VARIABLE)
-#define SX_IV_SPECIFICATIONP(_o) (SS_OBJECT_TYPE(_o) == G_IV_SPECIFICATION)
 #define SX_PLOT_REQUESTP(_o)     (SS_OBJECT_TYPE(_o) == G_PLOT_REQUEST)
 #define SX_PLOT_MAPP(_o)         (SS_OBJECT_TYPE(_o) == G_PLOT_MAP)
 #define SX_PLT_CRVP(_o)          (SS_OBJECT_TYPE(_o) == G_PLT_CRV)
-
-/* PGS Types */
-
-#define SX_GRAPHP(_o)            (SS_OBJECT_TYPE(_o) == G_GRAPH)
-#define SX_INTERFACE_OBJECTP(_o) (SS_OBJECT_TYPE(_o) == G_INTERFACE_OBJECT)
-#define SX_DEV_ATTRIBUTESP(_o)   (SS_OBJECT_TYPE(_o) == G_DEV_ATTRIBUTES)
 
 /*--------------------------------------------------------------------------*/
 
@@ -387,23 +323,12 @@
 
 enum e_SX_object_type
    {G_FILE = 240,
-    G_PDBFILE,
-    G_DEFSTR,
-    G_SYMENT,
-    G_DIMDES,
     G_MEMDES,
     G_PDBDATA,
-    G_PANVAR,
-    G_PACKAGE,
-    G_SOURCE_VARIABLE,
-    G_IV_SPECIFICATION,
     G_PLOT_REQUEST,
     G_PLOT_MAP,
     G_PLT_CRV,
-    G_GRAPH,
-    G_DEV_ATTRIBUTES,
-    G_FUNCTION,
-    G_INTERFACE_OBJECT};
+    G_FUNCTION};
 
 typedef enum e_SX_object_type SX_object_type;
 
