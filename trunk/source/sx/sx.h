@@ -89,60 +89,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_GET_GRAPH_FROM_LIST - extract a PG_graph from the list
- *                        - and cdr the list
- */
-
-#define SX_GET_GRAPH_FROM_LIST(_si, _v, _a, _s)                              \
-   {obj  = SS_car(_si, _a);                                                  \
-    _a = SS_cdr(_si, _a);                                                    \
-    if (SX_GRAPHP(obj))                                                      \
-       _v = SS_GET(PG_graph, obj);                                           \
-    else                                                                     \
-       SS_error(_si, _s, obj);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_GET_SET_FROM_LIST - extract a PM_set from the list
- *                      - and cdr the list
- */
-
-#define SX_GET_SET_FROM_LIST(_si, _v, _a, _s)                                \
-   {obj = SS_car(_si, _a);                                                   \
-    _a = SS_cdr(_si, _a);                                                    \
-    if (SX_SETP(obj))                                                        \
-       _v = SS_GET(PM_set, obj);                                             \
-    else                                                                     \
-       SS_error(_si, _s, obj);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_GET_MAPPING_FROM_LIST - extract a PM_mapping from the list
- *                          - and cdr the list
- *                          - if item is a graph extract the mapping from it
- *                          - NOTE: generalization of generated macro
- */
-
-#undef SX_GET_MAPPING_FROM_LIST
-#define SX_GET_MAPPING_FROM_LIST(_si, _p, _a)                                \
-    {PG_graph *_g;                                                           \
-     object *_o;                                                             \
-     _o = SS_car(_si, _a);                                                   \
-     _a = SS_cdr(_si, _a);                                                   \
-     if (SX_GRAPHP(_o))                                                      \
-        {_g = SS_GET(PG_graph, _o);                                          \
-         _p = g->f;}                                                         \
-     else if (SX_MAPPINGP(_o))                                               \
-        _p = SS_GET(PM_mapping, _o);                                         \
-     else                                                                    \
-        SS_error(_si, "BAD MAPPING OR GRAPH - SX_GET_MAPPING_FROM_LIST",     \
-		 _o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SX_OK_TO_DRAW - TRUE iff in graphics mode or is a hardcopy device */
 
 #define SX_OK_TO_DRAW(dev) (SX_gs.gr_mode || HARDCOPY_DEVICE(dev))

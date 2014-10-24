@@ -608,9 +608,8 @@ static void scheme_hdr_struct_def(FILE *fp, char *dv, char **ta, char *pck)
     fprintf(fp, "#define SX_GET_%s_FROM_LIST(_si, _v, _a, _s)   \\\n", tl.rnm);
     fprintf(fp, "   {obj = SS_car(_si, _a);   \\\n");
     fprintf(fp, "    _a = SS_cdr(_si, _a);   \\\n");
-    fprintf(fp, "    if (SX_%sP(obj))   \\\n", tl.rnm);
-    fprintf(fp, "       _v = SS_GET(%s, obj);   \\\n", tl.cnm);
-    fprintf(fp, "    else   \\\n");
+    fprintf(fp, "    _v = _SX_opt_%s(NULL, BIND_ARG, obj);   \\\n", tl.cnm);
+    fprintf(fp, "    if (((char *) _v) == _SX.unresolved)   \\\n");
     fprintf(fp, "       SS_error(_si, _s, obj);}\n");
     fprintf(fp, "\n");
 

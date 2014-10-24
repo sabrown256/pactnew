@@ -10,10 +10,6 @@
  
 #include "sx_int.h"
 
-#define ELSE_IF(str, typ)                                                    \
-    else if (strcmp(type, str) == 0)                                         \
-       *((typ *) (var->val)) =  *((typ *) val)
-
 SX_scope_private
  _SX = { "unresolved_arg", FAIL, 3,
 	 1.0e-15, 1.0e-3, 2.0,

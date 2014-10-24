@@ -28,7 +28,7 @@ void *_SX_opt_C_array(C_array *x, bind_opt wh, void *a)
              if (SS_nullobjp(o))
                 rv = NULL;
 	     else if (SX_C_ARRAYP(o))
-	        rv = (void *) SS_GET(C_array, o);
+	        rv = SS_GET(C_array, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -117,7 +117,7 @@ void *_SX_opt_PM_set(PM_set *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_SETP(o))
-	        rv = (void *) SS_GET(PM_set, o);
+	        rv = SS_GET(PM_set, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -150,7 +150,7 @@ void *_SX_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
 	     if (SX_GRAPHP(o))
 	        rv = SS_GET(PG_graph, o)->f;
 	     else if (SX_MAPPINGP(o))
-	        rv = (void *) SS_GET(PM_mapping, o);
+	        rv = SS_GET(PM_mapping, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -1288,8 +1288,8 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
 		     SS_error(si, "BAD CONVERSION - _SXI_LR_AC", SS_null);};};
 
 	    elements = CMAKE_N(void *, 2);
-	    elements[0] = (void *) x;
-	    elements[1] = (void *) y;
+	    elements[0] = x;
+	    elements[1] = y;
 
 	    ndom = PM_mk_set(odom->name, SC_DOUBLE_S, FALSE, odom->n_elements,
 			     odom->dimension, odom->dimension_elem,
