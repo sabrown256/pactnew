@@ -1,3 +1,7 @@
+/*
+ * GS-BL6.C - generated support routines for BL6
+ *
+ */
 
 #include "cpyright.h"
 #include "sx_int.h"

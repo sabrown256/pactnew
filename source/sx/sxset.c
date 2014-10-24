@@ -15,7 +15,7 @@
        *((typ *) (var->val)) =  *((typ *) val)
 
 SX_scope_private
- _SX = { FAIL, 3,
+ _SX = { "unresolved_arg", FAIL, 3,
 	 1.0e-15, 1.0e-3, 2.0,
 	 'a', LITERAL, 1, 1, '@', "curves.a",
          TRUE, };

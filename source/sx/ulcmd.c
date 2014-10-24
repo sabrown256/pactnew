@@ -916,7 +916,7 @@ object *UL_mode_graphics(SS_psides *si)
 
 	if (SX_gs.graphics_device != NULL)
 	   {if (scrwin == NULL)
-	       {scrwin = SX_mk_graphics_device(si, SX_gs.graphics_device);
+	       {scrwin = SX_make_pg_device(si, SX_gs.graphics_device);
 		SS_install_cv(si, "screen-window", scrwin, SS_OBJECT_I);
 		SS_UNCOLLECT(scrwin);}
  	    else

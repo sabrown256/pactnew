@@ -1,3 +1,7 @@
+/*
+ * GS-BL2.C - generated support routines for BL2
+ *
+ */
 
 #include "cpyright.h"
 #include "sx_int.h"

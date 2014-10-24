@@ -274,12 +274,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
        {DEREF(v) = NULL;
         return;};
 
-    alst = SC_type_info(type);
-    f    = SC_assoc(alst, "Scheme->C");
-    if (f != NULL)
-       *pv = f(si, obj);
-
-    else if (SC_is_type_char(type) == TRUE)
+    if (SC_is_type_char(type) == TRUE)
        _SS_fix_arg(si, obj, v, type);
 
     else if ((SC_is_type_fix(type) == TRUE) ||
@@ -338,7 +333,11 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 #endif
 
     else
-       {if (si->get_arg != NULL)
+       {alst = SC_type_info(type);
+	f    = SC_assoc(alst, "Scheme->C");
+	if (f != NULL)
+	   *pv = f(si, obj);
+	else if (si->get_arg != NULL)
 	   si->get_arg(si, obj, v, type);
         else
 	   *pv = obj->val;};

@@ -1,3 +1,7 @@
+/*
+ * GS-BL3.C - generated support routines for BL3
+ *
+ */
 
 #include "cpyright.h"
 #include "sx_int.h"
@@ -27,7 +31,7 @@ static object *_SXI_fe1(SS_psides *si, object *argl)
     _rv = fe1(_la1, _la2);
     _sz = SC_arrlen(_rv)/sizeof(str);
     _arr = PM_make_array("str", _sz, _rv);
-    _lo  = SX_mk_C_array(si, _arr);
+    _lo  = SX_make_c_array(si, _arr);
 
     return(_lo);}
 

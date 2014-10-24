@@ -198,7 +198,7 @@ static object *_SXI_get_domain(SS_psides *si, object *arg)
     else
        SS_error(si, "BAD SET - _SXI_GET_DOMAIN", arg);
 
-    rv = SX_mk_set(si, set);
+    rv = SX_make_pm_set(si, set);
 
     return(rv);}
 
@@ -213,7 +213,7 @@ static object *_SXI_get_range(SS_psides *si, object *arg)
 
     f = NULL;
     SS_args(si, arg,
-            G_MAPPING, &f,
+            SX_MAPPING_I, &f,
 	    0);
 
     rv = NULL;
@@ -221,7 +221,7 @@ static object *_SXI_get_range(SS_psides *si, object *arg)
        SS_error(si, "BAD MAPPING - _SXI_GET_RANGE", arg);
 
     else
-       rv = SX_mk_set(si, f->range);
+       rv = SX_make_pm_set(si, f->range);
 
     return(rv);}
 
@@ -731,7 +731,7 @@ object *SX_plane(SS_psides *si, object *argl)
 
     SX_gs.plot_flag = TRUE;
 
-    mo = SX_mk_mapping(si, f);
+    mo = SX_make_pm_mapping(si, f);
     if (plf)
        mo = SX_display_map(si, mo);
 
@@ -827,7 +827,7 @@ static PM_mapping *_SXI_filter_coef(SS_psides *si, PM_mapping *h,
     arr    = NULL;
     ntimes = 1;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
 	    SC_INT_I, &ntimes,
 	    0);
 
@@ -886,7 +886,7 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
 	    SS_error(si, bf, SS_null);};
 
         SS_args(si, SS_lk_var_val(si, obj),
-                G_NUM_ARRAY, &arr,
+                SX_C_ARRAY_I, &arr,
 		0);
 
         if (arr == NULL)

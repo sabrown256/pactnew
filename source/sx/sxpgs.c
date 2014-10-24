@@ -27,6 +27,115 @@ static PG_rendering
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_OPT_PG_DEVICE - handle BLANG binding related operations */
+
+void *_SX_opt_PG_device(PG_device *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+    static char nm[BFSML];
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_LABEL :
+	     snprintf(nm, BFSML, "%s,%s,%s", x->name, x->type, x->title);
+	     rv = CSTRSAVE(nm);
+	     break;
+
+        case BIND_PRINT :
+	     snprintf(nm, BFSML, "%s,%s,%s", x->name, x->type, x->title);
+	     rv = nm;
+	     break;
+
+        case BIND_ALLOC :
+	     break;
+
+        case BIND_FREE :
+	     break;
+
+        case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_DEVICEP(o))
+	        rv = (void *) SS_GET(PG_device, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PG_IMAGE - handle BLANG binding related operations */
+
+void *_SX_opt_PG_image(PG_image *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->label;
+	     break;
+
+        case BIND_ALLOC :
+	     break;
+
+        case BIND_FREE :
+	     break;
+
+        case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_IMAGEP(o))
+	        rv = (void *) SS_GET(PG_image, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PG_PALETTE - handle BLANG binding related operations */
+
+void *_SX_opt_PG_palette(PG_palette *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_LABEL :
+	     break;
+
+        case BIND_ALLOC :
+	     break;
+
+        case BIND_FREE :
+	     break;
+
+        case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_PALETTEP(o))
+	        rv = (void *) SS_GET(PG_palette, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SXI_DEF_FILE_GRAPH - define PM_set and PM_mapping to 
  *                     - a PDB file thereby preparing it for mappings
  */
@@ -566,62 +675,9 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
 	   {if (!PD_read(file, name, &im))
 	       SS_error(si, PD_get_error(), obj);};
 
-	o = SX_mk_image(si, im);};
+	o = SX_make_pg_image(si, im);};
 
     return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GIMAGE - print a g_image */
-
-static void _SX_wr_gimage(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<IMAGE|%s>",
-                              IMAGE_NAME(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GIMAGE - gc a image */
-
-static void _SX_rl_gimage(SS_psides *si, object *obj)
-   {
-
-/* GOTCHA - don't know right thing to do here. See _SX_rl_ggraph.
-   If image released, ci 1; ci 1 crashes pdbview. */
-/*
-    PG_image *im;
-
-    im = SS_GET(PG_image, obj);
-    CFREE(im->label);
-    CFREE(im->element_type);
-    CFREE(im->buffer);
-    CFREE(im);
-*/
-
-    SS_rl_object(si, obj);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_IMAGE - encapsulate a PG_image as an object */
-
-object *SX_mk_image(SS_psides *si, PG_image *im)
-   {object *op;
-
-    op = SS_null;
-
-    if (im != NULL)
-       op = SS_mk_object(si, im, G_IMAGE, SELF_EV, im->label,
-			 _SX_wr_gimage, _SX_rl_gimage);
-
-    return(op);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -641,7 +697,7 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
     po   = NULL;
     file = NULL;
     SS_args(si, argl,
-            G_MAPPING, &f,
+            SX_MAPPING_I, &f,
             G_FILE, &po,
             0);
 
@@ -692,7 +748,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
     file = NULL;
     strm = NULL;
     SS_args(si, argl,
-            G_IMAGE, &f,
+            SX_IMAGE_I, &f,
             G_FILE, &file,
             0);
 
@@ -812,7 +868,7 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
     if (dev != NULL)
        {dev->background_color_white = SX_gs.background_color_white;
 
-	o = SX_mk_graphics_device(si, dev);};
+	o = SX_make_pg_device(si, dev);};
 
     CFREE(name);
     if (ok == TRUE)
@@ -835,7 +891,7 @@ static object *_SXI_device_props(SS_psides *si, object *argl)
     rv  = SS_null;
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE, &dev,
+            SX_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -848,60 +904,6 @@ static object *_SXI_device_props(SS_psides *si, object *argl)
 			 0);
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GDEVICE - print a g_device */
-
-static void _SX_wr_gdevice(SS_psides *si, object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<GRAPHICS-DEVICE|%s,%s,%s>",
-                              DEVICE_NAME(obj),
-                              DEVICE_TYPE(obj),
-                              DEVICE_TITLE(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GDEVICE - gc a device */
-
-static void _SX_rl_gdevice(SS_psides *si, object *obj)
-   {
-
-/* GOTCHA: in the absence of the correct reference counting
- * assume that the device will be released only on an explicit
- * PG_close_device not merely a GC
- *
-    PG_device *dev;
-
-    dev = SS_GET(PG_device, obj);
-
-    PG_rl_device(dev);
- */
-
-    SS_rl_object(si, obj);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_GRAPHICS_DEVICE - encapsulate a PG_device as an object */
-
-object *SX_mk_graphics_device(SS_psides *si, PG_device *dev)
-   {object *op;
-
-    if (dev == NULL)
-       op = SS_null;
-    else
-       op = SS_mk_object(si, dev, G_DEVICE, SELF_EV, dev->title,
-			 _SX_wr_gdevice, _SX_rl_gdevice);
-
-    return(op);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1063,7 +1065,7 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
     xf  = yf  = 0.0;
     dxf = dyf = 0.0;
     SS_args(si, argl,
-            G_DEVICE, &dev,
+            SX_DEVICE_I, &dev,
             SC_DOUBLE_I, &xf,
             SC_DOUBLE_I, &yf,
             SC_DOUBLE_I, &dxf,
@@ -1180,14 +1182,14 @@ static object *_SXI_make_pgs_graph(SS_psides *si, object *argl)
        _SX.igg = 'A';
 
     SS_args(si, argl,
-            G_SET, &domain,
-            G_SET, &range,
+            SX_SET_I, &domain,
+            SX_SET_I, &range,
             SC_STRING_I, &name,
             SC_ENUM_I, &centering,
             SC_INT_I, &color,
             SC_DOUBLE_I, &width,
             SC_INT_I, &style,
-	    G_NUM_ARRAY, &arr,
+	    SX_C_ARRAY_I, &arr,
             0);
 
     if (centering == U_CENT)
@@ -1693,7 +1695,7 @@ static object *_SXI_make_image(SS_psides *si, object *argl)
 
     arr = NULL;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
             SC_INT_I, &w,
             SC_INT_I, &h,
             SC_STRING_I, &name,
@@ -1714,7 +1716,7 @@ static object *_SXI_make_image(SS_psides *si, object *argl)
     else
        {im = PG_make_image_n(name, arr->type, arr->data,
 			     2, WORLDC, dbx, rbx, w, h, 8, NULL);
-	rv = SX_mk_image(si, im);};
+	rv = SX_make_pg_image(si, im);};
 
     CFREE(name);
 
@@ -1750,8 +1752,8 @@ static object *_SXI_build_image(SS_psides *si, object *argl)
     dev = NULL;
     arr = NULL;
     SS_args(si, argl,
-            G_DEVICE, &dev,
-            G_NUM_ARRAY, &arr,
+            SX_DEVICE_I, &dev,
+            SX_C_ARRAY_I, &arr,
             SC_INT_I, &w,
             SC_INT_I, &h,
             SC_STRING_I, &name,
@@ -1775,7 +1777,7 @@ static object *_SXI_build_image(SS_psides *si, object *argl)
     else
        {im = PG_build_image(dev, name, arr->type, arr->data,
 			    w, h, 2, WORLDC, dbx, rbx);
-	rv = SX_mk_image(si, im);};
+	rv = SX_make_pg_image(si, im);};
 
     CFREE(name);
 
@@ -1803,8 +1805,8 @@ static object *_SXI_draw_image(SS_psides *si, object *argl)
     vp    = FALSE;
 
     SS_args(si, argl,
-            G_DEVICE, &dev,
-            G_IMAGE, &image,
+            SX_DEVICE_I, &dev,
+            SX_IMAGE_I, &image,
             SC_DOUBLE_I, &xmn,
             SC_DOUBLE_I, &xmx,
             SC_DOUBLE_I, &ymn,
@@ -1861,7 +1863,7 @@ pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
 	obj = SS_null;
 	SS_assign(si, obj, SX_list_array(si, val));
 	SS_args(si, obj,
-		G_NUM_ARRAY, &arr,
+		SX_C_ARRAY_I, &arr,
 		0);
 
 	SC_strncpy(dtype, MAXLINE, type, -1);
@@ -2488,10 +2490,10 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "next") == 0)
        {u = s->next;
 	if (val != NULL)
-	   {SS_args(si, val, G_SET, &u);
+	   {SS_args(si, val, SX_SET_I, &u);
 	    s->next = u;};
 
-	ret = SX_mk_set(si, u);};
+	ret = SX_make_pm_set(si, u);};
 
     return(ret);}
 
@@ -2530,26 +2532,26 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "domain") == 0)
        {s = f->domain;
 	if (val != NULL)
-	   {SS_args(si, val, G_SET, &s);
+	   {SS_args(si, val, SX_SET_I, &s);
 	    f->domain = s;};
 
-	ret = SX_mk_set(si, s);}
+	ret = SX_make_pm_set(si, s);}
 
     else if (strcmp(name, "range") == 0)
        {s = f->range;
 	if (val != NULL)
-	   {SS_args(si, val, G_SET, &s);
+	   {SS_args(si, val, SX_SET_I, &s);
 	    f->range = s;};
 
-	ret = SX_mk_set(si, s);}
+	ret = SX_make_pm_set(si, s);}
 
     else if (strcmp(name, "next") == 0)
        {g = f->next;
 	if (val != NULL)
-	   {SS_args(si, val, G_MAPPING, &g);
+	   {SS_args(si, val, SX_MAPPING_I, &g);
 	    f->next = g;};
 
-	ret = SX_mk_mapping(si, f);}
+	ret = SX_make_pm_mapping(si, f);}
 
     else if (strcmp(name, "file-type") == 0)
        {v = f->file_type;
@@ -2622,10 +2624,10 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "f") == 0)
        {f = g->f;
 	if (val != NULL)
-	   {SS_args(si, val, G_MAPPING, &f);
+	   {SS_args(si, val, SX_MAPPING_I, &f);
 	    g->f = f;};
 
-	ret = SX_mk_mapping(si, f);}
+	ret = SX_make_pm_mapping(si, f);}
 
     else if (strcmp(name, "info-type") == 0)
        {t = g->info_type;

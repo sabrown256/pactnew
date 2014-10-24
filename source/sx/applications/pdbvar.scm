@@ -373,7 +373,7 @@
 				 (pm-mapping->pdbdata name))
 				((pm-set? name)
 				 (pm-set->pdbdata name))
-				((pm-array? name)
+				((c-array? name)
 				 (pm-array->pdbdata name))
 				((pg-graph? name)
 				 (pg-graph->pdbdata name))

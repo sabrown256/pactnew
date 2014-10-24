@@ -339,16 +339,17 @@ struct s_PM_sp_lin_sys
     void (*cmp_Ap)(double *Ax, PM_sp_lin_sys *sls, double *x);
     void (*cmp_Lr)(double *Lr, PM_sp_lin_sys *sls, double *r);};
 
+
 /* C_ARRAY - define an encapulated vector/array type
  *         - PD_defstr'd in PANACE.C - changes must be reflected there!!!
  *         - NOTE: the TYPE member is used for a PD_cast and as such must be
  *         - "T *" if the data is of type T
  *
- * #bind derived C_array character-A G_ARRAY PyObject NULL
+ * #bind derived C_array character-A SX_ARRAY_I PyObject NULL
  */
 
 struct s_C_array
-   {char *type LBLI;                                           /* data type */
+   {char *type;                                                /* data type */
     long length;                                      /* number of elements */
     void *data;};                                    /* pointer to the data */
 
@@ -361,7 +362,10 @@ struct s_PM_matrix
     double *array;};
 
 
-/* PM_POLYGON - specify a 1d piecewise linear curve thru N space */
+/* PM_POLYGON - specify a 1d piecewise linear curve thru N space
+ *
+ * #bind derived PM_polygon character-A SX_POLYGON_I PyObject NULL
+ */
 
 struct s_PM_polygon
    {int nd;                             /* number of dimensions of a point */
@@ -617,11 +621,11 @@ struct s_PM_mesh_topology
  *     - is a part of flat, singly connected Euclidean N space over the
  *     - field of reals (doubles) and has a logical mesh structure 
  *
- * #bind derived PM_set character-A G_SET PyObject NULL
+ * #bind derived PM_set character-A SX_SET_I PyObject NULL
  */
 
 struct s_PM_set
-   {char *name LBLI;
+   {char *name;
     char *element_type;
     int dimension;
     int *max_index;
@@ -659,11 +663,11 @@ struct s_PM_map_info
 
 /* PM_MAPPING - describe mapping of domain set to range set
  *
- * #bind derived PM_mapping character-A G_MAPPING PyObject NULL
+ * #bind derived PM_mapping character-A SX_MAPPING_I PyObject NULL
  */
 
 struct s_PM_mapping
-   {char *name LBLI;                                  /* the mapping's name */
+   {char *name;                                       /* the mapping's name */
     char *category;                /* the category to which mapping belongs */
     PM_set *domain;                                 /* the mapping's domain */
     PM_set *range;             /* a subset of the image of DOMAIN under MAP */

@@ -122,6 +122,7 @@ struct s_SX_scope_private
 /* initializes to non-zero values */
 
 /* SXCONT.C */
+    char *unresolved;
     SX_file_action file_exist_action;
 
 /* SXPGS.C */
@@ -355,6 +356,8 @@ extern int
  _SX_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr);
 
 extern void
+ *_SX_opt_hasharr(hasharr *x, bind_opt wh, void *a),
+ *_SX_opt_PDBfile(PDBfile *x, bind_opt wh, void *a),
  _SX_type_container(char *dtype, char *stype);
 
 extern object
@@ -416,6 +419,11 @@ extern object
 extern SX_menu_item
  *_SX_get_menu_item(SS_psides *si, g_file *po, int i);
 
+extern void
+ *_SX_opt_PG_device(PG_device *x, bind_opt wh, void *a),
+ *_SX_opt_PG_palette(PG_palette *x, bind_opt wh, void *a),
+ *_SX_opt_PG_image(PG_image *x, bind_opt wh, void *a);
+
 
 /* SXPML.C declarations */
 
@@ -426,24 +434,11 @@ extern PM_set
 extern object
  *_SXI_list_array(SS_psides *si, object *argl);
 
-
-/* SXPMLG.C declarations */
-
 extern void
- *_SX_arg_g_set(SS_psides *si, object *o),
- *_SX_arg_g_mapping(SS_psides *si, object *o),
- *_SX_arg_num_array(SS_psides *si, object *o),
- *_SX_arg_pm_polygon(SS_psides *si, object *o);
-
-extern object
- *SX_mk_set(SS_psides *si, PM_set *set),
- *SX_mk_mapping(SS_psides *si, PM_mapping *f),
- *SX_mk_C_array(SS_psides *si, C_array *arr),
- *SX_mk_polygon(SS_psides *si, PM_polygon *py),
- *_SXI_setp(SS_psides *si, object *obj),
- *_SXI_mappingp(SS_psides *si, object *obj),
- *_SXI_numeric_arrayp(SS_psides *si, object *obj),
- *_SXI_polygonp(SS_psides *si, object *obj);
+ *_SX_opt_C_array(C_array *x, bind_opt wh, void *a),
+ *_SX_opt_PM_polygon(PM_polygon *x, bind_opt wh, void *a),
+ *_SX_opt_PM_set(PM_set *x, bind_opt wh, void *a),
+ *_SX_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a);
 
 
 /* SXSET.C declarations */

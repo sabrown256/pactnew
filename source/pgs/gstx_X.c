@@ -564,6 +564,8 @@ int _PG_rst_draw_text(PG_device *dev, char *s)
     double o[PG_SPACEDM];
     char *face, *sty;
 
+    PG_zero_vector(dx);
+
     nd = 2;
     ok = FALSE;
 

@@ -38,9 +38,9 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
     for (al = argl; SS_consp(al); al = SS_cdr(si, al))
         {obj = SS_car(si, al);
 	 
-	 if (SX_NUMERIC_ARRAYP(obj))
-	    {otyp = NUMERIC_ARRAY_TYPE(obj);
-	     n    = NUMERIC_ARRAY_LENGTH(obj);
+	 if (SX_C_ARRAYP(obj))
+	    {otyp = C_ARRAY_TYPE(obj);
+	     n    = C_ARRAY_LENGTH(obj);
 
 	     if (otyp != NULL)
 	        reta = PM_make_array(otyp, n, NULL);
@@ -56,8 +56,8 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
 
 	 id      = -1;
 	 operand = NULL;
-	 if (SX_NUMERIC_ARRAYP(obj))
-	    operand = NUMERIC_ARRAY(obj);
+	 if (SX_C_ARRAYP(obj))
+	    operand = C_ARRAY(obj);
 
 	 else
 	    {id = SC_arrtype(obj, -1);
@@ -69,7 +69,7 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
 
     PM_conv_array(reta, acc, TRUE);
 
-    rv = SX_mk_C_array(si, reta);
+    rv = SX_make_c_array(si, reta);
 
     return(rv);}
 
@@ -677,7 +677,7 @@ object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
     if (SS_floatp(first))
        mo = SS_binary_homogeneous(si, cp, argl);
 
-    else if (SX_NUMERIC_ARRAYP(first))
+    else if (SX_C_ARRAYP(first))
        mo = _SX_binary_arr(si, cp, argl);
 
     else
@@ -697,7 +697,7 @@ object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
 
 	    SX_gs.plot_flag = TRUE;
 
-	    mo = SX_mk_mapping(si, f);
+	    mo = SX_make_pm_mapping(si, f);
 	    if (plf)
 	       mo = SX_display_map(si, mo);};};
 
@@ -794,7 +794,7 @@ PM_mapping *_SXI_extract_mapping(SS_psides *si, PM_mapping *h, object *argl)
 
 	SX_gs.plot_flag = TRUE;
 
-	mo = SX_mk_mapping(si, f);
+	mo = SX_make_pm_mapping(si, f);
 	if (plf)
 	   mo = SX_display_map(si, mo);};
 

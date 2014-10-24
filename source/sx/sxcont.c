@@ -69,35 +69,11 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
 			 *pv = (void *) gf->file;};
 		 break;
 
-	    case G_DEVICE :
-	         if (!SX_DEVICEP(obj))
-		    SS_error(si, "OBJECT NOT PG_DEVICE - _SX_ARGS", obj);
-		 *pv = (void *) SS_GET(PG_device, obj);
-		 break;
-
-	    case G_SET :
-	         *pv = _SX_arg_g_set(si, obj);
-		 break;
-
-	    case G_MAPPING :
-	         *pv = _SX_arg_g_mapping(si, obj);
-		 break;
-
 	    case G_GRAPH :
 	         if (SX_GRAPHP(obj))
 		    *pv = (void *) SS_GET(PG_graph, obj);
 		 else
 		    SS_error(si, "OBJECT NOT PG_GRAPH - _SX_ARGS", obj);
-		 break;
-
-	    case G_NUM_ARRAY :
-	         *pv = _SX_arg_num_array(si, obj);
-		 break;
-
-	    case G_IMAGE :
-	         if (!SX_IMAGEP(obj))
-		    SS_error(si, "OBJECT NOT PG_IMAGE - _SX_ARGS", obj);
-		 *pv = (void *) SS_GET(PG_image, obj);
 		 break;
 
 	    case G_PACKAGE :
@@ -177,34 +153,9 @@ object *_SX_call_args(SS_psides *si, int type, void *v)
 		    obj = SX_mk_gfile(si, (g_file *) v);
 		 break;
 
-	    case G_DEVICE :
-                 if (v != NULL)
-		    obj = SX_mk_graphics_device(si, (PG_device *) v);
-		 break;
-
-	    case G_SET :
-	         if (v != NULL)
-		    obj = SX_mk_set(si, (PM_set *) v);
-		 break;
-
-	    case G_MAPPING :
-	         if (v != NULL)
-		    obj = SX_mk_mapping(si, (PM_mapping *) v);
-		 break;
-
 	    case G_GRAPH :
 	         if (v != NULL)
 		    obj = SX_mk_graph(si, (PG_graph *) v);
-		 break;
-
-	    case G_NUM_ARRAY :
-	         if (v != NULL)
-		    obj = SX_mk_C_array(si, (C_array *) v);
-		 break;
-
-	    case G_IMAGE :
-	         if (v != NULL)
-		    obj = SX_mk_image(si, (PG_image *) v);
 		 break;
 
 	    case G_PACKAGE :

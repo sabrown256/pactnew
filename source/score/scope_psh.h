@@ -25,12 +25,14 @@
 #undef ARG
 #define ARG(...)
 
-/* LBLI - use the struct member as a label for instances
- *      - of the struct allocated in blang generated code
+/* BIND_OPT - used to communicate between binding language
+ *          - and actual PACT C struct methods
  */
 
-#undef LBLI
-#define LBLI
+enum e_bind_opt
+   {BIND_NONE, BIND_ALLOC, BIND_FREE, BIND_LABEL, BIND_PRINT, BIND_ARG};
+
+typedef enum e_bind_opt bind_opt;
 
 /* include the PSH files with SCOPE_SCORE_PREPROC to get in
  * macro definitions, function and variable declarations

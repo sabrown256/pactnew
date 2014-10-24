@@ -37,7 +37,7 @@ inc scope_exe.h scope_dl.h
 inc pdb.h pdb_old.h pdform.h scope_dp.h
 inc scope_x11.h scope_cgm.h scope_raster.h ppc.h
 inc pgs.h pgs_old.h
-inc panace.h scheme.h syntax.h sx.h
+inc panace.h scheme.h syntax.h sx.h sx_gen.h
 
 etc do-run-db cfg.pl cfg.db
 etc env-csh csh-subroutines 

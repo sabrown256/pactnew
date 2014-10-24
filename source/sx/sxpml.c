@@ -15,6 +15,170 @@ typedef int (*PF_int_dd)(double, double);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_OPT_C_ARRAY - handle BLANG binding related operations */
+
+void *_SX_opt_C_array(C_array *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->type;
+	     break;
+
+        case BIND_ALLOC :
+	     SC_mark(x, 1);
+	     SC_mark(x->type, 1);
+	     SC_mark(x->data, 1);
+	     break;
+
+        case BIND_FREE :
+	     CFREE(x);
+
+/*  GOTCHA - it's currently possible that some PM_set may still be pointing
+ *  at type and/or array even though the reference count doesn't reflect it
+ *            CFREE(x->type);
+ *            CFREE(x->data);
+ */
+	     break;
+
+        case BIND_ARG :
+	     o = (object *) a;
+             if (SS_nullobjp(o))
+                rv = NULL;
+	     else if (SX_C_ARRAYP(o))
+	        rv = (void *) SS_GET(C_array, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PM_POLYGON - handle BLANG binding related operations */
+
+void *_SX_opt_PM_polygon(PM_polygon *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+    static char nm[BFSML];
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_LABEL :
+             snprintf(nm, BFSML, "%ld", (long) x->nn);
+	     rv = CSTRSAVE(nm);
+	     break;
+
+        case BIND_PRINT :
+             snprintf(nm, BFSML, "%ld", (long) x->nn);
+	     rv = nm;
+	     break;
+
+        case BIND_ALLOC :
+	     SC_mark(x, 1);
+	     SC_mark(x->x, 1);
+	     break;
+
+        case BIND_FREE :
+	     PM_free_polygon(x);
+	     break;
+
+        case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_POLYGONP(o))
+	        rv = (void *) SS_GET(PM_polygon, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PM_SET - handle BLANG binding related operations */
+
+void *_SX_opt_PM_set(PM_set *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+	     break;
+
+        case BIND_ALLOC :
+	     break;
+
+        case BIND_FREE :
+	     break;
+
+        case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_SETP(o))
+	        rv = (void *) SS_GET(PM_set, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PM_MAPPING - handle BLANG binding related operations */
+
+void *_SX_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->name;
+	     break;
+
+        case BIND_ALLOC :
+	     break;
+
+        case BIND_FREE :
+	     PM_rel_mapping(x, TRUE, TRUE);
+	     break;
+
+        case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_GRAPHP(o))
+	        rv = SS_GET(PG_graph, o)->f;
+	     else if (SX_MAPPINGP(o))
+	        rv = (void *) SS_GET(PM_mapping, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SXI_MK_ARRAY - allocate and return a C_array
  *               - form: (pm-make-array <type> <size>)
  */
@@ -42,7 +206,7 @@ static object *_SXI_mk_array(SS_psides *si, object *argl)
 
 	arr = PM_make_array(type, size, NULL);
 
-	rv = SX_mk_C_array(si, arr);};
+	rv = SX_make_c_array(si, arr);};
 
     return(rv);}
 
@@ -63,7 +227,7 @@ static object *_SXI_resz_array(SS_psides *si, object *argl)
     arr  = NULL;
     size = 0L;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
             SC_LONG_I, &size,
             0);
 
@@ -104,7 +268,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
     dims = SS_null;
     reg  = SS_null;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
             SS_OBJECT_I, &dims,
             SS_OBJECT_I, &reg,
             0);
@@ -172,7 +336,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
 
 	PM_sub_array(d, newarr->data, idims, ireg, bpi);
 
-	rv = SX_mk_C_array(si, newarr);};
+	rv = SX_make_c_array(si, newarr);};
 
     return(rv);}
 
@@ -191,7 +355,7 @@ static object *_SXI_array_ref(SS_psides *si, object *argl)
     arr = NULL;
     n   = 0L;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
             SC_LONG_I, &n,
             0);
 
@@ -231,7 +395,7 @@ static object *_SXI_array_set(SS_psides *si, object *argl)
     arr = NULL;
     n   = 0L;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
             SC_LONG_I, &n,
             SS_OBJECT_I, &val,
             0);
@@ -295,7 +459,7 @@ object *SX_list_array(SS_psides *si, object *argl)
 		     SC_DOUBLE_I, fp,
 		     0);};};
 
-    rv = SX_mk_C_array(si, arr);
+    rv = SX_make_c_array(si, arr);
 
     return(rv);}
 
@@ -325,7 +489,7 @@ static object *_SXI_array_list(SS_psides *si, object *argl)
 
     arr = NULL;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
             0);
 
     if (arr == NULL)
@@ -346,10 +510,10 @@ static object *_SXI_num_arr_len(SS_psides *si, object *obj)
    {long n;
     object *o;
 
-    if (!SX_NUMERIC_ARRAYP(obj))
+    if (!SX_C_ARRAYP(obj))
        SS_error(si, "ARGUMENT NOT NUMERIC ARRAY - _SXI_NUM_ARR_LEN", obj);
 
-    n = NUMERIC_ARRAY_LENGTH(obj);
+    n = C_ARRAY_LENGTH(obj);
 
     o = SS_mk_integer(si, n);
 
@@ -368,12 +532,12 @@ static object *_SXI_num_arr_extr(SS_psides *si, object *arg)
     double fmn, fmx;
     double *d;
 
-    if (!SX_NUMERIC_ARRAYP(arg))
+    if (!SX_C_ARRAYP(arg))
        SS_error(si, "ARGUMENT NOT NUMERIC ARRAY - _SXI_NUM_ARR_EXTR", arg);
 
-    n    = NUMERIC_ARRAY_LENGTH(arg);
-    type = NUMERIC_ARRAY_TYPE(arg);
-    data = NUMERIC_ARRAY_DATA(arg);
+    n    = C_ARRAY_LENGTH(arg);
+    type = C_ARRAY_TYPE(arg);
+    data = C_ARRAY_DATA(arg);
 
     d = PM_array_real(type, data, n, NULL);
 
@@ -413,7 +577,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
     mn   = NULL;
     file = NULL;
     SS_args(si, argl,
-            G_SET, &s,
+            SX_SET_I, &s,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -488,7 +652,7 @@ static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
 	if (s->info_type == NULL)
 	   s->info_type = SC_PCONS_P_S;
 
-	obj = SX_mk_set(si, s);};
+	obj = SX_make_pm_set(si, s);};
 
     return(obj);}
 
@@ -578,19 +742,19 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 
 /* get the number of elements */
 	obj = SS_car(si, components);
-	if (!SX_NUMERIC_ARRAYP(obj))
+	if (!SX_C_ARRAYP(obj))
 	   SS_error(si, "OBJECT NOT NUMERIC ARRAY - _SXI_MAKE_PML_SET", obj);
 
-	ne      = NUMERIC_ARRAY_LENGTH(obj);
-	type    = NUMERIC_ARRAY_TYPE(obj);
-	elem[0] = NUMERIC_ARRAY_DATA(obj);
+	ne      = C_ARRAY_LENGTH(obj);
+	type    = C_ARRAY_TYPE(obj);
+	elem[0] = C_ARRAY_DATA(obj);
 
 	for (pe = elem; !SS_nullobjp(components); )
 	    {arr        = NULL;
 	     obj        = SS_car(si, components);
 	     components = SS_cdr(si, components);
-	     if (SX_NUMERIC_ARRAYP(obj))
-	        arr = SS_GET(C_array, obj);
+	     if (SX_C_ARRAYP(obj))
+	        arr = C_ARRAY(obj);
 	     else
 	        SS_error(si, "BAD ELEMENT ARRAY - _SXI_MAKE_PML_SET", obj);
 
@@ -607,7 +771,7 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 			NULL, NULL, NULL, NULL, NULL, NULL,
 			NULL);};
 
-    rv = SX_mk_set(si, set);
+    rv = SX_make_pm_set(si, set);
 
     return(rv);}
 
@@ -640,7 +804,7 @@ static object *_SXI_make_cp_set(SS_psides *si, object *argl)
 
     CFREE(sets);
 
-    obj = SX_mk_set(si, cp);
+    obj = SX_make_pm_set(si, cp);
 
     return(obj);}
 
@@ -674,13 +838,13 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
     name      = NULL;
     next      = NULL;
     SS_args(si, argl,
-            G_SET, &domain,
-            G_SET, &range,
+            SX_SET_I, &domain,
+            SX_SET_I, &range,
             SC_ENUM_I, &centering,
             SC_STRING_I, &category,
             SC_STRING_I, &name,
-	    G_NUM_ARRAY, &arr,
-	    G_MAPPING, &next,
+	    SX_C_ARRAY_I, &arr,
+	    SX_MAPPING_I, &next,
             0);
 
     if (name == NULL)
@@ -708,7 +872,7 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
 			     "EXISTENCE", SC_CHAR_I, TRUE, emap,
 			     NULL);};
 
-    o = SX_mk_mapping(si, f);
+    o = SX_make_pm_mapping(si, f);
 
     return(o);}
 
@@ -795,7 +959,7 @@ static object *_SXI_set_map_type(SS_psides *si, object *argl)
     f    = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_MAPPING, &f,
+            SX_MAPPING_I, &f,
             SC_STRING_I, &name,
             0);
 
@@ -828,7 +992,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
     mn   = NULL;
     file = NULL;
     SS_args(si, argl,
-            G_MAPPING, &f,
+            SX_MAPPING_I, &f,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -958,7 +1122,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
 	     if (ret == FALSE)
 	        SS_error(si, "NO FIELD FOR TYPE - _SXI_PDBDATA_MAPPING", SS_null);};
 
-	rv = SX_mk_mapping(si, f);};
+	rv = SX_make_pm_mapping(si, f);};
 
     return(rv);}
 
@@ -980,6 +1144,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
     double **elem, *pe;
     void *data;
     object *obj, *components, *shape, *lst;
+    C_array *arr;
     PM_set *set;
 
     n     = 0;
@@ -1023,15 +1188,15 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
 
 /* get the number of elements */
     lst = SS_caar(si, components);
-    if (!SX_NUMERIC_ARRAYP(lst))
+    if (!SX_C_ARRAYP(lst))
        SS_error(si, "OBJECT NOT NUMERIC ARRAY - _SXI_ARRAYS_SET", lst);
 
-    SC_strncpy(type, MAXLINE, NUMERIC_ARRAY_TYPE(lst), -1);
+    SC_strncpy(type, MAXLINE, C_ARRAY_TYPE(lst), -1);
     PD_dereference(type);
     sid = SC_type_id(type, FALSE);
 
-    data = NUMERIC_ARRAY_DATA(lst);
-    nep  = NUMERIC_ARRAY_LENGTH(lst);
+    data = C_ARRAY_DATA(lst);
+    nep  = C_ARRAY_LENGTH(lst);
     ne   = nep*n;
 
     for (j = 0; !SS_nullobjp(components); j++, components = SS_cdr(si, components))
@@ -1039,9 +1204,10 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
          elem[j] = pe;
          lst = SS_car(si, components);
          for (i = 0; i < n; i++)
-             {SX_GET_ARRAY_FROM_LIST(si, data, lst,
-                                     "BAD ELEMENT ARRAY - _SXI_ARRAYS_SET");
+             {SX_GET_C_ARRAY_FROM_LIST(si, arr, lst,
+				       "BAD ELEMENT ARRAY - _SXI_ARRAYS_SET");
 
+	      data = arr->data;
               SC_convert_id(SC_DOUBLE_I, pe, 0, 1,
 			    sid, data, 0, 1, nep, FALSE);
 
@@ -1061,7 +1227,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
 		    NULL, NULL, NULL, NULL, NULL, NULL,
 		    NULL);
 
-    obj = SX_mk_set(si, set);
+    obj = SX_make_pm_set(si, set);
 
     return(obj);}
 
@@ -1086,7 +1252,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
     f   = NULL;
     ord = BND_CELL_MAX;
     SS_args(si, argl,
-            G_MAPPING, &f,
+            SX_MAPPING_I, &f,
             SC_INT_I, &ord,
             0);
 
@@ -1143,7 +1309,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
 
 	    g = PM_make_mapping(f->name, PM_AC_S, ndom, nran, cent, NULL);
 
-	    rv = SX_mk_mapping(si, g);};};
+	    rv = SX_make_pm_mapping(si, g);};};
 
     return(rv);}
 
@@ -1237,7 +1403,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
 		    PM_MESH_TOPOLOGY_P_S, mt,
 		    NULL, NULL, NULL);
 
-    o = SX_mk_set(si, set);
+    o = SX_make_pm_set(si, set);
 
     return(o);}
 
@@ -1264,7 +1430,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
     file = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -1316,7 +1482,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
     mn   = NULL;
     file = NULL;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -1384,7 +1550,7 @@ static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
 	   arr = PM_make_array(PD_entry_type(ep), PD_entry_number(ep),
 			       pd->data);
 
-	rv = SX_mk_C_array(si, arr);};
+	rv = SX_make_c_array(si, arr);};
 
     return(rv);}
 
@@ -1505,7 +1671,7 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
             SC_STRING_I, &yname,
             SC_STRING_I, &nzname,
             SC_STRING_I, &nnname,
-            G_NUM_ARRAY, &connct,
+            SX_C_ARRAY_I, &connct,
 	    LAST);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -1541,7 +1707,7 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
 
 	s = SX_rep_to_ac(sname, rx, ry, n_nodes, n_zones, zones);
 
-	rv = SX_mk_set(si, s);};
+	rv = SX_make_pm_set(si, s);};
 
     return(rv);}
 
@@ -1569,10 +1735,10 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
     indx = NULL;
     pred = NULL;
     SS_args(si, argl,
-            G_NUM_ARRAY, &arr,
+            SX_C_ARRAY_I, &arr,
             SS_PROCEDURE_I, &pred,
             SC_DOUBLE_I, &val,
-            G_NUM_ARRAY, &indx,
+            SX_C_ARRAY_I, &indx,
             0);
 
     if (pred == NULL)
@@ -1596,7 +1762,7 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
 
 	iarr = PM_make_array(SC_INT_S, no, out);
 
-	rv = SX_mk_C_array(si, iarr);};
+	rv = SX_make_c_array(si, iarr);};
 
     return(rv);}
         
@@ -1641,7 +1807,7 @@ static object *_SXI_mk_polygon(SS_psides *si, object *argl)
 
     py->nn = ip;
 
-    rv = SX_mk_polygon(si, py);
+    rv = SX_make_pm_polygon(si, py);
 
     return(rv);}
 
@@ -1715,7 +1881,7 @@ static object *_SX_combine_polygons(SS_psides *si, object *argl,
 	np = SC_array_get_n(a);
 	for (ip = 0; ip < np; ip++)
 	    {pa = PM_polygon_get(a, ip);
-	     o  = SX_mk_polygon(si, pa);
+	     o  = SX_make_pm_polygon(si, pa);
 	     rv = SS_mk_cons(si, o, rv);};
 
 	PM_free_polygons(a, FALSE);
@@ -1768,11 +1934,6 @@ void SX_install_pml_funcs(SS_psides *si)
                SS_nargs,
                _SXI_find_index, SS_PR_PROC);
 
-    SS_install(si, "pm-array?",
-               "Returns #t if the object is a numeric array, and #f otherwise",
-               SS_sargs,
-               _SXI_numeric_arrayp, SS_PR_PROC);
-
     SS_install(si, "list->pm-array",
                "Returns a numeric array built from a list of numbers",
                SS_nargs,
@@ -1818,20 +1979,10 @@ void SX_install_pml_funcs(SS_psides *si)
                SS_nargs,
                _SXI_sub_array, SS_PR_PROC);
 
-    SS_install(si, "pm-set?",
-               "Returns #t if the object is a PML set, and #f otherwise",
-               SS_sargs,
-               _SXI_setp, SS_PR_PROC);
-
     SS_install(si, "pm-set-mapping-type",
                "Set the type of a mapping object to the given string",
                SS_nargs,
                _SXI_set_map_type, SS_PR_PROC);
-
-    SS_install(si, "pm-mapping?",
-               "Returns #t if the object is a PML mapping, and #f otherwise",
-               SS_sargs,
-               _SXI_mappingp, SS_PR_PROC);
 
     SS_install(si, "pm-grotrian-mapping?",
                "Returns #t if the object is a PML grotrian mapping, and #f otherwise",
@@ -1919,11 +2070,6 @@ void SX_install_pml_funcs(SS_psides *si)
 	       _SXI_rep_ac_domain, SS_PR_PROC);
 
 /* polygon routines */
-    SS_install(si, "pm-polygon?",
-               "Returns #t if the object is a pm-polygon, and #f otherwise",
-               SS_sargs,
-               _SXI_polygonp, SS_PR_PROC);
-
     SS_install(si, "pm-make-polygon",
                "Allocate and return a pm-polygon of the specified type and size",
                SS_nargs,

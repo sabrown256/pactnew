@@ -8,10 +8,11 @@
 typedef struct s_tn_list tn_list;
 
 struct s_tn_list
-   {char snm[BFSML];        /* C struct name, PM_set */
+   {char cnm[BFSML];        /* C struct name, PM_set */
+    char snm[BFSML];        /* Scheme struct name, pm-set */
     char rnm[BFSML];        /* root struct id, SET */
-    char lnm[BFSML];        /* lower case version of SNM, pm_set */
-    char unm[BFSML];};      /* upper case version of SNM, PM_SET */
+    char lnm[BFSML];        /* lower case version of CNM, pm_set */
+    char unm[BFSML];};      /* upper case version of CNM, PM_SET */
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -21,15 +22,20 @@ struct s_tn_list
 static void scheme_type_name_list(char *typ, tn_list *na)
    {char *p;
 
-/* get struct name */
+/* get C struct name */
     p = trim(typ, BOTH, " \t");
-    nstrncpy(na->snm, BFSML, p, -1);
+    nstrncpy(na->cnm, BFSML, p, -1);
 
+/* upper case C name */
     nstrncpy(na->unm, BFSML, p, -1);
     upcase(na->unm);
 
+/* lower case C name */
     nstrncpy(na->lnm, BFSML, p, -1);
     downcase(na->lnm);
+
+/* make the Scheme name */
+    nstrncpy(na->snm, BFSML, subst(na->lnm, "_", "-", -1), -1);
 
 /* get root struct name */
     if (p[2] == '_')
@@ -39,6 +45,29 @@ static void scheme_type_name_list(char *typ, tn_list *na)
     upcase(na->rnm);
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_BIND_MEMBER - return the TRUE if the struct has a BIND member
+ *                    - the BIND member must be:
+ *                    -     void *(*BIND)(<type> *x, bind_opt wh, void *a)
+ *                    - it is the conventional member for struct specific
+ *                    - work done in conjunction with generic work done
+ *                    - in working with BLANG generated struct bindings
+ *                    - because the calling sequence is conventional
+ *                    - we only need a TRUE/FALSE return
+ */
+
+int scheme_bind_member(char **ta)
+   {int i, hnm;
+
+    hnm = FALSE;
+    for (i = 1; (ta[i] != NULL) && (hnm == FALSE); i++)
+        {if (strstr(ta[i], "void *(*BIND)") != NULL)
+	    hnm = TRUE;};
+
+    return(hnm);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -119,7 +148,7 @@ static fparam so_type(char *a, int nc, char *ty)
        
     else if (is_ptr(ty) == TRUE)
        {rv = FP_ARRAY;
-	nstrncpy(a, nc, "SX_mk_C_array", -1);}
+	nstrncpy(a, nc, "SX_make_c_array", -1);}
 
 /* handle unknown types with a mostly graceful failure */
     else
@@ -134,11 +163,13 @@ static fparam so_type(char *a, int nc, char *ty)
 /* INIT_SCHEME - initialize Scheme file */
 
 static void init_scheme(statedes *st, bindes *bd)
-   {char fn[BFLRG];
+   {char fn[BFLRG], upck[BFLRG];
     char *pck;
     FILE *fp;
 
     pck = st->pck;
+    snprintf(upck, BFLRG, pck, -1);
+    upcase(upck);
 
 /* open C file */
     if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
@@ -149,7 +180,13 @@ static void init_scheme(statedes *st, bindes *bd)
     fp = open_file("w", fn);
     bd->fp[0] = fp;
 
+    fprintf(fp, "/*\n");
+    fprintf(fp, " * GS-%s.C - generated support routines for %s\n",
+	    upck, upck);
+    fprintf(fp, " *\n");
+    fprintf(fp, " */\n");
     fprintf(fp, "\n");
+
     fprintf(fp, "#include \"cpyright.h\"\n");
     fprintf(fp, "#include \"sx_int.h\"\n");
     fprintf(fp, "#include \"%s_int.h\"\n", pck);
@@ -167,15 +204,22 @@ static void init_scheme(statedes *st, bindes *bd)
     fp = open_file("w", fn);
     bd->fp[1] = fp;
 
+    fprintf(fp, "/*\n");
+    fprintf(fp, " * GS-%s.H - header containing generated support for %s\n",
+	    upck, upck);
+    fprintf(fp, " *\n");
+    fprintf(fp, " */\n");
     fprintf(fp, "\n");
+
     fprintf(fp, "#include \"cpyright.h\"\n");
     fprintf(fp, "\n");
     fprintf(fp, "#ifndef GEN_%s_H\n", pck);
     fprintf(fp, "#define GEN_%s_H\n", pck);
     fprintf(fp, "\n");
+/*
     fprintf(fp, "#include \"gs-%s.h\"\n", pck);
     fprintf(fp, "\n");
-
+*/
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -540,19 +584,24 @@ static void scheme_hdr_struct_def(FILE *fp, char *dv, char **ta, char *pck)
 	    tl.rnm, tl.rnm);
     fprintf(fp, "\n");
 
+#if 0
+    fprintf(fp, "#define %s(_o)   \t(SS_GET(%s, _o))\n",
+	    tl.rnm, tl.cnm);
+#endif
+
 /* emit member accessor macros */
     for (i = 1; ta[i] != NULL; i++)
         {mbr = trim(ta[i], BOTH, " \t");
 	 if (IS_NULL(mbr) == FALSE)
 	    {nstrncpy(mnm, BFSML, mbr, -1);
 	     p = strtok(mnm, "* \t");
-	     p = strtok(NULL, "(*) \t");
+	     p = strtok(NULL, "[(*)] \t");
 	     nstrncpy(lnm, BFSML, p, -1);
 	     nstrncpy(unm, BFSML, p, -1);
 	     upcase(unm);
 
 	     fprintf(fp, "#define %s_%s(_o)   \t(SS_GET(%s, _o)->%s)\n",
-		     tl.rnm, unm, tl.snm, lnm);};};
+		     tl.rnm, unm, tl.cnm, lnm);};};
     fprintf(fp, "\n");
 
 /* emit list extractor */
@@ -560,9 +609,17 @@ static void scheme_hdr_struct_def(FILE *fp, char *dv, char **ta, char *pck)
     fprintf(fp, "   {obj = SS_car(_si, _a);   \\\n");
     fprintf(fp, "    _a = SS_cdr(_si, _a);   \\\n");
     fprintf(fp, "    if (SX_%sP(obj))   \\\n", tl.rnm);
-    fprintf(fp, "       _v = SS_GET(%s, obj);   \\\n", tl.snm);
+    fprintf(fp, "       _v = SS_GET(%s, obj);   \\\n", tl.cnm);
     fprintf(fp, "    else   \\\n");
     fprintf(fp, "       SS_error(_si, _s, obj);}\n");
+    fprintf(fp, "\n");
+
+/* emit external declarations */
+    fprintf(fp, "extern int SX_%s_I;\n", tl.rnm);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "extern object *SX_make_%s(SS_psides *si, %s *x);\n",
+	    tl.lnm, tl.cnm);
     fprintf(fp, "\n");
 
     return;}
@@ -581,26 +638,33 @@ static void scheme_c_struct_def(FILE *fp, char *dv, char **ta, char *pck)
 
     scheme_type_name_list(ta[0]+9, &tl);
 
-/* register with the SX VIF */
-    fprintf(fp, "    dp = PD_defstr(SX_gs.vif, \"%s\",\n", tl.snm);
+/* emit registration with the SX VIF */
+    fprintf(fp, "    dp = PD_defstr(SX_gs.vif, \"%s\",\n", tl.cnm);
 
     for (i = 2; ta[i] != NULL; i++)
         {mbr = trim(ta[i], BOTH, " \t");
+	 if (IS_NULL(mbr) == FALSE)
 
 /* function pointer */
-	 p = strstr(mbr, "(*");
-	 if (p != NULL)
-	    fprintf(fp, "                   \"function %s\",\n",
-		    strtok(p+2, ")"));
-	 else
-	    fprintf(fp, "                   \"%s\",\n", mbr);};
+	    {p = strstr(mbr, "(*");
+	     if (p != NULL)
+	        fprintf(fp, "                   \"function %s\",\n",
+			strtok(p+2, ")"));
+	     else
+	        fprintf(fp, "                   \"%s\",\n", mbr);};};
 
     fprintf(fp, "                   LAST);\n");
     fprintf(fp, "    nerr += (dp == NULL);\n");
     fprintf(fp, "\n");
 
-/* register with the SCORE type system */
-    fprintf(fp, "    SX_%s_I = SC_type_register(\"%s\", KIND_STRUCT, sizeof(%s),\n", tl.rnm, tl.snm, tl.snm);
+    fprintf(fp, "    SS_install(si, \"%s?\",\n", tl.snm);
+    fprintf(fp, "               \"Returns #t if the object is a %s, and #f otherwise\",\n", tl.cnm);
+    fprintf(fp, "               SS_sargs,\n");
+    fprintf(fp, "               _SXI_%sp, SS_PR_PROC);\n", tl.lnm);
+    fprintf(fp, "\n");
+
+/* emit registration with the SCORE type system */
+    fprintf(fp, "    SX_%s_I = SC_type_register(\"%s\", KIND_STRUCT, sizeof(%s),\n", tl.rnm, tl.cnm, tl.cnm);
     fprintf(fp, "              SC_TYPE_FREE, _SX_rl_%s,\n", tl.lnm);
     fprintf(fp, "              0);\n");
     fprintf(fp, "\n");
@@ -667,10 +731,7 @@ static void scheme_struct_defs(FILE **fp, char *dv, char **ta, char *pck)
  */
 
 static void scheme_object_defs(FILE **fp, char *dv, char **ta, char *pck)
-   {int i, hnm;
-    char inm[BFSML];
-    char **sa;
-    FILE *fs;
+   {FILE *fs;
     tn_list tl;
 
     fs = fp[0];
@@ -684,30 +745,18 @@ static void scheme_object_defs(FILE **fp, char *dv, char **ta, char *pck)
     else if (strncmp(ta[0], "struct s_", 9) == 0)
        {scheme_type_name_list(ta[0]+9, &tl);
 
-/* determine whether or not a member has been tagged with LBLI
- * it must be 'char *' or 'char []'
- */
-	hnm = FALSE;
-	for (i = 1; (ta[i] != NULL) && (hnm == FALSE); i++)
-	    {if (strstr(ta[i], "LBLI") != NULL)
-	        {sa = tokenize(ta[i], "* \t", 0);
-		 nstrncpy(inm, BFSML, sa[1], -1);
-		 lst_free(sa);
-		 hnm = TRUE;};};
-
+        csep(fs);
         fprintf(fs, "\n");
 
+/* emit the object write method */
 	fprintf(fs, "static void _SX_wr_%s(SS_psides *si, object *o, object *fp)\n",
 		tl.lnm);
-	fprintf(fs, "   {\n");
+	fprintf(fs, "   {%s *x;\n", tl.cnm);
 	fprintf(fs, "\n");
-
-        if (hnm == TRUE)
-	   fprintf(fs, "    PRINT(SS_OUTSTREAM(fp), \"<%s|%%s>\", %s_%s(o));\n",
-		   tl.rnm, tl.rnm, upcase(inm));
-        else
-	   fprintf(fs, "    PRINT(SS_OUTSTREAM(fp), \"<%s|%%p>\", o);\n",
-		   tl.rnm);
+	fprintf(fs, "    x = SS_GET(%s, o);\n", tl.cnm);
+	fprintf(fs, "\n");
+	fprintf(fs, "    PRINT(SS_OUTSTREAM(fp), \"<%s|%%s>\", _SX_opt_%s(x, BIND_PRINT, NULL));\n",
+		tl.rnm, tl.cnm);
 
 	fprintf(fs, "\n");
 	fprintf(fs, "    return;}\n");
@@ -717,36 +766,49 @@ static void scheme_object_defs(FILE **fp, char *dv, char **ta, char *pck)
         csep(fs);
         fprintf(fs, "\n");
 
+/* emit the object release method */
 	fprintf(fs, "static void _SX_rl_%s(SS_psides *si, object *o)\n",
 		tl.lnm);
-	fprintf(fs, "   {\n");
+	fprintf(fs, "   {%s *x;\n", tl.cnm);
+	fprintf(fs, "\n");
+	fprintf(fs, "    x = SS_GET(%s, o);\n", tl.cnm);
+	fprintf(fs, "\n");
+	fprintf(fs, "    _SX_opt_%s(x, BIND_FREE, NULL);\n", tl.cnm);
 	fprintf(fs, "\n");
 	fprintf(fs, "    SS_rl_object(si, o);\n");
 	fprintf(fs, "\n");
 	fprintf(fs, "    return;}\n");
-	fprintf(fs, "\n");
-
-        csep(fs);
-        csep(fs);
 
 	fprintf(fs, "\n");
+        csep(fs);
+        csep(fs);
+	fprintf(fs, "\n");
+
+/* emit the object instantiation method */
 	fprintf(fs, "int SX_%s_I;\n", tl.rnm);
 
 	fprintf(fs, "\n");
-	fprintf(fs, "object *SX_make_%s(SS_psides *si, object *argl)\n",
-		tl.lnm);
-	fprintf(fs, "   {%s *x;\n", tl.snm);
-	fprintf(fs, "    object *rv;\n");
+	fprintf(fs, "object *SX_make_%s(SS_psides *si, %s *x)\n",
+		tl.lnm, tl.cnm);
+	fprintf(fs, "   {object *rv;\n");
 	fprintf(fs, "\n");
-	fprintf(fs, "    x = CMAKE(%s);\n", tl.snm);
-	fprintf(fs, "\n");
+
 	fprintf(fs, "    if (x == NULL)\n");
 	fprintf(fs, "       rv = SS_null;\n");
 	fprintf(fs, "    else\n");
-	fprintf(fs, "       rv = SS_mk_object(si, x, SX_%s_I, SELF_EV, \"%s\",\n",
-		tl.rnm, tl.snm);
-	fprintf(fs, "                         _SX_wr_%s, _SX_rl_%s);\n",
+
+/* use the BIND member to determine the print name */
+	fprintf(fs, "       {char *nm;\n");
+	fprintf(fs, "\n");
+	fprintf(fs, "        _SX_opt_%s(x, BIND_ALLOC, NULL);\n",
+		tl.cnm);
+	fprintf(fs, "        nm = _SX_opt_%s(x, BIND_LABEL, NULL);\n",
+		tl.cnm);
+	fprintf(fs, "        rv = SS_mk_object(si, x, SX_%s_I, SELF_EV, nm,\n",
+		tl.rnm);
+	fprintf(fs, "                          _SX_wr_%s, _SX_rl_%s);}\n",
 		tl.lnm, tl.lnm);
+
 	fprintf(fs, "\n");
 	fprintf(fs, "    return(rv);}\n");
 
@@ -758,11 +820,9 @@ static void scheme_object_defs(FILE **fp, char *dv, char **ta, char *pck)
 	fprintf(fs, "void *_SX_arg_%s(SS_psides *si, object *o)\n", tl.lnm);
 	fprintf(fs, "   {void *rv;\n");
 	fprintf(fs, "\n");
-	fprintf(fs, "    rv = NULL;\n");
+	fprintf(fs, "    rv = _SX_opt_%s(NULL, BIND_ARG, o);\n", tl.cnm);
 	fprintf(fs, "\n");
-	fprintf(fs, "    if (SX_%sP(o))\n", tl.rnm);
-	fprintf(fs, "       rv = (void *) SS_GET(%s, o);\n", tl.snm);
-	fprintf(fs, "    else\n");
+	fprintf(fs, "    if (rv == _SX.unresolved)\n");
 	fprintf(fs, "       SS_error(si, \"OBJECT NOT %s - _SX_ARG_%s\", o);\n",
 		tl.unm, tl.unm);
 	fprintf(fs, "\n");
@@ -781,7 +841,8 @@ static void scheme_object_defs(FILE **fp, char *dv, char **ta, char *pck)
 	fprintf(fs, "\n");
 	fprintf(fs, "    return(rv);}\n");
 
-	fprintf(fs, "\n");};
+	fprintf(fs, "\n");
+        csep(fs);};
 
     return;}
 
