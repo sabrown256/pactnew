@@ -32,7 +32,7 @@ void *_SX_opt_hasharr(hasharr *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_HASHARRP(o))
-	        rv = (void *) SS_GET(hasharr, o);
+	        rv = SS_GET(hasharr, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -60,15 +60,15 @@ void *_SX_opt_PDBfile(PDBfile *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SS_nullobjp(o) || SX_FILEP(o))
-	        {rv = (void *) SX_gs.gvif;
+	        {rv = SX_gs.gvif;
 		 if (!SS_nullobjp(o))
 		    {g_file *gf;
              
 		     gf = (g_file *) SS_GET(g_file, o);
 		     if (gf != NULL)
-		        rv = (void *) gf->file;};}
+		        rv = gf->file;};}
 	     else if (SX_PDBFILEP(o))
-	        rv = (void *) SS_GET(PDBfile, o);
+	        rv = SS_GET(PDBfile, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -99,7 +99,7 @@ void *_SX_opt_syment(syment *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_SYMENTP(o))
-	        rv = (void *) SS_GET(syment, o);
+	        rv = SS_GET(syment, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -130,7 +130,7 @@ void *_SX_opt_defstr(defstr *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_DEFSTRP(o))
-	        rv = (void *) SS_GET(defstr, o);
+	        rv = SS_GET(defstr, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -566,7 +566,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
         outtype = intype;};
 
     if (SX_PDBDATAP(obj))
-       vr = (void *) PDBDATA_DATA(obj);
+       vr = PDBDATA_DATA(obj);
     else
        SS_error(si, "CAN'T HANDLE THIS DATA - _SXI_WR_RAW", argl);
 

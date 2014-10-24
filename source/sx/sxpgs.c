@@ -39,7 +39,7 @@ void *_SX_opt_PG_device(PG_device *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_DEVICEP(o))
-	        rv = (void *) SS_GET(PG_device, o);
+	        rv = SS_GET(PG_device, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -75,7 +75,7 @@ void *_SX_opt_PG_image(PG_image *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_IMAGEP(o))
-	        rv = (void *) SS_GET(PG_image, o);
+	        rv = SS_GET(PG_image, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -106,7 +106,7 @@ void *_SX_opt_PG_palette(PG_palette *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_PALETTEP(o))
-	        rv = (void *) SS_GET(PG_palette, o);
+	        rv = SS_GET(PG_palette, o);
 	     else
 	        rv = _SX.unresolved;
 	     break;
@@ -327,8 +327,8 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
 
     info_type = SC_PCONS_P_S;
     if ((ndd == 1) && (ndr == 1))
-       info = (void *) PG_set_line_info(NULL, PLOT_CARTESIAN, CARTESIAN_2D,
-					LINE_SOLID, FALSE, 0, clr, 0, 0.0);
+       info = PG_set_line_info(NULL, PLOT_CARTESIAN, CARTESIAN_2D,
+			       LINE_SOLID, FALSE, 0, clr, 0, 0.0);
 
     else if ((ndd == 2) && (ndr == 1))
        {int nlev;
@@ -336,13 +336,13 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
 	PG_get_attrs_glb(TRUE,
 			 "contour-n-levels", &nlev,
 			 NULL);
-	info = (void *) PG_set_tds_info(NULL, PLOT_CONTOUR, CARTESIAN_2D,
-					LINE_SOLID, clr, nlev,
-					1.0, 0.0, 0.0, 0.0, 0.0, HUGE);}
+	info = PG_set_tds_info(NULL, PLOT_CONTOUR, CARTESIAN_2D,
+			       LINE_SOLID, clr, nlev,
+			       1.0, 0.0, 0.0, 0.0, 0.0, HUGE);}
 
     else if ((ndd == 2) && (ndr == 2))
-       info = (void *) PG_set_tdv_info(NULL, PLOT_VECTOR, CARTESIAN_2D,
-				       LINE_SOLID, clr, 0.0);
+       info = PG_set_tdv_info(NULL, PLOT_VECTOR, CARTESIAN_2D,
+			      LINE_SOLID, clr, 0.0);
     else
        info = NULL;
 
@@ -1313,9 +1313,8 @@ static object *_SXI_draw_domain(SS_psides *si, object *argl)
     dev = NULL;
 
     if (SS_consp(argl))
-       SX_GET_OBJECT_FROM_LIST(si, SX_DEVICEP(obj), dev,
-                               SS_GET(PG_device, obj),
-                               argl, "BAD DEVICE - _SXI_DRAW_DOMAIN");
+       SX_GET_DEVICE_FROM_LIST(si, dev, argl,
+			       "BAD DEVICE - _SXI_DRAW_DOMAIN");
 
     if (dev == NULL)
        return(SS_null);
@@ -1380,7 +1379,7 @@ static void _SX_attach_rendering_1d(PG_graph *data, PG_rendering pty,
     for (g = data; g != NULL; g = g->next)
         {line_info = (pcons *) g->info;
 	 line_info = PG_set_plot_type(line_info, pty, axis_type);
-         g->info   = (void *) line_info;
+         g->info   = line_info;
 
          if (pty == PLOT_SCATTER)
 	    PG_set_attrs_graph(g,
@@ -1415,9 +1414,8 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
     dev = NULL;
 
     if (SS_consp(argl))
-       SX_GET_OBJECT_FROM_LIST(si, SX_DEVICEP(obj), dev,
-                               SS_GET(PG_device, obj),
-                               argl, "BAD DEVICE - _SXI_DRAW_PLOT");
+       SX_GET_DEVICE_FROM_LIST(si, dev, argl,
+			       "BAD DEVICE - _SXI_DRAW_PLOT");
 
     if ((dev == NULL) || (!SX_OK_TO_DRAW(dev)))
        return(SS_f);
@@ -1464,9 +1462,8 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
     info       = (pcons *) data->info;
 
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(si, SS_integerp(obj), apty,
-				(PG_rendering) SS_INTEGER_VALUE(obj),
-                                argl, "BAD PLOT TYPE - _SXI_DRAW_PLOT");
+       {SX_GET_INTEGER_FROM_LIST(si, apty, argl,
+				 "BAD PLOT TYPE - _SXI_DRAW_PLOT");
 
 /*	if ((pty == PLOT_NONE) && (apty != PLOT_NONE)) */
 	   pty = apty;
@@ -1540,11 +1537,8 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 			     {int *nlev;
 
 			      nlev = PG_ptr_attr_glb("contour-n-levels");
-			      SX_GET_OBJECT_FROM_LIST(si, SS_integerp(obj),
-						      *nlev,
-						      SS_INTEGER_VALUE(obj),
-						      argl,
-						      "BAD NUMBER OF LEVELS - _SXI_DRAW_PLOT");};
+			      SX_GET_INTEGER_FROM_LIST(si, *nlev, argl,
+						       "BAD NUMBER OF LEVELS - _SXI_DRAW_PLOT");};
 
 			  data->render = PG_contour_plot;
 			  break;
@@ -1559,7 +1553,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
     pty = *rendering_mode[domain_dim][range_dim];
 
     data->rendering = pty;
-    data->info      = (void *) info;
+    data->info      = info;
 /*    dev->data_id    = TRUE; */
 
     if ((pty == PLOT_SURFACE) ||
@@ -1603,7 +1597,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 	oinf = (pcons *) data->f->map;
 	ninf = SC_copy_alist(oinf);
 	ninf = SC_append_alist(ninf, SC_copy_alist(info));
-	data->f->map = (void *) ninf;
+	data->f->map = ninf;
 
 	PG_get_attrs_glb(TRUE,
 			 "ref-mesh", &refm,
@@ -1619,7 +1613,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 			refm, dev->WHITE, LINE_SOLID, 0.0);
 
 	SC_free_alist(ninf, 1);
-	data->f->map = (void *) oinf;}
+	data->f->map = oinf;}
 
     else if (data->render != NULL)
        data->render(dev, data);

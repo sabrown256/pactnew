@@ -968,16 +968,14 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
     pfb = NULL;
 
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(si, SX_ipdbfilep(obj), pfa, 
-                                FILE_STREAM(PDBfile, obj), argl, 
-                                "FIRST ARGUMENT NOT PDBFILE - _SXI_DIFF_VAR");}
+       {SX_GET_PDBFILE_FROM_LIST(si, pfa, argl,
+				 "FIRST ARGUMENT NOT PDBFILE - _SXI_DIFF_VAR");}
     else
        SS_error(si, "BAD FIRST ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(si, SX_ipdbfilep(obj), pfb, 
-                                FILE_STREAM(PDBfile, obj), argl, 
-                                "SECOND ARGUMENT NOT PDBFILE - _SXI_DIFF_VAR");}
+       {SX_GET_PDBFILE_FROM_LIST(si, pfb, argl,
+				 "SECOND ARGUMENT NOT PDBFILE - _SXI_DIFF_VAR");}
     else
        SS_error(si, "BAD SECOND ARGUMENT - _SXI_DIFF_VAR", SS_null);
 

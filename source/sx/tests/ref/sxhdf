@@ -10,25 +10,25 @@ reading file foofoo
 
 File Name: SX_gs.vif
 File Type: PDB
-File Creation Date: Mon Apr 30 10:46:14 2012
+File Creation Date: Fri Oct 24 07:51:40 2014
 PDB Version: 30
 PDB Format Version: 3
 Default Offset: 0
 Array Order: ROW MAJOR (C)
-Types Needing Conversion: * function haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
-Symbol Table Address: 0xd46490
-Structure Chart Address: 0xd48830
+Types Needing Conversion: * function PM_polygon haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
+Symbol Table Address: 0x1748370
+Structure Chart Address: 0x1748990
 
 File Name: SX_gs.vif
 File Type: PDB
-File Creation Date: Mon Apr 30 10:46:14 2012
+File Creation Date: Fri Oct 24 07:51:40 2014
 PDB Version: 30
 PDB Format Version: 3
 Default Offset: 0
 Array Order: ROW MAJOR (C)
-Types Needing Conversion: * function haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
-Symbol Table Address: 0xd46490
-Structure Chart Address: 0xd48830
+Types Needing Conversion: * function PM_polygon haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
+Symbol Table Address: 0x1748370
+Structure Chart Address: 0x1748990
 /cn(0) =      1
 /cn(1) =      2
 /cn(2) =      3
@@ -46,25 +46,25 @@ Structure Chart Address: 0xd48830
 
 File Name: SX_gs.vif
 File Type: PDB
-File Creation Date: Mon Apr 30 10:46:14 2012
+File Creation Date: Fri Oct 24 07:51:40 2014
 PDB Version: 30
 PDB Format Version: 3
 Default Offset: 0
 Array Order: ROW MAJOR (C)
-Types Needing Conversion: * function haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
-Symbol Table Address: 0xd46490
-Structure Chart Address: 0xd48830
+Types Needing Conversion: * function PM_polygon haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
+Symbol Table Address: 0x1748370
+Structure Chart Address: 0x1748990
 
 File Name: SX_gs.vif
 File Type: PDB
-File Creation Date: Mon Apr 30 10:46:14 2012
+File Creation Date: Fri Oct 24 07:51:40 2014
 PDB Version: 30
 PDB Format Version: 3
 Default Offset: 0
 Array Order: ROW MAJOR (C)
-Types Needing Conversion: * function haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
-Symbol Table Address: 0xd46490
-Structure Chart Address: 0xd48830
+Types Needing Conversion: * function PM_polygon haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
+Symbol Table Address: 0x1748370
+Structure Chart Address: 0x1748990
 /cs(0) =    1
 /cs(1) =    2
 /cs(2) =    3
@@ -82,25 +82,25 @@ Structure Chart Address: 0xd48830
 
 File Name: SX_gs.vif
 File Type: PDB
-File Creation Date: Mon Apr 30 10:46:14 2012
+File Creation Date: Fri Oct 24 07:51:40 2014
 PDB Version: 30
 PDB Format Version: 3
 Default Offset: 0
 Array Order: ROW MAJOR (C)
-Types Needing Conversion: * function haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
-Symbol Table Address: 0xd46490
-Structure Chart Address: 0xd48830
+Types Needing Conversion: * function PM_polygon haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
+Symbol Table Address: 0x1748370
+Structure Chart Address: 0x1748990
 
 File Name: SX_gs.vif
 File Type: PDB
-File Creation Date: Mon Apr 30 10:46:14 2012
+File Creation Date: Fri Oct 24 07:51:40 2014
 PDB Version: 30
 PDB Format Version: 3
 Default Offset: 0
 Array Order: ROW MAJOR (C)
-Types Needing Conversion: * function haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
-Symbol Table Address: 0xd46490
-Structure Chart Address: 0xd48830
+Types Needing Conversion: * function PM_polygon haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
+Symbol Table Address: 0x1748370
+Structure Chart Address: 0x1748990
 /struct1(0).i =     10
 /struct1(0).i1 =      1
 /struct1(0).f =   0.000e+00
@@ -112,36 +112,36 @@ Structure Chart Address: 0xd48830
 
 File Name: SX_gs.vif
 File Type: PDB
-File Creation Date: Mon Apr 30 10:46:14 2012
+File Creation Date: Fri Oct 24 07:51:40 2014
 PDB Version: 30
 PDB Format Version: 3
 Default Offset: 0
 Array Order: ROW MAJOR (C)
-Types Needing Conversion: * function haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
-Symbol Table Address: 0xd46490
-Structure Chart Address: 0xd48830
+Types Needing Conversion: * function PM_polygon haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
+Symbol Table Address: 0x1748370
+Structure Chart Address: 0x1748990
 
 File Name: SX_gs.vif
 File Type: PDB
-File Creation Date: Mon Apr 30 10:46:14 2012
+File Creation Date: Fri Oct 24 07:51:40 2014
 PDB Version: 30
 PDB Format Version: 3
 Default Offset: 0
 Array Order: ROW MAJOR (C)
-Types Needing Conversion: * function haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
-Symbol Table Address: 0xd46490
-Structure Chart Address: 0xd48830
+Types Needing Conversion: * function PM_polygon haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
+Symbol Table Address: 0x1748370
+Structure Chart Address: 0x1748990
 
 File Name: SX_gs.vif
 File Type: PDB
-File Creation Date: Mon Apr 30 10:46:14 2012
+File Creation Date: Fri Oct 24 07:51:40 2014
 PDB Version: 30
 PDB Format Version: 3
 Default Offset: 0
 Array Order: ROW MAJOR (C)
-Types Needing Conversion: * function haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
-Symbol Table Address: 0xd46490
-Structure Chart Address: 0xd48830
+Types Needing Conversion: * function PM_polygon haelem SC_array hasharr attribute attribute_value object SC_dynamic_array pcons PG_image PM_set PM_mesh_topology PM_mapping string cons variable boolean vector multides dimdes memdes syment fpdes C_array PM_matrix PA_iv_specification PA_set_spec PA_plot_request PA_set_index bird rabbit
+Symbol Table Address: 0x1748370
+Structure Chart Address: 0x1748990
 I/O stats:
    Operation       # Hits   Tave (sec)
       lfread           14   0.000e+00

@@ -25,7 +25,7 @@ void *_SX_opt_PA_package(PA_package *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_PACKAGEP(o))
-	        rv = (void *) SS_GET(PA_package, o);
+	        rv = SS_GET(PA_package, o);
 	     else
 	        {s  = SS_get_string(o);
 		 rv = PA_INQUIRE_VARIABLE(s);
@@ -60,7 +60,7 @@ void *_SX_opt_PA_variable(PA_variable *x, bind_opt wh, void *a)
        {case BIND_ARG :
 	     o = (object *) a;
 	     if (SX_VARIABLEP(o))
-	        rv = (void *) SS_GET(PA_variable, o);
+	        rv = SS_GET(PA_variable, o);
 	     else
 	        {s  = CSTRSAVE(SS_get_string(o));
 		 rv = PA_INQUIRE_VARIABLE(s);
@@ -532,7 +532,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
         if (nu == NULL)
            nu = nxt;
         else
-           prv->cdr = (void *) nxt;
+           prv->cdr = nxt;
         prv = nxt;};
 
     du = NULL;
@@ -549,7 +549,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
            if (du == NULL)
               du = nxt;
            else
-              prv->cdr = (void *) nxt;
+              prv->cdr = nxt;
            prv = nxt;};
 
     pp = _PA_mk_variable(vname, vdims, viv, vif,
