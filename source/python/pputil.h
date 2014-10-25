@@ -208,12 +208,6 @@ extern int
  PP_image_Check(PyObject *op);
 
 
-/* PMLMAPPING.C declarations */
-
-extern int
- PP_mapping_Check(PyObject *op);
-
-
 /* PPARRAYS.C declarations */
 
 extern void
@@ -287,14 +281,9 @@ extern PyObject
 
 /* PPPML.C declarations */
 
-extern int
- mapping_extractor(PyObject *obj, void *arg);
-
 extern PyObject
  *PPfield_from_ptr(PM_field *data),
- *PPtopology_from_ptr(PM_mesh_topology *data),
- *PPset_from_ptr(PM_set *data),
- *PPmapping_from_ptr(PM_mapping *data);
+ *PPtopology_from_ptr(PM_mesh_topology *data);
 
 
 /* PPTYPES.C declarations */

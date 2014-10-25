@@ -431,7 +431,7 @@ PP_device_draw_picture(PP_deviceObject *self,
     char *kw_list[] = {"f", "ptyp", "bndp", "cbnd", "sbnd", "wbnd", "mshp", "cmsh", "smsh", "wmsh", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&iiiidiiid:draw_picture", kw_list,
-                                     mapping_extractor, &f, &ptyp, &bndp, &cbnd, &sbnd, &wbnd, &mshp, &cmsh, &smsh, &wmsh))
+                                     _PY_mapping_extractor, &f, &ptyp, &bndp, &cbnd, &sbnd, &wbnd, &mshp, &cmsh, &smsh, &wmsh))
         return NULL;
     PG_draw_picture(self->dev, f, ptyp, bndp, cbnd, sbnd, wbnd, mshp, cmsh, smsh, wmsh);
     Py_INCREF(Py_None);
