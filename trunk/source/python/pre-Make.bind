@@ -66,13 +66,14 @@ targets :
 
 PySrc = pact/pgs.py pact/pdb.py
 
-Hdrs = pdbmodule.h  pdbrw.h  pgsmodule.h  pputil.h ppcommon.h  utilpgs.h
+Hdrs = py_int.h pdbmodule.h pdbrw.h pgsmodule.h  \
+       pputil.h ppcommon.h utilpgs.h
 
 OPDBO = pdbmodule.o pdbPDBfile.o pdbmemdes.o \
         pdbdefstr.o pdbpdbdata.o pdbhashtab.o pdbhasharr.o \
         pdbassoc.o
 
-OPMLO = pmlfield.o pmlset.o pmltopology.o \
+OPMLO = pypml.o pmlfield.o pmlset.o pmltopology.o \
         pmlmapping.o
 
 OPPO  = pputil.o pptypes.o pparrays.o \
@@ -104,8 +105,8 @@ ArPDBO = ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbPDBfile.o) ${TGTLib}(pdbmemdes.o) \
          ${TGTLib}(pdbhashtab.o) ${TGTLib}(pdbhasharr.o) \
          ${TGTLib}(pdbassoc.o)
 
-ArPMLO = ${TGTLib}(pmlfield.o) ${TGTLib}(pmlset.o) ${TGTLib}(pmltopology.o) \
-         ${TGTLib}(pmlmapping.o)
+ArPMLO = ${TGTLib}(pypml.o) ${TGTLib}(pmlfield.o) ${TGTLib}(pmlset.o) \
+         ${TGTLib}(pmltopology.o) ${TGTLib}(pmlmapping.o)
 
 ArPPO  = ${TGTLib}(pputil.o) ${TGTLib}(pptypes.o) ${TGTLib}(pparrays.o) \
          ${TGTLib}(ppdefstr.o) ${TGTLib}(ppassoc.o) \

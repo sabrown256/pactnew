@@ -28,7 +28,7 @@ static PyObject *
 PP_set_set_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set_get) UNMODIFIED */
-    return PPset_from_ptr(self->set);
+    return _PY_set_from_ptr(self->set);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set_get) */
 }
 
@@ -309,7 +309,7 @@ static PyObject *
 PP_set_set_next_get(PP_setObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.set.descriptor.set.next_get) UNMODIFIED */
-    return PPset_from_ptr(self->set->next);
+    return _PY_set_from_ptr(self->set->next);
 /* DO-NOT-DELETE splicer.end(pdb.set.descriptor.set.next_get) */
 }
 
@@ -384,20 +384,6 @@ PP_set_tp_init(PP_setObject *self, PyObject *args, PyObject *kwds)
     return 0;
 /* DO-NOT-DELETE splicer.end(pdb.set.as_type.init) */
 }
-/*--------------------------------------------------------------------------*/
-
-/* PP_set_Check - */
-
-/* static */ int
-PP_set_Check(PyObject *op)
-{
-    if (PyObject_TypeCheck(op, &PP_set_Type))
-        return 1;
-    else
-        return 0;
-/*  return PY_TYPE(op) == &PP_set_Type; */
-}
-
 /*--------------------------------------------------------------------------*/
 
 

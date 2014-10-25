@@ -19,10 +19,7 @@
 #ifndef PY_pgs_H
 #define PY_pgs_H
 
-#include <Python.h>
-#undef HAVE_GETHOSTBYNAME
-#include <pgs_int.h>
-#include <pputil.h>
+#include "py_int.h"
 #include "utilpgs.h"
 
 /*--------------------------------------------------------------------------*/
@@ -78,50 +75,6 @@ typedef struct s_PP_mesh_topologyObject {
 
 /* staticforward PyTypeObject PP_mesh_topology_Type;*/
 extern PyTypeObject PP_mesh_topology_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-/*--------------------------------------------------------------------------*/
-/*                                OBJECT set                                */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_set_Check(op)    (PY_TYPE(op) == &PP_set_Type) */
-
-typedef struct s_PP_setObject *PP_setObjectp;
-
-typedef struct s_PP_setObject {
-  PyObject_HEAD
-  PM_set *set;
-} PP_setObject;
-
-/* staticforward PyTypeObject PP_set_Type;*/
-extern PyTypeObject PP_set_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-/*--------------------------------------------------------------------------*/
-/*                              OBJECT mapping                              */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_mapping_Check(op)    (PY_TYPE(op) == &PP_mapping_Type) */
-
-typedef struct s_PP_mappingObject *PP_mappingObjectp;
-
-typedef struct s_PP_mappingObject {
-  PyObject_HEAD
-  PM_mapping *map;
-} PP_mappingObject;
-
-/* staticforward PyTypeObject PP_mapping_Type;*/
-extern PyTypeObject PP_mapping_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 
 /*--------------------------------------------------------------------------*/
 /*                              OBJECT defstr                               */

@@ -692,7 +692,7 @@ PP_make_set_1d(
                                      &name, &type, &cp, &nd, &max, &nde, REAL_array_extractor, &elem))
         return NULL;
     result = PM_make_set(name, type, cp, nd, max, nde, elem);
-    return PPset_from_ptr(result);
+    return _PY_set_from_ptr(result);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -726,7 +726,7 @@ PP_make_ac_set(
         return NULL;
     mt = mtobj->mt;
     result = PM_make_ac_set(name, type, cp, mt, nde, x, y);
-    return PPset_from_ptr(result);
+    return _PY_set_from_ptr(result);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1345,6 +1345,10 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
    {int ne;
     PyObject *d;
 
+    d = PyModule_GetDict(m);
+    if (d == NULL)
+       PY_MOD_RETURN_ERR;
+
     ne = _PY_pact_constants(m);
     if (ne > 0)
        PY_MOD_RETURN_ERR;
@@ -1357,6 +1361,10 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
     if (ne > 0)
        PY_MOD_RETURN_ERR;
 
+    ne += PY_init_pml(m, d);
+    if (ne > 0)
+       PY_MOD_RETURN_ERR;
+
     PP_field_Type.tp_new = PyType_GenericNew;
     PP_field_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_field_Type) < 0)
@@ -1365,14 +1373,7 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
     PP_mesh_topology_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_mesh_topology_Type) < 0)
        PY_MOD_RETURN_ERR;
-    PP_set_Type.tp_new = PyType_GenericNew;
-    PP_set_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_set_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    PP_mapping_Type.tp_new = PyType_GenericNew;
-    PP_mapping_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_mapping_Type) < 0)
-       PY_MOD_RETURN_ERR;
+
     PP_defstr_Type.tp_new = PyType_GenericNew;
     PP_defstr_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_defstr_Type) < 0)
@@ -1415,17 +1416,9 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
        PY_MOD_RETURN_ERR;
 
 /* add some symbolic constants to the module */
-    d = PyModule_GetDict(m);
-    if (d == NULL)
-       PY_MOD_RETURN_ERR;
-
     if (PyDict_SetItemString(d, "field", (PyObject *) &PP_field_Type) < 0)
        PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "mesh_topology", (PyObject *) &PP_mesh_topology_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "set", (PyObject *) &PP_set_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "mapping", (PyObject *) &PP_mapping_Type) < 0)
        PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "defstr", (PyObject *) &PP_defstr_Type) < 0)
        PY_MOD_RETURN_ERR;

@@ -28,7 +28,7 @@ static PyObject *
 PP_mapping_map_get(PP_mappingObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mapping.descriptor.map_get) UNMODIFIED */
-    return PPmapping_from_ptr(self->map);
+    return _PY_mapping_from_ptr(self->map);
 /* DO-NOT-DELETE splicer.end(pdb.mapping.descriptor.map_get) */
 }
 
@@ -70,7 +70,7 @@ static PyObject *
 PP_mapping_map_domain_get(PP_mappingObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mapping.descriptor.map.domain_get) UNMODIFIED */
-    return PPset_from_ptr(self->map->domain);
+    return _PY_set_from_ptr(self->map->domain);
 /* DO-NOT-DELETE splicer.end(pdb.mapping.descriptor.map.domain_get) */
 }
 
@@ -84,7 +84,7 @@ static PyObject *
 PP_mapping_map_range_get(PP_mappingObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mapping.descriptor.map.range_get) UNMODIFIED */
-    return PPset_from_ptr(self->map->range);
+    return _PY_set_from_ptr(self->map->range);
 /* DO-NOT-DELETE splicer.end(pdb.mapping.descriptor.map.range_get) */
 }
 
@@ -168,7 +168,7 @@ static PyObject *
 PP_mapping_map_next_get(PP_mappingObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.mapping.descriptor.map.next_get) UNMODIFIED */
-    return PPmapping_from_ptr(self->map->next);
+    return _PY_mapping_from_ptr(self->map->next);
 /* DO-NOT-DELETE splicer.end(pdb.mapping.descriptor.map.next_get) */
 }
 
@@ -212,7 +212,7 @@ PP_mapping_tp_init(PP_mappingObject *self, PyObject *args, PyObject *kwds)
     char *kw_list[] = {"name", "cat", "domain", "range", "centering", "next", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "ssO!O!iO&:make_mapping", kw_list,
-                                     &name, &cat, &PP_set_Type, &domainobj, &PP_set_Type, &rangeobj, &centering, mapping_extractor, &next))
+                                     &name, &cat, &PP_set_Type, &domainobj, &PP_set_Type, &rangeobj, &centering, _PY_mapping_extractor, &next))
         return -1;
     domain = domainobj->set;
     range = rangeobj->set;
@@ -220,20 +220,6 @@ PP_mapping_tp_init(PP_mappingObject *self, PyObject *args, PyObject *kwds)
     return 0;
 /* DO-NOT-DELETE splicer.end(pdb.mapping.as_type.init) */
 }
-/*--------------------------------------------------------------------------*/
-
-/* PP_mapping_Check - */
-
-/* static */ int
-PP_mapping_Check(PyObject *op)
-{
-    if (PyObject_TypeCheck(op, &PP_mapping_Type))
-        return 1;
-    else
-        return 0;
-/*  return PY_TYPE(op) == &PP_mapping_Type; */
-}
-
 /*--------------------------------------------------------------------------*/
 
 

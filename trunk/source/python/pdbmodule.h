@@ -19,10 +19,7 @@
 #ifndef PY_pdb_H
 #define PY_pdb_H
 
-#include <Python.h>
-#undef HAVE_GETHOSTBYNAME
-#include <pdb_int.h>
-#include <pputil.h>
+#include "py_int.h"
 
 /*--------------------------------------------------------------------------*/
 
@@ -85,54 +82,6 @@ extern PyTypeObject PP_mesh_topology_Type;
 
 /* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.C_declaration) UNMODIFIED */
 /* DO-NOT-DELETE splicer.end(pdb.mesh_topology.C_declaration) */
-
-/*--------------------------------------------------------------------------*/
-/*                                OBJECT set                                */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_set_Check(op)    (PY_TYPE(op) == &PP_set_Type) */
-
-typedef struct s_PP_setObject *PP_setObjectp;
-
-typedef struct s_PP_setObject {
-  PyObject_HEAD
-  PM_set *set;
-/* DO-NOT-DELETE splicer.begin(pdb.set.extra_object) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.set.extra_object) */
-} PP_setObject;
-
-/* staticforward PyTypeObject PP_set_Type;*/
-extern PyTypeObject PP_set_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.begin(pdb.set.C_declaration) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.set.C_declaration) */
-
-/*--------------------------------------------------------------------------*/
-/*                              OBJECT mapping                              */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_mapping_Check(op)    (PY_TYPE(op) == &PP_mapping_Type) */
-
-typedef struct s_PP_mappingObject *PP_mappingObjectp;
-
-typedef struct s_PP_mappingObject {
-  PyObject_HEAD
-  PM_mapping *map;
-/* DO-NOT-DELETE splicer.begin(pdb.mapping.extra_object) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.mapping.extra_object) */
-} PP_mappingObject;
-
-/* staticforward PyTypeObject PP_mapping_Type;*/
-extern PyTypeObject PP_mapping_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.begin(pdb.mapping.C_declaration) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.mapping.C_declaration) */
 
 /*--------------------------------------------------------------------------*/
 /*                              OBJECT defstr                               */
