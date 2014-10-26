@@ -5,6 +5,91 @@
  *
  */
 
+/*
+#define METHOD_DEF_VAR
+*/
+
+typedef struct s_tnp_list tnp_list;
+
+struct s_tnp_list
+   {char cnm[BFSML];        /* C struct name, PM_set */
+    char pnm[BFSML];        /* Python struct name, PY_PM_set */
+    char tnm[BFSML];        /* Python type name, PY_PM_set_type */
+    char rnm[BFSML];        /* root struct id, SET */
+    char lnm[BFSML];        /* lower case version of CNM, pm_set */
+    char unm[BFSML];};      /* upper case version of CNM, PM_SET */
+
+static char
+ **_py_bound_types = NULL;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_TYPE_NAME_LIST - make canonical variations of type name TYP */
+
+static void python_type_name_list(char *typ, tnp_list *na)
+   {char *p;
+
+/* get C struct name */
+    p = trim(typ, BOTH, " \t");
+    nstrncpy(na->cnm, BFSML, p, -1);
+
+/* upper case C name */
+    nstrncpy(na->unm, BFSML, p, -1);
+    upcase(na->unm);
+
+/* lower case C name */
+    nstrncpy(na->lnm, BFSML, p, -1);
+    downcase(na->lnm);
+
+/* make the Python name */
+    snprintf(na->pnm, BFSML, "PY_%s", p);
+
+/* make the Python type name */
+    snprintf(na->tnm, BFSML, "PY_%s_type", p);
+
+/* get root struct name */
+    if (p[2] == '_')
+       nstrncpy(na->rnm, BFSML, p+3, -1);
+    else
+       nstrncpy(na->rnm, BFSML, p, -1);
+    upcase(na->rnm);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_ADD_BOUND_TYPE - install TY to the list of
+ *                       - types that have bindings
+ */
+
+void python_add_bound_type(char *ty)
+   {
+
+    _py_bound_types = lst_push(_py_bound_types, ty);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_LOOKUP_BOUND_TYPE - lookup member type MTY to see if it
+ *                          - is a type that has bindings
+ */
+
+int python_lookup_bound_type(char *mty)
+   {int i, nc, ok;
+    char *t;
+
+    ok = FALSE;
+    for (i = 0; (_py_bound_types[i] != NULL) && (ok == FALSE); i++)
+        {t  = _py_bound_types[i];
+	 nc = strlen(t);
+	 ok = (strncmp(mty, t, nc) == 0);};
+
+    return(ok);}
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -90,10 +175,10 @@ static void py_arg(char *arg, int nc, char *spec)
 
 /* PYTHON_ENUM_DEFS - write the Python interface C enums DV */
 
-static void python_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
-   {FILE *fs;
+static void python_enum_defs(FILE **fpa, char *dv, char **ta, char *pck)
+   {FILE *fc;
 
-    fs = fp[0];
+    fc = fpa[0];
 
 /* syntax:
  *  To summarize adding enums to python, blang generates
@@ -114,16 +199,17 @@ static void python_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
-	   {fprintf(fs, "\n");
-	    fprintf(fs, "int py_add_%s_enum(PyObject *m)\n", pck);
-	    fprintf(fs, "   {int nerr;\n");
-	    fprintf(fs, "\n");
-	    fprintf(fs, "    nerr = 0;\n");}
+	   {fprintf(fc, "\n");
+	    fprintf(fc, "int PY_add_%s_enum(PyObject *m)\n", pck);
+	    fprintf(fc, "   {int nerr;\n");
+	    fprintf(fc, "\n");
+	    fprintf(fc, "    nerr = 0;\n");
+	    fprintf(fc, "\n");}
 
         else if (strcmp(dv, "end") == 0)
-	   {fprintf(fs, "    return(nerr);}\n");
-	    fprintf(fs, "\n");
-	    csep(fs);};}
+	   {fprintf(fc, "    return(nerr);}\n");
+	    fprintf(fc, "\n");
+	    csep(fc);};}
 
     else if (strcmp(ta[0], "enum") == 0)
        {int i;
@@ -139,9 +225,270 @@ static void python_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
 	     else
 	        vl++;
 
-	     fprintf(fs, "    nerr += (PyModule_AddIntConstant(m, \"%s\", %ld) < 0);\n",
+	     fprintf(fc, "    nerr += (PyModule_AddIntConstant(m, \"%s\", %ld) < 0);\n",
 		     vr, vl);
-	     fprintf(fs, "\n");};};
+	     fprintf(fc, "\n");};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_HDR_STRUCT_DEF - emitter for struct defs info belonging
+ *                       - in the header file
+ */
+
+static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
+   {tnp_list tl;
+
+    python_type_name_list(ta[0]+9, &tl);
+
+    python_add_bound_type(tl.cnm);
+
+    csep(fh);
+    fprintf(fh, "\n");
+
+    fprintf(fh, "/* %s binding */\n", tl.cnm);
+    fprintf(fh, "\n");
+    fprintf(fh, "typedef struct s_%s *%sp;\n", tl.pnm, tl.pnm);
+    fprintf(fh, "typedef struct s_%s %s;\n", tl.pnm, tl.pnm);
+    fprintf(fh, "\n");
+    fprintf(fh, "struct s_%s\n", tl.pnm);
+    fprintf(fh, "   {PyObject_HEAD\n");
+    fprintf(fh, "    %s *pyo;};\n", tl.cnm);
+    fprintf(fh, "\n");
+    fprintf(fh, "extern PyTypeObject\n");
+    fprintf(fh, " %s_type;\n", tl.pnm);
+    fprintf(fh, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_C_STRUCT_DEF - emitter for struct defs info belonging
+ *                     - in the C file
+ */
+
+static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
+   {int im, hs;
+    char mnm[BFSML], mty[BFSML], pty[BFSML];
+    char *pm;
+    tnp_list tl;
+
+    python_type_name_list(ta[0]+9, &tl);
+
+    csep(fc);
+    fprintf(fc, "\n");
+    fprintf(fc, "/*                     %s ROUTINES               */\n",
+	    tl.unm);
+    fprintf(fc, "\n");
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* object check routine */
+    fprintf(fc, "int %s_Check(PyObject *op)\n", tl.pnm);
+    fprintf(fc, "   {int rv;\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    rv = PyObject_TypeCheck(op, &%s);\n", tl.tnm);
+    fprintf(fc, "\n");
+    fprintf(fc, "    return(rv);}\n");
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* object from pointer routine */
+    fprintf(fc, "PyObject *_%s_from_ptr(%s *x)\n", tl.pnm, tl.cnm);
+    fprintf(fc, "   {%s *self;\n", tl.pnm);
+    fprintf(fc, "    PyObject *rv;\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    rv = NULL;\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    self = PyObject_NEW(%s, &%s);\n", tl.pnm, tl.tnm);
+    fprintf(fc, "    if (self != NULL)\n");
+    fprintf(fc, "       {self->pyo = x;\n");
+    fprintf(fc, "        rv = (PyObject *) self;};\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    return(rv);}\n");
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* object get routine */
+    fprintf(fc, "static PyObject *%s_get(%s *self, void *context)\n",
+	    tl.pnm, tl.pnm);
+    fprintf(fc, "   {PyObject *rv;\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    rv = _%s_from_ptr(self->pyo);\n", tl.pnm);
+    fprintf(fc, "\n");
+    fprintf(fc, "    return(rv);}\n");
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* member accessor methods */
+    for (im = 1; ta[im] != NULL; im++)
+        {pm = trim(ta[im], BOTH, " \t");
+	 if (IS_NULL(pm) == TRUE)
+	    continue;
+
+	 parse_member(pm, mnm, mty, NULL, BFSML);
+
+	 fprintf(fc, "static PyObject *%s_get_%s(%s *self, void *context)\n",
+		 tl.pnm, mnm, tl.pnm);
+	 fprintf(fc, "   {PyObject *rv;\n");
+	 fprintf(fc, "\n");
+
+/* if member is 'char *' */
+	 if (strcmp(mty, "char *") == 0)
+	    fprintf(fc, "    rv = Py_BuildValue(\"s\", self->pyo->%s);\n",
+		    mnm);
+
+/* if member is fixed point type */
+	 else if ((strcmp(mty, "int") == 0) ||
+		  (strcmp(mty, "long") == 0))
+	    fprintf(fc, "    rv = PY_INT_LONG(self->pyo->%s);\n", mnm);
+
+/* if member is pointer to a known bound type */
+         else if (python_lookup_bound_type(mty) == TRUE)
+	    {snprintf(pty, BFSML, "PY_%s", mty);
+	     fprintf(fc, "    rv = _%s_from_ptr(self->pyo->%s);\n",
+		     trim(pty, BOTH, " *"), mnm);}
+
+/* if member is pointer */
+         else if (LAST_CHAR(mty) == '*')
+	    fprintf(fc, "    rv = PY_COBJ_VOID_PTR(self->pyo->%s, NULL);\n",
+		    mnm);
+
+/* unknown member action */
+	 else
+            fprintf(fc, "   rv = NULL;     /* unknown member action */\n");
+
+	 fprintf(fc, "\n");
+	 fprintf(fc, "    return(rv);}\n");
+
+	 fprintf(fc, "\n");
+	 csep(fc);
+	 csep(fc);
+	 fprintf(fc, "\n");};
+
+/* tp_init method */
+
+    fprintf(fc, "static int %s_tp_init(%s *self, PyObject *args, PyObject *kwds)\n",
+	    tl.pnm, tl.pnm);
+    fprintf(fc, "   {int rv;\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    rv = -1;\n");
+    fprintf(fc, "\n");
+#if 0
+    fprintf(fc, "    int ok;\n");
+    fprintf(fc, "    char *kw_list[] = { <member-names>, NULL};\n");
+    fprintf(fc, "    ok = PyArg_ParseTupleAndKeywords(args, kwds,\n");
+    fprintf(fc, "				     "ssiliiO&zO!O&szszszO!:make_set",\n");
+    fprintf(fc, "				     kw_list,\n");
+    fprintf(fc, "                                     &<members>);\n");
+    fprintf(fc, "    if (ok)\n");
+    fprintf(fc, "       {rv        = 0;\n");
+    fprintf(fc, "	 self->pyo = PM_mk_set(<args>);};\n");
+    fprintf(fc, "\n");
+#endif
+    fprintf(fc, "    return(rv);}\n");
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* doc array */
+    fprintf(fc, "static char\n");
+
+    for (im = 1; ta[im] != NULL; im++)
+        {pm = trim(ta[im], BOTH, " \t");
+	 if (IS_NULL(pm) == TRUE)
+	    continue;
+	 parse_member(pm, mnm, mty, NULL, BFSML);
+         fprintf(fc, " %s_doc_%s[] = \"\",\n", tl.pnm, mnm);};
+
+    fprintf(fc, " %s_doc[] = \"\";\n", tl.pnm);
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* getset array */
+    fprintf(fc, "static PyGetSetDef %s_getset[] = {\n", tl.pnm);
+    fprintf(fc, "    {\"set\", (getter) %s_get, NULL, %s_doc, NULL},\n",
+	    tl.pnm, tl.pnm);
+
+    for (im = 1; ta[im] != NULL; im++)
+        {pm = trim(ta[im], BOTH, " \t");
+	 if (IS_NULL(pm) == TRUE)
+	    continue;
+	 parse_member(pm, mnm, mty, NULL, BFSML);
+
+/* GOTCHA: when do we have a setter? */
+	 hs = FALSE;
+
+         if (hs == TRUE)
+	    fprintf(fc, "    {\"%s\", (getter) %s_get_%s, (setter) %s_set_%s, %s_doc_%s, NULL},\n",
+		    mnm, tl.pnm, mnm, tl.pnm, mnm, tl.pnm, mnm);
+	 else
+	    fprintf(fc, "    {\"%s\", (getter) %s_get_%s, NULL, %s_doc_%s, NULL},\n",
+		    mnm, tl.pnm, mnm, tl.pnm, mnm);};
+
+    fprintf(fc, "    {NULL}};\n");
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
+    fprintf(fc, "PY_DEF_TYPE(%s);\n", tl.cnm);
+
+    fprintf(fc, "\n");
+
+#if 0
+/*--------------------------------------------------------------------------*/
+
+/*                              PM_SET_ROUTINES                             */
+
+/*--------------------------------------------------------------------------*/
+
+static int PY_PM_set_name_set(PY_PM_set *self, PyObject *value,
+			       void *context)
+   {int rv;
+
+    rv = -1;
+
+    if (value == NULL)
+       PyErr_SetString(PyExc_TypeError,
+		       "attribute deletion is not supported");
+
+    else if (PyArg_Parse(value, "s", &self->pyo->name))
+       rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static PyObject *PY_PM_set_opers_get(PY_PM_set *self, void *context)
+   {PyObject *rv;
+
+    rv = PPfield_from_ptr(self->pyo->opers);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
 
     return;}
 
@@ -150,11 +497,11 @@ static void python_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
 
 /* PYTHON_STRUCT_DEFS - write the Python interface C structs DV */
 
-static void python_struct_defs(FILE **fp, char *dv, char **ta, char *pck)
-   {
+static void python_struct_defs(FILE **fpa, char *dv, char **ta, char *pck)
+   {FILE *fc, *fh;
 
-/* syntax:
- */
+    fc = fpa[0];
+    fh = fpa[1];
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
@@ -162,45 +509,49 @@ static void python_struct_defs(FILE **fp, char *dv, char **ta, char *pck)
         else if (strcmp(dv, "end") == 0)
 	   {};}
 
-    else if (strcmp(ta[0], "struct") == 0)
-       {};
+    else if (strncmp(ta[0], "struct s_", 9) == 0)
+       {python_hdr_struct_def(fh, dv, ta, pck);
+	python_c_struct_def(fc, dv, ta, pck);};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PYTHON_DEF_STRUCTS - define local version of struct definitions */
+/* PYTHON_OBJECT_DEFS - define local version of struct definitions */
 
-static void python_def_structs(FILE *fp, statedes *st)
-   {int ib, nbi;
-    char t[BFLRG];
-    char *sb, *cty, *pty, **sbi, **sa;
+static void python_object_defs(FILE **fpa, char *dv, char **ta, char *pck)
+   {tnp_list tl;
+    FILE *fc;
 
-    sbi = st->sbi;
-    nbi = st->nbi;
+    fc = fpa[0];
 
-/* make local struct definitions */
-    for (ib = 0; ib < nbi; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-	    {nstrncpy(t, BFLRG, sb, -1);
-	     sa = tokenize(t, " \t", 0);
-	     if ((sa != NULL) && (strcmp(sa[0], "derived") == 0))
-	        {cty = sa[1];
-		 pty = sa[4];
-		 if ((IS_NULL(pty) == FALSE) &&
-		     (strcmp(sa[3], "SC_ENUM_I") != 0) &&
-		     (strcmp(pty, "PyObject") != 0))
-		    {fprintf(fp, "typedef struct s_%s *%sp;\n", pty, pty);
-		     fprintf(fp, "typedef struct s_%s %s;\n", pty, pty);
-		     fprintf(fp, "\n");
-		     fprintf(fp, "struct s_%s\n", pty);
-		     fprintf(fp, "   {PyObject_HEAD\n");
-		     fprintf(fp, "    %s *pobj;};\n", cty);
-		     fprintf(fp, "\n");};};
+    if (ta == NULL)
+       {if (strcmp(dv, "begin") == 0)
+	   {csep(fc);
+	    fprintf(fc, "\n");
+	    fprintf(fc, "int PY_init_%s(PyObject *m, PyObject *d)\n", pck);
+	    fprintf(fc, "   {int nerr;\n");
+	    fprintf(fc, "\n");
+	    fprintf(fc, "    nerr = 0;\n");
+	    fprintf(fc, "\n");}
 
-	     free_strings(sa);};};
+        else if (strcmp(dv, "end") == 0)
+	   {fprintf(fc, "    return(nerr);}\n");
+	    fprintf(fc, "\n");};}
+
+    else if (strncmp(ta[0], "struct s_", 9) == 0)
+       {python_type_name_list(ta[0]+9, &tl);
+
+	fprintf(fc, "    %s_type.tp_new   = PyType_GenericNew;\n",
+		tl.pnm);
+	fprintf(fc, "    %s_type.tp_alloc = PyType_GenericAlloc;\n",
+		tl.pnm);
+	fprintf(fc, "    nerr += (PyType_Ready(&%s_type) < 0);\n",
+		tl.pnm);
+	fprintf(fc, "    nerr += (PyDict_SetItemString(d, \"%s\", (PyObject *) &%s_type) < 0);\n",
+		tl.rnm, tl.pnm);
+	fprintf(fc, "\n");};
 
     return;}
 
@@ -210,32 +561,60 @@ static void python_def_structs(FILE *fp, statedes *st)
 /* INIT_PYTHON - initialize Python file */
 
 static void init_python(statedes *st, bindes *bd)
-   {char fn[BFLRG];
+   {char fn[BFLRG], upck[BFLRG];
     char *pck;
-    FILE *fp;
+    FILE *fc, *fh;
 
     pck = st->pck;
+    snprintf(upck, BFLRG, pck, -1);
+    upcase(upck);
 
-/* source C file */
+/* open C file */
     if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
        snprintf(fn, BFLRG, "gp-%s.c", pck);
     else
        snprintf(fn, BFLRG, "%s/gp-%s.c", st->path, pck);
 
-    fp = open_file("w", fn);
-    bd->fp[0] = fp;
+    fc = open_file("w", fn);
+    bd->fp[0] = fc;
 
-    fprintf(fp, "\n");
-    fprintf(fp, "#include <Python.h>\n");
-    fprintf(fp, "#include \"%s_int.h\"\n", pck);
-    fprintf(fp, "#include \"sx_int.h\"\n");
-    fprintf(fp, "\n");
+    fprintf(fc, "/*\n");
+    fprintf(fc, " * GP-%s.C - generated support routines for %s\n",
+	    upck, upck);
+    fprintf(fc, " *\n");
+    fprintf(fc, " */\n");
+    fprintf(fc, "\n");
 
-    python_def_structs(fp, st);
+    fprintf(fc, "\n");
+    fprintf(fc, "#include \"cpyright.h\"\n");
+    fprintf(fc, "#include \"py_int.h\"\n");
+    fprintf(fc, "#include \"%s_int.h\"\n", pck);
+    fprintf(fc, "#include \"gp-%s.h\"\n", pck);
+    fprintf(fc, "\n");
 
-    csep(fp);
+    csep(fc);
 
-    bd->fp[0] = fp;
+/* open header file */
+    if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
+       snprintf(fn, BFLRG, "gp-%s.h", pck);
+    else
+       snprintf(fn, BFLRG, "%s/gp-%s.h", st->path, pck);
+
+    fh = open_file("w", fn);
+    bd->fp[1] = fh;
+
+    fprintf(fh, "/*\n");
+    fprintf(fh, " * GP-%s.H - header containing generated support for %s\n",
+	    upck, upck);
+    fprintf(fh, " *\n");
+    fprintf(fh, " */\n");
+    fprintf(fh, "\n");
+
+    fprintf(fh, "#include \"cpyright.h\"\n");
+    fprintf(fh, "\n");
+    fprintf(fh, "#ifndef GEN_PY_%s_H\n", upck);
+    fprintf(fh, "#define GEN_PY_%s_H\n", upck);
+    fprintf(fh, "\n");
 
     return;}
 
@@ -245,8 +624,8 @@ static void init_python(statedes *st, bindes *bd)
 /* PYTHON_MAKE_DECL - make wrapper function declaration */
 
 static void python_make_decl(char *t, int nc, fdecl *dcl)
-   {int i, na, n;
-    char dty[BFLRG], s[BFLRG];
+   {int i, na;
+    char dty[BFLRG], p[BFSML];
     char *cfn, *ty, *lty, *pty;
     farg *al;
 
@@ -254,10 +633,13 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
     cfn = dcl->proto.name;
 
     snprintf(t, nc, " *_PY_%s", cfn);
+/*
+    int n;
+    char s[BFLRG];
     n = strlen(t);
     memset(s, ' ', n);
     s[n] = '\0';
-
+*/
     pty = "PyObject";
     for (i = 0; i < na; i++)
         {al = dcl->al + i;
@@ -266,6 +648,8 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
 	 lty = lookup_type(NULL, dty, MODE_C, MODE_P);
 	 if ((lty != NULL) && (strcmp(lty, "SC_ENUM_I") != 0))
 	    {pty = lty;
+	     snprintf(p, BFSML, "PY_%s", dty);
+	     pty = p;
 	     break;};};
 
     vstrcat(t, nc, "(%s *self, PyObject *args, PyObject *kwds)", pty);
@@ -277,16 +661,16 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
 
 /* PYTHON_WRAP_DECL - function declaration */
 
-static void python_wrap_decl(FILE *fp, fdecl *dcl)
+static void python_wrap_decl(FILE *fc, fdecl *dcl)
    {char t[BFLRG];
 
-    fprintf(fp, "\n");
-    fprintf(fp, "/* WRAP |%s| */\n", dcl->proto.arg);
-    fprintf(fp, "\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "/* WRAP |%s| */\n", dcl->proto.arg);
+    fprintf(fc, "\n");
 
     python_make_decl(t, BFLRG, dcl);
 
-    fprintf(fp, "PyObject%s\n", t);
+    fprintf(fc, "PyObject%s\n", t);
 
     return;}
 
@@ -317,7 +701,7 @@ static void python_kw_list(char *kw, int nc, fdecl *dcl)
 
 /* PYTHON_CLASS_SELF - emit the self object assignment */
 
-static void python_class_self(FILE *fp, fdecl *dcl)
+static void python_class_self(FILE *fc, fdecl *dcl)
    {int i, na;
     char *nm;
     farg *al;
@@ -328,7 +712,7 @@ static void python_class_self(FILE *fp, fdecl *dcl)
     for (i = 0; i < na; i++)
         {if (al[i].cls == TRUE)
 	    {nm = al[i].name;
-	     fprintf(fp, "    _l%s = self->pobj;\n\n", nm);
+	     fprintf(fc, "    _l%s = self->pyo;\n\n", nm);
 	     break;};};
 
     return;}
@@ -338,7 +722,7 @@ static void python_class_self(FILE *fp, fdecl *dcl)
 
 /* PYTHON_WRAP_LOCAL_DECL - local variable declarations */
 
-static void python_wrap_local_decl(FILE *fp, fdecl *dcl, char *kw)
+static void python_wrap_local_decl(FILE *fc, fdecl *dcl, char *kw)
    {int i, na, voida, voidf;
     char t[BFLRG];
     char *rty;
@@ -352,10 +736,10 @@ static void python_wrap_local_decl(FILE *fp, fdecl *dcl, char *kw)
     rty   = dcl->proto.type;
 	
     if ((voida == FALSE) && (IS_NULL(kw) == FALSE))
-       {fprintf(fp, "   {int ok;\n");
-	fprintf(fp, "    PyObject *_lo;\n");}
+       {fprintf(fc, "   {int ok;\n");
+	fprintf(fc, "    PyObject *_lo;\n");}
     else
-       fprintf(fp, "   {PyObject *_lo;\n");
+       fprintf(fc, "   {PyObject *_lo;\n");
 
     for (i = 0; i <= na; i++)
         {if ((voida == TRUE) && (i == 0))
@@ -378,9 +762,9 @@ static void python_wrap_local_decl(FILE *fp, fdecl *dcl, char *kw)
 	    nstrcat(t, BFLRG, ip->decl);
 
 	 if (IS_NULL(t) == FALSE)
-	    fputs(subst(t, "* ", "*", -1), fp);};
+	    fputs(subst(t, "* ", "*", -1), fc);};
 
-    fprintf(fp, "\n");
+    fprintf(fc, "\n");
 
     return;}
 
@@ -407,7 +791,7 @@ static void python_wrap_local_assn_arg(char *a, int nc, farg *al)
 
 /* PYTHON_WRAP_LOCAL_ASSN - local variable assignments */
 
-static void python_wrap_local_assn(FILE *fp, fdecl *dcl, char *pfn, char *kw)
+static void python_wrap_local_assn(FILE *fc, fdecl *dcl, char *pfn, char *kw)
    {int i, na, voida;
     char a[BFLRG], dcn[BFLRG], fmt[BFLRG], arg[BFLRG];
     char *cfn;
@@ -418,7 +802,7 @@ static void python_wrap_local_assn(FILE *fp, fdecl *dcl, char *pfn, char *kw)
     al    = dcl->al;
     voida = dcl->voida;
 
-    python_class_self(fp, dcl);
+    python_class_self(fc, dcl);
 
     if ((voida == FALSE) && (IS_NULL(kw) == FALSE))
        {map_name(dcn, BFLRG, cfn, pfn, "p", -1, FALSE, TRUE);
@@ -429,16 +813,16 @@ static void python_wrap_local_assn(FILE *fp, fdecl *dcl, char *pfn, char *kw)
 	    python_wrap_local_assn_arg(a, BFLRG, al+i);
 
 	py_format(fmt, BFLRG, a, dcn);
-	fprintf(fp, "    ok = PyArg_ParseTupleAndKeywords(args, kwds,\n");
-	fprintf(fp, "                                     \"%s\",\n", fmt);
-	fprintf(fp, "                                     kw_list,\n");
+	fprintf(fc, "    ok = PyArg_ParseTupleAndKeywords(args, kwds,\n");
+	fprintf(fc, "                                     \"%s\",\n", fmt);
+	fprintf(fc, "                                     kw_list,\n");
 
 	py_arg(arg, BFLRG, a);
-	fprintf(fp, "                                     %s);\n", arg);
+	fprintf(fc, "                                     %s);\n", arg);
 
-	fprintf(fp, "    if (ok == FALSE)\n");
-	fprintf(fp, "       return(NULL);\n");
-	fprintf(fp, "\n");};
+	fprintf(fc, "    if (ok == FALSE)\n");
+	fprintf(fc, "       return(NULL);\n");
+	fprintf(fc, "\n");};
 
     return;}
 
@@ -447,7 +831,7 @@ static void python_wrap_local_assn(FILE *fp, fdecl *dcl, char *pfn, char *kw)
 
 /* PYTHON_WRAP_LOCAL_CALL - function call */
 
-static void python_wrap_local_call(FILE *fp, fdecl *dcl)
+static void python_wrap_local_call(FILE *fc, fdecl *dcl)
    {int voidf;
     char a[BFLRG], t[BFLRG];
     char *nm;
@@ -462,7 +846,7 @@ static void python_wrap_local_call(FILE *fp, fdecl *dcl)
     else
        snprintf(t, BFLRG, "    _rv = %s(%s);\n", nm, a);
 
-    fputs(t, fp);
+    fputs(t, fc);
 
     return;}
 
@@ -524,18 +908,18 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 
 /* PYTHON_WRAP_LOCAL_RETURN - function return */
 
-static void python_wrap_local_return(FILE *fp, fdecl *dcl)
+static void python_wrap_local_return(FILE *fc, fdecl *dcl)
    {char t[BFLRG];
 
     python_value_return(t, BFLRG, dcl);
     if (IS_NULL(t) == TRUE)
-       fprintf(fp, "    _lo = Py_None;\n");
+       fprintf(fc, "    _lo = Py_None;\n");
     else
-       fputs(t, fp);
-    fprintf(fp, "\n");
+       fputs(t, fc);
+    fprintf(fc, "\n");
 
-    fprintf(fp, "    return(_lo);}\n");
-    fprintf(fp, "\n");
+    fprintf(fc, "    return(_lo);}\n");
+    fprintf(fc, "\n");
 
     return;}
 
@@ -602,33 +986,33 @@ static void python_method_def(char *dfn, int nc, fdecl *dcl,
  *             - using name PFN
  */
 
-static void python_wrap(FILE *fp, fdecl *dcl, char *pfn)
+static void python_wrap(FILE *fc, fdecl *dcl, char *pfn)
    {char upn[BFLRG], kw[BFLRG];
 
     if ((is_var_arg(dcl->proto.arg) == FALSE) && (strcmp(pfn, "none") != 0))
        {nstrncpy(upn, BFLRG, pfn, -1);
 	upcase(upn);
 
-	csep(fp);
+	csep(fc);
 
 	python_kw_list(kw, BFLRG, dcl);
 
 /* function declaration */
-	python_wrap_decl(fp, dcl);
+	python_wrap_decl(fc, dcl);
 
 /* local variable declarations */
-	python_wrap_local_decl(fp, dcl, kw);
+	python_wrap_local_decl(fc, dcl, kw);
 
 /* local variable assignments */
-	python_wrap_local_assn(fp, dcl, pfn, kw);
+	python_wrap_local_assn(fc, dcl, pfn, kw);
 
 /* function call */
-	python_wrap_local_call(fp, dcl);
+	python_wrap_local_call(fc, dcl);
 
 /* function return */
-	python_wrap_local_return(fp, dcl);
+	python_wrap_local_return(fc, dcl);
 
-	csep(fp);};
+	csep(fc);};
 
     return;}
 
@@ -639,8 +1023,8 @@ static void python_wrap(FILE *fp, fdecl *dcl, char *pfn)
 
 static void python_header(bindes *bd)
    {int ib, ndcl;
-    char name[BFLRG], upk[BFLRG], dfn[BFLRG], t[BFLRG];
-    char *pck, *cfn, *pfn;
+    char upk[BFLRG], t[BFLRG];
+    char *pck, *pfn;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fh;
@@ -653,19 +1037,12 @@ static void python_header(bindes *bd)
     nstrncpy(upk, BFLRG, pck, -1);
     upcase(upk);
 
-    if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
-       snprintf(name, BFLRG, "py-%s.h", pck);
-    else
-       snprintf(name, BFLRG, "%s/py-%s.h", st->path, pck);
-
-    fh = fopen_safe(name, "w");
+    fh = bd->fp[1];
     if (fh == NULL)
        return;
 
-    fprintf(fh, "/*\n");
-    fprintf(fh, " * PY-%s.H - generated header for %s bindings\n", upk, pck);
-    fprintf(fh, " *\n");
-    fprintf(fh, " */\n");
+    csep(fh);
+    csep(fh);
     fprintf(fh, "\n");
 
 /* extern declarations for wrappers */
@@ -679,10 +1056,33 @@ static void python_header(bindes *bd)
 	    {python_make_decl(t, BFLRG, dcl);
 	     fprintf(fh, "%s,\n", t);};};
 
+/* emit dummy to end the list of extern PyObjects */
     fprintf(fh, " _PY_%s_null;\n", pck);
     fprintf(fh, "\n");
 
+#ifdef METHOD_DEF_VAR
+/* method declarations */
+    char dfn[BFLRG];
+    char *cfn;
+    fprintf(fh, "extern PyMethodDef\n");
+    for (ib = 0; ib < ndcl; ib++)
+        {dcl = dcls + ib;
+	 cfn = dcl->proto.name;
+	 pfn = has_binding(dcl, "python");
+	 if ((pfn != NULL) && (strcmp(pfn, "none") != 0) &&
+	     (is_var_arg(dcl->proto.arg) == FALSE))
+	    {python_method_def(dfn, BFLRG, dcl, pfn, TRUE);
+	     fprintf(fh, " _PYD_%s,\n", cfn);};}
+    fprintf(fh, " _PYD_%s_null;\n", pck);
+    fprintf(fh, "\n");
+#else
+/* GOTCHA: this is emitted in the C file as a PyMethodDef variable
+ * so the #define should not be needed
+ * also the identical name for the variable and the macro is a problem
+ */
 /* method definition macros */
+    char dfn[BFLRG];
+    char *cfn;
     for (ib = 0; ib < ndcl; ib++)
         {dcl = dcls + ib;
 	 cfn = dcl->proto.name;
@@ -691,11 +1091,9 @@ static void python_header(bindes *bd)
 	     (is_var_arg(dcl->proto.arg) == FALSE))
 	    {python_method_def(dfn, BFLRG, dcl, pfn, TRUE);
 	     fprintf(fh, "#define _PYD_%s %s\n",
-		     cfn, subst(dfn, "\n", "\\\n", -1));};};
-
-    fprintf(fh, "\n");
-
-    fclose_safe(fh);
+		     cfn, subst(dfn, "\n", "\\\n", -1));
+	     fprintf(fh, "\n");};};
+#endif
 
     return;}
 
@@ -710,26 +1108,32 @@ static void python_install(bindes *bd)
     char *pck, *cfn, *pfn;
     fdecl *dcl, *dcls;
     statedes *st;
-    FILE *fp;
+    FILE *fc;
 
-    fp   = bd->fp[0];
+    fc   = bd->fp[0];
     st   = bd->st;
     pck  = st->pck;
     dcls = st->dcl;
     ndcl = st->ndcl;
 
-    csep(fp);
+    csep(fc);
 
 /* make the list of enum constants to install */
     emit_enum_defs(bd, python_enum_defs);
 
+/* make the list of struct objects */
+    emit_struct_defs(bd, python_object_defs);
+
 /* make the list of struct constants to install */
     emit_struct_defs(bd, python_struct_defs);
 
-    csep(fp);
+    csep(fc);
 
-    fprintf(fp, "\n");
-    fprintf(fp, "PyMethodDef\n");
+#ifdef METHOD_DEF_VAR
+    csep(fc);
+    fprintf(fc, "\n");
+
+    fprintf(fc, "PyMethodDef\n");
 
 /* method definition wrapper */
     for (ib = 0; ib < ndcl; ib++)
@@ -739,11 +1143,12 @@ static void python_install(bindes *bd)
 	 if ((pfn != NULL) && (strcmp(pfn, "none") != 0) &&
 	     (is_var_arg(dcl->proto.arg) == FALSE))
 	    {python_method_def(dfn, BFLRG, dcl, pfn, TRUE);
-	     fprintf(fp, " _PYD_%s = %s,\n", cfn, dfn);};};
+	     fprintf(fc, " _PYD_%s = %s,\n", cfn, dfn);};};
 
-    fprintf(fp, " _PYD_%s_null;\n", pck);
-    fprintf(fp, "\n");
-    csep(fp);
+    fprintf(fc, " _PYD_%s_null;\n", pck);
+    fprintf(fc, "\n");
+    csep(fc);
+#endif
 
     return;}
 
@@ -759,9 +1164,9 @@ static int bind_python(bindes *bd)
     char *pfn;
     fdecl *dcl, *dcls;
     statedes *st;
-    FILE *fp;
+    FILE *fc;
 
-    fp   = bd->fp[0];
+    fc   = bd->fp[0];
     st   = bd->st;
     dcls = st->dcl;
     ndcl = st->ndcl;
@@ -772,7 +1177,7 @@ static int bind_python(bindes *bd)
         {dcl = dcls + ib;
 	 pfn = has_binding(dcl, "python");
 	 if (pfn != NULL)
-	    python_wrap(fp, dcl, pfn);};
+	    python_wrap(fc, dcl, pfn);};
 
 /* write the method definitions */
     python_install(bd);
@@ -789,10 +1194,15 @@ static int bind_python(bindes *bd)
 
 static void fin_python(bindes *bd)
    {int i;
-    FILE *fp;
+    FILE *fc, *fh, *fp;
 
-    fp = bd->fp[0];
-    csep(fp);
+    fc = bd->fp[0];
+    csep(fc);
+
+/* finish of the header file */
+    fh = bd->fp[1];
+    fprintf(fh, "#endif\n");
+    fprintf(fh, "\n");
 
     for (i = 0; i < NF; i++)
         {fp = bd->fp[i];

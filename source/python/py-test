@@ -106,7 +106,7 @@ else if (-f $lpydir/pdb.py) then
    endif
 
    foreach i ($Tests)
-      $SrcDir/tests/$i
+      ftee $Log $SrcDir/tests/$i
       @ nerr = $nerr + $status
    end
 

@@ -1,7 +1,13 @@
+/*
+ * GP-BL5.C - generated support routines for BL5
+ *
+ */
 
-#include <Python.h>
+
+#include "cpyright.h"
+#include "py_int.h"
 #include "bl5_int.h"
-#include "sx_int.h"
+#include "gp-bl5.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -267,30 +273,5 @@ PyObject *_PY_B_f6(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-PyMethodDef
- _PYD_a_f1 = {"a_f1", (PyCFunction) _PY_a_f1, METH_KEYWORDS,
-              "Procedure: a_f1\n     Usage: a_f1(a)"},
- _PYD_a_f2 = {"a_f2", (PyCFunction) _PY_a_f2, METH_KEYWORDS,
-              "Procedure: a_f2\n     Usage: a_f2(b)"},
- _PYD_a_f3 = {"a_f3", (PyCFunction) _PY_a_f3, METH_KEYWORDS,
-              "Procedure: a_f3\n     Usage: a_f3(a, b)"},
- _PYD_a_f4 = {"a_f4", (PyCFunction) _PY_a_f4, METH_KEYWORDS,
-              "Procedure: a_f4\n     Usage: a_f4(b, a)"},
- _PYD_B_f1 = {"b_f1", (PyCFunction) _PY_B_f1, METH_KEYWORDS,
-              "Procedure: b_f1\n     Usage: b_f1(a, b)"},
- _PYD_B_f2 = {"b_f2", (PyCFunction) _PY_B_f2, METH_KEYWORDS,
-              "Procedure: b_f2\n     Usage: b_f2(a, b)"},
- _PYD_B_f3 = {"b_f3", (PyCFunction) _PY_B_f3, METH_KEYWORDS,
-              "Procedure: b_f3\n     Usage: b_f3(a, b, c)"},
- _PYD_B_f4 = {"b_f4", (PyCFunction) _PY_B_f4, METH_KEYWORDS,
-              "Procedure: b_f4\n     Usage: b_f4(a, b, c)"},
- _PYD_B_f5 = {"b_f5", (PyCFunction) _PY_B_f5, METH_KEYWORDS,
-              "Procedure: b_f5\n     Usage: b_f5(a, b, c)"},
- _PYD_B_f6 = {"b_f6", (PyCFunction) _PY_B_f6, METH_KEYWORDS,
-              "Procedure: b_f6\n     Usage: b_f6(a, b, c)"},
- _PYD_bl5_null;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

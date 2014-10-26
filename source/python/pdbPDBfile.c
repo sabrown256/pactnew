@@ -14,7 +14,7 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "pdbmodule.h"
-#include "py-pdb.h"
+#include "gp-pdb.h"
 
 /* DO-NOT-DELETE splicer.begin(pdb.PDBfile.C_definition) UNMODIFIED */
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.C_definition) */

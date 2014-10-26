@@ -5,9 +5,9 @@
  *
  */
 
-typedef struct s_tn_list tn_list;
+typedef struct s_tns_list tns_list;
 
-struct s_tn_list
+struct s_tns_list
    {char cnm[BFSML];        /* C struct name, PM_set */
     char snm[BFSML];        /* Scheme struct name, pm-set */
     char rnm[BFSML];        /* root struct id, SET */
@@ -19,7 +19,7 @@ struct s_tn_list
 
 /* SCHEME_TYPE_NAME_LIST - make canonical variations of type name TYP */
 
-static void scheme_type_name_list(char *typ, tn_list *na)
+static void scheme_type_name_list(char *typ, tns_list *na)
    {char *p;
 
 /* get C struct name */
@@ -45,29 +45,6 @@ static void scheme_type_name_list(char *typ, tn_list *na)
     upcase(na->rnm);
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SCHEME_BIND_MEMBER - return the TRUE if the struct has a BIND member
- *                    - the BIND member must be:
- *                    -     void *(*BIND)(<type> *x, bind_opt wh, void *a)
- *                    - it is the conventional member for struct specific
- *                    - work done in conjunction with generic work done
- *                    - in working with BLANG generated struct bindings
- *                    - because the calling sequence is conventional
- *                    - we only need a TRUE/FALSE return
- */
-
-int scheme_bind_member(char **ta)
-   {int i, hnm;
-
-    hnm = FALSE;
-    for (i = 1; (ta[i] != NULL) && (hnm == FALSE); i++)
-        {if (strstr(ta[i], "void *(*BIND)") != NULL)
-	    hnm = TRUE;};
-
-    return(hnm);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -165,7 +142,7 @@ static fparam so_type(char *a, int nc, char *ty)
 static void init_scheme(statedes *st, bindes *bd)
    {char fn[BFLRG], upck[BFLRG];
     char *pck;
-    FILE *fp;
+    FILE *fc, *fh;
 
     pck = st->pck;
     snprintf(upck, BFLRG, pck, -1);
@@ -177,23 +154,23 @@ static void init_scheme(statedes *st, bindes *bd)
     else
        snprintf(fn, BFLRG, "%s/gs-%s.c", st->path, pck);
 
-    fp = open_file("w", fn);
-    bd->fp[0] = fp;
+    fc = open_file("w", fn);
+    bd->fp[0] = fc;
 
-    fprintf(fp, "/*\n");
-    fprintf(fp, " * GS-%s.C - generated support routines for %s\n",
+    fprintf(fc, "/*\n");
+    fprintf(fc, " * GS-%s.C - generated support routines for %s\n",
 	    upck, upck);
-    fprintf(fp, " *\n");
-    fprintf(fp, " */\n");
-    fprintf(fp, "\n");
+    fprintf(fc, " *\n");
+    fprintf(fc, " */\n");
+    fprintf(fc, "\n");
 
-    fprintf(fp, "#include \"cpyright.h\"\n");
-    fprintf(fp, "#include \"sx_int.h\"\n");
-    fprintf(fp, "#include \"%s_int.h\"\n", pck);
-    fprintf(fp, "#include \"gs-%s.h\"\n", pck);
-    fprintf(fp, "\n");
+    fprintf(fc, "#include \"cpyright.h\"\n");
+    fprintf(fc, "#include \"sx_int.h\"\n");
+    fprintf(fc, "#include \"%s_int.h\"\n", pck);
+    fprintf(fc, "#include \"gs-%s.h\"\n", pck);
+    fprintf(fc, "\n");
 
-    csep(fp);
+    csep(fc);
 
 /* open header file */
     if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
@@ -201,25 +178,22 @@ static void init_scheme(statedes *st, bindes *bd)
     else
        snprintf(fn, BFLRG, "%s/gs-%s.h", st->path, pck);
 
-    fp = open_file("w", fn);
-    bd->fp[1] = fp;
+    fh = open_file("w", fn);
+    bd->fp[1] = fh;
 
-    fprintf(fp, "/*\n");
-    fprintf(fp, " * GS-%s.H - header containing generated support for %s\n",
+    fprintf(fh, "/*\n");
+    fprintf(fh, " * GS-%s.H - header containing generated support for %s\n",
 	    upck, upck);
-    fprintf(fp, " *\n");
-    fprintf(fp, " */\n");
-    fprintf(fp, "\n");
+    fprintf(fh, " *\n");
+    fprintf(fh, " */\n");
+    fprintf(fh, "\n");
 
-    fprintf(fp, "#include \"cpyright.h\"\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#ifndef GEN_%s_H\n", pck);
-    fprintf(fp, "#define GEN_%s_H\n", pck);
-    fprintf(fp, "\n");
-/*
-    fprintf(fp, "#include \"gs-%s.h\"\n", pck);
-    fprintf(fp, "\n");
-*/
+    fprintf(fh, "#include \"cpyright.h\"\n");
+    fprintf(fh, "\n");
+    fprintf(fh, "#ifndef GEN_SX_%s_H\n", upck);
+    fprintf(fh, "#define GEN_SX_%s_H\n", upck);
+    fprintf(fh, "\n");
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -227,7 +201,7 @@ static void init_scheme(statedes *st, bindes *bd)
 
 /* SCHEME_WRAP_DECL - function declaration */
 
-static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
+static void scheme_wrap_decl(FILE *fc, fdecl *dcl)
    {int na;
     char dcn[BFLRG];
 
@@ -236,18 +210,18 @@ static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
     nstrncpy(dcn, BFLRG, dcl->proto.name, -1);
     downcase(dcn);
 
-    fprintf(fp, "\n");
-    fprintf(fp, "/* WRAP |%s| */\n", dcl->proto.arg);
-    fprintf(fp, "\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "/* WRAP |%s| */\n", dcl->proto.arg);
+    fprintf(fc, "\n");
 
-    fprintf(fp, "static object *");
-    fprintf(fp, "_SXI_%s", dcn);
+    fprintf(fc, "static object *");
+    fprintf(fc, "_SXI_%s", dcn);
     if (na == 0)
-       fprintf(fp, "(SS_psides *si)");
+       fprintf(fc, "(SS_psides *si)");
     else
-       fprintf(fp, "(SS_psides *si, object *argl)");
+       fprintf(fc, "(SS_psides *si, object *argl)");
 
-    fprintf(fp, "\n");
+    fprintf(fc, "\n");
 
     return;}
 
@@ -256,7 +230,7 @@ static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
 
 /* SCHEME_WRAP_LOCAL_DECL - local variable declarations */
 
-static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
+static void scheme_wrap_local_decl(FILE *fc, fdecl *dcl,
 				   fparam knd, char *so)
    {int i, na, nv, voida, voidf;
     char t[BFLRG];
@@ -298,9 +272,9 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
             nv++;};
 
 	 if (IS_NULL(t) == FALSE)
-	    fputs(subst(t, "* ", "*", -1), fp);};
+	    fputs(subst(t, "* ", "*", -1), fc);};
 
-    fprintf(fp, "\n");
+    fprintf(fc, "\n");
 
     return;}
 
@@ -309,14 +283,14 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 
 /* SCHEME_WRAP_LOCAL_ASSN_DEF - assign default values to local variable AL */
 
-static void scheme_wrap_local_assn_def(FILE *fp, farg *al)
+static void scheme_wrap_local_assn_def(FILE *fc, farg *al)
    {char *defa;
     idecl *ip;
 
     ip   = &al->interp;
     defa = ip->defa;
 
-    fputs(defa, fp);
+    fputs(defa, fc);
 
     return;}
 
@@ -341,7 +315,7 @@ static void scheme_wrap_local_assn_arg(char *a, int nc, farg *al)
 
 /* SCHEME_WRAP_LOCAL_ASSN - local variable assignments */
 
-static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl)
+static void scheme_wrap_local_assn(FILE *fc, fdecl *dcl)
    {int i, na, voida;
     char a[BFLRG];
     farg *al;
@@ -354,17 +328,17 @@ static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl)
 
 /* set the default values */
 	for (i = 0; i < na; i++)
-	    scheme_wrap_local_assn_def(fp, al+i);
+	    scheme_wrap_local_assn_def(fc, al+i);
 
 /* make the SS_args call */
 	a[0] = '\0';
 	for (i = 0; i < na; i++)
 	    scheme_wrap_local_assn_arg(a, BFLRG, al+i);
 
-	fprintf(fp, "    SS_args(si, argl,\n");
-	fprintf(fp, "%s", a);
-	fprintf(fp, "            0);\n");
-	fprintf(fp, "\n");};
+	fprintf(fc, "    SS_args(si, argl,\n");
+	fprintf(fc, "%s", a);
+	fprintf(fc, "            0);\n");
+	fprintf(fc, "\n");};
 
     return;}
 
@@ -373,7 +347,7 @@ static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl)
 
 /* SCHEME_WRAP_LOCAL_CALL - function call */
 
-static void scheme_wrap_local_call(FILE *fp, fdecl *dcl)
+static void scheme_wrap_local_call(FILE *fc, fdecl *dcl)
    {char a[BFLRG], t[BFLRG];
     char *ty, *nm;
 
@@ -387,7 +361,7 @@ static void scheme_wrap_local_call(FILE *fp, fdecl *dcl)
     else
        snprintf(t, BFLRG, "    _rv = %s(%s);\n", nm, a);
 
-    fputs(t, fp);
+    fputs(t, fc);
 
     return;}
 
@@ -499,7 +473,7 @@ static void scheme_scalar_return(char *t, int nc,
 
 /* SCHEME_WRAP_LOCAL_RETURN - function return */
 
-static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
+static void scheme_wrap_local_return(FILE *fc, fdecl *dcl,
 				     fparam knd, char *so)
    {char t[BFLRG];
 
@@ -507,12 +481,12 @@ static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
     if (IS_NULL(t) == TRUE)
        scheme_scalar_return(t, BFLRG, dcl, knd, so);
 
-    fputs(t, fp);
+    fputs(t, fc);
 
-    fprintf(fp, "\n");
+    fprintf(fc, "\n");
 
-    fprintf(fp, "    return(_lo);}\n");
-    fprintf(fp, "\n");
+    fprintf(fc, "    return(_lo);}\n");
+    fprintf(fc, "\n");
 
     return;}
 
@@ -521,10 +495,10 @@ static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
 
 /* SCHEME_ENUM_DEFS - write the SCHEME interface C enums DV */
 
-static void scheme_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
-   {FILE *fs;
+static void scheme_enum_defs(FILE **fpa, char *dv, char **ta, char *pck)
+   {FILE *fc;
 
-    fs = fp[0];
+    fc = fpa[0];
 
 /* syntax:
  *    _SS_make_ext_int(si, <Enamei>, <Evaluei>);
@@ -532,17 +506,17 @@ static void scheme_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
-	   {csep(fs);
-	    fprintf(fs, "\n");
-	    fprintf(fs, "static void _SX_install_%s_consts(SS_psides *si)\n",
+	   {csep(fc);
+	    fprintf(fc, "\n");
+	    fprintf(fc, "static void _SX_install_%s_consts(SS_psides *si)\n",
 		    pck);
-	    fprintf(fs, "   {\n");
-	    fprintf(fs, "\n");}
+	    fprintf(fc, "   {\n");
+	    fprintf(fc, "\n");}
         else if (strcmp(dv, "end") == 0)
-	   {fprintf(fs, "\n");
-	    fprintf(fs, "    return;}\n");
-	    fprintf(fs, "\n");
-	    csep(fs);};}
+	   {fprintf(fc, "\n");
+	    fprintf(fc, "    return;}\n");
+	    fprintf(fc, "\n");
+	    csep(fc);};}
 
     else if (strcmp(ta[0], "enum") == 0)
        {int i;
@@ -558,7 +532,7 @@ static void scheme_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
 	     else
 	        vl++;
 
-	     fprintf(fs, "    _SS_make_ext_int(si, \"%s\", %ld);\n",
+	     fprintf(fc, "    _SS_make_ext_int(si, \"%s\", %ld);\n",
 	             vr, vl);};};
 
     return;}
@@ -570,22 +544,22 @@ static void scheme_enum_defs(FILE **fp, char *dv, char **ta, char *pck)
  *                       - in the header file
  */
 
-static void scheme_hdr_struct_def(FILE *fp, char *dv, char **ta, char *pck)
+static void scheme_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
    {int i;
     char lnm[BFSML], unm[BFSML], mnm[BFSML];
     char *p, *mbr;
-    tn_list tl;
+    tns_list tl;
 
     scheme_type_name_list(ta[0]+9, &tl);
 
 /* emit type check predicate macro */
-    fprintf(fp, "#undef SX_%sP\n", tl.rnm);
-    fprintf(fp, "#define SX_%sP(_o)   (SS_OBJECT_TYPE(_o) == SX_%s_I)\n",
+    fprintf(fh, "#undef SX_%sP\n", tl.rnm);
+    fprintf(fh, "#define SX_%sP(_o)   (SS_OBJECT_TYPE(_o) == SX_%s_I)\n",
 	    tl.rnm, tl.rnm);
-    fprintf(fp, "\n");
+    fprintf(fh, "\n");
 
 #if 0
-    fprintf(fp, "#define %s(_o)   \t(SS_GET(%s, _o))\n",
+    fprintf(fh, "#define %s(_o)   \t(SS_GET(%s, _o))\n",
 	    tl.rnm, tl.cnm);
 #endif
 
@@ -600,26 +574,26 @@ static void scheme_hdr_struct_def(FILE *fp, char *dv, char **ta, char *pck)
 	     nstrncpy(unm, BFSML, p, -1);
 	     upcase(unm);
 
-	     fprintf(fp, "#define %s_%s(_o)   \t(SS_GET(%s, _o)->%s)\n",
+	     fprintf(fh, "#define %s_%s(_o)   \t(SS_GET(%s, _o)->%s)\n",
 		     tl.rnm, unm, tl.cnm, lnm);};};
-    fprintf(fp, "\n");
+    fprintf(fh, "\n");
 
 /* emit list extractor */
-    fprintf(fp, "#define SX_GET_%s_FROM_LIST(_si, _v, _a, _s)   \\\n", tl.rnm);
-    fprintf(fp, "   {obj = SS_car(_si, _a);   \\\n");
-    fprintf(fp, "    _a = SS_cdr(_si, _a);   \\\n");
-    fprintf(fp, "    _v = _SX_opt_%s(NULL, BIND_ARG, obj);   \\\n", tl.cnm);
-    fprintf(fp, "    if (((char *) _v) == _SX.unresolved)   \\\n");
-    fprintf(fp, "       SS_error(_si, _s, obj);}\n");
-    fprintf(fp, "\n");
+    fprintf(fh, "#define SX_GET_%s_FROM_LIST(_si, _v, _a, _s)   \\\n", tl.rnm);
+    fprintf(fh, "   {obj = SS_car(_si, _a);   \\\n");
+    fprintf(fh, "    _a = SS_cdr(_si, _a);   \\\n");
+    fprintf(fh, "    _v = _SX_opt_%s(NULL, BIND_ARG, obj);   \\\n", tl.cnm);
+    fprintf(fh, "    if (((char *) _v) == _SX.unresolved)   \\\n");
+    fprintf(fh, "       SS_error(_si, _s, obj);}\n");
+    fprintf(fh, "\n");
 
 /* emit external declarations */
-    fprintf(fp, "extern int SX_%s_I;\n", tl.rnm);
-    fprintf(fp, "\n");
+    fprintf(fh, "extern int SX_%s_I;\n", tl.rnm);
+    fprintf(fh, "\n");
 
-    fprintf(fp, "extern object *SX_make_%s(SS_psides *si, %s *x);\n",
+    fprintf(fh, "extern object *SX_make_%s(SS_psides *si, %s *x);\n",
 	    tl.lnm, tl.cnm);
-    fprintf(fp, "\n");
+    fprintf(fh, "\n");
 
     return;}
 
@@ -630,15 +604,15 @@ static void scheme_hdr_struct_def(FILE *fp, char *dv, char **ta, char *pck)
  *                     - in the C file
  */
 
-static void scheme_c_struct_def(FILE *fp, char *dv, char **ta, char *pck)
+static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
    {int i;
     char *p, *mbr;
-    tn_list tl;
+    tns_list tl;
 
     scheme_type_name_list(ta[0]+9, &tl);
 
 /* emit registration with the SX VIF */
-    fprintf(fp, "    dp = PD_defstr(SX_gs.vif, \"%s\",\n", tl.cnm);
+    fprintf(fc, "    dp = PD_defstr(SX_gs.vif, \"%s\",\n", tl.cnm);
 
     for (i = 2; ta[i] != NULL; i++)
         {mbr = trim(ta[i], BOTH, " \t");
@@ -647,35 +621,35 @@ static void scheme_c_struct_def(FILE *fp, char *dv, char **ta, char *pck)
 /* function pointer */
 	    {p = strstr(mbr, "(*");
 	     if (p != NULL)
-	        fprintf(fp, "                   \"function %s\",\n",
+	        fprintf(fc, "                   \"function %s\",\n",
 			strtok(p+2, ")"));
 	     else
-	        fprintf(fp, "                   \"%s\",\n", mbr);};};
+	        fprintf(fc, "                   \"%s\",\n", mbr);};};
 
-    fprintf(fp, "                   LAST);\n");
-    fprintf(fp, "    nerr += (dp == NULL);\n");
-    fprintf(fp, "\n");
+    fprintf(fc, "                   LAST);\n");
+    fprintf(fc, "    nerr += (dp == NULL);\n");
+    fprintf(fc, "\n");
 
-    fprintf(fp, "    SS_install(si, \"%s?\",\n", tl.snm);
-    fprintf(fp, "               \"Returns #t if the object is a %s, and #f otherwise\",\n", tl.cnm);
-    fprintf(fp, "               SS_sargs,\n");
-    fprintf(fp, "               _SXI_%sp, SS_PR_PROC);\n", tl.lnm);
-    fprintf(fp, "\n");
+    fprintf(fc, "    SS_install(si, \"%s?\",\n", tl.snm);
+    fprintf(fc, "               \"Returns #t if the object is a %s, and #f otherwise\",\n", tl.cnm);
+    fprintf(fc, "               SS_sargs,\n");
+    fprintf(fc, "               _SXI_%sp, SS_PR_PROC);\n", tl.lnm);
+    fprintf(fc, "\n");
 
 /* emit registration with the SCORE type system */
-    fprintf(fp, "    SX_%s_I = SC_type_register(\"%s\", KIND_STRUCT, sizeof(%s),\n", tl.rnm, tl.cnm, tl.cnm);
-    fprintf(fp, "              SC_TYPE_FREE, _SX_rl_%s,\n", tl.lnm);
-    fprintf(fp, "              0);\n");
-    fprintf(fp, "\n");
+    fprintf(fc, "    SX_%s_I = SC_type_register(\"%s\", KIND_STRUCT, sizeof(%s),\n", tl.rnm, tl.cnm, tl.cnm);
+    fprintf(fc, "              SC_TYPE_FREE, _SX_rl_%s,\n", tl.lnm);
+    fprintf(fc, "              0);\n");
+    fprintf(fc, "\n");
 
-    fprintf(fp, "    ty    = _SC_get_type_id(SX_%s_I);\n", tl.rnm);
-    fprintf(fp, "    alst  = ty->a;\n");
-    fprintf(fp, "    alst  = SC_add_alist(alst, \"C->Scheme\", \"%s\", SX_make_%s);\n",
+    fprintf(fc, "    ty    = _SC_get_type_id(SX_%s_I);\n", tl.rnm);
+    fprintf(fc, "    alst  = ty->a;\n");
+    fprintf(fc, "    alst  = SC_add_alist(alst, \"C->Scheme\", \"%s\", SX_make_%s);\n",
 	    tl.unm, tl.lnm);
-    fprintf(fp, "    alst  = SC_add_alist(alst, \"Scheme->C\", \"%s\", _SX_arg_%s);\n",
+    fprintf(fc, "    alst  = SC_add_alist(alst, \"Scheme->C\", \"%s\", _SX_arg_%s);\n",
 	    tl.unm, tl.lnm);
-    fprintf(fp, "    ty->a = alst;\n");
-    fprintf(fp, "\n");
+    fprintf(fc, "    ty->a = alst;\n");
+    fprintf(fc, "\n");
 
     return;}
 
@@ -684,11 +658,11 @@ static void scheme_c_struct_def(FILE *fp, char *dv, char **ta, char *pck)
 
 /* SCHEME_STRUCT_DEFS - write the SCHEME interface C structs DV */
 
-static void scheme_struct_defs(FILE **fp, char *dv, char **ta, char *pck)
-   {FILE *fs, *fh;
+static void scheme_struct_defs(FILE **fpa, char *dv, char **ta, char *pck)
+   {FILE *fc, *fh;
 
-    fs = fp[0];
-    fh = fp[1];
+    fc = fpa[0];
+    fh = fpa[1];
 
 /* syntax:
  *    PD_defstr(SX_vif, <Sname>,
@@ -700,25 +674,25 @@ static void scheme_struct_defs(FILE **fp, char *dv, char **ta, char *pck)
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
-	   {csep(fs);
-	    fprintf(fs, "\n");
-	    fprintf(fs, "static int _SX_install_%s_derived(SS_psides *si)\n",
+	   {csep(fc);
+	    fprintf(fc, "\n");
+	    fprintf(fc, "static int _SX_install_%s_derived(SS_psides *si)\n",
 		    pck);
-	    fprintf(fs, "   {int nerr;\n");
-	    fprintf(fs, "    defstr *dp;\n");
-	    fprintf(fs, "    pcons *alst;\n");
-	    fprintf(fs, "    SC_type *ty;\n");
-	    fprintf(fs, "\n");
-	    fprintf(fs, "    nerr = 0;\n");
-	    fprintf(fs, "\n");}
+	    fprintf(fc, "   {int nerr;\n");
+	    fprintf(fc, "    defstr *dp;\n");
+	    fprintf(fc, "    pcons *alst;\n");
+	    fprintf(fc, "    SC_type *ty;\n");
+	    fprintf(fc, "\n");
+	    fprintf(fc, "    nerr = 0;\n");
+	    fprintf(fc, "\n");}
         else if (strcmp(dv, "end") == 0)
-	   {fprintf(fs, "    return(nerr);}\n");
-	    fprintf(fs, "\n");
-	    csep(fs);};}
+	   {fprintf(fc, "    return(nerr);}\n");
+	    fprintf(fc, "\n");
+	    csep(fc);};}
 
     else if (strncmp(ta[0], "struct s_", 9) == 0)
        {scheme_hdr_struct_def(fh, dv, ta, pck);
-	scheme_c_struct_def(fs, dv, ta, pck);};
+	scheme_c_struct_def(fc, dv, ta, pck);};
 
     return;}
 
@@ -729,119 +703,119 @@ static void scheme_struct_defs(FILE **fp, char *dv, char **ta, char *pck)
  *                    - SCHEME object from C structs
  */
 
-static void scheme_object_defs(FILE **fp, char *dv, char **ta, char *pck)
-   {FILE *fs;
-    tn_list tl;
+static void scheme_object_defs(FILE **fpa, char *dv, char **ta, char *pck)
+   {FILE *fc;
+    tns_list tl;
 
-    fs = fp[0];
+    fc = fpa[0];
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
-	   csep(fs);
+	   csep(fc);
         else if (strcmp(dv, "end") == 0)
-	   csep(fs);}
+	   csep(fc);}
 
     else if (strncmp(ta[0], "struct s_", 9) == 0)
        {scheme_type_name_list(ta[0]+9, &tl);
 
-        csep(fs);
-        fprintf(fs, "\n");
+        csep(fc);
+        fprintf(fc, "\n");
 
 /* emit the object write method */
-	fprintf(fs, "static void _SX_wr_%s(SS_psides *si, object *o, object *fp)\n",
+	fprintf(fc, "static void _SX_wr_%s(SS_psides *si, object *o, object *fp)\n",
 		tl.lnm);
-	fprintf(fs, "   {%s *x;\n", tl.cnm);
-	fprintf(fs, "\n");
-	fprintf(fs, "    x = SS_GET(%s, o);\n", tl.cnm);
-	fprintf(fs, "\n");
-	fprintf(fs, "    PRINT(SS_OUTSTREAM(fp), \"<%s|%%s>\", _SX_opt_%s(x, BIND_PRINT, NULL));\n",
+	fprintf(fc, "   {%s *x;\n", tl.cnm);
+	fprintf(fc, "\n");
+	fprintf(fc, "    x = SS_GET(%s, o);\n", tl.cnm);
+	fprintf(fc, "\n");
+	fprintf(fc, "    PRINT(SS_OUTSTREAM(fp), \"<%s|%%s>\", _SX_opt_%s(x, BIND_PRINT, NULL));\n",
 		tl.rnm, tl.cnm);
 
-	fprintf(fs, "\n");
-	fprintf(fs, "    return;}\n");
+	fprintf(fc, "\n");
+	fprintf(fc, "    return;}\n");
 
-        fprintf(fs, "\n");
-        csep(fs);
-        csep(fs);
-        fprintf(fs, "\n");
+        fprintf(fc, "\n");
+        csep(fc);
+        csep(fc);
+        fprintf(fc, "\n");
 
 /* emit the object release method */
-	fprintf(fs, "static void _SX_rl_%s(SS_psides *si, object *o)\n",
+	fprintf(fc, "static void _SX_rl_%s(SS_psides *si, object *o)\n",
 		tl.lnm);
-	fprintf(fs, "   {%s *x;\n", tl.cnm);
-	fprintf(fs, "\n");
-	fprintf(fs, "    x = SS_GET(%s, o);\n", tl.cnm);
-	fprintf(fs, "\n");
-	fprintf(fs, "    _SX_opt_%s(x, BIND_FREE, NULL);\n", tl.cnm);
-	fprintf(fs, "\n");
-	fprintf(fs, "    SS_rl_object(si, o);\n");
-	fprintf(fs, "\n");
-	fprintf(fs, "    return;}\n");
+	fprintf(fc, "   {%s *x;\n", tl.cnm);
+	fprintf(fc, "\n");
+	fprintf(fc, "    x = SS_GET(%s, o);\n", tl.cnm);
+	fprintf(fc, "\n");
+	fprintf(fc, "    _SX_opt_%s(x, BIND_FREE, NULL);\n", tl.cnm);
+	fprintf(fc, "\n");
+	fprintf(fc, "    SS_rl_object(si, o);\n");
+	fprintf(fc, "\n");
+	fprintf(fc, "    return;}\n");
 
-	fprintf(fs, "\n");
-        csep(fs);
-        csep(fs);
-	fprintf(fs, "\n");
+	fprintf(fc, "\n");
+        csep(fc);
+        csep(fc);
+	fprintf(fc, "\n");
 
 /* emit the object instantiation method */
-	fprintf(fs, "int SX_%s_I;\n", tl.rnm);
+	fprintf(fc, "int SX_%s_I;\n", tl.rnm);
 
-	fprintf(fs, "\n");
-	fprintf(fs, "object *SX_make_%s(SS_psides *si, %s *x)\n",
+	fprintf(fc, "\n");
+	fprintf(fc, "object *SX_make_%s(SS_psides *si, %s *x)\n",
 		tl.lnm, tl.cnm);
-	fprintf(fs, "   {object *rv;\n");
-	fprintf(fs, "\n");
+	fprintf(fc, "   {object *rv;\n");
+	fprintf(fc, "\n");
 
-	fprintf(fs, "    if (x == NULL)\n");
-	fprintf(fs, "       rv = SS_null;\n");
-	fprintf(fs, "    else\n");
+	fprintf(fc, "    if (x == NULL)\n");
+	fprintf(fc, "       rv = SS_null;\n");
+	fprintf(fc, "    else\n");
 
 /* use the BIND member to determine the print name */
-	fprintf(fs, "       {char *nm;\n");
-	fprintf(fs, "\n");
-	fprintf(fs, "        _SX_opt_%s(x, BIND_ALLOC, NULL);\n",
+	fprintf(fc, "       {char *nm;\n");
+	fprintf(fc, "\n");
+	fprintf(fc, "        _SX_opt_%s(x, BIND_ALLOC, NULL);\n",
 		tl.cnm);
-	fprintf(fs, "        nm = _SX_opt_%s(x, BIND_LABEL, NULL);\n",
+	fprintf(fc, "        nm = _SX_opt_%s(x, BIND_LABEL, NULL);\n",
 		tl.cnm);
-	fprintf(fs, "        rv = SS_mk_object(si, x, SX_%s_I, SELF_EV, nm,\n",
+	fprintf(fc, "        rv = SS_mk_object(si, x, SX_%s_I, SELF_EV, nm,\n",
 		tl.rnm);
-	fprintf(fs, "                          _SX_wr_%s, _SX_rl_%s);}\n",
+	fprintf(fc, "                          _SX_wr_%s, _SX_rl_%s);}\n",
 		tl.lnm, tl.lnm);
 
-	fprintf(fs, "\n");
-	fprintf(fs, "    return(rv);}\n");
+	fprintf(fc, "\n");
+	fprintf(fc, "    return(rv);}\n");
 
-	fprintf(fs, "\n");
-        csep(fs);
-        csep(fs);
-	fprintf(fs, "\n");
+	fprintf(fc, "\n");
+        csep(fc);
+        csep(fc);
+	fprintf(fc, "\n");
 
-	fprintf(fs, "void *_SX_arg_%s(SS_psides *si, object *o)\n", tl.lnm);
-	fprintf(fs, "   {void *rv;\n");
-	fprintf(fs, "\n");
-	fprintf(fs, "    rv = _SX_opt_%s(NULL, BIND_ARG, o);\n", tl.cnm);
-	fprintf(fs, "\n");
-	fprintf(fs, "    if (rv == _SX.unresolved)\n");
-	fprintf(fs, "       SS_error(si, \"OBJECT NOT %s - _SX_ARG_%s\", o);\n",
+	fprintf(fc, "void *_SX_arg_%s(SS_psides *si, object *o)\n", tl.lnm);
+	fprintf(fc, "   {void *rv;\n");
+	fprintf(fc, "\n");
+	fprintf(fc, "    rv = _SX_opt_%s(NULL, BIND_ARG, o);\n", tl.cnm);
+	fprintf(fc, "\n");
+	fprintf(fc, "    if (rv == _SX.unresolved)\n");
+	fprintf(fc, "       SS_error(si, \"OBJECT NOT %s - _SX_ARG_%s\", o);\n",
 		tl.unm, tl.unm);
-	fprintf(fs, "\n");
-	fprintf(fs, "    return(rv);}\n");
+	fprintf(fc, "\n");
+	fprintf(fc, "    return(rv);}\n");
 
-	fprintf(fs, "\n");
-        csep(fs);
-        csep(fs);
-	fprintf(fs, "\n");
+	fprintf(fc, "\n");
+        csep(fc);
+        csep(fc);
+	fprintf(fc, "\n");
 
-	fprintf(fs, "static object *_SXI_%sp(SS_psides *si, object *o)\n",
+	fprintf(fc, "static object *_SXI_%sp(SS_psides *si, object *o)\n",
 		tl.lnm);
-	fprintf(fs, "   {object *rv;\n");
-	fprintf(fs, "\n");
-	fprintf(fs, "    rv = SX_%sP(o) ? SS_t : SS_f;\n", tl.rnm);
-	fprintf(fs, "\n");
-	fprintf(fs, "    return(rv);}\n");
+	fprintf(fc, "   {object *rv;\n");
+	fprintf(fc, "\n");
+	fprintf(fc, "    rv = SX_%sP(o) ? SS_t : SS_f;\n", tl.rnm);
+	fprintf(fc, "\n");
+	fprintf(fc, "    return(rv);}\n");
 
-	fprintf(fs, "\n");
-        csep(fs);};
+	fprintf(fc, "\n");
+        csep(fc);};
 
     return;}
 
@@ -900,32 +874,32 @@ static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
  *             - using name FFN
  */
 
-static char **scheme_wrap(FILE *fp, char **fl, fdecl *dcl,
+static char **scheme_wrap(FILE *fc, char **fl, fdecl *dcl,
 			  char *sfn, char **com)
    {fparam knd;
     char so[BFLRG];
 
     if ((is_var_arg(dcl->proto.arg) == FALSE) && (strcmp(sfn, "none") != 0))
-       {csep(fp);
+       {csep(fc);
 
 	knd = so_type(so, BFLRG, dcl->proto.type);
 	
 /* function declaration */
-	scheme_wrap_decl(fp, dcl);
+	scheme_wrap_decl(fc, dcl);
 
 /* local variable declarations */
-	scheme_wrap_local_decl(fp, dcl, knd, so);
+	scheme_wrap_local_decl(fc, dcl, knd, so);
 
 /* local variable assignments */
-	scheme_wrap_local_assn(fp, dcl);
+	scheme_wrap_local_assn(fc, dcl);
 
 /* function call */
-	scheme_wrap_local_call(fp, dcl);
+	scheme_wrap_local_call(fc, dcl);
 
 /* function return */
-	scheme_wrap_local_return(fp, dcl, knd, so);
+	scheme_wrap_local_return(fc, dcl, knd, so);
 
-	csep(fp);
+	csep(fc);
 
 /* add the installation of the function */
 	fl = scheme_wrap_install(fl, dcl, sfn, com);};
@@ -939,11 +913,11 @@ static char **scheme_wrap(FILE *fp, char **fl, fdecl *dcl,
 
 static void scheme_install(bindes *bd, char **fl)
    {int i;
-    FILE *fp;
+    FILE *fc;
     char *pck;
     statedes *st;
 
-    fp  = bd->fp[0];
+    fc  = bd->fp[0];
     st  = bd->st;
     pck = st->pck;
 
@@ -956,30 +930,30 @@ static void scheme_install(bindes *bd, char **fl)
 /* make the list of structs to install */
     emit_struct_defs(bd, scheme_struct_defs);
 
-    csep(fp);
+    csep(fc);
 
-    fprintf(fp, "\n");
-    fprintf(fp, "void SX_install_%s_bindings(SS_psides *si)\n", pck);
-    fprintf(fp, "   {\n");
-    fprintf(fp, "\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "void SX_install_%s_bindings(SS_psides *si)\n", pck);
+    fprintf(fc, "   {\n");
+    fprintf(fc, "\n");
 
 /* make the list of enum constants to install */
-    fprintf(fp, "    _SX_install_%s_consts(si);\n", pck);
+    fprintf(fc, "    _SX_install_%s_consts(si);\n", pck);
 
 /* make the list of structs to install */
-    fprintf(fp, "    _SX_install_%s_derived(si);\n", pck);
+    fprintf(fc, "    _SX_install_%s_derived(si);\n", pck);
 
-    fprintf(fp, "\n");
+    fprintf(fc, "\n");
 
     if (fl != NULL)
        {for (i = 0; fl[i] != NULL; i++)
-	    fputs(fl[i], fp);
+	    fputs(fl[i], fc);
 
 	free_strings(fl);};
 
-    fprintf(fp, "   return;}\n");
-    fprintf(fp, "\n");
-    csep(fp);
+    fprintf(fc, "   return;}\n");
+    fprintf(fc, "\n");
+    csep(fc);
 
     return;}
 
@@ -995,9 +969,9 @@ static int bind_scheme(bindes *bd)
     char *sfn, **fl;
     fdecl *dcl, *dcls;
     statedes *st;
-    FILE *fp;
+    FILE *fc;
 
-    fp   = bd->fp[0];
+    fc   = bd->fp[0];
     st   = bd->st;
     dcls = st->dcl;
     ndcl = st->ndcl;
@@ -1010,7 +984,7 @@ static int bind_scheme(bindes *bd)
         {dcl = dcls + ib;
 	 sfn = has_binding(dcl, "scheme");
 	 if (sfn != NULL)
-	    fl = scheme_wrap(fp, fl, dcl, sfn, NULL);};
+	    fl = scheme_wrap(fc, fl, dcl, sfn, NULL);};
 
 /* write the routine to install the bindings */
     scheme_install(bd, fl);
@@ -1024,16 +998,16 @@ static int bind_scheme(bindes *bd)
 
 static void fin_scheme(bindes *bd)
    {int i;
-    FILE *fp;
+    FILE *fc, *fh, *fp;
 
 /* finish of the C file */
-    fp = bd->fp[0];
-    csep(fp);
+    fc = bd->fp[0];
+    csep(fc);
 
 /* finish of the header file */
-    fp = bd->fp[1];
-    fprintf(fp, "#endif\n");
-    fprintf(fp, "\n");
+    fh = bd->fp[1];
+    fprintf(fh, "#endif\n");
+    fprintf(fh, "\n");
 
     for (i = 0; i < NF; i++)
         {fp = bd->fp[i];

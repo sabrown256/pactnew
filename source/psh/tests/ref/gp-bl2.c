@@ -1,7 +1,13 @@
+/*
+ * GP-BL2.C - generated support routines for BL2
+ *
+ */
 
-#include <Python.h>
+
+#include "cpyright.h"
+#include "py_int.h"
 #include "bl2_int.h"
-#include "sx_int.h"
+#include "gp-bl2.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -91,16 +97,5 @@ PyObject *_PY_fbmcr2(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-PyMethodDef
- _PYD_fbcv1 = {"fbcv1p", (PyCFunction) _PY_fbcv1, METH_KEYWORDS,
-               "Procedure: fbcv1p\n     Usage: fbcv1p(a, b, c, d, e, f)"},
- _PYD_fbmcv1 = {"fbmcv1p", (PyCFunction) _PY_fbmcv1, METH_KEYWORDS,
-                "Procedure: fbmcv1p\n     Usage: fbmcv1p(a, b, c, d)"},
- _PYD_fbmcr2 = {"fbmcr2p", (PyCFunction) _PY_fbmcr2, METH_KEYWORDS,
-                "Procedure: fbmcr2p\n     Usage: fbmcr2p(a, b, c, d)"},
- _PYD_bl2_null;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

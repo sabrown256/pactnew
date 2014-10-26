@@ -12,6 +12,7 @@
 
 #include "cpyright.h"
 #include "score.h"
+#include "scope_hash.h"
 
 /*--------------------------------------------------------------------------*/
 

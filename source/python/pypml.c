@@ -49,12 +49,13 @@ void *_PY_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PY_INIT_PML - initializations for PML bindings */
+/* PY_INIT_PML_INT - interim initializations for PML bindings */
 
-int PY_init_pml(PyObject *m, PyObject *d)
+int PY_init_pml_int(PyObject *m, PyObject *d)
    {int nerr;
+    extern int PY_init_pml(PyObject *m, PyObject *d);
 
-    nerr = 0;
+    nerr = PY_init_pml(m, d);
 
     PP_set_Type.tp_new   = PyType_GenericNew;
     PP_set_Type.tp_alloc = PyType_GenericAlloc;

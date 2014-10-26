@@ -12,7 +12,9 @@
 
 #include <Python.h>
 #undef HAVE_GETHOSTBYNAME
-#include "pgs_int.h"
+#include "sx_int.h"
+#include "scope_hash.h"
+#include "py_gen.h"
 #include <pputil.h>
 
 /* PM_set binding */
@@ -52,6 +54,60 @@ extern PyTypeObject
 
 /*--------------------------------------------------------------------------*/
 
+/* PY_DEF_TYPE - handle the boiler plate defining a new Python type
+ *             - example:
+ *             -    PY_DEF_TYPE(PM_mapping)
+ */
+
+#define PY_DEF_TYPE(_t)                                                      \
+PyTypeObject                                                                 \
+ PY_ ## _t ## _type = {PY_HEAD_INIT(&PyType_Type, 0)                         \
+                  #_t,                                                       \
+                  sizeof(PY_ ## _t),                                         \
+                  0,                                                         \
+                  (destructor) 0,                                            \
+                  (printfunc) 0,                                             \
+                  (getattrfunc) 0,                                           \
+                  (setattrfunc) 0,                                           \
+                  (cmpfunc) 0,                                               \
+                  (reprfunc) 0,                                              \
+                  0,                                                         \
+                  0,                                                         \
+                  0,                                                         \
+                  (hashfunc) 0,                                              \
+                  (ternaryfunc) 0,                                           \
+                  (reprfunc) 0,                                              \
+                  (getattrofunc) 0,                                          \
+                  (setattrofunc) 0,                                          \
+                  0,                                                         \
+                  Py_TPFLAGS_DEFAULT,                                        \
+                  PY_ ## _t ## _doc,                                         \
+                  (traverseproc) 0,                                          \
+                  (inquiry) 0,                                               \
+                  (richcmpfunc) 0,                                           \
+                  0,                                                         \
+                  (getiterfunc) 0,                                           \
+                  (iternextfunc) 0,                                          \
+                  0,                                                         \
+                  0,                                                         \
+                  PY_ ## _t ## _getset,                                      \
+                  0,                                                         \
+                  0,                                                         \
+                  (descrgetfunc) 0,                                          \
+                  (descrsetfunc) 0,                                          \
+                  0,                                                         \
+                  (initproc) PY_ ## _t ## _tp_init,                          \
+                  (allocfunc) 0,                                             \
+                  (newfunc) 0,                                               \
+                  (freefunc) 0,                                              \
+                  (inquiry) 0,                                               \
+                  0,                                                         \
+                  0,                                                         \
+                  0,                                                         \
+                  0,                                                         \
+                  0,                                                         \
+                  (destructor) 0,}
+
 /*--------------------------------------------------------------------------*/
 
 /*                           STRUCT DEFINITIONS                             */
@@ -78,7 +134,7 @@ extern "C" {
 
 extern int
  _PY_mapping_extractor(PyObject *obj, void *arg),
- PY_init_pml(PyObject *m, PyObject *d),
+ PY_init_pml_int(PyObject *m, PyObject *d),
  PP_set_Check(PyObject *op),
  PP_mapping_Check(PyObject *op);
 

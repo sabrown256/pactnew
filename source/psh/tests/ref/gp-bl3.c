@@ -1,14 +1,20 @@
+/*
+ * GP-BL3.C - generated support routines for BL3
+ *
+ */
 
-#include <Python.h>
+
+#include "cpyright.h"
+#include "py_int.h"
 #include "bl3_int.h"
-#include "sx_int.h"
+#include "gp-bl3.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* WRAP |str *fe1(str *a1, int a2)| */
 
-PyObject *_PY_fe1(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject *_PY_fe1(PY_str *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     str *_la1;
@@ -34,7 +40,7 @@ PyObject *_PY_fe1(PyObject *self, PyObject *args, PyObject *kwds)
 
 /* WRAP |void fe2(str *dev, double *x, double *y, int n, pcons *info, int l)| */
 
-PyObject *_PY_fe2(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject *_PY_fe2(PY_str *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     str *_ldev;
@@ -61,14 +67,5 @@ PyObject *_PY_fe2(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-PyMethodDef
- _PYD_fe1 = {"fe1p", (PyCFunction) _PY_fe1, METH_KEYWORDS,
-             "Procedure: fe1p\n     Usage: fe1p(a1, a2)"},
- _PYD_fe2 = {"fe2p", (PyCFunction) _PY_fe2, METH_KEYWORDS,
-             "Procedure: fe2p\n     Usage: fe2p(dev, x, y, n, info, l)"},
- _PYD_bl3_null;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

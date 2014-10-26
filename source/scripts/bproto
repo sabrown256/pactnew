@@ -107,7 +107,14 @@ Note $Log ""
 
       case premk:
       default:
-           set Lst = ( `grep '${TGTLib}(' pre-Make | sed 's/TGTLib//g' | sed 's/[=()$\]//g'` )
+           if (-f pre-Make) then
+              set Lst = ( `grep '${TGTLib}(' pre-Make | sed 's/TGTLib//g' | sed 's/[=()$\]//g'` )
+
+# for example in python/2_numpy there is no pre-Make
+# and bindings are not appropriate there anyway
+           else
+              exit(0)
+           endif
            breaksw
    endsw
 
@@ -511,13 +518,15 @@ Note $Log ""
 
 # move all python stuff to the python package
       if ($d != python) then
-         if (-f gp-$d.c) then
-            set ldst =  ../../../python/$zdir
-            if (!(-d $ldst)) then
-               flog $Log mkdir -p $ldst
+         foreach s (c h)
+            if (-f gp-$d.$s) then
+               set ldst =  ../../../python/$zdir
+               if (!(-d $ldst)) then
+                  flog $Log mkdir -p $ldst
+               endif
+               flog $Log mv gp-$d.$s $ldst
             endif
-            flog $Log mv gp-$d.c py-$d.h $ldst
-         endif
+         end
       endif
 
 # move all documentation to the doc package

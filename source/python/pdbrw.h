@@ -8,6 +8,8 @@
 
 #include "cpyright.h"
 
+#undef DONE
+
 enum e_PD_instr_kind
    {DONE        = 1,
     LEAF        = 2,

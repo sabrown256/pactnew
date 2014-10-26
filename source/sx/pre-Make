@@ -11,7 +11,7 @@ LibName=sx
 
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTExe = ${BinDir}/sx
-TGTInc = sx.h sx_int.h ultra.h
+TGTInc = sx.h sx_int.h ${IncDir}/sx_gen.h ultra.h
 
 UltraExe = ${BinDir}/ultra
 
@@ -153,7 +153,7 @@ ${IncDir}/sxpdbd.h : sxpdbd.t
 	@(echo "template sxpdbd.t -o ${IncDir}/sxpdbd.h" ;  \
 	  ${BinDir}/template sxpdbd.t -o ${IncDir}/sxpdbd.h)
 
-hdrf = ${IncDir}/sxpdbd.h ${IncDir}/sx_gen.h
+hdrf = ${IncDir}/sxpdbd.h
 
 # language bindings
 

@@ -1082,15 +1082,15 @@ static int _PP_extra_defstr_mark(haelem *hp, void *arg)
 
 static int _PY_pdbmodule_const(PyObject *m)
    {int ne;
-    extern int py_add_score_enum(PyObject *m);
-    extern int py_add_pml_enum(PyObject *m);
-    extern int py_add_pdb_enum(PyObject *m);
+    extern int PY_add_score_enum(PyObject *m);
+    extern int PY_add_pml_enum(PyObject *m);
+    extern int PY_add_pdb_enum(PyObject *m);
 
     ne = 0;
 
-    ne += py_add_score_enum(m);
-    ne += py_add_pml_enum(m);
-    ne += py_add_pdb_enum(m);
+    ne += PY_add_score_enum(m);
+    ne += PY_add_pml_enum(m);
+    ne += PY_add_pdb_enum(m);
 
     return(ne);}
 
@@ -1128,7 +1128,7 @@ PY_MOD_BEGIN(_pdb, pdb_module_documentation, PP_methods)
     if (ne > 0)
        PY_MOD_RETURN_ERR;
 
-    ne += PY_init_pml(m, d);
+    ne += PY_init_pml_int(m, d);
     if (ne > 0)
        PY_MOD_RETURN_ERR;
 
