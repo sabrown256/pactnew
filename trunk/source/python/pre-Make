@@ -11,6 +11,7 @@
 
 # dummy target lib just to get to LibAction
 TGTLib = ${LibDir}/libpy.a
+TGTInc = py_int.h pputil.h ppcommon.h
 
 RemoveAction = @./psys remove
 LibAction    = @./psys devlib
@@ -18,15 +19,32 @@ IncAction    = @./psys incinstall
 
 #--------------------------------------------------------------------------
 
+GenInc = ${PACTTmpDir}/gp-score.h ${PACTTmpDir}/gp-pml.h \
+         ${PACTTmpDir}/gp-pdb.h ${PACTTmpDir}/gp-pgs.h \
+         ${PACTTmpDir}/gp-panacea.h
+
+${IncDir}/py_gen.h : ${GenInc}
+	@echo "build py_gen.h"
+	@rm -f ${IncDir}/py_gen.h
+	@cat ${GenInc} > ${IncDir}/py_gen.h
+
+#hdrf = ${IncDir}/py_gen.h
+
 generate:
 	@./psys generate
+
+IncAction = @pact ${IncDir}/py_gen.h
+
+#--------------------------------------------------------------------------
+
+install:
+	@./psys link
+
+#--------------------------------------------------------------------------
 
 link:
 	@./psys link
 	cp py-install ${BinDir}
-
-install:
-	@./psys link
 
 sharedlib:
 	@./psys sharedlib

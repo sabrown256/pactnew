@@ -1,14 +1,13 @@
+/*
+ * GP-BL6.C - generated support routines for BL6
+ *
+ */
 
-#include <Python.h>
+
+#include "cpyright.h"
+#include "py_int.h"
 #include "bl6_int.h"
-#include "sx_int.h"
-
-typedef struct s_strO *strOp;
-typedef struct s_strO strO;
-
-struct s_strO
-   {PyObject_HEAD
-    str *pobj;};
+#include "gp-bl6.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -418,14 +417,14 @@ PyObject *_PY_fc9(PyObject *self, PyObject *args, PyObject *kwds)
 
 /* WRAP |void fd1(str *a ARG(,,cls), int b)| */
 
-PyObject *_PY_fd1(strO *self, PyObject *args, PyObject *kwds)
+PyObject *_PY_fd1(PY_str *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     str *_la;
     int _lb;
     char *kw_list[] = {"b", NULL};
 
-    _la = self->pobj;
+    _la = self->pyo;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "i:fd1_p",
@@ -446,14 +445,14 @@ PyObject *_PY_fd1(strO *self, PyObject *args, PyObject *kwds)
 
 /* WRAP |void fd2(str *a ARG(,,cls), int b)| */
 
-PyObject *_PY_fd2(strO *self, PyObject *args, PyObject *kwds)
+PyObject *_PY_fd2(PY_str *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     str *_la;
     int _lb;
     char *kw_list[] = {"b", NULL};
 
-    _la = self->pobj;
+    _la = self->pyo;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "i:nfd",
@@ -474,14 +473,14 @@ PyObject *_PY_fd2(strO *self, PyObject *args, PyObject *kwds)
 
 /* WRAP |void PD_fd3(str *a ARG(,,cls), int b)| */
 
-PyObject *_PY_PD_fd3(strO *self, PyObject *args, PyObject *kwds)
+PyObject *_PY_PD_fd3(PY_str *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     str *_la;
     int _lb;
     char *kw_list[] = {"b", NULL};
 
-    _la = self->pobj;
+    _la = self->pyo;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "i:fd3",
@@ -502,14 +501,14 @@ PyObject *_PY_PD_fd3(strO *self, PyObject *args, PyObject *kwds)
 
 /* WRAP |void PD_fd4(str *a ARG(,,cls), int b)| */
 
-PyObject *_PY_PD_fd4(strO *self, PyObject *args, PyObject *kwds)
+PyObject *_PY_PD_fd4(PY_str *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     str *_la;
     int _lb;
     char *kw_list[] = {"b", NULL};
 
-    _la = self->pobj;
+    _la = self->pyo;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "i:mfd",
@@ -527,48 +526,5 @@ PyObject *_PY_PD_fd4(strO *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-PyMethodDef
- _PYD_fa1 = {"fa1p", (PyCFunction) _PY_fa1, METH_KEYWORDS,
-             "Procedure: fa1p\n     Usage: fa1p(a)"},
- _PYD_fa3 = {"fa3p", (PyCFunction) _PY_fa3, METH_KEYWORDS,
-             "Procedure: fa3p\n     Usage: fa3p(a, b, c)"},
- _PYD_fa4 = {"fa4p", (PyCFunction) _PY_fa4, METH_KEYWORDS,
-             "Procedure: fa4p\n     Usage: fa4p(a, b, c)"},
- _PYD_fb1 = {"fb1", (PyCFunction) _PY_fb1, METH_KEYWORDS,
-             "Procedure: fb1\n     Usage: fb1(a, b)"},
- _PYD_fb2 = {"fb2", (PyCFunction) _PY_fb2, METH_KEYWORDS,
-             "Procedure: fb2\n     Usage: fb2(a, b)"},
- _PYD_fb3 = {"fb3", (PyCFunction) _PY_fb3, METH_KEYWORDS,
-             "Procedure: fb3\n     Usage: fb3(a, b)"},
- _PYD_fc1 = {"fc1", (PyCFunction) _PY_fc1, METH_KEYWORDS,
-             "Procedure: fc1\n     Usage: fc1(a, b, c, d)"},
- _PYD_fc2 = {"fc2", (PyCFunction) _PY_fc2, METH_KEYWORDS,
-             "Procedure: fc2\n     Usage: fc2(a, b, c, d)"},
- _PYD_fc3 = {"fc3", (PyCFunction) _PY_fc3, METH_KEYWORDS,
-             "Procedure: fc3\n     Usage: fc3(a, b, c, d)"},
- _PYD_fc4 = {"fc4", (PyCFunction) _PY_fc4, METH_KEYWORDS,
-             "Procedure: fc4\n     Usage: fc4(a, b, c, d)"},
- _PYD_fc5 = {"fc5", (PyCFunction) _PY_fc5, METH_KEYWORDS,
-             "Procedure: fc5\n     Usage: fc5(a, b, c, d)"},
- _PYD_fc6 = {"fc6", (PyCFunction) _PY_fc6, METH_KEYWORDS,
-             "Procedure: fc6\n     Usage: fc6(a, b, c, d)"},
- _PYD_fc7 = {"fc7", (PyCFunction) _PY_fc7, METH_KEYWORDS,
-             "Procedure: fc7\n     Usage: fc7(a, b, c, d)"},
- _PYD_fc8 = {"fc8", (PyCFunction) _PY_fc8, METH_KEYWORDS,
-             "Procedure: fc8\n     Usage: fc8(s1, s2, s3, s4)"},
- _PYD_fc9 = {"fc9", (PyCFunction) _PY_fc9, METH_KEYWORDS,
-             "Procedure: fc9\n     Usage: fc9(c1, c2, c3, c4, c5)"},
- _PYD_fd1 = {"fd1", (PyCFunction) _PY_fd1, METH_KEYWORDS,
-             "Method: fd1\n     Usage: a.fd1(b)"},
- _PYD_fd2 = {"nfd", (PyCFunction) _PY_fd2, METH_KEYWORDS,
-             "Method: nfd\n     Usage: a.nfd(b)"},
- _PYD_PD_fd3 = {"fd3", (PyCFunction) _PY_PD_fd3, METH_KEYWORDS,
-                "Method: fd3\n     Usage: a.fd3(b)"},
- _PYD_PD_fd4 = {"mfd", (PyCFunction) _PY_PD_fd4, METH_KEYWORDS,
-                "Method: mfd\n     Usage: a.mfd(b)"},
- _PYD_bl6_null;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

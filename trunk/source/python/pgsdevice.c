@@ -14,7 +14,7 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "pgsmodule.h"
-#include "py-pgs.h"
+#include "gp-pgs.h"
 
 /* DO-NOT-DELETE splicer.begin(pgs.device.C_definition) UNMODIFIED */
 /* DO-NOT-DELETE splicer.end(pgs.device.C_definition) */

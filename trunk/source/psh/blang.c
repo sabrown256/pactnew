@@ -942,6 +942,58 @@ static void hsep(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PARSE_MEMBER - parse a member description into TYPE, NAME, DIMS */
+
+void parse_member(char *mbr, char *nm, char *ty, char *dm, int nc)
+   {int nl, ns, hd;
+    char s[BFLRG], ind[BFSML];
+    char **sa, *pn, *pt;
+
+    hd = (strchr(s, '[') != NULL);
+
+    nstrncpy(s, BFLRG, mbr, -1);
+    if (strstr(s, "(*") != NULL)
+       {sa = tokenize(s, "()[]", 0);
+	ns = 0;
+	pt = sa[0];
+	pn = sa[1] + 1;}
+    else if (strchr(s, '*') != NULL)
+       {sa = tokenize(s, " \t[]", 0);
+	pt = sa[0];
+	pn = sa[1];
+	ns = strspn(pn, "*");
+	pn += ns;}
+    else
+       {sa = tokenize(s, " \t[]", 0);
+	ns = 0;
+	pt = sa[0];
+	pn = sa[1];};
+
+    if (ty != NULL)
+       {if (ns > 0)
+	   {memset(ind, '*', ns);
+	    ind[ns] = '\0';
+	    snprintf(ty, nc, "%s %s", pt, ind);}
+	else
+	   nstrncpy(ty, nc, pt, -1);};
+
+    if (nm != NULL)
+       nstrncpy(nm, nc, pn, -1);
+
+    if (dm != NULL)
+       {if (hd == TRUE)
+	   {nl = lst_length(sa);
+	    nstrncpy(dm, nc, sa[nl-1], -1);}
+	else
+	    dm[0] = '\0';};
+
+    lst_free(sa);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* EMIT_ENUM_DEFS - emit enum specifications via FEMIT */
 
 void emit_enum_defs(bindes *bd,
@@ -1009,8 +1061,8 @@ void emit_struct_defs(bindes *bd,
 	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
 	     if ((strncmp(ps, "derived", 7) == 0) &&
 		 (strstr(ps, "SC_ENUM_I") == NULL))
-	        {te = strtok(ps, " ");
-		 te = strtok(NULL, " ");
+	        {te = strtok(ps, " \t");
+		 te = strtok(NULL, " \t");
 		 nc = strlen(te);
 		 for (id = 0; cdv[id] != NULL; id++)
 		     {sb = cdv[id];

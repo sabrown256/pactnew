@@ -42,7 +42,8 @@ while ($#argv > 0)
    shift
 end
 
-if (("$HAVE_PYTHON" !~ *FALSE*) && ($tgt != generate)) then
+#if (("$HAVE_PYTHON" !~ *FALSE*) && ($tgt != generate)) then
+if ("$HAVE_PYTHON" !~ *FALSE*) then
 
    InitLog log $cwd/$PSY_TmpDir/log.psys.$tgt
 

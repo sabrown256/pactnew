@@ -1,7 +1,13 @@
+/*
+ * GP-BL4.C - generated support routines for BL4
+ *
+ */
 
-#include <Python.h>
+
+#include "cpyright.h"
+#include "py_int.h"
 #include "bl4_int.h"
-#include "sx_int.h"
+#include "gp-bl4.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -815,74 +821,5 @@ PyObject *_PY_fp13(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-PyMethodDef
- _PYD_fb1 = {"fb1", (PyCFunction) _PY_fb1, METH_KEYWORDS,
-             "Procedure: fb1\n     Usage: fb1(a1, a2)"},
- _PYD_fb2 = {"fb2", (PyCFunction) _PY_fb2, METH_KEYWORDS,
-             "Procedure: fb2\n     Usage: fb2(a1, a2)"},
- _PYD_fb3 = {"fb3", (PyCFunction) _PY_fb3, METH_KEYWORDS,
-             "Procedure: fb3\n     Usage: fb3(a1, a2)"},
- _PYD_fb4 = {"fb4", (PyCFunction) _PY_fb4, METH_KEYWORDS,
-             "Procedure: fb4\n     Usage: fb4(a1, a2)"},
- _PYD_fb5 = {"fb5", (PyCFunction) _PY_fb5, METH_KEYWORDS,
-             "Procedure: fb5\n     Usage: fb5(a1, a2)"},
- _PYD_fb6 = {"fb6", (PyCFunction) _PY_fb6, METH_KEYWORDS,
-             "Procedure: fb6\n     Usage: fb6(a1, a2)"},
- _PYD_fb7 = {"fb7", (PyCFunction) _PY_fb7, METH_KEYWORDS,
-             "Procedure: fb7\n     Usage: fb7(a1, a2)"},
- _PYD_fb8 = {"fb8", (PyCFunction) _PY_fb8, METH_KEYWORDS,
-             "Procedure: fb8\n     Usage: fb8(a1, a2)"},
- _PYD_fb10 = {"fb10", (PyCFunction) _PY_fb10, METH_KEYWORDS,
-              "Procedure: fb10\n     Usage: fb10(a1, a2)"},
- _PYD_fb11 = {"fb11", (PyCFunction) _PY_fb11, METH_KEYWORDS,
-              "Procedure: fb11\n     Usage: fb11(a1, a2)"},
- _PYD_fr1 = {"fr1", (PyCFunction) _PY_fr1, METH_KEYWORDS,
-             "Procedure: fr1\n     Usage: fr1(a1)"},
- _PYD_fr2 = {"fr2", (PyCFunction) _PY_fr2, METH_KEYWORDS,
-             "Procedure: fr2\n     Usage: fr2(a1)"},
- _PYD_fr3 = {"fr3", (PyCFunction) _PY_fr3, METH_KEYWORDS,
-             "Procedure: fr3\n     Usage: fr3(a1)"},
- _PYD_fr4 = {"fr4", (PyCFunction) _PY_fr4, METH_KEYWORDS,
-             "Procedure: fr4\n     Usage: fr4(a1)"},
- _PYD_fr5 = {"fr5", (PyCFunction) _PY_fr5, METH_KEYWORDS,
-             "Procedure: fr5\n     Usage: fr5(a1)"},
- _PYD_fr6 = {"fr6", (PyCFunction) _PY_fr6, METH_KEYWORDS,
-             "Procedure: fr6\n     Usage: fr6(a1)"},
- _PYD_fr7 = {"fr7", (PyCFunction) _PY_fr7, METH_KEYWORDS,
-             "Procedure: fr7\n     Usage: fr7(a1)"},
- _PYD_fr8 = {"fr8", (PyCFunction) _PY_fr8, METH_KEYWORDS,
-             "Procedure: fr8\n     Usage: fr8(a1)"},
- _PYD_fr10 = {"fr10", (PyCFunction) _PY_fr10, METH_KEYWORDS,
-              "Procedure: fr10\n     Usage: fr10(a1)"},
- _PYD_fr11 = {"fr11", (PyCFunction) _PY_fr11, METH_KEYWORDS,
-              "Procedure: fr11\n     Usage: fr11(a1)"},
- _PYD_fr13 = {"fr13", (PyCFunction) _PY_fr13, METH_KEYWORDS,
-              "Procedure: fr13\n     Usage: fr13(a1)"},
- _PYD_fp1 = {"fp1", (PyCFunction) _PY_fp1, METH_KEYWORDS,
-             "Procedure: fp1\n     Usage: fp1(a1)"},
- _PYD_fp2 = {"fp2", (PyCFunction) _PY_fp2, METH_KEYWORDS,
-             "Procedure: fp2\n     Usage: fp2(a1)"},
- _PYD_fp3 = {"fp3", (PyCFunction) _PY_fp3, METH_KEYWORDS,
-             "Procedure: fp3\n     Usage: fp3(a1)"},
- _PYD_fp4 = {"fp4", (PyCFunction) _PY_fp4, METH_KEYWORDS,
-             "Procedure: fp4\n     Usage: fp4(a1)"},
- _PYD_fp5 = {"fp5", (PyCFunction) _PY_fp5, METH_KEYWORDS,
-             "Procedure: fp5\n     Usage: fp5(a1)"},
- _PYD_fp6 = {"fp6", (PyCFunction) _PY_fp6, METH_KEYWORDS,
-             "Procedure: fp6\n     Usage: fp6(a1)"},
- _PYD_fp7 = {"fp7", (PyCFunction) _PY_fp7, METH_KEYWORDS,
-             "Procedure: fp7\n     Usage: fp7(a1)"},
- _PYD_fp8 = {"fp8", (PyCFunction) _PY_fp8, METH_KEYWORDS,
-             "Procedure: fp8\n     Usage: fp8(a1)"},
- _PYD_fp10 = {"fp10", (PyCFunction) _PY_fp10, METH_KEYWORDS,
-              "Procedure: fp10\n     Usage: fp10(a1)"},
- _PYD_fp11 = {"fp11", (PyCFunction) _PY_fp11, METH_KEYWORDS,
-              "Procedure: fp11\n     Usage: fp11(a1)"},
- _PYD_fp13 = {"fp13", (PyCFunction) _PY_fp13, METH_KEYWORDS,
-              "Procedure: fp13\n     Usage: fp13(a1)"},
- _PYD_bl4_null;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
