@@ -482,14 +482,12 @@ proc_bf job_background(process_group *pg, proc_bf bf)
    {int ip, np, pgid;
     proc_bf rv;
     process *pp, **pa;
-    process_session *ps;
 
     rv = PROC_BF_NONE;
 
     if ((bf == PROC_BG_SUSP) || (bf == PROC_BG_RUN))
        {np = pg->np;
 	pa = pg->parents;
-	ps = pg->ss;
 
 /* GOTCHA: crap - rewrite */
 	for (ip = 0; ip < np; ip++)
@@ -498,7 +496,11 @@ proc_bf job_background(process_group *pg, proc_bf bf)
 /* send the job a continue signal to run in the background */
 	     if (bf == PROC_BG_RUN)
 	        {pgid = pp->pgid;
+
 #if defined(NEWWAY)
+		 process_session *ps;
+
+		 ps = pg->ss;
 		 job_suspend(ps, pgid, TRUE, FALSE);
 #else
 		 int st;

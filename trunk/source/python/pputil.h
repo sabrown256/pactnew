@@ -269,7 +269,7 @@ extern PyObject
 /* PPHASHARR.C declarations */
 
 extern void
- _PP_hasharr_entry(PP_file *fileinfo);
+ _PY_hasharr_entry(PP_file *fileinfo);
 
 extern int
  PP_update_hasharr(hasharr *hasharr, PyObject *dict);

@@ -159,30 +159,6 @@ extern PyTypeObject PP_hashtab_Type;
 /* DO-NOT-DELETE splicer.end(pdb.hashtab.C_declaration) */
 
 /*--------------------------------------------------------------------------*/
-/*                              OBJECT hasharr                              */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_hasharr_Check(op)    (PY_TYPE(op) == &PP_hasharr_Type) */
-
-typedef struct s_PP_hasharrObject *PP_hasharrObjectp;
-
-typedef struct s_PP_hasharrObject {
-  PyObject_HEAD
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.extra_object) */
-  PP_HEADER(hasharr)
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.extra_object) */
-} PP_hasharrObject;
-
-/* staticforward PyTypeObject PP_hasharr_Type;*/
-extern PyTypeObject PP_hasharr_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.C_declaration) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.C_declaration) */
-
-/*--------------------------------------------------------------------------*/
 /*                               OBJECT assoc                               */
 /*--------------------------------------------------------------------------*/
 
@@ -266,8 +242,8 @@ PP_defstrObject *PP_defstr_newobj(PP_defstrObject *obj, defstr *dp,
 PP_hashtabObject *PP_hashtab_newobj(PP_hashtabObject *obj,
                                     hasharr *tab);
 
-PP_hasharrObject *PP_hasharr_newobj(PP_hasharrObject *obj,
-                                    hasharr *tab);
+PY_hasharr *PY_hasharr_newobj(PY_hasharr *obj,
+			      hasharr *tab);
 
 PP_pdbdataObject *PP_pdbdata_newobj(PP_pdbdataObject *obj,
                                     void *vr, char *type, long nitems,

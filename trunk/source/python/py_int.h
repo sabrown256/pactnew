@@ -56,8 +56,24 @@ extern PyTypeObject
 
 /* PY_DEF_TYPE - handle the boiler plate defining a new Python type
  *             - example:
- *             -    PY_DEF_TYPE(PM_mapping)
+ *             -    PY_DEF_TYPE(PM_mapping, NULL, NULL, NULL, NULL)
  */
+
+#ifndef PY_DEF_DESTRUCTOR
+# define PY_DEF_DESTRUCTOR NULL
+#endif
+
+#ifndef PY_DEF_REPR
+# define PY_DEF_REPR NULL
+#endif
+
+#ifndef PY_DEF_AS_MAP
+# define PY_DEF_AS_MAP NULL
+#endif
+
+#ifndef PY_DEF_TP_METH
+# define PY_DEF_TP_METH NULL
+#endif
 
 #define PY_DEF_TYPE(_t)                                                      \
 PyTypeObject                                                                 \
@@ -65,15 +81,15 @@ PyTypeObject                                                                 \
                   #_t,                                                       \
                   sizeof(PY_ ## _t),                                         \
                   0,                                                         \
-                  (destructor) 0,                                            \
+                  (destructor) PY_DEF_DESTRUCTOR,                            \
                   (printfunc) 0,                                             \
                   (getattrfunc) 0,                                           \
                   (setattrfunc) 0,                                           \
                   (cmpfunc) 0,                                               \
-                  (reprfunc) 0,                                              \
+                  (reprfunc) PY_DEF_REPR,                                    \
                   0,                                                         \
                   0,                                                         \
-                  0,                                                         \
+                  PY_DEF_AS_MAP,                                             \
                   (hashfunc) 0,                                              \
                   (ternaryfunc) 0,                                           \
                   (reprfunc) 0,                                              \
@@ -88,7 +104,7 @@ PyTypeObject                                                                 \
                   0,                                                         \
                   (getiterfunc) 0,                                           \
                   (iternextfunc) 0,                                          \
-                  0,                                                         \
+                  PY_DEF_TP_METH,                                            \
                   0,                                                         \
                   PY_ ## _t ## _getset,                                      \
                   0,                                                         \

@@ -444,15 +444,23 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 		    mnm, tl.pnm, mnm, tl.pnm, mnm);};
 
     fprintf(fc, "    {NULL}};\n");
+    fprintf(fc, "\n");
 
+    fprintf(fc, "PyTypeObject %s_type;\n", tl.pnm);
+    fprintf(fc, "\n");
+
+#if 0
+/* this has to be in the application specific code where
+ * the additional method members may be set via #define'd constants
+ */
     fprintf(fc, "\n");
     csep(fc);
     csep(fc);
     fprintf(fc, "\n");
-
     fprintf(fc, "PY_DEF_TYPE(%s);\n", tl.cnm);
 
     fprintf(fc, "\n");
+#endif
 
 #if 0
 /*--------------------------------------------------------------------------*/
@@ -1103,18 +1111,9 @@ static void python_header(bindes *bd)
 /* PYTHON_INSTALL - write the routine to install the bindings */
 
 static void python_install(bindes *bd)
-   {int ib, ndcl;
-    char dfn[BFLRG];
-    char *pck, *cfn, *pfn;
-    fdecl *dcl, *dcls;
-    statedes *st;
-    FILE *fc;
+   {FILE *fc;
 
-    fc   = bd->fp[0];
-    st   = bd->st;
-    pck  = st->pck;
-    dcls = st->dcl;
-    ndcl = st->ndcl;
+    fc = bd->fp[0];
 
     csep(fc);
 
@@ -1130,6 +1129,17 @@ static void python_install(bindes *bd)
     csep(fc);
 
 #ifdef METHOD_DEF_VAR
+    int ib, ndcl;
+    char dfn[BFLRG];
+    char *pck, *cfn, *pfn;
+    fdecl *dcl, *dcls;
+    statedes *st;
+
+    st   = bd->st;
+    pck  = st->pck;
+    ndcl = st->ndcl;
+    dcls = st->dcl;
+
     csep(fc);
     fprintf(fc, "\n");
 
