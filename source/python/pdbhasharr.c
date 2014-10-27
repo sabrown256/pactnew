@@ -13,6 +13,11 @@
  * include cpyright.h
  */
 
+#define PY_DEF_DESTRUCTOR	    PY_hasharr_tp_dealloc
+#define PY_DEF_REPR                 PY_hasharr_tp_repr
+#define PY_DEF_TP_METH              PY_hasharr_methods
+#define PY_DEF_AS_MAP	            &PY_hasharr_as_mapping
+
 #include "pdbmodule.h"
 
 /*--------------------------------------------------------------------------*/
@@ -248,9 +253,13 @@ static PyMethodDef PY_hasharr_methods[] = {
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#if 0
+
 static PyGetSetDef PY_hasharr_getset[] = {
     {NULL}     /* Sentinel */
 };
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -593,11 +602,6 @@ static PyMappingMethods PY_hasharr_as_mapping = {
 /*--------------------------------------------------------------------------*/
 
 static char PY_hasharr_doc[] = "";
-
-#define PY_DEF_DESTRUCTOR	    PY_hasharr_tp_dealloc
-#define PY_DEF_REPR                 PY_hasharr_tp_repr
-#define PY_DEF_TP_METH              PY_hasharr_methods
-#define PY_DEF_AS_MAP	            &PY_hasharr_as_mapping
 
 PY_DEF_TYPE(hasharr);
 

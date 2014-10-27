@@ -530,37 +530,6 @@ PP_ref_count(
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_set_count - */
-
-static char PP_set_count__doc__[] = 
-""
-;
-
-static PyObject *
-PP_set_count(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.method.set_count) */
-    PyObject *pobj;
-    void *p;
-    int n;
-    char *kw_list[] = {"p", "n", NULL};
-    int result;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i:set_count", kw_list,
-                                     &PY_COBJ_TYPE, &pobj, &n))
-        return NULL;
-    p = (void *) PY_GET_PTR(pobj);
-    result = SC_set_count(p, n);
-    return PY_INT_LONG(result);
-/* DO-NOT-DELETE splicer.end(pdb.method.set_count) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PP_permanent - */
 
 static char PP_permanent__doc__[] = 
@@ -644,72 +613,6 @@ PP_pause(
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_set_io_hooks - */
-
-static char PP_set_io_hooks__doc__[] = 
-""
-;
-
-static PyObject *
-PP_set_io_hooks(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.method.set_io_hooks) UNMODIFIED */
-    int whch;
-    char *kw_list[] = {"whch", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_io_hooks", kw_list,
-                                     &whch))
-        return NULL;
-    SC_set_io_hooks(whch);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pdb.method.set_io_hooks) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_setform - */
-
-static char PP_setform__doc__[] = 
-""
-;
-
-static PyObject *
-PP_setform(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.method.setform) */
-    int ok;
-    int array, structure, scalar;
-    char *kw_list[] = {"array", "struct", "scalar", NULL};
-
-    array = AS_NONE;
-    structure = AS_NONE;
-    scalar = AS_NONE;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iii:setform", kw_list,
-                                     &array, &structure, &scalar))
-        return NULL;
-
-    ok = _PP_assign_form(&PP_global_form, array, structure, scalar);
-    if (ok < 0)
-        return NULL;
-
-    return Py_BuildValue("(iii)",
-                         PP_global_form.array_kind,
-                         PP_global_form.struct_kind,
-                         PP_global_form.scalar_kind);
-/* DO-NOT-DELETE splicer.end(pdb.method.setform) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PP_make_set_1d - */
 
 static char PP_make_set_1d__doc__[] = 
@@ -737,7 +640,7 @@ PP_make_set_1d(
                                      &name, &type, &cp, &nd, &max, &nde, REAL_array_extractor, &elem))
         return NULL;
     result = PM_make_set(name, type, cp, nd, max, nde, elem);
-    return _PY_set_from_ptr(result);
+    return _PY_PM_set_from_ptr(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.make_set_1d) */
 }
 
@@ -773,7 +676,7 @@ PP_make_ac_set(
         return NULL;
     mt = mtobj->mt;
     result = PM_make_ac_set(name, type, cp, mt, nde, x, y);
-    return _PY_set_from_ptr(result);
+    return _PY_PM_set_from_ptr(result);
 /* DO-NOT-DELETE splicer.end(pdb.method.make_ac_set) */
 }
 
@@ -1035,12 +938,12 @@ static PyMethodDef PP_methods[] = {
 {"arrlen", (PyCFunction)PP_arrlen, METH_KEYWORDS, PP_arrlen__doc__},
 {"mark", (PyCFunction)PP_mark, METH_KEYWORDS, PP_mark__doc__},
 {"ref_count", (PyCFunction)PP_ref_count, METH_KEYWORDS, PP_ref_count__doc__},
-{"set_count", (PyCFunction)PP_set_count, METH_KEYWORDS, PP_set_count__doc__},
+{"set_count", (PyCFunction)PY_set_count, METH_KEYWORDS, PY_set_count_doc},
 {"permanent", (PyCFunction)PP_permanent, METH_KEYWORDS, PP_permanent__doc__},
 {"arrtype", (PyCFunction)PP_arrtype, METH_KEYWORDS, PP_arrtype__doc__},
 {"pause", (PyCFunction)PP_pause, METH_NOARGS, PP_pause__doc__},
-{"set_io_hooks", (PyCFunction)PP_set_io_hooks, METH_KEYWORDS, PP_set_io_hooks__doc__},
-{"setform", (PyCFunction)PP_setform, METH_KEYWORDS, PP_setform__doc__},
+{"set_io_hooks", (PyCFunction)PY_set_io_hooks, METH_KEYWORDS, PY_set_io_hooks_doc},
+{"setform", (PyCFunction)PP_setform, METH_KEYWORDS, PP_setform_doc},
 {"make_set_1d", (PyCFunction)PP_make_set_1d, METH_KEYWORDS, PP_make_set_1d__doc__},
 {"make_ac_set", (PyCFunction)PP_make_ac_set, METH_KEYWORDS, PP_make_ac_set__doc__},
 {"open_vif", (PyCFunction)PP_open_vif, METH_KEYWORDS, PP_open_vif__doc__},

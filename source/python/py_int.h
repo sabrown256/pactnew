@@ -17,19 +17,6 @@
 #include "py_gen.h"
 #include <pputil.h>
 
-/* PM_set binding */
-
-typedef struct s_PP_setObject *PP_setObjectp;
-typedef struct s_PP_setObject PP_setObject;
-
-struct s_PP_setObject
-   {PyObject_HEAD
-    PM_set *set;};
-
-extern PyTypeObject
- PP_set_Type;
-
-
 /* PM_mapping binding */
 
 typedef struct s_PP_mappingObject *PP_mappingObjectp;
@@ -140,6 +127,21 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
+/* PYSCORE.C declarations */
+
+extern char
+ PY_set_count_doc[],
+ PY_set_io_hooks_doc[],
+ PP_setform_doc[];
+
+
+/* PGSGRAPH.C declarations */
+
+extern char
+ PY_set_line_info_doc[],
+ PY_set_tds_info_doc[],
+ PY_set_tdv_info_doc[];
+
 /*--------------------------------------------------------------------------*/
 
 /*                         FUNCTION DECLARATIONS                            */
@@ -151,12 +153,34 @@ extern "C" {
 extern int
  _PY_mapping_extractor(PyObject *obj, void *arg),
  PY_init_pml_int(PyObject *m, PyObject *d),
- PP_set_Check(PyObject *op),
  PP_mapping_Check(PyObject *op);
 
 extern PyObject
- *_PY_set_from_ptr(PM_set *data),
+ *_PY_PM_set_from_ptr(PM_set *x),
  *_PY_mapping_from_ptr(PM_mapping *data);
+
+
+/* PYSCORE.C declarations */
+
+extern PyObject
+ *PY_set_count(PyObject *self, PyObject *args, PyObject *kwds),
+ *PY_set_io_hooks(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_setform(PyObject *self, PyObject *args, PyObject *kwds);
+
+
+/* PGSGRAPH.C declarations */
+
+extern PyObject
+ *PY_set_line_info(PyObject *self, PyObject *args, PyObject *kwds),
+ *PY_set_tds_info(PyObject *self, PyObject *args, PyObject *kwds),
+ *PY_set_tdv_info(PyObject *self, PyObject *args, PyObject *kwds);
+
+
+/* PMLSET.C declarations */
+
+extern int
+ PY_PM_set_Check(PyObject *op);
+
 
 #ifdef __cplusplus
 }

@@ -498,35 +498,6 @@ PP_ref_count(
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_set_count - */
-
-static char PP_set_count__doc__[] = 
-""
-;
-
-static PyObject *
-PP_set_count(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    PyObject *pobj;
-    void *p;
-    int n;
-    char *kw_list[] = {"p", "n", NULL};
-    int result;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i:set_count", kw_list,
-                                     &PY_COBJ_TYPE, &pobj, &n))
-        return NULL;
-    p = (void *) PY_GET_PTR(pobj);
-    result = SC_set_count(p, n);
-    return PY_INT_LONG(result);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PP_permanent - */
 
 static char PP_permanent__doc__[] = 
@@ -604,68 +575,6 @@ PP_pause(
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_set_io_hooks - */
-
-static char PP_set_io_hooks__doc__[] = 
-""
-;
-
-static PyObject *
-PP_set_io_hooks(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    int whch;
-    char *kw_list[] = {"whch", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_io_hooks", kw_list,
-                                     &whch))
-        return NULL;
-    SC_set_io_hooks(whch);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_setform - */
-
-static char PP_setform__doc__[] = 
-""
-;
-
-static PyObject *
-PP_setform(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    int ok;
-    int array, structure, scalar;
-    char *kw_list[] = {"array", "struct", "scalar", NULL};
-
-    array = AS_NONE;
-    structure = AS_NONE;
-    scalar = AS_NONE;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iii:setform", kw_list,
-                                     &array, &structure, &scalar))
-        return NULL;
-
-    ok = _PP_assign_form(&PP_global_form, array, structure, scalar);
-    if (ok < 0)
-        return NULL;
-
-    return Py_BuildValue("(iii)",
-                         PP_global_form.array_kind,
-                         PP_global_form.struct_kind,
-                         PP_global_form.scalar_kind);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PP_make_set_1d - */
 
 static char PP_make_set_1d__doc__[] = 
@@ -692,7 +601,7 @@ PP_make_set_1d(
                                      &name, &type, &cp, &nd, &max, &nde, REAL_array_extractor, &elem))
         return NULL;
     result = PM_make_set(name, type, cp, nd, max, nde, elem);
-    return _PY_set_from_ptr(result);
+    return _PY_PM_set_from_ptr(result);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -726,7 +635,7 @@ PP_make_ac_set(
         return NULL;
     mt = mtobj->mt;
     result = PM_make_ac_set(name, type, cp, mt, nde, x, y);
-    return _PY_set_from_ptr(result);
+    return _PY_PM_set_from_ptr(result);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1029,114 +938,6 @@ PP_make_graph_r2_r1(
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_set_line_info - */
-
-static char PP_set_line_info__doc__[] = 
-""
-;
-
-static PyObject *
-PP_set_line_info(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.method.set_line_info) UNMODIFIED */
-    pcons *info;
-    int type;
-    int axis_type;
-    int style;
-    int scatter;
-    int marker;
-    int color;
-    int start;
-    double width;
-    char *kw_list[] = {"info", "type", "axis_type", "style", "scatter", "marker", "color", "start", "width", NULL};
-    pcons *result;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&iiiiiiid:set_line_info", kw_list,
-                                     PP_assoc_extractor, &info, &type, &axis_type, &style, &scatter, &marker, &color, &start, &width))
-        return NULL;
-    result = PG_set_line_info(info, type, axis_type, style, scatter, marker, color, start, width);
-    return PP_assoc_from_ptr(result);
-/* DO-NOT-DELETE splicer.end(pgs.method.set_line_info) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_set_tds_info - */
-
-static char PP_set_tds_info__doc__[] = 
-""
-;
-
-static PyObject *
-PP_set_tds_info(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.method.set_tds_info) UNMODIFIED */
-    pcons *info;
-    int type;
-    int axis_type;
-    int style;
-    int color;
-    int nlev;
-    double ratio;
-    double width;
-    double theta;
-    double phi;
-    double chi;
-    double d;
-    char *kw_list[] = {"info", "type", "axis_type", "style", "color", "nlev", "ratio", "width", "theta", "phi", "chi", "d", NULL};
-    pcons *result;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&iiiiidddddd:set_tds_info", kw_list,
-                                     PP_assoc_extractor, &info, &type, &axis_type, &style, &color, &nlev, &ratio, &width, &theta, &phi, &chi, &d))
-        return NULL;
-    result = PG_set_tds_info(info, type, axis_type, style, color, nlev, ratio, width, theta, phi, chi, d);
-    return PP_assoc_from_ptr(result);
-/* DO-NOT-DELETE splicer.end(pgs.method.set_tds_info) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_set_tdv_info - */
-
-static char PP_set_tdv_info__doc__[] = 
-""
-;
-
-static PyObject *
-PP_set_tdv_info(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.method.set_tdv_info) UNMODIFIED */
-    pcons *info;
-    int type;
-    int axis_type;
-    int style;
-    int color;
-    double width;
-    char *kw_list[] = {"info", "type", "axis_type", "style", "color", "width", NULL};
-    pcons *result;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&iiiid:set_tdv_info", kw_list,
-                                     PP_assoc_extractor, &info, &type, &axis_type, &style, &color, &width))
-        return NULL;
-    result = PG_set_tdv_info(info, type, axis_type, style, color, width);
-    return PP_assoc_from_ptr(result);
-/* DO-NOT-DELETE splicer.end(pgs.method.set_tdv_info) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PP_make_image - */
 
 static char PP_make_image__doc__[] = 
@@ -1278,12 +1079,12 @@ static PyMethodDef PP_methods[] = {
 {"arrlen", (PyCFunction)PP_arrlen, METH_KEYWORDS, PP_arrlen__doc__},
 {"mark", (PyCFunction)PP_mark, METH_KEYWORDS, PP_mark__doc__},
 {"ref_count", (PyCFunction)PP_ref_count, METH_KEYWORDS, PP_ref_count__doc__},
-{"set_count", (PyCFunction)PP_set_count, METH_KEYWORDS, PP_set_count__doc__},
+{"set_count", (PyCFunction)PY_set_count, METH_KEYWORDS, PY_set_count_doc},
 {"permanent", (PyCFunction)PP_permanent, METH_KEYWORDS, PP_permanent__doc__},
 {"arrtype", (PyCFunction)PP_arrtype, METH_KEYWORDS, PP_arrtype__doc__},
 {"pause", (PyCFunction)PP_pause, METH_NOARGS, PP_pause__doc__},
-{"set_io_hooks", (PyCFunction)PP_set_io_hooks, METH_KEYWORDS, PP_set_io_hooks__doc__},
-{"setform", (PyCFunction)PP_setform, METH_KEYWORDS, PP_setform__doc__},
+{"set_io_hooks", (PyCFunction)PY_set_io_hooks, METH_KEYWORDS, PY_set_io_hooks_doc},
+{"setform", (PyCFunction)PP_setform, METH_KEYWORDS, PP_setform_doc},
 {"make_set_1d", (PyCFunction)PP_make_set_1d, METH_KEYWORDS, PP_make_set_1d__doc__},
 {"make_ac_set", (PyCFunction)PP_make_ac_set, METH_KEYWORDS, PP_make_ac_set__doc__},
 {"open_vif", (PyCFunction)PP_open_vif, METH_KEYWORDS, PP_open_vif__doc__},
@@ -1295,9 +1096,9 @@ static PyMethodDef PP_methods[] = {
 {"unpack", (PyCFunction)PP_unpack, METH_KEYWORDS, PP_unpack__doc__},
 {"make_graph_1d", (PyCFunction)PP_make_graph_1d, METH_KEYWORDS, PP_make_graph_1d__doc__},
 {"make_graph_r2_r1", (PyCFunction)PP_make_graph_r2_r1, METH_KEYWORDS, PP_make_graph_r2_r1__doc__},
-{"set_line_info", (PyCFunction)PP_set_line_info, METH_KEYWORDS, PP_set_line_info__doc__},
-{"set_tds_info", (PyCFunction)PP_set_tds_info, METH_KEYWORDS, PP_set_tds_info__doc__},
-{"set_tdv_info", (PyCFunction)PP_set_tdv_info, METH_KEYWORDS, PP_set_tdv_info__doc__},
+{"set_line_info", (PyCFunction)PY_set_line_info, METH_KEYWORDS, PY_set_line_info_doc},
+{"set_tds_info", (PyCFunction)PY_set_tds_info, METH_KEYWORDS, PY_set_tds_info_doc},
+{"set_tdv_info", (PyCFunction)PY_set_tdv_info, METH_KEYWORDS, PY_set_tdv_info_doc},
 {"make_image", (PyCFunction)PP_make_image, METH_KEYWORDS, PP_make_image__doc__},
 {"get_processor_number", (PyCFunction)PP_get_processor_number, METH_NOARGS, PP_get_processor_number__doc__},
 {"get_number_processors", (PyCFunction)PP_get_number_processors, METH_NOARGS, PP_get_number_processors__doc__},

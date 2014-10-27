@@ -1,22 +1,102 @@
-/*--------------------------------------------------------------------------*/
-
-/* This is generated code.
- * Any edits must be made between the splicer.begin and splicer.end blocks.
- * All other edits will be lost.
- * Once a block is edited remove the 'UNMODIFIED' on the splicer.begin comment
- * to allow the block to be preserved when it is regenerated.
- */
 /*
  * Source Version: 9.0
  * Software Release: LLNL-CODE-422942
  *
  * include cpyright.h
  */
-/*--------------------------------------------------------------------------*/
+
 #include "pgsmodule.h"
 
-/* DO-NOT-DELETE splicer.begin(pgs.graph.C_definition) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pgs.graph.C_definition) */
+char
+ PY_set_line_info_doc[] = "",
+ PY_set_tds_info_doc[] = "",
+ PY_set_tdv_info_doc[] = "";
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PY_set_line_info - */
+
+PyObject *PY_set_line_info(PyObject *self, PyObject *args, PyObject *kwds)
+   {int type, axis_type, style, scatter, marker, color, start;
+    double width;
+    pcons *info, *result;
+    PyObject *rv;
+    char *kw_list[] = {"info", "type", "axis_type", "style",
+                       "scatter", "marker", "color", "start",
+		       "width", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O&iiiiiiid:set_line_info", kw_list,
+				    PP_assoc_extractor,
+				    &info, &type, &axis_type, &style,
+				    &scatter, &marker, &color,
+				    &start, &width))
+       {result = PG_set_line_info(info, type, axis_type, style,
+				  scatter, marker, color, start, width);
+	rv     = PP_assoc_from_ptr(result);};
+
+   return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PY_set_tds_info - */
+
+PyObject *PY_set_tds_info(PyObject *self, PyObject *args, PyObject *kwds)
+   {int type, axis_type, style, color, nlev;
+    double ratio, width, theta, phi, chi, d;
+    pcons *info, *result;
+    PyObject *rv;
+    char *kw_list[] = {"info", "type", "axis_type",
+		       "style", "color", "nlev", "ratio",
+		       "width", "theta", "phi", "chi", "d", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O&iiiiidddddd:set_tds_info", kw_list,
+				    PP_assoc_extractor, &info, &type,
+				    &axis_type, &style, &color,
+				    &nlev, &ratio, &width,
+				    &theta, &phi, &chi, &d))
+       {result = PG_set_tds_info(info, type, axis_type,
+				 style, color, nlev, ratio, width,
+				 theta, phi, chi, d);
+	rv     = PP_assoc_from_ptr(result);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PY_set_tdv_info - */
+
+PyObject *PY_set_tdv_info(PyObject *self, PyObject *args, PyObject *kwds)
+   {int type, axis_type, style, color;
+    double width;
+    pcons *info, *result;
+    PyObject *rv;
+    char *kw_list[] = {"info", "type", "axis_type",
+		       "style", "color", "width", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O&iiiid:set_tdv_info", kw_list,
+				    PP_assoc_extractor, &info, &type,
+				    &axis_type, &style, &color, &width))
+       {result = PG_set_tdv_info(info, type, axis_type,
+				 style, color, width);
+	rv     = PP_assoc_from_ptr(result);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                              GENERATED STUFF                             */
 
 /*--------------------------------------------------------------------------*/
 
