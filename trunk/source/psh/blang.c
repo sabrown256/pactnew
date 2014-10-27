@@ -949,7 +949,7 @@ void parse_member(char *mbr, char *nm, char *ty, char *dm, int nc)
     char s[BFLRG], ind[BFSML];
     char **sa, *pn, *pt;
 
-    hd = (strchr(s, '[') != NULL);
+    hd = (strchr(mbr, '[') != NULL);
 
     nstrncpy(s, BFLRG, mbr, -1);
     if (strstr(s, "(*") != NULL)

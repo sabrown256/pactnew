@@ -17,18 +17,6 @@
 #include "py_gen.h"
 #include <pputil.h>
 
-/* PM_mapping binding */
-
-typedef struct s_PP_mappingObject *PP_mappingObjectp;
-typedef struct s_PP_mappingObject PP_mappingObject;
-
-struct s_PP_mappingObject
-   {PyObject_HEAD
-    PM_mapping *map;};
-
-extern PyTypeObject
- PP_mapping_Type;
-
 /*--------------------------------------------------------------------------*/
 
 /*                                CONSTANTS                                 */
@@ -152,12 +140,11 @@ extern char
 
 extern int
  _PY_mapping_extractor(PyObject *obj, void *arg),
- PY_init_pml_int(PyObject *m, PyObject *d),
- PP_mapping_Check(PyObject *op);
+ PY_init_pml_int(PyObject *m, PyObject *d);
 
 extern PyObject
  *_PY_PM_set_from_ptr(PM_set *x),
- *_PY_mapping_from_ptr(PM_mapping *data);
+ *_PY_PM_mapping_from_ptr(PM_mapping *data);
 
 
 /* PYSCORE.C declarations */
@@ -174,12 +161,6 @@ extern PyObject
  *PY_set_line_info(PyObject *self, PyObject *args, PyObject *kwds),
  *PY_set_tds_info(PyObject *self, PyObject *args, PyObject *kwds),
  *PY_set_tdv_info(PyObject *self, PyObject *args, PyObject *kwds);
-
-
-/* PMLSET.C declarations */
-
-extern int
- PY_PM_set_Check(PyObject *op);
 
 
 #ifdef __cplusplus

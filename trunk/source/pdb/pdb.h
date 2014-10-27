@@ -658,7 +658,11 @@ struct s_dimdes
               "dimdes *next",       \
               LAST)
 
-/* member descriptor - describe a member efficiently */
+/* member descriptor - describe a member efficiently
+ *
+ * #bind derived memdes character-A SX_MEMDES_I PyObject NULL
+ */
+
 struct s_memdes
    {char *member;
     int64_t member_offs;

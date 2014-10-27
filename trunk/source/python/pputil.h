@@ -202,12 +202,6 @@ extern int
  PP_defstr_Check(PyObject *op);
 
 
-/* PGSIMAGE.C declarations */
-
-extern int
- PP_image_Check(PyObject *op);
-
-
 /* PPARRAYS.C declarations */
 
 extern void

@@ -1199,22 +1199,6 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
     PP_PDBfile_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_PDBfile_Type) < 0)
        PY_MOD_RETURN_ERR;
-    PP_palette_Type.tp_new = PyType_GenericNew;
-    PP_palette_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_palette_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    PP_graph_Type.tp_new = PyType_GenericNew;
-    PP_graph_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_graph_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    PP_image_Type.tp_new = PyType_GenericNew;
-    PP_image_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_image_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    PP_device_Type.tp_new = PyType_GenericNew;
-    PP_device_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_device_Type) < 0)
-       PY_MOD_RETURN_ERR;
 
 /* add some symbolic constants to the module */
     if (PyDict_SetItemString(d, "field", (PyObject *) &PP_field_Type) < 0)
@@ -1232,14 +1216,6 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
     if (PyDict_SetItemString(d, "memdes", (PyObject *) &PP_memdes_Type) < 0)
        PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "PDBfile", (PyObject *) &PP_PDBfile_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "palette", (PyObject *) &PP_palette_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "graph", (PyObject *) &PP_graph_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "image", (PyObject *) &PP_image_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "device", (PyObject *) &PP_device_Type) < 0)
        PY_MOD_RETURN_ERR;
 
     PP_init_type_map();
