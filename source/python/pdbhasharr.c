@@ -12,52 +12,38 @@
  *
  * include cpyright.h
  */
-/*--------------------------------------------------------------------------*/
+
 #include "pdbmodule.h"
 
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.C_definition) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.C_definition) */
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+static char PY_hasharr_doc_install[] = "";
 
-static char PP_hasharr_install__doc__[] = 
-""
-;
-
-static PyObject *
-PP_hasharr_install(PP_hasharrObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
+static PyObject *PY_hasharr_install(PY_hasharr *self,
+				    PyObject *args,
+				    PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.method.install) */
     char *key, *obj, *type;
     char *kw_list[] = {"key", "obj", "type", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "sss:install", kw_list,
                                      &key, &obj, &type))
         return NULL;
-    SC_hasharr_install(self->data, key, obj, type, 3, -1);
+    SC_hasharr_install(self->pyo, key, obj, type, 3, -1);
     Py_INCREF(Py_None);
     return Py_None;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.method.install) */
 }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+static char PY_hasharr_doc_def_lookup[] = "";
 
-static char PP_hasharr_def_lookup__doc__[] = 
-""
-;
-
-static PyObject *
-PP_hasharr_def_lookup(PP_hasharrObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
+static PyObject *PY_hasharr_def_lookup(PY_hasharr *self,
+				       PyObject *args,
+				       PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.method.def_lookup) */
   char *key;
   char *kw_list[] = {"key", NULL};
   hasharr *tab;
@@ -65,11 +51,10 @@ PP_hasharr_def_lookup(PP_hasharrObject *self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:def_lookup", kw_list,
                                    &key))
       return NULL;
-  tab = (hasharr *) self->data;
+  tab = (hasharr *) self->pyo;
   SC_hasharr_def_lookup(tab, key);
   Py_INCREF(Py_None);
   return Py_None;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.method.def_lookup) */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -88,37 +73,26 @@ int _PP_rl_haelem(haelem *hp, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+static char PY_hasharr_doc_clear[] = "";
 
-static char PP_hasharr_clear__doc__[] = 
-""
-;
-
-static PyObject *
-PP_hasharr_clear(PP_hasharrObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
+static PyObject *PY_hasharr_clear(PY_hasharr *self,
+				  PyObject *args,
+				  PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.method.clear) */
-    SC_hasharr_foreach(self->data, _PP_rl_haelem, NULL);
+    SC_hasharr_foreach(self->pyo, _PP_rl_haelem, NULL);
     Py_INCREF(Py_None);
     return Py_None;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.method.clear) */
 }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+static char PY_hasharr_doc_has_key[] = "";
 
-static char PP_hasharr_has_key__doc__[] = 
-""
-;
-
-static PyObject *
-PP_hasharr_has_key(PP_hasharrObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
+static PyObject *PY_hasharr_has_key(PY_hasharr *self,
+				    PyObject *args,
+				    PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.method.has_key) */
     long ok;
     char *key;
     char *kw_list[] = {"key", NULL};
@@ -128,7 +102,7 @@ PP_hasharr_has_key(PP_hasharrObject *self,
                                      &key))
         return NULL;
 
-    np = SC_hasharr_lookup(self->data, key);
+    np = SC_hasharr_lookup(self->pyo, key);
     ok = np != NULL;
 
 #if PYTHON_API_VERSION < 1012
@@ -136,49 +110,38 @@ PP_hasharr_has_key(PP_hasharrObject *self,
 #else
     return PyBool_FromLong(ok);
 #endif
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.method.has_key) */
 }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-
-static char PP_hasharr_items__doc__[] = 
-""
-;
+static char PY_hasharr_doc_items[] = "";
 
 static PyObject *
-PP_hasharr_items(PP_hasharrObject *self,
+PY_hasharr_items(PY_hasharr *self,
                   PyObject *args,
                   PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.method.items) */
     PyErr_SetString(PyExc_NotImplementedError, "items");
     return NULL;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.method.items) */
 }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+static char PY_hasharr_doc_keys[] = "";
 
-static char PP_hasharr_keys__doc__[] = 
-""
-;
-
-static PyObject *
-PP_hasharr_keys(PP_hasharrObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
+static PyObject *PY_hasharr_keys(PY_hasharr *self,
+				 PyObject *args,
+				 PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.method.keys) */
     int ne, err;
     char **names;
     hasharr *ha;
     Py_ssize_t i;
     PyObject *rv;
  
-    ha = self->data;
+    ha = self->pyo;
     if (ha == NULL) {
         PP_error_set(PP_error_internal,
                      NULL, "Hasharr is NULL");
@@ -206,23 +169,17 @@ PP_hasharr_keys(PP_hasharrObject *self,
     SC_free_strings(names);
   
     return rv;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.method.keys) */
 }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+static char PY_hasharr_doc_update[] = "";
 
-static char PP_hasharr_update__doc__[] = 
-""
-;
-
-static PyObject *
-PP_hasharr_update(PP_hasharrObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
+static PyObject *PY_hasharr_update(PY_hasharr *self,
+				   PyObject *args,
+				   PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.method.update) */
     int err;
     PyObject *dict;
     char *kw_list[] = {"dict", NULL};
@@ -232,7 +189,7 @@ PP_hasharr_update(PP_hasharrObject *self,
                                     &dict))
         return NULL;
 
-    tab = (hasharr *) self->data;
+    tab = (hasharr *) self->pyo;
     if (tab == NULL) {
         PP_error_set(PP_error_internal,
                      (PyObject *) self, "Hasharr is NULL");
@@ -245,120 +202,94 @@ PP_hasharr_update(PP_hasharrObject *self,
 
     Py_INCREF(Py_None);
     return Py_None;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.method.update) */
 }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+static char PY_hasharr_doc_values[] = "";
 
-static char PP_hasharr_values__doc__[] = 
-""
-;
-
-static PyObject *
-PP_hasharr_values(PP_hasharrObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
+static PyObject *PY_hasharr_values(PY_hasharr *self,
+				   PyObject *args,
+				   PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.method.values) */
     return NULL;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.method.values) */
 }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+static char PY_hasharr_doc_get[] = "";
 
-static char PP_hasharr_get__doc__[] = 
-""
-;
-
-static PyObject *
-PP_hasharr_get(PP_hasharrObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
+static PyObject *PY_hasharr_get(PY_hasharr *self,
+				PyObject *args,
+				PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.method.get) */
     PyErr_SetString(PyExc_NotImplementedError, "get");
     return NULL;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.method.get) */
 }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.extra_methods) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.extra_methods) */
-
-/*--------------------------------------------------------------------------*/
-
-static PyMethodDef PP_hasharr_methods[] = {
-{"install", (PyCFunction)PP_hasharr_install, METH_KEYWORDS, PP_hasharr_install__doc__},
-{"def_lookup", (PyCFunction)PP_hasharr_def_lookup, METH_KEYWORDS, PP_hasharr_def_lookup__doc__},
-{"clear", (PyCFunction)PP_hasharr_clear, METH_NOARGS, PP_hasharr_clear__doc__},
-{"has_key", (PyCFunction)PP_hasharr_has_key, METH_KEYWORDS, PP_hasharr_has_key__doc__},
-{"items", (PyCFunction)PP_hasharr_items, METH_NOARGS, PP_hasharr_items__doc__},
-{"keys", (PyCFunction)PP_hasharr_keys, METH_NOARGS, PP_hasharr_keys__doc__},
-{"update", (PyCFunction)PP_hasharr_update, METH_KEYWORDS, PP_hasharr_update__doc__},
-{"values", (PyCFunction)PP_hasharr_values, METH_NOARGS, PP_hasharr_values__doc__},
-{"get", (PyCFunction)PP_hasharr_get, METH_NOARGS, PP_hasharr_get__doc__},
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.extra_mlist) */
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.extra_mlist) */
+static PyMethodDef PY_hasharr_methods[] = {
+{"install", (PyCFunction)PY_hasharr_install, METH_KEYWORDS, PY_hasharr_doc_install},
+{"def_lookup", (PyCFunction)PY_hasharr_def_lookup, METH_KEYWORDS, PY_hasharr_doc_def_lookup},
+{"clear", (PyCFunction)PY_hasharr_clear, METH_NOARGS, PY_hasharr_doc_clear},
+{"has_key", (PyCFunction)PY_hasharr_has_key, METH_KEYWORDS, PY_hasharr_doc_has_key},
+{"items", (PyCFunction)PY_hasharr_items, METH_NOARGS, PY_hasharr_doc_items},
+{"keys", (PyCFunction)PY_hasharr_keys, METH_NOARGS, PY_hasharr_doc_keys},
+{"update", (PyCFunction)PY_hasharr_update, METH_KEYWORDS, PY_hasharr_doc_update},
+{"values", (PyCFunction)PY_hasharr_values, METH_NOARGS, PY_hasharr_doc_values},
+{"get", (PyCFunction)PY_hasharr_get, METH_NOARGS, PY_hasharr_doc_get},
 {NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
 };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.extra_members) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.extra_members) */
-
-static PyGetSetDef PP_hasharr_getset[] = {
-
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.extra_getset) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.extra_getset) */
+static PyGetSetDef PY_hasharr_getset[] = {
     {NULL}     /* Sentinel */
 };
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-static void
-PP_hasharr_tp_dealloc(PP_hasharrObject *self)
+static void PY_hasharr_tp_dealloc(PY_hasharr *self)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.as_type.dealloc) */
     int n;
 
-    n = SC_mark(self->data, 0);
+    n = SC_mark(self->pyo, 0);
     if (n < 2) {
-	SC_free_hasharr(self->data, _PP_rl_haelem, NULL);
-        self->data = NULL;
+	SC_free_hasharr(self->pyo, _PP_rl_haelem, NULL);
+        self->pyo = NULL;
     } else {
-        SC_mark(self->data, -1);
+        SC_mark(self->pyo, -1);
     }
     PY_TYPE(self)->tp_free((PyObject*)self);
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.as_type.dealloc) */
 }
 
-static PyObject *
-PP_hasharr_tp_repr(PP_hasharrObject *self)
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static PyObject *PY_hasharr_tp_repr(PY_hasharr *self)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.as_type.repr) */
     PyObject *rv, *h;
 
-    h = _PP_unpack_hasharr(self->data, 1L);
+    h = _PP_unpack_hasharr(self->pyo, 1L);
     if (h == NULL)
         return NULL;
     rv = PyObject_Repr(h);
     Py_DECREF(h);
     return rv;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.as_type.repr) */
 }
 
-static int
-PP_hasharr_tp_init(PP_hasharrObject *self, PyObject *args, PyObject *kwds)
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int PY_hasharr_tp_init(PY_hasharr *self,
+			      PyObject *args, PyObject *kwds)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.as_type.init) */
 
     int size, docflag;
     char *kw_list[] = {"size", "docflag", NULL};
@@ -375,25 +306,11 @@ PP_hasharr_tp_init(PP_hasharrObject *self, PyObject *args, PyObject *kwds)
         return -1;
     }
 
-    self = PP_hasharr_newobj(self, tab);
+    self = PY_hasharr_newobj(self, tab);
     if (self == NULL)
         return -1;
 
     return 0;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.as_type.init) */
-}
-/*--------------------------------------------------------------------------*/
-
-/* PP_hasharr_Check - */
-
-/* static */ int
-PP_hasharr_Check(PyObject *op)
-{
-    if (PyObject_TypeCheck(op, &PP_hasharr_Type))
-        return 1;
-    else
-        return 0;
-/*  return PY_TYPE(op) == &PP_hasharr_Type; */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -551,28 +468,26 @@ int PP_update_hasharr(hasharr *tab, PyObject *dict)
 
 /* Code to access hasharr objects as mappings */
 
-static Py_ssize_t
-PP_hasharr_mp_length(PyObject *_self)
+static Py_ssize_t PY_hasharr_mp_length(PyObject *_self)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.as_mapping.length) */
     int ne;
-    PP_hasharrObject *self = (PP_hasharrObject *) _self;
+    PY_hasharr *self = (PY_hasharr *) _self;
 
-    ne = SC_hasharr_get_n(self->data);
+    ne = SC_hasharr_get_n(self->pyo);
 
     return (Py_ssize_t) ne;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.as_mapping.length) */
 }
 
-static PyObject *
-PP_hasharr_mp_subscript(PyObject *_self, PyObject *key)
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static PyObject *PY_hasharr_mp_subscript(PyObject *_self, PyObject *key)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.as_mapping.subscript) */
     char *name;
     haelem *hp;
     hasharr *harr;
     PyObject *rv;
-    PP_hasharrObject *self = (PP_hasharrObject *) _self;
+    PY_hasharr *self = (PY_hasharr *) _self;
 
     if (!PY_STRING_CHECK(key)) {
         PP_error_set_user(key, "key must be string");
@@ -580,7 +495,7 @@ PP_hasharr_mp_subscript(PyObject *_self, PyObject *key)
     }
     name = PY_STRING_AS_STRING(key);
 
-    harr = self->data;
+    harr = self->pyo;
     if (harr == NULL) {
         PP_error_set(PP_error_internal,
                      (PyObject *) self, "hasharr is NULL");
@@ -596,17 +511,18 @@ PP_hasharr_mp_subscript(PyObject *_self, PyObject *key)
     rv = PP_unpack_hasharr_haelem(hp->type, hp->def);
 
     return rv;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.as_mapping.subscript) */
 }
 
-static int
-PP_hasharr_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int PY_hasharr_mp_ass_subscript(PyObject *_self,
+				       PyObject *key, PyObject *v)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.as_mapping.ass_subscript) */
     int ok;
     char *name, *ptype;
     hasharr *harr;
-    PP_hasharrObject *self = (PP_hasharrObject *) _self;
+    PY_hasharr *self = (PY_hasharr *) _self;
     
     if (!PY_STRING_CHECK(key)) {
         PP_error_set_user(key, "key must be string");
@@ -614,7 +530,7 @@ PP_hasharr_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
     }
     name = PY_STRING_AS_STRING(key);
 
-    harr = self->data;
+    harr = self->pyo;
     if (harr == NULL) {
         PP_error_set(PP_error_internal,
                      (PyObject *) self, "hasharr is NULL");
@@ -662,102 +578,39 @@ PP_hasharr_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
     }
 
     return 0;
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.as_mapping.ass_subscript) */
 }
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-static PyMappingMethods PP_hasharr_as_mapping = {
-        PP_hasharr_mp_length,           /* mp_length */
-        PP_hasharr_mp_subscript,        /* mp_subscript */
-        PP_hasharr_mp_ass_subscript,    /* mp_ass_subscript */
+static PyMappingMethods PY_hasharr_as_mapping = {
+        PY_hasharr_mp_length,           /* mp_length */
+        PY_hasharr_mp_subscript,        /* mp_subscript */
+        PY_hasharr_mp_ass_subscript,    /* mp_ass_subscript */
 };
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
+static char PY_hasharr_doc[] = "";
 
-static char PP_hasharr_Type__doc__[] = 
-""
-;
+#define PY_DEF_DESTRUCTOR	    PY_hasharr_tp_dealloc
+#define PY_DEF_REPR                 PY_hasharr_tp_repr
+#define PY_DEF_TP_METH              PY_hasharr_methods
+#define PY_DEF_AS_MAP	            &PY_hasharr_as_mapping
 
-/* static */
-PyTypeObject PP_hasharr_Type = {
-        PY_HEAD_INIT(&PyType_Type, 0)
-        "hasharr",                       /* tp_name */
-        sizeof(PP_hasharrObject),         /* tp_basicsize */
-        0,                              /* tp_itemsize */
-        /* Methods to implement standard operations */
-        (destructor)PP_hasharr_tp_dealloc, /* tp_dealloc */
-        (printfunc)0,                   /* tp_print */
-        (getattrfunc)0,                 /* tp_getattr */
-        (setattrfunc)0,                 /* tp_setattr */
-        (cmpfunc)0,                     /* tp_compare */
-        (reprfunc)PP_hasharr_tp_repr,   /* tp_repr */
-        /* Method suites for standard classes */
-        0,                              /* tp_as_number */
-        0,                              /* tp_as_sequence */
-        &PP_hasharr_as_mapping,         /* tp_as_mapping */
-        /* More standard operations (here for binary compatibility) */
-        (hashfunc)0,                    /* tp_hash */
-        (ternaryfunc)0,                 /* tp_call */
-        (reprfunc)0,                    /* tp_str */
-        (getattrofunc)0,                /* tp_getattro */
-        (setattrofunc)0,                /* tp_setattro */
-        /* Functions to access object as input/output buffer */
-        0,                              /* tp_as_buffer */
-        /* Flags to define presence of optional/expanded features */
-        Py_TPFLAGS_DEFAULT,             /* tp_flags */
-        PP_hasharr_Type__doc__,         /* tp_doc */
-        /* Assigned meaning in release 2.0 */
-        /* call function for all accessible objects */
-        (traverseproc)0,                /* tp_traverse */
-        /* delete references to contained objects */
-        (inquiry)0,                     /* tp_clear */
-        /* Assigned meaning in release 2.1 */
-        /* rich comparisons */
-        (richcmpfunc)0,                 /* tp_richcompare */
-        /* weak reference enabler */
-        0,                              /* tp_weaklistoffset */
-        /* Added in release 2.2 */
-        /* Iterators */
-        (getiterfunc)0,                 /* tp_iter */
-        (iternextfunc)0,                /* tp_iternext */
-        /* Attribute descriptor and subclassing stuff */
-        PP_hasharr_methods,             /* tp_methods */
-        0,                              /* tp_members */
-        PP_hasharr_getset,              /* tp_getset */
-        0,                              /* tp_base */
-        0,                              /* tp_dict */
-        (descrgetfunc)0,                /* tp_descr_get */
-        (descrsetfunc)0,                /* tp_descr_set */
-        0,                              /* tp_dictoffset */
-        (initproc)PP_hasharr_tp_init,   /* tp_init */
-        (allocfunc)0,                   /* tp_alloc */
-        (newfunc)0,                     /* tp_new */
-#if PYTHON_API_VERSION >= 1012
-        (freefunc)0,                    /* tp_free */
-#else
-        (destructor)0,                  /* tp_free */
-#endif
-        (inquiry)0,                     /* tp_is_gc */
-        0,                              /* tp_bases */
-        0,                              /* tp_mro */
-        0,                              /* tp_cache */
-        0,                              /* tp_subclasses */
-        0,                              /* tp_weaklist */
-#if PYTHON_API_VERSION >= 1012
-        (destructor)0,                  /* tp_del */
-#endif
-};
+PY_DEF_TYPE(hasharr);
 
-/* DO-NOT-DELETE splicer.begin(pdb.hasharr.extra) */
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-PP_hasharrObject *PP_hasharr_newobj(PP_hasharrObject *obj,
-                                    hasharr *tab)
+PY_hasharr *PY_hasharr_newobj(PY_hasharr *obj,
+			      hasharr *tab)
 {
     PP_defstrObject *dpobj;
     
     if (obj == NULL) {
-        obj = (PP_hasharrObject *) PyType_GenericAlloc(&PP_hasharr_Type, 0);
+        obj = (PY_hasharr *) PyType_GenericAlloc(&PY_hasharr_type, 0);
         if (obj == NULL) {
             return NULL;
         }
@@ -767,15 +620,12 @@ PP_hasharrObject *PP_hasharr_newobj(PP_hasharrObject *obj,
     if (dpobj == NULL)
         return NULL;
 
-    obj = (PP_hasharrObject *) PP_pdbdata_newobj(
+    obj = (PY_hasharr *) PP_pdbdata_newobj(
         (PP_pdbdataObject *) obj, tab, dpobj->dp->type, 1L, NULL,
         dpobj->dp, dpobj->fileinfo, dpobj, NULL);
 
     return obj;
 }
 
-/* DO-NOT-DELETE splicer.end(pdb.hasharr.extra) */
-/* End of code for hasharr objects */
 /*--------------------------------------------------------------------------*/
-/*                               OBJECT_TAIL                                */
 /*--------------------------------------------------------------------------*/
