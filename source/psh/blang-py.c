@@ -278,7 +278,7 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
 
 static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
    {int im, hs;
-    char mnm[BFSML], mty[BFSML], pty[BFSML];
+    char mnm[BFSML], mty[BFSML], mdm[BFSML], pty[BFSML];
     char *pm;
     tnp_list tl;
 
@@ -344,7 +344,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 if (IS_NULL(pm) == TRUE)
 	    continue;
 
-	 parse_member(pm, mnm, mty, NULL, BFSML);
+	 parse_member(pm, mnm, mty, mdm, BFSML);
 
 	 fprintf(fc, "static PyObject *%s_get_%s(%s *self, void *context)\n",
 		 tl.pnm, mnm, tl.pnm);
@@ -361,6 +361,14 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 		  (strcmp(mty, "long") == 0))
 	    fprintf(fc, "    rv = PY_INT_LONG(self->pyo->%s);\n", mnm);
 
+/* if member is floating point type */
+	 else if ((strcmp(mty, "float") == 0) ||
+		  (strcmp(mty, "double") == 0))
+	    {if (IS_NULL(mdm) == TRUE)
+	        fprintf(fc, "    rv = PyFloat_FromDouble(self->pyo->%s);\n", mnm);
+	     else
+	        fprintf(fc, "    rv = NULL;     /* unknown floating point array */\n");}
+
 /* if member is pointer to a known bound type */
          else if (python_lookup_bound_type(mty) == TRUE)
 	    {snprintf(pty, BFSML, "PY_%s", mty);
@@ -374,7 +382,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* unknown member action */
 	 else
-            fprintf(fc, "   rv = NULL;     /* unknown member action */\n");
+            fprintf(fc, "    rv = NULL;     /* unknown member action */\n");
 
 	 fprintf(fc, "\n");
 	 fprintf(fc, "    return(rv);}\n");
@@ -430,8 +438,8 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* getset array */
     fprintf(fc, "PyGetSetDef %s_getset[] = {\n", tl.pnm);
-    fprintf(fc, "    {\"set\", (getter) %s_get, NULL, %s_doc, NULL},\n",
-	    tl.pnm, tl.pnm);
+    fprintf(fc, "    {\"%s\", (getter) %s_get, NULL, %s_doc, NULL},\n",
+	    tl.rnm, tl.pnm, tl.pnm);
 
     for (im = 1; ta[im] != NULL; im++)
         {pm = trim(ta[im], BOTH, " \t");

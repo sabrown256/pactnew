@@ -119,6 +119,37 @@ void *_SX_opt_syment(syment *x, bind_opt wh, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_OPT_MEMDES - handle BLANG binding related operations */
+
+void *_SX_opt_memdes(memdes *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_MEMDESP(o))
+	        rv = SS_GET(memdes, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	case BIND_LABEL :
+        case BIND_PRINT :
+	     rv = x->member;
+	     break;
+
+        case BIND_ALLOC :
+        case BIND_FREE :
+        default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SX_OPT_DEFSTR - handle BLANG binding related operations */
 
 void *_SX_opt_defstr(defstr *x, bind_opt wh, void *a)
