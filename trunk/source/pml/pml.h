@@ -377,6 +377,8 @@ struct s_PM_polygon
 /* FIELD - specify the operations which define the field for a set
  *       - depending on which members are NULL one is left with an
  *       - algebra, a ring, a group, etc
+ *
+ * #bind derived PM_field character-A SX_FIELD_I PyObject NULL
  */
 
 struct s_PM_field
@@ -566,6 +568,8 @@ struct s_PM_mesh
  *               -                 - i.e. line segments whose endpoints
  *               -                 - are the node indices
  *               - boundaries[0]   - a mimimal description for the nodes
+ *
+ * #bind derived PM_mesh_topology character-A SX_MESH_TOPOLOGY_I PyObject NULL
  */
 
 struct s_PM_mesh_topology

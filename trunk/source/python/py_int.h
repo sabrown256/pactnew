@@ -120,7 +120,26 @@ extern "C" {
 extern char
  PY_set_count_doc[],
  PY_set_io_hooks_doc[],
- PP_setform_doc[];
+ PP_setform_doc[],
+ PP_print_controls_doc[],
+ PP_zero_space_doc[],
+ PP_alloc_doc[],
+ PP_realloc_doc[],
+ PP_cfree_doc[],
+ PP_mem_print_doc[],
+ PP_mem_trace_doc[],
+ PP_reg_mem_doc[],
+ PP_dereg_mem_doc[],
+ PP_mem_lookup_doc[],
+ PP_mem_monitor_doc[],
+ PP_mem_chk_doc[],
+ PP_is_score_ptr_doc[],
+ PP_arrlen_doc[],
+ PP_mark_doc[],
+ PP_ref_count_doc[],
+ PP_permanent_doc[],
+ PP_arrtype_doc[],
+ PP_pause_doc[];
 
 
 /* PGSGRAPH.C declarations */
@@ -129,6 +148,14 @@ extern char
  PY_set_line_info_doc[],
  PY_set_tds_info_doc[],
  PY_set_tdv_info_doc[];
+
+
+/* PYPML.C declarations */
+
+extern char
+ PP_make_set_1d_doc[],
+ PP_make_ac_set_doc[];
+
 
 /*--------------------------------------------------------------------------*/
 
@@ -143,8 +170,8 @@ extern int
  PY_init_pml_int(PyObject *m, PyObject *d);
 
 extern PyObject
- *_PY_PM_set_from_ptr(PM_set *x),
- *_PY_PM_mapping_from_ptr(PM_mapping *data);
+ *PP_make_set_1d(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_make_ac_set(PyObject *self, PyObject *args, PyObject *kwds);
 
 
 /* PYSCORE.C declarations */
@@ -152,7 +179,26 @@ extern PyObject
 extern PyObject
  *PY_set_count(PyObject *self, PyObject *args, PyObject *kwds),
  *PY_set_io_hooks(PyObject *self, PyObject *args, PyObject *kwds),
- *PP_setform(PyObject *self, PyObject *args, PyObject *kwds);
+ *PP_setform(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_print_controls(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_zero_space(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_alloc(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_realloc(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_cfree(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_mem_print(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_mem_trace(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_reg_mem(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_dereg_mem(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_mem_lookup(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_mem_monitor(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_mem_chk(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_is_score_ptr(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_arrlen(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_mark(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_ref_count(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_permanent(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_arrtype(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_pause(PyObject *self, PyObject *args, PyObject *kwds);
 
 
 /* PGSGRAPH.C declarations */

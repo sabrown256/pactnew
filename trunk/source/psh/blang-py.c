@@ -267,6 +267,14 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
     fprintf(fh, " %s_getset[];\n", tl.pnm);
     fprintf(fh, "\n");
 
+    fprintf(fh, "extern int\n");
+    fprintf(fh, " %s_check(PyObject *op);\n", tl.pnm);
+    fprintf(fh, "\n");
+
+    fprintf(fh, "extern PyObject\n");
+    fprintf(fh, " *%s_from_ptr(%s *x);\n", tl.pnm, tl.cnm);
+    fprintf(fh, "\n");
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -293,7 +301,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     fprintf(fc, "\n");
 
 /* object check routine */
-    fprintf(fc, "int %s_Check(PyObject *op)\n", tl.pnm);
+    fprintf(fc, "int %s_check(PyObject *op)\n", tl.pnm);
     fprintf(fc, "   {int rv;\n");
     fprintf(fc, "\n");
     fprintf(fc, "    rv = PyObject_TypeCheck(op, &%s);\n", tl.tnm);
@@ -306,7 +314,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     fprintf(fc, "\n");
 
 /* object from pointer routine */
-    fprintf(fc, "PyObject *_%s_from_ptr(%s *x)\n", tl.pnm, tl.cnm);
+    fprintf(fc, "PyObject *%s_from_ptr(%s *x)\n", tl.pnm, tl.cnm);
     fprintf(fc, "   {%s *self;\n", tl.pnm);
     fprintf(fc, "    PyObject *rv;\n");
     fprintf(fc, "\n");
@@ -329,7 +337,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	    tl.pnm, tl.pnm);
     fprintf(fc, "   {PyObject *rv;\n");
     fprintf(fc, "\n");
-    fprintf(fc, "    rv = _%s_from_ptr(self->pyo);\n", tl.pnm);
+    fprintf(fc, "    rv = %s_from_ptr(self->pyo);\n", tl.pnm);
     fprintf(fc, "\n");
     fprintf(fc, "    return(rv);}\n");
 
@@ -372,7 +380,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 /* if member is pointer to a known bound type */
          else if (python_lookup_bound_type(mty) == TRUE)
 	    {snprintf(pty, BFSML, "PY_%s", mty);
-	     fprintf(fc, "    rv = _%s_from_ptr(self->pyo->%s);\n",
+	     fprintf(fc, "    rv = %s_from_ptr(self->pyo->%s);\n",
 		     trim(pty, BOTH, " *"), mnm);}
 
 /* if member is pointer */
@@ -495,16 +503,6 @@ static int PY_PM_set_name_set(PY_PM_set *self, PyObject *value,
 
     else if (PyArg_Parse(value, "s", &self->pyo->name))
        rv = 0;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PY_PM_set_opers_get(PY_PM_set *self, void *context)
-   {PyObject *rv;
-
-    rv = PPfield_from_ptr(self->pyo->opers);
 
     return(rv);}
 

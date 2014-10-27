@@ -449,8 +449,10 @@ extern object
 extern void
  *_SX_opt_C_array(C_array *x, bind_opt wh, void *a),
  *_SX_opt_PM_polygon(PM_polygon *x, bind_opt wh, void *a),
+ *_SX_opt_PM_field(PM_field *x, bind_opt wh, void *a),
  *_SX_opt_PM_set(PM_set *x, bind_opt wh, void *a),
- *_SX_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a);
+ *_SX_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a),
+ *_SX_opt_PM_mesh_topology(PM_mesh_topology *x, bind_opt wh, void *a);
 
 
 /* SXSET.C declarations */

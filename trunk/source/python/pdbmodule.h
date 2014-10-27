@@ -36,54 +36,6 @@ typedef int Py_ssize_t;
 /* DO-NOT-DELETE splicer.end(pdb.C_declaration) */
 
 /*--------------------------------------------------------------------------*/
-/*                               OBJECT field                               */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_field_Check(op)    (PY_TYPE(op) == &PP_field_Type) */
-
-typedef struct s_PP_fieldObject *PP_fieldObjectp;
-
-typedef struct s_PP_fieldObject {
-  PyObject_HEAD
-  PM_field *opers;
-/* DO-NOT-DELETE splicer.begin(pdb.field.extra_object) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.field.extra_object) */
-} PP_fieldObject;
-
-/* staticforward PyTypeObject PP_field_Type;*/
-extern PyTypeObject PP_field_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.begin(pdb.field.C_declaration) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.field.C_declaration) */
-
-/*--------------------------------------------------------------------------*/
-/*                           OBJECT mesh_topology                           */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_mesh_topology_Check(op)    (PY_TYPE(op) == &PP_mesh_topology_Type) */
-
-typedef struct s_PP_mesh_topologyObject *PP_mesh_topologyObjectp;
-
-typedef struct s_PP_mesh_topologyObject {
-  PyObject_HEAD
-  PM_mesh_topology *mt;
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.extra_object) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.extra_object) */
-} PP_mesh_topologyObject;
-
-/* staticforward PyTypeObject PP_mesh_topology_Type;*/
-extern PyTypeObject PP_mesh_topology_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.C_declaration) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.C_declaration) */
-
-/*--------------------------------------------------------------------------*/
 /*                              OBJECT defstr                               */
 /*--------------------------------------------------------------------------*/
 
