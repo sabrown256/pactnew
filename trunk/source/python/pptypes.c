@@ -1320,16 +1320,6 @@ void PP_init_type_map(void)
     _PP_create_defstr_tab();
     
 #if 0
--    PP_set_mark_data_hook(NULL);
--    PP_set_rel_data_hook(NULL);
--    PP_set_alloc_data_hook(NULL);
--    PP_set_sizeof_data_hook(NULL);
--    PP_set_convert_pdbfile_hook(PP_missing_pdbfile);
-#endif
-
-
-
-#if 0
 -    /* function pointer */
 -    entry = PP_make_type_entry("function", "function", 0L,
 -                                   NULL,

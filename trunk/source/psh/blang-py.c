@@ -250,6 +250,7 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
 
     fprintf(fh, "/* %s binding */\n", tl.cnm);
     fprintf(fh, "\n");
+
     fprintf(fh, "typedef struct s_%s *%sp;\n", tl.pnm, tl.pnm);
     fprintf(fh, "typedef struct s_%s %s;\n", tl.pnm, tl.pnm);
     fprintf(fh, "\n");
@@ -257,8 +258,13 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
     fprintf(fh, "   {PyObject_HEAD\n");
     fprintf(fh, "    %s *pyo;};\n", tl.cnm);
     fprintf(fh, "\n");
+
     fprintf(fh, "extern PyTypeObject\n");
     fprintf(fh, " %s_type;\n", tl.pnm);
+    fprintf(fh, "\n");
+
+    fprintf(fh, "extern PyGetSetDef\n");
+    fprintf(fh, " %s_getset[];\n", tl.pnm);
     fprintf(fh, "\n");
 
     return;}
@@ -423,7 +429,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     fprintf(fc, "\n");
 
 /* getset array */
-    fprintf(fc, "static PyGetSetDef %s_getset[] = {\n", tl.pnm);
+    fprintf(fc, "PyGetSetDef %s_getset[] = {\n", tl.pnm);
     fprintf(fc, "    {\"set\", (getter) %s_get, NULL, %s_doc, NULL},\n",
 	    tl.pnm, tl.pnm);
 

@@ -57,10 +57,10 @@ int PY_init_pml_int(PyObject *m, PyObject *d)
 
     nerr = PY_init_pml(m, d);
 
-    PP_set_Type.tp_new   = PyType_GenericNew;
-    PP_set_Type.tp_alloc = PyType_GenericAlloc;
-    nerr += (PyType_Ready(&PP_set_Type) < 0);
-    nerr += (PyDict_SetItemString(d, "set", (PyObject *) &PP_set_Type) < 0);
+    PY_PM_set_type.tp_new   = PyType_GenericNew;
+    PY_PM_set_type.tp_alloc = PyType_GenericAlloc;
+    nerr += (PyType_Ready(&PY_PM_set_type) < 0);
+    nerr += (PyDict_SetItemString(d, "set", (PyObject *) &PY_PM_set_type) < 0);
 
     PP_mapping_Type.tp_new   = PyType_GenericNew;
     PP_mapping_Type.tp_alloc = PyType_GenericAlloc;
@@ -76,56 +76,8 @@ int PY_init_pml_int(PyObject *m, PyObject *d)
 
 /*--------------------------------------------------------------------------*/
 
-/* PP_set_Check - */
-
-int PP_set_Check(PyObject *op)
-   {int rv;
-
-    rv = PyObject_TypeCheck(op, &PP_set_Type);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-PyObject *_PY_set_from_ptr(PM_set *data)
-   {PP_setObject *self;
-    PyObject *rv;
-
-    rv = NULL;
-
-    self = PyObject_NEW(PP_setObject, &PP_set_Type);
-    if (self != NULL)
-       {self->set = data;
-	rv = (PyObject *) self;};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = _PY_set_from_ptr(self->set);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_name_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = Py_BuildValue("s", self->set->name);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int PP_set_set_name_set(PP_setObject *self, PyObject *value,
-			       void *context)
+static int PY_PM_set_name_set(PY_PM_set *self, PyObject *value,
+			      void *context)
    {int rv;
 
     rv = -1;
@@ -134,7 +86,7 @@ static int PP_set_set_name_set(PP_setObject *self, PyObject *value,
        PyErr_SetString(PyExc_TypeError,
 		       "attribute deletion is not supported");
 
-    else if (PyArg_Parse(value, "s", &self->set->name))
+    else if (PyArg_Parse(value, "s", &self->pyo->name))
        rv = 0;
 
     return(rv);}
@@ -142,235 +94,12 @@ static int PP_set_set_name_set(PP_setObject *self, PyObject *value,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *PP_set_set_element_type_get(PP_setObject *self, void *context)
+static PyObject *PY_PM_set_opers_get(PY_PM_set *self, void *context)
    {PyObject *rv;
 
-    rv = Py_BuildValue("s", self->set->element_type);
+    rv = PPfield_from_ptr(self->pyo->opers);
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_dimension_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PY_INT_LONG(self->set->dimension);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_max_index_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PY_COBJ_VOID_PTR((void *) self->set->max_index, NULL);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_dimension_elem_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PY_INT_LONG(self->set->dimension_elem);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_n_elements_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PY_INT_LONG(self->set->n_elements);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_elements_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PY_COBJ_VOID_PTR((void *) self->set->elements, NULL);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_es_type_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = Py_BuildValue("s", self->set->es_type);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_extrema_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = Py_BuildValue("s", self->set->extrema);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_scales_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = Py_BuildValue("s", self->set->scales);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_opers_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PPfield_from_ptr(self->set->opers);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_metric_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PY_COBJ_VOID_PTR((void *) self->set->metric, NULL);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_symmetry_type_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = Py_BuildValue("s", self->set->symmetry_type);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_symmetry_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PY_COBJ_VOID_PTR((void *) self->set->symmetry, NULL);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_topology_type_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = Py_BuildValue("s", self->set->topology_type);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_topology_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PY_COBJ_VOID_PTR((void *) self->set->topology, NULL);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_info_type_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = Py_BuildValue("s", self->set->info_type);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_info_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = PY_COBJ_VOID_PTR((void *) self->set->info, NULL);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *PP_set_set_next_get(PP_setObject *self, void *context)
-   {PyObject *rv;
-
-    rv = _PY_set_from_ptr(self->set->next);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static char
- PP_set_set__doc__[] = "",
- PP_set_set_name__doc__[] = "",
- PP_set_set_element_type__doc__[] = "",
- PP_set_set_dimension__doc__[] = "",
- PP_set_set_max_index__doc__[] = "",
- PP_set_set_dimension_elem__doc__[] = "",
- PP_set_set_n_elements__doc__[] = "",
- PP_set_set_elements__doc__[] = "",
- PP_set_set_es_type__doc__[] = "",
- PP_set_set_extrema__doc__[] = "",
- PP_set_set_scales__doc__[] = "",
- PP_set_set_opers__doc__[] = "",
- PP_set_set_metric__doc__[] = "",
- PP_set_set_symmetry_type__doc__[] = "",
- PP_set_set_symmetry__doc__[] = "",
- PP_set_set_topology_type__doc__[] = "",
- PP_set_set_topology__doc__[] = "",
- PP_set_set_info_type__doc__[] = "",
- PP_set_set_info__doc__[] = "",
- PP_set_set_next__doc__[] = "",
- PP_set_Type__doc__[] = "";
-
-
-static PyGetSetDef PP_set_getset[] = {
-    {"set", (getter) PP_set_set_get, NULL, PP_set_set__doc__, NULL},
-    {"name", (getter) PP_set_set_name_get, (setter) PP_set_set_name_set, PP_set_set_name__doc__, NULL},
-    {"element_type", (getter) PP_set_set_element_type_get, NULL, PP_set_set_element_type__doc__, NULL},
-    {"dimension", (getter) PP_set_set_dimension_get, NULL, PP_set_set_dimension__doc__, NULL},
-    {"max_index", (getter) PP_set_set_max_index_get, NULL, PP_set_set_max_index__doc__, NULL},
-    {"dimension_elem", (getter) PP_set_set_dimension_elem_get, NULL, PP_set_set_dimension_elem__doc__, NULL},
-    {"n_elements", (getter) PP_set_set_n_elements_get, NULL, PP_set_set_n_elements__doc__, NULL},
-    {"elements", (getter) PP_set_set_elements_get, NULL, PP_set_set_elements__doc__, NULL},
-    {"es_type", (getter) PP_set_set_es_type_get, NULL, PP_set_set_es_type__doc__, NULL},
-    {"extrema", (getter) PP_set_set_extrema_get, NULL, PP_set_set_extrema__doc__, NULL},
-    {"scales", (getter) PP_set_set_scales_get, NULL, PP_set_set_scales__doc__, NULL},
-    {"opers", (getter) PP_set_set_opers_get, NULL, PP_set_set_opers__doc__, NULL},
-    {"metric", (getter) PP_set_set_metric_get, NULL, PP_set_set_metric__doc__, NULL},
-    {"symmetry_type", (getter) PP_set_set_symmetry_type_get, NULL, PP_set_set_symmetry_type__doc__, NULL},
-    {"symmetry", (getter) PP_set_set_symmetry_get, NULL, PP_set_set_symmetry__doc__, NULL},
-    {"topology_type", (getter) PP_set_set_topology_type_get, NULL, PP_set_set_topology_type__doc__, NULL},
-    {"topology", (getter) PP_set_set_topology_get, NULL, PP_set_set_topology__doc__, NULL},
-    {"info_type", (getter) PP_set_set_info_type_get, NULL, PP_set_set_info_type__doc__, NULL},
-    {"info", (getter) PP_set_set_info_get, NULL, PP_set_set_info__doc__, NULL},
-    {"next", (getter) PP_set_set_next_get, NULL, PP_set_set_next__doc__, NULL},
-/* DO-NOT-DELETE splicer.begin(pdb.set.extra_getset) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.set.extra_getset) */
-    {NULL}     /* Sentinel */
-};
 
 /*--------------------------------------------------------------------------*/
 
@@ -378,7 +107,7 @@ static PyGetSetDef PP_set_getset[] = {
 
 /*--------------------------------------------------------------------------*/
 
-static int PP_set_tp_init(PP_setObject *self, PyObject *args, PyObject *kwds)
+static int PY_PM_set_tp_init(PY_PM_set *self, PyObject *args, PyObject *kwds)
    {int cp, nd, nde, rv, ok;
     int *maxes;
     long ne;
@@ -389,7 +118,7 @@ static int PP_set_tp_init(PP_setObject *self, PyObject *args, PyObject *kwds)
     double *metric;
     PM_set *next;
     PP_fieldObject *opersobj;
-    PP_setObject *nextobj;
+    PY_PM_set *nextobj;
     char *kw_list[] = {"name", "type", "cp", "ne", "nd",
 		       "nde", "maxes", "elem", "opers",
 		       "metric", "symtype", "sym", "toptype",
@@ -409,12 +138,12 @@ static int PP_set_tp_init(PP_setObject *self, PyObject *args, PyObject *kwds)
 				     &metric, &symtype, &sym,
 				     &toptype, &top,
 				     &inftype, &inf,
-				     &PP_set_Type, &nextobj);
+				     &PY_PM_set_type, &nextobj);
     if (ok)
        {rv    = 0;
 	opers = opersobj->opers;
 	next  = nextobj->set;
-	self->set = PM_mk_set(name, type, cp, ne, nd, nde, maxes, elem,
+	self->pyo = PM_mk_set(name, type, cp, ne, nd, nde, maxes, elem,
 			      opers, metric, symtype, sym, toptype, top,
 			      inftype, inf, next);};
 
@@ -423,11 +152,14 @@ static int PP_set_tp_init(PP_setObject *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-PyTypeObject PP_set_Type =
+PY_DEF_TYPE(PM_set);
+
+#if 0
+PyTypeObject PY_PM_set_type =
     {
         PY_HEAD_INIT(&PyType_Type, 0)
         "set",                          /* tp_name */
-        sizeof(PP_setObject),           /* tp_basicsize */
+        sizeof(PY_PM_set),           /* tp_basicsize */
         0,                              /* tp_itemsize */
         /* Methods to implement standard operations */
         (destructor) 0,                 /* tp_dealloc */
@@ -450,7 +182,7 @@ PyTypeObject PP_set_Type =
         0,                              /* tp_as_buffer */
         /* Flags to define presence of optional/expanded features */
         Py_TPFLAGS_DEFAULT,             /* tp_flags */
-        PP_set_Type__doc__,             /* tp_doc */
+        PY_PM_set_type_doc,             /* tp_doc */
         /* Assigned meaning in release 2.0 */
         /* call function for all accessible objects */
         (traverseproc) 0,               /* tp_traverse */
@@ -468,13 +200,13 @@ PyTypeObject PP_set_Type =
         /* Attribute descriptor and subclassing stuff */
         0,                              /* tp_methods */
         0,                              /* tp_members */
-        PP_set_getset,                  /* tp_getset */
+        PY_PM_set_getset,                  /* tp_getset */
         0,                              /* tp_base */
         0,                              /* tp_dict */
         (descrgetfunc) 0,               /* tp_descr_get */
         (descrsetfunc) 0,               /* tp_descr_set */
         0,                              /* tp_dictoffset */
-        (initproc)PP_set_tp_init,       /* tp_init */
+        (initproc)PY_PM_set_tp_init,       /* tp_init */
         (allocfunc) 0,                  /* tp_alloc */
         (newfunc) 0,                    /* tp_new */
 #if PYTHON_API_VERSION >= 1012
@@ -492,6 +224,8 @@ PyTypeObject PP_set_Type =
         (destructor) 0,                 /* tp_del */
 #endif
 	};
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -591,7 +325,7 @@ static PyObject *PP_mapping_map_category_get(PP_mappingObject *self, void *conte
 static PyObject *PP_mapping_map_domain_get(PP_mappingObject *self, void *context)
    {PyObject *rv;
 
-    rv = _PY_set_from_ptr(self->map->domain);
+    rv = _PY_PM_set_from_ptr(self->map->domain);
 
     return(rv);}
 
@@ -601,7 +335,7 @@ static PyObject *PP_mapping_map_domain_get(PP_mappingObject *self, void *context
 static PyObject *PP_mapping_map_range_get(PP_mappingObject *self, void *context)
    {PyObject *rv;
 
-    rv = _PY_set_from_ptr(self->map->range);
+    rv = _PY_PM_set_from_ptr(self->map->range);
 
     return(rv);}
 
@@ -712,8 +446,8 @@ static int PP_mapping_tp_init(PP_mappingObject *self,
     PM_set *domain;
     PM_set *range;
     PM_mapping *next;
-    PP_setObject *odom;
-    PP_setObject *oran;
+    PY_PM_set *odom;
+    PY_PM_set *oran;
     char *kw_list[] = {"name", "cat", "domain", "range",
                        "centering", "next", NULL};
 
@@ -721,8 +455,8 @@ static int PP_mapping_tp_init(PP_mappingObject *self,
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds, "ssO!O!iO&:make_mapping",
 				     kw_list, &name, &cat,
-				     &PP_set_Type, &odom,
-				     &PP_set_Type, &oran,
+				     &PY_PM_set_type, &odom,
+				     &PY_PM_set_type, &oran,
 				     &centering,
 				     _PY_mapping_extractor, &next);
     if (ok)
