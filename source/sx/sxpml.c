@@ -106,6 +106,34 @@ void *_SX_opt_PM_polygon(PM_polygon *x, bind_opt wh, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_OPT_PM_FIELD - handle BLANG binding related operations */
+
+void *_SX_opt_PM_field(PM_field *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_FIELDP(o))
+	        rv = SS_GET(PM_field, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_ALLOC :
+        case BIND_FREE :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SX_OPT_PM_SET - handle BLANG binding related operations */
 
 void *_SX_opt_PM_set(PM_set *x, bind_opt wh, void *a)
@@ -165,6 +193,34 @@ void *_SX_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
 	     break;
 
         case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PM_MESH_TOPOLOGY - handle BLANG binding related operations */
+
+void *_SX_opt_PM_mesh_topology(PM_mesh_topology *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_MESH_TOPOLOGYP(o))
+	        rv = SS_GET(PM_mesh_topology, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_ALLOC :
+        case BIND_FREE :
 	default:
 	     break;};
 

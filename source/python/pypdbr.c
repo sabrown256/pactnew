@@ -232,7 +232,7 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
                 return -1;
             }
             as_obj = AS_TUPLE;
-        } else if (PyMapping_Check(obj)) {
+        } else if (PY_PM_mapping_check(obj)) {
             as_obj = AS_DICT;
         } else {
             PP_error_set_user(obj,

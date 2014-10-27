@@ -27,14 +27,6 @@ static int PY_PM_set_set_name(PY_PM_set *self, PyObject *value, void *context)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *PY_PM_set_get_opers(PY_PM_set *self, void *context)
-{
-    return PPfield_from_ptr(self->pyo->opers);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 #if 0
 
 /* GOTCHA: example of a getset with setter method */
@@ -59,7 +51,7 @@ static int PY_PM_set_tp_init(PY_PM_set *self, PyObject *args, PyObject *kwds)
     double *metric;
     PM_field *opers;
     PM_set *next;
-    PP_fieldObject *opersobj;
+    PY_PM_field *opersobj;
     PY_PM_set *nextobj;
     char *kw_list[] = {"name", "type", "cp", "ne", "nd",
 		       "nde", "maxes", "elem", "opers",
@@ -73,13 +65,13 @@ static int PY_PM_set_tp_init(PY_PM_set *self, PyObject *args, PyObject *kwds)
 				    "ssiliiO&zO!O&szszszO!:make_set", kw_list,
 				    &name, &type, &cp, &ne, &nd, &nde,
 				    iarray_extractor, &maxes, &elem,
-				    &PP_field_Type, &opersobj,
+				    &PY_PM_field_type, &opersobj,
 				    REAL_array_extractor, &metric,
 				    &symtype, &sym, &toptype, &top,
 				    &inftype, &inf,
 				    &PY_PM_set_type, &nextobj))
        {rv = 0;
-	opers = opersobj->opers;
+	opers = opersobj->pyo;
 	next  = nextobj->pyo;
 	self->pyo = PM_mk_set(name, type, cp, ne, nd, nde, maxes, elem,
 			      opers, metric, symtype, sym, toptype, top,

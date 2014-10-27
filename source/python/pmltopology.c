@@ -1,155 +1,48 @@
-/*--------------------------------------------------------------------------*/
-
-/* This is generated code.
- * Any edits must be made between the splicer.begin and splicer.end blocks.
- * All other edits will be lost.
- * Once a block is edited remove the 'UNMODIFIED' on the splicer.begin comment
- * to allow the block to be preserved when it is regenerated.
- */
 /*
- * Source Version: 9.0
- * Software Release: LLNL-CODE-422942
+ * PMLTOPOLOGY.C
  *
  * include cpyright.h
  */
-/*--------------------------------------------------------------------------*/
+
 #include "pdbmodule.h"
 
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.C_definition) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.C_definition) */
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_mesh_topology_mt__doc__[] =
-""
-;
-
-static PyObject *
-PP_mesh_topology_mt_get(PP_mesh_topologyObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.descriptor.mt_get) UNMODIFIED */
-    return PPtopology_from_ptr(self->mt);
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.descriptor.mt_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_mesh_topology_mt_n_dimensions__doc__[] =
-""
-;
-
-static PyObject *
-PP_mesh_topology_mt_n_dimensions_get(PP_mesh_topologyObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.descriptor.mt.n_dimensions_get) UNMODIFIED */
-    return PY_INT_LONG(self->mt->n_dimensions);
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.descriptor.mt.n_dimensions_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_mesh_topology_mt_n_bound_params__doc__[] =
-""
-;
-
-static PyObject *
-PP_mesh_topology_mt_n_bound_params_get(PP_mesh_topologyObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.descriptor.mt.n_bound_params_get) UNMODIFIED */
-    return PY_COBJ_VOID_PTR((void *) self->mt->n_bound_params, NULL);
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.descriptor.mt.n_bound_params_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_mesh_topology_mt_n_cells__doc__[] =
-""
-;
-
-static PyObject *
-PP_mesh_topology_mt_n_cells_get(PP_mesh_topologyObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.descriptor.mt.n_cells_get) UNMODIFIED */
-    return PY_COBJ_VOID_PTR((void *) self->mt->n_cells, NULL);
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.descriptor.mt.n_cells_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_mesh_topology_mt_boundaries__doc__[] =
-""
-;
-
-static PyObject *
-PP_mesh_topology_mt_boundaries_get(PP_mesh_topologyObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.descriptor.mt.boundaries_get) UNMODIFIED */
-    return PY_COBJ_VOID_PTR((void *) self->mt->boundaries, NULL);
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.descriptor.mt.boundaries_get) */
-}
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.extra_members) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.extra_members) */
-
-static PyGetSetDef PP_mesh_topology_getset[] = {
-    {"mt", (getter) PP_mesh_topology_mt_get, NULL, PP_mesh_topology_mt__doc__, NULL},
-    {"n_dimensions", (getter) PP_mesh_topology_mt_n_dimensions_get, NULL, PP_mesh_topology_mt_n_dimensions__doc__, NULL},
-    {"n_bound_params", (getter) PP_mesh_topology_mt_n_bound_params_get, NULL, PP_mesh_topology_mt_n_bound_params__doc__, NULL},
-    {"n_cells", (getter) PP_mesh_topology_mt_n_cells_get, NULL, PP_mesh_topology_mt_n_cells__doc__, NULL},
-    {"boundaries", (getter) PP_mesh_topology_mt_boundaries_get, NULL, PP_mesh_topology_mt_boundaries__doc__, NULL},
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.extra_getset) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.extra_getset) */
-    {NULL}     /* Sentinel */
-};
-
-/*--------------------------------------------------------------------------*/
-
-static int
-PP_mesh_topology_tp_init(PP_mesh_topologyObject *self, PyObject *args, PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.as_type.init) */
-    int nd;
-    int *bnp;
-    int *bnc;
+static int PY_PM_mesh_topology_tp_init(PY_PM_mesh_topology *self,
+				       PyObject *args, PyObject *kwds)
+   {int nd, rv;
+    int *bnp, *bnc;
     long **bnd;
     char *kw_list[] = {"nd", "bnp", "bnc", "bnd", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iO&O&O&:make_topology", kw_list,
-                                     &nd, iarray_extractor, &bnp, iarray_extractor, &bnc, pplong_extractor, &bnd))
-        return -1;
-    self->mt = PM_make_topology(nd, bnp, bnc, bnd);
-    return 0;
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.as_type.init) */
-}
-/*--------------------------------------------------------------------------*/
+    rv = -1;
 
-/* PP_mesh_topology_Check - */
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "iO&O&O&:make_topology", kw_list,
+				    &nd,
+				    iarray_extractor, &bnp,
+				    iarray_extractor, &bnc,
+				    pplong_extractor, &bnd))
+       {self->pyo = PM_make_topology(nd, bnp, bnc, bnd);
+	rv        = 0;};
 
-/* static */ int
-PP_mesh_topology_Check(PyObject *op)
-{
-    if (PyObject_TypeCheck(op, &PP_mesh_topology_Type))
-        return 1;
-    else
-        return 0;
-/*  return PY_TYPE(op) == &PP_mesh_topology_Type; */
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
+static char PY_PM_mesh_topology_doc[] = "";
 
-static char PP_mesh_topology_Type__doc__[] = 
-""
-;
+PY_DEF_TYPE(PM_mesh_topology);
+
+#if 0
 
 /* static */
-PyTypeObject PP_mesh_topology_Type = {
+PyTypeObject PY_PM_mesh_topology_type = {
         PY_HEAD_INIT(&PyType_Type, 0)
         "mesh_topology",                       /* tp_name */
-        sizeof(PP_mesh_topologyObject),         /* tp_basicsize */
+        sizeof(PY_PM_mesh_topology),         /* tp_basicsize */
         0,                              /* tp_itemsize */
         /* Methods to implement standard operations */
         (destructor)0,                  /* tp_dealloc */
@@ -172,7 +65,7 @@ PyTypeObject PP_mesh_topology_Type = {
         0,                              /* tp_as_buffer */
         /* Flags to define presence of optional/expanded features */
         Py_TPFLAGS_DEFAULT,             /* tp_flags */
-        PP_mesh_topology_Type__doc__,   /* tp_doc */
+        PY_PM_mesh_topology_type_doc,   /* tp_doc */
         /* Assigned meaning in release 2.0 */
         /* call function for all accessible objects */
         (traverseproc)0,                /* tp_traverse */
@@ -190,13 +83,13 @@ PyTypeObject PP_mesh_topology_Type = {
         /* Attribute descriptor and subclassing stuff */
         0,                              /* tp_methods */
         0,                              /* tp_members */
-        PP_mesh_topology_getset,        /* tp_getset */
+        PY_PM_mesh_topology_getset,        /* tp_getset */
         0,                              /* tp_base */
         0,                              /* tp_dict */
         (descrgetfunc)0,                /* tp_descr_get */
         (descrsetfunc)0,                /* tp_descr_set */
         0,                              /* tp_dictoffset */
-        (initproc)PP_mesh_topology_tp_init, /* tp_init */
+        (initproc)PY_PM_mesh_topology_tp_init, /* tp_init */
         (allocfunc)0,                   /* tp_alloc */
         (newfunc)0,                     /* tp_new */
 #if PYTHON_API_VERSION >= 1012
@@ -215,9 +108,7 @@ PyTypeObject PP_mesh_topology_Type = {
 #endif
 };
 
-/* DO-NOT-DELETE splicer.begin(pdb.mesh_topology.extra) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.mesh_topology.extra) */
-/* End of code for mesh_topology objects */
+#endif
+
 /*--------------------------------------------------------------------------*/
-/*                               OBJECT_TAIL                                */
 /*--------------------------------------------------------------------------*/

@@ -276,7 +276,6 @@ extern PyObject
 /* PPPML.C declarations */
 
 extern PyObject
- *PPfield_from_ptr(PM_field *data),
  *PPtopology_from_ptr(PM_mesh_topology *data);
 
 

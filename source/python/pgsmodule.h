@@ -41,42 +41,6 @@
 /* DO-NOT-DELETE splicer.end(pgs.C_declaration) */
 
 /*--------------------------------------------------------------------------*/
-/*                               OBJECT field                               */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_field_Check(op)    (PY_TYPE(op) == &PP_field_Type) */
-
-typedef struct s_PP_fieldObject *PP_fieldObjectp;
-
-typedef struct s_PP_fieldObject {
-  PyObject_HEAD
-  PM_field *opers;
-} PP_fieldObject;
-
-/* staticforward PyTypeObject PP_field_Type;*/
-extern PyTypeObject PP_field_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-/*--------------------------------------------------------------------------*/
-/*                           OBJECT mesh_topology                           */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_mesh_topology_Check(op)    (PY_TYPE(op) == &PP_mesh_topology_Type) */
-
-typedef struct s_PP_mesh_topologyObject *PP_mesh_topologyObjectp;
-
-typedef struct s_PP_mesh_topologyObject {
-  PyObject_HEAD
-  PM_mesh_topology *mt;
-} PP_mesh_topologyObject;
-
-/* staticforward PyTypeObject PP_mesh_topology_Type;*/
-extern PyTypeObject PP_mesh_topology_Type;
-
-/*--------------------------------------------------------------------------*/
 /*                              OBJECT defstr                               */
 /*--------------------------------------------------------------------------*/
 
