@@ -93,7 +93,7 @@
 /*--------------------------------------------------------------------------*/
 
 /*
- * #bind derived SC_termst SC_ENUM_I SC_ENUM_I SC_TERM_UNKNOWN
+ * #bind enum SC_termst SC_TERM_UNKNOWN
  */
 
 enum e_SC_termst

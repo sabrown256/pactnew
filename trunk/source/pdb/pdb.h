@@ -276,7 +276,7 @@ typedef int (*PFSymDelay)(PDBfile *file, int ad, char *name, char *type,
 
 
 /*
- * #bind derived PD_data_std_i integer SC_ENUM_I SC_ENUM_I PD_NO_STD
+ * #bind enum PD_data_std_i PD_NO_STD
  */
 
 enum e_PD_data_std_i
@@ -296,7 +296,7 @@ enum e_PD_data_std_i
 typedef enum e_PD_data_std_i PD_data_std_i;
 
 /*
- * #bind derived PD_data_algn_i integer SC_ENUM_I SC_ENUM_I PD_NO_ALGN
+ * #bind enum PD_data_algn_i PD_NO_ALGN
  */
 
 enum e_PD_data_algn_i
@@ -320,7 +320,7 @@ enum e_PD_data_algn_i
 typedef enum e_PD_data_algn_i PD_data_algn_i;
 
 /*
- * #bind derived PD_major_op integer SC_ENUM_I SC_ENUM_I PD_GENERIC
+ * #bind enum PD_major_op PD_GENERIC
  */
 
 enum e_PD_major_op
@@ -338,7 +338,7 @@ enum e_PD_major_op
 typedef enum e_PD_major_op PD_major_op;
 
 /*
- * #bind derived PD_byte_order integer SC_ENUM_I SC_ENUM_I NO_ORDER
+ * #bind enum PD_byte_order NO_ORDER
  */
 
 enum e_PD_byte_order
@@ -368,7 +368,7 @@ enum e_PD_text_kind
 typedef enum e_PD_text_kind PD_text_kind;
 
 /*
- * #bind derived PD_major_order integer SC_ENUM_I SC_ENUM_I NO_MAJOR_ORDER
+ * #bind enum PD_major_order NO_MAJOR_ORDER
  */
 
 enum e_PD_major_order
@@ -379,7 +379,7 @@ enum e_PD_major_order
 typedef enum e_PD_major_order PD_major_order;
 
 /*
- * #bind derived PD_curve_io integer SC_ENUM_I SC_ENUM_I NOR_X_Y
+ * #bind enum PD_curve_io NOR_X_Y
  */
 
 enum e_PD_curve_io
@@ -397,7 +397,7 @@ enum e_PD_symbol_order
 typedef enum e_PD_symbol_order PD_symbol_order;
 
 /*
- * #bind derived PD_checksum_mode integer SC_ENUM_I SC_ENUM_I PD_MD5_OFF
+ * #bind enum PD_checksum_mode PD_MD5_OFF
  */
 
 #ifdef NON_INTEGER_ENUM
@@ -422,7 +422,7 @@ typedef enum e_PD_checksum_mode PD_checksum_mode;
 #endif
 
 /*
- * #bind derived PD_character_standard integer SC_ENUM_I SC_ENUM_I PD_UTF_8
+ * #bind enum PD_character_standard PD_UTF_8
  */
 
 enum e_PD_character_standard
@@ -552,7 +552,7 @@ struct s_PD_cksumdes
     PD_checksum_mode file;};   /* file use of checksums */
 
 /*
- * #bind derived PDBfile character-A SX_PDBFILE_I PP_PDBfileObject NULL
+ * #bind struct PDBfile
  */
 
 struct s_PDBfile
@@ -660,7 +660,7 @@ struct s_dimdes
 
 /* member descriptor - describe a member efficiently
  *
- * #bind derived memdes character-A SX_MEMDES_I PyObject NULL
+ * #bind struct memdes
  */
 
 struct s_memdes
@@ -712,7 +712,7 @@ struct s_symindir
 
 /* symbol table entry
  *
- * #bind derived syment character-A SX_SYMENT_I PyObject NULL
+ * #bind struct syment
  */
 
 struct s_syment
@@ -735,7 +735,7 @@ struct s_syment
 
 /* structure chart entry
  *
- * #bind derived defstr character-A SX_DEFSTR_I PyObject NULL
+ * #bind struct defstr
  */
 
 struct s_defstr
