@@ -1239,7 +1239,7 @@ static void init_types(void)
 static void add_derived_types(char **sbi)
    {int ib;
     char s[BFLRG];
-    char *fty, *sty, *defv, *sb, **ta;
+    char *fty, *sty, *pty, *defv, *sb, **ta;
 
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
@@ -1247,24 +1247,27 @@ static void add_derived_types(char **sbi)
 	    {if (strncmp(sb, "derived ", 8) == 0)
 		{nstrncpy(s, BFLRG, sb, -1);
 		 ta   = tokenize(s, " \t", 0);
-		 fty  = ta[3];
-		 sty  = ta[4];
+		 fty  = ta[2];
+		 sty  = ta[3];
+		 pty  = ta[4];
 		 defv = ta[5];}
 	     else if (strncmp(sb, "enum ", 5) == 0)
 	        {nstrncpy(s, BFLRG, sb, -1);
 		 ta   = tokenize(s, " \t", 0);
-		 fty  = tykind[TK_ENUM];
+		 fty  = "integer";
 		 sty  = tykind[TK_ENUM];
+		 pty  = tykind[TK_ENUM];
 		 defv = ta[2];}
 	     else if (strncmp(sb, "struct ", 7) == 0)
 	        {nstrncpy(s, BFLRG, sb, -1);
 		 ta   = tokenize(s, " \t", 0);
 		 fty  = tykind[TK_STRUCT];
 		 sty  = tykind[TK_STRUCT];
+		 pty  = tykind[TK_STRUCT];
 		 defv = NULL;};
 	
 	     if (ta != NULL)
-	        {add_type(ta[1], ta[2], fty, sty, defv);
+	        {add_type(ta[1], fty, sty, pty, defv);
 		 FREE(ta[0]);
 		 FREE(ta);};};};
 

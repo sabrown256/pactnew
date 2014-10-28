@@ -84,7 +84,7 @@
 /*--------------------------------------------------------------------------*/
 
 /*
- * #bind derived PA_scope_kind integer SC_ENUM_I SC_ENUM_I RUNTIME
+ * #bind enum PA_scope_kind RUNTIME
  */
 
 enum e_PA_scope_kind
@@ -99,7 +99,7 @@ typedef enum e_PA_scope_kind PA_scope_kind;
 #define SCOPE     'a'
 
 /*
- * #bind derived PA_class_kind integer SC_ENUM_I SC_ENUM_I REQU
+ * #bind enum PA_class_kind REQU
  */
 
 #undef REQU
@@ -115,7 +115,7 @@ typedef enum e_PA_class_kind PA_class_kind;
 #define CLASS     'b'
 
 /*
- * #bind derived PA_persist_kind integer SC_ENUM_I SC_ENUM_I REL
+ * #bind enum PA_persist_kind REL
  */
 
 enum e_PA_persist_kind
@@ -134,7 +134,7 @@ typedef enum e_PA_persist_kind PA_persist_kind;
 #define CENTER   'd'
 
 /*
- * #bind derived PA_allocation_kind integer SC_ENUM_I SC_ENUM_I REL
+ * #bind enum PA_allocation_kind REL
  */
 
 enum e_PA_allocation_kind
@@ -146,7 +146,7 @@ typedef enum e_PA_allocation_kind PA_allocation_kind;
 #define ALLOCATION 'e'
 
 /*
- * #bind derived PA_PA_gs.units_conversion integer SC_ENUM_I SC_ENUM_I INT_CGS
+ * #bind enum PA_unit_conversion INT_CGS
  */
 
 #undef NONE
@@ -604,7 +604,7 @@ struct s_PA_plot_request
 
 /* PANACEA package
  *
- * #bind derived PA_package character-A SX_PACKAGE_I PyObject NULL
+ * #bind struct PA_package
  */
 
 struct s_PA_package
@@ -650,7 +650,7 @@ struct s_PA_package
 
 /* PANACEA variable
  *
- * #bind derived PA_variable character-A SX_VARIABLE_I PyObject NULL
+ * #bind struct PA_variable
  */
 
 struct s_PA_variable
@@ -684,7 +684,7 @@ struct s_PA_variable
 
 /* PANACEA source variable
  *
- * #bind derived PA_src_variable character-A SX_SRC_VARIABLE_I PyObject NULL
+ * #bind struct PA_src_variable
  */
 
 struct s_PA_src_variable
@@ -716,7 +716,7 @@ struct s_PA_thread_state
 /* IV_SPECIFICATION is PD_DEFSTR'd in PA_DEF_STR in PANACEA.C
  * so any changes here must be reflected there
  *
- * #bind derived PA_iv_specification character-A SX_IV_SPECIFICATION_I PyObject NULL
+ * #bind struct PA_iv_specification
  */
 
 struct s_PA_iv_specification

@@ -232,7 +232,7 @@ typedef int (*PFRDev)(PG_device *dev);
 typedef void (*PFKeymap)(PG_text_box *b);
 
 /*
- * #bind derived PG_coord_sys integer SC_ENUM_I SC_ENUM_I WORLDC
+ * #bind enum PG_coord_sys WORLDC
  */
 
 enum e_PG_coord_sys
@@ -259,7 +259,7 @@ enum e_PG_dev_type
 typedef enum e_PG_dev_type PG_dev_type;
 
 /*
- * #bind derived PG_color integer SC_ENUM_I SC_ENUM_I ROTATING
+ * #bind enum PG_color ROTATING
  */
 
 enum e_PG_color
@@ -271,7 +271,7 @@ enum e_PG_color
 typedef enum e_PG_color PG_color;
 
 /*
- * #bind derived PG_rendering integer SC_ENUM_I SC_ENUM_I PLOT_NONE
+ * #bind enum PG_rendering PLOT_NONE
  */
 
 enum e_PG_rendering
@@ -297,7 +297,7 @@ enum e_PG_rendering
 typedef enum e_PG_rendering PG_rendering;
 
 /*
- * #bind derived PG_axis_attr integer SC_ENUM_I SC_ENUM_I AXIS_LINESTYLE
+ * #bind enum PG_axis_attr AXIS_LINESTYLE
  */
 
 enum e_PG_axis_attr
@@ -326,7 +326,7 @@ enum e_PG_axis_attr
 typedef enum e_PG_axis_attr PG_axis_attr;
 
 /*
- * #bind derived PG_axis_type integer SC_ENUM_I SC_ENUM_I CARTESIAN_2D
+ * #bind enum PG_axis_type CARTESIAN_2D
  */
 
 enum e_PG_axis_type
@@ -338,7 +338,7 @@ enum e_PG_axis_type
 typedef enum e_PG_axis_type PG_axis_type;
 
 /*
- * #bind derived PG_grid_attr integer SC_ENUM_I SC_ENUM_I GRID_LINESTYLE
+ * #bind enum PG_grid_attr GRID_LINESTYLE
  */
 
 enum e_PG_grid_attr
@@ -349,7 +349,7 @@ enum e_PG_grid_attr
 typedef enum e_PG_grid_attr PG_grid_attr;
 
 /*
- * #bind derived PG_line_attr integer SC_ENUM_I SC_ENUM_I LINE_SOLID
+ * #bind enum PG_line_attr LINE_SOLID
  */
 
 enum e_PG_line_attr
@@ -362,7 +362,7 @@ enum e_PG_line_attr
 typedef enum e_PG_line_attr PG_line_attr;
 
 /*
- * #bind derived PG_vector_attr integer SC_ENUM_I SC_ENUM_I VEC_SCALE
+ * #bind enum PG_vector_attr VEC_SCALE
  */
 
 enum e_PG_vector_attr
@@ -379,7 +379,7 @@ enum e_PG_vector_attr
 typedef enum e_PG_vector_attr PG_vector_attr;
 
 /*
- * #bind derived PG_mouse_button integer SC_ENUM_I SC_ENUM_I MOUSE_NONE
+ * #bind enum PG_mouse_button MOUSE_NONE
  */
 
 enum e_PG_mouse_button
@@ -395,7 +395,7 @@ enum e_PG_mouse_button
 typedef enum e_PG_mouse_button PG_mouse_button;
 
 /*
- * #bind derived PG_key_modifier integer SC_ENUM_I SC_ENUM_I KEY_SHIFT
+ * #bind enum PG_key_modifier KEY_SHIFT
  */
 
 enum e_PG_key_modifier
@@ -470,7 +470,7 @@ enum e_PG_angle_unit
 typedef enum e_PG_angle_unit PG_angle_unit;
 
 /*
- * #bind derived PG_logical_operation integer SC_ENUM_I SC_ENUM_I GS_COPY
+ * #bind enum PG_logical_operation GS_COPY
  */
 
 enum e_PG_logical_operation
@@ -544,7 +544,7 @@ struct s_PG_axis_def
 /* GRAPH - contains the information necessary to display a list of functions
  *       - in some fashion
  *
- * #bind derived PG_graph character-A SX_GRAPH_I PyObject NULL
+ * #bind struct PG_graph
  */
 
 struct s_PG_graph
@@ -616,7 +616,7 @@ struct s_RGB_color_map
 
 /* palette structure
  *
- * #bind derived PG_palette character-A SC_STRING_I PyObject NULL
+ * #bind struct PG_palette
  */
 
 struct s_PG_palette
@@ -686,7 +686,7 @@ struct s_PG_curve
 
 /* PG_INTERFACE_OBJECT
  *
- * #bind derived PG_interface_object character-A SX_INTERFACE_OBJEC_I PyObject NULL
+ * #bind struct PG_interface_object
  */
 
 struct s_PG_interface_object
@@ -769,7 +769,8 @@ struct s_PG_dev_geometry
 /*--------------------------------------------------------------------------*/
 
 /* PG_DEVICE - graphics device structure
- * #bind derived PG_device character-A SX_DEVICE_I PP_deviceObject NULL
+ *
+ * #bind struct PG_device
  */
 
 struct s_PG_device
@@ -1030,7 +1031,8 @@ struct s_PG_device
 
 /* PG_IMAGE is PD_defstr'd in PDBX.C any changes here must be reflected
  * there!!
- * #bind derived PG_image character-A SX_IMAGE_I PyObject NULL
+ *
+ * #bind struct PG_image
  */
 
 struct s_PG_image
@@ -1085,7 +1087,7 @@ struct s_PG_view_attributes
 
 /* PG_DEV_ATTRIBUTES
  *
- * #bind derived PG_dev_attributes character-A SX_DEV_ATTRIBUTES_I PyObject NULL
+ * #bind struct PG_dev_attributes
  */
 
 struct s_PG_dev_attributes

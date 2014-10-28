@@ -67,7 +67,7 @@ struct s_haelem
     PD_cast(_f, "haelem", "def", "type");}
 
 /*
- * #bind derived hasharr character-A SS_HASHARR_I PP_hasharrObject NULL
+ * #bind struct hasharr
  *
  * MEMFL bits:
  *     1  permanent memory
