@@ -251,7 +251,7 @@ enum e_PM_binary_operation
 typedef enum e_PM_binary_operation PM_binary_operation;
 
 /*
- * #bind derived PM_centering integer SC_ENUM_I SC_ENUM_I U_CENT
+ * #bind enum PM_centering U_CENT
  */
 
 enum e_PM_centering
@@ -268,7 +268,7 @@ typedef enum e_PM_centering PM_centering;
  *              - centering in boxes, text justification,
  *              - histograms, ...
  *
- * #bind derived PM_direction integer SC_ENUM_I SC_ENUM_I DIR_NONE
+ * #bind enum PM_direction DIR_NONE
  */
 
 enum e_PM_direction
@@ -345,7 +345,7 @@ struct s_PM_sp_lin_sys
  *         - NOTE: the TYPE member is used for a PD_cast and as such must be
  *         - "T *" if the data is of type T
  *
- * #bind derived C_array character-A SX_ARRAY_I PyObject NULL
+ * #bind struct C_array
  */
 
 struct s_C_array
@@ -364,7 +364,7 @@ struct s_PM_matrix
 
 /* PM_POLYGON - specify a 1d piecewise linear curve thru N space
  *
- * #bind derived PM_polygon character-A SX_POLYGON_I PyObject NULL
+ * #bind struct PM_polygon
  */
 
 struct s_PM_polygon
@@ -378,7 +378,7 @@ struct s_PM_polygon
  *       - depending on which members are NULL one is left with an
  *       - algebra, a ring, a group, etc
  *
- * #bind derived PM_field character-A SX_FIELD_I PyObject NULL
+ * #bind struct PM_field
  */
 
 struct s_PM_field
@@ -569,7 +569,7 @@ struct s_PM_mesh
  *               -                 - are the node indices
  *               - boundaries[0]   - a mimimal description for the nodes
  *
- * #bind derived PM_mesh_topology character-A SX_MESH_TOPOLOGY_I PyObject NULL
+ * #bind struct PM_mesh_topology
  */
 
 struct s_PM_mesh_topology
@@ -625,7 +625,7 @@ struct s_PM_mesh_topology
  *     - is a part of flat, singly connected Euclidean N space over the
  *     - field of reals (doubles) and has a logical mesh structure 
  *
- * #bind derived PM_set character-A SX_SET_I PyObject NULL
+ * #bind struct PM_set
  */
 
 struct s_PM_set
@@ -667,7 +667,7 @@ struct s_PM_map_info
 
 /* PM_MAPPING - describe mapping of domain set to range set
  *
- * #bind derived PM_mapping character-A SX_MAPPING_I PyObject NULL
+ * #bind struct PM_mapping
  */
 
 struct s_PM_mapping

@@ -49,6 +49,26 @@ static void scheme_type_name_list(char *typ, tns_list *na)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SCHEME_GET_TYPE - get the Scheme type name for TY from text TX */
+
+static void scheme_get_type(char *a, int nc, char *ty, char *tx)
+   {tns_list tl;
+
+    if (strcmp(ty, tykind[TK_ENUM]) == 0)
+       nstrncpy(a, nc, "SC_ENUM_I", -1);
+
+    else if (strcmp(ty, tykind[TK_STRUCT]) == 0)
+       {scheme_type_name_list(tx, &tl);
+	snprintf(a, nc, "SX_%s_I", tl.rnm);}
+
+    else
+       nstrncpy(a, nc, ty, -1);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CS_TYPE - return "Scheme" type corresponding to C type TY
  *         - to make SS_args call
  */
@@ -64,7 +84,7 @@ static void cs_type(char *a, int nc, farg *al, int drf)
 
     sty = lookup_type(NULL, ty, MODE_C, MODE_S);
     if (IS_NULL(sty) == FALSE)
-       nstrncpy(a, nc, sty, -1);
+       scheme_get_type(a, nc, sty, ty);
 
     else if (strcmp(ty, "void *") == 0)
        nstrncpy(a, nc, "SC_VOID_I", -1);
@@ -76,7 +96,7 @@ static void cs_type(char *a, int nc, farg *al, int drf)
        {deref(t, BFLRG, ty);
 	dty = lookup_type(NULL, t, MODE_C, MODE_S);
 	if (dty != NULL)
-	   nstrncpy(a, nc, dty, -1);
+	   scheme_get_type(a, nc, dty, t);
 	else
 	   nstrncpy(a, nc, "SC_POINTER_I", -1);}
 
@@ -518,7 +538,7 @@ static void scheme_enum_defs(FILE **fpa, char *dv, char **ta, char *pck)
 	    fprintf(fc, "\n");
 	    csep(fc);};}
 
-    else if (strcmp(ta[0], "enum") == 0)
+    else if (strcmp(ta[0], tykind[TK_ENUM]) == 0)
        {int i;
 	long vl;
 	char *vr;
