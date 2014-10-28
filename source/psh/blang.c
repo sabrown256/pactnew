@@ -18,6 +18,11 @@
 
 #define NF 3
 
+enum e_type_kind
+   {TK_PRIMITIVE = 0, TK_ENUM, TK_STRUCT};
+
+typedef enum e_type_kind type_kind;
+
 enum e_fparam
    {FP_ANY = 0,
     FP_VARARG,
@@ -118,6 +123,9 @@ static int
  MODE_S,
  MODE_P,
  MODE_B;
+
+static char
+ *tykind[3] = {"primitive", "enum", "struct"};
 
 static bindes
  gbd[N_MODES];
@@ -855,7 +863,9 @@ static int find_proto(fdecl *dcl, char **cpr, char *f)
 	        {pro = sp;
 		 break;};};};
 
-    if (strcmp(f, "derived") == 0)
+    if ((strcmp(f, "derived") == 0) ||
+	(strcmp(f, tykind[TK_ENUM]) == 0) ||
+	(strcmp(f, tykind[TK_STRUCT]) == 0))
        dcl = NULL;
 
     else if (pro == NULL)
@@ -1016,8 +1026,9 @@ void emit_enum_defs(bindes *bd,
 
 	for (ib = 0; ib < nbi; ib++)
 	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
-	     if ((strncmp(ps, "derived", 7) == 0) &&
-		 (strstr(ps, "SC_ENUM_I") != NULL))
+	     if ((strncmp(ps, tykind[TK_ENUM], 4) == 0) ||
+		 ((strncmp(ps, "derived", 7) == 0) &&
+		  (strstr(ps, "SC_ENUM_I") != NULL)))
 	        {te = strtok(ps, " ");
 		 te = strtok(NULL, " ");
 		 for (id = 0; cdv[id] != NULL; id++)
@@ -1059,8 +1070,9 @@ void emit_struct_defs(bindes *bd,
 
 	for (ib = 0; ib < nbi; ib++)
 	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
-	     if ((strncmp(ps, "derived", 7) == 0) &&
-		 (strstr(ps, "SC_ENUM_I") == NULL))
+	     if ((strncmp(ps, tykind[TK_STRUCT], 6) == 0) ||
+		 ((strncmp(ps, "derived", 7) == 0) &&
+		  (strstr(ps, "SC_ENUM_I") == NULL)))
 	        {te = strtok(ps, " \t");
 		 te = strtok(NULL, " \t");
 		 nc = strlen(te);
@@ -1227,18 +1239,34 @@ static void init_types(void)
 static void add_derived_types(char **sbi)
    {int ib;
     char s[BFLRG];
-    char *sb, **ta;
+    char *fty, *sty, *defv, *sb, **ta;
 
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
 	 if (blank_line(sb) == FALSE)
 	    {if (strncmp(sb, "derived ", 8) == 0)
-		 {nstrncpy(s, BFLRG, sb, -1);
-		  ta = tokenize(s, " \t", 0);
-		  if (ta != NULL)
-		     {add_type(ta[1], ta[2], ta[3], ta[4], ta[5]);
-		      FREE(ta[0]);
-		      FREE(ta);};};};};
+		{nstrncpy(s, BFLRG, sb, -1);
+		 ta   = tokenize(s, " \t", 0);
+		 fty  = ta[3];
+		 sty  = ta[4];
+		 defv = ta[5];}
+	     else if (strncmp(sb, "enum ", 5) == 0)
+	        {nstrncpy(s, BFLRG, sb, -1);
+		 ta   = tokenize(s, " \t", 0);
+		 fty  = tykind[TK_ENUM];
+		 sty  = tykind[TK_ENUM];
+		 defv = ta[2];}
+	     else if (strncmp(sb, "struct ", 7) == 0)
+	        {nstrncpy(s, BFLRG, sb, -1);
+		 ta   = tokenize(s, " \t", 0);
+		 fty  = tykind[TK_STRUCT];
+		 sty  = tykind[TK_STRUCT];
+		 defv = NULL;};
+	
+	     if (ta != NULL)
+	        {add_type(ta[1], ta[2], fty, sty, defv);
+		 FREE(ta[0]);
+		 FREE(ta);};};};
 
     return;}
 
@@ -1318,7 +1346,10 @@ static void find_bind(statedes *st)
 	        {nstrncpy(t, BFLRG, sb, -1);
 		 sa = tokenize(t, " \t", 0);
 
-		 if ((sa != NULL) && (strcmp(sa[0], "derived") != 0))
+		 if ((sa != NULL) &&
+		     (strcmp(sa[0], "derived") != 0) &&
+		     (strcmp(sa[0], tykind[TK_STRUCT]) != 0) &&
+		     (strcmp(sa[0], tykind[TK_ENUM]) != 0))
 		    {ta = NULL;
 		     for (i = 1; sa[i] != NULL; i++)
 		         {lng = sa[i];

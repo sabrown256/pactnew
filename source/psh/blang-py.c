@@ -180,23 +180,6 @@ static void python_enum_defs(FILE **fpa, char *dv, char **ta, char *pck)
 
     fc = fpa[0];
 
-/* syntax:
- *  To summarize adding enums to python, blang generates
- *  a function that adds the names to a dictionary.
- *  This function is then called by the module initialization instead
- *  of using the #include method that is being used with methods.
- *  
- *   if (PyModule_AddIntConstant(m, "TRUE", (long) TRUE) < 0)
- *      PY_MOD_RETURN_ERR;
- *
- * int blang_generated(PyObject *d)
- *    {if (PyDict_SetItemString(d, "enum", PyInt_FromLong(ENUM)) < 0)
- *        return(-1);
- *      ...
- *     return(0);}
- *
- */
-
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
 	   {fprintf(fc, "\n");
@@ -211,7 +194,7 @@ static void python_enum_defs(FILE **fpa, char *dv, char **ta, char *pck)
 	    fprintf(fc, "\n");
 	    csep(fc);};}
 
-    else if (strcmp(ta[0], "enum") == 0)
+    else if (strcmp(ta[0], tykind[TK_ENUM]) == 0)
        {int i;
 	long vl;
 	char *vr;
@@ -346,7 +329,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     csep(fc);
     fprintf(fc, "\n");
 
-/* member accessor methods */
+/* getter - member accessor methods */
     for (im = 1; ta[im] != NULL; im++)
         {pm = trim(ta[im], BOTH, " \t");
 	 if (IS_NULL(pm) == TRUE)
@@ -399,6 +382,89 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 csep(fc);
 	 csep(fc);
 	 fprintf(fc, "\n");};
+
+#if 0
+
+/* setter - member accessor methods */
+
+/* examples of setter methods
+ * 
+ * static int PY_PM_set_name_set(PY_PM_set *self, PyObject *value,
+ * 			       void *context)
+ *    {int rv;
+ * 
+ *     rv = -1;
+ * 
+ *     if (value == NULL)
+ *        PyErr_SetString(PyExc_TypeError,
+ * 		       "attribute deletion is not supported");
+ * 
+ *     else if (PyArg_Parse(value, "s", &self->pyo->name))
+ *        rv = 0;
+ * 
+ *     return(rv);}
+ * 
+ * static int PY_PG_graph_set_info(PY_PG_graph *self,
+ * 				PyObject *value, void *context)
+ *    {int rv;
+ * 
+ *     rv = -1;
+ * 
+ *     if (value == NULL)
+ *        PyErr_SetString(PyExc_TypeError,
+ * 		       "attribute deletion is not supported");
+ * 
+ *     else if (PP_assoc_extractor(value, &self->pyo->info) != 0)
+ *       {SC_mark(self->pyo->info, 1);
+ *        rv = 0;};
+ * 
+ *     return(rv);}
+ */
+
+    for (im = 1; ta[im] != NULL; im++)
+        {pm = trim(ta[im], BOTH, " \t");
+	 if (IS_NULL(pm) == TRUE)
+	    continue;
+
+	 parse_member(pm, mnm, mty, mdm, BFSML);
+
+	 fprintf(fc, "static int *%s_set_%s(%s *self,\n",
+		 tl.pnm, mnm, tl.pnm);
+         fprintf(fc, "                   PyObject *value, void *context)\n");
+	 fprintf(fc, "   {int rv, ok;\n");
+	 fprintf(fc, "\n");
+         fprintf(fc, "    rv = -1;\n");
+	 fprintf(fc, "\n");
+
+         fprintf(fc, "    if (value == NULL)\n");
+         fprintf(fc, "       PyErr_SetString(PyExc_TypeError,\n");
+         fprintf(fc, "                       \"attribute deletion is not supported\");\n");
+         fprintf(fc, "\n");
+         fprintf(fc, "    else\n");
+
+/* handle action for different types */
+         if (0)
+	    {fprintf(fc, "       {ok = PyArg_Parse(value, "s", &self->pyo->%s);\n", mnm);
+	     fprintf(fc, "        if (ok == TRUE)\n");
+	     fprintf(fc, "           rv = 0;};\n");}
+
+         else
+	    {fprintf(fc, "       {ok = PP_assoc_extractor(value, &self->pyo->info);\n");
+	     fprintf(fc, "        if (ok == TRUE)\n");
+	     fprintf(fc, "           {_PY_opt_%s(NULL, BIND_ARG, self->pyo);\n",
+		     tl.cnm);
+	     fprintf(fc, "            rv = 0;};};\n");}
+
+         fprintf(fc, "\n");
+
+	 fprintf(fc, "    return(rv);}\n");
+
+	 fprintf(fc, "\n");
+	 csep(fc);
+	 csep(fc);
+	 fprintf(fc, "\n");};
+
+#endif
 
 /* tp_init method */
 
@@ -470,45 +536,6 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
     fprintf(fc, "PyTypeObject %s_type;\n", tl.pnm);
     fprintf(fc, "\n");
-
-#if 0
-/* this has to be in the application specific code where
- * the additional method members may be set via #define'd constants
- */
-    fprintf(fc, "\n");
-    csep(fc);
-    csep(fc);
-    fprintf(fc, "\n");
-    fprintf(fc, "PY_DEF_TYPE(%s);\n", tl.cnm);
-
-    fprintf(fc, "\n");
-#endif
-
-#if 0
-/*--------------------------------------------------------------------------*/
-
-/*                              PM_SET_ROUTINES                             */
-
-/*--------------------------------------------------------------------------*/
-
-static int PY_PM_set_name_set(PY_PM_set *self, PyObject *value,
-			       void *context)
-   {int rv;
-
-    rv = -1;
-
-    if (value == NULL)
-       PyErr_SetString(PyExc_TypeError,
-		       "attribute deletion is not supported");
-
-    else if (PyArg_Parse(value, "s", &self->pyo->name))
-       rv = 0;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
 
     return;}
 
@@ -653,20 +680,16 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
     cfn = dcl->proto.name;
 
     snprintf(t, nc, " *_PY_%s", cfn);
-/*
-    int n;
-    char s[BFLRG];
-    n = strlen(t);
-    memset(s, ' ', n);
-    s[n] = '\0';
-*/
+
     pty = "PyObject";
     for (i = 0; i < na; i++)
         {al = dcl->al + i;
 	 ty = al->type;
 	 deref(dty, BFLRG, ty);
 	 lty = lookup_type(NULL, dty, MODE_C, MODE_P);
-	 if ((lty != NULL) && (strcmp(lty, "SC_ENUM_I") != 0))
+	 if ((lty != NULL) &&
+	     (strcmp(lty, "SC_ENUM_I") != 0) &&
+	     (strcmp(lty, tykind[TK_ENUM]) != 0))
 	    {pty = lty;
 	     snprintf(p, BFSML, "PY_%s", dty);
 	     pty = p;

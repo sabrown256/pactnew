@@ -117,19 +117,6 @@ int PY_init_pml_int(PyObject *m, PyObject *d)
 
     nerr = PY_init_pml(m, d);
 
-#if 0
-    PY_PM_set_type.tp_new   = PyType_GenericNew;
-    PY_PM_set_type.tp_alloc = PyType_GenericAlloc;
-    nerr += (PyType_Ready(&PY_PM_set_type) < 0);
-    nerr += (PyDict_SetItemString(d, "set", (PyObject *) &PY_PM_set_type) < 0);
-
-    PY_PM_mapping_type.tp_new   = PyType_GenericNew;
-    PY_PM_mapping_type.tp_alloc = PyType_GenericAlloc;
-    nerr += (PyType_Ready(&PY_PM_mapping_type) < 0);
-
-    nerr += (PyDict_SetItemString(d, "mapping", (PyObject *) &PY_PM_mapping_type) < 0);
-#endif
-
     return(nerr);}
 
 /*--------------------------------------------------------------------------*/

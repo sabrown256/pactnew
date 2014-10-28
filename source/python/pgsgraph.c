@@ -117,14 +117,14 @@ static PyObject *PY_PG_graph_get_info(PY_PG_graph *self, void *context)
 /* setter not generated */
 
 static int PY_PG_graph_set_info(PY_PG_graph *self,
-				     PyObject *value, void *context)
+				PyObject *value, void *context)
    {int rv;
 
     rv = -1;
 
     if (value == NULL)
        PyErr_SetString(PyExc_TypeError,
-                        "attribute deletion is not supported");
+		       "attribute deletion is not supported");
 
     else if (PP_assoc_extractor(value, &self->pyo->info) != 0)
       {SC_mark(self->pyo->info, 1);
