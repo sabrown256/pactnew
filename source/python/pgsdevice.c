@@ -335,7 +335,7 @@ static PyObject *PY_PG_device_draw_surface(PY_PG_device *self,
 				    &color, &style, &type,
 				    &name, &mesh_type,
 				    iarray_extractor, &cnnct,
-				    PP_assoc_extractor, &alist))
+				    PY_pcons_extractor, &alist))
        {r[0] = x;
 	r[1] = y;
 

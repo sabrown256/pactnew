@@ -234,9 +234,11 @@ struct s_SC_srcloc
     unsigned int line;};
     
 /* Pcons definition
- *    - useful for linked lists, association lists and whatnot
+ *    - useful for linked lists, association lists and what not
  *    - the type fields are for bookkeeping that may be crucial to
  *    - other packages
+ *
+ * #bind struct pcons
  */
 
 typedef struct s_pcons pcons;
@@ -247,7 +249,10 @@ struct s_pcons
     char *cdr_type;
     void *cdr;};
 
-/* QUATERNION - defined here so that it participates in type system */
+/* QUATERNION - defined here so that it participates in type system
+ *
+ * #bind struct quaternion
+ */
 
 typedef struct s_quaternion quaternion;
 

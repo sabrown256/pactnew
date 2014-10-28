@@ -538,14 +538,6 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
     PP_hashtab_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_hashtab_Type) < 0)
        PY_MOD_RETURN_ERR;
-    PP_assoc_Type.tp_new = PyType_GenericNew;
-    PP_assoc_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_assoc_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    PP_memdes_Type.tp_new = PyType_GenericNew;
-    PP_memdes_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_memdes_Type) < 0)
-       PY_MOD_RETURN_ERR;
     PP_PDBfile_Type.tp_new = PyType_GenericNew;
     PP_PDBfile_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_PDBfile_Type) < 0)
@@ -557,10 +549,6 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
     if (PyDict_SetItemString(d, "pdbdata", (PyObject *) &PP_pdbdata_Type) < 0)
        PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "hashtab", (PyObject *) &PP_hashtab_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "assoc", (PyObject *) &PP_assoc_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "memdes", (PyObject *) &PP_memdes_Type) < 0)
        PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "PDBfile", (PyObject *) &PP_PDBfile_Type) < 0)
        PY_MOD_RETURN_ERR;

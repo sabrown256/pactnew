@@ -221,12 +221,7 @@ extern PyObject
 /* PPASSOC.C declarations */
 
 extern int
- PP_assoc_extractor(PyObject *obj, void *ptr),
- PP_update_assoc(pcons **in, PyObject *dict);
-
-extern PyObject
- *PP_assoc_from_ptr(pcons *alist),
- *_PP_unpack_assoc(void *p, long nitems);
+ PY_pcons_extractor(PyObject *obj, void *ptr);
 
 
 /* PPDEFSTR.C declarations */
