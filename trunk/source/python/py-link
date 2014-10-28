@@ -146,8 +146,7 @@ else
 # remove PGS function - they do not belong with PDB module
    set lrmf = ""
    set lrmf = ( $lrmf scexe.o )
-   set lrmf = ( $lrmf pgsmodule.o pgsdevice.o pgsgraph.o pgsimage.o )
-   set lrmf = ( $lrmf pgspalette.o utilpgs.o )
+   set lrmf = ( $lrmf pypgs.o pgsmodule.o pgsdevice.o )
    set lrmf = ( $lrmf gp-pgs.o gp-panacea.o gp-scheme.o )
    flog $Log $RM $lrmf
    unset lrmf

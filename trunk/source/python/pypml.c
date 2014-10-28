@@ -25,6 +25,58 @@ int PY_init_pml_int(PyObject *m, PyObject *d)
 
 /*--------------------------------------------------------------------------*/
 
+/*                               FIELD ROUTINES                             */
+
+/*--------------------------------------------------------------------------*/
+
+static int PY_PM_field_tp_init(PY_PM_field *self,
+			       PyObject *args, PyObject *kwds)
+   {
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static char PY_PM_field_doc[] = "";
+
+PY_DEF_TYPE(PM_field);
+
+/*--------------------------------------------------------------------------*/
+
+/*                           MESH_TOPOLOGY ROUTINES                         */
+
+/*--------------------------------------------------------------------------*/
+
+static int PY_PM_mesh_topology_tp_init(PY_PM_mesh_topology *self,
+				       PyObject *args, PyObject *kwds)
+   {int nd, rv;
+    int *bnp, *bnc;
+    long **bnd;
+    char *kw_list[] = {"nd", "bnp", "bnc", "bnd", NULL};
+
+    rv = -1;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "iO&O&O&:make_topology", kw_list,
+				    &nd,
+				    iarray_extractor, &bnp,
+				    iarray_extractor, &bnc,
+				    pplong_extractor, &bnd))
+       {self->pyo = PM_make_topology(nd, bnp, bnc, bnd);
+	rv        = 0;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static char PY_PM_mesh_topology_doc[] = "";
+
+PY_DEF_TYPE(PM_mesh_topology);
+
+/*--------------------------------------------------------------------------*/
+
 /*                              PM_SET_ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/

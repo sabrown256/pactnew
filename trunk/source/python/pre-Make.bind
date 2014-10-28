@@ -70,17 +70,16 @@ Hdrs = py_int.h pdbmodule.h pdbrw.h pgsmodule.h  \
        pputil.h ppcommon.h utilpgs.h
 
 OPPO  = pyscore.o pputil.o pptypes.o pparrays.o \
-        ppdefstr.o pphashtab.o pphasharr.o ppassoc.o \
+        ppdefstr.o pphashtab.o ppassoc.o \
         pppdbr.o pypdbr.o pypdbl.o \
-        pypdbd.o struct.o pppml.o
+        pypdbd.o struct.o
 
-OPMLO = pypml.o pmlfield.o pmltopology.o
+OPMLO = pypml.o
 
 OPDBO = pdbmodule.o pdbPDBfile.o pdbmemdes.o \
         pdbdefstr.o pdbpdbdata.o pdbhashtab.o
 
-OPGSO = pgsmodule.o pgsdevice.o pgsgraph.o \
-        pgsimage.o pgspalette.o utilpgs.o
+OPGSO = pypgs.o pgsmodule.o pgsdevice.o
 
 OPDB = ${OPDBO} ${OPMLO} ${OPPO}
 OPGS = ${OPDBO} ${OPMLO} ${OPPO} ${OPGSO}
@@ -101,20 +100,18 @@ gpa = ${TGTLib}(gp-score.o) ${TGTLib}(gp-pml.o) ${TGTLib}(gp-pdb.o)   \
 ArPPO  = ${TGTLib}(pyscore.o) ${TGTLib}(pputil.o) \
          ${TGTLib}(pptypes.o) ${TGTLib}(pparrays.o) \
          ${TGTLib}(ppdefstr.o) ${TGTLib}(ppassoc.o) \
-         ${TGTLib}(pphashtab.o) ${TGTLib}(pphasharr.o) \
+         ${TGTLib}(pphashtab.o) \
          ${TGTLib}(pppdbr.o) ${TGTLib}(pypdbr.o) ${TGTLib}(pypdbl.o) \
-         ${TGTLib}(pypdbd.o) ${TGTLib}(struct.o) ${TGTLib}(pppml.o)
+         ${TGTLib}(pypdbd.o) ${TGTLib}(struct.o)
 
-ArPMLO = ${TGTLib}(pypml.o) ${TGTLib}(pmlfield.o) \
-         ${TGTLib}(pmltopology.o)
+ArPMLO = ${TGTLib}(pypml.o)
 
 ArPDBO = ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbPDBfile.o) \
          ${TGTLib}(pdbmemdes.o) \
          ${TGTLib}(pdbdefstr.o) ${TGTLib}(pdbpdbdata.o) \
          ${TGTLib}(pdbhashtab.o)
 
-ArPGSO = ${TGTLib}(pgsmodule.o) ${TGTLib}(pgsdevice.o) ${TGTLib}(pgsgraph.o) \
-         ${TGTLib}(pgsimage.o) ${TGTLib}(pgspalette.o) ${TGTLib}(utilpgs.o)
+ArPGSO = ${TGTLib}(pypgs.o) ${TGTLib}(pgsmodule.o) ${TGTLib}(pgsdevice.o)
 
 ArObjs = ${ArPPO} ${ArPMLO} ${ArPDBO} ${ArPGSO} ${gpa}
 
