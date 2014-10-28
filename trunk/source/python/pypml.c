@@ -13,6 +13,22 @@ char
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PY_INIT_PML_INT - interim initializations for PML bindings */
+
+int PY_init_pml_int(PyObject *m, PyObject *d)
+   {int nerr;
+    extern int PY_init_pml(PyObject *m, PyObject *d);
+
+    nerr = PY_init_pml(m, d);
+
+    return(nerr);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                              PM_SET_ROUTINES                             */
+
+/*--------------------------------------------------------------------------*/
+
 /* _PY_OPT_PM_SET - handle BLANG binding related operations */
 
 void *_PY_opt_PM_set(PM_set *x, bind_opt wh, void *a)
@@ -33,27 +49,25 @@ void *_PY_opt_PM_set(PM_set *x, bind_opt wh, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PY_OPT_PM_MAPPING - handle BLANG binding related operations */
+static int PY_PM_set_name_set(PY_PM_set *self, PyObject *value,
+			      void *context)
+   {int rv;
 
-void *_PY_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
-   {void *rv;
+    rv = -1;
 
-    rv = NULL;
-    switch (wh)
-       {case BIND_ARG :
-        case BIND_LABEL :
-        case BIND_PRINT :
-        case BIND_FREE :
-        case BIND_ALLOC :
-	default:
-	     break;};
+    if (value == NULL)
+       PyErr_SetString(PyExc_TypeError,
+		       "attribute deletion is not supported");
+
+    else if (PyArg_Parse(value, "s", &self->pyo->name))
+       rv = 0;
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_make_set_1d - */
+/* PP_MAKE_SET_1D - */
 
 PyObject *PP_make_set_1d(PyObject *self, PyObject *args, PyObject *kwds)
    {int cp, nd, max, nde;
@@ -79,7 +93,7 @@ PyObject *PP_make_set_1d(PyObject *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_make_ac_set - */
+/* PP_MAKE_AC_SET - */
 
 PyObject *PP_make_ac_set(PyObject *self, PyObject *args, PyObject *kwds)
    {int cp, nde;
@@ -109,41 +123,89 @@ PyObject *PP_make_ac_set(PyObject *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PY_INIT_PML_INT - interim initializations for PML bindings */
+#if 0
 
-int PY_init_pml_int(PyObject *m, PyObject *d)
-   {int nerr;
-    extern int PY_init_pml(PyObject *m, PyObject *d);
+/* GOTCHA: example of a getset with setter method */
 
-    nerr = PY_init_pml(m, d);
+static PyGetSetDef PY_PM_set_getset[] = {
 
-    return(nerr);}
+    {"name", (getter) PY_PM_set_get_name, (setter) PY_PM_set_set_name, PY_PM_set_doc_name, NULL},
 
-/*--------------------------------------------------------------------------*/
+    {NULL}};
 
-/*                              PM_SET_ROUTINES                             */
+#endif
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-static int PY_PM_set_name_set(PY_PM_set *self, PyObject *value,
-			      void *context)
-   {int rv;
+static int PY_PM_set_tp_init(PY_PM_set *self, PyObject *args, PyObject *kwds)
+   {int cp, nd, nde, rv;
+    int *maxes;
+    long ne;
+    char *name, *type, *symtype, *toptype, *inftype;
+    void *elem, *sym, *top, *inf;
+    double *metric;
+    PM_field *opers;
+    PM_set *next;
+    PY_PM_field *opersobj;
+    PY_PM_set *nextobj;
+    char *kw_list[] = {"name", "type", "cp", "ne", "nd",
+		       "nde", "maxes", "elem", "opers",
+		       "metric", "symtype", "sym",
+		       "toptype", "top", "inftype", "inf",
+		       "next", NULL};
 
     rv = -1;
 
-    if (value == NULL)
-       PyErr_SetString(PyExc_TypeError,
-		       "attribute deletion is not supported");
-
-    else if (PyArg_Parse(value, "s", &self->pyo->name))
-       rv = 0;
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "ssiliiO&zO!O&szszszO!:make_set", kw_list,
+				    &name, &type, &cp, &ne, &nd, &nde,
+				    iarray_extractor, &maxes, &elem,
+				    &PY_PM_field_type, &opersobj,
+				    REAL_array_extractor, &metric,
+				    &symtype, &sym, &toptype, &top,
+				    &inftype, &inf,
+				    &PY_PM_set_type, &nextobj))
+       {rv = 0;
+	opers = opersobj->pyo;
+	next  = nextobj->pyo;
+	self->pyo = PM_mk_set(name, type, cp, ne, nd, nde, maxes, elem,
+			      opers, metric, symtype, sym, toptype, top,
+			      inftype, inf, next);};
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static char PY_PM_set_doc[] = "";
+
+PY_DEF_TYPE(PM_set);
 
 /*--------------------------------------------------------------------------*/
 
 /*                            PM_MAPPING_ROUTINES                           */
 
+/*--------------------------------------------------------------------------*/
+
+/* _PY_OPT_PM_MAPPING - handle BLANG binding related operations */
+
+void *_PY_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PY_MAPPING_EXTRACTOR - extract a mapping from an object */
@@ -169,6 +231,43 @@ int _PY_mapping_extractor(PyObject *obj, void *arg)
        rv = FALSE;
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int PY_PM_mapping_tp_init(PY_PM_mapping *self, PyObject *args,
+				 PyObject *kwds)
+   {int centering, rv;
+    char *name, *cat;
+    PM_set *domain, *range;
+    PM_mapping *next;
+    PY_PM_set *domainobj, *rangeobj;
+    char *kw_list[] = {"name", "cat", "domain", "range",
+	               "centering", "next", NULL};
+
+    rv = -1;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "ssO!O!iO&:make_mapping", kw_list,
+				    &name, &cat,
+				    &PY_PM_set_type, &domainobj,
+				    &PY_PM_set_type, &rangeobj,
+				    &centering,
+				    _PY_mapping_extractor, &next))
+       {rv        = 0;
+	domain    = domainobj->pyo;
+	range     = rangeobj->pyo;
+	self->pyo = PM_make_mapping(name, cat, domain, range,
+				    centering, next);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static char PY_PM_mapping_doc[] = "";
+
+PY_DEF_TYPE(PM_mapping);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
