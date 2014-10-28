@@ -1,221 +1,69 @@
-/*--------------------------------------------------------------------------*/
-
-/* This is generated code.
- * Any edits must be made between the splicer.begin and splicer.end blocks.
- * All other edits will be lost.
- * Once a block is edited remove the 'UNMODIFIED' on the splicer.begin comment
- * to allow the block to be preserved when it is regenerated.
- */
 /*
  * Source Version: 9.0
  * Software Release: LLNL-CODE-422942
  *
  * include cpyright.h
  */
-/*--------------------------------------------------------------------------*/
+
+#define PY_DEF_DESTRUCTOR	    PY_memdes_tp_dealloc
+
 #include "pdbmodule.h"
 
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.C_definition) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.memdes.C_definition) */
-
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PP_memdes_desc__doc__[] =
-""
-;
+PY_memdes *PP_memdes_newobj(PY_memdes *obj, memdes *desc)
+   {
 
-static PyObject *
-PP_memdes_desc_get(PP_memdesObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc_get) UNMODIFIED */
-    return PY_COBJ_VOID_PTR((void *) self->desc, NULL);
-/* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc_get) */
-}
+    if (obj == NULL)
+       {obj = (PY_memdes *) PyType_GenericAlloc(&PY_memdes_type, 0);
+        if (obj == NULL)
+	   return NULL;};
 
-/*--------------------------------------------------------------------------*/
+    obj->pyo = desc;
+    SC_mark(desc, 1);
 
-static char PP_memdes_desc_member__doc__[] =
-""
-;
-
-static PyObject *
-PP_memdes_desc_member_get(PP_memdesObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.member_get) UNMODIFIED */
-    return Py_BuildValue("s", self->desc->member);
-/* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.member_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_memdes_desc_cast_memb__doc__[] =
-""
-;
-
-static PyObject *
-PP_memdes_desc_cast_memb_get(PP_memdesObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.cast_memb_get) UNMODIFIED */
-    return Py_BuildValue("s", self->desc->cast_memb);
-/* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.cast_memb_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_memdes_desc_cast_offs__doc__[] =
-""
-;
-
-static PyObject *
-PP_memdes_desc_cast_offs_get(PP_memdesObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.cast_offs_get) UNMODIFIED */
-    return PY_INT_LONG(self->desc->cast_offs);
-/* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.cast_offs_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_memdes_desc_is_indirect__doc__[] =
-""
-;
-
-static PyObject *
-PP_memdes_desc_is_indirect_get(PP_memdesObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.is_indirect_get) */
-#if PYTHON_API_VERSION < 1012
-    return PY_INT_LONG(self->desc->is_indirect);
-#else
-    return PyBool_FromLong((long) self->desc->is_indirect);
-#endif
-/* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.is_indirect_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_memdes_desc_type__doc__[] =
-""
-;
-
-static PyObject *
-PP_memdes_desc_type_get(PP_memdesObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.type_get) UNMODIFIED */
-    return Py_BuildValue("s", self->desc->type);
-/* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.type_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_memdes_desc_base_type__doc__[] =
-""
-;
-
-static PyObject *
-PP_memdes_desc_base_type_get(PP_memdesObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.base_type_get) UNMODIFIED */
-    return Py_BuildValue("s", self->desc->base_type);
-/* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.base_type_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_memdes_desc_name__doc__[] =
-""
-;
-
-static PyObject *
-PP_memdes_desc_name_get(PP_memdesObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.name_get) UNMODIFIED */
-    return Py_BuildValue("s", self->desc->name);
-/* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.name_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_memdes_desc_number__doc__[] =
-""
-;
-
-static PyObject *
-PP_memdes_desc_number_get(PP_memdesObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.descriptor.desc.number_get) UNMODIFIED */
-    return PY_INT_LONG(self->desc->number);
-/* DO-NOT-DELETE splicer.end(pdb.memdes.descriptor.desc.number_get) */
-}
+    return obj;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.extra_members) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.memdes.extra_members) */
+static void PY_memdes_tp_dealloc(PY_memdes *self)
+   {struct _typeobject *ot;
 
-static PyGetSetDef PP_memdes_getset[] = {
-    {"desc", (getter) PP_memdes_desc_get, NULL, PP_memdes_desc__doc__, NULL},
-    {"member", (getter) PP_memdes_desc_member_get, NULL, PP_memdes_desc_member__doc__, NULL},
-    {"cast_memb", (getter) PP_memdes_desc_cast_memb_get, NULL, PP_memdes_desc_cast_memb__doc__, NULL},
-    {"cast_offs", (getter) PP_memdes_desc_cast_offs_get, NULL, PP_memdes_desc_cast_offs__doc__, NULL},
-    {"is_indirect", (getter) PP_memdes_desc_is_indirect_get, NULL, PP_memdes_desc_is_indirect__doc__, NULL},
-    {"type", (getter) PP_memdes_desc_type_get, NULL, PP_memdes_desc_type__doc__, NULL},
-    {"base_type", (getter) PP_memdes_desc_base_type_get, NULL, PP_memdes_desc_base_type__doc__, NULL},
-    {"name", (getter) PP_memdes_desc_name_get, NULL, PP_memdes_desc_name__doc__, NULL},
-    {"number", (getter) PP_memdes_desc_number_get, NULL, PP_memdes_desc_number__doc__, NULL},
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.extra_getset) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.memdes.extra_getset) */
-    {NULL}     /* Sentinel */
-};
+    _PD_rl_descriptor(self->pyo);
+
+    ot = PY_TYPE(self);
+    if (ot->tp_free != NULL)
+       ot->tp_free(ot);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
-
-static void
-PP_memdes_tp_dealloc(PP_memdesObject *self)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.as_type.dealloc) */
-    _PD_rl_descriptor(self->desc);
-    PY_TYPE(self)->tp_free((PyObject*)self);
-/* DO-NOT-DELETE splicer.end(pdb.memdes.as_type.dealloc) */
-}
-
-static int
-PP_memdes_tp_init(PP_memdesObject *self, PyObject *args, PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.as_type.init) */
-    return 0;
-/* DO-NOT-DELETE splicer.end(pdb.memdes.as_type.init) */
-}
 /*--------------------------------------------------------------------------*/
 
-/* PP_memdes_Check - */
+static int PY_memdes_tp_init(PY_memdes *self, PyObject *args, PyObject *kwds)
+   {
 
-/* static */ int
-PP_memdes_Check(PyObject *op)
-{
-    if (PyObject_TypeCheck(op, &PP_memdes_Type))
-        return 1;
-    else
-        return 0;
-/*  return PY_TYPE(op) == &PP_memdes_Type; */
-}
+    return 0;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
+static char PY_memdes_doc[] = "";
 
-static char PP_memdes_Type__doc__[] = 
-""
-;
+PY_DEF_TYPE(memdes);
+
+#if 0
 
 /* static */
-PyTypeObject PP_memdes_Type = {
+PyTypeObject PY_memdes_type = {
         PY_HEAD_INIT(&PyType_Type, 0)
         "memdes",                       /* tp_name */
-        sizeof(PP_memdesObject),         /* tp_basicsize */
+        sizeof(PY_memdes),         /* tp_basicsize */
         0,                              /* tp_itemsize */
         /* Methods to implement standard operations */
-        (destructor)PP_memdes_tp_dealloc, /* tp_dealloc */
+        (destructor)PY_memdes_tp_dealloc, /* tp_dealloc */
         (printfunc)0,                   /* tp_print */
         (getattrfunc)0,                 /* tp_getattr */
         (setattrfunc)0,                 /* tp_setattr */
@@ -235,7 +83,7 @@ PyTypeObject PP_memdes_Type = {
         0,                              /* tp_as_buffer */
         /* Flags to define presence of optional/expanded features */
         Py_TPFLAGS_DEFAULT,             /* tp_flags */
-        PP_memdes_Type__doc__,          /* tp_doc */
+        PY_memdes_type_doc,          /* tp_doc */
         /* Assigned meaning in release 2.0 */
         /* call function for all accessible objects */
         (traverseproc)0,                /* tp_traverse */
@@ -253,13 +101,13 @@ PyTypeObject PP_memdes_Type = {
         /* Attribute descriptor and subclassing stuff */
         0,                              /* tp_methods */
         0,                              /* tp_members */
-        PP_memdes_getset,               /* tp_getset */
+        PY_memdes_getset,               /* tp_getset */
         0,                              /* tp_base */
         0,                              /* tp_dict */
         (descrgetfunc)0,                /* tp_descr_get */
         (descrsetfunc)0,                /* tp_descr_set */
         0,                              /* tp_dictoffset */
-        (initproc)PP_memdes_tp_init,    /* tp_init */
+        (initproc)PY_memdes_tp_init,    /* tp_init */
         (allocfunc)0,                   /* tp_alloc */
         (newfunc)0,                     /* tp_new */
 #if PYTHON_API_VERSION >= 1012
@@ -278,25 +126,7 @@ PyTypeObject PP_memdes_Type = {
 #endif
 };
 
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.extra) */
+#endif
 
-PP_memdesObject *PP_memdes_newobj(PP_memdesObject *obj, memdes *desc)
-{
-    if (obj == NULL) {
-        obj = (PP_memdesObject *) PyType_GenericAlloc(&PP_memdes_Type, 0);
-        if (obj == NULL) {
-            return NULL;
-        }
-    }
-
-    obj->desc = desc;
-    SC_mark(desc, 1);
-
-    return obj;
-}
-
-/* DO-NOT-DELETE splicer.end(pdb.memdes.extra) */
-/* End of code for memdes objects */
 /*--------------------------------------------------------------------------*/
-/*                               OBJECT_TAIL                                */
 /*--------------------------------------------------------------------------*/

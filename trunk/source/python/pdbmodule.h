@@ -111,54 +111,6 @@ extern PyTypeObject PP_hashtab_Type;
 /* DO-NOT-DELETE splicer.end(pdb.hashtab.C_declaration) */
 
 /*--------------------------------------------------------------------------*/
-/*                               OBJECT assoc                               */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_assoc_Check(op)    (PY_TYPE(op) == &PP_assoc_Type) */
-
-typedef struct s_PP_assocObject *PP_assocObjectp;
-
-typedef struct s_PP_assocObject {
-  PyObject_HEAD
-  pcons *alist;
-/* DO-NOT-DELETE splicer.begin(pdb.assoc.extra_object) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.assoc.extra_object) */
-} PP_assocObject;
-
-/* staticforward PyTypeObject PP_assoc_Type;*/
-extern PyTypeObject PP_assoc_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.begin(pdb.assoc.C_declaration) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.assoc.C_declaration) */
-
-/*--------------------------------------------------------------------------*/
-/*                              OBJECT memdes                               */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_memdes_Check(op)    (PY_TYPE(op) == &PP_memdes_Type) */
-
-typedef struct s_PP_memdesObject *PP_memdesObjectp;
-
-typedef struct s_PP_memdesObject {
-  PyObject_HEAD
-  memdes *desc;
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.extra_object) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.memdes.extra_object) */
-} PP_memdesObject;
-
-/* staticforward PyTypeObject PP_memdes_Type;*/
-extern PyTypeObject PP_memdes_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.begin(pdb.memdes.C_declaration) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.memdes.C_declaration) */
-
-/*--------------------------------------------------------------------------*/
 /*                              OBJECT PDBfile                              */
 /*--------------------------------------------------------------------------*/
 
@@ -186,7 +138,7 @@ extern PyTypeObject PP_PDBfile_Type;
 extern PP_PDBfileObject *PP_vif_obj;
 extern PyObject *PP_open_file_dict;
 
-PP_memdesObject *PP_memdes_newobj(PP_memdesObject *obj, memdes *desc);
+PY_memdes *PP_memdes_newobj(PY_memdes *obj, memdes *desc);
 
 PP_defstrObject *PP_defstr_newobj(PP_defstrObject *obj, defstr *dp,
                                   PP_file *fileinfo);

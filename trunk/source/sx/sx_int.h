@@ -448,6 +448,8 @@ extern object
 
 extern void
  *_SX_opt_C_array(C_array *x, bind_opt wh, void *a),
+ *_SX_opt_pcons(pcons *x, bind_opt wh, void *a),
+ *_SX_opt_quaternion(quaternion *x, bind_opt wh, void *a),
  *_SX_opt_PM_polygon(PM_polygon *x, bind_opt wh, void *a),
  *_SX_opt_PM_field(PM_field *x, bind_opt wh, void *a),
  *_SX_opt_PM_set(PM_set *x, bind_opt wh, void *a),

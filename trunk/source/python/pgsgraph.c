@@ -32,13 +32,13 @@ PyObject *PY_set_line_info(PyObject *self, PyObject *args, PyObject *kwds)
 
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "O&iiiiiiid:set_line_info", kw_list,
-				    PP_assoc_extractor,
+				    PY_pcons_extractor,
 				    &info, &type, &axis_type, &style,
 				    &scatter, &marker, &color,
 				    &start, &width))
        {result = PG_set_line_info(info, type, axis_type, style,
 				  scatter, marker, color, start, width);
-	rv     = PP_assoc_from_ptr(result);};
+	rv     = PY_pcons_from_ptr(result);};
 
    return(rv);}
 
@@ -60,14 +60,14 @@ PyObject *PY_set_tds_info(PyObject *self, PyObject *args, PyObject *kwds)
 
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "O&iiiiidddddd:set_tds_info", kw_list,
-				    PP_assoc_extractor, &info, &type,
+				    PY_pcons_extractor, &info, &type,
 				    &axis_type, &style, &color,
 				    &nlev, &ratio, &width,
 				    &theta, &phi, &chi, &d))
        {result = PG_set_tds_info(info, type, axis_type,
 				 style, color, nlev, ratio, width,
 				 theta, phi, chi, d);
-	rv     = PP_assoc_from_ptr(result);};
+	rv     = PY_pcons_from_ptr(result);};
 
     return(rv);}
 
@@ -88,11 +88,11 @@ PyObject *PY_set_tdv_info(PyObject *self, PyObject *args, PyObject *kwds)
 
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "O&iiiid:set_tdv_info", kw_list,
-				    PP_assoc_extractor, &info, &type,
+				    PY_pcons_extractor, &info, &type,
 				    &axis_type, &style, &color, &width))
        {result = PG_set_tdv_info(info, type, axis_type,
 				 style, color, width);
-	rv     = PP_assoc_from_ptr(result);};
+	rv     = PY_pcons_from_ptr(result);};
 
     return(rv);}
 
@@ -107,7 +107,7 @@ PyObject *PY_set_tdv_info(PyObject *self, PyObject *args, PyObject *kwds)
 static PyObject *PY_PG_graph_get_info(PY_PG_graph *self, void *context)
    {PyObject *rv;
 
-    rv = PP_assoc_from_ptr(self->pyo->info);
+    rv = PY_pcons_from_ptr(self->pyo->info);
 
     return(rv);}
 
@@ -126,7 +126,7 @@ static int PY_PG_graph_set_info(PY_PG_graph *self,
        PyErr_SetString(PyExc_TypeError,
 		       "attribute deletion is not supported");
 
-    else if (PP_assoc_extractor(value, &self->pyo->info) != 0)
+    else if (PY_pcons_extractor(value, &self->pyo->info) != 0)
       {SC_mark(self->pyo->info, 1);
        rv = 0;};
 
