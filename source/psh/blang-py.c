@@ -239,6 +239,9 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
     fprintf(fh, "\n");
     fprintf(fh, "struct s_%s\n", tl.pnm);
     fprintf(fh, "   {PyObject_HEAD\n");
+    fprintf(fh, "#ifdef PY_EXT_%s\n", tl.rnm);
+    fprintf(fh, "    PY_EXT_%s\n", tl.rnm);
+    fprintf(fh, "#endif\n");
     fprintf(fh, "    %s *pyo;};\n", tl.cnm);
     fprintf(fh, "\n");
 
