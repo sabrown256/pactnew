@@ -30,7 +30,6 @@ char
  PP_arrtype_doc[] = "",
  PP_pause_doc[] = "";
 
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -970,20 +969,20 @@ int PP_update_hasharr(hasharr *tab, PyObject *dict)
 /*--------------------------------------------------------------------------*/
 
 PY_hasharr *PY_hasharr_newobj(PY_hasharr *obj, hasharr *tab)
-   {PP_defstrObject *dpobj;
+   {PY_defstr *dpobj;
     
     if (obj == NULL)
        {obj = (PY_hasharr *) PyType_GenericAlloc(&PY_hasharr_type, 0);
         if (obj == NULL)
 	   return(NULL);};
 
-    dpobj = _PP_defstr_find_singleton("HASHARR", NULL, PP_vif_info);
+    dpobj = _PY_defstr_find_singleton("HASHARR", NULL, PP_vif_info);
     if (dpobj == NULL)
        return(NULL);
 
     obj = (PY_hasharr *) PP_pdbdata_newobj((PP_pdbdataObject *) obj,
-					   tab, dpobj->dp->type, 1L, NULL,
-					   dpobj->dp, dpobj->fileinfo,
+					   tab, dpobj->pyo->type, 1L, NULL,
+					   dpobj->pyo, dpobj->fileinfo,
 					   dpobj, NULL);
 
     return(obj);}

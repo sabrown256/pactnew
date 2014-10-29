@@ -70,14 +70,14 @@ Hdrs = py_int.h pdbmodule.h pdbrw.h pgsmodule.h  \
        pputil.h ppcommon.h utilpgs.h
 
 OPPO  = pyscore.o pputil.o pptypes.o pparrays.o \
-        ppdefstr.o pphashtab.o ppassoc.o \
+        pphashtab.o ppassoc.o \
         pppdbr.o pypdbr.o pypdbl.o \
         pypdbd.o struct.o
 
 OPMLO = pypml.o
 
 OPDBO = pdbmodule.o pdbPDBfile.o pdbmemdes.o \
-        pdbdefstr.o pdbpdbdata.o pdbhashtab.o
+        pdbpdbdata.o pdbhashtab.o
 
 OPGSO = pypgs.o pgsmodule.o pgsdevice.o
 
@@ -99,8 +99,7 @@ gpa = ${TGTLib}(gp-score.o) ${TGTLib}(gp-pml.o) ${TGTLib}(gp-pdb.o)   \
 
 ArPPO  = ${TGTLib}(pyscore.o) ${TGTLib}(pputil.o) \
          ${TGTLib}(pptypes.o) ${TGTLib}(pparrays.o) \
-         ${TGTLib}(ppdefstr.o) ${TGTLib}(ppassoc.o) \
-         ${TGTLib}(pphashtab.o) \
+         ${TGTLib}(ppassoc.o) ${TGTLib}(pphashtab.o) \
          ${TGTLib}(pppdbr.o) ${TGTLib}(pypdbr.o) ${TGTLib}(pypdbl.o) \
          ${TGTLib}(pypdbd.o) ${TGTLib}(struct.o)
 

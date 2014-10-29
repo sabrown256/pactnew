@@ -65,7 +65,7 @@ typedef enum e_PP_object_kind PP_object_kind;
     dimdes *dims;      \
     defstr *dp;        \
     PP_file *fileinfo; \
-    PP_defstrObject *dpobj; \
+    PY_defstr *dpobj; \
     PyObject *parent;
 
 /*--------------------------------------------------------------------------*/
@@ -196,12 +196,6 @@ extern int
  PP_PDBfile_Check(PyObject *op);
 
 
-/* PDBDEFSTR.C declarations */
-
-extern int
- PP_defstr_Check(PyObject *op);
-
-
 /* PPARRAYS.C declarations */
 
 extern void
@@ -222,24 +216,6 @@ extern PyObject
 
 extern int
  PY_pcons_extractor(PyObject *obj, void *ptr);
-
-
-/* PPDEFSTR.C declarations */
-
-extern void
- _PP_defstr_entry(PP_file *fileinfo),
- _PP_create_defstr_tab(void),
- _PP_cleanup_defstrs(PDBfile *fp);
-
-extern int
- PP_defstr_dict(defstr *dp, PyObject *dict);
-
-extern defstr
- *PP_defstr_alt(PDBfile *file, char *name, PyObject *members);
-
-extern PyObject
- *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
-			 char *name, long nitems, PyObject *parent);
 
 
 /* PPhasharr.C declarations */
@@ -335,7 +311,6 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type);
 /* PPUTIL.C declarations */
 
 extern void
- PP_defstr_rem(char *name, PDBfile *file),
  _PP_Py_decref(PyObject *obj),
  PP_free(void *p),
  PP_error_set(PyObject *errobj, PyObject *obj, char *fmt, ...),

@@ -57,7 +57,7 @@ PP_getdefstr(
   PyObject *kwds)
 {
     PP_pdbdataObject *obj;
-    PP_defstrObject *rv;
+    PY_defstr *rv;
     char *kw_list[] = {"obj", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:getdefstr", kw_list,
@@ -526,9 +526,9 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
     if (ne > 0)
        PY_MOD_RETURN_ERR;
 
-    PP_defstr_Type.tp_new = PyType_GenericNew;
-    PP_defstr_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_defstr_Type) < 0)
+    PY_defstr_type.tp_new = PyType_GenericNew;
+    PY_defstr_type.tp_alloc = PyType_GenericAlloc;
+    if (PyType_Ready(&PY_defstr_type) < 0)
        PY_MOD_RETURN_ERR;
     PP_pdbdata_Type.tp_new = PyType_GenericNew;
     PP_pdbdata_Type.tp_alloc = PyType_GenericAlloc;
@@ -544,7 +544,7 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
        PY_MOD_RETURN_ERR;
 
 /* add some symbolic constants to the module */
-    if (PyDict_SetItemString(d, "defstr", (PyObject *) &PP_defstr_Type) < 0)
+    if (PyDict_SetItemString(d, "defstr", (PyObject *) &PY_defstr_type) < 0)
        PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "pdbdata", (PyObject *) &PP_pdbdata_Type) < 0)
        PY_MOD_RETURN_ERR;

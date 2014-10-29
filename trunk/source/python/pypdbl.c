@@ -890,7 +890,7 @@ PyObject *_PP_wr_syment(PP_file *fileinfo,
         obj = PP_pdbdata_newobj(NULL, vr, type, nitems, dims, PP_pdbdataObject *obj,
                                 void *vr, char *type, long nitems,
                                 dimdes *dims, defstr *dp, PP_file *fileinfo,
-                                PP_defstrObject *dpobj, PyObject *parent);
+                                PY_defstr *dpobj, PyObject *parent);
     }
 #endif
     

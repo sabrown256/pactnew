@@ -60,14 +60,14 @@ static int _PP_extra_defstr_delete(haelem *hp, void *arg)
 
     if (SC_safe_to_free(dp)) {
         char *name = CSTRSAVE(dp->type);
-        PP_defstr_rem(name, fp);
+        PY_defstr_rem(name, fp);
         CFREE(name);
     }
 #if 0
     int dorm;
     if (SC_safe_to_free(dp)) {
         char *name = CSTRSAVE(dp->type);
-        PP_defstr_rem(name, fp);
+        PY_defstr_rem(name, fp);
         CFREE(name);
     } else {
         /* Do nothing, don't even change the refcount
@@ -347,7 +347,7 @@ PP_PDBfile_defstr(PP_PDBfileObject *self,
     char *kw_list[] = {"name", "members", NULL};
     PyObject *members;
     PDBfile *fp;
-    PP_defstrObject *rv;
+    PY_defstr *rv;
 
     fp = self->object;
     if (fp == NULL) {
@@ -361,9 +361,9 @@ PP_PDBfile_defstr(PP_PDBfileObject *self,
         return NULL;
 
     if (members == NULL) {
-        rv = _PP_defstr_find_singleton(name, NULL, self->fileinfo);
+        rv = _PY_defstr_find_singleton(name, NULL, self->fileinfo);
     } else {
-        rv = _PP_defstr_make_singleton(NULL, name, members, self->fileinfo);
+        rv = _PY_defstr_make_singleton(NULL, name, members, self->fileinfo);
     }
     if (rv == NULL)
         return NULL;
