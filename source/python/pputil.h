@@ -65,7 +65,7 @@ typedef enum e_PP_object_kind PP_object_kind;
     dimdes *dims;      \
     defstr *dp;        \
     PP_file *fileinfo; \
-    PY_defstr *dpobj; \
+    PY_defstr *dpobj;  \
     PyObject *parent;
 
 /*--------------------------------------------------------------------------*/
@@ -190,12 +190,6 @@ extern PP_form
 
 /*--------------------------------------------------------------------------*/
 
-/* PDBPDBFILE.C declarations */
-
-extern int
- PP_PDBfile_Check(PyObject *op);
-
-
 /* PPARRAYS.C declarations */
 
 extern void
@@ -216,19 +210,6 @@ extern PyObject
 
 extern int
  PY_pcons_extractor(PyObject *obj, void *ptr);
-
-
-/* PPhasharr.C declarations */
-
-extern void
- _PP_hashtab_entry(PP_file *fileinfo);
-
-extern int
- PP_update_hashtab(hasharr *hashtab, PyObject *dict);
-
-extern PyObject
- *_PP_unpack_hashtab(void *p, long nitems),
- *PP_unpack_hashtab_haelem(char *type, void *vr);
 
 
 /* PPHASHARR.C declarations */
@@ -311,6 +292,7 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type);
 /* PPUTIL.C declarations */
 
 extern void
+ PY_self_free(void *o),
  _PP_Py_decref(PyObject *obj),
  PP_free(void *p),
  PP_error_set(PyObject *errobj, PyObject *obj, char *fmt, ...),
@@ -333,6 +315,13 @@ extern dimdes
 extern PyObject
  *PP_dimdes_to_obj(dimdes *dims),
  *_PP_find_file_obj(PDBfile *fp);
+
+
+/* PPPDBR.C declarations */
+
+extern PyObject
+ *_PP_read_data(PP_file *fileinfo, char *name, char *intype,
+		int nd, long *ind, PP_form *form);
 
 
 /* PYPDBD.C declarations */

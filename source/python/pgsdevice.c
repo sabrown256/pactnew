@@ -750,7 +750,8 @@ static int PY_PG_device_tp_init(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_doc[] = "";
+char
+ PY_PG_device_doc[] = "";
 
 PY_DEF_TYPE(PG_device);
 

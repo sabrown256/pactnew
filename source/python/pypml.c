@@ -11,19 +11,6 @@ char
  PP_make_ac_set_doc[] = "";
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PY_INIT_PML_INT - interim initializations for PML bindings */
-
-int PY_init_pml_int(PyObject *m, PyObject *d)
-   {int nerr;
-    extern int PY_init_pml(PyObject *m, PyObject *d);
-
-    nerr = PY_init_pml(m, d);
-
-    return(nerr);}
-
-/*--------------------------------------------------------------------------*/
 
 /*                               FIELD ROUTINES                             */
 
@@ -38,7 +25,8 @@ static int PY_PM_field_tp_init(PY_PM_field *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PM_field_doc[] = "";
+char
+ PY_PM_field_doc[] = "";
 
 PY_DEF_TYPE(PM_field);
 
@@ -71,7 +59,8 @@ static int PY_PM_mesh_topology_tp_init(PY_PM_mesh_topology *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PM_mesh_topology_doc[] = "";
+char
+ PY_PM_mesh_topology_doc[] = "";
 
 PY_DEF_TYPE(PM_mesh_topology);
 
@@ -230,7 +219,8 @@ static int PY_PM_set_tp_init(PY_PM_set *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PM_set_doc[] = "";
+char
+ PY_PM_set_doc[] = "";
 
 PY_DEF_TYPE(PM_set);
 
@@ -317,7 +307,8 @@ static int PY_PM_mapping_tp_init(PY_PM_mapping *self, PyObject *args,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PM_mapping_doc[] = "";
+char
+ PY_PM_mapping_doc[] = "";
 
 PY_DEF_TYPE(PM_mapping);
 

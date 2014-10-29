@@ -61,7 +61,8 @@ PP_pdbdata_tp_dealloc(PP_pdbdataObject *self)
     _PD_rl_dimensions(self->dims);
     _PD_rl_defstr(self->dp);
     Py_XDECREF(self->dpobj);
-    PY_TYPE(self)->tp_free((PyObject*)self);
+
+    PY_self_free(self);
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.dealloc) */
 }
 
@@ -124,7 +125,7 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     defstr *dp;
     void *vr;
     PY_defstr *dpobj;
-    PP_PDBfileObject *file;
+    PY_PDBfile *file;
     PP_descr *descr;
     PP_descr *olddescr;
 

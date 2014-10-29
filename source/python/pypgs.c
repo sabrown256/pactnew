@@ -45,7 +45,8 @@ static int PY_PG_palette_tp_init(PY_PG_palette *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_palette_doc[] = "";
+char
+ PY_PG_palette_doc[] = "";
 
 PY_DEF_TYPE(PG_palette);
 
@@ -53,12 +54,6 @@ PY_DEF_TYPE(PG_palette);
 
 /*                              PG_IMAGE ROUTINES                           */
 
-/*--------------------------------------------------------------------------*/
-
-#undef PY_DEF_DESTRUCTOR
-#define PY_DEF_DESTRUCTOR	    PY_PG_image_tp_dealloc
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PP_BUFFER_EXTRACTOR - unsigned byte array */
@@ -144,7 +139,8 @@ static void PY_PG_image_tp_dealloc(PY_PG_image *self)
    {
 
     PG_rl_image(self->pyo);
-    PY_TYPE(self)->tp_free((PyObject*)self);
+
+    PY_self_free(self);
 
     return;}
 
@@ -160,7 +156,12 @@ static int PY_PG_image_tp_init(PY_PG_image *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_image_doc[] = "";
+#undef PY_DEF_DESTRUCTOR
+
+#define PY_DEF_DESTRUCTOR	    PY_PG_image_tp_dealloc
+
+char
+ PY_PG_image_doc[] = "";
 
 PY_DEF_TYPE(PG_image);
 
@@ -169,9 +170,6 @@ PY_DEF_TYPE(PG_image);
 /*                               PG_GRAPH ROUTINES                          */
 
 /*--------------------------------------------------------------------------*/
-
-#undef PY_DEF_DESTRUCTOR
-#define PY_DEF_DESTRUCTOR	    PY_PG_graph_tp_dealloc
 
 char
  PY_set_line_info_doc[] = "",
@@ -320,7 +318,7 @@ static void PY_PG_graph_tp_dealloc(PY_PG_graph *self)
 
     PG_rl_graph(self->pyo, TRUE, TRUE);
 
-    PY_TYPE(self)->tp_free((PyObject*) self);
+    PY_self_free(self);
 
     return;}
 
@@ -336,7 +334,11 @@ static int PY_PG_graph_tp_init(PY_PG_graph *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_graph_doc[] = "";
+#undef PY_DEF_DESTRUCTOR
+#define PY_DEF_DESTRUCTOR	    PY_PG_graph_tp_dealloc
+
+char
+ PY_PG_graph_doc[] = "";
 
 PY_DEF_TYPE(PG_graph);
 

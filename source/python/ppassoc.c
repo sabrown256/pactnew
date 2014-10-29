@@ -76,7 +76,7 @@ static PyObject *_PY_pcons_unpack(void *p, long nitems)
     for (pa = alist, i = 0; pa != NULL; pa = (pcons *) pa->cdr, i++)
         {c    = (pcons *) pa->car;
 	 name = (char *) c->car;
-	 item = PP_unpack_hashtab_haelem(c->cdr_type, c->cdr);
+	 item = PP_unpack_hasharr_haelem(c->cdr_type, c->cdr);
 	 if (item == NULL)
 	    {ierr = -1;
 	     break;};
@@ -241,7 +241,7 @@ static PyObject *PY_pcons_items(PY_pcons *self,
 
 	 obj = PY_STRING_STRING(s);
 	 PyTuple_SET_ITEM(item, 0, obj);
-	 obj = PP_unpack_hashtab_haelem(c->cdr_type, c->cdr);
+	 obj = PP_unpack_hasharr_haelem(c->cdr_type, c->cdr);
 	 PyTuple_SET_ITEM(item, 1, obj);
         
 	 PyList_SET_ITEM(rv, i, item);};
@@ -358,7 +358,8 @@ static void PY_pcons_tp_dealloc(PY_pcons *self)
 
     if (SC_safe_to_free(self->pyo))
         SC_free_alist(self->pyo, 3);
-    PY_TYPE(self)->tp_free((PyObject*)self);
+
+    PY_self_free(self);
 
     return;}
 
@@ -427,7 +428,7 @@ static PyObject *PY_pcons_mp_subscript(PyObject *_self, PyObject *key)
        {PyErr_SetString(PyExc_KeyError, name);
         return(NULL);};
 
-    rv = PP_unpack_hashtab_haelem(pa->cdr_type, pa->cdr);
+    rv = PP_unpack_hasharr_haelem(pa->cdr_type, pa->cdr);
 
     return(rv);}
 
@@ -509,7 +510,8 @@ static PyMappingMethods
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_pcons_doc[] = "";
+char
+ PY_pcons_doc[] = "";
 
 PY_DEF_TYPE(pcons);
 

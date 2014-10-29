@@ -58,7 +58,7 @@ PDBfile
 PP_file
     *PP_vif_info = NULL;
 
-PP_PDBfileObject *PP_vif_obj;
+PY_PDBfile *PP_vif_obj;
 PyObject *PP_open_file_dict;
 
 #if 0

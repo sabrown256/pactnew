@@ -16,6 +16,7 @@ struct s_tnp_list
     char pnm[BFSML];        /* Python struct name, PY_PM_set */
     char tnm[BFSML];        /* Python type name, PY_PM_set_type */
     char rnm[BFSML];        /* root struct id, SET */
+    char inm[BFSML];        /* default instance id, set */
     char lnm[BFSML];        /* lower case version of CNM, pm_set */
     char unm[BFSML];};      /* upper case version of CNM, PM_SET */
 
@@ -54,6 +55,10 @@ static void python_type_name_list(char *typ, tnp_list *na)
     else
        nstrncpy(na->rnm, BFSML, p, -1);
     upcase(na->rnm);
+
+/* get default instance name */
+    nstrncpy(na->inm, BFSML, na->rnm, -1);
+    downcase(na->inm);
 
     return;}
 
@@ -516,7 +521,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 /* getset array */
     fprintf(fc, "PyGetSetDef %s_getset[] = {\n", tl.pnm);
     fprintf(fc, "    {\"%s\", (getter) %s_get, NULL, %s_doc, NULL},\n",
-	    tl.rnm, tl.pnm, tl.pnm);
+	    tl.inm, tl.pnm, tl.pnm);
 
     for (im = 1; ta[im] != NULL; im++)
         {pm = trim(ta[im], BOTH, " \t");
@@ -1140,6 +1145,9 @@ static void python_header(bindes *bd)
 		     cfn, subst(dfn, "\n", "\\\n", -1));
 	     fprintf(fh, "\n");};};
 #endif
+
+    fprintf(fh, "extern int\n");
+    fprintf(fh, " PY_init_%s(PyObject *m, PyObject *d);\n", pck);
 
     return;}
 

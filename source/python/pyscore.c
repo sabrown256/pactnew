@@ -4,7 +4,7 @@
  */
 
 #include "cpyright.h"
-#include "py_int.h"
+#include "pdbmodule.h"
 
 char
  PY_set_count_doc[] = "",
@@ -529,21 +529,6 @@ PyObject *PP_pause(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 
-#undef PY_DEF_DESTRUCTOR
-#undef PY_DEF_REPR
-#undef PY_DEF_TP_METH
-#undef PY_DEF_AS_MAP
-
-#define PY_DEF_DESTRUCTOR	    PY_hasharr_tp_dealloc
-#define PY_DEF_REPR                 PY_hasharr_tp_repr
-#define PY_DEF_TP_METH              PY_hasharr_methods
-#define PY_DEF_AS_MAP	            &PY_hasharr_as_mapping
-
-#include "pdbmodule.h"
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 static char PY_hasharr_doc_install[] = "";
 
 static PyObject *PY_hasharr_install(PY_hasharr *self,
@@ -791,7 +776,7 @@ static void PY_hasharr_tp_dealloc(PY_hasharr *self)
     else
        SC_mark(self->pyo, -1);
 
-    PY_TYPE(self)->tp_free((PyObject*)self);
+    PY_self_free(self);
 
     return;}
 
@@ -1104,7 +1089,18 @@ static PyMappingMethods
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_hasharr_doc[] = "";
+#undef PY_DEF_DESTRUCTOR
+#undef PY_DEF_REPR
+#undef PY_DEF_TP_METH
+#undef PY_DEF_AS_MAP
+
+#define PY_DEF_DESTRUCTOR	    PY_hasharr_tp_dealloc
+#define PY_DEF_REPR                 PY_hasharr_tp_repr
+#define PY_DEF_TP_METH              PY_hasharr_methods
+#define PY_DEF_AS_MAP	            &PY_hasharr_as_mapping
+
+char
+ PY_hasharr_doc[] = "";
 
 PY_DEF_TYPE(hasharr);
 
