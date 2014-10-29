@@ -15,6 +15,10 @@
     hasharr *host_chart;                                                    \
     PyTypeObject *ctor;
 
+#define PY_EXT_PDBFILE                                                      \
+    PP_file *fileinfo;                                                      \
+    PP_form form;
+
 #include <Python.h>
 #undef HAVE_GETHOSTBYNAME
 #include "sx_int.h"
@@ -33,6 +37,11 @@
 /*                            PROCEDURAL MACROS                             */
 
 /*--------------------------------------------------------------------------*/
+
+/* PY_DEF_GETSET - modify the generated PyGetSetDef */
+
+#define PY_DEF_GETSET(_t, _n)                                                \
+   PY_ ## _t ## _getset[0].name = _n
 
 /* PY_DEF_TYPE - handle the boiler plate defining a new Python type
  *             - example:
@@ -155,6 +164,18 @@ extern char
  PP_pause_doc[];
 
 
+/* PDBFILE.C declarations */
+
+extern PY_PDBfile
+ *PP_vif_obj;
+
+extern PyObject
+ *PP_open_file_dict;
+
+extern char
+ PY_open_vif_doc[];
+
+
 /* PGSGRAPH.C declarations */
 
 extern char
@@ -179,8 +200,7 @@ extern char
 /* PYPML.C declarations */
 
 extern int
- _PY_mapping_extractor(PyObject *obj, void *arg),
- PY_init_pml_int(PyObject *m, PyObject *d);
+ _PY_mapping_extractor(PyObject *obj, void *arg);
 
 extern PyObject
  *PP_make_set_1d(PyObject *self, PyObject *args, PyObject *kwds),
@@ -212,6 +232,9 @@ extern PyObject
  *PP_permanent(PyObject *self, PyObject *args, PyObject *kwds),
  *PP_arrtype(PyObject *self, PyObject *args, PyObject *kwds),
  *PP_pause(PyObject *self, PyObject *args, PyObject *kwds);
+
+extern PY_hasharr
+ *PY_hasharr_newobj(PY_hasharr *obj, hasharr *tab);
 
 
 /* PGSGRAPH.C declarations */
@@ -258,6 +281,20 @@ extern PyObject
  *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
 			 char *name, long nitems, PyObject *parent);
 
+
+/* PDBMEMDES.C declarations */
+
+extern PY_memdes
+ *PY_memdes_newobj(PY_memdes *obj, memdes *desc);
+
+
+/* PDBFILE.C declarations */
+
+extern PY_PDBfile
+ *PY_PDBfile_newobj(PY_PDBfile *obj, PP_file *fileinfo);
+
+extern PyObject
+ *PY_open_vif(PyObject *self, PyObject *args, PyObject *kwds);
 
 
 #ifdef __cplusplus

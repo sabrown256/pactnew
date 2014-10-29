@@ -17,6 +17,21 @@ PyObject
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+void PY_self_free(void *o)
+   {PyObject *pyo;
+    struct _typeobject *ot;
+
+    pyo = (PyObject *) o;
+
+    ot = PY_TYPE(pyo);
+    if (ot->tp_free != NULL)
+       ot->tp_free(pyo);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PP_Py_DECREF- pact interface to Python reference decrement.
  *  This is used as the delete function when clearing a hash table
  *  of Python objects.
@@ -31,7 +46,7 @@ void _PP_Py_decref(PyObject *obj)
 /*--------------------------------------------------------------------------*/
 
 /* _PP_find_file_obj - given the PDBfile pointer, return the
- *   PP_PDBfileObject pointer.
+ *   PY_PDBfile pointer.
  *   replace by weak-references later?
  */
 
@@ -39,7 +54,7 @@ PyObject *_PP_find_file_obj(PDBfile *fp)
 {
     Py_ssize_t i, len;
     PyObject *rv, *values;
-    PP_PDBfileObject *obj;
+    PY_PDBfile *obj;
 
     if (fp == PP_vif) {
         rv = (PyObject *) PP_vif_obj;
@@ -50,8 +65,8 @@ PyObject *_PP_find_file_obj(PDBfile *fp)
         len = PyList_Size(values);
         
         for (i = 0; i < len; i++) {
-            obj = (PP_PDBfileObject *) PyList_GET_ITEM(values, i);
-            if (obj->object == fp) {
+            obj = (PY_PDBfile *) PyList_GET_ITEM(values, i);
+            if (obj->pyo == fp) {
                 rv = (PyObject *) obj;
                 break;
             }
@@ -464,7 +479,7 @@ int PP_convert_pdbfile(PyObject *obj, void **addr)
     if (obj == Py_None) {
         *addr = (void *) PP_vif_obj;
         ok = 1;
-    } else if (PP_PDBfile_Check(obj)) {
+    } else if (PY_PDBfile_check(obj)) {
         *addr = (void *) obj;
         ok = 1;
     } else {

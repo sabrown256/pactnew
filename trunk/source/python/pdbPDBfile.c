@@ -1,39 +1,76 @@
-/*--------------------------------------------------------------------------*/
-
-/* This is generated code.
- * Any edits must be made between the splicer.begin and splicer.end blocks.
- * All other edits will be lost.
- * Once a block is edited remove the 'UNMODIFIED' on the splicer.begin comment
- * to allow the block to be preserved when it is regenerated.
- */
 /*
  * Source Version: 9.0
  * Software Release: LLNL-CODE-422942
  *
  * include cpyright.h
  */
-/*--------------------------------------------------------------------------*/
+
 #include "pdbmodule.h"
 #include "gp-pdb.h"
 
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.C_definition) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.C_definition) */
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PY_PDBFILE_NEWOBJ -  */
+
+PY_PDBfile *PY_PDBfile_newobj(PY_PDBfile *obj, PP_file *fileinfo)
+   {
+
+    if (obj == NULL) {
+        obj = (PY_PDBfile *) PyType_GenericAlloc(&PY_PDBfile_type, 0);
+        if (obj == NULL) {
+            return NULL;
+        }
+    }
+
+    obj->pyo   = fileinfo->file;
+    obj->fileinfo = fileinfo;
+    obj->form     = PP_global_form;
+
+    return obj;
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_open_vif - */
+
+char PY_open_vif_doc[] = "";
+
+PyObject *PY_open_vif(PyObject *self, PyObject *args, PyObject *kwds)
+   {char *name;
+    PP_file *fileinfo;
+    PY_PDBfile *fileobj;
+    char *kw_list[] = {"name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:open_vif", kw_list,
+                                     &name))
+        return NULL;
+    fileinfo = _PP_open_vif(name);
+    if (fileinfo == NULL)
+        return NULL;
+    fileobj = PY_PDBfile_newobj(NULL, fileinfo);
+
+/* store singleton instance */
+    PyDict_SetItemString(PP_open_file_dict, name, (PyObject *) fileobj);
+
+    return (PyObject *) fileobj;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_flush__doc__[] = 
+static char PY_PDBfile_flush_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_flush(PP_PDBfileObject *self,
+PY_PDBfile_flush(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
 /* DO-NOT-DELETE splicer.begin(pdb.PDBfile.method.flush) UNMODIFIED */
-    PD_flush(self->object);
+    PD_flush(self->pyo);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.flush) */
@@ -84,12 +121,12 @@ static int _PP_extra_defstr_delete(haelem *hp, void *arg)
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_close__doc__[] = 
+static char PY_PDBfile_close_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_close(PP_PDBfileObject *self,
+PY_PDBfile_close(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -98,7 +135,7 @@ PP_PDBfile_close(PP_PDBfileObject *self,
     PP_file *fileinfo;
     PDBfile *fp;
 
-    fp = self->object;
+    fp = self->pyo;
     fileinfo = self->fileinfo;
     
     if (fp == NULL) {
@@ -130,7 +167,7 @@ PP_PDBfile_close(PP_PDBfileObject *self,
             return NULL;
         }
         _PP_close_file(fileinfo);
-        self->object   = NULL;
+        self->pyo   = NULL;
         self->fileinfo = NULL;
     }
 
@@ -143,12 +180,12 @@ PP_PDBfile_close(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_write__doc__[] = 
+static char PY_PDBfile_write_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_write(PP_PDBfileObject *self,
+PY_PDBfile_write(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -235,12 +272,12 @@ PP_PDBfile_write(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_write_raw__doc__[] = 
+static char PY_PDBfile_write_raw_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_write_raw(PP_PDBfileObject *self,
+PY_PDBfile_write_raw(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -252,7 +289,7 @@ PP_PDBfile_write_raw(PP_PDBfileObject *self,
     PDBfile *fp;
     PyObject *indobj;
 
-    fp = self->object;
+    fp = self->pyo;
     indobj = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "st#s|O:write_raw", kw_list,
                                      &name, &buffer, &buffer_len, &type, &indobj))
@@ -284,12 +321,12 @@ PP_PDBfile_write_raw(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_read__doc__[] = 
+static char PY_PDBfile_read_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_read(PP_PDBfileObject *self,
+PY_PDBfile_read(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -301,7 +338,7 @@ PP_PDBfile_read(PP_PDBfileObject *self,
     char *kw_list[] = {"name", "intype", "ind", NULL};
     PDBfile *fp;
 
-    fp = self->object;
+    fp = self->pyo;
     intype = NULL;
     indobj = NULL;
     nd = 0;
@@ -333,12 +370,12 @@ PP_PDBfile_read(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_defstr__doc__[] = 
+static char PY_PDBfile_defstr_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_defstr(PP_PDBfileObject *self,
+PY_PDBfile_defstr(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -349,7 +386,7 @@ PP_PDBfile_defstr(PP_PDBfileObject *self,
     PDBfile *fp;
     PY_defstr *rv;
 
-    fp = self->object;
+    fp = self->pyo;
     if (fp == NULL) {
         PP_error_set_user(NULL, "file is not open");
         return NULL;
@@ -377,12 +414,12 @@ PP_PDBfile_defstr(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_ls__doc__[] = 
+static char PY_PDBfile_ls_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_ls(PP_PDBfileObject *self,
+PY_PDBfile_ls(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -395,7 +432,7 @@ PP_PDBfile_ls(PP_PDBfileObject *self,
     PyObject *rv, *item;
     PDBfile *fp;
 
-    fp = self->object;
+    fp = self->pyo;
     path = NULL;
     type = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|zz:ls", kw_list,
@@ -436,12 +473,12 @@ PP_PDBfile_ls(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_get_obj_descr__doc__[] = 
+static char PY_PDBfile_get_obj_descr_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_get_obj_descr(PP_PDBfileObject *self,
+PY_PDBfile_get_obj_descr(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -450,7 +487,7 @@ PP_PDBfile_get_obj_descr(PP_PDBfileObject *self,
     char *kw_list[] = {"obj", NULL};
     PP_descr *descr;
 
-    if (self->object == NULL) {
+    if (self->pyo == NULL) {
         PP_error_set_user(NULL, "file is not open");
         return NULL;
     }
@@ -482,12 +519,12 @@ PP_PDBfile_get_obj_descr(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_register_class__doc__[] = 
+static char PY_PDBfile_register_class_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_register_class(PP_PDBfileObject *self,
+PY_PDBfile_register_class(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -535,12 +572,12 @@ PP_PDBfile_register_class(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_reset_vif__doc__[] = 
+static char PY_PDBfile_reset_vif_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_reset_vif(PP_PDBfileObject *self,
+PY_PDBfile_reset_vif(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -551,7 +588,7 @@ PP_PDBfile_reset_vif(PP_PDBfileObject *self,
      */
     PP_file *fileinfo;
 
-    if (self->object->virtual_internal == FALSE) {
+    if (self->pyo->virtual_internal == FALSE) {
         PP_error_set_user(NULL, "file is not virtual internal");
         return NULL;
     }
@@ -590,23 +627,23 @@ PP_PDBfile_reset_vif(PP_PDBfileObject *self,
 
 /*--------------------------------------------------------------------------*/
 
-static PyMethodDef PP_PDBfile_methods[] = {
-{"flush", (PyCFunction)PP_PDBfile_flush, METH_NOARGS, PP_PDBfile_flush__doc__},
-{"close", (PyCFunction)PP_PDBfile_close, METH_NOARGS, PP_PDBfile_close__doc__},
-{"write", (PyCFunction)PP_PDBfile_write, METH_KEYWORDS, PP_PDBfile_write__doc__},
-{"write_raw", (PyCFunction)PP_PDBfile_write_raw, METH_KEYWORDS, PP_PDBfile_write_raw__doc__},
-{"read", (PyCFunction)PP_PDBfile_read, METH_KEYWORDS, PP_PDBfile_read__doc__},
+static PyMethodDef PY_PDBfile_methods[] = {
+{"flush", (PyCFunction)PY_PDBfile_flush, METH_NOARGS, PY_PDBfile_flush_doc},
+{"close", (PyCFunction)PY_PDBfile_close, METH_NOARGS, PY_PDBfile_close_doc},
+{"write", (PyCFunction)PY_PDBfile_write, METH_KEYWORDS, PY_PDBfile_write_doc},
+{"write_raw", (PyCFunction)PY_PDBfile_write_raw, METH_KEYWORDS, PY_PDBfile_write_raw_doc},
+{"read", (PyCFunction)PY_PDBfile_read, METH_KEYWORDS, PY_PDBfile_read_doc},
  _PYD_PD_defent,
-{"defstr", (PyCFunction)PP_PDBfile_defstr, METH_KEYWORDS, PP_PDBfile_defstr__doc__},
+{"defstr", (PyCFunction)PY_PDBfile_defstr, METH_KEYWORDS, PY_PDBfile_defstr_doc},
  _PYD_PD_cd,
  _PYD_PD_mkdir,
  _PYD_PD_isdir,
  _PYD_PD_ln,
-{"ls", (PyCFunction)PP_PDBfile_ls, METH_KEYWORDS, PP_PDBfile_ls__doc__},
+{"ls", (PyCFunction)PY_PDBfile_ls, METH_KEYWORDS, PY_PDBfile_ls_doc},
  _PYD_PD_pwd,
-{"get_obj_descr", (PyCFunction)PP_PDBfile_get_obj_descr, METH_KEYWORDS, PP_PDBfile_get_obj_descr__doc__},
-{"register_class", (PyCFunction)PP_PDBfile_register_class, METH_KEYWORDS, PP_PDBfile_register_class__doc__},
-{"reset_vif", (PyCFunction)PP_PDBfile_reset_vif, METH_NOARGS, PP_PDBfile_reset_vif__doc__},
+{"get_obj_descr", (PyCFunction)PY_PDBfile_get_obj_descr, METH_KEYWORDS, PY_PDBfile_get_obj_descr_doc},
+{"register_class", (PyCFunction)PY_PDBfile_register_class, METH_KEYWORDS, PY_PDBfile_register_class_doc},
+{"reset_vif", (PyCFunction)PY_PDBfile_reset_vif, METH_NOARGS, PY_PDBfile_reset_vif_doc},
 /* DO-NOT-DELETE splicer.begin(pdb.PDBfile.extra_mlist) */
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.extra_mlist) */
 {NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
@@ -623,12 +660,12 @@ static PyMethodDef PP_PDBfile_methods[] = {
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_defent__doc__[] = 
+static char PY_PDBfile_defent_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_defent(PP_PDBfileObject *self,
+PY_PDBfile_defent(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -638,7 +675,7 @@ PP_PDBfile_defent(PP_PDBfileObject *self,
     char *kw_list[] = {"name", "type", NULL};
     PDBfile *fp;
 
-    fp = self->object;
+    fp = self->pyo;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss:defent", kw_list,
                                      &name, &type))
         return NULL;
@@ -659,12 +696,12 @@ PP_PDBfile_defent(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_cd__doc__[] = 
+static char PY_PDBfile_cd_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_cd(PP_PDBfileObject *self,
+PY_PDBfile_cd(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -674,7 +711,7 @@ PP_PDBfile_cd(PP_PDBfileObject *self,
     char *kw_list[] = {"dirname", NULL};
     PDBfile *fp;
 
-    fp = self->object;
+    fp = self->pyo;
     dirname = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|z:cd", kw_list,
                                      &dirname))
@@ -700,12 +737,12 @@ PP_PDBfile_cd(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_mkdir__doc__[] = 
+static char PY_PDBfile_mkdir_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_mkdir(PP_PDBfileObject *self,
+PY_PDBfile_mkdir(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -715,7 +752,7 @@ PP_PDBfile_mkdir(PP_PDBfileObject *self,
     char *kw_list[] = {"dirname", NULL};
     PDBfile *fp;
 
-    fp = self->object;
+    fp = self->pyo;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:mkdir", kw_list,
                                      &dirname))
         return NULL;
@@ -741,12 +778,12 @@ PP_PDBfile_mkdir(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_isdir__doc__[] = 
+static char PY_PDBfile_isdir_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_isdir(PP_PDBfileObject *self,
+PY_PDBfile_isdir(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -757,7 +794,7 @@ PP_PDBfile_isdir(PP_PDBfileObject *self,
     PDBfile *fp;
     PyObject *rv;
 
-    fp = self->object;
+    fp = self->pyo;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:isdir", kw_list,
                                      &dirname))
         return NULL;
@@ -779,12 +816,12 @@ PP_PDBfile_isdir(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_ln__doc__[] = 
+static char PY_PDBfile_ln_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_ln(PP_PDBfileObject *self,
+PY_PDBfile_ln(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -794,7 +831,7 @@ PP_PDBfile_ln(PP_PDBfileObject *self,
     char *kw_list[] = {"var", "link", NULL};
     PDBfile *fp;
 
-    fp = self->object;
+    fp = self->pyo;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss:ln", kw_list,
                                      &var, &link))
         return NULL;
@@ -819,12 +856,12 @@ PP_PDBfile_ln(PP_PDBfileObject *self,
 /*--------------------------------------------------------------------------*/
 
 
-static char PP_PDBfile_pwd__doc__[] = 
+static char PY_PDBfile_pwd_doc[] = 
 ""
 ;
 
 static PyObject *
-PP_PDBfile_pwd(PP_PDBfileObject *self,
+PY_PDBfile_pwd(PY_PDBfile *self,
                   PyObject *args,
                   PyObject *kwds)
 {
@@ -833,7 +870,7 @@ PP_PDBfile_pwd(PP_PDBfileObject *self,
     PyObject *rv;
     PDBfile *fp;
 
-    fp = self->object;
+    fp = self->pyo;
     
     if (fp == NULL) {
         PP_error_set_user(NULL, "file is not open");
@@ -850,23 +887,23 @@ PP_PDBfile_pwd(PP_PDBfileObject *self,
 
 /*--------------------------------------------------------------------------*/
 
-static PyMethodDef PP_PDBfile_methods[] = {
-{"flush", (PyCFunction)PP_PDBfile_flush, METH_NOARGS, PP_PDBfile_flush__doc__},
-{"close", (PyCFunction)PP_PDBfile_close, METH_NOARGS, PP_PDBfile_close__doc__},
-{"write", (PyCFunction)PP_PDBfile_write, METH_KEYWORDS, PP_PDBfile_write__doc__},
-{"write_raw", (PyCFunction)PP_PDBfile_write_raw, METH_KEYWORDS, PP_PDBfile_write_raw__doc__},
-{"read", (PyCFunction)PP_PDBfile_read, METH_KEYWORDS, PP_PDBfile_read__doc__},
-{"defent", (PyCFunction)PP_PDBfile_defent, METH_KEYWORDS, PP_PDBfile_defent__doc__},
-{"defstr", (PyCFunction)PP_PDBfile_defstr, METH_KEYWORDS, PP_PDBfile_defstr__doc__},
-{"cd", (PyCFunction)PP_PDBfile_cd, METH_KEYWORDS, PP_PDBfile_cd__doc__},
-{"mkdir", (PyCFunction)PP_PDBfile_mkdir, METH_KEYWORDS, PP_PDBfile_mkdir__doc__},
-{"isdir", (PyCFunction)PP_PDBfile_isdir, METH_KEYWORDS, PP_PDBfile_isdir__doc__},
-{"ln", (PyCFunction)PP_PDBfile_ln, METH_KEYWORDS, PP_PDBfile_ln__doc__},
-{"ls", (PyCFunction)PP_PDBfile_ls, METH_KEYWORDS, PP_PDBfile_ls__doc__},
-{"pwd", (PyCFunction)PP_PDBfile_pwd, METH_NOARGS, PP_PDBfile_pwd__doc__},
-{"get_obj_descr", (PyCFunction)PP_PDBfile_get_obj_descr, METH_KEYWORDS, PP_PDBfile_get_obj_descr__doc__},
-{"register_class", (PyCFunction)PP_PDBfile_register_class, METH_KEYWORDS, PP_PDBfile_register_class__doc__},
-{"reset_vif", (PyCFunction)PP_PDBfile_reset_vif, METH_NOARGS, PP_PDBfile_reset_vif__doc__},
+static PyMethodDef PY_PDBfile_methods[] = {
+{"flush", (PyCFunction)PY_PDBfile_flush, METH_NOARGS, PY_PDBfile_flush_doc},
+{"close", (PyCFunction)PY_PDBfile_close, METH_NOARGS, PY_PDBfile_close_doc},
+{"write", (PyCFunction)PY_PDBfile_write, METH_KEYWORDS, PY_PDBfile_write_doc},
+{"write_raw", (PyCFunction)PY_PDBfile_write_raw, METH_KEYWORDS, PY_PDBfile_write_raw_doc},
+{"read", (PyCFunction)PY_PDBfile_read, METH_KEYWORDS, PY_PDBfile_read_doc},
+{"defent", (PyCFunction)PY_PDBfile_defent, METH_KEYWORDS, PY_PDBfile_defent_doc},
+{"defstr", (PyCFunction)PY_PDBfile_defstr, METH_KEYWORDS, PY_PDBfile_defstr_doc},
+{"cd", (PyCFunction)PY_PDBfile_cd, METH_KEYWORDS, PY_PDBfile_cd_doc},
+{"mkdir", (PyCFunction)PY_PDBfile_mkdir, METH_KEYWORDS, PY_PDBfile_mkdir_doc},
+{"isdir", (PyCFunction)PY_PDBfile_isdir, METH_KEYWORDS, PY_PDBfile_isdir_doc},
+{"ln", (PyCFunction)PY_PDBfile_ln, METH_KEYWORDS, PY_PDBfile_ln_doc},
+{"ls", (PyCFunction)PY_PDBfile_ls, METH_KEYWORDS, PY_PDBfile_ls_doc},
+{"pwd", (PyCFunction)PY_PDBfile_pwd, METH_NOARGS, PY_PDBfile_pwd_doc},
+{"get_obj_descr", (PyCFunction)PY_PDBfile_get_obj_descr, METH_KEYWORDS, PY_PDBfile_get_obj_descr_doc},
+{"register_class", (PyCFunction)PY_PDBfile_register_class, METH_KEYWORDS, PY_PDBfile_register_class_doc},
+{"reset_vif", (PyCFunction)PY_PDBfile_reset_vif, METH_NOARGS, PY_PDBfile_reset_vif_doc},
 /* DO-NOT-DELETE splicer.begin(pdb.PDBfile.extra_mlist) */
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.extra_mlist) */
 {NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
@@ -878,142 +915,12 @@ static PyMethodDef PP_PDBfile_methods[] = {
 
 /*--------------------------------------------------------------------------*/
 
-static char PP_PDBfile_object__doc__[] =
-""
-;
+static char PY_PDBfile_doc_object_mode[] = "";
 
-static PyObject *
-PP_PDBfile_object_get(PP_PDBfileObject *self, void *context)
+static PyObject *PY_PDBfile_get_object_mode(PY_PDBfile *self, void *context)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object_get) */
-  return PY_COBJ_VOID_PTR(self->object, NULL);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_name__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_name_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.name_get) UNMODIFIED */
-    return Py_BuildValue("s", self->object->name);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.name_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_type__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_type_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.type_get) UNMODIFIED */
-    return Py_BuildValue("s", self->object->type);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.type_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_symtab__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_symtab_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.symtab_get) */
-    return (PyObject *) PP_hashtab_newobj(NULL, self->object->symtab);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.symtab_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_chart__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_chart_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.chart_get) */
-    return (PyObject *) PP_hashtab_newobj(NULL, self->object->chart);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.chart_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_host_chart__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_host_chart_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.host_chart_get) */
-    return (PyObject *) PP_hashtab_newobj(NULL, self->object->host_chart);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.host_chart_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_attrtab__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_attrtab_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.attrtab_get) */
-    return (PyObject *) PP_hashtab_newobj(NULL, self->object->attrtab);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.attrtab_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_previous_file__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_previous_file_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.previous_file_get) UNMODIFIED */
-    return Py_BuildValue("s", self->object->previous_file);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.previous_file_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_date__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_date_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.date_get) UNMODIFIED */
-    return Py_BuildValue("s", self->object->date);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.date_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_mode__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_mode_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.mode_get) */
     PyObject *rv;
-    switch (PD_get_mode(self->object)) {
+    switch (PD_get_mode(self->pyo)) {
     case PD_READ:
         rv = PY_STRING_STRING("PD_READ");
         break;
@@ -1039,268 +946,88 @@ PP_PDBfile_object_mode_get(PP_PDBfileObject *self, void *context)
         rv = PY_STRING_STRING("PD_PRINT");
         break;
     default:
-        rv = PY_INT_LONG(PD_get_mode(self->object));
+        rv = PY_INT_LONG(PD_get_mode(self->pyo));
         break;
     }
         
     return rv;
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.mode_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_default_offset__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_default_offset_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.default_offset_get) */
-    return PY_INT_LONG(PD_get_offset(self->object));
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.default_offset_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_virtual_internal__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_virtual_internal_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.virtual_internal_get) UNMODIFIED */
-    return PY_INT_LONG(self->object->virtual_internal);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.virtual_internal_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_system_version__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_system_version_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.system_version_get) UNMODIFIED */
-    return PY_INT_LONG(self->object->system_version);
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.system_version_get) */
-}
-
-/*--------------------------------------------------------------------------*/
-
-static char PP_PDBfile_object_major_order__doc__[] =
-""
-;
-
-static PyObject *
-PP_PDBfile_object_major_order_get(PP_PDBfileObject *self, void *context)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.descriptor.object.major_order_get) */
-    PyObject *rv;
-    
-    switch (PD_get_major_order(self->object)) {
-    case ROW_MAJOR_ORDER:
-        rv = PY_STRING_STRING("ROW MAJOR");
-        break;
-    case COLUMN_MAJOR_ORDER:
-        rv = PY_STRING_STRING("COLUMN MAJOR");
-        break;
-    default:
-        PP_error_set(PP_error_internal, NULL,
-                     "major_order had unexpected value %d",
-                     PD_get_major_order(self->object));
-        rv = NULL;
-    }
-    return rv;
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.descriptor.object.major_order_get) */
 }
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.extra_members) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.extra_members) */
+#if 0
 
-static PyGetSetDef PP_PDBfile_getset[] = {
-    {"object", (getter) PP_PDBfile_object_get, NULL, PP_PDBfile_object__doc__, NULL},
-    {"name", (getter) PP_PDBfile_object_name_get, NULL, PP_PDBfile_object_name__doc__, NULL},
-    {"type", (getter) PP_PDBfile_object_type_get, NULL, PP_PDBfile_object_type__doc__, NULL},
-    {"symtab", (getter) PP_PDBfile_object_symtab_get, NULL, PP_PDBfile_object_symtab__doc__, NULL},
-    {"chart", (getter) PP_PDBfile_object_chart_get, NULL, PP_PDBfile_object_chart__doc__, NULL},
-    {"host_chart", (getter) PP_PDBfile_object_host_chart_get, NULL, PP_PDBfile_object_host_chart__doc__, NULL},
-    {"attrtab", (getter) PP_PDBfile_object_attrtab_get, NULL, PP_PDBfile_object_attrtab__doc__, NULL},
-    {"previous_file", (getter) PP_PDBfile_object_previous_file_get, NULL, PP_PDBfile_object_previous_file__doc__, NULL},
-    {"date", (getter) PP_PDBfile_object_date_get, NULL, PP_PDBfile_object_date__doc__, NULL},
-    {"mode", (getter) PP_PDBfile_object_mode_get, NULL, PP_PDBfile_object_mode__doc__, NULL},
-    {"default_offset", (getter) PP_PDBfile_object_default_offset_get, NULL, PP_PDBfile_object_default_offset__doc__, NULL},
-    {"virtual_internal", (getter) PP_PDBfile_object_virtual_internal_get, NULL, PP_PDBfile_object_virtual_internal__doc__, NULL},
-    {"system_version", (getter) PP_PDBfile_object_system_version_get, NULL, PP_PDBfile_object_system_version__doc__, NULL},
-    {"major_order", (getter) PP_PDBfile_object_major_order_get, NULL, PP_PDBfile_object_major_order__doc__, NULL},
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.extra_getset) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.extra_getset) */
-    {NULL}     /* Sentinel */
-};
+PyGetSetDef PY_PDBfile_getset[] = {
+    {"object", (getter) PY_PDBfile_get, NULL, PY_PDBfile_doc, NULL},
+    {"name", (getter) PY_PDBfile_get_name, NULL, PY_PDBfile_doc_name, NULL},
+    {"type", (getter) PY_PDBfile_get_type, NULL, PY_PDBfile_doc_type, NULL},
+    {"symtab", (getter) PY_PDBfile_get_symtab, NULL, PY_PDBfile_doc_symtab, NULL},
+    {"chart", (getter) PY_PDBfile_get_chart, NULL, PY_PDBfile_doc_chart, NULL},
+    {"host_chart", (getter) PY_PDBfile_get_host_chart, NULL, PY_PDBfile_doc_host_chart, NULL},
+    {"attrtab", (getter) PY_PDBfile_get_attrtab, NULL, PY_PDBfile_doc_attrtab, NULL},
+    {"previous_file", (getter) PY_PDBfile_get_previous_file, NULL, PY_PDBfile_doc_previous_file, NULL},
+    {"date", (getter) PY_PDBfile_get_date, NULL, PY_PDBfile_doc_date, NULL},
+    {"mode", (getter) PY_PDBfile_get_mode, NULL, PY_PDBfile_doc_mode, NULL},
+    {"default_offset", (getter) PY_PDBfile_get_default_offset, NULL, PY_PDBfile_doc_default_offset, NULL},
+    {"virtual_internal", (getter) PY_PDBfile_get_virtual_internal, NULL, PY_PDBfile_doc_virtual_internal, NULL},
+    {"system_version", (getter) PY_PDBfile_get_system_version, NULL, PY_PDBfile_doc_system_version, NULL},
+    {"major_order", (getter) PY_PDBfile_get_major_order, NULL, PY_PDBfile_doc_major_order, NULL},
+    {NULL}};
+
+#endif
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-static int
-PP_PDBfile_tp_init(PP_PDBfileObject *self, PyObject *args, PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.as_type.init) */
-    char *name;
-    char *mode = "r";
-    char *kw_list[] = {"name", "mode", NULL};
+static int PY_PDBfile_tp_init(PY_PDBfile *self, PyObject *args, PyObject *kwds)
+   {int rv;
+    char *name, *mode;
     PDBfile *fp;
     PP_file *fileinfo;
+    char *kw_list[] = {"name", "mode", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|s:open", kw_list,
-                                     &name, &mode))
-        return -1;
+    rv = -1;
 
-    fp = PD_open(name, mode);
-    if (fp == NULL) {
-        PyErr_SetString(PP_error_user, PD_get_error());
-        return -1;
-    }
+    mode = "r";
 
-    /* Do not track pointers since we do lots of releasing memory in
-     * places like _PP_rel_syment.
-     */
-    PD_set_track_pointers(fp, FALSE);
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "s|s:open", kw_list,
+				    &name, &mode))
+       {fp = PD_open(name, mode);
+	if (fp == NULL)
+	   PyErr_SetString(PP_error_user, PD_get_error());
 
-    fileinfo = CMAKE(PP_file);
-    fileinfo->file = fp;
-    PP_init_type_map_basic(fileinfo);
+/* Do not track pointers since we do lots of releasing memory in
+ * places like _PP_rel_syment.
+ */
+	else
+	   {PD_set_track_pointers(fp, FALSE);
+
+	    fileinfo = CMAKE(PP_file);
+	    fileinfo->file = fp;
+	    PP_init_type_map_basic(fileinfo);
     
-    self = _PP_PDBfile_newobj(self, fileinfo);
-    if (self == NULL)
-        return -1;
+	    self = PY_PDBfile_newobj(self, fileinfo);
+	    if (self != NULL)
 
-    /* store singleton instance */
-    PyDict_SetItemString(PP_open_file_dict, name, (PyObject *) self);
+/* store singleton instance */
+	      {PyDict_SetItemString(PP_open_file_dict, name, (PyObject *) self);
+	       rv = 0;};};};
     
-    return 0;
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.as_type.init) */
-}
-/*--------------------------------------------------------------------------*/
-
-/* PP_PDBfile_Check - */
-
-/* static */ int
-PP_PDBfile_Check(PyObject *op)
-{
-    if (PyObject_TypeCheck(op, &PP_PDBfile_Type))
-        return 1;
-    else
-        return 0;
-/*  return PY_TYPE(op) == &PP_PDBfile_Type; */
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
-
-
-static char PP_PDBfile_Type__doc__[] = 
-""
-;
-
-/* static */
-PyTypeObject PP_PDBfile_Type = {
-        PY_HEAD_INIT(&PyType_Type, 0)
-        "PDBfile",                      /* tp_name */
-        sizeof(PP_PDBfileObject),       /* tp_basicsize */
-        0,                              /* tp_itemsize */
-        /* Methods to implement standard operations */
-        (destructor)0,                  /* tp_dealloc */
-        (printfunc)0,                   /* tp_print */
-        (getattrfunc)0,                 /* tp_getattr */
-        (setattrfunc)0,                 /* tp_setattr */
-        (cmpfunc)0,                     /* tp_compare */
-        (reprfunc)0,                    /* tp_repr */
-        /* Method suites for standard classes */
-        0,                              /* tp_as_number */
-        0,                              /* tp_as_sequence */
-        0,                              /* tp_as_mapping */
-        /* More standard operations (here for binary compatibility) */
-        (hashfunc)0,                    /* tp_hash */
-        (ternaryfunc)0,                 /* tp_call */
-        (reprfunc)0,                    /* tp_str */
-        (getattrofunc)0,                /* tp_getattro */
-        (setattrofunc)0,                /* tp_setattro */
-        /* Functions to access object as input/output buffer */
-        0,                              /* tp_as_buffer */
-        /* Flags to define presence of optional/expanded features */
-        Py_TPFLAGS_DEFAULT,             /* tp_flags */
-        PP_PDBfile_Type__doc__,         /* tp_doc */
-        /* Assigned meaning in release 2.0 */
-        /* call function for all accessible objects */
-        (traverseproc)0,                /* tp_traverse */
-        /* delete references to contained objects */
-        (inquiry)0,                     /* tp_clear */
-        /* Assigned meaning in release 2.1 */
-        /* rich comparisons */
-        (richcmpfunc)0,                 /* tp_richcompare */
-        /* weak reference enabler */
-        0,                              /* tp_weaklistoffset */
-        /* Added in release 2.2 */
-        /* Iterators */
-        (getiterfunc)0,                 /* tp_iter */
-        (iternextfunc)0,                /* tp_iternext */
-        /* Attribute descriptor and subclassing stuff */
-        PP_PDBfile_methods,             /* tp_methods */
-        0,                              /* tp_members */
-        PP_PDBfile_getset,              /* tp_getset */
-        0,                              /* tp_base */
-        0,                              /* tp_dict */
-        (descrgetfunc)0,                /* tp_descr_get */
-        (descrsetfunc)0,                /* tp_descr_set */
-        0,                              /* tp_dictoffset */
-        (initproc)PP_PDBfile_tp_init,   /* tp_init */
-        (allocfunc)0,                   /* tp_alloc */
-        (newfunc)0,                     /* tp_new */
-#if PYTHON_API_VERSION >= 1012
-        (freefunc)0,                    /* tp_free */
-#else
-        (destructor)0,                  /* tp_free */
-#endif
-        (inquiry)0,                     /* tp_is_gc */
-        0,                              /* tp_bases */
-        0,                              /* tp_mro */
-        0,                              /* tp_cache */
-        0,                              /* tp_subclasses */
-        0,                              /* tp_weaklist */
-#if PYTHON_API_VERSION >= 1012
-        (destructor)0,                  /* tp_del */
-#endif
-};
-
-/* DO-NOT-DELETE splicer.begin(pdb.PDBfile.extra) */
-
-/* _PP_PDBfile_newobj -  */
-
-PP_PDBfileObject *_PP_PDBfile_newobj(PP_PDBfileObject *obj,
-                                     PP_file *fileinfo)
-{
-
-    if (obj == NULL) {
-        obj = (PP_PDBfileObject *) PyType_GenericAlloc(&PP_PDBfile_Type, 0);
-        if (obj == NULL) {
-            return NULL;
-        }
-    }
-
-    obj->object   = fileinfo->file;
-    obj->fileinfo = fileinfo;
-    obj->form     = PP_global_form;
-
-    return obj;
-}
-
-
-/* DO-NOT-DELETE splicer.end(pdb.PDBfile.extra) */
-/* End of code for PDBfile objects */
 /*--------------------------------------------------------------------------*/
-/*                               OBJECT_TAIL                                */
+
+#undef PY_DEF_TP_METH
+
+#define PY_DEF_TP_METH              PY_PDBfile_methods
+
+char
+ PY_PDBfile_doc[] = "";
+
+PY_DEF_TYPE(PDBfile);
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

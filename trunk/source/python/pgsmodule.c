@@ -10,40 +10,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_open_vif - */
-
-static char PP_open_vif_doc[] = 
-""
-;
-
-static PyObject *
-PP_open_vif(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    char *name;
-    char *kw_list[] = {"name", NULL};
-    PP_file *fileinfo;
-    PP_PDBfileObject *fileobj;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:open_vif", kw_list,
-                                     &name))
-        return NULL;
-    fileinfo = _PP_open_vif(name);
-    if (fileinfo == NULL)
-        return NULL;
-    fileobj = _PP_PDBfile_newobj(NULL, fileinfo);
-
-    /* store singleton instance */
-    PyDict_SetItemString(PP_open_file_dict, name, (PyObject *) fileobj);
-
-    return (PyObject *) fileobj;
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PP_getdefstr - */
 
 static char PP_getdefstr_doc[] = 
@@ -110,14 +76,14 @@ PP_getfile(
   PyObject *kwds)
 {
     PP_pdbdataObject *obj;
-    PP_PDBfileObject *file;
+    PY_PDBfile *file;
     char *kw_list[] = {"obj", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:getfile", kw_list,
                                      &PP_pdbdata_Type, &obj))
         return NULL;
 
-    file = (PP_PDBfileObject *) _PP_find_file_obj(obj->fileinfo->file);
+    file = (PY_PDBfile *) _PP_find_file_obj(obj->fileinfo->file);
     if (file == NULL)
         return NULL;
 
@@ -449,7 +415,7 @@ static PyMethodDef PP_methods[] = {
 {"setform", (PyCFunction)PP_setform, METH_KEYWORDS, PP_setform_doc},
 {"make_set_1d", (PyCFunction)PP_make_set_1d, METH_KEYWORDS, PP_make_set_1d_doc},
 {"make_ac_set", (PyCFunction)PP_make_ac_set, METH_KEYWORDS, PP_make_ac_set_doc},
-{"open_vif", (PyCFunction)PP_open_vif, METH_KEYWORDS, PP_open_vif_doc},
+{"open_vif", (PyCFunction)PY_open_vif, METH_KEYWORDS, PY_open_vif_doc},
 {"getdefstr", (PyCFunction)PP_getdefstr, METH_KEYWORDS, PP_getdefstr_doc},
 {"gettype", (PyCFunction)PP_gettype, METH_KEYWORDS, PP_gettype_doc},
 {"getfile", (PyCFunction)PP_getfile, METH_KEYWORDS, PP_getfile_doc},
@@ -522,35 +488,46 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
     if (ne > 0)
        PY_MOD_RETURN_ERR;
 
-    ne += PY_init_pml_int(m, d);
+    ne += PY_init_score(m, d);
     if (ne > 0)
        PY_MOD_RETURN_ERR;
 
-    PY_defstr_type.tp_new = PyType_GenericNew;
-    PY_defstr_type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PY_defstr_type) < 0)
+    ne += PY_init_pml(m, d);
+    if (ne > 0)
        PY_MOD_RETURN_ERR;
+
+    ne += PY_init_pdb(m, d);
+    if (ne > 0)
+       PY_MOD_RETURN_ERR;
+
+    ne += PY_init_pgs(m, d);
+    if (ne > 0)
+       PY_MOD_RETURN_ERR;
+
+    PY_DEF_GETSET(pcons, "alist");
+    PY_DEF_GETSET(hasharr, "hasharr");
+
+    PY_DEF_GETSET(PM_field, "field");
+    PY_DEF_GETSET(PM_mesh_topology, "mt");
+    PY_DEF_GETSET(PM_set, "set");
+    PY_DEF_GETSET(PM_mapping, "map");
+
+    PY_DEF_GETSET(defstr, "dp");
+    PY_DEF_GETSET(memdes, "desc");
+    PY_DEF_GETSET(PDBfile, "object");
+
+    PY_DEF_GETSET(PG_device, "dev");
+    PY_DEF_GETSET(PG_palette, "pal");
+    PY_DEF_GETSET(PG_image, "im");
+    PY_DEF_GETSET(PG_graph, "data");
+
     PP_pdbdata_Type.tp_new = PyType_GenericNew;
     PP_pdbdata_Type.tp_alloc = PyType_GenericAlloc;
     if (PyType_Ready(&PP_pdbdata_Type) < 0)
        PY_MOD_RETURN_ERR;
-    PP_hashtab_Type.tp_new = PyType_GenericNew;
-    PP_hashtab_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_hashtab_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    PP_PDBfile_Type.tp_new = PyType_GenericNew;
-    PP_PDBfile_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_PDBfile_Type) < 0)
-       PY_MOD_RETURN_ERR;
 
 /* add some symbolic constants to the module */
-    if (PyDict_SetItemString(d, "defstr", (PyObject *) &PY_defstr_type) < 0)
-       PY_MOD_RETURN_ERR;
     if (PyDict_SetItemString(d, "pdbdata", (PyObject *) &PP_pdbdata_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "hashtab", (PyObject *) &PP_hashtab_Type) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyDict_SetItemString(d, "PDBfile", (PyObject *) &PP_PDBfile_Type) < 0)
        PY_MOD_RETURN_ERR;
 
     PP_init_type_map();
