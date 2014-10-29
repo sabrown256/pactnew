@@ -29,7 +29,7 @@ PyObject *_PP_read_data(PP_file *fileinfo, char *name, char *intype,
     SC_address addr;
     PDBfile *file;
     PyObject *rv;
-    PP_defstrObject *dpobj;
+    PY_defstr *dpobj;
 
     rv           = NULL;
     addr.memaddr = NULL;
@@ -84,10 +84,10 @@ PyObject *_PP_read_data(PP_file *fileinfo, char *name, char *intype,
 
     SC_mark(addr.memaddr, 1);
     if (form->array_kind == AS_PDBDATA) {
-        dpobj = _PP_defstr_find_singleton(type, NULL, fileinfo);
+        dpobj = _PY_defstr_find_singleton(type, NULL, fileinfo);
         if (dpobj == NULL)
             return NULL;
-        dp = dpobj->dp;
+        dp = dpobj->pyo;
     
         rv = (PyObject *) PP_pdbdata_newobj(NULL, addr.memaddr, type, number,
                                             dims, dp, fileinfo, dpobj, NULL);

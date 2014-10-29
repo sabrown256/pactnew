@@ -17,28 +17,6 @@ PyObject
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_defstr_rem - remove defstrs from file. */
-
-void PP_defstr_rem(char *name, PDBfile *file)
-{
-    defstr *dp;
-    
-    dp = PD_inquire_table_type(file->chart, name);
-    SC_mark(dp, 1);
-    SC_hasharr_remove(file->chart, name);
-    _PD_rl_defstr(dp);
-   
-    dp = PD_inquire_table_type(file->host_chart, name);
-    SC_mark(dp, 1);
-    SC_hasharr_remove(file->host_chart, name);
-    _PD_rl_defstr(dp);
-    
-    return;
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PP_Py_DECREF- pact interface to Python reference decrement.
  *  This is used as the delete function when clearing a hash table
  *  of Python objects.
@@ -96,7 +74,7 @@ PyObject *_PP_find_file_obj(PDBfile *fp)
 
 PyObject *PP_form_object(void *vr, char *type, long nitems,
                          dimdes *dims, defstr *dp, PP_file *fileinfo,
-                         PP_defstrObject *dpobj, PyObject *parent,
+                         PY_defstr *dpobj, PyObject *parent,
                          PP_form *form)
 {
     PyObject *rv;

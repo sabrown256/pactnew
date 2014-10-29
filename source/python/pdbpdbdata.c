@@ -123,7 +123,7 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     long number;
     defstr *dp;
     void *vr;
-    PP_defstrObject *dpobj;
+    PY_defstr *dpobj;
     PP_PDBfileObject *file;
     PP_descr *descr;
     PP_descr *olddescr;
@@ -163,17 +163,17 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     /* get base type, without dimension information */
     tbase = CSTRSAVE(descr->type);
     strtok(tbase, " *()[");
-    dpobj = _PP_defstr_find_singleton(tbase, NULL, fileinfo);
+    dpobj = _PY_defstr_find_singleton(tbase, NULL, fileinfo);
     CFREE(tbase);
     if (dpobj == NULL)
         goto err;
 /*        return -1;*/
-    dp = dpobj->dp;
+    dp = dpobj->pyo;
     
     self = PP_pdbdata_newobj(self, vr, descr->type, number,
                              descr->dims, dp, fileinfo, dpobj, NULL);
     
-/*    self->dict = PP_defstr_dict(ts, fp);*/
+/*    self->dict = PY_defstr_dict(ts, fp);*/
 
 #if 0
     dimdes *dims;
@@ -628,7 +628,7 @@ PyTypeObject PP_pdbdata_Type = {
 PP_pdbdataObject *PP_pdbdata_newobj(PP_pdbdataObject *obj,
                                     void *vr, char *type, long nitems,
                                     dimdes *dims, defstr *dp, PP_file *fileinfo,
-                                    PP_defstrObject *dpobj, PyObject *parent)
+                                    PY_defstr *dpobj, PyObject *parent)
 {
     if (obj == NULL) {
 /*        obj = (PP_pdbdataObject *) PyType_GenericAlloc(&PP_pdbdata_Type, 0);*/

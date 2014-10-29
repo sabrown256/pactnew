@@ -36,33 +36,6 @@ typedef int Py_ssize_t;
 /* DO-NOT-DELETE splicer.end(pdb.C_declaration) */
 
 /*--------------------------------------------------------------------------*/
-/*                              OBJECT defstr                               */
-/*--------------------------------------------------------------------------*/
-
-/* #define PP_defstr_Check(op)    (PY_TYPE(op) == &PP_defstr_Type) */
-
-typedef struct s_PP_defstrObject *PP_defstrObjectp;
-
-typedef struct s_PP_defstrObject {
-  PyObject_HEAD
-  defstr *dp;
-/* DO-NOT-DELETE splicer.begin(pdb.defstr.extra_object) */
-    PP_file *fileinfo;
-    hasharr *host_chart;
-    PyTypeObject *ctor;
-/* DO-NOT-DELETE splicer.end(pdb.defstr.extra_object) */
-} PP_defstrObject;
-
-/* staticforward PyTypeObject PP_defstr_Type;*/
-extern PyTypeObject PP_defstr_Type;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.begin(pdb.defstr.C_declaration) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.defstr.C_declaration) */
-
-/*--------------------------------------------------------------------------*/
 /*                              OBJECT pdbdata                              */
 /*--------------------------------------------------------------------------*/
 
@@ -140,9 +113,6 @@ extern PyObject *PP_open_file_dict;
 
 PY_memdes *PP_memdes_newobj(PY_memdes *obj, memdes *desc);
 
-PP_defstrObject *PP_defstr_newobj(PP_defstrObject *obj, defstr *dp,
-                                  PP_file *fileinfo);
-
 PP_hashtabObject *PP_hashtab_newobj(PP_hashtabObject *obj,
                                     hasharr *tab);
 
@@ -152,7 +122,7 @@ PY_hasharr *PY_hasharr_newobj(PY_hasharr *obj,
 PP_pdbdataObject *PP_pdbdata_newobj(PP_pdbdataObject *obj,
                                     void *vr, char *type, long nitems,
                                     dimdes *dims, defstr *dp, PP_file *fileinfo,
-                                    PP_defstrObject *dpobj, PyObject *parent);
+                                    PY_defstr *dpobj, PyObject *parent);
 
 PP_PDBfileObject *_PP_PDBfile_newobj(PP_PDBfileObject *obj,
                                      PP_file *fileinfo);
@@ -161,22 +131,6 @@ PP_PDBfileObject *_PP_PDBfile_newobj(PP_PDBfileObject *obj,
 
 PyObject *_PP_read_data(PP_file *fileinfo, char *name, char *intype,
                         int nd, long *ind, PP_form *form);
-
-/* ppdefstr.c */
-
-PyTypeObject *PP_defstr_mk_ctor(PP_defstrObject *dpobj);
-void _PP_rl_defstr(PP_defstrObject *dpobj);
-PP_defstrObject *_PP_defstr_make_singleton(
-    PP_defstrObject *self,
-    char *name, PyObject *members, PP_file *fileinfo);
-PP_defstrObject *_PP_defstr_find_singleton(
-    char *name, defstr *dp, PP_file *fileinfo);
-
-
-PyObject *PP_form_object(void *vr, char *type, long nitems,
-                         dimdes *dims, defstr *dp, PP_file *fileinfo,
-                         PP_defstrObject *dpobj, PyObject *parent,
-                         PP_form *form);
 
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.C_declaration) */
 

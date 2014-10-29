@@ -600,7 +600,7 @@ PyTypeObject PP_hashtab_Type = {
 PP_hashtabObject *PP_hashtab_newobj(PP_hashtabObject *obj,
                                     hasharr *tab)
 {
-    PP_defstrObject *dpobj;
+    PY_defstr *dpobj;
     
     if (obj == NULL) {
         obj = (PP_hashtabObject *) PyType_GenericAlloc(&PP_hashtab_Type, 0);
@@ -609,13 +609,13 @@ PP_hashtabObject *PP_hashtab_newobj(PP_hashtabObject *obj,
         }
     }
 
-    dpobj = _PP_defstr_find_singleton("hasharr", NULL, PP_vif_info);
+    dpobj = _PY_defstr_find_singleton("hasharr", NULL, PP_vif_info);
     if (dpobj == NULL)
         return NULL;
 
     obj = (PP_hashtabObject *) PP_pdbdata_newobj(
-        (PP_pdbdataObject *) obj, tab, dpobj->dp->type, 1L, NULL,
-        dpobj->dp, dpobj->fileinfo, dpobj, NULL);
+        (PP_pdbdataObject *) obj, tab, dpobj->pyo->type, 1L, NULL,
+        dpobj->pyo, dpobj->fileinfo, dpobj, NULL);
 
     return obj;
 }

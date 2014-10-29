@@ -10,12 +10,17 @@
 
 #define PCK_PY_INTERNAL
 
+#define PY_EXT_DEFSTR                                                       \
+    PP_file *fileinfo;                                                      \
+    hasharr *host_chart;                                                    \
+    PyTypeObject *ctor;
+
 #include <Python.h>
 #undef HAVE_GETHOSTBYNAME
 #include "sx_int.h"
 #include "scope_hash.h"
-#include "py_gen.h"
 #include <pputil.h>
+#include "py_gen.h"
 
 /*--------------------------------------------------------------------------*/
 
@@ -50,6 +55,14 @@
 # define PY_DEF_TP_METH NULL
 #endif
 
+#ifndef PY_DEF_TP_PRINT
+# define PY_DEF_TP_PRINT NULL
+#endif
+
+#ifndef PY_DEF_TP_CALL
+# define PY_DEF_TP_CALL NULL
+#endif
+
 #define PY_DEF_TYPE(_t)                                                      \
 PyTypeObject                                                                 \
  PY_ ## _t ## _type = {PY_HEAD_INIT(&PyType_Type, 0)                         \
@@ -57,7 +70,7 @@ PyTypeObject                                                                 \
                   sizeof(PY_ ## _t),                                         \
                   0,                                                         \
                   (destructor) PY_DEF_DESTRUCTOR,                            \
-                  (printfunc) 0,                                             \
+                  (printfunc) PY_DEF_TP_PRINT,                               \
                   (getattrfunc) 0,                                           \
                   (setattrfunc) 0,                                           \
                   (cmpfunc) 0,                                               \
@@ -66,7 +79,7 @@ PyTypeObject                                                                 \
                   0,                                                         \
                   PY_DEF_AS_MAP,                                             \
                   (hashfunc) 0,                                              \
-                  (ternaryfunc) 0,                                           \
+                  (ternaryfunc) PY_DEF_TP_CALL,                              \
                   (reprfunc) 0,                                              \
                   (getattrofunc) 0,                                          \
                   (setattrofunc) 0,                                          \
@@ -207,6 +220,44 @@ extern PyObject
  *PY_set_line_info(PyObject *self, PyObject *args, PyObject *kwds),
  *PY_set_tds_info(PyObject *self, PyObject *args, PyObject *kwds),
  *PY_set_tdv_info(PyObject *self, PyObject *args, PyObject *kwds);
+
+
+/* PDBDEFSTR.C declarations */
+
+extern PyTypeObject
+ *PY_defstr_mk_ctor(PY_defstr *dpobj);
+
+extern void
+ _PP_rl_defstr(PY_defstr *dpobj);
+
+extern PY_defstr
+ *PY_defstr_newobj(PY_defstr *obj, defstr *dp, PP_file *fileinfo),
+ *_PY_defstr_make_singleton(PY_defstr *self,
+			    char *name, PyObject *members, PP_file *fileinfo),
+ *_PY_defstr_find_singleton(char *name, defstr *dp, PP_file *fileinfo);
+
+
+PyObject *PP_form_object(void *vr, char *type, long nitems,
+                         dimdes *dims, defstr *dp, PP_file *fileinfo,
+                         PY_defstr *dpobj, PyObject *parent,
+                         PP_form *form);
+
+extern void
+ PY_defstr_rem(char *name, PDBfile *file),
+ _PY_defstr_entry(PP_file *fileinfo),
+ _PP_create_defstr_tab(void),
+ _PP_cleanup_defstrs(PDBfile *fp);
+
+extern int
+ PY_defstr_dict(defstr *dp, PyObject *dict);
+
+extern defstr
+ *PY_defstr_alt(PDBfile *file, char *name, PyObject *members);
+
+extern PyObject
+ *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
+			 char *name, long nitems, PyObject *parent);
+
 
 
 #ifdef __cplusplus

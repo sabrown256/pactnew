@@ -1630,7 +1630,7 @@ PyObject *PP_copy_mem_to_obj(PDBfile *file,
 -            obj = PP_pdbdata_newobj(NULL, vr, type, nitems, dims, PP_pdbdataObject *obj,
 -                                    void *vr, char *type, long nitems,
 -                                    dimdes *dims, defstr *dp, PDBfile *file,
--                                    PP_defstrObject *dpobj, PyObject *parent)
+-                                    PY_defstr *dpobj, PyObject *parent)
 -        }
 #endif
         if (form->array_kind == AS_ARRAY) {
