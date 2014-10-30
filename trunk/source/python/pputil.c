@@ -17,6 +17,71 @@ PyObject
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PY_SETUP_PACT - do setup for any PACT based module */
+
+int PY_setup_pact(PyObject *m, PyObject *d)
+   {int ne;
+
+    ne = 0;
+
+    if (ne == 0)
+       ne += _PY_pact_constants(m);
+
+    if (ne == 0)
+       ne += _PY_pact_type_system(m);
+
+    if (ne == 0)
+       ne += PY_init_score(m, d);
+
+    if (ne == 0)
+       ne += PY_init_pml(m, d);
+
+    if (ne == 0)
+       ne += PY_init_pdb(m, d);
+
+    if (ne == 0)
+       {PY_DEF_GETSET(pcons, "alist");
+	PY_DEF_GETSET(hasharr, "hasharr");
+
+	PY_DEF_GETSET(PM_field, "field");
+	PY_DEF_GETSET(PM_mesh_topology, "mt");
+	PY_DEF_GETSET(PM_set, "set");
+	PY_DEF_GETSET(PM_mapping, "map");
+
+	PY_DEF_GETSET(defstr, "dp");
+	PY_DEF_GETSET(memdes, "desc");
+	PY_DEF_GETSET(PDBfile, "object");
+
+	PP_pdbdata_Type.tp_new   = PyType_GenericNew;
+	PP_pdbdata_Type.tp_alloc = PyType_GenericAlloc;
+	ne += (PyType_Ready(&PP_pdbdata_Type) < 0);};
+
+/* add some symbolic constants to the module */
+    if (ne == 0)
+       {ne += (PyDict_SetItemString(d, "pdbdata",
+				    (PyObject *) &PP_pdbdata_Type) < 0);
+	ne += (PyDict_SetItemString(d, "assoc",
+				    (PyObject *) &PY_pcons_type) < 0);};
+
+    if (ne == 0)
+       {PP_init_type_map();
+
+#ifdef HAVE_PY_NUMPY
+	_PP_init_numpy();
+#endif
+
+/* add Error Exceptions */
+	PP_error_internal = PyErr_NewException("pdb.internal", NULL, NULL);
+	PyDict_SetItemString(d, "internal", PP_error_internal);
+
+	PP_error_user = PyErr_NewException("pdb.error", NULL, NULL);
+	PyDict_SetItemString(d, "error", PP_error_user);};
+
+    return(ne);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 void PY_self_free(void *o)
    {PyObject *pyo;
     struct _typeobject *ot;

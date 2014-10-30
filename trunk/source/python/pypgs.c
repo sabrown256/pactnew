@@ -6,6 +6,159 @@
 
 #include "pgsmodule.h"
 
+char
+ PP_make_graph_1d_doc[] = "",
+ PP_make_graph_r2_r1_doc[] = "",
+ PP_make_image_doc[] = "",
+ PP_get_processor_number_doc[] = "",
+ PP_get_number_processors_doc[] = "",
+ PP_iso_limit_doc[] = "";
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_MAKE_GRAPH_1D - */
+
+PyObject *PP_make_graph_1d(PyObject *self, PyObject *args, PyObject *kwds)
+   {int id, cp, n;
+    double *x, *y;
+    char *label, *xname, *yname;
+    PG_graph *result;
+    PyObject *rv;
+    char *kw_list[] = {"id", "label", "cp", "n",
+		       "x", "y", "xname", "yname", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "isiiO&O&ss:make_graph_1d", kw_list,
+				    &id, &label, &cp, &n,
+				    REAL_array_extractor, &x,
+				    REAL_array_extractor, &y,
+				    &xname, &yname))
+       {result = PG_make_graph_1d(id, label, cp, n, x, y, xname, yname);
+	SC_mark(result->info, 1);
+	rv = PPgraph_from_ptr(result);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_MAKE_GRAPH_R2_R1 - */
+
+PyObject *PP_make_graph_r2_r1(PyObject *self, PyObject *args, PyObject *kwds)
+   {int id, cp, imx, jmx, centering;
+    double *x, *y, *r;
+    char *label, *dname, *rname;
+    PG_graph *result;
+    PyObject *rv;
+    char *kw_list[] = {"id", "label", "cp", "imx", "jmx",
+		       "centering", "x", "y", "r",
+		       "dname", "rname", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "isiiiiO&O&O&ss:make_graph_r2_r1", kw_list,
+				    &id, &label, &cp, &imx, &jmx, &centering,
+				    REAL_array_extractor, &x,
+				    REAL_array_extractor, &y,
+				    REAL_array_extractor, &r,
+				    &dname, &rname))
+       {result = PG_make_graph_r2_r1(id, label, cp, imx, jmx, centering,
+				 x, y, r, dname, rname);
+	SC_mark(result->info, 1);
+	rv = PPgraph_from_ptr(result);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_MAKE_IMAGE - */
+
+PyObject *PP_make_image(PyObject *self, PyObject *args, PyObject *kwds)
+   {int w, h, bpp;
+    double dbx[PG_BOXSZ];
+    double rbx[PG_BOXSZ];
+    char *label, *type;
+    void *z;    /* XXX */
+    PG_palette *palette;
+    PG_image *result;
+    PyObject *rv;
+    char *kw_list[] = {"label", "type", "z",
+		       "xmn", "xmx", "ymn", "ymx", "zmn", "zmx",
+		       "w", "h", "bpp", "palette", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "ssO&ddddddiiiO&:make_image",
+				    kw_list, &label, &type,
+				    PP_buffer_extractor, &z,
+				    &dbx[0], &dbx[1], &dbx[2], &dbx[3],
+				    &rbx[0], &rbx[1],
+				    &w, &h, &bpp,
+				    PY_PG_palette_extractor, &palette))
+       {result = PG_make_image_n(label, type, z, 2, WORLDC,
+				 dbx, rbx, w, h, bpp, palette);
+	rv     = PPimage_from_ptr(result);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_GET_PROCESSOR_NUMBER - */
+
+PyObject *PP_get_processor_number(PyObject *self,
+				  PyObject *args, PyObject *kwds)
+   {int result;
+    PyObject *rv;
+
+    result = PG_get_processor_number();
+    rv     = PY_INT_LONG(result);
+
+   return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_GET_NUMBER_PROCESSORS - */
+
+PyObject *PP_get_number_processors(PyObject *self,
+				   PyObject *args, PyObject *kwds)
+   {int result;
+    PyObject *rv;
+
+    result = PG_get_number_processors();
+    rv     = PY_INT_LONG(result);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_ISO_LIMIT - */
+
+PyObject *PP_iso_limit(PyObject *self, PyObject *args, PyObject *kwds)
+   {int npts;
+    double min, max;
+    double *a;
+    PyObject *rv;
+    char *kw_list[] = {"a", "npts", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O&i:iso_limit", kw_list,
+				    REAL_array_extractor, &a, &npts))
+       {PG_iso_limit(a, npts, &min, &max);
+	rv = Py_BuildValue("ff", min, max);};
+
+   return(rv);}
+
 /*--------------------------------------------------------------------------*/
 
 /*                             PG_PALETTE ROUTINES                          */
@@ -41,7 +194,7 @@ char
 #define PY_DEF_TP_CALL              NULL
 #define PY_DEF_AS_MAP               NULL
 
-PY_DEF_TYPE(PG_palette);
+PY_DEF_TYPE_R(PG_palette, "palette");
 
 /*--------------------------------------------------------------------------*/
 
@@ -169,7 +322,7 @@ static int PY_PG_image_tp_init(PY_PG_image *self,
 char
  PY_PG_image_doc[] = "";
 
-PY_DEF_TYPE(PG_image);
+PY_DEF_TYPE_R(PG_image, "image");
 
 /*--------------------------------------------------------------------------*/
 
@@ -360,7 +513,7 @@ static int PY_PG_graph_tp_init(PY_PG_graph *self,
 char
  PY_PG_graph_doc[] = "";
 
-PY_DEF_TYPE(PG_graph);
+PY_DEF_TYPE_R(PG_graph, "graph");
 
 /*--------------------------------------------------------------------------*/
 
@@ -1125,7 +1278,7 @@ static int PY_PG_device_tp_init(PY_PG_device *self,
 char
  PY_PG_device_doc[] = "";
 
-PY_DEF_TYPE(PG_device);
+PY_DEF_TYPE_R(PG_device, "device");
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

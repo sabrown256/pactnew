@@ -33,7 +33,7 @@ static int PY_PM_field_tp_init(PY_PM_field *self,
 char
  PY_PM_field_doc[] = "";
 
-PY_DEF_TYPE(PM_field);
+PY_DEF_TYPE_R(PM_field, "field");
 
 /*--------------------------------------------------------------------------*/
 
@@ -72,7 +72,7 @@ static int PY_PM_mesh_topology_tp_init(PY_PM_mesh_topology *self,
 char
  PY_PM_mesh_topology_doc[] = "";
 
-PY_DEF_TYPE(PM_mesh_topology);
+PY_DEF_TYPE_R(PM_mesh_topology, "mesh_topology");
 
 /*--------------------------------------------------------------------------*/
 
@@ -237,7 +237,7 @@ static int PY_PM_set_tp_init(PY_PM_set *self, PyObject *args, PyObject *kwds)
 char
  PY_PM_set_doc[] = "";
 
-PY_DEF_TYPE(PM_set);
+PY_DEF_TYPE_R(PM_set, "set");
 
 /*--------------------------------------------------------------------------*/
 
@@ -303,7 +303,7 @@ static int PY_PM_mapping_tp_init(PY_PM_mapping *self, PyObject *args,
 char
  PY_PM_mapping_doc[] = "";
 
-PY_DEF_TYPE(PM_mapping);
+PY_DEF_TYPE_R(PM_mapping, "mapping");
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -69,13 +69,11 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
 
 object *_SX_call_args(SS_psides *si, int type, void *v)
    {object *obj;
-    pcons *alst;
     object *(*f)(SS_psides *si, void *a);
 
     obj = SS_null;
 
-    alst = SC_type_info(type);
-    f    = SC_assoc(alst, "C->Scheme");
+    SS_get_type_method(type, "C->Scheme", &f, NULL);
     if (f != NULL)
        obj = f(si, v);
 

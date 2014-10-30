@@ -16,17 +16,45 @@
 /* SS_GET_TYPE_METHOD - fetch the methods associated with TYPE */
 
 int SS_get_type_method(int type, ...)
-   {int rv;
-
-    rv = TRUE;
-
-#if 0
+   {int i, ok, rv;
+    char *mn;
     pcons *alst;
-    void *(*f)(SS_psides *si, object *o);
+    PFPVoid *pmf;
+    SC_type *ty;
 
-       {alst = SC_type_info(type);
-	f    = SC_assoc(alst, "Scheme->C");
-#endif
+    SC_VA_START(type);
+
+    ty = _SC_get_type_id(type);
+
+/* if the type is found set all the function pointers */
+    if (ty != NULL)
+       {alst = ty->a;
+
+	ok = TRUE;
+	for (i = 0; ok == TRUE; i++)
+	    {mn = SC_VA_ARG(char *);
+	     if (mn == NULL)
+	        ok = FALSE;
+	     else
+	        {pmf  = SC_VA_ARG(PFPVoid *);
+		 *pmf = SC_assoc(alst, mn);};};
+
+	rv = TRUE;}
+
+/* if the type is not found NULL out all the function pointers */
+    else
+       {ok = TRUE;
+	for (i = 0; ok == TRUE; i++)
+	    {mn = SC_VA_ARG(char *);
+	     if (mn == NULL)
+	        ok = FALSE;
+	     else
+	        {pmf  = SC_VA_ARG(PFPVoid *);
+		 *pmf = NULL;};};
+
+	rv = FALSE;};
+
+    SC_VA_END;
 
     return(rv);}
 
@@ -36,20 +64,35 @@ int SS_get_type_method(int type, ...)
 /* SS_SET_TYPE_METHOD - set the methods associated with TYPE */
 
 int SS_set_type_method(int type, ...)
-   {int rv;
-
-    rv = TRUE;
-
-#if 0
+   {int i, ok, rv;
+    char *tn, *mn;
     pcons *alst;
+    PFPVoid mf;
     SC_type *ty;
 
-    ty    = _SC_get_type_id(SX_QUATERNION_I);
-    alst  = ty->a;
-    alst  = SC_add_alist(alst, "C->Scheme", "QUATERNION", SX_make_quaternion);
-    alst  = SC_add_alist(alst, "Scheme->C", "QUATERNION", _SX_arg_quaternion);
-    ty->a = alst;
-#endif
+    SC_VA_START(type);
+
+    ty = _SC_get_type_id(type);
+    if (ty != NULL)
+       {tn   = ty->type;
+	alst = ty->a;
+
+	ok = TRUE;
+	for (i = 0; ok == TRUE; i++)
+	    {mn = SC_VA_ARG(char *);
+	     if (mn == NULL)
+	        ok = FALSE;
+	     else
+	        {mf   = SC_VA_ARG(PFPVoid);
+		 alst = SC_add_alist(alst, mn, tn, mf);};};
+
+	ty->a = alst;
+
+	rv = TRUE;}
+    else
+       rv = FALSE;
+
+    SC_VA_END;
 
     return(rv);}
 
@@ -306,7 +349,6 @@ static void _SS_quaternion_arg(SS_psides *si, object *obj, void *v)
 static void _SS_args(SS_psides *si, object *obj, void *v, int type)
    {void **pv;
     char *s;
-    pcons *alst;
     void *(*f)(SS_psides *si, object *o);
     procedure *pp;
 
@@ -376,8 +418,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 #endif
 
     else
-       {alst = SC_type_info(type);
-	f    = SC_assoc(alst, "Scheme->C");
+       {SS_get_type_method(type, "Scheme->C", &f, NULL);
 	if (f != NULL)
 	   *pv = f(si, obj);
 	else if (si->get_arg != NULL)

@@ -5,196 +5,14 @@
  */
 
 #define _pdb_MODULE
+
 #include "pdbmodule.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_getdefstr - */
-
-static char PP_getdefstr_doc[] = 
-""
-;
-
-static PyObject *
-PP_getdefstr(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    PP_pdbdataObject *obj;
-    PY_defstr *rv;
-    char *kw_list[] = {"obj", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:getdefstr", kw_list,
-                                     &PP_pdbdata_Type, &obj))
-        return NULL;
-
-    rv = obj->dpobj;
-    
-    Py_INCREF(rv);
-    return (PyObject *) rv;
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_gettype - */
-
-static char PP_gettype_doc[] = 
-""
-;
-
-static PyObject *
-PP_gettype(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    PP_pdbdataObject *obj;
-    char *kw_list[] = {"obj", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:gettype", kw_list,
-                                     &PP_pdbdata_Type, &obj))
-        return NULL;
-    return PY_STRING_STRING(obj->type);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_getfile - */
-
-static char PP_getfile_doc[] = 
-""
-;
-
-static PyObject *
-PP_getfile(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    PP_pdbdataObject *obj;
-    PY_PDBfile *file;
-    char *kw_list[] = {"obj", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:getfile", kw_list,
-                                     &PP_pdbdata_Type, &obj))
-        return NULL;
-
-    file = (PY_PDBfile *) _PP_find_file_obj(obj->fileinfo->file);
-    if (file == NULL)
-        return NULL;
-
-    Py_INCREF(file);
-    return (PyObject *) file;
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_getdata - */
-
-static char PP_getdata_doc[] = 
-""
-;
-
-static PyObject *
-PP_getdata(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    PP_pdbdataObject *obj;
-    char *kw_list[] = {"obj", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!:getdata", kw_list,
-                                     &PP_pdbdata_Type, &obj))
-        return NULL;
-    /* XXX add deallocator */
-    return PY_COBJ_VOID_PTR(obj->data, NULL);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_getmember - */
-
-static char PP_getmember_doc[] = 
-""
-;
-
-static PyObject *
-PP_getmember(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    PP_pdbdataObject *obj;
-    char *name;
-    char *kw_list[] = {"obj", "name", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!s:getmember", kw_list,
-                                     &PP_pdbdata_Type, &obj, &name))
-        return NULL;
-
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_unpack - */
-
-static char PP_unpack_doc[] = 
-""
-;
-
-static PyObject *
-PP_unpack(
-  PyObject *self,    /* not used */
-  PyObject *args,
-  PyObject *kwds)
-{
-    char *kw_list[] = {"data", "array", "struct", "scalar", NULL};
-    int ok;
-    int array, structure, scalar;
-    PyObject *rv;
-    PP_pdbdataObject *data;
-    PP_form form;
-
-    array = AS_NONE;
-    structure = AS_NONE;
-    scalar = AS_NONE;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|iii:unpack", kw_list,
-                                     &PP_pdbdata_Type, &data,
-                                     &array, &structure, &scalar))
-        return NULL;
-
-    /* default to global values */
-    form = PP_global_form;
-    ok = _PP_assign_form(&form, array, structure, scalar);
-    if (ok < 0)
-        return NULL;
-    /* replace AS_PDBDATA with unpack defaults */
-    if (form.array_kind == AS_PDBDATA)
-        form.array_kind = AS_LIST;
-    if (form.struct_kind == AS_PDBDATA)
-        form.struct_kind = AS_TUPLE;
-    if (form.scalar_kind == AS_PDBDATA)
-        form.scalar_kind = AS_OBJECT;
-
-    rv = _PP_wr_syment(data->fileinfo, data->type, data->dims,
-                       data->nitems, data->data, &form);
-    return rv;
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyMethodDef PP_methods[] = {
+static PyMethodDef
+ PP_methods[] = {
 {"print_controls", (PyCFunction)PP_print_controls, METH_KEYWORDS, PP_print_controls_doc},
 {"zero_space", (PyCFunction)PP_zero_space, METH_KEYWORDS, PP_zero_space_doc},
 {"alloc", (PyCFunction)PP_alloc, METH_KEYWORDS, PP_alloc_doc},
@@ -229,24 +47,6 @@ static PyMethodDef PP_methods[] = {
 {"unpack", (PyCFunction)PP_unpack, METH_KEYWORDS, PP_unpack_doc},
 {NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
 };
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PP_EXTRA_DEFSTR_MARK - add an extra mark into the virtual
- *                       - internal file's predefined defstrs
- */
-
-static int _PP_extra_defstr_mark(haelem *hp, void *arg)
-   {int ok;
-    defstr *dp;
-
-    ok = SC_haelem_data(hp, NULL, NULL, (void **) &dp, FALSE);
-    SC_ASSERT(ok == TRUE);
-
-    SC_mark(dp, 1);
-
-    return(0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -286,102 +86,22 @@ PY_MOD_BEGIN(_pdb, pdb_module_documentation, PP_methods)
     if (d == NULL)
        PY_MOD_RETURN_ERR;
 
-    ne = _PY_pact_constants(m);
+    ne = PY_setup_pact(m, d);
+    if (ne > 0)
+       PY_MOD_RETURN_ERR;
+    
+    ne += _PY_pdbmodule_const(m);
     if (ne > 0)
        PY_MOD_RETURN_ERR;
 
-    ne = _PY_pact_type_system(m);
+    ne += PY_setup_pdb(m);
     if (ne > 0)
-       PY_MOD_RETURN_ERR;
-
-    ne = _PY_pdbmodule_const(m);
-    if (ne > 0)
-       PY_MOD_RETURN_ERR;
-
-    ne += PY_init_score(m, d);
-    if (ne > 0)
-       PY_MOD_RETURN_ERR;
-
-    ne += PY_init_pml(m, d);
-    if (ne > 0)
-       PY_MOD_RETURN_ERR;
-
-    ne += PY_init_pdb(m, d);
-    if (ne > 0)
-       PY_MOD_RETURN_ERR;
-
-    PY_DEF_GETSET(pcons, "alist");
-    PY_DEF_GETSET(hasharr, "hasharr");
-
-    PY_DEF_GETSET(PM_field, "field");
-    PY_DEF_GETSET(PM_mesh_topology, "mt");
-    PY_DEF_GETSET(PM_set, "set");
-    PY_DEF_GETSET(PM_mapping, "map");
-
-    PY_DEF_GETSET(defstr, "dp");
-    PY_DEF_GETSET(memdes, "desc");
-    PY_DEF_GETSET(PDBfile, "object");
-
-    PP_pdbdata_Type.tp_new = PyType_GenericNew;
-    PP_pdbdata_Type.tp_alloc = PyType_GenericAlloc;
-    if (PyType_Ready(&PP_pdbdata_Type) < 0)
-       PY_MOD_RETURN_ERR;
-
-/* add some symbolic constants to the module */
-    if (PyDict_SetItemString(d, "pdbdata", (PyObject *) &PP_pdbdata_Type) < 0)
        PY_MOD_RETURN_ERR;
 
 /* make 'open' a synonym for 'PDBfile' */
     if (PyDict_SetItemString(d, "open", (PyObject *) &PY_PDBfile_type) < 0)
        PY_MOD_RETURN_ERR;
 
-    PP_init_type_map();
-
-#ifdef HAVE_PY_NUMPY
-    _PP_init_numpy();
-#endif
-  
-    if (PyModule_AddIntConstant(m, "AS_NONE", AS_NONE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AS_PDBDATA", AS_PDBDATA) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AS_OBJECT", AS_OBJECT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AS_TUPLE", AS_TUPLE) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AS_LIST", AS_LIST) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AS_DICT", AS_DICT) < 0)
-       PY_MOD_RETURN_ERR;
-    if (PyModule_AddIntConstant(m, "AS_ARRAY", AS_ARRAY) < 0)
-       PY_MOD_RETURN_ERR;
-    
-    PP_open_file_dict = PyDict_New();
-    if (PyModule_AddObject(m, "files", PP_open_file_dict) < 0)
-       PY_MOD_RETURN_ERR;
-
-    PP_vif_info = _PP_open_vif("PP_vif");
-    if (PP_vif_info != NULL)
-       {int err;
-
-        PP_vif_obj = PY_PDBfile_newobj(NULL, PP_vif_info);
-        PP_vif     = PP_vif_info->file;
-
-/* mark every currently existing defstr in the host_chart */
-	err = SC_hasharr_foreach(PP_vif->host_chart, _PP_extra_defstr_mark, NULL);
-	SC_ASSERT(err == TRUE);
-
-/* XXX - test err */
-        if (PyModule_AddObject(m, "vif", (PyObject *) PP_vif_obj) < 0)
-           PY_MOD_RETURN_ERR;};
-
-/* add Error Exceptions */
-    PP_error_internal = PyErr_NewException("pdb.internal", NULL, NULL);
-    PyDict_SetItemString(d, "internal", PP_error_internal);
-    
-    PP_error_user = PyErr_NewException("pdb.error", NULL, NULL);
-    PyDict_SetItemString(d, "error", PP_error_user);
-    
     PY_MOD_END(_pdb);}
 
 /*--------------------------------------------------------------------------*/
