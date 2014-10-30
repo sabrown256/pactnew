@@ -259,6 +259,7 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
     fprintf(fh, "\n");
 
     fprintf(fh, "extern int\n");
+    fprintf(fh, " %s_extractor(PyObject *obj, void *arg),\n", tl.pnm);
     fprintf(fh, " %s_check(PyObject *op);\n", tl.pnm);
     fprintf(fh, "\n");
 
@@ -366,7 +367,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	    {if (IS_NULL(mdm) == TRUE)
 	        fprintf(fc, "    rv = PyFloat_FromDouble(self->pyo->%s);\n", mnm);
 	     else
-	        fprintf(fc, "    rv = NULL;     /* unknown floating point array */\n");}
+	        fprintf(fc, "    rv = NULL;     /* unknown floating point array '%s' */\n", pm);}
 
 /* if member is pointer to a known bound type */
          else if (python_lookup_bound_type(mty) == TRUE)
@@ -381,7 +382,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* unknown member action */
 	 else
-            fprintf(fc, "    rv = NULL;     /* unknown member action */\n");
+            fprintf(fc, "    rv = NULL;     /* unknown member action '%s' */\n", pm);
 
 	 fprintf(fc, "\n");
 	 fprintf(fc, "    return(rv);}\n");
@@ -391,44 +392,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 csep(fc);
 	 fprintf(fc, "\n");};
 
-#if 0
-
 /* setter - member accessor methods */
-
-/* examples of setter methods
- * 
- * static int PY_PM_set_name_set(PY_PM_set *self, PyObject *value,
- * 			       void *context)
- *    {int rv;
- * 
- *     rv = -1;
- * 
- *     if (value == NULL)
- *        PyErr_SetString(PyExc_TypeError,
- * 		       "attribute deletion is not supported");
- * 
- *     else if (PyArg_Parse(value, "s", &self->pyo->name))
- *        rv = 0;
- * 
- *     return(rv);}
- * 
- * static int PY_PG_graph_set_info(PY_PG_graph *self,
- * 				PyObject *value, void *context)
- *    {int rv;
- * 
- *     rv = -1;
- * 
- *     if (value == NULL)
- *        PyErr_SetString(PyExc_TypeError,
- * 		       "attribute deletion is not supported");
- * 
- *     else if (PP_assoc_extractor(value, &self->pyo->info) != 0)
- *       {SC_mark(self->pyo->info, 1);
- *        rv = 0;};
- * 
- *     return(rv);}
- */
-
     for (im = 1; ta[im] != NULL; im++)
         {pm = trim(ta[im], BOTH, " \t");
 	 if (IS_NULL(pm) == TRUE)
@@ -436,7 +400,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 	 parse_member(pm, mnm, mty, mdm, BFSML);
 
-	 fprintf(fc, "static int *%s_set_%s(%s *self,\n",
+	 fprintf(fc, "static int %s_set_%s(%s *self,\n",
 		 tl.pnm, mnm, tl.pnm);
          fprintf(fc, "                   PyObject *value, void *context)\n");
 	 fprintf(fc, "   {int rv, ok;\n");
@@ -450,18 +414,57 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
          fprintf(fc, "\n");
          fprintf(fc, "    else\n");
 
-/* handle action for different types */
-         if (0)
-	    {fprintf(fc, "       {ok = PyArg_Parse(value, "s", &self->pyo->%s);\n", mnm);
+/* if member is 'char *' */
+	 if (strcmp(mty, "char *") == 0)
+	    {fprintf(fc, "       {ok = PyArg_Parse(value, \"s\", &self->pyo->%s);\n", mnm);
 	     fprintf(fc, "        if (ok == TRUE)\n");
 	     fprintf(fc, "           rv = 0;};\n");}
 
-         else
-	    {fprintf(fc, "       {ok = PP_assoc_extractor(value, &self->pyo->info);\n");
+/* if member is fixed point type */
+	 else if ((strcmp(mty, "int") == 0) ||
+		  (strcmp(mty, "long") == 0))
+	    {if (IS_NULL(mdm) == FALSE)
+	        fprintf(fc, "    {}; /* unknown fixed point array '%s' */\n",
+			pm);
+	     else
+	        {fprintf(fc, "       {long lv;\n");
+		 fprintf(fc, "        ok = PyArg_Parse(value, \"l\", &lv);\n");
+		 fprintf(fc, "        if (ok == TRUE)\n");
+		 fprintf(fc, "           {self->pyo->%s = lv;\n", mnm);
+		 fprintf(fc, "            rv = 0;};};\n");};}
+
+/* if member is floating point type */
+	 else if ((strcmp(mty, "float") == 0) ||
+		  (strcmp(mty, "double") == 0))
+	    {if (IS_NULL(mdm) == FALSE)
+	        fprintf(fc, "    {}; /* unknown floating point array '%s' */\n",
+			pm);
+	     else
+	        {fprintf(fc, "       {double dv;\n");
+		 fprintf(fc, "        ok = PyArg_Parse(value, \"d\", &dv);\n");
+		 fprintf(fc, "        if (ok == TRUE)\n");
+		 fprintf(fc, "           {self->pyo->%s = dv;\n", mnm);
+		 fprintf(fc, "            rv = 0;};};\n");};}
+
+/* if member is pointer to a known bound type */
+         else if (python_lookup_bound_type(mty) == TRUE)
+	    {snprintf(pty, BFSML, "PY_%s", mty);
+	     fprintf(fc, "       {ok = %s_extractor(value, self->pyo->%s);\n",
+		     trim(pty, BOTH, " *"), mnm);
 	     fprintf(fc, "        if (ok == TRUE)\n");
-	     fprintf(fc, "           {_PY_opt_%s(NULL, BIND_ARG, self->pyo);\n",
-		     tl.cnm);
+	     fprintf(fc, "           { /* SC_mark(self->pyo->%s, 1); */\n",
+		     mnm);
 	     fprintf(fc, "            rv = 0;};};\n");}
+
+/* if member is pointer */
+         else if (LAST_CHAR(mty) == '*')
+	    fprintf(fc, "         rv = -1;     /* other pointer '%s' */\n",
+		    pm);
+
+/* unknown member action */
+	 else
+            fprintf(fc, "         rv = -1;     /* unknown member action '%s' */\n",
+		    pm);
 
          fprintf(fc, "\n");
 
@@ -471,8 +474,6 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 csep(fc);
 	 csep(fc);
 	 fprintf(fc, "\n");};
-
-#endif
 
 /* tp_init method */
 
@@ -531,6 +532,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* GOTCHA: when do we have a setter? */
 	 hs = FALSE;
+	 hs = TRUE;
 
          if (hs == TRUE)
 	    fprintf(fc, "    {\"%s\", (getter) %s_get_%s, (setter) %s_set_%s, %s_doc_%s, NULL},\n",

@@ -206,12 +206,6 @@ extern PyObject
  *PP_array_unpack(void *vr, long nitems, PP_types tc);
 
 
-/* PPASSOC.C declarations */
-
-extern int
- PY_pcons_extractor(PyObject *obj, void *ptr);
-
-
 /* PPHASHARR.C declarations */
 
 extern void

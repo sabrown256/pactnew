@@ -16,6 +16,11 @@ char
 
 /*--------------------------------------------------------------------------*/
 
+PY_DEF_EXTRACTOR(PM_field);
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static int PY_PM_field_tp_init(PY_PM_field *self,
 			       PyObject *args, PyObject *kwds)
    {
@@ -34,6 +39,11 @@ PY_DEF_TYPE(PM_field);
 
 /*                           MESH_TOPOLOGY ROUTINES                         */
 
+/*--------------------------------------------------------------------------*/
+
+PY_DEF_EXTRACTOR(PM_mesh_topology);
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 static int PY_PM_mesh_topology_tp_init(PY_PM_mesh_topology *self,
@@ -68,6 +78,11 @@ PY_DEF_TYPE(PM_mesh_topology);
 
 /*                              PM_SET_ROUTINES                             */
 
+/*--------------------------------------------------------------------------*/
+
+PY_DEF_EXTRACTOR(PM_set);
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PY_OPT_PM_SET - handle BLANG binding related operations */
@@ -250,29 +265,7 @@ void *_PY_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PY_MAPPING_EXTRACTOR - extract a mapping from an object */
-
-int _PY_mapping_extractor(PyObject *obj, void *arg)
-   {int rv;
-    PM_mapping **ppm;
-
-    rv  = TRUE;
-    ppm = (PM_mapping **) arg;
-
-    if (obj == Py_None)
-        *ppm = NULL;
-
-    else if (PY_PM_mapping_check(obj))
-       {PY_PM_mapping *self;
-
-        self = (PY_PM_mapping *) obj;
-
-        *ppm = self->pyo;}
-
-    else
-       rv = FALSE;
-
-    return(rv);}
+PY_DEF_EXTRACTOR(PM_mapping);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -295,7 +288,7 @@ static int PY_PM_mapping_tp_init(PY_PM_mapping *self, PyObject *args,
 				    &PY_PM_set_type, &domainobj,
 				    &PY_PM_set_type, &rangeobj,
 				    &centering,
-				    _PY_mapping_extractor, &next))
+				    PY_PM_mapping_extractor, &next))
        {rv        = 0;
 	domain    = domainobj->pyo;
 	range     = rangeobj->pyo;

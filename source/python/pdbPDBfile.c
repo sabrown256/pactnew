@@ -1,12 +1,16 @@
 /*
- * Source Version: 9.0
- * Software Release: LLNL-CODE-422942
+ * PDBFILE.C
  *
  * include cpyright.h
  */
 
 #include "pdbmodule.h"
 #include "gp-pdb.h"
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+PY_DEF_EXTRACTOR(PDBfile);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -915,7 +919,9 @@ static PyMethodDef PY_PDBfile_methods[] = {
 
 /*--------------------------------------------------------------------------*/
 
+#if 0
 static char PY_PDBfile_doc_object_mode[] = "";
+#endif
 
 static PyObject *PY_PDBfile_get_object_mode(PY_PDBfile *self, void *context)
 {

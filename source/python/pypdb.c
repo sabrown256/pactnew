@@ -1,5 +1,5 @@
 /*
- * PDBDEFSTR.C
+ * PYPDB.C
  *
  * include cpyright.h
  */
@@ -20,6 +20,14 @@
 static hasharr
   *_PY_defstr_tab;
   
+/*--------------------------------------------------------------------------*/
+
+/*                               DEFSTR ROUTINES                            */
+
+/*--------------------------------------------------------------------------*/
+
+PY_DEF_EXTRACTOR(defstr);
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -1025,6 +1033,70 @@ char
  PY_defstr_doc[] = "";
 
 PY_DEF_TYPE(defstr);
+
+/*--------------------------------------------------------------------------*/
+
+/*                               MEMDES ROUTINES                            */
+
+/*--------------------------------------------------------------------------*/
+
+PY_DEF_EXTRACTOR(memdes);
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+PY_memdes *PY_memdes_newobj(PY_memdes *obj, memdes *desc)
+   {
+
+    if (obj == NULL)
+       {obj = (PY_memdes *) PyType_GenericAlloc(&PY_memdes_type, 0);
+        if (obj == NULL)
+	   return NULL;};
+
+    obj->pyo = desc;
+    SC_mark(desc, 1);
+
+    return obj;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static void PY_memdes_tp_dealloc(PY_memdes *self)
+   {
+
+    _PD_rl_descriptor(self->pyo);
+
+    PY_self_free(self);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int PY_memdes_tp_init(PY_memdes *self, PyObject *args, PyObject *kwds)
+   {
+
+    return 0;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#undef PY_DEF_DESTRUCTOR
+#undef PY_DEF_TP_METH
+#undef PY_DEF_TP_PRINT
+#undef PY_DEF_TP_CALL
+#undef PY_DEF_AS_MAP
+
+#define PY_DEF_DESTRUCTOR	    PY_memdes_tp_dealloc
+#define PY_DEF_TP_METH              NULL
+#define PY_DEF_TP_PRINT             NULL
+#define PY_DEF_TP_CALL              NULL
+#define PY_DEF_AS_MAP               NULL
+
+char
+ PY_memdes_doc[] = "";
+
+PY_DEF_TYPE(memdes);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

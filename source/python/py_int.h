@@ -38,6 +38,25 @@
 
 /*--------------------------------------------------------------------------*/
 
+/* PY_DEF_EXTRACTOR */
+
+#define PY_DEF_EXTRACTOR(_t)                                                 \
+int PY_ ## _t ## _extractor(PyObject *obj, void *arg)                        \
+   {int rv;                                                                  \
+    _t **pp;                                                                 \
+    rv = TRUE;                                                               \
+    pp = (_t **) arg;                                                        \
+    if (obj == Py_None)                                                      \
+       *pp = NULL;                                                           \
+    else if (PY_ ## _t ## _check(obj))                                       \
+       {PY_ ## _t *self;                                                     \
+        self = (PY_ ## _t *) obj;                                            \
+        *pp = self->pyo;}                                                    \
+    else                                                                     \
+       rv = FALSE;                                                           \
+    return(rv);}
+
+
 /* PY_DEF_GETSET - modify the generated PyGetSetDef */
 
 #define PY_DEF_GETSET(_t, _n)                                                \
@@ -197,10 +216,13 @@ extern char
 
 /*--------------------------------------------------------------------------*/
 
-/* PYPML.C declarations */
+int PP_buffer_extractor(PyObject *obj, void *arg);
 
-extern int
- _PY_mapping_extractor(PyObject *obj, void *arg);
+PyObject *PPgraph_from_ptr(PG_graph *data);
+PyObject *PPpalette_from_ptr(PG_palette *pal);
+PyObject *PPimage_from_ptr(PG_image *im);
+
+/* PYPML.C declarations */
 
 extern PyObject
  *PP_make_set_1d(PyObject *self, PyObject *args, PyObject *kwds),
