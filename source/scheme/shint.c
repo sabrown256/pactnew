@@ -13,6 +13,49 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SS_GET_TYPE_METHOD - fetch the methods associated with TYPE */
+
+int SS_get_type_method(int type, ...)
+   {int rv;
+
+    rv = TRUE;
+
+#if 0
+    pcons *alst;
+    void *(*f)(SS_psides *si, object *o);
+
+       {alst = SC_type_info(type);
+	f    = SC_assoc(alst, "Scheme->C");
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_SET_TYPE_METHOD - set the methods associated with TYPE */
+
+int SS_set_type_method(int type, ...)
+   {int rv;
+
+    rv = TRUE;
+
+#if 0
+    pcons *alst;
+    SC_type *ty;
+
+    ty    = _SC_get_type_id(SX_QUATERNION_I);
+    alst  = ty->a;
+    alst  = SC_add_alist(alst, "C->Scheme", "QUATERNION", SX_make_quaternion);
+    alst  = SC_add_alist(alst, "Scheme->C", "QUATERNION", _SX_arg_quaternion);
+    ty->a = alst;
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_LOAD_BF - load the temporary string buffer */
 
 static char *_SS_load_bf(char *s)
