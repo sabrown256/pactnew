@@ -9,7 +9,6 @@
 #define PY_pgs_H
 
 #include "py_int.h"
-#include "utilpgs.h"
 
 #define PY_ARRAY_UNIQUE_SYMBOL PP_
 #ifdef HAVE_PY_NUMERIC

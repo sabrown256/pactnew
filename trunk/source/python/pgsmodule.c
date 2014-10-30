@@ -215,12 +215,15 @@ PP_make_graph_1d(
     double *y;
     char *xname;
     char *yname;
-    char *kw_list[] = {"id", "label", "cp", "n", "x", "y", "xname", "yname", NULL};
+    char *kw_list[] = {"id", "label", "cp", "n",
+		       "x", "y", "xname", "yname", NULL};
     PG_graph *result;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "isiiO&O&ss:make_graph_1d", kw_list,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds,
+				     "isiiO&O&ss:make_graph_1d", kw_list,
                                      &id, &label, &cp, &n,
-                                     REAL_array_extractor, &x, REAL_array_extractor, &y,
+                                     REAL_array_extractor, &x,
+				     REAL_array_extractor, &y,
                                      &xname, &yname))
         return NULL;
     result = PG_make_graph_1d(id, label, cp, n, x, y, xname, yname);
@@ -256,15 +259,21 @@ PP_make_graph_r2_r1(
     double *r;
     char *dname;
     char *rname;
-    char *kw_list[] = {"id", "label", "cp", "imx", "jmx", "centering", "x", "y", "r", "dname", "rname", NULL};
+    char *kw_list[] = {"id", "label", "cp", "imx", "jmx",
+		       "centering", "x", "y", "r",
+		       "dname", "rname", NULL};
     PG_graph *result;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "isiiiiO&O&O&ss:make_graph_r2_r1", kw_list,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds,
+				     "isiiiiO&O&O&ss:make_graph_r2_r1", kw_list,
                                      &id, &label, &cp, &imx, &jmx, &centering,
-                                     REAL_array_extractor, &x, REAL_array_extractor, &y,
-                                     REAL_array_extractor, &r, &dname, &rname))
+                                     REAL_array_extractor, &x,
+				     REAL_array_extractor, &y,
+                                     REAL_array_extractor, &r,
+				     &dname, &rname))
         return NULL;
-    result = PG_make_graph_r2_r1(id, label, cp, imx, jmx, centering, x, y, r, dname, rname);
+    result = PG_make_graph_r2_r1(id, label, cp, imx, jmx, centering,
+				 x, y, r, dname, rname);
     SC_mark(result->info, 1);
     return PPgraph_from_ptr(result);
 /* DO-NOT-DELETE splicer.end(pgs.method.make_graph_r2_r1) */
@@ -302,7 +311,7 @@ PP_make_image(
 				     &dbx[0], &dbx[1], &dbx[2], &dbx[3],
 				     &rbx[0], &rbx[1],
 				     &w, &h, &bpp,
-				     palette_extractor, &palette))
+				     PY_PG_palette_extractor, &palette))
         return NULL;
 
     result = PG_make_image_n(label, type, z, 2, WORLDC,

@@ -368,6 +368,7 @@ extern void
  *_SX_opt_PDBfile(PDBfile *x, bind_opt wh, void *a),
  *_SX_opt_syment(syment *x, bind_opt wh, void *a),
  *_SX_opt_defstr(defstr *x, bind_opt wh, void *a),
+ *_SX_opt_memdes(memdes *x, bind_opt wh, void *a),
  _SX_type_container(char *dtype, char *stype);
 
 extern object

@@ -529,6 +529,11 @@ PyObject *PP_pause(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 
+PY_DEF_EXTRACTOR(hasharr);
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static char PY_hasharr_doc_install[] = "";
 
 static PyObject *PY_hasharr_install(PY_hasharr *self,

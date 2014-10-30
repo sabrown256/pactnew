@@ -67,45 +67,41 @@ targets :
 PySrc = pact/pgs.py pact/pdb.py
 
 Hdrs = py_int.h pdbmodule.h pdbrw.h pgsmodule.h  \
-       pputil.h ppcommon.h utilpgs.h
+       pputil.h ppcommon.h
 
-OPPO  = pyscore.o pputil.o pptypes.o pparrays.o ppassoc.o \
-        pppdbr.o pypdbr.o pypdbl.o pypdbd.o struct.o
+OPPO  = pyscore.o pputil.o pptypes.o pparrays.o ppassoc.o struct.o
 
 OPMLO = pypml.o
 
-OPDBO = pdbmodule.o pdbPDBfile.o pdbmemdes.o pdbpdbdata.o
+OPDBO = pypdb.o pdbmodule.o pdbPDBfile.o pdbpdbdata.o \
+        pypdbr.o pypdbl.o pypdbd.o
 
-OPGSO = pypgs.o pgsmodule.o pgsdevice.o
+OPGSO = pypgs.o pgsmodule.o
 
 OPDB = ${OPDBO} ${OPMLO} ${OPPO}
 OPGS = ${OPDBO} ${OPMLO} ${OPPO} ${OPGSO}
 Objs = ${OPGS}
 
 gps = gp-score.c gp-pml.c gp-pdb.c   \
-      gp-pgs.c gp-panacea.c \
-      gp-scheme.c
+      gp-pgs.c gp-panacea.c gp-scheme.c
 
 gpo = gp-score.o gp-pml.o gp-pdb.o   \
-      gp-pgs.o gp-panacea.o \
-      gp-scheme.o
+      gp-pgs.o gp-panacea.o gp-scheme.o
 
 gpa = ${TGTLib}(gp-score.o) ${TGTLib}(gp-pml.o) ${TGTLib}(gp-pdb.o)   \
-      ${TGTLib}(gp-pgs.o) ${TGTLib}(gp-panacea.o) \
-      ${TGTLib}(gp-scheme.o)
+      ${TGTLib}(gp-pgs.o) ${TGTLib}(gp-panacea.o) ${TGTLib}(gp-scheme.o)
 
 ArPPO  = ${TGTLib}(pyscore.o) ${TGTLib}(pputil.o) \
          ${TGTLib}(pptypes.o) ${TGTLib}(pparrays.o) \
-         ${TGTLib}(ppassoc.o) \
-         ${TGTLib}(pppdbr.o) ${TGTLib}(pypdbr.o) ${TGTLib}(pypdbl.o) \
-         ${TGTLib}(pypdbd.o) ${TGTLib}(struct.o)
+         ${TGTLib}(ppassoc.o) ${TGTLib}(struct.o) \
 
 ArPMLO = ${TGTLib}(pypml.o)
 
-ArPDBO = ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbPDBfile.o) ${TGTLib}(pdbmemdes.o) \
-         ${TGTLib}(pdbdefstr.o) ${TGTLib}(pdbpdbdata.o)
+ArPDBO = ${TGTLib}(pypdb.o) ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbPDBfile.o) \
+         ${TGTLib}(pdbpdbdata.o) \
+         ${TGTLib}(pypdbr.o) ${TGTLib}(pypdbl.o) ${TGTLib}(pypdbd.o)
 
-ArPGSO = ${TGTLib}(pypgs.o) ${TGTLib}(pgsmodule.o) ${TGTLib}(pgsdevice.o)
+ArPGSO = ${TGTLib}(pypgs.o) ${TGTLib}(pgsmodule.o)
 
 ArObjs = ${ArPPO} ${ArPMLO} ${ArPDBO} ${ArPGSO} ${gpa}
 
