@@ -73,7 +73,7 @@ OPPO  = pyscore.o pputil.o pptypes.o pparrays.o ppassoc.o struct.o
 
 OPMLO = pypml.o
 
-OPDBO = pypdb.o pdbmodule.o pdbPDBfile.o pdbpdbdata.o \
+OPDBO = pypdb.o pdbmodule.o pdbfile.o pdbdata.o \
         pypdbr.o pypdbl.o pypdbd.o
 
 OPGSO = pypgs.o pgsmodule.o
@@ -97,8 +97,8 @@ ArPPO  = ${TGTLib}(pyscore.o) ${TGTLib}(pputil.o) \
 
 ArPMLO = ${TGTLib}(pypml.o)
 
-ArPDBO = ${TGTLib}(pypdb.o) ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbPDBfile.o) \
-         ${TGTLib}(pdbpdbdata.o) \
+ArPDBO = ${TGTLib}(pypdb.o) ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbfile.o) \
+         ${TGTLib}(pdbdata.o) \
          ${TGTLib}(pypdbr.o) ${TGTLib}(pypdbl.o) ${TGTLib}(pypdbd.o)
 
 ArPGSO = ${TGTLib}(pypgs.o) ${TGTLib}(pgsmodule.o)
