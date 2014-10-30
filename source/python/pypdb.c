@@ -20,6 +20,211 @@
 static hasharr
   *_PY_defstr_tab;
   
+char
+ PP_getdefstr_doc[] = "",
+ PP_gettype_doc[] = "",
+ PP_getfile_doc[] = "",
+ PP_getdata_doc[] = "",
+ PP_getmember_doc[] = "",
+ PP_unpack_doc[] = "";
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PP_EXTRA_DEFSTR_MARK - add an extra mark into the virtual
+ *                       - internal file's predefined defstrs
+ */
+
+static int _PP_extra_defstr_mark(haelem *hp, void *arg)
+   {int ok;
+    defstr *dp;
+
+    ok = SC_haelem_data(hp, NULL, NULL, (void **) &dp, FALSE);
+    SC_ASSERT(ok == TRUE);
+
+    SC_mark(dp, 1);
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PY_SETUP_PDB - */
+
+int PY_setup_pdb(PyObject *m)
+   {int nerr;
+
+    nerr = 0;
+
+    nerr += (PyModule_AddIntConstant(m, "AS_NONE", AS_NONE) < 0);
+    nerr += (PyModule_AddIntConstant(m, "AS_PDBDATA", AS_PDBDATA) < 0);
+    nerr += (PyModule_AddIntConstant(m, "AS_OBJECT", AS_OBJECT) < 0);
+    nerr += (PyModule_AddIntConstant(m, "AS_TUPLE", AS_TUPLE) < 0);
+    nerr += (PyModule_AddIntConstant(m, "AS_LIST", AS_LIST) < 0);
+    nerr += (PyModule_AddIntConstant(m, "AS_DICT", AS_DICT) < 0);
+    nerr += (PyModule_AddIntConstant(m, "AS_ARRAY", AS_ARRAY) < 0);
+    
+    PP_open_file_dict = PyDict_New();
+    nerr += (PyModule_AddObject(m, "files", PP_open_file_dict) < 0);
+
+    PP_vif_info = _PP_open_vif("PP_vif");
+    if (PP_vif_info != NULL)
+       {int err;
+
+        PP_vif_obj = PY_PDBfile_newobj(NULL, PP_vif_info);
+        PP_vif     = PP_vif_info->file;
+
+/* mark every currently existing defstr in the host_chart */
+	err = SC_hasharr_foreach(PP_vif->host_chart,
+				 _PP_extra_defstr_mark,
+				 NULL);
+	nerr += (err != TRUE);
+
+/* XXX - test err */
+        nerr += (PyModule_AddObject(m, "vif", (PyObject *) PP_vif_obj) < 0);};
+
+    return(nerr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_GETDEFSTR - */
+
+PyObject *PP_getdefstr(PyObject *self, PyObject *args, PyObject *kwds)
+   {PP_pdbdataObject *obj;
+    PyObject *rv;
+    char *kw_list[] = {"obj", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O!:getdefstr", kw_list,
+				    &PP_pdbdata_Type, &obj))
+       {rv = (PyObject *) obj->dpobj;
+	Py_INCREF(rv);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_GETTYPE - */
+
+PyObject *PP_gettype(PyObject *self, PyObject *args, PyObject *kwds)
+   {PP_pdbdataObject *obj;
+    PyObject *rv;
+    char *kw_list[] = {"obj", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O!:gettype", kw_list,
+				    &PP_pdbdata_Type, &obj))
+       rv = PY_STRING_STRING(obj->type);
+
+   return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_GETFILE - */
+
+PyObject *PP_getfile(PyObject *self, PyObject *args, PyObject *kwds)
+   {PP_pdbdataObject *obj;
+    PY_PDBfile *file;
+    PyObject *rv;
+    char *kw_list[] = {"obj", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O!:getfile", kw_list,
+				    &PP_pdbdata_Type, &obj))
+       {file = (PY_PDBfile *) _PP_find_file_obj(obj->fileinfo->file);
+	if (file != NULL)
+	   {Py_INCREF(file);
+	    rv = (PyObject *) file;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_GETDATA - */
+
+PyObject *PP_getdata(PyObject *self, PyObject *args, PyObject *kwds)
+   {PP_pdbdataObject *obj;
+    PyObject *rv;
+    char *kw_list[] = {"obj", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "O!:getdata", kw_list,
+				    &PP_pdbdata_Type, &obj))
+       rv = PY_COBJ_VOID_PTR(obj->data, NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_GETMEMBER - */
+
+PyObject *PP_getmember(PyObject *self, PyObject *args, PyObject *kwds)
+   {char *name;
+    PP_pdbdataObject *obj;
+    PyObject *rv;
+    char *kw_list[] = {"obj", "name", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O!s:getmember", kw_list,
+				    &PP_pdbdata_Type, &obj, &name))
+       {rv = Py_None;
+	Py_INCREF(Py_None);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_UNPACK - */
+
+PyObject *PP_unpack(PyObject *self, PyObject *args, PyObject *kwds)
+   {int ok, array, structure, scalar;
+    PyObject *rv;
+    PP_pdbdataObject *data;
+    PP_form form;
+    char *kw_list[] = {"data", "array", "struct", "scalar", NULL};
+
+    rv = NULL;
+
+    array     = AS_NONE;
+    structure = AS_NONE;
+    scalar    = AS_NONE;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O!|iii:unpack", kw_list,
+				    &PP_pdbdata_Type, &data,
+				    &array, &structure, &scalar))
+/* default to global values */
+       {form = PP_global_form;
+	ok   = _PP_assign_form(&form, array, structure, scalar);
+	if (ok >= 0)
+
+/* replace AS_PDBDATA with unpack defaults */
+	   {if (form.array_kind == AS_PDBDATA)
+	       form.array_kind = AS_LIST;
+	    if (form.struct_kind == AS_PDBDATA)
+	       form.struct_kind = AS_TUPLE;
+	    if (form.scalar_kind == AS_PDBDATA)
+	       form.scalar_kind = AS_OBJECT;
+
+	    rv = _PP_wr_syment(data->fileinfo, data->type, data->dims,
+			       data->nitems, data->data, &form);};};
+    return(rv);}
+
 /*--------------------------------------------------------------------------*/
 
 /*                               DEFSTR ROUTINES                            */

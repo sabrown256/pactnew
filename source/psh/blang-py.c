@@ -607,7 +607,7 @@ static void python_object_defs(FILE **fpa, char *dv, char **ta, char *pck)
 	fprintf(fc, "    nerr += (PyType_Ready(&%s_type) < 0);\n",
 		tl.pnm);
 	fprintf(fc, "    nerr += (PyDict_SetItemString(d, \"%s\", (PyObject *) &%s_type) < 0);\n",
-		tl.rnm, tl.pnm);
+		tl.inm, tl.pnm);
 	fprintf(fc, "\n");};
 
     return;}

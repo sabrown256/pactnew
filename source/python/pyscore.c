@@ -966,7 +966,7 @@ PY_hasharr *PY_hasharr_newobj(PY_hasharr *obj, hasharr *tab)
         if (obj == NULL)
 	   return(NULL);};
 
-    dpobj = _PY_defstr_find_singleton("HASHARR", NULL, PP_vif_info);
+    dpobj = _PY_defstr_find_singleton("hasharr", NULL, PP_vif_info);
     if (dpobj == NULL)
        return(NULL);
 

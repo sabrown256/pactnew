@@ -64,7 +64,7 @@ int PY_ ## _t ## _extractor(PyObject *obj, void *arg)                        \
 
 /* PY_DEF_TYPE - handle the boiler plate defining a new Python type
  *             - example:
- *             -    PY_DEF_TYPE(PM_mapping, NULL, NULL, NULL, NULL)
+ *             -    PY_DEF_TYPE(PM_mapping, "mapping")
  */
 
 #ifndef PY_DEF_DESTRUCTOR
@@ -91,10 +91,10 @@ int PY_ ## _t ## _extractor(PyObject *obj, void *arg)                        \
 # define PY_DEF_TP_CALL NULL
 #endif
 
-#define PY_DEF_TYPE(_t)                                                      \
+#define PY_DEF_TYPE_R(_t, _n)                                                \
 PyTypeObject                                                                 \
  PY_ ## _t ## _type = {PY_HEAD_INIT(&PyType_Type, 0)                         \
-                  #_t,                                                       \
+                  _n,                                                        \
                   sizeof(PY_ ## _t),                                         \
                   0,                                                         \
                   (destructor) PY_DEF_DESTRUCTOR,                            \
@@ -140,6 +140,9 @@ PyTypeObject                                                                 \
                   0,                                                         \
                   (destructor) 0,}
 
+#define PY_DEF_TYPE(_t)                                                      \
+   PY_DEF_TYPE_R(_t, #_t)
+
 /*--------------------------------------------------------------------------*/
 
 /*                           STRUCT DEFINITIONS                             */
@@ -155,6 +158,28 @@ extern "C" {
 /*                         VARIABLE DECLARATIONS                            */
 
 /*--------------------------------------------------------------------------*/
+
+/* PYPDB.C declarations */
+
+extern char
+ PP_getdefstr_doc[],
+ PP_gettype_doc[],
+ PP_getfile_doc[],
+ PP_getdata_doc[],
+ PP_getmember_doc[],
+ PP_unpack_doc[];
+
+
+/* PYPGS.C declarations */
+
+extern char
+ PP_make_graph_1d_doc[],
+ PP_make_graph_r2_r1_doc[],
+ PP_make_image_doc[],
+ PP_get_processor_number_doc[],
+ PP_get_number_processors_doc[],
+ PP_iso_limit_doc[];
+
 
 /* PYSCORE.C declarations */
 
@@ -221,6 +246,32 @@ int PP_buffer_extractor(PyObject *obj, void *arg);
 PyObject *PPgraph_from_ptr(PG_graph *data);
 PyObject *PPpalette_from_ptr(PG_palette *pal);
 PyObject *PPimage_from_ptr(PG_image *im);
+
+
+/* PYPDB.C declarations */
+
+extern int
+ PY_setup_pdb(PyObject *m);
+
+extern PyObject
+ *PP_getdefstr(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_gettype(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_getfile(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_getdata(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_getmember(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_unpack(PyObject *self, PyObject *args, PyObject *kwds);
+
+
+/* PYPGS.C declarations */
+
+extern PyObject
+ *PP_make_graph_1d(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_make_graph_r2_r1(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_make_image(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_get_processor_number(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_get_number_processors(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_iso_limit(PyObject *self, PyObject *args, PyObject *kwds);
+
 
 /* PYPML.C declarations */
 

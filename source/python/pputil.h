@@ -293,6 +293,7 @@ extern void
  PP_error_set_user(PyObject *obj, char *fmt, ...);
 
 extern int
+ PY_setup_pact(PyObject *m, PyObject *d),
  PP_alloc_data(char *type, long nitems, PP_file *fileinfo, void **vr),
  PP_num_indirection(char *s),
  PP_dimdes_to_ind(dimdes *dims, long *ind),

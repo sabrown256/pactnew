@@ -662,6 +662,12 @@ static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     fprintf(fc, "              0);\n");
     fprintf(fc, "\n");
 
+    fprintf(fc, "    SS_set_type_method(SX_%s_I,\n", tl.rnm);
+    fprintf(fc, "		        \"C->Scheme\", SX_make_%s,\n", tl.lnm);
+    fprintf(fc, "		        \"Scheme->C\", _SX_arg_%s,\n", tl.lnm);
+    fprintf(fc, "		        NULL);\n");
+
+#if 0
     fprintf(fc, "    ty    = _SC_get_type_id(SX_%s_I);\n", tl.rnm);
     fprintf(fc, "    alst  = ty->a;\n");
     fprintf(fc, "    alst  = SC_add_alist(alst, \"C->Scheme\", \"%s\", SX_make_%s);\n",
@@ -669,6 +675,7 @@ static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     fprintf(fc, "    alst  = SC_add_alist(alst, \"Scheme->C\", \"%s\", _SX_arg_%s);\n",
 	    tl.unm, tl.lnm);
     fprintf(fc, "    ty->a = alst;\n");
+#endif
     fprintf(fc, "\n");
 
     return;}
@@ -700,8 +707,10 @@ static void scheme_struct_defs(FILE **fpa, char *dv, char **ta, char *pck)
 		    pck);
 	    fprintf(fc, "   {int nerr;\n");
 	    fprintf(fc, "    defstr *dp;\n");
+#if 0
 	    fprintf(fc, "    pcons *alst;\n");
 	    fprintf(fc, "    SC_type *ty;\n");
+#endif
 	    fprintf(fc, "\n");
 	    fprintf(fc, "    nerr = 0;\n");
 	    fprintf(fc, "\n");}
