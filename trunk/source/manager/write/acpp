@@ -47,7 +47,9 @@ set Inc = ( $Inc $DPInc )
 set Inc = ( $Inc $MDGInc )
 set Inc = ( $Inc $MDI_Inc )
 set Inc = ( $Inc $MDE_Inc )
-set Inc = ( $Inc -I$PY_IncDir )
+if ("$PY_IncDir" != "") then
+   set Inc = ( $Inc -I$PY_IncDir )
+endif
 
 # work out the C preprocessor invocation
 set CPP  = ( $PACT_CC_EXE $CC_Flags $Inc )
