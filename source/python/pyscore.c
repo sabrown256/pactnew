@@ -534,6 +534,26 @@ PY_DEF_EXTRACTOR(hasharr);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PY_OPT_HASHARR - handle BLANG binding related operations */
+
+void *_PY_opt_hasharr(hasharr *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static char PY_hasharr_doc_install[] = "";
 
 static PyObject *PY_hasharr_install(PY_hasharr *self,
@@ -845,7 +865,7 @@ PyObject *_PP_unpack_hasharr(void *p, long nitems)
        {dict = PyDict_New();
 	if (dict != NULL)
 	   {for (i = 0; SC_hasharr_next(tab, &i, &nm, NULL, (void **) &item); i++)
-	        {if (item == NULL)
+	        {if ((item == NULL) || (item->ob_type == NULL))
 		    {ierr = -1;
 		     break;};
 

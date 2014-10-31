@@ -35,6 +35,10 @@
 
 #endif
 
+#if defined(__FreeBSD__)
+# undef CMPLX
+#endif
+
 /* define the C11 complex constructor if not already defined */
 
 #if !defined(CMPLX)

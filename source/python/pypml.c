@@ -21,6 +21,26 @@ PY_DEF_EXTRACTOR(PM_field);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PY_OPT_PM_FIELD - handle BLANG binding related operations */
+
+void *_PY_opt_PM_field(PM_field *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static int PY_PM_field_tp_init(PY_PM_field *self,
 			       PyObject *args, PyObject *kwds)
    {
@@ -42,6 +62,26 @@ PY_DEF_TYPE_R(PM_field, "field");
 /*--------------------------------------------------------------------------*/
 
 PY_DEF_EXTRACTOR(PM_mesh_topology);
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PY_OPT_PM_MESH_TOPOLOGY - handle BLANG binding related operations */
+
+void *_PY_opt_PM_mesh_topology(PM_mesh_topology *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -76,7 +116,7 @@ PY_DEF_TYPE_R(PM_mesh_topology, "mesh_topology");
 
 /*--------------------------------------------------------------------------*/
 
-/*                              PM_SET_ROUTINES                             */
+/*                              PM_SET ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
@@ -241,8 +281,13 @@ PY_DEF_TYPE_R(PM_set, "set");
 
 /*--------------------------------------------------------------------------*/
 
-/*                            PM_MAPPING_ROUTINES                           */
+/*                            PM_MAPPING ROUTINES                           */
 
+/*--------------------------------------------------------------------------*/
+
+PY_DEF_EXTRACTOR(PM_mapping);
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PY_OPT_PM_MAPPING - handle BLANG binding related operations */
@@ -261,11 +306,6 @@ void *_PY_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a)
 	     break;};
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-PY_DEF_EXTRACTOR(PM_mapping);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -102,7 +102,8 @@ static object *_SS_set_var(SS_psides *si, void *vr, long nb,
 	if (type == SC_STRING_I)
 	   {char *d;
 
-	    d = (char *) vr;
+	    nc = 0;
+	    d  = (char *) vr;
 	    if (sv != NULL)
 	       {SC_strncpy(d, nb, sv, -1);
 		nc = strlen(d);}

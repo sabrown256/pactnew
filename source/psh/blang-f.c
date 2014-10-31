@@ -1531,11 +1531,12 @@ static int register_fortran(int fl, statedes *st)
    {int i, nb;
     bindes *pb;
 
+    nb = nbd;
+
     if (fl == TRUE)
-       {nb = nbd;
 
 /* fortran wrappers */
-	pb = gbd + nbd++;
+       {pb = gbd + nbd++;
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 

@@ -241,14 +241,11 @@ extern char
 
 /*--------------------------------------------------------------------------*/
 
-int PP_buffer_extractor(PyObject *obj, void *arg);
-
-PyObject *PPgraph_from_ptr(PG_graph *data);
-PyObject *PPpalette_from_ptr(PG_palette *pal);
-PyObject *PPimage_from_ptr(PG_image *im);
-
-
 /* PYPDB.C declarations */
+
+extern void
+ *_PY_opt_defstr(defstr *x, bind_opt wh, void *a),
+ *_PY_opt_memdes(memdes *x, bind_opt wh, void *a);
 
 extern int
  PY_setup_pdb(PyObject *m);
@@ -264,6 +261,12 @@ extern PyObject
 
 /* PYPGS.C declarations */
 
+extern void
+ *_PY_opt_PG_palette(PG_palette *x, bind_opt wh, void *a),
+ *_PY_opt_PG_image(PG_image *x, bind_opt wh, void *a),
+ *_PY_opt_PG_graph(PG_graph *x, bind_opt wh, void *a),
+ *_PY_opt_PG_device(PG_device *x, bind_opt wh, void *a);
+
 extern PyObject
  *PP_make_graph_1d(PyObject *self, PyObject *args, PyObject *kwds),
  *PP_make_graph_r2_r1(PyObject *self, PyObject *args, PyObject *kwds),
@@ -275,12 +278,21 @@ extern PyObject
 
 /* PYPML.C declarations */
 
+extern void
+ *_PY_opt_PM_field(PM_field *x, bind_opt wh, void *a),
+ *_PY_opt_PM_mesh_topology(PM_mesh_topology *x, bind_opt wh, void *a),
+ *_PY_opt_PM_set(PM_set *x, bind_opt wh, void *a),
+ *_PY_opt_PM_mapping(PM_mapping *x, bind_opt wh, void *a);
+
 extern PyObject
  *PP_make_set_1d(PyObject *self, PyObject *args, PyObject *kwds),
  *PP_make_ac_set(PyObject *self, PyObject *args, PyObject *kwds);
 
 
 /* PYSCORE.C declarations */
+
+extern void
+ *_PY_opt_hasharr(hasharr *x, bind_opt wh, void *a);
 
 extern PyObject
  *PY_set_count(PyObject *self, PyObject *args, PyObject *kwds),
@@ -363,11 +375,20 @@ extern PY_memdes
 
 /* PDBFILE.C declarations */
 
+extern void
+ *_PY_opt_PDBfile(PDBfile *x, bind_opt wh, void *a);
+
 extern PY_PDBfile
  *PY_PDBfile_newobj(PY_PDBfile *obj, PP_file *fileinfo);
 
 extern PyObject
  *PY_open_vif(PyObject *self, PyObject *args, PyObject *kwds);
+
+
+/* PPASSOC.C declarations */
+
+extern void
+ *_PY_opt_pcons(pcons *x, bind_opt wh, void *a);
 
 
 #ifdef __cplusplus

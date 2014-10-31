@@ -16,30 +16,34 @@
 #include "pdbmodule.h"
 
 /*--------------------------------------------------------------------------*/
+
+/*                              PCONS ROUTINES                              */
+
 /*--------------------------------------------------------------------------*/
 
-/* PY_PCONS_EXTRACTOR - find the pcons from from an pcons object
- *                    - extractor function
- */
+PY_DEF_EXTRACTOR(pcons)
 
-int PY_pcons_extractor(PyObject *obj, void *ptr)
-   {int ok;
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-    ok = 1;
-    
-    if (obj == Py_None)
-        *(void **) ptr = NULL;
+/* _PY_OPT_PCONS - handle BLANG binding related operations */
 
-    else if (PY_TYPE(obj) == &PY_pcons_type)
-       {PY_pcons *work;
+void *_PY_opt_pcons(pcons *x, bind_opt wh, void *a)
+   {void *rv;
 
-        work = (PY_pcons *) obj;
-        *(pcons **) ptr = work->pyo;}
-    else
-       {PyErr_SetString(PyExc_TypeError, "None or a pdb.assoc is required");
-        ok = 0;}
+    rv = NULL;
+    switch (wh)
+       {case BIND_ALLOC :
+	     SC_mark(x, 1);
+	     break;
+        case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+	default:
+	     break;};
 
-    return(ok);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

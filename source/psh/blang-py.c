@@ -448,12 +448,12 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* if member is pointer to a known bound type */
          else if (python_lookup_bound_type(mty) == TRUE)
-	    {snprintf(pty, BFSML, "PY_%s", mty);
-	     fprintf(fc, "       {ok = %s_extractor(value, self->pyo->%s);\n",
-		     trim(pty, BOTH, " *"), mnm);
+	    {nstrncpy(pty, BFSML, trim(mty, BOTH, " *"), -1);
+	     fprintf(fc, "       {ok = PY_%s_extractor(value, self->pyo->%s);\n",
+		     pty, mnm);
 	     fprintf(fc, "        if (ok == TRUE)\n");
-	     fprintf(fc, "           { /* SC_mark(self->pyo->%s, 1); */\n",
-		     mnm);
+	     fprintf(fc, "           {_PY_opt_%s(self->pyo->%s, BIND_ALLOC, NULL);\n",
+		     pty, mnm);
 	     fprintf(fc, "            rv = 0;};};\n");}
 
 /* if member is pointer */
@@ -1279,10 +1279,10 @@ static int register_python(int fl, statedes *st)
    {int i, nb;
     bindes *pb;
 
-    if (fl == TRUE)
-       {nb = nbd;
+    nb = nbd;
 
-	pb = gbd + nbd++;
+    if (fl == TRUE)
+       {pb = gbd + nbd++;
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 
