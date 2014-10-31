@@ -219,12 +219,6 @@ extern PyObject
  *PP_unpack_hasharr_haelem(char *type, void *vr);
 
 
-/* PPPML.C declarations */
-
-extern PyObject
- *PPtopology_from_ptr(PM_mesh_topology *data);
-
-
 /* PPTYPES.C declarations */
 
 extern int

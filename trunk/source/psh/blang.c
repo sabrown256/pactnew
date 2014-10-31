@@ -1559,10 +1559,10 @@ static int register_c(int fl, statedes *st)
    {int i, nb;
     bindes *pb;
 
-    if (fl == TRUE)
-       {nb = nbd;
+    nb = nbd;
 
-	pb = gbd + nbd++;
+    if (fl == TRUE)
+       {pb = gbd + nbd++;
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 

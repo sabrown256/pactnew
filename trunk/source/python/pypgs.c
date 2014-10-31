@@ -1,8 +1,9 @@
 /*
  * PYPGS.C - PGS binding support
  *
- * include cpyright.h
  */
+
+#include "cpyright.h"
 
 #include "pgsmodule.h"
 
@@ -12,7 +13,16 @@ char
  PP_make_image_doc[] = "",
  PP_get_processor_number_doc[] = "",
  PP_get_number_processors_doc[] = "",
- PP_iso_limit_doc[] = "";
+ PP_iso_limit_doc[] = "",
+ PY_set_line_info_doc[] = "",
+ PY_set_tds_info_doc[] = "",
+ PY_set_tdv_info_doc[] = "";
+
+static char
+ PY_PG_palette_doc[] = "",
+ PY_PG_image_doc[] = "",
+ PY_PG_graph_doc[] = "",
+ PY_PG_device_doc[] = "";
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -38,7 +48,7 @@ PyObject *PP_make_graph_1d(PyObject *self, PyObject *args, PyObject *kwds)
 				    &xname, &yname))
        {result = PG_make_graph_1d(id, label, cp, n, x, y, xname, yname);
 	SC_mark(result->info, 1);
-	rv = PPgraph_from_ptr(result);};
+	rv = PY_PG_graph_from_ptr(result);};
 
     return(rv);}
 
@@ -69,41 +79,7 @@ PyObject *PP_make_graph_r2_r1(PyObject *self, PyObject *args, PyObject *kwds)
        {result = PG_make_graph_r2_r1(id, label, cp, imx, jmx, centering,
 				 x, y, r, dname, rname);
 	SC_mark(result->info, 1);
-	rv = PPgraph_from_ptr(result);};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PP_MAKE_IMAGE - */
-
-PyObject *PP_make_image(PyObject *self, PyObject *args, PyObject *kwds)
-   {int w, h, bpp;
-    double dbx[PG_BOXSZ];
-    double rbx[PG_BOXSZ];
-    char *label, *type;
-    void *z;    /* XXX */
-    PG_palette *palette;
-    PG_image *result;
-    PyObject *rv;
-    char *kw_list[] = {"label", "type", "z",
-		       "xmn", "xmx", "ymn", "ymx", "zmn", "zmx",
-		       "w", "h", "bpp", "palette", NULL};
-
-    rv = NULL;
-
-    if (PyArg_ParseTupleAndKeywords(args, kwds,
-				    "ssO&ddddddiiiO&:make_image",
-				    kw_list, &label, &type,
-				    PP_buffer_extractor, &z,
-				    &dbx[0], &dbx[1], &dbx[2], &dbx[3],
-				    &rbx[0], &rbx[1],
-				    &w, &h, &bpp,
-				    PY_PG_palette_extractor, &palette))
-       {result = PG_make_image_n(label, type, z, 2, WORLDC,
-				 dbx, rbx, w, h, bpp, palette);
-	rv     = PPimage_from_ptr(result);};
+	rv = PY_PG_graph_from_ptr(result);};
 
     return(rv);}
 
@@ -170,6 +146,26 @@ PY_DEF_EXTRACTOR(PG_palette);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PY_OPT_PG_PALETTE - handle BLANG binding related operations */
+
+void *_PY_opt_PG_palette(PG_palette *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static int PY_PG_palette_tp_init(PY_PG_palette *self,
 			      PyObject *args, PyObject *kwds)
    {
@@ -178,9 +174,6 @@ static int PY_PG_palette_tp_init(PY_PG_palette *self,
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-char
- PY_PG_palette_doc[] = "";
 
 #undef PY_DEF_DESTRUCTOR
 #undef PY_DEF_TP_METH
@@ -207,9 +200,29 @@ PY_DEF_EXTRACTOR(PG_image);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_BUFFER_EXTRACTOR - unsigned byte array */
+/* _PY_OPT_PG_IMAGE - handle BLANG binding related operations */
 
-int PP_buffer_extractor(PyObject *obj, void *arg)
+void *_PY_opt_PG_image(PG_image *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PY_BUFFER_EXTRACTOR - unsigned byte array */
+
+static int _PY_buffer_extractor(PyObject *obj, void *arg)
    {int ret;
 
     ret = 1;
@@ -231,6 +244,40 @@ int PP_buffer_extractor(PyObject *obj, void *arg)
 #endif
 
     return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_MAKE_IMAGE - */
+
+PyObject *PP_make_image(PyObject *self, PyObject *args, PyObject *kwds)
+   {int w, h, bpp;
+    double dbx[PG_BOXSZ];
+    double rbx[PG_BOXSZ];
+    char *label, *type;
+    void *z;    /* XXX */
+    PG_palette *palette;
+    PG_image *result;
+    PyObject *rv;
+    char *kw_list[] = {"label", "type", "z",
+		       "xmn", "xmx", "ymn", "ymx", "zmn", "zmx",
+		       "w", "h", "bpp", "palette", NULL};
+
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "ssO&ddddddiiiO&:make_image",
+				    kw_list, &label, &type,
+				    _PY_buffer_extractor, &z,
+				    &dbx[0], &dbx[1], &dbx[2], &dbx[3],
+				    &rbx[0], &rbx[1],
+				    &w, &h, &bpp,
+				    PY_PG_palette_extractor, &palette))
+       {result = PG_make_image_n(label, type, z, 2, WORLDC,
+				 dbx, rbx, w, h, bpp, palette);
+	rv     = PY_PG_image_from_ptr(result);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -319,9 +366,6 @@ static int PY_PG_image_tp_init(PY_PG_image *self,
 #define PY_DEF_TP_CALL              NULL
 #define PY_DEF_AS_MAP               NULL
 
-char
- PY_PG_image_doc[] = "";
-
 PY_DEF_TYPE_R(PG_image, "image");
 
 /*--------------------------------------------------------------------------*/
@@ -330,20 +374,32 @@ PY_DEF_TYPE_R(PG_image, "image");
 
 /*--------------------------------------------------------------------------*/
 
-char
- PY_set_line_info_doc[] = "",
- PY_set_tds_info_doc[] = "",
- PY_set_tdv_info_doc[] = "";
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 PY_DEF_EXTRACTOR(PG_graph);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PY_set_line_info - */
+/* _PY_OPT_PG_GRAPH - handle BLANG binding related operations */
+
+void *_PY_opt_PG_graph(PG_graph *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PY_SET_LINE_INFO - */
 
 PyObject *PY_set_line_info(PyObject *self, PyObject *args, PyObject *kwds)
    {int type, axis_type, style, scatter, marker, color, start;
@@ -371,7 +427,7 @@ PyObject *PY_set_line_info(PyObject *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PY_set_tds_info - */
+/* PY_SET_TDS_INFO - */
 
 PyObject *PY_set_tds_info(PyObject *self, PyObject *args, PyObject *kwds)
    {int type, axis_type, style, color, nlev;
@@ -400,7 +456,7 @@ PyObject *PY_set_tds_info(PyObject *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PY_set_tdv_info - */
+/* PY_SET_TDV_INFO - */
 
 PyObject *PY_set_tdv_info(PyObject *self, PyObject *args, PyObject *kwds)
    {int type, axis_type, style, color;
@@ -510,9 +566,6 @@ static int PY_PG_graph_tp_init(PY_PG_graph *self,
 #define PY_DEF_TP_CALL              NULL
 #define PY_DEF_AS_MAP               NULL
 
-char
- PY_PG_graph_doc[] = "";
-
 PY_DEF_TYPE_R(PG_graph, "graph");
 
 /*--------------------------------------------------------------------------*/
@@ -523,14 +576,46 @@ PY_DEF_TYPE_R(PG_graph, "graph");
 
 PY_DEF_EXTRACTOR(PG_device);
 
+static char
+ PY_PG_device_set_font_doc[] = "",
+ PY_PG_device_set_viewport_doc[] = "",
+ PY_PG_device_set_window_doc[] = "",
+ PY_PG_device_draw_box_doc[] = "",
+ PY_PG_device_get_text_ext_doc[] = "",
+ PY_PG_device_draw_line_doc[] = "",
+ PY_PG_device_write_WC_doc[] = "",
+ PY_PG_device_draw_graph_doc[] = "",
+ PY_PG_device_draw_image_doc[] = "",
+ PY_PG_device_contour_plot_doc[] = "",
+ PY_PG_device_poly_fill_plot_doc[] = "",
+ PY_PG_device_draw_surface_doc[] = "",
+ PY_PG_device_draw_picture_doc[] = "";
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_set_font_doc[] = "";
+/* _PY_OPT_PG_DEVICE - handle BLANG binding related operations */
+
+void *_PY_opt_PG_device(PG_device *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 static PyObject *PY_PG_device_set_font(PY_PG_device *self,
-				       PyObject *args,
-				       PyObject *kwds)
+				       PyObject *args, PyObject *kwds)
    {int size;
     char *face, *style;
     PyObject *rv;
@@ -559,11 +644,8 @@ static PyObject *PY_PG_device_set_font(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_set_viewport_doc[] = "";
-
 static PyObject *PY_PG_device_set_viewport(PY_PG_device *self,
-					   PyObject *args,
-					   PyObject *kwds)
+					   PyObject *args, PyObject *kwds)
    {double ndc[PG_BOXSZ];
     PyObject *rv;
     char *kw_list[] = {"x1", "x2", "y1", "y2", NULL};
@@ -583,11 +665,8 @@ static PyObject *PY_PG_device_set_viewport(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_set_window_doc[] = "";
-
 static PyObject *PY_PG_device_set_window(PY_PG_device *self,
-					 PyObject *args,
-					 PyObject *kwds)
+					 PyObject *args, PyObject *kwds)
    {double wc[PG_BOXSZ];
     PyObject *rv;
     char *kw_list[] = {"xmn", "xmx", "ymn", "ymx", NULL};
@@ -607,11 +686,8 @@ static PyObject *PY_PG_device_set_window(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_draw_box_doc[] = "";
-
 static PyObject *PY_PG_device_draw_box(PY_PG_device *self,
-				       PyObject *args,
-				       PyObject *kwds)
+				       PyObject *args, PyObject *kwds)
    {double bx[PG_BOXSZ];
     PyObject *rv;
     char *kw_list[] = {"xmin", "xmax", "ymin", "ymax", NULL};
@@ -631,11 +707,8 @@ static PyObject *PY_PG_device_draw_box(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_get_text_ext_doc[] = "";
-
 static PyObject *PY_PG_device_get_text_ext(PY_PG_device *self,
-					   PyObject *args,
-					   PyObject *kwds)
+					   PyObject *args, PyObject *kwds)
    {char *s;
     double x[PG_SPACEDM];
     PyObject *rv;
@@ -654,11 +727,8 @@ static PyObject *PY_PG_device_get_text_ext(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_draw_line_doc[] = "";
-
 static PyObject *PY_PG_device_draw_line(PY_PG_device *self,
-					PyObject *args,
-					PyObject *kwds)
+					PyObject *args, PyObject *kwds)
    {double x1[PG_SPACEDM], x2[PG_SPACEDM];
     PyObject *rv;
     char *kw_list[] = {"x1", "y1", "x2", "y2", NULL};
@@ -678,11 +748,8 @@ static PyObject *PY_PG_device_draw_line(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_write_WC_doc[] = "";
-
 static PyObject *PY_PG_device_write_WC(PY_PG_device *self,
-				       PyObject *args,
-				       PyObject *kwds)
+				       PyObject *args, PyObject *kwds)
    {int result;
     double x, y;
     double p[PG_SPACEDM];
@@ -709,11 +776,8 @@ static PyObject *PY_PG_device_write_WC(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_draw_graph_doc[] = "";
-
 static PyObject *PY_PG_device_draw_graph(PY_PG_device *self,
-					 PyObject *args,
-					 PyObject *kwds)
+					 PyObject *args, PyObject *kwds)
    {PG_graph *data;
     PY_PG_graph *dataobj;
     PyObject *rv;
@@ -734,11 +798,8 @@ static PyObject *PY_PG_device_draw_graph(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_draw_image_doc[] = "";
-
 static PyObject *PY_PG_device_draw_image(PY_PG_device *self,
-					 PyObject *args,
-					 PyObject *kwds)
+					 PyObject *args, PyObject *kwds)
    {char *label;
     void *alist;
     PY_PG_image *imobj;
@@ -762,11 +823,8 @@ static PyObject *PY_PG_device_draw_image(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_contour_plot_doc[] = "";
-
 static PyObject *PY_PG_device_contour_plot(PY_PG_device *self,
-					   PyObject *args,
-					   PyObject *kwds)
+					   PyObject *args, PyObject *kwds)
    {PG_graph *data;
     PY_PG_graph *dataobj;
     PyObject *rv;
@@ -787,11 +845,8 @@ static PyObject *PY_PG_device_contour_plot(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_poly_fill_plot_doc[] = "";
-
 static PyObject *PY_PG_device_poly_fill_plot(PY_PG_device *self,
-					     PyObject *args,
-					     PyObject *kwds)
+					     PyObject *args, PyObject *kwds)
    {PG_graph *data;
     PY_PG_graph *dataobj;
     PyObject *rv;
@@ -812,11 +867,8 @@ static PyObject *PY_PG_device_poly_fill_plot(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_draw_surface_doc[] = "";
-
 static PyObject *PY_PG_device_draw_surface(PY_PG_device *self,
-					   PyObject *args,
-					   PyObject *kwds)
+					   PyObject *args, PyObject *kwds)
    {int nn, color, style, type;
     int *cnnct;
     double xmn, xmx, ymn, ymx;
@@ -867,11 +919,8 @@ static PyObject *PY_PG_device_draw_surface(PY_PG_device *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_draw_picture_doc[] = "";
-
 static PyObject *PY_PG_device_draw_picture(PY_PG_device *self,
-					   PyObject *args,
-					   PyObject *kwds)
+					   PyObject *args, PyObject *kwds)
    {int ptyp, bndp, cbnd, sbnd, mshp, cmsh, smsh;
     double wbnd, wmsh;
     PM_mapping *f;
@@ -939,269 +988,281 @@ static PyMethodDef PY_PG_device_methods[] = {
 
 #else
 
+static char
+ PY_PG_device_set_char_path_doc[] = "",
+ PY_PG_device_set_color_line_doc[] = "",
+ PY_PG_device_set_line_color_doc[] = "",
+ PY_PG_device_set_line_style_doc[] = "",
+ PY_PG_device_set_line_width_doc[] = "",
+ PY_PG_device_set_text_color_doc[] = "",
+ PY_PG_device_set_color_text_doc[] = "",
+ PY_PG_device_turn_data_id_doc[] = "",
+ PY_PG_device_clear_window_doc[] = "",
+ PY_PG_device_close_doc[] = "",
+ PY_PG_device_finish_plot_doc[] = "",
+ PY_PG_device_update_vs_doc[] = "",
+ PY_PG_device_open_doc[] = "",
+ PY_PG_device_set_palette_doc[] = "";
+
 /*--------------------------------------------------------------------------*/
 
 /*                             MANUAL WRAPPERS                              */
 
 /*--------------------------------------------------------------------------*/
 
-static char PY_PG_device_set_char_path_doc[] = "";
-
 static PyObject *PY_PG_device_set_char_path(PY_PG_device *self,
-                                            PyObject *args,
-                                            PyObject *kwds)
-{
-    double x[PG_SPACEDM];
+                                            PyObject *args, PyObject *kwds)
+   {double x[PG_SPACEDM];
+    PyObject *rv;
     char *kw_list[] = {"x", "y", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd:set_char_path", kw_list,
-                                     &x[0], &x[1]))
-        return NULL;
-    PG_fset_char_path(self->pyo, x);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "dd:set_char_path", kw_list,
+				    &x[0], &x[1]))
+       {PG_fset_char_path(self->pyo, x);
+	rv = Py_None;
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_set_color_line_doc[] = "";
 
 static PyObject *PY_PG_device_set_color_line(PY_PG_device *self,
-					     PyObject *args,
-					     PyObject *kwds)
-{
-    int color;
-    int mapped;
+					     PyObject *args, PyObject *kwds)
+   {int color, mapped;
+    PyObject *rv;
     char *kw_list[] = {"color", "mapped", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii:set_color_line", kw_list,
-                                     &color, &mapped))
-        return NULL;
-    PG_fset_line_color(self->pyo, color, mapped);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "ii:set_color_line", kw_list,
+				    &color, &mapped))
+       {PG_fset_line_color(self->pyo, color, mapped);
+	rv = Py_None;
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_set_line_color_doc[] = "";
 
 static PyObject *PY_PG_device_set_line_color(PY_PG_device *self,
-					     PyObject *args,
-					     PyObject *kwds)
-{
-    int color;
+					     PyObject *args, PyObject *kwds)
+   {int color;
+    PyObject *rv;
     char *kw_list[] = {"color", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_line_color", kw_list,
-                                     &color))
-        return NULL;
-    PG_fset_line_color(self->pyo, color, TRUE);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "i:set_line_color", kw_list,
+				    &color))
+       {PG_fset_line_color(self->pyo, color, TRUE);
+	rv = Py_None;
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_set_line_style_doc[] = "";
 
 static PyObject *PY_PG_device_set_line_style(PY_PG_device *self,
-					     PyObject *args,
-					     PyObject *kwds)
-{
-    int style;
+					     PyObject *args, PyObject *kwds)
+   {int style;
+    PyObject *rv;
     char *kw_list[] = {"style", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_line_style", kw_list,
-                                     &style))
-        return NULL;
-    PG_fset_line_style(self->pyo, style);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "i:set_line_style", kw_list,
+				    &style))
+       {PG_fset_line_style(self->pyo, style);
+	rv = Py_None;
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_set_line_width_doc[] = "";
 
 static PyObject *PY_PG_device_set_line_width(PY_PG_device *self,
-					     PyObject *args,
-					     PyObject *kwds)
-{
-    double width;
+					     PyObject *args, PyObject *kwds)
+   {double width;
+    PyObject *rv;
     char *kw_list[] = {"width", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d:set_line_width", kw_list,
-                                     &width))
-        return NULL;
-    PG_fset_line_width(self->pyo, width);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "d:set_line_width", kw_list,
+				    &width))
+       {PG_fset_line_width(self->pyo, width);
+	rv = Py_None;
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_set_text_color_doc[] = "";
 
 static PyObject *PY_PG_device_set_text_color(PY_PG_device *self,
-					     PyObject *args,
-					     PyObject *kwds)
-{
-    int color;
+					     PyObject *args, PyObject *kwds)
+   {int color;
+    PyObject *rv;
     char *kw_list[] = {"color", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_text_color", kw_list,
-                                     &color))
-        return NULL;
-    PG_fset_text_color(self->pyo, color, TRUE);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "i:set_text_color", kw_list,
+				    &color))
+       {PG_fset_text_color(self->pyo, color, TRUE);
+	rv = Py_None;
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_set_color_text_doc[] = "";
 
 static PyObject *PY_PG_device_set_color_text(PY_PG_device *self,
-					     PyObject *args,
-					     PyObject *kwds)
-{
-    int color;
-    int mapped;
+					     PyObject *args, PyObject *kwds)
+   {int color, mapped;
+    PyObject *rv;
     char *kw_list[] = {"color", "mapped", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii:set_color_text", kw_list,
-                                     &color, &mapped))
-        return NULL;
-    PG_fset_text_color(self->pyo, color, mapped);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "ii:set_color_text", kw_list,
+				    &color, &mapped))
+       {PG_fset_text_color(self->pyo, color, mapped);
+	rv = Py_None;
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_turn_data_id_doc[] = "";
 
 static PyObject *PY_PG_device_turn_data_id(PY_PG_device *self,
-					   PyObject *args,
-					   PyObject *kwds)
-{
-    int t;
+					   PyObject *args, PyObject *kwds)
+   {int t;
+    PyObject *rv;
     char *kw_list[] = {"t", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:turn_data_id", kw_list,
-                                     &t))
-        return NULL;
-    PG_turn_data_id(self->pyo, t);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "i:turn_data_id", kw_list,
+				    &t))
+       {PG_turn_data_id(self->pyo, t);
+	rv = Py_None;
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_clear_window_doc[] = "";
 
 static PyObject *PY_PG_device_clear_window(PY_PG_device *self,
-					   PyObject *args,
-					   PyObject *kwds)
-{
+					   PyObject *args, PyObject *kwds)
+   {PyObject *rv;
+
     PG_clear_window(self->pyo);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+
+    rv = Py_None;
+    Py_INCREF(rv);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_close_doc[] = "";
 
 static PyObject *PY_PG_device_close(PY_PG_device *self,
-				    PyObject *args,
-				    PyObject *kwds)
-{
+				    PyObject *args, PyObject *kwds)
+   {PyObject *rv;
+
     PG_close_device(self->pyo);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+
+    rv = Py_None;
+    Py_INCREF(rv);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_finish_plot_doc[] = "";
 
 static PyObject *PY_PG_device_finish_plot(PY_PG_device *self,
-					  PyObject *args,
-					  PyObject *kwds)
-{
+					  PyObject *args, PyObject *kwds)
+   {PyObject *rv;
+
     PG_finish_plot(self->pyo);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+
+    rv = Py_None;
+    Py_INCREF(rv);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_update_vs_doc[] = "";
 
 static PyObject *PY_PG_device_update_vs(PY_PG_device *self,
-					PyObject *args,
-					PyObject *kwds)
-{
+					PyObject *args,	PyObject *kwds)
+   {PyObject *rv;
+
     PG_update_vs(self->pyo);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+
+    rv = Py_None;
+    Py_INCREF(rv);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_open_doc[] = "";
 
 static PyObject *PY_PG_device_open(PY_PG_device *self,
-				   PyObject *args,
-				   PyObject *kwds)
-{
-    double xf;
-    double yf;
-    double dxf;
-    double dyf;
+				   PyObject *args, PyObject *kwds)
+   {double xf, yf, dxf, dyf;
+    PyObject *rv;
     char *kw_list[] = {"xf", "yf", "dxf", "dyf", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddd:open", kw_list,
-                                     &xf, &yf, &dxf, &dyf))
-        return NULL;
-    PG_open_device(self->pyo, xf, yf, dxf, dyf);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "dddd:open", kw_list,
+				    &xf, &yf, &dxf, &dyf))
+       {PG_open_device(self->pyo, xf, yf, dxf, dyf);
+	rv = Py_None;
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PG_device_set_palette_doc[] = "";
 
 static PyObject *PY_PG_device_set_palette(PY_PG_device *self,
 					  PyObject *args,
 					  PyObject *kwds)
-{
-    char *name;
-    char *kw_list[] = {"name", NULL};
+   {char *name;
     PG_palette *result;
+    PyObject *rv;
+    char *kw_list[] = {"name", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:set_palette", kw_list,
-                                     &name))
-        return NULL;
-    result = PG_fset_palette(self->pyo, name);
-    return PPpalette_from_ptr(result);
-}
+    rv = NULL;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "s:set_palette", kw_list,
+				    &name))
+       {result = PG_fset_palette(self->pyo, name);
+	rv     = PY_PG_palette_from_ptr(result);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1274,9 +1335,6 @@ static int PY_PG_device_tp_init(PY_PG_device *self,
 #define PY_DEF_TP_PRINT             NULL
 #define PY_DEF_TP_CALL              NULL
 #define PY_DEF_AS_MAP               NULL
-
-char
- PY_PG_device_doc[] = "";
 
 PY_DEF_TYPE_R(PG_device, "device");
 

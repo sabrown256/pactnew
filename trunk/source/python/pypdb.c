@@ -78,7 +78,7 @@ int PY_setup_pdb(PyObject *m)
 	err = SC_hasharr_foreach(PP_vif->host_chart,
 				 _PP_extra_defstr_mark,
 				 NULL);
-	nerr += (err != TRUE);
+	nerr += (err != FALSE);
 
 /* XXX - test err */
         nerr += (PyModule_AddObject(m, "vif", (PyObject *) PP_vif_obj) < 0);};
@@ -232,6 +232,26 @@ PyObject *PP_unpack(PyObject *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 
 PY_DEF_EXTRACTOR(defstr);
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PY_OPT_DEFSTR - handle BLANG binding related operations */
+
+void *_PY_opt_defstr(defstr *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1246,6 +1266,26 @@ PY_DEF_TYPE(defstr);
 /*--------------------------------------------------------------------------*/
 
 PY_DEF_EXTRACTOR(memdes);
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PY_OPT_MEMDES - handle BLANG binding related operations */
+
+void *_PY_opt_memdes(memdes *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

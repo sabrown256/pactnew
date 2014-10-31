@@ -36,6 +36,11 @@ if ($HSY_CPU == "unknown") then
    endif
 endif
 
+# PACT cannot/does not distinguish between x86_64 compliant flavors
+if ("$HostHW" == amd64) then
+   set HostHW = x86_64
+endif
+
 if ($HSY_FPU == "unknown") then
    if ("$HostHW" == "alpha") then
       setenv HSY_FPU  alpha
