@@ -19,6 +19,7 @@ static int
  MODE_F = -1;
 
 static char
+ *istrl,
  *ind = "";
 /* *ind = "      "; */
 
@@ -641,6 +642,7 @@ static int bind_fortran(bindes *bd)
 static void fin_fortran(bindes *bd)
    {int i;
     FILE *fp;
+    statedes *st;
 
     fp = bd->fp[0];
     csep(fp);
@@ -650,6 +652,11 @@ static void fin_fortran(bindes *bd)
 	 if (fp != NULL)
 	    {fclose_safe(fp);
 	     bd->fp[i] = NULL;};};
+
+    st = bd->st;
+
+    free_strings(st->fpr);
+    free_strings(st->fwr);
 
     return;}
 
@@ -1607,7 +1614,7 @@ static void bind_doc_fortran(FILE *fp, fdecl *dcl, doc_kind dk)
 
 static int cl_fortran(statedes *st, bindes *bd, int c, char **v)
    {int i, cfl;
-    char *fpr, *fwr;
+    char *fpr, *fwr, **sfp, **swr;
 
     istrl = "int";
     fpr   = "";
@@ -1637,6 +1644,17 @@ static int cl_fortran(statedes *st, bindes *bd, int c, char **v)
 	    fwr = v[++i];
 	 else if (strcmp(v[i], "-wr") == 0)
             cfl &= ~1;};
+
+    st->cfl = cfl;
+
+    sfp = file_text(FALSE, fpr);
+    swr = file_text(FALSE, fwr);
+
+    st->fpr = sfp;
+    st->nfp = lst_length(sfp);
+
+    st->fwr = swr;
+    st->nfw = lst_length(swr);
 
     return(0);}
 

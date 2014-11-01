@@ -149,9 +149,6 @@ static void
  fc_type(char *wty, int nc, farg *al, int afl, int mode),
  cs_type(char *a, int nc, farg *arg, int drf);
 
-static char
- *istrl;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -1474,32 +1471,14 @@ static char *has_binding(fdecl *dcl, char *lang)
 
 /* SETUP_BINDER - initialize the data members of BD */
 
-static void setup_binder(statedes *st, char *pck, int cfl,
-			 char **sbi, char **cdv, char **cdc, char **cpr,
-			 char **fpr, char **fwr)
+static void setup_binder(statedes *st, char *pck, char **sbi)
    {
 
     if (st != NULL)
        {st->pck = pck;
-	st->cfl = cfl;
 
 	st->sbi = sbi;
 	st->nbi = lst_length(sbi);
-
-	st->cdv = cdv;
-	st->ndv = lst_length(cdv);
-
-	st->cdc = cdc;
-	st->ndc = lst_length(cdc);
-
-	st->cpr = cpr;
-	st->ncp = lst_length(cpr);
-
-	st->fpr = fpr;
-	st->nfp = lst_length(fpr);
-
-	st->fwr = fwr;
-	st->nfw = lst_length(fwr);
 
 /* parse out and construct all the declarations */
 	find_bind(st);};
@@ -1641,9 +1620,10 @@ static void bind_doc_c(FILE *fp, fdecl *dcl, doc_kind dk)
 /* CL_C - process command line arguments for C binding */
 
 static int cl_c(statedes *st, bindes *bd, int c, char **v)
-   {int i;
-    char *cpr, *cdv;
+   {int i, rv;
+    char *cpr, *cdv, **sdv, **scp;
 
+    rv  = 1;
     cpr = "";
     cdv = "";
 
@@ -1657,9 +1637,25 @@ static int cl_c(statedes *st, bindes *bd, int c, char **v)
              printf("      c    file containing C prototypes\n");
              printf("      dv   file containing C enum,struct,union defs\n");
              printf("\n");
-             return(1);};};
+	     cpr = "";
+	     break;};};
 
-    return(0);}
+    if (IS_NULL(cpr) == FALSE)
+       {sdv = file_text(FALSE, cdv);
+	scp = file_text(FALSE, cpr);
+
+	st->cdv = sdv;
+	st->ndv = lst_length(sdv);
+
+	st->cpr = scp;
+	st->ncp = lst_length(scp);
+
+	rv = 0;}
+
+    else
+       printf("No prototypes found for '%s'\n", st->pck);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1695,59 +1691,45 @@ static int register_c(int fl, statedes *st)
  *       - return TRUE iff successful
  */
 
-static int blang(statedes *st, char *pck, int cfl, char *fbi,
-		 char *cdc, char *cdv, char *cpr, char *fpr, char *fwr)
+static int blang(statedes *st, char *pck, char *fbi)
    {int ib, rv;
-    char **sbi, **sdc, **sdv, **scp, **sfp, **swr;
+    char **sbi;
     bindes *pb;
 
     init_types();
 
     rv = FALSE;
 
-    if ((IS_NULL(cpr) == FALSE) && (IS_NULL(fbi) == FALSE))
+    if (IS_NULL(fbi) == FALSE)
        {sbi = file_text(FALSE, fbi);
-	sdc = file_text(FALSE, cdc);
-	sdv = file_text(FALSE, cdv);
-	scp = file_text(FALSE, cpr);
-	sfp = file_text(FALSE, fpr);
-	swr = file_text(FALSE, fwr);
 
-	if (scp == NULL)
-	   printf("No prototypes found for '%s'\n", pck);
-
-        else if (sbi == NULL)
+	if (sbi == NULL)
 	   printf("No bindings found for '%s'\n", pck);
             
 	else
 	   {add_derived_types(sbi);
 
-	    if (scp != NULL)
-	       {setup_binder(st, pck, cfl, sbi, sdv, sdc, scp, sfp, swr);
+	    setup_binder(st, pck, sbi);
 
 /* initialize the binding constructors */
-		for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
-		    {if (pb->init != NULL)
-		        pb->init(st, pb);};
+	    for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
+	        {if (pb->init != NULL)
+		    pb->init(st, pb);};
 
 /* make all the language bindings */
-		if (sbi != NULL)
-		   {for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
-		        {if (pb->bind != NULL)
-			    pb->bind(pb);};};
+	    if (sbi != NULL)
+	       {for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
+		    {if (pb->bind != NULL)
+			pb->bind(pb);};};
 
 /* cleanup */
-		for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
-		    {if (pb->fin != NULL)
-		        pb->fin(pb);};
+	    for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
+	        {if (pb->fin != NULL)
+		    pb->fin(pb);};
 
-		rv = TRUE;};};
+	    rv = TRUE;};
 
-	free_strings(sbi);
-	free_strings(sdc);
-	free_strings(scp);
-	free_strings(sfp);
-	free_strings(swr);};
+	free_strings(sbi);};
 
     return(rv);}
 
@@ -1757,9 +1739,9 @@ static int blang(statedes *st, char *pck, int cfl, char *fbi,
 /* MAIN - start it out here */
 
 int main(int c, char **v)
-   {int i, ib, rv, cfl;
+   {int i, ib, rv, err;
     char pck[BFLRG], msg[BFLRG];
-    char *fbi, *cdc, *cdv, *cpr, *fpr, *fwr;
+    char *fbi;
     bindes *pb;
     statedes st = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                    {FALSE, FALSE, FALSE, FALSE},
@@ -1782,26 +1764,13 @@ int main(int c, char **v)
 
     nstrncpy(st.path, BFLRG, ".", -1);
 
-    istrl = "int";
-    fbi   = "";
-    cpr   = "";
-    cdc   = "";
-    cdv   = "";
-    fpr   = "";
-    fwr   = "";
-    cfl   = 3;
+    rv  = 1;
+    fbi = "";
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-b") == 0)
 	    fbi = v[++i];
-	 else if (strcmp(v[i], "-c") == 0)
-	    cpr = v[++i];
-	 else if (strcmp(v[i], "-d") == 0)
-	    cdc = v[++i];
-	 else if (strcmp(v[i], "-dv") == 0)
-	    cdv = v[++i];
-	 else if (strcmp(v[i], "-f") == 0)
-	    fpr = v[++i];
+
 	 else if (strcmp(v[i], "-h") == 0)
             {printf("Usage: blang -b <bindings> [-h] [-p <dir>]\n");
              printf("   b    file containing binding specifications\n");
@@ -1810,49 +1779,34 @@ int main(int c, char **v)
              printf("\n");
 
 /* let each binding process its own help */
+             err = 0;
 	     for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
 	         {if (pb->cl != NULL)
-		     pb->cl(&st, pb, c, v);};
+		     err += pb->cl(&st, pb, c, v);};
 
-             return(1);}
+             return(err);}
 
-	 else if (strcmp(v[i], "-l") == 0)
-            istrl = "long";
-	 else if (strcmp(v[i], "-nob") == 0)
-	    st.no[4] = FALSE;
-	 else if (strcmp(v[i], "-nod") == 0)
-	    st.no[0] = FALSE;
-	 else if (strcmp(v[i], "-nof") == 0)
-	    st.no[1] = FALSE;
-	 else if (strcmp(v[i], "-nop") == 0)
-	    st.no[3] = FALSE;
-	 else if (strcmp(v[i], "-nos") == 0)
-	    st.no[2] = FALSE;
-	 else if (strcmp(v[i], "-o") == 0)
-            cfl &= ~2;
 	 else if (strcmp(v[i], "-p") == 0)
-            nstrncpy(st.path, BFLRG, v[++i], -1);
-	 else if (strcmp(v[i], "-w") == 0)
-	    fwr = v[++i];
-	 else if (strcmp(v[i], "-wr") == 0)
-            cfl &= ~1;};
+            nstrncpy(st.path, BFLRG, v[++i], -1);};
 
 /* let each binding process its own command line args */
+    err = 0;
     for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
         {if (pb->cl != NULL)
-	    pb->cl(&st, pb, c, v);};
+	    err += pb->cl(&st, pb, c, v);};
 
-    snprintf(pck, BFLRG, "%s", path_base(path_tail(fbi)));
-    snprintf(msg, BFLRG, "%s bindings", pck);
+    if (err == 0)
+       {snprintf(pck, BFLRG, "%s", path_base(path_tail(fbi)));
+	snprintf(msg, BFLRG, "%s bindings", pck);
 
-    printf("      %s ", fill_string(msg, 25));
+	printf("      %s ", fill_string(msg, 25));
 
-    rv = blang(&st, pck, cfl, fbi, cdc, cdv, cpr, fpr, fwr);
-    rv = (rv != TRUE);
+	rv = blang(&st, pck, fbi);
+	rv = (rv != TRUE);
 
-    printf("done\n");
+	printf("done\n");
 
-    log_safe("dump", 0, NULL, NULL);
+	log_safe("dump", 0, NULL, NULL);};
 
     return(rv);}
 
