@@ -1053,6 +1053,65 @@ static void fin_scheme(bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* BIND_DOC_SCHEME - emit Scheme binding documentation */
+
+static void bind_doc_scheme(FILE *fp, fdecl *dcl, doc_kind dk)
+   {char as[BFLRG], dcn[BFLRG];
+    char *bfn, *cfn;
+    extern void doc_proto_name_only(char *a, int nc, fdecl *dcl, char *dlm);
+
+    cfn = dcl->proto.name;
+    bfn = has_binding(dcl, "scheme");
+
+    if (dk == DK_HTML)
+       {if (bfn == NULL)
+	   fprintf(fp, "<i>SX Binding: </i>      none\n");
+	else if (dcl->bindings != NULL)
+	   {map_name(dcn, BFLRG, cfn, bfn, NULL, -1, TRUE, FALSE);
+	    doc_proto_name_only(as, BFLRG, dcl, NULL);
+	    if (IS_NULL(as) == TRUE)
+	       fprintf(fp, "<i>SX Binding: </i>      (%s)\n", dcn);
+	    else
+	       fprintf(fp, "<i>SX Binding: </i>      (%s %s)\n", dcn, as);};}
+
+    else if (dk == DK_MAN)
+       {if (bfn == NULL)
+	   {fprintf(fp, ".B SX Binding:      none\n");
+	    fprintf(fp, ".sp\n");}
+	else if (dcl->bindings != NULL)
+	   {map_name(dcn, BFLRG, cfn, bfn, NULL, -1, TRUE, FALSE);
+	    doc_proto_name_only(as, BFLRG, dcl, NULL);
+	    if (IS_NULL(as) == TRUE)
+	       fprintf(fp, ".B SX Binding:      (%s)\n", dcn);
+	    else
+	       fprintf(fp, ".B SX Binding:      (%s %s)\n", dcn, as);
+
+	    fprintf(fp, ".sp\n");};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CL_SCHEME - process command line arguments for Scheme binding */
+
+static int cl_scheme(statedes *st, bindes *bd, int c, char **v)
+   {int i;
+
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-h") == 0)
+            {printf("   Scheme options: [-nos]\n");
+             printf("      nos  do not generate Scheme interfaces\n");
+             printf("\n");
+             return(1);}
+	 else if (strcmp(v[i], "-nos") == 0)
+	    st->no[MODE_S] = FALSE;};
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* REGISTER_SCHEME - register SCHEME binding methods */
 
 static int register_scheme(int fl, statedes *st)
@@ -1067,8 +1126,10 @@ static int register_scheme(int fl, statedes *st)
 	    pb->fp[i] = NULL;
 
 	pb->st   = st;
+	pb->cl   = cl_scheme;
 	pb->init = init_scheme;
 	pb->bind = bind_scheme;
+	pb->doc  = bind_doc_scheme;
 	pb->fin  = fin_scheme;};
 
     return(MODE_S);}

@@ -1530,6 +1530,119 @@ static void fin_module(bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DOC_PROTO_FORTRAN - render the arg list of DCL into A for the
+ *                   - Fortran callable C wrapper
+ */
+
+static void doc_proto_fortran(char *a, int nc, fdecl *dcl)
+   {int i, na, ns;
+    char **args;
+
+    na = dcl->na;
+
+    a[0] = '\0';
+    if (na != 0)
+       {args = dcl->tfproto;
+	ns   = dcl->ntf;
+        for (i = 2; i < ns; i += 2)
+	    vstrcat(a, BFLRG, "%s %s, ", args[i], args[i+1]);
+        a[strlen(a) - 2] = '\0';};
+
+    memmove(a, trim(subst(a, "* ", "*", -1), BOTH, " "), nc);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* BIND_DOC_FORTRAN - emit Fortran binding documentation */
+
+static void bind_doc_fortran(FILE *fp, fdecl *dcl, doc_kind dk)
+   {int voidf;
+    char af[BFLRG], dcn[BFLRG];
+    char *bfn, **args;
+
+    bfn   = has_binding(dcl, "fortran");
+    voidf = dcl->voidf;
+
+    if (dk == DK_HTML)
+       {if (bfn == NULL)
+	   fprintf(fp, "<i>Fortran Binding: </i> none\n");
+	else if (dcl->bindings != NULL)
+	   {args = dcl->tfproto;
+
+	    doc_proto_fortran(af, BFLRG, dcl);
+	    map_name(dcn, BFLRG, args[1], bfn, "f", -1, FALSE, FALSE);
+	    if (voidf == TRUE)
+	       fprintf(fp, "<i>Fortran Binding: </i> %s(%s)\n",
+		       dcn, af);
+	    else
+	       fprintf(fp, "<i>Fortran Binding: </i> %s %s(%s)\n",
+		       args[0], dcn, af);};}
+
+    else if (dk == DK_MAN)
+       {if (bfn == NULL)
+	   {fprintf(fp, ".B Fortran Binding: none\n");
+	    fprintf(fp, ".sp\n");}
+	else if (dcl->bindings != NULL)
+	   {args = dcl->tfproto;
+
+	     doc_proto_fortran(af, BFLRG, dcl);
+	     map_name(dcn, BFLRG, args[1], bfn, "f", -1, FALSE, FALSE);
+	     if (voidf == TRUE)
+	        fprintf(fp, ".B Fortran Binding: %s(%s)\n",
+			dcn, af);
+	     else
+	        fprintf(fp, ".B Fortran Binding: %s %s(%s)\n",
+			args[0], dcn, af);
+
+	     fprintf(fp, ".sp\n");};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CL_FORTRAN - process command line arguments for Fortran binding */
+
+static int cl_fortran(statedes *st, bindes *bd, int c, char **v)
+   {int i, cfl;
+    char *fpr, *fwr;
+
+    istrl = "int";
+    fpr   = "";
+    fwr   = "";
+    cfl   = 3;
+
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-f") == 0)
+	    fpr = v[++i];
+	 else if (strcmp(v[i], "-h") == 0)
+            {printf("   Fortran options: [-f <f-proto>] [-l] [-nof] [-w <f-wrapper>] [-wr]\n");
+             printf("      f    file containing Fortran prototypes\n");
+             printf("      l    use long for Fortran implicit arguments\n");
+             printf("      nof  do not generate fortran interfaces\n");
+             printf("      o    no interoprabilty interfaces (Fortran wrappers only)\n");
+             printf("      w    file containing Fortran wrapper specifications\n");
+             printf("      wr   no Fortran wrappers (interoperability only)\n");
+             printf("\n");
+             return(1);}
+	 else if (strcmp(v[i], "-l") == 0)
+            istrl = "long";
+	 else if (strcmp(v[i], "-nof") == 0)
+	    st->no[MODE_F] = FALSE;
+	 else if (strcmp(v[i], "-o") == 0)
+            cfl &= ~2;
+	 else if (strcmp(v[i], "-w") == 0)
+	    fwr = v[++i];
+	 else if (strcmp(v[i], "-wr") == 0)
+            cfl &= ~1;};
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* REGISTER_FORTRAN - register FORTRAN binding methods */
 
 static int register_fortran(int fl, statedes *st)
@@ -1546,8 +1659,10 @@ static int register_fortran(int fl, statedes *st)
 	    pb->fp[i] = NULL;
 
 	pb->st   = st;
+	pb->cl   = cl_fortran;
 	pb->init = init_fortran;
 	pb->bind = bind_fortran;
+	pb->doc  = bind_doc_fortran;
 	pb->fin  = fin_fortran;
 
 /* fortran modules */
@@ -1556,8 +1671,10 @@ static int register_fortran(int fl, statedes *st)
 	    pb->fp[i] = NULL;
 
 	pb->st   = st;
+	pb->cl   = NULL;
 	pb->init = init_module;
 	pb->bind = bind_module;
+	pb->doc  = NULL;
 	pb->fin  = fin_module;};
 
     return(MODE_F);}

@@ -1287,6 +1287,84 @@ static void fin_python(bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DOC_PROTO_PYTHON - render the arg list of DCL into A for the
+ *                  - Python callable C wrapper
+ */
+
+static void doc_proto_python(char *a, int nc, char *dcn, fdecl *dcl)
+   {char t[BFLRG];
+    farg *alc;
+
+    alc = get_class_arg(dcl);
+
+    a[0] = '\0';
+
+    if (alc != NULL)
+       vstrcat(a, nc, "%s.%s", alc->name, dcn);
+    else
+       vstrcat(a, nc, "%s", dcn);
+
+    if_call_list(t, BFLRG, dcl, ",");
+    vstrcat(a, nc, "(%s)", t);
+
+    memmove(a, trim(a, BOTH, " "), nc);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* BIND_DOC_PYTHON - emit Python binding documentation */
+
+static void bind_doc_python(FILE *fp, fdecl *dcl, doc_kind dk)
+   {char ap[BFLRG], dcn[BFLRG];
+    char *bfn, *cfn;
+
+    cfn = dcl->proto.name;
+    bfn = has_binding(dcl, "python");
+
+    if (dk == DK_HTML)
+       {if (bfn == NULL)
+	   fprintf(fp, "<i>Python Binding: </i>  none\n");
+	else if (dcl->bindings != NULL)
+	   {map_name(dcn, BFLRG, cfn, bfn, NULL, -1, FALSE, TRUE);
+	    doc_proto_python(ap, BFLRG, dcn, dcl);
+	    fprintf(fp, "<i>Python Binding: </i>  %s\n", ap);};}
+
+    else if (dk == DK_MAN)
+       {if (bfn == NULL)
+	   {fprintf(fp, ".B Python Binding:  none\n");
+	    fprintf(fp, ".sp\n");}
+	else if (dcl->bindings != NULL)
+	   {map_name(dcn, BFLRG, cfn, bfn, NULL, -1, FALSE, TRUE);
+	    doc_proto_python(ap, BFLRG, dcn, dcl);
+	    fprintf(fp, ".B Python Binding:  %s\n", ap);
+	    fprintf(fp, ".sp\n");};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CL_PYTHON - process command line arguments for Python binding */
+
+static int cl_python(statedes *st, bindes *bd, int c, char **v)
+   {int i;
+
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-h") == 0)
+            {printf("   Python options: [-nop]\n");
+             printf("      nop  do not generate python interfaces\n");
+             printf("\n");
+             return(1);}
+	 else if (strcmp(v[i], "-nop") == 0)
+	    st->no[MODE_P] = FALSE;};
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* REGISTER_PYTHON - register PYTHON binding methods */
 
 static int register_python(int fl, statedes *st)
@@ -1301,8 +1379,10 @@ static int register_python(int fl, statedes *st)
 	    pb->fp[i] = NULL;
 
 	pb->st   = st;
+	pb->cl   = cl_python;
 	pb->init = init_python;
 	pb->bind = bind_python;
+	pb->doc  = bind_doc_python;
 	pb->fin  = fin_python;};
 
     return(MODE_P);}
