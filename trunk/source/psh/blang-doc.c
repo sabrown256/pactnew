@@ -297,7 +297,7 @@ static void fin_doc(bindes *bd)
 
 static int cl_doc(statedes *st, bindes *bd, int c, char **v)
    {int i;
-    char *cdc;
+    char *cdc, **sdc;
 
     cdc = "";
 
@@ -312,6 +312,11 @@ static int cl_doc(statedes *st, bindes *bd, int c, char **v)
              return(1);}
 	 else if (strcmp(v[i], "-nod") == 0)
 	    st->no[MODE_DOC] = FALSE;};
+
+    sdc = file_text(FALSE, cdc);
+
+    st->cdc = sdc;
+    st->ndc = lst_length(sdc);
 
     return(0);}
 
