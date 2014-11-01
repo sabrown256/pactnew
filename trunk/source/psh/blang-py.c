@@ -713,7 +713,7 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
         {al = dcl->al + i;
 	 ty = al->type;
 	 deref(dty, BFLRG, ty);
-	 lty = lookup_type(NULL, dty, MODE_C, MODE_P);
+	 lty = lookup_type(NULL, dty, MODE_C, gbd+MODE_P);
 	 if ((lty != NULL) && (strcmp(lty, tykind[TK_STRUCT]) == 0))
 	    {snprintf(p, BFSML, "PY_%s", dty);
 	     pty = p;

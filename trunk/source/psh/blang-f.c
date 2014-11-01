@@ -15,6 +15,11 @@
 #define C_PTR_RETURN "type(C_PTR)"
 #endif
 
+enum e_f_info
+   {FI_CFL, FI_NFP, FI_NFW};
+
+typedef enum e_f_info f_info;
+
 static int
  MODE_F = -1;
 
@@ -22,6 +27,90 @@ static char
  *istrl,
  *ind = "";
 /* *ind = "      "; */
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAP_FORTRAN_TYPES - map the C type names into Fortran type names */
+
+void map_fortran_types(void)
+   {
+
+#if 0
+
+    map_f_type("void",        "",            "");
+    map_f_type("bool",        "logical",     "SC_BOOL_I");
+    map_f_type("char",        "character",   "SC_CHAR_I");
+
+/* fixed point types */
+    map_f_type("short",       "integer(2)",  "SC_SHORT_I");
+    map_f_type("int",         "integer",     "SC_INT_I");
+    map_f_type("long",        "integer(8)",  "SC_LONG_I");
+    map_f_type("long long",   "integer(8)",  "SC_LONG_LONG_I");
+
+    map_f_type("size_t",      "integer(8)",  "SC_LONG_I");
+    map_f_type("ssize_t",     "integer(8)",  "SC_LONG_I");
+
+/* fixed width fixed point types */
+    map_f_type("int16_t",     "integer(2)",  "SC_INT16_I");
+    map_f_type("int32_t",     "integer(4)",  "SC_INT32_I");
+    map_f_type("int64_t",     "integer(8)",  "SC_INT64_I");
+
+/* floating point types */
+    map_f_type("float",       "real(4)",     "SC_FLOAT_I");
+    map_f_type("double",      "real(8)",     "SC_DOUBLE_I");
+    map_f_type("long double", "real(16)",    "SC_LONG_DOUBLE_I");
+
+/* complex types */
+    map_f_type("float _Complex",       "complex(4)",
+	     "SC_FLOAT_COMPLEX_I");
+    map_f_type("double _Complex",      "complex(8)",
+	     "SC_DOUBLE_COMPLEX_I");
+    map_f_type("long double _Complex", "complex(16)",
+	     "SC_LONG_DOUBLE_COMPLEX_I");
+
+/* GOTCHA: there is a general issue with pointers and Fortran here
+ * doing map_f_type on "void *" causes Fortran wrapper declarations
+ * to be generated with "void *" in the arg list
+ * if on the other hand we do not do an map_f_type on "void *" then
+ * blang will generate Fortran wrapper declarations with "void **"
+ * in the arg list
+ * in some contexts we would rather have "void **" to accord with
+ * the extra reference added by Fortran which is call by reference
+ * by default
+ * the same applies to all of these pointers and we have been
+ * bitten by FILE and void in the tests
+ * with "void *" defined pd_write_f works for real*8 a(10)
+ * but fails for type(C_PTR) b
+ */
+    map_f_type("void *",        "C_PTR-A",      "SC_POINTER_I");
+    map_f_type("bool *",        "logical-A",    "SC_BOOL_P_I");
+    map_f_type("char *",        "character-A",  "SC_STRING_I");
+
+    map_f_type("short *",       "integer(2)-A", "SC_SHORT_P_I");
+    map_f_type("int *",         "integer-A",    "SC_INT_P_I");
+    map_f_type("long *",        "integer(8)-A", "SC_LONG_P_I");
+    map_f_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I");
+
+    map_f_type("float *",       "real(4)-A",    "SC_FLOAT_P_I");
+    map_f_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I");
+    map_f_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I");
+
+/* complex types */
+    map_f_type("float _Complex *",       "complex(4)-A", "SC_FLOAT_COMPLEX_P_I");
+    map_f_type("double _Complex *",      "complex(8)-A", "SC_DOUBLE_COMPLEX_P_I");
+    map_f_type("long double _Complex *", "complex(16)-A", "SC_LONG_DOUBLE_COMPLEX_P_I");
+
+    map_f_type("pcons",         "C_PTR-A",      "SC_PCONS_I");
+    map_f_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I");
+/*
+    map_f_type("FILE *",        "C_PTR-A",      "SC_FILE_I");
+ */
+    map_f_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I");
+
+#endif
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -77,7 +166,7 @@ static void cf_type(char *a, int nc, char *ty)
        nstrncpy(a, nc, "void *", -1);
 
     else
-       {fty = lookup_type(NULL, ty, MODE_C, MODE_F);
+       {fty = lookup_type(NULL, ty, MODE_C, gbd+MODE_F);
 	if (fty != NULL)
 	   nstrncpy(a, nc, fty, -1);
 	else
@@ -92,7 +181,7 @@ static void cf_type(char *a, int nc, char *ty)
  *         - return the kind of FORTRAN argument TY is
  */
 
-static void fc_type(char *wty, int nc, farg *al, int afl, int mode)
+static void fc_type(char *wty, int nc, farg *al, int afl, bindes *bo)
    {fparam knd;
     char lty[BFLRG];
     char *pty, *arg, *ty;
@@ -107,7 +196,7 @@ static void fc_type(char *wty, int nc, farg *al, int afl, int mode)
 	arg = al->arg;
 	ty  = al->type;
 
-	pty = lookup_type(NULL, ty, MODE_C, mode);
+	pty = lookup_type(NULL, ty, MODE_C, bo);
 
 /* handle variable arg list */
 	if (is_var_arg(ty) == TRUE)
@@ -129,11 +218,11 @@ static void fc_type(char *wty, int nc, farg *al, int afl, int mode)
 	       {knd = FP_ARRAY;
 
 /* for C dereference the type so that we have an array of type */
-		if (mode == MODE_C)
+		if (bo == gbd+MODE_C)
 		   deref(wty, BFLRG, pty);
 
 /* for Fortran account for the -A convention used in the type registry */
-		else if (mode == MODE_F)
+		else if (bo == gbd+MODE_F)
 		   {nstrncpy(wty, nc, pty, -1);
 		    wty[strlen(wty)-2] = '\0';}
 
@@ -230,7 +319,7 @@ static void init_fortran(statedes *st, bindes *bd)
     FILE *fp;
 
     fp  = NULL;
-    cfl = st->cfl;
+    cfl = bd->iparam[FI_CFL];
     pck = st->pck;
 
     if (cfl & 1)
@@ -579,7 +668,7 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *ffn)
 	berr("%s is not interoperable - variable args", fn);}
 
     else if (strcmp(ffn, "none") != 0)
-       {fc_type(rt, BFLRG, &dcl->proto, FALSE, MODE_C);
+       {fc_type(rt, BFLRG, &dcl->proto, FALSE, gbd+MODE_C);
 
 	knd = dcl->proto.knd;
 
@@ -621,7 +710,7 @@ static int bind_fortran(bindes *bd)
     rv = TRUE;
     st = bd->st;
 
-    if (st->cfl & 1)
+    if (bd->iparam[FI_CFL] & 1)
        {fp = bd->fp[0];
 
 	dcls = st->dcl;
@@ -711,7 +800,7 @@ static void mc_type(int nc, char *fty, char *cty,
     char *ty;
 
     if (arg != NULL)
-       {fc_type(lwty, nc, arg, FALSE, MODE_F);
+       {fc_type(lwty, nc, arg, FALSE, gbd+MODE_F);
 	memmove(lwty, subst(lwty, "FIXNUM", "integer", -1), nc);
 
 	ty = arg->type;
@@ -955,7 +1044,10 @@ static void init_module(statedes *st, bindes *bd)
 
     fp = NULL;
 
-    cfl = st->cfl;
+    if (bd->iparam == NULL)
+       bd->iparam = gbd[MODE_F].iparam;
+
+    cfl = bd->iparam[FI_CFL];
     pck = st->pck;
 
     if (cfl & 2)
@@ -1421,7 +1513,7 @@ static int bind_module(bindes *bd)
     rv = TRUE;
     st = bd->st;
 
-    if (st->cfl & 2)
+    if (bd->iparam[FI_CFL] & 2)
        {fp   = bd->fp[0];
 	pck  = st->pck;
 	fpr  = st->fpr;
@@ -1616,6 +1708,8 @@ static int cl_fortran(statedes *st, bindes *bd, int c, char **v)
    {int i, cfl;
     char *fpr, *fwr, **sfp, **swr;
 
+    bd->iparam = MAKE_N(int, 3);
+
     istrl = "int";
     fpr   = "";
     fwr   = "";
@@ -1645,16 +1739,15 @@ static int cl_fortran(statedes *st, bindes *bd, int c, char **v)
 	 else if (strcmp(v[i], "-wr") == 0)
             cfl &= ~1;};
 
-    st->cfl = cfl;
-
     sfp = file_text(FALSE, fpr);
     swr = file_text(FALSE, fwr);
 
     st->fpr = sfp;
-    st->nfp = lst_length(sfp);
-
     st->fwr = swr;
-    st->nfw = lst_length(swr);
+
+    bd->iparam[FI_CFL] = cfl;
+    bd->iparam[FI_NFP] = lst_length(sfp);
+    bd->iparam[FI_NFW] = lst_length(swr);
 
     return(0);}
 

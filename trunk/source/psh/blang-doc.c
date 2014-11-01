@@ -254,7 +254,7 @@ static int bind_doc(bindes *bd)
 
     fp   = bd->fp[0];
     st   = bd->st;
-    ndc  = st->ndc;
+    ndc  = bd->iparam[0];
     cdc  = st->cdc;
     pck  = st->pck;
     dcls = st->dcl;
@@ -299,6 +299,8 @@ static int cl_doc(statedes *st, bindes *bd, int c, char **v)
    {int i;
     char *cdc, **sdc;
 
+    bd->iparam = MAKE_N(int, 1);
+
     cdc = "";
 
     for (i = 1; i < c; i++)
@@ -316,7 +318,8 @@ static int cl_doc(statedes *st, bindes *bd, int c, char **v)
     sdc = file_text(FALSE, cdc);
 
     st->cdc = sdc;
-    st->ndc = lst_length(sdc);
+
+    bd->iparam[0] = lst_length(sdc);
 
     return(0);}
 

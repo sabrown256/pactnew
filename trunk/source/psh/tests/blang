@@ -45,6 +45,8 @@ else
    flog $Log set cc = ( ${CC_Exe} ${CC_Debug_Default} ${CC_Flags} -I${IncDir} ${MDG_Inc} ${DP_Inc} )
    flog $Log set fc = ( ${FC_Exe} ${FC_Debug_Default} ${FC_Flags} -I${IncDir} )
 
+   flog $Log rm -f bl*.* blang
+
    foreach i (bl1 bl2 bl3 bl4 bl5 bl6)
 
       @ lerr = 0

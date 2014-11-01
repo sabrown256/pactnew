@@ -101,12 +101,6 @@ struct s_statedes
     int ndcl;                        /* number of declarations */
     int nen;                         /* number of enums */
     int nst;                         /* number of structs */
-    int ndc;                         /* number of doc lines */
-    int ncp;                         /* number of C prototype lines */
-    int ndv;                         /* number of C derived lines */
-    int cfl;                         /* Fortran wrappers/modules flag */
-    int nfp;                         /* number of Fortran prototype lines */
-    int nfw;                         /* number of Fortran wrapper lines */
     int no[N_MODES];                 /* no generate flags */
     char *pck;                       /* name of package */
     char **sbi;
@@ -122,7 +116,8 @@ struct s_statedes
     str_list defv;};
 
 struct s_bindes
-   {statedes *st;
+   {int *iparam;
+    statedes *st;
     FILE *fp[NF];
     str_list types;
     int (*cl)(statedes *st, bindes *bd, int c, char **v);
@@ -142,11 +137,11 @@ static bindes
  gbd[N_MODES];
 
 static char
- *lookup_type(char ***val, char *ty, int ity, int oty),
+ *lookup_type(char ***val, char *ty, int ity, bindes *bo),
  **mc_proto_list(fdecl *dcl);
 
 static void
- fc_type(char *wty, int nc, farg *al, int afl, int mode),
+ fc_type(char *wty, int nc, farg *al, int afl, bindes *bo),
  cs_type(char *a, int nc, farg *arg, int drf);
 
 /*--------------------------------------------------------------------------*/
@@ -337,15 +332,15 @@ static void get_def_value(char *lvl, int nc, char *sp, char *ty)
        {if ((is_ptr(ty) == TRUE) || (is_func_ptr(ty, 3) == TRUE))
 	   nstrncpy(lvl, nc, "NULL", -1);
 	else
-	   lookup_type(&dv, ty, MODE_C, MODE_C);}
+	   lookup_type(&dv, ty, MODE_C, NULL);}
 
 /* dereference a pointer type and get its default value */
     else if (lvl[0] == '*')
        {if (is_ptr(ty) == TRUE)
 	   {deref(lty, BFLRG, ty);
-	    lookup_type(&dv, lty, MODE_C, MODE_C);}
+	    lookup_type(&dv, lty, MODE_C, NULL);}
 	else
-	   lookup_type(&dv, ty, MODE_C, MODE_C);};
+	   lookup_type(&dv, ty, MODE_C, NULL);};
 
     if (dv != NULL)
        {nstrncpy(lvl, nc, dv[0], -1);
@@ -698,7 +693,7 @@ static int process_qualifiers(farg *al, char *qual)
 	    lst = NULL;
 	    arr = FALSE;
 	    if ((IS_NULL(val) == TRUE) || (val[0] == '*'))
-	       lookup_type(&lst, al->type, MODE_C, MODE_C);
+	       lookup_type(&lst, al->type, MODE_C, NULL);
 	    else
 	       {arr = (strchr(val, '[') != NULL);
 		lst = tokenize(val, "[,]", 0);};
@@ -736,7 +731,7 @@ static int process_qualifiers(farg *al, char *qual)
 
 	    free_strings(ta);}
 	else
-	   {lookup_type(&al->val, al->type, MODE_C, MODE_C);
+	   {lookup_type(&al->val, al->type, MODE_C, NULL);
 	    al->dir = FD_NONE;};};
 
     return(rv);}
@@ -845,7 +840,7 @@ static farg *proc_args(fdecl *dcl)
 		 err           = TRUE;
 		 break;}
 	     else
-	        {fc_type(NULL, 0, al+i, TRUE, MODE_C);
+	        {fc_type(NULL, 0, al+i, TRUE, gbd+MODE_C);
 		 nr += al[i].nv;};};
 
 	dcl->error = err;
@@ -1115,7 +1110,7 @@ static void add_type(char *cty, char *fty, char *sty, char *defv)
     str_lst_add(&gbd[i].types, cty);
     i++;
 
-/* add types for 2 Fortran modes */
+/* add types for 2 Fortran modes - modules and wrappers */
     for (j = 0; j < 2; j++)
         str_lst_add(&gbd[i++].types, fty);
 
@@ -1130,11 +1125,14 @@ static void add_type(char *cty, char *fty, char *sty, char *defv)
 
 /* LOOKUP_TYPE - lookup and return a type from the type lists */
 
-static char *lookup_type(char ***val, char *ty, int ity, int oty)
+static char *lookup_type(char ***val, char *ty, int ity, bindes *bo)
    {int i, l;
     char *rv, *dv, **lst, **ta;
 
     rv = NULL;
+
+    if (bo == NULL)
+       bo = gbd + MODE_C;
 
     l = -1;
 
@@ -1147,7 +1145,7 @@ static char *lookup_type(char ***val, char *ty, int ity, int oty)
     dv = NO_DEFAULT_VALUE;
     if (l != -1)
        {dv = gbd[0].st->defv.arr[l];
-	rv = gbd[oty].types.arr[l];}
+	rv = bo->types.arr[l];}
 
     else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
        dv = "NULL";
@@ -1623,6 +1621,8 @@ static int cl_c(statedes *st, bindes *bd, int c, char **v)
    {int i, rv;
     char *cpr, *cdv, **sdv, **scp;
 
+    bd->iparam = MAKE_N(int, 2);
+
     rv  = 1;
     cpr = "";
     cdv = "";
@@ -1645,10 +1645,10 @@ static int cl_c(statedes *st, bindes *bd, int c, char **v)
 	scp = file_text(FALSE, cpr);
 
 	st->cdv = sdv;
-	st->ndv = lst_length(sdv);
-
 	st->cpr = scp;
-	st->ncp = lst_length(scp);
+
+	bd->iparam[0] = lst_length(sdv);
+	bd->iparam[1] = lst_length(scp);
 
 	rv = 0;}
 
@@ -1743,7 +1743,7 @@ int main(int c, char **v)
     char pck[BFLRG], msg[BFLRG];
     char *fbi;
     bindes *pb;
-    statedes st = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    statedes st = {0, 0, 0, 0,
                    {FALSE, FALSE, FALSE, FALSE},
 		   NULL,
 		   NULL, NULL, NULL, NULL, NULL, NULL,
