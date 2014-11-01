@@ -18,6 +18,11 @@
 
 #define NF 3
 
+enum e_doc_kind
+   {DK_HTML = 0, DK_MAN};
+
+typedef enum e_doc_kind doc_kind;
+
 enum e_type_kind
    {TK_PRIMITIVE = 0, TK_ENUM, TK_STRUCT};
 
@@ -120,8 +125,10 @@ struct s_bindes
    {statedes *st;
     FILE *fp[NF];
     str_list types;
+    int (*cl)(statedes *st, bindes *bd, int c, char **v);
     void (*init)(statedes *st, bindes *bd);
     int (*bind)(bindes *bd);
+    void (*doc)(FILE *fp, fdecl *dcl, doc_kind dk);
     void (*fin)(bindes *bd);};
 
 static int
@@ -1612,6 +1619,51 @@ static void c_proto(char *pr, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* BIND_DOC_C - emit C binding documentation */
+
+static void bind_doc_c(FILE *fp, fdecl *dcl, doc_kind dk)
+   {char pr[BFLRG];
+
+    c_proto(pr, BFLRG, dcl);
+
+    if (dk == DK_HTML)
+       fprintf(fp, "<i>C Binding: </i>       %s\n", pr);
+
+    else if (dk == DK_MAN)
+       {fprintf(fp, ".B C Binding:       %s\n", pr);
+        fprintf(fp, ".sp\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CL_C - process command line arguments for C binding */
+
+static int cl_c(statedes *st, bindes *bd, int c, char **v)
+   {int i;
+    char *cpr, *cdv;
+
+    cpr = "";
+    cdv = "";
+
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-c") == 0)
+	    cpr = v[++i];
+	 else if (strcmp(v[i], "-dv") == 0)
+	    cdv = v[++i];
+	 else if (strcmp(v[i], "-h") == 0)
+            {printf("   C specifications: -c <c-proto> -dv <c-der>\n");
+             printf("      c    file containing C prototypes\n");
+             printf("      dv   file containing C enum,struct,union defs\n");
+             printf("\n");
+             return(1);};};
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* REGISTER_C - register C binding methods
  *            - this is a dummy - crucial but empty
  */
@@ -1628,8 +1680,10 @@ static int register_c(int fl, statedes *st)
 	    pb->fp[i] = NULL;
 
 	pb->st   = st;
+	pb->cl   = cl_c;
 	pb->init = NULL;
 	pb->bind = NULL;
+	pb->doc  = bind_doc_c;
 	pb->fin  = NULL;};
 
     return(MODE_C);}
@@ -1641,36 +1695,15 @@ static int register_c(int fl, statedes *st)
  *       - return TRUE iff successful
  */
 
-static int blang(char *pck, char *pth, int cfl, char *fbi,
-		 char *cdc, char *cdv, char *cpr, char *fpr, char *fwr,
-		 int *no)
-   {int i, ib, rv;
+static int blang(statedes *st, char *pck, int cfl, char *fbi,
+		 char *cdc, char *cdv, char *cpr, char *fpr, char *fwr)
+   {int ib, rv;
     char **sbi, **sdc, **sdv, **scp, **sfp, **swr;
     bindes *pb;
-    statedes st = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                   {FALSE, FALSE, FALSE, FALSE},
-		   NULL,
-		   NULL, NULL, NULL, NULL, NULL, NULL,
-		   NULL, NULL, NULL, };
-
-    nbd = 0;
-
-/* register the language bindings */
-    register_c(TRUE, &st);
-    register_doc(no[0], &st);
-    register_fortran(no[1], &st);
-    register_scheme(no[2], &st);
-    register_python(no[3], &st);
-    register_basis(no[4], &st);
 
     init_types();
 
     rv = FALSE;
-
-    for (i = 0; i < N_MODES; i++)
-        st.no[i] = no[i];
-
-    nstrncpy(st.path, BFLRG, pth, -1);
 
     if ((IS_NULL(cpr) == FALSE) && (IS_NULL(fbi) == FALSE))
        {sbi = file_text(FALSE, fbi);
@@ -1690,12 +1723,12 @@ static int blang(char *pck, char *pth, int cfl, char *fbi,
 	   {add_derived_types(sbi);
 
 	    if (scp != NULL)
-	       {setup_binder(&st, pck, cfl, sbi, sdv, sdc, scp, sfp, swr);
+	       {setup_binder(st, pck, cfl, sbi, sdv, sdc, scp, sfp, swr);
 
 /* initialize the binding constructors */
 		for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
 		    {if (pb->init != NULL)
-		        pb->init(&st, pb);};
+		        pb->init(st, pb);};
 
 /* make all the language bindings */
 		if (sbi != NULL)
@@ -1724,13 +1757,32 @@ static int blang(char *pck, char *pth, int cfl, char *fbi,
 /* MAIN - start it out here */
 
 int main(int c, char **v)
-   {int i, rv, cfl;
-    int no[N_MODES];
+   {int i, ib, rv, cfl;
     char pck[BFLRG], msg[BFLRG];
-    char *fbi, *cdc, *cdv, *cpr, *fpr, *fwr, *pth;
+    char *fbi, *cdc, *cdv, *cpr, *fpr, *fwr;
+    bindes *pb;
+    statedes st = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                   {FALSE, FALSE, FALSE, FALSE},
+		   NULL,
+		   NULL, NULL, NULL, NULL, NULL, NULL,
+		   NULL, NULL, NULL, };
+
+    nbd = 0;
+
+    for (i = 0; i < N_MODES; i++)
+        st.no[i] = TRUE;
+
+/* register the language bindings */
+    register_c(TRUE, &st);
+    register_doc(st.no[0], &st);
+    register_fortran(st.no[1], &st);
+    register_scheme(st.no[2], &st);
+    register_python(st.no[3], &st);
+    register_basis(st.no[4], &st);
+
+    nstrncpy(st.path, BFLRG, ".", -1);
 
     istrl = "int";
-    pth   = ".";
     fbi   = "";
     cpr   = "";
     cdc   = "";
@@ -1738,9 +1790,6 @@ int main(int c, char **v)
     fpr   = "";
     fwr   = "";
     cfl   = 3;
-
-    for (i = 0; i < N_MODES; i++)
-        no[i] = TRUE;
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-b") == 0)
@@ -1754,52 +1803,51 @@ int main(int c, char **v)
 	 else if (strcmp(v[i], "-f") == 0)
 	    fpr = v[++i];
 	 else if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] -dv <c-der> [-f <f-proto>] [-h] [-l] [-nob] [-nod] [-nof] [-nop] [-nos] [-p <dir>] [-w <f-wrapper>] [-wr]\n");
+            {printf("Usage: blang -b <bindings> [-h] [-p <dir>]\n");
              printf("   b    file containing binding specifications\n");
-             printf("   c    file containing C prototypes\n");
-             printf("   d    file containing documentation comments\n");
-             printf("   dv   file containing C enum,struct,union defs\n");
-             printf("   f    file containing Fortran prototypes\n");
              printf("   h    this help message\n");
-             printf("   l    use long for Fortran implicit arguments\n");
-             printf("   nod  do not generate documentation\n");
-             printf("   nof  do not generate fortran interfaces\n");
-             printf("   nop  do not generate python interfaces\n");
-             printf("   nos  do not generate scheme interfaces\n");
-             printf("   o    no interoprabilty interfaces (Fortran wrappers only)\n");
              printf("   p    directory for generated files\n");
-             printf("   w    file containing Fortran wrapper specifications\n");
-             printf("   wr   no Fortran wrappers (interoperability only)\n");
              printf("\n");
+
+/* let each binding process its own help */
+	     for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
+	         {if (pb->cl != NULL)
+		     pb->cl(&st, pb, c, v);};
+
              return(1);}
 
 	 else if (strcmp(v[i], "-l") == 0)
             istrl = "long";
 	 else if (strcmp(v[i], "-nob") == 0)
-	    no[4] = FALSE;
+	    st.no[4] = FALSE;
 	 else if (strcmp(v[i], "-nod") == 0)
-	    no[0] = FALSE;
+	    st.no[0] = FALSE;
 	 else if (strcmp(v[i], "-nof") == 0)
-	    no[1] = FALSE;
+	    st.no[1] = FALSE;
 	 else if (strcmp(v[i], "-nop") == 0)
-	    no[3] = FALSE;
+	    st.no[3] = FALSE;
 	 else if (strcmp(v[i], "-nos") == 0)
-	    no[2] = FALSE;
+	    st.no[2] = FALSE;
 	 else if (strcmp(v[i], "-o") == 0)
             cfl &= ~2;
 	 else if (strcmp(v[i], "-p") == 0)
-            pth = v[++i];
+            nstrncpy(st.path, BFLRG, v[++i], -1);
 	 else if (strcmp(v[i], "-w") == 0)
 	    fwr = v[++i];
 	 else if (strcmp(v[i], "-wr") == 0)
             cfl &= ~1;};
+
+/* let each binding process its own command line args */
+    for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
+        {if (pb->cl != NULL)
+	    pb->cl(&st, pb, c, v);};
 
     snprintf(pck, BFLRG, "%s", path_base(path_tail(fbi)));
     snprintf(msg, BFLRG, "%s bindings", pck);
 
     printf("      %s ", fill_string(msg, 25));
 
-    rv = blang(pck, pth, cfl, fbi, cdc, cdv, cpr, fpr, fwr, no);
+    rv = blang(&st, pck, cfl, fbi, cdc, cdv, cpr, fpr, fwr);
     rv = (rv != TRUE);
 
     printf("done\n");

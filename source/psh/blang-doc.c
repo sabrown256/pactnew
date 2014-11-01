@@ -38,63 +38,11 @@ static void init_doc(statedes *st, bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DOC_PROTO_FORTRAN - render the arg list of DCL into A for the
- *                   - Fortran callable C wrapper
- */
-
-static void doc_proto_fortran(char *a, int nc, fdecl *dcl)
-   {int i, na, ns;
-    char **args;
-
-    na = dcl->na;
-
-    a[0] = '\0';
-    if (na != 0)
-       {args = dcl->tfproto;
-	ns   = dcl->ntf;
-        for (i = 2; i < ns; i += 2)
-	    vstrcat(a, BFLRG, "%s %s, ", args[i], args[i+1]);
-        a[strlen(a) - 2] = '\0';};
-
-    memmove(a, trim(subst(a, "* ", "*", -1), BOTH, " "), nc);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DOC_PROTO_PYTHON - render the arg list of DCL into A for the
- *                  - Python callable C wrapper
- */
-
-static void doc_proto_python(char *a, int nc, char *dcn, fdecl *dcl)
-   {char t[BFLRG];
-    farg *alc;
-
-    alc = get_class_arg(dcl);
-
-    a[0] = '\0';
-
-    if (alc != NULL)
-       vstrcat(a, nc, "%s.%s", alc->name, dcn);
-    else
-       vstrcat(a, nc, "%s", dcn);
-
-    if_call_list(t, BFLRG, dcl, ",");
-    vstrcat(a, nc, "(%s)", t);
-
-    memmove(a, trim(a, BOTH, " "), nc);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* DOC_PROTO_NAME_ONLY - render the arg list of DCL into A using
  *                     - variable names only
  */
 
-static void doc_proto_name_only(char *a, int nc, fdecl *dcl, char *dlm)
+void doc_proto_name_only(char *a, int nc, fdecl *dcl, char *dlm)
    {int i, na;
     farg *al;
 
@@ -167,18 +115,15 @@ static void process_doc(char *t, int nc, char **com)
 /* HTML_WRAP - wrap C function DCL in HTML form */
 
 static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
-   {int voidf;
-    char pr[BFLRG];
-    char upn[BFLRG], lfn[BFLRG], dcn[BFLRG];
-    char af[BFLRG], as[BFLRG], ap[BFLRG];
+   {int ib;
+    char upn[BFLRG], lfn[BFLRG];
     char fty[BFLRG], t[BFLRG];
-    char *cfn, *bfn, **args, **com;
+    char *cfn, **com;
+    bindes *pb;
 
     cfn = dcl->proto.name;
 
     com = find_comment(cfn, ndc, cdc);
-
-    voidf = dcl->voidf;
 
     nstrncpy(upn, BFLRG, cfn, -1);
     upcase(upn);
@@ -196,46 +141,10 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
     fprintf(fp, "<p>\n");
     fprintf(fp, "<pre>\n");
 
-/* C */
-    c_proto(pr, BFLRG, dcl);
-    fprintf(fp, "<i>C Binding: </i>       %s\n", pr);
-
-/* Fortran */
-    bfn = has_binding(dcl, "fortran");
-    if (bfn == NULL)
-       fprintf(fp, "<i>Fortran Binding: </i> none\n");
-    else if (dcl->bindings != NULL)
-       {args = dcl->tfproto;
-
-	doc_proto_fortran(af, BFLRG, dcl);
-	map_name(dcn, BFLRG, args[1], bfn, "f", -1, FALSE, FALSE);
-	if (voidf == TRUE)
-	   fprintf(fp, "<i>Fortran Binding: </i> %s(%s)\n",
-		   dcn, af);
-	else
-	   fprintf(fp, "<i>Fortran Binding: </i> %s %s(%s)\n",
-		   args[0], dcn, af);};
-
-/* Scheme */
-    bfn = has_binding(dcl, "scheme");
-    if (bfn == NULL)
-       fprintf(fp, "<i>SX Binding: </i>      none\n");
-    else if (dcl->bindings != NULL)
-       {map_name(dcn, BFLRG, cfn, bfn, NULL, -1, TRUE, FALSE);
-	doc_proto_name_only(as, BFLRG, dcl, NULL);
-	if (IS_NULL(as) == TRUE)
-	   fprintf(fp, "<i>SX Binding: </i>      (%s)\n", dcn);
-	else
-	   fprintf(fp, "<i>SX Binding: </i>      (%s %s)\n", dcn, as);};
-
-/* Python */
-    bfn = has_binding(dcl, "python");
-    if (bfn == NULL)
-       fprintf(fp, "<i>Python Binding: </i>  none\n");
-    else if (dcl->bindings != NULL)
-       {map_name(dcn, BFLRG, cfn, bfn, NULL, -1, FALSE, TRUE);
-	doc_proto_python(ap, BFLRG, dcn, dcl);
-	fprintf(fp, "<i>Python Binding: </i>  %s\n", ap);};
+/* emit the contributions from the various languages */
+    for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
+        {if (pb->doc != NULL)
+	    pb->doc(fp, dcl, DK_HTML);};
 
     fprintf(fp, "</pre>\n");
     fprintf(fp, "<p>\n");
@@ -259,13 +168,13 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
 
 static void man_wrap(statedes *st, fdecl *dcl,
 		     char *sb, char *pck, int ndc, char **cdc)
-   {int voidf;
-    char fname[BFLRG], upk[BFLRG], pr[BFLRG];
-    char upn[BFLRG], lfn[BFLRG], dcn[BFLRG];
-    char af[BFLRG], as[BFLRG], ap[BFLRG];
+   {int ib, voidf;
+    char fname[BFLRG], upk[BFLRG];
+    char upn[BFLRG], lfn[BFLRG];
     char fty[BFLRG], t[BFLRG];
-    char *cfn, *bfn, **args, **com;
+    char *cfn, **com;
     FILE *fp;
+    bindes *pb;
 
     cfn   = dcl->proto.name;
     voidf = dcl->voidf;
@@ -305,55 +214,10 @@ static void man_wrap(statedes *st, fdecl *dcl,
     fprintf(fp, ".B #include <%s.h>\n", pck);
     fprintf(fp, ".sp\n");
 
-/* C */
-    c_proto(pr, BFLRG, dcl);
-    fprintf(fp, ".B C Binding:       %s\n", pr);
-    fprintf(fp, ".sp\n");
-
-/* Fortran */
-    bfn = has_binding(dcl, "fortran");
-    if (bfn == NULL)
-       {fprintf(fp, ".B Fortran Binding: none\n");
-	fprintf(fp, ".sp\n");}
-    else if (dcl->bindings != NULL)
-       {args = dcl->tfproto;
-
-	doc_proto_fortran(af, BFLRG, dcl);
-	map_name(dcn, BFLRG, args[1], bfn, "f", -1, FALSE, FALSE);
-	if (voidf == TRUE)
-	   fprintf(fp, ".B Fortran Binding: %s(%s)\n",
-		   dcn, af);
-	else
-	   fprintf(fp, ".B Fortran Binding: %s %s(%s)\n",
-		   args[0], dcn, af);
-
-	fprintf(fp, ".sp\n");};
-
-/* Scheme */
-    bfn = has_binding(dcl, "scheme");
-    if (bfn == NULL)
-       {fprintf(fp, ".B SX Binding:      none\n");
-	fprintf(fp, ".sp\n");}
-    else if (dcl->bindings != NULL)
-       {map_name(dcn, BFLRG, cfn, bfn, NULL, -1, TRUE, FALSE);
-	doc_proto_name_only(as, BFLRG, dcl, NULL);
-	if (IS_NULL(as) == TRUE)
-	   fprintf(fp, ".B SX Binding:      (%s)\n", dcn);
-	else
-	   fprintf(fp, ".B SX Binding:      (%s %s)\n", dcn, as);
-
-	fprintf(fp, ".sp\n");};
-
-/* Python */
-    bfn = has_binding(dcl, "python");
-    if (bfn == NULL)
-       {fprintf(fp, ".B Python Binding:  none\n");
-	fprintf(fp, ".sp\n");}
-    else if (dcl->bindings != NULL)
-       {map_name(dcn, BFLRG, cfn, bfn, NULL, -1, FALSE, TRUE);
-	doc_proto_python(ap, BFLRG, dcn, dcl);
-	fprintf(fp, ".B Python Binding:  %s\n", ap);
-	fprintf(fp, ".sp\n");};
+/* emit the contributions from the various languages */
+    for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
+        {if (pb->doc != NULL)
+	    pb->doc(fp, dcl, DK_MAN);};
 
     process_doc(t, BFLRG, com);
     if (IS_NULL(t) == FALSE)
@@ -429,6 +293,31 @@ static void fin_doc(bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CL_DOC - process command line arguments for doc binding */
+
+static int cl_doc(statedes *st, bindes *bd, int c, char **v)
+   {int i;
+    char *cdc;
+
+    cdc = "";
+
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-d") == 0)
+	    cdc = v[++i];
+	 else if (strcmp(v[i], "-h") == 0)
+	    {printf("   Documentation options: [-d <doc>] [-nod]\n");
+             printf("      d    file containing documentation comments\n");
+             printf("      nod  do not generate documentation\n");
+             printf("\n");
+             return(1);}
+	 else if (strcmp(v[i], "-nod") == 0)
+	    st->no[MODE_DOC] = FALSE;};
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* REGISTER_DOC - register documentation methods */
 
 static int register_doc(int fl, statedes *st)
@@ -443,8 +332,10 @@ static int register_doc(int fl, statedes *st)
 	    pb->fp[i] = NULL;
 
 	pb->st   = st;
+	pb->cl   = cl_doc;
 	pb->init = init_doc;
 	pb->bind = bind_doc;
+	pb->doc  = NULL;
 	pb->fin  = fin_doc;};
 
     return(MODE_DOC);}
