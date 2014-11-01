@@ -64,7 +64,7 @@ PyObject *_PY_fav4(PyObject *self, PyObject *args, PyObject *kwds)
     str _rv;
     
     _rv = fav4();
-    _lo = Py_BuildValue("s",
+    _lo = Py_BuildValue("O",
                         &_rv);
 
     return(_lo);}
@@ -124,7 +124,7 @@ PyObject *_PY_favp4(PyObject *self, PyObject *args, PyObject *kwds)
     str *_rv;
     
     _rv = favp4();
-    _lo = Py_BuildValue("s",
+    _lo = Py_BuildValue("O",
                         &_rv);
 
     return(_lo);}
@@ -146,5 +146,23 @@ PyObject *_PY_fav5(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+int PY_add_bl1_enum(PyObject *m)
+   {int nerr;
+
+    nerr = 0;
+
+    return(nerr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int PY_init_bl1(PyObject *m, PyObject *d)
+   {int nerr;
+
+    nerr = 0;
+
+    return(nerr);}
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

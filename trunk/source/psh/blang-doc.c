@@ -5,6 +5,9 @@
  *
  */
 
+static int
+ MODE_DOC = -1;
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -429,10 +432,10 @@ static void fin_doc(bindes *bd)
 /* REGISTER_DOC - register documentation methods */
 
 static int register_doc(int fl, statedes *st)
-   {int i, nb;
+   {int i;
     bindes *pb;
 
-    nb = nbd;
+    MODE_DOC = nbd;
 
     if (fl == TRUE)
        {pb = gbd + nbd++;
@@ -444,7 +447,7 @@ static int register_doc(int fl, statedes *st)
 	pb->bind = bind_doc;
 	pb->fin  = fin_doc;};
 
-    return(nb);}
+    return(MODE_DOC);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

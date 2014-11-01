@@ -13,6 +13,9 @@ module pact_bl6
 
 ! ... external declarations for generated wrappers
 
+! ... C enum declarations
+! ... C struct declarations
+
 
    interface
 

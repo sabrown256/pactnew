@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-derived str	character-A	G_STR	strO     NULL
+struct str
 
 # C	Fortran	Scheme	Python
 

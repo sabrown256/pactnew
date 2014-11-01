@@ -1,0 +1,8 @@
+#
+# BL6.DERIVEDC - systematic tests of ARG
+#
+# include "cpyright.h"
+#
+
+struct s_str {int nc; char *s;};
+

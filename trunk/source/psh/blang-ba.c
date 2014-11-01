@@ -5,6 +5,9 @@
  *
  */
 
+static int
+ MODE_B = -1;
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -45,10 +48,10 @@ static void fin_basis(bindes *bd)
 /* REGISTER_BASIS - register BASIS binding methods */
 
 static int register_basis(int fl, statedes *st)
-   {int i, nb;
+   {int i;
     bindes *pb;
 
-    nb = nbd;
+    MODE_B = nbd;
 
     if (fl == TRUE)
        {pb = gbd + nbd++;
@@ -60,7 +63,7 @@ static int register_basis(int fl, statedes *st)
 	pb->bind = bind_basis;
 	pb->fin  = fin_basis;};
 
-    return(nb);}
+    return(MODE_B);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -61,7 +61,11 @@ int PY_setup_pact(PyObject *m, PyObject *d)
        {ne += (PyDict_SetItemString(d, "pdbdata",
 				    (PyObject *) &PP_pdbdata_Type) < 0);
 	ne += (PyDict_SetItemString(d, "assoc",
-				    (PyObject *) &PY_pcons_type) < 0);};
+				    (PyObject *) &PY_pcons_type) < 0);
+
+/* for backward compatibility with old bindings */
+	ne += (PyDict_SetItemString(d, "PDBfile", (PyObject *) &PY_PDBfile_type) < 0);};
+
 
     if (ne == 0)
        {PP_init_type_map();
