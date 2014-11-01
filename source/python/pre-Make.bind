@@ -78,8 +78,10 @@ OPDBO = pypdb.o pdbmodule.o pdbfile.o pdbdata.o \
 
 OPGSO = pypgs.o pgsmodule.o
 
-OPDB = ${OPDBO} ${OPMLO} ${OPPO}
-OPGS = ${OPDBO} ${OPMLO} ${OPPO} ${OPGSO}
+OPANO = pypan.o
+
+OPDB = ${OPDBO} ${OPANO} ${OPMLO} ${OPPO}
+OPGS = ${OPDBO} ${OPANO} ${OPMLO} ${OPPO} ${OPGSO}
 Objs = ${OPGS}
 
 gps = gp-score.c gp-pml.c gp-pdb.c   \
@@ -103,7 +105,9 @@ ArPDBO = ${TGTLib}(pypdb.o) ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbfile.o) \
 
 ArPGSO = ${TGTLib}(pypgs.o) ${TGTLib}(pgsmodule.o)
 
-ArObjs = ${ArPPO} ${ArPMLO} ${ArPDBO} ${ArPGSO} ${gpa}
+ArPANO = ${TGTLib}(pypan.o)
+
+ArObjs = ${ArPPO} ${ArPMLO} ${ArPDBO} ${ArPANO} ${ArPGSO} ${gpa}
 
 ${Objs} : ${Hdrs}
 ${ArObjs} : ${Hdrs}

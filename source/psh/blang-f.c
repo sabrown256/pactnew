@@ -15,6 +15,9 @@
 #define C_PTR_RETURN "type(C_PTR)"
 #endif
 
+static int
+ MODE_F = -1;
+
 static char
  *ind = "";
 /* *ind = "      "; */
@@ -1069,7 +1072,8 @@ static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 
 /* MODULE_ENUM_DECL - write the Fortran interface C enums DV */
 
-static void module_enum_decl(FILE **fp, char *dv, char **ta, char *pck)
+static void module_enum_decl(FILE **fp, char *dv, char **ta,
+			     char *pck, int ni)
    {int i, nc;
     long vl;
     char s[BFLRG], x[BFLRG];
@@ -1125,7 +1129,8 @@ static void module_enum_decl(FILE **fp, char *dv, char **ta, char *pck)
 
 /* MODULE_STRUCT_DECL - write the Fortran interface C structs DV */
 
-static void module_struct_decl(FILE **fp, char *dv, char **ta, char *pck)
+static void module_struct_decl(FILE **fp, char *dv, char **ta,
+			       char *pck, int ni)
    {FILE *fm;
 
     fm = fp[0];
@@ -1528,10 +1533,10 @@ static void fin_module(bindes *bd)
 /* REGISTER_FORTRAN - register FORTRAN binding methods */
 
 static int register_fortran(int fl, statedes *st)
-   {int i, nb;
+   {int i;
     bindes *pb;
 
-    nb = nbd;
+    MODE_F = nbd;
 
     if (fl == TRUE)
 
@@ -1555,7 +1560,7 @@ static int register_fortran(int fl, statedes *st)
 	pb->bind = bind_module;
 	pb->fin  = fin_module;};
 
-    return(nb);}
+    return(MODE_F);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

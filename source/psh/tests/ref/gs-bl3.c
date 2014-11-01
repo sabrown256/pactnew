@@ -24,7 +24,7 @@ static object *_SXI_fe1(SS_psides *si, object *argl)
     _la1       = NULL;
     _la2       = 0;
     SS_args(si, argl,
-            G_STR, &_la1,
+            SX_STR_I, &_la1,
             SC_INT_I, &_la2,
             0);
 
@@ -56,7 +56,7 @@ static object *_SXI_fe2(SS_psides *si, object *argl)
     _linfo     = NULL;
     _ll        = 0;
     SS_args(si, argl,
-            G_STR, &_ldev,
+            SX_STR_I, &_ldev,
             SC_DOUBLE_P_I, &_lx,
             SC_DOUBLE_P_I, &_ly,
             SC_INT_I, &_ln,
@@ -68,6 +68,116 @@ static object *_SXI_fe2(SS_psides *si, object *argl)
     _lo = SS_f;
 
     return(_lo);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static void _SX_install_bl3_consts(SS_psides *si)
+   {
+
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static void _SX_wr_str(SS_psides *si, object *o, object *fp)
+   {str *x;
+
+    x = SS_GET(str, o);
+
+    PRINT(SS_OUTSTREAM(fp), "<STR|%s>", _SX_opt_str(x, BIND_PRINT, NULL));
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static void _SX_rl_str(SS_psides *si, object *o)
+   {str *x;
+
+    x = SS_GET(str, o);
+
+    _SX_opt_str(x, BIND_FREE, NULL);
+
+    SS_rl_object(si, o);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int SX_STR_I;
+
+object *SX_make_str(SS_psides *si, str *x)
+   {object *rv;
+
+    if (x == NULL)
+       rv = SS_null;
+    else
+       {char *nm;
+
+        _SX_opt_str(x, BIND_ALLOC, NULL);
+        nm = _SX_opt_str(x, BIND_LABEL, NULL);
+        rv = SS_mk_object(si, x, SX_STR_I, SELF_EV, nm,
+                          _SX_wr_str, _SX_rl_str);}
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+void *_SX_arg_str(SS_psides *si, object *o)
+   {void *rv;
+
+    rv = _SX_opt_str(NULL, BIND_ARG, o);
+
+    if (rv == _SX.unresolved)
+       SS_error(si, "OBJECT NOT STR - _SX_ARG_STR", o);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static object *_SXI_strp(SS_psides *si, object *o)
+   {object *rv;
+
+    rv = SX_STRP(o) ? SS_t : SS_f;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _SX_install_bl3_derived(SS_psides *si)
+   {int nerr;
+    defstr *dp;
+
+    nerr = 0;
+
+    dp = PD_defstr(SX_gs.vif, "str",
+                   "char *s",
+                   LAST);
+    nerr += (dp == NULL);
+
+    SS_install(si, "str?",
+               "Returns #t if the object is a str, and #f otherwise",
+               SS_sargs,
+               _SXI_strp, SS_PR_PROC);
+
+    SX_STR_I = SC_type_register("str", KIND_STRUCT, sizeof(str),
+              SC_TYPE_FREE, _SX_rl_str,
+              0);
+
+    SS_set_type_method(SX_STR_I,
+		        "C->Scheme", SX_make_str,
+		        "Scheme->C", _SX_arg_str,
+		        NULL);
+
+    return(nerr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

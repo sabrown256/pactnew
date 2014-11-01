@@ -241,6 +241,14 @@ extern char
 
 /*--------------------------------------------------------------------------*/
 
+/* PYPAN.C declarations */
+
+extern void
+ *_PY_opt_PA_package(PA_package *x, bind_opt wh, void *a),
+ *_PY_opt_PA_variable(PA_variable *x, bind_opt wh, void *a),
+ *_PY_opt_PA_iv_specification(PA_iv_specification *x, bind_opt wh, void *a);
+
+
 /* PYPDB.C declarations */
 
 extern void
@@ -265,7 +273,8 @@ extern void
  *_PY_opt_PG_palette(PG_palette *x, bind_opt wh, void *a),
  *_PY_opt_PG_image(PG_image *x, bind_opt wh, void *a),
  *_PY_opt_PG_graph(PG_graph *x, bind_opt wh, void *a),
- *_PY_opt_PG_device(PG_device *x, bind_opt wh, void *a);
+ *_PY_opt_PG_device(PG_device *x, bind_opt wh, void *a),
+ *_PY_opt_PG_interface_object(PG_interface_object *x, bind_opt wh, void *a);
 
 extern PyObject
  *PP_make_graph_1d(PyObject *self, PyObject *args, PyObject *kwds),

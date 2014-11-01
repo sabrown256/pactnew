@@ -1339,4 +1339,27 @@ static int PY_PG_device_tp_init(PY_PG_device *self,
 PY_DEF_TYPE_R(PG_device, "device");
 
 /*--------------------------------------------------------------------------*/
+
+/*                             INTERFACE OBJECT ROUTINES                    */
+
+/*--------------------------------------------------------------------------*/
+
+/* _PY_OPT_PG_INTERFACE_OBJECT - handle BLANG binding related operations */
+
+void *_PY_opt_PG_interface_object(PG_interface_object *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -41,6 +41,7 @@ typedef enum e_fdir fdir;
 typedef struct s_str_list str_list;
 typedef struct s_statedes statedes;
 typedef struct s_bindes bindes;
+typedef struct s_der_list der_list;
 typedef struct s_idecl idecl;
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
@@ -75,26 +76,32 @@ struct s_fdecl
     int na;                          /* number of arguments */
     int nr;                          /* number of return quantities */
     int nc;                          /* number of char * args */
-    int ntf;                         /* number of fortran prototype pairs */
+    int ntf;                         /* number of (type,var) prototype pairs */
     int voidf;                       /* TRUE for functions returning nothing */
     int voida;                       /* TRUE for functions with no args */
     int error;                       /* TRUE if declaration is incorrect */
     char **args;                     /* all args */
     char **cargs;                    /* char * args */
-    char **tfproto;                  /* type, var fortran prototype pairs */
+    char **tfproto;                  /* (type,var) prototype pairs */
     char **bindings;                 /* list of language bindings specified */
     farg proto;                      /* farg representation of declaration */
     farg *al;};
 
+struct s_der_list
+   {char *def;
+    char **members;};
+
 struct s_statedes
-   {int cfl;                         /* fortran wrappers/modules flag */
-    int nbi;                         /* number of bindings */
-    int ncp;                         /* number of C prototype lines */
+   {int nbi;                         /* number of bindings */
+    int ndcl;                        /* number of declarations */
+    int nen;                         /* number of enums */
+    int nst;                         /* number of structs */
     int ndc;                         /* number of doc lines */
+    int ncp;                         /* number of C prototype lines */
     int ndv;                         /* number of C derived lines */
+    int cfl;                         /* Fortran wrappers/modules flag */
     int nfp;                         /* number of Fortran prototype lines */
     int nfw;                         /* number of Fortran wrapper lines */
-    int ndcl;                        /* number of declarations */
     int no[N_MODES];                 /* no generate flags */
     char *pck;                       /* name of package */
     char **sbi;
@@ -104,6 +111,8 @@ struct s_statedes
     char **fpr;
     char **fwr;
     fdecl *dcl;
+    der_list *enums;
+    der_list *structs;
     char path[BFLRG];                /* path for output files */
     str_list defv;};
 
@@ -117,12 +126,7 @@ struct s_bindes
 
 static int
  nbd = 0,
- MODE_C,
- MODE_DOC,
- MODE_F,
- MODE_S,
- MODE_P,
- MODE_B;
+ MODE_C;
 
 static char
  *tykind[3] = {"primitive", "enum", "struct"};
@@ -161,6 +165,32 @@ static void berr(char *fmt, ...)
     printf("Error: %s\n", s);
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PUSH_DERIVED - add S and SA to the derived type list LST */
+
+static der_list *push_derived(der_list *lst, int *pnl, char *s, char **sa)
+   {int ni, nb;
+    static int nx = 10;
+
+    ni = *pnl;
+    if ((lst == NULL) || (ni == 0))
+       lst = MAKE_N(der_list, nx);
+	
+    if ((ni % nx == 0) && (ni > 0))
+       {nb = ni/nx;
+	REMAKE(lst, der_list, (nb+1)*nx);};
+
+    lst[ni].def     = STRSAVE(s);
+    lst[ni].members = sa;
+
+    ni++;
+
+    *pnl = ni;
+
+    return(lst);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -819,7 +849,7 @@ static farg *proc_args(fdecl *dcl)
 	dcl->nr    = nr;
 	dcl->voida = ((dcl->na == 1) && (IS_NULL(dcl->al[0].name) == TRUE));
 
-/* fill in the Fortran prototype token pairs */
+/* fill in the (type,var) prototype token pairs */
 	mc_proto_list(dcl);};
 
     return(al);}
@@ -1007,41 +1037,28 @@ void parse_member(char *mbr, char *nm, char *ty, char *dm, int nc)
 /* EMIT_ENUM_DEFS - emit enum specifications via FEMIT */
 
 void emit_enum_defs(bindes *bd,
-		    void (*femit)(FILE **fp, char *dv, char **ta, char *pck))
-   {int ib, id, nbi;
-    char ps[BFLRG], t[BFLRG];
-    char *pck, *sb, *te, **cdv, **sbi, **ta;
+		    void (*femit)(FILE **fp, char *dv, char **ta,
+				  char *pck, int ni))
+   {int ie, ne;
+    char *pck, *sb, **ta;
+    der_list *el;
     FILE **fp;
     statedes *st;
 
     st  = bd->st;
-    cdv = st->cdv;
-    if (cdv != NULL)
-       {fp  = bd->fp;
-	pck = st->pck;
-	sbi = st->sbi;
-	nbi = st->nbi;
+    fp  = bd->fp;
+    pck = st->pck;
+    ne  = st->nen;
+    el  = st->enums;
 
-	femit(fp, "begin", NULL, pck);
+    femit(fp, "begin", NULL, pck, ne);
 
-	for (ib = 0; ib < nbi; ib++)
-	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
-	     if ((strncmp(ps, tykind[TK_ENUM], 4) == 0) ||
-		 ((strncmp(ps, "derived", 7) == 0) &&
-		  (strstr(ps, "SC_ENUM_I") != NULL)))
-	        {te = strtok(ps, " ");
-		 te = strtok(NULL, " ");
-		 for (id = 0; cdv[id] != NULL; id++)
-		     {sb = cdv[id];
-		      if (blank_line(sb) == FALSE)
-			 {nstrncpy(t, BFLRG, sb, -1);
-			  ta = tokenize(t, " \t", 0);
-			  if (strcmp(ta[1]+2, te) == 0)
-			     {femit(fp, sb, ta, pck);
-			      break;};
-			  free_strings(ta);};};};};
-
-	femit(fp, "end", NULL, pck);};
+    for (ie = 0; ie < ne; ie++)
+        {sb = el[ie].def;
+	 ta = el[ie].members;
+	 femit(fp, sb, ta, pck, -1);};
+	    
+    femit(fp, "end", NULL, pck, -1);
 
     return;}
 
@@ -1051,42 +1068,28 @@ void emit_enum_defs(bindes *bd,
 /* EMIT_STRUCT_DEFS - emit struct specifications via FEMIT */
 
 void emit_struct_defs(bindes *bd,
-		      void (*femit)(FILE **fp, char *dv, char **ta, char *pck))
-   {int ib, id, nbi, nc;
-    char ps[BFLRG], t[BFLRG];
-    char *pck, *sb, *te, **cdv, **sbi, **ta;
+		      void (*femit)(FILE **fp, char *dv, char **ta,
+				    char *pck, int ni))
+   {int is, ns;
+    char *pck, *sb, **ta;
+    der_list *sl;
     FILE **fp;
     statedes *st;
 
     st  = bd->st;
-    cdv = st->cdv;
-    if (cdv != NULL)
-       {fp  = bd->fp;
-	pck = st->pck;
-	sbi = st->sbi;
-	nbi = st->nbi;
+    fp  = bd->fp;
+    pck = st->pck;
+    ns  = st->nst;
+    sl  = st->structs;
 
-	femit(fp, "begin", NULL, pck);
+    femit(fp, "begin", NULL, pck, ns);
 
-	for (ib = 0; ib < nbi; ib++)
-	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
-	     if ((strncmp(ps, tykind[TK_STRUCT], 6) == 0) ||
-		 ((strncmp(ps, "derived", 7) == 0) &&
-		  (strstr(ps, "SC_ENUM_I") == NULL)))
-	        {te = strtok(ps, " \t");
-		 te = strtok(NULL, " \t");
-		 nc = strlen(te);
-		 for (id = 0; cdv[id] != NULL; id++)
-		     {sb = cdv[id];
-		      if (blank_line(sb) == FALSE)
-			 {nstrncpy(t, BFLRG, sb, -1);
-			  ta = tokenize(t, "{;}", 0);
-			  if (strncmp(ta[0]+9, te, nc) == 0)
-			     {femit(fp, sb, ta, pck);
-			      break;};
-			  free_strings(ta);};};};};
-
-	femit(fp, "end", NULL, pck);};
+    for (is = 0; is < ns; is++)
+        {sb = sl[is].def;
+	 ta = sl[is].members;
+	 femit(fp, sb, ta, pck, -1);};
+	    
+    femit(fp, "end", NULL, pck, -1);
 
     return;}
 
@@ -1098,18 +1101,23 @@ void emit_struct_defs(bindes *bd,
 
 /* ADD_TYPE - add a type to the map */
 
-static void add_type(char *cty, char *fty, char *sty, char *pty, char *defv)
-   {
+static void add_type(char *cty, char *fty, char *sty, char *defv)
+   {int i, j;
 
-    str_lst_add(&gbd[MODE_C].types, cty);
+    i = MODE_C;
 
-    str_lst_add(&gbd[MODE_F].types, fty);
+/* add types for C mode */
+    str_lst_add(&gbd[i].st->defv, defv);
+    str_lst_add(&gbd[i].types, cty);
+    i++;
 
-    str_lst_add(&gbd[MODE_S].types, sty);
+/* add types for 2 Fortran modes */
+    for (j = 0; j < 2; j++)
+        str_lst_add(&gbd[i++].types, fty);
 
-    str_lst_add(&gbd[MODE_P].types, pty);
-
-    str_lst_add(&gbd[0].st->defv, defv);
+/* add types for remaining modes */
+    for (; i < nbd; i++)
+        str_lst_add(&gbd[i].types, sty);
 
     return;}
 
@@ -1156,41 +1164,41 @@ static char *lookup_type(char ***val, char *ty, int ity, int oty)
 static void init_types(void)
    {
 
-    add_type("void",        "",            "",                 NULL, "NULL");
-    add_type("bool",        "logical",     "SC_BOOL_I",        NULL, "FALSE");
-    add_type("char",        "character",   "SC_CHAR_I",        NULL, "'\\0'");
+    add_type("void",        "",            "",                 "NULL");
+    add_type("bool",        "logical",     "SC_BOOL_I",        "FALSE");
+    add_type("char",        "character",   "SC_CHAR_I",        "'\\0'");
 
 /* fixed point types */
-    add_type("short",       "integer(2)",  "SC_SHORT_I",       NULL, "0");
-    add_type("int",         "integer",     "SC_INT_I",         NULL, "0");
-    add_type("long",        "integer(8)",  "SC_LONG_I",        NULL, "0L");
-    add_type("long long",   "integer(8)",  "SC_LONG_LONG_I",   NULL, "0LL");
+    add_type("short",       "integer(2)",  "SC_SHORT_I",       "0");
+    add_type("int",         "integer",     "SC_INT_I",         "0");
+    add_type("long",        "integer(8)",  "SC_LONG_I",        "0L");
+    add_type("long long",   "integer(8)",  "SC_LONG_LONG_I",   "0LL");
 
-    add_type("size_t",      "integer(8)",  "SC_LONG_I",        NULL, "0L");
-    add_type("ssize_t",     "integer(8)",  "SC_LONG_I",        NULL, "0L");
+    add_type("size_t",      "integer(8)",  "SC_LONG_I",        "0L");
+    add_type("ssize_t",     "integer(8)",  "SC_LONG_I",        "0L");
 
 /* fixed width fixed point types */
-    add_type("int16_t",     "integer(2)",  "SC_INT16_I",       NULL, "0");
-    add_type("int32_t",     "integer(4)",  "SC_INT32_I",       NULL, "0");
-    add_type("int64_t",     "integer(8)",  "SC_INT64_I",       NULL, "0L");
+    add_type("int16_t",     "integer(2)",  "SC_INT16_I",       "0");
+    add_type("int32_t",     "integer(4)",  "SC_INT32_I",       "0");
+    add_type("int64_t",     "integer(8)",  "SC_INT64_I",       "0L");
 
 /* floating point types */
-    add_type("float",       "real(4)",     "SC_FLOAT_I",       NULL, "0.0");
-    add_type("double",      "real(8)",     "SC_DOUBLE_I",      NULL, "0.0");
-    add_type("long double", "real(16)",    "SC_LONG_DOUBLE_I", NULL, "0.0");
+    add_type("float",       "real(4)",     "SC_FLOAT_I",       "0.0");
+    add_type("double",      "real(8)",     "SC_DOUBLE_I",      "0.0");
+    add_type("long double", "real(16)",    "SC_LONG_DOUBLE_I", "0.0");
 
 /* complex types */
     add_type("float _Complex",       "complex(4)",
-	     "SC_FLOAT_COMPLEX_I", NULL, "0.0");
+	     "SC_FLOAT_COMPLEX_I", "0.0");
     add_type("double _Complex",      "complex(8)",
-	     "SC_DOUBLE_COMPLEX_I", NULL, "0.0");
+	     "SC_DOUBLE_COMPLEX_I", "0.0");
     add_type("long double _Complex", "complex(16)",
-	     "SC_LONG_DOUBLE_COMPLEX_I", NULL, "0.0");
+	     "SC_LONG_DOUBLE_COMPLEX_I", "0.0");
 
 /* GOTCHA: there is a general issue with pointers and Fortran here
  * doing add_type on "void *" causes Fortran wrapper declarations
  * to be generated with "void *" in the arg list
- * if on the other hand we do not to an add_type on "void *" then
+ * if on the other hand we do not do an add_type on "void *" then
  * blang will generate Fortran wrapper declarations with "void **"
  * in the arg list
  * in some contexts we would rather have "void **" to accord with
@@ -1201,33 +1209,33 @@ static void init_types(void)
  * with "void *" defined pd_write_f works for real*8 a(10)
  * but fails for type(C_PTR) b
  */
-    add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       NULL, "NULL");
-    add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        NULL, "NULL");
-    add_type("char *",        "character-A",  "SC_STRING_I",        NULL, "NULL");
+    add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       "NULL");
+    add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        "NULL");
+    add_type("char *",        "character-A",  "SC_STRING_I",        "NULL");
 
-    add_type("short *",       "integer(2)-A", "SC_SHORT_P_I",       NULL, "NULL");
-    add_type("int *",         "integer-A",    "SC_INT_P_I",         NULL, "NULL");
-    add_type("long *",        "integer(8)-A", "SC_LONG_P_I",        NULL, "NULL");
-    add_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I",   NULL, "NULL");
+    add_type("short *",       "integer(2)-A", "SC_SHORT_P_I",       "NULL");
+    add_type("int *",         "integer-A",    "SC_INT_P_I",         "NULL");
+    add_type("long *",        "integer(8)-A", "SC_LONG_P_I",        "NULL");
+    add_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I",   "NULL");
 
-    add_type("float *",       "real(4)-A",    "SC_FLOAT_P_I",       NULL, "NULL");
-    add_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I",      NULL, "NULL");
-    add_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", NULL, "NULL");
+    add_type("float *",       "real(4)-A",    "SC_FLOAT_P_I",       "NULL");
+    add_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I",      "NULL");
+    add_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", "NULL");
 
 /* complex types */
     add_type("float _Complex *",       "complex(4)-A",
-	     "SC_FLOAT_COMPLEX_P_I", NULL, "NULL");
+	     "SC_FLOAT_COMPLEX_P_I", "NULL");
     add_type("double _Complex *",      "complex(8)-A",
-	     "SC_DOUBLE_COMPLEX_P_I", NULL, "NULL");
+	     "SC_DOUBLE_COMPLEX_P_I", "NULL");
     add_type("long double _Complex *", "complex(16)-A",
-	     "SC_LONG_DOUBLE_COMPLEX_P_I", NULL, "NULL");
+	     "SC_LONG_DOUBLE_COMPLEX_P_I", "NULL");
 
-    add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         NULL, "NULL");
-    add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       NULL, "NULL");
+    add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         "NULL");
+    add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       "NULL");
 /*
-    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          NULL, "NULL");
+    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          "NULL");
  */
-    add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       NULL, "NULL");
+    add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       "NULL");
 
     return;}
 
@@ -1239,7 +1247,7 @@ static void init_types(void)
 static void add_derived_types(char **sbi)
    {int ib;
     char s[BFLRG];
-    char *fty, *sty, *pty, *defv, *sb, **ta;
+    char *fty, *sty, *defv, *sb, **ta;
 
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
@@ -1249,25 +1257,24 @@ static void add_derived_types(char **sbi)
 		 ta   = tokenize(s, " \t", 0);
 		 fty  = ta[2];
 		 sty  = ta[3];
-		 pty  = ta[4];
-		 defv = ta[5];}
+		 defv = ta[4];}
 	     else if (strncmp(sb, "enum ", 5) == 0)
 	        {nstrncpy(s, BFLRG, sb, -1);
 		 ta   = tokenize(s, " \t", 0);
 		 fty  = "integer";
 		 sty  = tykind[TK_ENUM];
-		 pty  = tykind[TK_ENUM];
 		 defv = ta[2];}
 	     else if (strncmp(sb, "struct ", 7) == 0)
 	        {nstrncpy(s, BFLRG, sb, -1);
 		 ta   = tokenize(s, " \t", 0);
 		 fty  = tykind[TK_STRUCT];
 		 sty  = tykind[TK_STRUCT];
-		 pty  = tykind[TK_STRUCT];
-		 defv = NULL;};
+		 defv = NULL;}
+	     else
+	        ta = NULL;
 	
 	     if (ta != NULL)
-	        {add_type(ta[1], fty, sty, pty, defv);
+	        {add_type(ta[1], fty, sty, defv);
 		 FREE(ta[0]);
 		 FREE(ta);};};};
 
@@ -1330,16 +1337,19 @@ static char *map_name(char *d, int nc, char *cf, char *lf,
  */
 
 static void find_bind(statedes *st)
-   {int i, ib, nb, nbi;
-    char t[BFLRG];
-    char *sb, *lng, *p;
-    char **cpr, **sbi, **sa, **ta;
+   {int i, ib, id, nb, nc, ne, ns, nbi;
+    char t[BFLRG], ps[BFLRG];
+    char *sb, *lng, *te, *p;
+    char **cpr, **cdv, **sbi, **sa, **ta;
     fdecl *dcl;
+    der_list *el, *sl;
 
     nbi = st->nbi;
     sbi = st->sbi;
     cpr = st->cpr;
+    cdv = st->cdv;
 
+/* parse out prototypes */
     nb  = 0;
     dcl = MAKE_N(fdecl, nbi);
     if (dcl != NULL)
@@ -1376,6 +1386,57 @@ static void find_bind(statedes *st)
 
     st->dcl  = dcl;
     st->ndcl = nb;
+
+/* parse out enums */
+    ne = 0;
+    el = NULL;
+    if (cdv != NULL)
+       {for (ib = 0; ib < nbi; ib++)
+	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
+	     if ((strncmp(ps, tykind[TK_ENUM], 4) == 0) ||
+		 ((strncmp(ps, "derived", 7) == 0) &&
+		  (strstr(ps, "SC_ENUM_I") != NULL)))
+	        {te = strtok(ps, " ");
+		 te = strtok(NULL, " ");
+		 for (id = 0; cdv[id] != NULL; id++)
+		     {sb = cdv[id];
+		      if (blank_line(sb) == FALSE)
+			 {nstrncpy(t, BFLRG, sb, -1);
+			  ta = tokenize(t, " \t", 0);
+			  if (strcmp(ta[1]+2, te) == 0)
+			     {el = push_derived(el, &ne, sb, ta);
+			      break;}
+			  else
+			     free_strings(ta);};};};};};
+
+    st->enums = el;
+    st->nen   = ne;
+
+/* parse out structs */
+    ns = 0;
+    sl = NULL;
+    if (cdv != NULL)
+       {for (ib = 0; ib < nbi; ib++)
+	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
+	     if ((strncmp(ps, tykind[TK_STRUCT], 6) == 0) ||
+		 ((strncmp(ps, "derived", 7) == 0) &&
+		  (strstr(ps, "SC_ENUM_I") == NULL)))
+	        {te = strtok(ps, " \t");
+		 te = strtok(NULL, " \t");
+		 nc = strlen(te);
+		 for (id = 0; cdv[id] != NULL; id++)
+		     {sb = cdv[id];
+		      if (blank_line(sb) == FALSE)
+			 {nstrncpy(t, BFLRG, sb, -1);
+			  ta = tokenize(t, "{;}", 0);
+			  if (strncmp(ta[0]+9, te, nc) == 0)
+			     {sl = push_derived(sl, &ns, sb, ta);
+			      break;}
+			  else
+			     free_strings(ta);};};};};};
+
+    st->structs = sl;
+    st->nst     = ns;
 
     return;}
 
@@ -1556,10 +1617,10 @@ static void c_proto(char *pr, int nc, fdecl *dcl)
  */
 
 static int register_c(int fl, statedes *st)
-   {int i, nb;
+   {int i;
     bindes *pb;
 
-    nb = nbd;
+    MODE_C = nbd;
 
     if (fl == TRUE)
        {pb = gbd + nbd++;
@@ -1571,7 +1632,7 @@ static int register_c(int fl, statedes *st)
 	pb->bind = NULL;
 	pb->fin  = NULL;};
 
-    return(nb);}
+    return(MODE_C);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1586,19 +1647,21 @@ static int blang(char *pck, char *pth, int cfl, char *fbi,
    {int i, ib, rv;
     char **sbi, **sdc, **sdv, **scp, **sfp, **swr;
     bindes *pb;
-    statedes st = {0, 0, 0, 0, 0, 0, 0, 0,
+    statedes st = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                    {FALSE, FALSE, FALSE, FALSE},
-		   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, };
+		   NULL,
+		   NULL, NULL, NULL, NULL, NULL, NULL,
+		   NULL, NULL, NULL, };
 
     nbd = 0;
 
 /* register the language bindings */
-    MODE_C   = register_c(TRUE, &st);
-    MODE_DOC = register_doc(no[0], &st);
-    MODE_F   = register_fortran(no[1], &st);
-    MODE_S   = register_scheme(no[2], &st);
-    MODE_P   = register_python(no[3], &st);
-    MODE_B   = register_basis(no[4], &st);
+    register_c(TRUE, &st);
+    register_doc(no[0], &st);
+    register_fortran(no[1], &st);
+    register_scheme(no[2], &st);
+    register_python(no[3], &st);
+    register_basis(no[4], &st);
 
     init_types();
 

@@ -8,8 +8,8 @@
 #
 
 # treat a struct as a character array - unless specific definition exists
-derived str	character-A	SC_STRING_I	PyObject
-derived etyp	integer		SC_ENUM_I	SC_ENUM_I
+struct str
+enum etyp 0
 
 # C	Fortran	Scheme	Python
 

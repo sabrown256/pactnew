@@ -14,6 +14,9 @@ struct s_tns_list
     char lnm[BFSML];        /* lower case version of CNM, pm_set */
     char unm[BFSML];};      /* upper case version of CNM, PM_SET */
 
+static int
+ MODE_S = -1;
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -452,7 +455,8 @@ static void scheme_scalar_return(char *t, int nc,
 	   {switch (knd)
 	       {case FP_ANY :
 		     sty = lookup_type(NULL, ty, MODE_C, MODE_S);
-		     if ((sty != NULL) && (strcmp(sty, "SC_ENUM_I") == 0))
+		     if ((sty != NULL) &&
+			 (strcmp(sty, tykind[TK_ENUM]) == 0))
 		        snprintf(t, nc, "    _lo = SS_mk_integer(si, _rv);\n");
 		     else
 		        {snprintf(t, nc,
@@ -515,7 +519,8 @@ static void scheme_wrap_local_return(FILE *fc, fdecl *dcl,
 
 /* SCHEME_ENUM_DEFS - write the SCHEME interface C enums DV */
 
-static void scheme_enum_defs(FILE **fpa, char *dv, char **ta, char *pck)
+static void scheme_enum_defs(FILE **fpa, char *dv, char **ta,
+			     char *pck, int ni)
    {FILE *fc;
 
     fc = fpa[0];
@@ -685,7 +690,8 @@ static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* SCHEME_STRUCT_DEFS - write the SCHEME interface C structs DV */
 
-static void scheme_struct_defs(FILE **fpa, char *dv, char **ta, char *pck)
+static void scheme_struct_defs(FILE **fpa, char *dv, char **ta,
+			       char *pck, int ni)
    {FILE *fc, *fh;
 
     fc = fpa[0];
@@ -706,11 +712,8 @@ static void scheme_struct_defs(FILE **fpa, char *dv, char **ta, char *pck)
 	    fprintf(fc, "static int _SX_install_%s_derived(SS_psides *si)\n",
 		    pck);
 	    fprintf(fc, "   {int nerr;\n");
-	    fprintf(fc, "    defstr *dp;\n");
-#if 0
-	    fprintf(fc, "    pcons *alst;\n");
-	    fprintf(fc, "    SC_type *ty;\n");
-#endif
+	    if (ni > 0)
+	       fprintf(fc, "    defstr *dp;\n");
 	    fprintf(fc, "\n");
 	    fprintf(fc, "    nerr = 0;\n");
 	    fprintf(fc, "\n");}
@@ -732,7 +735,8 @@ static void scheme_struct_defs(FILE **fpa, char *dv, char **ta, char *pck)
  *                    - SCHEME object from C structs
  */
 
-static void scheme_object_defs(FILE **fpa, char *dv, char **ta, char *pck)
+static void scheme_object_defs(FILE **fpa, char *dv, char **ta,
+			       char *pck, int ni)
    {FILE *fc;
     tns_list tl;
 
@@ -1052,10 +1056,10 @@ static void fin_scheme(bindes *bd)
 /* REGISTER_SCHEME - register SCHEME binding methods */
 
 static int register_scheme(int fl, statedes *st)
-   {int i, nb;
+   {int i;
     bindes *pb;
 
-    nb = nbd;
+    MODE_S = nbd;
 
     if (fl == TRUE)
        {pb = gbd + nbd++;
@@ -1067,7 +1071,7 @@ static int register_scheme(int fl, statedes *st)
 	pb->bind = bind_scheme;
 	pb->fin  = fin_scheme;};
 
-    return(nb);}
+    return(MODE_S);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

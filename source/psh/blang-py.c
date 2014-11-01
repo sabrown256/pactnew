@@ -23,6 +23,9 @@ struct s_tnp_list
 static char
  **_py_bound_types = NULL;
 
+static int
+ MODE_P = -1;
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -180,7 +183,8 @@ static void py_arg(char *arg, int nc, char *spec)
 
 /* PYTHON_ENUM_DEFS - write the Python interface C enums DV */
 
-static void python_enum_defs(FILE **fpa, char *dv, char **ta, char *pck)
+static void python_enum_defs(FILE **fpa, char *dv, char **ta,
+			     char *pck, int ni)
    {FILE *fc;
 
     fc = fpa[0];
@@ -359,7 +363,10 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 /* if member is fixed point type */
 	 else if ((strcmp(mty, "int") == 0) ||
 		  (strcmp(mty, "long") == 0))
-	    fprintf(fc, "    rv = PY_INT_LONG(self->pyo->%s);\n", mnm);
+	    {if (IS_NULL(mdm) == TRUE)
+	        fprintf(fc, "    rv = PY_INT_LONG(self->pyo->%s);\n", mnm);
+	     else
+	        fprintf(fc, "    rv = NULL;     /* unknown fixed point array '%s' */\n", pm);}
 
 /* if member is floating point type */
 	 else if ((strcmp(mty, "float") == 0) ||
@@ -403,7 +410,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 fprintf(fc, "static int %s_set_%s(%s *self,\n",
 		 tl.pnm, mnm, tl.pnm);
          fprintf(fc, "                   PyObject *value, void *context)\n");
-	 fprintf(fc, "   {int rv, ok;\n");
+	 fprintf(fc, "   {int rv;\n");
 	 fprintf(fc, "\n");
          fprintf(fc, "    rv = -1;\n");
 	 fprintf(fc, "\n");
@@ -416,7 +423,9 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* if member is 'char *' */
 	 if (strcmp(mty, "char *") == 0)
-	    {fprintf(fc, "       {ok = PyArg_Parse(value, \"s\", &self->pyo->%s);\n", mnm);
+	    {fprintf(fc, "       {int ok;\n");
+	     fprintf(fc, "\n");
+	     fprintf(fc, "        ok = PyArg_Parse(value, \"s\", &self->pyo->%s);\n", mnm);
 	     fprintf(fc, "        if (ok == TRUE)\n");
 	     fprintf(fc, "           rv = 0;};\n");}
 
@@ -427,7 +436,9 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	        fprintf(fc, "    {}; /* unknown fixed point array '%s' */\n",
 			pm);
 	     else
-	        {fprintf(fc, "       {long lv;\n");
+	        {fprintf(fc, "       {int ok;\n");
+		 fprintf(fc, "        long lv;\n");
+		 fprintf(fc, "\n");
 		 fprintf(fc, "        ok = PyArg_Parse(value, \"l\", &lv);\n");
 		 fprintf(fc, "        if (ok == TRUE)\n");
 		 fprintf(fc, "           {self->pyo->%s = lv;\n", mnm);
@@ -440,7 +451,9 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	        fprintf(fc, "    {}; /* unknown floating point array '%s' */\n",
 			pm);
 	     else
-	        {fprintf(fc, "       {double dv;\n");
+	        {fprintf(fc, "       {int ok;\n");
+	         fprintf(fc, "        double dv;\n");
+		 fprintf(fc, "\n");
 		 fprintf(fc, "        ok = PyArg_Parse(value, \"d\", &dv);\n");
 		 fprintf(fc, "        if (ok == TRUE)\n");
 		 fprintf(fc, "           {self->pyo->%s = dv;\n", mnm);
@@ -449,7 +462,9 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 /* if member is pointer to a known bound type */
          else if (python_lookup_bound_type(mty) == TRUE)
 	    {nstrncpy(pty, BFSML, trim(mty, BOTH, " *"), -1);
-	     fprintf(fc, "       {ok = PY_%s_extractor(value, self->pyo->%s);\n",
+	     fprintf(fc, "       {int ok;\n");
+	     fprintf(fc, "\n");
+	     fprintf(fc, "        ok = PY_%s_extractor(value, self->pyo->%s);\n",
 		     pty, mnm);
 	     fprintf(fc, "        if (ok == TRUE)\n");
 	     fprintf(fc, "           {_PY_opt_%s(self->pyo->%s, BIND_ALLOC, NULL);\n",
@@ -458,12 +473,12 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* if member is pointer */
          else if (LAST_CHAR(mty) == '*')
-	    fprintf(fc, "         rv = -1;     /* other pointer '%s' */\n",
+	    fprintf(fc, "       rv = -1;     /* unknown pointer '%s' */\n",
 		    pm);
 
 /* unknown member action */
 	 else
-            fprintf(fc, "         rv = -1;     /* unknown member action '%s' */\n",
+            fprintf(fc, "       rv = -1;     /* unknown member action '%s' */\n",
 		    pm);
 
          fprintf(fc, "\n");
@@ -554,7 +569,8 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* PYTHON_STRUCT_DEFS - write the Python interface C structs DV */
 
-static void python_struct_defs(FILE **fpa, char *dv, char **ta, char *pck)
+static void python_struct_defs(FILE **fpa, char *dv, char **ta,
+			       char *pck, int ni)
    {FILE *fc, *fh;
 
     fc = fpa[0];
@@ -577,7 +593,8 @@ static void python_struct_defs(FILE **fpa, char *dv, char **ta, char *pck)
 
 /* PYTHON_OBJECT_DEFS - define local version of struct definitions */
 
-static void python_object_defs(FILE **fpa, char *dv, char **ta, char *pck)
+static void python_object_defs(FILE **fpa, char *dv, char **ta,
+			       char *pck, int ni)
    {tnp_list tl;
     FILE *fc;
 
@@ -697,11 +714,8 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
 	 ty = al->type;
 	 deref(dty, BFLRG, ty);
 	 lty = lookup_type(NULL, dty, MODE_C, MODE_P);
-	 if ((lty != NULL) &&
-	     (strcmp(lty, "SC_ENUM_I") != 0) &&
-	     (strcmp(lty, tykind[TK_ENUM]) != 0))
-	    {pty = lty;
-	     snprintf(p, BFSML, "PY_%s", dty);
+	 if ((lty != NULL) && (strcmp(lty, tykind[TK_STRUCT]) == 0))
+	    {snprintf(p, BFSML, "PY_%s", dty);
 	     pty = p;
 	     break;};};
 
@@ -1276,10 +1290,10 @@ static void fin_python(bindes *bd)
 /* REGISTER_PYTHON - register PYTHON binding methods */
 
 static int register_python(int fl, statedes *st)
-   {int i, nb;
+   {int i;
     bindes *pb;
 
-    nb = nbd;
+    MODE_P = nbd;
 
     if (fl == TRUE)
        {pb = gbd + nbd++;
@@ -1291,7 +1305,7 @@ static int register_python(int fl, statedes *st)
 	pb->bind = bind_python;
 	pb->fin  = fin_python;};
 
-    return(nb);}
+    return(MODE_P);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
