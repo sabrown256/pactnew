@@ -143,10 +143,7 @@ static void py_format(char *fmt, int nc, char *spec, char *name)
        {pf = fmt;
         for (i = 0; ta[i] != NULL; i += 2)
 	    {ty = ta[i];
-	     if ((strcmp(ty, "SC_CHAR_I") == 0) ||
-		 (strcmp(ty, "char") == 0))
-	        *pf++ = 'b';
-	     else if ((strcmp(ty, "SC_SHORT_I") == 0) ||
+	     if ((strcmp(ty, "SC_SHORT_I") == 0) ||
 		      (strcmp(ty, "short") == 0))
 	        *pf++ = 'h';
 	     else if ((strcmp(ty, "SC_INT_I") == 0) ||
@@ -164,6 +161,13 @@ static void py_format(char *fmt, int nc, char *spec, char *name)
 	     else if ((strcmp(ty, "SC_DOUBLE_I") == 0) ||
 		      (strcmp(ty, "double") == 0))
 	        *pf++ = 'd';
+
+/* GOTHCA: only appear to get this in context of 'char *'
+ * e.g. PD_pwd
+ */
+	     else if ((strcmp(ty, "SC_CHAR_I") == 0) ||
+		 (strcmp(ty, "char") == 0))
+	        *pf++ = 's';
 	     else if ((strcmp(ty, "SC_STRING_I") == 0) ||
 		      (strcmp(ty, "char *") == 0))
 	        *pf++ = 's';
@@ -275,8 +279,8 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
     fprintf(fh, "\n");
     fprintf(fh, "struct s_%s\n", tl.pnm);
     fprintf(fh, "   {PyObject_HEAD\n");
-    fprintf(fh, "#ifdef PY_EXT_%s\n", tl.rnm);
-    fprintf(fh, "    PY_EXT_%s\n", tl.rnm);
+    fprintf(fh, "#ifdef PY_EXT_METHOD_%s\n", tl.rnm);
+    fprintf(fh, "    PY_EXT_METHOD_%s\n", tl.rnm);
     fprintf(fh, "#endif\n");
     fprintf(fh, "    %s *pyo;};\n", tl.cnm);
     fprintf(fh, "\n");
@@ -595,6 +599,10 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 else
 	    fprintf(fc, "    {\"%s\", (getter) %s_get_%s, NULL, %s_doc_%s, NULL},\n",
 		    mnm, tl.pnm, mnm, tl.pnm, mnm);};
+
+    fprintf(fc, "#ifdef PY_EXT_GETSET_%s\n", tl.rnm);
+    fprintf(fc, "    PY_EXT_GETSET_%s\n", tl.rnm);
+    fprintf(fc, "#endif\n");
 
     fprintf(fc, "    {NULL}};\n");
     fprintf(fc, "\n");

@@ -10,12 +10,14 @@
 
 #define PCK_PY_INTERNAL
 
-#define PY_EXT_DEFSTR                                                       \
+/* these get expanded in py_gen.h */
+
+#define PY_EXT_METHOD_DEFSTR                                                \
     PP_file *fileinfo;                                                      \
     hasharr *host_chart;                                                    \
     PyTypeObject *ctor;
 
-#define PY_EXT_PDBFILE                                                      \
+#define PY_EXT_METHOD_PDBFILE                                               \
     PP_file *fileinfo;                                                      \
     PP_form form;
 
@@ -31,6 +33,14 @@
 /*                                CONSTANTS                                 */
 
 /*--------------------------------------------------------------------------*/
+
+/* these get expanded in gp-xxx.c */
+
+extern PyObject
+ *PY_PDBfile_get_mode_alt(PY_PDBfile *self, void *context);
+
+#define PY_EXT_GETSET_PDBFILE                                               \
+    {"mode_alt", (getter) PY_PDBfile_get_mode_alt, (setter) NULL, PY_PDBfile_doc_mode, NULL},
 
 /*--------------------------------------------------------------------------*/
 

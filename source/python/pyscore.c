@@ -865,6 +865,8 @@ PyObject *_PP_unpack_hasharr(void *p, long nitems)
        {dict = PyDict_New();
 	if (dict != NULL)
 	   {for (i = 0; SC_hasharr_next(tab, &i, &nm, NULL, (void **) &item); i++)
+
+/* GOTCHA: ask Lee Taylor */
 	        {if ((item == NULL) || (item->ob_type == NULL))
 		    {ierr = -1;
 		     break;};

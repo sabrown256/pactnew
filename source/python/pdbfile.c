@@ -7,6 +7,18 @@
 #include "pdbmodule.h"
 #include "gp-pdb.h"
 
+static char
+ PY_PDBfile_flush_doc[] = "",
+ PY_PDBfile_close_doc[] = "",
+ PY_PDBfile_write_doc[] = "",
+ PY_PDBfile_write_raw_doc[] = "",
+ PY_PDBfile_read_doc[] = "",
+ PY_PDBfile_defstr_doc[] = "",
+ PY_PDBfile_ls_doc[] = "",
+ PY_PDBfile_get_obj_descr_doc[] = "",
+ PY_PDBfile_register_class_doc[] = "",
+ PY_PDBfile_reset_vif_doc[] = "";
+
 /*--------------------------------------------------------------------------*/
 
 /*                               PDBFILE ROUTINES                           */
@@ -86,8 +98,6 @@ PyObject *PY_open_vif(PyObject *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PDBfile_flush_doc[] = "";
-
 static PyObject *PY_PDBfile_flush(PY_PDBfile *self,
 				  PyObject *args, PyObject *kwds)
    {
@@ -127,8 +137,6 @@ static int _PP_extra_defstr_delete(haelem *hp, void *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PDBfile_close_doc[] = "";
-
 static PyObject *PY_PDBfile_close(PY_PDBfile *self,
 				  PyObject *args, PyObject *kwds)
    {int err;
@@ -161,7 +169,10 @@ static PyObject *PY_PDBfile_close(PY_PDBfile *self,
  * test suite to work
  */
 	err = SC_hasharr_foreach(fp->host_chart,
-				 _PP_extra_defstr_delete, fp);}
+				 _PP_extra_defstr_delete, fp);
+	rv = Py_None;
+
+	Py_INCREF(rv);}
 
     else
        {err = PyDict_DelItemString(PP_open_file_dict, fp->name);
@@ -181,8 +192,6 @@ static PyObject *PY_PDBfile_close(PY_PDBfile *self,
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PDBfile_write_doc[] = "";
 
 static PyObject *PY_PDBfile_write(PY_PDBfile *self,
 				  PyObject *args, PyObject *kwds)
@@ -263,8 +272,6 @@ static PyObject *PY_PDBfile_write(PY_PDBfile *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PDBfile_write_raw_doc[] = "";
-
 static PyObject *PY_PDBfile_write_raw(PY_PDBfile *self,
 				      PyObject *args, PyObject *kwds)
    {int ok, nd, buffer_len;
@@ -305,8 +312,6 @@ static PyObject *PY_PDBfile_write_raw(PY_PDBfile *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PDBfile_read_doc[] = "";
-
 static PyObject *PY_PDBfile_read(PY_PDBfile *self,
 				 PyObject *args, PyObject *kwds)
    {int nd;
@@ -342,8 +347,6 @@ static PyObject *PY_PDBfile_read(PY_PDBfile *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PDBfile_defstr_doc[] = "";
-
 static PyObject *PY_PDBfile_defstr(PY_PDBfile *self,
 				   PyObject *args, PyObject *kwds)
    {char *name;
@@ -376,8 +379,6 @@ static PyObject *PY_PDBfile_defstr(PY_PDBfile *self,
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PDBfile_ls_doc[] = "";
 
 static PyObject *PY_PDBfile_ls(PY_PDBfile *self,
 			       PyObject *args, PyObject *kwds)
@@ -425,45 +426,40 @@ static PyObject *PY_PDBfile_ls(PY_PDBfile *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PDBfile_get_obj_descr_doc[] = "";
-
 static PyObject *PY_PDBfile_get_obj_descr(PY_PDBfile *self,
 					  PyObject *args, PyObject *kwds)
-{
-    void *obj, *dim, *rv;
-    char *kw_list[] = {"obj", NULL};
+   {void *obj, *dim, *rv;
     PP_descr *descr;
+    char *kw_list[] = {"obj", NULL};
 
-    if (self->pyo == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return(NULL);
-    }
+    rv = NULL;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O:get_obj_descr", kw_list,
-                                     &obj))
-        return(NULL);
+    if (self->pyo == NULL)
+       {PP_error_set_user(NULL, "file is not open");
+        return(NULL);};
 
-    descr = PP_get_object_descr(self->fileinfo, obj);
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O:get_obj_descr", kw_list,
+				    &obj))
+       {descr = PP_get_object_descr(self->fileinfo, obj);
+	if (descr == NULL)
+	   PP_error_set_user(obj, "Unable to find PDB type");
+	else
+	   {if (descr->dims == NULL)
+	       {dim = Py_None;
+		Py_INCREF(Py_None);}
+	    else
+	       dim = PP_dimdes_to_obj(descr->dims);
 
-    if (descr == NULL) {
-        PP_error_set_user(obj, "Unable to find PDB type");
-        return(NULL);
-    } else if (descr->dims == NULL) {
-        dim = Py_None;
-        Py_INCREF(Py_None);
-    } else {
-        dim = PP_dimdes_to_obj(descr->dims);
-    }
-    rv = Py_BuildValue("iisO", (int) descr->typecode, descr->bpi,
-                       descr->type, dim);
-    _PP_rl_descr(descr);
+	    rv = Py_BuildValue("iisO", (int) descr->typecode, descr->bpi,
+			       descr->type, dim);
+
+	    _PP_rl_descr(descr);};};
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PDBfile_register_class_doc[] = "";
 
 /* This function is used to register a type.
  * It allows pypact to take an object with type and
@@ -474,43 +470,41 @@ static char PY_PDBfile_register_class_doc[] = "";
 
 static PyObject *PY_PDBfile_register_class(PY_PDBfile *self,
 					   PyObject *args, PyObject *kwds)
-{
-    PyTypeObject *cls;
-    PyFunctionObject *ctor;
-    char *type;
-    char *kw_list[] = {"cls", "type", "ctor", NULL};
+   {char *type;
     PP_class_descr *cdescr;
     PDBfile *fp;
     defstr *dp;
+    PyTypeObject *cls;
+    PyFunctionObject *ctor;
+    PyObject *rv;
+    char *kw_list[] = {"cls", "type", "ctor", NULL};
+
+    rv = NULL;
 
     ctor = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!s|O!:register_class", kw_list,
-                                     &PY_TYPE_TYPE, &cls,
-                                     &type,
-                                     &PyFunction_Type, &ctor))
-        return(NULL);
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O!s|O!:register_class", kw_list,
+				    &PY_TYPE_TYPE, &cls,
+				    &type,
+				    &PyFunction_Type, &ctor))
+       {fp = self->fileinfo->file;
+	dp = PD_inquire_table_type(fp->host_chart, type);
+	if (dp == NULL)
+	   PP_error_set_user(NULL, "No such type %s in file %s",
+			     type, fp->name);
+	else
+	   {cdescr = PP_make_class_descr(cls, type, ctor);
+	    if (cdescr != NULL)
+	       {PP_init_type_map_instance(self->fileinfo, cdescr);
 
-    fp = self->fileinfo->file;
-    dp = PD_inquire_table_type(fp->host_chart, type);
-    if (dp == NULL) {
-        PP_error_set_user(NULL, "No such type %s in file %s",
-                          type, fp->name);
-        return(NULL);
-    }
+		rv = Py_None;
 
-    cdescr = PP_make_class_descr(cls, type, ctor);
-    if (cdescr == NULL)
-        return(NULL);
-    PP_init_type_map_instance(self->fileinfo, cdescr);
+		Py_INCREF(rv);};};};
 
-    Py_INCREF(Py_None);
-    return(Py_None);
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PDBfile_reset_vif_doc[] = "";
 
 /* Clear out type info and reset with just native types
  * sort of like closing and reopening
@@ -519,35 +513,39 @@ static char PY_PDBfile_reset_vif_doc[] = "";
 
 static PyObject *PY_PDBfile_reset_vif(PY_PDBfile *self,
 				      PyObject *args, PyObject *kwds)
-   {
-    PP_file *fileinfo;
+   {PP_file *fileinfo;
+    PyObject *rv;
 
-    if (self->pyo->virtual_internal == FALSE) {
-        PP_error_set_user(NULL, "file is not virtual internal");
-        return(NULL);
-    }
-    
+    rv = NULL;
+
+    if (self->pyo->virtual_internal == FALSE)
+       PP_error_set_user(NULL, "file is not virtual internal");
+
+    else
+
 /* clear old */
-    fileinfo = self->fileinfo;
+       {fileinfo = self->fileinfo;
 
-    SC_free_hasharr(fileinfo->type_map, PP_rl_type_entry, NULL);
-    SC_free_hasharr(fileinfo->object_map, PP_rl_type_entry, NULL);
-    SC_free_hasharr(fileinfo->class_map, _PP_rl_class_descr, NULL);
-    SC_free_hasharr(fileinfo->deftypes,  _PP_decref_object, NULL);
+	SC_free_hasharr(fileinfo->type_map, PP_rl_type_entry, NULL);
+	SC_free_hasharr(fileinfo->object_map, PP_rl_type_entry, NULL);
+	SC_free_hasharr(fileinfo->class_map, _PP_rl_class_descr, NULL);
+	SC_free_hasharr(fileinfo->deftypes,  _PP_decref_object, NULL);
 
-    _PP_cleanup_defstrs(fileinfo->file);
+	_PP_cleanup_defstrs(fileinfo->file);
 
 /* reset */
-    PP_init_type_map_basic(fileinfo);
+	PP_init_type_map_basic(fileinfo);
 
-    Py_INCREF(Py_None);
-    return(Py_None);
-}
+	rv = Py_None;
+
+	Py_INCREF(rv);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *PY_PDBfile_get_mode(PY_PDBfile *self, void *context)
+PyObject *PY_PDBfile_get_mode_alt(PY_PDBfile *self, void *context)
    {PyObject *rv;
 
     switch (PD_get_mode(self->pyo))
@@ -615,194 +613,177 @@ static PyMethodDef
 
 #else
 
+static char
+ PY_PDBfile_defent_doc[] = "",
+ PY_PDBfile_cd_doc[] = "",
+ PY_PDBfile_mkdir_doc[] = "",
+ PY_PDBfile_isdir_doc[] = "",
+ PY_PDBfile_ln_doc[] = "",
+ PY_PDBfile_pwd_doc[] = "";
+
+
 /*--------------------------------------------------------------------------*/
 
 /*                             MANUAL WRAPPERS                              */
 
 /*--------------------------------------------------------------------------*/
 
-
-static char PY_PDBfile_defent_doc[] = "";
-
 static PyObject *PY_PDBfile_defent(PY_PDBfile *self,
 				   PyObject *args, PyObject *kwds)
-{
-    char *name;
-    char *type;
-    char *kw_list[] = {"name", "type", NULL};
-    PDBfile *fp;
-
-    fp = self->pyo;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss:defent", kw_list,
-                                     &name, &type))
-        return(NULL);
-
-    if (fp == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return(NULL);
-    }
-
-    PD_defent(fp, name, type);
-
-    Py_INCREF(Py_None);
-    return(Py_None);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static char PY_PDBfile_cd_doc[] = "";
-
-static PyObject *PY_PDBfile_cd(PY_PDBfile *self,
-			       PyObject *args,
-			       PyObject *kwds)
-   {
-
-    int ierr;
-    char *dirname;
-    char *kw_list[] = {"dirname", NULL};
-    PDBfile *fp;
-
-    fp = self->pyo;
-    dirname = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|z:cd", kw_list,
-                                     &dirname))
-        return(NULL);
-
-    if (fp == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return(NULL);
-    }
-
-    ierr = PD_cd(fp, dirname);
-    if (ierr == FALSE) {
-        PP_error_from_pdb();
-        return(NULL);
-    }
-
-    Py_INCREF(Py_None);
-    return(Py_None);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static char PY_PDBfile_mkdir_doc[] = "";
-
-static PyObject *PY_PDBfile_mkdir(PY_PDBfile *self,
-				  PyObject *args, PyObject *kwds)
-{
-    int ierr;
-    char *dirname;
-    char *kw_list[] = {"dirname", NULL};
-    PDBfile *fp;
-
-    fp = self->pyo;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:mkdir", kw_list,
-                                     &dirname))
-        return(NULL);
-    
-    if (fp == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return(NULL);
-    }
-
-    ierr = PD_mkdir(fp, dirname);
-
-    if (ierr == FALSE) {
-        PP_error_from_pdb();
-        return(NULL);
-    }
-
-    Py_INCREF(Py_None);
-    return(Py_None);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static char PY_PDBfile_isdir_doc[] = "";
-
-static PyObject *PY_PDBfile_isdir(PY_PDBfile *self,
-				  PyObject *args, PyObject *kwds)
-{
-    int ierr;
-    char *dirname;
-    char *kw_list[] = {"dirname", NULL};
+   {char *name, *type;
     PDBfile *fp;
     PyObject *rv;
+    char *kw_list[] = {"name", "type", NULL};
+
+    rv = NULL;
 
     fp = self->pyo;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:isdir", kw_list,
-                                     &dirname))
-        return(NULL);
-    
-    if (fp == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return(NULL);
-    }
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "ss:defent", kw_list,
+				    &name, &type))
+       {if (fp == NULL)
+	   PP_error_set_user(NULL, "file is not open");
+	else
+	   {PD_defent(fp, name, type);
 
-    ierr = PD_isdir(fp, dirname);
+	    rv = Py_None;
 
-    rv = PY_INT_LONG(ierr);
+	    Py_INCREF(rv);};};
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static char PY_PDBfile_ln_doc[] = "";
+static PyObject *PY_PDBfile_cd(PY_PDBfile *self,
+			       PyObject *args,
+			       PyObject *kwds)
+   {int ierr;
+    char *dirname;
+    PDBfile *fp;
+    PyObject *rv;
+    char *kw_list[] = {"dirname", NULL};
+
+    rv = NULL;
+
+    fp = self->pyo;
+    dirname = NULL;
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "|z:cd", kw_list,
+				    &dirname))
+       {if (fp == NULL)
+	   PP_error_set_user(NULL, "file is not open");
+
+	else
+	   {ierr = PD_cd(fp, dirname);
+	    if (ierr == FALSE)
+	       PP_error_from_pdb();
+	    else
+	       {rv = Py_None;
+		Py_INCREF(rv);};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static PyObject *PY_PDBfile_mkdir(PY_PDBfile *self,
+				  PyObject *args, PyObject *kwds)
+   {int ierr;
+    char *dirname;
+    PDBfile *fp;
+    PyObject *rv;
+    char *kw_list[] = {"dirname", NULL};
+
+    rv = NULL;
+
+    fp = self->pyo;
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "s:mkdir", kw_list,
+				    &dirname))
+       {if (fp == NULL)
+	   PP_error_set_user(NULL, "file is not open");
+	else
+	   {ierr = PD_mkdir(fp, dirname);
+	    if (ierr == FALSE)
+	       PP_error_from_pdb();
+	    else
+	       {rv = Py_None;
+		Py_INCREF(rv);};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static PyObject *PY_PDBfile_isdir(PY_PDBfile *self,
+				  PyObject *args, PyObject *kwds)
+   {int ierr;
+    char *dirname;
+    PDBfile *fp;
+    PyObject *rv;
+    char *kw_list[] = {"dirname", NULL};
+
+    rv = NULL;
+
+    fp = self->pyo;
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "s:isdir", kw_list,
+				    &dirname))
+       {if (fp == NULL)
+	   PP_error_set_user(NULL, "file is not open");
+	else
+	   {ierr = PD_isdir(fp, dirname);
+	    rv   = PY_INT_LONG(ierr);};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 static PyObject *PY_PDBfile_ln(PY_PDBfile *self,
 			       PyObject *args, PyObject *kwds)
-{
-    int ierr;
+   {int ierr;
     char *var, *link;
-    char *kw_list[] = {"var", "link", NULL};
     PDBfile *fp;
+    PyObject *rv;
+    char *kw_list[] = {"var", "link", NULL};
+
+    rv = NULL;
 
     fp = self->pyo;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss:ln", kw_list,
-                                     &var, &link))
-        return(NULL);
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "ss:ln", kw_list,
+				    &var, &link))
+       {if (fp == NULL)
+	   PP_error_set_user(NULL, "file is not open");
+	else
+	   {ierr = PD_ln(fp, var, link);
+	    if (ierr == FALSE)
+	       PP_error_from_pdb();
+	    else
+	       {rv = Py_None;
+		Py_INCREF(rv);};};};
 
-    if (fp == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return(NULL);
-    }
-    
-    ierr = PD_ln(fp, var, link);
-    if (ierr == FALSE) {
-        PP_error_from_pdb();
-        return(NULL);
-    }
-    
-    Py_INCREF(Py_None);
-    return(Py_None);
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-static char PY_PDBfile_pwd_doc[] = "";
 
 static PyObject *PY_PDBfile_pwd(PY_PDBfile *self,
 				PyObject *args, PyObject *kwds)
-{
-    char *pwd;
+   {char *pwd;
     PyObject *rv;
     PDBfile *fp;
 
     fp = self->pyo;
     
-    if (fp == NULL) {
-        PP_error_set_user(NULL, "file is not open");
-        return(NULL);
-    }
+    if (fp == NULL)
+       PP_error_set_user(NULL, "file is not open");
 
-    pwd = PD_pwd(fp);
-
-    rv = PY_STRING_STRING(pwd);
+    else
+       {pwd = PD_pwd(fp);
+	rv  = PY_STRING_STRING(pwd);};
 
     return(rv);}
 
