@@ -86,6 +86,9 @@ PY_MOD_BEGIN(_pdb, pdb_module_documentation, PP_methods)
     if (d == NULL)
        PY_MOD_RETURN_ERR;
 
+/* subtype pdbdata */
+    PY_hasharr_type.tp_base = &PP_pdbdata_Type;
+
     ne = PY_setup_pact(m, d);
     if (ne > 0)
        PY_MOD_RETURN_ERR;
@@ -98,6 +101,9 @@ PY_MOD_BEGIN(_pdb, pdb_module_documentation, PP_methods)
     if (ne > 0)
        PY_MOD_RETURN_ERR;
 
+/* remove sequence behavior from hashtab that is inherited from pdbdata */
+    PY_hasharr_type.tp_as_sequence = NULL;
+    
 /* make 'open' a synonym for 'PDBfile' */
     if (PyDict_SetItemString(d, "open", (PyObject *) &PY_PDBfile_type) < 0)
        PY_MOD_RETURN_ERR;

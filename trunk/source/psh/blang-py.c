@@ -68,6 +68,33 @@ static void python_type_name_list(char *typ, tnp_list *na)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PYTHON_PARSE_MEMBER - parse out MBR for python */
+
+static int python_parse_member(char *mbr, char *mnm, char *mty, char *mdm,
+			       char *bty, int nc)
+   {int nind, nb;
+    char *lty, *pb;
+
+    parse_member(mbr, mnm, mty, mdm, BFSML);
+
+    nstrncpy(bty, nc, mty, -1);
+
+    lty = lookup_type(NULL, mty, MODE_C, gbd+MODE_P);
+    if ((lty != NULL) && (strcmp(lty, tykind[TK_ENUM]) == 0))
+       nstrncpy(mty, nc, tykind[TK_ENUM], -1);
+
+    nb = strlen(bty) - 1;
+    pb = bty + nb;
+    for (nind = 0; (*pb == '*') && (nind < nb); pb--, nind++)
+        *pb = '\0';
+
+    trim(bty, BACK, " \t");
+
+    return(nind);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PYTHON_ADD_BOUND_TYPE - install TY to the list of
  *                       - types that have bindings
  */
@@ -281,8 +308,8 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
  */
 
 static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
-   {int im, hs;
-    char mnm[BFSML], mty[BFSML], mdm[BFSML], pty[BFSML];
+   {int im, hs, nind;
+    char mnm[BFSML], mty[BFSML], mdm[BFSML], pty[BFSML], bty[BFSML];
     char *pm;
     tnp_list tl;
 
@@ -348,7 +375,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 if (IS_NULL(pm) == TRUE)
 	    continue;
 
-	 parse_member(pm, mnm, mty, mdm, BFSML);
+	 nind = python_parse_member(pm, mnm, mty, mdm, bty, BFSML);
 
 	 fprintf(fc, "static PyObject *%s_get_%s(%s *self, void *context)\n",
 		 tl.pnm, mnm, tl.pnm);
@@ -362,11 +389,14 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* if member is fixed point type */
 	 else if ((strcmp(mty, "int") == 0) ||
-		  (strcmp(mty, "long") == 0))
+		  (strcmp(mty, "int64_t") == 0) ||
+		  (strcmp(mty, "long") == 0) ||
+		  (strcmp(mty, tykind[TK_ENUM]) == 0))
 	    {if (IS_NULL(mdm) == TRUE)
 	        fprintf(fc, "    rv = PY_INT_LONG(self->pyo->%s);\n", mnm);
 	     else
-	        fprintf(fc, "    rv = NULL;     /* unknown fixed point array '%s' */\n", pm);}
+	        fprintf(fc, "    rv = NULL;     /* unknown '%s' array '%s' */\n",
+			mty, pm);}
 
 /* if member is floating point type */
 	 else if ((strcmp(mty, "float") == 0) ||
@@ -374,16 +404,21 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	    {if (IS_NULL(mdm) == TRUE)
 	        fprintf(fc, "    rv = PyFloat_FromDouble(self->pyo->%s);\n", mnm);
 	     else
-	        fprintf(fc, "    rv = NULL;     /* unknown floating point array '%s' */\n", pm);}
+	        fprintf(fc, "    rv = NULL;     /* unknown '%s' array '%s' */\n",
+			mty, pm);}
 
 /* if member is pointer to a known bound type */
-         else if (python_lookup_bound_type(mty) == TRUE)
-	    {snprintf(pty, BFSML, "PY_%s", mty);
-	     fprintf(fc, "    rv = %s_from_ptr(self->pyo->%s);\n",
-		     trim(pty, BOTH, " *"), mnm);}
+         else if (python_lookup_bound_type(bty) == TRUE)
+	    {snprintf(pty, BFSML, "PY_%s", bty);
+	     if (nind > 0)
+	        fprintf(fc, "    rv = %s_from_ptr(self->pyo->%s);\n",
+			trim(pty, BOTH, " *"), mnm);
+	     else
+	        fprintf(fc, "    rv = %s_from_ptr(&self->pyo->%s);\n",
+			trim(pty, BOTH, " *"), mnm);}
 
 /* if member is pointer */
-         else if (LAST_CHAR(mty) == '*')
+         else if (nind > 0)
 	    fprintf(fc, "    rv = PY_COBJ_VOID_PTR(self->pyo->%s, NULL);\n",
 		    mnm);
 
@@ -405,7 +440,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 if (IS_NULL(pm) == TRUE)
 	    continue;
 
-	 parse_member(pm, mnm, mty, mdm, BFSML);
+	 nind = python_parse_member(pm, mnm, mty, mdm, bty, BFSML);
 
 	 fprintf(fc, "static int %s_set_%s(%s *self,\n",
 		 tl.pnm, mnm, tl.pnm);
@@ -431,10 +466,12 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* if member is fixed point type */
 	 else if ((strcmp(mty, "int") == 0) ||
-		  (strcmp(mty, "long") == 0))
+		  (strcmp(mty, "int64_t") == 0) ||
+		  (strcmp(mty, "long") == 0) ||
+		  (strcmp(mty, tykind[TK_ENUM]) == 0))
 	    {if (IS_NULL(mdm) == FALSE)
-	        fprintf(fc, "    {}; /* unknown fixed point array '%s' */\n",
-			pm);
+	        fprintf(fc, "    {}; /* unknown '%s' array '%s' */\n",
+			mty, pm);
 	     else
 	        {fprintf(fc, "       {int ok;\n");
 		 fprintf(fc, "        long lv;\n");
@@ -448,8 +485,8 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 else if ((strcmp(mty, "float") == 0) ||
 		  (strcmp(mty, "double") == 0))
 	    {if (IS_NULL(mdm) == FALSE)
-	        fprintf(fc, "    {}; /* unknown floating point array '%s' */\n",
-			pm);
+	        fprintf(fc, "    {}; /* unknown '%s' array '%s' */\n",
+			mty, pm);
 	     else
 	        {fprintf(fc, "       {int ok;\n");
 	         fprintf(fc, "        double dv;\n");
@@ -460,19 +497,22 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 		 fprintf(fc, "            rv = 0;};};\n");};}
 
 /* if member is pointer to a known bound type */
-         else if (python_lookup_bound_type(mty) == TRUE)
-	    {nstrncpy(pty, BFSML, trim(mty, BOTH, " *"), -1);
-	     fprintf(fc, "       {int ok;\n");
-	     fprintf(fc, "\n");
-	     fprintf(fc, "        ok = PY_%s_extractor(value, self->pyo->%s);\n",
-		     pty, mnm);
-	     fprintf(fc, "        if (ok == TRUE)\n");
-	     fprintf(fc, "           {_PY_opt_%s(self->pyo->%s, BIND_ALLOC, NULL);\n",
-		     pty, mnm);
-	     fprintf(fc, "            rv = 0;};};\n");}
+         else if (python_lookup_bound_type(bty) == TRUE)
+	    {if (nind > 0)
+	        {fprintf(fc, "       {int ok;\n");
+		 fprintf(fc, "\n");
+		 fprintf(fc, "        ok = PY_%s_extractor(value, self->pyo->%s);\n",
+			 bty, mnm);
+		 fprintf(fc, "        if (ok == TRUE)\n");
+		 fprintf(fc, "           {_PY_opt_%s(self->pyo->%s, BIND_ALLOC, NULL);\n",
+			 bty, mnm);
+		 fprintf(fc, "            rv = 0;};};\n");}
+	     else
+	        fprintf(fc, "       rv = -1;     /* non pointer struct '%s' */\n",
+			pm);}
 
 /* if member is pointer */
-         else if (LAST_CHAR(mty) == '*')
+         else if (nind > 0)
 	    fprintf(fc, "       rv = -1;     /* unknown pointer '%s' */\n",
 		    pm);
 

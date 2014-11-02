@@ -179,6 +179,34 @@ void *_SX_opt_defstr(defstr *x, bind_opt wh, void *a)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_OPT_PD_CKSUMDES - handle BLANG binding related operations */
+
+void *_SX_opt_PD_cksumdes(PD_cksumdes *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+	     if (SX_CKSUMDESP(o))
+	        rv = SS_GET(PD_cksumdes, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_ALLOC :
+        case BIND_FREE :
+        default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 #if 0
 

@@ -600,53 +600,55 @@ void _PP_rl_defstr(PY_defstr *self)
 PY_defstr *_PY_defstr_make_singleton(PY_defstr *self,
 				     char *name, PyObject *members,
 				     PP_file *fileinfo)
-{
-    defstr *dp;
+   {defstr *dp;
     PDBfile *fp;
+    PY_defstr *rv;
+
+    rv = NULL;
 
     fp = fileinfo->file;
 
     dp = PD_inquire_table_type(fp->host_chart, name);
-    if (dp != NULL) {
-        PP_error_set_user(NULL, "type already defined - %s", name);
-        return(NULL);
-    }
+    if (dp == NULL)
+       {if (PY_defstr_check(members) == 1)
+	   {PY_defstr *dpobj;
+	    memdes *lst;
 
-    if (PY_defstr_check(members) == 1) {
-        PY_defstr *dpobj;
-        memdes *lst;
+	    dpobj = (PY_defstr *) members;
+	    lst   = PD_copy_members(dpobj->pyo->members);
 
-        dpobj = (PY_defstr *) members;
-        lst = PD_copy_members(dpobj->pyo->members);
+	    dp = _PD_defstr_inst(fp, name, STRUCT_KIND, lst,
+				 -1, NULL, NULL, PD_CHART_HOST);
+	    if (dp == NULL)
+	       PP_error_from_pdb();}
 
-        dp = _PD_defstr_inst(fp, name, STRUCT_KIND, lst,
-			     -1, NULL, NULL, PD_CHART_HOST);
-        if (dp == NULL) {
-            PP_error_from_pdb();
-            return(NULL);
-        }
-    } else {
-        dp = PY_defstr_alt(fp, name, members);
-        if (dp == NULL)
-            return(NULL);
-    }
+	else
+	   dp = PY_defstr_alt(fp, name, members);}
+#if 0
+/* GOTCHA: ask Lee Taylor */
+    else
+       {PP_error_set_user(NULL, "type already defined - %s", name);
+        dp = NULL;}
+#endif
 
-    /* If self already exists, increment reference since
-     * it will be stored in deftypes. Otherwise the self
-     * returned by newobj will only have one reference which
-     * will be used to store in deftypes.
-     */
-    Py_XINCREF(self);
-    self = PY_defstr_newobj(self, dp, fileinfo);
+    if (dp != NULL)
 
-    /* Install object into the file's table */
-    if (self != NULL) {
-        SC_hasharr_install(fileinfo->deftypes, dp->type, self,
-			   "PY_defstr", 2, -1);
-    }
+/* If self already exists, increment reference since
+ * it will be stored in deftypes. Otherwise the self
+ * returned by newobj will only have one reference which
+ * will be used to store in deftypes.
+ */
+       {Py_XINCREF(self);
+	self = PY_defstr_newobj(self, dp, fileinfo);
 
-    return(self);
-}
+/* Install object into the file's table */
+	if (self != NULL)
+	   SC_hasharr_install(fileinfo->deftypes, dp->type, self,
+			      "PY_defstr", 2, -1);
+
+	rv = self;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1013,11 +1015,21 @@ static PyObject *PY_defstr_values(PY_defstr *self,
 static char PY_defstr_get_doc[] = "";
 
 static PyObject *PY_defstr_get(PY_defstr *self,
-			       PyObject *args,
-			       PyObject *kwds)
+			       PyObject *args, PyObject *kwds)
 {
     PyErr_SetString(PyExc_NotImplementedError, "get");
     return(NULL);
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static char PY_defstr_doc_order_flag[] = "";
+
+static PyObject *PY_defstr_get_order_flag(PY_defstr *self,
+					  PyObject *args, PyObject *kwds)
+{
+    return(PY_INT_LONG(self->pyo->fix.order));
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1030,22 +1042,13 @@ static PyMethodDef
    {"keys", (PyCFunction)PY_defstr_keys, METH_NOARGS, PY_defstr_keys_doc},
    {"values", (PyCFunction)PY_defstr_values, METH_NOARGS, PY_defstr_values_doc},
    {"get", (PyCFunction)PY_defstr_get, METH_NOARGS, PY_defstr_get_doc},
+   {"order_flag", (PyCFunction) PY_defstr_get_order_flag, METH_NOARGS, PY_defstr_doc_order_flag},
    {NULL, NULL, 0, NULL}};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *PY_defstr_get_order_flag(PY_defstr *self, void *context)
-{
-    return(PY_INT_LONG(self->pyo->fix.order));
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 #if 0
-
-static char PY_defstr_doc_order_flag[] = "";
 
 /* GOTCHA: this has the order_flag method */
 

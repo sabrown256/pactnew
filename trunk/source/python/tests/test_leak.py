@@ -18,8 +18,8 @@ as_array, as_struct, as_scalar = pdb.setform()
 
 class Leak(unittest.TestCase):
     lev  = 2
-#    leak = 0
-    leak = 1
+    leak = 0
+#    leak = 1
     
     def setUp(self):
         pdb.zero_space(3)  # zero on free only

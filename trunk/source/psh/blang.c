@@ -981,7 +981,10 @@ static void hsep(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PARSE_MEMBER - parse a member description into TYPE, NAME, DIMS */
+/* PARSE_MEMBER - parse a member description, MBR, into type, TY,
+ *              - name, NM, and dimensions, DM
+ *              - each of these is NC long if non-NULL
+ */
 
 void parse_member(char *mbr, char *nm, char *ty, char *dm, int nc)
    {int nl, ns, hd;
