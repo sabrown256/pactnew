@@ -56,7 +56,7 @@ class File(test_leak.Leak):
         fp = pdb.open("testfile", "w");
         fp.close()
         fp = pdb.open("testfile");
-        self.failUnlessEqual(fp.mode, "r")
+        self.failUnlessEqual(fp.mode_alt, "r")
         fp.close()
 
 #--------------------------------------------------------------------------
@@ -80,11 +80,11 @@ class File(test_leak.Leak):
         date = fp.date
         self.failUnlessEqual(type(date), str)
 
-        self.failUnlessEqual(fp.mode, "w")
+        self.failUnlessEqual(fp.mode_alt, "w")
         self.failUnlessEqual(fp.default_offset, 0)
         self.failUnlessEqual(fp.virtual_internal, 0)
         system_version = fp.system_version
-        self.failUnlessEqual(fp.major_order, "ROW MAJOR")
+        self.failUnlessEqual(fp.major_order, pdb.ROW_MAJOR_ORDER)
         fp.close()
 
     def xtest1e(self):
@@ -107,7 +107,7 @@ class File(test_leak.Leak):
         date = fp.date
         self.failUnlessEqual(type(date), str)
 
-        mode = fp.mode
+        mode = fp.mode_alt
         self.failUnlessEqual(type(mode), int)
 
         default_offset = fp.default_offset
@@ -119,7 +119,7 @@ class File(test_leak.Leak):
         system_version = fp.system_version
 
         major_order = fp.major_order
-        self.failUnlessEqual(major_order, "ROW MAJOR")
+        self.failUnlessEqual(major_order, pdb.ROW_MAJOR_ORDER)
         fp.close()
 
     def test2a(self):
