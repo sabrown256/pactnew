@@ -443,6 +443,9 @@ enum e_PD_data_location
 
 typedef enum e_PD_data_location PD_data_location;
 
+/*
+ * #bind enum PD_delay_mode PD_DELAY_NONE
+ */
 
 enum e_PD_delay_mode
    {PD_DELAY_NONE,
@@ -455,6 +458,7 @@ typedef enum e_PD_delay_mode PD_delay_mode;
 /* NOTE: see comment in scope_io.h concerning file_io_desc and the stream member
  *       here the buffer is the analog of the FILE *
  */
+
 struct BF_FILE_s
    {SC_address bf;
     SC_address addr;
@@ -545,6 +549,10 @@ struct s_PD_address
     int64_t reta;              /* disk address of end of data */
     char *ptr;                 /* memory address of data */
     syment *entry;};           /* symbol table entry */
+
+/*
+ * #bind struct PD_cksumdes
+ */
 
 struct s_PD_cksumdes
    {int verified;              /* is the file currently verified */

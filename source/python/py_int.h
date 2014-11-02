@@ -62,6 +62,7 @@ int PY_ ## _t ## _extractor(PyObject *obj, void *arg)                        \
 #define PY_DEF_GETSET(_t, _n)                                                \
    PY_ ## _t ## _getset[0].name = _n
 
+
 /* PY_DEF_TYPE - handle the boiler plate defining a new Python type
  *             - example:
  *             -    PY_DEF_TYPE(PM_mapping, "mapping")

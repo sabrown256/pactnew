@@ -829,9 +829,9 @@ static int PY_hasharr_tp_init(PY_hasharr *self,
     char *kw_list[] = {"size", "docflag", NULL};
     hasharr *tab;
 
-     rv = -1;
+    rv = -1;
 
-    size = HSZSMALL;
+    size    = HSZSMALL;
     docflag = NODOC;
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "|ii:init", kw_list,
@@ -979,23 +979,23 @@ int PP_update_hasharr(hasharr *tab, PyObject *dict)
 /*--------------------------------------------------------------------------*/
 
 PY_hasharr *PY_hasharr_newobj(PY_hasharr *obj, hasharr *tab)
-   {PY_defstr *dpobj;
+   {PY_hasharr *rv;
+    PY_defstr *dpobj;
     
+    rv = NULL;
+
     if (obj == NULL)
-       {obj = (PY_hasharr *) PyType_GenericAlloc(&PY_hasharr_type, 0);
-        if (obj == NULL)
-	   return(NULL);};
+       obj = (PY_hasharr *) PyType_GenericAlloc(&PY_hasharr_type, 0);
 
-    dpobj = _PY_defstr_find_singleton("hasharr", NULL, PP_vif_info);
-    if (dpobj == NULL)
-       return(NULL);
-
-    obj = (PY_hasharr *) PP_pdbdata_newobj((PP_pdbdataObject *) obj,
-					   tab, dpobj->pyo->type, 1L, NULL,
-					   dpobj->pyo, dpobj->fileinfo,
-					   dpobj, NULL);
-
-    return(obj);}
+    if (obj != NULL)
+       {dpobj = _PY_defstr_find_singleton("hasharr", NULL, PP_vif_info);
+	if (dpobj != NULL)
+	   rv = (PY_hasharr *) PP_pdbdata_newobj((PP_pdbdataObject *) obj,
+						 tab, dpobj->pyo->type,
+						 1L, NULL,
+						 dpobj->pyo, dpobj->fileinfo,
+						 dpobj, NULL);};
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
