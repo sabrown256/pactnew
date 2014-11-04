@@ -46,8 +46,6 @@ struct s_PP_getdescr {
 
 /*--------------------------------------------------------------------------*/
 
-/****************/
-
 char
     PP_line[MAXLINE],
     *XX_OBJECT_MAP_S,
@@ -235,10 +233,6 @@ STATIC PyObject *new_float_object(void *value, long nitems, dimdes * dims,
                 return(NULL);
             obj = obj1;
         }
-#if 0
--    } else {
--        obj = new_array_object(value, nitems, dims, type, need_array);
-#endif
     }
 
     return(obj);}
@@ -268,10 +262,6 @@ STATIC int copy_float_object_data(PyObject *obj, void *vr, long nitems,
             PP_error_set(PP_error_internal, obj, "can not convert to float");
             ierr = -1;
         }
-#if 0
--    } else {
--        ierr = copy_array_object_data(obj, vr, nitems, type);
-#endif
     }
 
     return(ierr);}
@@ -318,10 +308,6 @@ STATIC int get_float_object_data(PyObject *obj, void *vr, long nitems,
             ierr = -1;
         }
         ierr = 0;
-#if 0
--    } else {
--        ierr = get_array_object_data(obj, vr, nitems, type, gc);
-#endif
     }
 
     return(ierr);}
@@ -362,10 +348,6 @@ STATIC PyObject *new_int_object(void *value, long nitems, dimdes * dims,
                 return(NULL);
             obj = obj1;
         }
-#if 0
--    } else {
--        obj = new_array_object(value, nitems, dims, type, need_array);
-#endif
     }
 
     return(obj);}
@@ -395,10 +377,6 @@ STATIC int copy_int_object_data(PyObject *obj, void *vr, long nitems,
             PP_error_set(PP_error_internal, obj, "can not convert to int");
             return(-1);
         }
-#if 0
--    } else {
--        ierr = copy_array_object_data(obj, vr, nitems, type);
-#endif
     }
 
     return(ierr);}
@@ -464,11 +442,6 @@ STATIC int get_int_object_data(PyObject *obj, void *vr, long nitems,
 		 ierr = -1;
 		 break;};}
 
-#if 0
--    else
--        ierr = get_array_object_data(obj, vr, nitems, type, gc);
-#endif
-
     return(ierr);}
 
 /*--------------------------------------------------------------------------*/
@@ -514,239 +487,6 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
     return(0);}
 
 /*--------------------------------------------------------------------------*/
-
-/*                                  SEQUENCE                                */
-
-/*--------------------------------------------------------------------------*/
-
-#if 0
--
--/* get_sequence_object_data - Change a list into C memory.
-- *
-- * XXX - replace with a single layer version of _PP_rd_syment
-- * similar to the way PP_make_object is to _PP_wr_syment.
-- *
-- * create an array out of an object.
-- * If numbers, then create an NumPy array,
-- * else create a array of pointers.
-- * XXX - must garbage collect.
-- */
--
--static int get_sequence_object_data(PyObject *obj, void *vr, long nitems,
--                                    int type, int gc)
--{
--    int typecode;
--    int ierr;
--    char **pv;
--    PP_type_entry *entry;
--    Py_ssize_t i;
--    PyObject *obj1;
--
--    nitems = PyObject_Length(obj);
--    typecode = PyArray_ObjectType(obj, 0);
--
--    switch (typecode) {
--    case PP_CHAR_I:
--        pv = CMAKE_N(char *, nitems);
--
--        obj1 = PySequence_GetItem(obj, 0);
--        entry = PP_inquire_object(fileinfo, obj1);
--        if (entry == NULL) {
--            PP_error_set(PP_error_internal, obj1, "Can not get pact type");
--            return(-1);
--        }
--        for (i = 0; i < nitems; i++) {
--            obj1 = PySequence_GetItem(obj, i);
--            entry->get_data(obj1, &pv[i], 1L, typecode, PP_GC_YES);
--        }
--        DEREF(vr) = (char *) pv;
--        ierr = 0;
--        break;
--    default:
--        ierr = get_array_object_data(obj, vr, nitems, typecode, PP_GC_YES);
--    }
--
--    return(ierr);
--}
--
--/*--------------------------------------------------------------------------*/
--/*--------------------------------------------------------------------------*/
--
--/*  get_sequence_object_type - return(the type of a sequence.
-- *    This makes sure that all the elements in a sequence have the
-- *    same type.
-- *    Py_None will match anything.
-- */
--
--static char *get_sequence_object_type(PyObject *obj)
--{
--    int typecode;
--    char ts[MAXLINE];
--    PP_ssize_t i, nitems, istart;
--    PyObject *obj1;
--    PP_descr *descr;
--
--    DEBUG_OBJ("TOP", "obj", 0, obj);
--    nitems = PyObject_Length(obj);
--    if (nitems == -1)
--        return(NULL);
--    if (nitems == 0)
--        return(NULL);
--
--    /* find the type of the first non-None item */
--    istart = -1;
--    for (i = 0; i < nitems; i++) {
--        obj1 = PySequence_GetItem(obj, i);
--        if (obj1 != Py_None) {
--            istart = i + 1;
--            break;
--        }
--    }
--    if (istart == -1) {
--        PP_error_set(PP_error_internal, obj, "All members are None");
--        return(NULL);
--    }
--
--    if (PySequence_Check(obj1)) {
--        /* get type of first member, then make sure all the rest
--           are of the same type */
--        descr = PP_get_object_type(obj1);
--        if (descr == NULL)
--            return(NULL);
--        DEBUG_OBJ("FIRST", descr->type, 0, obj1);
--
--        /* special case string for efficiency */
--        if (PY_STRING_CHECK(obj1)) {
--            PyTypeObject *otype = PY_TYPE(obj1);
--
--            for (i = istart; i < nitems; i++) {
--                obj1 = PySequence_GetItem(obj, i);
--                if (obj1 == Py_None)
--                    continue;
--                DEBUG_OBJ("string", "obj1", i, obj1);
--                if (PY_TYPE(obj1) != otype) {
--                    PP_error_set(PP_error_internal, obj,
--                                 "Sequence members are not all strings");
--                    return(NULL);
--                }
--            }
--        } else {
--            char *nextdescr;
--
--            for (i = istart; i < nitems; i++) {
--                obj1 = PySequence_GetItem(obj, i);
--                if (obj1 == Py_None)
--                    continue;
--                nextdescr = PP_get_object_descr(fileinfo, obj1);
--                DEBUG_OBJ("string", nextdescr->type, i, obj1);
--                if (nexttype == NULL)
--                    return(NULL);
--                if (strcmp(descr->type, nextdescr->type) != 0) {
--                    PP_error_set(PP_error_internal, obj,
--                                 "Sequence members are not all %s",
--                                 type);
--                    return(NULL);
--                }
--            }
--        }
--        SC_strncpy(ts, MAXLINE, type, -1);
--	SC_strcat(ts, MAXLINE, "*");
--        CFREE(type);
--        type = CSTRSAVE(ts);
--
--    } else {
--        typecode = PP_ObjectType(obj, 0);
--#if 1
--        switch (typecode) {
--        case PP_CHAR_I:
--            break;
--        case PP_UBYTE_I:
--        case PP_SBYTE_I:
--        case PP_SHORT_I:
--        case PP_INT_I:
--        case PP_LONG_I:
--            type = SC_LONG_S;
--            break;
--        case PP_FLOAT_I:
--        case PP_DOUBLE_I:
--            type = SC_DOUBLE_S;
--            break;
--        case PP_CFLOAT_I:
--        case PP_CDOUBLE_I:
--            PP_error_set(PP_error_internal, obj, "Complex not supported");
--            type = NULL;
--            break;
--        default:
--            PP_error_set(PP_error_internal, obj, "Unknown NumPy type %d", typecode);
--            type = NULL;
--        }
--#else
--        switch (typecode) {
--        case PP_CHAR_I:
--            break;
--        case PP_UBYTE_I:
--        case PP_SBYTE_I:
--        case PP_SHORT_I:
--        case PP_INT_I:
--        case PP_LONG_I:
--            type = SC_LONG_P_S;
--            break;
--        case PP_FLOAT_I:
--        case PP_DOUBLE_I:
--            type = SC_DOUBLE_P_S;
--            break;
--        case PP_CFLOAT_I:
--        case PP_CDOUBLE_I:
--            PP_error_set(PP_error_internal, obj, "Complex not supported");
--            type = NULL;
--            break;
--        default:
--            PP_error_set(PP_error_internal, obj, "Unknown NumPy type %d", typecode);
--            type = NULL;
--        }
--#endif
--    }
--
--    return(type);
--}
--
--/*--------------------------------------------------------------------------*/
--/*--------------------------------------------------------------------------*/
--
--static char *get_sequence_object_ptype(PyObject *obj)
--{
--    char *type;
--    char ts[MAXLINE];
--
--    type = get_sequence_object_type(obj);
--    SC_strncpy(ts, MAXLINE, type, -1);
--    SC_strcat(ts, MAXLINE, "*");
--    CFREE(type);
--    type = CSTRSAVE(ts);
--
--    return(type);
--}
--
--/*--------------------------------------------------------------------------*/
--/*--------------------------------------------------------------------------*/
--
--/* get_sequence_object_dims -
-- */
--
--static dimdes *get_sequence_object_dims(PyObject *obj)
--{
--    dimdes *dims = NULL;
--    Py_ssize_t nitems;
--
--    nitems = PyObject_Length(obj);
--    if (nitems != -1) {
--        dims = _PD_mk_dimensions(0L, nitems);
--    }
--
--    return(dims);
--}
-#endif
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 static int _PP_pack_pdbdata(void *p, PyObject *v, long nitems, PP_types tc)
@@ -779,27 +519,6 @@ static PP_descr *_PP_get_pdbdata_descr(PP_file *fileinfo, PyObject *obj)
 }
 
 /*--------------------------------------------------------------------------*/
-#if 0
- UNUSED
-/*--------------------------------------------------------------------------*/
-
-static int _PP_pack_instance(void *p, PyObject *v, long nitems, PP_types tc)
-{
-    PP_error_set(PP_error_internal, NULL, "_PP_pack_pdbdata");
-    return(-1);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *_PP_unpack_instance(void *p, long nitems)
-{
-    PP_error_set(PP_error_internal, NULL, "_PP_unpack_instance");
-    return(NULL);
-}
-
-/*--------------------------------------------------------------------------*/
-#endif
 /*--------------------------------------------------------------------------*/
 
 /* _PP_get_instance_descr - Take a PyInstanceObject,
@@ -1161,22 +880,6 @@ void PP_init_type_map_basic(PP_file *fileinfo)
 
     PP_register_type(fileinfo, entry);  /* integer */
 
-#if 0
--    entry =
--        PP_make_type_entry(SC_INT_S, SC_INT_P_S, sizeof(int),
--                               &PY_INT_TYPE,
--                               NULL, NULL, PP_INT_I, FALSE,
--                               new_int_object,
--                               -1,
--                               copy_int_object_data,
--                               _PP_get_pack_func(PP_INT_I),
--                               _PP_get_unpack_func(PP_INT_I),
--                               get_int_object_data,
--                               NULL,
--                               NULL);
--    PP_register_type(fileinfo, entry);
-#endif
-    
     descr = PP_make_descr(
         PP_LONG_I,                      /* typecode */
         SC_LONG_S,                      /* type */
@@ -1319,73 +1022,6 @@ void PP_init_type_map(void)
 
     _PP_create_defstr_tab();
     
-#if 0
--    /* function pointer */
--    entry = PP_make_type_entry("function", "function", 0L,
--                                   NULL,
--                                   NULL, NULL, PP_FLOAT_I, FALSE,
--                                   new_none_object,
--                                   -1,
--                                   copy_none_object_data,
--                                   _PP_get_pack_func(PP__I),
--                                   _PP_get_unpack_func(PP__I),
--                                   get_none_object_data,
--                                   NULL,
--                                   NULL);
--    PP_register_type(fileinfo, entry);
-#endif
-    
-#if 0
--    /* List */
--    /* A list has no intrinsic dimension because nested lists
--     * lists must be of the same kind to be meaniful to C.
--     * The get_sequence_type takes any nested lists into account
--     * by creating an additional indirection.
--     *  i.e.  ['foo', 'bar'] is type char** with no dims.
--     * It would be possible to also call this char* with dim=[2]
--     * but that then makes a dependency between the
--     * get_type and get_dims functions.
--     */
--    entry = PP_make_type_entry(NULL, NULL, 0L, &PyList_Type,
--                                   get_sequence_object_type,
--                                   NULL /* get_sequence_object_ptype */, 0, TRUE,
--                                   NULL,
--                                   -1,
--                                   NULL,
--                                   _PP_get_pack_func(PP__I),
--                                   _PP_get_unpack_func(PP__I),
--                                   get_sequence_object_data,
--                                   get_sequence_object_dims,
--                                   NULL);
--    PP_register_object(fileinfo, entry);
--
--    entry = PP_make_type_entry(NULL, NULL, 0L, &PyTuple_Type,
--                                   get_sequence_object_type,
--                                   NULL /* get_sequence_object_ptype */, 0, TRUE,
--                                   NULL,
--                                   -1,
--                                   NULL,
--                                   _PP_get_pack_func(PP__I),
--                                   _PP_get_unpack_func(PP__I),
--                                   get_sequence_object_data,
--                                   get_sequence_object_dims,
--                                   NULL);
--    PP_register_object(fileinfo, entry);
-#endif
-
-#if 0
--    /* Py_None */
--    entry = PP_make_type_entry(SC_STRING_S, NULL, 0L, PY_TYPE(Py_None),
--                                   NULL, NULL, 0, FALSE,
--                                   NULL,
--                                   -1,
--                                   copy_none_object_data,
--                                   _PP_get_pack_func(PP__I),
--                                   _PP_get_unpack_func(PP__I),
--                                   get_none_object_data, NULL, NULL);
--    PP_register_object(fileinfo, entry);
-#endif
-
     PP_global_form.array_kind = AS_LIST;
     PP_global_form.struct_kind = AS_TUPLE;
     PP_global_form.scalar_kind = AS_OBJECT;
@@ -1401,17 +1037,6 @@ void PP_init_type_map(void)
 void _PP_init_file(PDBfile *file)
    {
 
-#if 0
-/* hash table types */
--    PD_def_attr_str(file);
-#endif
-    
-#if 0
-/* XXX - double defines SC_array resulting in memory leaks */ 
-/* PML types */
-    PD_def_mapping(file);
-#endif
-    
 /* SCORE types */
     PD_def_hash_types(file, 3);
 
@@ -1620,19 +1245,8 @@ PyObject *PP_copy_mem_to_obj(PDBfile *file,
         Py_INCREF(Py_None);
         obj = Py_None;
     } else if (entry == NULL || entry->unpack == NULL) {
-#if 0
--        obj = (PyObject *) PP_scoredata_New(vr, type, nitems, dims, file);
-#endif
         PP_error_set_user(NULL, "No 'unpack' function for type %s", type);
     } else {
-#if 0
--        if (form->array_kind == AS_PDBDATA) {
--            obj = PP_pdbdata_newobj(NULL, vr, type, nitems, dims, PP_pdbdataObject *obj,
--                                    void *vr, char *type, long nitems,
--                                    dimdes *dims, defstr *dp, PDBfile *file,
--                                    PY_defstr *dpobj, PyObject *parent)
--        }
-#endif
         if (form->array_kind == AS_ARRAY) {
             /* try to create an array out of it */
             obj = PP_array_unpack(vr, nitems, entry->typecode);
@@ -1683,87 +1297,11 @@ PyObject *PP_copy_mem_to_obj(PDBfile *file,
         }
     }
     /* XXX - verify order of this test */
-#if 0
--    } else if (need_scoredata) {
--        obj = (PyObject *) PP_scoredata_New(vr, type, nitems, dims, file);
-#endif
 
     return(obj);
 }
 
 /*--------------------------------------------------------------------------*/
-#if 0
--/*--------------------------------------------------------------------------*/
--
--/* PP_get_object_data - return a pointer to the C memory contained in the type.
-- *            - also return the type.
-- *    object 'obj'.
-- *
-- *    obj      - Python object to get the pointer for.
-- *    entry    -
-- *    vr       - address of pointer to set.
-- *               note: cannot return vr as value of function
-- *               because NULL is a legal value and can not
-- *               signal when an error has occured.
-- *    gc       - PP_GC_YES or PP_GC_NO
-- *               yes will produce an item that must be garbage collected
-- *               that is it has been allocated by pact, and thus uses the
-- *               pact memory manager.
-- *               no will return a pointer into the python object.
-- *
-- *   return -1 error
-- *   return  0 worked
-- *   return  1 didn't get object
-- */
--
--int PP_get_object_data(PyObject *obj, PP_type_entry *entry, long nitems,
--                       void **vr, int gc)
--{
--    int err = 1;                /* assume no way to get object */
--
--    if (entry != NULL) {
--        if (obj == Py_None) {
--            *vr = NULL;
--            err = 0;
--        } else if (entry->get_data != NULL) {
--            err = entry->get_data(obj, vr, nitems, entry->typecode, gc);
--        } else if (PY_TYPE(obj) == entry->obtyp) {
--            if (entry->poffset != -1) {
--#if 1
--                DEREF(vr) = DEREF((char *) obj + entry->poffset);
--#else
--                DEREF(vr) = (char *) obj + entry->poffset;
--#endif
--                SC_mark(DEREF(vr), 1);
--                err = 0;
--            } else {
--                err = -1;
--            }
--        } else {
--            /* XXXX - did not make, try to create out of given data */
--#if 0
--            _PP_rd_syment(obj, PP_vif, ep, entry->ptype, vr);
--#endif
--            /* didn't make, inform caller so it may try alternative method
--               to get the object */
--            err = 1;
--        }
--    } else {
--        err = -1;
--    }
--
--    if (err == -1) {
--        if (PyErr_Occurred() == NULL) {
--            PP_error_set_user(obj, "No way to get object data: %s",
--                              PY_TYPE(obj)->tp_name);
--        }
--    }
--
--    return(err);
--}
--
-/*--------------------------------------------------------------------------*/
-#endif
 /*--------------------------------------------------------------------------*/
 
 /* PP_make_data - Make 'C' data out of objects given the type.
@@ -2154,179 +1692,6 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-
-
-#if 0
--    int typecode;
--    char ts[MAXLINE];
--    PyObject i, nitems, istart;
--    PyObject *obj1;
--    PP_descr *descr;
--
--    DEBUG_OBJ("TOP", "obj", 0, obj);
--    nitems = PyObject_Length(obj);
--    if (nitems == -1)
--        return(NULL);
--    if (nitems == 0)
--        return(NULL);
--
--    /* find the type of the first non-None item */
--    istart = -1;
--    for (i = 0; i < nitems; i++) {
--        obj1 = PySequence_GetItem(obj, i);
--        if (obj1 != Py_None) {
--            istart = i + 1;
--            break;
--        }
--    }
--    if (istart == -1) {
--        PP_error_set(PP_error_internal, obj, "All members are None");
--        return(NULL);
--    }
--
--    if (PySequence_Check(obj1)) {
--        /* get type of first member, then make sure all the rest
--           are of the same type */
--        descr = PP_get_object_type(obj1);
--        if (descr == NULL)
--            return(NULL);
--        DEBUG_OBJ("FIRST", descr->type, 0, obj1);
--
--        /* special case string for efficiency */
--        if (PY_STRING_CHECK(obj1)) {
--            PyTypeObject *otype = PY_TYPE(obj1);
--
--            for (i = istart; i < nitems; i++) {
--                obj1 = PySequence_GetItem(obj, i);
--                if (obj1 == Py_None)
--                    continue;
--                DEBUG_OBJ("string", "obj1", i, obj1);
--                if (PY_TYPE(obj1) != otype) {
--                    PP_error_set(PP_error_internal, obj,
--                                 "Sequence members are not all strings");
--                    return(NULL);
--                }
--            }
--        } else {
--            char *nextdescr;
--
--            for (i = istart; i < nitems; i++) {
--                obj1 = PySequence_GetItem(obj, i);
--                if (obj1 == Py_None)
--                    continue;
--                nextdescr = PP_get_object_descr(fileinfo, obj1);
--                DEBUG_OBJ("string", nextdescr->type, i, obj1);
--                if (nexttype == NULL)
--                    return(NULL);
--                if (strcmp(descr->type, nextdescr->type) != 0) {
--                    PP_error_set(PP_error_internal, obj,
--                                 "Sequence members are not all %s",
--                                 type);
--                    return(NULL);
--                }
--            }
--        }
--        SC_strncpy(ts, MAXLINE, type, -1);
--	SC_strcat(ts, MAXLINE, "*");
--        CFREE(type);
--        type = CSTRSAVE(ts);
--
--    } else {
--        typecode = PP_ObjectType(obj, 0);
--#if 1
--        switch (typecode) {
--        case PP_CHAR_I:
--            break;
--        case PP_UBYTE_I:
--        case PP_SBYTE_I:
--        case PP_SHORT_I:
--        case PP_INT_I:
--        case PP_LONG_I:
--            type = SC_LONG_S;
--            break;
--        case PP_FLOAT_I:
--        case PP_DOUBLE_I:
--            type = SC_DOUBLE_S;
--            break;
--        case PP_CFLOAT_I:
--        case PP_CDOUBLE_I:
--            PP_error_set(PP_error_internal, obj, "Complex not supported");
--            type = NULL;
--            break;
--        default:
--            PP_error_set(PP_error_internal, obj, "Unknown NumPy type %d", typecode);
--            type = NULL;
--        }
--#else
--        switch (typecode) {
--        case PP_CHAR_I:
--            break;
--        case PP_UBYTE_I:
--        case PP_SBYTE_I:
--        case PP_SHORT_I:
--        case PP_INT_I:
--        case PP_LONG_I:
--            type = SC_LONG_P_S;
--            break;
--        case PP_FLOAT_I:
--        case PP_DOUBLE_I:
--            type = SC_DOUBLE_P_S;
--            break;
--        case PP_CFLOAT_I:
--        case PP_CDOUBLE_I:
--            PP_error_set(PP_error_internal, obj, "Complex not supported");
--            type = NULL;
--            break;
--        default:
--            PP_error_set(PP_error_internal, obj, "Unknown NumPy type %d", typecode);
--            type = NULL;
--        }
--#endif
--    }
--
--    return(type);
-#endif
-
-
-#if 0
--/*--------------------------------------------------------------------------*/
--/*--------------------------------------------------------------------------*/
--
--/* _PP_GET_OBJECT_DIMS - */
--
--dimdes *_PP_get_object_dims(PyObject *obj, PP_type_entry *entry)
--   {dimdes *rv;
--
--    if (entry->get_dims != NULL)
--       rv = entry->get_dims(obj);
--    else
--       rv = NULL;
--
--    return(rv);}
--
--/*--------------------------------------------------------------------------*/
--/*--------------------------------------------------------------------------*/
--
--/* PP_GET_OBJECT_DIMS - */
--
--dimdes *PP_get_object_dims(PyObject * obj)
--   {PP_type_entry *entry;
--    dimdes *rv;
--
--    entry = PP_inquire_object(fileinfo, obj);
--    if (entry == NULL)
--       rv = NULL;
--    else
--       rv = _PP_get_object_dims(obj, entry);
--
--    return(rv);}
--
--/*--------------------------------------------------------------------------*/
--
-#endif
-
-/*--------------------------------------------------------------------------*/
-
 /* PP_GET_OBJECT_LENGTH - return number of items */
 
 /* XXX - change to Py_ssize_t */
@@ -2345,27 +1710,6 @@ int PP_get_object_length(PyObject *obj)
 
     return(nitems);}
  
-#if 0
--        if (PyArray_Check(obj)) {
--        return(PyArray_Size(obj));
--    } else if (PY_STRING_CHECK(obj)) {
--        return(PY_STRING_SIZE(obj));
--    } else if (PyFloat_Check(obj)) {
--        return(1);
--    } else if (PY_INT_CHECK(obj)) {
--        return(1);
--    } else if (PySequence_Check(obj)) {
--        return(PySequence_Length(obj));
--    } else if (obj == Py_None) {
--        return(1);
--    } else {
--        /* XXXX - should a hook be provided here? */
--        return(1);
--    }
--    
--}
-#endif
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

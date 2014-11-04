@@ -27,7 +27,8 @@ PyObject *_PY_fe1(PY_str *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fe1");
+        return(NULL);};
 
     _rv = fe1(_la1, _la2);
     _lo = Py_BuildValue("O",
@@ -56,7 +57,8 @@ PyObject *_PY_fe2(PY_str *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_ldev, &_lx, &_ly, &_ln, &_linfo, &_ll);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fe2");
+        return(NULL);};
 
     fe2(_ldev, _lx, _ly, _ln, _linfo, _ll);
 
@@ -220,6 +222,9 @@ PyGetSetDef PY_str_getset[] = {
     {"str", (getter) PY_str_get, NULL, PY_str_doc, NULL},
     {"nc", (getter) PY_str_get_nc, (setter) PY_str_set_nc, PY_str_doc_nc, NULL},
     {"s", (getter) PY_str_get_s, (setter) PY_str_set_s, PY_str_doc_s, NULL},
+#ifdef PY_EXT_GETSET_STR
+    PY_EXT_GETSET_STR
+#endif
     {NULL}};
 
 PyTypeObject PY_str_type;

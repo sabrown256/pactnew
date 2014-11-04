@@ -48,20 +48,6 @@ void *_PY_opt_pcons(pcons *x, bind_opt wh, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#if 0
-/* _PY_PCONS_PACK - */
-
-static int _PY_pcons_pack(void *p, PyObject *v, long nitems, PP_types tc)
-   {
-
-    PP_error_set(PP_error_internal, NULL, "_PY_pcons_pack");
-
-    return(-1);}
-#endif
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PY_PCONS_UNPACK - */
 
 static PyObject *_PY_pcons_unpack(void *p, long nitems)

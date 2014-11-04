@@ -27,15 +27,16 @@ PyObject *_PY_fbcv1(PyObject *self, PyObject *args, PyObject *kwds)
     char *kw_list[] = {"a", "b", "c", "d", "e", "f", NULL};
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
-                                     "ifdbOO:fbcv1p",
+                                     "ifdsOO:fbcv1p",
                                      kw_list,
                                      &_la, &_lb, &_lc, &_ld, &_le, &_lf);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fbcv1");
+        return(NULL);};
 
     _rv = fbcv1(_la, _lb, _lc, _ld, _le, _lf);
-    _lo = Py_BuildValue("b",
-                        &_rv);
+    _lo = Py_BuildValue("s",
+                        _rv);
 
     return(_lo);}
 
@@ -55,15 +56,16 @@ PyObject *_PY_fbmcv1(PyObject *self, PyObject *args, PyObject *kwds)
     char *kw_list[] = {"a", "b", "c", "d", NULL};
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
-                                     "ifdb:fbmcv1p",
+                                     "ifds:fbmcv1p",
                                      kw_list,
                                      &_la, &_lb, &_lc, &_ld);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fbmcv1");
+        return(NULL);};
 
     _rv = fbmcv1(_la, _lb, _lc, _ld);
-    _lo = Py_BuildValue("b",
-                        &_rv);
+    _lo = Py_BuildValue("s",
+                        _rv);
 
     return(_lo);}
 
@@ -87,11 +89,12 @@ PyObject *_PY_fbmcr2(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb, &_lc, &_ld);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fbmcr2");
+        return(NULL);};
 
     _rv = fbmcr2(_la, _lb, _lc, _ld);
-    _lo = Py_BuildValue("b",
-                        &_rv);
+    _lo = Py_BuildValue("s",
+                        _rv);
 
     return(_lo);}
 

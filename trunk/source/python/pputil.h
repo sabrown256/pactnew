@@ -146,17 +146,6 @@ struct s_PP_form
     int struct_kind;
     int scalar_kind;};
 
-#if 0
-XXX - unused
-typedef struct s_PP_defmap {
-    PyObject *self;
-    defstr *dp;
-} PP_defmap;
-PP_defmap *_PP_mk_defmap(PyTypeObject *defctor, defstr *dp);
-void _PP_rl_defmap(PP_defmap *map);
-
-#endif
-
 struct s_PP_file {
     PDBfile *file;
     hasharr *type_map;
