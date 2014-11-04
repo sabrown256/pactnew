@@ -363,8 +363,10 @@ class ClassObjectIO(test_leak.LeakFile):
 
         self.fp.write("var1", input, 'user *')
         r = self.fp.read("var1")
-        self.failUnlessEqual(r.__class__, UserClass)
-        self.failUnlessEqual(r, input)
+        self.failUnless(isinstance(r, list))
+        self.failUnlessEqual(len(r), 1)
+        self.failUnlessEqual(r[0].__class__, UserClass)
+        self.failUnlessEqual(r[0], input)
 
     def testb1(self):
         "Write class instance array to file"

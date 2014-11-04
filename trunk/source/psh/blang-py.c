@@ -960,9 +960,7 @@ static void python_wrap_local_assn(FILE *fc, fdecl *dcl, char *pfn, char *kw)
 	fprintf(fc, "                                     %s);\n", arg);
 
 	fprintf(fc, "    if (ok == FALSE)\n");
-        fprintf(fc, "       {PyErr_SetString(PP_error_user, \"%s\");\n",
-		cfn);
-	fprintf(fc, "        return(NULL);};\n");
+	fprintf(fc, "       return(NULL);\n");
 	fprintf(fc, "\n");};
 
     return;}
@@ -1011,10 +1009,7 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 
     if (voidf == FALSE)
        {cs_type(dty, BFLRG, &dcl->proto, TRUE);
-	if (strcmp(dty, "SC_CHAR_I") == 0)
-	   vstrcat(a, BFLRG, "\t\t\t%s, _rv,\n", dty);
-	else
-	   vstrcat(a, BFLRG, "\t\t\t%s, &_rv,\n", dty);};
+	vstrcat(a, BFLRG, "\t\t\t%s, _rv,\n", dty);};
 
 /* make up the list arguments */
     if (nr > 0)
@@ -1028,10 +1023,10 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 		 cs_type(dty, BFLRG, al+i, TRUE);
 	     
 		 if (nvl == 1)
-		    vstrcat(a, BFLRG, "\t\t\t%s, &_l%s,\n", dty, nm);
+		    vstrcat(a, BFLRG, "\t\t\t%s, _l%s,\n", dty, nm);
 		 else
 		    {for (iv = 0; iv < nvl; iv++)
-			 vstrcat(a, BFLRG, "\t\t\t%s, &_l%s[%d],\n",
+			 vstrcat(a, BFLRG, "\t\t\t%s, _l%s[%d],\n",
 				 dty, nm, iv);};};};};
 
 /* if the list argument are non empty make up the call */
