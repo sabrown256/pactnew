@@ -304,35 +304,6 @@ static PyObject *PY_PG_image_buffer_get(PY_PG_image *self, void *context)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#if 0
-
-/* this has the correct image buffer routine */
-
-static PyGetSetDef PY_PG_image_getset[] = {
-    {"im", (getter) PY_PG_image_get, NULL, PY_PG_image_doc, NULL},
-    {"version_id", (getter) PY_PG_image_version_id_get, NULL, PY_PG_image_version_id_doc, NULL},
-    {"label", (getter) PY_PG_image_label_get, NULL, PY_PG_image_label_doc, NULL},
-    {"xmin", (getter) PY_PG_image_xmin_get, NULL, PY_PG_image_xmin_doc, NULL},
-    {"xmax", (getter) PY_PG_image_xmax_get, NULL, PY_PG_image_xmax_doc, NULL},
-    {"ymin", (getter) PY_PG_image_ymin_get, NULL, PY_PG_image_ymin_doc, NULL},
-    {"ymax", (getter) PY_PG_image_ymax_get, NULL, PY_PG_image_ymax_doc, NULL},
-    {"zmin", (getter) PY_PG_image_zmin_get, NULL, PY_PG_image_zmin_doc, NULL},
-    {"zmax", (getter) PY_PG_image_zmax_get, NULL, PY_PG_image_zmax_doc, NULL},
-    {"element_type", (getter) PY_PG_image_element_type_get, NULL, PY_PG_image_element_type_doc, NULL},
-    {"buffer", (getter) PY_PG_image_buffer_get, NULL, PY_PG_image_buffer_doc, NULL},
-    {"kmax", (getter) PY_PG_image_kmax_get, NULL, PY_PG_image_kmax_doc, NULL},
-    {"lmax", (getter) PY_PG_image_lmax_get, NULL, PY_PG_image_lmax_doc, NULL},
-    {"size", (getter) PY_PG_image_size_get, NULL, PY_PG_image_size_doc, NULL},
-    {"bits_pixel", (getter) PY_PG_image_bits_pixel_get, NULL, PY_PG_image_bits_pixel_doc, NULL},
-    {"palette", (getter) PY_PG_image_palette_get, NULL, PY_PG_image_palette_doc, NULL},
-    {NULL}     /* Sentinel */
-};
-
-#endif
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 static void PY_PG_image_tp_dealloc(PY_PG_image *self)
    {
 
@@ -510,25 +481,6 @@ static int PY_PG_graph_set_info(PY_PG_graph *self,
        rv = 0;};
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-#if 0
-
-/* GOTCHA - this is the correct version - it has the setter methods */
-
-static PyGetSetDef PY_PG_graph_getset[] = {
-    {"data", (getter) PY_PG_graph_get, NULL, PY_PG_graph_doc, NULL},
-    {"rendering", (getter) PY_PG_graph_get_rendering, NULL, PY_PG_graph_doc_rendering, NULL},
-    {"mesh", (getter) PY_PG_graph_get_mesh, NULL, PY_PG_graph_doc_mesh, NULL},
-    {"info_type", (getter) PY_PG_graph_get_info_type, NULL, PY_PG_graph_doc_info_type, NULL},
-    {"info", (getter) PY_PG_graph_get_info, (setter) PY_PG_graph_set_info, PY_PG_graph_doc_info, NULL},
-    {"identifier", (getter) PY_PG_graph_get_identifier, NULL, PY_PG_graph_doc_identifier, NULL},
-    {"use", (getter) PY_PG_graph_get_use, NULL, PY_PG_graph_doc_use, NULL},
-    {NULL}};
-
-#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

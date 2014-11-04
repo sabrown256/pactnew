@@ -813,7 +813,8 @@ static PyObject *PY_hasharr_tp_repr(PY_hasharr *self)
 
     h = _PP_unpack_hasharr(self->pyo, 1L);
     if (h == NULL)
-       rv = NULL;
+       {rv = Py_None;
+	Py_INCREF(rv);}
     else
        {rv = PyObject_Repr(h);
 	Py_DECREF(h);};
@@ -867,11 +868,12 @@ PyObject *_PP_unpack_hasharr(void *p, long nitems)
 	   {for (i = 0; SC_hasharr_next(tab, &i, &nm, NULL, (void **) &item); i++)
 
 /* GOTCHA: ask Lee Taylor */
-	        {if ((item == NULL) || (item->ob_type == NULL))
-		    {ierr = -1;
-		     break;};
-
-		 ierr = PyDict_SetItemString(dict, nm, item);
+	        {if (item == NULL)
+		    ierr = -1;
+		  else if (item->ob_type == NULL)
+		    ierr = PyDict_SetItemString(dict, nm, Py_None);
+		 else
+		    ierr = PyDict_SetItemString(dict, nm, item);
 		 if (ierr < 0)
 		    break;};
 

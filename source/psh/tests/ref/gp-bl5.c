@@ -25,7 +25,8 @@ PyObject *_PY_a_f1(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "a_f1");
+        return(NULL);};
 
     a_f1(_la);
 
@@ -50,7 +51,8 @@ PyObject *_PY_a_f2(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_lb);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "a_f2");
+        return(NULL);};
 
     a_f2(_lb);
 
@@ -76,7 +78,8 @@ PyObject *_PY_a_f3(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "a_f3");
+        return(NULL);};
 
     a_f3(_la, _lb);
 
@@ -102,7 +105,8 @@ PyObject *_PY_a_f4(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_lb, &_la);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "a_f4");
+        return(NULL);};
 
     a_f4(_lb, _la);
 
@@ -128,7 +132,8 @@ PyObject *_PY_B_f1(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "B_f1");
+        return(NULL);};
 
     B_f1(_la, _lb);
 
@@ -154,7 +159,8 @@ PyObject *_PY_B_f2(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "B_f2");
+        return(NULL);};
 
     B_f2(_la, _lb);
 
@@ -181,7 +187,8 @@ PyObject *_PY_B_f3(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb, &_lc);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "B_f3");
+        return(NULL);};
 
     B_f3(_la, _lb, _lc);
 
@@ -208,7 +215,8 @@ PyObject *_PY_B_f4(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb, &_lc);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "B_f4");
+        return(NULL);};
 
     B_f4(_la, _lb, _lc);
 
@@ -235,7 +243,8 @@ PyObject *_PY_B_f5(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb, &_lc);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "B_f5");
+        return(NULL);};
 
     B_f5(_la, _lb, _lc);
 
@@ -262,7 +271,8 @@ PyObject *_PY_B_f6(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb, &_lc);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "B_f6");
+        return(NULL);};
 
     B_f6(_la, _lb, _lc);
 

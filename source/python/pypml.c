@@ -219,21 +219,6 @@ PyObject *PP_make_ac_set(PyObject *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#if 0
-
-/* GOTCHA: example of a getset with setter method */
-
-static PyGetSetDef PY_PM_set_getset[] = {
-
-    {"name", (getter) PY_PM_set_get_name, (setter) PY_PM_set_set_name, PY_PM_set_doc_name, NULL},
-
-    {NULL}};
-
-#endif
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 static int PY_PM_set_tp_init(PY_PM_set *self, PyObject *args, PyObject *kwds)
    {int cp, nd, nde, rv;
     int *maxes;

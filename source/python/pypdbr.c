@@ -328,11 +328,9 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
                 return -1;
             }
             as_obj = AS_TUPLE;
-        } else if (PY_PM_mapping_check(obj)) {
+        } else if (PyMapping_Check(obj)) {
             as_obj = AS_DICT;
         } else {
-/* GOTCHA: ask Lee Taylor */
-/* we get here with a PyDict_Type in several tests such as testh in test_defstr.py */
             PP_error_set_user(obj,
                               "Expected sequence or mapping for struct type %s",
                               litype);

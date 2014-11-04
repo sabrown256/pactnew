@@ -27,7 +27,8 @@ PyObject *_PY_fb1(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb1");
+        return(NULL);};
 
     _rv = fb1(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -49,11 +50,12 @@ PyObject *_PY_fb2(PyObject *self, PyObject *args, PyObject *kwds)
     char *kw_list[] = {"a1", "a2", NULL};
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
-                                     "bs:fb2_p",
+                                     "ss:fb2_p",
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb2");
+        return(NULL);};
 
     _rv = fb2(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -79,7 +81,8 @@ PyObject *_PY_fb3(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb3");
+        return(NULL);};
 
     _rv = fb3(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -105,7 +108,8 @@ PyObject *_PY_fb4(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb4");
+        return(NULL);};
 
     _rv = fb4(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -131,7 +135,8 @@ PyObject *_PY_fb5(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb5");
+        return(NULL);};
 
     _rv = fb5(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -157,7 +162,8 @@ PyObject *_PY_fb6(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb6");
+        return(NULL);};
 
     _rv = fb6(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -183,7 +189,8 @@ PyObject *_PY_fb7(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb7");
+        return(NULL);};
 
     _rv = fb7(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -209,7 +216,8 @@ PyObject *_PY_fb8(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb8");
+        return(NULL);};
 
     _rv = fb8(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -235,7 +243,8 @@ PyObject *_PY_fb10(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb10");
+        return(NULL);};
 
     _rv = fb10(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -261,7 +270,8 @@ PyObject *_PY_fb11(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fb11");
+        return(NULL);};
 
     _rv = fb11(_la1, _la2);
     _lo = Py_BuildValue("i",
@@ -286,7 +296,8 @@ PyObject *_PY_fr1(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr1");
+        return(NULL);};
 
     _rv = fr1(_la1);
     _lo = Py_BuildValue("O",
@@ -311,11 +322,12 @@ PyObject *_PY_fr2(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr2");
+        return(NULL);};
 
     _rv = fr2(_la1);
-    _lo = Py_BuildValue("b",
-                        &_rv);
+    _lo = Py_BuildValue("s",
+                        _rv);
 
     return(_lo);}
 
@@ -336,7 +348,8 @@ PyObject *_PY_fr3(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr3");
+        return(NULL);};
 
     _rv = fr3(_la1);
     _lo = Py_BuildValue("h",
@@ -361,7 +374,8 @@ PyObject *_PY_fr4(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr4");
+        return(NULL);};
 
     _rv = fr4(_la1);
     _lo = Py_BuildValue("i",
@@ -386,7 +400,8 @@ PyObject *_PY_fr5(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr5");
+        return(NULL);};
 
     _rv = fr5(_la1);
     _lo = Py_BuildValue("l",
@@ -411,7 +426,8 @@ PyObject *_PY_fr6(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr6");
+        return(NULL);};
 
     _rv = fr6(_la1);
     _lo = Py_BuildValue("L",
@@ -436,7 +452,8 @@ PyObject *_PY_fr7(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr7");
+        return(NULL);};
 
     _rv = fr7(_la1);
     _lo = Py_BuildValue("f",
@@ -461,7 +478,8 @@ PyObject *_PY_fr8(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr8");
+        return(NULL);};
 
     _rv = fr8(_la1);
     _lo = Py_BuildValue("d",
@@ -486,7 +504,8 @@ PyObject *_PY_fr10(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr10");
+        return(NULL);};
 
     _rv = fr10(_la1);
     _lo = Py_BuildValue("O",
@@ -511,7 +530,8 @@ PyObject *_PY_fr11(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr11");
+        return(NULL);};
 
     _rv = fr11(_la1);
     _lo = Py_BuildValue("O",
@@ -536,7 +556,8 @@ PyObject *_PY_fr13(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fr13");
+        return(NULL);};
 
     _rv = fr13(_la1);
     _lo = Py_BuildValue("O",
@@ -561,7 +582,8 @@ PyObject *_PY_fp1(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp1");
+        return(NULL);};
 
     _rv = fp1(_la1);
     _lo = Py_BuildValue("O",
@@ -586,11 +608,12 @@ PyObject *_PY_fp2(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp2");
+        return(NULL);};
 
     _rv = fp2(_la1);
-    _lo = Py_BuildValue("b",
-                        &_rv);
+    _lo = Py_BuildValue("s",
+                        _rv);
 
     return(_lo);}
 
@@ -611,7 +634,8 @@ PyObject *_PY_fp3(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp3");
+        return(NULL);};
 
     _rv = fp3(_la1);
     _lo = Py_BuildValue("h",
@@ -636,7 +660,8 @@ PyObject *_PY_fp4(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp4");
+        return(NULL);};
 
     _rv = fp4(_la1);
     _lo = Py_BuildValue("i",
@@ -661,7 +686,8 @@ PyObject *_PY_fp5(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp5");
+        return(NULL);};
 
     _rv = fp5(_la1);
     _lo = Py_BuildValue("l",
@@ -686,7 +712,8 @@ PyObject *_PY_fp6(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp6");
+        return(NULL);};
 
     _rv = fp6(_la1);
     _lo = Py_BuildValue("L",
@@ -711,7 +738,8 @@ PyObject *_PY_fp7(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp7");
+        return(NULL);};
 
     _rv = fp7(_la1);
     _lo = Py_BuildValue("f",
@@ -736,7 +764,8 @@ PyObject *_PY_fp8(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp8");
+        return(NULL);};
 
     _rv = fp8(_la1);
     _lo = Py_BuildValue("d",
@@ -761,7 +790,8 @@ PyObject *_PY_fp10(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp10");
+        return(NULL);};
 
     _rv = fp10(_la1);
     _lo = Py_BuildValue("O",
@@ -786,7 +816,8 @@ PyObject *_PY_fp11(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp11");
+        return(NULL);};
 
     _rv = fp11(_la1);
     _lo = Py_BuildValue("O",
@@ -811,7 +842,8 @@ PyObject *_PY_fp13(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1);
     if (ok == FALSE)
-       return(NULL);
+       {PyErr_SetString(PP_error_user, "fp13");
+        return(NULL);};
 
     _rv = fp13(_la1);
     _lo = Py_BuildValue("O",

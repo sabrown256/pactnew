@@ -386,44 +386,6 @@ defstr *PY_defstr_alt(PDBfile *file, char *name, PyObject *members)
 }
 
 /*--------------------------------------------------------------------------*/
-#if 0
-/*--------------------------------------------------------------------------*/
-
-/* _PP_mk_defmap - */
-
-PP_defmap *_PP_mk_defmap(PyTypeObject *defctor, defstr *dp)
-{
-    PP_defmap *map;
-
-    map = CMAKE(PP_defmap);
-
-    map->defctor = defctor;
-    map->pyo = dp;
-
-    Py_INCREF(defctor);
-    SC_mark(dp, 1);
-
-    return(map);
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PP_rl_defmap - */
-
-void _PP_rl_defmap(PP_defmap *map)
-{
-    if (SC_save_to_free(map)) {
-        Py_DECREF(map->defctor);
-        _PD_rl_descriptor(map->pyo);
-    }
-
-    CFREE(map);
-}
-
-/*--------------------------------------------------------------------------*/
-#endif
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 static int
@@ -624,12 +586,9 @@ PY_defstr *_PY_defstr_make_singleton(PY_defstr *self,
 
 	else
 	   dp = PY_defstr_alt(fp, name, members);}
-#if 0
-/* GOTCHA: ask Lee Taylor */
     else
        {PP_error_set_user(NULL, "type already defined - %s", name);
-        dp = NULL;}
-#endif
+        dp = NULL;};
 
     if (dp != NULL)
 
@@ -1044,29 +1003,6 @@ static PyMethodDef
    {"get", (PyCFunction)PY_defstr_get, METH_NOARGS, PY_defstr_get_doc},
    {"order_flag", (PyCFunction) PY_defstr_get_order_flag, METH_NOARGS, PY_defstr_doc_order_flag},
    {NULL, NULL, 0, NULL}};
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-#if 0
-
-/* GOTCHA: this has the order_flag method */
-
-static PyGetSetDef PY_defstr_getset[] = {
-    {"dp", (getter) PY_defstr_get, NULL, PY_defstr_doc, NULL},
-    {"type", (getter) PY_defstr_get_type, NULL, PY_defstr_doc_type, NULL},
-    {"size_bits", (getter) PY_defstr_get_size_bits, NULL, PY_defstr_doc_size_bits, NULL},
-    {"size", (getter) PY_defstr_get_size, NULL, PY_defstr_doc_size, NULL},
-    {"alignment", (getter) PY_defstr_get_alignment, NULL, PY_defstr_doc_alignment, NULL},
-    {"n_indirects", (getter) PY_defstr_get_n_indirects, NULL, PY_defstr_doc_n_indirects, NULL},
-    {"is_indirect", (getter) PY_defstr_get_is_indirect, NULL, PY_defstr_is_indirect, NULL},
-    {"convert", (getter) PY_defstr_get_convert, NULL, PY_defstr_doc_convert, NULL},
-    {"onescmp", (getter) PY_defstr_get_onescmp, NULL, PY_defstr_doc_onescmp, NULL},
-    {"unsgned", (getter) PY_defstr_get_unsgned, NULL, PY_defstr_doc_unsgned, NULL},
-    {"order_flag", (getter) PY_defstr_get_order_flag, NULL, PY_defstr_doc_order_flag, NULL},
-    {NULL}};
-
-#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

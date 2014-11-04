@@ -307,6 +307,32 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PYTHON_UNKNOWN_MEMBER - handle unknown action case
+ *                       - FL is 1 for get action
+ *                       - and 2 for set action
+ */
+
+static void python_unknown_member(FILE *fc, char *pm, char *mty, int fl)
+   {
+
+/* for get methods */
+    if (fl == 1)
+       {fprintf(fc, "/* unknown get '%s' member '%s' */\n",mty, pm);
+        fprintf(fc, "    {PyErr_SetString(PyExc_NotImplementedError, \"%s\");\n",
+		pm);
+	fprintf(fc, "     rv = NULL;};\n");}
+
+/* for set methods */
+    else
+       {fprintf(fc, "/* unknown set '%s' member '%s' */\n", mty, pm);
+	fprintf(fc, "    PyErr_SetString(PyExc_NotImplementedError, \"%s\");\n",
+		pm);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PYTHON_C_STRUCT_DEF - emitter for struct defs info belonging
  *                     - in the C file
  */
@@ -386,8 +412,12 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 fprintf(fc, "   {PyObject *rv;\n");
 	 fprintf(fc, "\n");
 
+/* if member is a function pointer */
+	 if (strstr(pm, "(*") != NULL)
+	    python_unknown_member(fc, pm, mty, 1);
+
 /* if member is 'char *' */
-	 if (strcmp(mty, "char *") == 0)
+	 else if (strcmp(mty, "char *") == 0)
 	    fprintf(fc, "    rv = Py_BuildValue(\"s\", self->pyo->%s);\n",
 		    mnm);
 
@@ -399,8 +429,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	    {if (IS_NULL(mdm) == TRUE)
 	        fprintf(fc, "    rv = PY_INT_LONG(self->pyo->%s);\n", mnm);
 	     else
-	        fprintf(fc, "    rv = NULL;     /* unknown '%s' array '%s' */\n",
-			mty, pm);}
+                python_unknown_member(fc, pm, mty, 1);}
 
 /* if member is floating point type */
 	 else if ((strcmp(mty, "float") == 0) ||
@@ -408,8 +437,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	    {if (IS_NULL(mdm) == TRUE)
 	        fprintf(fc, "    rv = PyFloat_FromDouble(self->pyo->%s);\n", mnm);
 	     else
-	        fprintf(fc, "    rv = NULL;     /* unknown '%s' array '%s' */\n",
-			mty, pm);}
+                python_unknown_member(fc, pm, mty, 1);}
 
 /* if member is pointer to a known bound type */
          else if (python_lookup_bound_type(bty) == TRUE)
@@ -428,7 +456,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* unknown member action */
 	 else
-            fprintf(fc, "    rv = NULL;     /* unknown member action '%s' */\n", pm);
+	    python_unknown_member(fc, pm, mty, 1);
 
 	 fprintf(fc, "\n");
 	 fprintf(fc, "    return(rv);}\n");
@@ -474,8 +502,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 		  (strcmp(mty, "long") == 0) ||
 		  (strcmp(mty, tykind[TK_ENUM]) == 0))
 	    {if (IS_NULL(mdm) == FALSE)
-	        fprintf(fc, "    {}; /* unknown '%s' array '%s' */\n",
-			mty, pm);
+                python_unknown_member(fc, pm, mty, 2);
 	     else
 	        {fprintf(fc, "       {int ok;\n");
 		 fprintf(fc, "        long lv;\n");
@@ -489,8 +516,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 else if ((strcmp(mty, "float") == 0) ||
 		  (strcmp(mty, "double") == 0))
 	    {if (IS_NULL(mdm) == FALSE)
-	        fprintf(fc, "    {}; /* unknown '%s' array '%s' */\n",
-			mty, pm);
+                python_unknown_member(fc, pm, mty, 2);
 	     else
 	        {fprintf(fc, "       {int ok;\n");
 	         fprintf(fc, "        double dv;\n");
@@ -517,13 +543,11 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* if member is pointer */
          else if (nind > 0)
-	    fprintf(fc, "       rv = -1;     /* unknown pointer '%s' */\n",
-		    pm);
+	    python_unknown_member(fc, pm, mty, 2);
 
 /* unknown member action */
 	 else
-            fprintf(fc, "       rv = -1;     /* unknown member action '%s' */\n",
-		    pm);
+	    python_unknown_member(fc, pm, mty, 2);
 
          fprintf(fc, "\n");
 
@@ -936,7 +960,9 @@ static void python_wrap_local_assn(FILE *fc, fdecl *dcl, char *pfn, char *kw)
 	fprintf(fc, "                                     %s);\n", arg);
 
 	fprintf(fc, "    if (ok == FALSE)\n");
-	fprintf(fc, "       return(NULL);\n");
+        fprintf(fc, "       {PyErr_SetString(PP_error_user, \"%s\");\n",
+		cfn);
+	fprintf(fc, "        return(NULL);};\n");
 	fprintf(fc, "\n");};
 
     return;}
@@ -985,7 +1011,10 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 
     if (voidf == FALSE)
        {cs_type(dty, BFLRG, &dcl->proto, TRUE);
-	vstrcat(a, BFLRG, "\t\t\t%s, &_rv,\n", dty);};
+	if (strcmp(dty, "SC_CHAR_I") == 0)
+	   vstrcat(a, BFLRG, "\t\t\t%s, _rv,\n", dty);
+	else
+	   vstrcat(a, BFLRG, "\t\t\t%s, &_rv,\n", dty);};
 
 /* make up the list arguments */
     if (nr > 0)
