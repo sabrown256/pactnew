@@ -149,9 +149,26 @@ else if ($knd == git) then
    if ("$srcdate" != "") then
 
       set dt = ( `date -d $srcdate '+%b %e'` )
+      set yr = ( `date -d $srcdate '+%Y'` )
       cd $base
 
-      set inf = ( `git log | grep -B 2 "$dt"` )
+# GOTCHA: something like this is needed to get the revision
+# nearest the given date
+# set dt = ( `date -d "$srcdate" '+%Y %m %d'`)
+# set y = $dt[1]
+# set m = $dt[2]
+# set d = $dt[3]
+# 
+# git log | grep -B 2 "$y" | grep -v Author | \
+# awk '$1 == "commit" { tag = $2 }            \
+#      $1 == "Date:"  { "date -d \""$3" "$4" "$6" "$5"\" \"+%Y %m %d\""|getline dt } \
+#      $1 == "--" { printf("%s %s\n", dt, tag); }'                 | \
+# awk '$2 > "'$m'" { lm = $2 ; ld = $3 ; lt = $4}                    \
+#      $2 == "'$m'" && $3 > "'$d'" { lm = $2 ; ld = $3 ; lt = $4 }   \
+#      $2 == "'$m'" && $3 == "'$d'" { lm = $2 ; ld = $3 ; lt = $4 }  \
+#      END { printf("%s/%s/%s %s\n", '$y', lm, ld, lt); }'
+
+      set inf = ( `git log | grep -B 2 "$dt " | grep -B 2 "$yr"` )
       if ($#inf > 1) then
          set tag = $inf[2]
          echo "---------------------------"

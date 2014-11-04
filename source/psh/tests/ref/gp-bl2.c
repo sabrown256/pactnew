@@ -31,8 +31,7 @@ PyObject *_PY_fbcv1(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb, &_lc, &_ld, &_le, &_lf);
     if (ok == FALSE)
-       {PyErr_SetString(PP_error_user, "fbcv1");
-        return(NULL);};
+       return(NULL);
 
     _rv = fbcv1(_la, _lb, _lc, _ld, _le, _lf);
     _lo = Py_BuildValue("s",
@@ -60,8 +59,7 @@ PyObject *_PY_fbmcv1(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb, &_lc, &_ld);
     if (ok == FALSE)
-       {PyErr_SetString(PP_error_user, "fbmcv1");
-        return(NULL);};
+       return(NULL);
 
     _rv = fbmcv1(_la, _lb, _lc, _ld);
     _lo = Py_BuildValue("s",
@@ -89,8 +87,7 @@ PyObject *_PY_fbmcr2(PyObject *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la, &_lb, &_lc, &_ld);
     if (ok == FALSE)
-       {PyErr_SetString(PP_error_user, "fbmcr2");
-        return(NULL);};
+       return(NULL);
 
     _rv = fbmcr2(_la, _lb, _lc, _ld);
     _lo = Py_BuildValue("s",

@@ -813,8 +813,9 @@ static PyObject *PY_hasharr_tp_repr(PY_hasharr *self)
 
     h = _PP_unpack_hasharr(self->pyo, 1L);
     if (h == NULL)
-       {rv = Py_None;
-	Py_INCREF(rv);}
+       {PyErr_SetString(PyExc_TypeError,
+			"bad hasharr in repr");
+	rv = NULL;}
     else
        {rv = PyObject_Repr(h);
 	Py_DECREF(h);};
@@ -847,45 +848,6 @@ static int PY_hasharr_tp_init(PY_hasharr *self,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PP_UNPACK_HASHARR - */
-
-PyObject *_PP_unpack_hasharr(void *p, long nitems)
-   {int ierr;
-    long i;
-    char *nm;
-    hasharr *tab;
-    PyObject *dict, *item;
-
-    ierr = 0;
-    tab = (hasharr *) p;
-    if (tab == NULL)
-       {dict = Py_None;
-        Py_INCREF(dict);}
-
-    else
-       {dict = PyDict_New();
-	if (dict != NULL)
-	   {for (i = 0; SC_hasharr_next(tab, &i, &nm, NULL, (void **) &item); i++)
-
-/* GOTCHA: ask Lee Taylor */
-	        {if (item == NULL)
-		    ierr = -1;
-		  else if (item->ob_type == NULL)
-		    ierr = PyDict_SetItemString(dict, nm, Py_None);
-		 else
-		    ierr = PyDict_SetItemString(dict, nm, item);
-		 if (ierr < 0)
-		    break;};
-
-	    if (ierr < 0)
-	       {Py_DECREF(dict);
-		dict = NULL;};};};
-    
-    return(dict);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PP_UNPACK_HASHARR_HAELEM - */
 
 PyObject *PP_unpack_hasharr_haelem(char *type, void *vr)
@@ -913,6 +875,43 @@ PyObject *PP_unpack_hasharr_haelem(char *type, void *vr)
 	_PD_rl_dimensions(dims);};
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PP_UNPACK_HASHARR - */
+
+PyObject *_PP_unpack_hasharr(void *p, long nitems)
+   {int ierr;
+    long i;
+    char *nm, *ty;
+    void *df;
+    hasharr *tab;
+    PyObject *dict, *item;
+
+    ierr = 0;
+    tab = (hasharr *) p;
+    if (tab == NULL)
+       {dict = Py_None;
+        Py_INCREF(dict);}
+
+    else
+       {dict = PyDict_New();
+	if (dict != NULL)
+	   {for (i = 0; SC_hasharr_next(tab, &i, &nm, &ty, &df); i++)
+	        {item = PP_unpack_hasharr_haelem(ty, df);
+		 if (item == NULL)
+		    ierr = -1;
+		 else
+		    ierr = PyDict_SetItemString(dict, nm, item);
+		 if (ierr < 0)
+		    break;};
+
+	    if (ierr < 0)
+	       {Py_DECREF(dict);
+		dict = NULL;};};};
+    
+    return(dict);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

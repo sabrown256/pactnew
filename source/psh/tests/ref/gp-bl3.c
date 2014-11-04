@@ -27,12 +27,11 @@ PyObject *_PY_fe1(PY_str *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_la1, &_la2);
     if (ok == FALSE)
-       {PyErr_SetString(PP_error_user, "fe1");
-        return(NULL);};
+       return(NULL);
 
     _rv = fe1(_la1, _la2);
     _lo = Py_BuildValue("O",
-                        &_rv);
+                        _rv);
 
     return(_lo);}
 
@@ -57,8 +56,7 @@ PyObject *_PY_fe2(PY_str *self, PyObject *args, PyObject *kwds)
                                      kw_list,
                                      &_ldev, &_lx, &_ly, &_ln, &_linfo, &_ll);
     if (ok == FALSE)
-       {PyErr_SetString(PP_error_user, "fe2");
-        return(NULL);};
+       return(NULL);
 
     fe2(_ldev, _lx, _ly, _ln, _linfo, _ll);
 
@@ -134,10 +132,10 @@ static PyObject *PY_str_get(PY_str *self, void *context)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *PY_str_get_nc(PY_str *self, void *context)
+static PyObject *PY_str_get_n(PY_str *self, void *context)
    {PyObject *rv;
 
-    rv = PY_INT_LONG(self->pyo->nc);
+    rv = PY_INT_LONG(self->pyo->n);
 
     return(rv);}
 
@@ -154,7 +152,7 @@ static PyObject *PY_str_get_s(PY_str *self, void *context)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static int PY_str_set_nc(PY_str *self,
+static int PY_str_set_n(PY_str *self,
                    PyObject *value, void *context)
    {int rv;
 
@@ -170,7 +168,7 @@ static int PY_str_set_nc(PY_str *self,
 
         ok = PyArg_Parse(value, "l", &lv);
         if (ok == TRUE)
-           {self->pyo->nc = lv;
+           {self->pyo->n = lv;
             rv = 0;};};
 
     return(rv);}
@@ -211,7 +209,7 @@ static int PY_str_tp_init(PY_str *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 
 static char
- PY_str_doc_nc[] = "",
+ PY_str_doc_n[] = "",
  PY_str_doc_s[] = "",
  PY_str_doc[] = "";
 
@@ -220,7 +218,7 @@ static char
 
 PyGetSetDef PY_str_getset[] = {
     {"str", (getter) PY_str_get, NULL, PY_str_doc, NULL},
-    {"nc", (getter) PY_str_get_nc, (setter) PY_str_set_nc, PY_str_doc_nc, NULL},
+    {"n", (getter) PY_str_get_n, (setter) PY_str_set_n, PY_str_doc_n, NULL},
     {"s", (getter) PY_str_get_s, (setter) PY_str_set_s, PY_str_doc_s, NULL},
 #ifdef PY_EXT_GETSET_STR
     PY_EXT_GETSET_STR
