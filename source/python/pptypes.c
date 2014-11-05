@@ -788,6 +788,13 @@ PP_type_entry *PP_inquire_object(PP_file *fileinfo, PyObject *obj)
     PP_type_entry *entry;
     PyTypeObject *tp;
 
+    entry = NULL;
+    for (tp = PY_TYPE(obj); tp != NULL; tp = tp->tp_base) {
+        entry = (PP_type_entry *) SC_hasharr_def_lookup(fileinfo->object_map, tp);
+        if (entry != NULL)
+            break;
+    }
+
     return(entry);
 }
 
@@ -951,7 +958,11 @@ void PP_init_type_map_basic(PP_file *fileinfo)
         PP_INSTANCE_I,                   /* typecode */
         FALSE,                           /* sequence */
         NULL,                            /* descr */
+#if PY_MAJOR_VERSION >= 3
+        NULL,                            /* otype */
+#else
         &PyInstance_Type,                /* otype */
+#endif
         NULL, /*_PP_pack_instance, */              /* pack */
         NULL, /* _PP_unpack_instance, */            /* unpack */
         _PP_get_instance_descr           /* get_descr */

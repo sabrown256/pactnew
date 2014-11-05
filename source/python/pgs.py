@@ -5,4 +5,4 @@
 # include cpyright.h
 #
 
-from _pgs import *
+from ._pgs import *

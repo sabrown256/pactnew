@@ -126,6 +126,7 @@ flog $Log $RM $lpy_pact/*.o
 
 # link PyPDB
 
+Separator $Log
 NoteD $Log -n "   Linking pdb ..... "
 Note $Log ""
 
@@ -170,6 +171,7 @@ endif
 
 # link PyPGS
 
+Separator $Log
 NoteD $Log -n "   Linking pgs ..... "
 Note $Log ""
 
@@ -211,6 +213,7 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+Separator $Log
 flog $Log ls -l
 flog $Log popd
 
@@ -234,6 +237,7 @@ endif
 #--------------------------------------------------------------------------
 
 if ($Test == TRUE) then
+   Separator $Log
    NoteD $Log -n "   Testing ......... "
    Note $Log ""
    flog $Log setenv PYTHONPATH $lpy_path

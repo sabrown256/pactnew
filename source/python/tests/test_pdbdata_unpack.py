@@ -74,7 +74,8 @@ class Double(test_leak.LeakVif):
     def testb1(self):
         """create a C double from an python long"""
         d2 = struct.pack('d', 4.0)
-        d = pdb.pdbdata('double', 4L)
+#        d = pdb.pdbdata('double', 4L)
+        d = pdb.pdbdata('double', 4)
         self.failUnlessEqual(str(d2), str(d))
         o = pdb.unpack(d)
         self.failUnlessEqual(o, 4.0)

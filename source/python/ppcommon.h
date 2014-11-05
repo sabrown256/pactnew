@@ -19,6 +19,8 @@
 
 # define cmpfunc                    void *
 
+# define PY_ARG_KEY                 METH_VARARGS | METH_KEYWORDS 
+
 # define PY_HEAD_INIT(_t, _s)       PyVarObject_HEAD_INIT(_t, _s)
 # define PY_TYPE(_o)                Py_TYPE(_o)
 # define PY_TYPE_TYPE               PyType_Type
@@ -64,6 +66,8 @@ PyMODINIT_FUNC PyInit_##_nm(void)                                           \
     {_gb, _rb}
 
 #else
+
+# define PY_ARG_KEY                 METH_KEYWORDS 
 
 # define PY_HEAD_INIT(_t, _s)       PyObject_HEAD_INIT(_t) _s,
 # define PY_TYPE(_o)                (((PyObject *) (_o))->ob_type)

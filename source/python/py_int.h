@@ -23,6 +23,7 @@
 
 #include <Python.h>
 #undef HAVE_GETHOSTBYNAME
+#undef HAVE_MMAP
 #include "sx_int.h"
 #include "scope_hash.h"
 #include <pputil.h>

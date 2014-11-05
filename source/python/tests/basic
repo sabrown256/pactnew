@@ -17,9 +17,20 @@ set msg = "Basic Test ....................."
    Note $Log ""
 
    Note $Log "PYTHONPATH = $PYTHONPATH"
+   Note $Log "PYTHON     = $PYTHON"
+   flog $Log ls -l pact_test
 
    flog $Log $CROSS_FE $PYTHON $FilesDir/basic.py
-   set xstatus = $status
+   @ xstatus = $status
+
+   set inf = ( `grep 'FAILED (' $Log | sed 's|[()=]| |g'` )
+   if ("$inf" != "") then
+      if ($#inf > 4) then
+         @ xstatus = $xstatus + $inf[3] + $inf[5]
+      else if ($#inf > 2) then
+         @ xstatus = $xstatus + $inf[3]
+      endif
+   endif
 
    flog $Log touch foo.pyc
    set rpf = ( *.pyc )

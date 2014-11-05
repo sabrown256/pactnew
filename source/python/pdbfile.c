@@ -8,7 +8,6 @@
 #include "gp-pdb.h"
 
 static char
- PY_PDBfile_flush_doc[] = "",
  PY_PDBfile_close_doc[] = "",
  PY_PDBfile_write_doc[] = "",
  PY_PDBfile_write_raw_doc[] = "",
@@ -382,11 +381,10 @@ static PyObject *PY_PDBfile_defstr(PY_PDBfile *self,
 
 static PyObject *PY_PDBfile_ls(PY_PDBfile *self,
 			       PyObject *args, PyObject *kwds)
-   {int ierr, num;
+   {int num;
     char *path, *type;
     char **out;
-    Py_ssize_t i;
-    PyObject *rv, *item;
+    PyObject *rv;
     PDBfile *fp;
     char *kw_list[] = {"path", "type", NULL};
 
@@ -398,28 +396,8 @@ static PyObject *PY_PDBfile_ls(PY_PDBfile *self,
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "|zz:ls", kw_list,
 				    &path, &type))
-       {if (fp == NULL)
-	   PP_error_set_user(NULL, "file is not open");
-
-	else
-	   {out  = PD_ls(fp, path, type, &num);
-	    ierr = 0;
-
-	    rv = PyTuple_New(num);
-	    for (i = 0; i < num; i++)
-	        {item = PY_STRING_STRING(out[i]);
-		 if (item == NULL)
-		    {ierr = -1;
-		     break;};
-		 ierr = PyTuple_SetItem(rv, i, item);
-		 if (ierr < 0)
-		    break;};
-
-	    if (ierr < 0)
-	       {Py_DECREF(rv);
-		rv = NULL;};
-
-	    CFREE(out);};};
+       {out = PD_ls(fp, path, type, &num);
+	rv  = PY_strings_tuple(out, num, TRUE);};
 
     return(rv);}
 
@@ -584,7 +562,7 @@ PyObject *PY_PDBfile_get_mode_alt(PY_PDBfile *self, void *context)
 
 static PyMethodDef
  PY_PDBfile_methods[] = {
-{"flush", (PyCFunction)PY_PDBfile_flush, METH_NOARGS, PY_PDBfile_flush_doc},
+ _PYD_PD_flush,
 {"close", (PyCFunction)PY_PDBfile_close, METH_NOARGS, PY_PDBfile_close_doc},
 {"write", (PyCFunction)PY_PDBfile_write, METH_KEYWORDS, PY_PDBfile_write_doc},
 {"write_raw", (PyCFunction)PY_PDBfile_write_raw, METH_KEYWORDS, PY_PDBfile_write_raw_doc},

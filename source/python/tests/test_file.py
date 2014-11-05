@@ -286,10 +286,10 @@ class File(test_leak.Leak):
         '''PDBfile - directories, on closed file'''
         fp = pdb.PDBfile("testfile", "w")
         fp.close()
-        self.failUnlessEqual(fp.cd('/'), 0)
         self.failUnlessEqual(fp.pwd(), None)
         self.failUnlessEqual(fp.mkdir('foo'), 0)
-#        self.failUnlessRaises(pdb.error, fp.ls)
+        self.failUnlessEqual(fp.cd('/'), 0)
+        self.failUnlessEqual(fp.ls(), None)
 
     def test9(self):
         '''PDBfile - links'''
