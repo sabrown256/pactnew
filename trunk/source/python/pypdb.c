@@ -742,33 +742,7 @@ PyObject *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
     if (dpobj == NULL)
         return(NULL);
 
-    dp = dpobj->pyo;
-
-#if 0
-    switch (PP_num_indirection(type)) {
-    case 0:
-        dp = (defstr *) SC_hasharr_def_lookup(file->host_chart, type);
-        break;
-    case 1:
-        dtype = SC_dereference(CSTRSAVE(type));
-        dp = (defstr *) SC_hasharr_def_lookup(file->host_chart, dtype);
-        vr = DEREF(vr);
-        CFREE(dtype);
-        break;
-    default:
-        PP_error_set_user(NULL, "Too many levels of indirection: %s",
-                          type);
-        return(NULL);
-        break;
-    }
-
-    if (dp == NULL) {
-        PP_error_set_user(NULL, "Type %s is not in file %s", type,
-                          file->name);
-        return(NULL);
-    }
-#endif
-    
+    dp  = dpobj->pyo;
     svr = vr;
 
     for (desc = dp->members; desc != NULL; desc = desc->next) {
@@ -790,12 +764,6 @@ PyObject *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
             svr += desc->member_offs;
             obj = PP_form_object(svr, ttype, desc->number, desc->dimensions,
                                  dp, fileinfo, dpobj, parent, &form);
-                
-#if 0
-            obj =
-                _PP_wr_syment(fileinfo, ttype, desc->dimensions,
-                              desc->number, svr, &form);
-#endif
             break;
         }
     }

@@ -59,10 +59,6 @@ PP_file
 PY_PDBfile *PP_vif_obj;
 PyObject *PP_open_file_dict;
 
-#if 0
-static PP_type_entry *_tc_to_entry[PP_NUM_TYPES];
-#endif
-
 PP_form
     PP_global_form;
 
@@ -684,9 +680,6 @@ void PP_register_type(PP_file *fileinfo, PP_type_entry *entry)
     SC_hasharr_install(fileinfo->type_map, entry->descr->type, entry,
 		       XX_OBJECT_MAP_S, 3, -1);
 
-#if 0
-    _tc_to_entry[entry->typecode] = entry;
-#endif
 }
 
 /*--------------------------------------------------------------------------*/
@@ -795,17 +788,6 @@ PP_type_entry *PP_inquire_object(PP_file *fileinfo, PyObject *obj)
     PP_type_entry *entry;
     PyTypeObject *tp;
 
-#if 0
-    entry = (PP_type_entry *) SC_hasharr_def_lookup(fileinfo->object_map, PY_TYPE(obj));
-#else
-    entry = NULL;
-    for (tp = PY_TYPE(obj); tp != NULL; tp = tp->tp_base) {
-        entry = (PP_type_entry *) SC_hasharr_def_lookup(fileinfo->object_map, tp);
-        if (entry != NULL)
-            break;
-    }
-#endif
-    
     return(entry);
 }
 
@@ -1319,21 +1301,7 @@ int PP_make_data(PyObject *obj, PP_file *fileinfo, char *type,
     int ierr;
     long nitems;
     void *pv;
-#if 0
-    static PP_type_entry *scoredata_entry = NULL;
 
-    if (PP_scoredata_Check(obj)) {
-        /* XXXX - note: this is a total hack */
-        if (scoredata_entry == NULL)
-            scoredata_entry = PP_inquire_object(fileinfo, obj);
-        nitems = 1L;            /* XXXX - compute from dims ? */
-        ierr = PP_get_object_data(obj, scoredata_entry, nitems, &pv, TRUE);
-        if (ierr == 0) {
-            SC_mark(pv, 1);
-        }
-        DEREF(vr) = pv;
-    } else {
-#endif
         nitems = _PD_comp_num(dims);
 
         ierr = PP_alloc_data(type, nitems, fileinfo, &pv);
@@ -1440,26 +1408,6 @@ static int _PP_get_sequence_descr_work(PP_file *fileinfo, PyObject *obj, int nd,
             }
         }
 
-#if 0
-        if (descr->dims != NULL) {
-            /* the object itself is a sequence */
-#if 0
-            PP_error_set_user(NULL, "_PP_get_sequence_descr_work does not accept sequences: %s", PY_TYPE(obj)->tp_name);
-            rv = -1;
-#else
-            if (nd >= MAXDIM) {
-                PP_error_set_user(NULL, "Sequences nested too deeply, max %d", MAXDIM);
-                return -1;
-            }
-            nitems = _PD_comp_num(descr->dims);
-            if (seqinfo->dims[nd] == 0) {
-                seqinfo->dims[nd] = nitems;
-            } else if (seqinfo->dims[nd] != nitems) {
-                seqinfo->dims[nd] = -1;
-            }
-#endif
-        }
-#endif
         _PP_rl_descr(descr);
     } else if (PySequence_Check(obj) == 0) {
         PP_error_set_user(obj, "cannot get PACT type");

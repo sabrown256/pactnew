@@ -85,7 +85,7 @@ static PyObject *_PY_pcons_unpack(void *p, long nitems)
 /*--------------------------------------------------------------------------*/
 
 /* _PY_PCONS_UPDATE - update an pcons list from a dictionary.
- *   Note: pcons also support the dictionary protocol.
+ *                  - NOTE: pcons also support the dictionary protocol.
  */
 
 static int _PY_pcons_update(pcons **in, PyObject *dict)
@@ -117,7 +117,8 @@ static int _PY_pcons_update(pcons **in, PyObject *dict)
             break;};
 
 	 if (descr->data == NULL)
-	    {err = PP_make_data(value, PP_vif_info, descr->type, descr->dims, &vr);
+	    {err = PP_make_data(value, PP_vif_info,
+				descr->type, descr->dims, &vr);
 	     if (err == -1)
                 break;}
 	 else
@@ -154,13 +155,8 @@ static int _PY_pcons_update(pcons **in, PyObject *dict)
 static char PY_pcons_clear_doc[] = "";
 
 static PyObject *PY_pcons_clear(PY_pcons *self,
-				PyObject *args,
-				PyObject *kwds)
+				PyObject *args, PyObject *kwds)
    {
-
-#if 0
-    PD_clear(self->pyo);
-#endif
 
     Py_INCREF(Py_None);
 
@@ -172,8 +168,7 @@ static PyObject *PY_pcons_clear(PY_pcons *self,
 static char PY_pcons_has_key_doc[] = "";
 
 static PyObject *PY_pcons_has_key(PY_pcons *self,
-				  PyObject *args,
-				  PyObject *kwds)
+				  PyObject *args, PyObject *kwds)
    {long ok;
     char *key;
     pcons *alist, *pa;
@@ -206,8 +201,7 @@ static PyObject *PY_pcons_has_key(PY_pcons *self,
 static char PY_pcons_items_doc[] = "";
 
 static PyObject *PY_pcons_items(PY_pcons *self,
-				PyObject *args,
-				PyObject *kwds)
+				PyObject *args,	PyObject *kwds)
    {char *s;
     pcons *pa, *c;
     Py_ssize_t nitems, i;
@@ -244,8 +238,7 @@ static PyObject *PY_pcons_items(PY_pcons *self,
 static char PY_pcons_keys_doc[] = "";
 
 static PyObject *PY_pcons_keys(PY_pcons *self,
-			       PyObject *args,
-			       PyObject *kwds)
+			       PyObject *args, PyObject *kwds)
    {int err;
     char *s;
     pcons *pa, *c;
@@ -277,8 +270,7 @@ static PyObject *PY_pcons_keys(PY_pcons *self,
 static char PY_pcons_update_doc[] = "";
 
 static PyObject *PY_pcons_update(PY_pcons *self,
-				 PyObject *args,
-				 PyObject *kwds)
+				 PyObject *args, PyObject *kwds)
    {int err;
     pcons *alist;
     PyObject *dict;
@@ -304,8 +296,7 @@ static PyObject *PY_pcons_update(PY_pcons *self,
 static char PY_pcons_values_doc[] = "";
 
 static PyObject *PY_pcons_values(PY_pcons *self,
-				 PyObject *args,
-				 PyObject *kwds)
+				 PyObject *args, PyObject *kwds)
    {
 
     PyErr_SetString(PyExc_NotImplementedError, "values");
@@ -318,8 +309,7 @@ static PyObject *PY_pcons_values(PY_pcons *self,
 static char PY_pcons_get_doc[] = "";
 
 static PyObject *PY_pcons_get(PY_pcons *self,
-			      PyObject *args,
-			      PyObject *kwds)
+			      PyObject *args, PyObject *kwds)
    {
 
     PyErr_SetString(PyExc_NotImplementedError, "get");
@@ -431,12 +421,6 @@ static int PY_pcons_mp_ass_subscript(PyObject *_self,
     pcons *alist;
     PY_pcons *self = (PY_pcons *) _self;
     
-#if 0
-    if (!PY_STRING_CHECK(key))
-       {PP_user_error(PP_score_errorObject, key, "key must be string");
-        return(-1);};
-#endif
-
     name = PY_STRING_AS_STRING(key);
     
     alist = self->pyo;

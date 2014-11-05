@@ -31,11 +31,12 @@ if (-d ../../python) then
    NoteD $ALog "   Python: "
    Note $ALog ""
 
-   dbmget $ALog Python_Exe      =\? "python"^  \
-                Python_Path     =\? ""^        \
-                Python_CC_Exe   =\? "gcc"^     \
-                CC_Exe^                        \
-                PACT_CC_VERSION^               \
+   dbmget $ALog Python_Exe       =\? "python"^  \
+                Python_Path      =\? ""^        \
+                Python_CC_Exe    =\? "gcc"^     \
+                MAKE_Shared_Libs =\? "FALSE"^   \
+                CC_Exe^                         \
+                PACT_CC_VERSION^                \
                 HSY_OS_Name
 
    Note $ALog ""
@@ -70,6 +71,7 @@ if (-d ../../python) then
 
       foreach py ( `echo $Python_Exe | sed 's/,/ /g'` )
 
+         Separator $ALog
          set lhave_python     = ""
          set lhave_py_numeric = ""
          set lhave_py_numpy   = ""
@@ -119,7 +121,7 @@ if (-d ../../python) then
 
                @ ok = 0
                set inf = ( `$lpy_exe ../../python/python-info.py |& cat` )
-               Note $ALog "Python info: |$inf|"
+               Note $ALog "Python info: ($#inf) |$inf|"
                if ($#inf > 9) then
                   if ($inf[1] == "Version:") then
                      flog $ALog set lpy_vers = $inf[2]
@@ -294,6 +296,8 @@ if (-d ../../python) then
          set py_dirdst       = ( $py_dirdst       $lpy_dirdst )
          set py_dirsrc       = ( $py_dirsrc       $lpy_dirsrc )
       end
+
+      Separator $ALog
 
       flog $ALog setenv HAVE_PYTHON "$have_python"
 

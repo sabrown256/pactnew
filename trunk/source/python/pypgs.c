@@ -578,17 +578,11 @@ static PyObject *PY_PG_device_set_font(PY_PG_device *self,
     if (PyArg_ParseTupleAndKeywords(args, kwds, "ssi:set_font", kw_list,
 				    &face, &style, &size))
        {
-#if 0
-	int result;
-	result = PG_fset_font(self->pyo, face, style, size);
-	rv = PY_INT_LONG(result);
-#else
 	if (self->pyo != NULL)
 	   {if (self->pyo->set_font != NULL)
 	       self->pyo->set_font(self->pyo, face, style, size);}
 	Py_INCREF(Py_None);
 	rv = Py_None;
-#endif
         };
 
     return(rv);}
