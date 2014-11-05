@@ -5,4 +5,4 @@
 # include cpyright.h
 #
 
-from _pdb import *
+from ._pdb import *

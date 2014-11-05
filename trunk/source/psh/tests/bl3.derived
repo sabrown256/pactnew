@@ -1,7 +1,0 @@
-#
-# BL3.DERIVEDC - exceptional case blang test
-#
-# include "cpyright.h"
-#
-
-struct s_str {long n;  char *s;};

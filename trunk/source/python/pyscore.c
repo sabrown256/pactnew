@@ -683,8 +683,7 @@ static char PY_hasharr_doc_keys[] = "";
 static PyObject *PY_hasharr_keys(PY_hasharr *self,
 				 PyObject *args,
 				 PyObject *kwds)
-   {int ne, err;
-    Py_ssize_t i;
+   {int ne;
     char **names;
     hasharr *ha;
     PyObject *rv;
@@ -702,7 +701,14 @@ static PyObject *PY_hasharr_keys(PY_hasharr *self,
 	    Py_INCREF(rv);}
 
 	else
-	   {rv = PyTuple_New(ne);
+#if 1
+	   {names = SC_hasharr_dump(ha, NULL, NULL, FALSE);
+	    rv    = PY_strings_tuple(names, -1, TRUE);};
+#else
+	   {int err;
+	    Py_ssize_t i;
+
+	    rv = PyTuple_New(ne);
 	    if (rv != NULL)
 	       {names = SC_hasharr_dump(ha, NULL, NULL, FALSE);
 		for (i = 0; i < ne; i++)
@@ -712,8 +718,10 @@ static PyObject *PY_hasharr_keys(PY_hasharr *self,
 			 rv = NULL;
 			 break;};};
 
-		SC_free_strings(names);};};};
-  
+		SC_free_strings(names);};};
+#endif
+      };
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/

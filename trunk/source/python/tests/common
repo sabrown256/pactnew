@@ -12,4 +12,14 @@ setenv Package  python
 setenv Test     $0:t
 source ../../../scripts/test-env
 
+if ($?xv == 1) then
+   set sfx  = $Log:e
+   set nlog = $cwd/log.${Test}-${xv}.$sfx
+   mv $Log $nlog
+   setenv Log $nlog
+   unset sfx
+   unset nlog
+endif
+
 setenv PYTHONPATH $cwd
+

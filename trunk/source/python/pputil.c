@@ -101,6 +101,114 @@ void PY_self_free(void *o)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PY_STRINGS_TUPLE - return a tuple made from a C string array
+ *                  - if NS is less than 0 SA is assumed to be
+ *                  - NULL terminated
+ *                  - if FR is TRUE then SA will be freed
+ */
+
+PyObject *PY_strings_tuple(char **sa, int ns, int fr)
+   {int i, ierr;
+    PyObject *rv, *po;
+
+    if (sa == NULL)
+       {rv = Py_None;
+	Py_INCREF(rv);}
+    else
+       {if (ns < 0)
+	   ns = PS_lst_length(sa);
+
+	ierr = 0;
+
+	rv = PyTuple_New(ns);
+	for (i = 0; (i < ns) && (ierr >= 0); i++)
+	    {po = PY_STRING_STRING(sa[i]);
+	     if (po == NULL)
+	        ierr = -1;
+	     else
+	        ierr = PyTuple_SetItem(rv, i, po);};
+
+	if (ierr < 0)
+	   {Py_DECREF(rv);
+	    rv = NULL;};
+
+	if (fr == TRUE)
+	   PS_free_strings(sa);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+#if 0
+
+/*--------------------------------------------------------------------------*/
+
+/*
+ * METH_KEYWORDS is documented at
+ *  https://docs.python.org/2/c-api/structures.html?highlight=meth_keywords#METH_KEYWORDS
+ *
+ * The other one of interest is METH_NOARGS. This would be used for
+ * function like PD_ls which take no arguments.  Currently, since
+ * there is no call to parse the arguments, it will silently accept
+ * any and all arguments.  By using METH_NOARGS it should complain
+ * if called with arguments before it even reaches the wrapper
+ * around PD_ls.
+ *
+ * Usage:
+ * 
+ * initMOD(void)
+ * {
+ * 
+ * // Create the module and add the functions
+ *     m = Py_InitModule4("basis", PB_methods,
+ *                        PB__doc__,
+ *                        (PyObject*)NULL,PYTHON_API_VERSION);
+ *     if (m == NULL)
+ *         return;
+ * 
+ *     if (add_module_function(m, "name", func, METH_KEYWORDS, doc) != 0)
+ *     return;}
+ *
+ */
+
+int add_module_function(PyObject *m, const char *name, PyCFunction meth,
+			int flags, const char *doc)
+   {int rv;
+    char *modname;
+    PyMethodDef method;
+    PyObject *n, *d, *v;
+
+    rv = -1;
+
+    method.ml_name = name;    /* The name of the built-in function/method */
+    method.ml_meth = meth;    /* The C function that implements it */
+    method.flags   = flags;   /* Combination of METH_xxx flags, which mostly
+                               * describe the args expected by the C func */
+    method.ml_doc  = doc;     /* The __doc__ attribute, or NULL */
+
+    modname = PyModule_GetName(m);
+
+    n = PyString_FromString(modname);
+    if (n != NULL)
+       {d = PyModule_GetDict(m);
+
+	v = PyCFunction_NewEx(&method, NULL, n);
+	if (v != NULL)
+	   {if (PyDict_SetItemString(d, name, v) == 0)
+	       rv = 0;
+
+	    Py_DECREF(v);};
+
+	Py_DECREF(n);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
+/*--------------------------------------------------------------------------*/
+
 /* _PP_Py_DECREF- pact interface to Python reference decrement.
  *  This is used as the delete function when clearing a hash table
  *  of Python objects.
@@ -229,6 +337,7 @@ void PP_free(void *p)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
 /* PP_num_indirection - return number of levels of indirection */
 
 int PP_num_indirection(char *s)

@@ -127,7 +127,8 @@ class Double(test_leak.LeakVif, DataMixin):
     def testb2(self):
         """pack/unpack double scalar from long integer, explicit type"""
         self.work_testc2(
-            input = 4L,
+#            input = 4L,
+            input = 4,
             outtype = 'double',
             s = struct.pack('d', 4.0),
             )

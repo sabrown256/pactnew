@@ -1001,8 +1001,9 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
     char *nm;
     farg *al;
 
-    t[0] = '\0';
-    a[0] = '\0';
+    t[0]   = '\0';
+    a[0]   = '\0';
+    dty[0] = '\0';
 
     nr    = dcl->nr;
     voidf = dcl->voidf;
@@ -1031,10 +1032,13 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 
 /* if the list argument are non empty make up the call */
     if (IS_NULL(a) == FALSE)
-       {py_format(fmt, BFLRG, a, NULL);
-	py_arg(arg, BFLRG, a);
-	snprintf(t, nc, "    _lo = Py_BuildValue(\"%s\",\n", fmt);
-	vstrcat(t, nc,  "                        %s);\n", arg);}
+       {if (strcmp(dty, "SC_STRING_I") == 0)
+	   snprintf(t, nc, "    _lo = PY_strings_tuple(_rv, -1, TRUE);\n");
+        else
+	   {py_format(fmt, BFLRG, a, NULL);
+	    py_arg(arg, BFLRG, a);
+	    snprintf(t, nc, "    _lo = Py_BuildValue(\"%s\",\n", fmt);
+	    vstrcat(t, nc,  "                        %s);\n", arg);};}
     else
        {snprintf(t, nc, "\n");
 	nstrcat(t, nc, "    Py_INCREF(Py_None);\n");

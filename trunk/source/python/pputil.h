@@ -291,6 +291,7 @@ extern dimdes
  *PP_ind_to_dimdes(int nd, long *ind);
 
 extern PyObject
+ *PY_strings_tuple(char **sa, int ns, int fr),
  *PP_dimdes_to_obj(dimdes *dims),
  *_PP_find_file_obj(PDBfile *fp);
 
