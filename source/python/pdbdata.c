@@ -23,6 +23,7 @@ static PyGetSetDef PP_pdbdata_getset[] = {
 };
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 static void
 PP_pdbdata_tp_dealloc(PP_pdbdataObject *self)
@@ -54,6 +55,9 @@ PP_pdbdata_tp_dealloc(PP_pdbdataObject *self)
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.dealloc) */
 }
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static int
 PP_pdbdata_tp_print(PP_pdbdataObject *self, FILE *file, int flags)
 {
@@ -72,6 +76,9 @@ PP_pdbdata_tp_print(PP_pdbdataObject *self, FILE *file, int flags)
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.print) */
 }
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static PyObject *
 PP_pdbdata_tp_str(PP_pdbdataObject *self)
 {
@@ -80,7 +87,6 @@ PP_pdbdata_tp_str(PP_pdbdataObject *self)
     char *str;
     Py_ssize_t size;
 
-#if 1
     if (_PD_indirection(self->type)) {
         str = DEREF(self->data);
         size = SC_arrlen(str);
@@ -89,15 +95,13 @@ PP_pdbdata_tp_str(PP_pdbdataObject *self)
         bpi = _PD_lookup_size(self->type, self->fileinfo->file->host_chart);
         size = bpi * self->nitems;
     }
-#else
-    str = self->data;
-    bpi = _PD_lookup_size(self->type, self->file->host_chart);
-    size = bpi * self->nitems;
-#endif
     
     return PY_STRING_STRING_SIZE(str, size);
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.str) */
 }
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 static int
 PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
@@ -164,12 +168,6 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     
 /*    self->dict = PY_defstr_dict(ts, fp);*/
 
-#if 0
-    dimdes *dims;
-    dims   = NULL;
-    retobj = PP_make_object(fp, vr, number, ts, dims);
-    if (retobj == NULL) return -1;
-#endif
 /*    CFREE(ts);  XXX saved in self */
     _PP_rl_descr(descr);
     
@@ -188,6 +186,8 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     return -1;
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.init) */
 }
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PP_pdbdata_Check - */
@@ -226,27 +226,8 @@ PP_pdbdata_sq_length(PyObject *_self)
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.length) */
 }
 
-#if 0
-static PyObject *
-PP_pdbdata_sq_concat(PyObject *_self, PyObject *obj)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.concat) UNMODIFIED */
-UNDEFINED
-    PP_pdbdataObject self = (PP_pdbdataObject *) _self;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.concat) */
-}
-#endif
-
-#if 0
-static PyObject *
-PP_pdbdata_sq_repeat(PyObject *_self, Py_ssize_t i)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.repeat) UNMODIFIED */
-UNDEFINED
-    PP_pdbdataObject self = (PP_pdbdataObject *) _self;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.repeat) */
-}
-#endif
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 static PyObject *
 PP_pdbdata_sq_item(PyObject *_self, Py_ssize_t i)
@@ -292,6 +273,9 @@ PP_pdbdata_sq_item(PyObject *_self, Py_ssize_t i)
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.item) */
 }
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static PyObject *
 PP_pdbdata_sq_slice(PyObject *_self, Py_ssize_t ilow, Py_ssize_t ihigh)
 {
@@ -322,24 +306,6 @@ PP_pdbdata_sq_slice(PyObject *_self, Py_ssize_t ilow, Py_ssize_t ihigh)
     else if (ihigh > nitems)
         ihigh = nitems;
 
-#if 0
-    if (ilow < 0 || ilow >= nitems) {
-        if (indexerr == NULL)
-            indexerr = PY_STRING_STRING(
-                "pdbdata index out of range");
-        PyErr_SetObject(PyExc_IndexError, indexerr);
-        return NULL;
-    }
-
-    if (ihigh < 0 || ihigh >= nitems) {
-        if (indexerr == NULL)
-            indexerr = PY_STRING_STRING(
-                "pdbdata index out of range");
-        PyErr_SetObject(PyExc_IndexError, indexerr);
-        return NULL;
-    }
-#endif
-    
     form = &PP_global_form;
 
     nitems = ihigh - ilow;
@@ -355,6 +321,9 @@ PP_pdbdata_sq_slice(PyObject *_self, Py_ssize_t ilow, Py_ssize_t ihigh)
 
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.slice) */
 }
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 static int
 PP_pdbdata_sq_ass_item(PyObject *_self, Py_ssize_t i, PyObject *v)
@@ -388,50 +357,8 @@ PP_pdbdata_sq_ass_item(PyObject *_self, Py_ssize_t i, PyObject *v)
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.ass_item) */
 }
 
-#if 0
-static int
-PP_pdbdata_sq_ass_slice(PyObject *_self, Py_ssize_t ilow, Py_ssize_t ihigh, PyObject *v)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.ass_slice) UNMODIFIED */
-UNDEFINED
-    PP_pdbdataObject self = (PP_pdbdataObject *) _self;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.ass_slice) */
-}
-#endif
-
-#if 0
-static int
-PP_pdbdata_sq_contains(PyObject *_self, PyObject *key)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.contains) UNMODIFIED */
-UNDEFINED
-    PP_pdbdataObject self = (PP_pdbdataObject *) _self;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.contains) */
-}
-#endif
-
-#if 0
-static PyObject *
-PP_pdbdata_sq_inplace_concat(PyObject *_self, PyObject *obj)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.inplace_concat) UNMODIFIED */
-UNDEFINED
-    PP_pdbdataObject self = (PP_pdbdataObject *) _self;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.inplace_concat) */
-}
-#endif
-
-#if 0
-static PyObject *
-PP_pdbdata_sq_inplace_repeat(PyObject *_self, Py_ssize_t i)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.inplace_repeat) UNMODIFIED */
-UNDEFINED
-    PP_pdbdataObject self = (PP_pdbdataObject *) _self;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.inplace_repeat) */
-}
-#endif
-
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 static PySequenceMethods PP_pdbdata_as_sequence = {
         PP_pdbdata_sq_length,           /* sq_length */
@@ -474,6 +401,9 @@ PP_pdbdata_bf_getreadbuffer(PyObject *_self, Py_ssize_t segment, void **ptrptr)
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_buffer.getreadbuffer) */
 }
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static Py_ssize_t
 PP_pdbdata_bf_getwritebuffer(PyObject *_self, Py_ssize_t segment, void **ptrptr)
 {
@@ -493,6 +423,9 @@ PP_pdbdata_bf_getwritebuffer(PyObject *_self, Py_ssize_t segment, void **ptrptr)
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_buffer.getwritebuffer) */
 }
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static Py_ssize_t
 PP_pdbdata_bf_getsegcount(PyObject *_self, Py_ssize_t *lenp)
 {
@@ -502,6 +435,9 @@ PP_pdbdata_bf_getsegcount(PyObject *_self, Py_ssize_t *lenp)
     return 1;
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_buffer.getsegcount) */
 }
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 static Py_ssize_t
 PP_pdbdata_bf_getcharbuffer(PyObject *_self, Py_ssize_t segment, char **ptrptr)

@@ -67,17 +67,3 @@ typedef enum e_PD_instr_kind PD_instr_kind;
          PP_error_set_user(NULL, "UNDECIDABLE CASE");                        \
          return ret;};}
 
-
-#if 0
-/* also in pputil.h */
-#define PP_CAST_TYPE(t, d, vg, vl, err_obj, ret_val)                         \
-    {if (d->cast_offs < 0L)                                                  \
-        t = d->type;                                                         \
-     else                                                                    \
-        {t = DEREF(vl + d->cast_offs);                                       \
-         if (t == NULL)                                                      \
-            {if (DEREF(vg) != NULL)                                          \
-                {PP_error_set_user(err_obj, "bad cast");return ret_val;}     \
-             else                                                            \
-                t = d->type;};};}
-#endif

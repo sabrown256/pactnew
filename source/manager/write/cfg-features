@@ -100,10 +100,10 @@ if ($python == TRUE) then
    if (("$pyexe" != "") || ("$pydir" != "")) then
       echo "Group Python {" >> $outf
       if ("$pyexe" != "") then
-         echo "   Exe  = $pyexe" >> $outf
+         echo "   Exe  ?= $pyexe" >> $outf
       endif
       if ("$pydir" != "") then
-         echo "   Path = $pydir" >> $outf
+         echo "   Path ?= $pydir" >> $outf
       endif
       echo "}" >> $outf
    endif

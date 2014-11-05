@@ -216,11 +216,8 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
         DEBUG_RD("LEAF", litype, nitems, obj);
 
         /* read a basic type */
-#if 1
         entry = PP_inquire_type(fileinfo, litype);
-#else
-        entry = PP_inquire_object(fileinfo, obj);
-#endif
+
         if (entry != NULL && entry->typecode < PP_INSTANCE_I) {  /* primitive type */
             ierr = PP_copy_obj_to_mem(obj, fileinfo, entry, nitems, pv, dims);
             if (ierr == -1) {
@@ -259,10 +256,6 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
                 return -1;
             }
         }
-#if 0
-        if (PD_gs.read != NULL)
-            mem_lst = (*PD_gs.read) (dp->members);
-#endif
 
         /* compute number of entries in struct */
         for (nmembers = 0, desc = mem_lst; desc != NULL;
@@ -435,31 +428,6 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
         SAVE_S(litype, litype);
         SC_dereference(litype);
         entry = PP_inquire_type(fileinfo, litype);
-#if 0
-        /* attempt to cast obj to type litype */
-        if (entry != NULL) {
-            SAVE_I(nitems);
-            nitems = (long) PP_get_object_length(obj);
-            ierr =
-                PP_get_object_data(obj, entry, nitems, (void **) lvr,
-                                   PP_GC_YES);
-            RESTORE_I(nitems);
-            if (ierr == -1)
-                return -1;
-            if (ierr == 0) {
-                RESTORE_S(litype);
-                GO_CONT;
-            }
-        }
-#endif
-
-#if 0
-        /* find any entry for elements of this type */
-        SAVE_S(litype, litype);
-        SC_dereference(litype);
-        entry = PP_inquire_type(fileinfo, litype);
-        RESTORE_S(litype);
-#endif
 
         bpi = _PD_lookup_size(litype, file->host_chart);
         if (bpi == -1) {

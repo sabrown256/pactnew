@@ -141,41 +141,6 @@ static int get_ulonglong(PyObject *v, unsigned PY_LONG_LONG *p)
 #endif
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* Floating point helpers
- *     const char *p   start of 4-byte string
- *     int le          TRUE for little-endian, FALSE for big-endian
- */
-
-static PyObject *unpack_float(const char *p, int le)
-   {double x;
-
-    x = _PyFloat_Unpack4((unsigned char *)p, le);
-    if (x == -1.0 && PyErr_Occurred())
-       return(NULL);
-
-    return(PyFloat_FromDouble(x));}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static PyObject *unpack_double(const char *p, int le)
-   {double x;
-
-    x = _PyFloat_Unpack8((unsigned char *)p, le);
-    if (x == -1.0 && PyErr_Occurred())
-       return(NULL);
-
-    return(PyFloat_FromDouble(x));}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* NOTE:
@@ -368,8 +333,6 @@ static int np_ubyte(void *p, PyObject *v, long nitems, PP_types tc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#if 1
-
 static int np_char(void *p, PyObject *v, long nitems, PP_types tc)
    {Py_ssize_t nc;
 
@@ -387,22 +350,6 @@ static int np_char(void *p, PyObject *v, long nitems, PP_types tc)
 	memcpy(p, PY_STRING_AS_STRING(v), nc);};
 
     return(0);}
-
-#else
-
-static int np_char(void *p, PyObject *v, long nitems, PP_types tc)
-   {
-
-    if (!PY_STRING_CHECK(v) || PY_STRING_SIZE(v) != 1)
-       {PP_error_set_user(v, 
-			  "char format require string of length 1");
-	return(-1);};
-
-    *((char *) p) = *PY_STRING_AS_STRING(v);
-
-    return(0);}
-
-#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -581,40 +528,6 @@ STATIC int np_void_p(void *p, PyObject *v, long nitems, PP_types tc)
     return(0);}
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* original table */
-
-static formatdef native_table[] = {
-        {'x',   sizeof(char),   0,              NULL},
-        {'b',   sizeof(char),   0,              nu_byte,        np_byte},
-        {'B',   sizeof(char),   0,              nu_ubyte,       np_ubyte},
-        {'c',   sizeof(char),   0,              nu_char,        np_char},
-        {'s',   sizeof(char),   0,              NULL},
-        {'p',   sizeof(char),   0,              NULL},
-        {'h',   sizeof(short),  SHORT_ALIGN,    nu_short,       np_short},
-        {'H',   sizeof(short),  SHORT_ALIGN,    nu_ushort,      np_ushort},
-        {'i',   sizeof(int),    INT_ALIGN,      nu_int,         np_int},
-        {'I',   sizeof(int),    INT_ALIGN,      nu_uint,        np_uint},
-        {'l',   sizeof(long),   LONG_ALIGN,     nu_long,        np_long},
-        {'L',   sizeof(long),   LONG_ALIGN,     nu_ulong,       np_ulong},
-        {'f',   sizeof(float),  FLOAT_ALIGN,    nu_float,       np_float},
-        {'d',   sizeof(double), DOUBLE_ALIGN,   nu_double,      np_double},
-        {'P',   sizeof(void *), VOID_P_ALIGN,   nu_void_p,      np_void_p},
-#ifdef HAVE_LONG_LONG
-        {'q',   sizeof(PY_LONG_LONG), LONG_LONG_ALIGN, nu_longlong, np_longlong},
-        {'Q',   sizeof(PY_LONG_LONG), LONG_LONG_ALIGN, nu_ulonglong,np_ulonglong},
-#endif
-        {0}
-};
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 PP_unpack_func _PP_get_unpack_func(PP_types tc)
