@@ -37,7 +37,7 @@
 # define PY_STRING_STRING(_o)           PyBytes_FromString(_o)
 # define PY_STRING_CHECK(_o)            PyBytes_Check(_o)
 # define PY_STRING_SIZE(_o)             PyBytes_Size(_o)
-# define PY_STRING_AS_STRING(_o)        PyBytes_AsString(_o)
+# define PY_STRING_AS_STRING(_o)        PyUnicode_AsUTF8(_o)
 
 # define PY_COBJ_VOID_PTR(_o, _m)   PyCapsule_New(_o, 0, (PyCapsule_Destructor) _m)
 # define PY_GET_PTR(_o)             PyCapsule_GetPointer(_o, 0)

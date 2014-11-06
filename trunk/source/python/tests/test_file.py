@@ -17,12 +17,12 @@ import test_leak
 class File(test_leak.Leak):      
     def test0a(self):
         '''PDBfile - existence of pdb.files'''
-        self.failUnlessEqual(type(pdb.files), dict)
-        self.failUnlessEqual(len(pdb.files), 0)
+        self.assertEqual(type(pdb.files), dict)
+        self.assertEqual(len(pdb.files), 0)
     
     def test0(self):
         '''PDBfile - open with no arguments'''
-        self.failUnlessRaises(TypeError, pdb.PDBfile);
+        self.assertRaises(TypeError, pdb.PDBfile);
 
     def test1(self):
         '''PDBfile - make sure output does not exist, then try to open'''
@@ -30,25 +30,25 @@ class File(test_leak.Leak):
             os.unlink("testfile")
         except OSError:
             pass # file does not exits
-        self.failUnlessRaises(pdb.error, pdb.PDBfile, "testfile", "r");
+        self.assertRaises(pdb.error, pdb.PDBfile, "testfile", "r");
 #        fp.close()
 
     def test1a(self):
         '''PDBfile - open and close file'''
         fp = pdb.PDBfile("testfile", "w");
-        self.failUnlessEqual(type(fp), pdb.PDBfile)
-        self.failUnlessEqual(len(pdb.files), 1)
+        self.assertEqual(type(fp), pdb.PDBfile)
+        self.assertEqual(len(pdb.files), 1)
         self.assert_(pdb.files.has_key('testfile'))
         # cause defstr object to be created so it can be deleted
         # during the close
         fp.defstr("double")
         fp.close()
-        self.failUnlessEqual(len(pdb.files), 0)
+        self.assertEqual(len(pdb.files), 0)
 
     def test1b(self):
         '''PDBfile - open and close file using "open"'''
         fp = pdb.open("testfile", "w");
-        self.failUnlessEqual(type(fp), pdb.PDBfile)
+        self.assertEqual(type(fp), pdb.PDBfile)
         fp.close()
 
     def test1c(self):
@@ -56,7 +56,7 @@ class File(test_leak.Leak):
         fp = pdb.open("testfile", "w");
         fp.close()
         fp = pdb.open("testfile");
-        self.failUnlessEqual(fp.mode, pdb.PD_OPEN)
+        self.assertEqual(fp.mode, pdb.PD_OPEN)
         fp.close()
 
 #--------------------------------------------------------------------------
@@ -65,8 +65,8 @@ class File(test_leak.Leak):
         '''PDBfile - get attributes'''
         fp = pdb.open("testfile", "w");
         name = fp.name
-        self.failUnlessEqual(name, "testfile")
-        self.failUnlessEqual(fp.type, None)
+        self.assertEqual(name, "testfile")
+        self.assertEqual(fp.type, None)
 #        symtab = fp.symtab
 #        chart = fp.chart
 #        host_chart = fp.host_chart
@@ -75,16 +75,16 @@ class File(test_leak.Leak):
 #        attrtab = fp.attrtab
 
         previous_file = fp.previous_file
-        self.failUnlessEqual(previous_file, None)
+        self.assertEqual(previous_file, None)
 
         date = fp.date
-        self.failUnlessEqual(type(date), str)
+        self.assertEqual(type(date), str)
 
-        self.failUnlessEqual(fp.mode, pdb.PD_CREATE)
-        self.failUnlessEqual(fp.default_offset, 0)
-        self.failUnlessEqual(fp.virtual_internal, 0)
+        self.assertEqual(fp.mode, pdb.PD_CREATE)
+        self.assertEqual(fp.default_offset, 0)
+        self.assertEqual(fp.virtual_internal, 0)
         system_version = fp.system_version
-        self.failUnlessEqual(fp.major_order, pdb.ROW_MAJOR_ORDER)
+        self.assertEqual(fp.major_order, pdb.ROW_MAJOR_ORDER)
         fp.close()
 
     def xtest1e(self):
@@ -102,24 +102,24 @@ class File(test_leak.Leak):
 #        attrtab = fp.attrtab
 
         previous_file = fp.previous_file
-        self.failUnlessEqual(previous_file, None)
+        self.assertEqual(previous_file, None)
 
         date = fp.date
-        self.failUnlessEqual(type(date), str)
+        self.assertEqual(type(date), str)
 
         mode = fp.mode
-        self.failUnlessEqual(type(mode), int)
+        self.assertEqual(type(mode), int)
 
         default_offset = fp.default_offset
-        self.failUnlessEqual(default_offset, 0)
+        self.assertEqual(default_offset, 0)
 
         virtual_internal = fp.virtual_internal
-        self.failUnlessEqual(virtual_internal, 0)
+        self.assertEqual(virtual_internal, 0)
 
         system_version = fp.system_version
 
         major_order = fp.major_order
-        self.failUnlessEqual(major_order, pdb.ROW_MAJOR_ORDER)
+        self.assertEqual(major_order, pdb.ROW_MAJOR_ORDER)
         fp.close()
 
     def test2a(self):
@@ -178,20 +178,20 @@ class File(test_leak.Leak):
         fp = pdb.PDBfile("testfile", "w");
         fp.close()
         ref = (1.0, 2.0, 3.0, 4.0)
-        self.failUnlessRaises(pdb.error, fp.write, "d2", ref)
+        self.assertRaises(pdb.error, fp.write, "d2", ref)
 
     def test3e(self):
         '''PDBfile - write_raw to a closed file'''
         fp = pdb.PDBfile("testfile", "w");
         fp.close()
         d2 = struct.pack('dd', 2.0, 3.0)
-        self.failUnlessRaises(pdb.error, fp.write_raw,
+        self.assertRaises(pdb.error, fp.write_raw,
                               "d2(2)", d2, "double")
 
     def test4(self):
         '''PDBfile - read a non existent variable'''
         fp = pdb.PDBfile("testfile", "w");
-        self.failUnlessRaises(pdb.error, fp.read, "d1")
+        self.assertRaises(pdb.error, fp.read, "d1")
         fp.close()
 
     def test4b(self):
@@ -200,7 +200,7 @@ class File(test_leak.Leak):
         ref = (1.0, 2.0, 3.0, 4.0)
         fp.write("d2", ref)
         fp.close()
-        self.failUnlessRaises(pdb.error, fp.read, "d2")
+        self.assertRaises(pdb.error, fp.read, "d2")
 
 #--------------------------------------------------------------------------
 
@@ -212,10 +212,10 @@ class File(test_leak.Leak):
         fp.write("d2", ref)
         d2 = fp.read("d2")
 #        t = fp.defstr("double")
-#        self.failUnlessEqual(type(d2), pdb.pdbdata)
+#        self.assertEqual(type(d2), pdb.pdbdata)
         self.assert_(isinstance(d2, pdb.pdbdata))
         d3 = struct.unpack('dddd', str(d2))
-        self.failUnlessEqual(d3, ref)
+        self.assertEqual(d3, ref)
         fp.close()
 
     def test5b(self):
@@ -225,8 +225,8 @@ class File(test_leak.Leak):
         ref = (1.0, 2.0, 3.0, 4.0)
         fp.write("d2", ref)
         d2 = fp.read("d2")
-        self.failUnlessEqual(type(d2), tuple)
-        self.failUnlessEqual(d2, ref)
+        self.assertEqual(type(d2), tuple)
+        self.assertEqual(d2, ref)
         fp.close()
 
     def test5c(self):
@@ -236,8 +236,8 @@ class File(test_leak.Leak):
         ref = [1.0, 2.0, 3.0, 4.0]
         fp.write("d2", ref)
         d2 = fp.read("d2")
-        self.failUnlessEqual(type(d2), list)
-        self.failUnlessEqual(d2, ref)
+        self.assertEqual(type(d2), list)
+        self.assertEqual(d2, ref)
         fp.close()
 
     def test6a(self):
@@ -246,7 +246,7 @@ class File(test_leak.Leak):
         ref = [1.0, 2.0, 3.0, 4.0]
         fp.write("d2", ref)
         d2 = fp.read("d2", ind=[(1,2)])
-        self.failUnlessEqual(d2, ref[1:3])
+        self.assertEqual(d2, ref[1:3])
         fp.close()
 
     def test6b(self):
@@ -255,7 +255,7 @@ class File(test_leak.Leak):
         ref = [1.0, 2.0, 3.0, 4.0]
         fp.write("d2", ref)
         d2 = fp.read("d2", ind=[(0,3,2)])
-        self.failUnlessEqual(d2, [1.0, 3.0])
+        self.assertEqual(d2, [1.0, 3.0])
         fp.close()
 
     def test7a(self):
@@ -266,19 +266,19 @@ class File(test_leak.Leak):
         '''PDBfile - directories'''
         fp = pdb.PDBfile("testfile", "w")
         ls = fp.ls()
-        self.failUnlessEqual(ls, ())
+        self.assertEqual(ls, ())
 
         pwd = fp.pwd()
-        self.failUnlessEqual(pwd, '/')
+        self.assertEqual(pwd, '/')
 
         fp.mkdir('foo')
         ls = fp.ls()
-        self.failUnlessEqual(ls, ('foo/',))
+        self.assertEqual(ls, ('foo/',))
 
         fp.cd('foo')
 
         pwd = fp.pwd()
-        self.failUnlessEqual(pwd, '/foo')
+        self.assertEqual(pwd, '/foo')
 
         fp.close()
 
@@ -286,17 +286,17 @@ class File(test_leak.Leak):
         '''PDBfile - directories, on closed file'''
         fp = pdb.PDBfile("testfile", "w")
         fp.close()
-        self.failUnlessEqual(fp.pwd(), None)
-        self.failUnlessEqual(fp.mkdir('foo'), 0)
-        self.failUnlessEqual(fp.cd('/'), 0)
-        self.failUnlessEqual(fp.ls(), None)
+        self.assertEqual(fp.pwd(), None)
+        self.assertEqual(fp.mkdir('foo'), 0)
+        self.assertEqual(fp.cd('/'), 0)
+        self.assertEqual(fp.ls(), None)
 
     def test9(self):
         '''PDBfile - links'''
         fp = pdb.PDBfile("testfile", "w");
 
         # link to non-existent variable
-        self.failUnlessEqual(fp.ln('d2', 'd2link'), 0)
+        self.assertEqual(fp.ln('d2', 'd2link'), 0)
 
         # write a variable
         d2 = struct.pack('dd', 2.0, 3.0)
@@ -309,13 +309,13 @@ class File(test_leak.Leak):
 
         # not sure order names are returned in,
         # so check each name
-        self.failUnlessEqual(len(ls), 2)
-        self.failUnless('d2' in ls)
-        self.failUnless('d2link' in ls)
+        self.assertEqual(len(ls), 2)
+        self.assertTrue('d2' in ls)
+        self.assertTrue('d2link' in ls)
 
         # read by link
         d2 = fp.read("d2link")
-        self.failUnlessEqual(d2, [2.0, 3.0])
+        self.assertEqual(d2, [2.0, 3.0])
         
         fp.close()
         

@@ -31,9 +31,9 @@ class Assoc(test_leak.LeakVif):
     def testa(self):
         '''create an assoc'''
         h = pdb.assoc()
-        self.failUnlessEqual(type(h), pdb.assoc)
-        self.failUnless(isinstance(h, pdb.assoc))
-#        self.failUnless(isinstance(h, pdb.pdbdata))
+        self.assertEqual(type(h), pdb.assoc)
+        self.assertTrue(isinstance(h, pdb.assoc))
+#        self.assertTrue(isinstance(h, pdb.pdbdata))
 
     def testa1(self):
         '''create a assoc, then del'''
@@ -46,20 +46,20 @@ class Assoc(test_leak.LeakVif):
         h['foo'] = 5
 
         k = h['foo']
-        self.failUnlessEqual(type(k), int)
-        self.failUnlessEqual(k, 5)
+        self.assertEqual(type(k), int)
+        self.assertEqual(k, 5)
 
     def testb11(self):
         '''assoc as mapping, scalar int, replace index'''
         h = pdb.assoc()
         h['foo'] = 5
-        self.failUnlessEqual(len(h), 1)
+        self.assertEqual(len(h), 1)
         h['foo'] = 6
-        self.failUnlessEqual(len(h), 1)
+        self.assertEqual(len(h), 1)
 
         k = h['foo']
-        self.failUnlessEqual(type(k), int)
-        self.failUnlessEqual(k, 6)
+        self.assertEqual(type(k), int)
+        self.assertEqual(k, 6)
 
     def testb1(self):
         '''assoc as mapping, string'''
@@ -67,8 +67,8 @@ class Assoc(test_leak.LeakVif):
         h['foo'] = "I am string"
 
         k = h['foo']
-        self.failUnlessEqual(type(k), str)
-        self.failUnlessEqual(k, "I am string")
+        self.assertEqual(type(k), str)
+        self.assertEqual(k, "I am string")
 
     def testc(self):
         '''assoc as mapping, single item array'''
@@ -76,8 +76,8 @@ class Assoc(test_leak.LeakVif):
         h['foo'] = [5]
 
         k = h['foo']
-        self.failUnlessEqual(type(k), int)
-        self.failUnlessEqual(k, 5)
+        self.assertEqual(type(k), int)
+        self.assertEqual(k, 5)
 
 #--------------------------------------------------------------------------
 
@@ -88,8 +88,8 @@ class Assoc(test_leak.LeakVif):
         h['foo'] = ref
 
         k = h['foo']
-        self.failUnlessEqual(type(k), list)
-        self.failUnlessEqual(k, ref)
+        self.assertEqual(type(k), list)
+        self.assertEqual(k, ref)
 
     def testd1(self):
         '''assoc as mapping, pdbdata'''
@@ -99,79 +99,79 @@ class Assoc(test_leak.LeakVif):
         h['foo'] = d
 
         k = h['foo']
-        self.failUnlessEqual(type(k), list)
-        self.failUnlessEqual(k, ref)
+        self.assertEqual(type(k), list)
+        self.assertEqual(k, ref)
 
 
     def teste(self):
         '''assoc - len'''
         h = self.sampleassoc()
-        self.failUnlessEqual(len(h), len(self.sampledict))
+        self.assertEqual(len(h), len(self.sampledict))
 
     def testf(self):
         '''assoc - keys'''
         h = self.sampleassoc()
         k = h.keys()
-        self.failUnlessEqual(len(k), len(self.sampledict))
+        self.assertEqual(len(k), len(self.sampledict))
         for key in self.sampledict.keys():
-            self.failUnless(key in k)
+            self.assertTrue(key in k)
 
     def testf1(self):
         '''assoc - items'''
         h = self.sampleassoc()
         k = h.items()
-        self.failUnless(isinstance(k, list))
-        self.failUnlessEqual(len(k), len(self.sampledict))
-        self.failUnless(isinstance(k[0], tuple))
-        self.failUnless(isinstance(k[1], tuple))
-        self.failUnless(isinstance(k[1], tuple))
-        self.failUnlessEqual(k[0][0], 'baz')
-        self.failUnlessEqual(k[0][1], 3)
-        self.failUnlessEqual(k[1][0], 'bar')
-        self.failUnlessEqual(k[1][1], 2)
-        self.failUnlessEqual(k[2][0], 'foo')
-        self.failUnlessEqual(k[2][1], 1)
+        self.assertTrue(isinstance(k, list))
+        self.assertEqual(len(k), len(self.sampledict))
+        self.assertTrue(isinstance(k[0], tuple))
+        self.assertTrue(isinstance(k[1], tuple))
+        self.assertTrue(isinstance(k[1], tuple))
+        self.assertEqual(k[0][0], 'baz')
+        self.assertEqual(k[0][1], 3)
+        self.assertEqual(k[1][0], 'bar')
+        self.assertEqual(k[1][1], 2)
+        self.assertEqual(k[2][0], 'foo')
+        self.assertEqual(k[2][1], 1)
 
     def testg(self):
         '''assoc - has_key'''
         h = self.sampleassoc()
-        self.failUnless(h.has_key('foo'))
-        self.failUnless(not h.has_key('FOO'))
+        self.assertTrue(h.has_key('foo'))
+        self.assertTrue(not h.has_key('FOO'))
 
 #--------------------------------------------------------------------------
 
     def testg1(self):
         '''assoc - update from non-mapping'''
         h = pdb.assoc()
-        self.failUnlessRaises(AttributeError, h.update, 1)
+        self.assertRaises(AttributeError, h.update, 1)
 
     def testg2(self):
         '''assoc - update from dict'''
         h = pdb.assoc()
         h.update({"a":1, "b":2, "c":3})
-        self.failUnlessEqual(len(h), 3)
-        self.failUnlessEqual(h["a"], 1)
-        self.failUnlessEqual(h["b"], 2)
-        self.failUnlessEqual(h["c"], 3)
+        self.assertEqual(len(h), 3)
+        self.assertEqual(h["a"], 1)
+        self.assertEqual(h["b"], 2)
+        self.assertEqual(h["c"], 3)
 
     def testg3(self):
         '''assoc - repr, empty assoc'''
         h = pdb.assoc()
         r = repr(h);
-        self.failUnlessEqual(type(r), str);
+        self.assertEqual(type(r), str);
         a = eval(r);
-        self.failUnlessEqual(type(a), dict);
+        self.assertEqual(type(a), dict);
 
     def testg4(self):
         '''assoc - repr'''
         h = pdb.assoc()
         h.update(self.sampledict);
         r = repr(h);
-        self.failUnlessEqual(type(r), str);
+        self.assertEqual(type(r), str);
         a = eval(r);
-        self.failUnlessEqual(type(a), dict);
-        self.failUnlessEqual(len(a), len(self.sampledict))
-        self.failUnlessEqual(a, self.sampledict)
+        self.assertEqual(type(a), dict);
+        self.assertEqual(len(a), len(self.sampledict))
+        self.assertEqual(a, self.sampledict)
 
     def xtesth(self):
         # see HashIO

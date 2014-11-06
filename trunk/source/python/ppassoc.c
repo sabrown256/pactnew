@@ -322,10 +322,10 @@ static PyObject *PY_pcons_get(PY_pcons *self,
 static PyMethodDef
  PY_pcons_methods[] = {
    {"clear", (PyCFunction)PY_pcons_clear, METH_NOARGS, PY_pcons_clear_doc},
-   {"has_key", (PyCFunction)PY_pcons_has_key, METH_KEYWORDS, PY_pcons_has_key_doc},
+   {"has_key", (PyCFunction)PY_pcons_has_key, PY_ARG_KEY, PY_pcons_has_key_doc},
    {"items", (PyCFunction)PY_pcons_items, METH_NOARGS, PY_pcons_items_doc},
    {"keys", (PyCFunction)PY_pcons_keys, METH_NOARGS, PY_pcons_keys_doc},
-   {"update", (PyCFunction)PY_pcons_update, METH_KEYWORDS, PY_pcons_update_doc},
+   {"update", (PyCFunction)PY_pcons_update, PY_ARG_KEY, PY_pcons_update_doc},
    {"values", (PyCFunction)PY_pcons_values, METH_NOARGS, PY_pcons_values_doc},
    {"get", (PyCFunction)PY_pcons_get, METH_NOARGS, PY_pcons_get_doc},
    {NULL, NULL, 0, NULL}};

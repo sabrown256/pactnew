@@ -24,11 +24,11 @@ class ArrayMixin:
         a = array(ref, Float)
         d = pdb.pdbdata(a, 'double *', self.fp)
         x = pdb.unpack(d)
-        self.failUnlessEqual(ref, x)
-        self.failUnlessEqual(type(ref), type(x))
+        self.assertEqual(ref, x)
+        self.assertEqual(type(ref), type(x))
 #        x = d.array()
-#        self.failUnlessEqual(a, x)
-#        self.failUnlessEqual(type(a), type(x))
+#        self.assertEqual(a, x)
+#        self.assertEqual(type(a), type(x))
 
     def xtestb(self):
         """create an double array from defstr"""
@@ -36,9 +36,9 @@ class ArrayMixin:
         d2 = struct.pack('dddd', 1.0, 2.0, 4.0, 5.0)
         double = self.fp.defstr('double')
         d = double(ref, 4)
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, ref)
+        self.assertEqual(o, ref)
 
 class ArrayVif(test_leak.LeakVif, ArrayMixin):
     pass

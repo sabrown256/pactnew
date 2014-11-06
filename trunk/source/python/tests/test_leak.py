@@ -37,7 +37,7 @@ class Leak(unittest.TestCase):
         pdb.mem_chk(3)
         if self.leak:
             self.glnnmb, msg = pdb.mem_monitor(self.glnnmb, self.lev, "glob")
-            self.failUnlessEqual(msg, None)
+            self.assertEqual(msg, None)
 
 
 class LeakVif(Leak):
