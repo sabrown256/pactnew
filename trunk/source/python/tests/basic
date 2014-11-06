@@ -23,7 +23,7 @@ set msg = "Basic Test ....................."
    flog $Log $CROSS_FE $PYTHON $FilesDir/basic.py
    @ xstatus = $status
 
-   set inf = ( `grep 'FAILED (' $Log | sed 's|[()=]| |g'` )
+   set inf = ( `grep 'FAILED (' $Log | sed 's|[(,)=]| |g'` )
    if ("$inf" != "") then
       if ($#inf > 4) then
          @ xstatus = $xstatus + $inf[3] + $inf[5]

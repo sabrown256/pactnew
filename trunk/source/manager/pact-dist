@@ -105,12 +105,15 @@ while ($#argv >= 1)
       case +v:
       case -T:
            shift
-           set raw     = ( `date -d "$1" '+%Y_%m_%d %H:%M'` )
-           set DTag    = ( `echo $raw[1] | sed 's/^20//'` )
-           set DName   = "pact$DTag"
-           set raw     = ( `date -d "$1" '+%Y-%m-%d %H:%M'` )
-           set SRCDate = ( -D "$raw" )
-           set SCSOPT  = ( $SCSOpt $SRCDate )
+           set raw       = ( `date -d "$1" '+%Y_%m_%d %H:%M'` )
+           set DTag      = ( `echo $raw[1] | sed 's/^20//'` )
+           set DName     = "pact$DTag"
+#           set raw       = ( `date -d "$1" '+%Y-%m-%d %H:%M'` )
+           set raw       = ( `date -d "$1" '+%Y-%m-%d'` )
+           set SRCDate   = ( -D "$raw" )
+           set SCSOpt    = ( $SCSOpt $SRCDate )
+           set VersionID = ( `date -d "$1" '+%d.%m.%y'` )
+           unset raw
            breaksw
       case -x:
            set Extn = TRUE
@@ -125,6 +128,7 @@ while ($#argv >= 1)
 end
 
 Note $Log "Source tag: $SRCDate[2]"
+Note $Log "Source opt: $SCSOpt"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

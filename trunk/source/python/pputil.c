@@ -209,6 +209,28 @@ int add_module_function(PyObject *m, const char *name, PyCFunction meth,
 
 /*--------------------------------------------------------------------------*/
 
+/* PY_GET_STRING - handle unicode issues */
+
+char *PY_get_string(PyObject *o)
+   {char *rv;
+
+#if PY_MAJOR_VERSION >= 3
+
+    rv = (char *) PyUnicode_1BYTE_DATA(o);
+    rv = (char *) PyUnicode_2BYTE_DATA(o);
+    rv = (char *) PyUnicode_4BYTE_DATA(o);
+    rv = PyUnicode_AS_DATA(o);
+    rv = PyUnicode_AsUTF8(o);
+
+#else
+    rv = PyString_AsString(o);
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PP_Py_DECREF- pact interface to Python reference decrement.
  *  This is used as the delete function when clearing a hash table
  *  of Python objects.

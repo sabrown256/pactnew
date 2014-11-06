@@ -1109,7 +1109,7 @@ static void python_method_def(char *dfn, int nc, fdecl *dcl,
 	snprintf(s, BFLRG, " _PYD_%s = ", cfn);
 	n = strlen(s) + 1;
 
-	snprintf(dfn, nc, "{\"%s\", (PyCFunction) _PY_%s, METH_KEYWORDS,\n",
+	snprintf(dfn, nc, "{\"%s\", (PyCFunction) _PY_%s, PY_ARG_KEY,\n",
 		 fn, cfn);
 
 	memset(s, ' ', n);
