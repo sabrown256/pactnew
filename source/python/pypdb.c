@@ -964,7 +964,7 @@ static PyObject *PY_defstr_get_order_flag(PY_defstr *self,
 
 static PyMethodDef
  PY_defstr_methods[] = {
-   {"has_key", (PyCFunction)PY_defstr_has_key, METH_KEYWORDS, PY_defstr_has_key_doc},
+   {"has_key", (PyCFunction)PY_defstr_has_key, PY_ARG_KEY, PY_defstr_has_key_doc},
    {"items", (PyCFunction)PY_defstr_items, METH_NOARGS, PY_defstr_items_doc},
    {"keys", (PyCFunction)PY_defstr_keys, METH_NOARGS, PY_defstr_keys_doc},
    {"values", (PyCFunction)PY_defstr_values, METH_NOARGS, PY_defstr_values_doc},

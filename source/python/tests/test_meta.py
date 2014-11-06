@@ -23,10 +23,10 @@ class Meta(unittest.TestCase):
 #        d2 = struct.pack('d', ref)
 #        ctor = pdb.vif.defstr("double")
 #        d = ctor(ref)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
 #        o = repr(d)
-#        self.failUnlessEqual(o, ref)
+#        self.assertEqual(o, ref)
 
     def testb(self):
         """  """
@@ -39,8 +39,8 @@ class Meta(unittest.TestCase):
         print(ctor.__class__)
         d = ctor((3, 4.0))
         print(d)
-        self.failUnlessEqual(d.i, 3)
-        self.failUnlessEqual(d.j, 4.0)
+        self.assertEqual(d.i, 3)
+        self.assertEqual(d.j, 4.0)
 
 
 if __name__ == '__main__':

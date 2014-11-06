@@ -57,13 +57,13 @@ class SCmem(unittest.TestCase):
         name = 'testd'
         a = pdb.alloc(2, 8, name)
         #  pdb.mem_print(a)
-        self.failUnlessEqual(pdb.mem_lookup(a), name)
+        self.assertEqual(pdb.mem_lookup(a), name)
         self.assert_(pdb.is_score_ptr(a))
-        self.failUnlessEqual(pdb.arrlen(a), 16)
+        self.assertEqual(pdb.arrlen(a), 16)
 
     def teste(self):
         """memory - test allocation non-pointer"""
-        self.failUnlessRaises(TypeError, pdb.cfree, 1)
+        self.assertRaises(TypeError, pdb.cfree, 1)
 
 #--------------------------------------------------------------------------
 

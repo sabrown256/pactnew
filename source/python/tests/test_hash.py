@@ -21,13 +21,13 @@ class Hasharr(test_leak.LeakVif):
         for key, value in self.sampledict.items():
             h[key] = value
         return h
-        
+       
     def testa(self):
         '''create a hash table'''
         h = pdb.hasharr()
-        self.failUnlessEqual(type(h), pdb.hasharr)
-        self.failUnless(isinstance(h, pdb.hasharr))
-        self.failUnless(isinstance(h, pdb.pdbdata))
+        self.assertEqual(type(h), pdb.hasharr)
+        self.assertTrue(isinstance(h, pdb.hasharr))
+        self.assertTrue(isinstance(h, pdb.pdbdata))
 
     def testa1(self):
         '''create a hash table, then del'''
@@ -40,8 +40,8 @@ class Hasharr(test_leak.LeakVif):
         h['foo'] = 5
 
         k = h['foo']
-        self.failUnlessEqual(type(k), int)
-        self.failUnlessEqual(k, 5)
+        self.assertEqual(type(k), int)
+        self.assertEqual(k, 5)
 
     def testb1(self):
         '''hasharr as mapping, string'''
@@ -49,8 +49,8 @@ class Hasharr(test_leak.LeakVif):
         h['foo'] = "I am string"
 
         k = h['foo']
-        self.failUnlessEqual(type(k), str)
-        self.failUnlessEqual(k, "I am string")
+        self.assertEqual(type(k), str)
+        self.assertEqual(k, "I am string")
 
     def testc(self):
         '''hasharr as mapping, single item array'''
@@ -58,9 +58,10 @@ class Hasharr(test_leak.LeakVif):
         h['foo'] = [5]
 
         k = h['foo']
-        self.failUnlessEqual(type(k), int)
-        self.failUnlessEqual(k, 5)
+        self.assertEqual(type(k), int)
+        self.assertEqual(k, 5)
 
+# GOTCHA: python3
     def testd(self):
         '''hasharr as mapping, array'''
         ref = [5, 6, 7]
@@ -68,8 +69,8 @@ class Hasharr(test_leak.LeakVif):
         h['foo'] = ref
 
         k = h['foo']
-        self.failUnlessEqual(type(k), list)
-        self.failUnlessEqual(k, ref)
+        self.assertEqual(type(k), list)
+        self.assertEqual(k, ref)
 
 #--------------------------------------------------------------------------
 
@@ -81,41 +82,41 @@ class Hasharr(test_leak.LeakVif):
         h['foo'] = d
 
         k = h['foo']
-        self.failUnlessEqual(type(k), list)
-        self.failUnlessEqual(k, ref)
+        self.assertEqual(type(k), list)
+        self.assertEqual(k, ref)
 
     def teste(self):
         '''hasharr - len'''
         h = self.samplehash()
-        self.failUnlessEqual(len(h), len(self.sampledict))
+        self.assertEqual(len(h), len(self.sampledict))
 
     def testf(self):
         '''hasharr - keys'''
         h = self.samplehash()
         k = h.keys()
-        self.failUnlessEqual(len(k), len(self.sampledict))
+        self.assertEqual(len(k), len(self.sampledict))
         for key in self.sampledict.keys():
-            self.failUnless(key in k)
+            self.assertTrue(key in k)
 
     def testg(self):
         '''hasharr - has_key'''
         h = self.samplehash()
-        self.failUnless(h.has_key('foo'))
-        self.failUnless(not h.has_key('FOO'))
+        self.assertTrue(h.has_key('foo'))
+        self.assertTrue(not h.has_key('FOO'))
 
     def testg1(self):
         '''hasharr - update from non-mapping'''
         h = pdb.hasharr()
-        self.failUnlessRaises(AttributeError, h.update, 1)
+        self.assertRaises(AttributeError, h.update, 1)
 
     def testg2(self):
         '''hasharr - update from dict'''
         h = pdb.hasharr()
         h.update({"a":1, "b":2, "c":3})
-        self.failUnlessEqual(len(h), 3)
-        self.failUnlessEqual(h["a"], 1)
-        self.failUnlessEqual(h["b"], 2)
-        self.failUnlessEqual(h["c"], 3)
+        self.assertEqual(len(h), 3)
+        self.assertEqual(h["a"], 1)
+        self.assertEqual(h["b"], 2)
+        self.assertEqual(h["c"], 3)
 
 #--------------------------------------------------------------------------
 
@@ -123,20 +124,20 @@ class Hasharr(test_leak.LeakVif):
         '''hasharr - repr, empty hasharr'''
         h = pdb.hasharr()
         r = repr(h);
-        self.failUnlessEqual(type(r), str);
+        self.assertEqual(type(r), str);
         a = eval(r);
-        self.failUnlessEqual(type(a), dict);
+        self.assertEqual(type(a), dict);
 
     def testg4(self):
         '''hasharr - repr'''
         h = pdb.hasharr()
         h.update(self.sampledict);
         r = repr(h);
-        self.failUnlessEqual(type(r), str);
+        self.assertEqual(type(r), str);
         a = eval(r);
-        self.failUnlessEqual(type(a), dict);
-        self.failUnlessEqual(len(a), len(self.sampledict))
-        self.failUnlessEqual(a, self.sampledict)
+        self.assertEqual(type(a), dict);
+        self.assertEqual(len(a), len(self.sampledict))
+        self.assertEqual(a, self.sampledict)
 
 #--------------------------------------------------------------------------
 

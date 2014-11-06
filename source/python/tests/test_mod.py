@@ -32,53 +32,53 @@ class Mod(unittest.TestCase):
         as_array = pdb.AS_ARRAY
 
         array, struct, scalar = pdb.setform()
-        self.failUnlessEqual(array, as_list)
-        self.failUnlessEqual(struct, as_tuple)
-        self.failUnlessEqual(scalar, as_object)
+        self.assertEqual(array, as_list)
+        self.assertEqual(struct, as_tuple)
+        self.assertEqual(scalar, as_object)
 
         # test array
         form = pdb.setform(array, struct, scalar)
         form1 = pdb.setform(as_pdbdata, as_none, as_none)
-        self.failUnlessEqual(form1, (as_pdbdata, struct, scalar))
-        self.failUnlessRaises(pdb.error, pdb.setform,
+        self.assertEqual(form1, (as_pdbdata, struct, scalar))
+        self.assertRaises(pdb.error, pdb.setform,
                               as_object, struct, scalar)
         form1 = pdb.setform(as_tuple, as_none, as_none)
-        self.failUnlessEqual(form1, (as_tuple, struct, scalar))
+        self.assertEqual(form1, (as_tuple, struct, scalar))
         form1 = pdb.setform(as_list, as_none, as_none)
-        self.failUnlessEqual(form1, (as_list, struct, scalar))
-        self.failUnlessRaises(pdb.error, pdb.setform,
+        self.assertEqual(form1, (as_list, struct, scalar))
+        self.assertRaises(pdb.error, pdb.setform,
                               as_dict, as_none, as_none)
         form1 = pdb.setform(as_array, as_none, as_none)
-        self.failUnlessEqual(form1, (as_array, struct, scalar))
+        self.assertEqual(form1, (as_array, struct, scalar))
 
         # test struct
         form = pdb.setform(array, struct, scalar)
         form1 = pdb.setform(as_none, as_pdbdata, as_none)
-        self.failUnlessEqual(form1, (array, as_pdbdata, scalar))
-        self.failUnlessRaises(pdb.error, pdb.setform,
+        self.assertEqual(form1, (array, as_pdbdata, scalar))
+        self.assertRaises(pdb.error, pdb.setform,
                               as_none, as_object, as_none)
         form1 = pdb.setform(as_none, as_tuple, as_none)
-        self.failUnlessEqual(form1, (array, as_tuple, scalar))
-        self.failUnlessRaises(pdb.error, pdb.setform,
+        self.assertEqual(form1, (array, as_tuple, scalar))
+        self.assertRaises(pdb.error, pdb.setform,
                               as_none, as_list, as_none)
         form1 = pdb.setform(as_none, as_dict, as_none)
-        self.failUnlessEqual(form1, (array, as_dict, scalar))
-        self.failUnlessRaises(pdb.error, pdb.setform,
+        self.assertEqual(form1, (array, as_dict, scalar))
+        self.assertRaises(pdb.error, pdb.setform,
                               as_none, as_array, as_none)
 
         # test scalar
         form = pdb.setform(array, struct, scalar)
         form1 = pdb.setform(as_none, as_none, as_pdbdata)
-        self.failUnlessEqual(form1, (array, struct, as_pdbdata))
+        self.assertEqual(form1, (array, struct, as_pdbdata))
         form1 = pdb.setform(as_none, as_none, as_object)
-        self.failUnlessEqual(form1, (array, struct, as_object))
-        self.failUnlessRaises(pdb.error, pdb.setform,
+        self.assertEqual(form1, (array, struct, as_object))
+        self.assertRaises(pdb.error, pdb.setform,
                               as_none, as_none, as_tuple)
-        self.failUnlessRaises(pdb.error, pdb.setform,
+        self.assertRaises(pdb.error, pdb.setform,
                               as_none, as_none, as_list)
-        self.failUnlessRaises(pdb.error, pdb.setform,
+        self.assertRaises(pdb.error, pdb.setform,
                               as_none, as_none, as_dict)
-        self.failUnlessRaises(pdb.error, pdb.setform,
+        self.assertRaises(pdb.error, pdb.setform,
                               as_none, as_none, as_array)
 
 

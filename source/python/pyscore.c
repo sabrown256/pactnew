@@ -784,13 +784,13 @@ static PyObject *PY_hasharr_get(PY_hasharr *self,
 /*--------------------------------------------------------------------------*/
 
 static PyMethodDef PY_hasharr_methods[] = {
-{"install", (PyCFunction)PY_hasharr_install, METH_KEYWORDS, PY_hasharr_doc_install},
-{"def_lookup", (PyCFunction)PY_hasharr_def_lookup, METH_KEYWORDS, PY_hasharr_doc_def_lookup},
+{"install", (PyCFunction)PY_hasharr_install, PY_ARG_KEY, PY_hasharr_doc_install},
+{"def_lookup", (PyCFunction)PY_hasharr_def_lookup, PY_ARG_KEY, PY_hasharr_doc_def_lookup},
 {"clear", (PyCFunction)PY_hasharr_clear, METH_NOARGS, PY_hasharr_doc_clear},
-{"has_key", (PyCFunction)PY_hasharr_has_key, METH_KEYWORDS, PY_hasharr_doc_has_key},
+{"has_key", (PyCFunction)PY_hasharr_has_key, PY_ARG_KEY, PY_hasharr_doc_has_key},
 {"items", (PyCFunction)PY_hasharr_items, METH_NOARGS, PY_hasharr_doc_items},
 {"keys", (PyCFunction)PY_hasharr_keys, METH_NOARGS, PY_hasharr_doc_keys},
-{"update", (PyCFunction)PY_hasharr_update, METH_KEYWORDS, PY_hasharr_doc_update},
+{"update", (PyCFunction)PY_hasharr_update, PY_ARG_KEY, PY_hasharr_doc_update},
 {"values", (PyCFunction)PY_hasharr_values, METH_NOARGS, PY_hasharr_doc_values},
 {"get", (PyCFunction)PY_hasharr_get, METH_NOARGS, PY_hasharr_doc_get},
 {NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
@@ -947,7 +947,10 @@ int PP_update_hasharr(hasharr *tab, PyObject *dict)
     for (i = 0; i < nkeys; i++)
         {keyitem = PyList_GET_ITEM(keys, i);
 	 keyname = PY_STRING_AS_STRING(keyitem);
-	 value = PyMapping_GetItemString(dict, keyname);
+         if (keyname == NULL)
+	    {err = -1;
+	     break;};
+	 value   = PyMapping_GetItemString(dict, keyname);
 
 	 descr = PP_get_object_descr(PP_vif_info, value);
 	 if (descr == NULL)

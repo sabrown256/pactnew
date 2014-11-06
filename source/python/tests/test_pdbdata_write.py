@@ -38,35 +38,35 @@ class DoubleIO(DoIO):
         ref = 4.0
 #        d2 = struct.pack('d', ref)
         d = pdb.pdbdata(ref, 'double')
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
-#        self.failUnlessEqual(o, ref)
+#        self.assertEqual(o, ref)
         self.fp.write_raw('testa_raw', d, 'double')
         self.fp.write('testa', d)
         self.fp.write('testa_ref', ref)
 
         r = self.fp.read('testa')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
 #    def xtestb(self):
 #        """write a C double from an python int"""
 #        d2 = struct.pack('d', 4)
 #        d = pdb.pdbdata(4)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
-#        self.failUnlessEqual(o, 4.0)
+#        self.assertEqual(o, 4.0)
 
 #    def xtestb1(self):
 #        """write a C double from an python long"""
 #        d2 = struct.pack('d', 4.0)
 #        d = pdb.pdbdata(4L, 'double')
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
-#        self.failUnlessEqual(o, 4.0)
+#        self.assertEqual(o, 4.0)
 
 #    def xtestb2(self):
 #        """try to write a C double from a string"""
-#        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+#        self.assertRaises(pdb.error, pdb.pdbdata,
 #                              'four', 'double')
 
     def testc(self):
@@ -77,12 +77,12 @@ class DoubleIO(DoIO):
         self.fp.write_raw('testc_raw[2]', d, 'double')
         self.fp.write('testc', d)
         self.fp.write('testc_ref', ref)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
-#        self.failUnlessEqual(o, [4.0, 5.0])
+#        self.assertEqual(o, [4.0, 5.0])
 
         r = self.fp.read('testc')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
 
     def testc1(self):
@@ -90,24 +90,24 @@ class DoubleIO(DoIO):
         ref = [4.0, 5.0]
 #        d2 = struct.pack('dd', 4.0, 5.0)
         self.fp.write('testc1', ref)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = pdb.unpack(d)
-#        self.failUnlessEqual(o, [4.0, 5.0])
+#        self.assertEqual(o, [4.0, 5.0])
 
         r = self.fp.read('testc1')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def testc2(self):
         """write/read C double[2,3], implicit"""
 #        d2 = struct.pack('dd', 4.0, 5.0)
         ref = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]
         self.fp.write('testc2', ref)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = pdb.unpack(d)
-#        self.failUnlessEqual(o, [4.0, 5.0])
+#        self.assertEqual(o, [4.0, 5.0])
 
         r = self.fp.read('testc2')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def testc3(self):
         """write/read C double[2,3,4], implicit"""
@@ -119,46 +119,46 @@ class DoubleIO(DoIO):
             ]
 
         self.fp.write('testc3', ref)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = pdb.unpack(d)
-#        self.failUnlessEqual(o, [4.0, 5.0])
+#        self.assertEqual(o, [4.0, 5.0])
 
         r = self.fp.read('testc3')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def xtestd(self):
         """write C double[2] from tuple of float and int"""
         d2 = struct.pack('dd', 4.0, 5.0)
         d = pdb.pdbdata((4.0, 5))
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = d.unpack()
-        self.failUnlessEqual(o, [4.0, 5.0])
+        self.assertEqual(o, [4.0, 5.0])
 
     def xteste(self):
         """write C double[2] from too few items"""
 #        d2 = struct.pack('dd', 4.0, 5.0)
         ref = [4.0, 5.0]
-        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+        self.assertRaises(pdb.error, pdb.pdbdata,
                               ref, 'double[3]')
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
-#        self.failUnlessEqual(o, ref)
+#        self.assertEqual(o, ref)
 
     def xtestf(self):
         """write C double[2] from too many items"""
 #        d2 = struct.pack('dd', 4.0, 5.0)
         ref = [4.0, 5.0, 6.0, 7.0]
-        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+        self.assertRaises(pdb.error, pdb.pdbdata,
                               ref, 'double[3]')
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
-#        self.failUnlessEqual(o, ref)
+#        self.assertEqual(o, ref)
 
     def xtestg(self):
         """write "double *" from None"""
         d = pdb.pdbdata(None, 'double *')
         o = d.unpack()
-        self.failUnlessEqual(o, None)
+        self.assertEqual(o, None)
 
     def testh(self):
         """write "double *" from [1.0]"""
@@ -168,12 +168,12 @@ class DoubleIO(DoIO):
         self.fp.write_raw('testh_raw', d, 'double *')
         self.fp.write('testh', d)
         self.fp.write('testh_ref', ref)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
-#        self.failUnlessEqual(o, ref)
+#        self.assertEqual(o, ref)
 
         r = self.fp.read('testh')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def testi(self):
         """write "double *" from [1.0, 2.0]"""
@@ -183,18 +183,18 @@ class DoubleIO(DoIO):
         self.fp.write_raw('testi_raw', d, 'double *')
         self.fp.write('testi', d)
         self.fp.write('testi_ref', ref)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
-#        self.failUnlessEqual(o, ref)
+#        self.assertEqual(o, ref)
 
         r = self.fp.read('testi')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def xtestj(self):
         """write "double **" from None"""
         d = pdb.pdbdata(None, 'double **')
         o = d.unpack()
-        self.failUnlessEqual(o, None)
+        self.assertEqual(o, None)
 
     def testk(self):
         """write "double **" from [None, [4., 5.]]"""
@@ -206,7 +206,7 @@ class DoubleIO(DoIO):
 #        self.fp.write('testk_a', ref, 'double *[2]')
 
         r = self.fp.read('testk')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def testl(self):
         """write "double **" from [[1.0, 2.0, 3.0], [4., 5.]]"""
@@ -220,7 +220,7 @@ class DoubleIO(DoIO):
 ##        r = self.fp.read('testl_ref')
 
         r = self.fp.read('testl')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
 #--------------------------------------------------------------------------
 
@@ -233,7 +233,7 @@ class DoubleIO(DoIO):
 #        self.fp.write('testm_ref', ref)
 
         r = self.fp.read('testm')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def testn(self):
         """write "double *[2]" from [[2.0], [4., 5., 6.]]"""
@@ -244,7 +244,7 @@ class DoubleIO(DoIO):
 #        self.fp.write('testn_ref[2]', ref)
 
         r = self.fp.read('testn')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def testo(self):
         """write "double **[3]" """
@@ -264,7 +264,7 @@ class DoubleIO(DoIO):
 #        self.fp.write('testo_raw', ref)
 
         r = self.fp.read('testo')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
 class StringIO(DoIO):
         
@@ -276,7 +276,7 @@ class StringIO(DoIO):
         self.fp.write('testa', d)
 
         r = self.fp.read('testa')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def testStringb(self):
         """write a C char[5] from a python string"""
@@ -286,7 +286,7 @@ class StringIO(DoIO):
         self.fp.write('testb', d)
 
         r = self.fp.read('testb')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def testStringc(self):
         """write a C char** from a python string"""
@@ -296,7 +296,7 @@ class StringIO(DoIO):
         self.fp.write('testc', d)
 
         r = self.fp.read('testc')
-        self.failUnlessEqual(r, ref)
+        self.assertEqual(r, ref)
 
     def xtestStringd(self):
         """write a list of strings"""
@@ -318,7 +318,7 @@ class DefstrIO(DoIO):
 #        d1 = struct.pack('if', 1, 2)
         d = fp.defstr(typ, ('int i', 'float j'))
 #        d2 = pdb.pdbdata(ref, typ)
-#        self.failUnlessEqual(str(d1), str(d2))
+#        self.assertEqual(str(d1), str(d2))
 #        d3 = pdb.unpack(d2)
 
         fp.write('ptestd', ref, typ)
@@ -352,8 +352,8 @@ class ClassObjectIO(test_leak.LeakFile):
 
         self.fp.write("var1", input)
         r = self.fp.read("var1")
-        self.failUnlessEqual(r.__class__, UserClass)
-        self.failUnlessEqual(r, input)
+        self.assertEqual(r.__class__, UserClass)
+        self.assertEqual(r, input)
 
     def testa2(self):
         "Write class instance to file using type"
@@ -363,10 +363,10 @@ class ClassObjectIO(test_leak.LeakFile):
 
         self.fp.write("var1", input, 'user *')
         r = self.fp.read("var1")
-        self.failUnless(isinstance(r, list))
-        self.failUnlessEqual(len(r), 1)
-        self.failUnlessEqual(r[0].__class__, UserClass)
-        self.failUnlessEqual(r[0], input)
+        self.assertTrue(isinstance(r, list))
+        self.assertEqual(len(r), 1)
+        self.assertEqual(r[0].__class__, UserClass)
+        self.assertEqual(r[0], input)
 
     def testb1(self):
         "Write class instance array to file"
@@ -379,7 +379,7 @@ class ClassObjectIO(test_leak.LeakFile):
 
         self.fp.write("var1", input)
         r = self.fp.read("var1")
-        self.failUnlessEqual(r, input)
+        self.assertEqual(r, input)
 
     def testb2(self):
         "Write class instance array to file using type"
@@ -392,7 +392,7 @@ class ClassObjectIO(test_leak.LeakFile):
 
         self.fp.write("var1", input, 'user *')
         r = self.fp.read("var1")
-        self.failUnlessEqual(r, input)
+        self.assertEqual(r, input)
 
 
 

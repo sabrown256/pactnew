@@ -20,11 +20,11 @@ import test_leak
 class Pdbdata(test_leak.LeakVif):
     def testa(self):
         """Check argument type of pdbdata query functions"""
-        self.failUnlessRaises(TypeError, pdb.getdefstr, 1)
-        self.failUnlessRaises(TypeError, pdb.gettype, 1)
-        self.failUnlessRaises(TypeError, pdb.getfile, 1)
-        self.failUnlessRaises(TypeError, pdb.getdata, 1)
-        self.failUnlessRaises(TypeError, pdb.unpack, 1)
+        self.assertRaises(TypeError, pdb.getdefstr, 1)
+        self.assertRaises(TypeError, pdb.gettype, 1)
+        self.assertRaises(TypeError, pdb.getfile, 1)
+        self.assertRaises(TypeError, pdb.getdata, 1)
+        self.assertRaises(TypeError, pdb.unpack, 1)
         
     def testb(self):
         """pdbdata get attributes functions"""
@@ -32,20 +32,20 @@ class Pdbdata(test_leak.LeakVif):
         data = pdb.getdata(d)
         
         dp = pdb.getdefstr(d)
-        self.failUnlessEqual(type(dp), pdb.defstr)
+        self.assertEqual(type(dp), pdb.defstr)
 
         # check singleton nature of defstr's
         dpvif = pdb.vif.defstr("double")
         self.assert_(dp is dpvif)
 
         t = pdb.gettype(d)
-        self.failUnlessEqual(t, "double")
+        self.assertEqual(t, "double")
 
         t = pdb.getfile(d)
         self.assert_(t is pdb.vif)
 
         v = pdb.unpack(d)
-        self.failUnlessEqual(v, 4.0)
+        self.assertEqual(v, 4.0)
 
 #--------------------------------------------------------------------------
 
@@ -54,9 +54,9 @@ class Double(test_leak.LeakVif):
         """create a C double from a python float"""
         d2 = struct.pack('d', 4.0)
         d = pdb.pdbdata('double', 4.0)
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, 4.0)
+        self.assertEqual(o, 4.0)
 
     def testa1(self):
         """create a C double from a python float, delete"""
@@ -67,39 +67,39 @@ class Double(test_leak.LeakVif):
         """create a C double from an python int"""
         d2 = struct.pack('d', 4)
         d = pdb.pdbdata('double', 4)
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, 4.0)
+        self.assertEqual(o, 4.0)
 
     def testb1(self):
         """create a C double from an python long"""
         d2 = struct.pack('d', 4.0)
 #        d = pdb.pdbdata('double', 4L)
         d = pdb.pdbdata('double', 4)
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, 4.0)
+        self.assertEqual(o, 4.0)
 
     def testb2(self):
         """try to create a C double from a string"""
-        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+        self.assertRaises(pdb.error, pdb.pdbdata,
                               'double', 'four')
 
     def testc(self):
         """create C double[2] from tuple of two floats"""
         d2 = struct.pack('dd', 4.0, 5.0)
         d = pdb.pdbdata('double[2]', (4.0, 5.0))
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, [4.0, 5.0])
+        self.assertEqual(o, [4.0, 5.0])
 
     def xtestc1(self):
         """create C double[2] from tuple of two floats, implicit"""
         d2 = struct.pack('dd', 4.0, 5.0)
         d = pdb.pdbdata('double', (4.0, 5.0))
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, [4.0, 5.0])
+        self.assertEqual(o, [4.0, 5.0])
 
     def xtestc2(self):
         pass
@@ -110,53 +110,53 @@ class Double(test_leak.LeakVif):
         """create C double[2] from tuple of float and int"""
         d2 = struct.pack('dd', 4.0, 5.0)
         d = pdb.pdbdata('double[2]', (4.0, 5))
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, [4.0, 5.0])
+        self.assertEqual(o, [4.0, 5.0])
 
     def teste(self):
         """create C double[2] from too few items"""
 #        d2 = struct.pack('dd', 4.0, 5.0)
         ref = [4.0, 5.0]
-        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+        self.assertRaises(pdb.error, pdb.pdbdata,
                               'double[3]', ref)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = pdb.unpack(d)
-#        self.failUnlessEqual(o, ref)
+#        self.assertEqual(o, ref)
 
     def testf(self):
         """create C double[2] from too many items"""
 #        d2 = struct.pack('dd', 4.0, 5.0)
         ref = [4.0, 5.0, 6.0, 7.0]
-        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+        self.assertRaises(pdb.error, pdb.pdbdata,
                               'double[3]', ref)
-#        self.failUnlessEqual(str(d2), str(d))
+#        self.assertEqual(str(d2), str(d))
 #        o = pdb.unpack(d)
-#        self.failUnlessEqual(o, ref)
+#        self.assertEqual(o, ref)
 
     def testg(self):
         """create "double *" from None"""
         d = pdb.pdbdata('double *', None)
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, None)
+        self.assertEqual(o, None)
 
     def testh(self):
         """create "double *" from [1.0]"""
         d2 = struct.pack('d', 1.)
         ref = [1.]
         d = pdb.pdbdata('double *', ref)
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, ref)
+        self.assertEqual(o, ref)
 
     def testi(self):
         """create "double *" from [1.0, 2.0]"""
         d2 = struct.pack('dd', 1., 2.)
         ref = [1., 2.]
         d = pdb.pdbdata('double *', ref)
-        self.failUnlessEqual(str(d2), str(d))
+        self.assertEqual(str(d2), str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, ref)
+        self.assertEqual(o, ref)
 
 #--------------------------------------------------------------------------
 
@@ -164,35 +164,35 @@ class Double(test_leak.LeakVif):
         """create "double **" from None"""
         d = pdb.pdbdata('double **', None)
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, None)
+        self.assertEqual(o, None)
 
     def testk(self):
         """create "double **" from [None, [4., 5.]]"""
         ref = [None, [4., 5.]]
         d = pdb.pdbdata('double **', ref)
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, ref)
+        self.assertEqual(o, ref)
 
     def testl(self):
         """create "double **" from [[1.0, 2.0, 3.0], [4., 5.]]"""
         ref = [[1.0, 2.0, 3.0], [4., 5.]]
         d = pdb.pdbdata('double **', ref)
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, ref)
+        self.assertEqual(o, ref)
 
     def testm(self):
         """create "double **" from [None, None, None]"""
         ref = [None, None, None]
         d = pdb.pdbdata('double **', ref)
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, ref)
+        self.assertEqual(o, ref)
 
     def testn(self):
         """create "double *[2]" from [[2.0], [4., 5., 6.]]"""
         ref = [[2.0], [4., 5., 6.]]
         d = pdb.pdbdata('double *[2]', ref)
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, ref)
+        self.assertEqual(o, ref)
 
     def testo(self):
         """create "double **[3]" """
@@ -208,7 +208,7 @@ class Double(test_leak.LeakVif):
               ]
         d = pdb.pdbdata('double **[3]', ref)
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, ref)
+        self.assertEqual(o, ref)
 
 #--------------------------------------------------------------------------
 
@@ -218,43 +218,43 @@ class Double(test_leak.LeakVif):
         """Index a scalar double (read)"""
         d = pdb.pdbdata('double', 4.0)
         l = len(d)
-        self.failUnlessEqual(l, 1)
-        self.failUnlessRaises(IndexError, lambda : d[1])
+        self.assertEqual(l, 1)
+        self.assertRaises(IndexError, lambda : d[1])
         p = d[0]
-        self.failUnlessEqual(pdb.unpack(d), 4.0)
+        self.assertEqual(pdb.unpack(d), 4.0)
 
     def testp2(self):
         """Index a single subscripted double array (read)"""
         d = pdb.pdbdata('double[2]', (4.0, 5.0))
         l = len(d)
-        self.failUnlessEqual(l, 2)
+        self.assertEqual(l, 2)
         p = d[0]
-        self.failUnlessEqual(p, 4.0)
+        self.assertEqual(p, 4.0)
         p = d[1]
-        self.failUnlessEqual(p, 5.0)
+        self.assertEqual(p, 5.0)
 
 #    def testp0(self):
 #        """Index a NULL pointer (read)"""
 #        d = pdb.pdbdata('double *', None)
 #        l = len(d)
-#        self.failUnlessEqual(l, 0)
+#        self.assertEqual(l, 0)
 
     def testq1(self):
         """Index a scalar double (write)"""
         d = pdb.pdbdata('double', 4.0)
         def foo():
             d[1] = 5.0
-        self.failUnlessRaises(IndexError, foo)
+        self.assertRaises(IndexError, foo)
         d[0] = 5.0
-        self.failUnlessEqual(pdb.unpack(d), 5.0)
+        self.assertEqual(pdb.unpack(d), 5.0)
 
     def testq2(self):
         """Index a single subscripted double array (write)"""
         d = pdb.pdbdata('double[2]', (4.0, 5.0))
         d[0] = 6.0
-        self.failUnlessEqual(pdb.unpack(d), [6.0, 5.0])
+        self.assertEqual(pdb.unpack(d), [6.0, 5.0])
         d[1] = 7.0
-        self.failUnlessEqual(pdb.unpack(d), [6.0, 7.0])
+        self.assertEqual(pdb.unpack(d), [6.0, 7.0])
 
 
 
@@ -262,16 +262,16 @@ class String(test_leak.LeakVif):
     def testStringa(self):
         """create a C char from a python string"""
         d = pdb.pdbdata('char', 'a')
-        self.failUnlessEqual('a', str(d))
+        self.assertEqual('a', str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, 'a')
+        self.assertEqual(o, 'a')
 
     def testStringb(self):
         """create a C char[5] from a python string"""
         d = pdb.pdbdata('char[5]', 'abcde')
-        self.failUnlessEqual('abcde', str(d))
+        self.assertEqual('abcde', str(d))
         o = pdb.unpack(d)
-        self.failUnlessEqual(o, 'abcde')
+        self.assertEqual(o, 'abcde')
 
 
 if __name__ == '__main__':

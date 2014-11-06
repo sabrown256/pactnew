@@ -50,9 +50,9 @@ class Device(unittest.TestCase):
         
     def test1(self):
         dev = pgs.device("foo", "bar", "blat")
-        self.failUnlessEqual(dev.name, "foo")
-        self.failUnlessEqual(dev.type, "BAR")
-        self.failUnlessEqual(dev.title, "blat")
+        self.assertEqual(dev.name, "foo")
+        self.assertEqual(dev.type, "BAR")
+        self.assertEqual(dev.title, "blat")
 
     def test2(self):
         dev = pgs.device("SCREEN", "COLOR", "blat")
@@ -64,8 +64,8 @@ class Device(unittest.TestCase):
         dev = pgs.device("SCREEN", "COLOR", "blat")
         dev.open(0.01, 0.01, 0.3, 0.3)
         pal = dev.set_palette("rainbow")
-        self.failUnless(isinstance(pal, pgs.palette))
-        self.failUnlessEqual(pal.name, "rainbow")
+        self.assertTrue(isinstance(pal, pgs.palette))
+        self.assertEqual(pal.name, "rainbow")
         dev.close()
 
 ############################################################
@@ -80,35 +80,35 @@ class Graph(unittest.TestCase):
                                   "X Values", "Y Values")
         
         members = dir(graph)
-        self.failUnless('data' in members)
-        self.failUnless('identifier' in members)
-        self.failUnless('info_type' in members)
-        self.failUnless('mesh' in members)
-        self.failUnless('rendering' in members)
-        self.failUnless('use' in members)
+        self.assertTrue('data' in members)
+        self.assertTrue('identifier' in members)
+        self.assertTrue('info_type' in members)
+        self.assertTrue('mesh' in members)
+        self.assertTrue('rendering' in members)
+        self.assertTrue('use' in members)
 
-        self.failUnless(isinstance(graph.data, pgs.graph))
-        self.failUnlessEqual(graph.identifier, 65)
-        self.failUnlessEqual(graph.info_type, 'pcons *')
-        self.failUnlessEqual(graph.mesh, 0)
-#        self.failUnlessEqual(graph.rendering, 0)
-        self.failUnlessEqual(graph.use, None)
+        self.assertTrue(isinstance(graph.data, pgs.graph))
+        self.assertEqual(graph.identifier, 65)
+        self.assertEqual(graph.info_type, 'pcons *')
+        self.assertEqual(graph.mesh, 0)
+#        self.assertEqual(graph.rendering, 0)
+        self.assertEqual(graph.use, None)
 
         info = graph.info
-        self.failUnless(isinstance(info, pgs.assoc))
-        self.failUnlessEqual(len(info), 8)
-        self.failUnlessEqual(info['HIST-START'], 0)
-        self.failUnlessEqual(info['LINE-COLOR'], 1)
-        self.failUnlessEqual(info['MARKER-INDEX'], 0)
-        self.failUnlessEqual(info['AXIS-TYPE'], -1)
-        self.failUnlessEqual(info['LINE-STYLE'], 1)
-        self.failUnlessEqual(info['PLOT-TYPE'], -1)
-        self.failUnlessEqual(info['SCATTER'], 0)
-        self.failUnlessEqual(info['LINE-WIDTH'], 0)
+        self.assertTrue(isinstance(info, pgs.assoc))
+        self.assertEqual(len(info), 8)
+        self.assertEqual(info['HIST-START'], 0)
+        self.assertEqual(info['LINE-COLOR'], 1)
+        self.assertEqual(info['MARKER-INDEX'], 0)
+        self.assertEqual(info['AXIS-TYPE'], -1)
+        self.assertEqual(info['LINE-STYLE'], 1)
+        self.assertEqual(info['PLOT-TYPE'], -1)
+        self.assertEqual(info['SCATTER'], 0)
+        self.assertEqual(info['LINE-WIDTH'], 0)
 
         # test assignment
         graph.info = None
-        # self.failUnlessEqual(graph.info, {})
+        # self.assertEqual(graph.info, {})
         # should raise TypeError
         # del graph.info
 
@@ -124,26 +124,26 @@ class Image(unittest.TestCase):
         calc_im = pgs.make_image('Test Image', 'char', None,
                                  0.0, 0.0, 0.0, 0.0, 0.0, sf,
                                  X_max, Y_max, 4, None)
-        self.failUnless(isinstance(calc_im, pgs.image))
-        self.failUnlessEqual(calc_im.version_id, 0)
-        self.failUnlessEqual(calc_im.label, 'Test Image')
-        self.failUnlessEqual(calc_im.xmin, 0.0)
-        self.failUnlessEqual(calc_im.xmax, 250.0)
-        self.failUnlessEqual(calc_im.ymin, 0.0)
-        self.failUnlessEqual(calc_im.ymax, 250.0)
-        self.failUnlessEqual(calc_im.zmin, 0.0)
-        self.failUnlessEqual(calc_im.zmax, 255.0)
-        self.failUnlessEqual(calc_im.element_type, 'char *')
+        self.assertTrue(isinstance(calc_im, pgs.image))
+        self.assertEqual(calc_im.version_id, 0)
+        self.assertEqual(calc_im.label, 'Test Image')
+        self.assertEqual(calc_im.xmin, 0.0)
+        self.assertEqual(calc_im.xmax, 250.0)
+        self.assertEqual(calc_im.ymin, 0.0)
+        self.assertEqual(calc_im.ymax, 250.0)
+        self.assertEqual(calc_im.zmin, 0.0)
+        self.assertEqual(calc_im.zmax, 255.0)
+        self.assertEqual(calc_im.element_type, 'char *')
 
         im = calc_im.buffer
-        self.failUnlessEqual(type(im), type(Numeric.array(1)))
-        self.failUnlessEqual(im.shape, (250, 250))
+        self.assertEqual(type(im), type(Numeric.array(1)))
+        self.assertEqual(im.shape, (250, 250))
 
-        self.failUnlessEqual(calc_im.kmax, 250)
-        self.failUnlessEqual(calc_im.lmax, 250)
-        self.failUnlessEqual(calc_im.size, 62500)
-        self.failUnlessEqual(calc_im.bits_pixel, 4)
-        self.failUnless(isinstance(calc_im.palette, pgs.palette))
+        self.assertEqual(calc_im.kmax, 250)
+        self.assertEqual(calc_im.lmax, 250)
+        self.assertEqual(calc_im.size, 62500)
+        self.assertEqual(calc_im.bits_pixel, 4)
+        self.assertTrue(isinstance(calc_im.palette, pgs.palette))
 
 ############################################################
 

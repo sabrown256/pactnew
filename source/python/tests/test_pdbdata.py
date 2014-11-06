@@ -19,11 +19,11 @@ import test_leak
 class Pdbdata(test_leak.LeakVif):
     def testa(self):
         """Check argument type of pdbdata query functions"""
-        self.failUnlessRaises(TypeError, pdb.getdefstr, 1)
-        self.failUnlessRaises(TypeError, pdb.gettype, 1)
-        self.failUnlessRaises(TypeError, pdb.getfile, 1)
-        self.failUnlessRaises(TypeError, pdb.getdata, 1)
-        self.failUnlessRaises(TypeError, pdb.unpack, 1)
+        self.assertRaises(TypeError, pdb.getdefstr, 1)
+        self.assertRaises(TypeError, pdb.gettype, 1)
+        self.assertRaises(TypeError, pdb.getfile, 1)
+        self.assertRaises(TypeError, pdb.getdata, 1)
+        self.assertRaises(TypeError, pdb.unpack, 1)
         
     def testb(self):
         """pdbdata get attributes functions"""
@@ -31,20 +31,20 @@ class Pdbdata(test_leak.LeakVif):
         data = pdb.getdata(d)
         
         dp = pdb.getdefstr(d)
-        self.failUnlessEqual(type(dp), pdb.defstr)
+        self.assertEqual(type(dp), pdb.defstr)
 
         # check singleton nature of defstr's
         dpvif = pdb.vif.defstr("double")
         self.assert_(dp is dpvif)
 
         t = pdb.gettype(d)
-        self.failUnlessEqual(t, "double")
+        self.assertEqual(t, "double")
 
         t = pdb.getfile(d)
         self.assert_(t is pdb.vif)
 
         v = pdb.unpack(d)
-        self.failUnlessEqual(v, 4.0)
+        self.assertEqual(v, 4.0)
 
 class DataMixin:
     def work_testc2(self, input,
@@ -54,8 +54,8 @@ class DataMixin:
 
         if descr_type is not None:
             desc = self.fp.get_obj_descr(input)
-            self.failUnlessEqual(desc[2], descr_type)
-            self.failUnlessEqual(desc[3], descr_shape)
+            self.assertEqual(desc[2], descr_type)
+            self.assertEqual(desc[3], descr_shape)
 
         if gettype is None:
             gettype = outtype or descr_type
@@ -66,7 +66,7 @@ class DataMixin:
             x = pdb.pdbdata(input, outtype)
 #        print(x)
 
-        self.failUnlessEqual(pdb.gettype(x), gettype)
+        self.assertEqual(pdb.gettype(x), gettype)
 
         if ref_tuple is None:
             if isinstance(input, tuple):
@@ -85,13 +85,13 @@ class DataMixin:
 
         obj = pdb.unpack(x, array=pdb.AS_LIST)
 #        print("XXX", obj)
-        self.failUnlessEqual(obj, ref_list)
+        self.assertEqual(obj, ref_list)
         obj = pdb.unpack(x, array=pdb.AS_TUPLE)
 #        print("YYY", obj)
-        self.failUnlessEqual(obj, ref_tuple)
+        self.assertEqual(obj, ref_tuple)
 
         if s is not None:
-            self.failUnlessEqual(str(x), str(s))
+            self.assertEqual(str(x), str(s))
 
 ##################################################
 
@@ -267,24 +267,24 @@ class Double(test_leak.LeakVif, DataMixin):
 
     def test_erra(self):
         """try to pack using an illegal type"""
-        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+        self.assertRaises(pdb.error, pdb.pdbdata,
                               4.0, 'special_double')
                               
     def XX_test_errb(self):
         """try to pack a C double from a string"""
-        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+        self.assertRaises(pdb.error, pdb.pdbdata,
                               'four', 'double')
         
     def test_errc(self):
         """try to pack C double[2] from too few items"""
         input = [4.0, 5.0]
-        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+        self.assertRaises(pdb.error, pdb.pdbdata,
                               input, 'double[3]')
 
     def test_errd(self):
         """try to pack C double[2] from too many items"""
         input = [4.0, 5.0, 6.0, 7.0]
-        self.failUnlessRaises(pdb.error, pdb.pdbdata,
+        self.assertRaises(pdb.error, pdb.pdbdata,
                               input, 'double[3]')
 
         
@@ -296,43 +296,43 @@ class DoubleIndex(test_leak.LeakVif, DataMixin):
         """Index a scalar double (read)"""
         d = pdb.pdbdata(4.0)
         l = len(d)
-        self.failUnlessEqual(l, 1)
-        self.failUnlessRaises(IndexError, lambda : d[1])
+        self.assertEqual(l, 1)
+        self.assertRaises(IndexError, lambda : d[1])
         p = d[0]
-        self.failUnlessEqual(pdb.unpack(d), 4.0)
+        self.assertEqual(pdb.unpack(d), 4.0)
 
     def testp2(self):
         """Index a single subscripted double array (read)"""
         d = pdb.pdbdata((4.0, 5.0))
         l = len(d)
-        self.failUnlessEqual(l, 2)
+        self.assertEqual(l, 2)
         p = d[0]
-        self.failUnlessEqual(p, 4.0)
+        self.assertEqual(p, 4.0)
         p = d[1]
-        self.failUnlessEqual(p, 5.0)
+        self.assertEqual(p, 5.0)
 
 #    def testp0(self):
 #        """Index a NULL pointer (read)"""
 #        d = pdb.pdbdata(None, 'double *')
 #        l = len(d)
-#        self.failUnlessEqual(l, 0)
+#        self.assertEqual(l, 0)
 
     def testq1(self):
         """Index a scalar double (write)"""
         d = pdb.pdbdata(4.0)
         def foo():
             d[1] = 5.0
-        self.failUnlessRaises(IndexError, foo)
+        self.assertRaises(IndexError, foo)
         d[0] = 5.0
-        self.failUnlessEqual(pdb.unpack(d), 5.0)
+        self.assertEqual(pdb.unpack(d), 5.0)
 
     def testq2(self):
         """Index a single subscripted double array (write)"""
         d = pdb.pdbdata((4.0, 5.0))
         d[0] = 6.0
-        self.failUnlessEqual(pdb.unpack(d), [6.0, 5.0])
+        self.assertEqual(pdb.unpack(d), [6.0, 5.0])
         d[1] = 7.0
-        self.failUnlessEqual(pdb.unpack(d), [6.0, 7.0])
+        self.assertEqual(pdb.unpack(d), [6.0, 7.0])
 
 ##################################################
 
@@ -408,7 +408,7 @@ class ClassObject(test_leak.LeakVif, DataMixin):
         # reports leaks
         "Call get_obj_descr with unknown Class"
         input = UserClass(1, 2, 3)
-        self.failUnlessRaises(pdb.error, self.fp.get_obj_descr, input)
+        self.assertRaises(pdb.error, self.fp.get_obj_descr, input)
 
     def testb1(self):
         "Create pdbdata from class instance"
@@ -417,13 +417,13 @@ class ClassObject(test_leak.LeakVif, DataMixin):
         self.fp.register_class(UserClass, 'user')
 
         desc = self.fp.get_obj_descr(input)
-        self.failUnlessEqual(desc[2], 'user')
+        self.assertEqual(desc[2], 'user')
 
         x = pdb.pdbdata(input, file=self.fp)
-        self.failUnlessEqual(type(x), pdb.pdbdata)
-        self.failUnlessEqual(pdb.gettype(x), 'user')
+        self.assertEqual(type(x), pdb.pdbdata)
+        self.assertEqual(pdb.gettype(x), 'user')
         
-#        self.failUnlessEqual(desc[3], descr_shape)
+#        self.assertEqual(desc[3], descr_shape)
 #        self.work_testc2(uvar,
 #                         descr_type = 'user'
 #                         )
@@ -439,12 +439,12 @@ class ClassObject(test_leak.LeakVif, DataMixin):
 
         desc = self.fp.get_obj_descr(input)
         print(desc)
-        self.failUnlessEqual(desc[2], 'user')
-        self.failUnlessEqual(desc[3], ((0, 2),))
+        self.assertEqual(desc[2], 'user')
+        self.assertEqual(desc[3], ((0, 2),))
 
         x = pdb.pdbdata(input, file=self.fp)
-        self.failUnlessEqual(type(x), pdb.pdbdata)
-        self.failUnlessEqual(pdb.gettype(x), 'user')
+        self.assertEqual(type(x), pdb.pdbdata)
+        self.assertEqual(pdb.gettype(x), 'user')
 
 
 
