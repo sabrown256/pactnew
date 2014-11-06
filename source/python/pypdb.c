@@ -349,7 +349,7 @@ void _PY_defstr_entry(PP_file *fileinfo)
 
 defstr *PY_defstr_alt(PDBfile *file, char *name, PyObject *members)
 {
-    char **list;
+    char *s, **list;
     defstr *dp;
     Py_ssize_t i, nmemb;
     PyObject *item;
@@ -372,7 +372,8 @@ defstr *PY_defstr_alt(PDBfile *file, char *name, PyObject *members)
             PP_error_set_user(item, "members must be strings");
             return(NULL);  /* XXX cleanup */
         }
-        list[i] = PY_STRING_AS_STRING(item);
+        s = PY_STRING_AS_STRING(item);
+        list[i] = s;
     }
 
     dp = PD_defstr_alt(file, name, nmemb, list);

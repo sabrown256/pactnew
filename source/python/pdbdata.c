@@ -86,6 +86,7 @@ PP_pdbdata_tp_str(PP_pdbdataObject *self)
     intb bpi;
     char *str;
     Py_ssize_t size;
+    PyObject *rv;
 
     if (_PD_indirection(self->type)) {
         str = DEREF(self->data);
@@ -96,7 +97,17 @@ PP_pdbdata_tp_str(PP_pdbdataObject *self)
         size = bpi * self->nitems;
     }
     
-    return PY_STRING_STRING_SIZE(str, size);
+#if PY_MAJOR_VERSION >= 3
+    PyObject *io;
+
+    io = PyBytes_FromStringAndSize(str, size);
+    rv = PyObject_Str(io);
+
+#else
+    rv = PY_STRING_STRING_SIZE(str, size);
+#endif
+
+    return(rv);
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.str) */
 }
 

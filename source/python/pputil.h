@@ -285,6 +285,7 @@ extern int
  PP_convert_pdbfile(PyObject *obj, void **addr);
 
 extern char
+ *PY_get_string(PyObject *o),
  *PP_add_indirection(char *type, int n);
 
 extern dimdes

@@ -23,7 +23,8 @@ set msg = "Unit Test ......................"
    flog $Log $CROSS_FE $PYTHON $FilesDir/unittests.py
    @ xstatus = $status
 
-   set inf = ( `grep 'FAILED (' $Log | sed 's|[()=]| |g'` )
+   set inf = ( `grep 'FAILED (' $Log | sed 's|[(,)=]| |g'` )
+   Note $Log "Status info: ($#inf) |$inf|"
    if ("$inf" != "") then
       if ($#inf > 4) then
          @ xstatus = $xstatus + $inf[3] + $inf[5]

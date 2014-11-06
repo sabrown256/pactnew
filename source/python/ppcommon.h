@@ -28,16 +28,16 @@
 
 # define PY_INT_OBJECT                  PyLongObject
 # define PY_INT_TYPE                    PyLong_Type
-# define PY_STRING_TYPE                 PyBytes_Type
-
 # define PY_INT_LONG(_o)                PyLong_FromLong((long) (_o))
 # define PY_INT_CHECK(_o)               PyLong_Check(_o)
 # define PY_INT_AS_LONG(_o)             PyLong_AsLong(_o)
-# define PY_STRING_STRING_SIZE(_o, _s)  PyBytes_FromStringAndSize(_o, _s)
-# define PY_STRING_STRING(_o)           PyBytes_FromString(_o)
-# define PY_STRING_CHECK(_o)            PyBytes_Check(_o)
-# define PY_STRING_SIZE(_o)             PyBytes_Size(_o)
-# define PY_STRING_AS_STRING(_o)        PyUnicode_AsUTF8(_o)
+
+# define PY_STRING_TYPE                 PyUnicode_Type
+# define PY_STRING_STRING_SIZE(_o, _s)  PyUnicode_FromStringAndSize(_o, _s)
+# define PY_STRING_STRING(_o)           PyUnicode_FromString(_o)
+# define PY_STRING_CHECK(_o)            PyUnicode_Check(_o)
+# define PY_STRING_SIZE(_o)             PyUnicode_GET_LENGTH(_o)
+# define PY_STRING_AS_STRING(_o)        PY_get_string(_o)
 
 # define PY_COBJ_VOID_PTR(_o, _m)   PyCapsule_New(_o, 0, (PyCapsule_Destructor) _m)
 # define PY_GET_PTR(_o)             PyCapsule_GetPointer(_o, 0)
@@ -76,11 +76,11 @@ PyMODINIT_FUNC PyInit_##_nm(void)                                           \
 
 # define PY_INT_OBJECT                  PyIntObject
 # define PY_INT_TYPE                    PyInt_Type
-# define PY_STRING_TYPE                 PyString_Type
-
 # define PY_INT_LONG(_o)                PyInt_FromLong((long) (_o))
 # define PY_INT_CHECK(_o)               PyInt_Check(_o)
 # define PY_INT_AS_LONG(_o)             PyInt_AsLong(_o)
+
+# define PY_STRING_TYPE                 PyString_Type
 # define PY_STRING_STRING_SIZE(_o, _s)  PyString_FromStringAndSize(_o, _s)
 # define PY_STRING_STRING(_o)           PyString_FromString(_o)
 # define PY_STRING_CHECK(_o)            PyString_Check(_o)
