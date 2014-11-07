@@ -23,8 +23,8 @@ class SCmem(unittest.TestCase):
         glnnmb, msg = pdb.mem_monitor(-1, -1, "glob");
         a = pdb.alloc(2, 8, name)
         b1, msg = pdb.mem_monitor(glnnmb, -1, "glob");
-        self.assert_(msg is not None)
-        self.assert_(msg.startswith("LEAKED"))
+        self.assertTrue(msg is not None)
+        self.assertTrue(msg.startswith("LEAKED"))
 
     def testb(self):
         """memory - automatic deallocation of memory"""
@@ -34,7 +34,7 @@ class SCmem(unittest.TestCase):
             a = pdb.alloc(2, 8, name)
         foo()
         b1, msg = pdb.mem_monitor(glnnmb, -1, "glob");
-        self.assert_(msg is None)
+        self.assertTrue(msg is None)
 
     def testc(self):
         """memory - mark"""
@@ -50,7 +50,7 @@ class SCmem(unittest.TestCase):
         # garbage collects a will not release the memory
         # since Score's reference count was incremented
         b1, msg = pdb.mem_monitor(glnnmb, -1, "glob");
-        self.assert_(msg is None)
+        self.assertTrue(msg is None)
 
     def testd(self):
         """memory - test allocation"""
@@ -58,7 +58,7 @@ class SCmem(unittest.TestCase):
         a = pdb.alloc(2, 8, name)
         #  pdb.mem_print(a)
         self.assertEqual(pdb.mem_lookup(a), name)
-        self.assert_(pdb.is_score_ptr(a))
+        self.assertTrue(pdb.is_score_ptr(a))
         self.assertEqual(pdb.arrlen(a), 16)
 
     def teste(self):

@@ -34,7 +34,7 @@ static hasharr *_numpy_map;
 /*--------------------------------------------------------------------------*/
 
 int darray_extractor(PyObject *obj, void *arg)
-{
+   {
 
 #ifdef HAVE_PY_NUMERIC
     PyArrayObject *arr;
@@ -47,14 +47,13 @@ int darray_extractor(PyObject *obj, void *arg)
     *(double **) arg = (double *) arr->data;
 #endif
     
-    return 1;
-}
+    return 1;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 int iarray_extractor(PyObject *obj, void *arg)
-{
+   {
 
 #ifdef HAVE_PY_NUMERIC
     PyArrayObject *arr;
@@ -67,8 +66,7 @@ int iarray_extractor(PyObject *obj, void *arg)
     *(int **) arg = (int *) arr->data;
 #endif
     
-    return 1;
-}
+    return 1;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -77,7 +75,7 @@ int iarray_extractor(PyObject *obj, void *arg)
  */
 
 int pplong_extractor(PyObject *obj, void *arg)
-{
+   {
 
 #ifdef HAVE_PY_NUMERIC
     long **buf;
@@ -114,14 +112,13 @@ int pplong_extractor(PyObject *obj, void *arg)
     *(long ***) arg = buf;
 #endif    
     
-    return 1;
-}
+    return 1;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 int REAL_array_extractor(PyObject *obj, void *arg)
-{
+   {
 
 #ifdef HAVE_PY_NUMERIC
     PyArrayObject *arr;
@@ -137,27 +134,24 @@ int REAL_array_extractor(PyObject *obj, void *arg)
     *(double **) arg = (double *) arr->data;
 #endif
     
-    return 1;
-}
+    return 1;}
 
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 PP_numpy_map *PP_lookup_type_num(char *name)
-{
-    PP_numpy_map *entry;
+   {PP_numpy_map *entry;
     
     entry = (PP_numpy_map *) SC_hasharr_def_lookup(_numpy_map, name);
 
-    return entry;
-}
+    return entry;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 int array_pack(void *vr, PyObject *obj, long nitems, PP_types tc)
-{
+   {
 
 #ifdef HAVE_PY_NUMERIC
     PyArrayObject *arr;
@@ -183,15 +177,13 @@ int array_pack(void *vr, PyObject *obj, long nitems, PP_types tc)
     Py_DECREF(arr);
 #endif
 
-    return 0;
-}
+    return 0;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 PyObject *PP_array_unpack(void *vr, long nitems, PP_types tc)
-{
-    PyObject *rv;
+   {PyObject *rv;
 
     rv = NULL;
 
@@ -212,21 +204,19 @@ PyObject *PP_array_unpack(void *vr, long nitems, PP_types tc)
 	rv = PyArray_FromDimsAndData(ndims, dimensions, entry->type_num, vr);};
 #endif
 
-    return rv;
-}
+    return rv;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PP_init_numpy -
- */
+/* _PP_init_numpy - */
 
 void _PP_init_numpy(void)
-{
+   {
 
 #ifdef HAVE_PY_NUMERIC
     PP_numpy_map *nentry;
-    static char *XX_FOO_MAP;
+    static char *PY_FOO_MAP;
     static PP_numpy_map
            entries[] = {{PP_CHAR_I,     PyArray_CHAR,    "char"},
                         {PP_UBYTE_I,    PyArray_UBYTE,   "u_char"},
@@ -242,18 +232,18 @@ void _PP_init_numpy(void)
 /*                        {PP__I,         PyArray_CDOUBLE, ""},          */
                         {0,             0,               NULL}};
 
-    XX_FOO_MAP = CSTRSAVE("PP_numpy_map");
-    SC_permanent(XX_FOO_MAP);
+    PY_FOO_MAP = CSTRSAVE("PP_numpy_map");
+
+    SC_permanent(PY_FOO_MAP);
     
     import_array();
 
     _numpy_map = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
-    for (nentry = entries; nentry->name != NULL; nentry++) {
-        tc_to_entry[nentry->typecode] = nentry;
-        SC_hasharr_install(_numpy_map, nentry->name, nentry,
-			   XX_FOO_MAP, 3, -1);
-    }
+    for (nentry = entries; nentry->name != NULL; nentry++)
+        {tc_to_entry[nentry->typecode] = nentry;
+	 SC_hasharr_install(_numpy_map, nentry->name, nentry,
+			    PY_FOO_MAP, 3, -1);};
 
 #endif    
 
@@ -262,11 +252,11 @@ void _PP_init_numpy(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PP_init_numpy_types -
- */
+/* _PP_init_numpy_types - */
 
 void _PP_init_numpy_types(PP_file *fileinfo)
-{
+   {
+
 #ifdef HAVE_PY_NUMERIC
     PP_type_entry *entry;
 
@@ -281,7 +271,8 @@ void _PP_init_numpy_types(PP_file *fileinfo)
    );
     PP_register_object(fileinfo, entry);
 #endif
-}
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

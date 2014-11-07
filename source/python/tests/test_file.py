@@ -38,7 +38,7 @@ class File(test_leak.Leak):
         fp = pdb.PDBfile("testfile", "w");
         self.assertEqual(type(fp), pdb.PDBfile)
         self.assertEqual(len(pdb.files), 1)
-        self.assert_(pdb.files.has_key('testfile'))
+        self.assertTrue(pdb.files.has_key('testfile'))
         # cause defstr object to be created so it can be deleted
         # during the close
         fp.defstr("double")
@@ -213,7 +213,7 @@ class File(test_leak.Leak):
         d2 = fp.read("d2")
 #        t = fp.defstr("double")
 #        self.assertEqual(type(d2), pdb.pdbdata)
-        self.assert_(isinstance(d2, pdb.pdbdata))
+        self.assertTrue(isinstance(d2, pdb.pdbdata))
         d3 = struct.unpack('dddd', str(d2))
         self.assertEqual(d3, ref)
         fp.close()

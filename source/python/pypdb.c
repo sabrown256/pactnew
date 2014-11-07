@@ -257,85 +257,69 @@ void *_PY_opt_defstr(defstr *x, bind_opt wh, void *a)
 /*--------------------------------------------------------------------------*/
 
 static int _PP_pack_defstr(void *p, PyObject *v, long nitems, PP_types tc)
-{
+   {
+
     PP_error_set(PP_error_internal, NULL, "_PP_unpack_defstr");
-    return(-1);
-}
+
+    return(-1);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 static PyObject *_PP_unpack_defstr(void *p, long nitems)
-{
-    PyObject *rv;
+   {PyObject *rv;
     
-    if (nitems == 1) {
-        rv = (PyObject *) PY_defstr_newobj(NULL, (defstr *) p, PP_vif_info);
-    } else {
-#if 0
-        rv = (PyObject *) PP_pdbdata_newobj(NULL,
-                                            p, "defstr", nitems,
-                                            dims, dp, fileinfo, XXX1, XXX2);
-#else
-        PP_error_set(PP_error_internal, NULL, "_PP_unpack_defstr");
-        rv = NULL;
-#endif
-    }
-    return(rv);
-}
+    if (nitems == 1)
+       rv = (PyObject *) PY_defstr_newobj(NULL, (defstr *) p, PP_vif_info);
+
+    else
+       {PP_error_set(PP_error_internal, NULL, "_PP_unpack_defstr");
+        rv = NULL;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 static PP_descr *_PP_get_defstr_descr(PP_file *fileinfo, PyObject *obj)
-{
+   {defstr *dp;
     PP_descr *descr;
-    PY_defstr *self = (PY_defstr *) obj;
-    defstr *dp;
+    PY_defstr *self;
+
+    self = (PY_defstr *) obj;
 
     dp = _PD_type_lookup(PP_vif, PD_CHART_HOST, "DEFSTR");
 
-    descr = CMAKE(PP_descr);
+    descr           = CMAKE(PP_descr);
     descr->typecode = PP_UNKNOWN_I;
-    descr->bpi = dp->size;
-    descr->type = dp->type;
-    descr->dims = NULL;
-    descr->data = self->pyo;
+    descr->bpi      = dp->size;
+    descr->type     = dp->type;
+    descr->dims     = NULL;
+    descr->data     = self->pyo;
+
     SC_mark(descr->type, 1);
     SC_mark(descr, 1);
 
-    return(descr);
-}
+    return(descr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 void _PY_defstr_entry(PP_file *fileinfo)
-{
-    PP_descr *descr;
+   {PP_descr *descr;
     PP_type_entry *entry;
 
-    descr = PP_make_descr(
-        PP_UNKNOWN_I,                   /* typecode */
-        "defstr",                       /* type */
-        sizeof(defstr)                  /* bpi */
-        );
+    descr = PP_make_descr(PP_UNKNOWN_I, "defstr", sizeof(defstr));
 
-    entry = PP_make_type_entry(
-        PP_UNKNOWN_I,                    /* typecode */
-        FALSE,                           /* sequence */
-        descr,                           /* descr */
-        &PY_defstr_type,                 /* otype */
-        _PP_pack_defstr,                 /* pack */
-        _PP_unpack_defstr,               /* unpack */
-        _PP_get_defstr_descr             /* get_descr */
-        );
+    entry = PP_make_type_entry(PP_UNKNOWN_I, FALSE, descr, &PY_defstr_type,
+			       _PP_pack_defstr,
+			       _PP_unpack_defstr,
+			       _PP_get_defstr_descr);
     
     PP_register_type(fileinfo, entry);
     PP_register_object(fileinfo, entry);
 
-    return;
-}
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -348,113 +332,107 @@ void _PY_defstr_entry(PP_file *fileinfo)
  */
 
 defstr *PY_defstr_alt(PDBfile *file, char *name, PyObject *members)
-{
-    char *s, **list;
+   {char *s, **list;
     defstr *dp;
     Py_ssize_t i, nmemb;
     PyObject *item;
 
-    if (!PySequence_Check(members)) {
-        PP_error_set_user(members, "members must be a sequence");
-        return(NULL);
-    }
-    
-    nmemb = PySequence_Length(members);
-    if (nmemb == -1)
-        return(NULL);
+    dp = NULL;
 
-    list = CMAKE_N(char *, nmemb);
+    if (!PySequence_Check(members))
+       PP_error_set_user(members, "members must be a sequence");
 
-    /* create list of names */
-    for (i = 0; i < nmemb; i++) {
-        item = PySequence_GetItem(members, i);
-        if (! PY_STRING_CHECK(item)) {
-            PP_error_set_user(item, "members must be strings");
-            return(NULL);  /* XXX cleanup */
-        }
-        s = PY_STRING_AS_STRING(item);
-        list[i] = s;
-    }
+    else
+       {nmemb = PySequence_Length(members);
+	if (nmemb != -1)
+	   {list = CMAKE_N(char *, nmemb);
 
-    dp = PD_defstr_alt(file, name, nmemb, list);
-    if (dp == NULL)
-        PP_error_from_pdb();
+/* create list of names */
+	    for (i = 0; i < nmemb; i++)
+	        {item = PySequence_GetItem(members, i);
+		 if (!PY_STRING_CHECK(item))
+		    {PP_error_set_user(item, "members must be strings");
+		     return(NULL);};  /* XXX cleanup */
 
-    /* clean up list */
-    CFREE(list);
+		 s = PY_STRING_AS_STRING(item);
+		 list[i] = s;};
 
-    return(dp);
-}
+	    dp = PD_defstr_alt(file, name, nmemb, list);
+	    if (dp == NULL)
+	       PP_error_from_pdb();
+
+/* clean up list */
+	    CFREE(list);};};
+
+    return(dp);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static int
-PY_defstr_ctor_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
-{
-    char *ts;
-    PyObject *data, *indobj;
-    PP_file *fileinfo;
-    char *kw_list[] = {"data", "ind", NULL};
-    int ierr, nd;
+static int PY_defstr_ctor_tp_init(PP_pdbdataObject *self,
+				  PyObject *args, PyObject *kwds)
+   {int ierr, nd, rv;
     long number, ind[MAXDIM * 3];
+    char *ts;
+    void *vr;
     dimdes *dims;
     defstr *dp;
-    void *vr;
+    PyObject *data, *indobj;
+    PP_file *fileinfo;
     PY_defstr *dpobj;
+    char *kw_list[] = {"data", "ind", NULL};
+
+    rv = -1;
 
     indobj = NULL;
-    if(!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kw_list,
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O|O", kw_list,
                                     &data, &indobj))
-        return(-1);
+       {vr = NULL;
 
-    vr   = NULL;
+	DEBUG1("%s", "In PY_defstr_ctor_tp_init\n");
+    
+	dpobj = (PY_defstr *) SC_hasharr_def_lookup(_PY_defstr_tab,
+						    PY_TYPE(self));
+	if (dpobj == NULL)
+	   {PP_error_set(PP_error_internal, (PyObject *) self,
+			 "Unable to locate constructor for %s",
+			 PY_TYPE(self)->tp_name);
+	    return(-1);};
 
-    DEBUG1("%s", "In PY_defstr_ctor_tp_init\n");
+/* a sanity check */
+	if (PY_TYPE(self) != dpobj->ctor)
+	   {PP_error_set(PP_error_internal, (PyObject *) self,
+			 "Unable to find constructor");
+	    return(-1);};
     
-    dpobj = (PY_defstr *)
-        SC_hasharr_def_lookup(_PY_defstr_tab, PY_TYPE(self));
-    if (dpobj == NULL) {
-        PP_error_set(PP_error_internal, (PyObject *) self,
-                     "Unable to locate constructor for %s",
-                     PY_TYPE(self)->tp_name);
-        return(-1);
-    }
+	dp = dpobj->pyo;
+	ts = dp->type;
+	fileinfo = dpobj->fileinfo;
 
-    /* A sanity check */
-    if (PY_TYPE(self) != dpobj->ctor) {
-        PP_error_set(PP_error_internal, (PyObject *) self,
-                     "Unable to find constructor");
-        return(-1);
-    }
+	dims = NULL;
+	number = 1;
+	if (indobj != NULL)
+	   {nd = PP_obj_to_ind(indobj, ind);
+	    if (nd < 0)
+	       goto err;
+	    dims   = PP_ind_to_dimdes(nd, ind);
+	    number = _PD_comp_num(dims);};
     
-    dp = dpobj->pyo;
-    ts = dp->type;
-    fileinfo = dpobj->fileinfo;
+	ierr = PP_alloc_data(ts, number, fileinfo, &vr);
+	if (ierr < 0)
+	   {PP_error_set(PP_error_internal, (PyObject *) self,
+			 "Error allocating memory");
+	    goto err;};
 
-    dims = NULL;
-    number = 1;
-    if (indobj != NULL) {
-        nd = PP_obj_to_ind(indobj, ind);
-        if (nd < 0)
-            goto err;
-        dims = PP_ind_to_dimdes(nd, ind);
-        number = _PD_comp_num(dims);
-    }
+	ierr = _PP_rd_syment(data, fileinfo, ts, dims, number, vr);
+	if (ierr == -1)
+	   goto err;
     
-    ierr = PP_alloc_data(ts, number, fileinfo, &vr);
-    if (ierr < 0) {
-        PP_error_set(PP_error_internal, (PyObject *) self,
-                     "Error allocating memory");
-        goto err;
-    }
-
-    ierr = _PP_rd_syment(data, fileinfo, ts, dims, number, vr);
-    if (ierr == -1) goto err;
+	self = PP_pdbdata_newobj(self, vr, ts, number,
+				 dims, dp, fileinfo, dpobj, NULL);
     
-    self = PP_pdbdata_newobj(self, vr, ts, number, dims, dp, fileinfo, dpobj, NULL);
-    
-    return(0);
+	return(0);};
 
  err:
 /* XXX   PD_free(file, ts, vr); */
@@ -463,8 +441,7 @@ PY_defstr_ctor_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
 /* XXX  CFREE(ts); */
     _PD_rl_dimensions(dims);
 
-    return(-1);
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -480,52 +457,43 @@ PY_defstr_ctor_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
  */
 
 PyTypeObject *PY_defstr_mk_ctor(PY_defstr *dpobj)
-{
-    haelem *hp;
+   {haelem *hp;
     defstr *dp;
     PyTypeObject *ctor;
     PyHeapTypeObject *et;  
 
     ctor = (PyTypeObject *) PyType_GenericAlloc(&PyType_Type, 0);
     
-    if (ctor == NULL)
-        return(NULL);
+    if (ctor != NULL)
+       {dp = dpobj->pyo;
 
-    dp = dpobj->pyo;
+	ctor->tp_name  = dp->type;
+	ctor->tp_base  = (PyTypeObject *) &PP_pdbdata_Type;
+	Py_INCREF(&PP_pdbdata_Type);
+	ctor->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE;
+	ctor->tp_new   = PyType_GenericNew;
 
-    ctor->tp_name = dp->type;
-    ctor->tp_base = (PyTypeObject *) &PP_pdbdata_Type;
-    Py_INCREF(&PP_pdbdata_Type);
-    ctor->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE;
-    ctor->tp_new = PyType_GenericNew;
-    /* FIXME: why are there two assignments to ctor->tp_init ??? */
-    ctor->tp_init = PP_pdbdata_Type.tp_init;
-    ctor->tp_init = (initproc) PY_defstr_ctor_tp_init;
-    ctor->tp_alloc = PyType_GenericAlloc;
+/* FIXME: why are there two assignments to ctor->tp_init ??? */
+	ctor->tp_init  = PP_pdbdata_Type.tp_init;
+	ctor->tp_init  = (initproc) PY_defstr_ctor_tp_init;
+	ctor->tp_alloc = PyType_GenericAlloc;
 
-    /* Set name in the extended type object */
-    et = (PyHeapTypeObject *)ctor;
+/* set name in the extended type object */
+	et = (PyHeapTypeObject *) ctor;
 #if PYTHON_API_VERSION >= 1013
-    et->ht_name = PY_STRING_STRING(ctor->tp_name);
+	et->ht_name = PY_STRING_STRING(ctor->tp_name);
 #else
-    et->name = PY_STRING_STRING(ctor->tp_name);
+	et->name = PY_STRING_STRING(ctor->tp_name);
 #endif
 
-    if (PyType_Ready(ctor) < 0)
-        return(NULL);
-    if (PY_defstr_dict(dp, ctor->tp_dict) < 0)
-        return(NULL);
+	if (PyType_Ready(ctor) >= 0)
+	   {if (PY_defstr_dict(dp, ctor->tp_dict) >= 0)
+	       {hp = SC_hasharr_install(_PY_defstr_tab, ctor, dpobj,
+					"PY_defstr", 3, -1); 
+		if (hp != NULL)
+		   Py_INCREF(dpobj);};};};
 
-    hp = SC_hasharr_install(_PY_defstr_tab, ctor, dpobj,
-			    "PY_defstr", 3, -1); 
-    if (hp == NULL) {
-        return(NULL);
-    }
-    
-    Py_INCREF(dpobj);
-
-    return(ctor);
-}
+    return(ctor);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -535,23 +503,23 @@ PyTypeObject *PY_defstr_mk_ctor(PY_defstr *dpobj)
  */
 
 void _PP_rl_defstr(PY_defstr *self)
-{
+   {
 
     _PD_clr_table(self->host_chart, _PD_ha_rl_defstr);
     _PD_rl_defstr(self->pyo);
 
-    /* PACT will not release the definition since it is not
-     * pact memory, so use python decref
-     */
-    if (self->ctor != NULL) {
-        SC_hasharr_remove(_PY_defstr_tab, self->ctor);
-        Py_DECREF(self->ctor);
-    }
+/* PACT will not release the definition since it is not
+ * pact memory, so use python decref
+ */
+    if (self->ctor != NULL)
+       {SC_hasharr_remove(_PY_defstr_tab, self->ctor);
+        Py_DECREF(self->ctor);};
 
-    self->pyo = NULL;
+    self->pyo        = NULL;
     self->host_chart = NULL;
-    self->ctor = NULL;
-}
+    self->ctor       = NULL;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -619,92 +587,88 @@ PY_defstr *_PY_defstr_make_singleton(PY_defstr *self,
 
 PY_defstr *_PY_defstr_find_singleton(char *name, defstr *dp,
 				     PP_file *fileinfo)
-{
-    PDBfile *fp;
+   {PDBfile *fp;
     PY_defstr *rv;
 
     rv = (PY_defstr *) SC_hasharr_def_lookup(fileinfo->deftypes, name);
-    if (rv == NULL) {
-        fp = fileinfo->file;
-        if (dp == NULL) {
-            dp = PD_inquire_table_type(fp->host_chart, name);
-            if (dp == NULL) {
-                PP_error_set_user(NULL, "No such type %s in file %s",
-                                  name, fp->name);
-                return(NULL);
-            }
-        }
-        rv = PY_defstr_newobj(NULL, dp, fileinfo);
-        if (rv != NULL) {
-            /* This will use the new reference to install the item */
-	   SC_hasharr_install(fileinfo->deftypes,
-			      dp->type, rv, "PY_defstr", 2, -1);
-        }
-    }
+    if (rv == NULL)
+       {fp = fileinfo->file;
+        if (dp == NULL)
+	   {dp = PD_inquire_table_type(fp->host_chart, name);
+            if (dp == NULL)
+	       PP_error_set_user(NULL, "No such type %s in file %s",
+				 name, fp->name);
+	    else
 
-    return(rv);
-}
+/* this will use the new reference to install the item */
+	       {rv = PY_defstr_newobj(NULL, dp, fileinfo);
+		if (rv != NULL)
+		   SC_hasharr_install(fileinfo->deftypes, dp->type, rv,
+				      "PY_defstr", 2, -1);};};};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 static PyObject *defstr_getter(PP_pdbdataObject *self, void *closure)
-{
-    memdes *member = (memdes *) closure;
+   {memdes *member;
     PyObject *rv;
     
+    member = (memdes *) closure;
+
     rv = PP_getattr_from_defstr(self->fileinfo, self->data,
                                 self->type, member->name,
                                 self->nitems, (PyObject *) self);
-    
-    return(rv);
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 int defstr_setter(PP_pdbdataObject *self, PyObject *value, void *closure)
-{
-    int ierr;
+   {int ierr;
     void *vr;
-    memdes *desc = (memdes *) closure;
+    memdes *desc;
 
-    vr = ((char *) self->data) + desc->member_offs;
+    desc = (memdes *) closure;
+
+    vr   = ((char *) self->data) + desc->member_offs;
     ierr = _PP_rd_syment(value, self->fileinfo, desc->type,
                          desc->dimensions, desc->number, vr);
     
-    return(ierr);
-}
+    return(ierr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PY_defstr_dict - populate dictionary with desriptor objects
- *                - to access member of a defstr.*/
+ *                - to access member of a defstr
+ */
 
 int PY_defstr_dict(defstr *dp, PyObject *dict)
-{
-    memdes *member;
+   {int rv;
+    memdes *pm;
     PyGetSetDef *getset;
     PyObject *descr;
 
-    for (member = dp->members; member != NULL; member = member->next) {
-        getset = PyMem_New(PyGetSetDef, 1);
-        getset->name = member->name;
-        getset->get = (getter) defstr_getter;
-        getset->set = (setter) defstr_setter;
-        getset->doc = NULL;
-        getset->closure = member;
-        descr = PyDescr_NewGetSet(&PP_pdbdata_Type, getset);
-        if (descr == NULL)
-            return(-1);
-        if (PyDict_SetItemString(dict, getset->name, descr) < 0)
-            return(-1);
-        Py_DECREF(descr);
-    }
+    rv = 0;
 
-    return(0);
-}
+    for (pm = dp->members; (pm != NULL) && (rv == 0); pm = pm->next)
+        {getset          = PyMem_New(PyGetSetDef, 1);
+	 getset->name    = pm->name;
+	 getset->get     = (getter) defstr_getter;
+	 getset->set     = (setter) defstr_setter;
+	 getset->doc     = NULL;
+	 getset->closure = pm;
+
+	 descr = PyDescr_NewGetSet(&PP_pdbdata_Type, getset);
+	 if ((descr == NULL) ||
+	     (PyDict_SetItemString(dict, getset->name, descr) < 0))
+            rv = -1;
+	 else
+	    Py_DECREF(descr);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -718,59 +682,52 @@ int PY_defstr_dict(defstr *dp, PyObject *dict)
 PyObject *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
                                  char *name, long nitems,
                                  PyObject *parent)
-{
-    char *ttype, *ts;
-    char *svr;
-    PyObject *obj;
+   {char *ttype, *ts, *svr;
     defstr *dp;
     memdes *desc;
     PP_form form;
     PY_defstr *dpobj;
+    PyObject *obj;
 
-    obj = NULL;
+    obj  = NULL;
     form = PP_global_form;
 
-    if (fileinfo == NULL) {
-        PP_error_set_user(NULL, "fileinfo is NULL");
-        return(NULL);
-    }
+    if (fileinfo == NULL)
+       {PP_error_set_user(NULL, "fileinfo is NULL");
+        return(NULL);};
 
-    /* get base type */
+/* get base type */
     ts = CSTRSAVE(type);
     strtok(ts, " *()[");
     dpobj = _PY_defstr_find_singleton(ts, NULL, fileinfo);
     CFREE(ts);
     if (dpobj == NULL)
-        return(NULL);
+       return(NULL);
 
     dp  = dpobj->pyo;
     svr = vr;
 
-    for (desc = dp->members; desc != NULL; desc = desc->next) {
-        if (strcmp(desc->name, name) == 0) {
+    for (desc = dp->members; desc != NULL; desc = desc->next)
+        {if (strcmp(desc->name, name) == 0)
+	    {PP_CAST_TYPE(ttype, desc, svr + desc->member_offs, svr,
+			  Py_None, NULL);
 
-            PP_CAST_TYPE(ttype, desc, svr + desc->member_offs, svr,
-                         Py_None, NULL);
-
-            /* get base type */
-            ts = CSTRSAVE(ttype);
-            strtok(ts, " *()[");
-            dpobj = _PY_defstr_find_singleton(ts, NULL, fileinfo);
-            CFREE(ts);
-            if (dpobj == NULL)
+/* get base type */
+	     ts = CSTRSAVE(ttype);
+	     strtok(ts, " *()[");
+	     dpobj = _PY_defstr_find_singleton(ts, NULL, fileinfo);
+	     CFREE(ts);
+	     if (dpobj == NULL)
                 return(NULL);
 
-            dp = dpobj->pyo;
+	     dp = dpobj->pyo;
 
-            svr += desc->member_offs;
-            obj = PP_form_object(svr, ttype, desc->number, desc->dimensions,
-                                 dp, fileinfo, dpobj, parent, &form);
-            break;
-        }
-    }
+	     svr += desc->member_offs;
+	     obj = PP_form_object(svr, ttype, desc->number, desc->dimensions,
+				  dp, fileinfo, dpobj, parent, &form);
+	     break;};};
     
-    return(obj);
-}
+    return(obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -778,9 +735,11 @@ PyObject *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
 /* _PP_create_defstr_tab - */
 
 void _PP_create_defstr_tab(void)
-{
+   {
+
     _PY_defstr_tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_ADDR_KEY, 0);
-}
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -788,18 +747,17 @@ void _PP_create_defstr_tab(void)
 /* _PP_clr_defstr - if defstr is in fp, decrement */
  
 static int _PP_clr_defstr(haelem *hp, void *arg)
-{
-    int ok;
+   {int ok;
     PY_defstr *self;
-    PDBfile *fp = arg;
+    PDBfile *fp;
+    
+    fp = arg;
     
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &self, FALSE);
-    if ((ok == TRUE) && (self->fileinfo->file == fp)) {
-        Py_DECREF(self);
-    }
+    if ((ok == TRUE) && (self->fileinfo->file == fp))
+       Py_DECREF(self);
 
-    return(0);
-}
+    return(0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -810,14 +768,13 @@ static int _PP_clr_defstr(haelem *hp, void *arg)
  */
  
 void _PP_cleanup_defstrs(PDBfile *fp)
-{
-    int err;
+   {int err;
     
     err = SC_hasharr_foreach(_PY_defstr_tab, _PP_clr_defstr, fp);
+
     SC_ASSERT(err == TRUE);
 
-    /* XXX - test err? */
-}
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -825,8 +782,7 @@ void _PP_cleanup_defstrs(PDBfile *fp)
 /* PY_defstr_rem - remove defstrs from file. */
 
 void PY_defstr_rem(char *name, PDBfile *file)
-{
-    defstr *dp;
+   {defstr *dp;
     
     dp = PD_inquire_table_type(file->chart, name);
     SC_mark(dp, 1);
@@ -838,8 +794,7 @@ void PY_defstr_rem(char *name, PDBfile *file)
     SC_hasharr_remove(file->host_chart, name);
     _PD_rl_defstr(dp);
     
-    return;
-}
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -849,17 +804,15 @@ static char PY_defstr_has_key_doc[] = "";
 static PyObject *PY_defstr_has_key(PY_defstr *self,
 				   PyObject *args,
 				   PyObject *kwds)
-{
-    char *key;
+   {char *key;
     char *kw_list[] = {"key", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:has_key", kw_list,
-                                     &key))
-        return(NULL);
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "s:has_key", kw_list,
+				    &key))
+       PyErr_SetString(PyExc_NotImplementedError, "has_key");
 
-    PyErr_SetString(PyExc_NotImplementedError, "has_key");
-    return(NULL);
-}
+    return(NULL);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -869,10 +822,11 @@ static char PY_defstr_items_doc[] = "";
 static PyObject *PY_defstr_items(PY_defstr *self,
 				 PyObject *args,
 				 PyObject *kwds)
-{
+   {
+
     PyErr_SetString(PyExc_NotImplementedError, "items");
-    return(NULL);
-}
+
+    return(NULL);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -882,47 +836,40 @@ static char PY_defstr_keys_doc[] = "";
 static PyObject *PY_defstr_keys(PY_defstr *self,
 				PyObject *args,
 				PyObject *kwds)
-{
-    int err;
+   {int err;
     defstr *dp;
     memdes *desc;
     Py_ssize_t i;
     PyObject *rv;
  
     dp = self->pyo;
-    if (dp == NULL) {
-        PP_error_set(PP_error_internal,
+    if (dp == NULL)
+       {PP_error_set(PP_error_internal,
                      NULL, "Defstr is NULL");
-        return(NULL);
-    }
+        return(NULL);};
 
-    if (dp->members == 0) {
-        Py_INCREF(Py_None);
-        return(Py_None);
-    }
+    if (dp->members == 0)
+       {Py_INCREF(Py_None);
+        return(Py_None);};
+
+    for (i = 0, desc = self->pyo->members;
+         desc != NULL;
+         i++, desc = desc->next);
+
+    rv = PyTuple_New(i);
+    if (rv == NULL)
+       return(NULL);
 
     for (i = 0, desc = self->pyo->members;
          desc != NULL;
          i++, desc = desc->next)
-        ;
-
-
-    rv = PyTuple_New(i);
-    if (rv == NULL)
-        return(NULL);
-    for (i = 0, desc = self->pyo->members;
-         desc != NULL;
-         i++, desc = desc->next) {
-        err = PyTuple_SetItem(rv, i, PY_STRING_STRING(desc->name));
-        if (err < 0) {
-            Py_DECREF(rv);
-            rv = NULL;
-            break;
-        }
-    }
+        {err = PyTuple_SetItem(rv, i, PY_STRING_STRING(desc->name));
+	 if (err < 0)
+	    {Py_DECREF(rv);
+	     rv = NULL;
+	     break;};};
   
-    return(rv);
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -932,10 +879,11 @@ static char PY_defstr_values_doc[] = "";
 static PyObject *PY_defstr_values(PY_defstr *self,
 				  PyObject *args,
 				  PyObject *kwds)
-{
+   {
+
     PyErr_SetString(PyExc_NotImplementedError, "values");
-    return(NULL);
-}
+
+    return(NULL);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -944,10 +892,11 @@ static char PY_defstr_get_doc[] = "";
 
 static PyObject *PY_defstr_get(PY_defstr *self,
 			       PyObject *args, PyObject *kwds)
-{
+   {
+
     PyErr_SetString(PyExc_NotImplementedError, "get");
-    return(NULL);
-}
+
+    return(NULL);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -956,9 +905,9 @@ static char PY_defstr_doc_order_flag[] = "";
 
 static PyObject *PY_defstr_get_order_flag(PY_defstr *self,
 					  PyObject *args, PyObject *kwds)
-{
-    return(PY_INT_LONG(self->pyo->fix.order));
-}
+   {
+
+    return(PY_INT_LONG(self->pyo->fix.order));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -977,35 +926,31 @@ static PyMethodDef
 /*--------------------------------------------------------------------------*/
 
 PY_defstr *PY_defstr_newobj(PY_defstr *obj, defstr *dp, PP_file *fileinfo)
-{
-    PyTypeObject *ctor;
+   {PyTypeObject *ctor;
 
-    if (obj == NULL) {
-        obj = (PY_defstr *) PyType_GenericAlloc(&PY_defstr_type, 0);
-        if (obj == NULL) {
-            return(NULL);
-        }
-    }
+    if (obj == NULL)
+       {obj = (PY_defstr *) PyType_GenericAlloc(&PY_defstr_type, 0);
+        if (obj == NULL)
+	   return(NULL);};
 
-    obj->pyo       = dp;
+    obj->pyo      = dp;
     obj->fileinfo = fileinfo;
 
-    /* save a reference to the host_chart.
-     * This is used when the file has been closed but some
-     * references to defstrObjects still exist.
-     */
+/* save a reference to the host_chart.
+ * This is used when the file has been closed but some
+ * references to defstrObjects still exist.
+ */
     obj->host_chart = fileinfo->file->host_chart;
 
     ctor = PY_defstr_mk_ctor(obj);
     if (ctor == NULL)
-        return(NULL);
+       return(NULL);
     obj->ctor = ctor;
 
     SC_mark(dp, 1);
     SC_mark(fileinfo->file->host_chart, 1);
 
-    return(obj);
-}
+    return(obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1032,43 +977,43 @@ static int PY_defstr_tp_print(PY_defstr *self, FILE *file, int flags)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *PY_defstr_tp_call(PY_defstr *self, PyObject *args, PyObject *kwds)
-{
-    PyObject *rv;
+static PyObject *PY_defstr_tp_call(PY_defstr *self,
+				   PyObject *args, PyObject *kwds)
+   {PyObject *rv;
     
-    if (self->ctor == NULL) {
-        PyErr_Format(
-            PyExc_TypeError,
-            "'%s' object is not callable",
-            PY_TYPE(self)->tp_name);
-        rv = NULL;
-    } else {
-        rv = PyObject_Call((PyObject *) self->ctor, args, kwds);
-    }
-    return(rv);
-}
+    if (self->ctor == NULL)
+       {PyErr_Format(PyExc_TypeError,
+		     "'%s' object is not callable",
+		     PY_TYPE(self)->tp_name);
+        rv = NULL;}
+
+    else
+       rv = PyObject_Call((PyObject *) self->ctor, args, kwds);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 static int PY_defstr_tp_init(PY_defstr *self, PyObject *args, PyObject *kwds)
-{
+   {int rv;
     char *name;
     PyObject *members;
     PY_PDBfile *file;
     char *kw_list[] = {"name", "members", "file", NULL};
 
-    file = PP_vif_obj;
-    if(!PyArg_ParseTupleAndKeywords(args, kwds, "sO|O&", kw_list,
-                                    &name, &members, PP_convert_pdbfile, &file))
-        return(-1);
+    rv = -1;
 
-    self = _PY_defstr_make_singleton(self, name, members, file->fileinfo);
-    if (self == NULL)
-        return(-1);
-    
-    return(0);
-}
+    file = PP_vif_obj;
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "sO|O&", kw_list,
+				    &name, &members,
+				    PP_convert_pdbfile, &file))
+       {self = _PY_defstr_make_singleton(self, name, members, file->fileinfo);
+	if (self != NULL)
+	   rv = 0;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -1079,65 +1024,56 @@ static int PY_defstr_tp_init(PY_defstr *self, PyObject *args, PyObject *kwds)
 /* Code to access defstr objects as mappings */
 
 static Py_ssize_t PY_defstr_mp_length(PyObject *_self)
-{
-    Py_ssize_t nitems;
+   {Py_ssize_t nitems;
     defstr *dp;
     memdes *desc;
     PY_defstr *self = (PY_defstr *) _self;
  
     dp = self->pyo;
-    if (dp == NULL) {
-        PP_error_set(PP_error_internal,
+    if (dp == NULL)
+       {PP_error_set(PP_error_internal,
                      NULL, "Defstr is NULL");
-        return(-1);
-    }
+        return(-1);};
 
     for (nitems = 0, desc = self->pyo->members;
          desc != NULL;
-         nitems++, desc = desc->next)
-        ;
+         nitems++, desc = desc->next);
 
-    return(nitems);
-}
+    return(nitems);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 static PyObject *PY_defstr_mp_subscript(PyObject *_self, PyObject *key)
-{
-    char *name;
+   {char *name;
     defstr *dp;
     memdes *desc;
     PyObject *rv;
     PY_defstr *self = (PY_defstr *) _self;
  
-    if (!PY_STRING_CHECK(key)) {
-        PP_error_set_user(key, "key must be string");
-        return(NULL);
-    }
+    if (!PY_STRING_CHECK(key))
+       {PP_error_set_user(key, "key must be string");
+        return(NULL);};
+
     name = PY_STRING_AS_STRING(key);
 
     dp = self->pyo;
-    if (dp == NULL) {
-        PP_error_set(PP_error_internal,
+    if (dp == NULL)
+       {PP_error_set(PP_error_internal,
                      NULL, "Defstr is NULL");
-        return(NULL);
-    }
+        return(NULL);};
 
-    for (desc = self->pyo->members; desc != NULL; desc = desc->next) {
-        if (strcmp(desc->name, name) == 0)
-            break;
-    }
+    for (desc = self->pyo->members; desc != NULL; desc = desc->next)
+        {if (strcmp(desc->name, name) == 0)
+            break;};
 
-    if (desc != NULL) {
-        rv = (PyObject *) PY_memdes_newobj(NULL, desc);
-    } else {
-        PyErr_SetObject(PyExc_KeyError, key);
-        rv = NULL;
-    }
+    if (desc != NULL)
+       rv = (PyObject *) PY_memdes_newobj(NULL, desc);
+    else
+       {PyErr_SetObject(PyExc_KeyError, key);
+        rv = NULL;};
 
-    return(rv);
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
