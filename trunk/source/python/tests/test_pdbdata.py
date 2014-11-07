@@ -35,13 +35,13 @@ class Pdbdata(test_leak.LeakVif):
 
         # check singleton nature of defstr's
         dpvif = pdb.vif.defstr("double")
-        self.assert_(dp is dpvif)
+        self.assertTrue(dp is dpvif)
 
         t = pdb.gettype(d)
         self.assertEqual(t, "double")
 
         t = pdb.getfile(d)
-        self.assert_(t is pdb.vif)
+        self.assertTrue(t is pdb.vif)
 
         v = pdb.unpack(d)
         self.assertEqual(v, 4.0)

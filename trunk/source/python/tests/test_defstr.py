@@ -197,7 +197,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(scalar=pdb.AS_PDBDATA)
         d0 = d[0]
-        self.assert_(isinstance(d0, pdb.pdbdata))
+        self.assertTrue(isinstance(d0, pdb.pdbdata))
         self.assertEqual(pdb.unpack(d0), self.ref[0])
 
     def testg1g(self):
@@ -205,7 +205,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(scalar=pdb.AS_OBJECT)
         d0 = d[0]
-        self.assert_(type(d0), float)
+        self.assertTrue(type(d0), float)
         self.assertEqual(d0, self.ref[0])
 
 #--------------------------------------------------------------------------
@@ -215,7 +215,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(scalar=pdb.AS_PDBDATA)
         d0 = d[-1]
-        self.assert_(isinstance(d0, pdb.pdbdata))
+        self.assertTrue(isinstance(d0, pdb.pdbdata))
         self.assertEqual(pdb.unpack(d0), self.ref[-1])
 
     def testg1i(self):
@@ -223,7 +223,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(scalar=pdb.AS_OBJECT)
         d0 = d[-1]
-        self.assert_(type(d0), float)
+        self.assertTrue(type(d0), float)
         self.assertEqual(d0, self.ref[-1])
 
     def testg3a(self):
@@ -231,7 +231,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(array=pdb.AS_PDBDATA)
         d0 = d[0:2]
-        self.assert_(isinstance(d0, pdb.pdbdata))
+        self.assertTrue(isinstance(d0, pdb.pdbdata))
         self.assertEqual(pdb.unpack(d0), self.ref[0:2])
 
     def testg3b(self):
@@ -239,7 +239,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(array=pdb.AS_LIST)
         d0 = d[0:2]
-        self.assert_(type(d0), list)
+        self.assertTrue(type(d0), list)
         self.assertEqual(d0, self.ref[0:2])
 
 #--------------------------------------------------------------------------
@@ -249,7 +249,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(array=pdb.AS_TUPLE)
         d0 = d[0:2]
-        self.assert_(type(d0), tuple)
+        self.assertTrue(type(d0), tuple)
         self.assertEqual(d0, tuple(self.ref[0:2]))
 
     def xtestg3d(self):
@@ -257,7 +257,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(array=pdb.AS_PDBDATA)
         d0 = d[1:1]
-        self.assert_(isinstance(d0, pdb.pdbdata))
+        self.assertTrue(isinstance(d0, pdb.pdbdata))
         self.assertEqual(pdb.unpack(d0), self.ref[1:1])
 
     def testg3e(self):
@@ -265,7 +265,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(array=pdb.AS_LIST)
         d0 = d[1:1]
-        self.assert_(type(d0), list)
+        self.assertTrue(type(d0), list)
         self.assertEqual(d0, self.ref[1:1])
 
 #--------------------------------------------------------------------------
@@ -275,7 +275,7 @@ class DefstrMixin:
         d = self.driverg()
         pdb.setform(array=pdb.AS_TUPLE)
         d0 = d[1:1]
-        self.assert_(type(d0), tuple)
+        self.assertTrue(type(d0), tuple)
         self.assertEqual(d0, tuple(self.ref[1:1]))
 
     def testg4(self):
@@ -372,7 +372,7 @@ class DefstrMixin:
         d2 = self.driverh2()
         pdb.setform(scalar=pdb.AS_PDBDATA)
         d2j = d2.j
-        self.assert_(isinstance(d2j, pdb.pdbdata))
+        self.assertTrue(isinstance(d2j, pdb.pdbdata))
         self.assertEqual(pdb.unpack(d2j), self.ref['j'])
 
     def testh2g(self):
@@ -380,7 +380,7 @@ class DefstrMixin:
         d2 = self.driverh2()
         pdb.setform(scalar=pdb.AS_OBJECT)
         d2j = d2.j
-        self.assert_(type(d2j), float)
+        self.assertTrue(type(d2j), float)
         self.assertEqual(d2j, self.ref['j'])
 
 
@@ -581,7 +581,7 @@ class Memdes(test_leak.LeakVif):
         self.assertEqual(m1.member, 'int i')
         self.assertEqual(m1.cast_memb, None)
         self.assertEqual(m1.cast_offs, -1)
-        self.assert_(not m1.is_indirect)
+        self.assertTrue(not m1.is_indirect)
         self.assertEqual(m1.type, 'int')
         self.assertEqual(m1.base_type, 'int')
         self.assertEqual(m1.name, 'i')
@@ -591,7 +591,7 @@ class Memdes(test_leak.LeakVif):
         self.assertEqual(m2.member, 'float j[4][5]')
         self.assertEqual(m2.cast_memb, None)
         self.assertEqual(m2.cast_offs, -1)
-        self.assert_(not m2.is_indirect)
+        self.assertTrue(not m2.is_indirect)
         self.assertEqual(m2.type, 'float')
         self.assertEqual(m2.base_type, 'float')
         self.assertEqual(m2.name, 'j')
@@ -601,7 +601,7 @@ class Memdes(test_leak.LeakVif):
         self.assertEqual(m3.member, 'double *k')
         self.assertEqual(m3.cast_memb, None)
         self.assertEqual(m3.cast_offs, -1)
-        self.assert_(m3.is_indirect)
+        self.assertTrue(m3.is_indirect)
         self.assertEqual(m3.type, 'double *')
         self.assertEqual(m3.base_type, 'double')
         self.assertEqual(m3.name, 'k')
