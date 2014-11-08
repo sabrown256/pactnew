@@ -41,7 +41,8 @@ class DoubleIO(DoIO):
 #        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
 #        self.assertEqual(o, ref)
-        self.fp.write_raw('testa_raw', d, 'double')
+        s = str(d)
+        self.fp.write_raw('testa_raw', s, 'double')
         self.fp.write('testa', d)
         self.fp.write('testa_ref', ref)
 
@@ -74,7 +75,8 @@ class DoubleIO(DoIO):
 #        d2 = struct.pack('dd', 4.0, 5.0)
         ref = [4.0, 5.0]
         d = pdb.pdbdata(ref)
-        self.fp.write_raw('testc_raw[2]', d, 'double')
+        s = str(d)
+        self.fp.write_raw('testc_raw[2]', s, 'double')
         self.fp.write('testc', d)
         self.fp.write('testc_ref', ref)
 #        self.assertEqual(str(d2), str(d))
@@ -165,6 +167,9 @@ class DoubleIO(DoIO):
 #        d2 = struct.pack('d', 1.)
         ref = [1.]
         d = pdb.pdbdata(ref, 'double *')
+# GOTCHA
+# some will work with str(d) instead of d
+# see other examples in this file
         self.fp.write_raw('testh_raw', d, 'double *')
         self.fp.write('testh', d)
         self.fp.write('testh_ref', ref)
@@ -272,7 +277,8 @@ class StringIO(DoIO):
         """write a C char from a python string"""
         ref = 'a'
         d = pdb.pdbdata(ref)
-        self.fp.write_raw('testa_raw', d, 'char')
+        s = str(d)
+        self.fp.write_raw('testa_raw', s, 'char')
         self.fp.write('testa', d)
 
         r = self.fp.read('testa')
@@ -282,7 +288,8 @@ class StringIO(DoIO):
         """write a C char[5] from a python string"""
         ref = 'abcde'
         d = pdb.pdbdata('abcde', 'char[5]')
-        self.fp.write_raw('testb_raw[5]', d, 'char')
+        s = str(d)
+        self.fp.write_raw('testb_raw[5]', s, 'char')
         self.fp.write('testb', d)
 
         r = self.fp.read('testb')
