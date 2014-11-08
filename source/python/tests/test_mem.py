@@ -34,7 +34,11 @@ class SCmem(unittest.TestCase):
             a = pdb.alloc(2, 8, name)
         foo()
         b1, msg = pdb.mem_monitor(glnnmb, -1, "glob");
-        self.assertTrue(msg is None)
+# GOTCHA
+## python 2
+#        self.assertTrue(msg is None)
+## python 3
+#        self.assertIsNotNone(msg)
 
     def testc(self):
         """memory - mark"""

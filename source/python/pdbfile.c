@@ -285,9 +285,10 @@ static PyObject *PY_PDBfile_write_raw(PY_PDBfile *self,
     fp     = self->pyo;
     indobj = NULL;
     if (PyArg_ParseTupleAndKeywords(args, kwds,
-				    "st#s|O:write_raw", kw_list,
-				    &name, &buffer,
-				    &buffer_len, &type, &indobj))
+				    "ss#s|O:write_raw", kw_list,
+				    &name,
+				    &buffer, &buffer_len,
+				    &type, &indobj))
        {if (fp == NULL)
 	   PP_error_set_user(NULL, "file is not open");
 
