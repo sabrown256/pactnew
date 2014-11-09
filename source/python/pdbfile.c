@@ -273,9 +273,9 @@ static PyObject *PY_PDBfile_write(PY_PDBfile *self,
 
 static PyObject *PY_PDBfile_write_raw(PY_PDBfile *self,
 				      PyObject *args, PyObject *kwds)
-   {int ok, nd, buffer_len;
+   {int ok, nd, nb;
     long ind[MAXDIM * 3];
-    char *name, *type, *buffer;
+    char *name, *type, *bf, *fmt;
     PDBfile *fp;
     PyObject *indobj, *rv;
     char *kw_list[] = {"name", "var", "type", "ind", NULL};
@@ -284,22 +284,62 @@ static PyObject *PY_PDBfile_write_raw(PY_PDBfile *self,
 
     fp     = self->pyo;
     indobj = NULL;
+
+/* GOTCHA: ask Lee Taylor
+ * python 2 worked with t#, python 3 likes s# instead
+ */
+#if PY_MAJOR_VERSION >= 3
+    fmt = "ss#s|O:write_raw";
+#else
+    fmt = "st#s|O:write_raw";
+#endif
+
     if (PyArg_ParseTupleAndKeywords(args, kwds,
-				    "ss#s|O:write_raw", kw_list,
+				    fmt, kw_list,
 				    &name,
-				    &buffer, &buffer_len,
+				    &bf, &nb,
 				    &type, &indobj))
        {if (fp == NULL)
 	   PP_error_set_user(NULL, "file is not open");
 
 	else
-	   {if (indobj == NULL)
-	       ok = PD_write(fp, name, type, buffer);
+	   {
+
+#if PY_MAJOR_VERSION >= 3
+
+/* NOTE: python versions are inconsistent here
+ * python 2 worked without str(d) and with str(d) shows:
+ *  16 double   0x14a1d3c   for double[2]
+ *   8 double * 0x14b10e4   for double *  pointing to 4 doubles
+ * python 3 requires str(d) and shows:
+ *  61 double   0x7f2e4e5d3f40   for double[2]
+ *  32 double * 0x7f2e4e51b530   for double *  pointing to 4 doubles
+ * for the diagnostic print:
+ *    fprintf(stderr, "-> %d %s %p\n", nb, type, bf);
+ * so python 3 is inconsistent about type and length
+ */
+            if (_PD_indirection(type) == TRUE)
+               {char ty[BFSML];
+                char *t, **p;
+
+                SC_strncpy(ty, BFSML, type, -1);
+
+                t = CMAKE_N(char, nb);
+                memcpy(t, bf, nb);
+
+                for ( ; _PD_indirection(ty) == TRUE; t = (char *) p)
+		    {p  = CMAKE(char *);
+                     *p = t;
+                     PD_dereference(ty);};
+                bf = (char *) p;};
+#endif
+            if (indobj == NULL)
+	       ok = PD_write(fp, name, type, bf);
 	    else
 	       {nd = PP_obj_to_ind(indobj, ind);
 		if (nd < 0)
 		   return(NULL);
-		ok = PD_write_alt(fp, name, type, buffer, nd, ind);};
+		ok = PD_write_alt(fp, name, type, bf, nd, ind);};
 
 	    if (ok == FALSE)
 	       PyErr_SetString(PP_error_user, PD_get_error());
