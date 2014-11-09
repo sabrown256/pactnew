@@ -13,6 +13,7 @@ import unittest
 import os
 import struct
 import test_leak
+import py_inter
 
 class File(test_leak.Leak):      
     def test0a(self):
@@ -214,7 +215,9 @@ class File(test_leak.Leak):
 #        t = fp.defstr("double")
 #        self.assertEqual(type(d2), pdb.pdbdata)
         self.assertTrue(isinstance(d2, pdb.pdbdata))
-        d3 = struct.unpack('dddd', str(d2))
+        s3 = py_inter.to_bytes(d2)
+#        s3 = str(d2)
+        d3 = struct.unpack('dddd', s3)
         self.assertEqual(d3, ref)
         fp.close()
 
