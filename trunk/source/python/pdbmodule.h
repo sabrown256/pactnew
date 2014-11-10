@@ -21,14 +21,14 @@ typedef int Py_ssize_t;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-typedef struct s_PP_pdbdataObject *PP_pdbdataObjectp;
+typedef struct s_PY_pdbdata *PY_pdbdatap;
 
-typedef struct s_PP_pdbdataObject {
+typedef struct s_PY_pdbdata {
   PyObject_HEAD
   PP_HEADER(void)
-} PP_pdbdataObject;
+} PY_pdbdata;
 
-extern PyTypeObject PP_pdbdata_Type;
+extern PyTypeObject PY_pdbdata_type;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -39,8 +39,8 @@ extern "C" {
 
 /* PDBPDBDATA.C declarations */
 
-extern PP_pdbdataObject
- *PP_pdbdata_newobj(PP_pdbdataObject *obj,
+extern PY_pdbdata
+ *PY_pdbdata_newobj(PY_pdbdata *obj,
 		    void *vr, char *type, long nitems,
 		    dimdes *dims, defstr *dp, PP_file *fileinfo,
 		    PY_defstr *dpobj, PyObject *parent);
@@ -49,10 +49,12 @@ extern PP_pdbdataObject
 extern void
   init_pdb(void);
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 #ifdef __cplusplus
 }
 #endif
+
 #endif  /* !PY_pdb_H */
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/

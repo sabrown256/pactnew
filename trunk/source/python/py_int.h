@@ -87,6 +87,10 @@ int PY_ ## _t ## _extractor(PyObject *obj, void *arg)                        \
 # define PY_DEF_REPR NULL
 #endif
 
+#ifndef PY_DEF_AS_SEQ
+# define PY_DEF_AS_SEQ NULL
+#endif
+
 #ifndef PY_DEF_AS_MAP
 # define PY_DEF_AS_MAP NULL
 #endif
@@ -103,6 +107,14 @@ int PY_ ## _t ## _extractor(PyObject *obj, void *arg)                        \
 # define PY_DEF_TP_CALL NULL
 #endif
 
+#ifndef PY_DEF_TP_STR
+# define PY_DEF_TP_STR NULL
+#endif
+
+#ifndef PY_DEF_AS_BUFFER
+# define PY_DEF_AS_BUFFER NULL
+#endif
+
 #define PY_DEF_TYPE_R(_t, _n)                                                \
 PyTypeObject                                                                 \
  PY_ ## _t ## _type = {PY_HEAD_INIT(&PyType_Type, 0)                         \
@@ -116,14 +128,14 @@ PyTypeObject                                                                 \
                   (cmpfunc) 0,                                               \
                   (reprfunc) PY_DEF_REPR,                                    \
                   0,                                                         \
-                  0,                                                         \
+                  PY_DEF_AS_SEQ,                                             \
                   PY_DEF_AS_MAP,                                             \
                   (hashfunc) 0,                                              \
                   (ternaryfunc) PY_DEF_TP_CALL,                              \
-                  (reprfunc) 0,                                              \
+                  (reprfunc) PY_DEF_TP_STR,                                  \
                   (getattrofunc) 0,                                          \
                   (setattrofunc) 0,                                          \
-                  0,                                                         \
+                  PY_DEF_AS_BUFFER,                                          \
                   Py_TPFLAGS_DEFAULT,                                        \
                   PY_ ## _t ## _doc,                                         \
                   (traverseproc) 0,                                          \

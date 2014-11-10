@@ -500,9 +500,9 @@ static PyObject *_PP_unpack_pdbdata(void *p, long nitems)
 
 static PP_descr *_PP_get_pdbdata_descr(PP_file *fileinfo, PyObject *obj)
    {PP_descr *descr;
-    PP_pdbdataObject *self;
+    PY_pdbdata *self;
     
-    self = (PP_pdbdataObject *) obj;
+    self = (PY_pdbdata *) obj;
     
     descr = _PP_mk_descr(PP_PDBDATA_I, self->dp->size, self->type,
                          self->dims, self->data);
@@ -861,8 +861,8 @@ void PP_init_type_map_basic(PP_file *fileinfo)
     PP_register_type(fileinfo, entry);
     PP_register_object(fileinfo, entry);
 
-/* register PP_pdbdata type */
-    entry = PP_make_type_entry(PP_PDBDATA_I, FALSE, NULL, &PP_pdbdata_Type,
+/* register PY_pdbdata type */
+    entry = PP_make_type_entry(PP_PDBDATA_I, FALSE, NULL, &PY_pdbdata_type,
 			       _PP_pack_pdbdata,
 			       _PP_unpack_pdbdata,
 			       _PP_get_pdbdata_descr);

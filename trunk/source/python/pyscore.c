@@ -1004,7 +1004,7 @@ PY_hasharr *PY_hasharr_newobj(PY_hasharr *obj, hasharr *tab)
     if (obj != NULL)
        {dpobj = _PY_defstr_find_singleton("hasharr", NULL, PP_vif_info);
 	if (dpobj != NULL)
-	   rv = (PY_hasharr *) PP_pdbdata_newobj((PP_pdbdataObject *) obj,
+	   rv = (PY_hasharr *) PY_pdbdata_newobj((PY_pdbdata *) obj,
 						 tab, dpobj->pyo->type,
 						 1L, NULL,
 						 dpobj->pyo, dpobj->fileinfo,
