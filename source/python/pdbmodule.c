@@ -87,7 +87,7 @@ PY_MOD_BEGIN(_pdb, pdb_module_documentation, PP_methods)
        PY_MOD_RETURN_ERR;
 
 /* subtype pdbdata */
-    PY_hasharr_type.tp_base = &PP_pdbdata_Type;
+    PY_hasharr_type.tp_base = &PY_pdbdata_type;
 
     ne = PY_setup_pact(m, d);
     if (ne > 0)

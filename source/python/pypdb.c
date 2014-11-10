@@ -91,7 +91,7 @@ int PY_setup_pdb(PyObject *m)
 /* PP_GETDEFSTR - */
 
 PyObject *PP_getdefstr(PyObject *self, PyObject *args, PyObject *kwds)
-   {PP_pdbdataObject *obj;
+   {PY_pdbdata *obj;
     PyObject *rv;
     char *kw_list[] = {"obj", NULL};
 
@@ -99,7 +99,7 @@ PyObject *PP_getdefstr(PyObject *self, PyObject *args, PyObject *kwds)
 
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "O!:getdefstr", kw_list,
-				    &PP_pdbdata_Type, &obj))
+				    &PY_pdbdata_type, &obj))
        {rv = (PyObject *) obj->dpobj;
 	Py_INCREF(rv);};
 
@@ -111,7 +111,7 @@ PyObject *PP_getdefstr(PyObject *self, PyObject *args, PyObject *kwds)
 /* PP_GETTYPE - */
 
 PyObject *PP_gettype(PyObject *self, PyObject *args, PyObject *kwds)
-   {PP_pdbdataObject *obj;
+   {PY_pdbdata *obj;
     PyObject *rv;
     char *kw_list[] = {"obj", NULL};
 
@@ -119,7 +119,7 @@ PyObject *PP_gettype(PyObject *self, PyObject *args, PyObject *kwds)
 
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "O!:gettype", kw_list,
-				    &PP_pdbdata_Type, &obj))
+				    &PY_pdbdata_type, &obj))
        rv = PY_STRING_STRING(obj->type);
 
    return(rv);}
@@ -130,7 +130,7 @@ PyObject *PP_gettype(PyObject *self, PyObject *args, PyObject *kwds)
 /* PP_GETFILE - */
 
 PyObject *PP_getfile(PyObject *self, PyObject *args, PyObject *kwds)
-   {PP_pdbdataObject *obj;
+   {PY_pdbdata *obj;
     PY_PDBfile *file;
     PyObject *rv;
     char *kw_list[] = {"obj", NULL};
@@ -139,7 +139,7 @@ PyObject *PP_getfile(PyObject *self, PyObject *args, PyObject *kwds)
 
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "O!:getfile", kw_list,
-				    &PP_pdbdata_Type, &obj))
+				    &PY_pdbdata_type, &obj))
        {file = (PY_PDBfile *) _PP_find_file_obj(obj->fileinfo->file);
 	if (file != NULL)
 	   {Py_INCREF(file);
@@ -153,14 +153,14 @@ PyObject *PP_getfile(PyObject *self, PyObject *args, PyObject *kwds)
 /* PP_GETDATA - */
 
 PyObject *PP_getdata(PyObject *self, PyObject *args, PyObject *kwds)
-   {PP_pdbdataObject *obj;
+   {PY_pdbdata *obj;
     PyObject *rv;
     char *kw_list[] = {"obj", NULL};
 
     rv = NULL;
 
     if (PyArg_ParseTupleAndKeywords(args, kwds, "O!:getdata", kw_list,
-				    &PP_pdbdata_Type, &obj))
+				    &PY_pdbdata_type, &obj))
        rv = PY_COBJ_VOID_PTR(obj->data, NULL);
 
     return(rv);}
@@ -172,7 +172,7 @@ PyObject *PP_getdata(PyObject *self, PyObject *args, PyObject *kwds)
 
 PyObject *PP_getmember(PyObject *self, PyObject *args, PyObject *kwds)
    {char *name;
-    PP_pdbdataObject *obj;
+    PY_pdbdata *obj;
     PyObject *rv;
     char *kw_list[] = {"obj", "name", NULL};
 
@@ -180,7 +180,7 @@ PyObject *PP_getmember(PyObject *self, PyObject *args, PyObject *kwds)
 
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "O!s:getmember", kw_list,
-				    &PP_pdbdata_Type, &obj, &name))
+				    &PY_pdbdata_type, &obj, &name))
        {rv = Py_None;
 	Py_INCREF(Py_None);};
 
@@ -194,7 +194,7 @@ PyObject *PP_getmember(PyObject *self, PyObject *args, PyObject *kwds)
 PyObject *PP_unpack(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok, array, structure, scalar;
     PyObject *rv;
-    PP_pdbdataObject *data;
+    PY_pdbdata *data;
     PP_form form;
     char *kw_list[] = {"data", "array", "struct", "scalar", NULL};
 
@@ -206,7 +206,7 @@ PyObject *PP_unpack(PyObject *self, PyObject *args, PyObject *kwds)
 
     if (PyArg_ParseTupleAndKeywords(args, kwds,
 				    "O!|iii:unpack", kw_list,
-				    &PP_pdbdata_Type, &data,
+				    &PY_pdbdata_type, &data,
 				    &array, &structure, &scalar))
 /* default to global values */
        {form = PP_global_form;
@@ -369,7 +369,7 @@ defstr *PY_defstr_alt(PDBfile *file, char *name, PyObject *members)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static int PY_defstr_ctor_tp_init(PP_pdbdataObject *self,
+static int PY_defstr_ctor_tp_init(PY_pdbdata *self,
 				  PyObject *args, PyObject *kwds)
    {int ierr, nd, rv;
     long number, ind[MAXDIM * 3];
@@ -429,7 +429,7 @@ static int PY_defstr_ctor_tp_init(PP_pdbdataObject *self,
 	if (ierr == -1)
 	   goto err;
     
-	self = PP_pdbdata_newobj(self, vr, ts, number,
+	self = PY_pdbdata_newobj(self, vr, ts, number,
 				 dims, dp, fileinfo, dpobj, NULL);
     
 	return(0);};
@@ -468,13 +468,13 @@ PyTypeObject *PY_defstr_mk_ctor(PY_defstr *dpobj)
        {dp = dpobj->pyo;
 
 	ctor->tp_name  = dp->type;
-	ctor->tp_base  = (PyTypeObject *) &PP_pdbdata_Type;
-	Py_INCREF(&PP_pdbdata_Type);
+	ctor->tp_base  = (PyTypeObject *) &PY_pdbdata_type;
+	Py_INCREF(&PY_pdbdata_type);
 	ctor->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE;
 	ctor->tp_new   = PyType_GenericNew;
 
 /* FIXME: why are there two assignments to ctor->tp_init ??? */
-	ctor->tp_init  = PP_pdbdata_Type.tp_init;
+	ctor->tp_init  = PY_pdbdata_type.tp_init;
 	ctor->tp_init  = (initproc) PY_defstr_ctor_tp_init;
 	ctor->tp_alloc = PyType_GenericAlloc;
 
@@ -611,7 +611,7 @@ PY_defstr *_PY_defstr_find_singleton(char *name, defstr *dp,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *defstr_getter(PP_pdbdataObject *self, void *closure)
+static PyObject *defstr_getter(PY_pdbdata *self, void *closure)
    {memdes *member;
     PyObject *rv;
     
@@ -625,7 +625,7 @@ static PyObject *defstr_getter(PP_pdbdataObject *self, void *closure)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int defstr_setter(PP_pdbdataObject *self, PyObject *value, void *closure)
+int defstr_setter(PY_pdbdata *self, PyObject *value, void *closure)
    {int ierr;
     void *vr;
     memdes *desc;
@@ -661,7 +661,7 @@ int PY_defstr_dict(defstr *dp, PyObject *dict)
 	 getset->doc     = NULL;
 	 getset->closure = pm;
 
-	 descr = PyDescr_NewGetSet(&PP_pdbdata_Type, getset);
+	 descr = PyDescr_NewGetSet(&PY_pdbdata_type, getset);
 	 if ((descr == NULL) ||
 	     (PyDict_SetItemString(dict, getset->name, descr) < 0))
             rv = -1;

@@ -110,7 +110,7 @@ PyObject *_PP_read_data(PP_file *fileinfo, char *name, char *intype,
             return NULL;
         dp = dpobj->pyo;
     
-        rv = (PyObject *) PP_pdbdata_newobj(NULL, addr.memaddr, type, number,
+        rv = (PyObject *) PY_pdbdata_newobj(NULL, addr.memaddr, type, number,
                                             dims, dp, fileinfo, dpobj, NULL);
     } else {
         rv = _PP_wr_syment(fileinfo, type, dims, number, addr.memaddr, form);
@@ -289,7 +289,7 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
 
         if (entry != NULL) {
             as_obj = AS_OBJECT;
-        } else if (PyObject_IsSubclass((PyObject *) PY_TYPE(obj), (PyObject *) &PP_pdbdata_Type)) {
+        } else if (PyObject_IsSubclass((PyObject *) PY_TYPE(obj), (PyObject *) &PY_pdbdata_type)) {
             PP_type_entry *entry2;
             PP_descr *descr;
             entry2 = PP_inquire_object(fileinfo, obj);

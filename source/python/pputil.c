@@ -52,14 +52,14 @@ int PY_setup_pact(PyObject *m, PyObject *d)
 	PY_DEF_GETSET(memdes, "desc");
 	PY_DEF_GETSET(PDBfile, "object");
 
-	PP_pdbdata_Type.tp_new   = PyType_GenericNew;
-	PP_pdbdata_Type.tp_alloc = PyType_GenericAlloc;
-	ne += (PyType_Ready(&PP_pdbdata_Type) < 0);};
+	PY_pdbdata_type.tp_new   = PyType_GenericNew;
+	PY_pdbdata_type.tp_alloc = PyType_GenericAlloc;
+	ne += (PyType_Ready(&PY_pdbdata_type) < 0);};
 
 /* add some symbolic constants to the module */
     if (ne == 0)
        {ne += (PyDict_SetItemString(d, "pdbdata",
-				    (PyObject *) &PP_pdbdata_Type) < 0);
+				    (PyObject *) &PY_pdbdata_type) < 0);
 	ne += (PyDict_SetItemString(d, "assoc",
 				    (PyObject *) &PY_pcons_type) < 0);
 
@@ -216,10 +216,12 @@ char *PY_get_string(PyObject *o)
 
 #if PY_MAJOR_VERSION >= 3
 
+/*
     rv = (char *) PyUnicode_1BYTE_DATA(o);
     rv = (char *) PyUnicode_2BYTE_DATA(o);
     rv = (char *) PyUnicode_4BYTE_DATA(o);
-    rv = PyUnicode_AS_DATA(o);
+    rv = (char *) PyUnicode_AS_DATA(o);
+*/
     rv = PyUnicode_AsUTF8(o);
 
 #else
@@ -296,7 +298,7 @@ PyObject *PP_form_object(void *vr, char *type, long nitems,
     if ((nitems > 1 && form->array_kind == AS_PDBDATA) ||
         (dp->members != NULL && form->struct_kind == AS_PDBDATA) ||
         form->scalar_kind == AS_PDBDATA) {
-        rv = (PyObject *) PP_pdbdata_newobj(NULL, vr, type, nitems, dims,
+        rv = (PyObject *) PY_pdbdata_newobj(NULL, vr, type, nitems, dims,
                                             dp, fileinfo, dpobj, parent);
     } else {
         rv = _PP_wr_syment(fileinfo, type, dims, nitems, vr, form);

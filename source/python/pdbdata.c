@@ -12,57 +12,85 @@ static PyObject
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.extra_members) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.extra_members) */
-
-static PyGetSetDef PP_pdbdata_getset[] = {
-
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.extra_getset) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.extra_getset) */
-    {NULL}     /* Sentinel */
-};
+static PyGetSetDef
+ PY_pdbdata_getset[] = { {NULL} };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static void
-PP_pdbdata_tp_dealloc(PP_pdbdataObject *self)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_type.dealloc) */
+PY_pdbdata *PY_pdbdata_newobj(PY_pdbdata *obj,
+                                    void *vr, char *type, long nitems,
+                                    dimdes *dims, defstr *dp,
+				    PP_file *fileinfo,
+                                    PY_defstr *dpobj, PyObject *parent)
+   {
+
+    if (obj == NULL)
+       obj = (PY_pdbdata *) PyType_GenericAlloc(dpobj->ctor, 0);
+
+    if (obj != NULL)
+       {obj->data     = vr;
+	obj->type     = type;
+	obj->nitems   = nitems;
+	obj->dims     = dims;
+	obj->dp       = dp;
+	obj->fileinfo = fileinfo;
+	obj->dpobj    = dpobj;
+	obj->parent   = parent;
+
+/* are the data belong to us or someone else? */
+	if (parent == NULL)
+	   {SC_mark(vr, 1);}
+	else
+	   Py_INCREF(parent);
+
+	SC_mark(type, 1);
+	if (dims != NULL)
+	   SC_mark(dims, 1);
+
+	SC_mark(dp, 1);
+
+	Py_INCREF(dpobj);};
+
+    return(obj);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static void PY_pdbdata_tp_dealloc(PY_pdbdata *self)
+   {
+
 /* XXX    PD_free(self->file, self->type, self->data) ;*/
 
-    /* Check if the data actually belongs to another object.
-     * For example, by indexing.  In this case self->data
-     * may be pointer into the middle of an array so
-     * we can not delete it directly.  Instead decrement the parent.
-     */
-    if (self->parent == NULL) {
-        if (self->data != NULL) {
-            (void) _PP_rel_syment(self->dpobj->host_chart, self->data, self->nitems, self->type);
-            CFREE(self->data);
-        }
-    } else {
-        Py_DECREF(self->parent);
+/* Check if the data actually belongs to another object.
+ * For example, by indexing.  In this case self->data
+ * may be pointer into the middle of an array so
+ * we can not delete it directly.  Instead decrement the parent.
+ */
+    if (self->parent == NULL)
+       {if (self->data != NULL)
+	   {_PP_rel_syment(self->dpobj->host_chart, self->data,
+			   self->nitems, self->type);
+            CFREE(self->data);};}
+    else
+       {Py_DECREF(self->parent);
         self->parent = NULL;
-        self->data = NULL;
-    }
+        self->data   = NULL;};
+
     CFREE(self->type);
     _PD_rl_dimensions(self->dims);
     _PD_rl_defstr(self->dp);
     Py_XDECREF(self->dpobj);
 
     PY_self_free(self);
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.dealloc) */
-}
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static int
-PP_pdbdata_tp_print(PP_pdbdataObject *self, FILE *file, int flags)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_type.print) */
-    syment *ep;
+static int PY_pdbdata_tp_print(PY_pdbdata *self, FILE *file, int flags)
+   {syment *ep;
     SC_address addr;
 
     addr.memaddr = self->data;
@@ -71,31 +99,27 @@ PP_pdbdata_tp_print(PP_pdbdataObject *self, FILE *file, int flags)
     
     PD_write_entry(file, self->fileinfo->file, "data", self->data,
                    ep, 0, NULL);
+
     _PD_rl_syment(ep);
-    return 0;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.print) */
-}
+
+    return(0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *
-PP_pdbdata_tp_str(PP_pdbdataObject *self)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_type.str) */
-    intb bpi;
+static PyObject *PY_pdbdata_tp_str(PY_pdbdata *self)
+   {intb bpi;
     char *str;
     Py_ssize_t size;
     PyObject *rv;
 
-    if (_PD_indirection(self->type)) {
-        str = DEREF(self->data);
-        size = SC_arrlen(str);
-    } else {
-        str = self->data;
+    if (_PD_indirection(self->type))
+       {str = DEREF(self->data);
+        size = SC_arrlen(str);}
+    else
+       {str = self->data;
         bpi = _PD_lookup_size(self->type, self->fileinfo->file->host_chart);
-        size = bpi * self->nitems;
-    }
+        size = bpi * self->nitems;};
     
 #if PY_MAJOR_VERSION >= 3
     PyObject *io;
@@ -107,277 +131,246 @@ PP_pdbdata_tp_str(PP_pdbdataObject *self)
     rv = PY_STRING_STRING_SIZE(str, size);
 #endif
 
-    return(rv);
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.str) */
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static int
-PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_type.init) */
-    char *type, *tbase;
-    PyObject *obj;
-    PDBfile *fp;
-    PP_file *fileinfo;
-    char *kw_list[] = {"obj", "type", "file", NULL};
-    int ierr;
+static int PY_pdbdata_tp_init(PY_pdbdata *self,
+			      PyObject *args, PyObject *kwds)
+   {int ierr, rv;
     long number;
-    defstr *dp;
+    char *type, *tbase;
     void *vr;
+    defstr *dp;
+    PDBfile *fp;
+    PyObject *obj;
+    PP_file *fileinfo;
     PY_defstr *dpobj;
     PY_PDBfile *file;
-    PP_descr *descr;
-    PP_descr *olddescr;
+    PP_descr *descr, *olddescr;
+    char *kw_list[] = {"obj", "type", "file", NULL};
+
+    rv   = -1;
+    ierr = 0;
 
     type = NULL;
     file = PP_vif_obj;
-    if(!PyArg_ParseTupleAndKeywords(args, kwds, "O|sO&", kw_list,
-                                    &obj, &type, PP_convert_pdbfile, &file))
-            return -1;
+    if (PyArg_ParseTupleAndKeywords(args, kwds,
+				    "O|sO&", kw_list,
+				    &obj, &type,
+				    PP_convert_pdbfile, &file))
+       {vr       = NULL;
+	fileinfo = file->fileinfo;
+	fp       = fileinfo->file;
 
-    vr       = NULL;
-    fileinfo = file->fileinfo;
-    fp       = fileinfo->file;
+	descr = PP_get_object_descr(fileinfo, obj);
+	if (descr == NULL)
+	   PP_error_set_user(obj, "Unable to find PDB type");
 
-    descr = PP_get_object_descr(fileinfo, obj);
-    if (descr == NULL) {
-        PP_error_set_user(obj, "Unable to find PDB type");
-        return -1;
-    }
+	else
+	   {olddescr = descr;
+	    descr    = PP_outtype_descr(fp, descr, type);
+	    _PP_rl_descr(olddescr);
+	    if (descr != NULL)
+	       {number = _PD_comp_num(descr->dims);
 
-    olddescr = descr;
-    descr = PP_outtype_descr(fp, descr, type);
-    _PP_rl_descr(olddescr);
-    if (descr == NULL) {
-        return -1;
-    }
+		if (descr->data == NULL)
+		   ierr = PP_make_data(obj, fileinfo, descr->type,
+				       descr->dims, &vr);
+		else
+		   vr = descr->data;
 
-    number = _PD_comp_num(descr->dims);
+/* get base type, without dimension information */
+		if (ierr != -1)
+		   {tbase = CSTRSAVE(descr->type);
+		    strtok(tbase, " *()[");
+		    dpobj = _PY_defstr_find_singleton(tbase, NULL, fileinfo);
+		    CFREE(tbase);
 
-    if (descr->data == NULL) {
-        ierr = PP_make_data(obj, fileinfo, descr->type, descr->dims, &vr);
-        if (ierr == -1) goto err;
-    } else {
-        vr = descr->data;
-    }
+		    if (dpobj == NULL)
+		       ierr = -1;
 
-    /* get base type, without dimension information */
-    tbase = CSTRSAVE(descr->type);
-    strtok(tbase, " *()[");
-    dpobj = _PY_defstr_find_singleton(tbase, NULL, fileinfo);
-    CFREE(tbase);
-    if (dpobj == NULL)
-        goto err;
-/*        return -1;*/
-    dp = dpobj->pyo;
+		    else
+		       {dp = dpobj->pyo;
     
-    self = PP_pdbdata_newobj(self, vr, descr->type, number,
-                             descr->dims, dp, fileinfo, dpobj, NULL);
+			self = PY_pdbdata_newobj(self, vr, descr->type, number,
+						 descr->dims, dp, fileinfo,
+						 dpobj, NULL);
     
-/*    self->dict = PY_defstr_dict(ts, fp);*/
+			_PP_rl_descr(descr);
 
-/*    CFREE(ts);  XXX saved in self */
-    _PP_rl_descr(descr);
+			rv = 0;};};};
     
-    return 0;
+	    if ((ierr == -1) && (descr != NULL))
+	       {if (descr->data == NULL)
+		   {_PP_rel_syment(fp->host_chart, vr, number, descr->type);
+		    CFREE(vr);};
 
- err:
-    if (descr != NULL) {
-        if (descr->data == NULL) {
-            (void) _PP_rel_syment(fp->host_chart, vr, number, descr->type);
-            CFREE(vr);
-        }
-        _PP_rl_descr(descr);
-    }    
-/*    CFREE(ts);*/
-/*    _PD_rl_dimensions(dims); */
-    return -1;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.init) */
-}
+		_PP_rl_descr(descr);};};};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PP_pdbdata_Check - */
+/* PY_pdbdata_Check - */
 
-/* static */ int
-PP_pdbdata_Check(PyObject *op)
-{
-    if (PyObject_TypeCheck(op, &PP_pdbdata_Type))
-        return 1;
-    else
-        return 0;
-/*  return PY_TYPE(op) == &PP_pdbdata_Type; */
-}
+int PY_pdbdata_Check(PyObject *op)
+   {int rv;
+
+    rv = (PyObject_TypeCheck(op, &PY_pdbdata_type) != 0);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
-/*                          OBJECT_TP_AS_SEQUENCE                           */
 /*--------------------------------------------------------------------------*/
 
 /* Code to handle accessing pdbdata objects as sequence objects */
 
-static Py_ssize_t
-PP_pdbdata_sq_length(PyObject *_self)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.length) */
-    Py_ssize_t nitems;
-    PP_pdbdataObject *self = (PP_pdbdataObject *) _self;
+static Py_ssize_t PY_pdbdata_sq_length(PyObject *_self)
+   {Py_ssize_t nitems;
+    PY_pdbdata *self;
 
-    if (self->data == NULL) {
-        nitems = 0;
-    } else if (self->dims == NULL) {
-        nitems = 1;
-    } else {
-        nitems = self->dims->number;
-    }
-    return nitems;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.length) */
-}
+    self = (PY_pdbdata *) _self;
+
+    if (self->data == NULL)
+       nitems = 0;
+    else if (self->dims == NULL)
+       nitems = 1;
+    else
+       nitems = self->dims->number;
+
+    return(nitems);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *
-PP_pdbdata_sq_item(PyObject *_self, Py_ssize_t i)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.item) */
-    Py_ssize_t nitems;
+static PyObject *PY_pdbdata_sq_item(PyObject *_self, Py_ssize_t i)
+   {Py_ssize_t nitems;
     PyObject *rv;
     PP_form *form;
-    PP_pdbdataObject *self = (PP_pdbdataObject *) _self;
+    PY_pdbdata *self;
     
-    if (self->data == NULL) {
-        nitems = 0;
-    } else if (self->dims == NULL) {
-        nitems = 1;
-    } else {
-        nitems = self->dims->number;
-    }
+    rv = NULL;
 
-    if (i < 0 || i >= nitems) {
-        if (indexerr == NULL)
-            indexerr = PY_STRING_STRING(
-                "pdbdata index out of range");
-        PyErr_SetObject(PyExc_IndexError, indexerr);
-        return NULL;
-    }
+    self = (PY_pdbdata *) _self;
+    
+    if (self->data == NULL)
+       nitems = 0;
+    else if (self->dims == NULL)
+       nitems = 1;
+    else
+       nitems = self->dims->number;
 
-    form = &PP_global_form;
+    if ((i < 0) || (i >= nitems))
+       {if (indexerr == NULL)
+	   indexerr = PY_STRING_STRING("pdbdata index out of range");
+        PyErr_SetObject(PyExc_IndexError, indexerr);}
 
-    /* special case indexing a scalar item */
-    if (nitems == 1 && form->scalar_kind == AS_PDBDATA) {
-        Py_INCREF(self);
-        rv = (PyObject *) self;
-    } else {
-        void *vr;
+    else
+       {form = &PP_global_form;
 
-        vr = ((char *) self->data) + i * self->dp->size;
-        rv = PP_form_object(vr, self->type, 1, NULL,
-                            self->dp, self->fileinfo, self->dpobj,
-                            (PyObject *) self, form);
-    }
+/* special case indexing a scalar item */
+	if (nitems == 1 && form->scalar_kind == AS_PDBDATA)
+	   {Py_INCREF(self);
+	    rv = (PyObject *) self;}
+	else
+	   {void *vr;
+
+	    vr = ((char *) self->data) + i * self->dp->size;
+	    rv = PP_form_object(vr, self->type, 1, NULL,
+				self->dp, self->fileinfo, self->dpobj,
+				(PyObject *) self, form);};};
         
-    return rv;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.item) */
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *
-PP_pdbdata_sq_slice(PyObject *_self, Py_ssize_t ilow, Py_ssize_t ihigh)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.slice) */
-    Py_ssize_t nitems;
+static PyObject *PY_pdbdata_sq_slice(PyObject *_self,
+				     Py_ssize_t ilow, Py_ssize_t ihigh)
+   {Py_ssize_t nitems;
     void *vr;
     PyObject *rv;
     PP_form *form;
     dimdes *dims;
-    PP_pdbdataObject *self = (PP_pdbdataObject *) _self;
+    PY_pdbdata *self = (PY_pdbdata *) _self;
     
-    if (self->data == NULL) {
-        nitems = 0;
-    } else if (self->dims == NULL) {
-        nitems = 1;
-    } else {
-        nitems = self->dims->number;
-    }
+    if (self->data == NULL)
+       nitems = 0;
+    else if (self->dims == NULL)
+       nitems = 1;
+    else
+       nitems = self->dims->number;
 
-
-    /* lifted from listobject.c */
+/* lifted from listobject.c */
     if (ilow < 0)
-        ilow = 0;
+       ilow = 0;
     else if (ilow > nitems)
-        ilow = nitems;
+       ilow = nitems;
+
     if (ihigh < ilow)
-        ihigh = ilow;
+       ihigh = ilow;
     else if (ihigh > nitems)
-        ihigh = nitems;
+       ihigh = nitems;
 
     form = &PP_global_form;
 
     nitems = ihigh - ilow;
-    vr = ((char *) self->data) + ilow * self->dp->size;
-    dims = _PD_mk_dimensions(ilow, nitems);
+    vr     = ((char *) self->data) + ilow * self->dp->size;
+    dims   = _PD_mk_dimensions(ilow, nitems);
     SC_mark(dims, 1);
+
     rv = PP_form_object(vr, self->type, nitems, dims,
                         self->dp, self->fileinfo, self->dpobj,
                         (PyObject *) self, form);
+
     _PD_rl_dimensions(dims);
         
-    return rv;
-
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.slice) */
-}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static int
-PP_pdbdata_sq_ass_item(PyObject *_self, Py_ssize_t i, PyObject *v)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_sequence.ass_item) */
-    int ierr;
+static int PY_pdbdata_sq_ass_item(PyObject *_self,
+				  Py_ssize_t i, PyObject *v)
+   {int ierr;
     Py_ssize_t nitems;
     void *vr;
-    PP_pdbdataObject *self = (PP_pdbdataObject *) _self;
+    PY_pdbdata *self;
     
-    if (self->data == NULL) {
-        nitems = 0;
-    } else if (self->dims == NULL) {
-        nitems = 1;
-    } else {
-        nitems = self->dims->number;
-    }
+    self = (PY_pdbdata *) _self;
+    
+    if (self->data == NULL)
+       nitems = 0;
+    else if (self->dims == NULL)
+       nitems = 1;
+    else
+       nitems = self->dims->number;
 
-    if (i < 0 || i >= nitems) {
-        if (indexerr == NULL)
-            indexerr = PY_STRING_STRING(
-                "pdbdata index out of range");
+    if ((i < 0) || (i >= nitems))
+       {if (indexerr == NULL)
+	   indexerr = PY_STRING_STRING("pdbdata index out of range");
         PyErr_SetObject(PyExc_IndexError, indexerr);
-        return -1;
-    }
+        ierr = -1;}
+    else
+       {vr   = ((char *) self->data) + i * self->dp->size;
+	ierr = _PP_rd_syment(v, self->fileinfo, self->type, NULL, 1, vr);};
 
-    vr = ((char *) self->data) + i * self->dp->size;
-    ierr = _PP_rd_syment(v, self->fileinfo, self->type, NULL, 1, vr);
-
-    return ierr;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_sequence.ass_item) */
-}
+    return(ierr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PySequenceMethods PP_pdbdata_as_sequence = {
-        PP_pdbdata_sq_length,           /* sq_length */
+static PySequenceMethods
+ PY_pdbdata_as_sequence = {
+        PY_pdbdata_sq_length,           /* sq_length */
         0,                              /* sq_concat */
         0,                              /* sq_repeat */
-        PP_pdbdata_sq_item,             /* sq_item */
-        PP_pdbdata_sq_slice,            /* sq_slice */
-        PP_pdbdata_sq_ass_item,         /* sq_ass_item */
+        PY_pdbdata_sq_item,             /* sq_item */
+        PY_pdbdata_sq_slice,            /* sq_slice */
+        PY_pdbdata_sq_ass_item,         /* sq_ass_item */
         0,                              /* sq_ass_slice */
         0,                              /* sq_contains */
         /* Added in release 2.0 */
@@ -386,134 +379,157 @@ static PySequenceMethods PP_pdbdata_as_sequence = {
 };
 
 /*--------------------------------------------------------------------------*/
-/*                           OBJECT_TP_AS_BUFFER                            */
-/*--------------------------------------------------------------------------*/
 
 #if PY_MAJOR_VERSION < 3
 
+/*--------------------------------------------------------------------------*/
+
 /* Code to access pdbdata objects as buffer */
 
-static Py_ssize_t
-PP_pdbdata_bf_getreadbuffer(PyObject *_self, Py_ssize_t segment, void **ptrptr)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_buffer.getreadbuffer) */
-    Py_ssize_t n;
-    PP_pdbdataObject *self = (PP_pdbdataObject *) _self;
+static Py_ssize_t PY_pdbdata_bf_getreadbuffer(PyObject *_self,
+					      Py_ssize_t segment,
+					      void **ptrptr)
+   {Py_ssize_t n;
+    PY_pdbdata *self;
     
-    if ( segment != 0 ) {
-        PP_error_set(PP_error_internal, NULL,
+    self = (PY_pdbdata *) _self;
+    
+    if (segment != 0)
+       {PP_error_set(PP_error_internal, NULL,
                      "Accessing non-existent buffer segment:%d", segment);
-        n = -1;
-    } else {
-        *ptrptr = self->data;
-        n = self->nitems * self->dp->size;
-    }
-    return n;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_buffer.getreadbuffer) */
-}
+        n = -1;}
+    else
+       {*ptrptr = self->data;
+        n = self->nitems * self->dp->size;};
+
+    return(n);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static Py_ssize_t
-PP_pdbdata_bf_getwritebuffer(PyObject *_self, Py_ssize_t segment, void **ptrptr)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_buffer.getwritebuffer) */
-    Py_ssize_t n;
-    PP_pdbdataObject *self = (PP_pdbdataObject *) _self;
+static Py_ssize_t PY_pdbdata_bf_getwritebuffer(PyObject *_self,
+					       Py_ssize_t segment,
+					       void **ptrptr)
+   {Py_ssize_t n;
+    PY_pdbdata *self = (PY_pdbdata *) _self;
 
-    if ( segment != 0 ) {
-        PP_error_set(PP_error_internal, NULL,
+    if (segment != 0)
+       {PP_error_set(PP_error_internal, NULL,
                      "Accessing non-existent buffer segment:%d", segment);
-        n = -1;
-    } else {
-        *ptrptr = self->data;
-        n = self->nitems * self->dp->size;
-    }
-    return n;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_buffer.getwritebuffer) */
-}
+        n = -1;}
+    else
+       {*ptrptr = self->data;
+        n = self->nitems * self->dp->size;};
+
+    return(n);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static Py_ssize_t
-PP_pdbdata_bf_getsegcount(PyObject *_self, Py_ssize_t *lenp)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_buffer.getsegcount) */
+static Py_ssize_t PY_pdbdata_bf_getsegcount(PyObject *_self,
+					    Py_ssize_t *lenp)
+   {
+
     if (lenp != NULL)
-        *lenp = 1;
-    return 1;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_buffer.getsegcount) */
-}
+       *lenp = 1;
+
+    return(1);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static Py_ssize_t
-PP_pdbdata_bf_getcharbuffer(PyObject *_self, Py_ssize_t segment, char **ptrptr)
-{
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.as_buffer.getcharbuffer) */
-    Py_ssize_t n;
-    PP_pdbdataObject *self = (PP_pdbdataObject *) _self;
+static Py_ssize_t PY_pdbdata_bf_getcharbuffer(PyObject *_self,
+					      Py_ssize_t segment,
+					      char **ptrptr)
+   {Py_ssize_t n;
+    PY_pdbdata *self;
 
-    if ( segment != 0 ) {
-        PP_error_set(PP_error_internal, NULL,
+    self = (PY_pdbdata *) _self;
+
+    if (segment != 0)
+       {PP_error_set(PP_error_internal, NULL,
                      "Accessing non-existent buffer segment:%d", segment);
-        n = -1;
-    } else {
-        *ptrptr = self->data;
-        n = self->nitems * self->dp->size;
-    }
-    return n;
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_buffer.getcharbuffer) */
-}
+        n = -1;}
+    else
+       {*ptrptr = self->data;
+        n = self->nitems * self->dp->size;};
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
 
 #endif
 
+/*--------------------------------------------------------------------------*/
+
 static PyBufferProcs
- PP_pdbdata_as_buffer = PY_INIT_BUFFER_PROCS(PP_pdbdata_bf_getreadbuffer,
-                                             PP_pdbdata_bf_getwritebuffer,
-                                             PP_pdbdata_bf_getsegcount,
-                                             PP_pdbdata_bf_getcharbuffer,
+ PY_pdbdata_as_buffer = PY_INIT_BUFFER_PROCS(PY_pdbdata_bf_getreadbuffer,
+                                             PY_pdbdata_bf_getwritebuffer,
+                                             PY_pdbdata_bf_getsegcount,
+                                             PY_pdbdata_bf_getcharbuffer,
                                              NULL,
                                              NULL);
 
 /*--------------------------------------------------------------------------*/
 
+#if 0
 
-static char PP_pdbdata_Type__doc__[] = 
-""
-;
+#undef PY_DEF_DESTRUCTOR
+#undef PY_DEF_REPR
+#undef PY_DEF_TP_METH
+#undef PY_DEF_TP_PRINT
+#undef PY_DEF_TP_STR
+#undef PY_DEF_TP_CALL
+#undef PY_DEF_AS_SEQ
+#undef PY_DEF_AS_MAP
+#undef PY_DEF_AS_BUFFER
 
-/* static */
-PyTypeObject PP_pdbdata_Type = {
+#define PY_DEF_DESTRUCTOR	    PY_pdbdata_tp_dealloc
+#define PY_DEF_REPR                 NULL
+#define PY_DEF_TP_METH              NULL
+#define PY_DEF_TP_PRINT             PY_pdbdata_tp_print
+#define PY_DEF_TP_STR               PY_pdbdata_tp_str
+#define PY_DEF_TP_CALL              NULL
+#define PY_DEF_AS_SEQ               &PY_pdbdata_as_sequence
+#define PY_DEF_AS_MAP               NULL
+#define PY_DEF_AS_BUFFER            &PY_pdbdata_as_buffer
+
+char PY_pdbdata_doc[] = "";
+
+PY_DEF_TYPE(pdbdata);
+
+#else
+
+static char PY_pdbdata_type__doc__[] = "";
+
+PyTypeObject
+ PY_pdbdata_type = {
         PY_HEAD_INIT(&PyType_Type, 0)
         "pdbdata",                       /* tp_name */
-        sizeof(PP_pdbdataObject),         /* tp_basicsize */
+        sizeof(PY_pdbdata),         /* tp_basicsize */
         0,                              /* tp_itemsize */
         /* Methods to implement standard operations */
-        (destructor)PP_pdbdata_tp_dealloc, /* tp_dealloc */
-        (printfunc)PP_pdbdata_tp_print, /* tp_print */
+        (destructor)PY_pdbdata_tp_dealloc, /* tp_dealloc */
+        (printfunc)PY_pdbdata_tp_print, /* tp_print */
         (getattrfunc)0,                 /* tp_getattr */
         (setattrfunc)0,                 /* tp_setattr */
         (cmpfunc)0,                     /* tp_compare */
         (reprfunc)0,                    /* tp_repr */
         /* Method suites for standard classes */
         0,                              /* tp_as_number */
-        &PP_pdbdata_as_sequence,        /* tp_as_sequence */
+        &PY_pdbdata_as_sequence,        /* tp_as_sequence */
         0,                              /* tp_as_mapping */
         /* More standard operations (here for binary compatibility) */
         (hashfunc)0,                    /* tp_hash */
         (ternaryfunc)0,                 /* tp_call */
-        (reprfunc)PP_pdbdata_tp_str,    /* tp_str */
+        (reprfunc)PY_pdbdata_tp_str,    /* tp_str */
         (getattrofunc)0,                /* tp_getattro */
         (setattrofunc)0,                /* tp_setattro */
         /* Functions to access object as input/output buffer */
-        &PP_pdbdata_as_buffer,          /* tp_as_buffer */
+        &PY_pdbdata_as_buffer,          /* tp_as_buffer */
         /* Flags to define presence of optional/expanded features */
         Py_TPFLAGS_DEFAULT,             /* tp_flags */
-        PP_pdbdata_Type__doc__,         /* tp_doc */
+        PY_pdbdata_type__doc__,         /* tp_doc */
         /* Assigned meaning in release 2.0 */
         /* call function for all accessible objects */
         (traverseproc)0,                /* tp_traverse */
@@ -531,13 +547,13 @@ PyTypeObject PP_pdbdata_Type = {
         /* Attribute descriptor and subclassing stuff */
         0,                              /* tp_methods */
         0,                              /* tp_members */
-        PP_pdbdata_getset,              /* tp_getset */
+        PY_pdbdata_getset,              /* tp_getset */
         0,                              /* tp_base */
         0,                              /* tp_dict */
         (descrgetfunc)0,                /* tp_descr_get */
         (descrsetfunc)0,                /* tp_descr_set */
         0,                              /* tp_dictoffset */
-        (initproc)PP_pdbdata_tp_init,   /* tp_init */
+        (initproc)PY_pdbdata_tp_init,   /* tp_init */
         (allocfunc)0,                   /* tp_alloc */
         (newfunc)0,                     /* tp_new */
 #if PYTHON_API_VERSION >= 1012
@@ -556,54 +572,7 @@ PyTypeObject PP_pdbdata_Type = {
 #endif
 };
 
-/* DO-NOT-DELETE splicer.begin(pdb.pdbdata.extra) */
+#endif
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-PP_pdbdataObject *PP_pdbdata_newobj(PP_pdbdataObject *obj,
-                                    void *vr, char *type, long nitems,
-                                    dimdes *dims, defstr *dp, PP_file *fileinfo,
-                                    PY_defstr *dpobj, PyObject *parent)
-{
-    if (obj == NULL) {
-/*        obj = (PP_pdbdataObject *) PyType_GenericAlloc(&PP_pdbdata_Type, 0);*/
-        obj = (PP_pdbdataObject *) PyType_GenericAlloc(dpobj->ctor, 0);
-        if (obj == NULL) {
-            return NULL;
-        }
-    }
-
-    obj->data     = vr;
-    obj->type     = type;
-    obj->nitems   = nitems;
-    obj->dims     = dims;
-    obj->dp       = dp;
-    obj->fileinfo = fileinfo;
-    obj->dpobj    = dpobj;
-    obj->parent   = parent;
-
-    /* Are the data belong to us or someone else? */
-    if (parent == NULL) {
-        SC_mark(vr, 1);
-    } else {
-        Py_INCREF(parent);
-    }
-    SC_mark(type, 1);
-    if (dims != NULL)
-        SC_mark(dims, 1);
-    SC_mark(dp, 1);
-/* XXX    SC_mark(file, 1); */
-    Py_INCREF(dpobj);
-
-    return obj;
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DO-NOT-DELETE splicer.end(pdb.pdbdata.extra) */
-/* End of code for pdbdata objects */
-/*--------------------------------------------------------------------------*/
-/*                               OBJECT_TAIL                                */
 /*--------------------------------------------------------------------------*/
