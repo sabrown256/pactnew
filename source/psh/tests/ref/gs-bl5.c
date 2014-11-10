@@ -17,7 +17,9 @@ static object *_SXI_a_f1(SS_psides *si, object *argl)
    {PFDouble _la;
     object *_lo;
 
+/* local variable initializations */
     _la        = NULL;
+
     SS_args(si, argl,
             SC_POINTER_I, &_la,
             0);
@@ -36,7 +38,9 @@ static object *_SXI_a_f2(SS_psides *si, object *argl)
    {int (*_lb)(int *a);
     object *_lo;
 
+/* local variable initializations */
     _lb        = NULL;
+
     SS_args(si, argl,
             SC_POINTER_I, &_lb,
             0);
@@ -56,8 +60,10 @@ static object *_SXI_a_f3(SS_psides *si, object *argl)
     int (*_lb)(int *a);
     object *_lo;
 
+/* local variable initializations */
     _la        = NULL;
     _lb        = NULL;
+
     SS_args(si, argl,
             SC_POINTER_I, &_la,
             SC_POINTER_I, &_lb,
@@ -78,8 +84,10 @@ static object *_SXI_a_f4(SS_psides *si, object *argl)
     PFDouble _la;
     object *_lo;
 
+/* local variable initializations */
     _lb        = NULL;
     _la        = NULL;
+
     SS_args(si, argl,
             SC_POINTER_I, &_lb,
             SC_POINTER_I, &_la,
@@ -100,8 +108,10 @@ static object *_SXI_b_f1(SS_psides *si, object *argl)
     int _lb;
     object *_lo;
 
+/* local variable initializations */
     _la        = NULL;
     _lb        = 0;
+
     SS_args(si, argl,
             SC_POINTER_I, &_la,
             SC_INT_I, &_lb,
@@ -122,8 +132,10 @@ static object *_SXI_b_f2(SS_psides *si, object *argl)
     int _lb;
     object *_lo;
 
+/* local variable initializations */
     _la        = NULL;
     _lb        = 0;
+
     SS_args(si, argl,
             SC_POINTER_I, &_la,
             SC_INT_I, &_lb,
@@ -145,9 +157,11 @@ static object *_SXI_b_f3(SS_psides *si, object *argl)
     int _lc;
     object *_lo;
 
+/* local variable initializations */
     _la        = NULL;
     _lb        = NULL;
     _lc        = 0;
+
     SS_args(si, argl,
             SC_POINTER_I, &_la,
             SC_POINTER_I, &_lb,
@@ -170,9 +184,11 @@ static object *_SXI_b_f4(SS_psides *si, object *argl)
     int _lc;
     object *_lo;
 
+/* local variable initializations */
     _la        = NULL;
     _lb        = NULL;
     _lc        = 0;
+
     SS_args(si, argl,
             SC_POINTER_I, &_la,
             SC_POINTER_I, &_lb,
@@ -195,9 +211,11 @@ static object *_SXI_b_f5(SS_psides *si, object *argl)
     int (*_lc)(int *a);
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = NULL;
     _lc        = NULL;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_POINTER_I, &_lb,
@@ -220,9 +238,11 @@ static object *_SXI_b_f6(SS_psides *si, object *argl)
     PFDouble _lc;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = NULL;
     _lc        = NULL;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_POINTER_I, &_lb,

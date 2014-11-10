@@ -21,6 +21,9 @@ PyObject *_PY_fa1(PyObject *self, PyObject *args, PyObject *kwds)
     int _rv;
     char *kw_list[] = {"a", NULL};
 
+/* local variable initializations */
+    _la        = 2;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "i:fa1p",
                                      kw_list,
@@ -47,6 +50,14 @@ PyObject *_PY_fa3(PyObject *self, PyObject *args, PyObject *kwds)
     int _lc[3];
     int _rv;
     char *kw_list[] = {"a0", "a1", "a2", "b0", "b1", "b2", NULL};
+
+/* local variable initializations */
+    _la[0] = 1;
+    _la[1] = 2;
+    _la[2] = 3;
+    _lb[0] = 1;
+    _lb[1] = 2;
+    _lb[2] = 3;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "iiiiii:fa3p",
@@ -75,6 +86,11 @@ PyObject *_PY_fa4(PyObject *self, PyObject *args, PyObject *kwds)
     int _rv;
     char *kw_list[] = {"a", "b", NULL};
 
+/* local variable initializations */
+    _la        = NULL;
+    _lb        = 0;
+    _lc        = NULL;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "ii:fa4p",
                                      kw_list,
@@ -99,6 +115,10 @@ PyObject *_PY_fb1(PyObject *self, PyObject *args, PyObject *kwds)
     int _la;
     int _lb;
     char *kw_list[] = {"a", "b", NULL};
+
+/* local variable initializations */
+    _la        = 0;
+    _lb        = 1;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "ii:fb1_p",
@@ -126,6 +146,10 @@ PyObject *_PY_fb2(PyObject *self, PyObject *args, PyObject *kwds)
     int _lb;
     char *kw_list[] = {"a", "b", NULL};
 
+/* local variable initializations */
+    _la        = 0;
+    _lb        = 0;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "ii:fb2_p",
                                      kw_list,
@@ -151,6 +175,10 @@ PyObject *_PY_fb3(PyObject *self, PyObject *args, PyObject *kwds)
     int _la;
     int _lb;
     char *kw_list[] = {"a", "b", NULL};
+
+/* local variable initializations */
+    _la        = 0;
+    _lb        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "ii:fb3_p",
@@ -180,6 +208,12 @@ PyObject *_PY_fc1(PyObject *self, PyObject *args, PyObject *kwds)
     int *_ld;
     char *kw_list[] = {"a", "b", "c", NULL};
 
+/* local variable initializations */
+    _la        = 0;
+    _lb        = NULL;
+    _lc        = 0;
+    _ld        = NULL;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "iii:fc1_p",
                                      kw_list,
@@ -206,6 +240,12 @@ PyObject *_PY_fc2(PyObject *self, PyObject *args, PyObject *kwds)
     int _lc;
     int *_ld;
     char *kw_list[] = {"a", "b", "c", NULL};
+
+/* local variable initializations */
+    _la        = 0;
+    _lb        = NULL;
+    _lc        = 0;
+    _ld        = NULL;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "iii:fc2_p",
@@ -234,6 +274,12 @@ PyObject *_PY_fc3(PyObject *self, PyObject *args, PyObject *kwds)
     int *_ld;
     char *kw_list[] = {"a", "b", "c", NULL};
 
+/* local variable initializations */
+    _la        = 0;
+    _lb        = NULL;
+    _lc        = 0;
+    _ld        = NULL;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "iii:fc3_p",
                                      kw_list,
@@ -260,6 +306,12 @@ PyObject *_PY_fc4(PyObject *self, PyObject *args, PyObject *kwds)
     int _lc;
     int _ld;
     char *kw_list[] = {"a", "b", "c", NULL};
+
+/* local variable initializations */
+    _la        = 0;
+    _lb        = 1;
+    _lc        = 0;
+    _ld        = 1;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "iii:fc4_p",
@@ -288,6 +340,13 @@ PyObject *_PY_fc5(PyObject *self, PyObject *args, PyObject *kwds)
     int _ld[2];
     char *kw_list[] = {"a", "b0", "b1", "c0", "c1", NULL};
 
+/* local variable initializations */
+    _la        = 0;
+    _lb[0] = 1;
+    _lb[1] = 2;
+    _lc[0] = 1;
+    _lc[1] = 2;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "iiiii:fc5_p",
                                      kw_list,
@@ -314,6 +373,12 @@ PyObject *_PY_fc6(PyObject *self, PyObject *args, PyObject *kwds)
     int _lc;
     int _ld;
     char *kw_list[] = {"a", "b", "c", NULL};
+
+/* local variable initializations */
+    _la        = 0;
+    _lb        = 0;
+    _lc        = 0;
+    _ld        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "iii:fc6_p",
@@ -342,6 +407,13 @@ PyObject *_PY_fc7(PyObject *self, PyObject *args, PyObject *kwds)
     int _ld[2];
     char *kw_list[] = {"a", "b0", "b1", "c0", "c1", NULL};
 
+/* local variable initializations */
+    _la        = 0;
+    _lb[0] = 0;
+    _lb[1] = 0;
+    _lc[0] = 0;
+    _lc[1] = 0;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "iiiii:fc7_p",
                                      kw_list,
@@ -368,6 +440,13 @@ PyObject *_PY_fc8(PyObject *self, PyObject *args, PyObject *kwds)
     char *_ls3;
     char *_ls4[2];
     char *kw_list[] = {"s1", "s20", "s3", "s40", "s41", NULL};
+
+/* local variable initializations */
+    _ls1       = "abc";
+    _ls2[0] = "def";
+    _ls3       = '\0';
+    _ls4[0] = NULL;
+    _ls4[1] = NULL;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "sssss:fc8_p",
@@ -398,6 +477,14 @@ PyObject *_PY_fc9(PyObject *self, PyObject *args, PyObject *kwds)
     char _lc5[2];
     char *kw_list[] = {"c1", "c2", "c3", "c4", "c50", "c51", NULL};
 
+/* local variable initializations */
+    _lc1       = '\0';
+    _lc2       = 'a';
+    _lc3       = 'b';
+    _lc4       = '\0';
+    _lc5[0] = '\0';
+    _lc5[1] = '\0';
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "ssssss:fc9_p",
                                      kw_list,
@@ -425,6 +512,10 @@ PyObject *_PY_fd1(PY_str *self, PyObject *args, PyObject *kwds)
     char *kw_list[] = {"b", NULL};
 
     _la = self->pyo;
+
+/* local variable initializations */
+    _la        = NULL;
+    _lb        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "i:fd1_p",
@@ -454,6 +545,10 @@ PyObject *_PY_fd2(PY_str *self, PyObject *args, PyObject *kwds)
 
     _la = self->pyo;
 
+/* local variable initializations */
+    _la        = NULL;
+    _lb        = 0;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "i:nfd",
                                      kw_list,
@@ -482,6 +577,10 @@ PyObject *_PY_PD_fd3(PY_str *self, PyObject *args, PyObject *kwds)
 
     _la = self->pyo;
 
+/* local variable initializations */
+    _la        = NULL;
+    _lb        = 0;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "i:fd3",
                                      kw_list,
@@ -509,6 +608,10 @@ PyObject *_PY_PD_fd4(PY_str *self, PyObject *args, PyObject *kwds)
     char *kw_list[] = {"b", NULL};
 
     _la = self->pyo;
+
+/* local variable initializations */
+    _la        = NULL;
+    _lb        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "i:mfd",

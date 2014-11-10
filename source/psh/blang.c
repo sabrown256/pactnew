@@ -1096,6 +1096,31 @@ void emit_struct_defs(bindes *bd,
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* EMIT_LOCAL_VAR_INIT - emit initializations of local variables
+ *                     - mainly to quell compiler warnings
+ */
+
+static void emit_local_var_init(FILE *fc, fdecl *dcl)
+   {int i, na;
+    farg *al;
+
+    fprintf(fc, "/* local variable initializations */\n");
+
+    na = dcl->na;
+    al = dcl->al;
+        
+/* initialize local variable to quell compiler warnings */
+    for (i = 0; i < na; i++)
+        {if (IS_NULL(al[i].name) == FALSE)
+	    fputs(al[i].interp.defa, fc);};
+
+    fprintf(fc, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                           TYPE MAP ROUTINES                              */
 
@@ -1164,6 +1189,89 @@ static char *lookup_type(char ***val, char *ty, int ity, bindes *bo)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* IS_FIXED_POINT - return TRUE if T is a fixed point type */
+
+pboolean is_fixed_point(char *t)
+   {pboolean rv;
+
+    rv =  ((strcmp(t, "short") == 0)     ||
+	   (strcmp(t, "int") == 0)       ||
+	   (strcmp(t, "pboolean") == 0)  ||
+	   (strcmp(t, "long") == 0)      ||
+	   (strcmp(t, "long long") == 0) ||
+	   (strcmp(t, "int16_t") == 0)   ||
+	   (strcmp(t, "int32_t") == 0)   ||
+	   (strcmp(t, "int64_t") == 0));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_REAL - return TRUE if T is a real floating point type */
+
+pboolean is_real(char *t)
+   {pboolean rv;
+
+    rv = ((strcmp(t, "float") == 0) ||
+	  (strcmp(t, "double") == 0) ||
+	  (strcmp(t, "long double") == 0));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_COMPLEX - return TRUE if T is a complex floating point type */
+
+pboolean is_complex(char *t)
+   {pboolean rv;
+
+    rv = ((strcmp(t, "float _Complex") == 0) ||
+	  (strcmp(t, "double _Complex") == 0) ||
+	  (strcmp(t, "long double _Complex") == 0));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_BOOL - return TRUE if T is a boolean type */
+
+pboolean is_bool(char *t)
+   {pboolean rv;
+
+    rv = (strcmp(t, "bool") == 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_CHAR - return TRUE if T is a char type */
+
+pboolean is_char(char *t)
+   {pboolean rv;
+
+    rv = (strcmp(t, "char") == 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_STRING - return TRUE if T is a char * type */
+
+pboolean is_string(char *t)
+   {pboolean rv;
+
+    rv = (strcmp(t, "char *") == 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* INIT_TYPES - initialize the type map */
 
 static void init_types(void)
@@ -1172,6 +1280,7 @@ static void init_types(void)
     add_type("void",        "",            "",                 "NULL");
     add_type("bool",        "logical",     "SC_BOOL_I",        "FALSE");
     add_type("char",        "character",   "SC_CHAR_I",        "'\\0'");
+    add_type("pboolean",    "integer",     "SC_INT_I",         "B_F");
 
 /* fixed point types */
     add_type("short",       "integer(2)",  "SC_SHORT_I",       "0");

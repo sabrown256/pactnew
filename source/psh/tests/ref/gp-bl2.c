@@ -26,6 +26,14 @@ PyObject *_PY_fbcv1(PyObject *self, PyObject *args, PyObject *kwds)
     char *_rv;
     char *kw_list[] = {"a", "b", "c", "d", "e", "f", NULL};
 
+/* local variable initializations */
+    _la        = 0;
+    _lb        = 0.0;
+    _lc        = 0.0;
+    _ld        = '\0';
+    _le        = NULL;
+    _lf        = NULL;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "ifdsOO:fbcv1p",
                                      kw_list,
@@ -54,6 +62,12 @@ PyObject *_PY_fbmcv1(PyObject *self, PyObject *args, PyObject *kwds)
     char *_rv;
     char *kw_list[] = {"a", "b", "c", "d", NULL};
 
+/* local variable initializations */
+    _la        = 0;
+    _lb        = 0.0;
+    _lc        = 0.0;
+    _ld        = '\0';
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "ifds:fbmcv1p",
                                      kw_list,
@@ -81,6 +95,12 @@ PyObject *_PY_fbmcr2(PyObject *self, PyObject *args, PyObject *kwds)
     char *_ld;
     char *_rv;
     char *kw_list[] = {"a", "b", "c", "d", NULL};
+
+/* local variable initializations */
+    _la        = NULL;
+    _lb        = NULL;
+    _lc        = NULL;
+    _ld        = NULL;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "OOOs:fbmcr2p",

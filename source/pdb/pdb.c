@@ -197,13 +197,13 @@ PDBfile *PD_open_vif(char *name)
  * #bind PD_copy_type fortran() scheme() python()
  */
 
-int PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
+pboolean PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
    {int rv;
     defstr *dp;
     memdes *lst;
     PD_smp_state *pa;
 
-    rv = TRUE;
+    rv = B_T;
 
     pa = _PD_get_state(-1);
 
@@ -211,7 +211,7 @@ int PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
     if (dp == NULL)
        {snprintf(pa->err, MAXLINE,
 		 "ERROR: TYPE %s NOT FOUND - PD_COPY_TYPE\n", type);
-        rv = FALSE;}
+        rv = B_F;}
 
     else
        {lst = PD_copy_members(dp->members);
@@ -220,7 +220,7 @@ int PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
 	if (dp == NULL)
 	   {snprintf(pa->err, MAXLINE,
 		     "ERROR: CANNOT CREATE TYPE %s - PD_COPY_TYPE\n", type);
-	    rv = FALSE;};};
+	    rv = B_F;};};
 
     return(rv);}
 
@@ -229,7 +229,7 @@ int PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
 
 /* _PD_CLOSE_WRK - close a PDB file after writing out the symbol table and
  *               - structure chart
- *               - return the length of the file successful
+ *               - return the length of the file if successful
  *               - and -1 otherwise
  */
 
@@ -271,8 +271,8 @@ static int64_t _PD_close_wrk(PDBfile *file)
  * #bind PD_close fortran() scheme() python()
  */
 
-int PD_close(PDBfile *file ARG(,,cls))
-   {int ret;
+pboolean PD_close(PDBfile *file ARG(,,cls))
+   {pboolean ret;
     int64_t ln;
 
     ln  = _PD_close_wrk(file);
@@ -977,8 +977,8 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
  * #bind PD_write fortran() scheme() python()
  */
 
-int PD_write(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
-   {int rv;
+pboolean PD_write(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
+   {pboolean rv;
 
     rv = PD_write_as(file, name, type, type, vr);
 
@@ -998,15 +998,16 @@ int PD_write(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
  * #bind PD_write_as fortran() scheme() python()
  */
 
-int PD_write_as(PDBfile *file ARG(,,cls), char *name,
-		char *intype, char *outtype, void *vr)
-   {int appnd, new, ie, rv;
+pboolean PD_write_as(PDBfile *file ARG(,,cls), char *name,
+		     char *intype, char *outtype, void *vr)
+   {int appnd, new, ie;
+    pboolean rv;
     char *s, *t, *lname, fullpath[MAXLINE];
     syment *ep;
     dimdes *dims;
     PD_smp_state *pa;
 
-    rv = FALSE;
+    rv = B_F;
 
     if (file != NULL)
        {pa = _PD_get_state(-1);
@@ -1030,11 +1031,11 @@ int PD_write_as(PDBfile *file ARG(,,cls), char *name,
 	dims  = _PD_ex_dims(lname, file->default_offset, &ie);
 	ep    = file->tr->write(file, s, intype, outtype, vr, dims, appnd, &new);
 	if (ep != NULL)
-	   {if (new == FALSE)
-	       {if (appnd == FALSE)
+	   {if (new == B_F)
+	       {if (appnd == B_F)
 		   _PD_rl_dimensions(dims);
 		_PD_rl_syment_d(ep);};
-	    rv = TRUE;};};
+	    rv = B_T;};};
 
     return(rv);}
 
@@ -1055,9 +1056,9 @@ int PD_write_as(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_write_alt fortran() scheme() python()
  */
 
-int PD_write_alt(PDBfile *file ARG(,,cls), char *name, char *type, void *vr,
-		 int nd, long *ind)
-   {int rv;
+pboolean PD_write_alt(PDBfile *file ARG(,,cls), char *name, char *type,
+		      void *vr, int nd, long *ind)
+   {pboolean rv;
 
     rv = PD_write_as_alt(file, name, type, type, vr, nd, ind);
 
@@ -1080,10 +1081,11 @@ int PD_write_alt(PDBfile *file ARG(,,cls), char *name, char *type, void *vr,
  * #bind PD_write_as_alt fortran() scheme() python()
  */
 
-int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
-		    char *intype, char *outtype,
-		    void *vr, int nd, long *ind)
-   {int i, new, appnd, ret, nc;
+pboolean PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
+			 char *intype, char *outtype,
+			 void *vr, int nd, long *ind)
+   {int i, new, appnd, nc;
+    pboolean rv;
     long start, stop, step, leng;
     char lndx[MAXLINE], hname[MAXLINE], fullpath[MAXLINE];
     dimdes *dims, *next, *prev;
@@ -1137,11 +1139,11 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
 	   {if (!appnd)
 	       _PD_rl_dimensions(dims);
 	    _PD_rl_syment_d(ep);};
-	ret = TRUE;}
+	rv = B_T;}
     else
-       ret = FALSE;
+       rv = B_F;
 
-    return(ret);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1153,8 +1155,8 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_append fortran() scheme() python()
  */
 
-int PD_append(PDBfile *file ARG(,,cls), char *name, void *vr)
-   {int rv;
+pboolean PD_append(PDBfile *file ARG(,,cls), char *name, void *vr)
+   {pboolean rv;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
@@ -1176,14 +1178,14 @@ int PD_append(PDBfile *file ARG(,,cls), char *name, void *vr)
  * #bind PD_append_as fortran() scheme() python()
  */
 
-int PD_append_as(PDBfile *file ARG(,,cls), char *name,
-		 char *intype, void *vr)
-   {int rv;
+pboolean PD_append_as(PDBfile *file ARG(,,cls), char *name,
+		      char *intype, void *vr)
+   {pboolean rv;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
     
-    pa->append_flag = TRUE;
+    pa->append_flag = B_T;
 
     rv = PD_write_as(file, name, intype, NULL, vr);
 
@@ -1199,14 +1201,14 @@ int PD_append_as(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_append_alt fortran() scheme() python()
  */
 
-int PD_append_alt(PDBfile *file ARG(,,cls), char *name,
-		  void *vr, int nd, long *ind)
-   {int rv;
+pboolean PD_append_alt(PDBfile *file ARG(,,cls), char *name,
+		       void *vr, int nd, long *ind)
+   {pboolean rv;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
     
-    pa->append_flag = TRUE;
+    pa->append_flag = B_T;
 
     rv = PD_write_as_alt(file, name, NULL, NULL, vr, nd, ind);
 
@@ -1223,14 +1225,14 @@ int PD_append_alt(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_append_as_alt fortran() scheme() python()
  */
 
-int PD_append_as_alt(PDBfile *file ARG(,,cls), char *name, char *intype,
-		     void *vr, int nd, long *ind)
-   {int rv;
+pboolean PD_append_as_alt(PDBfile *file ARG(,,cls), char *name, char *intype,
+			  void *vr, int nd, long *ind)
+   {pboolean rv;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
     
-    pa->append_flag = TRUE;
+    pa->append_flag = B_T;
 
     rv = PD_write_as_alt(file, name, intype, NULL, vr, nd, ind);
 
@@ -1308,8 +1310,8 @@ void PD_error(char *s, PD_major_op n)
  * #bind PD_free fortran() scheme() python()
  */
 
-int PD_free(PDBfile *file ARG(,,cls), char *type, void *var) 
-   {int rv;
+pboolean PD_free(PDBfile *file ARG(,,cls), char *type, void *var) 
+   {pboolean rv;
     inti i, nb, nr, ni;
     intb bpi;
     char *pc, *p, *dtyp, *ityp;
@@ -1317,7 +1319,7 @@ int PD_free(PDBfile *file ARG(,,cls), char *type, void *var)
     memdes *member;
     void *pd;
 
-    rv = TRUE;
+    rv = B_T;
 
     if (var != NULL)
        {ityp = SC_dstrcpy(NULL, type);
@@ -1338,14 +1340,14 @@ int PD_free(PDBfile *file ARG(,,cls), char *type, void *var)
 	if (nb < 0)
 	   {CFREE(ityp);
 	    fprintf(stderr, "NOT SCORE ALLOCATED MEMORY %p - PD_FREE\n", pc);
-	    return(-1);};
+	    return(B_F);};
 
 	dp = _PD_type_lookup(file, PD_CHART_HOST, ityp);
  
 	if (dp == NULL) 
 	   {CFREE(ityp);
 	    fprintf(stderr, "CANNOT LOOKUP %s IN FILE - PD_FREE\n", ityp);
-	    return(-1);};
+	    return(B_F);};
 
 	bpi = dp->size;
 	ni  = nb / bpi;
@@ -1389,17 +1391,17 @@ int PD_free(PDBfile *file ARG(,,cls), char *type, void *var)
  * #bind PD_remove_entry fortran() scheme() python()
  */
 
-int PD_remove_entry(PDBfile *file ARG(,,cls), char *name) 
-   {int rv;
+pboolean PD_remove_entry(PDBfile *file ARG(,,cls), char *name) 
+   {pboolean rv;
     hasharr *tab;
     syment *ep;
 
-    rv  = FALSE;
+    rv  = B_F;
     tab = file->symtab;
 
     ep = (syment *) SC_hasharr_def_lookup(tab, name);
     if (ep != NULL)
-       {rv = TRUE;
+       {rv = B_T;
 
 /* NOTE: SC_hasharr_remove will do raw free on ep and miss the contents
  * _PD_rl_syment_d will do it all properly
@@ -1460,9 +1462,10 @@ int PD_autofix_denorm(PDBfile *file ARG(,,cls), int flag)
  * #bind PD_fix_denorm fortran() scheme() python()
  */
 
-int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
-   {int id, ifp, st, reord, mask, rshift, nbits, nrem;
+pboolean PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
+   {int id, ifp, reord, mask, rshift, nbits, nrem;
     int n_exp, n_mant, exp_sum, mant_sum, mant_bit, exp_bit;
+    pboolean st;
     int *ord;
     int64_t i, j, in, nb;
     long *fmt;
@@ -1474,21 +1477,21 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
     nb  = 0;
     fmt = NULL;
     ord = NULL;
-    st  = TRUE;
+    st  = B_T;
 
     if (std == NULL)
        std = PD_gs.int_standard;
 
-    id = SC_type_id(type, FALSE);
+    id = SC_type_id(type, B_F);
 
-    if (_PD_indirection(type) == TRUE)
+    if (_PD_indirection(type) == B_T)
        {snprintf(pa->err, MAXLINE,
 		 "ERROR: TYPE %s IS INDIRECT - PD_FIX_DENORM\n",
 		 type);
-	st = FALSE;}
+	st = B_F;}
 
 /* floating point type fmt */
-    else if (SC_is_type_fp(id) == TRUE)
+    else if (SC_is_type_fp(id) == B_T)
        {ifp = SC_TYPE_FP(id);
 	if (ifp < N_PRIMITIVE_FP)
 	   {nb  = std->fp[ifp].bpi;
@@ -1496,7 +1499,7 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
 	    ord = std->fp[ifp].order;};}
 
 /* complex floating point type fmt */
-    else if (SC_is_type_cx(id) == TRUE)
+    else if (SC_is_type_cx(id) == B_T)
        {ifp = SC_TYPE_CPX(id);
 	if (ifp < N_PRIMITIVE_FP)
 	   {nb  = std->fp[ifp].bpi;
@@ -1507,20 +1510,20 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
        {snprintf(pa->err, MAXLINE,
 		 "ERROR: TYPE %s IS NOT FLOATING POINT - PD_FIX_DENORM\n",
 		 type);
-	st = FALSE;};
+	st = B_F;};
 
-    if ((st == TRUE) && (ord != NULL))
+    if ((st == B_T) && (ord != NULL))
 
 /* make sure buf points to bytes that are in big endian byte order */
-       {reord = FALSE;
+       {reord = B_F;
 
 	for (i = 0L; i < nb; i++)
 	    {if (ord[i] != (i + 1L))
-	        {reord = TRUE;
+	        {reord = B_T;
 		 break;};}
 
 	var = (char *) vr;
-	if (reord == TRUE)
+	if (reord == B_T)
 	   {buf = CMAKE_N(char, nb * ni);
        
 	    if (buf == NULL)
@@ -1537,7 +1540,7 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
 	   buf = var;
 
 /* handle the general case: walk float values, zero-ing if necessary */
-	if ((st == TRUE) && (fmt != NULL))
+	if ((st == B_T) && (fmt != NULL))
 	   {n_exp    = fmt[1];     /* # of bits in exponent */
 	    n_mant   = fmt[2];     /* # of bits in mantissa */
 	    exp_bit  = fmt[4] % 8; /* start bit of exponent mod byte size */
@@ -1592,7 +1595,7 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
 			     *vtemp++ = '\0';};};};};
   
 /* if we reordered into a buffer, then free the buffer */
-	if (reord == TRUE)
+	if (reord == B_T)
 	   {CFREE(buf);};};
 
     return(st);}
