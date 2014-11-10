@@ -18,7 +18,9 @@ static object *_SXI_fa1(SS_psides *si, object *argl)
     int _rv;
     object *_lo;
 
+/* local variable initializations */
     _la        = 2;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             0);
@@ -40,12 +42,14 @@ static object *_SXI_fa3(SS_psides *si, object *argl)
     int _rv;
     object *_lo;
 
+/* local variable initializations */
     _la[0] = 1;
     _la[1] = 2;
     _la[2] = 3;
     _lb[0] = 1;
     _lb[1] = 2;
     _lb[2] = 3;
+
     SS_args(si, argl,
             SC_INT_I, &_la[0],
             SC_INT_I, &_la[1],
@@ -79,9 +83,11 @@ static object *_SXI_fa4(SS_psides *si, object *argl)
     int _rv;
     object *_lo;
 
+/* local variable initializations */
     _la        = NULL;
     _lb        = 0;
     _lc        = NULL;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb,
@@ -105,8 +111,10 @@ static object *_SXI_fb1(SS_psides *si, object *argl)
     int _lb;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = 1;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb,
@@ -127,8 +135,10 @@ static object *_SXI_fb2(SS_psides *si, object *argl)
     int _lb;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = 0;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb,
@@ -149,8 +159,10 @@ static object *_SXI_fb3(SS_psides *si, object *argl)
     int _lb;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = 0;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb,
@@ -173,10 +185,12 @@ static object *_SXI_fc1(SS_psides *si, object *argl)
     int *_ld;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = NULL;
     _lc        = 0;
     _ld        = NULL;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb,
@@ -203,10 +217,12 @@ static object *_SXI_fc2(SS_psides *si, object *argl)
     int *_ld;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = NULL;
     _lc        = 0;
     _ld        = NULL;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb,
@@ -233,10 +249,12 @@ static object *_SXI_fc3(SS_psides *si, object *argl)
     int *_ld;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = NULL;
     _lc        = 0;
     _ld        = NULL;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb,
@@ -263,10 +281,12 @@ static object *_SXI_fc4(SS_psides *si, object *argl)
     int _ld;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = 1;
     _lc        = 0;
     _ld        = 1;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb,
@@ -293,11 +313,13 @@ static object *_SXI_fc5(SS_psides *si, object *argl)
     int _ld[2];
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb[0] = 1;
     _lb[1] = 2;
     _lc[0] = 1;
     _lc[1] = 2;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb[0],
@@ -328,10 +350,12 @@ static object *_SXI_fc6(SS_psides *si, object *argl)
     int _ld;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = 0;
     _lc        = 0;
     _ld        = 0;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb,
@@ -358,11 +382,13 @@ static object *_SXI_fc7(SS_psides *si, object *argl)
     int _ld[2];
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb[0] = 0;
     _lb[1] = 0;
     _lc[0] = 0;
     _lc[1] = 0;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_INT_I, &_lb[0],
@@ -393,11 +419,13 @@ static object *_SXI_fc8(SS_psides *si, object *argl)
     char *_ls4[2];
     object *_lo;
 
+/* local variable initializations */
     _ls1       = "abc";
     _ls2[0] = "def";
     _ls3       = '\0';
     _ls4[0] = NULL;
     _ls4[1] = NULL;
+
     SS_args(si, argl,
             SC_STRING_I, &_ls1,
             SC_STRING_I, &_ls2[0],
@@ -424,12 +452,14 @@ static object *_SXI_fc9(SS_psides *si, object *argl)
     char _lc5[2];
     object *_lo;
 
+/* local variable initializations */
     _lc1       = '\0';
     _lc2       = 'a';
     _lc3       = 'b';
     _lc4       = '\0';
     _lc5[0] = '\0';
     _lc5[1] = '\0';
+
     SS_args(si, argl,
             SC_CHAR_I, &_lc1,
             SC_CHAR_I, &_lc2,

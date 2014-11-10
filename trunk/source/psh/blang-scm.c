@@ -118,35 +118,25 @@ static fparam so_type(char *a, int nc, char *ty)
 
     rv = FP_SCALAR;
 
-    if (strcmp(ty, "char") == 0)
+    if (is_char(ty) == B_T)
        nstrncpy(a, nc, "SS_mk_char", -1);
        
-    else if (strcmp(ty, "char *") == 0)
+    else if (is_string(ty) == B_T)
        nstrncpy(a, nc, "SS_mk_string", -1);
        
-    else if (strcmp(ty, "bool") == 0)
+    else if (is_bool(ty) == B_T)
        nstrncpy(a, nc, "SS_mk_boolean", -1);
        
-    else if ((strcmp(ty, "short") == 0) ||
-	     (strcmp(ty, "int") == 0) ||
-	     (strcmp(ty, "long") == 0) ||
-	     (strcmp(ty, "long long") == 0) ||
-	     (strcmp(ty, "int16_t") == 0) ||
-	     (strcmp(ty, "int32_t") == 0) ||
-	     (strcmp(ty, "int64_t") == 0))
+    else if (is_fixed_point(ty) == B_T)
        nstrncpy(a, nc, "SS_mk_integer", -1);
        
-    else if ((strcmp(ty, "float") == 0) ||
-	     (strcmp(ty, "double") == 0) ||
-	     (strcmp(ty, "long double") == 0))
+    else if (is_real(ty) == B_T)
        nstrncpy(a, nc, "SS_mk_float", -1);
        
-    else if ((strcmp(ty, "float _Complex") == 0) ||
-	     (strcmp(ty, "double _Complex") == 0) ||
-	     (strcmp(ty, "long double _Complex") == 0))
+    else if (is_complex(ty) == B_T)
        nstrncpy(a, nc, "SS_mk_complex", -1);
        
-    else if (is_ptr(ty) == TRUE)
+    else if (is_ptr(ty) == B_T)
        {rv = FP_ARRAY;
 	nstrncpy(a, nc, "SX_make_c_array", -1);}
 
@@ -304,22 +294,6 @@ static void scheme_wrap_local_decl(FILE *fc, fdecl *dcl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCHEME_WRAP_LOCAL_ASSN_DEF - assign default values to local variable AL */
-
-static void scheme_wrap_local_assn_def(FILE *fc, farg *al)
-   {char *defa;
-    idecl *ip;
-
-    ip   = &al->interp;
-    defa = ip->defa;
-
-    fputs(defa, fc);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SCHEME_WRAP_LOCAL_ASSN_ARG - add AL to SS_args call argument list */
 
 static void scheme_wrap_local_assn_arg(char *a, int nc, farg *al)
@@ -349,9 +323,7 @@ static void scheme_wrap_local_assn(FILE *fc, fdecl *dcl)
        {na = dcl->na;
 	al = dcl->al;
 
-/* set the default values */
-	for (i = 0; i < na; i++)
-	    scheme_wrap_local_assn_def(fc, al+i);
+	emit_local_var_init(fc, dcl);
 
 /* make the SS_args call */
 	a[0] = '\0';

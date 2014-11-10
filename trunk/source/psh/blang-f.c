@@ -38,76 +38,6 @@ void map_fortran_types(void)
 
 #if 0
 
-    map_f_type("void",        "",            "");
-    map_f_type("bool",        "logical",     "SC_BOOL_I");
-    map_f_type("char",        "character",   "SC_CHAR_I");
-
-/* fixed point types */
-    map_f_type("short",       "integer(2)",  "SC_SHORT_I");
-    map_f_type("int",         "integer",     "SC_INT_I");
-    map_f_type("long",        "integer(8)",  "SC_LONG_I");
-    map_f_type("long long",   "integer(8)",  "SC_LONG_LONG_I");
-
-    map_f_type("size_t",      "integer(8)",  "SC_LONG_I");
-    map_f_type("ssize_t",     "integer(8)",  "SC_LONG_I");
-
-/* fixed width fixed point types */
-    map_f_type("int16_t",     "integer(2)",  "SC_INT16_I");
-    map_f_type("int32_t",     "integer(4)",  "SC_INT32_I");
-    map_f_type("int64_t",     "integer(8)",  "SC_INT64_I");
-
-/* floating point types */
-    map_f_type("float",       "real(4)",     "SC_FLOAT_I");
-    map_f_type("double",      "real(8)",     "SC_DOUBLE_I");
-    map_f_type("long double", "real(16)",    "SC_LONG_DOUBLE_I");
-
-/* complex types */
-    map_f_type("float _Complex",       "complex(4)",
-	     "SC_FLOAT_COMPLEX_I");
-    map_f_type("double _Complex",      "complex(8)",
-	     "SC_DOUBLE_COMPLEX_I");
-    map_f_type("long double _Complex", "complex(16)",
-	     "SC_LONG_DOUBLE_COMPLEX_I");
-
-/* GOTCHA: there is a general issue with pointers and Fortran here
- * doing map_f_type on "void *" causes Fortran wrapper declarations
- * to be generated with "void *" in the arg list
- * if on the other hand we do not do an map_f_type on "void *" then
- * blang will generate Fortran wrapper declarations with "void **"
- * in the arg list
- * in some contexts we would rather have "void **" to accord with
- * the extra reference added by Fortran which is call by reference
- * by default
- * the same applies to all of these pointers and we have been
- * bitten by FILE and void in the tests
- * with "void *" defined pd_write_f works for real*8 a(10)
- * but fails for type(C_PTR) b
- */
-    map_f_type("void *",        "C_PTR-A",      "SC_POINTER_I");
-    map_f_type("bool *",        "logical-A",    "SC_BOOL_P_I");
-    map_f_type("char *",        "character-A",  "SC_STRING_I");
-
-    map_f_type("short *",       "integer(2)-A", "SC_SHORT_P_I");
-    map_f_type("int *",         "integer-A",    "SC_INT_P_I");
-    map_f_type("long *",        "integer(8)-A", "SC_LONG_P_I");
-    map_f_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I");
-
-    map_f_type("float *",       "real(4)-A",    "SC_FLOAT_P_I");
-    map_f_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I");
-    map_f_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I");
-
-/* complex types */
-    map_f_type("float _Complex *",       "complex(4)-A", "SC_FLOAT_COMPLEX_P_I");
-    map_f_type("double _Complex *",      "complex(8)-A", "SC_DOUBLE_COMPLEX_P_I");
-    map_f_type("long double _Complex *", "complex(16)-A", "SC_LONG_DOUBLE_COMPLEX_P_I");
-
-    map_f_type("pcons",         "C_PTR-A",      "SC_PCONS_I");
-    map_f_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I");
-/*
-    map_f_type("FILE *",        "C_PTR-A",      "SC_FILE_I");
- */
-    map_f_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I");
-
 #endif
 
     return;}
@@ -829,7 +759,8 @@ static void mc_type(int nc, char *fty, char *cty,
 	   {nstrncpy(lfty, BFLRG, "integer", -1);
 	    nstrncpy(lcty, BFLRG, "C_SHORT", -1);}
 
-	else if (strstr(ty, "int") != NULL)
+	else if ((strstr(ty, "int") != NULL) ||
+		 (strstr(ty, "pboolean") != NULL))
 	   {nstrncpy(lfty, BFLRG, "integer", -1);
 	    nstrncpy(lcty, BFLRG, "C_INT", -1);}
 

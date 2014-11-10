@@ -22,6 +22,10 @@ PyObject *_PY_fe1(PY_str *self, PyObject *args, PyObject *kwds)
     str *_rv;
     char *kw_list[] = {"a1", "a2", NULL};
 
+/* local variable initializations */
+    _la1       = NULL;
+    _la2       = 0;
+
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "Oi:fe1p",
                                      kw_list,
@@ -50,6 +54,14 @@ PyObject *_PY_fe2(PY_str *self, PyObject *args, PyObject *kwds)
     pcons *_linfo;
     int _ll;
     char *kw_list[] = {"dev", "x", "y", "n", "info", "l", NULL};
+
+/* local variable initializations */
+    _ldev      = NULL;
+    _lx        = NULL;
+    _ly        = NULL;
+    _ln        = 0;
+    _linfo     = NULL;
+    _ll        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
                                      "OOOiOi:fe2p",

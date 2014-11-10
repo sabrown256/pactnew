@@ -1028,14 +1028,17 @@ extern int64_t
 
 extern int
  PD_close(PDBfile *file),
- PD_remove_entry(PDBfile *file, char *name),
- PD_append(PDBfile *file, char *name, void *vr),
- PD_append_as(PDBfile *file, char *name, char *intype, void *vr),
- PD_append_alt(PDBfile *file, char *name, void *vr,
-	       int nd, long *ind),
- PD_append_as_alt(PDBfile *file, char *name,
-		  char *intype, void *vr,
-		  int nd, long *ind),
+ PD_read(PDBfile *file, char *name, void *vr),
+ PD_read_as(PDBfile *file, char *name, char *type, void *vr),
+ PD_read_as_dwim(PDBfile *file, char *name, char *outtype,
+		 long nix, void *space),
+ PD_read_alt(PDBfile *file, char *name, void *vr, long *ind),
+ PD_read_as_alt(PDBfile *file, char *name, char *type, void *vr,
+		long *ind),
+ PD_autofix_denorm(PDBfile *file, int flag);
+ 
+extern pboolean
+ PD_copy_type(PDBfile *sf, PDBfile *df, char *type),
  PD_write(PDBfile *file, char *name, char *type, void *vr),
  PD_write_as(PDBfile *file, char *name,
 	     char *intype, char *outtype, void *vr),
@@ -1044,18 +1047,17 @@ extern int
  PD_write_as_alt(PDBfile *file, char *name,
 		 char *intype, char *outtype, void *vr,
 		 int nd, long *ind),
- PD_read(PDBfile *file, char *name, void *vr),
- PD_read_as(PDBfile *file, char *name, char *type, void *vr),
- PD_read_as_dwim(PDBfile *file, char *name, char *outtype,
-		 long nix, void *space),
- PD_read_alt(PDBfile *file, char *name, void *vr, long *ind),
- PD_read_as_alt(PDBfile *file, char *name, char *type, void *vr,
-		long *ind),
- PD_copy_type(PDBfile *sf, PDBfile *df, char *type),
+ PD_append(PDBfile *file, char *name, void *vr),
+ PD_append_as(PDBfile *file, char *name, char *intype, void *vr),
+ PD_append_alt(PDBfile *file, char *name, void *vr,
+	       int nd, long *ind),
+ PD_append_as_alt(PDBfile *file, char *name,
+		  char *intype, void *vr,
+		  int nd, long *ind),
  PD_free(PDBfile *file, char *type, void *var),
- PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr),
- PD_autofix_denorm(PDBfile *file, int flag);
- 
+ PD_remove_entry(PDBfile *file, char *name),
+ PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr);
+
 extern void
  PD_set_io_hooks(int which),
  PD_error(char *s, PD_major_op n);

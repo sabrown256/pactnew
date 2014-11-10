@@ -147,6 +147,7 @@ static void py_format(char *fmt, int nc, char *spec, char *name)
 		      (strcmp(ty, "short") == 0))
 	        *pf++ = 'h';
 	     else if ((strcmp(ty, "SC_INT_I") == 0) ||
+		      (strcmp(ty, "pboolean") == 0) ||
 		      (strcmp(ty, "int") == 0))
 	        *pf++ = 'i';
 	     else if ((strcmp(ty, "SC_LONG_I") == 0) ||
@@ -422,9 +423,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 		    mnm);
 
 /* if member is fixed point type */
-	 else if ((strcmp(mty, "int") == 0) ||
-		  (strcmp(mty, "int64_t") == 0) ||
-		  (strcmp(mty, "long") == 0) ||
+	 else if ((is_fixed_point(mty) == B_T) ||
 		  (strcmp(mty, tykind[TK_ENUM]) == 0))
 	    {if (IS_NULL(mdm) == TRUE)
 	        fprintf(fc, "    rv = PY_INT_LONG(self->pyo->%s);\n", mnm);
@@ -432,8 +431,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
                 python_unknown_member(fc, pm, mty, 1);}
 
 /* if member is floating point type */
-	 else if ((strcmp(mty, "float") == 0) ||
-		  (strcmp(mty, "double") == 0))
+	 else if (is_real(mty) == B_T)
 	    {if (IS_NULL(mdm) == TRUE)
 	        fprintf(fc, "    rv = PyFloat_FromDouble(self->pyo->%s);\n", mnm);
 	     else
@@ -497,9 +495,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	     fprintf(fc, "           rv = 0;};\n");}
 
 /* if member is fixed point type */
-	 else if ((strcmp(mty, "int") == 0) ||
-		  (strcmp(mty, "int64_t") == 0) ||
-		  (strcmp(mty, "long") == 0) ||
+	 else if ((is_fixed_point(mty) == B_T) ||
 		  (strcmp(mty, tykind[TK_ENUM]) == 0))
 	    {if (IS_NULL(mdm) == FALSE)
                 python_unknown_member(fc, pm, mty, 2);
@@ -513,8 +509,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 		 fprintf(fc, "            rv = 0;};};\n");};}
 
 /* if member is floating point type */
-	 else if ((strcmp(mty, "float") == 0) ||
-		  (strcmp(mty, "double") == 0))
+	 else if (is_real(mty) == B_T)
 	    {if (IS_NULL(mdm) == FALSE)
                 python_unknown_member(fc, pm, mty, 2);
 	     else
@@ -943,6 +938,8 @@ static void python_wrap_local_assn(FILE *fc, fdecl *dcl, char *pfn, char *kw)
 
     python_class_self(fc, dcl);
 
+    emit_local_var_init(fc, dcl);
+
     if ((voida == FALSE) && (IS_NULL(kw) == FALSE))
        {map_name(dcn, BFLRG, cfn, pfn, "p", -1, FALSE, TRUE);
 
@@ -1016,7 +1013,8 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
     if (nr > 0)
        {na = dcl->na;
 	al = dcl->al;
-        for (i = 0; i < na; i++)
+
+	for (i = 0; i < na; i++)
 	    {nvl = al[i].nv;
 	     dir = al[i].dir;
 	     if ((nvl > 0) && ((dir == FD_OUT) || (dir == FD_IN_OUT)))
@@ -1030,7 +1028,7 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 			 vstrcat(a, BFLRG, "\t\t\t%s, _l%s[%d],\n",
 				 dty, nm, iv);};};};};
 
-/* if the list argument are non empty make up the call */
+/* if the list argument is non empty make up the call */
     if (IS_NULL(a) == FALSE)
        {if (strcmp(dty, "SC_STRING_I") == 0)
 	   snprintf(t, nc, "    _lo = PY_strings_tuple(_rv, -1, TRUE);\n");

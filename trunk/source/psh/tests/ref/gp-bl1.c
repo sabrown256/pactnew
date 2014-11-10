@@ -17,6 +17,8 @@
 PyObject *_PY_fav1(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     
+/* local variable initializations */
+
     fav1();
 
     Py_INCREF(Py_None);
@@ -33,6 +35,8 @@ PyObject *_PY_fav2(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     int _rv;
     
+/* local variable initializations */
+
     _rv = fav2();
     _lo = Py_BuildValue("i",
                         _rv);
@@ -48,6 +52,8 @@ PyObject *_PY_fav3(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     double _rv;
     
+/* local variable initializations */
+
     _rv = fav3();
     _lo = Py_BuildValue("d",
                         _rv);
@@ -63,6 +69,8 @@ PyObject *_PY_fav4(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     str _rv;
     
+/* local variable initializations */
+
     _rv = fav4();
     _lo = Py_BuildValue("O",
                         _rv);
@@ -78,6 +86,8 @@ PyObject *_PY_favp1(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     void *_rv;
     
+/* local variable initializations */
+
     _rv = favp1();
     _lo = Py_BuildValue("O",
                         _rv);
@@ -93,6 +103,8 @@ PyObject *_PY_favp2(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     int *_rv;
     
+/* local variable initializations */
+
     _rv = favp2();
     _lo = Py_BuildValue("i",
                         _rv);
@@ -108,6 +120,8 @@ PyObject *_PY_favp3(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     double *_rv;
     
+/* local variable initializations */
+
     _rv = favp3();
     _lo = Py_BuildValue("d",
                         _rv);
@@ -123,6 +137,8 @@ PyObject *_PY_favp4(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     str *_rv;
     
+/* local variable initializations */
+
     _rv = favp4();
     _lo = Py_BuildValue("O",
                         _rv);
@@ -137,6 +153,8 @@ PyObject *_PY_favp4(PyObject *self, PyObject *args, PyObject *kwds)
 PyObject *_PY_fav5(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     
+/* local variable initializations */
+
     fav5();
 
     Py_INCREF(Py_None);

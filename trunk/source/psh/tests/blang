@@ -154,7 +154,7 @@ else
 # compile Python wrapper
       Note $Log ""
       flog $Log set file = gp-$i.c
-      if ("$HAVE_PYTHON" =~ TRUE) then
+      if ("$HAVE_PYTHON" =~ *TRUE*) then
          Note $Log "Compile python wrapper"
          flog $Log ${cc} -I$PY_Inc -c $file
          @ xstatus = $status

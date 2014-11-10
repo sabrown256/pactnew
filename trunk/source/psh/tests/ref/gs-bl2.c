@@ -23,12 +23,14 @@ static object *_SXI_fbcv1(SS_psides *si, object *argl)
     char *_rv;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = 0.0;
     _lc        = 0.0;
     _ld        = '\0';
     _le        = NULL;
     _lf        = NULL;
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_FLOAT_I, &_lb,
@@ -56,10 +58,12 @@ static object *_SXI_fbmcv1(SS_psides *si, object *argl)
     char *_rv;
     object *_lo;
 
+/* local variable initializations */
     _la        = 0;
     _lb        = 0.0;
     _lc        = 0.0;
     _ld        = '\0';
+
     SS_args(si, argl,
             SC_INT_I, &_la,
             SC_FLOAT_I, &_lb,
@@ -85,10 +89,12 @@ static object *_SXI_fbmcr2(SS_psides *si, object *argl)
     char *_rv;
     object *_lo;
 
+/* local variable initializations */
     _la        = NULL;
     _lb        = NULL;
     _lc        = NULL;
     _ld        = NULL;
+
     SS_args(si, argl,
             SC_INT_P_I, &_la,
             SC_FLOAT_P_I, &_lb,
