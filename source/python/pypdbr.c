@@ -500,12 +500,7 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
 
         lvr = (char **) pv;
 
-/* GOTCHA: ask Lee Taylor */
-#if 0
-        have_dims = TRUE;
-#else
 	have_dims = (nitems > 1);
-#endif
 
         SET_CONT(INDIR_RET);
 

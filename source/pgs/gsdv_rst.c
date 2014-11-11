@@ -697,16 +697,20 @@ void _PG_rst_set_dev_prop(PG_device *dev, int dx, int dy, int nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_RST_QUERY_SCREEN - query some MPEG device characteristics */
+/* _PG_RST_QUERY_SCREEN - query some RASTER device characteristics */
 
 static void _PG_rst_query_screen(PG_device *dev, int *pdx, int *pnc)
    {int id, dx[PG_SPACEDM], nc;
     PG_dev_geometry *g;
+    static int defsz = 512;
 
     g = &dev->g;
 
     dx[0] = PG_window_width(dev);
     dx[1] = PG_window_height(dev);
+    if ((dx[0] == 0.0) || (dx[1] == 0.0))
+       {dx[0] = defsz;
+	dx[1] = defsz;};
 
     nc = dev->absolute_n_color;
 

@@ -319,14 +319,15 @@ static void python_unknown_member(FILE *fc, char *pm, char *mty, int fl)
 /* for get methods */
     if (fl == 1)
        {fprintf(fc, "/* unknown get '%s' member '%s' */\n",mty, pm);
-        fprintf(fc, "    {PyErr_SetString(PyExc_NotImplementedError, \"%s\");\n",
+        fprintf(fc, "    PyErr_SetString(PyExc_NotImplementedError, \"%s\");\n",
 		pm);
-	fprintf(fc, "     rv = NULL;};\n");}
+	fprintf(fc, "    rv = NULL;\n");}
 
 /* for set methods */
     else
-       {fprintf(fc, "/* unknown set '%s' member '%s' */\n", mty, pm);
-	fprintf(fc, "    PyErr_SetString(PyExc_NotImplementedError, \"%s\");\n",
+       {fprintf(fc, "\n");
+	fprintf(fc, "/* unknown set '%s' member '%s' */\n", mty, pm);
+	fprintf(fc, "       PyErr_SetString(PyExc_NotImplementedError, \"%s\");\n",
 		pm);};
 
     return;}
@@ -824,7 +825,7 @@ static void python_kw_list(char *kw, int nc, fdecl *dcl)
     kw[0] = '\0';
 
     for (i = 0; i < na; i++)
-        {if (al[i].cls == FALSE)
+        {if (al[i].cls == B_F)
 	    {ip = &al[i].interp;
 	     nstrcat(kw, BFLRG, ip->argn);};};
 
@@ -844,7 +845,7 @@ static void python_class_self(FILE *fc, fdecl *dcl)
     al = dcl->al;
 	
     for (i = 0; i < na; i++)
-        {if (al[i].cls == TRUE)
+        {if (al[i].cls == B_T)
 	    {nm = al[i].name;
 	     fprintf(fc, "    _l%s = self->pyo;\n\n", nm);
 	     break;};};
@@ -913,7 +914,7 @@ static void python_wrap_local_assn_arg(char *a, int nc, farg *al)
    {char *arg;
     idecl *ip;
 
-    if (al->cls == FALSE)
+    if (al->cls == B_F)
        {ip  = &al->interp;
         arg = ip->argi;
 	nstrcat(a, nc, arg);};
