@@ -66,7 +66,7 @@ struct s_idecl
 struct s_farg
    {int nv;                          /* number of default values specified */
     int arr;                         /* TRUE for array default values */
-    int cls;                         /* TRUE for class */
+    pboolean cls;                    /* TRUE for class */
     fparam knd;
     fdir dir;                        /* data flow direction */
     char *arg;                       /* original C argument specification */
@@ -364,7 +364,7 @@ static farg *get_class_arg(fdecl *dcl)
     rv = NULL;
 
     for (i = 0; (i < na) && (rv == NULL); i++)
-        {if (al[i].cls == TRUE)
+        {if (al[i].cls == B_T)
 	    rv = al + i;};
 
     return(rv);}
@@ -727,7 +727,7 @@ static int process_qualifiers(farg *al, char *qual)
 		rv = FALSE;};
 
 /* get kind adjustment */
-	    al->cls = ((IS_NULL(ta[2]) == FALSE) && (strcmp(ta[2], "cls") == 0));
+	    al->cls = ((IS_NULL(ta[2]) == B_F) && (strcmp(ta[2], "cls") == 0));
 
 	    free_strings(ta);}
 	else
@@ -1113,7 +1113,7 @@ static void emit_local_var_init(FILE *fc, fdecl *dcl)
         
 /* initialize local variable to quell compiler warnings */
     for (i = 0; i < na; i++)
-        {if (IS_NULL(al[i].name) == FALSE)
+        {if ((IS_NULL(al[i].name) == FALSE) && (al[i].cls == B_F))
 	    fputs(al[i].interp.defa, fc);};
 
     fprintf(fc, "\n");
@@ -1404,7 +1404,7 @@ static void add_derived_types(char **sbi)
  */
 
 static char *map_name(char *d, int nc, char *cf, char *lf,
-		      char *sfx, int cs, int us, int cls)
+		      char *sfx, int cs, int us, pboolean cls)
    {int i, n, ok;
     static char *pre[] = { "SC_", "PM_", "PD_", "PG_", "PA_" };
 
@@ -1420,7 +1420,7 @@ static char *map_name(char *d, int nc, char *cf, char *lf,
 	else
 	   nstrncpy(d, nc, lf, -1);}
 
-    else if ((cls == TRUE) && (ok == TRUE))
+    else if ((cls == B_T) && (ok == TRUE))
        snprintf(d, nc, "%s", cf+3);
 
     else
@@ -1653,14 +1653,14 @@ static void if_call_list(char *a, int nc, fdecl *dcl, char *dlm)
     if (voida == FALSE)
        {if (dlm == NULL)
 	   {for (i = 0; i < na; i++)
-	        {if (al[i].cls == FALSE)
+	        {if (al[i].cls == B_F)
 		    vstrcat(a, BFLRG, "%s ", al[i].name);};
 
 	    a[strlen(a) - 1] = '\0';}
 
 	else
 	   {for (i = 0; i < na; i++)
-	        {if (al[i].cls == FALSE)
+	        {if (al[i].cls == B_F)
 		    vstrcat(a, BFLRG, "%s%s ", al[i].name, dlm);};
 
 	    a[strlen(a) - 2] = '\0';};};
