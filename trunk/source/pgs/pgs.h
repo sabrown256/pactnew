@@ -1543,10 +1543,12 @@ extern PG_image
  *PG_extract_image(PG_device *dev, double *dbx, double *rbx);
 
 extern int
- PG_render_data_type(PG_graph *data),
  PG_copy_image(PG_image *dim, PG_image *sim, int bck),
  PG_place_image(PG_image *dim, PG_image *sim, int scale),
  PG_shift_image_range(PG_image *a, PG_image *b, int off);
+
+extern pboolean
+ PG_render_data_type(PG_graph *data);
 
 
 /* GSCRV.C declarations */
@@ -1594,8 +1596,10 @@ extern void
 		    unsigned int llf, int lcf, int slf, int lts);
 
 extern int
- PG_clip_line_seg(PG_device *dev, double *x1, double *x2),
  PG_clip_box(double *bx, double *wc, int *lgf);
+
+extern pboolean
+ PG_clip_line_seg(PG_device *dev, double *x1, double *x2);
 
 
 /* GSREND.C declarations */
@@ -1768,7 +1772,9 @@ extern void
 		   int nd, PG_coord_sys cs, long n, double **r);
 
 extern int
- PG_def_marker(int n, double *x1, double *y1, double *x2, double *y2),
+ PG_def_marker(int n, double *x1, double *y1, double *x2, double *y2);
+
+extern pboolean
  PG_setup_font(PG_device *dev, char *face, char *style, int size,
 	       char **pfn, int *pnf, int *pns);
 
@@ -1922,7 +1928,7 @@ extern void
 		 int n, double **x),
  PG_rotate_vectors(PG_device *dev, int nd, int n, double **x);
 
-extern int
+extern pboolean
  PG_box_contains(int nd, double *box, double *p);
 
 extern double

@@ -1096,12 +1096,13 @@ void PG_box_copy(int nd, double *d, double *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_BOX_CONTAINS - return TRUE if BOX contains P */
+/* PG_BOX_CONTAINS - return B_T if BOX contains P */
 
-int PG_box_contains(int nd, double *box, double *p)
-   {int id, l, ok;
+pboolean PG_box_contains(int nd, double *box, double *p)
+   {int id, l;
+    pboolean ok;
 
-    ok = TRUE;
+    ok = B_T;
 
     for (id = 0; id < nd; id++)
         {l   = 2*id;

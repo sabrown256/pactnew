@@ -109,21 +109,22 @@ static int _PG_rst_line_style(int *dl, int ls, double lw)
 
 /* _PG_RST_CLIP_LINE - clip the line X1 to X2
  *                   - to the box (xmn, ymn) to (xmx, ymx)
- *                   - return TRUE (visible) or FALSE (invisible)
+ *                   - return B_T (visible) or B_F (invisible)
  *                   - if visible, return new clipped points
  *                   - if not visible, no change to A and B.
  */
 
-static int _PG_rst_clip_line(PG_device *dev, double *x1, double *x2)
-   {int visible, count, i, sa, sb, inter, aorb;
+static pboolean _PG_rst_clip_line(PG_device *dev, double *x1, double *x2)
+   {int count, i, sa, sb, inter, aorb;
     int ac[4], bc[4];
     int nchk;
+    pboolean visible;
     double m, x, y;
     double a[PG_SPACEDM], b[PG_SPACEDM], p[PG_SPACEDM];
     double pc[PG_BOXSZ], wc[PG_BOXSZ];
 
     if (dev->clipping == FALSE)
-       return(TRUE);
+       return(B_T);
 
     a[0] = x1[0];
     b[0] = x2[0];
@@ -151,7 +152,7 @@ static int _PG_rst_clip_line(PG_device *dev, double *x1, double *x2)
  * and the counter
  */
     count   = 0;
-    visible = TRUE;
+    visible = B_T;
     aorb    = 0;
     m       = DBL_MAX;   /* initialize to an infinite slope */
 
@@ -172,7 +173,7 @@ static int _PG_rst_clip_line(PG_device *dev, double *x1, double *x2)
     for (i = 0; i < 4; i++)
         {inter += (ac[i] + bc[i])/2;
 	 if (inter != 0)
-	    {visible = FALSE;
+	    {visible = B_F;
 	     return(visible);};};
 
 /* line may be partially visible
@@ -194,7 +195,7 @@ static int _PG_rst_clip_line(PG_device *dev, double *x1, double *x2)
 	p[1]  = a[1];
 	nchk  = TRUE;};
 
-    while (visible == TRUE)
+    while (visible == B_T)
 
 /* neither end point inside window */
        {if (nchk == FALSE)
@@ -255,10 +256,10 @@ static int _PG_rst_clip_line(PG_device *dev, double *x1, double *x2)
 		continue;};
 
 /* the line is doubly invisible */
-	    visible = FALSE;};};
+	    visible = B_F;};};
 
 /* get clipping points P1 and P2 */
-    if (visible == TRUE)
+    if (visible == B_T)
        {x1[0] = a[0];
 	x1[1] = a[1];
 	x2[0] = b[0];

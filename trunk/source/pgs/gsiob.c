@@ -213,14 +213,12 @@ static void _PG_set_val(haelem *hp, int dxn, int dxd)
  *                 - matches the value in the specified haelem
  */
 
-static int _PG_value_match(int ityp, haelem *hp, char *val)
-   {int match;
+static pboolean _PG_value_match(int ityp, haelem *hp, char *val)
+   {pboolean match;
     char *ps;
     void *pv;
 
     pv = *(void **) hp->def;
-
-    match = FALSE;
 
 /* fixed point types (proper) */
     if (SC_is_type_fix(ityp) == TRUE)
@@ -249,7 +247,7 @@ static int _PG_value_match(int ityp, haelem *hp, char *val)
 	match = (ps == NULL) ? FALSE : (strcmp(ps, val) == 0);}
 
     else
-       match = FALSE;
+       match = B_F;
 
     return(match);}
 

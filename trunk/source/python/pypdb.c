@@ -382,7 +382,8 @@ static int PY_defstr_ctor_tp_init(PY_pdbdata *self,
     PY_defstr *dpobj;
     char *kw_list[] = {"data", "ind", NULL};
 
-    rv = -1;
+    rv   = -1;
+    ierr = 0;
 
     indobj = NULL;
     if (PyArg_ParseTupleAndKeywords(args, kwds,
@@ -395,51 +396,48 @@ static int PY_defstr_ctor_tp_init(PY_pdbdata *self,
 	dpobj = (PY_defstr *) SC_hasharr_def_lookup(_PY_defstr_tab,
 						    PY_TYPE(self));
 	if (dpobj == NULL)
-	   {PP_error_set(PP_error_internal, (PyObject *) self,
-			 "Unable to locate constructor for %s",
-			 PY_TYPE(self)->tp_name);
-	    return(-1);};
+	   PP_error_set(PP_error_internal, (PyObject *) self,
+			"Unable to locate constructor for %s",
+			PY_TYPE(self)->tp_name);
 
 /* a sanity check */
-	if (PY_TYPE(self) != dpobj->ctor)
-	   {PP_error_set(PP_error_internal, (PyObject *) self,
-			 "Unable to find constructor");
-	    return(-1);};
-    
-	dp = dpobj->pyo;
-	ts = dp->type;
-	fileinfo = dpobj->fileinfo;
+	else if (PY_TYPE(self) != dpobj->ctor)
+	   PP_error_set(PP_error_internal, (PyObject *) self,
+			"Unable to find constructor");
+	else
+	   {dp = dpobj->pyo;
+	    ts = dp->type;
+	    fileinfo = dpobj->fileinfo;
 
-	dims = NULL;
-	number = 1;
-	if (indobj != NULL)
-	   {nd = PP_obj_to_ind(indobj, ind);
-	    if (nd < 0)
-	       goto err;
-	    dims   = PP_ind_to_dimdes(nd, ind);
-	    number = _PD_comp_num(dims);};
+	    dims = NULL;
+	    number = 1;
+	    if (indobj != NULL)
+	       {nd = PP_obj_to_ind(indobj, ind);
+		if (nd < 0)
+		   ierr = -1;
+		else
+		   {dims   = PP_ind_to_dimdes(nd, ind);
+		    number = _PD_comp_num(dims);};};
     
-	ierr = PP_alloc_data(ts, number, fileinfo, &vr);
-	if (ierr < 0)
-	   {PP_error_set(PP_error_internal, (PyObject *) self,
-			 "Error allocating memory");
-	    goto err;};
+	    if (ierr != -1)
+	       {ierr = PP_alloc_data(ts, number, fileinfo, &vr);
+		if (ierr < 0)
+		   PP_error_set(PP_error_internal, (PyObject *) self,
+				"Error allocating memory");
+		else
+		   {ierr = _PP_rd_syment(data, fileinfo, ts,
+					 dims, number, vr);
+		    if (ierr != -1)
+		       {self = PY_pdbdata_newobj(self, vr, ts, number,
+						 dims, dp,
+						 fileinfo, dpobj, NULL);
+			rv = 0;};};};};};
 
-	ierr = _PP_rd_syment(data, fileinfo, ts, dims, number, vr);
-	if (ierr == -1)
-	   goto err;
-    
-	self = PY_pdbdata_newobj(self, vr, ts, number,
-				 dims, dp, fileinfo, dpobj, NULL);
-    
-	return(0);};
-
- err:
-/* XXX   PD_free(file, ts, vr); */
-    (void) _PP_rel_syment(dpobj->host_chart, vr, number, ts);
-    CFREE(vr);
+    if (ierr == -1)
+       {_PP_rel_syment(dpobj->host_chart, vr, number, ts);
+	CFREE(vr);
 /* XXX  CFREE(ts); */
-    _PD_rl_dimensions(dims);
+	_PD_rl_dimensions(dims);};
 
     return(rv);}
 
@@ -701,31 +699,31 @@ PyObject *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
     strtok(ts, " *()[");
     dpobj = _PY_defstr_find_singleton(ts, NULL, fileinfo);
     CFREE(ts);
-    if (dpobj == NULL)
-       return(NULL);
 
-    dp  = dpobj->pyo;
-    svr = vr;
+    if (dpobj != NULL)
+       {dp  = dpobj->pyo;
+	svr = vr;
 
-    for (desc = dp->members; desc != NULL; desc = desc->next)
-        {if (strcmp(desc->name, name) == 0)
-	    {PP_CAST_TYPE(ttype, desc, svr + desc->member_offs, svr,
-			  Py_None, NULL);
+	for (desc = dp->members; desc != NULL; desc = desc->next)
+	    {if (strcmp(desc->name, name) == 0)
+		{PP_CAST_TYPE(ttype, desc, svr + desc->member_offs, svr,
+			      Py_None, NULL);
 
-/* get base type */
-	     ts = CSTRSAVE(ttype);
-	     strtok(ts, " *()[");
-	     dpobj = _PY_defstr_find_singleton(ts, NULL, fileinfo);
-	     CFREE(ts);
-	     if (dpobj == NULL)
-                return(NULL);
+/* get member base type */
+		 ts = CSTRSAVE(ttype);
+		 strtok(ts, " *()[");
+		 dpobj = _PY_defstr_find_singleton(ts, NULL, fileinfo);
+		 CFREE(ts);
 
-	     dp = dpobj->pyo;
+		 if (dpobj != NULL)
+		    {dp = dpobj->pyo;
 
-	     svr += desc->member_offs;
-	     obj = PP_form_object(svr, ttype, desc->number, desc->dimensions,
-				  dp, fileinfo, dpobj, parent, &form);
-	     break;};};
+		     svr += desc->member_offs;
+		     obj = PP_form_object(svr, ttype,
+					  desc->number, desc->dimensions,
+					  dp, fileinfo, dpobj,
+					  parent, &form);};
+		 break;};};};
     
     return(obj);}
 
@@ -857,17 +855,15 @@ static PyObject *PY_defstr_keys(PY_defstr *self,
          i++, desc = desc->next);
 
     rv = PyTuple_New(i);
-    if (rv == NULL)
-       return(NULL);
-
-    for (i = 0, desc = self->pyo->members;
-         desc != NULL;
-         i++, desc = desc->next)
-        {err = PyTuple_SetItem(rv, i, PY_STRING_STRING(desc->name));
-	 if (err < 0)
-	    {Py_DECREF(rv);
-	     rv = NULL;
-	     break;};};
+    if (rv != NULL)
+       {for (i = 0, desc = self->pyo->members;
+	     desc != NULL;
+	     i++, desc = desc->next)
+	    {err = PyTuple_SetItem(rv, i, PY_STRING_STRING(desc->name));
+	     if (err < 0)
+	        {Py_DECREF(rv);
+		 rv = NULL;
+		 break;};};};
   
     return(rv);}
 
@@ -929,26 +925,26 @@ PY_defstr *PY_defstr_newobj(PY_defstr *obj, defstr *dp, PP_file *fileinfo)
    {PyTypeObject *ctor;
 
     if (obj == NULL)
-       {obj = (PY_defstr *) PyType_GenericAlloc(&PY_defstr_type, 0);
-        if (obj == NULL)
-	   return(NULL);};
+       obj = (PY_defstr *) PyType_GenericAlloc(&PY_defstr_type, 0);
 
-    obj->pyo      = dp;
-    obj->fileinfo = fileinfo;
+    if (obj != NULL)
+       {obj->pyo      = dp;
+	obj->fileinfo = fileinfo;
 
 /* save a reference to the host_chart.
  * This is used when the file has been closed but some
  * references to defstrObjects still exist.
  */
-    obj->host_chart = fileinfo->file->host_chart;
+	obj->host_chart = fileinfo->file->host_chart;
 
-    ctor = PY_defstr_mk_ctor(obj);
-    if (ctor == NULL)
-       return(NULL);
-    obj->ctor = ctor;
+	ctor = PY_defstr_mk_ctor(obj);
+	if (ctor == NULL)
+	   obj = NULL;
+	else
+	   {obj->ctor = ctor;
 
-    SC_mark(dp, 1);
-    SC_mark(fileinfo->file->host_chart, 1);
+	     SC_mark(dp, 1);
+	     SC_mark(fileinfo->file->host_chart, 1);};};
 
     return(obj);}
 
@@ -1027,17 +1023,20 @@ static Py_ssize_t PY_defstr_mp_length(PyObject *_self)
    {Py_ssize_t nitems;
     defstr *dp;
     memdes *desc;
-    PY_defstr *self = (PY_defstr *) _self;
+    PY_defstr *self;
  
+    self = (PY_defstr *) _self;
+ 
+    nitems = -1;
+
     dp = self->pyo;
     if (dp == NULL)
-       {PP_error_set(PP_error_internal,
-                     NULL, "Defstr is NULL");
-        return(-1);};
-
-    for (nitems = 0, desc = self->pyo->members;
-         desc != NULL;
-         nitems++, desc = desc->next);
+       PP_error_set(PP_error_internal,
+		    NULL, "Defstr is NULL");
+    else
+       {for (nitems = 0, desc = self->pyo->members;
+	     desc != NULL;
+	     nitems++, desc = desc->next);};
 
     return(nitems);}
 
@@ -1049,29 +1048,32 @@ static PyObject *PY_defstr_mp_subscript(PyObject *_self, PyObject *key)
     defstr *dp;
     memdes *desc;
     PyObject *rv;
-    PY_defstr *self = (PY_defstr *) _self;
+    PY_defstr *self;
+ 
+    rv = NULL;
+
+    self = (PY_defstr *) _self;
  
     if (!PY_STRING_CHECK(key))
-       {PP_error_set_user(key, "key must be string");
-        return(NULL);};
+       PP_error_set_user(key, "key must be string");
 
-    name = PY_STRING_AS_STRING(key);
-
-    dp = self->pyo;
-    if (dp == NULL)
-       {PP_error_set(PP_error_internal,
-                     NULL, "Defstr is NULL");
-        return(NULL);};
-
-    for (desc = self->pyo->members; desc != NULL; desc = desc->next)
-        {if (strcmp(desc->name, name) == 0)
-            break;};
-
-    if (desc != NULL)
-       rv = (PyObject *) PY_memdes_newobj(NULL, desc);
     else
-       {PyErr_SetObject(PyExc_KeyError, key);
-        rv = NULL;};
+       {name = PY_STRING_AS_STRING(key);
+
+	dp = self->pyo;
+	if (dp == NULL)
+	   PP_error_set(PP_error_internal,
+			NULL, "Defstr is NULL");
+	else
+	   {for (desc = self->pyo->members; desc != NULL; desc = desc->next)
+	        {if (strcmp(desc->name, name) == 0)
+		    break;};
+
+	    if (desc != NULL)
+	       rv = (PyObject *) PY_memdes_newobj(NULL, desc);
+	    else
+	       {PyErr_SetObject(PyExc_KeyError, key);
+		rv = NULL;};};};
 
     return(rv);}
 
@@ -1138,14 +1140,13 @@ PY_memdes *PY_memdes_newobj(PY_memdes *obj, memdes *desc)
    {
 
     if (obj == NULL)
-       {obj = (PY_memdes *) PyType_GenericAlloc(&PY_memdes_type, 0);
-        if (obj == NULL)
-	   return NULL;};
+       obj = (PY_memdes *) PyType_GenericAlloc(&PY_memdes_type, 0);
 
-    obj->pyo = desc;
-    SC_mark(desc, 1);
+    if (obj != NULL)
+       {obj->pyo = desc;
+	SC_mark(desc, 1);};
 
-    return obj;}
+    return(obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1165,7 +1166,7 @@ static void PY_memdes_tp_dealloc(PY_memdes *self)
 static int PY_memdes_tp_init(PY_memdes *self, PyObject *args, PyObject *kwds)
    {
 
-    return 0;}
+    return(0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

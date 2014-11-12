@@ -1323,10 +1323,11 @@ void _PG_init_chunk(itf_array *ifs, int it)
  *                       - range from I1 to I2 are contained in the surface
  */
 
-static int _PG_surface_contained(int *js, itf_array *ifs, int ic, int id,
-				 long **bnd, int it)
-   {int io;
-    int ok, off;
+static pboolean _PG_surface_contained(int *js, itf_array *ifs,
+				      int ic, int id,
+				      long **bnd, int it)
+   {int io, off;
+    pboolean ok;
     double dc, *dn;
     level_surface *itf;
 
@@ -1336,11 +1337,11 @@ static int _PG_surface_contained(int *js, itf_array *ifs, int ic, int id,
 
     _PG_grab_points(js, id+1, ic, off, dn, bnd);
 
-    ok = TRUE;
+    ok = B_T;
     for (io = 0; (io <= id) && ok; io++)
         {dc = dn[js[io]];
 	 if (dc == HUGE)
-	    {ok = FALSE;
+	    {ok = B_F;
 	     break;};
 
 	 ok &= (dc == 0.0);}
@@ -1352,7 +1353,7 @@ static int _PG_surface_contained(int *js, itf_array *ifs, int ic, int id,
     if (io > id)
        {dc = dn[js[io]];
 	if (dc == HUGE)
-	   ok = FALSE;
+	   ok = B_F;
 
 	else
 	   ok &= (dc < 0.0);};

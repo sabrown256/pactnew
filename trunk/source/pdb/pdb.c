@@ -1029,7 +1029,8 @@ pboolean PD_write_as(PDBfile *file ARG(,,cls), char *name,
 
 	appnd = pa->append_flag;
 	dims  = _PD_ex_dims(lname, file->default_offset, &ie);
-	ep    = file->tr->write(file, s, intype, outtype, vr, dims, appnd, &new);
+	ep    = file->tr->write(file, s, intype, outtype,
+                                vr, dims, appnd, &new);
 	if (ep != NULL)
 	   {if (new == B_F)
 	       {if (appnd == B_F)

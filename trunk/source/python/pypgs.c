@@ -464,7 +464,7 @@ static PyObject *PY_PG_graph_get_info(PY_PG_graph *self, void *context)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* GOTCHA: note difference between this and generated version */
+/* setter not generated */
 
 static int PY_PG_graph_set_info(PY_PG_graph *self,
 				PyObject *value, void *context)
