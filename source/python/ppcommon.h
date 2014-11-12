@@ -15,11 +15,16 @@
 
 /*--------------------------------------------------------------------------*/
 
+# define PY_ARG_KEY                 METH_VARARGS | METH_KEYWORDS 
+
+# define PY_COBJ_VOID_PTR(_o, _m)   PyCapsule_New(_o, 0, (PyCapsule_Destructor) _m)
+# define PY_GET_PTR(_o)             PyCapsule_GetPointer(_o, 0)
+# define PY_COBJ_TYPE               PyCapsule_Type
+
+
 #if PY_MAJOR_VERSION >= 3
 
 # define cmpfunc                    void *
-
-# define PY_ARG_KEY                 METH_VARARGS | METH_KEYWORDS 
 
 # define PY_HEAD_INIT(_t, _s)       PyVarObject_HEAD_INIT(_t, _s)
 # define PY_TYPE(_o)                Py_TYPE(_o)
@@ -39,9 +44,6 @@
 # define PY_STRING_SIZE(_o)             PyUnicode_GET_LENGTH(_o)
 # define PY_STRING_AS_STRING(_o)        PY_get_string(_o)
 
-# define PY_COBJ_VOID_PTR(_o, _m)   PyCapsule_New(_o, 0, (PyCapsule_Destructor) _m)
-# define PY_GET_PTR(_o)             PyCapsule_GetPointer(_o, 0)
-# define PY_COBJ_TYPE               PyCapsule_Type
 # define PY_NUM_INT(_m)             ((_m)->nb_int)
 
 # define PY_MOD_BEGIN(_nm, _doc, _mth)                                      \
@@ -67,8 +69,6 @@ PyMODINIT_FUNC PyInit_##_nm(void)                                           \
 
 #else
 
-# define PY_ARG_KEY                 METH_KEYWORDS 
-
 # define PY_HEAD_INIT(_t, _s)       PyObject_HEAD_INIT(_t) _s,
 # define PY_TYPE(_o)                (((PyObject *) (_o))->ob_type)
 # define PY_TYPE_TYPE               PyClass_Type
@@ -87,9 +87,6 @@ PyMODINIT_FUNC PyInit_##_nm(void)                                           \
 # define PY_STRING_SIZE(_o)             PyString_Size(_o)
 # define PY_STRING_AS_STRING(_o)        PyString_AsString(_o)
 
-# define PY_COBJ_VOID_PTR(_o, _m)   PyCObject_FromVoidPtr(_o, _m)
-# define PY_GET_PTR(_o)             PyCObject_AsVoidPtr(_o)
-# define PY_COBJ_TYPE               PyCObject_Type
 # define PY_NUM_INT(_m)             ((_m)->nb_long)
 
 # define PY_MOD_BEGIN(_nm, _doc, _mth)                                      \

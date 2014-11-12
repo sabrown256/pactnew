@@ -173,17 +173,20 @@ static void PG_image_hand(PG_device *dev, PG_graph *g,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_RENDER_DATA_TYPE - return TRUE iff the specified graph DATA has
- *                     - a mapping for its data and FALSE
+/* PG_RENDER_DATA_TYPE - return B_T iff the specified graph DATA has
+ *                     - a mapping for its data and B_F
  *                     - if it has a cast image
  */
 
-int PG_render_data_type(PG_graph *data)
+pboolean PG_render_data_type(PG_graph *data)
    {char *s;
+    pboolean rv;
 
     s = data->use;
 
-    return((s == NULL) || (strcmp(s, PG_IMAGE_S) != 0));}
+    rv = ((s == NULL) || (strcmp(s, PG_IMAGE_S) != 0));
+
+    return(rv);}
     
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

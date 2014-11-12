@@ -872,11 +872,12 @@ void PG_clip_line(int *pfl, double *x1, double *x2, double *wc, int *lgf)
 /*--------------------------------------------------------------------------*/
 
 /* PG_CLIP_LINE_SEG - clip a simple line segment
- *                  - return TRUE iff there is something to draw
+ *                  - return B_T iff there is something to draw
  */
 
-int PG_clip_line_seg(PG_device *dev, double *x1, double *x2)
-   {int flag, rv;
+pboolean PG_clip_line_seg(PG_device *dev, double *x1, double *x2)
+   {int flag;
+    pboolean rv;
     double bnd[PG_BOXSZ];
     PG_dev_geometry *g;
 

@@ -123,14 +123,17 @@ PG_dev_attributes *PG_get_attributes(PG_device *dev)
 
 /* PG_SETUP_FONT - map the given font name to the host font name and
  *               - perform other generic font setup
- *               - return TRUE iff successful
+ *               - return B_T iff successful
  */
 
-int PG_setup_font(PG_device *dev, char *face, char *style, int size, 
-                  char **pfn, int *pnf, int *pns)
+pboolean PG_setup_font(PG_device *dev, char *face, char *style, int size, 
+		       char **pfn, int *pnf, int *pns)
    {int l, fn, nfont;
+    pboolean rv;
     PG_font_family *ff;
     char **fs;
+
+    rv = B_F;
 
     if (dev->type_face == NULL)
        dev->type_face = CSTRSAVE(face);
@@ -154,31 +157,29 @@ int PG_setup_font(PG_device *dev, char *face, char *style, int size,
            break;
          nfont += ff->n_styles;};
 
-    if (ff == NULL)
-       return(FALSE);
+    if (ff != NULL)
+       {fs = ff->type_styles;
+	fn = ff->n_styles;
+	l  = 0;
+	if (strcmp(style, "medium") == 0)
+	   l = 0;
+	else if (strcmp(style, "italic") == 0)
+	   l = 1;
+	else if (strcmp(style, "bold") == 0)
+	   l = 2;
+	else if (strcmp(style, "bold-italic") == 0)
+	   l = 3;
 
-    fs = ff->type_styles;
-    fn = ff->n_styles;
-    l  = 0;
-    if (strcmp(style, "medium") == 0)
-       l = 0;
-    else if (strcmp(style, "italic") == 0)
-       l = 1;
-    else if (strcmp(style, "bold") == 0)
-       l = 2;
-    else if (strcmp(style, "bold-italic") == 0)
-       l = 3;
+	if (l < fn)
+	   {*pfn = fs[l];
 
-    if (l >= fn)
-       return(FALSE);
+	    nfont += l;
+	    *pnf   = nfont;
+	    *pns   = l;
 
-    *pfn = fs[l];
+	    rv = B_T;};};
 
-    nfont += l;
-    *pnf   = nfont;
-    *pns   = l;
-
-    return(TRUE);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 
