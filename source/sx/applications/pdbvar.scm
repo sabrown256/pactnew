@@ -93,7 +93,7 @@
      Usage: [varset!] <expr> <values>
             <expr>       :=  <variable> | <structure-member> | <find-expr>
             <find-expr>  :=  <arr> [<predicate> [<conjunction>]]*
-            <arr>        :=  a pm-array of values
+            <arr>        :=  a c-array of values
             <predicate>  :=  = | != | <= | < | >= | >
             <conjuntion> :=  and | or
      Examples: varset! a[10,15] 3.2
@@ -192,7 +192,7 @@
 	      (else
 	       (-varfind-expr "Indices of values" var expr)
 	       (printf nil "\n")
-	       (-varfind-index-only file var (pm-array->list ind) n)
+	       (-varfind-index-only file var (c-array->list ind) n)
 	       (printf nil "\n")))))
 
 ;--------------------------------------------------------------------------
@@ -208,9 +208,9 @@
 (define (-varfind-or var arr prd val rst indl)
     (let* ((aid (find-index arr prd val indl))
 	   (bid (-varfind var arr rst))
-	   (ai  (pm-array->list aid))
-	   (bi  (pm-array->list bid)))
-      (apply list->pm-array
+	   (ai  (c-array->list aid))
+	   (bi  (c-array->list bid)))
+      (apply list->c-array
 	     (append ai bi))))
 
 ;--------------------------------------------------------------------------
@@ -260,13 +260,13 @@
     "VARFIND - find indices of arrays for which values match
             specified criteria
      Usage: varfind <arr> [<predicate> # [<conjunction>]]*
-            <arr>        :=  a pm-array of values
+            <arr>        :=  a c-array of values
             <predicate>  :=  = | != | <= | < | >= | >
             <conjuntion> :=  and | or
      Examples: varfind foo < 3.1
                varfind foo < 3.1 and > -1.2 and != 0"
 
-    (let* ((arr (pdbdata->pm-array (read-pdbdata current-file var)))
+    (let* ((arr (pdbdata->c-array (read-pdbdata current-file var)))
 	   (dms (variable-dimensions var))
 	   (oid (-varfind var arr expr nil)))
 
@@ -374,7 +374,7 @@
 				((pm-set? name)
 				 (pm-set->pdbdata name))
 				((c-array? name)
-				 (pm-array->pdbdata name))
+				 (c-array->pdbdata name))
 				((pg-graph? name)
 				 (pg-graph->pdbdata name))
 				((pg-image? name)

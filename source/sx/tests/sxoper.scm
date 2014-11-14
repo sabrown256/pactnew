@@ -88,9 +88,9 @@
 
 (define (test-array typx typy name a1 a2 mop sop)
     (let* ((arr (mop a1 a2))
-	   (ld  (pm-array->list arr))
-	   (l1  (pm-array->list a1))
-	   (l2  (pm-array->list a2)))
+	   (ld  (c-array->list arr))
+	   (l1  (c-array->list a1))
+	   (l2  (c-array->list a2)))
           (compare-results ld l1 l2 sop "Array" typx typy name)))
 
 ;--------------------------------------------------------------------------
@@ -165,7 +165,7 @@
 	  (dpdb  (write-pdbdata nil name
 				'(type "C_array")
 				(list tspec nspec dspec))))
-         (pdbdata->pm-array dpdb)))
+         (pdbdata->c-array dpdb)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

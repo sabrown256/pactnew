@@ -728,7 +728,7 @@ static object *_SXI_dump_pp(SS_psides *si, object *argl)
 
 /* _SXI_DB_NUMERIC_DATA - connect to numeric data in PANACEA data base
  *                      -
- *                      - (pa-variable->pm-array name)
+ *                      - (pa-variable->c-array name)
  */
 
 static object *_SXI_db_numeric_data(SS_psides *si, object *obj)
@@ -844,7 +844,7 @@ void SX_install_panacea_funcs(SS_psides *si)
                SS_nargs,
                _SXI_pan_simulate, SS_PR_PROC);
 
-    SS_install(si, "pa-variable->pm-array",
+    SS_install(si, "pa-variable->c-array",
                "Save the data for the output requests from this cycle",
                SS_sargs,
                _SXI_db_numeric_data, SS_PR_PROC);

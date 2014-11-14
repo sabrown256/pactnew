@@ -248,7 +248,7 @@
      Usage: tdel-column <list>
      Example: tdel-column 1 (sequence 3 5 1) 11"
     (let*  ((clist    (tlflatten-list rest))
-            (carray   (apply list->pm-array clist)))
+            (carray   (apply list->c-array clist)))
  
         (dl)
         (set! tdims (del-column carray))

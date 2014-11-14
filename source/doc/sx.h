@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 10/23/2014
+MOD: 11/14/2014
 
 <CENTER>
 <P>
@@ -3247,17 +3247,17 @@ other <a href="#SXdocs">PACT documentation</a>.<p>
 <a name="539012"></a>
 <U><h4> PML Functions</h4></U>
 
-<B>list-&gt;pm-array</B>
+<B>list-&gt;c-array</B>
 <BR><I>Procedure: </I>Return a numeric array built from a list of numbers.
 <P>
-<B>pm-array?</B>
+<B>c-array?</B>
 </B><BR><I>C Information: </I>SX_C_ARRAYP
 <BR><I>Procedure: </I>Return #t if the object is a numeric array and #f otherwise.
 <P>
-<B>pm-array-&gt;list</B>
+<B>c-array-&gt;list</B>
 <BR><I>Procedure: </I>Return a list of numbers built from a numeric array.
 <P>
-<B>pm-array-length</B>
+<B>c-array-length</B>
 <BR><I>Procedure: </I>Return the length of the given numeric array.
 <P>
 <B>pdbdata-&gt;pm-mapping</B>

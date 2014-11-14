@@ -413,7 +413,7 @@
 	      (cond ((number? vals)
 		     vals)
 		    ((c-array? vals)
-		     (pm-array->list vals))
+		     (c-array->list vals))
 		    ((vector? vals)
 		     (vector->list vals))))))))
 
@@ -964,7 +964,7 @@
       (cond ((pdbdata? ev)
 	     name)
 	    ((c-array? ev)
-	     (pm-array->pdbdata ev nil name))
+	     (c-array->pdbdata ev nil name))
 	    ((pm-set? ev)
 	     (pm-set->pdbdata ev nil name))
 	    ((pm-mapping? ev)
@@ -1891,7 +1891,7 @@
     Usage: minmax name"
   (if (printable? (car rest))
       (let* ((data (pdb-read-numeric-data current-file (car rest)))
-	     (extr (pm-array-extrema data)))
+	     (extr (c-array-extrema data)))
 	(printf nil "\nmin: %12.5e  imin: %s\nmax: %12.5e  imax: %s\n"
 		(car extr) (caddr extr) (cadr extr) (cadddr extr))
 	extr)))
@@ -2236,7 +2236,7 @@
 			   ((pm-set? name)
 			    (pm-set->pdbdata name))
 			   ((c-array? name)
-			    (pm-array->pdbdata name))
+			    (c-array->pdbdata name))
 			   ((pg-graph? name)
 			    (pg-graph->pdbdata name))
 			   ((pg-image? name)

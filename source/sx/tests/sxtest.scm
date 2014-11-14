@@ -21,21 +21,21 @@
 (pg-open-device dev-b 0.34 0.04 0.3 0.3)
 (pg-open-device dev-c 0.66 0.04 0.3 0.3)
 
-(define rx1 (list->pm-array 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0))
-(define ry1 (list->pm-array 0.0 1.0 4.0 9.0 16.0 23.0 28.0 31.0 32.0 32.0))
+(define rx1 (list->c-array 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0))
+(define ry1 (list->c-array 0.0 1.0 4.0 9.0 16.0 23.0 28.0 31.0 32.0 32.0))
 
 (define dom-a (pm-make-set "doma" '(10) (list rx1)))
 (define ran-a (pm-make-set "rana" '(10) (list ry1)))
 
-(define rx2 (list->pm-array 0.0 1.0 2.0 0.0 1.0 2.0 0.0 1.0 2.0))
-(define ry2 (list->pm-array 0.0 0.0 0.0 1.0 1.0 1.0 2.0 2.0 2.0))
+(define rx2 (list->c-array 0.0 1.0 2.0 0.0 1.0 2.0 0.0 1.0 2.0))
+(define ry2 (list->c-array 0.0 0.0 0.0 1.0 1.0 1.0 2.0 2.0 2.0))
 
-(define rz2 (list->pm-array 0.0 0.5 1.0 2.0 1.0 0.0 0.0 2.0 4.0))
+(define rz2 (list->c-array 0.0 0.5 1.0 2.0 1.0 0.0 0.0 2.0 4.0))
 (define dom-b (pm-make-set "domb" '(3 3) (list rx2 ry2)))
 (define ran-b (pm-make-set "ranb" '(9) (list rz2)))
 
-(define u2 (list->pm-array 0.0 0.0 0.0 0.1 0.1 0.1 0.2 0.2 0.2))
-(define v2 (list->pm-array 0.2 0.1 0.0 0.2 0.1 0.0 0.2 0.1 0.0))
+(define u2 (list->c-array 0.0 0.0 0.0 0.1 0.1 0.1 0.2 0.2 0.2))
+(define v2 (list->c-array 0.2 0.1 0.0 0.2 0.1 0.0 0.2 0.1 0.0))
 (define ran-c (pm-make-set "ranc" '(9 9) (list u2 v2)))
 
 (define gr-a (pg-make-graph dom-a ran-a))

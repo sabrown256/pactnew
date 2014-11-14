@@ -68,7 +68,7 @@
 		(cond ((number? vals)
 		       vals)
 		      ((c-array? vals)
-		       (pm-array->list vals))
+		       (c-array->list vals))
 		      ((vector? vals)
 		       (vector->list vals))))))))
 

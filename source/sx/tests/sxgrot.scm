@@ -17,16 +17,16 @@
 
 (pg-open-device dev-a  0.02 0.04 0.3  0.3)
 
-(define iso (list->pm-array 2 2 2
+(define iso (list->c-array 2 2 2
 			   3 3 3 3 3 3
 			   4 4 4 4 4 4 4 4))
-(define en (list->pm-array -280 -260 -250
+(define en (list->c-array -280 -260 -250
 			  -270 -230 -210 -205 -202 -200
 			  -240 -200 -170 -150 -140 -135 -132 -130))
 
-(define tr (list->pm-array 5 6 7 8 9 1 2 3 4))
-(define up (list->pm-array 5 7 9 10 11 12 13 14 15 16))
-(define lo (list->pm-array 0 1 3 3 4 4 4 5 5))
+(define tr (list->c-array 5 6 7 8 9 1 2 3 4))
+(define up (list->c-array 5 7 9 10 11 12 13 14 15 16))
+(define lo (list->c-array 0 1 3 3 4 4 4 5 5))
 
 (define dom-a (pm-make-set "Grotrian-Domain" '(17) (list iso en)))
 (define ran-a (pm-make-set "Transitions" '(9) (list tr up lo)))
