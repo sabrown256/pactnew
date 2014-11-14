@@ -20,13 +20,13 @@
 	       (func var))
 	      (var
 	       (let* ((data (pdb-read-numeric-data current-file var))
-		      (n    (pm-array-length data)))
+		      (n    (c-array-length data)))
 		 (cons (pm-make-set var (list n) (list (func data))) out))))
 	(cond ((or (pm-set? var) (pm-mapping? var) (pg-graph? var))
 	       var)
 	      (var
 	       (let* ((data (pdb-read-numeric-data current-file var))
-		      (n    (pm-array-length data)))
+		      (n    (c-array-length data)))
 		 (cons (pm-make-set var (list n) (list data)) out))))))
 
 ;--------------------------------------------------------------------------
@@ -93,7 +93,7 @@
 	    (if (procedure? oper)
 		(oper (pdb-read-numeric-data current-file vnm))
 		(pdb-read-numeric-data current-file vnm)))
-      (set! len  (pm-array-length data))
+      (set! len  (c-array-length data))
       (set! dms  (dimensions->shape vnm))
 
       (if (not dms)
@@ -197,7 +197,7 @@
 		   (var (read-pdbdata current-file first))
 		   (dims (dimensions->shape
 			  (cddadr (pdb->list var))))
-		   (data (cons (pdbdata->pm-array var) ret)))
+		   (data (cons (pdbdata->c-array var) ret)))
 	      (if shape
 		  (if (equal? shape dims)
 		      (proc-comp rest dims data ldval error)
@@ -215,8 +215,8 @@
 	  (list name type shape data)))
 
     (define (product-aux error)
-	(let* ((rs (apply pm-arrays->set (fix-arrays ran error)))
-	       (ds (apply pm-arrays->set (fix-arrays dom error))))
+	(let* ((rs (apply c-arrays->set (fix-arrays ran error)))
+	       (ds (apply c-arrays->set (fix-arrays dom error))))
 	  (if (and rs ds)
 	      (pg-make-graph ds rs nil node blue 0.1 solid)
 	      (printf nil "\nBad component sets\n"))))
@@ -243,7 +243,7 @@
 
 (define (dm-nd-set var dims)
     (let* ((data (pdb-read-numeric-data current-file var))
-	   (n    (pm-array-length data))
+	   (n    (c-array-length data))
 	   (m    (apply * dims)))
       (if (= n m)
 	  (pm-make-set var dims (list data)))))

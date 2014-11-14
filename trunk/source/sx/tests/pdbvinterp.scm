@@ -130,7 +130,7 @@
 	   (lm (- l 1))
 	   (n-zones (* km lm))
 	   (nodes   (cartesian-nodes km lm x1 x2 y1 y2))
-	   (vals    (apply list->pm-array (range-values fnc nodes))))
+	   (vals    (apply list->c-array (range-values fnc nodes))))
           (pm-make-set "AC" (list n-zones) (list vals))))
 
 ;-----------------------------------------------------------------------

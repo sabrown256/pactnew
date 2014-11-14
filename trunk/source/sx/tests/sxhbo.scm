@@ -17,19 +17,19 @@
 (define dev-b  (pg-make-device "unix:0.0" "COLOR" "Display B"))
 (define dev-c  (pg-make-device "unix:0.0" "COLOR" "Display C"))
 
-; (define rx1 (list->pm-array 0.0 1.1 2.2  0.1 1.2 2.3  0.2 1.3 2.4))
-; (define ry1 (list->pm-array 0.0 0.1 0.2  1.3 1.4 1.5  2.6 2.8 3.0))
-; (define rz1 (list->pm-array 1.0 2.0 3.0  1.0 2.0 3.0  1.0 2.0 3.0))
+; (define rx1 (list->c-array 0.0 1.1 2.2  0.1 1.2 2.3  0.2 1.3 2.4))
+; (define ry1 (list->c-array 0.0 0.1 0.2  1.3 1.4 1.5  2.6 2.8 3.0))
+; (define rz1 (list->c-array 1.0 2.0 3.0  1.0 2.0 3.0  1.0 2.0 3.0))
 
-; (define rx1 (list->pm-array 0.0 1.0 2.0  0.0 1.0 2.0  0.0 1.0 2.0))
-; (define ry1 (list->pm-array 0.0 0.0 0.0  1.5 1.5 1.5  3.0 3.0 3.0))
-; (define rz1 (list->pm-array 1.0 2.0 3.0  1.0 2.0 3.0  1.0 2.0 3.0))
+; (define rx1 (list->c-array 0.0 1.0 2.0  0.0 1.0 2.0  0.0 1.0 2.0))
+; (define ry1 (list->c-array 0.0 0.0 0.0  1.5 1.5 1.5  3.0 3.0 3.0))
+; (define rz1 (list->c-array 1.0 2.0 3.0  1.0 2.0 3.0  1.0 2.0 3.0))
 
-; (define rx2 (list->pm-array 0.0 1.0 2.0  0.0 1.0 2.0  0.0 1.0 2.0  0.0 1.0 2.0))
-; (define ry2 (list->pm-array 0.0 0.0 0.0  1.0 1.0 1.0  2.0 2.0 2.0  3.0 3.0 3.0))
-; (define rz2 (list->pm-array 1.0 1.0 1.0  1.6 1.6 1.6  2.3 2.3 2.3  3.0 3.0 3.0))
+; (define rx2 (list->c-array 0.0 1.0 2.0  0.0 1.0 2.0  0.0 1.0 2.0  0.0 1.0 2.0))
+; (define ry2 (list->c-array 0.0 0.0 0.0  1.0 1.0 1.0  2.0 2.0 2.0  3.0 3.0 3.0))
+; (define rz2 (list->c-array 1.0 1.0 1.0  1.6 1.6 1.6  2.3 2.3 2.3  3.0 3.0 3.0))
 
-(define rx1 (list->pm-array
+(define rx1 (list->c-array
                  0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0
                  0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0
                  0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0
@@ -42,7 +42,7 @@
                  0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0
                  0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0))
 
-(define ry1 (list->pm-array
+(define ry1 (list->c-array
                  0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
                  1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
                  2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0
@@ -54,7 +54,7 @@
                  8.0 8.0 8.0 8.0 8.0 8.0 8.0 8.0 8.0 8.0
                  9.0 9.0 9.0 9.0 9.0 9.0 9.0 9.0 9.0 9.0))
 
-(define rz1 (list->pm-array
+(define rz1 (list->c-array
                  1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0
                  1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0
                  1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0
@@ -66,9 +66,9 @@
                  1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0
                  1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0))
 
-(define rx2 (list->pm-array 2.7 5.7 8.7  2.7 5.7 8.7  2.7 5.7 8.7))
-(define ry2 (list->pm-array 2.7 2.7 2.7  5.7 5.7 5.7  8.7 8.7 8.7))
-(define rz2 (list->pm-array 3.7 3.7 3.7  6.7 6.7 6.7  9.7 9.7 9.7))
+(define rx2 (list->c-array 2.7 5.7 8.7  2.7 5.7 8.7  2.7 5.7 8.7))
+(define ry2 (list->c-array 2.7 2.7 2.7  5.7 5.7 5.7  8.7 8.7 8.7))
+(define rz2 (list->c-array 3.7 3.7 3.7  6.7 6.7 6.7  9.7 9.7 9.7))
 
 (define dom-a (pm-make-set "doma" '(10 10) (list rx1 ry1)))
 (define ran-a (pm-make-set "rana" '(100) (list rz1)))

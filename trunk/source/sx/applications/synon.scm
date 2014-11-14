@@ -15,6 +15,11 @@
 
 (synonym line-color default-color)
 
+;-----------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+
+; ULTRA specific synonyms
+
 (if (defined? ultra)
     (begin
       (synonym erase era)
@@ -39,6 +44,11 @@
 
       (synonym end quit)
       (synonym break stop)))
+
+;-----------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+
+; PDBView specific synonyms
 
 (if (defined? pdbview)
     (begin
@@ -80,6 +90,9 @@
       (synonym close-textfile ct)
       (synonym table tab)))
 
+;-----------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+
 ; C syntax mode synonyms
 ; NOTE: these won't hurt even if C mode is not present
 
@@ -103,7 +116,7 @@
 	    (synonym pa-package?                 pa_packagep)
 	    (synonym pa-src-variable?            pa_src_variablep)
 	    (synonym pa-variable?                pa_variablep)
-	    (synonym pa-variable->pm-array       pa_variable_to_pm_array)
+	    (synonym pa-variable->c-array        pa_variable_to_c_array)
 	    (synonym defstr?                     defstrp)
 	    (synonym file-variable?              file_variablep)
 	    (synonym hash->pdbdata               hash_to_pdbdata)
@@ -176,9 +189,9 @@
 	    (synonym pg-world->normalized        pg_world_to_normalized)
 	    (synonym pg-set-color-type!          pg_set_color_typeb)
 	    (synonym c-array?                    c_arrayp)
-	    (synonym list->pm-array              list_to_pm_array)
-	    (synonym pm-array->list              pm_array_to_list)
-	    (synonym pm-array-set!               pm_array_setb)
+	    (synonym list->c-array               list_to_c_array)
+	    (synonym c-array->list               c_array_to_list)
+	    (synonym c-array-set!                c_array_setb)
 	    (synonym pm-set?                     pm_setp)
 	    (synonym pm-mapping?                 pm_mappingp)
 	    (synonym pm-grotrian-mapping?        pm_grotrian_mappingp)
@@ -186,15 +199,35 @@
 	    (synonym pdbdata->pm-mapping         pdbdata_to_pm_mapping)
 	    (synonym pm-set->pdbdata             pm_set_to_pdbdata)
 	    (synonym pdbdata->pm-set             pdbdata_to_pm_set)
-	    (synonym pdbdata->pm-array           pdbdata_to_pm_array)
-	    (synonym pm-array->pdbdata           pm_array_to_pdbdata)
-	    (synonym pm-array->pdbdata-i         pm_array_to_pdbdata_i)
+	    (synonym pdbdata->c-array            pdbdata_to_c_array)
+	    (synonym c-array->pdbdata            c_array_to_pdbdata)
+	    (synonym c-array->pdbdata-i          c_array_to_pdbdata_i)
 	    (synonym pm-lr->ac                   pm_lr_to_ac)
-	    (synonym pm-arrays->set              pm_arrays_to_set)
+	    (synonym c-arrays->set               c_arrays_to_set)
 	    (synonym pm-set-set-attribute!       pm_set_set_attributeb)
 	    (synonym pm-connection->ac-domain    pm_connection_to_ac_domain)
 	    (synonym have-spoke?                 have_spokep)))
 	    
+;-----------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+
+; backward compatibility synonyms
+; NOTE: remember the sense - (synonym select # cur pl)
+
+; replaced pm-array with c-array to more closely mirror the C code
+(if (defined? pdbview)
+    (begin (synonym list->c-array list->pm-array)
+	   (synonym pa-variable->c-array pa-variable->pm-array)
+	   (synonym pdbdata->c-array pdbdata->pm-array)
+	   (synonym c-array-extrema pm-array-extrema)
+	   (synonym c-array-length pm-array-length)
+	   (synonym c-array-ref pm-array-ref)
+	   (synonym c-array-set! pm-array-set!)
+	   (synonym c-array->list pm-array->list)
+	   (synonym c-array->pdbdata pm-array->pdbdata)
+	   (synonym c-array->pdbdata-i pm-array->pdbdata-i)
+	   (synonym c-arrays->set pm-arrays->set)))
+
 ;-----------------------------------------------------------------------------
 ;-----------------------------------------------------------------------------
 

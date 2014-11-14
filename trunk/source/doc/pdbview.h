@@ -1,5 +1,5 @@
 TXT: PDBView User's Manual
-MOD: 11/10/2009
+MOD: 11/14/2014
 
 <CENTER>
 <P>
@@ -3500,7 +3500,7 @@ Usage: [find] arr [predicate # [conjunction]]*
 <br>
 <br>
 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-            arr&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp :=&nbsp a pm-array of values
+            arr&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp :=&nbsp a c-array of values
 <br>
 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
             predicate&nbsp :=&nbsp = | != | <= | < | >= | >

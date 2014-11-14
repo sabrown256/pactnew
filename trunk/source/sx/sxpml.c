@@ -453,8 +453,8 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_ARRAY_REF - reference the nth element of a pm-array
- *                - form: (pm-array-ref <array> <n>)
+/* _SXI_ARRAY_REF - reference the nth element of a c-array
+ *                - form: (c-array-ref <array> <n>)
  */
 
 static object *_SXI_array_ref(SS_psides *si, object *argl)
@@ -493,8 +493,8 @@ static object *_SXI_array_ref(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_ARRAY_SET - set the nth element of a pm-array
- *                - form: (pm-array-set! <array> <n> <value>)
+/* _SXI_ARRAY_SET - set the nth element of a c-array
+ *                - form: (c-array-set! <array> <n> <value>)
  */
 
 static object *_SXI_array_set(SS_psides *si, object *argl)
@@ -1242,7 +1242,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
 /* _SXI_ARRAYS_SET - convert the data from a list of C_array objects to
  *                 - a set of one higher dimension than the arrays
  *                 - FORM:
- *                 -    (pm-arrays->set name <array> ...)
+ *                 -    (c-arrays->set name <array> ...)
  */
 
 static object *_SXI_arrays_set(SS_psides *si, object *argl)
@@ -1523,7 +1523,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
 /* _SXI_ARRAY_PDBDATA - convert the data from a C_array object to
  *                    - a pdbdata object
  *                    - FORM:
- *                    -    (pm-array->pdbdata <array> <file> [<name>])
+ *                    -    (c-array->pdbdata <array> <file> [<name>])
  */
 
 static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
@@ -1558,7 +1558,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
        SS_error(si, "INVALID ARRAY OBJECT - _SXI_ARRAY_PDBDATA", argl);
 
     else if (mn == NULL)
-       name = SC_dsnprintf(FALSE, "Pm-Array%d", _SX.ap++);
+       name = SC_dsnprintf(FALSE, "C-Array%d", _SX.ap++);
 
     else
        {name = SC_dsnprintf(FALSE, mn);
@@ -1571,10 +1571,10 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_ARRAY_PDBDATA_I - inverse of PDBDATA->PM-ARRAY
+/* _SXI_ARRAY_PDBDATA_I - inverse of PDBDATA->C-ARRAY
  *                      - a C_array object
  *                      - FORM:
- *                      -    (pm-array->pdbdata-i <array> <file> [<name>])
+ *                      -    (c-array->pdbdata-i <array> <file> [<name>])
  */
 
 static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
@@ -1610,7 +1610,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
        SS_error(si, "INVALID ARRAY OBJECT - _SXI_ARRAY_PDBDATA_I", argl);
 
     else if (mn == NULL)
-       name = SC_dsnprintf(FALSE, "Pm-Array%d", _SX.api++);
+       name = SC_dsnprintf(FALSE, "C-Array%d", _SX.api++);
 
     else
        {name = SC_dsnprintf(FALSE, mn);
@@ -1633,7 +1633,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
  *                    - NOTE: if the pdbdata object contains a C_array already
  *                    -       just use it
  *                    - FORM:
- *                    -    (pdbdata->pm-array <pdbdata>)
+ *                    -    (pdbdata->c-array <pdbdata>)
  */
 
 static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
@@ -2044,42 +2044,42 @@ void SX_install_pml_funcs(SS_psides *si)
                SS_nargs,
                _SXI_find_index, SS_PR_PROC);
 
-    SS_install(si, "list->pm-array",
+    SS_install(si, "list->c-array",
                "Returns a numeric array built from a list of numbers",
                SS_nargs,
                _SXI_list_array, SS_PR_PROC);
 
-    SS_install(si, "pm-array->list",
+    SS_install(si, "c-array->list",
                "Returns a list of numbers built from a numeric array",
                SS_sargs,
                _SXI_array_list, SS_PR_PROC);
 
     SS_install(si, "pm-make-array",
-               "Allocate and return a pm-array of the specified type and size",
+               "Allocate and return a c-array of the specified type and size",
                SS_nargs,
                _SXI_mk_array, SS_PR_PROC);
 
     SS_install(si, "pm-resize-array",
-               "reallocate the given pm-array to the specified size",
+               "reallocate the given c-array to the specified size",
                SS_nargs,
                _SXI_resz_array, SS_PR_PROC);
 
-    SS_install(si, "pm-array-ref",
-               "Reference the nth element of a pm-array",
+    SS_install(si, "c-array-ref",
+               "Reference the nth element of a c-array",
                SS_nargs,
                _SXI_array_ref, SS_PR_PROC);
 
-    SS_install(si, "pm-array-set!",
-               "Set the nth element of a pm-array",
+    SS_install(si, "c-array-set!",
+               "Set the nth element of a c-array",
                SS_nargs,
                _SXI_array_set, SS_PR_PROC);
 
-    SS_install(si, "pm-array-length",
+    SS_install(si, "c-array-length",
                "Returns the length of the given numeric array",
                SS_sargs,
                _SXI_num_arr_len, SS_PR_PROC);
 
-    SS_install(si, "pm-array-extrema",
+    SS_install(si, "c-array-extrema",
                "Returns the extrema of the given numeric array",
                SS_sargs,
                _SXI_num_arr_extr, SS_PR_PROC);
@@ -2124,18 +2124,18 @@ void SX_install_pml_funcs(SS_psides *si)
                SS_nargs,
                _SXI_pdbdata_set, SS_PR_PROC);
 
-    SS_install(si, "pdbdata->pm-array",
-               "Convert a PDBDATA object to a numeric array object\nFORM (pdbdata->pm-array <pdbdata>)",
+    SS_install(si, "pdbdata->c-array",
+               "Convert a PDBDATA object to a numeric array object\nFORM (pdbdata->c-array <pdbdata>)",
                SS_nargs,
                _SXI_pdbdata_array, SS_PR_PROC);
 
-    SS_install(si, "pm-array->pdbdata",
-               "Convert a numeric array object to a PDBDATA object\nFORM (pm-array->pdbdata <array>)",
+    SS_install(si, "c-array->pdbdata",
+               "Convert a numeric array object to a PDBDATA object\nFORM (c-array->pdbdata <array>)",
                SS_nargs,
                _SXI_array_pdbdata, SS_PR_PROC);
 
-    SS_install(si, "pm-array->pdbdata-i",
-               "Inverse of pdbdata->pm-array\nFORM (pm-array->pdbdata-i <array> <file> [<name>])",
+    SS_install(si, "c-array->pdbdata-i",
+               "Inverse of pdbdata->c-array\nFORM (c-array->pdbdata-i <array> <file> [<name>])",
                SS_nargs,
                _SXI_array_pdbdata_i, SS_PR_PROC);
 
@@ -2149,8 +2149,8 @@ void SX_install_pml_funcs(SS_psides *si)
                SS_nargs,
                _SXI_make_ac_set, SS_PR_PROC);
 
-    SS_install(si, "pm-arrays->set",
-               "Convert a list of numeric array objects to a set\nFORM (pm-arrays->set (<array> ...) ...)",
+    SS_install(si, "c-arrays->set",
+               "Convert a list of numeric array objects to a set\nFORM (c-arrays->set (<array> ...) ...)",
                SS_nargs,
                _SXI_arrays_set, SS_PR_PROC);
 
