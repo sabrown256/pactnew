@@ -71,17 +71,26 @@ static void python_type_name_list(char *typ, tnp_list *na)
 /* PYTHON_PARSE_MEMBER - parse out MBR for python */
 
 static int python_parse_member(char *mbr, char *mnm, char *mty, char *mdm,
-			       char *bty, int nc)
-   {int nind, nb;
+			       char *bty, char *aty, int nc)
+   {int nind, nb, ity;
     char *lty, *pb;
 
     parse_member(mbr, mnm, mty, mdm, BFSML);
 
     nstrncpy(bty, nc, mty, -1);
 
-    lty = lookup_type(NULL, mty, MODE_C, gbd+MODE_P);
+    lty = lookup_type(NULL, &ity, mty, MODE_C, gbd+MODE_P);
+
+    if (ity != -1)
+       nstrncpy(aty, nc, gbd[3].types.arr[ity], -1);
+    else if (is_ptr(mty) == B_T)
+       nstrncpy(aty, nc, "SC_POINTER_I", -1);
+    else
+       aty[0] = '\0';
+
     if ((lty != NULL) && (strcmp(lty, tykind[TK_ENUM]) == 0))
-       nstrncpy(mty, nc, tykind[TK_ENUM], -1);
+       {nstrncpy(mty, nc, tykind[TK_ENUM], -1);
+	nstrncpy(aty, nc, "SC_ENUM_I", -1);};
 
     nb = strlen(bty) - 1;
     pb = bty + nb;
@@ -308,6 +317,31 @@ static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PYTHON_UNMAPPABLE_MEMBER - no-op/error handling for members
+ *                          - which cannot map between C and python
+ */
+
+static void python_unmappable_member(FILE *fc, char *pm, char *mty, int fl,
+				     char *msg)
+   {
+
+/* for get methods */
+    if (fl == 1)
+       {fprintf(fc, "/* unmappable get '%s' member '%s' */\n", mty, pm);
+        fprintf(fc, "    PyErr_SetString(PyExc_TypeError, \"%s\");\n", msg);
+	fprintf(fc, "    rv = NULL;\n");}
+
+/* for set methods */
+    else
+       {fprintf(fc, "\n");
+	fprintf(fc, "/* unmappable set '%s' member '%s' */\n", mty, pm);
+        fprintf(fc, "    PyErr_SetString(PyExc_TypeError, \"%s\");\n", msg);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PYTHON_UNKNOWN_MEMBER - handle unknown action case
  *                       - FL is 1 for get action
  *                       - and 2 for set action
@@ -318,7 +352,7 @@ static void python_unknown_member(FILE *fc, char *pm, char *mty, int fl)
 
 /* for get methods */
     if (fl == 1)
-       {fprintf(fc, "/* unknown get '%s' member '%s' */\n",mty, pm);
+       {fprintf(fc, "/* unknown get '%s' member '%s' */\n", mty, pm);
         fprintf(fc, "    PyErr_SetString(PyExc_NotImplementedError, \"%s\");\n",
 		pm);
 	fprintf(fc, "    rv = NULL;\n");}
@@ -335,71 +369,13 @@ static void python_unknown_member(FILE *fc, char *pm, char *mty, int fl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PYTHON_C_STRUCT_DEF - emitter for struct defs info belonging
- *                     - in the C file
- */
+/* PYTHON_EMIT_GETTERS - emit the getter methods */
 
-static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
-   {int im, hs, nind;
-    char mnm[BFSML], mty[BFSML], mdm[BFSML], pty[BFSML], bty[BFSML];
+static void python_emit_getters(FILE *fc, char **ta, tnp_list *tl)
+   {int im;
+    char mnm[BFSML], mty[BFSML], mdm[BFSML];
+    char aty[BFSML], bty[BFSML];
     char *pm;
-    tnp_list tl;
-
-    python_type_name_list(ta[0]+9, &tl);
-
-    csep(fc);
-    fprintf(fc, "\n");
-    fprintf(fc, "/*                     %s ROUTINES               */\n",
-	    tl.unm);
-    fprintf(fc, "\n");
-    csep(fc);
-    fprintf(fc, "\n");
-
-/* object check routine */
-    fprintf(fc, "int %s_check(PyObject *op)\n", tl.pnm);
-    fprintf(fc, "   {int rv;\n");
-    fprintf(fc, "\n");
-    fprintf(fc, "    rv = PyObject_TypeCheck(op, &%s);\n", tl.tnm);
-    fprintf(fc, "\n");
-    fprintf(fc, "    return(rv);}\n");
-
-    fprintf(fc, "\n");
-    csep(fc);
-    csep(fc);
-    fprintf(fc, "\n");
-
-/* object from pointer routine */
-    fprintf(fc, "PyObject *%s_from_ptr(%s *x)\n", tl.pnm, tl.cnm);
-    fprintf(fc, "   {%s *self;\n", tl.pnm);
-    fprintf(fc, "    PyObject *rv;\n");
-    fprintf(fc, "\n");
-    fprintf(fc, "    rv = NULL;\n");
-    fprintf(fc, "\n");
-    fprintf(fc, "    self = PyObject_NEW(%s, &%s);\n", tl.pnm, tl.tnm);
-    fprintf(fc, "    if (self != NULL)\n");
-    fprintf(fc, "       {self->pyo = x;\n");
-    fprintf(fc, "        rv = (PyObject *) self;};\n");
-    fprintf(fc, "\n");
-    fprintf(fc, "    return(rv);}\n");
-
-    fprintf(fc, "\n");
-    csep(fc);
-    csep(fc);
-    fprintf(fc, "\n");
-
-/* object get routine */
-    fprintf(fc, "static PyObject *%s_get(%s *self, void *context)\n",
-	    tl.pnm, tl.pnm);
-    fprintf(fc, "   {PyObject *rv;\n");
-    fprintf(fc, "\n");
-    fprintf(fc, "    rv = %s_from_ptr(self->pyo);\n", tl.pnm);
-    fprintf(fc, "\n");
-    fprintf(fc, "    return(rv);}\n");
-
-    fprintf(fc, "\n");
-    csep(fc);
-    csep(fc);
-    fprintf(fc, "\n");
 
 /* getter - member accessor methods */
     for (im = 1; ta[im] != NULL; im++)
@@ -407,55 +383,28 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 if (IS_NULL(pm) == TRUE)
 	    continue;
 
-	 nind = python_parse_member(pm, mnm, mty, mdm, bty, BFSML);
+	 python_parse_member(pm, mnm, mty, mdm, bty, aty, BFSML);
 
 	 fprintf(fc, "static PyObject *%s_get_%s(%s *self, void *context)\n",
-		 tl.pnm, mnm, tl.pnm);
+		 tl->pnm, mnm, tl->pnm);
 	 fprintf(fc, "   {PyObject *rv;\n");
 	 fprintf(fc, "\n");
 
-/* if member is a function pointer */
-	 if (strstr(pm, "(*") != NULL)
-	    python_unknown_member(fc, pm, mty, 1);
+         if ((IS_NULL(aty) == TRUE) || (strcmp(aty, "struct") == 0))
+	    python_unmappable_member(fc, pm, mty, 1,
+				     "whole struct setting not supported");
 
-/* if member is 'char *' */
-	 else if (strcmp(mty, "char *") == 0)
-	    fprintf(fc, "    rv = Py_BuildValue(\"s\", self->pyo->%s);\n",
-		    mnm);
+	 else if (IS_NULL(mdm) == FALSE)
+	    {fprintf(fc, "    rv = PY_build_object(\"%s\",\n", mnm);
+	     fprintf(fc, "                         %s, %s, &self->pyo->%s,\n",
+		     aty, mdm, mnm);
+	     fprintf(fc, "                         0);\n");}
 
-/* if member is fixed point type */
-	 else if ((is_fixed_point(mty) == B_T) ||
-		  (strcmp(mty, tykind[TK_ENUM]) == 0))
-	    {if (IS_NULL(mdm) == TRUE)
-	        fprintf(fc, "    rv = PY_INT_LONG(self->pyo->%s);\n", mnm);
-	     else
-                python_unknown_member(fc, pm, mty, 1);}
-
-/* if member is floating point type */
-	 else if (is_real(mty) == B_T)
-	    {if (IS_NULL(mdm) == TRUE)
-	        fprintf(fc, "    rv = PyFloat_FromDouble(self->pyo->%s);\n", mnm);
-	     else
-                python_unknown_member(fc, pm, mty, 1);}
-
-/* if member is pointer to a known bound type */
-         else if (python_lookup_bound_type(bty) == TRUE)
-	    {snprintf(pty, BFSML, "PY_%s", bty);
-	     if (nind > 0)
-	        fprintf(fc, "    rv = %s_from_ptr(self->pyo->%s);\n",
-			trim(pty, BOTH, " *"), mnm);
-	     else
-	        fprintf(fc, "    rv = %s_from_ptr(&self->pyo->%s);\n",
-			trim(pty, BOTH, " *"), mnm);}
-
-/* if member is pointer */
-         else if (nind > 0)
-	    fprintf(fc, "    rv = PY_COBJ_VOID_PTR(self->pyo->%s, NULL);\n",
-		    mnm);
-
-/* unknown member action */
 	 else
-	    python_unknown_member(fc, pm, mty, 1);
+	    {fprintf(fc, "    rv = PY_build_object(\"%s\",\n", mnm);
+	     fprintf(fc, "                         %s, 0, &self->pyo->%s,\n",
+		     aty, mnm);
+	     fprintf(fc, "                         0);\n");};
 
 	 fprintf(fc, "\n");
 	 fprintf(fc, "    return(rv);}\n");
@@ -465,16 +414,28 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 csep(fc);
 	 fprintf(fc, "\n");};
 
-/* setter - member accessor methods */
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_EMIT_SETTERS - emit the setter methods */
+
+static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
+   {int im, nind;
+    char mnm[BFSML], mty[BFSML], mdm[BFSML];
+    char aty[BFSML], bty[BFSML];
+    char *pm;
+
     for (im = 1; ta[im] != NULL; im++)
         {pm = trim(ta[im], BOTH, " \t");
 	 if (IS_NULL(pm) == TRUE)
 	    continue;
 
-	 nind = python_parse_member(pm, mnm, mty, mdm, bty, BFSML);
+	 nind = python_parse_member(pm, mnm, mty, mdm, bty, aty, BFSML);
 
 	 fprintf(fc, "static int %s_set_%s(%s *self,\n",
-		 tl.pnm, mnm, tl.pnm);
+		 tl->pnm, mnm, tl->pnm);
          fprintf(fc, "                   PyObject *value, void *context)\n");
 	 fprintf(fc, "   {int rv;\n");
 	 fprintf(fc, "\n");
@@ -554,8 +515,84 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	 csep(fc);
 	 fprintf(fc, "\n");};
 
-/* tp_init method */
+    return;}
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_C_STRUCT_DEF - emitter for struct defs info belonging
+ *                     - in the C file
+ */
+
+static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
+   {int im, hs;
+    char mnm[BFSML], mty[BFSML];
+    char *pm;
+    tnp_list tl;
+
+    python_type_name_list(ta[0]+9, &tl);
+
+    csep(fc);
+    fprintf(fc, "\n");
+    fprintf(fc, "/*                     %s ROUTINES               */\n",
+	    tl.unm);
+    fprintf(fc, "\n");
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* object check routine */
+    fprintf(fc, "int %s_check(PyObject *op)\n", tl.pnm);
+    fprintf(fc, "   {int rv;\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    rv = PyObject_TypeCheck(op, &%s);\n", tl.tnm);
+    fprintf(fc, "\n");
+    fprintf(fc, "    return(rv);}\n");
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* object from pointer routine */
+    fprintf(fc, "PyObject *%s_from_ptr(%s *x)\n", tl.pnm, tl.cnm);
+    fprintf(fc, "   {%s *self;\n", tl.pnm);
+    fprintf(fc, "    PyObject *rv;\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    rv = NULL;\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    self = PyObject_NEW(%s, &%s);\n", tl.pnm, tl.tnm);
+    fprintf(fc, "    if (self != NULL)\n");
+    fprintf(fc, "       {self->pyo = x;\n");
+    fprintf(fc, "        rv = (PyObject *) self;};\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    return(rv);}\n");
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* object get routine */
+    fprintf(fc, "static PyObject *%s_get(%s *self, void *context)\n",
+	    tl.pnm, tl.pnm);
+    fprintf(fc, "   {PyObject *rv;\n");
+    fprintf(fc, "\n");
+    fprintf(fc, "    rv = %s_from_ptr(self->pyo);\n", tl.pnm);
+    fprintf(fc, "\n");
+    fprintf(fc, "    return(rv);}\n");
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
+/* getter - member accessor methods */
+    python_emit_getters(fc, ta, &tl);
+
+/* setter - member accessor methods */
+    python_emit_setters(fc, ta, &tl);
+
+/* tp_init method */
     fprintf(fc, "static int %s_tp_init(%s *self, PyObject *args, PyObject *kwds)\n",
 	    tl.pnm, tl.pnm);
     fprintf(fc, "   {int rv;\n");
@@ -781,7 +818,7 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
         {al = dcl->al + i;
 	 ty = al->type;
 	 deref(dty, BFLRG, ty);
-	 lty = lookup_type(NULL, dty, MODE_C, gbd+MODE_P);
+	 lty = lookup_type(NULL, NULL, dty, MODE_C, gbd+MODE_P);
 	 if ((lty != NULL) && (strcmp(lty, tykind[TK_STRUCT]) == 0))
 	    {snprintf(p, BFSML, "PY_%s", dty);
 	     pty = p;

@@ -137,7 +137,7 @@ static bindes
  gbd[N_MODES];
 
 static char
- *lookup_type(char ***val, char *ty, int ity, bindes *bo),
+ *lookup_type(char ***val, int *pit, char *ty, int ity, bindes *bo),
  **mc_proto_list(fdecl *dcl);
 
 static void
@@ -194,10 +194,137 @@ static der_list *push_derived(der_list *lst, int *pnl, char *s, char **sa)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* STR_LST_ADD - add S to list SL */
+
+int str_lst_add(str_list *sl, char *s)
+   {int n, nx;
+    char **sa;
+
+    n  = sl->n;
+    nx = sl->nx;
+    sa = sl->arr;
+
+    if (sa == NULL)
+       {nx = 100;
+        sa = MAKE_N(char *, nx);
+	if (sa != NULL)
+	   memset(sa, 0, nx*sizeof(char *));
+        sl->nx  = nx;
+        sl->arr = sa;};
+
+    if (sa != NULL)
+       {if (n >= nx - 10)
+	   {nx += 100;
+	    REMAKE(sa, char *, nx);
+	    if (sa != NULL)
+	       memset(sa+n, 0, (nx - n)*sizeof(char *));
+	    sl->nx  = nx;
+	    sl->arr = sa;};
+
+	if (sa != NULL)
+	   {if (s == NULL)
+	       sa[n] = NULL;
+	    else
+	       sa[n] = STRSAVE(s);
+            n++;};
+
+        sl->n = n;};
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                           TYPE MAP ROUTINES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* IS_FIXED_POINT - return TRUE if T is a fixed point type */
+
+pboolean is_fixed_point(char *t)
+   {pboolean rv;
+
+    rv =  ((strcmp(t, "short") == 0)     ||
+	   (strcmp(t, "int") == 0)       ||
+	   (strcmp(t, "pboolean") == 0)  ||
+	   (strcmp(t, "long") == 0)      ||
+	   (strcmp(t, "long long") == 0) ||
+	   (strcmp(t, "int16_t") == 0)   ||
+	   (strcmp(t, "int32_t") == 0)   ||
+	   (strcmp(t, "int64_t") == 0));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_REAL - return TRUE if T is a real floating point type */
+
+pboolean is_real(char *t)
+   {pboolean rv;
+
+    rv = ((strcmp(t, "float") == 0) ||
+	  (strcmp(t, "double") == 0) ||
+	  (strcmp(t, "long double") == 0));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_COMPLEX - return TRUE if T is a complex floating point type */
+
+pboolean is_complex(char *t)
+   {pboolean rv;
+
+    rv = ((strcmp(t, "float _Complex") == 0) ||
+	  (strcmp(t, "double _Complex") == 0) ||
+	  (strcmp(t, "long double _Complex") == 0));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_BOOL - return TRUE if T is a boolean type */
+
+pboolean is_bool(char *t)
+   {pboolean rv;
+
+    rv = (strcmp(t, "bool") == 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_CHAR - return TRUE if T is a char type */
+
+pboolean is_char(char *t)
+   {pboolean rv;
+
+    rv = (strcmp(t, "char") == 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_STRING - return TRUE if T is a char * type */
+
+pboolean is_string(char *t)
+   {pboolean rv;
+
+    rv = (strcmp(t, "char *") == 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* IS_PTR - return TRUE if TYPE is a pointer */
 
-static int is_ptr(char *type)
-   {int rv;
+static pboolean is_ptr(char *type)
+   {pboolean rv;
 
     rv = (strchr(type, '*') != NULL);
 
@@ -208,22 +335,213 @@ static int is_ptr(char *type)
 
 /* IS_FUNC_PTR - return TRUE if TYPE is a function pointer */
 
-static int is_func_ptr(char *type, int wh)
-   {int rv, syn, cnv;
+static pboolean is_func_ptr(char *type, int wh)
+   {pboolean rv, syn, cnv;
 
     syn = (strstr(type, "(*") != NULL);
     cnv = (strncmp(type, "PF", 2) == 0);
 
     if ((wh & 1) && (syn == TRUE))
-       rv = TRUE;
+       rv = B_T;
 
     else if ((wh & 2) && (cnv == TRUE))
-       rv = TRUE;
+       rv = B_T;
 
     else
-       rv = FALSE;
+       rv = B_F;
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ADD_TYPE - add a type to the map */
+
+static void add_type(char *cty, char *fty, char *sty, char *defv)
+   {int i, j;
+
+    i = MODE_C;
+
+/* add types for C mode */
+    str_lst_add(&gbd[i].st->defv, defv);
+    str_lst_add(&gbd[i].types, cty);
+    i++;
+
+/* add types for 2 Fortran modes - modules and wrappers */
+    for (j = 0; j < 2; j++)
+        str_lst_add(&gbd[i++].types, fty);
+
+/* add types for remaining modes */
+    for (; i < nbd; i++)
+        str_lst_add(&gbd[i].types, sty);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LOOKUP_TYPE - lookup and return a type from the type lists */
+
+static char *lookup_type(char ***val, int *pit, char *ty, int ity, bindes *bo)
+   {int i, l;
+    char *rv, *dv, **lst, **ta;
+
+    rv = NULL;
+
+    if (bo == NULL)
+       bo = gbd + MODE_C;
+
+    l = -1;
+
+    ta = gbd[ity].types.arr;
+    for (i = 0; ta[i] != NULL; i++)
+        {if (strcmp(ty, ta[i]) == 0)
+	    {l = i;
+	     break;};};
+
+    dv = NO_DEFAULT_VALUE;
+    if (l != -1)
+       {dv = gbd[0].st->defv.arr[l];
+	rv = bo->types.arr[l];}
+
+    else if ((is_func_ptr(ty, 3) == B_T) || (is_ptr(ty) == B_T))
+       dv = "NULL";
+
+    if (val != NULL)
+       {lst = NULL;
+	if (dv != NULL)
+	   lst = lst_push(lst, dv);
+	*val = lst;};
+
+    if (pit != NULL)
+       *pit = l;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* INIT_TYPES - initialize the type map */
+
+static void init_types(void)
+   {
+
+    add_type("void",        "",            "",                 "NULL");
+    add_type("bool",        "logical",     "SC_BOOL_I",        "FALSE");
+    add_type("char",        "character",   "SC_CHAR_I",        "'\\0'");
+    add_type("pboolean",    "integer",     "SC_INT_I",         "B_F");
+
+/* fixed point types */
+    add_type("short",       "integer(2)",  "SC_SHORT_I",       "0");
+    add_type("int",         "integer",     "SC_INT_I",         "0");
+    add_type("long",        "integer(8)",  "SC_LONG_I",        "0L");
+    add_type("long long",   "integer(8)",  "SC_LONG_LONG_I",   "0LL");
+
+    add_type("size_t",      "integer(8)",  "SC_LONG_I",        "0L");
+    add_type("ssize_t",     "integer(8)",  "SC_LONG_I",        "0L");
+
+/* fixed width fixed point types */
+    add_type("int16_t",     "integer(2)",  "SC_INT16_I",       "0");
+    add_type("int32_t",     "integer(4)",  "SC_INT32_I",       "0");
+    add_type("int64_t",     "integer(8)",  "SC_INT64_I",       "0L");
+
+/* floating point types */
+    add_type("float",       "real(4)",     "SC_FLOAT_I",       "0.0");
+    add_type("double",      "real(8)",     "SC_DOUBLE_I",      "0.0");
+    add_type("long double", "real(16)",    "SC_LONG_DOUBLE_I", "0.0");
+
+/* complex types */
+    add_type("float _Complex",       "complex(4)",
+	     "SC_FLOAT_COMPLEX_I", "0.0");
+    add_type("double _Complex",      "complex(8)",
+	     "SC_DOUBLE_COMPLEX_I", "0.0");
+    add_type("long double _Complex", "complex(16)",
+	     "SC_LONG_DOUBLE_COMPLEX_I", "0.0");
+
+/* GOTCHA: there is a general issue with pointers and Fortran here
+ * doing add_type on "void *" causes Fortran wrapper declarations
+ * to be generated with "void *" in the arg list
+ * if on the other hand we do not do an add_type on "void *" then
+ * blang will generate Fortran wrapper declarations with "void **"
+ * in the arg list
+ * in some contexts we would rather have "void **" to accord with
+ * the extra reference added by Fortran which is call by reference
+ * by default
+ * the same applies to all of these pointers and we have been
+ * bitten by FILE and void in the tests
+ * with "void *" defined pd_write_f works for real*8 a(10)
+ * but fails for type(C_PTR) b
+ */
+    add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       "NULL");
+    add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        "NULL");
+    add_type("char *",        "character-A",  "SC_STRING_I",        "NULL");
+
+    add_type("short *",       "integer(2)-A", "SC_SHORT_P_I",       "NULL");
+    add_type("int *",         "integer-A",    "SC_INT_P_I",         "NULL");
+    add_type("long *",        "integer(8)-A", "SC_LONG_P_I",        "NULL");
+    add_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I",   "NULL");
+
+    add_type("float *",       "real(4)-A",    "SC_FLOAT_P_I",       "NULL");
+    add_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I",      "NULL");
+    add_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", "NULL");
+
+/* complex types */
+    add_type("float _Complex *",       "complex(4)-A",
+	     "SC_FLOAT_COMPLEX_P_I", "NULL");
+    add_type("double _Complex *",      "complex(8)-A",
+	     "SC_DOUBLE_COMPLEX_P_I", "NULL");
+    add_type("long double _Complex *", "complex(16)-A",
+	     "SC_LONG_DOUBLE_COMPLEX_P_I", "NULL");
+
+    add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         "NULL");
+    add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       "NULL");
+/*
+    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          "NULL");
+ */
+    add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       "NULL");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ADD_DERIVED_TYPES - add derived types */
+
+static void add_derived_types(char **sbi)
+   {int ib;
+    char s[BFLRG];
+    char *fty, *sty, *defv, *sb, **ta;
+
+    for (ib = 0; sbi[ib] != NULL; ib++)
+        {sb = sbi[ib];
+	 if (blank_line(sb) == FALSE)
+	    {if (strncmp(sb, "derived ", 8) == 0)
+		{nstrncpy(s, BFLRG, sb, -1);
+		 ta   = tokenize(s, " \t", 0);
+		 fty  = ta[2];
+		 sty  = ta[3];
+		 defv = ta[4];}
+	     else if (strncmp(sb, "enum ", 5) == 0)
+	        {nstrncpy(s, BFLRG, sb, -1);
+		 ta   = tokenize(s, " \t", 0);
+		 fty  = "integer";
+		 sty  = tykind[TK_ENUM];
+		 defv = ta[2];}
+	     else if (strncmp(sb, "struct ", 7) == 0)
+	        {nstrncpy(s, BFLRG, sb, -1);
+		 ta   = tokenize(s, " \t", 0);
+		 fty  = tykind[TK_STRUCT];
+		 sty  = tykind[TK_STRUCT];
+		 defv = NULL;}
+	     else
+	        ta = NULL;
+	
+	     if (ta != NULL)
+	        {add_type(ta[1], fty, sty, defv);
+		 FREE(ta[0]);
+		 FREE(ta);};};};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -268,47 +586,9 @@ static int ideref(char *s)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
-/* STR_LST_ADD - add S to list SL */
+/*                           INFRASTRUCTURE ROUTINES                        */
 
-int str_lst_add(str_list *sl, char *s)
-   {int n, nx;
-    char **sa;
-
-    n  = sl->n;
-    nx = sl->nx;
-    sa = sl->arr;
-
-    if (sa == NULL)
-       {nx = 100;
-        sa = MAKE_N(char *, nx);
-	if (sa != NULL)
-	   memset(sa, 0, nx*sizeof(char *));
-        sl->nx  = nx;
-        sl->arr = sa;};
-
-    if (sa != NULL)
-       {if (n >= nx - 10)
-	   {nx += 100;
-	    REMAKE(sa, char *, nx);
-	    if (sa != NULL)
-	       memset(sa+n, 0, (nx - n)*sizeof(char *));
-	    sl->nx  = nx;
-	    sl->arr = sa;};
-
-	if (sa != NULL)
-	   {if (s == NULL)
-	       sa[n] = NULL;
-	    else
-	       sa[n] = STRSAVE(s);
-            n++;};
-
-        sl->n = n;};
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* GET_DEF_VALUE - get a proper default value VL appropriate to type TY
@@ -329,18 +609,18 @@ static void get_def_value(char *lvl, int nc, char *sp, char *ty)
 /* if no value specified */
     dv = NULL;
     if ((IS_NULL(lvl) == TRUE) || (strcmp(lvl, NO_DEFAULT_VALUE) == 0))
-       {if ((is_ptr(ty) == TRUE) || (is_func_ptr(ty, 3) == TRUE))
+       {if ((is_ptr(ty) == B_T) || (is_func_ptr(ty, 3) == B_T))
 	   nstrncpy(lvl, nc, "NULL", -1);
 	else
-	   lookup_type(&dv, ty, MODE_C, NULL);}
+	   lookup_type(&dv, NULL, ty, MODE_C, NULL);}
 
 /* dereference a pointer type and get its default value */
     else if (lvl[0] == '*')
-       {if (is_ptr(ty) == TRUE)
+       {if (is_ptr(ty) == B_T)
 	   {deref(lty, BFLRG, ty);
-	    lookup_type(&dv, lty, MODE_C, NULL);}
+	    lookup_type(&dv, NULL, lty, MODE_C, NULL);}
 	else
-	   lookup_type(&dv, ty, MODE_C, NULL);};
+	   lookup_type(&dv, NULL, ty, MODE_C, NULL);};
 
     if (dv != NULL)
        {nstrncpy(lvl, nc, dv[0], -1);
@@ -619,7 +899,7 @@ static void process_interp_def(farg *al)
     cs_type(lty, BFLRG, al, FALSE);
 
 /* function pointer */
-    if (is_func_ptr(arg, 1) == TRUE)
+    if (is_func_ptr(arg, 1) == B_T)
        {get_def_value(lvl, BFLRG, val, ty);
 	snprintf(oexp, BFLRG, "(*%s)", nm);
 	snprintf(nexp, BFLRG, "(*_l%s)", nm);
@@ -693,7 +973,7 @@ static int process_qualifiers(farg *al, char *qual)
 	    lst = NULL;
 	    arr = FALSE;
 	    if ((IS_NULL(val) == TRUE) || (val[0] == '*'))
-	       lookup_type(&lst, al->type, MODE_C, NULL);
+	       lookup_type(&lst, NULL, al->type, MODE_C, NULL);
 	    else
 	       {arr = (strchr(val, '[') != NULL);
 		lst = tokenize(val, "[,]", 0);};
@@ -731,7 +1011,7 @@ static int process_qualifiers(farg *al, char *qual)
 
 	    free_strings(ta);}
 	else
-	   {lookup_type(&al->val, al->type, MODE_C, NULL);
+	   {lookup_type(&al->val, NULL, al->type, MODE_C, NULL);
 	    al->dir = FD_NONE;};};
 
     return(rv);}
@@ -788,7 +1068,7 @@ static int split_decl(farg *al, char *s, int isarg)
 
 	rv = TRUE;}
 
-    else if (is_func_ptr(p, 2) == TRUE)
+    else if (is_func_ptr(p, 2) == B_T)
        {nstrncpy(al->name, BFLRG, pn, -1);
 	pn[-1] = '\0';
 	nstrncpy(al->type, BFLRG, p, -1);
@@ -1121,280 +1401,6 @@ static void emit_local_var_init(FILE *fc, fdecl *dcl)
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-/*                           TYPE MAP ROUTINES                              */
-
-/*--------------------------------------------------------------------------*/
-
-/* ADD_TYPE - add a type to the map */
-
-static void add_type(char *cty, char *fty, char *sty, char *defv)
-   {int i, j;
-
-    i = MODE_C;
-
-/* add types for C mode */
-    str_lst_add(&gbd[i].st->defv, defv);
-    str_lst_add(&gbd[i].types, cty);
-    i++;
-
-/* add types for 2 Fortran modes - modules and wrappers */
-    for (j = 0; j < 2; j++)
-        str_lst_add(&gbd[i++].types, fty);
-
-/* add types for remaining modes */
-    for (; i < nbd; i++)
-        str_lst_add(&gbd[i].types, sty);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* LOOKUP_TYPE - lookup and return a type from the type lists */
-
-static char *lookup_type(char ***val, char *ty, int ity, bindes *bo)
-   {int i, l;
-    char *rv, *dv, **lst, **ta;
-
-    rv = NULL;
-
-    if (bo == NULL)
-       bo = gbd + MODE_C;
-
-    l = -1;
-
-    ta = gbd[ity].types.arr;
-    for (i = 0; ta[i] != NULL; i++)
-        {if (strcmp(ty, ta[i]) == 0)
-	    {l = i;
-	     break;};};
-
-    dv = NO_DEFAULT_VALUE;
-    if (l != -1)
-       {dv = gbd[0].st->defv.arr[l];
-	rv = bo->types.arr[l];}
-
-    else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
-       dv = "NULL";
-
-    if (val != NULL)
-       {lst = NULL;
-	if (dv != NULL)
-	   lst = lst_push(lst, dv);
-	*val = lst;};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IS_FIXED_POINT - return TRUE if T is a fixed point type */
-
-pboolean is_fixed_point(char *t)
-   {pboolean rv;
-
-    rv =  ((strcmp(t, "short") == 0)     ||
-	   (strcmp(t, "int") == 0)       ||
-	   (strcmp(t, "pboolean") == 0)  ||
-	   (strcmp(t, "long") == 0)      ||
-	   (strcmp(t, "long long") == 0) ||
-	   (strcmp(t, "int16_t") == 0)   ||
-	   (strcmp(t, "int32_t") == 0)   ||
-	   (strcmp(t, "int64_t") == 0));
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IS_REAL - return TRUE if T is a real floating point type */
-
-pboolean is_real(char *t)
-   {pboolean rv;
-
-    rv = ((strcmp(t, "float") == 0) ||
-	  (strcmp(t, "double") == 0) ||
-	  (strcmp(t, "long double") == 0));
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IS_COMPLEX - return TRUE if T is a complex floating point type */
-
-pboolean is_complex(char *t)
-   {pboolean rv;
-
-    rv = ((strcmp(t, "float _Complex") == 0) ||
-	  (strcmp(t, "double _Complex") == 0) ||
-	  (strcmp(t, "long double _Complex") == 0));
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IS_BOOL - return TRUE if T is a boolean type */
-
-pboolean is_bool(char *t)
-   {pboolean rv;
-
-    rv = (strcmp(t, "bool") == 0);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IS_CHAR - return TRUE if T is a char type */
-
-pboolean is_char(char *t)
-   {pboolean rv;
-
-    rv = (strcmp(t, "char") == 0);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IS_STRING - return TRUE if T is a char * type */
-
-pboolean is_string(char *t)
-   {pboolean rv;
-
-    rv = (strcmp(t, "char *") == 0);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* INIT_TYPES - initialize the type map */
-
-static void init_types(void)
-   {
-
-    add_type("void",        "",            "",                 "NULL");
-    add_type("bool",        "logical",     "SC_BOOL_I",        "FALSE");
-    add_type("char",        "character",   "SC_CHAR_I",        "'\\0'");
-    add_type("pboolean",    "integer",     "SC_INT_I",         "B_F");
-
-/* fixed point types */
-    add_type("short",       "integer(2)",  "SC_SHORT_I",       "0");
-    add_type("int",         "integer",     "SC_INT_I",         "0");
-    add_type("long",        "integer(8)",  "SC_LONG_I",        "0L");
-    add_type("long long",   "integer(8)",  "SC_LONG_LONG_I",   "0LL");
-
-    add_type("size_t",      "integer(8)",  "SC_LONG_I",        "0L");
-    add_type("ssize_t",     "integer(8)",  "SC_LONG_I",        "0L");
-
-/* fixed width fixed point types */
-    add_type("int16_t",     "integer(2)",  "SC_INT16_I",       "0");
-    add_type("int32_t",     "integer(4)",  "SC_INT32_I",       "0");
-    add_type("int64_t",     "integer(8)",  "SC_INT64_I",       "0L");
-
-/* floating point types */
-    add_type("float",       "real(4)",     "SC_FLOAT_I",       "0.0");
-    add_type("double",      "real(8)",     "SC_DOUBLE_I",      "0.0");
-    add_type("long double", "real(16)",    "SC_LONG_DOUBLE_I", "0.0");
-
-/* complex types */
-    add_type("float _Complex",       "complex(4)",
-	     "SC_FLOAT_COMPLEX_I", "0.0");
-    add_type("double _Complex",      "complex(8)",
-	     "SC_DOUBLE_COMPLEX_I", "0.0");
-    add_type("long double _Complex", "complex(16)",
-	     "SC_LONG_DOUBLE_COMPLEX_I", "0.0");
-
-/* GOTCHA: there is a general issue with pointers and Fortran here
- * doing add_type on "void *" causes Fortran wrapper declarations
- * to be generated with "void *" in the arg list
- * if on the other hand we do not do an add_type on "void *" then
- * blang will generate Fortran wrapper declarations with "void **"
- * in the arg list
- * in some contexts we would rather have "void **" to accord with
- * the extra reference added by Fortran which is call by reference
- * by default
- * the same applies to all of these pointers and we have been
- * bitten by FILE and void in the tests
- * with "void *" defined pd_write_f works for real*8 a(10)
- * but fails for type(C_PTR) b
- */
-    add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       "NULL");
-    add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        "NULL");
-    add_type("char *",        "character-A",  "SC_STRING_I",        "NULL");
-
-    add_type("short *",       "integer(2)-A", "SC_SHORT_P_I",       "NULL");
-    add_type("int *",         "integer-A",    "SC_INT_P_I",         "NULL");
-    add_type("long *",        "integer(8)-A", "SC_LONG_P_I",        "NULL");
-    add_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I",   "NULL");
-
-    add_type("float *",       "real(4)-A",    "SC_FLOAT_P_I",       "NULL");
-    add_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I",      "NULL");
-    add_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", "NULL");
-
-/* complex types */
-    add_type("float _Complex *",       "complex(4)-A",
-	     "SC_FLOAT_COMPLEX_P_I", "NULL");
-    add_type("double _Complex *",      "complex(8)-A",
-	     "SC_DOUBLE_COMPLEX_P_I", "NULL");
-    add_type("long double _Complex *", "complex(16)-A",
-	     "SC_LONG_DOUBLE_COMPLEX_P_I", "NULL");
-
-    add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         "NULL");
-    add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       "NULL");
-/*
-    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          "NULL");
- */
-    add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       "NULL");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* ADD_DERIVED_TYPES - add derived types */
-
-static void add_derived_types(char **sbi)
-   {int ib;
-    char s[BFLRG];
-    char *fty, *sty, *defv, *sb, **ta;
-
-    for (ib = 0; sbi[ib] != NULL; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-	    {if (strncmp(sb, "derived ", 8) == 0)
-		{nstrncpy(s, BFLRG, sb, -1);
-		 ta   = tokenize(s, " \t", 0);
-		 fty  = ta[2];
-		 sty  = ta[3];
-		 defv = ta[4];}
-	     else if (strncmp(sb, "enum ", 5) == 0)
-	        {nstrncpy(s, BFLRG, sb, -1);
-		 ta   = tokenize(s, " \t", 0);
-		 fty  = "integer";
-		 sty  = tykind[TK_ENUM];
-		 defv = ta[2];}
-	     else if (strncmp(sb, "struct ", 7) == 0)
-	        {nstrncpy(s, BFLRG, sb, -1);
-		 ta   = tokenize(s, " \t", 0);
-		 fty  = tykind[TK_STRUCT];
-		 sty  = tykind[TK_STRUCT];
-		 defv = NULL;}
-	     else
-	        ta = NULL;
-	
-	     if (ta != NULL)
-	        {add_type(ta[1], fty, sty, defv);
-		 FREE(ta[0]);
-		 FREE(ta);};};};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* MAP_NAME - map the C function name CF to form target language name D
@@ -1507,9 +1513,7 @@ static void find_bind(statedes *st)
     if (cdv != NULL)
        {for (ib = 0; ib < nbi; ib++)
 	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
-	     if ((strncmp(ps, tykind[TK_ENUM], 4) == 0) ||
-		 ((strncmp(ps, "derived", 7) == 0) &&
-		  (strstr(ps, "SC_ENUM_I") != NULL)))
+	     if (strncmp(ps, tykind[TK_ENUM], 4) == 0)
 	        {te = strtok(ps, " ");
 		 te = strtok(NULL, " ");
 		 for (id = 0; cdv[id] != NULL; id++)
@@ -1532,9 +1536,7 @@ static void find_bind(statedes *st)
     if (cdv != NULL)
        {for (ib = 0; ib < nbi; ib++)
 	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
-	     if ((strncmp(ps, tykind[TK_STRUCT], 6) == 0) ||
-		 ((strncmp(ps, "derived", 7) == 0) &&
-		  (strstr(ps, "SC_ENUM_I") == NULL)))
+	     if (strncmp(ps, tykind[TK_STRUCT], 6) == 0)
 	        {te = strtok(ps, " \t");
 		 te = strtok(NULL, " \t");
 		 nc = strlen(te);

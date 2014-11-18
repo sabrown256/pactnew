@@ -96,7 +96,7 @@ static void cf_type(char *a, int nc, char *ty)
        nstrncpy(a, nc, "void *", -1);
 
     else
-       {fty = lookup_type(NULL, ty, MODE_C, gbd+MODE_F);
+       {fty = lookup_type(NULL, NULL, ty, MODE_C, gbd+MODE_F);
 	if (fty != NULL)
 	   nstrncpy(a, nc, fty, -1);
 	else
@@ -126,7 +126,7 @@ static void fc_type(char *wty, int nc, farg *al, int afl, bindes *bo)
 	arg = al->arg;
 	ty  = al->type;
 
-	pty = lookup_type(NULL, ty, MODE_C, bo);
+	pty = lookup_type(NULL, NULL, ty, MODE_C, bo);
 
 /* handle variable arg list */
 	if (is_var_arg(ty) == TRUE)

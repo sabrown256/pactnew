@@ -514,7 +514,6 @@ PyObject *_PY_fd1(PY_str *self, PyObject *args, PyObject *kwds)
     _la = self->pyo;
 
 /* local variable initializations */
-    _la        = NULL;
     _lb        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
@@ -546,7 +545,6 @@ PyObject *_PY_fd2(PY_str *self, PyObject *args, PyObject *kwds)
     _la = self->pyo;
 
 /* local variable initializations */
-    _la        = NULL;
     _lb        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
@@ -578,7 +576,6 @@ PyObject *_PY_PD_fd3(PY_str *self, PyObject *args, PyObject *kwds)
     _la = self->pyo;
 
 /* local variable initializations */
-    _la        = NULL;
     _lb        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
@@ -610,7 +607,6 @@ PyObject *_PY_PD_fd4(PY_str *self, PyObject *args, PyObject *kwds)
     _la = self->pyo;
 
 /* local variable initializations */
-    _la        = NULL;
     _lb        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
@@ -697,7 +693,9 @@ static PyObject *PY_str_get(PY_str *self, void *context)
 static PyObject *PY_str_get_nc(PY_str *self, void *context)
    {PyObject *rv;
 
-    rv = PY_INT_LONG(self->pyo->nc);
+    rv = PY_build_object("nc",
+                         SC_INT_I, 0, &self->pyo->nc,
+                         0);
 
     return(rv);}
 
@@ -707,7 +705,9 @@ static PyObject *PY_str_get_nc(PY_str *self, void *context)
 static PyObject *PY_str_get_s(PY_str *self, void *context)
    {PyObject *rv;
 
-    rv = Py_BuildValue("s", self->pyo->s);
+    rv = PY_build_object("s",
+                         SC_STRING_I, 0, &self->pyo->s,
+                         0);
 
     return(rv);}
 
