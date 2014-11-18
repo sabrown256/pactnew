@@ -147,7 +147,9 @@ static PyObject *PY_str_get(PY_str *self, void *context)
 static PyObject *PY_str_get_n(PY_str *self, void *context)
    {PyObject *rv;
 
-    rv = PY_INT_LONG(self->pyo->n);
+    rv = PY_build_object("n",
+                         SC_LONG_I, 0, &self->pyo->n,
+                         0);
 
     return(rv);}
 
@@ -157,7 +159,9 @@ static PyObject *PY_str_get_n(PY_str *self, void *context)
 static PyObject *PY_str_get_s(PY_str *self, void *context)
    {PyObject *rv;
 
-    rv = Py_BuildValue("s", self->pyo->s);
+    rv = PY_build_object("s",
+                         SC_STRING_I, 0, &self->pyo->s,
+                         0);
 
     return(rv);}
 

@@ -10,6 +10,15 @@
 
 #include "pdbmodule.h"
 
+#define N_PY_SPECS 16
+
+typedef struct s_buildsp buildsp;
+
+struct s_buildsp
+   {int ity;
+    int ni;
+    void *vr;};
+
 PyObject
  *PP_error_internal,
  *PP_error_user;
@@ -134,6 +143,150 @@ PyObject *PY_strings_tuple(char **sa, int ns, int fr)
 
 	if (fr == TRUE)
 	   PS_free_strings(sa);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PY_BUILD_OBJ - return a single Python object
+ *               - made from the Ith item specified by
+ *               - the info in SP
+ */
+
+static PyObject *_PY_build_obj(buildsp *sp, int i)
+   {int ity, ni;
+    void *vr;
+    PyObject *rv;
+
+    rv = NULL;
+    if (sp != NULL)
+       {ity = sp->ity;
+	ni  = sp->ni;
+	vr  = sp->vr;
+	if ((i == 0) ||
+	    ((0 <= i) && (i < ni)))
+	   {if (SC_is_type_prim(ity) == TRUE)
+	       {if ((SC_is_type_fix(ity) == TRUE) || (ity == SC_ENUM_I))
+		   {long lv;
+
+		    SC_convert_id(SC_LONG_I, &lv, 0, 1,
+				  ity, vr, i, 1, 1, FALSE);
+
+		    rv = PY_INT_LONG(lv);}
+
+	        else if (SC_is_type_fp(ity) == TRUE)
+		   {double dv;
+
+		    SC_convert_id(SC_DOUBLE_I, &dv, 0, 1,
+				  ity, vr, i, 1, 1, FALSE);
+
+		    rv = PyFloat_FromDouble(dv);}
+
+		else if (ity == SC_STRING_I)
+                   {char *s;
+
+		    s  = ((char **) vr)[i];
+
+		    rv = Py_BuildValue("s", s);}
+
+		else if (SC_is_type_ptr(ity) == TRUE)
+		   {void *p;
+
+		    p = ((void **) vr)[i];
+
+		    rv = PY_COBJ_VOID_PTR(p, NULL);}
+
+		else if (SC_is_type_char(ity) == TRUE)
+		   PyErr_SetString(PyExc_NotImplementedError,
+				   "char type");
+
+		else if (SC_is_type_cx(ity) == TRUE)
+		   PyErr_SetString(PyExc_NotImplementedError,
+				   "complex type");}
+
+	    else if (SC_is_type_struct(ity) == TRUE)
+	       PyErr_SetString(PyExc_NotImplementedError,
+			       "derived type");
+	    else
+	       PyErr_SetString(PyExc_TypeError,
+			       "unknown type");};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PY_APPEND_OBJ - add a Python object to the Ith slot of tuple TP
+ *                - made from info in SP
+ */
+
+static void _PY_append_obj(PyObject *tp, int i, buildsp *sp)
+   {int l, ni;
+    PyObject *o, *t;
+
+    ni = sp->ni;
+    if (ni == 0)
+       o = _PY_build_obj(sp, 1);
+
+    else
+       {o = PyTuple_New(ni);
+        for (l = 0; l < ni; l++)
+	    {t = _PY_build_obj(sp, l);
+	     PyTuple_SET_ITEM(o, l, t);};};
+
+    PyTuple_SET_ITEM(tp, i, o);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PY_BUILD_OBJECT - return a Python object made in
+ *                 - analogy with SS_make_list
+ *                 - each specification is a triplet:
+ *                 -   <type>, <length>, <address>
+ *                 - example:
+ *                 -   o = PY_build_object("foo",
+ *                 -                       SC_INT_I, 0, &i,
+ *                 -                       SC_DOUBLE_I, PG_SPACEDM, pt,
+ *                 -                       0);
+ */
+
+PyObject *PY_build_object(char *nm, ...)
+   {int i, n;
+    buildsp sp[N_PY_SPECS];
+    PyObject *rv;
+
+    rv = NULL;
+
+    SC_VA_START(nm);
+
+/* find out what we have got - especially the number of specifications
+ * NOTE: make this dynamic at some point
+ */
+    for (n = 0; n < N_PY_SPECS; n++)
+        {sp[n].ity = SC_VA_ARG(int);
+	 if (sp[n].ity == 0)
+	    break;
+	 sp[n].ni = SC_VA_ARG(int);
+	 sp[n].vr = SC_VA_ARG(void *);};
+
+    if (n < 1)
+       rv = Py_None;
+
+/* distinguish a scalar from an array that is 1 item long
+ * by specifying 0 for the length of a scalar
+ */
+    else if ((n == 1) && (sp[0].ni == 0))
+       rv = _PY_build_obj(&sp[0], 0);
+
+    else
+       {rv = PyTuple_New(n);
+        for (i = 0; i < n; i++)
+	    _PY_append_obj(rv, i, &sp[i]);};
+
+    SC_VA_END;
 
     return(rv);}
 

@@ -292,6 +292,7 @@ extern dimdes
 
 extern PyObject
  *PY_strings_tuple(char **sa, int ns, int fr),
+ *PY_build_object(char *nm, ...),
  *PP_dimdes_to_obj(dimdes *dims),
  *_PP_find_file_obj(PDBfile *fp);
 
