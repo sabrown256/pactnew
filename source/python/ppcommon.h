@@ -17,10 +17,6 @@
 
 # define PY_ARG_KEY                 METH_VARARGS | METH_KEYWORDS 
 
-# define PY_COBJ_VOID_PTR(_o, _m)   PyCapsule_New(_o, 0, (PyCapsule_Destructor) _m)
-# define PY_GET_PTR(_o)             PyCapsule_GetPointer(_o, 0)
-# define PY_COBJ_TYPE               PyCapsule_Type
-
 
 #if PY_MAJOR_VERSION >= 3
 
@@ -30,6 +26,8 @@
 # define PY_TYPE(_o)                Py_TYPE(_o)
 # define PY_TYPE_TYPE               PyType_Type
 # define PY_NUMBER_INT              PyNumber_Long
+
+# define PY_NUM_INT(_m)             ((_m)->nb_int)
 
 # define PY_INT_OBJECT                  PyLongObject
 # define PY_INT_TYPE                    PyLong_Type
@@ -44,7 +42,9 @@
 # define PY_STRING_SIZE(_o)             PyUnicode_GET_LENGTH(_o)
 # define PY_STRING_AS_STRING(_o)        PY_get_string(_o)
 
-# define PY_NUM_INT(_m)             ((_m)->nb_int)
+# define PY_COBJ_VOID_PTR(_o, _m)   PyCapsule_New(_o, 0, (PyCapsule_Destructor) _m)
+# define PY_GET_PTR(_o)             PyCapsule_GetPointer(_o, 0)
+# define PY_COBJ_TYPE               PyCapsule_Type
 
 # define PY_MOD_BEGIN(_nm, _doc, _mth)                                      \
 PyMODINIT_FUNC PyInit_##_nm(void)                                           \
@@ -74,6 +74,8 @@ PyMODINIT_FUNC PyInit_##_nm(void)                                           \
 # define PY_TYPE_TYPE               PyClass_Type
 # define PY_NUMBER_INT              PyNumber_Int
 
+# define PY_NUM_INT(_m)             ((_m)->nb_long)
+
 # define PY_INT_OBJECT                  PyIntObject
 # define PY_INT_TYPE                    PyInt_Type
 # define PY_INT_LONG(_o)                PyInt_FromLong((long) (_o))
@@ -87,7 +89,10 @@ PyMODINIT_FUNC PyInit_##_nm(void)                                           \
 # define PY_STRING_SIZE(_o)             PyString_Size(_o)
 # define PY_STRING_AS_STRING(_o)        PyString_AsString(_o)
 
-# define PY_NUM_INT(_m)             ((_m)->nb_long)
+/* needed for python 2.6 and earlier which do not have PyCapsule */
+# define PY_COBJ_VOID_PTR(_o, _m)   PyCObject_FromVoidPtr(_o, _m)
+# define PY_GET_PTR(_o)             PyCObject_AsVoidPtr(_o)
+# define PY_COBJ_TYPE               PyCObject_Type
 
 # define PY_MOD_BEGIN(_nm, _doc, _mth)                                      \
 void init##_nm(void)                                                        \
