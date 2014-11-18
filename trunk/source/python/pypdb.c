@@ -753,14 +753,14 @@ static int _PP_clr_defstr(haelem *hp, void *arg)
     
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &self, FALSE);
     if ((ok == TRUE) && (self->fileinfo->file == fp))
-       Py_DECREF(self);
+       {Py_DECREF(self);};
 
     return(0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PP_cleanup_defstrs - Go thur all defstrs in the global table,
+/* _PP_cleanup_defstrs - Go thru all defstrs in the global table,
  * if it is in this file, delete it.
  *  _PY_defstr_tab is file static.
  */
