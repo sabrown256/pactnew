@@ -34,8 +34,9 @@ PyObject *_PY_fb1(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb1(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb1",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -64,8 +65,9 @@ PyObject *_PY_fb2(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb2(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb2",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -94,8 +96,9 @@ PyObject *_PY_fb3(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb3(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb3",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -124,8 +127,9 @@ PyObject *_PY_fb4(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb4(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb4",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -154,8 +158,9 @@ PyObject *_PY_fb5(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb5(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb5",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -184,8 +189,9 @@ PyObject *_PY_fb6(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb6(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb6",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -214,8 +220,9 @@ PyObject *_PY_fb7(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb7(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb7",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -244,8 +251,9 @@ PyObject *_PY_fb8(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb8(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb8",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -274,8 +282,9 @@ PyObject *_PY_fb10(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb10(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb10",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -304,8 +313,9 @@ PyObject *_PY_fb11(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fb11(_la1, _la2);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fb11",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -332,8 +342,9 @@ PyObject *_PY_fr1(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr1(_la1);
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fr1",
+                          SC_BOOL_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -360,8 +371,9 @@ PyObject *_PY_fr2(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr2(_la1);
-    _lo = Py_BuildValue("s",
-                        _rv);
+    _lo = PY_build_object("fr2",
+                          SC_CHAR_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -388,8 +400,9 @@ PyObject *_PY_fr3(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr3(_la1);
-    _lo = Py_BuildValue("h",
-                        _rv);
+    _lo = PY_build_object("fr3",
+                          SC_SHORT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -416,8 +429,9 @@ PyObject *_PY_fr4(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr4(_la1);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fr4",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -444,8 +458,9 @@ PyObject *_PY_fr5(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr5(_la1);
-    _lo = Py_BuildValue("l",
-                        _rv);
+    _lo = PY_build_object("fr5",
+                          SC_LONG_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -472,8 +487,9 @@ PyObject *_PY_fr6(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr6(_la1);
-    _lo = Py_BuildValue("L",
-                        _rv);
+    _lo = PY_build_object("fr6",
+                          SC_LONG_LONG_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -500,8 +516,9 @@ PyObject *_PY_fr7(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr7(_la1);
-    _lo = Py_BuildValue("f",
-                        _rv);
+    _lo = PY_build_object("fr7",
+                          SC_FLOAT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -528,8 +545,9 @@ PyObject *_PY_fr8(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr8(_la1);
-    _lo = Py_BuildValue("d",
-                        _rv);
+    _lo = PY_build_object("fr8",
+                          SC_DOUBLE_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -556,8 +574,9 @@ PyObject *_PY_fr10(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr10(_la1);
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fr10",
+                          SC_FLOAT_COMPLEX_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -584,8 +603,9 @@ PyObject *_PY_fr11(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr11(_la1);
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fr11",
+                          SC_DOUBLE_COMPLEX_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -612,8 +632,9 @@ PyObject *_PY_fr13(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fr13(_la1);
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fr13",
+                          SX_STR_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -640,8 +661,9 @@ PyObject *_PY_fp1(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp1(_la1);
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fp1",
+                          SC_BOOL_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -668,8 +690,9 @@ PyObject *_PY_fp2(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp2(_la1);
-    _lo = Py_BuildValue("s",
-                        _rv);
+    _lo = PY_build_object("fp2",
+                          SC_CHAR_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -696,8 +719,9 @@ PyObject *_PY_fp3(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp3(_la1);
-    _lo = Py_BuildValue("h",
-                        _rv);
+    _lo = PY_build_object("fp3",
+                          SC_SHORT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -724,8 +748,9 @@ PyObject *_PY_fp4(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp4(_la1);
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fp4",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -752,8 +777,9 @@ PyObject *_PY_fp5(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp5(_la1);
-    _lo = Py_BuildValue("l",
-                        _rv);
+    _lo = PY_build_object("fp5",
+                          SC_LONG_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -780,8 +806,9 @@ PyObject *_PY_fp6(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp6(_la1);
-    _lo = Py_BuildValue("L",
-                        _rv);
+    _lo = PY_build_object("fp6",
+                          SC_LONG_LONG_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -808,8 +835,9 @@ PyObject *_PY_fp7(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp7(_la1);
-    _lo = Py_BuildValue("f",
-                        _rv);
+    _lo = PY_build_object("fp7",
+                          SC_FLOAT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -836,8 +864,9 @@ PyObject *_PY_fp8(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp8(_la1);
-    _lo = Py_BuildValue("d",
-                        _rv);
+    _lo = PY_build_object("fp8",
+                          SC_DOUBLE_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -864,8 +893,9 @@ PyObject *_PY_fp10(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp10(_la1);
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fp10",
+                          SC_FLOAT_COMPLEX_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -892,8 +922,9 @@ PyObject *_PY_fp11(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp11(_la1);
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fp11",
+                          SC_DOUBLE_COMPLEX_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -920,8 +951,9 @@ PyObject *_PY_fp13(PyObject *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fp13(_la1);
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fp13",
+                          SX_STR_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 

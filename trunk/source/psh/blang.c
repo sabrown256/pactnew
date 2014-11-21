@@ -82,6 +82,7 @@ struct s_fdecl
     int nr;                          /* number of return quantities */
     int nc;                          /* number of char * args */
     int ntf;                         /* number of (type,var) prototype pairs */
+    int iref;                        /* index of reference binding desc - C */
     int voidf;                       /* TRUE for functions returning nothing */
     int voida;                       /* TRUE for functions with no args */
     int error;                       /* TRUE if declaration is incorrect */
@@ -89,6 +90,7 @@ struct s_fdecl
     char **cargs;                    /* char * args */
     char **tfproto;                  /* (type,var) prototype pairs */
     char **bindings;                 /* list of language bindings specified */
+    bindes *ref;                     /* reference binding descriptor - C */
     farg proto;                      /* farg representation of declaration */
     farg *al;};
 
@@ -127,8 +129,7 @@ struct s_bindes
     void (*fin)(bindes *bd);};
 
 static int
- nbd = 0,
- MODE_C;
+ nbd = 0;
 
 static char
  *tykind[3] = {"primitive", "enum", "struct"};
@@ -137,12 +138,15 @@ static bindes
  gbd[N_MODES];
 
 static char
- *lookup_type(char ***val, int *pit, char *ty, int ity, bindes *bo),
+ *lookup_type(char ***val, int *pit, char *ty, bindes *bo),
  **mc_proto_list(fdecl *dcl);
 
 static void
- fc_type(char *wty, int nc, farg *al, int afl, bindes *bo),
+ fc_type(fdecl *dcl, char *wty, int nc, farg *al, int afl, bindes *bo),
  cs_type(char *a, int nc, farg *arg, int drf);
+
+extern int
+ MODE_C;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -357,10 +361,10 @@ static pboolean is_func_ptr(char *type, int wh)
 
 /* ADD_TYPE - add a type to the map */
 
-static void add_type(char *cty, char *fty, char *sty, char *defv)
+static void add_type(int iref, char *cty, char *fty, char *sty, char *defv)
    {int i, j;
 
-    i = MODE_C;
+    i = iref;
 
 /* add types for C mode */
     str_lst_add(&gbd[i].st->defv, defv);
@@ -382,18 +386,21 @@ static void add_type(char *cty, char *fty, char *sty, char *defv)
 
 /* LOOKUP_TYPE - lookup and return a type from the type lists */
 
-static char *lookup_type(char ***val, int *pit, char *ty, int ity, bindes *bo)
+static char *lookup_type(char ***val, int *pit, char *ty, bindes *bo)
    {int i, l;
     char *rv, *dv, **lst, **ta;
+    bindes *bi;
 
     rv = NULL;
 
+    bi = gbd + MODE_C;
+
     if (bo == NULL)
-       bo = gbd + MODE_C;
+       bo = bi;
 
     l = -1;
 
-    ta = gbd[ity].types.arr;
+    ta = bi->types.arr;
     for (i = 0; ta[i] != NULL; i++)
         {if (strcmp(ty, ta[i]) == 0)
 	    {l = i;
@@ -423,39 +430,39 @@ static char *lookup_type(char ***val, int *pit, char *ty, int ity, bindes *bo)
 
 /* INIT_TYPES - initialize the type map */
 
-static void init_types(void)
+static void init_types(int iref)
    {
 
-    add_type("void",        "",            "",                 "NULL");
-    add_type("bool",        "logical",     "SC_BOOL_I",        "FALSE");
-    add_type("char",        "character",   "SC_CHAR_I",        "'\\0'");
-    add_type("pboolean",    "integer",     "SC_INT_I",         "B_F");
+    add_type(iref, "void",        "",            "",                 "NULL");
+    add_type(iref, "bool",        "logical",     "SC_BOOL_I",        "FALSE");
+    add_type(iref, "char",        "character",   "SC_CHAR_I",        "'\\0'");
+    add_type(iref, "pboolean",    "integer",     "SC_INT_I",         "B_F");
 
 /* fixed point types */
-    add_type("short",       "integer(2)",  "SC_SHORT_I",       "0");
-    add_type("int",         "integer",     "SC_INT_I",         "0");
-    add_type("long",        "integer(8)",  "SC_LONG_I",        "0L");
-    add_type("long long",   "integer(8)",  "SC_LONG_LONG_I",   "0LL");
+    add_type(iref, "short",       "integer(2)",  "SC_SHORT_I",       "0");
+    add_type(iref, "int",         "integer",     "SC_INT_I",         "0");
+    add_type(iref, "long",        "integer(8)",  "SC_LONG_I",        "0L");
+    add_type(iref, "long long",   "integer(8)",  "SC_LONG_LONG_I",   "0LL");
 
-    add_type("size_t",      "integer(8)",  "SC_LONG_I",        "0L");
-    add_type("ssize_t",     "integer(8)",  "SC_LONG_I",        "0L");
+    add_type(iref, "size_t",      "integer(8)",  "SC_LONG_I",        "0L");
+    add_type(iref, "ssize_t",     "integer(8)",  "SC_LONG_I",        "0L");
 
 /* fixed width fixed point types */
-    add_type("int16_t",     "integer(2)",  "SC_INT16_I",       "0");
-    add_type("int32_t",     "integer(4)",  "SC_INT32_I",       "0");
-    add_type("int64_t",     "integer(8)",  "SC_INT64_I",       "0L");
+    add_type(iref, "int16_t",     "integer(2)",  "SC_INT16_I",       "0");
+    add_type(iref, "int32_t",     "integer(4)",  "SC_INT32_I",       "0");
+    add_type(iref, "int64_t",     "integer(8)",  "SC_INT64_I",       "0L");
 
 /* floating point types */
-    add_type("float",       "real(4)",     "SC_FLOAT_I",       "0.0");
-    add_type("double",      "real(8)",     "SC_DOUBLE_I",      "0.0");
-    add_type("long double", "real(16)",    "SC_LONG_DOUBLE_I", "0.0");
+    add_type(iref, "float",       "real(4)",     "SC_FLOAT_I",       "0.0");
+    add_type(iref, "double",      "real(8)",     "SC_DOUBLE_I",      "0.0");
+    add_type(iref, "long double", "real(16)",    "SC_LONG_DOUBLE_I", "0.0");
 
 /* complex types */
-    add_type("float _Complex",       "complex(4)",
+    add_type(iref, "float _Complex",       "complex(4)",
 	     "SC_FLOAT_COMPLEX_I", "0.0");
-    add_type("double _Complex",      "complex(8)",
+    add_type(iref, "double _Complex",      "complex(8)",
 	     "SC_DOUBLE_COMPLEX_I", "0.0");
-    add_type("long double _Complex", "complex(16)",
+    add_type(iref, "long double _Complex", "complex(16)",
 	     "SC_LONG_DOUBLE_COMPLEX_I", "0.0");
 
 /* GOTCHA: there is a general issue with pointers and Fortran here
@@ -472,33 +479,33 @@ static void init_types(void)
  * with "void *" defined pd_write_f works for real*8 a(10)
  * but fails for type(C_PTR) b
  */
-    add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       "NULL");
-    add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        "NULL");
-    add_type("char *",        "character-A",  "SC_STRING_I",        "NULL");
+    add_type(iref, "void *",        "C_PTR-A",      "SC_POINTER_I",       "NULL");
+    add_type(iref, "bool *",        "logical-A",    "SC_BOOL_P_I",        "NULL");
+    add_type(iref, "char *",        "character-A",  "SC_STRING_I",        "NULL");
 
-    add_type("short *",       "integer(2)-A", "SC_SHORT_P_I",       "NULL");
-    add_type("int *",         "integer-A",    "SC_INT_P_I",         "NULL");
-    add_type("long *",        "integer(8)-A", "SC_LONG_P_I",        "NULL");
-    add_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I",   "NULL");
+    add_type(iref, "short *",       "integer(2)-A", "SC_SHORT_P_I",       "NULL");
+    add_type(iref, "int *",         "integer-A",    "SC_INT_P_I",         "NULL");
+    add_type(iref, "long *",        "integer(8)-A", "SC_LONG_P_I",        "NULL");
+    add_type(iref, "long long *",   "integer(8)-A", "SC_LONG_LONG_P_I",   "NULL");
 
-    add_type("float *",       "real(4)-A",    "SC_FLOAT_P_I",       "NULL");
-    add_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I",      "NULL");
-    add_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", "NULL");
+    add_type(iref, "float *",       "real(4)-A",    "SC_FLOAT_P_I",       "NULL");
+    add_type(iref, "double *",      "real(8)-A",    "SC_DOUBLE_P_I",      "NULL");
+    add_type(iref, "long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", "NULL");
 
 /* complex types */
-    add_type("float _Complex *",       "complex(4)-A",
+    add_type(iref, "float _Complex *",       "complex(4)-A",
 	     "SC_FLOAT_COMPLEX_P_I", "NULL");
-    add_type("double _Complex *",      "complex(8)-A",
+    add_type(iref, "double _Complex *",      "complex(8)-A",
 	     "SC_DOUBLE_COMPLEX_P_I", "NULL");
-    add_type("long double _Complex *", "complex(16)-A",
+    add_type(iref, "long double _Complex *", "complex(16)-A",
 	     "SC_LONG_DOUBLE_COMPLEX_P_I", "NULL");
 
-    add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         "NULL");
-    add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       "NULL");
+    add_type(iref, "pcons",         "C_PTR-A",      "SC_PCONS_I",         "NULL");
+    add_type(iref, "pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       "NULL");
 /*
-    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          "NULL");
+    add_type(iref, "FILE *",        "C_PTR-A",      "SC_FILE_I",          "NULL");
  */
-    add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       "NULL");
+    add_type(iref, "PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       "NULL");
 
     return;}
 
@@ -507,7 +514,7 @@ static void init_types(void)
 
 /* ADD_DERIVED_TYPES - add derived types */
 
-static void add_derived_types(char **sbi)
+static void add_derived_types(int iref, char **sbi)
    {int ib;
     char s[BFLRG];
     char *fty, *sty, *defv, *sb, **ta;
@@ -537,7 +544,7 @@ static void add_derived_types(char **sbi)
 	        ta = NULL;
 	
 	     if (ta != NULL)
-	        {add_type(ta[1], fty, sty, defv);
+	        {add_type(iref, ta[1], fty, sty, defv);
 		 FREE(ta[0]);
 		 FREE(ta);};};};
 
@@ -612,15 +619,15 @@ static void get_def_value(char *lvl, int nc, char *sp, char *ty)
        {if ((is_ptr(ty) == B_T) || (is_func_ptr(ty, 3) == B_T))
 	   nstrncpy(lvl, nc, "NULL", -1);
 	else
-	   lookup_type(&dv, NULL, ty, MODE_C, NULL);}
+	   lookup_type(&dv, NULL, ty, NULL);}
 
 /* dereference a pointer type and get its default value */
     else if (lvl[0] == '*')
        {if (is_ptr(ty) == B_T)
 	   {deref(lty, BFLRG, ty);
-	    lookup_type(&dv, NULL, lty, MODE_C, NULL);}
+	    lookup_type(&dv, NULL, lty, NULL);}
 	else
-	   lookup_type(&dv, NULL, ty, MODE_C, NULL);};
+	   lookup_type(&dv, NULL, ty, NULL);};
 
     if (dv != NULL)
        {nstrncpy(lvl, nc, dv[0], -1);
@@ -973,7 +980,7 @@ static int process_qualifiers(farg *al, char *qual)
 	    lst = NULL;
 	    arr = FALSE;
 	    if ((IS_NULL(val) == TRUE) || (val[0] == '*'))
-	       lookup_type(&lst, NULL, al->type, MODE_C, NULL);
+	       lookup_type(&lst, NULL, al->type, NULL);
 	    else
 	       {arr = (strchr(val, '[') != NULL);
 		lst = tokenize(val, "[,]", 0);};
@@ -1011,7 +1018,7 @@ static int process_qualifiers(farg *al, char *qual)
 
 	    free_strings(ta);}
 	else
-	   {lookup_type(&al->val, NULL, al->type, MODE_C, NULL);
+	   {lookup_type(&al->val, NULL, al->type, NULL);
 	    al->dir = FD_NONE;};};
 
     return(rv);}
@@ -1100,10 +1107,12 @@ static farg *proc_args(fdecl *dcl)
    {int i, na, nr, ok, err;
     char **args;
     farg *al;
+    bindes *bd;
 
     na   = dcl->na;
     args = dcl->args;
-    
+    bd   = dcl->ref;
+
     al = MAKE_N(farg, na);
     if (al != NULL)
        {memset(al, 0, na*sizeof(farg));
@@ -1120,7 +1129,7 @@ static farg *proc_args(fdecl *dcl)
 		 err           = TRUE;
 		 break;}
 	     else
-	        {fc_type(NULL, 0, al+i, TRUE, gbd+MODE_C);
+	        {fc_type(dcl, NULL, 0, al+i, TRUE, bd);
 		 nr += al[i].nv;};};
 
 	dcl->error = err;
@@ -1456,7 +1465,7 @@ static char *map_name(char *d, int nc, char *cf, char *lf,
  *           - return TRUE iff successful
  */
 
-static void find_bind(statedes *st)
+static void find_bind(statedes *st, int iref)
    {int i, ib, id, nb, nc, ne, ns, nbi;
     char t[BFLRG], ps[BFLRG];
     char *sb, *lng, *te, *p;
@@ -1499,6 +1508,8 @@ static void find_bind(statedes *st)
 			     ta = lst_push(ta, lng);};
 
 		     dcl[nb].bindings = ta;
+		     dcl[nb].iref     = iref;
+		     dcl[nb].ref      = gbd + iref;
 
 		     nb += find_proto(dcl+nb, cpr, sa[0]);};
 
@@ -1583,7 +1594,7 @@ static char *has_binding(fdecl *dcl, char *lang)
 
 /* SETUP_BINDER - initialize the data members of BD */
 
-static void setup_binder(statedes *st, char *pck, char **sbi)
+static void setup_binder(statedes *st, int iref, char *pck, char **sbi)
    {
 
     if (st != NULL)
@@ -1593,7 +1604,7 @@ static void setup_binder(statedes *st, char *pck, char **sbi)
 	st->nbi = lst_length(sbi);
 
 /* parse out and construct all the declarations */
-	find_bind(st);};
+	find_bind(st, iref);};
 
     return;}
 
@@ -1701,6 +1712,7 @@ static void c_proto(char *pr, int nc, fdecl *dcl)
 
 /*--------------------------------------------------------------------------*/
 
+#include "blang-c.c"
 #include "blang-f.c"
 #include "blang-scm.c"
 #include "blang-py.c"
@@ -1710,107 +1722,16 @@ static void c_proto(char *pr, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* BIND_DOC_C - emit C binding documentation */
-
-static void bind_doc_c(FILE *fp, fdecl *dcl, doc_kind dk)
-   {char pr[BFLRG];
-
-    c_proto(pr, BFLRG, dcl);
-
-    if (dk == DK_HTML)
-       fprintf(fp, "<i>C Binding: </i>       %s\n", pr);
-
-    else if (dk == DK_MAN)
-       {fprintf(fp, ".B C Binding:       %s\n", pr);
-        fprintf(fp, ".sp\n");};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* CL_C - process command line arguments for C binding */
-
-static int cl_c(statedes *st, bindes *bd, int c, char **v)
-   {int i, rv;
-    char *cpr, *cdv, **sdv, **scp;
-
-    bd->iparam = MAKE_N(int, 2);
-
-    rv  = 1;
-    cpr = "";
-    cdv = "";
-
-    for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-c") == 0)
-	    cpr = v[++i];
-	 else if (strcmp(v[i], "-dv") == 0)
-	    cdv = v[++i];
-	 else if (strcmp(v[i], "-h") == 0)
-            {printf("   C specifications: -c <c-proto> -dv <c-der>\n");
-             printf("      c    file containing C prototypes\n");
-             printf("      dv   file containing C enum,struct,union defs\n");
-             printf("\n");
-	     cpr = "";
-	     break;};};
-
-    if (IS_NULL(cpr) == FALSE)
-       {sdv = file_text(FALSE, cdv);
-	scp = file_text(FALSE, cpr);
-
-	st->cdv = sdv;
-	st->cpr = scp;
-
-	bd->iparam[0] = lst_length(sdv);
-	bd->iparam[1] = lst_length(scp);
-
-	rv = 0;}
-
-    else
-       printf("No prototypes found for '%s'\n", st->pck);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REGISTER_C - register C binding methods
- *            - this is a dummy - crucial but empty
- */
-
-static int register_c(int fl, statedes *st)
-   {int i;
-    bindes *pb;
-
-    MODE_C = nbd;
-
-    if (fl == TRUE)
-       {pb = gbd + nbd++;
-	for (i = 0; i < NF; i++)
-	    pb->fp[i] = NULL;
-
-	pb->st   = st;
-	pb->cl   = cl_c;
-	pb->init = NULL;
-	pb->bind = NULL;
-	pb->doc  = bind_doc_c;
-	pb->fin  = NULL;};
-
-    return(MODE_C);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* BLANG - control the generation of language binding
  *       - return TRUE iff successful
  */
 
-static int blang(statedes *st, char *pck, char *fbi)
+static int blang(statedes *st, char *pck, char *fbi, int iref)
    {int ib, rv;
     char **sbi;
     bindes *pb;
 
-    init_types();
+    init_types(iref);
 
     rv = FALSE;
 
@@ -1821,9 +1742,9 @@ static int blang(statedes *st, char *pck, char *fbi)
 	   printf("No bindings found for '%s'\n", pck);
             
 	else
-	   {add_derived_types(sbi);
+	   {add_derived_types(iref, sbi);
 
-	    setup_binder(st, pck, sbi);
+	    setup_binder(st, iref, pck, sbi);
 
 /* initialize the binding constructors */
 	    for (pb = gbd, ib = 0; ib < nbd; ib++, pb++)
@@ -1853,7 +1774,7 @@ static int blang(statedes *st, char *pck, char *fbi)
 /* MAIN - start it out here */
 
 int main(int c, char **v)
-   {int i, ib, rv, err;
+   {int i, ib, iref, rv, err;
     char pck[BFLRG], msg[BFLRG];
     char *fbi;
     bindes *pb;
@@ -1869,7 +1790,7 @@ int main(int c, char **v)
         st.no[i] = TRUE;
 
 /* register the language bindings */
-    register_c(TRUE, &st);
+    iref = register_c(TRUE, &st);
     register_doc(st.no[0], &st);
     register_fortran(st.no[1], &st);
     register_scheme(st.no[2], &st);
@@ -1915,7 +1836,7 @@ int main(int c, char **v)
 
 	printf("      %s ", fill_string(msg, 25));
 
-	rv = blang(&st, pck, fbi);
+	rv = blang(&st, pck, fbi, iref);
 	rv = (rv != TRUE);
 
 	printf("done\n");

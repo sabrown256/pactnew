@@ -102,7 +102,14 @@ ${IncDir}/pasrc.h : pasrc.t
 	@(echo "template pasrc.t -o ${IncDir}/pasrc.h" ;  \
 	  ${BinDir}/template pasrc.t -o ${IncDir}/pasrc.h)
 
-hdrf = ${IncDir}/pasrc.h
+GenInc = ${PACTTmpDir}/gc-panacea.h
+
+${IncDir}/panacea_gen.h : ${GenInc}
+	@echo "build panacea_gen.h"
+	@rm -f ${IncDir}/panacea_gen.h
+	@cat ${GenInc} > ${IncDir}/panacea_gen.h
+
+hdrf = ${IncDir}/pasrc.h ${IncDir}/panacea_gen.h
 
 IncAction = @pact generate
 

@@ -96,7 +96,7 @@ static void cf_type(char *a, int nc, char *ty)
        nstrncpy(a, nc, "void *", -1);
 
     else
-       {fty = lookup_type(NULL, NULL, ty, MODE_C, gbd+MODE_F);
+       {fty = lookup_type(NULL, NULL, ty, gbd+MODE_F);
 	if (fty != NULL)
 	   nstrncpy(a, nc, fty, -1);
 	else
@@ -111,7 +111,8 @@ static void cf_type(char *a, int nc, char *ty)
  *         - return the kind of FORTRAN argument TY is
  */
 
-static void fc_type(char *wty, int nc, farg *al, int afl, bindes *bo)
+static void fc_type(fdecl *dcl, char *wty, int nc,
+		    farg *al, int afl, bindes *bo)
    {fparam knd;
     char lty[BFLRG];
     char *pty, *arg, *ty;
@@ -126,7 +127,7 @@ static void fc_type(char *wty, int nc, farg *al, int afl, bindes *bo)
 	arg = al->arg;
 	ty  = al->type;
 
-	pty = lookup_type(NULL, NULL, ty, MODE_C, bo);
+	pty = lookup_type(NULL, NULL, ty, bo);
 
 /* handle variable arg list */
 	if (is_var_arg(ty) == TRUE)
@@ -148,7 +149,7 @@ static void fc_type(char *wty, int nc, farg *al, int afl, bindes *bo)
 	       {knd = FP_ARRAY;
 
 /* for C dereference the type so that we have an array of type */
-		if (bo == gbd+MODE_C)
+		if (bo == dcl->ref)
 		   deref(wty, BFLRG, pty);
 
 /* for Fortran account for the -A convention used in the type registry */
@@ -598,7 +599,7 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *ffn)
 	berr("%s is not interoperable - variable args", fn);}
 
     else if (strcmp(ffn, "none") != 0)
-       {fc_type(rt, BFLRG, &dcl->proto, FALSE, gbd+MODE_C);
+       {fc_type(dcl, rt, BFLRG, &dcl->proto, FALSE, dcl->ref);
 
 	knd = dcl->proto.knd;
 
@@ -724,13 +725,13 @@ static void fin_fortran(bindes *bd)
  *    	C_CHAR			char
  */
 
-static void mc_type(int nc, char *fty, char *cty,
+static void mc_type(fdecl *dcl, int nc, char *fty, char *cty,
 		    char *wty, farg *arg)
    {char lfty[BFLRG], lcty[BFLRG], lwty[BFLRG];
     char *ty;
 
     if (arg != NULL)
-       {fc_type(lwty, nc, arg, FALSE, gbd+MODE_F);
+       {fc_type(dcl, lwty, nc, arg, FALSE, gbd+MODE_F);
 	memmove(lwty, subst(lwty, "FIXNUM", "integer", -1), nc);
 
 	ty = arg->type;
@@ -843,7 +844,7 @@ static char **mc_proto_list(fdecl *dcl)
     if (al != NULL)
 
 /* function/return type */
-       {mc_type(BFLRG, NULL, NULL, wty, &dcl->proto);
+       {mc_type(dcl, BFLRG, NULL, NULL, wty, &dcl->proto);
 	nm  = dcl->proto.name;
 	knd = dcl->proto.knd;
 	switch (knd)
@@ -874,7 +875,7 @@ static char **mc_proto_list(fdecl *dcl)
 	    {if ((voida == TRUE) && (i == 0))
 		continue;
 
-	      mc_type(BFLRG, NULL, NULL, wty, al+i);
+	      mc_type(dcl, BFLRG, NULL, NULL, wty, al+i);
 	      nm  = al[i].name;
 	      knd = al[i].knd;
 	      switch (knd)
@@ -921,14 +922,14 @@ static int mc_need_ptr(fdecl *dcl)
 
     ok = FALSE;
 
-    mc_type(BFLRG, NULL, cty, NULL, &dcl->proto);
+    mc_type(dcl, BFLRG, NULL, cty, NULL, &dcl->proto);
     if (dcl->proto.knd != FP_VARARG)
        ok |= ((strcmp(cty, "C_PTR") == 0) ||
 	      (strcmp(cty, "C_FUNPTR") == 0));
 
     if ((na > 0) && (al != NULL) && (voida == FALSE))
        {for (i = 0; i < na; i++)
-	    {mc_type(BFLRG, NULL, cty, NULL, al+i);
+	    {mc_type(dcl, BFLRG, NULL, cty, NULL, al+i);
 	     if (al[i].knd != FP_VARARG)
 	        ok |= ((strcmp(cty, "C_PTR") == 0) ||
 		       (strcmp(cty, "C_FUNPTR") == 0));};};
@@ -1288,7 +1289,7 @@ static void module_itf_wrap_ext(FILE *fp, fdecl *dcl, char *pck, char *ffn)
 		fprintf(fp, "\n");};};
 
 	rty = dcl->proto.type;
-	mc_type(BFLRG, fty, cty, NULL, &dcl->proto);
+	mc_type(dcl, BFLRG, fty, cty, NULL, &dcl->proto);
 	if (strcmp(rty, "void") == 0)
 	   fprintf(fp, "%s   external :: %s\n", ind, dcn);
         else
@@ -1322,7 +1323,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
 	voidf = dcl->voidf;
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
-	mc_type(BFLRG, fty, cty, NULL, &dcl->proto);
+	mc_type(dcl, BFLRG, fty, cty, NULL, &dcl->proto);
 	mc_decl_list(a, BFLRG, dcl);
 
 #if defined(FORTRAN_BIND_C_ALL)
@@ -1395,7 +1396,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
 	voidf = dcl->voidf;
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
-	mc_type(BFLRG, fty, cty, NULL, &dcl->proto);
+	mc_type(dcl, BFLRG, fty, cty, NULL, &dcl->proto);
 	mc_decl_list(a, BFLRG, dcl);
 
 	snprintf(cd, BFLRG, "%s      %s %s(%s)", ind, oper, dcn, a);
@@ -1414,7 +1415,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
 	    {if ((voida == TRUE) && (i == 0))
 	        continue;
 
-	     mc_type(BFLRG, fty, cty, NULL, al+i);
+	     mc_type(dcl, BFLRG, fty, cty, NULL, al+i);
 	     nm = al[i].name;
 	     fprintf(fp, "%s         %s(%s), value :: %s\n",
 		     ind, fty, cty, nm);};

@@ -34,8 +34,9 @@ PyObject *_PY_fe1(PY_str *self, PyObject *args, PyObject *kwds)
        return(NULL);
 
     _rv = fe1(_la1, _la2);
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fe1",
+                          SX_STR_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 

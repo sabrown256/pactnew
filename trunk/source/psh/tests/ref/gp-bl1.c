@@ -38,8 +38,9 @@ PyObject *_PY_fav2(PyObject *self, PyObject *args, PyObject *kwds)
 /* local variable initializations */
 
     _rv = fav2();
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("fav2",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -55,8 +56,9 @@ PyObject *_PY_fav3(PyObject *self, PyObject *args, PyObject *kwds)
 /* local variable initializations */
 
     _rv = fav3();
-    _lo = Py_BuildValue("d",
-                        _rv);
+    _lo = PY_build_object("fav3",
+                          SC_DOUBLE_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -72,8 +74,9 @@ PyObject *_PY_fav4(PyObject *self, PyObject *args, PyObject *kwds)
 /* local variable initializations */
 
     _rv = fav4();
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("fav4",
+                          SX_STR_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -89,8 +92,9 @@ PyObject *_PY_favp1(PyObject *self, PyObject *args, PyObject *kwds)
 /* local variable initializations */
 
     _rv = favp1();
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("favp1",
+                          SC_UNKNOWN_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -106,8 +110,9 @@ PyObject *_PY_favp2(PyObject *self, PyObject *args, PyObject *kwds)
 /* local variable initializations */
 
     _rv = favp2();
-    _lo = Py_BuildValue("i",
-                        _rv);
+    _lo = PY_build_object("favp2",
+                          SC_INT_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -123,8 +128,9 @@ PyObject *_PY_favp3(PyObject *self, PyObject *args, PyObject *kwds)
 /* local variable initializations */
 
     _rv = favp3();
-    _lo = Py_BuildValue("d",
-                        _rv);
+    _lo = PY_build_object("favp3",
+                          SC_DOUBLE_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
@@ -140,8 +146,9 @@ PyObject *_PY_favp4(PyObject *self, PyObject *args, PyObject *kwds)
 /* local variable initializations */
 
     _rv = favp4();
-    _lo = Py_BuildValue("O",
-                        _rv);
+    _lo = PY_build_object("favp4",
+                          SX_STR_I, 0, &_rv,
+                          0);
 
     return(_lo);}
 
