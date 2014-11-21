@@ -142,7 +142,14 @@ ${IncDir}/pdform.h : ${BinDir}/detect
 	@(echo "detect -c ${DP_BE} -o pdform.h" ; \
 	  ${CROSS_FE} ${BinDir}/detect -c ${DP_BE} -o ${IncDir}/pdform.h)
 
-hdrf = ${IncDir}/pdform.h
+GenInc = ${PACTTmpDir}/gc-pdb.h
+
+${IncDir}/pdb_gen.h : ${GenInc}
+	@echo "build pdb_gen.h"
+	@rm -f ${IncDir}/pdb_gen.h
+	@cat ${GenInc} > ${IncDir}/pdb_gen.h
+
+hdrf = ${IncDir}/pdform.h ${IncDir}/pdb_gen.h
 
 # spokes
 

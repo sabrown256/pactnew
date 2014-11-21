@@ -85,7 +85,7 @@ static void cs_type(char *a, int nc, farg *al, int drf)
     else
        nstrncpy(ty, BFLRG, al->type, -1);
 
-    sty = lookup_type(NULL, NULL, ty, MODE_C, gbd+MODE_S);
+    sty = lookup_type(NULL, NULL, ty, gbd+MODE_S);
     if (IS_NULL(sty) == FALSE)
        scheme_get_type(a, nc, sty, ty);
 
@@ -97,7 +97,7 @@ static void cs_type(char *a, int nc, farg *al, int drf)
 
     else if (strchr(ty, '*') != NULL)
        {deref(t, BFLRG, ty);
-	dty = lookup_type(NULL, NULL, t, MODE_C, gbd+MODE_S);
+	dty = lookup_type(NULL, NULL, t, gbd+MODE_S);
 	if (dty != NULL)
 	   scheme_get_type(a, nc, dty, t);
 	else
@@ -426,7 +426,7 @@ static void scheme_scalar_return(char *t, int nc,
        {if (IS_NULL(so) == FALSE)
 	   {switch (knd)
 	       {case FP_ANY :
-		     sty = lookup_type(NULL, NULL, ty, MODE_C, gbd+MODE_S);
+		     sty = lookup_type(NULL, NULL, ty, gbd+MODE_S);
 		     if ((sty != NULL) &&
 			 (strcmp(sty, tykind[TK_ENUM]) == 0))
 		        snprintf(t, nc, "    _lo = SS_mk_integer(si, _rv);\n");

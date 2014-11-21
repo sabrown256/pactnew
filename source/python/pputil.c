@@ -649,7 +649,11 @@ PyObject *PP_dimdes_to_obj(dimdes *dims)
         rv = PyTuple_New(nd);
         nd = 0;
         for (next = dims; next != NULL; next = next->next) {
-            dimobj = Py_BuildValue("ii", next->index_min, next->index_max);
+/*            dimobj = Py_BuildValue("ii", next->index_min, next->index_max); */
+	    dimobj = PY_build_object("dimdes_to_obj",
+				     SC_LONG_I, 0, &next->index_min,
+				     SC_LONG_I, 0, &next->index_max,
+			     0);
             PyTuple_SET_ITEM(rv, nd, dimobj);
             nd++;
         }

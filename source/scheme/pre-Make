@@ -158,7 +158,14 @@ ${LibDep} : ${hdrf} ${Hdrs} ${SyntaxModes}
 
 # headers
 
-hdrf = 
+GenInc = ${PACTTmpDir}/gc-scheme.h
+
+${IncDir}/scheme_gen.h : ${GenInc}
+	@echo "build scheme_gen.h"
+	@rm -f ${IncDir}/scheme_gen.h
+	@cat ${GenInc} > ${IncDir}/scheme_gen.h
+
+hdrf = ${IncDir}/scheme_gen.h
 
 IncAction = @pact generate
 

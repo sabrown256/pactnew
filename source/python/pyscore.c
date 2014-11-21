@@ -318,7 +318,11 @@ PyObject *PP_mem_lookup(PyObject *self, PyObject *args, PyObject *kwds)
 				    &PY_COBJ_TYPE, &pobj))
        {p      = (void *) PY_GET_PTR(pobj);
 	result = SC_mem_lookup(p);
-	rv     = Py_BuildValue("s", result);};
+
+	rv     = PY_build_object("mem_lookup",
+				 SC_STRING_I, 0, &result,
+				 0);};
+/*	rv     = Py_BuildValue("s", result);}; */
 
     return(rv);}
 

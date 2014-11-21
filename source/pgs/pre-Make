@@ -143,7 +143,14 @@ ${IncDir}/gsimag.h : gsimag.t
 	@(echo "template gsimag.t -o ${IncDir}/gsimag.h" ;  \
 	  ${BinDir}/template gsimag.t -o ${IncDir}/gsimag.h)
 
-hdrf = ${IncDir}/gsimag.h
+GenInc = ${PACTTmpDir}/gc-pgs.h
+
+${IncDir}/pgs_gen.h : ${GenInc}
+	@echo "build pgs_gen.h"
+	@rm -f ${IncDir}/pgs_gen.h
+	@cat ${GenInc} > ${IncDir}/pgs_gen.h
+
+hdrf = ${IncDir}/gsimag.h ${IncDir}/pgs_gen.h
 
 IncAction = @pact generate
 

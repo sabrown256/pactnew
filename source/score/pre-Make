@@ -224,7 +224,15 @@ ${IncDir}/scfnca.h : scfnca.t
 	@(echo "template scfnca.t -o ${IncDir}/scfnca.h" ;  \
 	  ${BinDir}/template scfnca.t -o ${IncDir}/scfnca.h)
 
-hdrf = ${IncDir}/scarg.h ${IncDir}/sctypeg.h ${IncDir}/scfnca.h
+GenInc = ${PACTTmpDir}/gc-score.h
+
+${IncDir}/score_gen.h : ${GenInc}
+	@echo "build score_gen.h"
+	@rm -f ${IncDir}/score_gen.h
+	@cat ${GenInc} > ${IncDir}/score_gen.h
+
+hdrf = ${IncDir}/scarg.h ${IncDir}/sctypeg.h \
+       ${IncDir}/scfnca.h ${IncDir}/score_gen.h
 
 IncAction = @pact generate
 

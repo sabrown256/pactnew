@@ -79,7 +79,7 @@ static int python_parse_member(char *mbr, char *mnm, char *mty, char *mdm,
 
     nstrncpy(bty, nc, mty, -1);
 
-    lty = lookup_type(NULL, &ity, mty, MODE_C, gbd+MODE_P);
+    lty = lookup_type(NULL, &ity, mty, gbd+MODE_P);
 
     if (ity != -1)
        nstrncpy(aty, nc, gbd[3].types.arr[ity], -1);
@@ -818,7 +818,7 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
         {al = dcl->al + i;
 	 ty = al->type;
 	 deref(dty, BFLRG, ty);
-	 lty = lookup_type(NULL, NULL, dty, MODE_C, gbd+MODE_P);
+	 lty = lookup_type(NULL, NULL, dty, gbd+MODE_P);
 	 if ((lty != NULL) && (strcmp(lty, tykind[TK_STRUCT]) == 0))
 	    {snprintf(p, BFSML, "PY_%s", dty);
 	     pty = p;
@@ -1073,8 +1073,18 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
         else
 	   {py_format(fmt, BFLRG, a, NULL);
 	    py_arg(arg, BFLRG, a);
+
+#if 1
+	    nm = dcl->proto.name;
+	    snprintf(t, nc, "    _lo = PY_build_object(\"%s\",\n", nm);
+	    vstrcat(t, nc, "                          %s, 0, &%s,\n",
+		    dty, arg);
+	    vstrcat(t, nc, "                          0);\n");
+#else
 	    snprintf(t, nc, "    _lo = Py_BuildValue(\"%s\",\n", fmt);
-	    vstrcat(t, nc,  "                        %s);\n", arg);};}
+	    vstrcat(t, nc,  "                        %s);\n", arg);
+#endif
+	   };}
     else
        {snprintf(t, nc, "\n");
 	nstrcat(t, nc, "    Py_INCREF(Py_None);\n");
