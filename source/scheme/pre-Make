@@ -131,7 +131,16 @@ ${TGTLib}(shgrm.o) : shlrm.l shgrm.y
 ${Om}  : ${HMSyn}
 ${Arm} : ${HMSyn}
 
+#
 # Object Files
+#
+
+gcs = gc-scheme.c
+
+gco = gc-scheme.o
+
+gca = ${TGTLib}(gc-scheme.o)
+
 PSObjs = shmm.o
 PrObjs = shprnt.o
 EvObjs = sheval.o shenvr.o sharr.o
@@ -139,7 +148,8 @@ RdObjs = shread.o
 FnObjs = shtlev.o shint.o shprm1.o shprm2.o shprm3.o shprm4.o shprm5.o shtty.o
 LrObjs = shstrg.o shchr.o shlarg.o shprc1.o shprc2.o shsynt.o shvar.o
 
-Objs = ${PSObjs} ${PrObjs} ${EvObjs} ${RdObjs} ${FnObjs} ${LrObjs}
+Objs = ${PSObjs} ${PrObjs} ${EvObjs} ${RdObjs} ${FnObjs} ${LrObjs} \
+       ${gco}
 
 ArObjs = ${TGTLib}(shmm.o) ${TGTLib}(shprnt.o) ${TGTLib}(sheval.o) \
          ${TGTLib}(shenvr.o) ${TGTLib}(shread.o) ${TGTLib}(shtlev.o) \
@@ -148,7 +158,8 @@ ArObjs = ${TGTLib}(shmm.o) ${TGTLib}(shprnt.o) ${TGTLib}(sheval.o) \
          ${TGTLib}(shtty.o) ${TGTLib}(shint.o) ${TGTLib}(sharr.o) \
          ${TGTLib}(shstrg.o) ${TGTLib}(shchr.o) ${TGTLib}(shlarg.o) \
          ${TGTLib}(shprc1.o) ${TGTLib}(shprc2.o) \
-         ${TGTLib}(shsynt.o) ${TGTLib}(shvar.o)
+         ${TGTLib}(shsynt.o) ${TGTLib}(shvar.o) \
+         ${gca}
 
 ${LibDep} : ${hdrf} ${Hdrs} ${SyntaxModes}
 
@@ -168,6 +179,10 @@ ${IncDir}/scheme_gen.h : ${GenInc}
 hdrf = ${IncDir}/scheme_gen.h
 
 IncAction = @pact generate
+
+IncAction = @pact generate
+
+LibAction = @(cd ${PACTTmpDir} ; echo "bindings" ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${PACTSrcDir}/${LibName}.h\" -f ../../pre-Make devlib)
 
 
 profiler : 

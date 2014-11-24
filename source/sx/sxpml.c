@@ -337,7 +337,7 @@ static object *_SXI_resz_array(SS_psides *si, object *argl)
     arr  = NULL;
     size = 0L;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
             SC_LONG_I, &size,
             0);
 
@@ -378,7 +378,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
     dims = SS_null;
     reg  = SS_null;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
             SS_OBJECT_I, &dims,
             SS_OBJECT_I, &reg,
             0);
@@ -465,7 +465,7 @@ static object *_SXI_array_ref(SS_psides *si, object *argl)
     arr = NULL;
     n   = 0L;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
             SC_LONG_I, &n,
             0);
 
@@ -505,7 +505,7 @@ static object *_SXI_array_set(SS_psides *si, object *argl)
     arr = NULL;
     n   = 0L;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
             SC_LONG_I, &n,
             SS_OBJECT_I, &val,
             0);
@@ -599,7 +599,7 @@ static object *_SXI_array_list(SS_psides *si, object *argl)
 
     arr = NULL;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
             0);
 
     if (arr == NULL)
@@ -687,7 +687,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
     mn   = NULL;
     file = NULL;
     SS_args(si, argl,
-            SX_SET_I, &s,
+            G_SET_I, &s,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -948,13 +948,13 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
     name      = NULL;
     next      = NULL;
     SS_args(si, argl,
-            SX_SET_I, &domain,
-            SX_SET_I, &range,
+            G_SET_I, &domain,
+            G_SET_I, &range,
             SC_ENUM_I, &centering,
             SC_STRING_I, &category,
             SC_STRING_I, &name,
-	    SX_C_ARRAY_I, &arr,
-	    SX_MAPPING_I, &next,
+	    G_C_ARRAY_I, &arr,
+	    G_MAPPING_I, &next,
             0);
 
     if (name == NULL)
@@ -1069,7 +1069,7 @@ static object *_SXI_set_map_type(SS_psides *si, object *argl)
     f    = NULL;
     name = NULL;
     SS_args(si, argl,
-            SX_MAPPING_I, &f,
+            G_MAPPING_I, &f,
             SC_STRING_I, &name,
             0);
 
@@ -1102,7 +1102,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
     mn   = NULL;
     file = NULL;
     SS_args(si, argl,
-            SX_MAPPING_I, &f,
+            G_MAPPING_I, &f,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -1362,7 +1362,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
     f   = NULL;
     ord = BND_CELL_MAX;
     SS_args(si, argl,
-            SX_MAPPING_I, &f,
+            G_MAPPING_I, &f,
             SC_INT_I, &ord,
             0);
 
@@ -1540,7 +1540,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
     file = NULL;
     name = NULL;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -1592,7 +1592,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
     mn   = NULL;
     file = NULL;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -1781,7 +1781,7 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
             SC_STRING_I, &yname,
             SC_STRING_I, &nzname,
             SC_STRING_I, &nnname,
-            SX_C_ARRAY_I, &connct,
+            G_C_ARRAY_I, &connct,
 	    LAST);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -1845,10 +1845,10 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
     indx = NULL;
     pred = NULL;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
             SS_PROCEDURE_I, &pred,
             SC_DOUBLE_I, &val,
-            SX_C_ARRAY_I, &indx,
+            G_C_ARRAY_I, &indx,
             0);
 
     if (pred == NULL)

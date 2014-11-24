@@ -62,10 +62,13 @@ else
       flog $Log set hdr = ${i}_int.h
       flog $Log $RM $hdr
       flog $Log touch $hdr
-      Note $hdr "#include <sx_int.h>"
-      Note $hdr "#define G_STR  256"
-      Note $hdr "struct s_str {int a; double b;};"
-      Note $hdr "typedef struct s_str str;"
+      Note $hdr '#include <sx_int.h>'
+      Note $hdr '#define G_STR_I  256'
+      Note $hdr '#define G_DEFINE_STR(_f)     NULL'
+      Note $hdr 'struct s_str {long n; char *s;};'
+      Note $hdr 'typedef struct s_str str;'
+      Note $hdr "extern void register_${i}_types();"
+      Note $hdr 'extern void *_SX_opt_str(str *x, bind_opt wh, void *a);'
       flog $Log cat $hdr
 
       flog $Log set inf = ( -b $i.bind -c $i.proto )

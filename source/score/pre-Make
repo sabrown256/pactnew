@@ -104,6 +104,12 @@ APIs = ${IncDir}/bfd.api
 #
 # Object Files
 #
+gcs = gc-score.c
+
+gco = gc-score.o
+
+gca = ${TGTLib}(gc-score.o)
+
 DObjs = scmkdp.o scmkpr.o scar.o sctar.o scfcnr.o
 
 EObjs = scexe.o
@@ -130,7 +136,8 @@ Objs = ${EObjs} ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
        scarrd.o scarrs.o \
        schash.o sctree.o sctab.o \
        scstr.o scrsca.o scrscb.o \
-       sclexs.o sctrk.o sclog.o scold.o scf77lr.o
+       sclexs.o sctrk.o sclog.o scold.o scf77lr.o \
+       ${gco}
 
 ArDObjs = ${TGTLib}(scmkdp.o) ${TGTLib}(scmkpr.o) ${TGTLib}(scar.o) \
           ${TGTLib}(sctar.o) ${TGTLib}(scfcnr.o)
@@ -171,7 +178,8 @@ ArObjs = ${ArDObjs} ${ArEObjs} ${ArMObjs} ${ArPObjs} \
          ${TGTLib}(schash.o) ${TGTLib}(sctree.o) ${TGTLib}(sctab.o) \
          ${TGTLib}(scrsca.o) ${TGTLib}(scrscb.o) \
          ${TGTLib}(sctrk.o) ${TGTLib}(sclog.o)   \
-         ${TGTLib}(scold.o) ${TGTLib}(scf77lr.o)
+         ${TGTLib}(scold.o) ${TGTLib}(scf77lr.o) \
+         ${gca}
 
 ${IncDir}/bfd.api : bfd.def
 	@echo "import-api bfd.def -o ${IncDir}/bfd.api"
@@ -235,6 +243,8 @@ hdrf = ${IncDir}/scarg.h ${IncDir}/sctypeg.h \
        ${IncDir}/scfnca.h ${IncDir}/score_gen.h
 
 IncAction = @pact generate
+
+LibAction = @(cd ${PACTTmpDir} ; echo "bindings" ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${PACTSrcDir}/${LibName}.h\" -f ../../pre-Make devlib)
 
 
 #

@@ -227,7 +227,7 @@ static void _PY_append_obj(PyObject *tp, int i, buildsp *sp)
 
     ni = sp->ni;
     if (ni == 0)
-       o = _PY_build_obj(sp, 1);
+       o = _PY_build_obj(sp, 0);
 
     else
        {o = PyTuple_New(ni);

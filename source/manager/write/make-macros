@@ -320,19 +320,20 @@ set psy_cfg = $PSY_Cfg:t
     Note $STDOUT '# language bindings'
     Note $STDOUT ''
 
-    Note $STDOUT 'gfb  = ../fortran/${tmpobj}/gf-${LibName}.c'
-    Note $STDOUT 'gmb  = ../fortran/${tmpobj}/gm-${LibName}.f'
-    Note $STDOUT 'gsb  = ../sx/${tmpobj}/gs-${LibName}.c'
-    Note $STDOUT 'gpb  = ../python/${tmpobj}/gp-${LibName}.c'
+    Note $STDOUT 'gcb = ${tmpobj}/gc-${LibName}.c'
+    Note $STDOUT 'gfb = ../fortran/${tmpobj}/gf-${LibName}.c'
+    Note $STDOUT 'gmb = ../fortran/${tmpobj}/gm-${LibName}.f'
+    Note $STDOUT 'gsb = ../sx/${tmpobj}/gs-${LibName}.c'
+    Note $STDOUT 'gpb = ../python/${tmpobj}/gp-${LibName}.c'
     Note $STDOUT ''
 
 # NOTE: technically this should be all of them but that results in
-# bproto being run 3 times - at least by dmake
-    Note $STDOUT '${gfb} :'
+# bproto being run many times - at least by dmake
+    Note $STDOUT '${gcb} :'
     Note $STDOUT '	@${PSY_ScrDir}/bproto'
     Note $STDOUT ''
 
-    Note $STDOUT 'generate : ${gfb} ${hdrf}'
+    Note $STDOUT 'generate : ${gcb} ${hdrf}'
     Note $STDOUT ''
 
 #--------------------------------------------------------------------------

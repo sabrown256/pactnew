@@ -513,7 +513,6 @@ static void _SX_rl_str(SS_psides *si, object *o)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int SX_STR_I;
 
 object *SX_make_str(SS_psides *si, str *x)
    {object *rv;
@@ -525,7 +524,7 @@ object *SX_make_str(SS_psides *si, str *x)
 
         _SX_opt_str(x, BIND_ALLOC, NULL);
         nm = _SX_opt_str(x, BIND_LABEL, NULL);
-        rv = SS_mk_object(si, x, SX_STR_I, SELF_EV, nm,
+        rv = SS_mk_object(si, x, G_STR_I, SELF_EV, nm,
                           _SX_wr_str, _SX_rl_str);}
 
     return(rv);}
@@ -561,11 +560,11 @@ static int _SX_install_bl6_derived(SS_psides *si)
    {int nerr;
     defstr *dp;
 
+    register_bl6_types();
+
     nerr = 0;
 
-    dp = PD_defstr(SX_gs.vif, "str",
-                   "char *s",
-                   LAST);
+    dp    = G_DEFINE_STR(SX_gs.vif);
     nerr += (dp == NULL);
 
     SS_install(si, "str?",
@@ -573,14 +572,10 @@ static int _SX_install_bl6_derived(SS_psides *si)
                SS_sargs,
                _SXI_strp, SS_PR_PROC);
 
-    SX_STR_I = SC_type_register("str", KIND_STRUCT, sizeof(str),
-              SC_TYPE_FREE, _SX_rl_str,
-              0);
-
-    SS_set_type_method(SX_STR_I,
-		        "C->Scheme", SX_make_str,
-		        "Scheme->C", _SX_arg_str,
-		        NULL);
+    SS_set_type_method(G_STR_I,
+                       "C->Scheme", SX_make_str,
+                       "Scheme->C", _SX_arg_str,
+                       NULL);
 
     return(nerr);}
 

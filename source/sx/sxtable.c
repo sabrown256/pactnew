@@ -696,7 +696,7 @@ static object *SX_wrt_text_table(SS_psides *si, object *argl)
 
     for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
         {SS_args(si, argl,
-		 SX_MAPPING_I, &f,
+		 G_MAPPING_I, &f,
 		 0);
 
          domain = f->domain;
@@ -893,7 +893,7 @@ static object *SX_delete_column(SS_psides *si, object *argl)
 
     else
        {SS_args(si, argl,
-                SX_C_ARRAY_I, &arr,
+                G_C_ARRAY_I, &arr,
 		0);
 
         data = (long *)arr->data;

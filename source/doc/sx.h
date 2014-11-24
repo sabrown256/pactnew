@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 11/14/2014
+MOD: 11/21/2014
 
 <CENTER>
 <P>
@@ -4086,23 +4086,23 @@ They are defined by the SX_object_type enumeration<p>
 <BLOCKQUOTE>
 <TABLE>
 <TR><TD>G_FILE</TD><TD>SX generic file object type</TD></TR>
-<TR><TD>SX_DEFSTR_I</TD><TD>PDB defstr object type</TD></TR>
-<TR><TD>SX_SYMENT_I</TD><TD>PDB syment object type</TD></TR>
+<TR><TD>G_DEFSTR_I</TD><TD>PDB defstr object type</TD></TR>
+<TR><TD>G_SYMENT_I</TD><TD>PDB syment object type</TD></TR>
 <TR><TD>G_PDBDATA</TD><TD>SX pdbdata object type</TD></TR>
-<TR><TD>SX_VARIABLE_I</TD><TD>PANACEA PA_variable object type</TD></TR>
-<TR><TD>SX_PACKAGE_I</TD><TD>PANACEA PA_package object type</TD></TR>
-<TR><TD>SX_SOURCE_VARIABLE_I</TD><TD>PANACEA PA_source_variable object type</TD></TR>
-<TR><TD>SX_IV_SPECIFICATION_I</TD><TD>PANACEA PA_iv_specification object type</TD></TR>
+<TR><TD>G_VARIABLE_I</TD><TD>PANACEA PA_variable object type</TD></TR>
+<TR><TD>G_PACKAGE_I</TD><TD>PANACEA PA_package object type</TD></TR>
+<TR><TD>G_SOURCE_VARIABLE_I</TD><TD>PANACEA PA_source_variable object type</TD></TR>
+<TR><TD>G_IV_SPECIFICATION_I</TD><TD>PANACEA PA_iv_specification object type</TD></TR>
 <TR><TD>G_PLOT_REQUEST</TD><TD>PANACEA PA_plot_request object type</TD></TR>
 <TR><TD>G_PLT_CRV</TD><TD>PGS curve object type</TD></TR>
-<TR><TD>SX_GRAPH_I</TD><TD>PGS PG_graph object type</TD></TR>
-<TR><TD>SX_DEVICE_I</TD><TD>PGS PG_device object type</TD></TR>
-<TR><TD>SX_DEV_ATTRIBUTES_I</TD><TD>PGS PG_dev_attributes object type</TD></TR>
-<TR><TD>SX_C_ARRAY_I</TD><TD>PML C_array object type</TD></TR>
-<TR><TD>SX_MAPPING_I</TD><TD>PML PM_mapping object type</TD></TR>
-<TR><TD>SX_SET_I</TD><TD>PML PM_set object type</TD></TR>
-<TR><TD>SX_IMAGE_I</TD><TD>PGS PG_image object type</TD></TR>
-<TR><TD>SX_INTERFACE_OBJECT_I</TD><TD>PGS PG_interface_object object type</TD></TR>
+<TR><TD>G_GRAPH_I</TD><TD>PGS PG_graph object type</TD></TR>
+<TR><TD>G_DEVICE_I</TD><TD>PGS PG_device object type</TD></TR>
+<TR><TD>G_DEV_ATTRIBUTES_I</TD><TD>PGS PG_dev_attributes object type</TD></TR>
+<TR><TD>G_C_ARRAY_I</TD><TD>PML C_array object type</TD></TR>
+<TR><TD>G_MAPPING_I</TD><TD>PML PM_mapping object type</TD></TR>
+<TR><TD>G_SET_I</TD><TD>PML PM_set object type</TD></TR>
+<TR><TD>G_IMAGE_I</TD><TD>PGS PG_image object type</TD></TR>
+<TR><TD>G_INTERFACE_OBJECT_I</TD><TD>PGS PG_interface_object object type</TD></TR>
 </TABLE>
 </BLOCKQUOTE>
 <P>

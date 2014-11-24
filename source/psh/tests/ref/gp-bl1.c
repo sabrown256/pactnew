@@ -75,7 +75,7 @@ PyObject *_PY_fav4(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fav4();
     _lo = PY_build_object("fav4",
-                          SX_STR_I, 0, &_rv,
+                          G_STR_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -147,7 +147,7 @@ PyObject *_PY_favp4(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = favp4();
     _lo = PY_build_object("favp4",
-                          SX_STR_I, 0, &_rv,
+                          G_STR_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -184,6 +184,8 @@ int PY_add_bl1_enum(PyObject *m)
 
 int PY_init_bl1(PyObject *m, PyObject *d)
    {int nerr;
+
+    register_bl1_types();
 
     nerr = 0;
 

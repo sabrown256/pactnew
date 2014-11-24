@@ -1460,7 +1460,7 @@ static object *_ULI_filter_coef(SS_psides *si, int l, object *argl)
     arr    = NULL;
     ntimes = 1;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
 	    SC_INT_I, &ntimes,
 	    0);
 
@@ -1539,7 +1539,7 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
 	    SS_error(si, bf, SS_null);};
 
         SS_args(si, SS_lk_var_val(si, obj),
-                SX_C_ARRAY_I, &arr,
+                G_C_ARRAY_I, &arr,
 		0);
 
         if (arr == NULL)

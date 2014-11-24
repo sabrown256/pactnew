@@ -117,12 +117,7 @@ static int cl_c(statedes *st, bindes *bd, int c, char **v)
 static void c_emit_types_def(FILE *fc, char **ta, tnc_list *tl)
    {
 
-/* examples:
- *
- *  int SC_HAELEM_I;
- */
-
-    fprintf(fc, "int G_%s_I;\n", tl->rnm);
+    fprintf(fc, "int G_%s_I = -1;\n", tl->rnm);
 
     return;}
 
@@ -136,35 +131,6 @@ static void c_emit_types_hdr(FILE *fh, char **ta, tnc_list *tl)
     char nm[BFSML], ty[BFSML], dm[BFSML];
     char *mbr;
 
-/* examples:
- *
- * typedef struct s_haelem haelem;
- * 
- * struct s_haelem                 
- *    {long iht;
- *     long iar;
- *     char *name;
- *     char *type;
- *     void *def;
- *     int free;
- *     haelem *next;};
- * 
- * #define PD_DEFINE_HAELEM(_f)                                       \
- *    {PD_defstr(_f, "haelem",                                        \
- * 	      "long iht",                                          \
- * 	      "long iar",                                          \
- * 	      "char *name",                                        \
- * 	      "char *type",                                        \
- * 	      "char *def",                                         \
- * 	      "int free",                                          \
- * 	      "haelem *next",                                      \
- * 	      LAST);                                               \
- *     PD_cast(_f, "haelem", "def", "type");}
- * 
- *  extern int SC_HAELEM_I;
- *
- */
-
 /* emit macro to define type to PDB file */
     fprintf(fh, "#define G_DEFINE_%s(_f)\t\\\n", tl->rnm);
     fprintf(fh, "   PD_defstr(_f, \"%s\", \t\\\n", tl->cnm);
@@ -173,7 +139,7 @@ static void c_emit_types_hdr(FILE *fh, char **ta, tnc_list *tl)
         {mbr = trim(ta[i], BOTH, " \t");
          if (IS_NULL(mbr) == FALSE)
 	    {parse_member(mbr, nm, ty, dm, BFSML);
-	     if (is_func_ptr(mbr, 1) == B_T)
+	     if (is_func_ptr(mbr, 7) == B_T)
 	        fprintf(fh, "\t\t\"function %s\",\t\\\n", nm);
 	     else
 	        fprintf(fh, "\t\t\"%s\",\t\\\n", mbr);};};
@@ -254,15 +220,19 @@ static void c_type_reg(FILE **fpa, char *dv, char **ta,
 
 static int bind_c(bindes *bd)
    {int rv;
-    FILE *fc;
+    FILE *fc, *fh;
     statedes *st;
 
     rv = TRUE;
     fc = bd->fp[0];
+    fh = bd->fp[1];
     st = bd->st;
 
 /* make the list of struct objects */
     emit_struct_defs(bd, c_object_defs);
+
+    fprintf(fh, "extern void register_%s_types(void);\n", st->pck);
+    fprintf(fh, "\n");
 
     fprintf(fc, "\n");
     csep(fc);

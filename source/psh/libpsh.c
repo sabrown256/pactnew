@@ -2933,7 +2933,7 @@ int strings_file(char **sa, char *fname, char *mode)
 int file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr)
    {int ne, nx, ev, fd, ost, rv;
     unsigned int i;
-    char t[BFLRG];
+    char t[BFVLG];
     char *p;
 
     rv = FALSE;
@@ -2952,7 +2952,7 @@ int file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr)
 	     else
 	        {ne++;
 		 block_fd(fd, i < nbr);
-		 p  = fgets(t, BFLRG, fp);
+		 p  = fgets(t, BFVLG, fp);
 		 ev = errno;
 		 if (p != NULL)
 		    {ne = 0;

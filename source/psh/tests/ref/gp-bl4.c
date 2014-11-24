@@ -372,7 +372,7 @@ PyObject *_PY_fr2(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fr2(_la1);
     _lo = PY_build_object("fr2",
-                          SC_CHAR_I, 0, &_rv,
+                          SC_STRING_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -633,7 +633,7 @@ PyObject *_PY_fr13(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fr13(_la1);
     _lo = PY_build_object("fr13",
-                          SX_STR_I, 0, &_rv,
+                          G_STR_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -691,7 +691,7 @@ PyObject *_PY_fp2(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fp2(_la1);
     _lo = PY_build_object("fp2",
-                          SC_CHAR_I, 0, &_rv,
+                          SC_STRING_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -952,7 +952,7 @@ PyObject *_PY_fp13(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fp13(_la1);
     _lo = PY_build_object("fp13",
-                          SX_STR_I, 0, &_rv,
+                          G_STR_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -972,6 +972,8 @@ int PY_add_bl4_enum(PyObject *m)
 
 int PY_init_bl4(PyObject *m, PyObject *d)
    {int nerr;
+
+    register_bl4_types();
 
     nerr = 0;
 

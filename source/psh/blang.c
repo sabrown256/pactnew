@@ -340,19 +340,18 @@ static pboolean is_ptr(char *type)
 /* IS_FUNC_PTR - return TRUE if TYPE is a function pointer */
 
 static pboolean is_func_ptr(char *type, int wh)
-   {pboolean rv, syn, cnv;
+   {pboolean rv;
 
-    syn = (strstr(type, "(*") != NULL);
-    cnv = (strncmp(type, "PF", 2) == 0);
+    rv  = B_F;
 
-    if ((wh & 1) && (syn == TRUE))
-       rv = B_T;
+    if ((rv == B_F) && (wh & 1))
+       rv |= (strstr(type, "(*") != NULL);
 
-    else if ((wh & 2) && (cnv == TRUE))
-       rv = B_T;
+    if ((rv == B_F) && (wh & 2))
+       rv |= (strncmp(type, "PF", 2) == 0);
 
-    else
-       rv = B_F;
+    if ((rv == B_F) && (wh & 4))
+       rv |= (strstr(type, "PG_event_handler") != NULL);
 
     return(rv);}
 
@@ -1467,7 +1466,7 @@ static char *map_name(char *d, int nc, char *cf, char *lf,
 
 static void find_bind(statedes *st, int iref)
    {int i, ib, id, nb, nc, ne, ns, nbi;
-    char t[BFLRG], ps[BFLRG];
+    char t[BFVLG], ps[BFLRG];
     char *sb, *lng, *te, *p;
     char **cpr, **cdv, **sbi, **sa, **ta;
     fdecl *dcl;
@@ -1485,7 +1484,7 @@ static void find_bind(statedes *st, int iref)
        {for (ib = 0; ib < nbi; ib++)
 	    {sb = sbi[ib];
 	     if (blank_line(sb) == FALSE)
-	        {nstrncpy(t, BFLRG, sb, -1);
+	        {nstrncpy(t, BFVLG, sb, -1);
 		 sa = tokenize(t, " \t", 0);
 
 		 if ((sa != NULL) &&
@@ -1530,7 +1529,7 @@ static void find_bind(statedes *st, int iref)
 		 for (id = 0; cdv[id] != NULL; id++)
 		     {sb = cdv[id];
 		      if (blank_line(sb) == FALSE)
-			 {nstrncpy(t, BFLRG, sb, -1);
+			 {nstrncpy(t, BFVLG, sb, -1);
 			  ta = tokenize(t, " \t", 0);
 			  if (strcmp(ta[1]+2, te) == 0)
 			     {el = push_derived(el, &ne, sb, ta);
@@ -1554,7 +1553,7 @@ static void find_bind(statedes *st, int iref)
 		 for (id = 0; cdv[id] != NULL; id++)
 		     {sb = cdv[id];
 		      if (blank_line(sb) == FALSE)
-			 {nstrncpy(t, BFLRG, sb, -1);
+			 {nstrncpy(t, BFVLG, sb, -1);
 			  ta = tokenize(t, "{;}", 0);
 			  if (strncmp(ta[0]+9, te, nc) == 0)
 			     {sl = push_derived(sl, &ns, sb, ta);

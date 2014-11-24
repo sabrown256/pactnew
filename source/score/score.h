@@ -13,6 +13,7 @@
 #include "cpyright.h"
 #include "scstd.h"
 #include "score_old.h"
+#include "score_gen.h"
 #include "scope_hash.h"
 #include "scope_typeh.h"
 #include "scope_io.h"

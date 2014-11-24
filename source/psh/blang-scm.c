@@ -62,7 +62,7 @@ static void scheme_get_type(char *a, int nc, char *ty, char *tx)
 
     else if (strcmp(ty, tykind[TK_STRUCT]) == 0)
        {scheme_type_name_list(tx, &tl);
-	snprintf(a, nc, "SX_%s_I", tl.rnm);}
+	snprintf(a, nc, "G_%s_I", tl.rnm);}
 
     else
        nstrncpy(a, nc, ty, -1);
@@ -551,7 +551,7 @@ static void scheme_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
 
 /* emit type check predicate macro */
     fprintf(fh, "#undef SX_%sP\n", tl.rnm);
-    fprintf(fh, "#define SX_%sP(_o)   (SS_OBJECT_TYPE(_o) == SX_%s_I)\n",
+    fprintf(fh, "#define SX_%sP(_o)   (SS_OBJECT_TYPE(_o) == G_%s_I)\n",
 	    tl.rnm, tl.rnm);
     fprintf(fh, "\n");
 
@@ -585,9 +585,6 @@ static void scheme_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
     fprintf(fh, "\n");
 
 /* emit external declarations */
-    fprintf(fh, "extern int SX_%s_I;\n", tl.rnm);
-    fprintf(fh, "\n");
-
     fprintf(fh, "extern object *SX_make_%s(SS_psides *si, %s *x);\n",
 	    tl.lnm, tl.cnm);
     fprintf(fh, "\n");
@@ -602,28 +599,12 @@ static void scheme_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
  */
 
 static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
-   {int i;
-    char *p, *mbr;
-    tns_list tl;
+   {tns_list tl;
 
     scheme_type_name_list(ta[0]+9, &tl);
 
 /* emit registration with the SX VIF */
-    fprintf(fc, "    dp = PD_defstr(SX_gs.vif, \"%s\",\n", tl.cnm);
-
-    for (i = 2; ta[i] != NULL; i++)
-        {mbr = trim(ta[i], BOTH, " \t");
-	 if (IS_NULL(mbr) == FALSE)
-
-/* function pointer */
-	    {p = strstr(mbr, "(*");
-	     if (p != NULL)
-	        fprintf(fc, "                   \"function %s\",\n",
-			strtok(p+2, ")"));
-	     else
-	        fprintf(fc, "                   \"%s\",\n", mbr);};};
-
-    fprintf(fc, "                   LAST);\n");
+    fprintf(fc, "    dp    = G_DEFINE_%s(SX_gs.vif);\n", tl.rnm);
     fprintf(fc, "    nerr += (dp == NULL);\n");
     fprintf(fc, "\n");
 
@@ -633,26 +614,10 @@ static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     fprintf(fc, "               _SXI_%sp, SS_PR_PROC);\n", tl.lnm);
     fprintf(fc, "\n");
 
-/* emit registration with the SCORE type system */
-    fprintf(fc, "    SX_%s_I = SC_type_register(\"%s\", KIND_STRUCT, sizeof(%s),\n", tl.rnm, tl.cnm, tl.cnm);
-    fprintf(fc, "              SC_TYPE_FREE, _SX_rl_%s,\n", tl.lnm);
-    fprintf(fc, "              0);\n");
-    fprintf(fc, "\n");
-
-    fprintf(fc, "    SS_set_type_method(SX_%s_I,\n", tl.rnm);
-    fprintf(fc, "		        \"C->Scheme\", SX_make_%s,\n", tl.lnm);
-    fprintf(fc, "		        \"Scheme->C\", _SX_arg_%s,\n", tl.lnm);
-    fprintf(fc, "		        NULL);\n");
-
-#if 0
-    fprintf(fc, "    ty    = _SC_get_type_id(SX_%s_I);\n", tl.rnm);
-    fprintf(fc, "    alst  = ty->a;\n");
-    fprintf(fc, "    alst  = SC_add_alist(alst, \"C->Scheme\", \"%s\", SX_make_%s);\n",
-	    tl.unm, tl.lnm);
-    fprintf(fc, "    alst  = SC_add_alist(alst, \"Scheme->C\", \"%s\", _SX_arg_%s);\n",
-	    tl.unm, tl.lnm);
-    fprintf(fc, "    ty->a = alst;\n");
-#endif
+    fprintf(fc, "    SS_set_type_method(G_%s_I,\n", tl.rnm);
+    fprintf(fc, "                       \"C->Scheme\", SX_make_%s,\n", tl.lnm);
+    fprintf(fc, "                       \"Scheme->C\", _SX_arg_%s,\n", tl.lnm);
+    fprintf(fc, "                       NULL);\n");
     fprintf(fc, "\n");
 
     return;}
@@ -669,14 +634,6 @@ static void scheme_struct_defs(FILE **fpa, char *dv, char **ta,
     fc = fpa[0];
     fh = fpa[1];
 
-/* syntax:
- *    PD_defstr(SX_vif, <Sname>,
- *              "<Mtype1> <Mname1>",
- *                    ...
- *              "<Mtypen> <Mnamen>",
- *              LAST);
- */
-
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
 	   {csep(fc);
@@ -686,6 +643,8 @@ static void scheme_struct_defs(FILE **fpa, char *dv, char **ta,
 	    fprintf(fc, "   {int nerr;\n");
 	    if (ni > 0)
 	       fprintf(fc, "    defstr *dp;\n");
+	    fprintf(fc, "\n");
+	    fprintf(fc, "    register_%s_types();\n", pck);
 	    fprintf(fc, "\n");
 	    fprintf(fc, "    nerr = 0;\n");
 	    fprintf(fc, "\n");}
@@ -763,8 +722,6 @@ static void scheme_object_defs(FILE **fpa, char *dv, char **ta,
 	fprintf(fc, "\n");
 
 /* emit the object instantiation method */
-	fprintf(fc, "int SX_%s_I;\n", tl.rnm);
-
 	fprintf(fc, "\n");
 	fprintf(fc, "object *SX_make_%s(SS_psides *si, %s *x)\n",
 		tl.lnm, tl.cnm);
@@ -782,7 +739,7 @@ static void scheme_object_defs(FILE **fpa, char *dv, char **ta,
 		tl.cnm);
 	fprintf(fc, "        nm = _SX_opt_%s(x, BIND_LABEL, NULL);\n",
 		tl.cnm);
-	fprintf(fc, "        rv = SS_mk_object(si, x, SX_%s_I, SELF_EV, nm,\n",
+	fprintf(fc, "        rv = SS_mk_object(si, x, G_%s_I, SELF_EV, nm,\n",
 		tl.rnm);
 	fprintf(fc, "                          _SX_wr_%s, _SX_rl_%s);}\n",
 		tl.lnm, tl.lnm);
