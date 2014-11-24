@@ -322,7 +322,6 @@ PyObject *PP_mem_lookup(PyObject *self, PyObject *args, PyObject *kwds)
 	rv     = PY_build_object("mem_lookup",
 				 SC_STRING_I, 0, &result,
 				 0);};
-/*	rv     = Py_BuildValue("s", result);}; */
 
     return(rv);}
 
@@ -533,7 +532,22 @@ PyObject *PP_pause(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 
-PY_DEF_EXTRACTOR(hasharr);
+/* _PY_OPT_HAELEM - handle BLANG binding related operations */
+
+void *_PY_opt_haelem(haelem *x, bind_opt wh, void *a)
+   {void *rv;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+        case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_FREE :
+        case BIND_ALLOC :
+	default:
+	     break;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

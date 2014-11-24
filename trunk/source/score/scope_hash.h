@@ -45,6 +45,11 @@ typedef long (*PFKeyHash)(void *s, int size);         /* hash */
 typedef struct s_haelem haelem;
 typedef struct s_hasharr hasharr;
 
+/*
+ * #bind struct haelem
+ *
+ */
+
 struct s_haelem                 
    {long iht;                /* index of hash bucket */
     long iar;                /* index into array */
@@ -55,15 +60,7 @@ struct s_haelem
     haelem *next;};          /* next haelem in linked list */
 
 #define PD_DEFINE_HAELEM(_f)                                       \
-   {PD_defstr(_f, "haelem",                                        \
-	      "long iht",                                          \
-	      "long iar",                                          \
-	      "char *name",                                        \
-	      "char *type",                                        \
-	      "char *def",                                         \
-	      "int free",                                          \
-	      "haelem *next",                                      \
-	      LAST);                                               \
+   {G_DEFINE_HAELEM(_f);                                           \
     PD_cast(_f, "haelem", "def", "type");}
 
 /*
@@ -85,19 +82,6 @@ struct s_hasharr
     char *key_type;          /* type of the key used: name or address */
     haelem **table;          /* size worth of buckets of haelem pointers */
     SC_array *a;};
-
-#define PD_DEFINE_HASHARRAY(_f)                                    \
-    PD_defstr(_f, "hasharr",                                       \
-	      "int size",                                          \
-	      "int docp",                                          \
-	      "int memfl",                                         \
-	      "long ne",                                           \
-	      "function hash",                                     \
-	      "function comp",                                     \
-	      "char *key_type",                                    \
-	      "haelem **table",                                    \
-	      "SC_array *a",                                       \
-	      LAST)
 
 /*--------------------------------------------------------------------------*/
 

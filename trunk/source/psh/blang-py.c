@@ -540,6 +540,13 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     csep(fc);
     fprintf(fc, "\n");
 
+    fprintf(fc, "PY_DEF_EXTRACTOR(%s);\n", tl.cnm);
+
+    fprintf(fc, "\n");
+    csep(fc);
+    csep(fc);
+    fprintf(fc, "\n");
+
 /* object check routine */
     fprintf(fc, "int %s_check(PyObject *op)\n", tl.pnm);
     fprintf(fc, "   {int rv;\n");

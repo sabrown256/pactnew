@@ -194,8 +194,15 @@ static PyObject *_PY_build_obj(buildsp *sp, int i)
 		   {void *p;
 
 		    p = ((void **) vr)[i];
-
-		    rv = PY_COBJ_VOID_PTR(p, NULL);}
+#if 0
+		    if (p == Py_None)
+		       rv = p;
+		    else
+		       rv = PY_COBJ_VOID_PTR(p, NULL);
+#else
+		    rv = p;
+#endif
+		    }
 
 		else if (SC_is_type_char(ity) == TRUE)
 		   PyErr_SetString(PyExc_NotImplementedError,
@@ -649,7 +656,6 @@ PyObject *PP_dimdes_to_obj(dimdes *dims)
         rv = PyTuple_New(nd);
         nd = 0;
         for (next = dims; next != NULL; next = next->next) {
-/*            dimobj = Py_BuildValue("ii", next->index_min, next->index_max); */
 	    dimobj = PY_build_object("dimdes_to_obj",
 				     SC_LONG_I, 0, &next->index_min,
 				     SC_LONG_I, 0, &next->index_max,

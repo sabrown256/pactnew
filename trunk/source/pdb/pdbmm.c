@@ -947,30 +947,39 @@ memdes *PD_copy_members(memdes *desc)
 memdes *_PD_mk_descriptor(char *member, int defoff)
    {int ie;
     char bf[MAXLINE];
-    char *ms, *ts, *bs, *ns, *p, *fp;
+    char *ms, *ts, *bs, *ns, *p;
     memdes *desc;
     dimdes *nd;
 
     desc = CMAKE(memdes);
 
 /* get rid of any leading white space */
-    for (p = member; strchr(" \t\n\r\f", *p) != NULL; p++);
+    p = SC_trim_left(member, " \t\n\r\f");
 
-    fp = SC_strstr(p, "(*");
-    if (fp == NULL)
-       {ms = CSTRSAVE(p);
-	ts = _PD_member_type(p);
-	bs = _PD_member_base_type(p);
-	ns = _PD_member_name(p);
-	nd = _PD_ex_dims(p, defoff, &ie);}
+/* convert 'void *' to 'char *'
+ * GOTCHA: this should be eliminated by accepting and properly
+ * treating 'void *' because if you convert char types you
+ * cannot confuse them with blobs
+ */
+    if ((strncmp(p, "void ", 5) == 0) && (p[5] == '*'))
+       {SC_strncpy(bf, MAXLINE, p, -1);
+	p = PS_subst(bf, "void", "char", 1);};
 
-    else
+/* look for function pointer */
+    if (SC_strstr(p, "(*") != NULL)
        {ts = CSTRSAVE("function");
 	bs = CSTRSAVE("function");
 	ns = _PD_member_name(p);
 	nd = NULL;
 	snprintf(bf, MAXLINE, "function %s", ns);
-	ms = CSTRSAVE(bf);};
+	ms = CSTRSAVE(bf);}
+
+    else
+       {ms = CSTRSAVE(p);
+	ts = _PD_member_type(p);
+	bs = _PD_member_base_type(p);
+	ns = _PD_member_name(p);
+	nd = _PD_ex_dims(p, defoff, &ie);};
 	
     desc->member      = ms;
     desc->type        = ts;

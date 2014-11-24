@@ -21,6 +21,36 @@ typedef int (*PDBFileRead)(PDBfile *fp, char *path, char *ty,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_OPT_HAELEM - handle BLANG binding related operations */
+
+void *_SX_opt_haelem(haelem *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+             if (SS_nullobjp(o))
+                rv = NULL;
+	     else if (SX_HAELEMP(o))
+	        rv = SS_GET(haelem, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_ALLOC :
+        case BIND_FREE :
+        default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SX_OPT_HASHARR - handle BLANG binding related operations */
 
 void *_SX_opt_hasharr(hasharr *x, bind_opt wh, void *a)

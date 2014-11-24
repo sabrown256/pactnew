@@ -463,7 +463,7 @@ int PD_def_hash_types(PDBfile *file ARG(,,cls), int flag)
 
     if (flag & 0x2)
        {PD_DEFINE_SMART_ARRAY(file);
-	PD_DEFINE_HASHARRAY(file);};
+	G_DEFINE_HASHARR(file);};
 
     return(err);}
 

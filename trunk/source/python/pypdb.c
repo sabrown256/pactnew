@@ -231,11 +231,6 @@ PyObject *PP_unpack(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------*/
 
-PY_DEF_EXTRACTOR(defstr);
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PY_OPT_DEFSTR - handle BLANG binding related operations */
 
 void *_PY_opt_defstr(defstr *x, bind_opt wh, void *a)
@@ -1109,11 +1104,6 @@ PY_DEF_TYPE(defstr);
 
 /*                               MEMDES ROUTINES                            */
 
-/*--------------------------------------------------------------------------*/
-
-PY_DEF_EXTRACTOR(memdes);
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PY_OPT_MEMDES - handle BLANG binding related operations */

@@ -364,6 +364,7 @@ extern int
  _SX_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr);
 
 extern void
+ *_SX_opt_haelem(haelem *x, bind_opt wh, void *a),
  *_SX_opt_hasharr(hasharr *x, bind_opt wh, void *a),
  *_SX_opt_PDBfile(PDBfile *x, bind_opt wh, void *a),
  *_SX_opt_syment(syment *x, bind_opt wh, void *a),
