@@ -76,7 +76,8 @@ int PY_ ## _t ## _extractor(PyObject *obj, void *arg)                        \
 
 /* PY_DEF_TYPE - handle the boiler plate defining a new Python type
  *             - example:
- *             -    PY_DEF_TYPE(PM_mapping, "mapping")
+ *             -    PY_DEF_TYPE_R(PM_mapping, "mapping")
+ *             -    PY_DEF_TYPE(PDBfile)
  */
 
 #ifndef PY_DEF_DESTRUCTOR
@@ -325,6 +326,7 @@ extern PyObject
 /* PYSCORE.C declarations */
 
 extern void
+ *_PY_opt_haelem(haelem *x, bind_opt wh, void *a),
  *_PY_opt_hasharr(hasharr *x, bind_opt wh, void *a);
 
 extern PyObject

@@ -135,7 +135,6 @@ PyObject *PP_iso_limit(PyObject *self, PyObject *args, PyObject *kwds)
 			     SC_DOUBLE_I, 0, &min,
 			     SC_DOUBLE_I, 0, &max,
 			     0);};
-/*	rv = Py_BuildValue("ff", min, max);}; */
 
    return(rv);}
 
@@ -143,11 +142,6 @@ PyObject *PP_iso_limit(PyObject *self, PyObject *args, PyObject *kwds)
 
 /*                             PG_PALETTE ROUTINES                          */
 
-/*--------------------------------------------------------------------------*/
-
-PY_DEF_EXTRACTOR(PG_palette);
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PY_OPT_PG_PALETTE - handle BLANG binding related operations */
@@ -197,11 +191,6 @@ PY_DEF_TYPE_R(PG_palette, "palette");
 
 /*                              PG_IMAGE ROUTINES                           */
 
-/*--------------------------------------------------------------------------*/
-
-PY_DEF_EXTRACTOR(PG_image);
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PY_OPT_PG_IMAGE - handle BLANG binding related operations */
@@ -347,11 +336,6 @@ PY_DEF_TYPE_R(PG_image, "image");
 
 /*                               PG_GRAPH ROUTINES                          */
 
-/*--------------------------------------------------------------------------*/
-
-PY_DEF_EXTRACTOR(PG_graph);
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PY_OPT_PG_GRAPH - handle BLANG binding related operations */
@@ -530,8 +514,6 @@ PY_DEF_TYPE_R(PG_graph, "graph");
 
 /*--------------------------------------------------------------------------*/
 
-PY_DEF_EXTRACTOR(PG_device);
-
 static char
  PY_PG_device_set_font_doc[] = "",
  PY_PG_device_set_viewport_doc[] = "",
@@ -674,7 +656,6 @@ static PyObject *PY_PG_device_get_text_ext(PY_PG_device *self,
 			     SC_DOUBLE_I, 0, &x[0],
 			     SC_DOUBLE_I, 0, &x[1],
 			     0);};
-/*	rv = Py_BuildValue("ff", x[0], x[1]);}; */
 
     return(rv);}
 

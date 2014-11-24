@@ -15,6 +15,36 @@ typedef int (*PF_int_dd)(double, double);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_OPT_PCONS - handle BLANG binding related operations */
+
+void *_SX_opt_pcons(pcons *x, bind_opt wh, void *a)
+   {void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o = (object *) a;
+             if (SS_nullobjp(o))
+                rv = NULL;
+	     else if (SX_PCONSP(o))
+	        rv = SS_GET(pcons, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_ALLOC :
+        case BIND_FREE :
+        default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SX_OPT_C_ARRAY - handle BLANG binding related operations */
 
 void *_SX_opt_C_array(C_array *x, bind_opt wh, void *a)
@@ -54,36 +84,6 @@ void *_SX_opt_C_array(C_array *x, bind_opt wh, void *a)
  */
 	     break;
 
-        default:
-	     break;};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_OPT_PCONS - handle BLANG binding related operations */
-
-void *_SX_opt_pcons(pcons *x, bind_opt wh, void *a)
-   {void *rv;
-    object *o;
-
-    rv = NULL;
-    switch (wh)
-       {case BIND_ARG :
-	     o = (object *) a;
-             if (SS_nullobjp(o))
-                rv = NULL;
-	     else if (SX_PCONSP(o))
-	        rv = SS_GET(pcons, o);
-	     else
-	        rv = _SX.unresolved;
-	     break;
-
-	case BIND_LABEL :
-        case BIND_PRINT :
-        case BIND_ALLOC :
-        case BIND_FREE :
         default:
 	     break;};
 

@@ -24,11 +24,6 @@ static char
 
 /*--------------------------------------------------------------------------*/
 
-PY_DEF_EXTRACTOR(PDBfile);
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PY_OPT_PDBFILE - handle BLANG binding related operations */
 
 void *_PY_opt_PDBfile(PDBfile *x, bind_opt wh, void *a)
@@ -447,7 +442,8 @@ static PyObject *PY_PDBfile_ls(PY_PDBfile *self,
 
 static PyObject *PY_PDBfile_get_obj_descr(PY_PDBfile *self,
 					  PyObject *args, PyObject *kwds)
-   {void *obj, *dim, *rv;
+   {int tc, bpi;
+    void *obj, *dim, *rv;
     PP_descr *descr;
     char *kw_list[] = {"obj", NULL};
 
@@ -470,8 +466,15 @@ static PyObject *PY_PDBfile_get_obj_descr(PY_PDBfile *self,
 	    else
 	       dim = PP_dimdes_to_obj(descr->dims);
 
-	    rv = Py_BuildValue("iisO", (int) descr->typecode, descr->bpi,
-			       descr->type, dim);
+	    tc  = descr->typecode;
+	    bpi = descr->bpi;
+
+	    rv = PY_build_object("get_obj_descr",
+				 SC_INT_I, 0, &tc,
+				 SC_INT_I, 0, &bpi,
+				 SC_STRING_I, 0, &descr->type,
+				 SC_POINTER_I, 0, &dim,
+				 0);
 
 	    _PP_rl_descr(descr);};};
 

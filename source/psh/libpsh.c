@@ -1190,7 +1190,7 @@ char *strstri(char *string1, char *string2)
 char *subst(char *s, char *a, char *b, size_t n)
    {size_t i, o, nc;
     char *p, *pr, *ps, *pa, *pb, *r;
-    static char bfa[1024*BFLRG], bfb[1024*BFLRG];
+    static char bfa[4*BFMG], bfb[4*BFMG];
 
     if (s == bfa)
        {pa = bfb;
@@ -1202,7 +1202,7 @@ char *subst(char *s, char *a, char *b, size_t n)
     ps = pa;
 	
     if ((s != NULL) && (IS_NULL(a) == FALSE) && (b != NULL))
-       {nc = 1024*BFLRG;
+       {nc = 4*BFMG;
 
 /* make sure s is not bfa to avoid buffer overlap errors */
 	nstrncpy(ps, nc, s, -1);
