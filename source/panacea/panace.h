@@ -564,7 +564,7 @@ struct s_PA_command
     PFPanHand handler;};
 
 
-/* PA_SET_SPEC is PD_DEFSTR'd in PA_DEF_STR in PANACEA.C
+/* PA_SET_SPEC is PD_DEFSTR'd in PA_DEF_STR in PASHAS.C
  * so any changes here must be reflected there
  */
 
@@ -576,7 +576,7 @@ struct s_PA_set_spec
     double *values;
     PA_set_spec *next;};
 
-/* PA_PLOT_REQUEST is PD_DEFSTR'd in PA_DEF_STR in PANACEA.C
+/* PA_PLOT_REQUEST is PD_DEFSTR'd in PA_DEF_STR in PASHAS.C
  * so any changes here must be reflected there
  */
 
@@ -714,7 +714,7 @@ struct s_PA_thread_state
    int ic;                          /* cache file index */
    char cache_fname[MAXLINE];};     /* cache file name */
 
-/* IV_SPECIFICATION is PD_DEFSTR'd in PA_DEF_STR in PANACEA.C
+/* IV_SPECIFICATION is PD_DEFSTR'd in PA_DEF_STR in PASHAS.C
  * so any changes here must be reflected there
  *
  * #bind struct PA_iv_specification
@@ -746,7 +746,7 @@ struct s_PA_unit_spec
     PA_unit_spec *next;};
 
 /* SET_INDEX - aid to selecting elements out of PM_sets
- *           - this is PD_defstr'd in PANACEA.C changes must be reflected there!!!
+ *           - this is PD_defstr'd in PASHAS.C changes must be reflected there!!!
  */
 
 struct s_PA_set_index

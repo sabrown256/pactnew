@@ -9,6 +9,7 @@
 #include "cpyright.h"
 
 #include "pdb_int.h"
+#include "pgs_gen.h"
 
 #define PG_SPACEDM 3
 
@@ -405,7 +406,7 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
        {PD_error("COULDN'T MAXLINE DIMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
         return(FALSE);};
 
-    dp = PD_DEFINE_MEMDES(file);
+    dp = G_DEFINE_MEMDES(file);
     if (dp == NULL)
        {PD_error("COULDN'T DEFINE MEMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
         return(FALSE);};
@@ -415,7 +416,7 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
        {PD_error("COULDN'T DEFINE SYMINDIR - PD_DEF_PDB_TYPES", PD_GENERIC);
         return(FALSE);};
 
-    dp = PD_DEFINE_SYMENT(file);
+    dp = G_DEFINE_SYMENT(file);
     if (dp == NULL)
        {PD_error("COULDN'T DEFINE SYMENT - PD_DEF_PDB_TYPES", PD_GENERIC);
         return(FALSE);};
@@ -435,7 +436,7 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
        {PD_error("COULDN'T DEFINE FPDES - PD_DEF_PDB_TYPES", PD_GENERIC);
         return(FALSE);};
 
-    dp = PD_DEFINE_DEFSTR(file);
+    dp = G_DEFINE_DEFSTR(file);
     if (dp == NULL)
        {PD_error("COULDN'T DEFINE DEFSTR - PD_DEF_PDB_TYPES", PD_GENERIC);
         return(FALSE);};
@@ -1172,7 +1173,6 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     defstr *ret;
 
     ONCE_SAFE(TRUE, NULL)
-
        SC_PCONS_P_S         = CSTRDUP("pcons *", 3);
        PM_SET_S             = CSTRDUP("PM_set", 3);
        PM_SET_P_S           = CSTRDUP("PM_set *", 3);
@@ -1181,6 +1181,8 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
        PM_MAPPING_S         = CSTRDUP("PM_mapping", 3);
     END_SAFE;
 
+    err = TRUE;
+
 /* define the SC_array */
     PD_DEFINE_SMART_ARRAY(fp);
 
@@ -1188,14 +1190,10 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     PD_DEFINE_DYNAMIC_ARRAY(fp);
 
 /* define the pcons */
-    ret = PD_defstr(fp, "pcons",
-		    "char *car_type",
-		    "char *car",
-		    "char *cdr_type",
-		    "char *cdr",
-                    LAST);
-
-    err = (ret != NULL);
+    ret = G_DEFINE_PCONS(fp);
+    err &= (ret != NULL);
+    err &= PD_cast(fp, "pcons", "car", "car_type");
+    err &= PD_cast(fp, "pcons", "cdr", "cdr_type");
 
 /* define the PG_image */
     ret = PD_defstr(fp, "PG_image",
@@ -1217,6 +1215,7 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
                     LAST);
 
     err &= (ret != NULL);
+    err &= PD_cast(fp, "PG_image", "buffer", "element_type");
 
 /* define the PM_set and PM_mapping */
     ret = PD_defstr(fp, "PM_set",
@@ -1242,36 +1241,6 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
 		    LAST);
 
     err &= (ret != NULL);
-
-/* define the PM_mesh_topology */
-    ret = PD_defstr(fp, "PM_mesh_topology",
-		    "int n_dimensions",
-		    "int *n_bound_params",
-		    "int *n_cells",
-		    "long **boundaries",
-                    LAST);
-
-/* define the PM_mapping */
-    ret = PD_defstr(fp, "PM_mapping",
-		    "char *name",
-		    "char *category",
-		    "PM_set *domain",
-		    "PM_set *range",
-		    "char *map_type",
-		    "char *map",
-		    "int file_type",
-		    "char *file_info",
-		    "char *file",
-		    "PM_mapping *next",
-		    LAST);
-
-    err &= (ret != NULL);
-
-/* set up the casts for pcons type */
-    err &= PD_cast(fp, "pcons", "car", "car_type");
-    err &= PD_cast(fp, "pcons", "cdr", "cdr_type");
-
-/* set up the casts for PM_set type */
     err &= PD_cast(fp, "PM_set", "elements", "element_type");
     err &= PD_cast(fp, "PM_set", "extrema", "es_type");
     err &= PD_cast(fp, "PM_set", "scales", "es_type");
@@ -1279,12 +1248,15 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     err &= PD_cast(fp, "PM_set", "topology", "topology_type");
     err &= PD_cast(fp, "PM_set", "info", "info_type");
 
-/* set up the casts for PM_mapping type */
+/* define the PM_mesh_topology */
+    ret = G_DEFINE_MESH_TOPOLOGY(fp);
+    err &= (ret != NULL);
+
+/* define the PM_mapping */
+    ret = G_DEFINE_MAPPING(fp);
+    err &= (ret != NULL);
     err &= PD_cast(fp, "PM_mapping", "map", "map_type");
     err &= PD_cast(fp, "PM_mapping", "file", "file_info");
-
-/* set up the casts for PD_image/PG_image type */
-    err &= PD_cast(fp, "PG_image", "buffer", "element_type");
 
     return(err);}
 

@@ -128,6 +128,43 @@ static object *_SX_list_vobjects(SS_psides *si, char *patt,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_OPT_GENERIC - handle BLANG binding related operations
+ *                 - for a generic object if there is no
+ *                 - specific method for its type
+ */
+
+void *_SX_opt_generic(void *x, bind_opt wh, void *a)
+   {int ity;
+    void *rv;
+    object *o;
+
+    rv = NULL;
+    switch (wh)
+       {case BIND_ARG :
+	     o   = (object *) a;
+	     ity = SS_OBJECT_TYPE(o);
+             if (SS_nullobjp(o))
+                rv = NULL;
+
+/* GOTCHA: figure out reasonable limits here */
+	     else if ((0 < ity) && (ity < 100))
+	        rv = SS_GET(void, o);
+	     else
+	        rv = _SX.unresolved;
+	     break;
+
+	case BIND_LABEL :
+        case BIND_PRINT :
+        case BIND_ALLOC :
+        case BIND_FREE :
+        default:
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SXI_MENU - print a menu of images, curves, and graphs */
 
 object *_SXI_menu(SS_psides *si, object *argl)

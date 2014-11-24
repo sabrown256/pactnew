@@ -239,6 +239,7 @@ extern object
 
 extern void
  _SX_args(SS_psides *si, object *obj, void *v, int type),
+ *_SX_opt_generic(void *x, bind_opt wh, void *a),
  _SX_get_menu(SS_psides *si, g_file *po),
  _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type);
 

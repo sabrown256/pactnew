@@ -327,12 +327,7 @@ void PA_def_str(PDBfile *pdrs)
               "double imaginary",
               LAST);
 
-    PD_defstr(pdrs, "C_array",
-              "char *type",
-              "long length",
-              "char *data",
-              LAST);
-
+    G_DEFINE_C_ARRAY(pdrs);
     PD_cast(pdrs, "C_array", "data", "type");
 
     PD_defstr(pdrs, "PM_matrix",
@@ -343,17 +338,7 @@ void PA_def_str(PDBfile *pdrs)
 
 /* define PANACEA types */
 
-    PD_defstr(pdrs, "PA_iv_specification",
-              "int type",
-              "char *name",
-              "char *file",
-              "int num",
-              "int index",
-              "int interpolate",
-              "char *spec",           /* this is a fudge, spec will be NULL */
-              "double *data",
-              "PA_iv_specification *next",
-              LAST);
+    G_DEFINE_IV_SPECIFICATION(pdrs);
 
     PD_defstr(pdrs, "PA_set_spec",
               "char *var_name",
