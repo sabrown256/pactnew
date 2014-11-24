@@ -957,6 +957,7 @@ memdes *_PD_mk_descriptor(char *member, int defoff)
     p = SC_trim_left(member, " \t\n\r\f");
 
 /* convert 'void *' to 'char *'
+ * also 'unsigned <type>' to 'u_<type>'
  * GOTCHA: this should be eliminated by accepting and properly
  * treating 'void *' because if you convert char types you
  * cannot confuse them with blobs
@@ -964,6 +965,10 @@ memdes *_PD_mk_descriptor(char *member, int defoff)
     if ((strncmp(p, "void ", 5) == 0) && (p[5] == '*'))
        {SC_strncpy(bf, MAXLINE, p, -1);
 	p = PS_subst(bf, "void", "char", 1);};
+
+    if (strncmp(p, "unsigned ", 9) == 0)
+       {SC_strncpy(bf, MAXLINE, p, -1);
+	p = PS_subst(bf, "unsigned ", "u_", 1);};
 
 /* look for function pointer */
     if (SC_strstr(p, "(*") != NULL)

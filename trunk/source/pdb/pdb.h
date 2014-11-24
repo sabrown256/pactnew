@@ -689,23 +689,6 @@ struct s_memdes
 
 FUNCTION_POINTER(memdes, *(*PFPmemdes));
 
-#define PD_DEFINE_MEMDES(_f)              \
-    PD_defstr(_f, "memdes",               \
-              "char *member",             \
-              "int64_t member_offs",      \
-              "char *cast_memb",          \
-              "long cast_offs",           \
-              "char **size_memb",         \
-              "int64_t *size_offs",       \
-              "int is_indirect",          \
-              "char *type",               \
-              "char *base_type",          \
-              "char *name",               \
-              "dimdes *dimensions",       \
-              "long number",              \
-              "memdes *next",             \
-              LAST) 
-
 /* symbol table entry indirects */
 struct s_symindir
    {int64_t addr;
@@ -732,16 +715,6 @@ struct s_syment
     symindir indirects;
     SC_array *blocks;};
 
-#define PD_DEFINE_SYMENT(_f)               \
-    PD_defstr(_f, "syment",                \
-              "char *type",                \
-              "dimdes *dimensions",        \
-              "long number",               \
-              "long foreign",              \
-              "symindir indirects",        \
-              "SC_array *blocks",          \
-              LAST)
-
 /* structure chart entry
  *
  * #bind struct defstr
@@ -762,24 +735,6 @@ struct s_defstr
     fpdes fp;
     memdes *members;
     multides *tuple;};
-
-#define PD_DEFINE_DEFSTR(_f)       \
-    PD_defstr(_f, "defstr",        \
-              "char *type",        \
-              "enum kind",         \
-              "long size_bits",    \
-              "long size",         \
-              "int alignment",     \
-              "int n_indirects",   \
-              "int is_indirect",   \
-              "int convert",       \
-              "int onescmp",       \
-              "int unsgned",       \
-              "fixdes fix",        \
-              "fpdes fp",          \
-              "memdes *member",    \
-              "multides *tuple",   \
-              LAST)
 
 /* indirect reference tag */
 struct s_PD_itag

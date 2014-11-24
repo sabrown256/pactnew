@@ -342,7 +342,6 @@ struct s_PM_sp_lin_sys
 
 
 /* C_ARRAY - define an encapulated vector/array type
- *         - PD_defstr'd in PANACE.C - changes must be reflected there!!!
  *         - NOTE: the TYPE member is used for a PD_cast and as such must be
  *         - "T *" if the data is of type T
  *

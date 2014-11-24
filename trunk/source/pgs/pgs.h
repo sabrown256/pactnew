@@ -1030,9 +1030,7 @@ struct s_PG_device
    
 /*--------------------------------------------------------------------------*/
 
-/* PG_IMAGE is PD_defstr'd in PDBX.C any changes here must be reflected
- * there!!
- *
+/*
  * #bind struct PG_image
  */
 
