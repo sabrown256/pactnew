@@ -4,5 +4,5 @@
 # include "cpyright.h"
 #
 
-struct s_str {int nc; char *s;};
+struct s_str {long n; char *s;};
 

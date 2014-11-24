@@ -35,7 +35,7 @@ PyObject *_PY_fe1(PY_str *self, PyObject *args, PyObject *kwds)
 
     _rv = fe1(_la1, _la2);
     _lo = PY_build_object("fe1",
-                          SX_STR_I, 0, &_rv,
+                          G_STR_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -93,6 +93,8 @@ int PY_add_bl3_enum(PyObject *m)
 
 int PY_init_bl3(PyObject *m, PyObject *d)
    {int nerr;
+
+    register_bl3_types();
 
     nerr = 0;
 

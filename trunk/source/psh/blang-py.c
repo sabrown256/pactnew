@@ -485,7 +485,7 @@ static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
 
 /* if member is pointer to a known bound type */
          else if (python_lookup_bound_type(bty) == TRUE)
-	    {if (nind > 0)
+	    {if ((nind > 0) && (is_func_ptr(pm, 7) == 0))
 	        {fprintf(fc, "       {int ok;\n");
 		 fprintf(fc, "\n");
 		 fprintf(fc, "        ok = PY_%s_extractor(value, self->pyo->%s);\n",
@@ -711,6 +711,8 @@ static void python_object_defs(FILE **fpa, char *dv, char **ta,
 	    fprintf(fc, "\n");
 	    fprintf(fc, "int PY_init_%s(PyObject *m, PyObject *d)\n", pck);
 	    fprintf(fc, "   {int nerr;\n");
+	    fprintf(fc, "\n");
+	    fprintf(fc, "    register_%s_types();\n", pck);
 	    fprintf(fc, "\n");
 	    fprintf(fc, "    nerr = 0;\n");
 	    fprintf(fc, "\n");}
@@ -1075,6 +1077,9 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 	    py_arg(arg, BFLRG, a);
 
 #if 1
+	    if (strcmp(dty, "SC_CHAR_I") == 0)
+	       nstrncpy(dty, BFLRG, "SC_STRING_I", -1);
+
 	    nm = dcl->proto.name;
 	    snprintf(t, nc, "    _lo = PY_build_object(\"%s\",\n", nm);
 	    vstrcat(t, nc, "                          %s, 0, &%s,\n",

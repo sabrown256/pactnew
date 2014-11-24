@@ -91,7 +91,7 @@ static object *_SX_desc_pan_variable(SS_psides *si, object *obj)
 
     pp = NULL;
     SS_args(si, obj,
-            SX_VARIABLE_I, &pp,
+            G_VARIABLE_I, &pp,
             0);
 
     if (pp == NULL)
@@ -214,7 +214,7 @@ static object *_SX_desc_pan_package(SS_psides *si, object *obj)
 
     pck = NULL;
     SS_args(si, obj,
-            SX_PACKAGE_I, &pck,
+            G_PACKAGE_I, &pck,
             0);
 
     if (pck == NULL)

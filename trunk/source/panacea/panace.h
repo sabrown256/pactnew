@@ -15,6 +15,7 @@
 #include "pdb.h"
 #include "scope_dp.h"
 #include "pgs.h"
+#include "panacea_gen.h"
     
 /*--------------------------------------------------------------------------*/
 

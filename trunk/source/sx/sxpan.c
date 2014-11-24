@@ -214,7 +214,7 @@ static object *_SXI_run_package(SS_psides *si, object *argl)
     object *numdt, *zondt, *o;
 
     SS_args(si, argl,
-            SX_PACKAGE_I, &pck,
+            G_PACKAGE_I, &pck,
             SC_DOUBLE_I, &t,
             SC_DOUBLE_I, &dt,
             SC_INT_I, &cycle,

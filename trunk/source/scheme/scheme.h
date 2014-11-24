@@ -20,6 +20,7 @@
 
 #include "pml.h"
 #include "scope_quaternion.h"
+#include "scheme_gen.h"
 
 #define LARGE
 

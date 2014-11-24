@@ -14,6 +14,7 @@
 
 #include "pml.h"
 #include "pdb_old.h"
+#include "pdb_gen.h"
 #include "scope_dl.h"
 
 /* PDBLib History:

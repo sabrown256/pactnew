@@ -245,7 +245,7 @@ object *SX_mk_mapping_proc(int i)
     s[0] = SX_gs.dataset[i].id;
     s[1] = '\0';
     
-    j = _SX_mapping_id(s[0]);
+    j = _G_MAPPING_Id(s[0]);
 
     obj = SX_get_curve_obj(j);
 
@@ -263,9 +263,9 @@ object *SX_mk_mapping_proc(int i)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_SET_ID - change the data-id of the given mapping */
+/* G_SET_ID - change the data-id of the given mapping */
 
-object *SX_set_id(SS_psides *si, object *argl)
+object *G_SET_Id(SS_psides *si, object *argl)
    {int iold;
     object *o;
 
@@ -381,11 +381,11 @@ object *SX_xindex_mapping(int j)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_MAPPING_ID - given the mapping character return
+/* _G_MAPPING_ID - given the mapping character return
  *                - the mapping name identifier
  */
 
-char *_SX_mapping_id(int c)
+char *_G_MAPPING_Id(int c)
    {char *rv;
 
     rv = NULL;
@@ -402,17 +402,17 @@ char *_SX_mapping_id(int c)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_MAPPING_ID - given the mapping object return the
+/* G_MAPPING_ID - given the mapping object return the
  *               - mapping name identifier
  */
 
-char *SX_mapping_id(object *c)
+char *G_MAPPING_Id(object *c)
    {char *rv;
 
     rv = NULL;
 
 #if 0
-    rv = _SX_mapping_id(*SX_get_string(c));
+    rv = _G_MAPPING_Id(*SX_get_string(c));
 #endif
 
     return(rv);}

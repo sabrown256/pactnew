@@ -245,7 +245,7 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
     po   = NULL;
     name = NULL;
     SS_args(si, argl,
-            SX_GRAPH_I, &g,
+            G_GRAPH_I, &g,
             G_FILE, &po,
             SC_STRING_I, &name,
             0);
@@ -669,7 +669,7 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
     po   = NULL;
     file = NULL;
     SS_args(si, argl,
-            SX_MAPPING_I, &f,
+            G_MAPPING_I, &f,
             G_FILE, &po,
             0);
 
@@ -720,7 +720,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
     file = NULL;
     strm = NULL;
     SS_args(si, argl,
-            SX_IMAGE_I, &f,
+            G_IMAGE_I, &f,
             G_FILE, &file,
             0);
 
@@ -863,7 +863,7 @@ static object *_SXI_device_props(SS_psides *si, object *argl)
     rv  = SS_null;
     dev = NULL;
     SS_args(si, argl,
-            SX_DEVICE_I, &dev,
+            G_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -1037,7 +1037,7 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
     xf  = yf  = 0.0;
     dxf = dyf = 0.0;
     SS_args(si, argl,
-            SX_DEVICE_I, &dev,
+            G_DEVICE_I, &dev,
             SC_DOUBLE_I, &xf,
             SC_DOUBLE_I, &yf,
             SC_DOUBLE_I, &dxf,
@@ -1154,14 +1154,14 @@ static object *_SXI_make_pgs_graph(SS_psides *si, object *argl)
        _SX.igg = 'A';
 
     SS_args(si, argl,
-            SX_SET_I, &domain,
-            SX_SET_I, &range,
+            G_SET_I, &domain,
+            G_SET_I, &range,
             SC_STRING_I, &name,
             SC_ENUM_I, &centering,
             SC_INT_I, &color,
             SC_DOUBLE_I, &width,
             SC_INT_I, &style,
-	    SX_C_ARRAY_I, &arr,
+	    G_C_ARRAY_I, &arr,
             0);
 
     if (centering == U_CENT)
@@ -1661,7 +1661,7 @@ static object *_SXI_make_image(SS_psides *si, object *argl)
 
     arr = NULL;
     SS_args(si, argl,
-            SX_C_ARRAY_I, &arr,
+            G_C_ARRAY_I, &arr,
             SC_INT_I, &w,
             SC_INT_I, &h,
             SC_STRING_I, &name,
@@ -1718,8 +1718,8 @@ static object *_SXI_build_image(SS_psides *si, object *argl)
     dev = NULL;
     arr = NULL;
     SS_args(si, argl,
-            SX_DEVICE_I, &dev,
-            SX_C_ARRAY_I, &arr,
+            G_DEVICE_I, &dev,
+            G_C_ARRAY_I, &arr,
             SC_INT_I, &w,
             SC_INT_I, &h,
             SC_STRING_I, &name,
@@ -1771,8 +1771,8 @@ static object *_SXI_draw_image(SS_psides *si, object *argl)
     vp    = FALSE;
 
     SS_args(si, argl,
-            SX_DEVICE_I, &dev,
-            SX_IMAGE_I, &image,
+            G_DEVICE_I, &dev,
+            G_IMAGE_I, &image,
             SC_DOUBLE_I, &xmn,
             SC_DOUBLE_I, &xmx,
             SC_DOUBLE_I, &ymn,
@@ -1829,7 +1829,7 @@ pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
 	obj = SS_null;
 	SS_assign(si, obj, SX_list_array(si, val));
 	SS_args(si, obj,
-		SX_C_ARRAY_I, &arr,
+		G_C_ARRAY_I, &arr,
 		0);
 
 	SC_strncpy(dtype, MAXLINE, type, -1);
@@ -1890,7 +1890,7 @@ static object *_SXI_set_attr_graph(SS_psides *si, object *argl)
     type = NULL;
     val  = SS_null;
     SS_args(si, argl,
-            SX_GRAPH_I, &g,
+            G_GRAPH_I, &g,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
             SS_OBJECT_I, &val,
@@ -2369,9 +2369,9 @@ static object *_SXI_get_label(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_SET_INFO - get/set information in the PM_set object given */
+/* _G_SET_INFO - get/set information in the PM_set object given */
 
-static object *_SX_set_info(SS_psides *si, object *obj,
+static object *_G_SET_Info(SS_psides *si, object *obj,
 			    char *name, object *val)
    {long v;
     char *t;
@@ -2456,7 +2456,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "next") == 0)
        {u = s->next;
 	if (val != NULL)
-	   {SS_args(si, val, SX_SET_I, &u);
+	   {SS_args(si, val, G_SET_I, &u);
 	    s->next = u;};
 
 	ret = SX_make_pm_set(si, u);};
@@ -2498,7 +2498,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "domain") == 0)
        {s = f->domain;
 	if (val != NULL)
-	   {SS_args(si, val, SX_SET_I, &s);
+	   {SS_args(si, val, G_SET_I, &s);
 	    f->domain = s;};
 
 	ret = SX_make_pm_set(si, s);}
@@ -2506,7 +2506,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "range") == 0)
        {s = f->range;
 	if (val != NULL)
-	   {SS_args(si, val, SX_SET_I, &s);
+	   {SS_args(si, val, G_SET_I, &s);
 	    f->range = s;};
 
 	ret = SX_make_pm_set(si, s);}
@@ -2514,7 +2514,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "next") == 0)
        {g = f->next;
 	if (val != NULL)
-	   {SS_args(si, val, SX_MAPPING_I, &g);
+	   {SS_args(si, val, G_MAPPING_I, &g);
 	    f->next = g;};
 
 	ret = SX_make_pm_mapping(si, f);}
@@ -2540,7 +2540,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_GRAPH_INFO - get/set information in the PG_graph object given */
+/* _G_GRAPH_INFO - get/set information in the PG_graph object given */
 
 static object *_SX_graph_info(SS_psides *si, object *obj,
 			      char *name, object *val)
@@ -2582,7 +2582,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "next") == 0)
        {h = g->next;
 	if (val != NULL)
-           {SS_args(si, val, SX_GRAPH_I, &h);
+           {SS_args(si, val, G_GRAPH_I, &h);
 	    g->next = h;};
 
 	ret = SX_make_pg_graph(si, h);}
@@ -2590,7 +2590,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "f") == 0)
        {f = g->f;
 	if (val != NULL)
-	   {SS_args(si, val, SX_MAPPING_I, &f);
+	   {SS_args(si, val, G_MAPPING_I, &f);
 	    g->f = f;};
 
 	ret = SX_make_pm_mapping(si, f);}
@@ -2616,7 +2616,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_IMAGE_INFO - get/set information in the PG_image object given */
+/* _G_IMAGE_INFO - get/set information in the PG_image object given */
 
 static object *_SX_image_info(SS_psides *si, object *obj,
 			      char *name, object *val)
@@ -2757,7 +2757,7 @@ static object *_SXI_drawable_info(SS_psides *si, object *argl)
             0);
 
     if (SX_SETP(obj))
-       ret = _SX_set_info(si, obj, name, val);
+       ret = _G_SET_Info(si, obj, name, val);
 
     else if (SX_MAPPINGP(obj))
        ret = _SX_map_info(si, obj, name, val);

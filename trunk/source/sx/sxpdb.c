@@ -1528,10 +1528,10 @@ static object *_SXI_pdb_to_list(SS_psides *si, object *arg)
     g_pdbdata *pp;
 
     ity = SS_OBJECT_TYPE(arg);
-    if (ity == SX_SYMENT_I)
+    if (ity == G_SYMENT_I)
        obj = _SX_syment_to_list(si, SS_GET(syment, arg));
 
-    else if (ity == SX_DEFSTR_I)
+    else if (ity == G_DEFSTR_I)
        obj = _SX_defstr_to_list(si, SS_GET(defstr, arg));
 
     else if (ity == G_MEMDES)
@@ -2165,7 +2165,7 @@ static object *_SXI_write_defstr(SS_psides *si, object *argl)
     dp = NULL;
     SS_args(si, argl,
             G_FILE, &po,
-            SX_DEFSTR_I, &dp,
+            G_DEFSTR_I, &dp,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -3186,8 +3186,8 @@ static object *_SXI_wrt_ultra_curve(SS_psides *si, object *argl)
     yarr = NULL;
     SS_args(si, argl,
             G_FILE, &po,
-            SX_C_ARRAY_I, &xarr,
-            SX_C_ARRAY_I, &yarr,
+            G_C_ARRAY_I, &xarr,
+            G_C_ARRAY_I, &yarr,
             SC_STRING_I, &labl,
             SC_INT_I, &npts,
             0);
@@ -3262,10 +3262,10 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
 	argl = SS_null;};
 
     ity = SS_OBJECT_TYPE(obj);
-    if (ity == SX_SYMENT_I)
+    if (ity == G_SYMENT_I)
        PD_write_syment(f0, SS_GET(syment, obj));
 
-    else if (ity == SX_DEFSTR_I)
+    else if (ity == G_DEFSTR_I)
        PD_write_defstr(f0, SS_GET(defstr, obj));
 
     else if (ity == G_PDBDATA)
@@ -3273,7 +3273,7 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
 	iarr = NULL;
 	SS_args(si, argl,
 		SC_INT_I, &_SC.types.max_digits,
-		SX_C_ARRAY_I, &iarr,
+		G_C_ARRAY_I, &iarr,
 		0);
 
 	n   = 0;

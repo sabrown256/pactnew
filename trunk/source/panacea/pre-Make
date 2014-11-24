@@ -76,12 +76,18 @@ Hdrs = ${TGTInc} ${hdrf}
 #
 # Object Files
 #
+gcs = gc-panacea.c
+
+gco = gc-panacea.o
+
+gca = ${TGTLib}(gc-panacea.o)
+
 GenObjs = pagnrd.o pahand.o pafi.o
-PanObjs = padsys.o pamm.o panacea.o paccess.o pashar.o pashas.o pastr.o pavars.o \
- 	  padef.o pacpp.o papkg.o pasmp.o
+PanObjs = padsys.o pamm.o panacea.o paccess.o pashar.o pashas.o \
+          pastr.o pavars.o padef.o pacpp.o papkg.o pasmp.o
 PPObjs  = papp.o padump.o panth.o
 SorObjs = pasrc.o
-Objs    = ${GenObjs} ${SorObjs} ${PanObjs} ${PPObjs}
+Objs    = ${GenObjs} ${SorObjs} ${PanObjs} ${PPObjs} ${gco}
 
 ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
 	 ${TGTLib}(pagnrd.o) ${TGTLib}(pahand.o) ${TGTLib}(pafi.o)     \
@@ -89,8 +95,8 @@ ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
          ${TGTLib}(paccess.o) ${TGTLib}(padsys.o) ${TGTLib}(pamm.o)    \
          ${TGTLib}(pavars.o) ${TGTLib}(papp.o) ${TGTLib}(padump.o)     \
          ${TGTLib}(pasrc.o) ${TGTLib}(pastr.o)                         \
-         ${TGTLib}(pasmp.o)                                            \
-         ${TGTLib}(panth.o)
+         ${TGTLib}(pasmp.o) ${TGTLib}(panth.o) \
+         ${gca}
 
 ${LibDep} : ${hdrf} ${Hdrs}
 
@@ -112,6 +118,9 @@ ${IncDir}/panacea_gen.h : ${GenInc}
 hdrf = ${IncDir}/pasrc.h ${IncDir}/panacea_gen.h
 
 IncAction = @pact generate
+
+LibAction = @(cd ${PACTTmpDir} ; echo "bindings" ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${PACTSrcDir}/${LibName}.h\" -f ../../pre-Make devlib)
+
 
 #
 # preprocessing test

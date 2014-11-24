@@ -15,6 +15,7 @@
 #define PGS_TOL 1.0e-10
 
 #include "pdb.h"
+#include "pgs_gen.h"
 
 #ifndef PACT_INCLUDES
 

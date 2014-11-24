@@ -14,6 +14,7 @@
 
 #include "score.h"
 #include "scope_constants.h"
+#include "pml_gen.h"
 
 #define TOLERANCE             1.0e-10
 #define PM_SPACEDM            3         /* maximum spatial dimension */

@@ -74,6 +74,12 @@ Hdrs = pml.h pml_int.h scope_constants.h scope_complex.h scope_quaternion.h
 #
 # Object Files
 #
+gcs = gc-pml.c
+
+gco = gc-pml.o
+
+gca = ${TGTLib}(gc-pml.o)
+
 Objs = mlconst.o mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o      \
        mlrfnc.o mlcfnc.o mlsfnc.o mlqfnc.o                        \
        mlsolv.o mlsvd.o mlvnd.o mleigen.o                         \
@@ -81,7 +87,8 @@ Objs = mlconst.o mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o      \
        mlfft.o mllsq.o mlfpe.o mloper.o mlgeom.o mlsort.o mlmm.o  \
        mlintm.o mlintp.o mlints.o                                 \
        mlchksm.o mlmesh.o mlmsrch.o mlcmsh.o mlmextr.o            \
-       mlvect.o mlsmp.o 
+       mlvect.o mlsmp.o \
+       ${gco}
 
 ArObjs = ${TGTLib}(mlconst.o) ${TGTLib}(mlmath.o)                       \
          ${TGTLib}(mlrfnc.o)  ${TGTLib}(mlcfnc.o)                       \
@@ -95,7 +102,8 @@ ArObjs = ${TGTLib}(mlconst.o) ${TGTLib}(mlmath.o)                       \
 	 ${TGTLib}(mlgeom.o)  ${TGTLib}(mlrand.o)  ${TGTLib}(mlmm.o)    \
          ${TGTLib}(mlmesh.o)  ${TGTLib}(mlmsrch.o) ${TGTLib}(mlcmsh.o)  \
          ${TGTLib}(mlmextr.o) ${TGTLib}(mlchksm.o)                      \
-         ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)
+         ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o) \
+         ${gca}
 
 ${LibDep} : ${hdrf} ${Hdrs}
 
@@ -120,9 +128,7 @@ hdrf = ${IncDir}/mlsrch.h ${IncDir}/pml_gen.h
 
 IncAction = @pact generate
 
-
-# extra commands needed when building TGTLib
-LibAction = pact patch-fpe
+LibAction = @(echo "pact patch-fpe" ; pact patch-fpe ; cd ${PACTTmpDir} ; echo "bindings" ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${PACTSrcDir}/${LibName}.h\" -f ../../pre-Make devlib)
 
 #
 # verify C++ compiles

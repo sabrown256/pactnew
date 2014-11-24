@@ -93,16 +93,6 @@ Hdrs = ${TGTInc} ${hdrf} ${IncDir}/sx_gen.h
 #
 # Object Files
 #
-ObjsA = sxhook.o sxmm.o sxmode.o sxgc.o sxhand.o sxfunc.o sxhbo.o
-ObjsB = sxpdb.o sxpdba.o sxpdbr.o sxpdbc.o sxpdbd.o sxpdbf.o sxpdbl.o
-ObjsC = sxpan.o sxpanw.o
-ObjsD = sxgri.o sxpgs.o sxpgsp.o sxgrot.o
-ObjsE = sxpml.o sxpmlg.o
-ObjsU = ulcmd.o ulfunc.o ulauxf.o ulhand.o ulcntl.o
-ObjsY = sxshar.o
-ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
-Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ} ${ObjsU}
-
 gss = gs-score.c gs-pml.c gs-pdb.c   \
       gs-pgs.c gs-panacea.c \
       gs-scheme.c
@@ -114,6 +104,17 @@ gso = gs-score.o gs-pml.o gs-pdb.o   \
 gsa = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
       ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
       ${TGTLib}(gs-scheme.o)
+
+ObjsA = sxhook.o sxmm.o sxmode.o sxgc.o sxhand.o sxfunc.o sxhbo.o
+ObjsB = sxpdb.o sxpdba.o sxpdbr.o sxpdbc.o sxpdbd.o sxpdbf.o sxpdbl.o
+ObjsC = sxpan.o sxpanw.o
+ObjsD = sxgri.o sxpgs.o sxpgsp.o sxgrot.o
+ObjsE = sxpml.o sxpmlg.o
+ObjsU = ulcmd.o ulfunc.o ulauxf.o ulhand.o ulcntl.o
+ObjsY = sxshar.o
+ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
+Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ} \
+       ${ObjsU} ${gso}
 
 ArObjsU = ${TGTLib}(ulcmd.o) ${TGTLib}(ulfunc.o) ${TGTLib}(ulauxf.o) \
  	  ${TGTLib}(ulhand.o) ${TGTLib}(ulcntl.o)

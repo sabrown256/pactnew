@@ -649,6 +649,8 @@ int PY_add_bl6_enum(PyObject *m)
 int PY_init_bl6(PyObject *m, PyObject *d)
    {int nerr;
 
+    register_bl6_types();
+
     nerr = 0;
 
     PY_str_type.tp_new   = PyType_GenericNew;
@@ -700,11 +702,11 @@ static PyObject *PY_str_get(PY_str *self, void *context)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static PyObject *PY_str_get_nc(PY_str *self, void *context)
+static PyObject *PY_str_get_n(PY_str *self, void *context)
    {PyObject *rv;
 
-    rv = PY_build_object("nc",
-                         SC_INT_I, 0, &self->pyo->nc,
+    rv = PY_build_object("n",
+                         SC_LONG_I, 0, &self->pyo->n,
                          0);
 
     return(rv);}
@@ -724,7 +726,7 @@ static PyObject *PY_str_get_s(PY_str *self, void *context)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static int PY_str_set_nc(PY_str *self,
+static int PY_str_set_n(PY_str *self,
                    PyObject *value, void *context)
    {int rv;
 
@@ -740,7 +742,7 @@ static int PY_str_set_nc(PY_str *self,
 
         ok = PyArg_Parse(value, "l", &lv);
         if (ok == TRUE)
-           {self->pyo->nc = lv;
+           {self->pyo->n = lv;
             rv = 0;};};
 
     return(rv);}
@@ -781,7 +783,7 @@ static int PY_str_tp_init(PY_str *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 
 static char
- PY_str_doc_nc[] = "",
+ PY_str_doc_n[] = "",
  PY_str_doc_s[] = "",
  PY_str_doc[] = "";
 
@@ -790,7 +792,7 @@ static char
 
 PyGetSetDef PY_str_getset[] = {
     {"str", (getter) PY_str_get, NULL, PY_str_doc, NULL},
-    {"nc", (getter) PY_str_get_nc, (setter) PY_str_set_nc, PY_str_doc_nc, NULL},
+    {"n", (getter) PY_str_get_n, (setter) PY_str_set_n, PY_str_doc_n, NULL},
     {"s", (getter) PY_str_get_s, (setter) PY_str_set_s, PY_str_doc_s, NULL},
 #ifdef PY_EXT_GETSET_STR
     PY_EXT_GETSET_STR
