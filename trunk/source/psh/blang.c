@@ -46,10 +46,17 @@ typedef enum e_fdir fdir;
 typedef struct s_str_list str_list;
 typedef struct s_statedes statedes;
 typedef struct s_bindes bindes;
+typedef struct s_typdes typdes;
 typedef struct s_der_list der_list;
 typedef struct s_idecl idecl;
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
+
+struct s_typdes
+   {char *c;
+    char *f;
+    char *gen;
+    char *defv;};
 
 struct s_str_list
    {int n;
@@ -360,7 +367,7 @@ static pboolean is_func_ptr(char *type, int wh)
 
 /* ADD_TYPE - add a type to the map */
 
-static void add_type(int iref, char *cty, char *fty, char *sty, char *defv)
+static void add_type(int iref, char *cty, char *fty, char *gty, char *defv)
    {int i, j;
 
     i = iref;
@@ -376,7 +383,38 @@ static void add_type(int iref, char *cty, char *fty, char *sty, char *defv)
 
 /* add types for remaining modes */
     for (; i < nbd; i++)
-        str_lst_add(&gbd[i].types, sty);
+        str_lst_add(&gbd[i].types, gty);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ADD_TYPE - add a type to the map */
+
+static void add_type_(int iref, typdes *td)
+   {int i, j;
+    char *cty, *fty, *gty, *defv;
+
+    cty  = td->c;
+    fty  = td->f;
+    gty  = td->gen;
+    defv = td->defv;
+
+    i = iref;
+
+/* add types for C mode */
+    str_lst_add(&gbd[i].st->defv, defv);
+    str_lst_add(&gbd[i].types, cty);
+    i++;
+
+/* add types for 2 Fortran modes - modules and wrappers */
+    for (j = 0; j < 2; j++)
+        str_lst_add(&gbd[i++].types, fty);
+
+/* add types for remaining modes */
+    for (; i < nbd; i++)
+        str_lst_add(&gbd[i].types, gty);
 
     return;}
 
@@ -516,7 +554,8 @@ static void init_types(int iref)
 static void add_derived_types(int iref, char **sbi)
    {int ib;
     char s[BFLRG];
-    char *fty, *sty, *defv, *sb, **ta;
+    char *sb, **ta;
+    typdes td;
 
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
@@ -524,26 +563,29 @@ static void add_derived_types(int iref, char **sbi)
 	    {if (strncmp(sb, "derived ", 8) == 0)
 		{nstrncpy(s, BFLRG, sb, -1);
 		 ta   = tokenize(s, " \t", 0);
-		 fty  = ta[2];
-		 sty  = ta[3];
-		 defv = ta[4];}
+		 td.c    = ta[1];
+		 td.f    = ta[2];
+		 td.gen  = ta[3];
+		 td.defv = ta[4];}
 	     else if (strncmp(sb, "enum ", 5) == 0)
 	        {nstrncpy(s, BFLRG, sb, -1);
 		 ta   = tokenize(s, " \t", 0);
-		 fty  = "integer";
-		 sty  = tykind[TK_ENUM];
-		 defv = ta[2];}
+		 td.c    = ta[1];
+		 td.f    = "integer";
+		 td.gen  = tykind[TK_ENUM];
+		 td.defv = ta[2];}
 	     else if (strncmp(sb, "struct ", 7) == 0)
 	        {nstrncpy(s, BFLRG, sb, -1);
 		 ta   = tokenize(s, " \t", 0);
-		 fty  = tykind[TK_STRUCT];
-		 sty  = tykind[TK_STRUCT];
-		 defv = NULL;}
+		 td.c    = ta[1];
+		 td.f    = tykind[TK_STRUCT];
+		 td.gen  = tykind[TK_STRUCT];
+		 td.defv = NULL;}
 	     else
 	        ta = NULL;
 	
 	     if (ta != NULL)
-	        {add_type(iref, ta[1], fty, sty, defv);
+	        {add_type_(iref, &td);
 		 FREE(ta[0]);
 		 FREE(ta);};};};
 

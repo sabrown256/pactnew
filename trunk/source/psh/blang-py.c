@@ -13,12 +13,13 @@ typedef struct s_tnp_list tnp_list;
 
 struct s_tnp_list
    {char cnm[BFSML];        /* C struct name, PM_set */
+    char lnm[BFSML];        /* lower case version of CNM, pm_set */
+    char unm[BFSML];        /* upper case version of CNM, PM_SET */
+    char rnm[BFSML];        /* root struct id, SET */
+
     char pnm[BFSML];        /* Python struct name, PY_PM_set */
     char tnm[BFSML];        /* Python type name, PY_PM_set_type */
-    char rnm[BFSML];        /* root struct id, SET */
-    char inm[BFSML];        /* default instance id, set */
-    char lnm[BFSML];        /* lower case version of CNM, pm_set */
-    char unm[BFSML];};      /* upper case version of CNM, PM_SET */
+    char inm[BFSML];};      /* default instance id, set */
 
 static char
  **_py_bound_types = NULL;
@@ -34,30 +35,15 @@ static int
 static void python_type_name_list(char *typ, tnp_list *na)
    {char *p;
 
-/* get C struct name */
-    p = trim(typ, BOTH, " \t");
-    nstrncpy(na->cnm, BFSML, p, -1);
+    c_type_name_list(typ, (tnc_list *) na);
 
-/* upper case C name */
-    nstrncpy(na->unm, BFSML, p, -1);
-    upcase(na->unm);
-
-/* lower case C name */
-    nstrncpy(na->lnm, BFSML, p, -1);
-    downcase(na->lnm);
+    p = na->cnm;
 
 /* make the Python name */
     snprintf(na->pnm, BFSML, "PY_%s", p);
 
 /* make the Python type name */
     snprintf(na->tnm, BFSML, "PY_%s_type", p);
-
-/* get root struct name */
-    if (p[2] == '_')
-       nstrncpy(na->rnm, BFSML, p+3, -1);
-    else
-       nstrncpy(na->rnm, BFSML, p, -1);
-    upcase(na->rnm);
 
 /* get default instance name */
     nstrncpy(na->inm, BFSML, na->rnm, -1);
