@@ -9,9 +9,9 @@ typedef struct s_tnc_list tnc_list;
 
 struct s_tnc_list
    {char cnm[BFSML];        /* C struct name, PM_set */
-    char rnm[BFSML];        /* root struct id, SET */
     char lnm[BFSML];        /* lower case version of CNM, pm_set */
-    char unm[BFSML];};      /* upper case version of CNM, PM_SET */
+    char unm[BFSML];        /* upper case version of CNM, PM_SET */
+    char rnm[BFSML];};      /* root struct id, SET */
 
 int
  MODE_C = -1;

@@ -9,10 +9,11 @@ typedef struct s_tns_list tns_list;
 
 struct s_tns_list
    {char cnm[BFSML];        /* C struct name, PM_set */
-    char snm[BFSML];        /* Scheme struct name, pm-set */
-    char rnm[BFSML];        /* root struct id, SET */
     char lnm[BFSML];        /* lower case version of CNM, pm_set */
-    char unm[BFSML];};      /* upper case version of CNM, PM_SET */
+    char unm[BFSML];        /* upper case version of CNM, PM_SET */
+    char rnm[BFSML];        /* root struct id, SET */
+
+    char snm[BFSML];};      /* Scheme struct name, pm-set */
 
 static int
  MODE_S = -1;
@@ -23,29 +24,12 @@ static int
 /* SCHEME_TYPE_NAME_LIST - make canonical variations of type name TYP */
 
 static void scheme_type_name_list(char *typ, tns_list *na)
-   {char *p;
+   {
 
-/* get C struct name */
-    p = trim(typ, BOTH, " \t");
-    nstrncpy(na->cnm, BFSML, p, -1);
-
-/* upper case C name */
-    nstrncpy(na->unm, BFSML, p, -1);
-    upcase(na->unm);
-
-/* lower case C name */
-    nstrncpy(na->lnm, BFSML, p, -1);
-    downcase(na->lnm);
+    c_type_name_list(typ, (tnc_list *) na);
 
 /* make the Scheme name */
     nstrncpy(na->snm, BFSML, subst(na->lnm, "_", "-", -1), -1);
-
-/* get root struct name */
-    if (p[2] == '_')
-       nstrncpy(na->rnm, BFSML, p+3, -1);
-    else
-       nstrncpy(na->rnm, BFSML, p, -1);
-    upcase(na->rnm);
 
     return;}
 
