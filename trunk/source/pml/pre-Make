@@ -128,7 +128,7 @@ hdrf = ${IncDir}/mlsrch.h ${IncDir}/pml_gen.h
 
 IncAction = @pact generate
 
-LibAction = @(echo "pact patch-fpe" ; pact patch-fpe ; cd ${PACTTmpDir} ; echo "bindings" ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${PACTSrcDir}/${LibName}.h\" -f ../../pre-Make devlib)
+LibAction = @(echo "pact patch-fpe" ; pact patch-fpe )
 
 #
 # verify C++ compiles

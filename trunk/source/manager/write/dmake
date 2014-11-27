@@ -57,6 +57,7 @@ dbmget $WLog CROSS_COMPILE^               \
 # clean - therefore do both separately
        flog $WLog $MAKE -i -na 1 clean
        flog $WLog $MAKE -i -na 1 remove
+       flog $WLog $MAKE -i -na 1 generate
 
        flog $WLog ls -l ${PERDB_PATH}*
 

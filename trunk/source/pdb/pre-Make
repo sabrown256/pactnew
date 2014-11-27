@@ -167,7 +167,7 @@ spokef = pdspoke.c
 
 IncAction = @pact generate
 
-LibAction = @(echo "build-spokes" ; build-spokes; cd ${PACTTmpDir} ; echo "bindings" ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${PACTSrcDir}/${LibName}.h\" -f ../../pre-Make devlib)
+LibAction = @(echo "build-spokes" ; build-spokes )
 
 
 #
