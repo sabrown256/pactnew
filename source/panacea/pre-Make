@@ -119,9 +119,6 @@ hdrf = ${IncDir}/pasrc.h ${IncDir}/panacea_gen.h
 
 IncAction = @pact generate
 
-LibAction = @(cd ${PACTTmpDir} ; echo "bindings" ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${PACTSrcDir}/${LibName}.h\" -f ../../pre-Make devlib)
-
-
 #
 # preprocessing test
 #

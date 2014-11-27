@@ -336,6 +336,16 @@ set psy_cfg = $PSY_Cfg:t
     Note $STDOUT 'generate : ${gcb} ${hdrf}'
     Note $STDOUT ''
 
+    Note $STDOUT '${gca} : ${PACTTmpDir}/${gcs}'
+    Note $STDOUT '	@(echo "${CCAnnounce} -c ${gcs}" ; \'
+    Note $STDOUT '          cd ${PACTTmpDir} ; \'
+    Note $STDOUT '          ${RM} errlog ; \'
+    Note $STDOUT '          touch errlog ; \'
+    Note $STDOUT '          ${CC} -c ${gcs} -o ${gco} ; \'
+    Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} ${gco} 2>> errlog ; \'
+    Note $STDOUT '          ${RM} ${gco} 2>> errlog)'
+    Note $STDOUT ''
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
