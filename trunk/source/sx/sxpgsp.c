@@ -2027,6 +2027,28 @@ static object *_SXI_satst(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SLOGSC - wrapper for PG_fset_log_scale */
+
+static object *_SXI_slogsc(SS_psides *si, object *argl)
+   {PG_device *dev;
+    int lsc[PG_SPACEDM];
+
+    dev    = NULL;
+    lsc[0] = 0;
+    lsc[1] = 0;
+    SS_args(si, argl,
+	    G_DEVICE_I, &dev,
+	    SC_INT_I, &lsc[0],
+	    SC_INT_I, &lsc[1],
+	    0);
+
+    PG_fset_axis_log_scale(dev, 2, lsc);
+
+    return(SS_t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
 
@@ -2197,6 +2219,11 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Set the specified attributes for the given set",
                SS_nargs,
                _SXI_satst, SS_PR_PROC);
+
+    SS_install(si, "pg-set-log-scale!",
+               "Set the log scale attributes for the given device",
+               SS_nargs,
+               _SXI_slogsc, SS_PR_PROC);
 
     SS_install(si, "pg-set-maximum-intensity!",
                "Set the maximum fractional intensity for colors (0.0 to 1.0) and optionally for RGB too",

@@ -1069,22 +1069,19 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 
     td = ad->tick + (AXIS_TICK_LABEL >> 1);
 
-    en[0] = td->en[0];
-    en[1] = td->en[1];
+    PM_copy_point(2, en, td->en);
     n  = td->n;
     dx = td->dx;
 
-    xs[0] = ad->x0[0];
-    xs[1] = ad->x0[1];
-    sx[0] = ad->scale_x[0];
-    sx[1] = ad->scale_x[1];
+    PM_copy_point(2, xs, ad->x0);
+    PM_copy_point(2, sx, ad->scale_x);
     ac[0] = ad->cosa;
     ac[1] = ad->sina;
 
 /* compute the actual point on the axis of the first and last tick */
     for (id = 0; id < 2; id++)
-        {xa[id] = xs[id] + ABS(en[0])*ac[id]*sx[id];
-	 xb[id] = xs[id] + ABS(en[1])*ac[id]*sx[id];};
+        {xa[id] = xs[id] + en[0]*ac[id]*sx[id];
+	 xb[id] = xs[id] + en[1]*ac[id]*sx[id];};
 
     log_scale = _PG_axis_place(dev, fdx, ad, 0.0, AXIS_TICK_LABEL);
 
@@ -1174,8 +1171,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
              return(FALSE);};
 
 /* draw the labels (always low to high - for numerics to come out right) */
-    vo[0] = td->vo[0];
-    vo[1] = td->vo[1];
+    PM_copy_point(2, vo, td->vo);
 
 /* set the axis type size now */
     if (_PG_gattrs.axis_char_size >= 8)
@@ -1228,9 +1224,8 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 	 if (ovlp[0] && ovlp[1])
 	    continue;
 
-/* remember this position and print it */
-	 for (id = 0; id < 2; id++)
-	     xp[id] = xs[id];
+/* remember this position */
+	 PM_copy_point(PG_SPACEDM, xp, xs);
 
          _PG_write_label(dev, format, xs, ls, tol, fx, FALSE);};
 
