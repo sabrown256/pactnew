@@ -51,17 +51,13 @@ typedef struct s_hasharr hasharr;
  */
 
 struct s_haelem                 
-   {long iht;                /* index of hash bucket */
-    long iar;                /* index into array */
-    char *name;              /* string on which the hash function operates */
-    char *type;              /* type of def member */
-    void *def;               /* actual object stored */
-    int free;                /* whether def member was marked (SC_mark?) */
-    haelem *next;};          /* next haelem in linked list */
-
-#define PD_DEFINE_HAELEM(_f)                                       \
-   {G_DEFINE_HAELEM(_f);                                           \
-    PD_cast(_f, "haelem", "def", "type");}
+   {long iht;                    /* index of hash bucket */
+    long iar;                    /* index into array */
+    char *name;                  /* hash key */
+    char *type;                  /* type of def member */
+    void *def  MBR(type, type);  /* actual object stored */
+    int free;                    /* TRUE iff def member SC_mark'd */
+    haelem *next;};              /* next haelem in linked list */
 
 /*
  * #bind struct hasharr

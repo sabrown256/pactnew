@@ -385,7 +385,9 @@ void *PD_get_attribute(PDBfile *file ARG(,,cls), char *vr, char *at)
  */
 
 int PD_def_pdb_types(PDBfile *file ARG(,,cls))
-   {defstr *dp;
+   {int err;
+
+    err = TRUE;
 
 /* define the SC_array */
     PD_DEFINE_SMART_ARRAY(file);
@@ -396,52 +398,43 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     if (_PD_block_define(file) == FALSE)
        return(FALSE);
 
-    dp = PD_DEFINE_MULTIDES(file);
-    if (dp == NULL)
-       {PD_error("COULDN'T MAXLINE MULTIDES - PD_DEF_PDB_TYPES", PD_GENERIC);
-        return(FALSE);};
+    err &= PD_DEFINE_MULTIDES(file);
+    if (err == FALSE)
+       PD_error("COULDN'T MAXLINE MULTIDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    dp = PD_DEFINE_DIMDES(file);
-    if (dp == NULL)
-       {PD_error("COULDN'T MAXLINE DIMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
-        return(FALSE);};
+    err &= PD_DEFINE_DIMDES(file);
+    if (err == FALSE)
+       PD_error("COULDN'T MAXLINE DIMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    dp = G_DEFINE_MEMDES(file);
-    if (dp == NULL)
-       {PD_error("COULDN'T DEFINE MEMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
-        return(FALSE);};
+    err &= G_DEFINE_MEMDES(file);
+    if (err == FALSE)
+       PD_error("COULDN'T DEFINE MEMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    dp = PD_DEFINE_SYMINDIR(file);
-    if (dp == NULL)
-       {PD_error("COULDN'T DEFINE SYMINDIR - PD_DEF_PDB_TYPES", PD_GENERIC);
-        return(FALSE);};
+    err &= PD_DEFINE_SYMINDIR(file);
+    if (err == FALSE)
+       PD_error("COULDN'T DEFINE SYMINDIR - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    dp = G_DEFINE_SYMENT(file);
-    if (dp == NULL)
-       {PD_error("COULDN'T DEFINE SYMENT - PD_DEF_PDB_TYPES", PD_GENERIC);
-        return(FALSE);};
+    err &= G_DEFINE_SYMENT(file);
+    if (err == FALSE)
+       PD_error("COULDN'T DEFINE SYMENT - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    dp = PD_DEFINE_CHARDES(file);
-    if (dp == NULL)
-       {PD_error("COULDN'T DEFINE CHARDES - PD_DEF_PDB_TYPES", PD_GENERIC);
-        return(FALSE);};
+    err &= PD_DEFINE_CHARDES(file);
+    if (err == FALSE)
+       PD_error("COULDN'T DEFINE CHARDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    dp = PD_DEFINE_FIXDES(file);
-    if (dp == NULL)
-       {PD_error("COULDN'T DEFINE FIXDES - PD_DEF_PDB_TYPES", PD_GENERIC);
-        return(FALSE);};
+    err &= PD_DEFINE_FIXDES(file);
+    if (err == FALSE)
+       PD_error("COULDN'T DEFINE FIXDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    dp = PD_DEFINE_FPDES(file);
-    if (dp == NULL)
-       {PD_error("COULDN'T DEFINE FPDES - PD_DEF_PDB_TYPES", PD_GENERIC);
-        return(FALSE);};
+    err &= PD_DEFINE_FPDES(file);
+    if (err == FALSE)
+       PD_error("COULDN'T DEFINE FPDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    dp = G_DEFINE_DEFSTR(file);
-    if (dp == NULL)
-       {PD_error("COULDN'T DEFINE DEFSTR - PD_DEF_PDB_TYPES", PD_GENERIC);
-        return(FALSE);};
+    err &= G_DEFINE_DEFSTR(file);
+    if (err == FALSE)
+       PD_error("COULDN'T DEFINE DEFSTR - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    return(TRUE);}
+    return(err);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -460,11 +453,11 @@ int PD_def_hash_types(PDBfile *file ARG(,,cls), int flag)
     err = TRUE;
 
     if (flag & 0x1)
-       PD_DEFINE_HAELEM(file);
+       err &= G_DEFINE_HAELEM(file);
 
     if (flag & 0x2)
        {PD_DEFINE_SMART_ARRAY(file);
-	G_DEFINE_HASHARR(file);};
+	err &= G_DEFINE_HASHARR(file);};
 
     return(err);}
 
@@ -1190,10 +1183,14 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     PD_DEFINE_DYNAMIC_ARRAY(fp);
 
 /* define the pcons */
+#if 1
+    err = G_DEFINE_PCONS(fp);
+#else
     ret = G_DEFINE_PCONS(fp);
     err &= (ret != NULL);
     err &= PD_cast(fp, "pcons", "car", "car_type");
     err &= PD_cast(fp, "pcons", "cdr", "cdr_type");
+#endif
 
 /* define the PG_image */
     ret = PD_defstr(fp, "PG_image",
@@ -1249,12 +1246,10 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     err &= PD_cast(fp, "PM_set", "info", "info_type");
 
 /* define the PM_mesh_topology */
-    ret = G_DEFINE_MESH_TOPOLOGY(fp);
-    err &= (ret != NULL);
+    err &= G_DEFINE_MESH_TOPOLOGY(fp);
 
 /* define the PM_mapping */
-    ret = G_DEFINE_MAPPING(fp);
-    err &= (ret != NULL);
+    err &= G_DEFINE_MAPPING(fp);
     err &= PD_cast(fp, "PM_mapping", "map", "map_type");
     err &= PD_cast(fp, "PM_mapping", "file", "file_info");
 

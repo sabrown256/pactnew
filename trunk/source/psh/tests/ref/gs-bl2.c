@@ -126,7 +126,7 @@ static int _SX_install_bl2_derived(SS_psides *si)
 
     register_bl2_types();
 
-    nerr = 0;
+    nerr = TRUE;
 
     return(nerr);}
 

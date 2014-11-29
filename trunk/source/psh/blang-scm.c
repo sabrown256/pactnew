@@ -588,8 +588,7 @@ static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     scheme_type_name_list(ta[0]+9, &tl);
 
 /* emit registration with the SX VIF */
-    fprintf(fc, "    dp    = G_DEFINE_%s(SX_gs.vif);\n", tl.rnm);
-    fprintf(fc, "    nerr += (dp == NULL);\n");
+    fprintf(fc, "    nerr &= G_DEFINE_%s(SX_gs.vif);\n", tl.rnm);
     fprintf(fc, "\n");
 
     fprintf(fc, "    SS_install(si, \"%s?\",\n", tl.snm);
@@ -625,12 +624,10 @@ static void scheme_struct_defs(FILE **fpa, char *dv, char **ta,
 	    fprintf(fc, "static int _SX_install_%s_derived(SS_psides *si)\n",
 		    pck);
 	    fprintf(fc, "   {int nerr;\n");
-	    if (ni > 0)
-	       fprintf(fc, "    defstr *dp;\n");
 	    fprintf(fc, "\n");
 	    fprintf(fc, "    register_%s_types();\n", pck);
 	    fprintf(fc, "\n");
-	    fprintf(fc, "    nerr = 0;\n");
+	    fprintf(fc, "    nerr = TRUE;\n");
 	    fprintf(fc, "\n");}
         else if (strcmp(dv, "end") == 0)
 	   {fprintf(fc, "    return(nerr);}\n");

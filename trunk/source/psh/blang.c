@@ -11,12 +11,16 @@
 #include "common.h"
 #include "libpsh.c"
 
-/* #define NO_DEFAULT_VALUE "NULL" */
 #define NO_DEFAULT_VALUE "----"
 
 #define N_MODES  7
 
 #define NF 3
+
+enum e_cast_kind
+   {CAST_NONE = 0, CAST_LENGTH, CAST_TYPE};
+
+typedef enum e_cast_kind cast_kind;
 
 enum e_doc_kind
    {DK_HTML = 0, DK_MAN};
@@ -47,10 +51,19 @@ typedef struct s_str_list str_list;
 typedef struct s_statedes statedes;
 typedef struct s_bindes bindes;
 typedef struct s_typdes typdes;
+typedef struct s_mbrdes mbrdes;
 typedef struct s_der_list der_list;
 typedef struct s_idecl idecl;
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
+
+struct s_mbrdes
+   {int is_fnc_ptr;
+    cast_kind cast;
+    char type[BFSML];
+    char name[BFSML];
+    char dim[BFSML];
+    char cast_mbr[BFSML];};
 
 struct s_typdes
    {char *c;
@@ -1316,48 +1329,64 @@ static void hsep(FILE *fp)
  *              - each of these is NC long if non-NULL
  */
 
-void parse_member(char *mbr, char *nm, char *ty, char *dm, int nc)
-   {int nl, ns, hd;
+void parse_member(mbrdes *md, char *mbr)
+   {int im, ns, hd;
     char s[BFLRG], ind[BFSML];
     char **sa, *pn, *pt;
 
+    memset(md, 0, sizeof(mbrdes));
+
     hd = (strchr(mbr, '[') != NULL);
+    im = 0;
 
     nstrncpy(s, BFLRG, mbr, -1);
     if (strstr(s, "(*") != NULL)
-       {sa = tokenize(s, "()[]", 0);
+       {md->is_fnc_ptr = TRUE;
+	sa = tokenize(s, "()[]", 0);
 	ns = 0;
-	pt = sa[0];
-	pn = sa[1] + 1;}
+	pt = sa[im++];
+	pn = sa[im++] + 1;}
+    else if (strncmp(s, "PF", 2) == 0)
+       {md->is_fnc_ptr = TRUE;
+	sa = tokenize(s, " \t", 0);
+	ns = 0;
+	pt = sa[im++];
+	pn = sa[im++];}
     else if (strchr(s, '*') != NULL)
        {sa = tokenize(s, " \t[]", 0);
-	pt = sa[0];
-	pn = sa[1];
+	pt = sa[im++];
+	pn = sa[im++];
 	ns = strspn(pn, "*");
 	pn += ns;}
     else
        {sa = tokenize(s, " \t[]", 0);
 	ns = 0;
-	pt = sa[0];
-	pn = sa[1];};
+	pt = sa[im++];
+	pn = sa[im++];};
 
-    if (ty != NULL)
-       {if (ns > 0)
-	   {memset(ind, '*', ns);
-	    ind[ns] = '\0';
-	    snprintf(ty, nc, "%s %s", pt, ind);}
-	else
-	   nstrncpy(ty, nc, pt, -1);};
+/* type */
+    if (ns > 0)
+       {memset(ind, '*', ns);
+	ind[ns] = '\0';
+	snprintf(md->type, BFSML, "%s %s", pt, ind);}
+    else
+       nstrncpy(md->type, BFSML, pt, -1);
 
-    if (nm != NULL)
-       nstrncpy(nm, nc, pn, -1);
+/* name */
+    nstrncpy(md->name, BFSML, pn, -1);
 
-    if (dm != NULL)
-       {if (hd == TRUE)
-	   {nl = lst_length(sa);
-	    nstrncpy(dm, nc, sa[nl-1], -1);}
-	else
-	    dm[0] = '\0';};
+/* dimensions */
+    if (hd == TRUE)
+       nstrncpy(md->dim, BFSML, sa[im++], -1);
+
+/* cast */
+    if ((IS_NULL(sa[im]) == FALSE) && (strncmp(sa[im], "MBR(", 4) == 0))
+       {char **ta;
+
+	ta = tokenize(sa[im], " \t(,)", 0);
+        md->cast = ((strcmp(ta[1], "type") == 0) ? CAST_TYPE : CAST_LENGTH);
+	nstrncpy(md->cast_mbr, BFSML, trim(sa[3], BOTH, "()"), -1);
+	lst_free(ta);};
 
     lst_free(sa);
 
