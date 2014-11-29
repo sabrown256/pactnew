@@ -229,6 +229,72 @@ defstr *PD_defloat(PDBfile *file ARG(,,cls), char *name, long bpi,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_DEFSTR_ALT - an alternate structure definition mechanism for PDBLib
+ *               -
+ *               - sample syntax:
+ *               -
+ *               -   PD_defstr_alt(<PDB file>, "<struct name>", n_members,
+ *               -                 <member-array>);
+ *               - the member array elements have the same syntax as for
+ *               - PD_defstr
+ *
+ * #bind PD_defstr_alt fortran() scheme() python()
+ */
+
+defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), char *name, int nmemb,
+		      char **members)
+   {int i, doffs;
+    char *mbr, *ptype;
+    hasharr *fchrt;
+    memdes *desc, *lst, *prev;
+    defstr *dp, *dp2;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    prev  = NULL;
+    lst   = NULL;
+    fchrt = file->chart;
+    doffs = file->default_offset;
+    for (i = 0; i < nmemb; i++)
+        {mbr   = members[i];
+         desc  = _PD_mk_descriptor(mbr, doffs);
+         ptype = desc->base_type;
+	 if (SC_hasharr_lookup(fchrt, ptype) == NULL)
+	    {if ((strcmp(ptype, name) != 0) || !_PD_indirection(mbr))
+	        {snprintf(pa->err, MAXLINE,
+			  "ERROR: %s BAD MEMBER TYPE - PD_DEFSTR_ALT\n",
+			  mbr);
+		 return(NULL);};};
+
+	 dp2 = PD_inquire_table_type(fchrt, ptype);
+	 if ((dp2 != NULL)  && !(_PD_indirection(desc->type)))
+	    {if (dp2->n_indirects > 0)
+	        {snprintf(pa->err, MAXLINE,
+			  "ERROR: STATIC MEMBER STRUCT %s CANNOT CONTAIN INDIRECTS\n",
+			  ptype);
+		 return(NULL);};};
+
+	 if (lst == NULL)
+	    lst = desc;
+	 else
+	    {prev->next = desc;
+	     SC_mark(desc, 1);};
+
+	 prev = desc;};
+
+/* install the type in all charts */
+    dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
+			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
+
+    if (dp == NULL)
+       PD_error("CAN'T HANDLE PRIMITIVE TYPE - PD_DEFSTR_ALT", PD_GENERIC);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PD_DEFSTR - a structure definition mechanism for PDBLib
  *           -
  *           - sample syntax:
@@ -258,35 +324,58 @@ defstr *PD_defloat(PDBfile *file ARG(,,cls), char *name, long bpi,
  *           - which consist of pointers
  *           -
  *           - Returns NULL if member types are unknown
+ *           -
+ *           - NOTE: PD_defstr returns the defstr and PD_defstr_i
+ *           - return a status of the operation
  *
  * #bind PD_defstr python()
  */
 
 defstr *PD_defstr(PDBfile *file ARG(,,cls), char *name, ...)
-   {char *nxt, *ptype;
+   {char *mbr;
+    defstr *dp;
+
+    SC_VA_START(name);
+
+#if 1
+    int n;
+    char **members;
+
+    members = NULL;
+    for (n = 0; TRUE; n++)
+        {mbr = SC_VA_ARG(char *);
+	 if (*mbr != 0)
+	    members = PS_lst_push(members, mbr);
+	 else
+	    break;};
+
+    dp = PD_defstr_alt(file, name, n, members);
+
+    SC_free_strings(members);
+
+#else
     int doffs;
+    char *ptype;
     hasharr *fchrt;
     memdes *desc, *lst, *prev;
-    defstr *dp, *dp2;
+    defstr *dp2;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
-
-    SC_VA_START(name);
 
     prev  = NULL;
     lst   = NULL;
     fchrt = file->chart;
     doffs = file->default_offset;
-    for (nxt = SC_VA_ARG(char *); (int) *nxt != 0;
-         nxt = SC_VA_ARG(char *))
-        {desc  = _PD_mk_descriptor(nxt, doffs);
+    for (mbr = SC_VA_ARG(char *); (int) *mbr != 0;
+         mbr = SC_VA_ARG(char *))
+        {desc  = _PD_mk_descriptor(mbr, doffs);
          ptype = desc->base_type;
          if (SC_hasharr_lookup(fchrt, ptype) == NULL)
-            if ((strcmp(ptype, name) != 0) || !_PD_indirection(nxt))
+            if ((strcmp(ptype, name) != 0) || !_PD_indirection(mbr))
                {snprintf(pa->err, MAXLINE,
 			 "ERROR: %s BAD MEMBER TYPE - PD_DEFSTR\n",
-			 nxt);
+			 mbr);
                 return(NULL);};
          
          dp2 = PD_inquire_table_type(fchrt, ptype);
@@ -305,85 +394,50 @@ defstr *PD_defstr(PDBfile *file ARG(,,cls), char *name, ...)
 
          prev = desc;};
 
-    SC_VA_END;
-
 /* install the type in all charts */
     dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
 			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
     if (dp == NULL)
        PD_error("CAN'T HANDLE PRIMITIVE TYPE - PD_DEFSTR", PD_GENERIC);
+#endif
+
+    SC_VA_END;
 
     return(dp);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFSTR_ALT - an alternate structure definition mechanism for PDBLib
- *               -
- *               - sample syntax:
- *               -
- *               -   PD_defstr_alt(<PDB file>, "<struct name>", n_members,
- *               -                 <member-array>);
- *               - the member array elements have the same syntax as for
- *               - PD_defstr
- *
- * #bind PD_defstr_alt fortran() scheme() python()
+/* PD_DEFSTR_I - define a new type and return TRUE iff successful
+ *             - NOTE: PD_defstr returns the defstr and PD_defstr_i
+ *             - return a status of the operation
  */
 
-defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), char *name, int nmemb,
-		      char **members)
-   {int i, doffs;
-    char *nxt, *ptype, *type;
-    hasharr *fchrt;
-    memdes *desc, *lst, *prev;
-    defstr *dp, *dp2;
-    PD_smp_state *pa;
+int PD_defstr_i(PDBfile *file ARG(,,cls), char *name, ...)
+   {int rv, n;
+    char **members, *mbr;
+    defstr *dp;
 
-    pa = _PD_get_state(-1);
+    SC_VA_START(name);
 
-    prev  = NULL;
-    lst   = NULL;
-    fchrt = file->chart;
-    doffs = file->default_offset;
-    for (i = 0; i < nmemb; i++)
-        {nxt   = members[i];
-         desc  = _PD_mk_descriptor(nxt, doffs);
-         type  = CSTRSAVE(nxt);
-         ptype = SC_firsttok(type, " \n");
-	 if (ptype != NULL)
-	    {if (SC_hasharr_lookup(fchrt, ptype) == NULL)
-		{if ((strcmp(ptype, name) != 0) || !_PD_indirection(nxt))
-		    {snprintf(pa->err, MAXLINE,
-			      "ERROR: %s BAD MEMBER TYPE - PD_DEFSTR_ALT\n",
-			      nxt);
-		     return(NULL);};};
+    members = NULL;
+    for (n = 0; TRUE; n++)
+        {mbr = SC_VA_ARG(char *);
+	 if (*mbr != 0)
+	    members = PS_lst_push(members, mbr);
+	 else
+	    break;};
 
-	     dp2 = PD_inquire_table_type(fchrt, ptype);
-	     if ((dp2 != NULL)  && !(_PD_indirection(desc->type)))
-	        {if (dp2->n_indirects > 0)
-		    {snprintf(pa->err, MAXLINE,
-			      "ERROR: STATIC MEMBER STRUCT %s CANNOT CONTAIN INDIRECTS\n",
-			      ptype);
-		      return(NULL);};};
+    SC_VA_END;
 
-	     CFREE(type);
-	     if (lst == NULL)
-	        lst = desc;
-	     else
-	        {prev->next = desc;
-		 SC_mark(desc, 1);};
+    dp = PD_defstr_alt(file, name, n, members);
 
-	     prev = desc;};};
+    SC_free_strings(members);
 
-/* install the type in all charts */
-    dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
-			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
+    rv = (dp != NULL);
 
-    if (dp == NULL)
-       PD_error("CAN'T HANDLE PRIMITIVE TYPE - PD_DEFSTR_ALT", PD_GENERIC);
-
-    return(dp);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

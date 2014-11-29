@@ -12,7 +12,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* helpers for bindings */
+/* helpers for BLANG bindings */
 
 /* variadic macro example:
  * #define eprintf(...) fprintf(stderr, __VA_ARGS__)
@@ -24,6 +24,13 @@
 
 #undef ARG
 #define ARG(...)
+
+/* MBR - specify cast members to generate PD_cast
+ *     - ignored by CC but parsed by BLANG
+ */
+
+#undef MBR
+#define MBR(...)
 
 /* BIND_OPT - used to communicate between binding language
  *          - and actual PACT C struct methods

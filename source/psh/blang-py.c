@@ -56,26 +56,26 @@ static void python_type_name_list(char *typ, tnp_list *na)
 
 /* PYTHON_PARSE_MEMBER - parse out MBR for python */
 
-static int python_parse_member(char *mbr, char *mnm, char *mty, char *mdm,
+static int python_parse_member(mbrdes *md, char *mbr,
 			       char *bty, char *aty, int nc)
    {int nind, nb, ity;
     char *lty, *pb;
 
-    parse_member(mbr, mnm, mty, mdm, BFSML);
+    parse_member(md, mbr);
 
-    nstrncpy(bty, nc, mty, -1);
+    nstrncpy(bty, nc, md->type, -1);
 
-    lty = lookup_type(NULL, &ity, mty, gbd+MODE_P);
+    lty = lookup_type(NULL, &ity, md->type, gbd+MODE_P);
 
     if (ity != -1)
        nstrncpy(aty, nc, gbd[3].types.arr[ity], -1);
-    else if (is_ptr(mty) == B_T)
+    else if (is_ptr(md->type) == B_T)
        nstrncpy(aty, nc, "SC_POINTER_I", -1);
     else
        aty[0] = '\0';
 
     if ((lty != NULL) && (strcmp(lty, tykind[TK_ENUM]) == 0))
-       {nstrncpy(mty, nc, tykind[TK_ENUM], -1);
+       {nstrncpy(md->type, nc, tykind[TK_ENUM], -1);
 	nstrncpy(aty, nc, "SC_ENUM_I", -1);};
 
     nb = strlen(bty) - 1;
@@ -359,9 +359,9 @@ static void python_unknown_member(FILE *fc, char *pm, char *mty, int fl)
 
 static void python_emit_getters(FILE *fc, char **ta, tnp_list *tl)
    {int im;
-    char mnm[BFSML], mty[BFSML], mdm[BFSML];
     char aty[BFSML], bty[BFSML];
     char *pm;
+    mbrdes md;
 
 /* getter - member accessor methods */
     for (im = 1; ta[im] != NULL; im++)
@@ -369,27 +369,27 @@ static void python_emit_getters(FILE *fc, char **ta, tnp_list *tl)
 	 if (IS_NULL(pm) == TRUE)
 	    continue;
 
-	 python_parse_member(pm, mnm, mty, mdm, bty, aty, BFSML);
+	 python_parse_member(&md, pm, bty, aty, BFSML);
 
 	 fprintf(fc, "static PyObject *%s_get_%s(%s *self, void *context)\n",
-		 tl->pnm, mnm, tl->pnm);
+		 tl->pnm, md.name, tl->pnm);
 	 fprintf(fc, "   {PyObject *rv;\n");
 	 fprintf(fc, "\n");
 
          if ((IS_NULL(aty) == TRUE) || (strcmp(aty, "struct") == 0))
-	    python_unmappable_member(fc, pm, mty, 1,
+	    python_unmappable_member(fc, pm, md.type, 1,
 				     "whole struct setting not supported");
 
-	 else if (IS_NULL(mdm) == FALSE)
-	    {fprintf(fc, "    rv = PY_build_object(\"%s\",\n", mnm);
+	 else if (IS_NULL(md.dim) == FALSE)
+	    {fprintf(fc, "    rv = PY_build_object(\"%s\",\n", md.name);
 	     fprintf(fc, "                         %s, %s, &self->pyo->%s,\n",
-		     aty, mdm, mnm);
+		     aty, md.dim, md.name);
 	     fprintf(fc, "                         0);\n");}
 
 	 else
-	    {fprintf(fc, "    rv = PY_build_object(\"%s\",\n", mnm);
+	    {fprintf(fc, "    rv = PY_build_object(\"%s\",\n", md.name);
 	     fprintf(fc, "                         %s, 0, &self->pyo->%s,\n",
-		     aty, mnm);
+		     aty, md.name);
 	     fprintf(fc, "                         0);\n");};
 
 	 fprintf(fc, "\n");
@@ -409,19 +409,19 @@ static void python_emit_getters(FILE *fc, char **ta, tnp_list *tl)
 
 static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
    {int im, nind;
-    char mnm[BFSML], mty[BFSML], mdm[BFSML];
     char aty[BFSML], bty[BFSML];
     char *pm;
+    mbrdes md;
 
     for (im = 1; ta[im] != NULL; im++)
         {pm = trim(ta[im], BOTH, " \t");
 	 if (IS_NULL(pm) == TRUE)
 	    continue;
 
-	 nind = python_parse_member(pm, mnm, mty, mdm, bty, aty, BFSML);
+	 nind = python_parse_member(&md, pm, bty, aty, BFSML);
 
 	 fprintf(fc, "static int %s_set_%s(%s *self,\n",
-		 tl->pnm, mnm, tl->pnm);
+		 tl->pnm, md.name, tl->pnm);
          fprintf(fc, "                   PyObject *value, void *context)\n");
 	 fprintf(fc, "   {int rv;\n");
 	 fprintf(fc, "\n");
@@ -435,38 +435,39 @@ static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
          fprintf(fc, "    else\n");
 
 /* if member is 'char *' */
-	 if (strcmp(mty, "char *") == 0)
+	 if (strcmp(md.type, "char *") == 0)
 	    {fprintf(fc, "       {int ok;\n");
 	     fprintf(fc, "\n");
-	     fprintf(fc, "        ok = PyArg_Parse(value, \"s\", &self->pyo->%s);\n", mnm);
+	     fprintf(fc, "        ok = PyArg_Parse(value, \"s\", &self->pyo->%s);\n",
+		     md.name);
 	     fprintf(fc, "        if (ok == TRUE)\n");
 	     fprintf(fc, "           rv = 0;};\n");}
 
 /* if member is fixed point type */
-	 else if ((is_fixed_point(mty) == B_T) ||
-		  (strcmp(mty, tykind[TK_ENUM]) == 0))
-	    {if (IS_NULL(mdm) == FALSE)
-                python_unknown_member(fc, pm, mty, 2);
+	 else if ((is_fixed_point(md.type) == B_T) ||
+		  (strcmp(md.type, tykind[TK_ENUM]) == 0))
+	    {if (IS_NULL(md.dim) == FALSE)
+                python_unknown_member(fc, pm, md.type, 2);
 	     else
 	        {fprintf(fc, "       {int ok;\n");
 		 fprintf(fc, "        long lv;\n");
 		 fprintf(fc, "\n");
 		 fprintf(fc, "        ok = PyArg_Parse(value, \"l\", &lv);\n");
 		 fprintf(fc, "        if (ok == TRUE)\n");
-		 fprintf(fc, "           {self->pyo->%s = lv;\n", mnm);
+		 fprintf(fc, "           {self->pyo->%s = lv;\n", md.name);
 		 fprintf(fc, "            rv = 0;};};\n");};}
 
 /* if member is floating point type */
-	 else if (is_real(mty) == B_T)
-	    {if (IS_NULL(mdm) == FALSE)
-                python_unknown_member(fc, pm, mty, 2);
+	 else if (is_real(md.type) == B_T)
+	    {if (IS_NULL(md.dim) == FALSE)
+                python_unknown_member(fc, pm, md.type, 2);
 	     else
 	        {fprintf(fc, "       {int ok;\n");
 	         fprintf(fc, "        double dv;\n");
 		 fprintf(fc, "\n");
 		 fprintf(fc, "        ok = PyArg_Parse(value, \"d\", &dv);\n");
 		 fprintf(fc, "        if (ok == TRUE)\n");
-		 fprintf(fc, "           {self->pyo->%s = dv;\n", mnm);
+		 fprintf(fc, "           {self->pyo->%s = dv;\n", md.name);
 		 fprintf(fc, "            rv = 0;};};\n");};}
 
 /* if member is pointer to a known bound type */
@@ -475,10 +476,10 @@ static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
 	        {fprintf(fc, "       {int ok;\n");
 		 fprintf(fc, "\n");
 		 fprintf(fc, "        ok = PY_%s_extractor(value, self->pyo->%s);\n",
-			 bty, mnm);
+			 bty, md.name);
 		 fprintf(fc, "        if (ok == TRUE)\n");
 		 fprintf(fc, "           {_PY_opt_%s(self->pyo->%s, BIND_ALLOC, NULL);\n",
-			 bty, mnm);
+			 bty, md.name);
 		 fprintf(fc, "            rv = 0;};};\n");}
 	     else
 	        fprintf(fc, "       rv = -1;     /* non pointer struct '%s' */\n",
@@ -486,11 +487,11 @@ static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
 
 /* if member is pointer */
          else if (nind > 0)
-	    python_unknown_member(fc, pm, mty, 2);
+	    python_unknown_member(fc, pm, md.type, 2);
 
 /* unknown member action */
 	 else
-	    python_unknown_member(fc, pm, mty, 2);
+	    python_unknown_member(fc, pm, md.type, 2);
 
          fprintf(fc, "\n");
 
@@ -512,8 +513,8 @@ static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
 
 static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
    {int im, hs;
-    char mnm[BFSML], mty[BFSML];
     char *pm;
+    mbrdes md;
     tnp_list tl;
 
     python_type_name_list(ta[0]+9, &tl);
@@ -618,8 +619,8 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
         {pm = trim(ta[im], BOTH, " \t");
 	 if (IS_NULL(pm) == TRUE)
 	    continue;
-	 parse_member(pm, mnm, mty, NULL, BFSML);
-         fprintf(fc, " %s_doc_%s[] = \"\",\n", tl.pnm, mnm);};
+	 parse_member(&md, pm);
+         fprintf(fc, " %s_doc_%s[] = \"\",\n", tl.pnm, md.name);};
 
     fprintf(fc, " %s_doc[] = \"\";\n", tl.pnm);
 
@@ -637,7 +638,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
         {pm = trim(ta[im], BOTH, " \t");
 	 if (IS_NULL(pm) == TRUE)
 	    continue;
-	 parse_member(pm, mnm, mty, NULL, BFSML);
+	 parse_member(&md, pm);
 
 /* GOTCHA: when do we have a setter? */
 	 hs = FALSE;
@@ -645,10 +646,15 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
          if (hs == TRUE)
 	    fprintf(fc, "    {\"%s\", (getter) %s_get_%s, (setter) %s_set_%s, %s_doc_%s, NULL},\n",
-		    mnm, tl.pnm, mnm, tl.pnm, mnm, tl.pnm, mnm);
+		    md.name, tl.pnm,
+		    md.name, tl.pnm,
+		    md.name, tl.pnm,
+		    md.name);
 	 else
 	    fprintf(fc, "    {\"%s\", (getter) %s_get_%s, NULL, %s_doc_%s, NULL},\n",
-		    mnm, tl.pnm, mnm, tl.pnm, mnm);};
+		    md.name, tl.pnm,
+		    md.name, tl.pnm,
+		    md.name);};
 
     fprintf(fc, "#ifdef PY_EXT_GETSET_%s\n", tl.rnm);
     fprintf(fc, "    PY_EXT_GETSET_%s\n", tl.rnm);

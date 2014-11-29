@@ -245,9 +245,9 @@ typedef struct s_pcons pcons;
 
 struct s_pcons
    {char *car_type;
-    void *car;
+    void *car       MBR(type, car_type);
     char *cdr_type;
-    void *cdr;};
+    void *cdr       MBR(type, cdr_type);};
 
 /* QUATERNION - defined here so that it participates in type system
  *

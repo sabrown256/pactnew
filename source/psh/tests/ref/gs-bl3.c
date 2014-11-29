@@ -157,14 +157,12 @@ static object *_SXI_strp(SS_psides *si, object *o)
 
 static int _SX_install_bl3_derived(SS_psides *si)
    {int nerr;
-    defstr *dp;
 
     register_bl3_types();
 
-    nerr = 0;
+    nerr = TRUE;
 
-    dp    = G_DEFINE_STR(SX_gs.vif);
-    nerr += (dp == NULL);
+    nerr &= G_DEFINE_STR(SX_gs.vif);
 
     SS_install(si, "str?",
                "Returns #t if the object is a str, and #f otherwise",

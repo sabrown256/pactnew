@@ -127,24 +127,46 @@ static void c_emit_types_def(FILE *fc, char **ta, tnc_list *tl)
 /* C_EMIT_TYPES_HDR - emit type related declarations and macros */
 
 static void c_emit_types_hdr(FILE *fh, char **ta, tnc_list *tl)
-   {int i;
-    char nm[BFSML], ty[BFSML], dm[BFSML];
-    char *mbr;
+   {int i, nc;
+    char a[BFLRG];
+    char *mbr, *p;
+    mbrdes md;
 
 /* emit macro to define type to PDB file */
     fprintf(fh, "#define G_DEFINE_%s(_f)\t\\\n", tl->rnm);
-    fprintf(fh, "   PD_defstr(_f, \"%s\", \t\\\n", tl->cnm);
+    fprintf(fh, "   (PD_defstr_i(_f, \"%s\", \t\\\n", tl->cnm);
 
+    a[0] = '\0';
     for (i = 1; ta[i] != NULL; i++)
         {mbr = trim(ta[i], BOTH, " \t");
          if (IS_NULL(mbr) == FALSE)
-	    {parse_member(mbr, nm, ty, dm, BFSML);
-	     if (is_func_ptr(mbr, 7) == B_T)
-	        fprintf(fh, "\t\t\"function %s\",\t\\\n", nm);
-	     else
-	        fprintf(fh, "\t\t\"%s\",\t\\\n", mbr);};};
+	    {parse_member(&md, mbr);
+	     if (md.cast != CAST_NONE)
+                {p  = strstr(mbr, "MBR(");
+                 *p = '\0';};
 
-    fprintf(fh, "\t\tLAST)\n");
+	     if (md.is_fnc_ptr == B_T)
+	        fprintf(fh, "\t\t\"function %s\",\t\\\n", md.name);
+	     else
+	        fprintf(fh, "\t\t\"%s\",\t\\\n", trim(mbr, BOTH, " \t"));
+	     
+	     if (md.cast == CAST_TYPE)
+	        vstrcat(a, BFLRG, 
+			"    PD_cast(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
+			tl->cnm, md.name, md.cast_mbr);
+	     else if (md.cast == CAST_LENGTH)
+	        vstrcat(a, BFLRG, 
+			"    PD_size_from(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
+			tl->cnm, md.name, md.cast_mbr);};};
+
+    if (IS_NULL(a) == FALSE)
+       {fprintf(fh, "\t\tLAST) &&\t\\\n");
+	nc = strlen(a);
+	nstrncpy(a+nc-6, 3, ")\n", 2);
+	fputs(a, fh);}
+    else
+       fprintf(fh, "\t\tLAST))\n");
+
     fprintf(fh, "\n");
 
 /* emit declaration of SCORE type index */

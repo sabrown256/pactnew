@@ -803,7 +803,7 @@ static int _SX_install_bl4_derived(SS_psides *si)
 
     register_bl4_types();
 
-    nerr = 0;
+    nerr = TRUE;
 
     return(nerr);}
 

@@ -273,7 +273,7 @@ static int _SX_install_bl5_derived(SS_psides *si)
 
     register_bl5_types();
 
-    nerr = 0;
+    nerr = TRUE;
 
     return(nerr);}
 
