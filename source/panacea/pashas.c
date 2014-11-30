@@ -311,10 +311,13 @@ void PA_init_strings(void)
  *            - for the restart dump
  */
 
-void PA_def_str(PDBfile *pdrs)
-   {PA_package *pck;
+int PA_def_str(PDBfile *pdrs)
+   {int err;
+    PA_package *pck;
     PFPkgDfstrc pck_dfstrc;
     PFDefTyp hook;
+
+    err = TRUE;
 
 /* get the PM_set in for the PA_plot_request */
     PA_ERR(!PD_def_mapping(pdrs),
@@ -327,8 +330,7 @@ void PA_def_str(PDBfile *pdrs)
               "double imaginary",
               LAST);
 
-    G_DEFINE_C_ARRAY(pdrs);
-    PD_cast(pdrs, "C_array", "data", "type");
+    err &= G_DEFINE_C_ARRAY(pdrs);
 
     PD_defstr(pdrs, "PM_matrix",
 	      "int nrow",
@@ -338,7 +340,7 @@ void PA_def_str(PDBfile *pdrs)
 
 /* define PANACEA types */
 
-    G_DEFINE_IV_SPECIFICATION(pdrs);
+    err &= G_DEFINE_IV_SPECIFICATION(pdrs);
 
     PD_defstr(pdrs, "PA_set_spec",
               "char *var_name",
@@ -391,7 +393,7 @@ void PA_def_str(PDBfile *pdrs)
          if (pck_dfstrc != NULL)
             (*pck_dfstrc)(pdrs);};
 
-    return;}
+    return(err);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

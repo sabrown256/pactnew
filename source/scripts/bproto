@@ -330,6 +330,32 @@ Note $Log ""
       NoteD $Log "   C derived type file: $cder"
    endif
 
+# support C derived type handling for SX
+   flog $Log set csopt = $dst/$d.opts
+
+   flog $Log rm -f $csopt
+   flog $Log touch $csopt
+
+   grep _SX_opt_ $PSY_Base/sx/sx_int.h  | \
+   sed 's|(.*)||'                       | \
+   sed 's|[*,;]||g'                     | \
+   sed 's| _SX_opt_||'                  | \
+   grep -v generic                      | \
+   cat >>& $csopt
+
+# support C derived type handling for Python
+   flog $Log set cpopt = $dst/$d.optp
+
+   flog $Log rm -f $cpopt
+   flog $Log touch $cpopt
+
+   grep _PY_opt_ $PSY_Base/python/py_int.h  | \
+   sed 's|(.*)||'                           | \
+   sed 's|[*,;]||g'                         | \
+   sed 's| _PY_opt_||'                      | \
+   grep -v generic                          | \
+   cat >>& $cpopt
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 

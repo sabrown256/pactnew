@@ -126,13 +126,14 @@ long _PD_number_refd(memdes *meml, void *svr, memdes *desc, void *vr,
            ni = _PD_cast_size(meml, svr, desc);
 
 	if (ni <= 0)
-	   {ni = SC_arrlen(vr);
-	    if (ni > 0)
-	       {bpi = _PD_lookup_size(type, tab);
-		if (bpi == -1)
-		   ni = -2;
-		else
-		   ni /= bpi;};};};
+	   {ni  = SC_arrlen(vr);
+	    bpi = _PD_lookup_size(type, tab);
+	    if ((ni <= 0) && (bpi != -1))
+	       ni = bpi;
+	    else if (bpi == -1)
+	       ni = -2;
+	    else
+	       ni /= bpi;};};
 
     return(ni);}
 

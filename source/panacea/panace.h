@@ -1146,12 +1146,12 @@ extern void
  PA_wr_restart(char *rsname),
  PA_close_pp(void),
  PA_init_strings(void),
- PA_def_str(PDBfile *pdrs),
  PA_change_dim(int *pdm, int val),
  PA_change_size(char *name, int flag),
  *PA_intern(void *vr, char *name);
 
 extern int
+ PA_def_str(PDBfile *pdrs),
  PA_sizeof(char *s);
 
 

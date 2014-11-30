@@ -398,13 +398,20 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     if (_PD_block_define(file) == FALSE)
        return(FALSE);
 
+    err &= (G_ENUM_CHECKSUM_MODE(file) != NULL);
+    err &= (G_ENUM_MAJOR_OP(file) != NULL);
+    err &= (G_ENUM_MAJOR_ORDER(file) != NULL);
+    err &= (G_ENUM_DELAY_MODE(file) != NULL);
+    err &= (PD_defenum(file, "PD_type_kind") != NULL);
+    err &= (PD_defenum(file, "PD_data_location") != NULL);
+
     err &= PD_DEFINE_MULTIDES(file);
     if (err == FALSE)
-       PD_error("COULDN'T MAXLINE MULTIDES - PD_DEF_PDB_TYPES", PD_GENERIC);
+       PD_error("COULDN'T DEFINE MULTIDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
     err &= PD_DEFINE_DIMDES(file);
     if (err == FALSE)
-       PD_error("COULDN'T MAXLINE DIMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
+       PD_error("COULDN'T DEFINE DIMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
     err &= G_DEFINE_MEMDES(file);
     if (err == FALSE)
@@ -1183,14 +1190,7 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     PD_DEFINE_DYNAMIC_ARRAY(fp);
 
 /* define the pcons */
-#if 1
     err = G_DEFINE_PCONS(fp);
-#else
-    ret = G_DEFINE_PCONS(fp);
-    err &= (ret != NULL);
-    err &= PD_cast(fp, "pcons", "car", "car_type");
-    err &= PD_cast(fp, "pcons", "cdr", "cdr_type");
-#endif
 
 /* define the PG_image */
     ret = PD_defstr(fp, "PG_image",
@@ -1214,44 +1214,12 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     err &= (ret != NULL);
     err &= PD_cast(fp, "PG_image", "buffer", "element_type");
 
-/* define the PM_set and PM_mapping */
-    ret = PD_defstr(fp, "PM_set",
-		    "char *name",
-		    "char *element_type",
-		    "int dimension",
-		    "int *max_index",
-		    "int dimension_elem",
-		    "long n_elements",
-		    "char *elements",
-		    "char *es_type",
-		    "char *extrema",
-		    "char *scales",
-		    "function opers",
-		    "double *metric",
-		    "char *symmetry_type",
-		    "char *symmetry",
-		    "char *topology_type",
-		    "char *topology",
-		    "char *info_type",
-		    "char *info",
-		    "PM_set *next",
-		    LAST);
-
-    err &= (ret != NULL);
-    err &= PD_cast(fp, "PM_set", "elements", "element_type");
-    err &= PD_cast(fp, "PM_set", "extrema", "es_type");
-    err &= PD_cast(fp, "PM_set", "scales", "es_type");
-    err &= PD_cast(fp, "PM_set", "symmetry", "symmetry_type");
-    err &= PD_cast(fp, "PM_set", "topology", "topology_type");
-    err &= PD_cast(fp, "PM_set", "info", "info_type");
-
-/* define the PM_mesh_topology */
+    err &= G_DEFINE_C_ARRAY(fp);
+    err &= G_DEFINE_POLYGON(fp);
+    err &= G_DEFINE_FIELD(fp);
     err &= G_DEFINE_MESH_TOPOLOGY(fp);
-
-/* define the PM_mapping */
+    err &= G_DEFINE_SET(fp);
     err &= G_DEFINE_MAPPING(fp);
-    err &= PD_cast(fp, "PM_mapping", "map", "map_type");
-    err &= PD_cast(fp, "PM_mapping", "file", "file_info");
 
     return(err);}
 

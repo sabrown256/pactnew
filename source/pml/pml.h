@@ -351,7 +351,7 @@ struct s_PM_sp_lin_sys
 struct s_C_array
    {char *type;                                                /* data type */
     long length;                                      /* number of elements */
-    void *data;};                                    /* pointer to the data */
+    void *data  MBR(type, type);};                   /* pointer to the data */
 
 
 /* PM_MATRIX - specify a 2d rank matrix */
@@ -635,18 +635,18 @@ struct s_PM_set
     int *max_index;
     int dimension_elem;
     long n_elements;
-    void *elements;
+    void *elements  MBR(type, element_type);
     char *es_type;
-    void *extrema;
-    void *scales;
+    void *extrema   MBR(type, es_type);
+    void *scales    MBR(type, es_type);
     PM_field *opers;
     double *metric;
     char *symmetry_type;                         /* describe any symmetries */
-    void *symmetry;
+    void *symmetry  MBR(type, symmetry_type);
     char *topology_type;              /* describe ordering and connectivity */
-    void *topology;
+    void *topology  MBR(type, topology_type);
     char *info_type;                  /* provide any additional information */
-    void *info;
+    void *info  MBR(type, info_type);
     PM_set *next;};
 
 
@@ -676,10 +676,10 @@ struct s_PM_mapping
     PM_set *domain;                                 /* the mapping's domain */
     PM_set *range;             /* a subset of the image of DOMAIN under MAP */
     char *map_type;             /* describe the data type pointed to by map */
-    void *map;         /* describe the mapping between the DOMAIN and RANGE */
+    void *map   MBR(type, map_type);   /* descr the mapping from DOM to RAN */
     int file_type;                          /* file type ASCII, BINARY, PDB */
     void *file_info;           /* file info - cast to some struct with info */
-    char *file;                                    /* file name for mapping */
+    char *file  MBR(type, file_info);              /* file name for mapping */
     PM_mapping *next;};
 
 struct s_PM_mesh_map

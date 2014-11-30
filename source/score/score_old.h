@@ -206,7 +206,7 @@ typedef struct s_SC_dynamic_array SC_dynamic_array;
 
 struct s_SC_dynamic_array
   {char *type;
-   void *array;
+   void *array MBR(type, type);
    int n;
    int nx;
    int bpi;

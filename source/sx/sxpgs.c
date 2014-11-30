@@ -218,9 +218,9 @@ static object *_SXI_def_file_graph(SS_psides *si, object *obj)
     if ((file->type == NULL) || (strcmp(file->type, "PDBfile") == 0))
        {if (PD_inquire_type(file, "PM_mapping") == NULL)
 	   {ok = PD_def_mapping(file); 
-	   if (ok != TRUE)
-	      SS_error(si, "CAN`T DEFINE MAPPINGS - _SXI_DEF_FILE_GRAPH",
-		       obj);};};
+	    if (ok != TRUE)
+	       SS_error(si, "CAN`T DEFINE MAPPINGS - _SXI_DEF_FILE_GRAPH",
+			obj);};};
 
     return(SS_t);}
 

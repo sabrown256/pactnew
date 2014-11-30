@@ -1023,6 +1023,7 @@ extern void
 
 extern defstr
  *PD_typedef(PDBfile *file, char *oname, char *tname),
+ *PD_defenum(PDBfile *file ARG(,,cls), char *name),
  *PD_defncv(PDBfile *file, char *name, long bpi, int align),
  *PD_defchr(PDBfile *file, char *name, long bpi, int align,
             PD_byte_order ord, int unsgned),
