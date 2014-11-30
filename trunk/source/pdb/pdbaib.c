@@ -97,6 +97,32 @@ defstr *PD_typedef(PDBfile *file ARG(,,cls), char *oname, char *tname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_DEFENUM - define an enum as a typedef of the appropriate size fixnum
+ *
+ * #bind PD_defenum fortran() scheme() python()
+ */
+
+defstr *PD_defenum(PDBfile *file ARG(,,cls), char *name)
+   {char *ity;
+    defstr *dp;
+    enum {A, B, C} t = A;
+
+    if (sizeof(t) == sizeof(int))
+       ity = SC_INT_S;
+    else if (sizeof(t) == sizeof(long))
+       ity = SC_LONG_S;
+    else if (sizeof(t) == sizeof(long long))
+       ity = SC_LONG_LONG_S;
+    else if (sizeof(t) == sizeof(short))
+       ity = SC_SHORT_S;
+
+    dp = PD_typedef(file, name, ity);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PD_DEFNCV - define a primitive type that will not be format converted
  *           - do it in both charts
  *
@@ -332,14 +358,11 @@ defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), char *name, int nmemb,
  */
 
 defstr *PD_defstr(PDBfile *file ARG(,,cls), char *name, ...)
-   {char *mbr;
+   {int n;
+    char **members, *mbr;
     defstr *dp;
 
     SC_VA_START(name);
-
-#if 1
-    int n;
-    char **members;
 
     members = NULL;
     for (n = 0; TRUE; n++)
@@ -352,55 +375,6 @@ defstr *PD_defstr(PDBfile *file ARG(,,cls), char *name, ...)
     dp = PD_defstr_alt(file, name, n, members);
 
     SC_free_strings(members);
-
-#else
-    int doffs;
-    char *ptype;
-    hasharr *fchrt;
-    memdes *desc, *lst, *prev;
-    defstr *dp2;
-    PD_smp_state *pa;
-
-    pa = _PD_get_state(-1);
-
-    prev  = NULL;
-    lst   = NULL;
-    fchrt = file->chart;
-    doffs = file->default_offset;
-    for (mbr = SC_VA_ARG(char *); (int) *mbr != 0;
-         mbr = SC_VA_ARG(char *))
-        {desc  = _PD_mk_descriptor(mbr, doffs);
-         ptype = desc->base_type;
-         if (SC_hasharr_lookup(fchrt, ptype) == NULL)
-            if ((strcmp(ptype, name) != 0) || !_PD_indirection(mbr))
-               {snprintf(pa->err, MAXLINE,
-			 "ERROR: %s BAD MEMBER TYPE - PD_DEFSTR\n",
-			 mbr);
-                return(NULL);};
-         
-         dp2 = PD_inquire_table_type(fchrt, ptype);
-         if ((dp2 != NULL)  && !(_PD_indirection(desc->type)))
-            if (dp2->n_indirects > 0)
-               {snprintf(pa->err, MAXLINE,
-			 "ERROR: STATIC MEMBER STRUCT %s CANNOT CONTAIN INDIRECTS\n",
-			 ptype);
-                return(NULL);};
-
-         if (lst == NULL)
-            lst = desc;
-         else
-	    {prev->next = desc;
-	     SC_mark(desc, 1);};
-
-         prev = desc;};
-
-/* install the type in all charts */
-    dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
-			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
-
-    if (dp == NULL)
-       PD_error("CAN'T HANDLE PRIMITIVE TYPE - PD_DEFSTR", PD_GENERIC);
-#endif
 
     SC_VA_END;
 

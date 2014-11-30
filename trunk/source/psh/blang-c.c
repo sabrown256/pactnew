@@ -178,17 +178,20 @@ static void c_emit_types_hdr(FILE *fh, char **ta, tnc_list *tl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* C_OBJECT_DEFS - generate coding to define SCORE type manager index
- *               - and PDBLib PD_defstr call
- */
+/* C_ENUM_DEFS - generate coding to define enums to PDBLib */
 
-static void c_object_defs(FILE **fpa, char *dv, char **ta,
-			  char *pck, int ni)
-   {FILE *fc, *fh;
+static void c_enum_defs(FILE **fpa, char *dv, char **ta,
+			char *pck, int ni)
+   {int nc;
+    char s[BFSML];
+    char *pat;
+    FILE *fh;
     tnc_list tl;
 
-    fc = fpa[0];
     fh = fpa[1];
+
+    pat = "enum";
+    nc  = strlen(pat);
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
@@ -196,7 +199,44 @@ static void c_object_defs(FILE **fpa, char *dv, char **ta,
         else if (strcmp(dv, "end") == 0)
 	   {};}
 
-    else if (strncmp(ta[0], "struct s_", 9) == 0)
+    else if (strncmp(ta[0], pat, nc) == 0)
+       {nstrncpy(s, BFSML, dv + 7, -1);
+	pat = strtok(s, " \t");
+	c_type_name_list(pat, &tl);
+
+/* emit macro to define enum to PDB file */
+	fprintf(fh, "#define G_ENUM_%s(_f)\t", tl.rnm);
+	fprintf(fh, "PD_defenum(_f, \"%s\")\n", tl.cnm);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* C_OBJECT_DEFS - generate coding to define SCORE type manager index
+ *               - and PDBLib PD_defstr call
+ */
+
+static void c_object_defs(FILE **fpa, char *dv, char **ta,
+			  char *pck, int ni)
+   {int nc;
+    char *pat;
+    FILE *fc, *fh;
+    tnc_list tl;
+
+    fc = fpa[0];
+    fh = fpa[1];
+
+    pat = "struct s_";
+    nc  = strlen(pat);
+
+    if (ta == NULL)
+       {if (strcmp(dv, "begin") == 0)
+	   {}
+        else if (strcmp(dv, "end") == 0)
+	   {};}
+
+    else if (strncmp(ta[0], pat, nc) == 0)
        {c_type_name_list(ta[0]+9, &tl);
 	c_emit_types_def(fc, ta, &tl);
         c_emit_types_hdr(fh, ta, &tl);};
@@ -249,6 +289,11 @@ static int bind_c(bindes *bd)
     fc = bd->fp[0];
     fh = bd->fp[1];
     st = bd->st;
+
+/* make the list of enum objects */
+    emit_enum_defs(bd, c_enum_defs);
+    fprintf(fh, "\n");
+    fprintf(fh, "\n");
 
 /* make the list of struct objects */
     emit_struct_defs(bd, c_object_defs);
