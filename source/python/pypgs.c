@@ -245,8 +245,7 @@ static int _PY_buffer_extractor(PyObject *obj, void *arg)
 
 PyObject *PP_make_image(PyObject *self, PyObject *args, PyObject *kwds)
    {int w, h, bpp;
-    double dbx[PG_BOXSZ];
-    double rbx[PG_BOXSZ];
+    double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     char *label, *type;
     void *z;    /* XXX */
     PG_palette *palette;

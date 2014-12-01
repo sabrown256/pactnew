@@ -59,6 +59,11 @@
 
 typedef struct s_SC_array SC_array;
 
+/* smart array structure
+ *
+ * #bind struct SC_array
+ */
+
 struct s_SC_array
   {char *name;
    char *type;                                   /* type of array elements */
@@ -67,24 +72,9 @@ struct s_SC_array
    long n;                                       /* max referenced element */
    long nx;                                /* number of elements allocated */
    double gf;                                             /* growth factor */
-   void *array;                                         /* the actual data */
+   void *array  MBR(type, type);                        /* the actual data */
    void (*init)(void *a);          /* initialize new elements when growing */
    void *(*access)(int oper, void *ra, int bpi, long n, void *v);};
-
-#define PD_DEFINE_SMART_ARRAY(_f)                                  \
-    {PD_defstr(_f, "SC_array",                                     \
-                    "char *name",                                  \
-                    "char *type",                                  \
-                    "int bpi",                                     \
-                    "int memfl",                                   \
-                    "long n",                                      \
-                    "long nx",                                     \
-                    "double gf",                                   \
-                    "char *array",                                 \
-                    "function init",                               \
-                    "function access",                             \
-                    LAST);                                         \
-     PD_cast(_f, "SC_array", "array", "type");}
 
 #ifdef __cplusplus
 extern "C" {

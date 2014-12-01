@@ -204,6 +204,10 @@ typedef char *F77_string;
 
 typedef struct s_SC_dynamic_array SC_dynamic_array;
 
+/*
+ * #bind struct SC_dynamic_array
+ */
+
 struct s_SC_dynamic_array
   {char *type;
    void *array MBR(type, type);
@@ -211,17 +215,6 @@ struct s_SC_dynamic_array
    int nx;
    int bpi;
    int delta;};
-
-#define PD_DEFINE_DYNAMIC_ARRAY(_f)                                \
-    {PD_defstr(_f, "SC_dynamic_array",                             \
-                    "char *type",                                  \
-                    "char *array",                                 \
-                    "int n",                                       \
-                    "int nx",                                      \
-                    "int bpi",                                     \
-                    "int delta",                                   \
-                    LAST);                                         \
-     PD_cast(_f, "SC_dynamic_array", "array", "type");}
 
 /*--------------------------------------------------------------------------*/
 

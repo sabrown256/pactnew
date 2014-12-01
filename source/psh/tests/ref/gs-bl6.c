@@ -492,7 +492,7 @@ static void _SX_wr_str(SS_psides *si, object *o, object *fp)
 
     x = SS_GET(str, o);
 
-    PRINT(SS_OUTSTREAM(fp), "<STR|%s>", _SX_opt_str(x, BIND_PRINT, NULL));
+    PRINT(SS_OUTSTREAM(fp), "<STR|%s>", _SX_opt_generic(x, BIND_PRINT, NULL));
 
     return;}
 
@@ -504,7 +504,7 @@ static void _SX_rl_str(SS_psides *si, object *o)
 
     x = SS_GET(str, o);
 
-    _SX_opt_str(x, BIND_FREE, NULL);
+    _SX_opt_generic(x, BIND_FREE, NULL);
 
     SS_rl_object(si, o);
 
@@ -522,8 +522,8 @@ object *SX_make_str(SS_psides *si, str *x)
     else
        {char *nm;
 
-        _SX_opt_str(x, BIND_ALLOC, NULL);
-        nm = _SX_opt_str(x, BIND_LABEL, NULL);
+        _SX_opt_generic(x, BIND_ALLOC, NULL);
+        nm = _SX_opt_generic(x, BIND_LABEL, NULL);
         rv = SS_mk_object(si, x, G_STR_I, SELF_EV, nm,
                           _SX_wr_str, _SX_rl_str);}
 
@@ -535,7 +535,7 @@ object *SX_make_str(SS_psides *si, str *x)
 void *_SX_arg_str(SS_psides *si, object *o)
    {void *rv;
 
-    rv = _SX_opt_str(NULL, BIND_ARG, o);
+    rv = _SX_opt_generic(NULL, BIND_ARG, o);
 
     if (rv == _SX.unresolved)
        SS_error(si, "OBJECT NOT STR - _SX_ARG_STR", o);

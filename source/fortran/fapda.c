@@ -1750,11 +1750,13 @@ FIXNUM FF_ID(pfwima, PFWIMA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 			     FIXNUM *sln, FIXNUM *slx,
 			     double *data, double *sxn, double *sxx,
 			     double *syn, double *syx, FIXNUM *sim)
-   {int n, kx, lx, kmin, kmax, lmin, k1, k2, l1, l2, k, l, i;
+   {int n, kmin, kmax, lmin, k1, k2, l1, l2, k, l, i;
+    int ix[PG_SPACEDM];
     FIXNUM rv;
-    double *pd, *d, xmin, xmax, ymin, ymax, zmin, zmax, z;
+    double *pd, *d, z;
+    double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     char s[MAXLINE];
-    PD_image *im;
+    PG_image *im;
     PDBfile *file;
 
     rv = TRUE;
@@ -1768,38 +1770,42 @@ FIXNUM FF_ID(pfwima, PFWIMA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
     else
        {SC_FORTRAN_STR_C(s, name, *sncn);
 
-	xmin = *sxn;
-	xmax = *sxx;
-	ymin = *syn;
-	ymax = *syx;
-	kmin = *skn;
-	kmax = *skx;
-	lmin = *sln;
-	k1   = xmin;
-	k2   = xmax;
-	l1   = ymin;
-	l2   = ymax;
-	kx   = k2 - k1 + 1;
-	lx   = l2 - l1 + 1;
-	n    = kx*lx;
-	d    = pd = CMAKE_N(double, n);
-	zmax = -HUGE;
-	zmin =  HUGE;
+	dbx[0] = *sxn;
+	dbx[1] = *sxx;
+	dbx[2] = *syn;
+	dbx[3] = *syx;
+	kmin   = *skn;
+	kmax   = *skx;
+	lmin   = *sln;
+	k1     = dbx[0];
+	k2     = dbx[1];
+	l1     = dbx[2];
+	l2     = dbx[3];
+	ix[0]  = k2 - k1 + 1;
+	ix[1]  = l2 - l1 + 1;
+	n      = ix[0]*ix[1];
+	d      = pd = CMAKE_N(double, n);
+	rbx[0] =  HUGE;
+	rbx[1] = -HUGE;
 	for (l = l1; l <= l2; l++)
 	    for (k = k1; k <= k2; k++)
-	        {i     = (l - lmin)*(kmax - kmin + 1) + k - kmin;
-		 z     = data[i];
-		 zmax  = max(zmax, z);
-		 zmin  = min(zmin, z);
-		 *pd++ = z;}
-
-	im = PD_make_image(s, SC_DOUBLE_P_S, d, kx, lx, 8, xmin, xmax,
-			   ymin, ymax, zmin, zmax);
+	        {i      = (l - lmin)*(kmax - kmin + 1) + k - kmin;
+		 z      = data[i];
+		 rbx[1] = max(rbx[1], z);
+		 rbx[0] = min(rbx[0], z);
+		 *pd++  = z;}
+#if 0
+	im = PD_make_image(s, SC_DOUBLE_P_S, d, ix[0], ix[1], 8,
+			   dbx[0], dbx[1], dbx[2], dbx[3],
+			   rbx[0], rbx[1]);
+#endif
+	im = PG_make_image_n(s, SC_DOUBLE_P_S, d, 2, WORLDC,
+			     dbx, rbx, ix[0], ix[1], 8, NULL);
 
 	if (!PD_put_image(file, im, *sim))
 	   rv = FALSE;
 	else
-	   PD_rel_image(im);};
+	   PG_rl_image(im);};
 
     return(rv);}
 

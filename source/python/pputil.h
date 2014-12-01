@@ -268,6 +268,7 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type);
 /* PPUTIL.C declarations */
 
 extern void
+ *_PY_opt_generic(void *x, bind_opt wh, void *a),
  PY_self_free(void *o),
  _PP_Py_decref(PyObject *obj),
  PP_free(void *p),

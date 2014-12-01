@@ -390,10 +390,10 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     err = TRUE;
 
 /* define the SC_array */
-    PD_DEFINE_SMART_ARRAY(file);
+    err &= G_DEFINE_ARRAY(file);
 
 /* define the deprecated SC_dynamic_array */
-    PD_DEFINE_DYNAMIC_ARRAY(file);
+    err &= G_DEFINE_DYNAMIC_ARRAY(file);
 
     if (_PD_block_define(file) == FALSE)
        return(FALSE);
@@ -463,7 +463,7 @@ int PD_def_hash_types(PDBfile *file ARG(,,cls), int flag)
        err &= G_DEFINE_HAELEM(file);
 
     if (flag & 0x2)
-       {PD_DEFINE_SMART_ARRAY(file);
+       {err &= G_DEFINE_ARRAY(file);
 	err &= G_DEFINE_HASHARR(file);};
 
     return(err);}
@@ -1170,7 +1170,6 @@ int PD_mesh_struct(PDBfile *file ARG(,,cls))
 
 int PD_def_mapping(PDBfile *fp ARG(,,cls))
    {int err;
-    defstr *ret;
 
     ONCE_SAFE(TRUE, NULL)
        SC_PCONS_P_S         = CSTRDUP("pcons *", 3);
@@ -1183,37 +1182,15 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
 
     err = TRUE;
 
-/* define the SC_array */
-    PD_DEFINE_SMART_ARRAY(fp);
+    err &= G_DEFINE_ARRAY(fp);
 
 /* define the deprecated SC_dynamic_array */
-    PD_DEFINE_DYNAMIC_ARRAY(fp);
+    err &= G_DEFINE_DYNAMIC_ARRAY(fp);
 
-/* define the pcons */
-    err = G_DEFINE_PCONS(fp);
-
-/* define the PG_image */
-    ret = PD_defstr(fp, "PG_image",
-                    "int version_id",
-                    "char *label",
-                    "double xmin",
-                    "double xmax",
-                    "double ymin",
-                    "double ymax",
-                    "double zmin",
-                    "double zmax",
-                    "char *element_type",
-                    "char *buffer",
-                    "int kmax",
-                    "int lmax",
-                    "long size",
-                    "int bits_pixel",
-                    "char *palette",
-                    LAST);
-
-    err &= (ret != NULL);
-    err &= PD_cast(fp, "PG_image", "buffer", "element_type");
-
+    err &= G_DEFINE_PCONS(fp);
+    err &= G_DEFINE_RGB_COLOR_MAP(fp);
+    err &= G_DEFINE_PALETTE(fp);
+    err &= G_DEFINE_IMAGE(fp);
     err &= G_DEFINE_C_ARRAY(fp);
     err &= G_DEFINE_POLYGON(fp);
     err &= G_DEFINE_FIELD(fp);

@@ -9326,7 +9326,7 @@ PDBView can do analysis and visualization operations with such data.
 
 <p>
 <pre>
-<i>C Binding: </i>  int PD_put_image(PDBfile *file, PD_image *image,
+<i>C Binding: </i>  int PD_put_image(PDBfile *file, PG_image *image,
                               int index)
 <i>Fortran Binding: </i>integer PFWIMA(integer fileid,
                             integer nchr, character name,
@@ -9341,19 +9341,19 @@ PDBView can do analysis and visualization operations with such data.
 </pre>
 <p>
 
-Build a <tt>PD_image</tt> structure out of the given input data and write it
+Build a <tt>PG_image</tt> structure out of the given input data and write it
 to a PDB file.
 <p>
-Rationale: The <tt>PD_image</tt> structure is a useful and general purpose
+Rationale: The <tt>PG_image</tt> structure is a useful and general purpose
 representation of a raster image. The nature of the generalization
 is that the values in the raster are floating point numbers. So in
 addition to the standard data sets that can be rasterized, the
-<tt>PD_image</tt> can be used to display the computational matrix of
+<tt>PG_image</tt> can be used to display the computational matrix of
 some system of equations, for example. This function is a
 convenient way for FORTRAN programs to put out their data into
-PDB files as <tt>PD_image</tt>'s for later visualization and processing
+PDB files as <tt>PG_image</tt>'s for later visualization and processing
 by other programs. It allows a rectangular subset of a two
-dimensional array to be specified for the <tt>PD_image</tt>.
+dimensional array to be specified for the <tt>PG_image</tt>.
 <p>
 The calling application must keep track of how many <tt>PM_image</tt>'s have
 been written to each file. PDBLib will write each <tt>PM_image</tt> under
@@ -9366,7 +9366,7 @@ file!
 <p>
 The arguments to <tt>PFWIMA</tt> are:
 <em>file</em>, PDBfile for writing;
-<em>image</em>, <tt>PD_image</tt> for writing;
+<em>image</em>, <tt>PG_image</tt> for writing;
 <em>ind</em>, integer index count;
 <em>fileid</em>, an integer identifier which designates the PDB file
    to which to attempt to write;
@@ -9395,7 +9395,7 @@ For FORTRAN programs an error message may be retrieved by invoking function <tt>
 <b>C Example</b>
 <pre>
        PDBfile *file;
-       PD_image *image;
+       PG_image *image;
        static int count = 0;
              .
              .

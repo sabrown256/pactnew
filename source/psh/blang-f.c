@@ -1103,15 +1103,16 @@ static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 
 /* MODULE_ENUM_DECL - write the Fortran interface C enums DV */
 
-static void module_enum_decl(FILE **fp, char *dv, char **ta,
-			     char *pck, int ni)
+static void module_enum_decl(bindes *bd, char *dv, char **ta, int ni)
    {int i, nc;
     long vl;
     char s[BFLRG], x[BFLRG];
     char *vr;
-    FILE *fm;
+    FILE *fm, **fpa;
 
-    fm = fp[0];
+    fpa = bd->fp;
+
+    fm = fpa[0];
 
 /* syntax:
  *    enum, bind(C)
@@ -1160,11 +1161,12 @@ static void module_enum_decl(FILE **fp, char *dv, char **ta,
 
 /* MODULE_STRUCT_DECL - write the Fortran interface C structs DV */
 
-static void module_struct_decl(FILE **fp, char *dv, char **ta,
-			       char *pck, int ni)
-   {FILE *fm;
+static void module_struct_decl(bindes *bd, char *dv, char **ta, int ni)
+   {FILE *fm, **fpa;
 
-    fm = fp[0];
+    fpa = bd->fp;
+
+    fm = fpa[0];
 
 /* syntax:
  *   type, bind(C) :: <Sname>
@@ -1713,7 +1715,9 @@ static int register_fortran(int fl, statedes *st)
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 
+	pb->lang = "fortran";
 	pb->st   = st;
+	pb->data = NULL;
 	pb->cl   = NULL;
 	pb->init = init_module;
 	pb->bind = bind_module;
