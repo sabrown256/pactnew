@@ -5,14 +5,7 @@
  *
  */
 
-typedef struct s_tnc_list tnc_list;
 typedef struct s_cmeta cmeta;
-
-struct s_tnc_list
-   {char cnm[BFSML];        /* C struct name, PM_set */
-    char lnm[BFSML];        /* lower case version of CNM, pm_set */
-    char unm[BFSML];        /* upper case version of CNM, PM_SET */
-    char rnm[BFSML];};      /* root struct id, SET */
 
 struct s_cmeta
    {char **enums;
@@ -21,35 +14,6 @@ struct s_cmeta
 
 int
  MODE_C = -1;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* C_TYPE_NAME_LIST - make canonical variations of type name TYP */
-
-static void c_type_name_list(char *typ, tnc_list *na)
-   {char *p;
-
-/* get C struct name */
-    p = trim(typ, BOTH, " \t");
-    nstrncpy(na->cnm, BFSML, p, -1);
-
-/* upper case C name */
-    nstrncpy(na->unm, BFSML, p, -1);
-    upcase(na->unm);
-
-/* lower case C name */
-    nstrncpy(na->lnm, BFSML, p, -1);
-    downcase(na->lnm);
-
-/* get root struct name */
-    if (p[2] == '_')
-       nstrncpy(na->rnm, BFSML, p+3, -1);
-    else
-       nstrncpy(na->rnm, BFSML, p, -1);
-    upcase(na->rnm);
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -120,10 +84,10 @@ static int cl_c(statedes *st, bindes *bd, int c, char **v)
 
 /* C_EMIT_TYPES_DEF - emit type related definitions into source file */
 
-static void c_emit_types_def(FILE *fc, char **ta, tnc_list *tl)
+static void c_emit_types_def(FILE *fc, der_list *sl)
    {
 
-    fprintf(fc, "int G_%s_I = -1;\n", tl->rnm);
+    fprintf(fc, "int G_%s_I = -1;\n", sl->na.rnm);
 
     return;}
 
@@ -132,38 +96,40 @@ static void c_emit_types_def(FILE *fc, char **ta, tnc_list *tl)
 
 /* C_EMIT_TYPES_HDR - emit type related declarations and macros */
 
-static void c_emit_types_hdr(FILE *fh, char **ta, tnc_list *tl)
+static void c_emit_types_hdr(FILE *fh, der_list *sl)
    {int i, nc;
     char a[BFLRG];
     char *mbr, *p;
-    mbrdes md;
+    mbrdes *md;
+    tn_list *tl;
+
+    md = sl->md;
+    tl = &sl->na;
 
 /* emit macro to define type to PDB file */
     fprintf(fh, "#define G_DEFINE_%s(_f)\t\\\n", tl->rnm);
     fprintf(fh, "   (PD_defstr_i(_f, \"%s\", \t\\\n", tl->cnm);
 
     a[0] = '\0';
-    for (i = 1; ta[i] != NULL; i++)
-        {mbr = trim(ta[i], BOTH, " \t");
-         if (IS_NULL(mbr) == FALSE)
-	    {parse_member(&md, mbr);
-	     if (md.cast != CAST_NONE)
-                {p  = strstr(mbr, "MBR(");
-                 *p = '\0';};
+    for (i = 0; md[i].text != NULL; i++)
+        {mbr = md[i].text;
+	 if (md[i].cast != CAST_NONE)
+	    {p  = strstr(mbr, "MBR(");
+	     *p = '\0';};
 
-	     if (md.is_fnc_ptr == B_T)
-	        fprintf(fh, "\t\t\"function %s\",\t\\\n", md.name);
-	     else
-	        fprintf(fh, "\t\t\"%s\",\t\\\n", trim(mbr, BOTH, " \t"));
+	 if (md[i].is_fnc_ptr == B_T)
+	    fprintf(fh, "\t\t\"function %s\",\t\\\n", md[i].name);
+	 else
+	    fprintf(fh, "\t\t\"%s\",\t\\\n", trim(mbr, BOTH, " \t"));
 	     
-	     if (md.cast == CAST_TYPE)
-	        vstrcat(a, BFLRG, 
-			"    PD_cast(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
-			tl->cnm, md.name, md.cast_mbr);
-	     else if (md.cast == CAST_LENGTH)
-	        vstrcat(a, BFLRG, 
-			"    PD_size_from(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
-			tl->cnm, md.name, md.cast_mbr);};};
+	 if (md[i].cast == CAST_TYPE)
+	    vstrcat(a, BFLRG, 
+		    "    PD_cast(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
+		    tl->cnm, md[i].name, md[i].cast_mbr);
+	 else if (md[i].cast == CAST_LENGTH)
+	    vstrcat(a, BFLRG, 
+		    "    PD_size_from(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
+		    tl->cnm, md[i].name, md[i].cast_mbr);};
 
     if (IS_NULL(a) == FALSE)
        {fprintf(fh, "\t\tLAST) &&\t\\\n");
@@ -186,30 +152,22 @@ static void c_emit_types_hdr(FILE *fh, char **ta, tnc_list *tl)
 
 /* C_ENUM_DEFS - generate coding to define enums to PDBLib */
 
-static void c_enum_defs(bindes *bd, char *dv, char **ta, int ni)
-   {int nc;
-    char s[BFSML];
-    char *pat;
-    FILE *fh, **fpa;
-    tnc_list tl;
+static void c_enum_defs(bindes *bd, char *tag, der_list *el, int ni)
+   {FILE *fh, **fpa;
+    tn_list tl;
 
     fpa = bd->fp;
 
     fh = fpa[1];
 
-    pat = "enum";
-    nc  = strlen(pat);
-
-    if (ta == NULL)
-       {if (strcmp(dv, "begin") == 0)
+    if (el == NULL)
+       {if (strcmp(tag, "begin") == 0)
 	   {}
-        else if (strcmp(dv, "end") == 0)
+        else if (strcmp(tag, "end") == 0)
 	   {};}
 
-    else if (strncmp(ta[0], pat, nc) == 0)
-       {nstrncpy(s, BFSML, dv + 7, -1);
-	pat = strtok(s, " \t");
-	c_type_name_list(pat, &tl);
+    else if (el->kind == TK_ENUM)
+       {tl = el->na;
 
 /* emit macro to define enum to PDB file */
 	fprintf(fh, "#define G_ENUM_%s(_f)\t", tl.rnm);
@@ -224,30 +182,23 @@ static void c_enum_defs(bindes *bd, char *dv, char **ta, int ni)
  *               - and PDBLib PD_defstr call
  */
 
-static void c_object_defs(bindes *bd, char *dv, char **ta, int ni)
-   {int nc;
-    char *pat;
-    FILE *fc, *fh, **fpa;
-    tnc_list tl;
+static void c_object_defs(bindes *bd, char *tag, der_list *sl, int ni)
+   {FILE *fc, *fh, **fpa;
 
     fpa = bd->fp;
 
     fc = fpa[0];
     fh = fpa[1];
 
-    pat = "struct s_";
-    nc  = strlen(pat);
-
-    if (ta == NULL)
-       {if (strcmp(dv, "begin") == 0)
+    if (sl == NULL)
+       {if (strcmp(tag, "begin") == 0)
 	   {}
-        else if (strcmp(dv, "end") == 0)
+        else if (strcmp(tag, "end") == 0)
 	   {};}
 
-    else if (strncmp(ta[0], pat, nc) == 0)
-       {c_type_name_list(ta[0]+9, &tl);
-	c_emit_types_def(fc, ta, &tl);
-        c_emit_types_hdr(fh, ta, &tl);};
+    else if (sl->kind == TK_STRUCT)
+       {c_emit_types_def(fc, sl);
+        c_emit_types_hdr(fh, sl);};
 
     return;}
 
@@ -256,29 +207,26 @@ static void c_object_defs(bindes *bd, char *dv, char **ta, int ni)
 
 /* C_TYPE_REG - generate coding to register C types with SCORE type manager */
 
-static void c_type_reg(bindes *bd, char *dv, char **ta, int ni)
+static void c_type_reg(bindes *bd, char *tag, der_list *sl, int ni)
    {FILE *fc, **fpa;
-    tnc_list tl;
+    tn_list *tl;
 
     fpa = bd->fp;
+    tl  = &sl->na;
 
     fc = fpa[0];
 
-    if (ta == NULL)
-       {if (strcmp(dv, "begin") == 0)
+    if (sl == NULL)
+       {if (strcmp(tag, "begin") == 0)
 	   {}
-        else if (strcmp(dv, "end") == 0)
+        else if (strcmp(tag, "end") == 0)
 	   {};}
 
-    else if (strncmp(ta[0], "struct s_", 9) == 0)
-/*  SC_HAELEM_I = SC_type_register(SC_HAELEM_S, KIND_STRUCT, sizeof(haelem), 0);
- */
-       {c_type_name_list(ta[0]+9, &tl);
-
-	fprintf(fc, "       G_%s_I = SC_type_register(\"%s\", KIND_STRUCT,\n",
-		tl.rnm, tl.cnm);
+    else if (sl->kind == TK_STRUCT)
+       {fprintf(fc, "       G_%s_I = SC_type_register(\"%s\", KIND_STRUCT,\n",
+		tl->rnm, tl->cnm);
 	fprintf(fc, "\t\t\t\tsizeof(%s), 0);\n",
-		tl.cnm);};
+		tl->cnm);};
 
     return;}
 
