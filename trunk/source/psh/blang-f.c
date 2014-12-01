@@ -1101,13 +1101,13 @@ static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MODULE_ENUM_DECL - write the Fortran interface C enums DV */
+/* MODULE_ENUM_DECL - write the Fortran interface C enums TAG */
 
-static void module_enum_decl(bindes *bd, char *dv, char **ta, int ni)
+static void module_enum_decl(bindes *bd, char *tag, der_list *el, int ni)
    {int i, nc;
     long vl;
     char s[BFLRG], x[BFLRG];
-    char *vr;
+    char *vr, **ta;
     FILE *fm, **fpa;
 
     fpa = bd->fp;
@@ -1120,14 +1120,16 @@ static void module_enum_decl(bindes *bd, char *dv, char **ta, int ni)
  *    end enum
  */
 
-    if (ta == NULL)
-       {if (strcmp(dv, "begin") == 0)
+    if (el == NULL)
+       {if (strcmp(tag, "begin") == 0)
 	   {}
-        else if (strcmp(dv, "end") == 0)
+        else if (strcmp(tag, "end") == 0)
 	   {};}
 
-    else if (strcmp(ta[0], "enum") == 0)
-       {fprintf(fm, "   enum, bind(C)\n");
+    else if (el->kind == TK_ENUM)
+       {ta = el->members;
+
+	fprintf(fm, "   enum, bind(C)\n");
 
 	fprintf(fm, "      ENUMERATOR ::");
 
@@ -1159,9 +1161,9 @@ static void module_enum_decl(bindes *bd, char *dv, char **ta, int ni)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MODULE_STRUCT_DECL - write the Fortran interface C structs DV */
+/* MODULE_STRUCT_DECL - write the Fortran interface C structs TAG */
 
-static void module_struct_decl(bindes *bd, char *dv, char **ta, int ni)
+static void module_struct_decl(bindes *bd, char *tag, der_list *sl, int ni)
    {FILE *fm, **fpa;
 
     fpa = bd->fp;
@@ -1189,13 +1191,13 @@ static void module_struct_decl(bindes *bd, char *dv, char **ta, int ni)
  *   end type foo
  */
 
-    if (ta == NULL)
-       {if (strcmp(dv, "begin") == 0)
+    if (sl == NULL)
+       {if (strcmp(tag, "begin") == 0)
 	   {}
-        else if (strcmp(dv, "end") == 0)
+        else if (strcmp(tag, "end") == 0)
 	   fprintf(fm, "\n");}
 
-    else if (strcmp(ta[0], "struct") == 0)
+    else if (sl->kind == TK_STRUCT)
        {};
 
     return;}

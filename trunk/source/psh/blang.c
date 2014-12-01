@@ -52,18 +52,20 @@ typedef struct s_statedes statedes;
 typedef struct s_bindes bindes;
 typedef struct s_typdes typdes;
 typedef struct s_mbrdes mbrdes;
+typedef struct s_tn_list tn_list;
 typedef struct s_der_list der_list;
 typedef struct s_idecl idecl;
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
 
 struct s_mbrdes
-   {int is_fnc_ptr;
-    cast_kind cast;
-    char type[BFSML];
-    char name[BFSML];
-    char dim[BFSML];
-    char cast_mbr[BFSML];};
+   {int is_fnc_ptr;               /* TRUE iff a function pointer */
+    cast_kind cast;               /* what kind of cast is it */
+    char type[BFSML];             /* member type */
+    char name[BFSML];             /* member name */
+    char dim[BFSML];              /* member dimensions */
+    char cast_mbr[BFSML];         /* member with cast info */
+    char *text;};                 /* full text of member */
 
 struct s_typdes
    {char *c;
@@ -114,9 +116,18 @@ struct s_fdecl
     farg proto;                      /* farg representation of declaration */
     farg *al;};
 
+struct s_tn_list
+   {char cnm[BFSML];        /* C struct name, PM_set */
+    char lnm[BFSML];        /* lower case version of CNM, pm_set */
+    char unm[BFSML];        /* upper case version of CNM, PM_SET */
+    char rnm[BFSML];};      /* root struct id, SET */
+
 struct s_der_list
-   {char *def;
-    char **members;};
+   {type_kind kind;
+    char *def;
+    char **members;
+    tn_list na;
+    mbrdes *md;};
 
 struct s_statedes
    {int nbi;                         /* number of bindings */
@@ -194,9 +205,164 @@ static void berr(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* TYPE_NAME_LIST - make canonical variations of type name TYP */
+
+static void type_name_list(char *typ, tn_list *na)
+   {int nc;
+    char *p, *pat;
+
+    pat = "struct s_";
+    nc  = strlen(pat);
+    if (strncmp(typ, pat, nc) != 0)
+       {pat = "enum e_";
+	nc  = strlen(pat);
+	if (strncmp(typ, pat, nc) != 0)
+	   {pat = "union u_";
+	    nc  = strlen(pat);};};
+
+/* get C struct name */
+    p  = typ + nc;
+    nc = strcspn(p, " \t");
+    nstrncpy(na->cnm, BFSML, p, nc);
+    p = na->cnm;
+
+/* upper case C name */
+    nstrncpy(na->unm, BFSML, p, -1);
+    upcase(na->unm);
+
+/* lower case C name */
+    nstrncpy(na->lnm, BFSML, p, -1);
+    downcase(na->lnm);
+
+/* get root struct name */
+    if (p[2] == '_')
+       nstrncpy(na->rnm, BFSML, p+3, -1);
+    else
+       nstrncpy(na->rnm, BFSML, p, -1);
+    upcase(na->rnm);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PARSE_MEMBER - parse a member description, MBR, into type, TY,
+ *              - name, NM, and dimensions, DM
+ *              - each of these is NC long if non-NULL
+ */
+
+void parse_member(mbrdes *md, char *mbr)
+   {int im, ns, hd;
+    char s[BFLRG], ind[BFSML];
+    char **sa, *pn, *pt;
+
+    memset(md, 0, sizeof(mbrdes));
+
+    hd = (strchr(mbr, '[') != NULL);
+    im = 0;
+
+    nstrncpy(s, BFLRG, mbr, -1);
+    md->text = STRSAVE(s);
+
+    if (strstr(s, "(*") != NULL)
+       {md->is_fnc_ptr = TRUE;
+	sa = tokenize(s, "()[]", 0);
+	ns = 0;
+	pt = sa[im++];
+	pn = sa[im++] + 1;}
+    else if (strncmp(s, "PF", 2) == 0)
+       {md->is_fnc_ptr = TRUE;
+	sa = tokenize(s, " \t", 0);
+	ns = 0;
+	pt = sa[im++];
+	pn = sa[im++];}
+    else if (strchr(s, '*') != NULL)
+       {sa = tokenize(s, " \t[]", 0);
+	pt = sa[im++];
+	pn = sa[im++];
+	ns = strspn(pn, "*");
+	pn += ns;}
+    else
+       {sa = tokenize(s, " \t[]", 0);
+	ns = 0;
+	pt = sa[im++];
+	pn = sa[im++];};
+
+/* type */
+    if (ns > 0)
+       {memset(ind, '*', ns);
+	ind[ns] = '\0';
+	snprintf(md->type, BFSML, "%s %s", pt, ind);}
+    else
+       nstrncpy(md->type, BFSML, pt, -1);
+
+/* name */
+    nstrncpy(md->name, BFSML, pn, -1);
+
+/* dimensions */
+    if (hd == TRUE)
+       nstrncpy(md->dim, BFSML, sa[im++], -1);
+
+/* cast */
+    if ((IS_NULL(sa[im]) == FALSE) && (strncmp(sa[im], "MBR(", 4) == 0))
+       {char **ta;
+
+	ta = tokenize(sa[im], " \t(,)", 0);
+        md->cast = ((strcmp(ta[1], "type") == 0) ? CAST_TYPE : CAST_LENGTH);
+	nstrncpy(md->cast_mbr, BFSML, trim(sa[3], BOTH, "()"), -1);
+	lst_free(ta);};
+
+    lst_free(sa);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PARSE_STRUCT - parse out everything needed for struct members
+ *              - for all future needs
+ */
+
+mbrdes *parse_struct(char **ta)
+   {int i, n;
+    char *mbr;
+    mbrdes *md;
+
+    for (n = 1; ta[n] != NULL; n++);
+
+    md = MAKE_N(mbrdes, n+1);
+    memset(md, 0, n*sizeof(mbrdes));
+
+    for (i = 1, n = 0; ta[i] != NULL; i++)
+        {mbr = trim(ta[i], BOTH, " \t");
+         if (IS_NULL(mbr) == FALSE)
+	    {parse_member(md+n, mbr);
+	     n++;};};
+
+    return(md);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FREE_PARSE_STRUCT - free the mbrdes array MD */
+
+void free_parse_struct(mbrdes *md)
+   {int i;
+
+    for (i = 0; md[i].text != NULL; i++)
+        FREE(md[i].text);
+
+    FREE(md);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PUSH_DERIVED - add S and SA to the derived type list LST */
 
-static der_list *push_derived(der_list *lst, int *pnl, char *s, char **sa)
+static der_list *push_derived(der_list *lst, int *pnl, char *s, char **sa,
+			      type_kind kind)
    {int ni, nb;
     static int nx = 10;
 
@@ -208,7 +374,14 @@ static der_list *push_derived(der_list *lst, int *pnl, char *s, char **sa)
        {nb = ni/nx;
 	REMAKE(lst, der_list, (nb+1)*nx);};
 
-    lst[ni].def     = STRSAVE(s);
+    lst[ni].kind = kind;
+    lst[ni].def  = STRSAVE(s);
+
+    type_name_list(s, &lst[ni].na);
+
+    if (kind == TK_STRUCT)
+       lst[ni].md = parse_struct(sa);
+
     lst[ni].members = sa;
 
     ni++;
@@ -1326,83 +1499,12 @@ static void hsep(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PARSE_MEMBER - parse a member description, MBR, into type, TY,
- *              - name, NM, and dimensions, DM
- *              - each of these is NC long if non-NULL
- */
-
-void parse_member(mbrdes *md, char *mbr)
-   {int im, ns, hd;
-    char s[BFLRG], ind[BFSML];
-    char **sa, *pn, *pt;
-
-    memset(md, 0, sizeof(mbrdes));
-
-    hd = (strchr(mbr, '[') != NULL);
-    im = 0;
-
-    nstrncpy(s, BFLRG, mbr, -1);
-    if (strstr(s, "(*") != NULL)
-       {md->is_fnc_ptr = TRUE;
-	sa = tokenize(s, "()[]", 0);
-	ns = 0;
-	pt = sa[im++];
-	pn = sa[im++] + 1;}
-    else if (strncmp(s, "PF", 2) == 0)
-       {md->is_fnc_ptr = TRUE;
-	sa = tokenize(s, " \t", 0);
-	ns = 0;
-	pt = sa[im++];
-	pn = sa[im++];}
-    else if (strchr(s, '*') != NULL)
-       {sa = tokenize(s, " \t[]", 0);
-	pt = sa[im++];
-	pn = sa[im++];
-	ns = strspn(pn, "*");
-	pn += ns;}
-    else
-       {sa = tokenize(s, " \t[]", 0);
-	ns = 0;
-	pt = sa[im++];
-	pn = sa[im++];};
-
-/* type */
-    if (ns > 0)
-       {memset(ind, '*', ns);
-	ind[ns] = '\0';
-	snprintf(md->type, BFSML, "%s %s", pt, ind);}
-    else
-       nstrncpy(md->type, BFSML, pt, -1);
-
-/* name */
-    nstrncpy(md->name, BFSML, pn, -1);
-
-/* dimensions */
-    if (hd == TRUE)
-       nstrncpy(md->dim, BFSML, sa[im++], -1);
-
-/* cast */
-    if ((IS_NULL(sa[im]) == FALSE) && (strncmp(sa[im], "MBR(", 4) == 0))
-       {char **ta;
-
-	ta = tokenize(sa[im], " \t(,)", 0);
-        md->cast = ((strcmp(ta[1], "type") == 0) ? CAST_TYPE : CAST_LENGTH);
-	nstrncpy(md->cast_mbr, BFSML, trim(sa[3], BOTH, "()"), -1);
-	lst_free(ta);};
-
-    lst_free(sa);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* EMIT_ENUM_DEFS - emit enum specifications via FEMIT */
 
 void emit_enum_defs(bindes *bd,
-		    void (*femit)(bindes *bd, char *dv, char **ta, int ni))
+		    void (*femit)(bindes *bd, char *tag,
+				  der_list *el, int ni))
    {int ie, ne;
-    char *sb, **ta;
     der_list *el;
     statedes *st;
 
@@ -1413,9 +1515,7 @@ void emit_enum_defs(bindes *bd,
     femit(bd, "begin", NULL, ne);
 
     for (ie = 0; ie < ne; ie++)
-        {sb = el[ie].def;
-	 ta = el[ie].members;
-	 femit(bd, sb, ta, -1);};
+        femit(bd, NULL, el+ie, -1);
 	    
     femit(bd, "end", NULL, -1);
 
@@ -1427,9 +1527,9 @@ void emit_enum_defs(bindes *bd,
 /* EMIT_STRUCT_DEFS - emit struct specifications via FEMIT */
 
 void emit_struct_defs(bindes *bd,
-		      void (*femit)(bindes *bd, char *dv, char **ta, int ni))
+		      void (*femit)(bindes *bd, char *tag,
+				    der_list *sl, int ni))
    {int is, ns;
-    char *sb, **ta;
     der_list *sl;
     statedes *st;
 
@@ -1440,9 +1540,7 @@ void emit_struct_defs(bindes *bd,
     femit(bd, "begin", NULL, ns);
 
     for (is = 0; is < ns; is++)
-        {sb = sl[is].def;
-	 ta = sl[is].members;
-	 femit(bd, sb, ta, -1);};
+        femit(bd, NULL, sl+is, -1);
 	    
     femit(bd, "end", NULL, -1);
 
@@ -1597,7 +1695,7 @@ static void find_bind(statedes *st, int iref)
 			 {nstrncpy(t, BFVLG, sb, -1);
 			  ta = tokenize(t, " \t", 0);
 			  if (strcmp(ta[1]+2, te) == 0)
-			     {el = push_derived(el, &ne, sb, ta);
+			     {el = push_derived(el, &ne, sb, ta, TK_ENUM);
 			      break;}
 			  else
 			     free_strings(ta);};};};};};
@@ -1621,7 +1719,7 @@ static void find_bind(statedes *st, int iref)
 			 {nstrncpy(t, BFVLG, sb, -1);
 			  ta = tokenize(t, "{;}", 0);
 			  if (strncmp(ta[0]+9, te, nc) == 0)
-			     {sl = push_derived(sl, &ns, sb, ta);
+			     {sl = push_derived(sl, &ns, sb, ta, TK_STRUCT);
 			      break;}
 			  else
 			     free_strings(ta);};};};};};

@@ -27,10 +27,10 @@ static int
 
 /* SCHEME_TYPE_NAME_LIST - make canonical variations of type name TYP */
 
-static void scheme_type_name_list(char *typ, tns_list *na)
+static void scheme_type_name_list(tns_list *na, tn_list *nc)
    {
 
-    c_type_name_list(typ, (tnc_list *) na);
+    *((tn_list *) na) = *nc;
 
 /* make the Scheme name */
     nstrncpy(na->snm, BFSML, subst(na->lnm, "_", "-", -1), -1);
@@ -43,13 +43,17 @@ static void scheme_type_name_list(char *typ, tns_list *na)
 /* SCHEME_GET_TYPE - get the Scheme type name for TY from text TX */
 
 static void scheme_get_type(char *a, int nc, char *ty, char *tx)
-   {tns_list tl;
+   {char s[BFSML];
+    tns_list tl;
+    tn_list tc;
 
     if (strcmp(ty, tykind[TK_ENUM]) == 0)
        nstrncpy(a, nc, "SC_ENUM_I", -1);
 
     else if (strcmp(ty, tykind[TK_STRUCT]) == 0)
-       {scheme_type_name_list(tx, &tl);
+       {snprintf(s, BFSML, "struct s_%s", tx);
+	type_name_list(s, &tc);
+	scheme_type_name_list(&tl, &tc);
 	snprintf(a, nc, "G_%s_I", tl.rnm);}
 
     else
@@ -501,9 +505,9 @@ static void scheme_wrap_local_return(FILE *fc, fdecl *dcl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCHEME_ENUM_DEFS - write the SCHEME interface C enums DV */
+/* SCHEME_ENUM_DEFS - write the SCHEME interface C enums TAG */
 
-static void scheme_enum_defs(bindes *bd, char *dv, char **ta, int ni)
+static void scheme_enum_defs(bindes *bd, char *tag, der_list *el, int ni)
    {char *pck;
     FILE *fc, **fpa;
     statedes *st;
@@ -518,25 +522,26 @@ static void scheme_enum_defs(bindes *bd, char *dv, char **ta, int ni)
  *    _SS_make_ext_int(si, <Enamei>, <Evaluei>);
  */
 
-    if (ta == NULL)
-       {if (strcmp(dv, "begin") == 0)
+    if (el == NULL)
+       {if (strcmp(tag, "begin") == 0)
 	   {csep(fc);
 	    fprintf(fc, "\n");
 	    fprintf(fc, "static void _SX_install_%s_consts(SS_psides *si)\n",
 		    pck);
 	    fprintf(fc, "   {\n");
 	    fprintf(fc, "\n");}
-        else if (strcmp(dv, "end") == 0)
+        else if (strcmp(tag, "end") == 0)
 	   {fprintf(fc, "\n");
 	    fprintf(fc, "    return;}\n");
 	    fprintf(fc, "\n");
 	    csep(fc);};}
 
-    else if (strcmp(ta[0], tykind[TK_ENUM]) == 0)
+    else if (el->kind == TK_ENUM)
        {int i;
 	long vl;
-	char *vr;
+	char *vr, **ta;
 
+	ta = el->members;
 	vl = 0;
 	for (i = 2; ta[i] != NULL; )
             {vr = strtok(ta[i++], "{,;}");
@@ -558,13 +563,14 @@ static void scheme_enum_defs(bindes *bd, char *dv, char **ta, int ni)
  *                       - in the header file
  */
 
-static void scheme_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
+static void scheme_hdr_struct_def(FILE *fh, der_list *sl, char *pck)
    {int i;
     char lnm[BFSML], unm[BFSML], mnm[BFSML];
     char *p, *mbr;
     tns_list tl;
+    mbrdes *md;
 
-    scheme_type_name_list(ta[0]+9, &tl);
+    scheme_type_name_list(&tl, &sl->na);
 
 /* emit type check predicate macro */
     fprintf(fh, "#undef SX_%sP\n", tl.rnm);
@@ -572,24 +578,19 @@ static void scheme_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
 	    tl.rnm, tl.rnm);
     fprintf(fh, "\n");
 
-#if 0
-    fprintf(fh, "#define %s(_o)   \t(SS_GET(%s, _o))\n",
-	    tl.rnm, tl.cnm);
-#endif
-
 /* emit member accessor macros */
-    for (i = 1; ta[i] != NULL; i++)
-        {mbr = trim(ta[i], BOTH, " \t");
-	 if (IS_NULL(mbr) == FALSE)
-	    {nstrncpy(mnm, BFSML, mbr, -1);
-	     p = strtok(mnm, "* \t");
-	     p = strtok(NULL, "[(*)] \t");
-	     nstrncpy(lnm, BFSML, p, -1);
-	     nstrncpy(unm, BFSML, p, -1);
-	     upcase(unm);
+    md = sl->md;
+    for (i = 0; md[i].text != NULL; i++)
+        {mbr = md[i].text;
+	 nstrncpy(mnm, BFSML, mbr, -1);
+	 p = strtok(mnm, "* \t");
+	 p = strtok(NULL, "[(*)] \t");
+	 nstrncpy(lnm, BFSML, p, -1);
+	 nstrncpy(unm, BFSML, p, -1);
+	 upcase(unm);
 
-	     fprintf(fh, "#define %s_%s(_o)   \t(SS_GET(%s, _o)->%s)\n",
-		     tl.rnm, unm, tl.cnm, lnm);};};
+	 fprintf(fh, "#define %s_%s(_o)   \t(SS_GET(%s, _o)->%s)\n",
+		 tl.rnm, unm, tl.cnm, lnm);};
     fprintf(fh, "\n");
 
 /* emit list extractor */
@@ -615,10 +616,10 @@ static void scheme_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
  *                     - in the C file
  */
 
-static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
+static void scheme_c_struct_def(FILE *fc, der_list *sl, char *pck)
    {tns_list tl;
 
-    scheme_type_name_list(ta[0]+9, &tl);
+    scheme_type_name_list(&tl, &sl->na);
 
 /* emit registration with the SX VIF */
     fprintf(fc, "    nerr &= G_DEFINE_%s(SX_gs.vif);\n", tl.rnm);
@@ -641,9 +642,9 @@ static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCHEME_STRUCT_DEFS - write the SCHEME interface C structs DV */
+/* SCHEME_STRUCT_DEFS - write the SCHEME interface C structs TAG */
 
-static void scheme_struct_defs(bindes *bd, char *dv, char **ta, int ni)
+static void scheme_struct_defs(bindes *bd, char *tag, der_list *sl, int ni)
    {char *pck;
     FILE *fc, *fh, **fpa;
     statedes *st;
@@ -655,8 +656,8 @@ static void scheme_struct_defs(bindes *bd, char *dv, char **ta, int ni)
     fc = fpa[0];
     fh = fpa[1];
 
-    if (ta == NULL)
-       {if (strcmp(dv, "begin") == 0)
+    if (sl == NULL)
+       {if (strcmp(tag, "begin") == 0)
 	   {csep(fc);
 	    fprintf(fc, "\n");
 	    fprintf(fc, "static int _SX_install_%s_derived(SS_psides *si)\n",
@@ -667,14 +668,14 @@ static void scheme_struct_defs(bindes *bd, char *dv, char **ta, int ni)
 	    fprintf(fc, "\n");
 	    fprintf(fc, "    nerr = TRUE;\n");
 	    fprintf(fc, "\n");}
-        else if (strcmp(dv, "end") == 0)
+        else if (strcmp(tag, "end") == 0)
 	   {fprintf(fc, "    return(nerr);}\n");
 	    fprintf(fc, "\n");
 	    csep(fc);};}
 
-    else if (strncmp(ta[0], "struct s_", 9) == 0)
-       {scheme_hdr_struct_def(fh, dv, ta, pck);
-	scheme_c_struct_def(fc, dv, ta, pck);};
+    else if (sl->kind == TK_STRUCT)
+       {scheme_hdr_struct_def(fh, sl, pck);
+	scheme_c_struct_def(fc, sl, pck);};
 
     return;}
 
@@ -685,7 +686,7 @@ static void scheme_struct_defs(bindes *bd, char *dv, char **ta, int ni)
  *                    - SCHEME object from C structs
  */
 
-static void scheme_object_defs(bindes *bd, char *dv, char **ta, int ni)
+static void scheme_object_defs(bindes *bd, char *tag, der_list *sl, int ni)
    {int i, ok;
     char topt[BFSML];
     char **to;
@@ -699,14 +700,14 @@ static void scheme_object_defs(bindes *bd, char *dv, char **ta, int ni)
 
     fc = fpa[0];
 
-    if (ta == NULL)
-       {if (strcmp(dv, "begin") == 0)
+    if (sl == NULL)
+       {if (strcmp(tag, "begin") == 0)
 	   csep(fc);
-        else if (strcmp(dv, "end") == 0)
+        else if (strcmp(tag, "end") == 0)
 	   csep(fc);}
 
-    else if (strncmp(ta[0], "struct s_", 9) == 0)
-       {scheme_type_name_list(ta[0]+9, &tl);
+    else if (sl->kind == TK_STRUCT)
+       {scheme_type_name_list(&tl, &sl->na);
 
 	ok = FALSE;
 	if (to != NULL)
