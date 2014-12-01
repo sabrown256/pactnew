@@ -604,7 +604,10 @@ struct s_PG_font_family
 
 /*--------------------------------------------------------------------------*/
 
-/* declare RGB color map */
+/* declare RGB color map
+ *
+ * #bind struct RGB_color_map
+ */
 
 typedef struct s_RGB_color_map RGB_color_map;
 
@@ -632,11 +635,9 @@ struct s_PG_palette
     RGB_color_map *pseudo_colormap;
     RGB_color_map *true_colormap;
     unsigned long *pixel_value;
-
 #ifdef MAC_COLOR
     PaletteHandle hpalette;
 #endif
-
     PG_palette *next;};
 
 /*--------------------------------------------------------------------------*/

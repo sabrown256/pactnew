@@ -6,6 +6,7 @@
  */
 
 typedef struct s_tns_list tns_list;
+typedef struct s_smeta smeta;
 
 struct s_tns_list
    {char cnm[BFSML];        /* C struct name, PM_set */
@@ -14,6 +15,9 @@ struct s_tns_list
     char rnm[BFSML];        /* root struct id, SET */
 
     char snm[BFSML];};      /* Scheme struct name, pm-set */
+
+struct s_smeta
+   {char **topt;};          /* type with _SX_opt_xxx methods */
 
 static int
  MODE_S = -1;
@@ -137,13 +141,37 @@ static fparam so_type(char *a, int nc, char *ty)
 /* INIT_SCHEME - initialize Scheme file */
 
 static void init_scheme(statedes *st, bindes *bd)
-   {char fn[BFLRG], upck[BFLRG];
-    char *pck;
-    FILE *fc, *fh;
+   {int i;
+    char fn[BFLRG], upck[BFLRG], s[BFMG];
+    char *pck, *p, **tl;
+    FILE *fc, *fh, *fp;
+    smeta *sm;
 
     pck = st->pck;
     snprintf(upck, BFLRG, pck, -1);
     upcase(upck);
+
+/* make the Scheme metadata from the opts file */
+    tl = NULL;
+    fp = open_file("r", "%s.opts", pck);
+    if (fp != NULL)
+       {for (i = 0; TRUE; i++)
+	    {p = fgets(s, BFMG, fp);
+	     if (p == NULL)
+	        break;
+	     LAST_CHAR(p) = '\0';
+	     if (blank_line(p) == TRUE)
+	        continue;
+	     else
+	        tl = lst_add(tl, p);};
+
+	tl = lst_add(tl, NULL);
+
+	fclose(fp);};
+
+    sm = MAKE(smeta);
+    sm->topt = tl;
+    bd->data = sm;
 
 /* open C file */
     if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
@@ -475,11 +503,16 @@ static void scheme_wrap_local_return(FILE *fc, fdecl *dcl,
 
 /* SCHEME_ENUM_DEFS - write the SCHEME interface C enums DV */
 
-static void scheme_enum_defs(FILE **fpa, char *dv, char **ta,
-			     char *pck, int ni)
-   {FILE *fc;
+static void scheme_enum_defs(bindes *bd, char *dv, char **ta, int ni)
+   {char *pck;
+    FILE *fc, **fpa;
+    statedes *st;
 
-    fc = fpa[0];
+    fpa = bd->fp;
+
+    fc  = fpa[0];
+    st  = bd->st;
+    pck = st->pck;
 
 /* syntax:
  *    _SS_make_ext_int(si, <Enamei>, <Evaluei>);
@@ -610,9 +643,14 @@ static void scheme_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* SCHEME_STRUCT_DEFS - write the SCHEME interface C structs DV */
 
-static void scheme_struct_defs(FILE **fpa, char *dv, char **ta,
-			       char *pck, int ni)
-   {FILE *fc, *fh;
+static void scheme_struct_defs(bindes *bd, char *dv, char **ta, int ni)
+   {char *pck;
+    FILE *fc, *fh, **fpa;
+    statedes *st;
+
+    fpa = bd->fp;
+    st  = bd->st;
+    pck = st->pck;
 
     fc = fpa[0];
     fh = fpa[1];
@@ -647,10 +685,17 @@ static void scheme_struct_defs(FILE **fpa, char *dv, char **ta,
  *                    - SCHEME object from C structs
  */
 
-static void scheme_object_defs(FILE **fpa, char *dv, char **ta,
-			       char *pck, int ni)
-   {FILE *fc;
+static void scheme_object_defs(bindes *bd, char *dv, char **ta, int ni)
+   {int i, ok;
+    char topt[BFSML];
+    char **to;
+    FILE *fc, **fpa;
     tns_list tl;
+    smeta *sm;
+
+    fpa = bd->fp;
+    sm  = bd->data;
+    to  = sm->topt;
 
     fc = fpa[0];
 
@@ -663,6 +708,16 @@ static void scheme_object_defs(FILE **fpa, char *dv, char **ta,
     else if (strncmp(ta[0], "struct s_", 9) == 0)
        {scheme_type_name_list(ta[0]+9, &tl);
 
+	ok = FALSE;
+	if (to != NULL)
+	   {for (i = 0; (to[i] != NULL) && (ok == FALSE); i++)
+	        ok = (strcmp(tl.cnm, to[i]) == 0);};
+
+	if (ok == TRUE)
+	   snprintf(topt, BFSML, "_SX_opt_%s", tl.cnm);
+	else
+	   nstrncpy(topt, BFSML, "_SX_opt_generic", -1);
+
         csep(fc);
         fprintf(fc, "\n");
 
@@ -673,8 +728,8 @@ static void scheme_object_defs(FILE **fpa, char *dv, char **ta,
 	fprintf(fc, "\n");
 	fprintf(fc, "    x = SS_GET(%s, o);\n", tl.cnm);
 	fprintf(fc, "\n");
-	fprintf(fc, "    PRINT(SS_OUTSTREAM(fp), \"<%s|%%s>\", _SX_opt_%s(x, BIND_PRINT, NULL));\n",
-		tl.rnm, tl.cnm);
+	fprintf(fc, "    PRINT(SS_OUTSTREAM(fp), \"<%s|%%s>\", %s(x, BIND_PRINT, NULL));\n",
+		tl.rnm, topt);
 
 	fprintf(fc, "\n");
 	fprintf(fc, "    return;}\n");
@@ -691,7 +746,7 @@ static void scheme_object_defs(FILE **fpa, char *dv, char **ta,
 	fprintf(fc, "\n");
 	fprintf(fc, "    x = SS_GET(%s, o);\n", tl.cnm);
 	fprintf(fc, "\n");
-	fprintf(fc, "    _SX_opt_%s(x, BIND_FREE, NULL);\n", tl.cnm);
+	fprintf(fc, "    %s(x, BIND_FREE, NULL);\n", topt);
 	fprintf(fc, "\n");
 	fprintf(fc, "    SS_rl_object(si, o);\n");
 	fprintf(fc, "\n");
@@ -716,10 +771,8 @@ static void scheme_object_defs(FILE **fpa, char *dv, char **ta,
 /* use the BIND member to determine the print name */
 	fprintf(fc, "       {char *nm;\n");
 	fprintf(fc, "\n");
-	fprintf(fc, "        _SX_opt_%s(x, BIND_ALLOC, NULL);\n",
-		tl.cnm);
-	fprintf(fc, "        nm = _SX_opt_%s(x, BIND_LABEL, NULL);\n",
-		tl.cnm);
+	fprintf(fc, "        %s(x, BIND_ALLOC, NULL);\n", topt);
+	fprintf(fc, "        nm = %s(x, BIND_LABEL, NULL);\n", topt);
 	fprintf(fc, "        rv = SS_mk_object(si, x, G_%s_I, SELF_EV, nm,\n",
 		tl.rnm);
 	fprintf(fc, "                          _SX_wr_%s, _SX_rl_%s);}\n",
@@ -736,7 +789,7 @@ static void scheme_object_defs(FILE **fpa, char *dv, char **ta,
 	fprintf(fc, "void *_SX_arg_%s(SS_psides *si, object *o)\n", tl.lnm);
 	fprintf(fc, "   {void *rv;\n");
 	fprintf(fc, "\n");
-	fprintf(fc, "    rv = _SX_opt_%s(NULL, BIND_ARG, o);\n", tl.cnm);
+	fprintf(fc, "    rv = %s(NULL, BIND_ARG, o);\n", topt);
 	fprintf(fc, "\n");
 	fprintf(fc, "    if (rv == _SX.unresolved)\n");
 	fprintf(fc, "       SS_error(si, \"OBJECT NOT %s - _SX_ARG_%s\", o);\n",
@@ -1035,7 +1088,9 @@ static int register_scheme(int fl, statedes *st)
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 
+	pb->lang = "Scheme";
 	pb->st   = st;
+	pb->data = NULL;
 	pb->cl   = cl_scheme;
 	pb->init = init_scheme;
 	pb->bind = bind_scheme;

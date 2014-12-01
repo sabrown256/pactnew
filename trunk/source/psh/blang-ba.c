@@ -84,7 +84,9 @@ static int register_basis(int fl, statedes *st)
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 
+	pb->lang = "basis";
 	pb->st   = st;
+	pb->data = NULL;
 	pb->cl   = cl_basis;
 	pb->init = init_basis;
 	pb->bind = bind_basis;

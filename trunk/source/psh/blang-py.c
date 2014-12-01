@@ -10,6 +10,7 @@
 */
 
 typedef struct s_tnp_list tnp_list;
+typedef struct s_pmeta pmeta;
 
 struct s_tnp_list
    {char cnm[BFSML];        /* C struct name, PM_set */
@@ -20,6 +21,9 @@ struct s_tnp_list
     char pnm[BFSML];        /* Python struct name, PY_PM_set */
     char tnm[BFSML];        /* Python type name, PY_PM_set_type */
     char inm[BFSML];};      /* default instance id, set */
+
+struct s_pmeta
+   {char **topt;};          /* type with _PY_opt_xxx methods */
 
 static char
  **_py_bound_types = NULL;
@@ -210,9 +214,14 @@ static void py_arg(char *arg, int nc, char *spec)
 
 /* PYTHON_ENUM_DEFS - write the Python interface C enums DV */
 
-static void python_enum_defs(FILE **fpa, char *dv, char **ta,
-			     char *pck, int ni)
-   {FILE *fc;
+static void python_enum_defs(bindes *bd, char *dv, char **ta, int ni)
+   {char *pck;
+    FILE *fc, **fpa;
+    statedes *st;
+
+    fpa = bd->fp;
+    st  = bd->st;
+    pck = st->pck;
 
     fc = fpa[0];
 
@@ -257,8 +266,13 @@ static void python_enum_defs(FILE **fpa, char *dv, char **ta,
  *                       - in the header file
  */
 
-static void python_hdr_struct_def(FILE *fh, char *dv, char **ta, char *pck)
-   {tnp_list tl;
+static void python_hdr_struct_def(bindes *bd, char *dv, char **ta)
+   {FILE *fh, **fpa;
+    tnp_list tl;
+
+    fpa = bd->fp;
+
+    fh = fpa[1];
 
     python_type_name_list(ta[0]+9, &tl);
 
@@ -407,18 +421,36 @@ static void python_emit_getters(FILE *fc, char **ta, tnp_list *tl)
 
 /* PYTHON_EMIT_SETTERS - emit the setter methods */
 
-static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
-   {int im, nind;
-    char aty[BFSML], bty[BFSML];
-    char *pm;
+static void python_emit_setters(bindes *bd, char **ta, tnp_list *tl)
+   {int i, im, nind, ok;
+    char aty[BFSML], bty[BFSML], topt[BFSML];
+    char *mbr, **to;
+    FILE *fc, **fpa;
     mbrdes md;
+    pmeta *pm;
+
+    fpa = bd->fp;
+    pm  = bd->data;
+    to  = pm->topt;
+
+    fc = fpa[0];
 
     for (im = 1; ta[im] != NULL; im++)
-        {pm = trim(ta[im], BOTH, " \t");
-	 if (IS_NULL(pm) == TRUE)
+        {mbr = trim(ta[im], BOTH, " \t");
+	 if (IS_NULL(mbr) == TRUE)
 	    continue;
 
-	 nind = python_parse_member(&md, pm, bty, aty, BFSML);
+	 nind = python_parse_member(&md, mbr, bty, aty, BFSML);
+
+	 ok = FALSE;
+	 if (to != NULL)
+	    {for (i = 0; (to[i] != NULL) && (ok == FALSE); i++)
+		 ok = (strcmp(bty, to[i]) == 0);};
+
+	 if (ok == TRUE)
+	    snprintf(topt, BFSML, "_PY_opt_%s", bty);
+	 else
+	    nstrncpy(topt, BFSML, "_PY_opt_generic", -1);
 
 	 fprintf(fc, "static int %s_set_%s(%s *self,\n",
 		 tl->pnm, md.name, tl->pnm);
@@ -447,7 +479,7 @@ static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
 	 else if ((is_fixed_point(md.type) == B_T) ||
 		  (strcmp(md.type, tykind[TK_ENUM]) == 0))
 	    {if (IS_NULL(md.dim) == FALSE)
-                python_unknown_member(fc, pm, md.type, 2);
+                python_unknown_member(fc, mbr, md.type, 2);
 	     else
 	        {fprintf(fc, "       {int ok;\n");
 		 fprintf(fc, "        long lv;\n");
@@ -460,7 +492,7 @@ static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
 /* if member is floating point type */
 	 else if (is_real(md.type) == B_T)
 	    {if (IS_NULL(md.dim) == FALSE)
-                python_unknown_member(fc, pm, md.type, 2);
+                python_unknown_member(fc, mbr, md.type, 2);
 	     else
 	        {fprintf(fc, "       {int ok;\n");
 	         fprintf(fc, "        double dv;\n");
@@ -472,26 +504,26 @@ static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
 
 /* if member is pointer to a known bound type */
          else if (python_lookup_bound_type(bty) == TRUE)
-	    {if ((nind > 0) && (is_func_ptr(pm, 7) == 0))
+	    {if ((nind > 0) && (is_func_ptr(mbr, 7) == 0))
 	        {fprintf(fc, "       {int ok;\n");
 		 fprintf(fc, "\n");
 		 fprintf(fc, "        ok = PY_%s_extractor(value, self->pyo->%s);\n",
 			 bty, md.name);
 		 fprintf(fc, "        if (ok == TRUE)\n");
-		 fprintf(fc, "           {_PY_opt_%s(self->pyo->%s, BIND_ALLOC, NULL);\n",
-			 bty, md.name);
+		 fprintf(fc, "           {%s(self->pyo->%s, BIND_ALLOC, NULL);\n",
+			 topt, md.name);
 		 fprintf(fc, "            rv = 0;};};\n");}
 	     else
 	        fprintf(fc, "       rv = -1;     /* non pointer struct '%s' */\n",
-			pm);}
+			mbr);}
 
 /* if member is pointer */
          else if (nind > 0)
-	    python_unknown_member(fc, pm, md.type, 2);
+	    python_unknown_member(fc, mbr, md.type, 2);
 
 /* unknown member action */
 	 else
-	    python_unknown_member(fc, pm, md.type, 2);
+	    python_unknown_member(fc, mbr, md.type, 2);
 
          fprintf(fc, "\n");
 
@@ -511,11 +543,16 @@ static void python_emit_setters(FILE *fc, char **ta, tnp_list *tl)
  *                     - in the C file
  */
 
-static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
+static void python_c_struct_def(bindes *bd, char *dv, char **ta)
    {int im, hs;
-    char *pm;
+    char *mbr;
+    FILE *fc, **fpa;
     mbrdes md;
     tnp_list tl;
+
+    fpa = bd->fp;
+
+    fc = fpa[0];
 
     python_type_name_list(ta[0]+9, &tl);
 
@@ -584,7 +621,7 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     python_emit_getters(fc, ta, &tl);
 
 /* setter - member accessor methods */
-    python_emit_setters(fc, ta, &tl);
+    python_emit_setters(bd, ta, &tl);
 
 /* tp_init method */
     fprintf(fc, "static int %s_tp_init(%s *self, PyObject *args, PyObject *kwds)\n",
@@ -616,10 +653,10 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
     fprintf(fc, "static char\n");
 
     for (im = 1; ta[im] != NULL; im++)
-        {pm = trim(ta[im], BOTH, " \t");
-	 if (IS_NULL(pm) == TRUE)
+        {mbr = trim(ta[im], BOTH, " \t");
+	 if (IS_NULL(mbr) == TRUE)
 	    continue;
-	 parse_member(&md, pm);
+	 parse_member(&md, mbr);
          fprintf(fc, " %s_doc_%s[] = \"\",\n", tl.pnm, md.name);};
 
     fprintf(fc, " %s_doc[] = \"\";\n", tl.pnm);
@@ -635,10 +672,10 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 	    tl.inm, tl.pnm, tl.pnm);
 
     for (im = 1; ta[im] != NULL; im++)
-        {pm = trim(ta[im], BOTH, " \t");
-	 if (IS_NULL(pm) == TRUE)
+        {mbr = trim(ta[im], BOTH, " \t");
+	 if (IS_NULL(mbr) == TRUE)
 	    continue;
-	 parse_member(&md, pm);
+	 parse_member(&md, mbr);
 
 /* GOTCHA: when do we have a setter? */
 	 hs = FALSE;
@@ -673,12 +710,8 @@ static void python_c_struct_def(FILE *fc, char *dv, char **ta, char *pck)
 
 /* PYTHON_STRUCT_DEFS - write the Python interface C structs DV */
 
-static void python_struct_defs(FILE **fpa, char *dv, char **ta,
-			       char *pck, int ni)
-   {FILE *fc, *fh;
-
-    fc = fpa[0];
-    fh = fpa[1];
+static void python_struct_defs(bindes *bd, char *dv, char **ta, int ni)
+   {
 
     if (ta == NULL)
        {if (strcmp(dv, "begin") == 0)
@@ -687,8 +720,8 @@ static void python_struct_defs(FILE **fpa, char *dv, char **ta,
 	   {};}
 
     else if (strncmp(ta[0], "struct s_", 9) == 0)
-       {python_hdr_struct_def(fh, dv, ta, pck);
-	python_c_struct_def(fc, dv, ta, pck);};
+       {python_hdr_struct_def(bd, dv, ta);
+	python_c_struct_def(bd, dv, ta);};
 
     return;}
 
@@ -697,10 +730,15 @@ static void python_struct_defs(FILE **fpa, char *dv, char **ta,
 
 /* PYTHON_OBJECT_DEFS - define local version of struct definitions */
 
-static void python_object_defs(FILE **fpa, char *dv, char **ta,
-			       char *pck, int ni)
-   {tnp_list tl;
-    FILE *fc;
+static void python_object_defs(bindes *bd, char *dv, char **ta, int ni)
+   {char *pck;
+    FILE *fc, **fpa;
+    tnp_list tl;
+    statedes *st;
+
+    fpa = bd->fp;
+    st  = bd->st;
+    pck = st->pck;
 
     fc = fpa[0];
 
@@ -741,13 +779,37 @@ static void python_object_defs(FILE **fpa, char *dv, char **ta,
 /* INIT_PYTHON - initialize Python file */
 
 static void init_python(statedes *st, bindes *bd)
-   {char fn[BFLRG], upck[BFLRG];
-    char *pck;
-    FILE *fc, *fh;
+   {int i;
+    char fn[BFLRG], upck[BFLRG], s[BFMG];
+    char *pck, *p, **tl;
+    FILE *fc, *fh, *fp;
+    pmeta *pm;
 
     pck = st->pck;
     snprintf(upck, BFLRG, pck, -1);
     upcase(upck);
+
+/* make the Python metadata from the optp file */
+    tl = NULL;
+    fp = open_file("r", "%s.optp", pck);
+    if (fp != NULL)
+       {for (i = 0; TRUE; i++)
+	    {p = fgets(s, BFMG, fp);
+	     if (p == NULL)
+	        break;
+	     LAST_CHAR(p) = '\0';
+	     if (blank_line(p) == TRUE)
+	        continue;
+	     else
+	        tl = lst_add(tl, p);};
+
+	tl = lst_add(tl, NULL);
+
+	fclose(fp);};
+
+    pm = MAKE(pmeta);
+    pm->topt = tl;
+    bd->data = pm;
 
 /* open C file */
     if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
@@ -1504,7 +1566,9 @@ static int register_python(int fl, statedes *st)
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 
+	pb->lang = "python";
 	pb->st   = st;
+	pb->data = NULL;
 	pb->cl   = cl_python;
 	pb->init = init_python;
 	pb->bind = bind_python;

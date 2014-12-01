@@ -138,10 +138,12 @@ struct s_statedes
     str_list defv;};
 
 struct s_bindes
-   {int *iparam;
+   {char *lang;
+    int *iparam;
     statedes *st;
     FILE *fp[NF];
     str_list types;
+    void *data;
     int (*cl)(statedes *st, bindes *bd, int c, char **v);
     void (*init)(statedes *st, bindes *bd);
     int (*bind)(bindes *bd);
@@ -1398,28 +1400,24 @@ void parse_member(mbrdes *md, char *mbr)
 /* EMIT_ENUM_DEFS - emit enum specifications via FEMIT */
 
 void emit_enum_defs(bindes *bd,
-		    void (*femit)(FILE **fp, char *dv, char **ta,
-				  char *pck, int ni))
+		    void (*femit)(bindes *bd, char *dv, char **ta, int ni))
    {int ie, ne;
-    char *pck, *sb, **ta;
+    char *sb, **ta;
     der_list *el;
-    FILE **fp;
     statedes *st;
 
-    st  = bd->st;
-    fp  = bd->fp;
-    pck = st->pck;
-    ne  = st->nen;
-    el  = st->enums;
+    st = bd->st;
+    ne = st->nen;
+    el = st->enums;
 
-    femit(fp, "begin", NULL, pck, ne);
+    femit(bd, "begin", NULL, ne);
 
     for (ie = 0; ie < ne; ie++)
         {sb = el[ie].def;
 	 ta = el[ie].members;
-	 femit(fp, sb, ta, pck, -1);};
+	 femit(bd, sb, ta, -1);};
 	    
-    femit(fp, "end", NULL, pck, -1);
+    femit(bd, "end", NULL, -1);
 
     return;}
 
@@ -1429,28 +1427,24 @@ void emit_enum_defs(bindes *bd,
 /* EMIT_STRUCT_DEFS - emit struct specifications via FEMIT */
 
 void emit_struct_defs(bindes *bd,
-		      void (*femit)(FILE **fp, char *dv, char **ta,
-				    char *pck, int ni))
+		      void (*femit)(bindes *bd, char *dv, char **ta, int ni))
    {int is, ns;
-    char *pck, *sb, **ta;
+    char *sb, **ta;
     der_list *sl;
-    FILE **fp;
     statedes *st;
 
-    st  = bd->st;
-    fp  = bd->fp;
-    pck = st->pck;
-    ns  = st->nst;
-    sl  = st->structs;
+    st = bd->st;
+    ns = st->nst;
+    sl = st->structs;
 
-    femit(fp, "begin", NULL, pck, ns);
+    femit(bd, "begin", NULL, ns);
 
     for (is = 0; is < ns; is++)
         {sb = sl[is].def;
 	 ta = sl[is].members;
-	 femit(fp, sb, ta, pck, -1);};
+	 femit(bd, sb, ta, -1);};
 	    
-    femit(fp, "end", NULL, pck, -1);
+    femit(bd, "end", NULL, -1);
 
     return;}
 

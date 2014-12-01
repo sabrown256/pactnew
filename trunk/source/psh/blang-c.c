@@ -6,12 +6,18 @@
  */
 
 typedef struct s_tnc_list tnc_list;
+typedef struct s_cmeta cmeta;
 
 struct s_tnc_list
    {char cnm[BFSML];        /* C struct name, PM_set */
     char lnm[BFSML];        /* lower case version of CNM, pm_set */
     char unm[BFSML];        /* upper case version of CNM, PM_SET */
     char rnm[BFSML];};      /* root struct id, SET */
+
+struct s_cmeta
+   {char **enums;
+    char **structs;
+    char **unions;};
 
 int
  MODE_C = -1;
@@ -180,13 +186,14 @@ static void c_emit_types_hdr(FILE *fh, char **ta, tnc_list *tl)
 
 /* C_ENUM_DEFS - generate coding to define enums to PDBLib */
 
-static void c_enum_defs(FILE **fpa, char *dv, char **ta,
-			char *pck, int ni)
+static void c_enum_defs(bindes *bd, char *dv, char **ta, int ni)
    {int nc;
     char s[BFSML];
     char *pat;
-    FILE *fh;
+    FILE *fh, **fpa;
     tnc_list tl;
+
+    fpa = bd->fp;
 
     fh = fpa[1];
 
@@ -217,12 +224,13 @@ static void c_enum_defs(FILE **fpa, char *dv, char **ta,
  *               - and PDBLib PD_defstr call
  */
 
-static void c_object_defs(FILE **fpa, char *dv, char **ta,
-			  char *pck, int ni)
+static void c_object_defs(bindes *bd, char *dv, char **ta, int ni)
    {int nc;
     char *pat;
-    FILE *fc, *fh;
+    FILE *fc, *fh, **fpa;
     tnc_list tl;
+
+    fpa = bd->fp;
 
     fc = fpa[0];
     fh = fpa[1];
@@ -248,10 +256,11 @@ static void c_object_defs(FILE **fpa, char *dv, char **ta,
 
 /* C_TYPE_REG - generate coding to register C types with SCORE type manager */
 
-static void c_type_reg(FILE **fpa, char *dv, char **ta,
-		       char *pck, int ni)
-   {FILE *fc;
+static void c_type_reg(bindes *bd, char *dv, char **ta, int ni)
+   {FILE *fc, **fpa;
     tnc_list tl;
+
+    fpa = bd->fp;
 
     fc = fpa[0];
 
@@ -329,13 +338,47 @@ static int bind_c(bindes *bd)
 /* INIT_C - initialize C files */
 
 static void init_c(statedes *st, bindes *bd)
-   {char fn[BFLRG], upck[BFLRG];
-    char *pck;
-    FILE *fc, *fh;
+   {int i;
+    char fn[BFLRG], upck[BFLRG], s[BFMG];
+    char *p, *pck, **el, **sl, **ul;
+    FILE *fc, *fh, *fp;
+    cmeta *cm;
 
     pck = st->pck;
     snprintf(upck, BFLRG, pck, -1);
     upcase(upck);
+
+/* make the C metadata from the derivedc file */
+    el = NULL;
+    sl = NULL;
+    ul = NULL;
+    fp = open_file("r", "%s.derivedc", pck);
+    if (fp != NULL)
+       {for (i = 0; TRUE; i++)
+	    {p = fgets(s, BFMG, fp);
+	     if (p == NULL)
+	        break;
+	     LAST_CHAR(p) = '\0';
+	     if (blank_line(p) == TRUE)
+	        continue;
+	     else if (strncmp(p, "enum e_", 7) == 0)
+	        el = lst_add(el, p);
+	     else if (strncmp(p, "struct s_", 9) == 0)
+	        sl = lst_add(sl, p);
+	     else if (strncmp(p, "union u_", 8) == 0)
+	        ul = lst_add(ul, p);};
+
+	el = lst_add(el, NULL);
+	sl = lst_add(sl, NULL);
+	ul = lst_add(ul, NULL);
+
+	fclose(fp);};
+
+    cm = MAKE(cmeta);
+    cm->enums   = el;
+    cm->structs = sl;
+    cm->unions  = ul;
+    bd->data    = cm;
 
 /* open C file */
     if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
@@ -390,6 +433,13 @@ static void init_c(statedes *st, bindes *bd)
 static void fin_c(bindes *bd)
    {int i;
     FILE *fh, *fp;
+    cmeta *cm;
+
+    cm = bd->data;
+    FREE(cm->enums);
+    FREE(cm->structs);
+    FREE(cm->unions);
+    FREE(cm);
 
 /* finish off the C file */
 
@@ -424,7 +474,9 @@ static int register_c(int fl, statedes *st)
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 
+	pb->lang = "C";
 	pb->st   = st;
+	pb->data = NULL;
 	pb->cl   = cl_c;
 	pb->init = init_c;
 	pb->bind = bind_c;

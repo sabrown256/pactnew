@@ -339,7 +339,9 @@ static int register_doc(int fl, statedes *st)
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 
+	pb->lang = "doc";
 	pb->st   = st;
+	pb->data = NULL;
 	pb->cl   = cl_doc;
 	pb->init = init_doc;
 	pb->bind = bind_doc;
