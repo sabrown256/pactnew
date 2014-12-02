@@ -213,7 +213,7 @@ static object *_SXI_get_range(SS_psides *si, object *arg)
 
     f = NULL;
     SS_args(si, arg,
-            G_MAPPING_I, &f,
+            G_PM_MAPPING_I, &f,
 	    0);
 
     rv = NULL;

@@ -17,10 +17,12 @@ struct s_tnp_list
     char lnm[BFSML];        /* lower case version of CNM, pm_set */
     char unm[BFSML];        /* upper case version of CNM, PM_SET */
     char rnm[BFSML];        /* root struct id, SET */
+    char inm[BFSML];        /* type index name, G_PM_SET_I */
+    char dnm[BFSML];        /* defstr macro name, G_PM_SET_D */
 
     char pnm[BFSML];        /* Python struct name, PY_PM_set */
     char tnm[BFSML];        /* Python type name, PY_PM_set_type */
-    char inm[BFSML];};      /* default instance id, set */
+    char ynm[BFSML];};      /* default instance id, set */
 
 struct s_pmeta
    {char **topt;};          /* type with _PY_opt_xxx methods */
@@ -50,8 +52,8 @@ static void python_type_name_list(tnp_list *na, tn_list *nc)
     snprintf(na->tnm, BFSML, "PY_%s_type", p);
 
 /* get default instance name */
-    nstrncpy(na->inm, BFSML, na->rnm, -1);
-    downcase(na->inm);
+    nstrncpy(na->ynm, BFSML, na->rnm, -1);
+    downcase(na->ynm);
 
     return;}
 
@@ -482,7 +484,8 @@ static void python_emit_setters(bindes *bd, mbrdes *md, tnp_list *tl)
 		 fprintf(fc, "\n");
 		 fprintf(fc, "        ok = PyArg_Parse(value, \"l\", &lv);\n");
 		 fprintf(fc, "        if (ok == TRUE)\n");
-		 fprintf(fc, "           {self->pyo->%s = lv;\n", md[im].name);
+		 fprintf(fc, "           {self->pyo->%s = lv;\n",
+			 md[im].name);
 		 fprintf(fc, "            rv = 0;};};\n");};}
 
 /* if member is floating point type */
@@ -495,7 +498,8 @@ static void python_emit_setters(bindes *bd, mbrdes *md, tnp_list *tl)
 		 fprintf(fc, "\n");
 		 fprintf(fc, "        ok = PyArg_Parse(value, \"d\", &dv);\n");
 		 fprintf(fc, "        if (ok == TRUE)\n");
-		 fprintf(fc, "           {self->pyo->%s = dv;\n", md[im].name);
+		 fprintf(fc, "           {self->pyo->%s = dv;\n",
+			 md[im].name);
 		 fprintf(fc, "            rv = 0;};};\n");};}
 
 /* if member is pointer to a known bound type */
@@ -661,7 +665,7 @@ static void python_c_struct_def(bindes *bd, der_list *sl)
 /* getset array */
     fprintf(fc, "PyGetSetDef %s_getset[] = {\n", tl.pnm);
     fprintf(fc, "    {\"%s\", (getter) %s_get, NULL, %s_doc, NULL},\n",
-	    tl.inm, tl.pnm, tl.pnm);
+	    tl.ynm, tl.pnm, tl.pnm);
 
     for (im = 0; md[im].text != NULL; im++)
         {fprintf(fc, "    {\"%s\", (getter) %s_get_%s, (setter) %s_set_%s, %s_doc_%s, NULL},\n",
@@ -745,7 +749,7 @@ static void python_object_defs(bindes *bd, char *tag, der_list *sl, int ni)
 	fprintf(fc, "    nerr += (PyType_Ready(&%s_type) < 0);\n",
 		tl.pnm);
 	fprintf(fc, "    nerr += (PyDict_SetItemString(d, \"%s\", (PyObject *) &%s_type) < 0);\n",
-		tl.inm, tl.pnm);
+		tl.ynm, tl.pnm);
 	fprintf(fc, "\n");};
 
     return;}
@@ -1345,13 +1349,13 @@ static void python_install(bindes *bd)
     csep(fc);
 
 /* make the list of enum constants to install */
-    emit_enum_defs(bd, python_enum_defs);
+    foreach_enum_defs(bd, python_enum_defs, FALSE);
 
 /* make the list of struct objects */
-    emit_struct_defs(bd, python_object_defs);
+    foreach_struct_defs(bd, python_object_defs, FALSE);
 
 /* make the list of struct constants to install */
-    emit_struct_defs(bd, python_struct_defs);
+    foreach_struct_defs(bd, python_struct_defs, FALSE);
 
     csep(fc);
 

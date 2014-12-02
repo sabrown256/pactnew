@@ -390,10 +390,10 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     err = TRUE;
 
 /* define the SC_array */
-    err &= G_DEFINE_ARRAY(file);
+    err &= G_SC_ARRAY_D(file);
 
 /* define the deprecated SC_dynamic_array */
-    err &= G_DEFINE_DYNAMIC_ARRAY(file);
+    err &= G_SC_DYNAMIC_ARRAY_D(file);
 
     if (_PD_block_define(file) == FALSE)
        return(FALSE);
@@ -413,7 +413,7 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     if (err == FALSE)
        PD_error("COULDN'T DEFINE DIMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    err &= G_DEFINE_MEMDES(file);
+    err &= G_MEMDES_D(file);
     if (err == FALSE)
        PD_error("COULDN'T DEFINE MEMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
@@ -421,7 +421,7 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     if (err == FALSE)
        PD_error("COULDN'T DEFINE SYMINDIR - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    err &= G_DEFINE_SYMENT(file);
+    err &= G_SYMENT_D(file);
     if (err == FALSE)
        PD_error("COULDN'T DEFINE SYMENT - PD_DEF_PDB_TYPES", PD_GENERIC);
 
@@ -437,7 +437,7 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     if (err == FALSE)
        PD_error("COULDN'T DEFINE FPDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    err &= G_DEFINE_DEFSTR(file);
+    err &= G_DEFSTR_D(file);
     if (err == FALSE)
        PD_error("COULDN'T DEFINE DEFSTR - PD_DEF_PDB_TYPES", PD_GENERIC);
 
@@ -460,11 +460,11 @@ int PD_def_hash_types(PDBfile *file ARG(,,cls), int flag)
     err = TRUE;
 
     if (flag & 0x1)
-       err &= G_DEFINE_HAELEM(file);
+       err &= G_HAELEM_D(file);
 
     if (flag & 0x2)
-       {err &= G_DEFINE_ARRAY(file);
-	err &= G_DEFINE_HASHARR(file);};
+       {err &= G_SC_ARRAY_D(file);
+	err &= G_HASHARR_D(file);};
 
     return(err);}
 
@@ -1182,21 +1182,21 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
 
     err = TRUE;
 
-    err &= G_DEFINE_ARRAY(fp);
+    err &= G_SC_ARRAY_D(fp);
 
 /* define the deprecated SC_dynamic_array */
-    err &= G_DEFINE_DYNAMIC_ARRAY(fp);
+    err &= G_SC_DYNAMIC_ARRAY_D(fp);
 
-    err &= G_DEFINE_PCONS(fp);
-    err &= G_DEFINE_RGB_COLOR_MAP(fp);
-    err &= G_DEFINE_PALETTE(fp);
-    err &= G_DEFINE_IMAGE(fp);
-    err &= G_DEFINE_C_ARRAY(fp);
-    err &= G_DEFINE_POLYGON(fp);
-    err &= G_DEFINE_FIELD(fp);
-    err &= G_DEFINE_MESH_TOPOLOGY(fp);
-    err &= G_DEFINE_SET(fp);
-    err &= G_DEFINE_MAPPING(fp);
+    err &= G_PCONS_D(fp);
+    err &= G_RGB_COLOR_MAP_D(fp);
+    err &= G_PG_PALETTE_D(fp);
+    err &= G_PG_IMAGE_D(fp);
+    err &= G_C_ARRAY_D(fp);
+    err &= G_PM_POLYGON_D(fp);
+    err &= G_PM_FIELD_D(fp);
+    err &= G_PM_MESH_TOPOLOGY_D(fp);
+    err &= G_PM_SET_D(fp);
+    err &= G_PM_MAPPING_D(fp);
 
     return(err);}
 

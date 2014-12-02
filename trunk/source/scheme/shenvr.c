@@ -201,7 +201,7 @@ int SS_true(object *obj)
 
 /* SS_ZARGS - zero argument macro/procedure handler */
 
-object *SS_zargs(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_zargs(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *o;
     PFZargs f;
 
@@ -215,7 +215,7 @@ object *SS_zargs(SS_psides *si, C_procedure *cp, object *argl)
 
 /* SS_SARGS - single argument macro/procedure handler */
 
-object *SS_sargs(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_sargs(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *o;
     PFSargs f;
 
@@ -229,7 +229,7 @@ object *SS_sargs(SS_psides *si, C_procedure *cp, object *argl)
 
 /* SS_NARGS - n argument macro/procedure handler */
 
-object *SS_nargs(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_nargs(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *o;
     PFSargs f;
 
@@ -243,7 +243,7 @@ object *SS_nargs(SS_psides *si, C_procedure *cp, object *argl)
 
 /* SS_ZNARGS - zero or more arguments macro/procedure handler */
 
-object *SS_znargs(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_znargs(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *o;
     PFSargs f;
 
@@ -262,7 +262,7 @@ object *SS_znargs(SS_psides *si, C_procedure *cp, object *argl)
 
 object *SS_proc_name(SS_psides *si, object *fun)
    {object *rv;
-    S_procedure *sp;
+    SS_S_procedure *sp;
 
     sp = SS_COMPOUND_PROCEDURE(fun);
     rv = sp->name;
@@ -276,7 +276,7 @@ object *SS_proc_name(SS_psides *si, object *fun)
 
 object *SS_proc_env(SS_psides *si, object *fun)
    {object *rv;
-    S_procedure *sp;
+    SS_S_procedure *sp;
 
     sp = SS_COMPOUND_PROCEDURE(fun);
     rv = sp->env;
@@ -290,7 +290,7 @@ object *SS_proc_env(SS_psides *si, object *fun)
 
 object *SS_params(SS_psides *si, object *fun)
    {object *le, *rv;
-    S_procedure *sp;
+    SS_S_procedure *sp;
 
     sp = SS_COMPOUND_PROCEDURE(fun);
     le = sp->lambda;
@@ -305,7 +305,7 @@ object *SS_params(SS_psides *si, object *fun)
 
 object *SS_proc_body(SS_psides *si, object *fun)
    {object *le, *rv;
-    S_procedure *sp;
+    SS_S_procedure *sp;
 
     sp = SS_COMPOUND_PROCEDURE(fun);
     le = sp->lambda;
@@ -788,14 +788,14 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
 char *_SS_get_print_name(SS_psides *si, object *o)
    {char t[MAXLINE];
     char *s, *rv;
-    procedure *pp;
+    SS_procedure *pp;
 
     rv = NULL;
     s  = NULL;
 
     if (o != NULL)
        {if (SS_procedurep(o))
-	   {pp = SS_GET(procedure, o);
+	   {pp = SS_GET(SS_procedure, o);
 	    switch (pp->type)
 	       {case SS_MACRO :
 		case SS_PROC  :
@@ -810,7 +810,7 @@ char *_SS_get_print_name(SS_psides *si, object *o)
 		     s = SS_PROCEDURE_NAME(o);
 		     break;
 		default :
-		     s = "procedure";
+		     s = "SS_procedure";
 		     break;};}
 
         else if (SS_integerp(o))
@@ -1057,14 +1057,14 @@ static void _SS_init_cont(SS_psides *si)
     si->ngoc  = 0;
 
     si->cont_ptr     = 0;
-    si->continue_int = CMAKE_N(continuation, sz);
+    si->continue_int = CMAKE_N(SS_continuation, sz);
     if (si->continue_int == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
     for (i = 0; i < sz; si->continue_int[i++].signal = SS_null);
 
 /* error continuation stack */
     si->err_cont_ptr = 0;
-    si->continue_err = CMAKE_N(err_continuation, sz);
+    si->continue_err = CMAKE_N(SS_err_continuation, sz);
     if (si->continue_err == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
     for (i = 0; i < sz; si->continue_err[i++].signal = SS_null);

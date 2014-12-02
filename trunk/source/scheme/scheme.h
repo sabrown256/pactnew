@@ -80,7 +80,7 @@
 
 
 #define SS_GET(_t, _o)          ((_t *) SS_OBJECT(_o))
-#define SS_PP(_f, _memb)        ((procedure *) SS_OBJECT(_f))->_memb
+#define SS_PP(_f, _memb)        ((SS_procedure *) SS_OBJECT(_f))->_memb
 
 /* OBJECT ACCESSORS */
 
@@ -106,34 +106,34 @@
 /* INPUT_PORT/OUTPUT_PORT ACCESSORS */
 
 #define SS_OUTSTREAM(_o)                                                     \
-    ((SS_outportp(_o)) ? (((output_port *) (_o)->val)->str) : stdout)
+    ((SS_outportp(_o)) ? (((SS_output_port *) (_o)->val)->str) : stdout)
 #define SS_OFILE_NAME(_o)                                                    \
-    ((SS_outportp(_o)) ? (((output_port *) (_o)->val)->name) : NULL)
+    ((SS_outportp(_o)) ? (((SS_output_port *) (_o)->val)->name) : NULL)
 
-#define SS_INSTREAM(_o)          (((input_port *) (_o)->val)->str)
-#define SS_BUFFER(_o)            (((input_port *) (_o)->val)->buffer)
-#define SS_PTR(_o)               (((input_port *) (_o)->val)->ptr)
-#define SS_LINE_NUMBER(_o)       (((input_port *) (_o)->val)->iln)
-#define SS_CHAR_INDEX(_o)        (((input_port *) (_o)->val)->ichr)
-#define SS_IFILE_NAME(_o)        (((input_port *) (_o)->val)->name)
+#define SS_INSTREAM(_o)          (((SS_input_port *) (_o)->val)->str)
+#define SS_BUFFER(_o)            (((SS_input_port *) (_o)->val)->buffer)
+#define SS_PTR(_o)               (((SS_input_port *) (_o)->val)->ptr)
+#define SS_LINE_NUMBER(_o)       (((SS_input_port *) (_o)->val)->iln)
+#define SS_CHAR_INDEX(_o)        (((SS_input_port *) (_o)->val)->ichr)
+#define SS_IFILE_NAME(_o)        (((SS_input_port *) (_o)->val)->name)
 
 /* CONS ACCESSORS */
 
-#define SS_CAR_MACRO(_o)         (((cons *) (_o)->val)->car)
-#define SS_CDR_MACRO(_o)         (((cons *) (_o)->val)->cdr)
+#define SS_CAR_MACRO(_o)         (((SS_cons *) (_o)->val)->car)
+#define SS_CDR_MACRO(_o)         (((SS_cons *) (_o)->val)->cdr)
 
 /* VARIABLE ACCESSORS */
 
-#define SS_VARIABLE_NAME(_o)     (((variable *) ((_o)->val))->name)
-#define SS_VARIABLE_VALUE(_o)    (((variable *) ((_o)->val))->value)
+#define SS_VARIABLE_NAME(_o)     (((SS_variable *) ((_o)->val))->name)
+#define SS_VARIABLE_VALUE(_o)    (((SS_variable *) ((_o)->val))->value)
 
 /* REFERENCE ACCESSORS */
 
-#define SS_REFERENCE_NAME(_o)    (((reference *) ((_o)->val))->name)
-#define SS_REFERENCE_VALUE(_o)   (((reference *) ((_o)->val))->value)
-#define SS_REFERENCE_GET(_o)     (((reference *) ((_o)->val))->get)
-#define SS_REFERENCE_SET(_o)     (((reference *) ((_o)->val))->set)
-#define SS_REFERENCE_STATE(_o)   (((reference *) ((_o)->val))->a)
+#define SS_REFERENCE_NAME(_o)    (((SS_reference *) ((_o)->val))->name)
+#define SS_REFERENCE_VALUE(_o)   (((SS_reference *) ((_o)->val))->value)
+#define SS_REFERENCE_GET(_o)     (((SS_reference *) ((_o)->val))->get)
+#define SS_REFERENCE_SET(_o)     (((SS_reference *) ((_o)->val))->set)
+#define SS_REFERENCE_STATE(_o)   (((SS_reference *) ((_o)->val))->a)
 
 
 /* BOOLEAN ACCESSORS */
@@ -143,52 +143,52 @@
 
 /* STRING ACCESSORS */
 
-#define SS_STRING_TEXT(_o)       (((string *) ((_o)->val))->string)
-#define SS_STRING_LENGTH(_o)     (((string *) ((_o)->val))->length)
+#define SS_STRING_TEXT(_o)       (((SS_string *) ((_o)->val))->string)
+#define SS_STRING_LENGTH(_o)     (((SS_string *) ((_o)->val))->length)
 
 /* PROCEDURE ACCESSORS */
 
-#define SS_PROCEDURE_TYPE(_o)    (((procedure *) ((_o)->val))->type)
-#define SS_PROCEDURE_NAME(_o)    (((procedure *) ((_o)->val))->name)
-#define SS_PROCEDURE_DOC(_o)     (((procedure *) ((_o)->val))->doc)
-#define SS_PROCEDURE_PROC(_o)    (((procedure *) ((_o)->val))->proc)
-#define SS_PROCEDURE_TRACEDP(_o) (((procedure *) ((_o)->val))->trace)
+#define SS_PROCEDURE_TYPE(_o)    (((SS_procedure *) ((_o)->val))->type)
+#define SS_PROCEDURE_NAME(_o)    (((SS_procedure *) ((_o)->val))->name)
+#define SS_PROCEDURE_DOC(_o)     (((SS_procedure *) ((_o)->val))->doc)
+#define SS_PROCEDURE_PROC(_o)    (((SS_procedure *) ((_o)->val))->proc)
+#define SS_PROCEDURE_TRACEDP(_o) (((SS_procedure *) ((_o)->val))->trace)
 
 /* C PROCEDURE ACCESSORS */
 
-#define SS_GET_C_PROCEDURE(_o)   ((C_procedure *) SS_PROCEDURE_PROC(_o))
+#define SS_GET_C_PROCEDURE(_o)   ((SS_C_procedure *) SS_PROCEDURE_PROC(_o))
 
 #define SS_C_PROCEDURE_HANDLER_PTR(_o)                                       \
-   (((C_procedure *) SS_PROCEDURE_PROC(_o))->handler)
+   (((SS_C_procedure *) SS_PROCEDURE_PROC(_o))->handler)
 #define SS_C_PROCEDURE_HANDLER(_o)                                           \
    (*SS_C_PROCEDURE_HANDLER_PTR(_o))
 #define SS_C_PROCEDURE_FUNCTION_PTR(_o)                                      \
-   (((C_procedure *) SS_PROCEDURE_PROC(_o))->proc[0])
+   (((SS_C_procedure *) SS_PROCEDURE_PROC(_o))->proc[0])
 #define SS_C_PROCEDURE_FUNCTION(_o)                                          \
    (*SS_C_PROCEDURE_FUNCTION_PTR(_o))
 
 /* COMPOUND PROCEDURE ACCESSORS */
 
 #define SS_COMPOUND_PROCEDURE(_o)                                            \
-   ((S_procedure *) SS_PROCEDURE_PROC(_o))
+   ((SS_S_procedure *) SS_PROCEDURE_PROC(_o))
 
 /* ESCAPE PROCEDURE ACCESSORS */
 
 #define SS_ESCAPE_CONTINUATION(_o)                                           \
-   (((Esc_procedure *) SS_PROCEDURE_PROC(_o))->cont)
+   (((SS_esc_procedure *) SS_PROCEDURE_PROC(_o))->cont)
 #define SS_ESCAPE_STACK(_o)                                                  \
-   (((Esc_procedure *) SS_PROCEDURE_PROC(_o))->stck)
+   (((SS_esc_procedure *) SS_PROCEDURE_PROC(_o))->stck)
 #define SS_ESCAPE_ERROR(_o)                                                  \
-   (((Esc_procedure *) SS_PROCEDURE_PROC(_o))->err)
+   (((SS_esc_procedure *) SS_PROCEDURE_PROC(_o))->err)
 #define SS_ESCAPE_TYPE(_o)                                                   \
-   (((Esc_procedure *) SS_PROCEDURE_PROC(_o))->type)
+   (((SS_esc_procedure *) SS_PROCEDURE_PROC(_o))->type)
 
 #ifdef LARGE
 
 /* VECTOR ACCESSORS */
 
-#define SS_VECTOR_LENGTH(_o)  (((vector *) (_o)->val)->length)
-#define SS_VECTOR_ARRAY(_o)   (((vector *) (_o)->val)->vect)
+#define SS_VECTOR_LENGTH(_o)  (((SS_vector *) (_o)->val)->length)
+#define SS_VECTOR_ARRAY(_o)   (((SS_vector *) (_o)->val)->vect)
 
 /* CHARACTER ACCESSOR */
 
@@ -243,7 +243,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_STRINGP - return TRUE if the object is of type STRING 
+/* SS_STRINGP - return TRUE if the object is of type SS_STRING 
  *            - return FALSE otherwise
  */
 
@@ -261,7 +261,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_VARIABLEP - return TRUE if the object is of type VARIABLE
+/* SS_VARIABLEP - return TRUE if the object is of type SS_VARIABLE
  *              - return FALSE otherwise
  */
 
@@ -270,7 +270,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_REFERENCEP - return TRUE if the object is of type REFERENCE
+/* SS_REFERENCEP - return TRUE if the object is of type SS_REFERENCE
  *               - return FALSE otherwise
  */
 
@@ -363,7 +363,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_VECTORP - return TRUE if the object is of type VECTOR
+/* SS_VECTORP - return TRUE if the object is of type SS_VECTOR
  *            - return FALSE otherwise
  */
 
@@ -499,7 +499,7 @@ extern void
 /* SS_TRACEDP - returns the trace field in the procedure struct */
 
 #define SS_tracedp(_o)                                                       \
-   ((SS_GET(procedure, _o)->trace) || (SS_gs.trace_all == TRUE))
+   ((SS_GET(SS_procedure, _o)->trace) || (SS_gs.trace_all == TRUE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -609,20 +609,20 @@ typedef enum e_SS_io_logging SS_io_logging;
 
 /* Generic object definition */
 
-typedef struct s_SS_input_port input_port;
-typedef struct s_SS_output_port output_port;
-typedef struct s_SS_cons cons;
-typedef struct s_SS_variable variable;
-typedef struct s_SS_reference reference;
+typedef struct s_SS_input_port SS_input_port;
+typedef struct s_SS_output_port SS_output_port;
+typedef struct s_SS_cons SS_cons;
+typedef struct s_SS_variable SS_variable;
+typedef struct s_SS_reference SS_reference;
 typedef struct s_SS_boolean SS_boolean;
-typedef struct s_SS_string string;
-typedef struct s_SS_continuation continuation;
-typedef struct s_SS_err_continuation err_continuation;
-typedef struct s_SS_esc_proc Esc_procedure;
-typedef struct s_SS_C_proc C_procedure;
-typedef struct s_SS_S_proc S_procedure;
-typedef struct s_SS_proc procedure;
-typedef struct s_SS_vect vector;
+typedef struct s_SS_string SS_string;
+typedef struct s_SS_continuation SS_continuation;
+typedef struct s_SS_err_continuation SS_err_continuation;
+typedef struct s_SS_esc_procedure SS_esc_procedure;
+typedef struct s_SS_C_procedure SS_C_procedure;
+typedef struct s_SS_S_procedure SS_S_procedure;
+typedef struct s_SS_procedure SS_procedure;
+typedef struct s_SS_vector SS_vector;
 typedef struct s_SS_psides SS_psides;
 typedef struct s_SS_scope_public SS_scope_public;
 typedef struct s_object object;
@@ -640,7 +640,7 @@ FUNCTION_POINTER(object, *(*PFPObject));
 
 typedef int (*PFPrChIn)(object *str, int ign_ws);
 typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
-typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
+typedef object *(*PFPHand)(SS_psides *si, SS_C_procedure *cp, object *argl);
 typedef object *(*PFPOprs)(SS_psides *si);
 
 typedef void (*PFREFGet)(SS_psides *si, object *vr, object *penv);
@@ -684,8 +684,8 @@ struct s_SS_psides
     char ans_prompt[MAXLINE];
     char *lex_text;
 
-    continuation *continue_int;
-    err_continuation *continue_err;
+    SS_continuation *continue_int;
+    SS_err_continuation *continue_err;
 
     SC_array *stack;
 
@@ -772,7 +772,7 @@ struct s_SS_variable
     object *value;};
 
 #define SS_DEFINE_VARIABLE        \
-    PD_defstr(file, "variable",   \
+    PD_defstr(file, "SS_variable",   \
               "char *name",       \
               "object *value",    \
               LAST)
@@ -788,7 +788,7 @@ struct s_SS_reference
     void (*set)(SS_psides *si, object *vr, object *vl, object *penv);};
 
 #define SS_DEFINE_REFERENCE        \
-    PD_defstr(file, "reference",   \
+    PD_defstr(file, "SS_reference",   \
               "char *name",        \
               "object *value",     \
               "object *a",         \
@@ -817,7 +817,7 @@ struct s_SS_string
     char *string;};
 
 #define SS_DEFINE_STRING          \
-    PD_defstr(file, "string",     \
+    PD_defstr(file, "SS_string",     \
               "int length",       \
               "char *string",     \
               LAST)
@@ -843,7 +843,7 @@ struct s_SS_err_continuation
 
 /* ESCAPE PROCEDURE - used to implement call-with-current-continuation */
 
-struct s_SS_esc_proc
+struct s_SS_esc_procedure
    {int cont;
     int stck;
     int err;
@@ -854,7 +854,7 @@ struct s_SS_esc_proc
 
 /*  C PROCEDURE - primitive procedure or special form (written in C) */
 
-struct s_SS_C_proc
+struct s_SS_C_procedure
    {int n;
     PFVoid *proc;
     PFPHand handler;};
@@ -864,7 +864,7 @@ struct s_SS_C_proc
 
 /* COMPOUND PROCEDURE - Scheme level procedure (written in Scheme) */
 
-struct s_SS_S_proc
+struct s_SS_S_procedure
    {SS_form type;
     object *name;
     object *lambda;
@@ -873,7 +873,7 @@ struct s_SS_S_proc
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-struct s_SS_proc
+struct s_SS_procedure
    {SS_form type;
     char *name;
     char *doc;
@@ -887,14 +887,15 @@ struct s_SS_proc
 /*--------------------------------------------------------------------------*/
 
 /*  Vector definition */
-struct s_SS_vect
+
+struct s_SS_vector
    {int length;
     object **vect;};
 
-#define SS_DEFINE_VECTOR         \
-    PD_defstr(file, "vector",    \
-              "int length",      \
-              "object **vect",   \
+#define SS_DEFINE_VECTOR            \
+    PD_defstr(file, "SS_vector",    \
+              "int length",         \
+              "object **vect",      \
               LAST)
 
 /*--------------------------------------------------------------------------*/
@@ -921,10 +922,10 @@ extern SS_scope_public
 
 extern object
  *SS_exp_eval(SS_psides *si, object *obj),
- *SS_zargs(SS_psides *si, C_procedure *cp, object *argl),
- *SS_sargs(SS_psides *si, C_procedure *cp, object *argl),
- *SS_nargs(SS_psides *si, C_procedure *cp, object *argl),
- *SS_znargs(SS_psides *si, C_procedure *cp, object *argl),
+ *SS_zargs(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_sargs(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_nargs(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_znargs(SS_psides *si, SS_C_procedure *cp, object *argl),
  *SS_bound_name(SS_psides *si, char *name),
  *SS_mk_new_frame(SS_psides *si, object *name, hasharr *tab),
  *SS_lk_var_val(SS_psides *si, object *vr),
@@ -1006,7 +1007,7 @@ extern object
 /* SHMM.C declarations */
 
 extern object
- *SS_mk_proc_object(SS_psides *si, procedure *pp),
+ *SS_mk_proc_object(SS_psides *si, SS_procedure *pp),
  *SS_mk_procedure(SS_psides *si, object *name,
 		  object *lam_exp, object *penv),
  *SS_mk_esc_proc(SS_psides *si, int err, int type),
@@ -1051,12 +1052,12 @@ extern object
 /* SHPRM2.C declarations */
 
 extern object
- *SS_unary_flt(SS_psides *si, C_procedure *cp, object *argl),
- *SS_unary_fix(SS_psides *si, C_procedure *cp, object *argl),
- *SS_binary_fix(SS_psides *si, C_procedure *cp, object *argl),
- *SS_binary_homogeneous(SS_psides *si, C_procedure *cp, object *argl),
- *SS_un_comp(SS_psides *si, C_procedure *cp, object *argl),
- *SS_bin_comp(SS_psides *si, C_procedure *cp, object *argl);
+ *SS_unary_flt(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_unary_fix(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_binary_fix(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_binary_homogeneous(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_un_comp(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_bin_comp(SS_psides *si, SS_C_procedure *cp, object *argl);
 
 
 /* SHPRM3.C declarations */
@@ -1195,12 +1196,12 @@ extern char
 extern object
  *SS_install_cf(SS_psides *si, char *name, char *document, ...),
  *SS_install_cv(SS_psides *si, char *name, void *pval, int type),
- *SS_acc_double(SS_psides *si, C_procedure *cp, object *argl),
- *SS_acc_int(SS_psides *si, C_procedure *cp, object *argl),
- *SS_acc_long(SS_psides *si, C_procedure *cp, object *argl),
- *SS_acc_char(SS_psides *si, C_procedure *cp, object *argl),
- *SS_acc_string(SS_psides *si, C_procedure *cp, object *argl),
- *SS_acc_ptr(SS_psides *si, C_procedure *cp, object *argl);
+ *SS_acc_double(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_acc_int(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_acc_long(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_acc_char(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_acc_string(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *SS_acc_ptr(SS_psides *si, SS_C_procedure *cp, object *argl);
 
 #ifdef __cplusplus
 }

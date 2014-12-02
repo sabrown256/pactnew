@@ -350,7 +350,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
    {void **pv;
     char *s;
     void *(*f)(SS_psides *si, object *o);
-    procedure *pp;
+    SS_procedure *pp;
 
     pv = (void **) v;
 
@@ -383,7 +383,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
        *pv = (void *) obj;
 
     else if (type == SS_PROCEDURE_I)
-       {pp  = (procedure *) obj->val;
+       {pp  = (SS_procedure *) obj->val;
 	*pv = (void *) pp->proc;}
 
     else if (type == SS_INPUT_PORT_I)

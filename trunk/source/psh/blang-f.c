@@ -1473,10 +1473,10 @@ static int bind_module(bindes *bd)
 /* make declarations for enums */
 	if (cdv != NULL)
 	   {fprintf(fp, "! ... C enum declarations\n");
-	    emit_enum_defs(bd, module_enum_decl);
+	    foreach_enum_defs(bd, module_enum_decl, FALSE);
 
 	    fprintf(fp, "! ... C struct declarations\n");
-	    emit_struct_defs(bd, module_struct_decl);};
+	    foreach_struct_defs(bd, module_struct_decl, FALSE);};
 
 /* make external declarations for variable argument pre-wrapped functions */
 	if (fwr != NULL)

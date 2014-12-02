@@ -687,7 +687,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
     mn   = NULL;
     file = NULL;
     SS_args(si, argl,
-            G_SET_I, &s,
+            G_PM_SET_I, &s,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -948,13 +948,13 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
     name      = NULL;
     next      = NULL;
     SS_args(si, argl,
-            G_SET_I, &domain,
-            G_SET_I, &range,
+            G_PM_SET_I, &domain,
+            G_PM_SET_I, &range,
             SC_ENUM_I, &centering,
             SC_STRING_I, &category,
             SC_STRING_I, &name,
 	    G_C_ARRAY_I, &arr,
-	    G_MAPPING_I, &next,
+	    G_PM_MAPPING_I, &next,
             0);
 
     if (name == NULL)
@@ -1069,7 +1069,7 @@ static object *_SXI_set_map_type(SS_psides *si, object *argl)
     f    = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_MAPPING_I, &f,
+            G_PM_MAPPING_I, &f,
             SC_STRING_I, &name,
             0);
 
@@ -1102,7 +1102,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
     mn   = NULL;
     file = NULL;
     SS_args(si, argl,
-            G_MAPPING_I, &f,
+            G_PM_MAPPING_I, &f,
             G_FILE, &po,
             SC_STRING_I, &mn,
             0);
@@ -1362,7 +1362,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
     f   = NULL;
     ord = BND_CELL_MAX;
     SS_args(si, argl,
-            G_MAPPING_I, &f,
+            G_PM_MAPPING_I, &f,
             SC_INT_I, &ord,
             0);
 
@@ -1835,7 +1835,7 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
     char nt[MAXLINE];
     void *na;
     C_array *arr, *indx, *iarr;
-    C_procedure *pred;
+    SS_C_procedure *pred;
     PF_int_dd fnc;
     object *rv;
 

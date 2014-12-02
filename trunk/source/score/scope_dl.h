@@ -38,23 +38,6 @@ enum e_objindex
 
 typedef enum e_objindex objindex;
 
-typedef struct s_sodes sodes;
-typedef struct s_sostate sostate;
-
-struct s_sodes
-   {objindex kind;
-    char *flags;      /* flags for controlling dlsym */
-    char *lib;        /* shared object file name */
-    char *path;       /* path to shared object file */
-    char *rv;         /* return value of function */
-    char *name;       /* function name */
-    char *argl;       /* function argument list */
-    void *so;         /* the shared object handle */
-    void *f;};        /* pointer to the function */
-
-struct s_sostate
-   {hasharr *tab;};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,9 +47,6 @@ extern "C" {
 /*                            VARIABLE DECLARATIONS                         */
 
 /*--------------------------------------------------------------------------*/
-
-extern sostate
- _SC_dl;
 
 /*--------------------------------------------------------------------------*/
 

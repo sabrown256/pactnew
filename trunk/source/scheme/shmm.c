@@ -21,12 +21,12 @@ struct s_obj_map
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_MK_C_PROC - instantiate a C_procedure */
+/* _SS_MK_C_PROC - instantiate a SS_C_procedure */
 
-C_procedure *_SS_mk_C_proc(PFPHand phand, int n, PFVoid *pr)
-   {C_procedure *cp;
+SS_C_procedure *_SS_mk_C_proc(PFPHand phand, int n, PFVoid *pr)
+   {SS_C_procedure *cp;
 
-    cp = CMAKE(C_procedure);
+    cp = CMAKE(SS_C_procedure);
     if (cp != NULL)
        {cp->handler = phand;
 	cp->n       = n;
@@ -37,9 +37,9 @@ C_procedure *_SS_mk_C_proc(PFPHand phand, int n, PFVoid *pr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_RL_C_PROC - release a C_procedure */
+/* _SS_RL_C_PROC - release a SS_C_procedure */
 
-void _SS_rl_C_proc(C_procedure *cp)
+void _SS_rl_C_proc(SS_C_procedure *cp)
    {
 
     CFREE(cp->proc);
@@ -50,11 +50,11 @@ void _SS_rl_C_proc(C_procedure *cp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_MK_C_PROC_VA - instantiate a C_procedure */
+/* _SS_MK_C_PROC_VA - instantiate a SS_C_procedure */
 
-C_procedure *_SS_mk_C_proc_va(PFPHand phand, int n, ...)
+SS_C_procedure *_SS_mk_C_proc_va(PFPHand phand, int n, ...)
    {int i;
-    C_procedure *cp;
+    SS_C_procedure *cp;
     PFVoid *pr;
 
     pr = CMAKE_N(PFVoid, n);
@@ -73,12 +73,12 @@ C_procedure *_SS_mk_C_proc_va(PFPHand phand, int n, ...)
 
 /* _SS_MK_SCHEME_PROC - instantiate a scheme procedure */
 
-procedure *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
-			      C_procedure *cp)
+SS_procedure *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
+			      SS_C_procedure *cp)
    {char *ds, *ns;
-    procedure *pp;
+    SS_procedure *pp;
 
-    pp = CMAKE(procedure);
+    pp = CMAKE(SS_procedure);
     if (pp != NULL)
        {ds = NULL;
 	if (pdoc != NULL)
@@ -101,32 +101,15 @@ procedure *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
 
 /* _SS_INSTALL - install procedure objects in the symbol table
  *             - a procedure object is a struct
- *             -      struct s_SS_proc
- *             -         {char type;
- *             -          char *doc;
- *             -          char *name;
- *             -          short int trace;
- *             -          object *proc;};
- *             -
- *             -      typedef struct s_SS_proc procedure;
- *             -
- *             - and the proc member points off to a C_procedure for
+ *             - and the proc member points off to a SS_C_procedure for
  *             - the purposes of _SS_install
- *             -
- *             -      typedef object *(*PFPHand)(PFVoid pr, object *argl);
- *             - 
- *             -      struct s_SS_C_proc
- *             -         {object *(*handler)();
- *             -          PFVOid proc;}
- *             -
- *             -      typedef struct s_SS_C_proc C_procedure;
  */
 
 void _SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand,
 		 int n, PFVoid *pr, SS_form ptype)
    {object *op, *vp;
-    procedure *pp;
-    C_procedure *cp;
+    SS_procedure *pp;
+    SS_C_procedure *cp;
 
 /* create the C level procedure */
     cp = _SS_mk_C_proc(phand, n, pr);
@@ -317,7 +300,7 @@ static void _SS_rl_reference(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_RL_CONS - release a CONS object
+/* _SS_RL_CONS - release a SS_CONS object
  *             - since this also SS_gc's lists be careful of
  *             - conses with multiple pointers
  */
@@ -325,7 +308,7 @@ static void _SS_rl_reference(SS_psides *si, object *obj)
 static void _SS_rl_cons(SS_psides *si, object *obj)
    {int nr;
     object *lst, *cdr, *car;
-    cons *cell;
+    SS_cons *cell;
 
     lst = obj;
     while (lst != NULL)
@@ -365,10 +348,10 @@ static void _SS_rl_cons(SS_psides *si, object *obj)
 
 static void _SS_rl_procedure(SS_psides *si, object *obj)
    {object *pr;
-    S_procedure *sp;
-    procedure *pp;
+    SS_S_procedure *sp;
+    SS_procedure *pp;
 
-    pp = SS_GET(procedure, obj);
+    pp = SS_GET(SS_procedure, obj);
 
     switch (pp->type)
 
@@ -406,7 +389,7 @@ static void _SS_rl_procedure(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_RL_INPORT - release an object of type INPUT_PORT which encapsulates
+/* _SS_RL_INPORT - release an object of type SS_INPUT_PORT which encapsulates
  *               - a port struct with FILE pointer str
  */
 
@@ -424,7 +407,7 @@ static void _SS_rl_inport(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_RL_OUTPORT - release an object of type OUTPUT_PORT which encapsulates
+/* _SS_RL_OUTPORT - release an object of type SS_OUTPUT_PORT which encapsulates
  *                - a port struct with FILE pointer str
  */
 
@@ -507,10 +490,10 @@ void SS_gc(SS_psides *si, object *obj)
 
 static void _SS_wr_inport(SS_psides *si, object *obj, object *strm)
    {long loc;
-    input_port *ip;
+    SS_input_port *ip;
     FILE *fp;
 
-    ip  = SS_GET(input_port, obj);
+    ip  = SS_GET(SS_input_port, obj);
     loc = ip->ptr - ip->buffer;
     fp  = SS_OUTSTREAM(strm);
 
@@ -524,10 +507,10 @@ static void _SS_wr_inport(SS_psides *si, object *obj, object *strm)
 /* _SS_WR_OUTPORT - print an output port */
 
 static void _SS_wr_outport(SS_psides *si, object *obj, object *strm)
-   {output_port *op;
+   {SS_output_port *op;
     FILE *fp;
 
-    op = SS_GET(output_port, obj);
+    op = SS_GET(SS_output_port, obj);
     fp = SS_OUTSTREAM(strm);
 
 
@@ -566,7 +549,7 @@ static void _SS_wr_vector(SS_psides *si, object *obj, object *strm)
 
 /* SS_MK_PROC_OBJECT - encapsulate a procedure as an object */
 
-object *SS_mk_proc_object(SS_psides *si, procedure *pp)
+object *SS_mk_proc_object(SS_psides *si, SS_procedure *pp)
    {object *op;
     
     op = SS_mk_object(si, pp, PROC_OBJ, SELF_EV, pp->name,
@@ -579,16 +562,16 @@ object *SS_mk_proc_object(SS_psides *si, procedure *pp)
 
 /* SS_MK_PROCEDURE - make-procedure returns a procedure
  *                 - the proc part of the procedure struct is a pointer
- *                 - to an S_procedure (compound or Scheme procedure)
+ *                 - to an SS_S_procedure (compound or Scheme procedure)
  */
 
 object *SS_mk_procedure(SS_psides *si, object *name,
 			object *lam_exp, object *penv)
-   {S_procedure *sp;
-    procedure *pp;
+   {SS_S_procedure *sp;
+    SS_procedure *pp;
     object *op;
 
-    sp = CMAKE(S_procedure);
+    sp = CMAKE(SS_S_procedure);
 
 /* it is a circular gc problem to have a procedure point
  * to the environment in which it is defined
@@ -602,7 +585,7 @@ object *SS_mk_procedure(SS_psides *si, object *name,
     SS_mark(sp->lambda);
 /*    SS_mark(sp->env); */
 
-    pp = CMAKE(procedure);
+    pp = CMAKE(SS_procedure);
 
     pp->type  = SS_PROC;
     pp->doc   = NULL;
@@ -621,20 +604,20 @@ object *SS_mk_procedure(SS_psides *si, object *name,
 
 object *SS_mk_esc_proc(SS_psides *si, int err, int type)
    {int cont, stck;
-    procedure *pp;
-    Esc_procedure *ep;
+    SS_procedure *pp;
+    SS_esc_procedure *ep;
     object *op;
 
     cont = si->cont_ptr;
     stck = SC_array_get_n(si->stack) - 1;
 
-    ep = CMAKE(Esc_procedure);
+    ep = CMAKE(SS_esc_procedure);
     ep->cont = cont;
     ep->stck = stck;
     ep->err  = err;
     ep->type = type;
 
-    pp = CMAKE(procedure);
+    pp = CMAKE(SS_procedure);
     pp->type = SS_ESC_PROC;
     pp->proc = (object *) ep;
     pp->name = CSTRSAVE("escape");
@@ -646,13 +629,13 @@ object *SS_mk_esc_proc(SS_psides *si, int err, int type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_MK_VARIABLE - encapsulate a VARIABLE in an object */
+/* SS_MK_VARIABLE - encapsulate an SS_VARIABLE in an object */
 
 object *SS_mk_variable(SS_psides *si, char *n, object *v)
-   {variable *vp;
+   {SS_variable *vp;
     object *op;
 
-    vp = CMAKE(variable);
+    vp = CMAKE(SS_variable);
     vp->name  = CSTRSAVE(n);
     vp->value = v;
 
@@ -664,14 +647,14 @@ object *SS_mk_variable(SS_psides *si, char *n, object *v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_MK_REFERENCE - encapsulate a REFERENCE in an object */
+/* SS_MK_REFERENCE - encapsulate an SS_REFERENCE in an object */
 
 object *SS_mk_reference(SS_psides *si, char *n,
 			PFREFGet get, PFREFSet set, void *a)
-   {reference *rp;
+   {SS_reference *rp;
     object *op;
 
-    rp = CMAKE(reference);
+    rp = CMAKE(SS_reference);
     rp->name  = CSTRSAVE(n);
     rp->value = SS_null;
     rp->get   = get;
@@ -686,14 +669,14 @@ object *SS_mk_reference(SS_psides *si, char *n,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_MK_STRING - make a string and imbed it in an object */
+/* SS_MK_STRING - make an SS_string and imbed it in an object */
 
 object *SS_mk_string(SS_psides *si, char *s)
-   {string *sp;
+   {SS_string *sp;
     object *op;
 
     if (s != NULL)
-       {sp = CMAKE(string);
+       {sp = CMAKE(SS_string);
 	sp->length = strlen(s);
 	sp->string = CSTRSAVE(s);
 
@@ -707,15 +690,15 @@ object *SS_mk_string(SS_psides *si, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_MK_INPORT - make an object of type INPUT_PORT which encapsulates
+/* SS_MK_INPORT - make an object of type SS_INPUT_PORT which encapsulates
  *              - a port struct with FILE pointer str
  */
 
 object *SS_mk_inport(SS_psides *si, FILE *str, char *name)
-   {input_port *pp;
+   {SS_input_port *pp;
     object *op;
 
-    pp = CMAKE(input_port);
+    pp = CMAKE(SS_input_port);
     pp->name = CSTRSAVE(name);
     pp->iln  = 1;
     pp->ichr = 1;
@@ -731,18 +714,18 @@ object *SS_mk_inport(SS_psides *si, FILE *str, char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_MK_OUTPORT - make an object of type OUTPUT_PORT which encapsulates
+/* SS_MK_OUTPORT - make an object of type SS_OUTPUT_PORT which encapsulates
  *               - a port struct with FILE pointer str
  */
 
 object *SS_mk_outport(SS_psides *si, FILE *str, char *name)
-   {output_port *pp;
+   {SS_output_port *pp;
     object *op;
 
     if (str != NULL)
        SC_setbuf(str, NULL);
 
-    pp = CMAKE(output_port);
+    pp = CMAKE(SS_output_port);
     pp->name = CSTRSAVE(name);
     pp->str  = str;
 
@@ -840,18 +823,18 @@ object *SS_mk_boolean(SS_psides *si, char *s, int v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_MK_CONS - put the two args together into a new cons,
+/* SS_MK_CONS - put the two args together into a new SS_cons,
  *            - puts that into a new object, and
  *            - returns a pointer to it
  *            - marks both car and cdr to do the garbage collection
- *            - bookkeeping this is the C version of cons
+ *            - bookkeeping this is the C version of SS_cons
  */
 
 object *SS_mk_cons(SS_psides *si, object *ca, object *cd)
-   {cons *cp;
+   {SS_cons *cp;
     object *op;
 
-    cp = CMAKE(cons);
+    cp = CMAKE(SS_cons);
     SS_mark(ca);
     SS_mark(cd);
     cp->car = ca;
@@ -1006,12 +989,12 @@ object *SS_mk_char(SS_psides *si, int i)
 /* SS_MK_VECTOR - make a vector object */
 
 object *SS_mk_vector(SS_psides *si, int l)
-   {vector *vp;
+   {SS_vector *vp;
     int i;
     object **va;
     object *o;
 
-    vp = CMAKE(vector);
+    vp = CMAKE(SS_vector);
     va = CMAKE_N(object *, l);
     for (i = 0; i < l; i++)
         va[i] = SS_null;
@@ -1042,19 +1025,19 @@ void SS_register_types(void)
     SS_OBJECT_I      = SC_type_register("object",      KIND_STRUCT, sizeof(object),
 					SC_TYPE_FREE,  SS_rl_object,
 					0);
-    SS_PROCEDURE_I   = SC_type_register("procedure",   KIND_STRUCT, sizeof(procedure),
+    SS_PROCEDURE_I   = SC_type_register("SS_procedure",   KIND_STRUCT, sizeof(SS_procedure),
 					SC_TYPE_FREE,  _SS_rl_procedure,
 					0);
-    SS_CONS_I        = SC_type_register("pair",        KIND_STRUCT, sizeof(cons),
+    SS_CONS_I        = SC_type_register("pair",        KIND_STRUCT, sizeof(SS_cons),
 					SC_TYPE_FREE,  _SS_rl_cons,
 					0);
-    SS_VARIABLE_I    = SC_type_register("variable",    KIND_STRUCT, sizeof(variable),
+    SS_VARIABLE_I    = SC_type_register("SS_variable",    KIND_STRUCT, sizeof(SS_variable),
 					SC_TYPE_FREE,  _SS_rl_variable,
 					0);
-    SS_INPUT_PORT_I  = SC_type_register("input port",  KIND_STRUCT, sizeof(input_port),
+    SS_INPUT_PORT_I  = SC_type_register("SS_input_port",  KIND_STRUCT, sizeof(SS_input_port),
 					SC_TYPE_FREE,  _SS_rl_inport,
 					0);
-    SS_OUTPUT_PORT_I = SC_type_register("output port", KIND_STRUCT, sizeof(output_port),
+    SS_OUTPUT_PORT_I = SC_type_register("SS_output_port", KIND_STRUCT, sizeof(SS_output_port),
 					SC_TYPE_FREE,  _SS_rl_outport,
 					0);
     SS_EOF_I         = SC_type_register("eof",         KIND_STRUCT, sizeof(SS_boolean),
@@ -1067,7 +1050,7 @@ void SS_register_types(void)
 
 #ifdef LARGE
 
-    SS_VECTOR_I      = SC_type_register("vector",       KIND_STRUCT, sizeof(vector),
+    SS_VECTOR_I      = SC_type_register("SS_vector",       KIND_STRUCT, sizeof(SS_vector),
 					SC_TYPE_FREE,   _SS_rl_vector,
 					0);
     SS_CHARACTER_I   = SC_type_register("character",    KIND_OTHER,  sizeof(int),
@@ -1082,7 +1065,7 @@ void SS_register_types(void)
 
 #endif
 
-    SS_REFERENCE_I   = SC_type_register("reference",    KIND_STRUCT, sizeof(reference),
+    SS_REFERENCE_I   = SC_type_register("SS_reference",    KIND_STRUCT, sizeof(SS_reference),
 					SC_TYPE_FREE,  _SS_rl_reference,
 					0);
 

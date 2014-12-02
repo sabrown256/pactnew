@@ -10,7 +10,7 @@
 
 #define EXTERN_VAR
 
-#include "shc.h"
+#include "scope_parse_c.h"
 
 SS_c_parse_state
  _SS_cps = { FALSE, FALSE, FALSE, FALSE };

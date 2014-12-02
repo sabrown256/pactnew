@@ -696,7 +696,7 @@ static object *SX_wrt_text_table(SS_psides *si, object *argl)
 
     for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
         {SS_args(si, argl,
-		 G_MAPPING_I, &f,
+		 G_PM_MAPPING_I, &f,
 		 0);
 
          domain = f->domain;

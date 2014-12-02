@@ -8,7 +8,8 @@
 typedef struct s_cmeta cmeta;
 
 struct s_cmeta
-   {char **enums;
+   {char **hdrs;
+    char **enums;
     char **structs;
     char **unions;};
 
@@ -87,7 +88,7 @@ static int cl_c(statedes *st, bindes *bd, int c, char **v)
 static void c_emit_types_def(FILE *fc, der_list *sl)
    {
 
-    fprintf(fc, "int G_%s_I = -1;\n", sl->na.rnm);
+    fprintf(fc, "int %s = -1;\n", sl->na.inm);
 
     return;}
 
@@ -107,7 +108,7 @@ static void c_emit_types_hdr(FILE *fh, der_list *sl)
     tl = &sl->na;
 
 /* emit macro to define type to PDB file */
-    fprintf(fh, "#define G_DEFINE_%s(_f)\t\\\n", tl->rnm);
+    fprintf(fh, "#define %s(_f)\t\\\n", tl->dnm);
     fprintf(fh, "   (PD_defstr_i(_f, \"%s\", \t\\\n", tl->cnm);
 
     a[0] = '\0';
@@ -142,7 +143,7 @@ static void c_emit_types_hdr(FILE *fh, der_list *sl)
     fprintf(fh, "\n");
 
 /* emit declaration of SCORE type index */
-    fprintf(fh, "extern int G_%s_I;\n", tl->rnm);
+    fprintf(fh, "extern int %s;\n", tl->inm);
     fprintf(fh, "\n");
 
     return;}
@@ -223,8 +224,8 @@ static void c_type_reg(bindes *bd, char *tag, der_list *sl, int ni)
 	   {};}
 
     else if (sl->kind == TK_STRUCT)
-       {fprintf(fc, "       G_%s_I = SC_type_register(\"%s\", KIND_STRUCT,\n",
-		tl->rnm, tl->cnm);
+       {fprintf(fc, "       %s = SC_type_register(\"%s\", KIND_STRUCT,\n",
+		tl->inm, tl->cnm);
 	fprintf(fc, "\t\t\t\tsizeof(%s), 0);\n",
 		tl->cnm);};
 
@@ -248,12 +249,12 @@ static int bind_c(bindes *bd)
     st = bd->st;
 
 /* make the list of enum objects */
-    emit_enum_defs(bd, c_enum_defs);
+    foreach_enum_defs(bd, c_enum_defs, TRUE);
     fprintf(fh, "\n");
     fprintf(fh, "\n");
 
 /* make the list of struct objects */
-    emit_struct_defs(bd, c_object_defs);
+    foreach_struct_defs(bd, c_object_defs, TRUE);
 
     fprintf(fh, "extern void register_%s_types(void);\n", st->pck);
     fprintf(fh, "\n");
@@ -267,7 +268,7 @@ static int bind_c(bindes *bd)
     fprintf(fc, "   {\n");
     fprintf(fc, "\n");
     fprintf(fc, "    ONCE_SAFE(TRUE, NULL)\n");
-    emit_struct_defs(bd, c_type_reg);
+    foreach_struct_defs(bd, c_type_reg, TRUE);
     fprintf(fc, "    END_SAFE;\n");
     fprintf(fc, "\n");
 
@@ -288,7 +289,7 @@ static int bind_c(bindes *bd)
 static void init_c(statedes *st, bindes *bd)
    {int i;
     char fn[BFLRG], upck[BFLRG], s[BFMG];
-    char *p, *pck, **el, **sl, **ul;
+    char *p, *pck, **el, **sl, **ul, **hl;
     FILE *fc, *fh, *fp;
     cmeta *cm;
 
@@ -297,6 +298,7 @@ static void init_c(statedes *st, bindes *bd)
     upcase(upck);
 
 /* make the C metadata from the derivedc file */
+    hl = NULL;
     el = NULL;
     sl = NULL;
     ul = NULL;
@@ -309,6 +311,8 @@ static void init_c(statedes *st, bindes *bd)
 	     LAST_CHAR(p) = '\0';
 	     if (blank_line(p) == TRUE)
 	        continue;
+	     else if (strncmp(p, "include = ", 10) == 0)
+	        hl = tokenize(p+10, " \t", 0);
 	     else if (strncmp(p, "enum e_", 7) == 0)
 	        el = lst_add(el, p);
 	     else if (strncmp(p, "struct s_", 9) == 0)
@@ -323,6 +327,7 @@ static void init_c(statedes *st, bindes *bd)
 	fclose(fp);};
 
     cm = MAKE(cmeta);
+    cm->hdrs    = hl;
     cm->enums   = el;
     cm->structs = sl;
     cm->unions  = ul;
@@ -345,7 +350,10 @@ static void init_c(statedes *st, bindes *bd)
     fprintf(fc, "\n");
 
     fprintf(fc, "#include \"cpyright.h\"\n");
-    fprintf(fc, "#include \"%s_int.h\"\n", pck);
+    if (hl != NULL)
+       {for (i = 0; hl[i] != NULL; i++)
+	    fprintf(fc, "#include \"%s\"\n", hl[i]);};
+/*    fprintf(fc, "#include \"%s_int.h\"\n", pck); */
     fprintf(fc, "#include \"%s_gen.h\"\n", pck);
     fprintf(fc, "\n");
 

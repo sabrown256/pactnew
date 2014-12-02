@@ -341,7 +341,7 @@ set psy_cfg = $PSY_Cfg:t
     Note $STDOUT '          cd ${PACTTmpDir} ; \'
     Note $STDOUT '          ${RM} errlog ; \'
     Note $STDOUT '          touch errlog ; \'
-    Note $STDOUT '          ${CC} -c ${gcs} -o ${gco} ; \'
+    Note $STDOUT '          ${CC} -I../.. -c ${gcs} -o ${gco} ; \'
     Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} ${gco} 2>> errlog ; \'
     Note $STDOUT '          ${RM} ${gco} 2>> errlog)'
     Note $STDOUT ''

@@ -10,7 +10,7 @@
 
 #define EXTERN_VAR
 
-#include "shm.h"
+#include "scope_parse_m.h"
 
 SS_m_parse_state
  _SS_mps = { FALSE, FALSE };

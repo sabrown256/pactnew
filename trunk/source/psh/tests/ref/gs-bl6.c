@@ -563,7 +563,7 @@ static int _SX_install_bl6_derived(SS_psides *si)
 
     nerr = TRUE;
 
-    nerr &= G_DEFINE_STR(SX_gs.vif);
+    nerr &= G_STR_D(SX_gs.vif);
 
     SS_install(si, "str?",
                "Returns #t if the object is a str, and #f otherwise",

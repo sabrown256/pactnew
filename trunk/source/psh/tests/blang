@@ -64,7 +64,7 @@ else
       flog $Log touch $hdr
       Note $hdr '#include <sx_int.h>'
       Note $hdr '#define G_STR_I  256'
-      Note $hdr '#define G_DEFINE_STR(_f)     TRUE'
+      Note $hdr '#define G_STR_D(_f)     TRUE'
       Note $hdr 'struct s_str {long n; char *s;};'
       Note $hdr 'typedef struct s_str str;'
       Note $hdr "extern void register_${i}_types();"

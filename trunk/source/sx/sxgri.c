@@ -254,8 +254,8 @@ static object *_SXI_copy_iob(SS_psides *si, object *argl)
     dvs = NULL;
     rm  = FALSE;
     SS_args(si, argl,
-            G_DEVICE_I, &dvd,
-            G_DEVICE_I, &dvs,
+            G_PG_DEVICE_I, &dvd,
+            G_PG_DEVICE_I, &dvs,
 	    SC_INT_I, &rm,
             0);
 
@@ -293,7 +293,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
     dev = NULL;
     s   = NULL;
     SS_args(si, argl,
-            G_DEVICE_I,    &dev,
+            G_PG_DEVICE_I,    &dev,
             SC_STRING_I, &s,
 	    SC_INT_I,    &td.color,
 	    SC_DOUBLE_I, &ndc[0],
@@ -336,7 +336,7 @@ static object *_SXI_free_iobs(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)

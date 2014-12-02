@@ -90,14 +90,16 @@ extern "C" {
 
 #  define HAVE_THREADS
 
-typedef int                   SC_thread;
-typedef int                   SC_thread_cond;
-typedef struct s_omp_lockdes  SC_thread_sys_lock;
-typedef int                   SC_thread_attr;
+typedef struct s_omp_lockdes omp_lockdes;
 
 struct s_omp_lockdes
    {int init;
     omp_lock_t lock;};
+
+typedef int          SC_thread;
+typedef int          SC_thread_cond;
+typedef omp_lockdes  SC_thread_sys_lock;
+typedef int          SC_thread_attr;
 
 #  define SC_LOCK_INIT_STATE    { -1, 0, 0, 0, SC_NULL_THREAD, { 0, } }
 #  define SC_COND_INIT_STATE    0

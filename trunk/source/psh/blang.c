@@ -120,7 +120,9 @@ struct s_tn_list
    {char cnm[BFSML];        /* C struct name, PM_set */
     char lnm[BFSML];        /* lower case version of CNM, pm_set */
     char unm[BFSML];        /* upper case version of CNM, PM_SET */
-    char rnm[BFSML];};      /* root struct id, SET */
+    char rnm[BFSML];        /* root struct id, SET */
+    char inm[BFSML];        /* type index name, G_PM_SET_I */
+    char dnm[BFSML];};      /* defstr macro name, G_PM_SET_D */
 
 struct s_der_list
    {type_kind kind;
@@ -143,8 +145,10 @@ struct s_statedes
     char **fpr;
     char **fwr;
     fdecl *dcl;
-    der_list *enums;
-    der_list *structs;
+    der_list *enums;                 /* all bound enums */
+    der_list *structs;               /* all bound structs */
+    der_list *denums;                /* all defined enums */
+    der_list *dstructs;              /* all defined structs */
     char path[BFLRG];                /* path for output files */
     str_list defv;};
 
@@ -240,6 +244,12 @@ static void type_name_list(char *typ, tn_list *na)
     else
        nstrncpy(na->rnm, BFSML, p, -1);
     upcase(na->rnm);
+
+/* get type index name */
+    snprintf(na->inm, BFSML, "G_%s_I", na->unm);
+
+/* get defstr macro name */
+    snprintf(na->dnm, BFSML, "G_%s_D", na->unm);
 
     return;}
 
@@ -359,10 +369,36 @@ void free_parse_struct(mbrdes *md)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DERIVED_ENTRY - fill der_list entry DE from S */
+
+static void derived_entry(der_list *de, char *s, char *dlm, type_kind kind)
+   {char t[BFVLG];
+    char **sa;
+
+    memset(de, 0, sizeof(der_list));
+
+    if ((s != NULL) && (dlm != NULL))
+       {nstrncpy(t, BFVLG, s, -1);
+	sa = tokenize(t, dlm, 0);
+
+	de->kind = kind;
+	de->def  = STRSAVE(s);
+
+	type_name_list(s, &de->na);
+
+	if (kind == TK_STRUCT)
+	   de->md = parse_struct(sa);
+
+	de->members = sa;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PUSH_DERIVED - add S and SA to the derived type list LST */
 
-static der_list *push_derived(der_list *lst, int *pnl, char *s, char **sa,
-			      type_kind kind)
+static der_list *push_derived(der_list *lst, int *pnl, der_list *de)
    {int ni, nb;
     static int nx = 10;
 
@@ -374,19 +410,12 @@ static der_list *push_derived(der_list *lst, int *pnl, char *s, char **sa,
        {nb = ni/nx;
 	REMAKE(lst, der_list, (nb+1)*nx);};
 
-    lst[ni].kind = kind;
-    lst[ni].def  = STRSAVE(s);
+    if (de != NULL)
+       lst[ni] = *de;
+    else
+       memset(lst+ni, 0, sizeof(der_list));
 
-    type_name_list(s, &lst[ni].na);
-
-    if (kind == TK_STRUCT)
-       lst[ni].md = parse_struct(sa);
-
-    lst[ni].members = sa;
-
-    ni++;
-
-    *pnl = ni;
+    *pnl = ++ni;
 
     return(lst);}
 
@@ -1499,22 +1528,23 @@ static void hsep(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* EMIT_ENUM_DEFS - emit enum specifications via FEMIT */
+/* FOREACH_ENUM_DEFS - map FEMIT over all enums in BD */
 
-void emit_enum_defs(bindes *bd,
-		    void (*femit)(bindes *bd, char *tag,
-				  der_list *el, int ni))
+void foreach_enum_defs(bindes *bd,
+		       void (*femit)(bindes *bd, char *tag,
+				     der_list *el, int ni),
+		       int wh)
    {int ie, ne;
     der_list *el;
     statedes *st;
 
     st = bd->st;
     ne = st->nen;
-    el = st->enums;
+    el = (wh == 1) ? st->denums : st->enums;
 
     femit(bd, "begin", NULL, ne);
 
-    for (ie = 0; ie < ne; ie++)
+    for (ie = 0; el[ie].def != NULL; ie++)
         femit(bd, NULL, el+ie, -1);
 	    
     femit(bd, "end", NULL, -1);
@@ -1524,22 +1554,28 @@ void emit_enum_defs(bindes *bd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* EMIT_STRUCT_DEFS - emit struct specifications via FEMIT */
+/* FOREACH_STRUCT_DEFS - map FEMIT over all structs in BD */
 
-void emit_struct_defs(bindes *bd,
-		      void (*femit)(bindes *bd, char *tag,
-				    der_list *sl, int ni))
+void foreach_struct_defs(bindes *bd,
+			 void (*femit)(bindes *bd, char *tag,
+				       der_list *sl, int ni),
+			 int wh)
    {int is, ns;
     der_list *sl;
     statedes *st;
 
     st = bd->st;
     ns = st->nst;
-    sl = st->structs;
+    sl = (wh == 1) ? st->dstructs : st->structs;
+
+/* NOTE:
+ * st->cdv has all the structs as char **
+ * st->structs has the #bind structs at der_list *
+ */
 
     femit(bd, "begin", NULL, ns);
 
-    for (is = 0; is < ns; is++)
+    for (is = 0; sl[is].def != NULL; is++)
         femit(bd, NULL, sl+is, -1);
 	    
     femit(bd, "end", NULL, -1);
@@ -1628,12 +1664,13 @@ static char *map_name(char *d, int nc, char *cf, char *lf,
  */
 
 static void find_bind(statedes *st, int iref)
-   {int i, ib, id, nb, nc, ne, ns, nbi;
-    char t[BFVLG], ps[BFLRG];
-    char *sb, *lng, *te, *p;
+   {int i, ib, id, nb, neb, ned, nsb, nsd, nbi;
+    char t[BFVLG], s[BFLRG];
+    char *ps, *lng, *te, *p;
     char **cpr, **cdv, **sbi, **sa, **ta;
     fdecl *dcl;
-    der_list *el, *sl;
+    der_list *eb, *sb, *ed, *sd;
+    der_list de;
 
     nbi = st->nbi;
     sbi = st->sbi;
@@ -1645,9 +1682,9 @@ static void find_bind(statedes *st, int iref)
     dcl = MAKE_N(fdecl, nbi);
     if (dcl != NULL)
        {for (ib = 0; ib < nbi; ib++)
-	    {sb = sbi[ib];
-	     if (blank_line(sb) == FALSE)
-	        {nstrncpy(t, BFVLG, sb, -1);
+	    {ps = sbi[ib];
+	     if (blank_line(ps) == FALSE)
+	        {nstrncpy(t, BFVLG, ps, -1);
 		 sa = tokenize(t, " \t", 0);
 
 		 if ((sa != NULL) &&
@@ -1681,51 +1718,62 @@ static void find_bind(statedes *st, int iref)
     st->ndcl = nb;
 
 /* parse out enums */
-    ne = 0;
-    el = NULL;
+    neb = 0;
+    ned = 0;
+    eb  = NULL;
+    ed  = NULL;
     if (cdv != NULL)
-       {for (ib = 0; ib < nbi; ib++)
-	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
-	     if (strncmp(ps, tykind[TK_ENUM], 4) == 0)
-	        {te = strtok(ps, " ");
-		 te = strtok(NULL, " ");
-		 for (id = 0; cdv[id] != NULL; id++)
-		     {sb = cdv[id];
-		      if (blank_line(sb) == FALSE)
-			 {nstrncpy(t, BFVLG, sb, -1);
-			  ta = tokenize(t, " \t", 0);
-			  if (strcmp(ta[1]+2, te) == 0)
-			     {el = push_derived(el, &ne, sb, ta, TK_ENUM);
-			      break;}
-			  else
-			     free_strings(ta);};};};};};
+       {for (id = 0; cdv[id] != NULL; id++)
+	    {ps = cdv[id];
+	     if (blank_line(ps) == TRUE)
+	        continue;
+	     else if (strncmp(ps, tykind[TK_ENUM], 4) == 0)
+	        {derived_entry(&de, ps, " \t", TK_ENUM);
+		 ed = push_derived(ed, &ned, &de);
+		 for (ib = 0; ib < nbi; ib++)
+		     {nstrncpy(s, BFLRG, sbi[ib], -1);
+		      if (blank_line(s) == FALSE)
+			 {te = strtok(s, " ");
+			  te = strtok(NULL, " ");
+			  if (strcmp(de.na.cnm, te) == 0)
+			     {eb = push_derived(eb, &neb, &de);
+			      break;};};};};};};
 
-    st->enums = el;
-    st->nen   = ne;
+    ed = push_derived(ed, &ned, NULL);
+    eb = push_derived(eb, &neb, NULL);
+
+    st->denums = ed;
+    st->enums  = eb;
+    st->nen    = neb;
 
 /* parse out structs */
-    ns = 0;
-    sl = NULL;
+    nsb = 0;
+    nsd = 0;
+    sb  = NULL;
+    sd  = NULL;
     if (cdv != NULL)
-       {for (ib = 0; ib < nbi; ib++)
-	    {nstrncpy(ps, BFLRG, sbi[ib], -1);
-	     if (strncmp(ps, tykind[TK_STRUCT], 6) == 0)
-	        {te = strtok(ps, " \t");
-		 te = strtok(NULL, " \t");
-		 nc = strlen(te);
-		 for (id = 0; cdv[id] != NULL; id++)
-		     {sb = cdv[id];
-		      if (blank_line(sb) == FALSE)
-			 {nstrncpy(t, BFVLG, sb, -1);
-			  ta = tokenize(t, "{;}", 0);
-			  if (strncmp(ta[0]+9, te, nc) == 0)
-			     {sl = push_derived(sl, &ns, sb, ta, TK_STRUCT);
-			      break;}
-			  else
-			     free_strings(ta);};};};};};
+       {for (id = 0; cdv[id] != NULL; id++)
+	    {ps = cdv[id];
+	     if (blank_line(ps) == TRUE)
+	        continue;
+	     else if (strncmp(ps, tykind[TK_STRUCT], 6) == 0)
+	        {derived_entry(&de, ps, "{;}", TK_STRUCT);
+		 sd = push_derived(sd, &nsd, &de);
+		 for (ib = 0; ib < nbi; ib++)
+		     {nstrncpy(s, BFLRG, sbi[ib], -1);
+		      if (blank_line(s) == FALSE)
+			 {te = strtok(s, " ");
+			  te = strtok(NULL, " ");
+			  if (strcmp(de.na.cnm, te) == 0)
+			     {sb = push_derived(sb, &nsb, &de);
+			      break;};};};};};};
 
-    st->structs = sl;
-    st->nst     = ns;
+    sd = push_derived(sd, &nsd, NULL);
+    sb = push_derived(sb, &nsb, NULL);
+
+    st->dstructs = sd;
+    st->structs  = sb;
+    st->nst      = nsb;
 
     return;}
 

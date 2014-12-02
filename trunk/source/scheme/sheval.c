@@ -86,8 +86,8 @@ void _SS_restore(SS_psides *si, object **po)
 void _SS_eval(SS_psides *si)
    {char msg[MAXLINE];
     char *s;
-    C_procedure *cp;
-    procedure *pf, *pg;
+    SS_C_procedure *cp;
+    SS_procedure *pf, *pg;
     SS_form pty;
     
     SS_set_cont(si, eval_disp, ret_val);
@@ -148,7 +148,7 @@ ev_args:
     if (!SS_procedurep(si->fun))
        SS_error(si, "ILLEGAL PROCEDURE OBJECT", si->fun);
 
-    pf  = SS_GET(procedure, si->fun);
+    pf  = SS_GET(SS_procedure, si->fun);
     pty = pf->type;
     switch (pty)
        {case SS_ESC_PROC :
@@ -238,8 +238,8 @@ ev_define:
         SS_assign(si, si->unev, SS_car(si, si->unev));
         SS_assign(si, si->val, SS_mk_procedure(si, si->unev, si->exn, si->env));
 
-	pf = SS_GET(procedure, si->fun);
-	pg = SS_GET(procedure, si->val);
+	pf = SS_GET(SS_procedure, si->fun);
+	pg = SS_GET(SS_procedure, si->val);
 
         if (strcmp(pf->name, "define-macro") == 0)
            pg->type = SS_MACRO;
@@ -362,7 +362,7 @@ acc_arg:
 apply_dis:
     _SS_bgn_trace(si, si->fun, si->argl);
 
-    pf  = SS_GET(procedure, si->fun);
+    pf  = SS_GET(SS_procedure, si->fun);
     pty = pf->type;
     switch (pty)
        {case SS_PROC :
@@ -392,7 +392,7 @@ macro_ee:
     SS_assign(si, si->unev, si->argl);
     SS_assign(si, si->fun, SS_car(si, si->unev));
 
-    pf  = SS_GET(procedure, si->fun);
+    pf  = SS_GET(SS_procedure, si->fun);
     pty = pf->type;
     switch (pty)
        {case SS_PROC     :

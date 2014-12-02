@@ -82,7 +82,7 @@ static object *_SSI_vctlen(SS_psides *si, object *arg)
 static object *_SSI_vctref(SS_psides *si, object *argl)
    {int i, n;
     object **va, *o;
-    vector *vct;
+    SS_vector *vct;
 
     vct = NULL;
     i   = -1;
@@ -109,7 +109,7 @@ static object *_SSI_vctref(SS_psides *si, object *argl)
 static object *_SSI_vctset(SS_psides *si, object *argl)
    {int i, n;
     object *val, **va, *o;
-    vector *vct;
+    SS_vector *vct;
 
     vct = NULL;
     i   = -1;
