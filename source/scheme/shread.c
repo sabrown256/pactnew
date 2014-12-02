@@ -432,11 +432,11 @@ static object *_SS_chr_unquote(SS_psides *si, object *str, int c)
 
 static object *_SS_chr_error(SS_psides *si, object *str, int c)
    {object *rv;
-    input_port *prt;
+    SS_input_port *prt;
 
     rv = SS_f;
 
-    prt = SS_GET(input_port, str);
+    prt = SS_GET(SS_input_port, str);
 
     PRINT(stdout, "SYNTAX ERROR: '%c' on line %d char %d in file %s\n",
 	  c, prt->iln, prt->ichr-1, prt->name);

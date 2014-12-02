@@ -57,7 +57,7 @@ targets :
 Hdrs = ${TGTInc}
 
 # C syntax mode specifications
-HCSyn = shc.h
+HCSyn = scope_parse_cc.h
 Oc    = shgrc.o shcsup.o
 Arc   = ${TGTLib}(shgrc.o) ${TGTLib}(shcsup.o)
 
@@ -82,7 +82,7 @@ ${Oc}  : ${HCSyn}
 ${Arc} : ${HCSyn}
 
 # Fortran syntax mode specifications
-HFSyn = shf.h
+HFSyn = scope_parse_f.h
 Of    = shgrf.o shfsup.o
 Arf   = ${TGTLib}(shgrf.o) ${TGTLib}(shfsup.o)
 
@@ -107,7 +107,7 @@ ${Of}  : ${HFSyn}
 ${Arf} : ${HFSyn}
 
 # Basis syntax mode specifications
-HMSyn = shm.h
+HMSyn = scope_parse_m.h
 Om    = shgrm.o shmsup.o
 Arm   = ${TGTLib}(shgrm.o) ${TGTLib}(shmsup.o)
 

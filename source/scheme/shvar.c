@@ -162,8 +162,8 @@ object *SS_install_cf(SS_psides *si, char *name, char *doc, ...)
     object *op, *vp;
     PFPHand handler;
     PFVoid fnc;
-    C_procedure *cp;
-    procedure *pp;
+    SS_C_procedure *cp;
+    SS_procedure *pp;
 
     nb = 0L;
 
@@ -260,7 +260,7 @@ object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
 
 /* _SS_ACC_VAR - the handler for accessing variables */
 
-static object *_SS_acc_var(SS_psides *si, C_procedure *cp,
+static object *_SS_acc_var(SS_psides *si, SS_C_procedure *cp,
 			   object *argl, int type)
    {long nb;
     object *vl, *ret;
@@ -286,7 +286,7 @@ static object *_SS_acc_var(SS_psides *si, C_procedure *cp,
 
 /* SS_ACC_DOUBLE - the handler for accessing double variables */
 
-object *SS_acc_double(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_acc_double(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
     ret = _SS_acc_var(si, cp, argl, SC_DOUBLE_I);
@@ -298,7 +298,7 @@ object *SS_acc_double(SS_psides *si, C_procedure *cp, object *argl)
 
 /* SS_ACC_INT - the handler for accessing int variables */
 
-object *SS_acc_int(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_acc_int(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
     ret = _SS_acc_var(si, cp, argl, SC_INT_I);
@@ -310,7 +310,7 @@ object *SS_acc_int(SS_psides *si, C_procedure *cp, object *argl)
 
 /* SS_ACC_LONG - the handler for accessing LONG variables */
 
-object *SS_acc_long(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_acc_long(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
     ret = _SS_acc_var(si, cp, argl, SC_LONG_I);
@@ -322,7 +322,7 @@ object *SS_acc_long(SS_psides *si, C_procedure *cp, object *argl)
 
 /* SS_ACC_CHAR - the handler for accessing char variables */
 
-object *SS_acc_char(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_acc_char(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
     ret = _SS_acc_var(si, cp, argl, SC_CHAR_I);
@@ -334,7 +334,7 @@ object *SS_acc_char(SS_psides *si, C_procedure *cp, object *argl)
 
 /* SS_ACC_STRING - the handler for accessing char * variables */
 
-object *SS_acc_string(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_acc_string(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
     ret = _SS_acc_var(si, cp, argl, SC_STRING_I);
@@ -346,7 +346,7 @@ object *SS_acc_string(SS_psides *si, C_procedure *cp, object *argl)
 
 /* SS_ACC_PTR - the handler for accessing pointer variables */
 
-object *SS_acc_ptr(SS_psides *si, C_procedure *cp, object *argl)
+object *SS_acc_ptr(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
     ret = _SS_acc_var(si, cp, argl, SC_POINTER_I);

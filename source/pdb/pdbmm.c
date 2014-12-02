@@ -9,7 +9,7 @@
 #include "cpyright.h"
 
 #include "pdb_int.h"
-#include "scope_formats.h"
+#include "data_formats.h"
 
 PD_scope_public
  PD_gs = { 0, 8, 2, -1, HOST_ORDER,

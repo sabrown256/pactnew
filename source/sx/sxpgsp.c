@@ -86,7 +86,7 @@ static object *_SXI_clear_region(SS_psides *si, object *argl)
     PG_box_init(3, ndc, 0.0, 1.0);
 
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &ndc[0],
             SC_DOUBLE_I, &ndc[1],
             SC_DOUBLE_I, &ndc[2],
@@ -175,7 +175,7 @@ static object *_SXI_drw_mrk(SS_psides *si, object *argl)
         x[id] = SS_null;
 
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
 	    SC_INT_I, &nd,
 	    SC_ENUM_I, &cs,
 	    SC_INT_I, &mrk,
@@ -263,7 +263,7 @@ static object *_SXI_draw_axis(SS_psides *si, object *argl)
     xl[0] = xl[1] = tn[0] = vw[0] = 0.0;
     xr[0] = xr[1] = tn[1] = vw[1] = 1.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &xl[0],
             SC_DOUBLE_I, &xl[1],
             SC_DOUBLE_I, &xr[0],
@@ -306,7 +306,7 @@ static object *_SXI_draw_box(SS_psides *si, object *argl)
     PG_box_init(3, bx, 0.0, 1.0);
 
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_ENUM_I, &cs,
             SC_DOUBLE_I, &bx[0],
             SC_DOUBLE_I, &bx[1],
@@ -343,7 +343,7 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
     clip = TRUE;
     cs   = WORLDC;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &nd,
             SC_ENUM_I, &cs,
             SC_INT_I, &clip,
@@ -386,7 +386,7 @@ static object *_SXI_dppn(SS_psides *si, object *argl)
     clip = TRUE;
     cs   = WORLDC;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &nd,
             SC_ENUM_I, &cs,
             SC_INT_I, &clip,
@@ -427,7 +427,7 @@ static object *_SXI_draw_line(SS_psides *si, object *argl)
     PM_array_set(x1, PG_SPACEDM, 0.0);
     PM_array_set(x2, PG_SPACEDM, 1.0);
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &x1[0],
             SC_DOUBLE_I, &x1[1],
             SC_DOUBLE_I, &x2[0],
@@ -469,7 +469,7 @@ static object *_SXI_draw_palette(SS_psides *si, object *argl)
     PG_box_init(1, rbx, 0.0, 1.0);
 
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &dbx[0],
             SC_DOUBLE_I, &dbx[1],
             SC_DOUBLE_I, &dbx[2],
@@ -505,7 +505,7 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
     clip = TRUE;
     cs   = WORLDC;
     SS_args(si, argl,
-            G_DEVICE_I,  &dev,
+            G_PG_DEVICE_I,  &dev,
             SC_INT_I,  &nd,
             SC_ENUM_I, &cs,
             SC_INT_I,  &clip,
@@ -556,7 +556,7 @@ static object *_SXI_draw_text(SS_psides *si, object *argl)
     p[0] = 0.0;
     p[1] = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &nd,
             SC_ENUM_I,    &cs,
             SC_DOUBLE_I,  &p[0],
@@ -589,7 +589,7 @@ static object *_SXI_fply(SS_psides *si, object *argl)
     dev = NULL;
     clr = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &clr,
             0);
 
@@ -626,7 +626,7 @@ static object *_SXI_gcss(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -652,7 +652,7 @@ static object *_SXI_gclp(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -676,7 +676,7 @@ static object *_SXI_gmxi(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -712,7 +712,7 @@ static object *_SXI_gtew(SS_psides *si, object *argl)
     cs  = NORMC;
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &nd,
             SC_ENUM_I, &cs,
             SC_STRING_I, &s,
@@ -745,7 +745,7 @@ static object *_SXI_gtxf(SS_psides *si, object *argl)
 
     dev  = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -775,7 +775,7 @@ static object *_SXI_get_viewport(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -803,7 +803,7 @@ static object *_SXI_get_frame(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -831,7 +831,7 @@ static object *_SXI_get_window(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -863,7 +863,7 @@ static object *_SXI_trans_box(SS_psides *si, object *argl)
     x[0] = 0.0;
     x[1] = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &nd,
             SC_ENUM_I, &ics,
             SC_ENUM_I, &ocs,
@@ -905,7 +905,7 @@ static object *_SXI_ptos(SS_psides *si, object *argl)
     x[0] = 0.0;
     x[1] = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &x[0],
             SC_DOUBLE_I, &x[1],
             0);
@@ -934,7 +934,7 @@ static object *_SXI_qdev(SS_psides *si, object *argl)
 
     dev  = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -961,7 +961,7 @@ static object *_SXI_qwin(SS_psides *si, object *argl)
 
     dev  = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -987,7 +987,7 @@ static object *_SXI_smxi(SS_psides *si, object *argl)
     i = r = g = b = 1.0;
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &i,
             SC_DOUBLE_I, &r,
             SC_DOUBLE_I, &g,
@@ -1028,7 +1028,7 @@ static object *_SXI_spal(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_STRING_I, &txt,
             0);
 
@@ -1057,7 +1057,7 @@ static object *_SXI_stxf(SS_psides *si, object *argl)
     dev  = NULL;
     size = 12;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_STRING_I, &face,
             SC_STRING_I, &style,
             SC_INT_I, &size,
@@ -1091,7 +1091,7 @@ static object *_SXI_set_viewport(SS_psides *si, object *argl)
     PG_box_init(3, ndc, 0.0, 1.0);
 
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &ndc[0],
             SC_DOUBLE_I, &ndc[1],
             SC_DOUBLE_I, &ndc[2],
@@ -1124,7 +1124,7 @@ static object *_SXI_set_frame(SS_psides *si, object *argl)
     PG_box_init(3, frm, 0.0, 1.0);
 
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &frm[0],
             SC_DOUBLE_I, &frm[1],
             SC_DOUBLE_I, &frm[2],
@@ -1157,7 +1157,7 @@ static object *_SXI_set_window(SS_psides *si, object *argl)
     PG_box_init(3, wc, 0.0, 1.0);
 
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &wc[0],
             SC_DOUBLE_I, &wc[1],
             SC_DOUBLE_I, &wc[2],
@@ -1191,7 +1191,7 @@ static object *_SXI_stop(SS_psides *si, object *argl)
     x[0] = 0.0;
     x[1] = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &x[0],
             SC_DOUBLE_I, &x[1],
             0);
@@ -1225,7 +1225,7 @@ static object *_SXI_stow(SS_psides *si, object *argl)
     x[0] = 0.0;
     x[1] = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &x[0],
             SC_DOUBLE_I, &x[1],
             0);
@@ -1255,7 +1255,7 @@ static object *_SXI_wtos(SS_psides *si, object *argl)
     x[0] = 0.0;
     x[1] = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &x[0],
             SC_DOUBLE_I, &x[1],
             0);
@@ -1284,7 +1284,7 @@ static object *_SXI_getva(SS_psides *si, object *argl)
 
     dev   = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     rv = SS_f;
@@ -1314,7 +1314,7 @@ static object *_SXI_setva(SS_psides *si, object *argl)
     dev = NULL;
     if (SX_DEVICEP(SS_car(si, argl)) == TRUE)
        {SS_args(si, argl,
-		G_DEVICE_I, &dev,
+		G_PG_DEVICE_I, &dev,
 		0);
         argl = SS_cdr(si, argl);};
 
@@ -1351,7 +1351,7 @@ static object *_SXI_pal_list(SS_psides *si, object *argl)
     name = NULL;
     dev  = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_STRING_I, &name,
             0);
 
@@ -1407,7 +1407,7 @@ static object *_SXI_list_pal(SS_psides *si, object *argl)
     name = NULL;
     dev  = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_STRING_I, &name,
             0);
 
@@ -1461,7 +1461,7 @@ static object *_SXI_current_pal(SS_psides *si, object *argl)
 
     dev  = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -1484,7 +1484,7 @@ static object *_SXI_pals(SS_psides *si, object *argl)
 
     dev  = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     lst   = SS_null;
@@ -1518,7 +1518,7 @@ static object *_SXI_mk_pal(SS_psides *si, object *argl)
     dims[2] = 1;
     wbck = TRUE;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_STRING_I, &name,
             SC_INT_I, &wbck,
             SC_INT_I, &ndims,
@@ -1548,7 +1548,7 @@ static object *_SXI_rd_pal(SS_psides *si, object *argl)
     dev  = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_STRING_I, &name,
             0);
 
@@ -1572,7 +1572,7 @@ static object *_SXI_wr_pal(SS_psides *si, object *argl)
     pname = NULL;
     fname = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_STRING_I, &pname,
             SC_STRING_I, &fname,
             0);
@@ -1599,7 +1599,7 @@ static object *_SXI_set_vect_attr(SS_psides *si, object *argl)
 
     dev  = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     
@@ -1646,7 +1646,7 @@ static object *_SXI_set_color_type(SS_psides *si, object *argl)
     dev_type = NULL;
     color    = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_STRING_I, &dev_type,
             SC_STRING_I, &color,
             0);
@@ -1768,7 +1768,7 @@ static object *_SXI_gatgr(SS_psides *si, object *argl)
 
     g = NULL;
     SS_args(si, argl,
-	    G_GRAPH_I, &g,
+	    G_PG_GRAPH_I, &g,
 	    0);
     argl = SS_cdr(si, argl);
 
@@ -1787,7 +1787,7 @@ static object *_SXI_gatmp(SS_psides *si, object *argl)
 
     f = NULL;
     SS_args(si, argl,
-	    G_MAPPING_I, &f,
+	    G_PM_MAPPING_I, &f,
 	    0);
     argl = SS_cdr(si, argl);
 
@@ -1806,7 +1806,7 @@ static object *_SXI_gatst(SS_psides *si, object *argl)
 
     s = NULL;
     SS_args(si, argl,
-	    G_SET_I, &s,
+	    G_PM_SET_I, &s,
 	    0);
     argl = SS_cdr(si, argl);
 
@@ -1981,7 +1981,7 @@ static object *_SXI_satgr(SS_psides *si, object *argl)
 
     g = NULL;
     SS_args(si, argl,
-	    G_GRAPH_I, &g,
+	    G_PG_GRAPH_I, &g,
 	    0);
     argl = SS_cdr(si, argl);
 
@@ -1999,7 +1999,7 @@ static object *_SXI_satmp(SS_psides *si, object *argl)
 
     f = NULL;
     SS_args(si, argl,
-	    G_MAPPING_I, &f,
+	    G_PM_MAPPING_I, &f,
 	    0);
     argl = SS_cdr(si, argl);
 
@@ -2017,7 +2017,7 @@ static object *_SXI_satst(SS_psides *si, object *argl)
 
     s = NULL;
     SS_args(si, argl,
-	    G_SET_I, &s,
+	    G_PM_SET_I, &s,
 	    0);
     argl = SS_cdr(si, argl);
 
@@ -2038,7 +2038,7 @@ static object *_SXI_slogsc(SS_psides *si, object *argl)
     lsc[0] = 0;
     lsc[1] = 0;
     SS_args(si, argl,
-	    G_DEVICE_I, &dev,
+	    G_PG_DEVICE_I, &dev,
 	    SC_INT_I, &lsc[0],
 	    SC_INT_I, &lsc[1],
 	    0);
@@ -2344,7 +2344,7 @@ static object *_SXI_axis(SS_psides *si, object *argl)
     dev  = NULL;
     type = CARTESIAN_2D;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &type,
             0);
 
@@ -2419,7 +2419,7 @@ static object *_SXI_clr_mode(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -2443,7 +2443,7 @@ static object *_SXI_gfin(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -2467,7 +2467,7 @@ static object *_SXI_sfin(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2490,7 +2490,7 @@ static object *_SXI_glns(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -2514,7 +2514,7 @@ static object *_SXI_slns(SS_psides *si, object *argl)
     dev = NULL;
     s   = LINE_SOLID;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &s,
             0);
 
@@ -2538,7 +2538,7 @@ static object *_SXI_glnw(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -2563,7 +2563,7 @@ static object *_SXI_slnw(SS_psides *si, object *argl)
     dev = NULL;
     w   = 0.1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &w,
             0);
 
@@ -2587,7 +2587,7 @@ static object *_SXI_mrk_ornt(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -2611,7 +2611,7 @@ static object *_SXI_set_mrk_ornt(SS_psides *si, object *argl)
     dev   = NULL;
     theta = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &theta,
             0);
 
@@ -2635,7 +2635,7 @@ static object *_SXI_mrk_scal(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -2659,7 +2659,7 @@ static object *_SXI_set_mrk_scal(SS_psides *si, object *argl)
     dev = NULL;
     sc  = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &sc,
             0);
 
@@ -2684,7 +2684,7 @@ static object *_SXI_sbwd(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2708,7 +2708,7 @@ static object *_SXI_sres_sf(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &sf,
             0);
 
@@ -2733,7 +2733,7 @@ static object *_SXI_glnc(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -2756,7 +2756,7 @@ static object *_SXI_slnc(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2779,7 +2779,7 @@ static object *_SXI_gtxc(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -2803,7 +2803,7 @@ static object *_SXI_stxc(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2828,7 +2828,7 @@ static object *_SXI_sfic(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2852,7 +2852,7 @@ static object *_SXI_swbk(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2873,7 +2873,7 @@ static object *_SXI_sgrd(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2896,7 +2896,7 @@ static object *_SXI_sdti(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2919,7 +2919,7 @@ static object *_SXI_ssct(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2940,7 +2940,7 @@ static object *_SXI_sadm(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2963,7 +2963,7 @@ static object *_SXI_sarn(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -2986,7 +2986,7 @@ static object *_SXI_sapl(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &c,
             0);
 
@@ -3007,7 +3007,7 @@ static object *_SXI_mdvc(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -3027,7 +3027,7 @@ static object *_SXI_rdvc(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -3047,7 +3047,7 @@ static object *_SXI_update_vs(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -3067,7 +3067,7 @@ static object *_SXI_finish_plot(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -3087,7 +3087,7 @@ static object *_SXI_close_device(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     PG_close_device(dev);
@@ -3104,7 +3104,7 @@ static object *_SXI_clear_window(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -3124,7 +3124,7 @@ static object *_SXI_clear_viewport(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -3146,7 +3146,7 @@ static object *_SXI_glop(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -3171,7 +3171,7 @@ static object *_SXI_slop(SS_psides *si, object *argl)
     dev = NULL;
     lop = GS_COPY;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_ENUM_I, &lop,
             0);
 
@@ -3197,7 +3197,7 @@ static object *_SXI_center_label(SS_psides *si, object *argl)
     sy    = 0.0;
     label = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &sy,
             SC_STRING_I, &label,
             0);
@@ -3225,7 +3225,7 @@ static object *_SXI_show_pal(SS_psides *si, object *argl)
     dev  = NULL;
     wbck = TRUE;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_INT_I, &wbck,
             0);
 
@@ -3247,7 +3247,7 @@ static object *_SXI_draw_rad(SS_psides *si, object *argl)
     x = y = 0.0;
     rn = rx = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &rn,
             SC_DOUBLE_I, &rx,
             SC_DOUBLE_I, &a,
@@ -3278,7 +3278,7 @@ static object *_SXI_draw_arc(SS_psides *si, object *argl)
     x = y = r = 0.0;
     a1 = a2 = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &r,
             SC_DOUBLE_I, &a1,
             SC_DOUBLE_I, &a2,
@@ -3312,7 +3312,7 @@ static object *_SXI_gcpw(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -3339,7 +3339,7 @@ static object *_SXI_scpw(SS_psides *si, object *argl)
     x[0] = 1.0;
     x[1] = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &x[0],
             SC_DOUBLE_I, &x[1],
             0);
@@ -3363,7 +3363,7 @@ static object *_SXI_gcuw(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     if (dev == NULL)
@@ -3390,7 +3390,7 @@ static object *_SXI_scuw(SS_psides *si, object *argl)
     x[0] = 0.0;
     x[1] = 1.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &x[0],
             SC_DOUBLE_I, &x[1],
             0);
@@ -3415,7 +3415,7 @@ static object *_SXI_setla(SS_psides *si, object *argl)
     la[0] = 0.0;
     la[1] = 0.0;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_DOUBLE_I, &la[0],
             SC_DOUBLE_I, &la[1],
             0);
@@ -3440,7 +3440,7 @@ static object *_SXI_getla(SS_psides *si, object *argl)
 
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             0);
 
     rv = SS_f;
@@ -3469,7 +3469,7 @@ static object *_SXI_sclp(SS_psides *si, object *argl)
     dev = NULL;
     c   = 1;
     SS_args(si, argl,
-            G_DEVICE_I, &dev,
+            G_PG_DEVICE_I, &dev,
             SC_BOOL_I, &c,
             0);
 

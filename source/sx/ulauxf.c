@@ -309,7 +309,7 @@ object *UL_curve_eval(SS_psides *si, object *arg)
     double value;
     object *ret;
 
-    s = SS_GET(procedure, si->fun)->name;
+    s = SS_GET(SS_procedure, si->fun)->name;
     i = SX_get_data_index(s);
     if (i < 0)
        SS_error(si, "CURVE DELETED, NO PROCEDURE - CURVE-EVAL", si->fun);

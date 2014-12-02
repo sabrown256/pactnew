@@ -54,7 +54,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-#include "shc.h"
+#include "scope_parse_c.h"
 
 #undef CONST
 #undef SIGNED

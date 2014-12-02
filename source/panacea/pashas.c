@@ -330,7 +330,7 @@ int PA_def_str(PDBfile *pdrs)
               "double imaginary",
               LAST);
 
-    err &= G_DEFINE_C_ARRAY(pdrs);
+    err &= G_C_ARRAY_D(pdrs);
 
     PD_defstr(pdrs, "PM_matrix",
 	      "int nrow",
@@ -340,7 +340,7 @@ int PA_def_str(PDBfile *pdrs)
 
 /* define PANACEA types */
 
-    err &= G_DEFINE_IV_SPECIFICATION(pdrs);
+    err &= G_PA_IV_SPECIFICATION_D(pdrs);
 
     PD_defstr(pdrs, "PA_set_spec",
               "char *var_name",

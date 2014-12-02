@@ -18,7 +18,7 @@
  *                - first cut all arrays required to be same type
  */
 
-static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
+static object *_SX_binary_arr(SS_psides *si, SS_C_procedure *cp, object *argl)
    {int n, id;
     char v[MAX_PRSZ];
     char *otyp;
@@ -664,7 +664,7 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
  *            - of the range set of the given list of mappings
  */
 
-object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
+object *_SX_mh_b_s(SS_psides *si, SS_C_procedure *cp, object *argl)
    {int plf;
     char label[MAXLINE+1];
     PFVoid *proc;

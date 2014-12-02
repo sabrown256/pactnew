@@ -296,10 +296,19 @@ Note $Log ""
 
    if ("$Cfiles" != "") then
       Note $Log "target = $tgt"
-      set files = ( *.h $Cfiles )
+      set files = ""
+      set files = ( $files *.h )
+#      set files = ( $files $Cfiles )
       set list  = (enum struct union)
       Note $Log "Files searched for derived type info:"
       Note $Log "   $files"
+
+      flog $Log ls ${d}_*.h scope_*.h
+      if ($status == 0) then
+         set hdrs = (${d}_*.h scope_*.h)
+         Note $cder "include = $hdrs"
+      endif
+
       foreach k ($list)
          Note $cder "#------------------------------------------------------"
          Note $cder "#                    $k"

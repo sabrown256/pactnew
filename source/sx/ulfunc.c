@@ -1289,7 +1289,7 @@ static object *_ULI_average(SS_psides *si, object *s)
    {int i;
     char *t, *lbl;
     object *c, *numtoks, *rv;
-    C_procedure *cpp, *cpd;
+    SS_C_procedure *cpp, *cpd;
 
     SX_prep_arg(si, s);
     UL_plot_off();

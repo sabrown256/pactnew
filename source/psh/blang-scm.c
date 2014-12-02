@@ -13,6 +13,8 @@ struct s_tns_list
     char lnm[BFSML];        /* lower case version of CNM, pm_set */
     char unm[BFSML];        /* upper case version of CNM, PM_SET */
     char rnm[BFSML];        /* root struct id, SET */
+    char inm[BFSML];        /* type index name, G_PM_SET_I */
+    char dnm[BFSML];        /* scope name, G_PM_SET_D */
 
     char snm[BFSML];};      /* Scheme struct name, pm-set */
 
@@ -54,7 +56,7 @@ static void scheme_get_type(char *a, int nc, char *ty, char *tx)
        {snprintf(s, BFSML, "struct s_%s", tx);
 	type_name_list(s, &tc);
 	scheme_type_name_list(&tl, &tc);
-	snprintf(a, nc, "G_%s_I", tl.rnm);}
+	nstrncpy(a, nc, tl.inm, -1);}
 
     else
        nstrncpy(a, nc, ty, -1);
@@ -574,8 +576,8 @@ static void scheme_hdr_struct_def(FILE *fh, der_list *sl, char *pck)
 
 /* emit type check predicate macro */
     fprintf(fh, "#undef SX_%sP\n", tl.rnm);
-    fprintf(fh, "#define SX_%sP(_o)   (SS_OBJECT_TYPE(_o) == G_%s_I)\n",
-	    tl.rnm, tl.rnm);
+    fprintf(fh, "#define SX_%sP(_o)   (SS_OBJECT_TYPE(_o) == %s)\n",
+	    tl.rnm, tl.inm);
     fprintf(fh, "\n");
 
 /* emit member accessor macros */
@@ -594,7 +596,8 @@ static void scheme_hdr_struct_def(FILE *fh, der_list *sl, char *pck)
     fprintf(fh, "\n");
 
 /* emit list extractor */
-    fprintf(fh, "#define SX_GET_%s_FROM_LIST(_si, _v, _a, _s)   \\\n", tl.rnm);
+    fprintf(fh, "#define SX_GET_%s_FROM_LIST(_si, _v, _a, _s)   \\\n",
+	    tl.rnm);
     fprintf(fh, "   {obj = SS_car(_si, _a);   \\\n");
     fprintf(fh, "    _a = SS_cdr(_si, _a);   \\\n");
     fprintf(fh, "    _v = _SX_opt_%s(NULL, BIND_ARG, obj);   \\\n", tl.cnm);
@@ -622,18 +625,21 @@ static void scheme_c_struct_def(FILE *fc, der_list *sl, char *pck)
     scheme_type_name_list(&tl, &sl->na);
 
 /* emit registration with the SX VIF */
-    fprintf(fc, "    nerr &= G_DEFINE_%s(SX_gs.vif);\n", tl.rnm);
+    fprintf(fc, "    nerr &= %s(SX_gs.vif);\n", tl.dnm);
     fprintf(fc, "\n");
 
     fprintf(fc, "    SS_install(si, \"%s?\",\n", tl.snm);
-    fprintf(fc, "               \"Returns #t if the object is a %s, and #f otherwise\",\n", tl.cnm);
+    fprintf(fc, "               \"Returns #t if the object is a %s, and #f otherwise\",\n",
+	    tl.cnm);
     fprintf(fc, "               SS_sargs,\n");
     fprintf(fc, "               _SXI_%sp, SS_PR_PROC);\n", tl.lnm);
     fprintf(fc, "\n");
 
-    fprintf(fc, "    SS_set_type_method(G_%s_I,\n", tl.rnm);
-    fprintf(fc, "                       \"C->Scheme\", SX_make_%s,\n", tl.lnm);
-    fprintf(fc, "                       \"Scheme->C\", _SX_arg_%s,\n", tl.lnm);
+    fprintf(fc, "    SS_set_type_method(%s,\n", tl.inm);
+    fprintf(fc, "                       \"C->Scheme\", SX_make_%s,\n",
+	    tl.lnm);
+    fprintf(fc, "                       \"Scheme->C\", _SX_arg_%s,\n",
+	    tl.lnm);
     fprintf(fc, "                       NULL);\n");
     fprintf(fc, "\n");
 
@@ -774,8 +780,8 @@ static void scheme_object_defs(bindes *bd, char *tag, der_list *sl, int ni)
 	fprintf(fc, "\n");
 	fprintf(fc, "        %s(x, BIND_ALLOC, NULL);\n", topt);
 	fprintf(fc, "        nm = %s(x, BIND_LABEL, NULL);\n", topt);
-	fprintf(fc, "        rv = SS_mk_object(si, x, G_%s_I, SELF_EV, nm,\n",
-		tl.rnm);
+	fprintf(fc, "        rv = SS_mk_object(si, x, %s, SELF_EV, nm,\n",
+		tl.inm);
 	fprintf(fc, "                          _SX_wr_%s, _SX_rl_%s);}\n",
 		tl.lnm, tl.lnm);
 
@@ -919,13 +925,13 @@ static void scheme_install(bindes *bd, char **fl)
     pck = st->pck;
 
 /* make the list of enum constants to install */
-    emit_enum_defs(bd, scheme_enum_defs);
+    foreach_enum_defs(bd, scheme_enum_defs, FALSE);
 
 /* make the list of struct objects */
-    emit_struct_defs(bd, scheme_object_defs);
+    foreach_struct_defs(bd, scheme_object_defs, FALSE);
 
 /* make the list of structs to install */
-    emit_struct_defs(bd, scheme_struct_defs);
+    foreach_struct_defs(bd, scheme_struct_defs, FALSE);
 
     csep(fc);
 

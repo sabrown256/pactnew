@@ -145,20 +145,20 @@ extern int
  UL_curve_strp(object *obj);
 
 extern object
- *UL_us(SS_psides *si, C_procedure *cp, object *argl),
- *UL_uc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_opxc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_opyc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_ul2toc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_ul2tocnp(SS_psides *si, C_procedure *cp, object *argl),
- *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_uopxc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_bftoc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl),
- *UL_bc(SS_psides *si, C_procedure *cp, object *argl),
- *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl);
+ *UL_us(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_uc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_opxc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_opyc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_ul2toc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_ul2tocnp(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_ulntoc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_uopxc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_uopyc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_bftoc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_bltoc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_bltocnp(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_bc(SS_psides *si, SS_C_procedure *cp, object *argl),
+ *UL_bcxl(SS_psides *si, SS_C_procedure *cp, object *argl);
 
 
 /* ULTRA.C declarations */

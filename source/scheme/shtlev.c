@@ -428,10 +428,10 @@ void SS_expand_stack(SS_psides *si)
     size = si->stack_size;
     si->stack_size = 2*size;
 
-    CREMAKE(si->continue_int, continuation, si->stack_size);
+    CREMAKE(si->continue_int, SS_continuation, si->stack_size);
     for (i = size; i < si->stack_size; si->continue_int[i++].signal = SS_null);
 
-    CREMAKE(si->continue_err, err_continuation, si->stack_size);
+    CREMAKE(si->continue_err, SS_err_continuation, si->stack_size);
     for (i = size; i < si->stack_size; si->continue_err[i++].signal = SS_null);
 
     CREMAKE(si->err_stack, object *, si->stack_size);

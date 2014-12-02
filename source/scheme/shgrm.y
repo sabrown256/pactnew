@@ -16,7 +16,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-#include "shm.h"
+#include "scope_parse_m.h"
 
 #ifdef ANSI
 # define YY_USE_PROTOS

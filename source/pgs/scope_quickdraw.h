@@ -8,6 +8,7 @@
 
 #include "cpyright.h"
 
+#if defined(MACOSX)
 #ifndef SCOPE_QUICKDRAW_GRAPHICS
 #define SCOPE_QUICKDRAW_GRAPHICS
 
@@ -115,26 +116,5 @@
 typedef RGBColor RGB_color_map;
 #endif
 
-#if 0
-
-/* this is the way the PG_event struct should be for quickdraw */
-struct s_PG_event
-   {EventRecord sys_event;
-    int type;};
-
-/* these things should be in the PG_device struct */
-    WindowPtr window;
-    Rect window_shape;
-    Rect scroll_bar_shape;
-    Rect drag_bound_shape;
-    Rect display_shape;  /* display rect which should be cleared */
-    Rect text_shape;     /* display_shape inset by (4,0) */
-    Point mouse;
-    TEHandle text;
-    ControlHandle scroll_bar;
-    MenuHandle menu[menuCount];
-    int next_palette_index;
-   
 #endif
-
 #endif

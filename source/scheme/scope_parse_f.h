@@ -30,6 +30,8 @@
 #undef CONST
 #undef SIGNED
 #undef ECHO
+#undef SI
+#undef DIAGNOSTIC
 
 #define SI               _SS_isf
 

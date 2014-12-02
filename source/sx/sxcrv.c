@@ -109,7 +109,7 @@ int SX_curve_id(object *c)
 void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
    {int i, nc;
     char s[10], s1[10], t[10];
-    procedure *pp;
+    SS_procedure *pp;
     object *o, *v, *p;
     curve *pc;
 
@@ -182,7 +182,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
          v = SS_mk_variable(si, s, o);
          SS_UNCOLLECT(v);
 
-         SS_GET(variable, o)->value = v;
+         SS_GET(SS_variable, o)->value = v;
 
          _SX.crv_obj[i]   = o;
          _SX.crv_proc[i]  = p;

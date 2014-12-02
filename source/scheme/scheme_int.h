@@ -257,13 +257,13 @@ extern void
 
 /* SHMM.C declarations */
 
-extern C_procedure
+extern SS_C_procedure
  *_SS_mk_C_proc(PFPHand phand, int n, PFVoid *pr),
  *_SS_mk_C_proc_va(PFPHand phand, int n, ...);
 
-extern procedure
+extern SS_procedure
  *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
-                     C_procedure *cp);
+                     SS_C_procedure *cp);
 
 extern int
  _SS_object_map(SS_psides *si, FILE *fp, int flag),
@@ -275,7 +275,7 @@ extern int
  _SS_max_numeric_type(SS_psides *si, object *argl, long *pn);
 
 extern void
- _SS_rl_C_proc(C_procedure *cp),
+ _SS_rl_C_proc(SS_C_procedure *cp),
  _SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand,
              int n, PFVoid *pr, SS_form ptype);
 
