@@ -402,14 +402,14 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     err &= (G_ENUM_MAJOR_OP(file) != NULL);
     err &= (G_ENUM_MAJOR_ORDER(file) != NULL);
     err &= (G_ENUM_DELAY_MODE(file) != NULL);
-    err &= (PD_defenum(file, "PD_type_kind") != NULL);
-    err &= (PD_defenum(file, "PD_data_location") != NULL);
+    err &= (G_ENUM_TYPE_KIND(file) != NULL);
+    err &= (G_ENUM_DATA_LOCATION(file) != NULL);
 
-    err &= PD_DEFINE_MULTIDES(file);
+    err &= G_MULTIDES_D(file);
     if (err == FALSE)
        PD_error("COULDN'T DEFINE MULTIDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    err &= PD_DEFINE_DIMDES(file);
+    err &= G_DIMDES_D(file);
     if (err == FALSE)
        PD_error("COULDN'T DEFINE DIMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
@@ -417,7 +417,7 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     if (err == FALSE)
        PD_error("COULDN'T DEFINE MEMDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    err &= PD_DEFINE_SYMINDIR(file);
+    err &= G_SYMINDIR_D(file);
     if (err == FALSE)
        PD_error("COULDN'T DEFINE SYMINDIR - PD_DEF_PDB_TYPES", PD_GENERIC);
 
@@ -425,15 +425,15 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     if (err == FALSE)
        PD_error("COULDN'T DEFINE SYMENT - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    err &= PD_DEFINE_CHARDES(file);
+    err &= G_CHARDES_D(file);
     if (err == FALSE)
        PD_error("COULDN'T DEFINE CHARDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    err &= PD_DEFINE_FIXDES(file);
+    err &= G_FIXDES_D(file);
     if (err == FALSE)
        PD_error("COULDN'T DEFINE FIXDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
-    err &= PD_DEFINE_FPDES(file);
+    err &= G_FPDES_D(file);
     if (err == FALSE)
        PD_error("COULDN'T DEFINE FPDES - PD_DEF_PDB_TYPES", PD_GENERIC);
 
@@ -479,32 +479,18 @@ int PD_def_hash_types(PDBfile *file ARG(,,cls), int flag)
 
 int PD_def_attr_str(PDBfile *file ARG(,,cls))
    {int err;
-    defstr *dp;
 
 /* hash table types */
     err = PD_def_hash_types(file, 3);
 
 /* attribute types */
-    dp = PD_defstr(file, "attribute",
-                   "char *name", 
-                   "char *type", 
-                   "char *data", 
-                   "long size",
-                   "long indx",
-                   LAST);
-    if (dp == NULL)
+    err &= G_ATTRIBUTE_D(file);
+    if (err == FALSE)
        {PD_error("COULDN'T DEFINE ATTRIBUTE - _PD_DEF_ATTR_STR", PD_GENERIC);
         return(FALSE);};
 
-    err &= PD_cast(file, "attribute", "data", "type");
-
-    dp = PD_defstr(file, "attribute_value",
-                   "attribute *attr", 
-                   "long indx",
-                   "attribute_value *next",
-                   LAST);
-
-    if (dp == NULL)
+    err &= G_ATTRIBUTE_VALUE_D(file);
+    if (err == FALSE)
        {PD_error("COULDN'T DEFINE ATTRIBUTE_VALUE - _PD_DEF_ATTR_STR", PD_GENERIC);
         return(FALSE);};
     
@@ -1074,87 +1060,12 @@ char *PD_process_set_name(char *dname)
 
 int PD_mesh_struct(PDBfile *file ARG(,,cls))
    {int err;
-    defstr *ret;
 
-    err = TRUE;
-
-    ret = PD_defstr(file, "PM_conic_curve",
-		    "char *type",
-		    "double xx",
-		    "double xy",
-		    "double yy",
-		    "double x",
-		    "double y",
-		    "double c",
-		    LAST);
-
-    err &= (ret != NULL);
-
-    ret = PD_defstr(file, "PM_end_point",
-		    "double rn",
-		    "double rx",
-		    "int k",
-		    "int dk",
-		    "double rat",
-		    "double drn",
-		    "double drx",
-		    "PM_end_point *next",
-		    LAST);
-
-    err &= (ret != NULL);
-
-    PD_defstr(file, "PM_side",
-	      "double x",
-	      "double y",
-	      "double ratio",
-	      "int dk",
-	      "int dl",
-	      "int k",
-	      "int l",
-	      "double side_rat",
-	      "double min_dr_f",
-	      "double max_dr_f",
-	      "double mag_start",
-	      "double exp_start",
-	      "double mag_end",
-	      "double exp_end",
-	      "int fill",
-	      "double scale",
-	      "double cosine",
-	      "double sine",
-	      "double c0",
-	      "double c1",
-	      "double c2",
-	      "double c3",
-	      "int dir",
-	      "PM_conic_curve *crve",
-	      "PM_side *match",
-	      "PM_side *next",
-	      LAST);
-	
-    err &= (ret != NULL);
-
-    PD_defstr(file, "PM_part",
-	      "int n_sides",
-	      "PM_side *leg",
-	      "PM_end_point *ends",
-	      "char *comp",
-	      "char *name",
-	      "int reg",
-	      "double k_ratio",
-	      "double k_mag_start",
-	      "double k_exp_start",
-	      "double k_mag_end",
-	      "double k_exp_end",
-	      "double l_ratio",
-	      "double l_mag_start",
-	      "double l_exp_start",
-	      "double l_mag_end",
-	      "double l_exp_end",
-	      "PM_part *next",
-	      LAST);
-
-    err &= (ret != NULL);
+    err  = TRUE;
+    err &= G_PM_CONIC_CURVE_D(file);
+    err &= G_PM_END_POINT_D(file);
+    err &= G_PM_SIDE_D(file);
+    err &= G_PM_PART_D(file);
 
     return(TRUE);}
 
@@ -1188,15 +1099,19 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     err &= G_SC_DYNAMIC_ARRAY_D(fp);
 
     err &= G_PCONS_D(fp);
-    err &= G_RGB_COLOR_MAP_D(fp);
-    err &= G_PG_PALETTE_D(fp);
-    err &= G_PG_IMAGE_D(fp);
+
+    err &= (G_ENUM_CENTERING(fp) != NULL);
+
     err &= G_C_ARRAY_D(fp);
     err &= G_PM_POLYGON_D(fp);
     err &= G_PM_FIELD_D(fp);
     err &= G_PM_MESH_TOPOLOGY_D(fp);
     err &= G_PM_SET_D(fp);
     err &= G_PM_MAPPING_D(fp);
+
+    err &= G_RGB_COLOR_MAP_D(fp);
+    err &= G_PG_PALETTE_D(fp);
+    err &= G_PG_IMAGE_D(fp);
 
     return(err);}
 

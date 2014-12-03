@@ -144,7 +144,7 @@ PDBfile *PA_th_family(PDBfile *file)
 
 defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
 		      int nmemb, char **members, char **labels)
-   {int i, n, count;
+   {int i, n, count, err;
     char bf[MAXLINE], **lbls, **mbrs, *ltyp;
     defstr *dp;
     th_record ht;
@@ -184,13 +184,9 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
 /* define the th_record type if necessary */
     dp = PD_inquire_type(file, "th_record");
     if (dp == NULL)
-       {PD_defstr(file, "th_record",
-                  "int n_members",
-                  "char **members",
-                  "char **labels",
-                  "char *type",
-                  "char *entry_name",
-                  LAST);};
+       {err = G_TH_RECORD_D(file);
+	if (err == FALSE)
+	   dp = NULL;};
 
 /* write the th_record for this type */
     ht.n_members  = nmemb;

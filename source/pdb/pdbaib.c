@@ -116,7 +116,7 @@ defstr *PD_defenum(PDBfile *file ARG(,,cls), char *name)
     else if (sizeof(t) == sizeof(short))
        ity = SC_SHORT_S;
 
-    dp = PD_typedef(file, name, ity);
+    dp = PD_typedef(file, ity, name);
 
     return(dp);}
 

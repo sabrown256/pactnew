@@ -388,9 +388,7 @@ struct s_PM_field
     PFByte mult;
     PFByte div;};
 
-/* PM_CONIC_CURVE - quadratic line descriptor
- *                - this is PD_defstr'd in PDBX.C
- */
+/* PM_CONIC_CURVE - quadratic line descriptor */
 
 struct s_PM_conic_curve
    {char *type;
@@ -402,9 +400,7 @@ struct s_PM_conic_curve
     double c;};
 
 
-/* PM_END_POINT - line segment end point for mesh generation
- *              - this is PD_defstr'd in PDBX.C
- */
+/* PM_END_POINT - line segment end point for mesh generation */
 
 struct s_PM_end_point
    {double rn;
@@ -417,9 +413,7 @@ struct s_PM_end_point
     PM_end_point *next;};
 
 
-/* PM_SIDE - mesh patch edge descriptor
- *         - this is PD_defstr'd in PDBX.C
- */
+/* PM_SIDE - mesh patch edge descriptor */
 
 struct s_PM_side
    {double x;
@@ -450,9 +444,7 @@ struct s_PM_side
     PM_side *next;};
 
 
-/* PM_PART - mesh patch part descriptor
- *         - this is PD_defstr'd in PDBX.C
- */
+/* PM_PART - mesh patch part descriptor */
 
 struct s_PM_part
    {int n_sides;

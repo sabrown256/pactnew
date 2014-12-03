@@ -477,32 +477,14 @@ struct s_chardes
   {int bpi;
    PD_text_kind utf;};
 
-#define PD_DEFINE_CHARDES(_f)                \
-    PD_defstr_i(_f, "chardes",               \
-                "int bpi",                   \
-                "enum utf",                  \
-                LAST)
-
 struct s_fixdes
    {int bpi;
     PD_byte_order order;};
 
-#define PD_DEFINE_FIXDES(_f)                 \
-    PD_defstr_i(_f, "fixdes",                \
-                "int bpi",                   \
-                "enum order",                \
-                LAST)
 struct s_fpdes
    {int bpi;
     long *format;
     int *order;};
-
-#define PD_DEFINE_FPDES(_f)                  \
-    PD_defstr_i(_f, "fpdes",                 \
-                "int bpi",                   \
-                "long *format",              \
-                "int *order",                \
-                LAST)
 
 struct s_io_request
    {PD_major_op oper;       /* requested operation */
@@ -645,27 +627,12 @@ struct s_multides
     int ni;
     int *order;};
 
-#define PD_DEFINE_MULTIDES(_f)        \
-    PD_defstr_i(_f, "multides",       \
-                "char *type",         \
-                "int ni",             \
-                "int *order",         \
-                LAST)
-
 /* dimension descriptor - describe an array dimension range */
 struct s_dimdes
    {long index_min;
     long index_max;
     long number;
     dimdes *next;};
-
-#define PD_DEFINE_DIMDES(_f)          \
-    PD_defstr_i(_f, "dimdes",         \
-                "long index_min",     \
-                "long index_max",     \
-                "long number",        \
-                "dimdes *next",       \
-                LAST)
 
 /* member descriptor - describe a member efficiently
  *
@@ -694,13 +661,6 @@ struct s_symindir
    {int64_t addr;
     long n_ind_type;
     long arr_offs;};
-
-#define PD_DEFINE_SYMINDIR(_f)              \
-  PD_defstr_i(_f, "symindir",               \
-              "int64_t addr",               \
-              "long n_ind_type",            \
-              "long arr_offs",              \
-              LAST)
 
 /* symbol table entry
  *
@@ -773,7 +733,7 @@ struct s_fltdes
 struct s_attribute
    {char *name;
     char *type;
-    void **data;
+    void **data   MBR(type, type);
     long size;
     long indx;};
 
