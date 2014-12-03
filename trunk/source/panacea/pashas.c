@@ -324,63 +324,19 @@ int PA_def_str(PDBfile *pdrs)
            "CAN`T DEFINE MAPPINGS - PA_DEF_STR");
 
 /* define PML types */
-
     PD_defstr(pdrs, "complex",
               "double real",
               "double imaginary",
               LAST);
 
     err &= G_C_ARRAY_D(pdrs);
-
-    PD_defstr(pdrs, "PM_matrix",
-	      "int nrow",
-	      "int ncol",
-	      "double *array",
-	      LAST);
+    err &= G_PM_MATRIX_D(pdrs);
 
 /* define PANACEA types */
-
     err &= G_PA_IV_SPECIFICATION_D(pdrs);
-
-    PD_defstr(pdrs, "PA_set_spec",
-              "char *var_name",
-              "char *function",
-              "char *text",
-	      "int n_values",
-	      "double *values",
-              "PA_set_spec *next",
-              LAST);
-
-    PD_defstr(pdrs, "PA_plot_request",
-              "PA_set_spec *range",
-              "char *range_name",
-              "PA_set_spec *domain",
-              "char *base_domain_name",
-              "C_array *domain_map",
-              "char *text",
-              "int time_plot",
-              "int mesh_plot",
-              "int status",
-              "long size",
-              "long offset",
-              "long stride",
-              "int str_index",
-              "double conv",
-              "int centering",
-              "int allocate_data",
-              "PM_set *data",
-              "int data_index",
-              "int data_type",
-              "PA_plot_request *next",
-              LAST);
-
-    PD_defstr(pdrs, "PA_set_index",
-              "double val",
-              "int index",
-              "int imax",
-              "double conv",
-              "char *name",
-              LAST);
+    err &= G_PA_SET_SPEC_D(pdrs);
+    err &= G_PA_PLOT_REQUEST_D(pdrs);
+    err &= G_PA_SET_INDEX_D(pdrs);
 
 /* see if there is a special hook */
     hook = PA_GET_FUNCTION(PFDefTyp, "define-types");

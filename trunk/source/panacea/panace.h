@@ -563,11 +563,6 @@ struct s_PA_command
     PFVoid proc;
     PFPanHand handler;};
 
-
-/* PA_SET_SPEC is PD_DEFSTR'd in PA_DEF_STR in PASHAS.C
- * so any changes here must be reflected there
- */
-
 struct s_PA_set_spec
    {char *var_name;
     char *function;
@@ -575,10 +570,6 @@ struct s_PA_set_spec
     int n_values;
     double *values;
     PA_set_spec *next;};
-
-/* PA_PLOT_REQUEST is PD_DEFSTR'd in PA_DEF_STR in PASHAS.C
- * so any changes here must be reflected there
- */
 
 struct s_PA_plot_request
    {PA_set_spec *range;
@@ -714,8 +705,7 @@ struct s_PA_thread_state
    int ic;                          /* cache file index */
    char cache_fname[MAXLINE];};     /* cache file name */
 
-/* IV_SPECIFICATION is PD_DEFSTR'd in PA_DEF_STR in PASHAS.C
- * so any changes here must be reflected there
+/* PA_IV_SPECIFICATION
  *
  * #bind struct PA_iv_specification
  */
@@ -744,10 +734,6 @@ struct s_PA_unit_spec
     int n_den;
     int *denominator;
     PA_unit_spec *next;};
-
-/* SET_INDEX - aid to selecting elements out of PM_sets
- *           - this is PD_defstr'd in PASHAS.C changes must be reflected there!!!
- */
 
 struct s_PA_set_index
    {double val;
