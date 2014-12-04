@@ -557,7 +557,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs, int wh)
     dims = SS_null;
     SS_args(si, specs,
 	    SC_STRING_I, &name,
-	    SS_OBJECT_I, &dims,
+	    G_OBJECT_I, &dims,
 	    0);
 
     if (dims == SS_null)
@@ -649,8 +649,8 @@ static object *_SXI_table_map(SS_psides *si, object *argl)
 
     SS_args(si, argl,
 	    SC_STRING_I, &name,
-	    SS_OBJECT_I, &dmlst,
-	    SS_OBJECT_I, &rnlst,
+	    G_OBJECT_I, &dmlst,
+	    G_OBJECT_I, &rnlst,
             SC_INT_I, &centering,
             0);
 

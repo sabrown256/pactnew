@@ -2379,7 +2379,7 @@ void SC_close_connection_pool(conpool *cp, int lg, int sum)
     as = cp->as;
 
 /* if log file requested by environment variable only use it */
-    lgf = getenv("SC_EXEC_LOG_FILE");
+    lgf = getenv("SC_EXEC_LOG_SX_FILE_I");
     if ((lgf != NULL) && (as->log == NULL))
        as->log = io_open(lgf, "w");
 

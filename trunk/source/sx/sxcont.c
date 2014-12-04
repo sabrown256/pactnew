@@ -31,7 +31,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
     if (pv == NULL)
        return;
 
-    else if (SS_nullobjp(obj) && (type != G_FILE))
+    else if (SS_nullobjp(obj) && (type != G_SX_FILE_I))
        {*pv = NULL;
         return;};
 
@@ -40,21 +40,21 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
     if (f != NULL)
        *pv = f(si, obj);
 
-/* G_FILE is for any file object wrapped in a g_file */
-    else if (type == G_FILE)
+/* G_SX_FILE_I is for any file object wrapped in a SX_file */
+    else if (type == G_SX_FILE_I)
        {if (!SS_nullobjp(obj) && !SX_FILEP(obj))
 	   SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
 
 	if (SS_nullobjp(obj))
 	   *pv = (void *) SX_gs.gvif;
 	else
-	   *pv = (void *) SS_GET(g_file, obj);}
+	   *pv = (void *) SS_GET(SX_file, obj);}
 
-    else if (type == G_PDBDATA)
+    else if (type == G_SX_PDBDATA_I)
        {if (!SX_PDBDATAP(obj))
 	   SS_error(si, "NOT PDBDATA OBJECT - _SX_ARGS", obj);
 
-	*pv = (void *) SS_GET(g_pdbdata, obj);}
+	*pv = (void *) SS_GET(SX_pdbdata, obj);}
 
     else
        SS_error(si, "BAD TYPE - _SX_ARGS",
@@ -77,11 +77,11 @@ object *_SX_call_args(SS_psides *si, int type, void *v)
     if (f != NULL)
        obj = f(si, v);
 
-    else if (type == G_FILE)
+    else if (type == G_SX_FILE_I)
        {if (v == NULL)
 	   obj = SX_gs.ovif;
 	else
-	   obj = SX_mk_gfile(si, (g_file *) v);}
+	   obj = SX_mk_gfile(si, (SX_file *) v);}
 
     else
        SS_error(si, "BAD TYPE - _SX_CALL_ARGS",
@@ -97,7 +97,7 @@ object *_SX_call_args(SS_psides *si, int type, void *v)
  */
 
 static object *_SX_list_vobjects(SS_psides *si, char *patt,
-				 g_file *po, int type)
+				 SX_file *po, int type)
    {long i, n;
     int t;
     char *s;
@@ -169,7 +169,7 @@ void *_SX_opt_generic(void *x, bind_opt wh, void *a)
 
 object *_SXI_menu(SS_psides *si, object *argl)
    {char *patt, *type;
-    g_file *po;
+    SX_file *po;
     object *ret;
 
     ret = SS_null;
@@ -178,7 +178,7 @@ object *_SXI_menu(SS_psides *si, object *argl)
     patt = NULL;
     type = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &patt,
             SC_STRING_I, &type,
             0);
@@ -229,7 +229,7 @@ static void _SX_sort_lists(SX_menu_item *a, int n)
  *              - in the current directory of the given file
  */
 
-void _SX_get_menu(SS_psides *si, g_file *po)
+void _SX_get_menu(SS_psides *si, SX_file *po)
    {int i, n;
     char *dir, **names;
     PDBfile *file;
@@ -283,7 +283,7 @@ void _SX_get_menu(SS_psides *si, g_file *po)
 
 /* _SX_PUSH_MENU_ITEM - add the given symbol table entry to the file menu */
 
-void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
+void _SX_push_menu_item(SS_psides *si, SX_file *po, char *name, char *type)
    {int nc;
     char s[MAXLINE];
     char *var, *lb;

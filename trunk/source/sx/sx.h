@@ -114,14 +114,14 @@
 #define FILE_FILE(_t, _o)    (_t *) ((_o)->file)
 
 #undef FILE_TYPE    /* Solaris has this */
-#define FILE_TYPE(_o)        (SS_GET(g_file, _o)->type)
-#define FILE_STREAM(_t, _o)  (_t *) (SS_GET(g_file, _o)->file)
-#define FILE_NAME(_o)        (SS_GET(g_file, _o)->name)
+#define FILE_TYPE(_o)        (SS_GET(SX_file, _o)->type)
+#define FILE_STREAM(_t, _o)  (_t *) (SS_GET(SX_file, _o)->file)
+#define FILE_NAME(_o)        (SS_GET(SX_file, _o)->name)
 
-#define PDBDATA_NAME(_o)     (SS_GET(g_pdbdata, _o)->name)
-#define PDBDATA_DATA(_o)     (SS_GET(g_pdbdata, _o)->data)
-#define PDBDATA_EP(_o)       (SS_GET(g_pdbdata, _o)->ep)
-#define PDBDATA_FILE(_o)     (SS_GET(g_pdbdata, _o)->file)
+#define PDBDATA_NAME(_o)     (SS_GET(SX_pdbdata, _o)->name)
+#define PDBDATA_DATA(_o)     (SS_GET(SX_pdbdata, _o)->data)
+#define PDBDATA_EP(_o)       (SS_GET(SX_pdbdata, _o)->ep)
+#define PDBDATA_FILE(_o)     (SS_GET(SX_pdbdata, _o)->file)
 
 /* PANACEA Types */
 
@@ -233,9 +233,9 @@
 #define MAPPING_RANGE(_o)            (SS_GET(PM_mapping, _o)->range)
 #define MAPPING_MAP_TYPE(_o)         (SS_GET(PM_mapping, _o)->map_type)
 #define MAPPING_MAP(_o)              (SS_GET(PM_mapping, _o)->map)
-#define MAPPING_FILE_TYPE(_o)        (SS_GET(PM_mapping, _o)->file_type)
-#define MAPPING_FILE_INFO(_o)        (SS_GET(PM_mapping, _o)->file_info)
-#define MAPPING_FILE(_o)             (SS_GET(PM_mapping, _o)->file)
+#define MAPPING_SX_FILE_I_TYPE(_o)   (SS_GET(PM_mapping, _o)->file_type)
+#define MAPPING_SX_FILE_I_INFO(_o)   (SS_GET(PM_mapping, _o)->file_info)
+#define MAPPING_SX_FILE_I(_o)        (SS_GET(PM_mapping, _o)->file)
 #define MAPPING_NEXT(_o)             (SS_GET(PM_mapping, _o)->next)
 
 /*--------------------------------------------------------------------------*/
@@ -246,18 +246,15 @@
  
 /* SX Types */
 
-#define SX_FUNCTIONP(_o)         (SS_OBJECT_TYPE(_o) == G_FUNCTION)
-#define SX_FILEP(_o)             (SS_OBJECT_TYPE(_o) == G_FILE)
+#define SX_FILEP(_o)             (SS_OBJECT_TYPE(_o) == G_SX_FILE_I)
 
 /* PDBLib Types */
 
-#define SX_PDBDATAP(_o)          (SS_OBJECT_TYPE(_o) == G_PDBDATA)
+#define SX_PDBDATAP(_o)          (SS_OBJECT_TYPE(_o) == G_SX_PDBDATA_I)
 
 /* PANACEA Types */
 
-#define SX_PLOT_REQUESTP(_o)     (SS_OBJECT_TYPE(_o) == G_PLOT_REQUEST)
-#define SX_PLOT_MAPP(_o)         (SS_OBJECT_TYPE(_o) == G_PLOT_MAP)
-#define SX_PLT_CRVP(_o)          (SS_OBJECT_TYPE(_o) == G_PLT_CRV)
+#define SX_PLOT_REQUESTP(_o)     (SS_OBJECT_TYPE(_o) == G_PA_PLOT_REQUEST_I)
 
 /*--------------------------------------------------------------------------*/
 
@@ -265,36 +262,23 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* SCHEME object type designations */
-
-enum e_SX_object_type
-   {G_FILE = 240,
-    G_MEMDES,
-    G_PDBDATA,
-    G_PLOT_REQUEST,
-    G_PLOT_MAP,
-    G_PLT_CRV,
-    G_FUNCTION};
-
-typedef enum e_SX_object_type SX_object_type;
-
 enum e_SX_session_mode
    {SX_MODE_SCHEME = 0, SX_MODE_SX, SX_MODE_PDBVIEW, SX_MODE_ULTRA};
 
 typedef enum e_SX_session_mode SX_session_mode;
 
 
-typedef struct s_g_pdbdata g_pdbdata;
+typedef struct s_SX_pdbdata SX_pdbdata;
 typedef struct s_SX_object SX_object;
 typedef struct s_SX_menu_item SX_menu_item;
 typedef struct s_SX_reparsed SX_reparsed;
-typedef struct s_g_file g_file;
+typedef struct s_SX_file SX_file;
 typedef struct s_out_device out_device;
 typedef struct s_SX_scope_public SX_scope_public;
 
 typedef union u_SX_pointer SX_pointer;
 
-struct s_g_pdbdata
+struct s_SX_pdbdata
    {char *name;                                     /* name of the variable */
     void *data;                                      /* pointer to the data */
     syment *ep;                                       /* symbol table entry */
@@ -322,13 +306,13 @@ struct s_SX_reparsed
     char *(*reproc)(SX_reparsed *pd, char *s);
     object *(*replot)(SS_psides *si);};
 
-struct s_g_file
+struct s_SX_file
    {char *name;
     char *type;                                       /* file type SX knows */
     void *file;
     object *file_object;
     SC_array *menu_lst;
-    g_file *next;};
+    SX_file *next;};
     
 struct s_out_device
    {int exist;
@@ -441,8 +425,8 @@ struct s_SX_scope_public
     PDBfile *out_pdb;
     PDBfile *vif;
 
-    g_file *gvif;
-    g_file *file_list;
+    SX_file *gvif;
+    SX_file *file_list;
 
     PG_device *graphics_device;};
 
@@ -599,7 +583,7 @@ extern object
 /* SXMM.C declarations */
 
 extern object
- *SX_mk_gfile(SS_psides *si, g_file *po);
+ *SX_mk_gfile(SS_psides *si, SX_file *po);
 
 
 /* SXMODE.C declarations */
@@ -638,8 +622,8 @@ extern int
 
 extern object
  *SX_get_pdbfile(SS_psides *si, object *argl,
-		 PDBfile **pfile, g_file **gfile),
- *SX_get_file(SS_psides *si, object *argl, g_file **pfile),
+		 PDBfile **pfile, SX_file **gfile),
+ *SX_get_file(SS_psides *si, object *argl, SX_file **pfile),
  *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
 		     char *name, char *type, void *vr, int flag);
 
@@ -655,7 +639,7 @@ extern void
 extern object
  *SX_mk_graph(SS_psides *si, PG_graph *g),
  *SX_mk_dev_attributes(SS_psides *si, PG_dev_attributes *da),
- *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype);
+ *SX_get_ref_map(SS_psides *si, SX_file *po, int indx, char *dtype);
 
 extern pcons
  *SX_set_attr_alist(SS_psides *si, pcons *inf,

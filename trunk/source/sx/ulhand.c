@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
  
-#include "ultra.h"
+#include "scope_ultra.h"
 
 typedef object *(*PFSargs)(SS_psides *si, object *argl);
 typedef object *(*PFSargsI)(SS_psides *si, int j);

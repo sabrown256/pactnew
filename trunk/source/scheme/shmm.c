@@ -883,7 +883,7 @@ int _SS_object_map(SS_psides *si, FILE *fp, int flag)
 	     info = &desc->desc.info;
 	     nr   = info->ref_count;
 	     ityp = info->type;
-	     if ((ityp >= SS_OBJECT_I) && (nr != UNCOLLECT))
+	     if ((ityp >= G_OBJECT_I) && (nr != UNCOLLECT))
 	        {map[no].indep = TRUE;
 		 map[no].type  = ityp;
 		 map[no].nref  = nr;
@@ -939,7 +939,7 @@ object *SS_mk_object(SS_psides *si,
     opt.perm = FALSE;
     opt.na   = FALSE;
     opt.zsp  = -1;
-    opt.typ  = SS_OBJECT_I;
+    opt.typ  = G_OBJECT_I;
     opt.where.pfunc = __func__;
     opt.where.pfile = __FILE__;
     opt.where.line  = __LINE__;
@@ -1022,7 +1022,9 @@ void SS_register_types(void)
 
     SC_init_base_types();
 
-    SS_OBJECT_I      = SC_type_register("object",      KIND_STRUCT, sizeof(object),
+    register_scheme_types();
+
+    G_OBJECT_I      = SC_type_register("object",      KIND_STRUCT, sizeof(object),
 					SC_TYPE_FREE,  SS_rl_object,
 					0);
     SS_PROCEDURE_I   = SC_type_register("SS_procedure",   KIND_STRUCT, sizeof(SS_procedure),

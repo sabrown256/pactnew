@@ -117,7 +117,7 @@ static object *_SSI_vctset(SS_psides *si, object *argl)
     SS_args(si, argl,
 	    SS_VECTOR_I,  &vct,
 	    SC_INT_I, &i,
-	    SS_OBJECT_I,  &val,
+	    G_OBJECT_I,  &val,
 	    0);
 
     n  = vct->length;
@@ -412,7 +412,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
         {vr = vrs[i];
 	 vl = _SS_lk_var_valc(si, vr, si->global_env);
 	 pr = SS_make_list(si, SC_STRING_I, vr,
-			   SS_OBJECT_I, vl,
+			   G_OBJECT_I, vl,
 			   0);
 	 SS_assign(si, lst, SS_mk_cons(si, pr, lst));};
 

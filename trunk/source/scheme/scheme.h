@@ -61,7 +61,10 @@
 #define SS_OBJECT_S        SS_gs.tnames[0]
 #define SS_POBJECT_S       SS_gs.tnames[1]
 
+/*
 #define SS_OBJECT_I        SS_gs.tind[0]
+*/
+
 #define SS_PROCEDURE_I     SS_gs.tind[1]
 #define SS_CONS_I          SS_gs.tind[2]
 #define SS_VARIABLE_I      SS_gs.tind[3]
@@ -646,19 +649,6 @@ typedef object *(*PFPOprs)(SS_psides *si);
 typedef void (*PFREFGet)(SS_psides *si, object *vr, object *penv);
 typedef void (*PFREFSet)(SS_psides *si, object *vr, object *vl, object *penv);
 
-#define SS_DEFINE_OBJECT(_si)                                               \
-   {defstr *dp;                                                             \
-    dp = PD_defstr(file, "object",                                          \
-                   "char *print_name",                                      \
-                   "char *val",                                             \
-                   "int eval_type",                                         \
-                   "function print",                                        \
-                   "function release",                                      \
-                   LAST);                                                   \
-    if (dp == NULL)                                                         \
-       SS_error(_si, "COULDN'T DEFINE OBJECT TO FILE - SS_DEFINE_OBJECT", \
-                SS_null);}
-
 struct s_SS_psides
    {int interactive;
     int trace_env;
@@ -758,24 +748,12 @@ struct s_SS_cons
    {object *car;
     object *cdr;};
 
-#define SS_DEFINE_CONS \
-    PD_defstr(file, "cons", \
-              "object *car", \
-              "object *cdr", \
-              LAST)
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 struct s_SS_variable
    {char *name;
     object *value;};
-
-#define SS_DEFINE_VARIABLE        \
-    PD_defstr(file, "SS_variable",   \
-              "char *name",       \
-              "object *value",    \
-              LAST)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -787,15 +765,6 @@ struct s_SS_reference
     void (*get)(SS_psides *si, object *vr, object *penv);
     void (*set)(SS_psides *si, object *vr, object *vl, object *penv);};
 
-#define SS_DEFINE_REFERENCE        \
-    PD_defstr(file, "SS_reference",   \
-              "char *name",        \
-              "object *value",     \
-              "object *a",         \
-              "function get",      \
-              "function set",      \
-              LAST)
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -803,24 +772,12 @@ struct s_SS_boolean
    {char *name;
     int value;};
 
-#define SS_DEFINE_BOOLEAN         \
-    PD_defstr(file, "boolean",    \
-              "char *name",       \
-              "int value",        \
-              LAST)
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 struct s_SS_string
    {int length;
     char *string;};
-
-#define SS_DEFINE_STRING          \
-    PD_defstr(file, "SS_string",     \
-              "int length",       \
-              "char *string",     \
-              LAST)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -891,12 +848,6 @@ struct s_SS_procedure
 struct s_SS_vector
    {int length;
     object **vect;};
-
-#define SS_DEFINE_VECTOR            \
-    PD_defstr(file, "SS_vector",    \
-              "int length",         \
-              "object **vect",      \
-              LAST)
 
 /*--------------------------------------------------------------------------*/
 

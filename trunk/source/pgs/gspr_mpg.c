@@ -174,9 +174,9 @@ boolean Default_Init(void)
      */
     qscaleI = 1;   /* our default value */
 
-    /* BASE_FILE_FORMAT: JPEG_FILE_TYPE for now */
+    /* BASE_FILE_FORMAT: JPEG_SX_FILE_I_TYPE for now */
     /* baseFormat = file_type;        (default: PPM_FILE_TYPE = 0) */
-    /* baseFormat = JPEG_FILE_TYPE; - probably not used at all */
+    /* baseFormat = JPEG_SX_FILE_I_TYPE; - probably not used at all */
 
     /* BIT_RATE */
     /* RateControlMode = FIXED_RATE;  (default: VARIABLE_RATE)

@@ -406,7 +406,7 @@ static object *_SSI_strfil(SS_psides *si, object *argl)
     s = NULL;
     c = ' ';
     SS_args(si, argl,
-            SS_OBJECT_I, &str,
+            G_OBJECT_I, &str,
             SC_INT_I, &c,
             0);
 
@@ -429,7 +429,7 @@ static object *_SSI_strset(SS_psides *si, object *argl)
     n = 0;
     c = ' ';
     SS_args(si, argl,
-            SS_OBJECT_I, &str,
+            G_OBJECT_I, &str,
             SC_INT_I, &n,
             SC_INT_I, &c,
             0);
@@ -942,9 +942,9 @@ static object *_SS_strtok(SS_psides *si, object *argl,
     delim = NULL;
     flag  = SS_f;
     SS_args(si, argl,
-            SS_OBJECT_I, &str,
+            G_OBJECT_I, &str,
             SC_STRING_I, &delim,
-            SS_OBJECT_I, &flag,
+            G_OBJECT_I, &flag,
             0);
 
     if (SS_nullobjp(str))

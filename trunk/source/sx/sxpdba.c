@@ -20,14 +20,14 @@
 static object *_SXI_def_attr(SS_psides *si, object *argl)
    {char *at, *type;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     object *o;
 
     po   = NULL;
     at   = NULL;
     type = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &at,
             SC_STRING_I, &type,
             0);
@@ -53,13 +53,13 @@ static object *_SXI_def_attr(SS_psides *si, object *argl)
 static object *_SXI_rem_attr(SS_psides *si, object *argl)
    {char *at;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     object *o;
 
     po   = NULL;
     at   = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &at,
             0);
 
@@ -88,8 +88,8 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
     char *at, *vr, *data_type, attr_type[MAXLINE];
     void *data;
     PDBfile *file;
-    g_file *po;
-    g_pdbdata *pv;
+    SX_file *po;
+    SX_pdbdata *pv;
     attribute *atr;
     object *obj;
 
@@ -98,10 +98,10 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
     vr = NULL;
     pv = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &vr,
             SC_STRING_I, &at,
-            SS_OBJECT_I, &obj,
+            G_OBJECT_I, &obj,
             0);
 
     if (po == NULL)
@@ -122,7 +122,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
     id = SC_type_id(attr_type, FALSE);
 
     if (SX_PDBDATAP(obj))
-       {pv = SS_GET(g_pdbdata, obj);
+       {pv = SS_GET(SX_pdbdata, obj);
 
         data_type = pv->ep->type;
         if (strcmp(data_type, attr_type) != 0)
@@ -193,7 +193,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
 static object *_SXI_get_attr_val(SS_psides *si, object *argl)
    {char *at, *vr, attr_type[MAXLINE];
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     SC_address data;
     attribute *atr;
     syment *ep;
@@ -203,7 +203,7 @@ static object *_SXI_get_attr_val(SS_psides *si, object *argl)
     at = NULL;
     vr = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &vr,
             SC_STRING_I, &at,
             0);
@@ -247,12 +247,12 @@ static object *_SXI_lst_attr(SS_psides *si, object *argl)
     object *obj;
     hasharr *tab;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     attribute *attr;
 
     po = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     if (po == NULL)

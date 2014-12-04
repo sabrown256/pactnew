@@ -171,7 +171,7 @@ static void c_enum_defs(bindes *bd, char *tag, der_list *el, int ni)
        {tl = el->na;
 
 /* emit macro to define enum to PDB file */
-	fprintf(fh, "#define G_ENUM_%s(_f)\t", tl.rnm);
+	fprintf(fh, "#define %s(_f)\t", tl.enm);
 	fprintf(fh, "PD_defenum(_f, \"%s\")\n", tl.cnm);};
 
     return;}

@@ -64,7 +64,7 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
 
 /* add the standard I/O channels */
     for (i = 0; i < N_IO_CHANNELS; i++)
-        {type[l] = SS_OBJECT_I;
+        {type[l] = G_OBJECT_I;
          if (i == 0)
 	    {SC_block_file(fp[i]);
 	     ptr[l] = SS_mk_inport(si, SC_fwrap(fp[i]), ioc[i]);}

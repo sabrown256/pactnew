@@ -813,9 +813,9 @@ void SS_error(SS_psides *si, char *s, object *obj)
 
     SS_assign(si, si->err_state,
 	      SS_make_list(si,
-			   SS_OBJECT_I, si->fun,
-			   SS_OBJECT_I, si->argl,
-			   SS_OBJECT_I, obj,
+			   G_OBJECT_I, si->fun,
+			   G_OBJECT_I, si->argl,
+			   G_OBJECT_I, obj,
 			   SC_STRING_I, t,
 			   0));
 

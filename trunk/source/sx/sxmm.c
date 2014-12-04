@@ -16,12 +16,12 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* _SX_MK_PDBDATA - make and return g_pdbdata */
+/* _SX_MK_PDBDATA - make and return SX_pdbdata */
 
-g_pdbdata *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file)
-   {g_pdbdata *pp;
+SX_pdbdata *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file)
+   {SX_pdbdata *pp;
 
-    pp = CMAKE(g_pdbdata);
+    pp = CMAKE(SX_pdbdata);
 
     SC_mark(data, 1);
     SC_mark(ep, 1);
@@ -37,12 +37,12 @@ g_pdbdata *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_RL_GPDBDATA - release g_pdbdata */
+/* _SX_RL_GPDBDATA - release SX_pdbdata */
 
 static void _SX_rl_gpdbdata(SS_psides *si, object *obj)
-   {g_pdbdata *pp;
+   {SX_pdbdata *pp;
 
-    pp = SS_GET(g_pdbdata, obj);
+    pp = SS_GET(SX_pdbdata, obj);
     if (SC_safe_to_free(pp))
        {CFREE(pp->name);
 
@@ -62,7 +62,7 @@ static void _SX_rl_gpdbdata(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_WR_GPDBDATA - print a g_pdbdata */
+/* _SX_WR_GPDBDATA - print a SX_pdbdata */
 
 static void _SX_wr_gpdbdata(SS_psides *si, object *obj, object *strm)
    {
@@ -74,16 +74,16 @@ static void _SX_wr_gpdbdata(SS_psides *si, object *obj, object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_MK_GPDBDATA - encapsulate a g_pdbdata as an object */
+/* _SX_MK_GPDBDATA - encapsulate a SX_pdbdata as an object */
 
 object *_SX_mk_gpdbdata(SS_psides *si, char *name,
 			void *data, syment *ep, PDBfile *file)
-   {g_pdbdata *pp;
+   {SX_pdbdata *pp;
     object *op;
 
     pp = _SX_mk_pdbdata(name, data, ep, file);
 
-    op = SS_mk_object(si, pp, G_PDBDATA, SELF_EV, pp->name,
+    op = SS_mk_object(si, pp, G_SX_PDBDATA_I, SELF_EV, pp->name,
 		      _SX_wr_gpdbdata, _SX_rl_gpdbdata);
     SC_mark(pp, 1);
 
@@ -92,19 +92,19 @@ object *_SX_mk_gpdbdata(SS_psides *si, char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_WR_GFILE - print a g_file */
+/* _SX_WR_GFILE - print a SX_file */
 
 static void _SX_wr_gfile(SS_psides *si, object *obj, object *strm)
    {char *tya, *tyw, *nm;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
 
     po  = NULL;
     tyw = "none";
     tya = "none";
     nm  = "none";
     SS_args(si, obj,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
 	    0);
 
     if (po != NULL)
@@ -124,12 +124,12 @@ static void _SX_wr_gfile(SS_psides *si, object *obj, object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_MK_FILE - make and return a g_file */
+/* _SX_MK_FILE - make and return a SX_file */
 
-g_file *_SX_mk_file(char *name, char *type, void *file)
-   {g_file *po;
+SX_file *_SX_mk_file(char *name, char *type, void *file)
+   {SX_file *po;
 
-    po = CMAKE(g_file);
+    po = CMAKE(SX_file);
 
     SC_mark(file, 1);
 
@@ -162,7 +162,7 @@ static int _SX_rl_menu_item(void *a)
 
 /* _SX_FREE_MENU - release the menus associated with a file */
 
-void _SX_free_menu(g_file *po, int re)
+void _SX_free_menu(SX_file *po, int re)
    {
 
     SC_free_array(po->menu_lst, _SX_rl_menu_item);
@@ -174,11 +174,11 @@ void _SX_free_menu(g_file *po, int re)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_RL_FILE - release a g_file
+/* _SX_RL_FILE - release a SX_file
  *             - assume the caller closed the file
  */
 
-static void _SX_rl_file(g_file *po)
+static void _SX_rl_file(SX_file *po)
    {
 
     _SX_free_menu(po, FALSE);
@@ -196,9 +196,9 @@ static void _SX_rl_file(g_file *po)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_MK_GFILE - make and return type g_file */
+/* SX_MK_GFILE - make and return type SX_file */
 
-object *SX_mk_gfile(SS_psides *si, g_file *po)
+object *SX_mk_gfile(SS_psides *si, SX_file *po)
    {object *op;
 
     if (po == NULL)
@@ -206,7 +206,7 @@ object *SX_mk_gfile(SS_psides *si, g_file *po)
 
     SC_mark(po, 1);
 
-    op = SS_mk_object(si, po, G_FILE, SELF_EV, po->name,
+    op = SS_mk_object(si, po, G_SX_FILE_I, SELF_EV, po->name,
 		      _SX_wr_gfile, SS_rl_object);
 
     return(op);}
@@ -214,16 +214,16 @@ object *SX_mk_gfile(SS_psides *si, g_file *po)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_MK_OPEN_FILE - initialize an g_file and return a pointer
+/* _SX_MK_OPEN_FILE - initialize an SX_file and return a pointer
  *                  - to it
  */
 
-g_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
+SX_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
    {char nm[MAXLINE];
     char *pnm;
     PDBfile *file;
     object *obj;
-    g_file *po;
+    SX_file *po;
     tr_layer *tr;
 
     pnm = name;
@@ -278,11 +278,11 @@ g_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_REL_OPEN_FILE - GC an g_file
+/* _SX_REL_OPEN_FILE - GC an SX_file
  *                   - include closing the file
  */
 
-void _SX_rel_open_file(SS_psides *si, g_file *po)
+void _SX_rel_open_file(SS_psides *si, SX_file *po)
    {PDBfile *file;
 
     if (po != NULL)

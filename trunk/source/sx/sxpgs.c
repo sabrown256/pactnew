@@ -199,11 +199,11 @@ void *_SX_opt_PG_dev_attributes(PG_dev_attributes *x, bind_opt wh, void *a)
 static object *_SXI_def_file_graph(SS_psides *si, object *obj)
    {int ok;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
 
     po = NULL;
     SS_args(si, obj,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     if (po == NULL)
@@ -237,7 +237,7 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
     PM_mapping *f;
     char *name;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     object *rv;
 
     rv   = SS_null;
@@ -246,7 +246,7 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
     name = NULL;
     SS_args(si, argl,
             G_PG_GRAPH_I, &g,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &name,
             0);
 
@@ -420,7 +420,7 @@ static object *_SX_pdbcurve_graph(SS_psides *si, PDBfile *file,
 
 /* _SX_GET_MENU_ITEM - return the Ith menu item from PO */
 
-SX_menu_item *_SX_get_menu_item(SS_psides *si, g_file *po, int i)
+SX_menu_item *_SX_get_menu_item(SS_psides *si, SX_file *po, int i)
    {int n;
     SX_menu_item *mi;
 
@@ -450,14 +450,14 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
     char *name;
     PDBfile *file;
     SX_menu_item *mi;
-    g_file *po;
+    SX_file *po;
     syment *ep;
 
     po  = NULL;
     obj = SS_null;
     SS_args(si, argl,
-            G_FILE, &po,
-            SS_OBJECT_I, &obj,
+            G_SX_FILE_I, &po,
+            G_OBJECT_I, &obj,
             0);
 
     if (strcmp(po->type, PDBFILE_S) != 0)
@@ -504,14 +504,14 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
 static object *_SXI_menu_item_type(SS_psides *si, object *argl)
    {int indx;
     char bf[MAXLINE], *s;
-    g_file *po;
+    SX_file *po;
     SX_menu_item *mi;
     object *rv;
 
     po   = NULL;
     indx = -1;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_INT_I, &indx,
             0);
 
@@ -539,7 +539,7 @@ static object *_SXI_get_text_image_name(SS_psides *si, object *argl)
    {long i;
     char *name;
     SX_menu_item *mi;
-    g_file *po;
+    SX_file *po;
     object *o;
 
     argl = SX_get_file(si, argl, &po);
@@ -570,7 +570,7 @@ static object *_SXI_get_text_mapping_name(SS_psides *si, object *argl)
    {long i;
     char *name;
     SX_menu_item *mi;
-    g_file *po;
+    SX_file *po;
     object *o;
 
     argl = SX_get_file(si, argl, &po);
@@ -604,7 +604,7 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
     char *name;
     SX_menu_item *mi;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     syment *ep;
     SC_address data;
     PG_image *im;
@@ -660,7 +660,7 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
 
 static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
    {PM_mapping *f;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     char *name;
     int i;
@@ -670,7 +670,7 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
     file = NULL;
     SS_args(si, argl,
             G_PM_MAPPING_I, &f,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -712,7 +712,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
    {long i;
     char *name;
     PG_image *f;
-    g_file *file;
+    SX_file *file;
     PDBfile *strm;
     object *ret;
 
@@ -721,7 +721,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
     strm = NULL;
     SS_args(si, argl,
             G_PG_IMAGE_I, &f,
-            G_FILE, &file,
+            G_SX_FILE_I, &file,
             0);
 
     if ((file == NULL) || (file == SX_gs.gvif))
@@ -885,7 +885,7 @@ static object *_SXI_device_props(SS_psides *si, object *argl)
  *                - for this file
  */
 
-object *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype)
+object *SX_get_ref_map(SS_psides *si, SX_file *po, int indx, char *dtype)
    {char type;
     object *argl, *ret;
     SX_menu_item *mi;
@@ -897,7 +897,7 @@ object *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype)
        {type = mi->type[3];
 	switch (type)
 	   {case 'i' :
-	         argl = SS_make_list(si, G_FILE, po,
+	         argl = SS_make_list(si, G_SX_FILE_I, po,
 				     SC_INT_I, &indx,
 				     0);
 		 ret = _SXI_pdbdata_image(si, argl);
@@ -906,7 +906,7 @@ object *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype)
 
 	    case 'm' :
             default  :
-	         argl = SS_make_list(si, G_FILE, po,
+	         argl = SS_make_list(si, G_SX_FILE_I, po,
 				     SC_INT_I, &indx,
 				     0);
 		 ret = _SXI_pdbdata_graph(si, argl);
@@ -1005,7 +1005,7 @@ void SX_mouse_event_handler(PG_device *dev, PG_event *ev)
         if (SS_procedurep(fnc))
 	   SS_call_scheme(si, "handle-mouse-event",
                           SC_INT_I, &type,
-			  SS_OBJECT_I, loc,
+			  G_OBJECT_I, loc,
 			  SC_ENUM_I, &button,
 			  SC_INT_I, &qual,
 			  0);};
@@ -1337,7 +1337,7 @@ static object *_SXI_draw_domain(SS_psides *si, object *argl)
     extr = SS_null;
     SS_args(si, argl,
             SC_ENUM_I, &pty,
-	    SS_OBJECT_I, &extr,
+	    G_OBJECT_I, &extr,
 	    0);
 
     if (!SS_nullobjp(extr))
@@ -1893,7 +1893,7 @@ static object *_SXI_set_attr_graph(SS_psides *si, object *argl)
             G_PG_GRAPH_I, &g,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
-            SS_OBJECT_I, &val,
+            G_OBJECT_I, &val,
             0);
 
     if ((g == NULL) || (name == NULL) || (type == NULL))
@@ -2273,7 +2273,7 @@ static object *_SXI_set_label(SS_psides *si, object *argl)
     obj   = NULL;
     label = NULL;
     SS_args(si, argl,
-            SS_OBJECT_I, &obj,
+            G_OBJECT_I, &obj,
             SC_STRING_I, &label,
             0);
 
@@ -2751,9 +2751,9 @@ static object *_SXI_drawable_info(SS_psides *si, object *argl)
     name = NULL;
     val  = NULL;
     SS_args(si, argl,
-            SS_OBJECT_I, &obj,
+            G_OBJECT_I, &obj,
             SC_STRING_I, &name,
-            SS_OBJECT_I, &val,
+            G_OBJECT_I, &val,
             0);
 
     if (SX_SETP(obj))

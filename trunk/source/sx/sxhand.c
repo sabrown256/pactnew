@@ -57,7 +57,7 @@ object *SX_display_map(SS_psides *si, object *mo)
 
 	SS_mark(mo);
 	SS_call_scheme(si, "display-mapping*",
-		       SS_OBJECT_I, mo,
+		       G_OBJECT_I, mo,
 		       0);};
 
     return(mo);}
@@ -89,7 +89,7 @@ static object *_SX_resolve_mapping(SS_psides *si, object *argl)
 	   {SS_mark(argl);
 
 	    fo = SS_call_scheme(si, "map-resolve",
-				SS_OBJECT_I, obj,
+				G_OBJECT_I, obj,
 				0);};};
 
     SS_restore(si, si->argl);

@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
  
-#include "ultra.h"
+#include "scope_ultra.h"
 
 #define MAX_ARY(a, ap, n, amax)                                              \
     for (ap = a, amax = *a; ap-a < n; amax = max(amax, *a++))
@@ -81,8 +81,8 @@ static object *_UL_fft(SS_psides *si, object *argl,
     CFREE(icy);
     CFREE(cy);
 
-    rv = SS_make_list(si, SS_OBJECT_I, ch1,
-		      SS_OBJECT_I, ch2,
+    rv = SS_make_list(si, G_OBJECT_I, ch1,
+		      G_OBJECT_I, ch2,
 		      0);
 
     return(rv);}
@@ -132,8 +132,8 @@ object *UL_fft(SS_psides *si, int j)
 	CFREE(x[1]);
 	CFREE(cy);
 
-	rv = SS_make_list(si, SS_OBJECT_I, cre,
-			  SS_OBJECT_I, cim,
+	rv = SS_make_list(si, G_OBJECT_I, cre,
+			  G_OBJECT_I, cim,
 			  0);};
 
     return(rv);}
@@ -351,9 +351,9 @@ object *UL_getx(SS_psides *si, object *obj, object *tok)
     tmp = _UL_get_value(si, SX_gs.dataset[i].x[1], SX_gs.dataset[i].x[0], value,
 			SX_gs.dataset[i].n, SX_gs.dataset[i].id);
 
-    o = SS_make_list(si, SS_OBJECT_I, obj,
-		     SS_OBJECT_I, tok,
-		     SS_OBJECT_I, tmp,
+    o = SS_make_list(si, G_OBJECT_I, obj,
+		     G_OBJECT_I, tok,
+		     G_OBJECT_I, tmp,
 		     0);
 
     return(o);}
@@ -377,9 +377,9 @@ object *UL_gety(SS_psides *si, object *obj, object *tok)
     tmp = _UL_get_value(si, SX_gs.dataset[i].x[0], SX_gs.dataset[i].x[1], value,
 			SX_gs.dataset[i].n, SX_gs.dataset[i].id);
 
-    o = SS_make_list(si, SS_OBJECT_I, obj,
-		     SS_OBJECT_I, tok,
-		     SS_OBJECT_I, tmp,
+    o = SS_make_list(si, G_OBJECT_I, obj,
+		     G_OBJECT_I, tok,
+		     G_OBJECT_I, tmp,
 		     0);
 
     return(o);}
@@ -598,11 +598,11 @@ static object *_ULI_error_plot(SS_psides *si, object *argl)
     xp[0] = NULL;
     xm[0] = NULL;
     SS_args(si, argl,
-            SS_OBJECT_I, &c,
-            SS_OBJECT_I, &xp[1],
-            SS_OBJECT_I, &xm[1],
-            SS_OBJECT_I, &xp[0],
-            SS_OBJECT_I, &xm[0],
+            G_OBJECT_I, &c,
+            G_OBJECT_I, &xp[1],
+            G_OBJECT_I, &xm[1],
+            G_OBJECT_I, &xp[0],
+            G_OBJECT_I, &xm[0],
 	    0);
 
     xpc[0] = ((xp[0] == NULL) || SS_nullobjp(xp[0])) ?

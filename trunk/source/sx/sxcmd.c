@@ -139,7 +139,7 @@ void SX_init_view(SS_psides *si)
 
 static object *_SX_mapping_ref(SS_psides *si, char *fname,
 			       char *dtype, int indx)
-   {g_file *po;
+   {SX_file *po;
     object *ret;
 
     if (strcmp(fname, "#t") == 0)
@@ -285,7 +285,7 @@ object *G_PM_SET_Id(SS_psides *si, object *argl)
 static object *_SXI_thru(SS_psides *si, object *argl)
    {int n;
     object *ret;
-    g_file *po;
+    SX_file *po;
 
     ret = SS_null;
 
@@ -315,7 +315,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
            f1 will not refer to the current input file */
 
 	SS_args(si, SS_lk_var_val(si, SX_gs.curfile),
-		G_FILE, &po,
+		G_SX_FILE_I, &po,
 		0);
 
 	_SX_get_menu(si, po);
@@ -432,7 +432,7 @@ void SX_init_env(SS_psides *si)
 
 /* initialize the some global objects */
 
-    SX_gs.curfile = SS_install_cv(si, "current-file", SS_null, SS_OBJECT_I);
+    SX_gs.curfile = SS_install_cv(si, "current-file", SS_null, G_OBJECT_I);
 
     SS_install(si, "describe*",
                "Procedure: Describe an SX function or variable\n     Usage: describe* <function-list> <variable-list>",

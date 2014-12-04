@@ -14,6 +14,7 @@ struct s_tns_list
     char unm[BFSML];        /* upper case version of CNM, PM_SET */
     char rnm[BFSML];        /* root struct id, SET */
     char inm[BFSML];        /* type index name, G_PM_SET_I */
+    char enm[BFSML];        /* defenum macro name, G_PM_SET_E */
     char dnm[BFSML];        /* scope name, G_PM_SET_D */
 
     char snm[BFSML];};      /* Scheme struct name, pm-set */

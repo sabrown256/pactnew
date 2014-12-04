@@ -11,7 +11,7 @@ LibName=sx
 
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTExe = ${BinDir}/sx
-TGTInc = sx.h sx_int.h ultra.h
+TGTInc = sx.h sx_int.h scope_ultra.h
 
 UltraExe = ${BinDir}/ultra
 
@@ -93,6 +93,12 @@ Hdrs = ${TGTInc} ${hdrf} ${IncDir}/sx_gen.h
 #
 # Object Files
 #
+gcs = gc-sx.c
+
+gco = gc-sx.o
+
+gca = ${TGTLib}(gc-sx.o)
+
 gss = gs-score.c gs-pml.c gs-pdb.c   \
       gs-pgs.c gs-panacea.c \
       gs-scheme.c
@@ -129,7 +135,7 @@ ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
          ${TGTLib}(sxgri.o) ${TGTLib}(sxpgs.o) ${TGTLib}(sxpgsp.o) ${TGTLib}(sxgrot.o) \
          ${TGTLib}(sxshar.o) ${TGTLib}(sxset.o) ${TGTLib}(sxcont.o)  \
          ${TGTLib}(sxulio.o) ${TGTLib}(sxcrv.o) ${TGTLib}(sxtable.o) \
-         ${ArObjsU} ${gsa}
+         ${ArObjsU} ${gsa} ${gca}
 
 sxmain.o : ${Hdrs}
 ultra.o : ${Hdrs}
@@ -143,7 +149,8 @@ ${LibDep} : ${Hdrs} ${hdrf}
 
 GenInc = ${PACTTmpDir}/gs-score.h ${PACTTmpDir}/gs-pml.h \
          ${PACTTmpDir}/gs-pdb.h ${PACTTmpDir}/gs-pgs.h \
-         ${PACTTmpDir}/gs-panacea.h
+         ${PACTTmpDir}/gs-panacea.h ${PACTTmpDir}/gs-scheme.h \
+         ${PACTTmpDir}/gc-sx.h
 
 ${IncDir}/sx_gen.h : ${GenInc}
 	@echo "build sx_gen.h"

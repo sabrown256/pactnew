@@ -19,12 +19,12 @@ object *TR_write_bin(SS_psides *si, object *arg)
    {PFBinWrite fun;
     PDBfile *file;
     tr_layer *tr;
-    g_file *po;
+    SX_file *po;
     object *o;
 
     po = NULL;
     SS_args(si, arg,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
     
     o = SS_f;
@@ -45,12 +45,12 @@ object *TR_read_bin(SS_psides *si, object *arg)
    {PFBinRead fun;
     PDBfile *file;
     tr_layer *tr;
-    g_file *po;
+    SX_file *po;
     object *o;
 
     po = NULL;
     SS_args(si, arg,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
     
     o = SS_f;
@@ -68,14 +68,14 @@ object *TR_read_bin(SS_psides *si, object *arg)
 /* TR_FILE_TYPE - return a string object containing the file type name */
 
 object *TR_file_type(SS_psides *si, object *arg)
-   {g_file *po;
+   {SX_file *po;
     PDBfile *file;
     object *o;
 
     po   = NULL;
     file = NULL;
     SS_args(si, arg,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     if (po != NULL)

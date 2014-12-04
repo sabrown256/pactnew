@@ -2378,7 +2378,7 @@ extern const double VidRateNum[9];
 #define BASE_FILE_TYPE	    4
 #define PNM_FILE_TYPE	    5
 #define SUB4_FILE_TYPE	    6
-#define JPEG_FILE_TYPE	    7
+#define JPEG_SX_FILE_I_TYPE	    7
 #define JMOVIE_FILE_TYPE    8
 #define Y_FILE_TYPE	    9
 #define SIGNED_YUV_FILE_TYPE 10

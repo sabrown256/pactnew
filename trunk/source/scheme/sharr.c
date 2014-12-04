@@ -31,7 +31,7 @@ static object *_SSI_hash_install(SS_psides *si, object *argl)
     tab  = si->symtab;
     SS_args(si, argl,
 	    SC_STRING_I, &name,
-	    SS_OBJECT_I, &obj,
+	    G_OBJECT_I, &obj,
 	    SS_HASHARR_I, &tab,
 	    0);
 
@@ -124,9 +124,9 @@ object *SS_hash_dump(SS_psides *si, object *argl)
     sort = SS_t;
 
     SS_args(si, argl,
-            SS_OBJECT_I, &to,
+            G_OBJECT_I, &to,
 	    SC_STRING_I, &patt,
-	    SS_OBJECT_I, &sort,
+	    G_OBJECT_I, &sort,
             0);
 
     if ((patt != NULL) && (strcmp(patt, "nil") == 0))

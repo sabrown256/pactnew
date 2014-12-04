@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
  
-#include "ultra.h"
+#include "scope_ultra.h"
 #include "scope_raster.h"
 #include "scope_proc.h"
 
