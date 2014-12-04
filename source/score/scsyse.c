@@ -408,7 +408,7 @@ static int _SC_do_session(PROCESS *pp,
 /* register the I/O channels for the event loop to monitor */
     pi  = SC_register_event_loop_callback(pe, SC_FILE_I, stdin,
 					  in, irej, -1);
-    pi &= SC_register_event_loop_callback(pe, SC_PROCESS_I, pp,
+    pi &= SC_register_event_loop_callback(pe, G_PROCESS_I, pp,
 					  out, orej, -1);
 
     d.fd = -1;

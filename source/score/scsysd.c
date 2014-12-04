@@ -469,7 +469,7 @@ static void _SC_pool_connection_close(conpool *cp, int vrb, char *tag,
 			   "close connection %d, %s, for %s - process %d (%d %d)",
 			   ic, pco->host, tag, id, pp->status, pp->reason);
 
-	SC_remove_event_loop_callback(pe, SC_PROCESS_I, pp);
+	SC_remove_event_loop_callback(pe, G_PROCESS_I, pp);
 
 	SC_close(pp);
 
@@ -1801,7 +1801,7 @@ static int _SC_launch_pool_connection(conpool *cp, int ic)
 	SC_set_attr(pp, SC_LINE, TRUE);
 
 	pe = cp->loop;
-	pi = SC_register_event_loop_callback(pe, SC_PROCESS_I, pp,
+	pi = SC_register_event_loop_callback(pe, G_PROCESS_I, pp,
 					     _SC_pool_output,
 					     _SC_pool_reject,
 					     -1);

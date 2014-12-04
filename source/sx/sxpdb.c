@@ -3475,7 +3475,7 @@ static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
     name = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SS_HASHARR_I, &tab,
+            G_HASHARR_I, &tab,
             SC_STRING_I, &name,
             0);
 

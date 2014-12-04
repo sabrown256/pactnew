@@ -186,7 +186,7 @@ static int interrupt_mode(descriptors *pd)
 					  tty_has_txt, NULL, -1);
     for (i = 0; i < n; i++)
         {if (pp[i] != NULL)
-	    pi &= SC_register_event_loop_callback(pe, SC_PROCESS_I, pp[i],
+	    pi &= SC_register_event_loop_callback(pe, G_PROCESS_I, pp[i],
 						  child_has_txt, NULL, -1);};
 
 /* if all channels are OK activate the interrupt handling */

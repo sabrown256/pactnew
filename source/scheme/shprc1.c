@@ -82,7 +82,7 @@ object *SS_mk_process(SS_psides *si, PROCESS *pp)
    {object *rv;
 
     if (pp != NULL)
-       {rv = SS_mk_object(si, pp, SS_PROCESS_I, SELF_EV, NULL,
+       {rv = SS_mk_object(si, pp, G_PROCESS_I, SELF_EV, NULL,
 			  _SS_wr_process, _SS_rl_process);
 	SC_mark(pp, 1);}
 
@@ -212,7 +212,7 @@ static object *_SSI_blck_pr(SS_psides *si, object *argl)
     pp = NULL;
     o  = NULL;
     SS_args(si, argl,
-            SS_PROCESS_I, &pp,
+            G_PROCESS_I, &pp,
             G_OBJECT_I, &o,
             0);
 
@@ -235,7 +235,7 @@ static object *_SSI_cls_pr(SS_psides *si, object *obj)
 
     pp = NULL;
     SS_args(si, obj,
-            SS_PROCESS_I, &pp,
+            G_PROCESS_I, &pp,
             0);
 
     SC_close(pp);
@@ -327,7 +327,7 @@ static object *_SSI_pr_sn_line(SS_psides *si, object *argl)
     pp = NULL;
     s  = NULL;
     SS_args(si, argl,
-            SS_PROCESS_I, &pp,
+            G_PROCESS_I, &pp,
             SC_STRING_I, &s,
             0);
 
