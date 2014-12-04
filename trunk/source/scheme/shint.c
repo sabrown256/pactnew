@@ -533,7 +533,7 @@ object *SS_define_constant(SS_psides *si, int n, ...)
        vr = SS_mk_variable(si, name, SS_null);
        SS_UNCOLLECT(vr);
 
-       SC_hasharr_install(si->symtab, name, vr, SS_POBJECT_S, 3, -1);
+       SC_hasharr_install(si->symtab, name, vr, SS_OBJECT_P_S, 3, -1);
        SS_def_var(si, vr, val, si->global_env);};
 
     SC_VA_END;

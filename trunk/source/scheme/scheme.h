@@ -59,7 +59,7 @@
 #define SS_N_SPECIAL       14
 
 #define SS_OBJECT_S        SS_gs.tnames[0]
-#define SS_POBJECT_S       SS_gs.tnames[1]
+#define SS_OBJECT_P_S      SS_gs.tnames[1]
 
 #define SS_EOF_I           SS_gs.tind[0]
 #define SS_NULL_I          SS_gs.tind[1]

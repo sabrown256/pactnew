@@ -112,21 +112,15 @@ typedef long double float128_t;
 #define SC_VOID_S                    SC_gs.ltyp[28].s
 #define SC_STRUCT_I                  SC_gs.ltyp[29].i
 #define SC_STRUCT_S                  SC_gs.ltyp[29].s
-#define SC_PCONS_I                   SC_gs.ltyp[30].i
-#define SC_PCONS_S                   SC_gs.ltyp[30].s
-#define SC_PROCESS_I                 SC_gs.ltyp[31].i
-#define SC_PROCESS_S                 SC_gs.ltyp[31].s
-#define SC_FILE_I                    SC_gs.ltyp[32].i
-#define SC_FILE_S                    SC_gs.ltyp[32].s
-#define SC_HAELEM_I                  SC_gs.ltyp[33].i
-#define SC_HAELEM_S                  SC_gs.ltyp[33].s
-#define SC_ENUM_I                    SC_gs.ltyp[34].i
-#define SC_ENUM_S                    SC_gs.ltyp[34].s
-#define SC_INTEGER_I                 SC_gs.ltyp[35].i
-#define SC_INTEGER_S                 SC_gs.ltyp[35].s
-#define SC_REAL_I                    SC_gs.ltyp[36].i
-#define SC_REAL_S                    SC_gs.ltyp[36].s
-#define SC_TYP_N                     37
+#define SC_FILE_I                    SC_gs.ltyp[30].i
+#define SC_FILE_S                    SC_gs.ltyp[30].s
+#define SC_ENUM_I                    SC_gs.ltyp[31].i
+#define SC_ENUM_S                    SC_gs.ltyp[31].s
+#define SC_INTEGER_I                 SC_gs.ltyp[32].i
+#define SC_INTEGER_S                 SC_gs.ltyp[32].s
+#define SC_REAL_I                    SC_gs.ltyp[33].i
+#define SC_REAL_S                    SC_gs.ltyp[33].s
+#define SC_TYP_N                     34
 
 #define SC_BOOL_P_I                  SC_gs.lityp[0].i
 #define SC_BOOL_P_S                  SC_gs.lityp[0].s
@@ -215,10 +209,7 @@ typedef long double float128_t;
    { 17, "void *" },                                                         \
    { 33, "void" },                                                           \
    { 34, "struct" },                                                         \
-   { 35, "pcons" },                                                          \
-   { 36, "PROCESS" },                                                        \
-   { 37, "FILE" },                                                           \
-   { 38, "haelem" },                                                         \
+   { 35, "FILE" },                                                           \
    { 7, "enum" },                                                            \
    { 7, "integer" },                                                         \
    { 11, "double" } }

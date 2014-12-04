@@ -183,7 +183,7 @@ object *SS_install_cf(SS_psides *si, char *name, char *doc, ...)
     vp = SS_mk_variable(si, name, op);
     SS_UNCOLLECT(vp);
 
-    SC_hasharr_install(si->symtab, name, vp, SS_POBJECT_S, 3, -1);
+    SC_hasharr_install(si->symtab, name, vp, SS_OBJECT_P_S, 3, -1);
 
     return(vp);}
 
@@ -237,14 +237,14 @@ object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
 
     else if (ityp == G_OBJECT_I)
        {SS_def_var(si, var, (object *) pval, si->global_env);
-	typ = SS_POBJECT_S;}
+	typ = SS_OBJECT_P_S;}
 
     else
        SS_error(si, "BAD VARIABLE TYPE - SX_INSTALL_VARIABLE",
 		  SS_null);
 
 /* GOTCHA: the type, typ, is wrong! var is an object * and typ should be
- *         replaced by SS_POBJECT_S if one wants to conform to the rules
+ *         replaced by SS_OBJECT_P_S if one wants to conform to the rules
  *         for such things
  */
     if (SC_hasharr_install(si->symtab, name, var, typ, 3, -1) == NULL)

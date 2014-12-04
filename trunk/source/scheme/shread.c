@@ -786,7 +786,7 @@ object *SS_add_variable(SS_psides *si, char *name)
 
     op = SS_mk_variable(si, name, SS_null);
     SS_UNCOLLECT(op);
-    hp = SC_hasharr_install(si->symtab, name, op, SS_POBJECT_S, 3, -1);
+    hp = SC_hasharr_install(si->symtab, name, op, SS_OBJECT_P_S, 3, -1);
     if (hp == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
 
