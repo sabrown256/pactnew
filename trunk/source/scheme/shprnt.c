@@ -1242,10 +1242,10 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	   snprintf(t, MAXLINE, "%c", SS_CHARACTER_VALUE(obj));
 #endif
 
-	else if (ityp == SS_VARIABLE_I)
+	else if (ityp == G_SS_VARIABLE_I)
 	   s = SS_VARIABLE_NAME(obj);
 
-	else if (ityp == SS_REFERENCE_I)
+	else if (ityp == G_SS_REFERENCE_I)
 	   s = SS_REFERENCE_NAME(obj);
 
 	else if (ityp == SS_NULL_I)

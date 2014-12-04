@@ -639,7 +639,7 @@ object *SS_mk_variable(SS_psides *si, char *n, object *v)
     vp->name  = CSTRSAVE(n);
     vp->value = v;
 
-    op = SS_mk_object(si, vp, SS_VARIABLE_I, VAR_EV, vp->name,
+    op = SS_mk_object(si, vp, G_SS_VARIABLE_I, VAR_EV, vp->name,
 		      SS_wr_atm, _SS_rl_variable);
 
     return(op);}
@@ -661,7 +661,7 @@ object *SS_mk_reference(SS_psides *si, char *n,
     rp->set   = set;
     rp->a     = a;
 
-    op = SS_mk_object(si, rp, SS_REFERENCE_I, VAR_EV, rp->name,
+    op = SS_mk_object(si, rp, G_SS_REFERENCE_I, VAR_EV, rp->name,
 		      SS_wr_atm, _SS_rl_reference);
 
     return(op);}
@@ -706,7 +706,7 @@ object *SS_mk_inport(SS_psides *si, FILE *str, char *name)
     pp->ptr  = pp->buffer;
     *pp->ptr = '\0';
 
-    op = SS_mk_object(si, pp, SS_INPUT_PORT_I, SELF_EV, NULL,
+    op = SS_mk_object(si, pp, G_SS_INPUT_PORT_I, SELF_EV, NULL,
 		      _SS_wr_inport, _SS_rl_inport);
 
     return(op);}
@@ -729,7 +729,7 @@ object *SS_mk_outport(SS_psides *si, FILE *str, char *name)
     pp->name = CSTRSAVE(name);
     pp->str  = str;
 
-    op = SS_mk_object(si, pp, SS_OUTPUT_PORT_I, SELF_EV, NULL,
+    op = SS_mk_object(si, pp, G_SS_OUTPUT_PORT_I, SELF_EV, NULL,
 		      _SS_wr_outport, _SS_rl_outport);
 
     return(op);}
@@ -840,7 +840,7 @@ object *SS_mk_cons(SS_psides *si, object *ca, object *cd)
     cp->car = ca;
     cp->cdr = cd;
 
-    op = SS_mk_object(si, cp, SS_CONS_I, PROC_EV, NULL,
+    op = SS_mk_object(si, cp, G_SS_CONS_I, PROC_EV, NULL,
 		      SS_wr_lst, _SS_rl_cons);
 
     return(op);}
@@ -1002,7 +1002,7 @@ object *SS_mk_vector(SS_psides *si, int l)
     vp->length = l;
     vp->vect   = va;
 
-    o = SS_mk_object(si, vp, SS_VECTOR_I, SELF_EV, NULL,
+    o = SS_mk_object(si, vp, G_SS_VECTOR_I, SELF_EV, NULL,
 		     _SS_wr_vector, _SS_rl_vector);
 
     return(o);}
@@ -1024,24 +1024,6 @@ void SS_register_types(void)
 
     register_scheme_types();
 
-    G_OBJECT_I      = SC_type_register("object",      KIND_STRUCT, sizeof(object),
-					SC_TYPE_FREE,  SS_rl_object,
-					0);
-    SS_PROCEDURE_I   = SC_type_register("SS_procedure",   KIND_STRUCT, sizeof(SS_procedure),
-					SC_TYPE_FREE,  _SS_rl_procedure,
-					0);
-    SS_CONS_I        = SC_type_register("pair",        KIND_STRUCT, sizeof(SS_cons),
-					SC_TYPE_FREE,  _SS_rl_cons,
-					0);
-    SS_VARIABLE_I    = SC_type_register("SS_variable",    KIND_STRUCT, sizeof(SS_variable),
-					SC_TYPE_FREE,  _SS_rl_variable,
-					0);
-    SS_INPUT_PORT_I  = SC_type_register("SS_input_port",  KIND_STRUCT, sizeof(SS_input_port),
-					SC_TYPE_FREE,  _SS_rl_inport,
-					0);
-    SS_OUTPUT_PORT_I = SC_type_register("SS_output_port", KIND_STRUCT, sizeof(SS_output_port),
-					SC_TYPE_FREE,  _SS_rl_outport,
-					0);
     SS_EOF_I         = SC_type_register("eof",         KIND_STRUCT, sizeof(SS_boolean),
 					SC_TYPE_FREE,  _SS_rl_boolean,
 					0);
@@ -1052,9 +1034,6 @@ void SS_register_types(void)
 
 #ifdef LARGE
 
-    SS_VECTOR_I      = SC_type_register("SS_vector",       KIND_STRUCT, sizeof(SS_vector),
-					SC_TYPE_FREE,   _SS_rl_vector,
-					0);
     SS_CHARACTER_I   = SC_type_register("character",    KIND_OTHER,  sizeof(int),
 					SC_TYPE_FREE,   _SS_rl_char,
 					0);
@@ -1066,10 +1045,6 @@ void SS_register_types(void)
     SS_HAELEM_I      = SC_type_register("hash element", KIND_STRUCT, sizeof(haelem),  0);
 
 #endif
-
-    SS_REFERENCE_I   = SC_type_register("SS_reference",    KIND_STRUCT, sizeof(SS_reference),
-					SC_TYPE_FREE,  _SS_rl_reference,
-					0);
 
     SS_OBJECT_S  = CSTRSAVE("object");
     SS_POBJECT_S = CSTRSAVE("object *");
@@ -1087,10 +1062,10 @@ int _SS_get_object_length(SS_psides *si, object *obj)
    {int ni, ityp;
 
     ityp = SC_arrtype(obj, -1);
-    if (ityp == SS_CONS_I)
+    if (ityp == G_SS_CONS_I)
        ni = SS_length(si, obj);
 
-    else if (ityp == SS_VECTOR_I)
+    else if (ityp == G_SS_VECTOR_I)
        ni = SS_VECTOR_LENGTH(obj);
 
     else if (ityp == SC_STRING_I)
@@ -1340,7 +1315,7 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
        {ityp = SC_arrtype(o, -1);
 	if (ityp == SC_STRING_I)
 	   strncpy(p, SS_STRING_TEXT(o), n);
-	else if (ityp == SS_CONS_I)
+	else if (ityp == G_SS_CONS_I)
 	   strncpy(p, SS_STRING_TEXT(SS_car(si, o)), n);
         else
 	   SS_error(si, "EXPECTED A STRING - _SS_LIST_TO_NUMTYPE", o);
@@ -1364,7 +1339,7 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
 	object *to, **ao;
 
 	oid = SC_arrtype(o, -1);
-	if (oid == SS_CONS_I)
+	if (oid == G_SS_CONS_I)
 	   {if (SS_consp(SS_car(si, o)))
 	       o = SS_car(si, o);
 	    for (i = 0; i < n; i++)
@@ -1374,7 +1349,7 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
 		 if (to != SS_null)
 		    o = to;};}
 
-	else if (oid == SS_VECTOR_I)
+	else if (oid == G_SS_VECTOR_I)
 	   {ao = SS_VECTOR_ARRAY(o);
 	    for (i = 0; i < n; i++)
 	        _SS_object_to_numtype_id(vid, p, i, ao[i]);}

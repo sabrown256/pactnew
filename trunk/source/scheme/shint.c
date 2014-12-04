@@ -382,14 +382,14 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
     else if (type == G_OBJECT_I)
        *pv = (void *) obj;
 
-    else if (type == SS_PROCEDURE_I)
+    else if (type == G_SS_PROCEDURE_I)
        {pp  = (SS_procedure *) obj->val;
 	*pv = (void *) pp->proc;}
 
-    else if (type == SS_INPUT_PORT_I)
+    else if (type == G_SS_INPUT_PORT_I)
        *pv = (void *) SS_INSTREAM(obj);
 
-    else if (type == SS_OUTPUT_PORT_I)
+    else if (type == G_SS_OUTPUT_PORT_I)
        *pv = (void *) SS_OUTSTREAM(obj);
 
 #ifdef LARGE
@@ -410,7 +410,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 	   SS_error(si, "OBJECT NOT PROCESS - _SS_ARGS", obj);
 	*pv = obj->val;}
 
-    else if (type == SS_VECTOR_I)
+    else if (type == G_SS_VECTOR_I)
        {if (!SS_vectorp(obj))
 	   SS_error(si, "OBJECT NOT VECTOR - _SS_ARGS", obj);
 	*pv = obj->val;}

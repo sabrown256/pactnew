@@ -754,13 +754,13 @@ static int _SS_eqv(SS_psides *si, object *o1, object *o2)
     else if (ityp == SS_CHARACTER_I)
        rv = (SS_CHARACTER_VALUE(o1) == SS_CHARACTER_VALUE(o2));
 
-    else if (ityp == SS_VARIABLE_I)
+    else if (ityp == G_SS_VARIABLE_I)
        rv = (strcmp(SS_VARIABLE_NAME(o1), SS_VARIABLE_NAME(o2)) == 0);
 
     else if (ityp == SC_BOOL_I)
        rv = (SS_BOOLEAN_VALUE(o1) == SS_BOOLEAN_VALUE(o2));
 
-    else if (ityp == SS_PROCEDURE_I)
+    else if (ityp == G_SS_PROCEDURE_I)
        rv = (SS_PROCEDURE_PROC(o1) == SS_PROCEDURE_PROC(o2));
 
     else

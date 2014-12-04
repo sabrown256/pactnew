@@ -907,7 +907,7 @@ void _SS_end_trace(SS_psides *si)
 static object *_SSI_catch(SS_psides *si, object *obj)
    {object *escape, *ret, *lst;
 
-    escape = SS_mk_esc_proc(si, si->errlev, SS_PROCEDURE_I);
+    escape = SS_mk_esc_proc(si, si->errlev, G_SS_PROCEDURE_I);
 
     lst    = SS_make_list(si, G_OBJECT_I, obj,
 			  G_OBJECT_I, escape,

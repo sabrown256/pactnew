@@ -61,24 +61,13 @@
 #define SS_OBJECT_S        SS_gs.tnames[0]
 #define SS_POBJECT_S       SS_gs.tnames[1]
 
-/*
-#define SS_OBJECT_I        SS_gs.tind[0]
-*/
-
-#define SS_PROCEDURE_I     SS_gs.tind[1]
-#define SS_CONS_I          SS_gs.tind[2]
-#define SS_VARIABLE_I      SS_gs.tind[3]
-#define SS_INPUT_PORT_I    SS_gs.tind[4]
-#define SS_OUTPUT_PORT_I   SS_gs.tind[5]
 #define SS_EOF_I           SS_gs.tind[6]
 #define SS_NULL_I          SS_gs.tind[7]
-#define SS_VECTOR_I        SS_gs.tind[8]
 #define SS_CHARACTER_I     SS_gs.tind[9]
 #define SS_ERROR_I         SS_gs.tind[10]
 #define SS_HAELEM_I        SS_gs.tind[11]
 #define SS_HASHARR_I       SS_gs.tind[12]
 #define SS_PROCESS_I       SS_gs.tind[13]
-#define SS_REFERENCE_I     SS_gs.tind[14]
 #define SS_N_TYPES         15
 
 
@@ -259,7 +248,7 @@
  *          - return FALSE otherwise
  */
 
-#define SS_consp(_o) (SC_arrtype(_o, -1) == SS_CONS_I)
+#define SS_consp(_o) (SC_arrtype(_o, -1) == G_SS_CONS_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -268,7 +257,7 @@
  *              - return FALSE otherwise
  */
 
-#define SS_variablep(_o) (SC_arrtype(_o, -1) == SS_VARIABLE_I)
+#define SS_variablep(_o) (SC_arrtype(_o, -1) == G_SS_VARIABLE_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -277,7 +266,7 @@
  *               - return FALSE otherwise
  */
 
-#define SS_referencep(_o) (SC_arrtype(_o, -1) == SS_REFERENCE_I)
+#define SS_referencep(_o) (SC_arrtype(_o, -1) == G_SS_REFERENCE_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -286,7 +275,7 @@
  *            - return FALSE otherwise
  */
 
-#define SS_inportp(_o) (SC_arrtype(_o, -1) == SS_INPUT_PORT_I)
+#define SS_inportp(_o) (SC_arrtype(_o, -1) == G_SS_INPUT_PORT_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -295,7 +284,7 @@
  *             - return FALSE otherwise
  */
 
-#define SS_outportp(_o) (SC_arrtype(_o, -1) == SS_OUTPUT_PORT_I)
+#define SS_outportp(_o) (SC_arrtype(_o, -1) == G_SS_OUTPUT_PORT_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -370,7 +359,7 @@
  *            - return FALSE otherwise
  */
 
-#define SS_vectorp(_o) (SC_arrtype(_o, -1) == SS_VECTOR_I)
+#define SS_vectorp(_o) (SC_arrtype(_o, -1) == G_SS_VECTOR_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

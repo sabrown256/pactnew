@@ -3354,7 +3354,7 @@ static object *_SXI_print_pdb(SS_psides *si, object *argl)
 
     fp = NULL;
     SS_args(si, argl,
-	    SS_OUTPUT_PORT_I, &fp,
+	    G_SS_OUTPUT_PORT_I, &fp,
 	    0);
     argl = SS_cdr(si, argl);
 
