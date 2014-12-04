@@ -909,8 +909,8 @@ static object *_SSI_catch(SS_psides *si, object *obj)
 
     escape = SS_mk_esc_proc(si, si->errlev, SS_PROCEDURE_I);
 
-    lst    = SS_make_list(si, SS_OBJECT_I, obj,
-			  SS_OBJECT_I, escape,
+    lst    = SS_make_list(si, G_OBJECT_I, obj,
+			  G_OBJECT_I, escape,
 			  0);
 
 /* Use the fact that SS_assign(si, si->exn, obj) is done in SS_eval to provide the
@@ -936,8 +936,8 @@ static object *_SSI_catch_err(SS_psides *si, object *argl)
     err_proc  = SS_null;
     proc_call = SS_null;
     SS_args(si, argl,
-	    SS_OBJECT_I, &err_proc,
-	    SS_OBJECT_I, &proc_call,
+	    G_OBJECT_I, &err_proc,
+	    G_OBJECT_I, &proc_call,
 	    0);
 
 /* set the stage for error handling at the SCHEME level */
@@ -1033,8 +1033,8 @@ static object *_SSI_etime(SS_psides *si, object *argl)
     obj = SS_null;
     fl  = SS_t;
     SS_args(si, argl,
-	    SS_OBJECT_I, &obj,
-	    SS_OBJECT_I, &fl,
+	    G_OBJECT_I, &obj,
+	    G_OBJECT_I, &fl,
 	    0);
 
     SS_args(si, obj,

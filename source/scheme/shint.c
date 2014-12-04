@@ -379,7 +379,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
        {s = _SS_get_print_name(si, obj);
 	DEREF(v) = s;}
 
-    else if (type == SS_OBJECT_I)
+    else if (type == G_OBJECT_I)
        *pv = (void *) obj;
 
     else if (type == SS_PROCEDURE_I)
@@ -523,7 +523,7 @@ object *SS_define_constant(SS_psides *si, int n, ...)
 	   v   = SC_VA_ARG(char *);
 	   val = SS_mk_string(si, v);}
 
-       else if (type == SS_OBJECT_I)
+       else if (type == G_OBJECT_I)
 	  val = SC_VA_ARG(object *);
 
        else
@@ -659,7 +659,7 @@ object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 	    {s   = (char *) vl;
 	     lst = SS_mk_cons(si, SS_mk_string(si, s), lst);}
  
-	 else if (ityp == SS_OBJECT_I)
+	 else if (ityp == G_OBJECT_I)
 	    {o   = (object *) vl;
 	     lst = SS_mk_cons(si, o, lst);}
  
@@ -738,13 +738,13 @@ object *SS_make_form(SS_psides *si, object *first, ...)
     void *ptr[MAXLINE];
     object *expr;
 
-    type[0] = SS_OBJECT_I;
+    type[0] = G_OBJECT_I;
     ptr[0]  = first;
 
     SC_VA_START(first);
 
     for (i = 1; i < MAXLINE; i++)
-        {type[i] = SS_OBJECT_I;
+        {type[i] = G_OBJECT_I;
          ptr[i]  = SC_VA_ARG(void *);
          if ((ptr[i] == (void *) LAST) || (ptr[i] == NULL))
             break;};
@@ -767,13 +767,13 @@ object *SS_eval_form(SS_psides *si, object *first, ...)
     void *ptr[MAXLINE];
     object *expr, *res;
 
-    type[0] = SS_OBJECT_I;
+    type[0] = G_OBJECT_I;
     ptr[0]  = first;
 
     SC_VA_START(first);
 
     for (i = 1; i < MAXLINE; i++)
-        {type[i] = SS_OBJECT_I;
+        {type[i] = G_OBJECT_I;
          ptr[i]  = SC_VA_ARG(void *);
          if ((ptr[i] == (void *) LAST) || (ptr[i] == NULL))
             break;};
@@ -896,7 +896,7 @@ static int _SS_load_scm(SS_psides *si)
 
     SS_call_scheme(si, "load",
                    SC_STRING_I, _SS.ibf,
-                   SS_OBJECT_I, SS_t,
+                   G_OBJECT_I, SS_t,
                    0);
 
     return(TRUE);}
@@ -1074,7 +1074,7 @@ int SS_define_argv(SS_psides *si, int c, char **v, int go)
 	argl = _SS_make_list(si, n, type, ptr);
 
 	SS_define_constant(si, 1,
-			   "argv", SS_OBJECT_I, argl,
+			   "argv", G_OBJECT_I, argl,
 			   NULL);
 
 /* load the full Scheme */

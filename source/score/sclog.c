@@ -151,7 +151,7 @@ int SC_close_log(SC_logfile lg)
        return(-1);
 
 /* get a handle to the global log */
-    fname = getenv("SC_GLOBAL_LOG_FILE");
+    fname = getenv("SC_GLOBAL_LOG_SX_FILE_I");
     if (fname == NULL)
        return(-1);
 

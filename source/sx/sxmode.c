@@ -218,7 +218,7 @@ static void _SX_parse(SS_psides *si, object *strm)
 
 static void _SX_read(SS_psides *si, object *strm)
    {char *s, *ptr, *t, *bf;
-    g_file *po;
+    SX_file *po;
     object *o;
     PDBfile *file;
 
@@ -241,7 +241,7 @@ static void _SX_read(SS_psides *si, object *strm)
  * on the name and the namespace it is found in
  */
 	else if (SS_variablep(o))
-	   {SS_var_value(si, "current-file", G_FILE, &po, TRUE);
+	   {SS_var_value(si, "current-file", G_SX_FILE_I, &po, TRUE);
 	    if (po == NULL)
 	       file = SX_gs.vif;
 	    else

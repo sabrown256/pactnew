@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
  
-#include "ultra.h"
+#include "scope_ultra.h"
 
 #define UL_COPY_CURVE(_si, _x)   UL_copy_curve(_si, SX_get_crv_index_i(_x))
 #define advance(j)               (j < (SX_gs.dataset[l].n-1)) ? j++ : j 
@@ -1129,8 +1129,8 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
     ran_pred = SS_null;
 
     SS_args(si, argl,
-            SS_OBJECT_I, &dom_pred,
-            SS_OBJECT_I, &ran_pred,
+            G_OBJECT_I, &dom_pred,
+            G_OBJECT_I, &ran_pred,
             0);
 
     if (SS_nullobjp(dom_pred))
@@ -1148,11 +1148,11 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
     yexpr = SS_null;
     for (i = 0, k = 0; i < n; i++)
         {xt = x[0][i];
-	 SS_assign(si, xexpr, SS_make_list(si, SS_OBJECT_I, dom_pred,
+	 SS_assign(si, xexpr, SS_make_list(si, G_OBJECT_I, dom_pred,
 				       SC_DOUBLE_I, &xt,
 				       0));
 	 xt = x[1][i];
-         SS_assign(si, yexpr, SS_make_list(si, SS_OBJECT_I, ran_pred,
+         SS_assign(si, yexpr, SS_make_list(si, G_OBJECT_I, ran_pred,
 				       SC_DOUBLE_I, &xt,
 				       0));
          if ((SS_true(SS_exp_eval(si, xexpr))) &&
@@ -1302,8 +1302,8 @@ static object *_ULI_average(SS_psides *si, object *s)
     if (SS_true(c))
        {cpd = _SS_mk_C_proc_va(UL_opyc, 1, PM_fdivide);
         c   = UL_opyc(si, cpd,
-		      SS_make_list(si, SS_OBJECT_I, c,
-				   SS_OBJECT_I, numtoks,
+		      SS_make_list(si, G_OBJECT_I, c,
+				   G_OBJECT_I, numtoks,
 				   0));
         i = SX_get_crv_index_i(c);
 
@@ -1654,8 +1654,8 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
     char *lbl;
     object *c, *tmp;
 
-    tmp = SS_make_list(si, SS_OBJECT_I, a,
-                       SS_OBJECT_I, b,
+    tmp = SS_make_list(si, G_OBJECT_I, a,
+                       G_OBJECT_I, b,
                        0);
     SS_mark(tmp);
     c = _ULI_average(si, tmp);
@@ -1906,8 +1906,8 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
 
     labls = "Curve";
     SS_args(si, argl,
-            SS_OBJECT_I, &xvals,
-            SS_OBJECT_I, &yvals,
+            G_OBJECT_I, &xvals,
+            G_OBJECT_I, &yvals,
             SC_STRING_I, &labls,
             0);
 
@@ -1972,8 +1972,8 @@ static object *_ULI_curve_list(SS_psides *si, object *arg)
         {xvals = SS_mk_cons(si, SS_mk_float(si, x[0][l]), xvals);
          yvals = SS_mk_cons(si, SS_mk_float(si, x[1][l]), yvals);};
 
-    o = SS_make_list(si, SS_OBJECT_I, SS_reverse(si, xvals),
-		     SS_OBJECT_I, SS_reverse(si, yvals),
+    o = SS_make_list(si, G_OBJECT_I, SS_reverse(si, xvals),
+		     G_OBJECT_I, SS_reverse(si, yvals),
 		     0);
 
     return(o);}

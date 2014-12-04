@@ -235,7 +235,7 @@ object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
 	v = (char *) pval;
 	SS_def_var(si, var, SS_mk_string(si, v), si->global_env);}
 
-    else if (ityp == SS_OBJECT_I)
+    else if (ityp == G_OBJECT_I)
        {SS_def_var(si, var, (object *) pval, si->global_env);
 	typ = SS_POBJECT_S;}
 

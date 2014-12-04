@@ -19944,7 +19944,7 @@ time(&diskStartTime);
     case SUB4_FILE_TYPE:
       ReadSub4(framePtr, ifp, yuvWidth, yuvHeight);
       break;
-    case JPEG_FILE_TYPE:
+    case JPEG_SX_FILE_I_TYPE:
     case JMOVIE_FILE_TYPE:
       ReadJPEG(framePtr, ifp);
       break;
@@ -20041,7 +20041,7 @@ char *format;
   } else if (strcmp(format, "PNM") == 0) {
     baseFormat = PNM_FILE_TYPE;
   } else if (( strcmp(format, "JPEG") == 0 ) || ( strcmp(format, "JPG") == 0 )) {
-    baseFormat = JPEG_FILE_TYPE;
+    baseFormat = JPEG_SX_FILE_I_TYPE;
   } else if (strcmp(format, "JMOVIE") == 0) {
     baseFormat = JMOVIE_FILE_TYPE;
   } else if (strcmp(format, "SUB4") == 0) {

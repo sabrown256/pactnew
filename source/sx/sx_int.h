@@ -240,8 +240,8 @@ extern object
 extern void
  _SX_args(SS_psides *si, object *obj, void *v, int type),
  *_SX_opt_generic(void *x, bind_opt wh, void *a),
- _SX_get_menu(SS_psides *si, g_file *po),
- _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type);
+ _SX_get_menu(SS_psides *si, SX_file *po),
+ _SX_push_menu_item(SS_psides *si, SX_file *po, char *name, char *type);
 
 extern int
  _SX_isodd(int n),
@@ -330,16 +330,16 @@ extern object
  *_SX_mk_gpdbdata(SS_psides *si, char *name,
 		  void *data, syment *ep, PDBfile *file);
 
-extern g_file
+extern SX_file
  *_SX_mk_file(char *name, char *type, void *file),
  *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode);
 
-extern g_pdbdata
+extern SX_pdbdata
  *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file);
 
 extern void
- _SX_free_menu(g_file *po, int re),
- _SX_rel_open_file(SS_psides *si, g_file *po);
+ _SX_free_menu(SX_file *po, int re),
+ _SX_rel_open_file(SS_psides *si, SX_file *po);
 
 
 /* SXPAN.C declarations */
@@ -431,7 +431,7 @@ extern object
 /* SXPGS.C declarations */
 
 extern SX_menu_item
- *_SX_get_menu_item(SS_psides *si, g_file *po, int i);
+ *_SX_get_menu_item(SS_psides *si, SX_file *po, int i);
 
 extern void
  *_SX_opt_PG_device(PG_device *x, bind_opt wh, void *a),

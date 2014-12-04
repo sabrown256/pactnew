@@ -179,9 +179,9 @@ static object *_SXI_drw_mrk(SS_psides *si, object *argl)
 	    SC_INT_I, &nd,
 	    SC_ENUM_I, &cs,
 	    SC_INT_I, &mrk,
-	    SS_OBJECT_I,  &x[0],
-	    SS_OBJECT_I,  &x[1],
-	    SS_OBJECT_I,  &x[2],
+	    G_OBJECT_I,  &x[0],
+	    G_OBJECT_I,  &x[1],
+	    G_OBJECT_I,  &x[2],
             0);
 
     if (dev == NULL)

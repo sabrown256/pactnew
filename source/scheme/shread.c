@@ -575,7 +575,7 @@ object *SS_read(SS_psides *si, object *str)
     fp = NULL;
     pr = NULL;
     SS_args(si, str,
-	    SS_OBJECT_I, &fp,
+	    G_OBJECT_I, &fp,
 	    SC_STRING_I, &pr,
 	    0);
 
@@ -612,7 +612,7 @@ static object *_SSI_read(SS_psides *si, object *args)
     fp = NULL;
     pr = NULL;
     SS_args(si, args,
-	    SS_OBJECT_I, &fp,
+	    G_OBJECT_I, &fp,
 	    SC_STRING_I, &pr,
 	    0);
 

@@ -398,12 +398,12 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     if (_PD_block_define(file) == FALSE)
        return(FALSE);
 
-    err &= (G_ENUM_CHECKSUM_MODE(file) != NULL);
-    err &= (G_ENUM_MAJOR_OP(file) != NULL);
-    err &= (G_ENUM_MAJOR_ORDER(file) != NULL);
-    err &= (G_ENUM_DELAY_MODE(file) != NULL);
-    err &= (G_ENUM_TYPE_KIND(file) != NULL);
-    err &= (G_ENUM_DATA_LOCATION(file) != NULL);
+    err &= (G_PD_CHECKSUM_MODE_E(file) != NULL);
+    err &= (G_PD_MAJOR_OP_E(file) != NULL);
+    err &= (G_PD_MAJOR_ORDER_E(file) != NULL);
+    err &= (G_PD_DELAY_MODE_E(file) != NULL);
+    err &= (G_PD_TYPE_KIND_E(file) != NULL);
+    err &= (G_PD_DATA_LOCATION_E(file) != NULL);
 
     err &= G_MULTIDES_D(file);
     if (err == FALSE)
@@ -1100,7 +1100,7 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
 
     err &= G_PCONS_D(fp);
 
-    err &= (G_ENUM_CENTERING(fp) != NULL);
+    err &= (G_PM_CENTERING_E(fp) != NULL);
 
     err &= G_C_ARRAY_D(fp);
     err &= G_PM_POLYGON_D(fp);

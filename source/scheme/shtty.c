@@ -264,7 +264,7 @@ object *SS_change_term_state(SS_psides *si, object *argl)
     trap = TRUE;
     a    = NULL;
     SS_args(si, argl,
-            SS_OBJECT_I,  &p,
+            G_OBJECT_I,  &p,
             SC_ENUM_I,    &st,
             SC_INTEGER_I, &trap,
             SC_VOID_I,    &a,

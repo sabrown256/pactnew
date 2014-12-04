@@ -474,7 +474,7 @@ char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
     else
        x = SS_make_list(si,
 			SC_STRING_I, fmt,
-			SS_OBJECT_I, obj,
+			G_OBJECT_I, obj,
 			0);
     SS_mark(x);
     s = _SS_sprintf_guts(si, si->outdev, x);
@@ -887,8 +887,8 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 		 bdy = SS_make_form(si, SS_quoteproc, bdy, LAST);
 		 if (fmt == TRUE)
 		    SS_call_scheme(si, "format-expr",
-				   SS_OBJECT_I, strm,
-				   SS_OBJECT_I, bdy,
+				   G_OBJECT_I, strm,
+				   G_OBJECT_I, bdy,
 				   SC_STRING_I, "     ",
 				   0);
 		 else
@@ -908,8 +908,8 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 		 bdy = SS_make_form(si, SS_quoteproc, bdy, LAST);
 		 if (fmt == TRUE)
 		    SS_call_scheme(si, "format-expr",
-				   SS_OBJECT_I, strm,
-				   SS_OBJECT_I, bdy,
+				   G_OBJECT_I, strm,
+				   G_OBJECT_I, bdy,
 				   SC_STRING_I, "     ",
 				   0);
 		 else
@@ -942,8 +942,8 @@ static object *_SSI_describe(SS_psides *si, object *argl)
     obj  = SS_null;
     strm = SS_null;
     SS_args(si, argl,
-	    SS_OBJECT_I, &obj,
-	    SS_OBJECT_I, &strm,
+	    G_OBJECT_I, &obj,
+	    G_OBJECT_I, &strm,
 	    0);
 
     if (SS_nullobjp(strm))
@@ -1085,8 +1085,8 @@ static object *_SSI_apropos(SS_psides *si, object *argl)
     obj  = SS_null;
     strm = SS_null;
     SS_args(si, argl,
-	    SS_OBJECT_I, &obj,
-	    SS_OBJECT_I, &strm,
+	    G_OBJECT_I, &obj,
+	    G_OBJECT_I, &strm,
 	    0);
 
     if (SS_nullobjp(strm))

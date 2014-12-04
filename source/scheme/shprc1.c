@@ -144,9 +144,9 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
     fwr  = SS_null;
     SS_args(si, argl,
             SC_STRING_I, &mode,
-	    SS_OBJECT_I, &obj,
-	    SS_OBJECT_I, &frd,
-	    SS_OBJECT_I, &fwr,
+	    G_OBJECT_I, &obj,
+	    G_OBJECT_I, &frd,
+	    G_OBJECT_I, &fwr,
             0);
 
     if (strchr("rwa", mode[0]) == NULL)
@@ -213,7 +213,7 @@ static object *_SSI_blck_pr(SS_psides *si, object *argl)
     o  = NULL;
     SS_args(si, argl,
             SS_PROCESS_I, &pp,
-            SS_OBJECT_I, &o,
+            G_OBJECT_I, &o,
             0);
 
     if (SS_true(o))

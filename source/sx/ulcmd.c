@@ -5,7 +5,7 @@
 
 #include "cpyright.h"
 
-#include "ultra.h"
+#include "scope_ultra.h"
 #include "scope_raster.h"
 #include "scope_proc.h"
 
@@ -640,7 +640,7 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
     xstop  = 1.0;
     xstep  = 0.1;
     SS_args(si, argl,
-            SS_OBJECT_I, &crv,
+            G_OBJECT_I, &crv,
             SC_DOUBLE_I, &xstart,
             SC_DOUBLE_I, &xstop,
             SC_DOUBLE_I, &xstep,
@@ -917,7 +917,7 @@ object *UL_mode_graphics(SS_psides *si)
 	if (SX_gs.graphics_device != NULL)
 	   {if (scrwin == NULL)
 	       {scrwin = SX_make_pg_device(si, SX_gs.graphics_device);
-		SS_install_cv(si, "screen-window", scrwin, SS_OBJECT_I);
+		SS_install_cv(si, "screen-window", scrwin, G_OBJECT_I);
 		SS_UNCOLLECT(scrwin);}
  	    else
 	       scrwin->val = (void *) SX_gs.graphics_device;

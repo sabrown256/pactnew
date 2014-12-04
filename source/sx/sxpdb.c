@@ -92,9 +92,9 @@ void *_SX_opt_PDBfile(PDBfile *x, bind_opt wh, void *a)
 	     if (SS_nullobjp(o) || SX_FILEP(o))
 	        {rv = SX_gs.gvif;
 		 if (!SS_nullobjp(o))
-		    {g_file *gf;
+		    {SX_file *gf;
              
-		     gf = (g_file *) SS_GET(g_file, o);
+		     gf = (SX_file *) SS_GET(SX_file, o);
 		     if (gf != NULL)
 		        rv = gf->file;};}
 	     else if (SX_PDBFILEP(o))
@@ -451,12 +451,12 @@ static object *_SXI_seek_raw_file(SS_psides *si, object *argl)
     int64_t addr;
     PDBfile *file;
     FILE *fp;
-    g_file *po;
+    SX_file *po;
 
     addr   = 0;
     whence = 0;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_LONG_LONG_I, &addr,
             SC_INT_I, &whence,
             0);
@@ -492,11 +492,11 @@ static object *_SXI_seek_raw_file(SS_psides *si, object *argl)
 
 static object *_SXI_close_raw_file(SS_psides *si, object *argl)
    {PDBfile *file;
-    g_file *po;
+    SX_file *po;
     FILE *fp;
 
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     if (po == NULL)
@@ -532,7 +532,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
     PD_smp_state *pa;
     FILE *fp;
     syment *ep;
-    g_file *po;
+    SX_file *po;
     object *rv;
 
     pa = _PD_get_state(-1);
@@ -541,7 +541,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 
     if (SS_length(si, argl) > 4)
        SS_args(si, argl,
-               G_FILE, &po,
+               G_SX_FILE_I, &po,
                SC_LONG_LONG_I, &addr,
                SC_LONG_I, &ni,
                SC_STRING_I, &intype,
@@ -549,7 +549,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
                0);
     else
        {SS_args(si, argl,
-                G_FILE, &po,
+                G_SX_FILE_I, &po,
                 SC_LONG_LONG_I, &addr,
                 SC_LONG_I, &ni,
                 SC_STRING_I, &intype,
@@ -626,7 +626,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
     PD_smp_state *pa;
     object *obj;
     FILE *fp;
-    g_file *po;
+    SX_file *po;
     
     pa = _PD_get_state(-1);
 
@@ -636,8 +636,8 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
 
     if (SS_length(si, argl) > 5)
        SS_args(si, argl,
-               G_FILE, &po,
-               SS_OBJECT_I, &obj,
+               G_SX_FILE_I, &po,
+               G_OBJECT_I, &obj,
                SC_LONG_LONG_I, &addr,
                SC_LONG_I, &ni,
                SC_STRING_I, &intype,
@@ -645,8 +645,8 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
                0);
     else
        {SS_args(si, argl,
-                G_FILE, &po,
-                SS_OBJECT_I, &obj,
+                G_SX_FILE_I, &po,
+                G_OBJECT_I, &obj,
                 SC_LONG_LONG_I, &addr,
                 SC_LONG_I, &ni,
                 SC_STRING_I, &intype,
@@ -823,16 +823,16 @@ static syment *_SX_spec_instance(SS_psides *si, PDBfile *file,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_PDBFILEP - return TRUE iff an object is a G_FILE of external type PDB */
+/* SX_PDBFILEP - return TRUE iff an object is a G_SX_FILE_I of external type PDB */
 
 int SX_pdbfilep(object *obj)
    {int rv;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
 
     rv = FALSE;
     if (SX_FILEP(obj))
-       {po = SS_GET(g_file, obj);
+       {po = SS_GET(SX_file, obj);
 
 	file = FILE_FILE(PDBfile, po);
 
@@ -847,7 +847,7 @@ int SX_pdbfilep(object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_IPDBFILEP - return TRUE iff an object is a G_FILE of internal type PDB */
+/* SX_IPDBFILEP - return TRUE iff an object is a G_SX_FILE_I of internal type PDB */
 
 int SX_ipdbfilep(object *obj)
    {int rv;
@@ -869,9 +869,9 @@ int SX_ipdbfilep(object *obj)
  */
 
 object *SX_get_pdbfile(SS_psides *si, object *argl,
-		       PDBfile **pfile, g_file **gfile)
+		       PDBfile **pfile, SX_file **gfile)
    {PDBfile *pf;
-    g_file *po;
+    SX_file *po;
     object *fo;
 
     pf = SX_gs.vif;
@@ -879,7 +879,7 @@ object *SX_get_pdbfile(SS_psides *si, object *argl,
 
     fo = SS_car(si, argl);
     if (SX_FILEP(fo))
-       {po = SS_GET(g_file, fo);
+       {po = SS_GET(SX_file, fo);
 	pf = FILE_FILE(PDBfile, po);};
 
     argl   = SS_cdr(si, argl);
@@ -892,18 +892,18 @@ object *SX_get_pdbfile(SS_psides *si, object *argl,
 /*--------------------------------------------------------------------------*/
 
 /* SX_GET_FILE - examine the argument list and return either the
- *             - g_file which is first on the list or 
+ *             - SX_file which is first on the list or 
  *             - the default internal file if there is no file on the
  *             - argument list
  */
 
-object *SX_get_file(SS_psides *si, object *argl, g_file **pfile)
+object *SX_get_file(SS_psides *si, object *argl, SX_file **pfile)
    {object *fo;
-    g_file *po;
+    SX_file *po;
 
     fo = SS_car(si, argl);
     if (SX_FILEP(fo))
-       {po     = SS_GET(g_file, fo);
+       {po     = SS_GET(SX_file, fo);
         argl   = SS_cdr(si, argl);
         *pfile = po;}
 
@@ -916,13 +916,13 @@ object *SX_get_file(SS_psides *si, object *argl, g_file **pfile)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_OPEN_FILE - open up the named G_FILE and
+/* _SX_OPEN_FILE - open up the named G_SX_FILE_I and
  *               - cons its object to SX_gs.file_list.
  */
 
 object *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode)
    {char *name;
-    g_file *po, *pn;
+    SX_file *po, *pn;
     object *o;
 
     name = NULL;
@@ -982,13 +982,13 @@ static object *_SXI_get_io_info(SS_psides *si, object *arg)
    {int i;
     int *nh;
     double *ns;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *o, *c;
 
     po = NULL;
     SS_args(si, arg,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     o = SS_null;
@@ -1047,13 +1047,13 @@ static object *_SXI_open_pdbfile(SS_psides *si, object *argl)
 /* _SXI_FLUSH_PDBFILE - flush a PDBFile */
 
 static object *_SXI_flush_pdbfile(SS_psides *si, object *arg)
-   {g_file *po;
+   {SX_file *po;
     PDBfile *file;
     object *o;
 
     po = NULL;
     SS_args(si, arg,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     o = SS_f;
@@ -1070,12 +1070,12 @@ static object *_SXI_flush_pdbfile(SS_psides *si, object *arg)
 /* _SXI_DEF_COMMON_TYPES - define common internal SX types to the file */
 
 static object *_SXI_def_common_types(SS_psides *si, object *arg)
-   {g_file *po;
+   {SX_file *po;
     PDBfile *file;
 
     po = NULL;
     SS_args(si, arg,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     if (po == NULL)
@@ -1094,7 +1094,7 @@ static object *_SXI_def_common_types(SS_psides *si, object *arg)
 
 static object *_SXI_entry_number(SS_psides *si, object *argl)
    {char *name;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *obj;
     syment *ep;
@@ -1102,7 +1102,7 @@ static object *_SXI_entry_number(SS_psides *si, object *argl)
     po   = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &name,
             0);
 
@@ -1126,11 +1126,11 @@ static object *_SXI_entry_number(SS_psides *si, object *argl)
 
 static object *_SXI_reset_ptrs(SS_psides *si, object *argl)
    {PDBfile *file;
-    g_file *po;
+    SX_file *po;
 
     po = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     if (po == NULL)
@@ -1150,15 +1150,15 @@ static object *_SXI_reset_ptrs(SS_psides *si, object *argl)
 static object *_SXI_family_file(SS_psides *si, object *argl)
    {int ifl;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     object *fl, *o;
 
     o  = SS_null;
     po = NULL;
     fl = SS_t;
     SS_args(si, argl,
-            G_FILE, &po,
-            SS_OBJECT_I, &fl,
+            G_SX_FILE_I, &po,
+            G_OBJECT_I, &fl,
             0);
 
     if (po == NULL)
@@ -1182,7 +1182,7 @@ static object *_SXI_family_file(SS_psides *si, object *argl)
 
 static object *_SXI_file_content(SS_psides *si, object *argl)
    {int vers, chrt;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     FILE *out;
     object *fout;
@@ -1193,8 +1193,8 @@ static object *_SXI_file_content(SS_psides *si, object *argl)
     fout = SS_null;
     chrt = 0;
     SS_args(si, argl,
-            G_FILE, &po,
-            SS_OBJECT_I, &fout,
+            G_SX_FILE_I, &po,
+            G_OBJECT_I, &fout,
 	    SC_INT_I, &vers,
 	    SC_INT_I, &chrt,
             0);
@@ -1236,14 +1236,14 @@ static object *_SXI_file_content(SS_psides *si, object *argl)
 
 static object *_SXI_file_info(SS_psides *si, object *argl)
    {char *name;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *obj;
 
     po   = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &name,
             0);
 
@@ -1320,13 +1320,13 @@ static object *_SXI_file_info(SS_psides *si, object *argl)
 
 static object *_SXI_default_offset(SS_psides *si, object *arg)
    {int offset, nargs;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *o;
 
     po = NULL;
     nargs = SS_args(si, arg,
-                    G_FILE, &po,
+                    G_SX_FILE_I, &po,
                     SC_INT_I, &offset,
                     0);
 
@@ -1350,15 +1350,15 @@ static object *_SXI_default_offset(SS_psides *si, object *arg)
 static object *_SXI_major_order(SS_psides *si, object *arg)
    {char *s;
     PD_major_order ord;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *o, *order;
 
     po    = NULL;
     order = SS_null;
     SS_args(si, arg,
-            G_FILE, &po,
-            SS_OBJECT_I, &order,
+            G_SX_FILE_I, &po,
+            G_OBJECT_I, &order,
             0);
 
     if (po == NULL)
@@ -1392,14 +1392,14 @@ static object *_SXI_major_order(SS_psides *si, object *arg)
 
 static object *_SXI_file_mode(SS_psides *si, object *arg)
    {char *mode;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *o;
 
     po = NULL;
     mode = NULL;
     SS_args(si, arg,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &mode,
             0);
 
@@ -1515,7 +1515,7 @@ static object *_SX_memdes_to_list(SS_psides *si, memdes *mp)
     obj = SS_make_list(si, SC_STRING_I, mp->type,
                        SC_STRING_I, mp->name,
                        SC_INT_I, &mp->number,
-                       SS_OBJECT_I, _SX_make_dims_obj(si, mp->dimensions),
+                       G_OBJECT_I, _SX_make_dims_obj(si, mp->dimensions),
                        0);
 
     return(obj);}
@@ -1555,7 +1555,7 @@ object *_SX_pdbdata_to_list(SS_psides *si, char *name, void *vr,
 static object *_SXI_pdb_to_list(SS_psides *si, object *arg)
    {int ity;
     object *obj;
-    g_pdbdata *pp;
+    SX_pdbdata *pp;
 
     ity = SS_OBJECT_TYPE(arg);
     if (ity == G_SYMENT_I)
@@ -1564,11 +1564,11 @@ static object *_SXI_pdb_to_list(SS_psides *si, object *arg)
     else if (ity == G_DEFSTR_I)
        obj = _SX_defstr_to_list(si, SS_GET(defstr, arg));
 
-    else if (ity == G_MEMDES)
+    else if (ity == G_MEMDES_I)
        obj = _SX_memdes_to_list(si, SS_GET(memdes, arg));
 
-    else if (ity == G_PDBDATA)
-       {pp  = SS_GET(g_pdbdata, arg);
+    else if (ity == G_SX_PDBDATA_I)
+       {pp  = SS_GET(SX_pdbdata, arg);
 	obj = _SX_pdbdata_to_list(si, pp->name, pp->data,
 				  pp->ep, pp->file);}
     else if (SX_ipdbfilep(arg))
@@ -1609,16 +1609,16 @@ static object *_SXI_parse_type(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_CLOSE_FILE - close a G_FILE and
+/* _SX_CLOSE_FILE - close a G_SX_FILE_I and
  *                - remove the object from SX_gs.file_list
  */
 
 static object *_SX_close_file(SS_psides *si, object *arg)
-   {g_file *po, *prev;
+   {SX_file *po, *prev;
 
     po = NULL;
     SS_args(si, arg,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     if (po == NULL)
@@ -1661,7 +1661,7 @@ static object *_SXI_close_pdbfile(SS_psides *si, object *arg)
 /* _SXI_LIST_FILE - return a list of open files */
 
 static object *_SXI_list_file(SS_psides *si)
-   {g_file *po;
+   {SX_file *po;
     object *obj;
 
     obj = SS_null;
@@ -1726,13 +1726,13 @@ static object *_SXI_symp(SS_psides *si, object *obj)
 static object *_SXI_list_symtab(SS_psides *si, object *argl)
    {object *args, *obj;
     char *patt;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
 
     po   = NULL;
     patt = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &patt,
             0);
 
@@ -1769,7 +1769,7 @@ static object *_SXI_list_variables(SS_psides *si, object *argl)
     char **names;
     int i, num, all;
     long size;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
 
     po    = NULL;
@@ -1779,12 +1779,12 @@ static object *_SXI_list_variables(SS_psides *si, object *argl)
     size  = -1L;
     oall  = SS_f;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &flags,
             SC_STRING_I, &patt,
             SC_STRING_I, &type,
             SC_LONG_I, &size,
-            SS_OBJECT_I, &oall,
+            G_OBJECT_I, &oall,
             0);
 
     if (po == NULL)
@@ -1818,14 +1818,14 @@ static object *_SXI_list_variables(SS_psides *si, object *argl)
 
 static object *_SXI_change_directory(SS_psides *si, object *argl)
    {char *dir;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *o;
 
     po  = NULL;
     dir = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &dir,
             0);
 
@@ -1851,7 +1851,7 @@ static object *_SXI_change_directory(SS_psides *si, object *argl)
 
 static object *_SXI_make_directory(SS_psides *si, object *argl)
    {char *dir;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *errf, *o;
 
@@ -1859,9 +1859,9 @@ static object *_SXI_make_directory(SS_psides *si, object *argl)
     dir  = NULL;
     errf = SS_t;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &dir,
-            SS_OBJECT_I, &errf,
+            G_OBJECT_I, &errf,
             0);
 
     if (po == NULL)
@@ -1888,14 +1888,14 @@ static object *_SXI_make_directory(SS_psides *si, object *argl)
 
 static object *_SXI_file_dirp(SS_psides *si, object *argl)
    {char *dir;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *o;
 
     po  = NULL;
     dir = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &dir,
             0);
 
@@ -1914,13 +1914,13 @@ static object *_SXI_file_dirp(SS_psides *si, object *argl)
 /* _SXI_CURRENT_DIRECTORY - return the current working directory in a file */
 
 static object *_SXI_current_directory(SS_psides *si, object *arg)
-   {g_file *po;
+   {SX_file *po;
     PDBfile *file;
     object *o;
 
     po      = NULL;
     SS_args(si, arg,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             0);
 
     if (po == NULL)
@@ -1939,7 +1939,7 @@ static object *_SXI_current_directory(SS_psides *si, object *arg)
 
 static object *_SXI_create_link(SS_psides *si, object *argl)
    {char *oldname, *newname;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *o;
 
@@ -1947,7 +1947,7 @@ static object *_SXI_create_link(SS_psides *si, object *argl)
     oldname = NULL;
     newname = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &oldname,
             SC_STRING_I, &newname,
             0);
@@ -1971,14 +1971,14 @@ static object *_SXI_create_link(SS_psides *si, object *argl)
 
 static object *_SXI_list_defstrs(SS_psides *si, object *argl)
    {object *obj, *sort;
-    g_file *po;
+    SX_file *po;
     PDBfile *strm;
 
     po   = NULL;
     sort = SS_t;
     SS_args(si, argl,
-            G_FILE, &po,
-	    SS_OBJECT_I, &sort,
+            G_SX_FILE_I, &po,
+	    G_OBJECT_I, &sort,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -1986,9 +1986,9 @@ static object *_SXI_list_defstrs(SS_psides *si, object *argl)
     else
        strm = FILE_FILE(PDBfile, po);
 
-    obj = SS_make_list(si, SS_OBJECT_I, SS_mk_hasharr(si, strm->chart),
-                       SS_OBJECT_I, SS_null,
-                       SS_OBJECT_I, sort,
+    obj = SS_make_list(si, G_OBJECT_I, SS_mk_hasharr(si, strm->chart),
+                       G_OBJECT_I, SS_null,
+                       G_OBJECT_I, sort,
                        0);
 
     obj = SS_hash_dump(si, obj);
@@ -2013,7 +2013,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
     int align;
     PDBfile *file;
     defstr *dp;
-    g_file *po;
+    SX_file *po;
     object *rv;
 
     dp    = NULL;
@@ -2024,7 +2024,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
     align = 0;
 
     n = SS_args(si, argl,
-                G_FILE, &po,
+                G_SX_FILE_I, &po,
                 SC_STRING_I, &name,
                 SC_STRING_I, &type,
                 SC_LONG_I, &bpi,
@@ -2057,7 +2057,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
 
         rest = SS_list_tail(si, argl, n);
         SS_args(si, rest,
-                SS_OBJECT_I, &ord,
+                G_OBJECT_I, &ord,
                 SC_LONG_I, &expb,
                 SC_LONG_I, &mantb,
                 SC_LONG_I, &sbs,
@@ -2100,7 +2100,7 @@ static object *_SXI_chg_prim(SS_psides *si, object *argl)
     int *ordr;
     long fmt[7];
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     object *ord, *rv;
 
     po    = NULL;
@@ -2108,11 +2108,11 @@ static object *_SXI_chg_prim(SS_psides *si, object *argl)
     align = 0;
 
     SS_args(si, argl,
-	    G_FILE, &po,
+	    G_SX_FILE_I, &po,
 	    SC_INT_I, &ityp,
 	    SC_INT_I, &nb,
 	    SC_INT_I, &align,
-	    SS_OBJECT_I, &ord,
+	    G_OBJECT_I, &ord,
 	    SC_LONG_I, fmt + 0,
 	    SC_LONG_I, fmt + 1,
 	    SC_LONG_I, fmt + 2,
@@ -2153,7 +2153,7 @@ static object *_SXI_chg_prim(SS_psides *si, object *argl)
  
 static object *_SXI_read_defstr(SS_psides *si, object *argl)
    {char *name;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     defstr *dp;
     object *o;
@@ -2161,7 +2161,7 @@ static object *_SXI_read_defstr(SS_psides *si, object *argl)
     po   = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &name,
             0);
 
@@ -2186,7 +2186,7 @@ static object *_SXI_read_defstr(SS_psides *si, object *argl)
  */
  
 static object *_SXI_write_defstr(SS_psides *si, object *argl)
-   {g_file *po;
+   {SX_file *po;
     PDBfile *file;
     memdes *desc;
     defstr *dp;
@@ -2194,7 +2194,7 @@ static object *_SXI_write_defstr(SS_psides *si, object *argl)
     po = NULL;
     dp = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             G_DEFSTR_I, &dp,
             0);
 
@@ -2242,14 +2242,14 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
     memdes *desc, *lst, *prev;
     dimdes *dims, *dim0;
     object *member_obj, *dim_obj, *o;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     defstr *dp;
 
     po   = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &name,
             0);
 
@@ -2324,14 +2324,14 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
 static object *_SXI_make_typedef(SS_psides *si, object *argl)
    {char *ntype, *otype;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     object *o;
 
     po    = NULL;
     ntype = NULL;
     otype = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &otype,
             SC_STRING_I, &ntype,
             0);
@@ -2356,7 +2356,7 @@ static object *_SXI_make_typedef(SS_psides *si, object *argl)
 static object *_SXI_make_cast(SS_psides *si, object *argl)
    {char *type, *memb, *contr;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     object *o;
 
     po   = NULL;
@@ -2364,7 +2364,7 @@ static object *_SXI_make_cast(SS_psides *si, object *argl)
     memb  = NULL;
     contr = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &type,
             SC_STRING_I, &memb,
             SC_STRING_I, &contr,
@@ -2391,15 +2391,15 @@ static object *_SXI_file_varp(SS_psides *si, object *argl)
     char *name;
     object *fobj, *o;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
 
     po   = NULL;
     name = NULL;
     fobj = SS_f;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &name,
-            SS_OBJECT_I, &fobj,
+            G_OBJECT_I, &fobj,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -2477,7 +2477,7 @@ int _SX_file_varp(PDBfile *file, char *name, int flag)
 
 static object *_SXI_rd_syment(SS_psides *si, object *argl)
    {char *name, *s;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     syment *ep;
     dimdes *dp;
@@ -2487,9 +2487,9 @@ static object *_SXI_rd_syment(SS_psides *si, object *argl)
     name = NULL;
     err  = SS_f;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &name,
-            SS_OBJECT_I, &err,
+            G_OBJECT_I, &err,
             0);
 
     if (po == NULL)
@@ -2595,7 +2595,7 @@ static object *_SXI_wr_syment(SS_psides *si, object *argl)
    {long n;
     char *name, *type;
     char s[MAXLINE];
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     syment *ep;
     dimdes *dims;
@@ -2607,10 +2607,10 @@ static object *_SXI_wr_syment(SS_psides *si, object *argl)
     type = NULL;
     alst = SS_null;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
-            SS_OBJECT_I, &alst,
+            G_OBJECT_I, &alst,
             0);
 
     if (po == NULL)
@@ -2764,7 +2764,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
     dimdes *dims;
     defstr *dp, *ndp;
     SC_address addr;
-    g_file *po;
+    SX_file *po;
     PFBinWrite wr;
     object *namo, *symo, *rv;
     
@@ -2922,7 +2922,7 @@ static object *_SXI_scatter_pdbdata(SS_psides *si, object *argl)
 static object *_SXI_remove_entry(SS_psides *si, object *argl)
    {char *name;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     object *rv;
 
     rv   = SS_f;
@@ -2930,7 +2930,7 @@ static object *_SXI_remove_entry(SS_psides *si, object *argl)
     name = NULL;
     file = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
 	    SC_STRING_I, &name,
 	    0);
 
@@ -2974,7 +2974,7 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
     dimdes *dims;
     defstr *dp, *ndp;
     SC_address addr;
-    g_file *po;
+    SX_file *po;
     object *namo, *symo, *o;
     
     if (!SS_consp(argl))
@@ -3074,7 +3074,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
     SC_address addr;
     dimdes *dims, *dimscheck;
     PFBinRead rd;
-    g_file *po;
+    SX_file *po;
     object *namo, *o;
 
     pa = _PD_get_state(-1);
@@ -3203,7 +3203,7 @@ static object *_SXI_read_pdbdata(SS_psides *si, object *argl)
 static object *_SXI_wrt_ultra_curve(SS_psides *si, object *argl)
    {int npts;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     C_array *xarr, *yarr;
     double *xval, *yval;
     char *labl;
@@ -3215,7 +3215,7 @@ static object *_SXI_wrt_ultra_curve(SS_psides *si, object *argl)
     xarr = NULL;
     yarr = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             G_C_ARRAY_I, &xarr,
             G_C_ARRAY_I, &yarr,
             SC_STRING_I, &labl,
@@ -3242,7 +3242,7 @@ static object *_SXI_sizeof(SS_psides *si, object *argl)
    {int flg;
     intb bpi;
     char *type;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *o;
 
@@ -3252,7 +3252,7 @@ static object *_SXI_sizeof(SS_psides *si, object *argl)
     flg  = FALSE;
     SS_args(si, argl,
             SC_STRING_I, &type,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_INT_I, &flg,
             0);
 
@@ -3280,7 +3280,7 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
     char typ[MAXLINE];
     long *ind;
     void *d;
-    g_pdbdata *pp;
+    SX_pdbdata *pp;
     C_array *iarr;
     object *obj;
 
@@ -3298,8 +3298,8 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
     else if (ity == G_DEFSTR_I)
        PD_write_defstr(f0, SS_GET(defstr, obj));
 
-    else if (ity == G_PDBDATA)
-       {pp   = SS_GET(g_pdbdata, obj);
+    else if (ity == G_SX_PDBDATA_I)
+       {pp   = SS_GET(SX_pdbdata, obj);
 	iarr = NULL;
 	SS_args(si, argl,
 		SC_INT_I, &_SC.types.max_digits,
@@ -3465,7 +3465,7 @@ static object *_SXI_pdbdata_to_hash(SS_psides *si, object *arg)
 static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
    {char *name;
     hasharr *tab;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *rv;
 
@@ -3474,7 +3474,7 @@ static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
     file = NULL;
     name = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SS_HASHARR_I, &tab,
             SC_STRING_I, &name,
             0);
@@ -3589,13 +3589,13 @@ static object *_SXI_set_switch(SS_psides *si, object *argl)
 
 static object *_SXI_set_max_size(SS_psides *si, object *argl)
    {int v;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
 
     po = NULL;
     v  = -1;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_INT_I, &v,
             0);
 
@@ -3615,13 +3615,13 @@ static object *_SXI_set_max_size(SS_psides *si, object *argl)
 
 static object *_SXI_set_track_pointers(SS_psides *si, object *argl)
    {int v;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
 
     po = NULL;
     v  = -1;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_INT_I, &v,
             0);
 
@@ -3846,7 +3846,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
     char *name, *type, *data;
     PDBfile *file;
     C_array *arr;
-    g_file *po;
+    SX_file *po;
     object *rv;
 
     rv    = SS_null;
@@ -3859,7 +3859,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
     fpp   = 1;
     offs  = 0L;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
             SC_LONG_I, &ni,
@@ -3899,7 +3899,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
 void _SX_type_container(char *dtype, char *stype)
    {defstr *sp, *dp;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     SS_psides *si;
 
     si = SC_GET_CONTEXT(_SX_type_container);
@@ -3908,7 +3908,7 @@ void _SX_type_container(char *dtype, char *stype)
 
     po = NULL;
     SS_args(si, SS_lk_var_val(si, SX_gs.curfile),
-	    G_FILE, &po,
+	    G_SX_FILE_I, &po,
 	    0);
 
     if (po == NULL)
@@ -3940,7 +3940,7 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
     syment *ep;
     dimdes *dp;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     object *rv;
 
     rv   = SS_null;
@@ -3949,7 +3949,7 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
     indx = 0L;
     file = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
 	    SC_STRING_I, &name,
 	    SC_LONG_I, &indx,
 	    0);

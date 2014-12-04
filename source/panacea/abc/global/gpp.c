@@ -1041,8 +1041,8 @@ object *LR_def_domain(SS_psides *si, object *argl)
 /* now make the domain map and the domain arrays */
     ret = SS_make_list(si, SC_STRING_I, "domain",
                        SC_INTEGER_I, &space,
-                       SS_OBJECT_I, SX_make_pm_set(si, dom),
-                       SS_OBJECT_I, SX_make_c_array(si, arr),
+                       G_OBJECT_I, SX_make_pm_set(si, dom),
+                       G_OBJECT_I, SX_make_c_array(si, arr),
                        0);
 
     return(ret);}

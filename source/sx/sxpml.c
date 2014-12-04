@@ -379,8 +379,8 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
     reg  = SS_null;
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
-            SS_OBJECT_I, &dims,
-            SS_OBJECT_I, &reg,
+            G_OBJECT_I, &dims,
+            G_OBJECT_I, &reg,
             0);
 
     if (arr == NULL)
@@ -507,7 +507,7 @@ static object *_SXI_array_set(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
             SC_LONG_I, &n,
-            SS_OBJECT_I, &val,
+            G_OBJECT_I, &val,
             0);
 
     if (arr != NULL)
@@ -678,7 +678,7 @@ static object *_SXI_num_arr_extr(SS_psides *si, object *arg)
 static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
    {char *mn, set_name[MAXLINE];
     PM_set *s;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *rv;
 
@@ -688,7 +688,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
     file = NULL;
     SS_args(si, argl,
             G_PM_SET_I, &s,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &mn,
             0);
 
@@ -726,7 +726,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
 static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
    {char *name;
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     syment *ep;
     SC_address data;
     PM_set *s;
@@ -822,8 +822,8 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
     components = SS_null;
     SS_args(si, argl,
             SC_STRING_I, &name,
-            SS_OBJECT_I, &shape,
-            SS_OBJECT_I, &components,
+            G_OBJECT_I, &shape,
+            G_OBJECT_I, &components,
             0);
 
 /* extract the name */
@@ -1027,10 +1027,10 @@ static object *_SXI_set_attr_set(SS_psides *si, object *argl)
     type = NULL;
     val  = SS_null;
     SS_args(si, argl,
-            SS_OBJECT_I, &o,
+            G_OBJECT_I, &o,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
-            SS_OBJECT_I, &val,
+            G_OBJECT_I, &val,
             0);
 
     if ((o == NULL) || (name == NULL) || (type == NULL))
@@ -1084,14 +1084,14 @@ static object *_SXI_set_map_type(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_MAPPING_PDBDATA - given a PM_mapping object
+/* _SXI_MAPPING_SX_PDBDATA_I - given a PM_mapping object
  *                      - allocate and fill a PDB data object with the
  *                      - PM_mapping and return it
  */
 
-static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
+static object *_SXI_mappinSX_pdbdata(SS_psides *si, object *argl)
    {PM_mapping *f, *pf;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     char *mn, *name;
     long i;
@@ -1103,7 +1103,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
     file = NULL;
     SS_args(si, argl,
             G_PM_MAPPING_I, &f,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &mn,
             0);
 
@@ -1115,10 +1115,10 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     else
-       SS_error(si, "BAD FILE - _SXI_MAPPING_PDBDATA", argl);
+       SS_error(si, "BAD FILE - _SXI_MAPPING_SX_PDBDATA_I", argl);
 
     if (f == NULL)
-       SS_error(si, "BAD ARGUMENT - _SXI_MAPPING_PDBDATA", argl);
+       SS_error(si, "BAD ARGUMENT - _SXI_MAPPING_SX_PDBDATA_I", argl);
 
     if (mn == NULL)
        {_SX_get_menu(si, po);
@@ -1159,7 +1159,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
    {int i, ret;
     char *name, dname[MAXLINE];
     PDBfile *file;
-    g_file *po;
+    SX_file *po;
     syment *ep;
     SC_address data;
     PM_set *domain, *range;
@@ -1265,7 +1265,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
     SS_args(si, argl,
             SC_STRING_I, &name,
             SC_INT_I, &tflag,
-            SS_OBJECT_I, &shape,
+            G_OBJECT_I, &shape,
             0);
 
     components = SS_cdddr(si, argl);
@@ -1529,7 +1529,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
 static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
    {char *mn, *name;
     C_array *arr;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *rv;
 
@@ -1541,7 +1541,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
     name = NULL;
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &mn,
             0);
 
@@ -1582,7 +1582,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
     char *mn, *pt, *name;
     void *x;
     C_array *arr;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     object *rv;
 
@@ -1593,7 +1593,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
     file = NULL;
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &mn,
             0);
 
@@ -1637,7 +1637,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
  */
 
 static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
-   {g_pdbdata *pd;
+   {SX_pdbdata *pd;
     syment *ep;
     C_array *arr;
     object *rv;
@@ -1645,7 +1645,7 @@ static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
     rv = SS_null;
     pd = NULL;
     SS_args(si, arg,
-            G_PDBDATA, &pd,
+            G_SX_PDBDATA_I, &pd,
             0);
 
     if (pd == NULL)
@@ -1763,7 +1763,7 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
     char *xname, *yname, *nzname, *nnname, *sname;
     double *rx, *ry;
     PM_set *s;
-    g_file *po;
+    SX_file *po;
     PDBfile *file;
     C_array *connct;
     object *rv;
@@ -1776,7 +1776,7 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
     nzname = NULL;
     nnname = NULL;
     SS_args(si, argl,
-            G_FILE, &po,
+            G_SX_FILE_I, &po,
             SC_STRING_I, &xname,
             SC_STRING_I, &yname,
             SC_STRING_I, &nzname,
@@ -2102,7 +2102,7 @@ void SX_install_pml_funcs(SS_psides *si)
     SS_install(si, "pm-mapping->pdbdata",
                "Write a PML mapping object to a PDB file\nFORM (pm-mapping->pdbdata <mapping> <file> <name>)",
                SS_nargs,
-               _SXI_mapping_pdbdata, SS_PR_PROC);
+               _SXI_mappinSX_pdbdata, SS_PR_PROC);
 
     SS_install(si, "pdbdata->pm-mapping",
                "Read a PML mapping object from a PDB file\nFORM (pdbdata->pm-mapping <file> <name>)",

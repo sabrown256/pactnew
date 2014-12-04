@@ -325,7 +325,7 @@ static object *_SSI_lst_tail(SS_psides *si, object *argl)
     object *lst, *o;
 
     SS_args(si, argl,
-	    SS_OBJECT_I, &lst,
+	    G_OBJECT_I, &lst,
 	    SC_INT_I, &n,
             0);
 
@@ -343,7 +343,7 @@ static object *_SSI_lst_ref(SS_psides *si, object *argl)
     object *lst, *o;
 
     SS_args(si, argl,
-	    SS_OBJECT_I, &lst,
+	    G_OBJECT_I, &lst,
 	    SC_INT_I, &n,
             0);
 

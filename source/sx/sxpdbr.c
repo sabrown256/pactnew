@@ -172,7 +172,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
     syment *ep, *cp;
     SC_address addr;
     C_array *arr;
-    g_file *po;
+    SX_file *po;
 
     pa = _PD_get_state(-1);
 

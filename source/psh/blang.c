@@ -28,7 +28,7 @@ enum e_doc_kind
 typedef enum e_doc_kind doc_kind;
 
 enum e_type_kind
-   {TK_PRIMITIVE = 0, TK_ENUM, TK_STRUCT};
+   {TK_PRIMITIVE = 0, TK_ENUM, TK_STRUCT, TK_UNION};
 
 typedef enum e_type_kind type_kind;
 
@@ -122,6 +122,7 @@ struct s_tn_list
     char unm[BFSML];        /* upper case version of CNM, PM_SET */
     char rnm[BFSML];        /* root struct id, SET */
     char inm[BFSML];        /* type index name, G_PM_SET_I */
+    char enm[BFSML];        /* defenum macro name, G_PM_SET_E */
     char dnm[BFSML];};      /* defstr macro name, G_PM_SET_D */
 
 struct s_der_list
@@ -169,7 +170,7 @@ static int
  nbd = 0;
 
 static char
- *tykind[3] = {"primitive", "enum", "struct"};
+ *tykind[4] = {"primitive", "enum", "struct", "union"};
 
 static bindes
  gbd[N_MODES];
@@ -247,6 +248,9 @@ static void type_name_list(char *typ, tn_list *na)
 
 /* get type index name */
     snprintf(na->inm, BFSML, "G_%s_I", na->unm);
+
+/* get enum macro name */
+    snprintf(na->enm, BFSML, "G_%s_E", na->unm);
 
 /* get defstr macro name */
     snprintf(na->dnm, BFSML, "G_%s_D", na->unm);

@@ -429,8 +429,8 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
     SS_args(si, argl,
             SC_STRING_I, &vname,
             SC_STRING_I, &vtype,
-            SS_OBJECT_I, &oviv,
-            SS_OBJECT_I, &ovif,
+            G_OBJECT_I, &oviv,
+            G_OBJECT_I, &ovif,
             0);
 
     for (i = 0; i < 4; i++, argl = SS_cdr(si, argl));
