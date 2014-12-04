@@ -1416,7 +1416,7 @@ static int _SC_manage_launched_job(taskdesc *job, asyncstate *as, PROCESS *pp)
 	       {SC_unblock(pp);
 		SC_set_attr(pp, SC_LINE, TRUE);
 
-		pi = SC_register_event_loop_callback(pe, SC_PROCESS_I, pp,
+		pi = SC_register_event_loop_callback(pe, G_PROCESS_I, pp,
 						     state->acc, state->rej,
 						     -1);
 		SC_ASSERT(pi >= 0);};
@@ -2124,7 +2124,7 @@ static int _SC_close_job_process(taskdesc *job, int setst)
 		rtry = job->done(job, setst);
 
 		if (state != NULL)
-		   SC_remove_event_loop_callback(state->loop, SC_PROCESS_I, pp);
+		   SC_remove_event_loop_callback(state->loop, G_PROCESS_I, pp);
 
 		ok = SC_close(pp);
 		SC_ASSERT(ok == TRUE);};

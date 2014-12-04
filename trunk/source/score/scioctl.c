@@ -205,7 +205,7 @@ int SC_register_event_loop_callback(SC_evlpdes *pe, int type, void *p,
     if (p != NULL)
        {fd = -1;
 
-	if (type == SC_PROCESS_I)
+	if (type == G_PROCESS_I)
 	   {int *io;
 
 	    io = ((PROCESS *) p)->io;
@@ -245,7 +245,7 @@ int SC_replace_event_loop_accept(SC_evlpdes *pe, int type, void *p,
    {int i, n, fd;
     SC_poll_desc *pd;
 
-    if (type == SC_PROCESS_I)
+    if (type == G_PROCESS_I)
        fd = ((PROCESS *) p)->io[0];
 
     else if (type == SC_FILE_I)
@@ -281,7 +281,7 @@ int SC_replace_event_loop_reject(SC_evlpdes *pe, int type, void *p,
    {int i, n, fd;
     SC_poll_desc *pd;
 
-    if (type == SC_PROCESS_I)
+    if (type == G_PROCESS_I)
        fd = ((PROCESS *) p)->io[0];
 
     else if (type == SC_FILE_I)
@@ -321,7 +321,7 @@ void SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p)
     if (p == NULL)
        return;
 
-    if (type == SC_PROCESS_I)
+    if (type == G_PROCESS_I)
        {pp = (PROCESS *) p;
 	fd = pp->io[0];}
 
@@ -366,7 +366,7 @@ void SC_get_event_loop_callback(SC_evlpdes *pe, int type, void *p,
     if (p == NULL)
        return;
 
-    if (type == SC_PROCESS_I)
+    if (type == G_PROCESS_I)
        {pp = (PROCESS *) p;
 	fd = pp->io[0];}
 
@@ -565,7 +565,7 @@ int SC_process_event_loop(PROCESS *pp, void *a,
     pe = SC_make_event_loop(NULL, NULL, ex, -1, -1, -1);
 
 /* register the I/O channels for the event loop to monitor */
-    pi = SC_register_event_loop_callback(pe, SC_PROCESS_I, pp,
+    pi = SC_register_event_loop_callback(pe, G_PROCESS_I, pp,
 					 acc, rej, -1);
 
 /* if all channels are OK activate the interrupt handling */

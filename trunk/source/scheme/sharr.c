@@ -32,7 +32,7 @@ static object *_SSI_hash_install(SS_psides *si, object *argl)
     SS_args(si, argl,
 	    SC_STRING_I, &name,
 	    G_OBJECT_I, &obj,
-	    SS_HASHARR_I, &tab,
+	    G_HASHARR_I, &tab,
 	    0);
 
     hp = SC_hasharr_install(tab, name, obj, SS_POBJECT_S, 3, -1);
@@ -63,7 +63,7 @@ static object *_SSI_hash_lookup(SS_psides *si, object *argl)
     tab  = si->symtab;
     SS_args(si, argl,
 	    SC_STRING_I, &name,
-	    SS_HASHARR_I, &tab,
+	    G_HASHARR_I, &tab,
 	    0);
 
     vr = SC_hasharr_def_lookup(tab, name);
@@ -90,7 +90,7 @@ static object *_SSI_hash_remove(SS_psides *si, object *argl)
     tab  = si->symtab;
     SS_args(si, argl,
 	    SC_STRING_I, &name,
-	    SS_HASHARR_I, &tab,
+	    G_HASHARR_I, &tab,
 	    0);
 
 /* lookup up the object and do a SS_gc on it */
@@ -171,7 +171,7 @@ static object *_SSI_hash_info(SS_psides *si, object *arg)
 
     tab = si->symtab;
     SS_args(si, arg,
-	    SS_HASHARR_I, &tab,
+	    G_HASHARR_I, &tab,
 	    0);
 
     flg = (tab->docp) ? SS_t : SS_f;
@@ -267,7 +267,7 @@ static void _SS_rl_hasharr(SS_psides *si, object *obj)
 object *SS_mk_hasharr(SS_psides *si, hasharr *tb)
    {object *op;
 
-    op = SS_mk_object(si, tb, SS_HASHARR_I, SELF_EV, NULL,
+    op = SS_mk_object(si, tb, G_HASHARR_I, SELF_EV, NULL,
 		      _SS_wr_hasharr, _SS_rl_hasharr);
 
     return(op);}
@@ -313,7 +313,7 @@ object *SS_mk_haelem(SS_psides *si, haelem *hp)
     if (hp != NULL)
        {SC_mark(hp, 1);
 
-	op = SS_mk_object(si, hp, SS_HAELEM_I, SELF_EV, hp->name,
+	op = SS_mk_object(si, hp, G_HAELEM_I, SELF_EV, hp->name,
 			  _SS_wr_haelem, _SS_rl_haelem);};
 
     return(op);}

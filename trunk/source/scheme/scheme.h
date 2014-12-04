@@ -61,14 +61,11 @@
 #define SS_OBJECT_S        SS_gs.tnames[0]
 #define SS_POBJECT_S       SS_gs.tnames[1]
 
-#define SS_EOF_I           SS_gs.tind[6]
-#define SS_NULL_I          SS_gs.tind[7]
-#define SS_CHARACTER_I     SS_gs.tind[9]
-#define SS_ERROR_I         SS_gs.tind[10]
-#define SS_HAELEM_I        SS_gs.tind[11]
-#define SS_HASHARR_I       SS_gs.tind[12]
-#define SS_PROCESS_I       SS_gs.tind[13]
-#define SS_N_TYPES         15
+#define SS_EOF_I           SS_gs.tind[0]
+#define SS_NULL_I          SS_gs.tind[1]
+#define SS_ERROR_I         SS_gs.tind[2]
+#define SS_CHARACTER_I     SS_gs.tind[3]
+#define SS_N_TYPES         4
 
 
 #define SS_GET(_t, _o)          ((_t *) SS_OBJECT(_o))
@@ -332,7 +329,7 @@
  *             - return FALSE otherwise
  */
 
-#define SS_hasharrp(_o) (SC_arrtype(_o, -1) == SS_HASHARR_I)
+#define SS_hasharrp(_o) (SC_arrtype(_o, -1) == G_HASHARR_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -341,7 +338,7 @@
  *            - return FALSE otherwise
  */
 
-#define SS_haelemp(_o) (SC_arrtype(_o, -1) == SS_HAELEM_I)
+#define SS_haelemp(_o) (SC_arrtype(_o, -1) == G_HAELEM_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -368,7 +365,7 @@
  *             - return FALSE otherwise
  */
 
-#define SS_processp(_o) (SC_arrtype(_o, -1) == SS_PROCESS_I)
+#define SS_processp(_o) (SC_arrtype(_o, -1) == G_PROCESS_I)
 
 /*--------------------------------------------------------------------------*/
 
@@ -1112,7 +1109,7 @@ extern void
  SS_repl(SS_psides *si),
  SS_end_scheme(SS_psides *si, int val),
  SS_expand_stack(SS_psides *si),
- SS_push_err(SS_psides *si, int flag, int type),
+ SS_push_err(SS_psides *si, int flag),
  SS_error(SS_psides *si, char *s, object *obj);
 
 

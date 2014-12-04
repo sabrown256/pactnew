@@ -173,7 +173,7 @@ static int interrupt_mode(descriptors *pd)
 /* register the I/O channels for the event loop to monitor */
     pi  = SC_register_event_loop_callback(pe, SC_FILE_I, stdin,
 					  tty_has_txt, NULL, -1);
-    pi &= SC_register_event_loop_callback(pe, SC_PROCESS_I, pp,
+    pi &= SC_register_event_loop_callback(pe, G_PROCESS_I, pp,
 					  child_has_txt, NULL, -1);
 
 /* if all channels are OK activate the interrupt handling */

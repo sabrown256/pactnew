@@ -1022,28 +1022,19 @@ void SS_register_types(void)
 
     SC_init_base_types();
 
+    register_score_types();
     register_scheme_types();
 
-    SS_EOF_I         = SC_type_register("eof",         KIND_STRUCT, sizeof(SS_boolean),
-					SC_TYPE_FREE,  _SS_rl_boolean,
-					0);
-    SS_NULL_I        = SC_type_register("nil",         KIND_STRUCT, sizeof(SS_boolean),
-					SC_TYPE_FREE,  _SS_rl_boolean,
-					0);
-    SS_ERROR_I       = SC_type_register("error",       KIND_OTHER,  0, 0);
+    SS_EOF_I   = SC_type_register("eof", KIND_STRUCT, sizeof(SS_boolean),
+				  SC_TYPE_FREE, _SS_rl_boolean, 0);
+    SS_NULL_I  = SC_type_register("nil", KIND_STRUCT, sizeof(SS_boolean),
+				  SC_TYPE_FREE, _SS_rl_boolean, 0);
+    SS_ERROR_I = SC_type_register("error", KIND_OTHER,  0, 0);
 
 #ifdef LARGE
 
-    SS_CHARACTER_I   = SC_type_register("character",    KIND_OTHER,  sizeof(int),
-					SC_TYPE_FREE,   _SS_rl_char,
-					0);
-    SS_PROCESS_I     = SC_type_register("process",      KIND_STRUCT, sizeof(PROCESS),
-					SC_TYPE_FREE,   _SS_rl_process,
-					0);
-
-    SS_HASHARR_I     = SC_type_register("hash array",   KIND_STRUCT, sizeof(hasharr), 0);
-    SS_HAELEM_I      = SC_type_register("hash element", KIND_STRUCT, sizeof(haelem),  0);
-
+    SS_CHARACTER_I = SC_type_register("character", KIND_OTHER, sizeof(int),
+				      SC_TYPE_FREE, _SS_rl_char, 0);
 #endif
 
     SS_OBJECT_S  = CSTRSAVE("object");

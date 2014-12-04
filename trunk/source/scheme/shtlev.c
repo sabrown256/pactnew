@@ -499,12 +499,12 @@ object *SS_lookup_object(SS_psides *si, object *obj)
 
 /* SS_PUSH_ERR - push an error stack frame */
 
-void SS_push_err(SS_psides *si, int flag, int type)
+void SS_push_err(SS_psides *si, int flag)
    {object *x;
 
     SS_save_registers(si, flag);
 
-    x = SS_mk_esc_proc(si, si->errlev, type);
+    x = SS_mk_esc_proc(si, si->errlev, SS_ERROR_I);
     SS_mark(x);
     si->err_stack[si->errlev] = x;
 
@@ -625,7 +625,7 @@ static object *_SSI_break(SS_psides *si)
     SS_save(si, si->evobj);
     SS_save(si, si->rdobj);
 
-    SS_push_err(si, TRUE, SS_ERROR_I);
+    SS_push_err(si, TRUE);
     PRINT(stdout,"\n");
 
     _SS_repl(si);
@@ -772,7 +772,7 @@ int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
 
     _SS.ret = TRUE;
     si->cont_ptr++;
-    SS_push_err(si, FALSE, SS_ERROR_I);
+    SS_push_err(si, FALSE);
     switch (SETJMP(si->continue_int[si->cont_ptr].cont))
        {case ABORT :
 	     if (errf != NULL)
@@ -894,13 +894,13 @@ char *SS_object_type_name(object *o, char *atype, long nb)
     else if (itype == SS_CHARACTER_I)
        SC_strncpy(atype, nb, SC_CHAR_S, -1);
 
-    else if (itype == SS_HAELEM_I)
+    else if (itype == G_HAELEM_I)
        SC_strncpy(atype, nb, "hash element", -1);
 
-    else if (itype == SS_HASHARR_I)
+    else if (itype == G_HASHARR_I)
        SC_strncpy(atype, nb, "hash array", -1);
 
-    else if (itype == SS_PROCESS_I)
+    else if (itype == G_PROCESS_I)
        SC_strncpy(atype, nb, "process", -1);
 
     else if (itype == SS_ERROR_I)

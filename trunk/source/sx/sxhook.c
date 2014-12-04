@@ -240,7 +240,7 @@ static void _SS_proc_callback(int fd, int mask, void *a)
 	pp = pi->pp;
 
 	SS_call_scheme(si, nm,
-		       SS_PROCESS_I, pp,
+		       G_PROCESS_I, pp,
 		       0);};
 
     return;}

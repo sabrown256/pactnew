@@ -394,18 +394,18 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 
 #ifdef LARGE
 
-    else if (type == SS_HAELEM_I)
+    else if (type == G_HAELEM_I)
        {if (!SS_haelemp(obj))
 	   SS_error(si, "OBJECT NOT HASH_ELEMENT - _SS_ARGS", obj);
 	*pv = obj->val;}
 
-    else if (type == SS_HASHARR_I)
+    else if (type == G_HASHARR_I)
        {if (!SS_nullobjp(obj))
 	   {if (!SS_hasharrp(obj))
 	       SS_error(si, "OBJECT NOT HASH_ARRAY - _SS_ARGS", obj);
 	    *pv = obj->val;};}
 
-    else if (type == SS_PROCESS_I)
+    else if (type == G_PROCESS_I)
        {if (!SS_processp(obj))
 	   SS_error(si, "OBJECT NOT PROCESS - _SS_ARGS", obj);
 	*pv = obj->val;}
@@ -670,17 +670,17 @@ object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 	    {c   = *(int *) vl;
 	     lst = SS_mk_cons(si, SS_mk_char(si, c), lst);}
  
-	 else if (ityp == SS_HAELEM_I)
+	 else if (ityp == G_HAELEM_I)
 	    {haelem *hp;
 	     hp  = (haelem *) vl;
 	     lst = SS_mk_cons(si, SS_mk_haelem(si, hp), lst);}
  
-	 else if (ityp == SS_HASHARR_I)
+	 else if (ityp == G_HASHARR_I)
 	    {hasharr *ht;
 	     ht  = (hasharr *) vl;
 	     lst = SS_mk_cons(si, SS_mk_hasharr(si, ht), lst);}
 
-	 else if (ityp == SS_PROCESS_I)
+	 else if (ityp == G_PROCESS_I)
 	    {PROCESS *pp;
 	     pp  = (PROCESS *) vl;
 	     lst = SS_mk_cons(si, SS_mk_process(si, pp), lst);}

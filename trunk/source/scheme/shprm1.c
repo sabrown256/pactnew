@@ -945,7 +945,7 @@ static object *_SSI_catch_err(SS_psides *si, object *argl)
     SS_set_print_err_func(NULL, FALSE);
 
     si->cont_ptr++;
-    SS_push_err(si, FALSE, SS_ERROR_I);
+    SS_push_err(si, FALSE);
     switch (SETJMP(si->continue_int[si->cont_ptr].cont))
        {case ABORT :
 	     SS_set_print_err_func(_SS.oph, FALSE);
