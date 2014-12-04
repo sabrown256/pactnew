@@ -2958,7 +2958,7 @@ int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
 <P>
 object *SS_pop_err(int n, int flag)
 <P>
-void SS_push_err(int flag, int type)
+void SS_push_err(SS_psides *si, int flag)
 <P>
 void SS_error(SS_psides *si, char *s, object *obj)
 <P>

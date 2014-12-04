@@ -864,22 +864,22 @@ char *SS_object_type_name(object *o, char *atype, long nb)
     else if (itype == SC_STRING_I)
        SC_strncpy(atype, nb, "string", -1);
 
-    else if (itype == SS_CONS_I)
+    else if (itype == G_SS_CONS_I)
        SC_strncpy(atype, nb, "pair", -1);
 
-    else if (itype == SS_VARIABLE_I)
+    else if (itype == G_SS_VARIABLE_I)
        SC_strncpy(atype, nb, "variable", -1);
 
-    else if (itype == SS_PROCEDURE_I)
+    else if (itype == G_SS_PROCEDURE_I)
        SC_strncpy(atype, nb, "procedure", -1);
 
     else if (itype == SC_BOOL_I)
        SC_strncpy(atype, nb, "boolean", -1);
 
-    else if (itype == SS_INPUT_PORT_I)
+    else if (itype == G_SS_INPUT_PORT_I)
        SC_strncpy(atype, nb, "input port", -1);
 
-    else if (itype == SS_OUTPUT_PORT_I)
+    else if (itype == G_SS_OUTPUT_PORT_I)
        SC_strncpy(atype, nb, "output port", -1);
 
     else if (itype == SS_EOF_I)
@@ -888,7 +888,7 @@ char *SS_object_type_name(object *o, char *atype, long nb)
     else if (itype == SS_NULL_I)
        SC_strncpy(atype, nb, "nil", -1);
 
-    else if (itype == SS_VECTOR_I)
+    else if (itype == G_SS_VECTOR_I)
        SC_strncpy(atype, nb, "vector", -1);
 
     else if (itype == SS_CHARACTER_I)

@@ -1846,7 +1846,7 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
     pred = NULL;
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
-            SS_PROCEDURE_I, &pred,
+            G_SS_PROCEDURE_I, &pred,
             SC_DOUBLE_I, &val,
             G_C_ARRAY_I, &indx,
             0);

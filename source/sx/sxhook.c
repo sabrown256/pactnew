@@ -83,10 +83,10 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
 	else if (c == SC_STRING_I)
 	   SC_strncpy(new_mem, MAXLINE, "SS_string *val", -1);
 
-	else if (c == SS_CONS_I)
+	else if (c == G_SS_CONS_I)
 	   SC_strncpy(new_mem, MAXLINE, "SS_cons *val", -1);
 
-	else if (c == SS_VARIABLE_I)
+	else if (c == G_SS_VARIABLE_I)
 	   SC_strncpy(new_mem, MAXLINE, "SS_variable *val", -1);
 
 	else if ((c == SC_BOOL_I) ||
@@ -94,7 +94,7 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
 		 (c == SS_NULL_I))
 	   SC_strncpy(new_mem, MAXLINE, "SS_boolean *val", -1);
 
-	else if (c == SS_VECTOR_I)
+	else if (c == G_SS_VECTOR_I)
 	   SC_strncpy(new_mem, MAXLINE, "SS_vector *val", -1);
 
 	else

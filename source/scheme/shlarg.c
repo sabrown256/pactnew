@@ -87,7 +87,7 @@ static object *_SSI_vctref(SS_psides *si, object *argl)
     vct = NULL;
     i   = -1;
     SS_args(si, argl,
-	    SS_VECTOR_I,  &vct,
+	    G_SS_VECTOR_I,  &vct,
 	    SC_INT_I, &i,
 	    0);
 
@@ -115,7 +115,7 @@ static object *_SSI_vctset(SS_psides *si, object *argl)
     i   = -1;
     val = SS_null;
     SS_args(si, argl,
-	    SS_VECTOR_I,  &vct,
+	    G_SS_VECTOR_I,  &vct,
 	    SC_INT_I, &i,
 	    G_OBJECT_I,  &val,
 	    0);
