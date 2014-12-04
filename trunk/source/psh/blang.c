@@ -758,8 +758,6 @@ static void init_types(int iref)
     add_type(iref, "long double _Complex *", "complex(16)-A",
 	     "SC_LONG_DOUBLE_COMPLEX_P_I", "NULL");
 
-    add_type(iref, "pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       "NULL");
-
     return;}
 
 /*--------------------------------------------------------------------------*/
