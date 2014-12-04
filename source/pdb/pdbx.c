@@ -1083,7 +1083,6 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
    {int err;
 
     ONCE_SAFE(TRUE, NULL)
-       SC_PCONS_P_S         = CSTRDUP("pcons *", 3);
        PM_SET_S             = CSTRDUP("PM_set", 3);
        PM_SET_P_S           = CSTRDUP("PM_set *", 3);
        PM_MESH_TOPOLOGY_P_S = CSTRDUP("PM_mesh_topology *", 3);

@@ -600,7 +600,7 @@ static object *_SXI_list_pan_pck(SS_psides *si)
          else
             {obj = SS_mk_variable(si, name, SS_null);
              SS_UNCOLLECT(obj);
-             if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, 3, -1) == NULL)
+             if (SC_hasharr_install(si->symtab, name, obj, SS_OBJECT_P_S, 3, -1) == NULL)
                 SS_error(si, "CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
 
 /* put these in the top level environment frame
@@ -637,7 +637,7 @@ static object *_SXI_intern_packages(SS_psides *si)
          else
             {obj = SS_mk_variable(si, name, SS_null);
              SS_UNCOLLECT(obj);
-             if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, 3, -1) == NULL)
+             if (SC_hasharr_install(si->symtab, name, obj, SS_OBJECT_P_S, 3, -1) == NULL)
                 SS_error(si, "CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
 
 /* put these in the top level environment frame

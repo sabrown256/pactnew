@@ -648,11 +648,7 @@ void SC_init_base_types(void)
 
        SC_VOID_I                  = SC_type_register(SC_VOID_S,     KIND_OTHER,   0,               0);
        SC_STRUCT_I                = SC_type_register(SC_STRUCT_S,   KIND_STRUCT,  0,               0);
-       SC_PCONS_I                 = SC_type_register(SC_PCONS_S,    KIND_STRUCT,  sizeof(pcons),   0);
-       SC_PROCESS_I               = SC_type_register(SC_PROCESS_S,  KIND_STRUCT,  sizeof(PROCESS), 0);
        SC_FILE_I                  = SC_type_register(SC_FILE_S,     KIND_STRUCT,  sizeof(FILE),    0);
-       SC_HAELEM_I                = SC_type_register(SC_HAELEM_S,   KIND_STRUCT,  sizeof(haelem),  0);
-
        SC_PCONS_P_I               = SC_type_register(SC_PCONS_P_S,  KIND_POINTER, szptr,           0);
 
 /* aliases */

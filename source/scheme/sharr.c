@@ -35,7 +35,7 @@ static object *_SSI_hash_install(SS_psides *si, object *argl)
 	    G_HASHARR_I, &tab,
 	    0);
 
-    hp = SC_hasharr_install(tab, name, obj, SS_POBJECT_S, 3, -1);
+    hp = SC_hasharr_install(tab, name, obj, SS_OBJECT_P_S, 3, -1);
 
 /* the hash table has one reference and the object will have another
  * without this the haelem can be freed when obj is GC'd - NOT GOOD!
@@ -393,7 +393,7 @@ void _SS_inst_hash(SS_psides *si)
 
     SS_scheme_symtab = SS_mk_hasharr(si, si->symtab);
     SC_hasharr_install(si->symtab, "system-hash-table",
-		       SS_scheme_symtab, SS_POBJECT_S, 3, -1);
+		       SS_scheme_symtab, SS_OBJECT_P_S, 3, -1);
     SS_UNCOLLECT(SS_scheme_symtab);
 
     return;}

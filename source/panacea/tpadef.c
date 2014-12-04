@@ -8,19 +8,19 @@
 
 #include "cpyright.h"
  
-#include "panace.h"
+#include "panacea_int.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 void PA_print_var_dim(PA_dimens *vdims)
-   {int min_index = 0;
-    int max_index = 0;
+   {int ixx, ixn, min_index, max_index;
     int *mini, *maxi;
-    int ixx, ixn;
-    PA_dimens *pvd;
-    char *dim;
     char s[MAXLINE];
+    PA_dimens *pvd;
+
+    min_index = 0;
+    max_index = 0;
 
     printf("dim    : ");
     if (vdims == NULL)
@@ -138,29 +138,25 @@ static void _PA_print_alist_node(char *type, void *data)
        printf("NULL\t(%s)", type);
 
     else
-       {switch (itype)
-	   {case SC_INT_I:
-	    case SC_INT_P_I:
-	         i = *(int *) data;
-		 printf("%d\t(%s)", i, type);
-		 break;
-	    case SC_STRING_I:
-		 s = (char *) data;
-		 printf("%s\t(%s)", s, type);
-		 break;
-	    case SC_PCONS_I:
-	    case SC_PCONS_P_I:
-		 pp = (pcons *) data; 
-		 printf("%x (%s)\n", data, type);
-		 _PA_print_alist_node(pp->car_type, pp->car);
-		 printf("\t");
-		 _PA_print_alist_node(pp->cdr_type, pp->cdr);
-		 _PA_print_info_sym(pp->car, pp->cdr);
-		 printf("\n");
-		 break;
-	    default:
-		 printf("%x", data);
-	         break;};};
+       {if ((itype == SC_INT_I) || (itype == SC_INT_P_I))
+	   {i = *(int *) data;
+	    printf("%d\t(%s)", i, type);}
+
+	else if (itype == SC_STRING_I)
+	   {s = (char *) data;
+	    printf("%s\t(%s)", s, type);}
+
+	else if ((itype == G_PCONS_I) || (itype == SC_PCONS_P_I))
+	   {pp = (pcons *) data; 
+	    printf("%p (%s)\n", data, type);
+	    _PA_print_alist_node(pp->car_type, pp->car);
+	    printf("\t");
+	    _PA_print_alist_node(pp->cdr_type, pp->cdr);
+	    _PA_print_info_sym(pp->car, pp->cdr);
+	    printf("\n");}
+
+       else
+	  printf("%p", data);};
 
     return;}
 
@@ -170,7 +166,7 @@ static void _PA_print_alist_node(char *type, void *data)
 /* PA_PRINT_ALIST -  */
 
 void PA_print_alist(pcons *alist)
-   {pcons *pa, *c;
+   {pcons *pa;
 
     printf("---\n");
     for (pa = alist; pa != NULL; pa = (pcons *) pa->cdr)
@@ -208,8 +204,7 @@ void PA_print_variable(PA_variable *pp)
 /*--------------------------------------------------------------------------*/
 
 void PA_print_var_tab(hasharr *tab)
-   {int i;
-    char **dump, **work;
+   {char **dump, **work;
     PA_variable *pp;
 
     dump = SC_hasharr_dump(tab, NULL, NULL, FALSE);
@@ -242,20 +237,20 @@ int main(int c, char **v)
 
 /* ------- test units --------------- */
     PA_def_var_units("1/cm", PER, CM, UNITS);
-    unit_alist = (pcons *) SC_hasharr_def_lookup(PA_var_unit_tab, "1/cm", "1/cm");
+    unit_alist = (pcons *) SC_hasharr_def_lookup(PA_gs.var_unit_tab, "1/cm");
     printf("1/cm -\n");
     PA_print_alist(unit_alist);
 
 /* ------- test attributes --------------- */
     PA_def_var_attribute("foo_att", PA_INFO_ALLOCATION, STATIC,
 			 PA_INFO_PERSISTENCE, CACHE_F, PA_INFO_CENTER, Z_CENT, 0);
-    att_alist = (pcons *) SC_hasharr_def_lookup(PA_gs.var_att_tab, "foo_att", "foo_att");
+    att_alist = (pcons *) SC_hasharr_def_lookup(PA_gs.var_att_tab, "foo_att");
     printf("foo_att -\n");
     PA_print_alist(att_alist);
 
 /* ------- test dimensions --------------- */
     PA_def_var_dimension("dim1", &len1, LAST);
-    vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_gs.var_dim_tab, "dim1", "dim1");
+    vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_gs.var_dim_tab, "dim1");
     printf("\ndim1 - ");
     PA_print_var_dim(vdims);
 
@@ -277,7 +272,7 @@ int main(int c, char **v)
 
     PA_def_var_dimension("dim4", &len1, &len2, &len3, 
 			 PA_gs.don, &len1, &len2, PA_gs.dul, &len3, &len4, LAST);
-    vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_gs.var_dim_tab, "dim4", "dim4");
+    vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_gs.var_dim_tab, "dim4");
     printf("\ndim4 - ");
     PA_print_var_dim(vdims);
 

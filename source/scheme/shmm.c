@@ -131,7 +131,7 @@ void _SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand,
     vp = SS_mk_variable(si, pname, op);
     SS_UNCOLLECT(vp);
 
-    SC_hasharr_install(si->symtab, pname, vp, SS_POBJECT_S, 3, -1);
+    SC_hasharr_install(si->symtab, pname, vp, SS_OBJECT_P_S, 3, -1);
 
     return;}
 
@@ -1037,8 +1037,8 @@ void SS_register_types(void)
 				      SC_TYPE_FREE, _SS_rl_char, 0);
 #endif
 
-    SS_OBJECT_S  = CSTRSAVE("object");
-    SS_POBJECT_S = CSTRSAVE("object *");
+    SS_OBJECT_S   = CSTRSAVE("object");
+    SS_OBJECT_P_S = CSTRSAVE("object *");
 
     END_SAFE;
 

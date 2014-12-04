@@ -26,9 +26,6 @@
 typedef object *(*PFZargs)(SS_psides *si);
 typedef object *(*PFSargs)(SS_psides *si, object *argl);
 
-char
- *SS_OBJECT_P_S = "object *";
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -995,7 +992,7 @@ object *_SS_make_ext_boolean(SS_psides *si, char *name, int val)
 
     o = SS_mk_boolean(si, name, val);
 
-    SC_hasharr_install(si->symtab, name, o, SS_POBJECT_S, 3, -1);
+    SC_hasharr_install(si->symtab, name, o, SS_OBJECT_P_S, 3, -1);
 
     SS_UNCOLLECT(o);
 
@@ -1014,7 +1011,7 @@ object *_SS_make_ext_int(SS_psides *si, char *name, long val)
 
     o = SS_mk_integer(si, val);
 
-    SC_hasharr_install(si->symtab, name, o, SS_POBJECT_S, 3, -1);
+    SC_hasharr_install(si->symtab, name, o, SS_OBJECT_P_S, 3, -1);
 
     SS_UNCOLLECT(o);
 

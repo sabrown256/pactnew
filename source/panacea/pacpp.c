@@ -333,7 +333,6 @@ void PA_cpp_default(void)
     PA_cpp_add_name(SC_LONG_P_S,    PA_gs.cpp_type_SC, SC_LONG_P_I);
     PA_cpp_add_name(SC_FLOAT_P_S,   PA_gs.cpp_type_SC, SC_FLOAT_P_I);
     PA_cpp_add_name(SC_DOUBLE_P_S,  PA_gs.cpp_type_SC, SC_DOUBLE_P_I);
-    PA_cpp_add_name(SC_PCONS_S,     PA_gs.cpp_type_SC, SC_PCONS_I);
     PA_cpp_add_name(SC_STRUCT_S,    PA_gs.cpp_type_SC, SC_STRUCT_I);
     PA_cpp_add_name(SC_UNKNOWN_S,   PA_gs.cpp_type_SC, SC_UNKNOWN_I);
 
@@ -354,7 +353,6 @@ void PA_cpp_default(void)
     PA_cpp_add_name("SC_FLOAT_P_I",   PA_gs.cpp_type, SC_FLOAT_P_I);
     PA_cpp_add_name("SC_REAL_P_I",    PA_gs.cpp_type, SC_REAL_P_I);
     PA_cpp_add_name("SC_DOUBLE_P_I",  PA_gs.cpp_type, SC_DOUBLE_P_I);
-    PA_cpp_add_name("SC_PCONS_I",     PA_gs.cpp_type, SC_PCONS_I);
     PA_cpp_add_name("SC_STRUCT_I",    PA_gs.cpp_type, SC_STRUCT_I);
     PA_cpp_add_name("SC_UNKNOWN_I",   PA_gs.cpp_type, SC_UNKNOWN_I);
 
@@ -376,7 +374,6 @@ void PA_cpp_default(void)
     PA_cpp_add_name("SC_FLOAT_P_S",   PA_gs.cpp_type_S, SC_FLOAT_P_S);
     PA_cpp_add_name("SC_REAL_P_S",    PA_gs.cpp_type_S, SC_REAL_P_S);
     PA_cpp_add_name("SC_DOUBLE_P_S",  PA_gs.cpp_type_S, SC_DOUBLE_P_S);
-    PA_cpp_add_name("SC_PCONS_S",     PA_gs.cpp_type_S, SC_PCONS_S);
     PA_cpp_add_name("SC_STRUCT_S",    PA_gs.cpp_type_S, SC_STRUCT_S);
     PA_cpp_add_name("SC_UNKNOWN_S",   PA_gs.cpp_type_S, SC_UNKNOWN_S);
 
