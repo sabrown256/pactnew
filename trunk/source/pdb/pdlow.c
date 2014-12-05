@@ -426,7 +426,7 @@ static void _PD_d_install_in(char *name, defstr *def, hasharr *tab,
 		     break;
 		default :
 		     break;};};
-	SC_type_register(name, kind, def->size, 0);}
+	SC_type_register(name, kind, B_T, def->size, 0);}
 
     return;}
 

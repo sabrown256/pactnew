@@ -153,31 +153,34 @@ typedef long double float128_t;
 #define SC_QUATERNION_P_I            SC_gs.ltyp[25].p_i
 #define SC_QUATERNION_P_S            SC_gs.ltyp[25].p_s
 
-#define SC_VOID_I                    SC_gs.ltyp[28].i
-#define SC_VOID_S                    SC_gs.ltyp[28].s
-#define SC_POINTER_I                 SC_gs.ltyp[28].p_i
-#define SC_POINTER_S                 SC_gs.ltyp[28].p_s
+#define SC_VOID_I                    SC_gs.ltyp[26].i
+#define SC_VOID_S                    SC_gs.ltyp[26].s
+#define SC_POINTER_I                 SC_gs.ltyp[26].p_i
+#define SC_POINTER_S                 SC_gs.ltyp[26].p_s
 
-#define SC_STRUCT_I                  SC_gs.ltyp[29].i
-#define SC_STRUCT_S                  SC_gs.ltyp[29].s
-#define SC_FILE_I                    SC_gs.ltyp[30].i
-#define SC_FILE_S                    SC_gs.ltyp[30].s
-#define SC_ENUM_I                    SC_gs.ltyp[31].i
-#define SC_ENUM_S                    SC_gs.ltyp[31].s
-#define SC_INTEGER_I                 SC_gs.ltyp[32].i
-#define SC_INTEGER_S                 SC_gs.ltyp[32].s
-#define SC_REAL_I                    SC_gs.ltyp[33].i
-#define SC_REAL_S                    SC_gs.ltyp[33].s
-#define SC_REAL_P_I                  SC_gs.ltyp[33].p_i
-#define SC_REAL_P_S                  SC_gs.ltyp[33].p_s
-#define SC_TYP_N                     34
+#define SC_ENUM_I                    SC_gs.ltyp[27].i
+#define SC_ENUM_S                    SC_gs.ltyp[27].s
+#define SC_STRUCT_I                  SC_gs.ltyp[28].i
+#define SC_STRUCT_S                  SC_gs.ltyp[28].s
+
+#define SC_FILE_I                    SC_gs.ltyp[29].i
+#define SC_FILE_S                    SC_gs.ltyp[29].s
+#define SC_INTEGER_I                 SC_gs.ltyp[30].i
+#define SC_INTEGER_S                 SC_gs.ltyp[30].s
+
+#define SC_REAL_I                    SC_gs.ltyp[31].i
+#define SC_REAL_S                    SC_gs.ltyp[31].s
+#define SC_REAL_P_I                  SC_gs.ltyp[31].p_i
+#define SC_REAL_P_S                  SC_gs.ltyp[31].p_s
+
+#define SC_TYP_N                     32
 
 
 
 
-#define SC_PCONS_P_I                 SC_gs.lityp[23].i
-#define SC_PCONS_P_S                 SC_gs.lityp[23].s
-#define SC_ITYP_N                    25
+#define SC_PCONS_P_I                 SC_gs.lityp[0].i
+#define SC_PCONS_P_S                 SC_gs.lityp[0].s
+#define SC_ITYP_N                    1
 
 /* these must have the same sequence/values as the dynamic values
  * assigned in SC_init_base_types
@@ -211,41 +214,15 @@ typedef long double float128_t;
    { 14, "complex64_t",          30, "complex64_t *" },                      \
    { 15, "complex128_t",         31, "complex128_t *" },                     \
    { 16, "quaternion",           32, "quaternion *" },                       \
-   { 19, "char *", },                                                        \
-   { 17, "void *", },                                                        \
    { 33, "void",                 17, "void *" },                             \
+   { 7,  "enum", },                                                          \
    { 34, "struct", },                                                        \
    { 35, "FILE", },                                                          \
-   { 7, "enum", },                                                           \
    { 7, "integer", },                                                        \
    { 11, "double", } }
 
 #define _SC_DEF_ITYP_                                                        \
- { { 18, "bool *",  },                                                       \
-   { 20, "wchar *",  },                                                      \
-   { 22, "short *",  },                                                      \
-   { 23, "int *",  },                                                        \
-   { 24, "long *",  },                                                       \
-   { 25, "long_long *",  },                                                  \
-   { 21, "int8_t *",  },                                                     \
-   { 22, "int16_t *", },                                                     \
-   { 23, "int32_t *",  },                                                    \
-   { 25, "int64_t *",  },                                                    \
-   { 26, "float *",  },                                                      \
-   { 27, "double *",  },                                                     \
-   { 28, "long_double *",  },                                                \
-   { 26, "float32_t *",  },                                                  \
-   { 27, "float64_t *",  },                                                  \
-   { 28, "float128_t *",  },                                                 \
-   { 29, "float_complex *",  },                                              \
-   { 30, "double_complex *",  },                                             \
-   { 31, "long_double_complex *",  },                                        \
-   { 29, "complex32_t *",  },                                                \
-   { 30, "complex64_t *",  },                                                \
-   { 31, "float128_t *",  },                                                 \
-   { 32, "quaternion *",  },                                                 \
-   { 39, "pcons *",  },                                                      \
-   { 27, "double *", } }
+ { { 39, "pcons *",  } }
 
 
 /*--------------------------------------------------------------------------*/
@@ -458,7 +435,7 @@ extern SC_type
  *_SC_get_type_id(int id);
 
 extern int
- SC_type_register(char *name, SC_kind kind, int bpi, ...),
+ SC_type_register(char *name, SC_kind kind, bool ptr, int bpi, ...),
  SC_type_alias(char *name, int id),
  SC_type_id(char *name, int unsg),
  SC_type_ptr_id(int id),

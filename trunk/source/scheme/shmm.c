@@ -1025,15 +1025,16 @@ void SS_register_types(void)
     register_score_types();
     register_scheme_types();
 
-    SS_EOF_I   = SC_type_register("eof", KIND_STRUCT, sizeof(SS_boolean),
+    SS_EOF_I   = SC_type_register("eof", KIND_STRUCT, B_F, sizeof(SS_boolean),
 				  SC_TYPE_FREE, _SS_rl_boolean, 0);
-    SS_NULL_I  = SC_type_register("nil", KIND_STRUCT, sizeof(SS_boolean),
+    SS_NULL_I  = SC_type_register("nil", KIND_STRUCT, B_F, sizeof(SS_boolean),
 				  SC_TYPE_FREE, _SS_rl_boolean, 0);
-    SS_ERROR_I = SC_type_register("error", KIND_OTHER,  0, 0);
+    SS_ERROR_I = SC_type_register("error", KIND_OTHER,  B_F, 0, 0);
 
 #ifdef LARGE
 
-    SS_CHARACTER_I = SC_type_register("character", KIND_OTHER, sizeof(int),
+    SS_CHARACTER_I = SC_type_register("character", KIND_OTHER, B_T,
+				      sizeof(int),
 				      SC_TYPE_FREE, _SS_rl_char, 0);
 #endif
 

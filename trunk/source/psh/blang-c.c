@@ -226,7 +226,7 @@ static void c_type_reg(bindes *bd, char *tag, der_list *sl, int ni)
     else if (sl->kind == TK_STRUCT)
        {fprintf(fc, "       %s = SC_type_register(\"%s\", KIND_STRUCT,\n",
 		tl->inm, tl->cnm);
-	fprintf(fc, "\t\t\t\tsizeof(%s), 0);\n",
+	fprintf(fc, "\t\t\t\tTRUE, sizeof(%s), 0);\n",
 		tl->cnm);};
 
     return;}
