@@ -86,14 +86,11 @@ static SC_type *_SC_get_type_name(char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_TYPE_REGISTER - register a data type with the type manager */
+/* _SC_TYPE_REGISTER - register a data type, NAME, with the type manager */
 
-int SC_type_register(char *name, SC_kind kind, int bpi, ...)
-   {int id, ok;
-    void *pf;
-    SC_type_method attr;
+static int _SC_type_register(char *name, SC_type *t)
+   {int id;
     hasharr *ha;
-    SC_type *t;
 
     ha = (hasharr *) _SC.types.typ;
     if (ha == NULL)
@@ -101,17 +98,37 @@ int SC_type_register(char *name, SC_kind kind, int bpi, ...)
 	_SC.types.typ = ha;
 	SC_init_base_types();};
 
+    id = SC_hasharr_get_n(ha);
+
+    t->id = id;
+
+    SC_hasharr_install(ha, name, t, "SC_TYPE", 3, -1);
+
+    return(id);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_TYPE_REGISTER - register a data type, NAME, with the type manager
+ *                  - if PTR is TRUE register a pointer type too, e.g.
+ *                  -    "int" also gets "int *"
+ */
+
+int SC_type_register(char *name, SC_kind kind, bool ptr, int bpi, ...)
+   {int id, ok;
+    void *pf;
+    SC_type_method attr;
+    SC_type *t;
+
     SC_VA_START(bpi);
 
-    t = (SC_type *) SC_hasharr_def_lookup(ha, name);
+    t = _SC_get_type_name(name);
     if (t != NULL)
        id = t->id;
     else
-       {id = SC_hasharr_get_n(ha);
+       {t = CPMAKE(SC_type, 3);
 
-	t = CPMAKE(SC_type, 3);
-
-	t->id   = id;
+	t->id   = -1;
 	t->type = CSTRDUP(name, 3);
 	t->kind = kind;
 	t->bpi  = bpi;
@@ -138,7 +155,29 @@ int SC_type_register(char *name, SC_kind kind, int bpi, ...)
 			  ok = FALSE;
 			  break;};};};
 
-	SC_hasharr_install(ha, name, t, "SC_TYPE", 3, -1);};
+	id = _SC_type_register(name, t);
+
+#if 0
+	if (ptr == TRUE)
+	   {int pid;
+	    char ps[BFSML];
+	    SC_type *p;
+
+	    snprintf(ps, BFSML, "%s *", name);
+
+	    p = CPMAKE(SC_type, 3);
+
+	    p->id   = -1;
+	    p->type = CSTRDUP(ps, 3);
+	    p->kind = KIND_POINTER;
+	    p->bpi  = sizeof(char *);
+	    p->a    = NULL;
+	    p->init = NULL;
+	    p->free = NULL;
+
+	    pid = _SC_type_register(ps, p);};
+#endif
+	};
 
     SC_VA_END;
 
@@ -625,53 +664,53 @@ void SC_init_base_types(void)
  */
 
 /* 0 */
-       SC_UNKNOWN_I               = SC_type_register(SC_UNKNOWN_S,             KIND_OTHER,      0,                            0);
+       SC_UNKNOWN_I               = SC_type_register(SC_UNKNOWN_S,             KIND_OTHER,      B_F, 0,                            0);
 
-       SC_BIT_I                   = SC_type_register(SC_BIT_S,                 KIND_OTHER,      0,                            0);
-       SC_BOOL_I                  = SC_type_register(SC_BOOL_S,                KIND_BOOL,       sizeof(bool),                 0);
-       SC_CHAR_I                  = SC_type_register(SC_CHAR_S,                KIND_CHAR,       sizeof(char),                 0);
-       SC_WCHAR_I                 = SC_type_register(SC_WCHAR_S,               KIND_CHAR,       sizeof(wchar_t),              0);
-       SC_INT8_I                  = SC_type_register(SC_INT8_S,                KIND_INT,        sizeof(int8_t),               0);
-       SC_SHORT_I                 = SC_type_register(SC_SHORT_S,               KIND_INT,        sizeof(short),                0);
-       SC_INT_I                   = SC_type_register(SC_INT_S,                 KIND_INT,        sizeof(int),                  0);
-       SC_LONG_I                  = SC_type_register(SC_LONG_S,                KIND_INT,        sizeof(long),                 0);
-       SC_LONG_LONG_I             = SC_type_register(SC_LONG_LONG_S,           KIND_INT,        sizeof(long long),            0);
+       SC_BIT_I                   = SC_type_register(SC_BIT_S,                 KIND_OTHER,      B_F, 0,                            0);
+       SC_BOOL_I                  = SC_type_register(SC_BOOL_S,                KIND_BOOL,       B_T, sizeof(bool),                 0);
+       SC_CHAR_I                  = SC_type_register(SC_CHAR_S,                KIND_CHAR,       B_T, sizeof(char),                 0);
+       SC_WCHAR_I                 = SC_type_register(SC_WCHAR_S,               KIND_CHAR,       B_T, sizeof(wchar_t),              0);
+       SC_INT8_I                  = SC_type_register(SC_INT8_S,                KIND_INT,        B_T, sizeof(int8_t),               0);
+       SC_SHORT_I                 = SC_type_register(SC_SHORT_S,               KIND_INT,        B_T, sizeof(short),                0);
+       SC_INT_I                   = SC_type_register(SC_INT_S,                 KIND_INT,        B_T, sizeof(int),                  0);
+       SC_LONG_I                  = SC_type_register(SC_LONG_S,                KIND_INT,        B_T, sizeof(long),                 0);
+       SC_LONG_LONG_I             = SC_type_register(SC_LONG_LONG_S,           KIND_INT,        B_T, sizeof(long long),            0);
 /* 10 */
-       SC_FLOAT_I                 = SC_type_register(SC_FLOAT_S,               KIND_FLOAT,      sizeof(float),                0);
-       SC_DOUBLE_I                = SC_type_register(SC_DOUBLE_S,              KIND_FLOAT,      sizeof(double),               0);
-       SC_LONG_DOUBLE_I           = SC_type_register(SC_LONG_DOUBLE_S,         KIND_FLOAT,      sizeof(long double),          0);
-       SC_FLOAT_COMPLEX_I         = SC_type_register(SC_FLOAT_COMPLEX_S,       KIND_COMPLEX,    sizeof(float _Complex),       0);
-       SC_DOUBLE_COMPLEX_I        = SC_type_register(SC_DOUBLE_COMPLEX_S,      KIND_COMPLEX,    sizeof(double _Complex),      0);
-       SC_LONG_DOUBLE_COMPLEX_I   = SC_type_register(SC_LONG_DOUBLE_COMPLEX_S, KIND_COMPLEX,    sizeof(long double _Complex), 0);
-       SC_QUATERNION_I            = SC_type_register(SC_QUATERNION_S,          KIND_QUATERNION, 4*sizeof(double),             0);
+       SC_FLOAT_I                 = SC_type_register(SC_FLOAT_S,               KIND_FLOAT,      B_T, sizeof(float),                0);
+       SC_DOUBLE_I                = SC_type_register(SC_DOUBLE_S,              KIND_FLOAT,      B_T, sizeof(double),               0);
+       SC_LONG_DOUBLE_I           = SC_type_register(SC_LONG_DOUBLE_S,         KIND_FLOAT,      B_T, sizeof(long double),          0);
+       SC_FLOAT_COMPLEX_I         = SC_type_register(SC_FLOAT_COMPLEX_S,       KIND_COMPLEX,    B_T, sizeof(float _Complex),       0);
+       SC_DOUBLE_COMPLEX_I        = SC_type_register(SC_DOUBLE_COMPLEX_S,      KIND_COMPLEX,    B_T, sizeof(double _Complex),      0);
+       SC_LONG_DOUBLE_COMPLEX_I   = SC_type_register(SC_LONG_DOUBLE_COMPLEX_S, KIND_COMPLEX,    B_T, sizeof(long double _Complex), 0);
+       SC_QUATERNION_I            = SC_type_register(SC_QUATERNION_S,          KIND_QUATERNION, B_T, 4*sizeof(double),             0);
 
 /* these must shadow SC_BIT_I thru SC_QUATERNION_I
  * so that SC_xxx_P_I = SC_xxx_I - SC_BIT_I + SC_POINTER_I
  * this make SC_type_ptr_id work
  */
-       SC_POINTER_I               = SC_type_register(SC_POINTER_S,               KIND_POINTER, szptr, 0);
-       SC_BOOL_P_I                = SC_type_register(SC_BOOL_P_S,                KIND_POINTER, szptr, 0);
-       SC_STRING_I                = SC_type_register(SC_STRING_S,                KIND_POINTER, szptr, 0);
+       SC_POINTER_I               = SC_type_register(SC_POINTER_S,               KIND_POINTER, B_F, szptr, 0);
+       SC_BOOL_P_I                = SC_type_register(SC_BOOL_P_S,                KIND_POINTER, B_F, szptr, 0);
+       SC_STRING_I                = SC_type_register(SC_STRING_S,                KIND_POINTER, B_F, szptr, 0);
 /* 20 */
-       SC_WCHAR_P_I               = SC_type_register(SC_WCHAR_P_S,               KIND_POINTER, szptr, 0);
-       SC_INT8_P_I                = SC_type_register(SC_INT8_P_S,                KIND_POINTER, szptr, 0);
-       SC_SHORT_P_I               = SC_type_register(SC_SHORT_P_S,               KIND_POINTER, szptr, 0);
-       SC_INT_P_I                 = SC_type_register(SC_INT_P_S,                 KIND_POINTER, szptr, 0);
-       SC_LONG_P_I                = SC_type_register(SC_LONG_P_S,                KIND_POINTER, szptr, 0);
-       SC_LONG_LONG_P_I           = SC_type_register(SC_LONG_LONG_P_S,           KIND_POINTER, szptr, 0);
-       SC_FLOAT_P_I               = SC_type_register(SC_FLOAT_P_S,               KIND_POINTER, szptr, 0);
-       SC_DOUBLE_P_I              = SC_type_register(SC_DOUBLE_P_S,              KIND_POINTER, szptr, 0);
-       SC_LONG_DOUBLE_P_I         = SC_type_register(SC_LONG_DOUBLE_P_S,         KIND_POINTER, szptr, 0);
-       SC_FLOAT_COMPLEX_P_I       = SC_type_register(SC_FLOAT_COMPLEX_P_S,       KIND_POINTER, szptr, 0);
+       SC_WCHAR_P_I               = SC_type_register(SC_WCHAR_P_S,               KIND_POINTER, B_F, szptr, 0);
+       SC_INT8_P_I                = SC_type_register(SC_INT8_P_S,                KIND_POINTER, B_F, szptr, 0);
+       SC_SHORT_P_I               = SC_type_register(SC_SHORT_P_S,               KIND_POINTER, B_F, szptr, 0);
+       SC_INT_P_I                 = SC_type_register(SC_INT_P_S,                 KIND_POINTER, B_F, szptr, 0);
+       SC_LONG_P_I                = SC_type_register(SC_LONG_P_S,                KIND_POINTER, B_F, szptr, 0);
+       SC_LONG_LONG_P_I           = SC_type_register(SC_LONG_LONG_P_S,           KIND_POINTER, B_F, szptr, 0);
+       SC_FLOAT_P_I               = SC_type_register(SC_FLOAT_P_S,               KIND_POINTER, B_F, szptr, 0);
+       SC_DOUBLE_P_I              = SC_type_register(SC_DOUBLE_P_S,              KIND_POINTER, B_F, szptr, 0);
+       SC_LONG_DOUBLE_P_I         = SC_type_register(SC_LONG_DOUBLE_P_S,         KIND_POINTER, B_F, szptr, 0);
+       SC_FLOAT_COMPLEX_P_I       = SC_type_register(SC_FLOAT_COMPLEX_P_S,       KIND_POINTER, B_F, szptr, 0);
 /* 30 */
-       SC_DOUBLE_COMPLEX_P_I      = SC_type_register(SC_DOUBLE_COMPLEX_P_S,      KIND_POINTER, szptr, 0);
-       SC_LONG_DOUBLE_COMPLEX_P_I = SC_type_register(SC_LONG_DOUBLE_COMPLEX_P_S, KIND_POINTER, szptr, 0);
-       SC_QUATERNION_P_I          = SC_type_register(SC_QUATERNION_P_S,          KIND_POINTER, szptr, 0);
+       SC_DOUBLE_COMPLEX_P_I      = SC_type_register(SC_DOUBLE_COMPLEX_P_S,      KIND_POINTER, B_F, szptr, 0);
+       SC_LONG_DOUBLE_COMPLEX_P_I = SC_type_register(SC_LONG_DOUBLE_COMPLEX_P_S, KIND_POINTER, B_F, szptr, 0);
+       SC_QUATERNION_P_I          = SC_type_register(SC_QUATERNION_P_S,          KIND_POINTER, B_F, szptr, 0);
 
-       SC_VOID_I                  = SC_type_register(SC_VOID_S,     KIND_OTHER,   0,               0);
-       SC_STRUCT_I                = SC_type_register(SC_STRUCT_S,   KIND_STRUCT,  0,               0);
-       SC_FILE_I                  = SC_type_register(SC_FILE_S,     KIND_STRUCT,  sizeof(FILE),    0);
-       SC_PCONS_P_I               = SC_type_register(SC_PCONS_P_S,  KIND_POINTER, szptr,           0);
+       SC_VOID_I                  = SC_type_register(SC_VOID_S,     KIND_OTHER,   B_T, 0,               0);
+       SC_STRUCT_I                = SC_type_register(SC_STRUCT_S,   KIND_STRUCT,  B_F, 0,               0);
+       SC_FILE_I                  = SC_type_register(SC_FILE_S,     KIND_STRUCT,  B_F, sizeof(FILE),    0);
+       SC_PCONS_P_I               = SC_type_register(SC_PCONS_P_S,  KIND_POINTER, B_F, szptr,           0);
 /* 36 */
 
 /* aliases */
