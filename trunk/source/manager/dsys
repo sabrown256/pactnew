@@ -2545,6 +2545,7 @@ CFG_DONE:
 
 # remove other files
         NoteD $Log "    in $PSY_Base/"'*'"/$PSY_TmpDir directories"
+        flog $Log $RM ../*/$PSY_TmpDir/obj/g*.[ch]
         flog $Log $RM ../*/$PSY_TmpDir/obj/*.[cfo] ../*/$PSY_TmpDir/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
         flog $Log $RM ../sx/$PSY_TmpDir/obj/*.[cfo]
