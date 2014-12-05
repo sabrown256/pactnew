@@ -208,6 +208,23 @@ int SC_type_ptr_id(int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_TYPE_PTR_NAME - given the ID of a primitive type
+ *                  - return the NAME of the pointer to the type
+ *                  - return NULL if type NAME is unknown
+ */
+
+char *SC_type_ptr_name(int id)
+   {int pid;
+    char *pnm;
+
+    pid = id - SC_BIT_I + SC_POINTER_I;
+    pnm = SC_type_name(pid);
+
+    return(pnm);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_FIX_TYPE_ID - given the fixed point type NAME return the type id
  *                - return -1 if type NAME is unknown or not fixed point
  */
@@ -607,6 +624,7 @@ void SC_init_base_types(void)
  * changes here MUST be reflected there
  */
 
+/* 0 */
        SC_UNKNOWN_I               = SC_type_register(SC_UNKNOWN_S,             KIND_OTHER,      0,                            0);
 
        SC_BIT_I                   = SC_type_register(SC_BIT_S,                 KIND_OTHER,      0,                            0);
@@ -618,6 +636,7 @@ void SC_init_base_types(void)
        SC_INT_I                   = SC_type_register(SC_INT_S,                 KIND_INT,        sizeof(int),                  0);
        SC_LONG_I                  = SC_type_register(SC_LONG_S,                KIND_INT,        sizeof(long),                 0);
        SC_LONG_LONG_I             = SC_type_register(SC_LONG_LONG_S,           KIND_INT,        sizeof(long long),            0);
+/* 10 */
        SC_FLOAT_I                 = SC_type_register(SC_FLOAT_S,               KIND_FLOAT,      sizeof(float),                0);
        SC_DOUBLE_I                = SC_type_register(SC_DOUBLE_S,              KIND_FLOAT,      sizeof(double),               0);
        SC_LONG_DOUBLE_I           = SC_type_register(SC_LONG_DOUBLE_S,         KIND_FLOAT,      sizeof(long double),          0);
@@ -628,10 +647,12 @@ void SC_init_base_types(void)
 
 /* these must shadow SC_BIT_I thru SC_QUATERNION_I
  * so that SC_xxx_P_I = SC_xxx_I - SC_BIT_I + SC_POINTER_I
+ * this make SC_type_ptr_id work
  */
        SC_POINTER_I               = SC_type_register(SC_POINTER_S,               KIND_POINTER, szptr, 0);
        SC_BOOL_P_I                = SC_type_register(SC_BOOL_P_S,                KIND_POINTER, szptr, 0);
        SC_STRING_I                = SC_type_register(SC_STRING_S,                KIND_POINTER, szptr, 0);
+/* 20 */
        SC_WCHAR_P_I               = SC_type_register(SC_WCHAR_P_S,               KIND_POINTER, szptr, 0);
        SC_INT8_P_I                = SC_type_register(SC_INT8_P_S,                KIND_POINTER, szptr, 0);
        SC_SHORT_P_I               = SC_type_register(SC_SHORT_P_S,               KIND_POINTER, szptr, 0);
@@ -642,6 +663,7 @@ void SC_init_base_types(void)
        SC_DOUBLE_P_I              = SC_type_register(SC_DOUBLE_P_S,              KIND_POINTER, szptr, 0);
        SC_LONG_DOUBLE_P_I         = SC_type_register(SC_LONG_DOUBLE_P_S,         KIND_POINTER, szptr, 0);
        SC_FLOAT_COMPLEX_P_I       = SC_type_register(SC_FLOAT_COMPLEX_P_S,       KIND_POINTER, szptr, 0);
+/* 30 */
        SC_DOUBLE_COMPLEX_P_I      = SC_type_register(SC_DOUBLE_COMPLEX_P_S,      KIND_POINTER, szptr, 0);
        SC_LONG_DOUBLE_COMPLEX_P_I = SC_type_register(SC_LONG_DOUBLE_COMPLEX_P_S, KIND_POINTER, szptr, 0);
        SC_QUATERNION_P_I          = SC_type_register(SC_QUATERNION_P_S,          KIND_POINTER, szptr, 0);
@@ -650,6 +672,7 @@ void SC_init_base_types(void)
        SC_STRUCT_I                = SC_type_register(SC_STRUCT_S,   KIND_STRUCT,  0,               0);
        SC_FILE_I                  = SC_type_register(SC_FILE_S,     KIND_STRUCT,  sizeof(FILE),    0);
        SC_PCONS_P_I               = SC_type_register(SC_PCONS_P_S,  KIND_POINTER, szptr,           0);
+/* 36 */
 
 /* aliases */
        SC_ENUM_I         = SC_type_alias(SC_ENUM_S,    SC_INT_I);

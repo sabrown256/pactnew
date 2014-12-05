@@ -29,7 +29,7 @@ module pact_bl3
          integer         :: a2
       end function fe1f
 
-      subroutine fe2f(dev, x, y, n, info, l) 
+      subroutine fe2f(dev, x, y, n, l) 
          use iso_c_binding
          use types_bl3
          implicit none
@@ -37,7 +37,6 @@ module pact_bl3
          real(8)         :: x(*)
          real(8)         :: y(*)
          integer         :: n
-         type(C_PTR)     :: info
          integer         :: l
       end subroutine fe2f
 
@@ -51,7 +50,7 @@ module pact_bl3
          integer(C_INT), value :: a2
       end function fe1f_i
 
-      subroutine fe2f_i(dev, x, y, n, info, l) &
+      subroutine fe2f_i(dev, x, y, n, l) &
                 bind(c, name='fe2')
          use iso_c_binding
          implicit none
@@ -59,7 +58,6 @@ module pact_bl3
          type(C_PTR), value :: x
          type(C_PTR), value :: y
          integer(C_INT), value :: n
-         type(C_PTR), value :: info
          integer(C_INT), value :: l
       end subroutine fe2f_i
 
