@@ -8,4 +8,4 @@
 #
 
 str *fe1(str *a1, int a2)
-void fe2(str *dev, double *x, double *y, int n, pcons *info, int l)
+void fe2(str *dev, double *x, double *y, int n, int l)

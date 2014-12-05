@@ -43,7 +43,7 @@ PyObject *_PY_fe1(PY_str *self, PyObject *args, PyObject *kwds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP |void fe2(str *dev, double *x, double *y, int n, pcons *info, int l)| */
+/* WRAP |void fe2(str *dev, double *x, double *y, int n, int l)| */
 
 PyObject *_PY_fe2(PY_str *self, PyObject *args, PyObject *kwds)
    {int ok;
@@ -52,26 +52,24 @@ PyObject *_PY_fe2(PY_str *self, PyObject *args, PyObject *kwds)
     double *_lx;
     double *_ly;
     int _ln;
-    pcons *_linfo;
     int _ll;
-    char *kw_list[] = {"dev", "x", "y", "n", "info", "l", NULL};
+    char *kw_list[] = {"dev", "x", "y", "n", "l", NULL};
 
 /* local variable initializations */
     _ldev      = NULL;
     _lx        = NULL;
     _ly        = NULL;
     _ln        = 0;
-    _linfo     = NULL;
     _ll        = 0;
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
-                                     "OOOiOi:fe2p",
+                                     "OOOii:fe2p",
                                      kw_list,
-                                     &_ldev, &_lx, &_ly, &_ln, &_linfo, &_ll);
+                                     &_ldev, &_lx, &_ly, &_ln, &_ll);
     if (ok == FALSE)
        return(NULL);
 
-    fe2(_ldev, _lx, _ly, _ln, _linfo, _ll);
+    fe2(_ldev, _lx, _ly, _ln, _ll);
 
     Py_INCREF(Py_None);
     _lo = Py_None;

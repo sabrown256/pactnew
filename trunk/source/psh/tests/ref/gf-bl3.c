@@ -29,24 +29,22 @@ void *FF_ID(fe1f, FE1F)(str **a1, int *a2)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP |void fe2(str *dev, double *x, double *y, int n, pcons *info, int l)| */
+/* WRAP |void fe2(str *dev, double *x, double *y, int n, int l)| */
 
-void FF_ID(fe2f, FE2F)(str **dev, double *x, double *y, int *n, pcons *info, int *l)
+void FF_ID(fe2f, FE2F)(str **dev, double *x, double *y, int *n, int *l)
    {str *_ldev;
     double *_lx;
     double *_ly;
     int _ln;
-    pcons *_linfo;
     int _ll;
     
     _ldev      = *(str **) dev;
     _lx        = (double *) x;
     _ly        = (double *) y;
     _ln        = (int) *n;
-    _linfo     = (pcons *) info;
     _ll        = (int) *l;
 
-    fe2(_ldev, _lx, _ly, _ln, _linfo, _ll);
+    fe2(_ldev, _lx, _ly, _ln, _ll);
 
     return;}
 
