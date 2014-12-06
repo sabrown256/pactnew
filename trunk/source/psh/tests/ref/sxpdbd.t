@@ -37,7 +37,7 @@ static int _SX_diff_primitives_char(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_wchar(char *indx, void *bfa, void *bfb, long n,
+static int _SX_diff_primitives_wchr(char *indx, void *bfa, void *bfb, long n,
 			long double tol, int ipt)
     {int ok, ret;
      long i, ne;
@@ -345,7 +345,7 @@ static PF_SX_diff_primitives
                 NULL,
                 NULL,
                 _SX_diff_primitives_char,
-                _SX_diff_primitives_wchar,
+                _SX_diff_primitives_wchr,
                 _SX_diff_primitives_int8,
                 _SX_diff_primitives_shrt,
                 _SX_diff_primitives_int,
