@@ -232,6 +232,7 @@ Group DB {
    HOST_SERVER    = 
    RUN_SIGNATURE  = 
    SITE_SIGNATURE =
+   TYPES          = ${PSY_Root}/etc/types.db
    UPDATE_SYS     = 
 }
 

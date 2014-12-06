@@ -658,6 +658,10 @@ void SC_init_base_types(void)
     ONCE_SAFE(FALSE, NULL)
        szptr = sizeof(char *);
 
+#if 0
+       DEF_STANDARD_TYPES;
+#else
+
 /* these must have the same sequence/values as the static values
  * in the definition at the top of the file
  * changes here MUST be reflected there
@@ -742,6 +746,7 @@ void SC_init_base_types(void)
        SC_COMPLEX32_P_I  = SC_type_alias(SC_COMPLEX32_P_S,  SC_FLOAT_COMPLEX_P_I);
        SC_COMPLEX64_P_I  = SC_type_alias(SC_COMPLEX64_P_S,  SC_DOUBLE_COMPLEX_P_I);
        SC_COMPLEX128_P_I = SC_type_alias(SC_COMPLEX128_P_S, SC_LONG_DOUBLE_COMPLEX_P_I);
+#endif
 
        _SC_set_format_defaults();
 
