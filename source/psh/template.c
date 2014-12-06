@@ -15,7 +15,6 @@
 #define NMAX 100
 
 #define I_BOOL        2
-#define I_NON         3
 #define I_CHAR        (I_BOOL+N_PRIMITIVE_CHAR)
 #define I_FIX         (I_CHAR+N_PRIMITIVE_FIX)   /* last fixed point type */
 #define I_FLOAT       (I_FIX+N_PRIMITIVE_FP)     /* last floating point type */
@@ -26,6 +25,7 @@
 #define Separator(_f)  fprintf(_f, "/*--------------------------------------------------------------------------*/\n\n")
 
 typedef struct s_template template;
+typedef struct s_typinf typinf;
 
 struct s_template
    {int tmn;
@@ -37,62 +37,38 @@ struct s_template
     char *args;
     char **body;};
 
-static char
- *names[]  = { NULL, NULL, "bool",
-	       "char", "wchar",
-	       "int8", "shrt", "int", "lng", "ll",
-	       "flt", "dbl", "ldbl",
-	       "fcx", "dcx", "ldcx",
-	       "qut", "ptr", NULL, "str" },
- *types[]  = { NULL, NULL, "bool",
-	       "char", "wchar_t",
-	       "int8_t", "short", "int", "long", "long long",
-	       "float", "double", "long double",
-	       "float _Complex", "double _Complex",
-	       "long double _Complex",
-	       "quaternion", "void *", NULL, "char *" },
- *stypes[] = { NULL, NULL, "bool",
-	       "signed char", "wchar_t",
-	       "int8_t", "signed short", "signed int",
-               "signed long", "signed long long",
-	       "float", "double", "long double",
-	       "float _Complex", "double _Complex",
-	       "long double _Complex",
-	       "quaternion", "void *", NULL, "char *" },
- *utypes[] = { NULL, NULL, "bool",
-	       "unsigned char", "wchar_t",
-	       "u_int8_t", "unsigned short", "unsigned int",
-               "unsigned long", "unsigned long long",
-	       "float", "double", "long double",
-	       "float _Complex", "double _Complex",
-	       "long double _Complex",
-	       "quaternion", "void *", NULL, "char *" },
- *comp[]   = { NULL, NULL, "bool",
-	       "char", "wchar_t",
-	       "int8_t", "short", "int", "long", "long long",
-	       "float", "double", "long double",
-	       "float", "double",
-	       "long double",
-	       "double", "void *", NULL, "char *" },
- *promo[] =  { NULL, NULL, "int",
-               "int", "int",
-	       "int", "int", "int", "long", "long long",
-	       "double", "double", "long double",
-	       "float _Complex", "double _Complex",
-	       "long double _Complex",
-	       "quaternion", "void *", NULL, "char *" },
- *mn[]    =  { NULL, NULL, "BOOL_MIN",
-	       "SCHAR_MIN", "WCHAR_MIN",
-	       "INT8_MIN", "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
-	       "-FLT_MAX", "-DBL_MAX", "-LDBL_MAX",
-	       "-FLT_MAX", "-DBL_MAX", "-LDBL_MAX",
-	       "-DBL_MAX", "-LLONG_MAX" },
- *mx[]    =  { NULL, NULL, "BOOL_MAX",
-	       "SCHAR_MAX", "WCHAR_MAX",
-	       "INT8_MAX", "SHRT_MAX", "INT_MAX", "LONG_MAX", "LLONG_MAX",
-	       "FLT_MAX", "DBL_MAX", "LDBL_MAX",
-	       "FLT_MAX", "DBL_MAX", "LDBL_MAX",
-	       "DBL_MAX", "LLONG_MAX" };
+struct s_typinf
+   {int id;
+    char *name;
+    char *type;
+    char *stype;
+    char *utype;
+    char *comp;
+    char *promo;
+    char *mn;
+    char *mx;};
+
+static typinf
+ ti[] = { {0,  NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+	  {1,  NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+	  {2,  "bool", "bool", "bool", "bool", "bool", "int", "BOOL_MIN", "BOOL_MAX"},
+	  {3,  "char", "char", "signed char", "unsigned char", "char", "int", "SCHAR_MIN", "SCHAR_MAX"},
+	  {4,  "wchr", "wchar_t", "wchar_t", "wchar_t", "wchar_t", "int", "WCHAR_MIN", "WCHAR_MAX"},
+	  {5,  "int8", "int8_t", "int8_t", "u_int8_t", "int8_t", "int", "INT8_MIN", "INT8_MAX"},
+	  {6,  "shrt", "short", "signed short", "unsigned short", "short", "int", "SHRT_MIN", "SHRT_MAX"},
+	  {7,  "int",  "int", "signed int", "unsigned int", "int", "int", "INT_MIN", "INT_MAX"},
+	  {8,  "lng",  "long", "signed long", "unsigned long", "long", "long", "LONG_MIN", "LONG_MAX"},
+	  {9,  "ll",   "long long", "signed long long", "unsigned long long", "long long", "long long", "LLONG_MIN", "LLONG_MAX"},
+	  {10, "flt",  "float", "float", "float", "float", "double", "-FLT_MAX", "FLT_MAX"},
+	  {11, "dbl",  "double", "double", "double", "double", "double", "-DBL_MAX", "DBL_MAX"},
+	  {12, "ldbl", "long double", "long double", "long double", "long double", "long double", "-LDBL_MAX", "LDBL_MAX"},
+	  {13, "fcx",  "float _Complex", "float _Complex", "float _Complex", "float", "float _Complex", "-FLT_MAX", "FLT_MAX"},
+	  {14, "dcx",  "double _Complex", "double _Complex", "double _Complex", "double", "double _Complex", "-DBL_MAX", "DBL_MAX"},
+	  {15, "ldcx", "long double _Complex", "long double _Complex", "long double _Complex", "long double", "long double _Complex", "-LDBL_MAX", "LDBL_MAX"},
+	  {16, "qut",  "quaternion", "quaternion", "quaternion", "double", "quaternion", "-DBL_MAX", "DBL_MAX"},
+	  {17, "ptr",  "void *", "void *", "void *", "void *", "void *", "-LLONG_MAX", "LLONG_MAX"},
+	  {18, NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+	  {19, "str",  "char *", "char *", "char *", "char *", "char *", "-LLONG_MAX", "LLONG_MAX"} };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -101,7 +77,7 @@ static char
 
 template *make_template(char *proto, int nl, char **body,
 			char *tmn, char *tmx, int ln)
-   {int i, n;
+   {int i, id, n;
     char rtype[BFLRG];
     char *p, *args, *fname, **sa;
     template *t;
@@ -113,11 +89,12 @@ template *make_template(char *proto, int nl, char **body,
 
 /* reduce the type range names to indeces */
     for (i = 0; i < N_TYPES; i++)
-        {if (types[i] != NULL)
-	    {if (strcmp(tmn, types[i]) == 0)
-	        t->tmn = i;
-	     else if (strcmp(tmx, types[i]) == 0)
-	        t->tmx = i;};};
+        {id = ti[i].id;
+	 if (ti[i].type != NULL)
+	    {if (strcmp(tmn, ti[i].type) == 0)
+	        t->tmn = id;
+	     else if (strcmp(tmx, ti[i].type) == 0)
+	        t->tmx = id;};};
 
 /* parse out the prototype */
     p = strtok(proto, "(\n\r");
@@ -233,15 +210,16 @@ static void write_fnc_instance(FILE *fp, int id, template *t)
     fname = t->fname;
     args  = t->args;
 
-    fprintf(fp, "static %s %s_%s(%s)\n", rtype, fname, names[id], args);
+    fprintf(fp, "static %s %s_%s(%s)\n", rtype, fname,
+	    ti[id].name, args);
     for (i = 0; i < nl; i++)
         {nstrncpy(s, BFLRG, body[i], -1);
-	 p = subst(s, "<TYPE>",     types[id],  -1);
-	 p = subst(p, "<SIGNED>",   stypes[id], -1);
-	 p = subst(p, "<UNSIGNED>", utypes[id], -1);
-	 p = subst(p, "<CTYPE>",    comp[id],   -1);
-	 p = subst(p, "<MIN>",      mn[id],     -1);
-	 p = subst(p, "<MAX>",      mx[id],     -1);
+	 p = subst(s, "<TYPE>",     ti[id].type,  -1);
+	 p = subst(p, "<SIGNED>",   ti[id].stype, -1);
+	 p = subst(p, "<UNSIGNED>", ti[id].utype, -1);
+	 p = subst(p, "<CTYPE>",    ti[id].comp,  -1);
+	 p = subst(p, "<MIN>",      ti[id].mn,    -1);
+	 p = subst(p, "<MAX>",      ti[id].mx,    -1);
 	 fputs(p, fp);};
 
     fprintf(fp, "\n");
@@ -254,16 +232,14 @@ static void write_fnc_instance(FILE *fp, int id, template *t)
 /* WRITE_FNC_DECL - write the declaration of the template array */
 
 static void write_fnc_decl(FILE *fp, template **tl, int it, int nt)
-   {int i, lt, nl, ok, tmn, tmx;
-    char **body, *rtype, *fname, *args;
+   {int i, id, lt, ok, tmn, tmx;
+    char *rtype, *fname, *args;
     template *t;
 
     t = tl[it];
     if (t == NULL)
        return;
 
-    nl    = t->nl;
-    body  = t->body;
     rtype = t->rtype;
     fname = t->fname;
     args  = t->args;
@@ -277,6 +253,7 @@ static void write_fnc_decl(FILE *fp, template **tl, int it, int nt)
     fprintf(fp, " %s_fnc[] = {\n", fname);
     for (i = 0; i < N_TYPES; i++)
         {ok = FALSE;
+	 id = i;
 
 /* scan templates for this type */
 	 for (lt = it; lt < nt; lt++)
@@ -284,14 +261,15 @@ static void write_fnc_decl(FILE *fp, template **tl, int it, int nt)
 	      if ((t == NULL) || (strcmp(t->fname, fname) != 0))
 		 continue;
 
-	      body = t->body;
-	      tmn  = t->tmn;
-	      tmx  = t->tmx;
-	      if ((types[i] != NULL) && (tmn <= i) && (i <= tmx))
+	      tmn = t->tmn;
+	      tmx = t->tmx;
+	      if ((ti[i].type != NULL) && (tmn <= id) && (id <= tmx))
 		 {if (i == N_TYPES-1)
-		     fprintf(fp, "                %s_%s\n", fname, names[i]);
+		     fprintf(fp, "                %s_%s\n",
+			     fname, ti[i].name);
 		  else
-		     fprintf(fp, "                %s_%s,\n", fname, names[i]);
+		     fprintf(fp, "                %s_%s,\n",
+			     fname, ti[i].name);
 		  ok = TRUE;
 		  break;};};
 
@@ -327,7 +305,7 @@ static void write_fnc(FILE *fp, template **tl, int it, int nt)
     tmx = t->tmx;
 
     for (i = tmn; i <= tmx; i++)
-	{if (types[i] != NULL)
+	{if (ti[i].type != NULL)
 	    write_fnc_instance(fp, i, t);};
 
     return;}
@@ -357,22 +335,19 @@ static void write_fnc_decls(FILE *fp, template **tl, int it, int nt)
 static void write_switch_clause(FILE *fp, int id, template *t)
    {int i, nl;
     char s[BFLRG], u[BFLRG];
-    char **body, *rtype, *fname, *args, *p;
+    char **body, *p;
 
-    nl    = t->nl;
-    body  = t->body;
-    rtype = t->rtype;
-    fname = t->fname;
-    args  = t->args;
+    nl   = t->nl;
+    body = t->body;
 
     fprintf(fp, "        case %d :\n", id);
 
     for (i = 0; i < nl; i++)
-        {nstrncpy(s, BFLRG, body[i], -1);
-	 p = subst(s, "<TYPE>", types[id], -1);
-	 p = subst(p, "<CTYPE>", comp[id], -1);
-	 p = subst(p, "<MIN>", mn[id], -1);
-	 p = subst(p, "<MAX>", mx[id], -1);
+	{nstrncpy(s, BFLRG, body[i], -1);
+	 p = subst(s, "<TYPE>",  ti[i].type, -1);
+	 p = subst(p, "<CTYPE>", ti[i].comp, -1);
+	 p = subst(p, "<MIN>",   ti[i].mn,   -1);
+	 p = subst(p, "<MAX>",   ti[i].mx,   -1);
 
 	 nstrncpy(u, BFLRG, "          ", -1);
 	 nstrcat(u, BFLRG, p);
@@ -390,13 +365,11 @@ static void write_switch_clause(FILE *fp, int id, template *t)
 /* WRITE_SWITCH - write switch based template */
 
 static void write_switch(FILE *fp, template *t)
-   {int i, nl;
-    char **body, *rtype, *fname, *args;
+   {int i;
+    char *rtype, *fname, *args;
 
     Separator(fp);
 
-    nl    = t->nl;
-    body  = t->body;
     rtype = t->rtype;
     fname = t->fname;
     args  = t->args;
@@ -408,8 +381,8 @@ static void write_switch(FILE *fp, template *t)
     fprintf(fp, "       {\n");
 
     for (i = 0; i < N_TYPES; i++)
-        {if (types[i] != NULL)
-            write_switch_clause(fp, i, t);};
+        {if (ti[i].type != NULL)
+	    write_switch_clause(fp, i, t);};
 
 /* add empty default clause */
     fprintf(fp, "         default :\n");
@@ -432,15 +405,17 @@ static void write_switch(FILE *fp, template *t)
 
 /* WRITE_VA_ARG_CLAUSE - write the variable arg clause for type ID */
 
-static void write_va_arg_clause(FILE *fp, int id)
-   {
+static void write_va_arg_clause(FILE *fp, int i)
+   {int id;
+
+    id = ti[i].id;
 
     fprintf(fp, "       case %d:                                    \\\n",
 	    id);
     fprintf(fp, "            {%s *_pv = (%s *) (_d);                \\\n",
-	    types[id], types[id]);
+	    ti[i].type, ti[i].type);
     fprintf(fp, "             _pv[_n] = va_arg(__a__, %s);};        \\\n",
-	    promo[id]);
+	    ti[i].promo);
     fprintf(fp, "            break;                                 \\\n");
 
     return;}
@@ -451,7 +426,7 @@ static void write_va_arg_clause(FILE *fp, int id)
 /* WRITE_VA_ARG - write the va arg routines */
 
 static void write_va_arg(FILE *fp)
-   {int i;
+   {int i, id;
 
 /* if va_arg supports complex types */
     fprintf(fp, "#ifdef HAVE_COMPLEX_VA_ARG\n");
@@ -467,8 +442,9 @@ static void write_va_arg(FILE *fp)
     fprintf(fp, "    switch (_lid) {                                  \\\n");
 
     for (i = 0; i < N_TYPES; i++)
-        {if (types[i] != NULL)
-            write_va_arg_clause(fp, i);};
+        {if (ti[i].type != NULL)
+	    {id = i;
+             write_va_arg_clause(fp, id);};};
 
     fprintf(fp, "       }                                             \\\n");
     fprintf(fp, "   }\n");
@@ -487,12 +463,14 @@ static void write_va_arg(FILE *fp)
     fprintf(fp, "    switch (_lid) {                                  \\\n");
 
     for (i = 0; i <= I_FLOAT; i++)
-        {if (types[i] != NULL)
-            write_va_arg_clause(fp, i);};
+        {if (ti[i].type != NULL)
+	    {id = i;
+	     write_va_arg_clause(fp, id);};};
 
     for (i = I_COMPLEX+1; i < N_TYPES; i++)
-        {if (types[i] != NULL)
-            write_va_arg_clause(fp, i);};
+        {if (ti[i].type != NULL)
+	    {id = i;
+	     write_va_arg_clause(fp, id);};};
 
     fprintf(fp, "       }                                             \\\n");
     fprintf(fp, "   }\n");
@@ -543,6 +521,7 @@ static template *parse_tmpl(FILE *fp, int *flo)
 		 tmx = STRSAVE(strtok(NULL, "<|>"));}
 	     else
 	        {st = fseek(fp, ad, SEEK_SET);
+                 ASSERT(st == 0);
 		 break;};
 	     fpr = FALSE;}
 	 else if (nt == 1)

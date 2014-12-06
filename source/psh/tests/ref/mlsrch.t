@@ -36,7 +36,7 @@ static int PM_find_index_char(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_wchar(void *p, double f, int n)
+static int PM_find_index_wchr(void *p, double f, int n)
    {int indx;
     wchar_t *d, v;
     long i, j;
@@ -254,7 +254,7 @@ static int _PM_find_index_fast_char(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_wchar(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_wchr(void *p, double f, int n, long *plast)
    {int last, indx;
     wchar_t *d, v;
     long imn, imx;
@@ -475,7 +475,7 @@ static void _PM_find_value_char(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_wchar(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_wchr(int nx, void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -997,7 +997,7 @@ static void PM_min_max_char(void *p, int n, void *pn, void *px, int *imn, int *i
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_wchar(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_wchr(void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     wchar_t *d, *pvn, *pvx, vn, vx, v;
     d   = (wchar_t *) p;
@@ -1275,7 +1275,7 @@ static PFPM_find_index
                 NULL,
                 NULL,
                 PM_find_index_char,
-                PM_find_index_wchar,
+                PM_find_index_wchr,
                 PM_find_index_int8,
                 PM_find_index_shrt,
                 PM_find_index_int,
@@ -1303,7 +1303,7 @@ static PF_PM_find_index_fast
                 NULL,
                 NULL,
                 _PM_find_index_fast_char,
-                _PM_find_index_fast_wchar,
+                _PM_find_index_fast_wchr,
                 _PM_find_index_fast_int8,
                 _PM_find_index_fast_shrt,
                 _PM_find_index_fast_int,
@@ -1332,7 +1332,7 @@ static PF_PM_find_value
                 NULL,
                 NULL,
                 _PM_find_value_char,
-                _PM_find_value_wchar,
+                _PM_find_value_wchr,
                 _PM_find_value_int8,
                 _PM_find_value_shrt,
                 _PM_find_value_int,
@@ -1362,7 +1362,7 @@ static PFPM_min_max
                 NULL,
                 NULL,
                 PM_min_max_char,
-                PM_min_max_wchar,
+                PM_min_max_wchr,
                 PM_min_max_int8,
                 PM_min_max_shrt,
                 PM_min_max_int,

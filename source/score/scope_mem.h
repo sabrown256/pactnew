@@ -59,6 +59,18 @@
 # define SC_MEM_ALIGN_SIZE   sizeof(long double);
 #endif
 
+#ifdef USE_FULL_MM
+#define _SC_DEF_MM_METHOD_                                                  \
+    {_SC_nalloc_wl, _SC_alloc_wl, _SC_realloc_wl,                           \
+     _SC_free_wl, _SC_arrlen_wl,                                            \
+     _SC_alloc_nl, _SC_realloc_nl, _SC_free_nl}
+#else
+#define _SC_DEF_MM_METHOD_                                                  \
+    {_SC_nalloc_ws, _SC_alloc_ws, _SC_realloc_ws,                           \
+     _SC_free_ws, _SC_arrlen_ws,                                            \
+     _SC_alloc_ns, _SC_realloc_ns, _SC_free_ns}
+#endif
+
 /* memory manager constants */
 
 #define SC_MEM_ID         0xCAFEFEED
