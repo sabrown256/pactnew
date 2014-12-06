@@ -317,6 +317,10 @@ void PA_cpp_default(void)
  *   type  = (char *) PA_cpp_name_to_value("SC_DOUBLE_S");  returns "double"
  */
 
+#if 0
+    DEF_PANACEA_TYPES;
+#else
+
 /* install the actual types */
     PA_cpp_add_name(SC_CHAR_S,      PA_gs.cpp_type_SC, SC_CHAR_I);
     PA_cpp_add_name(SC_SHORT_S,     PA_gs.cpp_type_SC, SC_SHORT_I);
@@ -376,6 +380,7 @@ void PA_cpp_default(void)
     PA_cpp_add_name("SC_DOUBLE_P_S",  PA_gs.cpp_type_S, SC_DOUBLE_P_S);
     PA_cpp_add_name("SC_STRUCT_S",    PA_gs.cpp_type_S, SC_STRUCT_S);
     PA_cpp_add_name("SC_UNKNOWN_S",   PA_gs.cpp_type_S, SC_UNKNOWN_S);
+#endif
 
     PA_cpp_add_name("PA_INFO_TYPE",         PA_gs.cpp_info, PA_INFO_TYPE);
     PA_cpp_add_name("PA_INFO_N_DIMS",       PA_gs.cpp_info, PA_INFO_N_DIMS);

@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "libpsh.c"
+#include "libtyp.c"
 
 #define NO_DEFAULT_VALUE "----"
 
@@ -26,11 +27,6 @@ enum e_doc_kind
    {DK_HTML = 0, DK_MAN};
 
 typedef enum e_doc_kind doc_kind;
-
-enum e_type_kind
-   {TK_PRIMITIVE = 0, TK_ENUM, TK_STRUCT, TK_UNION};
-
-typedef enum e_type_kind type_kind;
 
 enum e_fparam
    {FP_ANY = 0,
@@ -50,7 +46,6 @@ typedef enum e_fdir fdir;
 typedef struct s_str_list str_list;
 typedef struct s_statedes statedes;
 typedef struct s_bindes bindes;
-typedef struct s_typdes typdes;
 typedef struct s_mbrdes mbrdes;
 typedef struct s_tn_list tn_list;
 typedef struct s_der_list der_list;
@@ -66,12 +61,6 @@ struct s_mbrdes
     char dim[BFSML];              /* member dimensions */
     char cast_mbr[BFSML];         /* member with cast info */
     char *text;};                 /* full text of member */
-
-struct s_typdes
-   {char *c;
-    char *f;
-    char *gen;
-    char *defv;};
 
 struct s_str_list
    {int n;
@@ -150,7 +139,10 @@ struct s_statedes
     der_list *structs;               /* all bound structs */
     der_list *denums;                /* all defined enums */
     der_list *dstructs;              /* all defined structs */
+    typdes *stl;                     /* standard type database */
+    typdes *atl;                     /* alias type database */
     char path[BFLRG];                /* path for output files */
+    char tytab[BFLRG];               /* path to type table file */
     str_list defv;};
 
 struct s_bindes
@@ -168,9 +160,6 @@ struct s_bindes
 
 static int
  nbd = 0;
-
-static char
- *tykind[4] = {"primitive", "enum", "struct", "union"};
 
 static bindes
  gbd[N_MODES];
@@ -615,11 +604,12 @@ static void add_type(int iref, char *cty, char *fty, char *gty, char *defv)
 
 static void add_type_(int iref, typdes *td)
    {int i, j;
-    char *cty, *fty, *gty, *defv;
+    char *cty, *fty, *defv;
+    type_kind gty;
 
-    cty  = td->c;
-    fty  = td->f;
-    gty  = td->gen;
+    cty  = td->type;
+    fty  = td->f90;
+    gty  = td->knd;
     defv = td->defv;
 
     i = iref;
@@ -635,7 +625,7 @@ static void add_type_(int iref, typdes *td)
 
 /* add types for remaining modes */
     for (; i < nbd; i++)
-        str_lst_add(&gbd[i].types, gty);
+        str_lst_add(&gbd[i].types, tykind[gty]);
 
     return;}
 
@@ -688,8 +678,18 @@ static char *lookup_type(char ***val, int *pit, char *ty, bindes *bo)
 
 /* INIT_TYPES - initialize the type map */
 
-static void init_types(int iref)
+static void init_types(statedes *st, int iref)
    {
+
+    if (IS_NULL(st->tytab) == FALSE)
+       {parse_type_table(st->tytab);
+
+	st->stl = stl;
+	st->atl = atl;};
+
+#if 0
+    DEF_GENERATED_TYPES;
+#else
 
     add_type(iref, "void",        "",            "",                 "NULL");
     add_type(iref, "bool",        "logical",     "SC_BOOL_I",        "FALSE");
@@ -758,6 +758,8 @@ static void init_types(int iref)
     add_type(iref, "long double _Complex *", "complex(16)-A",
 	     "SC_LONG_DOUBLE_COMPLEX_P_I", "NULL");
 
+#endif
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -774,26 +776,26 @@ static void add_derived_types(int iref, char **sbi)
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
 	 if (blank_line(sb) == FALSE)
-	    {if (strncmp(sb, "derived ", 8) == 0)
-		{nstrncpy(s, BFLRG, sb, -1);
-		 ta   = tokenize(s, " \t", 0);
-		 td.c    = ta[1];
-		 td.f    = ta[2];
-		 td.gen  = ta[3];
-		 td.defv = ta[4];}
-	     else if (strncmp(sb, "enum ", 5) == 0)
+	    {if (strncmp(sb, "enum ", 5) == 0)
 	        {nstrncpy(s, BFLRG, sb, -1);
-		 ta   = tokenize(s, " \t", 0);
-		 td.c    = ta[1];
-		 td.f    = "integer";
-		 td.gen  = tykind[TK_ENUM];
+		 ta      = tokenize(s, " \t", 0);
+		 td.type = ta[1];
+		 td.f90  = "integer";
+		 td.knd  = TK_ENUM;
 		 td.defv = ta[2];}
 	     else if (strncmp(sb, "struct ", 7) == 0)
 	        {nstrncpy(s, BFLRG, sb, -1);
-		 ta   = tokenize(s, " \t", 0);
-		 td.c    = ta[1];
-		 td.f    = tykind[TK_STRUCT];
-		 td.gen  = tykind[TK_STRUCT];
+		 ta      = tokenize(s, " \t", 0);
+		 td.type = ta[1];
+		 td.f90  = tykind[TK_STRUCT];
+		 td.knd  = TK_STRUCT;
+		 td.defv = NULL;}
+	     else if (strncmp(sb, "union ", 6) == 0)
+	        {nstrncpy(s, BFLRG, sb, -1);
+		 ta      = tokenize(s, " \t", 0);
+		 td.type = ta[1];
+		 td.f90  = tykind[TK_UNION];
+		 td.knd  = TK_UNION;
 		 td.defv = NULL;}
 	     else
 	        ta = NULL;
@@ -1938,7 +1940,7 @@ static int blang(statedes *st, char *pck, char *fbi, int iref)
     char **sbi;
     bindes *pb;
 
-    init_types(iref);
+    init_types(st, iref);
 
     rv = FALSE;
 
@@ -1983,18 +1985,23 @@ static int blang(statedes *st, char *pck, char *fbi, int iref)
 int main(int c, char **v)
    {int i, ib, iref, rv, err;
     char pck[BFLRG], msg[BFLRG];
-    char *fbi;
+    char *fbi, *t;
     bindes *pb;
     statedes st = {0, 0, 0, 0,
                    {FALSE, FALSE, FALSE, FALSE},
 		   NULL,
 		   NULL, NULL, NULL, NULL, NULL, NULL,
-		   NULL, NULL, NULL, };
+		   NULL, NULL, NULL, NULL,
+		   NULL, NULL, };
 
     nbd = 0;
 
     for (i = 0; i < N_MODES; i++)
         st.no[i] = TRUE;
+
+    t = getenv("DB_TYPES");
+    if (t != NULL)
+       nstrncpy(st.tytab, BFLRG, t, -1);
 
 /* register the language bindings */
     iref = register_c(TRUE, &st);
@@ -2014,10 +2021,11 @@ int main(int c, char **v)
 	    fbi = v[++i];
 
 	 else if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: blang -b <bindings> [-h] [-p <dir>]\n");
+            {printf("Usage: blang -b <bindings> [-h] [-p <dir>] [-t <file>]\n");
              printf("   b    file containing binding specifications\n");
              printf("   h    this help message\n");
              printf("   p    directory for generated files\n");
+             printf("   t    master type table\n");
              printf("\n");
 
 /* let each binding process its own help */
@@ -2029,7 +2037,10 @@ int main(int c, char **v)
              return(err);}
 
 	 else if (strcmp(v[i], "-p") == 0)
-            nstrncpy(st.path, BFLRG, v[++i], -1);};
+            nstrncpy(st.path, BFLRG, v[++i], -1);
+
+	 else if (strcmp(v[i], "-t") == 0)
+            nstrncpy(st.tytab, BFLRG, v[++i], -1);};
 
 /* let each binding process its own command line args */
     err = 0;

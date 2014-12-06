@@ -290,6 +290,8 @@ enum e_SC_type_method
 
 typedef enum e_SC_type_method SC_type_method;
 
+/* GOTCHA: replace with type_group from libtyp.c */
+
 enum e_SC_kind
    {KIND_CHAR = 0,
     KIND_BOOL,

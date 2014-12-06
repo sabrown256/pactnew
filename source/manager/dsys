@@ -1166,6 +1166,7 @@ switch ($Cmnd)
            flog $Log ./ccw -g blang.c -o $BinDir/blang
            flog $Log ./ccw -g rpath.c -o $BinDir/rpath
            flog $Log ./ccw -g -I../score -I../manager template.c -o $BinDir/template
+           flog $Log cp types.db $EtcDir
         else
            NoteD $Log ""
            NoteD $Log "Failed to build pco utility - exiting"
@@ -2460,7 +2461,7 @@ CFG_DONE:
         set EtcFiles = ( $EtcFiles configured cfg.conn )
         if ($strict == FALSE) then
            set EtcFiles = ( $EtcFiles do-run-db cfg.db cfg.pco cfg.pl )
-           set EtcFiles = ( $EtcFiles cfg.log package )
+           set EtcFiles = ( $EtcFiles cfg.log package types.db )
            set EtcFiles = ( $EtcFiles Makefile make-def make-macros )
            set EtcFiles = ( $EtcFiles env-pact.csh env-pact.sh )
            set EtcFiles = ( $EtcFiles env-pact.dk env-pact.mod )
