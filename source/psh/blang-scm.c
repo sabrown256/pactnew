@@ -43,26 +43,29 @@ static void scheme_type_name_list(tns_list *na, tn_list *nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCHEME_GET_TYPE - get the Scheme type name for TY from text TX */
+/* LOOKUP_SCHEME_TYPE - get the Scheme type name for T into A */
 
-static void scheme_get_type(char *a, int nc, char *ty, char *tx)
-   {char s[BFSML];
-    tns_list tl;
-    tn_list tc;
 
-    if (strcmp(ty, tykind[TK_ENUM]) == 0)
-       nstrncpy(a, nc, "SC_ENUM_I", -1);
+int lookup_scheme_type(char *a, int nc, char *t)
+   {int rv;
+    typdes *td;
 
-    else if (strcmp(ty, tykind[TK_STRUCT]) == 0)
-       {snprintf(s, BFSML, "struct s_%s", tx);
-	type_name_list(s, &tc);
-	scheme_type_name_list(&tl, &tc);
-	nstrncpy(a, nc, tl.inm, -1);}
+    rv = FALSE;
 
-    else
-       nstrncpy(a, nc, ty, -1);
+    td = lookup_type_info(t);
+    if (td != NULL)
+       {if (td->knd == TK_ENUM)
+	   nstrncpy(a, nc, "SC_ENUM_I", -1);
 
-    return;}
+	else if (td->knd == TK_UNION)
+	   nstrncpy(a, nc, "SC_UNION_I", -1);
+
+	else
+	   nstrncpy(a, nc, td->typ_i, -1);
+
+	rv = TRUE;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -72,34 +75,30 @@ static void scheme_get_type(char *a, int nc, char *ty, char *tx)
  */
 
 static void cs_type(char *a, int nc, farg *al, int drf)
-   {char t[BFLRG], ty[BFLRG];
-    char *sty, *dty;
+   {int ok;
+    char t[BFLRG], ty[BFLRG];
 
     if (drf == TRUE)
        deref(ty, BFLRG, al->type);
     else
        nstrncpy(ty, BFLRG, al->type, -1);
 
-    sty = lookup_type(NULL, NULL, ty, gbd+MODE_S);
-    if (IS_NULL(sty) == FALSE)
-       scheme_get_type(a, nc, sty, ty);
+    ok = lookup_scheme_type(a, nc, ty);
+    if (ok == FALSE)
+       {if (strcmp(ty, "void *") == 0)
+	   nstrncpy(a, nc, "SC_VOID_I", -1);
 
-    else if (strcmp(ty, "void *") == 0)
-       nstrncpy(a, nc, "SC_VOID_I", -1);
+	else if (is_func_ptr(ty, 3) == TRUE)
+	   nstrncpy(a, nc, "SC_POINTER_I", -1);
 
-    else if (is_func_ptr(ty, 3) == TRUE)
-       nstrncpy(a, nc, "SC_POINTER_I", -1);
+	else if (strchr(ty, '*') != NULL)
+	   {deref(t, BFLRG, ty);
+	    ok = lookup_scheme_type(a, nc, t);
+	    if (ok == FALSE)
+	       nstrncpy(a, nc, "SC_POINTER_I", -1);}
 
-    else if (strchr(ty, '*') != NULL)
-       {deref(t, BFLRG, ty);
-	dty = lookup_type(NULL, NULL, t, gbd+MODE_S);
-	if (dty != NULL)
-	   scheme_get_type(a, nc, dty, t);
 	else
-	   nstrncpy(a, nc, "SC_POINTER_I", -1);}
-
-    else
-       nstrncpy(a, nc, "SC_UNKNOWN_I", -1);
+	   nstrncpy(a, nc, "SC_UNKNOWN_I", -1);};
 
     return;}
 
@@ -433,7 +432,8 @@ static void scheme_array_return(char *t, int nc, fdecl *dcl)
 static void scheme_scalar_return(char *t, int nc,
 				 fdecl *dcl, fparam knd, char *so)
    {char dty[BFLRG];
-    char *ty, *sty;
+    char *ty;
+    typdes *td;
 
     t[0] = '\0';
 
@@ -445,9 +445,8 @@ static void scheme_scalar_return(char *t, int nc,
        {if (IS_NULL(so) == FALSE)
 	   {switch (knd)
 	       {case FP_ANY :
-		     sty = lookup_type(NULL, NULL, ty, gbd+MODE_S);
-		     if ((sty != NULL) &&
-			 (strcmp(sty, tykind[TK_ENUM]) == 0))
+		     td = lookup_type_info(ty);
+		     if ((td != NULL) && (td->knd == TK_ENUM))
 		        snprintf(t, nc, "    _lo = SS_mk_integer(si, _rv);\n");
 		     else
 		        {snprintf(t, nc,

@@ -713,8 +713,9 @@ void SC_init_base_types(void)
 
        SC_VOID_I                  = SC_type_register(SC_VOID_S,     KIND_OTHER,   B_T, 0,               0);
        SC_STRUCT_I                = SC_type_register(SC_STRUCT_S,   KIND_STRUCT,  B_F, 0,               0);
-       SC_FILE_I                  = SC_type_register(SC_FILE_S,     KIND_STRUCT,  B_F, sizeof(FILE),    0);
+       SC_FILE_I                  = SC_type_register(SC_FILE_S,     KIND_STRUCT,  B_T, sizeof(FILE),    0);
        SC_PCONS_P_I               = SC_type_register(SC_PCONS_P_S,  KIND_POINTER, B_F, szptr,           0);
+       SC_FILE_P_I                = SC_type_register(SC_FILE_P_S,   KIND_POINTER, B_F, szptr,           0);
 /* 36 */
 
 /* aliases */
@@ -738,7 +739,7 @@ void SC_init_base_types(void)
        SC_INT32_P_I      = SC_type_alias(SC_INT32_P_S,   SC_INT_P_I);
        SC_INT64_P_I      = SC_type_alias(SC_INT64_P_S,   SC_LONG_LONG_P_I);
 
-       SC_REAL_P_I       = SC_type_alias(SC_REAL_P_S,  SC_DOUBLE_P_I);
+       SC_REAL_P_I       = SC_type_alias(SC_REAL_P_S,     SC_DOUBLE_P_I);
        SC_FLOAT32_P_I    = SC_type_alias(SC_FLOAT32_P_S,  SC_FLOAT_P_I);
        SC_FLOAT64_P_I    = SC_type_alias(SC_FLOAT64_P_S,  SC_DOUBLE_P_I);
        SC_FLOAT128_P_I   = SC_type_alias(SC_FLOAT128_P_S, SC_LONG_DOUBLE_P_I);

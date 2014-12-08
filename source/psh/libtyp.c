@@ -9,6 +9,10 @@
  *    whack the "_t" for foo_t
  *    pointer versions have min/max  -LLONG_MAX  LLONG_MAX
  *   
+ *    exceptions for implied variables:
+ *        SC_CHAR_P_x   -> SC_STRING_x
+ *        SC_VOID_P_x   -> SC_POINTER_x
+ *
  *    KIND_CHAR/KIND_INT have
  *      signed       unsigned    variations
  *      int8_t       u_int8_t
@@ -44,6 +48,22 @@
 
 # define LIBTYP
 
+#define GET_TYPE(_t)                                                       \
+    ((strcmp(_t, "-") == 0) ? NULL : trim(_t, BOTH, " \t\""))
+
+/*--------------------------------------------------------------------------*/
+
+# ifndef SCOPE_SCORE_COMPILE
+
+#define N_PRIMITIVE_CHAR  2
+#define N_PRIMITIVE_FIX   5
+#define N_PRIMITIVE_FP    3
+#define N_PRIMITIVE_CPX   3
+#define N_PRIMITIVE_QUT   1
+
+#define N_PRIMITIVES     18   /* up through SC_POINTER_I */
+#define N_TYPES          20   /* up through SC_STRING_I */
+
 enum e_type_kind
    {TK_PRIMITIVE = 0, TK_ENUM, TK_STRUCT, TK_UNION};
 
@@ -78,79 +98,158 @@ struct s_typdes
     char *mn;       /* minimum value of type */
     char *mx;       /* maximum value of type */
     char *defv;     /* default value of type */
-    char *f90;};    /* F90 type name for the C type */
+    char *f90;      /* F90 type name for the C type */
+    char *promo;    /* type promoted to in calls */
+    char *comp;     /* unit type for composite types */
+    char *typ_i;    /* type index variable name, SC_INT_I */
+    char *typ_s;};  /* type name variable name, SC_INT_S */
+
+# endif
+
+/*--------------------------------------------------------------------------*/
+
+# ifndef SCOPE_SCORE_PREPROC
 
 static char
  *tykind[4] = {"primitive", "enum", "struct", "union"};
 
-static typdes
- *stl = NULL,
- *atl = NULL;
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FIX_TYPE_DESIGNATOR - make a properly named type designator
+ *                     - from raw string T
+ */
+
+static char *fix_type_designator(char *fmt, ...)
+   {int nc;
+    char t[BFLRG];
+    char *p, *rv;
+
+    VA_START(fmt);
+    VSNPRINTF(t, BFLRG, fmt);
+    VA_END;
+
+    upcase(t);
+    rv = subst(t, " ", "_", -1);
+    rv = subst(rv, "__", "_", -1);
+    
+/* fix hated _t types
+ * e.g. SC_INT32_T_I -> SC_INT32_I
+ * or   SC_INT32_T_P_I -> SC_INT32_P_I
+ */
+    nc = strlen(rv);
+    p  = rv + nc - 2;
+    if ((strcmp(p, "_I") == 0) || (strcmp(p, "_S") == 0))
+       {p -= 2;
+	if (strncmp(p, "_P", 2) == 0)
+	   p -= 2;
+	if (strncmp(p, "_T", 2) == 0)
+	   memmove(p, p+2, strlen(p)-1);};
+
+    rv = STRSAVE(rv);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PUSH_TYPE - push TD onto the type list LT */
+/* TYPE_TABLE - return a pointer to the type table */
 
-typdes *push_type(typdes *lt, typdes *td)
+typdes *type_table(typdes *td)
    {int nb;
     static int ni = 0;
-    static int nx = 10;
+    static int nx = 20;
+    static typdes *tl = NULL;
 
-    if (lt == NULL)
+    if (tl == NULL)
        {ni = 0;
-        lt = MAKE_N(typdes, nx);};
+        tl = MAKE_N(typdes, nx);};
 	
-    if ((ni % nx == 0) && (ni > 0))
-       {nb = ni/nx;
-	REMAKE(lt, typdes, (nb+1)*nx);};
+    if (((ni + 1) % nx == 0) && (ni > 0))
+       {nb = (ni + 1)/nx;
+	REMAKE(tl, typdes, (nb+1)*nx);};
 
     if (td != NULL)
-       lt[ni] = *td;
-    else
-       memset(lt+ni, 0, sizeof(typdes));
+       tl[ni++] = *td;
 
-    ni++;
+/* always leave the list NULL terminated */
+    memset(tl+ni, 0, sizeof(typdes));
 
-    return(lt);}
+    return(tl);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PUSH_TYPE_PTR - push a pointer type derived from TD onto LT */
+/* LOOKUP_TYPE_INFO - lookup and return a type from the type lists */
 
-typdes *push_type_ptr(typdes *lt, typdes *td)
-   {char t[BFLRG];
+typdes *lookup_type_info(char *ty)
+   {int i;
+    typdes *tl, *rv;
+
+    rv = NULL;
+    tl = type_table(NULL);
+
+    for (i = 0; tl[i].type != NULL; i++)
+        {if (strcmp(ty, tl[i].type) == 0)
+	    {rv = tl + i;
+	     break;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PUSH_TYPE_PTR - add a pointer type derived from TD to the type table */
+
+static void _push_type_ptr(typdes *td)
+   {char ti[BFSML], ts[BFSML];
     typdes tp;
 
     tp = *td;
 
-    snprintf(t, BFLRG, "%s *", tp.type);
-    tp.type = STRSAVE(t);
+    snprintf(ti, BFSML, "%s *", tp.type);
+    tp.type = STRSAVE(ti);
 
     tp.name = NULL;
-
-    tp.knd = TK_PRIMITIVE;
-    tp.g   = KIND_POINTER;
+    tp.g    = KIND_POINTER;
     tp.size = "sizeof";
     tp.ptr  = B_F;
     tp.mn   = NULL;
     tp.mx   = NULL;
-    tp.defv = NULL;
+    tp.defv = "NULL";
 
-    snprintf(t, BFLRG, "%s-A", tp.f90);
-    tp.f90 = STRSAVE(t);
+    if (td->f90 != NULL)
+       {if (strcmp(td->f90, "void") == 0)
+	   nstrncpy(ti, BFSML, "C_PTR-A", -1);
+	else
+	   snprintf(ti, BFSML, "%s-A", tp.f90);}
+    else
+       nstrncpy(ti, BFSML, "character-A", -1);
+    tp.f90 = STRSAVE(ti);
 
-    lt = push_type(lt, &tp);
+    if (strcmp(td->type, "char") == 0)
+       {nstrncpy(ti, BFSML, "SC_STRING_I", -1);
+	nstrncpy(ts, BFSML, "SC_STRING_S", -1);}
+    else if (strcmp(td->type, "void") == 0)
+       {nstrncpy(ti, BFSML, "SC_POINTER_I", -1);
+	nstrncpy(ts, BFSML, "SC_POINTER_S", -1);}
+    else
+       {snprintf(ti, BFSML, "SC_%s_P_I", td->type);
+	snprintf(ts, BFSML, "SC_%s_P_S", td->type);};
 
-    return(lt);}
+    tp.typ_i = fix_type_designator(ti);
+    tp.typ_s = fix_type_designator(ts);
+
+    type_table(&tp);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PARSE_STANDARD_TYPES - parse the master type table, type-table */
+/* _PARSE_STANDARD_TYPES - parse the master type table, type-table */
 
-void parse_standard_types(char **sa)
+static void _parse_standard_types(char **sa)
    {int i, in;
     char *s, **ta;
     typdes td;
@@ -163,13 +262,14 @@ void parse_standard_types(char **sa)
 	    continue;
 	 else if (strcmp(s, "standard = {") == 0)
 	    in = TRUE;
-	 else if (strcmp(s, "}") == 0)
+	 else if ((strcmp(s, "}") == 0) && (in == TRUE))
 	    {in = FALSE;
 	     break;}
 	 else if (in == TRUE)
 	    {ta = tokenize(s, " \t\n", 0);
-             td.type = trim(ta[0], BOTH, "\" ");
-             td.name = ta[1];
+
+             td.type = GET_TYPE(ta[0]);
+             td.name = GET_TYPE(ta[1]);
 
              td.knd = TK_PRIMITIVE;
 	     if (strcmp(ta[2], "CHAR") == 0)
@@ -200,34 +300,84 @@ void parse_standard_types(char **sa)
 	     else
 	        td.size = ta[3];
 
-             td.ptr = ((strcmp(ta[4], "TRUE") == 0) ||
-		       (strcmp(ta[4], "B_T") == 0));
+             td.ptr   = ((strcmp(ta[4], "TRUE") == 0) ||
+		         (strcmp(ta[4], "B_T") == 0));
 
-             td.mn   = ta[5];
-             td.mx   = ta[6];
-             td.defv = ta[7];
-             td.f90  = ta[8];
+             td.mn    = GET_TYPE(ta[5]);
+             td.mx    = GET_TYPE(ta[6]);
+             td.defv  = GET_TYPE(ta[7]);
+             td.f90   = GET_TYPE(ta[8]);
+	     td.promo = GET_TYPE(ta[9]);
+	     td.comp  = GET_TYPE(ta[10]);
 
-	     stl = push_type(stl, &td);
+	     td.typ_i = fix_type_designator("SC_%s_I", td.type);
+	     td.typ_s = fix_type_designator("SC_%s_S", td.type);
+
+	     type_table(&td);
 
 	     if (td.ptr == B_T)
-                stl = push_type_ptr(stl, &td);
+                _push_type_ptr(&td);
 
 	     FREE(ta);};};
-
-    stl = push_type(stl, NULL);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PARSE_ALIAS_TYPES - parse the master type table, type-table */
+/* INSTALL_DERIVED_TYPE - construct and install an entry
+ *                      - for a derived type
+ */
 
-void parse_alias_types(char **sa)
-   {int i, in;
-    char *s, **ta;
+void install_derived_type(char *name, type_kind knd, char *defv)
+   {char t[BFSML];
     typdes td;
+
+    if (knd == TK_ENUM)
+       {td.f90  = "integer";
+	td.g    = KIND_INT;
+	td.defv = defv;}
+    else if (knd == TK_STRUCT)
+       {td.f90  = tykind[knd];
+	td.g    = KIND_STRUCT;
+	td.defv = NULL;}
+    else if (knd == TK_UNION)
+       {td.f90  = tykind[knd];
+	td.g    = KIND_UNION;
+	td.defv = NULL;};
+	
+    td.type = name;
+    td.name = NULL;
+    td.knd  = knd;
+    td.size = NULL;
+    td.ptr  = B_F;
+    td.mn   = NULL;
+    td.mx   = NULL;
+
+    snprintf(t, BFSML, "G_%s_I", td.type);
+    upcase(t);
+    td.typ_i = STRSAVE(subst(t, " ", "_", -1));
+
+    snprintf(t, BFSML, "G_%s_S", td.type);
+    upcase(t);
+    td.typ_s = STRSAVE(subst(t, " ", "_", -1));
+
+    td.promo = NULL;
+    td.comp  = NULL;
+
+    type_table(&td);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PARSE_ALIAS_TYPES - parse the master type table, type-table */
+
+static void _parse_alias_types(char **sa)
+   {int i, in;
+    char *s, *p, **ta;
+    typdes td, *to;
 
     in = FALSE;
 
@@ -237,26 +387,30 @@ void parse_alias_types(char **sa)
         {s = trim(sa[i], BOTH, " \t\n");
 	 if (blank_line(s))
 	    continue;
-	 else if (strcmp(s, "standard = {") == 0)
+	 else if (strcmp(s, "alias = {") == 0)
 	    in = TRUE;
-	 else if (strcmp(s, "}") == 0)
+	 else if ((strcmp(s, "}") == 0) && (in == TRUE))
 	    {in = FALSE;
 	     break;}
 	 else if (in == TRUE)
 	    {ta = tokenize(s, " \t\n", 0);
-             td.type = ta[0];                   /* new */
-             td.name = ta[1];                   /* old */
-             td.ptr = ((strcmp(ta[4], "TRUE") == 0) ||
-		       (strcmp(ta[4], "B_T") == 0));
+	     p  = trim(ta[1], BOTH, " \"");
+	     to = lookup_type_info(p);
+	     if (to != NULL)
+	        {td = *to;
 
-	     atl = push_type(atl, &td);
+		 td.type = trim(ta[0], BOTH, " \"");    /* new */
+		 td.name = p;                           /* old */
 
-	     if (td.ptr == B_T)
-                atl = push_type_ptr(atl, &td);
+		 td.ptr = ((strcmp(ta[2], "TRUE") == 0) ||
+			   (strcmp(ta[2], "B_T") == 0));
 
-	     FREE(ta);};};
+		 type_table(&td);
 
-    atl = push_type(atl, NULL);
+		 if (td.ptr == B_T)
+		    _push_type_ptr(&td);
+
+		 FREE(ta);};};};
 
     return;}
 
@@ -270,12 +424,29 @@ void parse_type_table(char *tytab)
 
     sa = file_text(FALSE, tytab);
 
-    parse_standard_types(sa);
-    parse_alias_types(sa);
+    _parse_standard_types(sa);
+    _parse_alias_types(sa);
 
     lst_free(sa);
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FOREACH_TYPE - parse the master type table TYTAB */
+
+int foreach_type(int (*f)(typdes *td, void *a), void *a)
+   {int i, rv;
+    typdes *tl;
+
+    rv = TRUE;
+    tl = type_table(NULL);
+
+    for (i = 0; tl[i].type != NULL; i++)
+        rv &= f(tl+i, a);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -954,5 +1125,9 @@ void PA_cpp_default(void)
 
 #endif
 
+#undef UNDEFINED
+#undef GET_TYPE
+
+# endif
 #endif
 

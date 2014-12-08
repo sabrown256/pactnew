@@ -88,6 +88,7 @@ static void femit(FILE *fp, char *t, char *trm)
 
 static void cf_type(char *a, int nc, char *ty)
    {char *fty;
+    typdes *td;
 
     if (strcmp(ty, "char *") == 0)
        nstrncpy(a, nc, "string", -1);
@@ -96,7 +97,8 @@ static void cf_type(char *a, int nc, char *ty)
        nstrncpy(a, nc, "void *", -1);
 
     else
-       {fty = lookup_type(NULL, NULL, ty, gbd+MODE_F);
+       {td  = lookup_type_info(ty);
+	fty = (td != NULL) ? td->f90 : NULL;
 	if (fty != NULL)
 	   nstrncpy(a, nc, fty, -1);
 	else
@@ -116,6 +118,7 @@ static void fc_type(fdecl *dcl, char *wty, int nc,
    {fparam knd;
     char lty[BFLRG];
     char *pty, *arg, *ty;
+    typdes *td;
 
     if (al != NULL)
        {knd = FP_ANY;
@@ -127,7 +130,14 @@ static void fc_type(fdecl *dcl, char *wty, int nc,
 	arg = al->arg;
 	ty  = al->type;
 
-	pty = lookup_type(NULL, NULL, ty, bo);
+	td  = lookup_type_info(ty);
+	if (td != NULL)
+	   {if (strcmp(bo->lang, "fortran") == 0)
+	       pty = td->f90;
+	    else
+	       pty = td->type;}
+	else
+	   pty = NULL;
 
 /* handle variable arg list */
 	if (is_var_arg(ty) == TRUE)
@@ -1705,6 +1715,7 @@ static int register_fortran(int fl, statedes *st)
 	for (i = 0; i < NF; i++)
 	    pb->fp[i] = NULL;
 
+	pb->lang = "fortran";
 	pb->st   = st;
 	pb->cl   = cl_fortran;
 	pb->init = init_fortran;
