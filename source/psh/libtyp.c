@@ -161,19 +161,20 @@ typdes *type_table(typdes *td)
     static int nx = 20;
     static typdes *tl = NULL;
 
-    if (tl == NULL)
-       {ni = 0;
-        tl = MAKE_N(typdes, nx);};
-	
-    if (((ni + 1) % nx == 0) && (ni > 0))
-       {nb = (ni + 1)/nx;
-	REMAKE(tl, typdes, (nb+1)*nx);};
-
+/* if we are not adding anything just return the existing table */
     if (td != NULL)
-       tl[ni++] = *td;
+       {if (tl == NULL)
+	   {ni = 0;
+	    tl = MAKE_N(typdes, nx);};
+	
+	if (((ni + 1) % nx == 0) && (ni > 0))
+	   {nb = (ni + 1)/nx;
+	    REMAKE(tl, typdes, (nb+1)*nx);};
+
+	tl[ni++] = *td;
 
 /* always leave the list NULL terminated */
-    memset(tl+ni, 0, sizeof(typdes));
+	memset(tl+ni, 0, sizeof(typdes));};
 
     return(tl);}
 
@@ -422,12 +423,13 @@ static void _parse_alias_types(char **sa)
 void parse_type_table(char *tytab)
    {char **sa;
 
-    sa = file_text(FALSE, tytab);
+    if (type_table(NULL) == NULL)
+       {sa = file_text(FALSE, tytab);
 
-    _parse_standard_types(sa);
-    _parse_alias_types(sa);
+	_parse_standard_types(sa);
+	_parse_alias_types(sa);
 
-    lst_free(sa);
+	lst_free(sa);};
 
     return;}
 

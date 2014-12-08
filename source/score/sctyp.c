@@ -658,8 +658,9 @@ void SC_init_base_types(void)
     ONCE_SAFE(FALSE, NULL)
        szptr = sizeof(char *);
 
-#if 0
+#if 1
        DEF_STANDARD_TYPES;
+       DEF_STANDARD_ALIASES;
 #else
 
 /* these must have the same sequence/values as the static values
