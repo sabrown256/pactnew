@@ -35,14 +35,6 @@ typedef long double float128_t;
 
 /*--------------------------------------------------------------------------*/
 
-#define N_PRIMITIVE_CHAR  2
-#define N_PRIMITIVE_FIX   5
-#define N_PRIMITIVE_FP    3
-#define N_PRIMITIVE_CPX   3
-#define N_PRIMITIVE_QUT   1
-#define N_PRIMITIVES     18   /* up through SC_POINTER_I */
-#define N_TYPES          20   /* up through SC_STRING_I */
-
 #define SC_UNKNOWN_I                 SC_gs.ltyp[0].i
 #define SC_UNKNOWN_S                 SC_gs.ltyp[0].s
 #define SC_BIT_I                     SC_gs.ltyp[1].i
@@ -165,6 +157,9 @@ typedef long double float128_t;
 
 #define SC_FILE_I                    SC_gs.ltyp[29].i
 #define SC_FILE_S                    SC_gs.ltyp[29].s
+#define SC_FILE_P_I                  SC_gs.ltyp[29].p_i
+#define SC_FILE_P_S                  SC_gs.ltyp[29].p_s
+
 #define SC_INTEGER_I                 SC_gs.ltyp[30].i
 #define SC_INTEGER_S                 SC_gs.ltyp[30].s
 
@@ -217,7 +212,7 @@ typedef long double float128_t;
    { 33, "void",                 17, "void *" },                             \
    { 7,  "enum", },                                                          \
    { 34, "struct", },                                                        \
-   { 35, "FILE", },                                                          \
+   { 35, "FILE",                 40, "FILE *" },                             \
    { 7, "integer", },                                                        \
    { 11, "double", } }
 
@@ -290,20 +285,7 @@ enum e_SC_type_method
 
 typedef enum e_SC_type_method SC_type_method;
 
-/* GOTCHA: replace with type_group from libtyp.c */
-
-enum e_SC_kind
-   {KIND_CHAR = 0,
-    KIND_BOOL,
-    KIND_INT,
-    KIND_FLOAT,
-    KIND_COMPLEX,
-    KIND_QUATERNION,
-    KIND_POINTER,
-    KIND_STRUCT,
-    KIND_OTHER};
-
-typedef enum e_SC_kind SC_kind;
+#define SC_kind type_group
 
 typedef struct s_SC_type SC_type;
 typedef struct s_SC_type_label SC_type_label;

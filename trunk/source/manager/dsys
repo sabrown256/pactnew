@@ -1165,8 +1165,9 @@ switch ($Cmnd)
            flog $Log ./ccw -g elide.c -o $BinDir/elide
            flog $Log ./ccw -g blang.c -o $BinDir/blang
            flog $Log ./ccw -g rpath.c -o $BinDir/rpath
-           flog $Log ./ccw -g -I../score -I../manager template.c -o $BinDir/template
+           flog $Log ./ccw -g template.c -o $BinDir/template
            flog $Log cp types.db $EtcDir
+           flog $Log setenv DB_TYPES $EtcDir/types.db
         else
            NoteD $Log ""
            NoteD $Log "Failed to build pco utility - exiting"

@@ -11,40 +11,42 @@
 
 # STANDARD - standard type table
 #          - type fields are:
-#          -    type - C type name quoted to capture white space,
-#          -           e.g. "long long"
-#          -    name - abbreviate name to use in generated function names
-#          -    kind - enumerated type kind: bool, int, float, complex, etc
-#          -    size - size or method for determining size of a
-#          -           single instance
-#          -    ptr  - generate "foo *" for "foo" iff TRUE
-#          -    min  - minimum value of type
-#          -    max  - maximum value of type
-#          -    def  - default value of type
-#          -    f90  - F90 type name for the C type
+#          -    type  - C type name quoted to capture white space,
+#          -            e.g. "long long"
+#          -    name  - abbreviate name to use in generated function names
+#          -    kind  - enumerated type kind: bool, int, float, complex, etc
+#          -    size  - size or method for determining size of a
+#          -            single instance
+#          -    ptr   - generate "foo *" for "foo" iff TRUE
+#          -    min   - minimum value of type
+#          -    max   - maximum value of type
+#          -    def   - default value of type
+#          -    f90   - F90 type name for the C type
+#          -    promo - type to which it is promoted in C calls/assignments
+#          -    comp  - unit type of which composite types are formed
 
 standard = {
-# type                  name   kind       size     ptr   min        max         def    f90
- "unknown"              unk    OTHER      0        B_F   -          -           -      -    
- "bit"                  bit    OTHER      0        B_F   -          -           -      -    
- "struct"               strct  STRUCT     0        B_F   -          -           -      -    
- "void"                 any    OTHER      0        B_T   -          -           -      -    
- "bool"                 bool   BOOL       sizeof   B_T   BOOL_MIN   BOOL_MAX    B_F    logical
- "char"                 chr    CHAR       sizeof   B_T   SCHAR_MIN  SCHAR_MAX   '\0'   character
- "wchar_t"              wchr   CHAR       sizeof   B_T   WCHAR_MIN  WCHAR_MAX   -      -
- "int8_t"               int8   INT        sizeof   B_T   INT8_MIN   INT8_MAX    0      integer(1)
- "short"                shrt   INT        sizeof   B_T   SHRT_MIN   SHRT_MAX    0      integer(2)
- "int"                  int    INT        sizeof   B_T   INT_MIN    INT_MAX     0      integer
- "long"                 lng    INT        sizeof   B_T   LONG_MIN   LONG_MAX    0L     integer(8)
- "long long"            ll     INT        sizeof   B_T   LLONG_MIN  LLONG_MAX   0LL    integer(8)
- "float"                flt    FLOAT      sizeof   B_T   -FLT_MAX   FLT_MAX     0.0    real(4)
- "double"               dbl    FLOAT      sizeof   B_T   -DBL_MAX   DBL_MAX     0.0    real(8)
- "long double"          ldbl   FLOAT      sizeof   B_T   -LDBL_MAX  LDBL_MAX    0.0    real(16)
- "float _Complex"       fcx    COMPLEX    sizeof   B_T   -FLT_MAX   FLT_MAX     0.0    complex(4)
- "double _Complex"      dcx    COMPLEX    sizeof   B_T   -DBL_MAX   DBL_MAX     0.0    complex(8)
- "long double _Complex" ldcx   COMPLEX    sizeof   B_T   -LDBL_MAX  LDBL_MAX    0.0    complex(16)
- "quaternion"           qut    QUATERNION sizeof   B_T   -DBL_MAX   DBL_MAX     Q_ZERO
- "FILE"                 file   STRUCT     sizeof   B_T   -          -           -      -    
+# type                  name   kind       size     ptr   min        max         def    f90           promo    comp
+ "unknown"              unk    OTHER      0        B_F   -          -           -      -             -        -
+ "bit"                  bit    OTHER      0        B_F   -          -           -      -             -        -
+ "struct"               strct  STRUCT     0        B_F   -          -           -      -             -        -
+ "void"                 any    OTHER      0        B_T   -          -           NULL   void          -        -
+ "bool"                 bool   BOOL       sizeof   B_T   BOOL_MIN   BOOL_MAX    FALSE  logical       -        -
+ "char"                 chr    CHAR       sizeof   B_T   SCHAR_MIN  SCHAR_MAX   '\0'   character     int      -
+ "wchar_t"              wchr   CHAR       sizeof   B_T   WCHAR_MIN  WCHAR_MAX   0      -             int      -
+ "int8_t"               int8   INT        sizeof   B_T   INT8_MIN   INT8_MAX    0      integer(1)    int      -
+ "short"                shrt   INT        sizeof   B_T   SHRT_MIN   SHRT_MAX    0      integer(2)    int      -
+ "int"                  int    INT        sizeof   B_T   INT_MIN    INT_MAX     0      integer       -        -
+ "long"                 lng    INT        sizeof   B_T   LONG_MIN   LONG_MAX    0L     integer(8)    -        -
+ "long long"            ll     INT        sizeof   B_T   LLONG_MIN  LLONG_MAX   0LL    integer(8)    -        -
+ "float"                flt    FLOAT      sizeof   B_T   -FLT_MAX   FLT_MAX     0.0    real(4)       double   -
+ "double"               dbl    FLOAT      sizeof   B_T   -DBL_MAX   DBL_MAX     0.0    real(8)       -        -
+ "long double"          ldbl   FLOAT      sizeof   B_T   -LDBL_MAX  LDBL_MAX    0.0    real(16)      -        -
+ "float _Complex"       fcx    COMPLEX    sizeof   B_T   -FLT_MAX   FLT_MAX     0.0    complex(4)    -        "float"
+ "double _Complex"      dcx    COMPLEX    sizeof   B_T   -DBL_MAX   DBL_MAX     0.0    complex(8)    -        "double"
+ "long double _Complex" ldcx   COMPLEX    sizeof   B_T   -LDBL_MAX  LDBL_MAX    0.0    complex(16)   -        "long double"
+ "quaternion"           qut    QUATERNION sizeof   B_T   -DBL_MAX   DBL_MAX     Q_ZERO -             -        -
+ "FILE"                 file   STRUCT     sizeof   B_T   -          -           NULL   -             -        -
 }
 
 #--------------------------------------------------------------------------
@@ -54,7 +56,7 @@ standard = {
 #       - aliases imply the same variables for the new name
 #       - alias fields are:
 #       -    new name - name of the new type in quotes
-#       -    existing - name of the existing type in quotes
+#       -    old name - name of the existing type in quotes
 #       -    ptr      - generate "foo *" for "foo" iff TRUE
 
 alias = {

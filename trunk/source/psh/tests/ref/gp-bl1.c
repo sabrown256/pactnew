@@ -93,7 +93,7 @@ PyObject *_PY_favp1(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = favp1();
     _lo = PY_build_object("favp1",
-                          SC_UNKNOWN_I, 0, &_rv,
+                          SC_VOID_I, 0, &_rv,
                           0);
 
     return(_lo);}

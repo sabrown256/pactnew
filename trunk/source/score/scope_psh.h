@@ -55,6 +55,7 @@ typedef enum e_bind_opt bind_opt;
 #include <shell/libfio.c>
 #include <shell/libpsh.c>
 #include <shell/libhash.c>
+#include <shell/libtyp.c>
 #include <shell/libstack.c>
 #include <shell/libtime.c>
 #include <shell/libasync.c>
@@ -514,6 +515,15 @@ extern double
 extern char
  *PS_time_string(char *ts, int nc, int fmt, double t);
 
+
+/* LIBTYP.C declarations */
+
+extern typdes
+ *PS_type_table(typdes *td),
+ *PS_lookup_type_info(char *ty);
+
+extern int
+ PS_foreach_type(int (*f)(typdes *td, void *a), void *a);
 
 #ifdef __cplusplus
 }

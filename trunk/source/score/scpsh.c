@@ -66,6 +66,10 @@
 
 /* API functions */
 
+#define type_table		PS_type_table
+#define lookup_type_info        PS_lookup_type_info
+#define foreach_type            PS_foreach_type
+
 #define close_safe 		PS_close_safe
 #define fclose_safe 		PS_fclose_safe
 #define fflush_safe 		PS_fflush_safe

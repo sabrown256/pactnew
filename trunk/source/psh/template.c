@@ -10,7 +10,7 @@
 
 #include "common.h"
 #include "libpsh.c"
-#include <scope_typeh.h>
+#include "libtyp.c"
 
 #define NMAX 100
 
@@ -49,7 +49,7 @@ struct s_typinf
     char *mx;};
 
 static typinf
- ti[] = { {0,  NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+ sti[] = {{0,  NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
 	  {1,  NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
 	  {2,  "bool", "bool", "bool", "bool", "bool", "int", "BOOL_MIN", "BOOL_MAX"},
 	  {3,  "char", "char", "signed char", "unsigned char", "char", "int", "SCHAR_MIN", "SCHAR_MAX"},
@@ -68,7 +68,24 @@ static typinf
 	  {16, "qut",  "quaternion", "quaternion", "quaternion", "double", "quaternion", "-DBL_MAX", "DBL_MAX"},
 	  {17, "ptr",  "void *", "void *", "void *", "void *", "void *", "-LLONG_MAX", "LLONG_MAX"},
 	  {18, NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
-	  {19, "str",  "char *", "char *", "char *", "char *", "char *", "-LLONG_MAX", "LLONG_MAX"} };
+	  {19, "str",  "char *", "char *", "char *", "char *", "char *", "-LLONG_MAX", "LLONG_MAX"} },
+  *ti;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAKE_TYPE_TABLE - construct the internal representation
+ *                 - of the type table
+ */
+
+static void make_type_table(char *tytab)
+   {
+
+    parse_type_table(tytab);
+
+    ti = sti;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -572,12 +589,16 @@ static void help(void)
 
 int main(int c, char **v)
    {int i, ln, nt, rv, tgt;
-    char tmpf[BFLRG];
-    char *inf, *outf;
+    char tmpf[BFLRG], tytab[BFLRG];
+    char *inf, *outf, *s;
     FILE *fi, *fo;
     template *t, *tl[NMAX];
 
     rv = 0;
+
+    s = getenv("DB_TYPES");
+    if (s != NULL)
+       nstrncpy(tytab, BFLRG, s, -1);
 
     tgt  = 0;
     inf  = NULL;
@@ -592,10 +613,18 @@ int main(int c, char **v)
 	    outf = v[++i];
 	 else if (strcmp(v[i], "-s") == 0)
 	    tgt = 1;
+	 else if (strcmp(v[i], "-t") == 0)
+	    nstrncpy(tytab, BFLRG, v[++i], -1);
 	 else if (strcmp(v[i], "-va") == 0)
 	    tgt = 2;
 	 else
 	    inf = v[i];};
+
+    if (IS_NULL(tytab) == TRUE)
+       {printf("No type table file specified - exiting\n");
+	return(1);}
+    else
+       make_type_table(tytab);
 
     if (inf != NULL)
        fi = fopen_safe(inf, "r+");

@@ -65,25 +65,26 @@ static void python_type_name_list(tnp_list *na, tn_list *nc)
 
 static int python_parse_member(mbrdes *md, char *mbr,
 			       char *bty, char *aty, int nc)
-   {int nind, nb, ity;
-    char *lty, *pb;
+   {int nind, nb;
+    char *pb;
+    typdes *td;
 
     parse_member(md, mbr);
 
+    aty[0] = '\0';
     nstrncpy(bty, nc, md->type, -1);
 
-    lty = lookup_type(NULL, &ity, md->type, gbd+MODE_P);
+    td = lookup_type_info(md->type);
+    if (td != NULL)
+       {if (td->knd == TK_ENUM)
+	   {nstrncpy(md->type, nc, tykind[TK_ENUM], -1);
+	    nstrncpy(aty, nc, "SC_ENUM_I", -1);}
 
-    if (ity != -1)
-       nstrncpy(aty, nc, gbd[3].types.arr[ity], -1);
-    else if (is_ptr(md->type) == B_T)
-       nstrncpy(aty, nc, "SC_POINTER_I", -1);
-    else
-       aty[0] = '\0';
+	else if ((td->knd == TK_PRIMITIVE) || (td->g != KIND_POINTER))
+	   nstrncpy(aty, nc, td->typ_i, -1);
 
-    if ((lty != NULL) && (strcmp(lty, tykind[TK_ENUM]) == 0))
-       {nstrncpy(md->type, nc, tykind[TK_ENUM], -1);
-	nstrncpy(aty, nc, "SC_ENUM_I", -1);};
+	else
+	   nstrncpy(aty, nc, "SC_POINTER_I", -1);};
 
     nb = strlen(bty) - 1;
     pb = bty + nb;
@@ -840,6 +841,10 @@ static void init_python(statedes *st, bindes *bd)
     fprintf(fh, "#define GEN_PY_%s_H\n", upck);
     fprintf(fh, "\n");
 
+/* handle exceptional but ubiquituous FILE type */
+    fprintf(fh, "#define PY_FILE   PyObject\n");
+    fprintf(fh, "\n");
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -850,7 +855,8 @@ static void init_python(statedes *st, bindes *bd)
 static void python_make_decl(char *t, int nc, fdecl *dcl)
    {int i, na;
     char dty[BFLRG], p[BFSML];
-    char *cfn, *ty, *lty, *pty;
+    char *cfn, *ty, *pty;
+    typdes *td;
     farg *al;
 
     na  = dcl->na;
@@ -863,8 +869,9 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
         {al = dcl->al + i;
 	 ty = al->type;
 	 deref(dty, BFLRG, ty);
-	 lty = lookup_type(NULL, NULL, dty, gbd+MODE_P);
-	 if ((lty != NULL) && (strcmp(lty, tykind[TK_STRUCT]) == 0))
+	 td = lookup_type_info(dty);
+	 if ((td != NULL) && (td->knd == TK_STRUCT) &&
+	     (strcmp(td->type, "FILE") != 0))
 	    {snprintf(p, BFSML, "PY_%s", dty);
 	     pty = p;
 	     break;};};
@@ -1225,6 +1232,7 @@ static void python_method_def(char *dfn, int nc, fdecl *dcl,
 
 static void python_wrap(FILE *fc, fdecl *dcl, char *pfn)
    {char upn[BFLRG], kw[BFLRG];
+    static int count = 0;
 
     if ((is_var_arg(dcl->proto.arg) == FALSE) && (strcmp(pfn, "none") != 0))
        {nstrncpy(upn, BFLRG, pfn, -1);
@@ -1249,7 +1257,9 @@ static void python_wrap(FILE *fc, fdecl *dcl, char *pfn)
 /* function return */
 	python_wrap_local_return(fc, dcl);
 
-	csep(fc);};
+	csep(fc);
+
+	count++;};
 
     return;}
 
