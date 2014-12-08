@@ -78,14 +78,27 @@ static typinf
  *                 - of the type table
  */
 
-static void make_type_table(char *tytab)
-   {
+static int make_type_table(char *tytab)
+   {int rv;
+    char t[BFLRG];
+    char *s;
 
-    parse_type_table(tytab);
+    if (IS_NULL(tytab) == TRUE)
+       {s = getenv("DB_TYPES");
+	if (s != NULL)
+	   {nstrncpy(t, BFLRG, s, -1);
+	    tytab = t;};};
+
+    if (IS_NULL(tytab) == TRUE)
+       {printf("No type table file specified - exiting\n");
+	rv = FALSE;}
+    else
+       {parse_type_table(tytab);
+	rv = TRUE;};
 
     ti = sti;
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -175,9 +188,6 @@ static void write_header(FILE *fp, char *inf)
     fprintf(fp, "/*\n");
     fprintf(fp, " * %s.H - generated type handling routines - do not edit\n",
 	    p);
-    fprintf(fp, " *\n");
-    fprintf(fp, " * Source Version: 3.0\n");
-    fprintf(fp, " * Software Release #: LLNL-CODE-422942\n");
     fprintf(fp, " *\n");
     fprintf(fp, " */\n");
     fprintf(fp, "\n");
@@ -445,6 +455,277 @@ static void write_va_arg_clause(FILE *fp, int i)
 static void write_va_arg(FILE *fp)
    {int i, id;
 
+/* formerly in scope_typeh.h */
+    fprintf(fp, "#define REAL double\n");
+    fprintf(fp, "#define HUGE_REAL 1.0e100\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "#ifndef HAVE_FIXED_WIDTH_FLOAT\n");
+    fprintf(fp, "typedef float       float32_t;\n");
+    fprintf(fp, "typedef double      float64_t;\n");
+    fprintf(fp, "typedef long double float128_t;\n");
+    fprintf(fp, "#endif\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "/*--------------------------------------------------------------------------*/\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "/*                           DEFINED CONSTANTS                              */\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "/*--------------------------------------------------------------------------*/\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "#define SC_UNKNOWN_I                 SC_gs.ltyp[0].i\n");
+    fprintf(fp, "#define SC_UNKNOWN_S                 SC_gs.ltyp[0].s\n");
+    fprintf(fp, "#define SC_BIT_I                     SC_gs.ltyp[1].i\n");
+    fprintf(fp, "#define SC_BIT_S                     SC_gs.ltyp[1].s\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "#define SC_BOOL_I                    SC_gs.ltyp[2].i\n");
+    fprintf(fp, "#define SC_BOOL_S                    SC_gs.ltyp[2].s\n");
+    fprintf(fp, "#define SC_BOOL_P_I                  SC_gs.ltyp[2].p_i\n");
+    fprintf(fp, "#define SC_BOOL_P_S                  SC_gs.ltyp[2].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_CHAR_I                    SC_gs.ltyp[3].i\n");
+    fprintf(fp, "#define SC_CHAR_S                    SC_gs.ltyp[3].s\n");
+    fprintf(fp, "#define SC_STRING_I                  SC_gs.ltyp[3].p_i\n");
+    fprintf(fp, "#define SC_STRING_S                  SC_gs.ltyp[3].p_s\n");
+    fprintf(fp, "#define SC_WCHAR_I                   SC_gs.ltyp[4].i\n");
+    fprintf(fp, "#define SC_WCHAR_S                   SC_gs.ltyp[4].s\n");
+    fprintf(fp, "#define SC_WCHAR_P_I                 SC_gs.ltyp[4].p_i\n");
+    fprintf(fp, "#define SC_WCHAR_P_S                 SC_gs.ltyp[4].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_SHORT_I                   SC_gs.ltyp[5].i\n");
+    fprintf(fp, "#define SC_SHORT_S                   SC_gs.ltyp[5].s\n");
+    fprintf(fp, "#define SC_SHORT_P_I                 SC_gs.ltyp[5].p_i\n");
+    fprintf(fp, "#define SC_SHORT_P_S                 SC_gs.ltyp[5].p_s\n");
+    fprintf(fp, "#define SC_INT_I                     SC_gs.ltyp[6].i\n");
+    fprintf(fp, "#define SC_INT_S                     SC_gs.ltyp[6].s\n");
+    fprintf(fp, "#define SC_INT_P_I                   SC_gs.ltyp[6].p_i\n");
+    fprintf(fp, "#define SC_INT_P_S                   SC_gs.ltyp[6].p_s\n");
+    fprintf(fp, "#define SC_LONG_I                    SC_gs.ltyp[7].i\n");
+    fprintf(fp, "#define SC_LONG_S                    SC_gs.ltyp[7].s\n");
+    fprintf(fp, "#define SC_LONG_P_I                  SC_gs.ltyp[7].p_i\n");
+    fprintf(fp, "#define SC_LONG_P_S                  SC_gs.ltyp[7].p_s\n");
+    fprintf(fp, "#define SC_LONG_LONG_I               SC_gs.ltyp[8].i\n");
+    fprintf(fp, "#define SC_LONG_LONG_S               SC_gs.ltyp[8].s\n");
+    fprintf(fp, "#define SC_LONG_LONG_P_I             SC_gs.ltyp[8].p_i\n");
+    fprintf(fp, "#define SC_LONG_LONG_P_S             SC_gs.ltyp[8].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_INT8_I                    SC_gs.ltyp[9].i\n");
+    fprintf(fp, "#define SC_INT8_S                    SC_gs.ltyp[9].s\n");
+    fprintf(fp, "#define SC_INT8_P_I                  SC_gs.ltyp[9].p_i\n");
+    fprintf(fp, "#define SC_INT8_P_S                  SC_gs.ltyp[9].p_s\n");
+    fprintf(fp, "#define SC_INT16_I                   SC_gs.ltyp[10].i\n");
+    fprintf(fp, "#define SC_INT16_S                   SC_gs.ltyp[10].s\n");
+    fprintf(fp, "#define SC_INT16_P_I                 SC_gs.ltyp[10].p_i\n");
+    fprintf(fp, "#define SC_INT16_P_S                 SC_gs.ltyp[10].p_s\n");
+    fprintf(fp, "#define SC_INT32_I                   SC_gs.ltyp[11].i\n");
+    fprintf(fp, "#define SC_INT32_S                   SC_gs.ltyp[11].s\n");
+    fprintf(fp, "#define SC_INT32_P_I                 SC_gs.ltyp[11].p_i\n");
+    fprintf(fp, "#define SC_INT32_P_S                 SC_gs.ltyp[11].p_s\n");
+    fprintf(fp, "#define SC_INT64_I                   SC_gs.ltyp[12].i\n");
+    fprintf(fp, "#define SC_INT64_S                   SC_gs.ltyp[12].s\n");
+    fprintf(fp, "#define SC_INT64_P_I                 SC_gs.ltyp[12].p_i\n");
+    fprintf(fp, "#define SC_INT64_P_S                 SC_gs.ltyp[12].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_FLOAT_I                   SC_gs.ltyp[13].i\n");
+    fprintf(fp, "#define SC_FLOAT_S                   SC_gs.ltyp[13].s\n");
+    fprintf(fp, "#define SC_FLOAT_P_I                 SC_gs.ltyp[13].p_i\n");
+    fprintf(fp, "#define SC_FLOAT_P_S                 SC_gs.ltyp[13].p_s\n");
+    fprintf(fp, "#define SC_DOUBLE_I                  SC_gs.ltyp[14].i\n");
+    fprintf(fp, "#define SC_DOUBLE_S                  SC_gs.ltyp[14].s\n");
+    fprintf(fp, "#define SC_DOUBLE_P_I                SC_gs.ltyp[14].p_i\n");
+    fprintf(fp, "#define SC_DOUBLE_P_S                SC_gs.ltyp[14].p_s\n");
+    fprintf(fp, "#define SC_LONG_DOUBLE_I             SC_gs.ltyp[15].i\n");
+    fprintf(fp, "#define SC_LONG_DOUBLE_S             SC_gs.ltyp[15].s\n");
+    fprintf(fp, "#define SC_LONG_DOUBLE_P_I           SC_gs.ltyp[15].p_i\n");
+    fprintf(fp, "#define SC_LONG_DOUBLE_P_S           SC_gs.ltyp[15].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_FLOAT32_I                 SC_gs.ltyp[16].i\n");
+    fprintf(fp, "#define SC_FLOAT32_S                 SC_gs.ltyp[16].s\n");
+    fprintf(fp, "#define SC_FLOAT32_P_I               SC_gs.ltyp[16].p_i\n");
+    fprintf(fp, "#define SC_FLOAT32_P_S               SC_gs.ltyp[16].p_s\n");
+    fprintf(fp, "#define SC_FLOAT64_I                 SC_gs.ltyp[17].i\n");
+    fprintf(fp, "#define SC_FLOAT64_S                 SC_gs.ltyp[17].s\n");
+    fprintf(fp, "#define SC_FLOAT64_P_I               SC_gs.ltyp[17].p_i\n");
+    fprintf(fp, "#define SC_FLOAT64_P_S               SC_gs.ltyp[17].p_s\n");
+    fprintf(fp, "#define SC_FLOAT128_I                SC_gs.ltyp[18].i\n");
+    fprintf(fp, "#define SC_FLOAT128_S                SC_gs.ltyp[18].s\n");
+    fprintf(fp, "#define SC_FLOAT128_P_I              SC_gs.ltyp[18].p_i\n");
+    fprintf(fp, "#define SC_FLOAT128_P_S              SC_gs.ltyp[18].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_FLOAT_COMPLEX_I           SC_gs.ltyp[19].i\n");
+    fprintf(fp, "#define SC_FLOAT_COMPLEX_S           SC_gs.ltyp[19].s\n");
+    fprintf(fp, "#define SC_FLOAT_COMPLEX_P_I         SC_gs.ltyp[19].p_i\n");
+    fprintf(fp, "#define SC_FLOAT_COMPLEX_P_S         SC_gs.ltyp[19].p_s\n");
+    fprintf(fp, "#define SC_DOUBLE_COMPLEX_I          SC_gs.ltyp[20].i\n");
+    fprintf(fp, "#define SC_DOUBLE_COMPLEX_S          SC_gs.ltyp[20].s\n");
+    fprintf(fp, "#define SC_DOUBLE_COMPLEX_P_I        SC_gs.ltyp[20].p_i\n");
+    fprintf(fp, "#define SC_DOUBLE_COMPLEX_P_S        SC_gs.ltyp[20].p_s\n");
+    fprintf(fp, "#define SC_LONG_DOUBLE_COMPLEX_I     SC_gs.ltyp[21].i\n");
+    fprintf(fp, "#define SC_LONG_DOUBLE_COMPLEX_S     SC_gs.ltyp[21].s\n");
+    fprintf(fp, "#define SC_LONG_DOUBLE_COMPLEX_P_I   SC_gs.ltyp[21].p_i\n");
+    fprintf(fp, "#define SC_LONG_DOUBLE_COMPLEX_P_S   SC_gs.ltyp[21].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_COMPLEX32_I               SC_gs.ltyp[22].i\n");
+    fprintf(fp, "#define SC_COMPLEX32_S               SC_gs.ltyp[22].s\n");
+    fprintf(fp, "#define SC_COMPLEX32_P_I             SC_gs.ltyp[22].p_i\n");
+    fprintf(fp, "#define SC_COMPLEX32_P_S             SC_gs.ltyp[22].p_s\n");
+    fprintf(fp, "#define SC_COMPLEX64_I               SC_gs.ltyp[23].i\n");
+    fprintf(fp, "#define SC_COMPLEX64_S               SC_gs.ltyp[23].s\n");
+    fprintf(fp, "#define SC_COMPLEX64_P_I             SC_gs.ltyp[23].p_i\n");
+    fprintf(fp, "#define SC_COMPLEX64_P_S             SC_gs.ltyp[23].p_s\n");
+    fprintf(fp, "#define SC_COMPLEX128_I              SC_gs.ltyp[24].i\n");
+    fprintf(fp, "#define SC_COMPLEX128_S              SC_gs.ltyp[24].s\n");
+    fprintf(fp, "#define SC_COMPLEX128_P_I            SC_gs.ltyp[24].p_i\n");
+    fprintf(fp, "#define SC_COMPLEX128_P_S            SC_gs.ltyp[24].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_QUATERNION_I              SC_gs.ltyp[25].i\n");
+    fprintf(fp, "#define SC_QUATERNION_S              SC_gs.ltyp[25].s\n");
+    fprintf(fp, "#define SC_QUATERNION_P_I            SC_gs.ltyp[25].p_i\n");
+    fprintf(fp, "#define SC_QUATERNION_P_S            SC_gs.ltyp[25].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_VOID_I                    SC_gs.ltyp[26].i\n");
+    fprintf(fp, "#define SC_VOID_S                    SC_gs.ltyp[26].s\n");
+    fprintf(fp, "#define SC_POINTER_I                 SC_gs.ltyp[26].p_i\n");
+    fprintf(fp, "#define SC_POINTER_S                 SC_gs.ltyp[26].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_ENUM_I                    SC_gs.ltyp[27].i\n");
+    fprintf(fp, "#define SC_ENUM_S                    SC_gs.ltyp[27].s\n");
+    fprintf(fp, "#define SC_STRUCT_I                  SC_gs.ltyp[28].i\n");
+    fprintf(fp, "#define SC_STRUCT_S                  SC_gs.ltyp[28].s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_FILE_I                    SC_gs.ltyp[29].i\n");
+    fprintf(fp, "#define SC_FILE_S                    SC_gs.ltyp[29].s\n");
+    fprintf(fp, "#define SC_FILE_P_I                  SC_gs.ltyp[29].p_i\n");
+    fprintf(fp, "#define SC_FILE_P_S                  SC_gs.ltyp[29].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_INTEGER_I                 SC_gs.ltyp[30].i\n");
+    fprintf(fp, "#define SC_INTEGER_S                 SC_gs.ltyp[30].s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_REAL_I                    SC_gs.ltyp[31].i\n");
+    fprintf(fp, "#define SC_REAL_S                    SC_gs.ltyp[31].s\n");
+    fprintf(fp, "#define SC_REAL_P_I                  SC_gs.ltyp[31].p_i\n");
+    fprintf(fp, "#define SC_REAL_P_S                  SC_gs.ltyp[31].p_s\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define SC_TYP_N                     32\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "/* these must have the same sequence/values as the dynamic values\n");
+    fprintf(fp, " * assigned in SC_init_base_types\n");
+    fprintf(fp, " * changes here MUST be reflected there\n");
+    fprintf(fp, " */\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define _SC_DEF_TYP_                                                         \\\n");
+    fprintf(fp, " { { 0, \"unknown\", },                                                        \\\n");
+    fprintf(fp, "   { 1, \"bit\", },                                                            \\\n");
+    fprintf(fp, "   { 2, \"bool\",                  18, \"bool *\" },                             \\\n");
+    fprintf(fp, "   { 3, \"char\",                  19, \"char *\" },                             \\\n");
+    fprintf(fp, "   { 4, \"wchar\",                 20, \"wchar *\" },                            \\\n");
+    fprintf(fp, "   { 6, \"short\",                 22, \"short *\" },                            \\\n");
+    fprintf(fp, "   { 7, \"int\",                   23, \"int *\" },                              \\\n");
+    fprintf(fp, "   { 8, \"long\",                  24, \"long *\" },                             \\\n");
+    fprintf(fp, "   { 9, \"long_long\",             25, \"long_long *\" },                        \\\n");
+    fprintf(fp, "   { 5, \"int8_t\",                21, \"int8_t *\" },                           \\\n");
+    fprintf(fp, "   { 6, \"int16_t\",               22, \"int16_t *\" },                          \\\n");
+    fprintf(fp, "   { 7, \"int32_t\",               23, \"int32_t *\" },                          \\\n");
+    fprintf(fp, "   { 9, \"int64_t\",               25, \"int64_t *\" },                          \\\n");
+    fprintf(fp, "   { 10, \"float\",                26, \"float *\" },                            \\\n");
+    fprintf(fp, "   { 11, \"double\",               27, \"double *\" },                           \\\n");
+    fprintf(fp, "   { 12, \"long_double\",          28, \"long_double *\" },                      \\\n");
+    fprintf(fp, "   { 10, \"float32_t\",            26, \"float32_t *\" },                        \\\n");
+    fprintf(fp, "   { 11, \"float64_t\",            27, \"float64_t *\" },                        \\\n");
+    fprintf(fp, "   { 12, \"float128_t\",           28, \"float128_t *\" },                       \\\n");
+    fprintf(fp, "   { 13, \"float_complex\",        29, \"float_complex *\" },                    \\\n");
+    fprintf(fp, "   { 14, \"double_complex\",       30, \"double_complex *\" },                   \\\n");
+    fprintf(fp, "   { 15, \"long_double_complex\",  31, \"long_double_complex *\" },              \\\n");
+    fprintf(fp, "   { 13, \"complex32_t\",          29, \"complex32_t *\" },                      \\\n");
+    fprintf(fp, "   { 14, \"complex64_t\",          30, \"complex64_t *\" },                      \\\n");
+    fprintf(fp, "   { 15, \"complex128_t\",         31, \"complex128_t *\" },                     \\\n");
+    fprintf(fp, "   { 16, \"quaternion\",           32, \"quaternion *\" },                       \\\n");
+    fprintf(fp, "   { 33, \"void\",                 17, \"void *\" },                             \\\n");
+    fprintf(fp, "   { 7,  \"enum\", },                                                          \\\n");
+    fprintf(fp, "   { 34, \"struct\", },                                                        \\\n");
+    fprintf(fp, "   { 35, \"FILE\",                 40, \"FILE *\" },                             \\\n");
+    fprintf(fp, "   { 7, \"integer\", },                                                        \\\n");
+    fprintf(fp, "   { 11, \"double\", } }\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "#define _SC_DEF_ITYP_                                                        \\\n");
+    fprintf(fp, " { { 39, \"pcons *\",  } }\n");
+    fprintf(fp, "\n");
+
+/* formerly in sctyp.c */
+
+    fprintf(fp, "#define DEF_STANDARD_TYPES  \\\n");
+    fprintf(fp, "       SC_UNKNOWN_I               = SC_type_register(SC_UNKNOWN_S,             KIND_OTHER,      B_F, 0,                            0);\\\n");
+    fprintf(fp, "       SC_BIT_I                   = SC_type_register(SC_BIT_S,                 KIND_OTHER,      B_F, 0,                            0);\\\n");
+    fprintf(fp, "       SC_BOOL_I                  = SC_type_register(SC_BOOL_S,                KIND_BOOL,       B_T, sizeof(bool),                 0);\\\n");
+    fprintf(fp, "       SC_CHAR_I                  = SC_type_register(SC_CHAR_S,                KIND_CHAR,       B_T, sizeof(char),                 0);\\\n");
+    fprintf(fp, "       SC_WCHAR_I                 = SC_type_register(SC_WCHAR_S,               KIND_CHAR,       B_T, sizeof(wchar_t),              0);\\\n");
+    fprintf(fp, "       SC_INT8_I                  = SC_type_register(SC_INT8_S,                KIND_INT,        B_T, sizeof(int8_t),               0);\\\n");
+    fprintf(fp, "       SC_SHORT_I                 = SC_type_register(SC_SHORT_S,               KIND_INT,        B_T, sizeof(short),                0);\\\n");
+    fprintf(fp, "       SC_INT_I                   = SC_type_register(SC_INT_S,                 KIND_INT,        B_T, sizeof(int),                  0);\\\n");
+    fprintf(fp, "       SC_LONG_I                  = SC_type_register(SC_LONG_S,                KIND_INT,        B_T, sizeof(long),                 0);\\\n");
+    fprintf(fp, "       SC_LONG_LONG_I             = SC_type_register(SC_LONG_LONG_S,           KIND_INT,        B_T, sizeof(long long),            0);\\\n");
+    fprintf(fp, "       SC_FLOAT_I                 = SC_type_register(SC_FLOAT_S,               KIND_FLOAT,      B_T, sizeof(float),                0);\\\n");
+    fprintf(fp, "       SC_DOUBLE_I                = SC_type_register(SC_DOUBLE_S,              KIND_FLOAT,      B_T, sizeof(double),               0);\\\n");
+    fprintf(fp, "       SC_LONG_DOUBLE_I           = SC_type_register(SC_LONG_DOUBLE_S,         KIND_FLOAT,      B_T, sizeof(long double),          0);\\\n");
+    fprintf(fp, "       SC_FLOAT_COMPLEX_I         = SC_type_register(SC_FLOAT_COMPLEX_S,       KIND_COMPLEX,    B_T, sizeof(float _Complex),       0);\\\n");
+    fprintf(fp, "       SC_DOUBLE_COMPLEX_I        = SC_type_register(SC_DOUBLE_COMPLEX_S,      KIND_COMPLEX,    B_T, sizeof(double _Complex),      0);\\\n");
+    fprintf(fp, "       SC_LONG_DOUBLE_COMPLEX_I   = SC_type_register(SC_LONG_DOUBLE_COMPLEX_S, KIND_COMPLEX,    B_T, sizeof(long double _Complex), 0);\\\n");
+    fprintf(fp, "       SC_QUATERNION_I            = SC_type_register(SC_QUATERNION_S,          KIND_QUATERNION, B_T, 4*sizeof(double),             0);\\\n");
+    fprintf(fp, "       SC_POINTER_I               = SC_type_register(SC_POINTER_S,               KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_BOOL_P_I                = SC_type_register(SC_BOOL_P_S,                KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_STRING_I                = SC_type_register(SC_STRING_S,                KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_WCHAR_P_I               = SC_type_register(SC_WCHAR_P_S,               KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_INT8_P_I                = SC_type_register(SC_INT8_P_S,                KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_SHORT_P_I               = SC_type_register(SC_SHORT_P_S,               KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_INT_P_I                 = SC_type_register(SC_INT_P_S,                 KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_LONG_P_I                = SC_type_register(SC_LONG_P_S,                KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_LONG_LONG_P_I           = SC_type_register(SC_LONG_LONG_P_S,           KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_FLOAT_P_I               = SC_type_register(SC_FLOAT_P_S,               KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_DOUBLE_P_I              = SC_type_register(SC_DOUBLE_P_S,              KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_LONG_DOUBLE_P_I         = SC_type_register(SC_LONG_DOUBLE_P_S,         KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_FLOAT_COMPLEX_P_I       = SC_type_register(SC_FLOAT_COMPLEX_P_S,       KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_DOUBLE_COMPLEX_P_I      = SC_type_register(SC_DOUBLE_COMPLEX_P_S,      KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_LONG_DOUBLE_COMPLEX_P_I = SC_type_register(SC_LONG_DOUBLE_COMPLEX_P_S, KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_QUATERNION_P_I          = SC_type_register(SC_QUATERNION_P_S,          KIND_POINTER, B_F, szptr, 0);\\\n");
+    fprintf(fp, "       SC_VOID_I                  = SC_type_register(SC_VOID_S,     KIND_OTHER,   B_T, 0,               0);\\\n");
+    fprintf(fp, "       SC_STRUCT_I                = SC_type_register(SC_STRUCT_S,   KIND_STRUCT,  B_F, 0,               0);\\\n");
+    fprintf(fp, "       SC_FILE_I                  = SC_type_register(SC_FILE_S,     KIND_STRUCT,  B_T, sizeof(FILE),    0);\\\n");
+    fprintf(fp, "       SC_PCONS_P_I               = SC_type_register(SC_PCONS_P_S,  KIND_POINTER, B_F, szptr,           0);\\\n");
+    fprintf(fp, "       SC_FILE_P_I                = SC_type_register(SC_FILE_P_S,   KIND_POINTER, B_F, szptr,           0)\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "/* aliases */\n");
+    fprintf(fp, "#define DEF_STANDARD_ALIASES  \\\n");
+    fprintf(fp, "       SC_ENUM_I         = SC_type_alias(SC_ENUM_S,    SC_INT_I);\\\n");
+    fprintf(fp, "       SC_INTEGER_I      = SC_type_alias(SC_INTEGER_S, SC_INT_I);\\\n");
+    fprintf(fp, "       SC_INT16_I        = SC_type_alias(SC_INT16_S,   SC_SHORT_I);\\\n");
+    fprintf(fp, "       SC_INT32_I        = SC_type_alias(SC_INT32_S,   SC_INT_I);\\\n");
+    fprintf(fp, "       SC_INT64_I        = SC_type_alias(SC_INT64_S,   SC_LONG_LONG_I);\\\n");
+    fprintf(fp, "       SC_REAL_I         = SC_type_alias(SC_REAL_S,    SC_DOUBLE_I);\\\n");
+    fprintf(fp, "       SC_FLOAT32_I      = SC_type_alias(SC_FLOAT32_S,  SC_FLOAT_I);\\\n");
+    fprintf(fp, "       SC_FLOAT64_I      = SC_type_alias(SC_FLOAT64_S,  SC_DOUBLE_I);\\\n");
+    fprintf(fp, "       SC_FLOAT128_I     = SC_type_alias(SC_FLOAT128_S, SC_LONG_DOUBLE_I);\\\n");
+    fprintf(fp, "       SC_COMPLEX32_I    = SC_type_alias(SC_COMPLEX32_S,  SC_FLOAT_COMPLEX_I);\\\n");
+    fprintf(fp, "       SC_COMPLEX64_I    = SC_type_alias(SC_COMPLEX64_S,  SC_DOUBLE_COMPLEX_I);\\\n");
+    fprintf(fp, "       SC_COMPLEX128_I   = SC_type_alias(SC_COMPLEX128_S, SC_LONG_DOUBLE_COMPLEX_I);\\\n");
+    fprintf(fp, "       SC_INT16_P_I      = SC_type_alias(SC_INT16_P_S,   SC_SHORT_P_I);\\\n");
+    fprintf(fp, "       SC_INT32_P_I      = SC_type_alias(SC_INT32_P_S,   SC_INT_P_I);\\\n");
+    fprintf(fp, "       SC_INT64_P_I      = SC_type_alias(SC_INT64_P_S,   SC_LONG_LONG_P_I);\\\n");
+    fprintf(fp, "       SC_REAL_P_I       = SC_type_alias(SC_REAL_P_S,     SC_DOUBLE_P_I);\\\n");
+    fprintf(fp, "       SC_FLOAT32_P_I    = SC_type_alias(SC_FLOAT32_P_S,  SC_FLOAT_P_I);\\\n");
+    fprintf(fp, "       SC_FLOAT64_P_I    = SC_type_alias(SC_FLOAT64_P_S,  SC_DOUBLE_P_I);\\\n");
+    fprintf(fp, "       SC_FLOAT128_P_I   = SC_type_alias(SC_FLOAT128_P_S, SC_LONG_DOUBLE_P_I);\\\n");
+    fprintf(fp, "       SC_COMPLEX32_P_I  = SC_type_alias(SC_COMPLEX32_P_S,  SC_FLOAT_COMPLEX_P_I);\\\n");
+    fprintf(fp, "       SC_COMPLEX64_P_I  = SC_type_alias(SC_COMPLEX64_P_S,  SC_DOUBLE_COMPLEX_P_I);\\\n");
+    fprintf(fp, "       SC_COMPLEX128_P_I = SC_type_alias(SC_COMPLEX128_P_S, SC_LONG_DOUBLE_COMPLEX_P_I)\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "#ifndef NO_VA_ARG_ID\n");
+
 /* if va_arg supports complex types */
     fprintf(fp, "#ifdef HAVE_COMPLEX_VA_ARG\n");
 
@@ -491,6 +772,9 @@ static void write_va_arg(FILE *fp)
 
     fprintf(fp, "       }                                             \\\n");
     fprintf(fp, "   }\n");
+
+    fprintf(fp, "#endif\n");
+    fprintf(fp, "\n");
 
     fprintf(fp, "#endif\n");
 
@@ -590,15 +874,13 @@ static void help(void)
 int main(int c, char **v)
    {int i, ln, nt, rv, tgt;
     char tmpf[BFLRG], tytab[BFLRG];
-    char *inf, *outf, *s;
+    char *inf, *outf;
     FILE *fi, *fo;
     template *t, *tl[NMAX];
 
     rv = 0;
 
-    s = getenv("DB_TYPES");
-    if (s != NULL)
-       nstrncpy(tytab, BFLRG, s, -1);
+    tytab[0] = '\0';
 
     tgt  = 0;
     inf  = NULL;
@@ -620,11 +902,9 @@ int main(int c, char **v)
 	 else
 	    inf = v[i];};
 
-    if (IS_NULL(tytab) == TRUE)
+    if (make_type_table(tytab) == FALSE)
        {printf("No type table file specified - exiting\n");
-	return(1);}
-    else
-       make_type_table(tytab);
+	return(1);};
 
     if (inf != NULL)
        fi = fopen_safe(inf, "r+");

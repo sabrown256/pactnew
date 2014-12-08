@@ -71,7 +71,9 @@ else
       NoteD $Log -n "                        $f "
       Note $Log ""
 
-      flog $Log cp $PSY_Base/$t .
+      if (-f $PSY_Base/$t) then
+         flog $Log cp $PSY_Base/$t .
+      endif
       flog $Log $TEMPLATE $u -o $Res
 
       set xstatus = $status

@@ -22,6 +22,7 @@ Note $WLog ""
 
 dbmget $WLog CROSS_COMPILE^               \
              CROSS_REF       =\?  "none"^ \
+	     DB_TYPES^                    \
              PACT_CC_EXE^                 \
              PACT_CC_FAMILY^              \
              PACT_CC_PATH^                \

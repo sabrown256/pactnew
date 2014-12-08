@@ -1,9 +1,6 @@
 /*
  * MLSRCH.H - generated type handling routines - do not edit
  *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
- *
  */
 
 #ifndef PCK_MLSRCH
