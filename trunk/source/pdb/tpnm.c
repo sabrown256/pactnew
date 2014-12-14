@@ -5,7 +5,7 @@
 
 #include "cpyright.h"
 
-#include "pdb.h"
+#include "pdbtfr.h"
 #include "scope_proc.h"
 #include "scope_dp.h"
 
@@ -66,8 +66,8 @@ static void tty_has_txt(int fd, int mask, void *a)
 	i = SC_stoi(t);
 	p = pp[i - 1];
 	if (p == NULL)
-	   {PRINT(stdout, "\nError: child #%d previously terminated\n\n", i);
-	    exit(1);};
+	   error(1, stdout,
+		 "\nError: child #%d previously terminated\n\n", i);
 
 	t = SC_strtok(NULL, "", pt);
 	SC_printf(p, "%s", t);
@@ -235,8 +235,8 @@ static int poll_mode(descriptors *pd)
             i = SC_stoi(t);
 	    p = pp[i - 1];
             if (p == NULL)
-	       {PRINT(stdout, "\nError: child #%d previously terminated\n\n", i);
-		exit(1);};
+	       error(1, stdout,
+		     "\nError: child #%d previously terminated\n\n", i);
 
             t = SC_strtok(NULL, "", pt);
 	    SC_printf(p, "%s", t);
@@ -323,9 +323,8 @@ int main(int argc, char **argv, char **envp)
     for (i = 0; i < n; i++)
         {p = PN_open_process(argl, envp, mode);
 	 if (p == NULL)
-	    {PRINT(stdout, "\nError: failed to open copy #%d of %s\n\n",
-		   i + 1, prog);
-	     exit(1);};
+	    error(1, stdout, "\nError: failed to open copy #%d of %s\n\n",
+		  i + 1, prog);
 
 	 pp[i] = p;
 

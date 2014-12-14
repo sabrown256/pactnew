@@ -84,12 +84,10 @@ static void write_test_gather_data(PDBfile *strm)
 
 /* write primitive arrays into the file */
     if (!PD_write(strm, "ia(2,3,5)", "integer", ia_w))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_GATHER_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_GATHER_DATA\n");
 
     if (!PD_write(strm, "da(4,3)", "double", da_w))
-       {PRINT(STDOUT, "DA WRITE FAILED - WRITE_TEST_GATHER_DATA\n");
-        exit(1);};
+       error(-1, stdout, "DA WRITE FAILED - WRITE_TEST_GATHER_DATA\n");
 
     return;}
 
@@ -243,8 +241,7 @@ static int test_1(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     prep_test_gather_data();
@@ -254,15 +251,13 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -273,8 +268,7 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -313,8 +307,7 @@ static int test_2(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     PD_set_major_order(strm, COLUMN_MAJOR_ORDER);
@@ -326,15 +319,13 @@ static int test_2(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -345,8 +336,7 @@ static int test_2(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -422,12 +412,10 @@ static void write_test_scatter_data(PDBfile *strm)
 
 /* write primitive arrays into the file */
     if (!PD_write(strm, "ib(2,3)", "integer", ib_w))
-       {PRINT(STDOUT, "IB WRITE FAILED - WRITE_TEST_SCATTER_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IB WRITE FAILED - WRITE_TEST_SCATTER_DATA\n");
 
     if (!PD_write(strm, "db(4,3)", "double", db_w))
-       {PRINT(STDOUT, "DA WRITE FAILED - WRITE_TEST_SCATTER_DATA\n");
-        exit(1);};
+       error(-1, stdout, "DA WRITE FAILED - WRITE_TEST_SCATTER_DATA\n");
 
     return;}
 
@@ -584,8 +572,7 @@ static int test_3(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     prep_test_scatter_data();
@@ -595,15 +582,13 @@ static int test_3(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "a");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -614,8 +599,7 @@ static int test_3(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -654,8 +638,7 @@ static int test_4(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     PD_set_major_order(strm, COLUMN_MAJOR_ORDER);
@@ -667,15 +650,13 @@ static int test_4(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "a");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -686,8 +667,7 @@ static int test_4(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -727,12 +707,12 @@ static int run_test(PFTest test, int n, char *host)
 
 	     nm = PD_target_platform_name(i);
 	     if ((*test)(host, nm, n) == FALSE)
-	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
+	        {error(-1, stdout, "Test #%d %s failed\n", n, nm);
 		 fail++;};};};
 
 /* native test */
     if ((*test)(host, NULL, n) == FALSE)
-       {PRINT(STDOUT, "Test #%d native failed\n", n);
+       {error(-1, stdout, "Test #%d native failed\n", n);
 	fail++;};
 
     post_test(&st, n);

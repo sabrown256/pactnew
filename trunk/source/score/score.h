@@ -640,6 +640,8 @@ struct s_SC_scope_public
     char **argv;                       /* command line arguments from main */
     char **env;                                   /* environment from main */
     void *exe_info;                           /* slot for exedes if needed */
+    SC_type stl[N_TYPES+1];                   /* built in static type list */
+    SC_type *tl;                 /* pointer to static or dynamic type list */
     SC_type_label ltyp[SC_TYP_N];              /* labels of selected types */
     SC_type_label lityp[SC_ITYP_N];   /* labels of selected indirect types */
     int (*size)(char *s);                       /* string driven size hook */

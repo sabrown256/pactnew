@@ -178,8 +178,7 @@ static void write_test_1_data(PDBfile *strm)
    {
 
     if (!PD_write(strm, "tar", "lev1 *",  &tar_w))
-       {PRINT(STDOUT, "TAR WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, stdout, "TAR WRITE FAILED - WRITE_TEST_1_DATA\n");
 
     return;}
 
@@ -259,8 +258,7 @@ static int test_1(char *base, char *tgt, int n)
 /* create the named file */
        {strm = PD_create(datfile);
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 /* make a few defstructs */
@@ -280,8 +278,7 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
 	if (!PD_close(strm))
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);};
 
     if (write_only == FALSE)
@@ -289,8 +286,7 @@ static int test_1(char *base, char *tgt, int n)
 /* reopen the file */
        {strm = PD_open(datfile, "r");
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't open file %s\r\n", datfile);
 	PRINT(fp, "File %s opened\n", datfile);
 
 /* read the structs */
@@ -298,8 +294,7 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
 	if (!PD_close(strm))
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* cleanup test data memory */
@@ -332,7 +327,7 @@ static int run_test(PFTest test, int n, char *host, int dbg)
     fail = 0;
 
     if ((*test)(host, NULL, n) == 0)
-       {PRINT(STDOUT, "Test #%d failed\n", n);
+       {error(-1, stdout, "Test #%d failed\n", n);
 	fail++;};
 
     post_test(&st, n);

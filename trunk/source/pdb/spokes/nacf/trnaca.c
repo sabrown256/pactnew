@@ -303,7 +303,7 @@ static defstr *_NAC_proc_str(PDBfile *file, char *names,
        {n_structs++;
 
 /* install the type in both charts */
-        dp = _PD_defstr_inst(file, type_name, STRUCT_KIND, lst,
+        dp = _PD_defstr_inst(file, type_name, KIND_STRUCT, lst,
 			     NO_ORDER, NULL, NULL, PD_CHART_HOST);}
     else
        for (desc = lst; desc != NULL; desc = lst)

@@ -137,21 +137,13 @@ ${LibDep} : ${hdrf} ${Hdrs} pdspoke.c pdb_formats.h scope_dp.h
 # Generated code rules
 #
 
-# detect
-
-${BinDir}/detect : detect.c ${Hdrs} 
-	@(echo "${CCAnnounce} $< -o $@" ; \
-	  ${CCCfe} ${CROSS_FE_LD_Flags} ${CROSS_FE_LD_RPath} -I../score detect.c -o ${BinDir}/detect ${CROSS_FE_LD_Lib})
-
-detect : ${BinDir}/detect
-
-${IncDir}/pdform.h : ${BinDir}/detect
-	@(echo "detect -c ${DP_BE} -o pdform.h" ; \
-	  ${CROSS_FE} ${BinDir}/detect -c ${DP_BE} -o ${IncDir}/pdform.h)
+${IncDir}/pdform.h :
+	@(echo "template -desc 1 -o pdform.h" ; \
+	  ${CROSS_FE} ${BinDir}/template -desc 1 -o ${IncDir}/pdform.h)
 
 GenInc = ${PACTTmpDir}/gc-pdb.h
 
-${IncDir}/pdb_gen.h : ${GenInc}
+${IncDir}/pdb_gen.h : ${IncDir}/pdform.h ${GenInc}
 	@echo "build pdb_gen.h"
 	@rm -f ${IncDir}/pdb_gen.h
 	@cat ${GenInc} > ${IncDir}/pdb_gen.h

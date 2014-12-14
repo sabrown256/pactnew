@@ -455,7 +455,7 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
 	    cnv |= (dpf->onescmp     != dph->onescmp);
 	    cnv |= (dpf->unsgned     != dph->unsgned);
 
-	    if (dpf->kind == INT_KIND)
+	    if (dpf->kind == KIND_INT)
 	       cnv |= (dpf->fix.order   != dph->fix.order);
 
 	    cnv |= lreorder;
@@ -713,9 +713,9 @@ int _PD_prim_typep(char *memb, hasharr *chrt, PD_major_op error)
 
 static void _PD_bin_text(char **out, char **in, char *typ, inti ni,
 			 intb boffs,
-			 PD_type_kind kndi, long *ifmt, intb nbi,
+			 SC_kind kndi, long *ifmt, intb nbi,
 			 PD_byte_order ordi, int *iord,
-			 PD_type_kind kndo, long *ofmt, intb nbo,
+			 SC_kind kndo, long *ofmt, intb nbo,
 			 PD_byte_order ordo, int *oord,
 			 data_standard *hstd,
 			 int onescmp, int usg, int rdx, char *delim)
@@ -738,7 +738,7 @@ static void _PD_bin_text(char **out, char **in, char *typ, inti ni,
     nbl  = hstd->fx[PD_LONG_I].bpi;
 
 /* convert char types */
-    if (kndi == CHAR_KIND)
+    if (kndi == KIND_CHAR)
        {nb = ni*nbi;
 	if (delim == NULL)
 	   {snprintf(fmt, MAXLINE, "%%-%ss", SC_itos(NULL, 0, nb, NULL));
@@ -759,7 +759,7 @@ static void _PD_bin_text(char **out, char **in, char *typ, inti ni,
 	*out += nc;}
 
 /* convert integer types */
-    else if (kndi == INT_KIND)
+    else if (kndi == KIND_INT)
        {long *lv;
 
 	lv   = CMAKE_N(long, ni);
@@ -781,7 +781,7 @@ static void _PD_bin_text(char **out, char **in, char *typ, inti ni,
 	*out += nbo*ni;}
 
 /* convert floating point types */
-    else if (kndi == FLOAT_KIND)
+    else if (kndi == KIND_FLOAT)
        {double *dv;
 
 	dv   = CMAKE_N(double, ni);
@@ -815,9 +815,9 @@ static void _PD_bin_text(char **out, char **in, char *typ, inti ni,
 
 void _PD_text_bin(char **out, char **in, char *typ, inti ni,
 		  intb boffs,
-		  PD_type_kind kndi, long *ifmt, intb nbi,
+		  SC_kind kndi, long *ifmt, intb nbi,
 		  PD_byte_order ordi, int *iord,
-		  PD_type_kind kndo, long *ofmt, intb nbo,
+		  SC_kind kndo, long *ofmt, intb nbo,
 		  PD_byte_order ordo, int *oord,
 		  data_standard *hstd,
 		  int onescmp, int usg, int rdx, char *delim)
@@ -851,7 +851,7 @@ void _PD_text_bin(char **out, char **in, char *typ, inti ni,
        delim = "\n";
 
 /* convert char types */
-    if (kndi == CHAR_KIND)
+    if (kndi == KIND_CHAR)
        {nb = ni*nbo;
 	p  = strdelim(lin, delim);
 	if (p != NULL)
@@ -868,7 +868,7 @@ void _PD_text_bin(char **out, char **in, char *typ, inti ni,
 	lin  += nc;}
 
 /* convert integer types */
-    else if (kndi == INT_KIND)
+    else if (kndi == KIND_INT)
        {long *lv;
 
 	lv = CMAKE_N(long, ni);
@@ -888,7 +888,7 @@ void _PD_text_bin(char **out, char **in, char *typ, inti ni,
 	CFREE(lv);}
 
 /* convert floating point types */
-    else if (kndi == FLOAT_KIND)
+    else if (kndi == KIND_FLOAT)
        {double *dv;
 
 	dv = CMAKE_N(double, ni);
@@ -932,8 +932,8 @@ long _PD_convert_ptr_rd(char *bfi, intb fbpi, PD_byte_order ford,
     out = (char *) &n;
     if (ford == TEXT_ORDER)
        _PD_text_bin(&out, &in, SC_INT_S, 1L, 0,
-		    INT_KIND, NULL, fbpi, ford, NULL,
-		    INT_KIND, NULL, hbpi, hord, NULL,
+		    KIND_INT, NULL, fbpi, ford, NULL,
+		    KIND_INT, NULL, hbpi, hord, NULL,
 		    hs, FALSE, FALSE, 10, NULL);
     else
        _PD_iconvert(&out, &in, 1L, fbpi, ford, hbpi, hord, FALSE, FALSE);
@@ -956,8 +956,8 @@ static void _PD_convert_ptr_wr(char *bfo, long n, PDBfile *file,
     if (_PD_TEXT_OUT(file) == TRUE)
        {memset(out, ' ', fbpi);
 	_PD_bin_text(&out, &in, SC_INT_S, 1L, 0,
-		     INT_KIND, NULL, hbpi, hord, NULL,
-		     INT_KIND, NULL, fbpi, ford, NULL,
+		     KIND_INT, NULL, hbpi, hord, NULL,
+		     KIND_INT, NULL, fbpi, ford, NULL,
 		     hs, FALSE, FALSE, 10, NULL);}
     else
        {memset(out, 0, fbpi);
@@ -2130,7 +2130,7 @@ static int _PD_convert(char **out, char **in, inti ni, int boffs,
     intb inbts, lnby;
     long *ifmt, *ofmt;
     char *inty, *outty, *delim;
-    PD_type_kind iknd, oknd;
+    SC_kind iknd, oknd;
     PD_byte_order isord, osord, lsord, inord, outord;
 
     inty    = idp->type;

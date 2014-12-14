@@ -594,7 +594,7 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
     file->host_align = pa->host_align;
 
 /* install the type in both charts */
-    dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
+    dp = _PD_defstr_inst(file, name, KIND_STRUCT, lst,
 			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
 /* free tmp PDBfile */

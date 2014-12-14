@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb.h"
+#include "pdbtfr.h"
 
 #define DATFILE "nat"
 
@@ -46,10 +46,10 @@ extern long _PD_lookup_size(char *s, hasharr *tab);
 
 /*--------------------------------------------------------------------------*/
 
-/* TEST_TARGET - set up the target for the data file */
+/* TEST_TGT - set up the target for the data file */
 
-static void test_target(char *base, int n, char *fname, char *datfile,
-			long nc)
+static void test_tgt(char *base, int n, char *fname, char *datfile,
+		     long nc)
    {
 
     snprintf(fname, nc, "%s-nat.rs%d", base, n);
@@ -100,10 +100,9 @@ static void show_stat(statedes *st, char *tag, int na)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DUMP_TEST_SYMBOL_TABLE - dump the symbol table */
+/* DUMP_TEST_SYMTAB - dump the symbol table */
 
-static void dump_test_symbol_table(statedes *st, FILE *fp,
-				   hasharr *tab, int n)
+static void dump_test_symtab(statedes *st, FILE *fp, hasharr *tab, int n)
    {int i, ne;
     char **names;
 
@@ -116,24 +115,6 @@ static void dump_test_symbol_table(statedes *st, FILE *fp,
     SC_free_strings(names);
 
     PRINT(fp, "\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* ERROR - get out on an error */
-
-static void error(int n, FILE *fp, char *fmt, ...)
-   {char t[MAXLINE];
-        
-    SC_VA_START(fmt);
-    SC_VSNPRINTF(t, MAXLINE, fmt);
-    SC_VA_END;
-
-    io_printf(fp, "%s", t);
-
-    exit(n);
 
     return;}
 
@@ -269,7 +250,7 @@ static int test_1(statedes *st, char *base, char *tgt, int n, int na)
     show_stat(st, NULL, na);
 
 /* target the file as asked */
-    test_target(base, n, fname, datfile, MAXLINE);
+    test_tgt(base, n, fname, datfile, MAXLINE);
 
     fp = io_open(fname, "w");
 
@@ -304,7 +285,7 @@ static int test_1(statedes *st, char *base, char *tgt, int n, int na)
     PD_set_track_pointers(strm, st->track);
 
 /* dump the symbol table */
-    dump_test_symbol_table(st, fp, strm->symtab, 1);
+    dump_test_symtab(st, fp, strm->symtab, 1);
 
 /* read the data from the file */
     read_test_1_data(st, strm);
@@ -361,7 +342,7 @@ static int run_test(statedes *st, PFTest test, int n, char *host)
 
     for (ia = dna; ia <= st->na; ia *= dna)
         {if ((*test)(st, host, NULL, n, ia) == FALSE)
-	    {PRINT(STDOUT, "Test #%d failed\n", n);
+	    {error(-1, stdout, "Test #%d failed\n", n);
 	     fail++;};};
 
     cs = SC_mem_monitor(cs, dbg, "B", msg);

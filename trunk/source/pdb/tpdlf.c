@@ -316,7 +316,7 @@ static int run_test(statedes *st, PFTest test, char *tag)
 
 	 for (iv = 0; iv < nv; iv++)
 	     {if ((*test)(st, iv, it) == FALSE)
-		 {PRINT(STDOUT, "Test #%d failed\n", st->i);
+		 {error(-1, "Test #%d failed\n", st->i);
 		  fail++;};};
        
 	 tr += (SC_wall_clock_time() - dt);

@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb_int.h"
+#include "pdbtfr.h"
 
 #define NPTS 10
 
@@ -170,48 +170,48 @@ static int check_myplot(int tid, myplot *a, myplot *b, char *s)
     ok = TRUE;
 
     if ((ok == TRUE) && (a->npts != b->npts))
-       {PRINT(stdout, "%d> a->npts differs from b->npts in %s\n", tid, s);
+       {error(-1, stdout, "%d> a->npts differs from b->npts in %s\n", tid, s);
         ok = FALSE;};
 
     if (ok == TRUE)
        {for (i = 0; i < 10; i++)
 	    {if (a->x_axis[i] != b->x_axis[i])
-	        {PRINT(stdout, "%d> a->x_axis[%d] differs from b->x_axis[%d] in %s\n",
+	        {error(-1, stdout, "%d> a->x_axis[%d] differs from b->x_axis[%d] in %s\n",
 		       tid, i, i, s);
 		 ok = FALSE;};};};
 
     if ((ok == TRUE) && (a->label == NULL))
-       {PRINT(stdout, "%d> a->label is NULL %s\n",
+       {error(-1, stdout, "%d> a->label is NULL %s\n",
 	      tid, s);
         ok = FALSE;};
 
     if ((ok == TRUE) && (b->label == NULL))
-       {PRINT(stdout, "%d> b->label is NULL %s\n",
+       {error(-1, stdout, "%d> b->label is NULL %s\n",
 	      tid, s);
         ok = FALSE;};
 
     if ((ok == TRUE) && (strcmp(a->label, b->label) != 0))
-       {PRINT(stdout, "%d> a->label differs from b->label in %s\n",
+       {error(-1, stdout, "%d> a->label differs from b->label in %s\n",
 	      tid, s);
         ok = FALSE;};
 
     if ((ok == TRUE) && (a->view->x_min != b->view->x_min))
-       {PRINT(stdout, "%d> a->view->xmin differs from b->view->xmin in %s\n",
+       {error(-1, stdout, "%d> a->view->xmin differs from b->view->xmin in %s\n",
 	      tid, s);
         ok = FALSE;};
 
     if ((ok == TRUE) && (a->view->x_max != b->view->x_max))
-       {PRINT(stdout, "%d> a->view->x_max differs from b->view->x_max in %s\n",
+       {error(-1, stdout, "%d> a->view->x_max differs from b->view->x_max in %s\n",
 	      tid, s);
         ok = FALSE;};
 
     if ((ok == TRUE) && (a->view->y_min != b->view->y_min))
-       {PRINT(stdout, "%d> a->view->y_min differs from b->view->y_min in %s\n",
+       {error(-1, stdout, "%d> a->view->y_min differs from b->view->y_min in %s\n",
 	      tid, s);
         ok = FALSE;};
 
     if ((ok == TRUE) && (a->view->y_max != b->view->y_max))
-       {PRINT(stdout, "%d> a->view->y_max differs from b->view->y_max in %s\n",
+       {error(-1, stdout, "%d> a->view->y_max differs from b->view->y_max in %s\n",
 	      tid, s);
         ok = FALSE;};
 
@@ -245,16 +245,13 @@ static void *writeitd(void *arg)
          SC_strncpy(sname3+9, 91, suffix, -1);
 
         if (!PD_write(file, sname1, "myplot", &mypl))
-           {PRINT(stdout, "Error writing %s - exiting\n", sname1);
-            exit(1);}
+           error(1, stdout, "Error writing %s - exiting\n", sname1);
 
         if (!PD_write(file, sname2, "myplot *", &xp))
-           {PRINT(stdout, "Error writing %s - exiting\n", sname2);
-            exit(1);}
+           error(1, stdout, "Error writing %s - exiting\n", sname2);
 
         if (!PD_write(file, sname3, "myplot", &mypl))
-           {PRINT(stdout, "Error writing %s - exiting\n", sname3);
-            exit(1);};}
+           error(1, stdout, "Error writing %s - exiting\n", sname3);};
 
     ok_count++;
 
@@ -289,12 +286,10 @@ static void *writeits(void *arg)
          SC_strncpy(sname2+8, 92, suffix, -1);
 
          if (!PD_write(file, sname1, "myplot", &xplot))
-            {PRINT(stdout, "Error writing %s - exiting\n", sname1);
-             exit(1);}       
+            error(1, stdout, "Error writing %s - exiting\n", sname1);
 
          if (!PD_write(file, sname2, "myplot", &xplot))
-            {PRINT(stdout, "Error writing %s - exiting\n", sname2);
-             exit(1);};}
+	    error(1, stdout, "Error writing %s - exiting\n", sname2);};
 
     ok_count++;
 
@@ -334,8 +329,7 @@ void *readitd(void *arg)
          SC_strncpy(sname3+9, 91, suffix, -1);
 
          if (!PD_read(file, sname1, &rmypl))
-            {PRINT(stdout, "Error reading %s - exiting\n", sname1);
-             exit(1);}
+            error(1, stdout, "Error reading %s - exiting\n", sname1);
 
 /* compare with original */
          err &= check_myplot(tid, &mypl, &rmypl, sname1);
@@ -345,8 +339,7 @@ void *readitd(void *arg)
 	    clean_plot(&rmypl, 0);
 
          if (!PD_read(file, sname2, &rxp))
-            {PRINT(stdout, "Error reading %s - exiting\n", sname2);
-             exit(1);}
+            error(1, stdout, "Error reading %s - exiting\n", sname2);
 
 /* compare with original */
          err &= check_myplot(tid, xp, rxp, sname2);
@@ -356,8 +349,7 @@ void *readitd(void *arg)
 	    free_plot(rxp, 0);
 
          if (!PD_read(file, sname3, &rmypl))
-            {PRINT(stdout, "Error reading %s - exiting\n", sname3);
-             exit(1);};
+            error(1, stdout, "Error reading %s - exiting\n", sname3);
 
 /* compare with original */
          err &= check_myplot(tid, &mypl, &rmypl, sname3);
@@ -402,8 +394,7 @@ void *readits(void *arg)
          SC_strncpy(sname2+8, 92, suffix, -1);
 
          if (!PD_read(file, sname1, &rxplot))
-            {PRINT(stdout, "Error reading %s - exiting\n", sname1);
-             exit(1);}       
+            error(1, stdout, "Error reading %s - exiting\n", sname1);
 
 /* compare with original */
          err &= check_myplot(tid, &xplot, &rxplot, sname1);
@@ -413,8 +404,7 @@ void *readits(void *arg)
 	    clean_plot(&rxplot, 0);
 
          if (!PD_read(file, sname2, &rxplot))
-            {PRINT(stdout, "Error reading %s - exiting\n", sname2);
-             exit(1);};
+            error(1, stdout, "Error reading %s - exiting\n", sname2);
 
 /* compare with original */
          err &= check_myplot(tid, &xplot, &rxplot, sname2);
@@ -512,7 +502,7 @@ int main(int c, char **v)
 /* create the output file */
     file = PD_open("ptest.pdb", "w");
     if (file == NULL)
-       {PRINT(stdout, "Error creating ptest.pdb\n");
+       {error(-1, stdout, "Error creating ptest.pdb\n");
         return(1);};
 
 /* define the structures to the library */
@@ -561,13 +551,13 @@ int main(int c, char **v)
 
 /* flush the tables to the file */
     if (!PD_flush(file))
-       {PRINT(stdout, "Error flushing file before reads\n");
+       {error(-1, stdout, "Error flushing file before reads\n");
         return(1);};
 
     PD_close(file);
 
     if ((file = PD_open("ptest.pdb", "r")) == NULL)
-       {PRINT(stdout, "Error re-opening ptest.pdb\n");
+       {error(-1, stdout, "Error re-opening ptest.pdb\n");
         return(1);};
 
 /* two threads read the file */

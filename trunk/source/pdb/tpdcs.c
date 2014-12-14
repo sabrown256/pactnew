@@ -105,15 +105,15 @@ static int write_test_1_data(PDBfile *strm)
 
 /* this also writes out an extra hidden checksum variable for x */
     if (!PD_write(strm, "x", "float", &st.x))
-       {PRINT(stdout, "%s", PD_get_error());
+       {error(-1, stdout, "%s", PD_get_error());
 	rv = FALSE;};
         
     if (!PD_write(strm, st.yname, "long", st.y))
-       {PRINT(stdout, "%s", PD_get_error());
+       {error(-1, stdout, "%s", PD_get_error());
 	rv = FALSE;};
         
     if (!PD_write(strm, st.tsname, "ts1", st.foo))
-       {PRINT(stdout, "%s", PD_get_error());
+       {error(-1, stdout, "%s", PD_get_error());
 	rv = FALSE;};
                            
     return(rv);}
@@ -131,19 +131,19 @@ static int read_test_1_data(PDBfile *strm)
 /* determine if read failed or checksum failed: check error */     
     rv = PD_read(strm, "x", &st.x); 
     if ((rv == FALSE) || (rv == -1))
-       {PRINT(stdout, "%s", PD_get_error());  
+       {error(-1, stdout, "%s", PD_get_error());  
 	ok = FALSE;};
 
 /* determine if read failed or checksum failed: check error */     
     rv = PD_read(strm, "y", st.y); 
     if ((rv == FALSE) || (rv == -1))
-       {PRINT(stdout, "%s", PD_get_error());  
+       {error(-1, stdout, "%s", PD_get_error());  
 	ok = FALSE;};
          
 /* determine if read failed or checksum failed: check error */     
     rv = PD_read(strm, "foo", st.foo); 
     if ((rv == FALSE) || (rv == -1))
-       {PRINT(stdout, "%s", PD_get_error());  
+       {error(-1, stdout, "%s", PD_get_error());  
 	ok = FALSE;};
 
     return(ok);}
@@ -297,15 +297,15 @@ static int write_test_2_data(PDBfile *strm)
 
 /* this also writes out an extra hidden checksum variable for x */
     if (!PD_write(strm, "x", "float", &st.x))
-       {PRINT(stdout, "%s", PD_get_error());
+       {error(-1, stdout, "%s", PD_get_error());
 	rv = FALSE;};
 
     if (!PD_write(strm, st.yname, "long", st.y))
-       {PRINT(stdout, "%s", PD_get_error());
+       {error(-1, stdout, "%s", PD_get_error());
 	rv = FALSE;};
 
     if (!PD_write(strm, st.tsname, "ts1", st.foo))
-       {PRINT(stdout, "%s", PD_get_error());
+       {error(-1, stdout, "%s", PD_get_error());
 	rv = FALSE;};
 
     return(rv);}
@@ -323,19 +323,19 @@ static int read_test_2_data(PDBfile *strm)
 /* determine if read failed or checksum failed: check error */     
     rv = PD_read(strm, "x", &st.x); 
     if ((rv == FALSE) || (rv == -1))
-       {PRINT(stdout, "%s", PD_get_error());  
+       {error(-1, stdout, "%s", PD_get_error());  
 	ok = FALSE;};
 
 /* determine if read failed or checksum failed: check error */     
     rv = PD_read(strm, "y", st.y); 
     if ((rv == FALSE) || (rv == -1))
-       {PRINT(stdout, "%s", PD_get_error());  
+       {error(-1, stdout, "%s", PD_get_error());  
 	ok = FALSE;};
          
 /* determine if read failed or checksum failed: check error */     
     rv = PD_read(strm, "foo", st.foo); 
     if ((rv == FALSE) || (rv == -1))
-       {PRINT(stdout, "%s", PD_get_error());  
+       {error(-1, stdout, "%s", PD_get_error());  
 	ok = FALSE;};
 
     return(ok);}
@@ -450,11 +450,11 @@ static int write_test_3_data(PDBfile *strm)
            
 /* this also writes out an extra hidden checksum variable for x */
     if (!PD_write(strm, "x", "float", &st.x))
-       {PRINT(stdout, "%s", PD_get_error());
+       {error(-1, stdout, "%s", PD_get_error());
 	rv = FALSE;};
         
     if (!PD_write(strm, st.yname, "long", st.y))
-       {PRINT(stdout, "%s", PD_get_error());
+       {error(-1, stdout, "%s", PD_get_error());
 	rv = FALSE;};
         
 /* turn off variable checksums */      
@@ -462,7 +462,7 @@ static int write_test_3_data(PDBfile *strm)
     SC_ASSERT(old == TRUE);
            
     if (!PD_write(strm, st.tsname, "ts1", st.foo))
-       {PRINT(stdout, "%s", PD_get_error());
+       {error(-1, stdout, "%s", PD_get_error());
 	rv = FALSE;};
                            
     return(rv);}
@@ -668,15 +668,15 @@ static int write_test_4_data(PDBfile *strm)
 /* write a primitive 2D array into the file in three blocks */
 
     if (!PD_write(strm, "ia(1,5)", "integer", st.ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
+       {error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
         rv = FALSE;};
 
     if (!PD_append(strm, "ia(1:1,0:4)", st.ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_4_DATA\n");
+       {error(-1, stdout, "IA APPEND 1 FAILED - WRITE_TEST_4_DATA\n");
         rv = FALSE;};
 
     if (!PD_append(strm, "ia(2:2,0:4)", st.ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_4_DATA\n");
+       {error(-1, stdout, "IA APPEND 2 FAILED - WRITE_TEST_4_DATA\n");
         rv = FALSE;};
 
     return(rv);}
@@ -843,15 +843,15 @@ static int write_test_5_data(PDBfile *strm)
 /* write a primitive 1D array into the file in three blocks */
 
     if (!PD_write(strm, "ia(5)", "integer", st.ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_5_DATA\n");
+       {error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_5_DATA\n");
         rv = FALSE;};
 
     if (!PD_append(strm, "ia(5:9)", st.ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_5_DATA\n");
+       {error(-1, stdout, "IA APPEND 1 FAILED - WRITE_TEST_5_DATA\n");
         rv = FALSE;};
 
     if (!PD_append(strm, "ia(10:14)", st.ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_5_DATA\n");
+       {error(-1, stdout, "IA APPEND 2 FAILED - WRITE_TEST_5_DATA\n");
         rv = FALSE;};
 
     return(rv);}
@@ -875,14 +875,14 @@ static int change_test_5_data(PDBfile *strm)
 
 /* change a value in the middle of the first block */
     if (!PD_write(strm, "ia(3)", "integer", ia_a))
-       {PRINT(STDOUT, "IA WRITE FAILED - CHANGE_TEST_5_DATA\n");
+       {error(-1, stdout, "IA WRITE FAILED - CHANGE_TEST_5_DATA\n");
         rv = FALSE;};
 
 /* change values in the first and second block
  * this tests writes spanning blocks
  */
     if (!PD_write(strm, "ia(4:5)", "integer", ia_a))
-       {PRINT(STDOUT, "IA WRITE FAILED - CHANGE_TEST_5_DATA\n");
+       {error(-1, stdout, "IA WRITE FAILED - CHANGE_TEST_5_DATA\n");
         rv = FALSE;};
 
 /* NOTE: we leave the third block alone to test handling of valid blocks */
@@ -1152,12 +1152,12 @@ static int run_test(PFTest test, int n, char *host)
 
 	     nm = PD_target_platform_name(i);
 	     if ((*test)(host, nm, n) == FALSE)
-	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
+	        {error(-1, stdout, "Test #%d %s failed\n", n, nm);
 		 fail++;};};};
 
 /* native test */
     if ((*test)(host, NULL, n) == FALSE)
-       {PRINT(STDOUT, "Test #%d native failed\n", n);
+       {error(-1, stdout, "Test #%d native failed\n", n);
 	fail++;};
 
     post_test(&ti, n);

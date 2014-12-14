@@ -215,7 +215,7 @@ pboolean PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
 
     else
        {lst = PD_copy_members(dp->members);
-	dp  = _PD_defstr_inst(df, type, STRUCT_KIND, lst,
+	dp  = _PD_defstr_inst(df, type, KIND_STRUCT, lst,
 			      NO_ORDER, NULL, NULL, PD_CHART_HOST);
 	if (dp == NULL)
 	   {snprintf(pa->err, MAXLINE,
@@ -365,7 +365,7 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
     typ = (type == NULL) ? PD_entry_type(ep) : type;
     if (file->fix_denorm &&  (typ != NULL))
        {dp = PD_inquire_type(file, typ);
-	if ((dp != NULL) && (dp->kind == FLOAT_KIND))
+	if ((dp != NULL) && (dp->kind == KIND_FLOAT))
 	   {if (ind == NULL)
 	       nf = _PD_comp_num(ep->dimensions);
 	    else

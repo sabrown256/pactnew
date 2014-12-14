@@ -410,7 +410,7 @@ static int _PD_test_recursion(char *type, char *mtype)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PRINT_CHAR_KIND - print an entry of CHAR_KIND */
+/* _PD_PRKIND_INT_CHAR - print an entry of KIND_CHAR */
 
 static void _PD_print_char_kind(PD_printdes *prnt, char *vr, inti ni,
 				char *type, int quo, int idx,
@@ -568,11 +568,11 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	else if (id == SC_BOOL_I)
 	  _PD_disp_data(prnt, vr, ni, SC_BOOL_I, n, ind);
 
-	else if ((pd->kind == CHAR_KIND) || (isz == sizeof(char)))
+	else if ((pd->kind == KIND_CHAR) || (isz == sizeof(char)))
 	   {if (id == SC_CHAR_I)
 	       {idx = SC_STRING_I;
 	        quo = TRUE;}
-	    else if (pd->kind == CHAR_KIND)
+	    else if (pd->kind == KIND_CHAR)
 	       {idx = SC_STRING_I;
 		ni  = isz;
 	        quo = FALSE;}

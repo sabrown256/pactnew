@@ -154,8 +154,7 @@ static int setup_data(int rank)
 /* set up the int array */
     p_int_w = CMAKE_N(int, N_INT);
     if (p_int_w == NULL)
-       {printf("Error allocating p_int_w, process %d--quitting\n", rank);
-        exit(1);}
+       error(1, "Error allocating p_int_w, process %d--quitting\n", rank);
 
     for (i = 0; i < N_INT; i++)
         p_int_w[i] = rank * i;
@@ -163,8 +162,7 @@ static int setup_data(int rank)
 /* set up the float array */
     p_float_w = CMAKE_N(float, N_FLOAT);
     if (p_float_w == NULL)
-       {printf("Error allocating p_float_w, process %d--quitting\n", rank);
-        return(FALSE);};
+       error(1, "Error allocating p_float_w, process %d--quitting\n", rank);
 
     for (i = 0; i < N_FLOAT; i++)
         p_float_w[i] = (float)(rank * i);
@@ -172,8 +170,7 @@ static int setup_data(int rank)
 /* setup the serial array */
     p_fserial_w = CMAKE_N(float, N_FLOAT);
     if (p_fserial_w == NULL)
-       {printf("Error allocating p_fserial_w, process %d--quitting\n", rank);
-        return(FALSE);};
+       error(1, "Error allocating p_fserial_w, process %d--quitting\n", rank);
 
     for (i = 0; i < N_FLOAT; i++)
         p_fserial_w[i] = (float)(i);
@@ -219,15 +216,15 @@ static int write_data_serial(PDBfile *file, int rank, int numprocs,
         int_serial   = INT_MAX;
 
         if (!PD_write(file, "float_serial", "float", &float_serial))
-           {printf("Error writing fserial: process %d\n", rank);
+           {error(-1, "Error writing fserial: process %d\n", rank);
             rv = FALSE;};
 
         if (!PD_write(file, "p_fserial", "float *", &p_fserial_w))
-           {printf("Error writing p_fserial: process %d\n", rank);
+           {error(-1, "Error writing p_fserial: process %d\n", rank);
             rv = FALSE;};
 
         if (!PD_write(file, "int_serial", "int", &int_serial))
-           {printf("Error writing iserial: process %d\n", rank);
+           {error(-1, "Error writing iserial: process %d\n", rank);
             rv = FALSE;};
 
         PD_mp_set_serial(file, oldflag);};
@@ -250,14 +247,14 @@ static int write_data_scalar(PDBfile *file, int rank, int numprocs,
 /* write an integer */
     snprintf(var, MAXLINE, "rank_%d", rank);
     if (!PD_write(file, var, "integer", &rank))
-       {printf("Error writing rank: process %d\n", rank);
+       {error(-1, "Error writing rank: process %d\n", rank);
         rv = FALSE;};
 
 /* write a float */
     frank = rank;
     snprintf(var, MAXLINE, "frank_%d", rank);
     if (!PD_write(file, var, "float", &frank))
-       {printf("Error writing frank: process %d\n", rank);
+       {error(-1, "Error writing frank: process %d\n", rank);
         rv = FALSE;};
 
     return(rv);}
@@ -277,13 +274,13 @@ static int write_data_array(PDBfile *file, int rank, int numprocs,
 /* write an int array */
     snprintf(var, MAXLINE, "p_int_%d", rank);
     if (!PD_write(file, var, "int *", &p_int_w))
-       {printf("Error writing p_int: process %d\n", rank);
+       {error(-1, "Error writing p_int: process %d\n", rank);
         rv = FALSE;};
 
 /* write an float array */
     snprintf(var, MAXLINE, "p_float_%d", rank);
     if (!PD_write(file, var, "float *", &p_float_w))
-       {printf("Error writing p_float: process %d\n", rank);
+       {error(-1, "Error writing p_float: process %d\n", rank);
         rv = FALSE;};
 
     return(rv);}
@@ -322,13 +319,13 @@ static int write_data_struct(PDBfile *file, int rank, int numprocs,
 /* write a struct */
     snprintf(var, MAXLINE, "myplot_%d", rank);
     if (!PD_write(file, var, "myplot", &mypl_w))
-       {printf("Error writing myplot: process %d\n", rank);
+       {error(-1, "Error writing myplot: process %d\n", rank);
         rv = FALSE;};
 
 /* try a PD_defent */
     snprintf(var, MAXLINE, "x[%d]", N_ELEM);
     if (!PD_defent(file, var, "float"))
-       {printf("PD_defent failed for x[%d], process %d\n", N_ELEM, rank);
+       {error(-1, "PD_defent failed for x[%d], process %d\n", N_ELEM, rank);
         rv = FALSE;};
 
     nwrite = (comm == SC_COMM_SELF) ? N_ELEM : N_ELEM / numprocs;
@@ -341,7 +338,7 @@ static int write_data_struct(PDBfile *file, int rank, int numprocs,
        snprintf(var, MAXLINE, "x[0:%d]", N_ELEM-1);
 
     if (!PD_write(file, var, "float", x))
-       {printf("Error writing x, process %d\n", rank);
+       {error(-1, "Error writing x, process %d\n", rank);
         rv = FALSE;};
 
     return(rv);}
@@ -361,12 +358,12 @@ static int read_data_serial(PDBfile *file, int rank, int numprocs,
 /* read the serial data */
     if (((comm == SC_COMM_SELF) && (rank == 0)) || (comm == SC_COMM_WORLD))
        {if (!PD_read(file, "p_fserial", &p_fserial_r))
-           {printf("Error reading p_fserial: process %d\n", rank);
+           {error(-1, "Error reading p_fserial: process %d\n", rank);
             rv = FALSE;};
 
         for (i = 0; i < N_FLOAT; i++)
             if (p_fserial_r[i] != p_fserial_w[i])
-               {printf("Error: p_fserial_r[%d] = %g != p_fserial_w[%d] = %g",
+               {error(-1, "Error: p_fserial_r[%d] = %g != p_fserial_w[%d] = %g",
                         i, p_fserial_r[i], i, p_fserial_w[i]);
                 printf(" Process %d\n", rank);
                 print_comm_type(comm);
@@ -374,20 +371,20 @@ static int read_data_serial(PDBfile *file, int rank, int numprocs,
                 break;};
 
         if (!PD_read(file, "float_serial", &float_serial))
-           {printf("Error reading float_serial: process %d\n", rank);
+           {error(-1, "Error reading float_serial: process %d\n", rank);
             rv = FALSE;};
 
         if (float_serial != FLT_MAX)
-           {printf("Error: float_serial_w = %g != float_serial_r = %g\n",
+           {error(-1, "Error: float_serial_w = %g != float_serial_r = %g\n",
 		   float_serial, FLT_MAX);
             rv = FALSE;};
 
         if (!PD_read(file, "int_serial", &int_serial))
-           {printf("Error reading int_serial: process %d\n", rank);
+           {error(-1, "Error reading int_serial: process %d\n", rank);
             rv = FALSE;};
 
         if (int_serial != INT_MAX)
-           {printf("Error: int_serial_w = %d != int_serial_r = %d\n",
+           {error(-1, "Error: int_serial_w = %d != int_serial_r = %d\n",
 		   int_serial, INT_MAX);
             rv = FALSE;};};
 
@@ -409,24 +406,24 @@ static int read_data_scalar(PDBfile *file, int rank, int numprocs,
 /* read an integer */
     snprintf(var, MAXLINE, "rank_%d", rank);
     if (!PD_read(file, var, &rankr))
-       {printf("Error reading rank: process %d\n", rank);
+       {error(-1, "Error reading rank: process %d\n", rank);
         print_comm_type(comm);
         rv = FALSE;};
 
     if (rankr != rank)
-       {printf("Error: rankr != rank: process %d\n", rank);
+       {error(-1, "Error: rankr != rank: process %d\n", rank);
         print_comm_type(comm);
         rv = FALSE;};
 
 /* read a float */
     snprintf(var, MAXLINE, "frank_%d", rank);
     if (!PD_read(file, var, &frank))
-       {printf("Error reading frank: process %d\n", rank);
+       {error(-1, "Error reading frank: process %d\n", rank);
         print_comm_type(comm);
         rv = FALSE;};
 
     if (frank != (float)rank)
-       {printf("Error: frank != rank: process %d\n", rank);
+       {error(-1, "Error: frank != rank: process %d\n", rank);
         print_comm_type(comm);
         rv = FALSE;};
 
@@ -447,13 +444,13 @@ static int read_data_array(PDBfile *file, int rank, int numprocs,
 /* read an int *array */
     snprintf(var, MAXLINE, "p_int_%d", rank);
     if (!PD_read(file, var, &p_int_r))
-       {printf("Error reading p_int: process %d\n", rank);
+       {error(-1, "Error reading p_int: process %d\n", rank);
         print_comm_type(comm);
         rv = FALSE;}
 
     for (i = 0; i < N_INT; i++)
         if (p_int_r[i] != p_int_w[i])
-           {printf("Error: p_int_r[%d] != p_int_w[%d], p_int_r[%d] = %d, p_int_w[%d] = %d",
+           {error(-1, "Error: p_int_r[%d] != p_int_w[%d], p_int_r[%d] = %d, p_int_w[%d] = %d",
                     i, i, i, p_int_r[i], i, p_int_w[i]);
             printf(" Process %d\n", rank);
             print_comm_type(comm);
@@ -463,12 +460,12 @@ static int read_data_array(PDBfile *file, int rank, int numprocs,
 /* read a float array */
     snprintf(var, MAXLINE, "p_float_%d", rank);
     if (!PD_read(file, var, &p_float_r))
-       {printf("Error reading p_float: process %d\n", rank);
+       {error(-1, "Error reading p_float: process %d\n", rank);
         rv = FALSE;};
 
     for (i = 0; i < N_FLOAT; i++)
         if (p_float_r[i] != p_float_w[i])
-           {printf("Error: p_float_r[%d] != p_float_w[%d], p_float_r[%d] = %g, p_float_w[%d] = %g",
+           {error(-1, "Error: p_float_r[%d] != p_float_w[%d], p_float_r[%d] = %g, p_float_w[%d] = %g",
                     i, i, i, p_float_r[i], i, p_float_w[i]);
             printf(" Process %d\n", rank);
             print_comm_type(comm);
@@ -501,7 +498,7 @@ static int read_data_struct(PDBfile *file, int rank, int numprocs,
 /* read a struct */
     snprintf(var, MAXLINE, "myplot_%d", rank);
     if (!PD_read(file, var, &mypl_r))
-       {printf("Error reading myplot: process %d\n", rank);
+       {error(-1, "Error reading myplot: process %d\n", rank);
         print_comm_type(comm);
         rv = FALSE;};
 
@@ -511,14 +508,14 @@ static int read_data_struct(PDBfile *file, int rank, int numprocs,
     snprintf(var, MAXLINE, "x[0:%d]", N_ELEM-1);
 
     if (!PD_read(file, var, xr))
-       {printf("Error reading x, process %d\n", rank);
+       {error(-1, "Error reading x, process %d\n", rank);
         print_comm_type(comm);
         rv = FALSE;};
 
     if (comm == SC_COMM_SELF)
        {for (i = 0; i < N_ELEM; i++)
             if (xr[i] != x[i])
-               {printf("Error: xr[%d] != x[%d], xr[%d] = %g, x[%d] = %g\n",
+               {error(-1, "Error: xr[%d] != x[%d], xr[%d] = %g, x[%d] = %g\n",
                        i, i, i, xr[i], i, x[i]);
                 printf(" Process %d\n", rank);
                 print_comm_type(comm); 
@@ -528,7 +525,7 @@ static int read_data_struct(PDBfile *file, int rank, int numprocs,
        {int nchunk = N_ELEM / numprocs;
         for (i = rank*nchunk; i < (rank+1)*nchunk; i++)
             if (xr[i] != (float)rank)
-               {printf("Error: xr[%d] != rank, xr[%d] = %f, rank = %d\n",
+               {error(-1, "Error: xr[%d] != rank, xr[%d] = %f, rank = %d\n",
                        i, i, xr[i], rank);
                 printf(" Process %d\n", rank);
                 print_comm_type(comm);

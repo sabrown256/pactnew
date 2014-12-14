@@ -17,6 +17,35 @@
 #define BUFINCR   4096
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CAT_TYPE - concatenate type tokens to make a valid C type
+ *              - expect the C type tokens to be followed by a
+ *              - string representation of a number
+ */
+
+char *_PD_cat_type(char **sa, int *pit)
+   {int it, nt;
+    char t[BFSML];
+    char *rv;
+
+    it = *pit;
+
+    for (nt = it; sa[nt] != NULL; nt++)
+        {if (isdigit(sa[nt][0]))
+	    break;};
+
+    if (nt > it)
+       {PS_concatenate(t, BFSML, sa, it, nt, " ");
+	rv   = CSTRSAVE(t);
+	*pit = nt;}
+    else
+       {rv   = NULL;
+	*pit = -1;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                           READ/WRITE SUPPORT                             */
 

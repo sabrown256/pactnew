@@ -589,7 +589,7 @@
 (make-meshes)
 (write-meshes)
 (cf mesh.dat)
-
+(trace pg-draw-domain)
 ;(cw "A" "COLOR" "WINDOW" 0.01 0.01 0.5 0.5)
 (cw "pdbvmesh" "COLOR" "PS" 0.0 0.0 1.0 1.0)
 (pld particle0 helix2 cylinder3 line1)

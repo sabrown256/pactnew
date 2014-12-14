@@ -567,10 +567,16 @@ syment *_PD_mk_syment(char *type, inti ni, int64_t addr, symindir *indr,
 	else
 	   {t = CSTRSAVE(type);
 	    SC_mark(t, 1);};
+	ep->type = t;
 
-	ep->type       = t;
-	ep->number     = ni;
-	ep->dimensions = dims;
+	ep->number = ni;
+
+	if (ni > 0)
+	   {ep->dimensions = dims;
+	    SC_mark(dims, 1);}
+	else
+	   {ep->dimensions = NULL;
+	    CFREE(dims);};
 
 	if (indr == NULL)
 	   {symindir iloc;
@@ -578,11 +584,8 @@ syment *_PD_mk_syment(char *type, inti ni, int64_t addr, symindir *indr,
 	    iloc.n_ind_type = 0L;
 	    iloc.arr_offs   = 0L;
 	    ep->indirects   = iloc;}
-
 	else
-	   ep->indirects = *indr;
-
-	SC_mark(dims, 1);};
+	   ep->indirects = *indr;};
 
     return(ep);}
 
@@ -647,7 +650,7 @@ void _PD_rl_syment(syment *ep)
 
 /* _PD_MK_DEFSTR - make a defstr entry for the structure chart */
 
-defstr *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind,
+defstr *_PD_mk_defstr(hasharr *chrt, char *type, SC_kind kind,
 		      memdes *lst, multides *tuple, long sz, int align,
 		      PD_byte_order ord, int conv,
 		      int *ordr, long *formt, int unsgned, int onescmp)

@@ -15,6 +15,7 @@
 #include "pml_int.h"
 #include "pdb.h"
 #include "scope_mpi.h"
+#include "scope_typeh.h"
 
 /*--------------------------------------------------------------------------*/
 
@@ -328,7 +329,7 @@ extern syment
 
 extern defstr
  *_PD_defstr_copy(defstr *dp),
- *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind,
+ *_PD_mk_defstr(hasharr *chrt, char *type, SC_kind kind,
 		memdes *lst, multides *tuple,
 		long sz, int align, PD_byte_order ord, int conv,
 		int *ordr, long *formt, int unsgned, int onescmp);
@@ -476,6 +477,7 @@ extern int
 /* PDFMT.C declarations */
 
 extern char
+ *_PD_cat_type(char **sa, int *pit),
  *_PD_header_token(int which),
  *_PD_rfgets(char *s, int n, FILE *fp),
  *_PD_get_tbuffer(void),
@@ -523,12 +525,13 @@ extern void
 		 data_alignment *falign, data_alignment *halign,
 		 PD_chart_kind chk, int ftk),
  _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
-		    PD_type_kind kind, multides *tuple,
+		    SC_kind kind, multides *tuple,
 		    intb bpi, int align, PD_byte_order ord,
 		    int *ordr, long *formt,
 		    int unsgned, int onescmp, int conv),
  _PD_def_real(char *type, PDBfile *file),
- _PD_d_install(PDBfile *file, char *name, defstr *def, PD_chart_kind chk),
+ _PD_d_install(PDBfile *file, char *name, defstr *def,
+	       PD_chart_kind chk, char *alias),
  _PD_e_install(PDBfile *file, char *name, syment *entr, int lookup),
  _PD_request_unset(PDBfile *file),
  _PD_replace_file(PDBfile *file, char *name, int64_t addr);
@@ -552,11 +555,11 @@ extern int64_t
 
 extern defstr
  *_PD_defstr(PDBfile *file, PD_chart_kind host,
-	     char *name, PD_type_kind kind,
+	     char *name, SC_kind kind,
 	     memdes *desc, multides *tuple,
 	     long sz, int align, PD_byte_order ord,
 	     int conv, int *ordr, long *formt, int unsgned, int onescmp),
- *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
+ *_PD_defstr_inst(PDBfile *file, char *name, SC_kind kind,
 		  memdes *desc, PD_byte_order ord,
 		  int *ordr, long *formt, PD_chart_kind chk),
  *_PD_type_container(PDBfile *file, defstr *dp);

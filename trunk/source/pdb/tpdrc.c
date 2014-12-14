@@ -95,14 +95,14 @@ int test_1(char *base, char *tgt, int n)
 		   "List *next",
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr List: %s\n", PD_get_error());
+       error(-1, stdout, "PD_defstr List: %s\n", PD_get_error());
   
     dp = PD_defstr(file,
 		   "ASTRUCT",
 		   "int val",
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr A: %s\n", PD_get_error());
+       error(-1, stdout, "PD_defstr A: %s\n", PD_get_error());
     
     dp = PD_defstr(file,
 		   "BSTRUCT",
@@ -110,10 +110,10 @@ int test_1(char *base, char *tgt, int n)
 		   "float y",
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr B: %s\n", PD_get_error());
+       error(-1, stdout, "PD_defstr B: %s\n", PD_get_error());
   
     if (PD_cast(file, "List", "data", "type") == 0)
-       PRINT(stdout, "PD_cast: %s\n", PD_get_error());
+       error(-1, stdout, "PD_cast: %s\n", PD_get_error());
 
     head = CMAKE(List);
     ptr  = head;
@@ -142,7 +142,7 @@ int test_1(char *base, char *tgt, int n)
 	    ptr->next = NULL;};
     
     if (PD_write(file, "mylist", "List", head) == 0)
-       PRINT(stdout, "PD_write: %s\n", PD_get_error());
+       error(-1, stdout, "PD_write: %s\n", PD_get_error());
 
     PD_close(file);
 
@@ -181,11 +181,11 @@ int test_2(char *base, char *tgt, int n)
 		   "char *a", 
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr da2: %s\n", PD_get_error());
+       error(-1, stdout, "PD_defstr da2: %s\n", PD_get_error());
   
     ok = PD_size_from(file, "da2", "a", "n");
     if (ok == 0)
-       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+       error(-1, stdout, "PD_size_from: %s\n", PD_get_error());
 
     dp = PD_defstr(file, "db2",
 		   "int i",
@@ -193,11 +193,11 @@ int test_2(char *base, char *tgt, int n)
 		   "char *a", 
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr db2: %s\n", PD_get_error());
+       error(-1, stdout, "PD_defstr db2: %s\n", PD_get_error());
   
     ok = PD_size_from(file, "db2", "a", "i,j");
     if (ok == 0)
-       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+       error(-1, stdout, "PD_size_from: %s\n", PD_get_error());
 
     m1 = 10;
     m2 = 2;
@@ -283,22 +283,22 @@ int test_3(char *base, char *tgt, int n)
 		   "char *a", 
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr da3: %s\n", PD_get_error());
+       error(-1, stdout, "PD_defstr da3: %s\n", PD_get_error());
   
     ok = PD_size_from(file, "da3", "a", "n");
     if (ok == 0)
-       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+       error(-1, stdout, "PD_size_from: %s\n", PD_get_error());
 
     dp = PD_defstr(file, "db3",
 		   "long *n",
 		   "char *a", 
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr db3: %s\n", PD_get_error());
+       error(-1, stdout, "PD_defstr db3: %s\n", PD_get_error());
   
     ok = PD_size_from(file, "db3", "a", "n");
     if (ok == 0)
-       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+       error(-1, stdout, "PD_size_from: %s\n", PD_get_error());
 
 /* setup data */
     for (l = 0; l < N; l++)
@@ -403,15 +403,15 @@ int test_4(char *base, char *tgt, int n)
 		   "char *a", 
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr da4: %s\n", PD_get_error());
+       error(-1, stdout, "PD_defstr da4: %s\n", PD_get_error());
   
     ok = PD_cast(file, "da4", "a", "type");
     if (ok == 0)
-       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+       error(-1, stdout, "PD_size_from: %s\n", PD_get_error());
 
     ok = PD_size_from(file, "da4", "a", "n");
     if (ok == 0)
-       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+       error(-1, stdout, "PD_size_from: %s\n", PD_get_error());
 
     for (l = 0; l < N; l++)
         {va_w[l].type = CSTRSAVE("float *");
@@ -494,12 +494,12 @@ static int run_test(PFTest test, int n, char *host, int native)
 
 	     nm = PD_target_platform_name(i);
 	     if ((*test)(host, nm, n) == FALSE)
-	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
+	        {error(-1, stdout, "Test #%d %s failed\n", n, nm);
 		 fail++;};};};
 
 /* native test */
     if ((*test)(host, NULL, n) == FALSE)
-       {PRINT(STDOUT, "Test #%d native failed\n", n);
+       {error(-1, stdout, "Test #%d native failed\n", n);
 	fail++;};
 
     post_test(&st, n);

@@ -86,7 +86,8 @@ void error(int n, FILE *fp, char *fmt, ...)
 
     io_printf(fp, "%s", t);
 
-    exit(n);
+    if (n > 0)
+       exit(n);
 
     return;}
 

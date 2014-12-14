@@ -11,7 +11,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_char(void *p, double f, int n)
+static int PM_find_index_chr(void *p, double f, int n)
    {int indx;
     char *d, v;
     long i, j;
@@ -231,7 +231,7 @@ static int PM_find_index_ldbl(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_char(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_chr(void *p, double f, int n, long *plast)
    {int last, indx;
     char *d, v;
     long imn, imx;
@@ -431,7 +431,7 @@ static int _PM_find_index_fast_ldbl(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_char(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_chr(int nx, void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -964,7 +964,7 @@ static void _PM_find_value_ldcx(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_char(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_chr(void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     signed char *d, *pvn, *pvx, vn, vx, v;
     d   = (signed char *) p;
@@ -1271,15 +1271,28 @@ static PFPM_find_index
                 NULL,
                 NULL,
                 NULL,
-                PM_find_index_char,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                PM_find_index_chr,
+                NULL,
                 PM_find_index_wchr,
+                NULL,
                 PM_find_index_int8,
+                NULL,
                 PM_find_index_shrt,
+                NULL,
                 PM_find_index_int,
+                NULL,
                 PM_find_index_lng,
+                NULL,
                 PM_find_index_ll,
+                NULL,
                 PM_find_index_flt,
+                NULL,
                 PM_find_index_dbl,
+                NULL,
                 PM_find_index_ldbl,
                 NULL,
                 NULL,
@@ -1287,8 +1300,39 @@ static PFPM_find_index
                 NULL,
                 NULL,
                 NULL,
-                NULL
-};
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+   };
 
 /*--------------------------------------------------------------------------*/
 
@@ -1299,15 +1343,28 @@ static PF_PM_find_index_fast
                 NULL,
                 NULL,
                 NULL,
-                _PM_find_index_fast_char,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                _PM_find_index_fast_chr,
+                NULL,
                 _PM_find_index_fast_wchr,
+                NULL,
                 _PM_find_index_fast_int8,
+                NULL,
                 _PM_find_index_fast_shrt,
+                NULL,
                 _PM_find_index_fast_int,
+                NULL,
                 _PM_find_index_fast_lng,
+                NULL,
                 _PM_find_index_fast_ll,
+                NULL,
                 _PM_find_index_fast_flt,
+                NULL,
                 _PM_find_index_fast_dbl,
+                NULL,
                 _PM_find_index_fast_ldbl,
                 NULL,
                 NULL,
@@ -1315,8 +1372,39 @@ static PF_PM_find_index_fast
                 NULL,
                 NULL,
                 NULL,
-                NULL
-};
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+   };
 
 /*--------------------------------------------------------------------------*/
 
@@ -1328,24 +1416,68 @@ static PF_PM_find_value
                 NULL,
                 NULL,
                 NULL,
-                _PM_find_value_char,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                _PM_find_value_chr,
+                NULL,
                 _PM_find_value_wchr,
+                NULL,
                 _PM_find_value_int8,
+                NULL,
                 _PM_find_value_shrt,
+                NULL,
                 _PM_find_value_int,
+                NULL,
                 _PM_find_value_lng,
+                NULL,
                 _PM_find_value_ll,
+                NULL,
                 _PM_find_value_flt,
+                NULL,
                 _PM_find_value_dbl,
+                NULL,
                 _PM_find_value_ldbl,
+                NULL,
                 _PM_find_value_fcx,
+                NULL,
                 _PM_find_value_dcx,
+                NULL,
                 _PM_find_value_ldcx,
                 NULL,
                 NULL,
                 NULL,
-                NULL
-};
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+   };
 
 /*--------------------------------------------------------------------------*/
 
@@ -1358,15 +1490,28 @@ static PFPM_min_max
                 NULL,
                 NULL,
                 NULL,
-                PM_min_max_char,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                PM_min_max_chr,
+                NULL,
                 PM_min_max_wchr,
+                NULL,
                 PM_min_max_int8,
+                NULL,
                 PM_min_max_shrt,
+                NULL,
                 PM_min_max_int,
+                NULL,
                 PM_min_max_lng,
+                NULL,
                 PM_min_max_ll,
+                NULL,
                 PM_min_max_flt,
+                NULL,
                 PM_min_max_dbl,
+                NULL,
                 PM_min_max_ldbl,
                 NULL,
                 NULL,
@@ -1374,8 +1519,39 @@ static PFPM_min_max
                 NULL,
                 NULL,
                 NULL,
-                NULL
-};
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+   };
 
 
 #endif

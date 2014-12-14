@@ -312,16 +312,16 @@
 /chart
 |__ docp =      0
 |__ memfl =      0
-|__ ne =       74
+|__ ne =       85
 |__ hash = <function>
 |__ comp = <function>
 |__ key_type = "by-name"
 |__ table(0)
 |   |__ iht =        0
-|   |__ iar =       18
+|   |__ iar =       57
 |   |__ name = "long_double"
 |   |__ type = "defstr *"
 
 ----- PRINT A HASH TABLE
 
-("/hash_aaa" ("type" "hasharr") (3 0 0 5   ("by-name") ((((0 4 ("long-number") ("object *") ((((()) (23) 0  ))) 1 (((0 3 ("double-number") ("object *") ((((()) (3.14159) 0  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 0  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 0  ))) 1 (())))))))))))) () ((2 1 ("cat") ("object *") (((("kitty") (((5 ("kitty")))) 0  ))) 1 (()))))) (((("_SC_hasharr_init") ("haelem * *") d 0 5 7 6.98492e-10 ((((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 0  ))) 1 (()))) ((2 1 ("cat") ("object *") (((("kitty") (((5 ("kitty")))) 0  ))) 1 (()))) ((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 0  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 0  ))) 1 (())))))) ((0 3 ("double-number") ("object *") ((((()) (3.14159) 0  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 0  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 0  ))) 1 (()))))))))) ((0 4 ("long-number") ("object *") ((((()) (23) 0  ))) 1 (((0 3 ("double-number") ("object *") ((((()) (3.14159) 0  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 0  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 0  ))) 1 (())))))))))))) () ()))  )))))
+("/hash_aaa" ("type" "hasharr") (3 0 0 5   ("by-name") ((((0 4 ("long-number") ("object *") ((((()) (23) 1  ))) 1 (((0 3 ("double-number") ("object *") ((((()) (3.14159) 1  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (())))))))))))) () ((2 1 ("cat") ("object *") (((("kitty") (((5 ("kitty")))) 1  ))) 1 (()))))) (((("_SC_hasharr_init") ("haelem * *") d 0 5 7 6.98492e-10 ((((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (()))) ((2 1 ("cat") ("object *") (((("kitty") (((5 ("kitty")))) 1  ))) 1 (()))) ((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (())))))) ((0 3 ("double-number") ("object *") ((((()) (3.14159) 1  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (()))))))))) ((0 4 ("long-number") ("object *") ((((()) (23) 1  ))) 1 (((0 3 ("double-number") ("object *") ((((()) (3.14159) 1  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (())))))))))))) () ()))  )))))

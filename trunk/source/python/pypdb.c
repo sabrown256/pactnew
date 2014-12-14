@@ -541,7 +541,7 @@ PY_defstr *_PY_defstr_make_singleton(PY_defstr *self,
 	    dpobj = (PY_defstr *) members;
 	    lst   = PD_copy_members(dpobj->pyo->members);
 
-	    dp = _PD_defstr_inst(fp, name, STRUCT_KIND, lst,
+	    dp = _PD_defstr_inst(fp, name, KIND_STRUCT, lst,
 				 -1, NULL, NULL, PD_CHART_HOST);
 	    if (dp == NULL)
 	       PP_error_from_pdb();}

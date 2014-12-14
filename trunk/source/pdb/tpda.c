@@ -9,10 +9,10 @@
 #include "cpyright.h"
 
 #include "pdb.h"
+#include "pdbtfr.h"
 
-static int
- debug_mode = FALSE,
- read_only  = FALSE;
+int
+ debug_mode = FALSE;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -42,14 +42,14 @@ static int print_info(PDBfile *file, FILE *fp, hasharr *tab,
 /* get attribute associated with var */
     nrank = (int *) PD_get_attribute(file, s, "rank");
     if (nrank == NULL)
-       {PRINT(fp, "Error getting rank attribute\n");
+       {error(-1, fp, "Error getting rank attribute\n");
         ret = FALSE;}
     else
        PRINT(fp, "Rank of %s : %d\n", s, *nrank);
 
     center = (int **) PD_get_attribute(file, s, "centering");
     if (center == NULL)
-       {PRINT(fp, "Error getting centering attribute\n");
+       {error(-1, fp, "Error getting centering attribute\n");
         ret = FALSE;}
     else
        PRINT(fp, "Centering of %s : %d %d\n", s, center[0][0], center[0][1]);
@@ -78,7 +78,7 @@ static int write_test(FILE *fp)
     if (read_only == FALSE)
        {file = PD_open("tpda.db", "w");
 	if ((file == NULL) || (fp == NULL))
-	   {PRINT(stderr, "Error creating tpda.db\n");
+	   {error(-1, fp, "Error creating tpda.db\n");
 	    err = FALSE;
 	    return(err);};
 	PRINT(fp, "\nCreated tpda.db\n\n");
@@ -87,11 +87,11 @@ static int write_test(FILE *fp)
 
 /* define & set some attributes */
 	if (PD_def_attribute(file, "rank", "integer") == FALSE)
-	   {PRINT(fp, "Error defining RANK\n");
+	   {error(-1, fp, "Error defining RANK\n");
 	    err = FALSE;};
 
 	if (PD_def_attribute(file, "centering", "integer *") == FALSE)
-	   {PRINT(fp, "Error defining CENTERING\n");
+	   {error(-1, fp, "Error defining CENTERING\n");
 	    err = FALSE;};
 
 	rank  = CMAKE(int);
@@ -104,11 +104,11 @@ static int write_test(FILE *fp)
 	center[1] = 55;
 
 	if (PD_set_attribute(file, "d", "rank", (void *) rank) == FALSE)
-	   {PRINT(fp, "Error setting rank attribute\n");
+	   {error(-1, fp, "Error setting rank attribute\n");
 	    err = FALSE;};
 
 	if (PD_set_attribute(file, "d", "centering", (void *) pc) == FALSE)
-	   {PRINT(fp, "Error setting center attribute\n");
+	   {error(-1, fp, "Error setting center attribute\n");
 	    err = FALSE;};
 
 	err &= print_info(file, fp, file->attrtab, "d", "Attribute Table");
@@ -141,15 +141,15 @@ static int hash_test(FILE *fp)
 
 /* try writing then reading hash table from file */
        {if (!PD_write(file, "foo", "hasharr", file->attrtab))
-	   {PRINT(fp, "Error writing attribute hash table to file\n");
-	    PRINT(fp, "PD_err = %s\n", PD_get_error());
+	   {error(-1, fp, "Error writing attribute hash table to file\n");
+	    error(-1, fp, "PD_err = %s\n", PD_get_error());
 	    err = FALSE;};};
 
     tab = CMAKE(hasharr);
 
     if (PD_read(file, "foo", tab) == FALSE)
-       {PRINT(fp, "Error reading attribute hash table from file\n");
-        PRINT(fp, "PD_err = %s\n", PD_get_error());
+       {error(-1, fp, "Error reading attribute hash table from file\n");
+        error(-1, fp, "PD_err = %s\n", PD_get_error());
         err = FALSE;};
 
 /* connect up the hash methods */

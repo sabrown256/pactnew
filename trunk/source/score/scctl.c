@@ -42,6 +42,7 @@ SC_scope_public
  SC_gs = {PACT_VERSION,
 	  0, 0, 0, 1, FALSE, 10, TRUE, FALSE,
 	  0, NULL, NULL, NULL,
+          _SC_DEF_STATIC_TYPE_LIST_, SC_gs.stl,
           _SC_DEF_TYP_, _SC_DEF_ITYP_,
           SC_sizeof,
           _SC_otol,

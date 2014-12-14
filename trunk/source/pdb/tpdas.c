@@ -261,8 +261,7 @@ static int test_1(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     PD_defix(strm, "int8", 1, 1, NORMAL_ORDER);
@@ -280,15 +279,13 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* dump the symbol table */
@@ -302,8 +299,7 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -452,8 +448,7 @@ static int test_2(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     PD_change_primitive(strm, SC_INT_I, nb, nb, NULL, NULL);
@@ -465,15 +460,13 @@ static int test_2(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
     PD_change_primitive(strm, SC_INT_I, nb, nb, NULL, NULL);
@@ -489,8 +482,7 @@ static int test_2(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -521,7 +513,7 @@ static int run_test(PFTest test, int n, char *host)
 
 /* native test */
     if ((*test)(host, NULL, n) == FALSE)
-       {PRINT(STDOUT, "Test #%d native failed\n", n);
+       {error(-1, stdout, "Test #%d native failed\n", n);
 	fail++;};
 
     if (native_only == FALSE)
@@ -532,7 +524,7 @@ static int run_test(PFTest test, int n, char *host)
 
 	     nm = PD_target_platform_name(i);
 	     if ((*test)(host, nm, n) == FALSE)
-	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
+	        {error(-1, stdout, "Test #%d %s failed\n", n, nm);
 		 fail++;};};};
 
     post_test(&st, n);

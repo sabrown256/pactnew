@@ -2210,14 +2210,16 @@ static object *_SXI_write_defstr(SS_psides *si, object *argl)
            _PD_defstr(file, PD_CHART_FILE, dp->type, dp->kind,
 		      desc, NULL,
 		      dp->size, dp->alignment,
-		      dp->fix.order, dp->convert, dp->fp.order, dp->fp.format, 
+		      dp->fix.order, dp->convert,
+		      dp->fp.order, dp->fp.format, 
 		      dp->unsgned, dp->onescmp);
 
         if (PD_inquire_table_type(file->host_chart, dp->type) == NULL)
            _PD_defstr(file, PD_CHART_HOST, dp->type, dp->kind,
 		      desc, NULL,
 		      dp->size, dp->alignment,
-		      dp->fix.order, dp->convert, dp->fp.order, dp->fp.format, 
+		      dp->fix.order, dp->convert,
+		      dp->fp.order, dp->fp.format, 
 		      dp->unsgned, dp->onescmp);}
 
     else
@@ -2307,7 +2309,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
 	    prev->next = desc;
 	 prev = desc;};
 
-    dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
+    dp = _PD_defstr_inst(file, name, KIND_STRUCT, lst,
 			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
     o  = SX_make_defstr(si, dp);
 
@@ -3642,7 +3644,8 @@ static object *_SXI_set_track_pointers(SS_psides *si, object *argl)
  *                     - for that type
  */
 
-static object *_SX_set_user_format(SS_psides *si, int i, char *format, int whch)
+static object *_SX_set_user_format(SS_psides *si, int i,
+				   char *format, int whch)
    {int h1, h2;
     object *rv;
     char **fmts, **fmta;
@@ -3689,16 +3692,11 @@ static object *_SX_set_user_format(SS_psides *si, int i, char *format, int whch)
 /* _SXI_SET_FORMAT - set a format */
 
 static object *_SXI_set_format(SS_psides *si, object *argl)
-   {int i, id, ok;
+   {int ok;
     char s1[MAXLINE], s2[MAXLINE];
-    char *field, *format, *typ;
-    char **chtypes, **fxtypes, **fptypes, **cmtypes;
+    char *field, *format;
+    typdes *td;
     object *rv;
-
-    chtypes = _SC.types.chrtyp;
-    fxtypes = _SC.types.fixtyp;
-    fptypes = _SC.types.fptyp;
-    cmtypes = _SC.types.cpxtyp;
 
     field  = NULL;
     format = NULL;
@@ -3711,77 +3709,20 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
 
     ok = FALSE;
 
-/* character types (proper) */
-    for (i = 0; (i < N_PRIMITIVE_CHAR) && (ok == FALSE); i++)
-        {id  = SC_TYPE_CHAR(i);
-	 typ = chtypes[i];
-	 snprintf(s1, MAXLINE, "%s1", typ);
-	 snprintf(s2, MAXLINE, "%s2", typ);
-	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 3);
-	     ok = TRUE;}
+    td = _SC_get_type_name(field);
+    snprintf(s1, MAXLINE, "%s1", td->type);
+    snprintf(s2, MAXLINE, "%s2", td->type);
+    if (strcmp(field, td->type) == 0)
+       {rv = _SX_set_user_format(si, td->id, format, 3);
+	ok = TRUE;}
 
-	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 1);
-	     ok = TRUE;}
+    else if (strcmp(field, s1) == 0)
+       {rv = _SX_set_user_format(si, td->id, format, 1);
+	ok = TRUE;}
 
-	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 2);
-	     ok = TRUE;};};
-
-/* fixed point types (proper) */
-    for (i = 0; (i < N_PRIMITIVE_FIX) && (ok == FALSE); i++)
-        {id  = SC_TYPE_FIX_ID(i);
-	 typ = fxtypes[i];
-	 snprintf(s1, MAXLINE, "%s1", typ);
-	 snprintf(s2, MAXLINE, "%s2", typ);
-	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 3);
-	     ok = TRUE;}
-
-	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 1);
-	     ok = TRUE;}
-
-	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 2);
-	     ok = TRUE;};};
-
-/* real floating point types (proper) */
-    for (i = 0; (i < N_PRIMITIVE_FP) && (ok == FALSE); i++)
-        {id  = SC_TYPE_FP_ID(i);
-	 typ = fptypes[i];
-	 snprintf(s1, MAXLINE, "%s1", typ);
-	 snprintf(s2, MAXLINE, "%s2", typ);
-	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 3);
-	     ok = TRUE;}
-
-	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 1);
-	     ok = TRUE;}
-
-	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 2);
-	     ok = TRUE;};};
-
-/* complex floating point types (proper) */
-    for (i = 0; (i < N_PRIMITIVE_FP) && (ok == FALSE); i++)
-        {id  = SC_TYPE_CPX_ID(i);
-	 typ = cmtypes[i];
-	 snprintf(s1, MAXLINE, "%s1", typ);
-	 snprintf(s2, MAXLINE, "%s2", typ);
-	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 3);
-	     ok = TRUE;}
-
-	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 1);
-	     ok = TRUE;}
-
-	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(si, id, format, 2);
-	     ok = TRUE;};};
+    else if (strcmp(field, s2) == 0)
+       {rv = _SX_set_user_format(si, td->id, format, 2);
+	ok = TRUE;};
 
     if (ok == FALSE)
        {if (strcmp(field, SC_BOOL_S) == 0)
