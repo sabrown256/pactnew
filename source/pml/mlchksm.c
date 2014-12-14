@@ -112,7 +112,11 @@ static unsigned char
                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                           0, 0, 0, 0};
 
-/* this stuff derives from detect.c which unfortunately comes later */
+/* GOTCHA: this stuff derives from psh/template-desc.c which
+ * should be available
+ * this needs an update
+ */
+
 union ci
    {unsigned char c[32];
     int i[2];} bo;
@@ -521,8 +525,9 @@ void PM_checksum(long *psum, int *prmdr, void *parr, int boff,
     long is, sum, nby, nbi, msk;
     char *in;
 
-/* this stuff is derived from detect.c which unfortunately
- * comes later
+/* GOTCHA: this stuff derives from psh/template-desc.c which
+ * should be available
+ * this needs an update
  */
     bo.i[0] = 1;
     if (bo.c[0] == 1)

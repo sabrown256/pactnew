@@ -324,6 +324,7 @@
 #undef LIBLOG
 #undef LIBPSH
 #undef LIBHASH
+#undef LIBTYP
 #undef LIBSTACK
 #undef LIBTIME
 #undef LIBASYNC
@@ -352,6 +353,7 @@
 #include <shell/libfio.c>
 #include <shell/libpsh.c>
 #include <shell/libhash.c>
+#include <shell/libtyp.c>
 #include <shell/libstack.c>
 #include <shell/libtime.c>
 #include <shell/libasync.c>

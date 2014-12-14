@@ -982,6 +982,7 @@ object *_SSI_scheme_mode(SS_psides *si)
 
 object *SS_load(SS_psides *si, object *argl)
    {int c;
+    long long i;
     object *fnm, *strm, *flag;
     PFPOprs prs;
 
@@ -1013,21 +1014,21 @@ object *SS_load(SS_psides *si, object *argl)
 
     prs = _SS_change_parser(si, fnm);
 
-    while (TRUE)
-       {SS_assign(si, si->rdobj, SS_read(si, strm));
-        if (si->post_read != NULL)
-           (*si->post_read)(si, strm);
+    for (i = 0; i < LLONG_MAX; i++)
+        {SS_assign(si, si->rdobj, SS_read(si, strm));
+	 if (si->post_read != NULL)
+            (*si->post_read)(si, strm);
 
-        if (SS_eofobjp(si->rdobj))
-           {_SSI_cls_in(si, strm);
-	    SS_gc(si, strm);
-            break;};
-        SS_save(si, si->env);
-        SS_assign(si, si->evobj, SS_exp_eval(si, si->rdobj));
-        SS_restore(si, si->env);
+	 if (SS_eofobjp(si->rdobj))
+            {_SSI_cls_in(si, strm);
+	     SS_gc(si, strm);
+	     break;};
+	 SS_save(si, si->env);
+	 SS_assign(si, si->evobj, SS_exp_eval(si, si->rdobj));
+	 SS_restore(si, si->env);
 
-        if (si->post_eval != NULL)
-           (*si->post_eval)(si, strm);};
+	 if (si->post_eval != NULL)
+            (*si->post_eval)(si, strm);};
 
     _SS_restore_parser(si, prs);
 

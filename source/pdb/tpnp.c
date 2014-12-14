@@ -348,7 +348,7 @@ static void test_type_sel(pp)
     return;}
 
 /*--------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* TEST_BROADCAST - broadcast a message */
 
@@ -449,7 +449,7 @@ static void test_rates(pp)
     return;}
 
 /*--------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* TEST_ERROR - test error handling */
 
@@ -459,7 +459,7 @@ static void test_error(pp)
 
     pid = pp->acpu;
     if (pid == 0)
-       {PRINT(stdout, "\nTest Bad dest exception\n");
+       {error(-1, "\nTest Bad dest exception\n");
 	filt[0] = SC_MATCH_TAG;
 	filt[1] = 0;
 	filt[2] = SC_MATCH_NODE;
@@ -490,20 +490,20 @@ static void setup()
     buf2 = CMAKE_N(int, BSIZE + 8);
 
     if (buf1 == NULL)
-       PRINT(stdout, "FAILED TO ALLOCATE buf1\n");
+       error(-1, "FAILED TO ALLOCATE buf1\n");
   
     if (buf2 == NULL)
-       PRINT(stdout, "FAILED TO ALLOCATE buf2\n");
+       error(-1, "FAILED TO ALLOCATE buf2\n");
 
 /*
     buf1 = (int *) ((int) buf1 + (32 - ((int) buf1 % 32)));
     buf2 = (int *) ((int) buf2 + (32 - ((int) buf2 % 32)));
   
     if (((int) buf1 % 32) != 0)
-       PRINT(stdout, "Buffer 1 not 32 byte aligned %d \n",(int)buf1 % 32);
+       error(-1, "Buffer 1 not 32 byte aligned %d \n",(int)buf1 % 32);
 
     if (((int) buf2 % 32) != 0)
-       PRINT(stdout, "Buffer 2 not 32 byte aligned %d\n",(int)buf2 % 32);
+       error(-1, "Buffer 2 not 32 byte aligned %d\n",(int)buf2 % 32);
 
     ew_touchBuf(buf1, sizeof(buf1));
     ew_touchBuf(buf2, sizeof(buf2));
@@ -557,7 +557,7 @@ static int check_buf(b, len)
     for (i = 0; i < len; i++)
         {bdata = *p++;
 	 if (bdata != i)
-	    {PRINT(stdout,
+	    {error(-1,
 		   "ERROR: data(%d) = %d (not %d) - CHECK_BUF\n",
 		    i, bdata, i);
 	     errors++;

@@ -402,7 +402,6 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
     err &= (G_PD_MAJOR_OP_E(file) != NULL);
     err &= (G_PD_MAJOR_ORDER_E(file) != NULL);
     err &= (G_PD_DELAY_MODE_E(file) != NULL);
-    err &= (G_PD_TYPE_KIND_E(file) != NULL);
     err &= (G_PD_DATA_LOCATION_E(file) != NULL);
 
     err &= G_MULTIDES_D(file);

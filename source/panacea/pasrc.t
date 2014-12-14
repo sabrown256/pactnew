@@ -9,7 +9,7 @@
 
 #--------------------------------------------------------------------------
 
-template<int8|long double>
+template<int8_t|long double>
 void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
 		   double t, double dt,
 		   double t0, double t1, double t2, double t3)

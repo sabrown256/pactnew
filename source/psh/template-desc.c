@@ -1,31 +1,15 @@
 /*
- * DETECT.C - decipher the basic C binary data formats
- *          - adapted and completed from the Dave Munro original
- *          - this is constructed to be absolutely vanilla C and
- *          - should compile correctly with ANSI compilers
- *
- * Source Version: 9.0
- * Software Release #: LLNL-CODE-422942
+ * TEMPLATE-DESC.C - decipher the binary data formats of primitive types
+ *                 - this is constructed to be absolutely vanilla C and
+ *                 - should compile correctly with ANSI compilers
  *
  * #include "cpyright.h"
  *
  */
 
+#include <complex.h>
+
 #undef LONGLONG_MAX
-
-/* GOTCHA: clean up this mess */
-
-#include "../psh/posix.h"
-
-#include "scstd.h"
-#include "scope_typeh.h"
-
-#undef LIBFIO
-#undef SCOPE_SCORE_PREPROC
-#define VA_START  SC_VA_START
-#define VSNPRINTF(s, n, f) vsnprintf(s, n, f, __a__)
-#define VA_END    SC_VA_END
-#include "../psh/libfio.c"
 
 #define DBFSZ                  512
 #define BITS_DEFAULT             8
@@ -46,9 +30,13 @@
 #define I_LONG_DOUBLE_COMPLEX   13
 #define I_POINTER               14
 #define I_STRUCT                15
-
+#define I_INT16                 16
+#define I_INT32                 17
+#define I_INT64                 18
+#define I_TYPES                 19
 
 #define TYPE_SET(_i, _t, _v)     type_set(_i, sizeof(_t), sizeof(_v))
+#define TYPE_SET_N(_i, _td, _v)  type_set(_i, _td->bpi, sizeof(_v))
 
 /* these structs will help determine alignment of the primitive types */
 struct cbool
@@ -132,9 +120,9 @@ union ucsil
     long l[2];} bo;
 
 static int 
- size[N_TYPES],
- ssize[N_TYPES],
- align[N_TYPES];
+ size[I_TYPES],
+ ssize[I_TYPES],
+ align[I_TYPES];
 
 static char
  int_order[80];
@@ -667,23 +655,23 @@ int derive_complex_format(int *fc, int *dc, int *lc)
 
 void print_html(FILE *fp)
    {int mfields, nt;
-    char lmx[MAXLINE], lmn[MAXLINE], t[MAXLINE];
-    char dmx[MAXLINE], dmn[MAXLINE];
+    char lmx[BFSML], lmn[BFSML], t[BFSML];
+    char dmx[BFSML], dmn[BFSML];
 
 /* determine the size of the min and max fields */     
-    snprintf(lmn, MAXLINE, LL_FMT, (long long) LLONG_MIN);
-    snprintf(lmx, MAXLINE, LL_FMT, (long long) LLONG_MAX);
+    snprintf(lmn, BFSML, LL_FMT, (long long) LLONG_MIN);
+    snprintf(lmx, BFSML, LL_FMT, (long long) LLONG_MAX);
     mfields = strlen(lmx);
 
 #if defined(MSW)
-    snprintf(dmn, MAXLINE, "%.8e", (double) LDBL_MIN);
-    snprintf(dmx, MAXLINE, "%.8e", (double) LDBL_MAX);
+    snprintf(dmn, BFSML, "%.8e", (double) LDBL_MIN);
+    snprintf(dmx, BFSML, "%.8e", (double) LDBL_MAX);
 #else
-    snprintf(dmn, MAXLINE, "%.8Le", (long double) LDBL_MIN);
-    snprintf(dmx, MAXLINE, "%.8Le", (long double) LDBL_MAX);
+    snprintf(dmn, BFSML, "%.8Le", (long double) LDBL_MIN);
+    snprintf(dmx, BFSML, "%.8Le", (long double) LDBL_MAX);
 #endif
 
-     snprintf(t, MAXLINE, "%3.8g", DBL_MAX);
+     snprintf(t, BFSML, "%3.8g", DBL_MAX);
      nt = strlen(t);
      mfields = max(mfields, nt);
      mfields += 2;
@@ -780,8 +768,8 @@ void print_html(FILE *fp)
 static void print_fix_type(char *type, int sz, int aln,
 			   int mfields, int64_t mn, int64_t mx)
    {int tfield, sfield, afield;
-    char bf[MAXLINE], t[MAXLINE];
-    char lmn[MAXLINE], lmx[MAXLINE];
+    char bf[BFSML], t[BFSML];
+    char lmn[BFSML], lmx[BFSML];
     char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
 /* sizes of the fields in the output table */
@@ -795,24 +783,24 @@ static void print_fix_type(char *type, int sz, int aln,
     mnptr = bf + tfield + sfield + afield;
     mxptr = bf + tfield + sfield + afield + mfields;
 
-    memset(bf, ' ', MAXLINE);
+    memset(bf, ' ', BFSML);
 
     strncpy(tptr, type, strlen(type));
 
-    snprintf(t, MAXLINE, "%12d", sz);
+    snprintf(t, BFSML, "%12d", sz);
     strncpy(sptr, t, strlen(t));
 
-    snprintf(t, MAXLINE, "%9d", aln);
+    snprintf(t, BFSML, "%9d", aln);
     strncpy(aptr, t, strlen(t));
 
-    snprintf(lmn, MAXLINE, LL_FMT, (long long) mn);
-    snprintf(lmx, MAXLINE, LL_FMT, (long long) mx);
+    snprintf(lmn, BFSML, LL_FMT, (long long) mn);
+    snprintf(lmx, BFSML, LL_FMT, (long long) mx);
 
-    snprintf(t, MAXLINE, "%*s", mfields, lmn);
+    snprintf(t, BFSML, "%*s", mfields, lmn);
     strncpy(mnptr, t, strlen(t));
 
-    snprintf(t, MAXLINE, "%*s", mfields, lmx);
-    strncpy(mxptr, t, MAXLINE);
+    snprintf(t, BFSML, "%*s", mfields, lmx);
+    strncpy(mxptr, t, BFSML);
 
     puts(bf);
 
@@ -826,7 +814,7 @@ static void print_fix_type(char *type, int sz, int aln,
 static void print_flt_type(char *type, int sz, int aln,
 			   int mfields, long double mn, long double mx)
    {int tfield, sfield, afield, offset, np;
-    char bf[MAXLINE], s[MAXLINE], t[MAXLINE], fmt[MAXLINE];
+    char bf[BFSML], s[BFSML], t[BFSML], fmt[BFSML];
     char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
 /* sizes of the fields in the output table */
@@ -840,14 +828,14 @@ static void print_flt_type(char *type, int sz, int aln,
     mnptr = bf + tfield + sfield + afield;
     mxptr = bf + tfield + sfield + afield + mfields;
 
-    memset(bf, ' ', MAXLINE);
+    memset(bf, ' ', BFSML);
 
     strncpy(tptr, type, strlen(type));
 
-    snprintf(t, MAXLINE, "%4d", sz);
+    snprintf(t, BFSML, "%4d", sz);
     strncpy(sptr, t, strlen(t));
 
-    snprintf(t, MAXLINE, "%9d", aln);
+    snprintf(t, BFSML, "%9d", aln);
     strncpy(aptr, t, strlen(t));
 
 #if defined(MSW)
@@ -857,9 +845,9 @@ static void print_flt_type(char *type, int sz, int aln,
        np = 9;
     else
        np = 11;
-    snprintf(fmt, MAXLINE, "%%.%dle", np);
-    snprintf(s, MAXLINE, fmt, (double) mn);
-    snprintf(t, MAXLINE, fmt, (double) mx);
+    snprintf(fmt, BFSML, "%%.%dle", np);
+    snprintf(s, BFSML, fmt, (double) mn);
+    snprintf(t, BFSML, fmt, (double) mx);
 #else
     if (sz < 5)
        np = 7;
@@ -867,21 +855,21 @@ static void print_flt_type(char *type, int sz, int aln,
        np = 9;
     else
        np = 11;
-    snprintf(fmt, MAXLINE, "%%.%dLe", np);
-    snprintf(s, MAXLINE, fmt, mn);
-    snprintf(t, MAXLINE, fmt, mx);
+    snprintf(fmt, BFSML, "%%.%dLe", np);
+    snprintf(s, BFSML, fmt, mn);
+    snprintf(t, BFSML, fmt, mx);
 #endif
 
 /*
     if (sz < 5)
-       {snprintf(s, MAXLINE, "%.7Le", mn);
-	snprintf(t, MAXLINE, "%.7Le", mx);}
+       {snprintf(s, BFSML, "%.7Le", mn);
+	snprintf(t, BFSML, "%.7Le", mx);}
     else if (sz < 9)
-       {snprintf(s, MAXLINE, "%.9Le", mn);
-	snprintf(t, MAXLINE, "%.9Le", mx);}
+       {snprintf(s, BFSML, "%.9Le", mn);
+	snprintf(t, BFSML, "%.9Le", mx);}
     else
-       {snprintf(s, MAXLINE, "%.11Le", mn);
-	snprintf(t, MAXLINE, "%.11Le", mx);};
+       {snprintf(s, BFSML, "%.11Le", mn);
+	snprintf(t, BFSML, "%.11Le", mx);};
 */
     offset = mfields - strlen(t);
     strncpy(mnptr+offset, t, strlen(t));
@@ -901,7 +889,7 @@ static void print_flt_type(char *type, int sz, int aln,
 void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
     {int nt, mfields, offset;
      int tfield, sfield, afield;
-     char bf[DBFSZ], t[MAXLINE];
+     char bf[DBFSZ], t[BFSML];
      char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
 /* sizes of the fields in the output table */
@@ -910,10 +898,10 @@ void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
      afield = 11;
 
 /* determine the size of the min and max fields */     
-     snprintf(t, MAXLINE, LL_FMT, (long long) LLONG_MAX);
+     snprintf(t, BFSML, LL_FMT, (long long) LLONG_MAX);
      mfields = strlen(t);
 
-     snprintf(t, MAXLINE, "%3.8g", DBL_MAX);
+     snprintf(t, BFSML, "%3.8g", DBL_MAX);
      nt = strlen(t);
      mfields = max(mfields, nt);
      mfields += 2;
@@ -925,7 +913,7 @@ void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
      mnptr = bf + tfield + sfield + afield;
      mxptr = bf + tfield + sfield + afield + mfields;
 
-     memset(bf, ' ', MAXLINE);
+     memset(bf, ' ', BFSML);
 
 /* title */
      fprintf(fp, "\n              NATIVE TYPE INFORMATION\n\n");
@@ -973,13 +961,13 @@ void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
 		    mfields, LLONG_MIN, LLONG_MAX);
 
 /* print C99 fixed width integer types info */
-     print_fix_type("int8_t", size[14], align[14],
+     print_fix_type("int8_t", size[I_INT8], align[I_INT8],
 		    mfields, INT8_MIN, INT8_MAX);
-     print_fix_type("int16_t", size[15], align[15],
+     print_fix_type("int16_t", size[I_INT16], align[I_INT16],
 		    mfields, INT16_MIN, INT16_MAX);
-     print_fix_type("int32_t", size[16], align[16],
+     print_fix_type("int32_t", size[I_INT32], align[I_INT32],
 		    mfields, INT32_MIN, INT32_MAX);
-     print_fix_type("int64_t", size[17], align[17],
+     print_fix_type("int64_t", size[I_INT64], align[I_INT64],
 		    mfields, INT64_MIN, INT64_MAX);
 
 /* print float info */
@@ -1009,17 +997,17 @@ void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
 
 /* print optional non-native types */
      if (sflag)
-        {memset(bf, ' ', MAXLINE);
-         strncpy(tptr, "int64_t", 6);
+        {memset(bf, ' ', BFSML);
+         strncpy(tptr, "int64_t", 7);
     
-         snprintf(t, MAXLINE, "%12d", (int) sizeof(int64_t));
+         snprintf(t, BFSML, "%12d", (int) sizeof(int64_t));
          strcpy(sptr, t);
          puts(bf);
 
-         memset(bf, ' ', MAXLINE);
+         memset(bf, ' ', BFSML);
          strncpy(tptr, "size_t", 6);
 
-         snprintf(t, MAXLINE, "%12d", (int) sizeof(size_t));
+         snprintf(t, BFSML, "%12d", (int) sizeof(size_t));
          strcpy(sptr, t);
          puts(bf);}
 
@@ -1154,6 +1142,117 @@ void print_header(FILE *fp,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRITE_DESC - write out binary format parametrizations */
+
+static void write_desc(FILE *fo, int ne, typdes *tl, int *dfl)
+   {int cflag, wflag, sflag;
+    int fb[40], db[40], ldb[40];
+    int fc[4], dc[4], lc[4];
+    long ff[8], df[8], ldf[8];
+
+/* C header output */
+    cflag = dfl[0];
+
+/* HTML output */
+    wflag = dfl[1];
+
+/* do alias types */
+    sflag = dfl[2];
+
+/* data type sizes are straightforward */
+#if 0
+    int i;
+    typdes *td;
+
+    for (i = 0; i < ne; i++)
+        {td = tl + i;
+	 if (strcmp(td->type, "bool") == 0)
+	    TYPE_SET_N(I_BOOL, td, cb);
+	 else if (strcmp(td->type, "char") == 0)
+	    TYPE_SET_N(I_CHAR, td, cc);
+	 else if (strcmp(td->type, "wchar_t") == 0)
+	    TYPE_SET_N(I_WCHAR, td, cw);
+	 else if (strcmp(td->type, "int8_t") == 0)
+	    TYPE_SET_N(I_INT8, td, ci8);
+	 else if (strcmp(td->type, "short") == 0)
+	    TYPE_SET_N(I_SHORT, td, cs);
+	 else if (strcmp(td->type, "int") == 0)
+	    TYPE_SET_N(I_INT, td, ci);
+	 else if (strcmp(td->type, "long") == 0)
+	    TYPE_SET_N(I_LONG, td, cl);
+	 else if (strcmp(td->type, "long long") == 0)
+	    TYPE_SET_N(I_LONG_LONG, td, cll);
+	 else if (strcmp(td->type, "float") == 0)
+	    TYPE_SET_N(I_FLOAT, td, cf);
+	 else if (strcmp(td->type, "double") == 0)
+	    TYPE_SET_N(I_DOUBLE, td, cd);
+	 else if (strcmp(td->type, "long double") == 0)
+	    TYPE_SET_N(I_LONG_DOUBLE, td, cld);
+	 else if (strcmp(td->type, "float _Complex") == 0)
+	    TYPE_SET_N(I_FLOAT_COMPLEX, td, cfc);
+	 else if (strcmp(td->type, "double _Complex") == 0)
+	    TYPE_SET_N(I_DOUBLE_COMPLEX, td, cdc);
+	 else if (strcmp(td->type, "long double _Complex") == 0)
+	    TYPE_SET_N(I_LONG_DOUBLE_COMPLEX, td, clc);
+	 else if (strcmp(td->type, "void *") == 0)
+	    TYPE_SET_N(I_POINTER, td, cp);
+	 else if (strcmp(td->type, "struct") == 0)
+	    type_set(I_STRUCT, 2*sizeof(char), sizeof(ct));
+	 else if (strcmp(td->type, "int16_t") == 0)
+	    TYPE_SET_N(I_INT16, td, ci16);
+	 else if (strcmp(td->type, "int32_t") == 0)
+	    TYPE_SET_N(I_INT32, td, ci32);
+	 else if (strcmp(td->type, "int64_t") == 0)
+	    TYPE_SET_N(I_INT64, td, ci64);};
+
+#else
+    TYPE_SET(I_BOOL,                bool,                 cb);
+    TYPE_SET(I_CHAR,                char,                 cc);
+    TYPE_SET(I_WCHAR,               wchar_t,              cw);
+    TYPE_SET(I_INT8,                int8_t,               ci8);
+    TYPE_SET(I_SHORT,               short,                cs);
+    TYPE_SET(I_INT,                 int,                  ci);
+    TYPE_SET(I_LONG,                long,                 cl);
+    TYPE_SET(I_LONG_LONG,           long long,            cll);
+    TYPE_SET(I_FLOAT,               float,                cf);
+    TYPE_SET(I_DOUBLE,              double,               cd);
+    TYPE_SET(I_LONG_DOUBLE,         long double,          cld);
+    TYPE_SET(I_FLOAT_COMPLEX,       float _Complex,       cfc);
+    TYPE_SET(I_DOUBLE_COMPLEX,      double _Complex,      cdc);
+    TYPE_SET(I_LONG_DOUBLE_COMPLEX, long double _Complex, clc);
+    TYPE_SET(I_POINTER,             void *,               cp);
+
+    type_set(I_STRUCT,              2*sizeof(char),       sizeof(ct));
+
+    TYPE_SET(I_INT16, int16_t,              ci16);
+    TYPE_SET(I_INT32, int32_t,              ci32);
+    TYPE_SET(I_INT64, int64_t,              ci64);
+#endif
+
+    bo.i[0] = 1;
+    if (bo.c[0] == 1)
+       strncpy(int_order, "REVERSE_ORDER", 80);
+    else
+       strncpy(int_order, "NORMAL_ORDER", 80);
+
+    derive_fp_format(fb, db, ldb, ff, df, ldf);
+    derive_complex_format(fc, dc, lc);
+
+    if (cflag)
+       print_header(fo, fb, db, ldb, ff, df, ldf, fc, dc, lc);
+    else if (wflag)
+       print_html(fo);
+    else
+       print_human(fo, sflag, fc, dc, lc);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+#if 0
+
+/*--------------------------------------------------------------------------*/
+
 /* HELP - print help message */
 
 static void help(void)
@@ -1224,45 +1323,7 @@ int main(int c, char **v)
        fo = stdout;
 
     if (fo != NULL)
-
-/* data type sizes are straightforward */
-       {TYPE_SET(I_BOOL,                bool,                 cb);
-	TYPE_SET(I_CHAR,                char,                 cc);
-	TYPE_SET(I_WCHAR,               wchar_t,              cw);
-	TYPE_SET(I_INT8,                int8_t,               ci8);
-	TYPE_SET(I_SHORT,               short,                cs);
-	TYPE_SET(I_INT,                 int,                  ci);
-	TYPE_SET(I_LONG,                long,                 cl);
-	TYPE_SET(I_LONG_LONG,           long long,            cll);
-	TYPE_SET(I_FLOAT,               float,                cf);
-	TYPE_SET(I_DOUBLE,              double,               cd);
-	TYPE_SET(I_LONG_DOUBLE,         long double,          cld);
-	TYPE_SET(I_FLOAT_COMPLEX,       float _Complex,       cfc);
-	TYPE_SET(I_DOUBLE_COMPLEX,      double _Complex,      cdc);
-	TYPE_SET(I_LONG_DOUBLE_COMPLEX, long double _Complex, clc);
-
-	TYPE_SET(I_POINTER,             void *,               cp);
-	type_set(I_STRUCT,              2*sizeof(char),       sizeof(ct));
-
-	TYPE_SET(17, int16_t,              ci16);
-	TYPE_SET(18, int32_t,              ci32);
-	TYPE_SET(19, int64_t,              ci64);
-
-	bo.i[0] = 1;
-	if (bo.c[0] == 1)
-	   strncpy(int_order, "REVERSE_ORDER", 80);
-	else
-	   strncpy(int_order, "NORMAL_ORDER", 80);
-
-	derive_fp_format(fb, db, ldb, ff, df, ldf);
-	derive_complex_format(fc, dc, lc);
-
-	if (cflag)
-	   print_header(fo, fb, db, ldb, ff, df, ldf, fc, dc, lc);
-	else if (wflag)
-	   print_html(fo);
-	else
-	   print_human(fo, sflag, fc, dc, lc);
+       {write_desc(fo, ne, tl);
 
 	if (outf != NULL)
 	   fclose_safe(fo);};
@@ -1270,5 +1331,8 @@ int main(int c, char **v)
     return(0);}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 

@@ -255,7 +255,9 @@ char *PA_cpp_value_to_name(char *group, ...)
  */
 
 void PA_cpp_default(void)
-   {
+   {int id, np;
+    char t[BFSML];
+    typdes *td;
 
     PA_gs.cpp_info        = CSTRDUP("INFO", 3);
     PA_gs.cpp_allocation  = CSTRDUP("ALLOCATION", 3);
@@ -316,71 +318,14 @@ void PA_cpp_default(void)
  *   itype = *(int *) PA_cpp_name_to_value("double");       returns 7
  *   type  = (char *) PA_cpp_name_to_value("SC_DOUBLE_S");  returns "double"
  */
-
-#if 0
-    DEF_PANACEA_TYPES;
-#else
-
-/* install the actual types */
-    PA_cpp_add_name(SC_CHAR_S,      PA_gs.cpp_type_SC, SC_CHAR_I);
-    PA_cpp_add_name(SC_SHORT_S,     PA_gs.cpp_type_SC, SC_SHORT_I);
-    PA_cpp_add_name(SC_INT_S,       PA_gs.cpp_type_SC, SC_INT_I);
-    PA_cpp_add_name(SC_LONG_S,      PA_gs.cpp_type_SC, SC_LONG_I);
-    PA_cpp_add_name(SC_FLOAT_S,     PA_gs.cpp_type_SC, SC_FLOAT_I);
-    PA_cpp_add_name(SC_DOUBLE_S,    PA_gs.cpp_type_SC, SC_DOUBLE_I);
-    PA_cpp_add_name(SC_STRING_S,    PA_gs.cpp_type_SC, SC_STRING_I);
-    PA_cpp_add_name(SC_POINTER_S,   PA_gs.cpp_type_SC, SC_POINTER_I);
-    PA_cpp_add_name(SC_PCONS_P_S,   PA_gs.cpp_type_SC, SC_PCONS_P_I);
-    PA_cpp_add_name(SC_VOID_S,      PA_gs.cpp_type_SC, SC_VOID_I);
-    PA_cpp_add_name(SC_SHORT_P_S,   PA_gs.cpp_type_SC, SC_SHORT_I);
-    PA_cpp_add_name(SC_INT_P_S,     PA_gs.cpp_type_SC, SC_INT_P_I);
-    PA_cpp_add_name(SC_LONG_P_S,    PA_gs.cpp_type_SC, SC_LONG_P_I);
-    PA_cpp_add_name(SC_FLOAT_P_S,   PA_gs.cpp_type_SC, SC_FLOAT_P_I);
-    PA_cpp_add_name(SC_DOUBLE_P_S,  PA_gs.cpp_type_SC, SC_DOUBLE_P_I);
-    PA_cpp_add_name(SC_STRUCT_S,    PA_gs.cpp_type_SC, SC_STRUCT_I);
-    PA_cpp_add_name(SC_UNKNOWN_S,   PA_gs.cpp_type_SC, SC_UNKNOWN_I);
-
-    PA_cpp_add_name("SC_CHAR_I",      PA_gs.cpp_type, SC_CHAR_I);
-    PA_cpp_add_name("SC_SHORT_I",     PA_gs.cpp_type, SC_SHORT_I);
-    PA_cpp_add_name("SC_INT_I",       PA_gs.cpp_type, SC_INT_I);
-    PA_cpp_add_name("SC_LONG_I",      PA_gs.cpp_type, SC_LONG_I);
-    PA_cpp_add_name("SC_FLOAT_I",     PA_gs.cpp_type, SC_FLOAT_I);
-    PA_cpp_add_name("SC_DOUBLE_I",    PA_gs.cpp_type, SC_DOUBLE_I);
-    PA_cpp_add_name("SC_REAL_I",      PA_gs.cpp_type, SC_REAL_I);
-    PA_cpp_add_name("SC_STRING_I",    PA_gs.cpp_type, SC_STRING_I);
-    PA_cpp_add_name("SC_POINTER_I",   PA_gs.cpp_type, SC_POINTER_I);
-    PA_cpp_add_name("SC_PCONS_P_I",   PA_gs.cpp_type, SC_PCONS_P_I);
-    PA_cpp_add_name("SC_VOID_I",      PA_gs.cpp_type, SC_VOID_I);
-    PA_cpp_add_name("SC_SHORT_P_I",   PA_gs.cpp_type, SC_SHORT_P_I);
-    PA_cpp_add_name("SC_INT_P_I",     PA_gs.cpp_type, SC_INT_P_I);
-    PA_cpp_add_name("SC_LONG_P_I",    PA_gs.cpp_type, SC_LONG_P_I);
-    PA_cpp_add_name("SC_FLOAT_P_I",   PA_gs.cpp_type, SC_FLOAT_P_I);
-    PA_cpp_add_name("SC_REAL_P_I",    PA_gs.cpp_type, SC_REAL_P_I);
-    PA_cpp_add_name("SC_DOUBLE_P_I",  PA_gs.cpp_type, SC_DOUBLE_P_I);
-    PA_cpp_add_name("SC_STRUCT_I",    PA_gs.cpp_type, SC_STRUCT_I);
-    PA_cpp_add_name("SC_UNKNOWN_I",   PA_gs.cpp_type, SC_UNKNOWN_I);
-
-/* install the types as strings */
-    PA_cpp_add_name("SC_CHAR_S",      PA_gs.cpp_type_S, SC_CHAR_S);
-    PA_cpp_add_name("SC_SHORT_S",     PA_gs.cpp_type_S, SC_SHORT_S);
-    PA_cpp_add_name("SC_INT_S",       PA_gs.cpp_type_S, SC_INT_S);
-    PA_cpp_add_name("SC_LONG_S",      PA_gs.cpp_type_S, SC_LONG_S);
-    PA_cpp_add_name("SC_FLOAT_S",     PA_gs.cpp_type_S, SC_FLOAT_S);
-    PA_cpp_add_name("SC_DOUBLE_S",    PA_gs.cpp_type_S, SC_DOUBLE_S);
-    PA_cpp_add_name("SC_REAL_S",      PA_gs.cpp_type_S, SC_REAL_S);
-    PA_cpp_add_name("SC_STRING_S",    PA_gs.cpp_type_S, SC_STRING_S);
-    PA_cpp_add_name("SC_POINTER_S",   PA_gs.cpp_type_S, SC_POINTER_S);
-    PA_cpp_add_name("SC_PCONS_P_S",   PA_gs.cpp_type_S, SC_PCONS_P_S);
-    PA_cpp_add_name("SC_VOID_S",      PA_gs.cpp_type_S, SC_VOID_S);
-    PA_cpp_add_name("SC_SHORT_P_S",   PA_gs.cpp_type_S, SC_SHORT_S);
-    PA_cpp_add_name("SC_INT_P_S",     PA_gs.cpp_type_S, SC_INT_P_S);
-    PA_cpp_add_name("SC_LONG_P_S",    PA_gs.cpp_type_S, SC_LONG_P_S);
-    PA_cpp_add_name("SC_FLOAT_P_S",   PA_gs.cpp_type_S, SC_FLOAT_P_S);
-    PA_cpp_add_name("SC_REAL_P_S",    PA_gs.cpp_type_S, SC_REAL_P_S);
-    PA_cpp_add_name("SC_DOUBLE_P_S",  PA_gs.cpp_type_S, SC_DOUBLE_P_S);
-    PA_cpp_add_name("SC_STRUCT_S",    PA_gs.cpp_type_S, SC_STRUCT_S);
-    PA_cpp_add_name("SC_UNKNOWN_S",   PA_gs.cpp_type_S, SC_UNKNOWN_S);
-#endif
+    np = _SC.types.nprimitive;
+    for (id = 0; id < np; id++)
+        {td = SC_gs.stl + id;
+         PA_cpp_add_name(td->typ_s, PA_gs.cpp_type_SC, td->typ_i);
+         snprintf(t, BFSML, "\"%s\"", td->typ_i);
+         PA_cpp_add_name(t, PA_gs.cpp_type_SC, td->typ_i);
+         snprintf(t, BFSML, "\"%s\"", td->typ_s);
+         PA_cpp_add_name(t, PA_gs.cpp_type_SC, td->typ_s);};
 
     PA_cpp_add_name("PA_INFO_TYPE",         PA_gs.cpp_info, PA_INFO_TYPE);
     PA_cpp_add_name("PA_INFO_N_DIMS",       PA_gs.cpp_info, PA_INFO_N_DIMS);

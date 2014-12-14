@@ -173,13 +173,13 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 
 /* define to both file and host charts a 64-bit signed integer type */
-	dp = _PD_defstr(file, PD_CHART_FILE, "int64_t", INT_KIND,
+	dp = _PD_defstr(file, PD_CHART_FILE, "int64_t", KIND_INT,
 			NULL, NULL,
 			8, 8, file->std->fx[1].order, TRUE,
 			NULL, NULL, FALSE, FALSE);
 	SC_ASSERT(dp != NULL);
 
-	dp = _PD_defstr(file, PD_CHART_HOST, "int64_t", INT_KIND,
+	dp = _PD_defstr(file, PD_CHART_HOST, "int64_t", KIND_INT,
 			NULL, NULL,
 			8, 8, file->host_std->fx[1].order, TRUE,
 			NULL, NULL, FALSE, FALSE);

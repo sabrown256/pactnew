@@ -12,22 +12,22 @@ setenv Package panacea
 setenv Test abc
 source ../../../scripts/test-env
 
-set PIncDir  = $IncDir
-set PBinDir  = $BinDir
+set PIncDir = $IncDir
+set PBinDir = $BinDir
 
-set Base     = $cwd
-set Base     = $Base:h
-set RootDir  = $Base/dev
+set Base    = $cwd
+set Base    = $Base:h
+set RootDir = $Base/dev
 
-set RootDir  = $RootDir/$PSY_ID
-set BinDir   = $RootDir/bin
-set IncDir   = $RootDir/include
+set RootDir = $RootDir/$PSY_ID
+set BinDir  = $RootDir/bin
+set IncDir  = $RootDir/include
 
-if (!(-d $PSY_Prefix)) then
-   mkdir $PSY_Prefix
+if (!(-d $PSY_TmpDir)) then
+   mkdir $PSY_TmpDir
 endif
 
-cd $PSY_Prefix
+cd $PSY_TmpDir
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

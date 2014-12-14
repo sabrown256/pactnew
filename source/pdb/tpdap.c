@@ -134,16 +134,13 @@ static void write_test_1_data(PDBfile *strm)
 
 /* write primitive arrays into the file */
     if (!PD_write(strm, "ia(1,5)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_1_DATA\n");
 
     if (!PD_append(strm, "ia(1:1,0:4)", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 1 FAILED - WRITE_TEST_1_DATA\n");
 
     if (!PD_append(strm, "ia(2:2,0:4)", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 2 FAILED - WRITE_TEST_1_DATA\n");
 
     return;}
 
@@ -168,8 +165,7 @@ static int test_1(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     prep_test_data();
@@ -179,15 +175,13 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -198,8 +192,7 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -233,16 +226,13 @@ static void write_test_2_data(PDBfile *strm)
 
 /* write primitive arrays into the file */
     if (!PD_write(strm, "ia(5,1)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_2_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_2_DATA\n");
 
     if (!PD_append(strm, "ia(0:4,1:1)", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_2_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 1 FAILED - WRITE_TEST_2_DATA\n");
 
     if (!PD_append(strm, "ia(0:4,2:2)", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_2_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 2 FAILED - WRITE_TEST_2_DATA\n");
 
     return;}
 
@@ -267,8 +257,7 @@ static int test_2(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     PD_set_major_order(strm, COLUMN_MAJOR_ORDER);
@@ -280,15 +269,13 @@ static int test_2(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -299,8 +286,7 @@ static int test_2(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -334,20 +320,16 @@ static void write_test_3_data(PDBfile *strm)
 
 /* write primitive arrays into the file */
     if (!PD_defent(strm, "ia(1,5)", "int"))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_3_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_3_DATA\n");
 
     if (!PD_write(strm, "ia(0:0,0:4)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_3_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_3_DATA\n");
 
     if (!PD_append(strm, "ia(1:1,0:4)", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_3_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 1 FAILED - WRITE_TEST_3_DATA\n");
 
     if (!PD_append(strm, "ia(2:2,0:4)", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_3_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 2 FAILED - WRITE_TEST_3_DATA\n");
 
     return;}
 
@@ -372,8 +354,7 @@ static int test_3(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     prep_test_data();
@@ -383,15 +364,13 @@ static int test_3(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "a");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -402,8 +381,7 @@ static int test_3(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -437,20 +415,16 @@ static void write_test_4_data(PDBfile *strm)
 
 /* write primitive arrays into the file */
     if (!PD_defent(strm, "ia(5,1)", "int"))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
 
     if (!PD_write(strm, "ia(0:4,0:0)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
 
     if (!PD_append(strm, "ia(0:4,1:1)", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 1 FAILED - WRITE_TEST_4_DATA\n");
 
     if (!PD_append(strm, "ia(0:4,2:2)", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 2 FAILED - WRITE_TEST_4_DATA\n");
 
     return;}
 
@@ -475,8 +449,7 @@ static int test_4(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     PD_set_major_order(strm, COLUMN_MAJOR_ORDER);
@@ -488,15 +461,13 @@ static int test_4(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "a");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -507,8 +478,7 @@ static int test_4(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -542,24 +512,19 @@ static void write_test_5_data(PDBfile *strm)
 
 /* write primitive arrays into the file */
     if (!PD_defent(strm, "ia(1,5)", "int"))
-       {PRINT(STDOUT, "IA DEFENT 1 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA DEFENT 1 FAILED - WRITE_TEST_5_DATA\n");
 
     if (!PD_write(strm, "ia(0:0,0:4)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_5_DATA\n");
 
     if (!PD_defent(strm, "ia(1:2,0:4)", "int"))
-       {PRINT(STDOUT, "IA DEFENT 2 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA DEFENT 2 FAILED - WRITE_TEST_5_DATA\n");
 
     if (!PD_write(strm, "ia(1:1,0:4)", "int", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 1 FAILED - WRITE_TEST_5_DATA\n");
 
     if (!PD_write(strm, "ia(2:2,0:4)", "int", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 2 FAILED - WRITE_TEST_5_DATA\n");
 
     return;}
 
@@ -584,8 +549,7 @@ static int test_5(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     prep_test_data();
@@ -595,15 +559,13 @@ static int test_5(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "a");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -614,8 +576,7 @@ static int test_5(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -649,24 +610,19 @@ static void write_test_6_data(PDBfile *strm)
 
 /* write primitive arrays into the file */
     if (!PD_defent(strm, "ia(5,1)", "int"))
-       {PRINT(STDOUT, "IA DEFENT 1 FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA DEFENT 1 FAILED - WRITE_TEST_6_DATA\n");
 
     if (!PD_write(strm, "ia(0:4,0:0)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA WRITE FAILED - WRITE_TEST_6_DATA\n");
 
     if (!PD_defent(strm, "ia(0:4,1:2)", "int"))
-       {PRINT(STDOUT, "IA DEFENT 2 FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA DEFENT 2 FAILED - WRITE_TEST_6_DATA\n");
 
     if (!PD_write(strm, "ia(0:4,1:1)", "int", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 1 FAILED - WRITE_TEST_6_DATA\n");
 
     if (!PD_write(strm, "ia(0:4,2:2)", "int", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
+       error(-1, stdout, "IA APPEND 2 FAILED - WRITE_TEST_6_DATA\n");
 
     return;}
 
@@ -691,8 +647,7 @@ static int test_6(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
     PD_set_major_order(strm, COLUMN_MAJOR_ORDER);
@@ -704,15 +659,13 @@ static int test_6(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file */
     strm = PD_open(datfile, "a");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
@@ -723,8 +676,7 @@ static int test_6(char *base, char *tgt, int n)
 
 /* close the file */
     if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(-1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -764,12 +716,12 @@ static int run_test(PFTest test, int n, char *host)
 
 	     nm = PD_target_platform_name(i);
 	     if ((*test)(host, nm, n) == FALSE)
-	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
+	        {error(-1, stdout, "Test #%d %s failed\n", n, nm);
 		 fail++;};};};
 
 /* native test */
     if ((*test)(host, NULL, n) == FALSE)
-       {PRINT(STDOUT, "Test #%d native failed\n", n);
+       {error(-1, stdout, "Test #%d native failed\n", n);
 	fail++;};
 
     post_test(&st, n);

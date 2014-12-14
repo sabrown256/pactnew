@@ -58,7 +58,7 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
     l = 0;
 
 /* start with the function mode */
-    type[l] = SC_INTEGER_I;
+    type[l] = SC_INT_I;
     ptr[l]  = &m;
     l++;
 
@@ -96,7 +96,7 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
 
     rv = -1;
     SS_args(si, si->val,
-	    SC_INTEGER_I, &rv,
+	    SC_INT_I, &rv,
 	    0);
 
     return(rv);}

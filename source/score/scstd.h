@@ -254,14 +254,6 @@ struct s_pcons
  * #bind struct quaternion
  */
 
-typedef struct s_quaternion quaternion;
-
-struct s_quaternion
-   {double s;
-    double i;
-    double j;
-    double k;};
-
 /*--------------------------------------------------------------------------*/
 
 /*                                SETJMP MACROS                             */

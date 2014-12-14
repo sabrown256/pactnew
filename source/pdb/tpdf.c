@@ -967,12 +967,12 @@ static int run_test(PFTest test, int n, char *host, fltdes *fl, int native)
 
 	     nm = PD_target_platform_name(i);
 	     if ((*test)(host, nm, fl, n) == FALSE)
-	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
+	        {error(-1, stdout, "Test #%d %s failed\n", n, nm);
 		 fail++;};};};
 
 /* native test */
     if ((*test)(host, NULL, fl, n) == FALSE)
-       {PRINT(STDOUT, "Test #%d native failed\n", n);
+       {error(-1, stdout, "Test #%d native failed\n", n);
 	fail++;};
 
     post_test(&st, n);

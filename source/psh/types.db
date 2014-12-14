@@ -13,10 +13,10 @@
 #          - type fields are:
 #          -    type  - C type name quoted to capture white space,
 #          -            e.g. "long long"
+#          -    sgnd  - signed type name
+#          -    usgnd - unsigned type name
 #          -    name  - abbreviate name to use in generated function names
 #          -    kind  - enumerated type kind: bool, int, float, complex, etc
-#          -    size  - size or method for determining size of a
-#          -            single instance
 #          -    ptr   - generate "foo *" for "foo" iff TRUE
 #          -    min   - minimum value of type
 #          -    max   - maximum value of type
@@ -24,29 +24,34 @@
 #          -    f90   - F90 type name for the C type
 #          -    promo - type to which it is promoted in C calls/assignments
 #          -    comp  - unit type of which composite types are formed
+# for sgnd/usgnd the following apply:
+#   -       the signed/unsigned name is the same as type
+#   +       the signed/unsigned name is the same as type prefixed with
+#           either signed or unsigned as appropriate
+#   <name>  is used as the literal signed/unsigned type name
 
 standard = {
-# type                  name   kind       size     ptr   min        max         def    f90           promo    comp
- "unknown"              unk    OTHER      0        B_F   -          -           -      -             -        -
- "bit"                  bit    OTHER      0        B_F   -          -           -      -             -        -
- "struct"               strct  STRUCT     0        B_F   -          -           -      -             -        -
- "void"                 any    OTHER      0        B_T   -          -           NULL   void          -        -
- "bool"                 bool   BOOL       sizeof   B_T   BOOL_MIN   BOOL_MAX    FALSE  logical       -        -
- "char"                 chr    CHAR       sizeof   B_T   SCHAR_MIN  SCHAR_MAX   '\0'   character     int      -
- "wchar_t"              wchr   CHAR       sizeof   B_T   WCHAR_MIN  WCHAR_MAX   0      -             int      -
- "int8_t"               int8   INT        sizeof   B_T   INT8_MIN   INT8_MAX    0      integer(1)    int      -
- "short"                shrt   INT        sizeof   B_T   SHRT_MIN   SHRT_MAX    0      integer(2)    int      -
- "int"                  int    INT        sizeof   B_T   INT_MIN    INT_MAX     0      integer       -        -
- "long"                 lng    INT        sizeof   B_T   LONG_MIN   LONG_MAX    0L     integer(8)    -        -
- "long long"            ll     INT        sizeof   B_T   LLONG_MIN  LLONG_MAX   0LL    integer(8)    -        -
- "float"                flt    FLOAT      sizeof   B_T   -FLT_MAX   FLT_MAX     0.0    real(4)       double   -
- "double"               dbl    FLOAT      sizeof   B_T   -DBL_MAX   DBL_MAX     0.0    real(8)       -        -
- "long double"          ldbl   FLOAT      sizeof   B_T   -LDBL_MAX  LDBL_MAX    0.0    real(16)      -        -
- "float _Complex"       fcx    COMPLEX    sizeof   B_T   -FLT_MAX   FLT_MAX     0.0    complex(4)    -        "float"
- "double _Complex"      dcx    COMPLEX    sizeof   B_T   -DBL_MAX   DBL_MAX     0.0    complex(8)    -        "double"
- "long double _Complex" ldcx   COMPLEX    sizeof   B_T   -LDBL_MAX  LDBL_MAX    0.0    complex(16)   -        "long double"
- "quaternion"           qut    QUATERNION sizeof   B_T   -DBL_MAX   DBL_MAX     Q_ZERO -             -        -
- "FILE"                 file   STRUCT     sizeof   B_T   -          -           NULL   -             -        -
+# type                  name   kind       ptr   min        max         def    f90           promo    comp            sgnd      usgnd
+ "unknown"              unk    OTHER      B_F   -          -           -      -             -        -               -         -
+ "bit"                  bit    OTHER      B_F   -          -           -      -             -        -               -         -
+ "struct"               strct  OTHER      B_F   -          -           -      -             -        -               -         -
+ "void"                 any    OTHER      B_T   -          -           NULL   void          -        -               -         -
+ "bool"                 bool   BOOL       B_T   BOOL_MIN   BOOL_MAX    FALSE  logical       int      -               -         -
+ "char"                 chr    CHAR       B_T   SCHAR_MIN  SCHAR_MAX   '\0'   character     int      -               +         +
+ "wchar_t"              wchr   CHAR       B_T   WCHAR_MIN  WCHAR_MAX   0      -             int      -               "wchar_t" "wchar_t"
+ "int8_t"               int8   INT        B_T   INT8_MIN   INT8_MAX    0      integer(1)    int      -               -         "u_int8_t"
+ "short"                shrt   INT        B_T   SHRT_MIN   SHRT_MAX    0      integer(2)    int      -               +         +
+ "int"                  int    INT        B_T   INT_MIN    INT_MAX     0      integer       -        -               +         +
+ "long"                 lng    INT        B_T   LONG_MIN   LONG_MAX    0L     integer(8)    -        -               +         +
+ "long long"            ll     INT        B_T   LLONG_MIN  LLONG_MAX   0LL    integer(8)    -        -               +         +
+ "float"                flt    FLOAT      B_T   -FLT_MAX   FLT_MAX     0.0    real(4)       double   -               -         -
+ "double"               dbl    FLOAT      B_T   -DBL_MAX   DBL_MAX     0.0    real(8)       -        -               -         -
+ "long double"          ldbl   FLOAT      B_T   -LDBL_MAX  LDBL_MAX    0.0    real(16)      -        -               -         -
+ "float _Complex"       fcx    COMPLEX    B_T   -FLT_MAX   FLT_MAX     0.0    complex(4)    -        "float"         -         -
+ "double _Complex"      dcx    COMPLEX    B_T   -DBL_MAX   DBL_MAX     0.0    complex(8)    -        "double"        -         -
+ "long double _Complex" ldcx   COMPLEX    B_T   -LDBL_MAX  LDBL_MAX    0.0    complex(16)   -        "long double"   -         -
+ "quaternion"           qut    QUATERNION B_T   -DBL_MAX   DBL_MAX     Q_ZERO -             -        "double"        -         -
+ "FILE"                 file   STRUCT     B_T   -          -           NULL   -             -        -               -         -
 }
 
 #--------------------------------------------------------------------------

@@ -747,7 +747,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 	     prv = desc;};
 
 /* install the type in both charts */
-        dp = _PD_defstr_inst(PA_gs.vif, pt->name, STRUCT_KIND, lst,
+        dp = _PD_defstr_inst(PA_gs.vif, pt->name, KIND_STRUCT, lst,
 			     NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
 	PA_ERR((dp == NULL),

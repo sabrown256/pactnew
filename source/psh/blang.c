@@ -553,7 +553,7 @@ static void add_derived_types(int iref, char **sbi)
 		 td.type = ta[1];
 		 td.f90  = "integer";
 		 td.knd  = TK_ENUM;
-		 td.g    = KIND_INT;
+		 td.g    = KIND_ENUM;
 		 td.defv = ta[2];}
 	     else if (strncmp(sb, "struct ", 7) == 0)
 	        {nstrncpy(s, BFLRG, sb, -1);
@@ -577,48 +577,6 @@ static void add_derived_types(int iref, char **sbi)
 	     install_derived_type(td.type, td.knd, td.defv);};};
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DEREF - dereference a pointer S
- *       - place result in D
- *       - return TRUE iff a pointer was dereferenced
- */
-
-static int deref(char *d, int nc, char *s)
-   {int rv;
-
-    rv = FALSE;
-
-    nstrncpy(d, nc, s, -1);
-    if (LAST_CHAR(d) == '*')
-       {LAST_CHAR(d) = '\0';
-	memmove(d, trim(d, BOTH, " \t"), nc);
-        rv = TRUE;};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IDEREF - dereference S with SC_FOO_P_I to SC_FOO_I
- *        - in place
- *        - return TRUE iff a pointer was dereferenced
- */
-
-static int ideref(char *s)
-   {int rv;
-    char *p;
-
-    rv = FALSE;
-
-    p = strstr(s, "_P_I");
-    if (p != NULL)
-       {memmove(p, p+2, 3);
-	rv = TRUE;};
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 

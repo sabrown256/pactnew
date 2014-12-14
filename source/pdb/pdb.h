@@ -138,9 +138,13 @@
  * determined by other members similarly to the way types can be
  * controlled by PD_cast.  04/11/2012
  *
+ * Version 31 handles exact C types such as 'long long' rather
+ * than requiring a PDB variant 'long_long' the old PDB variants
+ * are added as PD_typedef's for backward compatibility.  12/13/2014
+ *
  */
 
-#define PDB_SYSTEM_VERSION  30
+#define PDB_SYSTEM_VERSION  31
 
 #define BITS_DEFAULT 8     /* default bits per byte */
 #define NSTD         6     /* number of standards currently in the system 
@@ -350,15 +354,6 @@ enum e_PD_byte_order
     SPEC_ORDER};              /* explicitly specified byte order */
 
 typedef enum e_PD_byte_order PD_byte_order;
-
-enum e_PD_type_kind
-   {CHAR_KIND = 0,
-    INT_KIND,
-    FLOAT_KIND,
-    NON_CONVERT_KIND,
-    STRUCT_KIND};
-
-typedef enum e_PD_type_kind PD_type_kind;
 
 enum e_PD_text_kind
    {UTF_8 = 0,
@@ -682,7 +677,7 @@ struct s_syment
 
 struct s_defstr
    {char *type;
-    PD_type_kind kind;
+    SC_kind kind;
     long size_bits;
     long size;
     int alignment;   /* type begins on byte boundary divisible by alignment */

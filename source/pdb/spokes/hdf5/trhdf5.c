@@ -530,7 +530,7 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
    {int i, cnv;
     short precision;
     char *typ;
-    PD_type_kind knd;
+    SC_kind knd;
     PD_byte_order order;
     defstr *dp;
     hdf_state *hst;
@@ -552,41 +552,41 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
     if (H5Tget_sign(htyp)) 
        {if (precision == 8)
            {typ = CSTRSAVE(SC_CHAR_S);
-	    knd = CHAR_KIND;}
+	    knd = KIND_CHAR;}
         else if (precision == 16)
 	   {typ = CSTRSAVE(SC_SHORT_S);
-	    knd = INT_KIND;}
+	    knd = KIND_INT;}
         else if (precision == 32)
 	   {typ = CSTRSAVE(SC_INT_S);
-	    knd = INT_KIND;}
+	    knd = KIND_INT;}
         else if (precision == 64)
            {typ = CSTRSAVE(SC_LONG_S);
-	    knd = INT_KIND;}
+	    knd = KIND_INT;}
         else if (precision >  64)
            {typ = CSTRSAVE(SC_LONG_LONG_S);
-	    knd = INT_KIND;}
+	    knd = KIND_INT;}
         else
 	   {typ = CSTRSAVE("UNKNOWN");
-	    knd = NON_CONVERT_KIND;};}
+	    knd = KIND_OTHER;};}
     else
        {if (precision == 8)
 	   {typ = CSTRSAVE("u_char");
-	    knd = CHAR_KIND;}
+	    knd = KIND_CHAR;}
         else if (precision == 16)
            {typ = CSTRSAVE("u_short");
-	    knd = INT_KIND;}
+	    knd = KIND_INT;}
         else if (precision == 32)
            {typ = CSTRSAVE("u_int");
-	    knd = INT_KIND;}
+	    knd = KIND_INT;}
         else if (precision == 64)
            {typ = CSTRSAVE("u_long");
-	    knd = INT_KIND;}
+	    knd = KIND_INT;}
         else if (precision >  64)
            {typ = CSTRSAVE("u_long_long");
-	    knd = INT_KIND;}
+	    knd = KIND_INT;}
         else
            {typ = CSTRSAVE("UNKNOWN");
-	    knd = NON_CONVERT_KIND;};};
+	    knd = KIND_OTHER;};};
 
 /* decode byte ordering */ 
     if (H5Tget_order(htyp) == H5T_ORDER_BE) 
@@ -823,7 +823,7 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
     dp = CMAKE(defstr);
     if (dp != NULL)
        {dp->type        = CSTRSAVE(typ);
-	dp->kind        = FLOAT_KIND;
+	dp->kind        = KIND_FLOAT;
 
 	dp->size_bits   = 0;  /* format[0]; */
 	dp->size        = format[0] / 8;
@@ -1184,7 +1184,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
 #endif
    
 /* after fully parsing the members, construct the defstr */
-        _PD_defstr_inst(hst->pf, typ, STRUCT_KIND, members,
+        _PD_defstr_inst(hst->pf, typ, KIND_STRUCT, members,
 			NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
 #if 0

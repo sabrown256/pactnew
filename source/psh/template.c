@@ -1,8 +1,7 @@
 /*
  * TEMPLATE.C - generate C functions for primitive types from templates
  *
- * Source Version: 3.0
- * Software Release #: LLNL-CODE-422942
+ * #include "cpyright.h"
  *
  */
 
@@ -14,18 +13,17 @@
 
 #define NMAX 100
 
-#define I_BOOL        2
-#define I_CHAR        (I_BOOL+N_PRIMITIVE_CHAR)
-#define I_FIX         (I_CHAR+N_PRIMITIVE_FIX)   /* last fixed point type */
-#define I_FLOAT       (I_FIX+N_PRIMITIVE_FP)     /* last floating point type */
-#define I_COMPLEX     (I_FLOAT+N_PRIMITIVE_CPX)  /* last complex floating point type */
-#define I_QUATERNION  (I_COMPLEX+1)
-#define I_POINTER     (I_QUATERNION+1)
+#define N_PRIMITIVES     type_counts[11]
+#define N_TYPES          type_counts[12]
 
 #define Separator(_f)  fprintf(_f, "/*--------------------------------------------------------------------------*/\n\n")
 
+#define STRINGIFY(_x)    #_x
+
+#define TYPE_FIELD(_f, _t)                                                   \
+    ((_t == NULL) ? fprintf(_f, "NULL, ") : fprintf(_f, "\"%s\", ", _t))
+
 typedef struct s_template template;
-typedef struct s_typinf typinf;
 
 struct s_template
    {int tmn;
@@ -37,39 +35,9 @@ struct s_template
     char *args;
     char **body;};
 
-struct s_typinf
-   {int id;
-    char *name;
-    char *type;
-    char *stype;
-    char *utype;
-    char *comp;
-    char *promo;
-    char *mn;
-    char *mx;};
-
-static typinf
- sti[] = {{0,  NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
-	  {1,  NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
-	  {2,  "bool", "bool", "bool", "bool", "bool", "int", "BOOL_MIN", "BOOL_MAX"},
-	  {3,  "char", "char", "signed char", "unsigned char", "char", "int", "SCHAR_MIN", "SCHAR_MAX"},
-	  {4,  "wchr", "wchar_t", "wchar_t", "wchar_t", "wchar_t", "int", "WCHAR_MIN", "WCHAR_MAX"},
-	  {5,  "int8", "int8_t", "int8_t", "u_int8_t", "int8_t", "int", "INT8_MIN", "INT8_MAX"},
-	  {6,  "shrt", "short", "signed short", "unsigned short", "short", "int", "SHRT_MIN", "SHRT_MAX"},
-	  {7,  "int",  "int", "signed int", "unsigned int", "int", "int", "INT_MIN", "INT_MAX"},
-	  {8,  "lng",  "long", "signed long", "unsigned long", "long", "long", "LONG_MIN", "LONG_MAX"},
-	  {9,  "ll",   "long long", "signed long long", "unsigned long long", "long long", "long long", "LLONG_MIN", "LLONG_MAX"},
-	  {10, "flt",  "float", "float", "float", "float", "double", "-FLT_MAX", "FLT_MAX"},
-	  {11, "dbl",  "double", "double", "double", "double", "double", "-DBL_MAX", "DBL_MAX"},
-	  {12, "ldbl", "long double", "long double", "long double", "long double", "long double", "-LDBL_MAX", "LDBL_MAX"},
-	  {13, "fcx",  "float _Complex", "float _Complex", "float _Complex", "float", "float _Complex", "-FLT_MAX", "FLT_MAX"},
-	  {14, "dcx",  "double _Complex", "double _Complex", "double _Complex", "double", "double _Complex", "-DBL_MAX", "DBL_MAX"},
-	  {15, "ldcx", "long double _Complex", "long double _Complex", "long double _Complex", "long double", "long double _Complex", "-LDBL_MAX", "LDBL_MAX"},
-	  {16, "qut",  "quaternion", "quaternion", "quaternion", "double", "quaternion", "-DBL_MAX", "DBL_MAX"},
-	  {17, "ptr",  "void *", "void *", "void *", "void *", "void *", "-LLONG_MAX", "LLONG_MAX"},
-	  {18, NULL,   NULL, NULL, NULL, NULL, NULL, NULL, NULL},
-	  {19, "str",  "char *", "char *", "char *", "char *", "char *", "-LLONG_MAX", "LLONG_MAX"} },
-  *ti;
+static char
+ *realp[] = { "crealf", "creal", STRINGIFY(CREALL) },
+ *imagp[] = { "cimagf", "cimag", STRINGIFY(CIMAGL) };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -96,8 +64,6 @@ static int make_type_table(char *tytab)
        {parse_type_table(tytab);
 	rv = TRUE;};
 
-    ti = sti;
-
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -105,11 +71,13 @@ static int make_type_table(char *tytab)
 
 /* MAKE_TEMPLATE - instantiate a template */
 
-template *make_template(char *proto, int nl, char **body,
+template *make_template(char *proto, int ne, typdes *tl,
+			int nl, char **body,
 			char *tmn, char *tmx, int ln)
    {int i, id, n;
     char rtype[BFLRG];
     char *p, *args, *fname, **sa;
+    typdes *td;
     template *t;
 
     t = MAKE(template);
@@ -118,12 +86,12 @@ template *make_template(char *proto, int nl, char **body,
     t->tmx = 0;
 
 /* reduce the type range names to indeces */
-    for (i = 0; i < N_TYPES; i++)
-        {id = ti[i].id;
-	 if (ti[i].type != NULL)
-	    {if (strcmp(tmn, ti[i].type) == 0)
+    for (id = 0; id < ne; id++)
+        {td = tl + id;
+	 if (td->type != NULL)
+	    {if (strcmp(tmn, td->type) == 0)
 	        t->tmn = id;
-	     else if (strcmp(tmx, ti[i].type) == 0)
+	     else if (strcmp(tmx, td->type) == 0)
 	        t->tmx = id;};};
 
 /* parse out the prototype */
@@ -222,9 +190,9 @@ static void write_trailer(FILE *fp, char *inf)
 
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_FNC_INSTANCE - write the function for type ID */
+/* WRITE_FNC_INSTANCE - write the function for type TD */
 
-static void write_fnc_instance(FILE *fp, int id, template *t)
+static void write_fnc_instance(FILE *fp, typdes *td, template *t)
    {int i, nl;
     char s[BFLRG];
     char **body, *rtype, *fname, *args, *p;
@@ -238,15 +206,15 @@ static void write_fnc_instance(FILE *fp, int id, template *t)
     args  = t->args;
 
     fprintf(fp, "static %s %s_%s(%s)\n", rtype, fname,
-	    ti[id].name, args);
+	    td->fncp, args);
     for (i = 0; i < nl; i++)
         {nstrncpy(s, BFLRG, body[i], -1);
-	 p = subst(s, "<TYPE>",     ti[id].type,  -1);
-	 p = subst(p, "<SIGNED>",   ti[id].stype, -1);
-	 p = subst(p, "<UNSIGNED>", ti[id].utype, -1);
-	 p = subst(p, "<CTYPE>",    ti[id].comp,  -1);
-	 p = subst(p, "<MIN>",      ti[id].mn,    -1);
-	 p = subst(p, "<MAX>",      ti[id].mx,    -1);
+	 p = subst(s, "<TYPE>",     td->type,  -1);
+	 p = subst(p, "<SIGNED>",   td->stype, -1);
+	 p = subst(p, "<UNSIGNED>", td->utype, -1);
+	 p = subst(p, "<CTYPE>",    td->comp,  -1);
+	 p = subst(p, "<MIN>",      td->mn,    -1);
+	 p = subst(p, "<MAX>",      td->mx,    -1);
 	 fputs(p, fp);};
 
     fprintf(fp, "\n");
@@ -258,12 +226,14 @@ static void write_fnc_instance(FILE *fp, int id, template *t)
 
 /* WRITE_FNC_DECL - write the declaration of the template array */
 
-static void write_fnc_decl(FILE *fp, template **tl, int it, int nt)
+static void write_fnc_decl(FILE *fp, int ne, typdes *tl,
+			   template **tm, int it, int nt)
    {int i, id, lt, ok, tmn, tmx;
     char *rtype, *fname, *args;
     template *t;
+    typdes *td;
 
-    t = tl[it];
+    t = tm[it];
     if (t == NULL)
        return;
 
@@ -278,43 +248,40 @@ static void write_fnc_decl(FILE *fp, template **tl, int it, int nt)
 
     fprintf(fp, "static PF%s\n", fname);
     fprintf(fp, " %s_fnc[] = {\n", fname);
-    for (i = 0; i < N_TYPES; i++)
-        {ok = FALSE;
-	 id = i;
+    for (i = 0; i < ne; i++)
+        {id = i;
+	 td = tl + i;
 
 /* scan templates for this type */
-	 for (lt = it; lt < nt; lt++)
-	     {t = tl[lt];
-	      if ((t == NULL) || (strcmp(t->fname, fname) != 0))
-		 continue;
+	 ok = FALSE;
+	 if (td->g != KIND_POINTER)
+	    {for (lt = it; lt < nt; lt++)
+		 {t = tm[lt];
+		  if ((t == NULL) || (strcmp(t->fname, fname) != 0))
+		     continue;
 
-	      tmn = t->tmn;
-	      tmx = t->tmx;
-	      if ((ti[i].type != NULL) && (tmn <= id) && (id <= tmx))
-		 {if (i == N_TYPES-1)
-		     fprintf(fp, "                %s_%s\n",
-			     fname, ti[i].name);
-		  else
-		     fprintf(fp, "                %s_%s,\n",
-			     fname, ti[i].name);
-		  ok = TRUE;
-		  break;};};
+		  tmn = t->tmn;
+		  tmx = t->tmx;
+		  if ((td->type != NULL) && (tmn <= id) && (id <= tmx))
+		     {fprintf(fp, "                %s_%s",
+			      fname, td->fncp);
+		      ok = TRUE;
+		      break;};};};
 
 	 if (ok == FALSE)
-	    {if (i == N_TYPES-1)
-	        fprintf(fp, "                NULL\n");
-	     else
-	        fprintf(fp, "                NULL,\n");};};
+	    fprintf(fp, "                NULL");
 
-    fprintf(fp, "};\n");
+	 fprintf(fp, ",\n");};
+
+    fprintf(fp, "   };\n");
     fprintf(fp, "\n");
 
 /* free all templates with the current function name */
     for (lt = it; lt < nt; lt++)
-        {t = tl[lt];
+        {t = tm[lt];
 	 if (strcmp(t->fname, fname) == 0)
-	    {free_template(tl[i]);
-	     tl[lt] = NULL;};};
+	    {free_template(tm[i]);
+	     tm[lt] = NULL;};};
 
     return;}
 
@@ -323,17 +290,22 @@ static void write_fnc_decl(FILE *fp, template **tl, int it, int nt)
 
 /* WRITE_FNC - write the routines from the template */
 
-static void write_fnc(FILE *fp, template **tl, int it, int nt)
-   {int i, tmn, tmx;
+static void write_fnc(FILE *fp, int ne, typdes *tl,
+		      template **tm, int it, int nt)
+   {int id, tmn, tmx;
+    typdes *td;
     template *t;
 
-    t   = tl[it];
+    t   = tm[it];
     tmn = t->tmn;
     tmx = t->tmx;
 
-    for (i = tmn; i <= tmx; i++)
-	{if (ti[i].type != NULL)
-	    write_fnc_instance(fp, i, t);};
+    for (id = tmn; id <= tmx; id++)
+	{td = tl + id;
+	 if (IS_PRIMITIVE_TYPE(td) == B_F)
+	    continue;
+         else
+	    write_fnc_instance(fp, td, t);};
 
     return;}
 
@@ -342,12 +314,13 @@ static void write_fnc(FILE *fp, template **tl, int it, int nt)
 
 /* WRITE_FNC_DECLS - write the function array declaration */
 
-static void write_fnc_decls(FILE *fp, template **tl, int it, int nt)
+static void write_fnc_decls(FILE *fp, int ne, typdes *tl,
+			    template **tm, int it, int nt)
    {
 
     Separator(fp);
 
-    write_fnc_decl(fp, tl, it, nt);
+    write_fnc_decl(fp, ne, tl, tm, it, nt);
 
     return;}
 
@@ -357,9 +330,9 @@ static void write_fnc_decls(FILE *fp, template **tl, int it, int nt)
 
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_SWITCH_CLAUSE - write the switch clause for type ID */
+/* WRITE_SWITCH_CLAUSE - write the switch clause for type TD */
 
-static void write_switch_clause(FILE *fp, int id, template *t)
+static void write_switch_clause(FILE *fp, typdes *td, template *t)
    {int i, nl;
     char s[BFLRG], u[BFLRG];
     char **body, *p;
@@ -367,14 +340,14 @@ static void write_switch_clause(FILE *fp, int id, template *t)
     nl   = t->nl;
     body = t->body;
 
-    fprintf(fp, "        case %d :\n", id);
+    fprintf(fp, "        case %d :\n", td->id);
 
     for (i = 0; i < nl; i++)
 	{nstrncpy(s, BFLRG, body[i], -1);
-	 p = subst(s, "<TYPE>",  ti[i].type, -1);
-	 p = subst(p, "<CTYPE>", ti[i].comp, -1);
-	 p = subst(p, "<MIN>",   ti[i].mn,   -1);
-	 p = subst(p, "<MAX>",   ti[i].mx,   -1);
+	 p = subst(s, "<TYPE>",  td->type, -1);
+	 p = subst(p, "<CTYPE>", td->comp, -1);
+	 p = subst(p, "<MIN>",   td->mn,   -1);
+	 p = subst(p, "<MAX>",   td->mx,   -1);
 
 	 nstrncpy(u, BFLRG, "          ", -1);
 	 nstrcat(u, BFLRG, p);
@@ -391,9 +364,10 @@ static void write_switch_clause(FILE *fp, int id, template *t)
 
 /* WRITE_SWITCH - write switch based template */
 
-static void write_switch(FILE *fp, template *t)
-   {int i;
+static void write_switch(FILE *fp, int ne, typdes *tl, template *t)
+   {int id;
     char *rtype, *fname, *args;
+    typdes *td;
 
     Separator(fp);
 
@@ -407,9 +381,10 @@ static void write_switch(FILE *fp, template *t)
     fprintf(fp, "    switch (id)\n");
     fprintf(fp, "       {\n");
 
-    for (i = 0; i < N_TYPES; i++)
-        {if (ti[i].type != NULL)
-	    write_switch_clause(fp, i, t);};
+    for (id = 0; id < ne; id++)
+        {td = tl + id;
+	 if (td->type != NULL)
+	    write_switch_clause(fp, td, t);};
 
 /* add empty default clause */
     fprintf(fp, "         default :\n");
@@ -426,369 +401,13 @@ static void write_switch(FILE *fp, template *t)
 
 /*--------------------------------------------------------------------------*/
 
-/*                            VA ARG TEMPLATES                              */
-
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_VA_ARG_CLAUSE - write the variable arg clause for type ID */
-
-static void write_va_arg_clause(FILE *fp, int i)
-   {int id;
-
-    id = ti[i].id;
-
-    fprintf(fp, "       case %d:                                    \\\n",
-	    id);
-    fprintf(fp, "            {%s *_pv = (%s *) (_d);                \\\n",
-	    ti[i].type, ti[i].type);
-    fprintf(fp, "             _pv[_n] = va_arg(__a__, %s);};        \\\n",
-	    ti[i].promo);
-    fprintf(fp, "            break;                                 \\\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_VA_ARG - write the va arg routines */
-
-static void write_va_arg(FILE *fp)
-   {int i, id;
-
-/* formerly in scope_typeh.h */
-    fprintf(fp, "#define REAL double\n");
-    fprintf(fp, "#define HUGE_REAL 1.0e100\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "#ifndef HAVE_FIXED_WIDTH_FLOAT\n");
-    fprintf(fp, "typedef float       float32_t;\n");
-    fprintf(fp, "typedef double      float64_t;\n");
-    fprintf(fp, "typedef long double float128_t;\n");
-    fprintf(fp, "#endif\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "/*--------------------------------------------------------------------------*/\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "/*                           DEFINED CONSTANTS                              */\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "/*--------------------------------------------------------------------------*/\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "#define SC_UNKNOWN_I                 SC_gs.ltyp[0].i\n");
-    fprintf(fp, "#define SC_UNKNOWN_S                 SC_gs.ltyp[0].s\n");
-    fprintf(fp, "#define SC_BIT_I                     SC_gs.ltyp[1].i\n");
-    fprintf(fp, "#define SC_BIT_S                     SC_gs.ltyp[1].s\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "#define SC_BOOL_I                    SC_gs.ltyp[2].i\n");
-    fprintf(fp, "#define SC_BOOL_S                    SC_gs.ltyp[2].s\n");
-    fprintf(fp, "#define SC_BOOL_P_I                  SC_gs.ltyp[2].p_i\n");
-    fprintf(fp, "#define SC_BOOL_P_S                  SC_gs.ltyp[2].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_CHAR_I                    SC_gs.ltyp[3].i\n");
-    fprintf(fp, "#define SC_CHAR_S                    SC_gs.ltyp[3].s\n");
-    fprintf(fp, "#define SC_STRING_I                  SC_gs.ltyp[3].p_i\n");
-    fprintf(fp, "#define SC_STRING_S                  SC_gs.ltyp[3].p_s\n");
-    fprintf(fp, "#define SC_WCHAR_I                   SC_gs.ltyp[4].i\n");
-    fprintf(fp, "#define SC_WCHAR_S                   SC_gs.ltyp[4].s\n");
-    fprintf(fp, "#define SC_WCHAR_P_I                 SC_gs.ltyp[4].p_i\n");
-    fprintf(fp, "#define SC_WCHAR_P_S                 SC_gs.ltyp[4].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_SHORT_I                   SC_gs.ltyp[5].i\n");
-    fprintf(fp, "#define SC_SHORT_S                   SC_gs.ltyp[5].s\n");
-    fprintf(fp, "#define SC_SHORT_P_I                 SC_gs.ltyp[5].p_i\n");
-    fprintf(fp, "#define SC_SHORT_P_S                 SC_gs.ltyp[5].p_s\n");
-    fprintf(fp, "#define SC_INT_I                     SC_gs.ltyp[6].i\n");
-    fprintf(fp, "#define SC_INT_S                     SC_gs.ltyp[6].s\n");
-    fprintf(fp, "#define SC_INT_P_I                   SC_gs.ltyp[6].p_i\n");
-    fprintf(fp, "#define SC_INT_P_S                   SC_gs.ltyp[6].p_s\n");
-    fprintf(fp, "#define SC_LONG_I                    SC_gs.ltyp[7].i\n");
-    fprintf(fp, "#define SC_LONG_S                    SC_gs.ltyp[7].s\n");
-    fprintf(fp, "#define SC_LONG_P_I                  SC_gs.ltyp[7].p_i\n");
-    fprintf(fp, "#define SC_LONG_P_S                  SC_gs.ltyp[7].p_s\n");
-    fprintf(fp, "#define SC_LONG_LONG_I               SC_gs.ltyp[8].i\n");
-    fprintf(fp, "#define SC_LONG_LONG_S               SC_gs.ltyp[8].s\n");
-    fprintf(fp, "#define SC_LONG_LONG_P_I             SC_gs.ltyp[8].p_i\n");
-    fprintf(fp, "#define SC_LONG_LONG_P_S             SC_gs.ltyp[8].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_INT8_I                    SC_gs.ltyp[9].i\n");
-    fprintf(fp, "#define SC_INT8_S                    SC_gs.ltyp[9].s\n");
-    fprintf(fp, "#define SC_INT8_P_I                  SC_gs.ltyp[9].p_i\n");
-    fprintf(fp, "#define SC_INT8_P_S                  SC_gs.ltyp[9].p_s\n");
-    fprintf(fp, "#define SC_INT16_I                   SC_gs.ltyp[10].i\n");
-    fprintf(fp, "#define SC_INT16_S                   SC_gs.ltyp[10].s\n");
-    fprintf(fp, "#define SC_INT16_P_I                 SC_gs.ltyp[10].p_i\n");
-    fprintf(fp, "#define SC_INT16_P_S                 SC_gs.ltyp[10].p_s\n");
-    fprintf(fp, "#define SC_INT32_I                   SC_gs.ltyp[11].i\n");
-    fprintf(fp, "#define SC_INT32_S                   SC_gs.ltyp[11].s\n");
-    fprintf(fp, "#define SC_INT32_P_I                 SC_gs.ltyp[11].p_i\n");
-    fprintf(fp, "#define SC_INT32_P_S                 SC_gs.ltyp[11].p_s\n");
-    fprintf(fp, "#define SC_INT64_I                   SC_gs.ltyp[12].i\n");
-    fprintf(fp, "#define SC_INT64_S                   SC_gs.ltyp[12].s\n");
-    fprintf(fp, "#define SC_INT64_P_I                 SC_gs.ltyp[12].p_i\n");
-    fprintf(fp, "#define SC_INT64_P_S                 SC_gs.ltyp[12].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_FLOAT_I                   SC_gs.ltyp[13].i\n");
-    fprintf(fp, "#define SC_FLOAT_S                   SC_gs.ltyp[13].s\n");
-    fprintf(fp, "#define SC_FLOAT_P_I                 SC_gs.ltyp[13].p_i\n");
-    fprintf(fp, "#define SC_FLOAT_P_S                 SC_gs.ltyp[13].p_s\n");
-    fprintf(fp, "#define SC_DOUBLE_I                  SC_gs.ltyp[14].i\n");
-    fprintf(fp, "#define SC_DOUBLE_S                  SC_gs.ltyp[14].s\n");
-    fprintf(fp, "#define SC_DOUBLE_P_I                SC_gs.ltyp[14].p_i\n");
-    fprintf(fp, "#define SC_DOUBLE_P_S                SC_gs.ltyp[14].p_s\n");
-    fprintf(fp, "#define SC_LONG_DOUBLE_I             SC_gs.ltyp[15].i\n");
-    fprintf(fp, "#define SC_LONG_DOUBLE_S             SC_gs.ltyp[15].s\n");
-    fprintf(fp, "#define SC_LONG_DOUBLE_P_I           SC_gs.ltyp[15].p_i\n");
-    fprintf(fp, "#define SC_LONG_DOUBLE_P_S           SC_gs.ltyp[15].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_FLOAT32_I                 SC_gs.ltyp[16].i\n");
-    fprintf(fp, "#define SC_FLOAT32_S                 SC_gs.ltyp[16].s\n");
-    fprintf(fp, "#define SC_FLOAT32_P_I               SC_gs.ltyp[16].p_i\n");
-    fprintf(fp, "#define SC_FLOAT32_P_S               SC_gs.ltyp[16].p_s\n");
-    fprintf(fp, "#define SC_FLOAT64_I                 SC_gs.ltyp[17].i\n");
-    fprintf(fp, "#define SC_FLOAT64_S                 SC_gs.ltyp[17].s\n");
-    fprintf(fp, "#define SC_FLOAT64_P_I               SC_gs.ltyp[17].p_i\n");
-    fprintf(fp, "#define SC_FLOAT64_P_S               SC_gs.ltyp[17].p_s\n");
-    fprintf(fp, "#define SC_FLOAT128_I                SC_gs.ltyp[18].i\n");
-    fprintf(fp, "#define SC_FLOAT128_S                SC_gs.ltyp[18].s\n");
-    fprintf(fp, "#define SC_FLOAT128_P_I              SC_gs.ltyp[18].p_i\n");
-    fprintf(fp, "#define SC_FLOAT128_P_S              SC_gs.ltyp[18].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_FLOAT_COMPLEX_I           SC_gs.ltyp[19].i\n");
-    fprintf(fp, "#define SC_FLOAT_COMPLEX_S           SC_gs.ltyp[19].s\n");
-    fprintf(fp, "#define SC_FLOAT_COMPLEX_P_I         SC_gs.ltyp[19].p_i\n");
-    fprintf(fp, "#define SC_FLOAT_COMPLEX_P_S         SC_gs.ltyp[19].p_s\n");
-    fprintf(fp, "#define SC_DOUBLE_COMPLEX_I          SC_gs.ltyp[20].i\n");
-    fprintf(fp, "#define SC_DOUBLE_COMPLEX_S          SC_gs.ltyp[20].s\n");
-    fprintf(fp, "#define SC_DOUBLE_COMPLEX_P_I        SC_gs.ltyp[20].p_i\n");
-    fprintf(fp, "#define SC_DOUBLE_COMPLEX_P_S        SC_gs.ltyp[20].p_s\n");
-    fprintf(fp, "#define SC_LONG_DOUBLE_COMPLEX_I     SC_gs.ltyp[21].i\n");
-    fprintf(fp, "#define SC_LONG_DOUBLE_COMPLEX_S     SC_gs.ltyp[21].s\n");
-    fprintf(fp, "#define SC_LONG_DOUBLE_COMPLEX_P_I   SC_gs.ltyp[21].p_i\n");
-    fprintf(fp, "#define SC_LONG_DOUBLE_COMPLEX_P_S   SC_gs.ltyp[21].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_COMPLEX32_I               SC_gs.ltyp[22].i\n");
-    fprintf(fp, "#define SC_COMPLEX32_S               SC_gs.ltyp[22].s\n");
-    fprintf(fp, "#define SC_COMPLEX32_P_I             SC_gs.ltyp[22].p_i\n");
-    fprintf(fp, "#define SC_COMPLEX32_P_S             SC_gs.ltyp[22].p_s\n");
-    fprintf(fp, "#define SC_COMPLEX64_I               SC_gs.ltyp[23].i\n");
-    fprintf(fp, "#define SC_COMPLEX64_S               SC_gs.ltyp[23].s\n");
-    fprintf(fp, "#define SC_COMPLEX64_P_I             SC_gs.ltyp[23].p_i\n");
-    fprintf(fp, "#define SC_COMPLEX64_P_S             SC_gs.ltyp[23].p_s\n");
-    fprintf(fp, "#define SC_COMPLEX128_I              SC_gs.ltyp[24].i\n");
-    fprintf(fp, "#define SC_COMPLEX128_S              SC_gs.ltyp[24].s\n");
-    fprintf(fp, "#define SC_COMPLEX128_P_I            SC_gs.ltyp[24].p_i\n");
-    fprintf(fp, "#define SC_COMPLEX128_P_S            SC_gs.ltyp[24].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_QUATERNION_I              SC_gs.ltyp[25].i\n");
-    fprintf(fp, "#define SC_QUATERNION_S              SC_gs.ltyp[25].s\n");
-    fprintf(fp, "#define SC_QUATERNION_P_I            SC_gs.ltyp[25].p_i\n");
-    fprintf(fp, "#define SC_QUATERNION_P_S            SC_gs.ltyp[25].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_VOID_I                    SC_gs.ltyp[26].i\n");
-    fprintf(fp, "#define SC_VOID_S                    SC_gs.ltyp[26].s\n");
-    fprintf(fp, "#define SC_POINTER_I                 SC_gs.ltyp[26].p_i\n");
-    fprintf(fp, "#define SC_POINTER_S                 SC_gs.ltyp[26].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_ENUM_I                    SC_gs.ltyp[27].i\n");
-    fprintf(fp, "#define SC_ENUM_S                    SC_gs.ltyp[27].s\n");
-    fprintf(fp, "#define SC_STRUCT_I                  SC_gs.ltyp[28].i\n");
-    fprintf(fp, "#define SC_STRUCT_S                  SC_gs.ltyp[28].s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_FILE_I                    SC_gs.ltyp[29].i\n");
-    fprintf(fp, "#define SC_FILE_S                    SC_gs.ltyp[29].s\n");
-    fprintf(fp, "#define SC_FILE_P_I                  SC_gs.ltyp[29].p_i\n");
-    fprintf(fp, "#define SC_FILE_P_S                  SC_gs.ltyp[29].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_INTEGER_I                 SC_gs.ltyp[30].i\n");
-    fprintf(fp, "#define SC_INTEGER_S                 SC_gs.ltyp[30].s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_REAL_I                    SC_gs.ltyp[31].i\n");
-    fprintf(fp, "#define SC_REAL_S                    SC_gs.ltyp[31].s\n");
-    fprintf(fp, "#define SC_REAL_P_I                  SC_gs.ltyp[31].p_i\n");
-    fprintf(fp, "#define SC_REAL_P_S                  SC_gs.ltyp[31].p_s\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define SC_TYP_N                     32\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "/* these must have the same sequence/values as the dynamic values\n");
-    fprintf(fp, " * assigned in SC_init_base_types\n");
-    fprintf(fp, " * changes here MUST be reflected there\n");
-    fprintf(fp, " */\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define _SC_DEF_TYP_                                                         \\\n");
-    fprintf(fp, " { { 0, \"unknown\", },                                                        \\\n");
-    fprintf(fp, "   { 1, \"bit\", },                                                            \\\n");
-    fprintf(fp, "   { 2, \"bool\",                  18, \"bool *\" },                             \\\n");
-    fprintf(fp, "   { 3, \"char\",                  19, \"char *\" },                             \\\n");
-    fprintf(fp, "   { 4, \"wchar\",                 20, \"wchar *\" },                            \\\n");
-    fprintf(fp, "   { 6, \"short\",                 22, \"short *\" },                            \\\n");
-    fprintf(fp, "   { 7, \"int\",                   23, \"int *\" },                              \\\n");
-    fprintf(fp, "   { 8, \"long\",                  24, \"long *\" },                             \\\n");
-    fprintf(fp, "   { 9, \"long_long\",             25, \"long_long *\" },                        \\\n");
-    fprintf(fp, "   { 5, \"int8_t\",                21, \"int8_t *\" },                           \\\n");
-    fprintf(fp, "   { 6, \"int16_t\",               22, \"int16_t *\" },                          \\\n");
-    fprintf(fp, "   { 7, \"int32_t\",               23, \"int32_t *\" },                          \\\n");
-    fprintf(fp, "   { 9, \"int64_t\",               25, \"int64_t *\" },                          \\\n");
-    fprintf(fp, "   { 10, \"float\",                26, \"float *\" },                            \\\n");
-    fprintf(fp, "   { 11, \"double\",               27, \"double *\" },                           \\\n");
-    fprintf(fp, "   { 12, \"long_double\",          28, \"long_double *\" },                      \\\n");
-    fprintf(fp, "   { 10, \"float32_t\",            26, \"float32_t *\" },                        \\\n");
-    fprintf(fp, "   { 11, \"float64_t\",            27, \"float64_t *\" },                        \\\n");
-    fprintf(fp, "   { 12, \"float128_t\",           28, \"float128_t *\" },                       \\\n");
-    fprintf(fp, "   { 13, \"float_complex\",        29, \"float_complex *\" },                    \\\n");
-    fprintf(fp, "   { 14, \"double_complex\",       30, \"double_complex *\" },                   \\\n");
-    fprintf(fp, "   { 15, \"long_double_complex\",  31, \"long_double_complex *\" },              \\\n");
-    fprintf(fp, "   { 13, \"complex32_t\",          29, \"complex32_t *\" },                      \\\n");
-    fprintf(fp, "   { 14, \"complex64_t\",          30, \"complex64_t *\" },                      \\\n");
-    fprintf(fp, "   { 15, \"complex128_t\",         31, \"complex128_t *\" },                     \\\n");
-    fprintf(fp, "   { 16, \"quaternion\",           32, \"quaternion *\" },                       \\\n");
-    fprintf(fp, "   { 33, \"void\",                 17, \"void *\" },                             \\\n");
-    fprintf(fp, "   { 7,  \"enum\", },                                                          \\\n");
-    fprintf(fp, "   { 34, \"struct\", },                                                        \\\n");
-    fprintf(fp, "   { 35, \"FILE\",                 40, \"FILE *\" },                             \\\n");
-    fprintf(fp, "   { 7, \"integer\", },                                                        \\\n");
-    fprintf(fp, "   { 11, \"double\", } }\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "#define _SC_DEF_ITYP_                                                        \\\n");
-    fprintf(fp, " { { 39, \"pcons *\",  } }\n");
-    fprintf(fp, "\n");
-
-/* formerly in sctyp.c */
-
-    fprintf(fp, "#define DEF_STANDARD_TYPES  \\\n");
-    fprintf(fp, "       SC_UNKNOWN_I               = SC_type_register(SC_UNKNOWN_S,             KIND_OTHER,      B_F, 0,                            0);\\\n");
-    fprintf(fp, "       SC_BIT_I                   = SC_type_register(SC_BIT_S,                 KIND_OTHER,      B_F, 0,                            0);\\\n");
-    fprintf(fp, "       SC_BOOL_I                  = SC_type_register(SC_BOOL_S,                KIND_BOOL,       B_T, sizeof(bool),                 0);\\\n");
-    fprintf(fp, "       SC_CHAR_I                  = SC_type_register(SC_CHAR_S,                KIND_CHAR,       B_T, sizeof(char),                 0);\\\n");
-    fprintf(fp, "       SC_WCHAR_I                 = SC_type_register(SC_WCHAR_S,               KIND_CHAR,       B_T, sizeof(wchar_t),              0);\\\n");
-    fprintf(fp, "       SC_INT8_I                  = SC_type_register(SC_INT8_S,                KIND_INT,        B_T, sizeof(int8_t),               0);\\\n");
-    fprintf(fp, "       SC_SHORT_I                 = SC_type_register(SC_SHORT_S,               KIND_INT,        B_T, sizeof(short),                0);\\\n");
-    fprintf(fp, "       SC_INT_I                   = SC_type_register(SC_INT_S,                 KIND_INT,        B_T, sizeof(int),                  0);\\\n");
-    fprintf(fp, "       SC_LONG_I                  = SC_type_register(SC_LONG_S,                KIND_INT,        B_T, sizeof(long),                 0);\\\n");
-    fprintf(fp, "       SC_LONG_LONG_I             = SC_type_register(SC_LONG_LONG_S,           KIND_INT,        B_T, sizeof(long long),            0);\\\n");
-    fprintf(fp, "       SC_FLOAT_I                 = SC_type_register(SC_FLOAT_S,               KIND_FLOAT,      B_T, sizeof(float),                0);\\\n");
-    fprintf(fp, "       SC_DOUBLE_I                = SC_type_register(SC_DOUBLE_S,              KIND_FLOAT,      B_T, sizeof(double),               0);\\\n");
-    fprintf(fp, "       SC_LONG_DOUBLE_I           = SC_type_register(SC_LONG_DOUBLE_S,         KIND_FLOAT,      B_T, sizeof(long double),          0);\\\n");
-    fprintf(fp, "       SC_FLOAT_COMPLEX_I         = SC_type_register(SC_FLOAT_COMPLEX_S,       KIND_COMPLEX,    B_T, sizeof(float _Complex),       0);\\\n");
-    fprintf(fp, "       SC_DOUBLE_COMPLEX_I        = SC_type_register(SC_DOUBLE_COMPLEX_S,      KIND_COMPLEX,    B_T, sizeof(double _Complex),      0);\\\n");
-    fprintf(fp, "       SC_LONG_DOUBLE_COMPLEX_I   = SC_type_register(SC_LONG_DOUBLE_COMPLEX_S, KIND_COMPLEX,    B_T, sizeof(long double _Complex), 0);\\\n");
-    fprintf(fp, "       SC_QUATERNION_I            = SC_type_register(SC_QUATERNION_S,          KIND_QUATERNION, B_T, 4*sizeof(double),             0);\\\n");
-    fprintf(fp, "       SC_POINTER_I               = SC_type_register(SC_POINTER_S,               KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_BOOL_P_I                = SC_type_register(SC_BOOL_P_S,                KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_STRING_I                = SC_type_register(SC_STRING_S,                KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_WCHAR_P_I               = SC_type_register(SC_WCHAR_P_S,               KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_INT8_P_I                = SC_type_register(SC_INT8_P_S,                KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_SHORT_P_I               = SC_type_register(SC_SHORT_P_S,               KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_INT_P_I                 = SC_type_register(SC_INT_P_S,                 KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_LONG_P_I                = SC_type_register(SC_LONG_P_S,                KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_LONG_LONG_P_I           = SC_type_register(SC_LONG_LONG_P_S,           KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_FLOAT_P_I               = SC_type_register(SC_FLOAT_P_S,               KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_DOUBLE_P_I              = SC_type_register(SC_DOUBLE_P_S,              KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_LONG_DOUBLE_P_I         = SC_type_register(SC_LONG_DOUBLE_P_S,         KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_FLOAT_COMPLEX_P_I       = SC_type_register(SC_FLOAT_COMPLEX_P_S,       KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_DOUBLE_COMPLEX_P_I      = SC_type_register(SC_DOUBLE_COMPLEX_P_S,      KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_LONG_DOUBLE_COMPLEX_P_I = SC_type_register(SC_LONG_DOUBLE_COMPLEX_P_S, KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_QUATERNION_P_I          = SC_type_register(SC_QUATERNION_P_S,          KIND_POINTER, B_F, szptr, 0);\\\n");
-    fprintf(fp, "       SC_VOID_I                  = SC_type_register(SC_VOID_S,     KIND_OTHER,   B_T, 0,               0);\\\n");
-    fprintf(fp, "       SC_STRUCT_I                = SC_type_register(SC_STRUCT_S,   KIND_STRUCT,  B_F, 0,               0);\\\n");
-    fprintf(fp, "       SC_FILE_I                  = SC_type_register(SC_FILE_S,     KIND_STRUCT,  B_T, sizeof(FILE),    0);\\\n");
-    fprintf(fp, "       SC_PCONS_P_I               = SC_type_register(SC_PCONS_P_S,  KIND_POINTER, B_F, szptr,           0);\\\n");
-    fprintf(fp, "       SC_FILE_P_I                = SC_type_register(SC_FILE_P_S,   KIND_POINTER, B_F, szptr,           0)\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "/* aliases */\n");
-    fprintf(fp, "#define DEF_STANDARD_ALIASES  \\\n");
-    fprintf(fp, "       SC_ENUM_I         = SC_type_alias(SC_ENUM_S,    SC_INT_I);\\\n");
-    fprintf(fp, "       SC_INTEGER_I      = SC_type_alias(SC_INTEGER_S, SC_INT_I);\\\n");
-    fprintf(fp, "       SC_INT16_I        = SC_type_alias(SC_INT16_S,   SC_SHORT_I);\\\n");
-    fprintf(fp, "       SC_INT32_I        = SC_type_alias(SC_INT32_S,   SC_INT_I);\\\n");
-    fprintf(fp, "       SC_INT64_I        = SC_type_alias(SC_INT64_S,   SC_LONG_LONG_I);\\\n");
-    fprintf(fp, "       SC_REAL_I         = SC_type_alias(SC_REAL_S,    SC_DOUBLE_I);\\\n");
-    fprintf(fp, "       SC_FLOAT32_I      = SC_type_alias(SC_FLOAT32_S,  SC_FLOAT_I);\\\n");
-    fprintf(fp, "       SC_FLOAT64_I      = SC_type_alias(SC_FLOAT64_S,  SC_DOUBLE_I);\\\n");
-    fprintf(fp, "       SC_FLOAT128_I     = SC_type_alias(SC_FLOAT128_S, SC_LONG_DOUBLE_I);\\\n");
-    fprintf(fp, "       SC_COMPLEX32_I    = SC_type_alias(SC_COMPLEX32_S,  SC_FLOAT_COMPLEX_I);\\\n");
-    fprintf(fp, "       SC_COMPLEX64_I    = SC_type_alias(SC_COMPLEX64_S,  SC_DOUBLE_COMPLEX_I);\\\n");
-    fprintf(fp, "       SC_COMPLEX128_I   = SC_type_alias(SC_COMPLEX128_S, SC_LONG_DOUBLE_COMPLEX_I);\\\n");
-    fprintf(fp, "       SC_INT16_P_I      = SC_type_alias(SC_INT16_P_S,   SC_SHORT_P_I);\\\n");
-    fprintf(fp, "       SC_INT32_P_I      = SC_type_alias(SC_INT32_P_S,   SC_INT_P_I);\\\n");
-    fprintf(fp, "       SC_INT64_P_I      = SC_type_alias(SC_INT64_P_S,   SC_LONG_LONG_P_I);\\\n");
-    fprintf(fp, "       SC_REAL_P_I       = SC_type_alias(SC_REAL_P_S,     SC_DOUBLE_P_I);\\\n");
-    fprintf(fp, "       SC_FLOAT32_P_I    = SC_type_alias(SC_FLOAT32_P_S,  SC_FLOAT_P_I);\\\n");
-    fprintf(fp, "       SC_FLOAT64_P_I    = SC_type_alias(SC_FLOAT64_P_S,  SC_DOUBLE_P_I);\\\n");
-    fprintf(fp, "       SC_FLOAT128_P_I   = SC_type_alias(SC_FLOAT128_P_S, SC_LONG_DOUBLE_P_I);\\\n");
-    fprintf(fp, "       SC_COMPLEX32_P_I  = SC_type_alias(SC_COMPLEX32_P_S,  SC_FLOAT_COMPLEX_P_I);\\\n");
-    fprintf(fp, "       SC_COMPLEX64_P_I  = SC_type_alias(SC_COMPLEX64_P_S,  SC_DOUBLE_COMPLEX_P_I);\\\n");
-    fprintf(fp, "       SC_COMPLEX128_P_I = SC_type_alias(SC_COMPLEX128_P_S, SC_LONG_DOUBLE_COMPLEX_P_I)\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "#ifndef NO_VA_ARG_ID\n");
-
-/* if va_arg supports complex types */
-    fprintf(fp, "#ifdef HAVE_COMPLEX_VA_ARG\n");
-
-    fprintf(fp, "#define SC_VA_ARG_ID(_id, _d, _n)                    \\\n");
-    fprintf(fp, "   {int _lid;                                        \\\n");
-    fprintf(fp, "    if (_id == SC_STRING_I)                          \\\n");
-    fprintf(fp, "       _lid = _id;                                   \\\n");
-    fprintf(fp, "    else if (SC_is_type_ptr(_id) == TRUE)            \\\n");
-    fprintf(fp, "       _lid = SC_POINTER_I;                          \\\n");
-    fprintf(fp, "    else                                             \\\n");
-    fprintf(fp, "       _lid = _id;                                   \\\n");
-    fprintf(fp, "    switch (_lid) {                                  \\\n");
-
-    for (i = 0; i < N_TYPES; i++)
-        {if (ti[i].type != NULL)
-	    {id = i;
-             write_va_arg_clause(fp, id);};};
-
-    fprintf(fp, "       }                                             \\\n");
-    fprintf(fp, "   }\n");
-
-/* if va_arg does NOT support complex type */
-    fprintf(fp, "#else\n");
-
-    fprintf(fp, "#define SC_VA_ARG_ID(_id, _d, _n)                    \\\n");
-    fprintf(fp, "   {int _lid;                                        \\\n");
-    fprintf(fp, "    if (_id == SC_STRING_I)                          \\\n");
-    fprintf(fp, "       _lid = _id;                                   \\\n");
-    fprintf(fp, "    else if (SC_is_type_ptr(_id) == TRUE)            \\\n");
-    fprintf(fp, "       _lid = SC_POINTER_I;                          \\\n");
-    fprintf(fp, "    else                                             \\\n");
-    fprintf(fp, "       _lid = _id;                                   \\\n");
-    fprintf(fp, "    switch (_lid) {                                  \\\n");
-
-    for (i = 0; i <= I_FLOAT; i++)
-        {if (ti[i].type != NULL)
-	    {id = i;
-	     write_va_arg_clause(fp, id);};};
-
-    for (i = I_COMPLEX+1; i < N_TYPES; i++)
-        {if (ti[i].type != NULL)
-	    {id = i;
-	     write_va_arg_clause(fp, id);};};
-
-    fprintf(fp, "       }                                             \\\n");
-    fprintf(fp, "   }\n");
-
-    fprintf(fp, "#endif\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "#endif\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
 /*                             PARSING ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
 /* PARSE_TMPL - read and parse the next template from FP */
 
-static template *parse_tmpl(FILE *fp, int *flo)
+static template *parse_tmpl(FILE *fp, int ne, typdes *tl, int *flo)
    {int i, lo, nt, nl, npo, npc, fpr, st;
     off_t ad;
     char s[BFLRG], proto[BFLRG];
@@ -837,7 +456,7 @@ static template *parse_tmpl(FILE *fp, int *flo)
 		 sa = lst_push(sa, "%s", p);};};};
 
     if ((nt > 0) && (sa != NULL))
-       t = make_template(proto, nl, sa, tmn, tmx, lo);
+       t = make_template(proto, ne, tl, nl, sa, tmn, tmx, lo);
     else
        t = NULL;
 
@@ -869,18 +488,33 @@ static void help(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#include "template-type.c"
+#include "template-vararg.c"
+#include "template-coerce.c"
+#include "template-render.c"
+#include "template-desc.c"
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int i, ln, nt, rv, tgt;
+   {int i, ln, ne, nt, rv, tgt, fl;
+    int dfl[3];
     char tmpf[BFLRG], tytab[BFLRG];
     char *inf, *outf;
     FILE *fi, *fo;
-    template *t, *tl[NMAX];
+    template *t, *tm[NMAX];
+    typdes *tl;
 
     rv = 0;
 
     tytab[0] = '\0';
+
+    dfl[0] = 0;    /* C header for desc mode */
+    dfl[1] = 0;    /* HTML for desc mode */
+    dfl[2] = 0;    /* show alias types */
 
     tgt  = 0;
     inf  = NULL;
@@ -899,6 +533,17 @@ int main(int c, char **v)
 	    nstrncpy(tytab, BFLRG, v[++i], -1);
 	 else if (strcmp(v[i], "-va") == 0)
 	    tgt = 2;
+	 else if (strcmp(v[i], "-coerce") == 0)
+	    tgt = 3;
+	 else if (strcmp(v[i], "-desc") == 0)
+	    {tgt = 4;
+             fl  = atol(v[++i]);
+	     if (fl & 1)
+	        dfl[0] = TRUE;
+	     else if (fl & 2)
+	        dfl[1] = TRUE;
+	     else if (fl & 4)
+	        dfl[2] = TRUE;}
 	 else
 	    inf = v[i];};
 
@@ -909,24 +554,35 @@ int main(int c, char **v)
     if (inf != NULL)
        fi = fopen_safe(inf, "r+");
 
+    tl = type_table(NULL);
+    for (ne = 0; tl[ne].type != NULL; ne++);
+
     if (tgt == 2)
        {nt  = 0;
 	inf = "scarg.h";}
+
+    else if (tgt == 3)
+       {nt  = 0;
+	inf = "sctypeg.h";}
+
+    else if (tgt == 4)
+       {nt  = 0;
+	inf = "pdform.h";}
 
     else if ((inf == NULL) || (fi == NULL))
        {printf("No input file specified - exiting\n");
 	return(1);}
 
     else
-       {memset(tl, 0, sizeof(tl));
+       {ln = 1;
 
-	ln = 1;
+        memset(tm, 0, sizeof(tm));
 
 	for (nt = 0; nt < NMAX; nt++)
-	    {t = parse_tmpl(fi, &ln);
+	    {t = parse_tmpl(fi, ne, tl, &ln);
 	     if (t == NULL)
 	        break;
-	     tl[nt] = t;};};
+	     tm[nt] = t;};};
 
     if (outf != NULL)
        {snprintf(tmpf, BFLRG, "%s.%d", outf, getpid());
@@ -946,27 +602,39 @@ int main(int c, char **v)
 /* write template as an array of functions */
        {case 0 :
 	     for (i = 0; i < nt; i++)
-	         write_fnc(fo, tl, i, nt);
+	         write_fnc(fo, ne, tl, tm, i, nt);
 
 	     for (i = 0; i < nt; i++)
-	         write_fnc_decls(fo, tl, i, nt);
+	         write_fnc_decls(fo, ne, tl, tm, i, nt);
 
 	     break;
 
 /* write template as a switch statement */
 	case 1 :
 	     for (i = 0; i < nt; i++)
-	         write_switch(fo, tl[i]);
+	         write_switch(fo, ne, tl, tm[i]);
 
 	     break;
 
 /* write special template for variable arg handler */
 	case 2 :
-	     write_va_arg(fo);
+	     def_type_manager(fo, ne, tl);
+	     write_va_arg(fo, ne, tl);
+	     break;
+
+/* write special template for type conversion and rendering */
+	case 3 :
+	     write_coerce(fo, ne, tl);
+	     write_str(fo, ne, tl);
+	     break;
+
+/* write special template for type conversion and rendering */
+	case 4 :
+	     write_desc(fo, ne, tl, dfl);
 	     break;};
 
     for (i = 0; i < nt; i++)
-	free_template(tl[i]);
+	free_template(tm[i]);
 
     write_trailer(fo, inf);
 

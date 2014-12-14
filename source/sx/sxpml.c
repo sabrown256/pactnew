@@ -104,7 +104,7 @@ void *_SX_opt_quaternion(quaternion *x, bind_opt wh, void *a)
 	     o = (object *) a;
              if (SS_nullobjp(o))
                 rv = NULL;
-	     else if (SX_QUATERNIONP(o))
+	     else if (SS_quaternionp(o))
 	        rv = SS_GET(quaternion, o);
 	     else
 	        rv = _SX.unresolved;

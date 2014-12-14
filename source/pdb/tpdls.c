@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb.h"
+#include "pdbtfr.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -69,8 +69,7 @@ int main(int c, char **v)
 
     file = PD_open(fname, "r");
     if (file == NULL)
-       {printf("Error opening %s\n", fname);
-	exit(1);};
+       error(1, stdout, "Error opening %s\n", fname);
 
     printf("\nSymbol Table:\n");
 

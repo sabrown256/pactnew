@@ -85,9 +85,9 @@ PA_thread_state *PA_get_thread(int id)
 
     if (_PA.tsid < 0)
        _PA.tsid = SC_register_thread_data("panacea-state",
-					     "PA_thread_state",
-					     1, sizeof(PA_thread_state),
-					     (PFTinit) _PA_init_state);
+					  "PA_thread_state",
+					  1, sizeof(PA_thread_state),
+					  (PFTinit) _PA_init_state);
 
     if (id < 0)
        id  = PA_current_thread();

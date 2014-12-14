@@ -168,14 +168,14 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 /* _PD_RD_PRIM_TYP_III - read the primitive types from the extras table */
 
 static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
-   {int ni, align;
+   {int l, it, ni, align;
     int unsgned, onescmp, conv;
     int *ordr, *aord;
     intb i, bpi, bsz;
     long *formt;
-    char *token, *type, *origtype, *atype, *s, *local;
+    char *token, *type, *origtype, *atype, *s, *local, **sa;
     multides *tuple;
-    PD_type_kind kind;
+    SC_kind kind;
     PD_byte_order ord, ordo;
     PD_smp_state *pa;
 
@@ -193,102 +193,107 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
 /* initialize the pdb system defs and structure chart */
     _PD_init_chrt(file, FALSE);
 
-    while (_PD_get_token(NULL, local, bsz, '\n'))
-       {if (*local == '\0')
-           break;
+    for (l = 0; _PD_get_token(NULL, local, bsz, '\n'); l++)
+        {if (*local == '\0')
+            break;
 
-        type = CSTRSAVE(SC_strtok(local, " \t", s));
+	 ord      = NO_ORDER;
+	 ordo     = NO_ORDER;
+	 ordr     = NULL;
+	 formt    = NULL;
+	 unsgned  = FALSE;
+	 onescmp  = FALSE;
+	 conv     = TRUE;
+	 kind     = KIND_OTHER;
+	 tuple    = NULL;
+	 origtype = NULL;
 
-        bpi      = SC_stol(SC_strtok(NULL, " \t", s));
-        align    = SC_stol(SC_strtok(NULL, " \t", s));
-        ord      = NO_ORDER;
-	ordo     = NO_ORDER;
-        ordr     = NULL;
-        formt    = NULL;
-        unsgned  = FALSE;
-        onescmp  = FALSE;
-        conv     = TRUE;
-	kind     = NON_CONVERT_KIND;
-	tuple    = NULL;
-	origtype = NULL;
+	 sa = PS_tokenize(local, "(,;|) \t\n", 0);
+	 it = 0;
 
-        while ((token = SC_strtok(NULL, "(|;\n", s)) != NULL)
-	   {token = SC_trim_left(token, " \n");
-	    if (strncmp(token, "ORDER", 5) == 0)
-	       {ordr = CMAKE_N(int, bpi);
-		for (i = 0L; i < bpi; i++)
-		    {token = SC_strtok(NULL, ",)|", s);
-		     if (token == NULL)
-		        continue;
-		     else if (strcmp(token, "text") == 0)
-		        {for (i = 0L; i < bpi; i++)
-			     ordr[i] = i + 1;
-			 ordo = TEXT_ORDER;
-			 break;}
-		     else if (strcmp(token, "big") == 0)
-		        {for (i = 0L; i < bpi; i++)
-			     ordr[i] = i + 1;
-			 ordo = NORMAL_ORDER;
-			 break;}
-		     else if (strcmp(token, "little") == 0)
-		        {for (i = 0L; i < bpi; i++)
-			     ordr[i] = bpi - i;
-			 ordo = REVERSE_ORDER;
-			 break;}
-
-		     else
-		        {ordr[i] = SC_stol(token);
-			 ordo = SPEC_ORDER;};};}
+	 type  = _PD_cat_type(sa, &it);
+	 bpi   = SC_stol(sa[it++]);
+	 align = SC_stol(sa[it++]);
+	 for (; sa[it] != NULL; )
+	     {token = sa[it++];
+	      if (strncmp(token, "ORDER", 5) == 0)
+	         {ordr = CMAKE_N(int, bpi);
+		  for (i = 0L; i < bpi; i++)
+		      {token = sa[it++];
+		       if (strcmp(token, "text") == 0)
+		          {for (i = 0L; i < bpi; i++)
+			       ordr[i] = i + 1;
+			   ordo = TEXT_ORDER;
+			   break;}
+		       else if (strcmp(token, "big") == 0)
+		          {for (i = 0L; i < bpi; i++)
+			       ordr[i] = i + 1;
+			   ordo = NORMAL_ORDER;
+			   break;}
+		       else if (strcmp(token, "little") == 0)
+		          {for (i = 0L; i < bpi; i++)
+			       ordr[i] = bpi - i;
+			   ordo = REVERSE_ORDER;
+			   break;}
+		       else
+		          {ordr[i] = SC_stol(token);
+			   ordo = SPEC_ORDER;};};}
                     
-	    else if (strncmp(token, "FIX", 3) == 0)
-	       {CFREE(ordr);
-		ord  = ordo;
-		kind = INT_KIND;}
+	      else if (strncmp(token, "FIX", 3) == 0)
+	         {CFREE(ordr);
+		  ord  = ordo;
+		  kind = KIND_INT;}
                     
-	    else if (strncmp(token, "FLOAT", 5) == 0)
-	       {formt = CMAKE_N(long, 8);
-		for (i = 0L; i < 8; i++)
-		    formt[i] = SC_stol(SC_strtok(NULL, ",)|", s));
-		kind = FLOAT_KIND;}
+	      else if (strncmp(token, "FLOAT", 5) == 0)
+	         {formt = CMAKE_N(long, 8);
+		  for (i = 0L; i < 8; i++)
+		      formt[i] = SC_stol(sa[it++]);
+		  kind = KIND_FLOAT;}
 
-	    else if (strncmp(token, "TUPLE", 5) == 0)
-	       {atype = SC_strtok(NULL, ",)|", s);
-	        ni    = SC_stol(SC_strtok(NULL, ",)|", s));
-		aord  = CMAKE_N(int, ni);
-		for (i = 0L; i < ni; i++)
-		    aord[i] = SC_stol(SC_strtok(NULL, ",)|", s));
-		if (aord[0] == -1)
-		   {CFREE(aord);};
-		tuple = _PD_make_tuple(atype, ni, aord);}
+	      else if (strncmp(token, "TUPLE", 5) == 0)
+	         {atype = _PD_cat_type(sa, &it);
+		  ni    = SC_stol(sa[it++]);
+		  aord  = CMAKE_N(int, ni);
+		  for (i = 0L; i < ni; i++)
+		      {aord[i] = SC_stol(sa[it++]);
+		       if (aord[i] == -1)
+			  break;};
+		  if (aord[0] == -1)
+		     CFREE(aord);
+		  tuple = _PD_make_tuple(atype, ni, aord);}
 
-	    else if (strncmp(token, "CHAR", 4) == 0)
-	       kind = CHAR_KIND;
+	      else if (strncmp(token, "CHAR", 4) == 0)
+	         kind = KIND_CHAR;
                     
-	    else if (strncmp(token, "NO-CONV", 7) == 0)
-	       {kind = NON_CONVERT_KIND;
-		conv = FALSE;}
+	      else if (strncmp(token, "NO-CONV", 7) == 0)
+	         {kind = KIND_OTHER;
+		  conv = FALSE;}
 
-	    else if (strncmp(token, "UNSGNED", 7) == 0)
-               unsgned = TRUE;
+	      else if (strncmp(token, "UNSGNED", 7) == 0)
+                 unsgned = TRUE;
 
-	    else if (strncmp(token, "ONESCMP", 7) == 0)
-               onescmp = TRUE;
+	      else if (strncmp(token, "ONESCMP", 7) == 0)
+                 onescmp = TRUE;
 
-            else if (strncmp(token, "TYPEDEF", 7) == 0)
-	       origtype = SC_strtok(NULL, ")", s);};
+	      else if (strncmp(token, "TYPEDEF", 7) == 0)
+	         origtype = _PD_cat_type(sa, &it);};
 
-	_PD_prim_type_iii(file, type, bpi, align, ord, ordr, formt);
+	 _PD_prim_type_iii(file, type, bpi, align, ord, ordr, formt);
 
-	_PD_defstr_prim_rd(file, type, origtype, kind,
-			   tuple, bpi, align, ord,
-			   ordr, formt, unsgned, onescmp, conv);
+	 _PD_defstr_prim_rd(file, type, origtype, kind,
+			    tuple, bpi, align, ord,
+			    ordr, formt, unsgned, onescmp, conv);
 
 /* if these have a reference do not free them */
-	if ((origtype != NULL)  && (SC_ref_count(formt) == 0))
-	   {CFREE(ordr);
-	    CFREE(formt);};
+	 if ((origtype != NULL)  && (SC_ref_count(formt) == 0))
+	    {CFREE(ordr);
+	     CFREE(formt);};
 
-        CFREE(type);};
+	 PS_free_strings(sa);
+
+	 CFREE(atype);
+	 CFREE(origtype);
+	 CFREE(type);};
 
 /* get global type qualifier information */
 
@@ -441,7 +446,7 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 		   break;};};
 
 /* install the type in both charts */
-        _PD_defstr_inst(file, type, STRUCT_KIND, lst,
+        _PD_defstr_inst(file, type, KIND_STRUCT, lst,
 			NO_ORDER, NULL, NULL, PD_CHART_HOST);};
 
     pa->cast_lst = pl;
@@ -776,13 +781,13 @@ static int _PD_wr_prim_typ_iii(FILE *fp, hasharr *tab)
 /* write the floating point format */
 	 formt = dp->fp.format;
 	 switch (dp->kind)
-	    {case CHAR_KIND :
+	    {case KIND_CHAR :
 	          ok &= _PD_put_string(l++, "|CHAR");
 		  break;
-	     case INT_KIND :
+	     case KIND_INT :
 		  ok &= _PD_put_string(l++, "|FIX");
 		  break;
-	     case FLOAT_KIND :
+	     case KIND_FLOAT :
 		  if (formt != NULL)
 		     {ok &= _PD_put_string(l++, "|FLOAT(");
 		      for (j = 0L; j < 8; j++)

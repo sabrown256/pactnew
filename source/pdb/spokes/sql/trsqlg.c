@@ -316,7 +316,7 @@ static defstr *_SQL_rd_defstr(PDBfile *file, char *type)
 	     prev = desc;};};
 
 /* install the type in all charts */
-    dp = _PD_defstr_inst(file, type, STRUCT_KIND, lst,
+    dp = _PD_defstr_inst(file, type, KIND_STRUCT, lst,
 			 TEXT_ORDER, NULL, NULL, PD_CHART_HOST);
 
     if (dp == NULL)
