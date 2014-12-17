@@ -119,6 +119,8 @@ hdrf = ${IncDir}/pasrc.h ${IncDir}/panacea_gen.h
 
 IncAction = @pact generate
 
+LibAction = @pact devgen
+
 #
 # preprocessing test
 #

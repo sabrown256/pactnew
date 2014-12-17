@@ -216,13 +216,18 @@ int main(int c, char **v)
     fprintf(fp, "#\n");
     fprintf(fp, "# Site Dependent OS Support\n");
     fprintf(fp, "#\n");
-    fprintf(fp, "OSSupport =");
     if (strcmp(lostd, "UNIX") == 0)
-       fprintf(fp, " ${%sUnxObjs}\n", osrc);
+       {fprintf(fp, "OSSrcs = ${UnxSrcs}\n");
+        fprintf(fp, "OSObjs = ${%sUnxObjs}\n", osrc);}
 
 /* cannot ever get here but it shows how the abstraction works */
     else if (strcmp(lostd, "WIN32") == 0)
-       fprintf(fp, " ${%sW32Objs}\n", osrc);
+       {fprintf(fp, "OSSrcs = ${W32Srcs}\n");
+	fprintf(fp, "OSObjs = ${%sW32Objs}\n", osrc);}
+
+    else
+       {fprintf(fp, "OSSrcs =");
+        fprintf(fp, "OSObjs =");};
 
     fprintf(fp, "\n");
 
@@ -418,6 +423,9 @@ int main(int c, char **v)
     fprintf(fp, "DATE    = `./code-date`\n");
     fprintf(fp, "\n");
 
+    fprintf(fp, "IncGen     =\n");
+    fprintf(fp, "\n");
+
 /* get the entries for RPATH */
     npath = run(FALSE, "analyze/rpath -o link");
     fprintf(wlog, "analyze/rpath -o link => |%s|\n", npath);
@@ -546,7 +554,7 @@ int main(int c, char **v)
     fprintf(fp, "YCAnnounce     = ${YCAnnounce${SFL_}}\n");
     fprintf(fp, "\n");
 
-    fprintf(fp, "CC  = ${CCompiler} ${ODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}\n");
+    fprintf(fp, "CC  = ${CCompiler} ${ODC} ${CFLAGS} ${Shared_CC_Flags} ${IncGen} ${CcFlags}\n");
     fprintf(fp, "CXX = ${CXCompiler} ${ODC} ${CXFLAGS} ${CxFlags}\n");
     fprintf(fp, "FC  = ${FCompiler} ${ODF} ${FFLAGS} ${FcFlags}\n");
     fprintf(fp, "LX  = ${CCompiler} ${ODC} ${LXFLAGS} ${CcFlags}\n");

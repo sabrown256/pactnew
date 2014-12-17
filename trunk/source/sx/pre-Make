@@ -167,10 +167,7 @@ hdrf = ${IncDir}/sxpdbd.h
 
 IncAction = @pact generate
 
-SDir = ${PACTSrcDir}
-
-LibAction = @(echo "build-ext" ; build-ext ; cd ${PACTTmpDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" -f ../../pre-Make devlib)
-
+LibAction = @(echo "build-ext" ; build-ext ; pact devgen)
 
 #
 # make the executable

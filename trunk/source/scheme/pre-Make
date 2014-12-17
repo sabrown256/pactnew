@@ -180,9 +180,7 @@ hdrf = ${IncDir}/scheme_gen.h
 
 IncAction = @pact generate
 
-IncAction = @pact generate
-
-
+LibAction = @pact devgen
 
 profiler : 
 	pact remove

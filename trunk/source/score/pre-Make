@@ -96,7 +96,7 @@ Hdrs = scstd.h scapi.h scunix.h scwin32.h scbgl.h \
        sclnx.h scosx.h sccyg.h scbsd.h \
        scaix.h scsol.h scbeos.h schurd.h \
        score.h score_int.h score_old.h \
-       scope_hash.h scope_typeh.h scope_io.h scope_array.h \
+       scope_hash.h scope_type.h scope_io.h scope_array.h \
        scope_dl.h
 
 APIs = ${IncDir}/bfd.api
@@ -104,11 +104,40 @@ APIs = ${IncDir}/bfd.api
 #
 # Object Files
 #
-gcs = gc-score.c
+gcs = gc-type.c gc-score.c
+GSrcs = ${PACTTmpDir}/gc-type.c ${PACTTmpDir}/gc-score.c
 
-gco = gc-score.o
+DSrcs = scmkdp.c scmkpr.c scar.c sctar.c scfcnr.c
 
-gca = ${TGTLib}(gc-score.o)
+ESrcs = scexe.c
+
+MSrcs = scmemc.c scmemcl.c scmemcs.c \
+        scmemda.c scmemdb.c scmemdc.c scmeme.c \
+        scmemg.c scmemh.c scmemt.c sctyp.c
+
+PSrcs = scerr.c sccntx.c \
+        schp.c scpman.c schttp.c scinet.c \
+        scmmap.c sclmmap.c scmmaps.c \
+        scsysa.c scsysb.c scsysc.c scsysd.c scsyse.c \
+        scfio.c scbio.c scudl.c scioctl.c scsig.c schsrv.c \
+        scterm.c scleh.c \
+        scdl.c sctrace.c scpsh.c
+
+TSrcs = scpar.c scthn.c scthe.c scthp.c sctho.c scths.c
+
+W32Srcs = sclpw32.c scwin32.c
+UnxSrcs = sclppsx.c scunix.c scaix.c scbgl.c scpcc.c sccyg.c scbsd.c scbeos.c
+
+Srcs = ${DSrcs} ${ESrcs} ${MSrcs} ${PSrcs} ${TSrcs} ${OSSrcs} \
+       scctl.c scapi.c scfnca.c scfncb.c scfnct.c \
+       scarrd.c scarrs.c \
+       schash.c sctree.c sctab.c \
+       scstr.c scrsca.c scrscb.c \
+       sclexs.c sctrk.c sclog.c scold.c \
+       ${GSrcs}
+
+
+gco = gc-type.o gc-score.o
 
 DObjs = scmkdp.o scmkpr.o scar.o sctar.o scfcnr.o
 
@@ -131,13 +160,14 @@ TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
 OW32Objs = sclpw32.o scwin32.o
 OUnxObjs = sclppsx.o scunix.o scaix.o scbgl.o scpcc.o sccyg.o scbsd.o scbeos.o
 
-Objs = ${EObjs} ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
+Objs = ${EObjs} ${MObjs} ${PObjs} ${TObjs} ${OSSObjs} \
        scctl.o scapi.o scfnca.o scfncb.o scfnct.o \
        scarrd.o scarrs.o \
        schash.o sctree.o sctab.o \
        scstr.o scrsca.o scrscb.o \
-       sclexs.o sctrk.o sclog.o scold.o scf77lr.o \
-       ${gco}
+       sclexs.o sctrk.o sclog.o scold.o scf77lr.o
+
+gca = ${TGTLib}(gc-type.o) ${TGTLib}(gc-score.o)
 
 ArDObjs = ${TGTLib}(scmkdp.o) ${TGTLib}(scmkpr.o) ${TGTLib}(scar.o) \
           ${TGTLib}(sctar.o) ${TGTLib}(scfcnr.o)
@@ -171,7 +201,7 @@ ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) \
             ${TGTLib}(sccyg.o) ${TGTLib}(scbsd.o)
 
 ArObjs = ${ArDObjs} ${ArEObjs} ${ArMObjs} ${ArPObjs} \
-         ${ArSObjs} ${ArTObjs} ${OSSupport} \
+         ${ArSObjs} ${ArTObjs} ${OSObjs} \
          ${TGTLib}(scctl.o) ${TGTLib}(scapi.o) \
 	 ${TGTLib}(scfnca.o) ${TGTLib}(scfncb.o) ${TGTLib}(scfnct.o) \
          ${TGTLib}(scarrd.o) ${TGTLib}(scarrs.o) ${TGTLib}(scstr.o) \
@@ -210,31 +240,33 @@ ${MMDep}  : ${Hdrs}
 # Generated code rules
 #
 
-# headers
+# generated headers and sources
 
-${IncDir}/sctypeg.h :
-	@(echo "template -coerce -o ${IncDir}/sctypeg.h" ; \
-	  ${CROSS_FE} template -coerce -o ${IncDir}/sctypeg.h)
+${PACTTmpDir}/gc-type.c :
+	@(echo "template -gc -o ${PACTTmpDir}/gc-type.c" ; \
+	  ${CROSS_FE} template -gc -o ${PACTTmpDir}/gc-type.c)
 
-${IncDir}/scarg.h :
-	@(echo "template -va -o ${IncDir}/scarg.h" ; \
-	  ${BinDir}/template -va -o ${IncDir}/scarg.h)
+${PACTTmpDir}/gc-type.h :
+	@(echo "template -gh -o ${PACTTmpDir}/gc-type.h" ; \
+	  ${BinDir}/template -gh -o ${PACTTmpDir}/gc-type.h)
 
 ${IncDir}/scfnca.h : scfnca.t
 	@(echo "template scfnca.t -o ${IncDir}/scfnca.h" ;  \
 	  ${BinDir}/template scfnca.t -o ${IncDir}/scfnca.h)
 
-GenInc = ${PACTTmpDir}/gc-score.h
+GenInc = ${PACTTmpDir}/gc-type.h ${PACTTmpDir}/gc-score.h
 
 ${IncDir}/score_gen.h : ${GenInc}
 	@echo "build score_gen.h"
 	@rm -f ${IncDir}/score_gen.h
 	@cat ${GenInc} > ${IncDir}/score_gen.h
 
-hdrf = ${IncDir}/scarg.h ${IncDir}/sctypeg.h \
+hdrf = ${PACTTmpDir}/gc-type.h ${PACTTmpDir}/gc-type.c \
        ${IncDir}/scfnca.h ${IncDir}/score_gen.h
 
 IncAction = @pact generate
+
+LibAction = @pact devgen
 
 #
 # MMLib 
@@ -573,11 +605,22 @@ example : ${TGTLib} example.c
 #       - this is a special target that you cannot build with dmake
 #       - it must be built with smake
 #
-dmake : ${hdrf}
-	${BinDir}/smake ${BinDir}/dmake
+DFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+mklib : ${APIs} ${LibDep}
+	@acc ${DFlags} -c ${Srcs} -a ${TGTLib}
+
+ndmake :
+	@smake mklib
+	@acc ${DFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
+
+dmake :
+	@echo "import-api bfd.def -o ${IncDir}/bfd.api"
+	@import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
+	@acc ${DFlags} -c ${Srcs} -a ${TGTLib}
+	@acc ${DFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 
 dmt : ${hdrf}
-	${BinDir}/smake ${BinDir}/dmake
+	${BinDir}/smake dmake
 	sctest mk
 
 #

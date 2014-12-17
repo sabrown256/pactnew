@@ -15,7 +15,7 @@
 #include "score_old.h"
 #include "score_gen.h"
 #include "scope_hash.h"
-#include "scope_typeh.h"
+#include "scope_type.h"
 #include "scope_io.h"
 #include "scope_array.h"
 #include "scope_lex.h"

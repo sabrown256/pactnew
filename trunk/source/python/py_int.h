@@ -3,7 +3,6 @@
  *
  */
 
-
 #include "cpyright.h"
  
 #ifndef PCK_PY_INTERNAL

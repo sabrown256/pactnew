@@ -59,7 +59,7 @@ The changes consist of:
          score/scope_proc.h	
          score/scope_term.h
          score/scope_thread.h
-         score/scope_typeh.h
+         score/scope_type.h
 
          pml/scope_complex.h  
          pml/scope_math.h     

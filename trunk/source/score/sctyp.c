@@ -10,7 +10,6 @@
 
 #include "score_int.h"
 #include "scope_mem.h"
-#include <sctypeg.h>
 
 /* to add a new primitive type you need to check at least the
  * following places:
@@ -899,7 +898,7 @@ int SC_type_match_size(SC_kind kind, int nb)
 void *SC_convert_id(int did, void *d, long od, long ds,
 		    int sid, void *s, long os, long ss,
 		    long n, int flag)
-   {int rv, bpi, nd, np;
+   {int rv, bpi, np;
     int pdid, psid;
     long nc;
     typdes *td, *ts;
@@ -919,8 +918,7 @@ void *SC_convert_id(int did, void *d, long od, long ds,
     psid = SC_PRIMITIVE_ID(psid);
 
     np = _SC.types.nprimitive;
-    nd = sizeof(_SC_convf)/(np*sizeof(PFConv));
-    if ((0 <= pdid) && (pdid < nd) &&
+    if ((0 <= pdid) && (pdid < np) &&
 	(0 <= psid) && (psid < np) &&
 	(_SC_convf[pdid][psid] != NULL))
        nc = _SC_convf[pdid][psid](d, od, ds, s, os, ss, n);

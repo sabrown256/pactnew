@@ -49,18 +49,23 @@ else
    NoteD $Log "                    $msg"
    Note $Log ""
 
-   set List = (-va score/scfnca.t pml/mlsrch.t sx/sxpdbd.t)
+   set List = (-gh -gc score/scfnca.t pml/mlsrch.t sx/sxpdbd.t)
 
    Note $Log "Using $TEMPLATE"
 
    foreach t ($List)
       Separator $Log
 
-      if ("$t" == "-va") then
+      if ("$t" == "-gh") then
          set u = $t
-         set f = ( `fill-string -n 28 arg` )
-         flog $Log set Res = arg.res
-         flog $Log set Ref = $RefDir/arg
+         set f = ( `fill-string -n 28 gc_type.h` )
+         flog $Log set Res = gch.res
+         flog $Log set Ref = $RefDir/gch
+      else if ("$t" == "-gc") then
+         set u = $t
+         set f = ( `fill-string -n 28 gc_type.c` )
+         flog $Log set Res = gcc.res
+         flog $Log set Ref = $RefDir/gcc
       else
          set u = $t:t
          set f = ( `fill-string -n 28 $u` )

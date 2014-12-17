@@ -31,7 +31,7 @@ inc scgnu.h scpcc.h sclnx.h scosx.h sccyg.h
 inc scaix.h scsol.h schpux.h scirix.h
 inc scope_array.h scope_hash.h scope_io.h
 inc scope_make.h scope_mem.h scope_mpi.h scope_proc.h scope_psh.h
-inc scope_thread.h scope_term.h scope_typeh.h scarg.h
+inc scope_thread.h scope_term.h scope_type.h scarg.h
 inc scope_lex.h sclexan.h pml.h scope_complex.h scope_constants.h
 inc scope_exe.h scope_dl.h
 inc pdb.h pdb_old.h pdform.h scope_dp.h

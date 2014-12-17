@@ -15,7 +15,6 @@
 #include "pml_int.h"
 #include "pdb.h"
 #include "scope_mpi.h"
-#include "scope_typeh.h"
 
 /*--------------------------------------------------------------------------*/
 

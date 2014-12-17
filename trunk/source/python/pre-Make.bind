@@ -124,16 +124,6 @@ hdrf =
 
 IncAction = 
 
-# language bindings
-
-# NOTE: to get generated code dependencies to work the
-# file newer predicate only checks current directory for file
-# so we must be in PACTGenDir for the generated wrappers
-
-SDir = ${PACTGenDir}
-
-LibAction = @(mkdir -p ${PyDir} ; sync ; cd ${SDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\"${PACTGenDir}\" PACTTmpDir=\"${PACTTmpDir}\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" lpyext=${lpyext} lpycfg=${lpycfg} lpyver=${lpyver} lpyinc=${lpyinc} lpynum=${lpynum} -f ../../pre-Make.bind sysdir=${PSY_Root} devlib)
-
 
 TGTSPDB  = ${PyDir}/libpypdb.so
 TGTShPDB = ${TGTSPDB}.1
@@ -171,6 +161,15 @@ ${TGTShPGS} : ${TGTLib}
 	  ln -s ${TGTShPGS} _pgs.so ; \
 	  rm -f *.o _____* )
 
+
+#
+# devgenpy
+#
+
+devgenpy:
+	@(cd ${PACTGenDir} ; \
+          echo "bindings" ; \
+          pact -f ${PACTSrcDir}/pre-Make.bind IncGen=\"-I../..\" PACTSrcDir=\"${PACTGenDir}\" PACTTmpDir=\"${PACTTmpDir}\" sysdir=\"${PSY_Root}\" lpycfg=\"${lpcfg}\" lpyver=\"${lpyver}\" lpyinc=\"${lpyinc}\" lpyext=\"${lpyext}\" lpynum=\"${lpynum}\" LibAction=@/bin/true devlib)
 
 #
 # link 

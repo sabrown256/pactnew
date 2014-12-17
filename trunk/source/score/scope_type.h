@@ -13,8 +13,6 @@
 typedef long long int64_t;
 #endif
 
-#include <scarg.h>
-
 #define SC_PCONS_P_I                 SC_gs.lityp[0].i
 #define SC_PCONS_P_S                 SC_gs.lityp[0].s
 #define SC_ITYP_N                    1
