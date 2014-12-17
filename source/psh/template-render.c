@@ -16,7 +16,7 @@ static void write_str_proto(FILE *fp, typdes *td)
    {
 
     fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
-	    td->fncp);
+            td->fncp);
 
     return;}
 
@@ -35,7 +35,7 @@ static void _SC_write_bool(FILE *fp, typdes *td)
     fprintf(fp, "    %s *pv = (%s *) s;\n", td->type, td->type);
 
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
-	    td->id, td->id);
+            td->id, td->id);
 
     fprintf(fp, "    nb = -1;\n");
     fprintf(fp, "    if (strchr(fmt, 's') != NULL)\n");
@@ -74,7 +74,7 @@ static void _SC_write_complex(FILE *fp, typdes *td)
     fprintf(fp, "    %s *pv = (%s *) s;\n", td->type, td->type);
 
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
-	    td->id, td->id);
+            td->id, td->id);
 
 #if (AF_LONG_DOUBLE_IO == 1)
     fprintf(fp, "\n");
@@ -119,7 +119,7 @@ static void _SC_write_quaternion(FILE *fp, typdes *td)
     fprintf(fp, "    %s *pv = (%s *) s;\n", td->type, td->type);
 
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
-	    td->id, td->id);
+            td->id, td->id);
 
     fprintf(fp, "    q  = pv[n];\n");
     fprintf(fp, "    nb = snprintf(t, nc, fmt, q.s, q.i, q.j, q.k);\n");
@@ -148,7 +148,7 @@ static void _SC_write_ntos(FILE *fp, typdes *td)
     fprintf(fp, "    %s *pv = (%s *) s;\n", td->type, td->type);
 
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
-	    td->id, td->id);
+            td->id, td->id);
 
 /* non-standard long double I/O */
 #if (AF_LONG_DOUBLE_IO == 1)
@@ -202,7 +202,7 @@ static void _SC_write_ptr(FILE *fp, typdes *td)
 
     fprintf(fp, "    nld = 0;\n");
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
-	    td->id, td->id);
+            td->id, td->id);
 
 /* non-standard long double I/O */
 #if (AF_LONG_DOUBLE_IO == 1)
@@ -245,23 +245,29 @@ static void _SC_write_ptr(FILE *fp, typdes *td)
 
 /* WRITE_STR_DECL - write the declaration of the rendering array */
 
-static void write_str_decl(FILE *fp, int ne, typdes *tl)
+static void write_str_decl(FILE *fp, int ne, typdes *tl, int src)
    {int i;
     typdes *td;
 
-    fprintf(fp, "typedef char *(*PFStrv)(char *t, int nc, void *s, long n, int mode);\n");
-    fprintf(fp, "\n");
+    if (src == TRUE)
+       {fprintf(fp, "PFStrv\n");
+	fprintf(fp, " _SC_strf[] = {\n");
 
-    fprintf(fp, "static PFStrv\n");
-    fprintf(fp, " _SC_strf[] = {\n");
-    for (i = 0; i < ne; i++)
-        {td = tl + i;
-	 if (IS_PRIMITIVE_TYPE(td) == B_F)
-	    fprintf(fp, "                NULL,\n");
-	 else
-	    fprintf(fp, "                _SC_str_%s,\n", td->fncp);};
+	for (i = 0; i < ne; i++)
+	    {td = tl + i;
+	     if (IS_PRIMITIVE_TYPE(td) == B_F)
+	        fprintf(fp, "                NULL,\n");
+	     else
+	        fprintf(fp, "                _SC_str_%s,\n", td->fncp);};
 
-    fprintf(fp, "   };\n");
+	fprintf(fp, "   };\n");}
+    else
+       {fprintf(fp, "typedef char *(*PFStrv)(char *t, int nc, void *s, long n, int mode);\n");
+	fprintf(fp, "\n");
+
+	fprintf(fp, "extern PFStrv\n");
+	fprintf(fp, " _SC_strf[];\n");};
+
     fprintf(fp, "\n");
 
     return;}
@@ -271,37 +277,38 @@ static void write_str_decl(FILE *fp, int ne, typdes *tl)
 
 /* WRITE_STR - write the rendering routines */
 
-static void write_str(FILE *fp, int ne, typdes *tl)
+static void write_str(FILE *fp, int ne, typdes *tl, int src)
    {int i;
     typdes *td;
 
-    Separator(fp);
-    fprintf(fp, "/*                          NUMBER RENDERING                                */\n\n");
-    Separator(fp);
+    if (src == TRUE)
+       {Separator(fp);
+        fprintf(fp, "/*                          NUMBER RENDERING                                */\n\n");
+        Separator(fp);
 
-    for (i = 0; i < ne; i++)
-	{td = tl + i;
-	 if (IS_PRIMITIVE_TYPE(td) == B_F)
-	    continue;
+        for (i = 0; i < ne; i++)
+            {td = tl + i;
+             if (IS_PRIMITIVE_TYPE(td) == B_F)
+                continue;
 
-	 switch (td->g)
-	    {case KIND_BOOL :
-	          _SC_write_bool(fp, td);
-                  break;
-	     case KIND_COMPLEX :
-	          _SC_write_complex(fp, td);
-                  break;
-	     case KIND_QUATERNION :
-	          _SC_write_quaternion(fp, td);
-                  break;
-	     case KIND_POINTER :
-	          _SC_write_ptr(fp, td);
-                  break;
-	     default :
-	          _SC_write_ntos(fp, td);
-                  break;};};
+             switch (td->g)
+                {case KIND_BOOL :
+                      _SC_write_bool(fp, td);
+                      break;
+                 case KIND_COMPLEX :
+                      _SC_write_complex(fp, td);
+                      break;
+                 case KIND_QUATERNION :
+                      _SC_write_quaternion(fp, td);
+                      break;
+                 case KIND_POINTER :
+                      _SC_write_ptr(fp, td);
+                      break;
+                 default :
+                      _SC_write_ntos(fp, td);
+                      break;};};};
 
-    write_str_decl(fp, ne, tl);
+    write_str_decl(fp, ne, tl, src);
 
     return;}
 

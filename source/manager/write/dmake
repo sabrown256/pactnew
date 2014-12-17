@@ -39,6 +39,13 @@ dbmget $WLog CROSS_COMPILE^               \
     flog $WLog set opt  = smake
     flog $WLog set path = ( $BinDir $path )
 
+    flog $WLog pushd $BinDir
+    set exe = `rpath pact`
+    if (!(-x "$exe")) then
+       flog $WLog ln -s smake pact
+    endif
+    flog $WLog popd
+
     set err = 1
 
 #--------------------------------------------------------------------------

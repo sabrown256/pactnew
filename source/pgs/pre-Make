@@ -160,6 +160,8 @@ hdrf = ${IncDir}/gsimag.h ${IncDir}/pgs_gen.h
 
 IncAction = @pact generate
 
+LibAction = @pact devgen
+
 #
 # link 
 #

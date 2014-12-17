@@ -146,7 +146,7 @@ void free_template(template *t)
 
 /* WRITE_HEADER - write the beginning of the file */
 
-static void write_header(FILE *fp, char *inf)
+static void write_header(FILE *fp, char *inf, int pfl)
    {char s[BFLRG];
     char *p;
 
@@ -160,10 +160,11 @@ static void write_header(FILE *fp, char *inf)
     fprintf(fp, " */\n");
     fprintf(fp, "\n");
 
-    fprintf(fp, "#ifndef PCK_%s\n", p);
-    fprintf(fp, "\n");
-    fprintf(fp, "#define PCK_%s\n", p);
-    fprintf(fp, "\n");
+    if (pfl == TRUE)
+       {fprintf(fp, "#ifndef PCK_%s\n", p);
+	fprintf(fp, "\n");
+	fprintf(fp, "#define PCK_%s\n", p);
+	fprintf(fp, "\n");};
 
     fprintf(fp, "#include \"cpyright.h\"\n");
     fprintf(fp, "\n");
@@ -175,12 +176,14 @@ static void write_header(FILE *fp, char *inf)
 
 /* WRITE_TRAILER - write the end of the file */
 
-static void write_trailer(FILE *fp, char *inf)
+static void write_trailer(FILE *fp, char *inf, int pfl)
    {
 
     fprintf(fp, "\n");
-    fprintf(fp, "#endif\n");
-    fprintf(fp, "\n");
+
+    if (pfl == TRUE)
+       {fprintf(fp, "#endif\n");
+	fprintf(fp, "\n");};
 
     return;}
 
@@ -500,7 +503,7 @@ static void help(void)
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int i, ln, ne, nt, rv, tgt, fl;
+   {int i, ln, ne, nt, rv, tgt, fl, pfl;
     int dfl[3];
     char tmpf[BFLRG], tytab[BFLRG];
     char *inf, *outf;
@@ -531,9 +534,9 @@ int main(int c, char **v)
 	    tgt = 1;
 	 else if (strcmp(v[i], "-t") == 0)
 	    nstrncpy(tytab, BFLRG, v[++i], -1);
-	 else if (strcmp(v[i], "-va") == 0)
+	 else if (strcmp(v[i], "-gh") == 0)
 	    tgt = 2;
-	 else if (strcmp(v[i], "-coerce") == 0)
+	 else if (strcmp(v[i], "-gc") == 0)
 	    tgt = 3;
 	 else if (strcmp(v[i], "-desc") == 0)
 	    {tgt = 4;
@@ -557,13 +560,15 @@ int main(int c, char **v)
     tl = type_table(NULL);
     for (ne = 0; tl[ne].type != NULL; ne++);
 
+    pfl = TRUE;
     if (tgt == 2)
        {nt  = 0;
-	inf = "scarg.h";}
+	inf = "gc_type.h";
+        pfl = FALSE;}
 
     else if (tgt == 3)
        {nt  = 0;
-	inf = "sctypeg.h";}
+	inf = "gc_type.c";}
 
     else if (tgt == 4)
        {nt  = 0;
@@ -595,7 +600,7 @@ int main(int c, char **v)
     else
        fo = stdout;
 
-    write_header(fo, inf);
+    write_header(fo, inf, pfl);
 
     switch (tgt)
 
@@ -616,19 +621,21 @@ int main(int c, char **v)
 
 	     break;
 
-/* write special template for variable arg handler */
+/* write special type handler declarations in gc-type.h */
 	case 2 :
 	     def_type_manager(fo, ne, tl);
 	     write_va_arg(fo, ne, tl);
+	     write_coerce(fo, ne, tl, FALSE);
+	     write_str(fo, ne, tl, FALSE);
 	     break;
 
-/* write special template for type conversion and rendering */
+/* write special type handler definitions in gc-type.c */
 	case 3 :
-	     write_coerce(fo, ne, tl);
-	     write_str(fo, ne, tl);
+	     write_coerce(fo, ne, tl, TRUE);
+	     write_str(fo, ne, tl, TRUE);
 	     break;
 
-/* write special template for type conversion and rendering */
+/* write special template for binary type format specifications in pdform.h */
 	case 4 :
 	     write_desc(fo, ne, tl, dfl);
 	     break;};
@@ -636,7 +643,7 @@ int main(int c, char **v)
     for (i = 0; i < nt; i++)
 	free_template(tm[i]);
 
-    write_trailer(fo, inf);
+    write_trailer(fo, inf, pfl);
 
     if (outf != NULL)
        {fclose_safe(fo);

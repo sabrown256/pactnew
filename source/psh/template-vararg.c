@@ -128,6 +128,7 @@ static void write_va_arg(FILE *fp, int ne, typdes *tl)
     def_vararg_macros(fp, ne, tl);
 
     fprintf(fp, "#endif\n");
+    fprintf(fp, "\n");
 
     return;}
 

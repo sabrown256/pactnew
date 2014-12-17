@@ -159,7 +159,7 @@ spokef = pdspoke.c
 
 IncAction = @pact generate
 
-LibAction = @(echo "build-spokes" ; build-spokes )
+LibAction = @(echo "build-spokes" ; build-spokes ; pact devgen)
 
 
 #

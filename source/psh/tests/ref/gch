@@ -1,11 +1,7 @@
 /*
- * SCARG.H - generated type handling routines - do not edit
+ * GC_TYPE.H - generated type handling routines - do not edit
  *
  */
-
-#ifndef PCK_SCARG
-
-#define PCK_SCARG
 
 #include "cpyright.h"
 
@@ -423,5 +419,14 @@ typedef long double float128_t;
 
 #endif
 
-#endif
+typedef long (*PFConv)(void *d, long od, long ds, void *s, long os, long ss, long n);
+
+extern PFConv
+ _SC_convf[][N_PRIMITIVES];
+
+typedef char *(*PFStrv)(char *t, int nc, void *s, long n, int mode);
+
+extern PFStrv
+ _SC_strf[];
+
 

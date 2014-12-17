@@ -80,12 +80,15 @@ if ("$HAVE_PYTHON" !~ *FALSE*) then
 
       flog $log mkdir -p $v/$PSY_TmpDir/obj
 
-      if (($tgt == devlib) || ("$tgt" =~ *.i) || ("$tgt" =~ *.i)) then
+      if ($tgt == devlib) then
+         pact -f pre-Make.bind sysdir=$sysdir $dev $arg devlib
+         @ err = $err + $status
+         pact LibAction=@true -f pre-Make.bind sysdir=$sysdir $dev $arg devgenpy
+         @ err = $err + $status
+      else if (("$tgt" =~ *.i) || ("$tgt" =~ *.i)) then
          pact -f pre-Make.bind sysdir=$sysdir $dev $arg $tgt
          @ err = $err + $status
-         if ($tgt != devlib) then
-            mv $tgt $v
-         endif
+         mv $tgt $v
       else
          flog $log pushd $v
 

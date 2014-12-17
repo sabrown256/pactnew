@@ -542,14 +542,11 @@ int main(int c, char **v)
     mv[0]  = v[0];
 
     snprintf(mkfile, BFLRG, "%s/Makefile", st.arch);
-    if (stat(mkfile, &sbf) == 0)
-       {if (S_ISREG(sbf.st_mode))
-	   {tmm    = (long) sbf.st_mtime;
-	    status = method_2(&st, mc, mv, mkfile, tmm);
-	    status = (status == 0) ? 0 : 1;
-	    return(status);};};
-
-    status = method_1(&st, mc, mv, pmname);
+    if ((stat(mkfile, &sbf) == 0) && (S_ISREG(sbf.st_mode)))
+       {tmm    = (long) sbf.st_mtime;
+	status = method_2(&st, mc, mv, mkfile, tmm);}
+    else
+       status = method_1(&st, mc, mv, pmname);
 
     log_safe("dump", 0, NULL, NULL);
 

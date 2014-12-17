@@ -448,32 +448,38 @@ static void _SC_write_q_to_p(FILE *fp, typdes *td, typdes *ts)
 
 /* WRITE_CONV_DEF - write the definition of the conversion array */
 
-static void write_conv_def(FILE *fp, int ne, typdes *tl)
+static void write_conv_def(FILE *fp, int ne, typdes *tl, int src)
    {int id, is;
     typdes *td, *ts;
 
-    fprintf(fp, "typedef long (*PFConv)(void *d, long od, long ds, void *s, long os, long ss, long n);\n");
-    fprintf(fp, "\n");
+    if (src == TRUE)
+       {fprintf(fp, "PFConv\n");
+	fprintf(fp, " _SC_convf[N_PRIMITIVES][N_PRIMITIVES] = {\n");
 
-    fprintf(fp, "static PFConv\n");
-    fprintf(fp, " _SC_convf[N_PRIMITIVES][N_PRIMITIVES] = {\n");
+	for (id = 0; id < ne; id++)
+	    {td = tl + id;
+	     if (IS_PRIMITIVE_TYPE(td) == B_F)
+	        continue;
 
-    for (id = 0; id < ne; id++)
-        {td = tl + id;
-	 if (IS_PRIMITIVE_TYPE(td) == B_F)
-	    continue;
+	     fprintf(fp, "      {\n");
+	     for (is = 0; is < ne; is++)
+	         {ts = tl + is;
+		  if (IS_PRIMITIVE_TYPE(ts) == B_F)
+		     continue;
 
-	 fprintf(fp, "      {\n");
-	 for (is = 0; is < ne; is++)
-	     {ts = tl + is;
-	      if (IS_PRIMITIVE_TYPE(ts) == B_F)
-		 continue;
+		  fprintf(fp, "        _SC_%s_%s,\n", td->fncp, ts->fncp);};
 
-	      fprintf(fp, "        _SC_%s_%s,\n", td->fncp, ts->fncp);};
+	     fprintf(fp, "       },\n");};
 
-	 fprintf(fp, "       },\n");};
+	fprintf(fp, "};\n");}
+    else
+       {fprintf(fp, "typedef long (*PFConv)(void *d, long od, long ds, void *s, long os, long ss, long n);\n");
+	fprintf(fp, "\n");
 
-    fprintf(fp, "};\n");
+	fprintf(fp, "extern PFConv\n");
+	fprintf(fp, " _SC_convf[][N_PRIMITIVES];\n");};
+
+
     fprintf(fp, "\n");
 
     return;}
@@ -566,62 +572,66 @@ static void write_to_q(FILE *fp, typdes *td, typdes *ts)
 
 /* WRITE_COERCE - write the conversion routines */
 
-static void write_coerce(FILE *fp, int ne, typdes *tl)
+static void write_coerce(FILE *fp, int ne, typdes *tl, int src)
    {int id, is;
     typdes *td, *ts;
 
-    fprintf(fp, "#undef CONVERT\n");
-    fprintf(fp, " \n");
+    if (src == TRUE)
+       {fprintf(fp, "#include \"score_int.h\"\n");
+	fprintf(fp, " \n");
 
-    fprintf(fp, "#define BOOL_MIN    0\n");
-    fprintf(fp, "#define BOOL_MAX    1\n");
-    fprintf(fp, " \n");
+	fprintf(fp, "#undef CONVERT\n");
+	fprintf(fp, " \n");
 
-    Separator(fp);
-    fprintf(fp, "/*                           TYPE CONVERSION                                */\n\n");
-    Separator(fp);
+	fprintf(fp, "#define BOOL_MIN    0\n");
+	fprintf(fp, "#define BOOL_MAX    1\n");
+	fprintf(fp, " \n");
 
-    for (id = 0; id < ne; id++)
-        {td = tl + id;
-	 if (IS_PRIMITIVE_TYPE(td) == B_F)
-	    continue;
+	Separator(fp);
+	fprintf(fp, "/*                           TYPE CONVERSION                                */\n\n");
+	Separator(fp);
 
-	 for (is = 0; is < ne; is++)
-	     {ts = tl + is;
-	      if (IS_PRIMITIVE_TYPE(ts) == B_F)
-		 continue;
+	for (id = 0; id < ne; id++)
+	    {td = tl + id;
+	     if (IS_PRIMITIVE_TYPE(td) == B_F)
+	        continue;
+
+	     for (is = 0; is < ne; is++)
+	         {ts = tl + is;
+		  if (IS_PRIMITIVE_TYPE(ts) == B_F)
+		     continue;
 
 /* direct copy */
-	      if ((id == is) && (td->g != KIND_POINTER))
-		 _SC_write_n_to_n_fast(fp, td, ts);
+		  if ((id == is) && (td->g != KIND_POINTER))
+		     _SC_write_n_to_n_fast(fp, td, ts);
 
 /* complex to anything conversions */
-	      else if (ts->g == KIND_COMPLEX)
-		 write_from_c(fp, td, ts);
+		  else if (ts->g == KIND_COMPLEX)
+		     write_from_c(fp, td, ts);
 
 /* quaternion to anything conversions */
-	      else if (ts->g == KIND_QUATERNION)
-	         write_from_q(fp, td, ts);
+		  else if (ts->g == KIND_QUATERNION)
+		     write_from_q(fp, td, ts);
 
 /* anything to quaternion conversions */
-	      else if (td->g == KIND_QUATERNION)
-		 write_to_q(fp, td, ts);
+		  else if (td->g == KIND_QUATERNION)
+		     write_to_q(fp, td, ts);
 
-	      else if ((td->g != KIND_POINTER) &&
-		       (ts->g == KIND_POINTER))
-		 _SC_write_p_to_n(fp, td, ts);
+		  else if ((td->g != KIND_POINTER) &&
+			   (ts->g == KIND_POINTER))
+		     _SC_write_p_to_n(fp, td, ts);
 
-	      else if ((td->g == KIND_POINTER) &&
-		       (ts->g != KIND_POINTER))
-		 _SC_write_n_to_p(fp, td, ts);
+		  else if ((td->g == KIND_POINTER) &&
+			   (ts->g != KIND_POINTER))
+		     _SC_write_n_to_p(fp, td, ts);
 
-	      else if ((td->knd == TK_PRIMITIVE) &&
-		       (ts->knd == TK_PRIMITIVE))
-		 CONVERT(fp, td, ts);};};
+		  else if ((td->knd == TK_PRIMITIVE) &&
+			    (ts->knd == TK_PRIMITIVE))
+		     CONVERT(fp, td, ts);};};
 
-    fprintf(fp, "\n");
+	fprintf(fp, "\n");};
 
-    write_conv_def(fp, ne, tl);
+    write_conv_def(fp, ne, tl, src);
 
     return;}
 

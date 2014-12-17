@@ -33,9 +33,12 @@ Separator $WLog
 NoteD $WLog "   Abstract C compiler wrapper - acc"
 Note $WLog ""
 
-dbmget $WLog CC_Debug^           \
+dbmget $WLog AR_Exe^             \
+             AR_IFlag^           \
+             CC_Debug^           \
              CC_Optimize^        \
              CC_Profile^         \
+             LD_Exe^             \
              PACT_CC_FAMILY^     \
              PACT_CC_VERSION^    \
              PACT_CC_PATH^       \
@@ -58,7 +61,7 @@ flog $WLog touch $outf
 set CPP = ( `$BinDir/perdb -f $EtcDir/cfg IRules_CCP` )
 
 # typical value for CPP is '${CC} -E $< > $*.i'
-set lcpp = ( `echo "$CPP" | sed 's|$<|$inf|' | sed 's|$\*.i|+out+|'` )
+set lcpp = ( `echo "$CPP" | sed 's|$<|$fi|' | sed 's|$\*.i|+out+|'` )
 
 Note $WLog "CPP  = |$CPP|"
 Note $WLog "lcpp = |$lcpp|"
@@ -83,19 +86,28 @@ Note $outf ""
 Note $outf "source $EtcDir/env-pact.csh"
 Note $outf ""
 
+Note $outf '@ vrb = 0'
+Note $outf ''
+
 Note $outf "set exe  = $exe"
+Note $outf 'set co   = FALSE'
 Note $outf 'set dbg  = FALSE'
 Note $outf 'set opt  = FALSE'
+Note $outf 'set arc  = ""'
 Note $outf 'set lib  = ""'
 Note $outf 'set prf  = FALSE'
-Note $outf 'set vrb  = FALSE'
 Note $outf 'set inf  = ""'
 Note $outf 'set pref = ""'
 Note $outf 'set outf = ""'
-
 Note $outf 'set args = ""'
+Note $outf ''
+
 Note $outf 'while ($#argv > 0)'
 Note $outf '   switch ("$1")'
+Note $outf '      case -a:'
+Note $outf '           shift'
+Note $outf '           set arc = $1'
+Note $outf '           breaksw'
 Note $outf '      case -ag:'
 Note $outf '           set dbg = TRUE'
 Note $outf '           set opt = FALSE'
@@ -129,7 +141,10 @@ Note $outf '           shift'
 Note $outf '           set pref = $1'
 Note $outf '           breaksw'
 Note $outf '      case -avrb:'
-Note $outf '           set vrb = TRUE'
+Note $outf '           @ vrb = $vrb + 1'
+Note $outf '           breaksw'
+Note $outf '      case -c:'
+Note $outf '           set co = TRUE'
 Note $outf '           breaksw'
 Note $outf '      case -l*:'
 Note $outf '           set lib = ( $lib "$1" )'
@@ -140,8 +155,8 @@ Note $outf '      default:'
 Note $outf '           if (("$1" =~ *.a) || ("$1" =~ *.so*)) then'
 Note $outf '              set lib = ( $lib "$1" )'
 
-# the first argument which is an existing file goes into inf
-Note $outf '           else if (("$inf" == "") && (-f "$1")) then'
+# the first argument which is an existing C file goes into inf
+Note $outf '           else if (("$1" =~ *.c) && (-f "$1")) then'
 Note $outf '              set inf = ( $inf "$1" )'
 
 # everything goes into lib once lib has anything
@@ -150,7 +165,7 @@ Note $outf '           else'
 Note $outf '              if ("$lib" != "") then'
 Note $outf '                 set lib = ( $lib "$1" )'
 Note $outf '              else'
-Note $outf '                 set args = ( $args `echo "$1" | sed '"'"'s|"|+++|g'"'"'` )'
+Note $outf '                 set args = ( $args `echo "$1" | sed '"'"'s|\"|+++|g'"'"'` )'
 Note $outf '              endif'
 Note $outf '           endif'
 
@@ -168,20 +183,29 @@ Note $outf '   shift'
 Note $outf 'end'
 Note $outf ""
 
+Note $outf 'if ($vrb > 2) then'
+Note $outf '   echo "inf  = |$inf|"'
+Note $outf '   echo "outf = |$outf|"'
+Note $outf '   echo "co   = |$co|"'
+Note $outf '   echo "arc  = |$arc|"'
+Note $outf '   echo "args = |$args|"'
+Note $outf '   echo "lib  = |$lib|"'
+Note $outf 'endif'
+Note $outf ''
+
 Note $outf 'if ("$inf" == "") then'
 Note $outf '   echo "No input file specified - exiting"'
 Note $outf '   exit(1)'
 Note $outf 'endif'
 Note $outf ""
 
-Note $outf 'if (("$outf" == "") && ("$pref" == "")) then'
+Note $outf 'if (("$outf" == "") && ("$pref" == "") && ($co == FALSE)) then'
 Note $outf '   echo "No output file specified - exiting"'
 Note $outf '   exit(1)'
 Note $outf 'endif'
 Note $outf ""
 
 Note $outf 'set CC  = ( $exe $args )'
-Note $outf "set cpp = $lcpp"
 Note $outf ""
 
 #--------------------------------------------------------------------------'
@@ -218,7 +242,7 @@ if (-f $compilers) then
          set val = $linf[2]
          shift linf
          shift linf
-         Note $outf 'if ($vrb == TRUE) then'
+         Note $outf 'if ($vrb > 1) then'
          Note $outf '   echo "   setenv '$var $val'"'
          Note $outf 'endif'
          Note $outf "setenv $var $val"
@@ -277,16 +301,18 @@ Note $outf ""
 Note $outf 'if ($prf == TRUE) then'
 Note $outf '   set args = ( '$CC_Profile' $args )'
 Note $outf 'endif'
-Note $outf 'unset linf'
 Note $outf ""
 
 Note $outf 'if ("$pref" != "") then'
-Note $outf '   set CPP = ( `echo "$cpp" | sed "s|+out+|$pref|" | sed '"'"'s|+++|\"|g'"'"'` )'
-Note $outf '   if ($vrb == TRUE) then'
-Note $outf '      echo "   Preprocess: $CPP"'
-Note $outf '   endif'
-Note $outf '   rm -f $pref'
-Note $outf '   eval $CPP'
+Note $outf '   foreach fi ($inf)'
+Note $outf "      set cpp = $lcpp"
+Note $outf '      set CPP = ( `echo "$cpp" | sed "s|+out+|$pref|" | sed '"'"'s|+++|\"|g'"'"'` )'
+Note $outf '      if ($vrb > 0) then'
+Note $outf '         echo "   Preprocess: $CPP"'
+Note $outf '      endif'
+Note $outf '      rm -f $pref'
+Note $outf '      eval $CPP'
+Note $outf '   end'
 Note $outf '   exit($status)'
 Note $outf 'endif'
 Note $outf ""
@@ -338,6 +364,7 @@ switch ($comp)
 
 # try preprocessing until the preprocessed file is at least as big
 # as the unpreprocessed file and the exit status is 0
+# GOTCHA: fix this for multiple input files!!!
         Note $outf '   @ lerr = 1'
         Note $outf '   @ dt  = 0'
         Note $outf '   @ ia  = 0'
@@ -383,23 +410,75 @@ Note $outf 'unsetenv PACT_CC_VERSION'
 Note $outf 'unsetenv PACT_CC_PATH'
 Note $outf ""
 
-Note $outf 'rm -f $outf'
-Note $outf 'set cmd = ( `echo "$CC -o $outf $inf $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
+#if ("$arc" != "") then
+#   set atl = ( time-stamp $arc )
+#   set stl = ( time-stamp $inf )
+#endif
 
-# verbose mode diagnostic for debugging
-Note $outf 'if ($vrb == TRUE) then'
-Note $outf '   echo "   Compile: $cmd"'
-Note $outf 'endif'
-Note $outf ""
+Note $outf '@ nc = $#inf'
+Note $outf 'set lfo = ""'
+Note $outf ''
 
-Note $outf 'if ("$action" == "") then'
-Note $outf '   exec $cmd'
-Note $outf 'else'
+Note $outf 'foreach fi ($inf)'
+Note $outf '   if ($nc > 1) then'
+Note $outf '      set ft  = $fi:t'
+Note $outf '      set fo  = $ft:r.o'
+Note $outf '      set lfo = ( $lfo $fo )'
+Note $outf '      set co  = TRUE'
+Note $outf '   else'
+Note $outf '      set fo = $outf'
+Note $outf '   endif'
+Note $outf '   rm -f $fo'
+Note $outf '   if ($co == TRUE) then'
+Note $outf '      set cmd = ( `echo "$CC -o $fo -c $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
+Note $outf '      if ($vrb > 1) then'
+Note $outf '         echo "   $cmd"'
+Note $outf '      else if ($vrb > 0) then'
+Note $outf '         echo "   $exe:t -o $fo -c $fi:t $lib"'
+Note $outf '      endif'
+Note $outf '   else'
+Note $outf '      set cmd = ( `echo "$CC -o $fo $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
+Note $outf '      if ($vrb > 1) then'
+Note $outf '         echo "   $cmd"'
+Note $outf '      else if ($vrb > 0) then'
+Note $outf '         echo "   $exe:t -o $fo $fi:t $lib"'
+Note $outf '      endif'
+Note $outf '   endif'
 Note $outf '   $cmd'
-Note $outf '   @ err = $status'
+Note $outf '   @ err = $err + $status'
 Note $outf '   $action'
+Note $outf 'end'
+Note $outf ''
+Note $outf 'if ($err == 0) then'
+Note $outf '   if ("$arc" != "") then'
+Note $outf '      set cmd = ( '$AR_Exe $AR_IFlag' $arc $lfo )'
+Note $outf '      if ($vrb > 0) then'
+Note $outf '         echo "   '$AR_Exe $AR_IFlag' $arc"'
+Note $outf '      endif'
+Note $outf '      $cmd'
+Note $outf '      @ xstatus = $status'
+Note $outf '      if ($xstatus == 0) then'
+Note $outf '         rm -f $lfo'
+Note $outf '      else'
+Note $outf '         @ err = $err + $xstatus'
+Note $outf '      endif'
+Note $outf '   else if (("$outf" != "") && ("$lfo" != "")) then'
+Note $outf '      set cmd = ( '$LD_Exe' $args -o $outf $lfo $lib)'
+Note $outf '      if ($vrb > 1) then'
+Note $outf '         echo "   $cmd"'
+Note $outf '      else if ($vrb > 0) then'
+Note $outf '         echo "   '$LD_Exe:t' -o $outf $lib"'
+Note $outf '      endif'
+Note $outf '      $cmd'
+Note $outf '      @ xstatus = $status'
+Note $outf '      if ($xstatus == 0) then'
+Note $outf '         rm -f $lfo'
+Note $outf '      else'
+Note $outf '         @ err = $err + $xstatus'
+Note $outf '      endif'
+Note $outf '   endif'
 Note $outf 'endif'
-Note $outf ""
+Note $outf ''
 
 Note $outf 'exit($err)'
 

@@ -1,0 +1,3435 @@
+/*
+ * GC_TYPE.H - generated type handling routines - do not edit
+ *
+ */
+
+#ifndef PCK_GC_TYPE
+
+#define PCK_GC_TYPE
+
+#include "cpyright.h"
+
+#include "score_int.h"
+ 
+#undef CONVERT
+ 
+#define BOOL_MIN    0
+#define BOOL_MAX    1
+ 
+/*--------------------------------------------------------------------------*/
+
+/*                           TYPE CONVERSION                                */
+
+/*--------------------------------------------------------------------------*/
+
+long _SC_ptr_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    void * *ps = (void * *) s;
+    void * *pd = (void * *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ptr_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    bool *ps = (bool *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    char *ps = (char *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    wchar_t *ps = (wchar_t *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    int8_t *ps = (int8_t *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    short *ps = (short *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    int *ps = (int *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    long *ps = (long *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    long long *ps = (long long *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    float *ps = (float *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    double *ps = (double *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    long double *ps = (long double *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    float _Complex *ps = (float _Complex *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    double _Complex *ps = (double _Complex *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    long double _Complex *ps = (long double _Complex *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.diskaddr = *ps;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_ptr_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *ps = (quaternion *) s;
+    void **pd = (void **) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q           = *ps;
+         ad.diskaddr = q.s;
+         *pd         = ad.memaddr;};
+    return(i);}
+
+long _SC_bool_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_bool_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_bool_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_bool_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    bool *pd = (bool *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_chr_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_chr_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_chr_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_chr_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    char *pd = (char *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_wchr_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_wchr_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_wchr_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_wchr_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    wchar_t *pd = (wchar_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_int8_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_int8_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_int8_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int8_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    int8_t *pd = (int8_t *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_shrt_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_shrt_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_shrt_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_shrt_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    short *pd = (short *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_int_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_int_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_int_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_int_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    int *pd = (int *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_lng_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_lng_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_lng_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_lng_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    long *pd = (long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_ll_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_ll_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_ll_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ll_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    long long *pd = (long long *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_flt_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_flt_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_flt_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_flt_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = CREALL(*ps);
+    return(i);}
+
+long _SC_flt_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = CREALL(*ps);
+    return(i);}
+
+long _SC_flt_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = CREALL(*ps);
+    return(i);}
+
+long _SC_flt_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    float *pd = (float *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_dbl_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_dbl_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_dbl_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dbl_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = CREALL(*ps);
+    return(i);}
+
+long _SC_dbl_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = CREALL(*ps);
+    return(i);}
+
+long _SC_dbl_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = CREALL(*ps);
+    return(i);}
+
+long _SC_dbl_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    double *pd = (double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_ldbl_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_ldbl_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldbl_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_ldbl_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = CREALL(*ps);
+    return(i);}
+
+long _SC_ldbl_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = CREALL(*ps);
+    return(i);}
+
+long _SC_ldbl_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = CREALL(*ps);
+    return(i);}
+
+long _SC_ldbl_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    long double *pd = (long double *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = ps->s;
+    return(i);}
+
+long _SC_fcx_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_fcx_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_fcx_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    float _Complex *pd = (float _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_fcx_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    float _Complex *pd = (float _Complex *) d;
+    long double sr, si, smn, smx;
+    long double _Complex zs;
+    smn = -FLT_MAX;
+    smx = FLT_MAX;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {zs = *ps;
+         sr = CREALL(zs);
+         si = CIMAGL(zs);
+         sr = min(sr, smx);
+         sr = max(sr, smn);
+         si = min(si, smx);
+         si = max(si, smn);
+         *pd = sr + si*I;};
+    return(i);}
+
+long _SC_fcx_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    float _Complex *pd = (float _Complex *) d;
+    long double sr, si, smn, smx;
+    long double _Complex zs;
+    smn = -FLT_MAX;
+    smx = FLT_MAX;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {zs = *ps;
+         sr = CREALL(zs);
+         si = CIMAGL(zs);
+         sr = min(sr, smx);
+         sr = max(sr, smn);
+         si = min(si, smx);
+         si = max(si, smn);
+         *pd = sr + si*I;};
+    return(i);}
+
+long _SC_fcx_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    float _Complex *pd = (float _Complex *) d;
+    float _Complex z;
+    quaternion q;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q   = *ps;
+         z   = q.s + q.i*I;
+         *pd = z;};
+    return(i);}
+
+long _SC_dcx_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_dcx_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_dcx_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    double _Complex *pd = (double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_dcx_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    double _Complex *pd = (double _Complex *) d;
+    long double sr, si, smn, smx;
+    long double _Complex zs;
+    smn = -DBL_MAX;
+    smx = DBL_MAX;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {zs = *ps;
+         sr = CREALL(zs);
+         si = CIMAGL(zs);
+         sr = min(sr, smx);
+         sr = max(sr, smn);
+         si = min(si, smx);
+         si = max(si, smn);
+         *pd = sr + si*I;};
+    return(i);}
+
+long _SC_dcx_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    double _Complex *pd = (double _Complex *) d;
+    double _Complex z;
+    quaternion q;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q   = *ps;
+         z   = q.s + q.i*I;
+         *pd = z;};
+    return(i);}
+
+long _SC_ldcx_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    void **ps = (void **) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         *pd        = ad.diskaddr;};
+    return(i);}
+
+long _SC_ldcx_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+
+long _SC_ldcx_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+long _SC_ldcx_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    long double _Complex *pd = (long double _Complex *) d;
+    long double _Complex z;
+    quaternion q;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q   = *ps;
+         z   = q.s + q.i*I;
+         *pd = z;};
+    return(i);}
+
+long _SC_qut_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    SC_address ad;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    void * *ps = (void * *) s;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {ad.memaddr = *ps;
+         q.s        = ad.diskaddr;
+         *pd        = q;};
+    return(i);}
+
+long _SC_qut_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    bool *ps = (bool *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    char *ps = (char *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    wchar_t *ps = (wchar_t *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int8_t *ps = (int8_t *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    short *ps = (short *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    int *ps = (int *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long *ps = (long *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long long *ps = (long long *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float *ps = (float *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double *ps = (double *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double *ps = (long double *) s;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {q.s = *ps;
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    float _Complex *ps = (float _Complex *) s;
+    long double _Complex z;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {z   = *ps;
+         q.s = CREALL(z);
+         q.i = CIMAGL(z);
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    double _Complex *ps = (double _Complex *) s;
+    long double _Complex z;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {z   = *ps;
+         q.s = CREALL(z);
+         q.i = CIMAGL(z);
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    long double _Complex *ps = (long double _Complex *) s;
+    long double _Complex z;
+    quaternion q = {0.0, 0.0, 0.0, 0.0};
+    quaternion *pd = d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        {z   = *ps;
+         q.s = CREALL(z);
+         q.i = CIMAGL(z);
+         *pd = q;};
+    return(i);}
+
+long _SC_qut_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+   {long i;
+    quaternion *ps = (quaternion *) s;
+    quaternion *pd = (quaternion *) d;
+    ps += os;
+    pd += od;
+    for (i = 0; i < n; i++, pd += ds, ps += ss)
+        *pd = *ps;
+    return(i);}
+ 
+
+PFConv
+ _SC_convf[N_PRIMITIVES][N_PRIMITIVES] = {
+      {
+        _SC_ptr_ptr,
+        _SC_ptr_bool,
+        _SC_ptr_chr,
+        _SC_ptr_wchr,
+        _SC_ptr_int8,
+        _SC_ptr_shrt,
+        _SC_ptr_int,
+        _SC_ptr_lng,
+        _SC_ptr_ll,
+        _SC_ptr_flt,
+        _SC_ptr_dbl,
+        _SC_ptr_ldbl,
+        _SC_ptr_fcx,
+        _SC_ptr_dcx,
+        _SC_ptr_ldcx,
+        _SC_ptr_qut,
+       },
+      {
+        _SC_bool_ptr,
+        _SC_bool_bool,
+        _SC_bool_chr,
+        _SC_bool_wchr,
+        _SC_bool_int8,
+        _SC_bool_shrt,
+        _SC_bool_int,
+        _SC_bool_lng,
+        _SC_bool_ll,
+        _SC_bool_flt,
+        _SC_bool_dbl,
+        _SC_bool_ldbl,
+        _SC_bool_fcx,
+        _SC_bool_dcx,
+        _SC_bool_ldcx,
+        _SC_bool_qut,
+       },
+      {
+        _SC_chr_ptr,
+        _SC_chr_bool,
+        _SC_chr_chr,
+        _SC_chr_wchr,
+        _SC_chr_int8,
+        _SC_chr_shrt,
+        _SC_chr_int,
+        _SC_chr_lng,
+        _SC_chr_ll,
+        _SC_chr_flt,
+        _SC_chr_dbl,
+        _SC_chr_ldbl,
+        _SC_chr_fcx,
+        _SC_chr_dcx,
+        _SC_chr_ldcx,
+        _SC_chr_qut,
+       },
+      {
+        _SC_wchr_ptr,
+        _SC_wchr_bool,
+        _SC_wchr_chr,
+        _SC_wchr_wchr,
+        _SC_wchr_int8,
+        _SC_wchr_shrt,
+        _SC_wchr_int,
+        _SC_wchr_lng,
+        _SC_wchr_ll,
+        _SC_wchr_flt,
+        _SC_wchr_dbl,
+        _SC_wchr_ldbl,
+        _SC_wchr_fcx,
+        _SC_wchr_dcx,
+        _SC_wchr_ldcx,
+        _SC_wchr_qut,
+       },
+      {
+        _SC_int8_ptr,
+        _SC_int8_bool,
+        _SC_int8_chr,
+        _SC_int8_wchr,
+        _SC_int8_int8,
+        _SC_int8_shrt,
+        _SC_int8_int,
+        _SC_int8_lng,
+        _SC_int8_ll,
+        _SC_int8_flt,
+        _SC_int8_dbl,
+        _SC_int8_ldbl,
+        _SC_int8_fcx,
+        _SC_int8_dcx,
+        _SC_int8_ldcx,
+        _SC_int8_qut,
+       },
+      {
+        _SC_shrt_ptr,
+        _SC_shrt_bool,
+        _SC_shrt_chr,
+        _SC_shrt_wchr,
+        _SC_shrt_int8,
+        _SC_shrt_shrt,
+        _SC_shrt_int,
+        _SC_shrt_lng,
+        _SC_shrt_ll,
+        _SC_shrt_flt,
+        _SC_shrt_dbl,
+        _SC_shrt_ldbl,
+        _SC_shrt_fcx,
+        _SC_shrt_dcx,
+        _SC_shrt_ldcx,
+        _SC_shrt_qut,
+       },
+      {
+        _SC_int_ptr,
+        _SC_int_bool,
+        _SC_int_chr,
+        _SC_int_wchr,
+        _SC_int_int8,
+        _SC_int_shrt,
+        _SC_int_int,
+        _SC_int_lng,
+        _SC_int_ll,
+        _SC_int_flt,
+        _SC_int_dbl,
+        _SC_int_ldbl,
+        _SC_int_fcx,
+        _SC_int_dcx,
+        _SC_int_ldcx,
+        _SC_int_qut,
+       },
+      {
+        _SC_lng_ptr,
+        _SC_lng_bool,
+        _SC_lng_chr,
+        _SC_lng_wchr,
+        _SC_lng_int8,
+        _SC_lng_shrt,
+        _SC_lng_int,
+        _SC_lng_lng,
+        _SC_lng_ll,
+        _SC_lng_flt,
+        _SC_lng_dbl,
+        _SC_lng_ldbl,
+        _SC_lng_fcx,
+        _SC_lng_dcx,
+        _SC_lng_ldcx,
+        _SC_lng_qut,
+       },
+      {
+        _SC_ll_ptr,
+        _SC_ll_bool,
+        _SC_ll_chr,
+        _SC_ll_wchr,
+        _SC_ll_int8,
+        _SC_ll_shrt,
+        _SC_ll_int,
+        _SC_ll_lng,
+        _SC_ll_ll,
+        _SC_ll_flt,
+        _SC_ll_dbl,
+        _SC_ll_ldbl,
+        _SC_ll_fcx,
+        _SC_ll_dcx,
+        _SC_ll_ldcx,
+        _SC_ll_qut,
+       },
+      {
+        _SC_flt_ptr,
+        _SC_flt_bool,
+        _SC_flt_chr,
+        _SC_flt_wchr,
+        _SC_flt_int8,
+        _SC_flt_shrt,
+        _SC_flt_int,
+        _SC_flt_lng,
+        _SC_flt_ll,
+        _SC_flt_flt,
+        _SC_flt_dbl,
+        _SC_flt_ldbl,
+        _SC_flt_fcx,
+        _SC_flt_dcx,
+        _SC_flt_ldcx,
+        _SC_flt_qut,
+       },
+      {
+        _SC_dbl_ptr,
+        _SC_dbl_bool,
+        _SC_dbl_chr,
+        _SC_dbl_wchr,
+        _SC_dbl_int8,
+        _SC_dbl_shrt,
+        _SC_dbl_int,
+        _SC_dbl_lng,
+        _SC_dbl_ll,
+        _SC_dbl_flt,
+        _SC_dbl_dbl,
+        _SC_dbl_ldbl,
+        _SC_dbl_fcx,
+        _SC_dbl_dcx,
+        _SC_dbl_ldcx,
+        _SC_dbl_qut,
+       },
+      {
+        _SC_ldbl_ptr,
+        _SC_ldbl_bool,
+        _SC_ldbl_chr,
+        _SC_ldbl_wchr,
+        _SC_ldbl_int8,
+        _SC_ldbl_shrt,
+        _SC_ldbl_int,
+        _SC_ldbl_lng,
+        _SC_ldbl_ll,
+        _SC_ldbl_flt,
+        _SC_ldbl_dbl,
+        _SC_ldbl_ldbl,
+        _SC_ldbl_fcx,
+        _SC_ldbl_dcx,
+        _SC_ldbl_ldcx,
+        _SC_ldbl_qut,
+       },
+      {
+        _SC_fcx_ptr,
+        _SC_fcx_bool,
+        _SC_fcx_chr,
+        _SC_fcx_wchr,
+        _SC_fcx_int8,
+        _SC_fcx_shrt,
+        _SC_fcx_int,
+        _SC_fcx_lng,
+        _SC_fcx_ll,
+        _SC_fcx_flt,
+        _SC_fcx_dbl,
+        _SC_fcx_ldbl,
+        _SC_fcx_fcx,
+        _SC_fcx_dcx,
+        _SC_fcx_ldcx,
+        _SC_fcx_qut,
+       },
+      {
+        _SC_dcx_ptr,
+        _SC_dcx_bool,
+        _SC_dcx_chr,
+        _SC_dcx_wchr,
+        _SC_dcx_int8,
+        _SC_dcx_shrt,
+        _SC_dcx_int,
+        _SC_dcx_lng,
+        _SC_dcx_ll,
+        _SC_dcx_flt,
+        _SC_dcx_dbl,
+        _SC_dcx_ldbl,
+        _SC_dcx_fcx,
+        _SC_dcx_dcx,
+        _SC_dcx_ldcx,
+        _SC_dcx_qut,
+       },
+      {
+        _SC_ldcx_ptr,
+        _SC_ldcx_bool,
+        _SC_ldcx_chr,
+        _SC_ldcx_wchr,
+        _SC_ldcx_int8,
+        _SC_ldcx_shrt,
+        _SC_ldcx_int,
+        _SC_ldcx_lng,
+        _SC_ldcx_ll,
+        _SC_ldcx_flt,
+        _SC_ldcx_dbl,
+        _SC_ldcx_ldbl,
+        _SC_ldcx_fcx,
+        _SC_ldcx_dcx,
+        _SC_ldcx_ldcx,
+        _SC_ldcx_qut,
+       },
+      {
+        _SC_qut_ptr,
+        _SC_qut_bool,
+        _SC_qut_chr,
+        _SC_qut_wchr,
+        _SC_qut_int8,
+        _SC_qut_shrt,
+        _SC_qut_int,
+        _SC_qut_lng,
+        _SC_qut_ll,
+        _SC_qut_flt,
+        _SC_qut_dbl,
+        _SC_qut_ldbl,
+        _SC_qut_fcx,
+        _SC_qut_dcx,
+        _SC_qut_ldcx,
+        _SC_qut_qut,
+       },
+};
+
+/*--------------------------------------------------------------------------*/
+
+/*                          NUMBER RENDERING                                */
+
+/*--------------------------------------------------------------------------*/
+
+char *_SC_str_ptr(char *t, int nc, void *s, long n, int mode)
+   {int nld, nb;
+    char *fmt;
+    void * *pv = (void * *) s;
+    nld = 0;
+    fmt = (mode == 1) ? _SC.types.formats[4] : _SC.types.formata[4];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, *(double *) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_bool(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    bool *pv = (bool *) s;
+    fmt = (mode == 1) ? _SC.types.formats[5] : _SC.types.formata[5];
+    nb = -1;
+    if (strchr(fmt, 's') != NULL)
+       nb = snprintf(t, nc, fmt, pv[n] ? "T" : "F");
+    else if (strchr(fmt, 'd') != NULL)
+       nb = snprintf(t, nc, fmt, (int) pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_chr(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    char *pv = (char *) s;
+    fmt = (mode == 1) ? _SC.types.formats[7] : _SC.types.formata[7];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_wchr(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    wchar_t *pv = (wchar_t *) s;
+    fmt = (mode == 1) ? _SC.types.formats[9] : _SC.types.formata[9];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_int8(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    int8_t *pv = (int8_t *) s;
+    fmt = (mode == 1) ? _SC.types.formats[11] : _SC.types.formata[11];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_shrt(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    short *pv = (short *) s;
+    fmt = (mode == 1) ? _SC.types.formats[13] : _SC.types.formata[13];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_int(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    int *pv = (int *) s;
+    fmt = (mode == 1) ? _SC.types.formats[15] : _SC.types.formata[15];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_lng(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    long *pv = (long *) s;
+    fmt = (mode == 1) ? _SC.types.formats[17] : _SC.types.formata[17];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_ll(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    long long *pv = (long long *) s;
+    fmt = (mode == 1) ? _SC.types.formats[19] : _SC.types.formata[19];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_flt(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    float *pv = (float *) s;
+    fmt = (mode == 1) ? _SC.types.formats[21] : _SC.types.formata[21];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_dbl(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    double *pv = (double *) s;
+    fmt = (mode == 1) ? _SC.types.formats[23] : _SC.types.formata[23];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_ldbl(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    static int nld = 0;
+    long double *pv = (long double *) s;
+    fmt = (mode == 1) ? _SC.types.formats[25] : _SC.types.formata[25];
+
+    {char lc, *ls, *ld;
+     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
+         {lc = *ls;
+          if (lc != 'L')
+             *ld++ = lc;
+          else
+             nld = 1;};
+     *ld = '\0';};
+
+    if (nld == 1)
+       nb  = snprintf(t, nc, fmt, (double) pv[n]);
+    else
+       nb  = snprintf(t, nc, fmt, pv[n]);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_fcx(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    float _Complex z;
+    float _Complex *pv = (float _Complex *) s;
+    fmt = (mode == 1) ? _SC.types.formats[27] : _SC.types.formata[27];
+    {float pr, pi;
+     z  = pv[n];
+     pr = crealf(z);
+     pi = cimagf(z);
+     nb = snprintf(t, nc, fmt, pr, pi);};
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_dcx(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    double _Complex z;
+    double _Complex *pv = (double _Complex *) s;
+    fmt = (mode == 1) ? _SC.types.formats[29] : _SC.types.formata[29];
+    {double pr, pi;
+     z  = pv[n];
+     pr = creal(z);
+     pi = cimag(z);
+     nb = snprintf(t, nc, fmt, pr, pi);};
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_ldcx(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    long double _Complex z;
+    long double _Complex *pv = (long double _Complex *) s;
+    fmt = (mode == 1) ? _SC.types.formats[31] : _SC.types.formata[31];
+    {long double pr, pi;
+     z  = pv[n];
+     pr = CREALL(z);
+     pi = CIMAGL(z);
+     nb = snprintf(t, nc, fmt, pr, pi);};
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+char *_SC_str_qut(char *t, int nc, void *s, long n, int mode)
+   {int nb;
+    char *fmt;
+    quaternion q;
+    quaternion *pv = (quaternion *) s;
+    fmt = (mode == 1) ? _SC.types.formats[33] : _SC.types.formata[33];
+    q  = pv[n];
+    nb = snprintf(t, nc, fmt, q.s, q.i, q.j, q.k);
+    if (nb < 0)
+       t = NULL;
+    return(t);}
+
+PFStrv
+ _SC_strf[] = {
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                _SC_str_ptr,
+                _SC_str_bool,
+                NULL,
+                _SC_str_chr,
+                NULL,
+                _SC_str_wchr,
+                NULL,
+                _SC_str_int8,
+                NULL,
+                _SC_str_shrt,
+                NULL,
+                _SC_str_int,
+                NULL,
+                _SC_str_lng,
+                NULL,
+                _SC_str_ll,
+                NULL,
+                _SC_str_flt,
+                NULL,
+                _SC_str_dbl,
+                NULL,
+                _SC_str_ldbl,
+                NULL,
+                _SC_str_fcx,
+                NULL,
+                _SC_str_dcx,
+                NULL,
+                _SC_str_ldcx,
+                NULL,
+                _SC_str_qut,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+   };
+
+
+#endif
+
