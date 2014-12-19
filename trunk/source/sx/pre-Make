@@ -93,23 +93,27 @@ Hdrs = ${TGTInc} ${hdrf} ${IncDir}/sx_gen.h
 #
 # Object Files
 #
-gcs = gc-sx.c
+gcs = ${PACTTmpDir}/gc-sx.c
+
+gss = ${PACTTmpDir}/gs-score.c ${PACTTmpDir}/gs-pml.c ${PACTTmpDir}/gs-pdb.c \
+      ${PACTTmpDir}/gs-pgs.c ${PACTTmpDir}/gs-panacea.c                      \
+      ${PACTTmpDir}/gs-scheme.c
+
+SrcsU = ulcmd.c ulfunc.c ulauxf.c    \
+        ulhand.c ulcntl.c
+
+Srcs = sxhook.c sxmm.c sxmode.c sxgc.c sxcmd.c                       \
+       sxhand.c sxfunc.c sxhbo.c sxpdb.c sxpdba.c sxpdbr.c           \
+       sxpdbc.c sxpdbd.c sxpdbf.c sxpdbl.c sxpan.c                   \
+       sxpanw.c sxpml.c sxpmlg.c sxgri.c sxpgs.c sxpgsp.c sxgrot.c   \
+       sxshar.c sxset.c sxcont.c sxulio.c sxcrv.c sxtable.c          \
+       ${SrcsU} ${gss} ${gcs}
 
 gco = gc-sx.o
-
-gca = ${TGTLib}(gc-sx.o)
-
-gss = gs-score.c gs-pml.c gs-pdb.c   \
-      gs-pgs.c gs-panacea.c \
-      gs-scheme.c
 
 gso = gs-score.o gs-pml.o gs-pdb.o   \
       gs-pgs.o gs-panacea.o \
       gs-scheme.o
-
-gsa = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
-      ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
-      ${TGTLib}(gs-scheme.o)
 
 ObjsA = sxhook.o sxmm.o sxmode.o sxgc.o sxhand.o sxfunc.o sxhbo.o
 ObjsB = sxpdb.o sxpdba.o sxpdbr.o sxpdbc.o sxpdbd.o sxpdbf.o sxpdbl.o
@@ -121,6 +125,12 @@ ObjsY = sxshar.o
 ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
 Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ} \
        ${ObjsU} ${gso}
+
+gca = ${TGTLib}(gc-sx.o)
+
+gsa = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
+      ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
+      ${TGTLib}(gs-scheme.o)
 
 ArObjsU = ${TGTLib}(ulcmd.o) ${TGTLib}(ulfunc.o) ${TGTLib}(ulauxf.o) \
  	  ${TGTLib}(ulhand.o) ${TGTLib}(ulcntl.o)
@@ -168,6 +178,11 @@ hdrf = ${IncDir}/sxpdbd.h
 IncAction = @pact generate
 
 LibAction = @(echo "build-ext" ; build-ext ; pact devgen)
+
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+build : ${IncDir}/sx_gen.h ${hdrf}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+	build-ext
 
 #
 # make the executable

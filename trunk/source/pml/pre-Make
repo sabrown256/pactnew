@@ -74,11 +74,19 @@ Hdrs = pml.h pml_int.h scope_constants.h scope_complex.h scope_quaternion.h
 #
 # Object Files
 #
-gcs = gc-pml.c
+gcs = ${PACTTmpDir}/gc-pml.c
+
+Srcs = mlconst.c mlmath.c mlsrch.c mlrand.c mlnls.c mlmatr.c      \
+       mlrfnc.c mlcfnc.c mlsfnc.c mlqfnc.c                        \
+       mlsolv.c mlsvd.c mlvnd.c mleigen.c                         \
+       mlcg.c mliccg.c mlicgs.c                                   \
+       mlfft.c mllsq.c mlfpe.c mloper.c mlgeom.c mlsort.c mlmm.c  \
+       mlintm.c mlintp.c mlints.c                                 \
+       mlchksm.c mlmesh.c mlmsrch.c mlcmsh.c mlmextr.c            \
+       mlvect.c mlsmp.c \
+       ${gcs}
 
 gco = gc-pml.o
-
-gca = ${TGTLib}(gc-pml.o)
 
 Objs = mlconst.o mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o      \
        mlrfnc.o mlcfnc.o mlsfnc.o mlqfnc.o                        \
@@ -89,6 +97,8 @@ Objs = mlconst.o mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o      \
        mlchksm.o mlmesh.o mlmsrch.o mlcmsh.o mlmextr.o            \
        mlvect.o mlsmp.o \
        ${gco}
+
+gca = ${TGTLib}(gc-pml.o)
 
 ArObjs = ${TGTLib}(mlconst.o) ${TGTLib}(mlmath.o)                       \
          ${TGTLib}(mlrfnc.o)  ${TGTLib}(mlcfnc.o)                       \
@@ -129,6 +139,11 @@ hdrf = ${IncDir}/mlsrch.h ${IncDir}/pml_gen.h
 IncAction = @pact generate
 
 LibAction = @(echo "pact patch-fpe" ; pact patch-fpe ; pact devgen)
+
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+build : ${hdrf}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+	@pact patch-fpe
 
 #
 # verify C++ compiles

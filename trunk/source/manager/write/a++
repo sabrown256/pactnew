@@ -32,9 +32,12 @@ Separator $WLog
 NoteD $WLog "   Abstract C++ compiler wrapper - a++"
 Note $WLog ""
 
-dbmget $WLog CXX_Debug^                   \
+dbmget $WLog AR_Exe^                      \
+             AR_IFlag^                    \
+             CXX_Debug^                   \
              CXX_Optimize^                \
              CXX_Profile^                 \
+             LD_Exe^                      \
              PACT_CXX_EXE      =\? g++^   \
              PACT_CXX_FAMILY^             \
              PACT_CXX_VERSION^            \
@@ -49,120 +52,137 @@ setenv EtcDir  $PSY_Root/etc
 flog $WLog set exe    = $PACT_CXX_EXE
 flog $WLog set vers   = $PACT_CXX_VERSION
 flog $WLog set comp   = $exe:t
-flog $WLog set STDOUT = $BinDir/a++
-flog $WLog $RM $STDOUT
-flog $WLog touch $STDOUT
+flog $WLog set outf = $BinDir/a++
+flog $WLog $RM $outf
+flog $WLog touch $outf
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Note $STDOUT '#\!/bin/csh -f'
-Note $STDOUT '#'
-Note $STDOUT "# A++ - abstract compiler wrapper for $PACT_CXX_EXE"
-Note $STDOUT '#'
-Note $STDOUT '# include "cpyright.h"'
-Note $STDOUT '#'
-Note $STDOUT ""
+Note $outf '#\!/bin/csh -f'
+Note $outf '#'
+Note $outf "# A++ - abstract compiler wrapper for $PACT_CXX_EXE"
+Note $outf '#'
+Note $outf '# include "cpyright.h"'
+Note $outf '#'
+Note $outf ""
 
-Note $STDOUT 'unalias *'
-Note $STDOUT ""
+Note $outf 'unalias *'
+Note $outf ""
 
-Note $STDOUT '@ err = 0'
-Note $STDOUT ""
+Note $outf '@ err = 0'
+Note $outf ""
 
-Note $STDOUT "source $EtcDir/env-pact.csh"
-Note $STDOUT ""
+Note $outf "source $EtcDir/env-pact.csh"
+Note $outf ""
 
-Note $STDOUT "set exe  = $exe"
-Note $STDOUT 'set dbg  = FALSE'
-Note $STDOUT 'set opt  = FALSE'
-Note $STDOUT 'set lib  = ""'
-Note $STDOUT 'set prf  = FALSE'
-Note $STDOUT 'set vrb  = FALSE'
-Note $STDOUT 'set inf  = ""'
-Note $STDOUT 'set pref = ""'
-Note $STDOUT 'set outf = ""'
+Note $outf '@ vrb = 0'
+Note $outf ''
 
-Note $STDOUT 'set args = ""'
-Note $STDOUT 'while ($#argv > 0)'
-Note $STDOUT '   switch ("$1")'
-Note $STDOUT '      case -ag:'
-Note $STDOUT '           set dbg = TRUE'
-Note $STDOUT '           set opt = FALSE'
-Note $STDOUT '           breaksw'
-Note $STDOUT '      case -ahelp:'
-Note $STDOUT '           echo ""'
-Note $STDOUT '           echo "Usage: a++ [-ag] [-ahelp] [-aO] [-apre <file>] [-aprf] [-avrb] -ao <outf> <args>*"'
-Note $STDOUT '           echo "   ag      compile debuggable"'
-Note $STDOUT '           echo "   ahelp   this help message"'
-Note $STDOUT '           echo "   aO      compile optimized"'
-Note $STDOUT '           echo "   apre    preprocess <file> only"'
-Note $STDOUT '           echo "   aprf    compile for profiling"'
-Note $STDOUT '           echo "   avrb    verbose mode"'
-Note $STDOUT '           echo ""'
-Note $STDOUT '           exit(1)'
-Note $STDOUT '           breaksw'
-Note $STDOUT '      case -aO:'
-Note $STDOUT '           set dbg = FALSE'
-Note $STDOUT '           set opt = TRUE'
-Note $STDOUT '           breaksw'
-Note $STDOUT '      case -o:'
-Note $STDOUT '      case -ao:'
-Note $STDOUT '           shift'
-Note $STDOUT '           set outf = $1'
-Note $STDOUT '           breaksw'
-Note $STDOUT '      case -aprf:'
-Note $STDOUT '           set prf = TRUE'
-Note $STDOUT '           breaksw'
-Note $STDOUT '      case -apre:'
-Note $STDOUT '           shift'
-Note $STDOUT '           set pref = $1'
-Note $STDOUT '           breaksw'
-Note $STDOUT '      case -avrb:'
-Note $STDOUT '           set vrb = TRUE'
-Note $STDOUT '           breaksw'
-Note $STDOUT '      case -l*:'
-Note $STDOUT '           set lib = ( $lib "$1" )'
-Note $STDOUT '           breaksw'
-Note $STDOUT '      default:'
+Note $outf "set exe  = $exe"
+Note $outf 'set dbg  = FALSE'
+Note $outf 'set opt  = FALSE'
+Note $outf 'set arc  = ""'
+Note $outf 'set lib  = ""'
+Note $outf 'set prf  = FALSE'
+Note $outf 'set inf  = ""'
+Note $outf 'set pref = ""'
+Note $outf 'set outf = ""'
+
+Note $outf 'set args = ""'
+Note $outf 'while ($#argv > 0)'
+Note $outf '   switch ("$1")'
+Note $outf '      case -a:'
+Note $outf '           shift'
+Note $outf '           set arc = $1'
+Note $outf '           breaksw'
+Note $outf '      case -ag:'
+Note $outf '           set dbg = TRUE'
+Note $outf '           set opt = FALSE'
+Note $outf '           breaksw'
+Note $outf '      case -ahelp:'
+Note $outf '           echo ""'
+Note $outf '           echo "Usage: a++ [-ag] [-ahelp] [-aO] [-apre <file>] [-aprf] [-avrb]* -ao <outf> <args>*"'
+Note $outf '           echo "   ag      compile debuggable"'
+Note $outf '           echo "   ahelp   this help message"'
+Note $outf '           echo "   aO      compile optimized"'
+Note $outf '           echo "   apre    preprocess <file> only"'
+Note $outf '           echo "   aprf    compile for profiling"'
+Note $outf '           echo "   avrb    verbosity level"'
+Note $outf '           echo ""'
+Note $outf '           exit(1)'
+Note $outf '           breaksw'
+Note $outf '      case -aO:'
+Note $outf '           set dbg = FALSE'
+Note $outf '           set opt = TRUE'
+Note $outf '           breaksw'
+Note $outf '      case -o:'
+Note $outf '      case -ao:'
+Note $outf '           shift'
+Note $outf '           set outf = $1'
+Note $outf '           breaksw'
+Note $outf '      case -aprf:'
+Note $outf '           set prf = TRUE'
+Note $outf '           breaksw'
+Note $outf '      case -apre:'
+Note $outf '           shift'
+Note $outf '           set pref = $1'
+Note $outf '           breaksw'
+Note $outf '      case -avrb:'
+Note $outf '           @ vrb = $vrb + 1'
+Note $outf '           breaksw'
+Note $outf '      case -l*:'
+Note $outf '           set lib = ( $lib "$1" )'
+Note $outf '           breaksw'
+Note $outf '      default:'
 
 # literal foo.a, foo.so, or foo.so.2 goes into lib
-Note $STDOUT '           if (("$1" =~ *.a) || ("$1" =~ *.so*)) then'
-Note $STDOUT '              set lib = ( $lib "$1" )'
+Note $outf '           if (("$1" =~ *.a) || ("$1" =~ *.so*)) then'
+Note $outf '              set lib = ( $lib "$1" )'
 
-# the first argument which is an existing file goes into inf
-Note $STDOUT '           else if (("$inf" == "") && (-f "$1")) then'
-Note $STDOUT '              set inf = ( $inf "$1" )'
+# arguments which are existing C++ files go into inf
+Note $outf '           else if (("$1" =~ *.cc) && (-f "$1")) then'
+Note $outf '              set inf = ( $inf "$1" )'
 
 # everything goes into lib once lib has anything
 # otherwise it goes into args
-Note $STDOUT '           else'
-Note $STDOUT '              if ("$lib" != "") then'
-Note $STDOUT '                 set lib = ( $lib "$1" )'
-Note $STDOUT '              else'
-Note $STDOUT '                 set args = ( $args "$1" )'
-Note $STDOUT '              endif'
-Note $STDOUT '           endif'
-Note $STDOUT '           breaksw'
-Note $STDOUT '   endsw'
-Note $STDOUT '   shift'
-Note $STDOUT 'end'
-Note $STDOUT ""
+Note $outf '           else'
+Note $outf '              if ("$lib" != "") then'
+Note $outf '                 set lib = ( $lib "$1" )'
+Note $outf '              else'
+Note $outf '                 set args = ( $args "$1" )'
+Note $outf '              endif'
+Note $outf '           endif'
+Note $outf '           breaksw'
+Note $outf '   endsw'
+Note $outf '   shift'
+Note $outf 'end'
+Note $outf ""
 
-Note $STDOUT 'if ("$inf" == "") then'
-Note $STDOUT '   echo "No input file specified - exiting"'
-Note $STDOUT '   exit(1)'
-Note $STDOUT 'endif'
-Note $STDOUT ""
+Note $outf 'if ($vrb > 2) then'
+Note $outf '   echo "inf  = |$inf|"'
+Note $outf '   echo "outf = |$outf|"'
+Note $outf '   echo "co   = |$co|"'
+Note $outf '   echo "arc  = |$arc|"'
+Note $outf '   echo "args = |$args|"'
+Note $outf '   echo "lib  = |$lib|"'
+Note $outf 'endif'
+Note $outf ''
 
-Note $STDOUT 'if (("$outf" == "") && ("$pref" == "")) then'
-Note $STDOUT '   echo "No output file specified - exiting"'
-Note $STDOUT '   exit(1)'
-Note $STDOUT 'endif'
-Note $STDOUT ""
+Note $outf 'if ("$inf" == "") then'
+Note $outf '   echo "No input file specified - exiting"'
+Note $outf '   exit(1)'
+Note $outf 'endif'
+Note $outf ""
 
-Note $STDOUT 'set CX = ( $exe $args )'
-Note $STDOUT ""
+Note $outf 'if (("$outf" == "") && ("$pref" == "")) then'
+Note $outf '   echo "No output file specified - exiting"'
+Note $outf '   exit(1)'
+Note $outf 'endif'
+Note $outf ""
+
+Note $outf 'set CX = ( $exe $args )'
+Note $outf ""
 
 #--------------------------------------------------------------------------'
 #--------------------------------------------------------------------------'
@@ -198,10 +218,10 @@ if (-f $compilers) then
          set val = $linf[2]
          shift linf
          shift linf
-         Note $STDOUT 'if ($vrb == TRUE) then'
-         Note $STDOUT '   echo "   setenv '$var $val'"'
-         Note $STDOUT 'endif'
-         Note $STDOUT "setenv $var $val"
+         Note $outf 'if ($vrb > 0) then'
+         Note $outf '   echo "   setenv '$var $val'"'
+         Note $outf 'endif'
+         Note $outf "setenv $var $val"
       end
    endif
 
@@ -221,44 +241,44 @@ unset compilers
 # run without LD_LIBRARY_PATH being set
 
 if ("$RPATH" != "") then
-   Note $STDOUT 'if ($?LD_LIBRARY_PATH == 1) then'
-   Note $STDOUT '   setenv LD_LIBRARY_PATH '$RPATH':$LD_LIBRARY_PATH'
-   Note $STDOUT 'else'
-   Note $STDOUT '   setenv LD_LIBRARY_PATH '$RPATH
-   Note $STDOUT 'endif'
-   Note $STDOUT ""
+   Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
+   Note $outf '   setenv LD_LIBRARY_PATH '$RPATH':$LD_LIBRARY_PATH'
+   Note $outf 'else'
+   Note $outf '   setenv LD_LIBRARY_PATH '$RPATH
+   Note $outf 'endif'
+   Note $outf ""
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Note $STDOUT 'set path   = ( '$BinDir' $path )'
-Note $STDOUT 'set action = ""'
+Note $outf 'set path   = ( '$BinDir' $path )'
+Note $outf 'set action = ""'
 
-Note $STDOUT 'if ($?SC_EXEC_N_ATTEMPTS == 1) then'
-Note $STDOUT '   @ na = $SC_EXEC_N_ATTEMPTS'
-Note $STDOUT 'else'
-Note $STDOUT '   @ na = 1'
-Note $STDOUT 'endif'
-Note $STDOUT ""
+Note $outf 'if ($?SC_EXEC_N_ATTEMPTS == 1) then'
+Note $outf '   @ na = $SC_EXEC_N_ATTEMPTS'
+Note $outf 'else'
+Note $outf '   @ na = 1'
+Note $outf 'endif'
+Note $outf ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # check abstract options
 
-Note $STDOUT 'if ($dbg == TRUE) then'
-Note $STDOUT '   set args = ( '$CXX_Debug' $args )'
-Note $STDOUT 'else if ($opt == TRUE) then'
-Note $STDOUT '   set args = ( '$CXX_Optimize' $args )'
-Note $STDOUT 'endif'
-Note $STDOUT ""
+Note $outf 'if ($dbg == TRUE) then'
+Note $outf '   set args = ( '$CXX_Debug' $args )'
+Note $outf 'else if ($opt == TRUE) then'
+Note $outf '   set args = ( '$CXX_Optimize' $args )'
+Note $outf 'endif'
+Note $outf ""
 
-Note $STDOUT 'if ($prf == TRUE) then'
-Note $STDOUT '   set args = ( '$CXX_Profile' $args )'
-Note $STDOUT 'endif'
-Note $STDOUT 'unset linf'
-Note $STDOUT ""
+Note $outf 'if ($prf == TRUE) then'
+Note $outf '   set args = ( '$CXX_Profile' $args )'
+Note $outf 'endif'
+Note $outf 'unset linf'
+Note $outf ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -269,69 +289,122 @@ switch ($comp)
 # for some reason they were not built with -rpath
 # this is not for the compiled executables but the compiler
    case g++:
-        Note $STDOUT 'set root = $exe:h'
-        Note $STDOUT 'set root = $root:h'
-        Note $STDOUT 'if ($?LD_LIBRARY_PATH == 1) then'
-        Note $STDOUT '   setenv LD_LIBRARY_PATH  $root/lib64:$root/lib:${LD_LIBRARY_PATH}'
-        Note $STDOUT 'else'
-        Note $STDOUT '   setenv LD_LIBRARY_PATH  $root/lib64:$root/lib'
-        Note $STDOUT 'endif'
+        Note $outf 'set root = $exe:h'
+        Note $outf 'set root = $root:h'
+        Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
+        Note $outf '   setenv LD_LIBRARY_PATH  $root/lib64:$root/lib:${LD_LIBRARY_PATH}'
+        Note $outf 'else'
+        Note $outf '   setenv LD_LIBRARY_PATH  $root/lib64:$root/lib'
+        Note $outf 'endif'
 
-        Note $STDOUT 'unset root'
+        Note $outf 'unset root'
         breaksw
 
    case pathCC:
-        Note $STDOUT 'set root  = $exe:h'
-        Note $STDOUT 'set root  = $root:h'
-        Note $STDOUT 'set lvers = `ls $root/lib`'
-        Note $STDOUT 'if ($?LD_LIBRARY_PATH == 1) then'
-        Note $STDOUT '   setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32:${LD_LIBRARY_PATH}'
-        Note $STDOUT 'else'
-        Note $STDOUT '   setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32'
-        Note $STDOUT 'endif'
+        Note $outf 'set root  = $exe:h'
+        Note $outf 'set root  = $root:h'
+        Note $outf 'set lvers = `ls $root/lib`'
+        Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
+        Note $outf '   setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32:${LD_LIBRARY_PATH}'
+        Note $outf 'else'
+        Note $outf '   setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32'
+        Note $outf 'endif'
 
-        Note $STDOUT 'unset root'
+        Note $outf 'unset root'
         breaksw
 
    case pgCC:
         breaksw
 endsw
-Note $STDOUT ""
+Note $outf ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # these are variables which may be used elsewhere
 # we are done with them - so unset them
-Note $STDOUT 'unsetenv PACT_CXX_FAMILY'
-Note $STDOUT 'unsetenv PACT_CXX_VERSION'
-Note $STDOUT 'unsetenv PACT_CXX_PATH'
-Note $STDOUT ""
+Note $outf 'unsetenv PACT_CXX_FAMILY'
+Note $outf 'unsetenv PACT_CXX_VERSION'
+Note $outf 'unsetenv PACT_CXX_PATH'
+Note $outf ""
 
-Note $STDOUT 'rm -f $outf'
-Note $STDOUT 'set cmd = ( $CX -o $outf $inf $lib )'
+Note $outf 'if ("$arc" != "") then'
+Note $outf '   set atl = ( file-time $arc )'
+Note $outf '   set stl = ( file-time $inf )'
+Note $outf 'endif'
+Note $outf ''
 
-# verbose mode diagnostic for debugging
-Note $STDOUT 'if ($vrb == TRUE) then'
-Note $STDOUT '   echo "   Compile: $cmd"'
-Note $STDOUT 'endif'
-Note $STDOUT ""
+Note $outf '@ nc = $#inf'
+Note $outf 'set lfo = ""'
+Note $outf ''
 
-Note $STDOUT 'if ("$action" == "") then'
-Note $STDOUT '   exec $cmd'
-Note $STDOUT 'else'
-Note $STDOUT '   $cmd'
-Note $STDOUT '   @ err = $status'
-Note $STDOUT '   $action'
-Note $STDOUT 'endif'
-Note $STDOUT ""
+Note $outf 'foreach fi ($inf)'
+Note $outf '   if ($nc > 1) then'
+Note $outf '      set ft  = $fi:t'
+Note $outf '      set fo  = $ft:r.o'
+Note $outf '      set lfo = ( $lfo $fo )'
+Note $outf '      set co  = TRUE'
+Note $outf '   else'
+Note $outf '      set fo = $outf'
+Note $outf '   endif'
+Note $outf '   rm -f $fo'
+Note $outf '   if ($co == TRUE) then'
+Note $outf '      set cmd = ( `echo "$CX -o $fo -c $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
+Note $outf '      if ($vrb > 1) then'
+Note $outf '         echo "   $cmd"'
+Note $outf '      else if ($vrb > 0) then'
+Note $outf '         echo "   $exe:t -o $fo -c $fi:t $lib"'
+Note $outf '      endif'
+Note $outf '   else'
+Note $outf '      set cmd = ( `echo "$CX -o $fo $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
+Note $outf '      if ($vrb > 1) then'
+Note $outf '         echo "   $cmd"'
+Note $outf '      else if ($vrb > 0) then'
+Note $outf '         echo "   $exe:t -o $fo $fi:t $lib"'
+Note $outf '      endif'
+Note $outf '   endif'
+Note $outf '   $cmd'
+Note $outf '   @ err = $err + $status'
+Note $outf '   $action'
+Note $outf 'end'
+Note $outf ''
+Note $outf 'if ($err == 0) then'
+Note $outf '   if ("$arc" != "") then'
+Note $outf '      set cmd = ( '$AR_Exe $AR_IFlag' $arc $lfo )'
+Note $outf '      if ($vrb > 0) then'
+Note $outf '         echo "   '$AR_Exe $AR_IFlag' $arc"'
+Note $outf '      endif'
+Note $outf '      $cmd'
+Note $outf '      @ xstatus = $status'
+Note $outf '      if ($xstatus == 0) then'
+Note $outf '         rm -f $lfo'
+Note $outf '      else'
+Note $outf '         @ err = $err + $xstatus'
+Note $outf '      endif'
+Note $outf '   else if (("$outf" != "") && ("$lfo" != "")) then'
+Note $outf '      set cmd = ( '$LD_Exe' $args -o $outf $lfo $lib)'
+Note $outf '      if ($vrb > 1) then'
+Note $outf '         echo "   $cmd"'
+Note $outf '      else if ($vrb > 0) then'
+Note $outf '         echo "   '$LD_Exe:t' -o $outf $lib"'
+Note $outf '      endif'
+Note $outf '      $cmd'
+Note $outf '      @ xstatus = $status'
+Note $outf '      if ($xstatus == 0) then'
+Note $outf '         rm -f $lfo'
+Note $outf '      else'
+Note $outf '         @ err = $err + $xstatus'
+Note $outf '      endif'
+Note $outf '   endif'
+Note $outf 'endif'
+Note $outf ''
 
-Note $STDOUT 'exit($err)'
+Note $outf 'exit($err)'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-flog $WLog chmod a+x $STDOUT
+flog $WLog chmod a+x $outf
 
 source $Me:h/post-common
 

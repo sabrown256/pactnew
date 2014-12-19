@@ -88,14 +88,25 @@ Hdrs = pdb.h pdb_int.h pdb_old.h scope_dp.h
 #
 # Object Files
 #
-gcs = gc-pdb.c
+gcs = ${PACTTmpDir}/gc-pdb.c
+
+SrcsA = pnet.c pnbin.c pnpio.c
+SrcsN = ${MPDevicesS} ${IPCDevicesS} ${SrcsA}
+
+SPARC  = pnparc.c pnmpi.c
+SNOIPC = pnnil.c
+
+Srcs = pdb.c pdbaib.c pdcast.c pdfmt.c pdfmta.c pdfmtb.c pdfmtc.c pdsymt.c  \
+       pdcomm.c pdbmp.c pdser.c pdlow.c pdrdwr.c pdptr.c                    \
+       pdmemb.c pdgs.c pdcsum.c pdflt.c pdblk.c pdbmm.c pdconv.c            \
+       pdpath.c pdbfc.c pdbnet.c pdprnt.c pdshar.c pdtgt.c pdbx.c           \
+       pdmap.c pdbdir.c pdszof.c pdpar.c pdparmp.c pdspoke.c pdold.c        \
+       ${SrcsN} ${gcs}
 
 gco = gc-pdb.o
 
-gca = ${TGTLib}(gc-pdb.o)
-
 ObjsA = pnet.o pnbin.o pnpio.o
-ObjsN = ${MPassDevices} ${IPCDevices} ${ObjsA}
+ObjsN = ${MPDevicesO} ${IPCDevicesO} ${ObjsA}
 
 ${ObjsN} : ${Hdrs}
 
@@ -109,7 +120,9 @@ Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdsymt.o pdblk.o      \
        pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o pdold.o \
        ${gco}
 
-ArObjsN = ${MPassDevices} ${IPCDevices}        \
+gca = ${TGTLib}(gc-pdb.o)
+
+ArObjsN = ${MPDevicesO} ${IPCDevicesO}         \
           ${TGTLib}(pnet.o) ${TGTLib}(pnbin.o) \
           ${TGTLib}(pnpio.o)
 
@@ -161,6 +174,10 @@ IncAction = @pact generate
 
 LibAction = @(echo "build-spokes" ; build-spokes ; pact devgen)
 
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+build : ${hdrf}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+	build-spokes
 
 #
 # standard tests

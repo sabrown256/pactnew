@@ -146,7 +146,7 @@ static void _PA_print_alist_node(char *type, void *data)
 	   {s = (char *) data;
 	    printf("%s\t(%s)", s, type);}
 
-	else if ((itype == G_PCONS_I) || (itype == SC_PCONS_P_I))
+	else if (itype == G_PCONS_I)
 	   {pp = (pcons *) data; 
 	    printf("%p (%s)\n", data, type);
 	    _PA_print_alist_node(pp->car_type, pp->car);

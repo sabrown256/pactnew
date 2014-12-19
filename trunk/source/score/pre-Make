@@ -133,7 +133,7 @@ Srcs = ${DSrcs} ${ESrcs} ${MSrcs} ${PSrcs} ${TSrcs} ${OSSrcs} \
        scarrd.c scarrs.c \
        schash.c sctree.c sctab.c \
        scstr.c scrsca.c scrscb.c \
-       sclexs.c sctrk.c sclog.c scold.c \
+       sclexs.c sctrk.c sclog.c scold.c scf77lr.l \
        ${GSrcs}
 
 
@@ -605,19 +605,19 @@ example : ${TGTLib} example.c
 #       - this is a special target that you cannot build with dmake
 #       - it must be built with smake
 #
-DFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
-mklib : ${APIs} ${LibDep}
-	@acc ${DFlags} -c ${Srcs} -a ${TGTLib}
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+build : ${APIs} ${LibDep}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 
 ndmake :
 	@smake mklib
-	@acc ${DFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
+	@acc ${ACFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 
 dmake :
 	@echo "import-api bfd.def -o ${IncDir}/bfd.api"
 	@import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
-	@acc ${DFlags} -c ${Srcs} -a ${TGTLib}
-	@acc ${DFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+	@acc ${ACFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 
 dmt : ${hdrf}
 	${BinDir}/smake dmake

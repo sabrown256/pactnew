@@ -102,88 +102,106 @@ setenv EtcDir  $PSY_Root/etc
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# build target
+# build target variations
 
-    Note $STDOUT 'build:'
-    Note $STDOUT '	@(echo "" ; echo "Generate sources for '$PSY_ID'")'
-    Note $STDOUT '	${BARRIER}'
+    foreach t (build lib)
 
-    foreach p ($Pck)
-       @ i = 0
-       @ n = 0
-       while ($i < $ni)
-          @ n = $n + 1
-          @ i = $i + 1
-          set cfg = $inf[$i]
-          @ i = $i + 1
-          set sid = $inf[$i]
-
-          set root = $base/$sid 
-          set etcd = $root/etc
-   
-#          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact generate in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr generate)"'
-          Note $STDOUT '	@(cd '$p' ; printf "\npact generate in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr generate)'
-       end
-       if ($p == score) then
-          Note $STDOUT '	${BARRIER}'
+       if ($t == build) then
+          set tgt = devlib
+       else if ($t == lib) then
+          set tgt = build
        endif
-    end
-
-    Note $STDOUT '	${BARRIER}'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Note $STDOUT '	@(echo "" ; echo "Install headers for '$PSY_ID'")'
-    Note $STDOUT '	${BARRIER}'
+# generate phase
 
-    foreach p ($Pck)
-       @ i = 0
-       @ n = 0
-       while ($i < $ni)
-          @ n = $n + 1
-          @ i = $i + 1
-          set cfg = $inf[$i]
-          @ i = $i + 1
-          set sid = $inf[$i]
+       Note $STDOUT "${t}:"
+       Note $STDOUT '	@(echo "" ; echo "Generate sources for '$PSY_ID'")'
+       Note $STDOUT '	${BARRIER}'
 
-          set root = $base/$sid 
-          set etcd = $root/etc
+       foreach p ($Pck)
+          @ i = 0
+          @ n = 0
+          while ($i < $ni)
+             @ n = $n + 1
+             @ i = $i + 1
+             set cfg = $inf[$i]
+             @ i = $i + 1
+             set sid = $inf[$i]
+
+             set root = $base/$sid 
+             set etcd = $root/etc
    
-#          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact incinstall in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr incinstall)"'
-          Note $STDOUT '	@(cd '$p' ; printf "\npact incinstall in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr incinstall)'
+#             Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact generate in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr generate)"'
+             Note $STDOUT '	@(cd '$p' ; printf "\npact generate in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr generate)'
+          end
+          if ($p == score) then
+             Note $STDOUT '	${BARRIER}'
+          endif
        end
-    end
 
-    Note $STDOUT '	${BARRIER}'
+       Note $STDOUT '	${BARRIER}'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Note $STDOUT '	@(echo "" ; echo "Compile sources for '$PSY_ID'")'
-    Note $STDOUT '	${BARRIER}'
+# incinstall phase
 
-    foreach p ($Pck)
-       @ i = 0
-       @ n = 0
-       while ($i < $ni)
-          @ n = $n + 1
-          @ i = $i + 1
-          set cfg = $inf[$i]
-          @ i = $i + 1
-          set sid = $inf[$i]
+       Note $STDOUT '	@(echo "" ; echo "Install headers for '$PSY_ID'")'
+       Note $STDOUT '	${BARRIER}'
 
-          set root = $base/$sid 
-          set etcd = $root/etc
+       foreach p ($Pck)
+          @ i = 0
+          @ n = 0
+          while ($i < $ni)
+             @ n = $n + 1
+             @ i = $i + 1
+             set cfg = $inf[$i]
+             @ i = $i + 1
+             set sid = $inf[$i]
+
+             set root = $base/$sid 
+             set etcd = $root/etc
    
-#          Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact devlib in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr devlib)"'
-          Note $STDOUT '	@(cd '$p' ; printf "\npact devlib in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr devlib)'
+#             Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact incinstall in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr incinstall)"'
+             Note $STDOUT '	@(cd '$p' ; printf "\npact incinstall in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr incinstall)'
+          end
        end
-    end
 
-    Note $STDOUT '	${BARRIER}'
-    Note $STDOUT '	${PACT1} -f ${MkFile1} link'
-    Note $STDOUT ''
+       Note $STDOUT '	${BARRIER}'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# compile phase
+
+       Note $STDOUT '	@(echo "" ; echo "Compile sources for '$PSY_ID'")'
+       Note $STDOUT '	${BARRIER}'
+
+       foreach p ($Pck)
+          @ i = 0
+          @ n = 0
+          while ($i < $ni)
+             @ n = $n + 1
+             @ i = $i + 1
+             set cfg = $inf[$i]
+             @ i = $i + 1
+             set sid = $inf[$i]
+
+             set root = $base/$sid 
+             set etcd = $root/etc
+   
+#             Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact devlib in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr '$tgt')"'
+             Note $STDOUT '	@(cd '$p' ; printf "\npact devlib in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr '$tgt')'
+          end
+       end
+
+       Note $STDOUT '	${BARRIER}'
+       Note $STDOUT '	${PACT1} -f ${MkFile1} link'
+       Note $STDOUT ''
+    end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

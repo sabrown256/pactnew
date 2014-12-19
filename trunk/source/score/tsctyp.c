@@ -17,7 +17,7 @@
 static int test_1(void)
    {int i, id, st, cs;
     char msg[MAXLINE];
-    SC_type_label *lt;
+    typdes *td;
     static int dbg = 0;
     char *tchr[] = { "SC_CHAR_I", "SC_WCHAR_I" };
     char *tfix[] = { "SC_INT8_I", "SC_SHORT_I",
@@ -40,45 +40,45 @@ static int test_1(void)
     printf("\t\t\tCharacter types:\n");
     for (i = 0; i < N_PRIMITIVE_CHAR; i++)
         {id = SC_TYPE_CHAR_ID(i);
-	 lt = SC_gs.ltyp + id;
+	 td = SC_gs.stl + id;
          printf("   %-20s %3d %3d %3d %s\n",
-		lt->s, i, id, lt->i, tchr[i]);};
+		td->typ_s, i, id, td->typ_i, tchr[i]);};
     printf("\n");
 
 /* fix point types */
     printf("\t\t\tFixed point types:\n");
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
         {id = SC_TYPE_FIX_ID(i);
-	 lt = SC_gs.ltyp + id;
+	 td = SC_gs.stl + id;
          printf("   %-20s %3d %3d %3d %s\n",
-		lt->s, i, id, lt->i, tfix[i]);};
+		td->typ_s, i, id, td->typ_i, tfix[i]);};
     printf("\n");
 
 /* floating point types */
     printf("\t\t\tFloating point types:\n");
     for (i = 0; i < N_PRIMITIVE_FP; i++)
         {id = SC_TYPE_FP_ID(i);
-	 lt = SC_gs.ltyp + id;
+	 td = SC_gs.stl + id;
          printf("   %-20s %3d %3d %3d %s\n",
-		lt->s, i, id, lt->i, tfp[i]);};
+		td->typ_s, i, id, td->typ_i, tfp[i]);};
     printf("\n");
 
 /* complex types */
     printf("\t\t\tComplex types:\n");
     for (i = 0; i < N_PRIMITIVE_CPX; i++)
         {id = SC_TYPE_CPX_ID(i);
-	 lt = SC_gs.ltyp + id;
+	 td = SC_gs.stl + id;
          printf("   %-20s %3d %3d %3d %s\n",
-		lt->s, i, id, lt->i, tcpx[i]);};
+		td->typ_s, i, id, td->typ_i, tcpx[i]);};
     printf("\n");
 
 /* aliased types */
     printf("\t\t\tAliased types:\n");
     for (id = SC_FILE_I; id <= SC_COMPLEX128_I; id++)
-        {lt = SC_gs.ltyp + id;
+        {td = SC_gs.stl + id;
 	 i  = id - SC_FILE_I;
          printf("   %-20s %3d %3d %3d %s\n",
-		lt->s, i, id, lt->i, tal[i]);};
+		td->typ_s, i, id, td->typ_i, tal[i]);};
     printf("\n");
 
 

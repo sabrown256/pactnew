@@ -1,0 +1,101 @@
+#!/bin/csh -f
+#
+# FILE-TIME - display time stamps of files in directories or containers
+#
+# include cpyright.h
+#
+
+unalias *
+
+@ err = 0
+
+set flst = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: file-time [-h] <files>* | <container>*"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           if (-f $1) then
+              set flst = ( $flst $1 )
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+set os  = `uname -s`
+set fmt = "%b %d %T %Y"
+
+set tl = ""
+
+foreach f ($flst)
+   if ($f =~ *.a) then
+# sol: rw-rw---- 1001/506   6808 Jul 24 10:24 2014 mlconst.o
+# bsd: rw-rw---- 1001/504   9872 Dec 18 15:31 2013 mlconst.o
+# lnx: rw-rw---- 1001/506  10312 Dec 17 06:11 2014 mlconst.o
+      set atl = ( `ar -tv $f |& awk '{printf("file %s %s %s %s %s ", $8, $4, $5, $6, $7)}'` )
+      set tl = ( $tl $atl )
+   else if ($f =~ *.tar) then
+# sol: -rw-rw-r-- sabrown/automation 982 2014-12-14 13:57 ccwarn.c
+# bsd: -rw-rw-r--  0 sabrown automation 982 Dec 14 13:57 ccwarn.c
+# lnx: -rw-rw-r-- sabrown/automation 982 2014-12-14 13:57 ccwarn.c
+      if ($os == FreeBSD) then
+         set ttl = ( `tar -tvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
+      else
+         set ttl = ( `tar -tvf $f |& awk '{printf("file %s %s %s ", $6, $4, $5)}'`)
+      endif
+      set tl  = ( $tl $ttl )
+   else if ($f =~ *gz) then
+      if ($os == FreeBSD) then
+         set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
+      else
+         set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s ", $6, $4, $5)}'`)
+      endif
+      set tl  = ( $tl $ttl )
+   else
+# sol: -rw-rw-r--+ 1 sabrown automation 4538 Dec 14 13:57 limits.c
+# bsd: -rw-rw-r--+ 1 sabrown  automation  4538 Dec 14 13:57 limits.c
+# lnx: -rw-rw-r-- 1 sabrown automation 4538 Dec 14 13:57 limits.c
+      set fmt = "%b %d %Y"
+      set ftl = ( `ls -l $f` )
+      set tl  = ( $tl file $f $ftl[6-8] )
+   endif
+end
+
+set ts = ""
+set tf = ""
+@ nl = $#tl
+@ il = 0
+while ($il < $nl)
+   @ il = $il + 1
+   if ($tl[$il] == file) then
+      if ("$ts" != "") then
+         if ($os == FreeBSD) then
+            set dt = ( `date -j -f "$fmt" "$ts" '+%Y-%m-%d-%H-%M-%S'` )
+         else
+            set dt = ( `date -d "$ts" '+%Y-%m-%d-%H-%M-%S'` )
+         endif
+         printf "   %-25s %s\n" $tf $dt
+      endif
+      @ il = $il + 1
+      set tf = $tl[$il]
+      set ts = ""
+   else
+      set ts = ( $ts $tl[$il] )
+   endif
+end
+if ("$ts" != "") then
+   if ($os == FreeBSD) then
+      set dt = ( `date -j -f "$fmt" "$ts" '+%Y-%m-%d-%H-%M-%S'` )
+   else
+      set dt = ( `date -d "$ts" '+%Y-%m-%d-%H-%M-%S'` )
+   endif
+   printf "   %-25s %s\n" $tf $dt
+endif
+
+exit($err)

@@ -81,6 +81,8 @@ ${TGTLib}(shgrc.o) : shlrc.l shgrc.y
 ${Oc}  : ${HCSyn}
 ${Arc} : ${HCSyn}
 
+csynt : ${TGTLib}(shgrc.o)
+
 # Fortran syntax mode specifications
 HFSyn = scope_parse_f.h
 Of    = shgrf.o shfsup.o
@@ -102,6 +104,8 @@ ${TGTLib}(shgrf.o) : shlrf.l shgrf.y
 	  ${YC} -c shgrf.c -o shgrf.o ; \
 	  ${AR} ${AROpt} ${TGTLib} shgrf.o 2>> errlog ; \
 	  ${RM} shgrf.c shgrf.o shlrf.c )
+
+fsynt : ${TGTLib}(shgrf.o)
 
 ${Of}  : ${HFSyn}
 ${Arf} : ${HFSyn}
@@ -128,6 +132,8 @@ ${TGTLib}(shgrm.o) : shlrm.l shgrm.y
 	  ${AR} ${AROpt} ${TGTLib} shgrm.o 2>> errlog ; \
 	  ${RM} shgrm.c shgrm.o shlrm.c )
 
+msynt : ${TGTLib}(shgrm.o)
+
 ${Om}  : ${HMSyn}
 ${Arm} : ${HMSyn}
 
@@ -135,11 +141,19 @@ ${Arm} : ${HMSyn}
 # Object Files
 #
 
-gcs = gc-scheme.c
+gcs = ${PACTTmpDir}/gc-scheme.c
+
+GSrcs = shcsup.c shfsup.c shmsup.c
+
+Srcs = ${GSrcs}                                              \
+       shmm.c shprnt.c sheval.c shenvr.c shread.c shtlev.c   \
+       shprm1.c shprm2.c shprm3.c shprm4.c shprm5.c          \
+       shtty.c shint.c sharr.c shstrg.c shchr.c shlarg.c     \
+       shprc1.c shprc2.c shsynt.c shvar.c                    \
+       ${gcs}
+
 
 gco = gc-scheme.o
-
-gca = ${TGTLib}(gc-scheme.o)
 
 PSObjs = shmm.o
 PrObjs = shprnt.o
@@ -150,6 +164,9 @@ LrObjs = shstrg.o shchr.o shlarg.o shprc1.o shprc2.o shsynt.o shvar.o
 
 Objs = ${PSObjs} ${PrObjs} ${EvObjs} ${RdObjs} ${FnObjs} ${LrObjs} \
        ${gco}
+
+
+gca = ${TGTLib}(gc-scheme.o)
 
 ArObjs = ${TGTLib}(shmm.o) ${TGTLib}(shprnt.o) ${TGTLib}(sheval.o) \
          ${TGTLib}(shenvr.o) ${TGTLib}(shread.o) ${TGTLib}(shtlev.o) \
@@ -181,6 +198,13 @@ hdrf = ${IncDir}/scheme_gen.h
 IncAction = @pact generate
 
 LibAction = @pact devgen
+
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+build : ${hdrf}
+	pact csynt
+	pact fsynt
+	pact msynt
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 
 profiler : 
 	pact remove

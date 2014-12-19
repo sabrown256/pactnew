@@ -76,11 +76,14 @@ Hdrs = ${TGTInc} ${hdrf}
 #
 # Object Files
 #
-gcs = gc-panacea.c
+gcs = ${PACTTmpDir}/gc-panacea.c
+
+Srcs = padef.c pacpp.c papkg.c pagnrd.c pahand.c pafi.c            \
+         panacea.c pashar.c pashas.c paccess.c padsys.c pamm.c     \
+         pavars.c papp.c padump.c pasrc.c pastr.c pasmp.c panth.c  \
+         ${gcs}
 
 gco = gc-panacea.o
-
-gca = ${TGTLib}(gc-panacea.o)
 
 GenObjs = pagnrd.o pahand.o pafi.o
 PanObjs = padsys.o pamm.o panacea.o paccess.o pashar.o pashas.o \
@@ -88,6 +91,8 @@ PanObjs = padsys.o pamm.o panacea.o paccess.o pashar.o pashas.o \
 PPObjs  = papp.o padump.o panth.o
 SorObjs = pasrc.o
 Objs    = ${GenObjs} ${SorObjs} ${PanObjs} ${PPObjs} ${gco}
+
+gca = ${TGTLib}(gc-panacea.o)
 
 ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
 	 ${TGTLib}(pagnrd.o) ${TGTLib}(pahand.o) ${TGTLib}(pafi.o)     \
@@ -120,6 +125,10 @@ hdrf = ${IncDir}/pasrc.h ${IncDir}/panacea_gen.h
 IncAction = @pact generate
 
 LibAction = @pact devgen
+
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+build : ${hdrf}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 
 #
 # preprocessing test
