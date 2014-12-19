@@ -71,7 +71,11 @@ ${Obj} : ${Hdrs}
 ${ArObjs} : ${Hdrs}
 
 # Object Files
-Objs   = sccsynt.o sccinf.o sccem.o scchk.o sccsup.o sccgr.o
+
+Srcs = sccsynt.c sccinf.c sccem.c scchk.c sccsup.c
+
+Objs = sccsynt.o sccinf.o sccem.o scchk.o sccsup.o sccgr.o
+
 ArObjs = ${TGTLib}(sccsynt.o) ${TGTLib}(sccinf.o)       \
          ${TGTLib}(sccem.o) ${TGTLib}(scchk.o)          \
          ${TGTLib}(sccsup.o) ${TGTLib}(sccgr.o)
@@ -89,6 +93,9 @@ hdrf =
 
 IncAction = 
 
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+build : ${hdrf}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 
 profiler : 
 	pact remove

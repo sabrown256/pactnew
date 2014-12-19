@@ -66,13 +66,20 @@ targets :
 #
 Hdrs = fpact.h
 
-gfs = gf-score.c gf-pml.c gf-pdb.c   \
-      gf-pgs.c gf-panacea.c \
-      gf-scheme.c gf-fortran.c
+gfs = ${PACTTmpDir}/gf-score.c ${PACTTmpDir}/gf-pml.c ${PACTTmpDir}/gf-pdb.c \
+      ${PACTTmpDir}/gf-pgs.c ${PACTTmpDir}/gf-panacea.c \
+      ${PACTTmpDir}/gf-scheme.c ${PACTTmpDir}/gf-fortran.c
 
-gms = gm-score.f gm-pml.f gm-pdb.f   \
-      gm-pgs.f gm-panacea.f \
-      gm-scheme.f gm-fortran.f
+gms = ${PACTTmpDir}/gm-score.f ${PACTTmpDir}/gm-pml.f ${PACTTmpDir}/gm-pdb.f \
+      ${PACTTmpDir}/gm-pgs.f ${PACTTmpDir}/gm-panacea.f \
+      ${PACTTmpDir}/gm-scheme.f ${PACTTmpDir}/gm-fortran.f
+
+FSrcs = ${gms} flibc.f
+
+CSrcs = ${gfs} fasca.c fascb.c fascs.c fascm.c \
+        famla.c fapda.c fapana.c \
+        fagsa.c fagsb.c fagsc.c \
+        fasxa.c
 
 #
 # Object Files
@@ -132,6 +139,17 @@ LibAction = @(cd ${PACTTmpDir} ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpD
 SLibs = ${DPLib} ${FLib} ${MDLib}
 Libs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
 NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
+
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+AFFlags = -ag -avrb ${FFLAGS} ${FcFlags}
+build :
+	@acc ${ACFlags} -c ${CSrcs} -a ${TGTLib}
+	@afc ${AFFlags} -c ${FSrcs} -a ${TGTLib}
+	@(cd ${PACTTmpDir} ; \
+	  touch dummy.mod ; \
+	  sinstall *.mod ${IncDir} ; \
+	  rm -f dummy.mod ${IncDir}/dummy.mod ; \
+	  rm -rf ${PSY_TmpDir})
 
 #
 # SCORE tests

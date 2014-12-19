@@ -37,6 +37,9 @@ IncAction = @pact ${IncDir}/py_gen.h
 
 #--------------------------------------------------------------------------
 
+build:
+	@./psys build
+
 install:
 	@./psys link
 

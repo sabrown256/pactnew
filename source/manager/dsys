@@ -263,12 +263,13 @@ switch ($Cmnd)
                       set Args = ( $Args "-async" $1 )
                    endif
                    breaksw
+              case -l :
+                   set MTgt = lib
+                   breaksw
               case -s :
-                   shift
                    set MTgt = shared
                    breaksw
               case -u :
-                   shift
                    set MTgt = build
                    breaksw
               case -o :
@@ -329,8 +330,8 @@ switch ($Cmnd)
            flog $Log setenv  SC_EXEC_TIME_FACTOR     80
            flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
 
-           Note $Log "pact -log $Log -f $EtcDir/Makefile $Args build"
-           pact -log $Log -f $EtcDir/Makefile $Args build
+           Note $Log "pact -log $Log -f $EtcDir/Makefile $Args $MTgt"
+           pact -log $Log -f $EtcDir/Makefile $Args $MTgt
            set RStatus = $status
 
            flog $Log popd

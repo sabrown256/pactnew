@@ -80,11 +80,28 @@ XHdr   = scope_x11.h
 #
 # Object Files
 #
-gcs = gc-pgs.c
+gcs = ${PACTTmpDir}/gc-pgs.c
+
+SPS  = gsdv_ps.c gspr_ps.c
+SCGM = gsdv_cgm.c gspr_cgm.c
+SQD  = gsdv_qd.c gspr_qd.c
+SX   = gsdv_X.c gspr_X.c
+SOGL = gsdv_GL.c gspr_GL.c
+SJPG = gsdv_jpg.c
+SMPG = gsdv_mpg.c gspr_mpg.c gsmpeg.c
+SPNG = gsdv_png.c
+
+Srcs = gsdv.c gspr.c gsacc.c gsvsp.c gsdv_im.c gsevmn.c               \
+       gsdv_rst.c gspr_rst.c gsdlr.c gsaux.c gsmm.c gsattr.c          \
+       gshigh.c gsrend.c gstxt.c gstx_X.c gsiob.c gsiod.c gsrwi.c     \
+       gsdplt.c gsaxis.c gsscale.c gsdlin.c gscrv.c gscntr.c          \
+       gsncnt.c gsvect.c gsimag.c gssurf.c gsdvb.c gspolf.c           \
+       gsgrot.c gshls.c gsscat.c gsclr.c gsold.c gssfnt.c             \
+       ${SPS} ${SCGM} ${SMPG} ${GRDevicesS}                           \
+       ${gcs}
+
 
 gco = gc-pgs.o
-
-gca = ${TGTLib}(gc-pgs.o)
 
 GObjsA = gsaux.o gsaxis.o gsscale.o gsdlin.o gscrv.o gscntr.o gsvect.o gsimag.o gssurf.o gshls.o gsacc.o
 GObjsB = gsdvb.o gspolf.o gsdplt.o gsgrot.o gsscat.o gsiob.o gsiod.o gsrwi.o
@@ -92,7 +109,7 @@ GObjsC = gsmm.o gsattr.o gstxt.o gsclr.o gshigh.o gsdv.o gspr.o gsvsp.o gsrend.o
 GObjsD = gsdv_im.o gsdv_rst.o gspr_rst.o gsdlr.o gsold.o gssfnt.o
 GObjsE = gsfia.o gsfib.o
 Objs = ${GObjsA} ${GObjsB} ${GObjsC} ${GObjsD} ${GObjsE} \
-       ${gco} ${GRAPHICS_Devices}
+       ${gco} ${GRDevicesO}
 
 OPS  = gsdv_ps.o gspr_ps.o
 OCGM = gsdv_cgm.o gspr_cgm.o
@@ -106,6 +123,8 @@ OPNG = gsdv_png.o
 ${Objs} : ${Hdrs}
 ${OX} : ${XHdr}
 ${OOGL} : ${XHdr}
+
+gca = ${TGTLib}(gc-pgs.o)
 
 ArObjs = ${TGTLib}(gsdv.o) ${TGTLib}(gspr.o) \
          ${TGTLib}(gsacc.o) ${TGTLib}(gsvsp.o) \
@@ -133,7 +152,7 @@ ArJPG = ${TGTLib}(gsdv_jpg.o)
 ArMPG = ${TGTLib}(gsdv_mpg.o) ${TGTLib}(gspr_mpg.o) ${TGTLib}(gsmpeg.o)
 ArPNG = ${TGTLib}(gsdv_png.o)
 
-${LibDep} : ${hdrf} ${Hdrs} ${GRAPHICS_Devices}
+${LibDep} : ${hdrf} ${Hdrs} ${GRDevicesO}
 
 ${ArMPG} : ${MpgHdr}
 ${ArX}   : ${XHdr}
@@ -161,6 +180,10 @@ hdrf = ${IncDir}/gsimag.h ${IncDir}/pgs_gen.h
 IncAction = @pact generate
 
 LibAction = @pact devgen
+
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+build : ${hdrf}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 
 #
 # link 

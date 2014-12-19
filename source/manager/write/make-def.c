@@ -8,14 +8,6 @@
 #include "libdb.c"
 #include "libpsh.c"
 
-#if 0
-set Me = $0
-source $Me:h/pre-common
-source $Me:h/post-common
-
-exit(0)
-#endif
-
 typedef struct s_tgdes tgdes;
 
 struct s_tgdes
@@ -48,7 +40,7 @@ void printrule(FILE *fp, client *cl, char *rule, char *var)
 int main(int c, char **v)
    {int i, rv;
     int ig, ng, it;
-    char r[BFLRG], md[BFLRG], cc_inc[BFLRG];
+    char r[BFLRG],  t[BFLRG], md[BFLRG], cc_inc[BFLRG];
     char *psy_root, *psy_base, *psy_cfg, *psy_load, *psy_inst;
     char *psy_publib;
     char *hsy_os_name, *hsy_os_type, *lostd;
@@ -239,12 +231,16 @@ int main(int c, char **v)
     fprintf(fp, "MDGInc           = %s\n", dbget(cl, FALSE, "MDG_Inc"));
     fprintf(fp, "MDGLib           = %s\n", dbget(cl, FALSE, "MDG_Lib"));
 
-    fprintf(fp, "GRAPHICS_Devices =");
+    r[0] = '\0';
+    t[0] = '\0';
     sa = tokenize(dbget(cl, FALSE, "GRAPHICS_Devices"), " ", 0);
     for (i = 0; sa[i] != NULL; i++)
         {dev = sa[i];
-	 fprintf(fp, " ${%s%s}", osrc, dev);};
+	 vstrcat(t, BFLRG, " ${S%s}", dev);
+	 vstrcat(r, BFLRG, " ${%s%s}", osrc, dev);};
     lst_free(sa);
+    fprintf(fp, "GRDevicesS = %s\n", t);
+    fprintf(fp, "GRDevicesO = %s\n", r);
 
     fprintf(fp, "\n");
 
@@ -285,10 +281,14 @@ int main(int c, char **v)
     lst_free(SynSCM);
 
 /* Parallel I/O */
-    fprintf(fp, "MPassDevices = ${%s%s}\n",
-	    osrc, dbget(cl, FALSE, "DP_METHOD"));
-    fprintf(fp, "IPCDevices   = ${%s%s}\n",
-	    osrc, dbget(cl, FALSE, "STD_IPC"));
+    nstrncpy(r, BFLRG, dbget(cl, FALSE, "DP_METHOD"), -1);
+    fprintf(fp, "MPDevicesS  = ${S%s}\n", r);
+    fprintf(fp, "MPDevicesO  = ${%s%s}\n", osrc, r);
+
+    nstrncpy(r, BFLRG, dbget(cl, FALSE, "STD_IPC"), -1);
+    fprintf(fp, "IPCDevicesS = ${S%s}\n", r);
+    fprintf(fp, "IPCDevicesO = ${%s%s}\n", osrc, r);
+
     fprintf(fp, "\n");
 
     fprintf(fp, "#\n");
@@ -497,6 +497,16 @@ int main(int c, char **v)
     fprintf(fp, "COptimize      = ${CCDefOptimize}\n");
     fprintf(fp, "\n");
 
+/* invocations for ACC whether it is the default or not */
+    fprintf(fp, "ACDefDebug     = %s\n",
+	    dbget(cl, FALSE, "ACC_Debug_Default"));
+    fprintf(fp, "ACDefOptimize  = %s\n",
+	    dbget(cl, FALSE, "ACC_Optimize_Default"));
+    fprintf(fp, "AODC           = ${AC${${OD}}}\n");
+    fprintf(fp, "ACDebug        = ${ACDefDebug}\n");
+    fprintf(fp, "ACOptimize     = ${ACDefOptimize}\n");
+    fprintf(fp, "\n");
+
     if (strcmp(use_acc, "TRUE") == 0)
        {fprintf(fp, "CXCompiler     = a++\n");
 	fprintf(fp, "CXCmpLdr       = a++\n");
@@ -534,6 +544,17 @@ int main(int c, char **v)
     fprintf(fp, "FFLAGS         = %s\n", dbget(cl, FALSE, "FC_Flags"));
     fprintf(fp, "FDebug         = ${FCDefDebug}\n");
     fprintf(fp, "FOptimize      = ${FCDefOptimize}\n");
+    fprintf(fp, "\n");
+
+/* invocations for AFC whether it is the default or not */
+    fprintf(fp, "AFDefDebug     = %s\n",
+	    dbget(cl, FALSE, "AFC_Debug_Default"));
+    fprintf(fp, "AFDefOptimize  = %s\n",
+	    dbget(cl, FALSE, "AFC_Optimize_Default"));
+    fprintf(fp, "AFOptimize     = ${AFDefOptimize}\n");
+    fprintf(fp, "AODF           = ${AF${${OD}}}\n");
+    fprintf(fp, "AFDebug        = ${AFDefDebug}\n");
+    fprintf(fp, "AFOptimize     = ${AFDefOptimize}\n");
     fprintf(fp, "\n");
 
     fprintf(fp, "CCAnnounceFull = ${CC}\n");

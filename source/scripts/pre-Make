@@ -25,7 +25,7 @@ TGTScr = do-local do-stats do-automake distribute \
          scs-add scs-remove scs-lock scs-diff scs-move scs-tag \
          scs-sync scs-revert scs-init \
          var-list winer loco who-does get-line frnsic stan \
-         insert-text
+         insert-text file-time
 
 TGTEtc = csh-subroutines \
          functions-pact.csh functions-pact.sh functions-pact.pl

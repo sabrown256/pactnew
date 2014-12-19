@@ -69,6 +69,33 @@ PySrc = pact/pgs.py pact/pdb.py
 Hdrs = py_int.h pdbmodule.h pdbrw.h pgsmodule.h  \
        pputil.h ppcommon.h
 
+gps = ${PACTGenDir}/gp-score.c ${PACTGenDir}/gp-pml.c ${PACTGenDir}/gp-pdb.c \
+      ${PACTGenDir}/gp-pgs.c ${PACTGenDir}/gp-panacea.c \
+      ${PACTGenDir}/gp-scheme.c
+
+SPPS  = ${PACTSrcDir}/pyscore.c ${PACTSrcDir}/pputil.c \
+        ${PACTSrcDir}/pptypes.c ${PACTSrcDir}/pparrays.c \
+        ${PACTSrcDir}/ppassoc.c ${PACTSrcDir}/struct.c
+
+SPMLS = ${PACTSrcDir}/pypml.c
+
+SPDBS = ${PACTSrcDir}/pypdb.c ${PACTSrcDir}/pdbmodule.c \
+        ${PACTSrcDir}/pdbfile.c ${PACTSrcDir}/pdbdata.c \
+        ${PACTSrcDir}/pypdbr.c ${PACTSrcDir}/pypdbl.c \
+        ${PACTSrcDir}/pypdbd.c
+
+SPGSS = ${PACTSrcDir}/pypgs.c ${PACTSrcDir}/pgsmodule.c
+
+SPANS = ${PACTSrcDir}/pypan.c
+
+SPDB = ${SPPS} ${SPMLS} ${SPDBS} ${SPANS}
+SPGS = ${SPDB} ${SPGSS}
+Srcs = ${SPGS} ${gps}
+
+
+gpo = gp-score.o gp-pml.o gp-pdb.o   \
+      gp-pgs.o gp-panacea.o gp-scheme.o
+
 OPPO  = pyscore.o pputil.o pptypes.o pparrays.o ppassoc.o struct.o
 
 OPMLO = pypml.o
@@ -83,12 +110,6 @@ OPANO = pypan.o
 OPDB = ${OPDBO} ${OPANO} ${OPMLO} ${OPPO}
 OPGS = ${OPDBO} ${OPANO} ${OPMLO} ${OPPO} ${OPGSO}
 Objs = ${OPGS}
-
-gps = gp-score.c gp-pml.c gp-pdb.c   \
-      gp-pgs.c gp-panacea.c gp-scheme.c
-
-gpo = gp-score.o gp-pml.o gp-pdb.o   \
-      gp-pgs.o gp-panacea.o gp-scheme.o
 
 gpa = ${TGTLib}(gp-score.o) ${TGTLib}(gp-pml.o) ${TGTLib}(gp-pdb.o)   \
       ${TGTLib}(gp-pgs.o) ${TGTLib}(gp-panacea.o) ${TGTLib}(gp-scheme.o)
@@ -161,6 +182,10 @@ ${TGTShPGS} : ${TGTLib}
 	  ln -s ${TGTShPGS} _pgs.so ; \
 	  rm -f *.o _____* )
 
+ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+
+build :
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 
 #
 # devgenpy

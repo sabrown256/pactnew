@@ -39,13 +39,17 @@ dbmget $WLog AR_Exe^             \
              CC_Optimize^        \
              CC_Profile^         \
              LD_Exe^             \
+             Lex_Exe^            \
              PACT_CC_FAMILY^     \
              PACT_CC_VERSION^    \
              PACT_CC_PATH^       \
              PACT_CC_EXE^        \
              PSY_Arch^           \
              PSY_Root^           \
-             RPATH
+             PSY_TmpDir^         \
+             RPATH^              \
+             Yacc_Exe^           \
+             Yacc_Flags
             
 setenv BinDir  $PSY_Root/bin
 setenv EtcDir  $PSY_Root/etc
@@ -75,16 +79,16 @@ Note $outf "# ACC - abstract compiler wrapper for $PACT_CC_EXE"
 Note $outf '#'
 Note $outf '# include "cpyright.h"'
 Note $outf '#'
-Note $outf ""
+Note $outf ''
 
 Note $outf 'unalias *'
-Note $outf ""
+Note $outf ''
 
 Note $outf '@ err = 0'
-Note $outf ""
+Note $outf ''
 
 Note $outf "source $EtcDir/env-pact.csh"
-Note $outf ""
+Note $outf ''
 
 Note $outf '@ vrb = 0'
 Note $outf ''
@@ -114,13 +118,13 @@ Note $outf '           set opt = FALSE'
 Note $outf '           breaksw'
 Note $outf '      case -ahelp:'
 Note $outf '           echo ""'
-Note $outf '           echo "Usage: acc [-ag] [-ahelp] [-aO] [-apre <file>] [-aprf] [-avrb] -ao <outf> <args>*"'
+Note $outf '           echo "Usage: acc [-ag] [-ahelp] [-aO] [-apre <file>] [-aprf] [-avrb]* -ao <outf> <args>*"'
 Note $outf '           echo "   ag      compile debuggable"'
 Note $outf '           echo "   ahelp   this help message"'
 Note $outf '           echo "   aO      compile optimized"'
 Note $outf '           echo "   apre    preprocess <file> only"'
 Note $outf '           echo "   aprf    compile for profiling"'
-Note $outf '           echo "   avrb    verbose mode"'
+Note $outf '           echo "   avrb    verbosity level"'
 Note $outf '           echo ""'
 Note $outf '           exit(1)'
 Note $outf '           breaksw'
@@ -155,8 +159,8 @@ Note $outf '      default:'
 Note $outf '           if (("$1" =~ *.a) || ("$1" =~ *.so*)) then'
 Note $outf '              set lib = ( $lib "$1" )'
 
-# the first argument which is an existing C file goes into inf
-Note $outf '           else if (("$1" =~ *.c) && (-f "$1")) then'
+# arguments which are existing C files go into inf
+Note $outf '           else if (("$1" =~ *.[clyh]) && (-f "$1")) then'
 Note $outf '              set inf = ( $inf "$1" )'
 
 # everything goes into lib once lib has anything
@@ -169,19 +173,11 @@ Note $outf '                 set args = ( $args `echo "$1" | sed '"'"'s|\"|+++|g
 Note $outf '              endif'
 Note $outf '           endif'
 
-#Note $outf '           if ("$lib" != "") then'
-#Note $outf '              set lib = ( $lib "$1" )'
-#Note $outf '           else if (-f "$1") then'
-#Note $outf '              set inf = ( $inf "$1" )'
-#Note $outf '           else'
-#Note $outf '              set args = ( $args "$1" )'
-#Note $outf '           endif'
-
 Note $outf '           breaksw'
 Note $outf '   endsw'
 Note $outf '   shift'
 Note $outf 'end'
-Note $outf ""
+Note $outf ''
 
 Note $outf 'if ($vrb > 2) then'
 Note $outf '   echo "inf  = |$inf|"'
@@ -197,19 +193,21 @@ Note $outf 'if ("$inf" == "") then'
 Note $outf '   echo "No input file specified - exiting"'
 Note $outf '   exit(1)'
 Note $outf 'endif'
-Note $outf ""
+Note $outf ''
 
 Note $outf 'if (("$outf" == "") && ("$pref" == "") && ($co == FALSE)) then'
 Note $outf '   echo "No output file specified - exiting"'
 Note $outf '   exit(1)'
 Note $outf 'endif'
-Note $outf ""
+Note $outf ''
 
-Note $outf 'set CC  = ( $exe $args )'
-Note $outf ""
+Note $outf 'set CC   = ( $exe $args )'
+Note $outf "set LEX  = ( $Lex_Exe )"
+Note $outf "set YACC = ( $Yacc_Exe $Yacc_Flags )"
+Note $outf ''
 
-#--------------------------------------------------------------------------'
-#--------------------------------------------------------------------------'
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 # check the compilers database for needed environment variables
 # such as license file, directory paths
@@ -270,7 +268,7 @@ if ("$RPATH" != "") then
    Note $outf 'else'
    Note $outf '   setenv LD_LIBRARY_PATH '$RPATH
    Note $outf 'endif'
-   Note $outf ""
+   Note $outf ''
 endif
 
 #--------------------------------------------------------------------------
@@ -284,7 +282,7 @@ Note $outf '   @ na = $SC_EXEC_N_ATTEMPTS'
 Note $outf 'else'
 Note $outf '   @ na = 1'
 Note $outf 'endif'
-Note $outf ""
+Note $outf ''
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -296,12 +294,12 @@ Note $outf '   set args = ( '$CC_Debug' $args )'
 Note $outf 'else if ($opt == TRUE) then'
 Note $outf '   set args = ( '$CC_Optimize' $args )'
 Note $outf 'endif'
-Note $outf ""
+Note $outf ''
 
 Note $outf 'if ($prf == TRUE) then'
 Note $outf '   set args = ( '$CC_Profile' $args )'
 Note $outf 'endif'
-Note $outf ""
+Note $outf ''
 
 Note $outf 'if ("$pref" != "") then'
 Note $outf '   foreach fi ($inf)'
@@ -315,7 +313,7 @@ Note $outf '      eval $CPP'
 Note $outf '   end'
 Note $outf '   exit($status)'
 Note $outf 'endif'
-Note $outf ""
+Note $outf ''
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -398,7 +396,7 @@ switch ($comp)
 
         breaksw
 endsw
-Note $outf ""
+Note $outf ''
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -408,12 +406,13 @@ Note $outf ""
 Note $outf 'unsetenv PACT_CC_FAMILY'
 Note $outf 'unsetenv PACT_CC_VERSION'
 Note $outf 'unsetenv PACT_CC_PATH'
-Note $outf ""
+Note $outf ''
 
-#if ("$arc" != "") then
-#   set atl = ( time-stamp $arc )
-#   set stl = ( time-stamp $inf )
-#endif
+Note $outf 'if ("$arc" != "") then'
+Note $outf '   set atl = ( file-time $arc )'
+Note $outf '   set stl = ( file-time $inf )'
+Note $outf 'endif'
+Note $outf ''
 
 Note $outf '@ nc = $#inf'
 Note $outf 'set lfo = ""'
@@ -428,20 +427,55 @@ Note $outf '      set co  = TRUE'
 Note $outf '   else'
 Note $outf '      set fo = $outf'
 Note $outf '   endif'
+Note $outf ''
+
+Note $outf '   if ("$arc" != "") then'
+Note $outf '      set tmpdir = $cwd/'$PSY_TmpDir'/obj'
+Note $outf '      if (!(-d $tmpdir)) then'
+Note $outf '         mkdir -p $tmpdir >& /dev/null'
+Note $outf '      endif'
+Note $outf '      set fo = $tmpdir/$fo'
+Note $outf '   else'
+Note $outf '      set tmpdir = .'
+Note $outf '   endif'
+Note $outf ''
+
 Note $outf '   rm -f $fo'
+Note $outf ''
+
+Note $outf 'if ($fi =~ *.l) then'
+Note $outf '   set fl = $fi'
+Note $outf '   set fb = $fi:r'
+Note $outf '   set fi = $fb.c'
+Note $outf '   set ft = $tmpdir/lex.yy.c'
+Note $outf '   ${LEX} -t $fl >&! $ft'
+Note $outf '   sed "s|lex.yy.c|$fi|" $ft | sed "s|yy|${fb}_|g" >&! $fi'
+Note $outf '   rm -f $ft'
+Note $outf 'else if ($fi =~ *.y) then'
+Note $outf '   set fy = $fi'
+Note $outf '   set fb = $fi:r'
+Note $outf '   set fi = $fb.c'
+Note $outf '   set ft = $tmpdir/y.tab.c'
+Note $outf '   rm -f $ft'
+Note $outf '   ${YACC} $fy'
+Note $outf '   sed "s|y.tab.c|$fi|" $ft | sed "s|yy|${fb}_|g" >&! $fi'
+Note $outf '   rm -f $ft'
+Note $outf 'endif'
+Note $outf ''
+
 Note $outf '   if ($co == TRUE) then'
 Note $outf '      set cmd = ( `echo "$CC -o $fo -c $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
 Note $outf '      if ($vrb > 1) then'
 Note $outf '         echo "   $cmd"'
 Note $outf '      else if ($vrb > 0) then'
-Note $outf '         echo "   $exe:t -o $fo -c $fi:t $lib"'
+Note $outf '         echo "   $exe:t -o $fo:t -c $fi:t $lib"'
 Note $outf '      endif'
 Note $outf '   else'
 Note $outf '      set cmd = ( `echo "$CC -o $fo $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
 Note $outf '      if ($vrb > 1) then'
 Note $outf '         echo "   $cmd"'
 Note $outf '      else if ($vrb > 0) then'
-Note $outf '         echo "   $exe:t -o $fo $fi:t $lib"'
+Note $outf '         echo "   $exe:t -o $fo:t $fi:t $lib"'
 Note $outf '      endif'
 Note $outf '   endif'
 Note $outf '   $cmd'
@@ -449,8 +483,12 @@ Note $outf '   @ err = $err + $status'
 Note $outf '   $action'
 Note $outf 'end'
 Note $outf ''
+
 Note $outf 'if ($err == 0) then'
+
+# put .o's into archive
 Note $outf '   if ("$arc" != "") then'
+Note $outf '      pushd $tmpdir >& /dev/null'
 Note $outf '      set cmd = ( '$AR_Exe $AR_IFlag' $arc $lfo )'
 Note $outf '      if ($vrb > 0) then'
 Note $outf '         echo "   '$AR_Exe $AR_IFlag' $arc"'
@@ -462,6 +500,9 @@ Note $outf '         rm -f $lfo'
 Note $outf '      else'
 Note $outf '         @ err = $err + $xstatus'
 Note $outf '      endif'
+Note $outf '      popd >& /dev/null'
+
+# link .o's into another .o
 Note $outf '   else if (("$outf" != "") && ("$lfo" != "")) then'
 Note $outf '      set cmd = ( '$LD_Exe' $args -o $outf $lfo $lib)'
 Note $outf '      if ($vrb > 1) then'
@@ -476,6 +517,7 @@ Note $outf '         rm -f $lfo'
 Note $outf '      else'
 Note $outf '         @ err = $err + $xstatus'
 Note $outf '      endif'
+
 Note $outf '   endif'
 Note $outf 'endif'
 Note $outf ''
