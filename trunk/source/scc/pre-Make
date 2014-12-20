@@ -19,6 +19,8 @@ OD = DefaultO
 CcFlags = -I. -I../.. -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+
 # files to Save for Backup (pact save)
 SaveFiles = *.c *.h *.y *.l
 
@@ -93,7 +95,6 @@ hdrf =
 
 IncAction = 
 
-ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
 build : ${hdrf}
 	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 

@@ -20,6 +20,8 @@ OD = DefaultG
 CcFlags = -I. -I${PACTTmpDir} -I${IncDir} ${MDInc} ${MDI_Inc}
 LdFlags = -L${LibDir}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+
 #
 # Files to remove in directory clean (make clean)
 #
@@ -35,6 +37,8 @@ APIs = ${IncDir}/sqlite3.api ${IncDir}/mysql.api
 #
 # Object Files
 #
+Srcs = trsql.c trsqlg.c trsqlite.c trmysql.c
+
 Objs = trsql.o trsqlg.o trsqlite.o trmysql.o
 
 ArObjs = ${TGTLib}(trsql.o) ${TGTLib}(trsqlg.o) \
@@ -52,3 +56,7 @@ ${Objs} : ${Hdrs} ${APIs}
 ${LibDep} : ${Hdrs} ${APIs}
 
 spoke : ${TGTLib} ${LibDep}
+
+build : ${APIs} ${Hdrs}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+

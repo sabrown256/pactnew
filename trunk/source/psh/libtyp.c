@@ -48,6 +48,12 @@
      (_t->alias == NULL) &&                                                  \
      ((_t->g != KIND_POINTER) || (_t->id == std_pointer_id)))
 
+#ifdef __cplusplus
+# define DEF_FUNCTION_PTR(_t, _n) typedef _t (*PF##_n)(...)
+#else
+# define DEF_FUNCTION_PTR(_t, _n) typedef _t (*PF##_n)(void)
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 # ifndef SCOPE_SCORE_COMPILE
@@ -287,6 +293,37 @@ char *fix_component(char *tc, char *t)
 
     if (IS_NULL(rv) == TRUE)
        rv = STRSAVE(t);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FIX_CAMELCASE - make up a camel case version of the type T */
+
+char *fix_camelcase(char *t)
+   {int n;
+    char s[BFSML], r[BFSML];
+    char **sa, *rv;
+
+    rv = subst(t, "_t", "", -1);
+    sa = tokenize(rv, " _\t", 0);
+
+/* capitolize each token for a camel case version of type name */
+    for (n = 0; sa[n] != NULL; n++)
+        sa[n][0] = toupper(sa[n][0]);
+
+    if (sa[n-1][0] == '*')
+       snprintf(s, BFSML, "%s%s",
+                subst(sa[n-1], "*", "P", -1),
+                concatenate(r, BFSML, sa, 0, n-1, ""));
+    else
+       snprintf(s, BFSML, "%s",
+		concatenate(r, BFSML, sa, 0, -1, ""));
+
+    free_strings(sa);
+
+    rv = STRSAVE(s);
 
     return(rv);}
 

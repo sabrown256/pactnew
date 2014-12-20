@@ -93,6 +93,10 @@ Note $outf ''
 Note $outf '@ vrb = 0'
 Note $outf ''
 
+Note $outf "set fdbg = ( $CC_Debug )"
+Note $outf "set fopt = ( $CC_Optimize )"
+Note $outf "set fprf = ( $CC_Profile )"
+
 Note $outf "set exe  = $exe"
 Note $outf 'set co   = FALSE'
 Note $outf 'set dbg  = FALSE'
@@ -179,16 +183,6 @@ Note $outf '   shift'
 Note $outf 'end'
 Note $outf ''
 
-Note $outf 'if ($vrb > 2) then'
-Note $outf '   echo "inf  = |$inf|"'
-Note $outf '   echo "outf = |$outf|"'
-Note $outf '   echo "co   = |$co|"'
-Note $outf '   echo "arc  = |$arc|"'
-Note $outf '   echo "args = |$args|"'
-Note $outf '   echo "lib  = |$lib|"'
-Note $outf 'endif'
-Note $outf ''
-
 Note $outf 'if ("$inf" == "") then'
 Note $outf '   echo "No input file specified - exiting"'
 Note $outf '   exit(1)'
@@ -201,7 +195,7 @@ Note $outf '   exit(1)'
 Note $outf 'endif'
 Note $outf ''
 
-Note $outf 'set CC   = ( $exe $args )'
+Note $outf 'set CI   = ( $exe $args )'
 Note $outf "set LEX  = ( $Lex_Exe )"
 Note $outf "set YACC = ( $Yacc_Exe $Yacc_Flags )"
 Note $outf ''
@@ -289,18 +283,6 @@ Note $outf ''
 
 # check abstract options
 
-Note $outf 'if ($dbg == TRUE) then'
-Note $outf '   set args = ( '$CC_Debug' $args )'
-Note $outf 'else if ($opt == TRUE) then'
-Note $outf '   set args = ( '$CC_Optimize' $args )'
-Note $outf 'endif'
-Note $outf ''
-
-Note $outf 'if ($prf == TRUE) then'
-Note $outf '   set args = ( '$CC_Profile' $args )'
-Note $outf 'endif'
-Note $outf ''
-
 Note $outf 'if ("$pref" != "") then'
 Note $outf '   foreach fi ($inf)'
 Note $outf "      set cpp = $lcpp"
@@ -350,6 +332,7 @@ switch ($comp)
         Note $outf 'endif'
 
         Note $outf 'unset root'
+        Note $outf 'unset lvers'
         breaksw
 
    case pgcc:
@@ -401,126 +384,7 @@ Note $outf ''
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# these are variables which may be used elsewhere
-# we are done with them - so unset them
-Note $outf 'unsetenv PACT_CC_FAMILY'
-Note $outf 'unsetenv PACT_CC_VERSION'
-Note $outf 'unsetenv PACT_CC_PATH'
-Note $outf ''
-
-Note $outf 'if ("$arc" != "") then'
-Note $outf '   set atl = ( file-time $arc )'
-Note $outf '   set stl = ( file-time $inf )'
-Note $outf 'endif'
-Note $outf ''
-
-Note $outf '@ nc = $#inf'
-Note $outf 'set lfo = ""'
-Note $outf ''
-
-Note $outf 'foreach fi ($inf)'
-Note $outf '   if ($nc > 1) then'
-Note $outf '      set ft  = $fi:t'
-Note $outf '      set fo  = $ft:r.o'
-Note $outf '      set lfo = ( $lfo $fo )'
-Note $outf '      set co  = TRUE'
-Note $outf '   else'
-Note $outf '      set fo = $outf'
-Note $outf '   endif'
-Note $outf ''
-
-Note $outf '   if ("$arc" != "") then'
-Note $outf '      set tmpdir = $cwd/'$PSY_TmpDir'/obj'
-Note $outf '      if (!(-d $tmpdir)) then'
-Note $outf '         mkdir -p $tmpdir >& /dev/null'
-Note $outf '      endif'
-Note $outf '      set fo = $tmpdir/$fo'
-Note $outf '   else'
-Note $outf '      set tmpdir = .'
-Note $outf '   endif'
-Note $outf ''
-
-Note $outf '   rm -f $fo'
-Note $outf ''
-
-Note $outf 'if ($fi =~ *.l) then'
-Note $outf '   set fl = $fi'
-Note $outf '   set fb = $fi:r'
-Note $outf '   set fi = $fb.c'
-Note $outf '   set ft = $tmpdir/lex.yy.c'
-Note $outf '   ${LEX} -t $fl >&! $ft'
-Note $outf '   sed "s|lex.yy.c|$fi|" $ft | sed "s|yy|${fb}_|g" >&! $fi'
-Note $outf '   rm -f $ft'
-Note $outf 'else if ($fi =~ *.y) then'
-Note $outf '   set fy = $fi'
-Note $outf '   set fb = $fi:r'
-Note $outf '   set fi = $fb.c'
-Note $outf '   set ft = $tmpdir/y.tab.c'
-Note $outf '   rm -f $ft'
-Note $outf '   ${YACC} $fy'
-Note $outf '   sed "s|y.tab.c|$fi|" $ft | sed "s|yy|${fb}_|g" >&! $fi'
-Note $outf '   rm -f $ft'
-Note $outf 'endif'
-Note $outf ''
-
-Note $outf '   if ($co == TRUE) then'
-Note $outf '      set cmd = ( `echo "$CC -o $fo -c $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
-Note $outf '      if ($vrb > 1) then'
-Note $outf '         echo "   $cmd"'
-Note $outf '      else if ($vrb > 0) then'
-Note $outf '         echo "   $exe:t -o $fo:t -c $fi:t $lib"'
-Note $outf '      endif'
-Note $outf '   else'
-Note $outf '      set cmd = ( `echo "$CC -o $fo $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
-Note $outf '      if ($vrb > 1) then'
-Note $outf '         echo "   $cmd"'
-Note $outf '      else if ($vrb > 0) then'
-Note $outf '         echo "   $exe:t -o $fo:t $fi:t $lib"'
-Note $outf '      endif'
-Note $outf '   endif'
-Note $outf '   $cmd'
-Note $outf '   @ err = $err + $status'
-Note $outf '   $action'
-Note $outf 'end'
-Note $outf ''
-
-Note $outf 'if ($err == 0) then'
-
-# put .o's into archive
-Note $outf '   if ("$arc" != "") then'
-Note $outf '      pushd $tmpdir >& /dev/null'
-Note $outf '      set cmd = ( '$AR_Exe $AR_IFlag' $arc $lfo )'
-Note $outf '      if ($vrb > 0) then'
-Note $outf '         echo "   '$AR_Exe $AR_IFlag' $arc"'
-Note $outf '      endif'
-Note $outf '      $cmd'
-Note $outf '      @ xstatus = $status'
-Note $outf '      if ($xstatus == 0) then'
-Note $outf '         rm -f $lfo'
-Note $outf '      else'
-Note $outf '         @ err = $err + $xstatus'
-Note $outf '      endif'
-Note $outf '      popd >& /dev/null'
-
-# link .o's into another .o
-Note $outf '   else if (("$outf" != "") && ("$lfo" != "")) then'
-Note $outf '      set cmd = ( '$LD_Exe' $args -o $outf $lfo $lib)'
-Note $outf '      if ($vrb > 1) then'
-Note $outf '         echo "   $cmd"'
-Note $outf '      else if ($vrb > 0) then'
-Note $outf '         echo "   '$LD_Exe:t' -o $outf $lib"'
-Note $outf '      endif'
-Note $outf '      $cmd'
-Note $outf '      @ xstatus = $status'
-Note $outf '      if ($xstatus == 0) then'
-Note $outf '         rm -f $lfo'
-Note $outf '      else'
-Note $outf '         @ err = $err + $xstatus'
-Note $outf '      endif'
-
-Note $outf '   endif'
-Note $outf 'endif'
-Note $outf ''
+cat write/acbe >>& $outf
 
 Note $outf 'exit($err)'
 

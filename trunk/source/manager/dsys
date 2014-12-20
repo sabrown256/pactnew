@@ -226,6 +226,7 @@ switch ($Cmnd)
 #        set Args = "-dbg"
         set Args = ""
         set Tgts = ""
+        set BTgt = build
         while ($#argv > 0)
            switch ($1)
               case -a:
@@ -264,7 +265,7 @@ switch ($Cmnd)
                    endif
                    breaksw
               case -l :
-                   set MTgt = lib
+                   set BTgt = lib
                    breaksw
               case -s :
                    set MTgt = shared
@@ -330,8 +331,8 @@ switch ($Cmnd)
            flog $Log setenv  SC_EXEC_TIME_FACTOR     80
            flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
 
-           Note $Log "pact -log $Log -f $EtcDir/Makefile $Args $MTgt"
-           pact -log $Log -f $EtcDir/Makefile $Args $MTgt
+           Note $Log "pact -log $Log -f $EtcDir/Makefile $Args $BTgt"
+           pact -log $Log -f $EtcDir/Makefile $Args $BTgt
            set RStatus = $status
 
            flog $Log popd

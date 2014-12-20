@@ -139,8 +139,6 @@ typedef enum e_SC_task_kind SC_task_kind;
 typedef struct s_SC_iodes SC_iodes;
 typedef struct s_SC_ttydes SC_ttydes;
 
-FUNCTION_POINTER(FILE,  *(*PFPFILE));
-
 struct s_SC_iodes
    {int fd;
     int fid;                /* file descriptor for redirect - 2>&1 type */

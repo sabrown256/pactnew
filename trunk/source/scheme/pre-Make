@@ -24,6 +24,8 @@ OD = DefaultO
 CcFlags = -I. -I../.. -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+
 # files to Save for Backup (pact save)
 SaveFiles = *.c *.h *.scm
 
@@ -199,7 +201,6 @@ IncAction = @pact generate
 
 LibAction = @pact devgen
 
-ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
 build : ${hdrf}
 	pact csynt
 	pact fsynt

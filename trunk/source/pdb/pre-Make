@@ -24,6 +24,8 @@ CcFlags = -I. -I${IncDir} ${MDInc} ${MDI_Inc}
 FcFlags = -I. -I${IncDir}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+
 #
 # Files to Save for Backup (pact save)
 #
@@ -172,12 +174,11 @@ spokef = pdspoke.c
 
 IncAction = @pact generate
 
-LibAction = @(echo "build-spokes" ; build-spokes ; pact devgen)
+LibAction = @(echo "build-spokes" ; build-spokes spoke ; pact devgen)
 
-ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
 build : ${hdrf}
 	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
-	build-spokes
+	build-spokes build
 
 #
 # standard tests

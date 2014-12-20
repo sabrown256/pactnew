@@ -1,0 +1,179 @@
+#
+# ACBE - coding common to all abstract compiler drivers
+#
+# include "cpyright.h"
+#
+
+# check abstract options
+
+set adsp = ""
+if ($dbg == TRUE) then
+   set adsp = ( $adsp -ag )
+   set args = ( $fdbg $args )
+else if ($opt == TRUE) then
+   set adsp = ( $adsp -ao )
+   set args = ( $fopt $args )
+endif
+
+if ($prf == TRUE) then
+   set adsp = ( $adsp -aprf )
+   set args = ( $fprf $args )
+endif
+
+set CI = ( $CI[1] $args )
+
+if ($vrb > 2) then
+   echo "inf  = |$inf|"
+   echo "outf = |$outf|"
+   echo "co   = |$co|"
+   echo "arc  = |$arc|"
+   echo "args = |$args|"
+   echo "lib  = |$lib|"
+endif
+
+unsetenv PACT_CC_FAMILY
+unsetenv PACT_CC_VERSION
+unsetenv PACT_CC_PATH
+
+unsetenv PACT_FC_FAMILY
+unsetenv PACT_FC_VERSION
+unsetenv PACT_FC_PATH
+
+unsetenv PACT_CXX_FAMILY
+unsetenv PACT_CXX_VERSION
+unsetenv PACT_CXX_PATH
+
+set stl = ( `file-time $inf` )
+@ nstl = $#stl
+
+if ("$arc" != "") then
+   set atl = ( `file-time $arc` )
+   @ natl = $#atl
+   set tmpdir = $cwd/z-ognu/obj
+   if (!(-d $tmpdir)) then
+      mkdir -p $tmpdir >& /dev/null
+   endif
+else
+   set tmpdir = .
+endif
+
+@ nc = $#inf
+set lfo = ""
+
+@ lf = 1
+while ($lf < $nstl)
+   set fi = $stl[$lf]
+   @ lf  = $lf + 1
+   @ sts = ( `echo $stl[$lf] | sed 's|-||g'` )
+   @ lf  = $lf + 1
+ 
+   if (($nstl > 2) || ("$arc" != "")) then
+      set co = TRUE
+      set ft = $fi:t
+      set fo = $ft:r.o
+
+      @ i = 1
+      @ ats = 00000000000000
+      while ($i < $natl)
+         if ($atl[$i] == $fo) then
+            @ i   = $i + 1
+            @ ats = ( `echo $atl[$i] | sed 's|-||g'` )
+            break
+         else
+            @ i = $i + 2
+         endif
+      end
+      if ("$sts" < "$ats") then
+         if ($vrb > 1) then
+            echo "   $fo up to date: $sts < $ats"
+         endif
+         continue
+      endif
+
+      set lfo = ( $lfo $fo )
+      set fo  = $tmpdir/$fo
+   else
+      set fo = $outf
+   endif
+
+   rm -f $fo
+
+   if ($fi =~ *.l) then
+      set fl = $fi
+      set fb = $fi:r
+      set fi = $fb.c
+      set ft = $tmpdir/lex.yy.c
+      ${LEX} -t $fl >&! $ft
+      @ err = $err + $status
+      sed "s|lex.yy.c|$fi|" $ft | sed "s|yy|${fb}_|g" >&! $fi
+      rm -f $ft
+   else if ($fi =~ *.y) then
+      set fy = $fi
+      set fb = $fi:r
+      set fi = $fb.c
+      set ft = $tmpdir/y.tab.c
+      rm -f $ft
+      ${YACC} $fy
+      @ err = $err + $status
+      sed "s|y.tab.c|$fi|" $ft | sed "s|yy|${fb}_|g" >&! $fi
+      rm -f $ft
+   endif
+
+   if ($co == TRUE) then
+      set cmd = ( `echo "$CI -o $fo -c $fi $lib" | sed 's|+++|\"|g'` )
+      if ($vrb > 1) then
+         echo "   $cmd"
+      else if ($vrb > 0) then
+         echo "   $exe:t $adsp -o $fo:t -c $fi:t $lib"
+      endif
+   else
+      set cmd = ( `echo "$CI -o $fo $fi $lib" | sed 's|+++|\"|g'` )
+      if ($vrb > 1) then
+         echo "   $cmd"
+      else if ($vrb > 0) then
+         echo "   $exe:t $adsp -o $fo:t $fi:t $lib"
+      endif
+   endif
+   $cmd
+   @ err = $err + $status
+   $action
+end
+
+if ($err == 0) then
+   if ("$arc" != "") then
+      if ("$lfo" != "") then
+         pushd $tmpdir >& /dev/null
+         set cmd = ( ar rsc $arc $lfo )
+         if ($vrb > 0) then
+            echo "   ar rsc $arc"
+         endif
+         $cmd
+         @ xstatus = $status
+         if ($xstatus == 0) then
+            rm -f $lfo
+         else
+            @ err = $err + $xstatus
+         endif
+         popd >& /dev/null
+      else
+         if ($vrb > 1) then
+            echo "   nothing to be done for $arc"
+         endif
+      endif
+   else if (("$outf" != "") && ("$lfo" != "")) then
+      set cmd = ( /usr/bin/ld $args -o $outf $lfo $lib)
+      if ($vrb > 1) then
+         echo "   $cmd"
+      else if ($vrb > 0) then
+         echo "   ld $adsp -o $outf $lib"
+      endif
+      $cmd
+      @ xstatus = $status
+      if ($xstatus == 0) then
+         rm -f $lfo
+      else
+         @ err = $err + $xstatus
+      endif
+   endif
+endif
+

@@ -20,6 +20,8 @@ OD = DefaultG
 CcFlags = -I${IncDir} ${MDInc} ${MDI_Inc}
 LdFlags = -L${LibDir} ${MechDepLib}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+
 #
 # Files to remove in directory clean (make clean)
 #
@@ -35,6 +37,8 @@ APIs = ${IncDir}/hdf5.api
 #
 # Object Files
 #
+Srcs = trhdf5.c
+
 Objs = trhdf5.o
 
 ArObjs = ${TGTLib}(trhdf5.o)
@@ -47,3 +51,7 @@ ${Objs} : ${Hdrs} ${APIs}
 ${LibDep} : ${Hdrs} ${APIs}
 
 spoke : ${TGTLib} ${LibDep}
+
+build : ${APIs} ${Hdrs}
+	acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+

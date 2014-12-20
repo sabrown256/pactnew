@@ -47,6 +47,8 @@ OD = DefaultG
 CcFlags = -I${IncDir} -I. ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+
 #
 # Files to Save for Backup (pact save)
 #
@@ -179,7 +181,6 @@ IncAction = @pact generate
 
 LibAction = @(echo "build-ext" ; build-ext ; pact devgen)
 
-ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
 build : ${IncDir}/sx_gen.h ${hdrf}
 	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 	build-ext

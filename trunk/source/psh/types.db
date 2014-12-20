@@ -52,6 +52,9 @@ standard = {
  "long double _Complex" ldcx   COMPLEX    B_T   -LDBL_MAX  LDBL_MAX    0.0    complex(16)   -        "long double"   -         -
  "quaternion"           qut    QUATERNION B_T   -DBL_MAX   DBL_MAX     Q_ZERO -             -        "double"        -         -
  "FILE"                 file   STRUCT     B_T   -          -           NULL   -             -        -               -         -
+ "type_group"           tgrp   ENUM       B_T   KIND_CHAR  KIND_OTHER  KIND_CHAR -          -        -               -         -
+ "type_kind"            tknd   ENUM       B_T   TK_PRIMITIVE  TK_META  TK_PRIMITIVE -       -        -               -         -
+ "pcons"                pcns   STRUCT     B_T   -          -           NULL   -             -        -               -         -
 }
 
 #--------------------------------------------------------------------------

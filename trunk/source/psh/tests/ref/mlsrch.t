@@ -1332,6 +1332,12 @@ static PFPM_find_index
                 NULL,
                 NULL,
                 NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
    };
 
 /*--------------------------------------------------------------------------*/
@@ -1366,6 +1372,12 @@ static PF_PM_find_index_fast
                 _PM_find_index_fast_dbl,
                 NULL,
                 _PM_find_index_fast_ldbl,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
                 NULL,
                 NULL,
                 NULL,
@@ -1477,6 +1489,12 @@ static PF_PM_find_value
                 NULL,
                 NULL,
                 NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
    };
 
 /*--------------------------------------------------------------------------*/
@@ -1513,6 +1531,12 @@ static PFPM_min_max
                 PM_min_max_dbl,
                 NULL,
                 PM_min_max_ldbl,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
                 NULL,
                 NULL,
                 NULL,

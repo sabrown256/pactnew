@@ -11,8 +11,8 @@
 /* DEF_TYPE_MANAGER - generate type definitions for SCORE type manager */
 
 static void def_type_manager(FILE *fp, int ne, typdes *tl)
-   {int id, nv;
-    char **tia, **tma;
+   {int id;
+    char **tia;
     typdes *td, *tp;
 
     fprintf(fp, "#define REAL double\n");
@@ -38,10 +38,21 @@ static void def_type_manager(FILE *fp, int ne, typdes *tl)
     fprintf(fp, "#define N_PRIMITIVE_FP    %d\n", type_counts[KIND_FLOAT]);
     fprintf(fp, "#define N_PRIMITIVE_CPX   %d\n", type_counts[KIND_COMPLEX]);
     fprintf(fp, "#define N_PRIMITIVE_QUT   %d\n", type_counts[KIND_QUATERNION]);
+    fprintf(fp, "#define N_SPECIAL_ENUM    %d\n", type_counts[KIND_ENUM]);
+    fprintf(fp, "#define N_SPECIAL_STRUCT  %d\n", type_counts[KIND_STRUCT]);
+    fprintf(fp, "#define N_SPECIAL_UNION   %d\n", type_counts[KIND_UNION]);
     fprintf(fp, "\n");
 
     fprintf(fp, "#define N_PRIMITIVES     %d\n", N_PRIMITIVES);
     fprintf(fp, "#define N_TYPES          %d\n", N_TYPES);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "#undef DEF_FUNCTION_PTR\n");
+    fprintf(fp, "#ifdef __cplusplus\n");
+    fprintf(fp, "# define DEF_FUNCTION_PTR(_t, _n) typedef _t (*PF##_n)(...)\n");
+    fprintf(fp, "#else\n");
+    fprintf(fp, "# define DEF_FUNCTION_PTR(_t, _n) typedef _t (*PF##_n)(void)\n");
+    fprintf(fp, "#endif\n");
     fprintf(fp, "\n");
 
 /* define the default static type set macro */
@@ -90,40 +101,30 @@ static void def_type_manager(FILE *fp, int ne, typdes *tl)
 
 /* #define index and name variables - e.g. SC_INT_S, SC_INT_S */
     tia = NULL;
-    tma = NULL;
-    nv = 0;
-    for (id = 0; id < ne; )
-        {td = tl + id++;
-	 tia = lst_push(tia, "#define %s\t\tSC_gs.ltyp[%d].i\n",
-			td->typ_i, nv);
-	 tia = lst_push(tia, "#define %s\t\tSC_gs.ltyp[%d].s\n",
-			td->typ_s, nv);
+    for (id = 0; id < ne; id++)
+        {td  = tl + id;
+	 tia = lst_push(tia, "#define %s\t\tSC_gs.stl[%d].id\n",
+			td->typ_i, id);
+	 tia = lst_push(tia, "#define %s\t\tSC_gs.stl[%d].type\n",
+			td->typ_s, id);};
 
-	 if (td->ptr == B_T)
-	    {tp = tl + id++;
-	     tia = lst_push(tia, "#define %s\t\tSC_gs.ltyp[%d].p_i\n",
-			    tp->typ_i, nv);
-	     tia = lst_push(tia, "#define %s\t\tSC_gs.ltyp[%d].p_s\n",
-			    tp->typ_s, nv);
-
-	     tma = lst_push(tma, "   { %3d, \"%s\",\t%3d, \"%s\" },   \t\t\\\n",
-			    td->id, td->type, tp->id, tp->type);}
-	 else
-	    tma = lst_push(tma, "   { %3d, \"%s\", },   \t\t\\\n",
-			   td->id, td->type);
-
-	 nv++;};
-
-    fprintf(fp, "#define SC_TYP_N\t\t%d\n", nv);
     strings_out(fp, tia, 0, -1, B_F);
     fprintf(fp, "\n");
 
-/* define the default type initializer macro */
-    fprintf(fp, "/* these must have the same sequence/values as the dynamic values */\n");
-    fprintf(fp, "\n");
-    fprintf(fp, "#define _SC_DEF_TYP_ {                                                       \\\n");
-    strings_out(fp, tma, 0, -1, B_F);
-    fprintf(fp, "   }\n");
+/* function pointer typedefs for statically defined types */
+    tia = NULL;
+    tia = lst_push(tia, "DEF_FUNCTION_PTR(void, Void);\n");
+    for (id = 0; id < ne; )
+        {td  = tl + id++;
+         if ((td->g != KIND_OTHER) && (td->alias == NULL))
+	    {tia = lst_push(tia, "DEF_FUNCTION_PTR(%s, %s);\n",
+			    td->type, fix_camelcase(td->type));
+	     if (td->ptr == B_T)
+	        {tp  = tl + id++;
+		 tia = lst_push(tia, "DEF_FUNCTION_PTR(%s, %s);\n",
+				tp->type, fix_camelcase(tp->type));};};};
+
+    strings_out(fp, tia, 0, -1, B_F);
     fprintf(fp, "\n");
 
     return;}

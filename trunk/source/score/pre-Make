@@ -28,6 +28,8 @@ CcFlags = -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
 FcFlags = 
 LdFlags = -L${LibDir} ${LDFLAGS}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+
 #
 # Files to Save for Backup (make save)
 #
@@ -102,10 +104,10 @@ Hdrs = scstd.h scapi.h scunix.h scwin32.h scbgl.h \
 APIs = ${IncDir}/bfd.api
 
 #
-# Object Files
+# Source Files
 #
-gcs = gc-type.c gc-score.c
-GSrcs = ${PACTTmpDir}/gc-type.c ${PACTTmpDir}/gc-score.c
+gcs = gc_type.c gc-score.c
+GSrcs = ${PACTTmpDir}/gc_type.c ${PACTTmpDir}/gc-score.c
 
 DSrcs = scmkdp.c scmkpr.c scar.c sctar.c scfcnr.c
 
@@ -136,8 +138,10 @@ Srcs = ${DSrcs} ${ESrcs} ${MSrcs} ${PSrcs} ${TSrcs} ${OSSrcs} \
        sclexs.c sctrk.c sclog.c scold.c scf77lr.l \
        ${GSrcs}
 
-
-gco = gc-type.o gc-score.o
+#
+# Object Files
+#
+gco = gc_type.o gc-score.o
 
 DObjs = scmkdp.o scmkpr.o scar.o sctar.o scfcnr.o
 
@@ -167,7 +171,10 @@ Objs = ${EObjs} ${MObjs} ${PObjs} ${TObjs} ${OSSObjs} \
        scstr.o scrsca.o scrscb.o \
        sclexs.o sctrk.o sclog.o scold.o scf77lr.o
 
-gca = ${TGTLib}(gc-type.o) ${TGTLib}(gc-score.o)
+#
+# Archive Files
+#
+gca = ${TGTLib}(gc_type.o) ${TGTLib}(gc-score.o)
 
 ArDObjs = ${TGTLib}(scmkdp.o) ${TGTLib}(scmkpr.o) ${TGTLib}(scar.o) \
           ${TGTLib}(sctar.o) ${TGTLib}(scfcnr.o)
@@ -242,31 +249,33 @@ ${MMDep}  : ${Hdrs}
 
 # generated headers and sources
 
-${PACTTmpDir}/gc-type.c :
-	@(echo "template -gc -o ${PACTTmpDir}/gc-type.c" ; \
-	  ${CROSS_FE} template -gc -o ${PACTTmpDir}/gc-type.c)
+${PACTTmpDir}/gc_type.c :
+	@(echo "template -gc -o ${PACTTmpDir}/gc_type.c" ; \
+	  ${CROSS_FE} template -gc -o ${PACTTmpDir}/gc_type.c)
 
-${PACTTmpDir}/gc-type.h :
-	@(echo "template -gh -o ${PACTTmpDir}/gc-type.h" ; \
-	  ${BinDir}/template -gh -o ${PACTTmpDir}/gc-type.h)
+${PACTTmpDir}/gc_type.h :
+	@(echo "template -gh -o ${PACTTmpDir}/gc_type.h" ; \
+	  ${BinDir}/template -gh -o ${PACTTmpDir}/gc_type.h)
 
 ${IncDir}/scfnca.h : scfnca.t
 	@(echo "template scfnca.t -o ${IncDir}/scfnca.h" ;  \
 	  ${BinDir}/template scfnca.t -o ${IncDir}/scfnca.h)
 
-GenInc = ${PACTTmpDir}/gc-type.h ${PACTTmpDir}/gc-score.h
+GenInc = ${PACTTmpDir}/gc_type.h ${PACTTmpDir}/gc-score.h
 
 ${IncDir}/score_gen.h : ${GenInc}
 	@echo "build score_gen.h"
 	@rm -f ${IncDir}/score_gen.h
 	@cat ${GenInc} > ${IncDir}/score_gen.h
 
-hdrf = ${PACTTmpDir}/gc-type.h ${PACTTmpDir}/gc-type.c \
-       ${IncDir}/scfnca.h ${IncDir}/score_gen.h
+hdrf = ${GenInc} ${IncDir}/scfnca.h ${IncDir}/score_gen.h
 
 IncAction = @pact generate
 
 LibAction = @pact devgen
+
+build : ${PACTTmpDir}/gc_type.c ${hdrf} ${APIs} ${TGTInc}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 
 #
 # MMLib 
@@ -605,19 +614,17 @@ example : ${TGTLib} example.c
 #       - this is a special target that you cannot build with dmake
 #       - it must be built with smake
 #
-ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
-build : ${APIs} ${LibDep}
-	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
-
-ndmake :
-	@smake mklib
-	@acc ${ACFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 
 dmake :
-	@echo "import-api bfd.def -o ${IncDir}/bfd.api"
-	@import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
-	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+	${PSY_ScrDir}/bproto
+	@smake build
 	@acc ${ACFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
+
+#dmake :
+#	@echo "import-api bfd.def -o ${IncDir}/bfd.api"
+#	@import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
+#	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+#	@acc ${ACFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 
 dmt : ${hdrf}
 	${BinDir}/smake dmake

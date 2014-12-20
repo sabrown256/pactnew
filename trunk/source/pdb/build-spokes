@@ -7,6 +7,24 @@
 
 unalias *
 
+set tgt = spoke
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: build-spokes [-h] <tgt>"
+           echo "   h     this help message"
+           echo "   <tgt> 'spoke' | 'build' (default is spoke)"
+           echo ""
+           exit(1)
+      default:
+           set tgt = $1
+           breaksw
+   endsw
+   shift
+end
+
 cd spokes
 @ err = $err + $status
 
@@ -15,10 +33,10 @@ cd spokes
 @ np = 0
 foreach entry (*)
    if ((-d $entry) && ($entry != CVS)) then
-      echo "          Building $entry spoke"
+      echo "          Building $entry $tgt"
       @ np = $np + 1
       pushd $entry >>& /dev/null
-      pact spoke
+      pact $tgt
       if ($status == 0) then
          @ ns = $ns + 1
       else

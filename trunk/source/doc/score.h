@@ -1,12 +1,10 @@
 TXT: SCORE User's Manual
-MOD: 02/07/2013
+MOD: 12/19/2014
 
 <CENTER>
 <P>
 <H1><font color="#ff0000">$TXT</font></H1>
 <H4>Stewart A. Brown<BR>
-    Dennis Braddy<BR>
-    Gregory Smethells<BR>
 </H4>
 </CENTER>
 
@@ -2176,7 +2174,7 @@ the application is responsible for releasing it with <tt>CFREE</tt>.
 <p>
 
 <pre>
-<I>C Binding: </I>void SC_init(char *msg, PFByte fnc, int sighand, PFByte sigfnc,
+<I>C Binding: </I>void SC_init(char *msg, PFVoid fnc, int sighand, PFVoid sigfnc,
  void *sigctx, int nb, int bfhand, char *bf, int bfsize)
 <I>Fortran Binding: </I>
 <I>SX Binding: </I>

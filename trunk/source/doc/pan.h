@@ -1,5 +1,5 @@
 TXT: PANACEA User's Manual
-MOD: 03/22/2012
+MOD: 12/19/2014
 
 <CENTER>
 <P>
@@ -1444,7 +1444,7 @@ Returns the value of the name space flag in the argument flag. See the PA_SET_NA
 <h4> PA_INSTALL_FUNCTION</h4>
 
 <BLOCKQUOTE>
-PA_install_function(char *name, PFByte fnc)
+PA_install_function(char *name, PFVoid fnc)
 </BLOCKQUOTE>
 
 This function provides a means for applications to make arbitrary procedures known to the PANACEA database. This is critical for interactive or interpreted applications which may need to invoke a function given only its name. It associates an address to which control can be passed with an ASCII name.<p>
@@ -2388,7 +2388,7 @@ This function returns nothing.<p>
 <li>PA_put_mapping(PG_device *dev, PDBfile *file, PM_mapping *f, int plot_type)<br><br>
 <li>PA_sePA_gs.t_data(char *name, C_array *arr, int *pcent)<br><br>
 <li>PA_fill_component(double *data, int len, int *pist, int ne)<br><br>
-<li>PA_build_mapping(PA_plot_request *pr, PFPPM_set build_ran, double t)<br><br>
+<li>PA_build_mapping(PA_plot_request *pr, PM_set *(*build_ran)(PA_plot_request *pr, char *name), double t)<br><br>
 <li>PA_non_time_domain(PA_plot_request *pr)<br><br>
 <li>PA_PR_RANGE_SIZE(PA_plot_request *pr, long n)<br>
 Reset the size of the plot request range.

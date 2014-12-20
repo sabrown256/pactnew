@@ -1,12 +1,11 @@
 TXT: PGS User's Manual
-MOD: 09/12/2014
+MOD: 12/19/2014
 
 <CENTER>
 <P>
 <H1><font color="#ff0000">$TXT</font></H1>
 <H2>Portable Graphics System</H2>
 <H4>Stewart A. Brown
-<BR>Dennis Braddy</H4>
 </CENTER>
 
 <P>
@@ -600,40 +599,40 @@ Given the above list of recognized events, PGS defines a function pointer
 what is done with specific events. The following functions let applications
 assign their function to these hooks.<p>
 
-<I>C Binding: </I>PFByte PG_set_key_down_event_handler(PG_device *d, void 
+<I>C Binding: </I>PFVoid PG_set_key_down_event_handler(PG_device *d, void 
 (*fnc)())
 <BR><I>Fortran Binding: </I>integer pgsekd(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>
-<I>C Binding: </I>PFByte PG_set_key_up_event_handler(PG_device *d, void (*fnc)())
+<I>C Binding: </I>PFVoid PG_set_key_up_event_handler(PG_device *d, void (*fnc)())
 <BR><I>Fortran Binding: </I>integer pgseku(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
-<I>C Binding: </I>PFByte PG_set_mouse_down_event_handler(PG_device *d, void 
+<I>C Binding: </I>PFVoid PG_set_mouse_down_event_handler(PG_device *d, void 
 (*fnc)())
 <BR><I>Fortran Binding: </I>integer pgsemd(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
-<I>C Binding: </I>PFByte PG_set_mouse_up_event_handler(PG_device *d, void 
+<I>C Binding: </I>PFVoid PG_set_mouse_up_event_handler(PG_device *d, void 
 (*fnc)())
 <BR><I>Fortran Binding: </I>integer pgsemu(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
-<I>C Binding: </I>PFByte PG_set_update_event_handler(PG_device *d, void (*fnc)())
+<I>C Binding: </I>PFVoid PG_set_update_event_handler(PG_device *d, void (*fnc)())
 <BR><I>Fortran Binding: </I>integer pgseup(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
-<I>C Binding: </I>PFByte PG_set_expose_event_handler(PG_device *d, void (*fnc)())
+<I>C Binding: </I>PFVoid PG_set_expose_event_handler(PG_device *d, void (*fnc)())
 <BR><I>Fortran Binding: </I>integer pgseex(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
-<I>C Binding: </I>PFByte PG_set_default_event_handler(PG_device *d, void (*fnc)())
+<I>C Binding: </I>PFVoid PG_set_default_event_handler(PG_device *d, void (*fnc)())
 <BR><I>Fortran Binding: </I>integer pgsedf(integer d, fnc)
 <BR><I>SX Binding: </I>
 
@@ -645,7 +644,7 @@ which takes a PG_device pointer and a PG_event pointer as arguments.The
 C routines all return the old value of the hook and the following
 typedef applies:<p>
 
-<UL>typedef void (*PFByte)();</UL>
+<UL>typedef void (*PFVoid)();</UL>
 
 <P>
 <P>
