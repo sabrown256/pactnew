@@ -402,6 +402,12 @@ static PF_SX_diff_primitives
                 NULL,
                 NULL,
                 NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
    };
 
 /*--------------------------------------------------------------------------*/

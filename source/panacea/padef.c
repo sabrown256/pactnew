@@ -326,7 +326,7 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 	         alist1 = SC_add_alist(alist1,
 				       tag_name,
 				       SC_POINTER_S,
-				       SC_VA_ARG(PFByte *));
+				       SC_VA_ARG(PFVoid *));
 		 break;
 
 	    case PA_INFO_TYPE :

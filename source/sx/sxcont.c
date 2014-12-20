@@ -911,8 +911,6 @@ void SX_install_global_vars(SS_psides *si)
     char **axslxf, **axslyf, **axstf, **txtfm;
     PG_rendering *ppty;
 
-    PG_setup_attrs_glb();
-
 /* change default color to rotating */
     PG_set_attrs_glb(TRUE, "line-color", ROTATING, NULL);
 

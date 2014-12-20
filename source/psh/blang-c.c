@@ -146,6 +146,19 @@ static void c_emit_types_hdr(FILE *fh, der_list *sl)
     fprintf(fh, "extern int %s;\n", tl->inm);
     fprintf(fh, "\n");
 
+#if 0
+/* GOTCHA: structs haven't been defined yet, typedef'ing here
+ * doesn't work either
+ */
+/* emit function pointer declaration */
+    snprintf(a, BFLRG, "%s *", tl->cnm);
+    fprintf(fh, "DEF_FUNCTION_PTR (%s, %s);\n",
+	    tl->cnm, fix_camelcase(tl->cnm));
+    fprintf(fh, "DEF_FUNCTION_PTR (%s, %s);\n",
+	    a, fix_camelcase(a));
+    fprintf(fh, "\n");
+#endif
+
     return;}
 
 /*--------------------------------------------------------------------------*/

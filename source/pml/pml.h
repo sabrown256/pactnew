@@ -242,9 +242,6 @@ typedef struct s_PM_mapping PM_mapping;
 typedef struct s_PM_scope_public PM_scope_public;
 typedef struct s_sort_link sort_link;
 
-FUNCTION_POINTER(PM_set, *(*PFPPM_set));
-FUNCTION_POINTER(PM_mapping, *(*PFPPM_mapping));
-
 enum e_PM_binary_operation
    {PM_PLUS = 1, PM_MINUS, PM_TIMES, PM_DIVIDE,
     PM_INTERSECT, PM_UNION};
@@ -382,11 +379,11 @@ struct s_PM_polygon
  */
 
 struct s_PM_field
-   {PFByte add;
-    PFByte sub;
-    PFByte scalar_mult;
-    PFByte mult;
-    PFByte div;};
+   {PFVoid add;
+    PFVoid sub;
+    PFVoid scalar_mult;
+    PFVoid mult;
+    PFVoid div;};
 
 /* PM_CONIC_CURVE - quadratic line descriptor */
 

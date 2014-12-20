@@ -20,6 +20,8 @@ OD = DefaultG
 CcFlags = -I. -I${IncDir} ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+
 #
 # Files to remove in directory clean (make clean)
 #
@@ -33,6 +35,8 @@ Hdrs = trnacf.h ../../pdb_int.h
 #
 # Object Files
 #
+Srcs = trnaca.c
+
 Objs = trnaca.o
 
 ArObjs = ${TGTLib}(trnaca.o)
@@ -41,3 +45,7 @@ ${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs}
 
 spoke : ${TGTLib} ${LibDep}
+
+build : ${Hdrs}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+

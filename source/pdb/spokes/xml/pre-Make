@@ -20,6 +20,8 @@ OD = DefaultG
 CcFlags = -I${IncDir} ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+
 #
 # Files to remove in directory clean (make clean)
 #
@@ -33,6 +35,8 @@ Hdrs = trxml.h ../../pdb_int.h
 #
 # Object Files
 #
+Srcs = trxml.c trxmlp.c trxmldtd.c trxmlxsd.c
+
 Objs = trxml.o trxmlp.o trxmldtd.o trxmlxsd.o
 
 ArObjs = ${TGTLib}(trxml.o) ${TGTLib}(trxmlp.o)        \
@@ -43,3 +47,7 @@ ${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs}
 
 spoke : ${TGTLib} ${LibDep}
+
+build : ${Hdrs}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+

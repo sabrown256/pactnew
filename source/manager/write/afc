@@ -20,7 +20,7 @@ source $Me:h/pre-common
 
 Note $WLog "----- write/afc -----"
 Note $WLog "Write: afc"
-Note $WLog ""
+Note $WLog ''
 
 HAVE_SUBROUTINES
 
@@ -30,7 +30,7 @@ HAVE_SUBROUTINES
 Separator $WLog
 
 NoteD $WLog "   Abstract Fortran compiler wrapper - afc"
-Note $WLog ""
+Note $WLog ''
 
 dbmget $WLog AR_Exe^             \
              AR_IFlag^           \
@@ -44,6 +44,7 @@ dbmget $WLog AR_Exe^             \
              PACT_FC_EXE^        \
              PSY_Arch^           \
              PSY_Root^           \
+             PSY_TmpDir^         \
              RPATH
             
 setenv BinDir  $PSY_Root/bin
@@ -69,19 +70,23 @@ Note $outf "# AFC - abstract compiler wrapper for $PACT_FC_EXE"
 Note $outf '#'
 Note $outf '# include "cpyright.h"'
 Note $outf '#'
-Note $outf ""
+Note $outf ''
 
 Note $outf 'unalias *'
-Note $outf ""
+Note $outf ''
 
 Note $outf '@ err = 0'
-Note $outf ""
+Note $outf ''
 
 set wexe = `which $comp`
 if (-x "$wexe") then
 
    Note $outf "source $EtcDir/env-pact.csh"
-   Note $outf ""
+   Note $outf ''
+
+   Note $outf "set fdbg = ( $FC_Debug )"
+   Note $outf "set fopt = ( $FC_Optimize )"
+   Note $outf "set fprf = ( $FC_Profile )"
 
    Note $outf '@ vrb = 0'
    Note $outf ''
@@ -168,32 +173,22 @@ if (-x "$wexe") then
    Note $outf '   endsw'
    Note $outf '   shift'
    Note $outf 'end'
-   Note $outf ""
-
-   Note $outf 'if ($vrb > 2) then'
-   Note $outf '   echo "inf  = |$inf|"'
-   Note $outf '   echo "outf = |$outf|"'
-   Note $outf '   echo "co   = |$co|"'
-   Note $outf '   echo "arc  = |$arc|"'
-   Note $outf '   echo "args = |$args|"'
-   Note $outf '   echo "lib  = |$lib|"'
-   Note $outf 'endif'
    Note $outf ''
 
    Note $outf 'if ("$inf" == "") then'
    Note $outf '   echo "No input file specified - exiting"'
    Note $outf '   exit(1)'
    Note $outf 'endif'
-   Note $outf ""
+   Note $outf ''
 
    Note $outf 'if (("$outf" == "") && ("$pref" == "") && ($co == FALSE)) then'
    Note $outf '   echo "No output file specified - exiting"'
    Note $outf '   exit(1)'
    Note $outf 'endif'
-   Note $outf ""
+   Note $outf ''
 
-   Note $outf 'set FC  = ( $exe $args )'
-   Note $outf ""
+   Note $outf 'set CI  = ( $exe $args )'
+   Note $outf ''
 
 #--------------------------------------------------------------------------'
 #--------------------------------------------------------------------------'
@@ -256,7 +251,7 @@ if (-x "$wexe") then
       Note $outf 'else'
       Note $outf '   setenv LD_LIBRARY_PATH '$RPATH
       Note $outf 'endif'
-      Note $outf ""
+      Note $outf ''
    endif
 
 #--------------------------------------------------------------------------
@@ -270,24 +265,7 @@ if (-x "$wexe") then
    Note $outf 'else'
    Note $outf '   @ na = 1'
    Note $outf 'endif'
-   Note $outf ""
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# check abstract options
-
-   Note $outf 'if ($dbg == TRUE) then'
-   Note $outf '   set args = ( '$FC_Debug' $args )'
-   Note $outf 'else if ($opt == TRUE) then'
-   Note $outf '   set args = ( '$FC_Optimize' $args )'
-   Note $outf 'endif'
-   Note $outf ""
-
-   Note $outf 'if ($prf == TRUE) then'
-   Note $outf '   set args = ( '$FC_Profile' $args )'
-   Note $outf 'endif'
-   Note $outf ""
+   Note $outf ''
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -325,93 +303,12 @@ if (-x "$wexe") then
       case pgf90:
            breaksw
    endsw
-   Note $outf ""
+   Note $outf ''
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# these are variables which may be used elsewhere
-# we are done with them - so unset them
-   Note $outf 'unsetenv PACT_FC_FAMILY'
-   Note $outf 'unsetenv PACT_FC_VERSION'
-   Note $outf 'unsetenv PACT_FC_PATH'
-   Note $outf ""
-
-   Note $outf 'if ("$arc" != "") then'
-   Note $outf '   set atl = ( file-time $arc )'
-   Note $outf '   set stl = ( file-time $inf )'
-   Note $outf 'endif'
-   Note $outf ''
-
-#   Note $outf 'rm -f $outf'
-#   Note $outf 'set cmd = ( $FC -o $outf $inf $lib )'
-
-   Note $outf '@ nc = $#inf'
-   Note $outf 'set lfo = ""'
-   Note $outf ''
-
-   Note $outf 'foreach fi ($inf)'
-   Note $outf '   if ($nc > 1) then'
-   Note $outf '      set ft  = $fi:t'
-   Note $outf '      set fo  = $ft:r.o'
-   Note $outf '      set lfo = ( $lfo $fo )'
-   Note $outf '      set co  = TRUE'
-   Note $outf '   else'
-   Note $outf '      set fo = $outf'
-   Note $outf '   endif'
-   Note $outf '   rm -f $fo'
-   Note $outf '   if ($co == TRUE) then'
-   Note $outf '      set cmd = ( `echo "$FC -o $fo -c $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
-   Note $outf '      if ($vrb > 1) then'
-   Note $outf '         echo "   $cmd"'
-   Note $outf '      else if ($vrb > 0) then'
-   Note $outf '         echo "   $exe:t -o $fo -c $fi:t $lib"'
-   Note $outf '      endif'
-   Note $outf '   else'
-   Note $outf '      set cmd = ( `echo "$FC -o $fo $fi $lib" | sed '"'"'s|+++|\"|g'"'"'` )'
-   Note $outf '      if ($vrb > 1) then'
-   Note $outf '         echo "   $cmd"'
-   Note $outf '      else if ($vrb > 0) then'
-   Note $outf '         echo "   $exe:t -o $fo $fi:t $lib"'
-   Note $outf '      endif'
-   Note $outf '   endif'
-   Note $outf '   $cmd'
-   Note $outf '   @ err = $err + $status'
-   Note $outf '   $action'
-   Note $outf 'end'
-   Note $outf ''
-
-   Note $outf ''
-   Note $outf 'if ($err == 0) then'
-   Note $outf '   if ("$arc" != "") then'
-   Note $outf '      set cmd = ( '$AR_Exe $AR_IFlag' $arc $lfo )'
-   Note $outf '      if ($vrb > 0) then'
-   Note $outf '         echo "   '$AR_Exe $AR_IFlag' $arc"'
-   Note $outf '      endif'
-   Note $outf '      $cmd'
-   Note $outf '      @ xstatus = $status'
-   Note $outf '      if ($xstatus == 0) then'
-   Note $outf '         rm -f $lfo'
-   Note $outf '      else'
-   Note $outf '         @ err = $err + $xstatus'
-   Note $outf '      endif'
-   Note $outf '   else if (("$outf" != "") && ("$lfo" != "")) then'
-   Note $outf '      set cmd = ( '$LD_Exe' $args -o $outf $lfo $lib)'
-   Note $outf '      if ($vrb > 1) then'
-   Note $outf '         echo "   $cmd"'
-   Note $outf '      else if ($vrb > 0) then'
-   Note $outf '         echo "   '$LD_Exe:t' -o $outf $lib"'
-   Note $outf '      endif'
-   Note $outf '      $cmd'
-   Note $outf '      @ xstatus = $status'
-   Note $outf '      if ($xstatus == 0) then'
-   Note $outf '         rm -f $lfo'
-   Note $outf '      else'
-   Note $outf '         @ err = $err + $xstatus'
-   Note $outf '      endif'
-   Note $outf '   endif'
-   Note $outf 'endif'
-   Note $outf ''
+   cat write/acbe >>& $outf
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -420,13 +317,12 @@ else
 
    Note $outf 'echo "No native fortran compiler - exiting"'
    Note $outf '@ err = 1'
+   Note $outf ''
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
-
-Note $outf ""
 
 Note $outf 'exit($err)'
 

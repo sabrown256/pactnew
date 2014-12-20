@@ -22,6 +22,8 @@ OD = DefaultO
 CcFlags = -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
+ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+
 CXX = ${CC_Exe} ${CcFlags}
 
 #
@@ -140,7 +142,6 @@ IncAction = @pact generate
 
 LibAction = @(echo "pact patch-fpe" ; pact patch-fpe ; pact devgen)
 
-ACFlags = -ag -avrb ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
 build : ${hdrf}
 	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 	@pact patch-fpe

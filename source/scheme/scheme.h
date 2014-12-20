@@ -624,8 +624,7 @@ struct s_object
     void (*print)(SS_psides *si, object *obj, object *strm);
     void (*release)(SS_psides *si, object *obj);};
 
-FUNCTION_POINTER(object, (*PFObject));
-FUNCTION_POINTER(object, *(*PFPObject));
+DEF_FUNCTION_PTR(object *, PObject);
 
 typedef int (*PFPrChIn)(object *str, int ign_ws);
 typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);

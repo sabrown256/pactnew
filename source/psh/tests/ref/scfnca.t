@@ -119,6 +119,12 @@ static PFSC_unpack_bits
                 NULL,
                 NULL,
                 NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
    };
 
 

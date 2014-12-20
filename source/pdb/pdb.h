@@ -649,9 +649,8 @@ struct s_memdes
     long number;
     memdes *next;};
 
-FUNCTION_POINTER(memdes, *(*PFPmemdes));
-
 /* symbol table entry indirects */
+
 struct s_symindir
    {int64_t addr;
     long n_ind_type;

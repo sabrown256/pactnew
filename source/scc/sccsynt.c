@@ -10,7 +10,7 @@
 
 #include "scc_int.h"
 
-FUNCTION_POINTER(expr, *(*PFPExpr));
+DEF_FUNCTION_PTR(expr *, PExpr);
 
 /*--------------------------------------------------------------------------*/
 

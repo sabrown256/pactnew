@@ -18,12 +18,12 @@
 	    								    
 /* GOTCHA: handle all primitive types as for SCHEME and SX */
 PM_field
- _fp_opers      = {(PFByte) PM_fplus,  (PFByte) PM_fminus,   NULL,
-		   (PFByte) PM_ftimes, (PFByte) PM_fdivide},
- _int_opers     = {(PFByte) PM_iplus,  (PFByte) PM_iminus,   NULL, 
-	 	   (PFByte) PM_itimes, (PFByte) PM_idivide},
- _long_opers    = {(PFByte) PM_lplus,  (PFByte) PM_lminus,   NULL, 
-                   (PFByte) PM_ltimes, (PFByte) PM_ldivide};
+ _fp_opers      = {(PFVoid) PM_fplus,  (PFVoid) PM_fminus,   NULL,
+		   (PFVoid) PM_ftimes, (PFVoid) PM_fdivide},
+ _int_opers     = {(PFVoid) PM_iplus,  (PFVoid) PM_iminus,   NULL, 
+	 	   (PFVoid) PM_itimes, (PFVoid) PM_idivide},
+ _long_opers    = {(PFVoid) PM_lplus,  (PFVoid) PM_lminus,   NULL, 
+                   (PFVoid) PM_ltimes, (PFVoid) PM_ldivide};
 
 PM_scope_public
  PM_gs = { &_fp_opers, &_int_opers, &_long_opers,

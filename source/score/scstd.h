@@ -158,12 +158,6 @@
 # define FIXNUM long
 #endif
 
-#ifdef __cplusplus
-# define FUNCTION_POINTER(t, n) typedef t n(...)
-#else
-# define FUNCTION_POINTER(t, n) typedef t n(void)
-#endif
-
 /* this is a minor diagnostic that counts unexpected results
  * it will also silence warnings about variables being set but not used
  */
@@ -180,27 +174,6 @@
 # define OFF_T_MAX LONG_MAX
 
 #endif
-
-FUNCTION_POINTER(void, (*PFVoid));
-
-FUNCTION_POINTER(char, (*PFChar));
-FUNCTION_POINTER(int, (*PFInt));
-FUNCTION_POINTER(long, (*PFLong));
-FUNCTION_POINTER(int64_t, (*PFInt64));
-FUNCTION_POINTER(float, (*PFFloat));
-FUNCTION_POINTER(double, (*PFDouble));
-FUNCTION_POINTER(void, (*PFByte));
-
-FUNCTION_POINTER(char, *(*PFPChar));
-FUNCTION_POINTER(int, *(*PFPInt));
-FUNCTION_POINTER(long, *(*PFPLong));
-FUNCTION_POINTER(int64_t, *(*PFPInt64));
-FUNCTION_POINTER(float, *(*PFPFloat));
-FUNCTION_POINTER(double, *(*PFPDouble));
-FUNCTION_POINTER(void, *(*PFPByte));
-FUNCTION_POINTER(void, *(*PFPVoid));
-
-FUNCTION_POINTER(char, **(*PFPPChar));
 
 typedef void (*PFVoidAPV)(void *);
 typedef void *(*PFPVoidAPV)(void *);

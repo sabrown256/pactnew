@@ -13,13 +13,6 @@
 typedef long long int64_t;
 #endif
 
-#define SC_PCONS_P_I                 SC_gs.lityp[0].i
-#define SC_PCONS_P_S                 SC_gs.lityp[0].s
-#define SC_ITYP_N                    1
-
-#define _SC_DEF_ITYP_                                                       \
- { { 37, "pcons *",  } }
-
 /*--------------------------------------------------------------------------*/
 
 /*                           PROCEDURAL MACROS                              */
@@ -39,6 +32,7 @@ typedef long long int64_t;
 #define SC_TYPE_FP_ID(_i)    (((_i) << 1) + SC_FLOAT_I)
 #define SC_TYPE_CPX_ID(_i)   (((_i) << 1) + SC_FLOAT_COMPLEX_I)
 #define SC_TYPE_QUT_ID(_i)   (((_i) << 1) + SC_QUATERNION_I)
+
 
 /* SC_VA_ARG_FETCH - convert a variable arg item to an item of type index _DID
  *                 - NOTE: the variable arg item is read into a char array
@@ -87,25 +81,12 @@ enum e_SC_type_method
 
 typedef enum e_SC_type_method SC_type_method;
 
-#define SC_kind type_group
-
-/* typedef struct s_SC_type SC_type; */
+/* these "link" to the libtyp originals */
+typedef type_group SC_kind;
 typedef typdes SC_type;
 
-typedef struct s_SC_type_label SC_type_label;
 typedef struct s_precisionfp precisionfp;
 typedef struct s_SC_type_manager SC_type_manager;
-
-/* SC_type_label - used for global variables referencing
- * installed type info
- * e.g. SC_INT_I, SC_INT_S, SC_INT_P_I, and SC_INT_P_S
- */
-
-struct s_SC_type_label
-   {int i;
-    char *s;
-    int p_i;
-    char *p_s;};
 
 struct s_precisionfp
    {int digits;
@@ -148,9 +129,6 @@ extern "C" {
 /*                         VARIABLE DECLARATIONS                            */
 
 /*--------------------------------------------------------------------------*/
-
-extern int
- SC_KIND_I;
 
 /*--------------------------------------------------------------------------*/
 

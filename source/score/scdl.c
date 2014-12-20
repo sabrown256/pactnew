@@ -69,7 +69,7 @@ int SC_so_register_func(objindex kind, char *lib, char *name,
 	    se->so    = NULL;
 	    se->f     = NULL;
 
-	    SC_hasharr_install(_SC_dl.tab, name, se, "sodes", 3, TRUE);
+	    SC_hasharr_install(_SC_dl.tab, name, se, "sodes", 3, -1);
 
 	    ok = TRUE;};};
 

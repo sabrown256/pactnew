@@ -22,9 +22,6 @@
  *         for example:  id - SC_SHORT_I  ->  id - SC_INT8_I
  */
 
-int
- SC_KIND_I = -1;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -641,21 +638,14 @@ void SC_fin_type_manager(void)
  */
 
 void SC_init_base_types(void)
-   {int szptr;
+   {
 
     ONCE_SAFE(FALSE, NULL)
-
-       szptr = sizeof(char *);
-
        typdes *tl;
 
        for (tl = SC_gs.stl; tl->type != NULL; tl++)
 	   _SC_type_register(tl->type, tl);
 	   
-       SC_KIND_I    = SC_type_alias("SC_kind", SC_INT_I);
-       SC_PCONS_P_I = SC_type_register(SC_PCONS_P_S, KIND_POINTER,
-				       B_F, szptr, 0);
-
        _SC_set_format_defaults();
 
     END_SAFE;
