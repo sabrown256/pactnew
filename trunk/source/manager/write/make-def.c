@@ -223,6 +223,9 @@ int main(int c, char **v)
 
     fprintf(fp, "\n");
 
+    fprintf(fp, "ExcludeType =\n");
+    fprintf(fp, "\n");
+
 /* graphics devices */
     fprintf(fp, "#\n");
     fprintf(fp, "# Site Dependent Graphics Information\n");

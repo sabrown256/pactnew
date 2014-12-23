@@ -32,9 +32,10 @@ if ($?FirstCommon == 0) then
 
    unset lbin
    unset lroot
-   unset larch
 
    setenv FirstCommon FALSE
+else
+   set larch = `cfgman use`
 endif
 
 source $ldir/functions-pact.csh
@@ -61,6 +62,12 @@ Note $ALog "Current: $cwd"
 Note $ALog "Date: `date`"
 Note $ALog "Temporary file base: $Tmp"
 Note $ALog "Manager directory: $psy_mngdir"
+Note $ALog "Session: $larch"
+if ($?SESSION_CONFIG == 1) then
+   Note $ALog "SESSION_CONFIG: $SESSION_CONFIG"
+else
+   Note $ALog "SESSION_CONFIG: undefined"
+endif
 Note $ALog ""
 
 dbmget $ALog AF_CList =\? ""^           \

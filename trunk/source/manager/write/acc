@@ -46,6 +46,7 @@ dbmget $WLog AR_Exe^             \
              PACT_CC_EXE^        \
              PSY_Arch^           \
              PSY_Root^           \
+             PSY_ScrDir^         \
              PSY_TmpDir^         \
              RPATH^              \
              Yacc_Exe^           \
@@ -60,6 +61,8 @@ flog $WLog set comp = $exe:t
 flog $WLog set outf = $BinDir/acc
 flog $WLog $RM $outf
 flog $WLog touch $outf
+
+flog $WLog cp $PSY_ScrDir/file-time $BinDir
 
 # dbmget chokes getting this one
 set CPP = ( `$BinDir/perdb -f $EtcDir/cfg IRules_CCP` )

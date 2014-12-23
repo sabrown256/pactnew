@@ -1966,7 +1966,7 @@ CFG_DONE:
         set InstF = ""
         set InstF = ( $InstF pact-update code-date )
         set InstF = ( $InstF install-ext )
-        set InstF = ( $InstF ../scripts/{import-api,px,frnsic,sinstall} )
+        set InstF = ( $InstF ../scripts/{import-api,file-time,px,frnsic,sinstall} )
 
 # requiring pact-dist to be run from manager - no need to install
 #        set InstF = ( $InstF pact-dist )
@@ -2439,7 +2439,7 @@ CFG_DONE:
            set BinFiles = ( $BinFiles acc afc a++ acpp aranlib )
            set BinFiles = ( $BinFiles cfgman system-id timer px frnsic )
            set BinFiles = ( $BinFiles do-run elide blang rpath gexec perdb )
-           set BinFiles = ( $BinFiles make-syntax )
+           set BinFiles = ( $BinFiles file-time make-syntax )
            set BinFiles = ( $BinFiles import-api )
            set BinFiles = ( $BinFiles sinstall install-pact install-ext )
         endif
@@ -3843,19 +3843,24 @@ PCO_CONFIG:
       set PArgs = ( $PArgs -ft `echo $flst | sed 's| |-|g'` )
    endif
 
+   Note $Log "SESSION_CONFIG = $SESSION_CONFIG"
+
 # do the main configuration work
    if ("$ucfg" != "") then
+      Note $Log "File config"
       Note $Log "Command: $PCO $PArgs -s $PSY_ID $ucfg"
       $PCO -s $PSY_ID $PArgs $ucfg
       set RStatus = $status
 
    else if ("$dbcfg" != "") then
+      Note $Log "Database config"
       Note $Log "Command: $PCO -s $PSY_ID $PArgs -db $dbcfg"
       $PCO -s $PSY_ID $PArgs -db $dbcfg
       set RStatus = $status
       unset dbcfg
 
    else
+      Note $Log "No config"
       NoteD $Log "There is no $Configuration in $PSY_CONFIG_PATH"
       set RStatus = 3
    endif

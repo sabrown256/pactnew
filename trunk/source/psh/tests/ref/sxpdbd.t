@@ -1,11 +1,11 @@
 /*
- * SXPDBD.H - generated type handling routines - do not edit
+ * SXPDBD_T.H - generated type handling routines - do not edit
  *
  */
 
-#ifndef PCK_SXPDBD
+#ifndef PCK_SXPDBD_T
 
-#define PCK_SXPDBD
+#define PCK_SXPDBD_T
 
 #include "cpyright.h"
 

@@ -1,7 +1,11 @@
 /*
- * GC_TYPE.H - generated type handling routines - do not edit
+ * GC_TYPE_H.H - generated type handling routines - do not edit
  *
  */
+
+#ifndef PCK_GC_TYPE_H
+
+#define PCK_GC_TYPE_H
 
 #include "cpyright.h"
 
@@ -50,7 +54,7 @@ typedef long double float128_t;
    {    7, sizeof(char), "char", "signed char", "unsigned char", "char", "chr", NULL, 1, TK_PRIMITIVE, KIND_CHAR, "SCHAR_MIN", "SCHAR_MAX", "'\0'", "character", "int", "char", "SC_CHAR_I", "SC_CHAR_S", NULL, NULL, NULL }, 	\
    {    8,    8, "char *", "char *", "char *", "char", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "character-A", "int", "char", "SC_STRING_I", "SC_STRING_S", NULL, NULL, NULL }, 	\
    {    9, sizeof(wchar_t), "wchar_t", "wchar_t", "wchar_t", "wchar_t", "wchr", NULL, 1, TK_PRIMITIVE, KIND_CHAR, "WCHAR_MIN", "WCHAR_MAX", "0", NULL, "int", "wchar_t", "SC_WCHAR_I", "SC_WCHAR_S", NULL, NULL, NULL }, 	\
-   {   10,    8, "wchar_t *", "wchar_t *", "wchar_t *", "wchar_t", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "character-A", "int", "wchar_t", "SC_WCHAR_P_I", "SC_WCHAR_P_S", NULL, NULL, NULL }, 	\
+   {   10,    8, "wchar_t *", "wchar_t *", "wchar_t *", "wchar_t", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", "int", "wchar_t", "SC_WCHAR_P_I", "SC_WCHAR_P_S", NULL, NULL, NULL }, 	\
    {   11, sizeof(int8_t), "int8_t", "int8_t", "u_int8_t", "int8_t", "int8", NULL, 1, TK_PRIMITIVE, KIND_INT, "INT8_MIN", "INT8_MAX", "0", "integer(1)", "int", "int8_t", "SC_INT8_I", "SC_INT8_S", NULL, NULL, NULL }, 	\
    {   12,    8, "int8_t *", "int8_t *", "int8_t *", "int8_t", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "integer(1)-A", "int", "int8_t", "SC_INT8_P_I", "SC_INT8_P_S", NULL, NULL, NULL }, 	\
    {   13, sizeof(short), "short", "signed short", "unsigned short", "short", "shrt", NULL, 1, TK_PRIMITIVE, KIND_INT, "SHRT_MIN", "SHRT_MAX", "0", "integer(2)", "int", "short", "SC_SHORT_I", "SC_SHORT_S", NULL, NULL, NULL }, 	\
@@ -74,15 +78,15 @@ typedef long double float128_t;
    {   31, sizeof(long double _Complex), "long double _Complex", "long double _Complex", "long double _Complex", "long_double_complex", "ldcx", NULL, 1, TK_PRIMITIVE, KIND_COMPLEX, "-LDBL_MAX", "LDBL_MAX", "0.0", "complex(16)", NULL, "long double", "SC_LONG_DOUBLE_COMPLEX_I", "SC_LONG_DOUBLE_COMPLEX_S", NULL, NULL, NULL }, 	\
    {   32,    8, "long double _Complex *", "long double _Complex *", "long double _Complex *", "long_double_complex", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "complex(16)-A", NULL, "long double", "SC_LONG_DOUBLE_COMPLEX_P_I", "SC_LONG_DOUBLE_COMPLEX_P_S", NULL, NULL, NULL }, 	\
    {   33, sizeof(quaternion), "quaternion", "quaternion", "quaternion", "quaternion", "qut", NULL, 1, TK_PRIMITIVE, KIND_QUATERNION, "-DBL_MAX", "DBL_MAX", "Q_ZERO", NULL, NULL, "double", "SC_QUATERNION_I", "SC_QUATERNION_S", NULL, NULL, NULL }, 	\
-   {   34,    8, "quaternion *", "quaternion *", "quaternion *", "quaternion", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "character-A", NULL, "double", "SC_QUATERNION_P_I", "SC_QUATERNION_P_S", NULL, NULL, NULL }, 	\
+   {   34,    8, "quaternion *", "quaternion *", "quaternion *", "quaternion", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", NULL, "double", "SC_QUATERNION_P_I", "SC_QUATERNION_P_S", NULL, NULL, NULL }, 	\
    {   35, sizeof(FILE), "FILE", "FILE", "FILE", "file", "file", NULL, 1, TK_STRUCT, KIND_STRUCT, NULL, NULL, "NULL", NULL, NULL, "FILE", "SC_FILE_I", "SC_FILE_S", NULL, NULL, NULL }, 	\
-   {   36,    8, "FILE *", "FILE *", "FILE *", "file", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "character-A", NULL, "FILE", "SC_FILE_P_I", "SC_FILE_P_S", NULL, NULL, NULL }, 	\
+   {   36,    8, "FILE *", "FILE *", "FILE *", "file", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", NULL, "FILE", "SC_FILE_P_I", "SC_FILE_P_S", NULL, NULL, NULL }, 	\
    {   37, sizeof(type_group), "type_group", "type_group", "type_group", "type_group", "tgrp", NULL, 1, TK_ENUM, KIND_ENUM, "KIND_CHAR", "KIND_OTHER", "KIND_CHAR", NULL, NULL, "type_group", "SC_TYPE_GROUP_I", "SC_TYPE_GROUP_S", NULL, NULL, NULL }, 	\
-   {   38,    8, "type_group *", "type_group *", "type_group *", "type_group", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "character-A", NULL, "type_group", "SC_TYPE_GROUP_P_I", "SC_TYPE_GROUP_P_S", NULL, NULL, NULL }, 	\
+   {   38,    8, "type_group *", "type_group *", "type_group *", "type_group", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", NULL, "type_group", "SC_TYPE_GROUP_P_I", "SC_TYPE_GROUP_P_S", NULL, NULL, NULL }, 	\
    {   39, sizeof(type_kind), "type_kind", "type_kind", "type_kind", "type_kind", "tknd", NULL, 1, TK_ENUM, KIND_ENUM, "TK_PRIMITIVE", "TK_META", "TK_PRIMITIVE", NULL, NULL, "type_kind", "SC_TYPE_KIND_I", "SC_TYPE_KIND_S", NULL, NULL, NULL }, 	\
-   {   40,    8, "type_kind *", "type_kind *", "type_kind *", "type_kind", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "character-A", NULL, "type_kind", "SC_TYPE_KIND_P_I", "SC_TYPE_KIND_P_S", NULL, NULL, NULL }, 	\
+   {   40,    8, "type_kind *", "type_kind *", "type_kind *", "type_kind", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", NULL, "type_kind", "SC_TYPE_KIND_P_I", "SC_TYPE_KIND_P_S", NULL, NULL, NULL }, 	\
    {   41, sizeof(pcons), "pcons", "pcons", "pcons", "pcons", "pcns", NULL, 1, TK_STRUCT, KIND_STRUCT, NULL, NULL, "NULL", NULL, NULL, "pcons", "SC_PCONS_I", "SC_PCONS_S", NULL, NULL, NULL }, 	\
-   {   42,    8, "pcons *", "pcons *", "pcons *", "pcons", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "character-A", NULL, "pcons", "SC_PCONS_P_I", "SC_PCONS_P_S", NULL, NULL, NULL }, 	\
+   {   42,    8, "pcons *", "pcons *", "pcons *", "pcons", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", NULL, "pcons", "SC_PCONS_P_I", "SC_PCONS_P_S", NULL, NULL, NULL }, 	\
    {   43, sizeof(int), "enum", "enum", "enum", "enum", "int", "int", 0, TK_PRIMITIVE, KIND_INT, "INT_MIN", "INT_MAX", "0", "integer", NULL, "int", "SC_ENUM_I", "SC_ENUM_S", NULL, NULL, NULL }, 	\
    {   44, sizeof(int), "pboolean", "pboolean", "pboolean", "pboolean", "int", "int", 1, TK_PRIMITIVE, KIND_INT, "INT_MIN", "INT_MAX", "0", "integer", NULL, "int", "SC_PBOOLEAN_I", "SC_PBOOLEAN_S", NULL, NULL, NULL }, 	\
    {   45, sizeof(int), "pboolean *", "pboolean *", "pboolean *", "pboolean", "int *", "int", 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "integer-A", NULL, "int", "SC_PBOOLEAN_P_I", "SC_PBOOLEAN_P_S", NULL, NULL, NULL }, 	\
@@ -474,4 +478,6 @@ typedef char *(*PFStrv)(char *t, int nc, void *s, long n, int mode);
 extern PFStrv
  _SC_strf[];
 
+
+#endif
 

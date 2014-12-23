@@ -330,7 +330,7 @@ set psy_cfg = $PSY_Cfg:t
 # NOTE: technically this should be all of them but that results in
 # bproto being run many times - at least by dmake
     Note $STDOUT '${gcb} :'
-    Note $STDOUT '	@${PSY_ScrDir}/bproto'
+    Note $STDOUT '	@${PSY_ScrDir}/bproto ${ExcludeType}'
     Note $STDOUT ''
 
     Note $STDOUT 'generate : ${gcb} ${hdrf}'

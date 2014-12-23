@@ -151,7 +151,11 @@ static void write_header(FILE *fp, char *inf, int pfl)
     char *p;
 
     nstrncpy(s, BFLRG, inf, -1);
+#if 0
     p = path_tail(upcase(strtok(s, ".\n")));
+#else
+    p = path_tail(upcase(subst(s, ".", "_", -1)));
+#endif
 
     fprintf(fp, "/*\n");
     fprintf(fp, " * %s.H - generated type handling routines - do not edit\n",
@@ -563,8 +567,7 @@ int main(int c, char **v)
     pfl = TRUE;
     if (tgt == 2)
        {nt  = 0;
-	inf = "gc_type.h";
-        pfl = FALSE;}
+	inf = "gc_type.h";}
 
     else if (tgt == 3)
        {nt  = 0;
@@ -590,7 +593,7 @@ int main(int c, char **v)
 	     tm[nt] = t;};};
 
     if (outf != NULL)
-       {snprintf(tmpf, BFLRG, "%s.%d", outf, getpid());
+       {snprintf(tmpf, BFLRG, "%s.%ld", outf, (long) getpid());
 
 /* write a temporary file then rename it at the end
  * so that if the file currently exists it can be used

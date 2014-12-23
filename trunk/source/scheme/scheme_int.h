@@ -37,6 +37,8 @@
 
 /*--------------------------------------------------------------------------*/
 
+typedef object *objp;
+
 typedef struct s_SS_scope_private SS_scope_private;
 typedef struct s_SS_smp_state SS_smp_state;
 typedef object *(*PFSRead)(SS_psides *si, object *str, int c);

@@ -1,11 +1,11 @@
 /*
- * MLSRCH.H - generated type handling routines - do not edit
+ * MLSRCH_T.H - generated type handling routines - do not edit
  *
  */
 
-#ifndef PCK_MLSRCH
+#ifndef PCK_MLSRCH_T
 
-#define PCK_MLSRCH
+#define PCK_MLSRCH_T
 
 #include "cpyright.h"
 

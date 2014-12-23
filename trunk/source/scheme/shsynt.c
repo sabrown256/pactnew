@@ -10,8 +10,6 @@
 
 #include "scheme_int.h"
 
-typedef object *objp;
-
 /*--------------------------------------------------------------------------*/
 
 /*                       LEXICAL ANALYZER SUPPORT                           */

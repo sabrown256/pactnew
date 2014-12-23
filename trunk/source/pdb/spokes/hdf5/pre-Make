@@ -53,5 +53,5 @@ ${LibDep} : ${Hdrs} ${APIs}
 spoke : ${TGTLib} ${LibDep}
 
 build : ${APIs} ${Hdrs}
-	acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 

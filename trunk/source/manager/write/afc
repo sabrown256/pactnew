@@ -276,6 +276,7 @@ if (-x "$wexe") then
 # for some reason they were not built with -rpath
 # this is not for the compiled executables but the compiler
       case gfortran:
+           Note $outf 'set args = ( $args -J'$PSY_TmpDir'/obj )'
            Note $outf 'set root = $exe:h'
            Note $outf 'set root = $root:h'
            Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
@@ -288,6 +289,7 @@ if (-x "$wexe") then
            breaksw
 
       case pathf90:
+           Note $outf 'set args = ( $args -module '$PSY_TmpDir'/obj )'
            Note $outf 'set root  = $exe:h'
            Note $outf 'set root  = $root:h'
            Note $outf 'set lvers = `ls $root/lib`'
