@@ -46,7 +46,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-typedef object *objp;
 typedef struct s_SS_c_parse_state SS_c_parse_state;
 
 struct s_SS_c_parse_state

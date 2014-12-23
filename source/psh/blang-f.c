@@ -130,7 +130,7 @@ static void fc_type(fdecl *dcl, char *wty, int nc,
 	arg = al->arg;
 	ty  = al->type;
 
-	td  = lookup_type_info(ty);
+	td = lookup_type_info(ty);
 	if (td != NULL)
 	   {if (strcmp(bo->lang, "fortran") == 0)
 	       pty = td->f90;

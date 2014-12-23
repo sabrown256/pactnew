@@ -1,11 +1,11 @@
 /*
- * SCFNCA.H - generated type handling routines - do not edit
+ * SCFNCA_T.H - generated type handling routines - do not edit
  *
  */
 
-#ifndef PCK_SCFNCA
+#ifndef PCK_SCFNCA_T
 
-#define PCK_SCFNCA
+#define PCK_SCFNCA_T
 
 #include "cpyright.h"
 

@@ -9,6 +9,12 @@
 
 #include <complex.h>
 
+/* GOTCHA: if you have an old GCC - e.g. Solaris */
+#if (__GNUC__ < 4)
+# undef I
+# define I	(__extension__ 1.0iF)
+#endif
+
 #undef LONGLONG_MAX
 
 #define DBFSZ                  512
@@ -78,13 +84,13 @@ struct cfloat16
 
 struct ccomplex4
    {char c;
-    float complex x;} cfc;
+    float _Complex x;} cfc;
 struct ccomplex8
    {char c;
-    double complex x;} cdc;
+    double _Complex x;} cdc;
 struct ccomplex16
    {char c;
-    long double complex x;} clc;
+    long double _Complex x;} clc;
 
 struct cptr
    {char c;

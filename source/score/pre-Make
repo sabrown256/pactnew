@@ -130,13 +130,13 @@ TSrcs = scpar.c scthn.c scthe.c scthp.c sctho.c scths.c
 W32Srcs = sclpw32.c scwin32.c
 UnxSrcs = sclppsx.c scunix.c scaix.c scbgl.c scpcc.c sccyg.c scbsd.c scbeos.c
 
-Srcs = ${DSrcs} ${ESrcs} ${MSrcs} ${PSrcs} ${TSrcs} ${OSSrcs} \
+Srcs = ${GSrcs} ${DSrcs} ${ESrcs} ${MSrcs} ${PSrcs} ${TSrcs} ${OSSrcs} \
        scctl.c scapi.c scfnca.c scfncb.c scfnct.c \
        scarrd.c scarrs.c \
        schash.c sctree.c sctab.c \
        scstr.c scrsca.c scrscb.c \
-       sclexs.c sctrk.c sclog.c scold.c scf77lr.l \
-       ${GSrcs}
+       sclexs.c sctrk.c sclog.c scold.c scf77lr.l
+       
 
 #
 # Object Files
@@ -615,8 +615,13 @@ example : ${TGTLib} example.c
 #       - it must be built with smake
 #
 
+ExcludeType  = -excl omp_lockdes
+LExcludeType = ${ExcludeType}
+
 dmake :
-	${PSY_ScrDir}/bproto
+	echo "${ExcludeType}"
+	echo "${LExcludeType}"
+	${PSY_ScrDir}/bproto ${LExcludeType}
 	@smake build
 	@acc ${ACFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 

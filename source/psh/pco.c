@@ -330,7 +330,9 @@ static int reset_env(int c, char **v)
    {int i, rv;
     char *p, **sa, **except;
 
-/* get the list of variables that are to be left intact from the -env file */
+/* get the list of variables that are to be left intact from
+ * the file specified by -env - usually manager/pact.env
+ */
     sa = NULL;
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-env") == 0)

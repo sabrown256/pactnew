@@ -23,14 +23,6 @@ if ($?FirstCommon == 0) then
    set lbin  = $lroot/dev/$larch/bin
    set path  = ( $psy_scrdir $lbin $path )
 
-   unset lbin
-   unset lroot
-   unset larch
-
-   eval `$psy_scrdir/prune-env -e psy_mngdir pact`
-
-   setenv FirstCommon FALSE
-
    InitLog WLog $llog:h/write.$0:t
    unset llog
 
@@ -40,7 +32,21 @@ if ($?FirstCommon == 0) then
    Note $WLog "Current: $cwd"
    Note $WLog "Date: `date`"
    Note $WLog "Manager directory: $psy_mngdir"
+   Note $WLog "Session: $larch"
+   if ($?SESSION_CONFIG == 1) then
+      Note $ALog "SESSION_CONFIG: $SESSION_CONFIG"
+   else
+      Note $ALog "SESSION_CONFIG: undefined"
+   endif
    Note $WLog ""
+
+   unset lbin
+   unset lroot
+   unset larch
+
+   eval `$psy_scrdir/prune-env -e psy_mngdir pact`
+
+   setenv FirstCommon FALSE
 
    dbmget $WLog PATH
    flog $WLog set path = ( $psy_scrdir $path )

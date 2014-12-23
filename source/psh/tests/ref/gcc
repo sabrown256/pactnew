@@ -1,11 +1,11 @@
 /*
- * GC_TYPE.H - generated type handling routines - do not edit
+ * GC_TYPE_C.H - generated type handling routines - do not edit
  *
  */
 
-#ifndef PCK_GC_TYPE
+#ifndef PCK_GC_TYPE_C
 
-#define PCK_GC_TYPE
+#define PCK_GC_TYPE_C
 
 #include "cpyright.h"
 

@@ -77,7 +77,7 @@ gms = ${PACTTmpDir}/gm-score.f ${PACTTmpDir}/gm-pml.f ${PACTTmpDir}/gm-pdb.f \
       ${PACTTmpDir}/gm-pgs.f ${PACTTmpDir}/gm-panacea.f \
       ${PACTTmpDir}/gm-scheme.f ${PACTTmpDir}/gm-fortran.f
 
-FSrcs = ${gms} flibc.f
+FSrcs = ${gms} flibc.f fapdprm.f
 
 CSrcs = ${gfs} fasca.c fascb.c fascs.c fascm.c \
         famla.c fapda.c fapana.c \

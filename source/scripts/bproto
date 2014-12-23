@@ -28,12 +28,17 @@ set tgt  = premk
 set vrb  = FALSE
 set flst = ""
 set dst  = $PSY_TmpDir/obj
+set excl = ""
 
 while ($#argv > 0)
    switch ($1)
       case -d:
            shift
            set dst = $1
+           breaksw
+      case -excl:
+           shift
+           set excl = ( $excl `echo $1 | sed 's|,| |g'` )
            breaksw
       case -f:
            set tgt = files
@@ -332,6 +337,15 @@ Note $Log ""
          cat >>& $cder
          Note $cder ""
       end
+
+# remove excluded structs
+      if ("$excl" != "") then
+         foreach e ($excl)
+            grep -v $e $cder >&! $cder.t
+            mv $cder.t $cder
+         end
+      endif         
+
       flog $Log wc -l $cder
    endif
 
