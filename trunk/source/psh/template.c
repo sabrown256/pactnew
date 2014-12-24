@@ -6,6 +6,7 @@
  */
 
 #define NO_VA_ARG_ID
+#define HAVE_ANSI_C9X_COMPLEX
 
 #include "common.h"
 #include "libpsh.c"

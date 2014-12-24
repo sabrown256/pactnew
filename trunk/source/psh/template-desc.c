@@ -7,14 +7,6 @@
  *
  */
 
-#include <complex.h>
-
-/* GOTCHA: if you have an old GCC - e.g. Solaris */
-#if (__GNUC__ < 4)
-# undef I
-# define I	(__extension__ 1.0iF)
-#endif
-
 #undef LONGLONG_MAX
 
 #define DBFSZ                  512

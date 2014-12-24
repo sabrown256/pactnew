@@ -64,7 +64,11 @@ else if ((-d "$src") && (-d "$dst")) then
    set sz = ( `ls -lh $sf` )
    set estat = `iopr -b $bstat`
    set etime = `timer -b $btime`
-   echo "size ($sz[5])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+   if ($#estat > 11) then
+      echo "size ($sz[5])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+   else
+      echo "time ($etime)"
+   endif
 
 # generate a file at dst
    echo -n "   Generating dst file ... "
@@ -74,7 +78,11 @@ else if ((-d "$src") && (-d "$dst")) then
    set sz = ( `ls -lh $df` )
    set estat = `iopr -b $bstat`
    set etime = `timer -b $btime`
-   echo "size ($sz[5])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+   if ($#estat > 11) then
+      echo "size ($sz[5])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+   else
+      echo "time ($etime)"
+   endif
    rm -f $df
 
 # copy the file and measure the rate
@@ -84,7 +92,11 @@ else if ((-d "$src") && (-d "$dst")) then
    cp $sf $df.cp >& /dev/null
    set estat = `iopr -b $bstat`
    set etime = `timer -b $btime`
-   echo "size ($sz[5])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+   if ($#estat > 11) then
+      echo "size ($sz[5])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+   else
+      echo "time ($etime)"
+   endif
   
 # cleanup
    echo -n "   Cleaning up ........... "
