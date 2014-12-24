@@ -616,7 +616,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
     int pclass, pscope, psz;
     long i;
     double conv_fac;
-    char *pname, *ty;
+    char *lname, *pname, *ty;
     void *pdata;
     PA_variable *pp;
     syment *ep;
@@ -634,6 +634,8 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
     pdrs = PA_open(rsname, "w", TRUE);
     if (pdrs != NULL)
        {fp = pdrs->stream;
+
+	PD_cd(pdrs, "/");
 
 /* save the definition constants */
 	PD_write(pdrs, "n_units", SC_INT_S, &PA_gs.n_units);
@@ -708,14 +710,15 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 		     case PSEUDO :
 		     case OPTL   :
 			  if (pdata != NULL)
-			     {_PD_e_install(pdrs, pname, ep, TRUE);
+			     {lname = _PD_fixname(pdrs, pname);
+			      _PD_e_install(pdrs, lname, ep, TRUE);
 
 /* convert units before writing if requested */
 			      if (int_conv_flag)
 				 PM_array_scale(pdata, psz,
 						conv_fac);
 
-			      PA_ERR(!_PD_sys_write(pdrs, pname, pdata,
+			      PA_ERR(!_PD_sys_write(pdrs, lname, pdata,
 						    PD_entry_number(ep),
 						    PD_entry_type(ep),
 						    PD_entry_type(ep)),

@@ -78,7 +78,7 @@
 
       (function-definition file "int" "main" '("int c" "char **v") "top level" "main")
 
-      (printf file "   {double t;\n\n")
+      (printf file "   {double lt;\n\n")
 
 					; GOTCHA: this isn't strictly needed and causes problems on some platforms
 					;	(printf file "    PG_open_console(\"%s\", \"MONOCHROME\", 1, 0.1, 0.1, 0.8, 0.8);\n"
@@ -117,10 +117,10 @@
       (printf file "    %s(c, v);\n" init-problem-name)
       (printf file "\n")
     
-      (printf file "    t = SC_wall_clock_time();\n\n")
+      (printf file "    lt = SC_wall_clock_time();\n\n")
       (generate-pan-simulation file run-problem-name)
-      (printf file "    t = SC_wall_clock_time() - t;\n")
-      (printf file "    PRINT(STDOUT, \"Wall clock time: %%9.3e\\n\", t);\n\n")
+      (printf file "    lt = SC_wall_clock_time() - lt;\n")
+      (printf file "    PRINT(STDOUT, \"Wall clock time: %%9.3e\\n\", lt);\n\n")
     
       (printf file "    %s();\n" fin-problem-name)
     

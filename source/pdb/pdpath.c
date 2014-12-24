@@ -1923,7 +1923,8 @@ static void _PD_disp_rules(PD_smp_state *pa, int rule, char **pvt)
  */
 
 static void _PD_parse(PD_smp_state *pa)
-   {char **pvt;
+   {int l;
+    char **pvt;
     register char **lpv;   	/* top of value stack */
     register int *lps;	        /* top of state stack */
     register int lstate;	/* current state */
@@ -1972,7 +1973,7 @@ static void _PD_parse(PD_smp_state *pa)
     HAVE_COLON = FALSE;
 
 /* loop as expressions are pushed onto the stack */
-    for (;;)
+    for (l = 0; TRUE; l++)
 
 /* put a state and value onto the stacks */
         {if (++lps >= &FRAME(s)[MAXPARSEDEPTH])

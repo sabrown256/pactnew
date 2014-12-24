@@ -589,6 +589,7 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
 	     pty = PLOT_VECTOR;
 	     break;
         default :
+	     pty = PLOT_SCATTER;
 	     break;};
 
     ne = SC_MEM_GET_N(double, elem[0]);

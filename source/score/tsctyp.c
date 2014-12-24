@@ -106,13 +106,12 @@ static int test_1(void)
 		td->typ_s, i, id, sts, tal[i]);};
     printf("\n");
 
+    st = (nerr == 0);
 
     io_printf(stdout, "\t\t\ttype indeces .............. %s\n",
 	      (st == TRUE) ? "ok" : "ng");
 
     cs = SC_mem_monitor(cs, dbg, "T1", msg);
-
-    st = (nerr == 0);
 
     return(st);}
 

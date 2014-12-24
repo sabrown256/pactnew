@@ -32,6 +32,13 @@
 # ifndef __cplusplus
 #  ifdef HAVE_ANSI_C9X_COMPLEX
 #   include <complex.h>
+
+/* GOTCHA: if you have an old GCC - e.g. Solaris */
+#   if (__GNUC__ < 4)
+#      undef I
+#      define I	(__extension__ 1.0iF)
+#   endif
+
 #  endif
 # endif
 
