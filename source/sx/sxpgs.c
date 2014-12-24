@@ -325,7 +325,7 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
     ndr = (range == NULL) ? 0 : range->dimension_elem;
     clr = _SX.ig % 14 + 1;
 
-    info_type = SC_PCONS_P_S;
+    info_type = G_PCONS_P_S;
     if ((ndd == 1) && (ndr == 1))
        info = PG_set_line_info(NULL, PLOT_CARTESIAN, CARTESIAN_2D,
 			       LINE_SOLID, FALSE, 0, clr, 0, 0.0);
@@ -355,12 +355,12 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
          if (domain != NULL)
             {ret &= PM_set_opers(domain);
 	     if (domain->info_type == NULL)
-                domain->info_type = SC_PCONS_P_S;};
+                domain->info_type = G_PCONS_P_S;};
 
          if (range != NULL)
             {ret &= PM_set_opers(range);
 	     if (range->info_type == NULL)
-                range->info_type = SC_PCONS_P_S;};
+                range->info_type = G_PCONS_P_S;};
 
 /* GOTCHA: it is not necessary to die here if you only want to view
  *         the data
@@ -406,7 +406,7 @@ static object *_SX_pdbcurve_graph(SS_psides *si, PDBfile *file,
     clr  = _SX.icg % 14 + 1;
     info = PG_set_line_info(NULL, PLOT_CARTESIAN, CARTESIAN_2D,
 			    LINE_SOLID, FALSE, 0, clr, 0, 0.0);
-    g    = PG_make_graph_from_mapping(f, SC_PCONS_P_S, info, _SX.icg++, NULL);
+    g    = PG_make_graph_from_mapping(f, G_PCONS_P_S, info, _SX.icg++, NULL);
 
     if (_SX.icg > 1000)
        _SX.icg = 1;
@@ -1182,7 +1182,7 @@ static object *_SXI_make_pgs_graph(SS_psides *si, object *argl)
     info = PG_set_line_info(NULL, PLOT_CARTESIAN, CARTESIAN_2D,
 			    LINE_SOLID, FALSE, 0, clr, 0, 0.0);
     g = PG_make_graph_from_sets(lbl, domain, range, centering,
-                                SC_PCONS_P_S, info, _SX.igg, NULL);
+                                G_PCONS_P_S, info, _SX.igg, NULL);
 
     if (arr == NULL)
        {emap = CMAKE_N(char, domain->n_elements);
@@ -1581,12 +1581,12 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
     SS_set_put_string(si, SX_fputs);
 
     if ((domain != NULL) && (domain->info_type != NULL))
-       {if (strcmp(domain->info_type, SC_PCONS_P_S) == 0)
+       {if (strcmp(domain->info_type, G_PCONS_P_S) == 0)
 	  dev->autodomain = (SC_assoc_entry((pcons *) domain->info,
 					    "LIMITS") == NULL);};
 
     if ((range != NULL) && (range->info_type != NULL))
-       {if (strcmp(range->info_type, SC_PCONS_P_S) == 0)
+       {if (strcmp(range->info_type, G_PCONS_P_S) == 0)
 	  dev->autorange  = (SC_assoc_entry((pcons *) range->info,
 					    "LIMITS") == NULL);};
 
@@ -1903,7 +1903,7 @@ static object *_SXI_set_attr_graph(SS_psides *si, object *argl)
 
 /* get the current list */
        {if (g->info_type != NULL)
-	   {if (strcmp(g->info_type, SC_PCONS_P_S) == 0)
+	   {if (strcmp(g->info_type, G_PCONS_P_S) == 0)
 	       inf = (pcons *) g->info;
 	    else
 	       inf = NULL;}
@@ -1911,7 +1911,7 @@ static object *_SXI_set_attr_graph(SS_psides *si, object *argl)
 	   inf = NULL;
 
 	g->info      = SX_set_attr_alist(si, inf, name, type, val);
-	g->info_type = SC_PCONS_P_S;};
+	g->info_type = G_PCONS_P_S;};
 
     CFREE(name);
     CFREE(type);

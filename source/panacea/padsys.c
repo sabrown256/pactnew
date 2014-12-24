@@ -24,8 +24,8 @@ void _PA_internal_init(void)
 
     PA_gs.variable     = CSTRDUP("PA_variable", 3);
     PA_gs.package      = CSTRDUP("PA_package", 3);
-    PA_gs.attribute    = CSTRDUP(SC_PCONS_P_S, 3);
-    PA_gs.unit         = CSTRDUP(SC_PCONS_P_S, 3);
+    PA_gs.attribute    = CSTRDUP(G_PCONS_P_S, 3);
+    PA_gs.unit         = CSTRDUP(G_PCONS_P_S, 3);
     PA_gs.dimension    = CSTRDUP("PA_dimens", 3);
     PA_gs.domain       = CSTRDUP("PA_edit_domain", 3);
     PA_gs.edit_REQUEST = CSTRDUP("PA_edit_request", 3);

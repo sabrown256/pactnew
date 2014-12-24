@@ -70,7 +70,7 @@ static int _SC_type_register(char *name, SC_type *t)
    {int id;
     hasharr *ha;
     haelem *hp;
-    typdes *td;
+    type_desc *td;
 
     ha = (hasharr *) _SC.types.typ;
     if (ha == NULL)
@@ -81,7 +81,7 @@ static int _SC_type_register(char *name, SC_type *t)
     id = SC_hasharr_get_n(ha);
 
     hp = SC_hasharr_install(ha, name, t, "SC_TYPE", 3, -1);
-    td = (typdes *) hp->def;
+    td = (type_desc *) hp->def;
     if (t != td)
        id = td->id;
     else
@@ -641,7 +641,7 @@ void SC_init_base_types(void)
    {
 
     ONCE_SAFE(FALSE, NULL)
-       typdes *tl;
+       type_desc *tl;
 
        for (tl = SC_gs.stl; tl->type != NULL; tl++)
 	   _SC_type_register(tl->type, tl);
@@ -675,7 +675,7 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
  */
 
 SC_type *SC_find_primitive(int id)
-   {typdes *ta, *rv;
+   {type_desc *ta, *rv;
 
     for (ta = SC_gs.stl + id, rv = NULL; (rv == NULL) && (ta != NULL); )
 	{if (ta->alias != NULL)
@@ -891,7 +891,7 @@ void *SC_convert_id(int did, void *d, long od, long ds,
    {int rv, bpi, np;
     int pdid, psid;
     long nc;
-    typdes *td, *ts;
+    type_desc *td, *ts;
 
 /* allocate the space if need be */
     if (d == NULL)

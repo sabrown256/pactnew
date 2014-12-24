@@ -518,12 +518,13 @@ extern char
 
 /* LIBTYP.C declarations */
 
-extern typdes
- *PS_type_table(typdes *td),
- *PS_lookup_type_info(char *ty);
+extern type_desc
+ *PS_type_table(type_desc *td),
+ *PS_lookup_type_info(char *ty),
+ *PS_resolve_type_alias(char *ty);
 
 extern int
- PS_foreach_type(int (*f)(typdes *td, void *a), void *a);
+ PS_foreach_type(int (*f)(type_desc *td, void *a), void *a);
 
 #ifdef __cplusplus
 }

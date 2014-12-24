@@ -54,7 +54,7 @@ standard = {
  "FILE"                 file   STRUCT     B_T   -          -           NULL   -             -        -               -         -
  "type_group"           tgrp   ENUM       B_T   KIND_CHAR  KIND_OTHER  KIND_CHAR -          -        -               -         -
  "type_kind"            tknd   ENUM       B_T   TK_PRIMITIVE  TK_META  TK_PRIMITIVE -       -        -               -         -
- "pcons"                pcns   STRUCT     B_T   -          -           NULL   -             -        -               -         -
+ "type_desc"            tdes   STRUCT     B_T   -          -           NULL   -             -        -               -         -
 }
 
 #--------------------------------------------------------------------------

@@ -51,7 +51,7 @@ object *SX_display_map(SS_psides *si, object *mo)
     if (SX_gs.plot_flag && SX_gs.autoplot)
        {h  = SS_GET(PM_mapping, mo);
 	g  = PG_make_graph_from_mapping(h,
-					SC_PCONS_P_S, NULL,
+					G_PCONS_P_S, NULL,
 					1, NULL);
 	mo = SX_make_pg_graph(si, g);
 

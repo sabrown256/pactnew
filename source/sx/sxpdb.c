@@ -3695,7 +3695,7 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
    {int ok;
     char s1[MAXLINE], s2[MAXLINE];
     char *field, *format;
-    typdes *td;
+    type_desc *td;
     object *rv;
 
     field  = NULL;

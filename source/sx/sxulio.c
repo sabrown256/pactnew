@@ -1538,7 +1538,7 @@ void SX_push_open_file(FILE *fp)
    {
 
     if (!SX_file_open(fp))
-       _SX.file_list = SC_mk_pcons(NULL, fp, SC_PCONS_P_S, _SX.file_list);
+       _SX.file_list = SC_mk_pcons(NULL, fp, G_PCONS_P_S, _SX.file_list);
 
     return;}
 

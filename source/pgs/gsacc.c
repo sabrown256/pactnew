@@ -946,7 +946,7 @@ pcons *PG_fget_render_info(PG_graph *g)
 
     rv = NULL;
     if ((g != NULL) && (g->info_type != NULL))
-       {if (strcmp(g->info_type, SC_PCONS_P_S) == 0)
+       {if (strcmp(g->info_type, G_PCONS_P_S) == 0)
 	   rv = (pcons *) g->info;};
 
     return(rv);}

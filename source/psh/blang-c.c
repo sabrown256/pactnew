@@ -143,6 +143,8 @@ static void c_emit_types_hdr(FILE *fh, der_list *sl)
     fprintf(fh, "\n");
 
 /* emit declaration of SCORE type index */
+    fprintf(fh, "#define G_%s_S \"%s\"\n", tl->unm, tl->cnm);
+    fprintf(fh, "#define G_%s_P_S \"%s *\"\n", tl->unm, tl->cnm);
     fprintf(fh, "extern int %s;\n", tl->inm);
     fprintf(fh, "\n");
 

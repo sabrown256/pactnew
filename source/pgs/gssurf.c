@@ -1384,7 +1384,7 @@ void PG_draw_surface_n(PG_device *dev ARG(,,cls),
     alst = SC_copy_alist(alist);
 
     g = PG_make_graph_from_sets(name, domain, range, N_CENT,
-				SC_PCONS_P_S, alst, 'A', NULL);
+				G_PCONS_P_S, alst, 'A', NULL);
 
 /* add the attributes */
     PG_set_attrs_graph(g,

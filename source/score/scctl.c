@@ -972,9 +972,9 @@ void *SC_assoc(pcons *alist, char *s)
 pcons *SC_add_alist(pcons *alist, char *name, char *type, void *val)
    {pcons *rv;
 
-    rv = SC_mk_pcons(SC_PCONS_P_S,
+    rv = SC_mk_pcons(G_PCONS_P_S,
 		     SC_mk_pcons(SC_STRING_S, CSTRSAVE(name), type, val),
-		     SC_PCONS_P_S, alist);
+		     G_PCONS_P_S, alist);
 
     return(rv);}
 
@@ -1241,8 +1241,8 @@ pcons *SC_append_alist(pcons *alist1, pcons *alist2)
         {c   = (pcons *) pa->car;
          nxt = (pcons *) pa->cdr;
 
-         alist1 = SC_mk_pcons(SC_PCONS_P_S, c,
-			      SC_PCONS_P_S, alist1);
+         alist1 = SC_mk_pcons(G_PCONS_P_S, c,
+			      G_PCONS_P_S, alist1);
 
          SC_rl_pcons(pa, 1);
 	 SC_mark(alist1->cdr, -1);};

@@ -88,7 +88,7 @@ static void femit(FILE *fp, char *t, char *trm)
 
 static void cf_type(char *a, int nc, char *ty)
    {char *fty;
-    typdes *td;
+    type_desc *td;
 
     if (strcmp(ty, "char *") == 0)
        nstrncpy(a, nc, "string", -1);
@@ -118,7 +118,7 @@ static void fc_type(fdecl *dcl, char *wty, int nc,
    {fparam knd;
     char lty[BFLRG];
     char *pty, *arg, *ty;
-    typdes *td;
+    type_desc *td;
 
     if (al != NULL)
        {knd = FP_ANY;

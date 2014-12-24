@@ -257,7 +257,7 @@ char *PA_cpp_value_to_name(char *group, ...)
 void PA_cpp_default(void)
    {int id, np;
     char t[BFSML];
-    typdes *td;
+    type_desc *td;
 
     PA_gs.cpp_info        = CSTRDUP("INFO", 3);
     PA_gs.cpp_allocation  = CSTRDUP("ALLOCATION", 3);

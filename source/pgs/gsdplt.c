@@ -1072,7 +1072,7 @@ void PG_domain_plot(PG_device *dev ARG(,,cls), PM_set *dom, PM_set *ran)
 
     g.f         = &f;
     g.rendering = PLOT_MESH;
-    g.info_type = SC_PCONS_P_S;
+    g.info_type = G_PCONS_P_S;
     g.info      = dom->info;
 
     pd = PG_setup_picture(dev, data, TRUE, TRUE, TRUE);
@@ -1137,7 +1137,7 @@ void PG_mesh_plot(PG_device *dev, PG_graph *data, ...)
 	      info = domain->info;
 
 /* make a master list of attributes from the mapping, domain, and graph */
-	      if (strcmp(f->map_type, SC_PCONS_P_S) == 0)
+	      if (strcmp(f->map_type, G_PCONS_P_S) == 0)
 		 mlst = SC_copy_alist((pcons *) f->map);
 	      else
 		 mlst = NULL;

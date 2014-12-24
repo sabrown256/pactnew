@@ -528,7 +528,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
            break;
         pv  = CMAKE(int);
         *pv = dm;
-        nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+        nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = nxt;
         else
@@ -545,7 +545,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 
            pv  = CMAKE(int);
            *pv = dm;
-           nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+           nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
            if (du == NULL)
               du = nxt;
            else

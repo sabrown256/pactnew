@@ -12,7 +12,7 @@
  *                 - a rendering routine
  */
 
-static void write_str_proto(FILE *fp, typdes *td)
+static void write_str_proto(FILE *fp, type_desc *td)
    {
 
     fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
@@ -25,7 +25,7 @@ static void write_str_proto(FILE *fp, typdes *td)
 
 /* _SC_WRITE_BOOL - write the rendering function for KIND_BOOL */
 
-static void _SC_write_bool(FILE *fp, typdes *td)
+static void _SC_write_bool(FILE *fp, type_desc *td)
    {
 
     write_str_proto(fp, td);
@@ -55,9 +55,9 @@ static void _SC_write_bool(FILE *fp, typdes *td)
 
 /* _SC_WRITE_COMPLEX - write the rendering function for KIND_COMPLEX */
 
-static void _SC_write_complex(FILE *fp, typdes *td)
+static void _SC_write_complex(FILE *fp, type_desc *td)
    {int eid;
-    typdes *tc;
+    type_desc *tc;
     static int flid = -1;
 
     tc = lookup_type_info(td->comp);
@@ -108,7 +108,7 @@ static void _SC_write_complex(FILE *fp, typdes *td)
  *                      - for KIND_QUATERNION
  */
 
-static void _SC_write_quaternion(FILE *fp, typdes *td)
+static void _SC_write_quaternion(FILE *fp, type_desc *td)
    {
 
     write_str_proto(fp, td);
@@ -137,7 +137,7 @@ static void _SC_write_quaternion(FILE *fp, typdes *td)
 
 /* _SC_WRITE_NTOS - write the rendering function for type TD */
 
-static void _SC_write_ntos(FILE *fp, typdes *td)
+static void _SC_write_ntos(FILE *fp, type_desc *td)
    {
 
     write_str_proto(fp, td);
@@ -191,7 +191,7 @@ static void _SC_write_ntos(FILE *fp, typdes *td)
 
 /* _SC_WRITE_PTR - write the rendering function for pointer type TD */
 
-static void _SC_write_ptr(FILE *fp, typdes *td)
+static void _SC_write_ptr(FILE *fp, type_desc *td)
    {
 
     write_str_proto(fp, td);
@@ -245,9 +245,9 @@ static void _SC_write_ptr(FILE *fp, typdes *td)
 
 /* WRITE_STR_DECL - write the declaration of the rendering array */
 
-static void write_str_decl(FILE *fp, int ne, typdes *tl, int src)
+static void write_str_decl(FILE *fp, int ne, type_desc *tl, int src)
    {int i;
-    typdes *td;
+    type_desc *td;
 
     if (src == TRUE)
        {fprintf(fp, "PFStrv\n");
@@ -277,9 +277,9 @@ static void write_str_decl(FILE *fp, int ne, typdes *tl, int src)
 
 /* WRITE_STR - write the rendering routines */
 
-static void write_str(FILE *fp, int ne, typdes *tl, int src)
+static void write_str(FILE *fp, int ne, type_desc *tl, int src)
    {int i;
-    typdes *td;
+    type_desc *td;
 
     if (src == TRUE)
        {Separator(fp);

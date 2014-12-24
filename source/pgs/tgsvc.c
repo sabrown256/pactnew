@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 
     data = PG_make_graph_from_sets("{x, y}->{u, v}", domain, range,
 				   centering,
-				   SC_PCONS_P_S, NULL, id, NULL);
+				   G_PCONS_P_S, NULL, id, NULL);
 
     PG_set_tdv_info(data->info, PLOT_VECTOR, CARTESIAN_2D,
 		    lnstyle, lncolor, lnwidth);

@@ -10,10 +10,10 @@
 
 /* DEF_TYPE_MANAGER - generate type definitions for SCORE type manager */
 
-static void def_type_manager(FILE *fp, int ne, typdes *tl)
+static void def_type_manager(FILE *fp, int ne, type_desc *tl)
    {int id;
     char **tia;
-    typdes *td, *tp;
+    type_desc *td, *tp;
 
     fprintf(fp, "#define REAL double\n");
     fprintf(fp, "#define HUGE_REAL 1.0e100\n");

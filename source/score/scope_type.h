@@ -83,7 +83,7 @@ typedef enum e_SC_type_method SC_type_method;
 
 /* these "link" to the libtyp originals */
 typedef type_group SC_kind;
-typedef typdes SC_type;
+typedef type_desc SC_type;
 
 typedef struct s_precisionfp precisionfp;
 typedef struct s_SC_type_manager SC_type_manager;

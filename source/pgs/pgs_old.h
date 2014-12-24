@@ -187,7 +187,7 @@
 #define PG_get_render_info(_g, _a)                                           \
     {_a = NULL;                                                              \
      if (((_g) != NULL) && ((_g)->info_type != NULL))                        \
-        {if (strcmp((_g)->info_type, SC_PCONS_P_S) == 0)                     \
+        {if (strcmp((_g)->info_type, G_PCONS_P_S) == 0)                     \
 	    _a = (pcons *) ((_g)->info);};}
 #define PG_set_render_info(g, a)                                             \
    {if ((g) != NULL)                                                         \

@@ -514,7 +514,7 @@ static PA_tab_head *_PA_rd_tab_head(FILE *fp, char *fn)
             break;
 
          pb   = NULL;
-         next = SC_mk_pcons(SC_STRING_S, CSTRSAVE(key), SC_PCONS_P_S, NULL);
+         next = SC_mk_pcons(SC_STRING_S, CSTRSAVE(key), G_PCONS_P_S, NULL);
          if (keys == NULL)
             keys = next;
          else
@@ -586,10 +586,10 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
               pb = NULL;
 
 /* NOTE: clean this out using SC_add_alist */
-              next = SC_mk_pcons(SC_PCONS_P_S,
-				 SC_mk_pcons(SC_PCONS_P_S, pk->car,
+              next = SC_mk_pcons(G_PCONS_P_S,
+				 SC_mk_pcons(G_PCONS_P_S, pk->car,
 					     SC_STRING_S, token),
-				 SC_PCONS_P_S, NULL);
+				 G_PCONS_P_S, NULL);
               if (alist == NULL)
                  alist = next;
               else
@@ -689,11 +689,11 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 		      token = vname;};
 
 /* NOTE: clean this out using SC_add_alist */
-		  next = SC_mk_pcons(SC_PCONS_P_S,
-				     SC_mk_pcons(SC_PCONS_P_S, pk->car,
+		  next = SC_mk_pcons(G_PCONS_P_S,
+				     SC_mk_pcons(G_PCONS_P_S, pk->car,
 						 SC_STRING_S,
 						 CSTRSAVE(token)),
-				     SC_PCONS_P_S, NULL);
+				     G_PCONS_P_S, NULL);
 		  if (alist == NULL)
 		     alist = next;
 		  else
@@ -761,7 +761,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 
 /* cons this dictionary name onto the list */
 	pck->db_list = SC_mk_pcons(SC_STRING_S, CSTRSAVE(pt->name),
-				   SC_PCONS_P_S, pck->db_list);};
+				   G_PCONS_P_S, pck->db_list);};
 
     return(nr);}
 

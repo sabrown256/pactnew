@@ -78,9 +78,9 @@ enum e_type_group
 
 typedef enum e_type_group type_group;
 
-typedef struct s_typdes typdes;
+typedef struct s_type_desc type_desc;
 
-struct s_typdes
+struct s_type_desc
    {int id;         /* integer type id */
     int bpi;        /* bytes per item */
     char *type;     /* C type name quoted to capture white space,
@@ -332,22 +332,22 @@ char *fix_camelcase(char *t)
 
 /* TYPE_TABLE - return a pointer to the type table */
 
-typdes *type_table(typdes *td)
+type_desc *type_table(type_desc *td)
    {int nb;
     static int ni = 0;
     static int nx = 20;
-    static typdes *tl = NULL;
+    static type_desc *tl = NULL;
 
 /* if we are not adding anything just return the existing table */
     if (td != NULL)
        {if (tl == NULL)
 	   {ni = 0;
-	    tl = MAKE_N(typdes, nx);
+	    tl = MAKE_N(type_desc, nx);
 	    memset(type_counts, 0, sizeof(type_counts));};
 	
 	if (((ni + 1) % nx == 0) && (ni > 0))
 	   {nb = (ni + 1)/nx;
-	    REMAKE(tl, typdes, (nb+1)*nx);};
+	    REMAKE(tl, type_desc, (nb+1)*nx);};
 
 	td->id   = ni;
 	tl[ni++] = *td;
@@ -359,7 +359,7 @@ typdes *type_table(typdes *td)
         type_counts[12]  = ni;
 
 /* always leave the list NULL terminated */
-	memset(tl+ni, 0, sizeof(typdes));};
+	memset(tl+ni, 0, sizeof(type_desc));};
 
     return(tl);}
 
@@ -368,9 +368,9 @@ typdes *type_table(typdes *td)
 
 /* LOOKUP_TYPE_INFO - lookup and return a type from the type lists */
 
-typdes *lookup_type_info(char *ty)
+type_desc *lookup_type_info(char *ty)
    {int i;
-    typdes *tl, *rv;
+    type_desc *tl, *rv;
 
     rv = NULL;
     tl = type_table(NULL);
@@ -387,9 +387,9 @@ typdes *lookup_type_info(char *ty)
 
 /* _PUSH_TYPE_PTR - add a pointer type derived from TD to the type table */
 
-static void _push_type_ptr(typdes *td, int alias)
+static void _push_type_ptr(type_desc *td, int alias)
    {char ti[BFSML], ts[BFSML];
-    typdes tp;
+    type_desc tp;
 
     tp = *td;
 
@@ -456,7 +456,7 @@ static void _push_type_ptr(typdes *td, int alias)
 static int _parse_standard_types(char **sa)
    {int i, in, nt;
     char *s, **ta;
-    typdes td;
+    type_desc td;
 
     in = FALSE;
 
@@ -548,11 +548,11 @@ static int _parse_standard_types(char **sa)
 static int _parse_alias_types(char **sa)
    {int i, in, nt;
     char *s, *p, **ta;
-    typdes td, *to;
+    type_desc td, *to;
 
     in = FALSE;
 
-    memset(&td, 0, sizeof(typdes));
+    memset(&td, 0, sizeof(type_desc));
 
     for (i = 0, nt = 0; sa[i] != NULL; i++)
         {s = trim(sa[i], BOTH, " \t\n");
@@ -623,7 +623,7 @@ void parse_type_table(char *tytab)
 
 void install_derived_type(char *name, type_kind knd, char *defv)
    {char t[BFSML];
-    typdes td;
+    type_desc td;
 
     if (knd == TK_ENUM)
        {td.f90  = "integer";
@@ -668,9 +668,9 @@ void install_derived_type(char *name, type_kind knd, char *defv)
 
 /* FOREACH_TYPE - parse the master type table TYTAB */
 
-int foreach_type(int (*f)(typdes *td, void *a), void *a)
+int foreach_type(int (*f)(type_desc *td, void *a), void *a)
    {int i, rv;
-    typdes *tl;
+    type_desc *tl;
 
     rv = TRUE;
     tl = type_table(NULL);
@@ -679,6 +679,22 @@ int foreach_type(int (*f)(typdes *td, void *a), void *a)
         rv &= f(tl+i, a);
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* RESOLVE_TYPE_ALIAS - find the ultimate type referenced by an alias */
+
+type_desc *resolve_type_alias(char *ty)
+   {char *t;
+    type_desc *td;
+
+    td = NULL;
+
+    for (t = ty; t != NULL; t = td->alias)
+        td = lookup_type_info(t);
+
+    return(td);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

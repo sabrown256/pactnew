@@ -781,7 +781,7 @@ static int test_6(PG_device *dev)
 
     data = PG_make_graph_from_sets("{x, y}->{u, v}", domain, range,
 				   centering,
-				   SC_PCONS_P_S, NULL, id, NULL);
+				   G_PCONS_P_S, NULL, id, NULL);
 
     data->info = (void *) PG_set_tdv_info(data->info, PLOT_VECTOR, CARTESIAN_2D,
 					  lnstyle, lncolor, lnwidth);
@@ -998,7 +998,7 @@ static int test_9(PG_device *dev)
 
     data = PG_make_graph_from_sets("{x, y}->f", domain, range,
 				   centering,
-				   SC_PCONS_P_S, NULL, id, NULL);
+				   G_PCONS_P_S, NULL, id, NULL);
 
     data->info = (void *) PG_set_tds_info(data->info, PLOT_MESH, CARTESIAN_2D,
 					  lnstyle, lncolor, 10, 1.0,
@@ -1046,7 +1046,7 @@ static int test_9(PG_device *dev)
 
     data = PG_make_graph_from_sets("{x, y, z}->f", domain, range,
 				   centering,
-				   SC_PCONS_P_S, NULL, id, NULL);
+				   G_PCONS_P_S, NULL, id, NULL);
 
     theta = 30.0;
     phi   = 45.0;

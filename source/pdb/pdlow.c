@@ -870,7 +870,7 @@ void _PD_init_consts(void)
 
 static void _PD_init_typedefs(PDBfile *file)
    {int id, nt;
-    typdes *td, *ta;
+    type_desc *td, *ta;
 
 /* add PDB_SYSTEM_VERSION <= 30 PDB types for backward compatibility */
     PD_typedef(file, "unsigned char",        "u_char");
@@ -979,7 +979,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
    {int ic, id, ifx, ifp, conv, flag;
     int fcnv[N_PRIMITIVE_FP];
     multides *tup;
-    typdes *td;
+    type_desc *td;
 
     flag = (hstd != NULL);
 

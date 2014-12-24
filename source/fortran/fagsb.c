@@ -233,7 +233,7 @@ FIXNUM FF_ID(pgmg22, PGMG22)(FIXNUM *sid,
     range = PM_make_set(rname, SC_DOUBLE_S, cp, 2, kmax, lmax, 2, au, av);
 
     g = PG_make_graph_from_sets(label, domain, range, centering,
-                                SC_PCONS_P_S, NULL, id, NULL);
+                                G_PCONS_P_S, NULL, id, NULL);
 
     if (g != NULL)
        rv = SC_ADD_POINTER(g);
@@ -273,7 +273,7 @@ FIXNUM FF_ID(pgmgfs, PGMGFS)(FIXNUM *sncn, char *fname,
     else
        f = PM_make_mapping(name, PM_AC_S, domain, range, centering, NULL);
 
-    g = PG_make_graph_from_mapping(f, SC_PCONS_P_S, NULL, id, NULL);
+    g = PG_make_graph_from_mapping(f, G_PCONS_P_S, NULL, id, NULL);
     if (g != NULL)
        {g->next = next;
 	rv = SC_ADD_POINTER(g);};
