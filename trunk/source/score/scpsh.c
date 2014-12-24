@@ -69,6 +69,7 @@
 #define type_table		PS_type_table
 #define lookup_type_info        PS_lookup_type_info
 #define foreach_type            PS_foreach_type
+#define resolve_type_alias      PS_resolve_type_alias
 
 #define close_safe 		PS_close_safe
 #define fclose_safe 		PS_fclose_safe

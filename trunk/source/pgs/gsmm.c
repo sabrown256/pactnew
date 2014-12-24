@@ -116,7 +116,7 @@ PG_graph *PG_make_graph_1d(int id, char *label, int cp, int n,
 			    LINE_SOLID, FALSE,
 			    0, 1, 0, 0.0);
     g    = PG_make_graph_from_sets(label, domain, range, N_CENT,
-				   SC_PCONS_P_S, info, id, NULL);
+				   G_PCONS_P_S, info, id, NULL);
 
     return(g);}
 
@@ -144,7 +144,7 @@ PG_graph *PG_make_graph_r2_r1(int id, char *label, int cp,
     range = PM_make_set(rname, SC_DOUBLE_S, cp, 2, imx, jmx, 1, r);
 
     g = PG_make_graph_from_sets(label, domain, range, centering,
-                                SC_PCONS_P_S, NULL, id, NULL);
+                                G_PCONS_P_S, NULL, id, NULL);
 
     return(g);}
 
@@ -170,7 +170,7 @@ PG_graph *PG_make_graph_r3_r1(int id, char *label, int cp,
     range = PM_make_set(rname, SC_DOUBLE_S, cp, 3, imx, jmx, kmx, 1, r);
 
     g = PG_make_graph_from_sets(label, domain, range, centering,
-                                SC_PCONS_P_S, NULL, id, NULL);
+                                G_PCONS_P_S, NULL, id, NULL);
 
     return(g);}
 
@@ -308,7 +308,7 @@ void PG_rl_graph(PG_graph *g, int rld, int rlr)
    {pcons *inf;
 
     if (g->info_type != NULL)
-       {if (strcmp(g->info_type, SC_PCONS_P_S) == 0)
+       {if (strcmp(g->info_type, G_PCONS_P_S) == 0)
 	   {inf = (pcons *) g->info;
 	    if (inf != NULL)
 	       SC_free_alist(inf, 3);};};

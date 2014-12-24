@@ -351,7 +351,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
     char *s;
     void *(*f)(SS_psides *si, object *o);
     SS_procedure *pp;
-    typdes *td;
+    type_desc *td;
 
     pv = (void **) v;
     td = SC_gs.stl + type;

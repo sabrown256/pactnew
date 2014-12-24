@@ -7,6 +7,10 @@
 
 #include "score.h"
 
+#define STR_EQUAL(_a, _b)                                                    \
+    (((_a != NULL) && (_b != NULL) && (strcmp(_a, _b) == 0)) ||              \
+     ((_a == NULL) && (_b == NULL)))
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -16,7 +20,7 @@ static int test_1(void)
    {int i, id, st, cs, nerr;
     char msg[MAXLINE];
     char *sts;
-    typdes *td;
+    type_desc *td;
     static int dbg = 0;
     char *tchr[] = { "SC_CHAR_I", "SC_WCHAR_I" };
     char *tfix[] = { "SC_INT8_I", "SC_SHORT_I",
@@ -25,7 +29,7 @@ static int test_1(void)
     char *tcpx[] = { "SC_FLOAT_COMPLEX_I", "SC_DOUBLE_COMPLEX_I",
 		     "SC_LONG_DOUBLE_COMPLEX_I" };
     char *tal[]  = { "SC_FILE_I", "SC_TYPE_GROUP_I", "SC_TYPE_KIND_I", 
-		     "SC_PCONS_I", "SC_ENUM_I", "SC_PBOOLEAN_I",
+		     "SC_TYPE_DESC_I", "SC_ENUM_I", "SC_PBOOLEAN_I",
 		     "SC_SSIZE_I", "SC_INTEGER_I", "SC_INT16_I",
 		     "SC_INT32_I", "SC_INT64_I",
 		     "SC_REAL_I", "SC_FLOAT32_I", "SC_FLOAT64_I",
@@ -122,7 +126,7 @@ static int test_1(void)
 
 static int test_2(void)
    {int i, err, st;
-    typdes *td, *ts;
+    type_desc *td, *ts;
 
     st = TRUE;
 
@@ -133,24 +137,27 @@ static int test_2(void)
 	 err = TRUE;
 	 err &= (td->id == ts->id);
 	 err &= (td->bpi == ts->bpi);
-	 err &= (strcmp(td->type, ts->type) == 0);
-	 err &= (strcmp(td->stype, ts->stype) == 0);
-	 err &= (strcmp(td->utype, ts->utype) == 0);
-	 err &= (strcmp(td->ftype, ts->ftype) == 0);
-	 err &= (strcmp(td->fncp, ts->fncp) == 0);
-	 err &= (strcmp(td->alias, ts->alias) == 0);
+	 err &= STR_EQUAL(td->type, ts->type);
+	 err &= STR_EQUAL(td->stype, ts->stype);
+	 err &= STR_EQUAL(td->utype, ts->utype);
+	 err &= STR_EQUAL(td->ftype, ts->ftype);
+	 err &= STR_EQUAL(td->fncp, ts->fncp);
+	 err &= STR_EQUAL(td->alias, ts->alias);
 	 err &= (td->ptr == ts->ptr);
 	 err &= (td->knd == ts->knd);
 	 err &= (td->g == ts->g);
-	 err &= (strcmp(td->mn, ts->mn) == 0);
-	 err &= (strcmp(td->mx, ts->mx) == 0);
-	 err &= (strcmp(td->defv, ts->defv) == 0);
-	 err &= (strcmp(td->promo, ts->promo) == 0);
-	 err &= (strcmp(td->comp, ts->comp) == 0);
-	 err &= (strcmp(td->typ_i, ts->typ_i) == 0);
-	 err &= (strcmp(td->typ_s, ts->typ_s) == 0);
+	 err &= STR_EQUAL(td->mn, ts->mn);
+	 err &= STR_EQUAL(td->mx, ts->mx);
+	 err &= STR_EQUAL(td->defv, ts->defv);
+	 err &= STR_EQUAL(td->promo, ts->promo);
+	 err &= STR_EQUAL(td->comp, ts->comp);
+	 err &= STR_EQUAL(td->typ_i, ts->typ_i);
+	 err &= STR_EQUAL(td->typ_s, ts->typ_s);
 
 	 st &= err;};
+
+    io_printf(stdout, "\t\t\tstatic/dynamic check ...... %s\n",
+	      (st == TRUE) ? "ok" : "ng");
 
     return(st);}
 
@@ -160,9 +167,23 @@ static int test_2(void)
 /* TEST_3 - check that aliases resolve to the correct type */
 
 static int test_3(void)
-   {int st;
+   {int i, err, st;
+    type_desc *td, *ta;
 
-    st  = TRUE;
+    err = 0;
+
+    for (i = 0; i < N_TYPES; i++)
+        {td = _SC_get_type_id(i);
+         if (td->alias != NULL)
+	    {ta = SC_find_primitive(i);
+             err += (ta == NULL);
+             io_printf(stdout, "\t\t%3d %-20s -> %3d %-20s\n",
+		       td->id, td->type, ta->id, ta->type);};};
+
+    st = (err == 0);
+
+    io_printf(stdout, "\t\t\talias check ............... %s\n",
+	      (st == TRUE) ? "ok" : "ng");
 
     return(st);}
 

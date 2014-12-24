@@ -48,7 +48,7 @@ static void scheme_type_name_list(tns_list *na, tn_list *nc)
 
 int lookup_scheme_type(char *a, int nc, char *t)
    {int rv;
-    typdes *td;
+    type_desc *td;
 
     rv = FALSE;
 
@@ -433,7 +433,7 @@ static void scheme_scalar_return(char *t, int nc,
 				 fdecl *dcl, fparam knd, char *so)
    {char dty[BFLRG];
     char *ty;
-    typdes *td;
+    type_desc *td;
 
     t[0] = '\0';
 

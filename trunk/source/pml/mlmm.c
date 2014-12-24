@@ -475,7 +475,7 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
        info = SC_copy_alist(info);
 
     if (inftype == NULL)
-       inftype = SC_PCONS_P_S;
+       inftype = G_PCONS_P_S;
 
     SC_CHANGE_VALUE_ALIST(info, int, SC_INT_P_S, "COPY-MEMORY", cp);
 
@@ -574,7 +574,7 @@ void PM_rel_set(PM_set *set, int mfl)
 	    CFREE(set->topology_type);};
 
 	if (set->info_type != NULL)
-	   {if (strcmp(set->info_type, SC_PCONS_P_S) == 0)
+	   {if (strcmp(set->info_type, G_PCONS_P_S) == 0)
 	       {inf = (pcons *) set->info;
 		if (inf != NULL)
 		   SC_free_alist(inf, 3);};
@@ -1275,7 +1275,7 @@ PM_mapping *PM_make_mapping(char *name, char *cat,
     f->category   = CSTRSAVE(cat);
     f->domain     = domain;
     f->range      = range;
-    f->map_type   = SC_PCONS_P_S;
+    f->map_type   = G_PCONS_P_S;
     f->map        = (void *) inf;
     f->file_info  = NULL;
     f->file_type  = SC_NO_FILE;
@@ -1343,7 +1343,7 @@ void PM_rel_mapping(PM_mapping *f, int rld, int rlr)
 
 	CFREE(f->name);
 	CFREE(f->category);
-	if (strcmp(f->map_type, SC_PCONS_P_S) == 0)
+	if (strcmp(f->map_type, G_PCONS_P_S) == 0)
 	   SC_free_alist((pcons *) mi, 3);
 	else
 	   CFREE(mi);
@@ -1599,7 +1599,7 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
     if (strncmp(h->map_type, "PM_map_info", 11) == 0)
        {hmap = (PM_map_info *) (h->map);
 	map_alist = NULL;}
-    else if (strcmp(h->map_type, SC_PCONS_P_S) == 0)
+    else if (strcmp(h->map_type, G_PCONS_P_S) == 0)
        {map_alist = (pcons *) (h->map);
 	hmap = NULL;}
     else
@@ -1647,7 +1647,7 @@ double *PM_get_limits(PM_set *s)
 
     extr = NULL;
     if ((s != NULL) && (s->info_type != NULL))
-       if (strcmp(s->info_type, SC_PCONS_P_S) == 0)
+       if (strcmp(s->info_type, G_PCONS_P_S) == 0)
 	  SC_assoc_info((pcons *) s->info,
 			"LIMITS", &extr,
 			NULL);
@@ -1667,7 +1667,7 @@ void PM_set_limits(PM_set *s, double *extr)
 
 /* get the current list */
     if (s->info_type != NULL)
-       {if (strcmp(s->info_type, SC_PCONS_P_S) == 0)
+       {if (strcmp(s->info_type, G_PCONS_P_S) == 0)
 	   inf = (pcons *) s->info;
 
         else
@@ -1702,7 +1702,7 @@ void PM_set_limits(PM_set *s, double *extr)
     else
        inf = SC_change_alist(inf, "LIMITS", SC_DOUBLE_P_S, (void *) extr);
 
-    s->info_type = SC_PCONS_P_S;
+    s->info_type = G_PCONS_P_S;
     s->info      = (void *) inf;
 
     return;}

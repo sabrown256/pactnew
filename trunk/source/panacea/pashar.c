@@ -150,7 +150,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
            break;
         pv  = CMAKE(int);
         *pv = dm;
-        nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+        nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = nxt;
         else
@@ -162,7 +162,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
        while ((dm = SC_VA_ARG(int)) != UNITS)
           {pv  = CMAKE(int);
            *pv = dm;
-           nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+           nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
            if (du == NULL)
               du = nxt;
            else
@@ -296,7 +296,7 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
            break;
         pv  = CMAKE(int);
         *pv = dm;
-        nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+        nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = nxt;
         else
@@ -308,7 +308,7 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
        while ((dm = SC_VA_ARG(int)) != UNITS)
           {pv  = CMAKE(int);
            *pv = dm;
-           nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+           nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
            if (du == NULL)
               du = nxt;
            else
@@ -397,7 +397,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
            break;
         pv  = CMAKE(int);
         *pv = dm;
-        next = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+        next = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = next;
         else
@@ -409,7 +409,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
        while ((dm = SC_VA_ARG(int)) != UNITS)
           {pv  = CMAKE(int);
            *pv = dm;
-           next = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+           next = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
            if (du == NULL)
               du = next;
            else

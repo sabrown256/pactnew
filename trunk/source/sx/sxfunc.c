@@ -565,7 +565,7 @@ static PM_mapping *_SXI_copy_mapping(SS_psides *si, PM_mapping *h)
 
     f = PM_make_mapping(name, cat, domain, range, centering, NULL);
 
-    if (strcmp(f->map_type, SC_PCONS_P_S) == 0)
+    if (strcmp(f->map_type, G_PCONS_P_S) == 0)
        {SC_free_alist(f->map, 0);
 	f->map = SC_copy_alist(h->map);};
 

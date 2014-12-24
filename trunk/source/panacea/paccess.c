@@ -86,7 +86,7 @@ void PA_equivalence(void *vr, char *s)
     if (pc == NULL)
        {snprintf(bf, MAXLINE, "%s *", (char *) PA_VARIABLE_TYPE(pp));
 	pc = SC_mk_pcons(bf, vr,
-			 SC_PCONS_P_S, PA_VARIABLE_REFERENCE_LIST(pp));
+			 G_PCONS_P_S, PA_VARIABLE_REFERENCE_LIST(pp));
 
 	PA_VARIABLE_REFERENCE_LIST(pp) = pc;};
 
@@ -357,7 +357,7 @@ void *PA_get_access(void **vr, char *s, long offs, long ne, int track)
         if (pc == NULL)
            {snprintf(bf, MAXLINE, "%s *", (char *) PA_VARIABLE_TYPE(pp));
 	    pc = SC_make_pcons(bf, FALSE, vr,
-			       SC_PCONS_P_S, TRUE,
+			       G_PCONS_P_S, TRUE,
 			       PA_VARIABLE_ACCESS_LIST(pp));
 
             PA_VARIABLE_ACCESS_LIST(pp) = pc;};

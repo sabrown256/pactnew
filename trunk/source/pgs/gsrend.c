@@ -996,7 +996,7 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
     g = &data;
     SC_MEM_INIT(PG_graph, g);
 
-    data.info_type  = SC_PCONS_P_S;
+    data.info_type  = G_PCONS_P_S;
     data.info       = (void *) inf;
     data.f          = f;
     data.rendering  = pty;
@@ -1025,7 +1025,7 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
 	 if (pf != f)
 	    _PG_gattrs.plot_title = FALSE;
 
-	 g = PG_make_graph_from_mapping(pf, SC_PCONS_P_S, NULL, id, NULL);
+	 g = PG_make_graph_from_mapping(pf, G_PCONS_P_S, NULL, id, NULL);
 
 /* setup the graph's info list */
 	 inf = SC_copy_alist((pcons *) pf->map);

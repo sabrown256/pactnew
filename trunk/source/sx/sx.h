@@ -125,10 +125,6 @@
 
 /* PANACEA Types */
 
-/* IV_SPECIFICATION is PD_DEFSTR'd in DEF_STR in PANACEA.C
- * so any changes here must be reflected there
- */
-
 #define IV_SPECIFICATION_TYPE(_o)      (SS_GET(PA_iv_specification, _o)->type)
 #define IV_SPECIFICATION_NAME(_o)      (SS_GET(PA_iv_specification, _o)->name)
 #define IV_SPECIFICATION_FILE(_o)      (SS_GET(PA_iv_specification, _o)->file)
@@ -137,10 +133,6 @@
 #define IV_SPECIFICATION_SPEC(_o)      (SS_GET(PA_iv_specification, _o)->spec)
 #define IV_SPECIFICATION_DATA(_o)      (SS_GET(PA_iv_specification, _o)->data)
 #define IV_SPECIFICATION_NEXT(_o)      (SS_GET(PA_iv_specification, _o)->next)
-
-/* PLOT_REQUEST is PD_DEFSTR'd in DEF_STR in PANACEA.C
- * so any changes here must be reflected there
- */
 
 #define PLOT_REQUEST_Y_AXIS(_o)      (SS_GET(plot_request, _o)->y_axis)
 #define PLOT_REQUEST_Y_ZONE(_o)      (SS_GET(plot_request, _o)->y_zone)

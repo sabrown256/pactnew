@@ -22,7 +22,7 @@
  *                    - a conversion routine
  */
 
-static void write_coerce_proto(FILE *fp, typdes *td, typdes *ts)
+static void write_coerce_proto(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
@@ -35,7 +35,7 @@ static void write_coerce_proto(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_N_TO_N_FAST - number to number conversions */
 
-static void _SC_write_n_to_n_fast(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_n_to_n_fast(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     if ((td->g == KIND_OTHER) || (ts->g == KIND_OTHER))
@@ -64,7 +64,7 @@ static void _SC_write_n_to_n_fast(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_N_TO_N_SAFE - number to number conversions */
 
-static void _SC_write_n_to_n_safe(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_n_to_n_safe(FILE *fp, type_desc *td, type_desc *ts)
    {int ok;
 
     if ((td->g == KIND_OTHER) || (ts->g == KIND_OTHER))
@@ -109,7 +109,7 @@ static void _SC_write_n_to_n_safe(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_C_TO_C_SAFE - complex to complex conversions */
 
-static void _SC_write_c_to_c_safe(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_c_to_c_safe(FILE *fp, type_desc *td, type_desc *ts)
    {int eid;
 
     if ((td->fncp == NULL) || (ts->fncp == NULL))
@@ -157,7 +157,7 @@ static void _SC_write_c_to_c_safe(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_C_TO_R - complex to real conversions */
 
-static void _SC_write_c_to_r(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_c_to_r(FILE *fp, type_desc *td, type_desc *ts)
    {int eid;
 
     if ((td->fncp == NULL) || (ts->fncp == NULL))
@@ -191,7 +191,7 @@ static void _SC_write_c_to_r(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_Q_TO_R - quaternion to real conversions */
 
-static void _SC_write_q_to_r(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_q_to_r(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     if ((td->fncp == NULL) || (ts->fncp == NULL))
@@ -220,7 +220,7 @@ static void _SC_write_q_to_r(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_Q_TO_C - quaternion to complex conversions */
 
-static void _SC_write_q_to_c(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_q_to_c(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     if ((td->fncp == NULL) || (ts->fncp == NULL))
@@ -253,7 +253,7 @@ static void _SC_write_q_to_c(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_R_TO_Q - real to quaternion conversions */
 
-static void _SC_write_r_to_q(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_r_to_q(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     if ((td->fncp == NULL) || (ts->fncp == NULL))
@@ -284,7 +284,7 @@ static void _SC_write_r_to_q(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_C_TO_Q - complex to quaternion conversions */
 
-static void _SC_write_c_to_q(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_c_to_q(FILE *fp, type_desc *td, type_desc *ts)
    {int eid;
 
     if ((td->fncp == NULL) || (ts->fncp == NULL))
@@ -320,7 +320,7 @@ static void _SC_write_c_to_q(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_P_TO_N - pointer to number conversions */
 
-static void _SC_write_p_to_n(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_p_to_n(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     if (td->fncp == NULL)
@@ -351,7 +351,7 @@ static void _SC_write_p_to_n(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_P_TO_Q - pointer to quaternion conversions */
 
-static void _SC_write_p_to_q(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_p_to_q(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     if (td->fncp == NULL)
@@ -384,7 +384,7 @@ static void _SC_write_p_to_q(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_N_TO_P - number to pointer conversions */
 
-static void _SC_write_n_to_p(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_n_to_p(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     if (ts->fncp == NULL)
@@ -415,7 +415,7 @@ static void _SC_write_n_to_p(FILE *fp, typdes *td, typdes *ts)
 
 /* _SC_WRITE_Q_TO_P - quaternion to pointer conversions */
 
-static void _SC_write_q_to_p(FILE *fp, typdes *td, typdes *ts)
+static void _SC_write_q_to_p(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     if (ts->fncp == NULL)
@@ -448,9 +448,9 @@ static void _SC_write_q_to_p(FILE *fp, typdes *td, typdes *ts)
 
 /* WRITE_CONV_DEF - write the definition of the conversion array */
 
-static void write_conv_def(FILE *fp, int ne, typdes *tl, int src)
+static void write_conv_def(FILE *fp, int ne, type_desc *tl, int src)
    {int id, is;
-    typdes *td, *ts;
+    type_desc *td, *ts;
 
     if (src == TRUE)
        {fprintf(fp, "PFConv\n");
@@ -489,7 +489,7 @@ static void write_conv_def(FILE *fp, int ne, typdes *tl, int src)
 
 /* WRITE_FROM_C - write conversions from complex */
 
-static void write_from_c(FILE *fp, typdes *td, typdes *ts)
+static void write_from_c(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     switch (td->g)
@@ -520,7 +520,7 @@ static void write_from_c(FILE *fp, typdes *td, typdes *ts)
 
 /* WRITE_FROM_Q - write conversions from quaternion */
 
-static void write_from_q(FILE *fp, typdes *td, typdes *ts)
+static void write_from_q(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     switch (td->g)
@@ -546,7 +546,7 @@ static void write_from_q(FILE *fp, typdes *td, typdes *ts)
 
 /* WRITE_TO_Q - write conversions to quaternion */
 
-static void write_to_q(FILE *fp, typdes *td, typdes *ts)
+static void write_to_q(FILE *fp, type_desc *td, type_desc *ts)
    {
 
     switch (ts->g)
@@ -572,9 +572,9 @@ static void write_to_q(FILE *fp, typdes *td, typdes *ts)
 
 /* WRITE_COERCE - write the conversion routines */
 
-static void write_coerce(FILE *fp, int ne, typdes *tl, int src)
+static void write_coerce(FILE *fp, int ne, type_desc *tl, int src)
    {int id, is;
-    typdes *td, *ts;
+    type_desc *td, *ts;
 
     if (src == TRUE)
        {fprintf(fp, "#include \"score_int.h\"\n");

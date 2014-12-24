@@ -177,7 +177,7 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, char *fname,
 	set->symmetry       = NULL;
 	set->topology_type  = topt;
 	set->topology       = (void *) top;
-	set->info_type      = SC_PCONS_P_S;
+	set->info_type      = G_PCONS_P_S;
 	set->info           = (void *) info;
 	set->next           = next;
     

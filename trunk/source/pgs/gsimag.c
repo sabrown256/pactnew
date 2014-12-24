@@ -695,7 +695,7 @@ void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
 	    g.f         = (PM_mapping *) im;
 	    g.use       = PG_IMAGE_S;
 	    g.rendering = PLOT_IMAGE;
-	    g.info_type = SC_PCONS_P_S;
+	    g.info_type = G_PCONS_P_S;
 	    g.info      = (void *) alist;
 	    do_par_set  = TRUE;}
 
@@ -823,7 +823,7 @@ void PG_render_parallel(PG_device *dd, PG_image *nim, int np, PG_image *pim)
 
     g.f         = (PM_mapping *) nim;
     g.use       = PG_IMAGE_S;
-    g.info_type = SC_PCONS_P_S;
+    g.info_type = G_PCONS_P_S;
     g.info      = (void *) dd->pri->alist;
     g.rendering = dd->pri->render;
 

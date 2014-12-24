@@ -542,7 +542,7 @@ static void add_derived_types(int iref, char **sbi)
    {int ib;
     char s[BFLRG];
     char *sb, **ta;
-    typdes td;
+    type_desc td;
 
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
@@ -593,7 +593,7 @@ static void add_derived_types(int iref, char **sbi)
 static void get_def_value(char *lvl, int nc, char *sp, char *ty)
    {char lty[BFLRG];
     char *dv;
-    typdes *td;
+    type_desc *td;
     static char *ndv = "NULL";
 
     if (sp == NULL)
@@ -944,7 +944,7 @@ static int process_qualifiers(farg *al, char *qual)
    {int rv, arr, ptr;
     char t[BFLRG];
     char *dv, *val, *dir, **lst, **ta;
-    typdes *td;
+    type_desc *td;
     static char *ndv[2] = { "NULL", NULL };
 
     rv = TRUE;

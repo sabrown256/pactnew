@@ -605,7 +605,7 @@ pcons *_PA_process_units(va_list *list, pcons *alist)
            break;
         pv  = CMAKE(int);
         *pv = dm;
-        next = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+        next = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = next;
         else
@@ -617,7 +617,7 @@ pcons *_PA_process_units(va_list *list, pcons *alist)
        while ((dm = SC_VA_ARG(int)) != UNITS)
           {pv  = CMAKE(int);
            *pv = dm;
-	   next = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
+	   next = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
            if (du == NULL)
               du = next;
            else
@@ -628,11 +628,11 @@ pcons *_PA_process_units(va_list *list, pcons *alist)
 
     alist = SC_add_alist(alist,
 			 PA_info_name(PA_INFO_UNIT_NUMER),
-			 SC_PCONS_P_S,
+			 G_PCONS_P_S,
 			 nu);
     alist = SC_add_alist(alist,
 			 PA_info_name(PA_INFO_UNIT_DENOM),
-			 SC_PCONS_P_S,
+			 G_PCONS_P_S,
 			 du);
     return(alist);}
 

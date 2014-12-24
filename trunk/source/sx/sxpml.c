@@ -760,7 +760,7 @@ static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
 	    s = (PM_set *) data.memaddr;};
 
 	if (s->info_type == NULL)
-	   s->info_type = SC_PCONS_P_S;
+	   s->info_type = G_PCONS_P_S;
 
 	obj = SX_make_pm_set(si, s);};
 
@@ -1041,7 +1041,7 @@ static object *_SXI_set_attr_set(SS_psides *si, object *argl)
 
 /* get the current list */
 	if (s->info_type != NULL)
-	   {if (strcmp(s->info_type, SC_PCONS_P_S) == 0)
+	   {if (strcmp(s->info_type, G_PCONS_P_S) == 0)
 	       inf = (pcons *) s->info;
 	    else
 	       inf = NULL;}
@@ -1049,7 +1049,7 @@ static object *_SXI_set_attr_set(SS_psides *si, object *argl)
 	   inf = NULL;
 
 	s->info      = SX_set_attr_alist(si, inf, name, type, val);
-	s->info_type = SC_PCONS_P_S;
+	s->info_type = G_PCONS_P_S;
 
 	rv = SS_t;};
 
@@ -1222,12 +1222,12 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
 	     if (domain != NULL)
 	        {ret &= PM_set_opers(domain);
 		 if (domain->info_type == NULL)
-		    domain->info_type = SC_PCONS_P_S;};
+		    domain->info_type = G_PCONS_P_S;};
 
 	     if (range != NULL)
 	        {ret &= PM_set_opers(range);
 		 if (range->info_type == NULL)
-		    range->info_type = SC_PCONS_P_S;};
+		    range->info_type = G_PCONS_P_S;};
 
 	     if (ret == FALSE)
 	        SS_error(si, "NO FIELD FOR TYPE - _SXI_PDBDATA_MAPPING", SS_null);};

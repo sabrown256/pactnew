@@ -288,7 +288,7 @@ void PA_specifyh(void)
 
             nxtp = CMAKE(double);
             *nxtp = nxt;
-            _PA.ivlst = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, SC_PCONS_P_S, NULL);
+            _PA.ivlst = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, G_PCONS_P_S, NULL);
             if (first == NULL)
                first = _PA.ivlst;
             else
@@ -315,7 +315,7 @@ void PA_sh(void)
        {nxt = PA_alias_value(s);
         nxtp = CMAKE(double);
         *nxtp = nxt;
-        next = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, SC_PCONS_P_S, NULL);
+        next = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, G_PCONS_P_S, NULL);
         if (_PA.ivlst == NULL)
            PA_gs.iv_spec_lst->spec = next;
         else

@@ -1142,7 +1142,7 @@ void print_header(FILE *fp,
 
 /* WRITE_DESC - write out binary format parametrizations */
 
-static void write_desc(FILE *fo, int ne, typdes *tl, int *dfl)
+static void write_desc(FILE *fo, int ne, type_desc *tl, int *dfl)
    {int cflag, wflag, sflag;
     int fb[40], db[40], ldb[40];
     int fc[4], dc[4], lc[4];
@@ -1160,7 +1160,7 @@ static void write_desc(FILE *fo, int ne, typdes *tl, int *dfl)
 /* data type sizes are straightforward */
 #if 0
     int i;
-    typdes *td;
+    type_desc *td;
 
     for (i = 0; i < ne; i++)
         {td = tl + i;

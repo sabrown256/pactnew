@@ -10,7 +10,7 @@
 
 /* WRITE_VA_ARG_CLAUSE - write the variable arg clause for type ID */
 
-static void write_va_arg_clause(FILE *fp, typdes *td)
+static void write_va_arg_clause(FILE *fp, type_desc *td)
    {char *ty, *tp;
 
     ty = td->type;
@@ -31,9 +31,9 @@ static void write_va_arg_clause(FILE *fp, typdes *td)
 
 /* DEF_VARARG_MACROS - generate the variable arg type macros */
 
-static void def_vararg_macros(FILE *fp, int ne, typdes *tl)
+static void def_vararg_macros(FILE *fp, int ne, type_desc *tl)
    {int i;
-    typdes *td;
+    type_desc *td;
 
 /* variable arg macros */
     fprintf(fp, "#ifndef NO_VA_ARG_ID\n");
@@ -121,7 +121,7 @@ static void def_vararg_macros(FILE *fp, int ne, typdes *tl)
 
 /* WRITE_VA_ARG - write the va arg routines */
 
-static void write_va_arg(FILE *fp, int ne, typdes *tl)
+static void write_va_arg(FILE *fp, int ne, type_desc *tl)
    {
 
 /* variable arg macros */

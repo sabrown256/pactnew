@@ -85,8 +85,8 @@ typedef long double float128_t;
    {   38,    8, "type_group *", "type_group *", "type_group *", "type_group", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", NULL, "type_group", "SC_TYPE_GROUP_P_I", "SC_TYPE_GROUP_P_S", NULL, NULL, NULL }, 	\
    {   39, sizeof(type_kind), "type_kind", "type_kind", "type_kind", "type_kind", "tknd", NULL, 1, TK_ENUM, KIND_ENUM, "TK_PRIMITIVE", "TK_META", "TK_PRIMITIVE", NULL, NULL, "type_kind", "SC_TYPE_KIND_I", "SC_TYPE_KIND_S", NULL, NULL, NULL }, 	\
    {   40,    8, "type_kind *", "type_kind *", "type_kind *", "type_kind", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", NULL, "type_kind", "SC_TYPE_KIND_P_I", "SC_TYPE_KIND_P_S", NULL, NULL, NULL }, 	\
-   {   41, sizeof(pcons), "pcons", "pcons", "pcons", "pcons", "pcns", NULL, 1, TK_STRUCT, KIND_STRUCT, NULL, NULL, "NULL", NULL, NULL, "pcons", "SC_PCONS_I", "SC_PCONS_S", NULL, NULL, NULL }, 	\
-   {   42,    8, "pcons *", "pcons *", "pcons *", "pcons", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", NULL, "pcons", "SC_PCONS_P_I", "SC_PCONS_P_S", NULL, NULL, NULL }, 	\
+   {   41, sizeof(type_desc), "type_desc", "type_desc", "type_desc", "type_desc", "tdes", NULL, 1, TK_STRUCT, KIND_STRUCT, NULL, NULL, "NULL", NULL, NULL, "type_desc", "SC_TYPE_DESC_I", "SC_TYPE_DESC_S", NULL, NULL, NULL }, 	\
+   {   42,    8, "type_desc *", "type_desc *", "type_desc *", "type_desc", "ptr", NULL, 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "C_PTR-A", NULL, "type_desc", "SC_TYPE_DESC_P_I", "SC_TYPE_DESC_P_S", NULL, NULL, NULL }, 	\
    {   43, sizeof(int), "enum", "enum", "enum", "enum", "int", "int", 0, TK_PRIMITIVE, KIND_INT, "INT_MIN", "INT_MAX", "0", "integer", NULL, "int", "SC_ENUM_I", "SC_ENUM_S", NULL, NULL, NULL }, 	\
    {   44, sizeof(int), "pboolean", "pboolean", "pboolean", "pboolean", "int", "int", 1, TK_PRIMITIVE, KIND_INT, "INT_MIN", "INT_MAX", "0", "integer", NULL, "int", "SC_PBOOLEAN_I", "SC_PBOOLEAN_S", NULL, NULL, NULL }, 	\
    {   45, sizeof(int), "pboolean *", "pboolean *", "pboolean *", "pboolean", "int *", "int", 0, TK_PRIMITIVE, KIND_POINTER, NULL, NULL, "NULL", "integer-A", NULL, "int", "SC_PBOOLEAN_P_I", "SC_PBOOLEAN_P_S", NULL, NULL, NULL }, 	\
@@ -199,10 +199,10 @@ typedef long double float128_t;
 #define SC_TYPE_KIND_S		SC_gs.stl[39].type
 #define SC_TYPE_KIND_P_I		SC_gs.stl[40].id
 #define SC_TYPE_KIND_P_S		SC_gs.stl[40].type
-#define SC_PCONS_I		SC_gs.stl[41].id
-#define SC_PCONS_S		SC_gs.stl[41].type
-#define SC_PCONS_P_I		SC_gs.stl[42].id
-#define SC_PCONS_P_S		SC_gs.stl[42].type
+#define SC_TYPE_DESC_I		SC_gs.stl[41].id
+#define SC_TYPE_DESC_S		SC_gs.stl[41].type
+#define SC_TYPE_DESC_P_I		SC_gs.stl[42].id
+#define SC_TYPE_DESC_P_S		SC_gs.stl[42].type
 #define SC_ENUM_I		SC_gs.stl[43].id
 #define SC_ENUM_S		SC_gs.stl[43].type
 #define SC_PBOOLEAN_I		SC_gs.stl[44].id
@@ -296,8 +296,8 @@ DEF_FUNCTION_PTR(type_group, TypeGroup);
 DEF_FUNCTION_PTR(type_group *, PTypeGroup);
 DEF_FUNCTION_PTR(type_kind, TypeKind);
 DEF_FUNCTION_PTR(type_kind *, PTypeKind);
-DEF_FUNCTION_PTR(pcons, Pcons);
-DEF_FUNCTION_PTR(pcons *, PPcons);
+DEF_FUNCTION_PTR(type_desc, TypeDesc);
+DEF_FUNCTION_PTR(type_desc *, PTypeDesc);
 
 #ifndef NO_VA_ARG_ID
 #ifdef HAVE_COMPLEX_VA_ARG

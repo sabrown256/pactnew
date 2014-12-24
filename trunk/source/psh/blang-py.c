@@ -67,7 +67,7 @@ static int python_parse_member(mbrdes *md, char *mbr,
 			       char *bty, char *aty, int nc)
    {int nind, nb;
     char *pb;
-    typdes *td;
+    type_desc *td;
 
     parse_member(md, mbr);
 
@@ -856,7 +856,7 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
    {int i, na;
     char dty[BFLRG], p[BFSML];
     char *cfn, *ty, *pty;
-    typdes *td;
+    type_desc *td;
     farg *al;
 
     na  = dcl->na;

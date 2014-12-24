@@ -407,7 +407,7 @@ void PG_draw_scatter(PG_device *dev, double *a1, double *a2,
     alst = SC_copy_alist(alist);
 
     g = PG_make_graph_from_sets(name, domain, range, N_CENT,
-				SC_PCONS_P_S, alst, 'A', NULL);
+				G_PCONS_P_S, alst, 'A', NULL);
 
     g->rendering = PLOT_SCATTER;
 

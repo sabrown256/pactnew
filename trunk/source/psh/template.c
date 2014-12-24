@@ -72,13 +72,13 @@ static int make_type_table(char *tytab)
 
 /* MAKE_TEMPLATE - instantiate a template */
 
-template *make_template(char *proto, int ne, typdes *tl,
+template *make_template(char *proto, int ne, type_desc *tl,
 			int nl, char **body,
 			char *tmn, char *tmx, int ln)
    {int i, id, n;
     char rtype[BFLRG];
     char *p, *args, *fname, **sa;
-    typdes *td;
+    type_desc *td;
     template *t;
 
     t = MAKE(template);
@@ -200,7 +200,7 @@ static void write_trailer(FILE *fp, char *inf, int pfl)
 
 /* WRITE_FNC_INSTANCE - write the function for type TD */
 
-static void write_fnc_instance(FILE *fp, typdes *td, template *t)
+static void write_fnc_instance(FILE *fp, type_desc *td, template *t)
    {int i, nl;
     char s[BFLRG];
     char **body, *rtype, *fname, *args, *p;
@@ -234,12 +234,12 @@ static void write_fnc_instance(FILE *fp, typdes *td, template *t)
 
 /* WRITE_FNC_DECL - write the declaration of the template array */
 
-static void write_fnc_decl(FILE *fp, int ne, typdes *tl,
+static void write_fnc_decl(FILE *fp, int ne, type_desc *tl,
 			   template **tm, int it, int nt)
    {int i, id, lt, ok, tmn, tmx;
     char *rtype, *fname, *args;
     template *t;
-    typdes *td;
+    type_desc *td;
 
     t = tm[it];
     if (t == NULL)
@@ -298,10 +298,10 @@ static void write_fnc_decl(FILE *fp, int ne, typdes *tl,
 
 /* WRITE_FNC - write the routines from the template */
 
-static void write_fnc(FILE *fp, int ne, typdes *tl,
+static void write_fnc(FILE *fp, int ne, type_desc *tl,
 		      template **tm, int it, int nt)
    {int id, tmn, tmx;
-    typdes *td;
+    type_desc *td;
     template *t;
 
     t   = tm[it];
@@ -322,7 +322,7 @@ static void write_fnc(FILE *fp, int ne, typdes *tl,
 
 /* WRITE_FNC_DECLS - write the function array declaration */
 
-static void write_fnc_decls(FILE *fp, int ne, typdes *tl,
+static void write_fnc_decls(FILE *fp, int ne, type_desc *tl,
 			    template **tm, int it, int nt)
    {
 
@@ -340,7 +340,7 @@ static void write_fnc_decls(FILE *fp, int ne, typdes *tl,
 
 /* WRITE_SWITCH_CLAUSE - write the switch clause for type TD */
 
-static void write_switch_clause(FILE *fp, typdes *td, template *t)
+static void write_switch_clause(FILE *fp, type_desc *td, template *t)
    {int i, nl;
     char s[BFLRG], u[BFLRG];
     char **body, *p;
@@ -372,10 +372,10 @@ static void write_switch_clause(FILE *fp, typdes *td, template *t)
 
 /* WRITE_SWITCH - write switch based template */
 
-static void write_switch(FILE *fp, int ne, typdes *tl, template *t)
+static void write_switch(FILE *fp, int ne, type_desc *tl, template *t)
    {int id;
     char *rtype, *fname, *args;
-    typdes *td;
+    type_desc *td;
 
     Separator(fp);
 
@@ -415,7 +415,7 @@ static void write_switch(FILE *fp, int ne, typdes *tl, template *t)
 
 /* PARSE_TMPL - read and parse the next template from FP */
 
-static template *parse_tmpl(FILE *fp, int ne, typdes *tl, int *flo)
+static template *parse_tmpl(FILE *fp, int ne, type_desc *tl, int *flo)
    {int i, lo, nt, nl, npo, npc, fpr, st;
     off_t ad;
     char s[BFLRG], proto[BFLRG];
@@ -514,7 +514,7 @@ int main(int c, char **v)
     char *inf, *outf;
     FILE *fi, *fo;
     template *t, *tm[NMAX];
-    typdes *tl;
+    type_desc *tl;
 
     rv = 0;
 
