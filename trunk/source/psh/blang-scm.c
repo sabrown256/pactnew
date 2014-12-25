@@ -14,10 +14,11 @@ struct s_tns_list
     char unm[BFSML];        /* upper case version of CNM, PM_SET */
     char rnm[BFSML];        /* root struct id, SET */
     char inm[BFSML];        /* type index name, G_PM_SET_I */
+    char snm[BFSML];        /* type index name, G_PM_SET_S */
     char enm[BFSML];        /* defenum macro name, G_PM_SET_E */
     char dnm[BFSML];        /* scope name, G_PM_SET_D */
 
-    char snm[BFSML];};      /* Scheme struct name, pm-set */
+    char onm[BFSML];};      /* Scheme struct name, pm-set */
 
 struct s_smeta
    {char **topt;};          /* type with _SX_opt_xxx methods */
@@ -36,7 +37,7 @@ static void scheme_type_name_list(tns_list *na, tn_list *nc)
     *((tn_list *) na) = *nc;
 
 /* make the Scheme name */
-    nstrncpy(na->snm, BFSML, subst(na->lnm, "_", "-", -1), -1);
+    nstrncpy(na->onm, BFSML, subst(na->lnm, "_", "-", -1), -1);
 
     return;}
 
@@ -509,7 +510,8 @@ static void scheme_wrap_local_return(FILE *fc, fdecl *dcl,
 
 /* SCHEME_ENUM_DEFS - write the SCHEME interface C enums TAG */
 
-static void scheme_enum_defs(bindes *bd, char *tag, der_list *el, int ni)
+static void scheme_enum_defs(bindes *bd, char *tag, der_list *el,
+			     int ie, int ni)
    {char *pck;
     FILE *fc, **fpa;
     statedes *st;
@@ -628,7 +630,7 @@ static void scheme_c_struct_def(FILE *fc, der_list *sl, char *pck)
     fprintf(fc, "    nerr &= %s(SX_gs.vif);\n", tl.dnm);
     fprintf(fc, "\n");
 
-    fprintf(fc, "    SS_install(si, \"%s?\",\n", tl.snm);
+    fprintf(fc, "    SS_install(si, \"%s?\",\n", tl.onm);
     fprintf(fc, "               \"Returns #t if the object is a %s, and #f otherwise\",\n",
 	    tl.cnm);
     fprintf(fc, "               SS_sargs,\n");
@@ -650,7 +652,8 @@ static void scheme_c_struct_def(FILE *fc, der_list *sl, char *pck)
 
 /* SCHEME_STRUCT_DEFS - write the SCHEME interface C structs TAG */
 
-static void scheme_struct_defs(bindes *bd, char *tag, der_list *sl, int ni)
+static void scheme_struct_defs(bindes *bd, char *tag, der_list *sl,
+			       int is, int ni)
    {char *pck;
     FILE *fc, *fh, **fpa;
     statedes *st;
@@ -692,7 +695,8 @@ static void scheme_struct_defs(bindes *bd, char *tag, der_list *sl, int ni)
  *                    - SCHEME object from C structs
  */
 
-static void scheme_object_defs(bindes *bd, char *tag, der_list *sl, int ni)
+static void scheme_object_defs(bindes *bd, char *tag, der_list *sl,
+			       int is, int ni)
    {int i, ok;
     char topt[BFSML];
     char **to;

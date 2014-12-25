@@ -58,9 +58,6 @@
 #define SS_else            SS_gs.objs[13]
 #define SS_N_SPECIAL       14
 
-#define SS_OBJECT_S        SS_gs.tnames[0]
-#define SS_OBJECT_P_S      SS_gs.tnames[1]
-
 #define SS_EOF_I           SS_gs.tind[0]
 #define SS_NULL_I          SS_gs.tind[1]
 #define SS_ERROR_I         SS_gs.tind[2]
@@ -704,9 +701,7 @@ struct s_SS_scope_public
  {int trace_all;
   int tind[SS_N_TYPES];
   char *fmts[4];            /* formats for numeric types */
-  char *tnames[2];
   object *objs[SS_N_SPECIAL];};
-  
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

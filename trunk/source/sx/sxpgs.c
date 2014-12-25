@@ -2369,9 +2369,9 @@ static object *_SXI_get_label(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _G_PM_SET_INFO - get/set information in the PM_set object given */
+/* _SX_SET_INFO - get/set information in the PM_set object given */
 
-static object *_G_PM_SET_Info(SS_psides *si, object *obj,
+static object *_SX_set_info(SS_psides *si, object *obj,
 			    char *name, object *val)
    {long v;
     char *t;
@@ -2757,7 +2757,7 @@ static object *_SXI_drawable_info(SS_psides *si, object *argl)
             0);
 
     if (SX_SETP(obj))
-       ret = _G_PM_SET_Info(si, obj, name, val);
+       ret = _SX_set_info(si, obj, name, val);
 
     else if (SX_MAPPINGP(obj))
        ret = _SX_map_info(si, obj, name, val);

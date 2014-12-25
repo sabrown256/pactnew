@@ -18,6 +18,7 @@ struct s_tnp_list
     char unm[BFSML];        /* upper case version of CNM, PM_SET */
     char rnm[BFSML];        /* root struct id, SET */
     char inm[BFSML];        /* type index name, G_PM_SET_I */
+    char snm[BFSML];        /* type index name, G_PM_SET_S */
     char enm[BFSML];        /* defenum macro name, G_PM_SET_E */
     char dnm[BFSML];        /* defstr macro name, G_PM_SET_D */
 
@@ -218,7 +219,8 @@ static void py_arg(char *arg, int nc, char *spec)
 
 /* PYTHON_ENUM_DEFS - write the Python interface C enums TAG */
 
-static void python_enum_defs(bindes *bd, char *tag, der_list *el, int ni)
+static void python_enum_defs(bindes *bd, char *tag, der_list *el,
+			     int ie, int ni)
    {char *pck;
     FILE *fc, **fpa;
     statedes *st;
@@ -693,7 +695,8 @@ static void python_c_struct_def(bindes *bd, der_list *sl)
 
 /* PYTHON_STRUCT_DEFS - write the Python interface C structs TAG */
 
-static void python_struct_defs(bindes *bd, char *tag, der_list *sl, int ni)
+static void python_struct_defs(bindes *bd, char *tag, der_list *sl,
+			       int is, int ni)
    {
 
     if (sl == NULL)
@@ -713,7 +716,8 @@ static void python_struct_defs(bindes *bd, char *tag, der_list *sl, int ni)
 
 /* PYTHON_OBJECT_DEFS - define local version of struct definitions */
 
-static void python_object_defs(bindes *bd, char *tag, der_list *sl, int ni)
+static void python_object_defs(bindes *bd, char *tag, der_list *sl,
+			       int is, int ni)
    {char *pck;
     FILE *fc, **fpa;
     tnp_list tl;
