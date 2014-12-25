@@ -995,7 +995,7 @@ object *LR_def_domain(SS_psides *si, object *argl)
     dmap = CMAKE_N(PA_set_index, nmax);
 
     arr         = CMAKE(C_array);
-    arr->type   = PA_SET_INDEX_P_S;
+    arr->type   = G_PA_SET_INDEX_P_S;
     arr->length = nmax;
     arr->data   = (byte *) dmap;
 
@@ -1035,7 +1035,7 @@ object *LR_def_domain(SS_psides *si, object *argl)
 
 /* encapsulate the domain map indices */
     arr         = CMAKE(C_array);
-    arr->type   = PA_SET_INDEX_S;
+    arr->type   = G_PA_SET_INDEX_S;
     arr->length = n;
     arr->data   = (byte *) dmap;
 

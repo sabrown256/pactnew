@@ -216,7 +216,7 @@ static PG_triangle *PG_triangularize(PG_device *dev, char *type, double **r,
 				     double **orient)
    {PG_triangle *tri;
 
-    if (strcmp(type, PM_MESH_TOPOLOGY_S) == 0)
+    if (strcmp(type, G_PM_MESH_TOPOLOGY_S) == 0)
        tri = PG_triangularize_ac(dev, (PM_mesh_topology *) cnnct,
 				 r, f,
 				 norm, pn, pnx, orient);

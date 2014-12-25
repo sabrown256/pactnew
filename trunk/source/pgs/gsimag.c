@@ -18,9 +18,6 @@ typedef void (*PFImgZC)(PG_device *dev, char *name, char *type, void *f,
 typedef void (*PFImgNC)(PG_device *dev, char *name, char *type, void *f,
                         double *frm, void *cnnct, pcons *alist);
 
-static char
- *PG_IMAGE_S = "PG_image";
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -184,7 +181,7 @@ pboolean PG_render_data_type(PG_graph *data)
 
     s = data->use;
 
-    rv = ((s == NULL) || (strcmp(s, PG_IMAGE_S) != 0));
+    rv = ((s == NULL) || (strcmp(s, G_PG_IMAGE_S) != 0));
 
     return(rv);}
     
@@ -693,7 +690,7 @@ void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
 	    SC_MEM_INIT(PG_graph, data);
 
 	    g.f         = (PM_mapping *) im;
-	    g.use       = PG_IMAGE_S;
+	    g.use       = G_PG_IMAGE_S;
 	    g.rendering = PLOT_IMAGE;
 	    g.info_type = G_PCONS_P_S;
 	    g.info      = (void *) alist;
@@ -822,7 +819,7 @@ void PG_render_parallel(PG_device *dd, PG_image *nim, int np, PG_image *pim)
     SC_MEM_INIT(PG_graph, data);
 
     g.f         = (PM_mapping *) nim;
-    g.use       = PG_IMAGE_S;
+    g.use       = G_PG_IMAGE_S;
     g.info_type = G_PCONS_P_S;
     g.info      = (void *) dd->pri->alist;
     g.rendering = dd->pri->render;

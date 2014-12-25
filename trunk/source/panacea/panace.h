@@ -49,10 +49,6 @@
 #define ERG       PA_gs.erg
 #define CC        PA_gs.cc
 
-#define PA_SET_INDEX_N_ENTRIES  2
-#define PA_SET_INDEX_S          PA_gs.snames[0]
-#define PA_SET_INDEX_P_S        PA_gs.snames[1]
-
 #define PA_INFO_TYPE_S          PA_gs.inames[PA_INFO_TYPE]
 #define PA_INFO_N_DIMS_S        PA_gs.inames[PA_INFO_N_DIMS]
 #define PA_INFO_DIMS_S          PA_gs.inames[PA_INFO_DIMS]
@@ -848,7 +844,6 @@ struct s_PA_scope_public
     char *edit_OUT;
     char *unit;
     char *inames[PA_INFO_N_ENTRIES];
-    char *snames[PA_SET_INDEX_N_ENTRIES];
     char *cpp_info;
     char *cpp_allocation;
     char *cpp_scope;

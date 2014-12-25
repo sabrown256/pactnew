@@ -443,7 +443,7 @@ PM_set *PM_make_ac_set(char *name, char *type, int cp,
 		    ne, nd, nde,
 		    NULL, elem,
 		    NULL, NULL, NULL, NULL,
-		    PM_MESH_TOPOLOGY_P_S, mt,
+		    G_PM_MESH_TOPOLOGY_P_S, mt,
 		    NULL, NULL, NULL);
 
     return(set);}
@@ -566,7 +566,7 @@ void PM_rel_set(PM_set *set, int mfl)
 	CFREE(set->max_index);
 
 	if (set->topology_type != NULL)
-	   {if (strcmp(set->topology_type, PM_MESH_TOPOLOGY_P_S) == 0)
+	   {if (strcmp(set->topology_type, G_PM_MESH_TOPOLOGY_P_S) == 0)
 	       {mt = (PM_mesh_topology *) set->topology;
 		if (mt != NULL)
 		   PM_rel_topology(mt);};

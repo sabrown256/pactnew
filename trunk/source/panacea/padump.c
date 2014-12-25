@@ -602,7 +602,7 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
     dmap = CMAKE_N(PA_set_index, n);
 
 /* encapsulate the domain map indices */
-    arr = PM_make_array(PA_SET_INDEX_P_S, n, dmap);
+    arr = PM_make_array(G_PA_SET_INDEX_P_S, n, dmap);
 
 /* time plots will be handled separately - so don't record them in the
  * domain_list
