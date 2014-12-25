@@ -263,9 +263,9 @@ object *SX_mk_mapping_proc(int i)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* G_PM_SET_ID - change the data-id of the given mapping */
+/* SX_SET_ID - change the data-id of the given mapping */
 
-object *G_PM_SET_Id(SS_psides *si, object *argl)
+object *SX_set_id(SS_psides *si, object *argl)
    {int iold;
     object *o;
 

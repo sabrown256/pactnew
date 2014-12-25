@@ -105,6 +105,7 @@ struct s_tn_list
     char unm[BFSML];        /* upper case version of CNM, PM_SET */
     char rnm[BFSML];        /* root struct id, SET */
     char inm[BFSML];        /* type index name, G_PM_SET_I */
+    char snm[BFSML];        /* type index name, G_PM_SET_S */
     char enm[BFSML];        /* defenum macro name, G_PM_SET_E */
     char dnm[BFSML];};      /* defstr macro name, G_PM_SET_D */
 
@@ -118,8 +119,12 @@ struct s_der_list
 struct s_statedes
    {int nbi;                         /* number of bindings */
     int ndcl;                        /* number of declarations */
-    int nen;                         /* number of enums */
-    int nst;                         /* number of structs */
+    int nen;                         /* number of enums from #bind */
+    int nst;                         /* number of structs from #bind */
+    int nun;                         /* number of unions from #bind */
+    int nden;                        /* number of enums from hdrs */
+    int ndst;                        /* number of structs from hdrs */
+    int ndun;                        /* number of unions from hdrs */
     int no[N_MODES];                 /* no generate flags */
     char *pck;                       /* name of package */
     char **sbi;
@@ -130,9 +135,11 @@ struct s_statedes
     char **fwr;
     fdecl *dcl;
     der_list *enums;                 /* all bound enums */
-    der_list *structs;               /* all bound structs */
     der_list *denums;                /* all defined enums */
+    der_list *structs;               /* all bound structs */
     der_list *dstructs;              /* all defined structs */
+    der_list *unions;                /* all bound unions */
+    der_list *dunions;               /* all defined unions */
     char path[BFLRG];                /* path for output files */
     char tytab[BFLRG];};             /* path to type table file */
 
@@ -226,6 +233,9 @@ static void type_name_list(char *typ, tn_list *na)
 
 /* get type index name */
     snprintf(na->inm, BFSML, "G_%s_I", na->unm);
+
+/* get type name */
+    snprintf(na->snm, BFSML, "G_%s_S", na->unm);
 
 /* get enum macro name */
     snprintf(na->enm, BFSML, "G_%s_E", na->unm);
@@ -1271,22 +1281,26 @@ static void hsep(FILE *fp)
 
 void foreach_enum_defs(bindes *bd,
 		       void (*femit)(bindes *bd, char *tag,
-				     der_list *el, int ni),
+				     der_list *el, int ie, int ni),
 		       int wh)
    {int ie, ne;
     der_list *el;
     statedes *st;
 
     st = bd->st;
-    ne = st->nen;
-    el = (wh == 1) ? st->denums : st->enums;
+    if (wh == 1)
+       {el = st->denums;
+	ne = st->nden;}
+    else
+       {el = st->enums;
+	ne = st->nen;};
 
-    femit(bd, "begin", NULL, ne);
+    femit(bd, "begin", NULL, -1, ne);
 
     for (ie = 0; el[ie].def != NULL; ie++)
-        femit(bd, NULL, el+ie, -1);
+        femit(bd, NULL, el+ie, ie, -1);
 	    
-    femit(bd, "end", NULL, -1);
+    femit(bd, "end", NULL, -1, -1);
 
     return;}
 
@@ -1297,27 +1311,61 @@ void foreach_enum_defs(bindes *bd,
 
 void foreach_struct_defs(bindes *bd,
 			 void (*femit)(bindes *bd, char *tag,
-				       der_list *sl, int ni),
+				       der_list *sl, int is, int ni),
 			 int wh)
    {int is, ns;
     der_list *sl;
     statedes *st;
 
     st = bd->st;
-    ns = st->nst;
-    sl = (wh == 1) ? st->dstructs : st->structs;
+    if (wh == 1)
+       {sl = st->dstructs;
+	ns = st->ndst;}
+    else
+       {sl = st->structs;
+	ns = st->nst;};
 
 /* NOTE:
  * st->cdv has all the structs as char **
  * st->structs has the #bind structs at der_list *
  */
 
-    femit(bd, "begin", NULL, ns);
+    femit(bd, "begin", NULL, -1, ns);
 
     for (is = 0; sl[is].def != NULL; is++)
-        femit(bd, NULL, sl+is, -1);
+        femit(bd, NULL, sl+is, is, -1);
 	    
-    femit(bd, "end", NULL, -1);
+    femit(bd, "end", NULL, -1, -1);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FOREACH_UNION_DEFS - map FEMIT over all unions in BD */
+
+void foreach_union_defs(bindes *bd,
+			void (*femit)(bindes *bd, char *tag,
+				      der_list *ul, int iu, int ni),
+			int wh)
+   {int iu, nu;
+    der_list *ul;
+    statedes *st;
+
+    st = bd->st;
+    if (wh == 1)
+       {ul = st->dunions;
+	nu = st->ndst;}
+    else
+       {ul = st->unions;
+	nu = st->nst;};
+
+    femit(bd, "begin", NULL, -1, nu);
+
+    for (iu = 0; ul[iu].def != NULL; iu++)
+        femit(bd, NULL, ul+iu, iu, -1);
+	    
+    femit(bd, "end", NULL, -1, -1);
 
     return;}
 
@@ -1403,12 +1451,12 @@ static char *map_name(char *d, int nc, char *cf, char *lf,
  */
 
 static void find_bind(statedes *st, int iref)
-   {int i, ib, id, nb, neb, ned, nsb, nsd, nbi;
+   {int i, ib, id, nb, neb, ned, nsb, nsd, nub, nud, nbi;
     char t[BFVLG], s[BFLRG];
     char *ps, *lng, *te, *p;
     char **cpr, **cdv, **sbi, **sa, **ta;
     fdecl *dcl;
-    der_list *eb, *sb, *ed, *sd;
+    der_list *eb, *sb, *ub, *ed, *sd, *ud;
     der_list de;
 
     nbi = st->nbi;
@@ -1484,6 +1532,7 @@ static void find_bind(statedes *st, int iref)
     st->denums = ed;
     st->enums  = eb;
     st->nen    = neb;
+    st->nden   = ned;
 
 /* parse out structs */
     nsb = 0;
@@ -1513,6 +1562,37 @@ static void find_bind(statedes *st, int iref)
     st->dstructs = sd;
     st->structs  = sb;
     st->nst      = nsb;
+    st->ndst     = nsd;
+
+/* parse out unions */
+    nub = 0;
+    nud = 0;
+    ub  = NULL;
+    ud  = NULL;
+    if (cdv != NULL)
+       {for (id = 0; cdv[id] != NULL; id++)
+	    {ps = cdv[id];
+	     if (blank_line(ps) == TRUE)
+	        continue;
+	     else if (strncmp(ps, tykind[TK_UNION], 5) == 0)
+	        {derived_entry(&de, ps, "{;}", TK_UNION);
+		 ud = push_derived(ud, &nud, &de);
+		 for (ib = 0; ib < nbi; ib++)
+		     {nstrncpy(s, BFLRG, sbi[ib], -1);
+		      if (blank_line(s) == FALSE)
+			 {te = strtok(s, " ");
+			  te = strtok(NULL, " ");
+			  if (strcmp(de.na.cnm, te) == 0)
+			     {ub = push_derived(ub, &nub, &de);
+			      break;};};};};};};
+
+    ud = push_derived(ud, &nud, NULL);
+    ub = push_derived(ub, &nub, NULL);
+
+    st->dunions = ud;
+    st->unions  = ub;
+    st->nun     = nub;
+    st->ndun    = nud;
 
     return;}
 
@@ -1727,11 +1807,11 @@ int main(int c, char **v)
     char pck[BFLRG], msg[BFLRG];
     char *fbi, *t;
     bindes *pb;
-    statedes st = {0, 0, 0, 0,
+    statedes st = {0, 0, 0, 0, 0, 0, 0, 0,
                    {FALSE, FALSE, FALSE, FALSE},
 		   NULL,
 		   NULL, NULL, NULL, NULL, NULL, NULL,
-		   NULL, NULL, NULL, NULL,
+		   NULL, NULL, NULL, NULL, NULL, NULL,
 		   NULL, };
 
     nbd = 0;

@@ -245,6 +245,8 @@ void SC_register_thread_state(void)
 
        st.init = TRUE;
 
+       SC_init_base_types();
+
     END_SAFE;
 
     return;}

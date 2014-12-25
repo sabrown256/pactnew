@@ -12,11 +12,6 @@
 
 #define EOE(str) ((*SS_PTR(str) == '\n') || (*SS_PTR(str) == '\0'))
 
-static char
- *SX_MAPPING_S = "PM_mapping *",
- *SX_IMAGE_S = "PG_image *",
- *SX_CURVE_S = "PG_curve";
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -250,20 +245,20 @@ void _SX_get_menu(SS_psides *si, SX_file *po)
     names = PD_ls(file, dir, "PM_mapping *", &n);
     if (names != NULL)
        {for (i = 0; i < n; i++)
-	    _SX_push_menu_item(si, po, names[i], SX_MAPPING_S);
+	    _SX_push_menu_item(si, po, names[i], G_PM_MAPPING_P_S);
 	CFREE(names);};
 
     names = PD_ls(file, dir, "PG_image *", &n);
     if (names != NULL)
        {for (i = 0; i < n; i++)
-	    _SX_push_menu_item(si, po, names[i], SX_IMAGE_S);
+	    _SX_push_menu_item(si, po, names[i], G_PG_IMAGE_P_S);
 	CFREE(names);};
 
     names = PD_ls(file, dir, SC_CHAR_S, &n);
     if (names != NULL)
        {for (i = 0; i < n; i++)
 	    if (SC_regx_match(names[i], "curve????"))
-	       _SX_push_menu_item(si, po, names[i], SX_CURVE_S);
+	       _SX_push_menu_item(si, po, names[i], G_PG_CURVE_S);
 	CFREE(names);};
 
     n      = SC_array_get_n(po->menu_lst);
@@ -298,7 +293,7 @@ void _SX_push_menu_item(SS_psides *si, SX_file *po, char *name, char *type)
     mitem.vname = CSTRSAVE(s);
 
 /* get mapping label */
-    if (strcmp(type, SX_MAPPING_S) == 0)
+    if (strcmp(type, G_PM_MAPPING_P_S) == 0)
        {var = SC_dsnprintf(FALSE, "%s[%d].name", s, file->default_offset);
         if (!PD_read(file, var, &lb))
  	   SS_error(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
@@ -309,7 +304,7 @@ void _SX_push_menu_item(SS_psides *si, SX_file *po, char *name, char *type)
 	SC_array_push(po->menu_lst, &mitem);}
 
 /* get curve label */
-    else if (strcmp(type, SX_CURVE_S) == 0)
+    else if (strcmp(type, G_PG_CURVE_S) == 0)
        {char *u, t[MAXLINE], *pt;
 
         if (!PD_read(file, s, t))
@@ -343,7 +338,7 @@ void _SX_push_menu_item(SS_psides *si, SX_file *po, char *name, char *type)
 	SC_array_push(po->menu_lst, &mitem);}
 
 /* get image label */
-    else if (strcmp(type, SX_IMAGE_S) == 0)
+    else if (strcmp(type, G_PG_IMAGE_P_S) == 0)
        {var = SC_dsnprintf(FALSE, "%s[%d].label", s, file->default_offset);
         if (!PD_read(file, var, &lb))
            SS_error(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",

@@ -646,6 +646,8 @@ void SC_init_base_types(void)
        for (tl = SC_gs.stl; tl->type != NULL; tl++)
 	   _SC_type_register(tl->type, tl);
 	   
+       register_score_types();
+
        _SC_set_format_defaults();
 
     END_SAFE;

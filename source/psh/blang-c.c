@@ -85,10 +85,16 @@ static int cl_c(statedes *st, bindes *bd, int c, char **v)
 
 /* C_EMIT_TYPES_DEF - emit type related definitions into source file */
 
-static void c_emit_types_def(FILE *fc, der_list *sl)
+static void c_emit_types_def(FILE *fc, der_list *sl, char *pck,
+			     int ni, int fl)
    {
 
-    fprintf(fc, "int %s = -1;\n", sl->na.inm);
+    if (fl == TRUE)
+       {fprintf(fc, "char *g_%s_names[%d];\n", pck, 2*ni);
+	fprintf(fc, "\n");}
+
+    else
+       fprintf(fc, "int %s = -1;\n", sl->na.inm);
 
     return;}
 
@@ -97,69 +103,65 @@ static void c_emit_types_def(FILE *fc, der_list *sl)
 
 /* C_EMIT_TYPES_HDR - emit type related declarations and macros */
 
-static void c_emit_types_hdr(FILE *fh, der_list *sl)
+static void c_emit_types_hdr(FILE *fh, der_list *sl, char *pck,
+			     int ni, int fl)
    {int i, nc;
     char a[BFLRG];
     char *mbr, *p;
     mbrdes *md;
     tn_list *tl;
 
-    md = sl->md;
-    tl = &sl->na;
+    if (fl == TRUE)
+       {fprintf(fh, "extern char *g_%s_names[];\n", pck);
+	fprintf(fh, "\n");}
+
+    else
+       {md = sl->md;
+	tl = &sl->na;
 
 /* emit macro to define type to PDB file */
-    fprintf(fh, "#define %s(_f)\t\\\n", tl->dnm);
-    fprintf(fh, "   (PD_defstr_i(_f, \"%s\", \t\\\n", tl->cnm);
+	fprintf(fh, "#define %s(_f)\t\\\n", tl->dnm);
+	fprintf(fh, "   (PD_defstr_i(_f, \"%s\", \t\\\n", tl->cnm);
 
-    a[0] = '\0';
-    for (i = 0; md[i].text != NULL; i++)
-        {mbr = md[i].text;
-	 if (md[i].cast != CAST_NONE)
-	    {p  = strstr(mbr, "MBR(");
-	     *p = '\0';};
+	a[0] = '\0';
+	for (i = 0; md[i].text != NULL; i++)
+	    {mbr = md[i].text;
+	     if (md[i].cast != CAST_NONE)
+		{p  = strstr(mbr, "MBR(");
+		 *p = '\0';};
 
-	 if (md[i].is_fnc_ptr == B_T)
-	    fprintf(fh, "\t\t\"function %s\",\t\\\n", md[i].name);
-	 else
-	    fprintf(fh, "\t\t\"%s\",\t\\\n", trim(mbr, BOTH, " \t"));
+	     if (md[i].is_fnc_ptr == B_T)
+	        fprintf(fh, "\t\t\"function %s\",\t\\\n", md[i].name);
+	     else
+	        fprintf(fh, "\t\t\"%s\",\t\\\n", trim(mbr, BOTH, " \t"));
 	     
-	 if (md[i].cast == CAST_TYPE)
-	    vstrcat(a, BFLRG, 
-		    "    PD_cast(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
-		    tl->cnm, md[i].name, md[i].cast_mbr);
-	 else if (md[i].cast == CAST_LENGTH)
-	    vstrcat(a, BFLRG, 
-		    "    PD_size_from(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
-		    tl->cnm, md[i].name, md[i].cast_mbr);};
+	     if (md[i].cast == CAST_TYPE)
+	        vstrcat(a, BFLRG, 
+			"    PD_cast(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
+			tl->cnm, md[i].name, md[i].cast_mbr);
+	     else if (md[i].cast == CAST_LENGTH)
+	        vstrcat(a, BFLRG, 
+			"    PD_size_from(_f, \"%s\", \"%s\", \"%s\") &&\t\\\n",
+			tl->cnm, md[i].name, md[i].cast_mbr);};
 
-    if (IS_NULL(a) == FALSE)
-       {fprintf(fh, "\t\tLAST) &&\t\\\n");
-	nc = strlen(a);
-	nstrncpy(a+nc-6, 3, ")\n", 2);
-	fputs(a, fh);}
-    else
-       fprintf(fh, "\t\tLAST))\n");
+	if (IS_NULL(a) == FALSE)
+	   {fprintf(fh, "\t\tLAST) &&\t\\\n");
+	    nc = strlen(a);
+	    nstrncpy(a+nc-6, 3, ")\n", 2);
+	    fputs(a, fh);}
+	else
+	   fprintf(fh, "\t\tLAST))\n");
 
-    fprintf(fh, "\n");
+	fprintf(fh, "\n");
 
 /* emit declaration of SCORE type index */
-    fprintf(fh, "#define G_%s_S \"%s\"\n", tl->unm, tl->cnm);
-    fprintf(fh, "#define G_%s_P_S \"%s *\"\n", tl->unm, tl->cnm);
-    fprintf(fh, "extern int %s;\n", tl->inm);
-    fprintf(fh, "\n");
+	fprintf(fh, "#define G_%s_S   g_%s_names[%d]\n",
+		tl->unm, pck, 2*ni);
+	fprintf(fh, "#define G_%s_P_S g_%s_names[%d]\n",
+		tl->unm, pck, 2*ni+1);
 
-#if 0
-/* GOTCHA: structs haven't been defined yet, typedef'ing here
- * doesn't work either
- */
-/* emit function pointer declaration */
-    snprintf(a, BFLRG, "%s *", tl->cnm);
-    fprintf(fh, "DEF_FUNCTION_PTR (%s, %s);\n",
-	    tl->cnm, fix_camelcase(tl->cnm));
-    fprintf(fh, "DEF_FUNCTION_PTR (%s, %s);\n",
-	    a, fix_camelcase(a));
-    fprintf(fh, "\n");
-#endif
+	fprintf(fh, "extern int %s;\n", tl->inm);
+	fprintf(fh, "\n");};
 
     return;}
 
@@ -168,7 +170,7 @@ static void c_emit_types_hdr(FILE *fh, der_list *sl)
 
 /* C_ENUM_DEFS - generate coding to define enums to PDBLib */
 
-static void c_enum_defs(bindes *bd, char *tag, der_list *el, int ni)
+static void c_enum_defs(bindes *bd, char *tag, der_list *el, int ie, int ni)
    {FILE *fh, **fpa;
     tn_list tl;
 
@@ -198,23 +200,26 @@ static void c_enum_defs(bindes *bd, char *tag, der_list *el, int ni)
  *               - and PDBLib PD_defstr call
  */
 
-static void c_object_defs(bindes *bd, char *tag, der_list *sl, int ni)
-   {FILE *fc, *fh, **fpa;
+static void c_object_defs(bindes *bd, char *tag, der_list *sl, int is, int ni)
+   {char *pck;
+    FILE *fc, *fh, **fpa;
 
     fpa = bd->fp;
+    pck = bd->st->pck;
 
     fc = fpa[0];
     fh = fpa[1];
 
     if (sl == NULL)
        {if (strcmp(tag, "begin") == 0)
-	   {}
+	   {c_emit_types_def(fc, sl, pck, ni, TRUE);
+	    c_emit_types_hdr(fh, sl, pck, ni, TRUE);}
         else if (strcmp(tag, "end") == 0)
 	   {};}
 
     else if (sl->kind == TK_STRUCT)
-       {c_emit_types_def(fc, sl);
-        c_emit_types_hdr(fh, sl);};
+       {c_emit_types_def(fc, sl, pck, is, FALSE);
+        c_emit_types_hdr(fh, sl, pck, is, FALSE);};
 
     return;}
 
@@ -223,7 +228,7 @@ static void c_object_defs(bindes *bd, char *tag, der_list *sl, int ni)
 
 /* C_TYPE_REG - generate coding to register C types with SCORE type manager */
 
-static void c_type_reg(bindes *bd, char *tag, der_list *sl, int ni)
+static void c_type_reg(bindes *bd, char *tag, der_list *sl, int is, int ni)
    {FILE *fc, **fpa;
     tn_list *tl;
 
@@ -239,10 +244,20 @@ static void c_type_reg(bindes *bd, char *tag, der_list *sl, int ni)
 	   {};}
 
     else if (sl->kind == TK_STRUCT)
-       {fprintf(fc, "       %s = SC_type_register(\"%s\", KIND_STRUCT,\n",
+
+/* initialize G_*_I */
+       {fprintf(fc, "       %s   = SC_type_register(\"%s\", KIND_STRUCT,\n",
 		tl->inm, tl->cnm);
 	fprintf(fc, "\t\t\t\tTRUE, sizeof(%s), 0);\n",
-		tl->cnm);};
+		tl->cnm);
+
+/* initialize G_*_S and G_*_P_S */
+	fprintf(fc, "       %s   = CSTRSAVE(\"%s\");\n",
+		tl->snm, tl->cnm);
+	fprintf(fc, "       G_%s_P_S = CSTRSAVE(\"%s *\");\n",
+		tl->unm, tl->cnm);
+
+	fprintf(fc, "\n");};
 
     return;}
 

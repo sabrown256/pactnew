@@ -457,7 +457,7 @@ static object *_SSI_synonym(SS_psides *si, object *argl)
     for (argl = SS_cdr(si, argl); SS_consp(argl); argl = SS_cdr(si, argl))
         {synname = SS_get_string(SS_car(si, argl));
          SC_hasharr_remove(si->symtab, synname);
-         SC_hasharr_install(si->symtab, synname, func, SS_OBJECT_S, 3, -1);};
+         SC_hasharr_install(si->symtab, synname, func, G_OBJECT_S, 3, -1);};
 
     return(SS_t);}
 

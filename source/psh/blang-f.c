@@ -1113,7 +1113,8 @@ static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 
 /* MODULE_ENUM_DECL - write the Fortran interface C enums TAG */
 
-static void module_enum_decl(bindes *bd, char *tag, der_list *el, int ni)
+static void module_enum_decl(bindes *bd, char *tag, der_list *el,
+			     int ie, int ni)
    {int i, nc;
     long vl;
     char s[BFLRG], x[BFLRG];
@@ -1173,7 +1174,8 @@ static void module_enum_decl(bindes *bd, char *tag, der_list *el, int ni)
 
 /* MODULE_STRUCT_DECL - write the Fortran interface C structs TAG */
 
-static void module_struct_decl(bindes *bd, char *tag, der_list *sl, int ni)
+static void module_struct_decl(bindes *bd, char *tag, der_list *sl,
+			       int is, int ni)
    {FILE *fm, **fpa;
 
     fpa = bd->fp;

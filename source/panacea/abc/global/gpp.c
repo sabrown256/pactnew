@@ -771,7 +771,7 @@ object *LR_var_plot(SS_psides *si, object *argl)
     if (g != NULL)
        {g  = PG_make_graph_from_mapping(f, NULL, NULL, id++, g);
 
-	g->info_type = SC_PCONS_P_S;
+	g->info_type = G_PCONS_P_S;
 	g->info = (byte *) PG_set_tds_info((pcons *) g->info,
 					   PLOT_CONTOUR, CARTESIAN_2D, 
 					   lstyle, lcolor, 10, 1.0,
