@@ -18,6 +18,8 @@
 void _PA_internal_init(void)
    {
 
+    register_panacea_types();
+
     PA_set_n_threads(1);
 
     PA_gs.variable_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);

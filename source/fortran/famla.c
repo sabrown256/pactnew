@@ -148,7 +148,7 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, char *fname,
 	top  = NULL;}
 
     else
-       {topt  = PM_MESH_TOPOLOGY_P_S;
+       {topt  = G_PM_MESH_TOPOLOGY_P_S;
         top   = SC_GET_POINTER(PM_mesh_topology, *stp);
 	maxes = NULL;
         ne    = top->n_cells[0];};

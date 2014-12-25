@@ -1412,7 +1412,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
 			     odom->max_index, elements,
 			     odom->opers, odom->metric,
 			     odom->symmetry_type, odom->symmetry,
-			     PM_MESH_TOPOLOGY_P_S, mt,
+			     G_PM_MESH_TOPOLOGY_P_S, mt,
 			     odom->info_type, odom->info, NULL);
 
 	    nran = PM_copy_set(oran);
@@ -1510,7 +1510,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
     set = PM_mk_set(name, SC_DOUBLE_S, FALSE,
 		    ne, nd, nde, NULL, elem,
 		    NULL, NULL, NULL, NULL,
-		    PM_MESH_TOPOLOGY_P_S, mt,
+		    G_PM_MESH_TOPOLOGY_P_S, mt,
 		    NULL, NULL, NULL);
 
     o = SX_make_pm_set(si, set);
@@ -1743,7 +1743,7 @@ PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
     s  = PM_mk_set(name, SC_DOUBLE_S, FALSE, n_nodes, 2, 2,
 		   NULL, elem,
 		   NULL, NULL, NULL, NULL, 
-		   PM_MESH_TOPOLOGY_P_S, mt,
+		   G_PM_MESH_TOPOLOGY_P_S, mt,
 		   NULL, NULL, NULL);
 
     return(s);}

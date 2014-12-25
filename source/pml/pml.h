@@ -27,17 +27,9 @@
 #define PM_random PM_random_48
 #endif
 
-#define PM_SET_S                PM_gs.tnames[0]
-#define PM_SET_P_S              PM_gs.tnames[1]
-#define PM_MAP_INFO_S           PM_gs.tnames[2]
-#define PM_MAP_INFO_P_S         PM_gs.tnames[3]
-#define PM_MAPPING_S            PM_gs.tnames[4]
-#define PM_MAPPING_P_S          PM_gs.tnames[5]
-#define PM_MESH_TOPOLOGY_S      PM_gs.tnames[6]
-#define PM_MESH_TOPOLOGY_P_S    PM_gs.tnames[7]
-#define PM_AC_S                 PM_gs.tnames[8]
-#define PM_LR_S                 PM_gs.tnames[9]
-#define PM_N_TYPES              10
+#define PM_AC_S                 PM_gs.tnames[0]
+#define PM_LR_S                 PM_gs.tnames[1]
+#define PM_N_TYPES              2
 
 /*--------------------------------------------------------------------------*/
 

@@ -375,7 +375,7 @@ static void _PG_dom_2d(PG_device *dev, PM_set *dom, PM_set *ran)
 	        {cnnct = (void *) p->max_index;
 		 _PG_dom_lr_2d(dev, d[0], d[1], cnnct, alst);}
 
-	     else if (strcmp(p->topology_type, PM_MESH_TOPOLOGY_P_S) == 0)
+	     else if (strcmp(p->topology_type, G_PM_MESH_TOPOLOGY_P_S) == 0)
 	        {cnnct = p->topology;
 		 _PG_dom_ac_2d(dev, d[0], d[1], cnnct, alst);};
 
@@ -667,7 +667,8 @@ static void _PG_dom_ac_3d_shaded(PG_device *dev, double **r,
 
     nd = 3;
 
-    tri = _PG_hls_remove(dev, PM_MESH_TOPOLOGY_S, r, NULL, cnnct, alist, &nt);
+    tri = _PG_hls_remove(dev, G_PM_MESH_TOPOLOGY_S, r, NULL,
+			 cnnct, alist, &nt);
     if (tri == NULL)
        return;
 
@@ -882,7 +883,7 @@ static void _PG_draw_3d_domain(PG_device *dev, PM_set *dom, PM_set *ran,
        {cnnct = (void *) dom->max_index;
         _PG_dom_lr_3d(dev, r, dextr, cnnct, alst);}
 
-    else if (strcmp(dom->topology_type, PM_MESH_TOPOLOGY_P_S) == 0)
+    else if (strcmp(dom->topology_type, G_PM_MESH_TOPOLOGY_P_S) == 0)
        {cnnct = dom->topology;
         if (_PG.ptype == PLOT_SURFACE)
 	   _PG_dom_ac_3d_shaded(dev, r, cnnct, alst);

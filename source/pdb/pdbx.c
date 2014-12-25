@@ -1081,15 +1081,11 @@ int PD_mesh_struct(PDBfile *file ARG(,,cls))
 int PD_def_mapping(PDBfile *fp ARG(,,cls))
    {int err;
 
-    ONCE_SAFE(TRUE, NULL)
-       PM_SET_S             = CSTRDUP("PM_set", 3);
-       PM_SET_P_S           = CSTRDUP("PM_set *", 3);
-       PM_MESH_TOPOLOGY_P_S = CSTRDUP("PM_mesh_topology *", 3);
-       PM_MAPPING_P_S       = CSTRDUP("PM_mapping *", 3);
-       PM_MAPPING_S         = CSTRDUP("PM_mapping", 3);
-    END_SAFE;
+    register_pml_types();
 
     err = TRUE;
+
+    err &= (G_PM_CENTERING_E(fp) != NULL);
 
     err &= G_SC_ARRAY_D(fp);
 
@@ -1097,8 +1093,6 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     err &= G_SC_DYNAMIC_ARRAY_D(fp);
 
     err &= G_PCONS_D(fp);
-
-    err &= (G_PM_CENTERING_E(fp) != NULL);
 
     err &= G_C_ARRAY_D(fp);
     err &= G_PM_POLYGON_D(fp);

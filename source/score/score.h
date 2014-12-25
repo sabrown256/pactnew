@@ -1128,7 +1128,8 @@ extern void
 /* SCSTR.C declarations */
 
 extern char
- *SC_strsavec(char *s, int memfl, const char *file, const char *fnc, int line),
+ *SC_strsavec(char *s, int memfl,
+	      const char *file, const char *fnc, int line),
  *SC_strcat(char *dest, size_t lnd, char *src),
  *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...),
  *SC_dstrcat(char *dest, char *src),
