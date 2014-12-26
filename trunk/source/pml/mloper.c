@@ -27,10 +27,7 @@ PM_field
 
 PM_scope_public
  PM_gs = { &_fp_opers, &_int_opers, &_long_opers,
-	   { "PM_set", "PM_set *", "PM_map_info", "PM_map_info *",
-	     "PM_mapping", "PM_mapping *",
-	     "PM_mesh_topology", "PM_mesh_topology *",
-	     "Arbitrarily-Connected", "Logical-Rectangular" },
+	   { "Arbitrarily-Connected", "Logical-Rectangular" },
 	 };
 
 PM_scope_private

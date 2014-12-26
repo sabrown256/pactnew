@@ -232,7 +232,7 @@ int _PD_spokep(char *type)
 int _PD_pdbfilep(char *type)
    {int rv;
 
-    rv = (strcmp(type, PDBFILE_S) == 0);
+    rv = (strcmp(type, G_PDBFILE_S) == 0);
 
     return(rv);}
 
@@ -246,7 +246,7 @@ int PD_register_pdb(void)
 
     ONCE_SAFE(TRUE, NULL)
 
-       n = PD_REGISTER(PDBFILE_S, "pdb", _PD_pdbfilep,
+       n = PD_REGISTER(G_PDBFILE_S, "pdb", _PD_pdbfilep,
 		       _PD_create, _PD_open, _PD_close, _PD_write, _PD_read);
 
        SC_ASSERT(n >= 0);
@@ -287,7 +287,7 @@ static PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
  * try creating file
  */
 	if ((file == NULL) && (SC_isfile(pu->path) == FALSE))
-	   {if ((*mode == 'a') && (crt != NULL) && (tr->type == PDBFILE_S))
+	   {if ((*mode == 'a') && (crt != NULL) && (tr->type == G_PDBFILE_S))
 	       {_SC_rel_udl(pu);
 	        file = _PD_open_bin_aux(pu, name, "w", tr, a);};};};
 

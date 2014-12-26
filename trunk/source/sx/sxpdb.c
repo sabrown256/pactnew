@@ -437,7 +437,7 @@ static object *_SXI_open_raw_file(SS_psides *si, object *argl)
 
     _PD_init_chrt(file, TRUE);
 
-    o  = SX_mk_gfile(si, _SX_mk_file(name, PDBFILE_S, file));
+    o  = SX_mk_gfile(si, _SX_mk_file(name, G_PDBFILE_S, file));
 
     return(o);}
 
@@ -839,7 +839,7 @@ int SX_pdbfilep(object *obj)
 /* the virtual internal file may have a NULL translation layer
  * but it is a PDBfile
  */
-	if ((file == NULL) || (strcmp(file->tr->type, PDBFILE_S) == 0))
+	if ((file == NULL) || (strcmp(file->tr->type, G_PDBFILE_S) == 0))
            rv = TRUE;};
 
     return(rv);}
@@ -854,7 +854,7 @@ int SX_ipdbfilep(object *obj)
 
     rv = FALSE;
     if (SX_FILEP(obj))
-       {if (strcmp(FILE_TYPE(obj), PDBFILE_S) == 0)
+       {if (strcmp(FILE_TYPE(obj), G_PDBFILE_S) == 0)
            rv = TRUE;};
 
     return(rv);}
@@ -1014,7 +1014,7 @@ static object *_SXI_get_io_info(SS_psides *si, object *arg)
 static object *_SXI_create_pdbfile(SS_psides *si, object *arg)
    {object *o;
 
-    o = _SX_open_file(si, arg, PDBFILE_S, "w");
+    o = _SX_open_file(si, arg, G_PDBFILE_S, "w");
 
     return(o);}
 
@@ -1037,7 +1037,7 @@ static object *_SXI_open_pdbfile(SS_psides *si, object *argl)
     else
        obj = argl;
 
-    o = _SX_open_file(si, obj, PDBFILE_S, mode);
+    o = _SX_open_file(si, obj, G_PDBFILE_S, mode);
 
     return(o);}
 
@@ -1169,7 +1169,7 @@ static object *_SXI_family_file(SS_psides *si, object *argl)
     ifl  = SS_true(fl);
     file = PD_family(file, ifl);
     if (file != NULL)
-       o = SX_mk_gfile(si, _SX_mk_file(file->name, PDBFILE_S, file));
+       o = SX_mk_gfile(si, _SX_mk_file(file->name, G_PDBFILE_S, file));
 
     return(o);}
 
@@ -2939,7 +2939,7 @@ static object *_SXI_remove_entry(SS_psides *si, object *argl)
     if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
-    else if (strcmp(po->type, PDBFILE_S) == 0)
+    else if (strcmp(po->type, G_PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
 
     else
@@ -3813,7 +3813,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
     if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
-    else if (strcmp(po->type, PDBFILE_S) == 0)
+    else if (strcmp(po->type, G_PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
 
     else
@@ -3898,7 +3898,7 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
     if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
-    else if (strcmp(po->type, PDBFILE_S) == 0)
+    else if (strcmp(po->type, G_PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
 
     else

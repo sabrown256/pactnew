@@ -115,7 +115,7 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
 /* SX initializations depending on scheme */
     SX_install_funcs(si);
 
-    SX_gs.gvif = _SX_mk_file("virtual-internal", PDBFILE_S, SX_gs.vif);
+    SX_gs.gvif = _SX_mk_file("virtual-internal", G_PDBFILE_S, SX_gs.vif);
     SX_gs.ovif = SX_mk_gfile(si, SX_gs.gvif);
 
 /* PDB initializations */

@@ -2767,7 +2767,7 @@ object *SS_mk_vector(SS_psides *si, int l)
 <P>
 object *SS_mk_hasharr(SS_psides *si, hasharr *tb)
 <P>
-object *SS_mk_haelem(SS_psides *si, hashel *hp)
+object *SS_mk_haelem(SS_psides *si, haelem *hp)
 <P><BR>
 <P>object *SS_mk_object(SS_psides *si, void *p,
                         int type, int ev_type, char *name)

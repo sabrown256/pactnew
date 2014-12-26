@@ -507,8 +507,8 @@ hasharr *PN_target(data_standard *std, data_alignment *align)
 		    PD_CHART_FILE, TRUE);
 
 /* special hack for jollies and to save typing */
-    SC_hasharr_install(chart, "standard", std, PD_STANDARD_S, 3, -1);
-    SC_hasharr_install(chart, "alignment", align, PD_ALIGNMENT_S, 3, -1);
+    SC_hasharr_install(chart, "standard", std, G_DATA_STANDARD_S, 3, -1);
+    SC_hasharr_install(chart, "alignment", align, G_DATA_ALIGNMENT_S, 3, -1);
 
     return(chart);}
 

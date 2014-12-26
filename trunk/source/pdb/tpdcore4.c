@@ -30,13 +30,7 @@ static hasharr
  *tab4_w;
 
 static char
- *CHAR_S,
- *SHORT_S,
- *INT_S,
- *LONG_S,
- *FLOAT_S,
- *DOUBLE_S,
- *HASHEL_S;
+ *DOUBLE_S;
 
 /*--------------------------------------------------------------------------*/
 
@@ -57,42 +51,36 @@ static void prep_test_4_data(void)
 
     tab4_w = SC_make_hasharr(3, NODOC, SC_HA_NAME_KEY, 0);
 
-    CHAR_S   = CSTRSAVE("char *");
-    SHORT_S  = CSTRSAVE("short *");
-    INT_S    = CSTRSAVE("int *");
-    LONG_S   = CSTRSAVE("long *");
-    FLOAT_S  = CSTRSAVE("float *");
     DOUBLE_S = CSTRSAVE("double *");
-    HASHEL_S = CSTRSAVE("haelem *");
 
     pc  = CMAKE(char);
     *pc = 'A';   
-    SC_hasharr_install(tab4_w, "pc", pc, CHAR_S, 3, -1);
+    SC_hasharr_install(tab4_w, "pc", pc, SC_STRING_S, 3, -1);
 
     ps  = CMAKE(short);
     *ps = -1024;
-    SC_hasharr_install(tab4_w, "ps", ps, SHORT_S, 3, -1);
+    SC_hasharr_install(tab4_w, "ps", ps, SC_SHORT_P_S, 3, -1);
 
     pi  = CMAKE(int);
     *pi = 16384;
-    SC_hasharr_install(tab4_w, "pi", pi, INT_S, 3, -1);
+    SC_hasharr_install(tab4_w, "pi", pi, SC_INT_P_S, 3, -1);
 
     pl  = CMAKE(long);
     *pl = -1048576;
-    SC_hasharr_install(tab4_w, "pl", pl, LONG_S, 3, -1);
+    SC_hasharr_install(tab4_w, "pl", pl, SC_LONG_P_S, 3, -1);
 
     pf  = CMAKE(float);
     *pf = 3.141596;
-    SC_hasharr_install(tab4_w, "pf", pf, FLOAT_S, 3, -1);
+    SC_hasharr_install(tab4_w, "pf", pf, SC_FLOAT_P_S, 3, -1);
 
     pd  = CMAKE(double);
     *pd = -1.0e-30;
-    hp = SC_hasharr_install(tab4_w, "pd", pd, DOUBLE_S, 3, -1);
+    hp  = SC_hasharr_install(tab4_w, "pd", pd, DOUBLE_S, 3, -1);
 
 /* mark to keep reference count right and valgrind clean */
     SC_mark(hp, 1);
 
-    SC_hasharr_install(tab4_w, "ph", hp, HASHEL_S, 3, -1);
+    SC_hasharr_install(tab4_w, "ph", hp, G_HAELEM_P_S, 3, -1);
 
     tab4_r = NULL;
 
@@ -134,13 +122,7 @@ static void cleanup_test_4(void)
     if (tab4_r != NULL)
        SC_free_hasharr(tab4_r, cleanup_ha_test_4, NULL);
 
-    CFREE(CHAR_S);
-    CFREE(SHORT_S);
-    CFREE(INT_S);
-    CFREE(LONG_S);
-    CFREE(FLOAT_S);
     CFREE(DOUBLE_S);
-    CFREE(HASHEL_S);
 
     CFREE(vr4_w);
     CFREE(vr4_r);
@@ -212,12 +194,12 @@ static void print_test_4_data(FILE *fp)
     SC_mark(ph, 1);
 
     PRINT(fp, "Table values:\n");
-    PRINT(fp, "   pc = %c %s\n", *pc, CHAR_S);
-    PRINT(fp, "   ps = %d %s\n", *ps, SHORT_S);
-    PRINT(fp, "   pi = %d %s\n", *pi, INT_S);
-    PRINT(fp, "   pl = %ld %s\n", *pl, LONG_S);
-    PRINT(fp, "   pf = %f %s\n", *pf, FLOAT_S);
-    PRINT(fp, "   pd = %e %s\n", *pd, DOUBLE_S);
+    PRINT(fp, "   pc = %c %s\n", *pc, SC_STRING_S);
+    PRINT(fp, "   ps = %d %s\n", *ps, SC_SHORT_P_S);
+    PRINT(fp, "   pi = %d %s\n", *pi, SC_INT_P_S);
+    PRINT(fp, "   pl = %ld %s\n", *pl, SC_LONG_P_S);
+    PRINT(fp, "   pf = %f %s\n", *pf, SC_FLOAT_P_S);
+    PRINT(fp, "   pd = %e %s\n", *pd, SC_DOUBLE_P_S);
 
     PRINT(fp, "\n   ph : %s %s\n\n", ph->name, ph->type);
 

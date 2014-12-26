@@ -210,7 +210,7 @@ static object *_SXI_def_file_graph(SS_psides *si, object *obj)
        file = SX_gs.vif;
 
     else
-       {if (strcmp(po->type, PDBFILE_S) != 0)
+       {if (strcmp(po->type, G_PDBFILE_S) != 0)
 	   SS_error(si, "REQUIRE PDB FILE - _SXI_DEF_FILE_GRAPH", obj);
 
 	file = FILE_FILE(PDBfile, po);};
@@ -250,7 +250,7 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
             SC_STRING_I, &name,
             0);
 
-    if (strcmp(po->type, PDBFILE_S) != 0)
+    if (strcmp(po->type, G_PDBFILE_S) != 0)
        SS_error(si, "REQUIRE PDB FILE - _SXI_GRAPH_PDBDATA", argl);
     file = FILE_FILE(PDBfile, po);
 
@@ -460,7 +460,7 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
             G_OBJECT_I, &obj,
             0);
 
-    if (strcmp(po->type, PDBFILE_S) != 0)
+    if (strcmp(po->type, G_PDBFILE_S) != 0)
        SS_error(si, "REQUIRE PDB FILE - _SXI_PDBDATA_GRAPH", argl);
 
     file = FILE_FILE(PDBfile, po);
@@ -676,7 +676,7 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
     if ((po == NULL) || (po == SX_gs.gvif))
        {file = SX_gs.vif;
 	po   = SX_gs.gvif;}
-    else if (strcmp(po->type, PDBFILE_S) == 0)
+    else if (strcmp(po->type, G_PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
     else
        SS_error(si, "BAD FILE - _SXI_GRAPH_PDBCURVE", argl);
@@ -727,7 +727,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
     if ((file == NULL) || (file == SX_gs.gvif))
        {file = SX_gs.gvif;
 	strm = SX_gs.vif;}
-    else if (strcmp(file->type, PDBFILE_S) == 0)
+    else if (strcmp(file->type, G_PDBFILE_S) == 0)
        strm = (PDBfile *) file->file;
     else
        SS_error(si, "BAD FILE - _SXI_IMAGE_PDBDATA", argl);
