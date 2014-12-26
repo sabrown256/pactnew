@@ -150,19 +150,6 @@
 #define NSTD         6     /* number of standards currently in the system 
                             * should be same as last standard */
 
-#define PD_TYPI(_n)     _n ## _I
-#define PD_TYPPI(_n)    _n ## _P_I
-#define PD_TYPN(_n)     PD_gs.tnames[PD_TYPI(_n) - PD_TYPI(PDBfile)]
-#define PD_TYPPN(_n)    PD_gs.tpnames[PD_TYPPI(_n) - PD_TYPPI(PDBfile)]
-
-#define PDBFILE_S       PD_gs.tnames[0]
-#define PD_DEFSTR_S     PD_gs.tnames[1]
-#define PD_ALIGNMENT_S  PD_gs.tnames[2]
-#define PD_STANDARD_S   PD_gs.tnames[3]
-#define SYMENT_S        PD_gs.tnames[4]
-#define SYMENT_P_S      PD_gs.tnames[5]
-#define PD_N_TYPES      6
-
 #define TEXT_STD        PD_gs.standards[PD_TEXT_STD]
 #define I386_STD        PD_gs.standards[PD_I386_STD]
 #define I586L_STD       PD_gs.standards[PD_I586L_STD]
@@ -199,7 +186,7 @@
 #define PN_sizeof(type, tab)  _PD_lookup_size(type, tab)
 
 #define PD_get_file_type(file)                                               \
-   (((file)->type == NULL) ? PDBFILE_S : (file)->type)
+   (((file)->type == NULL) ? G_PDBFILE_S : (file)->type)
 
 /* deprecated in favor PD_set_fmt_version and PD_get_fmt_version */
 #define PD_set_format_version        PD_set_fmt_version
@@ -792,7 +779,6 @@ struct s_PD_scope_public
     long print_ctrl[10];
 
     char err[MAXLINE];
-    char *tnames[PD_N_TYPES];
 
     PDBfile *vif;
     PFPDBwrite write;                    /* semi-obsolete read/write hooks */

@@ -24,7 +24,6 @@ PD_scope_public
  */
            {0L, 0L, 0L, 20L, 2L, 0L, 0L, 0L, 0L, 0L},
            "",
-           { "PDBfile", NULL, NULL, NULL },
 	   NULL, NULL, NULL,
 
 /* data_standards */

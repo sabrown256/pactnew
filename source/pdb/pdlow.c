@@ -366,7 +366,7 @@ void _PD_e_install(PDBfile *file, char *name, syment *ep, int lookup)
 	if (lookup)
 	   PD_remove_entry(file, name);
 
-	SC_hasharr_install(tab, name, ep, SYMENT_P_S, 1, -1);};
+	SC_hasharr_install(tab, name, ep, G_SYMENT_P_S, 1, -1);};
 
     return;}
 
@@ -395,7 +395,7 @@ static void _PD_d_install_in(char *name, defstr *def, hasharr *tab,
 	hp->def = NULL;
 	SC_hasharr_remove(tab, name);};
 
-    SC_hasharr_install(tab, name, def, PD_DEFSTR_S, 3, -1);
+    SC_hasharr_install(tab, name, def, G_DEFSTR_P_S, 3, -1);
 
 /* if this is the host chart register the type */
     typ = def->type;
@@ -853,13 +853,14 @@ int64_t PD_entry_address(syment *ep)
 void _PD_init_consts(void)
    {
 
-    if (PD_DEFSTR_S == NULL)
-       {LAST  = CPMAKE(int, 3);
-        *LAST = 0;
+    ONCE_SAFE(TRUE, NULL)
+       LAST  = CPMAKE(int, 3);
+       *LAST = 0;
 
-        PD_DEFSTR_S = CSTRDUP("defstr *", 3);
-        SYMENT_P_S  = CSTRDUP("syment *", 3);
-        SYMENT_S    = CSTRDUP("syment", 3);};
+        register_score_types();
+        register_pml_types();
+        register_pdb_types();
+    END_SAFE;
 
     return;}
 
@@ -1069,7 +1070,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 void _PD_def_real(char *type, PDBfile *file)
    {
 
-    if (strcmp(type, PDBFILE_S) == 0)
+    if (strcmp(type, G_PDBFILE_S) == 0)
        {PD_typedef_primitive_types(file);
 	_PD_init_typedefs(file);};
 

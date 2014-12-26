@@ -178,7 +178,7 @@ object *_SXI_menu(SS_psides *si, object *argl)
             SC_STRING_I, &type,
             0);
 
-    if (strcmp(po->type, PDBFILE_S) != 0)
+    if (strcmp(po->type, G_PDBFILE_S) != 0)
        return(ret);
 
     _SX_get_menu(si, po);
