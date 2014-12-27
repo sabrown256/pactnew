@@ -13,6 +13,51 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_GET_TYPE_METHOD - fetch the methods associated with TYPE */
+
+int _SS_get_type_method(SC_type *td, ...)
+   {int i, ok, rv;
+    char *mn;
+    pcons *alst;
+    PFPVoid *pmf;
+
+    SC_VA_START(td);
+
+/* if the type is found set all the function pointers */
+    if (td != NULL)
+       {alst = td->a;
+
+	ok = TRUE;
+	for (i = 0; ok == TRUE; i++)
+	    {mn = SC_VA_ARG(char *);
+	     if (mn == NULL)
+	        ok = FALSE;
+	     else
+	        {pmf  = SC_VA_ARG(PFPVoid *);
+		 *pmf = SC_assoc(alst, mn);};};
+
+	rv = TRUE;}
+
+/* if the type is not found NULL out all the function pointers */
+    else
+       {ok = TRUE;
+	for (i = 0; ok == TRUE; i++)
+	    {mn = SC_VA_ARG(char *);
+	     if (mn == NULL)
+	        ok = FALSE;
+	     else
+	        {pmf  = SC_VA_ARG(PFPVoid *);
+		 *pmf = NULL;};};
+
+	rv = FALSE;};
+
+    SC_VA_END;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SS_GET_TYPE_METHOD - fetch the methods associated with TYPE */
 
 int SS_get_type_method(int type, ...)
@@ -347,87 +392,69 @@ static void _SS_quaternion_arg(SS_psides *si, object *obj, void *v)
 /* _SS_ARGS - get a C level data item from a single SCHEME object */
 
 static void _SS_args(SS_psides *si, object *obj, void *v, int type)
-   {void **pv;
+   {int ok;
+    void **pv;
     char *s;
     void *(*f)(SS_psides *si, object *o);
     SS_procedure *pp;
     type_desc *td;
 
     pv = (void **) v;
-    td = SC_gs.stl + type;
+    td = _SC_get_type_id(type);
+    ok = FALSE;
 
 /* if the object has been GC'd along the line NULL out the C level item */
     if (obj->val == NULL)
-       {DEREF(v) = NULL;
-        return;};
+       {ok = TRUE;
+	DEREF(v) = NULL;}
 
-    if (SC_is_type_char(type) == TRUE)
-       _SS_fix_arg(si, obj, v, type);
+    else if (td != NULL)
+       {ok = TRUE;
+	switch (td->g)
+	   {case KIND_CHAR :
+	    case KIND_BOOL :
+	    case KIND_INT :
+	         _SS_fix_arg(si, obj, v, type);
+		 break;
+	    case KIND_FLOAT :
+	         _SS_float_arg(si, obj, v, type);
+		 break;
+	    case KIND_COMPLEX :
+	         _SS_complex_arg(si, obj, v);
+		 break;
+	    case KIND_QUATERNION :
+	         _SS_quaternion_arg(si, obj, v);
+	    default :
+	         if (type == SC_STRING_I)
+		    {s = _SS_get_print_name(si, obj);
+		     DEREF(v) = s;}
 
-    else if ((SC_is_type_fix(type) == TRUE) ||
-	     (type == SC_BOOL_I))
-       _SS_fix_arg(si, obj, v, type);
+		 else if (type == G_OBJECT_I)
+		    *pv = (void *) obj;
 
-    else if (SC_is_type_fp(type) == TRUE)
-       _SS_float_arg(si, obj, v, type);
+		 else if (type == G_SS_PROCEDURE_I)
+		    {pp  = (SS_procedure *) obj->val;
+		     *pv = (void *) pp->proc;}
 
-    else if (SC_is_type_cx(type) == TRUE)
-       _SS_complex_arg(si, obj, v);
+		 else if (type == G_SS_INPUT_PORT_I)
+		    *pv = (void *) SS_INSTREAM(obj);
 
-    else if (type == SC_QUATERNION_I)
-       _SS_quaternion_arg(si, obj, v);
+		 else if (type == G_SS_OUTPUT_PORT_I)
+		    *pv = (void *) SS_OUTSTREAM(obj);
 
-    else if (type == SC_STRING_I)
-       {s = _SS_get_print_name(si, obj);
-	DEREF(v) = s;}
+		 else
+		    ok = FALSE;
+		 break;};};
 
-    else if (type == G_OBJECT_I)
-       *pv = (void *) obj;
-
-    else if (type == G_SS_PROCEDURE_I)
-       {pp  = (SS_procedure *) obj->val;
-	*pv = (void *) pp->proc;}
-
-    else if (type == G_SS_INPUT_PORT_I)
-       *pv = (void *) SS_INSTREAM(obj);
-
-    else if (type == G_SS_OUTPUT_PORT_I)
-       *pv = (void *) SS_OUTSTREAM(obj);
-
-#ifdef LARGE
-
-    else if (type == G_HAELEM_I)
-       {if (!SS_haelemp(obj))
-	   SS_error(si, "OBJECT NOT HASH_ELEMENT - _SS_ARGS", obj);
-	*pv = obj->val;}
-
-    else if (type == G_HASHARR_I)
-       {if (!SS_nullobjp(obj))
-	   {if (!SS_hasharrp(obj))
-	       SS_error(si, "OBJECT NOT HASH_ARRAY - _SS_ARGS", obj);
-	    *pv = obj->val;};}
-
-    else if (type == G_PROCESS_I)
-       {if (!SS_processp(obj))
-	   SS_error(si, "OBJECT NOT PROCESS - _SS_ARGS", obj);
-	*pv = obj->val;}
-
-    else if (type == G_SS_VECTOR_I)
-       {if (!SS_vectorp(obj))
-	   SS_error(si, "OBJECT NOT VECTOR - _SS_ARGS", obj);
-	*pv = obj->val;}
-
-#endif
-
-    else
-       {SS_get_type_method(type, "Scheme->C", &f, NULL);
+    if (ok == FALSE)
+       {_SS_get_type_method(td, "Scheme->C", &f, NULL);
 	if (f != NULL)
 	   *pv = f(si, obj);
 	else if (si->get_arg != NULL)
-	   si->get_arg(si, obj, v, type);
-        else
+	   si->get_arg(si, obj, v, td);
+	else
 	   *pv = obj->val;};
-
+       
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -626,12 +653,15 @@ object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
    {int i, c, ityp;
     char *s;
     void *vl;
+    SC_type *td;
     object *o, *lst;
 
     lst = SS_null;
     for (i = 0; i < n; i++)
         {ityp = type[i];
 	 vl   = ptr[i];
+
+	 td = _SC_get_type_id(ityp);
 
 /* fixed point types (proper) */
 	 if (SC_is_type_fix(ityp) == TRUE)
@@ -691,7 +721,7 @@ object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
  
 	 else
 	    {if (si->call_arg != NULL)
-	        {o   = si->call_arg(si, type[i], vl);
+	        {o   = si->call_arg(si, td, vl);
 		 lst = SS_mk_cons(si, o, lst);}
 	     else
 	        lst = SS_mk_cons(si, SS_null, lst);};};

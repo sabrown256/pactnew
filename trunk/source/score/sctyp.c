@@ -139,29 +139,7 @@ int SC_type_register(char *name, SC_kind kind, bool ptr, int bpi, ...)
 			  ok = FALSE;
 			  break;};};};
 
-	id = _SC_type_register(name, t);
-
-#if 0
-	if (ptr == TRUE)
-	   {int pid;
-	    char ps[BFSML];
-	    SC_type *p;
-
-	    snprintf(ps, BFSML, "%s *", name);
-
-	    p = CPMAKE(SC_type, 3);
-
-	    p->id   = -1;
-	    p->type = CSTRDUP(ps, 3);
-	    p->knd  = KIND_POINTER;
-	    p->bpi  = sizeof(char *);
-	    p->a    = NULL;
-	    p->init = NULL;
-	    p->free = NULL;
-
-	    pid = _SC_type_register(ps, p);};
-#endif
-	};
+	id = _SC_type_register(name, t);};
 
     SC_VA_END;
 

@@ -30,6 +30,13 @@ SS_psides *UL_init(char *code, char *vers, int c, char **v, char **env)
 
     _SX_install_generated(si);
 
+    UL_CURVE_INDEX_I = SC_type_register("curve_i_space",
+					KIND_ENUM, B_F, sizeof(int), 0);
+    UL_CURVE_INDEX_J = SC_type_register("curve_j_space",
+					KIND_ENUM, B_F, sizeof(int), 0);
+    UL_DATA_ID_I     = SC_type_register("data_id",
+					KIND_ENUM, B_F, sizeof(int), 0);
+
 /* ULTRA initializations not depending on scheme */
     UL_init_view(si);
     UL_init_hash();
@@ -107,47 +114,43 @@ void UL_init_view(SS_psides *si)
 
 /* _UL_ARGS - get a C level data item from a single Scheme object */
 
-static void _UL_args(SS_psides *si, object *obj, void *v, int type)
-   {int *pi, len, i;
+static void _UL_args(SS_psides *si, object *obj, void *v, SC_type *td)
+   {int type, len, i;
+    int *pi;
     char *s, *cptr;
 
-    switch (type)
-       {case UL_CURVE_INDEX_I :
-             if (SX_curvep_a(obj))
-                {pi  = (int *) v;
-                 *pi = SX_get_crv_index_i(obj);}
-             else if (SS_integerp(obj))
-                {pi = (int *) v;
-                 *pi = SX_gs.number[*SS_GET(int, obj)];}
-             else
-                SS_error(si, "OBJECT NOT CURVE - _UL_ARGS", obj);
-             break;
+    type = td->id;
 
-        case UL_CURVE_INDEX_J :
-             if (SX_curvep_a(obj))
-                {pi  = (int *) v;
-                 *pi = SX_get_crv_index_j(obj);}
-             else if (SS_integerp(obj))
-                {pi = (int *) v;
-                 *pi = SX_gs.number[*SS_GET(int, obj)];}
-             else
-                SS_error(si, "OBJECT NOT CURVE - _UL_ARGS", obj);
-             break;
+    if (type == UL_CURVE_INDEX_I)
+       {if (SX_curvep_a(obj))
+	   {pi  = (int *) v;
+	    *pi = SX_get_crv_index_i(obj);}
+        else if (SS_integerp(obj))
+	   {pi = (int *) v;
+	    *pi = SX_gs.number[*SS_GET(int, obj)];}
+	else
+	   SS_error(si, "OBJECT NOT CURVE - _UL_ARGS", obj);}
 
-        case UL_DATA_ID_I :
-             s   = SS_get_string(obj);
-             len = strlen(s);
-             cptr = (char *) v;
-             for (i = 0; i < len; i++)
-                 cptr[i] = (char) toupper((int) s[i]);
-             cptr[i] = '\0';
-             break;
-#if 0
-             *(char *) v = (char) toupper((int) *SS_get_string(obj));
-             break;
-#endif
-        default :
-             _SX_args(si, obj, v, type);};
+    else if (type == UL_CURVE_INDEX_J)
+       {if (SX_curvep_a(obj))
+	   {pi  = (int *) v;
+	    *pi = SX_get_crv_index_j(obj);}
+        else if (SS_integerp(obj))
+	   {pi = (int *) v;
+	    *pi = SX_gs.number[*SS_GET(int, obj)];}
+	else
+	   SS_error(si, "OBJECT NOT CURVE - _UL_ARGS", obj);}
+
+    else if (type == UL_DATA_ID_I)
+       {s   = SS_get_string(obj);
+	len = strlen(s);
+	cptr = (char *) v;
+	for (i = 0; i < len; i++)
+	    cptr[i] = (char) toupper((int) s[i]);
+	cptr[i] = '\0';}
+
+    else
+       _SX_args(si, obj, v, td);
 
     return;}
 

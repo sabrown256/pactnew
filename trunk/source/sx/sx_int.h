@@ -234,11 +234,11 @@ extern SX_scope_private
 /* SXCONT.C declarations */
 
 extern object
- *_SX_call_args(SS_psides *si, int type, void *v),
+ *_SX_call_args(SS_psides *si, SC_type *td, void *v),
  *_SXI_menu(SS_psides *si, object *argl);
 
 extern void
- _SX_args(SS_psides *si, object *obj, void *v, int type),
+ _SX_args(SS_psides *si, object *obj, void *v, SC_type *td),
  *_SX_opt_generic(void *x, bind_opt wh, void *a),
  _SX_get_menu(SS_psides *si, SX_file *po),
  _SX_push_menu_item(SS_psides *si, SX_file *po, char *name, char *type);
