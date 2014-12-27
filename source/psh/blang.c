@@ -251,9 +251,10 @@ static void type_name_list(char *typ, tn_list *na)
 /* PARSE_MEMBER - parse a member description, MBR, into type, TY,
  *              - name, NM, and dimensions, DM
  *              - each of these is NC long if non-NULL
+ *              - return the number of indirections of TY
  */
 
-void parse_member(mbrdes *md, char *mbr)
+int parse_member(mbrdes *md, char *mbr)
    {int im, ns, hd;
     char s[BFLRG], ind[BFSML];
     char **sa, *pn, *pt;
@@ -316,7 +317,7 @@ void parse_member(mbrdes *md, char *mbr)
 
     lst_free(sa);
 
-    return;}
+    return(ns);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -13,9 +13,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_GET_TYPE_METHOD - fetch the methods associated with TYPE */
+/* SS_GET_TYPE_METHOD - fetch the methods associated with TYPE */
 
-int _SS_get_type_method(SC_type *td, ...)
+int SS_get_type_method(SC_type *td, ...)
    {int i, ok, rv;
     char *mn;
     pcons *alst;
@@ -26,54 +26,6 @@ int _SS_get_type_method(SC_type *td, ...)
 /* if the type is found set all the function pointers */
     if (td != NULL)
        {alst = td->a;
-
-	ok = TRUE;
-	for (i = 0; ok == TRUE; i++)
-	    {mn = SC_VA_ARG(char *);
-	     if (mn == NULL)
-	        ok = FALSE;
-	     else
-	        {pmf  = SC_VA_ARG(PFPVoid *);
-		 *pmf = SC_assoc(alst, mn);};};
-
-	rv = TRUE;}
-
-/* if the type is not found NULL out all the function pointers */
-    else
-       {ok = TRUE;
-	for (i = 0; ok == TRUE; i++)
-	    {mn = SC_VA_ARG(char *);
-	     if (mn == NULL)
-	        ok = FALSE;
-	     else
-	        {pmf  = SC_VA_ARG(PFPVoid *);
-		 *pmf = NULL;};};
-
-	rv = FALSE;};
-
-    SC_VA_END;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SS_GET_TYPE_METHOD - fetch the methods associated with TYPE */
-
-int SS_get_type_method(int type, ...)
-   {int i, ok, rv;
-    char *mn;
-    pcons *alst;
-    PFPVoid *pmf;
-    SC_type *ty;
-
-    SC_VA_START(type);
-
-    ty = _SC_get_type_id(type);
-
-/* if the type is found set all the function pointers */
-    if (ty != NULL)
-       {alst = ty->a;
 
 	ok = TRUE;
 	for (i = 0; ok == TRUE; i++)
@@ -447,7 +399,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 		 break;};};
 
     if (ok == FALSE)
-       {_SS_get_type_method(td, "Scheme->C", &f, NULL);
+       {SS_get_type_method(td, "Scheme->C", &f, NULL);
 	if (f != NULL)
 	   *pv = f(si, obj);
 	else if (si->get_arg != NULL)

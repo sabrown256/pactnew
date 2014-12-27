@@ -73,7 +73,7 @@ object *_SX_call_args(SS_psides *si, SC_type *td, void *v)
     obj  = SS_null;
     type = td->id;
 
-    _SS_get_type_method(td, "C->Scheme", &f, NULL);
+    SS_get_type_method(td, "C->Scheme", &f, NULL);
     if (f != NULL)
        obj = f(si, v);
 
