@@ -17,9 +17,10 @@
 #undef CODE
 #define CODE "ULTRA 2.5"
 
-#define UL_CURVE_INDEX_I 500
-#define UL_CURVE_INDEX_J 502
-#define UL_DATA_ID_I     501   
+#define UL_CURVE_INDEX_I   _UL.tnames[0]
+#define UL_CURVE_INDEX_J   _UL.tnames[1]
+#define UL_DATA_ID_I       _UL.tnames[2]
+#define N_UL_TYPES         3
 
 #define PRINT_DOUBLE(_x)                                                     \
     PRINT(stdout, "%s", SC_ftos(NULL, -1, FALSE, SS_gs.fmts[1], _x))
@@ -47,12 +48,13 @@ typedef struct s_UL_scope_private UL_scope_private;
 struct s_UL_scope_private
    {
 
+/* ULCMD.C */
+    int tnames[N_UL_TYPES];
+
 /* ULTRA.C */
     object *crva;
     object *crvb;
-    char bf[MAXLINE];
-
-};
+    char bf[MAXLINE];};
 
 #ifdef __cplusplus
 extern "C" {

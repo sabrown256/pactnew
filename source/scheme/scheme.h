@@ -688,9 +688,9 @@ struct s_SS_psides
     void (*post_read)(SS_psides *si, object *fp);
     void (*post_eval)(SS_psides *si, object *fp);
     void (*name_reproc)(SS_psides *si, char *s, int sz, char *name);
-    void (*get_arg)(SS_psides *si, object *obj, void *v, int type);
+    void (*get_arg)(SS_psides *si, object *obj, void *v, SC_type *td);
     object *(*read)(SS_psides *si, object *fp);
-    object *(*call_arg)(SS_psides *si, int type, void *v);
+    object *(*call_arg)(SS_psides *si, SC_type *td, void *v);
 
     void (*pr_ch_out)(int c, object *fp);
     void (*pr_ch_un)(int c, object *fp);

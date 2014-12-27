@@ -1206,7 +1206,7 @@ static object *_ULI_integrate(SS_psides *si, int j, double d1, double d2)
 
 /* take care of some bad cases */
     if ((SX_gs.dataset[j].wc[0] >= d2) || (SX_gs.dataset[j].wc[1] <= d1))
-       SS_error(si, "XMIN GREATER THAN XMAX - _UL__INTEGRATE", SS_null);
+       SS_error(si, "XMIN GREATER THAN XMAX - _ULI_INTEGRATE", SS_null);
 
     PM_integrate_tzr(d1, d2, &n, x[0], x[1], UL_gs.bfa[0], UL_gs.bfa[1]);
 

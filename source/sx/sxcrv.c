@@ -282,20 +282,6 @@ int SX_get_crv_index_i(object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_GET_CURVE_ID - return the curve id
- *                 - this means an index in SX_gs.data_index (i.e. J) space
- */
-
-int SX_get_curve_id(char *s)
-   {int j;
-
-    j = _SX_curve_id(s);
-
-    return(j);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SX_GET_CRV_INDEX_J - return the index if the object is a curve that is
  *                    - currently visible
  *                    - this means an index in SX_gs.data_index (i.e. J) space
@@ -311,6 +297,20 @@ int SX_get_crv_index_j(object *obj)
     if (SX_curvep_a(obj))
        {s = SS_get_string(obj);
 	j = SX_get_curve_id(s);};
+
+    return(j);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_GET_CURVE_ID - return the curve id
+ *                 - this means an index in SX_gs.data_index (i.e. J) space
+ */
+
+int SX_get_curve_id(char *s)
+   {int j;
+
+    j = _SX_curve_id(s);
 
     return(j);}
 

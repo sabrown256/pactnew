@@ -229,6 +229,7 @@ extern object
  *_SS_make_list(SS_psides *si, int n, int *type, void **ptr);
 
 extern int
+ _SS_get_type_method(SC_type *td, ...),
  SS_get_type_method(int type, ...),
  SS_set_type_method(int type, ...),
  _SS_text_data_filep(FILE *fp, int cmnt);

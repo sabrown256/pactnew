@@ -17,43 +17,46 @@
 
 /* _SX_ARGS - get a C level data item from a single Scheme object */
 
-void _SX_args(SS_psides *si, object *obj, void *v, int type)
-   {void **pv;
+void _SX_args(SS_psides *si, object *obj, void *v, SC_type *td)
+   {int type;
+    void **pv;
     pcons *alst;
     void *(*f)(SS_psides *si, object *o);
 
     pv = (void **) v;
-    if (pv == NULL)
-       return;
+    if (pv != NULL)
+       {type = td->id;
+	if (SS_nullobjp(obj) && (type != G_SX_FILE_I))
+	   *pv = NULL;
 
-    else if (SS_nullobjp(obj) && (type != G_SX_FILE_I))
-       {*pv = NULL;
-        return;};
-
-    alst = SC_type_info(type);
-    f    = SC_assoc(alst, "Scheme->C");
-    if (f != NULL)
-       *pv = f(si, obj);
+	else
+	   {alst = td->a;
+	    f    = SC_assoc(alst, "Scheme->C");
+	    if (f != NULL)
+	       *pv = f(si, obj);
 
 /* G_SX_FILE_I is for any file object wrapped in a SX_file */
-    else if (type == G_SX_FILE_I)
-       {if (!SS_nullobjp(obj) && !SX_FILEP(obj))
-	   SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
+	    else if (type == G_SX_FILE_I)
+	       {if (!SS_nullobjp(obj) && !SX_FILEP(obj))
+		   SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
 
-	if (SS_nullobjp(obj))
-	   *pv = (void *) SX_gs.gvif;
-	else
-	   *pv = (void *) SS_GET(SX_file, obj);}
+		if (SS_nullobjp(obj))
+		   *pv = (void *) SX_gs.gvif;
+		else
+		   *pv = (void *) SS_GET(SX_file, obj);}
 
-    else if (type == G_SX_PDBDATA_I)
-       {if (!SX_PDBDATAP(obj))
-	   SS_error(si, "NOT PDBDATA OBJECT - _SX_ARGS", obj);
+	    else if (type == G_SX_PDBDATA_I)
+	       {if (!SX_PDBDATAP(obj))
+		   SS_error(si, "NOT PDBDATA OBJECT - _SX_ARGS", obj);
 
-	*pv = (void *) SS_GET(SX_pdbdata, obj);}
+		*pv = (void *) SS_GET(SX_pdbdata, obj);}
 
-    else
-       SS_error(si, "BAD TYPE - _SX_ARGS",
-		SS_mk_integer(si, type));
+	    else if (obj->val != NULL)
+	       *pv = obj->val;
+
+	    else
+	       SS_error(si, "BAD TYPE - _SX_ARGS",
+			SS_mk_integer(si, type));};};
 
     return;}
 
@@ -62,13 +65,15 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
 
 /* _SX_CALL_ARGS - make a SCHEME level object from a C level one */
 
-object *_SX_call_args(SS_psides *si, int type, void *v)
-   {object *obj;
+object *_SX_call_args(SS_psides *si, SC_type *td, void *v)
+   {int type;
+    object *obj;
     object *(*f)(SS_psides *si, void *a);
 
-    obj = SS_null;
+    obj  = SS_null;
+    type = td->id;
 
-    SS_get_type_method(type, "C->Scheme", &f, NULL);
+    _SS_get_type_method(td, "C->Scheme", &f, NULL);
     if (f != NULL)
        obj = f(si, v);
 
