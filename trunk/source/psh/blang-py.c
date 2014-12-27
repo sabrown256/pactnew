@@ -66,17 +66,20 @@ static void python_type_name_list(tnp_list *na, tn_list *nc)
 
 static int python_parse_member(mbrdes *md, char *mbr,
 			       char *bty, char *aty, int nc)
-   {int nind, nb;
+   {int nind, nb, np;
     char *pb;
     type_desc *td;
 
-    parse_member(md, mbr);
+    np = parse_member(md, mbr);
 
     aty[0] = '\0';
     nstrncpy(bty, nc, md->type, -1);
 
     td = lookup_type_info(md->type);
-    if (td != NULL)
+    if (np > 1)
+       nstrncpy(aty, nc, "SC_POINTER_I", -1);
+
+    else if (td != NULL)
        {if (td->knd == TK_ENUM)
 	   {nstrncpy(md->type, nc, tykind[TK_ENUM], -1);
 	    nstrncpy(aty, nc, "SC_ENUM_I", -1);}
@@ -445,7 +448,7 @@ static void python_emit_setters(bindes *bd, mbrdes *md, tnp_list *tl)
 	 nind = python_parse_member(&lmd, mbr, bty, aty, BFSML);
 
 	 ok = FALSE;
-	 if (to != NULL)
+	 if ((to != NULL) && (nind < 2))
 	    {for (i = 0; (to[i] != NULL) && (ok == FALSE); i++)
 		 ok = (strcmp(bty, to[i]) == 0);};
 
