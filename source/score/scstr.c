@@ -122,7 +122,7 @@ char *SC_strsavec(char *s, int memfl,
 	opt.perm = prm;
 	opt.na   = na;
 	opt.zsp  = -1;
-	opt.typ  = SC_STRING_I;
+	opt.typ  = G_STRING_I;
 
 	opt.where.pfunc = file;
 	opt.where.pfile = fnc;

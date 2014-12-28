@@ -334,8 +334,8 @@ static object *_SX_read_table(SS_psides *si, tabinfo *ti)
     _SX_table.n  = n;
     _SX_table.ln = nl;
 
-    rv = SS_make_list(si, SC_INT_I, &nr,
-		      SC_INT_I, &nc,
+    rv = SS_make_list(si, G_INT_I, &nr,
+		      G_INT_I, &nc,
 		      0);
 
     return(rv);}
@@ -361,10 +361,10 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
     ti.nl     = 1;
     ti.nlabel = 0;
     SS_args(si, argl,
-            SC_STRING_I, &name,
-            SC_INT_I, &ti.n,
-            SC_INT_I, &ti.nlabel,
-            SC_INT_I, &ti.nl,
+            G_STRING_I, &name,
+            G_INT_I, &ti.n,
+            G_INT_I, &ti.nlabel,
+            G_INT_I, &ti.nl,
             0);
 
     _SX_table.name = CSTRSAVE(name);
@@ -506,7 +506,7 @@ static PM_set *_SX_lr_zc_domain(char *name)
     maxes[0] = _SX_table.current->ncol + 1;
     maxes[1] = _SX_table.current->nrow + 1;
 
-    set = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nd,
+    set = PM_make_lr_index_domain(name, G_DOUBLE_S, nd, nd,
 				  maxes, NULL, NULL);
 
     elements = (void **) set->elements;
@@ -556,7 +556,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs, int wh)
     name = NULL;
     dims = SS_null;
     SS_args(si, specs,
-	    SC_STRING_I, &name,
+	    G_STRING_I, &name,
 	    G_OBJECT_I, &dims,
 	    0);
 
@@ -568,7 +568,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs, int wh)
 	maxes = CMAKE_N(int, nd);
 	for (i = 0; dims != SS_null; dims = SS_cdr(si, dims), i++)
 	    {SS_args(si, dims,
-		     SC_INT_I, &dv,
+		     G_INT_I, &dv,
 		     0);
 	     maxes[i] = dv;};
 
@@ -587,9 +587,9 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs, int wh)
 	     npts  = _SX_table.current->nrow;
 	     step  = _SX_table.current->ncol;
 	     SS_args(si, sp,
-		     SC_LONG_I, &start,
-		     SC_LONG_I, &npts,
-		     SC_LONG_I, &step,
+		     G_LONG_I, &start,
+		     G_LONG_I, &npts,
+		     G_LONG_I, &step,
 		     0);
 
 	     if ((i > 0) && (npts != ne))
@@ -598,7 +598,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs, int wh)
 	     elem[i] = SX_extract_vector(_SX_table.current, start, step, npts);
 	     ne = npts;};
 
-	set = PM_mk_set(name, SC_DOUBLE_S, FALSE, ne, nd, nde,
+	set = PM_mk_set(name, G_DOUBLE_S, FALSE, ne, nd, nde,
 			maxes, elem, NULL,
 			NULL, NULL, NULL,
 			NULL, NULL, NULL, NULL, NULL);};
@@ -648,10 +648,10 @@ static object *_SXI_table_map(SS_psides *si, object *argl)
     centering = N_CENT;
 
     SS_args(si, argl,
-	    SC_STRING_I, &name,
+	    G_STRING_I, &name,
 	    G_OBJECT_I, &dmlst,
 	    G_OBJECT_I, &rnlst,
-            SC_INT_I, &centering,
+            G_INT_I, &centering,
             0);
 
     domain = _SX_table_set(si, dmlst, TRUE);
@@ -756,7 +756,7 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
 
     fname = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &fname,
+            G_STRING_I, &fname,
             0);
 
     fp = NULL;
@@ -819,7 +819,7 @@ static object *SX_print_column(SS_psides *si, object *argl)
 
     else
        {SS_args(si, argl,
-		SC_LONG_I, &col,
+		G_LONG_I, &col,
 		0);
  
 	nr = _SX_table.current->nrow;
@@ -841,7 +841,7 @@ static object *SX_print_column(SS_psides *si, object *argl)
                  "\n Column %ld : %ld values\n\n",
                  col, nr);
 
-	rv = SS_make_list(si, SC_INT_I, &nr,
+	rv = SS_make_list(si, G_INT_I, &nr,
 			  0);};
 
     return(rv);}
@@ -930,8 +930,8 @@ static object *SX_delete_column(SS_psides *si, object *argl)
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
 
-	rv = SS_make_list(si, SC_INT_I, &nr,
-			  SC_INT_I, &nc,
+	rv = SS_make_list(si, G_INT_I, &nr,
+			  G_INT_I, &nc,
 			  0);};
 
     return(rv);}
@@ -953,7 +953,7 @@ static object *SX_sort_on_column(SS_psides *si, object *argl)
 
     else
        {SS_args(si, argl,
-		SC_INT_I, &col,
+		G_INT_I, &col,
 		0);
 
 	PM_sort_on_col(_SX_table.current, col);
@@ -966,8 +966,8 @@ static object *SX_sort_on_column(SS_psides *si, object *argl)
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
 
-	rv = SS_make_list(si, SC_INT_I, &nr,
-			  SC_INT_I, &nc,
+	rv = SS_make_list(si, G_INT_I, &nr,
+			  G_INT_I, &nc,
 			  0);};
 
     return(rv);}
@@ -998,8 +998,8 @@ static object *SX_cnormalize_table(SS_psides *si)
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
 
-	rv = SS_make_list(si, SC_INT_I, &nr,
-			  SC_INT_I, &nc,
+	rv = SS_make_list(si, G_INT_I, &nr,
+			  G_INT_I, &nc,
 			  0);};
 
     return(rv);}

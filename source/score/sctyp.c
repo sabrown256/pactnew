@@ -19,7 +19,7 @@
  *      add any special conversion coding
  *   elsewhere check:
  *      look for changes to the minimum type of a family
- *         for example:  id - SC_SHORT_I  ->  id - SC_INT8_I
+ *         for example:  id - G_SHORT_I  ->  id - G_INT8_I
  */
 
 /*--------------------------------------------------------------------------*/
@@ -411,7 +411,7 @@ int SC_is_type_ptr_a(char *name)
 int SC_is_type_prim(int id)
    {int rv;
 
-    rv = ((SC_UNKNOWN_I < id) && (id < N_TYPES));
+    rv = ((G_UNKNOWN_I < id) && (id < N_TYPES));
 
     return(rv);}
 
@@ -692,7 +692,7 @@ int SC_type_container_size(SC_kind kind, int nb)
 		      if (nb <= t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_CHAR)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
 /* fixed point types (proper) */
@@ -705,7 +705,7 @@ int SC_type_container_size(SC_kind kind, int nb)
 		      if (nb <= t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_FIX)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
 /* real floating point types (proper) */
@@ -718,7 +718,7 @@ int SC_type_container_size(SC_kind kind, int nb)
 		      if (nb <= t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_FP)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
 /* complex floating point types (proper) */
@@ -731,7 +731,7 @@ int SC_type_container_size(SC_kind kind, int nb)
 		      if (nb <= t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_CPX)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
 /* quaternion point types (proper) */
@@ -744,11 +744,11 @@ int SC_type_container_size(SC_kind kind, int nb)
 		      if (nb <= t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_QUT)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
         default :
-	     id = SC_UNKNOWN_I;
+	     id = G_UNKNOWN_I;
              break;}
 
     return(id);}
@@ -780,7 +780,7 @@ int SC_type_match_size(SC_kind kind, int nb)
 		      if (nb == t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_CHAR)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
 /* fixed point types (proper) */
@@ -793,7 +793,7 @@ int SC_type_match_size(SC_kind kind, int nb)
 		      if (nb == t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_FIX)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
 /* real floating point types (proper) */
@@ -806,7 +806,7 @@ int SC_type_match_size(SC_kind kind, int nb)
 		      if (nb == t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_FP)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
 /* complex floating point types (proper) */
@@ -819,7 +819,7 @@ int SC_type_match_size(SC_kind kind, int nb)
 		      if (nb == t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_CPX)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
 /* quaternion point types (proper) */
@@ -832,11 +832,11 @@ int SC_type_match_size(SC_kind kind, int nb)
 		      if (nb == t->bpi)
 			 break;};};
 	     if (i >= N_PRIMITIVE_QUT)
-	        id = SC_UNKNOWN_I;
+	        id = G_UNKNOWN_I;
              break;
 
         default :
-	     id = SC_UNKNOWN_I;
+	     id = G_UNKNOWN_I;
              break;}
 
     return(id);}
@@ -1028,17 +1028,17 @@ void _SC_set_format_defaults(void)
 
 /* fmts is used for scalars */
 
-    if (fmts[SC_BIT_I] != NULL)
-       CFREE(fmts[SC_BIT_I]);
+    if (fmts[G_BIT_I] != NULL)
+       CFREE(fmts[G_BIT_I]);
 
     t = CSTRDUP("%x", 3);
-    fmts[SC_BIT_I] = t;
+    fmts[G_BIT_I] = t;
 
-    if (fmts[SC_BOOL_I] != NULL)
-       CFREE(fmts[SC_BOOL_I]);
+    if (fmts[G_BOOL_I] != NULL)
+       CFREE(fmts[G_BOOL_I]);
 
     t = CSTRDUP("%s", 3);
-    fmts[SC_BOOL_I] = t;
+    fmts[G_BOOL_I] = t;
 
 /* character types (proper) */
     for (i = 0; i < N_PRIMITIVE_CHAR; i++)
@@ -1046,9 +1046,9 @@ void _SC_set_format_defaults(void)
 	 if (fmts[id] != NULL)
 	    CFREE(fmts[id]);
 
-	 if (id == SC_CHAR_I)
+	 if (id == G_CHAR_I)
 	    snprintf(tmp, MAXLINE, "%%c");
-	 else if (id == SC_WCHAR_I)
+	 else if (id == G_WCHAR_I)
 	    snprintf(tmp, MAXLINE, "%%Lc");
 
 	 t = CSTRDUP(tmp, 3);
@@ -1060,9 +1060,9 @@ void _SC_set_format_defaults(void)
 	 if (fmts[id] != NULL)
 	    CFREE(fmts[id]);
 
-	 if (id == SC_LONG_LONG_I)
+	 if (id == G_LONG_LONG_I)
 	    snprintf(tmp, MAXLINE, "%%%dlld", fix_pre[i]);
-	 else if (id == SC_LONG_I)
+	 else if (id == G_LONG_I)
 	    snprintf(tmp, MAXLINE, "%%%dld", fix_pre[i]);
 	 else
 	    snprintf(tmp, MAXLINE, "%%%dd", fix_pre[i]);
@@ -1076,7 +1076,7 @@ void _SC_set_format_defaults(void)
 	 if (fmts[id] != NULL)
 	    CFREE(fmts[id]);
 
-	 if (id == SC_LONG_DOUBLE_I)
+	 if (id == G_LONG_DOUBLE_I)
 	    snprintf(tmp, MAXLINE, "%%# .%dle", fp_pre[i].digits);
 	 else
 	    snprintf(tmp, MAXLINE, "%%# .%de", fp_pre[i].digits);
@@ -1090,7 +1090,7 @@ void _SC_set_format_defaults(void)
 	 if (fmts[id] != NULL)
 	    CFREE(fmts[id]);
 
-	 if (id == SC_LONG_DOUBLE_COMPLEX_I)
+	 if (id == G_LONG_DOUBLE_COMPLEX_I)
 	    snprintf(tmp, MAXLINE, "%%# .%dle + %%# .%dle*I",
 		     fp_pre[i].digits, fp_pre[i].digits);
 	 else
@@ -1101,11 +1101,11 @@ void _SC_set_format_defaults(void)
 	 fmts[id] = t;};
 
 /* other primitive types */
-    if (fmts[SC_STRING_I] != NULL)
-       CFREE(fmts[SC_STRING_I]);
+    if (fmts[G_STRING_I] != NULL)
+       CFREE(fmts[G_STRING_I]);
 
     t = CSTRDUP("%s", 3);
-    fmts[SC_STRING_I] = t;
+    fmts[G_STRING_I] = t;
 
 /* fmta is used for arrays */
     for (i = 0; i < nt; i++)

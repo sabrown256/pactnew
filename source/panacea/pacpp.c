@@ -30,9 +30,9 @@
  *
  * Then the usage would be:
  *      PA_cpp_init();
- *      PA_cpp_add_group("FOO", SC_INT_I, NULL);
- *      PA_cpp_add_group("BAR", SC_INT_I, NULL);
- *      PA_cpp_add_group("BLAT", SC_STRING_I, NULL);
+ *      PA_cpp_add_group("FOO", G_INT_I, NULL);
+ *      PA_cpp_add_group("BAR", G_INT_I, NULL);
+ *      PA_cpp_add_group("BLAT", G_STRING_I, NULL);
  *
  * Then define some names:
  *      PA_cpp_add_name("FOO_FIRST",  "FOO", 1)
@@ -202,7 +202,7 @@ void *PA_cpp_name_to_value(char *name)
 /*--------------------------------------------------------------------------*/
 
 /* PA_CPP_NAME_ITYPE - return the names type as an integer
- *                   - using SC_TYPE_I defines
+ *                   - using G_TYPE_I defines
  */
 
 int PA_cpp_name_itype(char *name)
@@ -214,7 +214,7 @@ int PA_cpp_name_itype(char *name)
     if (node != NULL)
        itype = node->itype;
     else
-       itype = SC_UNKNOWN_I;
+       itype = G_UNKNOWN_I;
 
     return(itype);}
 
@@ -299,24 +299,24 @@ void PA_cpp_default(void)
     PA_INFO_MAP_DOMAIN_S   = CSTRDUP("PA_INFO_MAP_DOMAIN", 3);
     PA_INFO_BUILD_DOMAIN_S = CSTRDUP("PA_INFO_BUILD_DOMAIN", 3);
 
-    PA_cpp_add_group(PA_gs.cpp_info,        SC_INT_I, NULL);
-    PA_cpp_add_group(PA_gs.cpp_allocation,  SC_INT_I, NULL);
-    PA_cpp_add_group(PA_gs.cpp_scope,       SC_INT_I, NULL);
-    PA_cpp_add_group(PA_gs.cpp_class,       SC_INT_I, NULL);
-    PA_cpp_add_group(PA_gs.cpp_center,      SC_INT_I, NULL);
-    PA_cpp_add_group(PA_gs.cpp_persistence, SC_INT_I, NULL);
-    PA_cpp_add_group(PA_gs.cpp_units,       SC_INT_I, NULL);
-    PA_cpp_add_group(PA_gs.cpp_type,        SC_INT_I, NULL);
-    PA_cpp_add_group(PA_gs.cpp_type_SC,     SC_INT_I, NULL);
-    PA_cpp_add_group(PA_gs.cpp_type_S,      SC_STRING_I,  NULL);
+    PA_cpp_add_group(PA_gs.cpp_info,        G_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_allocation,  G_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_scope,       G_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_class,       G_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_center,      G_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_persistence, G_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_units,       G_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_type,        G_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_type_SC,     G_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_type_S,      G_STRING_I,  NULL);
 
 /* install types in several ways so that the following will work:
- *   #define SC_DOUBLE_I   6
- *   char SC_DOUBLE_S = "double";
+ *   #define G_DOUBLE_I   6
+ *   char G_DOUBLE_S = "double";
  *
- *   itype = *(int *) PA_cpp_name_to_value("SC_DOUBLE_I");  returns  7
+ *   itype = *(int *) PA_cpp_name_to_value("G_DOUBLE_I");  returns  7
  *   itype = *(int *) PA_cpp_name_to_value("double");       returns 7
- *   type  = (char *) PA_cpp_name_to_value("SC_DOUBLE_S");  returns "double"
+ *   type  = (char *) PA_cpp_name_to_value("G_DOUBLE_S");  returns "double"
  */
     np = _SC.types.nprimitive;
     for (id = 0; id < np; id++)
@@ -415,7 +415,7 @@ int convert_type_s_i(char *type_name)
     if (ptype != NULL)
        type = *ptype;
     else
-       type = SC_UNKNOWN_I;
+       type = G_UNKNOWN_I;
 
     return(type);}
 
@@ -431,7 +431,7 @@ char *convert_type_i_s(int type)
 
     type_name = PA_cpp_value_to_name(PA_gs.cpp_type, type);
     if (type_name == NULL)
-       type_name = SC_UNKNOWN_S;
+       type_name = G_UNKNOWN_S;
 
     return(type_name);}
 

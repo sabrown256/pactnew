@@ -24,10 +24,10 @@ static object *_SSI_mk_rectq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_DOUBLE_I, &q.s,
-	    SC_DOUBLE_I, &q.i,
-	    SC_DOUBLE_I, &q.j,
-	    SC_DOUBLE_I, &q.k,
+	    G_DOUBLE_I, &q.s,
+	    G_DOUBLE_I, &q.i,
+	    G_DOUBLE_I, &q.j,
+	    G_DOUBLE_I, &q.k,
 	    0);
 
     o = SS_mk_quaternion(si, q);
@@ -56,10 +56,10 @@ static object *_SSI_mk_polarq(SS_psides *si, object *argl)
     ph = 0.0;
     ch = 0.0;
     SS_args(si, argl,
-	    SC_DOUBLE_I, &m,
-	    SC_DOUBLE_I, &th,
-	    SC_DOUBLE_I, &ph,
-	    SC_DOUBLE_I, &ch,
+	    G_DOUBLE_I, &m,
+	    G_DOUBLE_I, &th,
+	    G_DOUBLE_I, &ph,
+	    G_DOUBLE_I, &ch,
 	    0);
 
     ms  = m*sin(th);
@@ -88,7 +88,7 @@ static object *_SSI_real_partq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_QUATERNION_I, &q,
+	    G_QUATERNION_I, &q,
 	    0);
 
     o = SS_mk_float(si, q.s);
@@ -109,7 +109,7 @@ static object *_SSI_imag_partq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_QUATERNION_I, &q,
+	    G_QUATERNION_I, &q,
 	    0);
 
     o = SS_mk_float(si, q.i);
@@ -130,7 +130,7 @@ static object *_SSI_jmag_partq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_QUATERNION_I, &q,
+	    G_QUATERNION_I, &q,
 	    0);
 
     o = SS_mk_float(si, q.j);
@@ -151,7 +151,7 @@ static object *_SSI_kmag_partq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_QUATERNION_I, &q,
+	    G_QUATERNION_I, &q,
 	    0);
 
     o = SS_mk_float(si, q.k);
@@ -173,7 +173,7 @@ static object *_SSI_magnitudeq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_QUATERNION_I, &q,
+	    G_QUATERNION_I, &q,
 	    0);
 
     m = PM_qnorm(q);
@@ -199,7 +199,7 @@ static object *_SSI_angleq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_QUATERNION_I, &q,
+	    G_QUATERNION_I, &q,
 	    0);
 
     th = atan2(sqrt(q.i*q.i + q.j*q.j + q.k*q.k), q.s);
@@ -225,7 +225,7 @@ static object *_SSI_colatq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_QUATERNION_I, &q,
+	    G_QUATERNION_I, &q,
 	    0);
 
     ph = atan2(sqrt(q.j*q.j + q.k*q.k), q.i);
@@ -251,7 +251,7 @@ static object *_SSI_longq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_QUATERNION_I, &q,
+	    G_QUATERNION_I, &q,
 	    0);
 
     ch = atan2(q.k, q.j);
@@ -273,7 +273,7 @@ static object *_SSI_versorq(SS_psides *si, object *argl)
     q.j = 0.0;
     q.k = 0.0;
     SS_args(si, argl,
-	    SC_QUATERNION_I, &q,
+	    G_QUATERNION_I, &q,
 	    0);
 
     a = PM_qversor(q);

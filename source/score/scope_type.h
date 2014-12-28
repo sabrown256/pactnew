@@ -21,17 +21,17 @@ typedef long long int64_t;
 
 #define SC_TYPEOF(_t)        SC_type_id(#_t, FALSE)
 
-#define SC_TYPE_CHAR(_i)     (((_i) - SC_CHAR_I) >> 1)
-#define SC_TYPE_FIX(_i)      (((_i) - SC_INT8_I) >> 1)
-#define SC_TYPE_FP(_i)       (((_i) - SC_FLOAT_I) >> 1)
-#define SC_TYPE_CPX(_i)      (((_i) - SC_FLOAT_COMPLEX_I) >> 1)
-#define SC_TYPE_QUT(_i)      (((_i) - SC_QUATERNION_I) >> 1)
+#define SC_TYPE_CHAR(_i)     (((_i) - G_CHAR_I) >> 1)
+#define SC_TYPE_FIX(_i)      (((_i) - G_INT8_I) >> 1)
+#define SC_TYPE_FP(_i)       (((_i) - G_FLOAT_I) >> 1)
+#define SC_TYPE_CPX(_i)      (((_i) - G_FLOAT_COMPLEX_I) >> 1)
+#define SC_TYPE_QUT(_i)      (((_i) - G_QUATERNION_I) >> 1)
 
-#define SC_TYPE_CHAR_ID(_i)  (((_i) << 1) + SC_CHAR_I)
-#define SC_TYPE_FIX_ID(_i)   (((_i) << 1) + SC_INT8_I)
-#define SC_TYPE_FP_ID(_i)    (((_i) << 1) + SC_FLOAT_I)
-#define SC_TYPE_CPX_ID(_i)   (((_i) << 1) + SC_FLOAT_COMPLEX_I)
-#define SC_TYPE_QUT_ID(_i)   (((_i) << 1) + SC_QUATERNION_I)
+#define SC_TYPE_CHAR_ID(_i)  (((_i) << 1) + G_CHAR_I)
+#define SC_TYPE_FIX_ID(_i)   (((_i) << 1) + G_INT8_I)
+#define SC_TYPE_FP_ID(_i)    (((_i) << 1) + G_FLOAT_I)
+#define SC_TYPE_CPX_ID(_i)   (((_i) << 1) + G_FLOAT_COMPLEX_I)
+#define SC_TYPE_QUT_ID(_i)   (((_i) << 1) + G_QUATERNION_I)
 
 
 /* SC_VA_ARG_FETCH - convert a variable arg item to an item of type index _DID

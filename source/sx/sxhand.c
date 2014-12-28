@@ -188,7 +188,7 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
         w[i] = fn(w[i]);
 
 /* convert the data back to the correct type in D */
-    SC_convert_id(did, d, 0, 1, SC_DOUBLE_I, w, 0, 1, n, FALSE);
+    SC_convert_id(did, d, 0, 1, G_DOUBLE_I, w, 0, 1, n, FALSE);
 
     if (rel)
        CFREE(w);
@@ -386,7 +386,7 @@ object *_SX_m11_b_mrs(SS_psides *si, SS_C_procedure *cp, object *argl)
 
     a = HUGE;
     SS_args(si, argl,
-	    SC_DOUBLE_I, &a,
+	    G_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - SX_M11_B_MDS ", argl);
@@ -427,7 +427,7 @@ object *_SX_m11_b_mds(SS_psides *si, SS_C_procedure *cp, object *argl)
 
     a = HUGE;
     SS_args(si, argl,
-	    SC_DOUBLE_I, &a,
+	    G_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - SX_M11_B_MDS ", argl);
@@ -471,8 +471,8 @@ object *_SX_mij_b_mrs(SS_psides *si, SS_C_procedure *cp, object *argl)
     i = -1;
     a = HUGE;
     SS_args(si, argl,
-	    SC_INT_I, &i,
-	    SC_DOUBLE_I, &a,
+	    G_INT_I, &i,
+	    G_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - SX_MIJ_B_MDS ", argl);
@@ -519,8 +519,8 @@ object *_SX_mij_b_mds(SS_psides *si, SS_C_procedure *cp, object *argl)
     i = -1;
     a = HUGE;
     SS_args(si, argl,
-	    SC_INT_I, &i,
-	    SC_DOUBLE_I, &a,
+	    G_INT_I, &i,
+	    G_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - SX_MIJ_B_MDS ", argl);

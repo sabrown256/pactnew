@@ -96,8 +96,8 @@ static object *_SS_strcmp(SS_psides *si, object *argl,
     s1 = NULL;
     s2 = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &s1,
-            SC_STRING_I, &s2,
+            G_STRING_I, &s1,
+            G_STRING_I, &s2,
             0);
 
     cmp = func(s1, s2);
@@ -122,8 +122,8 @@ static object *_SS_cistrcmp(SS_psides *si, object *argl,
     s1 = NULL;
     s2 = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &s1,
-            SC_STRING_I, &s2,
+            G_STRING_I, &s1,
+            G_STRING_I, &s2,
             0);
 
     SC_str_lower(s1);
@@ -335,7 +335,7 @@ static object *_SSI_strlen(SS_psides *si, object *str)
 
     s = NULL;
     SS_args(si, str,
-            SC_STRING_I, &s,
+            G_STRING_I, &s,
             0);
 
     ln = (s == NULL) ? 0 : strlen(s);
@@ -358,8 +358,8 @@ static object *_SSI_strref(SS_psides *si, object *argl)
     s = NULL;
     n = 0;
     SS_args(si, argl,
-            SC_STRING_I, &s,
-            SC_INT_I, &n,
+            G_STRING_I, &s,
+            G_INT_I, &n,
             0);
 
     ns = strlen(s);
@@ -384,7 +384,7 @@ static object *_SSI_strcpy(SS_psides *si, object *argl)
 
     s = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &s,
+            G_STRING_I, &s,
             0);
 
     str = SS_mk_string(si, s);
@@ -407,7 +407,7 @@ static object *_SSI_strfil(SS_psides *si, object *argl)
     c = ' ';
     SS_args(si, argl,
             G_OBJECT_I, &str,
-            SC_INT_I, &c,
+            G_INT_I, &c,
             0);
 
     s = SS_STRING_TEXT(str);
@@ -430,8 +430,8 @@ static object *_SSI_strset(SS_psides *si, object *argl)
     c = ' ';
     SS_args(si, argl,
             G_OBJECT_I, &str,
-            SC_INT_I, &n,
-            SC_INT_I, &c,
+            G_INT_I, &n,
+            G_INT_I, &c,
             0);
 
     s = SS_STRING_TEXT(str);
@@ -459,9 +459,9 @@ static object *_SSI_strsub(SS_psides *si, object *argl)
     n1 = INT_MAX;
     n2 = INT_MAX;
     SS_args(si, argl,
-            SC_STRING_I, &s,
-            SC_INT_I, &n1,
-            SC_INT_I, &n2,
+            G_STRING_I, &s,
+            G_INT_I, &n1,
+            G_INT_I, &n2,
             0);
 
     n = strlen(s);
@@ -680,8 +680,8 @@ static object *_SSI_mk_str(SS_psides *si, object *argl)
     n = 0;
     c = ' ';
     SS_args(si, argl,
-            SC_INT_I, &n,
-            SC_INT_I, &c,
+            G_INT_I, &n,
+            G_INT_I, &c,
             0);
 
     s = CMAKE_N(char, n+2);
@@ -706,7 +706,7 @@ static object *_SSI_strnum(SS_psides *si, object *argl)
 
     text  = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &text,
+            G_STRING_I, &text,
             0);
 
     rv = SS_f;
@@ -734,8 +734,8 @@ static object *_SSI_strchr(SS_psides *si, object *argl)
     text  = NULL;
     delim = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &text,
-            SC_STRING_I, &delim,
+            G_STRING_I, &text,
+            G_STRING_I, &delim,
             0);
 
     _SS_descape_string(delim, delim);
@@ -761,8 +761,8 @@ static object *_SSI_strstr(SS_psides *si, object *argl)
     cs = NULL;
     ct = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &cs,
-            SC_STRING_I, &ct,
+            G_STRING_I, &cs,
+            G_STRING_I, &ct,
             0);
 
     s  = strstr(cs, ct);
@@ -785,8 +785,8 @@ static object *_SSI_strcasestr(SS_psides *si, object *argl)
     cs = NULL;
     ct = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &cs,
-            SC_STRING_I, &ct,
+            G_STRING_I, &cs,
+            G_STRING_I, &ct,
             0);
 
     cs = SC_str_lower(cs);
@@ -816,8 +816,8 @@ static object *_SSI_istrchr(SS_psides *si, object *argl)
     text  = NULL;
     delim = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &text,
-            SC_STRING_I, &delim,
+            G_STRING_I, &text,
+            G_STRING_I, &delim,
             0);
 
     _SS_descape_string(delim, delim);
@@ -849,8 +849,8 @@ static object *_SSI_istrstr(SS_psides *si, object *argl)
     cs = NULL;
     ct = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &cs,
-            SC_STRING_I, &ct,
+            G_STRING_I, &cs,
+            G_STRING_I, &ct,
             0);
 
     s = strstr(cs, ct);
@@ -879,8 +879,8 @@ static object *_SSI_blankstr(SS_psides *si, object *argl)
     cs = NULL;
     ct = "#";
     SS_args(si, argl,
-            SC_STRING_I, &cs,
-            SC_STRING_I, &ct,
+            G_STRING_I, &cs,
+            G_STRING_I, &ct,
             0);
 
     ok = SC_blankp(cs, ct);
@@ -906,9 +906,9 @@ static object *_SSI_trim(SS_psides *si, object *argl)
     d   = NULL;
     dir = -1;
     SS_args(si, argl,
-            SC_STRING_I, &s,
-            SC_STRING_I, &d,
-            SC_INT_I, &dir,
+            G_STRING_I, &s,
+            G_STRING_I, &d,
+            G_INT_I, &dir,
             0);
 
     if (dir < 0)
@@ -943,7 +943,7 @@ static object *_SS_strtok(SS_psides *si, object *argl,
     flag  = SS_f;
     SS_args(si, argl,
             G_OBJECT_I, &str,
-            SC_STRING_I, &delim,
+            G_STRING_I, &delim,
             G_OBJECT_I, &flag,
             0);
 

@@ -55,23 +55,23 @@ static void prep_test_4_data(void)
 
     pc  = CMAKE(char);
     *pc = 'A';   
-    SC_hasharr_install(tab4_w, "pc", pc, SC_STRING_S, 3, -1);
+    SC_hasharr_install(tab4_w, "pc", pc, G_STRING_S, 3, -1);
 
     ps  = CMAKE(short);
     *ps = -1024;
-    SC_hasharr_install(tab4_w, "ps", ps, SC_SHORT_P_S, 3, -1);
+    SC_hasharr_install(tab4_w, "ps", ps, G_SHORT_P_S, 3, -1);
 
     pi  = CMAKE(int);
     *pi = 16384;
-    SC_hasharr_install(tab4_w, "pi", pi, SC_INT_P_S, 3, -1);
+    SC_hasharr_install(tab4_w, "pi", pi, G_INT_P_S, 3, -1);
 
     pl  = CMAKE(long);
     *pl = -1048576;
-    SC_hasharr_install(tab4_w, "pl", pl, SC_LONG_P_S, 3, -1);
+    SC_hasharr_install(tab4_w, "pl", pl, G_LONG_P_S, 3, -1);
 
     pf  = CMAKE(float);
     *pf = 3.141596;
-    SC_hasharr_install(tab4_w, "pf", pf, SC_FLOAT_P_S, 3, -1);
+    SC_hasharr_install(tab4_w, "pf", pf, G_FLOAT_P_S, 3, -1);
 
     pd  = CMAKE(double);
     *pd = -1.0e-30;
@@ -194,12 +194,12 @@ static void print_test_4_data(FILE *fp)
     SC_mark(ph, 1);
 
     PRINT(fp, "Table values:\n");
-    PRINT(fp, "   pc = %c %s\n", *pc, SC_STRING_S);
-    PRINT(fp, "   ps = %d %s\n", *ps, SC_SHORT_P_S);
-    PRINT(fp, "   pi = %d %s\n", *pi, SC_INT_P_S);
-    PRINT(fp, "   pl = %ld %s\n", *pl, SC_LONG_P_S);
-    PRINT(fp, "   pf = %f %s\n", *pf, SC_FLOAT_P_S);
-    PRINT(fp, "   pd = %e %s\n", *pd, SC_DOUBLE_P_S);
+    PRINT(fp, "   pc = %c %s\n", *pc, G_STRING_S);
+    PRINT(fp, "   ps = %d %s\n", *ps, G_SHORT_P_S);
+    PRINT(fp, "   pi = %d %s\n", *pi, G_INT_P_S);
+    PRINT(fp, "   pl = %ld %s\n", *pl, G_LONG_P_S);
+    PRINT(fp, "   pf = %f %s\n", *pf, G_FLOAT_P_S);
+    PRINT(fp, "   pd = %e %s\n", *pd, G_DOUBLE_P_S);
 
     PRINT(fp, "\n   ph : %s %s\n\n", ph->name, ph->type);
 

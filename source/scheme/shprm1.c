@@ -749,7 +749,7 @@ static object *_SSI_check_objects(SS_psides *si, object *obj)
 
     kind = -1;
     SS_args(si, obj,
-	    SC_INT_I, &kind,
+	    G_INT_I, &kind,
 	    0);
 
     nm = 0L;
@@ -994,12 +994,13 @@ static object *_SSI_time(SS_psides *si)
        {loct->tm_year -= 100;
 	loct->tm_mon++;
 
-	o = SS_make_list(si, SC_INT_I, &loct->tm_year,
-			 SC_INT_I, &loct->tm_mon,
-			 SC_INT_I, &loct->tm_mday,
-			 SC_INT_I, &loct->tm_hour,
-			 SC_INT_I, &loct->tm_min,
-			 SC_INT_I, &loct->tm_sec,
+	o = SS_make_list(si,
+			 G_INT_I, &loct->tm_year,
+			 G_INT_I, &loct->tm_mon,
+			 G_INT_I, &loct->tm_mday,
+			 G_INT_I, &loct->tm_hour,
+			 G_INT_I, &loct->tm_min,
+			 G_INT_I, &loct->tm_sec,
 			 0);};
 
     return(o);}
@@ -1038,12 +1039,12 @@ static object *_SSI_etime(SS_psides *si, object *argl)
 	    0);
 
     SS_args(si, obj,
-	    SC_INT_I, &ref.tm_year,
-	    SC_INT_I, &ref.tm_mon,
-	    SC_INT_I, &ref.tm_mday,
-	    SC_INT_I, &ref.tm_hour,
-	    SC_INT_I, &ref.tm_min,
-	    SC_INT_I, &ref.tm_sec,
+	    G_INT_I, &ref.tm_year,
+	    G_INT_I, &ref.tm_mon,
+	    G_INT_I, &ref.tm_mday,
+	    G_INT_I, &ref.tm_hour,
+	    G_INT_I, &ref.tm_min,
+	    G_INT_I, &ref.tm_sec,
 	    0);
 
 /* make the month right */
@@ -1062,11 +1063,12 @@ static object *_SSI_etime(SS_psides *si, object *argl)
 	    {dt[i] = r / secsper[i];
 	     r    %= secsper[i];};
 
-	rv = SS_make_list(si, SC_INT_I, &dt[0],
-			  SC_INT_I, &dt[1],
-			  SC_INT_I, &dt[2],
-			  SC_INT_I, &dt[3],
-			  SC_INT_I, &dt[4],
+	rv = SS_make_list(si,
+			  G_INT_I, &dt[0],
+			  G_INT_I, &dt[1],
+			  G_INT_I, &dt[2],
+			  G_INT_I, &dt[3],
+			  G_INT_I, &dt[4],
 			  0);};
     return(rv);}
 
@@ -1090,7 +1092,7 @@ static object *_SSI_unlink(SS_psides *si, object *argl)
     
 	 path = NULL;
 	 SS_args(si, o,
-		 SC_STRING_I, &path,
+		 G_STRING_I, &path,
 		 0);
 
 	 if ((path != NULL) && (strcmp(path, "nil") != 0))

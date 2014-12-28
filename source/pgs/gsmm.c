@@ -106,10 +106,10 @@ PG_graph *PG_make_graph_1d(int id, char *label, int cp, int n,
     PM_set *domain, *range;
 
 /* build the domain set */
-    domain = PM_make_set(xname, SC_DOUBLE_S, cp, 1, n, 1, x);
+    domain = PM_make_set(xname, G_DOUBLE_S, cp, 1, n, 1, x);
 
 /* build the range set */
-    range = PM_make_set(yname, SC_DOUBLE_S, cp, 1, n, 1, y);
+    range = PM_make_set(yname, G_DOUBLE_S, cp, 1, n, 1, y);
 
 /* set default info attributes */
     info = PG_set_line_info(NULL, PLOT_CARTESIAN, CARTESIAN_2D,
@@ -138,10 +138,10 @@ PG_graph *PG_make_graph_r2_r1(int id, char *label, int cp,
     PM_set *domain, *range;
 
 /* build the domain set */
-    domain = PM_make_set(dname, SC_DOUBLE_S, cp, 2, imx, jmx, 2, x, y);
+    domain = PM_make_set(dname, G_DOUBLE_S, cp, 2, imx, jmx, 2, x, y);
 
 /* build the range set */
-    range = PM_make_set(rname, SC_DOUBLE_S, cp, 2, imx, jmx, 1, r);
+    range = PM_make_set(rname, G_DOUBLE_S, cp, 2, imx, jmx, 1, r);
 
     g = PG_make_graph_from_sets(label, domain, range, centering,
                                 G_PCONS_P_S, NULL, id, NULL);
@@ -164,10 +164,10 @@ PG_graph *PG_make_graph_r3_r1(int id, char *label, int cp,
     PM_set *domain, *range;
 
 /* build the domain set */
-    domain = PM_make_set(dname, SC_DOUBLE_S, cp, 3, imx, jmx, kmx, 3, x, y, z);
+    domain = PM_make_set(dname, G_DOUBLE_S, cp, 3, imx, jmx, kmx, 3, x, y, z);
 
 /* build the range set */
-    range = PM_make_set(rname, SC_DOUBLE_S, cp, 3, imx, jmx, kmx, 1, r);
+    range = PM_make_set(rname, G_DOUBLE_S, cp, 3, imx, jmx, kmx, 1, r);
 
     g = PG_make_graph_from_sets(label, domain, range, centering,
                                 G_PCONS_P_S, NULL, id, NULL);
@@ -190,12 +190,12 @@ pcons *PG_set_line_info(pcons *info, PG_rendering pty,
     info = PG_set_plot_type(info, pty, axis_type);
 
     info = PG_set_attrs_alist(info,
-			      "HIST-START",   SC_INT_I,    FALSE, start,
-			      "SCATTER",      SC_INT_I,    FALSE, scatter,
-			      "MARKER-INDEX", SC_INT_I,    FALSE, marker,
-			      "LINE-COLOR",   SC_INT_I,    FALSE, color,
-			      "LINE-STYLE",   SC_INT_I,    FALSE, style,
-			      "LINE-WIDTH",   SC_DOUBLE_I, FALSE, width,
+			      "HIST-START",   G_INT_I,    FALSE, start,
+			      "SCATTER",      G_INT_I,    FALSE, scatter,
+			      "MARKER-INDEX", G_INT_I,    FALSE, marker,
+			      "LINE-COLOR",   G_INT_I,    FALSE, color,
+			      "LINE-STYLE",   G_INT_I,    FALSE, style,
+			      "LINE-WIDTH",   G_DOUBLE_I, FALSE, width,
 			      NULL);
 
     return(info);}
@@ -216,15 +216,15 @@ pcons *PG_set_tds_info(pcons *info, PG_rendering pty,
     info = PG_set_plot_type(info, pty, axis_type);
 
     info = PG_set_attrs_alist(info,
-			      "N-LEVELS",   SC_INT_I,    FALSE, nlev,
-			      "LINE-COLOR", SC_INT_I,    FALSE, color,
-			      "LINE-STYLE", SC_INT_I,    FALSE, style,
-			      "LINE-WIDTH", SC_DOUBLE_I, FALSE, width,
-			      "RATIO",      SC_DOUBLE_I, FALSE, ratio,
-			      "THETA",      SC_DOUBLE_I, FALSE, theta,
-			      "PHI",        SC_DOUBLE_I, FALSE, phi,
-			      "CHI",        SC_DOUBLE_I, FALSE, chi,
-			      "DISTANCE",   SC_DOUBLE_I, FALSE, d,
+			      "N-LEVELS",   G_INT_I,    FALSE, nlev,
+			      "LINE-COLOR", G_INT_I,    FALSE, color,
+			      "LINE-STYLE", G_INT_I,    FALSE, style,
+			      "LINE-WIDTH", G_DOUBLE_I, FALSE, width,
+			      "RATIO",      G_DOUBLE_I, FALSE, ratio,
+			      "THETA",      G_DOUBLE_I, FALSE, theta,
+			      "PHI",        G_DOUBLE_I, FALSE, phi,
+			      "CHI",        G_DOUBLE_I, FALSE, chi,
+			      "DISTANCE",   G_DOUBLE_I, FALSE, d,
 			      NULL);
 
     return(info);}
@@ -243,9 +243,9 @@ pcons *PG_set_tdv_info(pcons *info, PG_rendering pty, int axis_type,
     info = PG_set_plot_type(info, pty, axis_type);
 
     info = PG_set_attrs_alist(info,
-			      "LINE-COLOR",   SC_INT_I,    FALSE, color,
-			      "LINE-STYLE",   SC_INT_I,    FALSE, style,
-			      "LINE-WIDTH",   SC_DOUBLE_I, FALSE, width,
+			      "LINE-COLOR",   G_INT_I,    FALSE, color,
+			      "LINE-STYLE",   G_INT_I,    FALSE, style,
+			      "LINE-WIDTH",   G_DOUBLE_I, FALSE, width,
 			      NULL);
     return(info);}
 

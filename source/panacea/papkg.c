@@ -33,7 +33,7 @@ void PA_gencmd(void)
     PA_inst_c("define", none,     FALSE,     0, (PFVoid) PA_defh,     PA_zargs);
     PA_inst_c("dump",   none,     FALSE,     0, (PFVoid) PA_wrrstrth, PA_zargs);
 
-    PA_inst_c("read", _PA.input_line, SC_CHAR_I, 1, (PFVoid) PA_readh, PA_strarg);
+    PA_inst_c("read", _PA.input_line, G_CHAR_I, 1, (PFVoid) PA_readh, PA_strarg);
 
 /* install the commands for initial value specification */
     PA_inst_c("specify", none, FALSE, 0, (PFVoid) PA_specifyh, PA_zargs);

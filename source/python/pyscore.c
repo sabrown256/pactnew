@@ -320,7 +320,7 @@ PyObject *PP_mem_lookup(PyObject *self, PyObject *args, PyObject *kwds)
 	result = SC_mem_lookup(p);
 
 	rv     = PY_build_object("mem_lookup",
-				 SC_STRING_I, 0, &result,
+				 G_STRING_I, 0, &result,
 				 0);};
 
     return(rv);}

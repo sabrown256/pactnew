@@ -38,7 +38,7 @@ static object *_SSI_set_prompt(SS_psides *si, object *obj)
 
     s = NULL;
     SS_args(si, obj,
-	    SC_STRING_I, &s,
+	    G_STRING_I, &s,
 	    0);
 
     if (s != NULL)
@@ -473,7 +473,7 @@ char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
        x = SS_mk_cons(si, SS_mk_string(si, fmt), obj);
     else
        x = SS_make_list(si,
-			SC_STRING_I, fmt,
+			G_STRING_I, fmt,
 			G_OBJECT_I, obj,
 			0);
     SS_mark(x);
@@ -673,7 +673,7 @@ static object *_SSI_trans_on(SS_psides *si, object *obj)
 
     s = NULL;
     SS_args(si, obj,
-	    SC_STRING_I, &s,
+	    G_STRING_I, &s,
 	    0);
 
     str = io_open(s, "a");
@@ -721,7 +721,7 @@ static object *_SSI_opn_out(SS_psides *si, object *obj)
 
     s = NULL;
     SS_args(si, obj,
-	    SC_STRING_I, &s,
+	    G_STRING_I, &s,
 	    0);
 
     str = io_open(s, "w");
@@ -767,7 +767,7 @@ object *_SSI_call_of(SS_psides *si, object *argl)
 
     s = NULL;
     SS_args(si, obj,
-	    SC_STRING_I, &s,
+	    G_STRING_I, &s,
 	    0);
 
     str = io_open(s, BINARY_MODE_W);
@@ -834,8 +834,8 @@ object *SS_banner(SS_psides *si, object *obj)
    {char *s;
 
     SS_args(si, obj,
-	    SC_STRING_I, &s,
-	    SC_INT_I, &_SS.override,
+	    G_STRING_I, &s,
+	    G_INT_I, &_SS.override,
 	    0);
 
     if (_SS.override)
@@ -889,7 +889,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 		    SS_call_scheme(si, "format-expr",
 				   G_OBJECT_I, strm,
 				   G_OBJECT_I, bdy,
-				   SC_STRING_I, "     ",
+				   G_STRING_I, "     ",
 				   0);
 		 else
 		    SS_wr_lst(si, desc, strm);
@@ -910,7 +910,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 		    SS_call_scheme(si, "format-expr",
 				   G_OBJECT_I, strm,
 				   G_OBJECT_I, bdy,
-				   SC_STRING_I, "     ",
+				   G_STRING_I, "     ",
 				   0);
 		 else
 		    SS_wr_lst(si, desc, strm);
@@ -1182,7 +1182,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
     ityp = SS_OBJECT_TYPE(obj);
 
 /* use PUTS for strings to get double quotes right */
-    if (ityp == SC_STRING_I)
+    if (ityp == G_STRING_I)
        {s = SS_STRING_TEXT(obj);
 	PUTS(s, str);}
 
@@ -1193,13 +1193,13 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
     else
        {s = t;
 
-	if (ityp == SC_INT_I)
+	if (ityp == G_INT_I)
 	   SC_itos(t, MAXLINE, SS_INTEGER_VALUE(obj), NULL);
 
-	else if (ityp == SC_FLOAT_I)
+	else if (ityp == G_FLOAT_I)
 	   SC_ftos(t, MAXLINE, FALSE, SS_gs.fmts[1], SS_FLOAT_VALUE(obj));
 
-	else if (ityp == SC_DOUBLE_COMPLEX_I)
+	else if (ityp == G_DOUBLE_COMPLEX_I)
           {double r, i;
 	   double _Complex z;
 
@@ -1215,7 +1215,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 
 	   _SS_cmp_cat(t, MAXLINE, SS_gs.fmts[2], i, "i", (r == 0.0));}
 
-	else if (ityp == SC_QUATERNION_I)
+	else if (ityp == G_QUATERNION_I)
           {double d, i, j, k;
 	   quaternion q;
 
@@ -1251,7 +1251,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	else if (ityp == SS_NULL_I)
 	   SC_strncpy(t, MAXLINE, "()", -1);
 
-	else if ((ityp == SS_EOF_I) || (ityp == SC_BOOL_I))
+	else if ((ityp == SS_EOF_I) || (ityp == G_BOOL_I))
 	   snprintf(t, MAXLINE, "%s", SS_BOOLEAN_NAME(obj));
 
 	else

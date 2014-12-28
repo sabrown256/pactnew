@@ -22,19 +22,19 @@ static int test_1(void)
     char *sts;
     type_desc *td;
     static int dbg = 0;
-    char *tchr[] = { "SC_CHAR_I", "SC_WCHAR_I" };
-    char *tfix[] = { "SC_INT8_I", "SC_SHORT_I",
-		     "SC_INT_I", "SC_LONG_I", "SC_LONG_LONG_I" };
-    char *tfp[]  = { "SC_FLOAT_I", "SC_DOUBLE_I", "SC_LONG_DOUBLE_I" };
-    char *tcpx[] = { "SC_FLOAT_COMPLEX_I", "SC_DOUBLE_COMPLEX_I",
-		     "SC_LONG_DOUBLE_COMPLEX_I" };
-    char *tal[]  = { "SC_FILE_I", "SC_TYPE_GROUP_I", "SC_TYPE_KIND_I", 
-		     "SC_TYPE_DESC_I", "SC_ENUM_I", "SC_PBOOLEAN_I",
-		     "SC_SSIZE_I", "SC_INTEGER_I", "SC_INT16_I",
-		     "SC_INT32_I", "SC_INT64_I",
-		     "SC_REAL_I", "SC_FLOAT32_I", "SC_FLOAT64_I",
-		     "SC_FLOAT128_I", "SC_COMPLEX32_I", "SC_COMPLEX64_I",
-		     "SC_COMPLEX128_I"};
+    char *tchr[] = { "G_CHAR_I", "G_WCHAR_I" };
+    char *tfix[] = { "G_INT8_I", "G_SHORT_I",
+		     "G_INT_I", "G_LONG_I", "G_LONG_LONG_I" };
+    char *tfp[]  = { "G_FLOAT_I", "G_DOUBLE_I", "G_LONG_DOUBLE_I" };
+    char *tcpx[] = { "G_FLOAT_COMPLEX_I", "G_DOUBLE_COMPLEX_I",
+		     "G_LONG_DOUBLE_COMPLEX_I" };
+    char *tal[]  = { "G_FILE_I", "G_TYPE_GROUP_I", "G_TYPE_KIND_I", 
+		     "G_TYPE_DEG_I", "G_ENUM_I", "G_PBOOLEAN_I",
+		     "G_SSIZE_I", "G_INTEGER_I", "G_INT16_I",
+		     "G_INT32_I", "G_INT64_I",
+		     "G_REAL_I", "G_FLOAT32_I", "G_FLOAT64_I",
+		     "G_FLOAT128_I", "G_COMPLEX32_I", "G_COMPLEX64_I",
+		     "G_COMPLEX128_I"};
 
     nerr = 0;
 
@@ -98,7 +98,7 @@ static int test_1(void)
 
 /* aliased types */
     printf("\t\t\tAliased types:\n");
-    for (id = SC_FILE_I; id <= SC_COMPLEX128_I; id += 2)
+    for (id = G_FILE_I; id <= G_COMPLEX128_I; id += 2)
         {td = SC_gs.stl + id;
 	 i  = (id - SC_FILE_I) >> 1;
 	 if (td->id == id)

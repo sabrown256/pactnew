@@ -28,8 +28,8 @@ static object *_SXI_def_attr(SS_psides *si, object *argl)
     type = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &at,
-            SC_STRING_I, &type,
+            G_STRING_I, &at,
+            G_STRING_I, &type,
             0);
 
     if (po == NULL)
@@ -60,7 +60,7 @@ static object *_SXI_rem_attr(SS_psides *si, object *argl)
     at   = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &at,
+            G_STRING_I, &at,
             0);
 
     if (po == NULL)
@@ -99,8 +99,8 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
     pv = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &vr,
-            SC_STRING_I, &at,
+            G_STRING_I, &vr,
+            G_STRING_I, &at,
             G_OBJECT_I, &obj,
             0);
 
@@ -131,14 +131,14 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
 
         data = pv->data;}
 
-    else if ((id == SC_STRING_I) && (SS_stringp(obj)))
+    else if ((id == G_STRING_I) && (SS_stringp(obj)))
         {char **cv;
 
          cv   = CMAKE(char *);
          *cv  = CSTRSAVE(SS_STRING_TEXT(obj));
          data = (void *) cv;}
 
-    else if (id == SC_CHAR_I)
+    else if (id == G_CHAR_I)
         {char *cv;
 
          cv = CMAKE(char);
@@ -149,7 +149,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
 
          data = (void *) cv;}
 
-    else if ((id == SC_INT_I) && (SS_numbp(obj)))
+    else if ((id == G_INT_I) && (SS_numbp(obj)))
         {int *iv;
 
          iv = CMAKE(int);
@@ -160,7 +160,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
 
          data = (void *) iv;}
 
-    else if ((id == SC_DOUBLE_I) && (SS_numbp(obj)))
+    else if ((id == G_DOUBLE_I) && (SS_numbp(obj)))
         {double *dv;
 
          dv = CMAKE(double);
@@ -204,8 +204,8 @@ static object *_SXI_get_attr_val(SS_psides *si, object *argl)
     vr = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &vr,
-            SC_STRING_I, &at,
+            G_STRING_I, &vr,
+            G_STRING_I, &at,
             0);
 
     if (po == NULL)

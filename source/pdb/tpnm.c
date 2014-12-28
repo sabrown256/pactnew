@@ -182,7 +182,7 @@ static int interrupt_mode(descriptors *pd)
     pe = SC_make_event_loop(NULL, NULL, process_end, -1, -1, -1);
 
 /* register the I/O channels for the event loop to monitor */
-    pi  = SC_register_event_loop_callback(pe, SC_FILE_I, stdin,
+    pi  = SC_register_event_loop_callback(pe, G_FILE_I, stdin,
 					  tty_has_txt, NULL, -1);
     for (i = 0; i < n; i++)
         {if (pp[i] != NULL)

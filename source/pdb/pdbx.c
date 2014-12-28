@@ -741,14 +741,14 @@ int PD_read_pdb_curve(PDBfile *fp ARG(,,cls),
        {snprintf(txex, MAXLINE, "%s%s", prefix, s);
 	snprintf(tyex, MAXLINE, "%s%s", prefix, t);
 
-        if (!PD_read_as(fp, tyex, SC_DOUBLE_S, extr))
+        if (!PD_read_as(fp, tyex, G_DOUBLE_S, extr))
            {PD_error("BAD Y EXTREMA - PD_READ_PDB_CURVE", PD_GENERIC);
             return(FALSE);};
 
         *pymn = extr[0];
         *pymx = extr[1];
 
-	if (!PD_read_as(fp, txex, SC_DOUBLE_S, extr))
+	if (!PD_read_as(fp, txex, G_DOUBLE_S, extr))
            {PD_error("BAD X EXTREMA - PD_READ_PDB_CURVE", PD_GENERIC);
             return(FALSE);};
 
@@ -770,7 +770,7 @@ int PD_read_pdb_curve(PDBfile *fp ARG(,,cls),
 
         *pxp = x[0];
 
-	if (!PD_read_as(fp, xval, SC_DOUBLE_S, x[0]))
+	if (!PD_read_as(fp, xval, G_DOUBLE_S, x[0]))
 	   {PD_error("BAD X ARRAY - PD_READ_PDB_CURVE", PD_GENERIC);
 	    return(FALSE);};}
     else
@@ -786,7 +786,7 @@ int PD_read_pdb_curve(PDBfile *fp ARG(,,cls),
 	else
 	   {*pyp = x[1];
 
-	    if (!PD_read_as(fp, yval, SC_DOUBLE_S, x[1]))
+	    if (!PD_read_as(fp, yval, G_DOUBLE_S, x[1]))
 	       {PD_error("BAD Y ARRAY - PD_READ_PDB_CURVE", PD_GENERIC);
 		rv = FALSE;};};}
     else
@@ -845,34 +845,34 @@ int PD_wrt_pdb_curve(PDBfile *fp ARG(,,cls), char *labl, int n,
 
 /* use len to effect the cast from size_t to int */
     snprintf(name, MAXLINE, "curve%04d(%d)", icurve, (int) strlen(dp) + 1);
-    if (!PD_write(fp, name, SC_CHAR_S, dp))
+    if (!PD_write(fp, name, G_CHAR_S, dp))
        return(FALSE);
 
 /* save the curve label */
     snprintf(name, MAXLINE, "labl%d(%d)", icurve, (int) strlen(labl) + 1);
-    if (!PD_write(fp, name, SC_CHAR_S, lp))
+    if (!PD_write(fp, name, G_CHAR_S, lp))
        return(FALSE);
 
 /* save the number of points */
     snprintf(name, MAXLINE, "npts%d", icurve);
-    if (!PD_write(fp, name, SC_INT_S, np))
+    if (!PD_write(fp, name, G_INT_S, np))
        return(FALSE);
 
 /* save the x and y arrays and the extrema */
     snprintf(name, MAXLINE, "yext%d(2)", icurve);
-    if (!PD_write(fp, name, SC_DOUBLE_S, yext))
+    if (!PD_write(fp, name, G_DOUBLE_S, yext))
        return(FALSE);
 
     snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-    if (!PD_write(fp, name, SC_DOUBLE_S, x[1]))
+    if (!PD_write(fp, name, G_DOUBLE_S, x[1]))
        return(FALSE);
 
     snprintf(name, MAXLINE, "xext%d(2)", icurve);
-    if (!PD_write(fp, name, SC_DOUBLE_S, xext))
+    if (!PD_write(fp, name, G_DOUBLE_S, xext))
        return(FALSE);
 
     snprintf(name, MAXLINE, "xval%d(%d)", icurve, n);
-    if (!PD_write(fp, name, SC_DOUBLE_S, x[0]))
+    if (!PD_write(fp, name, G_DOUBLE_S, x[0]))
        return(FALSE);
 
     if (!fp->virtual_internal)
@@ -935,28 +935,28 @@ int PD_wrt_pdb_curve_y(PDBfile *fp ARG(,,cls),
 /* use len to effect the cast from size_t to int */
     len = strlen(desc) + 1;
     snprintf(name, MAXLINE, "curve%04d(%d)", icurve, len);
-    if (!PD_write(fp, name, SC_CHAR_S, desc))
+    if (!PD_write(fp, name, G_CHAR_S, desc))
        return(FALSE);
 
 /* save the curve label */
     snprintf(name, MAXLINE, "labl%d(%d)", icurve, i);
-    if (!PD_write(fp, name, SC_CHAR_S, labl))
+    if (!PD_write(fp, name, G_CHAR_S, labl))
        return(FALSE);
 
 /* save the number of points */
 /*
     snprintf(name, MAXLINE, "npts%d", icurve);
-    if (!PD_write(fp, name, SC_INT_S, &n))
+    if (!PD_write(fp, name, G_INT_S, &n))
        return(FALSE);
 */
 
 /* save the y array and the extrema */
     snprintf(name, MAXLINE, "yext%d(2)", icurve);
-    if (!PD_write(fp, name, SC_DOUBLE_S, extr))
+    if (!PD_write(fp, name, G_DOUBLE_S, extr))
        return(FALSE);
 
     snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-    if (!PD_write(fp, name, SC_DOUBLE_S, py))
+    if (!PD_write(fp, name, G_DOUBLE_S, py))
        return(FALSE);
 
     return(TRUE);}

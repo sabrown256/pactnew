@@ -108,13 +108,13 @@ defstr *PD_defenum(PDBfile *file ARG(,,cls), char *name)
     enum {A, B, C} t = A;
 
     if (sizeof(t) == sizeof(int))
-       ity = SC_INT_S;
+       ity = G_INT_S;
     else if (sizeof(t) == sizeof(long))
-       ity = SC_LONG_S;
+       ity = G_LONG_S;
     else if (sizeof(t) == sizeof(long long))
-       ity = SC_LONG_LONG_S;
+       ity = G_LONG_LONG_S;
     else if (sizeof(t) == sizeof(short))
-       ity = SC_SHORT_S;
+       ity = G_SHORT_S;
 
     dp = PD_typedef(file, ity, name);
 

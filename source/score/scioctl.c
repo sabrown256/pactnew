@@ -212,7 +212,7 @@ int SC_register_event_loop_callback(SC_evlpdes *pe, int type, void *p,
 	    if (io != NULL)
 	       fd = io[0];}
 
-        else if (type == SC_FILE_I)
+        else if (type == G_FILE_I)
 	   fd = fileno((FILE *) p);
 
 	else
@@ -248,7 +248,7 @@ int SC_replace_event_loop_accept(SC_evlpdes *pe, int type, void *p,
     if (type == G_PROCESS_I)
        fd = ((PROCESS *) p)->io[0];
 
-    else if (type == SC_FILE_I)
+    else if (type == G_FILE_I)
        fd = fileno((FILE *) p);
 
     else
@@ -262,7 +262,7 @@ int SC_replace_event_loop_accept(SC_evlpdes *pe, int type, void *p,
              break;};};
 
     if (i >= n)
-       i = SC_register_event_loop_callback(pe, SC_INT_I, &fd,
+       i = SC_register_event_loop_callback(pe, G_INT_I, &fd,
 					   acc, NULL, -1);
 
     return(i);}
@@ -284,7 +284,7 @@ int SC_replace_event_loop_reject(SC_evlpdes *pe, int type, void *p,
     if (type == G_PROCESS_I)
        fd = ((PROCESS *) p)->io[0];
 
-    else if (type == SC_FILE_I)
+    else if (type == G_FILE_I)
        fd = fileno((FILE *) p);
 
     else
@@ -298,7 +298,7 @@ int SC_replace_event_loop_reject(SC_evlpdes *pe, int type, void *p,
              break;};};
 
     if (i >= n)
-       i = SC_register_event_loop_callback(pe, SC_INT_I, &fd,
+       i = SC_register_event_loop_callback(pe, G_INT_I, &fd,
 					   NULL, rej, -1);
 
     return(i);}
@@ -325,7 +325,7 @@ void SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p)
        {pp = (PROCESS *) p;
 	fd = pp->io[0];}
 
-    else if (type == SC_FILE_I)
+    else if (type == G_FILE_I)
        {fp = (FILE *) p;
 	fd = fileno(fp);}
 
@@ -370,7 +370,7 @@ void SC_get_event_loop_callback(SC_evlpdes *pe, int type, void *p,
        {pp = (PROCESS *) p;
 	fd = pp->io[0];}
 
-    else if (type == SC_FILE_I)
+    else if (type == G_FILE_I)
        {fp = (FILE *) p;
 	fd = fileno(fp);}
 

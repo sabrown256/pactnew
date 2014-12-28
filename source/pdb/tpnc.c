@@ -46,12 +46,12 @@ static void send_binary(long ni, char *type)
        {file = pp->vif;
 	did  = SC_type_id(type, FALSE);
 
-	src = (double *) _PD_alloc_entry(file, SC_DOUBLE_S, ni);
+	src = (double *) _PD_alloc_entry(file, G_DOUBLE_S, ni);
 	for (i = 0L; i < ni; i++)
 	    src[i] = (double) i;
 
 	space = SC_convert_id(did, NULL, 0, 1,
-			      SC_DOUBLE_I, src, 0, 1, ni, TRUE);
+			      G_DOUBLE_I, src, 0, 1, ni, TRUE);
 
 	if (SC_write(space, type, ni, pp))
 	   printf("Binary data sent: %s %ld\n",
@@ -94,8 +94,8 @@ int main(int argc, char **argv)
 		      break;};};};
 
     if (binary)
-       {send_binary(100, SC_LONG_S);
-        send_binary(10,  SC_DOUBLE_S);};
+       {send_binary(100, G_LONG_S);
+        send_binary(10,  G_DOUBLE_S);};
 
     while (TRUE)
        {PRINT(stdout, "-> ");

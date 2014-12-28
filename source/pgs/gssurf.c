@@ -782,13 +782,13 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
     mesh = PG_fget_fill_bound(dev);
 
     PG_get_attrs_graph(g, FALSE,
-		       "THETA",      SC_DOUBLE_I,  &va[0], 0.0,
-		       "PHI",        SC_DOUBLE_I,  &va[1], 0.0,
-		       "CHI",        SC_DOUBLE_I,  &va[2], 0.0,
-		       "DRAW-MESH",  SC_INT_I, &mesh,  _PG_gattrs.ref_mesh,
-		       "LINE-COLOR", SC_INT_I, &color, dev->BLUE,
-		       "LINE-STYLE", SC_INT_I, &style, LINE_SOLID,
-		       "LINE-WIDTH", SC_DOUBLE_I,  &width, 0.0,
+		       "THETA",      G_DOUBLE_I,  &va[0], 0.0,
+		       "PHI",        G_DOUBLE_I,  &va[1], 0.0,
+		       "CHI",        G_DOUBLE_I,  &va[2], 0.0,
+		       "DRAW-MESH",  G_INT_I, &mesh,  _PG_gattrs.ref_mesh,
+		       "LINE-COLOR", G_INT_I, &color, dev->BLUE,
+		       "LINE-STYLE", G_INT_I, &style, LINE_SOLID,
+		       "LINE-WIDTH", G_DOUBLE_I,  &width, 0.0,
 		       NULL);
 
     for (i = 0; i < PG_NANGLES; i++)
@@ -816,7 +816,7 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
     nd    = range->dimension_elem;
     mtype = SC_strtok(bf, " *", s);
     sid   = SC_type_id(mtype, FALSE);
-    same  = (sid == SC_DOUBLE_I);
+    same  = (sid == G_DOUBLE_I);
 
     afd   = CMAKE_N(double *, nd);
     afs   = (void **) range->elements;
@@ -833,11 +833,11 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
             afd[i] = (double *) afs[i];}
     else
        {for (i = 0; i < nd; i++)
-            afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1,
+            afd[i] = SC_convert_id(G_DOUBLE_I, NULL, 0, 1,
 				   sid, afs[i], 0, 1, npts, FALSE);
 
         if (rexfl)
-           rextr = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1,
+           rextr = SC_convert_id(G_DOUBLE_I, NULL, 0, 1,
 				 sid, range->extrema, 0, 1, 2*nd, FALSE);};
 
     PG_register_range_extrema(dev, nd, rextr);
@@ -1368,18 +1368,18 @@ void PG_draw_surface_n(PG_device *dev ARG(,,cls),
        {maxes  = (int *) cnnct;
 	imx    = maxes[0];
 	jmx    = maxes[1];
-	domain = PM_make_set("{x,y}", SC_DOUBLE_S, FALSE, 2, imx, jmx,
+	domain = PM_make_set("{x,y}", G_DOUBLE_S, FALSE, 2, imx, jmx,
 			     2, r[0], r[1]);}
 
     else if (strcmp(mesh_type, PM_AC_S) == 0)
-       domain = PM_make_ac_set("{x,y}", SC_DOUBLE_S, FALSE,
+       domain = PM_make_ac_set("{x,y}", G_DOUBLE_S, FALSE,
 			       (PM_mesh_topology *) cnnct, 2, r[0], r[1]);
 
 /* build the range set */
     if (a2 == NULL)
-       range = PM_make_set("{a}", SC_DOUBLE_S, FALSE, 1, nn, 1, a1);
+       range = PM_make_set("{a}", G_DOUBLE_S, FALSE, 1, nn, 1, a1);
     else
-       range = PM_make_set("{u,v}", SC_DOUBLE_S, FALSE, 1, nn, 2, a1, a2);
+       range = PM_make_set("{u,v}", G_DOUBLE_S, FALSE, 1, nn, 2, a1, a2);
 
     alst = SC_copy_alist(alist);
 
@@ -1388,12 +1388,12 @@ void PG_draw_surface_n(PG_device *dev ARG(,,cls),
 
 /* add the attributes */
     PG_set_attrs_graph(g,
-		       "LINE-COLOR", SC_INT_I, FALSE, color,
-		       "LINE-STYLE", SC_INT_I, FALSE, style,
-		       "LINE-WIDTH", SC_DOUBLE_I,  FALSE, width,
-		       "THETA",      SC_DOUBLE_I,  FALSE, va[0],
-		       "PHI",        SC_DOUBLE_I,  FALSE, va[1],
-		       "CHI",        SC_DOUBLE_I,  FALSE, va[2],
+		       "LINE-COLOR", G_INT_I, FALSE, color,
+		       "LINE-STYLE", G_INT_I, FALSE, style,
+		       "LINE-WIDTH", G_DOUBLE_I,  FALSE, width,
+		       "THETA",      G_DOUBLE_I,  FALSE, va[0],
+		       "PHI",        G_DOUBLE_I,  FALSE, va[1],
+		       "CHI",        G_DOUBLE_I,  FALSE, va[2],
 		       NULL);
 
     g->rendering = pty;

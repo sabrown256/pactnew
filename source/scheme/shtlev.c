@@ -214,8 +214,8 @@ static object *_SSI_repl(SS_psides *si, object *arg)
     prompt = NULL;
     prefix = NULL;
     SS_args(si, arg,
-	    SC_STRING_I, &prompt,
-	    SC_STRING_I, &prefix,
+	    G_STRING_I, &prompt,
+	    G_STRING_I, &prefix,
 	    0);
 
     if (prompt != NULL)
@@ -261,7 +261,7 @@ static object *_SSI_quit(SS_psides *si, object *arg)
 
     _SS.exit_val = 0;
     SS_args(si, arg,
-            SC_INT_I, &_SS.exit_val,
+            G_INT_I, &_SS.exit_val,
             0);
 
     LONGJMP(SC_gs.cpu, ERR_FREE);
@@ -475,7 +475,7 @@ object *SS_lookup_object(SS_psides *si, object *obj)
 /* take anything that will give a name - procedure, string, variable ... */
     name = NULL;
     SS_args(si, obj,
-	    SC_STRING_I, &name,
+	    G_STRING_I, &name,
 	    0);
 
     obj = SS_bound_name(si, name);
@@ -815,7 +815,7 @@ void SS_error(SS_psides *si, char *s, object *obj)
 			   G_OBJECT_I, si->fun,
 			   G_OBJECT_I, si->argl,
 			   G_OBJECT_I, obj,
-			   SC_STRING_I, t,
+			   G_STRING_I, t,
 			   0));
 
     str = SS_OUTSTREAM(si->outdev);
@@ -854,13 +854,13 @@ char *SS_object_type_name(object *o, char *atype, long nb)
     itype = SC_arrtype(o, -1);
     p     = atype;
 
-    if (itype == SC_INT_I)
-       SC_strncpy(atype, nb, SC_INT_S, -1);
+    if (itype == G_INT_I)
+       SC_strncpy(atype, nb, G_INT_S, -1);
 
-    else if (itype == SC_FLOAT_I)
-       SC_strncpy(atype, nb, SC_FLOAT_S, -1);
+    else if (itype == G_FLOAT_I)
+       SC_strncpy(atype, nb, G_FLOAT_S, -1);
 
-    else if (itype == SC_STRING_I)
+    else if (itype == G_STRING_I)
        SC_strncpy(atype, nb, "string", -1);
 
     else if (itype == G_SS_CONS_I)
@@ -872,7 +872,7 @@ char *SS_object_type_name(object *o, char *atype, long nb)
     else if (itype == G_SS_PROCEDURE_I)
        SC_strncpy(atype, nb, "procedure", -1);
 
-    else if (itype == SC_BOOL_I)
+    else if (itype == G_BOOL_I)
        SC_strncpy(atype, nb, "boolean", -1);
 
     else if (itype == G_SS_INPUT_PORT_I)
@@ -891,7 +891,7 @@ char *SS_object_type_name(object *o, char *atype, long nb)
        SC_strncpy(atype, nb, "vector", -1);
 
     else if (itype == SS_CHARACTER_I)
-       SC_strncpy(atype, nb, SC_CHAR_S, -1);
+       SC_strncpy(atype, nb, G_CHAR_S, -1);
 
     else if (itype == G_HAELEM_I)
        SC_strncpy(atype, nb, "hash element", -1);
@@ -927,8 +927,8 @@ static object *_SSI_system(SS_psides *si, object *argl)
     cmd = NULL;
     to  = -1;
     SS_args(si, argl,
-	    SC_STRING_I,  &cmd,
-	    SC_INT_I, &to,
+	    G_STRING_I,  &cmd,
+	    G_INT_I, &to,
 	    0);
 
     if (to > 0)
@@ -966,8 +966,8 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
     cmd    = NULL;
     to     = -1;
     SS_args(si, argl,
-	    SC_STRING_I,  &cmd,
-	    SC_INT_I, &to,
+	    G_STRING_I,  &cmd,
+	    G_INT_I, &to,
 	    0);
 
     ost = ps->msh_syntax;

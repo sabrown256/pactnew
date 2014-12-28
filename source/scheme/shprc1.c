@@ -143,7 +143,7 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
     frd  = SS_null;
     fwr  = SS_null;
     SS_args(si, argl,
-            SC_STRING_I, &mode,
+            G_STRING_I, &mode,
 	    G_OBJECT_I, &obj,
 	    G_OBJECT_I, &frd,
 	    G_OBJECT_I, &fwr,
@@ -252,7 +252,7 @@ static object *_SSI_pr_rd_tries(SS_psides *si, object *argl)
 
     if (!SS_nullobjp(argl))
        SS_args(si, argl,
-               SC_INT_I, &_SS.n_tries,
+               G_INT_I, &_SS.n_tries,
                0);
 
     o = SS_mk_integer(si, (int64_t) _SS.n_tries);
@@ -280,11 +280,11 @@ static object *_SSI_pr_stat(SS_psides *si, object *obj)
     else
        rs = pp->reason;
 
-    ret = SS_make_list(si, SC_INT_I, &pp->id,
-                       SC_INT_I, &pp->io[0],
-                       SC_INT_I, &pp->io[1],
-                       SC_INT_I, &st,
-                       SC_INT_I, &rs,
+    ret = SS_make_list(si, G_INT_I, &pp->id,
+                       G_INT_I, &pp->io[0],
+                       G_INT_I, &pp->io[1],
+                       G_INT_I, &st,
+                       G_INT_I, &rs,
                        0);
 
     return(ret);}    
@@ -328,7 +328,7 @@ static object *_SSI_pr_sn_line(SS_psides *si, object *argl)
     s  = NULL;
     SS_args(si, argl,
             G_PROCESS_I, &pp,
-            SC_STRING_I, &s,
+            G_STRING_I, &s,
             0);
 
     if (s[0] == '"')
@@ -353,9 +353,9 @@ static object *_SSI_get_url_file(SS_psides *si, object *argl)
     file = NULL;
     vers = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &url,
-            SC_STRING_I, &file,
-            SC_STRING_I, &vers,
+            G_STRING_I, &url,
+            G_STRING_I, &file,
+            G_STRING_I, &vers,
             0);
 
     ret = SC_http_url_file(url, file, vers);
@@ -377,7 +377,7 @@ static object *_SSI_get_host_name(SS_psides *si, object *argl)
 
     sys  = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &sys,
+            G_STRING_I, &sys,
             0);
 
     ret = SC_get_host_name(hst, MAXLINE, sys);
@@ -407,8 +407,8 @@ static object *_SSI_get_host_types(SS_psides *si, object *argl)
     all = TRUE;
     net = NULL;
     SS_args(si, argl,
-            SC_INT_I, &all,
-            SC_STRING_I, &net,
+            G_INT_I, &all,
+            G_STRING_I, &net,
             0);
 
     strs = SC_get_host_types(all, net);
@@ -440,7 +440,7 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
 
     pid = TRUE;
     SS_args(si, argl,
-            SC_INT_I, &pid,
+            G_INT_I, &pid,
             0);
 
     if (pid == -1)
@@ -448,27 +448,27 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
 
     err = SC_resource_usage(&ru, pid);
     if (err == TRUE)
-       o = SS_make_list(si, SC_INT_I, &ru.pid,      /* process id */
-			SC_INT_I,     &ru.ppid,     /* process parent id */
-			SC_INT_I,     &ru.uid,      /* process user id */
-			SC_INT_I,     &ru.priority, /* process scheduling priority */
-			SC_STRING_I,  &ru.cmd,      /* command line */
-			SC_DOUBLE_I,  &ru.ut,       /* total user time used (in sec) */
-			SC_DOUBLE_I,  &ru.st,       /* total system time used (in sec) */
-			SC_DOUBLE_I,  &ru.maxrss,   /* maximum resident set size (in MBy) */
-			SC_DOUBLE_I,  &ru.idrss,    /* data segment memory used */
-			SC_DOUBLE_I,  &ru.isrss,    /* stack memory used */
-			SC_DOUBLE_I,  &ru.minflt,   /* soft page faults - reclaims */
-			SC_DOUBLE_I,  &ru.majflt,   /* hard page faults - requiring I/O */
-			SC_DOUBLE_I,  &ru.nswap,    /* times a process was swapped out of memory */
-			SC_DOUBLE_I,  &ru.inblock,  /* block input operations via the file system */
-			SC_DOUBLE_I,  &ru.outblock, /* block output operations via the file system */
-			SC_DOUBLE_I,  &ru.msgsnd,   /* IPC messages sent */
-			SC_DOUBLE_I,  &ru.msgrcv,   /* IPC messages received */
-			SC_DOUBLE_I,  &ru.nsignals, /* signals delivered */
-			SC_DOUBLE_I,  &ru.nvcsw,    /* voluntary context switches */
-			SC_DOUBLE_I,  &ru.nivcsw,   /* involuntary context switches */
-			SC_DOUBLE_I,  &ru.nsysc,    /* system calls */
+       o = SS_make_list(si, G_INT_I, &ru.pid,      /* process id */
+			G_INT_I,     &ru.ppid,     /* process parent id */
+			G_INT_I,     &ru.uid,      /* process user id */
+			G_INT_I,     &ru.priority, /* process scheduling priority */
+			G_STRING_I,  &ru.cmd,      /* command line */
+			G_DOUBLE_I,  &ru.ut,       /* total user time used (in sec) */
+			G_DOUBLE_I,  &ru.st,       /* total system time used (in sec) */
+			G_DOUBLE_I,  &ru.maxrss,   /* maximum resident set size (in MBy) */
+			G_DOUBLE_I,  &ru.idrss,    /* data segment memory used */
+			G_DOUBLE_I,  &ru.isrss,    /* stack memory used */
+			G_DOUBLE_I,  &ru.minflt,   /* soft page faults - reclaims */
+			G_DOUBLE_I,  &ru.majflt,   /* hard page faults - requiring I/O */
+			G_DOUBLE_I,  &ru.nswap,    /* times a process was swapped out of memory */
+			G_DOUBLE_I,  &ru.inblock,  /* block input operations via the file system */
+			G_DOUBLE_I,  &ru.outblock, /* block output operations via the file system */
+			G_DOUBLE_I,  &ru.msgsnd,   /* IPC messages sent */
+			G_DOUBLE_I,  &ru.msgrcv,   /* IPC messages received */
+			G_DOUBLE_I,  &ru.nsignals, /* signals delivered */
+			G_DOUBLE_I,  &ru.nvcsw,    /* voluntary context switches */
+			G_DOUBLE_I,  &ru.nivcsw,   /* involuntary context switches */
+			G_DOUBLE_I,  &ru.nsysc,    /* system calls */
 			0);
 
     else

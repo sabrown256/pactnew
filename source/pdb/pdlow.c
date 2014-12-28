@@ -995,7 +995,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 	   PD_COMPARE_BOOL_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
-    _PD_defstr_in(chart, SC_BOOL_S, KIND_INT,
+    _PD_defstr_in(chart, G_BOOL_S, KIND_INT,
 		  NULL, NULL, fstd->bool_bytes,
 		  falign->bool_alignment, NO_ORDER,
 		  conv, NULL, NULL, FALSE, FALSE, chk, NULL);

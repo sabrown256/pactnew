@@ -56,10 +56,10 @@ int lookup_scheme_type(char *a, int nc, char *t)
     td = lookup_type_info(t);
     if (td != NULL)
        {if (td->knd == TK_ENUM)
-	   nstrncpy(a, nc, "SC_ENUM_I", -1);
+	   nstrncpy(a, nc, "G_ENUM_I", -1);
 
 	else if (td->knd == TK_UNION)
-	   nstrncpy(a, nc, "SC_UNION_I", -1);
+	   nstrncpy(a, nc, "G_UNION_I", -1);
 
 	else
 	   nstrncpy(a, nc, td->typ_i, -1);
@@ -87,19 +87,19 @@ static void cs_type(char *a, int nc, farg *al, int drf)
     ok = lookup_scheme_type(a, nc, ty);
     if (ok == FALSE)
        {if (strcmp(ty, "void *") == 0)
-	   nstrncpy(a, nc, "SC_VOID_I", -1);
+	   nstrncpy(a, nc, "G_VOID_I", -1);
 
 	else if (is_func_ptr(ty, 3) == TRUE)
-	   nstrncpy(a, nc, "SC_POINTER_I", -1);
+	   nstrncpy(a, nc, "G_POINTER_I", -1);
 
 	else if (strchr(ty, '*') != NULL)
 	   {deref(t, BFLRG, ty);
 	    ok = lookup_scheme_type(a, nc, t);
 	    if (ok == FALSE)
-	       nstrncpy(a, nc, "SC_POINTER_I", -1);}
+	       nstrncpy(a, nc, "G_POINTER_I", -1);}
 
 	else
-	   nstrncpy(a, nc, "SC_UNKNOWN_I", -1);};
+	   nstrncpy(a, nc, "G_UNKNOWN_I", -1);};
 
     return;}
 

@@ -11,9 +11,9 @@
 
 #include "pgs_int.h"
 
-#define ATTR_STR(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_STRING_S, 2, -1)
-#define ATTR_INT(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_INT_S,    2, -1)
-#define ATTR_DBL(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_DOUBLE_S, 2, -1)
+#define ATTR_STR(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, G_STRING_S, 2, -1)
+#define ATTR_INT(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, G_INT_S,    2, -1)
+#define ATTR_DBL(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, G_DOUBLE_S, 2, -1)
 
 gattrdes
  _PG_gattrs;
@@ -59,16 +59,16 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 SC_assoc_info(alst, name, &pa, NULL);
 
 	 pv = NULL;
-	 SC_VA_ARG_ID(SC_POINTER_I, &pv, 0);
+	 SC_VA_ARG_ID(G_POINTER_I, &pv, 0);
 	 SC_VA_ARG_ID(ityp, v, 0);
 	     
-/* GOTCHA: there is something wrong in the SC_POINTER_I conversion case
+/* GOTCHA: there is something wrong in the G_POINTER_I conversion case
  * notice the &pa versus pa for everything else
  */
 	 if (pa != NULL)
 	    {if (SC_is_type_num(ityp) == TRUE)
 		SC_convert_id(ityp, pv, 0, 1, ityp, pa, 0, 1, 1, FALSE);
-	     else if (ityp == SC_POINTER_I)
+	     else if (ityp == G_POINTER_I)
 	        SC_convert_id(ityp, pv, 0, 1, ityp, &pa, 0, 1, 1, FALSE);}
 
 	 else if (dflt == TRUE)
@@ -204,7 +204,7 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list __a__)
 	 typn = SC_type_name(pid);
 
 	 if ((ptr == FALSE) &&
-	     ((SC_is_type_num(ityp) == TRUE) || (ityp == SC_POINTER_I)))
+	     ((SC_is_type_num(ityp) == TRUE) || (ityp == G_POINTER_I)))
 	    {pv = CMAKE_N(char, bpi);
 	     SC_VA_ARG_ID(ityp, pv, 0);}
 	 else
@@ -621,19 +621,19 @@ void _PG_ptr_attr_set(char *typ, void *pvo, void *pvi)
     if ((pvo != NULL) && (pvi != NULL))
        {id = SC_type_id(typ, FALSE);
 
-	if (id == SC_INT_I)
+	if (id == G_INT_I)
 	   {int *iv;
 
 	    iv  = (int *) pvo;
 	    *iv = *(int *) pvi;}
 
-	else if (id == SC_DOUBLE_I)
+	else if (id == G_DOUBLE_I)
 	   {double *dv;
 
 	    dv  = (double *) pvo;
 	    *dv = *(double *) pvi;}
 
-	else if (id == SC_STRING_I)
+	else if (id == G_STRING_I)
 	   {char **sv;
 
 	    sv  = (char **) pvo;

@@ -1686,9 +1686,9 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, inti ni,
 
     CFREE(etype);
 
-    ep->type   = CSTRSAVE(SC_CHAR_S);
+    ep->type   = CSTRSAVE(G_CHAR_S);
     ep->number = nie;
-    nir = _PD_sys_read(file, ep, SC_CHAR_S, in);
+    nir = _PD_sys_read(file, ep, G_CHAR_S, in);
     if (nir != nie)
        {CFREE(in);
 	_PD_rl_syment_d(ep);

@@ -157,7 +157,7 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
        {std->ptr_bytes       = nb;
 	align->ptr_alignment = al;}
 
-    else if (id == SC_STRUCT_I)
+    else if (id == G_STRUCT_I)
        align->struct_alignment = al;
 
     return;}

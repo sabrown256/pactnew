@@ -832,7 +832,7 @@ static void id_fd_in(idecl *ip, char *ty, char *lty,
     drf = deref(dty, BFLRG, ty);
     ideref(lty);
 
-    strp = (strcmp(lty, "SC_STRING_I") == 0);
+    strp = (strcmp(lty, "G_STRING_I") == 0);
     sarr = ((arr == TRUE) && (strp == TRUE) && (strcmp(ty, "char *") != 0));
     if ((nvl == 1) && (sarr == FALSE))
        {get_def_value(lvl, BFLRG, vls[0], dty);

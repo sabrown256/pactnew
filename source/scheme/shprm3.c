@@ -326,7 +326,7 @@ static object *_SSI_lst_tail(SS_psides *si, object *argl)
 
     SS_args(si, argl,
 	    G_OBJECT_I, &lst,
-	    SC_INT_I, &n,
+	    G_INT_I, &n,
             0);
 
     o = SS_list_tail(si, lst, n);
@@ -344,7 +344,7 @@ static object *_SSI_lst_ref(SS_psides *si, object *argl)
 
     SS_args(si, argl,
 	    G_OBJECT_I, &lst,
-	    SC_INT_I, &n,
+	    G_INT_I, &n,
             0);
 
     o = SS_null;
@@ -541,7 +541,7 @@ static object *_SSI_intp(SS_psides *si, object *obj)
     rv = SS_f;
     if (SS_numbp(obj))
        {SS_args(si, obj,
-		SC_DOUBLE_I, &r,
+		G_DOUBLE_I, &r,
 		0);
 
 	rv = (floor(r) == r) ? SS_t : SS_f;};
@@ -638,10 +638,10 @@ static int _SS_filep(SS_psides *si, object *argl, char *dtype)
     scope = NULL;
 
     SS_args(si, argl,
-	    SC_STRING_I, &name,
-	    SC_STRING_I, &mode,
-	    SC_STRING_I, &type,
-	    SC_STRING_I, &scope,
+	    G_STRING_I, &name,
+	    G_STRING_I, &mode,
+	    G_STRING_I, &type,
+	    G_STRING_I, &scope,
 	    0);
 
     if (mode != NULL)
@@ -745,10 +745,10 @@ static int _SS_eqv(SS_psides *si, object *o1, object *o2)
     else if (SC_is_type_cx(ityp) == TRUE)
        rv = PM_cequal(SS_COMPLEX_VALUE(o1), SS_COMPLEX_VALUE(o2));
 
-    else if (ityp == SC_QUATERNION_I)
+    else if (ityp == G_QUATERNION_I)
        rv = PM_qequal(SS_QUATERNION_VALUE(o1), SS_QUATERNION_VALUE(o2));
 
-    else if (ityp == SC_STRING_I)
+    else if (ityp == G_STRING_I)
        rv = (strcmp(SS_STRING_TEXT(o1), SS_STRING_TEXT(o2)) == 0);
 
     else if (ityp == SS_CHARACTER_I)
@@ -757,7 +757,7 @@ static int _SS_eqv(SS_psides *si, object *o1, object *o2)
     else if (ityp == G_SS_VARIABLE_I)
        rv = (strcmp(SS_VARIABLE_NAME(o1), SS_VARIABLE_NAME(o2)) == 0);
 
-    else if (ityp == SC_BOOL_I)
+    else if (ityp == G_BOOL_I)
        rv = (SS_BOOLEAN_VALUE(o1) == SS_BOOLEAN_VALUE(o2));
 
     else if (ityp == G_SS_PROCEDURE_I)

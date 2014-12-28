@@ -208,7 +208,7 @@ object *UL_opxc(SS_psides *si, SS_C_procedure *cp, object *argl)
 
     a = HUGE;
     SS_args(si, tok,
-            SC_DOUBLE_I, &a,
+            G_DOUBLE_I, &a,
             0);
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - UL_OPXC ", tok);
@@ -259,7 +259,7 @@ object *UL_opyc(SS_psides *si, SS_C_procedure *cp, object *argl)
 
     a = HUGE;
     SS_args(si, tok,
-            SC_DOUBLE_I, &a,
+            G_DOUBLE_I, &a,
             0);
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - UL_OPYC ", tok);
@@ -333,13 +333,13 @@ static object *_UL_ul2toc(SS_psides *si, SS_C_procedure *cp,
             {i = SX_get_crv_index_i(s);
 	     if (tok1 != NULL)
 	        SS_args(si, tok1,
-			SC_DOUBLE_I, &d1,
+			G_DOUBLE_I, &d1,
 			0);
 	     else
 	        d1 = SX_gs.dataset[i].wc[0];
 	     if (tok2 != NULL)
 	        SS_args(si, tok2,
-			SC_DOUBLE_I, &d2,
+			G_DOUBLE_I, &d2,
 			0);
 	     else
 	        d2 = SX_gs.dataset[i].wc[1];

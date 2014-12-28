@@ -5,13 +5,13 @@
  *    fundamental types - mostly primitive
  *                        (quaternion and FILE are exceptional)
  *    type foo or foo_t implies variables:
- *        SC_FOO_I, SC_FOO_S, SC_FOO_P_I, SC_FOO_P_S
+ *        G_FOO_I, G_FOO_S, G_FOO_P_I, G_FOO_P_S
  *    whack the "_t" for foo_t
  *    pointer versions have min/max  -LLONG_MAX  LLONG_MAX
  *   
  *    exceptions for implied variables:
- *        SC_CHAR_P_x   -> SC_STRING_x
- *        SC_VOID_P_x   -> SC_POINTER_x
+ *        G_CHAR_P_x   -> G_STRING_x
+ *        G_VOID_P_x   -> G_POINTER_x
  *
  *    KIND_CHAR/KIND_INT have
  *      signed       unsigned    variations
@@ -99,8 +99,8 @@ struct s_type_desc
     char *f90;      /* F90 type name for the C type */
     char *promo;    /* type promoted to in calls */
     char *comp;     /* unit type for composite types */
-    char *typ_i;    /* type index variable name, SC_INT_I */
-    char *typ_s;    /* type name variable name, SC_INT_S */
+    char *typ_i;    /* type index variable name, G_INT_I */
+    char *typ_s;    /* type name variable name, G_INT_S */
     void *a;        /* application supplied info */
     void (*init)(void *x);     /* function to initialize instance */
     void (*free)(void *x);};   /* function to free instance */
@@ -158,7 +158,7 @@ int deref(char *d, int nc, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* IDEREF - dereference S with SC_FOO_P_I to SC_FOO_I
+/* IDEREF - dereference S with G_FOO_P_I to G_FOO_I
  *        - in place
  *        - return TRUE iff a pointer was dereferenced
  */
@@ -203,8 +203,8 @@ char *fix_type_designator(int fl, char *fmt, ...)
     rv = subst(rv, "__", "_", -1);
     
 /* fix hated _t types
- * e.g. SC_INT32_T_I -> SC_INT32_I
- * or   SC_INT32_T_P_I -> SC_INT32_P_I
+ * e.g. G_INT32_T_I -> G_INT32_I
+ * or   G_INT32_T_P_I -> G_INT32_P_I
  */
     if (fl & 2)
        {nc = strlen(rv);
@@ -426,14 +426,14 @@ static void _push_type_ptr(type_desc *td, int alias)
     tp.f90 = STRSAVE(ti);
 
     if (strcmp(td->type, "char") == 0)
-       {nstrncpy(ti, BFSML, "SC_STRING_I", -1);
-	nstrncpy(ts, BFSML, "SC_STRING_S", -1);}
+       {nstrncpy(ti, BFSML, "G_STRING_I", -1);
+	nstrncpy(ts, BFSML, "G_STRING_S", -1);}
     else if (strcmp(td->type, "void") == 0)
-       {nstrncpy(ti, BFSML, "SC_POINTER_I", -1);
-	nstrncpy(ts, BFSML, "SC_POINTER_S", -1);}
+       {nstrncpy(ti, BFSML, "G_POINTER_I", -1);
+	nstrncpy(ts, BFSML, "G_POINTER_S", -1);}
     else
-       {snprintf(ti, BFSML, "SC_%s_P_I", td->type);
-	snprintf(ts, BFSML, "SC_%s_P_S", td->type);};
+       {snprintf(ti, BFSML, "G_%s_P_I", td->type);
+	snprintf(ts, BFSML, "G_%s_P_S", td->type);};
 
     tp.typ_i = fix_type_designator(3, ti);
     tp.typ_s = fix_type_designator(3, ts);
@@ -522,8 +522,8 @@ static int _parse_standard_types(char **sa)
 	     td.utype = fix_signed(ta[11], "unsigned", td.type);
 	     td.ftype = fix_type_designator(0, td.type);
 
-	     td.typ_i = fix_type_designator(3, "SC_%s_I", td.type);
-	     td.typ_s = fix_type_designator(3, "SC_%s_S", td.type);
+	     td.typ_i = fix_type_designator(3, "G_%s_I", td.type);
+	     td.typ_s = fix_type_designator(3, "G_%s_S", td.type);
 
 	     td.a    = NULL;
 	     td.init = NULL;
@@ -580,8 +580,8 @@ static int _parse_alias_types(char **sa)
 		 td.ptr = ((strcmp(ta[2], "TRUE") == 0) ||
 			   (strcmp(ta[2], "B_T") == 0));
 
-		 td.typ_i = fix_type_designator(3, "SC_%s_I", td.type);
-		 td.typ_s = fix_type_designator(3, "SC_%s_S", td.type);
+		 td.typ_i = fix_type_designator(3, "G_%s_I", td.type);
+		 td.typ_s = fix_type_designator(3, "G_%s_S", td.type);
 
 		 type_table(&td);
 		 nt++;

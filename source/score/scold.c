@@ -305,7 +305,7 @@ char *SC_strsaven(char *s, char *name)
 	opt.perm = FALSE;
 	opt.na   = TRUE;
 	opt.zsp  = -1;
-	opt.typ  = SC_STRING_I;
+	opt.typ  = G_STRING_I;
 	opt.where.pfunc = name;
 	opt.where.pfile = NULL;
 	opt.where.line  = -1;

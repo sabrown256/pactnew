@@ -184,7 +184,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
 
     name = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     s = name;

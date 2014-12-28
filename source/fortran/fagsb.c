@@ -227,10 +227,10 @@ FIXNUM FF_ID(pgmg22, PGMG22)(FIXNUM *sid,
     centering = (PM_centering) *scen;
 
 /* build the domain set */
-    domain = PM_make_set(dname, SC_DOUBLE_S, cp, 2, kmax, lmax, 2, ax, ay);
+    domain = PM_make_set(dname, G_DOUBLE_S, cp, 2, kmax, lmax, 2, ax, ay);
 
 /* build the range set */
-    range = PM_make_set(rname, SC_DOUBLE_S, cp, 2, kmax, lmax, 2, au, av);
+    range = PM_make_set(rname, G_DOUBLE_S, cp, 2, kmax, lmax, 2, au, av);
 
     g = PG_make_graph_from_sets(label, domain, range, centering,
                                 G_PCONS_P_S, NULL, id, NULL);
@@ -579,11 +579,11 @@ FIXNUM FF_ID(pgsrat, PGSRAT)(FIXNUM *sgid,
 
     id = SC_type_id(ltype, FALSE);
 
-    if (id == SC_INT_I)
-       {SC_strncpy(ltype, MAXLINE, SC_INT_P_S, -1);
+    if (id == G_INT_I)
+       {SC_strncpy(ltype, MAXLINE, G_INT_P_S, -1);
         n = sizeof(int);}
     else if (strcmp(ltype, "real") == 0)
-       {SC_strncpy(ltype, MAXLINE, SC_DOUBLE_P_S, -1);
+       {SC_strncpy(ltype, MAXLINE, G_DOUBLE_P_S, -1);
         n = sizeof(double);}
     else if (strcmp(ltype, "string") == 0)
        {SC_strncpy(ltype, MAXLINE, "char **", -1);
@@ -640,7 +640,7 @@ FIXNUM FF_ID(pgsvlm, PGSVLM)(FIXNUM *sgid, double *av)
     memcpy(pv, av, 4*sizeof(double));
 
     PG_set_attrs_graph(g,
-		       "VIEW-PORT", SC_DOUBLE_I, TRUE, pv,
+		       "VIEW-PORT", G_DOUBLE_I, TRUE, pv,
 		       NULL);
 
     rv = TRUE;

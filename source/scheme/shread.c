@@ -40,7 +40,7 @@ static object *_SSI_set_syntax(SS_psides *si, object *argl)
     body = NULL;
 
     SS_args(si, argl,
-            SC_STRING_I, &nm,
+            G_STRING_I, &nm,
             0);
 
     if (_SS.sub == NULL)
@@ -576,7 +576,7 @@ object *SS_read(SS_psides *si, object *str)
     pr = NULL;
     SS_args(si, str,
 	    G_OBJECT_I, &fp,
-	    SC_STRING_I, &pr,
+	    G_STRING_I, &pr,
 	    0);
 
     if (si->read == NULL)
@@ -613,7 +613,7 @@ static object *_SSI_read(SS_psides *si, object *args)
     pr = NULL;
     SS_args(si, args,
 	    G_OBJECT_I, &fp,
-	    SC_STRING_I, &pr,
+	    G_STRING_I, &pr,
 	    0);
 
     if (pr != NULL)
@@ -644,7 +644,7 @@ static object *_SSI_opn_in(SS_psides *si, object *obj)
 
     s = NULL;
     SS_args(si, obj,
-	    SC_STRING_I, &s,
+	    G_STRING_I, &s,
 	    0);
 
     if (s == NULL)
@@ -897,7 +897,7 @@ static PFPOprs _SS_change_parser(SS_psides *si, object *fnm)
     op = NULL;
     s  = NULL;
     SS_args(si, fnm,
-	    SC_STRING_I, &s,
+	    G_STRING_I, &s,
 	    0);
 
     if (s == NULL)

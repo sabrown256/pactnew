@@ -210,7 +210,7 @@ object *_SS_make_cast(SS_psides *si, object *type, object *expr)
     object *typ, *cast;
 
     SS_args(si, type,
-	    SC_STRING_I, &t,
+	    G_STRING_I, &t,
 	    LAST);
     SC_strncpy(tname, MAXLINE, t, -1);
     p = strstr(tname, "define-");
@@ -301,7 +301,7 @@ static object *SS_c_add_type(SS_psides *si, object *argl)
 
     name = NULL;
     SS_args(si, argl,
-	    SC_STRING_I, &name,
+	    G_STRING_I, &name,
 	    0);
 
     typ = SS_add_type_synt(si, name);
@@ -381,13 +381,13 @@ void SS_init_c_syntax_mode(SS_psides *si)
 /* GOTHCA: work out adding C99 types
  * the space in types like "long double" will have to be sorted out
  */
-	SS_add_type_synt(si, SC_CHAR_S);
-	SS_add_type_synt(si, SC_SHORT_S);
-	SS_add_type_synt(si, SC_INT_S);
-	SS_add_type_synt(si, SC_LONG_S);
-	SS_add_type_synt(si, SC_FLOAT_S);
-	SS_add_type_synt(si, SC_DOUBLE_S);
-	SS_add_type_synt(si, SC_VOID_S);
+	SS_add_type_synt(si, G_CHAR_S);
+	SS_add_type_synt(si, G_SHORT_S);
+	SS_add_type_synt(si, G_INT_S);
+	SS_add_type_synt(si, G_LONG_S);
+	SS_add_type_synt(si, G_FLOAT_S);
+	SS_add_type_synt(si, G_DOUBLE_S);
+	SS_add_type_synt(si, G_VOID_S);
 
 	SS_add_parser(".c", SS_c_mode);
 	SS_add_parser(".h", SS_c_mode);

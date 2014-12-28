@@ -19,12 +19,12 @@ typedef object *(*PFBINOBJ)(SS_psides *si, object *argl);
      _num  = SS_car(si, _arg);                                               \
      _arg  = SS_cdr(si, _arg);                                               \
      _ityp = SC_arrtype(_num, -1);                                           \
-     _typ  = SC_INT_I;                                                       \
-     if (_ityp == SC_INT_I)                                                  \
+     _typ  = G_INT_I;                                                       \
+     if (_ityp == G_INT_I)                                                  \
         _oper = SS_INTEGER_VALUE(_num);                                      \
-     else if (_ityp == SC_FLOAT_I)                                           \
+     else if (_ityp == G_FLOAT_I)                                           \
         {_oper = SS_FLOAT_VALUE(_num);                                       \
-         _typ  = SC_FLOAT_I;}                                                \
+         _typ  = G_FLOAT_I;}                                                \
      else                                                                    \
         SS_error(_si, "ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", _num);}
 
@@ -81,28 +81,28 @@ object *SS_unary_flt(SS_psides *si, SS_C_procedure *cp, object *argl)
     x  = SS_car(si, argl);
     id = SC_arrtype(x, -1);
 
-    if (id == SC_INT_I)
+    if (id == G_INT_I)
        {double y;
 	PFDoubled f;
 	f  = (PFDoubled) cp->proc[0];
 	y  = f(SS_INTEGER_VALUE(x));
 	rv = SS_mk_float(si, y);}
 
-    else if (id == SC_FLOAT_I)
+    else if (id == G_FLOAT_I)
        {double y;
 	PFDoubled f;
 	f  = (PFDoubled) cp->proc[0];
 	y  = f(SS_FLOAT_VALUE(x));
 	rv = SS_mk_float(si, y);}
 
-    else if (id == SC_DOUBLE_COMPLEX_I)
+    else if (id == G_DOUBLE_COMPLEX_I)
        {double _Complex y;
 	PFComplexc f;
 	f  = (PFComplexc) cp->proc[1];
 	y  = f(SS_COMPLEX_VALUE(x));
 	rv = SS_mk_complex(si, y);}
 
-    else if (id == SC_QUATERNION_I)
+    else if (id == G_QUATERNION_I)
        {quaternion y;
 	PFQuaternionq f;
 	f  = (PFQuaternionq) cp->proc[2];
@@ -228,10 +228,10 @@ static object *_SS_bin_fix(SS_psides *si, long ni,
     double accv, *v;
     object *acc;
 
-    idf = ((op == PM_fdivide) || (op == HYPOT)) ? SC_FLOAT_I : SC_INT_I;
+    idf = ((op == PM_fdivide) || (op == HYPOT)) ? G_FLOAT_I : G_INT_I;
 
     v = CMAKE_N(double, ni);
-    _SS_list_to_numtype_id(si, SC_DOUBLE_I, v, ni, argl);
+    _SS_list_to_numtype_id(si, G_DOUBLE_I, v, ni, argl);
 
     if (ni < 2)
        {ident = ((op != PM_fplus) && (op != PM_fminus));
@@ -268,7 +268,7 @@ static object *_SS_bin_float(SS_psides *si, long ni,
     object *acc;
 
     v = CMAKE_N(double, ni);
-    _SS_list_to_numtype_id(si, SC_DOUBLE_I, v, ni, argl);
+    _SS_list_to_numtype_id(si, G_DOUBLE_I, v, ni, argl);
 
     if (ni < 2)
        {ident = ((op != PM_fplus) && (op != PM_fminus));
@@ -302,7 +302,7 @@ static object *_SS_bin_complex(SS_psides *si, long ni,
     object *acc;
 
     v = CMAKE_N(double _Complex, ni);
-    _SS_list_to_numtype_id(si, SC_DOUBLE_COMPLEX_I, v, ni, argl);
+    _SS_list_to_numtype_id(si, G_DOUBLE_COMPLEX_I, v, ni, argl);
 
     if (ni < 2)
        {ident = ((op != PM_plus_cc) && (op != PM_minus_cc));
@@ -336,7 +336,7 @@ static object *_SS_bin_quaternion(SS_psides *si, long ni,
     object *acc;
 
     v = CMAKE_N(quaternion, ni);
-    _SS_list_to_numtype_id(si, SC_QUATERNION_I, v, ni, argl);
+    _SS_list_to_numtype_id(si, G_QUATERNION_I, v, ni, argl);
 
     accv.i = 0;
     accv.j = 0;
@@ -421,8 +421,8 @@ object *SS_binary_heterogeneous(SS_psides *si, SS_C_procedure *cp, object *argl)
 	PFDoubledd op;
 
 	SS_args(si, argl,
-		SC_DOUBLE_I, &x,
-		SC_DOUBLE_I, &n,
+		G_DOUBLE_I, &x,
+		G_DOUBLE_I, &n,
 		0);
 
 	op   = (PFDoubledd) cp->proc[0];
@@ -435,8 +435,8 @@ object *SS_binary_heterogeneous(SS_psides *si, SS_C_procedure *cp, object *argl)
 	PFComplexcd op;
 
 	SS_args(si, argl,
-		SC_DOUBLE_COMPLEX_I, &z,
-		SC_DOUBLE_I, &n,
+		G_DOUBLE_COMPLEX_I, &z,
+		G_DOUBLE_I, &n,
 		0);
 
 	op   = (PFComplexcd) cp->proc[1];
@@ -449,8 +449,8 @@ object *SS_binary_heterogeneous(SS_psides *si, SS_C_procedure *cp, object *argl)
 	PFQuaternionqd op;
 
 	SS_args(si, argl,
-		SC_QUATERNION_I, &q,
-		SC_DOUBLE_I, &n,
+		G_QUATERNION_I, &q,
+		G_DOUBLE_I, &n,
 		0);
 
 	op   = (PFQuaternionqd) cp->proc[2];

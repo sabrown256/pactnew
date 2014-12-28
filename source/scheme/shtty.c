@@ -265,9 +265,9 @@ object *SS_change_term_state(SS_psides *si, object *argl)
     a    = NULL;
     SS_args(si, argl,
             G_OBJECT_I,  &p,
-            SC_ENUM_I,    &st,
-            SC_INTEGER_I, &trap,
-            SC_VOID_I,    &a,
+            G_ENUM_I,    &st,
+            G_INTEGER_I, &trap,
+            G_VOID_I,    &a,
             0);
 
     if (SS_processp(p))

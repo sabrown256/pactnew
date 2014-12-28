@@ -136,7 +136,7 @@ SC_udl *_SC_parse_udl(char *s)
 			    {*p++ = '\0';
 			     val  = CSTRSAVE(p);};
 
-			 info = SC_add_alist(info, key, SC_STRING_S, val);
+			 info = SC_add_alist(info, key, G_STRING_S, val);
 
 			 if (n == NULL)
 			    break;};};};

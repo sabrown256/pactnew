@@ -27,8 +27,8 @@
 /* #define USE_REQUESTS */
 
 /* type indeces for long and double */
-#define PD_LONG_I         SC_TYPE_FIX(SC_LONG_I)
-#define PD_DOUBLE_I       SC_TYPE_FP(SC_DOUBLE_I)
+#define PD_LONG_I         SC_TYPE_FIX(G_LONG_I)
+#define PD_DOUBLE_I       SC_TYPE_FP(G_DOUBLE_I)
 
 #define PD_CKSUM_LEN     33
 

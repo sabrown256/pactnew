@@ -251,7 +251,7 @@ void PG_iob_register_toggle(PG_device *dev, PG_interface_object *cnt,
     double abx[PG_BOXSZ];
     PG_interface_object *var, *btn, *iob;
 
-    PG_register_variable(name, SC_INT_S, pv, &zero, &one);
+    PG_register_variable(name, G_INT_S, pv, &zero, &one);
     PG_register_callback("toggle-var", _PG_iob_toggle_var);
 
 /*
@@ -311,7 +311,7 @@ void PG_iob_register_slider(PG_device *dev, PG_interface_object *cnt,
    {PG_interface_object *var, *btn, *c1, *c2;
     double abx[PG_BOXSZ];
 
-    PG_register_variable(name, SC_INT_S, pv, &zero, &hundred);
+    PG_register_variable(name, G_INT_S, pv, &zero, &hundred);
 
 /*
    Container CLR(0,0) BND(RECT) (0.005,0.400) (0.995,0.500)

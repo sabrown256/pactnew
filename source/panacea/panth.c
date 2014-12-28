@@ -110,7 +110,7 @@ PDBfile *PA_th_family(PDBfile *file)
 
         count = 0;
         PD_read(file, "n_types", &count);
-        PD_write(nf, "n_types", SC_INT_S, &count);
+        PD_write(nf, "n_types", G_INT_S, &count);
 
         PD_close(file);};
 
@@ -205,7 +205,7 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
     dp = PD_defstr_alt(file, type, nmemb, mbrs);
 
 /* update the counter */
-    PD_write(file, "n_types", SC_INT_S, &count);
+    PD_write(file, "n_types", G_INT_S, &count);
 
 /* reset the pointer lists */
     PD_reset_ptr_list(file);
@@ -676,7 +676,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
     if (nthf <= 0)
        return(FALSE);
 
-    SC_strncpy(type, MAXLINE, SC_DOUBLE_S, -1);
+    SC_strncpy(type, MAXLINE, G_DOUBLE_S, -1);
 
     n_max       = 10;
     _PA.thd  = CMAKE_N(th_record, n_max);
@@ -764,7 +764,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
          np = _PA.ndpt[i].number;
 
 /* write the curve n_points */
-         PD_write(puf, "npts0", SC_INT_S, &np);
+         PD_write(puf, "npts0", G_INT_S, &np);
 
 /* intialize extrema to dummy values */
 	 ext[0] =  HUGE;
@@ -856,7 +856,7 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
                   ps   += incr;
 
                   pd = &crve[j][k];
-                  SC_convert_id(SC_DOUBLE_I, pd, 0, 1, sid, ps, 0, 1, 1, FALSE);
+                  SC_convert_id(G_DOUBLE_I, pd, 0, 1, sid, ps, 0, 1, 1, FALSE);
 
 /* increment to the next member */
                   offs += bpm;
@@ -865,7 +865,7 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
     else
        {sid  = SC_type_id(mix, FALSE);
         ns   = (nrd - na)*nv;
-        data = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1,
+        data = SC_convert_id(G_DOUBLE_I, NULL, 0, 1,
 			     sid, stripe, 0, 1, ns, FALSE);
 
         pd = data;
@@ -964,7 +964,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 
 /* allocate the curve arrays */
     crve = CMAKE_N(double *, nv);
-    SC_strncpy(type, MAXLINE, SC_DOUBLE_S, -1);
+    SC_strncpy(type, MAXLINE, G_DOUBLE_S, -1);
 
     nptm = _PA.ndpt[recn].number;
     for (i = 0; i < nv; i++)
@@ -1066,7 +1066,7 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
              return(FALSE);};};
 
 /* find the extrema */
-    SC_strncpy(type, MAXLINE, SC_DOUBLE_S, -1);
+    SC_strncpy(type, MAXLINE, G_DOUBLE_S, -1);
 
     for (i = 0; i < _PA.ndom; i++)
 	{PD_read(_PA.uf[i], "npts0", &n);

@@ -384,7 +384,7 @@ int _PD_pack_bits(char *out, char *in, int ityp, intb nbits,
     long vl;
 
     for (i = 0L; i < ni; i++)
-        {SC_convert_id(SC_LONG_I, &vl, 0, 1, ityp, in, i, 1, 1, FALSE);
+        {SC_convert_id(G_LONG_I, &vl, 0, 1, ityp, in, i, 1, 1, FALSE);
 	 _PD_insert_field(vl, nbits, out, offs,
                           PD_gs.host_order, sizeof(long));
 	 offs += nbits;};
@@ -931,7 +931,7 @@ long _PD_convert_ptr_rd(char *bfi, intb fbpi, PD_byte_order ford,
     in  = bfi;
     out = (char *) &n;
     if (ford == TEXT_ORDER)
-       _PD_text_bin(&out, &in, SC_INT_S, 1L, 0,
+       _PD_text_bin(&out, &in, G_INT_S, 1L, 0,
 		    KIND_INT, NULL, fbpi, ford, NULL,
 		    KIND_INT, NULL, hbpi, hord, NULL,
 		    hs, FALSE, FALSE, 10, NULL);
@@ -955,7 +955,7 @@ static void _PD_convert_ptr_wr(char *bfo, long n, PDBfile *file,
     out = bfo;
     if (_PD_TEXT_OUT(file) == TRUE)
        {memset(out, ' ', fbpi);
-	_PD_bin_text(&out, &in, SC_INT_S, 1L, 0,
+	_PD_bin_text(&out, &in, G_INT_S, 1L, 0,
 		     KIND_INT, NULL, hbpi, hord, NULL,
 		     KIND_INT, NULL, fbpi, ford, NULL,
 		     hs, FALSE, FALSE, 10, NULL);}
@@ -2220,7 +2220,7 @@ static int _PD_convert(char **out, char **in, inti ni, int boffs,
        {int ityp;
 
 	ityp = SC_type_container_size(KIND_INT, onb);
-	if (ityp == SC_UNKNOWN_I)
+	if (ityp == G_UNKNOWN_I)
 	   return(FALSE);
 
 /* unpack the bitstream into a bytestream */
@@ -2228,7 +2228,7 @@ static int _PD_convert(char **out, char **in, inti ni, int boffs,
 			     0, ni, ni, boffs);
 
 /* convert binary characters */
-        if (strcmp(inty, SC_CHAR_S) == 0)
+        if (strcmp(inty, G_CHAR_S) == 0)
 	   _PD_conv_to_ascii_7(*out, ni, inbts);
 
 /* convert integers */
@@ -2467,7 +2467,7 @@ char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
     ni = (8*nb)/n;
 
 /* unpack the bitstream into a bytestream */
-    ret = SC_unpack_bits(out, in, SC_INT8_I, n, 0, ni, ni, 0);
+    ret = SC_unpack_bits(out, in, G_INT8_I, n, 0, ni, ni, 0);
 
     SC_ASSERT(ret == TRUE);
 
@@ -2508,7 +2508,7 @@ char *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
 	     memcpy(t, in, n);
 	     memset(out, 0, nc);
              nn = _PD_conv_to_ita2(t, nx, n, PD_ASCII_7);
-	     _PD_pack_bits(out, t, SC_CHAR_I, 5, 0, 1, nn, 0);
+	     _PD_pack_bits(out, t, G_CHAR_I, 5, 0, 1, nn, 0);
              CFREE(t);
 	     break;
         case PD_ASCII_6_UPPER :
@@ -2517,7 +2517,7 @@ char *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
 	     memcpy(t, in, n);
 	     memset(out, 0, nc);
              _PD_conv_to_ascii_6(t, n, PD_ASCII_7);
-	     _PD_pack_bits(out, t, SC_CHAR_I, 6, 0, 1, n, 0);
+	     _PD_pack_bits(out, t, G_CHAR_I, 6, 0, 1, n, 0);
              CFREE(t);
 	     break;
         case PD_EBCDIC :

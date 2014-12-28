@@ -167,10 +167,10 @@ static PyObject *_PY_build_obj(buildsp *sp, int i)
 	if ((i == 0) ||
 	    ((0 <= i) && (i < ni)))
 	   {if (SC_is_type_prim(ity) == TRUE)
-	       {if ((SC_is_type_fix(ity) == TRUE) || (ity == SC_ENUM_I))
+	       {if ((SC_is_type_fix(ity) == TRUE) || (ity == G_ENUM_I))
 		   {long lv;
 
-		    SC_convert_id(SC_LONG_I, &lv, 0, 1,
+		    SC_convert_id(G_LONG_I, &lv, 0, 1,
 				  ity, vr, i, 1, 1, FALSE);
 
 		    rv = PY_INT_LONG(lv);}
@@ -178,12 +178,12 @@ static PyObject *_PY_build_obj(buildsp *sp, int i)
 	        else if (SC_is_type_fp(ity) == TRUE)
 		   {double dv;
 
-		    SC_convert_id(SC_DOUBLE_I, &dv, 0, 1,
+		    SC_convert_id(G_DOUBLE_I, &dv, 0, 1,
 				  ity, vr, i, 1, 1, FALSE);
 
 		    rv = PyFloat_FromDouble(dv);}
 
-		else if (ity == SC_STRING_I)
+		else if (ity == G_STRING_I)
                    {char *s;
 
 		    s  = ((char **) vr)[i];
@@ -255,8 +255,8 @@ static void _PY_append_obj(PyObject *tp, int i, buildsp *sp)
  *                 -   <type>, <length>, <address>
  *                 - example:
  *                 -   o = PY_build_object("foo",
- *                 -                       SC_INT_I, 0, &i,
- *                 -                       SC_DOUBLE_I, PG_SPACEDM, pt,
+ *                 -                       G_INT_I, 0, &i,
+ *                 -                       G_DOUBLE_I, PG_SPACEDM, pt,
  *                 -                       0);
  */
 
@@ -677,8 +677,8 @@ PyObject *PP_dimdes_to_obj(dimdes *dims)
         nd = 0;
         for (next = dims; next != NULL; next = next->next) {
 	    dimobj = PY_build_object("dimdes_to_obj",
-				     SC_LONG_I, 0, &next->index_min,
-				     SC_LONG_I, 0, &next->index_max,
+				     G_LONG_I, 0, &next->index_min,
+				     G_LONG_I, 0, &next->index_max,
 			     0);
             PyTuple_SET_ITEM(rv, nd, dimobj);
             nd++;

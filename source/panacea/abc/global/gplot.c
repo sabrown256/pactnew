@@ -538,16 +538,16 @@ void turn(void)
         window_init   = FALSE;
 
         swtab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
-        SC_hasharr_install(swtab, "mesh",       &mesh_mesh,     SC_INTEGER_S, 3, -1);
-        SC_hasharr_install(swtab, "boundary",   &mesh_bndry,    SC_INTEGER_S, 3, -1);
-        SC_hasharr_install(swtab, "vector",     &mesh_vectr,    SC_INTEGER_S, 3, -1);
+        SC_hasharr_install(swtab, "mesh",       &mesh_mesh,     G_INTEGER_S, 3, -1);
+        SC_hasharr_install(swtab, "boundary",   &mesh_bndry,    G_INTEGER_S, 3, -1);
+        SC_hasharr_install(swtab, "vector",     &mesh_vectr,    G_INTEGER_S, 3, -1);
 /*
-        SC_hasharr_install(swtab, "physical",   &plot_physical, SC_INTEGER_S, 3, -1);
-        SC_hasharr_install(swtab, "logical",    &plot_log,      SC_INTEGER_S, 3, -1);
+        SC_hasharr_install(swtab, "physical",   &plot_physical, G_INTEGER_S, 3, -1);
+        SC_hasharr_install(swtab, "logical",    &plot_log,      G_INTEGER_S, 3, -1);
 */
-        SC_hasharr_install(swtab, "mesh-r",     &mesh_mesh_r,   SC_INTEGER_S, 3, -1);
-        SC_hasharr_install(swtab, "boundary-r", &mesh_bndry_r,  SC_INTEGER_S, 3, -1);
-        SC_hasharr_install(swtab, "vector-r",   &mesh_vectr_r,  SC_INTEGER_S, 3, -1);};
+        SC_hasharr_install(swtab, "mesh-r",     &mesh_mesh_r,   G_INTEGER_S, 3, -1);
+        SC_hasharr_install(swtab, "boundary-r", &mesh_bndry_r,  G_INTEGER_S, 3, -1);
+        SC_hasharr_install(swtab, "vector-r",   &mesh_vectr_r,  G_INTEGER_S, 3, -1);};
 
     token = PA_get_field("TYPE", "TURN", REQU);
     sval  = PA_get_field("VALUE", "TURN", REQU);

@@ -1794,12 +1794,8 @@ FIXNUM FF_ID(pfwima, PFWIMA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 		 rbx[1] = max(rbx[1], z);
 		 rbx[0] = min(rbx[0], z);
 		 *pd++  = z;}
-#if 0
-	im = PD_make_image(s, SC_DOUBLE_P_S, d, ix[0], ix[1], 8,
-			   dbx[0], dbx[1], dbx[2], dbx[3],
-			   rbx[0], rbx[1]);
-#endif
-	im = PG_make_image_n(s, SC_DOUBLE_P_S, d, 2, WORLDC,
+
+	im = PG_make_image_n(s, G_DOUBLE_P_S, d, 2, WORLDC,
 			     dbx, rbx, ix[0], ix[1], 8, NULL);
 
 	if (!PD_put_image(file, im, *sim))

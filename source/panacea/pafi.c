@@ -69,11 +69,11 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
 	 if (PA_VARIABLE_N_DIMS(pp) == 0)
 	    {id = SC_type_id(pt, FALSE);
 
-	     if (id == SC_INT_I)
+	     if (id == G_INT_I)
 	        n_integers++;
-	     else if (id == SC_DOUBLE_I)
+	     else if (id == G_DOUBLE_I)
 	        n_doubles++;
-	     else if (id == SC_STRING_I)
+	     else if (id == G_STRING_I)
 	        n_strings++;};};
 
     PA_mk_control(pck, pck->name, n_strings, n_doubles, n_integers+1);
@@ -124,13 +124,13 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
 
          type = PA_VARIABLE_TYPE_S(pp);
 	 id   = SC_type_id(type, FALSE);
-         if (id == SC_INT_I)
+         if (id == G_INT_I)
             {PA_VARIABLE_DATA(pp) = (void *) &SWTCH[isw++];}
 
-         else if (id == SC_DOUBLE_I)
+         else if (id == G_DOUBLE_I)
             {PA_VARIABLE_DATA(pp) = (void *) &PARAM[ipr++];}
 
-         else if (id == SC_STRING_I)
+         else if (id == G_STRING_I)
             {PA_VARIABLE_DATA(pp) = (void *) &NAME[inm++];};};
 
     return;}
@@ -213,9 +213,9 @@ static void _PA_get_alist_dims(PA_package *pck, PA_variable *pp, hasharr *tab)
  *               - the possible requests are:
  *                     PA_INFO_TYPE
  *                         - ASCII string naming the type of the variable
- *                         - valid values are: SC_INT_S, SC_DOUBLE_S
- *                         - SC_STRING_S, SC_LONG_S, SC_SHORT_S, SC_FLOAT_S,
- *                         - SC_CHAR_S, and any derived type
+ *                         - valid values are: G_INT_S, G_DOUBLE_S
+ *                         - G_STRING_S, G_LONG_S, G_SHORT_S, G_FLOAT_S,
+ *                         - G_CHAR_S, and any derived type
  *                     PA_INFO_N_DIMS
  *                         - integer number of dimensions
  *                     PA_INFO_DIMS
@@ -514,7 +514,7 @@ static PA_tab_head *_PA_rd_tab_head(FILE *fp, char *fn)
             break;
 
          pb   = NULL;
-         next = SC_mk_pcons(SC_STRING_S, CSTRSAVE(key), G_PCONS_P_S, NULL);
+         next = SC_mk_pcons(G_STRING_S, CSTRSAVE(key), G_PCONS_P_S, NULL);
          if (keys == NULL)
             keys = next;
          else
@@ -588,7 +588,7 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
 /* NOTE: clean this out using SC_add_alist */
               next = SC_mk_pcons(G_PCONS_P_S,
 				 SC_mk_pcons(G_PCONS_P_S, pk->car,
-					     SC_STRING_S, token),
+					     G_STRING_S, token),
 				 G_PCONS_P_S, NULL);
               if (alist == NULL)
                  alist = next;
@@ -691,7 +691,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 /* NOTE: clean this out using SC_add_alist */
 		  next = SC_mk_pcons(G_PCONS_P_S,
 				     SC_mk_pcons(G_PCONS_P_S, pk->car,
-						 SC_STRING_S,
+						 G_STRING_S,
 						 CSTRSAVE(token)),
 				     G_PCONS_P_S, NULL);
 		  if (alist == NULL)
@@ -706,7 +706,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 
 /* NOTE: make a default variable for now, the rest will come later */
 	     pp = _PA_mk_variable(vname, NULL, NULL, NULL,
-				  vattr, SC_DOUBLE_S,
+				  vattr, G_DOUBLE_S,
 				  1.0, 1.0,
 				  NULL, NULL, alist);
 
@@ -760,7 +760,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 	PA_gs.token_delimiters = old_delim;
 
 /* cons this dictionary name onto the list */
-	pck->db_list = SC_mk_pcons(SC_STRING_S, CSTRSAVE(pt->name),
+	pck->db_list = SC_mk_pcons(G_STRING_S, CSTRSAVE(pt->name),
 				   G_PCONS_P_S, pck->db_list);};
 
     return(nr);}
@@ -858,7 +858,7 @@ void PA_add_hook(char *name, void *fnc)
        PA_gs.symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     ad.funcaddr = (PFInt) fnc;
-    SC_hasharr_install(PA_gs.symbol_tab, name, ad.memaddr, SC_POINTER_S, 2, -1);
+    SC_hasharr_install(PA_gs.symbol_tab, name, ad.memaddr, G_POINTER_S, 2, -1);
 
     return;}
 

@@ -26,7 +26,7 @@ void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
 
     id = SC_arrtype(p, -1);
     if (SC_is_type_prim(id) == FALSE)
-       id = SC_DOUBLE_I;
+       id = G_DOUBLE_I;
 
     if (PM_min_max_fnc[id] != NULL)
        PM_min_max_fnc[id](p, n, pn, px, imin, imax);
@@ -118,7 +118,7 @@ int PM_find_index(void *p, double f, int n)
 
     id = SC_arrtype(p, -1);
     if (SC_is_type_prim(id) == FALSE)
-       id = SC_DOUBLE_I;
+       id = G_DOUBLE_I;
 
     if (PM_find_index_fnc[id] != NULL)
        indx = PM_find_index_fnc[id](p, f, n);
@@ -165,7 +165,7 @@ void PM_search(int nx, double *x, int ny, double *y, int offs, int *indx)
     ma->last = max(0L, ma->last);
 
     for (ix = 0; ix < nx; ix++)
-        {iy = _PM_find_index_fast_fnc[SC_DOUBLE_I](y, x[ix], ny, &(ma->last));
+        {iy = _PM_find_index_fast_fnc[G_DOUBLE_I](y, x[ix], ny, &(ma->last));
 
 	 indx[ix] = iy + offs;};
 

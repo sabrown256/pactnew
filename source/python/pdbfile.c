@@ -470,10 +470,10 @@ static PyObject *PY_PDBfile_get_obj_descr(PY_PDBfile *self,
 	    bpi = descr->bpi;
 
 	    rv = PY_build_object("get_obj_descr",
-				 SC_INT_I, 0, &tc,
-				 SC_INT_I, 0, &bpi,
-				 SC_STRING_I, 0, &descr->type,
-				 SC_POINTER_I, 0, &dim,
+				 G_INT_I, 0, &tc,
+				 G_INT_I, 0, &bpi,
+				 G_STRING_I, 0, &descr->type,
+				 G_POINTER_I, 0, &dim,
 				 0);
 
 	    _PP_rl_descr(descr);};};

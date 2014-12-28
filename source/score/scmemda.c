@@ -409,7 +409,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
 			 space+1, nb, nr, name);
 
 	    if ((strncmp(name, "char*:", 6) == 0) ||
-		(info->type == SC_STRING_I))
+		(info->type == G_STRING_I))
 	       {io_printf(fp, " = \"");
 		pc = (char *) (space + 1);
 		for (j = 0; j < nb; j++)

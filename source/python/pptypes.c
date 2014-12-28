@@ -82,7 +82,7 @@ static PP_descr *_PP_get_string_descr(PP_file *fileinfo, PyObject *obj)
     nitems = PY_STRING_SIZE(obj);
     dims   = _PD_mk_dimensions(0, nitems);
 
-    descr = _PP_mk_descr(SC_CHAR_I, sizeof(char), SC_CHAR_S,
+    descr = _PP_mk_descr(G_CHAR_I, sizeof(char), G_CHAR_S,
                          dims, NULL);
 
     return(descr);}
@@ -791,7 +791,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
  */
 
 /* register char type */
-    descr = PP_make_descr(PP_CHAR_I, SC_CHAR_S, sizeof(char));
+    descr = PP_make_descr(PP_CHAR_I, G_CHAR_S, sizeof(char));
 
     entry = PP_make_type_entry(PP_CHAR_I, TRUE, descr, &PY_STRING_TYPE,
 			       _PP_get_pack_func(PP_CHAR_I),
@@ -802,7 +802,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
     PP_register_object(fileinfo, entry);
 
 /* register int type */
-    descr = PP_make_descr(PP_INT_I, SC_INT_S, sizeof(int));
+    descr = PP_make_descr(PP_INT_I, G_INT_S, sizeof(int));
 
     entry = PP_make_type_entry(PP_INT_I, FALSE, descr, &PY_INT_TYPE,
 			       _PP_get_pack_func(PP_INT_I),
@@ -812,7 +812,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
     PP_register_type(fileinfo, entry);
 
 /* register integer type - make it just like int */
-    descr = PP_make_descr(PP_INT_I, SC_INTEGER_S, sizeof(int));
+    descr = PP_make_descr(PP_INT_I, G_INTEGER_S, sizeof(int));
 
     entry = PP_make_type_entry(PP_INT_I, FALSE, descr, &PY_INT_TYPE,
 			       _PP_get_pack_func(PP_INT_I),
@@ -822,7 +822,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
     PP_register_type(fileinfo, entry);
 
 /* register long type */
-    descr = PP_make_descr(PP_LONG_I, SC_LONG_S, sizeof(long));
+    descr = PP_make_descr(PP_LONG_I, G_LONG_S, sizeof(long));
 
     entry = PP_make_type_entry(PP_LONG_I, FALSE, descr, &PY_INT_TYPE,
 			       _PP_get_pack_func(PP_LONG_I),
@@ -841,7 +841,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
     PP_register_object(fileinfo, entry);
     
 /* register float type */
-    descr = PP_make_descr(PP_FLOAT_I, SC_FLOAT_S, sizeof(float));
+    descr = PP_make_descr(PP_FLOAT_I, G_FLOAT_S, sizeof(float));
 
     entry = PP_make_type_entry(PP_FLOAT_I, FALSE, descr, &PyFloat_Type,
 			       _PP_get_pack_func(PP_FLOAT_I),
@@ -851,7 +851,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
     PP_register_type(fileinfo, entry);
 
 /* register double type */
-    descr = PP_make_descr(PP_DOUBLE_I, SC_DOUBLE_S, sizeof(double));
+    descr = PP_make_descr(PP_DOUBLE_I, G_DOUBLE_S, sizeof(double));
 
     entry = PP_make_type_entry(PP_DOUBLE_I, FALSE, descr, &PyFloat_Type,
 			       _PP_get_pack_func(PP_DOUBLE_I),
@@ -1400,7 +1400,7 @@ PP_descr *PP_get_object_descr(PP_file *fileinfo, PyObject *obj)
 /* treat None as int * NULL */
     if (obj == Py_None)
        {descr = _PP_mk_descr(PP_INT_I, sizeof(void *),
-                             SC_INT_P_S, NULL, NULL);
+                             G_INT_P_S, NULL, NULL);
         SC_mark(descr, 1);
         return(descr);};
 
@@ -1451,7 +1451,7 @@ PP_descr *PP_get_object_descr(PP_file *fileinfo, PyObject *obj)
 /* [ None, None ], assume int */
             if (seqinfo.tc == PP_NONE_I)
 	       {seqinfo.tc = PP_INT_I;
-                type = PP_add_indirection(SC_INT_S, nindir);
+                type = PP_add_indirection(G_INT_S, nindir);
                 seqinfo.bpi = sizeof(int);}
 	    else
                type = PP_add_indirection(seqinfo.type, nindir);

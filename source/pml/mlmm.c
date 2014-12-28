@@ -477,7 +477,7 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
     if (inftype == NULL)
        inftype = G_PCONS_P_S;
 
-    SC_CHANGE_VALUE_ALIST(info, int, SC_INT_P_S, "COPY-MEMORY", cp);
+    SC_CHANGE_VALUE_ALIST(info, int, G_INT_P_S, "COPY-MEMORY", cp);
 
     inf = (void *) info;
 
@@ -705,7 +705,7 @@ double *PM_array_real(char *type, void *p, int n, double *x)
     SC_strncpy(bf, MAXLINE, type, -1);
     sid = SC_type_id(strtok(bf, " *"), FALSE);
 
-    x = SC_convert_id(SC_DOUBLE_I, x, 0, 1, sid, p, 0, 1, n, FALSE);
+    x = SC_convert_id(G_DOUBLE_I, x, 0, 1, sid, p, 0, 1, n, FALSE);
 
     return(x);}
 
@@ -787,7 +787,7 @@ void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
     nd  = s->dimension;
        
     sid  = SC_type_id(typ, FALSE);
-    emap = SC_convert_id(SC_CHAR_I, NULL, 0, 1, sid, em, 0, 1, ne, FALSE);
+    emap = SC_convert_id(G_CHAR_I, NULL, 0, 1, sid, em, 0, 1, ne, FALSE);
 
     extr   = CMAKE_N(double, 2*nde);
     scales = CMAKE_N(double, nde);
@@ -798,7 +798,7 @@ void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
     elem = (void **) s->elements;
     x    = PM_make_vectors(nde, ne);
     for (i = 0; i < nde; i++)
-        x[i] = SC_convert_id(SC_DOUBLE_I, x[i], 0, 1,
+        x[i] = SC_convert_id(G_DOUBLE_I, x[i], 0, 1,
 			     sid, elem[i], 0, 1, ne, FALSE);
 
     PM_vector_select_extrema(nde, ne, x, emap, extr);
@@ -829,9 +829,9 @@ void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
 	     scales[i] = dx/ds;};};
 
     s->extrema = SC_convert_id(sid, s->extrema, 0, 1,
-			       SC_DOUBLE_I, extr, 0, 1, 2*nde, TRUE);
+			       G_DOUBLE_I, extr, 0, 1, 2*nde, TRUE);
     s->scales  = SC_convert_id(sid, s->scales, 0, 1,
-			       SC_DOUBLE_I, scales, 0, 1, nde, TRUE);
+			       G_DOUBLE_I, scales, 0, 1, nde, TRUE);
 
     return;}
 
@@ -863,7 +863,7 @@ void PM_find_extrema(PM_set *s)
     emap = CMAKE_N(char, ne);
     memset(emap, 1, ne);
 
-    PM_find_exist_extrema(s, SC_CHAR_S, emap);
+    PM_find_exist_extrema(s, G_CHAR_S, emap);
 
     CFREE(emap);
 
@@ -1003,7 +1003,7 @@ PM_set *PM_make_lr_cp_domain(char *name, char *type, int nd, PM_set **sets)
  * we do NOT need to copy it in the set
  * to copy it would be to cause a memory leak
  */
-    set = PM_mk_set(name, SC_DOUBLE_S, FALSE,
+    set = PM_mk_set(name, G_DOUBLE_S, FALSE,
 		    ne, nd, nd, maxes, x, NULL,
 		    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
@@ -1121,7 +1121,7 @@ PM_set *PM_make_lr_index_domain(char *name, char *type, int nd, int nde,
     elem = CMAKE_N(void *, nde);
     for (i = 0; i < nde; i++)
         elem[i] = SC_convert_id(did, NULL, 0, 1,
-				SC_DOUBLE_I, x[i], 0, 1, ne, FALSE);
+				G_DOUBLE_I, x[i], 0, 1, ne, FALSE);
 
     PM_free_vectors(nde, x);
 
@@ -1267,7 +1267,7 @@ PM_mapping *PM_make_mapping(char *name, char *cat,
 /* build the map information */
     pi  = CMAKE(int);
     *pi = centering;
-    inf = SC_add_alist(NULL, "CENTERING", SC_INT_P_S, (void *) pi);
+    inf = SC_add_alist(NULL, "CENTERING", G_INT_P_S, (void *) pi);
 
 /* build the mapping */
     f             = CMAKE(PM_mapping);
@@ -1626,7 +1626,7 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
 		if (SC_is_type_num(id) == TRUE)
 		   {SC_VA_ARG_STORE(id, asc->cdr);}
 
-                else if (id == SC_STRING_I)
+                else if (id == G_STRING_I)
 	           {ps  = SC_VA_ARG(char **);
                     *ps = (char *) asc->cdr;};};}
 
@@ -1700,7 +1700,7 @@ void PM_set_limits(PM_set *s, double *extr)
 
 /* otherwise add it */
     else
-       inf = SC_change_alist(inf, "LIMITS", SC_DOUBLE_P_S, (void *) extr);
+       inf = SC_change_alist(inf, "LIMITS", G_DOUBLE_P_S, (void *) extr);
 
     s->info_type = G_PCONS_P_S;
     s->info      = (void *) inf;
@@ -1722,7 +1722,7 @@ pcons *PM_map_info_alist(PM_map_info *ti)
 
     pi  = CMAKE(int);
     *pi = ti->centering;
-    inf = SC_add_alist(inf, "CENTERING", SC_INT_P_S, (void *) pi);
+    inf = SC_add_alist(inf, "CENTERING", G_INT_P_S, (void *) pi);
 
     return(inf);}
 
@@ -1751,10 +1751,10 @@ char *PM_check_emap(int *peflag, pcons *alst, long n)
 
     else
        {sid = SC_deref_id(pc->cdr_type, FALSE);
-	if (sid == SC_CHAR_I)
+	if (sid == G_CHAR_I)
 	   emap = pc->cdr;
 	else
-	   {emap = SC_convert_id(SC_CHAR_I, NULL, 0, 1,
+	   {emap = SC_convert_id(G_CHAR_I, NULL, 0, 1,
 				 sid, pc->cdr, 0, 1,
 				 n, FALSE);
 	    eflg = TRUE;};};

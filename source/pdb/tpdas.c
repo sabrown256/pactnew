@@ -451,7 +451,7 @@ static int test_2(char *base, char *tgt, int n)
        error(1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
-    PD_change_primitive(strm, SC_INT_I, nb, nb, NULL, NULL);
+    PD_change_primitive(strm, G_INT_I, nb, nb, NULL, NULL);
 
     prep_test_2_data();
 
@@ -469,7 +469,7 @@ static int test_2(char *base, char *tgt, int n)
        error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
-    PD_change_primitive(strm, SC_INT_I, nb, nb, NULL, NULL);
+    PD_change_primitive(strm, G_INT_I, nb, nb, NULL, NULL);
 
 /* dump the symbol table */
     dump_test_symbol_table(fp, strm->symtab, 1);

@@ -435,10 +435,10 @@ static object *B_files(SS_psides *si)
 
     else
        o = SS_make_list(si,
-			SC_STRING_I, PA_gs.global_name[2],
-			SC_STRING_I, PA_gs.global_name[5],
-			SC_STRING_I, PA_gs.global_name[3],
-			SC_STRING_I, PA_gs.global_name[4],
+			G_STRING_I, PA_gs.global_name[2],
+			G_STRING_I, PA_gs.global_name[5],
+			G_STRING_I, PA_gs.global_name[3],
+			G_STRING_I, PA_gs.global_name[4],
 			0);
 
     return(o);}

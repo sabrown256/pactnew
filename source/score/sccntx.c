@@ -80,7 +80,7 @@ int SC_register_context(void *f, void *a, int nb)
 		cd->a = a;
 	    cd->nb = nb;};};
 
-	hp = SC_hasharr_install(ha, f, cd, SC_POINTER_S, 2, -1);
+	hp = SC_hasharr_install(ha, f, cd, G_POINTER_S, 2, -1);
 	if (hp != NULL)
 	   rv = TRUE;};
 

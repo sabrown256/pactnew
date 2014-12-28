@@ -165,7 +165,7 @@ static void _SS_fix_arg(SS_psides *si, object *obj, void *v, int type)
 	else
 	   SS_error(si, "BAD OBJECT - _SS_FIX_ARG", obj);
 
-	SC_convert_id(type, v, 0, 1, SC_LONG_LONG_I, &l, 0, 1, 1, FALSE);};
+	SC_convert_id(type, v, 0, 1, G_LONG_LONG_I, &l, 0, 1, 1, FALSE);};
 
     return;}
 
@@ -215,7 +215,7 @@ static void _SS_float_arg(SS_psides *si, object *obj, void *v, int type)
 	else
 	   SS_error(si, "BAD OBJECT - _SS_FLOAT_ARG", obj);
 
-	SC_convert_id(type, v, 0, 1, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);};
+	SC_convert_id(type, v, 0, 1, G_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);};
 
     return;}
 
@@ -229,7 +229,7 @@ static void _SS_float_arg(SS_psides *si, object *obj, void *v, int type)
 static void _SS_complex_arg(SS_psides *si, object *obj, void *v)
    {int ok;
 
-    ok = _SS_object_to_numtype_id(SC_DOUBLE_COMPLEX_I, v, 0, obj);
+    ok = _SS_object_to_numtype_id(G_DOUBLE_COMPLEX_I, v, 0, obj);
     if (ok == FALSE)
        {double _Complex z, *zp;
 
@@ -377,7 +377,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 	    case KIND_QUATERNION :
 	         _SS_quaternion_arg(si, obj, v);
 	    default :
-	         if (type == SC_STRING_I)
+	         if (type == G_STRING_I)
 		    {s = _SS_get_print_name(si, obj);
 		     DEREF(v) = s;}
 
@@ -478,28 +478,28 @@ object *SS_define_constant(SS_psides *si, int n, ...)
 /* character types (proper) */
        if (SC_is_type_char(type) == TRUE)
 	  {long long v;
-	   SC_VA_ARG_FETCH(SC_LONG_LONG_I, &v, type);
+	   SC_VA_ARG_FETCH(G_LONG_LONG_I, &v, type);
 	   val = SS_mk_integer(si, v);}
 
 /* fixed point types (proper) */
        else if (SC_is_type_fix(type) == TRUE)
 	  {long long v;
-	   SC_VA_ARG_FETCH(SC_LONG_LONG_I, &v, type);
+	   SC_VA_ARG_FETCH(G_LONG_LONG_I, &v, type);
 	   val = SS_mk_integer(si, v);}
 
 /* floating point types (proper) */
        else if (SC_is_type_fp(type) == TRUE)
 	  {long double v;
-	   SC_VA_ARG_FETCH(SC_LONG_DOUBLE_I, &v, type);
+	   SC_VA_ARG_FETCH(G_LONG_DOUBLE_I, &v, type);
 	   val = SS_mk_float(si, v);}
 
 /* complex floating point types (proper) */
        else if (SC_is_type_cx(type) == TRUE)
 	  {long double _Complex v;
-	   SC_VA_ARG_FETCH(SC_LONG_DOUBLE_COMPLEX_I, &v, type);
+	   SC_VA_ARG_FETCH(G_LONG_DOUBLE_COMPLEX_I, &v, type);
 	   val = SS_mk_complex(si, v);}
 
-       else if (type == SC_STRING_I)
+       else if (type == G_STRING_I)
 	  {char *v;
 	   v   = SC_VA_ARG(char *);
 	   val = SS_mk_string(si, v);}
@@ -619,7 +619,7 @@ object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 	 if (SC_is_type_fix(ityp) == TRUE)
 	    {long long v;
 
-	     SC_convert_id(SC_LONG_LONG_I, &v, 0, 1,
+	     SC_convert_id(G_LONG_LONG_I, &v, 0, 1,
 			   ityp, vl, 0, 1, 1, FALSE);
 	     lst = SS_mk_cons(si, SS_mk_integer(si, v), lst);}
 
@@ -627,7 +627,7 @@ object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 	 else if (SC_is_type_fp(ityp) == TRUE)
 	    {long double v;
 
-	     SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1,
+	     SC_convert_id(G_LONG_DOUBLE_I, &v, 0, 1,
 			   ityp, vl, 0, 1, 1, FALSE);
 	     lst = SS_mk_cons(si, SS_mk_float(si, v), lst);}
 
@@ -635,11 +635,11 @@ object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 	 else if (SC_is_type_cx(ityp) == TRUE)
 	    {long double _Complex v;
 
-	     SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
+	     SC_convert_id(G_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 			   ityp, vl, 0, 1, 1, FALSE);
 	     lst = SS_mk_cons(si, SS_mk_complex(si, v), lst);}
  
-	 else if (ityp == SC_STRING_I)
+	 else if (ityp == G_STRING_I)
 	    {s   = (char *) vl;
 	     lst = SS_mk_cons(si, SS_mk_string(si, s), lst);}
  
@@ -845,7 +845,7 @@ static int _SS_run(SS_psides *si)
     iret = FALSE;
     if (SS_numbp(ret))
        SS_args(si, ret,
-	       SC_INT_I, &iret,
+	       G_INT_I, &iret,
 	       0);
 
     else
@@ -879,7 +879,7 @@ static int _SS_load_scm(SS_psides *si)
    {
 
     SS_call_scheme(si, "load",
-                   SC_STRING_I, _SS.ibf,
+                   G_STRING_I, _SS.ibf,
                    G_OBJECT_I, SS_t,
                    0);
 
@@ -1034,20 +1034,20 @@ int SS_define_argv(SS_psides *si, int c, char **v, int go)
 	        continue;
 
 	     if (s[0] == '-')
-	        {t = SC_STRING_I;
+	        {t = G_STRING_I;
 		 p = s;}
 	     else if (SC_intstrp(s, 10))
-	        {t   = SC_LONG_I;
+	        {t   = G_LONG_I;
 		 lp  = CMAKE(long);
 		 *lp = SC_stol(s);
 		 p   = lp;}
 	     else if (SC_fltstrp(s))
-	        {t   = SC_DOUBLE_I;
+	        {t   = G_DOUBLE_I;
 		 dp  = CMAKE(double);
 		 *dp = SC_stof(s);
 		 p   = dp;}
 	     else
-	        {t = SC_STRING_I;
+	        {t = G_STRING_I;
 		 p = s;}
 
 	     type[n] = t;

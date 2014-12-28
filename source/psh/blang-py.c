@@ -77,18 +77,18 @@ static int python_parse_member(mbrdes *md, char *mbr,
 
     td = lookup_type_info(md->type);
     if (np > 1)
-       nstrncpy(aty, nc, "SC_POINTER_I", -1);
+       nstrncpy(aty, nc, "G_POINTER_I", -1);
 
     else if (td != NULL)
        {if (td->knd == TK_ENUM)
 	   {nstrncpy(md->type, nc, tykind[TK_ENUM], -1);
-	    nstrncpy(aty, nc, "SC_ENUM_I", -1);}
+	    nstrncpy(aty, nc, "G_ENUM_I", -1);}
 
 	else if ((td->knd == TK_PRIMITIVE) || (td->g != KIND_POINTER))
 	   nstrncpy(aty, nc, td->typ_i, -1);
 
 	else
-	   nstrncpy(aty, nc, "SC_POINTER_I", -1);};
+	   nstrncpy(aty, nc, "G_POINTER_I", -1);};
 
     nb = strlen(bty) - 1;
     pb = bty + nb;
@@ -150,36 +150,36 @@ static void py_format(char *fmt, int nc, char *spec, char *name)
        {pf = fmt;
         for (i = 0; ta[i] != NULL; i += 2)
 	    {ty = ta[i];
-	     if ((strcmp(ty, "SC_SHORT_I") == 0) ||
+	     if ((strcmp(ty, "G_SHORT_I") == 0) ||
 		      (strcmp(ty, "short") == 0))
 	        *pf++ = 'h';
-	     else if ((strcmp(ty, "SC_INT_I") == 0) ||
+	     else if ((strcmp(ty, "G_INT_I") == 0) ||
 		      (strcmp(ty, "pboolean") == 0) ||
 		      (strcmp(ty, "int") == 0))
 	        *pf++ = 'i';
-	     else if ((strcmp(ty, "SC_LONG_I") == 0) ||
+	     else if ((strcmp(ty, "G_LONG_I") == 0) ||
 		      (strcmp(ty, "long") == 0))
 	        *pf++ = 'l';
-	     else if ((strcmp(ty, "SC_LONG_LONG_I") == 0) ||
+	     else if ((strcmp(ty, "G_LONG_LONG_I") == 0) ||
 		      (strcmp(ty, "long long") == 0))
 	        *pf++ = 'L';
-	     else if ((strcmp(ty, "SC_FLOAT_I") == 0) ||
+	     else if ((strcmp(ty, "G_FLOAT_I") == 0) ||
 		      (strcmp(ty, "float") == 0))
 	        *pf++ = 'f';
-	     else if ((strcmp(ty, "SC_DOUBLE_I") == 0) ||
+	     else if ((strcmp(ty, "G_DOUBLE_I") == 0) ||
 		      (strcmp(ty, "double") == 0))
 	        *pf++ = 'd';
 
 /* GOTHCA: only appear to get this in context of 'char *'
  * e.g. PD_pwd
  */
-	     else if ((strcmp(ty, "SC_CHAR_I") == 0) ||
+	     else if ((strcmp(ty, "G_CHAR_I") == 0) ||
 		 (strcmp(ty, "char") == 0))
 	        *pf++ = 's';
-	     else if ((strcmp(ty, "SC_STRING_I") == 0) ||
+	     else if ((strcmp(ty, "G_STRING_I") == 0) ||
 		      (strcmp(ty, "char *") == 0))
 	        *pf++ = 's';
-	     else if (strcmp(ty, "SC_ENUM_I") == 0)
+	     else if (strcmp(ty, "G_ENUM_I") == 0)
 	        *pf++ = 'i';
 	     else
 	        *pf++ = 'O';};
@@ -1127,15 +1127,15 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 
 /* if the list argument is non empty make up the call */
     if (IS_NULL(a) == FALSE)
-       {if (strcmp(dty, "SC_STRING_I") == 0)
+       {if (strcmp(dty, "G_STRING_I") == 0)
 	   snprintf(t, nc, "    _lo = PY_strings_tuple(_rv, -1, TRUE);\n");
         else
 	   {py_format(fmt, BFLRG, a, NULL);
 	    py_arg(arg, BFLRG, a);
 
 #if 1
-	    if (strcmp(dty, "SC_CHAR_I") == 0)
-	       nstrncpy(dty, BFLRG, "SC_STRING_I", -1);
+	    if (strcmp(dty, "G_CHAR_I") == 0)
+	       nstrncpy(dty, BFLRG, "G_STRING_I", -1);
 
 	    nm = dcl->proto.name;
 	    snprintf(t, nc, "    _lo = PY_build_object(\"%s\",\n", nm);

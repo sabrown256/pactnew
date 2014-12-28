@@ -341,8 +341,8 @@ static object *_SXI_target(SS_psides *si, object *arg)
     align = PD_NO_ALGN;
 
     SS_args(si, arg,
-            SC_ENUM_I, &data,
-            SC_ENUM_I, &align,
+            G_ENUM_I, &data,
+            G_ENUM_I, &align,
             0);
 
     _SX_target(si, data, align);
@@ -377,11 +377,11 @@ static object *_SXI_open_raw_file(SS_psides *si, object *argl)
     align = PD_NO_ALGN;
     type  = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &name,
-            SC_STRING_I, &mode,
-            SC_STRING_I, &type,
-            SC_ENUM_I, &data,
-            SC_ENUM_I, &align,
+            G_STRING_I, &name,
+            G_STRING_I, &mode,
+            G_STRING_I, &type,
+            G_ENUM_I, &data,
+            G_ENUM_I, &align,
             0);
 
 /* if it is a UDL */
@@ -457,8 +457,8 @@ static object *_SXI_seek_raw_file(SS_psides *si, object *argl)
     whence = 0;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_LONG_LONG_I, &addr,
-            SC_INT_I, &whence,
+            G_LONG_LONG_I, &addr,
+            G_INT_I, &whence,
             0);
 
     if (po == NULL)
@@ -542,17 +542,17 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
     if (SS_length(si, argl) > 4)
        SS_args(si, argl,
                G_SX_FILE_I, &po,
-               SC_LONG_LONG_I, &addr,
-               SC_LONG_I, &ni,
-               SC_STRING_I, &intype,
-               SC_STRING_I, &outtype,
+               G_LONG_LONG_I, &addr,
+               G_LONG_I, &ni,
+               G_STRING_I, &intype,
+               G_STRING_I, &outtype,
                0);
     else
        {SS_args(si, argl,
                 G_SX_FILE_I, &po,
-                SC_LONG_LONG_I, &addr,
-                SC_LONG_I, &ni,
-                SC_STRING_I, &intype,
+                G_LONG_LONG_I, &addr,
+                G_LONG_I, &ni,
+                G_STRING_I, &intype,
                 0);
 
         outtype = intype;};
@@ -586,7 +586,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 		    argl);
 
 /* pad char arrays with 2 null characters - for printing and SC_firsttok */
-	if (strcmp(outtype, SC_CHAR_S) == 0)
+	if (strcmp(outtype, G_CHAR_S) == 0)
 	   vr = _PD_alloc_entry(file, outtype, ni + 2L);
 	else
 	   vr = _PD_alloc_entry(file, outtype, ni);
@@ -638,18 +638,18 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
        SS_args(si, argl,
                G_SX_FILE_I, &po,
                G_OBJECT_I, &obj,
-               SC_LONG_LONG_I, &addr,
-               SC_LONG_I, &ni,
-               SC_STRING_I, &intype,
-               SC_STRING_I, &outtype,
+               G_LONG_LONG_I, &addr,
+               G_LONG_I, &ni,
+               G_STRING_I, &intype,
+               G_STRING_I, &outtype,
                0);
     else
        {SS_args(si, argl,
                 G_SX_FILE_I, &po,
                 G_OBJECT_I, &obj,
-                SC_LONG_LONG_I, &addr,
-                SC_LONG_I, &ni,
-                SC_STRING_I, &intype,
+                G_LONG_LONG_I, &addr,
+                G_LONG_I, &ni,
+                G_STRING_I, &intype,
                 0);
 
         outtype = intype;};
@@ -927,7 +927,7 @@ object *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode)
 
     name = NULL;
     SS_args(si, arg,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     if (name == NULL)
@@ -964,7 +964,7 @@ static object *_SXI_collect_io_info(SS_psides *si, object *arg)
 
     wh = FALSE;
     SS_args(si, arg,
-            SC_INT_I, &wh,
+            G_INT_I, &wh,
             0);
 
     wh = SC_collect_io_info(wh);
@@ -1103,7 +1103,7 @@ static object *_SXI_entry_number(SS_psides *si, object *argl)
     name = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     if (po == NULL)
@@ -1195,8 +1195,8 @@ static object *_SXI_file_content(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_SX_FILE_I, &po,
             G_OBJECT_I, &fout,
-	    SC_INT_I, &vers,
-	    SC_INT_I, &chrt,
+	    G_INT_I, &vers,
+	    G_INT_I, &chrt,
             0);
 
     if (po == NULL)
@@ -1244,7 +1244,7 @@ static object *_SXI_file_info(SS_psides *si, object *argl)
     name = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     if (po == NULL)
@@ -1327,7 +1327,7 @@ static object *_SXI_default_offset(SS_psides *si, object *arg)
     po = NULL;
     nargs = SS_args(si, arg,
                     G_SX_FILE_I, &po,
-                    SC_INT_I, &offset,
+                    G_INT_I, &offset,
                     0);
 
     if (po == NULL)
@@ -1400,7 +1400,7 @@ static object *_SXI_file_mode(SS_psides *si, object *arg)
     mode = NULL;
     SS_args(si, arg,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &mode,
+            G_STRING_I, &mode,
             0);
 
     if (po == NULL)
@@ -1489,8 +1489,8 @@ object *_SX_defstr_to_list(SS_psides *si, defstr *dp)
 
 /* convert to dimension from a dimdes to a cons list */
     for (lst = dp->members; lst != NULL; lst = lst->next)
-        {obj1 = SS_make_list(si, SC_STRING_I, lst->type,
-                             SC_STRING_I, lst->name,
+        {obj1 = SS_make_list(si, G_STRING_I, lst->type,
+                             G_STRING_I, lst->name,
                              0);
 
          obj1 = SS_mk_cons(si, obj1,
@@ -1512,9 +1512,9 @@ object *_SX_defstr_to_list(SS_psides *si, defstr *dp)
 static object *_SX_memdes_to_list(SS_psides *si, memdes *mp)
    {object *obj;
 
-    obj = SS_make_list(si, SC_STRING_I, mp->type,
-                       SC_STRING_I, mp->name,
-                       SC_INT_I, &mp->number,
+    obj = SS_make_list(si, G_STRING_I, mp->type,
+                       G_STRING_I, mp->name,
+                       G_INT_I, &mp->number,
                        G_OBJECT_I, _SX_make_dims_obj(si, mp->dimensions),
                        0);
 
@@ -1592,7 +1592,7 @@ static object *_SXI_parse_type(SS_psides *si, object *argl)
 
     def = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &def,
+            G_STRING_I, &def,
             0);
 
     ret = SS_null;
@@ -1733,7 +1733,7 @@ static object *_SXI_list_symtab(SS_psides *si, object *argl)
     patt = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &patt,
+            G_STRING_I, &patt,
             0);
 
     if (po == NULL)
@@ -1780,10 +1780,10 @@ static object *_SXI_list_variables(SS_psides *si, object *argl)
     oall  = SS_f;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &flags,
-            SC_STRING_I, &patt,
-            SC_STRING_I, &type,
-            SC_LONG_I, &size,
+            G_STRING_I, &flags,
+            G_STRING_I, &patt,
+            G_STRING_I, &type,
+            G_LONG_I, &size,
             G_OBJECT_I, &oall,
             0);
 
@@ -1826,7 +1826,7 @@ static object *_SXI_change_directory(SS_psides *si, object *argl)
     dir = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &dir,
+            G_STRING_I, &dir,
             0);
 
     if (po == NULL)
@@ -1860,7 +1860,7 @@ static object *_SXI_make_directory(SS_psides *si, object *argl)
     errf = SS_t;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &dir,
+            G_STRING_I, &dir,
             G_OBJECT_I, &errf,
             0);
 
@@ -1896,7 +1896,7 @@ static object *_SXI_file_dirp(SS_psides *si, object *argl)
     dir = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &dir,
+            G_STRING_I, &dir,
             0);
 
     if (po == NULL)
@@ -1948,8 +1948,8 @@ static object *_SXI_create_link(SS_psides *si, object *argl)
     newname = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &oldname,
-            SC_STRING_I, &newname,
+            G_STRING_I, &oldname,
+            G_STRING_I, &newname,
             0);
 
     if (po == NULL)
@@ -2025,10 +2025,10 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
 
     n = SS_args(si, argl,
                 G_SX_FILE_I, &po,
-                SC_STRING_I, &name,
-                SC_STRING_I, &type,
-                SC_LONG_I, &bpi,
-                SC_INT_I, &align,
+                G_STRING_I, &name,
+                G_STRING_I, &type,
+                G_LONG_I, &bpi,
+                G_INT_I, &align,
                 0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -2045,7 +2045,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
 
         rest = SS_list_tail(si, argl, n);
         SS_args(si, rest,
-                SC_ENUM_I, &ord,
+                G_ENUM_I, &ord,
                 0);
 
         dp = PD_defix(file, name, bpi, align, ord);}
@@ -2058,13 +2058,13 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
         rest = SS_list_tail(si, argl, n);
         SS_args(si, rest,
                 G_OBJECT_I, &ord,
-                SC_LONG_I, &expb,
-                SC_LONG_I, &mantb,
-                SC_LONG_I, &sbs,
-                SC_LONG_I, &sbe,
-                SC_LONG_I, &sbm,
-                SC_LONG_I, &hmb,
-                SC_LONG_I, &bias,
+                G_LONG_I, &expb,
+                G_LONG_I, &mantb,
+                G_LONG_I, &sbs,
+                G_LONG_I, &sbe,
+                G_LONG_I, &sbm,
+                G_LONG_I, &hmb,
+                G_LONG_I, &bias,
                 0);
 
         if (SS_nullobjp(ord))
@@ -2109,17 +2109,17 @@ static object *_SXI_chg_prim(SS_psides *si, object *argl)
 
     SS_args(si, argl,
 	    G_SX_FILE_I, &po,
-	    SC_INT_I, &ityp,
-	    SC_INT_I, &nb,
-	    SC_INT_I, &align,
+	    G_INT_I, &ityp,
+	    G_INT_I, &nb,
+	    G_INT_I, &align,
 	    G_OBJECT_I, &ord,
-	    SC_LONG_I, fmt + 0,
-	    SC_LONG_I, fmt + 1,
-	    SC_LONG_I, fmt + 2,
-	    SC_LONG_I, fmt + 3,
-	    SC_LONG_I, fmt + 4,
-	    SC_LONG_I, fmt + 5,
-	    SC_LONG_I, fmt + 6,
+	    G_LONG_I, fmt + 0,
+	    G_LONG_I, fmt + 1,
+	    G_LONG_I, fmt + 2,
+	    G_LONG_I, fmt + 3,
+	    G_LONG_I, fmt + 4,
+	    G_LONG_I, fmt + 5,
+	    G_LONG_I, fmt + 6,
 	    0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -2162,7 +2162,7 @@ static object *_SXI_read_defstr(SS_psides *si, object *argl)
     name = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -2252,7 +2252,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
     name = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -2271,8 +2271,8 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
          mname = NULL;
          type  = NULL;
          SS_args(si, member_obj,
-                 SC_STRING_I, &type,
-                 SC_STRING_I, &mname,
+                 G_STRING_I, &type,
+                 G_STRING_I, &mname,
                  0);
 
 	 snprintf(member, MAXLINE, "%s %s", type, mname);
@@ -2334,8 +2334,8 @@ static object *_SXI_make_typedef(SS_psides *si, object *argl)
     otype = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &otype,
-            SC_STRING_I, &ntype,
+            G_STRING_I, &otype,
+            G_STRING_I, &ntype,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -2367,9 +2367,9 @@ static object *_SXI_make_cast(SS_psides *si, object *argl)
     contr = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &type,
-            SC_STRING_I, &memb,
-            SC_STRING_I, &contr,
+            G_STRING_I, &type,
+            G_STRING_I, &memb,
+            G_STRING_I, &contr,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -2400,7 +2400,7 @@ static object *_SXI_file_varp(SS_psides *si, object *argl)
     fobj = SS_f;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             G_OBJECT_I, &fobj,
             0);
 
@@ -2490,7 +2490,7 @@ static object *_SXI_rd_syment(SS_psides *si, object *argl)
     err  = SS_f;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             G_OBJECT_I, &err,
             0);
 
@@ -2552,8 +2552,8 @@ static SC_array *_SX_make_blocks(SS_psides *si, object *alst, long numb)
         tot = 0L;
         for (i = 0; i < n; i++)
             {SS_args(si, alst,
-                     SC_LONG_LONG_I, &addr,
-                     SC_LONG_LONG_I, &ni,
+                     G_LONG_LONG_I, &addr,
+                     G_LONG_LONG_I, &ni,
                      0);
 	     _PD_block_set_desc(addr, ni, bl, i);
 
@@ -2570,7 +2570,7 @@ static SC_array *_SX_make_blocks(SS_psides *si, object *alst, long numb)
        {bl = _PD_block_make(1);
 
 	SS_args(si, alst,
-		SC_LONG_LONG_I, &addr,
+		G_LONG_LONG_I, &addr,
 		0);
 
 	_PD_block_set_desc(addr, 1, bl, 0);};
@@ -2610,8 +2610,8 @@ static object *_SXI_wr_syment(SS_psides *si, object *argl)
     alst = SS_null;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &name,
-            SC_STRING_I, &type,
+            G_STRING_I, &name,
+            G_STRING_I, &type,
             G_OBJECT_I, &alst,
             0);
 
@@ -2933,7 +2933,7 @@ static object *_SXI_remove_entry(SS_psides *si, object *argl)
     file = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-	    SC_STRING_I, &name,
+	    G_STRING_I, &name,
 	    0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -3163,7 +3163,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
     else
        tep = ep;
 
-    if ((strcmp(type, SC_CHAR_S) == 0) && (_SX.string_mode != LITERAL))
+    if ((strcmp(type, G_CHAR_S) == 0) && (_SX.string_mode != LITERAL))
        {s = (char *) addr.memaddr;
 	if (s != NULL)
 	   {for (n = number - 1; n >= 0; n--)
@@ -3220,8 +3220,8 @@ static object *_SXI_wrt_ultra_curve(SS_psides *si, object *argl)
             G_SX_FILE_I, &po,
             G_C_ARRAY_I, &xarr,
             G_C_ARRAY_I, &yarr,
-            SC_STRING_I, &labl,
-            SC_INT_I, &npts,
+            G_STRING_I, &labl,
+            G_INT_I, &npts,
             0);
 
     if (po == NULL)
@@ -3253,9 +3253,9 @@ static object *_SXI_sizeof(SS_psides *si, object *argl)
     type = NULL;
     flg  = FALSE;
     SS_args(si, argl,
-            SC_STRING_I, &type,
+            G_STRING_I, &type,
             G_SX_FILE_I, &po,
-            SC_INT_I, &flg,
+            G_INT_I, &flg,
             0);
 
     if (po == NULL)
@@ -3304,7 +3304,7 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
        {pp   = SS_GET(SX_pdbdata, obj);
 	iarr = NULL;
 	SS_args(si, argl,
-		SC_INT_I, &_SC.types.max_digits,
+		G_INT_I, &_SC.types.max_digits,
 		G_C_ARRAY_I, &iarr,
 		0);
 
@@ -3313,7 +3313,7 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
 	if (iarr != NULL)
 	   {PM_ARRAY_CONTENTS(iarr, void, n, typ, d);
 	    sid = SC_type_id(typ, FALSE);
-	    ind = SC_convert_id(SC_LONG_I, NULL, 0, 1,
+	    ind = SC_convert_id(G_LONG_I, NULL, 0, 1,
 				sid, d, 0, 1, n, FALSE);};
 
 	PD_write_entry(f0,
@@ -3478,7 +3478,7 @@ static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_SX_FILE_I, &po,
             G_HASHARR_I, &tab,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     if (po == NULL)
@@ -3570,8 +3570,8 @@ static object *_SXI_set_switch(SS_psides *si, object *argl)
     indx = -1;
     val  = -1;
     SS_args(si, argl,
-            SC_INT_I, &indx,
-            SC_INT_I, &val,
+            G_INT_I, &indx,
+            G_INT_I, &val,
             0);
 
     if (indx < 0)
@@ -3598,7 +3598,7 @@ static object *_SXI_set_max_size(SS_psides *si, object *argl)
     v  = -1;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_INT_I, &v,
+            G_INT_I, &v,
             0);
 
     if (po == NULL)
@@ -3624,7 +3624,7 @@ static object *_SXI_set_track_pointers(SS_psides *si, object *argl)
     v  = -1;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_INT_I, &v,
+            G_INT_I, &v,
             0);
 
     if (po == NULL)
@@ -3701,8 +3701,8 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
     field  = NULL;
     format = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &field,
-            SC_STRING_I, &format,
+            G_STRING_I, &field,
+            G_STRING_I, &format,
             0);
 
     rv = SS_t;
@@ -3725,17 +3725,17 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
 	ok = TRUE;};
 
     if (ok == FALSE)
-       {if (strcmp(field, SC_BOOL_S) == 0)
-	   rv = _SX_set_user_format(si, SC_BOOL_I, format, 3);
+       {if (strcmp(field, G_BOOL_S) == 0)
+	   rv = _SX_set_user_format(si, G_BOOL_I, format, 3);
 
         else if (strcmp(field, "bool1") == 0)
-	   rv = _SX_set_user_format(si, SC_BOOL_I, format, 1);
+	   rv = _SX_set_user_format(si, G_BOOL_I, format, 1);
 
 	else if (strcmp(field, "bool2") == 0)
-	   rv = _SX_set_user_format(si, SC_BOOL_I, format, 2);
+	   rv = _SX_set_user_format(si, G_BOOL_I, format, 2);
 
 	else if (strcmp(field, "user-int") == 0)
-	   rv = _SX_set_user_format(si, SC_BIT_I, format, 3);
+	   rv = _SX_set_user_format(si, G_BIT_I, format, 3);
 
 	else if (strcmp(field, "suppress-member") == 0)
 	   {if (_SC.types.suppress_member != NULL)
@@ -3801,13 +3801,13 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
     offs  = 0L;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &name,
-            SC_STRING_I, &type,
-            SC_LONG_I, &ni,
-            SC_INT_I, &nbits,
-            SC_INT_I, &padsz,
-            SC_INT_I, &fpp,
-            SC_LONG_I, &offs,
+            G_STRING_I, &name,
+            G_STRING_I, &type,
+            G_LONG_I, &ni,
+            G_INT_I, &nbits,
+            G_INT_I, &padsz,
+            G_INT_I, &fpp,
+            G_LONG_I, &offs,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -3891,8 +3891,8 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
     file = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-	    SC_STRING_I, &name,
-	    SC_LONG_I, &indx,
+	    G_STRING_I, &name,
+	    G_LONG_I, &indx,
 	    0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -4411,7 +4411,7 @@ static object *_SXI_set_buffer_size(SS_psides *si, object *argl)
 
     v = -1;
     SS_args(si, argl,
-            SC_INT_I, &v,
+            G_INT_I, &v,
             0);
 
     PD_set_buffer_size(v);

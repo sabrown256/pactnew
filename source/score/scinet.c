@@ -233,7 +233,7 @@ static void _SC_tcp_acceptor(int fd, int mask, void *a)
 
     nfd = PS_tcp_accept_connection(fd, ad, TRUE);
     if (nfd > 0)
-       {pi = SC_register_event_loop_callback(pe, SC_INT_I, &nfd,
+       {pi = SC_register_event_loop_callback(pe, G_INT_I, &nfd,
 					     acc, rej, -1);
 	SC_ASSERT(pi != 0);}
     else
@@ -270,7 +270,7 @@ int _SC_tcp_serve(int fd, sckades ad, void *a,
        {pe = SC_make_event_loop(NULL, NULL, ex, -1, -1, -1);
 
 /* register the I/O channels for the event loop to monitor */
-	pi = SC_register_event_loop_callback(pe, SC_INT_I, &fd,
+	pi = SC_register_event_loop_callback(pe, G_INT_I, &fd,
 					     _SC_tcp_acceptor, NULL, -1);
 
 /* if all channels are OK activate the interrupt handling */

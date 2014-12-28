@@ -322,7 +322,7 @@ static double _PA_array_ref_i(void *vr, long indx, int type)
     d = 0.0;
 
     if (SC_is_type_num(type) == TRUE)
-       SC_convert_id(SC_DOUBLE_I, &d, 0, 1, type, vr, indx, 1, 1, FALSE);
+       SC_convert_id(G_DOUBLE_I, &d, 0, 1, type, vr, indx, 1, 1, FALSE);
 
     else
        PA_ERR(TRUE,
@@ -347,7 +347,7 @@ static void _PA_dump_time_plots(double tc, double dtc, int cycle)
        return;
 
     if (PA_gs.current_pp_cycle == -1)
-       PD_write(PA_gs.pp_file, "first-cycle", SC_INT_S, &cycle);
+       PD_write(PA_gs.pp_file, "first-cycle", G_INT_S, &cycle);
 
     PA_gs.current_pp_cycle = cycle;
 
@@ -633,7 +633,7 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
          if (pi->text != NULL)
             {ps  = (char **) PA_VARIABLE_DATA(pp);
              ndx = PA_VARIABLE_SIZE(pp);
-             if (strcmp(PA_VARIABLE_TYPE_S(pp), SC_STRING_S) == 0)
+             if (strcmp(PA_VARIABLE_TYPE_S(pp), G_STRING_S) == 0)
                 {for (indx = 0; indx < ndx; indx++)
                      {if (strcmp(pi->text, ps[indx]) == 0)
                          {dmap[i].val = indx;
@@ -797,7 +797,7 @@ static void _PA_init_pseudo_set(PA_plot_request *pr)
     for (nde = 0, pi = pr->range; pi != NULL; pi = pi->next, nde++)
         {elem[nde] = CMAKE_N(double, ne);};
 
-    set = PM_mk_set(pr->range_name, SC_DOUBLE_S, FALSE,
+    set = PM_mk_set(pr->range_name, G_DOUBLE_S, FALSE,
 		    ne, nd, nde, maxes, elem,
 		    NULL, NULL,
 		    NULL, NULL, NULL, NULL, NULL, NULL,
@@ -935,7 +935,7 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
         
     if (SC_is_type_num(id) == TRUE)
        {ps = PA_VARIABLE_DATA(pp);
-        _PA_copy_sub_select(SC_DOUBLE_I, data, 0,
+        _PA_copy_sub_select(G_DOUBLE_I, data, 0,
 			    id, ps, offset, maxes, strides, nd);};
 
     conv = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
@@ -971,7 +971,7 @@ int _PA_get_data(double *d, char *vr, inti ni, long offset, long stride)
 
     if (SC_is_type_num(id) == TRUE)
        {pv = PA_VARIABLE_DATA(pp);
-	SC_convert_id(SC_DOUBLE_I, d, 0, 1, id, pv, offset, stride, ni, FALSE);}
+	SC_convert_id(G_DOUBLE_I, d, 0, 1, id, pv, offset, stride, ni, FALSE);}
 
     else
        PA_ERR(TRUE,
@@ -1185,7 +1185,7 @@ static PM_set *_PA_get_n_set(PA_plot_request *pr, char *name)
     maxes[0] = ne;
     pr->size = ne;
 
-    set = PM_mk_set(name, SC_DOUBLE_S, FALSE,
+    set = PM_mk_set(name, G_DOUBLE_S, FALSE,
 		    ne, nd, nde, maxes, elem,
 		    NULL, NULL,
 		    NULL, NULL, NULL, NULL, NULL, NULL,
@@ -1272,7 +1272,7 @@ static PM_set *_PA_build_domain(char *base_name, C_array *arr, double t)
                                                 PA_VARIABLE_SIZE(pp),
                                                 &ist, ne);};};
 
-    set = PM_mk_set(dname, SC_DOUBLE_S, FALSE,
+    set = PM_mk_set(dname, G_DOUBLE_S, FALSE,
 		    ne, nd, nde, maxes, elem,
 		    NULL, NULL,
 		    NULL, NULL, NULL, NULL, NULL, NULL,

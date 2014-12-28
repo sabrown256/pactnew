@@ -1457,9 +1457,9 @@ Modifying attribute lists is done with the following functions:
                where
                   <i>attr</i>    = string naming the attribute (e.g. "LINE-COLOR")
                   <i>type</i>    = integer type code for the value. One of
-                            SC_CHAR_I, SC_SHORT_I, SC_INT_I,
-                            SC_LONG_I, SC_FLOAT_I, SC_DOUBLE_I, SC_DOUBLE_I,
-                            or SC_POINTER_I
+                            G_CHAR_I, G_SHORT_I, G_INT_I,
+                            G_LONG_I, G_FLOAT_I, G_DOUBLE_I, G_DOUBLE_I,
+                            or G_POINTER_I
                   <i>var</i>     = the address of the variable to set
                   <i>default</i> = the default value to assign
                             if the attribute is not present
@@ -1480,9 +1480,9 @@ Modifying attribute lists is done with the following functions:
                where
                   <i>attr</i>    = string naming the attribute (e.g. "LINE-COLOR")
                   <i>type</i>    = integer type code for the value. One of
-                            SC_CHAR_I, SC_SHORT_I, SC_INT_I,
-                            SC_LONG_I, SC_FLOAT_I, SC_DOUBLE_I, SC_DOUBLE_I,
-                            or SC_POINTER_I
+                            G_CHAR_I, G_SHORT_I, G_INT_I,
+                            G_LONG_I, G_FLOAT_I, G_DOUBLE_I, G_DOUBLE_I,
+                            or G_POINTER_I
                   <i>ptr</i>     = TRUE iff the attribute is an array of values
                   <i>default</i> = the value to assign to the attribute
                The last argument must be NULL indicating the end of the
@@ -1523,9 +1523,9 @@ Here are a few examples of using functions to manipulate attributes.
                       .
 
     PG_set_attrs_graph(data,
-		       "DRAW-MESH", SC_INT_I, FALSE, mshp,
-		       "N-LEVELS",  SC_INT_I, FALSE, nlev,
-		       "LEVELS",    SC_DOUBLE_I,  TRUE,  levels,
+		       "DRAW-MESH", G_INT_I, FALSE, mshp,
+		       "N-LEVELS",  G_INT_I, FALSE, nlev,
+		       "LEVELS",    G_DOUBLE_I,  TRUE,  levels,
 		       NULL);
                       .
                       .
@@ -1549,10 +1549,10 @@ mesh to be drawn depending on whether or not <i>mshp</i> is TRUE.
                       .
 
     PG_set_attrs_mapping(data->f,
-			 "PLOT-TYPE", SC_INT_I, FALSE, pty,
-			 "THETA",     SC_DOUBLE_I,  FALSE, theta,
-			 "PHI",       SC_DOUBLE_I,  FALSE, phi,
-			 "CHI",       SC_DOUBLE_I,  FALSE, 0.0,
+			 "PLOT-TYPE", G_INT_I, FALSE, pty,
+			 "THETA",     G_DOUBLE_I,  FALSE, theta,
+			 "PHI",       G_DOUBLE_I,  FALSE, phi,
+			 "CHI",       G_DOUBLE_I,  FALSE, 0.0,
 			 NULL);
                       .
                       .
@@ -1572,9 +1572,9 @@ given by THETA, PHI, and CHI.
                       .
 
     tlst = PG_set_attrs_alist(tlst,
-			      "DRAW-AXIS",  SC_INT_I, FALSE, FALSE,
-			      "DRAW-LABEL", SC_INT_I, FALSE, FALSE,
-			      "LINE-COLOR", SC_INT_I, FALSE, ++color,
+			      "DRAW-AXIS",  G_INT_I, FALSE, FALSE,
+			      "DRAW-LABEL", G_INT_I, FALSE, FALSE,
+			      "LINE-COLOR", G_INT_I, FALSE, ++color,
 			      NULL);
                       .
                       .
@@ -1595,9 +1595,9 @@ from the previous value.
                       .
 
     PG_get_attrs_set(domain,
-		     "DOMAIN-BORDER-WIDTH", SC_DOUBLE_I,    &dbwid, -1.0,
-		     "DOMAIN-BORDER-COLOR", SC_INT_I, &dbclr, dev->WHITE,
-		     "DOMAIN-BORDER-STYLE", SC_INT_I, &dbsty, LINE_SOLID,
+		     "DOMAIN-BORDER-WIDTH", G_DOUBLE_I,    &dbwid, -1.0,
+		     "DOMAIN-BORDER-COLOR", G_INT_I, &dbclr, dev->WHITE,
+		     "DOMAIN-BORDER-STYLE", G_INT_I, &dbsty, LINE_SOLID,
 		     NULL);
                       .
                       .
@@ -5479,7 +5479,7 @@ int main(int c, char **v)
     PG_box_init(2, dbx, 0.0, 0.0);
     PG_box_init(1, rbx, 0.0, 256.0);
 
-    calc_im = PG_make_image_n("Test Image", SC_CHAR_S,
+    calc_im = PG_make_image_n("Test Image", G_CHAR_S,
 			      2, WORLDC, dbx, rbx, w, h, 4, NULL);
 
     if (calc_im == NULL)

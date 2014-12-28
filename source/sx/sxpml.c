@@ -303,8 +303,8 @@ static object *_SXI_mk_array(SS_psides *si, object *argl)
     type = NULL;
     size = 0L;
     SS_args(si, argl,
-            SC_STRING_I, &type,
-            SC_LONG_I, &size,
+            G_STRING_I, &type,
+            G_LONG_I, &size,
             0);
 
     if (SX_gs.vif != NULL)
@@ -338,7 +338,7 @@ static object *_SXI_resz_array(SS_psides *si, object *argl)
     size = 0L;
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
-            SC_LONG_I, &size,
+            G_LONG_I, &size,
             0);
 
     if (arr != NULL)
@@ -466,7 +466,7 @@ static object *_SXI_array_ref(SS_psides *si, object *argl)
     n   = 0L;
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
-            SC_LONG_I, &n,
+            G_LONG_I, &n,
             0);
 
     o = SS_null;
@@ -506,7 +506,7 @@ static object *_SXI_array_set(SS_psides *si, object *argl)
     n   = 0L;
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
-            SC_LONG_I, &n,
+            G_LONG_I, &n,
             G_OBJECT_I, &val,
             0);
 
@@ -555,18 +555,18 @@ object *SX_list_array(SS_psides *si, object *argl)
         fixp &= SS_integerp(SS_car(si, lst));
 
     if (fixp)
-       {arr = PM_make_array(SC_LONG_S, n, NULL);
+       {arr = PM_make_array(G_LONG_S, n, NULL);
 	lp  = (long *) arr->data;
 	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(si, lst), lp++)
 	    {SS_args(si, lst,
-		     SC_LONG_I, lp,
+		     G_LONG_I, lp,
 		     0);};}
     else
-       {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
+       {arr = PM_make_array(G_DOUBLE_S, n, NULL);
 	fp  = (double *) arr->data;
 	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(si, lst), fp++)
 	    {SS_args(si, lst,
-		     SC_DOUBLE_I, fp,
+		     G_DOUBLE_I, fp,
 		     0);};};
 
     rv = SX_make_c_array(si, arr);
@@ -689,7 +689,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_PM_SET_I, &s,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &mn,
+            G_STRING_I, &mn,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -821,7 +821,7 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
     shape = SS_null;
     components = SS_null;
     SS_args(si, argl,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             G_OBJECT_I, &shape,
             G_OBJECT_I, &components,
             0);
@@ -843,7 +843,7 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 
 /* extract the set elements */
     if (SS_nullobjp(components))
-       set = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nd,
+       set = PM_make_lr_index_domain(name, G_DOUBLE_S, nd, nd,
 				     maxes, NULL, NULL);
 
     else
@@ -910,7 +910,7 @@ static object *_SXI_make_cp_set(SS_psides *si, object *argl)
 
     name = SC_dsnprintf(FALSE, "CP %d", n);
 
-    cp = PM_make_lr_cp_domain(name, SC_DOUBLE_S, n, sets);
+    cp = PM_make_lr_cp_domain(name, G_DOUBLE_S, n, sets);
 
     CFREE(sets);
 
@@ -950,9 +950,9 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_PM_SET_I, &domain,
             G_PM_SET_I, &range,
-            SC_ENUM_I, &centering,
-            SC_STRING_I, &category,
-            SC_STRING_I, &name,
+            G_ENUM_I, &centering,
+            G_STRING_I, &category,
+            G_STRING_I, &name,
 	    G_C_ARRAY_I, &arr,
 	    G_PM_MAPPING_I, &next,
             0);
@@ -975,11 +975,11 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
 	PM_ARRAY_CONTENTS(arr, void, n, type, data);
 
 	sid  = SC_type_id(type, FALSE);
-        emap = SC_convert_id(SC_CHAR_I, NULL, 0, 1,
+        emap = SC_convert_id(G_CHAR_I, NULL, 0, 1,
 			     sid, data, 0, 1, n, FALSE);
 
 	PG_set_attrs_mapping(f,
-			     "EXISTENCE", SC_CHAR_I, TRUE, emap,
+			     "EXISTENCE", G_CHAR_I, TRUE, emap,
 			     NULL);};
 
     o = SX_make_pm_mapping(si, f);
@@ -1028,8 +1028,8 @@ static object *_SXI_set_attr_set(SS_psides *si, object *argl)
     val  = SS_null;
     SS_args(si, argl,
             G_OBJECT_I, &o,
-            SC_STRING_I, &name,
-            SC_STRING_I, &type,
+            G_STRING_I, &name,
+            G_STRING_I, &type,
             G_OBJECT_I, &val,
             0);
 
@@ -1070,7 +1070,7 @@ static object *_SXI_set_map_type(SS_psides *si, object *argl)
     name = NULL;
     SS_args(si, argl,
             G_PM_MAPPING_I, &f,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     if ((f == NULL) || (name == NULL))
@@ -1104,7 +1104,7 @@ static object *_SXI_mappinSX_pdbdata(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_PM_MAPPING_I, &f,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &mn,
+            G_STRING_I, &mn,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -1263,8 +1263,8 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
     components = SS_null;
     tflag = FALSE;
     SS_args(si, argl,
-            SC_STRING_I, &name,
-            SC_INT_I, &tflag,
+            G_STRING_I, &name,
+            G_INT_I, &tflag,
             G_OBJECT_I, &shape,
             0);
 
@@ -1318,7 +1318,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
 				       "BAD ELEMENT ARRAY - _SXI_ARRAYS_SET");
 
 	      data = arr->data;
-              SC_convert_id(SC_DOUBLE_I, pe, 0, 1,
+              SC_convert_id(G_DOUBLE_I, pe, 0, 1,
 			    sid, data, 0, 1, nep, FALSE);
 
               pe += nep;};};
@@ -1331,7 +1331,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
             {for (j = 0; j < nep; j++)
                  *pe++ = i;};};
 
-    set = PM_mk_set(name, SC_DOUBLE_S, FALSE,
+    set = PM_mk_set(name, G_DOUBLE_S, FALSE,
 		    ne, nd, nde, maxes, elem,
 		    NULL, NULL,
 		    NULL, NULL, NULL, NULL, NULL, NULL,
@@ -1363,7 +1363,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
     ord = BND_CELL_MAX;
     SS_args(si, argl,
             G_PM_MAPPING_I, &f,
-            SC_INT_I, &ord,
+            G_INT_I, &ord,
             0);
 
     if (f == NULL)
@@ -1407,7 +1407,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
 	    elements[0] = x;
 	    elements[1] = y;
 
-	    ndom = PM_mk_set(odom->name, SC_DOUBLE_S, FALSE, odom->n_elements,
+	    ndom = PM_mk_set(odom->name, G_DOUBLE_S, FALSE, odom->n_elements,
 			     odom->dimension, odom->dimension_elem,
 			     odom->max_index, elements,
 			     odom->opers, odom->metric,
@@ -1472,7 +1472,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
         {node = SS_car(si, nodes);
 	 for (j = 0; j < nde; j++, node = SS_cdr(si, node))
              {SS_args(si, node,
-		      SC_DOUBLE_I, elem[j]+i,
+		      G_DOUBLE_I, elem[j]+i,
 		      0);};};
 
 /* construct the cell boundary arrays */
@@ -1491,7 +1491,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
              {ncell = SS_car(si, ncells);
 	      for (k = 0; k < ord; k++, ncell = SS_cdr(si, ncell))
                   {SS_args(si, ncell,
-			   SC_LONG_I, pb++,
+			   G_LONG_I, pb++,
 			   0);};};};
 
 /* reduce the number of dimensions to its proper value now */
@@ -1507,7 +1507,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
 
     name = SC_dsnprintf(FALSE, "D%d-%d", nd, nde);
 
-    set = PM_mk_set(name, SC_DOUBLE_S, FALSE,
+    set = PM_mk_set(name, G_DOUBLE_S, FALSE,
 		    ne, nd, nde, NULL, elem,
 		    NULL, NULL, NULL, NULL,
 		    G_PM_MESH_TOPOLOGY_P_S, mt,
@@ -1542,7 +1542,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &mn,
+            G_STRING_I, &mn,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -1594,7 +1594,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &mn,
+            G_STRING_I, &mn,
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
@@ -1740,7 +1740,7 @@ PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
 
 /* put it all together */
     mt = PM_make_topology(2, nbp, nc, bnd);
-    s  = PM_mk_set(name, SC_DOUBLE_S, FALSE, n_nodes, 2, 2,
+    s  = PM_mk_set(name, G_DOUBLE_S, FALSE, n_nodes, 2, 2,
 		   NULL, elem,
 		   NULL, NULL, NULL, NULL, 
 		   G_PM_MESH_TOPOLOGY_P_S, mt,
@@ -1777,10 +1777,10 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
     nnname = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &xname,
-            SC_STRING_I, &yname,
-            SC_STRING_I, &nzname,
-            SC_STRING_I, &nnname,
+            G_STRING_I, &xname,
+            G_STRING_I, &yname,
+            G_STRING_I, &nzname,
+            G_STRING_I, &nnname,
             G_C_ARRAY_I, &connct,
 	    LAST);
 
@@ -1847,7 +1847,7 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
             G_SS_PROCEDURE_I, &pred,
-            SC_DOUBLE_I, &val,
+            G_DOUBLE_I, &val,
             G_C_ARRAY_I, &indx,
             0);
 
@@ -1870,7 +1870,7 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
 
 	_PM_find_value(&no, &out, nx, nt, na, fnc, val, ni, in);
 
-	iarr = PM_make_array(SC_INT_S, no, out);
+	iarr = PM_make_array(G_INT_S, no, out);
 
 	rv = SX_make_c_array(si, iarr);};
 
@@ -1897,7 +1897,7 @@ static object *_SXI_mk_polygon(SS_psides *si, object *argl)
     rv = SS_null;
     nd = 0L;
     SS_args(si, argl,
-            SC_LONG_I, &nd,
+            G_LONG_I, &nd,
             0);
 
     argl = SS_cdr(si, argl);
@@ -1908,7 +1908,7 @@ static object *_SXI_mk_polygon(SS_psides *si, object *argl)
 
     for (id = 0, ip = 0; !SS_nullobjp(argl); argl = SS_cdr(si, argl))
 	{SS_args(si, argl,
-		 SC_DOUBLE_I, &v,
+		 G_DOUBLE_I, &v,
 		 0);
 	 py->x[id++][ip] = v;
 	 if (id == nd)

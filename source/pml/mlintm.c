@@ -575,8 +575,8 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 	 for (i = 0; i < nxo; i++)
 	     xoc[i] = xmn + i*dx;};
 
-    sd = PM_make_set_alt("sd", SC_DOUBLE_S, FALSE, 1, &ni, nd, (void **) xi);
-    dd = PM_make_lr_index_domain("dd", SC_DOUBLE_S, nd, nd, mxo, extr, rat);
+    sd = PM_make_set_alt("sd", G_DOUBLE_S, FALSE, 1, &ni, nd, (void **) xi);
+    dd = PM_make_lr_index_domain("dd", G_DOUBLE_S, nd, nd, mxo, extr, rat);
 
     ne = dd->n_elements;
     for (id = 0; id < nf; id++)
@@ -584,8 +584,8 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 	 PM_array_set(t, ne, 0.0);
          fo[id] = t;};
 
-    sr = PM_make_set_alt("sr", SC_DOUBLE_S, FALSE, 1, &ni, nf, (void **) fi);
-    dr = PM_make_set_alt("dr", SC_DOUBLE_S, FALSE, nd, mxo, nf, (void **) fo);
+    sr = PM_make_set_alt("sr", G_DOUBLE_S, FALSE, 1, &ni, nf, (void **) fi);
+    dr = PM_make_set_alt("dr", G_DOUBLE_S, FALSE, nd, mxo, nf, (void **) fo);
 
     src = PM_make_mapping("src", PM_LR_S, sd, sr, N_CENT, NULL);
     dst = PM_make_mapping("dst", PM_LR_S, dd, dr, N_CENT, NULL);
@@ -593,10 +593,10 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
     tre = PM_interpolate_mapping_id(dst, src, 0, prm);
 
     sa.length = ne;
-    sa.type   = SC_DOUBLE_P_S;
+    sa.type   = G_DOUBLE_P_S;
 
     da.length = ne;
-    da.type   = SC_DOUBLE_P_S;
+    da.type   = G_DOUBLE_P_S;
 
     for (id = 0; id < nf; id++)
         {da.data = fo[id];

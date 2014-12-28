@@ -631,7 +631,7 @@ static PM_set *_PG_make_domain(itf_array *ifs, int it)
 /* put it all together */
     mt = PM_make_topology(nd, bnp, bnc, bnd);
 
-    domain = PM_make_ac_set("cross-cell-domain", SC_DOUBLE_S, TRUE,
+    domain = PM_make_ac_set("cross-cell-domain", G_DOUBLE_S, TRUE,
 			    mt, nd, xn[0], xn[min(1,nd-1)], xn[min(2,nd-1)]);
 
 /* the domain can't own the component arrays
@@ -1190,16 +1190,16 @@ static PM_set *_PG_make_surface_set(itf_array *ifs, int no, int it)
 
 /* allow space in the coordinate arrays and the mesh topology */
     snprintf(t, MAXLINE, "level[%d]", no);
-    surface = PM_make_ac_set(t, SC_DOUBLE_S,
+    surface = PM_make_ac_set(t, G_DOUBLE_S,
 			     FALSE, mts, nd, xs[0], xs[1], xs[2]);
 
     pclr = colors[no % 6];
 
     surface->info = SC_append_alist(surface->info, SC_copy_alist(iri->alist));
     PG_set_attrs_set(surface,
-/*		     "DRAW-AXIS",  SC_INT_I, FALSE, FALSE, */
-		     "LINE-COLOR", SC_INT_I, FALSE, no+4,
-		     "PALETTE",    SC_CHAR_I,    TRUE,  pclr,
+/*		     "DRAW-AXIS",  G_INT_I, FALSE, FALSE, */
+		     "LINE-COLOR", G_INT_I, FALSE, no+4,
+		     "PALETTE",    G_CHAR_I,    TRUE,  pclr,
 		     NULL);
 
     LOCAL_STOP_TIME(cntr_times.merge_surface);
@@ -1996,7 +1996,7 @@ void _PG_iso_nc_lr_3d(PG_device *dev, double *a,
 
 /* extract some needed info */
     PG_get_attrs_alist(alist,
-		       "PLOT-TYPE", SC_INT_I, &pty, PLOT_WIRE_MESH,
+		       "PLOT-TYPE", G_INT_I, &pty, PLOT_WIRE_MESH,
 		       NULL);
 
 /* parallel controls */

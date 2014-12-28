@@ -680,7 +680,7 @@ object *SS_mk_string(SS_psides *si, char *s)
 	sp->length = strlen(s);
 	sp->string = CSTRSAVE(s);
 
-	op = SS_mk_object(si, sp, SC_STRING_I, SELF_EV, sp->string,
+	op = SS_mk_object(si, sp, G_STRING_I, SELF_EV, sp->string,
 			  SS_wr_atm, _SS_rl_string);}
     else
        op = SS_null;
@@ -746,7 +746,7 @@ object *SS_mk_integer(SS_psides *si, int64_t i)
     lp  = CMAKE(int64_t);
     *lp = i;
 
-    op = SS_mk_object(si, lp, SC_INT_I, SELF_EV, NULL,
+    op = SS_mk_object(si, lp, G_INT_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_integer);
 
     return(op);}
@@ -763,7 +763,7 @@ object *SS_mk_float(SS_psides *si, double d)
     dp  = CMAKE(double);
     *dp = d;
 
-    op = SS_mk_object(si, dp, SC_FLOAT_I, SELF_EV, NULL,
+    op = SS_mk_object(si, dp, G_FLOAT_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_float);
 
     return(op);}
@@ -780,7 +780,7 @@ object *SS_mk_complex(SS_psides *si, double _Complex d)
     dp  = CMAKE(double _Complex);
     *dp = d;
 
-    op = SS_mk_object(si, dp, SC_DOUBLE_COMPLEX_I, SELF_EV, NULL,
+    op = SS_mk_object(si, dp, G_DOUBLE_COMPLEX_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_complex);
 
     return(op);}
@@ -797,7 +797,7 @@ object *SS_mk_quaternion(SS_psides *si, quaternion q)
     qp  = CMAKE(quaternion);
     *qp = q;
 
-    op = SS_mk_object(si, qp, SC_QUATERNION_I, SELF_EV, NULL,
+    op = SS_mk_object(si, qp, G_QUATERNION_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_quaternion);
 
     return(op);}
@@ -815,7 +815,7 @@ object *SS_mk_boolean(SS_psides *si, char *s, int v)
     bp->name  = CSTRSAVE(s);
     bp->value = v;
 
-    op = SS_mk_object(si, bp, SC_BOOL_I, SELF_EV, bp->name,
+    op = SS_mk_object(si, bp, G_BOOL_I, SELF_EV, bp->name,
 		      SS_wr_atm, _SS_rl_boolean);
 
     return(op);}
@@ -1057,11 +1057,11 @@ int _SS_get_object_length(SS_psides *si, object *obj)
     else if (ityp == G_SS_VECTOR_I)
        ni = SS_VECTOR_LENGTH(obj);
 
-    else if (ityp == SC_STRING_I)
+    else if (ityp == G_STRING_I)
        ni = SS_STRING_LENGTH(obj) + 1;
 
-    else if ((ityp == SC_INT_I) ||
-	     (ityp == SC_FLOAT_I))
+    else if ((ityp == G_INT_I) ||
+	     (ityp == G_FLOAT_I))
        ni = 1;
 
     else
@@ -1082,34 +1082,34 @@ object *_SS_numtype_to_object_id(SS_psides *si, int id, void *p, long n)
 /* character types (proper) */
     if (SC_is_type_char(id) == TRUE)
        {long long v;
-	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
+	SC_convert_id(G_LONG_LONG_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
 	o = SS_mk_integer(si, v);}
 
 /* fixed point types (proper) */
     else if (SC_is_type_fix(id) == TRUE)
        {long long v;
-	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
+	SC_convert_id(G_LONG_LONG_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
 	o = SS_mk_integer(si, v);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(id) == TRUE)
        {long double v;
-	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
+	SC_convert_id(G_LONG_DOUBLE_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
 	o = SS_mk_float(si, v);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(id) == TRUE)
        {long double _Complex v;
-	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
+	SC_convert_id(G_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 		      id, p, n, 1, 1, FALSE);
 	o = SS_mk_complex(si, v);}
 
-    else if (id == SC_BOOL_I)
+    else if (id == G_BOOL_I)
        {bool *v;
 	v = (bool *) p;
 	o = SS_mk_boolean(si, "#boolean", v[n]);}
 
-    else if (id == SC_QUATERNION_I)
+    else if (id == G_QUATERNION_I)
        {quaternion *v;
 	v = (quaternion *) p;
 	o = SS_mk_quaternion(si, v[n]);}
@@ -1192,20 +1192,20 @@ int _SS_object_to_numtype_id(int vid, void *p, long n, object *val)
     rv  = TRUE;
     oid = SC_arrtype(val, -1);
 
-    num = ((SC_BOOL_I <= oid) && (oid <= SC_LONG_DOUBLE_I));
+    num = ((G_BOOL_I <= oid) && (oid <= G_LONG_DOUBLE_I));
 
-    if ((oid == SC_CHAR_I) || (oid == SS_CHARACTER_I))
+    if ((oid == G_CHAR_I) || (oid == SS_CHARACTER_I))
        d = SS_CHARACTER_VALUE(val);
-    else if (oid == SC_BOOL_I)
+    else if (oid == G_BOOL_I)
        d = SS_BOOLEAN_VALUE(val);
-    else if (oid == SC_INT_I)
+    else if (oid == G_INT_I)
        d = SS_INTEGER_VALUE(val);
-    else if (oid == SC_FLOAT_I)
+    else if (oid == G_FLOAT_I)
        d = SS_FLOAT_VALUE(val);
     else
        d = 0.0;
 
-    if (vid == SC_QUATERNION_I)
+    if (vid == G_QUATERNION_I)
        {quaternion q, *pv;
 	pv  = (quaternion *) p;
         q.i = 0.0;
@@ -1213,12 +1213,12 @@ int _SS_object_to_numtype_id(int vid, void *p, long n, object *val)
         q.k = 0.0;
 	if (num == TRUE)
 	   q.s = d;
-        else if (oid == SC_DOUBLE_COMPLEX_I)
+        else if (oid == G_DOUBLE_COMPLEX_I)
            {double _Complex z;
             z   = SS_COMPLEX_VALUE(val);
             q.s = creal(z);
             q.i = cimag(z);}
-        else if (oid == SC_QUATERNION_I)
+        else if (oid == G_QUATERNION_I)
            q = SS_QUATERNION_VALUE(val);
         else
            rv = FALSE;
@@ -1229,9 +1229,9 @@ int _SS_object_to_numtype_id(int vid, void *p, long n, object *val)
        {double _Complex z;
 	if (num == TRUE)
 	   z = d;
-        else if (oid == SC_DOUBLE_COMPLEX_I)
+        else if (oid == G_DOUBLE_COMPLEX_I)
            z = SS_COMPLEX_VALUE(val);
-        else if (oid == SC_QUATERNION_I)
+        else if (oid == G_QUATERNION_I)
            {quaternion q;
             q = SS_QUATERNION_VALUE(val);
             z = q.s + q.i*I;}
@@ -1239,26 +1239,26 @@ int _SS_object_to_numtype_id(int vid, void *p, long n, object *val)
            rv = FALSE;
         if (rv == TRUE)
 	   SC_convert_id(vid, p, n, 1,
-			 SC_DOUBLE_COMPLEX_I, &z, 0, 1, 1, FALSE);}
+			 G_DOUBLE_COMPLEX_I, &z, 0, 1, 1, FALSE);}
 
     else if (SC_is_type_num(vid) == TRUE)
        {if ((num == TRUE) || (oid == SS_CHARACTER_I))
 	   SC_convert_id(vid, p, n, 1,
-			 SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);
+			 G_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);
 
-        else if (oid == SC_DOUBLE_COMPLEX_I)
+        else if (oid == G_DOUBLE_COMPLEX_I)
            {double _Complex z;
             z = SS_COMPLEX_VALUE(val);
 	    d = creal(z);
 	    SC_convert_id(vid, p, n, 1,
-			  SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
+			  G_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
 
-        else if (oid == SC_QUATERNION_I)
+        else if (oid == G_QUATERNION_I)
            {quaternion q;
             q = SS_QUATERNION_VALUE(val);
 	    d = q.s;
 	    SC_convert_id(vid, p, n, 1,
-			  SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
+			  G_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
 
         else
            rv = FALSE;}
@@ -1302,7 +1302,7 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
 /* print out the type */
     if (SC_is_type_char(vid) == TRUE)
        {ityp = SC_arrtype(o, -1);
-	if (ityp == SC_STRING_I)
+	if (ityp == G_STRING_I)
 	   strncpy(p, SS_STRING_TEXT(o), n);
 	else if (ityp == G_SS_CONS_I)
 	   strncpy(p, SS_STRING_TEXT(SS_car(si, o)), n);
@@ -1387,7 +1387,7 @@ int _SS_max_numeric_type(SS_psides *si, object *argl, long *pn)
 	 id  = SC_arrtype(o, -1);
 	 idx = max(idx, id);};
 
-    if ((idx < SC_BOOL_I) || (SC_QUATERNION_I < idx))
+    if ((idx < G_BOOL_I) || (G_QUATERNION_I < idx))
        idx = -1;
 
     if (pn != NULL)

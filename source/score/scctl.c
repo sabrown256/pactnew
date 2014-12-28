@@ -973,7 +973,7 @@ pcons *SC_add_alist(pcons *alist, char *name, char *type, void *val)
    {pcons *rv;
 
     rv = SC_mk_pcons(G_PCONS_P_S,
-		     SC_mk_pcons(SC_STRING_S, CSTRSAVE(name), type, val),
+		     SC_mk_pcons(G_STRING_S, CSTRSAVE(name), type, val),
 		     G_PCONS_P_S, alist);
 
     return(rv);}
@@ -1274,10 +1274,10 @@ void daprint(pcons *alst)
 
 	 id = SC_type_id(ths->cdr_type, FALSE);
 
-         if (id == SC_CHAR_I)
+         if (id == G_CHAR_I)
             io_printf(stdout, "\t%s", ((char *) ths->cdr));
 
-         else if (id == SC_STRING_I)
+         else if (id == G_STRING_I)
             io_printf(stdout, "\t%s", ((char **) ths->cdr)[0]);
 
 /* print the first value only */
