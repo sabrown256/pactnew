@@ -185,8 +185,8 @@ static PM_mapping *compute_2d_ac_mapping_2(double *x, double *y,
 	 f[i] = floor(fv/tol)*tol;};
 
 /* put it all together */
-    dom = PM_make_ac_set("Dac", SC_DOUBLE_S, FALSE, mt, nd, x, y);
-    ran = PM_make_set("R", SC_DOUBLE_S, FALSE, 1, bnc[2], 1, f);
+    dom = PM_make_ac_set("Dac", G_DOUBLE_S, FALSE, mt, nd, x, y);
+    ran = PM_make_set("R", G_DOUBLE_S, FALSE, 1, bnc[2], 1, f);
     h   = PM_make_mapping("Dac->R", PM_AC_S, dom, ran, Z_CENT, NULL);
 
     return(h);}
@@ -302,8 +302,8 @@ static PM_mapping *compute_2d_ac_mapping_1(double *x, double *y,
 	 f[i] = floor(fv/tol)*tol;};
 
 /* put it all together */
-    dom = PM_make_ac_set("Dac", SC_DOUBLE_S, FALSE, mt, nd, x, y);
-    ran = PM_make_set("R", SC_DOUBLE_S, FALSE, 1, bnc[2], 1, f);
+    dom = PM_make_ac_set("Dac", G_DOUBLE_S, FALSE, mt, nd, x, y);
+    ran = PM_make_set("R", G_DOUBLE_S, FALSE, 1, bnc[2], 1, f);
     h   = PM_make_mapping("Dac->R", PM_AC_S, dom, ran, Z_CENT, NULL);
 
     return(h);}
@@ -474,7 +474,7 @@ static int test_3(PG_device *dev)
     PG_box_init(2, dbx, 0.0, 0.0);
     PG_box_init(1, rbx, 0.0, sf);
 
-    calc_im = PG_make_image_n("Test Image", SC_CHAR_S, NULL,
+    calc_im = PG_make_image_n("Test Image", G_CHAR_S, NULL,
 			      2, WORLDC, dbx, rbx, w, h, 4, NULL);
     if (calc_im == NULL)
        {PRINT(STDOUT, "CAN'T ALLOCATE IMAGE");
@@ -772,11 +772,11 @@ static int test_6(PG_device *dev)
              v[i] = sin(l*lm);};
 
 /* build the domain set */
-    domain = PM_make_set("{x, y}", SC_DOUBLE_S, FALSE,
+    domain = PM_make_set("{x, y}", G_DOUBLE_S, FALSE,
 			 2, kmax, lmax, 2, x, y);
 
 /* build the range set */
-    range = PM_make_set("{u, v}", SC_DOUBLE_S, FALSE,
+    range = PM_make_set("{u, v}", G_DOUBLE_S, FALSE,
 			2, kmax, lmax, 2, u, v);
 
     data = PG_make_graph_from_sets("{x, y}->{u, v}", domain, range,
@@ -880,7 +880,7 @@ static int test_8(PG_device *dev)
     emap = CMAKE_N(char, kxl);
     memset(emap, 1, kxl);
     alist = PG_set_attrs_alist(NULL,
-			      "EXISTENCE", SC_CHAR_I, TRUE, emap,
+			      "EXISTENCE", G_CHAR_I, TRUE, emap,
 			      NULL);
 
     ext = CMAKE_N(double, 4);
@@ -990,10 +990,10 @@ static int test_9(PG_device *dev)
              y[i] = l*dy + ymin;
              f[i] = 0.0;};
 
-    domain = PM_make_set("{x, y}", SC_DOUBLE_S, FALSE,
+    domain = PM_make_set("{x, y}", G_DOUBLE_S, FALSE,
 			 2, kmax, lmax, 2, x, y);
 
-    range = PM_make_set("f", SC_DOUBLE_S, FALSE,
+    range = PM_make_set("f", G_DOUBLE_S, FALSE,
 			2, kmax, lmax, 1, f);
 
     data = PG_make_graph_from_sets("{x, y}->f", domain, range,
@@ -1038,10 +1038,10 @@ static int test_9(PG_device *dev)
 		 z[i] = m;
 		 f[i] = 0.0;};
 
-    domain = PM_make_set("{x, y, z}", SC_DOUBLE_S, FALSE,
+    domain = PM_make_set("{x, y, z}", G_DOUBLE_S, FALSE,
 			 3, kmax, lmax, mmax, 3, x, y, z);
 
-    range = PM_make_set("f", SC_DOUBLE_S, FALSE,
+    range = PM_make_set("f", G_DOUBLE_S, FALSE,
 			3, kmax, lmax, mmax, 1, f);
 
     data = PG_make_graph_from_sets("{x, y, z}->f", domain, range,
@@ -1160,7 +1160,7 @@ static int test_11(PG_device *dev)
     PG_turn_data_id(dev, OFF);
 
     PG_set_attrs_mapping(f,
-			 "PALETTE", SC_CHAR_I, TRUE, "rainbow",
+			 "PALETTE", G_CHAR_I, TRUE, "rainbow",
 			 NULL);
 
     PG_set_attrs_glb(TRUE,
@@ -1218,7 +1218,7 @@ static int test_12(PG_device *dev)
     f = compute_2d_ac_mapping_1(x, y, kmax, lmax);
 
     PG_set_attrs_mapping(f,
-			 "PALETTE", SC_CHAR_I, TRUE, "rainbow",
+			 "PALETTE", G_CHAR_I, TRUE, "rainbow",
 			 NULL);
 
     PG_set_attrs_glb(TRUE,

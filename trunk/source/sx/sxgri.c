@@ -256,7 +256,7 @@ static object *_SXI_copy_iob(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_PG_DEVICE_I, &dvd,
             G_PG_DEVICE_I, &dvs,
-	    SC_INT_I, &rm,
+	    G_INT_I, &rm,
             0);
 
     if ((dvd == NULL) || (dvs == NULL))
@@ -294,18 +294,18 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
     s   = NULL;
     SS_args(si, argl,
             G_PG_DEVICE_I,    &dev,
-            SC_STRING_I, &s,
-	    SC_INT_I,    &td.color,
-	    SC_DOUBLE_I, &ndc[0],
-	    SC_DOUBLE_I, &ndc[1],
-	    SC_DOUBLE_I, &ndc[2],
-	    SC_DOUBLE_I, &ndc[3],
-	    SC_ENUM_I,   &td.align,
-	    SC_DOUBLE_I, &td.angle,
-	    SC_INT_I,    &td.size,
-	    SC_STRING_I, &td.style,
-	    SC_STRING_I, &td.face,
-	    SC_STRING_I, &td.other,
+            G_STRING_I, &s,
+	    G_INT_I,    &td.color,
+	    G_DOUBLE_I, &ndc[0],
+	    G_DOUBLE_I, &ndc[1],
+	    G_DOUBLE_I, &ndc[2],
+	    G_DOUBLE_I, &ndc[3],
+	    G_ENUM_I,   &td.align,
+	    G_DOUBLE_I, &td.angle,
+	    G_INT_I,    &td.size,
+	    G_STRING_I, &td.style,
+	    G_STRING_I, &td.face,
+	    G_STRING_I, &td.other,
             0);
 
     if (dev == NULL)
@@ -405,7 +405,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
        return(SS_f);
 
     SS_args(si, toggle,
-	    SC_INT_I, &flag,
+	    G_INT_I, &flag,
 	    0);
 
     if (flag)
@@ -492,76 +492,76 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_callback("ReDraw", _SX_clear_window);
 
 /* axis controls */
-	PG_register_variable("Axis", SC_INT_S,
+	PG_register_variable("Axis", G_INT_S,
 			     axson, NULL, NULL);
-	PG_register_variable("Grid", SC_INT_S,
+	PG_register_variable("Grid", G_INT_S,
 			     &SX_gs.grid, NULL, NULL);
-	PG_register_variable("Max Major Ticks", SC_INT_S,
+	PG_register_variable("Max Major Ticks", G_INT_S,
 			     axsmjt, NULL, NULL);
-	PG_register_variable("# Minor Ticks", SC_INT_S,
+	PG_register_variable("# Minor Ticks", G_INT_S,
 			     axsmnt, NULL, NULL);
-	PG_register_variable("# Decades", SC_DOUBLE_S,
+	PG_register_variable("# Decades", G_DOUBLE_S,
 			     axndec, NULL, NULL);
-	PG_register_variable("axis_char_angle", SC_DOUBLE_S,
+	PG_register_variable("axis_char_angle", G_DOUBLE_S,
 			     axsca, NULL, NULL);
-	PG_register_variable("Line Color", SC_INT_S,
+	PG_register_variable("Line Color", G_INT_S,
 			     axslc, NULL, NULL);
-	PG_register_variable("Line Style", SC_INT_S,
+	PG_register_variable("Line Style", G_INT_S,
 			     axsls, NULL, NULL);
-	PG_register_variable("Line Width", SC_DOUBLE_S,
+	PG_register_variable("Line Width", G_DOUBLE_S,
 			     axslw, NULL, NULL);
-	PG_register_variable("Tick Size", SC_DOUBLE_S,
+	PG_register_variable("Tick Size", G_DOUBLE_S,
 			     axsmts, NULL, NULL);
-	PG_register_variable("X Axis", SC_STRING_S,
+	PG_register_variable("X Axis", G_STRING_S,
 			     axslxf, NULL, NULL);
-	PG_register_variable("Y Axis", SC_STRING_S,
+	PG_register_variable("Y Axis", G_STRING_S,
 			     axslyf, NULL, NULL);
 
-	PG_register_variable("Left Offset", SC_DOUBLE_S,
+	PG_register_variable("Left Offset", G_DOUBLE_S,
 			     &SX_gs.gpad[0], NULL, NULL);
-	PG_register_variable("Right Offset", SC_DOUBLE_S,
+	PG_register_variable("Right Offset", G_DOUBLE_S,
 			     &SX_gs.gpad[1], NULL, NULL);
-	PG_register_variable("Bottom Offset", SC_DOUBLE_S,
+	PG_register_variable("Bottom Offset", G_DOUBLE_S,
 			     &SX_gs.gpad[2], NULL, NULL);
-	PG_register_variable("Top Offset", SC_DOUBLE_S,
+	PG_register_variable("Top Offset", G_DOUBLE_S,
 			     &SX_gs.gpad[3], NULL, NULL);
 
 /* font controls */
-	PG_register_variable("Type Face", SC_STRING_S,
+	PG_register_variable("Type Face", G_STRING_S,
 			     axstf, NULL, NULL);
-	PG_register_variable("Type Size", SC_INT_S,
+	PG_register_variable("Type Size", G_INT_S,
 			     &SX_gs.plot_type_size, NULL, NULL);
-	PG_register_variable("Type Style", SC_STRING_S,
+	PG_register_variable("Type Style", G_STRING_S,
 			     &SX_gs.plot_type_style, NULL, NULL);
 
 /* label controls */
-	PG_register_variable("Label Color Flag", SC_INT_S,
+	PG_register_variable("Label Color Flag", G_INT_S,
 			     labcf, NULL, NULL);
-	PG_register_variable("Label Length", SC_INT_S,
+	PG_register_variable("Label Length", G_INT_S,
 			     labln, NULL, NULL);
-	PG_register_variable("Label Type Size", SC_INT_S,
+	PG_register_variable("Label Type Size", G_INT_S,
 			     labts, NULL, NULL);
-	PG_register_variable("Label Space", SC_DOUBLE_S,
+	PG_register_variable("Label Space", G_DOUBLE_S,
 			     labsp, NULL, NULL);
 
 /* marker controls */
-	PG_register_variable("Marker Index", SC_INT_S,
+	PG_register_variable("Marker Index", G_INT_S,
 			     mrki, NULL, NULL);
-	PG_register_variable("Orientation", SC_DOUBLE_S,
+	PG_register_variable("Orientation", G_DOUBLE_S,
 			     &SX_gs.marker_orientation, NULL, NULL);
-	PG_register_variable("Marker Scale", SC_DOUBLE_S,
+	PG_register_variable("Marker Scale", G_DOUBLE_S,
 			     mrks, NULL, NULL);
 
 /* math controls */
-	PG_register_variable("Smooth Method", SC_STRING_S,
+	PG_register_variable("Smooth Method", G_STRING_S,
 			     &SX_gs.smooth_method, NULL, NULL);
 
 /* mouse location controls */
-	PG_register_variable("Mouse", SC_INT_S, 
+	PG_register_variable("Mouse", G_INT_S, 
 			     &SX_gs.show_mouse_location, NULL, NULL);
-	PG_register_variable("X Location", SC_DOUBLE_S,
+	PG_register_variable("X Location", G_DOUBLE_S,
 			     &SX_gs.show_mouse_x[0], NULL, NULL);
-	PG_register_variable("Y Location", SC_DOUBLE_S,
+	PG_register_variable("Y Location", G_DOUBLE_S,
 			     &SX_gs.show_mouse_x[1], NULL, NULL);
 
 /* output controls */
@@ -569,51 +569,51 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	    {out = SX_get_device(i);
 
 	     s = SC_dsnprintf(FALSE, "%s Flag", out->dupp);
-	     PG_register_variable(s, SC_INT_S,
+	     PG_register_variable(s, G_INT_S,
 				  &out->active, NULL, NULL);
 	     s = SC_dsnprintf(FALSE, "%s Name", out->dupp);
-	     PG_register_variable(s, SC_STRING_S,
+	     PG_register_variable(s, G_STRING_S,
 				  &out->fname, NULL, NULL);
 	     s = SC_dsnprintf(FALSE, "%s Type", out->dupp);
-	     PG_register_variable(s, SC_STRING_S,
+	     PG_register_variable(s, G_STRING_S,
 				  &out->type, NULL, NULL);};
 
 /* rendering controls */
-	PG_register_variable("1D->1D", SC_INT_S,
+	PG_register_variable("1D->1D", G_INT_S,
 			     &SX_gs.render_1d_1d, NULL, NULL);
-	PG_register_variable("2D->1D", SC_INT_S,
+	PG_register_variable("2D->1D", G_INT_S,
 			     &SX_gs.render_2d_1d, NULL, NULL);
-	PG_register_variable("2D->2D", SC_INT_S,
+	PG_register_variable("2D->2D", G_INT_S,
 			     &SX_gs.render_2d_2d, NULL, NULL);
-	PG_register_variable("# Contour Levels", SC_INT_S,
+	PG_register_variable("# Contour Levels", G_INT_S,
 			     nlev, NULL, NULL);
-	PG_register_variable("Contour Ratio", SC_DOUBLE_S,
+	PG_register_variable("Contour Ratio", G_DOUBLE_S,
 			     cntrat, NULL, NULL);
-	PG_register_variable("Chi", SC_DOUBLE_S,
+	PG_register_variable("Chi", G_DOUBLE_S,
 			     &SX_gs.view_angle[2], &_SX.ea_mn[2], &_SX.ea_mx[2]);
-	PG_register_variable("Phi", SC_DOUBLE_S,
+	PG_register_variable("Phi", G_DOUBLE_S,
 			     &SX_gs.view_angle[1], &_SX.ea_mn[1], &_SX.ea_mx[1]);
-	PG_register_variable("Theta", SC_DOUBLE_S,
+	PG_register_variable("Theta", G_DOUBLE_S,
 			     &SX_gs.view_angle[0], &_SX.ea_mn[0], &_SX.ea_mx[0]);
-	PG_register_variable("Default Color", SC_INT_S,
+	PG_register_variable("Default Color", G_INT_S,
 			     lnclr, NULL, NULL);
 
-	PG_register_variable("Default Style", SC_INT_S,
+	PG_register_variable("Default Style", G_INT_S,
 			     lnsty, NULL, NULL);
 
-	PG_register_variable("Default Width", SC_DOUBLE_S,
+	PG_register_variable("Default Width", G_DOUBLE_S,
 			     lnwid, NULL, NULL);
 
 /* window controls */
-	PG_register_variable("Border Width", SC_INT_S,
+	PG_register_variable("Border Width", G_INT_S,
 			     &SX_gs.border_width, NULL, NULL);
-	PG_register_variable("Clear Mode", SC_INT_S,
+	PG_register_variable("Clear Mode", G_INT_S,
 			     clrmd, NULL, NULL);
 
 /* tty output controls */
-	PG_register_variable("answer_prompt", SC_STRING_S,
+	PG_register_variable("answer_prompt", G_STRING_S,
 			     si->ans_prompt, NULL, NULL);
-	PG_register_variable("prompt", SC_STRING_S,
+	PG_register_variable("prompt", G_STRING_S,
 			     si->prompt, NULL, NULL);
 
 	name = SC_search_file(NULL, SX_gs.pui_file);

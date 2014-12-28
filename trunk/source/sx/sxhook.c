@@ -74,13 +74,13 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
 
     if (strcmp(type, "object") == 0)
        {c = SC_arrtype(vr, 0);
-        if (c == SC_INT_I)
+        if (c == G_INT_I)
 	   SC_strncpy(new_mem, MAXLINE, "long_long *val", -1);
 
-	else if (c == SC_FLOAT_I)
+	else if (c == G_FLOAT_I)
 	   SC_strncpy(new_mem, MAXLINE, "double *val", -1);
 
-	else if (c == SC_STRING_I)
+	else if (c == G_STRING_I)
 	   SC_strncpy(new_mem, MAXLINE, "SS_string *val", -1);
 
 	else if (c == G_SS_CONS_I)
@@ -89,7 +89,7 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
 	else if (c == G_SS_VARIABLE_I)
 	   SC_strncpy(new_mem, MAXLINE, "SS_variable *val", -1);
 
-	else if ((c == SC_BOOL_I) ||
+	else if ((c == G_BOOL_I) ||
 		 (c == SS_EOF_I) ||
 		 (c == SS_NULL_I))
 	   SC_strncpy(new_mem, MAXLINE, "SS_boolean *val", -1);
@@ -255,7 +255,7 @@ void _SX_process_io_callback(PROCESS *pp, object *frd, object *fwr)
     SX_iodes *pi;
 
     fd = pp->io[0];
-    PG_loop_callback(SC_INTEGER_I, &fd,
+    PG_loop_callback(G_INTEGER_I, &fd,
 		     _SS_proc_callback, NULL, pp->id);
 
     pi = _SX_callbacks + fd;
@@ -264,7 +264,7 @@ void _SX_process_io_callback(PROCESS *pp, object *frd, object *fwr)
     pi->fnc = frd;
 
     fd = pp->io[1];
-    PG_loop_callback(SC_INTEGER_I, &fd,
+    PG_loop_callback(G_INTEGER_I, &fd,
 		     _SS_proc_callback, NULL, pp->id);
 
     pi = _SX_callbacks + fd;

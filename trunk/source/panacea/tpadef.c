@@ -138,11 +138,11 @@ static void _PA_print_alist_node(char *type, void *data)
        printf("NULL\t(%s)", type);
 
     else
-       {if ((itype == SC_INT_I) || (itype == SC_INT_P_I))
+       {if ((itype == G_INT_I) || (itype == G_INT_P_I))
 	   {i = *(int *) data;
 	    printf("%d\t(%s)", i, type);}
 
-	else if (itype == SC_STRING_I)
+	else if (itype == G_STRING_I)
 	   {s = (char *) data;
 	    printf("%s\t(%s)", s, type);}
 

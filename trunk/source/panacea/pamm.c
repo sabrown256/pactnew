@@ -204,7 +204,7 @@ void PA_mk_control(PA_package *pck, char *s, int n_a, int n_p, int n_s)
        {snprintf(bf, MAXLINE, "%s-names", s);
         pn_a  = CMAKE(int);
         *pn_a = n_a;
-        PA_inst_var(bf, SC_STRING_S, NULL, NULL,
+        PA_inst_var(bf, G_STRING_S, NULL, NULL,
                     SCOPE, DEFN, ATTRIBUTE,
                     pn_a, DIMENSION, UNITS);
         pck->ascii = (char **) PA_intern(NULL, bf);
@@ -220,7 +220,7 @@ void PA_mk_control(PA_package *pck, char *s, int n_a, int n_p, int n_s)
        {snprintf(bf, MAXLINE, "%s-params", s);
         pn_p  = CMAKE(int);
         *pn_p = n_p;
-        PA_inst_var(bf, SC_DOUBLE_S, NULL, NULL,
+        PA_inst_var(bf, G_DOUBLE_S, NULL, NULL,
                     SCOPE, DEFN, ATTRIBUTE,
                     pn_p, DIMENSION, UNITS);
         pck->rparam = (double *) PA_intern(NULL, bf);
@@ -236,7 +236,7 @@ void PA_mk_control(PA_package *pck, char *s, int n_a, int n_p, int n_s)
        {snprintf(bf, MAXLINE, "%s-swtchs", s);
         pn_s  = CMAKE(int);
         *pn_s = n_s;
-        PA_inst_var(bf, SC_INT_S, NULL, NULL,
+        PA_inst_var(bf, G_INT_S, NULL, NULL,
                     SCOPE, DEFN, ATTRIBUTE,
                     pn_s, DIMENSION, UNITS);
         pck->iswtch = (int *) PA_intern(NULL, bf);

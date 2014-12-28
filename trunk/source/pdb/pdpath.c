@@ -863,7 +863,7 @@ static long _PD_itag_reduce(PD_smp_state *pa)
                     PD_TRACE);
 
         ep = _PD_mk_syment(CURRENT(intype), 1L, addr, NULL, NULL);
-	_PD_sys_read(file, ep, SC_LONG_S, &val);
+	_PD_sys_read(file, ep, G_LONG_S, &val);
         _PD_rl_syment(ep);
 
         FRAME(n)--;}
@@ -1122,7 +1122,7 @@ static long _PD_ptr_reduce(PD_smp_state *pa)
                     PD_TRACE);
 
         ep = _PD_mk_syment(CURRENT(intype), 1L, addr, NULL, NULL);
-	_PD_sys_read(file, ep, SC_LONG_S, &val);
+	_PD_sys_read(file, ep, G_LONG_S, &val);
         _PD_rl_syment(ep);
 
         FRAME(n)--;}

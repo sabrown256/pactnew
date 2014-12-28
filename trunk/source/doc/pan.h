@@ -520,39 +520,39 @@ def_hydro(pck)
 
 /* RESTART VARIABLES */
 
-    PA_def_var("n", SC_DOUBLE_S, NULL, NULL,
+    PA_def_var("n", G_DOUBLE_S, NULL, NULL,
                SCOPE, RESTART, CLASS, REQU, CENTER, Z_CENT, ATTRIBUTE
                P_zones, DIMENSION, PER, CC, UNITS);
 
-    PA_def_var("P", SC_DOUBLE_S, NULL, NULL,
+    PA_def_var("P", G_DOUBLE_S, NULL, NULL,
                SCOPE, RESTART, CLASS, REQU, CENTER, Z_CENT, ATTRIBUTE
                P_zones, DIMENSION, ERG, PER, CC, UNITS);
 
-    PA_def_var("rho", SC_DOUBLE_S, NULL, NULL,
+    PA_def_var("rho", G_DOUBLE_S, NULL, NULL,
                SCOPE, RESTART, CLASS, REQU, CENTER, Z_CENT, ATTRIBUTE
                P_zones, DIMENSION, G, PER, CC, UNITS);
 
 /* RUNTIME VARIABLES */
 
-    PA_def_var("Rpdv", SC_DOUBLE_S, NULL, NULL,
+    PA_def_var("Rpdv", G_DOUBLE_S, NULL, NULL,
                CENTER, Z_CENT, ATTRIBUTE,
                P_zones, DIMENSION, EV, PER, SEC, UNITS);
 
-    PA_def_var("Rqdv", SC_DOUBLE_S, NULL, NULL,
+    PA_def_var("Rqdv", G_DOUBLE_S, NULL, NULL,
                CENTER, Z_CENT, ATTRIBUTE,
                P_zones, DIMENSION, EV, PER, SEC, UNITS);
 
-    PA_def_var("vol", SC_DOUBLE_S, NULL, NULL,
+    PA_def_var("vol", G_DOUBLE_S, NULL, NULL,
                CENTER, Z_CENT, ATTRIBUTE,
                P_zones, DIMENSION, CC, UNITS);
 
-    PA_def_var("mass-z", SC_DOUBLE_S, NULL, NULL,
+    PA_def_var("mass-z", G_DOUBLE_S, NULL, NULL,
                CENTER, Z_CENT, ATTRIBUTE,
                P_zones, DIMENSION, G, UNITS);
 
 /* EDIT VARIABLES */
 
-    PA_def_var("Q", SC_DOUBLE_S, NULL, NULL,
+    PA_def_var("Q", G_DOUBLE_S, NULL, NULL,
                SCOPE, EDIT, CLASS, REQU, CENTER, Z_CENT, ATTRIBUTE,
                P_zones, DIMENSION, ERG, PER, CC, UNITS);
 
@@ -649,10 +649,10 @@ global_cmmnds()
 
 /* named switches, parameters, and names */
 
-    PA_inst_c("start-time", param, SC_DOUBLE_I, 2, PA_pshand,
+    PA_inst_c("start-time", param, G_DOUBLE_I, 2, PA_pshand,
               PA_sargs, commands);
 
-    PA_inst_c("stop-time",  param, SC_DOUBLE_I, 3, PA_pshand,      
+    PA_inst_c("stop-time",  param, G_DOUBLE_I, 3, PA_pshand,      
               PA_sargs, commands);
 
     return;}
@@ -5687,19 +5687,19 @@ the swtch array for the package for efficiency in handling the state file.<p>
 
        /* RESTART VARIABLES */
 
-           PA_def_var("foo_var_1", SC_INT_S, NULL, NULL,
+           PA_def_var("foo_var_1", G_INT_S, NULL, NULL,
                       SCOPE, RESTART, CLASS, OPTL, ATTRIBUTE,
                       P_dim_1, DIMENSION, UNITS);
 
        /* RUNTIME VARIABLES */
 
-           PA_def_var("foo_var_2", SC_DOUBLE_S, NULL, NULL,
+           PA_def_var("foo_var_2", G_DOUBLE_S, NULL, NULL,
                       ATTRIBUTE,
                       P_dim_2, P_dim_3, DIMENSION, UNITS);
 
        /* EDIT VARIABLES */
 
-           PA_def_var("foo_var_3", SC_INT_S, NULL, NULL,
+           PA_def_var("foo_var_3", G_INT_S, NULL, NULL,
                       SCOPE, EDIT, CLASS, PSEUDO, ATTRIBUTE,
                       P_dim_4, DIMENSION, UNITS);
 

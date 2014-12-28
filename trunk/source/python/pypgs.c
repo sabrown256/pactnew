@@ -132,8 +132,8 @@ PyObject *PP_iso_limit(PyObject *self, PyObject *args, PyObject *kwds)
 				    REAL_array_extractor, &a, &npts))
        {PG_iso_limit(a, npts, &min, &max);
 	rv = PY_build_object("iso_limit",
-			     SC_DOUBLE_I, 0, &min,
-			     SC_DOUBLE_I, 0, &max,
+			     G_DOUBLE_I, 0, &min,
+			     G_DOUBLE_I, 0, &max,
 			     0);};
 
    return(rv);}
@@ -652,8 +652,8 @@ static PyObject *PY_PG_device_get_text_ext(PY_PG_device *self,
 				    &s))
        {PG_get_text_ext_n(self->pyo, 2, WORLDC, s, x);
 	rv = PY_build_object("text_ext",
-			     SC_DOUBLE_I, 0, &x[0],
-			     SC_DOUBLE_I, 0, &x[1],
+			     G_DOUBLE_I, 0, &x[0],
+			     G_DOUBLE_I, 0, &x[1],
 			     0);};
 
     return(rv);}

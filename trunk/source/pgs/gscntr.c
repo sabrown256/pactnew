@@ -133,9 +133,9 @@ void PG_setup_iso_levels(PG_device *dev, PG_graph *data, PG_picture_desc *pd)
 
     alst = pd->alist;
     PG_get_attrs_alist(alst,
-		       "RATIO",    SC_DOUBLE_I,    &ratio, _PG_gattrs.contour_ratio,
-		       "N-LEVELS", SC_INT_I, &nlev,  _PG_gattrs.contour_n_levels,
-		       "LEVELS",   SC_POINTER_I, &lv,    NULL,
+		       "RATIO",    G_DOUBLE_I,    &ratio, _PG_gattrs.contour_ratio,
+		       "N-LEVELS", G_INT_I, &nlev,  _PG_gattrs.contour_n_levels,
+		       "LEVELS",   G_POINTER_I, &lv,    NULL,
 		       NULL);
 
     if (nlev <= 0)
@@ -463,7 +463,7 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
     nmap  = (imx - 1)*(jmx - 1);
 
     PG_get_attrs_alist(alist,
-		       "CONTOUR-METHOD", SC_INT_I, &method, 0,
+		       "CONTOUR-METHOD", G_INT_I, &method, 0,
 		       NULL);
 
     emap = PM_check_emap(&eflag, alist, nmap);
@@ -550,7 +550,7 @@ void PG_draw_iso_nc_lr(PG_device *dev ARG(,,cls), double *a,
    {int method;
 
     PG_get_attrs_alist(alist,
-		       "CONTOUR-METHOD", SC_INT_I, &method, 0,
+		       "CONTOUR-METHOD", G_INT_I, &method, 0,
 		       NULL);
 
     if (ndd == 2)
@@ -610,7 +610,7 @@ static void PG_draw_iso_nc_ac(PG_device *dev, double *a,
     PM_mesh_topology *mt;
 
     PG_get_attrs_alist(alist,
-		       "CONTOUR-METHOD", SC_INT_I, &method, 0,
+		       "CONTOUR-METHOD", G_INT_I, &method, 0,
 		       NULL);
 
     mt = (PM_mesh_topology *) cnnct;
@@ -716,9 +716,9 @@ static void PG_iso_hand(PG_device *dev, PG_graph *g, PG_picture_desc *pd,
 
     for (h = g->f; h != NULL; h = h->next)
         {PG_get_attrs_graph(g, FALSE,
-			    "LINE-COLOR", SC_INT_I, &color, dev->BLUE,
-			    "LINE-STYLE", SC_INT_I, &style, LINE_SOLID,
-			    "LINE-WIDTH", SC_DOUBLE_I,  &width, 0.0,
+			    "LINE-COLOR", G_INT_I, &color, dev->BLUE,
+			    "LINE-STYLE", G_INT_I, &style, LINE_SOLID,
+			    "LINE-WIDTH", G_DOUBLE_I,  &width, 0.0,
 			    NULL);
 
 	 PG_fset_line_style(dev, style);
@@ -805,14 +805,14 @@ void PG_contour_plot(PG_device *dev, PG_graph *data, ...)
    {double ratio, *pr;
         
     PG_get_attrs_graph(data, FALSE,
-		       "RATIO", SC_DOUBLE_I, &ratio, 1.0,
+		       "RATIO", G_DOUBLE_I, &ratio, 1.0,
 		       NULL);
     if (ratio == 0.0)
        {SC_VA_START(data);
         pr  = CMAKE(double);
         *pr = SC_VA_ARG(double);
 	PG_set_attrs_graph(data,
-			   "RATIO", SC_DOUBLE_I, TRUE, pr,
+			   "RATIO", G_DOUBLE_I, TRUE, pr,
 			   NULL);
         SC_VA_END;};
 

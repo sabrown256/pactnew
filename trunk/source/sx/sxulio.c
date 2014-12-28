@@ -100,7 +100,7 @@ static int _SX_termdata(SS_psides *si, int *aryptr,
     PG_box_copy(2, SX_gs.dataset[j].wc, wc);
 
     SC_CHANGE_VALUE_ALIST(SX_gs.dataset[j].info,
-			  int, SC_INT_P_S,
+			  int, G_INT_P_S,
 			  "LINE-COLOR", 0);
 
 /* put this curve's data in a cache somewhere (let us defer the question
@@ -897,10 +897,10 @@ object *SX_read_text_table(SS_psides *si, object *argl)
     nl     = 1;
     nlabel = 0;
     SS_args(si, argl,
-            SC_STRING_I, &name,
-            SC_INT_I, &n,
-            SC_INT_I, &nlabel,
-            SC_LONG_I, &nl,
+            G_STRING_I, &name,
+            G_INT_I, &n,
+            G_INT_I, &nlabel,
+            G_LONG_I, &nl,
             0);
 
     _SX.table_name = CSTRSAVE(name);
@@ -971,8 +971,8 @@ object *SX_read_text_table(SS_psides *si, object *argl)
     _SX.table_n  = n;
     _SX.table_ln = nl;
 
-    o = SS_make_list(si, SC_INT_I, &nr,
-		     SC_INT_I, &nc,
+    o = SS_make_list(si, G_INT_I, &nr,
+		     G_INT_I, &nc,
 		     0);
 
     return(o);}
@@ -1016,11 +1016,11 @@ object *SX_table_curve(SS_psides *si, object *argl)
     xs = 1;
     xo = -1;
     SS_args(si, argl,
-            SC_INT_I, &na,
-            SC_INT_I, &yo,
-            SC_INT_I, &ys,
-            SC_INT_I, &xo,
-            SC_INT_I, &xs,
+            G_INT_I, &na,
+            G_INT_I, &yo,
+            G_INT_I, &ys,
+            G_INT_I, &xo,
+            G_INT_I, &xs,
             0);
 
     xa[1] = SX_extract_vector(_SX.current_table, yo, ys, na);
@@ -1069,9 +1069,9 @@ object *SX_table_attr(SS_psides *si)
            PRINT(stdout, "\n Table %d : %d rows and %d columns\n\n",
                  table_n, nrows, ncols);
 
-        ret = SS_make_list(si, SC_INT_I, &nrows,
-                           SC_INT_I, &ncols,
-                           SC_INT_I, &table_n,
+        ret = SS_make_list(si, G_INT_I, &nrows,
+                           G_INT_I, &ncols,
+                           G_INT_I, &table_n,
                            0);};
 
     return(ret);}
@@ -1243,8 +1243,8 @@ object *SX_write_data(SS_psides *si, object *argl)
     mode  = NULL;
     fname = NULL;
     SS_args(si, argl,
-	    SC_STRING_I, &mode,
-	    SC_STRING_I, &fname,
+	    G_STRING_I, &mode,
+	    G_STRING_I, &fname,
 	    0);
 
 /* sort out the file type */
@@ -1287,7 +1287,7 @@ object *SX_write_data(SS_psides *si, object *argl)
 		     SS_error(si, "FILE ALREADY EXISTS - SX_WRITE_DATA", fobj);
 		     break;};};
 
-	SC_hasharr_install(_SX.files, fname, mode, SC_STRING_S, 3, -1);}
+	SC_hasharr_install(_SX.files, fname, mode, G_STRING_S, 3, -1);}
 
     else
        {if (strcmp(type, mode) != 0)

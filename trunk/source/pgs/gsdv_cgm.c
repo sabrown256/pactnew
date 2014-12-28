@@ -573,7 +573,7 @@ static void _PG_CGM_write_text(PG_device *dev, FILE *fp, char *s)
     info[0] = ix[0];
     info[1] = ix[1];
     info[2] = 1;
-    PG_CGM_command(dev, TEXT, info, 1, SC_STRING_S, s);
+    PG_CGM_command(dev, TEXT, info, 1, G_STRING_S, s);
  
 /* restore the character orientation to horizontal */
     if (fl)

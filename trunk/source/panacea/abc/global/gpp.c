@@ -809,7 +809,7 @@ static PM_set *LR_mesh_set(char *name)
     conv = PA_gs.units[CM]/PA_gs.convrsns[CM];
     PM_array_scale(xc, ni, conv);
     PM_array_scale(yc, ni, conv);
-    set = PM_make_set(name, SC_DOUBLE_S, FALSE,
+    set = PM_make_set(name, G_DOUBLE_S, FALSE,
                             2, kmax, lmax,
                             2, xc, yc);
 
@@ -845,7 +845,7 @@ PM_set *LR_get_set(char *name, PM_centering *pcent, C_array *arr, int space)
                               for (k = 1; k <= kmax; k++)
                                   {i = NODE_OF(k, l);
                                    *dp++ = data[i];};
-                          set = PM_make_set(name, SC_DOUBLE_S, FALSE,
+                          set = PM_make_set(name, G_DOUBLE_S, FALSE,
                                             2, kmax, lmax,
                                             1, data);
                           break;
@@ -854,7 +854,7 @@ PM_set *LR_get_set(char *name, PM_centering *pcent, C_array *arr, int space)
                               for (k = 2; k <= kmax; k++)
                                   {j = NODE_OF(k, l);
                                    *dp++ = data[j];};
-                          set = PM_make_set(name, SC_DOUBLE_S, FALSE,
+                          set = PM_make_set(name, G_DOUBLE_S, FALSE,
                                             2, kmax-1, lmax-1,
                                             1, data);
                           break;
@@ -867,7 +867,7 @@ PM_set *LR_get_set(char *name, PM_centering *pcent, C_array *arr, int space)
  */
     else
        {ni  = SC_MEM_GET_N(double, data);
-        set = PM_make_set(name, SC_DOUBLE_S, FALSE,
+        set = PM_make_set(name, G_DOUBLE_S, FALSE,
 			  1, ni, 1, data);};
 
     return(set);}
@@ -887,9 +887,9 @@ object *LR_get_time_data(SS_psides *si)
     tc    = tconv*t;
     dtc   = tconv*dt;
     return(SS_make_list(si,
-			SC_DOUBLE_I, &tc,
-                        SC_DOUBLE_I, &dtc,
-                        SC_INTEGER_I, &cycle,
+			G_DOUBLE_I, &tc,
+                        G_DOUBLE_I, &dtc,
+                        G_INTEGER_I, &cycle,
 			0));}
 
 /*--------------------------------------------------------------------------*/
@@ -925,13 +925,13 @@ object *LR_get_mesh_data(SS_psides *si)
    {object *th;
 
     th = SS_make_list(si,
-		      SC_INTEGER_I, &N_zones,
-		      SC_INTEGER_I, &frz,
-		      SC_INTEGER_I, &lrz,
-		      SC_INTEGER_I, &frn,
-		      SC_INTEGER_I, &lrn,
-		      SC_INTEGER_I, &kmax,
-		      SC_INTEGER_I, &lmax,
+		      G_INTEGER_I, &N_zones,
+		      G_INTEGER_I, &frz,
+		      G_INTEGER_I, &lrz,
+		      G_INTEGER_I, &frn,
+		      G_INTEGER_I, &lrn,
+		      G_INTEGER_I, &kmax,
+		      G_INTEGER_I, &lmax,
 		      0);
 
     return(th);}
@@ -1040,8 +1040,8 @@ object *LR_def_domain(SS_psides *si, object *argl)
     arr->data   = (byte *) dmap;
 
 /* now make the domain map and the domain arrays */
-    ret = SS_make_list(si, SC_STRING_I, "domain",
-                       SC_INTEGER_I, &space,
+    ret = SS_make_list(si, G_STRING_I, "domain",
+                       G_INTEGER_I, &space,
                        G_OBJECT_I, SX_make_pm_set(si, dom),
                        G_OBJECT_I, SX_make_c_array(si, arr),
                        0);

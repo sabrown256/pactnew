@@ -145,7 +145,7 @@ static void test_nb_read_patterned(pp)
         nir = 0;
         pbf = buf2;
         while (nir < BSIZE)
-	   {n    = PN_in(pbf, SC_INT_S, BSIZE-nir, pp, filt);
+	   {n    = PN_in(pbf, G_INT_S, BSIZE-nir, pp, filt);
 	    nir += n;
 	    pbf += n;
 	    sleep(1);
@@ -165,7 +165,7 @@ static void test_nb_read_patterned(pp)
 	sleep(2);
 	fill_buf(buf1, BSIZE);
 	filt[4] = 1;
-        PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
+        PN_out(buf1, G_INT_S, BSIZE, pp, filt);
 
         PRINT(stdout, "Test done\n");};
 
@@ -203,16 +203,16 @@ static void test_ring_b(pp)
 /* odd nodes go one way */
 	 if (pid & 1)
 	    {filt[4] = next;
-	     PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
+	     PN_out(buf1, G_INT_S, BSIZE, pp, filt);
 	     filt[4] = prev;
-	     PN_in(buf2, SC_INT_S, BSIZE, pp, filt);}
+	     PN_in(buf2, G_INT_S, BSIZE, pp, filt);}
 
 /* even nodes go the other */
 	 else
 	    {filt[4] = prev;
-	     PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	     PN_in(buf2, G_INT_S, BSIZE, pp, filt);
 	     filt[4] = next;
-	     PN_out(buf1, SC_INT_S, BSIZE, pp, filt);};
+	     PN_out(buf1, G_INT_S, BSIZE, pp, filt);};
 
 	 check_buf(buf2, BSIZE);};
     PRINT(stdout, "   %d iterations made\n", i);
@@ -251,20 +251,20 @@ static void test_ring_nb(pp)
     filt[6] = FALSE;
 
     filt[4] = next;
-    PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
+    PN_out(buf1, G_INT_S, BSIZE, pp, filt);
     filt[4] = prev;
-    PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
+    PN_in(buf2, G_INT_S, BSIZE, pp, filt);
 
     check_buf(buf2, BSIZE);
 
     PRINT(stdout, "Check mismatched messge sizes\n");
     if (pid == 0)
        {filt[4] = next;
-	PN_out(buf1, SC_INT_S, BSIZE/2, pp, filt);};
+	PN_out(buf1, G_INT_S, BSIZE/2, pp, filt);};
 
     if (pid == 1)
        {filt[4] = prev;
-	rlen = PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	rlen = PN_in(buf2, G_INT_S, BSIZE, pp, filt);
 	if (rlen == BSIZE/2)
 	   PRINT(stdout, "Got right size OK\n");};
     
@@ -298,21 +298,21 @@ static void test_type_sel(pp)
     if (pid == 0)
        {filt[4] = next;
 	filt[1] = 66;
-	PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
+	PN_out(buf1, G_INT_S, BSIZE, pp, filt);
 	filt[1] = 99;
-	PN_out(buf1, SC_INT_S, BSIZE, pp, filt);};
+	PN_out(buf1, G_INT_S, BSIZE, pp, filt);};
 
     if (pid == 2)
        {filt[4] = prev;
 	filt[1] = 66;
-	PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
+	PN_out(buf1, G_INT_S, BSIZE, pp, filt);
 	filt[1] = 99;
-	PN_out(buf1, SC_INT_S, BSIZE, pp, filt);};
+	PN_out(buf1, G_INT_S, BSIZE, pp, filt);};
 
     if (pid == 1)
        {filt[4] = prev;
 	filt[1] = 99;
-	PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	PN_in(buf2, G_INT_S, BSIZE, pp, filt);
 	PRINT(stdout,
 	      "   Got message from %d tag %d length %d\n",
 	      prev, 99, BSIZE);
@@ -320,7 +320,7 @@ static void test_type_sel(pp)
 
         filt[4] = next;
 	filt[1] = 99;
-	PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	PN_in(buf2, G_INT_S, BSIZE, pp, filt);
 	PRINT(stdout,
 	      "   Got message from %d tag %d length %d\n",
 	      next, 99, BSIZE);
@@ -328,7 +328,7 @@ static void test_type_sel(pp)
 
         filt[4] = prev;
 	filt[1] = 66;
-	PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	PN_in(buf2, G_INT_S, BSIZE, pp, filt);
 	PRINT(stdout,
 	      "   Got message from %d tag %d length %d\n",
 	      prev, 66, BSIZE);
@@ -336,7 +336,7 @@ static void test_type_sel(pp)
 
         filt[4] = next;
 	filt[1] = -1;
-	PN_in(buf2, SC_INT_S, BSIZE, pp, filt);
+	PN_in(buf2, G_INT_S, BSIZE, pp, filt);
 	PRINT(stdout,
 	      "   Got message from %d tag %d length %d\n",
 	      next, filt[1], BSIZE);
@@ -370,7 +370,7 @@ static void test_broadcast(pp)
     for (i = 0; i < nodes; i++)
         {fill_buf(buf1, BSIZE);
 
-         PN_out(buf1, SC_INT_S, BSIZE, pp, filt);
+         PN_out(buf1, G_INT_S, BSIZE, pp, filt);
 
 	 PRINT(stdout, "   Node %d got message from %d\n", pid, i);
 	 check_buf(buf1, BSIZE); 
@@ -416,7 +416,7 @@ static void test_rates(pp)
 	     tstart = SC_wall_clock_time();
              filt[4] = 1;
 	     for (j = 0 ; j < reps; j++)
-                 PN_in(buf1, SC_INT_S, bytes[i] >> 2, pp, filt);
+                 PN_in(buf1, G_INT_S, bytes[i] >> 2, pp, filt);
 
 	     tend = SC_wall_clock_time();
 	     secs = tend - tstart;
@@ -467,7 +467,7 @@ static void test_error(pp)
 	filt[4] = -999;
 	filt[5] = 0;
 
-        PN_out(buf1, SC_INT_S, BSIZE, pp, filt);};
+        PN_out(buf1, G_INT_S, BSIZE, pp, filt);};
 
     return;}
 

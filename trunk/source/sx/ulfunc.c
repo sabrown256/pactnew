@@ -27,7 +27,7 @@ static object *UL_select(SS_psides *si, object *s)
 
     j = -1;
     SS_args(si, s,
-            SC_INT_I, &j,
+            G_INT_I, &j,
             0);
 
     if ((j < 1) || (j > SX_gs.n_curves_read))
@@ -135,7 +135,7 @@ static object *_ULI_menui(SS_psides *si, object *s)
 
     j = -1;
     SS_args(si, s,
-            SC_INT_I, &j,
+            G_INT_I, &j,
             0);
 
     if ((0 < j) && (j <= SX_gs.n_curves_read))
@@ -241,7 +241,7 @@ static object *_ULI_expunge_macro(SS_psides *si, object *argl)
              s = SS_cdr(si, s))
 	    {t = SS_car(si, s);
              SS_args(si, t,
-		     SC_INT_I, &j,
+		     G_INT_I, &j,
 		     0);
 	     if ((0 <= j) && (j <= limit))
 	        {if (!UL_expunge(j))
@@ -301,7 +301,7 @@ static object *_ULI_color(SS_psides *si, object *obj, object *color)
 
     i = SX_get_crv_index_i(obj);
 
-    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, SC_INT_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, G_INT_P_S,
 			  "LINE-COLOR", SS_INTEGER_VALUE(color));
 
     return(obj);}
@@ -316,7 +316,7 @@ static object *_ULI_scatter(SS_psides *si, object *obj, object *flag)
 
     i = SX_get_crv_index_i(obj);
 
-    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, SC_INT_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, G_INT_P_S,
 			  "SCATTER", SS_INTEGER_VALUE(flag));
 
     return(obj);}
@@ -331,7 +331,7 @@ static object *_ULI_fill(SS_psides *si, object *obj, object *flag)
 
     i = SX_get_crv_index_i(obj);
 
-    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, SC_INT_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, G_INT_P_S,
 			  "FILL", SS_INTEGER_VALUE(flag));
 
     return(obj);}
@@ -384,7 +384,7 @@ static object *_ULI_marker(SS_psides *si, object *obj, object *flag)
     if ((mrk < 0) || (mrk >= mi))
        SS_error(si, "BAD MARKER VALUE - _ULI_MARKER", flag);
 
-    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, SC_INT_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, G_INT_P_S,
 			  "MARKER-INDEX", mrk);
 
     return(obj);}
@@ -419,7 +419,7 @@ static object *_ULI_hist(SS_psides *si, object *obj, object *flag)
     info = SX_gs.dataset[i].info;
     info = PG_set_plot_type(info, pty, pty);
 
-    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, SC_INT_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, G_INT_P_S,
 			  "HIST-START", side);
 
     SX_gs.dataset[i].info = info;
@@ -439,10 +439,10 @@ static object *_ULI_lnwidth(SS_psides *si, object *obj, object *width)
 
     wd = 0.0;
     SS_args(si, width,
-	    SC_DOUBLE_I, &wd,
+	    G_DOUBLE_I, &wd,
 	    0);
 
-    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, double, SC_DOUBLE_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, double, G_DOUBLE_P_S,
 			  "LINE-WIDTH", wd);
 
     return(obj);}
@@ -457,7 +457,7 @@ static object *_ULI_lnstyle(SS_psides *si, object *obj, object *style)
 
     i = SX_get_crv_index_i(obj);
 
-    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, SC_INT_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[i].info, int, G_INT_P_S,
 			  "LINE-STYLE", SS_INTEGER_VALUE(style));
 
     return(obj);}
@@ -518,8 +518,8 @@ static object *_ULI_range(SS_psides *si, object *argl)
 	       SS_error(si, "BAD ARGUMENTS - _ULI_RANGE", s);}
 	else
 	   {SS_args(si, argl,
-		    SC_DOUBLE_I, &wc[2],
-		    SC_DOUBLE_I, &wc[3],
+		    G_DOUBLE_I, &wc[2],
+		    G_DOUBLE_I, &wc[3],
 		    0);
 	    if (wc[2] == HUGE)
 	       SS_error(si, "BAD NUMBER LOWER LIMIT - _ULI_RANGE", argl);
@@ -555,7 +555,7 @@ static object *_ULI_clipping(SS_psides *si, object *argl)
 
     clp = TRUE;
     SS_args(si, argl,
-	    SC_INTEGER_I, &clp,
+	    G_INTEGER_I, &clp,
 	    0);
 
     dev = _UL_get_some_device();
@@ -600,8 +600,8 @@ static object *_ULI_domain(SS_psides *si, object *argl)
 	       SS_error(si, "BAD ARGUMENTS - _ULI_DOMAIN", s);}
 	else
 	   {SS_args(si, argl,
-		    SC_DOUBLE_I, &wc[0],
-		    SC_DOUBLE_I, &wc[1],
+		    G_DOUBLE_I, &wc[0],
+		    G_DOUBLE_I, &wc[1],
 		    0);
 	    if (wc[0] == HUGE)
 	       SS_error(si, "BAD NUMBER LOWER LIMIT - _ULI_DOMAIN", argl);
@@ -646,9 +646,9 @@ static object *_ULI_open_device(SS_psides *si, object *argl)
     type  = NULL;
     title = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &name,
-            SC_STRING_I, &type,
-            SC_STRING_I, &title,
+            G_STRING_I, &name,
+            G_STRING_I, &type,
+            G_STRING_I, &title,
             0);
 
     SC_str_upper(name);
@@ -767,7 +767,7 @@ static object *_ULI_quit(SS_psides *si, object *arg)
 
     exit_val = 0;
     SS_args(si, arg,
-            SC_INT_I, &exit_val,
+            G_INT_I, &exit_val,
             0);
 
     _UL_quit(si, exit_val);
@@ -872,9 +872,9 @@ static object *_ULI_menu(SS_psides *si, object *argl)
     pf = NULL;
     pn = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &pr,
-            SC_STRING_I, &pf,
-            SC_STRING_I, &pn,
+            G_STRING_I, &pr,
+            G_STRING_I, &pf,
+            G_STRING_I, &pn,
             0);
 
     ret = UL_print_labels(si, SX_gs.number, SX_gs.n_curves,
@@ -976,8 +976,8 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
     pr = NULL;
     pf = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &pr,
-            SC_STRING_I, &pf,
+            G_STRING_I, &pr,
+            G_STRING_I, &pf,
             0);
 
     ret = UL_print_labels(si, SX_gs.data_index, SX_gs.n_curves,
@@ -1085,8 +1085,8 @@ static object *_ULI_thin(SS_psides *si, int j, object *argl)
     type  = NULL;
     toler = 0.02;
     SS_args(si, argl,
-            SC_STRING_I, &type,
-            SC_DOUBLE_I, &toler,
+            G_STRING_I, &type,
+            G_DOUBLE_I, &toler,
             0);
 
     n  = SX_gs.dataset[j].n;
@@ -1149,11 +1149,11 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
     for (i = 0, k = 0; i < n; i++)
         {xt = x[0][i];
 	 SS_assign(si, xexpr, SS_make_list(si, G_OBJECT_I, dom_pred,
-				       SC_DOUBLE_I, &xt,
+				       G_DOUBLE_I, &xt,
 				       0));
 	 xt = x[1][i];
          SS_assign(si, yexpr, SS_make_list(si, G_OBJECT_I, ran_pred,
-				       SC_DOUBLE_I, &xt,
+				       G_DOUBLE_I, &xt,
 				       0));
          if ((SS_true(SS_exp_eval(si, xexpr))) &&
 	     (SS_true(SS_exp_eval(si, yexpr))))
@@ -1235,7 +1235,7 @@ static object *_ULI_label(SS_psides *si, object *argl)
     labl = NULL;
     SS_args(si, argl,
             UL_CURVE_INDEX_I, &j,
-            SC_STRING_I, &labl,
+            G_STRING_I, &labl,
             0);
 
     if (j < 0)
@@ -1461,7 +1461,7 @@ static object *_ULI_filter_coef(SS_psides *si, int l, object *argl)
     ntimes = 1;
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
-	    SC_INT_I, &ntimes,
+	    G_INT_I, &ntimes,
 	    0);
 
     SX_filter_coeff(si, SX_gs.dataset[l].x[1], SX_gs.dataset[l].n, arr, ntimes);
@@ -1487,7 +1487,7 @@ static object *_ULI_lnnorm(SS_psides *si, object *argl)
     order = 1;
     SS_args(si, argl,
             UL_CURVE_INDEX_I, &j,
-	    SC_INT_I, &order,
+	    G_INT_I, &order,
 	    0);
 
     n = SX_gs.dataset[j].n;
@@ -1511,8 +1511,8 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
     ntimes = 1;
 
     SS_args(si, argl,
-	    SC_INT_I, &pts,
-	    SC_INT_I, &ntimes,
+	    G_INT_I, &pts,
+	    G_INT_I, &ntimes,
 	    0);
 
     n = SX_gs.dataset[l].n;
@@ -1808,7 +1808,7 @@ static object *_ULI_append(SS_psides *si, object *argl)
 static object *UL_hide(SS_psides *si, int j)
    {object *o;
 
-    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[j].info, int, SC_INT_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[j].info, int, G_INT_P_S,
 			  "LINE-COLOR", -1);
 
     o = (object *) SX_gs.dataset[j].obj;
@@ -1823,7 +1823,7 @@ static object *UL_hide(SS_psides *si, int j)
 static object *UL_show(SS_psides *si, int j)
    {object *o;
 
-    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[j].info, int, SC_INT_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[j].info, int, G_INT_P_S,
 			  "LINE-COLOR",
 			  SX_next_color(SX_gs.graphics_device));
 
@@ -1881,11 +1881,11 @@ static object *_ULI_make_ln(SS_psides *si, object *argl)
     last   = 1.0;
     n      = SX_gs.default_npts;
     SS_args(si, argl,
-            SC_DOUBLE_I, &slope,
-            SC_DOUBLE_I, &interc,
-            SC_DOUBLE_I, &first,
-            SC_DOUBLE_I, &last,
-            SC_INT_I, &n,
+            G_DOUBLE_I, &slope,
+            G_DOUBLE_I, &interc,
+            G_DOUBLE_I, &first,
+            G_DOUBLE_I, &last,
+            G_INT_I, &n,
             0);
 
     o = _UL_make_ln(si, slope, interc, first, last, n);
@@ -1908,7 +1908,7 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_OBJECT_I, &xvals,
             G_OBJECT_I, &yvals,
-            SC_STRING_I, &labls,
+            G_STRING_I, &labls,
             0);
 
     if (!SS_consp(xvals))

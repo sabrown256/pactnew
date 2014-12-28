@@ -753,7 +753,7 @@ static int _SC_exec_srv_core(char *shell, char *fname, int na,
 		    "%s %s %d\n",
 		    _SC_EXEC_SRV_ID, _SC_EXEC_NCPU, np);
 
-    pi = SC_register_event_loop_callback(pe, SC_FILE_I, stdin,
+    pi = SC_register_event_loop_callback(pe, G_FILE_I, stdin,
 					 _SC_server_input,
 					 _SC_server_in_reject,
 					 -1);

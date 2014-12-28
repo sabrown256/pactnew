@@ -33,7 +33,7 @@ PyObject *_PY_fa1(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fa1(_la);
     _lo = PY_build_object("fa1",
-                          SC_INT_I, 0, &_rv,
+                          G_INT_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -69,7 +69,7 @@ PyObject *_PY_fa3(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fa3(_la, _lb, _lc);
     _lo = PY_build_object("fa3",
-                          SC_INT_I, 0, &_rv, _lb[0], _lb[1], _lb[2], _lc[0], _lc[1], _lc[2],
+                          G_INT_I, 0, &_rv, _lb[0], _lb[1], _lb[2], _lc[0], _lc[1], _lc[2],
                           0);
 
     return(_lo);}
@@ -102,7 +102,7 @@ PyObject *_PY_fa4(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fa4(_la, &_lb, _lc);
     _lo = PY_build_object("fa4",
-                          SC_INT_I, 0, &_rv, _lb, _lc,
+                          G_INT_I, 0, &_rv, _lb, _lc,
                           0);
 
     return(_lo);}
@@ -226,7 +226,7 @@ PyObject *_PY_fc1(PyObject *self, PyObject *args, PyObject *kwds)
 
     fc1(_la, _lb, &_lc, _ld);
     _lo = PY_build_object("fc1",
-                          SC_INT_I, 0, &_lc, _ld,
+                          G_INT_I, 0, &_lc, _ld,
                           0);
 
     return(_lo);}
@@ -260,7 +260,7 @@ PyObject *_PY_fc2(PyObject *self, PyObject *args, PyObject *kwds)
 
     fc2(_la, _lb, &_lc, _ld);
     _lo = PY_build_object("fc2",
-                          SC_INT_I, 0, &_lc, _ld,
+                          G_INT_I, 0, &_lc, _ld,
                           0);
 
     return(_lo);}
@@ -294,7 +294,7 @@ PyObject *_PY_fc3(PyObject *self, PyObject *args, PyObject *kwds)
 
     fc3(_la, _lb, &_lc, _ld);
     _lo = PY_build_object("fc3",
-                          SC_INT_I, 0, &_lc, _ld,
+                          G_INT_I, 0, &_lc, _ld,
                           0);
 
     return(_lo);}
@@ -328,7 +328,7 @@ PyObject *_PY_fc4(PyObject *self, PyObject *args, PyObject *kwds)
 
     fc4(_la, &_lb, &_lc, &_ld);
     _lo = PY_build_object("fc4",
-                          SC_INT_I, 0, &_lc, _ld,
+                          G_INT_I, 0, &_lc, _ld,
                           0);
 
     return(_lo);}
@@ -363,7 +363,7 @@ PyObject *_PY_fc5(PyObject *self, PyObject *args, PyObject *kwds)
 
     fc5(_la, _lb, _lc, _ld);
     _lo = PY_build_object("fc5",
-                          SC_INT_I, 0, &_lc[0], _lc[1], _ld[0], _ld[1],
+                          G_INT_I, 0, &_lc[0], _lc[1], _ld[0], _ld[1],
                           0);
 
     return(_lo);}
@@ -397,7 +397,7 @@ PyObject *_PY_fc6(PyObject *self, PyObject *args, PyObject *kwds)
 
     fc6(_la, &_lb, &_lc, &_ld);
     _lo = PY_build_object("fc6",
-                          SC_INT_I, 0, &_lc, _ld,
+                          G_INT_I, 0, &_lc, _ld,
                           0);
 
     return(_lo);}
@@ -432,7 +432,7 @@ PyObject *_PY_fc7(PyObject *self, PyObject *args, PyObject *kwds)
 
     fc7(_la, _lb, _lc, _ld);
     _lo = PY_build_object("fc7",
-                          SC_INT_I, 0, &_lc[0], _lc[1], _ld[0], _ld[1],
+                          G_INT_I, 0, &_lc[0], _lc[1], _ld[0], _ld[1],
                           0);
 
     return(_lo);}
@@ -711,7 +711,7 @@ static PyObject *PY_str_get_n(PY_str *self, void *context)
    {PyObject *rv;
 
     rv = PY_build_object("n",
-                         SC_LONG_I, 0, &self->pyo->n,
+                         G_LONG_I, 0, &self->pyo->n,
                          0);
 
     return(rv);}
@@ -723,7 +723,7 @@ static PyObject *PY_str_get_s(PY_str *self, void *context)
    {PyObject *rv;
 
     rv = PY_build_object("s",
-                         SC_STRING_I, 0, &self->pyo->s,
+                         G_STRING_I, 0, &self->pyo->s,
                          0);
 
     return(rv);}

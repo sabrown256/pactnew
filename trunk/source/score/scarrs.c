@@ -287,7 +287,7 @@ SC_array *_SC_make_array(char *type, int bpi,
 SC_array *_SC_string_array(char *name)
    {SC_array *a;
 
-    a = _SC_make_array(SC_STRING_S, sizeof(char *), NULL, name, 0);
+    a = _SC_make_array(G_STRING_S, sizeof(char *), NULL, name, 0);
 
     return(a);}
 
@@ -833,7 +833,7 @@ SC_array *SC_strings_array(int n, char **sa)
     a = CMAKE(SC_array);
 
     a->name  = "SC_STRINGS_ARRAY";
-    a->type  = SC_STRING_S;
+    a->type  = G_STRING_S;
     a->bpi   = sizeof(char *);
     a->nx    = n;
     a->n     = n;

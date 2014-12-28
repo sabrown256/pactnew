@@ -145,7 +145,7 @@ static void _PG_dom_lr_2d(PG_device *dev, double *rx, double *ry,
     emap = PM_check_emap(&eflag, alist, nmap);
 
     PG_get_attrs_alist(alist,
-		       "MESH-SUBSELECT", SC_POINTER_I, &str, NULL,
+		       "MESH-SUBSELECT", G_POINTER_I, &str, NULL,
 		       NULL);
 
     if (str == NULL)
@@ -352,9 +352,9 @@ static void _PG_dom_2d(PG_device *dev, PM_set *dom, PM_set *ran)
 	 r    = (double **) p->elements;
 
 	 PG_get_attrs_set(p,
-			  "LINE-COLOR", SC_INT_I,    &color, dev->BLUE,
-			  "LINE-STYLE", SC_INT_I,    &style, LINE_SOLID,
-			  "LINE-WIDTH", SC_DOUBLE_I, &width, 0.0,
+			  "LINE-COLOR", G_INT_I,    &color, dev->BLUE,
+			  "LINE-STYLE", G_INT_I,    &style, LINE_SOLID,
+			  "LINE-WIDTH", G_DOUBLE_I, &width, 0.0,
 			  NULL);
 
          if (style != LINE_NONE)
@@ -414,7 +414,7 @@ static void _PG_dom_lr_3d(PG_device *dev, double **r,
     t = PM_make_vectors(3, np);
 
     PG_get_attrs_alist(alist,
-		       "MESH-SUBSELECT", SC_POINTER_I, &str, NULL,
+		       "MESH-SUBSELECT", G_POINTER_I, &str, NULL,
 		       NULL);
 
     emap = PM_check_emap(&eflag, alist, n);
@@ -676,9 +676,9 @@ static void _PG_dom_ac_3d_shaded(PG_device *dev, double **r,
 
 /* check for applicable attributes */
     PG_get_attrs_alist(alist,
-		       "THETA-LIGHT", SC_DOUBLE_I,  &thl, thld,
-		       "PHI-LIGHT",   SC_DOUBLE_I,  &phl, phld,
-		       "PALETTE",     SC_POINTER_I, &pal, _PG.palette,
+		       "THETA-LIGHT", G_DOUBLE_I,  &thl, thld,
+		       "PHI-LIGHT",   G_DOUBLE_I,  &phl, phld,
+		       "PALETTE",     G_POINTER_I, &pal, _PG.palette,
 		       NULL);
 
     thl *= DEG_RAD;
@@ -757,8 +757,8 @@ static void _PG_dom_0d_3d(PG_device *dev, long npts,
     double **t;
 
     PG_get_attrs_alist(alst,
-		       "MARKER-INDEX", SC_INT_I,    &mrk,  0,
-		       "MARKER-SCALE", SC_DOUBLE_I, &dev->marker_scale, dev->marker_scale,
+		       "MARKER-INDEX", G_INT_I,    &mrk,  0,
+		       "MARKER-SCALE", G_DOUBLE_I, &dev->marker_scale, dev->marker_scale,
 		       NULL);
 
     t = PM_copy_vectors(3, npts, r);
@@ -831,7 +831,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 	else if (SC_is_type_fix(id) == TRUE)
 	   {int *fi;
 
-	    fi = SC_convert_id(SC_INT_I, NULL, 0, 1, id, f, 0, 1, n, FALSE);
+	    fi = SC_convert_id(G_INT_I, NULL, 0, 1, id, f, 0, 1, n, FALSE);
 	    for (i = 0; i < n; i++)
 	        {snprintf(lbl, MAXLINE, "%d", fi[i]);
 		 p[0] = r[0][i];
@@ -930,9 +930,9 @@ static void _PG_dom_3d(PG_device *dev, PM_set *dom, PM_set *ran)
 	 r = (double **) p->elements;
 
 	 PG_get_attrs_set(p,
-			  "LINE-COLOR", SC_INT_I,    &color, dev->WHITE,
-			  "LINE-STYLE", SC_INT_I,    &style, LINE_SOLID,
-			  "LINE-WIDTH", SC_DOUBLE_I, &width, 0.0,
+			  "LINE-COLOR", G_INT_I,    &color, dev->WHITE,
+			  "LINE-STYLE", G_INT_I,    &style, LINE_SOLID,
+			  "LINE-WIDTH", G_DOUBLE_I, &width, 0.0,
 			  NULL);
 
 	 PG_fset_line_color(dev, color, TRUE);
@@ -979,18 +979,18 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 
     alst = pd->alist;
     PG_get_attrs_alist(alst,
-		       "PLOT-TYPE",   SC_INT_I,     &_PG.ptype,   PLOT_MESH,
-		       "LINE-COLOR",  SC_INT_I,     &clr,      dev->WHITE,
-		       "LINE-STYLE",  SC_INT_I,     &sty,      LINE_SOLID,
-		       "LINE-WIDTH",  SC_DOUBLE_I,  &wid,      0.0,
-		       "THETA-LIGHT", SC_DOUBLE_I,  &thl,      45.0,
-		       "PHI-LIGHT",   SC_DOUBLE_I,  &phl,      45.0,
-		       "CENTERING",   SC_INT_I,     (int *) &_PG.cntrg,   N_CENT,
-		       "PALETTE",     SC_POINTER_I, &_PG.palette, dev->current_palette->name,
-		       "SCATTER",     SC_INT_I,     &_PG.scatter, _PG_gattrs.scatter_plot,
-		       "THETA",       SC_DOUBLE_I,  &th,       0.0,
-		       "PHI",         SC_DOUBLE_I,  &ph,       0.0,
-		       "CHI",         SC_DOUBLE_I,  &ch,       0.0,
+		       "PLOT-TYPE",   G_INT_I,     &_PG.ptype,   PLOT_MESH,
+		       "LINE-COLOR",  G_INT_I,     &clr,      dev->WHITE,
+		       "LINE-STYLE",  G_INT_I,     &sty,      LINE_SOLID,
+		       "LINE-WIDTH",  G_DOUBLE_I,  &wid,      0.0,
+		       "THETA-LIGHT", G_DOUBLE_I,  &thl,      45.0,
+		       "PHI-LIGHT",   G_DOUBLE_I,  &phl,      45.0,
+		       "CENTERING",   G_INT_I,     (int *) &_PG.cntrg,   N_CENT,
+		       "PALETTE",     G_POINTER_I, &_PG.palette, dev->current_palette->name,
+		       "SCATTER",     G_INT_I,     &_PG.scatter, _PG_gattrs.scatter_plot,
+		       "THETA",       G_DOUBLE_I,  &th,       0.0,
+		       "PHI",         G_DOUBLE_I,  &ph,       0.0,
+		       "CHI",         G_DOUBLE_I,  &ch,       0.0,
 		       NULL);
 
     pd->legend_palette_fl = FALSE;
@@ -1081,9 +1081,9 @@ void PG_domain_plot(PG_device *dev ARG(,,cls), PM_set *dom, PM_set *ran)
     PG_adorn_before(dev, pd, data);
 
     PG_get_attrs_set(dom,
-		     "LINE-COLOR",   SC_INT_I,    &color, dev->WHITE,
-		     "LINE-STYLE",   SC_INT_I,    &style, LINE_SOLID,
-		     "LINE-WIDTH",   SC_DOUBLE_I, &width, 0.0,
+		     "LINE-COLOR",   G_INT_I,    &color, dev->WHITE,
+		     "LINE-STYLE",   G_INT_I,    &style, LINE_SOLID,
+		     "LINE-WIDTH",   G_DOUBLE_I, &width, 0.0,
 		     NULL);
 
     PG_fset_line_color(dev, color, TRUE);
@@ -1151,13 +1151,13 @@ void PG_mesh_plot(PG_device *dev, PG_graph *data, ...)
 	      if (f == g->f)
 		 {extr = PM_get_limits(domain);
 		  PG_get_attrs_alist(tlst,
-				     "LINE-COLOR", SC_INT_I, &color, dev->BLUE,
+				     "LINE-COLOR", G_INT_I, &color, dev->BLUE,
 				     NULL);}
 	      else
 		 tlst = PG_set_attrs_alist(tlst,
-					   "DRAW-AXIS",  SC_INT_I, FALSE, FALSE,
-					   "DRAW-LABEL", SC_INT_I, FALSE, FALSE,
-					   "LINE-COLOR", SC_INT_I, FALSE, ++color,
+					   "DRAW-AXIS",  G_INT_I, FALSE, FALSE,
+					   "DRAW-LABEL", G_INT_I, FALSE, FALSE,
+					   "LINE-COLOR", G_INT_I, FALSE, ++color,
 					   NULL);
 
 /* temporarily make the domain info be the master list */
@@ -1287,9 +1287,9 @@ void PG_draw_domain_boundary(PG_device *dev, PM_mapping *f)
     PG_fset_palette(dev, "standard");
 
     PG_get_attrs_set(domain,
-		     "DOMAIN-BORDER-WIDTH", SC_DOUBLE_I, &dbwid, -1.0,
-		     "DOMAIN-BORDER-COLOR", SC_INT_I,    &dbclr, dev->WHITE,
-		     "DOMAIN-BORDER-STYLE", SC_INT_I,    &dbsty, LINE_SOLID,
+		     "DOMAIN-BORDER-WIDTH", G_DOUBLE_I, &dbwid, -1.0,
+		     "DOMAIN-BORDER-COLOR", G_INT_I,    &dbclr, dev->WHITE,
+		     "DOMAIN-BORDER-STYLE", G_INT_I,    &dbsty, LINE_SOLID,
 		     NULL);
 
     if (dbwid > -1.0)
@@ -1363,7 +1363,7 @@ void PG_ref_mesh(PG_device *dev, PG_graph *data, int ndims,
 	   {pv = CMAKE_N(double, 4);
 	    PG_box_copy(2, pv, bx);
 	    PG_set_attrs_graph(data,
-			       "VIEW-PORT", SC_DOUBLE_I, TRUE, pv,
+			       "VIEW-PORT", G_DOUBLE_I, TRUE, pv,
 			       NULL);};
 
 /* save some state */
@@ -1381,14 +1381,14 @@ void PG_ref_mesh(PG_device *dev, PG_graph *data, int ndims,
 
 /* save the line color */
 	PG_get_attrs_set(domain,
-			 "LINE-COLOR", SC_POINTER_I, &pc, NULL,
+			 "LINE-COLOR", G_POINTER_I, &pc, NULL,
 			 NULL);
 
 	_PG_gattrs.ref_mesh_color = _PG_trans_color(dev, _PG_gattrs.ref_mesh_color);
 
 /* set the line color for the reference mesh */
 	PG_set_attrs_set(domain,
-			 "LINE-COLOR", SC_INT_I, FALSE, _PG_gattrs.ref_mesh_color,
+			 "LINE-COLOR", G_INT_I, FALSE, _PG_gattrs.ref_mesh_color,
 			 NULL);
 
 	PG_mesh_plot(dev, data, ndims);
@@ -1406,7 +1406,7 @@ void PG_ref_mesh(PG_device *dev, PG_graph *data, int ndims,
 	   PG_rem_attrs_set(domain, "LINE-COLOR", NULL);
 	else
 	   PG_set_attrs_set(domain,
-			    "LINE-COLOR", SC_INT_I, TRUE, pc,
+			    "LINE-COLOR", G_INT_I, TRUE, pc,
 			    NULL);
 
 	data->mesh = mshf;};

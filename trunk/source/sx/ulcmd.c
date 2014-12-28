@@ -517,8 +517,8 @@ object *_ULI_thru(SS_psides *si, object *argl)
        {int first = 0, last = 0, id;
         
         SS_args(si, argl,
-                SC_INT_I, &first,
-                SC_INT_I, &last,
+                G_INT_I, &first,
+                G_INT_I, &last,
                 0);
 
         if (first < 1)
@@ -644,9 +644,9 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
     xstep  = 0.1;
     SS_args(si, argl,
             G_OBJECT_I, &crv,
-            SC_DOUBLE_I, &xstart,
-            SC_DOUBLE_I, &xstop,
-            SC_DOUBLE_I, &xstep,
+            G_DOUBLE_I, &xstart,
+            G_DOUBLE_I, &xstop,
+            G_DOUBLE_I, &xstep,
             0);
 
     j = SX_get_crv_index_i(crv);
@@ -807,7 +807,7 @@ void UL_init_env(SS_psides *si)
 
     plot_type = PG_ptr_attr_glb("plot-type");
 
-    PG_register_variable("Plot Type", SC_INT_S,
+    PG_register_variable("Plot Type", G_INT_S,
 			 plot_type, NULL, NULL);
 
 /* add the SX annotation stuff */

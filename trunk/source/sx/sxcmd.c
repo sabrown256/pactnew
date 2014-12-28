@@ -58,7 +58,7 @@ static int _SX_rd_scm(SS_psides *si)
     cmd = (SX_gs.sm == SX_MODE_PDBVIEW) ? "cf" : "rd";
 
     SS_call_scheme(si, cmd,
-                   SC_STRING_I, _SX.bf,
+                   G_STRING_I, _SX.bf,
                    0);
 
     return(TRUE);}
@@ -191,9 +191,9 @@ static object *SXI_mapping_ref(SS_psides *si, object *argl)
     dtype = NULL;
     indx  = -1;
     SS_args(si, argl,
-            SC_STRING_I, &fname,
-            SC_STRING_I, &dtype,
-            SC_INT_I, &indx,
+            G_STRING_I, &fname,
+            G_STRING_I, &dtype,
+            G_INT_I, &indx,
             0);
 
     o = _SX_mapping_ref(si, fname, dtype, indx);
@@ -297,8 +297,8 @@ static object *_SXI_thru(SS_psides *si, object *argl)
 	first = 0;
 	last  = 0;
         SS_args(si, argl,
-                SC_INT_I, &first,
-                SC_INT_I, &last,
+                G_INT_I, &first,
+                G_INT_I, &last,
                 0);
 
         if (first < 1)

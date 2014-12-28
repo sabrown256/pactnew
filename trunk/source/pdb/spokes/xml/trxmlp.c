@@ -255,7 +255,7 @@ static void _XML_entry_info(char *s, char **ptype, long *pni)
 
 	     if (pe == pb)
 	        ok = FALSE;};
-        type = SC_LONG_S;};
+        type = G_LONG_S;};
 
 /* check for doubles */
     if (ok == FALSE)
@@ -271,11 +271,11 @@ static void _XML_entry_info(char *s, char **ptype, long *pni)
 
 	     if (pe == pb)
 	        ok = FALSE;};
-        type = SC_DOUBLE_S;};
+        type = G_DOUBLE_S;};
 
 /* otherwise it is char */
     if (ok == FALSE)
-       {type = SC_CHAR_S;
+       {type = G_CHAR_S;
 	ni   = strlen(s);};
 
     type = CSTRSAVE(type);

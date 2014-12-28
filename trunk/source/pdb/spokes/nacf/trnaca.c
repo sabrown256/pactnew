@@ -48,7 +48,7 @@ static long *_NAC_unpack_table(PDBfile *file, char *rt, char *dt,
 
     n  = nrt/5;
     ft = CMAKE_N(long, nrt);
-    _PD_conv_in(file, ft, rt, SC_LONG_S, (long) nrt);
+    _PD_conv_in(file, ft, rt, G_LONG_S, (long) nrt);
 
 /* compute the number of words per entry (nwpe) */
     nwpe = 0L;
@@ -533,7 +533,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 	_PD_init_chrt(file, TRUE);
 
-	_PD_conv_in(file, SS_params, &str[16], SC_LONG_S, 8L);
+	_PD_conv_in(file, SS_params, &str[16], G_LONG_S, 8L);
 
 /* get the table pointer table */
 	tptlen  = SS_params[4];
@@ -548,7 +548,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	if (nr != tptlen)
 	   PD_error("FAILED TO READ TABLE POINTER TABLE - _NAC_OPEN", PD_OPEN);
 
-	_PD_conv_in(file, tp, bf, SC_LONG_S, (long) tptlen);
+	_PD_conv_in(file, tp, bf, G_LONG_S, (long) tptlen);
 	CFREE(bf);
 
 /* get the directory field table */

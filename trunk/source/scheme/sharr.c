@@ -30,7 +30,7 @@ static object *_SSI_hash_install(SS_psides *si, object *argl)
     obj  = SS_null;
     tab  = si->symtab;
     SS_args(si, argl,
-	    SC_STRING_I, &name,
+	    G_STRING_I, &name,
 	    G_OBJECT_I, &obj,
 	    G_HASHARR_I, &tab,
 	    0);
@@ -62,7 +62,7 @@ static object *_SSI_hash_lookup(SS_psides *si, object *argl)
     name = NULL;
     tab  = si->symtab;
     SS_args(si, argl,
-	    SC_STRING_I, &name,
+	    G_STRING_I, &name,
 	    G_HASHARR_I, &tab,
 	    0);
 
@@ -89,7 +89,7 @@ static object *_SSI_hash_remove(SS_psides *si, object *argl)
     name = NULL;
     tab  = si->symtab;
     SS_args(si, argl,
-	    SC_STRING_I, &name,
+	    G_STRING_I, &name,
 	    G_HASHARR_I, &tab,
 	    0);
 
@@ -125,7 +125,7 @@ object *SS_hash_dump(SS_psides *si, object *argl)
 
     SS_args(si, argl,
             G_OBJECT_I, &to,
-	    SC_STRING_I, &patt,
+	    G_STRING_I, &patt,
 	    G_OBJECT_I, &sort,
             0);
 
@@ -197,9 +197,9 @@ static object *_SSI_make_hasharr(SS_psides *si, object *arg)
 
     sz  = 0;
     typ = SC_arrtype(arg, -1);
-    if (typ == SC_INT_I)
+    if (typ == G_INT_I)
        sz = (int) SS_INTEGER_VALUE(arg);
-    else if (typ == SC_FLOAT_I)
+    else if (typ == G_FLOAT_I)
        sz = (int) SS_FLOAT_VALUE(arg);
     else
        SS_error(si, "BAD ARGUMENT - MAKE-HASH-TABLE", arg);

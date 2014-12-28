@@ -244,7 +244,7 @@ inti _PD_cast_size(memdes *meml, void *svr, memdes *desc)
 	     else
 	        sn = md->number;
 
-	     dm = SC_convert_id(SC_INT64_I, NULL, 0, 1,
+	     dm = SC_convert_id(G_INT64_I, NULL, 0, 1,
 				sid, p, 0, 1, sn, FALSE);
 
 	     n = 1;
@@ -283,7 +283,7 @@ int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
     dp   = PD_inquire_type(file, type);
     desc = _PD_inquire_member_name(dp, contr);
     if ((desc == NULL) ||
-	(strcmp(desc->base_type, SC_CHAR_S) != 0) ||
+	(strcmp(desc->base_type, G_CHAR_S) != 0) ||
 	!_PD_indirection(desc->type))
        {PD_error("BAD CAST CONTROLLER - PD_CAST", PD_GENERIC);
 	rv = FALSE;};

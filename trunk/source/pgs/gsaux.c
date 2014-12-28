@@ -419,7 +419,7 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
 	    {ityp = SC_type_id(type[i], FALSE);
 
 /* fixed point types */
-	     if (ityp == SC_INT_I)
+	     if (ityp == G_INT_I)
 	        {lbytes = ni[i] << 1;
 		 if (ni[i] == 1)
 		    iv[i] = SC_VA_ARG(int);
@@ -427,21 +427,21 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
 		    piv[i] = SC_VA_ARG(int *);}
 
 /* floating point types */
-	     else if (ityp == SC_DOUBLE_I)
+	     else if (ityp == G_DOUBLE_I)
 	        {lbytes = ni[i] << 2;
 		 if (ni[i] == 1)
 		    dv[i] = SC_VA_ARG(double);
 		 else
 		    pdv[i] = SC_VA_ARG(double *);}
 
-	     else if (ityp == SC_CHAR_I)
+	     else if (ityp == G_CHAR_I)
 	        {lbytes = ni[i];
 		 if (ni[i] == 1)
 		    cv[i] = SC_VA_ARG(int);
 		 else
 		    pcv[i] = SC_VA_ARG(char *);}
 
-	     else if (ityp == SC_STRING_I)
+	     else if (ityp == G_STRING_I)
 	        {if (ni[i] == 1)
 		    {pcv[i] = SC_VA_ARG(char *);
 		     if (pcv[i] != NULL)
@@ -484,7 +484,7 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
 	    {ityp = SC_type_id(type[i], FALSE);
 
 /* fixed point types */
-	     if (ityp == SC_INT_I)
+	     if (ityp == G_INT_I)
 	        {if (ni[i] == 1)
 		    abytes -= PG_CGM_word(dev, &iv[i], 1L,
 					  nbytes, morec);
@@ -493,7 +493,7 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
 					  nbytes, morec);}
 
 /* floating point types */
-	     else if (ityp == SC_DOUBLE_I)
+	     else if (ityp == G_DOUBLE_I)
 	        {if (ni[i] == 1)
 		    abytes -= PG_CGM_double(dev, &dv[i], 1L,
 					    nbytes, morec);
@@ -501,7 +501,7 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
 		    abytes -= PG_CGM_double(dev, pdv[i], (long) ni[i],
 					    nbytes, morec);}
 
-	     else if (ityp == SC_CHAR_I)
+	     else if (ityp == G_CHAR_I)
 	        {if (ni[i] == 1)
 		    abytes -= PG_CGM_byte(dev, &cv[i], 1L,
 					  nbytes, morec);
@@ -509,7 +509,7 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
 		    abytes -= PG_CGM_byte(dev, pcv[i], (long) ni[i],
 					  nbytes, morec);}
 
-	     else if (ityp == SC_STRING_I)
+	     else if (ityp == G_STRING_I)
 	        {if (ni[i] == 1)
 		    {nb =  PG_CGM_string(dev, &pcv[i], 1L,
 					 nbytes, morec, TRUE);

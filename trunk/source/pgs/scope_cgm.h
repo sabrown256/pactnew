@@ -23,10 +23,10 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define CGM_NO_OP                         0,0,1,1,SC_STRING_S
-#define BEGIN_METAFILE                    0,1,1,1,SC_STRING_S
+#define CGM_NO_OP                         0,0,1,1,G_STRING_S
+#define BEGIN_METAFILE                    0,1,1,1,G_STRING_S
 #define END_METAFILE                      0,2,0,0,NULL
-#define BEGIN_PICTURE                     0,3,1,1,SC_STRING_S
+#define BEGIN_PICTURE                     0,3,1,1,G_STRING_S
 #define BEGIN_PICTURE_BODY                0,4,0,0,NULL
 #define END_PICTURE                       0,5,0,0,NULL
 
@@ -36,15 +36,15 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define METAFILE_VERSION                  1,1,1,1,SC_INT_S
-#define METAFILE_DESCRIPTION              1,2,1,1,SC_STRING_S
-#define VDC_TYPE                          1,3,1,1,SC_INT_S
-#define INTEGER_PRECISION                 1,4,1,1,SC_INT_S
-#define REAL_PRECISION                    1,5,1,3,SC_INT_S
-#define MAXIMUM_COLOUR_INDEX              1,9,1,1,SC_CHAR_S
-#define METAFILE_ELEMENT_LIST             1,11,1,3,SC_INT_S
+#define METAFILE_VERSION                  1,1,1,1,G_INT_S
+#define METAFILE_DESCRIPTION              1,2,1,1,G_STRING_S
+#define VDC_TYPE                          1,3,1,1,G_INT_S
+#define INTEGER_PRECISION                 1,4,1,1,G_INT_S
+#define REAL_PRECISION                    1,5,1,3,G_INT_S
+#define MAXIMUM_COLOUR_INDEX              1,9,1,1,G_CHAR_S
+#define METAFILE_ELEMENT_LIST             1,11,1,3,G_INT_S
 #define METAFILE_DEFAULTS_REPLACEMENT(n)  1,12,1,n,NULL
-#define FONT_LIST(n)                      1,13,1,n,SC_STRING_S
+#define FONT_LIST(n)                      1,13,1,n,G_STRING_S
 
 /* not currently used */
 
@@ -65,9 +65,9 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define COLOUR_SELECTION_MODE           2,2,1,1,SC_INT_S
-#define BACKGROUND_COLOUR               2,7,1,3,SC_CHAR_S
-#define LINE_WIDTH_SPECIFICATION_MODE   2,3,1,1,SC_INT_S
+#define COLOUR_SELECTION_MODE           2,2,1,1,G_INT_S
+#define BACKGROUND_COLOUR               2,7,1,3,G_CHAR_S
+#define LINE_WIDTH_SPECIFICATION_MODE   2,3,1,1,G_INT_S
 
 /* not currently used */
 
@@ -86,8 +86,8 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define CLIP_RECTANGLE                  3,5,1,4,SC_INT_S
-#define CLIP_INDICATOR                  3,6,1,1,SC_INT_S
+#define CLIP_RECTANGLE                  3,5,1,4,G_INT_S
+#define CLIP_INDICATOR                  3,6,1,1,G_INT_S
 
 /* not currently used */
 
@@ -106,27 +106,27 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define POLYLINE(n)                     4,1,1,n,SC_INT_S
-#define DISJOINT_POLYLINE(n)            4,2,1,n,SC_INT_S
+#define POLYLINE(n)                     4,1,1,n,G_INT_S
+#define DISJOINT_POLYLINE(n)            4,2,1,n,G_INT_S
 
 #ifdef TEXT
 # undef TEXT
 #endif
 
-#define TEXT                            4,4,2,3,SC_INT_S
-#define POLYGON(n)                      4,7,1,n,SC_INT_S
-#define CELL_ARRAY(p, n)                4,9,2,10,SC_INT_S,p,n,SC_CHAR_S
+#define TEXT                            4,4,2,3,G_INT_S
+#define POLYGON(n)                      4,7,1,n,G_INT_S
+#define CELL_ARRAY(p, n)                4,9,2,10,G_INT_S,p,n,G_CHAR_S
 
 /* not currently used */
 
 #if 0
 
-#define POLYMARKER(n)                   4,3,n,SC_INT_S
+#define POLYMARKER(n)                   4,3,n,G_INT_S
 #define RESTRICTED_TEXT                 4,5,5
 #define APPEND_TEXT                     4,6,2
 #define POLYGON_SET                     4,8,2                 /* unusual */
 #define GENERALIZED_DRAWING_PRIMITIVE   4,10,1,"gdp *"        /* unusual */
-#define RECTANGLE                       4,11,4,SC_INT_S
+#define RECTANGLE                       4,11,4,G_INT_S
 #define CIRCLE                          4,12,2
 #define CIRCULAR_ARC_3_POINT            4,13,3
 #define CIRCULAR_ARC_3_POINT_CLOSE      4,14,4
@@ -146,17 +146,17 @@
 
 #undef TEXT_ALIGNMENT
 
-#define LINE_TYPE                       5,2,1,1,SC_INT_S
-#define LINE_WIDTH                      5,3,1,1,SC_INT_S
-#define LINE_COLOUR                     5,4,1,1,SC_CHAR_S
-#define TEXT_FONT_INDEX                 5,10,1,1,SC_INT_S
-#define TEXT_PRECISION                  5,11,1,1,SC_INT_S
-#define TEXT_COLOUR                     5,14,1,1,SC_CHAR_S
-#define CHARACTER_HEIGHT                5,15,1,1,SC_INT_S
-#define CHARACTER_ORIENTATION           5,16,1,4,SC_INT_S
-#define TEXT_ALIGNMENT(al, ca)          5,18,2,2,SC_INT_S,al,2,SC_DOUBLE_S,ca
-#define INTERIOR_STYLE                  5,22,1,1,SC_INT_S
-#define FILL_COLOUR                     5,23,1,1,SC_CHAR_S
+#define LINE_TYPE                       5,2,1,1,G_INT_S
+#define LINE_WIDTH                      5,3,1,1,G_INT_S
+#define LINE_COLOUR                     5,4,1,1,G_CHAR_S
+#define TEXT_FONT_INDEX                 5,10,1,1,G_INT_S
+#define TEXT_PRECISION                  5,11,1,1,G_INT_S
+#define TEXT_COLOUR                     5,14,1,1,G_CHAR_S
+#define CHARACTER_HEIGHT                5,15,1,1,G_INT_S
+#define CHARACTER_ORIENTATION           5,16,1,4,G_INT_S
+#define TEXT_ALIGNMENT(al, ca)          5,18,2,2,G_INT_S,al,2,G_DOUBLE_S,ca
+#define INTERIOR_STYLE                  5,22,1,1,G_INT_S
+#define FILL_COLOUR                     5,23,1,1,G_CHAR_S
 #define COLOUR_TABLE(n)                 5,34,1,n,"PG_palette"
 
 /* not currently used */

@@ -150,7 +150,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
            break;
         pv  = CMAKE(int);
         *pv = dm;
-        nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
+        nxt = SC_mk_pcons(G_INT_P_S, pv, G_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = nxt;
         else
@@ -162,7 +162,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
        while ((dm = SC_VA_ARG(int)) != UNITS)
           {pv  = CMAKE(int);
            *pv = dm;
-           nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
+           nxt = SC_mk_pcons(G_INT_P_S, pv, G_PCONS_P_S, NULL);
            if (du == NULL)
               du = nxt;
            else
@@ -296,7 +296,7 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
            break;
         pv  = CMAKE(int);
         *pv = dm;
-        nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
+        nxt = SC_mk_pcons(G_INT_P_S, pv, G_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = nxt;
         else
@@ -308,7 +308,7 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
        while ((dm = SC_VA_ARG(int)) != UNITS)
           {pv  = CMAKE(int);
            *pv = dm;
-           nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
+           nxt = SC_mk_pcons(G_INT_P_S, pv, G_PCONS_P_S, NULL);
            if (du == NULL)
               du = nxt;
            else
@@ -397,7 +397,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
            break;
         pv  = CMAKE(int);
         *pv = dm;
-        next = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
+        next = SC_mk_pcons(G_INT_P_S, pv, G_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = next;
         else
@@ -409,7 +409,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
        while ((dm = SC_VA_ARG(int)) != UNITS)
           {pv  = CMAKE(int);
            *pv = dm;
-           next = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
+           next = SC_mk_pcons(G_INT_P_S, pv, G_PCONS_P_S, NULL);
            if (du == NULL)
               du = next;
            else
@@ -638,7 +638,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 	PD_cd(pdrs, "/");
 
 /* save the definition constants */
-	PD_write(pdrs, "n_units", SC_INT_S, &PA_gs.n_units);
+	PD_write(pdrs, "n_units", G_INT_S, &PA_gs.n_units);
 	_PA_wr_pseudo_plot_requests(pdrs);
 
 /* check every element of PA_gs.variable_tab to find the RESTART variables */

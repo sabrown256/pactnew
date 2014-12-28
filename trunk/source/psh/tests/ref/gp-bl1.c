@@ -39,7 +39,7 @@ PyObject *_PY_fav2(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fav2();
     _lo = PY_build_object("fav2",
-                          SC_INT_I, 0, &_rv,
+                          G_INT_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -57,7 +57,7 @@ PyObject *_PY_fav3(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fav3();
     _lo = PY_build_object("fav3",
-                          SC_DOUBLE_I, 0, &_rv,
+                          G_DOUBLE_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -93,7 +93,7 @@ PyObject *_PY_favp1(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = favp1();
     _lo = PY_build_object("favp1",
-                          SC_VOID_I, 0, &_rv,
+                          G_VOID_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -111,7 +111,7 @@ PyObject *_PY_favp2(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = favp2();
     _lo = PY_build_object("favp2",
-                          SC_INT_I, 0, &_rv,
+                          G_INT_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -129,7 +129,7 @@ PyObject *_PY_favp3(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = favp3();
     _lo = PY_build_object("favp3",
-                          SC_DOUBLE_I, 0, &_rv,
+                          G_DOUBLE_I, 0, &_rv,
                           0);
 
     return(_lo);}

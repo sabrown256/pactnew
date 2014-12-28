@@ -206,7 +206,7 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
  */
     if (s[0] == '\0')
        {if (count > 8)
-           SC_remove_event_loop_callback(pe, SC_FILE_I, stdin);
+           SC_remove_event_loop_callback(pe, G_FILE_I, stdin);
 
 	count++;}
 
@@ -234,7 +234,7 @@ static void _SC_ex_trm_rej(int fd, int mask, void *a)
  * the whole CPU handling the infinite streams of EOFs
  */
     if (_SC.tty_n_rej > 16)
-       SC_remove_event_loop_callback(pe, SC_FILE_I, stdin);
+       SC_remove_event_loop_callback(pe, G_FILE_I, stdin);
 
     _SC.tty_n_rej++;
 
@@ -406,7 +406,7 @@ static int _SC_do_session(PROCESS *pp,
     pe = SC_make_event_loop(NULL, NULL, _SC_process_end, -1, -1, -1);
 
 /* register the I/O channels for the event loop to monitor */
-    pi  = SC_register_event_loop_callback(pe, SC_FILE_I, stdin,
+    pi  = SC_register_event_loop_callback(pe, G_FILE_I, stdin,
 					  in, irej, -1);
     pi &= SC_register_event_loop_callback(pe, G_PROCESS_I, pp,
 					  out, orej, -1);

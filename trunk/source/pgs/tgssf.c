@@ -153,7 +153,7 @@ int main(int argc, char **argv)
     emap = CMAKE_N(char, n_pts);
     memset(emap, 1, n_pts);
     alist = PG_set_attrs_alist(NULL,
-			      "EXISTENCE", SC_CHAR_I, TRUE, emap,
+			      "EXISTENCE", G_CHAR_I, TRUE, emap,
 			      NULL);
 
     PG_open_console("TGSSF", "MONOCHROME", 1,

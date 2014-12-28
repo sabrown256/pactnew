@@ -69,9 +69,9 @@ void PA_transpose_pp(char *ppname, int ntp, int nuv)
 
 /* close the pp file */
     if (PA_gs.pp_file != NULL)
-       {PD_write(PA_gs.pp_file, "n-time-plots",  SC_INT_S, &ntp);
-        PD_write(PA_gs.pp_file, "n-time-arrays", SC_INT_S, &nuv);
-        PD_write(PA_gs.pp_file, "last-cycle",    SC_INT_S, &PA_gs.current_pp_cycle);
+       {PD_write(PA_gs.pp_file, "n-time-plots",  G_INT_S, &ntp);
+        PD_write(PA_gs.pp_file, "n-time-arrays", G_INT_S, &nuv);
+        PD_write(PA_gs.pp_file, "last-cycle",    G_INT_S, &PA_gs.current_pp_cycle);
 
         PA_ERR(!PD_close(PA_gs.pp_file),
                "TROUBLE CLOSING POST PROCESSOR FILE %s - PA_TRANSPOSE_PP",
@@ -136,7 +136,7 @@ static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
     crve     = CMAKE_N(double *, n_arrays);
     stripe   = CMAKE_N(double, n_arrays);
 
-    SC_strncpy(type, 10, SC_DOUBLE_S, -1);
+    SC_strncpy(type, 10, G_DOUBLE_S, -1);
 
 /* find the maximum possible curve length */
     nptm = _PA.last_cycle - _PA.first_cycle + 1;
@@ -169,7 +169,7 @@ static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
     ind[0] = 1L;
     ind[2] = 1L;
     for (i = 0; i < n_dom; i++)
-        {nptm   = SC_arrlen(crve[i])/SIZEOF(SC_DOUBLE_S);
+        {nptm   = SC_arrlen(crve[i])/SIZEOF(G_DOUBLE_S);
          ind[1] = nptm;
 
          snprintf(_PA.pp_title, MAXLINE, "td%d", i);
@@ -181,11 +181,11 @@ static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
     ind[0] = 1L;
     ind[2] = 1L;
     for (i = nfirst, j = n_dom; i <= nlast; i++, j++)
-        {nptm   = SC_arrlen(crve[j])/SIZEOF(SC_DOUBLE_S);
+        {nptm   = SC_arrlen(crve[j])/SIZEOF(G_DOUBLE_S);
          ind[1] = nptm;
 
          snprintf(_PA.pp_title, MAXLINE, "tn%d", i);
-         PD_write(_PA.pduf, _PA.pp_title, SC_INT_S, &nptm);
+         PD_write(_PA.pduf, _PA.pp_title, G_INT_S, &nptm);
 
          snprintf(_PA.pp_title, MAXLINE, "td%d", i + n_dom);
          PD_write_alt(_PA.pduf, _PA.pp_title, type, crve[j], 1, ind);
@@ -243,7 +243,7 @@ void _PA_proc_time(char *ufname)
 /* enter the ultra tag */
          snprintf(_PA.pp_title, MAXLINE, "curve%04d", _PA.n_curve++);
          ind[1] = strlen(_PA.pp_bf) + 1;
-         PD_write_alt(_PA.pduf, _PA.pp_title, SC_CHAR_S, _PA.pp_bf, 1, ind);
+         PD_write_alt(_PA.pduf, _PA.pp_title, G_CHAR_S, _PA.pp_bf, 1, ind);
 
 /* extract the names of the label, x array, y array and number of points */
          labl = SC_strtok(_PA.pp_bf, "|", s);
@@ -257,7 +257,7 @@ void _PA_proc_time(char *ufname)
          PA_ERR(!PD_read(PA_gs.pp_file, labl, _PA.pp_ubf),
                 "BAD LABEL - PROC-TIME");
          ind[1] = strlen(_PA.pp_ubf) + 1;
-         PD_write_alt(_PA.pduf, labl, SC_CHAR_S, _PA.pp_ubf, 1, ind);
+         PD_write_alt(_PA.pduf, labl, G_CHAR_S, _PA.pp_ubf, 1, ind);
 
 /* if the maximum number of curves is reached
  * write out the curves and start a new file

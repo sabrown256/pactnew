@@ -179,8 +179,8 @@ object *_SXI_menu(SS_psides *si, object *argl)
     type = NULL;
     SS_args(si, argl,
             G_SX_FILE_I, &po,
-            SC_STRING_I, &patt,
-            SC_STRING_I, &type,
+            G_STRING_I, &patt,
+            G_STRING_I, &type,
             0);
 
     if (strcmp(po->type, G_PDBFILE_S) != 0)
@@ -259,7 +259,7 @@ void _SX_get_menu(SS_psides *si, SX_file *po)
 	    _SX_push_menu_item(si, po, names[i], G_PG_IMAGE_P_S);
 	CFREE(names);};
 
-    names = PD_ls(file, dir, SC_CHAR_S, &n);
+    names = PD_ls(file, dir, G_CHAR_S, &n);
     if (names != NULL)
        {for (i = 0; i < n; i++)
 	    if (SC_regx_match(names[i], "curve????"))

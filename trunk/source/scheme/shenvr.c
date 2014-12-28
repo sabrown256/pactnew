@@ -821,13 +821,13 @@ char *_SS_get_print_name(SS_psides *si, object *o)
         else if (SS_complexp(o))
 	   {complex c;
 	    c = SS_COMPLEX_VALUE(o);
-	    SC_ntos(t, MAXLINE, SC_DOUBLE_COMPLEX_I, &c, 0, 1);
+	    SC_ntos(t, MAXLINE, G_DOUBLE_COMPLEX_I, &c, 0, 1);
 	    s = t;}
 
         else if (SS_quaternionp(o))
 	   {quaternion q;
 	    q = SS_QUATERNION_VALUE(o);
-	    SC_ntos(t, MAXLINE, SC_QUATERNION_I, &q, 0, 1);
+	    SC_ntos(t, MAXLINE, G_QUATERNION_I, &q, 0, 1);
 	    s = t;}
 
         else if (o->print_name != NULL)
@@ -1207,11 +1207,11 @@ static void _SS_init_scheme(SS_psides *si)
     SS_assign(si, si->env, si->global_env);
 
     SS_define_constant(si, 1,
-		       "system-arch",      SC_STRING_I, PSY_Arch,
-		       "system-id",        SC_STRING_I, PSY_ID,
-		       "system-compiler",  SC_STRING_I, USE_COMPILER,
-		       "compiler-version", SC_STRING_I, COMPILER_VERSION,
-		       "pact-version",     SC_STRING_I, PACT_VERSION,
+		       "system-arch",      G_STRING_I, PSY_Arch,
+		       "system-id",        G_STRING_I, PSY_ID,
+		       "system-compiler",  G_STRING_I, USE_COMPILER,
+		       "compiler-version", G_STRING_I, COMPILER_VERSION,
+		       "pact-version",     G_STRING_I, PACT_VERSION,
 		       "argv",             G_OBJECT_I, SS_null,
 		       "stdin",            G_OBJECT_I, si->indev,
 		       "stdout",           G_OBJECT_I, si->outdev,

@@ -38,7 +38,7 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
         if (pp->data != NULL)
            {ep = pp->desc;
 	    id = SC_type_id(PD_entry_type(ep), FALSE);
-            if (id == SC_DOUBLE_I)
+            if (id == G_DOUBLE_I)
                {ni   = PD_entry_number(ep);
                 conv = pp->conv/pp->unit;
                 PM_array_scale(pp->data, ni, conv);
@@ -63,7 +63,7 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
         else if (pp->data != NULL)
            {ep = pp->desc;
 	    id = SC_type_id(PD_entry_type(ep), FALSE);
-            if (id == SC_DOUBLE_I)
+            if (id == G_DOUBLE_I)
                {ni   = PD_entry_number(ep);
                 conv = pp->conv/pp->unit;
                 PM_array_scale(pp->data, ni, conv);

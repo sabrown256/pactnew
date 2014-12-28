@@ -164,15 +164,15 @@ static object *_SXI_pan_simulate(SS_psides *si, object *argl)
     ti = 0.0;
     tf = 0.0;
     SS_args(si, argl,
-            SC_DOUBLE_I, &ti,
-            SC_DOUBLE_I, &tf,
-            SC_DOUBLE_I, &_SX.dtf_min,
-            SC_DOUBLE_I, &_SX.dtf_max,
-            SC_DOUBLE_I, &_SX.dtf_inc,
-            SC_STRING_I, &_SX.rsname,
-            SC_STRING_I, &_SX.edname,
-            SC_STRING_I, &_SX.ppname,
-            SC_STRING_I, &_SX.gfname,
+            G_DOUBLE_I, &ti,
+            G_DOUBLE_I, &tf,
+            G_DOUBLE_I, &_SX.dtf_min,
+            G_DOUBLE_I, &_SX.dtf_max,
+            G_DOUBLE_I, &_SX.dtf_inc,
+            G_STRING_I, &_SX.rsname,
+            G_STRING_I, &_SX.edname,
+            G_STRING_I, &_SX.ppname,
+            G_STRING_I, &_SX.gfname,
             0);
 
     ti *= PA_gs.units[SEC]/PA_gs.convrsns[SEC];
@@ -215,9 +215,9 @@ static object *_SXI_run_package(SS_psides *si, object *argl)
 
     SS_args(si, argl,
             G_PA_PACKAGE_I, &pck,
-            SC_DOUBLE_I, &t,
-            SC_DOUBLE_I, &dt,
-            SC_INT_I, &cycle,
+            G_DOUBLE_I, &t,
+            G_DOUBLE_I, &dt,
+            G_INT_I, &cycle,
             0);
 
     pck_entry = (PFPkgMain) pck->main;
@@ -288,9 +288,9 @@ static object *_SXI_advance_time(SS_psides *si, object *argl)
     (*pcy)++;
 
     nargs = SS_args(si, argl,
-                    SC_DOUBLE_I, &t1,
-                    SC_DOUBLE_I, &t2,
-                    SC_DOUBLE_I, &t3,
+                    G_DOUBLE_I, &t1,
+                    G_DOUBLE_I, &t2,
+                    G_DOUBLE_I, &t3,
                     0);
 
     tconv = PA_gs.units[SEC]/PA_gs.convrsns[SEC];
@@ -427,8 +427,8 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
     viv = NULL;
 
     SS_args(si, argl,
-            SC_STRING_I, &vname,
-            SC_STRING_I, &vtype,
+            G_STRING_I, &vname,
+            G_STRING_I, &vtype,
             G_OBJECT_I, &oviv,
             G_OBJECT_I, &ovif,
             0);
@@ -528,7 +528,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
            break;
         pv  = CMAKE(int);
         *pv = dm;
-        nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
+        nxt = SC_mk_pcons(G_INT_P_S, pv, G_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = nxt;
         else
@@ -545,7 +545,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 
            pv  = CMAKE(int);
            *pv = dm;
-           nxt = SC_mk_pcons(SC_INT_P_S, pv, G_PCONS_P_S, NULL);
+           nxt = SC_mk_pcons(G_INT_P_S, pv, G_PCONS_P_S, NULL);
            if (du == NULL)
               du = nxt;
            else
@@ -677,7 +677,7 @@ static object *_SXI_pan_cmmnd(SS_psides *si, object *argl)
 
     s = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &s,
+            G_STRING_I, &s,
             0);
 
     o     = SS_f;
@@ -709,12 +709,12 @@ static object *_SXI_dump_pp(SS_psides *si, object *argl)
     pp = NULL;
     gf = NULL;
     SS_args(si, argl,
-            SC_DOUBLE_I, &t,
-            SC_DOUBLE_I, &dt,
-            SC_INT_I, &cy,
-            SC_STRING_I, &ed,
-            SC_STRING_I, &pp,
-            SC_STRING_I, &gf,
+            G_DOUBLE_I, &t,
+            G_DOUBLE_I, &dt,
+            G_INT_I, &cy,
+            G_STRING_I, &ed,
+            G_STRING_I, &pp,
+            G_STRING_I, &gf,
             0);
 
     PA_dump_pp(t, dt, cy);
@@ -744,7 +744,7 @@ static object *_SXI_db_numeric_data(SS_psides *si, object *obj)
     rv   = SS_null;
     name = NULL;
     SS_args(si, obj,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
 /* if no other arguments, read the variable */
@@ -759,13 +759,13 @@ static object *_SXI_db_numeric_data(SS_psides *si, object *obj)
 	id   = SC_type_id(type, FALSE);
 
 /* all arrays will be doubles */
-	if (id == SC_DOUBLE_I)
+	if (id == G_DOUBLE_I)
 	   arr = PM_make_array(type, n, pd);
 	else
-	   {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
+	   {arr = PM_make_array(G_DOUBLE_S, n, NULL);
 	    dp  = (double *) arr->data;
 
-	    SC_convert_id(SC_DOUBLE_I, dp, 0, 1, id, pd, 0, 1, n, FALSE);};
+	    SC_convert_id(G_DOUBLE_I, dp, 0, 1, id, pd, 0, 1, n, FALSE);};
 
 	rv = SX_make_c_array(si, arr);};
 
@@ -850,64 +850,64 @@ void SX_install_panacea_funcs(SS_psides *si)
                _SXI_db_numeric_data, SS_PR_PROC);
 
     SS_define_constant(si, 0,
-                       "dimension",     SC_STRING_I, "dimension",
-                       "upper-lower",   SC_STRING_I, "upper-lower",
-                       "offset-number", SC_STRING_I, "offset-number",
-                       "units",         SC_INT_I, -1,
-                       "per",           SC_INT_I, -2,
-                       "attribute",     SC_INT_I, 102,
+                       "dimension",     G_STRING_I, "dimension",
+                       "upper-lower",   G_STRING_I, "upper-lower",
+                       "offset-number", G_STRING_I, "offset-number",
+                       "units",         G_INT_I, -1,
+                       "per",           G_INT_I, -2,
+                       "attribute",     G_INT_I, 102,
                        NULL);
 
     SS_define_constant(si, 0,
-                       "scope",         SC_INT_I, 97,
-                       "defn",          SC_INT_I, -1,
-                       "restart",       SC_INT_I, -2,
-                       "demand",        SC_INT_I, -3,
-                       "runtime",       SC_INT_I, -4,
-                       "edit",          SC_INT_I, -5,
-                       "scratch",       SC_INT_I, -6,
+                       "scope",         G_INT_I, 97,
+                       "defn",          G_INT_I, -1,
+                       "restart",       G_INT_I, -2,
+                       "demand",        G_INT_I, -3,
+                       "runtime",       G_INT_I, -4,
+                       "edit",          G_INT_I, -5,
+                       "scratch",       G_INT_I, -6,
                        NULL);
 
     SS_define_constant(si, 0,
-                       "class",         SC_INT_I, 98,
-                       "required",      SC_INT_I, 1,
-                       "optional",      SC_INT_I, 2,
-                       "pseudo",        SC_INT_I, 3,
+                       "class",         G_INT_I, 98,
+                       "required",      G_INT_I, 1,
+                       "optional",      G_INT_I, 2,
+                       "pseudo",        G_INT_I, 3,
                        NULL);
 
     SS_define_constant(si, 0,
-                       "persist",       SC_INT_I, 99,
-                       "release",       SC_INT_I, -10,
-                       "keep",          SC_INT_I, -11,
-                       "cache",         SC_INT_I, -12,
+                       "persist",       G_INT_I, 99,
+                       "release",       G_INT_I, -10,
+                       "keep",          G_INT_I, -11,
+                       "cache",         G_INT_I, -12,
                        NULL);
 
     SS_define_constant(si, 0,
-                       "center",        SC_INT_I, 100,
-                       "zone-centered", SC_INT_I, -1,
-                       "node-centered", SC_INT_I, -2,
-                       "face-centered", SC_INT_I, -3,
-                       "edge-centered", SC_INT_I, -4,
-                       "uncentered",    SC_INT_I, -5,
+                       "center",        G_INT_I, 100,
+                       "zone-centered", G_INT_I, -1,
+                       "node-centered", G_INT_I, -2,
+                       "face-centered", G_INT_I, -3,
+                       "edge-centered", G_INT_I, -4,
+                       "uncentered",    G_INT_I, -5,
                        NULL);
 
     SS_define_constant(si, 0,
-                       "allocation",    SC_INT_I, 101,
-                       "static",        SC_INT_I, -100,
-                       "dynamic",       SC_INT_I, -101,
+                       "allocation",    G_INT_I, 101,
+                       "static",        G_INT_I, -100,
+                       "dynamic",       G_INT_I, -101,
                        NULL);
 
-    SS_install_cv(si, "radian",    &PA_gs.radian,          SC_INT_I);
-    SS_install_cv(si, "steradian", &PA_gs.steradian,       SC_INT_I);
-    SS_install_cv(si, "mole",      &PA_gs.mole,            SC_INT_I);
-    SS_install_cv(si, "Q",         &PA_gs.electric_charge, SC_INT_I);
-    SS_install_cv(si, "cm",        &PA_gs.cm,              SC_INT_I);
-    SS_install_cv(si, "sec",       &PA_gs.sec,             SC_INT_I);
-    SS_install_cv(si, "g",         &PA_gs.gram,            SC_INT_I);
-    SS_install_cv(si, "eV",        &PA_gs.eV,              SC_INT_I);
-    SS_install_cv(si, "K",         &PA_gs.kelvin,          SC_INT_I);
-    SS_install_cv(si, "erg",       &PA_gs.erg,             SC_INT_I);
-    SS_install_cv(si, "cc",        &PA_gs.cc,              SC_INT_I);
+    SS_install_cv(si, "radian",    &PA_gs.radian,          G_INT_I);
+    SS_install_cv(si, "steradian", &PA_gs.steradian,       G_INT_I);
+    SS_install_cv(si, "mole",      &PA_gs.mole,            G_INT_I);
+    SS_install_cv(si, "Q",         &PA_gs.electric_charge, G_INT_I);
+    SS_install_cv(si, "cm",        &PA_gs.cm,              G_INT_I);
+    SS_install_cv(si, "sec",       &PA_gs.sec,             G_INT_I);
+    SS_install_cv(si, "g",         &PA_gs.gram,            G_INT_I);
+    SS_install_cv(si, "eV",        &PA_gs.eV,              G_INT_I);
+    SS_install_cv(si, "K",         &PA_gs.kelvin,          G_INT_I);
+    SS_install_cv(si, "erg",       &PA_gs.erg,             G_INT_I);
+    SS_install_cv(si, "cc",        &PA_gs.cc,              G_INT_I);
 
     return;}
 
@@ -926,8 +926,8 @@ static object *_SXI_rd_restart(SS_psides *si, object *argl)
     name  = NULL;
     convs = NONE;
     SS_args(si, argl,
-            SC_STRING_I, &name,
-            SC_INT_I, &convs,
+            G_STRING_I, &name,
+            G_INT_I, &convs,
             0);
 
     if (name == NULL)
@@ -956,12 +956,12 @@ static object *_SXI_init_problem(SS_psides *si, object *argl)
     ppname = NULL;
     gfname = NULL;
     SS_args(si, argl,
-            SC_DOUBLE_I, &t,
-            SC_DOUBLE_I, &dt,
-            SC_INT_I, &nc,
-            SC_STRING_I, &edname,
-            SC_STRING_I, &ppname,
-            SC_STRING_I, &gfname,
+            G_DOUBLE_I, &t,
+            G_DOUBLE_I, &dt,
+            G_INT_I, &nc,
+            G_STRING_I, &edname,
+            G_STRING_I, &ppname,
+            G_STRING_I, &gfname,
             0);
 
 /* read the source files, initialize the packages */
@@ -979,7 +979,7 @@ static object *_SXI_readh(SS_psides *si, object *argl)
 
     name = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     PA_readh(name);
@@ -997,8 +997,8 @@ static object *_SXI_fin_system(SS_psides *si, object *argl)
     nz = 0;
     cy = 0;
     SS_args(si, argl,
-            SC_INT_I, &nz,
-            SC_INT_I, &cy,
+            G_INT_I, &nz,
+            G_INT_I, &cy,
             0);
 
     PA_fin_system(nz, cy, FALSE);
@@ -1015,7 +1015,7 @@ static object *_SXI_wr_restart(SS_psides *si, object *argl)
 
     name = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     if (name == NULL)

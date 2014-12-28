@@ -24,8 +24,8 @@ static object *_SXI_fb1(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_BOOL_I, &_la1,
-            SC_BOOL_P_I, &_la2,
+            G_BOOL_I, &_la1,
+            G_BOOL_P_I, &_la2,
             0);
 
     _rv = fb1(_la1, _la2);
@@ -49,8 +49,8 @@ static object *_SXI_fb2(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_CHAR_I, &_la1,
-            SC_STRING_I, &_la2,
+            G_CHAR_I, &_la1,
+            G_STRING_I, &_la2,
             0);
 
     _rv = fb2(_la1, _la2);
@@ -74,8 +74,8 @@ static object *_SXI_fb3(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_SHORT_I, &_la1,
-            SC_SHORT_P_I, &_la2,
+            G_SHORT_I, &_la1,
+            G_SHORT_P_I, &_la2,
             0);
 
     _rv = fb3(_la1, _la2);
@@ -99,8 +99,8 @@ static object *_SXI_fb4(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
-            SC_INT_P_I, &_la2,
+            G_INT_I, &_la1,
+            G_INT_P_I, &_la2,
             0);
 
     _rv = fb4(_la1, _la2);
@@ -124,8 +124,8 @@ static object *_SXI_fb5(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_LONG_I, &_la1,
-            SC_LONG_P_I, &_la2,
+            G_LONG_I, &_la1,
+            G_LONG_P_I, &_la2,
             0);
 
     _rv = fb5(_la1, _la2);
@@ -149,8 +149,8 @@ static object *_SXI_fb6(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_LONG_LONG_I, &_la1,
-            SC_LONG_LONG_P_I, &_la2,
+            G_LONG_LONG_I, &_la1,
+            G_LONG_LONG_P_I, &_la2,
             0);
 
     _rv = fb6(_la1, _la2);
@@ -174,8 +174,8 @@ static object *_SXI_fb7(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_FLOAT_I, &_la1,
-            SC_FLOAT_P_I, &_la2,
+            G_FLOAT_I, &_la1,
+            G_FLOAT_P_I, &_la2,
             0);
 
     _rv = fb7(_la1, _la2);
@@ -199,8 +199,8 @@ static object *_SXI_fb8(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_DOUBLE_I, &_la1,
-            SC_DOUBLE_P_I, &_la2,
+            G_DOUBLE_I, &_la1,
+            G_DOUBLE_P_I, &_la2,
             0);
 
     _rv = fb8(_la1, _la2);
@@ -224,8 +224,8 @@ static object *_SXI_fb10(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_FLOAT_COMPLEX_I, &_la1,
-            SC_FLOAT_COMPLEX_P_I, &_la2,
+            G_FLOAT_COMPLEX_I, &_la1,
+            G_FLOAT_COMPLEX_P_I, &_la2,
             0);
 
     _rv = fb10(_la1, _la2);
@@ -249,8 +249,8 @@ static object *_SXI_fb11(SS_psides *si, object *argl)
     _la2       = NULL;
 
     SS_args(si, argl,
-            SC_DOUBLE_COMPLEX_I, &_la1,
-            SC_DOUBLE_COMPLEX_P_I, &_la2,
+            G_DOUBLE_COMPLEX_I, &_la1,
+            G_DOUBLE_COMPLEX_P_I, &_la2,
             0);
 
     _rv = fb11(_la1, _la2);
@@ -272,7 +272,7 @@ static object *_SXI_fr1(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr1(_la1);
@@ -294,7 +294,7 @@ static object *_SXI_fr2(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr2(_la1);
@@ -316,7 +316,7 @@ static object *_SXI_fr3(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr3(_la1);
@@ -338,7 +338,7 @@ static object *_SXI_fr4(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr4(_la1);
@@ -360,7 +360,7 @@ static object *_SXI_fr5(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr5(_la1);
@@ -382,7 +382,7 @@ static object *_SXI_fr6(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr6(_la1);
@@ -404,7 +404,7 @@ static object *_SXI_fr7(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr7(_la1);
@@ -426,7 +426,7 @@ static object *_SXI_fr8(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr8(_la1);
@@ -448,7 +448,7 @@ static object *_SXI_fr10(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr10(_la1);
@@ -470,7 +470,7 @@ static object *_SXI_fr11(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr11(_la1);
@@ -492,7 +492,7 @@ static object *_SXI_fr13(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fr13(_la1);
@@ -518,7 +518,7 @@ static object *_SXI_fp1(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp1(_la1);
@@ -542,7 +542,7 @@ static object *_SXI_fp2(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp2(_la1);
@@ -566,7 +566,7 @@ static object *_SXI_fp3(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp3(_la1);
@@ -592,7 +592,7 @@ static object *_SXI_fp4(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp4(_la1);
@@ -618,7 +618,7 @@ static object *_SXI_fp5(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp5(_la1);
@@ -644,7 +644,7 @@ static object *_SXI_fp6(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp6(_la1);
@@ -670,7 +670,7 @@ static object *_SXI_fp7(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp7(_la1);
@@ -696,7 +696,7 @@ static object *_SXI_fp8(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp8(_la1);
@@ -722,7 +722,7 @@ static object *_SXI_fp10(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp10(_la1);
@@ -748,7 +748,7 @@ static object *_SXI_fp11(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp11(_la1);
@@ -774,7 +774,7 @@ static object *_SXI_fp13(SS_psides *si, object *argl)
     _la1       = 0;
 
     SS_args(si, argl,
-            SC_INT_I, &_la1,
+            G_INT_I, &_la1,
             0);
 
     _rv = fp13(_la1);

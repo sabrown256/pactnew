@@ -77,7 +77,7 @@ static object *_SXI_quit(SS_psides *si, object *arg)
    {int rv;
 
     SS_args(si, arg,
-            SC_INT_I, &rv,
+            G_INT_I, &rv,
             0);
 
     SX_quit(rv);
@@ -100,9 +100,9 @@ static object *_SXI_import(SS_psides *si, object *arg)
     so    = NULL;
     flags = NULL;
     SS_args(si, arg,
-            SC_STRING_I, &hdr,
-            SC_STRING_I, &so,
-            SC_STRING_I, &flags,
+            G_STRING_I, &hdr,
+            G_STRING_I, &so,
+            G_STRING_I, &flags,
             0);
 
     st = SX_import_so(si, hdr, so, flags);
@@ -532,7 +532,7 @@ static PM_mapping *_SXI_norm_mapping(SS_psides *si, PM_mapping *h)
 
     elem[0] = (void *) dre;
     lbl = SC_dsnprintf(FALSE, "||%s||", range->name);
-    range = PM_make_set_alt(lbl, SC_DOUBLE_S, FALSE,
+    range = PM_make_set_alt(lbl, G_DOUBLE_S, FALSE,
 			    range->dimension, range->max_index,
 			    nde, elem);
 
@@ -684,7 +684,7 @@ object *SX_plane(SS_psides *si, object *argl)
     coeff = pc = CMAKE_N(double, nd--);
 
     SS_args(si, argl,
-	    SC_DOUBLE_I, pc++,
+	    G_DOUBLE_I, pc++,
             0);
     argl = SS_cdr(si, argl);
 
@@ -697,11 +697,11 @@ object *SX_plane(SS_psides *si, object *argl)
 	 
 	 ratio[i] = 1.0;
 	 SS_args(si, lst,
-		 SC_DOUBLE_I, pc++,
-		 SC_DOUBLE_I, &xmn,
-		 SC_DOUBLE_I, &xmx,
-		 SC_INT_I, pm++,
-		 SC_DOUBLE_I, &ratio[i],
+		 G_DOUBLE_I, pc++,
+		 G_DOUBLE_I, &xmn,
+		 G_DOUBLE_I, &xmx,
+		 G_INT_I, pm++,
+		 G_DOUBLE_I, &ratio[i],
 		 0);
 	 *px++ = xmn;
 	 *px++ = xmx;};
@@ -710,7 +710,7 @@ object *SX_plane(SS_psides *si, object *argl)
 
 /* make the domain */
     name = SC_dsnprintf(FALSE, "D%d_%d", nd, nde);
-    dom  = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nde,
+    dom  = PM_make_lr_index_domain(name, G_DOUBLE_S, nd, nde,
 				   maxes, extr, ratio);
 
     CFREE(extr);
@@ -728,11 +728,11 @@ object *SX_plane(SS_psides *si, object *argl)
 	 pr[i] = v;};
 
 /* make the range having the same dimension as the domain */
-    ran = PM_make_set_alt("Plane", SC_DOUBLE_S, FALSE, nd,
+    ran = PM_make_set_alt("Plane", G_DOUBLE_S, FALSE, nd,
 			  dom->max_index, 1, (void **) &r);
 /* we used to make a simple 1d range
  * that gets into incommensurate range trouble when doing arithmetic
-    ran = PM_make_set("Plane", SC_DOUBLE_S, FALSE, nd, ne, 1, r);
+    ran = PM_make_set("Plane", G_DOUBLE_S, FALSE, nd, ne, 1, r);
  */
 
 /* make the mapping */
@@ -779,8 +779,8 @@ static PM_mapping *_SXI_derivative(SS_psides *si, PM_mapping *h)
     else if (n > 2)
        n--;
 
-    d = PM_make_set("X", SC_DOUBLE_S, FALSE, 1, n, 1, bx);
-    r = PM_make_set("Y", SC_DOUBLE_S, FALSE, 1, n, 1, by);
+    d = PM_make_set("X", G_DOUBLE_S, FALSE, 1, n, 1, bx);
+    r = PM_make_set("Y", G_DOUBLE_S, FALSE, 1, n, 1, by);
     f = PM_make_mapping(lbl, PM_LR_S, d, r, N_CENT, NULL);
 
     return(f);}
@@ -800,7 +800,7 @@ void SX_filter_coeff(SS_psides *si, double *yp, int n,
     if (arr != NULL)
        {PM_ARRAY_CONTENTS(arr, void, ne, type, d);
 	sid   = SC_type_id(type, FALSE);
-	coeff = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1,
+	coeff = SC_convert_id(G_DOUBLE_I, NULL, 0, 1,
 			      sid, d, 0, 1, ne, FALSE);
         ne--;
 
@@ -838,7 +838,7 @@ static PM_mapping *_SXI_filter_coef(SS_psides *si, PM_mapping *h,
     ntimes = 1;
     SS_args(si, argl,
             G_C_ARRAY_I, &arr,
-	    SC_INT_I, &ntimes,
+	    G_INT_I, &ntimes,
 	    0);
 
     SX_filter_coeff(si, x[1], n, arr, ntimes);
@@ -862,8 +862,8 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
     pts    = 3;
     ntimes = 1;
     SS_args(si, argl,
-	    SC_INT_I, &pts,
-	    SC_INT_I, &ntimes,
+	    G_INT_I, &pts,
+	    G_INT_I, &ntimes,
 	    0);
 
     if (SC_str_icmp(SX_gs.smooth_method, "fft") == 0)

@@ -225,7 +225,7 @@ static void _SX_read(SS_psides *si, object *strm)
     s = NULL;
     o = si->rdobj;
     SS_args(si, o,
-            SC_STRING_I, &s,
+            G_STRING_I, &s,
             0);
 
     if (s != NULL)

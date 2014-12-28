@@ -171,7 +171,7 @@ static int interrupt_mode(descriptors *pd)
     SC_event_loop_set_masks(pe, acc, rej);
 
 /* register the I/O channels for the event loop to monitor */
-    pi  = SC_register_event_loop_callback(pe, SC_FILE_I, stdin,
+    pi  = SC_register_event_loop_callback(pe, G_FILE_I, stdin,
 					  tty_has_txt, NULL, -1);
     pi &= SC_register_event_loop_callback(pe, G_PROCESS_I, pp,
 					  child_has_txt, NULL, -1);

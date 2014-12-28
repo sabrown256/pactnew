@@ -99,7 +99,7 @@ static void def_type_manager(FILE *fp, int ne, type_desc *tl)
     fprintf(fp, "   }\n");
     fprintf(fp, "\n");
 
-/* #define index and name variables - e.g. SC_INT_S, SC_INT_S */
+/* #define index and name variables - e.g. G_INT_S, G_INT_S */
     tia = NULL;
     for (id = 0; id < ne; id++)
         {td  = tl + id;

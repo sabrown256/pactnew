@@ -518,9 +518,9 @@ static long _PD_ptr_install(adloc *al, long i, void *vr)
 /* used to do this but saved memory trying to reuse any existing entry
  * no test found a problem - changed 11/14/2011
  * remove if no problems arise by 06/2012
-    SC_hasharr_install(ah, vr, pi, SC_LONG_S, 1, -1);
+    SC_hasharr_install(ah, vr, pi, G_LONG_S, 1, -1);
  */
-    SC_hasharr_install(ah, vr, pi, SC_LONG_S, 7, -1);
+    SC_hasharr_install(ah, vr, pi, G_LONG_S, 7, -1);
 
     return(i);}
 

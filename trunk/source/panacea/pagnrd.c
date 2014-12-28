@@ -135,7 +135,7 @@ void PA_def_alias(char *name, char *type, void *pv)
     void *v;
 
     id = SC_type_id(type, FALSE);
-    if (id == SC_STRING_I)
+    if (id == G_STRING_I)
        v = CSTRSAVE(pv);
     else
        v = SC_convert_id(id, NULL, 0, 1, id, pv, 0, 1, 1, FALSE);
@@ -167,10 +167,10 @@ double PA_alias_value(char *s)
 	else
 	   {id = SC_type_id(hp->type, FALSE);
 	    if (SC_is_type_num(id) == TRUE)
-	       SC_convert_id(SC_DOUBLE_I, &d, 0, 1,
+	       SC_convert_id(G_DOUBLE_I, &d, 0, 1,
 			     id, hp->def, 0, 1, 1, FALSE);
 
-	    else if (id == SC_STRING_I)
+	    else if (id == G_STRING_I)
 	       d = -2.0*HUGE;
 
 	    else
@@ -213,15 +213,15 @@ void PA_defh(void)
 
 	if (SC_fltstrp(val))
 	   {dv = SC_stof(val);
-	    PA_def_alias(var, SC_DOUBLE_S, &dv);}
+	    PA_def_alias(var, G_DOUBLE_S, &dv);}
 
 	else if (SC_intstrp(val, 10))
 	   {lv = SC_stoi(val);
-	    PA_def_alias(var, SC_LONG_S, &lv);}
+	    PA_def_alias(var, G_LONG_S, &lv);}
 
 	else
 	   {sv = CSTRSAVE(val);
-	    PA_def_alias(var, SC_STRING_S, &sv);};};
+	    PA_def_alias(var, G_STRING_S, &sv);};};
 
     return;}
 
@@ -288,7 +288,7 @@ void PA_specifyh(void)
 
             nxtp = CMAKE(double);
             *nxtp = nxt;
-            _PA.ivlst = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, G_PCONS_P_S, NULL);
+            _PA.ivlst = SC_mk_pcons(G_DOUBLE_P_S, nxtp, G_PCONS_P_S, NULL);
             if (first == NULL)
                first = _PA.ivlst;
             else
@@ -315,7 +315,7 @@ void PA_sh(void)
        {nxt = PA_alias_value(s);
         nxtp = CMAKE(double);
         *nxtp = nxt;
-        next = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, G_PCONS_P_S, NULL);
+        next = SC_mk_pcons(G_DOUBLE_P_S, nxtp, G_PCONS_P_S, NULL);
         if (_PA.ivlst == NULL)
            PA_gs.iv_spec_lst->spec = next;
         else
@@ -655,9 +655,9 @@ void PA_pshand(PA_command *cp)
 	did  = cp->type;
 
 	if (SC_is_type_num(did) == TRUE)
-	   SC_convert_id(did, cp->vr, i, 1, SC_DOUBLE_I, &d, 0, 1, 1, FALSE);
+	   SC_convert_id(did, cp->vr, i, 1, G_DOUBLE_I, &d, 0, 1, 1, FALSE);
 
-        else if ((did == SC_CHAR_I) || (did == SC_STRING_I))
+        else if ((did == G_CHAR_I) || (did == G_STRING_I))
            ((char **) cp->vr)[i] = CSTRSAVE(sval);};
 
     return;}
@@ -753,7 +753,7 @@ PA_plot_request *_PA_mk_plot_request(PA_set_spec *range, PA_set_spec *domain,
     req->allocate_data    = TRUE;
     req->data             = NULL;
     req->data_index       = (int) -INT_MAX;
-    req->data_type        = SC_DOUBLE_I;
+    req->data_type        = G_DOUBLE_I;
     req->next             = next;
 
     return(req);}

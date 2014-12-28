@@ -38,11 +38,11 @@ int PM_set_opers(PM_set *set)
 	   ret = FALSE;
 	else
 	   {id = SC_type_id(token, FALSE);
-	    if (id == SC_INT_I)
+	    if (id == G_INT_I)
 	       set->opers = PM_gs.int_opers;
-	    else if (id == SC_LONG_I)
+	    else if (id == G_LONG_I)
 	       set->opers = PM_gs.long_opers;
-	    else if (id == SC_DOUBLE_I)
+	    else if (id == G_DOUBLE_I)
 	       set->opers = PM_gs.fp_opers;
 	    else
 	       ret = FALSE;};};

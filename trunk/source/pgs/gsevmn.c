@@ -187,7 +187,7 @@ int PG_init_event_handling(void)
        _PG_ev_loop = SC_make_event_loop(NULL, NULL, NULL, -1, -1, -1);
 
     ONCE_SAFE(TRUE, NULL)
-       fd = PG_loop_callback(SC_FILE_I, stdin,
+       fd = PG_loop_callback(G_FILE_I, stdin,
 			     _PG_get_input, NULL, -1);
     END_SAFE;
 

@@ -27,7 +27,7 @@ static char **_SS_list_strings(SS_psides *si, object *argl)
         {o = SS_car(si, argl);
 	 s = NULL;
 	 SS_args(si, o,
-		 SC_STRING_I, &s,
+		 G_STRING_I, &s,
 		 0);
 	 SC_array_string_add_copy(a, s);};
 	 
@@ -58,7 +58,7 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
     l = 0;
 
 /* start with the function mode */
-    type[l] = SC_INT_I;
+    type[l] = G_INT_I;
     ptr[l]  = &m;
     l++;
 
@@ -74,7 +74,7 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
 
 /* add the arguments */
     for (i = 0; i < c; i++)
-        {type[l] = SC_STRING_I;
+        {type[l] = G_STRING_I;
          ptr[l]  = v[i];
          l++;};
 
@@ -96,7 +96,7 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
 
     rv = -1;
     SS_args(si, si->val,
-	    SC_INT_I, &rv,
+	    G_INT_I, &rv,
 	    0);
 
     return(rv);}

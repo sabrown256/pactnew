@@ -43,10 +43,10 @@ static void def_vararg_macros(FILE *fp, int ne, type_desc *tl)
 
     fprintf(fp, "#define SC_VA_ARG_ID(_id, _d, _n)                    \\\n");
     fprintf(fp, "   {int _lid;                                        \\\n");
-    fprintf(fp, "    if (_id == SC_STRING_I)                          \\\n");
+    fprintf(fp, "    if (_id == G_STRING_I)                           \\\n");
     fprintf(fp, "       _lid = _id;                                   \\\n");
     fprintf(fp, "    else if (SC_is_type_ptr(_id) == TRUE)            \\\n");
-    fprintf(fp, "       _lid = SC_POINTER_I;                          \\\n");
+    fprintf(fp, "       _lid = G_POINTER_I;                           \\\n");
     fprintf(fp, "    else                                             \\\n");
     fprintf(fp, "       _lid = _id;                                   \\\n");
     fprintf(fp, "    switch (_lid) {                                  \\\n");
@@ -80,10 +80,10 @@ static void def_vararg_macros(FILE *fp, int ne, type_desc *tl)
 
     fprintf(fp, "#define SC_VA_ARG_ID(_id, _d, _n)                    \\\n");
     fprintf(fp, "   {int _lid;                                        \\\n");
-    fprintf(fp, "    if (_id == SC_STRING_I)                          \\\n");
+    fprintf(fp, "    if (_id == G_STRING_I)                           \\\n");
     fprintf(fp, "       _lid = _id;                                   \\\n");
     fprintf(fp, "    else if (SC_is_type_ptr(_id) == TRUE)            \\\n");
-    fprintf(fp, "       _lid = SC_POINTER_I;                          \\\n");
+    fprintf(fp, "       _lid = G_POINTER_I;                           \\\n");
     fprintf(fp, "    else                                             \\\n");
     fprintf(fp, "       _lid = _id;                                   \\\n");
     fprintf(fp, "    switch (_lid) {                                  \\\n");

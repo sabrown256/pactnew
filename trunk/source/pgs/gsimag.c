@@ -136,9 +136,9 @@ static void PG_image_hand(PG_device *dev, PG_graph *g,
 	    name = h->name;
 	 else
 	    alst = PG_set_attrs_alist(alst,
-				      "DRAW-AXIS",    SC_INT_I, FALSE, FALSE,
-				      "DRAW-LABEL",   SC_INT_I, FALSE, FALSE,
-				      "DRAW-PALETTE", SC_INT_I, FALSE, FALSE,
+				      "DRAW-AXIS",    G_INT_I, FALSE, FALSE,
+				      "DRAW-LABEL",   G_INT_I, FALSE, FALSE,
+				      "DRAW-PALETTE", G_INT_I, FALSE, FALSE,
 				      NULL);
 
 	 wc[4] = fmn;
@@ -147,11 +147,11 @@ static void PG_image_hand(PG_device *dev, PG_graph *g,
 /* this is done consistently with PG_draw_vector */
 	 switch (centering)
 	    {case Z_CENT :
-                  (*fnc_zc)(dev, name, SC_DOUBLE_S, f, wc, cnnct, alst);
+                  (*fnc_zc)(dev, name, G_DOUBLE_S, f, wc, cnnct, alst);
 		  break;
 
              case N_CENT :
-                  (*fnc_nc)(dev, name, SC_DOUBLE_S, f, wc, cnnct, alst);
+                  (*fnc_nc)(dev, name, G_DOUBLE_S, f, wc, cnnct, alst);
 		  break;
 
              case F_CENT :
@@ -253,7 +253,7 @@ PG_picture_desc *PG_setup_picture_image(PG_device *dev, PG_graph *data,
 
 /* check on any special attributes */
     PG_get_attrs_alist(alst,
-		       "POLAR-IMAGE", SC_POINTER_I, &_PG.pol_extr, NULL,
+		       "POLAR-IMAGE", G_POINTER_I, &_PG.pol_extr, NULL,
 		       NULL);
 
     if (change)
@@ -541,7 +541,7 @@ PG_image *PG_build_image(PG_device *dev, char *name, char *type, void *z,
 
     bpp = log((double) (dev->absolute_n_color))/log(2.0) + 0.5;
 
-    im = PG_make_image_n(name, SC_CHAR_S, NULL, nd, cs,
+    im = PG_make_image_n(name, G_CHAR_S, NULL, nd, cs,
 			 dbx, rbx, w, h, bpp, NULL);
     if (im != NULL)
 
@@ -659,7 +659,7 @@ static PG_image *PG_prep_image(PG_device *dev, PG_image *im,
     rbx[0] = wrk.zmin;
     rbx[1] = wrk.zmax;
 
-    nim = PG_make_image_n(dev->title, SC_STRING_S, NULL, 2, WORLDC,
+    nim = PG_make_image_n(dev->title, G_STRING_S, NULL, 2, WORLDC,
 			  dbx, rbx, nx, ny, wrk.bits_pixel, wrk.palette);
     if (nim != NULL)
        PG_place_image(nim, &wrk, TRUE);
@@ -755,7 +755,7 @@ PG_image *PG_extract_image(PG_device *dev, double *dbx, double *rbx)
 	ny = dbx[3] - dbx[2];
 
 	bpp = log((double) (dev->absolute_n_color))/log(2.0) + 0.5;
-	im  = PG_make_image_n(dev->title, SC_CHAR_S, NULL, 2, WORLDC,
+	im  = PG_make_image_n(dev->title, G_CHAR_S, NULL, 2, WORLDC,
 			      wc, rbx, nx, ny, bpp, NULL);
 
 /* load up the image data */

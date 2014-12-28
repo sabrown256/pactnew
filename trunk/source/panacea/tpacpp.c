@@ -21,19 +21,19 @@ int main(int c, char **v)
 
 /* arrays used to automate some of the testing */
     char *type_slist[] = {
-        "SC_CHAR_S",    "SC_SHORT_S",   "SC_INT_S",     "SC_LONG_S",
-        "SC_FLOAT_S",   "SC_DOUBLE_S",  "SC_REAL_S",    "SC_STRING_S",
-        "SC_POINTER_S", "SC_VOID_S",    "SC_SHORT_P_S",
-	"SC_INT_P_S",   "SC_LONG_P_S",  "SC_FLOAT_P_S","SC_DOUBLE_P_S",
-        "SC_STRUCT_S",  "SC_UNKNOWN_S",
+        "G_CHAR_S",    "G_SHORT_S",   "G_INT_S",     "G_LONG_S",
+        "G_FLOAT_S",   "G_DOUBLE_S",  "G_REAL_S",    "G_STRING_S",
+        "G_POINTER_S", "G_VOID_S",    "G_SHORT_P_S",
+	"G_INT_P_S",   "G_LONG_P_S",  "G_FLOAT_P_S","G_DOUBLE_P_S",
+        "G_STRUCT_S",  "G_UNKNOWN_S",
         NULL };
 
     int type_ilist[] = {
-        SC_CHAR_I,    SC_SHORT_I,   SC_INT_I,     SC_LONG_I,
-        SC_FLOAT_I,   SC_DOUBLE_I,  SC_REAL_I,    SC_STRING_I,
-        SC_POINTER_I, SC_VOID_I,    SC_SHORT_P_I,
-	SC_INT_P_I,   SC_LONG_P_I,  SC_FLOAT_P_I, SC_DOUBLE_P_I,
-        SC_STRUCT_I,  SC_UNKNOWN_I,
+        G_CHAR_I,    G_SHORT_I,   G_INT_I,     G_LONG_I,
+        G_FLOAT_I,   G_DOUBLE_I,  G_REAL_I,    G_STRING_I,
+        G_POINTER_I, G_VOID_I,    G_SHORT_P_I,
+	G_INT_P_I,   G_LONG_P_I,  G_FLOAT_P_I, G_DOUBLE_P_I,
+        G_STRUCT_I,  G_UNKNOWN_I,
         -100 };
 
     _PA_internal_init();
@@ -47,20 +47,20 @@ int main(int c, char **v)
 	 itype = *(int *) PA_cpp_name_to_value(name);
 	 printf(" %s\t%s\t\%d\n", *s_index, name, itype);};
 
-    type = (char *) PA_cpp_name_to_value("SC_STRING_S");
-    printf(" SC_STRING_S  - %s\n", type);
+    type = (char *) PA_cpp_name_to_value("G_STRING_S");
+    printf(" G_STRING_S  - %s\n", type);
 
-    itype = *(int *) PA_cpp_name_to_value("SC_STRING_I");
-    printf(" SC_STRING_I  - %d\n", itype);
+    itype = *(int *) PA_cpp_name_to_value("G_STRING_I");
+    printf(" G_STRING_I  - %d\n", itype);
 
-    itype  = *(int *) PA_cpp_name_to_value(SC_DOUBLE_S);
-    itype1 = *(int *) PA_cpp_name_to_value("SC_DOUBLE_I");
-    type   = (char *) PA_cpp_name_to_value("SC_DOUBLE_S");
+    itype  = *(int *) PA_cpp_name_to_value(G_DOUBLE_S);
+    itype1 = *(int *) PA_cpp_name_to_value("G_DOUBLE_I");
+    type   = (char *) PA_cpp_name_to_value("G_DOUBLE_S");
     type1  = (char *) PA_cpp_value_to_name(PA_gs.cpp_type, 1);
     printf("PA_cpp_name_to_value - %d %d %s %s\n",
 	   itype, itype1, type, type1);
 
-    itype = SC_type_id(SC_DOUBLE_S, FALSE);
+    itype = SC_type_id(G_DOUBLE_S, FALSE);
     printf("double is %d\n", itype);
     type = SC_type_name(6);
     printf("6 is %s\n", type);

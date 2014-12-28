@@ -320,7 +320,7 @@ void *_PD_alloc_entry(PDBfile *file, char *type, inti ni)
 /* add extra space to chars - one for '\0' and one in case SC_firsttok
  * is applied to this string
  */
-        if (strcmp(type, SC_CHAR_S) == 0)
+        if (strcmp(type, G_CHAR_S) == 0)
            ni += 2;
 
 	ipt = _PD_items_per_tuple(dp);

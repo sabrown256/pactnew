@@ -132,25 +132,25 @@ static int _PD_rd_fmt_ii(PDBfile *file)
 
     i = 0;
 
-    for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+    for (id = G_SHORT_I; id <= G_LONG_I; id++)
         {i = SC_TYPE_FIX(id);
 	 std->fx[i].bpi = *(p++);};
 
-    std->fx[SC_TYPE_FIX(SC_INT8_I)].bpi = 1;
+    std->fx[SC_TYPE_FIX(G_INT8_I)].bpi = 1;
 
-    for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+    for (id = G_FLOAT_I; id <= G_DOUBLE_I; id++)
         {i = SC_TYPE_FP(id);
 	 std->fp[i].bpi = *(p++);};
 
 /* get the fix point byte orders in */
-    for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+    for (id = G_SHORT_I; id <= G_LONG_I; id++)
         {i = SC_TYPE_FIX(id);
 	 std->fx[i].order = (PD_byte_order) *(p++);};
 
-    std->fx[SC_TYPE_FIX(SC_INT8_I)].order = std->fx[i].order;
+    std->fx[SC_TYPE_FIX(G_INT8_I)].order = std->fx[i].order;
 
 /* get the floating point byte orders in */
-    for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+    for (id = G_FLOAT_I; id <= G_DOUBLE_I; id++)
         {i = SC_TYPE_FP(id);
 	 n     = std->fp[i].bpi;
 	 order = std->fp[i].order;
@@ -161,7 +161,7 @@ static int _PD_rd_fmt_ii(PDBfile *file)
 
 /* get the floating point format data in */
     n = PD_gs.format_fields - 1;
-    for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+    for (id = G_FLOAT_I; id <= G_DOUBLE_I; id++)
         {i = SC_TYPE_FP(id);
 	 format = std->fp[i].format;
 	 for (j = 0; j < n; j++, *(format++) = *(p++));};
@@ -170,7 +170,7 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     if (_PD_rfgets(infor, MAXLINE, file->stream) == NULL)
        PD_error("CAN'T READ THE BIASES - _PD_RD_FMT_II", PD_OPEN);
     
-    for (id = SC_FLOAT_I, pi = infor; id <= SC_DOUBLE_I; id++, pi = NULL)
+    for (id = G_FLOAT_I, pi = infor; id <= G_DOUBLE_I; id++, pi = NULL)
         {i = SC_TYPE_FP(id);
 	 format    = std->fp[i].format;
 	 format[7] = SC_stol(SC_strtok(pi, "\001", s));};
@@ -432,7 +432,7 @@ static void _PD_rd_prim_align_type(char *type, int al, data_alignment *align)
 
     else
        {id = SC_type_id(type, FALSE);
-	if (id == SC_BOOL_I)
+	if (id == G_BOOL_I)
 	   align->bool_alignment = al;
 
 	else if (SC_is_type_char(id) == TRUE)
@@ -622,7 +622,7 @@ int _PD_rd_ext_ii(PDBfile *file)
         else if (strcmp(token, "Longlong-Format-Alignment") == 0)
 	   {int i;
 
-	    i = SC_TYPE_FIX(SC_LONG_LONG_I);
+	    i = SC_TYPE_FIX(G_LONG_LONG_I);
 	    token = SC_strtok(NULL, "\n", p);
             if (token != NULL)
                {ps = file->std;
@@ -1079,17 +1079,17 @@ static int _PD_wr_prim_align(PDBfile *file)
     n  = 0;
 
 /* prepare original C type data for Alignment */
-    for (id = SC_CHAR_I; id < SC_WCHAR_I; id++)
+    for (id = G_CHAR_I; id < G_WCHAR_I; id++)
         {i = SC_TYPE_CHAR(id);
 	 al[n++] = pl->chr[i];};
 
     al[n++] = pl->ptr_alignment;
 
-    for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+    for (id = G_SHORT_I; id <= G_LONG_I; id++)
         {i = SC_TYPE_FIX(id);
 	 al[n++] = pl->fx[i];};
 
-    for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+    for (id = G_FLOAT_I; id <= G_DOUBLE_I; id++)
         {i = SC_TYPE_FP(id);
 	 al[n++] = pl->fp[i];};
 
@@ -1110,7 +1110,7 @@ static int _PD_wr_prim_align(PDBfile *file)
 
 
 /* write out the long long standard and alignment */
-    i  = SC_TYPE_FIX(SC_LONG_LONG_I);
+    i  = SC_TYPE_FIX(G_LONG_LONG_I);
     ps = file->std;
     al[0] = ps->fx[i].bpi;
     al[1] = ps->fx[i].order;
@@ -1273,28 +1273,28 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 /* get the byte lengths in */
        {*(p++) = std->ptr_bytes;
 
-	for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+	for (id = G_SHORT_I; id <= G_LONG_I; id++)
 	    {i = SC_TYPE_FIX(id);
 	     *(p++) = std->fx[i].bpi;};
 
-	for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+	for (id = G_FLOAT_I; id <= G_DOUBLE_I; id++)
 	    {i = SC_TYPE_FP(id);
 	     *(p++) = std->fp[i].bpi;};
 
 /* get the integral types byte order in */
-	for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+	for (id = G_SHORT_I; id <= G_LONG_I; id++)
 	    {i = SC_TYPE_FIX(id);
 	     *(p++) = std->fx[i].order;};
 
 /* get the floating point format byte orders in */
-	for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+	for (id = G_FLOAT_I; id <= G_DOUBLE_I; id++)
 	    {i = SC_TYPE_FP(id);
 	     order = std->fp[i].order;
 	     n     = std->fp[i].bpi;
 	     for (j = 0; j < n; j++, *(p++) = *(order++));};
 
 /* get the floating point formats in */
-	for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+	for (id = G_FLOAT_I; id <= G_DOUBLE_I; id++)
 	    {i = SC_TYPE_FP(id);
 	     format = std->fp[i].format;
 	     n = PD_gs.format_fields - 1;

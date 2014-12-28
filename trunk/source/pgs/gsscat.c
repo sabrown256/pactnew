@@ -169,11 +169,11 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
        return;
 
     PG_get_attrs_graph(g, FALSE,
-		       "THETA",        SC_DOUBLE_I,    &theta, 0.0,
-		       "PHI",          SC_DOUBLE_I,    &phi,   0.0,
-		       "CHI",          SC_DOUBLE_I,    &chi,   0.0,
-		       "PALETTE",      SC_POINTER_I,   &pn,    NULL,
-		       "MARKER-SCALE", SC_POINTER_I,   &pm,    NULL,
+		       "THETA",        G_DOUBLE_I,    &theta, 0.0,
+		       "PHI",          G_DOUBLE_I,    &phi,   0.0,
+		       "CHI",          G_DOUBLE_I,    &chi,   0.0,
+		       "PALETTE",      G_POINTER_I,   &pn,    NULL,
+		       "MARKER-SCALE", G_POINTER_I,   &pm,    NULL,
 		       NULL);
 
     if (pn != NULL)
@@ -196,7 +196,7 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
 /* setup the domain limits */
     if (dev->autodomain)
        {PG_get_attrs_graph(g, FALSE,
-			   "LIMITS", SC_POINTER_I, &dextr, NULL,
+			   "LIMITS", G_POINTER_I, &dextr, NULL,
 			   NULL);
 	if (dextr == NULL)
 	   dextr = PM_array_real(domain->element_type, domain->extrema, 4, NULL);}
@@ -213,7 +213,7 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
     nd    = range->dimension_elem;
     mtype = SC_strtok(bf, " *", s);
     sid   = SC_type_id(mtype, FALSE);
-    same  = (sid == SC_DOUBLE_I);
+    same  = (sid == G_DOUBLE_I);
 
     afd   = CMAKE_N(double *, nd);
     afs   = (void **) range->elements;
@@ -230,11 +230,11 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
             afd[i] = (double *) afs[i];}
     else
        {for (i = 0; i < nd; i++)
-            afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1,
+            afd[i] = SC_convert_id(G_DOUBLE_I, NULL, 0, 1,
 				   sid, afs[i], 0, 1, npts, FALSE);
 
         if (rexfl == TRUE)
-           rextr = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1,
+           rextr = SC_convert_id(G_DOUBLE_I, NULL, 0, 1,
 				 sid, range->extrema, 0, 1, 2*nd, FALSE);};
 
     PG_register_range_extrema(dev, nd, rextr);
@@ -395,14 +395,14 @@ void PG_draw_scatter(PG_device *dev, double *a1, double *a2,
 
 /* build the domain set */
     diml[0] = nn;
-    domain = PM_make_set_alt("{D}", SC_DOUBLE_S, FALSE,
+    domain = PM_make_set_alt("{D}", G_DOUBLE_S, FALSE,
 			     1, diml, ne, (void **) x);
 
 /* build the range set */
     if (a2 == NULL)
-       range = PM_make_set("{a}", SC_DOUBLE_S, FALSE, 1, nn, 1, a1);
+       range = PM_make_set("{a}", G_DOUBLE_S, FALSE, 1, nn, 1, a1);
     else
-       range = PM_make_set("{u,v}", SC_DOUBLE_S, FALSE, 1, nn, 2, a1, a2);
+       range = PM_make_set("{u,v}", G_DOUBLE_S, FALSE, 1, nn, 2, a1, a2);
 
     alst = SC_copy_alist(alist);
 
@@ -413,12 +413,12 @@ void PG_draw_scatter(PG_device *dev, double *a1, double *a2,
 
 /* add the attributes */
     PG_set_attrs_graph(g,
-		       "LINE-COLOR", SC_INT_I, FALSE, color,
-		       "LINE-STYLE", SC_INT_I, FALSE, style,
-		       "LINE-WIDTH", SC_DOUBLE_I,  FALSE, width,
-		       "THETA",      SC_DOUBLE_I,  FALSE, theta,
-		       "PHI",        SC_DOUBLE_I,  FALSE, phi,
-		       "CHI",        SC_DOUBLE_I,  FALSE, chi,
+		       "LINE-COLOR", G_INT_I, FALSE, color,
+		       "LINE-STYLE", G_INT_I, FALSE, style,
+		       "LINE-WIDTH", G_DOUBLE_I,  FALSE, width,
+		       "THETA",      G_DOUBLE_I,  FALSE, theta,
+		       "PHI",        G_DOUBLE_I,  FALSE, phi,
+		       "CHI",        G_DOUBLE_I,  FALSE, chi,
 		       NULL);
 
     PG_scatter_plot(dev, g);

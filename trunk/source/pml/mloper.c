@@ -527,7 +527,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	sid  = SC_deref_id(styp, TRUE);
 
 /* fixed and floating point types (ok) */
-	if ((sid == SC_BOOL_I) ||
+	if ((sid == G_BOOL_I) ||
 	    (SC_is_type_char(sid) == TRUE) ||
 	    (SC_is_type_fix(sid) == TRUE) ||
 	    (SC_is_type_fp(sid) == TRUE))
@@ -563,7 +563,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 
 	    ret = TRUE;}
 
-	else if (sid == SC_QUATERNION_I)
+	else if (sid == G_QUATERNION_I)
 	   {quaternion *s, *da;
 	    PFQuaternionqq fnc;
 
@@ -586,7 +586,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	   sid = SC_deref_id(operand->type, TRUE);
 
 /* fixed and floating point types (ok) */
-	if ((sid == SC_BOOL_I) ||
+	if ((sid == G_BOOL_I) ||
 	    (SC_is_type_char(sid) == TRUE) ||
 	    (SC_is_type_fix(sid) == TRUE) ||
 	    (SC_is_type_fp(sid) == TRUE))
@@ -618,7 +618,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 
 	    ret = TRUE;}
 
-	else if (sid == SC_QUATERNION_I)
+	else if (sid == G_QUATERNION_I)
 	   {quaternion s, *da;
 	    PFQuaternionqq fnc;
 
@@ -649,7 +649,7 @@ C_array *PM_accumulate_oper(PFVoid *proc, C_array *acc,
     if (acc == NULL)
        {if (operand != NULL)
 	   {n   = operand->length;
-	    acc = PM_make_array(SC_DOUBLE_P_S, n, NULL);
+	    acc = PM_make_array(G_DOUBLE_P_S, n, NULL);
 
 	    PM_conv_array(acc, operand, FALSE);};}
 

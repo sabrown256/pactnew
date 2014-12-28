@@ -502,7 +502,7 @@ static void _SX_init_range(SS_psides *si,
     tre = NULL;
 
     src.length = ne;
-    src.type   = SC_DOUBLE_P_S;
+    src.type   = G_DOUBLE_P_S;
 
     dst.length = ne;
     dst.type   = dty;
@@ -601,7 +601,7 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
     for (i = 0; i < dnde; i++)
         acc[i] = NULL;
 
-    operand.type   = SC_DOUBLE_P_S;
+    operand.type   = G_DOUBLE_P_S;
     operand.length = ne;
 
 /* accumulate the results */
@@ -736,8 +736,8 @@ static PM_set *_SX_build_restricted_domain(SS_psides *si, PM_set *hd,
 
     for (i = 0; i < nd; i++)
         {SS_args(si, argl,
-		 SC_DOUBLE_I, &mn,
-		 SC_DOUBLE_I, &mx,
+		 G_DOUBLE_I, &mn,
+		 G_DOUBLE_I, &mx,
 		 0);
          argl = SS_cddr(si, argl);
 
@@ -758,7 +758,7 @@ static PM_set *_SX_build_restricted_domain(SS_psides *si, PM_set *hd,
 	 extr[2*i+1] = dx;};
 
     name = SC_dsnprintf(FALSE, "Sub %s", hd->name);
-    fd   = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nde,
+    fd   = PM_make_lr_index_domain(name, G_DOUBLE_S, nd, nde,
 				   maxes, extr, NULL);
 
     CFREE(extr);
@@ -832,7 +832,7 @@ static PM_set *_SX_build_lr_domain(SS_psides *si, PM_set *hd, object *argl)
     snprintf(name, MAXLINE, "LR (");
     for (i = 0; i < nd; i++)
         {SS_args(si, argl,
-		 SC_INT_I, &maxes[i],
+		 G_INT_I, &maxes[i],
 		 0);
 
 	 nc = strlen(name);
@@ -843,7 +843,7 @@ static PM_set *_SX_build_lr_domain(SS_psides *si, PM_set *hd, object *argl)
     SC_NTH_LAST_CHAR(name, 1) = '\0';
     SC_strcat(name, MAXLINE, ")");
 
-    fd = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nde,
+    fd = PM_make_lr_index_domain(name, G_DOUBLE_S, nd, nde,
 				 maxes, extr, NULL);
 
     CFREE(extr);

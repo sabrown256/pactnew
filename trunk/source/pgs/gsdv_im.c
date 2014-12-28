@@ -204,12 +204,12 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
             for (i = 0; i < np; i++)
                 {if (i != dp)
                     {sp[2] = i;
-                     PN_in(adc+i*ne, SC_DOUBLE_S, ne, pp, sp);};};}
+                     PN_in(adc+i*ne, G_DOUBLE_S, ne, pp, sp);};};}
 
 /* post the sends */
         else
            {sp[2] = dp;
-            PN_out(dc, SC_DOUBLE_S, ne, pp, sp);};
+            PN_out(dc, G_DOUBLE_S, ne, pp, sp);};
 
 /* wait for the data to move */
         PN_wait(pp);
@@ -253,11 +253,11 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
             for (i = 0; i < np; i++)
                 {if (i != dp)
                     {sp[2] = i;
-                     PN_out(dc, SC_DOUBLE_S, ne, pp, sp);};};}
+                     PN_out(dc, G_DOUBLE_S, ne, pp, sp);};};}
 
         else
            {sp[2] = dp;
-            PN_in(dc, SC_DOUBLE_S, ne, pp, sp);};
+            PN_in(dc, G_DOUBLE_S, ne, pp, sp);};
         
         PN_wait(pp);
 

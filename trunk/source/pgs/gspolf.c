@@ -155,14 +155,14 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 	 mtype = SC_strtok(bf, " *", s);
 	 sid   = SC_type_id(mtype, FALSE);
 
-	 same = (sid == SC_DOUBLE_I);
+	 same = (sid == G_DOUBLE_I);
 	 if (same == TRUE)
 	    afd  = (double **) range->elements;
 	 else
 	    {afs = (double **) range->elements;
 	     afd = CMAKE_N(double *, nd);
 	     for (i = 0; i < nd; i++)
-	         afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1, 
+	         afd[i] = SC_convert_id(G_DOUBLE_I, NULL, 0, 1, 
 					sid, afs[i], 0, 1, npts, FALSE);};
 
 /* find the range limits if any */

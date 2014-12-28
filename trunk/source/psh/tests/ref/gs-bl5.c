@@ -21,7 +21,7 @@ static object *_SXI_a_f1(SS_psides *si, object *argl)
     _la        = NULL;
 
     SS_args(si, argl,
-            SC_POINTER_I, &_la,
+            G_POINTER_I, &_la,
             0);
 
     a_f1(_la);
@@ -42,7 +42,7 @@ static object *_SXI_a_f2(SS_psides *si, object *argl)
     _lb        = NULL;
 
     SS_args(si, argl,
-            SC_POINTER_I, &_lb,
+            G_POINTER_I, &_lb,
             0);
 
     a_f2(_lb);
@@ -65,8 +65,8 @@ static object *_SXI_a_f3(SS_psides *si, object *argl)
     _lb        = NULL;
 
     SS_args(si, argl,
-            SC_POINTER_I, &_la,
-            SC_POINTER_I, &_lb,
+            G_POINTER_I, &_la,
+            G_POINTER_I, &_lb,
             0);
 
     a_f3(_la, _lb);
@@ -89,8 +89,8 @@ static object *_SXI_a_f4(SS_psides *si, object *argl)
     _la        = NULL;
 
     SS_args(si, argl,
-            SC_POINTER_I, &_lb,
-            SC_POINTER_I, &_la,
+            G_POINTER_I, &_lb,
+            G_POINTER_I, &_la,
             0);
 
     a_f4(_lb, _la);
@@ -113,8 +113,8 @@ static object *_SXI_b_f1(SS_psides *si, object *argl)
     _lb        = 0;
 
     SS_args(si, argl,
-            SC_POINTER_I, &_la,
-            SC_INT_I, &_lb,
+            G_POINTER_I, &_la,
+            G_INT_I, &_lb,
             0);
 
     B_f1(_la, _lb);
@@ -137,8 +137,8 @@ static object *_SXI_b_f2(SS_psides *si, object *argl)
     _lb        = 0;
 
     SS_args(si, argl,
-            SC_POINTER_I, &_la,
-            SC_INT_I, &_lb,
+            G_POINTER_I, &_la,
+            G_INT_I, &_lb,
             0);
 
     B_f2(_la, _lb);
@@ -163,9 +163,9 @@ static object *_SXI_b_f3(SS_psides *si, object *argl)
     _lc        = 0;
 
     SS_args(si, argl,
-            SC_POINTER_I, &_la,
-            SC_POINTER_I, &_lb,
-            SC_INT_I, &_lc,
+            G_POINTER_I, &_la,
+            G_POINTER_I, &_lb,
+            G_INT_I, &_lc,
             0);
 
     B_f3(_la, _lb, _lc);
@@ -190,9 +190,9 @@ static object *_SXI_b_f4(SS_psides *si, object *argl)
     _lc        = 0;
 
     SS_args(si, argl,
-            SC_POINTER_I, &_la,
-            SC_POINTER_I, &_lb,
-            SC_INT_I, &_lc,
+            G_POINTER_I, &_la,
+            G_POINTER_I, &_lb,
+            G_INT_I, &_lc,
             0);
 
     B_f4(_la, _lb, _lc);
@@ -217,9 +217,9 @@ static object *_SXI_b_f5(SS_psides *si, object *argl)
     _lc        = NULL;
 
     SS_args(si, argl,
-            SC_INT_I, &_la,
-            SC_POINTER_I, &_lb,
-            SC_POINTER_I, &_lc,
+            G_INT_I, &_la,
+            G_POINTER_I, &_lb,
+            G_POINTER_I, &_lc,
             0);
 
     B_f5(_la, _lb, _lc);
@@ -244,9 +244,9 @@ static object *_SXI_b_f6(SS_psides *si, object *argl)
     _lc        = NULL;
 
     SS_args(si, argl,
-            SC_INT_I, &_la,
-            SC_POINTER_I, &_lb,
-            SC_POINTER_I, &_lc,
+            G_INT_I, &_la,
+            G_POINTER_I, &_lb,
+            G_POINTER_I, &_lc,
             0);
 
     B_f6(_la, _lb, _lc);

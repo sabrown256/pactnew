@@ -17,7 +17,7 @@
     {if (lst == NULL)                                                       \
         {nx  = 1000;                                                        \
 	 n   = 0;                                                           \
-	 lst = CMAKE_N(PG_triangle, nx);};                   \
+	 lst = CMAKE_N(PG_triangle, nx);};                                  \
      lst[n++] = *a;                                                         \
      if (n >= nx)                                                           \
 	{nx += 1000;                                                        \
@@ -304,7 +304,7 @@ PG_triangle *_PG_hls_remove(PG_device *dev, char *type,
     PG_triangle *trial, *vis;
 
     PG_get_attrs_alist(alst,
-		       "NORMAL-DIRECTION", SC_DOUBLE_I, &norm, 1.0,
+		       "NORMAL-DIRECTION", G_DOUBLE_I, &norm, 1.0,
 		       NULL);
     nvi    = 0;
     vis    = NULL;

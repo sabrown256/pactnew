@@ -430,7 +430,7 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, inti ni,
 
     cp = (char *) vr;
 
-    if (idx == SC_STRING_I)
+    if (idx == G_STRING_I)
        {if ((ni == 1L) && (offset == 0L))
 	   {if (PD_gs.print_ctrl[5] == 0)
 	       {PRINT(f0, "%s%s%s = %c\n",
@@ -565,19 +565,19 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
        {if ((ifx = SC_fix_type_id(type, FALSE)) != -1)
 	   _PD_disp_data(prnt, vr, ni, ifx, n, ind);
 
-	else if (id == SC_BOOL_I)
-	  _PD_disp_data(prnt, vr, ni, SC_BOOL_I, n, ind);
+	else if (id == G_BOOL_I)
+	  _PD_disp_data(prnt, vr, ni, G_BOOL_I, n, ind);
 
 	else if ((pd->kind == KIND_CHAR) || (isz == sizeof(char)))
-	   {if (id == SC_CHAR_I)
-	       {idx = SC_STRING_I;
+	   {if (id == G_CHAR_I)
+	       {idx = G_STRING_I;
 	        quo = TRUE;}
 	    else if (pd->kind == KIND_CHAR)
-	       {idx = SC_STRING_I;
+	       {idx = G_STRING_I;
 		ni  = isz;
 	        quo = FALSE;}
 	    else
-	       {idx = SC_INT_I;
+	       {idx = G_INT_I;
 	        quo = FALSE;};
 
 	    _PD_print_char_kind(prnt, vr, ni, type, quo, idx, n, ind);}
@@ -590,8 +590,8 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	    else
 	       {PRINT(f0, "        <function>\n");};}
 
-        else if (SC_type_match_size(KIND_INT, isz) != SC_UNKNOWN_I)
-	   _PD_disp_data(prnt, vr, ni, SC_BIT_I, n, ind);
+        else if (SC_type_match_size(KIND_INT, isz) != G_UNKNOWN_I)
+	   _PD_disp_data(prnt, vr, ni, G_BIT_I, n, ind);
 
 	else
 	   {PRINT(f0, "%s%s%s = ", prefix, before, nodename);

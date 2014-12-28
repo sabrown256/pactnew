@@ -264,8 +264,8 @@ void PG_curve_plot(PG_device *dev, PG_graph *data, ...)
 				DEREF(range->elements), n, NULL);
 
 	      PG_get_attrs_graph(g, FALSE,
-				 "LINE-COLOR", SC_INT_I, &color, dev->BLUE,
-				 "PLOT-TYPE",  SC_INT_I, &plt,   PLOT_CARTESIAN,
+				 "LINE-COLOR", G_INT_I, &color, dev->BLUE,
+				 "PLOT-TYPE",  G_INT_I, &plt,   PLOT_CARTESIAN,
 				 NULL);
 
 	      info = PG_fget_render_info(g);
@@ -411,8 +411,8 @@ static void PG_draw_data_ids_alt(PG_device *dev, double *x, double *y,
        dx = (wc[1] - wc[0])/((double) m);
 
     PG_get_attrs_alist(info,
-		       "SCATTER",   SC_INT_I, &scatter, FALSE,
-		       "PLOT-TYPE", SC_INT_I, &pty,     PLOT_CARTESIAN,
+		       "SCATTER",   G_INT_I, &scatter, FALSE,
+		       "PLOT-TYPE", G_INT_I, &pty,     PLOT_CARTESIAN,
 		       NULL);
 
     if (!scatter && ((pty == PLOT_CARTESIAN) || (pty == PLOT_HISTOGRAM)))
@@ -608,8 +608,8 @@ void PG_draw_data_ids(PG_device *dev, double *x, double *y,
         x0 = box[0] + r*dx;}
 
     PG_get_attrs_alist(info,
-		       "SCATTER",   SC_INT_I, &scatter, FALSE,
-		       "PLOT-TYPE", SC_INT_I, &pty,     PLOT_CARTESIAN,
+		       "SCATTER",   G_INT_I, &scatter, FALSE,
+		       "PLOT-TYPE", G_INT_I, &pty,     PLOT_CARTESIAN,
 		       NULL);
 
     if ((pty == PLOT_CARTESIAN) || (pty == PLOT_SCATTER) ||
@@ -692,10 +692,10 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
        return;
 
     PG_get_attrs_alist(info,
-		       "DY-PLUS",  SC_POINTER_I, &xp[1], NULL,
-		       "DY-MINUS", SC_POINTER_I, &xm[1], NULL,
-		       "DX-PLUS",  SC_POINTER_I, &xp[0], NULL,
-		       "DX-MINUS", SC_POINTER_I, &xm[0], NULL,
+		       "DY-PLUS",  G_POINTER_I, &xp[1], NULL,
+		       "DY-MINUS", G_POINTER_I, &xm[1], NULL,
+		       "DX-PLUS",  G_POINTER_I, &xp[0], NULL,
+		       "DX-MINUS", G_POINTER_I, &xm[0], NULL,
 		       NULL);
     r[0] = x[0];
     r[1] = x[1];
@@ -1150,15 +1150,15 @@ void PG_plot_curve(PG_device *dev ARG(,,cls),
     r[1] = y;
 
     PG_get_attrs_alist(info,
-		       "PLOT-TYPE",    SC_INT_I, &pty,     PLOT_CARTESIAN,
-		       "HIST-START",   SC_INT_I, &start,   _PG_gattrs.hist_start,
-		       "MARKER-INDEX", SC_INT_I, &marker,  0,
-		       "FILL",         SC_INT_I, &fcol,    -100,
-		       "SCATTER",      SC_INT_I, &scatter, _PG_gattrs.scatter_plot,
-		       "HIDDEN",       SC_INT_I, &hiddn,   FALSE,
-		       "LINE-COLOR",   SC_INT_I, &lncol,   dev->BLUE,
-		       "LINE-STYLE",   SC_INT_I, &lnsty,   LINE_SOLID,
-		       "LINE-WIDTH",   SC_DOUBLE_I,  &lnwid,   0.0,
+		       "PLOT-TYPE",    G_INT_I, &pty,     PLOT_CARTESIAN,
+		       "HIST-START",   G_INT_I, &start,   _PG_gattrs.hist_start,
+		       "MARKER-INDEX", G_INT_I, &marker,  0,
+		       "FILL",         G_INT_I, &fcol,    -100,
+		       "SCATTER",      G_INT_I, &scatter, _PG_gattrs.scatter_plot,
+		       "HIDDEN",       G_INT_I, &hiddn,   FALSE,
+		       "LINE-COLOR",   G_INT_I, &lncol,   dev->BLUE,
+		       "LINE-STYLE",   G_INT_I, &lnsty,   LINE_SOLID,
+		       "LINE-WIDTH",   G_DOUBLE_I,  &lnwid,   0.0,
 		       NULL);
 
     ofc = dev->fill_color;

@@ -157,10 +157,10 @@ void PA_definitions(void)
        PA_def_str(PA_gs.vif);
 
 /* global problem definition variables */
-    PA_inst_var("unit", SC_DOUBLE_S, NULL, NULL,
+    PA_inst_var("unit", G_DOUBLE_S, NULL, NULL,
                 SCOPE, DEFN, CLASS, REQU, ATTRIBUTE,
                 P_Units, DIMENSION, UNITS);
-    PA_inst_var("convrsn", SC_DOUBLE_S, NULL, NULL,
+    PA_inst_var("convrsn", G_DOUBLE_S, NULL, NULL,
                 SCOPE, DEFN, CLASS, REQU, ATTRIBUTE,
                 P_Units, DIMENSION, UNITS);
 

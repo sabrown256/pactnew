@@ -35,27 +35,27 @@ static object *_SS_exa_var(SS_psides *si, void *vr, int type)
 /* fixed point types (proper) */
     else if (SC_is_type_fix(type) == TRUE)
        {long long v;
-	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, type, vr, 0, 1, 1, FALSE);
+	SC_convert_id(G_LONG_LONG_I, &v, 0, 1, type, vr, 0, 1, 1, FALSE);
 	ret = SS_mk_integer(si, v);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(type) == TRUE)
        {long double v;
-	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1, type, vr, 0, 1, 1, FALSE);
+	SC_convert_id(G_LONG_DOUBLE_I, &v, 0, 1, type, vr, 0, 1, 1, FALSE);
 	ret = SS_mk_float(si, v);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(type) == TRUE)
        {long double _Complex v;
-	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
+	SC_convert_id(G_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 		      type, vr, 0, 1, 1, FALSE);
 	ret = SS_mk_complex(si, v);}
 
-    else if (type == SC_STRING_I)
+    else if (type == G_STRING_I)
        {sv  = (char *) vr;
 	ret = SS_mk_string(si, sv);}
 
-    else if (type == SC_POINTER_I)
+    else if (type == G_POINTER_I)
        {pv = (char **) vr;
 	if (*pv != NULL)
 	   ret = SS_mk_string(si, *pv);
@@ -99,7 +99,7 @@ static object *_SS_set_var(SS_psides *si, void *vr, long nb,
 	else
 	   sv = SS_get_string(vl);
 
-	if (type == SC_STRING_I)
+	if (type == G_STRING_I)
 	   {char *d;
 
 	    nc = 0;
@@ -117,7 +117,7 @@ static object *_SS_set_var(SS_psides *si, void *vr, long nb,
 	    if (nc >= nb)
 	       SS_error(si, "STRING OVERFLOW - _SS_SET_VAR", vl);}
 
-	else if (type == SC_POINTER_I)
+	else if (type == G_POINTER_I)
 	   {char **d;
 
 	    d = (char **) vr;
@@ -214,23 +214,23 @@ object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
 /* fixed point types (proper) */
     else if (SC_is_type_fix(ityp) == TRUE)
        {long long v;
-	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
+	SC_convert_id(G_LONG_LONG_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
 	SS_def_var(si, var, SS_mk_integer(si, v), si->global_env);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(ityp) == TRUE)
        {long double v;
-	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
+	SC_convert_id(G_LONG_DOUBLE_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
 	SS_def_var(si, var, SS_mk_float(si, v), si->global_env);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(ityp) == TRUE)
        {long double _Complex v;
-	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
+	SC_convert_id(G_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 		      ityp, pval, 0, 1, 1, FALSE);
 	SS_def_var(si, var, SS_mk_complex(si, v), si->global_env);}
 
-    else if (ityp == SC_STRING_I)
+    else if (ityp == G_STRING_I)
        {char *v;
 	v = (char *) pval;
 	SS_def_var(si, var, SS_mk_string(si, v), si->global_env);}
@@ -289,7 +289,7 @@ static object *_SS_acc_var(SS_psides *si, SS_C_procedure *cp,
 object *SS_acc_double(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = _SS_acc_var(si, cp, argl, SC_DOUBLE_I);
+    ret = _SS_acc_var(si, cp, argl, G_DOUBLE_I);
 
     return(ret);}
 
@@ -301,7 +301,7 @@ object *SS_acc_double(SS_psides *si, SS_C_procedure *cp, object *argl)
 object *SS_acc_int(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = _SS_acc_var(si, cp, argl, SC_INT_I);
+    ret = _SS_acc_var(si, cp, argl, G_INT_I);
 
     return(ret);}
 
@@ -313,7 +313,7 @@ object *SS_acc_int(SS_psides *si, SS_C_procedure *cp, object *argl)
 object *SS_acc_long(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = _SS_acc_var(si, cp, argl, SC_LONG_I);
+    ret = _SS_acc_var(si, cp, argl, G_LONG_I);
 
     return(ret);}
 
@@ -325,7 +325,7 @@ object *SS_acc_long(SS_psides *si, SS_C_procedure *cp, object *argl)
 object *SS_acc_char(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = _SS_acc_var(si, cp, argl, SC_CHAR_I);
+    ret = _SS_acc_var(si, cp, argl, G_CHAR_I);
 
     return(ret);}
 
@@ -337,7 +337,7 @@ object *SS_acc_char(SS_psides *si, SS_C_procedure *cp, object *argl)
 object *SS_acc_string(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = _SS_acc_var(si, cp, argl, SC_STRING_I);
+    ret = _SS_acc_var(si, cp, argl, G_STRING_I);
 
     return(ret);}
 
@@ -349,7 +349,7 @@ object *SS_acc_string(SS_psides *si, SS_C_procedure *cp, object *argl)
 object *SS_acc_ptr(SS_psides *si, SS_C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = _SS_acc_var(si, cp, argl, SC_POINTER_I);
+    ret = _SS_acc_var(si, cp, argl, G_POINTER_I);
 
     return(ret);}
 

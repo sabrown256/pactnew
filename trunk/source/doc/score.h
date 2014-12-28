@@ -987,32 +987,32 @@ Many others are automatically registered as well.  SCORE provided
 variables containing the index and the names.  They are:
 <pre>
        Integer ID                  String Name
-     SC_BOOL_I                   SC_BOOL_S
-     SC_CHAR_I                   SC_CHAR_S
-     SC_WCHAR_I                  SC_WCHAR_S
-     SC_SHORT_I                  SC_SHORT_S
-     SC_INT_I                    SC_INT_S
-     SC_LONG_I                   SC_LONG_S
-     SC_LONG_LONG_I              SC_LONG_LONG_S
-     SC_FLOAT_I                  SC_FLOAT_S
-     SC_DOUBLE_I                 SC_DOUBLE_S
-     SC_LONG_DOUBLE_I            SC_LONG_DOUBLE_S
-     SC_FLOAT_COMPLEX_I          SC_FLOAT_COMPLEX_S
-     SC_DOUBLE_COMPLEX_I         SC_DOUBLE_COMPLEX_S
-     SC_LONG_DOUBLE_COMPLEX_I    SC_LONG_DOUBLE_COMPLEX_S
-     SC_POINTER_I                SC_POINTER_S
-     SC_STRING_I                 SC_STRING_S
-     SC_VOID_I                   SC_VOID_S
-     SC_INT8_I                   SC_INT8_S
-     SC_INT16_I                  SC_INT16_S
-     SC_INT32_I                  SC_INT32_S
-     SC_INT64_I                  SC_INT64_S
-     SC_FLOAT32_I                SC_FLOAT32_S
-     SC_FLOAT64_I                SC_FLOAT64_S
-     SC_FLOAT128_I               SC_FLOAT128_S
-     SC_COMPLEX32_I              SC_COMPLEX32_S
-     SC_COMPLEX64_I              SC_COMPLEX64_S
-     SC_COMPLEX128_I             SC_COMPLEX128_S
+     G_BOOL_I                   G_BOOL_S
+     G_CHAR_I                   G_CHAR_S
+     G_WCHAR_I                  G_WCHAR_S
+     G_SHORT_I                  G_SHORT_S
+     G_INT_I                    G_INT_S
+     G_LONG_I                   G_LONG_S
+     G_LONG_LONG_I              G_LONG_LONG_S
+     G_FLOAT_I                  G_FLOAT_S
+     G_DOUBLE_I                 G_DOUBLE_S
+     G_LONG_DOUBLE_I            G_LONG_DOUBLE_S
+     G_FLOAT_COMPLEX_I          G_FLOAT_COMPLEX_S
+     G_DOUBLE_COMPLEX_I         G_DOUBLE_COMPLEX_S
+     G_LONG_DOUBLE_COMPLEX_I    G_LONG_DOUBLE_COMPLEX_S
+     G_POINTER_I                G_POINTER_S
+     G_STRING_I                 G_STRING_S
+     G_VOID_I                   G_VOID_S
+     G_INT8_I                   G_INT8_S
+     G_INT16_I                  G_INT16_S
+     G_INT32_I                  G_INT32_S
+     G_INT64_I                  G_INT64_S
+     G_FLOAT32_I                G_FLOAT32_S
+     G_FLOAT64_I                G_FLOAT64_S
+     G_FLOAT128_I               G_FLOAT128_S
+     G_COMPLEX32_I              G_COMPLEX32_S
+     G_COMPLEX64_I              G_COMPLEX64_S
+     G_COMPLEX128_I             G_COMPLEX128_S
 </pre>
 
 With the identification of types with C objects which can be passed
@@ -1055,7 +1055,7 @@ favor of the first definition.
 </pre>
 
 Sometimes you want to refer to a type by more than one name.  For
-example, SC_ENUM_I is an alias for SC_INT_I (since C enums are
+example, G_ENUM_I is an alias for G_INT_I (since C enums are
 implemented as ints).  The name of the new type is given in NAME and
 the id of the existing type is given in ID.
 <p>
@@ -1215,7 +1215,7 @@ Example:
 
        while ((id = SC_VA_ARG(int)) != -1)
           {if (SC_is_type_num(id) == TRUE)
-	      {SC_VA_ARG_FETCH(SC_INT_I, a+i, id);};};
+	      {SC_VA_ARG_FETCH(G_INT_I, a+i, id);};};
 
        SC_VA_END;
 
@@ -1223,7 +1223,7 @@ Example:
 
    int *a;
 
-   a = get(0, SC_INT_I, 3, SC_LONG_I, 4, SC_DOUBLE_I, 5.0, -1);
+   a = get(0, G_INT_I, 3, G_LONG_I, 4, G_DOUBLE_I, 5.0, -1);
 
 </pre>
 
@@ -1257,7 +1257,7 @@ Example:
    long b;
    double c;
 
-   set(0, SC_INT_I, &a, 3, SC_LONG_I, &b, 4, SC_DOUBLE_I, &c, 5.0, -1);
+   set(0, G_INT_I, &a, 3, G_LONG_I, &b, 4, G_DOUBLE_I, &c, 5.0, -1);
 
 </pre>
 

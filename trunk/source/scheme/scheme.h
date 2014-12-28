@@ -197,7 +197,7 @@
  *             - return FALSE otherwise
  */
 
-#define SS_integerp(_o) (SC_arrtype(_o, -1) == SC_INT_I)
+#define SS_integerp(_o) (SC_arrtype(_o, -1) == G_INT_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -206,7 +206,7 @@
  *           - return FALSE otherwise
  */
 
-#define SS_floatp(_o) (SC_arrtype(_o, -1) == SC_FLOAT_I)
+#define SS_floatp(_o) (SC_arrtype(_o, -1) == G_FLOAT_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -215,7 +215,7 @@
  *             - return FALSE otherwise
  */
 
-#define SS_complexp(_o) (SC_arrtype(_o, -1) == SC_DOUBLE_COMPLEX_I)
+#define SS_complexp(_o) (SC_arrtype(_o, -1) == G_DOUBLE_COMPLEX_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -224,7 +224,7 @@
  *                - return FALSE otherwise
  */
 
-#define SS_quaternionp(_o) (SC_arrtype(_o, -1) == SC_QUATERNION_I)
+#define SS_quaternionp(_o) (SC_arrtype(_o, -1) == G_QUATERNION_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -233,7 +233,7 @@
  *            - return FALSE otherwise
  */
 
-#define SS_stringp(_o) (SC_arrtype(_o, -1) == SC_STRING_I)
+#define SS_stringp(_o) (SC_arrtype(_o, -1) == G_STRING_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -314,7 +314,7 @@
  *             - return FALSE otherwise
  */
 
-#define SS_booleanp(_o) (SC_arrtype(_o, -1) == SC_BOOL_I)
+#define SS_booleanp(_o) (SC_arrtype(_o, -1) == G_BOOL_I)
 
 /*--------------------------------------------------------------------------*/
 

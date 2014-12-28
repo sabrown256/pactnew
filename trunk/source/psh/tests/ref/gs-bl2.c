@@ -32,12 +32,12 @@ static object *_SXI_fbcv1(SS_psides *si, object *argl)
     _lf        = NULL;
 
     SS_args(si, argl,
-            SC_INT_I, &_la,
-            SC_FLOAT_I, &_lb,
-            SC_DOUBLE_I, &_lc,
-            SC_CHAR_I, &_ld,
-            SC_POINTER_I, &_le,
-            SC_POINTER_I, &_lf,
+            G_INT_I, &_la,
+            G_FLOAT_I, &_lb,
+            G_DOUBLE_I, &_lc,
+            G_CHAR_I, &_ld,
+            G_POINTER_I, &_le,
+            G_POINTER_I, &_lf,
             0);
 
     _rv = fbcv1(_la, _lb, _lc, _ld, _le, _lf);
@@ -65,10 +65,10 @@ static object *_SXI_fbmcv1(SS_psides *si, object *argl)
     _ld        = '\0';
 
     SS_args(si, argl,
-            SC_INT_I, &_la,
-            SC_FLOAT_I, &_lb,
-            SC_DOUBLE_I, &_lc,
-            SC_CHAR_I, &_ld,
+            G_INT_I, &_la,
+            G_FLOAT_I, &_lb,
+            G_DOUBLE_I, &_lc,
+            G_CHAR_I, &_ld,
             0);
 
     _rv = fbmcv1(_la, _lb, _lc, _ld);
@@ -96,10 +96,10 @@ static object *_SXI_fbmcr2(SS_psides *si, object *argl)
     _ld        = NULL;
 
     SS_args(si, argl,
-            SC_INT_P_I, &_la,
-            SC_FLOAT_P_I, &_lb,
-            SC_DOUBLE_P_I, &_lc,
-            SC_STRING_I, &_ld,
+            G_INT_P_I, &_la,
+            G_FLOAT_P_I, &_lb,
+            G_DOUBLE_P_I, &_lc,
+            G_STRING_I, &_ld,
             0);
 
     _rv = fbmcr2(_la, _lb, _lc, _ld);

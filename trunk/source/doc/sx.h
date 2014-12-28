@@ -2874,7 +2874,7 @@ object *SS_make_list(SS_psides *si, int first, ...)
 Given a list of type index, variable pointer pairs create and return a
 SCHEME list. A pair with a type index of 0 terminates the list. The pointers
 in the pairs must be pointers to the types indicated by the type index.
-Thus SC_INT_I would be accompanied by and int *.<p>
+Thus G_INT_I would be accompanied by and int *.<p>
 
 <B></B>
 <BLOCKQUOTE>

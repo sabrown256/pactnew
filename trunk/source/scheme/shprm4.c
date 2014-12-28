@@ -23,8 +23,8 @@ static object *_SSI_mk_rect(SS_psides *si, object *argl)
     r = 0.0;
     i = 0.0;
     SS_args(si, argl,
-	    SC_DOUBLE_I, &r,
-	    SC_DOUBLE_I, &i,
+	    G_DOUBLE_I, &r,
+	    G_DOUBLE_I, &i,
 	    0);
 
     z = r + i*I;
@@ -45,8 +45,8 @@ static object *_SSI_mk_polar(SS_psides *si, object *argl)
     m = 0.0;
     a = 0.0;
     SS_args(si, argl,
-	    SC_DOUBLE_I, &m,
-	    SC_DOUBLE_I, &a,
+	    G_DOUBLE_I, &m,
+	    G_DOUBLE_I, &a,
 	    0);
 
     r = m*cos(a);
@@ -68,7 +68,7 @@ static object *_SSI_real_part(SS_psides *si, object *argl)
 
     z = 0.0;
     SS_args(si, argl,
-	    SC_DOUBLE_COMPLEX_I, &z,
+	    G_DOUBLE_COMPLEX_I, &z,
 	    0);
 
     r = creal(z);
@@ -88,7 +88,7 @@ static object *_SSI_imag_part(SS_psides *si, object *argl)
 
     z = 0.0;
     SS_args(si, argl,
-	    SC_DOUBLE_COMPLEX_I, &z,
+	    G_DOUBLE_COMPLEX_I, &z,
 	    0);
 
     r = cimag(z);
@@ -108,7 +108,7 @@ static object *_SSI_magnitude(SS_psides *si, object *argl)
 
     z = 0.0;
     SS_args(si, argl,
-	    SC_DOUBLE_COMPLEX_I, &z,
+	    G_DOUBLE_COMPLEX_I, &z,
 	    0);
 
     r = creal(z);
@@ -130,7 +130,7 @@ static object *_SSI_angle(SS_psides *si, object *argl)
 
     z = 0.0;
     SS_args(si, argl,
-	    SC_DOUBLE_COMPLEX_I, &z,
+	    G_DOUBLE_COMPLEX_I, &z,
 	    0);
 
     r = creal(z);

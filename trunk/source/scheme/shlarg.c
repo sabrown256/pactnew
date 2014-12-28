@@ -88,7 +88,7 @@ static object *_SSI_vctref(SS_psides *si, object *argl)
     i   = -1;
     SS_args(si, argl,
 	    G_SS_VECTOR_I,  &vct,
-	    SC_INT_I, &i,
+	    G_INT_I, &i,
 	    0);
 
     n  = vct->length;
@@ -116,7 +116,7 @@ static object *_SSI_vctset(SS_psides *si, object *argl)
     val = SS_null;
     SS_args(si, argl,
 	    G_SS_VECTOR_I,  &vct,
-	    SC_INT_I, &i,
+	    G_INT_I, &i,
 	    G_OBJECT_I,  &val,
 	    0);
 
@@ -266,7 +266,7 @@ static object *_SSI_sleep(SS_psides *si, object *obj)
 
     n = 0;
     SS_args(si, obj,
-            SC_INT_I, &n,
+            G_INT_I, &n,
             0);
 
     SC_sleep(n);
@@ -303,7 +303,7 @@ static object *_SSI_getenv(SS_psides *si, object *obj)
     vr = NULL;
     vl = NULL;
     SS_args(si, obj,
-            SC_STRING_I, &vr,
+            G_STRING_I, &vr,
             0);
 
     if (vr != NULL)
@@ -333,8 +333,8 @@ static object *_SSI_setenv(SS_psides *si, object *obj)
     vr = NULL;
     vl = NULL;
     SS_args(si, obj,
-            SC_STRING_I, &vr,
-            SC_STRING_I, &vl,
+            G_STRING_I, &vr,
+            G_STRING_I, &vl,
             0);
 
     if (vr != NULL)
@@ -377,7 +377,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 	for (l = argl; !SS_nullobjp(l); l = SS_cdr(si, l))
 	    {v = SS_car(si, l);
 	     SS_args(si, v,
-		     SC_STRING_I, &vr,
+		     G_STRING_I, &vr,
 		     0);
 	     snprintf(s, MAXLINE, "$%s", vr);
 	     vrs[n++] = CSTRSAVE(s);
@@ -411,7 +411,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
     for (i = n-1; i >= 0; i--)
         {vr = vrs[i];
 	 vl = _SS_lk_var_valc(si, vr, si->global_env);
-	 pr = SS_make_list(si, SC_STRING_I, vr,
+	 pr = SS_make_list(si, G_STRING_I, vr,
 			   G_OBJECT_I, vl,
 			   0);
 	 SS_assign(si, lst, SS_mk_cons(si, pr, lst));};
@@ -434,7 +434,7 @@ static object *_SSI_print_env(SS_psides *si, object *obj)
 
     n = 0;
     SS_args(si, obj,
-            SC_INT_I, &n,
+            G_INT_I, &n,
             0);
 
     penv = si->env;
@@ -457,7 +457,7 @@ static object *_SSI_get_pname(SS_psides *si, object *obj)
 
     id = -1;
     SS_args(si, obj,
-            SC_INT_I, &id,
+            G_INT_I, &id,
             0);
 
     rv = SC_get_pname(path, PATH_MAX, id);
@@ -480,9 +480,9 @@ static object *_SSI_load_ave(SS_psides *si)
 
     rv = SC_load_ave(av);
     if (rv == TRUE)
-       s = SS_make_list(si, SC_DOUBLE_I, av,
-			SC_DOUBLE_I, av+1,
-			SC_DOUBLE_I, av+2,
+       s = SS_make_list(si, G_DOUBLE_I, av,
+			G_DOUBLE_I, av+1,
+			G_DOUBLE_I, av+2,
 			0);
     else
        s = SS_null;
@@ -516,8 +516,8 @@ object *_SSI_fopen(SS_psides *si, object *argl)
     name = NULL;
     mode = NULL;
     SS_args(si, argl,
-	    SC_STRING_I, &name,
-	    SC_STRING_I, &mode,
+	    G_STRING_I, &name,
+	    G_STRING_I, &mode,
 	    0);
 
     if (mode == NULL)
@@ -582,9 +582,9 @@ static object *_SSI_mem_usg(SS_psides *si)
 
     SC_mem_stats(&a, &f, &d, NULL);
 
-    ret = SS_make_list(si, SC_INT_I, &a,
-		       SC_INT_I, &f,
-		       SC_INT_I, &d,
+    ret = SS_make_list(si, G_INT_I, &a,
+		       G_INT_I, &f,
+		       G_INT_I, &d,
 		       0);
 
     return(ret);}
@@ -624,9 +624,9 @@ static object *_SSI_mem_monitor(SS_psides *si, object *arg)
     lev = 0;
     s   = "scheme";
     SS_args(si, arg,
-            SC_INT_I, &old,
-            SC_INT_I, &lev,
-            SC_STRING_I, &s,
+            G_INT_I, &old,
+            G_INT_I, &lev,
+            G_STRING_I, &s,
             0);
 
 /* make this local copy to avoid reporting that S leaked */
@@ -668,9 +668,9 @@ static object *_SSI_mem_chk(SS_psides *si)
     na = SC_mem_chk(1);
     nf = SC_mem_chk(2);
     nr = SC_mem_chk(4);
-    o  = SS_make_list(si, SC_INT_I, &na,
-		      SC_INT_I, &nf,
-		      SC_INT_I, &nr,
+    o  = SS_make_list(si, G_INT_I, &na,
+		      G_INT_I, &nf,
+		      G_INT_I, &nr,
 		      0);
 
     return(o);}
@@ -687,7 +687,7 @@ static object *_SSI_sizeof(SS_psides *si, object *arg)
 
     type = NULL;
     SS_args(si, arg,
-	    SC_STRING_I, &type,
+	    G_STRING_I, &type,
 	    0);
 
     nb = (type == NULL) ? 0 : SIZEOF(type);
@@ -710,7 +710,7 @@ static object *_SSI_attach(SS_psides *si, object *arg)
 
     pid = -1;
     SS_args(si, arg,
-	    SC_INT_I, &pid,
+	    G_INT_I, &pid,
 	    0);
 
     rv = SC_attach_dbg(pid);
@@ -732,8 +732,8 @@ static object *_SSI_retrace(SS_psides *si, object *arg)
     pid = -1;
     to  = -1;
     SS_args(si, arg,
-	    SC_INT_I, &pid,
-	    SC_INT_I, &to,
+	    G_INT_I, &pid,
+	    G_INT_I, &to,
 	    0);
 
     rv = SC_retrace_exe(NULL, pid, to);

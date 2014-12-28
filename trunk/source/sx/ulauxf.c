@@ -215,7 +215,7 @@ static object *_ULI_convlv(SS_psides *si, object *argl)
     SS_args(si, argl,
             UL_CURVE_INDEX_I, &jg,
             UL_CURVE_INDEX_I, &jh,
-            SC_DOUBLE_I, &dt,
+            G_DOUBLE_I, &dt,
             0);
 
     if ((jg < 0) || (jh < 0))
@@ -623,10 +623,10 @@ static object *_ULI_error_plot(SS_psides *si, object *argl)
     info = PG_set_plot_type(info, PLOT_ERROR_BAR, CARTESIAN_2D);
 
     info = PG_set_attrs_alist(info,
-			      "DX-PLUS",  SC_DOUBLE_I, TRUE, xpc[0],
-			      "DX-MINUS", SC_DOUBLE_I, TRUE, xmc[0],
-			      "DY-PLUS",  SC_DOUBLE_I, TRUE, xpc[1],
-			      "DY-MINUS", SC_DOUBLE_I, TRUE, xmc[1],
+			      "DX-PLUS",  G_DOUBLE_I, TRUE, xpc[0],
+			      "DX-MINUS", G_DOUBLE_I, TRUE, xmc[0],
+			      "DY-PLUS",  G_DOUBLE_I, TRUE, xpc[1],
+			      "DY-MINUS", G_DOUBLE_I, TRUE, xmc[1],
 			      NULL);
     crv->info = info;
 
@@ -649,9 +649,9 @@ static object *_ULI_mk_palette(SS_psides *si, object *argl)
     nc   = 8;
     wbck = TRUE;
     SS_args(si, argl,
-            SC_STRING_I, &name,
-            SC_INT_I, &nc,
-            SC_INT_I, &wbck,
+            G_STRING_I, &name,
+            G_INT_I, &nc,
+            G_INT_I, &wbck,
             0);
 
     dev = SX_gs.graphics_device;
@@ -680,7 +680,7 @@ static object *_ULI_rd_palette(SS_psides *si, object *argl)
 
     name = NULL;
     SS_args(si, argl,
-            SC_STRING_I, &name,
+            G_STRING_I, &name,
             0);
 
     dev = SX_gs.graphics_device;
@@ -786,18 +786,18 @@ static object *_ULI_edit(SS_psides *si, int ie)
 
 /* remember the original curve's color */
     PG_get_attrs_alist(ocv->info,
-		       "LINE-COLOR", SC_INT_I, &oldc, dev->WHITE,
+		       "LINE-COLOR", G_INT_I, &oldc, dev->WHITE,
 		       NULL);
 
 /* redraw original curve in gray */
     ocv->info = PG_set_attrs_alist(ocv->info,
-				   "LINE-COLOR", SC_INT_I, FALSE, dev->GRAY,
+				   "LINE-COLOR", G_INT_I, FALSE, dev->GRAY,
 				   NULL);
 
 /* draw scatter version of curve in green */
     crv->info = PG_set_attrs_alist(crv->info,
-				   "SCATTER",    SC_INT_I, FALSE, TRUE,
-				   "LINE-COLOR", SC_INT_I, FALSE, dev->GREEN,
+				   "SCATTER",    G_INT_I, FALSE, TRUE,
+				   "LINE-COLOR", G_INT_I, FALSE, dev->GREEN,
 				   NULL);
     UL_plot(si);
 
@@ -879,10 +879,10 @@ static object *_UL_stat(SS_psides *si, int j)
     PM_stats_mean(n, SX_gs.dataset[j].x[0], &xmean, NULL, NULL, &xstd);
     PM_stats_mean(n, SX_gs.dataset[j].x[1], &ymean, NULL, NULL, &ystd);
 
-    ret = SS_make_list(si, SC_DOUBLE_I, &xmean,
-                       SC_DOUBLE_I, &xstd,
-                       SC_DOUBLE_I, &ymean,
-                       SC_DOUBLE_I, &ystd,
+    ret = SS_make_list(si, G_DOUBLE_I, &xmean,
+                       G_DOUBLE_I, &xstd,
+                       G_DOUBLE_I, &ymean,
+                       G_DOUBLE_I, &ystd,
                        0);
 
     if (si->interactive == ON)
@@ -1115,9 +1115,9 @@ static object *_ULI_crv_attr(SS_psides *si, object *obj)
 	dfcol = (SX_gs.graphics_device == NULL) ? 4 : SX_gs.graphics_device->BLUE;
 	   
 	PG_get_attrs_alist(info,
-			   "LINE-COLOR", SC_INT_I, &lncol, dfcol,
-			   "LINE-STYLE", SC_INT_I, &lnsty, LINE_SOLID,
-			   "LINE-WIDTH", SC_DOUBLE_I,    &lnwid, 0.0,
+			   "LINE-COLOR", G_INT_I, &lncol, dfcol,
+			   "LINE-STYLE", G_INT_I, &lnsty, LINE_SOLID,
+			   "LINE-WIDTH", G_DOUBLE_I,    &lnwid, 0.0,
 			   NULL);
 
         if (si->interactive == ON)
@@ -1129,9 +1129,9 @@ static object *_ULI_crv_attr(SS_psides *si, object *obj)
 	    PRINT_DOUBLE(wd);
             PRINT(stdout, " %ld)\n\n", lnsty);};
 
-        o = SS_make_list(si, SC_INT_I, &lncol,
-			 SC_DOUBLE_I,  &lnwid,
-			 SC_INT_I, &lnsty,
+        o = SS_make_list(si, G_INT_I, &lncol,
+			 G_DOUBLE_I,  &lnwid,
+			 G_INT_I, &lnsty,
 			 0);};
 
     return(o);}
@@ -1151,9 +1151,9 @@ static object *_ULI_write_abs(SS_psides *si, object *argl)
     x[1] = 0.0;
     text = NULL;
     SS_args(si, argl,
-            SC_DOUBLE_I, &x[0],
-            SC_DOUBLE_I, &x[1],
-            SC_STRING_I, &text,
+            G_DOUBLE_I, &x[0],
+            G_DOUBLE_I, &x[1],
+            G_STRING_I, &text,
             0);
 
     PG_write_n(SX_gs.graphics_device, 2, NORMC, x, text);

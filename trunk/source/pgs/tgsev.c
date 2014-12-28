@@ -345,14 +345,14 @@ int main(int argc, char *argv[])
     PG_set_default_event_handler(SCR_dev, unspecified_event_handler);
     PG_set_mouse_down_event_handler(SCR_dev, mouse_event_handler);
 
-    PG_register_variable("PS-Flag", SC_INT_S, &ps_flag, NULL, NULL);
-    PG_register_variable("Direction", SC_STRING_S, &direction, NULL, NULL);
+    PG_register_variable("PS-Flag", G_INT_S, &ps_flag, NULL, NULL);
+    PG_register_variable("Direction", G_STRING_S, &direction, NULL, NULL);
     phimn = -180.0;
     phimx =  180.0;
-    PG_register_variable("Phi", SC_DOUBLE_S, &phi, &phimn, &phimx);
+    PG_register_variable("Phi", G_DOUBLE_S, &phi, &phimn, &phimx);
     thetamn = 0.0;
     thetamx = 90.0;
-    PG_register_variable("Theta", SC_DOUBLE_S, &theta, &thetamn, &thetamx);
+    PG_register_variable("Theta", G_DOUBLE_S, &theta, &thetamn, &thetamx);
 
     if (SC_isfile("tgsev.pui"))
        {PG_register_callback("End", end_prog);

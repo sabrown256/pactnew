@@ -154,7 +154,7 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, char *fname,
         ne    = top->n_cells[0];};
 
     info = NULL;
-    SC_CHANGE_VALUE_ALIST(info, int, SC_INT_P_S, "COPY-MEMORY", cp);
+    SC_CHANGE_VALUE_ALIST(info, int, G_INT_P_S, "COPY-MEMORY", cp);
 
     elem = CMAKE_N(void *, nde);
 
@@ -187,7 +187,7 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, char *fname,
 	   {bpi = 0;
 
 	    id = SC_type_id(bf, FALSE);
-	    if ((id == SC_BOOL_I) || (SC_is_type_num(id) == TRUE))
+	    if ((id == G_BOOL_I) || (SC_is_type_num(id) == TRUE))
 	       bpi = SC_type_size_a(bf);
 
 	    if (bpi > 0)

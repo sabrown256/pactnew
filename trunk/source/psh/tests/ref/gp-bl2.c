@@ -43,7 +43,7 @@ PyObject *_PY_fbcv1(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fbcv1(_la, _lb, _lc, _ld, _le, _lf);
     _lo = PY_build_object("fbcv1",
-                          SC_STRING_I, 0, &_rv,
+                          G_STRING_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -78,7 +78,7 @@ PyObject *_PY_fbmcv1(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fbmcv1(_la, _lb, _lc, _ld);
     _lo = PY_build_object("fbmcv1",
-                          SC_STRING_I, 0, &_rv,
+                          G_STRING_I, 0, &_rv,
                           0);
 
     return(_lo);}
@@ -113,7 +113,7 @@ PyObject *_PY_fbmcr2(PyObject *self, PyObject *args, PyObject *kwds)
 
     _rv = fbmcr2(_la, _lb, _lc, _ld);
     _lo = PY_build_object("fbmcr2",
-                          SC_STRING_I, 0, &_rv,
+                          G_STRING_I, 0, &_rv,
                           0);
 
     return(_lo);}

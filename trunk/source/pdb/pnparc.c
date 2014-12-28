@@ -416,7 +416,7 @@ static double _PN_glmn_message_n(double vi)
     np = SC_get_number_processors();
 
     sp[1] = -1;
-    PN_out(&vi, SC_DOUBLE_S, 1, NULL, sp);
+    PN_out(&vi, G_DOUBLE_S, 1, NULL, sp);
 
     vo = vi;
     vt = 0.0;
@@ -426,7 +426,7 @@ static double _PN_glmn_message_n(double vi)
 	    continue;
 
 	 sp[1] = i;
-	 PN_in(&vt, SC_DOUBLE_S, 1, NULL, sp);
+	 PN_in(&vt, G_DOUBLE_S, 1, NULL, sp);
 
 	 vo = min(vo, vt);};
 
@@ -587,7 +587,7 @@ static long _PN_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
          nbr -= nbt;
          if (nbr > 0)
 	    {SC_printf(pp, "%c,%s,%ld,%d\n", SC_FREAD,
-		       SC_CHAR_S, nbr, block);
+		       G_CHAR_S, nbr, block);
 
 	     SC_gets(reply, MAXLINE, pp);
 	     sscanf(reply, "%d,%254s\n", &nis, types);
