@@ -11,6 +11,8 @@
 
 #include "pgs_int.h"
 
+/* #define DEBUG */
+
 #define LABS(x) abs((int) (x))
 
 typedef struct s_PG_scan_raster PG_scan_raster;
@@ -531,7 +533,7 @@ static void *_PG_do_scan_line(void *arg)
     PFSurfScan fnc_scan;
     void *rv;
 
-#if 0
+#if defined(DEBUG)
     int id;
 
     id = SC_current_thread();
@@ -733,19 +735,6 @@ static void _PG_draw_surface(PG_device *dev, int nd,
 /* restore the window offsets */
     for (i = 0; i < 3; i++)
         dev->window_x[2*i] = tr[i];
-
-#if 0
-    switch (_PG_gattrs.hl_clear_mode)
-       {case CLEAR_SCREEN :
-             PG_clear_window(dev);
-             break;
-        case CLEAR_VIEWPORT :
-             PG_clear_viewport(dev);
-             break;
-        case CLEAR_FRAME :
-             PG_clear_frame(dev);
-             break;};
-#endif
 
     PG_draw_box_n(dev, 3, WORLDC, dextr);
 

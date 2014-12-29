@@ -323,31 +323,12 @@ static void _PG_interp_point(PG_device *dev, double *yp, double x,
                              double *xa, double *xb)
    {double p[PG_SPACEDM];
 
-#if 0
-    p[0] = x;
-    p[1] = 0.0;
-    
-    if (g->iflog[0])
-       {xa[0] = log10(ABS(xa[0]) + SMALL);
-        xb[0] = log10(ABS(xb[0]) + SMALL);
-        p[0]  = log10(ABS(p[0])  + SMALL);};
-
-    if (g->iflog[1])
-       {PM_interp(p[1], p[0], xa[0], xa[1], xb[0], xb[1]);
-        if (p[1] <= 0.0)
-           {*yp = -HUGE;
-            return;};
-
-        xa[1] = log10(ABS(xa[1]) + SMALL);
-        xb[1] = log10(ABS(xb[1]) + SMALL);};
-#else
     p[0] = x;
     p[1] = 1.0;
     
     PG_log_point(dev, 2, xa);
     PG_log_point(dev, 2, xb);
     PG_log_point(dev, 2, p);
-#endif
 
     PG_trans_point(dev, 2, WORLDC, xa, NORMC, xa);
     PG_trans_point(dev, 2, WORLDC, xb, NORMC, xb);
@@ -375,153 +356,6 @@ static void _PG_interp_point(PG_device *dev, double *yp, double x,
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* PG_DRAW_DATA_IDS_ALT - draw the curve data ids */
- 
-static void PG_draw_data_ids_alt(PG_device *dev, double *x, double *y,
-				 int n, int label, pcons *info)
-   {char mark[2];
-    int i, j, k, j0, m, scatter;
-    int imn, imx;
-    int *ppt, *psc;
-    double xp[PG_SPACEDM];
-    double xa[0], xb[0], xa[1], xb[1], s1, s2;
-    double dx, dy, dt;
-    double s, ds, r, wc[PG_BOXSZ];
-    double *ln;
-    PG_rendering pty;
-
-    PG_fset_clipping(dev, TRUE);
-    PG_get_viewspace(dev, WORLDC, wc);
- 
-    mark[0] = label;
-    mark[1] = '\0';
-
-    m = 6;
-    r = 0.5*(1.0 + PM_random(1));
-    k = n/m;
-
-    if (g->iflog[0])
-       dx = POW(10.0, (log10(wc[1]/wc[0]))/((double) m));
-    else
-       dx = (wc[1] - wc[0])/((double) m);
-
-    PG_get_attrs_alist(info,
-		       "SCATTER",   G_INT_I, &scatter, FALSE,
-		       "PLOT-TYPE", G_INT_I, &pty,     PLOT_CARTESIAN,
-		       NULL);
-
-    if (!scatter && ((pty == PLOT_CARTESIAN) || (pty == PLOT_HISTOGRAM)))
-       {ln = CMAKE_N(double, n);
-
-/* NOTE: the following assume that the arrays are sorted */
-        for (imn = 0; imn < n; imn++)
-	    {if ((wc[0] <= x[imn]) && (wc[2] <= y[imn]))
-                break;};
-
-        for (imx = n-1; imx >= 0; imx--)
-	    {if ((x[imx] <= wc[1]) && (y[imx] <= wc[3]))
-                break;};
-
-/* find the lengths of each segment */
-        xa[0] = x[0];
-        xa[1] = y[0];
-        for (i = 1; i < n; i++)
-            {xb[0] = x[i];
-             xb[1] = y[i];
-	     ln[i] = PM_hypot(xb[0] - xa[0], xb[1] - xa[1]);
-	     xa[0] = xb[0];
-             xa[1] = xb[1];};
-
-/* integrate to find the total curve length */
-        for (i = 1, s = 0.0; i < n; i++)
-            {s += ln[i];
-             ln[i] = s;};
-
-/* normalize to find the fractional curve length */
-        for (i = 1, s = 1.0/ln[n-1]; i < n; i++)
-            ln[i] *= s;
-
-	if ((g->iflog[0]) || (g->iflog[1]))
-	   {dx = wc[1] - wc[0];
-	    dy = wc[3] - wc[2];
-	    dt = max(dx, dy);
-	    ds = log(dt);
-	    ds = ABS(ds);
-	    ds = min(ds, _PG_gattrs.axis_n_decades);
-	    s  = ln[imx]*POW(ds, -((double) m));}
-	else
-	   {if (imn == imx)
-               {if (imn == 0)
-                   imx++;
-                else
-		   imn--;};
-
-	    ds = (ln[imx] - ln[imn])/((double) m);
-	    s  = ln[imn] + r*ds;};
-
-	for (i = 0; i < m; i++)
-	    {j = PM_find_index(ln, s, n);
-
-             if ((imn <= j) && (j <= imx))
-                {if (pty == PLOT_HISTOGRAM || scatter)
-                    {xp[0] = x[j-1];
-                     xp[1] = y[j-1];}
-                 else
-                    {xa[0] = x[j-1];
-                     xa[1] = y[j-1];
-                     xb[0] = x[j];
-                     xb[1] = y[j];
-                     s1 = ln[j-1];
-                     s2 = ln[j];
-
-                     if (xa[0] < wc[0])
-                        {PM_interp(xa[1], wc[0], xa[0], xa[1], xb[0], xb[1]);
-                         xa[0] = wc[0];}
-                     if (xb[0] > wc[1])
-                        {PM_interp(xb[1], wc[1], xa[0], xa[1], xb[0], xb[1]);
-                         xb[0] = wc[1];}
-
-		     xp[0] = xa[0] + (xb[0] - xa[0])*(s - s1)/(s2 - s1 + SMALL);
-		     if ((g->iflog[0]) || (g->iflog[1]))
-			s *= ds;
-                     else
-		        s += ds;
-
-                     _PG_interp_point(dev, &xp[1], xp[0], xa, xb);};
-
-                 if (PG_box_contains(2, wc, xp) == TRUE)
-                    PG_write_n(dev, 2, WORLDC, xp, mark);};};
-
-	CFREE(ln);}
-
-    else if (pty == PLOT_POLAR)
-       {double tc, rc, xc, yc;
-
-	j0 = ((double) k)*r;
-	j0 = abs(j0);
-
-        for (i = 0; i < m; i++)
-            {j  = j0 + k*i;
-             tc = x[j];
-             rc = y[j];
-             xp[0] = rc*cos(tc);
-             xp[1] = rc*sin(tc);
-	     if (PG_box_contains(2, wc, xp) == TRUE)
-	        PG_write_n(dev, 2, WORLDC, xp, mark);};};
- 
-    PG_fset_clipping(dev, FALSE);
- 
-    return;}
- 
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* PG_DRAW_DATA_IDS - draw the curve data ids */

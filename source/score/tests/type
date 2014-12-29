@@ -1,0 +1,50 @@
+#!/bin/csh -f
+#
+# TYPE - test SCORE type manager
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "SCORE Type Management Test ...."
+set exe = $BinDir/tsctyp
+
+@ lerr = 1
+
+flog $Log pushd $SrcDir
+flog $Log $MAKE type
+set xstatus = $status
+flog $Log popd
+
+if ($xstatus != 0) then
+   NoteD $Log ""
+   NoteD $Log "                         Can't build SCORE Type Test Program"
+else
+   if ("$CROSS_FE" != "") then
+      setenv CROSS_FE   "$CROSS_FE -v"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
+
+   set rpf = none
+   set opt = ""
+   set io  = flog
+
+   source ../../../scripts/test-run
+
+   @ lerr = $status
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endif
+
+$TEST_CHECK part -a type -e $lerr -dt $dt -x $exe none
+
+exit($status)

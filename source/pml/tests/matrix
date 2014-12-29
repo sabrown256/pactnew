@@ -2,9 +2,6 @@
 #
 # MATRIX - PML matrix tests
 #
-# Source Version: 3.0
-# Software Release #: LLNL-CODE-422942
-#
 # include "cpyright.h"
 #
 
@@ -17,6 +14,7 @@ set io  = flog
 
    NoteD $Log ""
    NoteD $Log  -n "                    $msg"
+   Note $Log ""
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE matrix

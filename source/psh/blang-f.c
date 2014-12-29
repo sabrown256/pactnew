@@ -36,10 +36,6 @@ static char
 void map_fortran_types(void)
    {
 
-#if 0
-
-#endif
-
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -285,18 +281,12 @@ static void init_fortran(statedes *st, bindes *bd)
 	fprintf(fp, " */\n");
 	fprintf(fp, "\n");
 
-#if 1
 	fprintf(fp, "#include \"cpyright.h\"\n");
 
 	snprintf(hf, BFLRG, "%s_int.h", pck);
 	fprintf(fp, "#include \"sx_int.h\"\n");
 	if (file_exists(hf) == TRUE)
 	   fprintf(fp, "#include \"%s\"\n", hf);
-#else
-	fprintf(fp, "#include \"cpyright.h\"\n");
-	fprintf(fp, "#include \"sx_int.h\"\n");
-	fprintf(fp, "#include \"%s_int.h\"\n", pck);
-#endif
 
 	fprintf(fp, "\n");
 	csep(fp);};

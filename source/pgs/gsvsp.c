@@ -2211,15 +2211,10 @@ static INLINE void _PG_conform_trans(int nd, int n, double **x,
 
 	 sf = (smn == smx) ? 0.0 : (dmx - dmn)/(smx - smn);
 
-#if 1
 	 sf = min(sf, 1.0);
 
 /* translate from the scaled center */
 	 tf = 0.5*((dmn + dmx) - sf*(smn + smx));
-
-#else
-	 tf = 0.5*((dmn + dmx) - (smn + smx));
-#endif
 
 	 dos |= (sf != 1.0);
 	 dot |= (tf != 0.0);

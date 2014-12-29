@@ -1362,11 +1362,6 @@ static int _PD_write_meta_iii(PDBfile *file, FILE *out, int fh)
 
     fp = file->stream;
 
-#if 0
-    if (_PD_safe_flush(file) == FALSE)
-       PD_error("FFLUSH FAILED BEFORE CHART - _PD_WRITE_META_III", PD_WRITE);
-#endif
-
 /* seek the place to write the structure chart */
     addr = _PD_eod(file);
     _PD_set_current_address(file, addr, SEEK_SET, PD_WRITE);

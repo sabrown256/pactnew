@@ -200,17 +200,7 @@ void _PM_permute(long *region, long **strtind, long noffs)
               else
                   count++;};}
     
-#if 0
-    printf("The permuted start indices are:\n");
-    for (i = 0; i < noffs; i++)
-        for (j = 0; j < ndims; j++)
-            {printf("%2ld ", strtind[i][j]);
-             if (j == (ndims - 1))
-	        printf("\n");}
-#endif
-
     return;}
-
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

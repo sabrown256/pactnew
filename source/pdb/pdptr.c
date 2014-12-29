@@ -783,24 +783,6 @@ static PD_address *_PD_ptr_install_entry(adloc *al, long i,
 static void _PD_ptr_remove_addr(adloc *al, PD_address *ad, int lck)
    {
 
-#if 0
-    void *vr;
-    hasharr *ah;
-
-    if (file != NULL)
-       {if (lck == TRUE)
-	   SC_LOCKON(PD_ptr_lock);
-
-	vr = _SC_to_address(ad->addr);
-
-	ah = al->ah;
-
-	SC_hasharr_remove(ah, vr);
-
-	if (lck == TRUE)
-	   SC_LOCKOFF(PD_ptr_lock);};
-#endif
-
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -1162,29 +1144,6 @@ void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr,
 
 void _PD_ptr_remove_entry(PDBfile *file, syment *ep, int lck)
    {
-
-#if 0
-    if (file != NULL)
-       {if (lck == TRUE)
-	   SC_LOCKON(PD_ptr_lock);
-
-	int64_t addr;
-	PD_address *ad;
-	adloc *al;
-
-	al   = _PD_ptr_get_al(file, FALSE);
-	addr = PD_entry_address(ep);
-	ad   = _PD_ptr_rd_lookup(file, addr, FALSE, NULL);
-	_PD_ptr_remove_addr(al, ad, FALSE);
-
-/* this will be freed when the hash table is releases
- * we had to free the contents here
-	CFREE(ad);
- */
-
-	if (lck == TRUE)
-	   SC_LOCKOFF(PD_ptr_lock);};
-#endif
 
     return;}
 

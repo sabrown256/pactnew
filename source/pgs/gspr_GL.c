@@ -667,10 +667,6 @@ void _PG_GL_put_image(PG_device *dev, unsigned char *bf,
 
     PG_QUAD_FOUR_BOX(dev, pbx);
 
-#if 0
-    iy = iy + ny - 1;
-#endif
-
     p[0] = pbx[0];
     p[1] = pbx[2];
     PG_trans_point(dev, 2, PIXELC, p, NORMC, p);

@@ -839,39 +839,7 @@ void UL_init_env(SS_psides *si)
 object *UL_mode_text(SS_psides *si)
    {object *ret;
 
-#if 1
     ret = SX_mode_text(si);
-#else
-
-    if (PG_gs.console == NULL)
-       PG_open_console("ULTRA II", SX_gs.console_type,
-		       SX_gs.background_color_white,
-                       SX_gs.console_x[0], SX_gs.console_x[1],
-                       SX_gs.console_dx[0], SX_gs.console_dx[1]);
-
-    if (SX_gs.graphics_device != NULL)
-       {PG_clear_window(SX_gs.graphics_device);
-        PG_close_device(SX_gs.graphics_device);
-        SX_gs.graphics_device = NULL;
-
-        SX_gs.gr_mode   = FALSE;
-        SX_gs.plot_flag = FALSE;
-
-        ret = SS_t;}
-    else
-        ret = SS_f;
-
-/* give default values to the lisp package interface variables */
-    si->post_read  = NULL;
-    si->post_eval  = NULL;
-    si->post_print = NULL;
-    si->pr_ch_un   = SS_unget_ch;
-    si->pr_ch_out  = SS_put_ch;
-
-    SS_set_put_line(si, SS_printf);
-    SS_set_put_string(si, SS_fputs);
-    SC_set_get_line(io_gets);
-#endif
 
     SS_set_prompt(si, "S-> ");
 
@@ -1060,8 +1028,6 @@ void UL_set_graphics_state(PG_device *d)
 void SX_mode_ultra(SS_psides *si, int load_init, int load_rc, int track)
    {
 
-#if 1
-
     SX_gs.autoplot = OFF;
     if (load_init == TRUE)
        SX_load_rc(si, "ultra.scm", load_rc, ".ultrarc", "ultra.ini");
@@ -1076,37 +1042,6 @@ void SX_mode_ultra(SS_psides *si, int load_init, int load_rc, int track)
        UL_mode_text(si);
 
     PG_expose_device(PG_gs.console);
-
-#else
-
-    SX_gs.gr_mode = TRUE;
-
-    SC_set_banner(" %s  -  %s\n\n", PCODE, VERSION);
-
-    SX_init_view(si);
-    SX_install_global_vars(si);
-    SX_init_mappings(si);
-    SX_init_env(si);
-
-#ifndef NO_SHELL
-    if ((SX_gs.gr_mode == TRUE) && (SX_gs.qflag == FALSE))
-       SS_banner(si, SS_mk_string(si, PCODE));
-#endif
-
-/* load the SCHEME level Ultra functionality */
-    if (load_init)
-       SX_load_rc(si, "ultra.scm",
-		  load_rc, ".ultrarc", "ultra.rc");
-
-    SS_load_scm(si, "nature.scm");
-
-    if (SX_gs.gr_mode)
-       SX_mode_graphics(si);
-    else
-       SX_mode_text(si);
-
-    PG_expose_device(PG_gs.console);
-#endif
 
     return;}
 

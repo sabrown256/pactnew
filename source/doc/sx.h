@@ -2555,7 +2555,7 @@ associated object</TD></TR>
 <TR><TD>SS_nullobjp(x)</TD>
 <TD>TRUE iff x is of type NULL_OBJ (() or nil) </TD></TR>
 <TR><TD>SS_procedurep(x)</TD>
-<TD>TRUE iff x is of type PROC_OBJ </TD></TR>
+<TD>TRUE iff x is of type PROCEDURE (procedure) </TD></TR>
 <TR><TD>SS_booleanp(x)</TD>
 <TD>TRUE iff x is of type BOOLEAN (#t or #f) </TD></TR>
 </TABLE>

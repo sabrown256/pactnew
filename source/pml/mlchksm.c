@@ -11,6 +11,8 @@
 
 #include "pml_int.h"
 
+/* #define DBG_TIMER */
+
 /* This notice pertains to each of the PM_md5_* and PM_MD5_* items below */
 
 /* Copyright @ 1991-2, RSA Data Security, Inc. Created 1991. All
@@ -384,7 +386,7 @@ void PM_md5_checksum_array(void *arr, u_int64_t ni, u_int64_t bpi,
 /* read the arr in 1024 byte (1 kB) chunks */
     sz = (int64_t) 1024;
     
-#if 0
+#if defined(DBG_TIMER)
     {double t0, rate;
     t0 = SC_wall_clock_time();
 #endif
@@ -401,7 +403,7 @@ void PM_md5_checksum_array(void *arr, u_int64_t ni, u_int64_t bpi,
 
     _PM_md5_final(dig, 33, &mc);
     
-#if 0
+#if defined(DBG_TIMER)
     t0   = SC_wall_clock_time() - t0;
     rate = ((double) nb)/t0;};
 #endif
@@ -442,23 +444,16 @@ void PM_md5_checksum_file(FILE *file, int64_t start, int64_t stop,
 /* jump to the starting point */
     io_seek(file, start, SEEK_SET);
 
-#if 0
+#if defined(DBG_TIMER)
     {double t0, rate;
     t0 = SC_wall_clock_time();
 #endif
-
-int l, j = 0, doit=0;
 
     _PM_md5_init(&mc);
 
     for (ib = nb; ib > 0; )
         {seg = min(ib, sz);
 	 len = io_read(bf, 1, seg, file);  
-if (doit == TRUE)
-{printf("bf %8ld %4d ", (long) nb, j++);
-for (l = 0; l < len; l++)
-    printf("%02x", bf[l]);
-printf("\n");};
 	 if (len == seg)
 	    {_PM_md5_update(&mc, bf, len);
 	     ib -= len;}
@@ -467,7 +462,7 @@ printf("\n");};
 
     _PM_md5_final(dig, 33, &mc); 
 
-#if 0
+#if defined(DBG_TIMER)
     t0   = SC_wall_clock_time() - t0;
     rate = ((double) nb)/t0;};
 #endif

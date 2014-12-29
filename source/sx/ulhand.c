@@ -654,16 +654,7 @@ static int _UL_bc_load_oper(SS_psides *si, int i, double **x,
 	    x[id] = xt[id];};
 
     if (cpy == FALSE)
-       {
-#if 0
-    SC_vstrcat(bf, nc, " %s", _UL_id_str(i, i));
-#else
-    char *lbl;
-
-    lbl = SC_dsnprintf(FALSE, "%s %s", bf, _UL_id_str(i, i));
-    SC_strncpy(bf, MAXLINE, lbl, -1);
-#endif
-    };
+       SC_vstrcat(bf, nc, " %s", _UL_id_str(i, i));
 
     return(n);}
 

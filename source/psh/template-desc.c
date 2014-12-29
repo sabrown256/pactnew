@@ -1158,52 +1158,6 @@ static void write_desc(FILE *fo, int ne, type_desc *tl, int *dfl)
     sflag = dfl[2];
 
 /* data type sizes are straightforward */
-#if 0
-    int i;
-    type_desc *td;
-
-    for (i = 0; i < ne; i++)
-        {td = tl + i;
-	 if (strcmp(td->type, "bool") == 0)
-	    TYPE_SET_N(I_BOOL, td, cb);
-	 else if (strcmp(td->type, "char") == 0)
-	    TYPE_SET_N(I_CHAR, td, cc);
-	 else if (strcmp(td->type, "wchar_t") == 0)
-	    TYPE_SET_N(I_WCHAR, td, cw);
-	 else if (strcmp(td->type, "int8_t") == 0)
-	    TYPE_SET_N(I_INT8, td, ci8);
-	 else if (strcmp(td->type, "short") == 0)
-	    TYPE_SET_N(I_SHORT, td, cs);
-	 else if (strcmp(td->type, "int") == 0)
-	    TYPE_SET_N(I_INT, td, ci);
-	 else if (strcmp(td->type, "long") == 0)
-	    TYPE_SET_N(I_LONG, td, cl);
-	 else if (strcmp(td->type, "long long") == 0)
-	    TYPE_SET_N(I_LONG_LONG, td, cll);
-	 else if (strcmp(td->type, "float") == 0)
-	    TYPE_SET_N(I_FLOAT, td, cf);
-	 else if (strcmp(td->type, "double") == 0)
-	    TYPE_SET_N(I_DOUBLE, td, cd);
-	 else if (strcmp(td->type, "long double") == 0)
-	    TYPE_SET_N(I_LONG_DOUBLE, td, cld);
-	 else if (strcmp(td->type, "float _Complex") == 0)
-	    TYPE_SET_N(I_FLOAT_COMPLEX, td, cfc);
-	 else if (strcmp(td->type, "double _Complex") == 0)
-	    TYPE_SET_N(I_DOUBLE_COMPLEX, td, cdc);
-	 else if (strcmp(td->type, "long double _Complex") == 0)
-	    TYPE_SET_N(I_LONG_DOUBLE_COMPLEX, td, clc);
-	 else if (strcmp(td->type, "void *") == 0)
-	    TYPE_SET_N(I_POINTER, td, cp);
-	 else if (strcmp(td->type, "struct") == 0)
-	    type_set(I_STRUCT, 2*sizeof(char), sizeof(ct));
-	 else if (strcmp(td->type, "int16_t") == 0)
-	    TYPE_SET_N(I_INT16, td, ci16);
-	 else if (strcmp(td->type, "int32_t") == 0)
-	    TYPE_SET_N(I_INT32, td, ci32);
-	 else if (strcmp(td->type, "int64_t") == 0)
-	    TYPE_SET_N(I_INT64, td, ci64);};
-
-#else
     TYPE_SET(I_BOOL,                bool,                 cb);
     TYPE_SET(I_CHAR,                char,                 cc);
     TYPE_SET(I_WCHAR,               wchar_t,              cw);
@@ -1225,7 +1179,6 @@ static void write_desc(FILE *fo, int ne, type_desc *tl, int *dfl)
     TYPE_SET(I_INT16, int16_t,              ci16);
     TYPE_SET(I_INT32, int32_t,              ci32);
     TYPE_SET(I_INT64, int64_t,              ci64);
-#endif
 
     bo.i[0] = 1;
     if (bo.c[0] == 1)

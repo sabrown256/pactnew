@@ -408,15 +408,8 @@ static void _PG_tick_div_nrm(PG_axis_tick_def *td)
     dx = td->dx;
 
     if (na > 1)
-       {
-
-#if 0
-        extr[1] = dx[na - 1];
-        extr[0] = dx[0];
-#else
-        extr[1] = td->vo[1];
+       {extr[1] = td->vo[1];
         extr[0] = td->vo[0];
-#endif
 
 /* shift by the mimimum value */
         for (j = 0; j < na; j++)

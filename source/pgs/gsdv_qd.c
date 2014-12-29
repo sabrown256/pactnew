@@ -947,13 +947,6 @@ void _PG_qd_query_pointer(PG_device *dev, int *ir, int *pb, int *pq)
     
     mod = 0;
 
-/* little MAC's */
-#if 0
-    mod |= (pk[56]) ? KEY_SHIFT : 0;
-    mod |= (pk[55]) ? KEY_CNTL  : 0;
-    mod |= (pk[58]) ? KEY_ALT   : 0;
-#endif
-
     i = (pk[1]) & ~(~0 << 1);
     mod |= (i)  ? KEY_SHIFT : 0;
 

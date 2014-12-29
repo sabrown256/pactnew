@@ -444,12 +444,6 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
 	    cnv |= (dpf->kind        != dph->kind);
 	    cnv |= (dpf->size_bits   != dph->size_bits);
 	    cnv |= (dpf->size        != dph->size);
-#if 0
-/* alignment should be irrelevant to conversion
- * issues of alignment would be handled elsewhere
- */
-	    cnv |= (dpf->alignment   != dph->alignment);
-#endif
 	    cnv |= (dpf->n_indirects != dph->n_indirects);
 	    cnv |= (dpf->is_indirect != dph->is_indirect);
 	    cnv |= (dpf->onescmp     != dph->onescmp);

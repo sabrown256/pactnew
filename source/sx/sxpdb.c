@@ -237,53 +237,6 @@ void *_SX_opt_PD_cksumdes(PD_cksumdes *x, bind_opt wh, void *a)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* _SX_TARGET_OLD - set the data standard and alignment for the next file to be
- *                - created. If an argument is 0 or missing, the corresponding
- *                - value is not changed.
- */
-
-static void _SX_target_old(SS_psides *si, int data, int align)
-   {int data_max, align_max;
-
-    data_max  = 0;
-    align_max = 0;
-
-    if (data == 0)
-       {if (PD_gs.req_standard != NULL)
-           while (PD_gs.req_standard != PD_gs.std_standards[data++]);}
-    else
-       {while (PD_gs.std_standards[data_max++]);
-        if ((data < 1) || (data >= data_max))
-           SS_error(si, "UNKNOWN DATA STANDARD - _SX_TARGET",
-                    SS_mk_integer(si, data));};
-        
-    if (align == 0)
-       {if (PD_gs.req_alignment != NULL)
-           while (PD_gs.req_alignment != PD_gs.std_alignments[align++]);}
-    else
-       {while (PD_gs.std_alignments[align_max++]);
-       if ((align < 1) || (align >= align_max))
-          SS_error(si, "UNKNOWN DATA ALIGNMENT - _SX_TARGET",
-                   SS_mk_integer(si, align));};
-
-    if (data != 0)
-       PD_gs.req_standard  = PD_gs.std_standards[data - 1];
-    if (align != 0)
-       PD_gs.req_alignment = PD_gs.std_alignments[align - 1];
-
-    PD_target(PD_gs.req_standard, PD_gs.req_alignment);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* _SX_TARGET - set the data standard and alignment for the next file to be
@@ -4355,25 +4308,6 @@ void SX_install_pdb_funcs(SS_psides *si)
                SS_nargs,
                _SXI_wrt_ultra_curve, SS_PR_PROC);
 
-#if 0
-
-    SS_install(si, "close-text-file",
-               "Close a text file",
-               SS_nargs,
-               _SXI_close_textfile, SS_PR_PROC);
-
-    SS_install(si, "open-text-file",
-               "Open a text file",
-               SS_nargs,
-               _SXI_open_textfile, SS_PR_PROC);
-
-    SS_install(si, "wr-to-textfile",
-               "Write the contents of a PDB variable to a text file",
-               SS_nargs,
-               _SXI_wr_to_textfile, SS_PR_PROC);
-
-#endif
-
     SS_install_cf(si, "string-mode",
                   "Variable: Mode for string reads - literal or nopadding",
                   SS_acc_int,
@@ -4399,80 +4333,4 @@ void SX_install_pdb_funcs(SS_psides *si)
     return;}
  
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_SET_BUFFER_SIZE - set the buffer_size */
-
-static object *_SXI_set_buffer_size(SS_psides *si, object *argl)
-   {int v;
-
-    v = -1;
-    SS_args(si, argl,
-            G_INT_I, &v,
-            0);
-
-    PD_set_buffer_size(v);
-
-    return(SS_t);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_GET_BUFFER_SIZE - get the buffer_size */
-
-static object *_SXI_get_buffer_size(SS_psides *si)
-   {long long v;
-    object *o;
-
-    v = PD_get_buffer_size();
-    o = SS_mk_integer(si, v);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_GET_ERROR - get the PDB error message */
-
-static object *_SXI_get_error(SS_psides *si)
-   {char *v;
-    object *o;
-
-    v = PD_get_error();
-    o = SS_mk_string(si, v);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* SX_INSTALL_PDB_FUNCS - install the PDB extensions to Scheme */
- 
-void SX_install_pdb_funcs(SS_psides *si)
-   {
-
-    SS_install(si, "pd-get-buffer-size",
-               "Get the default buffer size for I/O files",
-               SS_zargs,
-               _SXI_get_buffer_size, SS_PR_PROC);
-
-    SS_install(si, "pd-set-buffer-size!",
-               "Set the default file buffer size",
-               SS_nargs, 
-               _SXI_set_buffer_size, SS_PR_PROC);
-
-    SS_install(si, "pd-error-message",
-               "Get the last PDB error message",
-               SS_zargs,
-               _SXI_get_error, SS_PR_PROC);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/

@@ -152,11 +152,7 @@ static void write_header(FILE *fp, char *inf, int pfl)
     char *p;
 
     nstrncpy(s, BFLRG, inf, -1);
-#if 0
-    p = path_tail(upcase(strtok(s, ".\n")));
-#else
     p = path_tail(upcase(subst(s, ".", "_", -1)));
-#endif
 
     fprintf(fp, "/*\n");
     fprintf(fp, " * %s.H - generated type handling routines - do not edit\n",

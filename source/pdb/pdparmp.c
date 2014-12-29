@@ -1355,41 +1355,6 @@ static void _PD_pfm_service_req(int id, int request)
 
 /*--------------------------------------------------------------------------*/
 
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PFM_MASTER_THREAD - control thread for mpi file management
- *                       - in threaded environment
- */
-
-static void *_PD_pfm_master_thread(void *x)
-   {int rv;
-    PD_MP_request req;
-    MPI_Comm comm;
-
-    DBG("+ _PD_pfm_master_thread");
-    comm = (MPI_Comm) _PD.mp_comm;
-
-/* go into message handling loop */
-    while (1)
-       {req.type = _PD_pfm_get_msg(&req.buf, &req.len, &req.sender);
-
-        DBG2("%d: _PD_pfm_master_thread got msg from %d\n",
-	     _PD.mp_rank, req.sender);
-
-        rv = _PD_pfm_complete_request(req, comm);
-
-        if (rv == PFM_TERM_MASTER)
-           {DBG("- _PD_pfm_master_thread");
-            return(NULL);};};}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
-/*--------------------------------------------------------------------------*/
-
 /*                       PARALLEL FILE MANAGER API                          */
 
 /*--------------------------------------------------------------------------*/

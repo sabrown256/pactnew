@@ -708,9 +708,7 @@ int save_db(database *db, char **vars, FILE *fp, const char *fmt)
     rv = FALSE;
 
     if (db != NULL)
-       {
-#if 1
-        int is, ns;
+       {int is, ns;
 	char **sa;
 
 	sa = hash_dump(db->tab, NULL, NULL, 3);
@@ -720,17 +718,6 @@ int save_db(database *db, char **vars, FILE *fp, const char *fmt)
 	    _emit_var(db, fp, fmt, sa[is], vars);
 
 	free_strings(sa);
-
-#else
-        vardes pv;
-
-	pv.fmt  = (char *) fmt;
-	pv.db   = db;
-	pv.fp   = fp;
-	pv.vars = vars;
-
-        hash_foreach(db->tab, _save_var, &pv);
-#endif
 
 	rv = TRUE;};
 

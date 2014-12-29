@@ -467,11 +467,8 @@ struct s_PROCESS
     char *stop_time;
 
     SC_process_rusedes *pru;
-#if 0
-    SC_thread_proc *tstate;       /* state for all processes owned by thread */
-#else
-    void *tstate;       /* state for all processes owned by thread */
-#endif
+    void *tstate;                /* state for all processes owned by thread */
+
     int open_retry;   /* time in milliseconds to retry select open failures */
     SC_iodes fd[3];      /* file desc for stdin, stdout, stderr redirection */
 

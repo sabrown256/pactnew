@@ -297,15 +297,12 @@ static void _PM_inv_dist_wgt(SC_array *pwd, int *nof,
 	 else
 	    {ist = ism;
 	     dc  = dm;};
-#if 1
+
 	 SC_ASSERT(dc != 0.0);
 
 	 for (j = 0; j < snde; j++)
 	     ds[j] = (sde[j][ist] - sde[j][is]);
-#else
-	 for (j = 0; j < snde; j++)
-	     ds[j] = dc;
-#endif
+
 	 _PM_find_overlap_point(tb, ta, dd, ds, prm);
 
 	 nn = 1;

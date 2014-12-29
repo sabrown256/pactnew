@@ -99,6 +99,7 @@ SC_oscapdes
 	     _SC_query_exec_unix,
 	     _SC_posix_process };
 
+#if 0
 /* system call API - POSIX level compliant */
 
 syscall_api
@@ -114,5 +115,6 @@ syscall_api
 		ttyname,
 		srandom,       /* FreeBSD differs in protoype */
 		random };
+#endif
 
 #endif

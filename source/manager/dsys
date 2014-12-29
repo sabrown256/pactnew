@@ -2322,6 +2322,10 @@ CFG_DONE:
         endsw
         unset meth
 
+        if ($?SESSION_CONFIG == 0) then
+           setenv SESSION_CONFIG `$PSY_CfgMan use`
+        endif
+
         $DSYS config $args $inst
         set RStatus = $status
 

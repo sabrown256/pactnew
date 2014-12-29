@@ -329,34 +329,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
            {first = min(first, n);
             for (id = first; id >= last; id--)
                 SS_assign(si, ret, SS_mk_cons(si, SS_mk_integer(si, id), ret));};}
-#if 0
-    else
-       {char first = '\0', last = '\0', id;
 
-        SS_args(si, argl,
-                SX_DATA_ID_I, &first,
-                SX_DATA_ID_I, &last,
-                0);
-
-        if ((first < 'A') || (first > 'Z'))
-           SS_error(si, "FIRST ARGUMENT NOT A VALID DATA-ID - _SXI_THRU",
-		      argl);
-
-        if ((last < 'A') || (last > 'Z'))
-           SS_error(si, "SECOND ARGUMENT NOT A VALID DATA-ID - _SXI_THRU",
-		      argl);
-
-        if (first <= last)
-           {for (id = first; id <= last; id++)
-                if (_SX_mappingp(&id))
-                   SS_assign(si, ret, SS_mk_cons(si, SX_get_curve_obj(id - 'A'),
-					     ret));}
-        else
-           {for (id = first; id >= last; id--)
-                if (_SX_mappingp(&id))
-                   SS_assign(si, ret, SS_mk_cons(si, SX_get_curve_obj(id - 'A'),
-					     ret));};};
-#endif
     SX_prep_ret(si, ret);
 
     return(ret);}
@@ -381,11 +354,11 @@ object *SX_xindex_mapping(int j)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _G_PM_MAPPING_ID - given the mapping character return
+/* _SX_MAPPING_ID - given the mapping character return
  *                - the mapping name identifier
  */
 
-char *_G_PM_MAPPING_Id(int c)
+char *_SX_mapping_id(int c)
    {char *rv;
 
     rv = NULL;
@@ -402,17 +375,17 @@ char *_G_PM_MAPPING_Id(int c)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* G_PM_MAPPING_ID - given the mapping object return the
+/* SX_MAPPING_ID - given the mapping object return the
  *               - mapping name identifier
  */
 
-char *G_PM_MAPPING_Id(object *c)
+char *SX_mapping_id(object *c)
    {char *rv;
 
     rv = NULL;
 
 #if 0
-    rv = _G_PM_MAPPING_Id(*SX_get_string(c));
+    rv = _SX_mapping_id(*SX_get_string(c));
 #endif
 
     return(rv);}

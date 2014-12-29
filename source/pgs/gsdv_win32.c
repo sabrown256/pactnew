@@ -302,13 +302,8 @@ static void _PG_win32_close_device(PG_device *dev)
 
     _PG_remove_device(dev);
 
-#if 0
-    if (_PG.n_devices == 0)
-       SC_free_array(_PG_win32_point_list, NULL);
-#else
     if (SC_array_get_n(_PG_devlst) == 0)
        SC_free_array(_PG_win32_point_list, NULL);
-#endif
 
    return;}
 
