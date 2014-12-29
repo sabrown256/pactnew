@@ -185,7 +185,7 @@ int PY_add_bl1_enum(PyObject *m)
 int PY_init_bl1(PyObject *m, PyObject *d)
    {int nerr;
 
-    register_bl1_types();
+    G_register_bl1_types();
 
     nerr = 0;
 

@@ -1081,7 +1081,7 @@ int PD_mesh_struct(PDBfile *file ARG(,,cls))
 int PD_def_mapping(PDBfile *fp ARG(,,cls))
    {int err;
 
-    register_pml_types();
+    G_register_pml_types();
 
     err = TRUE;
 

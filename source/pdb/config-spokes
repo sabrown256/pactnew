@@ -59,7 +59,7 @@ int _PD_register_spokes(void)
 EOF
 
 echo "    if (ns == 0)" >>& pdspoke.c
-echo "       {register_pdb_types();" >>& pdspoke.c
+echo "       {G_register_pdb_types();" >>& pdspoke.c
 echo "        ns += (PD_register_pdb() >= 0);" >>& pdspoke.c
 
 foreach i ($spokes)

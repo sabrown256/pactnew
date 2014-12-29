@@ -973,7 +973,7 @@ int PY_add_bl4_enum(PyObject *m)
 int PY_init_bl4(PyObject *m, PyObject *d)
    {int nerr;
 
-    register_bl4_types();
+    G_register_bl4_types();
 
     nerr = 0;
 

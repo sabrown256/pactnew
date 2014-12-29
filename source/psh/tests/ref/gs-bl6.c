@@ -559,7 +559,7 @@ static object *_SXI_strp(SS_psides *si, object *o)
 static int _SX_install_bl6_derived(SS_psides *si)
    {int nerr;
 
-    register_bl6_types();
+    G_register_bl6_types();
 
     nerr = TRUE;
 

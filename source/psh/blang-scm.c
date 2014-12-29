@@ -673,7 +673,7 @@ static void scheme_struct_defs(bindes *bd, char *tag, der_list *sl,
 		    pck);
 	    fprintf(fc, "   {int nerr;\n");
 	    fprintf(fc, "\n");
-	    fprintf(fc, "    register_%s_types();\n", pck);
+	    fprintf(fc, "    G_register_%s_types();\n", pck);
 	    fprintf(fc, "\n");
 	    fprintf(fc, "    nerr = TRUE;\n");
 	    fprintf(fc, "\n");}

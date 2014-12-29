@@ -90,7 +90,7 @@ static void c_emit_types_def(FILE *fc, der_list *sl, char *pck,
    {
 
     if (fl == TRUE)
-       {fprintf(fc, "char *g_%s_names[%d];\n", pck, 2*ni);
+       {fprintf(fc, "char *G_%s_names[%d];\n", pck, 2*ni);
 	fprintf(fc, "\n");}
 
     else
@@ -112,7 +112,7 @@ static void c_emit_types_hdr(FILE *fh, der_list *sl, char *pck,
     tn_list *tl;
 
     if (fl == TRUE)
-       {fprintf(fh, "extern char *g_%s_names[];\n", pck);
+       {fprintf(fh, "extern char *G_%s_names[];\n", pck);
 	fprintf(fh, "\n");}
 
     else
@@ -155,9 +155,9 @@ static void c_emit_types_hdr(FILE *fh, der_list *sl, char *pck,
 	fprintf(fh, "\n");
 
 /* emit declaration of SCORE type index */
-	fprintf(fh, "#define G_%s_S   g_%s_names[%d]\n",
+	fprintf(fh, "#define G_%s_S   G_%s_names[%d]\n",
 		tl->unm, pck, 2*ni);
-	fprintf(fh, "#define G_%s_P_S g_%s_names[%d]\n",
+	fprintf(fh, "#define G_%s_P_S G_%s_names[%d]\n",
 		tl->unm, pck, 2*ni+1);
 
 	fprintf(fh, "extern int %s;\n", tl->inm);
@@ -286,7 +286,7 @@ static int bind_c(bindes *bd)
 /* make the list of struct objects */
     foreach_struct_defs(bd, c_object_defs, TRUE);
 
-    fprintf(fh, "extern void register_%s_types(void);\n", st->pck);
+    fprintf(fh, "extern void G_register_%s_types(void);\n", st->pck);
     fprintf(fh, "\n");
 
     fprintf(fc, "\n");
@@ -294,7 +294,7 @@ static int bind_c(bindes *bd)
     csep(fc);
     fprintf(fc, "\n");
 
-    fprintf(fc, "void register_%s_types(void)\n", st->pck);
+    fprintf(fc, "void G_register_%s_types(void)\n", st->pck);
     fprintf(fc, "   {\n");
     fprintf(fc, "\n");
     fprintf(fc, "    ONCE_SAFE(TRUE, NULL)\n");

@@ -857,9 +857,9 @@ void _PD_init_consts(void)
        LAST  = CPMAKE(int, 3);
        *LAST = 0;
 
-        register_score_types();
-        register_pml_types();
-        register_pdb_types();
+        G_register_score_types();
+        G_register_pml_types();
+        G_register_pdb_types();
     END_SAFE;
 
     return;}

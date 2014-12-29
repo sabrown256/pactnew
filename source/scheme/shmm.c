@@ -1022,8 +1022,8 @@ void SS_register_types(void)
 
     SC_init_base_types();
 
-    register_score_types();
-    register_scheme_types();
+    G_register_score_types();
+    G_register_scheme_types();
 
     SS_EOF_I   = SC_type_register("eof", KIND_STRUCT, B_F, sizeof(SS_boolean),
 				  SC_TYPE_FREE, _SS_rl_boolean, 0);

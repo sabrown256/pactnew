@@ -167,7 +167,7 @@ static void _SX_install_bl1_consts(SS_psides *si)
 static int _SX_install_bl1_derived(SS_psides *si)
    {int nerr;
 
-    register_bl1_types();
+    G_register_bl1_types();
 
     nerr = TRUE;
 
