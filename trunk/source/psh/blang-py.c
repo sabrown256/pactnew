@@ -1133,7 +1133,6 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 	   {py_format(fmt, BFLRG, a, NULL);
 	    py_arg(arg, BFLRG, a);
 
-#if 1
 	    if (strcmp(dty, "G_CHAR_I") == 0)
 	       nstrncpy(dty, BFLRG, "G_STRING_I", -1);
 
@@ -1141,12 +1140,7 @@ static void python_value_return(char *t, int nc, fdecl *dcl)
 	    snprintf(t, nc, "    _lo = PY_build_object(\"%s\",\n", nm);
 	    vstrcat(t, nc, "                          %s, 0, &%s,\n",
 		    dty, arg);
-	    vstrcat(t, nc, "                          0);\n");
-#else
-	    snprintf(t, nc, "    _lo = Py_BuildValue(\"%s\",\n", fmt);
-	    vstrcat(t, nc,  "                        %s);\n", arg);
-#endif
-	   };}
+	    vstrcat(t, nc, "                          0);\n");};}
     else
        {snprintf(t, nc, "\n");
 	nstrcat(t, nc, "    Py_INCREF(Py_None);\n");

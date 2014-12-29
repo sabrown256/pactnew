@@ -363,6 +363,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
     char s[MAXLINE];
     char *vr, **vrs;
     object *l, *v, *vl, *lst, *pr;
+    static int dsp = FALSE;
 
 /* make a list of names from the global environment frame */
     if (SS_nullobjp(argl))
@@ -388,23 +389,22 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 
     lst = SS_null;
 
-#if 0
+    if (dsp == TRUE)
+       {int dspo;
 
 /* print the list of names and variable values */
-    dspo = SS_set_display_flag(TRUE);
+        dspo = SS_set_display_flag(TRUE);
 
-    for (i = 0; vrs[i] != NULL; i++)
-        {vr = vrs[i];
-	 vl = _SS_lk_var_valc(si, vr, si->global_env);
-	 snprintf(s, MAXLINE, "%s = ", vr);
-	 if (vl == NULL)
-	    SS_print(si, si->outdev, SS_null, s, "\n");
-	 else
-	    SS_print(si, si->outdev, vl, s, "\n");};
+	for (i = 0; vrs[i] != NULL; i++)
+	    {vr = vrs[i];
+	     vl = _SS_lk_var_valc(si, vr, si->global_env);
+	     snprintf(s, MAXLINE, "%s = ", vr);
+	     if (vl == NULL)
+	        SS_print(si, si->outdev, SS_null, s, "\n");
+	     else
+	        SS_print(si, si->outdev, vl, s, "\n");};
 
-    SS_set_display_flag(dspo);
-
-#endif
+	SS_set_display_flag(dspo);};
 
 /* make a list of variable,value pairs */
     SC_ptr_arr_len(n, vrs);

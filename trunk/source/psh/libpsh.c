@@ -2393,39 +2393,9 @@ char *cwhich(char *fmt, ...)
     else
        prg[0] = '\0';
 
-#if 0
-    int ok;
-    char d[BFLRG];
-    char *path;
-
-    if (prg[0] == '/')
-       snprintf(exe, BFLRG, "%s", prg);
-       
-    else if (strncmp(prg, "./", 2) == 0)
-       {getcwd(d, BFLRG);
-	snprintf(exe, BFLRG, "%s/%s", d, prg+2);}
-       
-    else if (strncmp(prg, "../", 3) == 0)
-       {getcwd(d, BFLRG);
-	snprintf(exe, BFLRG, "%s/%s", path_head(d), prg+3);}
-       
-    else
-       {ok   = FALSE;
-	path = cgetenv(TRUE, "PATH");
-	FOREACH(dir, path, " :\n")
-	   snprintf(exe, BFLRG, "%s/%s", dir, prg);
-	   if (file_executable(exe) == TRUE)
-	      {ok = TRUE;
-	       break;};
-	ENDFOR;
-
-	if (ok == FALSE)
-	   nstrncpy(exe, BFLRG, "none", -1);};
-#else
     st = full_path(exe, BFLRG, TRUE, NULL, prg);
     if (st != 0)
        exe[0] = '\0';
-#endif
 
     return(exe);}
 
@@ -2483,29 +2453,7 @@ char **ls(char *opt, char *fmt, ...)
        return(1);}
 
 int match(char *s, char *patt)
-   {int rv;
-
-#if 0
-    int flags;
-
-    flags = 0;
-
-/* flags:
- *   FNM_NOESCAPE treat backslash as an ordinary character,
- *                instead of an escape character
- *   FNM_PATHNAME match a slash in string only with a slash
- *                in pattern and not by an asterisk or a question mark
- *                metacharacter, nor by a bracket expression ([])
- *                containing a slash
- *   FNM_PERIOD   a leading period in string has to be matched exactly
- *                by a period in pattern
- *                a period is considered to be leading if it is the
- *                first character in string, or if both
- */
-    rv = fnmatch(patt, s, flags);
-
-#else
-    int b, c;
+   {int rv, b, c;
     char *ps, *pp;
 
     ps = s;
@@ -2559,7 +2507,6 @@ int match(char *s, char *patt)
 
 	if (*ps == '\0')
 	   rv = -1;};
-#endif
 
     return(rv);}
 

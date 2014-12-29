@@ -377,36 +377,6 @@ int PM_cross_line_plane(double *x1, double *x2,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_INSERT_POINT - insert I into the vector D */
-
-#if 0
-static INLINE int _PM_insert_point(int i, int ln, int lx, int **pd, int *pn)
-    {int l, n;
-     int *d;
-
-     n = *pn;
-     d = *pd;
-
-     lx++;
-
-     if (n >= lx)
-        {n += 10;
-	 CREMAKE(d, int, n);};
-
-     for (l = lx-1; l > ln; l--)
-         d[l] = d[l-1];
-
-     d[l] = i;
-
-     *pn = n;
-     *pd = d;
-
-     return(lx);}
-#endif
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PM_BY_ANGLE - return TRUE iff angle of a < angle of b */
 
 static int _PM_by_angle(void *a, void *b)
@@ -1715,16 +1685,6 @@ void PM_compute_hex_volume(double *vol, int nc, int *indx, double **x)
 	 v6 = PM_DAX(7, 6, 2, 3);
 			  
 	 vca = v1 + v2 + v3 + v4 + v5 + v6;
-
-#if 0
-	 v1 = PM_VOLTET(1, 2, 4, 5);
-	 v2 = PM_VOLTET(3, 4, 2, 7);
-	 v3 = PM_VOLTET(6, 2, 5, 7);
-	 v4 = PM_VOLTET(8, 7, 4, 5);
-	 v5 = PM_VOLTET(4, 2, 7, 5);
-			  
-	 vcb = v1 + v2 + v3 + v4 + v5 + v6;
-#endif
 
 	 vol[i] = vca;};
 

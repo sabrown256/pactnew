@@ -1421,21 +1421,12 @@ static int _job_parent_fork(process *pp, process *cp, int *fds, char *mode)
     if (ps->dbg_level & 2)
        dprpio("_job_parent_fork", pp);
 
-#if 1
-
 /* wait until the child starts running before returning */
     for (i = 0; i < 1000; i++)
         {job_wait(pp);
 	 if (pp->status == JOB_RUNNING)
 	    break;
 	 sched_yield();};
-
-#else
-
-/* yield and hope the child starts running before returning */
-    sched_yield();
-
-#endif
 
     return(st);}
 

@@ -821,21 +821,6 @@ static object *_ULI_edit(SS_psides *si, int ie)
 
     crv->n = n;
 
-/* GOTCHA: a compiler rightly complained about scn,
- *         cln, and clo not being initialized
- *         are these necessary any more?
- */
-#if 0
-    int *scn, *cln, *clo;
-
-/* change rendering of new curve */
-    *scn  = FALSE;
-    *cln  = SX_next_color(dev); 
-
-/* restore original curve color */
-    *clo = oldc;
-#endif
-
     o = (object *) crv->obj;
 
     return(o);}

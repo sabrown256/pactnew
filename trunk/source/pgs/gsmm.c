@@ -458,12 +458,7 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
 		     "text-color", &txclr,
 		     NULL);
 
-#if 0
-    snprintf(bf, MAXLINE, "%s [PROC:%d]", title, dp);
-    pttl = bf;
-#else
     pttl = title;
-#endif
 
 /* parallel graphics info */
     d->pri = _PG_init_dev_parallel(dd, dp);

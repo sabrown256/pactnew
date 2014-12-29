@@ -123,12 +123,7 @@ typedef struct s_db_ls_info db_ls_info;
 typedef struct s_level_surface level_surface;
 typedef struct s_itf_array itf_array;
 
-#if 0
-typedef void (*PFParTsk)(int (*fnc)(itf_array **pifs, int *pit),
-                         void **pa, int *pnp, int *poff, int *pon);
-#else
 typedef void (*PFParTsk)(PFInt fnc, void **pa, int *pnp, int *poff, int *pon);
-#endif
 
 struct s_timing_lev_surf
    {double init;                  /* _PG_init_cell */

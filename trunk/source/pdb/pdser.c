@@ -299,36 +299,6 @@ static int _PD_is_null_fp_s(void *fp)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* _PD_STELL - FTELL method for STREAM */
-
-static int64_t _PD_stell(FILE *stream)
-   {int64_t rv;
-
-    rv = lio_tell(stream);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_SSEEK - FSEEK method for STREAM */
-
-static int _PD_sseek(FILE *stream, int64_t addr, int offset)
-   {int rv;
-
-    rv = lio_seek(stream, addr, offset);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* _PD_INIT_S - initialize the library for serial */

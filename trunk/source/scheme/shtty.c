@@ -124,15 +124,6 @@ int SS_get_ch(SS_psides *si, object *str, int ign_ws)
 		      uc = (unsigned char) c;
 		      o  = _SS.chr_tab[uc](si, str, c);
 		      ok = (o == SS_t);
-#if 0
-		      while ((ok == TRUE) && ((c = *SS_PTR(str)++) != '\0'))
-		         {if (c == EOF)
-			     ok = FALSE;
-			  else if ((c == '\n') || (c == '\r'))
-			     {SS_LINE_NUMBER(str)++;
-			      SS_CHAR_INDEX(str) = 1;
-			      break;};};
-#endif
 		      break;
 
                  default :

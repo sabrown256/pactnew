@@ -598,43 +598,6 @@ static bio_frame *_SC_bfr_read_setup(bio_desc *bid, bio_frame *fr)
 static void _SC_bio_read_opt(bio_desc *bid, char *mode, int64_t bsz)
    {
 
-
-/* GOTCHA: turning this on only has the effect of adding an fstat
- * and an ioctl to the set of operations reported by strace
- * the reference is reading all variables in a PDB file with a
- * buffer size greater than the file size
- */
-
-#if 0
-    int fd, rv;
-    int64_t sz;
-    struct stat bf;
-    bio_frame *fr;
-
-    if (bsz > 0)
-       {fd = bid->fd;
-	if (((strcmp(mode, "r") == 0) || (strcmp(mode, "rb") == 0)) &&
-	    (isatty(fd) == FALSE))
-	   {rv = fstat(fd, &bf);
-	    if (rv == 0)
-	       {sz = bf.st_size;
-
-/* if the file size is greater than zero and less than the requested size */
-		if (CONTAINS(0, sz-1, bsz))
-
-/* initialize buffering in the descriptor */
-		   {_SC_bio_buffer(bid, bsz);
-
-/* read in the whole file */
-		    fr = _SC_bfr_read_setup(bid, NULL);
-
-/* push the frame onto the stack */
-		    SC_array_push(bid->stack, &fr);
-		    bid->nbfmx = max(bid->nbfmx, bid->stack->n);};};
-
-	    bid->nhits[BIO_OPER_STAT]++;};};
-#endif
-
     return;}
 
 /*--------------------------------------------------------------------------*/

@@ -153,13 +153,6 @@ struct s_complex
 
 /*--------------------------------------------------------------------------*/
 
-
-#if 0
-extern double complex
- cproj(double complex); 	/* complex projection[A] */
-#endif
-
-
 /* MLFFT.C declarations */
 
 extern complex

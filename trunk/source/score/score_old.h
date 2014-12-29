@@ -158,46 +158,6 @@ typedef char *F77_string;
 
 /*--------------------------------------------------------------------------*/
 
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* SC_dynamic_array macros - not used */
-
-#define SC_REMEMBERF(_t, _item, _lst, _n, _nx, _delta, _name)                \
-    {if (_lst == NULL)                                                       \
-        {_nx = _delta;                                                       \
-         _n  = 0;                                                            \
-         _lst = FMAKE_N(_t, _nx, _name);};                                   \
-     _lst[_n++] = _item;                                                     \
-     if (_n >= _nx)                                                          \
-        {_nx += _delta;                                                      \
-         CREMAKE(_lst, _t, _nx);};}
-
-#define SC_INIT_DYNAMIC_ARRAY_F(_a, _t, _tn, _d, _name)                      \
-    SC_da_init(&(_a), sizeof(_t), _tn, _d, _name)
-
-#define SC_REMEMBER_DYNAMIC_F(_t, item, _a, name)                            \
-    SC_da_remember(&(_a), &(item))
-
-#define SC_REMEMBER_STRING(_s, _a)                                           \
-    SC_remember_string(_s, &(_a))
-
-#define SC_REMEMBER_STRING_COPY(_s, _a)                                      \
-    SC_remember_string_copy(_s, &(_a))
-
-#define SC_SET_NTH_DYNAMIC(_t, _a, n, v)  ((_t *) (_a).array)[(n)] = (v)
-
-#define SC_SIZE_DYNAMIC(_t, _a, m)        SC_da_grow(&(_a), m)
-
-#define SC_SHRINK_DYNAMIC(_t, _a, _n)     SC_da_shrink(&(_a), _n)
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
-/*--------------------------------------------------------------------------*/
-
 /*                         TYPEDEFS AND STRUCTS                             */
 
 /*--------------------------------------------------------------------------*/

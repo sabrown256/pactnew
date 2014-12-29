@@ -336,8 +336,6 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
 
 #else
 
-#if 1
-
 /* NOTE: this is part of the way between the two versions
  *       and does not leak memory
  */
@@ -394,66 +392,6 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
 
 /*--------------------------------------------------------------------------*/
 
-#else
-
-/* NOTE: it used to look like this
- *       and this version does not leak memory
- */
-
-/*--------------------------------------------------------------------------*/
-
-/* _SSI_LETSTR - transform a let* special form into a let form
- *             - to be handed back to eval
- */
-
-static object *_SSI_letstr(SS_psides *si, object *letr)
-   {object *vlpair, *vr, *vl, *lst, *frm;
-
-    if (SS_nullobjp(letr) || !SS_consp(letr))
-       SS_error(si, "BAD LET* FORM", letr);
-
-    SS_save(si, si->this);
-    SS_save(si, si->unev);
-    SS_save(si, si->argl);
-    SS_save(si, si->fun);
-    SS_save(si, si->val);
-
-/* transform into a functionally equivalent let form */
-    SS_assign(si, si->this, SS_null);
-    SS_assign(si, si->argl, SS_null);
-    SS_assign(si, si->unev, SS_null);
-    for (lst = SS_car(si, letr); !SS_nullobjp(lst); lst = SS_cdr(si, lst))
-        {if (!SS_consp(vlpair = SS_car(si, lst)))
-            {vr = vlpair;
-             vl = SS_null;}
-         else
-            {vr = SS_car(si, vlpair);
-             vl = SS_cadr(si, vlpair);};
-
-         SS_assign(si, si->val,
-		   SS_make_form(si, SS_setproc, vr, vl, LAST));
-         SS_end_cons_macro(si, si->argl, si->this, si->val);
-         SS_assign(si, si->unev, SS_mk_cons(si, vr, si->unev));};
-
-/* complete the transformation */
-    frm = SS_mk_cons(si, si->unev, SS_append(si, si->argl, SS_cdr(si, letr)));
-    SS_assign(si, si->fun, frm);
-
-/* process the let form */
-    SS_assign(si, si->exn, SS_let(si, si->fun));
-
-/* clean up the mess */
-    SS_restore(si, si->val);
-    SS_restore(si, si->fun);
-    SS_restore(si, si->argl);
-    SS_restore(si, si->unev);
-    SS_restore(si, si->this);
-
-    return(si->exn);}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
 #endif
 
 /*--------------------------------------------------------------------------*/

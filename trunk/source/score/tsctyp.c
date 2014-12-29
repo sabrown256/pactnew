@@ -100,7 +100,7 @@ static int test_1(void)
     printf("\t\t\tAliased types:\n");
     for (id = G_FILE_I; id <= G_COMPLEX128_I; id += 2)
         {td = SC_gs.stl + id;
-	 i  = (id - SC_FILE_I) >> 1;
+	 i  = (id - G_FILE_I) >> 1;
 	 if (td->id == id)
 	    sts = "ok";
 	 else

@@ -124,6 +124,7 @@ SC_oscapdes
 	     _SC_query_exec_win32,
 	     _SC_win32_process };
 
+#if 0
 /* system call API */
 
 syscall_api
@@ -135,5 +136,6 @@ syscall_api
 		poll, nanosleep, 
 		setenv, unsetenv, 
 		gethostname, ttyname, srandom, random };
+#endif
 
 #endif

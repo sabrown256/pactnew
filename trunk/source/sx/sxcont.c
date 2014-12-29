@@ -602,47 +602,15 @@ int SX_expand_expr(char *s, int nb)
  */
 
 int SX_split_command(char *cmd, int nc, char *lst)
-   {int rv;
+   {int nb, rv;
     char *pc, *pl;
 
-#if 1
-    int nb;
-
     nb = PS_strcpy_tok(cmd, nc, lst, -1, NULL, ";", 0);
+
     for (pc = lst, pl = pc+nb; (*pc++ = *pl++) != '\0'; );
+
     rv = (nb != 0);
 
-#else
-    int ok;
-
-    ok = FALSE;
-    rv = FALSE;
-    for (pl = lst, pc = cmd; ok == FALSE; )
-        {switch (*pc++ = *pl++)
-            {case '\"' :
-	          while ((*pc++ = *pl++) != '\"');
-		  break;
-
-             case '\r' :
-             case '\n' :
-             case ';'  :
-	          pc--;
-		  *pc = '\0';
-
-/* copy the remainder of lst down to the beginning of lst */
-		  for (pc = lst; (*pc++ = *pl++) != '\0'; );
-		  ok = TRUE;
-		  rv = TRUE;
-		  break;
-
-             case '\0' :
-		  ok = TRUE;
-		  rv = FALSE;
-		  break;
-
-             default :
-	          break;};};
-#endif
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -1030,13 +998,6 @@ void SX_install_global_vars(SS_psides *si)
                   "Variable: A string printed before the return value\n     Usage: answer-prompt <string>",
                   SS_acc_string,
                   si->ans_prompt, MAXLINE);
-
-#if 0
-    SS_install_cf(si, "ascii-output-format",
-                  "Variable: Controls format for ASCII output of floating point numbers\n     Usage: ascii-output-format <format>",
-                  SS_acc_ptr,
-                  &SS_gs.fmts[1]);
-#endif
 
     SS_install_cf(si, "autorange",
                   "Variable: Turns on or off autoranging\n     Usage: autorange on | off",

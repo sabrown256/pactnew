@@ -194,15 +194,7 @@ static PyObject *_PY_build_obj(buildsp *sp, int i)
 		   {void *p;
 
 		    p = ((void **) vr)[i];
-#if 0
-		    if (p == Py_None)
-		       rv = p;
-		    else
-		       rv = PY_COBJ_VOID_PTR(p, NULL);
-#else
-		    rv = p;
-#endif
-		    }
+		    rv = p;}
 
 		else if (SC_is_type_char(ity) == TRUE)
 		   PyErr_SetString(PyExc_NotImplementedError,

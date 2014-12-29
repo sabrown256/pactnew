@@ -1105,7 +1105,6 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
 	for (i = 0; i < n; i++)
 	    st |= ps->ed.res[i];}
     else
-#if 1
        {int it[2];
 	void *a;
 
@@ -1115,12 +1114,6 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
 	st = _SC_exec_one(&a, it);
 	for (i = 0; i < n; i++)
 	    st |= ps->ed.res[i];};
-#else
-       {for (i = 0; i < n; i++)
-	    {st |= _SC_exec_one(i, &ps->ed);
-	     if ((ignore == FALSE) && (st == TRUE))
-	        break;};};
-#endif
 
     if (lname != NULL)
        io_close(cs->log);

@@ -417,11 +417,7 @@ static void _push_type_ptr(type_desc *td, int alias)
 	else
 	   snprintf(ti, BFSML, "%s-A", tp.f90);}
     else
-#if 1
        nstrncpy(ti, BFSML, "C_PTR-A", -1);
-#else
-       nstrncpy(ti, BFSML, "character-A", -1);
-#endif
 
     tp.f90 = STRSAVE(ti);
 

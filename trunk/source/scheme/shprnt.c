@@ -436,37 +436,6 @@ static char *_SS_sprintf_guts(SS_psides *si, object *fp, object *argl)
 
 char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
    {char *s;
-
-#if 0
-    PFfprintf pr;
-    PFfputs ps;
-
-/* turn off SIGIO handler */
-    SC_catch_io_interrupts(FALSE);
-
-    if (SS_stringp(obj))
-       {s = SS_STRING_TEXT(obj);
-	s = CSTRSAVE(s);}
-    else
-       {CFREE(_SS.vbf);
-
-	SC_get_put_line(pr);
-	SC_get_put_string(ps);
-	SS_set_put_line(si, SS_printf);
-	SS_set_put_string(si, SS_fputs);
-
-	SS_OBJECT_PRINT(si, obj, SS_null);
-
-	SS_set_put_line(si, pr);
-	SS_set_put_string(si, ps);
-
-	s = CSTRSAVE(_SS.vbf);};
-
-/* turn on SIGIO handler */
-    SC_catch_io_interrupts(-1);
-
-#else
-
     object *x;
 
     if (SS_consp(obj) == TRUE)
@@ -479,8 +448,6 @@ char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
     SS_mark(x);
     s = _SS_sprintf_guts(si, si->outdev, x);
     SS_gc(si, x);
-
-#endif
 
     return(s);}
 

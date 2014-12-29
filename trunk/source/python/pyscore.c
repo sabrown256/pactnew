@@ -719,26 +719,8 @@ static PyObject *PY_hasharr_keys(PY_hasharr *self,
 	    Py_INCREF(rv);}
 
 	else
-#if 1
 	   {names = SC_hasharr_dump(ha, NULL, NULL, FALSE);
-	    rv    = PY_strings_tuple(names, -1, TRUE);};
-#else
-	   {int err;
-	    Py_ssize_t i;
-
-	    rv = PyTuple_New(ne);
-	    if (rv != NULL)
-	       {names = SC_hasharr_dump(ha, NULL, NULL, FALSE);
-		for (i = 0; i < ne; i++)
-		    {err = PyTuple_SetItem(rv, i, PY_STRING_STRING(names[i]));
-		     if (err < 0)
-		        {Py_DECREF(rv);
-			 rv = NULL;
-			 break;};};
-
-		SC_free_strings(names);};};
-#endif
-      };
+	    rv    = PY_strings_tuple(names, -1, TRUE);};};
 
     return(rv);}
 

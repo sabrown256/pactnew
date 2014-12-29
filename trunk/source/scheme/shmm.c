@@ -552,7 +552,7 @@ static void _SS_wr_vector(SS_psides *si, object *obj, object *strm)
 object *SS_mk_proc_object(SS_psides *si, SS_procedure *pp)
    {object *op;
     
-    op = SS_mk_object(si, pp, PROC_OBJ, SELF_EV, pp->name,
+    op = SS_mk_object(si, pp, G_SS_PROCEDURE_I, SELF_EV, pp->name,
 		      SS_wr_proc, _SS_rl_procedure);
 
     return(op);}

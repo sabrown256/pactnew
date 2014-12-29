@@ -35,7 +35,7 @@ static int test_1(void)
          f += cos(1.0/(i + 1.0));};
 #endif
 
-/* NOTE: cannot use SC_time_allow because we may use SC_exec which
+/* NOTE: cannot use SC_time_allow here because we may use SC_exec which
  * uses it internally
  */
     ti = SC_wall_clock_time();

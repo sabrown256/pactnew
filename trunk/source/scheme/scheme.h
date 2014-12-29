@@ -29,10 +29,6 @@
 # include "scope_dp.h"
 #endif
 
-#if 1
-# define PROC_OBJ        126
-#endif
-
 /* #define STACK_FNC */
 
 /*--------------------------------------------------------------------------*/
@@ -301,11 +297,11 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_PROCEDUREP - return TRUE if the object is of type PROC_OBJ
+/* SS_PROCEDUREP - return TRUE if the object is of type G_SS_PROCEDURE_I
  *               - return FALSE otherwise
  */
 
-#define SS_procedurep(_o) (SC_arrtype(_o, -1) == PROC_OBJ)
+#define SS_procedurep(_o) (SC_arrtype(_o, -1) == G_SS_PROCEDURE_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -873,7 +873,6 @@ void PP_init_type_map_basic(PP_file *fileinfo)
  * this entry is used to take a python instance and find
  * the PP_descr so we know the PDBlib type.
  */
-#if 1
 #if PY_MAJOR_VERSION >= 3
     entry = PP_make_type_entry(PP_INSTANCE_I, FALSE, NULL, &PyBytes_Type,
 			       NULL, NULL, _PP_get_instance_descr);
@@ -883,7 +882,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
 #endif
 
     PP_register_object(fileinfo, entry);
-#endif
+
     return;}
 
 /*--------------------------------------------------------------------------*/
