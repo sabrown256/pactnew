@@ -18,7 +18,7 @@
 void _PA_internal_init(void)
    {
 
-    register_panacea_types();
+    G_register_panacea_types();
 
     PA_set_n_threads(1);
 

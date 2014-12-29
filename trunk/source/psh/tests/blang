@@ -67,7 +67,7 @@ else
       Note $hdr '#define G_STR_D(_f)     TRUE'
       Note $hdr 'struct s_str {long n; char *s;};'
       Note $hdr 'typedef struct s_str str;'
-      Note $hdr "extern void register_${i}_types();"
+      Note $hdr "extern void G_register_${i}_types();"
       Note $hdr 'extern void *_SX_opt_str(str *x, bind_opt wh, void *a);'
       flog $Log cat $hdr
 

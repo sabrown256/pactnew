@@ -176,7 +176,7 @@ IncAction = @pact generate
 
 LibAction = @(echo "build-spokes" ; build-spokes spoke ; pact devgen)
 
-build : ${hdrf}
+build : ${hdrf} pdspoke.c
 	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
 	build-spokes build
 

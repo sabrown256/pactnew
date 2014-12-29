@@ -31,7 +31,7 @@ while ($#argv > 0)
            set opt = ( $opt $1 )
            breaksw
       default:
-           set Tests = ( $1 )
+           set Tests = ( $Tests $1 )
            breaksw
    endsw
    shift
