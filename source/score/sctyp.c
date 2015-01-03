@@ -411,7 +411,7 @@ int SC_is_type_ptr_a(char *name)
 int SC_is_type_prim(int id)
    {int rv;
 
-    rv = ((G_UNKNOWN_I < id) && (id < N_TYPES));
+    rv = ((G_UNKNOWN_I < id) && (id < _SC.types.nstandard));
 
     return(rv);}
 

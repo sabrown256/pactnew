@@ -10,6 +10,8 @@
  
 #include "pml_int.h"
 
+/* #define DEBUG */
+
 #define NODE_OF(k, l) (((l) - 1)*kmax + (k) - 1)
 
 #define INDEX(_i, _j, _k, _di, _dj)   (((_k)*(_dj) + (_j))*(_di) + (_i))
@@ -88,9 +90,6 @@
     _ia = _in;                                                               \
     _oa = _of;}
 
-static int
- debug = FALSE;
-
 /*--------------------------------------------------------------------------*/
 
 /*                            DEBUG ROUTINES                                */
@@ -103,46 +102,48 @@ static void show_mesh(double *x, int nd, int *mn, int *mx,
 		      int idr, int side, int ig)
    {
 
-    if (debug == TRUE)
-       {int id, din, djn, nn;
-	int maxes[2];
-	char bf[MAXLINE];
-	PM_set *dom;
-	double **y;
+#if defined(DEBUG)
+    int id, din, djn, nn;
+    int maxes[2];
+    char bf[MAXLINE];
+    PM_set *dom;
+    double **y;
 
 #include <pgs.h>
 
-	static PG_device *dev = NULL;
+    static PG_device *dev = NULL;
 
-	if (dev == NULL)
-	   {dev = PG_make_device("SCREEN", "COLOR", "Mesh Debug");
-	    PG_open_device(dev, 0.01, 0.01, 0.4, 0.4);};
+    if (dev == NULL)
+       {dev = PG_make_device("SCREEN", "COLOR", "Mesh Debug");
+	PG_open_device(dev, 0.01, 0.01, 0.4, 0.4);};
 
-	din = mx[0] - mn[0] + 1;
-	djn = mx[1] - mn[1] + 1;
-	nn  = din*djn;
+    din = mx[0] - mn[0] + 1;
+    djn = mx[1] - mn[1] + 1;
+    nn  = din*djn;
 
-	maxes[0] = din;
-	maxes[1] = djn;
+    maxes[0] = din;
+    maxes[1] = djn;
 
-	y = PM_make_vectors(nd, nn);
-	for (id = 0; id < nd; id++)
-	    {y[id] = x + id*nn;
-	     PM_array_copy(y[id], x+id*nn, nn);};
+    y = PM_make_vectors(nd, nn);
+    for (id = 0; id < nd; id++)
+        {y[id] = x + id*nn;
+	 PM_array_copy(y[id], x+id*nn, nn);};
 
 /* build the set */
-	snprintf(bf, MAXLINE, "Dir = %d, Side = %d, I = %d", idr, side, ig);
-	dom = PM_mk_set(bf, G_DOUBLE_S, FALSE, nn, nd, nd,
-			maxes, y, NULL,
-			NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    snprintf(bf, MAXLINE, "Dir = %d, Side = %d, I = %d", idr, side, ig);
+    dom = PM_mk_set(bf, G_DOUBLE_S, FALSE, nn, nd, nd,
+		    maxes, y, NULL,
+		    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-	PG_clear_screen(dev);
+    PG_clear_screen(dev);
 
-	PG_domain_plot(dev, dom, NULL);
+    PG_domain_plot(dev, dom, NULL);
 
-	PM_rel_set(dom, FALSE);
+    PM_rel_set(dom, FALSE);
 
-	SC_pause();};
+    SC_pause();
+
+#endif
 
     return;}
 
@@ -659,6 +660,13 @@ static void _PM_mesh_extr_nd(double *x, int *smn, int *smx, int *mn, int *mx,
    {int jd, ig, nn, nt;
     int *unt, *str;
     double *kra, *lra, *apk, *apl;
+    int debug;
+
+#if defined(DEBUG)
+    debug = TRUE;
+#else
+    debug = FALSE;
+#endif
 
     nn = 1;
     for (jd = 0; jd < nd; jd++)
