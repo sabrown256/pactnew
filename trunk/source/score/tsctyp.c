@@ -5,7 +5,7 @@
 
 #include "cpyright.h"
 
-#include "score.h"
+#include "score_int.h"
 
 #define STR_EQUAL(_a, _b)                                                    \
     (((_a != NULL) && (_b != NULL) && (strcmp(_a, _b) == 0)) ||              \
@@ -130,7 +130,7 @@ static int test_2(void)
 
     st = TRUE;
 
-    for (i = 0; i < N_TYPES; i++)
+    for (i = 0; i < _SC.types.nstandard; i++)
         {td = _SC_get_type_id(i);
 	 ts = SC_gs.stl + i;
 
@@ -172,7 +172,7 @@ static int test_3(void)
 
     err = 0;
 
-    for (i = 0; i < N_TYPES; i++)
+    for (i = 0; i < _SC.types.nstandard; i++)
         {td = _SC_get_type_id(i);
          if (td->alias != NULL)
 	    {ta = SC_find_primitive(i);

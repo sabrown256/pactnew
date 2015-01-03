@@ -438,7 +438,8 @@ enum e_PD_delay_mode
 typedef enum e_PD_delay_mode PD_delay_mode;
 
 
-/* NOTE: see comment in scope_io.h concerning file_io_desc and the stream member
+/* NOTE: see comment in scope_io.h concerning file_io_desc and
+ *       the stream member
  *       here the buffer is the analog of the FILE *
  */
 

@@ -318,7 +318,6 @@ if (-x "$wexe") then
 else
 
    Note $outf 'echo "No native fortran compiler - exiting"'
-   Note $outf '@ err = 1'
    Note $outf ''
 
 #--------------------------------------------------------------------------

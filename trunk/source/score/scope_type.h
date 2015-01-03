@@ -9,10 +9,6 @@
 
 #include "cpyright.h"
 
-#if defined(BEOS)
-typedef long long int64_t;
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /*                           PROCEDURAL MACROS                              */
