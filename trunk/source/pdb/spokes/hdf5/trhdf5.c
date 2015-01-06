@@ -250,31 +250,31 @@ static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
 
     tid = SC_type_id(ptyp, FALSE);
 
-    if (tid == SC_SHORT_I)
+    if (tid == G_SHORT_I)
        htyp = H5T_NATIVE_SHORT;
 
-    else if (tid == SC_INT_I)
+    else if (tid == G_INT_I)
        htyp = H5T_NATIVE_INT;
 
-    else if (tid == SC_LONG_I)
+    else if (tid == G_LONG_I)
        htyp = H5T_NATIVE_LONG;
 
-    else if (tid == SC_LONG_LONG_I)
+    else if (tid == G_LONG_LONG_I)
        htyp = H5T_NATIVE_LLONG;
 
-    else if (tid == SC_FLOAT_I)
+    else if (tid == G_FLOAT_I)
        htyp = H5T_NATIVE_FLOAT;
 
-    else if (tid == SC_DOUBLE_I)
+    else if (tid == G_DOUBLE_I)
        htyp = H5T_NATIVE_DOUBLE;
 
-    else if (tid == SC_LONG_DOUBLE_I)
+    else if (tid == G_LONG_DOUBLE_I)
        htyp = H5T_NATIVE_LDOUBLE;
 
-    else if (tid == SC_CHAR_I)
+    else if (tid == G_CHAR_I)
        htyp = H5T_NATIVE_SCHAR;
 
-    else if (tid == SC_BOOL_I)
+    else if (tid == G_BOOL_I)
        htyp = H5T_NATIVE_HBOOL;
 
     else
@@ -551,19 +551,19 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
  */
     if (H5Tget_sign(htyp)) 
        {if (precision == 8)
-           {typ = CSTRSAVE(SC_CHAR_S);
+           {typ = CSTRSAVE(G_CHAR_S);
 	    knd = KIND_CHAR;}
         else if (precision == 16)
-	   {typ = CSTRSAVE(SC_SHORT_S);
+	   {typ = CSTRSAVE(G_SHORT_S);
 	    knd = KIND_INT;}
         else if (precision == 32)
-	   {typ = CSTRSAVE(SC_INT_S);
+	   {typ = CSTRSAVE(G_INT_S);
 	    knd = KIND_INT;}
         else if (precision == 64)
-           {typ = CSTRSAVE(SC_LONG_S);
+           {typ = CSTRSAVE(G_LONG_S);
 	    knd = KIND_INT;}
         else if (precision >  64)
-           {typ = CSTRSAVE(SC_LONG_LONG_S);
+           {typ = CSTRSAVE(G_LONG_LONG_S);
 	    knd = KIND_INT;}
         else
 	   {typ = CSTRSAVE("UNKNOWN");
@@ -647,7 +647,7 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
 	dp->tuple       = NULL;
 
 /* insert into the file charts */
-	_PD_d_install(hst->pf, typ, dp, PD_CHART_FILE);
+	_PD_d_install(hst->pf, typ, dp, PD_CHART_FILE, NULL);
 
 	DEBUG1("  Inserted definition for %s\n", typ);};
 
@@ -719,7 +719,7 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
  */
     if (precision <= 32) 
        {format = fstd->fp[0].format;
-        typ    = CSTRSAVE(SC_FLOAT_S);
+        typ    = CSTRSAVE(G_FLOAT_S);
         fpo    = CMAKE_N(int, bpif);
 
         for (i = 0; i < bpif; i++) 
@@ -727,7 +727,7 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
 
     else 
        {format = fstd->fp[1].format;
-        typ    = CSTRSAVE(SC_DOUBLE_S);
+        typ    = CSTRSAVE(G_DOUBLE_S);
         fpo    = CMAKE_N(int, bpid);
 
         for (i = 0; i < bpid; i++) 
@@ -851,7 +851,7 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
 	dp->tuple       = NULL;
 
 /* insert into the file charts */
-	_PD_d_install(hst->pf, typ, dp, PD_CHART_FILE);
+	_PD_d_install(hst->pf, typ, dp, PD_CHART_FILE, NULL);
  
 	DEBUG1("  Inserted definition for %s\n", typ);};
  
@@ -1197,7 +1197,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
         DEBUG1("      size %ld\n", (long) H5Tget_size(htyp));
         DEBUG1("      alignment %d\n", 4);
 
-        _PD_d_install(hst->pf, typ, dp, PD_CHART_HOST);
+        _PD_d_install(hst->pf, typ, dp, PD_CHART_HOST, NULL);
     
 /* make a copy of dp for the file charts */
         host_entry = CMAKE(defstr);
@@ -1208,7 +1208,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
     
 /* set convert just before adding to the file charts */
         host_entry->convert = convert; 
-        _PD_d_install(hst->pf, typ, host_entry, PD_CHART_FILE);
+        _PD_d_install(hst->pf, typ, host_entry, PD_CHART_FILE, NULL);
     
         DEBUG1("Inserted defstr for %s in both charts\n", typ); 
 #endif

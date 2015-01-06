@@ -83,6 +83,7 @@ Note $outf ''
 Note $outf "set fdbg = ( $CXX_Debug )"
 Note $outf "set fopt = ( $CXX_Optimize )"
 Note $outf "set fprf = ( $CXX_Profile )"
+Note $outf "set tmpr = ( $PSY_TmpDir/obj )"
 
 Note $outf "set exe  = $exe"
 Note $outf 'set dbg  = FALSE'
@@ -177,6 +178,7 @@ Note $outf 'endif'
 Note $outf ''
 
 Note $outf 'set CI = ( $exe $args )'
+Note $outf "set LD = ( $LD_Exe )"
 Note $outf ''
 
 #--------------------------------------------------------------------------'

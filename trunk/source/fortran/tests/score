@@ -31,6 +31,7 @@ if ($#inf >= 16) then
    Note $Log " $inf"
    flog $Log @ xstatus = $xstatus + 0
 else
+   Note $Log "Missing a number of modules: $#inf"
    flog $Log @ xstatus = $xstatus + 1
 endif
 

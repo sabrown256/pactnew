@@ -1,5 +1,5 @@
 /*
- * SCAR.C - routines for accessign archives
+ * SCAR.C - routines for accessing archives
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

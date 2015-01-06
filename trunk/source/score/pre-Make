@@ -619,8 +619,6 @@ ExcludeType  = -excl omp_lockdes
 LExcludeType = ${ExcludeType}
 
 dmake :
-	echo "${ExcludeType}"
-	echo "${LExcludeType}"
 	${PSY_ScrDir}/bproto ${LExcludeType}
 	@smake build
 	@acc ${ACFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}

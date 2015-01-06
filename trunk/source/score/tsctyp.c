@@ -7,6 +7,8 @@
 
 #include "score_int.h"
 
+#define N_TEST 4
+
 #define STR_EQUAL(_a, _b)                                                    \
     (((_a != NULL) && (_b != NULL) && (strcmp(_a, _b) == 0)) ||              \
      ((_a == NULL) && (_b == NULL)))
@@ -194,11 +196,11 @@ static int test_3(void)
 
 int main(int c, char **v)
    {int i, rv, st;
-    int ts[4];
+    int ts[N_TEST];
 
     SC_setbuf(stdout, NULL);
 
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < N_TEST; i++)
         ts[i] = TRUE;
 
 /* process the command line arguments */

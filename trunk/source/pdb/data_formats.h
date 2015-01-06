@@ -1,5 +1,5 @@
 /*
- * PDB_FORMATS.H - spell out the data formats
+ * DATA_FORMATS.H - spell out the data formats
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
