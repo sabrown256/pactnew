@@ -87,6 +87,7 @@ if (-x "$wexe") then
    Note $outf "set fdbg = ( $FC_Debug )"
    Note $outf "set fopt = ( $FC_Optimize )"
    Note $outf "set fprf = ( $FC_Profile )"
+   Note $outf "set tmpr = ( $PSY_TmpDir/obj )"
 
    Note $outf '@ vrb = 0'
    Note $outf ''
@@ -187,7 +188,8 @@ if (-x "$wexe") then
    Note $outf 'endif'
    Note $outf ''
 
-   Note $outf 'set CI  = ( $exe $args )'
+   Note $outf 'set CI = ( $exe $args )'
+   Note $outf "set LD = ( $LD_Exe )"
    Note $outf ''
 
 #--------------------------------------------------------------------------'
@@ -303,6 +305,12 @@ if (-x "$wexe") then
            breaksw
 
       case pgf90:
+      case ifort:
+           Note $outf 'set args = ( $args -module '$PSY_TmpDir'/obj )'
+           breaksw
+
+      case sunf9*:
+           Note $outf 'set args = ( $args -moddir='$PSY_TmpDir'/obj )'
            breaksw
    endsw
    Note $outf ''

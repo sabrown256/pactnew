@@ -4,6 +4,8 @@
 # include "cpyright.h"
 #
 
+set memlg = FALSE
+
 # check abstract options
 
 set adsp = ""
@@ -21,6 +23,11 @@ if ($prf == TRUE) then
 endif
 
 set CI = ( $CI[1] $args )
+if ($exe =~ *pgcc*) then
+   set mangle = TRUE
+else
+   set mangle = FALSE
+endif
 
 if ($vrb > 2) then
    echo "inf  = |$inf|"
@@ -43,13 +50,13 @@ unsetenv PACT_CXX_FAMILY
 unsetenv PACT_CXX_VERSION
 unsetenv PACT_CXX_PATH
 
-set stl = ( `file-time $inf` )
+set stl = ( `file-time -m sec $inf` )
 @ nstl = $#stl
 
 if ("$arc" != "") then
-   set atl = ( `file-time $arc` )
+   set atl = ( `file-time -m sec $arc` )
    @ natl = $#atl
-   set tmpdir = $cwd/z-ognu/obj
+   set tmpdir = $cwd/$tmpr
    if (!(-d $tmpdir)) then
       mkdir -p $tmpdir >& /dev/null
    endif
@@ -64,7 +71,7 @@ set lfo = ""
 while ($lf < $nstl)
    set fi = $stl[$lf]
    @ lf  = $lf + 1
-   @ sts = ( `echo $stl[$lf] | sed 's|-||g'` )
+   @ sts = ( `echo $stl[$lf] | sed 's|-||g' | sed 's|^0*||'` )
    @ lf  = $lf + 1
  
    if (($nstl > 2) || ("$arc" != "")) then
@@ -77,7 +84,7 @@ while ($lf < $nstl)
       while ($i < $natl)
          if ($atl[$i] == $fo) then
             @ i   = $i + 1
-            @ ats = ( `echo $atl[$i] | sed 's|-||g'` )
+            @ ats = ( `echo $atl[$i] | sed 's|-||g' | sed 's|^0*||'` )
             break
          else
             @ i = $i + 2
@@ -90,8 +97,10 @@ while ($lf < $nstl)
          continue
       endif
 
-      set lfo = ( $lfo $fo )
-      set fo  = $tmpdir/$fo
+      if ($memlg == TRUE) then
+         set lfo = ( $lfo $fo )
+      endif
+      set fo = $tmpdir/$fo
    else
       set fo = $outf
    endif
@@ -101,22 +110,41 @@ while ($lf < $nstl)
    if ($fi =~ *.l) then
       set fl = $fi
       set fb = $fi:r
-      set fi = $fb.c
+      set fi = $tmpdir/$fb.c
       set ft = $tmpdir/lex.yy.c
-      ${LEX} -t $fl >&! $ft
+
+      set cmd = "${LEX} -t $fl"
+      if ($vrb > 0) then
+         echo "   $cmd >&! $ft"
+      endif
+
+      $cmd >&! $ft
       @ err = $err + $status
-      sed "s|lex.yy.c|$fi|" $ft | sed "s|yy|${fb}_|g" >&! $fi
+      sed "s|lex.yy.c|$fi:t|" $ft | sed "s|yy|${fb}_|g" >&! $fi
       rm -f $ft
    else if ($fi =~ *.y) then
       set fy = $fi
       set fb = $fi:r
-      set fi = $fb.c
+      set fi = $tmpdir/$fb.c
       set ft = $tmpdir/y.tab.c
       rm -f $ft
-      ${YACC} $fy
+
+      set cmd = "${YACC} $fy"
+      if ($vrb > 0) then
+         echo "   $cmd"
+      endif
+
+      $cmd
       @ err = $err + $status
-      sed "s|y.tab.c|$fi|" $ft | sed "s|yy|${fb}_|g" >&! $fi
+      sed "s|y.tab.c|$fi:t|" $ft | sed "s|yy|${fb}_|g" >&! $fi
       rm -f $ft
+   endif
+
+   set lfi = $fi:t
+   set lfo = $fo:t
+   if ($mangle == TRUE) then
+      set lfi = $lfi:r:r.c
+      set lfo = $lfo:r:r.c
    endif
 
    if ($co == TRUE) then
@@ -124,23 +152,40 @@ while ($lf < $nstl)
       if ($vrb > 1) then
          echo "   $cmd"
       else if ($vrb > 0) then
-         echo "   $exe:t $adsp -o $fo:t -c $fi:t $lib"
+         echo "   $exe:t $adsp -o $lfo -c $lfi $lib"
       endif
    else
       set cmd = ( `echo "$CI -o $fo $fi $lib" | sed 's|+++|\"|g'` )
       if ($vrb > 1) then
          echo "   $cmd"
       else if ($vrb > 0) then
-         echo "   $exe:t $adsp -o $fo:t $fi:t $lib"
+         echo "   $exe:t $adsp -o $lfo $lfi $lib"
       endif
    endif
+
    $cmd
    @ err = $err + $status
    $action
+
+   if (($memlg == FALSE) && ("$arc" != "")) then
+      pushd $tmpdir >& /dev/null
+      set cmd = ( ar rsc $arc $fo:t )
+      if ($vrb > 2) then
+         echo "   $cmd"
+      endif
+      $cmd
+      @ xstatus = $status
+      if ($xstatus == 0) then
+         rm -f $fo:t
+      else
+         @ err = $err + $xstatus
+      endif
+      popd >& /dev/null
+   endif
 end
 
 if ($err == 0) then
-   if ("$arc" != "") then
+   if (($memlg == TRUE) && ("$arc" != "")) then
       if ("$lfo" != "") then
          pushd $tmpdir >& /dev/null
          set cmd = ( ar rsc $arc $lfo )
@@ -160,8 +205,8 @@ if ($err == 0) then
             echo "   nothing to be done for $arc"
          endif
       endif
-   else if (("$outf" != "") && ("$lfo" != "")) then
-      set cmd = ( /usr/bin/ld $args -o $outf $lfo $lib)
+   else if (("$outf" != "") && ("$lfo" != "") && ($co == TRUE)) then
+      set cmd = ( $LD $args -o $outf $lfo $lib)
       if ($vrb > 1) then
          echo "   $cmd"
       else if ($vrb > 0) then

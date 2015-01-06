@@ -206,6 +206,7 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
 	 conv     = TRUE;
 	 kind     = KIND_OTHER;
 	 tuple    = NULL;
+	 atype    = NULL;
 	 origtype = NULL;
 
 	 sa = PS_tokenize(local, "(,;|) \t\n", 0);

@@ -10,15 +10,23 @@ unalias *
 @ err = 0
 
 set flst = ""
+set tgt  = date
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: file-time [-h] <files>* | <container>*"
+           echo "Usage: file-time [-h] [-m <tgt>] <files>* | <container>*"
            echo "   h   this help message"
+           echo "   m   output mode - one of:
+           echo "        date - date in <yyyy>-<mm>-<dd>-<HH>-<MM>-<SS> form (default)"
+           echo "        sec  - seconds from the epoch"
            echo ""
            exit(1)
+      case -m:
+           shift
+           set tgt = $1
+           breaksw
       default:
            if (-f $1) then
               set flst = ( $flst $1 )
@@ -34,38 +42,101 @@ set fmt = "%b %d %T %Y"
 set tl = ""
 
 foreach f ($flst)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check archive files
+
    if ($f =~ *.a) then
-# sol: rw-rw---- 1001/506   6808 Jul 24 10:24 2014 mlconst.o
-# bsd: rw-rw---- 1001/504   9872 Dec 18 15:31 2013 mlconst.o
-# lnx: rw-rw---- 1001/506  10312 Dec 17 06:11 2014 mlconst.o
-      set atl = ( `ar -tv $f |& awk '{printf("file %s %s %s %s %s ", $8, $4, $5, $6, $7)}'` )
+
+# lnx: rw-rw---- uid/gid size Dec 17 06:11 2014 file
+# sol: rw-rw---- uid/gid size Jul 24 10:24 2014 file
+# bsd: rw-rw---- uid/gid size Dec 18 15:31 2013 file
+# osx: rw-rw---- uid/gid size Nov 24 23:30 2014 file
+      set atl = ( `ar -tv $f |& awk '{printf("file %s %s %s %s %s ", $8, $4, $5, $7, $6)}'` )
       set tl = ( $tl $atl )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check tar files
+
    else if ($f =~ *.tar) then
-# sol: -rw-rw-r-- sabrown/automation 982 2014-12-14 13:57 ccwarn.c
-# bsd: -rw-rw-r--  0 sabrown automation 982 Dec 14 13:57 ccwarn.c
-# lnx: -rw-rw-r-- sabrown/automation 982 2014-12-14 13:57 ccwarn.c
-      if ($os == FreeBSD) then
-         set ttl = ( `tar -tvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
-      else
-         set ttl = ( `tar -tvf $f |& awk '{printf("file %s %s %s ", $6, $4, $5)}'`)
-      endif
-      set tl  = ( $tl $ttl )
+
+# lnx: -rw-rw-r-- usr/grp   size 2014-12-14 13:57 file
+# sol: -rw-rw-r-- usr/grp   size 2014-12-14 13:57 file
+# bsd: -rw-rw-r-- 0 usr grp size Dec 14 13:57     file
+# osx: -rwxrwx--- usr/grp   size 2013-10-15 07:21 file
+      switch ($os)
+         case FreeBSD :
+              set ttl = ( `tar -tvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
+              breaksw
+         default :
+              set ttl = ( `tar -tvf $f |& awk '{printf("file %s %s %s ", $6, $4, $5)}'`)
+              breaksw
+      endsw
+      set tl = ( $tl $ttl )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check compressed tar files
+
    else if ($f =~ *gz) then
-      if ($os == FreeBSD) then
-         set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
-      else
-         set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s ", $6, $4, $5)}'`)
-      endif
-      set tl  = ( $tl $ttl )
+      switch ($os)
+         case FreeBSD :
+         case Darwin :
+              set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
+              breaksw
+         default :
+              set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s ", $6, $4, $5)}'`)
+              breaksw
+      endsw
+      set tl = ( $tl $ttl )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check regular files
+
    else
-# sol: -rw-rw-r--+ 1 sabrown automation 4538 Dec 14 13:57 limits.c
-# bsd: -rw-rw-r--+ 1 sabrown  automation  4538 Dec 14 13:57 limits.c
-# lnx: -rw-rw-r-- 1 sabrown automation 4538 Dec 14 13:57 limits.c
-      set fmt = "%b %d %Y"
-      set ftl = ( `ls -l $f` )
-      set tl  = ( $tl file $f $ftl[6-8] )
+      switch ($os)
+         case FreeBSD :
+         case Darwin :
+              set inf = ( `stat -f "%Sm" -t "%b %d %Y %H %M %S" $f` )
+              breaksw
+         default :
+              set inf = ( `date -r $f '+%b %d %Y %H:%M:%S'` )
+              breaksw
+      endsw
+# lnx: -rw-rw-r-- 1  usr grp size Dec 14 13:57 file
+# sol: -rw-rw-r--+ 1 usr grp size Dec 14 13:57 file
+# bsd: -rw-rw-r--+ 1 usr grp size Dec 14 13:57 file
+# osx: -rwxrwx---  1 usr grp size May  1  2013 file
+      set tl = ( $tl file $f $inf )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
    endif
 end
+
+# GOTCHA: older shells have 32 bit ints so current dates will show negative
+# suppress the year in this case and watch out for builds at the change
+# of the year
+switch ($tgt)
+   case date :
+        set fmt = '+%Y-%m-%d-%H-%M-%S'
+        breaksw
+   case sec :
+        set fmt = '+%s'
+        breaksw
+   default :
+        echo "unknown mode '$tgt' - exiting"
+        exit(1)
+        breaksw
+endsw
 
 set ts = ""
 set tf = ""
@@ -75,11 +146,29 @@ while ($il < $nl)
    @ il = $il + 1
    if ($tl[$il] == file) then
       if ("$ts" != "") then
-         if ($os == FreeBSD) then
-            set dt = ( `date -j -f "$fmt" "$ts" '+%Y-%m-%d-%H-%M-%S'` )
-         else
-            set dt = ( `date -d "$ts" '+%Y-%m-%d-%H-%M-%S'` )
-         endif
+         switch ($os)
+            case FreeBSD :
+            case Darwin :
+                 set its  = ( `echo $ts | sed 's|[-:]| |g'` )
+                 if ($its[1] =~ [0-9]*) then
+                    if ($#its > 5) then
+                       set ifmt = '%m %d %Y %H %M %S'
+                    else
+                       set ifmt = '%m %d %Y %H %M'
+                    endif
+                 else
+                    if ($#its > 5) then
+                       set ifmt = '%b %d %Y %H %M %S'
+                    else
+                       set ifmt = '%b %d %Y %H %M'
+                    endif
+                 endif
+                 set dt   = ( `date -j -f "$ifmt" "$its" "$fmt"` )
+                 breaksw
+            default :
+                 set dt = ( `date -d "$ts" "$fmt"` )
+                 breaksw
+         endsw
          printf "   %-25s %s\n" $tf $dt
       endif
       @ il = $il + 1
@@ -89,12 +178,31 @@ while ($il < $nl)
       set ts = ( $ts $tl[$il] )
    endif
 end
+
 if ("$ts" != "") then
-   if ($os == FreeBSD) then
-      set dt = ( `date -j -f "$fmt" "$ts" '+%Y-%m-%d-%H-%M-%S'` )
-   else
-      set dt = ( `date -d "$ts" '+%Y-%m-%d-%H-%M-%S'` )
-   endif
+   switch ($os)
+      case FreeBSD :
+      case Darwin :
+           set its  = ( `echo $ts | sed 's|[-:]| |g'` )
+           if ($its[1] =~ [0-9]*) then
+              if ($#its > 5) then
+                 set ifmt = '%m %d %Y %H %M %S'
+              else
+                 set ifmt = '%m %d %Y %H %M'
+              endif
+           else
+              if ($#its > 5) then
+                 set ifmt = '%b %d %Y %H %M %S'
+              else
+                 set ifmt = '%b %d %Y %H %M'
+              endif
+           endif
+           set dt   = ( `date -j -f "$ifmt" "$its" "$fmt"` )
+           breaksw
+      default :
+           set dt = ( `date -d "$ts" "$fmt"` )
+           breaksw
+   endsw
    printf "   %-25s %s\n" $tf $dt
 endif
 
