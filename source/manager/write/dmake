@@ -20,7 +20,8 @@ Separator $WLog
 NoteD $WLog "   Persistent Portable Parallel Make - dmake"
 Note $WLog ""
 
-dbmget $WLog CROSS_COMPILE^               \
+dbmget $WLog AF_LONG_DOUBLE_IO^           \
+             CROSS_COMPILE^               \
              CROSS_REF       =\?  "none"^ \
 	     DB_TYPES^                    \
              PACT_CC_EXE^                 \
@@ -47,6 +48,18 @@ dbmget $WLog CROSS_COMPILE^               \
     flog $WLog popd
 
     set err = 1
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TEMPLATE - recompile the template utility now that we know the compiler
+
+    set opt = ""
+    set opt = ( $opt -DAF_LONG_DOUBLE_IO=$AF_LONG_DOUBLE_IO )
+
+    flog $WLog pushd $PSY_Base/psh
+    flog $WLog ./ccw -g $opt template.c -o $BinDir/template
+    flog $WLog popd
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

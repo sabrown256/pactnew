@@ -85,8 +85,8 @@ foreach f ($flst)
 
    else if ($f =~ *gz) then
       switch ($os)
-         case FreeBSD :
          case Darwin :
+         case FreeBSD :
               set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
               breaksw
          default :
@@ -102,14 +102,15 @@ foreach f ($flst)
 
    else
       switch ($os)
-         case FreeBSD :
          case Darwin :
+         case FreeBSD :
               set inf = ( `stat -f "%Sm" -t "%b %d %Y %H %M %S" $f` )
               breaksw
          default :
               set inf = ( `date -r $f '+%b %d %Y %H:%M:%S'` )
               breaksw
       endsw
+
 # lnx: -rw-rw-r-- 1  usr grp size Dec 14 13:57 file
 # sol: -rw-rw-r--+ 1 usr grp size Dec 14 13:57 file
 # bsd: -rw-rw-r--+ 1 usr grp size Dec 14 13:57 file
@@ -125,6 +126,7 @@ end
 # GOTCHA: older shells have 32 bit ints so current dates will show negative
 # suppress the year in this case and watch out for builds at the change
 # of the year
+
 switch ($tgt)
    case date :
         set fmt = '+%Y-%m-%d-%H-%M-%S'
@@ -147,8 +149,8 @@ while ($il < $nl)
    if ($tl[$il] == file) then
       if ("$ts" != "") then
          switch ($os)
-            case FreeBSD :
             case Darwin :
+            case FreeBSD :
                  set its  = ( `echo $ts | sed 's|[-:]| |g'` )
                  if ($its[1] =~ [0-9]*) then
                     if ($#its > 5) then
@@ -181,8 +183,8 @@ end
 
 if ("$ts" != "") then
    switch ($os)
-      case FreeBSD :
       case Darwin :
+      case FreeBSD :
            set its  = ( `echo $ts | sed 's|[-:]| |g'` )
            if ($its[1] =~ [0-9]*) then
               if ($#its > 5) then

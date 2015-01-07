@@ -358,6 +358,9 @@ int main(int c, char **v)
 
     fprintf(fp, "\n");
 
+    fprintf(fp, "AF_LONG_DOUBLE = %s\n", dbget(cl, FALSE, "AF_LONG_DOUBLE"));
+    fprintf(fp, "\n");
+
 /* emit the load names for the libraries - cover threaded/nonthreaded */
     fprintf(fp, "SMP_LibExt=%s\n", dbget(cl, FALSE, "SMP_LibExt"));
     fprintf(fp, "LSCORE      = -lscore\n");
