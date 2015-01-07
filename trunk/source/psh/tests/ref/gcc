@@ -3033,16 +3033,6 @@ char *_SC_str_ptr(char *t, int nc, void *s, long n, int mode)
     void * *pv = (void * *) s;
     nld = 0;
     fmt = (mode == 1) ? _SC.types.formats[4] : _SC.types.formata[4];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, *(double *) pv[n]);
     else
@@ -3071,16 +3061,6 @@ char *_SC_str_chr(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     char *pv = (char *) s;
     fmt = (mode == 1) ? _SC.types.formats[7] : _SC.types.formata[7];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else
@@ -3095,16 +3075,6 @@ char *_SC_str_wchr(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     wchar_t *pv = (wchar_t *) s;
     fmt = (mode == 1) ? _SC.types.formats[9] : _SC.types.formata[9];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else
@@ -3119,16 +3089,6 @@ char *_SC_str_int8(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     int8_t *pv = (int8_t *) s;
     fmt = (mode == 1) ? _SC.types.formats[11] : _SC.types.formata[11];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else
@@ -3143,16 +3103,6 @@ char *_SC_str_shrt(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     short *pv = (short *) s;
     fmt = (mode == 1) ? _SC.types.formats[13] : _SC.types.formata[13];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else
@@ -3167,16 +3117,6 @@ char *_SC_str_int(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     int *pv = (int *) s;
     fmt = (mode == 1) ? _SC.types.formats[15] : _SC.types.formata[15];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else
@@ -3191,16 +3131,6 @@ char *_SC_str_lng(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     long *pv = (long *) s;
     fmt = (mode == 1) ? _SC.types.formats[17] : _SC.types.formata[17];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else
@@ -3215,16 +3145,6 @@ char *_SC_str_ll(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     long long *pv = (long long *) s;
     fmt = (mode == 1) ? _SC.types.formats[19] : _SC.types.formata[19];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else
@@ -3239,16 +3159,6 @@ char *_SC_str_flt(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     float *pv = (float *) s;
     fmt = (mode == 1) ? _SC.types.formats[21] : _SC.types.formata[21];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else
@@ -3263,16 +3173,6 @@ char *_SC_str_dbl(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     double *pv = (double *) s;
     fmt = (mode == 1) ? _SC.types.formats[23] : _SC.types.formata[23];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else
@@ -3287,16 +3187,6 @@ char *_SC_str_ldbl(char *t, int nc, void *s, long n, int mode)
     static int nld = 0;
     long double *pv = (long double *) s;
     fmt = (mode == 1) ? _SC.types.formats[25] : _SC.types.formata[25];
-
-    {char lc, *ls, *ld;
-     for (ls = fmt, ld = fmt; *ls != '\0'; ls++)
-         {lc = *ls;
-          if (lc != 'L')
-             *ld++ = lc;
-          else
-             nld = 1;};
-     *ld = '\0';};
-
     if (nld == 1)
        nb  = snprintf(t, nc, fmt, (double) pv[n]);
     else

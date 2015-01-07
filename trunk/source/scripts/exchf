@@ -1,0 +1,45 @@
+#!/bin/csh -f
+#
+# EXCHF - exchange files
+#
+# include cpyright.h
+#
+
+unalias *
+
+@ err = 0
+
+set files = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: exchf [-h] <file1> <file2>"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           if (-f $1) then
+              set files = ( $files $1 )
+           else
+              echo "Ignoring '$1' - not file"
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if ($#files != 2) then
+   echo "Wrong number of files - exiting"
+   @ err = 1
+else
+   set fa = $files[1]
+   set fb = $files[2]
+   set fc = $cwd/tmp.sf.$$
+   mv $fa $fc
+   mv $fb $fa
+   mv $fc $fb
+endif
+
+exit($err)

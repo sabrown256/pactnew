@@ -154,7 +154,7 @@ template : ${BinDir}/template
 
 ${BinDir}/template : template.c ${LibFiles}
 	@(echo "${PCAnnounce} template.c -o ${BinDir}/template" ; \
-	  ccw -g template.c -o ${BinDir}/template)
+	  ccw -DAF_LONG_DOUBLE_IO=${AF_LONG_DOUBLE_IO} -g template.c -o ${BinDir}/template)
 
 link : ${InstallDep}
 
