@@ -15,6 +15,7 @@ Tool CC {
 Tool FC {
    Exe   = f90
    Flags = +U77
+#   Mod       = xxx
 }
 
 Tool Lex {

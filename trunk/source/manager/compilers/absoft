@@ -21,6 +21,7 @@ Tool FC {
                  *     = -m* ]
    Flags    += [ _cmd_ = -p ;                   # profiling
                  on    = $FC_Profile ]
+#   Mod       = xxx
    MOD_FLAG  = -p
    Debug     = -g
    Optimize  = -g -O3

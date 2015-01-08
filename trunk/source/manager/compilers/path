@@ -29,6 +29,7 @@ Tool CC {
 
 Tool FC {
    Exe     = pathf90
+   Mod     = -module@                           # see afc about @
    Flags   = -freeform
    Version = --version
 }

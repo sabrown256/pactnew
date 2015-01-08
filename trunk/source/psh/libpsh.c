@@ -2715,7 +2715,7 @@ void key_val(char **key, char **val, char *s, char *dlm)
 	p = strpbrk(k, dlm);
 	if (p != NULL)
 	   {*p++ = '\0';
-	    v    = trim(p, BOTH, dlm);};};
+	    v    = trim(trim(p, FRONT, dlm), BACK, " \t\n");};};
 
     if (key != NULL)
        *key = k;

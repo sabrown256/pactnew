@@ -16,6 +16,8 @@
 # define MAC_COLOR
 # define PACT_INCLUDES
 
+# undef user2
+
 #include <ApplicationServices/ApplicationServices.h>
 #include <Carbon/Carbon.h>
 

@@ -226,7 +226,7 @@ switch ($Cmnd)
 #        set Args = "-dbg"
         set Args = ""
         set Tgts = ""
-        set BTgt = build
+        set BTgt = lib
         while ($#argv > 0)
            switch ($1)
               case -a:
@@ -242,11 +242,12 @@ switch ($Cmnd)
                    breaksw
               case -h :
                    echo ""
-                   echo "Usage: dsys build [-a <sys>] [-all] [-h] [-na #] [-p #] [-s] [-u] [tgts]*"
+                   echo "Usage: dsys build [-a <sys>] [-all] [-h] [-m <mode>] [-na #] [-p #] [-s] [-u] [tgts]*"
                    echo ""
                    echo "     a   - do build for configuration <sys>"
                    echo "     all - build all current configurations"
                    echo "     h   - this help message"
+                   echo "     m   - one of: build | lib (default is lib - the new method)"
                    echo "     na  - number of attempts when commands fail"
                    echo "     p   - number of nodes to use"
                    echo "     s   - build shared libraries if configured"
@@ -264,8 +265,9 @@ switch ($Cmnd)
                       set Args = ( $Args "-async" $1 )
                    endif
                    breaksw
-              case -l :
-                   set BTgt = lib
+              case -m :
+                   shift
+                   set BTgt = $1
                    breaksw
               case -s :
                    set MTgt = shared
