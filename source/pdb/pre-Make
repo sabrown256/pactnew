@@ -154,7 +154,7 @@ ${LibDep} : ${hdrf} ${Hdrs} pdspoke.c pdb_formats.h scope_dp.h
 
 ${IncDir}/pdform.h :
 	@(echo "template -desc 1 -o pdform.h" ; \
-	  ${CROSS_FE} ${BinDir}/template -desc 1 -o ${IncDir}/pdform.h)
+	  ${CROSS_FE} ${BinDir}/template -t ${EtcDir}/types.db -desc 1 -o ${IncDir}/pdform.h)
 
 GenInc = ${PACTTmpDir}/gc-pdb.h
 

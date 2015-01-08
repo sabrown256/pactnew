@@ -24,7 +24,7 @@ FcFlags = ${FC_MOD_FLAG}${IncDir} ${MDInc}
 LdFlags = -g -L${LibDir} ${LDFLAGS}
 
 ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
-AFFlags = -avrb ${AODF} ${FFLAGS} ${FcFlags}
+AFFlags = -avrb ${AODF} ${FFLAGS} ${FC_MOD_FLAG}${tmpobj} ${FcFlags}
 
 #
 # Files to Save for Backup (make save)
@@ -144,6 +144,7 @@ Libs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
 NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
 
 build :
+	@rm -f *.mod >& /dev/null
 	@acc ${ACFlags} -c ${CSrcs} -a ${TGTLib}
 	@afc ${AFFlags} -c ${FSrcs} -a ${TGTLib}
 	@(cd ${PACTTmpDir} ; \

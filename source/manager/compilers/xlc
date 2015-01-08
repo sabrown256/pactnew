@@ -34,6 +34,7 @@ Tool FC {
                *     = -q* ]
    Flags  += [ _cmd_ = -p ;                  # profiling
 	       on    = -qpdf1 ]
+   Mod     = -qmoddir=                       # module directory
    Version = -qversion
 }
 

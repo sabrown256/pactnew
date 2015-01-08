@@ -240,7 +240,7 @@ ${TObjs} : scope_thread.h
 ${Objs}  : ${Hdrs} ${hdrf}
 
 #${LibDep} : ${hdrf} ${HDrs}
-${LibDep} : ${hdrf} ${TGTInc}
+${LibDep} : ${PACTTmpDir}/gc_type.c ${hdrf} ${TGTInc}
 ${MMDep}  : ${Hdrs}
 
 #
@@ -251,11 +251,11 @@ ${MMDep}  : ${Hdrs}
 
 ${PACTTmpDir}/gc_type.c :
 	@(echo "template -gc -o ${PACTTmpDir}/gc_type.c" ; \
-	  ${CROSS_FE} template -gc -o ${PACTTmpDir}/gc_type.c)
+	  ${CROSS_FE} template -gc -t ${EtcDir}/types.db -o ${PACTTmpDir}/gc_type.c)
 
 ${PACTTmpDir}/gc_type.h :
 	@(echo "template -gh -o ${PACTTmpDir}/gc_type.h" ; \
-	  ${BinDir}/template -gh -o ${PACTTmpDir}/gc_type.h)
+	  ${BinDir}/template -gh -t ${EtcDir}/types.db -o ${PACTTmpDir}/gc_type.h)
 
 ${IncDir}/scfnca.h : scfnca.t
 	@(echo "template scfnca.t -o ${IncDir}/scfnca.h" ;  \

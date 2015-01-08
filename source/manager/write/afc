@@ -37,6 +37,7 @@ dbmget $WLog AR_Exe^             \
              FC_Debug^           \
              FC_Optimize^        \
              FC_Profile^         \
+             FC_Mod^             \
              LD_Exe^             \
              PACT_FC_FAMILY^     \
              PACT_FC_VERSION^    \
@@ -269,6 +270,29 @@ if (-x "$wexe") then
    Note $outf 'endif'
    Note $outf ''
 
+# add the module destination directory specification
+# to the compile command line
+# NOTE: known compilers have three syntaxes:
+#   1) <flag><dir>
+#   2) <flag> <dir>
+#   3) <flag>=<dir>
+# have the compiler file specify case (2) with a trailing '@'
+# which we remove only here
+# in case (1) the compiler file will just have <flag>
+# and in case (3) the compiler file will have <flag>=
+# this can only be done here because <dir> is not known for
+# the compiler file
+
+   if ("$FC_Mod" != "") then
+      if ("$PSY_TmpDir" =~ /*) then
+         set tmpdir = ${PSY_TmpDir}/obj
+      else
+         set tmpdir = '$cwd/'${PSY_TmpDir}/obj
+      endif
+      set moddir = ( `echo "${FC_Mod}${tmpdir}" | sed 's|@| |'` )
+      Note $outf 'set args = ( $args '$moddir' )'
+   endif
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -278,7 +302,6 @@ if (-x "$wexe") then
 # for some reason they were not built with -rpath
 # this is not for the compiled executables but the compiler
       case gfortran:
-           Note $outf 'set args = ( $args -J'$PSY_TmpDir'/obj )'
            Note $outf 'set root = $exe:h'
            Note $outf 'set root = $root:h'
            Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
@@ -291,7 +314,6 @@ if (-x "$wexe") then
            breaksw
 
       case pathf90:
-           Note $outf 'set args = ( $args -module '$PSY_TmpDir'/obj )'
            Note $outf 'set root  = $exe:h'
            Note $outf 'set root  = $root:h'
            Note $outf 'set lvers = `ls $root/lib`'
@@ -302,15 +324,6 @@ if (-x "$wexe") then
            Note $outf 'endif'
 
            Note $outf 'unset root'
-           breaksw
-
-      case pgf90:
-      case ifort:
-           Note $outf 'set args = ( $args -module '$PSY_TmpDir'/obj )'
-           breaksw
-
-      case sunf9*:
-           Note $outf 'set args = ( $args -moddir='$PSY_TmpDir'/obj )'
            breaksw
    endsw
    Note $outf ''

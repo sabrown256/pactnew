@@ -19,6 +19,7 @@ Tool FC {
    Exe   = f90
    Flags = [ _env_ = Bits ;                 # address bit size
              *     = -* ]
+#   Mod       = xxx
 }
 
 Tool LD {

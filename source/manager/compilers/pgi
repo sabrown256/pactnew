@@ -29,10 +29,11 @@ Tool CC {
 }
 
 Tool FC {
-   Exe     = pgf90
-   Flags   = -Mfree -Mnoref_externals
-   Flags  += ${OCV_Bits}
-   Flags  += ${OCV_PIC}
+   Exe      = pgf90
+   Flags    = -Mfree -Mnoref_externals
+   Flags   += ${OCV_Bits}
+   Flags   += ${OCV_PIC}
+   Mod      = -module@                      # see afc about @
    Debug    = -g -O0
    Optimize = -g -O
    Version  = -V
@@ -91,3 +92,7 @@ Group LibM {
 
 include cpp-rule
 include serial
+
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:psh_template
+}

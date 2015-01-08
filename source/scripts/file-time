@@ -36,8 +36,21 @@ while ($#argv > 0)
    shift
 end
 
-set os  = `uname -s`
-set fmt = "%b %d %T %Y"
+set os = `uname -s`
+
+# GOTCHA: because the BSD shell mishandles multiple cases on a single
+# block of code - characterize the UNIX variant and proceed from that
+switch ($os)
+   case Darwin :
+        set unx = BSD
+        breaksw
+   case FreeBSD :
+        set unx = BSD
+        breaksw
+   default :
+        set unx = SYSV
+        breaksw
+endsw
 
 set tl = ""
 
@@ -68,8 +81,8 @@ foreach f ($flst)
 # sol: -rw-rw-r-- usr/grp   size 2014-12-14 13:57 file
 # bsd: -rw-rw-r-- 0 usr grp size Dec 14 13:57     file
 # osx: -rwxrwx--- usr/grp   size 2013-10-15 07:21 file
-      switch ($os)
-         case FreeBSD :
+      switch ($unx)
+         case BSD :
               set ttl = ( `tar -tvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
               breaksw
          default :
@@ -84,9 +97,8 @@ foreach f ($flst)
 # check compressed tar files
 
    else if ($f =~ *gz) then
-      switch ($os)
-         case Darwin :
-         case FreeBSD :
+      switch ($unx)
+         case BSD :
               set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
               breaksw
          default :
@@ -101,9 +113,8 @@ foreach f ($flst)
 # check regular files
 
    else
-      switch ($os)
-         case Darwin :
-         case FreeBSD :
+      switch ($unx)
+         case BSD :
               set inf = ( `stat -f "%Sm" -t "%b %d %Y %H %M %S" $f` )
               breaksw
          default :
@@ -122,10 +133,6 @@ foreach f ($flst)
 
    endif
 end
-
-# GOTCHA: older shells have 32 bit ints so current dates will show negative
-# suppress the year in this case and watch out for builds at the change
-# of the year
 
 switch ($tgt)
    case date :
@@ -148,9 +155,8 @@ while ($il < $nl)
    @ il = $il + 1
    if ($tl[$il] == file) then
       if ("$ts" != "") then
-         switch ($os)
-            case Darwin :
-            case FreeBSD :
+         switch ($unx)
+            case BSD :
                  set its  = ( `echo $ts | sed 's|[-:]| |g'` )
                  if ($its[1] =~ [0-9]*) then
                     if ($#its > 5) then
@@ -182,9 +188,8 @@ while ($il < $nl)
 end
 
 if ("$ts" != "") then
-   switch ($os)
-      case Darwin :
-      case FreeBSD :
+   switch ($unx)
+      case BSD :
            set its  = ( `echo $ts | sed 's|[-:]| |g'` )
            if ($its[1] =~ [0-9]*) then
               if ($#its > 5) then

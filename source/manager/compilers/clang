@@ -97,6 +97,7 @@ Tool FC {
 	         on    = -pg ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
 	         on    = -fprofile-arcs -ftest-coverage ]
+   Mod       = -J
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
    Version   = -v

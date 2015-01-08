@@ -34,6 +34,7 @@ Tool FC {
                 *     = -m* ]
    LD_RPath = -z -rpath,@
 #   LD_Lib   = -lgfortran
+   Mod      = -moddir=
    Version  = -V
 }
 

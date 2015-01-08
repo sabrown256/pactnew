@@ -133,10 +133,11 @@ Tool FC {
                  on    = $FC_Profile ]
    Flags    =+ [ _cmd_ = -cov ;                 # coverage analysis
                  on    = -fprofile-arcs -ftest-coverage ]
-   Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
-   Profile   = -pg
-   Version   = -v
+   Mod      = -J
+   Debug    = -g -O0 -Wall
+   Optimize = -g -O -Wunused
+   Profile  = -pg
+   Version  = -v
 }
 
 Tool CXX {

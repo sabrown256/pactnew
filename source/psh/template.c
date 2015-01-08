@@ -552,8 +552,7 @@ int main(int c, char **v)
 	    inf = v[i];};
 
     if (make_type_table(tytab) == FALSE)
-       {printf("No type table file specified - exiting\n");
-	return(1);};
+       return(1);
 
     if (inf != NULL)
        fi = fopen_safe(inf, "r+");

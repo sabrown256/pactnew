@@ -226,7 +226,10 @@ struct s_file_io_desc
     double nsec[SC_N_IO_OPER];};
 
 
-#ifdef HAVE_MMAP
+/* the SC_file_block and SC_mapped_file are only
+ * really only used #ifdef HAVE_MMAP
+ * but other struct refer to them
+ */
 
 typedef struct s_SC_file_block SC_file_block;
 typedef struct s_SC_mapped_file SC_mapped_file;
@@ -296,8 +299,6 @@ struct s_SC_mapped_file
     void (*setup)(SC_mapped_file *mf);
     
     file_io_desc fid;};
-
-#endif
 
 
 /* UDL support */

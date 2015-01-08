@@ -16,6 +16,7 @@ Tool CC {
 
 Tool FC {
    Exe = f90
+#   Mod       = xxx
 }
 
 Tool LD {
