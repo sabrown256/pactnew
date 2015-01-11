@@ -12,6 +12,8 @@
 
 #define EOE(str) ((*SS_PTR(str) == '\n') || (*SS_PTR(str) == '\0'))
 
+typedef void *(*PFPVPsiObj)(SS_psides *si, object *o);
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -21,7 +23,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, SC_type *td)
    {int type;
     void **pv;
     pcons *alst;
-    void *(*f)(SS_psides *si, object *o);
+    PFPVPsiObj f;
 
     pv = (void **) v;
     if (pv != NULL)
@@ -31,7 +33,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, SC_type *td)
 
 	else
 	   {alst = td->a;
-	    f    = SC_assoc(alst, "Scheme->C");
+	    f    = (PFPVPsiObj) SC_assoc(alst, "Scheme->C");
 	    if (f != NULL)
 	       *pv = f(si, obj);
 

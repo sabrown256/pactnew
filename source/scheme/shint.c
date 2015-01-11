@@ -34,7 +34,7 @@ int SS_get_type_method(SC_type *td, ...)
 	        ok = FALSE;
 	     else
 	        {pmf  = SC_VA_ARG(PFPVoid *);
-		 *pmf = SC_assoc(alst, mn);};};
+		 *pmf = SC_assoc(alst, (void *) mn);};};
 
 	rv = TRUE;}
 
@@ -81,7 +81,7 @@ int SS_set_type_method(int type, ...)
 	        ok = FALSE;
 	     else
 	        {mf   = SC_VA_ARG(PFPVoid);
-		 alst = SC_add_alist(alst, mn, tn, mf);};};
+		 alst = SC_add_alist(alst, mn, tn, (void *) mf);};};
 
 	ty->a = alst;
 

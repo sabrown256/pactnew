@@ -28,65 +28,6 @@ extern GC
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_X_TXT_CONNECT_SERVER - connect to the X server
- *                          - and register call backs for interrupt driven I/O
- *                          - on stdin and the connection to the server
- *                          - do this at most one time in a program
- */
-
-static void _PG_X_txt_connect_server(PG_device *dev)
-   {char *window_name;
-
-    if (_PG_X_txt_display == NULL)
-
-/* try to open the connection from the PGS device */
-       {if (strcmp(dev->name, "WINDOW") != 0)
-           _PG_X_txt_display = XOpenDisplay(dev->name);
-
-/* try to open the connection from the DISPLAY variable */
-        if (_PG_X_txt_display == NULL)
-           {window_name       = getenv("DISPLAY");
-            _PG_X_txt_display = XOpenDisplay(window_name);};};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PG_X_TXT_QUERY_SCREEN - query some physical device characteristics */
-
-static void _PG_X_txt_query_screen(PG_device *dev, int *pdx, int *pnc)
-   {int id, nc, screen, n_planes;
-    int dx[PG_SPACEDM];
-
-/* connect to X server once only */
-    _PG_X_txt_connect_server(dev);
-
-    if (_PG_X_txt_display != NULL)
-       {dev->display = _PG_X_txt_display;
- 
-	screen   = DefaultScreen(_PG_X_txt_display);
-	n_planes = DisplayPlanes(_PG_X_txt_display, screen);
-
-	dx[0] = DisplayWidth(_PG_X_txt_display, screen);
-	dx[1] = DisplayHeight(_PG_X_txt_display, screen);
-	nc    = 1 << n_planes;}
-
-    else
-       {dx[0] = 0;
-	dx[1] = 0;
-	nc    = 0;};
-
-    for (id = 0; id < 2; id++)
-        pdx[id] = dx[id];
-
-    *pnc = nc;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PG_X_TXT_SETUP_FONT - load the named font for X if it exists */
 
 static int _PG_X_txt_setup_font(PG_device *dev, char *bf)

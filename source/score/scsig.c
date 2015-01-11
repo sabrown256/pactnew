@@ -174,7 +174,7 @@ void *_SC_signal_action_t(void *a)
 /* set the context for this thread */
     SC_register_context((void *) fn, arg, nb);
 
-    rv = (PFSignal_handler) fo;
+    rv = (void *) fo;
 
     return(rv);}
 
