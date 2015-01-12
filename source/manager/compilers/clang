@@ -128,6 +128,11 @@ Group AF {
    PATTERN_ERR  = ":+sp+error:"
 }
 
+# specifications for FPE patching
+Group FPE {
+   Exe = clang
+}
+
 Group Std {
    CC_Flags = ${CC_Flags}
    FC_Flags = ${FC_Flags}

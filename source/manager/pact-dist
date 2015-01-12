@@ -62,6 +62,9 @@ set RM    = "rm -f"
 set RMDir = "rm -rf"
 
 InitLog Log $psy_base/dev/$PSY_ID/log/dist
+Note $Log "Repository = |$SCSRepository|"
+Note $Log "Kind       = |$SCSKind|"
+Note $Log "Date       = |$SRCDate|"
 
 set Opt = "$Exe:t  $argv"
 
