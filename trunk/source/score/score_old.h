@@ -18,6 +18,20 @@
 
 /*--------------------------------------------------------------------------*/
 
+#define SC_INT_I         G_INT_I
+#define SC_INT_S         G_INT_S
+#define SC_INT8_I        G_INT8_I
+#define SC_INT8_S        G_INT8_S
+#define SC_INTEGER_I     G_INTEGER_I
+#define SC_INTEGER_S     G_INTEGER_S
+#define SC_FLOAT_I       G_FLOAT_I
+#define SC_FLOAT_S       G_FLOAT_S
+#define SC_DOUBLE_I      G_DOUBLE_I
+#define SC_DOUBLE_S      G_DOUBLE_S
+#define SC_REAL_P_S      G_REAL_P_S
+#define SC_PCONS_P_S     G_PCONS_P_S
+#define SC_FILE_I        G_FILE_I
+
 /*--------------------------------------------------------------------------*/
 
 /*                           PROCEDURAL MACROS                              */

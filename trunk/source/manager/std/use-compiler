@@ -122,8 +122,8 @@ switch ($cname)
         set pact_cc_family = INTEL
         set pact_fc_family = INTEL
         set opt   = ( -v )
-        set pat   = ( Version )
-        set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
+        set pat   = ( version )
+        set prog  = ( '$0 ~ /Version/ { print $2 } $0 ~ /version/ { print $3 } $0 ~ /Compile line:/ { print $3 }' )
         breaksw
 
 # OPEN64

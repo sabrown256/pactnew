@@ -7,9 +7,6 @@
 
 #ifdef HAVE_X11
 
-static Display
- *_PG_X_txt_display = NULL;
-
 static char
  *backup_font[] = {"*-medium-r-*-12-*",
                    "*-r-*-12-*",

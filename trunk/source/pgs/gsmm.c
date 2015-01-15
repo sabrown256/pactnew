@@ -444,6 +444,9 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
     PG_device *d;
     PFRDev fnc;
 
+    G_register_pml_types();
+    G_register_pgs_types();
+
     PG_setup_attrs_glb();
 
     d = CMAKE(PG_device);
