@@ -1131,7 +1131,7 @@ switch ($Cmnd)
               else
                  set ok = TRUE
                  foreach l ($nflst)
-                    if ("$f" == $l) then
+                    if ("$f" == "$l") then
                        set ok = FALSE
                        break
                     endif
@@ -3850,7 +3850,11 @@ PCO_CONFIG:
       set PArgs = ( $PArgs -ft `echo $flst | sed 's| |-|g'` )
    endif
 
-   Note $Log "SESSION_CONFIG = $SESSION_CONFIG"
+   if ($?SESSION_CONFIG == 0) then
+      Note $Log "SESSION_CONFIG is undefined"
+   else
+      Note $Log "SESSION_CONFIG = $SESSION_CONFIG"
+   endif
 
 # do the main configuration work
    if ("$ucfg" != "") then

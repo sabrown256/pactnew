@@ -252,9 +252,9 @@ static void c_type_reg(bindes *bd, char *tag, der_list *sl, int is, int ni)
 		tl->cnm);
 
 /* initialize G_*_S and G_*_P_S */
-	fprintf(fc, "       %s   = CSTRSAVE(\"%s\");\n",
+	fprintf(fc, "       %s   = CSTRDUP(\"%s\", 3);\n",
 		tl->snm, tl->cnm);
-	fprintf(fc, "       G_%s_P_S = CSTRSAVE(\"%s *\");\n",
+	fprintf(fc, "       G_%s_P_S = CSTRDUP(\"%s *\", 3);\n",
 		tl->unm, tl->cnm);
 
 	fprintf(fc, "\n");};

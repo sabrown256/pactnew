@@ -275,6 +275,12 @@ ${BinDir}/tpnc : ${TGTLib} tpnc.c
 	@(echo "${CCAnnounce} tpnc.c -o ${BinDir}/tpnc" ; \
 	  ${CLD} ${LdFlags} tpnc.c -o ${BinDir}/tpnc ${Libs})
 
+nan : ${BinDir}/tpdnan
+
+${BinDir}/tpdnan : ${TGTLib} tpdnan.c
+	@(echo "${CCAnnounce} tpdnan.c -o ${BinDir}/tpdnan" ; \
+	  ${CLD} ${LdFlags} tpdnan.c -o ${BinDir}/tpdnan ${Libs})
+
 #
 # multiple process tests
 #

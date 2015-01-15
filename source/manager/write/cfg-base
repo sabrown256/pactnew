@@ -130,6 +130,19 @@ endif
          set pf = $cf
       endif
 
+# get full path to compiler
+      if (("$lcc" !~ /*) && ("$lcc" !~ mp-*)) then
+         if ("$lcc" =~ */*) then
+            set lcc = $cwd/$lcc
+         else
+            set lcc = `which $lcc`
+         endif
+      endif
+
+# add compiler location to path
+# NOTE: PCO strips path down and this will add it back
+      echo 'setenv PATH  ${PATH}:'$lcc:h >>& $pf
+
 # build the config off the operating system
       echo "include spokes" >>& $pf
       switch ($los)
@@ -290,7 +303,7 @@ endif
 
 # get the main compiler family
               switch ($lcc)
-                 case clang:
+                 case *clang*:
                       set lcfam = clang-lnx
                       breaksw
                  case *mpicc*:
