@@ -712,5 +712,3 @@ For questions and comments,
 please contact the <A HREF="pactteam.html">PACT
 Development Team</A>.
 
-<hr>
-Last Updated: $MOD

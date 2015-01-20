@@ -132,5 +132,3 @@ We would like to hear of your experiences with PACT.
 Please contact the <a href="pactteam.html">PACT Development Team</a>.<p>
 <p>
 
-<hr>
-Last Updated: $MOD

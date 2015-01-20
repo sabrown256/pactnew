@@ -65,5 +65,3 @@ Lee Minner --  Programming, debugging and design
 Al Franz --  Programming, debugging and design
 <BR>
 
-<hr>
-Last Updated: $MOD

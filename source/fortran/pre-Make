@@ -26,6 +26,8 @@ LdFlags = -g -L${LibDir} ${LDFLAGS}
 ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
 AFFlags = -avrb ${AODF} ${FFLAGS} ${FC_MOD_FLAG}${tmpobj} ${FcFlags}
 
+AFC = afc ${AODF} ${FFLAGS} ${FcFlags}
+
 #
 # Files to Save for Backup (make save)
 #
@@ -160,12 +162,12 @@ build :
 fha : ${BinDir}/tscfh
 
 ${BinDir}/tscfh : tscfh.f ${InstallDep}
-	${FC} ${LdFlags} tscfh.f -o ${BinDir}/tscfh ${Libs}
+	${AFC} ${LdFlags} tscfh.f -o ${BinDir}/tscfh ${Libs}
 
 omp : ${BinDir}/tscfomp
 
 ${BinDir}/tscfomp : tscfomp.f ${InstallDep}
-	${FC} ${LdFlags} tscfomp.f -o ${BinDir}/tscfomp ${Libs}
+	${AFC} ${LdFlags} tscfomp.f -o ${BinDir}/tscfomp ${Libs}
 
 scan : ${BinDir}/tscls
 
@@ -179,24 +181,24 @@ pdb : ${BinDir}/tpdf ${BinDir}/tpdfw ${BinDir}/tpdfg ${BinDir}/tpdfhy \
       ${BinDir}/tpcf
 
 ${BinDir}/tpdf : tpdf.f ${InstallDep}
-	${FC} ${LdFlags} tpdf.f -o ${BinDir}/tpdf ${Libs}
+	${AFC} ${LdFlags} tpdf.f -o ${BinDir}/tpdf ${Libs}
 
 ${BinDir}/tpdfw : tpdfw.f ${InstallDep}
-	${FC} ${LdFlags} tpdfw.f -o ${BinDir}/tpdfw ${Libs}
+	${AFC} ${LdFlags} tpdfw.f -o ${BinDir}/tpdfw ${Libs}
 
 ${BinDir}/tpdfg : tpdfg.f ${InstallDep}
-	${FC} ${LdFlags} tpdfg.f -o ${BinDir}/tpdfg ${Libs}
+	${AFC} ${LdFlags} tpdfg.f -o ${BinDir}/tpdfg ${Libs}
 
 ${BinDir}/tpdfhy : tpdfhy.f ${InstallDep}
-	${FC} ${LdFlags} tpdfhy.f -o ${BinDir}/tpdfhy ${Libs}
+	${AFC} ${LdFlags} tpdfhy.f -o ${BinDir}/tpdfhy ${Libs}
 
 ${BinDir}/tpcf : tpcf.f ${InstallDep}
-	${FC} ${LdFlags} tpcf.f -o ${BinDir}/tpcf ${Libs}
+	${AFC} ${LdFlags} tpcf.f -o ${BinDir}/tpcf ${Libs}
 
 fdp : ${BinDir}/tpdfd
 
 ${BinDir}/tpdfd : tpdfd.f ${InstallDep}
-	${FC} ${LdFlags} tpdfd.f -o ${BinDir}/tpdfd ${Libs}
+	${AFC} ${LdFlags} tpdfd.f -o ${BinDir}/tpdfd ${Libs}
 
 
 # PGS tests
@@ -204,15 +206,15 @@ ${BinDir}/tpdfd : tpdfd.f ${InstallDep}
 pgs : ${BinDir}/tgsf ${BinDir}/tgsfg ${BinDir}/tgsfc
 
 ${BinDir}/tgsf : tgsf.f ${InstallDep}
-	${FC} ${LdFlags} tgsf.f -o ${BinDir}/tgsf ${NGLibs}
+	${AFC} ${LdFlags} tgsf.f -o ${BinDir}/tgsf ${NGLibs}
 
 ${BinDir}/tgsfg : tgsfg.f ${InstallDep}
-	${FC} ${LdFlags} tgsfg.f -o ${BinDir}/tgsfg ${NGLibs}
+	${AFC} ${LdFlags} tgsfg.f -o ${BinDir}/tgsfg ${NGLibs}
 
 contour : ${BinDir}/tgsfc
 
 ${BinDir}/tgsfc : tgsfc.f ${InstallDep}
-	${FC} ${LdFlags} tgsfc.f -o ${BinDir}/tgsfc ${NGLibs}
+	${AFC} ${LdFlags} tgsfc.f -o ${BinDir}/tgsfc ${NGLibs}
 
 #
 # PANACEA tests
@@ -224,7 +226,7 @@ ${BinDir}/tpath : tpath.c ${InstallDep}
 	  ${CLD} ${LdFlags} tpath.c -o ${BinDir}/tpath ${NGLibs})
 
 ${BinDir}/tpafth : tpafth.f ${InstallDep}
-	${FC} ${LdFlags} tpafth.f -o ${BinDir}/tpafth ${NGLibs}
+	${AFC} ${LdFlags} tpafth.f -o ${BinDir}/tpafth ${NGLibs}
 
 #
 # link 

@@ -88,5 +88,3 @@ Solaris, Cray UNICOS and HP9000.
 For questions and comments, 
 please contact the <A HREF="pactteam.html">PACT
 Development Team</A>.
-<hr>
-Last Updated: $MOD

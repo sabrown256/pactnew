@@ -83,6 +83,8 @@ endif
 set Sed = `which sed`
 set Awk = `which awk`
 
+Note $ALog "Starting PATH = $PATH"
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -209,7 +211,7 @@ switch ($cname)
         set pact_cc_family = XLC
         set pact_fc_family = XLF
         set opt   = ( -qversion )
-        set pat   = ( IBM XL C )
+        set pat   = ( IBM XL )
         set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
         set fname = ( `echo $cname | sed 's|xlc|xlf90|'` )
         breaksw
@@ -289,6 +291,10 @@ foreach c ($fname $cname)
       set sdir = $cmp:h
       set dirl = ( $dirl $sdir )
    else
+      Note $ALog "No compiler '$c' found"
+      Note $ALog "   cmp   = |$cmp|"
+      Note $ALog "   cpath = |$cpath|"
+      Note $ALog "   PATH  = |$PATH|"
       continue
    endif
 

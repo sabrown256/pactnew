@@ -18,11 +18,17 @@ while ($#argv > 0)
            echo "Usage: make-html [-h] [-i] <file>*"
            echo "   h       this help message"
            echo "   i       use institutional attribution content"
+           echo "   s       suffix"
+           echo "       local, inst, lc"
            echo "   <file>  should be <name>.h"
            echo ""
            exit(1)
       case -i:
            set Sfx = inst
+           breaksw
+      case -s:
+           shift
+           set Sfx = $1
            breaksw
       default:
            set InF = ( $InF $1 )
@@ -35,7 +41,7 @@ if ("$InF" == "") then
    set InF = ( `ls -1 *.h` )
 endif
 
-set Hdr = html-header
+set Hdr = html-header.$Sfx
 set Trl = html-trailer.$Sfx
 
 foreach i ($InF)

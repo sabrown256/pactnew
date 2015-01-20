@@ -177,7 +177,9 @@ while ("$1" =~ -*)
                       set PshOnly = TRUE
                       breaksw
                  case scc:
-                      set SccOnly = TRUE
+                      if (-d $SccDir) then
+                         set SccOnly = TRUE
+                      endif
                       breaksw
               endsw
               breaksw

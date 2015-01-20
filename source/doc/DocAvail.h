@@ -28,5 +28,3 @@ pact, panacea, pdb, pgs, pml, ppc, scheme, score, sx, ultra.
 For questions and comments, 
 please contact the <A HREF="pactteam.html">PACT
 Development Team</A>.
-<hr>
-Last Updated: $MOD

@@ -26,6 +26,7 @@ dbmget $WLog HAVE_FORTRAN^     \
              HAVE_PYTHON^      \
              HAVE_PY_NUMPY^    \
              HAVE_PY_NUMERIC^  \
+             PSY_Base^         \
              PSY_Root
 
     setenv EtcDir  $PSY_Root/etc
@@ -50,7 +51,7 @@ dbmget $WLog HAVE_FORTRAN^     \
           if ($HAVE_FORTRAN == TRUE) then
              echo "$i" >>& $STDOUT
           endif
-       else
+       else if (-d $PSY_Base/$i) then
           echo "$i" >>& $STDOUT
        endif
     end

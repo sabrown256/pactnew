@@ -4,6 +4,7 @@
 # include "cpyright.h"
 #
 
+run std/use-compiler xlc
 include compilers/xlc-lnx
 
 

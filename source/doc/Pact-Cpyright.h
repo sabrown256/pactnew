@@ -67,5 +67,3 @@ MOD: 07/29/2010
  purposes.
 <P>
 
-<hr>
-Last Updated: $MOD

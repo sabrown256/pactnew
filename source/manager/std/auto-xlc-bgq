@@ -7,6 +7,6 @@
 # include "cpyright.h"
 #
 
-run std/use-compiler mpixlc
+run std/use-compiler /usr/local/bin/mpixlc
 
 include features/xlc-bgq-set
