@@ -38,16 +38,14 @@ end
 
 set os = `uname -s`
 
-# GOTCHA: because the BSD shell mishandles multiple cases on a single
-# block of code - characterize the UNIX variant and proceed from that
 switch ($os)
-   case Darwin :
+   case Darwin:
         set unx = BSD
         breaksw
-   case FreeBSD :
+   case FreeBSD:
         set unx = BSD
         breaksw
-   default :
+   default:
         set unx = SYSV
         breaksw
 endsw
@@ -82,10 +80,10 @@ foreach f ($flst)
 # bsd: -rw-rw-r-- 0 usr grp size Dec 14 13:57     file
 # osx: -rwxrwx--- usr/grp   size 2013-10-15 07:21 file
       switch ($unx)
-         case BSD :
+         case BSD:
               set ttl = ( `tar -tvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
               breaksw
-         default :
+         default:
               set ttl = ( `tar -tvf $f |& awk '{printf("file %s %s %s ", $6, $4, $5)}'`)
               breaksw
       endsw
@@ -98,10 +96,10 @@ foreach f ($flst)
 
    else if ($f =~ *gz) then
       switch ($unx)
-         case BSD :
+         case BSD:
               set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s %s ", $9, $6, $7, $8)}'`)
               breaksw
-         default :
+         default:
               set ttl = ( `tar -tzvf $f |& awk '{printf("file %s %s %s ", $6, $4, $5)}'`)
               breaksw
       endsw
@@ -114,10 +112,10 @@ foreach f ($flst)
 
    else
       switch ($unx)
-         case BSD :
+         case BSD:
               set inf = ( `stat -f "%Sm" -t "%b %d %Y %H %M %S" $f` )
               breaksw
-         default :
+         default:
               set inf = ( `date -r $f '+%b %d %Y %H:%M:%S'` )
               breaksw
       endsw
@@ -135,13 +133,13 @@ foreach f ($flst)
 end
 
 switch ($tgt)
-   case date :
+   case date:
         set fmt = '+%Y-%m-%d-%H-%M-%S'
         breaksw
-   case sec :
+   case sec:
         set fmt = '+%s'
         breaksw
-   default :
+   default:
         echo "unknown mode '$tgt' - exiting"
         exit(1)
         breaksw
@@ -156,7 +154,7 @@ while ($il < $nl)
    if ($tl[$il] == file) then
       if ("$ts" != "") then
          switch ($unx)
-            case BSD :
+            case BSD:
                  set its  = ( `echo $ts | sed 's|[-:]| |g'` )
                  if ($its[1] =~ [0-9]*) then
                     if ($#its > 5) then
@@ -173,7 +171,7 @@ while ($il < $nl)
                  endif
                  set dt   = ( `date -j -f "$ifmt" "$its" "$fmt"` )
                  breaksw
-            default :
+            default:
                  set dt = ( `date -d "$ts" "$fmt"` )
                  breaksw
          endsw
@@ -189,7 +187,7 @@ end
 
 if ("$ts" != "") then
    switch ($unx)
-      case BSD :
+      case BSD:
            set its  = ( `echo $ts | sed 's|[-:]| |g'` )
            if ($its[1] =~ [0-9]*) then
               if ($#its > 5) then
@@ -206,7 +204,7 @@ if ("$ts" != "") then
            endif
            set dt   = ( `date -j -f "$ifmt" "$its" "$fmt"` )
            breaksw
-      default :
+      default:
            set dt = ( `date -d "$ts" "$fmt"` )
            breaksw
    endsw

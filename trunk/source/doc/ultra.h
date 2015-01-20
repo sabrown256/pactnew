@@ -2862,7 +2862,7 @@ INTEGER - total number of curves read from files (returned only, not set).
 <P>
 <I>Usage: </I>n-curves-read
 <P>
-<BR><B>plot-date
+<BR><B>plot-date</B><BR>
 </B<BR
 
 >INTEGER - plot the date, time, and host (if available) on hardcopy devices (PS or CGM).
@@ -3899,5 +3899,3 @@ The list of PACT Documents is:<p>
 For questions and comments, 
 please contact the <A HREF="pactteam.html">PACT Development Team</A>.
 
-<hr>
-Last Updated: $MOD

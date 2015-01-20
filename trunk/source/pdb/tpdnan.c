@@ -9,7 +9,8 @@
 
 #define DATFILE "nat"
 
-#define N 6
+/* #define N 6 */
+#define N 2
 
 typedef int (*PFTest)(char *base, char *tgt, int n);
 
@@ -40,6 +41,8 @@ static void prep_test_1_data(void)
 
     ca = (char *) dw;
 
+#if (N > 4)
+
 /* plus and minus infinities
  *   positive double 0x7ff0000000000000
  *   negative double 0xfff0000000000000
@@ -59,28 +62,9 @@ static void prep_test_1_data(void)
 
     ca += 8;
 
-/* plus and minus signalling NaNs
- *   positive double 0x7ff0000000000001 to 0x7ff7ffffffffffff
- *   negative double 0xfff0000000000001 to 0xfff7ffffffffffff
- */
-    if (le == TRUE)
-       {ca[5] = 0x80;
-	ca[6] = 0xf0;
-	ca[7] = 0x7f;
-	ca += 8;
-	ca[5] = 0x80;
-	ca[6] = 0xf0;
-	ca[7] = 0xff;}
-    else
-       {ca[0] = 0x7f;
-	ca[1] = 0xf0;
-	ca[2] = 0x80;
-	ca += 8;
-	ca[0] = 0xff;
-	ca[1] = 0xf0;
-	ca[2] = 0x80;};
+#endif
 
-    ca += 8;
+#if (N > 2)
 
 /* plus and minus quiet NaNs
  *   positive double 0x7ff8000000000000 to 0x7fffffffffffffff
@@ -105,6 +89,35 @@ static void prep_test_1_data(void)
 
     ca += 8;
 
+#endif
+
+/* plus and minus signalling NaNs
+ *   positive double 0x7ff0000000000001 to 0x7ff7ffffffffffff
+ *   negative double 0xfff0000000000001 to 0xfff7ffffffffffff
+ */
+    if (le == TRUE)
+       {ca[1] = 0xff;
+	ca[2] = 0xff;
+	ca[3] = 0xff;
+	ca[4] = 0xff;
+	ca[5] = 0xff;
+	ca[6] = 0xf7;
+	ca[7] = 0x7f;
+	ca += 8;
+	ca[5] = 0xff;
+	ca[6] = 0xf7;
+	ca[7] = 0xff;}
+    else
+       {ca[0] = 0x7f;
+	ca[1] = 0xf7;
+	ca[2] = 0xff;
+	ca += 8;
+	ca[0] = 0xff;
+	ca[1] = 0xf7;
+	ca[2] = 0xff;};
+
+    ca += 8;
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -113,9 +126,13 @@ static void prep_test_1_data(void)
 /* WRITE_TEST_1_DATA - write out the data into the PDB file */
 
 static void write_test_1_data(PDBfile *strm)
-   {
+   {long ind[3];
 
-    if (PD_write(strm, "d[6]", "double", &dw) == 0)
+    ind[0] = 0L;
+    ind[1] = N - 1;
+    ind[2] = 1L;
+
+    if (PD_write_alt(strm, "d", "double", dw, 1, ind) == 0)
        error(1, STDOUT, "D WRITE FAILED - WRITE_TEST_1_DATA\n");
 
     return;}
@@ -243,7 +260,12 @@ static int run_test(PFTest test, int n, char *host, int native)
     if (native == FALSE)
        {m = PD_target_n_platforms();
 	for (i = 0; i < m; i++)
-	    {rv = PD_target_platform_n(i);
+
+/* skip dos and vax which may be hopeless to test anymore */
+	    {if ((i == 7) || (i == 11))
+	        continue;
+
+	     rv = PD_target_platform_n(i);
 	     SC_ASSERT(rv == TRUE);
 
 	     nm = PD_target_platform_name(i);

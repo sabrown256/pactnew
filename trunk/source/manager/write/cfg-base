@@ -141,7 +141,9 @@ endif
 
 # add compiler location to path
 # NOTE: PCO strips path down and this will add it back
-      echo 'setenv PATH  ${PATH}:'$lcc:h >>& $pf
+      if (-x "$lcc") then
+         echo 'setenv PATH  ${PATH}:'$lcc:h >>& $pf
+      endif
 
 # build the config off the operating system
       echo "include spokes" >>& $pf
@@ -394,16 +396,25 @@ endif
                  case gnu-bgl:
                  case gnu-bgp:
                  case gnu-bgq:
-                 case xlc-bgl:
-                 case xlc-bgp:
-                 case xlc-bgq:
                  case mp-gnu-bgl:
                  case mp-gnu-bgp:
                  case mp-gnu-bgq:
                  case mp-gnu-win:
+                      echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
+                      if ("$lbts" != "") then
+                         echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      echo "include auto-$lcc" >>& $pf
+                      breaksw
+
+                 case xlc-bgl:
+                 case xlc-bgp:
+                 case xlc-bgq:
                  case mp-xlc-bgl:
                  case mp-xlc-bgp:
                  case mp-xlc-bgq:
+                      set xcc = `which xlc`
+                      echo 'setenv PATH                ${PATH}:'$xcc:h >>& $pf
                       echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
                       if ("$lbts" != "") then
                          echo "include ${lbts}-bit" >>& $pf

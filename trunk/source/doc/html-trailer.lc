@@ -1,0 +1,47 @@
+
+<!-- TRAILER START -->
+<table width="100%" height="17" cellpadding="0" cellspacing="0" height="38">
+  <tr>
+    <td width="30%" height="19" class="wci_footer_table">
+      <span class="wci_footer_banner">
+      <a href="https://www.llnl.gov/disclaimer.html">
+        <span class="wci_footer_banner">LLNL-CODE-422942|&nbsp;&nbsp;Privacy &amp; Legal Notice</span>
+      </a>
+      </span>
+    </td>
+    <td width="34%" class="wci_footer_table">
+      <span class="wci_footer_banner">
+      &nbsp; Contact:
+      <a href="mailto:ltaylor@llnl.gov">
+        <span class="wci_footer_banner">ltaylor@llnl.gov</span>
+      </a>
+      </span>
+    </td>
+    <td width="34%" class="wci_footer_table">
+      <div align="right"><span class="wci_footer_banner">
+      Last Updated $MOD
+      </span></div>
+    <td>
+  </tr>
+  <tr>
+    <td>
+      <a href="http://nnsa.energy.gov/"><img src="http://wci/media/gif/nnsa_logo.gif" alt="NNSA Logo" width="88" height="30" border="0" /></a>
+      <a href="http://www.energy.gov/"><img src="http://wci/media/gif/doe_logo.gif" alt="DOE Logo" width="31" height="30" border="0" /></a>
+    </td>
+    <td>
+      <a href="http://www.llnl.gov"<img src="http://wci/media/gif/llnl_logo.gif" alt="LLNL Logo" width="30" height="31" hspace="5" border="0" align="left" /></a>
+      <span class="wci_footer_text">
+         Lawrence Livermore National Laboratory<br />7000 East Avenue &#8226; Livermore, CA 94550
+      </span>
+    </td>
+    <td>
+      <div align="right" class="wci_footer">
+        Operated by Lawrence Livermore National Security, LLC, for the <br /> Department of Energy's National Nuclear Security Administration
+      </div>
+    </td>
+  </tr>
+</table>
+<!-- TRAILER END -->
+
+</BODY>
+</HTML>

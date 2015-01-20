@@ -1,0 +1,37 @@
+
+html, body {
+    font-family: Verdana, Airal, Helvectica, sans-serif;
+}
+
+/* ------------ */
+/* Footer Style */
+/* ------------ */
+
+.wci_footer_table {
+    background-color:#99CCCC;
+}
+
+.wci_footer_banner {
+    text-align:center;
+    font-size:10px;
+    font-weight:bold;
+    color:white;
+}
+
+.wci_footer_banner a  {
+    color:white;
+    text-decoration:none;
+}
+
+.wci_footer_text {
+    font-size:10px;
+    color:black;
+    line-height:12px;
+    font-weight:bold;
+}
+
+.wci_footer {
+    font-size:9px;
+    color:black;
+}
+

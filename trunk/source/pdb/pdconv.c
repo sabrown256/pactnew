@@ -1882,9 +1882,9 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 		 else
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
 		         {if ((0 < esave[i]) && (esave[i] < emax))
-			     *pout |= (pin[0] << dmbit)  & mask;};};}
+			     *pout |= (pin[0] << dmbit) & mask;};};}
 
-/* no overflow */
+/* no - overflow */
 	     else
 	        {if (onescmp)
 		    {cmask = (1 << (8 - mbiti)) - 1;
@@ -1895,7 +1895,7 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 			     *pout |= (pin[0] << dmbit) & mask;};}
 		 else
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-		         *pout |= (pin[0] << dmbit)  & mask;};};
+		         *pout |= (pin[0] << dmbit) & mask;};};
  
 /* fill in the rest of the first output byte with the first
  * part of the second input byte
@@ -1945,7 +1945,7 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 				 *pout |=  (pin[0] >> rmndr) & mask;};};}
 		 else
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-		         {if ((0 < esave[i]) && (esave[i] < emax))
+		         {if ((0 < esave[i]) && (esave[i] <= emax))
 			     *pout |= (pin[0] >> rmndr) & mask;};};}
 	     else
 	        {if (onescmp)
@@ -1981,7 +1981,7 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 
 /* move the mantissa over bytewise */
 		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-		          {if ((0 < esave[i]) && (esave[i] < emax))
+		          {if ((0 < esave[i]) && (esave[i] <= emax))
 			      {if (ssave[i])
 				  *pout = ((~pin[0] & mask1) << (8 - rmndr)) |
 				            (~(pin[1] >> rmndr) & mask2);
@@ -1992,7 +1992,7 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 /* move the mantissa over bytewise */
 		  else
 		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-		          {if ((0 < esave[i]) && (esave[i] < emax))
+		          {if ((0 < esave[i]) && (esave[i] <= emax))
 			      *pout = ((pin[0] & mask1) << (8 - rmndr)) |
 				        ((pin[1] >> rmndr) & mask2);};};}
 	      else
@@ -2028,14 +2028,14 @@ void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 	     if (loverflow || lunderflow)
 	        {if (onescmp)
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-		         {if ((0 < esave[i]) && (esave[i] < emax))
+		         {if ((0 < esave[i]) && (esave[i] <= emax))
 			     {if (ssave[i])
 				 *pout = ~(pin[0] << (8 - rmndr)) & mask;
 			      else
 				 *pout =  (pin[0] << (8 - rmndr)) & mask;};};}
 		 else
 		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
-		         {if ((0 < esave[i]) && (esave[i] < emax))
+		         {if ((0 < esave[i]) && (esave[i] <= emax))
 			     *pout = (pin[0] << (8 - rmndr)) & mask;};};}
 	     else
 	        {if (onescmp)
