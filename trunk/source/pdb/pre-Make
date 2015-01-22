@@ -265,6 +265,12 @@ ${BinDir}/tpdds : tpdds.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	  ${CLD} ${LdFlags} tpdds.c -o ${BinDir}/tpdds ${Libs})
         
 #
+# verify C++ compiles
+#
+chk++ :
+	${CXX} ${CcFlags} -c tests/chk++.cc -o ${PACTTmpDir}/chk++.o
+
+#
 # binary data tests
 #
 ${BinDir}/tpnb : ${TGTLib} tpnb.c

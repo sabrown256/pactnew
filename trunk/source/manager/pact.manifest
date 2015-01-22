@@ -26,18 +26,21 @@ inc posix.h posix-unix.h posix-msw.h posix-beos.h
 inc network.h network-unix.h network-msw.h network-beos.h
 inc ansic.h
 inc f77std.h f90kinds.inc f90types.h
-inc score.h scstd.h score_old.h scapi.h scunix.h scwin32.h scbgl.h
+inc score.h score_gen.h score_old.h
+inc scstd.h scapi.h scunix.h scwin32.h scbgl.h
 inc scgnu.h scpcc.h sclnx.h scosx.h sccyg.h
 inc scaix.h scsol.h schpux.h scirix.h
 inc scope_array.h scope_hash.h scope_io.h
 inc scope_make.h scope_mem.h scope_mpi.h scope_proc.h scope_psh.h
 inc scope_thread.h scope_term.h scope_type.h scarg.h
-inc scope_lex.h sclexan.h pml.h scope_complex.h scope_constants.h
-inc scope_exe.h scope_dl.h
-inc pdb.h pdb_old.h pdform.h scope_dp.h
-inc scope_x11.h scope_cgm.h scope_raster.h ppc.h
-inc pgs.h pgs_old.h
-inc panace.h scheme.h syntax.h sx.h sx_gen.h
+inc scope_lex.h sclexan.h scope_exe.h scope_dl.h
+inc pml.h pml_gen.h scope_complex.h scope_constants.h
+inc pdb.h pdb_gen.h pdb_old.h pdform.h scope_dp.h
+inc pgs.h pgs_gen.h pgs_old.h
+inc scope_x11.h scope_cgm.h scope_raster.h
+inc panace.h panacea_gen.h
+inc scheme.h scheme_gen.h syntax.h
+inc sx.h sx_gen.h
 
 etc do-run-db cfg.pl cfg.db
 etc env-csh csh-subroutines 
