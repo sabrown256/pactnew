@@ -111,6 +111,13 @@ switch ($cname)
         set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( clang version )
+
+# toxic piece of crap
+# clang version variants:
+# clang version 3.4 (tags/RELEASE_34/final)
+# clang version 3.4.2 
+# Apple LLVM version 5.1 (clang-503.0.40) (based on LLVM 3.4svn)
+
 #        set prog  = ( '$0 ~ /'$pat'/ { print $3 } $0 ~ /Compile line:/ { print $3 }' )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
         set fname = gfortran
@@ -326,7 +333,18 @@ foreach c ($fname $cname)
             set lfvers = $inf[1]
             set fc     = $cmp
          endif
+      else
+
+# NOTE: if we cannot decipher the version just reverify
+# that the compiler doesn't crash trying to get the version
+# and use that
+         $cmp $opt >& /dev/null
+         if ($status == 0) then
+            set lfvers = unknown
+            set fc     = $cmp
+         endif
       endif
+
       if (!(-f "$lfvers")) then
          set lfvers = ( `echo $lfvers | $Sed 's/[-_]/./g'` )
       endif
@@ -361,7 +379,19 @@ foreach c ($fname $cname)
             set lcvers = $inf[1]
             set cc     = $cmp
          endif
+
+      else
+
+# NOTE: if we cannot decipher the version just reverify
+# that the compiler doesn't crash trying to get the version
+# and use that
+         $cmp $opt >& /dev/null
+         if ($status == 0) then
+            set lcvers = unknown
+            set cc     = $cmp
+         endif
       endif
+
       if (!(-f "$lcvers")) then
          set lcvers = ( `echo $lcvers | $Sed 's/[-_]/./g'` )
       endif

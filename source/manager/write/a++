@@ -86,6 +86,7 @@ Note $outf "set fprf = ( $CXX_Profile )"
 Note $outf "set tmpr = ( $PSY_TmpDir/obj )"
 
 Note $outf "set exe  = $exe"
+Note $outf 'set co   = FALSE'
 Note $outf 'set dbg  = FALSE'
 Note $outf 'set opt  = FALSE'
 Note $outf 'set arc  = ""'
@@ -137,6 +138,9 @@ Note $outf '           breaksw'
 Note $outf '      case -avrb:'
 Note $outf '           @ vrb = $vrb + 1'
 Note $outf '           breaksw'
+Note $outf '      case -c:'
+Note $outf '           set co = TRUE'
+Note $outf '           breaksw'
 Note $outf '      case -l*:'
 Note $outf '           set lib = ( $lib "$1" )'
 Note $outf '           breaksw'
@@ -171,7 +175,7 @@ Note $outf '   exit(1)'
 Note $outf 'endif'
 Note $outf ''
 
-Note $outf 'if (("$outf" == "") && ("$pref" == "")) then'
+Note $outf 'if (("$outf" == "") && ("$pref" == "") && ($co == FALSE)) then'
 Note $outf '   echo "No output file specified - exiting"'
 Note $outf '   exit(1)'
 Note $outf 'endif'

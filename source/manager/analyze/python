@@ -144,7 +144,7 @@ if (-d ../../python) then
 # lately the Python reports the compiler as 'x86_64-linux-gnu-gcc'
 # that is <hw>-<os>-<vndr>-<compiler>
 # for the compiler - just take the end
-                     set tcc = ( `echo $inf[10] | sed 's|-| |g'` )
+                     set tcc = ( `echo $inf[10] | sed 's|^.*/||' | sed 's|-| |g'` )
                      flog $ALog set lpy_cc =  $tcc[$#tcc]
                      unset tcc
                      @ ok = $ok + 1
