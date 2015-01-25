@@ -39,12 +39,12 @@ void printrule(FILE *fp, client *cl, char *rule, char *var)
 
 int main(int c, char **v)
    {int i, rv;
-    int ig, ng, it;
+    int ig, ng, it, use_acc;
     char r[BFLRG],  t[BFLRG], md[BFLRG], cc_inc[BFLRG];
     char *psy_root, *psy_base, *psy_cfg, *psy_load, *psy_inst;
     char *psy_publib;
     char *hsy_os_name, *hsy_os_type, *lostd;
-    char *make_strategy, *make_usegnu, *dev, *use_acc;
+    char *make_strategy, *make_usegnu, *dev;
     char *fc_ld_lib, *dp_inc, *have_py, *yacc_exe;
     char *scsd, *npath, *lrpath;
     char *mod, *mk, *tnm, *date, *osrc;
@@ -123,6 +123,10 @@ int main(int c, char **v)
        lostd = "WIN32";
     else
        lostd = "UNIX";
+
+    nstrncpy(t, BFLRG, dbget(cl, TRUE, "USE_ACC"), -1);
+    use_acc = (strcmp(t, "TRUE") == 0);
+    use_acc = TRUE;
 
     make_strategy = dbget(cl, TRUE, "MAKE_Strategy");
     if (strcmp(make_strategy, "SpaceSaving") == 0)
@@ -481,8 +485,7 @@ int main(int c, char **v)
     fprintf(fp, "\n");
 
 /* compiler invocations */
-    use_acc = dbget(cl, TRUE, "USE_ACC");
-    if (strcmp(use_acc, "TRUE") == 0)
+    if (use_acc == TRUE)
        {fprintf(fp, "CCompiler      = acc\n");
 	fprintf(fp, "CCmpLdr        = acc\n");
 	fprintf(fp, "CDefDebug      = %s\n",
@@ -513,7 +516,7 @@ int main(int c, char **v)
     fprintf(fp, "ACOptimize     = ${ACDefOptimize}\n");
     fprintf(fp, "\n");
 
-    if (strcmp(use_acc, "TRUE") == 0)
+    if (use_acc == TRUE)
        {fprintf(fp, "CXCompiler     = a++\n");
 	fprintf(fp, "CXCmpLdr       = a++\n");
 	fprintf(fp, "CXDefDebug     = %s\n",
@@ -533,7 +536,7 @@ int main(int c, char **v)
     fprintf(fp, "CXOptimize     = ${CXXDefOptimize}\n");
     fprintf(fp, "\n");
 
-    if (strcmp(use_acc, "TRUE") == 0)
+    if (use_acc == TRUE)
        {fprintf(fp, "FCompiler      = afc\n");
 	fprintf(fp, "FDefDebug      = %s\n",
 		dbget(cl, FALSE, "AFC_Debug_Default"));
@@ -589,8 +592,13 @@ int main(int c, char **v)
     fprintf(fp, "LD  = ${Linker} ${LdFlags}\n");
     fprintf(fp, "\n");
  
+    fprintf(fp, "ACCFlags  = ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${IncGen} ${CcFlags}\n");
+    fprintf(fp, "ACXXFlags = ${AODC} ${CXFLAGS} ${CxFlags}\n");
+    fprintf(fp, "AFCFlags  = ${AODF} ${FFLAGS} ${FcFlags}\n");
+    fprintf(fp, "\n");
+ 
 /* other invocations */
-    if (strcmp(use_acc, "TRUE") == 0)
+    if (use_acc == TRUE)
        {fprintf(fp, "CLD            = acc ${ODC} ${CFLAGS} ${CcFlags}\n");
 	fprintf(fp, "CCCfg          = acc ${ODC} ${Cfg_CC_Flags} ${CcFlags} ${Shared_CC_Flags}\n");
 	fprintf(fp, "FCCfg          = afc ${ODF} ${Cfg_FC_Flags} ${FcFlags}\n");

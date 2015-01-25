@@ -278,8 +278,8 @@ ${BinDir}/tmlfpe : tmlfpe.c ${TGTLib}
 	  ${CLD} ${LdFlags} tmlfpe.c -o ${BinDir}/tmlfpe ${Libs})
 
 ${BinDir}/tmlnan : tmlnan.c ${TGTLib}
-	${CC} -c tmlnan.c -o ${PACTTmpDir}/tmlnan.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/tmlnan.o -o ${BinDir}/tmlnan ${Libs}
+	@(echo "${CCAnnounce} tmlnan.c -o ${BinDir}/tmlnan" ; \
+	  ${CLD} ${LdFlags} tmlnan.c -o ${BinDir}/tmlnan ${Libs})
 
 #
 # test performance
