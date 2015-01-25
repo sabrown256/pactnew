@@ -74,10 +74,11 @@ while ($lf < $nstl)
    @ sts = ( `echo $stl[$lf] | sed 's|-||g' | sed 's|^0*||'` )
    @ lf  = $lf + 1
  
+   set ft = $fi:t
+   set fo = $ft:r.o
+
    if (($nstl > 2) || ("$arc" != "")) then
       set co = TRUE
-      set ft = $fi:t
-      set fo = $ft:r.o
 
       @ i = 1
       @ ats = 00000000000000
@@ -101,7 +102,7 @@ while ($lf < $nstl)
          set lfo = ( $lfo $fo )
       endif
       set fo = $tmpdir/$fo
-   else
+   else if ("$outf" != "") then
       set fo = $outf
    endif
 
@@ -205,7 +206,7 @@ if ($err == 0) then
             echo "   nothing to be done for $arc"
          endif
       endif
-   else if (("$outf" != "") && ("$lfo" != "") && ($co == TRUE)) then
+   else if (("$outf" != "") && ("$lfo" != "") && ($co == TRUE) && ($nc > 1)) then
       set cmd = ( $LD $args -o $outf $lfo $lib)
       if ($vrb > 1) then
          echo "   $cmd"

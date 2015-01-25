@@ -28,7 +28,7 @@ CcFlags = -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
 FcFlags = 
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+ACFlags = -avrb ${ACCFlags}
 
 #
 # Files to Save for Backup (make save)
