@@ -350,7 +350,11 @@ switch ($comp)
         Note $outf '   if ("$fi" =~ *.c) then'
         Note $outf "      set cpp  = $lcpp"
         Note $outf '      set tf   = $fi:t'
-        Note $outf '      set pref = $cwd/$tmpr/$tf:r.int.c'
+        Note $outf '      if ($cwd =~ *$tmpr) then'
+        Note $outf '         set pref = $cwd/$tf:r.int.c'
+        Note $outf '      else'
+        Note $outf '         set pref = $cwd/$tmpr/$tf:r.int.c'
+        Note $outf '      endif'
         Note $outf '      set CPP  = ( `echo "$cpp" | sed "s|+out+|$pref|" | sed '"'"'s|+++|\"|g'"'"'` )'
         Note $outf '      if ($vrb == TRUE) then'
         Note $outf '         echo "   Preprocess: $CPP"'

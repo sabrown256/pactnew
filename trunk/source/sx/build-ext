@@ -10,7 +10,7 @@
 
 @ err = 0
 
-set cc = ( $argv )
+#set cc = ( $argv )
 
 # generate stubs if no extensions directory exists
 if (!(-d extensions)) then
@@ -30,41 +30,37 @@ void SX_install_ext_funcs(SS_psides *si)
 EOF
 endif
 
+# write pre-Make
+if (!(-f pre-Make)) then
+   echo "Rebuilding extensions/pre-Make"
+   cat >&! pre-Make << EOF
+TGTLib = \${LibDir}/libsx.a
+UniFlags =
+CcFlags  = \${CDebug} -I\${IncDir} \${MDInc} \${MDGInc}
+FcFlags  =
+LdFlags  = -L\${LibDir} \${LDFLAGS}
+CCAnnounce = \${CCompiler} \${CDebug} \${Shared_CC_Flags} \${CFLAGS}
+CCAnnounce = \${CCompiler} \${CDebug}
+InstallDep = \${TGTLib}
+BinDep = \${Hdrs} \${TGTLib}
+Hdrs = ../sx_int.h
+Objs = sxext.o
+ArObjs = \${TGTLib}(sxext.o)
+\${Objs} : \${Hdrs}
+\${ArObjs} : \${Hdrs}
+EOF
+endif
+
+# compile the extensions
+pact -na 1 devlib
+@ err = $status
+
 popd >>& /dev/null
 
-$cc
+#$cc
 
 exit($err)
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# # write pre-Make
-# if (!(-f pre-Make)) then
-#    echo "Rebuilding extensions/pre-Make"
-#    cat >&! pre-Make << EOF
-# TGTLib = \${LibDir}/libsx.a
-# UniFlags =
-# CcFlags  = \${CDebug} -I\${IncDir} \${MDInc} \${MDGInc}
-# FcFlags  =
-# LdFlags  = -L\${LibDir} \${LDFLAGS}
-# CCAnnounce = \${CCompiler} \${CDebug} \${Shared_CC_Flags} \${CFLAGS}
-# CCAnnounce = \${CCompiler} \${CDebug}
-# InstallDep = \${TGTLib}
-# BinDep = \${Hdrs} \${TGTLib}
-# Hdrs = ../sx_int.h
-# Objs = sxext.o
-# ArObjs = \${TGTLib}(sxext.o)
-# \${Objs} : \${Hdrs}
-# \${ArObjs} : \${Hdrs}
-# EOF
-# endif
-# 
-# # compile the extensions
-# pact -na 1 devlib
-# @ err = $status
-# 
-# popd >>& /dev/null
-# 
-# exit($err)
-# 
