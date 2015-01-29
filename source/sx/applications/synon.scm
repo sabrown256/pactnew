@@ -216,17 +216,18 @@
 
 ; replaced pm-array with c-array to more closely mirror the C code
 (if (defined? pdbview)
-    (begin (synonym list->c-array list->pm-array)
-	   (synonym pa-variable->c-array pa-variable->pm-array)
-	   (synonym pdbdata->c-array pdbdata->pm-array)
-	   (synonym c-array-extrema pm-array-extrema)
-	   (synonym c-array-length pm-array-length)
-	   (synonym c-array-ref pm-array-ref)
-	   (synonym c-array-set! pm-array-set!)
-	   (synonym c-array->list pm-array->list)
-	   (synonym c-array->pdbdata pm-array->pdbdata)
-	   (synonym c-array->pdbdata-i pm-array->pdbdata-i)
-	   (synonym c-arrays->set pm-arrays->set)))
+    (begin (synonym list->c-array         list->pm-array)
+	   (synonym pa-variable->c-array  pa-variable->pm-array)
+	   (synonym pdbdata->c-array      pdbdata->pm-array)
+	   (synonym c-array?              pm-array?)
+	   (synonym c-array-extrema       pm-array-extrema)
+	   (synonym c-array-length        pm-array-length)
+	   (synonym c-array-ref           pm-array-ref)
+	   (synonym c-array-set!          pm-array-set!)
+	   (synonym c-array->list         pm-array->list)
+	   (synonym c-array->pdbdata      pm-array->pdbdata)
+	   (synonym c-array->pdbdata-i    pm-array->pdbdata-i)
+	   (synonym c-arrays->set         pm-arrays->set)))
 
 ;-----------------------------------------------------------------------------
 ;-----------------------------------------------------------------------------

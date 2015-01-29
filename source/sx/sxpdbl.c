@@ -25,9 +25,7 @@ object
  *_SX_make_list_indirection(SS_psides *si, PDBfile *file,
 			    char **vr, inti ni, char *type),
  *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
-		     char *vr, inti ni, char *type),
- *_SX_make_list_io(SS_psides *si, PDBfile *file,
-		   char *vr, inti ni, char *type);
+		     char *vr, inti ni, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -25,8 +25,9 @@ targets :
 OD = DefaultG
 
 CcFlags    = ${LDPath} ${LDRPath}
-PCC        = ${CCSer}
+#PCC        = ${CCSer}
 #PCC        = cc -g
+PCC        = ${Ser_CC_Exe} ${Ser_CC_Debug} ${Ser_CC_Flags} ${CcFlags} ${Shared_CC_Flags}
 PCAnnounce = ${Ser_CC_Exe}
 
 POSIXHdrs = posix.h posix-unix.h posix-msw.h posix-beos.h

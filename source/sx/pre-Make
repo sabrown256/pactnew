@@ -183,7 +183,7 @@ LibAction = @(echo "build-ext" ; build-ext ; pact devgen)
 
 build : ${IncDir}/sx_gen.h ${hdrf}
 	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
-	@build-ext acc ${ACFlags} -c extensions/sxext.c -a ${TGTLib}
+	@build-ext
 
 #
 # make the executable

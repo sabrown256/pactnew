@@ -414,6 +414,8 @@ extern object
 /* SXPDBL.C declarations */
 
 extern object
+ *_SX_make_list_io(SS_psides *si, PDBfile *file,
+		   char *vr, inti ni, char *type),
  *_SX_make_list_syment(SS_psides *si, PDBfile *file,
 		       void *vr, inti ni, char *type);
 

@@ -3721,6 +3721,55 @@ static object *_SXI_pdb_type(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SXI_BYTES_TYPE - return a vector of objects of the specified type out
+ *                 - of an array of hex bytes
+ *                 - the length of the vector will be the length of
+ *                 - the string divided by the byte size of the type
+ *                 - Form: (bytes->data "double" "7ff0000000000001")
+ */
+
+static object *_SXI_bytes_type(SS_psides *si, object *argl)
+   {inti i, k, l, nc, ni;
+    char b, c;
+    char *s, *t, *type;
+    object *o;
+
+    type = NULL;
+    s    = NULL;
+
+    SS_args(si, argl,
+            G_STRING_I, &type,
+            G_STRING_I, &s,
+            0);
+
+    nc = strlen(s);
+    nc >>= 1;
+    t  = CMAKE_N(char, nc+1);
+    for (i = 0; i < nc; i++)
+        {l = 2*i;
+         b = 0;
+	 for (k = 0; k < 2; k++)
+	     {c   = s[l + k];
+	      b <<= 4;
+	      if (('0' <= c) && (c <= '9'))
+		 b += (c - '0');
+	      else if (('a' <= c) && (c <= 'f'))
+		 b += (c - 'a' + 10);
+	      else if (('A' <= c) && (c <= 'F'))
+		 b += (c - 'A' + 10);};
+	 t[i] = b;};
+
+    ni = nc/SC_sizeof(type);
+
+    o = _SX_make_list_io(si, SX_gs.vif, t, ni, type);
+
+    CFREE(t);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SXI_UNP_BITSTRM - read a variable as a bitstream and unpack it into
  *                  - the specified type in a numeric array
  *                  -
@@ -3907,6 +3956,11 @@ void SX_install_pdb_funcs(SS_psides *si)
    {
 
     _SS.assp_ext = _SX_assp;
+
+    SS_install(si, "bytes->data",
+               "Make a list of data from a string of hex bytes",
+               SS_nargs,
+               _SXI_bytes_type, SS_PR_PROC);
 
     SS_install(si, "change-directory",
                "Change current working directory in a file",
