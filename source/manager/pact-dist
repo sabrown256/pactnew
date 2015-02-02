@@ -472,6 +472,12 @@ REMOVE_LOCAL:
    Separator $Log
    NoteD $Log "Remove local facilities sources"
 
+   flog $Log pwd
+   flog $Log pushd pact
+   flog $Log $RMDir manager/local
+   flog $Log $RMDir manager/hosts
+   flog $Log popd
+
    return
 
 #--------------------------------------------------------------------------
@@ -483,9 +489,6 @@ EXPORT_DIST:
 
    Separator $Log
    NoteD $Log "Setting up Repository export"
-
-   flog $Log $RMDir manager/local
-   flog $Log $RMDir manager/hosts
 
    call REMOVE_LOCAL()
 
