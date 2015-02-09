@@ -8,6 +8,7 @@
 
 #include "cpyright.h"
 
+#if 0
 #if defined(MACOSX)
 #ifndef SCOPE_QUICKDRAW_GRAPHICS
 #define SCOPE_QUICKDRAW_GRAPHICS
@@ -118,5 +119,6 @@
 typedef RGBColor RGB_color_map;
 #endif
 
+#endif
 #endif
 #endif
