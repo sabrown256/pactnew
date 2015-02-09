@@ -229,6 +229,8 @@ int flt_test(void)
 	ca[1] = 0xc1;
 	ca += 4;};
 
+#ifndef COMPILER_PGI
+
 /* classify NaNs */
     PRINT(stdout, "\t\tFloat NaN detection:\n");
     for (i = 0; i < N; i++)
@@ -259,6 +261,8 @@ int flt_test(void)
 
 	 PRINT(stdout, "\t\t%10g ... %s\n", f[i], msg);};
     PRINT(stdout, "\n");
+
+#endif
 
     PM_clear_fpu();
 
