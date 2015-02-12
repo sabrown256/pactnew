@@ -1740,6 +1740,7 @@ inti _PD_parse_index_expr(char *expr, dimdes *dim, inti *pstart,
     FRAME_N  = 0;
     FRAME_NX = 2;
     FRAME_FRAME   = CMAKE_N(parse_frame, FRAME_NX);
+    memset(FRAME_FRAME, 0, FRAME_NX*sizeof(parse_frame));
 
     FRAME(lex_bf) = CSTRSAVE(expr);
     FRAME(index)  = 0;

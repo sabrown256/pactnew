@@ -3112,6 +3112,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
        {type = _PD_hyper_type(name, type);
 	dims = _PD_hyper_dims(file, name, PD_entry_dimensions(ep));
 	tep  = _PD_mk_syment(type, number, addr.diskaddr, NULL, dims);
+	ep->type = NULL;
 	_PD_rl_syment_d(ep);}
     else
        tep = ep;
