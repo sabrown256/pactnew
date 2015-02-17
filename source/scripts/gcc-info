@@ -22,11 +22,11 @@ while ($#argv > 0)
 end
 
 if ("$Gcc" == "") then
-   set Gcc = ( `where gcc | head -n 1` )
+   set Gcc = ( `../scripts/pwhere -n 1 gcc` )
 endif
 
 if ("$Gcc" !~ /*) then
-   set Gcc = ( `where $Gcc | head -n 1` )
+   set Gcc = ( `../scripts/pwhere -n 1 $Gcc` )
 endif
 
 if (!(-x "$Gcc")) then

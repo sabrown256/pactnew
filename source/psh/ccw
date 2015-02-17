@@ -33,9 +33,9 @@ switch ($os)
    default:
 #        set path = ( /sw/bin /usr/bin $path )
         set path = ( /usr/bin /sw/bin $path )
-        set cc   = ( `where gcc | head -n 1` )
+        set cc   = ( `../scripts/pwhere -n 1 gcc` )
 	if (!(-x "$cc")) then
-           set cc = ( `where cc | head -n 1` )
+           set cc = ( `../scripts/pwhere -n 1 cc` )
 	   if (!(-x "$cc")) then
               set cc = none
            endif

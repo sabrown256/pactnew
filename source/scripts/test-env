@@ -39,7 +39,7 @@ if ($?Test == 1) then
    endif
 endif
 
-set VG = `where valgrind | head -n 1`
+set VG = `pwhere -n 1 valgrind`
 if (-x "$VG") then
    set largs = ( $argv )
    while ($#largs > 0)
@@ -284,8 +284,8 @@ if ($?DB_RUN_SIGNATURE == 1) then
    Note $Log "DB_RUN_SIGNATURE  = $DB_RUN_SIGNATURE"
 endif
 
-flog $Log ( where pact | head -n 1 )
-flog $Log ( where cc   | head -n 1 )
+flog $Log ( pwhere -n 1 pact )
+flog $Log ( pwhere -n 1 cc )
 
 Separator $Log
 

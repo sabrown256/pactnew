@@ -107,7 +107,7 @@ endif
 
 set dbg = ""
 foreach i ($dbglst)
-   set j = `where $i | head -n 1`
+   set j = `pwhere -n 1 $i`
    if (-x "$j") then
       set dbg = $j
       break

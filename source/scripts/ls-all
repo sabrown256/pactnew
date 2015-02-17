@@ -22,7 +22,7 @@ set LUser   = ""
 set SSH     = 'ssh -q -x -o BatchMode=yes -o StrictHostKeyChecking=no'
 
 set HostFile = $HOME/.all-hosts
-if (-x `where hserve | head -n 1`) then
+if (-x `pwhere -n 1 hserve`) then
    set Method = hserve
 else
    set Method = script

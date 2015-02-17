@@ -15,7 +15,7 @@ touch $log
 set cmd  = $0
 set args = ( $argv )
 
-set rcmd = ( `where $cmd:t` )
+set rcmd = ( `pwhere $cmd:t` )
 foreach c ($rcmd)
    if ($c != $cmd) then
       set cmd = $c

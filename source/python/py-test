@@ -95,8 +95,8 @@ else if (-f $lpydir/pdb.py) then
    Note $Log "PACT_Exe   = |$PACT_Exe|"
    Note $Log "Parallel   = |$Parallel|"
    Note $Log "MPI        = |$MPI|"
-   flog $Log ( where pact |& head -n 1 )
-   flog $Log ( where cc |& head -n 1 )
+   flog $Log ( $TestScrDir/pwhere -n 1 pact )
+   flog $Log ( $TestScrDir/pwhere -n 1 cc )
 
    if ("$Tests" == "") then
       set Tests = ""

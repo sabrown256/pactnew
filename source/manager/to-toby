@@ -10,7 +10,7 @@
 
 unalias *
 
-set Exe = `where toby |& head -n 1`
+set Exe = `../scripts/pwhere -n 1 toby`
 if (-x "$Exe") then
    set psy_id   = `../scripts/cfgman use`
    set psy_base = $cwd:h

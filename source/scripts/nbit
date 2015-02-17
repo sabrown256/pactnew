@@ -11,9 +11,7 @@
 
 unalias *
 
-set Err = 0
-set Tmp = $cwd/.tmp-nbit.$$
-set OS  = `uname -s`
+@ err = 0
 
 set DefOnly = FALSE
 
@@ -33,6 +31,15 @@ while ($#argv > 0)
    endsw
    shift
 end
+
+set OS  = `uname -s`
+set Tmp = $cwd/.tmp-nbit.$$
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/system-id") then
+   set path = ( $Exe $path )
+endif
 
 set clist = ""
 if ("$OS" == AIX) then
@@ -58,7 +65,7 @@ while ($#lst > 0)
    shift lst
    shift lst
 
-   set CExe = `where $Cmp | head -n 1`
+   set CExe = `pwhere -n 1 $Cmp`
    if (-x "$CExe") then
 
       if ("$Cmp" == gcc) then
@@ -120,5 +127,5 @@ end
 
 rm -f $Tmp $Tmp.c >& /dev/null
 
-exit($Err)
+exit($err)
 

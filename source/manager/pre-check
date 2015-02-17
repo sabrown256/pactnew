@@ -24,7 +24,7 @@ set Requ = ( $Requ csh make ar )
 
 set Missing = ""
 foreach i ($Requ)
-   if (!(-x `where $i |& head -n 1`)) then
+   if (!(-x `../scripts/pwhere -n 1 $i`)) then
       set Missing = ( $Missing $i )
    endif
 end
@@ -49,11 +49,11 @@ endif
 
 # check for lex/flex
 set HaveLex = FALSE
-if (-x `where lex |& head -n 1`) then
+if (-x `../scripts/pwhere -n 1 lex`) then
    set HaveLex = TRUE
 endif
 set HaveFlex = FALSE
-if (-x `wher flex |& head -n 1`) then
+if (-x `../scripts/pwhere -n 1 flex`) then
    set HaveFlex = TRUE
 endif
 if (($HaveLex == FALSE) && ($HaveFlex == FALSE)) then
@@ -64,11 +64,11 @@ endif
 
 # check for yacc/bison
 set HaveYacc = FALSE
-if (-x `where yacc |& head -n 1`) then
+if (-x `../scripts/pwhere -n 1 yacc`) then
    set HaveYacc = TRUE
 endif
 set HaveBison = FALSE
-if (-x `where bison |& head -n 1`) then
+if (-x `../scripts/pwhere -n 1 bison`) then
    set HaveBison = TRUE
 endif
 if (($HaveYacc == FALSE) && ($HaveBison == FALSE)) then

@@ -13,6 +13,11 @@ unalias *
 
 onintr FINISH
 
+set Exe = `dirname $0`
+if (-x "$Exe/sinstall") then
+   set path = ( $Exe $path )
+endif
+
 if ($?SC_EXEC_N_ATTEMPTS) then
    @ na = $SC_EXEC_N_ATTEMPTS
 else
@@ -101,11 +106,11 @@ foreach src ( $srcl )
    endif
 
 # decide on MD5 checksumming command
-   set md5cmd = ( `where md5sum | head -n 1` )
+   set md5cmd = ( `pwhere -n 1 md5sum` )
    if (-x "$md5cmd") then
       set md5cmd = ( $md5cmd -b )
    else
-      set md5cmd = ( `where md5 | head -n 1` )
+      set md5cmd = ( `pwhere -n 1 md5` )
       if (!(-x "$md5cmd")) then
          set md5cmd = ( wc -c )
       endif

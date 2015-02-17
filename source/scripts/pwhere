@@ -1,0 +1,56 @@
+#!/bin/csh -f
+#
+# PWHERE - a failsafe script to find executables on your PATH
+#        - old CSHs and BASH lack a where builtin
+#
+# include cpyright.h
+#
+
+unalias *
+
+@ err = 0
+@ n   = $#path
+
+set exe = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: pwhere [-h] [-n #] <exe>"
+           echo "   h   this help message"
+           echo "   n   report only the first n occurrences"
+           echo ""
+           exit(1)
+      case -n:
+           shift
+           @ n = $1
+           breaksw
+      default:
+           set exe = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$exe" != "") then
+   set elst = ""
+   foreach d ($path)
+      if (-xf $d/$exe) then
+         set elst = ( $elst $d/$exe )
+      endif
+   end
+
+   @ il = 0
+   @ nl = $#elst
+   if ($n < $nl) then
+      @ nl = $n
+   endif
+
+   while ($il < $nl)
+      @ il = $il + 1
+      echo $elst[$il]
+   end
+endif
+
+exit($err)

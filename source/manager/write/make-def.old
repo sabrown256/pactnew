@@ -183,9 +183,9 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     set THE_DATE = `cat .pact-version`
     Note $STDOUT "Version    = $THE_DATE"
 
-    set mk = `where gmake |& head -n 1`
+    set mk = `pwhere -n 1 gmake`
     if (!(-x "$mk")) then
-       set mk = `where make |& head -n 1`
+       set mk = `pwhere -n 1 make`
     endif
     Note $WLog "Using '$mk' for system make"
     Note $STDOUT "UMake      = $mk"

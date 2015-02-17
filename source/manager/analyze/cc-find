@@ -110,7 +110,7 @@ set allcc  = ""
 set ansicc = ""
 
 foreach cc ($cclst)
-   set res = `where $cc |& head -n 1`
+   set res = `pwhere -n 1 $cc`
    if ("$res" =~ /*) then
 
       set bindir = $res:h

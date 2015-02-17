@@ -18,7 +18,7 @@ if (-x "$Exe/sign") then
 endif
 
 # absolutely must have ls-jobs - stop without it (update-sys for example)
-set LSJOBS = `where ls-jobs | head -n 1`
+set LSJOBS = `pwhere -n 1 ls-jobs`
 if (!(-x "$LSJOBS")) then
    echo "SIGN error - no ls-jobs found on path:"
    echo "    $path"

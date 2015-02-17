@@ -299,7 +299,7 @@ switch ($Cmnd)
 
         InitLog Log $LogDir/build
 
-        flog $Log ( where pact |& head -n 1 )
+        flog $Log ( pwhere -n pact )
 
         set BeginTime = `$TIMER -r`
 
@@ -416,7 +416,7 @@ switch ($Cmnd)
 
         InitLog Log $LogDir/load
 
-        flog $Log ( where pact |& head -n 1 )
+        flog $Log ( pwhere -n 1 pact )
 
 #        set Args = "-dbg"
         set Args = ""
@@ -534,7 +534,7 @@ switch ($Cmnd)
    case clean:
         InitLog Log $LogDir/clean
 
-        flog $Log ( where pact |& head -n 1 )
+        flog $Log ( pwhere -n 1 pact )
 
         set Args = "-i"
         while ($#argv > 0)
@@ -1370,7 +1370,7 @@ CFG_DONE:
    case diff-hdrs:
         InitLog Log $LogDir/diff-hdrs
 
-        flog $Log ( where pact |& head -n 1 )
+        flog $Log ( pwhere -n 1 pact )
 
         set Args = "-i"
         while ($#argv > 0)
@@ -1511,7 +1511,7 @@ CFG_DONE:
 
         set All = "seld"
 
-        set ROOT    = `where smake |& head -n 1`
+        set ROOT    = `$PWHERE -n 1 smake`
         set BINDIR  = $ROOT:h
         set RepoDir = ""
         set SrcDir  = ""
@@ -1966,14 +1966,6 @@ CFG_DONE:
            popd >& /dev/null
         endif
 
-        set InstF = ""
-        set InstF = ( $InstF pact-update code-date )
-        set InstF = ( $InstF install-ext )
-        set InstF = ( $InstF ../scripts/{import-api,file-time,px,frnsic,sinstall} )
-
-# requiring pact-dist to be run from manager - no need to install
-#        set InstF = ( $InstF pact-dist )
-
         set liu = ../scripts/sinstall
 
         @ lerr = 0
@@ -1984,8 +1976,24 @@ CFG_DONE:
         @ lerr = $lerr + $status
         $liu cpyright.h $IncDir
         @ lerr = $lerr + $status
+
+# install files from manager
+        set InstF = ""
+        set InstF = ( $InstF pact-update code-date )
+        set InstF = ( $InstF install-ext )
         $liu $InstF $BinDir
         @ lerr = $lerr + $status
+
+# install files from scripts
+        pushd ../scripts >& /dev/null
+
+        set InstF = ""
+        set InstF = ( $InstF import-api file-time frnsic sinstall )
+        set InstF = ( $InstF px pwhere )
+        $liu $InstF $BinDir
+        @ lerr = $lerr + $status
+
+        popd >& /dev/null
 
         set RStatus = $lerr
 
@@ -2419,7 +2427,7 @@ CFG_DONE:
         eval `$PSY_ScrDir/simplify-path`
 
         flog $Log date
-        flog $Log ( where pact |& head -n 1 )
+        flog $Log ( pwhere -n 1 pact )
 
 # do remove for multi-platform configuration
         flog $Log setenv PERDB_PATH $EtcDir/cfg
@@ -2602,7 +2610,7 @@ CFG_DONE:
    case send:
         InitLog Log $LogDir/send
 
-        flog $Log ( where pact |& head -n 1 )
+        flog $Log ( pwhere -n 1 pact )
 
         NoteD $Log ""
         NoteD $Log "Sending PACT Directories ..."
@@ -2623,7 +2631,7 @@ CFG_DONE:
    case shared:
         InitLog Log $LogDir/shared
 
-        flog $Log ( where pact |& head -n 1 )
+        flog $Log ( pwhere -n 1 pact )
 
         set Args = "-i"
         while ($#argv > 0)
@@ -3093,7 +3101,7 @@ CFG_DONE:
 
 # verify that valgrind exists before trying to use it
         if ("$Valgrind" != "") then
-           set lvg = ( `where valgrind |& head -n 1` )
+           set lvg = ( `pwhere -n 1 valgrind` )
            if (-x "$lvg") then
               set TLog = test-vg
               InitLog Log $LogDir/$TLog
@@ -3112,7 +3120,7 @@ CFG_DONE:
 # provide context for child processes
         setenv DSYS_TARGET pact_test
 
-        flog $Log ( where pact |& head -n 1 )
+        flog $Log ( pwhere -n 1 pact )
         flog $Log umask
         flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/test.error
 
@@ -3130,7 +3138,7 @@ CFG_DONE:
         flog $Log pushd ..
 
 # do it for smake
-        flog $Log (ls -l `where pact |& head -n 1` |& grep smake)
+        flog $Log (ls -l `pwhere -n 1 pact` |& grep smake)
         if ($status == 0) then
            set PCKS = ( `awk '$1 == "pkg" {print}' $PSY_MngDir/pact.manifest | sed 's/^pkg//'` )
            foreach d ($PCKS)

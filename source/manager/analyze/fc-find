@@ -86,7 +86,7 @@ set allfc  = ""
 set ansifc = ""
 
 foreach fc ($fclst)
-   set res = `where $fc |& head -n 1`
+   set res = `pwhere -n 1 $fc`
    if ("$res" =~ /*) then
 
       set bindir = $res:h

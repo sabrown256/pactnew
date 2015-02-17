@@ -127,7 +127,7 @@ switch ($Phase)
         flog $LogHost set HaveGMake = FALSE
         flog $LogHost set UMake     = make
         foreach i (gmake make)
-           set lMake = `where $i | head -n 1`
+           set lMake = `pwhere -n 1 $i`
            if (-x "$lMake") then
               flog $LogHost $lMake --version
               if ($status == 0) then

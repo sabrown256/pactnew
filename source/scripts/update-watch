@@ -15,13 +15,13 @@ set Exe = `dirname $0`
 # look for PACT and use it if available
 # if you have PACT you get certain defaults and otherwise
 # you have to specify everything in the command line
-set PACT = `where pact | head -n 1`
+set PACT = `pwhere -n 1 pact`
 if (-x "$PACT") then
    set Exe  = `rpath $0`
    set Root = $Exe:h
    set Root = $Root:h
    if (!(-d $Root/include)) then
-      set Exe  = `where pact | head -n 1`
+      set Exe  = `pwhere -n 1 pact`
       set Root = $Exe:h
       set Root = $Root:h
    endif
@@ -32,7 +32,7 @@ if (-x "$PACT") then
    end
 
 # PACT must be on your path - end of story
-#   set lsys = `where sys-site | head -n 1`
+#   set lsys = `pwhere -n 1 sys-site`
 #   eval `$lsys`
 
 else
@@ -42,7 +42,7 @@ else
    alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
 endif
 
-set SSH       = `where ssh | head -n 1`
+set SSH       = `pwhere -n 1 ssh`
 set UpF       = ""
 set Tags      = ""
 set AllSites  = FALSE

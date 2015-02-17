@@ -328,7 +328,7 @@ while ($#argv > 0)
    shift
 end
 
-set RPATH  = `where rpath | head -n 1`
+set RPATH  = `pwhere -n 1 rpath`
 set SSH    = ""
 set TIMER  = ""
 set HSERVE = ""
@@ -946,7 +946,7 @@ SESSION:
    if ($Watch == TRUE) then
       set Title    = "DO-NET-WATCH"
       set Geometry = ( 90x15-10+10 )
-      set DO_NET   = `where do-net | head -n 1`
+      set DO_NET   = `pwhere -n 1 do-net`
 
       if ($WatchOut == TEXT) then
          set WArgs = "+watch"
@@ -1222,13 +1222,13 @@ READHOST:
    endif
 
    if ("$Mailer" == "") then
-      where mailx | head -n 1 >& /dev/null
+      pwhere -n 1 mailx >& /dev/null
       if ($status == 0) then
-         set Mailer = `where mailx | head -n 1`
+         set Mailer = `pwhere -n 1 mailx`
       else
-         where mail | head -n 1 >& /dev/null
+         pwhere -n 1 mail >& /dev/null
          if ($status == 0) then
-            set Mailer = `where mail | head -n 1`
+            set Mailer = `pwhere -n 1 mail`
          else
             echo ""
             echo "Can't determine the mail program to be used"
@@ -2120,7 +2120,7 @@ return
 
 FINDRUN:
 
-   set DoBin   = `where do-net | head -n 1`
+   set DoBin   = `pwhere -n 1 do-net`
    set DoBin   = $DoBin:h
    set DoLocal = $DoBin/do-local
    set DLocal  = .$DoLocal:t.$Stamp

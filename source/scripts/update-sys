@@ -18,7 +18,7 @@ umask 002
 set Exe  = `rpath $0`
 set Root = $Exe:h
 if (!(-d $Root/include)) then
-   set Exe  = `where pact | head -n 1`
+   set Exe  = `pwhere -n 1 pact`
    set Root = $Exe:h
    set Root = $Root:h
 endif
@@ -26,11 +26,11 @@ source $Root/etc/functions-pact.csh
 
 Intervene help.update-sys
 
-set lsys  = `where sys-site | head -n 1`
+set lsys  = `pwhere -n 1 sys-site`
 eval `$lsys`
 
-set SSH      = ( `where ssh | head -n 1` -o TCPKeepAlive=yes )
-set SCP      = `where scp | head -n 1`
+set SSH      = ( `pwhere -n 1 ssh` -o TCPKeepAlive=yes )
+set SCP      = `pwhere -n 1 scp`
 set UpF      = ""
 set Tags     = ""
 set Oper     = "add"
