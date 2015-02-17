@@ -776,7 +776,7 @@ switch ($Cmnd)
                    echo "Usage: dsys config [-a <sid>] [-as] [-b 32 | 64] [-c] [-db <db>]"
                    echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
                    echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp <path>] [+/-logdb] [-o] [-O]"
-                   echo "                   [-p] [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
+                   echo "                   [-p] [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-tp <too> <path>] [-v] [<config>]"
                    echo ""
                    echo "        -a         set the system id for this config"
                    echo "        -as        do parts of config asynchronously"
@@ -851,6 +851,7 @@ switch ($Cmnd)
                    echo "        -s         build OpenMP version (equivalent to -feature openmp)"
                    echo "        -sl        build shared libraries (equivalent to -feature shared)"
                    echo "        -t         build threaded version (equivalent to -feature pthread)"
+                   echo "        -tp        specify path to tool - used to select tool versions"
                    echo ""
                    echo "   Config files are optional and should be used to exercise"
                    echo "   more control than is available from the command line options"
@@ -937,6 +938,15 @@ switch ($Cmnd)
               case -t:
                    set pthread = TRUE
                    set flst    = ( $flst -t )
+                   breaksw
+              case -tp:
+                   shift
+                   set tool = $1
+                   shift
+                   set tpth = $1
+                   setenv ${tool}_Path $tpth
+                   unset tool
+                   unset tpth
                    breaksw
               case -v*:
                    source pact-scs

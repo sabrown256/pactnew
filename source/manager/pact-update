@@ -108,7 +108,7 @@ while ($#argv > 0)
            else
               echo "Usage:"
               echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-db <db> <path>] [-force] [-extr] [-g]"
-              echo "                [-h] [-i <dir>] [-keep] [-src] [-t]"
+              echo "                [-h] [-i <dir>] [-keep] [-src] [-t] [-tp <tool> <path>]"
               echo "                [-ub] [-uc] [-ui] [-ur] [-ut] [-vers] [-vrb]"
               echo "                ..."
               echo ""
@@ -217,6 +217,7 @@ while ($#argv > 0)
               echo "    -s         build OpenMP version (equivalent to -feature openmp)"
               echo "    -sl        build shared libraries (equivalent to -feature shared)"
               echo "    -t         build threaded version (equivalent to -feature pthread)"
+              echo "    -tp        specify path to tool - used to select tool versions"
               echo ""
               echo "   Config files are optional and should be used to exercise"
               echo "   more control than is available from the command line options"
@@ -326,6 +327,12 @@ while ($#argv > 0)
       case -cc:
       case -llp:
            set cargs = ( $cargs $1 $2 )
+           shift
+           breaksw
+
+      case -tp:
+           set cargs = ( $cargs $1 $2 $3 )
+           shift
            shift
            breaksw
 
