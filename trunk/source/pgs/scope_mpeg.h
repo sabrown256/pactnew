@@ -419,14 +419,11 @@ void pnm_invertxel ARGS(( xel* xP, xelval maxval, int format ));
  *  _ANSI_ARGS_ macro stolen from Tcl6.5 by John Ousterhout
  */
 #undef _ANSI_ARGS_
-#undef CONST             /*NOTE: replaced "const" by "CONST" NOTE*/
 /*#ifdef NON_ANSI_COMPILER*/
 #ifdef PCC
 #define _ANSI_ARGS_(x)       ()
-#define CONST
 #else
 #define _ANSI_ARGS_(x)   x
-#define CONST const
 #ifdef __cplusplus
 #define VARARGS (...)
 #else

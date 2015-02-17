@@ -197,7 +197,7 @@ typedef int (*PFIntBin)(void *a, void *b);
 
 #undef SIGNAL_HANDLER_DEFINED
 
-typedef char *CONST * CONST_STRINGS;
+typedef char *const * CONST_STRINGS;
 
 typedef struct s_SC_srcloc SC_srcloc;
 

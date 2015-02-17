@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 12/19/2014
+MOD: 2/17/2015
 
 <CENTER>
 <P>
@@ -2270,7 +2270,7 @@ by <tt>SC_do_threads</tt>.
 <pre>
 <i>C Binding: </i>void SC_chunk_loop(PFPByte fnc, char *msg,
 			      int mn, int mx,
-			      int serial, byte *argl)
+			      int serial, void *argl)
 <i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
@@ -2306,7 +2306,7 @@ the entire loop range is completed.
 
 <pre>
 <i>C Binding: </i>void SC_queue_work(PFPByte fnc,
-                              int serial, byte *argl)
+                              int serial, void *argl)
 <i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>

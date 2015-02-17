@@ -10966,7 +10966,7 @@ static u_int32_t mbPatTable[][2] = {
 
 /* not static anymore because information is used for computing frame rate 
  * and for statistics */
-CONST double VidRateNum[9]={1.0, 23.976, 24.0, 25.0, 29.97, 30.0,
+const double VidRateNum[9]={1.0, 23.976, 24.0, 25.0, 29.97, 30.0,
                              50.0 ,59.94, 60.0};
 
 
