@@ -27,7 +27,6 @@
 #undef ELSE
 #undef CONTINUE
 #undef RETURN
-#undef CONST
 #undef SIGNED
 #undef ECHO
 #undef SI

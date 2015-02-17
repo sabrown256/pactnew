@@ -1,5 +1,5 @@
 TXT: PANACEA User's Manual
-MOD: 12/19/2014
+MOD: 2/17/2015
 
 <CENTER>
 <P>
@@ -1457,7 +1457,7 @@ This function returns nothing.<p>
 <h4> PA_INSTALL_IDENTIFIER</h4>
 
 <BLOCKQUOTE>
-PA_install_identifier(char *name, byte *vr)
+PA_install_identifier(char *name, void *vr)
 </BLOCKQUOTE>
 
 This function provides a means for applications to make arbitrary compiled variables known to the PANACEA database. This is critical for interactive or interpreted applications which may need to refer to a variable given only its name. It associates an address with which a value can be accessed with an ASCII name.<p>
@@ -1555,8 +1555,8 @@ PA_variables(int flag)<br>
 <BLOCKQUOTE>
 <PRE>PA_def_var(char *vname,
            char *vtype,
-           byte *viv,
-           byte *vif,
+           void *viv,
+           void *vif,
            ...)
 </PRE>
 </BLOCKQUOTE>
@@ -1770,14 +1770,14 @@ PA_change_size<br>
 <h5>PA_INTERN</h5>
 
 <UL>
-PA_INTERN(byte *var, char *name)
+PA_INTERN(void *var, char *name)
 </UL>
 Intern a given array in the variable data base.<p>
 
 <a name="PAN2436"></a>
 <h5>PA_CONNECT</h5>
 <UL>
-PA_CONNECT(byte *var, char *name, int flag)
+PA_CONNECT(void *var, char *name, int flag)
 </UL>
 In the PANACEA model the PANACEA database is viewed as the manager of dynamic
 memory. As such one of its key functions is to dispense pointers to the data
@@ -1864,7 +1864,7 @@ Return.
 <h5>PA_DISCONNECT</h5>
 
 <UL>
-PA_DISCONNECT(char *name, byte *ptr)
+PA_DISCONNECT(char *name, void *ptr)
 </UL>
 In the course of doing a numerical simulation, an application may wish to
 relinquish access to the data associated with a PANACEA variable. Most likely
@@ -1927,7 +1927,7 @@ Return a connection to a sub-space of an array.<p>
 <h5>PA_RELEASE</h5>
 
 <UL>
-PA_RELEASE(char * name, byte * ptr, long offs, long ne) 
+PA_RELEASE(char * name, void * ptr, long offs, long ne) 
 </UL>
 Release the access to an array sub-space.<p>
 
@@ -2431,7 +2431,7 @@ Save away the given time value data.<p>
 <BLOCKQUOTE>
 PA_inst_com
 <P>PA_inst_pck_gen_cmmnds()<br>
-<P>PA_inst_c(char *cname, byte *cvar, int ctype, int cnum, PFVoid cproc,
+<P>PA_inst_c(char *cname, void *cvar, int ctype, int cnum, PFVoid cproc,
 PFVoid chand)<br>
 </BLOCKQUOTE>
 <B>Optional Functions</B>
