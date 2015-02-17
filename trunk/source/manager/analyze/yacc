@@ -22,7 +22,7 @@ dbmget $ALog Yacc_Exe   =\? yacc^    \
 # find an executable
 if (!(-x "$Yacc_Exe")) then
    set ypath = ""
-   set yexe  = `where $Yacc_Exe |& head -n 1`
+   set yexe  = `pwhere -n 1 $Yacc_Exe`
    if (-x "$yexe") then
       set ypath = $yexe:h
    endif

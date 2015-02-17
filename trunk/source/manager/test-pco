@@ -41,7 +41,7 @@ while ($#argv > 0)
            set Compare = FALSE
            breaksw
       case -vg:
-           set ValGrind = `where valgrind |& head -n 1`
+           set ValGrind = `../scripts/pwhere -n 1 valgrind`
            if (!(-x "$ValGrind")) then
               set ValGrind = ""
            endif

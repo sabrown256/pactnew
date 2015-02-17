@@ -50,7 +50,7 @@ dbmget $ALog Bits^             \
        NoteD $ALog ""
        exit(1)
     else
-       set UCC = `where $CC_Exe |& head -n 1`
+       set UCC = `pwhere -n 1 $CC_Exe`
        NoteD $ALog "   C Compiler used is $UCC"
     endif
 
@@ -64,7 +64,7 @@ dbmget $ALog Bits^             \
        NoteD $ALog "   ERROR: No Fortran compiler available - check your system or your path"
        NoteD $ALog ""
     else
-       set UFC = `where $FC_Exe |& head -n 1`
+       set UFC = `pwhere -n 1 $FC_Exe`
        if (-x "$UFC") then
           NoteD $ALog "   Fortran Compiler used is $UFC"
        else

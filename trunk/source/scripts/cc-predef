@@ -22,11 +22,11 @@ while ($#argv > 0)
 end
 
 if ("$cc" == "") then
-   set cc = ( `where cc | head -n 1` )
+   set cc = ( `pwhere -n 1 cc` )
 endif
 
 if ("$cc" !~ /*) then
-   set cc = ( `where $cc | head -n 1` )
+   set cc = ( `pwhere -n 1 $cc` )
 endif
 
 if (!(-x "$cc")) then

@@ -38,12 +38,12 @@ Note $ALog "Path = $PATH"
 flog $ALog gmake --version
 if ($status == 0) then
    flog $ALog setenv MAKE_Exe gmake
-   set msg = "$msg `where gmake |& head -n 1` (GNU) library aware"
+   set msg = "$msg `pwhere -n 1 gmake` (GNU) library aware"
    setenv MAKE_UseGNU "-DUSE_GNU_MAKE"
    setenv MAKE_Strategy "SpaceSaving"
 
 else
-   set lmake = ( `where make |& head -n 1` )
+   set lmake = ( `pwhere -n 1 make` )
    if (-x "$lmake") then
       set msg = "$msg $lmake"
       flog $ALog setenv MAKE_Exe make

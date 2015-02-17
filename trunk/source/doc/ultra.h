@@ -1,5 +1,5 @@
 TXT: ULTRA User's Manual
-MOD: 8/15/2014
+MOD: 2/17/2015
 
 <CENTER>
 <P>
@@ -2610,11 +2610,11 @@ double quotes.
 <P>
 
 <BR><B>background-color-flag</B><BR>
-INTEGER - background color on display. Takes effect when screen is invoked.
+INTEGER - open display with white background. Takes effect when screen command is invoked.
 <P>
-<I>Usage: </I>background-color-flag white | black
+<I>Usage: </I>background-color-flag on | off
 <P>
-<I>Default: </I>white
+<I>Default: </I>off
 <P>
 
 <BR><B>border-width</B><BR>
@@ -2634,12 +2634,11 @@ REAL - fractional space at bottom of plot, i.e. between curves and axes.
 <P>
 
 <BR><B>cgm-background-color-flag</B><BR>
-INTEGER - CGM device background color. If auto specified, use display background 
-color as specified by background-color-flag.
+INTEGER - use white background color for CGM device. If auto specified, use display background color as specified by background-color-flag.
 <P>
-<I>Usage: </I>cgm-background-color-flag white | black | auto
+<I>Usage: </I>cgm-background-color-flag on | off | auto
 <P>
-<I>Default: </I>white
+<I>Default: </I>off
 <P>
 
 <BR><B>cgm-flag</B><BR>
@@ -3213,8 +3212,6 @@ part of the SCHEME environment.<p>
 <TR><TD>all</TD><TD>value for kill command</TD></TR>
 <TR><TD>on</TD><TD>value for variables which toggle off and on</TD></TR>
 <TR><TD>off</TD><TD>value for variables which toggle off and on</TD></TR>
-<TR><TD>white</TD><TD>value for background color control</TD></TR>
-<TR><TD>black</TD><TD>value for background color control</TD></TR>
 <TR><TD>auto</TD><TD>value for background color control</TD></TR>
 <TR><TD>right-of-axis</TD><TD>value for axis control</TD></TR>
 <TR><TD>left-of-axis</TD><TD>value for axis control</TD></TR>
@@ -3376,7 +3373,7 @@ out because the values given are the built-in C level defaults.<p>
 <CENTER><B>Window Controls</B></CENTER>
 <BLOCKQUOTE>
 <PRE>
- (background-color-flag white)
+ (background-color-flag on)
 
  (border-width     2)
 

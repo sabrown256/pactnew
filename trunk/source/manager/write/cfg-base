@@ -216,7 +216,7 @@ endif
               echo "include compilers/osf" >>& $pf
               breaksw
          case sunos:
-              set lccsys  = `where cc |& head -n 1`
+              set lccsys  = `pwhere -n 1 cc`
               set lccroot = $lccsys:h
               set lccroot = $lccroot:h
               if ("$lbts" != "") then

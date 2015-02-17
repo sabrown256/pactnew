@@ -16,7 +16,7 @@ Note $ALog ""
 
 dbmget $ALog INSTALL_Exe  =\? cp
 
-set res = `where install |& head -n 1`
+set res = `pwhere -n 1 install`
 if (-x "$res") then
    set MINSTALL = $res
 else if (-e /etc/install) then

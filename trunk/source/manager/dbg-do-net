@@ -55,7 +55,7 @@ while ($#argv > 0)
 end
 
 if ("$Pact" == "") then
-   set Pact = `where pact | head -n 1`
+   set Pact = `pwhere -n 1 pact`
 endif
 
 set Root   = $Pact:h

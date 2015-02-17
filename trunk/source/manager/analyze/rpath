@@ -82,7 +82,7 @@ while ($#argv > 0)
    shift
 end
 
-set VAR_LIST = `where var-list |& head -n 1`
+set VAR_LIST = `pwhere -n 1 var-list`
 if (!(-x "$VAR_LIST")) then
    echo "RPATH: var-list not found - exiting"
    exit(1)

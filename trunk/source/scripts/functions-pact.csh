@@ -32,9 +32,6 @@ unalias ls
 unalias rm
 unalias mv
 
-# nasty bootstrapping issue here when building PACT for the first time
-# we are not supposed to be doing a lot of work in this script
-#setenv PERDB `where perdb | head -n 1`
 if ($?PERDB == 0) then
    setenv PERDB perdb
 endif

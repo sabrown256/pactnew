@@ -31,8 +31,8 @@ dbmget $ALog LD_Exe        =\? ""^   \
              HSY_OS_Name
 
 if (!(-x "$LD_Exe")) then
-   if (-x `where ld |& head -n 1`) then
-      flog $ALog setenv LD_Exe `where ld |& head -n 1`
+   if (-x `pwhere -n 1 ld`) then
+      flog $ALog setenv LD_Exe `pwhere -n 1 ld`
    else
       flog $ALog setenv LD_Exe ""
    endif
