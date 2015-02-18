@@ -358,6 +358,11 @@ static int reset_env(int c, char **v)
 
 	    free_strings(except);};};
 
+/* now add specified variables */
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-tg") == 0)
+	    putenv(v[++i]);};
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -2782,7 +2787,7 @@ static void help(void)
    {
 
     printf("\n");
-    printf("Usage: pco [-a] [-c] [-db <db>] [-f <path>] [-F] [-ft <features>] [-g] [-i <directory>] [-l] [-o] [-p] [-s <sysid>] [-v] | <cfg>\n");
+    printf("Usage: pco [-a] [-c] [-db <db>] [-f <path>] [-F] [-ft <features>] [-g] [-i <directory>] [-l] [-o] [-p] [-s <sysid>] [-tg <var>=<value>] [-v] | <cfg>\n");
     printf("\n");
     printf("             -a      do NOT perform ANALYZE step\n");
     printf("             -c      create missing directories for -i option\n");
@@ -2797,6 +2802,7 @@ static void help(void)
     printf("             -o      build optimized version\n");
     printf("             -p      build profiling version\n");
     printf("             -s      explicit system id\n");
+    printf("             -tg     set tool/group variable\n");
     printf("             -v      verbose on (diagnostic)\n");
     printf("             <cfg>   the config file for the installation\n");
     printf("\n");
@@ -2894,6 +2900,10 @@ int main(int c, char **v, char **env)
  
 /* this was handled in reset_env */
          else if (strcmp(v[i], "-env") == 0)
+            i++;
+ 
+/* this was handled in reset_env */
+         else if (strcmp(v[i], "-tg") == 0)
             i++;
  
          else if (strcmp(v[i], "-ft") == 0)
