@@ -273,10 +273,10 @@ Group HAVE {
 }
 
 Group HDF {
-   Inc   = 
-   Lib   = 
-   RPath = 
-   Path  = 
+   Inc   =? $HDF_Inc
+   Lib   =? $HDF_Lib
+   RPath =? $HDF_RPath
+   Path  =? $HDF_Path
 }
 
 # Host SYstem group

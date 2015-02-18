@@ -95,7 +95,7 @@ EOF
       if (($RF_Linking == dynamic) && ($?lSO == 1)) then
          setenv HDF5_SO    $lSO
       endif
-      flog $ALog setenv RPATH         ${RPATH}:${HDF_RPath}
+      flog $ALog setenv RPATH         ${RPATH}:${PckPath}
       flog $ALog setenv HAVE_HDF5     TRUE
 
       flog $ALog $Tmp
