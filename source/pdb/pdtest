@@ -97,7 +97,7 @@ else if (-e $SrcDir/pdb.h) then
       if ($test_file == TRUE) then
          if ("$TestL" == "") then
             set TestL = ""
-            set TestL = ($TestL master c99 perf)
+            set TestL = ($TestL master c99 chk++ perf)
             set TestL = ($TestL bufa bufb appdef gatsca filter checksum)
             set TestL = ($TestL usrtyp net fd hyper fixdnrm attr trans)
             set TestL = ($TestL cast typdef browse free)

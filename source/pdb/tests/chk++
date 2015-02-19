@@ -1,0 +1,28 @@
+#!/bin/csh -f
+#
+# CHK++ - PDB C++ API compile test
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+source ../../tests/common
+
+set msg = "PDB C++ API Test ..................."
+
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+Note $Log ""
+
+set res = chk++.res
+
+a++ -ag -I$IncDir -c $FilesDir/chk++.cc -o chk++.o >&! $res
+@ xstatus = `cat $res | wc -l`
+
+set rpf = ( $rpf chk++.o )
+
+$TEST_CHECK part -a chk++ -e $xstatus -dt $dt -rpf "$rpf" none
+
+exit($status)
+

@@ -69,7 +69,7 @@ KEY    ("if"|"then"|"else"|"elseif"|"endif"|"for"|"continue"|"common")
 {D}+[hH]  {int i, nc;
            char s[10];
 
-           strncpy(s, (CONST char *) yytext, 10);
+           strncpy(s, (const char *) yytext, 10);
            nc = strlen(s);
            s[nc-1] = '\0';
 
