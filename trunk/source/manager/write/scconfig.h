@@ -184,8 +184,6 @@ setenv IncDir  $PSY_Root/include
     Note $STDOUT ""
 
     Note $STDOUT "#define ANSI"
-    Note $STDOUT "#undef CONST"
-    Note $STDOUT "#define CONST const"
     Note $STDOUT "#undef SIGNED"
     Note $STDOUT "#define SIGNED signed"
     Note $STDOUT "#undef INLINE"
