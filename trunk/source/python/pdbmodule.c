@@ -44,6 +44,8 @@ static PyMethodDef
 {"getfile", (PyCFunction)PP_getfile, PY_ARG_KEY, PP_getfile_doc},
 {"getdata", (PyCFunction)PP_getdata, PY_ARG_KEY, PP_getdata_doc},
 {"getmember", (PyCFunction)PP_getmember, PY_ARG_KEY, PP_getmember_doc},
+{"printdata", (PyCFunction)PP_printdata, PY_ARG_KEY, PP_printdata_doc},
+{"printdefstr", (PyCFunction)PP_printdefstr, PY_ARG_KEY, PP_printdefstr_doc},
 {"unpack", (PyCFunction)PP_unpack, PY_ARG_KEY, PP_unpack_doc},
 {NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
 };
@@ -107,6 +109,8 @@ PY_MOD_BEGIN(_pdb, pdb_module_documentation, PP_methods)
 /* make 'open' a synonym for 'PDBfile' */
     if (PyDict_SetItemString(d, "open", (PyObject *) &PY_PDBfile_type) < 0)
        PY_MOD_RETURN_ERR;
+
+    PY_INIT_FILE_EMULATOR;
 
     PY_MOD_END(_pdb);}
 

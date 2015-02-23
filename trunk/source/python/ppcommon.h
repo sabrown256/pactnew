@@ -66,6 +66,10 @@ PyMODINIT_FUNC PyInit_##_nm(void)                                           \
 
 # define PY_INIT_BUFFER_PROCS(_rd, _wr, _sc, _gc, _gb, _rb)                 \
     {_gb, _rb}
+#define Py_TPFLAGS_HAVE_NEWBUFFER 0
+
+void PY_init_file_emulator(void);
+#define PY_INIT_FILE_EMULATOR  PY_init_file_emulator()
 
 #else
 
@@ -111,7 +115,9 @@ void init##_nm(void)                                                        \
 # define PY_MOD_RETURN_ERR          return
 
 # define PY_INIT_BUFFER_PROCS(_rd, _wr, _sc, _gc, _gb, _rb)                 \
-    {_rd, _wr, _sc, _gc}
+    {_rd, _wr, _sc, _gc, _gb, _rb}
+
+#define PY_INIT_FILE_EMULATOR
 
 #endif
 

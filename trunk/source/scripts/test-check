@@ -246,8 +246,8 @@ switch ($tgt)
            set dt = `$TIMER -b $t0`
         endif
 
-        Note $log "Advisory      = $adv"
-        Note $log "TEST_ADVISORY = $TEST_ADVISORY"
+        Note $log "Advisory needed    = $adv"
+        Note $log "Advisory specified = $TEST_ADVISORY"
 
 # check the test advisory
         set advise = FALSE
