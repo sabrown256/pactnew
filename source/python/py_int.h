@@ -9,7 +9,7 @@
 
 #define PCK_PY_INTERNAL
 
-/* these get expanded in py_gen.h */
+/* these get expanded in gp-pdb.h */
 
 #define PY_EXT_METHOD_DEFSTR                                                \
     PP_file *fileinfo;                                                      \
@@ -83,8 +83,8 @@ int PY_ ## _t ## _extractor(PyObject *obj, void *arg)                        \
 # define PY_DEF_DESTRUCTOR NULL
 #endif
 
-#ifndef PY_DEF_REPR
-# define PY_DEF_REPR NULL
+#ifndef PY_DEF_TP_REPR
+# define PY_DEF_TP_REPR NULL
 #endif
 
 #ifndef PY_DEF_AS_SEQ
@@ -126,7 +126,7 @@ PyTypeObject                                                                 \
                   (getattrfunc) 0,                                           \
                   (setattrfunc) 0,                                           \
                   (cmpfunc) 0,                                               \
-                  (reprfunc) PY_DEF_REPR,                                    \
+                  (reprfunc) PY_DEF_TP_REPR,                                 \
                   0,                                                         \
                   PY_DEF_AS_SEQ,                                             \
                   PY_DEF_AS_MAP,                                             \
@@ -191,6 +191,8 @@ extern char
  PP_getfile_doc[],
  PP_getdata_doc[],
  PP_getmember_doc[],
+ PP_printdata_doc[],
+ PP_printdefstr_doc[],
  PP_unpack_doc[];
 
 
@@ -288,6 +290,8 @@ extern PyObject
  *PP_getfile(PyObject *self, PyObject *args, PyObject *kwds),
  *PP_getdata(PyObject *self, PyObject *args, PyObject *kwds),
  *PP_getmember(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_printdata(PyObject *self, PyObject *args, PyObject *kwds),
+ *PP_printdefstr(PyObject *self, PyObject *args, PyObject *kwds),
  *PP_unpack(PyObject *self, PyObject *args, PyObject *kwds);
 
 

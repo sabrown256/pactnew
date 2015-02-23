@@ -299,7 +299,7 @@ switch ($Cmnd)
 
         InitLog Log $LogDir/build
 
-        flog $Log ( pwhere -n pact )
+        flog $Log ( pwhere -n 1 pact )
 
         set BeginTime = `$TIMER -r`
 

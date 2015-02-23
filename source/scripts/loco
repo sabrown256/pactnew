@@ -15,13 +15,14 @@ touch $log
 set cmd  = $0
 set args = ( $argv )
 
-set rcmd = ( `pwhere $cmd:t` )
-foreach c ($rcmd)
-   if ($c != $cmd) then
-      set cmd = $c
-      break
-   endif
-end
+set cmd = ( `pwhere -n 1 $cmd:t` )
+#set rcmd = ( `pwhere $cmd:t` )
+#foreach c ($rcmd)
+#   if ($c != $cmd) then
+#      set cmd = $c
+#      break
+#   endif
+#end
 
 set ppid   = ( `ps -ef | awk '$2 == '$$' { print $3 }'` )
 set parent = ( `ps -ef | awk '$2 == '$ppid' { print }'` )

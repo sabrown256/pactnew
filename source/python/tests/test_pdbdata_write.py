@@ -15,7 +15,6 @@ import pact_test.pdb as pdb
 import unittest
 import struct
 import test_leak
-import py_inter
 
 class DoIO(test_leak.LeakFile):
     def tearDown(self):
@@ -42,8 +41,7 @@ class DoubleIO(DoIO):
 #        self.assertEqual(str(d2), str(d))
 #        o = d.unpack()
 #        self.assertEqual(o, ref)
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testa_raw', s, 'double')
+        self.fp.write_raw('testa_raw', d, 'double')
         self.fp.write('testa', d)
         self.fp.write('testa_ref', ref)
 
@@ -76,8 +74,7 @@ class DoubleIO(DoIO):
 #        d2 = struct.pack('dd', 4.0, 5.0)
         ref = [4.0, 5.0]
         d = pdb.pdbdata(ref)
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testc_raw[2]', s, 'double')
+        self.fp.write_raw('testc_raw[2]', d, 'double')
         self.fp.write('testc', d)
         self.fp.write('testc_ref', ref)
 #        self.assertEqual(str(d2), str(d))
@@ -168,8 +165,7 @@ class DoubleIO(DoIO):
 #        d2 = struct.pack('d', 1.)
         ref = [1.]
         d = pdb.pdbdata(ref, 'double *')
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testh_raw', s, 'double *')
+        self.fp.write_raw('testh_raw', d, 'double *')
         self.fp.write('testh', d)
         self.fp.write('testh_ref', ref)
 #        self.assertEqual(str(d2), str(d))
@@ -184,8 +180,7 @@ class DoubleIO(DoIO):
 #        d2 = struct.pack('dd', 1., 2.)
         ref = [1., 2.]
         d = pdb.pdbdata(ref, 'double *')
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testi_raw', s, 'double *')
+        self.fp.write_raw('testi_raw', d, 'double *')
         self.fp.write('testi', d)
         self.fp.write('testi_ref', ref)
 #        self.assertEqual(str(d2), str(d))
@@ -205,8 +200,7 @@ class DoubleIO(DoIO):
         """write "double **" from [None, [4., 5.]]"""
         ref = [None, [4., 5.]]
         d = pdb.pdbdata(ref, 'double **')
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testk_raw', s, 'double **')
+        self.fp.write_raw('testk_raw', d, 'double **')
         self.fp.write('testk', d)
 #        self.fp.write('testk_ref', ref)
 #        self.fp.write('testk_a', ref, 'double *[2]')
@@ -218,8 +212,7 @@ class DoubleIO(DoIO):
         """write "double **" from [[1.0, 2.0, 3.0], [4., 5.]]"""
         ref = [[1.0, 2.0, 3.0], [4., 5.]]
         d = pdb.pdbdata(ref, 'double **')
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testl_raw', s, 'double **')
+        self.fp.write_raw('testl_raw', d, 'double **')
         self.fp.write('testl', d)
         self.fp.write('testl_ref', ref)
 ##        self.fp.write('testl_a', ref, 'double *[2]')
@@ -235,8 +228,7 @@ class DoubleIO(DoIO):
         """write "double **" from [None, None, None]"""
         ref = [None, None, None]
         d = pdb.pdbdata(ref, 'double **')
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testm_raw', s, 'double **')
+        self.fp.write_raw('testm_raw', d, 'double **')
         self.fp.write('testm', d)
 #        self.fp.write('testm_ref', ref)
 
@@ -247,8 +239,7 @@ class DoubleIO(DoIO):
         """write "double *[2]" from [[2.0], [4., 5., 6.]]"""
         ref = [[2.0], [4., 5., 6.]]
         d = pdb.pdbdata(ref, 'double *[2]')
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testn_raw[2]', s, 'double *')
+        self.fp.write_raw('testn_raw[2]', d, 'double *')
         self.fp.write('testn[2]', d)
 #        self.fp.write('testn_ref[2]', ref)
 
@@ -268,7 +259,6 @@ class DoubleIO(DoIO):
                ], None
               ]
         d = pdb.pdbdata(ref, 'double **[3]')
-        s = py_inter.to_bytes(d)
         self.fp.write_raw('testo_raw[3]', d, 'double **')
         self.fp.write('testo', d)
 #        self.fp.write('testo_raw', ref)
@@ -282,8 +272,7 @@ class StringIO(DoIO):
         """write a C char from a python string"""
         ref = 'a'
         d = pdb.pdbdata(ref)
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testa_raw', s, 'char')
+        self.fp.write_raw('testa_raw', d, 'char')
         self.fp.write('testa', d)
 
         r = self.fp.read('testa')
@@ -293,8 +282,7 @@ class StringIO(DoIO):
         """write a C char[5] from a python string"""
         ref = 'abcde'
         d = pdb.pdbdata('abcde', 'char[5]')
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testb_raw[5]', s, 'char')
+        self.fp.write_raw('testb_raw[5]', d, 'char')
         self.fp.write('testb', d)
 
         r = self.fp.read('testb')
@@ -304,8 +292,7 @@ class StringIO(DoIO):
         """write a C char** from a python string"""
         ref = ["hello", "world!"]
         d = pdb.pdbdata(ref, 'char**')
-        s = py_inter.to_bytes(d)
-        self.fp.write_raw('testc_raw', s, 'char **')
+        self.fp.write_raw('testc_raw', d, 'char **')
         self.fp.write('testc', d)
 
         r = self.fp.read('testc')
@@ -314,8 +301,7 @@ class StringIO(DoIO):
     def xtestStringd(self):
         """write a list of strings"""
 #        d = pdb.pdbdata('abcde', 'char[5]')
-#        s = py_inter.to_bytes(d)
-#        self.fp.write_raw('testd_raw[5]', s, 'char')
+#        self.fp.write_raw('testd_raw[5]', d, 'char')
         self.fp.write('testd', ["hello", "world"])
 
 

@@ -89,20 +89,17 @@ static void PY_pdbdata_tp_dealloc(PY_pdbdata *self)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static int PY_pdbdata_tp_print(PY_pdbdata *self, FILE *file, int flags)
-   {syment *ep;
-    SC_address addr;
+static PyObject *PY_pdbdata_tp_repr(PY_pdbdata *self)
+{
+    int nc;
+    char buffer[80];
+    PyObject *rv;
 
-    addr.memaddr = self->data;
-    ep = _PD_mk_syment(self->type, self->nitems,
-                       addr.diskaddr, NULL, self->dims);
-    
-    PD_write_entry(file, self->fileinfo->file, "data", self->data,
-                   ep, 0, NULL);
+    nc = snprintf(buffer, sizeof(buffer), "<pdbdata type='%s'>", self->type);
+    rv = PY_STRING_STRING_SIZE(buffer, nc);
 
-    _PD_rl_syment(ep);
-
-    return(0);}
+    return rv;
+}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -226,9 +223,9 @@ int PY_pdbdata_Check(PyObject *op)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* Code to handle accessing pdbdata objects as sequence objects */
+/* Code to access pdbdata objects as mappings */
 
-static Py_ssize_t PY_pdbdata_sq_length(PyObject *_self)
+static Py_ssize_t PY_pdbdata_mp_length(PyObject *_self)
    {Py_ssize_t nitems;
     PY_pdbdata *self;
 
@@ -244,18 +241,16 @@ static Py_ssize_t PY_pdbdata_sq_length(PyObject *_self)
     return(nitems);}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
-static PyObject *PY_pdbdata_sq_item(PyObject *_self, Py_ssize_t i)
+static PyObject *PY_pdbdata_mp_subscript(PyObject *_self, PyObject *key)
    {Py_ssize_t nitems;
-    PyObject *rv;
-    PP_form *form;
     PY_pdbdata *self;
-    
-    rv = NULL;
+    PyObject *rv = NULL;
+    PP_form *form;
 
     self = (PY_pdbdata *) _self;
-    
+
+    /* find length of available data */
     if (self->data == NULL)
        nitems = 0;
     else if (self->dims == NULL)
@@ -263,83 +258,77 @@ static PyObject *PY_pdbdata_sq_item(PyObject *_self, Py_ssize_t i)
     else
        nitems = self->dims->number;
 
-    if ((i < 0) || (i >= nitems))
-       {if (indexerr == NULL)
-	   indexerr = PY_STRING_STRING("pdbdata index out of range");
-        PyErr_SetObject(PyExc_IndexError, indexerr);}
+    if (PyIndex_Check(key)) {
+	Py_ssize_t i;
+        i = PyNumber_AsSsize_t(key, PyExc_IndexError);
 
-    else
-       {form = &PP_global_form;
+	if (i < 0)
+	    i += nitems;
+	if (i >= nitems) {
+	    if (indexerr == NULL)
+	        indexerr = PY_STRING_STRING("pdbdata index out of range");
+	    PyErr_SetObject(PyExc_IndexError, indexerr);
+	}
+	else {
+	    form = &PP_global_form;
 
 /* special case indexing a scalar item */
-	if (nitems == 1 && form->scalar_kind == AS_PDBDATA)
-	   {Py_INCREF(self);
-	    rv = (PyObject *) self;}
-	else
-	   {void *vr;
+            if (nitems == 1 && form->scalar_kind == AS_PDBDATA) {
+		Py_INCREF(self);
+	        rv = (PyObject *) self;
+	    } else {
+		void *vr;
+	        vr = ((char *) self->data) + i * self->dp->size;
+	        rv = PP_form_object(vr, self->type, 1, NULL,
+				    self->dp, self->fileinfo, self->dpobj,
+				    (PyObject *) self, form);
+	    }
+	}
 
-	    vr = ((char *) self->data) + i * self->dp->size;
-	    rv = PP_form_object(vr, self->type, 1, NULL,
+    } else if (PySlice_Check(key)) {
+        Py_ssize_t start, stop, step, length;
+	void *vr;
+	dimdes *dims;
+
+        if (PySlice_GetIndicesEx(
+#if PY_MAJOR_VERSION >= 3
+				 key, 
+#else
+				 (PySliceObject*)key, 
+#endif
+                                 nitems, &start, &stop, 
+                                 &step, &length) == 0) {
+	    form = &PP_global_form;
+
+	    vr     = ((char *) self->data) + start * self->dp->size;
+	    dims   = _PD_mk_dimensions(0, length);
+	    SC_mark(dims, 1);
+	
+	    rv = PP_form_object(vr, self->type, length, dims,
 				self->dp, self->fileinfo, self->dpobj,
-				(PyObject *) self, form);};};
-        
-    return(rv);}
+				(PyObject *) self, form);
+	    _PD_rl_dimensions(dims);
+	}
+
+    } else {
+        PyErr_Format(PyExc_TypeError,
+                     "pdbdata indices must be integers, not %.200s",
+                     key->ob_type->tp_name);
+    }
+    return rv;
+}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
-static PyObject *PY_pdbdata_sq_slice(PyObject *_self,
-				     Py_ssize_t ilow, Py_ssize_t ihigh)
-   {Py_ssize_t nitems;
-    void *vr;
-    PyObject *rv;
-    PP_form *form;
-    dimdes *dims;
-    PY_pdbdata *self = (PY_pdbdata *) _self;
-    
-    if (self->data == NULL)
-       nitems = 0;
-    else if (self->dims == NULL)
-       nitems = 1;
-    else
-       nitems = self->dims->number;
-
-/* lifted from listobject.c */
-    if (ilow < 0)
-       ilow = 0;
-    else if (ilow > nitems)
-       ilow = nitems;
-
-    if (ihigh < ilow)
-       ihigh = ilow;
-    else if (ihigh > nitems)
-       ihigh = nitems;
-
-    form = &PP_global_form;
-
-    nitems = ihigh - ilow;
-    vr     = ((char *) self->data) + ilow * self->dp->size;
-    dims   = _PD_mk_dimensions(ilow, nitems);
-    SC_mark(dims, 1);
-
-    rv = PP_form_object(vr, self->type, nitems, dims,
-                        self->dp, self->fileinfo, self->dpobj,
-                        (PyObject *) self, form);
-
-    _PD_rl_dimensions(dims);
-        
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int PY_pdbdata_sq_ass_item(PyObject *_self,
-				  Py_ssize_t i, PyObject *v)
-   {int ierr;
+static int
+PY_pdbdata_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *value)
+{
+    int ierr;
     Py_ssize_t nitems;
     void *vr;
     PY_pdbdata *self;
     
+    ierr = -1;
     self = (PY_pdbdata *) _self;
     
     if (self->data == NULL)
@@ -349,133 +338,125 @@ static int PY_pdbdata_sq_ass_item(PyObject *_self,
     else
        nitems = self->dims->number;
 
-    if ((i < 0) || (i >= nitems))
-       {if (indexerr == NULL)
-	   indexerr = PY_STRING_STRING("pdbdata index out of range");
-        PyErr_SetObject(PyExc_IndexError, indexerr);
-        ierr = -1;}
-    else
-       {vr   = ((char *) self->data) + i * self->dp->size;
-	ierr = _PP_rd_syment(v, self->fileinfo, self->type, NULL, 1, vr);};
+    if (PyIndex_Check(key)) {
+	Py_ssize_t i;
+        i = PyNumber_AsSsize_t(key, PyExc_IndexError);
 
-    return(ierr);}
+	if (i < 0)
+	    i += nitems;
+	if (i >= nitems) {
+	    if (indexerr == NULL)
+	        indexerr = PY_STRING_STRING("pdbdata index out of range");
+	    PyErr_SetObject(PyExc_IndexError, indexerr);
+	} else {
+	    vr   = ((char *) self->data) + i * self->dp->size;
+	    ierr = _PP_rd_syment(value, self->fileinfo, self->type, NULL, 1, vr);
+	}
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+    } else if (PySlice_Check(key)) {
+	PyErr_SetString(PyExc_NotImplementedError, "Using slices for assignment to pdbdata");
 
-static PySequenceMethods
- PY_pdbdata_as_sequence = {
-        PY_pdbdata_sq_length,           /* sq_length */
-        0,                              /* sq_concat */
-        0,                              /* sq_repeat */
-        PY_pdbdata_sq_item,             /* sq_item */
-        PY_pdbdata_sq_slice,            /* sq_slice */
-        PY_pdbdata_sq_ass_item,         /* sq_ass_item */
-        0,                              /* sq_ass_slice */
-        0,                              /* sq_contains */
-        /* Added in release 2.0 */
-        0,                              /* sq_inplace_concat */
-        0,                              /* sq_inplace_repeat */
-};
+    } else {
+        PyErr_Format(PyExc_TypeError,
+                     "pdbdata indices must be integers, not %.200s",
+                     key->ob_type->tp_name);
+    }
+
+    return ierr;
+}
 
 /*--------------------------------------------------------------------------*/
 
-#if PY_MAJOR_VERSION < 3
+static PyMappingMethods
+ PY_pdbdata_as_mapping = {PY_pdbdata_mp_length,     /* mp_length */
+	 		  PY_pdbdata_mp_subscript,  /* mp_subscript */
+			  PY_pdbdata_mp_ass_subscript}; /* mp_ass_subscript */
+
 
 /*--------------------------------------------------------------------------*/
 
-/* Code to access pdbdata objects as buffer */
-
-static Py_ssize_t PY_pdbdata_bf_getreadbuffer(PyObject *_self,
-					      Py_ssize_t segment,
-					      void **ptrptr)
-   {Py_ssize_t n;
+static int PY_pdbdata_bf_getbuffer(PyObject *_self, Py_buffer *view, int flags)
+{
     PY_pdbdata *self;
     
     self = (PY_pdbdata *) _self;
-    
-    if (segment != 0)
-       {PP_error_set(PP_error_internal, NULL,
-                     "Accessing non-existent buffer segment:%d", segment);
-        n = -1;}
-    else
-       {*ptrptr = self->data;
-        n = self->nitems * self->dp->size;};
+    view->obj = NULL;  /* prepare for error return */
 
-    return(n);}
+    if (view == NULL) {
+        PyErr_SetString(PyExc_BufferError, "NULL view in getbuffer");
+        return -1;
+    }
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+    view->buf = self->data;
+    view->len = self->nitems * self->dp->size;
+    view->itemsize = self->dp->size;
+    view->suboffsets = NULL;
+    view->readonly = 0;
+    view->internal = NULL;
+    if (flags == PyBUF_SIMPLE) {
+	view->format = NULL;
+	view->ndim = 0;
+	view->shape = NULL;
+	view->strides = NULL;
+    } else {
+	
+        PyErr_SetString(PyExc_BufferError, "Only support PyBUF_SIMPLE");
+        return -1;
+#if 0
+	if ((flags & PyBUF_FORMAT) == PyBUF_FORMAT) {
+	    view->format = info->format;
+	} else {
+	    view->format = NULL;
+	}
+	if ((flags & PyBUF_ND) == PyBUF_ND) {
+	    view->ndim = info->ndim;
+	    view->shape = info->shape;
+	}
+	else {
+	    view->ndim = 0;
+	    view->shape = NULL;
+	}
+	if ((flags & PyBUF_STRIDES) == PyBUF_STRIDES) {
+	    view->strides = info->strides;
+	}
+	else {
+	    view->strides = NULL;
+	}
+#endif
+    }
+    view->obj = (PyObject*)self;
 
-static Py_ssize_t PY_pdbdata_bf_getwritebuffer(PyObject *_self,
-					       Py_ssize_t segment,
-					       void **ptrptr)
-   {Py_ssize_t n;
-    PY_pdbdata *self = (PY_pdbdata *) _self;
+    Py_INCREF(self);
+    return 0;
+}
 
-    if (segment != 0)
-       {PP_error_set(PP_error_internal, NULL,
-                     "Accessing non-existent buffer segment:%d", segment);
-        n = -1;}
-    else
-       {*ptrptr = self->data;
-        n = self->nitems * self->dp->size;};
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static Py_ssize_t PY_pdbdata_bf_getsegcount(PyObject *_self,
-					    Py_ssize_t *lenp)
-   {
-
-    if (lenp != NULL)
-       *lenp = 1;
-
-    return(1);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static Py_ssize_t PY_pdbdata_bf_getcharbuffer(PyObject *_self,
-					      Py_ssize_t segment,
-					      char **ptrptr)
-   {Py_ssize_t n;
-    PY_pdbdata *self;
-
-    self = (PY_pdbdata *) _self;
-
-    if (segment != 0)
-       {PP_error_set(PP_error_internal, NULL,
-                     "Accessing non-existent buffer segment:%d", segment);
-        n = -1;}
-    else
-       {*ptrptr = self->data;
-        n = self->nitems * self->dp->size;};
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-
+#if 0
+/* This routine will be needed if getbuffer starts allocating memory */
+static void PY_pdbdata_bf_releasebuffer(PyObject *self, Py_buffer *view)
+{
+    PyErr_SetString(PyExc_NotImplementedError, "PP_hasharr_buffer_releasebuffer");
+    return;
+}
 #endif
 
 /*--------------------------------------------------------------------------*/
 
 static PyBufferProcs
- PY_pdbdata_as_buffer = PY_INIT_BUFFER_PROCS(PY_pdbdata_bf_getreadbuffer,
-                                             PY_pdbdata_bf_getwritebuffer,
-                                             PY_pdbdata_bf_getsegcount,
-                                             PY_pdbdata_bf_getcharbuffer,
-                                             NULL,
-                                             NULL);
+ PY_pdbdata_as_buffer = PY_INIT_BUFFER_PROCS(
+					     0,
+                                             0,
+                                             0,
+                                             0,
+					     PY_pdbdata_bf_getbuffer,
+					     0); //PY_pdbdata_bf_releasebuffer);
+
 
 /*--------------------------------------------------------------------------*/
 
 #if 0
 
 #undef PY_DEF_DESTRUCTOR
-#undef PY_DEF_REPR
+#undef PY_DEF_TP_REPR
 #undef PY_DEF_TP_METH
 #undef PY_DEF_TP_PRINT
 #undef PY_DEF_TP_STR
@@ -485,13 +466,13 @@ static PyBufferProcs
 #undef PY_DEF_AS_BUFFER
 
 #define PY_DEF_DESTRUCTOR	    PY_pdbdata_tp_dealloc
-#define PY_DEF_REPR                 NULL
+#define PY_DEF_TP_REPR              PY_pdbdata_tp_repr
 #define PY_DEF_TP_METH              NULL
 #define PY_DEF_TP_PRINT             PY_pdbdata_tp_print
 #define PY_DEF_TP_STR               PY_pdbdata_tp_str
 #define PY_DEF_TP_CALL              NULL
-#define PY_DEF_AS_SEQ               &PY_pdbdata_as_sequence
-#define PY_DEF_AS_MAP               NULL
+#define PY_DEF_AS_SEQ               NULL
+#define PY_DEF_AS_MAP               &PY_pdbdata_as_mapping
 #define PY_DEF_AS_BUFFER            &PY_pdbdata_as_buffer
 
 char PY_pdbdata_doc[] = "";
@@ -510,15 +491,15 @@ PyTypeObject
         0,                              /* tp_itemsize */
         /* Methods to implement standard operations */
         (destructor)PY_pdbdata_tp_dealloc, /* tp_dealloc */
-        (printfunc)PY_pdbdata_tp_print, /* tp_print */
+        (printfunc)0,                   /* tp_print */
         (getattrfunc)0,                 /* tp_getattr */
         (setattrfunc)0,                 /* tp_setattr */
         (cmpfunc)0,                     /* tp_compare */
-        (reprfunc)0,                    /* tp_repr */
+        (reprfunc)PY_pdbdata_tp_repr,   /* tp_repr */
         /* Method suites for standard classes */
         0,                              /* tp_as_number */
-        &PY_pdbdata_as_sequence,        /* tp_as_sequence */
-        0,                              /* tp_as_mapping */
+        0,                              /* tp_as_sequence */
+        &PY_pdbdata_as_mapping,         /* tp_as_mapping */
         /* More standard operations (here for binary compatibility) */
         (hashfunc)0,                    /* tp_hash */
         (ternaryfunc)0,                 /* tp_call */
@@ -528,7 +509,7 @@ PyTypeObject
         /* Functions to access object as input/output buffer */
         &PY_pdbdata_as_buffer,          /* tp_as_buffer */
         /* Flags to define presence of optional/expanded features */
-        Py_TPFLAGS_DEFAULT,             /* tp_flags */
+        Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_NEWBUFFER, /* tp_flags */
         PY_pdbdata_type__doc__,         /* tp_doc */
         /* Assigned meaning in release 2.0 */
         /* call function for all accessible objects */

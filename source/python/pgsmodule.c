@@ -44,6 +44,8 @@ static PyMethodDef
 {"getfile", (PyCFunction)PP_getfile, PY_ARG_KEY, PP_getfile_doc},
 {"getdata", (PyCFunction)PP_getdata, PY_ARG_KEY, PP_getdata_doc},
 {"getmember", (PyCFunction)PP_getmember, PY_ARG_KEY, PP_getmember_doc},
+{"printdata", (PyCFunction)PP_printdata, PY_ARG_KEY, PP_printdata_doc},
+{"printdefstr", (PyCFunction)PP_printdefstr, PY_ARG_KEY, PP_printdefstr_doc},
 {"unpack", (PyCFunction)PP_unpack, PY_ARG_KEY, PP_unpack_doc},
 {"make_graph_1d", (PyCFunction)PP_make_graph_1d, PY_ARG_KEY, PP_make_graph_1d_doc},
 {"make_graph_r2_r1", (PyCFunction)PP_make_graph_r2_r1, PY_ARG_KEY, PP_make_graph_r2_r1_doc},
@@ -113,6 +115,8 @@ PY_MOD_BEGIN(_pgs, pgs_module_documentation, PP_methods)
     PY_DEF_GETSET(PG_palette, "pal");
     PY_DEF_GETSET(PG_image, "im");
     PY_DEF_GETSET(PG_graph, "data");
+
+    PY_INIT_FILE_EMULATOR;
 
     PY_MOD_END(_pgs);}
 

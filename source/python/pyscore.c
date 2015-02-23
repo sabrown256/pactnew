@@ -1129,12 +1129,12 @@ static PyMappingMethods
 /*--------------------------------------------------------------------------*/
 
 #undef PY_DEF_DESTRUCTOR
-#undef PY_DEF_REPR
+#undef PY_DEF_TP_REPR
 #undef PY_DEF_TP_METH
 #undef PY_DEF_AS_MAP
 
 #define PY_DEF_DESTRUCTOR	    PY_hasharr_tp_dealloc
-#define PY_DEF_REPR                 PY_hasharr_tp_repr
+#define PY_DEF_TP_REPR              PY_hasharr_tp_repr
 #define PY_DEF_TP_METH              PY_hasharr_methods
 #define PY_DEF_AS_MAP	            &PY_hasharr_as_mapping
 

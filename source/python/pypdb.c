@@ -6,6 +6,14 @@
 
 #include "pdbmodule.h"
 
+#if PY_MAJOR_VERSION >= 3
+#include "file_emulator.h"
+void PY_init_file_emulator(void)
+{
+    init_file_emulator();
+}
+#endif
+
 #if 0
 #define DEBUG1(_a_, _b_)  fprintf(stderr, _a_, _b_)
 #else
@@ -26,6 +34,8 @@ char
  PP_getfile_doc[] = "",
  PP_getdata_doc[] = "",
  PP_getmember_doc[] = "",
+ PP_printdata_doc[] = "",
+ PP_printdefstr_doc[] = "",
  PP_unpack_doc[] = "";
 
 /*--------------------------------------------------------------------------*/
@@ -185,6 +195,100 @@ PyObject *PP_getmember(PyObject *self, PyObject *args, PyObject *kwds)
 	Py_INCREF(Py_None);};
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_PRINTDATA - */
+
+PyObject *PP_printdata(PyObject *self, PyObject *args, PyObject *kwds)
+   {syment *ep;
+    SC_address addr;
+    PY_pdbdata *obj;
+    char *kw_list[] = {"obj", "file", NULL};
+    FILE *fp;
+    PyObject *fileobj;
+
+    fileobj = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O:printdata", kw_list,
+				     &PY_pdbdata_type, &obj, &fileobj))
+	return NULL;
+
+    if (fileobj == NULL) {
+	/* default to stdout */
+	PyObject *sys = PyImport_ImportModule("sys");
+	if (sys == NULL)
+	    return NULL;
+	fileobj = PyObject_GetAttrString(sys, "stdout");
+	Py_DECREF(sys);
+	if (fileobj == NULL)
+	    return NULL;
+    } else {
+	Py_INCREF(fileobj);
+    }
+
+    if (!PyFile_Check(fileobj)) {
+        PyErr_SetString(PyExc_IOError,
+                "second argument must be an open file");
+	Py_DECREF(fileobj);
+        return NULL;
+    }
+    fp = PyFile_AsFile(fileobj);
+    fp = SC_fwrap(fp);
+
+    addr.memaddr = obj->data;
+    ep = _PD_mk_syment(obj->type, obj->nitems,
+                       addr.diskaddr, NULL, obj->dims);
+    
+    PD_write_entry(fp, obj->fileinfo->file, "data", obj->data,
+                   ep, 0, NULL);
+
+    _PD_rl_syment(ep);
+    Py_DECREF(fileobj);
+    Py_RETURN_NONE;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PP_PRINTDEFSTR - */
+
+PyObject *PP_printdefstr(PyObject *self, PyObject *args, PyObject *kwds)
+   {PY_defstr *obj;
+    char *kw_list[] = {"obj", "file", NULL};
+    FILE *fp;
+    PyObject *fileobj;
+
+    fileobj = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O:printdefstr", kw_list,
+				     &PY_defstr_type, &obj, &fileobj))
+	return NULL;
+
+    if (fileobj == NULL) {
+	/* default to stdout */
+	PyObject *sys = PyImport_ImportModule("sys");
+	if (sys == NULL)
+	    return NULL;
+	fileobj = PyObject_GetAttrString(sys, "stdout");
+	Py_DECREF(sys);
+	if (fileobj == NULL)
+	    return NULL;
+    } else {
+	Py_INCREF(fileobj);
+    }
+
+    if (!PyFile_Check(fileobj)) {
+        PyErr_SetString(PyExc_IOError,
+                "second argument must be an open file");
+	Py_DECREF(fileobj);
+        return NULL;
+    }
+    fp = PyFile_AsFile(fileobj);
+    fp = SC_fwrap(fp);
+
+    PD_write_defstr(fp, obj->pyo);
+
+    Py_DECREF(fileobj);
+    Py_RETURN_NONE;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -473,10 +577,9 @@ PyTypeObject *PY_defstr_mk_ctor(PY_defstr *dpobj)
 
 /* set name in the extended type object */
 	et = (PyHeapTypeObject *) ctor;
-#if PYTHON_API_VERSION >= 1013
 	et->ht_name = PY_STRING_STRING(ctor->tp_name);
-#else
-	et->name = PY_STRING_STRING(ctor->tp_name);
+#if PY_MAJOR_VERSION >= 3
+	et->ht_qualname = PY_STRING_STRING(ctor->tp_name);
 #endif
 
 	if (PyType_Ready(ctor) >= 0)
@@ -958,12 +1061,18 @@ static void PY_defstr_tp_dealloc(PY_defstr *self)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static int PY_defstr_tp_print(PY_defstr *self, FILE *file, int flags)
-   {
 
-    PD_write_defstr(file, self->pyo);
+static PyObject *PY_defstr_tp_repr(PY_defstr *self)
+{
+    int nc;
+    char buffer[80];
+    PyObject *rv;
 
-    return(0);}
+    nc = snprintf(buffer, sizeof(buffer), "<defstr name='%s'>", self->pyo->type);
+    rv = PY_STRING_STRING_SIZE(buffer, nc);
+
+    return rv;
+}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1086,11 +1195,13 @@ static PyMappingMethods
 #undef PY_DEF_DESTRUCTOR
 #undef PY_DEF_TP_METH
 #undef PY_DEF_TP_PRINT
+#undef PY_DEF_TP_REPR
 #undef PY_DEF_TP_CALL
 #undef PY_DEF_AS_MAP
 
 #define PY_DEF_DESTRUCTOR	    PY_defstr_tp_dealloc
-#define PY_DEF_TP_PRINT             PY_defstr_tp_print
+#define PY_DEF_TP_PRINT             NULL
+#define PY_DEF_TP_REPR              PY_defstr_tp_repr
 #define PY_DEF_TP_CALL              PY_defstr_tp_call
 #define PY_DEF_TP_METH              PY_defstr_methods
 #define PY_DEF_AS_MAP	            &PY_defstr_as_mapping
@@ -1164,12 +1275,14 @@ static int PY_memdes_tp_init(PY_memdes *self, PyObject *args, PyObject *kwds)
 #undef PY_DEF_DESTRUCTOR
 #undef PY_DEF_TP_METH
 #undef PY_DEF_TP_PRINT
+#undef PY_DEF_TP_REPR
 #undef PY_DEF_TP_CALL
 #undef PY_DEF_AS_MAP
 
 #define PY_DEF_DESTRUCTOR	    PY_memdes_tp_dealloc
 #define PY_DEF_TP_METH              NULL
 #define PY_DEF_TP_PRINT             NULL
+#define PY_DEF_TP_REPR              NULL
 #define PY_DEF_TP_CALL              NULL
 #define PY_DEF_AS_MAP               NULL
 

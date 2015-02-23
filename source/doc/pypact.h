@@ -260,6 +260,17 @@ These module methods take a <tt>pdbdata</tt> object and return the individual fi
 <!-- <dt><tt>getmember(obj)</tt> - returns None. -->
 </dl>
 
+<p>
+These modules methods can be used to print the contents of objects.
+These replace the output from the <tt>print</tt> statement in
+earlier version.  Python 3 changed the way objects are printed
+requiring the addition of these functions.
+
+<dl>
+<dt><tt>printdata(obj [, file])</tt> - print a <tt>pdbdata</tt> object to stdout.
+<dt><tt>printdefstr(obj [, file])</tt> - print a <tt>defstr</tt> object to stdout.
+</dl>
+
 In addition to using the constructor,
 a pdbdata can be returned by any method that returns user data; for example, 
 <tt>pdbfile.read</tt>.

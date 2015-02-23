@@ -268,10 +268,12 @@ static PyObject *PY_PDBfile_write(PY_PDBfile *self,
 
 static PyObject *PY_PDBfile_write_raw(PY_PDBfile *self,
 				      PyObject *args, PyObject *kwds)
-   {int ok, nd, nb;
+   {int ok, nd;
     long ind[MAXDIM * 3];
-    char *name, *type, *bf, *fmt;
+    char *name, *type;
+    void *bf;
     PDBfile *fp;
+    Py_buffer view;
     PyObject *indobj, *rv;
     char *kw_list[] = {"name", "var", "type", "ind", NULL};
 
@@ -280,54 +282,15 @@ static PyObject *PY_PDBfile_write_raw(PY_PDBfile *self,
     fp     = self->pyo;
     indobj = NULL;
 
-/* GOTCHA: ask Lee Taylor
- * python 2 worked with t#, python 3 likes s# instead
- */
-#if PY_MAJOR_VERSION >= 3
-    fmt = "ss#s|O:write_raw";
-#else
-    fmt = "st#s|O:write_raw";
-#endif
-
     if (PyArg_ParseTupleAndKeywords(args, kwds,
-				    fmt, kw_list,
-				    &name,
-				    &bf, &nb,
+				    "ss*s|O:write_raw", kw_list,
+				    &name, &view,
 				    &type, &indobj))
        {if (fp == NULL)
 	   PP_error_set_user(NULL, "file is not open");
 
 	else
-	   {
-
-#if PY_MAJOR_VERSION >= 3
-
-/* NOTE: python versions are inconsistent here
- * python 2 worked without str(d) and with str(d) shows:
- *  16 double   0x14a1d3c   for double[2]
- *   8 double * 0x14b10e4   for double *  pointing to 4 doubles
- * python 3 requires str(d) and shows:
- *  61 double   0x7f2e4e5d3f40   for double[2]
- *  32 double * 0x7f2e4e51b530   for double *  pointing to 4 doubles
- * for the diagnostic print:
- *    fprintf(stderr, "-> %d %s %p\n", nb, type, bf);
- * so python 3 is inconsistent about type and length
- */
-            if (_PD_indirection(type) == TRUE)
-               {char ty[BFSML];
-                char *t, **p;
-
-                SC_strncpy(ty, BFSML, type, -1);
-
-                t = CMAKE_N(char, nb);
-                memcpy(t, bf, nb);
-
-                for ( ; _PD_indirection(ty) == TRUE; t = (char *) p)
-		    {p  = CMAKE(char *);
-                     *p = t;
-                     PD_dereference(ty);};
-                bf = (char *) p;};
-#endif
+	   {bf = view.buf;
             if (indobj == NULL)
 	       ok = PD_write(fp, name, type, bf);
 	    else
@@ -341,6 +304,8 @@ static PyObject *PY_PDBfile_write_raw(PY_PDBfile *self,
 	    else
 	       {rv = Py_None;
 		Py_INCREF(rv);};};};
+
+    PyBuffer_Release(&view);
 
     return(rv);}
 
@@ -558,7 +523,7 @@ static PyObject *PY_PDBfile_reset_vif(PY_PDBfile *self,
 /* reset */
 	PP_init_type_map_basic(fileinfo);
 
-	rv = Py_None;
+        rv = Py_None;
 
 	Py_INCREF(rv);};
 

@@ -9,7 +9,7 @@
 #include "cpyright.h"
 
 #define PY_DEF_DESTRUCTOR	    PY_pcons_tp_dealloc
-#define PY_DEF_REPR                 PY_pcons_tp_repr
+#define PY_DEF_TP_REPR              PY_pcons_tp_repr
 #define PY_DEF_TP_METH              PY_pcons_methods
 #define PY_DEF_AS_MAP	            &PY_pcons_as_mapping
 
