@@ -386,6 +386,9 @@ Group PACT {
    CC_FAMILY  = generic
    CC_EXE     = `which cc`
    CC_VERSION = ""
+   CX_FAMILY  = generic
+   CX_EXE     = ""
+   CX_VERSION = ""
    FC_FAMILY  = generic
    FC_VERSION = ""
 }

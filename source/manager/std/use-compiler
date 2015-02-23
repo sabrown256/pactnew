@@ -99,8 +99,10 @@ switch ($cname)
 # ABSOFT
    case af90*:
         set pact_cc_family = GNU
+        set pact_cx_family = GNU
         set pact_fc_family = ABSOFT
         set cname = gcc
+        set xname = g++
         set fname = af90
         set opt   = ( --version )
         set pat   = ( Absoft )
@@ -110,6 +112,7 @@ switch ($cname)
 # CLANG
    case clang*:
         set pact_cc_family = CLANG
+        set pact_cx_family = CLANG
         set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( clang version )
@@ -129,8 +132,10 @@ switch ($cname)
    case intel*:
         set cname = icc
    case icc*:
+        set xname = iCC
         set fname = ifort
         set pact_cc_family = INTEL
+        set pact_cx_family = INTEL
         set pact_fc_family = INTEL
         set opt   = ( -v )
         set pat   = ( version )
@@ -140,9 +145,11 @@ switch ($cname)
 # OPEN64
    case open64*:
         set cname = opencc
-        set fname = openf90
    case opencc*:
+        set xname = openCC
+        set fname = openf90
         set pact_cc_family = OPEN64
+        set pact_cx_family = OPEN64
         set pact_fc_family = OPEN64
         set opt   = ( -v )
         set pat   = ( Open64 Compiler Suite: Version )
@@ -154,8 +161,10 @@ switch ($cname)
    case pathscale*:
         set cname = pathcc
    case pathcc*:
+        set xname = pathCC
         set fname = pathf90
         set pact_cc_family = PATHSCALE
+        set pact_cx_family = PATHSCALE
         set pact_fc_family = PATHSCALE
         set opt   = ( -v )
         set pat   = ( Compiler Suite: Version )
@@ -165,19 +174,23 @@ switch ($cname)
 # PCC
    case pcc*:
         set pact_cc_family = PCC
+        set pact_cx_family = GNU
         set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( pcc )
         set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
+        set xname = g++
         set fname = gfortran
         breaksw
 
 # PGI
    cae pgi*
         set cname = pgcc
-        set fname = pgf90
    case pgcc*:
+        set xname = pgCC
+        set fname = pgf90
         set pact_cc_family = PGI
+        set pact_cx_family = PGI
         set pact_fc_family = PGI
         set opt   = ( -V )
         set pat   = ( target on )
@@ -188,58 +201,70 @@ switch ($cname)
 # SUN
    case suncc*:
         set pact_cc_family = SUN
+        set pact_cx_family = SUN
         set pact_fc_family = SUN
         set opt   = ( -V )
         set pat   = ( cc: Sun C )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
+        set xname = sunCC
         set fname = sunf90
         breaksw
 
 # Tau
    case tau_cc*:
         set pact_cc_family = TAU
+        set pact_cx_family = TAU
         set pact_fc_family = TAU
         set opt   = ( -v )
         set pat   = ( tau_cc version )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
+        set xname = tau_CC
         set fname = tau_f90
         breaksw
 
 # TinyCC
    case tcc*:
         set pact_cc_family = TCC
+        set pact_cx_family = GNU
         set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( tcc version )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
+        set xname = g++
         set fname = gfortran
         breaksw
 
 # XLC
    case *xlc*:
         set pact_cc_family = XLC
+        set pact_cx_family = XLC
         set pact_fc_family = XLF
         set opt   = ( -qversion )
         set pat   = ( IBM XL )
         set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
+        set xname = xlC
         set fname = ( `echo $cname | sed 's|xlc|xlf90|'` )
         breaksw
 
 # GNU is default
    default:
         set pact_cc_family = GNU
+        set pact_cx_family = GNU
         set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( gcc version )
         set prog  = ( '$0 ~ /'$pat'/ { print $3 } $0 ~ /Compile line:/ { print $3 }' )
+        set xname = g++
         set fname = gfortran
         breaksw
 endsw
 
 Note $ALog "Info derived from ${cname}:"
 Note $ALog "   pact_cc_family  = $pact_cc_family"
+Note $ALog "   pact_cx_family  = $pact_cx_family"
 Note $ALog "   pact_fc_family  = $pact_fc_family"
 Note $ALog "   cname           = $cname"
+Note $ALog "   xname           = $xname"
 Note $ALog "   fname           = $fname"
 Note $ALog "   Version option  = $opt"
 Note $ALog "   Version pattern = $pat"
@@ -253,10 +278,13 @@ Note $ALog "   Version awk     = $prog"
 Separator $ALog
 
 set cc     = none
+set cx     = none
 set fc     = none
 set croot  = none
+set xroot  = none
 set froot  = none
 set lcvers = none
+set lxvers = none
 set lfvers = none
 set lrpath = ""
 
@@ -265,7 +293,7 @@ set lrpath = ""
 # do C last to get its environment as the final result
 
 set dirl = ""
-foreach c ($fname $cname)
+foreach c ($fname $xname $cname)
 
    set cmp = `which $c`
    Note $ALog "cmp = $cmp"
@@ -315,6 +343,8 @@ foreach c ($fname $cname)
       continue
    endif
 
+#--------------------------------------------------------------------------
+
 # only take lfvers and froot from Fortran compiler
    if ($c == $fname) then
       set bindir = $sdir
@@ -362,6 +392,57 @@ foreach c ($fname $cname)
       set froot = $bindir:h
       unset bindir
 
+#--------------------------------------------------------------------------
+
+# only take lxvers and xroot from C++ compiler
+   else if ($c == $xname) then
+      set bindir = $sdir
+
+# query the compiler for information
+      set inf = ( `$cmp $opt |& $Awk "$prog"` )
+      Note $ALog " inf = $inf"
+      if ($#inf > 1) then
+         set lxvers = $inf[2]
+         set cx     = $inf[1]
+         set bindir = $cx:h
+
+      else if ($#inf > 0) then
+
+# NOTE: some compilers such as ifort lie about their versions
+# ifort 12.1.xxx all say they are 12.1.0
+# so take the version from the installed path in such a case.
+# this depends on some coordination with the ccomp script
+# and the fact that installations of multiple versions must
+# be more nearly correct in their identifications
+         echo "$inf" |& grep $lvers >& /dev/null
+	 if ($status == 0) then
+            set lxvers = $lvers
+            set cx     = $inf
+            set bindir = $inf:h
+         else
+            set lxvers = $inf[1]
+            set cx     = $cmp
+         endif
+      else
+
+# NOTE: if we cannot decipher the version just reverify
+# that the compiler doesn't crash trying to get the version
+# and use that
+         $cmp $opt >& /dev/null
+         if ($status == 0) then
+            set lxvers = unknown
+            set cx     = $cmp
+         endif
+      endif
+
+      if (!(-f "$lxvers")) then
+         set lxvers = ( `echo $lxvers | $Sed 's/[-_]/./g'` )
+      endif
+      set xroot = $bindir:h
+      unset bindir
+
+#--------------------------------------------------------------------------
+
 # only take lcvers and croot from C compiler
    else if ($c == $cname) then
       set bindir = $sdir
@@ -392,6 +473,8 @@ foreach c ($fname $cname)
          endif
 
       else
+
+#--------------------------------------------------------------------------
 
 # NOTE: if we cannot decipher the version just reverify
 # that the compiler doesn't crash trying to get the version
@@ -436,6 +519,7 @@ endif
 # check the bits for the compiler library
 if ("$lbits" == 32) then
    set croot = `echo $croot | $Sed 's/-64//'`
+   set xroot = `echo $xroot | $Sed 's/-64//'`
    set froot = `echo $froot | $Sed 's/-64//'`
 endif
 
@@ -443,12 +527,17 @@ set pact_cc_version = $lcvers
 set pact_cc_path    = $croot
 set pact_cc_exe     = $cc
 
+set pact_cx_version = $lxvers
+set pact_cx_path    = $xroot
+set pact_cx_exe     = $cx
+
 set pact_fc_version = $lfvers
 set pact_fc_path    = $froot
 set pact_fc_exe     = $fc
 
 if ($pact_cc_family == PATHSCALE) then
    set pact_cc_path = $pact_cc_path/lib/$lcvers
+   set pact_cx_path = $pact_cx_path/lib/$lxvers
    set pact_fc_path = $pact_fc_path/lib/$lfvers
 endif
 
@@ -456,6 +545,10 @@ dbmset $ALog PACT_CC_FAMILY   = $pact_cc_family^   \
              PACT_CC_VERSION  = $pact_cc_version^  \
              PACT_CC_PATH     = $pact_cc_path^     \
              PACT_CC_EXE      = $pact_cc_exe^      \
+             PACT_CX_FAMILY   = $pact_cx_family^   \
+             PACT_CX_VERSION  = $pact_cx_version^  \
+             PACT_CX_PATH     = $pact_cx_path^     \
+             PACT_CX_EXE      = $pact_cx_exe^      \
              PACT_FC_FAMILY   = $pact_fc_family^   \
              PACT_FC_VERSION  = $pact_fc_version^  \
              PACT_FC_PATH     = $pact_fc_path^     \
@@ -497,6 +590,10 @@ if ($vrb == TRUE) then
    NoteD $ALog "   PACT_CC_VERSION  = $pact_cc_version"
    NoteD $ALog "   PACT_CC_PATH     = $pact_cc_path"
    NoteD $ALog "   PACT_CC_EXE      = $pact_cc_exe"
+   NoteD $ALog "   PACT_CX_FAMILY   = $pact_cx_family"
+   NoteD $ALog "   PACT_CX_VERSION  = $pact_cx_version"
+   NoteD $ALog "   PACT_CX_PATH     = $pact_cx_path"
+   NoteD $ALog "   PACT_CX_EXE      = $pact_cx_exe"
    NoteD $ALog "   PACT_FC_FAMILY   = $pact_fc_family"
    NoteD $ALog "   PACT_FC_VERSION  = $pact_fc_version"
    NoteD $ALog "   PACT_FC_PATH     = $pact_fc_path"
