@@ -2962,12 +2962,10 @@ char **file_text(int sort, char *fname, ...)
 	in = fopen_safe(file, "r");
 	if (in != NULL)
 	   {sa = file_strings(in);
-	    fclose_safe(in);}
-	else
-	   fprintf(stderr, "FILE_TEXT: Failed to open '%s'\n", file);
+	    fclose_safe(in);
 
-	if (sort == TRUE)
-	   run(FALSE, "rm -f %s", file);};
+	    if (sort == TRUE)
+	       run(FALSE, "rm -f %s", file);};};
 
     return(sa);}
 

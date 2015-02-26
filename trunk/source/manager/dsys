@@ -2463,7 +2463,8 @@ CFG_DONE:
         if ($strict == FALSE) then
            set BinFiles = ( $BinFiles smake dmake pact template )
            set BinFiles = ( $BinFiles acc afc a++ acpp aranlib )
-           set BinFiles = ( $BinFiles cfgman system-id timer px frnsic )
+           set BinFiles = ( $BinFiles cfgman system-id timer )
+           set BinFiles = ( $BinFiles pwhere px frnsic )
            set BinFiles = ( $BinFiles do-run elide blang rpath gexec perdb )
            set BinFiles = ( $BinFiles file-time make-syntax )
            set BinFiles = ( $BinFiles import-api )
