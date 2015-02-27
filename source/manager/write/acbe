@@ -46,9 +46,9 @@ unsetenv PACT_FC_FAMILY
 unsetenv PACT_FC_VERSION
 unsetenv PACT_FC_PATH
 
-unsetenv PACT_CXX_FAMILY
-unsetenv PACT_CXX_VERSION
-unsetenv PACT_CXX_PATH
+unsetenv PACT_CX_FAMILY
+unsetenv PACT_CX_VERSION
+unsetenv PACT_CX_PATH
 
 set stl = ( `file-time -m sec $inf` )
 @ nstl = $#stl
