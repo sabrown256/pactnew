@@ -25,6 +25,7 @@ Group OCV {
    StackP  = 
 }
 
+#run analyze/rpath gnu
 run analyze/rpath -a /usr/${OCV_MINGW}/lib
 run analyze/rpath -a /usr/lib/gcc/${OCV_MINGW}/4.6
 

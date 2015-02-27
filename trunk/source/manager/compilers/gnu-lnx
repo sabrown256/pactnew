@@ -7,6 +7,8 @@
 # include "cpyright.h"
 #
 
+run analyze/rpath gnu
+
 Group OCV {
    Bits   = [ _env_ = Bits ;              # address bit size
               *     = -m* ]

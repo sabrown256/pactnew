@@ -104,6 +104,7 @@ Group OpenMP {
 
 Group TEST {
    ADVISORY = ${TEST_ADVISORY}:score_mpi
+   SKIP    += pdb:pdb_chk++
 }
 
 include cpp-rule

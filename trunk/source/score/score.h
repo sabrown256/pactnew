@@ -1172,8 +1172,10 @@ extern int64_t
  SC_stol(char *s),
  SC_stoi(char *s);
 
+#ifndef __cplusplus
 extern long double _Complex
  SC_stoc(char *s);
+#endif
 
 extern unsigned int
  SC_char_index(char *s, int n);

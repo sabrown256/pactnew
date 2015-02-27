@@ -93,6 +93,10 @@ Group OpenMP {
    SharedFnc = yes
 }
 
+Group TEST {
+   SKIP    += pdb:pdb_chk++
+}
+
 include cpp-rule
 include serial
 
