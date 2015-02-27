@@ -27,6 +27,18 @@ while ($#argv > 0)
    shift
 end
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($TEST_SKIP =~ *scripts:dobatch*) then
+
+   NoteD $Log "                    $msg skipped"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DOB - test functions-pact
+
 # NOTE: this may be incorrect wrt JOBS_System
 # batch execution is not equivalent to DP but they often go together
 # the mpirun avaiable as a package with Linux distributions
@@ -35,12 +47,7 @@ end
 # for now assume you have to have a real resource manager
 # such as SLURM in order to run batch
 
-if (($CROSS_COMPILE == FALSE) && ($JOBS_System != loner)) then
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# DOB - test functions-pact
+else if (($CROSS_COMPILE == FALSE) && ($JOBS_System != loner)) then
 
    NoteD $Log -n "                    $msg"
 

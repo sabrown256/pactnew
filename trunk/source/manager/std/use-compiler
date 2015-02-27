@@ -98,12 +98,12 @@ switch ($cname)
 
 # ABSOFT
    case af90*:
-        set pact_cc_family = GNU
-        set pact_cx_family = GNU
-        set pact_fc_family = ABSOFT
         set cname = gcc
         set xname = g++
         set fname = af90
+        set pact_cc_family = GNU
+        set pact_cx_family = GNU
+        set pact_fc_family = ABSOFT
         set opt   = ( --version )
         set pat   = ( Absoft )
         set prog  = ( '$0 ~ /'$pat'/ { print $5 } $0 ~ /Compile line:/ { print $3 }' )
@@ -111,6 +111,8 @@ switch ($cname)
 
 # CLANG
    case clang*:
+        set xname = clang++
+        set fname = gfortran
         set pact_cc_family = CLANG
         set pact_cx_family = CLANG
         set pact_fc_family = GNU
@@ -125,14 +127,13 @@ switch ($cname)
 
 #        set prog  = ( '$0 ~ /'$pat'/ { print $3 } $0 ~ /Compile line:/ { print $3 }' )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
-        set fname = gfortran
         breaksw
 
 # INTEL
    case intel*:
         set cname = icc
    case icc*:
-        set xname = iCC
+        set xname = icpc
         set fname = ifort
         set pact_cc_family = INTEL
         set pact_cx_family = INTEL
@@ -154,7 +155,6 @@ switch ($cname)
         set opt   = ( -v )
         set pat   = ( Open64 Compiler Suite: Version )
         set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
-        set fname = openf90
         breaksw
 
 # PATHSCALE
@@ -173,14 +173,14 @@ switch ($cname)
 
 # PCC
    case pcc*:
+        set xname = g++
+        set fname = gfortran
         set pact_cc_family = PCC
         set pact_cx_family = GNU
         set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( pcc )
         set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
-        set xname = g++
-        set fname = gfortran
         breaksw
 
 # PGI
@@ -195,67 +195,66 @@ switch ($cname)
         set opt   = ( -V )
         set pat   = ( target on )
         set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
-        set fname = pgf90
         breaksw
 
 # SUN
    case suncc*:
+        set xname = sunCC
+        set fname = sunf90
         set pact_cc_family = SUN
         set pact_cx_family = SUN
         set pact_fc_family = SUN
         set opt   = ( -V )
         set pat   = ( cc: Sun C )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
-        set xname = sunCC
-        set fname = sunf90
         breaksw
 
 # Tau
    case tau_cc*:
+        set xname = tau_CC
+        set fname = tau_f90
         set pact_cc_family = TAU
         set pact_cx_family = TAU
         set pact_fc_family = TAU
         set opt   = ( -v )
         set pat   = ( tau_cc version )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
-        set xname = tau_CC
-        set fname = tau_f90
         breaksw
 
 # TinyCC
    case tcc*:
+        set xname = g++
+        set fname = gfortran
         set pact_cc_family = TCC
         set pact_cx_family = GNU
         set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( tcc version )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
-        set xname = g++
-        set fname = gfortran
         breaksw
 
 # XLC
    case *xlc*:
+        set xname = xlC
+        set fname = ( `echo $cname | sed 's|xlc|xlf90|'` )
         set pact_cc_family = XLC
         set pact_cx_family = XLC
         set pact_fc_family = XLF
         set opt   = ( -qversion )
         set pat   = ( IBM XL )
         set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
-        set xname = xlC
-        set fname = ( `echo $cname | sed 's|xlc|xlf90|'` )
         breaksw
 
 # GNU is default
    default:
+        set xname = g++
+        set fname = gfortran
         set pact_cc_family = GNU
         set pact_cx_family = GNU
         set pact_fc_family = GNU
         set opt   = ( -v )
         set pat   = ( gcc version )
         set prog  = ( '$0 ~ /'$pat'/ { print $3 } $0 ~ /Compile line:/ { print $3 }' )
-        set xname = g++
-        set fname = gfortran
         breaksw
 endsw
 

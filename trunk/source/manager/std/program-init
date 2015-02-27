@@ -472,6 +472,7 @@ Group STD {
 
 Group TEST {
    ADVISORY = ""
+   SKIP     = ""
 }
 
 # the USE group contains features that have been requested, verified to

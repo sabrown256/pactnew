@@ -38,10 +38,10 @@ dbmget $WLog AR_Exe^                      \
              CXX_Optimize^                \
              CXX_Profile^                 \
              LD_Exe^                      \
-             PACT_CXX_EXE      =\? g++^   \
-             PACT_CXX_FAMILY^             \
-             PACT_CXX_VERSION^            \
-             PACT_CXX_PATH^               \
+             PACT_CX_EXE      =\? g++^    \
+             PACT_CX_FAMILY^              \
+             PACT_CX_VERSION^             \
+             PACT_CX_PATH^                \
              PSY_Arch^                    \
              PSY_Root^                    \
              PSY_TmpDir^                  \
@@ -50,8 +50,8 @@ dbmget $WLog AR_Exe^                      \
 setenv BinDir  $PSY_Root/bin
 setenv EtcDir  $PSY_Root/etc
              
-flog $WLog set exe    = $PACT_CXX_EXE
-flog $WLog set vers   = $PACT_CXX_VERSION
+flog $WLog set exe    = $PACT_CX_EXE
+flog $WLog set vers   = $PACT_CX_VERSION
 flog $WLog set comp   = $exe:t
 flog $WLog set outf = $BinDir/a++
 flog $WLog $RM $outf
@@ -62,7 +62,7 @@ flog $WLog touch $outf
 
 Note $outf '#\!/bin/csh -f'
 Note $outf '#'
-Note $outf "# A++ - abstract compiler wrapper for $PACT_CXX_EXE"
+Note $outf "# A++ - abstract compiler wrapper for $PACT_CX_EXE"
 Note $outf '#'
 Note $outf '# include "cpyright.h"'
 Note $outf '#'
