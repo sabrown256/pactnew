@@ -282,12 +282,14 @@ DEF_FUNCTION_PTR(double, Double);
 DEF_FUNCTION_PTR(double *, PDouble);
 DEF_FUNCTION_PTR(long double, LongDouble);
 DEF_FUNCTION_PTR(long double *, PLongDouble);
+#ifndef __cplusplus
 DEF_FUNCTION_PTR(float _Complex, FloatComplex);
 DEF_FUNCTION_PTR(float _Complex *, PFloatComplex);
 DEF_FUNCTION_PTR(double _Complex, DoubleComplex);
 DEF_FUNCTION_PTR(double _Complex *, PDoubleComplex);
 DEF_FUNCTION_PTR(long double _Complex, LongDoubleComplex);
 DEF_FUNCTION_PTR(long double _Complex *, PLongDoubleComplex);
+#endif
 DEF_FUNCTION_PTR(quaternion, Quaternion);
 DEF_FUNCTION_PTR(quaternion *, PQuaternion);
 DEF_FUNCTION_PTR(FILE, FILE);

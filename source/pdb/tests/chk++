@@ -7,22 +7,30 @@
 
 unalias *
 
+@ err = 0
+
 source ../../tests/common
 
-set msg = "PDB C++ API Test ..................."
+if ($TEST_SKIP !~ *pdb:pdb_chk++*) then
 
-NoteD $Log ""
-NoteD $Log -n "                    $msg"
-Note $Log ""
+   set msg = "PDB C++ API Test ..................."
 
-set res = chk++.res
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
 
-a++ -ag -I$IncDir -c $FilesDir/chk++.cc -o chk++.o >&! $res
-@ xstatus = `cat $res | wc -l`
+   set res = chk++.res
 
-set rpf = ( $rpf chk++.o )
+   flog $Log pwhere a++
+   flog $Log ( a++ -ag -I$IncDir -c $FilesDir/chk++.cc -o chk++.o >&! $res )
+   @ xstatus = `cat $res | wc -l`
 
-$TEST_CHECK part -a chk++ -e $xstatus -dt $dt -rpf "$rpf" none
+   set rpf = ( $rpf chk++.o )
 
-exit($status)
+   $TEST_CHECK part -a chk++ -e $xstatus -dt $dt -rpf "$rpf" none
+   @ err = $err + $status
+
+endif
+
+exit($err)
 

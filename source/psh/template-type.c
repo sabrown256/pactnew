@@ -12,6 +12,7 @@
 
 static void def_type_manager(FILE *fp, int ne, type_desc *tl)
    {int id;
+    pboolean cxx;
     char **tia;
     type_desc *td, *tp;
 
@@ -112,12 +113,19 @@ static void def_type_manager(FILE *fp, int ne, type_desc *tl)
     fprintf(fp, "\n");
 
 /* function pointer typedefs for statically defined types */
+    cxx = B_F;
     tia = NULL;
     tia = lst_push(tia, "DEF_FUNCTION_PTR(void, Void);\n");
     for (id = 0; id < ne; )
         {td  = tl + id++;
          if ((td->g != KIND_OTHER) && (td->alias == NULL))
-	    {tia = lst_push(tia, "DEF_FUNCTION_PTR(%s, %s);\n",
+	    {if ((td->g == KIND_COMPLEX) && (cxx == B_F))
+	        {cxx = B_T;
+		 tia = lst_push(tia, "#ifndef __cplusplus\n");}
+	     else if ((td->g == KIND_QUATERNION) && (cxx == B_T))
+	        {cxx = B_F;
+		 tia = lst_push(tia, "#endif\n");};
+	     tia = lst_push(tia, "DEF_FUNCTION_PTR(%s, %s);\n",
 			    td->type, fix_camelcase(td->type));
 	     if (td->ptr == B_T)
 	        {tp  = tl + id++;
