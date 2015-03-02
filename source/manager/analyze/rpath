@@ -88,11 +88,12 @@ if (!(-x "$VAR_LIST")) then
    exit(1)
 endif
 
-dbmget /dev/null Cfg_RPATH^    \
-                 LD_RPath^     \
-                 LIB^          \
-                 PACT_CC_PATH^ \
-                 PATH^         \
+dbmget /dev/null Cfg_RPATH^     \
+                 CROSS_COMPILE^ \
+                 LD_RPath^      \
+                 LIB^           \
+                 PACT_CC_PATH^  \
+                 PATH^          \
                  RPATH
 
 switch ($Tgt)
@@ -294,6 +295,15 @@ CLEAN_PATH:
                    break
                 endif
              end
+
+# GOTCHA: this filtering of paths should be driven by a variable
+# set in the config files
+             if (($ok == TRUE) && ($CROSS_COMPILE != FALSE)) then
+                if (($i == /usr/lib) || ($i == /usr/lib64)) then
+                   set ok = FALSE
+                endif
+             endif
+
              if ($ok == TRUE) then
                 set npath = ( $npath $i )
              endif
