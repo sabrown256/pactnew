@@ -191,32 +191,35 @@ char *fix_type_designator(int fl, char *fmt, ...)
     char t[BFLRG];
     char *p, *rv;
 
-    VA_START(fmt);
-    VSNPRINTF(t, BFLRG, fmt);
-    VA_END;
+    rv = NULL;
 
-    if (fl & 1)
-       upcase(t);
-    else
-       downcase(t);
-    rv = subst(t, " ", "_", -1);
-    rv = subst(rv, "__", "_", -1);
+    if (fmt != NULL)
+       {VA_START(fmt);
+	VSNPRINTF(t, BFLRG, fmt);
+	VA_END;
+
+	if (fl & 1)
+	   upcase(t);
+	else
+	   downcase(t);
+	rv = subst(t, " ", "_", -1);
+	rv = subst(rv, "__", "_", -1);
     
 /* fix hated _t types
  * e.g. G_INT32_T_I -> G_INT32_I
  * or   G_INT32_T_P_I -> G_INT32_P_I
  */
-    if (fl & 2)
-       {nc = strlen(rv);
-	p  = rv + nc - 2;
-	if ((strcmp(p, "_I") == 0) || (strcmp(p, "_S") == 0))
-	   {p -= 2;
-	    if (strncmp(p, "_P", 2) == 0)
-	       p -= 2;
-	    if (strncmp(p, "_T", 2) == 0)
-	       memmove(p, p+2, strlen(p)-1);};};
+	if (fl & 2)
+	   {nc = strlen(rv);
+	    p  = rv + nc - 2;
+	    if ((strcmp(p, "_I") == 0) || (strcmp(p, "_S") == 0))
+	       {p -= 2;
+		if (strncmp(p, "_P", 2) == 0)
+		   p -= 2;
+		if (strncmp(p, "_T", 2) == 0)
+		   memmove(p, p+2, strlen(p)-1);};};
 
-    rv = STRSAVE(rv);
+	rv = STRSAVE(rv);};
 
     return(rv);}
 
