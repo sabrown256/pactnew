@@ -326,7 +326,7 @@ static char *_PG_X_find_scalable_font(PG_device *dev,
 
 /* change from "-0-" to "-<size>-" */
 		 case 8 :     /* point size */
-		      sprintf(&nfn[j], "%d", size);
+		      snprintf(&nfn[j], nc, "%d", size);
 		      while (nfn[j] != '\0')
 			 j++;
 		      if (name[i+1] != '\0')
@@ -336,7 +336,8 @@ static char *_PG_X_find_scalable_font(PG_device *dev,
 /* change from an unspecified resolution to dx[0] or dx[1] */
 		 case 9 :    /* x-resolution */
 		 case 10 :   /* y-resolution */
-		      sprintf(nfn+j, "%d", (field == 9) ? dx[0] : dx[1]);
+		      snprintf(nfn+j, nc-j, "%d",
+			       (field == 9) ? dx[0] : dx[1]);
 		      while (nfn[j] != '\0')
 			 j++;
 		      while ((name[i+1] != '-') && (name[i+1] != '\0'))

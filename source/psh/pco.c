@@ -1710,9 +1710,7 @@ static void env_subst(client *cl, char *refvar, char *nt)
 /*--------------------------------------------------------------------------*/
 
 /* DO_COND_SET - perform conditional assignment of VAL to VAR
- *             - check value of VAL
- *             - we want things such as "foo =? $bar" to do nothing if
- *             - "$bar" is not defined
+ *             - only do assigment if VAL is not empty
  */
 
 void do_cond_set(client *cl, char *var, char *oper, char *val)
@@ -1856,11 +1854,11 @@ static void set_var(client *cl, char *var, char *oper, char *val)
 
 	FREE(t);}
 
-/* set variable to value only if value is defined and not empty */
+/* set variable to value only if value is not empty */
     else if (strcmp(oper, "=?") == 0)
        do_cond_set(cl, fvar, "=?", val);
 
-/* set variable only if variable undefined and value is defined and not empty */
+/* set variable only if variable undefined and value is not empty */
     else if (strcmp(oper, "?=") == 0)
        {if (dbdef(cl, fvar) == FALSE)
 	   do_cond_set(cl, fvar, "?=", val);

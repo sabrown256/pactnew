@@ -9,7 +9,7 @@
 
 I) Introduction
 
-Do-net is a script to automate the setup, building, testing, and installation
+Do-net is a utility to automate the setup, building, testing, and installation
 of a code system on multiple hosts possibly on multiple networks as efficiently
 as possible.  This means that codes for which multiple simultaneous builds from
 a single set of sources is possible can be built in the shortest time. There
