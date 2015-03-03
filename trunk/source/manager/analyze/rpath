@@ -88,12 +88,13 @@ if (!(-x "$VAR_LIST")) then
    exit(1)
 endif
 
-dbmget /dev/null Cfg_RPATH^     \
-                 CROSS_COMPILE^ \
-                 LD_RPath^      \
-                 LIB^           \
-                 PACT_CC_PATH^  \
-                 PATH^          \
+dbmget /dev/null Cfg_RPATH^        \
+                 RF_RPATH_FILTER^  \
+                 CROSS_COMPILE^    \
+                 LD_RPath^         \
+                 LIB^              \
+                 PACT_CC_PATH^     \
+                 PATH^             \
                  RPATH
 
 switch ($Tgt)
@@ -296,12 +297,20 @@ CLEAN_PATH:
                 endif
              end
 
-# GOTCHA: this filtering of paths should be driven by a variable
-# set in the config files
-             if (($ok == TRUE) && ($CROSS_COMPILE != FALSE)) then
-                if (($i == /usr/lib) || ($i == /usr/lib64)) then
-                   set ok = FALSE
-                endif
+# filter out requested directories
+# comes up with cross compiling where local directories are found
+# and used inappropriately
+# NOTE: this may whack something that was found by an analyzer
+# and give trouble downstream - but it is a good choke point to
+# prevent bad directories getting into the RPATH
+             if (($ok == TRUE) && ($RF_RPATH_FILTER != none)) then
+                set flst = ( `echo $RF_RPATH_FILTER | sed 's|:| |g'` )
+                foreach f ($flst)
+		   if ($i == $f) then
+                      set ok = FALSE
+                      break
+                   endif
+                end
              endif
 
              if ($ok == TRUE) then

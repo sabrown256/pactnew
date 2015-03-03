@@ -16,6 +16,10 @@ Group OCV {
    OMP_Lib = 
 }
 
+Group RF {
+   RPATH_FILTER = /usr/lib:/usr/lib64
+}
+
 include compilers/gnu-bg
 include os/bgq
 

@@ -429,6 +429,7 @@ Group PCO {
 
 # requested features - pre-analyze
 Group RF {
+   RPATH_FILTER   = none
    SPOKES_C       =
    SPOKES_SCHEME  = netcdf
    STATIC_LINKING = FALSE
