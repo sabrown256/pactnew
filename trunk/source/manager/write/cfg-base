@@ -308,6 +308,20 @@ endif
                  case *clang*:
                       set lcfam = clang-lnx
                       breaksw
+                 case *mpiclang*:
+                      echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
+                      if ("$lbts" != "") then
+                         echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      if ($lcc =~ /*) then
+                         set lcdir = $lcc:h
+                         echo "setenv PATH  ${lcdir}:"'${PATH}' >>& $pf
+                         unset lcdir
+                      endif
+                      echo "run std/use-compiler $lcc" >>& $pf
+                      echo "include features/clang-bgq-set" >>& $pf
+                      set lcc = none
+                      breaksw
                  case *mpicc*:
                       echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
                       if ("$lbts" != "") then
@@ -393,6 +407,15 @@ endif
 # all known examples of BG/X machines use scripts to
 # control environment in which compiler runs
 # since PACT uses those scripts we do not need to use ACC
+                 case clang-bgq:
+                 case mp-clang-bgq:
+                      echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
+                      if ("$lbts" != "") then
+                         echo "include ${lbts}-bit" >>& $pf
+                      endif
+                      echo "include auto-$lcc" >>& $pf
+                      breaksw
+
                  case gnu-bgl:
                  case gnu-bgp:
                  case gnu-bgq:

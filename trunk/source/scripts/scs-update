@@ -59,39 +59,46 @@ switch ($scsi[1])
         else
            set repo = ( `$ldir/scs-meta -r` )
 
+           set mode = 0
+
 # update local copy with changes from master repo
-           git pull $repo master >&! .log.sup
-           set xstatus = $status
+           @ xstatus = 0
+
+           switch ($mode)
+
+# old way - actually had a second pull after the report was made
+# AND it does not touch files causing emacs to prompt you to re-read them
+              case 0:
+                   git pull $repo master >&! .log.sup
+                   @ xstatus = $xstatus + $status
+                   if ($xstatus == 0) breaksw
+
+# new way - handles merge/conflict more like CVS and SVN
+# BUT it touches files causing emacs to prompt you to re-read them
+# seriously annoying
+              case 1:
+                   git stash >&! .log.sup
+                   @ xstatus = $xstatus + $status
+                   git pull $repo master >&! .log.sup
+                   @ xstatus = $xstatus + $status
+                   git stash pop >&! .log.sup
+                   @ xstatus = $xstatus + $status
+                   breaksw
+            endsw
 
 # report changed files
-	   if ($sort == TRUE) then
-              grep '|' .log.sup | sed 's/|.*$//' | awk '{printf("   P %s\n", $1);}' | sort -k 2
+           if ($sort == TRUE) then
+              git status --porcelain -uno | sort -k 2
            else
-              grep '|' .log.sup | sed 's/|.*$//' | awk '{printf("   P %s\n", $1);}'
+              git status --porcelain -uno
            endif
+
            if ($xstatus == 0) then
               rm .log.sup
            else
               @ err = $err + $xstatus
               cat .log.sup
            endif
-
-# update this way
-# if this is not done then you eventually get messages like:
-#    On branch master
-#    Your branch is ahead of 'origin/master' by 17 commits.
-# from git status
-# what is the difference between the two pulls?
-           git pull >&! .log.sup
-           @ err = $err + $status
-
-# report status of local changes
-           if ("$scsi[3]" == ".") then
-              git status -s |& egrep -v '^\?'
-           else
-              git status -s |& egrep -v '^\?' | grep "$scsi[3]/"
-           endif
-        endif
 
         popd >& /dev/null
         breaksw

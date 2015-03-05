@@ -1,0 +1,28 @@
+#
+# CLANG-BGQ - define CLANG compiler for IBM BG/Q backend
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Group OCV {
+   CC      = /usr/apps/gnu/clang/llnl/bin/mpiclang
+   CXX     = /usr/apps/gnu/clang/llnl/bin/mpiclang++
+   LD_Lib  = -lc
+   OMP_Lib = 
+}
+
+Group RF {
+   RPATH_FILTER = /usr/lib:/usr/lib64
+}
+
+include compilers/clang-bg
+include os/bgq
+include features/no-fortran
+
+Group TEST {
+  ADVISORY = ${TEST_ADVISORY}:score_retrc
+}
+

@@ -1,0 +1,13 @@
+#
+# AUTO-CLANG - LINUX configuration with CLANG
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run std/use-compiler vers any clang
+
+include compilers/clang-lnx
+

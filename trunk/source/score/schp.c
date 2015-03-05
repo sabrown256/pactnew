@@ -690,7 +690,7 @@ static void _SC_error_fork(PROCESS *pp, PROCESS *cp)
 
 static subtask *_SC_make_group_tasks(char **argv, char **env)
    {int i, n, na;
-    char cmd[MAXLINE];
+    char cmd[BFLRG];
     char **al;
     subtask *pg;
 
@@ -721,7 +721,7 @@ static subtask *_SC_make_group_tasks(char **argv, char **env)
     for (i = 0; i <= n; i++)
         {al = pg[i].argf;
 	 SC_ptr_arr_len(na, al);
-	 SC_concatenate(cmd, MAXLINE, al, 0, na, " ", FALSE);
+	 SC_concatenate(cmd, BFLRG, al, 0, na, " ", FALSE);
 	 pg[i].command = CSTRSAVE(cmd);
 	 pg[i].kind    = TASK_GROUP;};
 
@@ -2019,7 +2019,7 @@ void _SC_copy_filedes(SC_iodes *fb, SC_iodes *fa)
 
 PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
    {int ok, ifd, iex, retry;
-    char name[MAXLINE];
+    char name[BFLRG];
     char *key, *host, *proc, *s, *nm;
     SC_iodes fd[SC_N_IO_CH];
     PROCESS *pp;
@@ -2089,7 +2089,7 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
 	SC_VA_END;
 
 /* copy the name to see where we are going */
-	SC_strncpy(name, MAXLINE, argv[0], -1);
+	SC_strncpy(name, BFLRG, argv[0], -1);
 
 	if (SC_OTHER_HOSTP(name))
 	   {host = SC_strtok(name, ":", s);

@@ -26,77 +26,104 @@ while ($#argv > 0)
    shift
 end
 
-InitLog Log $TestDir/log.blang.$LogSfx
+@ err = 0
 
-flog $Log cd $TestDir
+if ($TEST_SKIP !~ *psh:blang*) then
 
-NoteD $Log ""
+   InitLog Log $TestDir/log.blang.$LogSfx
 
-# omit tests - usually in difficult CROSS_COMPILE situation
-if ($RUN_TESTS == FALSE) then
-   NoteD $Log "                    ${msg}omitted"
+   flog $Log cd $TestDir
+
    NoteD $Log ""
 
-else
+# omit tests - usually in difficult CROSS_COMPILE situation
+   if ($RUN_TESTS == FALSE) then
+      NoteD $Log "                    ${msg}omitted"
+      NoteD $Log ""
 
-   NoteD $Log "                    $msg"
-   Note $Log ""
+   else
 
-   flog $Log set cc = ( ${CC_Exe} ${CC_Debug_Default} ${CC_Flags} -I${IncDir} ${MDG_Inc} ${DP_Inc} )
-   flog $Log set fc = ( ${FC_Exe} ${FC_Debug_Default} ${FC_Flags} -I${IncDir} )
-
-   flog $Log rm -f bl*.* blang
-
-   foreach i (bl1 bl2 bl3 bl4 bl5 bl6)
-
-      @ lerr = 0
-
-      Separator $Log
-
-      set f = ( `fill-string -n 23 $i` )
-      NoteD $Log -n "                        $f"
+      NoteD $Log "                    $msg"
       Note $Log ""
 
-      flog $Log cp $FilesDir/$i.* .
+      flog $Log set cc = ( ${CC_Exe} ${CC_Debug_Default} ${CC_Flags} -I${IncDir} ${MDG_Inc} ${DP_Inc} )
+      flog $Log set fc = ( ${FC_Exe} ${FC_Debug_Default} ${FC_Flags} -I${IncDir} )
 
-      flog $Log set hdr = ${i}_int.h
-      flog $Log $RM $hdr
-      flog $Log touch $hdr
-      Note $hdr '#include <sx_int.h>'
-      Note $hdr '#define G_STR_I  256'
-      Note $hdr '#define G_STR_D(_f)     TRUE'
-      Note $hdr 'struct s_str {long n; char *s;};'
-      Note $hdr 'typedef struct s_str str;'
-      Note $hdr "extern void G_register_${i}_types();"
-      Note $hdr 'extern void *_SX_opt_str(str *x, bind_opt wh, void *a);'
-      flog $Log cat $hdr
+      flog $Log rm -f bl*.* blang
 
-      flog $Log set inf = ( -b $i.bind -c $i.proto )
-      if (-f $i.derivedc) then
-         flog $Log set inf = ( $inf -dv $i.derivedc )
-      endif
-      flog $Log blang $inf
+      foreach i (bl1 bl2 bl3 bl4 bl5 bl6)
 
-      cat $i.proto | \
-      grep -v '#' | \
-      awk '$0 != "" { printf("extern %s;\n", $0); }' >>& $hdr
+         @ lerr = 0
+
+         Separator $Log
+
+         set f = ( `fill-string -n 23 $i` )
+         NoteD $Log -n "                        $f"
+         Note $Log ""
+
+         flog $Log cp $FilesDir/$i.* .
+
+         flog $Log set hdr = ${i}_int.h
+         flog $Log $RM $hdr
+         flog $Log touch $hdr
+         Note $hdr '#include <sx_int.h>'
+         Note $hdr '#define G_STR_I  256'
+         Note $hdr '#define G_STR_D(_f)     TRUE'
+         Note $hdr 'struct s_str {long n; char *s;};'
+         Note $hdr 'typedef struct s_str str;'
+         Note $hdr "extern void G_register_${i}_types();"
+         Note $hdr 'extern void *_SX_opt_str(str *x, bind_opt wh, void *a);'
+         flog $Log cat $hdr
+
+         flog $Log set inf = ( -b $i.bind -c $i.proto )
+         if (-f $i.derivedc) then
+            flog $Log set inf = ( $inf -dv $i.derivedc )
+         endif
+         flog $Log blang $inf
+
+         cat $i.proto | \
+         grep -v '#' | \
+         awk '$0 != "" { printf("extern %s;\n", $0); }' >>& $hdr
 
 # compile Fortran module
-      if ($FC_Exe == none) then
-         NoteD $Log -n "."
-      else
+         if ($FC_Exe == none) then
+            NoteD $Log -n "."
+         else
+            Note $Log ""
+            Note $Log "Compile fortran module"
+            flog $Log set file = gm-$i.f
+            flog $Log ${fc} -c $file
+            @ xstatus = $status
+            if (-f $RefDir/$file) then
+               flog $Log ( grep -v 'isizea =' $file >&! $file.cmp )
+               flog $Log ( grep -v 'isizea =' $RefDir/$file >&! $file.ref.cmp )
+               flog $Log diff $file.cmp $file.ref.cmp
+               if ($status != 0) then
+                  @ xstatus = $xstatus + 1
+                  flog $Log rm -f $file.cmp $file.ref.cmp
+               endif
+            else
+               flog $Log cp $file $RefDir/$file
+            endif
+            if ($xstatus == 0) then
+               NoteD $Log -n "."
+            else
+               NoteD $Log -n "x"
+               @ lerr = $lerr + 1
+            endif
+            unset file
+         endif
+
+# compile Fortran wrapper
          Note $Log ""
-         Note $Log "Compile fortran module"
-         flog $Log set file = gm-$i.f
-         flog $Log ${fc} -c $file
+         Note $Log "Compile fortran wrapper"
+         flog $Log set file = gf-$i.c
+         flog $Log ${cc} -c $file
          @ xstatus = $status
          if (-f $RefDir/$file) then
-            flog $Log ( grep -v 'isizea =' $file >&! $file.cmp )
-            flog $Log ( grep -v 'isizea =' $RefDir/$file >&! $file.ref.cmp )
-            flog $Log diff $file.cmp $file.ref.cmp
+            flog $Log diff $file $RefDir/$file
             if ($status != 0) then
                @ xstatus = $xstatus + 1
-               flog $Log rm -f $file.cmp $file.ref.cmp
             endif
          else
             flog $Log cp $file $RefDir/$file
@@ -108,120 +135,100 @@ else
             @ lerr = $lerr + 1
          endif
          unset file
-      endif
-
-# compile Fortran wrapper
-      Note $Log ""
-      Note $Log "Compile fortran wrapper"
-      flog $Log set file = gf-$i.c
-      flog $Log ${cc} -c $file
-      @ xstatus = $status
-      if (-f $RefDir/$file) then
-         flog $Log diff $file $RefDir/$file
-         if ($status != 0) then
-            @ xstatus = $xstatus + 1
-         endif
-      else
-         flog $Log cp $file $RefDir/$file
-      endif
-      if ($xstatus == 0) then
-         NoteD $Log -n "."
-      else
-         NoteD $Log -n "x"
-         @ lerr = $lerr + 1
-      endif
-      unset file
 
 # compile Scheme wrapper
-      Note $Log ""
-      Note $Log "Compile scheme wrapper"
-      flog $Log set file = gs-$i.c
-      flog $Log ${cc} -c $file
-      @ xstatus = $status
-      if (-f $RefDir/$file) then
-         flog $Log diff $file $RefDir/$file
-         if ($status != 0) then
-            @ xstatus = $xstatus + 1
+         Note $Log ""
+         Note $Log "Compile scheme wrapper"
+         flog $Log set file = gs-$i.c
+         flog $Log ${cc} -c $file
+         @ xstatus = $status
+         if (-f $RefDir/$file) then
+            flog $Log diff $file $RefDir/$file
+            if ($status != 0) then
+               @ xstatus = $xstatus + 1
+            endif
+         else
+            flog $Log cp $file $RefDir/$file
          endif
-      else
-         flog $Log cp $file $RefDir/$file
-      endif
-      if ($xstatus == 0) then
-         NoteD $Log -n "."
-      else
-         NoteD $Log -n "x"
-         @ lerr = $lerr + 1
-      endif
-      unset file
+         if ($xstatus == 0) then
+            NoteD $Log -n "."
+         else
+            NoteD $Log -n "x"
+            @ lerr = $lerr + 1
+         endif
+         unset file
 
 # compile Python wrapper
-      Note $Log ""
-      flog $Log set file = gp-$i.c
-      if ("$HAVE_PYTHON" =~ *TRUE*) then
-         Note $Log "Compile python wrapper"
-         flog $Log ${cc} -I$PY_Inc -c $file
-         @ xstatus = $status
-      else
-         Note $Log "Not compiling python wrapper"
-         @ xstatus = 0
-      endif
-      if (-f $RefDir/$file) then
-         flog $Log diff $file $RefDir/$file
-         if ($status != 0) then
-            @ xstatus = $xstatus + 1
+         Note $Log ""
+         flog $Log set file = gp-$i.c
+         if ("$HAVE_PYTHON" =~ *TRUE*) then
+            Note $Log "Compile python wrapper"
+            flog $Log ${cc} -I$PY_Inc -c $file
+            @ xstatus = $status
+         else
+            Note $Log "Not compiling python wrapper"
+            @ xstatus = 0
          endif
-      else
-         flog $Log cp $file $RefDir/$file
-      endif
+         if (-f $RefDir/$file) then
+            flog $Log diff $file $RefDir/$file
+            if ($status != 0) then
+               @ xstatus = $xstatus + 1
+            endif
+         else
+            flog $Log cp $file $RefDir/$file
+         endif
 
-      if ($xstatus == 0) then
-         NoteD $Log -n "."
-      else
-         NoteD $Log -n "x"
+         if ($xstatus == 0) then
+            NoteD $Log -n "."
+         else
+            NoteD $Log -n "x"
 # GOTCHA: need to rework the python binding tests bl3 and bl6 for structs
-#         @ lerr = $lerr + 1
-      endif
-      unset file
+#            @ lerr = $lerr + 1
+         endif
+         unset file
 
 # compare HTML
-      Note $Log ""
-      flog $Log set file = gh-$i.html
-      @ xstatus = 0
-      if (-f $RefDir/$file) then
-         flog $Log diff $file $RefDir/$file
-         if ($status != 0) then
-            @ xstatus = $xstatus + 1
+         Note $Log ""
+         flog $Log set file = gh-$i.html
+         @ xstatus = 0
+         if (-f $RefDir/$file) then
+            flog $Log diff $file $RefDir/$file
+            if ($status != 0) then
+               @ xstatus = $xstatus + 1
+            endif
+         else
+            flog $Log cp $file $RefDir/$file
          endif
-      else
-         flog $Log cp $file $RefDir/$file
-      endif
-      if ($xstatus == 0) then
-         NoteD $Log -n "."
-      else
-         NoteD $Log -n "x"
-         @ lerr = $lerr + 1
-      endif
-      unset file
+         if ($xstatus == 0) then
+            NoteD $Log -n "."
+         else
+            NoteD $Log -n "x"
+            @ lerr = $lerr + 1
+         endif
+         unset file
 
 # report status
-      Note $Log ""
-      if ($lerr == 0) then
-         NoteD $Log " ok"
-         $RM $i*.* $hdr
-      else
-         NoteD $Log " ng"
-         @ nerr = $nerr + 1
-      endif
+         Note $Log ""
+         if ($lerr == 0) then
+            NoteD $Log " ok"
+            $RM $i*.* $hdr
+         else
+            NoteD $Log " ng"
+            @ nerr = $nerr + 1
+         endif
 
-   end
+      end
 
-   set rpf = ( $rpf *.o *.mod )
+      set rpf = ( $rpf *.o *.mod )
 
-   Separator $Log
+      Separator $Log
 
+   endif
+
+   $TEST_CHECK part -a blang -e $nerr -rpf "$rpf" "$msg"
+
+   @ err = $status
 endif
 
-$TEST_CHECK part -a blang -e $nerr -rpf "$rpf" "$msg"
-
-exit($status)
+exit($err)
 

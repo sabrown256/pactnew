@@ -67,7 +67,7 @@ if ($HAVE_FORTRAN == TRUE) then
       if ($xstatus != 0) then
          Note $ALog ""
          Note $ALog "--Compilation failed--"
-         Note $ALog "/* $lCC -I../.. -c $lsdir/csizer.c -o csizer.o */
+         Note $ALog "/* $lCC -I../.. -c $lsdir/csizer.c -o csizer.o */"
          cat $Tmp.c >>& $ALog
 
          Note $ALog "      Cannot compile csizer.c"
@@ -106,7 +106,7 @@ if ($HAVE_FORTRAN == TRUE) then
       if ($xstatus != 0) then
          Note $ALog ""
          Note $ALog "--Compilation failed--"
-         Note $ALog "/* $lCC -I../.. $lsdir/genfiles.c -o genfiles */
+         Note $ALog "/* $lCC -I../.. $lsdir/genfiles.c -o genfiles */"
          cat $Tmp.c >>& $ALog
 
          Note $ALog "      Cannot compile genfiles.c"
