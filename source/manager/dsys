@@ -2871,8 +2871,10 @@ CFG_DONE:
         Note $Log " "  
 
         Separator $Log
-        flog $Log pwd
         flog $Log printenv
+
+        Separator $Log
+        flog $Log pwd
 
 # GOTCHA: check git status for things like:
 #     Your branch is behind 'origin/master' by <n> commits

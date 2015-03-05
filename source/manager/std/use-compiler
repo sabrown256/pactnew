@@ -110,8 +110,8 @@ switch ($cname)
         breaksw
 
 # CLANG
-   case clang*:
-        set xname = clang++
+   case *clang*:
+        set xname = ( `echo "$cname" | sed 's|clang|clang++|'` )
         set fname = gfortran
         set pact_cc_family = CLANG
         set pact_cx_family = CLANG

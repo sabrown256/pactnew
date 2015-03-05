@@ -173,14 +173,10 @@ void _SC_init_thr_processes(SC_thread_proc *ps, int id)
 
     assert(ps != NULL);
 
+    memset(ps, 0, sizeof(SC_thread_proc));
+
     ps->tid                     = id;
     ps->current_flushed_process = -1;
-    ps->debug                   = FALSE;
-    ps->msh_syntax              = FALSE;
-    ps->debug_proc              = FALSE;
-    ps->wait_list               = NULL;
-    ps->process_list            = NULL;
-    ps->diag                    = NULL;
 
     return;}
 

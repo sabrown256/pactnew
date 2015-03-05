@@ -1,0 +1,12 @@
+#
+# AUTO-MP-CLANG-BGQ - multi-platform CLANG build
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include auto-clang
+include cross-clang-bgq
+

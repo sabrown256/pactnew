@@ -1,0 +1,5 @@
+#
+# CROSS-CLANG-BGQ - add CLANG-BGQ as a CROSS-COMPILEd second platform 
+#
+
+platform auto-clang-bgq-mpi  ${PSY_InstRoot}-mpi

@@ -1,0 +1,13 @@
+#
+# AUTO-CLANG-BGQ - BG/Q back end configuration with CLANG
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run std/use-compiler /usr/local/apps/gnu/clang/llnl/bin/mpiclang
+
+include features/clang-bgq-set
+
