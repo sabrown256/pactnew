@@ -99,6 +99,7 @@ switch ($scsi[1])
               @ err = $err + $xstatus
               cat .log.sup
            endif
+        endif
 
         popd >& /dev/null
         breaksw
