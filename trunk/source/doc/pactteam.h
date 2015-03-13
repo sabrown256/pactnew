@@ -15,7 +15,10 @@ We would like to hear of your experiences with PACT.
 <P>
 <strong>Absolute portability is our goal!!!</strong> 
 <P>
-If PACT does not automatically configure, compile, test, and install itself on your system, please let us know. Also, we would be pleased to discuss adding your mathematical, graphical, or other functionality to future distributions of PACT.
+If PACT does not automatically configure, compile, test, and install itself
+on your system, please let us know. Also, we would be pleased to discuss
+adding your mathematical, graphical, or other functionality to future
+distributions of PACT.
 <P>
 For technical support or to report problems contact:
 <P>

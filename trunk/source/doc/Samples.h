@@ -84,27 +84,6 @@ pdtime
 
 <P>
 
-<B>PPC</B>
-<UL>
-<li>
-pcbtst
-; Test exchange of binary data with process (C API)
-; pact Cstd
-</li>
-<li>
-pcmtst
-; Multiple child test (C API)
-; pact Cstd
-</li>
-<li>
-pcexec
-; Utility to execute child via pipes, sockets, or PTY (C API)
-; pact Cstd
-</li>
-</UL>
-
-<P>
-
 <B>PGS</B>
 <UL>
 <li>

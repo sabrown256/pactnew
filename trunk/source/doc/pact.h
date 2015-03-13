@@ -1,5 +1,5 @@
 TXT: PACT User's Guide
-MOD: 09/29/2012
+MOD: 03/13/2015
 
 <CENTER>
 <h1><FONT color="#ff0000">PACT User's Guide</FONT></h1>
@@ -21,8 +21,6 @@ MOD: 09/29/2012
 <table>
 <tr><td><ul><li><a href="#716865">SCORE</a></ul></td>
 <td>A Low Level Foundation </td></tr>
-<tr><td><ul><li><a href="#716877">PPC</a></ul></td>
-<TD>Portable Process Control Library </TD></TR>
 <TR><TD><ul><li><a href="#716886">PML</a></ul></TD>
 <TD>Portable Mathematics Library </TD></TR>
 <TR><TD><ul><li><a href="#716896">PDB</a></ul></TD>
@@ -115,10 +113,11 @@ systems.<p>
 <a name="pact-org-intro"></a>
 <H3> Organization of PACT</H3>
 
-In its current conception, PACT is a set of nine tools. Eight of these are
-implemented as libraries, and two of them provide both libraries and
+In its current conception, PACT is a set of tools. Some of these are
+implemented as libraries, and some of them provide both libraries and
 executable applications. PACT is entirely coded in C but was designed with
-a view toward support of other languages, notably FORTRAN.<p>
+a view toward support of other languages, notably FORTRAN, and more recently
+PYTHON.<p>
 
 The design of PACT was and is functionally driven. The main idea is to
 identify generic blocks of functionality independent of considerations
@@ -158,10 +157,6 @@ PACT includes the following software libraries and applications:<p>
 <TD>a math library</TD>
 </TR>
 <TR>
-<TD>PPC</TD>
-<TD>a process control library
-</TR>
-<TR>
 <TD>PDB</TD>
 <TD>a portable binary database management library
 </TR>
@@ -183,7 +178,7 @@ PACT includes the following software libraries and applications:<p>
 </TR>
 <TR>
 <TD>SX</TD>
-<TD>Scheme with extensions (PDBView and PDBDiff are SX programs)
+<TD>Scheme with extensions (PDBView, PDBDiff, and ULTRA are SX programs)
 </TR>
 
 </TABLE>
@@ -210,11 +205,11 @@ fit in the following hierarchy:<p>
 
 <CENTER>
 <B>
-ULTRA     SX
+SX
 <BR>
 PANACEA
 <BR>
-PGS     SCHEME   PPC
+PGS     SCHEME
 <BR>
 PDB
 <BR>
@@ -226,7 +221,7 @@ SCORE
 
 <p>
 
-ULTRA and SX are at the top of the hierarchy and SCORE is at the bottom.
+SX is at the top of the hierarchy and SCORE is at the bottom.
 This in turn sits on the more raw, vendor supplied, hierarchy:<p>
 
 <p>
@@ -429,7 +424,6 @@ The list of designators for the PACT tools is:<p>
 
 <TR><TD WIDTH="100">Package</TD><TD WIDTH="100">Designator</TD><TD>Example</TD></TR>
 <TR><TD>SCORE</TD><TD>SC</TD><TD>SC_exec</TD></TR>
-<TR><TD>PPC</TD><TD>PC</TD><TD>PC_open</TD></TR>
 <TR><TD>PML</TD><TD>PM</TD><TD>PM_decompose</TD></TR>
 <TR><TD>PDB</TD><TD>PD</TD><TD>PD_read</TD></TR>
 <TR><TD>SCHEME</TD><TD>SS</TD><TD>SS_eval</TD></TR>
@@ -508,37 +502,6 @@ See Also:  <A HREF="score.html">
 SCORE User&#146;s Manual</A><p>
 
 Dependent PACT Libraries: None<p>
-
-<a name="716877"></a>
-<h3>  PPC: Portable Process Control Library</h3>
-
-In operating systems which permit multiple independent processes to run and communicate
-there are several different notions of how the communication should work. An example is
-the difference between pipes and sockets. Even worse in the case of pipes is the fact
-that BSD Unix and System V Unix have substantial differences in the implementations of
-the pipe mechanism.<p>
-
-The abstract requirements of applications are more straightforward. A process should
-be able to spawn a subordinate process and open communications with it. The two
-processes should be able to exchange messages. The processes should be able to monitor
-one another&#146;s status. <p>
-
-PPC defines and implements an API which embodies that simple model. Its interface is
-made as analogous as possible to the standard C file interface so that the experience
-which programmers have with files relates directly to interprocess communication. The
-details of whether pipes or sockets are used are substantially irrelevant to the
-application developer so long as the necessary functionality is there.<p>
-
-PPC is the least mature of the PACT tools. Ultimately, in conjunction with the binary
-data handling mechanisms of PDBLib, it will provide, in addition to interprocess
-communications (IPC) functionality, a highly efficient remote procedure call (RPC)
-capability. This will permit and facilitate the development of distributed
-applications in a portable manner.<p>
-
-See Also: <A HREF="ppc.html">
-PPC User&#146;s Manual</A><p>
-
-Dependent PACT Libraries: SCORE, PDB<p>
 
 <a name="716886"></a>
 <h3> PML: Portable Mathematics Library</h3>
@@ -666,7 +629,7 @@ it is running which some garbage collection schemes will attempt to do.<p>
 See Also: <A HREF="sx.html">
 SX User&#146;s Manual</A><p>
 
-Dependent PACT Libraries: PML, PPC, SCORE<p>
+Dependent PACT Libraries: PML, SCORE<p>
 
 <a name="716916"></a>
 <h3> PGS: Portable Graphics System</h3>
@@ -768,7 +731,7 @@ Thus ULTRA II is extremely flexible.<p>
 See Also: <A HREF="ultra.html">
 ULTRA II User&#146;s Manual</A><p>
 
-Dependent PACT Libraries: SCHEME, PGS, PDB, PML, PPC, SCORE<p>
+Dependent PACT Libraries: SCHEME, PGS, PDB, PML, SCORE<p>
 
 <a name="716943"></a>
 <h3> SX: Scheme with Extensions</h3>
@@ -808,7 +771,7 @@ browse the files and compare all or part of arbitrary file entries.<p>
 See Also: <A HREF="sx.html">
 SX User&#146;s Manual</A><p>
 
-Dependent PACT Libraries: SCHEME, PANACEA, PGS, PDB, PML, PPC, SCORE<p>
+Dependent PACT Libraries: SCHEME, PANACEA, PGS, PDB, PML, SCORE<p>
 
 <!--------------------------------------------------------------------------------->
 <!--------------------------------------------------------------------------------->
@@ -867,7 +830,7 @@ same for all of the components of PACT. This part is called make-def and it
 is generated by pact-config during the configuration process.
 The second part contains the specifics
 of the components and therefore each component of PACT has a separate file
-called pre-Make. In pact/score, pact/pml, pact/ppc, and so on there is a file
+called pre-Make. In pact/score, pact/pml, and so on there is a file
 called pre-Make which contains dependencies particular to those parts of PACT.
 The third part contains a number of macros and dependencies common to all of
 PACT but which depend on the operating system. This file is called make-macros
@@ -885,7 +848,7 @@ directory.  In such a case you will have to do some work by hand if only to
 determine what is necessary to make the automatic build function properly.
 If you must build PACT by hand, you will have to edit/re-create the Makefiles
 in each sub-directory, and run make over them by hand. This should be done
-in the order stated above: SCORE, PML, PPC, PDB, PGS, SCHEME, PANACEA, ULTRA,
+in the order stated above: SCORE, PML, PDB, PGS, SCHEME, PANACEA, ULTRA,
 and SX.  Hopefully you will not have to do this.
 <p>
 
@@ -1487,12 +1450,11 @@ for any component on which the desired component depends.<p>
 <TR><TD WIDTH="80">SCORE</TD><TD>none</TD></TR>
 <TR><TD>PML</TD><TD>SCORE</TD></TR>
 <TR><TD>PDB</TD><TD>SCORE</TD></TR>
-<TR><TD>PPC</TD><TD>SCORE, PDB</TD></TR>
 <TR><TD>PGS</TD><TD>SCORE, PML</TD></TR>
-<TR><TD>SCHEME</TD><TD>SCORE, PML, PPC</TD></TR>
-<TR><TD>PANACEA</TD><TD>SCORE, PML, PPC, PDB, PGS</TD></TR>
-<TR><TD>SX</TD><TD>SCORE, PML, PPC, PDB, PGS, SCHEME, PANACEA</TD></TR>
-<TR><TD>ULTRA II</TD><TD>SCORE, PML, PPC, PDB, PGS, SCHEME</TD></TR>
+<TR><TD>SCHEME</TD><TD>SCORE, PML</TD></TR>
+<TR><TD>PANACEA</TD><TD>SCORE, PML, PDB, PGS</TD></TR>
+<TR><TD>SX</TD><TD>SCORE, PML, PDB, PGS, SCHEME, PANACEA</TD></TR>
+<TR><TD>ULTRA II</TD><TD>SCORE, PML, PDB, PGS, SCHEME</TD></TR>
 
 </TABLE>
 </BLOCKQUOTE>
@@ -1504,7 +1466,6 @@ The list of PACT Documents is:<p>
 <BLOCKQUOTE>
 <a href=pact.html>PACT User&#146;s Guide</a><br><br>
 <a href=score.html>SCORE User&#146;s Manual</a><br><br>
-<a href=ppc.html>PPC User&#146;s Manual</a><br><br>
 <a href=pml.html>PML User&#146;s Manual</a><br><br>
 <a href=pdb.html>PDBLib User&#146;s Manual</a><br><br>
 <a href=pgs.html>PGS User&#146;s Manual</a><br><br>
@@ -1543,8 +1504,8 @@ following platforms:<p>
 
 <pre>
    Linux
-   AIX
    Apple OS X
+   FreeBSD
    Solaris
    Cygwin
 </pre>
@@ -1552,7 +1513,7 @@ following platforms:<p>
 The host graphics systems used are:
 
 <pre>
-   the X Window System (X11 R3 and up)
+   the X Window System (X11 R6 and up)
    OpenGL
    PostScript
    CGM
@@ -1562,6 +1523,7 @@ The host graphics systems used are:
 In the past parts of PACT have been ported to the following platforms:<p>
 
 <pre>
+   AIX
    OSF1
    IRIX64
    HP 700 under HPUX
@@ -1570,8 +1532,7 @@ In the past parts of PACT have been ported to the following platforms:<p>
    INTEL 80x86 under DOS
 </pre>
 
-These ports were not completed due to lack of access to the
-necessary computers.
+These ports illustrate the effort to achieve complete portability.
 <p>
 
 <!--------------------------------------------------------------------------------->

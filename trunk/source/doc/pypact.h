@@ -31,7 +31,7 @@ The package is <tt>pact</tt> and the modules are <tt>pdb</tt> and <tt>pgs</tt>.
 The <tt>pdb</tt> module provides access to Score, PML and PDBLib.
 The <tt>pgs</tt> module provides access to Score, PML, PDBLib and PGS.
 Only one module should be used at a time.
-No access is provided to Scheme, PPC or Panacea at this time.
+No access is provided to Scheme or Panacea at this time.
 
 <p>
 TODO<BR>
@@ -93,7 +93,7 @@ ULTRA     SX
 <BR>
 PANACEA
 <BR>
-PGS     SCHEME   PPC
+PGS     SCHEME
 <BR>
 PDB
 <BR>

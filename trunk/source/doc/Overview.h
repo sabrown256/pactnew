@@ -1,5 +1,5 @@
 TXT: PACT Overview
-MOD: 04/06/2011
+MOD: 03/13/2015
 
 <blockquote>
 
@@ -15,8 +15,6 @@ MOD: 04/06/2011
 <TD></TD></TR>
 <TR><TD><li><A HREF="./Overview.html#Score"> SCORE</a></TD>
 <TD>a low level, environment balancing library</TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Ppc"> PPC</a></TD>
-<TD>a process control library</TD></TR>
 <TR><TD><li><A HREF="./Overview.html#Pml"> PML</a></TD>
 <TD>a math library</TD></TR>
 <TR><TD><li><A HREF="./Overview.html#Pdb"> PDB</a></TD>
@@ -96,11 +94,6 @@ PACT has been strongly influenced by that book.
 <TD WIDTH=100>PML</TD>
 <TD>a math library</TD>
 </TR>
-<TR>
-<TD WIDTH=100>PPC</TD>
-<TD>a process control library</TD>
-</TR>
-<TR>
 <TD WIDTH=100>PDB</TD>
 <TD>a portable binary database management library</TD>
 </TR>
@@ -147,7 +140,7 @@ ULTRA     SX
 <BR><BR>
  PANACEA
 <BR>
-  PGS    SCHEME     PPC
+  PGS    SCHEME
 <BR>
  PML       PDB
 <BR>
@@ -192,10 +185,6 @@ The list of designators for the PACT tools is:
 <TD>CSTRSAVE</TD>
 </TR>
 <TR>
-<TD WIDTH="80">PPC</TD>
-<TD ALIGN="CENTER">PC</TD>
-<TD>PC_open</TD>
-</TR>
 <TR>
 <TD WIDTH="80">PML</TD>
 <TD ALIGN="CENTER">PM</TD>
@@ -292,49 +281,6 @@ There are basically three other areas which SCORE functions address: memory mana
 hash table management; and extended string handling.
 <P>See Also:  SCORE User's Manual
 <P>Dependent PACT Libraries: None
-
-<BR>
-<BR>
-<A HREF="./Overview.html#Cont"><SMALL>Contents</SMALL></A>
-
-</BLOCKQUOTE>
-
-<!--                                                           -->
-<!--                                                           -->
-<!--                                                           -->
-<!--                                                           -->
-
-<HR size=2 width="50%" NOSHADE>
-
-<BLOCKQUOTE>
-<H2 ALIGN="CENTER"><A NAME="Ppc"> PPC: Portable Process Control Library </a></H2>
-<P>
-In operating systems which permit multiple independent processes to run and communicate
-there are several different notions of how the communication should work. An example
-is the difference between pipes and sockets. Even worse in the case of pipes is the fact 
-that BSD Unix and System V Unix have substantial differences in the implementations of 
-the pipe mechanism.
-<P>
-The abstract requirements of applications are more straightforward. A process should be 
-able to spawn a subordinate process and open communications with it. The two processes 
-should be able to exchange messages. The processes should be able to monitor one 
-another's status. 
-
-PPC defines and implements an API which embodies that simple model. Its interface is 
-made as analogous as possible to the standard C file interface so that the experience which 
-programmers have with files relates directly to interprocess communication. The details of 
-whether pipes or sockets are used are substantially irrelevant to the application developer 
-so long as the necessary functionality is there.
-
-PPC is the least mature of the PACT tools. Ultimately, in conjunction with the binary data 
-handling mechanisms of PDBLib, it will provide, in addition to interprocess communica
-tions (IPC) functionality, a highly efficient remote procedure call (RPC) capability. This 
-will permit and facilitate the development of distributed applications in a portable manner.
-
-
-
-<P>See Also: PPC User's Manual
-<P>Dependent PACT Libraries: SCORE, PDB
 
 <BR>
 <BR>
@@ -487,7 +433,7 @@ running which some garbage collection schemes will attempt to do.
 
 <P>
 <P>See Also: SX User's Manual
-<P>Dependent PACT Libraries: PML, PPC, SCORE
+<P>Dependent PACT Libraries: PML, SCORE
 
 <BR>
 <BR>
@@ -618,7 +564,7 @@ compile in everybody's pet extension. Thus ULTRA is extremely flexible.
 
 <P>
 <P>See Also: ULTRA User's Manual
-<P>Dependent PACT Libraries: SCHEME, PGS, PDB, PML, PPC, SCORE
+<P>Dependent PACT Libraries: SCHEME, PGS, PDB, PML, SCORE
 
 <BR>
 <BR>
@@ -666,7 +612,7 @@ browse the files and compare all or part of arbitrary file entries.
 
 <P>
 <P>See Also: SX User's Manual
-<P>Dependent PACT Libraries: SCHEME, PANACEA, PGS, PDB, PML, PPC, SCORE
+<P>Dependent PACT Libraries: SCHEME, PANACEA, PGS, PDB, PML, SCORE
 
 <BR>
 <BR>
@@ -694,7 +640,6 @@ depends.
 <BLOCKQUOTE>
 <a href=pact.html>PACT User&#146;s Guide</a><br><br>
 <a href=score.html>SCORE User&#146;s Manual</a><br><br>
-<a href=ppc.html>PPC User&#146;s Manual</a><br><br>
 <a href=pml.html>PML User&#146;s Manual</a><br><br>
 <a href=pdb.html>PDBLib User&#146;s Manual</a><br><br>
 <a href=pgs.html>PGS User&#146;s Manual</a><br><br>
