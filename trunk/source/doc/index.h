@@ -1,5 +1,5 @@
 TXT: PACT
-MOD: 02/03/2010
+MOD: 03/13/2015
 
 <center>
 <h1><font color="#ff0000">$TXT</font></h1>
@@ -71,9 +71,6 @@ your software project.
 <li><a href="Fillpoly.html">polygon fill</a></li>
 <li><a href="Contour.html">contour surfaces</a></li>
 <li><a href="Image.html">raster images</a></li>
-</ul>
-<li>Benchmarks
-<ul><li><a href="benchmarks.html">Comparison of PDB and HDF5</a></li></ul></li>
 </ul>
 <p>
 

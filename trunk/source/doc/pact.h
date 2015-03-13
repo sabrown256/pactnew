@@ -39,8 +39,6 @@ MOD: 03/13/2015
 
 <li><a href="#Pinst"><b>Installing PACT</b></a>
 <table>
-<tr><td><ul><li><a href="#install-mac">Mac OS</a></ul></td></tr>
-<tr><td><ul><li><a href="#install-ms">MS Windows</a></ul></td></tr>
 <tr><td><ul><li><a href="#install-unix">UNIX</a></ul></td></tr>
 <tr><td><ul><li><a href="#pact-parallel-config">Parallel PACT Issues</a></ul></td></tr>
 <tr><td><ul><li><a href="#pact-shared">Building Shared Libraries</a></ul></td></tr>
@@ -107,8 +105,8 @@ the application developer a relatively small and efficient set of tools.
 For this reason, the total capability of PACT is unmatched in other software
 systems.<p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <a name="pact-org-intro"></a>
 <H3> Organization of PACT</H3>
@@ -238,8 +236,8 @@ HARDWARE
 
 <p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <a name="pact-parallel-config"></a>
 <H3> Parallel PACT Issues</H3>
@@ -272,8 +270,8 @@ libraries with names like, libscore.a.
 <p>
 
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <a name="pact-parallel-build"></a>
 <H3> Building PACT in Parallel</H3>
@@ -317,8 +315,8 @@ There are four main scenarios for a parallel build.
    dsys build -p 3 -o foo,bar,baz
 <p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <a name="pact-parallel-running"></a>
 <H3> Running Distributed Parallel Applications</H3>
@@ -366,8 +364,8 @@ The do-run usage is:
 </pre>
 <p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 
 <a name="pact-shared"></a>
@@ -388,8 +386,8 @@ capability and there are apt to be some rough edges.  Please let us
 know of any problems which you experience so that we can fix them.
 <p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <hr>
 <a name="Pover"></a>
@@ -773,37 +771,15 @@ SX User&#146;s Manual</A><p>
 
 Dependent PACT Libraries: SCHEME, PANACEA, PGS, PDB, PML, SCORE<p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <hr>
 <a name="Pinst"></a>
 <h2 ALIGN="CENTER">Installing PACT</h2>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
-
-<a name="install-mac"></a>
-<h3> Mac OS</h3>
-
-PACT is now only supported on Macintosh systems running OS X and above.
-
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
-
-<a name="install-ms"></a>
-<h3> MS Windows</h3>
-
-Installing PACT on an MS Windows platform is unfortunately not easy.
-The process is very laborious due to the lack of
-useful tools to help automate it.  The popular IDE tools currently have
-no means of operating from an easy to maintain pure text description
-of a code system.  Building "project" files is an onerous task with 
-a graphical interface.  Consequently, building PACT is time
-consuming and involved on these platforms.
-
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <a name="install-unix"></a>
 <h3> UNIX</h3>
@@ -836,114 +812,14 @@ The third part contains a number of macros and dependencies common to all of
 PACT but which depend on the operating system. This file is called make-macros
 and it too is generated by pact-config during the configuration process.
 <p>
-
-I have found the mechanism to be very simple and portable. I have used it in
-preference to such alternate mechanisms as Imake because it is much easier
-to manage and depends only on standard UNIX facilities.
-<p>
-
 Building PACT is a highly automated process.  It sometimes breaks down for
 a variety of reasons such as required utilities being in some unknowable
 directory.  In such a case you will have to do some work by hand if only to
 determine what is necessary to make the automatic build function properly.
-If you must build PACT by hand, you will have to edit/re-create the Makefiles
-in each sub-directory, and run make over them by hand. This should be done
-in the order stated above: SCORE, PML, PDB, PGS, SCHEME, PANACEA, ULTRA,
-and SX.  Hopefully you will not have to do this.
-<p>
+See the <a href="./unix-README">README</a> file for details.
 
-
-   IMPORTANT: You may use any directory you choose to do the
-   install. One of your own (e.g.; ~myhome/pactdir) or one
-   in /usr/local (e.g.; /usr/local/src). Of course you must
-   have read/write/execute permissions for the install to work.
-   You do not want to have a subdirectory of the directory
-   in which you have put the distribution file named pact. The
-   installation process will mangle it thoroughly if you do!
-<p>
-
-1) Obtain the distribution file (e.g. pact10_02_03-src) by some means and put it
-   in a place such as /usr/local/src as follows:
-
-<pre>
-     -> cd /usr/local/src
-<br>
-     -> wget http:<somewhere>/pact10_02_03-src .
-<br>
-     -> chmod a+x pact10_02_03-src
-<br>
-     -> mv pact10_02_03-src pact-src
-</pre>
-<p>
-
-   For the rest of this document the distribution file will be called
-   pact-src (you may or may not want to rename it to this).
-<p>
-
-2) Run the distribution file (the C Shell must be installed on your system).
-   Running the distribution file without arguments will give you a usage
-   summary. Select the arguments you wish and run it again.  For example:
-<p>
-
-<pre>
-     -> pact-src
-                          .
-                 &lt;usage summary&gt;
-                          .
-                          .
-<br>    
-     -> pact-src -i /usr/local/pact auto
-</pre>
-
-   This does the following things: configures the distribution, compiles all
-   packages, runs all of the PACT tests, and finally installs it in the
-   designated place (unless "-i&#160&#160none" is used). On a fast machine all of
-   the above will take a few minutes and on a slow machine it will take
-   a few hours.
-<p>
-
-   NOTE: The directory designated for installation, if any,  must contain
-   at least the following subdirectories: include, bin, lib, and scheme
-   and it and the subdirectories must be writable by you.
-<p>
-
-   As the installation proceeds, most messages from component programs
-   and scripts are routed into a file called Build.Log. When the installation
-   completes the name is changed to &lt;site&gt;.BUILD and the file is moved up
-   one directory level so as to be out of the way in case another attempt
-   or a build on a different system is to be done next. You may wish to check
-   this file for problems or information about the process itself. There
-   should be no error or warning messages in a normal installation.
-<p>
-
-3) If the installation fails consult the README file in the pact/manager
-   directory or skip down to the <a href=#pact-manager>PACT Manager</a>
-   section below.
-<p>
-
-4) Now that PACT is installed. You need to set two environment variables
-   in order to use ULTRA, SCHEME, SX, PDBVIEW, or PDBDIFF. The SCHEME and
-   ULTRA environment variables must be set to point to the directory in which
-   the scheme files were installed. The default for this directory is
-   /usr/local/scheme and in the above example it would be /usr/local/pact/scheme.
-<p>
-
-<pre>
-     -> setenv SCHEME /usr/local/pact/scheme
-<br>
-     -> setenv ULTRA /usr/local/pact/scheme
-</pre>
-
-   These should probably be put into your .cshrc or your .profile so that
-   they appear when you log into your system.
-<p>
-
-   The PACT documentation has additional information about these
-   environment variables. This example will serve to get you started.
-<p>
-
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <hr>
 <a name="pact-config"></a>
@@ -1044,8 +920,8 @@ referred to as <em>system</em>,
 built into their names to avoid conflicts.
 <p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <a name="pact-makefiles"></a>
 <h3> PACT Makefiles</h3>
@@ -1061,376 +937,8 @@ installation they control. The make-def and make-macro files live with the
 manager. They are constructed in the configuration process.
 <p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
-
-<a name="717122"></a>
-<h3> Configuration File Syntax</h3>
-
-The syntax of a configuration file is fairly simple. Blank lines and lines
-beginning with a &#145;#&#146; signal the end of a section or are ignored.
-There are the following main section types: MakeRule, CEnvironment,
-CDeclarations, and VariableDef.  The sections are begun by a line containing
-the section type. The default section type is VariableDef.
-<p>
-
-You can have any number of instances of the main sections and their
-specifications are all concatenated together. Specifications in the
-CEnvironment and CDeclarations sections result in #define&#146;s and variable
-or function declarations in the scconfig.h file. MakeRule specifications
-allow sites to add targets and macro definitions to the make-def (and hence
-Makefile) files for the system.  VariableDef specifications go into the
-construction of the make-def, scope_trans.h, and spokes.scm files.
-<p>
-
-In addtion to the main section types there are the following special section
-types: .c.i:, .c.o:, .c.a:, .l.o:, .l.a:, .f.o:, and .f.a:.  These are to
-define the make rules for preprocessing a C source file, compiling a C source
-file into an object file, compiling a C source file &#147;directly&#148; into
-an archive file (if your system&#146;s make is capable of doing so), compiling
-a LEX source file into an object module, compiling a LEX source file directly
-into an archive file (make willing), compiling a FORTRAN source file into an
-object file, and compiling a FORTRAN source file directly into an archive file
-(make willing) respectively.  These sections are begun by a line containing
-the section name.
-<p>
-
-All sections are ended by blank or comment lines (lines beginning
-with &#145;#&#146;).
-<p>
-
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
-
-<a name="717127"></a>
-<h3> Configuration Parameters Described</h3>
-
-This group of parameters is used by the configuration building and make
-processes to distinguish various operating system characteristics as well
-as the utilities which come with a UNIX/POSIX system.<p>
-
-Some of these are implied by PACT coding and are listed here to give you an
-idea of what they are for (just in case you need to look in the code).<p>
-
-<P>
-<P>
-
-<B>MAKE_Strategy</B>
-<BR>
-<UL>UNIX systems with a sufficiently smart make can save lots of disk space by
-building the objects directly into library archives. Use
-&#147;SpaceSaving&#148; if your make is good enough and &#147;none&#148;
-otherwise.  PACT-ANALYZE will detect this for you.
-<BR>Default is &#147;SpaceSaving&#148;</UL>
-
-<P>
-<B>CCompiler</B>
-<BR>
-<UL>The name of the C compiler to be used.
-<BR>Default is &#147;cc&#148;</UL>
-
-<P>
-<B>CDebug</B>
-<BR>
-<UL>C compiler flags to specify debuggable packages.
-<BR>Default is &#147;-g&#148;</UL>
-
-<P>
-<B>CFLAGS</B>
-<BR>
-<UL>C compiler flags to be used for all PACT packages.  This is for those options
-which do not control debugging or optimization. Use CDebug or COptimize for
-those purposes.
-<BR>Default is &#147;&#147;</UL>
-
-<P>
-<B>COptimize</B>
-<BR>
-<UL>C compiler flags to specify optimized packages.
-<BR>Default is &#147;-O&#148;.</UL>
-
-<P>
-<B>RF_SPOKES_C</B>
-<BR>
-<UL>A list of C codes binary file translation spokes to be built with SX. An
-NACF spoke is included with the distribution.
-<BR>Default is &#147;nacf&#148;.</UL>
-
-<P>
-<B>FCompiler</B>
-<BR>
-<UL>The name of the FORTRAN compiler to be used.
-<BR>Default is &#147;f90&#148;</UL>
-
-<P>
-<B>FDebug</B>
-<BR>
-<UL>Fortran compiler flags to specify debuggable packages.
-<BR>Default is &#147;-g&#148;</UL>
-
-<P>
-<B>FFLAGS</B>
-<BR>
-<UL>Fortran compiler flags to be used for all PACT packages.  This is for those
-options which do not control debugging or optimization. Use FDebug or
-FOptimize for those purposes.
-<BR>Default is &#147;&#147;</UL>
-
-<P>
-<B>FOptimize</B>
-<BR>
-<UL>Fortran compiler flags to specify optimized packages.
-<BR>Default is &#147;-O&#148;</UL>
-
-<P>
-<B>GRAPHICS_Flags</B>
-<BR>
-<UL>Any special graphics flag (not usually needed with X11).
-<BR>Default is &#147;&#147;</UL>
-
-<P>
-<B>GRAPHICS_Windows</B>
-<BR>
-<UL>The host graphics system being used (almost always X).
-<BR>Default is &#147;X&#148;</UL>
-
-<P>
-<B>INSTALL</B>
-<BR>
-<UL>Place holder for either &#147;install &lt;options&gt;&#148; or
-&#147;cp&#148; depending on whether or not your system has install.
-<BR>Default is &#147;cp&#148;</UL>
-
-<P>
-<B>PSY_InstRoot</B>
-<BR>
-<UL>The directory in which the PACT manager expects to find lib, bin, and
-include directories into which to install PACT.
-<BR>Default is &#147;/usr/local&#148;</UL>
-
-<P>
-<B>LDFLAGS</B>
-<BR>
-<UL>Special loader/linker flags.
-<BR>Default is &#147;&#147;</UL>
-
-<P>
-<B>LXFLAGS</B>
-<BR>
-<UL>Flags for C compilation of LEX generated files.
-<BR>Default is &#147;&#148;</UL>
-
-<P>
-<B>MDGInc</B>
-<BR>
-<UL>Special specifications for the C compiler to find graphics related
-include files (e.g. -I/usr/include/X11). This is not often needed.
-<BR>Default is &#147;&#147;</UL>
-
-<P>
-<B>MDGLib</B>
-<BR>
-<UL>Special specifications for graphics libraries to be loaded (e.g.
-/usr/lib/libX11.a).
-<BR>Default is &#147;&#147;</UL>
-
-<P>
-<B>MDInc</B>
-<BR>
-<UL>Special specifications for the C compiler to find non-graphics related
-include files (e.g. -I/usr/local/include). This is not often needed.
-<BR>Default is &#147;&#147;</UL>
-
-<P>
-<B>MDLib</B>
-<BR>
-<UL>Special specifications for non-graphics libraries to be loaded (e.g. -lbsd).
-Default is &#147;&#147;</UL>
-
-<P>
-<B>NEED_MEM_TRACE</B>
-<BR>
-<UL>PACT supports a layer of memory management over the system memory manager 
-which provides diagnostic capabilities as well as useful features for
-applications.  On some systems, PACT can understand the workings of the
-memory manager sufficiently to require a smaller amount of overhead and look
-more deeply in the system heap. Other systems are not so and PACT must do
-more bookkeeping work. Set this parameter to TRUE to indicate the latter
-case and FALSE to indicate the former.
-<BR>Default is &#147;TRUE&#148;</UL>
-
-<P>
-<B>RANLIB</B>
-<BR>
-<UL>Place holder for either &#147;ranlib&#148; or &#147;touch&#148; depending
-on whether or not your system has ranlib.
-<BR>Default is &#147;touch&#148;</UL>
-
-<P>
-<B>RM</B>
-<BR>
-<UL>Place holder for &#147;rm &lt;options&gt;&#148; depending on the
-options your system&#146;s rm has.  
-<BR>Default is &#147;rm -f&#148;</UL>
-
-<P>
-<B>RF_SPOKES_SCHEME</B>
-<BR>
-<UL>A list of Scheme coded binary file translation spokes to be used with SX.
-A netCDF spoke is included with the distribution.
-<BR>Default is &#147;netcdf&#148;</UL>
-
-
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
-
-<P>
-
-<a name="717176"></a>
-<h3> C Environment Parameters</h3>
-
-This group of parameters is used in C header files to set up and define the
-C compilation environment for the PACT sources. These are specified in a
-CEnvironment section of a configuration file.<p>
-
-<br>
-<CENTER><B>C Language Standard</B></CENTER>
-<br>
-
-These parameters define which C standard is to be assumed when compiling
-PACT sources. Use at most one.<p>
-
-<P>
-<B>ANSI</B>
-<BR>
-<UL>Conforming to ANSI C (this is the default).</UL>
-
-<P>
-<B>PCC</B>
-<BR>
-<UL>Conforming to the Portable C Compiler (KR 1rst edition).</UL>
-
-<P>
-<br>
-<CENTER><B>FORTRAN Language Standard</B></CENTER>
-
-<P>
-<br>
-<CENTER><B>System Dependent Parameters Which Must Exist</B></CENTER>
-<br>
-
-The following parameters are implied by other selected options:
-
-<P>
-<B>byte</B>
-<BR>
-<UL>Type &#147;void&#148; if supported (default for ANSI compilers),
-type &#147;char&#148; if no voids (default for PCC compilers).</UL>
-
-<P>
-<B>UNIX</B>
-<BR>
-<UL>UNIX/POSIX Operating System.</UL>
-
-<P>
-<B>X11R4</B>
-<BR>
-<UL>PACT uses X11 R4 or later graphics (implied by &#147;GRAPHICS_Windows = X&#148;).</UL>
-
-<P>
-<br>
-<CENTER><B>Other System Dependent Parameters</B></CENTER>
-
-<P>
-<B>AIX</B>
-<BR>
-<UL>This indicates the presence of the IBM UNIX variant.</UL>
-
-<P>
-<B>BINARY_MODE_R</B>
-<BR>
-<UL>Binary file mode parameter for read only mode. Default
-is &#147;rb&#148;.</UL>
-
-<P>
-<B>BINARY_MODE_RPLUS</B>
-<BR>
-<UL>Binary file mode parameter for open for update mode. Default
-is &#147;r+b&#148;.</UL>
-
-<P>
-<B>BINARY_MODE_W</B>
-<BR>
-<UL>Binary file mode parameter for create mode. Default is &#147;wb&#148;.</UL>
-
-<P>
-<B>BINARY_MODE_WPLUS </B>
-<BR>
-<UL>Binary file mode parameter for create for update. 
-Default is &#147;w+b&#148;.</UL>
-
-<P>
-<B>BSD</B>
-<BR>
-<UL>This indicates the presence of BSD UNIX 4.2 or later.</UL>
-
-<P>
-<B>FIXNUM</B>
-<BR>
-<UL>C type corresponding to FORTRAN integer defaults to long.
-Don&#146;t set this.</UL>
-
-<P>
-<B>HAVE_SELECT</B>
-<BR>
-<UL>Indicate the presence of a working &#147;select&#148; system call iff
-there is no working STREAMS package available. PACT-ANALYZE detects this
-for you.</UL>
-
-<P>
-<B>HAVE_SOCKETS</B>
-<BR>
-<UL>Indicate the presence of a working socket library. Default is off.
-If you have X windows you have this.</UL>
-
-<P>
-<B>HAVE_STREAMS</B>
-<BR>
-<UL>Indicate the presence of a working STREAMS package. Default is off.
-PACT-ANALYZE detects this for you.</UL>
-
-<P>
-<B>HPUX</B>
-<BR>
-<UL>This indicates the presence of the HP UNIX variant.</UL>
-
-<P>
-<B>Register</B>
-<BR>
-<UL>Some C compilers take a dim view of the use of the register allocation
-specifier.  Set to 
-&#147;register&#148; if appropriate, and &#147;&#147; if not.
-Default is &#147;&#147;.</UL>
-
-<P>
-<B>SGI</B>
-<BR>
-<UL>This indicates the presence of Silicon Graphics machines.</UL>
-
-<P>
-<B>SYSV</B>
-<BR>
-<UL>This indicates the presence of UNIX System V.</UL>
-
-<P>
-<B>UNICOS</B>
-<BR>
-<UL>This indicates the presence of Cray Research C for UNICOS.</UL>
-
-<P>
-
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <hr>
 <a name="Pdocs"></a>
@@ -1489,8 +997,8 @@ that readers may find useful are:<p>
    Press, Flannery, Teukolsky, and Vetterling, <I>Numerical Recipes in C</I>, Cambridge Press.
 </pre>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <hr>
 <a name="Psoft"></a>
@@ -1535,8 +1043,8 @@ In the past parts of PACT have been ported to the following platforms:<p>
 These ports illustrate the effort to achieve complete portability.
 <p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <a name="717000"></a>
 <h4> Obtaining the PACT Distribution</h4>
@@ -1545,8 +1053,8 @@ The PACT distribution is available on the Internet.  You can find it
 and more information at http://pact.llnl.gov.
 <p>
 
-<!--------------------------------------------------------------------------------->
-<!--------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------->
 
 <a name="Psupport"></a>
 <br>

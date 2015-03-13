@@ -11,26 +11,51 @@ MOD: 03/13/2015
 <a name="Cont"></a>
 <TABLE>
 <ul>
-<TR><TD><li><A HREF="./Overview.html#Intro">Introduction</a></TD>
-<TD></TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Score"> SCORE</a></TD>
-<TD>a low level, environment balancing library</TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Pml"> PML</a></TD>
-<TD>a math library</TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Pdb"> PDB</a></TD>
-<TD>a portable binary database management library</TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Scheme"> SCHEME</a></TD>
-<TD>an interpreter for the Scheme dialect of the LISP language</TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Pgs"> PGS</a></TD>
-<TD>a graphics library</TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Panacea">  PANACEA</a></TD>
-<TD>a simulation code development system</TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Ultra">ULTRA</a></TD>
-<TD>a 1d data presentation, analysis, and manipulation tool</TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Sx">SX</a></TD>
-<TD>Scheme with extensions (PDBView and PDBDiff are SX  programs)</TD></TR>
-<TR><TD><li><A HREF="./Overview.html#Doc">Documentation</a></TD>
-<TD>list of availiable documents</TD></TR>
+<TR>
+<TD><li><A HREF="./Overview.html#Intro">Introduction</a></TD>
+<TD></TD>
+</TR>
+
+<TR>
+<TD><li><A HREF="./Overview.html#Score"> SCORE</a></TD>
+<TD>a low level, environment balancing library</TD>
+</TR>
+
+<TR>
+<TD><li><A HREF="./Overview.html#Pml"> PML</a></TD>
+<TD>a math library</TD>
+</TR>
+
+<TR>
+<TD><li><A HREF="./Overview.html#Pdb"> PDB</a></TD>
+<TD>a portable binary database management library</TD>
+</TR>
+
+<TR>
+<TD><li><A HREF="./Overview.html#Scheme"> SCHEME</a></TD>
+<TD>an interpreter for the Scheme dialect of the LISP language</TD>
+</TR>
+
+<TR>
+<TD><li><A HREF="./Overview.html#Pgs"> PGS</a></TD>
+<TD>a graphics library</TD>
+</TR>
+
+<TR>
+<TD><li><A HREF="./Overview.html#Panacea">  PANACEA</a></TD>
+<TD>a simulation code development system</TD>
+</TR>
+
+<TR>
+<TD><li><A HREF="./Overview.html#Sx">SX</a></TD>
+<TD>Scheme with extensions (PDBView, PDBDiff, and ULTRA are SX  programs)</TD>
+</TR>
+
+<TR>
+<TD><li><A HREF="./Overview.html#Doc">Documentation</a></TD>
+<TD>list of availiable documents</TD>
+</TR>
+
 </ul>
 </TABLE>
 
@@ -136,15 +161,15 @@ block of functionality, e.g. graphics, and address it in a general and comprehen
 <FONT SIZE="+1">
 <CENTER>
 <PRE>
-ULTRA     SX
-<BR><BR>
- PANACEA
+SX
 <BR>
-  PGS    SCHEME
+PANACEA
 <BR>
- PML       PDB
+PGS    SCHEME
 <BR>
- SCORE
+PML       PDB
+<BR>
+SCORE
 </PRE>
 </CENTER>
 </FONT>
@@ -182,7 +207,7 @@ The list of designators for the PACT tools is:
 <TR>
 <TD WIDTH="80">SCORE</TD>
 <TD ALIGN="CENTER">SC</TD>
-<TD>CSTRSAVE</TD>
+<TD>SC_arrlen</TD>
 </TR>
 <TR>
 <TR>
@@ -458,7 +483,7 @@ there will be the need for a tool like PGS.
 PGS is an API that is independent of the underlying host graphics system. All of the 
 graphics portability headaches are confined to PGS and applications which use PGS are 
 completely portable. PGS currently sits on top of X Windows on UNIX platforms, 
-PostScript, CGM, PNG, and JPEG.
+PostScript, PNG, and JPEG.
 <P>
 PGS takes a least common denominator approach regarding what graphics functionality it 
 supports. The goal is to run on the widest variety of machines. This lets out high level 
@@ -549,37 +574,6 @@ services.
 <HR size=2 width="50%" NOSHADE>
 
 <BLOCKQUOTE>
-<H2 ALIGN="CENTER"><A NAME="Ultra"> ULTRA: 1D Data Presentation, Analysis, and Manipulation </a></H2>
-<P>
-ULTRA is a tool for the presentation, analysis, and manipulation of 1D data sets or 
-curves (i.e. y=f(x)). It supports operations such as addition, subtraction, multiplication, 
-and division of curves; applying functions to curves (e.g. sin, cos); Fourier transforms; and 
-shifting and scaling of curves. The user can control the range and domain of the displayed 
-data as well as such attributes as line color, style, and width.
-<P>
-Either ASCII or binary data can be written or read by ULTRA. ULTRA uses the 
-SCHEME interpreter to provide users with a very powerful mechanism to configure and 
-extend ULTRA to suit their needs. This also keeps the code small by not having to
-compile in everybody's pet extension. Thus ULTRA is extremely flexible.
-
-<P>
-<P>See Also: ULTRA User's Manual
-<P>Dependent PACT Libraries: SCHEME, PGS, PDB, PML, SCORE
-
-<BR>
-<BR>
-<A HREF="./Overview.html#Cont"><SMALL>Contents</SMALL></A>
-
-</BLOCKQUOTE>
-
-<!--                                                           -->
-<!--                                                           -->
-<!--                                                           -->
-<!--                                                           -->
-
-<HR size=2 width="50%" NOSHADE>
-
-<BLOCKQUOTE>
 <H2 ALIGN="CENTER"><A NAME="Sx"> SX: Scheme with Extensions </a></H2>
 <P>
 SX is perhaps the ultimate PACT statement. It is simply SCHEME plus the other parts of 
@@ -628,6 +622,37 @@ browse the files and compare all or part of arbitrary file entries.
 <HR size=2 width="50%" NOSHADE>
 
 <BLOCKQUOTE>
+<H2 ALIGN="CENTER"><A NAME="Ultra"> ULTRA: 1D Data Presentation, Analysis, and Manipulation </a></H2>
+<P>
+ULTRA is a tool for the presentation, analysis, and manipulation of 1D data sets or 
+curves (i.e. y=f(x)). It supports operations such as addition, subtraction, multiplication, 
+and division of curves; applying functions to curves (e.g. sin, cos); Fourier transforms; and 
+shifting and scaling of curves. The user can control the range and domain of the displayed 
+data as well as such attributes as line color, style, and width.
+<P>
+Either ASCII or binary data can be written or read by ULTRA. ULTRA uses the 
+SX interpreter to provide users with a very powerful mechanism to configure and 
+extend ULTRA to suit their needs. This also keeps the code small by not having to
+compile in everybody's pet extension. Thus ULTRA is extremely flexible.
+
+<P>
+<P>See Also: ULTRA User's Manual
+<P>Dependent PACT Libraries: SX, SCHEME, PGS, PDB, PML, SCORE
+
+<BR>
+<BR>
+<A HREF="./Overview.html#Cont"><SMALL>Contents</SMALL></A>
+
+</BLOCKQUOTE>
+
+<!--                                                           -->
+<!--                                                           -->
+<!--                                                           -->
+<!--                                                           -->
+
+<HR size=2 width="50%" NOSHADE>
+
+<BLOCKQUOTE>
 <H2 ALIGN="CENTER"><A NAME="Doc">PACT Documentation </a></H2>
 <P>
 The individual components of PACT have their own documentation which is intended to 
@@ -644,10 +669,10 @@ depends.
 <a href=pdb.html>PDBLib User&#146;s Manual</a><br><br>
 <a href=pgs.html>PGS User&#146;s Manual</a><br><br>
 <a href=pan.html>PANACEA User&#146;s Manual</a><br><br>
+<a href=sx.html>SX User&#146;s Manual</a>
 <a href=ultra.html>ULTRA II User&#146;s Manual</a><br><br>
 <a href=pdbdiff.html>PDBDiff User&#146;s Manual</a><br><br>
 <a href=pdbview.html>PDBView User&#146;s Manual</a><br><br>
-<a href=sx.html>SX User&#146;s Manual</a>
 </BLOCKQUOTE>
 
 <A HREF="./Overview.html#Cont"><SMALL>Contents</SMALL></A>

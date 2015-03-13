@@ -1,5 +1,5 @@
 TXT: PACT Development Team
-MOD: 07/29/2010
+MOD: 03/13/2015
 
 <CENTER>
 <P>
@@ -48,23 +48,23 @@ Stewart A. Brown (<A HREF="mailto:brown50@llnl.gov">brown50@llnl.gov</A>)
 Previous developers on the <strong>PACT</strong> effort have been:
 <P>
 Kelly Barrett -- Documentation
-<BR>
+<br>
 Dennis Braddy -- Programming, debugging and design
-<BR>
+<br>
 Pete Keller -- Graphics, documentation and user support
-<BR>
+<br>
 Charles McMillan -- First version of Ultra
-<BR>
+<br>
 Jan Moura -- Source management, documentation and user support
-<BR>
+<br>
 Greg Smethells -- Programming, debugging and design
-<BR>
+<br>
 Lee Taylor -- Programming and design
-<BR>
+<br>
 Art Rodrigues --  Source management, documentation and user support
-<P>
+<br>
 Lee Minner --  Programming, debugging and design
-<BR>
+<br>
 Al Franz --  Programming, debugging and design
-<BR>
+<br>
 
