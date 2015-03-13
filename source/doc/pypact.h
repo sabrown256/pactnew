@@ -1,12 +1,10 @@
 TXT: PACT Python Bindings
-MOD: 11/01/2012
+MOD: 3/13/2015
 
 <CENTER>
 <P>
 <H1><font color="#ff0000">$TXT</font></H1>
 <H4>Lee Taylor
-<br>Greg Smethells
-<br>Al Franz
 </H4>
 </CENTER>
 
@@ -15,12 +13,11 @@ MOD: 11/01/2012
 <P>
 <HR>
 
-<a href="#pypact_intro"><H3>Introduction</H3></a>
-
-<a href="#pypact_pdb"><H3>PDB</H3></a>
-
-<a href="#pypact_pgs"><H3>PGS</H3></a>
-
+<ul>
+<li><a href="#pypact_intro"><H3>Introduction</H3></a>
+<li><a href="#pypact_pdb"><H3>PDB</H3></a>
+<li><a href="#pypact_pgs"><H3>PGS</H3></a>
+</ul>
 <hr>
 
 <a name="pypact_intro"><h2>Introduction</h2></a>
@@ -89,7 +86,7 @@ Recall that the PACT tools fit in the following hierarchy:
 <p>
 <CENTER>
 <B>
-ULTRA     SX
+SX
 <BR>
 PANACEA
 <BR>
@@ -102,13 +99,7 @@ PML
 SCORE
 </B>
 </CENTER>
-
-<!--
-Score is oriented towards low level functionality that is already provided by
-Python's standard libraries.
--->
-<p>
-
+<br>
 Score and PML are not provided as stand alone modules since 
 PDB is the first level that Python users are usually interested in using.
 Much of Score functionality such as memory allocation, hash tables and

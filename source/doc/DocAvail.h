@@ -1,5 +1,5 @@
 TXT: PACT: Documentation Availability
-MOD: 02/03/2010
+MOD: 03/13/2015
 
 <blockquote>
 
@@ -9,9 +9,6 @@ MOD: 02/03/2010
 </center>
 
 <hr>
-Note: <I>pkg</I> refers to any one of the PACT packages - 
-pact, panacea, pdb, pgs, pml, scheme, score, sx, ultra.
-<hr>
 
 <P>
 
@@ -19,11 +16,7 @@ pact, panacea, pdb, pgs, pml, scheme, score, sx, ultra.
 <DT><B>WORLD WIDE WEB</B> (http://pact.llnl.gov)</DT>
 </DL>
 
-<BR>
-<HR WIDTH="50%" NOSHADE>
-
 <br>
-<hr>
 
 For questions and comments, 
 please contact the <A HREF="pactteam.html">PACT

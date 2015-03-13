@@ -1,5 +1,5 @@
 TXT: PACT FAQ
-MOD: 02/03/2010
+MOD: 03/13/2015
 
 <BLOCKQUOTE>
 
@@ -46,8 +46,7 @@ direct all portability issues to:
 <L0>1) <A HREF="#F1">What is PACT?</A>
 <BR>2) <A HREF="#F2">What machines does PACT run on?</A>
 <BR>3) <A HREF="#F3">Where can I get PACT?</A>
-<BR>4) <A HREF="#F4">How can I get in touch with PACT developers and users?</A>
-<BR>5) <A HREF="#F5">What are the PACT packages?</A>
+<BR>4) <A HREF="#F4">What are the PACT packages?</A>
 </UL>
 
 <A NAME="F1"></a>
@@ -62,28 +61,34 @@ Binary Data
 <BR>Graphics
 <BR>Interprocess Communication
 </UL>
-PACT is composed of several (currently nine) specific packages
+PACT is composed of several specific packages
 each of which address a specific functionality.
 <br><BR><SMALL><A HREF="#F0">index</A></SMALL>
 
 <A NAME="F2"></a>
 <H3>2) What machines does PACT run on?</H3>
 
-PACT has been tested on the following systems:
+PACT has been tested on the following operating systems:
 <UL>
-AIX 2 and up
-<BR>HP-UX
-<BR>Irix 4.x
-<BR>Irix 5.x
-<BR>Linux 1.x
-<BR>MAC OS X
-<BR>OSF 1.x
-<BR>SunOS 4.x
-<BR>SunOS 5.x (Solaris)
-<BR>Ultrix 
-<BR>Unicos 7 and up
+<LI>Linux
+<LI>MAC OS X
+<LI>FreeBSD
+<LI>Solaris
 </UL>
-<br><BR><SMALL><A HREF="#F0">index</A></SMALL>
+<P>
+
+PACT has been tested with the following compilers/compiler sets:
+<UL>
+<LI>GNU
+<LI>Clang
+<LI>Intel
+<LI>PGI
+<LI>SunStudio
+<LI>Open64
+<LI>IBM XL
+</UL>
+
+<BR><SMALL><A HREF="#F0">index</A></SMALL>
 
 <A NAME="F3"></a>
 <H3>3) Where can I get PACT?</H3>
@@ -97,22 +102,6 @@ is the self configuring, self installing distribution file.
 <br><BR><SMALL><A HREF="#F0">index</A></SMALL>
 
 <A NAME="F4"></a>
-<H3>4) How can I get in touch with PACT developers and users?</H3>
-
-
-The PACT team has setup a Majordomo based mailing list for users
-of PACT.  You can subscribe to it by sending the following message
-to Majordomo@lists.llnl.gov
-<UL>
-subscribe pact-users
-</UL>
-You can contact the PACT developers by sending to
-<UL>
-pactdev@llnl.gov
-</UL>
-<SMALL><A HREF="#F0">index</A></SMALL>
-
-<A NAME="F5"></a>
 <H3>5) What are the PACT packages?</H3>
 
 <UL>
@@ -151,10 +140,8 @@ pactdev@llnl.gov
 </TR>
 </TABLE>
 </UL>
-PACT is held together by a system of C shell scripts called the
-manager.  The PACT manager can also be used by other code systems
-to assist with source maintenance and control.
-<br><br><SMALL><A HREF="#F0">index</A></SMALL>
+
+<br><SMALL><A HREF="#F0">index</A></SMALL>
 
 <hr>
 For questions and comments, 
