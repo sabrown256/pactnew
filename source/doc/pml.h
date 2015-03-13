@@ -1372,7 +1372,6 @@ The list of PACT Documents is:<p>
 <BLOCKQUOTE>
 <a href=pact.html>PACT User&#146;s Guide</a><br><br>
 <a href=score.html>SCORE User&#146;s Manual</a><br><br>
-<a href=ppc.html>PPC User&#146;s Manual</a><br><br>
 <a href=pml.html>PML User&#146;s Manual</a><br><br>
 <a href=pdb.html>PDBLib User&#146;s Manual</a><br><br>
 <a href=pgs.html>PGS User&#146;s Manual</a><br><br>

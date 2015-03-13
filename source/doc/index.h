@@ -94,7 +94,6 @@ your software project.
 <li><a href="pdbview.html">PDBView</a><br>
 <li><a href="pgs.html">PGS</a><br>
 <li><a href="pml.html">PML</a><br>
-<li><a href="ppc.html">PPC</a><br>
 <li><a href="score.html">SCORE</a><br>
 <li><a href="sx.html">SX</a><br>
 <li><a href="ultra.html">ULTRA</a><br>

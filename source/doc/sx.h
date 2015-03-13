@@ -4559,14 +4559,14 @@ specified. For SCHEME only programs use:<p>
 
 <B>
 <BLOCKQUOTE>
--lscheme -lppc -lpdb -lpml -lscore [-lm ...]
+-lscheme -lpdb -lpml -lscore [-lm ...]
 </BLOCKQUOTE>
 </B>
 
 For SX programs use:<p>
 
 <B>
--lsx -lscheme -lpanacea -lpgs [-lX11] -lppc -lpdb -lpml -lscore [-lm ...]
+-lsx -lscheme -lpanacea -lpgs [-lX11] -lpdb -lpml -lscore [-lm ...]
 </B>
 
 <P>
@@ -4688,7 +4688,6 @@ The list of PACT Documents is:<p>
 <BLOCKQUOTE>
 <a href=pact.html>PACT User&#146;s Guide</a><br><br>
 <a href=score.html>SCORE User&#146;s Manual</a><br><br>
-<a href=ppc.html>PPC User&#146;s Manual</a><br><br>
 <a href=pml.html>PML User&#146;s Manual</a><br><br>
 <a href=pdb.html>PDBLib User&#146;s Manual</a><br><br>
 <a href=pgs.html>PGS User&#146;s Manual</a><br><br>

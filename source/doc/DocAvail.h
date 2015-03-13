@@ -10,7 +10,7 @@ MOD: 02/03/2010
 
 <hr>
 Note: <I>pkg</I> refers to any one of the PACT packages - 
-pact, panacea, pdb, pgs, pml, ppc, scheme, score, sx, ultra.
+pact, panacea, pdb, pgs, pml, scheme, score, sx, ultra.
 <hr>
 
 <P>
