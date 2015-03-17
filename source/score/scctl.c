@@ -266,29 +266,28 @@ void SC_add_search_path(char *fmt, ...)
     char d[BFLRG], delim[10];
     char **sa;
 
-    if (d != NULL)
-       {if (_SC.path == NULL)
-	   {_SC.path = CMAKE_ARRAY(char *, NULL, 0);
-	    SC_array_string_add_copy(_SC.path, ".");};
+    if (_SC.path == NULL)
+       {_SC.path = CMAKE_ARRAY(char *, NULL, 0);
+	SC_array_string_add_copy(_SC.path, ".");};
 
-	SC_PATH_DELIMITER(delim);
+    SC_PATH_DELIMITER(delim);
 
-	SC_VA_START(fmt);
-	SC_VSNPRINTF(d, BFLRG, fmt);
-	SC_VA_END;
+    SC_VA_START(fmt);
+    SC_VSNPRINTF(d, BFLRG, fmt);
+    SC_VA_END;
 
-	ne = SC_array_get_n(_SC.path);
-	if (ne > 1)
-	   SC_array_pop(_SC.path);
+    ne = SC_array_get_n(_SC.path);
+    if (ne > 1)
+       SC_array_pop(_SC.path);
 
-	sa = PS_tokenize(d, delim, 0);
-	ns = PS_lst_length(sa);
-	for (is = 0; is < ns; is++)
-	    SC_array_string_add_copy(_SC.path, sa[is]);
+    sa = PS_tokenize(d, delim, 0);
+    ns = PS_lst_length(sa);
+    for (is = 0; is < ns; is++)
+        SC_array_string_add_copy(_SC.path, sa[is]);
 
-	PS_free_strings(sa);
+    PS_free_strings(sa);
 
-	SC_array_string_add(_SC.path, NULL);};
+    SC_array_string_add(_SC.path, NULL);
 
     return;}
 

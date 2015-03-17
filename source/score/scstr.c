@@ -78,7 +78,7 @@ int _SC_fmt_strcat(char *d, int nd, int ln, char *fmt, char *s)
     wd = SC_stoi(pf);
 
 /* no width or string longer than specified width - print it all */
-    if (ns >= ABS(wd))
+    if (ns >= abs(wd))
        {CAT(d, nd, ln, s);}
 
 /* right justified field */
@@ -1322,7 +1322,7 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
     sa = SC_array_done(arr);
 
 #ifdef DEBUG
-int na, nb;
+int i, na, nb;
 SC_ptr_arr_len(na, ta);
 SC_ptr_arr_len(nb, sa);
 if (na != nb)
