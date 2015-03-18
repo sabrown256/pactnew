@@ -7,6 +7,9 @@
 # include "cpyright.h"
 #
 
-include auto-clang
+run std/use-compiler vers any bgclang
+
+include compilers/clang-lnx
+
 include cross-clang-bgq
 
