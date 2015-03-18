@@ -10,8 +10,16 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath clang
 
+Group OCV {
+   CC      ?= clang
+   CXX     ?= clang++
+   LD      ?= 
+   CC_Cfg  ?= clang
+   CC_Sh   ?= -fPIC
+}
+
 Tool CC {
-   Exe       = clang
+   Exe       = ${OCV_CC}
    Flags     =
 #   Flags    += -Wcovered-switch-default
    Flags    += -Wno-unknown-pragmas -Wno-empty-body
@@ -92,7 +100,7 @@ Tool FC {
                  4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
    Flags    += [ _env_ = Bits ;                 # address bit size
                  32    = -m32 ;
-                 64    = -m64 -fPIC ]
+                 64    = -m64 ]
    Flags    += [ _cmd_ = -p ;                   # profiling
 	         on    = -pg ]
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
@@ -104,7 +112,7 @@ Tool FC {
 }
 
 Tool CXX {
-   Exe       = clang++
+   Exe       = ${OCV_CXX}
    Flags     = 
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
@@ -130,7 +138,7 @@ Group AF {
 
 # specifications for FPE patching
 Group FPE {
-   Exe = clang
+   Exe = ${OCV_CC}
 }
 
 Group Std {
@@ -141,12 +149,12 @@ Group Std {
 
 Group Cfg {
    Use    = Std
-   CC_Exe = clang
+   CC_Exe = ${OCV_CC_Cfg}
 }
 
 Group Shared {
-   LD_Exe   = clang
-   CC_Flags = -fPIC
+   LD_Exe   = ${OCV_CC}
+   CC_Flags = ${OCV_CC_Sh}
    LD_Flags = ${OCV_Sh}
 }
 
@@ -158,9 +166,7 @@ Group OpenMP {
    CC_Flags  =
    LD_Flags  = -fopenmp
    LD_Lib    = -lgomp
-   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
-                4.6.0  <  yes ;
-                4.6.0  >= no ]
+   SharedFnc = no
 }
 
 include cpp-rule

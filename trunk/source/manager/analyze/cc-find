@@ -67,10 +67,10 @@ int main(int c, char **v)
 {int rv;
 #ifdef __STDC__
 rv = 0;
-printf("ANSI");
+printf("ANSI\n");
 #else
 rv = 1;
-printf("PCC");
+printf("PCC\n");
 #endif
 return(rv);}
 EOF
@@ -98,7 +98,9 @@ end
 set cclst = ( $ncclst )
 
 if ($Verbose > 0) then
-   echo "Complete list of potential compilers: $cclst"
+   NoteD $ALog "Complete list of potential compilers: $cclst"
+else
+   Note $ALog "Complete list of potential compilers: $cclst"
 endif
 
 #--------------------------------------------------------------------------
@@ -110,6 +112,9 @@ set allcc  = ""
 set ansicc = ""
 
 foreach cc ($cclst)
+   Separator $ALog
+   Note $ALog "Checking $cc"
+
    set res = `pwhere -n 1 $cc`
    if ("$res" =~ /*) then
 
@@ -162,6 +167,7 @@ end
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+Separator $ALog
 flog $ALog rm -f $Tmp.c $Tmp
 
 if ($af_ansi == TRUE) then

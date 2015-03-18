@@ -195,25 +195,27 @@ if (-d ../../python) then
                      flog $ALog set lpy_ext = none
                   endif
 
-                  Note $ALog "Python summary:"
-                  NoteD $ALog "      $lpy_ext"
-                  NoteD $ALog "         $lpy_exe"
-                  NoteD $ALog "         compiled with $lpy_cc"
-                  NoteD $ALog "         has include directory $lpy_inc"
-                  NoteD $ALog "         has lib directory $lpy_lib"
+                  if ($lpy_ext != none) then
+                     Note $ALog "Python summary:"
+                     NoteD $ALog "      $lpy_ext"
+                     NoteD $ALog "         $lpy_exe"
+                     NoteD $ALog "         compiled with $lpy_cc"
+                     NoteD $ALog "         has include directory $lpy_inc"
+                     NoteD $ALog "         has lib directory $lpy_lib"
 
-                  if ($lhave_py_numpy == TRUE) then
-                     NoteD $ALog "         has numpy extensions"
-                  endif
-                  if ($lhave_py_numeric == TRUE) then
-                     NoteD $ALog "         has numeric extensions"
-                  endif
+                     if ($lhave_py_numpy == TRUE) then
+                        NoteD $ALog "         has numpy extensions"
+                     endif
+                     if ($lhave_py_numeric == TRUE) then
+                        NoteD $ALog "         has numeric extensions"
+                     endif
 
-                  if (($lhave_py_numeric == FALSE) && ($lhave_py_numpy == FALSE)) then
-                     NoteD $ALog "         does not have numeric extensions"
+                     if (($lhave_py_numeric == FALSE) && ($lhave_py_numpy == FALSE)) then
+                        NoteD $ALog "         does not have numeric extensions"
 # NOTE: if we can build sensibly without any numeric extensions delete these
-                     flog $ALog set lpy_exe      = "no-numeric"
-                     flog $ALog set lhave_python = FALSE
+                        flog $ALog set lpy_exe      = "no-numeric"
+                        flog $ALog set lhave_python = FALSE
+                     endif
                   endif
 
                   if ($HSY_OS_Name == "AIX") then
@@ -239,7 +241,7 @@ if (-d ../../python) then
          end
 
          if ($found == FALSE) then
-            NoteD $ALog "none recognizable"
+            NoteD $ALog "      no python found consistent with $CC_Exe:t"
             flog $ALog set lhave_python     = FALSE
             flog $ALog set lhave_py_numeric = FALSE
             flog $ALog set lhave_py_numpy   = FALSE

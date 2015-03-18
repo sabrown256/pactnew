@@ -14,7 +14,6 @@ Group OCV {
    StackP =
    RPath  = -Wl,-rpath,@
    LD     =
-   CC_Cfg = clang
    CC_Sh  =  -fPIC
    CC_Sh += [ _env_ = Bits ;                 # address bit size
               *     = -m* ]

@@ -8,8 +8,9 @@
 #
 
 Group OCV {
-   CC      = /usr/apps/gnu/clang/llnl/bin/mpiclang
-   CXX     = /usr/apps/gnu/clang/llnl/bin/mpiclang++
+   CC      = mpiclang
+   CC_Cfg  = bgclang
+   CXX     = mpiclang++
    LD_Lib  = -lc
    OMP_Lib = 
 }
