@@ -33,7 +33,7 @@ long _SC_hasharr_name(void *key, int size)
     for (v = 0L; *s != '\0'; s++)
         v = (v << 1) ^ (*s);
 
-    v = ((long) abs(v)) % (long) size;
+    v = labs(v) % (long) size;
 
     return(v);}
 
@@ -58,7 +58,7 @@ static long _SC_hasharr_addr(void *key, int size)
         {c = (a >> 8*i) & 0xff;
 	 v = (v << 1L) ^ c;};
 
-    r = ((long) abs(v)) % m;
+    r = labs(v) % m;
 
     return(r);}
 

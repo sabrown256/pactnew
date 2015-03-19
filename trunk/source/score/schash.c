@@ -34,7 +34,7 @@ static long _SC_hash_name(void *key, int size)
     for (v = 0L; *s != '\0'; s++)
         v = (v << 1) ^ (*s);
 
-    v = ((long) abs(v)) % (long) size;
+    v = labs(v) % (long) size;
 
     return(v);}
 
@@ -44,9 +44,9 @@ static long _SC_hash_name(void *key, int size)
 /* _SC_HASH_ADDR - compute hash value for pointer S in a table of SIZE */
 
 static long _SC_hash_addr(void *key, int size)
-   {SC_address ad;
-    int c;
+   {int c;
     long a, v, r, n, i, m;
+    SC_address ad;
 
     ad.memaddr = key;
 
@@ -59,7 +59,7 @@ static long _SC_hash_addr(void *key, int size)
         {c = (a >> 8*i) & 0xff;
 	 v = (v << 1L) ^ c;};
 
-    r = ((long) abs(v)) % m;
+    r = labs(v) % m;
 
     return(r);}
 
