@@ -10,7 +10,7 @@
 
 #include "pml_int.h"
 
-#define SIGN(a, b) (((b) < 0.0) ? -ABS(a) : ABS(a))
+#define SIGN(a, b) (((b) < 0.0) ? -fabs(a) : fabs(a))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -44,7 +44,7 @@ PM_matrix *_PM_hrsymatr(PM_matrix *a, int cmv)
 	 nrm = 0.0;
 	 if (l > 1)
 	    {for (k = 1; k <= l; k++)
-	         nrm += ABS(PM_element(a, i, k));
+	         nrm += fabs(PM_element(a, i, k));
 
 /* skip transformation */
 	     if (nrm == 0.0)
@@ -152,8 +152,8 @@ static int _PM_ql_tri_eigen(PM_matrix *r, PM_matrix *z, int cmv)
     for (l = 1; l <= n; l++)
         {it = 0;
 	 do {for (m = l; m <= n - 1; m++)
-	         {d = ABS(PM_element(r, m, 1)) + ABS(PM_element(r, m+1, 1));
-		  if (ABS(PM_element(r, m, 2)) + d == d)
+	         {d = fabs(PM_element(r, m, 1)) + fabs(PM_element(r, m+1, 1));
+		  if (fabs(PM_element(r, m, 2)) + d == d)
 		     break;};
 
 	     if (m != l)
@@ -171,7 +171,7 @@ static int _PM_ql_tri_eigen(PM_matrix *r, PM_matrix *z, int cmv)
 		 for (i = m-1; i >= l; i--)
 		     {f = s*PM_element(r, i, 2);
 		      b = c*PM_element(r, i, 2);
-		      if (ABS(f) >= ABS(g))
+		      if (fabs(f) >= fabs(g))
 			 {c = g/f;
 			  t = sqrt(c*c + 1.0);
 			  PM_element(r, i+1, 2) = f*t;

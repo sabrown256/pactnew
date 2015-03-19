@@ -102,7 +102,7 @@ int PM_is_zero(PM_matrix *a)
 
     ok = TRUE;
     for (i = 0; i < n; i++)
-        ok &= (ABS(ar[i]) <= tol);
+        ok &= (fabs(ar[i]) <= tol);
 
     return(ok);}
 

@@ -180,10 +180,10 @@ PM_set *_LR_get_n_set(PA_plot_request *pr, char *name)
     set->dimension      = nd;
     set->dimension_elem = nde;
     set->max_index      = maxes;
-    set->elements       = (byte *) elem;
+    set->elements       = elem;
     set->es_type        = CSTRSAVE("double *");
-    set->extrema        = (byte *) CMAKE_N(double, 2*nde);
-    set->scales         = (byte *) CMAKE_N(double, nde);
+    set->extrema        = CMAKE_N(double, 2*nde);
+    set->scales         = CMAKE_N(double, nde);
     set->opers          = PM_gs.fp_opers;
     set->metric         = NULL;
     set->symmetry_type  = NULL;
@@ -443,10 +443,10 @@ PM_set *LR_build_domain(char *base_name, C_array *arr, double lt)
     set->dimension      = nd;
     set->dimension_elem = nde;
     set->max_index      = maxes;
-    set->elements       = (byte *) elem;
+    set->elements       = elem;
     set->es_type        = CSTRSAVE("double *");
-    set->extrema        = (byte *) CMAKE_N(double, 2*nde);
-    set->scales         = (byte *) CMAKE_N(double, nde);
+    set->extrema        = CMAKE_N(double, 2*nde);
+    set->scales         = CMAKE_N(double, nde);
     set->opers          = PM_gs.fp_opers;
     set->metric         = NULL;
     set->symmetry_type  = NULL;
@@ -602,10 +602,10 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
     range->dimension      = nd;
     range->dimension_elem = nde;
     range->max_index      = maxes;
-    range->elements       = (byte *) elem;
+    range->elements       = elem;
     range->es_type        = CSTRSAVE("double *");
-    range->extrema        = (byte *) CMAKE_N(double, 2*nde);
-    range->scales         = (byte *) CMAKE_N(double, nde);
+    range->extrema        = CMAKE_N(double, 2*nde);
+    range->scales         = CMAKE_N(double, nde);
 
     PM_find_extrema(range);
 
@@ -772,11 +772,11 @@ object *LR_var_plot(SS_psides *si, object *argl)
        {g  = PG_make_graph_from_mapping(f, NULL, NULL, id++, g);
 
 	g->info_type = G_PCONS_P_S;
-	g->info = (byte *) PG_set_tds_info((pcons *) g->info,
-					   PLOT_CONTOUR, CARTESIAN_2D, 
-					   lstyle, lcolor, 10, 1.0,
-					   lwidth, 0.0, 0.0, 0.0,
-					   HUGE);
+	g->info      = PG_set_tds_info((pcons *) g->info,
+				       PLOT_CONTOUR, CARTESIAN_2D, 
+				       lstyle, lcolor, 10, 1.0,
+				       lwidth, 0.0, 0.0, 0.0,
+				       HUGE);
         
         gr = SX_make_pg_graph(si, g);}
 
@@ -997,7 +997,7 @@ object *LR_def_domain(SS_psides *si, object *argl)
     arr         = CMAKE(C_array);
     arr->type   = G_PA_SET_INDEX_P_S;
     arr->length = nmax;
-    arr->data   = (byte *) dmap;
+    arr->data   = dmap;
 
 /* make a list of names and indices suitable for C */
     i = 0;
@@ -1037,7 +1037,7 @@ object *LR_def_domain(SS_psides *si, object *argl)
     arr         = CMAKE(C_array);
     arr->type   = G_PA_SET_INDEX_S;
     arr->length = n;
-    arr->data   = (byte *) dmap;
+    arr->data   = dmap;
 
 /* now make the domain map and the domain arrays */
     ret = SS_make_list(si, G_STRING_I, "domain",

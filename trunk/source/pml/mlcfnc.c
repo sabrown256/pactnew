@@ -50,8 +50,8 @@
      ai  = cimag(_ac);                                                      \
      br  = creal(_bc);                                                      \
      bi  = cimag(_bc);                                                      \
-     abr = ABS(br);                                                         \
-     abi = ABS(bi);                                                         \
+     abr = fabs(br);                                                        \
+     abi = fabs(bi);                                                        \
      u   = max(abr,abi);                                                    \
      brovu = br/u;                                                          \
      biovu = bi/u;                                                          \
@@ -1393,8 +1393,8 @@ int PM_cclose(complex a, complex b, double tol)
     ar = creal(nd);
     ai = cimag(nd);
 
-    ar = ABS(ar);
-    ai = ABS(ai);
+    ar = fabs(ar);
+    ai = fabs(ai);
 
     eq = ((ar < tol) && (ai < tol));
 

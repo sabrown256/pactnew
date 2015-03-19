@@ -351,8 +351,8 @@ double PM_fmax(double x, double y)
 double PM_ffeq(double x, double y)
    {double d, a;
 
-    d = 2.0*(x - y)/(ABS(x) + ABS(y) + SMALL);
-    a = ABS(d);
+    d = 2.0*(x - y)/(fabs(x) + fabs(y) + SMALL);
+    a = fabs(d);
 
     return((double) (a < 1.0e-15));}
 
@@ -414,8 +414,8 @@ double PM_fflt(double x, double y)
 int PM_feq(double x, double y)
    {double d, a;
 
-    d = 2.0*(x - y)/(ABS(x) + ABS(y) + SMALL);
-    a = ABS(d);
+    d = 2.0*(x - y)/(fabs(x) + fabs(y) + SMALL);
+    a = fabs(d);
 
     return(a < 1.0e-15);}
 

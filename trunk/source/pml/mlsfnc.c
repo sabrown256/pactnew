@@ -48,7 +48,7 @@ double PM_cf_eval(int n, double *a, double *b, double tol)
 	 if (bn != 0.0)
 	    {f  = an/bn;
 	     df = f - fo;
-	     if (ABS(df) < tol*ABS(f))
+	     if (fabs(df) < tol*fabs(f))
 	        break;};
 	 fo = f;
 	 a0 = a1;
@@ -180,7 +180,7 @@ static double _PM_igamma_sm(double a, double x)
 	    {ap += 1.0;
 	     ds *= x/ap;
 	     s  += ds;
-	     if (ABS(ds) < ABS(s*_PM.igamma_tol))
+	     if (fabs(ds) < fabs(s*_PM.igamma_tol))
 	        {gl = exp(-x + a*log(x) - PM_ln_gamma(a));
 	         gs = s*gl;
 		 break;};};};
@@ -222,7 +222,7 @@ static double _PM_igamma_cf(double a, double x)
 	 if (a1 != 0.0)
 	    {ds = 1.0/a1;
 	     s  = b1*ds;
-	     if (ABS(s - so) < ABS(s*_PM.igamma_tol))
+	     if (fabs(s - so) < fabs(s*_PM.igamma_tol))
 	        {gl = exp(-x + a*log(x) - PM_ln_gamma(a));
 	         gs = s*gl;
 		 break;};
@@ -287,7 +287,7 @@ double PM_igamma_q(double x, double a)
 static double _PM_erfc_a(double x)
    {double a, xa, rv;
 
-    xa = ABS(x);
+    xa = fabs(x);
     rv = 0.0;
 
 /* Abramowitz and Stegun 7.1.25 - fractional error < 9.25e-3 */
@@ -368,7 +368,7 @@ double PM_legendre(double x, int l, int m)
     if ((m < 0) || (m > l))
        PM_err("BAD SELECTION - PM_LEGENDRE");
 
-    else if (ABS(x) > 1.0)
+    else if (fabs(x) > 1.0)
        PM_err("ARGUMENT OUT OF DOMAIN - PM_LEGENDRE");
 
     else
@@ -458,11 +458,11 @@ double PM_elliptic_integral_g2(double x, double k, double a, double b)
 	h  = ac;
 	z  = h - bc;
 	ac = 0.5*(ac + bc);
-	y  = ABS(1.0/x);
+	y  = fabs(1.0/x);
 	f  = 0.0;
 	l  = 0;
 	em = 1.0;
-	kc = ABS(kc);
+	kc = fabs(kc);
 	while (TRUE)
 	   {bc += (h*kc);
 	    e   = em*kc;
@@ -478,7 +478,7 @@ double PM_elliptic_integral_g2(double x, double k, double a, double b)
 	    y  -= (e/y);
 	    if (y == 0.0)
 	       y = sqrt(e)*CB;
-	    if (ABS(g-kc) <= CA*g)
+	    if (fabs(g-kc) <= CA*g)
 	       break;
 	    kc = sqrt(e)*2.0;
 	    l *= 2;
@@ -518,7 +518,7 @@ double PM_elliptic_integral_gc(double k, double p, double a, double b)
 	gc = HUGE;}
 
     else
-       {kc = ABS(k);
+       {kc = fabs(k);
 	ac = a;
 	bc = b;
 	pc = p;
@@ -546,7 +546,7 @@ double PM_elliptic_integral_gc(double k, double p, double a, double b)
 	    pc  = g + pc;
 	    g   = em;
 	    em += kc;
-	    if (ABS(g-kc) <= g*CA)
+	    if (fabs(g-kc) <= g*CA)
 	       break;
 	    kc  = sqrt(e);
 	    kc += kc;
@@ -684,7 +684,7 @@ static void _PM_jacobian_elliptic(double u, double k,
 	     kcs   = sqrt(kcs);
 	     en[i] = kcs;
 	     c     = 0.5*(a + kcs);
-	     if (ABS(a - kcs) <= CA*a)
+	     if (fabs(a - kcs) <= CA*a)
 	        break;
 	     kcs *= a;
 	     a    = c;};

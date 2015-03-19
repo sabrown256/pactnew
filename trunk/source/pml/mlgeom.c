@@ -13,7 +13,7 @@
 #define ORIENTATION(_rv, _x1, _x2, _x3)                                      \
    {double _cp;                                                              \
     _cp = PM_DELTA_CROSS_2D(_x1[0], _x1[1], _x2[0], _x2[1], _x3[0], _x3[1]); \
-    if (ABS(_cp) < TOLERANCE)                                                \
+    if (fabs(_cp) < TOLERANCE)                                                \
        _rv = 0;                                                              \
     else                                                                     \
        _rv = (_cp < 0) ? -1 : 1;}
@@ -494,12 +494,12 @@ static int _PM_colinear_2d(double **x, int n)
     for (id = 0; id < nd; id++)
         {x1[id]  = x[id][0];
 	 dx[id]  = x[id][1] - x1[id];
-	 ifx[id] = (ABS(dx[id]) < TOLERANCE);};
+	 ifx[id] = (fabs(dx[id]) < TOLERANCE);};
 
     for (i = 2, col = TRUE; (i < n) && col; i++)
         {for (id = 0; id < nd; id++)
 	     {dxi[id]  = x[id][i] - x1[id];
-	      ifxi[id] = (ABS(dxi[id]) < TOLERANCE);};
+	      ifxi[id] = (fabs(dxi[id]) < TOLERANCE);};
 
          if ((ifx[0] && ifxi[0]) || (ifx[1] && ifxi[1]))
 	    col = TRUE;
@@ -531,7 +531,7 @@ static int _PM_colinear_3d(double **x, int n)
 	 else
 	    dx[id] = x[id][1] - x1[id];
 
-        ifx[id] = (ABS(dx[0]) < TOLERANCE);};
+        ifx[id] = (fabs(dx[0]) < TOLERANCE);};
 
     for (i = 2, col = TRUE; (i < n) && (col == TRUE); i++)
         {for (id = 0; id < nd; id++)

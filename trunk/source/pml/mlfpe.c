@@ -452,7 +452,7 @@ long PM_fix_nand(long n, double *d, int mask, double v)
     nn = 0;
     for (i = 0; i < n; i++)
         {ty = PM_fp_typed(d[i]);
-	 ty = ABS(ty);
+	 ty = abs(ty);
 	 if ((ty & mask) != 0)
 	    {nn++;
 	     d[i] = v;};};
@@ -474,7 +474,7 @@ long PM_count_nand(long n, double *d, int mask)
     nn = 0;
     for (i = 0; i < n; i++)
         {ty = PM_fp_typed(d[i]);
-	 ty = ABS(ty);
+	 ty = abs(ty);
 	 if ((ty & mask) != 0)
 	    nn++;};
 
@@ -496,7 +496,7 @@ long PM_fix_nanf(long n, float *f, int mask, float v)
     nn = 0;
     for (i = 0; i < n; i++)
         {ty = PM_fp_typef(f[i]);
-	 ty = ABS(ty);
+	 ty = abs(ty);
 	 if ((ty & mask) != 0)
 	    {nn++;
 	     f[i] = v;};};
@@ -519,7 +519,7 @@ long PM_count_nanf(long n, float *f, int mask)
     nn = 0;
     for (i = 0; i < n; i++)
         {ty = PM_fp_typef(f[i]);
-	 ty = ABS(ty);
+	 ty = abs(ty);
 	 if ((ty & mask) != 0)
 	    nn++;};
 

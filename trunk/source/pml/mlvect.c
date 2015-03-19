@@ -37,19 +37,19 @@ double PM_lnnorm(double *v, double *x, int n, int order)
 
 /* special case: Infinity norm */
     if (order < 0)
-       {norm = ABS(v[0]);
+       {norm = fabs(v[0]);
         for (i = 1; i < n; i++)
-            norm = max(norm, ABS(v[i]));}
+            norm = max(norm, fabs(v[i]));}
 
     else if (order == 1)
        {norm = 0.0;
         for (i = 0; i < n-1; i++)
-            norm += ABS(v[i]) * (x[i+1] - x[i]);}
+            norm += fabs(v[i]) * (x[i+1] - x[i]);}
 
     else if (order > 1)
        {norm = 0.0;
         for (i = 0; i < n-1; i++)
-            norm += pow(ABS(v[i]), order) * (x[i+1] - x[i]);
+            norm += pow(fabs(v[i]), order) * (x[i+1] - x[i]);
         norm = pow(norm, 1.0/((double) order));};
 
     return(norm);}

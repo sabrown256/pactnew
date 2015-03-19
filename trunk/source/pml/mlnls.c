@@ -21,7 +21,7 @@ static void _PM_settol(int neqns, double *tol, double *x,
    {int i;
 
     for (i = 0; i < neqns; i++)
-        tol[i] = 1.0 / (latol + lrtol*ABS(x[i]));
+        tol[i] = 1.0 / (latol + lrtol*fabs(x[i]));
 
     return;}
 
@@ -335,8 +335,8 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
 
     iasymm = 1.0/asymm;
     fltol  = 10.0*_PM.precision;
-    if (ABS(x1[0]) > 1.0)
-       fltol *= ABS(x1[0]);
+    if (fabs(x1[0]) > 1.0)
+       fltol *= fabs(x1[0]);
 
     fltol = max(fltol, xtol);
 
@@ -378,17 +378,17 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
 	if ((xt <= xm) || (xp <= xt))
 	   dx = (yp*xm - ym*xp)/(yp - ym) - x1[0];
 
-	if (ABS(dx) < _PM.precision)
+	if (fabs(dx) < _PM.precision)
 	   {it   = -1;
 	    itx  = 0;
-	    yerr = ABS(x1[1]);};
+	    yerr = fabs(x1[1]);};
 
 	for (it = 1; it < itx; it++)
 	    {x1[0] += dx;
 	     x1[1]  = (*fnc)(x1[0], arg);
 
-	     yerr = ABS(x1[1]);
-	     xerr = ABS(dx);
+	     yerr = fabs(x1[1]);
+	     xerr = fabs(dx);
 	     if ((yerr < ytol) || (xerr < fltol))
 	        break;
 
@@ -412,7 +412,7 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
                 {for (; it < itx; it++)
 		     {x2[0] = x1[0] + 0.1*(xp - x1[0]);
 		      dx    = x2[0] - x1[0];
-		      if (ABS(dx) < fltol)
+		      if (fabs(dx) < fltol)
 			 break;
 
 		      x2[1] = (*fnc)(x2[0], arg);
@@ -431,7 +431,7 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
                 {for (; it < itx; it++)
 		     {x2[0] = x1[0] - 0.1*(x1[0] - xm);
 		      dx    = x2[0] - x1[0];
-		      if (ABS(dx) < fltol)
+		      if (fabs(dx) < fltol)
 			 break;
 
 		      x2[1] = (*fnc)(x2[0], arg);
@@ -452,7 +452,7 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
                 {for (; it < itx; it++)
 		     {x2[0] = 0.5*(x1[0] + xp);
 		      dx    = x2[0] - x1[0];
-		      if (ABS(dx) < fltol)
+		      if (fabs(dx) < fltol)
 			 break;
 
 		      x2[1] = (*fnc)(x2[0], arg);
@@ -472,7 +472,7 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
                 {for (; it < itx; it++)
 		     {x2[0] = 0.5*(x1[0] + xm);
 		      dx    = x2[0] - x1[0];
-		      if (ABS(dx) < fltol)
+		      if (fabs(dx) < fltol)
 			 break;
 
 		      x2[1] = (*fnc)(x2[0], arg);
@@ -487,8 +487,8 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
 			  x1[1] = x2[1];
 			  break;};};}
 
-	     yerr = ABS(x1[1]);
-	     xerr = ABS(dx);
+	     yerr = fabs(x1[1]);
+	     xerr = fabs(dx);
 	     if ((yerr < ytol) || (xerr < fltol))
 	        break;
 
@@ -514,7 +514,7 @@ void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
 
 /* if we aren't changing stop */
 	     dxa = 2.0*dx/(xp + xm);
-	     if (ABS(dxa) < _PM.precision)
+	     if (fabs(dxa) < _PM.precision)
 	        {it = -it;
 		 break;};};};
 

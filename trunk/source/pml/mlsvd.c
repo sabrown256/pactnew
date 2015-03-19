@@ -13,7 +13,7 @@
 
 #define TOL 1.0e-5
 
-#define SIGN(a, b) ((b) >= 0.0 ? ABS(a) : -ABS(a))
+#define SIGN(a, b) ((b) >= 0.0 ? fabs(a) : -fabs(a))
 
 #define INDEX(i, j, m)  i*m + j
 
@@ -83,7 +83,7 @@ static void _PM_svd_reduce(double **prv1, double *panrm,
 	 if (i < m)
 	    {for (k = i; k < m; k++)
 	         {ki  = INDEX(k, i, n);
-		  sc += ABS(a[ki]);};
+		  sc += fabs(a[ki]);};
 
 	     if (sc != 0.0)
 		{for (k = i; k < m; k++)
@@ -123,7 +123,7 @@ static void _PM_svd_reduce(double **prv1, double *panrm,
 	 if ((i < m) && (i != n-1))
 	    {for (k = l; k < n; k++)
 	         {ik  = INDEX(i, k, n);
-		  sc += ABS(a[ik]);};
+		  sc += fabs(a[ik]);};
 
 	     if (sc != 0.0)
 		{for (k = l; k < n; k++)
@@ -158,7 +158,7 @@ static void _PM_svd_reduce(double **prv1, double *panrm,
 		     {ik     = INDEX(i, k, n);
 		      a[ik] *= sc;};};};
 
-	 bnrm = ABS(w[i]) + ABS(rv1[i]);
+	 bnrm = fabs(w[i]) + fabs(rv1[i]);
 	 anrm = max(anrm, bnrm);};
 
     *panrm = anrm;
@@ -312,11 +312,11 @@ int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
 	       for (l = k; l >= 0; l--)
 		   {nm = l - 1;
                     wc = (l > 0) ? w[nm] : 0.0;
-		    if (ABS(rv1[l]) + anrm == anrm)
+		    if (fabs(rv1[l]) + anrm == anrm)
 		       {flag = 0;
 			break;};
 
-		    if (ABS(wc) + anrm == anrm)
+		    if (fabs(wc) + anrm == anrm)
 		       break;};
 
 	       if (flag != 0)
@@ -324,7 +324,7 @@ int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
 		   s = 1.0;
 		   for (i = 0; i < k; i++)
 		       {f = s*rv1[i];
-			if (ABS(f) != 0.0)
+			if (fabs(f) != 0.0)
 			   {g = w[i];
 			    h = HYPOT(f, g);
 			    w[i] = h;

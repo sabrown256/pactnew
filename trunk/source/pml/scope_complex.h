@@ -132,7 +132,7 @@ struct s_complex
 
 #define PM_CLOSETO_COMPLEX(_ok, _x, _y, _tol)                                \
    {long double _del;                                                        \
-    _del = (2.0*(_x - _y)/(ABS(_x) + ABS(_y) + SMALL));                      \
+    _del = (2.0*(_x - _y)/(fabs(_x) + fabs(_y) + SMALL));                    \
     _ok  = ((_del < -_tol) || (_tol < _del));}
 
 /*--------------------------------------------------------------------------*/
