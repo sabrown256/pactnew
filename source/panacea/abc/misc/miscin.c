@@ -223,7 +223,7 @@ void materialh(void)
 /*  associate mat with apropriate part (ie same name) */    
     for (parta = parts; parta != NULL; parta = parta->next)
         if (strcmp(parta->name, s) == 0)
-           {parta->comp = (byte *) mat;
+           {parta->comp = mat;
             return;};
 
     PA_ERR(TRUE, "NO PART FOR THIS MATERIAL\n-> %s %g", s, lrho);

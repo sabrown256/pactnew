@@ -33,7 +33,7 @@
 /* SAME - return TRUE is the points are too close */
 
 #define SAME(x1, y1, x2, y2)                                                 \
-    ((ABS(x1-x2) < TOLERANCE) && (ABS(y1-y2) < TOLERANCE))
+    ((fabs(x1-x2) < TOLERANCE) && (fabs(y1-y2) < TOLERANCE))
 
 /* NODE_OF - compute the node associated with (k, l) */
 
@@ -375,7 +375,7 @@ static int _PM_fit_curve(PM_side *base)
         xx3 = b+c;
         xx2 = xx3*xx3;
         xx1 = xx2*xx2;
-        ts2 = 1.0/(c*ABS(c)*xx4);
+        ts2 = 1.0/(c*fabs(c)*xx4);
         ts3 = xx4/c;
         ts4 = sqrt(a*xx2+xx1);
         ts5 = ts4/sqrt(xx1);
@@ -982,7 +982,7 @@ static double _PM_comp_ratio(double b0, int nz)
                  rN = 1.0 - pow(r0, nzd);
                  b  = r1/rN;
                  db = b0 - b;
-                 if (ABS(db) < 0.0001)
+                 if (fabs(db) < 0.0001)
                     break;
 
                  rN1 = 1.0 - pow(r0, (nzd-1.0));
@@ -999,14 +999,14 @@ static double _PM_comp_ratio(double b0, int nz)
                  rN = 1.0 - pow(r0, nzd);
                  b  = rN/r1;
                  db = b0 - b;
-                 if (ABS(db) < 0.005)
+                 if (fabs(db) < 0.005)
                     break;
 
                  rN1 = 1.0 - pow(r0, (nzd-1.0));
                  dr  = db*r1*r1/(nzd*rN1 - (nzd-1.0)*rN);
                  r0 += dr;};};};
 
-    PM_MESH_ERR((ABS(db) > 0.01) || (r0 == 1.0));
+    PM_MESH_ERR((fabs(db) > 0.01) || (r0 == 1.0));
 
     return(r0);}
 
@@ -1289,7 +1289,7 @@ static void _PM_compute_points(PM_mesh *mesh, double px1, double py1,
         xp = CMAKE_N(double, m);
         yp = CMAKE_N(double, m);
 
-        dt = 3.0*sqrt(ABS(ac/(axx*axx + ayy*ayy + axy*axy)))/(10.0*n);
+        dt = 3.0*sqrt(fabs(ac/(axx*axx + ayy*ayy + axy*axy)))/(10.0*n);
         if (dt == 0.0)
            dt = 3.0*sqrt((ax*ax + ay*ay)/(axx*axx + ayy*ayy + axy*axy))/
                 (10.0*n);
@@ -1306,7 +1306,7 @@ static void _PM_compute_points(PM_mesh *mesh, double px1, double py1,
 
              xp[i] = x;
              yp[i] = y;
-             if (ABS(ty) > ABS(tx))
+             if (fabs(ty) > fabs(tx))
                 {sg = dir*dt/sqrt(1.0 + tx*tx/(ty*ty));
                  if (ty >= 0.0)
                     {y += sg;

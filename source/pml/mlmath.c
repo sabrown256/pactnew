@@ -65,10 +65,10 @@ int PM_value_equal(double x1, double x2, double tol)
        tol = TOLERANCE;
 
     ok  = TRUE;
-    x1a = ABS(x1);
-    x2a = ABS(x2);
+    x1a = fabs(x1);
+    x2a = fabs(x2);
     if ((tol < x1a) || (tol < x2a))
-       ok &= (2.0*ABS(x1 - x2)/(x1a + x2a + SMALL) < tol);
+       ok &= (2.0*fabs(x1 - x2)/(x1a + x2a + SMALL) < tol);
 
     return(ok);}
 
@@ -87,7 +87,7 @@ int PM_value_compare(double x1, double x2, double tol)
     if (tol < 0.0)
        tol = TOLERANCE;
 
-    dx = (x1 - x2)/(ABS(x1) + ABS(x2) + SMALL);
+    dx = (x1 - x2)/(fabs(x1) + fabs(x2) + SMALL);
     if (dx < -tol)
        rv = -1;
     else if (tol < dx)
@@ -114,7 +114,7 @@ int PM_qvalue_compare(long double x1, long double x2, long double tol)
     if (tol < 0.0)
        tol = TOLERANCE;
 
-    dx = (x1 - x2)/(ABS(x1) + ABS(x2) + SMALL);
+    dx = (x1 - x2)/(fabs(x1) + fabs(x2) + SMALL);
     if (dx < -tol)
        rv = -1;
     else if (tol < dx)
@@ -142,7 +142,7 @@ int PM_qvalue_compare(long double x1, long double x2, long double tol)
     if (ltol < 0.0)
        ltol = TOLERANCE;
 
-    dx = (lx1 - lx2)/(ABS(lx1) + ABS(lx2) + SMALL);
+    dx = (lx1 - lx2)/(fabs(lx1) + fabs(lx2) + SMALL);
     if (dx < -ltol)
        rv = -1;
     else if (ltol < dx)
@@ -488,7 +488,7 @@ double PM_romberg(double (*func)(double x), double x0, double x1, double tol)
 
          ly0 = b[n-1];
 
-         toln = ABS((ly0 - b[n-2])/ly0);
+         toln = fabs((ly0 - b[n-2])/ly0);
          if (toln > tol)
             for (i = 0; i < n; i++)
                 a[i] = b[i];};
@@ -614,7 +614,7 @@ int PM_thin_1d_der(int n, double *fncx, double *fncy, double *thnx, double *thny
          else
 	    dydx = x2[1] > x1[1] ? HUGE : -HUGE;
 
-         xt = 0.5*ABS(dydx - odydx)/(ABS(dydx) + ABS(odydx) + SMALL);
+         xt = 0.5*fabs(dydx - odydx)/(fabs(dydx) + fabs(odydx) + SMALL);
          if (xt > toler)
             {if (i0 < i-1)
                 {thnx[j] = x1[0];
@@ -669,7 +669,7 @@ int PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny
          yc = thny[i+1] - thny[i-1];
          sm = yc/xc;
          b  = thny[i+1] - sm*thnx[i+1];
-         ht = ABS(thny[i] - sm*thnx[i] - b)/sqrt(sm*sm + 1.0);
+         ht = fabs(thny[i] - sm*thnx[i] - b)/sqrt(sm*sm + 1.0);
 
          area[i] = 0.5*ht*HYPOT(xc, yc);};
 
@@ -702,7 +702,7 @@ int PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny
                   yc = thny[i+1] - thny[i-1];
                   sm = yc/xc;
                   b  = thny[i+1] - sm*thnx[i+1];
-                  ht = ABS(thny[i] - sm*thnx[i] - b)/sqrt(sm*sm + 1.0);
+                  ht = fabs(thny[i] - sm*thnx[i] - b)/sqrt(sm*sm + 1.0);
                   area[i] = 0.5*ht*HYPOT(xc, yc);};};};
 
     CFREE(area);
@@ -824,7 +824,7 @@ int PM_smooth_int_ave(double *x, double *y, int n, int pts)
          Dx = SMALL;
          for (k = kn; k < kx; k++)
              {xn  = *px++;
-              dx  = ABS(xn - xo);
+              dx  = fabs(xn - xo);
               Dx += dx;
               xo  = xn;
 
@@ -1057,7 +1057,7 @@ double PM_machine_precision(void)
 /* what's left should be numerical noise and that's what
  * we want to know
  */
-    x = ABS(1.0 - x);
+    x = fabs(1.0 - x);
 
 /* on some platforms (LINUX - optimized) we need to clear the
  * state of the floating point unit because the preceeding has

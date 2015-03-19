@@ -1121,7 +1121,7 @@ int PM_find_coefficients(double x, double y, PM_lagrangian_mesh *grid,
                   i3 = kb;
                   u = 1.0;
                   v = 0.0;}
-              else if (ABS(parallelp) > TOLERANCE)
+              else if (fabs(parallelp) > TOLERANCE)
                  {dxij  = xi - px[la];
                   dyij  = yi - py[la];
                   cross = dxj1j*dyij - dyj1j*dxij;

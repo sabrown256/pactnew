@@ -54,10 +54,7 @@ PG_device
 
 /* PLOTW - make a new plot */
 
-int plotw(dev, new, name)
-   PG_device *dev;
-   int new;
-   char *name;
+int plotw(PG_device *dev, int new, char *name)
    {
 
 #ifndef GEN_ONLY
@@ -218,9 +215,7 @@ int newframew(PG_device *dev, int new)
 
 /* MATSW -  draw material boundaries */
 
-int matsw(dev, refl)
-   PG_device *dev;
-   int refl;
+int matsw(PG_device *dev, int refl)
    {int k1, k2, l1, l2;
     PM_part *parta;
     PM_side *base;
@@ -259,10 +254,7 @@ int matsw(dev, refl)
 
 /* PLOT_LEG - plot the boundary segments for the given side */
 
-int plot_leg(dev, base, refl)
-   PG_device *dev;
-   PM_side *base;
-   int refl;
+int plot_leg(PG_device *dev, PM_side *base, int refl)
    {int i, ie, j, n, dk, dl;
     int sdk, sdl, dkdl, dldk, dke, dle, m, m1;
 
@@ -357,9 +349,7 @@ int plot_leg(dev, base, refl)
 
 /* MESHW - draw the mesh */
 
-int meshw(dev, refl)
-   PG_device *dev;
-   int refl;
+int meshw(PG_device *dev, int refl)
    {int k, l, i1, i2;
 
     PG_set_line_color(dev, mesh_mcolor);
@@ -389,7 +379,7 @@ int meshw(dev, refl)
  *           - portion of the mesh
  */
 
-double velmaxw()
+double velmaxw(void)
     {return(0.0);}
 
 /*--------------------------------------------------------------------------*/
@@ -397,9 +387,7 @@ double velmaxw()
 
 /* VELW - plot the velocities on the mesh */
 
-int velw(dev, refl)
-   PG_device *dev;
-   int refl;
+int velw(PG_device *dev, int refl)
    {return(refl);}
 
 /*--------------------------------------------------------------------------*/
@@ -407,7 +395,7 @@ int velw(dev, refl)
 
 /* MAKE_FRAME - initialize global graphics info */
 
-int make_frame()
+int make_frame(void)
    {
 
     mesh_kmax = kmax;

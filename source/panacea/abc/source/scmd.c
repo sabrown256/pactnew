@@ -250,8 +250,8 @@ static void record_entry(char *name, double time, double *ldata)
 /* cons the new time onto the list of times */
     tp       = (time_list *) (hp->def);
     sp       = mk_source_record(time, ldata);
-    fp       = SC_mk_pcons("source record *", (byte *) sp,
-			   "time_list *", (byte *) (tp->list));
+    fp       = SC_mk_pcons("source record *", sp,
+			   "time_list *", tp->list);
     tp->list = fp;
     (tp->length)++;
 

@@ -320,7 +320,7 @@ static double _PM_gcg(double *a0, double *a1, double *b0, double *b1, double *bm
  */
     for (yabsum = SMALL, i = 0; i < neq; i++)
         {r[i]    = y[i] - w[i];
-         yabsum += ABS(y[i]);};
+         yabsum += fabs(y[i]);};
 
 /* compute w = [(LLt)-1].r */
     tssolve(w, r, d, a1, b0, b1, bm1, w, q, ks, km, lm);
@@ -364,8 +364,8 @@ static double _PM_gcg(double *a0, double *a1, double *b0, double *b1, double *bm
               pnorm += p[i]*p[i];
               xerr  += x[i]*x[i];};
 
-         rerr = ABS(rerr) / yabsum;
-         xerr = ABS(aa) * sqrt(pnorm/xerr);
+         rerr = fabs(rerr) / yabsum;
+         xerr = fabs(aa) * sqrt(pnorm/xerr);
  
 /* test if done */
          if ((xerr < eps) && (rerr < eps))
@@ -409,13 +409,13 @@ static void tsdecomp(double *a0, double *a1, double *d, int nblocks,
  
 /* do first row of every step/km block (compute d's) */
     for (j = 0; j <= lastbl; j += step)
-        d[j] = 1.0 / (ABS(a0[j]) + SMALL);
+        d[j] = 1.0 / (fabs(a0[j]) + SMALL);
  
 /* do ith row of every step/km block (compute d's) */
     for (i = 1; i < km; i++)
         for (j = 0; j <= lastbl; j += step)
             d[i+j] = 1.0 /
-                     (ABS(a0[i+j]-a1[i+j-1]*a1[i+j-1]*d[i+j-1]) + SMALL);
+                     (fabs(a0[i+j]-a1[i+j-1]*a1[i+j-1]*d[i+j-1]) + SMALL);
 
     return;}
 

@@ -142,7 +142,7 @@ mesh_quality *compute_mesh_quality(void)
          dytb = 0.5*(y2[j] + y3[j] - y1[j] - y4[j]);
 
          lvol  = 0.5*(dx13*dy24 - dx24*dy13);
-         jt    = lvol/(ABS(dxrl*dytb) + ABS(dxtb*dyrl) + SMALL);
+         jt    = lvol/(fabs(dxrl*dytb) + fabs(dxtb*dyrl) + SMALL);
          jac  += jt*jt;
 
          dx1   = sqrt(dx13*dx13 + dy13*dy13);

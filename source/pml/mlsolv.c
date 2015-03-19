@@ -786,7 +786,7 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
         {ulb = ula + i*n;
          big = 0.0;
          for (j = 0; j < n; j++)
-             {size = ABS(ulb[j]);
+             {size = fabs(ulb[j]);
               if (size - big > tol*big)
                  big = size;};
 
@@ -828,7 +828,7 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
               ulc[j] = alp;
 
 /* check for the largest pivot element */
-              size = scales[i]*ABS(alp);
+              size = scales[i]*fabs(alp);
               if (size - big >= tol*big)
                  {big = size;
                   ipv = i;};};
@@ -1173,13 +1173,13 @@ PM_matrix *PM_decb(int n, int ml, int mu, PM_matrix *b, int *ip)
 
 /*  find the pivot in column nr, within the band, at or below row nr. */
              mx = nr;
-             xm = ABS(PM_element(b, 1, nr));
+             xm = fabs(PM_element(b, 1, nr));
              if (ml != 0)
                 for (i = np; i <= lr; i++)
-                    {if (ABS(PM_element(b, 1, i)) <= xm)
+                    {if (fabs(PM_element(b, 1, i)) <= xm)
                         continue;
                      mx = i;
-                     xm = ABS(PM_element(b, 1, i));};
+                     xm = fabs(PM_element(b, 1, i));};
              ip[nr-1] = mx;
 
 /* interchange rows nr and mx */

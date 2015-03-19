@@ -69,7 +69,7 @@ static INLINE double DISTANCE(double **a, int ia, double **b,
         {xa = a[j][ia];
 	 xb = b[j][ib];
 	 dx = (xb - xa);
-	 dx = ABS(dx);
+	 dx = fabs(dx);
 	 d += POW(dx, pw);};
 
     d = POW(d, 1.0/pw);
@@ -162,7 +162,7 @@ static void _PM_find_overlap_point(int *tb, int *ta, PM_set *dd, double *ds,
         {dc = ddix[id];
 
 	 rc = ds[id]/dsc[id];
-	 rc = ABS(rc) - 1.0;
+	 rc = fabs(rc) - 1.0;
 	 rc = max(rc, 0.0);
 	 rc = 1.0 + MSCALE*rc;
 
@@ -267,7 +267,7 @@ static void _PM_inv_dist_wgt(SC_array *pwd, int *nof,
 	      oc = ls - floor(ls + 0.5);
 
 /* GOTCHA: this tolerance is just plain arbitrary */
-	      on[j] = (ABS(oc) < 2.0e-10);
+	      on[j] = (fabs(oc) < 2.0e-10);
 
 	      it[j] = ls + 0.5;
 	      idc   = idc*ddix[j] + ls;};
@@ -500,7 +500,7 @@ double **PM_interpolate_mapping_id(PM_mapping *dest, PM_mapping *source,
 	     for (i = 0; i < dne; i++)
 	         {iwc    = wgt[i];
 		  tc     = trc[i]*iwc;
-		  tc     = (ABS(tc) <= SMALL) ? 0.0 : tc;
+		  tc     = (fabs(tc) <= SMALL) ? 0.0 : tc;
 		  trc[i] = tc;};
 
 	    };};

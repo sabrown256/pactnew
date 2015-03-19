@@ -488,7 +488,7 @@ long PM_md5_hash(void *key, int size)
     PM_md5_checksum_array(s, nc, 1, d);
 
     v = *(long *) d;
-    v = ((long) abs(v)) % (long) size;
+    v = labs(v) % (long) size;
 
     return(v);}
 

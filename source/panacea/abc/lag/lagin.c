@@ -340,7 +340,7 @@ static double dareadt(double *lrx, double *lry, double *lvx, double *lvy)
               VOLR(vx1[j], vx2[j], vx3[j], vx4[j],
                    ry1[j], ry2[j], ry3[j], ry4[j]);
 
-         dainv = 1.0/(ABS(da) + SMALL);
+         dainv = 1.0/(fabs(da) + SMALL);
          dtav = mdtv*dainv;
 
          dta = min(dta, dtav);};
@@ -573,7 +573,7 @@ int lagw(void)
          dtc = cw(csp);
          dta = dareadt(rx, ry, vx, vy);
 
-         dts0 = ABS(dt-dtelapse);
+         dts0 = fabs(dt-dtelapse);
          dts  = min(dtc, dts0);
          dts  = min(dta, dts);
          if (dts != dts0)
@@ -665,7 +665,7 @@ int lag(PA_package *pck)
 /* compute fractional volume change time step control */
     for (lgdt = HUGE, j = frz; j <= lrz; j++)
         {if (zone[j] != 0.0)
-	    {dvov = ABS(volo[j] - voln[j])/voln[j];
+	    {dvov = fabs(volo[j] - voln[j])/voln[j];
 	     if ((dvov > PARAM[5]) && (dt*PARAM[7] < lgdt))
 	        {lgdt = dt*PARAM[7];
 		 lgz = j;};};};

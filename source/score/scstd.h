@@ -143,10 +143,6 @@
 #undef MAX_BFSZ
 #define MAX_BFSZ     4096
 
-#ifndef ABS
-# define ABS fabs
-#endif
-
 #ifndef POW
 # define POW pow
 #endif

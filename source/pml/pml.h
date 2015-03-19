@@ -56,7 +56,7 @@
 /* PM_SAME - return TRUE if the points are too close */
 
 #define PM_SAME(x1, y1, x2, y2)                                              \
-    ((ABS(x1-x2) < TOLERANCE) && (ABS(y1-y2) < TOLERANCE))
+    ((fabs(x1-x2) < TOLERANCE) && (fabs(y1-y2) < TOLERANCE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -68,7 +68,7 @@
 
 #define PM_CLOSETO_FLOAT(_ok, _x, _y, _tol)                                  \
    {long double _del;                                                        \
-    _del = (2.0*(_x - _y)/(ABS(_x) + ABS(_y) + SMALL));                      \
+    _del = (2.0*(_x - _y)/(fabs(_x) + fabs(_y) + SMALL));                    \
     _ok  = ((_del < -_tol) || (_tol < _del));}
 
 /*--------------------------------------------------------------------------*/
@@ -77,7 +77,7 @@
 /* PM_CLOSETO_ABS - return TRUE if the numbers are close enough */
 
 #define PM_CLOSETO_ABS(x1, x2)                                               \
-    ((ABS(x1-x2) < TOLERANCE))
+    ((fabs(x1-x2) < TOLERANCE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -85,7 +85,7 @@
 /* PM_CLOSETO_REL - return TRUE if the numbers are close enough */
 
 #define PM_CLOSETO_REL(x1, x2)                                               \
-    ((2.0*ABS((x1)-(x2))/(ABS(x1)+ABS(x2)+SMALL) < TOLERANCE))
+    ((2.0*fabs((x1)-(x2))/(fabs(x1)+fabs(x2)+SMALL) < TOLERANCE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -94,7 +94,7 @@
  *              - NOTE: this breaks down if |y| ~ SMALL
  */
 
-#define PM_LESS_LESS(x, y) (ABS(x)/(ABS(y) + SMALL) < TOLERANCE)
+#define PM_LESS_LESS(x, y) (fabs(x)/(fabs(y) + SMALL) < TOLERANCE)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -156,7 +156,7 @@
 #define PM_VOL_TRI_CYLR(_v, _z1, _r1, _z2, _r2, _z3, _r3)                    \
    {double _ra;                                                              \
     _ra = (_r1 + _r2 + _r3)/3.0;                                             \
-    _ra = ABS(_ra);                                                          \
+    _ra = fabs(_ra);                                                         \
     _v  = PI*_ra*((_z1 - _z2)*(_r3 - _r2) - (_r1 - _r2)*(_z3 - _z2));}
 
 /*--------------------------------------------------------------------------*/

@@ -276,7 +276,7 @@ static double _PM_gcg_s(double *a0, double *a1,
 
     for (yabsum = SMALL, i = 0; i < neq; i++)
         {r[i]    = y[i] - r[i];
-         yabsum += ABS(y[i]);};
+         yabsum += fabs(y[i]);};
  
 /* solve R = [(LDLt)].Q */
     icildu(di, la1, lb0, lb1, lbm1, q, r, km, lm, neq, method);
@@ -319,8 +319,8 @@ static double _PM_gcg_s(double *a0, double *a1,
               pnorm += p[i]*p[i];
               xerr  += x[i]*x[i];};
 
-         rerr = ABS(rerr)/yabsum;
-         xerr = ABS(aa)*sqrt(pnorm/xerr);
+         rerr = fabs(rerr)/yabsum;
+         xerr = fabs(aa)*sqrt(pnorm/xerr);
  
 /* test if done */
          if ((xerr < eps) && (rerr < eps))

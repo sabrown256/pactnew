@@ -171,7 +171,7 @@ double PM_sqr(double x)
 double PM_sqrt(double x)
    {double rv;
 
-    rv = sqrt(ABS(x));
+    rv = sqrt(fabs(x));
 
     return(rv);}
 
@@ -330,7 +330,7 @@ double PM_sign2(double x, double y)
 double PM_recip(double x)
    {double rv;
 
-    if (ABS(x) > SMALL)
+    if (fabs(x) > SMALL)
        rv = 1.0/x;
     else
        rv = HUGE;
@@ -357,7 +357,7 @@ double PM_pow(double x, double y)
     else if (y == 1.0)
        rv = x;
     else
-       rv = pow(ABS(x), y);
+       rv = pow(fabs(x), y);
 
     return(rv);}
  
@@ -413,7 +413,7 @@ double PM_sign(double x)
    {double rv;
 
     if (x != 0.0)
-       rv = ABS(x)/x;
+       rv = fabs(x)/x;
     else
        rv = 1.0;
  
@@ -428,7 +428,7 @@ double PM_round(double x)
    {double rv;
     extern double round(double x);
 
-/*    rv = PM_sign(x)*floor(ABS(x) + 0.5); */
+/*    rv = PM_sign(x)*floor(fabs(x) + 0.5); */
     rv = round(x);
  
     return(rv);}
@@ -464,7 +464,7 @@ double PM_fix(double v)
 
     if (v < 0.0)
        {v  = max(v, -maxlv);
-        iv = (long) ABS(v);
+        iv = (long) fabs(v);
         rv = -((double) iv);}
     else
        {v  = min(v, maxlv);
@@ -481,7 +481,7 @@ double PM_fix(double v)
 double PM_sgn(double sign, double v)
    {
 
-    v = ABS(v);
+    v = fabs(v);
     if (sign < 0.0)
        v = -v;
 
@@ -509,7 +509,7 @@ double PM_hypot(double x, double y)
        {r  = y/x;
 	rv = x*sqrt(1.0 + r*r);};
        
-    rv = ABS(rv);
+    rv = fabs(rv);
 
     return(rv);}
 
@@ -528,7 +528,7 @@ static double _PM_jn(int n, double x)
     double ax, z, bj, bjm, bjp, tot, tox, ret;
     double xx, y, num, den, ct, st;
 
-    ax = ABS(x);
+    ax = fabs(x);
     if (n == 0)
        {if (ax < 8.0)
            {y   = x*x;
@@ -589,7 +589,7 @@ static double _PM_jn(int n, double x)
                 {bjm = j*tox*bj - bjp;
                  bjp = bj;
                  bj  = bjm;
-                 if (ABS(bj) > HUGE)
+                 if (fabs(bj) > HUGE)
                     {bj  *= SMALL;
                      bjp *= SMALL;
                      ret *= SMALL;
@@ -825,7 +825,7 @@ double PM_in(double x, double nd)
     n = nd;
 
     if (n == 0)
-       {ax = ABS(x);
+       {ax = fabs(x);
 	if (ax < 3.75)
            {z   = x/3.75;
 	    y   = z*z;
@@ -836,7 +836,7 @@ double PM_in(double x, double nd)
             ret = a1*exp(ax)/sqrt(ax);};}
 
     else if (n == 1)
-       {ax = ABS(x);
+       {ax = fabs(x);
 	if (ax < 3.75)
            {z   = x/3.75;
 	    y   = z*z;
@@ -850,7 +850,7 @@ double PM_in(double x, double nd)
       ret = x;
 
     else
-       {tox = 2.0/ABS(x);
+       {tox = 2.0/fabs(x);
         bi  = 1.0;
 	bip = 0.0;
         ret = 0.0;
@@ -859,7 +859,7 @@ double PM_in(double x, double nd)
 	    {bim = bip + j*tox*bi;
              bip = bi;
 	     bi  = bim;
-	     if (ABS(bi) > HUGE)
+	     if (fabs(bi) > HUGE)
 	        {ret *= SMALL;
 		 bi  *= SMALL;
 		 bip *= SMALL;};
@@ -936,7 +936,7 @@ double PM_kn(double x, double nd)
             ret = a1*a2;};}
 
     else
-       {tox = 2.0/ABS(x);
+       {tox = 2.0/fabs(x);
         bkm = PM_kn(x, 0.0);
 	bk  = PM_kn(x, 1.0);
         ret = 0.0;

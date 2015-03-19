@@ -57,7 +57,7 @@ typedef enum e_line_case line_case;
 /* SAME - return TRUE is the points are too close */
 
 #define SAME(x1, y1, x2, y2)                                                 \
-    ((ABS(x1-x2) < TOLERANCE) && (ABS(y1-y2) < TOLERANCE))
+    ((fabs(x1-x2) < TOLERANCE) && (fabs(y1-y2) < TOLERANCE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -65,7 +65,7 @@ typedef enum e_line_case line_case;
 /* CLOSETO - return TRUE is the numbers are close enough */
 
 #define CLOSETO(x1, x2)                                                      \
-    ((ABS(x1-x2) < TOLERANCE))
+    ((fabs(x1-x2) < TOLERANCE))
 
 /*--------------------------------------------------------------------------*/
 
