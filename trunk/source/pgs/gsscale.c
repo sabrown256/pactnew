@@ -21,7 +21,7 @@ static INLINE double _PG_axis_delta(double c, double lwr, double upr,
     {double del;
 
      if (flg == TRUE)
-        {del = 1.0 + lsc*ABS(c*log10(upr/lwr));
+        {del = 1.0 + lsc*fabs(c*log10(upr/lwr));
          if (c < 0.0)
 	    del = 1.0/del;
          if (upr < lwr)
@@ -495,7 +495,7 @@ static void _PG_tick_div_lin(PG_axis_tick_def *td,
 
     vo[0] = ad->vo[0];
     vo[1] = ad->vo[1];
-    sp    = ABS(sp);
+    sp    = fabs(sp);
 
     va[0] = sp*PM_fix(vo[0]/sp);
     va[1] = sp*PM_fix(vo[1]/sp);
@@ -549,8 +549,8 @@ void _PG_tick(PG_axis_def *ad, int tick)
  */
 
 /* log scale */
-    if ((ad->log_scale[0] && (ABS(ad->cosa) >= 0.9999)) ||
-        (ad->log_scale[1] && (ABS(ad->sina) >= 0.9999)))
+    if ((ad->log_scale[0] && (fabs(ad->cosa) >= 0.9999)) ||
+        (ad->log_scale[1] && (fabs(ad->sina) >= 0.9999)))
        _PG_tick_div_log(td, ad, tick);
 
 /* linear scale */
@@ -605,7 +605,7 @@ PG_axis_def *_PG_mk_axis_def(int atype, int ttype, int ltype,
 
 /* VO[0] and VO[1] must be further apart than toler apart */
     toler = 1.0e-8;
-    if (ABS(vo[0] - vo[1]) < toler*(ABS(vo[0]) + ABS(vo[1])))
+    if (fabs(vo[0] - vo[1]) < toler*(fabs(vo[0]) + fabs(vo[1])))
        {if (vo[0] == 0.0)
 	   {vo[0] -= 0.1;
 	    vo[1] += 0.1;}

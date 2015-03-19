@@ -1538,8 +1538,8 @@ int PG_select_color(PG_device *dev, int n, double *a, double *extr)
                     av = ax;}
 
              if ((an <= av) && (av <= ax))
-                {da     = (shape[i] - 1)/(ABS(ax - an) + SMALL);
-                 color += (int)(ABS(av - an)*da + 0.49999) * prod;
+                {da     = (shape[i] - 1)/(fabs(ax - an) + SMALL);
+                 color += (int)(fabs(av - an)*da + 0.49999) * prod;
                  prod  *= shape[i];}
              else
                 return(dev->WHITE);

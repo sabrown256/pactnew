@@ -101,7 +101,7 @@ void PG_draw_multiple_line(PG_device *dev, int nlines,
              *py++ = x2[1] + sp*dy24;};}
     else
        {for (i = 0; i < nlines; ++i)
-            {sp = ABS(dx[i]);
+            {sp = fabs(dx[i]);
              *px++ = x1[0] + sp*dx13;
              *py++ = x1[1] + sp*dy13;
              *px++ = x2[0] + sp*dx24;

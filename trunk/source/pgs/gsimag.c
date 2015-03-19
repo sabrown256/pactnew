@@ -488,8 +488,8 @@ static void PG_crop_image(PG_device *dev, PG_image *im)
     kmax = im->kmax;
     lmax = im->lmax;
 
-    dx = 1.00001*(kmax - 1)/(ABS(im->xmax - xmin));
-    dy = 1.00001*(lmax - 1)/(ABS(im->ymax - ymin));
+    dx = 1.00001*(kmax - 1)/(fabs(im->xmax - xmin));
+    dy = 1.00001*(lmax - 1)/(fabs(im->ymax - ymin));
 
     PG_get_viewspace(dev, WORLDC, wc);
     k1 = (wc[0] - xmin)*dx;
@@ -1022,7 +1022,7 @@ void PG_draw_palette_n(PG_device *dev ARG(,,cls),
  *       and clipping for arbitrary size windows
  */
     toler = 10.0*PG_window_width(dev)/((double) INT_MAX);
-    if (ABS(rbx[1] - rbx[0]) < toler*(ABS(rbx[0]) + ABS(rbx[1])))
+    if (fabs(rbx[1] - rbx[0]) < toler*(fabs(rbx[0]) + fabs(rbx[1])))
        {if (rbx[0] == 0.0)
 	   {rbx[0] -= 0.1;
 	    rbx[1] += 0.1;}
@@ -1125,7 +1125,7 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
  *       and clipping for arbitrary size windows
  */
     toler = 10.0*PG_window_width(dev)/((double) INT_MAX);
-    if (ABS(rex[1] - rex[0]) < toler*(ABS(rex[0]) + ABS(rex[1])))
+    if (fabs(rex[1] - rex[0]) < toler*(fabs(rex[0]) + fabs(rex[1])))
        {if (rex[0] == 0.0)
 	   {rex[0] -= 0.1;
 	    rex[1] += 0.1;}
@@ -1133,7 +1133,7 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
 	   {rex[0] -= 0.5*toler*rex[0];
 	    rex[1] += 0.5*toler*rex[1];};};
 
-    if (ABS(rex[3] - rex[2]) < toler*(ABS(rex[2]) + ABS(rex[3])))
+    if (fabs(rex[3] - rex[2]) < toler*(fabs(rex[2]) + fabs(rex[3])))
        {if (rex[2] == 0.0)
 	   {rex[2] -= 0.1;
 	    rex[3] += 0.1;}

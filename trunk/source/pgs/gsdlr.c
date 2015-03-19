@@ -273,10 +273,10 @@ static pboolean _PG_rst_clip_line(PG_device *dev, double *x1, double *x2)
 /* _PG_RST_DRAW_LINE_2D - draw a line on the current frame buffer */
 
 void _PG_rst_draw_line_2d(PG_device *dev, int *i1, int *i2)
-   {int i, dxi, dyi, visible, rgb;
+   {int i, visible, rgb;
     int limit, il, icnt, lim1, nn, sp, dl[4];
     int ls, lc;
-    int ir[PG_SPACEDM];
+    int ir[PG_SPACEDM], dxi[PG_SPACEDM];
     double lw, dxr, dyr, rx, ry;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
     RGB_color_map clr;
@@ -311,30 +311,30 @@ void _PG_rst_draw_line_2d(PG_device *dev, int *i1, int *i2)
 
     PG_rgb_color(&clr, lc, rgb, pal);
 
-    dxi = i2[0] - i1[0];
-    dyi = i2[1] - i1[1];
+    dxi[0] = i2[0] - i1[0];
+    dxi[1] = i2[1] - i1[1];
 
-    if (abs(dxi) > abs(dyi))
-       {dxr = (dxi > 0) ? 1.0 : -1.0 ;
-        dyr = ((double) abs(dyi)) / ((double) abs(dxi));
-        if (dyi < 0)
+    if (abs(dxi[0]) > abs(dxi[1]))
+       {dxr = (dxi[0] > 0) ? 1.0 : -1.0 ;
+        dyr = ((double) abs(dxi[1])) / ((double) abs(dxi[0]));
+        if (dxi[1] < 0)
 	   dyr = -dyr;}
 
-    else if (abs(dyi) > abs(dxi))
-       {dyr = (dyi > 0) ? 1.0 : -1.0 ;
-        dxr = ((double) abs(dxi)) / ((double) abs(dyi));
-        if (dxi < 0)
+    else if (abs(dxi[1]) > abs(dxi[0]))
+       {dyr = (dxi[1] > 0) ? 1.0 : -1.0 ;
+        dxr = ((double) abs(dxi[0])) / ((double) abs(dxi[1]));
+        if (dxi[0] < 0)
 	   dxr = -dxr;}
     else
-       {dxr = (dxi > 0) ? 1.0 : -1.0;
-        dyr = (dyi > 0) ? 1.0 : -1.0;};
+       {dxr = (dxi[0] > 0) ? 1.0 : -1.0;
+        dyr = (dxi[1] > 0) ? 1.0 : -1.0;};
 
     il   = 1;
     icnt = 0;
     lim1 = dl[0];
 
 /* should we use "+ 0.49" or not ? */
-    limit = max(ABS(x1[0]-x2[0]), ABS(x1[1]-x2[1])) + 0.49;
+    limit = max(fabs(x1[0]-x2[0]), fabs(x1[1]-x2[1])) + 0.49;
     rx = x1[0];
     ry = x1[1];
     ir[0] = (int) (rx + 0.49);
@@ -374,10 +374,10 @@ void _PG_rst_draw_line_2d(PG_device *dev, int *i1, int *i2)
  */
 
 void _PG_rst_draw_line_3d(PG_device *dev, int *i1, int *i2)
-   {int i, id, dxi, dyi, visible, rgb;
+   {int i, id, visible, rgb;
     int limit, il, icnt, lim1, nn, sp, dl[4];
     int ls, lc, wox, woy;
-    int ir[PG_SPACEDM];
+    int ir[PG_SPACEDM], dxi[PG_SPACEDM];
     double lw, sf, dxr, dyr, dzr, rx, ry, rz;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
     RGB_color_map clr;
@@ -420,31 +420,31 @@ void _PG_rst_draw_line_3d(PG_device *dev, int *i1, int *i2)
 
     PG_rgb_color(&clr, lc, rgb, pal);
 
-    dxi = i2[0] - i1[0];
-    dyi = i2[1] - i1[1];
+    dxi[0] = i2[0] - i1[0];
+    dxi[1] = i2[1] - i1[1];
     dzr = i2[2] - i1[2];
 
-    if (abs(dxi) > abs(dyi))
-       {dxr = (dxi > 0) ? 1.0 : -1.0 ;
-        dyr = ((double) abs(dyi)) / ((double) abs(dxi));
-        if (dyi < 0)
+    if (abs(dxi[0]) > abs(dxi[1]))
+       {dxr = (dxi[0] > 0) ? 1.0 : -1.0 ;
+        dyr = ((double) abs(dxi[1])) / ((double) abs(dxi[0]));
+        if (dxi[1] < 0)
 	   dyr = -dyr;}
 
-    else if (abs(dyi) > abs(dxi))
-       {dyr = (dyi > 0) ? 1.0 : -1.0 ;
-        dxr = ((double) abs(dxi)) / ((double) abs(dyi));
-        if (dxi < 0)
+    else if (abs(dxi[1]) > abs(dxi[0]))
+       {dyr = (dxi[1] > 0) ? 1.0 : -1.0 ;
+        dxr = ((double) abs(dxi[0])) / ((double) abs(dxi[1]));
+        if (dxi[0] < 0)
 	   dxr = -dxr;}
     else
-       {dxr = (dxi > 0) ? 1.0 : -1.0;
-        dyr = (dyi > 0) ? 1.0 : -1.0;};
+       {dxr = (dxi[0] > 0) ? 1.0 : -1.0;
+        dyr = (dxi[1] > 0) ? 1.0 : -1.0;};
 
     il   = 1;
     icnt = 0;
     lim1 = dl[0];
 
 /* should we use "+ 0.49" or not ? */
-    limit = max(ABS(x1[0]-x2[0]), ABS(x1[1]-x2[1])) + 0.49;
+    limit = max(fabs(x1[0]-x2[0]), fabs(x1[1]-x2[1])) + 0.49;
     if (limit > 1)
        dzr /= ((double) limit - 1.0);
     else
@@ -461,8 +461,8 @@ void _PG_rst_draw_line_3d(PG_device *dev, int *i1, int *i2)
         {rx += dxr;
          ry += dyr;
          rz += dzr;
-         ir[0]  = (int) (sf*rx + 0.49);
-         ir[1]  = (int) (sf*ry + 0.49);
+         ir[0] = (int) (sf*rx + 0.49);
+         ir[1] = (int) (sf*ry + 0.49);
 
 /* handle intervals for non-line_solid lines */
 	 il++;

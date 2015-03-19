@@ -915,7 +915,7 @@ void _SS_install_math(SS_psides *si)
     SS_install_mf(si, "abs",
 		  "Procedure: Returns the absolute value of a numeric object",
 		  SS_unary_flt,
-		  ABS, PM_cabs, PM_qnorm, SS_PR_PROC);
+		  fabs, PM_cabs, PM_qnorm, SS_PR_PROC);
 
     SS_install_mf(si, "acos",
 		  "Procedure: Returns the arc cosine of the argument",

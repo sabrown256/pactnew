@@ -180,7 +180,7 @@ static double _UL_effective_dx(double *x, double *y, int n)
 
     yx = 0.0;
     for (i = 0; i < n; i++)
-        {v  = ABS(y[i]);
+        {v  = fabs(y[i]);
 	 yx = max(yx, v);};
     yx *= 0.5;
 

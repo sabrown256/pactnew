@@ -2555,11 +2555,11 @@ void UL_install_funcs(SS_psides *si)
     SS_install_cf(si, "abs",
                   "Procedure: Take absolute value of y values of curves\n     Usage: abs <curve-list>",
                   UL_uopyc, 
-                  ABS);
+                  fabs);
     SS_install_cf(si, "absx",
                   "Procedure: Take absolute value of x values of curves\n     Usage: absx <curve-list>",
                   UL_uopxc, 
-                  ABS);
+                  fabs);
     SS_install_cf(si, "recip",
                   "Procedure: Take reciprocal of y values of curves\n     Usage: recip <curve-list>",
                   UL_uopyc, 

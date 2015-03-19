@@ -651,7 +651,7 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
 
     j = SX_get_crv_index_i(crv);
     i = SX_next_space(si);
-    n = 1 + (1.0 + TOLERANCE)*ABS(xstop - xstart)/xstep;
+    n = 1 + (1.0 + TOLERANCE)*fabs(xstop - xstart)/xstep;
 
     xpj = SX_gs.dataset[j].x[0];
     ypj = SX_gs.dataset[j].x[1];

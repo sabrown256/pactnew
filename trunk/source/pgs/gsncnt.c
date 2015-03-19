@@ -376,7 +376,7 @@ static int _PG_fix_orientation(int *js, int in, long *edge, double **x, int nd)
     om = or[0]*or[0] + or[1]*or[1] + or[2]*or[2];
     nm = dxn[0]*dxn[0] + dxn[1]*dxn[1] + dxn[2]*dxn[2];
 
-    nc /= sqrt(ABS(om*nm) + SMALL);
+    nc /= sqrt(fabs(om*nm) + SMALL);
 
     alt = (nc < -1.0e-8);
     if (alt)
