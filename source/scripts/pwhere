@@ -33,7 +33,10 @@ while ($#argv > 0)
    shift
 end
 
-if ("$exe" != "") then
+if ("$exe" =~ /*) then
+   echo $exe
+
+else if ("$exe" != "") then
    set elst = ""
    foreach d ($path)
       if (-xf $d/$exe) then

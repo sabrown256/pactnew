@@ -880,9 +880,9 @@ void _PG_PS_set_dev_color(PG_device *dev, int prim, int check)
         scale = 1.0/((double) MAXPIX);
 
         true_cm = pal->true_colormap;
-        r = ABS(scale*true_cm[color].red);
-        g = ABS(scale*true_cm[color].green);
-        b = ABS(scale*true_cm[color].blue);
+        r = fabs(scale*true_cm[color].red);
+        g = fabs(scale*true_cm[color].green);
+        b = fabs(scale*true_cm[color].blue);
 
         io_printf(dev->file, "%.2f %.2f %.2f Srgb\n", r, g, b);}
 

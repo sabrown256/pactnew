@@ -750,7 +750,7 @@ static int _UL_bc_operate(PFVoid basicf, double **xa,
 
 	 xa[0][na++] = xv;
 
-	 ida = 2.0*ABS(d2 - d1)/(d1 + d2 + SMALL);
+	 ida = 2.0*fabs(d2 - d1)/(d1 + d2 + SMALL);
 	 if (ida >= 0.2)
             {if (d2 < d1)
                 ic1--;

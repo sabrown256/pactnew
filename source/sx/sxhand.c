@@ -707,7 +707,7 @@ void SX_mf_install(SS_psides *si)
     SS_install(si, "abs",
                "Math absolute value of range values\nFORM abs <graph-list>",
                _SX_mh_u_s,
-	       ABS, SS_PR_PROC);
+	       fabs, SS_PR_PROC);
 
 /* Functions under the _SX_MH_U_M handler */
 
@@ -792,7 +792,7 @@ void SX_mf_install(SS_psides *si)
     SS_install(si, "absx",
                "Math absolute value of x\nFORM absx <graph-list>",
                _SX_m11_x,
-	       ABS, SS_PR_PROC);
+	       fabs, SS_PR_PROC);
     SS_install(si, "recipx",
                "Math reciprocal of x\nFORM recipx <graph-list>",
                _SX_m11_x,

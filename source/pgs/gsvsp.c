@@ -1057,7 +1057,7 @@ void PG_trans_interval(PG_device *dev, int nd, PG_coord_sys ics, double *dxi,
 	for (id = 0; id < nd; id++)
 	    {l = 2*id;
 	     d = bx[l] - bx[l+1];
-	     dxo[id] = ABS(d);};};
+	     dxo[id] = fabs(d);};};
 
     return;}
 
@@ -1136,8 +1136,8 @@ static void _PG_log_transform(PG_device *dev, int nd, double *box)
  * take logs of min and max
  */
 	 if (iflog[id])
-	    {mx = log10(ABS(mx) + SMALL);
-	     mn = log10(ABS(mn) + SMALL);
+	    {mx = log10(fabs(mx) + SMALL);
+	     mn = log10(fabs(mn) + SMALL);
 	     ma = mx - _PG_gattrs.axis_n_decades;
 
 /* limit mn to be within PG_axis_n_decades of the max value */
@@ -1173,7 +1173,7 @@ void PG_log_space(PG_device *dev, int nd, int dec, double *box)
 
 /* if log axis options have been used take log */
 	     if (iflog[id])
-	        xc = log10(ABS(xc) + SMALL);
+	        xc = log10(fabs(xc) + SMALL);
 
 	     box[l] = xc;};};
 
@@ -1195,7 +1195,7 @@ void PG_log_point(PG_device *dev, int nd, double *p)
 
 /* if log axis options have been used take log */
 	 if (iflog[id] == TRUE)
-	    pc = log10(ABS(pc) + SMALL);
+	    pc = log10(fabs(pc) + SMALL);
 
 	 p[id] = pc;};
 

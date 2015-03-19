@@ -243,7 +243,7 @@ void PG_find_extrema(PG_graph *data, double stdoff, double **pdpex, double **prp
 	     rmn = rdex[ia];
 	     rmx = rdex[ib];
 
-	     rm = max(ABS(rmx), ABS(rmn));
+	     rm = max(fabs(rmx), fabs(rmn));
 	     sc = (rm == 0.0) ? 0.0 : stdoff*(dmx - dmn)/rm;
 
 	     ddex[ia] += (min(0.0, sc*rmn));

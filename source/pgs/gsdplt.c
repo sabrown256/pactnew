@@ -728,7 +728,7 @@ static void _PG_dom_ac_3d_shaded(PG_device *dev, double **r,
 
 /* else if above the horizon pick the color from the palette */
          else
-	    {v     = ABS(v);
+	    {v     = fabs(v);
 	     color = PG_select_color(dev, 1, &v, ext);};
 
 	 PG_fill_polygon_n(dev, color, TRUE, nd, WORLDC, 4, s);

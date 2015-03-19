@@ -35,16 +35,6 @@ typedef void (*PFCntrNC)(PG_device *dev, double *a,
          osd[onp] = onp;                                                      \
          onp++;};}
 
-#define PG_ZONE_SIDE(xa, ya, aa, xb, yb, ab)                                 \
-    if (((aa[l] < lv+PGS_TOL) && (lv-PGS_TOL < ab[l])) ||                    \
-        ((aa[l] > lv-PGS_TOL) && (lv+PGS_TOL > ab[l])))                      \
-       {if ((ABS(aa[l] - ab[l]) > PGS_TOL) || (ABS(ab[l] - lv) > PGS_TOL))   \
-           {fracb = (lv - aa[l])/(ab[l] - aa[l] + SMALL);                    \
-            fraca = 1.0 - fracb;                                             \
-            xpt[npt] = fraca*xa[l] + fracb*xb[l];                            \
-            ypt[npt] = fraca*ya[l] + fracb*yb[l];                            \
-            npt++;};}
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

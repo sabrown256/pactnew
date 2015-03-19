@@ -492,7 +492,7 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
     if ((box[2] == box[3]) && (box[2] != 0.0))
        {double dy;
 
-        dy = ABS(0.01*(box[2] + box[3]));
+        dy = fabs(0.01*(box[2] + box[3]));
         box[2] -= dy;
         box[3] += dy;}
 

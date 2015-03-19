@@ -302,9 +302,9 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 	     mn = extr[ne++];
 	     mx = extr[ne++];
              dm = mx - mn;
-             if (ABS(mn) < tol*ABS(dm))
+             if (fabs(mn) < tol*fabs(dm))
 	        mn = 0.0;
-             if (ABS(mx) < tol*ABS(dm))
+             if (fabs(mx) < tol*fabs(dm))
 	        mx = 0.0;
 
 	     p[0] = xo[0];
@@ -316,9 +316,9 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 	     mn = extr[ne++];
 	     mx = extr[ne++];
              dm = mx - mn;
-             if (ABS(mn) < tol*ABS(dm))
+             if (fabs(mn) < tol*fabs(dm))
 	        mn = 0.0;
-             if (ABS(mx) < tol*ABS(dm))
+             if (fabs(mx) < tol*fabs(dm))
 	        mx = 0.0;
 
 	     p[0] = xo[2];
@@ -640,8 +640,8 @@ void PG_clip_line(int *pfl, double *x1, double *x2, double *wc, int *lgf)
     lrgr  = 1.0 + PAD_FACTOR;
     smllr = 1.0/lrgr;
 
-    dx[0] = PAD_FACTOR*ABS(lwc[1] - lwc[0]);
-    dx[1] = PAD_FACTOR*ABS(lwc[3] - lwc[2]);
+    dx[0] = PAD_FACTOR*fabs(lwc[1] - lwc[0]);
+    dx[1] = PAD_FACTOR*fabs(lwc[3] - lwc[2]);
 
     tx[0] = 0.0;
     tx[1] = 0.0;;

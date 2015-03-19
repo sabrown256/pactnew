@@ -58,9 +58,9 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
     en[0] = td->en[0];
     en[1] = td->en[1];
 
-    fr    = max(ABS(bx[2]), ABS(bx[3]))/(bx[3] - bx[2]);
+    fr    = max(fabs(bx[2]), fabs(bx[3]))/(bx[3] - bx[2]);
     nr    = fr*n;
-    fr    = max(ABS(bx[0]), ABS(bx[1]))/(bx[1] - bx[0]);
+    fr    = max(fabs(bx[0]), fabs(bx[1]))/(bx[1] - bx[0]);
     nr    = max(nr, fr*n);
     na    = 32;
     aincr = tpi/na;
@@ -90,8 +90,8 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
             {a1 = 0.0;
              a2 = tpi;}
          else
-            {a1 = atan2(bx[2],  ABS(bx[0]));
-             a2 = tpi + atan2(bx[2], -ABS(bx[0]));};
+            {a1 = atan2(bx[2],  fabs(bx[0]));
+             a2 = tpi + atan2(bx[2], -fabs(bx[0]));};
 
          PG_draw_arc(dev, rc, a1, a2, 0.0, 0.0, RADIAN);};
 
@@ -824,7 +824,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 	     x4[0] = xb[0];
 	     x4[1] = xb[1];
 	     if (g->iflog[0])
-	        {if (((ABS(xs[0]) - ABS(en[1])) == 0.0) && (xb[0] == 0.0))
+	        {if (((fabs(xs[0]) - fabs(en[1])) == 0.0) && (xb[0] == 0.0))
 		    x4[0] = x2[0]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x1[0] = x2[0]/fdx[0];
 		 x3[0] = x4[0]/fdx[0];}
@@ -834,7 +834,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 		 x3[0] = x4[0] - fdx[0];};
 
 	     if (g->iflog[1])
-	        {if (((ABS(xs[1]) - ABS(en[1])) == 0.0) && (xb[1] == 0.0))
+	        {if (((fabs(xs[1]) - fabs(en[1])) == 0.0) && (xb[1] == 0.0))
 		    x4[1] = x2[1]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x1[1] = x2[1]*fdx[1];
 		 x3[1] = x4[1]*fdx[1];}
@@ -851,7 +851,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 	     x3[0] = xb[0];
 	     x3[1] = xb[1];
 	     if (g->iflog[0])
-	        {if (((ABS(xs[0]) - ABS(en[1])) == 0.0) && (xb[0] == 0.0))
+	        {if (((fabs(xs[0]) - fabs(en[1])) == 0.0) && (xb[0] == 0.0))
 		    x3[0] = x1[0]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x2[0] = x1[0]*fdx[0];
 		 x4[0] = x3[0]*fdx[0];}
@@ -861,7 +861,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 		 x4[0] = x3[0] + fdx[0];};
 
 	     if (g->iflog[1])
-	        {if (((ABS(xs[1]) - ABS(en[1])) == 0.0) && (xb[1] == 0.0))
+	        {if (((fabs(xs[1]) - fabs(en[1])) == 0.0) && (xb[1] == 0.0))
 		    x3[1] = x1[1]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x2[1] = x1[1]/fdx[1];
 		 x4[1] = x3[1]/fdx[1];}
@@ -874,7 +874,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 
         case AXIS_TICK_STRADDLE :
 	     if (g->iflog[0])
-	        {if (((ABS(xs[0]) - ABS(en[1])) == 0.0) && (xb[0] == 0.0))
+	        {if (((fabs(xs[0]) - fabs(en[1])) == 0.0) && (xb[0] == 0.0))
 		    xb[0] = xa[0]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x1[0] = xa[0]/fdx[0];
 		 x2[0] = xa[0]*fdx[0];
@@ -888,7 +888,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 		 x4[0] = xb[0] + fdx[0];}
 
 	     if (g->iflog[1])
-	        {if (((ABS(xs[1]) - ABS(en[1])) == 0.0) && (xb[1] == 0.0))
+	        {if (((fabs(xs[1]) - fabs(en[1])) == 0.0) && (xb[1] == 0.0))
 		    xb[1] = xa[1]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x1[1] = xa[1]*fdx[1];
 		 x2[1] = xa[1]/fdx[1];
@@ -923,7 +923,7 @@ static void _PG_sprintf(char *string, long nc,
 			char *format, double value, double tol)
    {char t[40], *token, *s;
 
-    if (ABS(value) < tol)
+    if (fabs(value) < tol)
        value = 0.0;
 
     if (strchr(format, 'd') != NULL)
@@ -971,10 +971,10 @@ static void _PG_axis_label_fmt(PG_device *dev, char *format, long nc,
     if (g->iflog[0] || g->iflog[1])
        tol = 0.0;
     else
-       tol = 1.0e-6*ABS(vo[1] - vo[0]);
+       tol = 1.0e-6*fabs(vo[1] - vo[0]);
 
 /* determine whether to use 'e' or 'f' format */
-    yo = max(ABS(en[0]), ABS(en[1]));
+    yo = max(fabs(en[0]), fabs(en[1]));
     ti = strlen(format) - 1;
     ti = max(ti, 0);
     fc = format[ti];
@@ -1114,7 +1114,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
                  xb[1] += fdx[1];};
 
              fx[0] = -0.47*(1.0 + ac[1]);
-             fx[1] = 0.5*ac[0] - 0.25*ABS(ac[0]) - 0.33*ABS(ac[1]);
+             fx[1] = 0.5*ac[0] - 0.25*fabs(ac[0]) - 0.33*fabs(ac[1]);
              break;
 
         case AXIS_TICK_RIGHT :
@@ -1136,7 +1136,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
                  xb[1] -= fdx[1];};
 
              fx[0] = -0.47*(1.0 - ac[1]);
-             fx[1] = -0.5*ac[0] - 0.25*ABS(ac[0]) - 0.33*ABS(ac[1]);
+             fx[1] = -0.5*ac[0] - 0.25*fabs(ac[0]) - 0.33*fabs(ac[1]);
              break;
 
         case AXIS_TICK_ENDS :
@@ -1155,7 +1155,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 		  dx0[id] = Dr*ac[id];
 		  if (g->iflog[id])
 		     {idm = log_scale/
-			    (ABS(0.5*(bnd[l] + bnd[l+1])) + SMALL);
+			    (fabs(0.5*(bnd[l] + bnd[l+1])) + SMALL);
 		      dx0[id] *= (1.0 + (2.0*xa[id] - fx[id]*ldx[id]*ac[id])*idm);
 		      xb[id]   = (xs[id] + 1.015*sp*ac[id]*sx[id])*(1.0 + xa[id]*idm);
 		      xa[id]   = xs[id]/(1.0 + xa[id]*idm);}
@@ -1181,8 +1181,8 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 /* if the labels cannot be distinguished because of the precision
  * try a different tack
  */
-    dv = ABS(vo[1] - vo[0]);
-    sv = ABS(vo[0]) + ABS(vo[1]);
+    dv = fabs(vo[1] - vo[0]);
+    sv = fabs(vo[0]) + fabs(vo[1]);
 
 /* treat the first label specially because of the possible '~' or '>' */
     db = dx[0];
@@ -1213,13 +1213,13 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 	     ovlp[0] |= ((ldx[0] <= 1.1) && (ldx[0] > rmx));
 	     ovlp[0] &= (xs[0]*xp[0] != 0.0);}
 	 else
-	    ovlp[0] = (ldx[0] > ABS(xs[0] - xp[0]));
+	    ovlp[0] = (ldx[0] > fabs(xs[0] - xp[0]));
 
 	 if (g->iflog[1])
 	    {rmx     = max(xs[1]/xp[1], xp[1]/xs[1]);
 	     ovlp[1] = ((xs[1]*xp[1] != 0.0) && (ldx[1] > rmx));}
 	 else
-	    ovlp[1] = (ldx[1] > ABS(xs[1] - xp[1]));
+	    ovlp[1] = (ldx[1] > fabs(xs[1] - xp[1]));
 
 	 if (ovlp[0] && ovlp[1])
 	    continue;

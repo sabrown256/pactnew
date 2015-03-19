@@ -111,7 +111,7 @@ int main(int c, char **v)
 
 /* check it to make sure it is correct */
     for (i = 0; i < 24; i++)
-        {if (abs(nonew[i] - noner[i]) > FLOAT_TOLERANCE)
+        {if (fabsf(nonew[i] - noner[i]) > FLOAT_TOLERANCE)
             {printf("Error in check %f != %f ", nonew[i], noner[i]);
              printf("at position none[%d]\n", i); 
              PD_close(file);
@@ -141,7 +141,7 @@ int main(int c, char **v)
 
 /* check it to make sure it is correct */
     for (i = 0; i < 24; i++)
-        {if (abs(middlew[i] - middler[i]) > FLOAT_TOLERANCE)
+        {if (fabs(middlew[i] - middler[i]) > FLOAT_TOLERANCE)
             {printf("Error in check %f != %f ", middlew[i], middler[i]);
              printf("at position middle[%d]\n", i);
              PD_close(file);
@@ -171,7 +171,7 @@ int main(int c, char **v)
 
 /* check it to make sure it is correct */
     for (i = 0; i < 24; i++)
-        {if (abs(allw[i] - allr[i]) > FLOAT_TOLERANCE)
+        {if (fabs(allw[i] - allr[i]) > FLOAT_TOLERANCE)
             {printf("Error in check %f != %f ", allw[i], allr[i]);
              printf("at position all[%d]\n", i); 
              PD_close(file);
@@ -206,7 +206,7 @@ int main(int c, char **v)
 
 /* check it to make sure it is correct */
     for (i = 0; i < 24; i++)
-        {if (abs(nonew[i] - noner[i]) > FLOAT_TOLERANCE)
+        {if (fabs(nonew[i] - noner[i]) > FLOAT_TOLERANCE)
             {printf("Error in check %f != %f ", nonew[i], noner[i]);
              printf("at position nonestep[%d]\n", i);
              PD_close(file);
@@ -236,7 +236,7 @@ int main(int c, char **v)
 
 /* check it to make sure it is correct */
     for (i = 0; i < 24; i++)
-        {if (abs(middlew[i] - middler[i]) > FLOAT_TOLERANCE)
+        {if (fabs(middlew[i] - middler[i]) > FLOAT_TOLERANCE)
             {printf("Error in check %f != %f ", middlew[i], middler[i]);
              printf("at position middlestep[%d]\n", i);
              PD_close(file);
@@ -273,7 +273,7 @@ int main(int c, char **v)
 
 /* check it to make sure it is correct */
     for (i = 0; i < 24; i++)
-        {if (abs(allwstep[i] - allrstep[i]) > FLOAT_TOLERANCE)
+        {if (fabs(allwstep[i] - allrstep[i]) > FLOAT_TOLERANCE)
             {printf("Error in check %f != %f ", allwstep[i], allrstep[i]);
              printf("at position allstep[%d]\n", i);
              PD_close(file);

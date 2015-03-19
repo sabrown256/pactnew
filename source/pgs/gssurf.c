@@ -13,8 +13,6 @@
 
 /* #define DEBUG */
 
-#define LABS(x) abs((int) (x))
-
 typedef struct s_PG_scan_raster PG_scan_raster;
 typedef struct s_PG_scan_line_data PG_scan_line_data;
 

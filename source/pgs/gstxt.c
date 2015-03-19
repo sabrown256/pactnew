@@ -123,8 +123,8 @@ void PG_resize_text_box(PG_text_box *b, double *cbx, int n_lines)
 
     PG_get_text_ext_n(dev, 2, NORMC, "s", co);
 
-    n_linep = ABS(cbx[2] - cbx[3])/co[1];
-    n_chars = ABS(cbx[0] - cbx[1])/co[0];
+    n_linep = fabs(cbx[2] - cbx[3])/co[1];
+    n_chars = fabs(cbx[0] - cbx[1])/co[0];
 
     n_linep = max(1, n_linep);
     n_chars = max(1, n_chars);
@@ -280,7 +280,7 @@ static void _PG_move_to(PG_text_box *b, int c, int l)
 	yr = x[1][3];
 
 	xo[0] = bnd->x_origin + xl;
-	if (ABS(sin(ang)) > sin(PI/4.0))
+	if (fabs(sin(ang)) > sin(PI/4.0))
 	   xo[1] = bnd->y_origin + yl;
 	else
 	   xo[1] = bnd->y_origin + yr - 0.8*sign*dxe[1]*PG_window_height(dev);
@@ -294,12 +294,12 @@ static void _PG_move_to(PG_text_box *b, int c, int l)
 
 	    case DIR_CENTER :
                  ix[0] = xo[0] + cos(ang)*0.5*(xr - xl - dx);
-	         ix[1] = xo[1] + sign*sin(ang)*0.5*(ABS(yr - yl) - dx);
+	         ix[1] = xo[1] + sign*sin(ang)*0.5*(fabs(yr - yl) - dx);
 	         break;
 
 	    case DIR_RIGHT :
 	         ix[0] = xo[0] + xr - xl - cos(ang)*(so + dx);
-	         ix[1] = xo[1] + sign*sin(ang)*(ABS(yr - yl) - dx - so);
+	         ix[1] = xo[1] + sign*sin(ang)*(fabs(yr - yl) - dx - so);
 	         break;};
 
 	f[0] = ix[0];
@@ -1062,8 +1062,8 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
 
     PG_get_text_ext_n(dev, 2, NORMC, "s", dx);
     PG_get_curve_extent(dev, crv, NORMC, bx);
-    n_linep = ABS(bx[2] - bx[3])/dx[1];
-    n_chars = ABS(bx[0] - bx[1])/dx[0];
+    n_linep = fabs(bx[2] - bx[3])/dx[1];
+    n_chars = fabs(bx[0] - bx[1])/dx[0];
 
     n_linep = max(1, n_linep);
     n_chars = max(1, n_chars);

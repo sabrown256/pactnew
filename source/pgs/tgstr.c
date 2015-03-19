@@ -18,7 +18,7 @@
 #define TOLERANCE  1.0e-8
 
 #define CLOSETO_REL(x1, x2, tol)                                            \
-    ((2.0*ABS((x1)-(x2))/(ABS(x1)+ABS(x2)+SMALL) < tol))
+    ((2.0*fabs((x1)-(x2))/(fabs(x1)+fabs(x2)+SMALL) < tol))
 
 typedef struct testdes_s testdes;
 typedef int (*gtest)(PG_device *dev, int nd, int np, int icc);
@@ -194,7 +194,7 @@ static void dump_err(PG_device *dev, char *s, int nd,
 
     if ((xcn != HUGE) && (xco != HUGE))
        {d = 2.0*(xco - xcn)/(xco + xcn);
-	d = ABS(d);
+	d = fabs(d);
 	dfmx = max(dfmx, d);
 	io_printf(fp, "cmp:     %12.5e %12.5e %12.5e %12.5e  %s\n",
 		  xco, xcn, d, tol,
@@ -203,7 +203,7 @@ static void dump_err(PG_device *dev, char *s, int nd,
     if ((xn != NULL) && (xo != NULL))
        {for (id = 0; id < nd; id++)
 	    {d = 2.0*(xo[id] - xn[id])/(xo[id] + xn[id]);
-	     d = ABS(d);
+	     d = fabs(d);
 	     dfmx = max(dfmx, d);
 	     io_printf(fp, "pnt:  %d   %12.5e %12.5e %12.5e %12.5e  %s\n",
 		       id+1, xo[id], xn[id], d, tol,
@@ -212,7 +212,7 @@ static void dump_err(PG_device *dev, char *s, int nd,
     if ((bn != NULL) && (bo != NULL))
        {for (l = 0; l < n; l++)
 	    {d = 2.0*(bo[l] - bn[l])/(bo[l] + bn[l]);
-	     d = ABS(d);
+	     d = fabs(d);
 	     dfmx = max(dfmx, d);
 	     io_printf(fp, "box:  %d   %12.5e %12.5e %12.5e %12.5e  %s\n",
 		       l+1, bo[l], bn[l], d, tol,
@@ -339,7 +339,7 @@ static int compare_cmp(PG_device *dev, char *s,
 
     d = 2.0*(n - o)/(n + o);
 
-    ok = (ABS(d) < tol);
+    ok = (fabs(d) < tol);
 
     if ((ok != TRUE) && (dbg == TRUE))
        dump_err(dev, s, PG_SPACEDM, o, n, NULL, NULL, NULL, NULL, tol);
@@ -412,7 +412,7 @@ static int compare_2(PG_device *dev, char *s, int nd,
     ok = TRUE;
 
     for (id = 0; id < nd; id++)
-        {d = 2.0*(xn[id] - xo[id])/(ABS(xn[id]) + ABS(xo[id]) + SMALL);
+        {d = 2.0*(xn[id] - xo[id])/(fabs(xn[id]) + fabs(xo[id]) + SMALL);
 	 ok &= (d < tol);};
 
     if ((ok != TRUE) && (dbg == TRUE))
@@ -586,10 +586,10 @@ static int compare_3(PG_device *dev, int nd,
         {l = 2*id;
 
 	 d   = 2.0*(xl[id] - b[l])/(xl[id] + b[l]);
-	 ok &= (ABS(d) < tol);
+	 ok &= (fabs(d) < tol);
 
 	 d   = 2.0*(xu[id] - b[l+1])/(xu[id] + b[l+1]);
-	 ok &= (ABS(d) < tol);};
+	 ok &= (fabs(d) < tol);};
 
     return(ok);}
 

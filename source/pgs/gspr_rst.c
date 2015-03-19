@@ -669,7 +669,7 @@ static INLINE void _PG_edge_point(int *ip, int nd, edgedes *ei, int iy)
         {if (id != 1)
 	    {x      = ei->x[id] + 0.5*ei->dx[id] + SMALLNO;
 	     ip[id] = x;
-	     if (ABS(x - (double) ip[id]) > NODIFF)
+	     if (fabs(x - (double) ip[id]) > NODIFF)
 	        ip[id] = ceil(x);
 
 	     else if (ei->x[id] > (double) ip[id])

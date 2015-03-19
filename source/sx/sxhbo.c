@@ -746,7 +746,7 @@ static PM_set *_SX_build_restricted_domain(SS_psides *si, PM_set *hd,
 
 	 rd  = dmx[i];
 	 rf  = (mx - mn)/(dx - dn);
-	 rd *= ABS(rf);
+	 rd *= fabs(rf);
 	 rd  = max(rd, 2);
 
 	 maxes[i] = (int) rd;

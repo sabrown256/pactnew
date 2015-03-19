@@ -189,13 +189,13 @@ PG_picture_desc *PG_setup_picture_curve(PG_device *dev, PG_graph *data,
 
 /* setup the window limits */
 	avg = 0.5*(wc[0] + wc[1]);
-	tol = (avg == 0.0) ? TOLERANCE : ABS(0.001*avg);
+	tol = (avg == 0.0) ? TOLERANCE : fabs(0.001*avg);
 	if (wc[0] + tol > wc[1])
 	   {wc[0] -= tol;
 	    wc[1] += tol;};
 
 	avg = 0.5*(wc[2] + wc[3]);
-	tol = (avg == 0.0) ? TOLERANCE : ABS(0.001*avg);
+	tol = (avg == 0.0) ? TOLERANCE : fabs(0.001*avg);
 	if (wc[2] + tol > wc[3])
 	   {wc[2] -= tol;
 	    wc[3] += tol;};
