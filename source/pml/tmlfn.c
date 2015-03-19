@@ -16,8 +16,8 @@
     _rl = (_r);                                                             \
     _sl = (_s);                                                             \
     dl  = _rl - _sl;                                                        \
-    _al = 0.5*(ABS(_rl) + ABS(_sl));                                        \
-    dl  = ABS(dl);                                                          \
+    _al = 0.5*(fabs(_rl) + fabs(_sl));                                      \
+    dl  = fabs(dl);                                                         \
     if (_al > 1.0)                                                          \
        dl /= _al;                                                           \
     dlmx = max(dlmx, dl);}

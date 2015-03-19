@@ -31,11 +31,11 @@
 
 int checkd(double dval, char *fcn_name, char xxx[MAX],
 	   double expected, int pass)
-   {double d, tolerance;
-    int fail;
+   {int fail;
+    double d, tolerance;
 
     tolerance = 1.0e-13;
-    d         = 0.5*ABS(dval - expected)/(ABS(dval) + ABS(expected));
+    d         = 0.5*fabs(dval - expected)/(fabs(dval) + fabs(expected));
     fail      = (d > tolerance);
     io_printf(STDOUT, "%s       \t%s     \t%11e  %11e\t %s \n",
 	      xxx, fcn_name, dval, expected,

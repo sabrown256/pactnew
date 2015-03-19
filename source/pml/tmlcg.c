@@ -390,8 +390,8 @@ static double diff_array(double *a, double *b, int nc, double tol)
 	 bc = b[i];
 
 	 nmr = ac - bc;
-	 nmr = ABS(nmr);
-	 den = 0.5*(ABS(ac) + ABS(bc) + SMALL);
+	 nmr = fabs(nmr);
+	 den = 0.5*(fabs(ac) + fabs(bc) + SMALL);
 
 	 fd += (nmr/den);};
 

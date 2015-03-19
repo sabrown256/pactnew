@@ -441,7 +441,7 @@ static int check_image_ave(char *ta, char *tb, pixdes *pd)
 	      ca = pow(ca, ex);
 	      cb = pow(cb, ex);
 	      f  = ((ca - cb)*den);
-	      f  = ABS(f);
+	      f  = fabs(f);
 
 	      d[j] += f;};};
 
@@ -556,8 +556,8 @@ static int diff_line(char *bfa, char *bfb, pixdes *pd, int verbose,
 		else if (SC_fltstrp(ta) && SC_fltstrp(tb))
 		   {da   = SC_stof(ta);
 		    db   = SC_stof(tb);
-		    dd   = (da - db)/(ABS(da) + ABS(db) + SMALL);
-		    errl = (ABS(dd) > toler);}
+		    dd   = (da - db)/(fabs(da) + fabs(db) + SMALL);
+		    errl = (fabs(dd) > toler);}
 
 /* otherwise it is an error */
 		else
@@ -831,9 +831,9 @@ static int diff_frac(char *bfa, long na, char *bfb, long nb, diff_stat *ds,
 		       continue;
 
 		    else
-		       {dav  = 0.5*(ABS(da) + ABS(db) + SMALL);
+		       {dav  = 0.5*(fabs(da) + fabs(db) + SMALL);
 			ddf  = (da - db);
-			ddf  = ABS(ddf);
+			ddf  = fabs(ddf);
 			dd   = ddf/dav;
 			ddmn = min(ddmn, dd);
 			ddmx = max(ddmx, dd);

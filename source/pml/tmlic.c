@@ -66,7 +66,7 @@ int orient_row(void)
     for (i = 0; i < KM; i++)
         {k   = KM + i;
 	 erc = x[k] - ans[i];
-	 err += ABS(erc);};
+	 err += fabs(erc);};
 
     tol = 10.0*PM_machine_precision();
     ok  = (err < tol);
@@ -124,7 +124,7 @@ int orient_col(void)
     for (i = 0; i < KM; i++)
         {k   = KM + i;
 	 erc = x[k] - ans[i];
-	 err += ABS(erc);};
+	 err += fabs(erc);};
 
     tol = 10.0*PM_machine_precision();
 
