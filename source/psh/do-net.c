@@ -1723,7 +1723,7 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
 	       sp[i].proc->status, sp[i].proc->io[0].fd,
 	       sp[i].proc->id, job_running(sp[i].proc),
 	       (sp[i].host == NULL) ? "no-host" : sp[i].host,
-	       (sp[i].logn == NULL) ? "no-name" : sp[i].logn);
+	       sp[i].logn);
 	   
 /* convert host or system type to host */
          FREE(sp[i].host);

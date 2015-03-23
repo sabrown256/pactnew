@@ -183,16 +183,16 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, char *fname,
     
 	SC_strncpy(bf, MAXLINE, type, -1);
 	SC_strtok(bf, " *", s);
-	if (bf != NULL)
-	   {bpi = 0;
 
-	    id = SC_type_id(bf, FALSE);
-	    if ((id == G_BOOL_I) || (SC_is_type_num(id) == TRUE))
-	       bpi = SC_type_size_a(bf);
+	bpi = 0;
 
-	    if (bpi > 0)
-	       {set->extrema = CMAKE_N(char, 2*bpi*nde);
-		set->scales  = CMAKE_N(char, bpi*nde);};}
+	id = SC_type_id(bf, FALSE);
+	if ((id == G_BOOL_I) || (SC_is_type_num(id) == TRUE))
+	   bpi = SC_type_size_a(bf);
+
+	if (bpi > 0)
+	   {set->extrema = CMAKE_N(char, 2*bpi*nde);
+	    set->scales  = CMAKE_N(char, bpi*nde);};
 
 	SC_strcat(bf, MAXLINE, " *");
 	set->es_type = CSTRSAVE(bf);

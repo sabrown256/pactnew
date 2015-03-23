@@ -242,7 +242,8 @@ static void _PG_clear_text_box(PG_text_box *b, int i)
 /* _PG_MOVE_TO - move to the specified line and column of a text box */
 
 static void _PG_move_to(PG_text_box *b, int c, int l)
-   {int so, xr, yr, xl, yl;
+   {int so;
+    int xr[PG_SPACEDM], xl[PG_SPACEDM];
     int ix[PG_SPACEDM], xo[PG_SPACEDM];
     int *x[PG_SPACEDM];
     double dx, sign, ang;
@@ -274,16 +275,16 @@ static void _PG_move_to(PG_text_box *b, int c, int l)
 	x[0] = bnd->x;
 	x[1] = bnd->y;
 
-	xl = x[0][0];
-	xr = x[0][1];
-	yl = x[1][0];
-	yr = x[1][3];
+	xl[0] = x[0][0];
+	xr[0] = x[0][1];
+	xl[1] = x[1][0];
+	xr[1] = x[1][3];
 
-	xo[0] = bnd->x_origin + xl;
+	xo[0] = bnd->x_origin + xl[0];
 	if (fabs(sin(ang)) > sin(PI/4.0))
-	   xo[1] = bnd->y_origin + yl;
+	   xo[1] = bnd->y_origin + xl[1];
 	else
-	   xo[1] = bnd->y_origin + yr - 0.8*sign*dxe[1]*PG_window_height(dev);
+	   xo[1] = bnd->y_origin + xr[1] - 0.8*sign*dxe[1]*PG_window_height(dev);
 
 	switch (td->align)
 	   {default   :
@@ -293,13 +294,13 @@ static void _PG_move_to(PG_text_box *b, int c, int l)
 	         break;
 
 	    case DIR_CENTER :
-                 ix[0] = xo[0] + cos(ang)*0.5*(xr - xl - dx);
-	         ix[1] = xo[1] + sign*sin(ang)*0.5*(fabs(yr - yl) - dx);
+                 ix[0] = xo[0] + cos(ang)*0.5*(xr[0] - xl[0] - dx);
+	         ix[1] = xo[1] + sign*sin(ang)*0.5*(abs(xr[1] - xl[1]) - dx);
 	         break;
 
 	    case DIR_RIGHT :
-	         ix[0] = xo[0] + xr - xl - cos(ang)*(so + dx);
-	         ix[1] = xo[1] + sign*sin(ang)*(fabs(yr - yl) - dx - so);
+	         ix[0] = xo[0] + xr[0] - xl[0] - cos(ang)*(so + dx);
+	         ix[1] = xo[1] + sign*sin(ang)*(abs(xr[1] - xl[1]) - dx - so);
 	         break;};
 
 	f[0] = ix[0];

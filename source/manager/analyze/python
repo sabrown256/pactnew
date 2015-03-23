@@ -192,7 +192,10 @@ if (-d ../../python) then
                   else if (($lpy_vers =~ 3*) && ($lhave_py_numpy == TRUE)) then
                      flog $ALog set lpy_ext = 3_numpy
                   else
-                     flog $ALog set lpy_ext = none
+                     NoteD $ALog "      does not have numeric extensions"
+                     flog $ALog set lpy_ext      = none
+                     flog $ALog set lpy_exe      = "no-numeric"
+                     flog $ALog set lhave_python = FALSE
                   endif
 
                   if ($lpy_ext != none) then
@@ -210,12 +213,7 @@ if (-d ../../python) then
                         NoteD $ALog "         has numeric extensions"
                      endif
 
-                     if (($lhave_py_numeric == FALSE) && ($lhave_py_numpy == FALSE)) then
-                        NoteD $ALog "         does not have numeric extensions"
-# NOTE: if we can build sensibly without any numeric extensions delete these
-                        flog $ALog set lpy_exe      = "no-numeric"
-                        flog $ALog set lhave_python = FALSE
-                     endif
+                     flog $ALog set found = TRUE
                   endif
 
                   if ($HSY_OS_Name == "AIX") then
@@ -234,7 +232,6 @@ if (-d ../../python) then
                      flog $ALog set lhave_python = FALSE
                   endif
                   flog $ALog set lpy_path = $i
-                  flog $ALog set found    = TRUE
                   break
                endif
             endif

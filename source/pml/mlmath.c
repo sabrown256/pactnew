@@ -114,7 +114,7 @@ int PM_qvalue_compare(long double x1, long double x2, long double tol)
     if (tol < 0.0)
        tol = TOLERANCE;
 
-    dx = (x1 - x2)/(fabs(x1) + fabs(x2) + SMALL);
+    dx = (x1 - x2)/(FABSL(x1) + FABSL(x2) + SMALL);
     if (dx < -tol)
        rv = -1;
     else if (tol < dx)

@@ -68,7 +68,7 @@
 
 #define PM_CLOSETO_FLOAT(_ok, _x, _y, _tol)                                  \
    {long double _del;                                                        \
-    _del = (2.0*(_x - _y)/(fabs(_x) + fabs(_y) + SMALL));                    \
+    _del = (2.0*(_x - _y)/(FABSL(_x) + FABSL(_y) + SMALL));                  \
     _ok  = ((_del < -_tol) || (_tol < _del));}
 
 /*--------------------------------------------------------------------------*/
