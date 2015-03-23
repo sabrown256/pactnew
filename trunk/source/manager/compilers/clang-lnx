@@ -10,7 +10,7 @@
 Group OCV {
    RPath = -Wl,-rpath,@
    LD    = -rdynamic
-   LDLb  = -ldl -lc
+   LDLb += -ldl -lc
    Sh    = -shared
 }
 

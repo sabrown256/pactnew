@@ -392,20 +392,20 @@ static void _PG_fix_flags(PG_device *dev, int *flags, char *ps)
 
     s = SC_firsttok(ps, ")");
     SC_strncpy(t, MAXLINE, s, -1);
-    if (t != NULL)
-       {while (TRUE)
-	   {tok = SC_firsttok(t, " ,");
-	    if (tok == NULL)
-	       break;
 
-	    if (strcmp(tok, "IsVis") == 0)
-	       flags[0] = TRUE;
+    while (TRUE)
+       {tok = SC_firsttok(t, " ,");
+	if (tok == NULL)
+	   break;
 
-	    else if (strcmp(tok, "IsSel") == 0)
-	       flags[1] = TRUE;
+	if (strcmp(tok, "IsVis") == 0)
+	   flags[0] = TRUE;
 
-	    else if (strcmp(tok, "IsAct") == 0)
-	       flags[2] = TRUE;};};
+	else if (strcmp(tok, "IsSel") == 0)
+	   flags[1] = TRUE;
+
+	else if (strcmp(tok, "IsAct") == 0)
+	   flags[2] = TRUE;};
 
     return;}
 

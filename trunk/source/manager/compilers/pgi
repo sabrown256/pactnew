@@ -85,7 +85,8 @@ Group OpenMP {
 # PGI compilers do not do long double arithmetic
 # properly - they have the functions but they are broken
 Group LibM {
-   Functions  = "POWL pow pow"
+   Functions  = "FABSL fabs fabs"
+   Functions += "POWL pow pow"
    Functions += "CREALL creal creal"
    Functions += "CIMAGL cimag cimag"
 }

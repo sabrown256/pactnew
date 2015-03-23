@@ -11,8 +11,7 @@ Group OCV {
    CC      = mpiclang
    CC_Cfg  = bgclang
    CXX     = mpiclang++
-   LD_Lib  = -lc
-   OMP_Lib = 
+   LDLb    = -lc -lnss_files -lnss_dns -lresolv
 }
 
 Group RF {

@@ -19,6 +19,7 @@ dbmget $ALog LibM_Functions =\? ""
 
 if ("$LibM_Functions" == "") then
    set flst = ""
+   set flst = ( $flst FABSL fabsl fabs )
    set flst = ( $flst POWL powl pow )
    set flst = ( $flst CREALL creall creal )
    set flst = ( $flst CIMAGL cimagl cimag )

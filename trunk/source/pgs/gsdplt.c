@@ -810,50 +810,50 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 
     SC_strncpy(ltype, MAXLINE, type, -1);
     SC_strtok(ltype, " *", s);
-    if (ltype != NULL)
-       {id = SC_type_id(ltype, FALSE);
+
+    id = SC_type_id(ltype, FALSE);
 
 /* character types (proper) */
-       if (SC_is_type_char(id) == TRUE)
-	  {char t[2], *fi;
+    if (SC_is_type_char(id) == TRUE)
+       {char t[2], *fi;
 
-	   t[1] = '\0';
-	   fi   = f;
-	   for (i = 0; i < n; i++)
-	       {t[0] = fi[i];
-		p[0] = r[0][i];
-		p[1] = r[1][i];
-		PG_write_n(dev, 2, WORLDC, p, t);};
+	t[1] = '\0';
+	fi   = f;
+	for (i = 0; i < n; i++)
+	    {t[0] = fi[i];
+	     p[0] = r[0][i];
+	     p[1] = r[1][i];
+	     PG_write_n(dev, 2, WORLDC, p, t);};
 
-	   CFREE(fi);}
+	CFREE(fi);}
 
 /* fixed point types (proper) */
-	else if (SC_is_type_fix(id) == TRUE)
-	   {int *fi;
+    else if (SC_is_type_fix(id) == TRUE)
+       {int *fi;
 
-	    fi = SC_convert_id(G_INT_I, NULL, 0, 1, id, f, 0, 1, n, FALSE);
-	    for (i = 0; i < n; i++)
-	        {snprintf(lbl, MAXLINE, "%d", fi[i]);
-		 p[0] = r[0][i];
-		 p[1] = r[1][i];
-		 PG_write_n(dev, 2, WORLDC, p, lbl);};
+	fi = SC_convert_id(G_INT_I, NULL, 0, 1, id, f, 0, 1, n, FALSE);
+	for (i = 0; i < n; i++)
+	    {snprintf(lbl, MAXLINE, "%d", fi[i]);
+	     p[0] = r[0][i];
+	     p[1] = r[1][i];
+	     PG_write_n(dev, 2, WORLDC, p, lbl);};
 
-	    CFREE(fi);}
+	CFREE(fi);}
 
 /* floating point types (proper) */
-       else if (SC_is_type_fp(id) == TRUE)
-	  {double *fi;
+    else if (SC_is_type_fp(id) == TRUE)
+       {double *fi;
 
-	   fi = PM_array_real(type, f, n, NULL);
-	   for (i = 0; i < n; i++)
-	       {snprintf(lbl, MAXLINE, _PG_gattrs.text_format, fi[i]);
-		p[0] = r[0][i];
-		p[1] = r[1][i];
-		PG_write_n(dev, 2, WORLDC, p, lbl);};
+	fi = PM_array_real(type, f, n, NULL);
+	for (i = 0; i < n; i++)
+	    {snprintf(lbl, MAXLINE, _PG_gattrs.text_format, fi[i]);
+	     p[0] = r[0][i];
+	     p[1] = r[1][i];
+	     PG_write_n(dev, 2, WORLDC, p, lbl);};
 
-	   CFREE(fi);};
+	CFREE(fi);};
 
-	PM_free_vectors(3, r);};
+    PM_free_vectors(3, r);
 
     return;}
 
