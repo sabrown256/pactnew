@@ -34,7 +34,7 @@ int SS_get_type_method(SC_type *td, ...)
 	        ok = FALSE;
 	     else
 	        {pmf  = SC_VA_ARG(PFPVoid *);
-		 *pmf = SC_assoc(alst, (void *) mn);};};
+		 *pmf = (PFPVoid) SC_assoc(alst, (void *) mn);};};
 
 	rv = TRUE;}
 

@@ -305,9 +305,6 @@ endif
 
 # get the main compiler family
               switch ($lcc)
-                 case *clang*:
-                      set lcfam = clang-lnx
-                      breaksw
                  case *mpiclang*:
                       echo "setenv FORCE_COMPILER_PATH TRUE" >>& $pf
                       if ("$lbts" != "") then
@@ -349,6 +346,19 @@ endif
                       echo "run std/use-compiler $lcc" >>& $pf
                       echo "include features/gnu-bgl-set" >>& $pf
                       set lcc = none
+                      breaksw
+                 case *bgclang*:
+                      echo 'Group OCV {' >>& $pf
+                      echo '   CC     = bgclang' >>& $pf
+                      echo '   CC_Cfg = bgclang' >>& $pf
+                      echo '   CXX    = bgclang++' >>& $pf
+                      echo '   LDLb  += -lnss_files -lnss_dns -lresolv' >>& $pf
+                      echo '}' >>& $pf
+                      echo 'Group RF {' >>& $pf
+                      echo '   RPATH_FILTER = /usr/lib:/usr/lib64' >>& $pf
+                      echo '}' >>& $pf
+                 case *clang*:
+                      set lcfam = clang-lnx
                       breaksw
                  case *intel:
                  case *icc:

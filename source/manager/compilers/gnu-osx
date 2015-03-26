@@ -26,6 +26,10 @@ Group OCV {
 include compilers/gnu
 include os/osx
 
+Tool CC {
+   Flags += -fno-common
+}
+
 # there is a libbfd in /opt/local/lib but it does not seem to work
 #run analyze/rpath -a /opt/local/${LIB}
 
