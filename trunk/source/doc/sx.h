@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 12/3/2014
+MOD: 03/26/2015
 
 <CENTER>
 <P>
@@ -4313,6 +4313,9 @@ Initialize the SX system. This includes all the initialization of the
 interpreter done with <B>SS_init</B>.<p>
 
 <BR>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="SXinterfacing"></a>
 <h1 ALIGN="CENTER"> Interfacing Compiled and Interpreted Code</h1>
