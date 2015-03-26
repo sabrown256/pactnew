@@ -1,5 +1,5 @@
 TXT: PANACEA User's Manual
-MOD: 2/17/2015
+MOD: 3/26/2015
 
 <CENTER>
 <P>
@@ -209,6 +209,7 @@ numerical simulation code, which is generic to all simulation codes</H2>
 <li><a href="#PAN3310">Miscellaneous</a></li>
 </ul>
 
+<li><a href="#PANgen">PANACEA Functions</a></li>
 <li><a href="#PANgens">PANACEA Initial Value Problem Generators</a></li>
 <ul>
 <li><a href="#PAN3313">Generic Commands Supplied by PANACEA</a></li>
@@ -5257,6 +5258,24 @@ c-----------------------------------------------------------------------
 
 <a name="PAN3310"></a>
 <h3> Miscellaneous</h3>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
+<a name="PANgen"><h2>PANACEA Functions</h2></a>
+
+The following documentation is generated automatically from the
+PDBLib source.  As such it is absolutely the most up to date description
+of the functions and supercedes any details in the documentation above.
+<p>
+Note: some of the functions listed refer to a type, pboolean.  This is
+currently an int but is being used as a transition to the C99 bool type.
+<p>
+<a href="gh-panacea.html">Function bindings</a>
+<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PANgens"></a>
 <h2 ALIGN="CENTER"> PANACEA Initial Value Problem Generators</h2>

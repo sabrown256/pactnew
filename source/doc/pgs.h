@@ -1,5 +1,5 @@
 TXT: PGS User's Manual
-MOD: 12/19/2014
+MOD: 03/26/2015
 
 <CENTER>
 <P>
@@ -66,7 +66,7 @@ MOD: 12/19/2014
 <li><a href="#PGSapi">The PGS API</a>
 <ul>
 <li><a href="#PGS0307">Compiling and Loading</a>
-<li><a href="#PGS0316">PGS Functions</a>
+<li><a href="#PGS0316">PGS Functionality</a>
 <ul>
 <li><a href="#PGS0318">Global State Setting Routines</a>
 <li><a href="#PGS0330">Global State Query Routines</a>
@@ -93,6 +93,7 @@ MOD: 12/19/2014
 <li><a href="#PGS1096">Level Diagram Plot Routine</a>
 <li><a href="#PGS1103">Graphical Interface Routines</a>
 </ul>
+<li><a href="#PGSgen">PGS Functions</a>
 <li><a href="#PGS1135">Structures</a>
 <li><a href="#PGS1154">PGS Constants</a>
 </ul>
@@ -121,6 +122,9 @@ MOD: 12/19/2014
 </ul>
 
 <hr>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGSintro"></a>
 <h1 ALIGN="CENTER"> Introduction</h1>
@@ -160,6 +164,9 @@ surface plots (for 2D data sets); and Grotrian diagram plots.<p>
 PGS has primitives for 2D and 3D line, polyline, disjointed polyline, and
 text drawing.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGSover"></a>
 <h1 ALIGN="CENTER"> Overview of PGS</h1>
 
@@ -189,6 +196,9 @@ appropriate.<p>
 
 The remainder of this section discusses the PGS device model and the
 PGS drawing model.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS21"></a>
 <h2> The PGS Device Model</h2>
@@ -241,6 +251,9 @@ Quickdraw (Apple Macintosh)
 Microsoft Graphics Library
 </BLOCKQUOTE>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS22"></a>
 <h2> The PGS Drawing Model</h2>
 
@@ -260,6 +273,9 @@ operations. PGS windows then map naturally onto the kinds of windows associated
 with such host graphics systems as X Windows and Quickdraw. This
 idea also has application to a PostScript or CGM device.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS23"></a>
 <h3> PGS Window Placement</h3>
 
@@ -269,6 +285,9 @@ PGS window is given in normalized coordinates relative to a coordinate
 origin in the upper left corner of the host graphics system device.<p>
 
 <img src="pgs1.gif">
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS24"></a>
 <h3> Frames, Viewspaces, and View Boundaries</h3>
@@ -337,6 +356,9 @@ rightspace, and botspace.<p>
 The application can move the frame or viewspace around in the PGS window
 at any time as well as altering its size.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS25"></a>
 <h3> Coordinate Systems</h3>
 
@@ -352,6 +374,9 @@ origin which is in the lower left corner of the PGS window.<p>
 
 PGS supplies a set of macros to convert between all of the coordinate
 systems which a PGS window may have.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS26"></a>
 <h3> Axis Drawing Notes</h3>
@@ -393,6 +418,9 @@ for plotting space.<p>
 
 NOTE: this does not currently apply to log axes.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGSuser"></a>
 <h1 ALIGN="CENTER"> The PGS User Interface Model</h1>
 
@@ -406,6 +434,9 @@ of textual interfaces, graphical interfaces, and hybrids. In the
 following sections, we will discuss the concepts underlying user interfaces
 from PGS&#146;s point of view (PGS emphasizes portability and flexibility
 especially).<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS3a"></a>
 <h2> A Textual Interface</h2>
@@ -435,6 +466,9 @@ or hard. Some of the graphical user interface models can be ported with some car
 abstraction barriers (and PGS does this too), but this example is something of a
 lowest common denominator. So we will start with this and build up a model that
 supports this simple text driven style and the most elaborate graphical application.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS3b"></a>
 <h2> Adding Abstraction Barriers</h2>
@@ -507,6 +541,9 @@ main(int c, char **v)
 There is an important issue remaining here and that is the subject
 of the next section.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0075"></a>
 <h2> Multiplexed I/O and Interrupt Driven I/O</h2>
 
@@ -554,6 +591,9 @@ mode of programming. The fact that PGS runs on such systems as wells as
 those that support text only or hybrid interfaces should give some idea
 of the idea of portability and flexibility which PGS aims to provide.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0080"></a>
 <h2> Event Handling</h2>
 
@@ -589,6 +629,9 @@ or relate to a particular screen window. So when PGS get notified by the
 windowing system that there is an event present, it determines which window
 is effected. It then passes both the pointer to the effected window and the
 event on to the function which is going to handle the event.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0093"></a>
 <h3> Event Handling Functions</h3>
@@ -679,6 +722,9 @@ gets a mouse down event it first checks to see whether there is a mouse down
 handler. If so it is called. If not it then checks to see whether there is
 a default handler and if so calls it.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0113"></a>
 <h3>  Event Related Macros</h3>
 
@@ -765,6 +811,9 @@ Return the ASCII code of the next character entered from the keyboard
 into the specified PG_device, d.<p>
 </UL>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0132"></a>
 <h2>  Interface Objects</h2>
 
@@ -843,6 +892,9 @@ a variable or some other structure). These items may be used in fairly
 arbitrary ways by applications. PGS uses them for the pre-defined objects
 as discussed in the next section.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0149"></a>
 <h3>  Event Handling and Interface Objects</h3>
 
@@ -860,6 +912,9 @@ is called.
 <LI>Otherwise if there is a handler for the event type, it is called.
 </OL>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0154"></a>
 <h3>  Portable User Interface Description</h3>
 
@@ -873,6 +928,9 @@ PGS supplies for graphical editing is moving objects around. Creation,
 deletion, duplication, and resizing are planned for future releases.
 However, these options can all be accomplished by editing the interface
 file or by application supplied editing routines.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0156"></a>
 <h4>  Syntax for Interface Description</h4>
@@ -964,6 +1022,9 @@ This is a very general mechanism for assigning events to actions and generically
 handling common activities on behalf of applications. PGS goes one step further
 and supplies a number of specific interface objects.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0195"></a>
 <H2>PGS Interface Objects</H2>
 
@@ -1049,6 +1110,9 @@ of interface objects. This position relationship contributes as much as the atom
 properties of the individual objects to the functioning of these combinations. This
 is a key feature in the flexibility of the PGS design.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0217"></a>
 <h3> Buttons</h3>
 
@@ -1066,6 +1130,9 @@ Button CLR(3,2) DRW(draw-button) ACT(End) BND(RECT) (0.1,0.9) (0.2,0.95)
 The action method of the button is the function associated with the string
 &#147;End&#148; in the callback table. The text &#147;End&#148; appears in
 the button and is visible but not selectable.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0222"></a>
 <h3> Enumerable Variables</h3>
@@ -1114,6 +1181,9 @@ buttons (which are not rectangles), &#147;N&#148;, &#147;E&#148;,
 &#147;S&#148;, and &#147;W&#148; which take values that are strings and
 the text of the buttons is outside of the buttons at the points.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0246"></a>
 <h3> Nonenumerable Variables</h3>
 
@@ -1139,6 +1209,9 @@ it to show the correct value, and hit a carriage return. The value of the
 variable is then set to that show in the text box. Note that the VARIABLE
 object must be selectable in order for the text box which actually controls
 the value to be selectable.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0252"></a>
 <h3> Sliders</h3>
@@ -1187,6 +1260,9 @@ does not span either the entire x or y direction of the CONTAINER parent.
 The first VARIABLE, &#147;Theta&#148;, associates with the x direction and
 the second VARIABLE, &#147;Phi&#148;, with the y direction. The text boxes
 work the same way as for the one dimensional slider.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0270"></a>
 <h3> Transients</h3>
@@ -1244,6 +1320,9 @@ does not and should not be registered by the application. PGS implicitly
 defines and registers undefined variables like this as strings and uses them
 as described above.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGSrender"></a>
 <h1 ALIGN="CENTER"> Rendering Model</h1>
 
@@ -1279,6 +1358,9 @@ need. A picture of how these parts fit together is:<p>
 </B>
 
 <HR>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2129"></a>
 <h2> Data Structures</h2>
@@ -1328,6 +1410,9 @@ This information tells PGS how to match 3 dimensional RGB color space with
 n dimensional data sets. The most common situation is that of a single
 dimension data in a range set or image, but PGS supports multidimensional
 palettes for higher dimensional ranges.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2130"></a>
 <h2> Rendering Modes</h2>
@@ -1422,6 +1507,8 @@ range is specified only the mesh is drawn. If a range is supplied the range
 values are printed at their corresponding nodes. They are requesed by
 setting the PLOT-TYPE attribute of the graph to PLOT_MESH.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0983"></a>
 <h2> Rendering Attributes</h2>
@@ -1507,6 +1594,9 @@ Modifying attribute lists is done with the following functions:
 
 
 </PRE>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2131a"></a>
 <h3> Examples of Setting and Getting Attribute Values</h3>
@@ -1625,7 +1715,8 @@ In this example we remove the LINE-COLOR attribute from the set
 <i>domain</i>.
 <p>
 
-
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2131b"></a>
 <h3> Attributes</h3>
@@ -1792,10 +1883,16 @@ by each rendering routine to maximize the area of the plot.
 <P>
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS2161"></a>
 <h3> Plots and associated attributes</h3>
 
 This section tells which rendering attributes are meaningful to which renderings.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2163"></a>
 <h4> Contour Plot Attributes</h4>
@@ -1816,6 +1913,9 @@ DRAW-AXIS
 </BLOCKQUOTE>
 
 <P>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2171"></a>
 <h4> Domain Plot Attributes</h4>
@@ -1843,6 +1943,9 @@ CHI
 
 <P>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS2189"></a>
 <h4> Line Plot Attributes</h4>
 
@@ -1863,6 +1966,9 @@ AXIS-TYPE
 
 <P>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS2203"></a>
 <h4> Hidden Surface Attributes</h4>
 
@@ -1871,6 +1977,9 @@ NORMAL-DIRECTION
 </BLOCKQUOTE>
 
 <P>
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS2206"></a>
 <h4> Image Plot Attributes</h4>
 
@@ -1883,6 +1992,9 @@ CORNER
 </BLOCKQUOTE>
 
 <P>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2211"></a>
 <h4> Fill Poly Plot Attributes</h4>
@@ -1897,6 +2009,9 @@ CORNER
 </BLOCKQUOTE>
 
 <P>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2219"></a>
 <h4> Surface Plot Attributes</h4>
@@ -1917,6 +2032,9 @@ CHI
 
 <P>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS2230"></a>
 <h4> Vector Plot Attributes</h4>
 
@@ -1933,6 +2051,9 @@ CORNER
 </BLOCKQUOTE>
 
 <P>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGSapi"></a>
 <h1 ALIGN="CENTER"> The PGS API</h1>
@@ -2003,6 +2124,9 @@ via the argument list. Instead a list of the return values is made and
 returned. The number and order of the values in the list matches those that
 are returned via the argument list in the C and Fortran calls.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0307"></a>
 <h2>Compiling and Loading</h2>
 
@@ -2036,12 +2160,18 @@ is assumed to understand the appropriate naming conventions as well as knowing
 how to tell the linker to find the installed PACT libraries on each system
 that they use.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0316"></a>
-<h2> PGS Functions</h2>
+<h2> PGS Functionality</h2>
 
 PGS has a wide variety of functionality. The functionality is broken down
 into related groups which are listed together in sections and alphabetically
 in each section.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0318"></a>
 <h3> Global State Setting Routines</h3>
@@ -2095,6 +2225,9 @@ is done so that a view looking down the z axis (x, y) is turned into a view
 looking down the y axis (x, z) in the most economical manner - that is with
 theta equal to 90 degrees.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0330"></a>
 <h3> Global State Query Routines</h3>
 
@@ -2117,6 +2250,9 @@ routines use to interpret what it means to clear the current picture. See
 PG_fset_clear_mode for a fuller discussion.<p>
 
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0331"></a>
 <h3> Memory Management Routines</h3>
@@ -2270,6 +2406,9 @@ ymin to ymax. The data ranges from zmin to zmax and is of type type. A
 palette may be supplied along with a label for a plot.<p>
 
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0373"></a>
 <h3> Device Control Routines</h3>
@@ -2640,6 +2779,9 @@ buffered graphics to the output medium of the device.<p>
 <P>
 If n is TRUE use a white background otherwise use a black background.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0525"></a>
 <h3> Device Query Routines</h3>
 
@@ -2802,6 +2944,9 @@ Temporarily spawn a window to display the available marker characters on
 the specified device.<p>
 
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0581"></a>
 <h3> Coordinate Transformation Routines</h3>
 
@@ -2845,6 +2990,9 @@ Converts (x, y) from screen coordinates to world coordinates.<p>
 Converts (x, y) from world coordinates to screen coordinates.<p>
 
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0604"></a>
 <h3> Coordinate System and Viewspace Control Routines</h3>
@@ -2997,6 +3145,9 @@ about the x axis.
 If CNV is TRUE the angles are in degrees, otherwise in radians.
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0652"></a>
 <h3> Line Attribute Control Routines</h3>
 
@@ -3044,6 +3195,9 @@ the new value, while the get routines take a device and the address where
 the current line attribute value is to be put. Line widths go from 0.0
 (thinnest) on up with 3.0 being a very thick line. Line styles are:
 LINE_SOLID, LINE_DOTTED, LINE_DASHED, LINE_DOTDASHED.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0675"></a>
 <h3> Text Attribute Control Routines</h3>
@@ -3195,6 +3349,9 @@ This routine returns the normalized coordinate extent of the character string s 
 
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0762"></a>
 <h3> Graphical Text I/O Routines</h3>
 
@@ -3220,6 +3377,9 @@ This routine does an snprintf style print to the specified device, dev,
 and at the point, in CS, specified by X.<p>
 
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0785"></a>
 <h3> Point Move Routines</h3>
@@ -3250,6 +3410,9 @@ an absolute world coordinate point or relative to the current world
 coordinate point.<p>
 
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0799"></a>
 <h3> Primitive Drawing Routines</h3>
@@ -3324,8 +3487,14 @@ in the arrays r and fills it with the current fill color
 
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0830"></a>
 <h3> Basic Line Drawing Routines</h3>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0831"></a>
 These routines add some creature comforts to PGS line drawing. They are
@@ -3395,6 +3564,9 @@ angle a is in degrees and otherwise it is in radians (there is a RADIAN
 constant for symmetry).<p>
 
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0857"></a>
 <h3> Axis Drawing Routines</h3>
@@ -3629,6 +3801,9 @@ controlled limit to the number of decades plotted. In this way, potentially
 ill-defined logarithmic values (such as very small positive numbers)
 don&#146;t interfere with the display of otherwise fine values.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0915"></a>
 <h3> Colormap Related Routines</h3>
 
@@ -3697,6 +3872,9 @@ This function writes a specified palette, pal, to a palette file. The format
 of a palette file is simple. It is an ASCII file whose first line contains
 the name of the palette and the number of colors, nc. The next nc lines
 contain normalized red, green, and blue values.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS0941"></a>
 <h3> Graph Control Routines</h3>
@@ -3823,6 +4001,9 @@ limits are arranged as xmin, xmax, ymin, ymax.<p>
 
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS0975"></a>
 <h3> Line Plot Routines</h3>
 
@@ -3920,6 +4101,9 @@ qualifying arguments are:<p>
 
 <P>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS1002"></a>
 <h3> Contour Plotting Routines</h3>
 
@@ -3981,6 +4165,9 @@ levels</TD></TR>
 
 <P>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS1019"></a>
 <h3> Filled Polygon Plot Routines</h3>
 
@@ -3995,6 +4182,9 @@ PG_draw_graph dispatches to this routine when the rendering specified
 in data is a a filled polygon plot.<p>
 
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1026"></a>
 <h3> Image Plot Routines</h3>
@@ -4065,6 +4255,9 @@ This routine draws the specified device palette as a raster image. The palette i
 drawn next to the viewspace in a rectangle along an axis specified by the points
 (xmn, ymn) and (xmx, ymx). The axis is labeled by values ranging from zmn to zmx.
 The width of the palette in the rectangle is specified in normalized form by wid.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1042"></a>
 <h3> Surface Plot Routines</h3>
@@ -4143,6 +4336,9 @@ or a pointer to a PM_mesh_topology struct for AC meshes</TD></TR>
 
 <P>
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1070"></a>
 <h3> Vector Plot Routines</h3>
@@ -4262,6 +4458,9 @@ exception. The list must be ended with a zero. The attributes are:<p>
 </TABLE>
 </BLOCKQUOTE>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS1096"></a>
 <h3> Level Diagram Plot Routine</h3>
 
@@ -4278,6 +4477,9 @@ This routine renders the specified graph as a level diagram plot.
 PG_draw_graph dispatches to this routine when the rendering specified in
 data is a level diagram plot. These graphs have an unusual data layout
 and would not produce a very meaningful plot rendered any other way.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1103"></a>
 <h3> Graphical Interface Routines</h3>
@@ -4350,6 +4552,25 @@ device to the named file.<p>
 
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
+<a name="PGSgen"><h2>PGS Functions</h2></a>
+
+
+The following documentation is generated automatically from the
+PGS source.  As such it is absolutely the most up to date description
+of the functions and supercedes any details in the documentation above.
+<p>
+Note: some of the functions listed refer to a type, pboolean.  This is
+currently an int but is being used as a transition to the C99 bool type.
+<p>
+<a href="gh-pgs.html">Function bindings</a>
+<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS1135"></a>
 <h2> Structures</h2>
 
@@ -4418,6 +4639,9 @@ and fill colors, line style and width, palette, and clipping state. It
 is convenient to save these all at once in a PG_dev_attributes, change
 the device state, perform drawing operation, and restore the original
 device state from the PG_dev_attributes.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1154"></a>
 <h2 align=center>PGS Constants</h2>
@@ -4671,6 +4895,9 @@ The following constants are defined in the PM_direction enumeration:
 </TABLE>
 </BLOCKQUOTE>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGSgloss"></a>
 <h1 ALIGN="CENTER"> Glossary</h1>
 
@@ -4718,6 +4945,9 @@ computational mesh.</TD></TR>
 <P>
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGSexample"></a>
 <h1 ALIGN="CENTER">PGS By Example</h1>
 
@@ -4742,6 +4972,9 @@ Before showing the examples we discuss some sequences of PGS calls that are
 common to most PGS applications. The hope is that this will make clear why
 some of PGS functions exist and how they relate to one another.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS1267"></a>
 <h2> Common Call Sequences</h2>
 
@@ -4750,6 +4983,9 @@ What is important is the way they are used together to accomplish various
 graphical objectives. We are not focusing on the details of the calls here
 so many details are omitted.  Concentrate on which calls are being made and
 when they are performed.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2354"></a>
 <h3> Initializing a Device</h3>
@@ -4779,6 +5015,9 @@ The PG_make_device call only allocates a PG_device structure and sets
 default values for the state it contains. The PG_open_device call
 actually consults the state of the PG_device and opens the device.
 The calls in between change the state of the PG_device from the defaults. <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2358"></a>
 <h3> Making a Picture</h3>
@@ -4814,6 +5053,9 @@ been requested is visible. When the picture is complete and there is nothing
 more to be drawn to it, PG_finish_plot is called.  This is crucial for
 hardcopy devices! It is also crucial that PG_clear_window and
 PG_finish_plot be called once per picture.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS2434"></a>
 <h3> Setting Attributes</h3>
@@ -4865,6 +5107,9 @@ call pgsinf(gid, ial)
 </BLOCKQUOTE>
 
 <P>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1268"></a>
 <h2> Text Placement and Drawing</h2>
@@ -5015,6 +5260,9 @@ The following program demonstrates some of the PGS functionality for placement a
      /*-----------------------------------------------------------------*/
 </PRE>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS1409"></a>
 <h2> Line Drawing</h2>
 
@@ -5114,6 +5362,9 @@ main(int argc, char **argv)
 /*-----------------------------------------------------------------*/
 </PRE>
 </blockquote>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1499"></a>
 <h2> Line Plots</h2>
@@ -5242,6 +5493,9 @@ main(argc, argv)
 /*-----------------------------------------------------------------*/
 </PRE>
 </blockquote>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1612"></a>
 <h2> Contour Plots</h2>
@@ -5450,6 +5704,9 @@ c --------------------------------------------------------------------------
 </PRE>
 </blockquote>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS1701"></a>
 <h2> Image Plots</h2>
 
@@ -5554,6 +5811,9 @@ int main(int c, char **v)
 /*-----------------------------------------------------------------*/
 </PRE>
 </blockquote>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1793"></a>
 <h2> Surface Plots</h2>
@@ -5728,11 +5988,17 @@ static void draw_set(PG_device *SCR_dev, PG_device *PS_dev,
 </PRE>
 </blockquote>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PGS1946"></a>
 <h2> Vector Plots</h2>
 
 PGS can render 2 dimensional vector fields. The following program demonstrates
 this capability.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGS1948"></a>
 <h2> FORTRAN API Example</h2>
@@ -5896,6 +6162,9 @@ c ... close the device
 c ------------------------------------------------------------------
 </PRE>
 </blockquote>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PGSdocs"></a>
 <h1 ALIGN="CENTER"> Other PACT Documentation</h1>

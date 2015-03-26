@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 08/15/2014
+MOD: 03/26/2015
 
 <CENTER>
 <P>
@@ -371,6 +371,10 @@ indicates functions for optional use
 <a href="#pdb_syment_s"><dt><dd>SYMENT</a>
 
 </dl>
+
+<!-- -------------------------------------------------------------------- --> 
+ 
+<a href="#pdb_gen"><H3>PDBLib Functions</H3></a>
 
 <!-- -------------------------------------------------------------------- --> 
  
@@ -10505,6 +10509,22 @@ Just as the <tt>defstr</tt> type describes entries in the structure chart the
 <tt>syment</tt> type describes entries in the symbol table. The <tt>syment</tt> includes
 information about the data type of the entry, the number of elements,
 the dimensions of the entry, and its disk address.
+<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
+<a name="pdb_gen"><h2>PDBLib Functions</h2></a>
+
+
+The following documentation is generated automatically from the
+PDBLib source.  As such it is absolutely the most up to date description
+of the functions and supercedes any details in the documentation above.
+<p>
+Note: some of the functions listed refer to a type, pboolean.  This is
+currently an int but is being used as a transition to the C99 bool type.
+<p>
+<a href="gh-pdb.html">Function bindings</a>
 <p>
 
 <!-- -------------------------------------------------------------------- --> 

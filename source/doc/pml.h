@@ -1,5 +1,5 @@
 TXT: PML User's Manual
-MOD: 04/06/2011
+MOD: 03/26/2015
 
 <CENTER>
 <P>
@@ -47,6 +47,8 @@ MOD: 04/06/2011
 <li><a href="#PMLsort">Sorting Routines</a>
 
 </ul>
+<li><a href="#PMLgen">PML Functions</a>
+
 <li><a href="#PMLfapi">Summary of the PML FORTRAN API</a>
 
 <li><a href="#PMLexamps">EXAMPLES</a>
@@ -60,6 +62,9 @@ MOD: 04/06/2011
 </ul>
 
 <HR>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLintro"></a><h2 ALIGN="CENTER">Introduction</h2>
 
@@ -95,6 +100,9 @@ I would like to acknowledge the work of Charles F. McMillan in PML. He devised
 the original matrix structure and wrote many of the routines to manipulate them.
 The final form that they take in PML is very close to his original conception.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLdata"></a>
 <h2 ALIGN="CENTER"> Data Structures</h2>
 
@@ -114,6 +122,9 @@ to provide the set of operations which can be carried out on the elements of set
 This also makes the set and mapping structures very general (which it should be) and
 still reasonably efficient.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLcomplex"></a>
 <h3>Complex</h3>
 
@@ -129,6 +140,9 @@ struct s_complex
 
 The real part of the complex number is kept in the member real and the imaginary
 part of the complex number is kept in the member imag.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLmatrix"></a>
 <h3> PM_matrix</h3>
@@ -159,6 +173,8 @@ When operating on matrices it is necessary only to pass the matrix as an argumen
 since the number of rows and columns is contained in the structure. A vector is
 taken to be simply a matrix with either one row or one column.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLset"></a>
 <h3> Set</h3>
@@ -227,6 +243,8 @@ sets of other kinds could be programmed to distinguish between the
 topological information associated with these mesh sets and that of
 other sets it knows about.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLexampset"></a>
 <b> Example of building a set</b><br><br>
@@ -285,6 +303,9 @@ main()
     return(0);}
 </PRE>
 </BLOCKQUOTE>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLmap"></a>
 <h3> Mapping</h3>
@@ -357,6 +378,9 @@ zone centered; N_CENT for node centered; F_CENT for face centered; E_CENT
 for edge centered; or U_CENT for uncentered.<p>
 
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLconnect"></a>
 <b> Connectivity</b><br><br>
 To support general computational meshes PML has a model for arbitrarily
@@ -364,6 +388,9 @@ connected meshes which is independent of dimensionality and a priori
 assumptions about shapes of zones or elements. We give a complete
 discussion below including definitions of terms. Hopefully this will
 suffice to give a useful account of this topic.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLconcept"></a>
 <b> Concepts</b><br><br>
@@ -376,6 +403,9 @@ of information.  At the bottom of the heirarchy is the minimal information
 needed by a minimal connectivity scheme. At the top is a maximal set of
 information which is computable from the minimal information but is kept
 in memory rather than recomputing it.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLdefs"></a>
 <b> Definitions</b><br><br>
@@ -438,6 +468,9 @@ in their boundary and which collectively cover the N-cell.
 <B>Figure 1: The cell A is one cell in the irreducible decomposition of the rectangular 2-Cell shown
 </B><HR>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLaxiom"></a>
 <b> Axioms</b><br>
 
@@ -449,6 +482,9 @@ is: 1) a list of nodes; and 2) for each node a list of its neighboring nodes.
 is: 1) a list of nodes; 2) a list of zones; and 3) for each node a list
 of its neighboring nodes.
 </ul>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLreqs"></a>
 <b> Representation Requirements</b><br><br>
@@ -496,6 +532,9 @@ PML defines the following constants to name the cell description parameters<p>
 </BLOCKQUOTE>
 
 <P>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLrepcon"></a>
 <b> Representation of Connectivity</b><br><br>
@@ -552,6 +591,9 @@ in boundaries[3] which are neighbors.<p>
 </B><HR>
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLfield"></a>
 <h3>Field</h3>
 Depending on which operations are defined on a set of elements (in addition
@@ -573,12 +615,18 @@ typedef struct s_PM_field PM_field;
 
 <P>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLcapi"></a>
 <h2 ALIGN="CENTER"> Summary of the PML C API</h2>
 Here is a brief summary of the routines in PML. They are broken down by
 category as: matrix manipulation routines; other equation solvers; geometry
 routines; mathematical functions; constructors and destructors; field
 operators; and sorting routines.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLmanip"></a>
 <h3> MATRIX Manipulation Routines</h3>
@@ -689,6 +737,8 @@ transpose and is returned.<p>
 Create and fill a matrix consisting of the super-diagonal part of the input
 matrix a. The new matrix is returned.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLother"></a>
 <h3> Other Equation Solvers</h3>
@@ -777,6 +827,9 @@ shorter than the diagonal. The number of equations is n. The result is
 returned in u. All vectors are passed into the routine which returns TRUE
 if successful and FALSE otherwise.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLgeom"></a>
 <h3> Geometry Routines</h3>
 
@@ -851,6 +904,9 @@ This routine finds the point in the curve defined by the n points in the px and
 py arrays which is nearest to the point (xs, ys). The point is returned in
 (pxt, pyt) and the index of that point in pi.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLmath"></a>
 <h3> Mathematical Functions</h3>
 
@@ -886,6 +942,9 @@ Return the sign of x (-1.0 or 1.0) or 0 if x = 0.<p>
 <B>double PM_sqr(double x)
 </B><BR><PRE> Return x<SUP>2</SUP>.
 </PRE>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLcondes"></a>
 <h3> Constructors and Destructors</h3>
@@ -930,6 +989,8 @@ Release the space associated with the specified mapping. If rld is TRUE
 the data arrays of the domain set will be released and if rlr is TRUE the
 data arrays of the range set will be released.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLfieldop"></a>
 <h3> Field Operators</h3>
@@ -971,6 +1032,9 @@ Return mod(x, y) as a long integer value.<p>
 return a double result.
 </PRE>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLsort"></a>
 <h3> Sorting Routines</h3>
 
@@ -986,6 +1050,25 @@ the ordering into ord. The array ord must be n_pts long if it is passed in.
 In any case, if successful, a pointer to the ordering array is returned.
 If there are loops in the topology specified by in, or there are other errors
 NULL is returned.<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
+<a name="PMLgen"><h2>PML Functions</h2></a>
+
+
+The following documentation is generated automatically from the
+PML source.  As such it is absolutely the most up to date description
+of the functions and supercedes any details in the documentation above.
+<p>
+Note: some of the functions listed refer to a type, pboolean.  This is
+currently an int but is being used as a transition to the C99 bool type.
+<p>
+<a href="gh-pml.html">Function bindings</a>
+<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLfapi"></a>
 <h2 ALIGN="CENTER"> Summary of the PML FORTRAN API</h2>
@@ -1131,6 +1214,9 @@ n<SUB>i</SUB> = 1 + nc(i)*bp(i)
 It is crucial to remember that the values in bnd are indices which are 
 zero-based! Be sure to review the section on connectivity.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLexamps"></a>
 <h2 ALIGN="CENTER"> EXAMPLES</h2>
 
@@ -1141,6 +1227,8 @@ and the test program for the topological sort routine. The routine to generate a
 PM_set was included in the discussion of the PM_set data structure. Users may contact
 the author for further examples.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLexamp1"></a>
 <h3> Examples of MATRIX Functions</h3>
@@ -1188,6 +1276,9 @@ main()
 </PRE>
 
 </BLOCKQUOTE>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLexamp2"></a>
 <h3> Example of ICCG Routine</h3>
@@ -1299,6 +1390,9 @@ main()
 
 </BLOCKQUOTE>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="PMLexamp3"></a>
 <h3> Example of Topological Sort Routine</h3>
 
@@ -1360,6 +1454,9 @@ main()
 </PRE>
 
 </BLOCKQUOTE>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="PMLdocs"></a>
 <h2 ALIGN="CENTER"> Related Documentation</h2>

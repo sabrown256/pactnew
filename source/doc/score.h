@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 2/17/2015
+MOD: 3/26/2015
 
 <CENTER>
 <P>
@@ -64,12 +64,17 @@ MOD: 2/17/2015
 <li><a href="#score.scstd">scstd.h</a> 
 </ul>
 
+<li><a href="#score.gen">SCORE Functions</a>
+
 <li><a href="#score.examp">Examples</a>
 
 <li><a href="#score.docs">Related Documentation</a>
 </ul>
 
 <hr>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.intro"></a>
 <h2 ALIGN="CENTER">Introduction</h2>
@@ -763,6 +768,9 @@ assocation list <em>al1</em> is returned if successful.
 The string handling routines in SCORE provide functionality which extends
 or supplements that available from the standard C library.<p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.preds">
 <b>Predicates</b>
 </a>
@@ -809,6 +817,9 @@ Return <tt>TRUE</tt> iff <em>string1</em> is  blank or a comment. A comment begi
 a character in <em>string2</em> followed by a blank, tab, or end of line.<p>
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.patt">
 <b>Pattern Matching</b>
 </a>
@@ -847,6 +858,9 @@ Match string <em>s</em> against regular expression <em>patt</em>.
 number of characters. &#145;?&#146; matches any single character.
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.sort">
 <b>String Sorting</b>
 </a>
@@ -862,6 +876,9 @@ Sort an array of character pointers by what they point to. The arguments are:
 <em>s</em>, an array of pointers to ASCII strings,
 and <em>number</em>, the number of strings.
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.case">
 <b>String Operations Involving Case</b>
@@ -892,6 +909,9 @@ Convert a string to all uppercase.
 Convert a string to all lowercase.
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.toke">
 <b>Tokenizers</b>
 </a>
@@ -920,6 +940,9 @@ Find the first token or quoted token string in a string.
 
 Find the last token in a string.
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.other">
 <b>Other String Operations</b>
@@ -1338,6 +1361,9 @@ standard C library function ctime.
 <h3>Memory Management</h3>
 </a>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.mmover">
 <b>Overview of the SCORE Memory Manager</b>
 </a>
@@ -1401,6 +1427,9 @@ in performance.  In thread parallel applications it provides an even bigger
 benefit by managing heaps on a per thread basis and avoiding the overhead
 of locking and unlocking memory management operations.
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.mmdesc">
 <b>Description of the SCORE Memory Manager</b>
@@ -1525,6 +1554,9 @@ There may still be bugs in it, but you are unlikely to have found one.
 You should check your application first as hard as that may be to do.
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.mmconf">
 <b>Configuring the Memory Manager</b>
 </a>
@@ -1602,6 +1634,9 @@ all choices that you get to make.
 <p>
 
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.mmlk">
 <b>Tracking Down Memory Leaks</b>
 </a>
@@ -1676,6 +1711,9 @@ of bytes difference would have been reported.
 NOTE: All arguments but the first must be the same in the pairs of
 <tt>SC_mem_monitor</tt> calls.
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.mmfnc">
 <b>Memory Manager Functions</b>
@@ -2009,6 +2047,9 @@ Returns the old value of the flag.
 <h3>Miscellaneous Routines</h3>
 </a>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.bit">
 <b>Bit Level Manipulations</b>
 </a>
@@ -2032,6 +2073,9 @@ Count the number of set bits in the specified number of bytes of a given long.
 
 Reverse the specified number of bits of a given unsigned int.
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.nconv">
 <b>Numeric Conversion</b>
@@ -2089,6 +2133,9 @@ This macro invokes either the standard C library function strtod or the
 guaranteed to work SCORE equivalent.
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.onum">
 <b>Other Numeric</b>
 </a>
@@ -2120,6 +2167,9 @@ Return the greater of the two arguments.
 
 Return the lesser of the two arguments.
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.file">
 <b>File Search</b>
@@ -2155,6 +2205,9 @@ if the file exists.  The return string is dynamically allocated and
 the application is responsible for releasing it with <tt>CFREE</tt>.
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.io">
 <b>I/O</b>
 </a>
@@ -2167,6 +2220,9 @@ the application is responsible for releasing it with <tt>CFREE</tt>.
 <pre>
 <I>C Binding: </I>GETLN
 </pre>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.intrpt">
 <b>Interrupts</b>
@@ -2192,6 +2248,9 @@ buffering for an application.
 
 Handle interrupts in a default sort of way.
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.other2">
 <b>Other</b>
@@ -2345,6 +2404,9 @@ dispense work anyway it sees fit.  This is simply a very useful
 special case.
 <p>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.cons">
 <h2 ALIGN="CENTER">SCORE Constants</h2>
 </a>
@@ -2434,6 +2496,9 @@ The following constants are defined in the SC_token_type enumeration:
 </TABLE>
 </BLOCKQUOTE>
 
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
 <a name="score.scstd"></a>
 <h3 ALIGN="CENTER">scstd.h Constants</h3>
 
@@ -2489,6 +2554,26 @@ The following &#35define'd constants help with path portability:
 </TABLE>
 </BLOCKQUOTE>
 
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
+<a name="score.gen">
+<h2 ALIGN="CENTER">SCORE Functions</h2></a>
+
+
+The following documentation is generated automatically from the
+SCORE source.  As such it is absolutely the most up to date description
+of the functions and supercedes any details in the documentation above.
+<p>
+Note: some of the functions listed refer to a type, pboolean.  This is
+currently an int but is being used as a transition to the C99 bool type.
+<p>
+<a href="gh-score.html">Function bindings</a>
+<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.examp">
 <h2 ALIGN="CENTER">Examples</h2>
@@ -2607,6 +2692,9 @@ becomes:
                   .
 </pre>
 <p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
 
 <a name="score.docs">
 <h2 ALIGN="CENTER">Related Documentation</h2>
