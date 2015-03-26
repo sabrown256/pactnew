@@ -4,8 +4,6 @@
 # include "cpyright.h"
 #
 
-#setenv PATH  ${PATH}:/bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/bin
-
 # specify DP group directly for BG/Q since there is no variation
 Group DP {
    Inc   = -I/bgsys/drivers/ppcfloor/comm/gcc/include
@@ -13,10 +11,6 @@ Group DP {
    RPath = /bgsys/drivers/ppcfloor/comm/gcc/lib
    Path  = /bgsys/drivers/ppcfloor/comm/gcc/bin
 }
-
-#Group HSY {
-#   RootInc = /bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/sys-include
-#}
 
 include compilers/clang-bgq
 

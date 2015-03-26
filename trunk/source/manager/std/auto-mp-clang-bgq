@@ -7,9 +7,31 @@
 # include "cpyright.h"
 #
 
-run std/use-compiler vers any bgclang
+Group OCV {
+   CC     = bgclang
+   CC_Cfg = bgclang
+   CXX    = bgclang++
+   LDLb  += -lnss_files -lnss_dns -lresolv
+}
+
+Group RF {
+   RPATH_FILTER = /usr/lib:/usr/lib64
+}
+
+run std/use-compiler bgclang
+
+run analyze/locate-mpi mvapich2 ib gnu
 
 include compilers/clang-lnx
+include no-jpeg
+include no-fortran
+
+Group TEST {
+   SKIP    += scripts:dobatch
+   ADVISORY = ${TEST_ADVISORY}:scripts_acpp
+   ADVISORY = ${TEST_ADVISORY}:pml_fpe:sx_drun:sx_intp3:pdb_pty
+   ADVISORY = ${TEST_ADVISORY}:scheme_gexec_var
+}
 
 include cross-clang-bgq
 

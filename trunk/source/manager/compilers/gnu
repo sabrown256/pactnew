@@ -79,6 +79,7 @@ Tool CC {
 #   Flags    =+ -Werror
    Flags    =+ -Wformat -Wformat-security -Wmultichar
    Flags    =+ -Wpointer-arith -Winit-self
+   Flags    =+ -Wno-unused-value
 
 # -Wextra turns on the following warning flags:
 #    -Wclobbered -Wempty-body -Wignored-qualifiers

@@ -23,6 +23,9 @@ include os/bgq
 include features/no-fortran
 
 Group TEST {
-  ADVISORY = ${TEST_ADVISORY}:score_retrc
+  ADVISORY = ${TEST_ADVISORY}:scripts_acpp
+  ADVISORY = ${TEST_ADVISORY}:score_retrc:score_mpi_wrap
+  ADVISORY = ${TEST_ADVISORY}:pdb_pipe:pdb_socket:pdb_pty
+  ADVISORY = ${TEST_ADVISORY}:sx_drun:sx_intp3
 }
 

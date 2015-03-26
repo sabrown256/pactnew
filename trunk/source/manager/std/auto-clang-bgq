@@ -7,7 +7,17 @@
 # include "cpyright.h"
 #
 
-run std/use-compiler /usr/local/apps/gnu/clang/llnl/bin/mpiclang
+setenv PATH  ${PATH}:/usr/gapps/pact/scripts:/usr/local/apps/gnu/clang/llnl/bin
+
+Group HSY {
+   RootLib = /usr/apps/gnu/clang/lib
+}
+
+Group TEST {
+   ADVISORY = ${TEST_ADVISORY}:pdb_dp
+}
+
+run std/use-compiler mpiclang
 
 include features/clang-bgq-set
 

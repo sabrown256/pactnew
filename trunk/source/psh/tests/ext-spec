@@ -43,11 +43,15 @@ foreach i (1 2 3 4)
 
    switch ($i)
       case 1:
+# GOTCHA: so far only Clang 3.6 on PowerPC gets this right
+# so test fiducial has the wrong answer until this is fixed
            set cmd = ( gexec $opt /bin/echo "$id" @x $logout '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            breaksw
       case 2:
+# GOTCHA: so far only Clang 3.6 on PowerPC gets this right
+# so test fiducial has the wrong answer until this is fixed
            set cmd = ( gexec $opt /bin/echo "$id" @r $logout '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
@@ -109,6 +113,7 @@ foreach i (1 2 3 4)
             NoteD $Log -n "o"
             Note $Log "$id differed"
             flog $Log cat $dif
+            set rpf = ( $rpf ext-$t )
          endif
          flog $Log rm -f $res.no
       else
@@ -127,6 +132,7 @@ foreach i (1 2 3 4)
       @ err = $err + $xstatus
       if ($xstatus == 0) then
          NoteD $Log -n "."
+         set rpf = ( $rpf ext-$t )
       else
          NoteD $Log -n "x"
       endif
@@ -145,8 +151,6 @@ Note $Log ""
 set xstatus = $err
 
 set lt = `timer -b $lt`
-
-set rpf = ( $rpf ext-$t )
 
 $TEST_CHECK part -a gexec_${t} -e $xstatus -dt $lt -x $exe -l -rpf "$rpf" none
 
