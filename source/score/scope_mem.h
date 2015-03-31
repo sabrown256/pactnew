@@ -265,6 +265,10 @@ struct s_SC_scope_mem
 typedef int (*PFMemMap)(SC_heap_des *ph, mem_descriptor *md,
 			mem_kind wh, void *a, long i, long j);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 # ifndef MM_CONFIG
 
 /*--------------------------------------------------------------------------*/
@@ -388,5 +392,9 @@ extern SC_heap_des
  *_SC_get_heap(int id);
 
 # endif
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
