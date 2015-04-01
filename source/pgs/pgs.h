@@ -1207,7 +1207,7 @@ extern void
  PG_fget_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
  PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
  PG_fget_font(PG_device *dev, char **of, char **ost, int *osz),
- PG_fset_font(PG_device *dev, char *face, char *style, int sz),
+ PG_fset_font(PG_device *dev, CONST char *face, CONST char *style, int sz),
  PG_fget_viewport_pos(PG_device *dev, double *x),
  PG_fset_viewport_pos(PG_device *dev, double *x),
  PG_fget_viewport_shape(PG_device *dev, double *dx, double *pa),
@@ -1239,7 +1239,7 @@ extern void
  PG_clear_region(PG_device *dev, int nd, PG_coord_sys cs,
 		 double *ndc, int pad),
  PG_clear_page(PG_device *dev, int i),
- PG_write_text(PG_device *dev, FILE *fp, char *s),
+ PG_write_text(PG_device *dev, FILE *fp, CONST char *s),
  PG_next_line(PG_device *dev, FILE *fp),
  PG_shade_poly_n(PG_device *dev, int nd, int n, double **r),
  PG_fill_curve(PG_device *dev, PG_curve *crv),
@@ -1286,7 +1286,7 @@ extern pcons
 
 extern void
  PG_setup_attrs_glb(void),
- *PG_ptr_attr_glb(char *name);
+ *PG_ptr_attr_glb(CONST char *name);
 
 
 /* GSAUX.C declarations */
@@ -1314,7 +1314,7 @@ extern void
 extern PG_axis_def
  *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
 		 double *tn, double *vw, double sc,
-		 char *format, int tick_type, int label_type,
+		 CONST char *format, int tick_type, int label_type,
 		 int flag, ...);
 
 
@@ -1323,28 +1323,28 @@ extern PG_axis_def
 extern int
  PG_rgb_index(PG_device *dev, RGB_color_map *cm),
  PG_select_color(PG_device *dev, int n, double *a, double *extr),
- PG_wr_palette(PG_device *dev, PG_palette *pal, char *fname);
+ PG_wr_palette(PG_device *dev, PG_palette *pal, CONST char *fname);
 
 extern void
  PG_register_palette(PG_device *dev, PG_palette *pal, int map),
  PG_setup_standard_palettes(PG_device *dev, int nc, int *gs),
  PG_rl_palette(PG_palette *pal),
- PG_show_palettes(PG_device *sdev, char *type, int wbck),
- PG_show_colormap(char *type, int wbck),
- PG_dump_colormap(char *type, char *file),
+ PG_show_palettes(PG_device *sdev, CONST char *type, int wbck),
+ PG_show_colormap(CONST char *type, int wbck),
+ PG_dump_colormap(CONST char *type, CONST char *file),
  PG_rgb_color(RGB_color_map *clr, int lc, int rgb, PG_palette *pal),
  PG_color_map(PG_device *dev, int mono, int fix),
  PG_gray_map(PG_device *dev, int ng, int *gs, double imx);
 
 extern PG_palette
- *PG_mk_palette(PG_device *dev, char *name, int nclr),
- *PG_fget_palette(PG_device *dev, char *name),
- *PG_fset_palette(PG_device *dev, char *name),
- *PG_make_palette(PG_device *tdev, char *name,
+ *PG_mk_palette(PG_device *dev, CONST char *name, int nclr),
+ *PG_fget_palette(PG_device *dev, CONST char *name),
+ *PG_fset_palette(PG_device *dev, CONST char *name),
+ *PG_make_palette(PG_device *tdev, CONST char *name,
 		  int nclr, int wbck),
- *PG_make_ndim_palette(PG_device *tdev, char *name,
+ *PG_make_ndim_palette(PG_device *tdev, CONST char *name,
 		       int ndims, int *dims,  int wbck),
- *PG_rd_palette(PG_device *dev, char *fname);
+ *PG_rd_palette(PG_device *dev, CONST char *fname);
 
 
 /* GSCNTR.C declarations */
@@ -1401,7 +1401,7 @@ extern void
 extern void
  PG_setup_input(char *s, int nc, size_t nr),
  PG_reset_input(void),
- PG_device_filename(char *fname, long nc, char *raw, char *ext),
+ PG_device_filename(char *fname, long nc, CONST char *raw, CONST char *ext),
  PG_query_device(PG_device *dev, int *pdx, int *pdy, int *pnc),
  PG_query_window(PG_device *dev, int *pdx, int *pdy),
  PG_register_range_extrema(PG_device *dev, int nd, double *extr),
@@ -1418,13 +1418,14 @@ extern char
 
 extern int
  PG_setup_window_device(PG_device *dev),
- PG_fprintf(FILE *fp, char *fmt, ...),
- PG_fputs(char *s, FILE *fp),
- PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, char *fmt, ...),
+ PG_fprintf(FILE *fp, CONST char *fmt, ...),
+ PG_fputs(CONST char *s, FILE *fp),
+ PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x,
+	    CONST char *fmt, ...),
  PG_wind_fgetc(FILE *stream),
- PG_wind_fprintf(FILE *fp, char *fmt, ...),
- PG_wind_fputs(char *s, FILE *fp),
- PG_open_console(char *title, char *type, int bckgr,
+ PG_wind_fprintf(FILE *fp, CONST char *fmt, ...),
+ PG_wind_fputs(CONST char *s, FILE *fp),
+ PG_open_console(CONST char *title, CONST char *type, int bckgr,
 		 double xf, double yf, double dxf, double dyf);
 
 
@@ -1520,7 +1521,7 @@ extern PG_picture_desc
 extern void
  PG_image_picture_info(PG_graph *data, int *pnd, double *dbx, double *rbx),
  PG_image_plot(PG_device *dev, PG_graph *data, ...),
- PG_draw_image_pixels(PG_device *dev, char *name, char *type,
+ PG_draw_image_pixels(PG_device *dev, CONST char *name, CONST char *type,
 		      void *f, double *dbx, double *ext,
 		      void *cnnct, pcons *alist),
  PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
@@ -1530,14 +1531,14 @@ extern void
 		      int kx, int lx, int bpi),
  PG_invert_image(PG_image *im),
  PG_get_viewport_size(PG_device *dev, int *pix, int *piy, int *pnx, int *pny),
- PG_draw_image(PG_device *dev, PG_image *im, char *label,
+ PG_draw_image(PG_device *dev, PG_image *im, CONST char *label,
 	       pcons *alst),
  PG_rl_image(PG_image *im);
 
 extern PG_image
- *PG_build_image(PG_device *dev, char *name, char *type, void *z,
+ *PG_build_image(PG_device *dev, CONST char *name, CONST char *type, void *z,
 		 int w, int h, int nd, PG_coord_sys cs, double *dbx, double *rbx),
- *PG_make_image_n(char *label, char *type, void *z,
+ *PG_make_image_n(CONST char *label, CONST char *type, void *z,
 		  int nd, PG_coord_sys cs, double *dbx, double *rbx,
 		  int w, int h, int bpp, PG_palette *palette),
  *PG_extract_image(PG_device *dev, double *dbx, double *rbx);
@@ -1585,14 +1586,14 @@ extern void
  PG_clip_data(PG_device *dev, double *tx, double *ty, int *ptn,
 	      double *x, double *y, int n),
  PG_clip_line(int *pfl, double *x1, double *x2, double *wc, int *lgf),
- PG_center_label(PG_device *dev, double sy, char *label),
+ PG_center_label(PG_device *dev, double sy, CONST char *label),
  PG_polar_limits(double *bx, double *x, double *y, int n),
  PG_set_limits_n(PG_device *dev, int nd, PG_coord_sys cs, long n, double **x,
 		 PG_rendering pty),
  PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 		    char **labels, char **files,
 		    int *dataid, int *modified, int *clr,
-		    double *extr, char *ctg,
+		    double *extr, CONST char *ctg,
 		    unsigned int llf, int lcf, int slf, int lts);
 
 extern int
@@ -1636,19 +1637,20 @@ extern PG_device
 extern PG_interface_object
  *PG_get_object_event(PG_device *dev, PG_event *ev),
  *PG_copy_interface_object(PG_device *dev, PG_interface_object *iob),
- *PG_find_object(PG_device *dev, char *s, PG_interface_object *parent);
+ *PG_find_object(PG_device *dev, CONST char *s, PG_interface_object *parent);
 
 extern haelem
- *PG_lookup_variable(char *name);
+ *PG_lookup_variable(CONST char *name);
 
 extern PFVoid
- PG_lookup_callback(char *name);
+ PG_lookup_callback(CONST char *name);
 
 extern void
  PG_define_region(PG_device *dev, PG_coord_sys cs, double *bx),
  PG_print_pointer_location(PG_device *dev, double cx, double cy, int coord),
- PG_register_callback(char *name, ...),
- PG_register_variable(char *name, char *type, void *var, void *vn, void *vx),
+ PG_register_callback(CONST char *name, ...),
+ PG_register_variable(CONST char *name, CONST char *type,
+		      void *var, void *vn, void *vx),
  PG_move_object(PG_interface_object *iob, double *bx, int redraw),
  PG_draw_interface_object(PG_interface_object *iob),
  PG_draw_interface_objects(PG_device *dev),
@@ -1656,8 +1658,8 @@ extern void
  PG_map_interface_object(PG_interface_object *iob, PFEvCallback fnc, void *a),
  PG_map_interface_objects(PG_device *dev, PFEvCallback fnc, void *a),
  PG_register_interface_object(PG_device *dev, PG_interface_object *iob),
- PG_add_text_obj(PG_device *dev, double *obx, char *s),
- PG_add_button(PG_device *dev, double *obx, char *s, PFEvCallback fnc),
+ PG_add_text_obj(PG_device *dev, double *obx, CONST char *s),
+ PG_add_button(PG_device *dev, double *obx, CONST char *s, PFEvCallback fnc),
  PG_free_interface_objects(PG_device *dev),
  PG_copy_interface_objects(PG_device *dvd, PG_device *dvs, int rm),
  PG_handle_keyboard_event(PG_interface_object *iob, PG_event *ev);
@@ -1667,52 +1669,54 @@ extern void
 
 extern PG_interface_object
  *PG_add_iob(PG_device *dev, PG_interface_object *cnt,
-	     double *bx, char *type, ...),
- *PG_iob_make_container(PG_device *dev, char *name, double *bx);
+	     double *bx, CONST char *type, ...),
+ *PG_iob_make_container(PG_device *dev, CONST char *name, double *bx);
 
 extern void
  PG_iob_register_toggle(PG_device *dev, PG_interface_object *cnt,
-			char *name, char *abbrv, int *pv,
+			CONST char *name, CONST char *abbrv, int *pv,
 			double *bx, int on_clr, int off_clr),
  PG_iob_register_slider(PG_device *dev, PG_interface_object *cnt,
-			char *name, char *abbrv, int *pv,
+			CONST char *name, CONST char *abbrv, int *pv,
 			double *bx, double dx, double dy);
 
 
 /* GSMM.C declarations */
 
 extern PG_graph
- *PG_make_graph_1d(int id, char *label, int cp, int n, double *x, double *y,
-		   char *xname, char *yname),
- *PG_make_graph_r2_r1(int id, char *label, int cp, int imx, int jmx,
+ *PG_make_graph_1d(int id, CONST char *label, int cp, int n, double *x, double *y,
+		   CONST char *xname, CONST char *yname),
+ *PG_make_graph_r2_r1(int id, CONST char *label, int cp, int imx, int jmx,
 		      PM_centering centering, double *x, double *y,
-		      double *r, char *dname, char *rname),
- *PG_make_graph_r3_r1(int id, char *label, int cp,
+		      double *r, CONST char *dname, CONST char *rname),
+ *PG_make_graph_r3_r1(int id, CONST char *label, int cp,
 		      int imx, int jmx, int kmx, PM_centering centering,
 		      double *x, double *y, double *z, double *r,
-		      char *dname, char *rname),
- *PG_make_graph_from_sets(char *name, PM_set *domain, PM_set *range,
-			  PM_centering centering, char *info_type, void *info,
+		      CONST char *dname, CONST char *rname),
+ *PG_make_graph_from_sets(CONST char *name, PM_set *domain, PM_set *range,
+			  PM_centering centering,
+			  CONST char *info_type, void *info,
 			  int id, PG_graph *next),
- *PG_make_graph_from_mapping(PM_mapping *f, char *info_type, void *info,
+ *PG_make_graph_from_mapping(PM_mapping *f, CONST char *info_type, void *info,
 			     int id, PG_graph *next);
 
 extern PG_device
- *PG_make_device(char *name, char *type, char *title);
+ *PG_make_device(CONST char *name, CONST char *type, CONST char *title);
 
 extern PG_view_attributes
  *PG_make_view_attributes(PG_device *dev);
 
 extern PG_font_family
- *PG_make_font_family(PG_device *dev, char *name,
+ *PG_make_font_family(PG_device *dev, CONST char *name,
 		      PG_font_family *next, int n, ...);
 
 extern PG_interface_object
- *PG_make_interface_object_n(PG_device *dev, char *name, char *type,
+ *PG_make_interface_object_n(PG_device *dev, CONST char *name, CONST char *type,
 			     void *obj, PG_curve *crv,
 			     int *flags, int fc, int bc,
 			     PG_textdes *ptd,
-			     char *slct, char *draw, char *action,
+			     CONST char *slct, CONST char *draw,
+			     CONST char *action,
 			     PG_interface_object *parent);
 
 extern PG_curve
@@ -1734,7 +1738,7 @@ extern pcons
 
 extern void
  PG_rl_all(void),
- PG_register_device(char *name, PFRDev fnc),
+ PG_register_device(CONST char *name, PFRDev fnc),
  PG_rl_device(PG_device *dev),
  PG_rl_graph(PG_graph *g, int rld, int rlr),
  PG_save_view_attributes(PG_view_attributes *d, PG_device *dev),
@@ -1762,7 +1766,8 @@ extern PG_dev_attributes
  *PG_get_attributes(PG_device *dev);
 
 extern void
- PG_get_text_ext_n(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p),
+ PG_get_text_ext_n(PG_device *dev, int nd, PG_coord_sys cs,
+		   CONST char *s, double *p),
  PG_set_attributes(PG_device *dev, PG_dev_attributes *attr),
  PG_setup_markers(void),
  PG_draw_markers_n(PG_device *dev, int nd, PG_coord_sys cs,
@@ -1775,15 +1780,15 @@ extern int
  PG_def_marker(int n, double *x1, double *y1, double *x2, double *y2);
 
 extern pboolean
- PG_setup_font(PG_device *dev, char *face, char *style, int size,
+ PG_setup_font(PG_device *dev, CONST char *face, CONST char *style, int size,
 	       char **pfn, int *pnf, int *pns);
 
 
 /* GSRWI.C declarations */
 
 extern int
- PG_write_interface(PG_device *dev, char *name),
- PG_read_interface(PG_device *dev, char *name);
+ PG_write_interface(PG_device *dev, CONST char *name),
+ PG_read_interface(PG_device *dev, CONST char *name);
 
 
 /* GSSCAT.C declarations */
@@ -1796,7 +1801,7 @@ extern void
  PG_draw_scatter(PG_device *dev, double *a1, double *a2,
 		 int nn, int ne, double **x,
 		 double theta, double phi, double chi, double width,
-		 int color, int style, int type, char *name,
+		 int color, int style, int type, CONST char *name,
 		 pcons *alist);
 
 
@@ -1809,8 +1814,8 @@ extern void
  PG_surface_plot(PG_device *dev, PG_graph *data, ...),
  PG_draw_surface_n(PG_device *dev, double *a1, double *a2, double *aext,
 		   double **r, int nn, double *va, double width,
-		   int color, int style, PG_rendering pty, char *name,
-		   char *mesh_type, void *cnnct, pcons *alist);
+		   int color, int style, PG_rendering pty, CONST char *name,
+		   CONST char *mesh_type, void *cnnct, pcons *alist);
 
 
 /* GSPOLF.C declarations */
@@ -1856,10 +1861,10 @@ extern int
  PG_is_inactive_text_box(PG_interface_object *iob);
 
 extern PG_text_box
- *PG_open_text_rect(PG_device *dev, char *name, int type,
+ *PG_open_text_rect(PG_device *dev, CONST char *name, int type,
 		    PFKeymap *keymap, PG_curve *crv,
 		    double brd, int ndrw),
- *PG_open_text_box(PG_device *dev, char *name, int type,
+ *PG_open_text_box(PG_device *dev, CONST char *name, int type,
 		   PFKeymap *keymap,
 		   double xf, double yf,
 		   double dxf, double dyf),

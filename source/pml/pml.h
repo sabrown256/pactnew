@@ -757,7 +757,7 @@ extern PM_mesh
 		  double dspat, double drat, double orient);
 
 extern PM_conic_curve
- *PM_mk_cline(char *type, double axx, double ayy, double axy,
+ *PM_mk_cline(CONST char *type, double axx, double ayy, double axy,
 	      double ax, double ay, double ac);
 
 extern PM_side
@@ -768,7 +768,7 @@ extern PM_side
 	     PM_side *match, PM_side *next);
 
 extern PM_part
- *PM_mk_part(char *name, int rg, int nsides,
+ *PM_mk_part(CONST char *name, int rg, int nsides,
 	     PM_side *leg, PM_end_point *ends,
 	     void *comp, double kms, double kes,
 	     double kme, double kee, double krat,
@@ -874,7 +874,7 @@ extern double
  PM_distance(int nd, double *x1, double *x2, double *g),
  PM_polygon_area(PM_polygon *py),
  **PM_project_vectors(int nd, int n, double **x),
- **PM_convert_vectors(int nd, int n, void *v, char *typ);
+ **PM_convert_vectors(int nd, int n, void *v, CONST char *typ);
 
 
 /* MLICCG.C declarations */
@@ -968,7 +968,7 @@ extern void
  PM_array_shift(double *p, int n, double f),
  PM_array_set(double *p, int n, double f),
  PM_array_copy(double *s, double *t, int n),
- PM_err(char *fmt, ...);
+ PM_err(CONST char *fmt, ...);
 
 extern int
  PM_del_col(PM_matrix *a, long *col, long ncol),
@@ -1039,33 +1039,33 @@ extern void
 /* MLMM.C declarations */
 
 extern C_array
- *PM_make_array(char *type, long size, void *data);
+ *PM_make_array(CONST char *type, long size, void *data);
 
 extern PM_set
- *PM_make_set_alt(char *name, char *type, int cp, int nd,
+ *PM_make_set_alt(CONST char *name, CONST char *type, int cp, int nd,
 		  int *diml, int nde, void **elml),
- *PM_make_set(char *name, char *type, int rl,
+ *PM_make_set(CONST char *name, CONST char *type, int rl,
 	      int nd, ...),
- *PM_make_ac_set(char *name, char *type, int cp,
+ *PM_make_ac_set(CONST char *name, CONST char *type, int cp,
 		 PM_mesh_topology *mt, int nde, ...),
  *PM_copy_set(PM_set *s),
- *PM_make_lr_index_domain(char *name, char *type,
+ *PM_make_lr_index_domain(CONST char *name, CONST char *type,
 			  int nd, int nde, int *maxes,
 			  double *extrema, double *ratio),
- *PM_make_lr_cp_domain(char *name, char *type, int nd,
+ *PM_make_lr_cp_domain(CONST char *name, CONST char *type, int nd,
 		       PM_set **sets),
- *PM_mk_set(char *name, char *type, int cp, long ne,
+ *PM_mk_set(CONST char *name, CONST char *type, int cp, long ne,
 	    int nd, int nde, int *maxes, void *elem,
 	    PM_field *opers, double *metric,
-	    char *symtype, void *sym,
-	    char *toptype, void *top,
-	    char *inftype, void *inf,
+	    CONST char *symtype, void *sym,
+	    CONST char *toptype, void *top,
+	    CONST char *inftype, void *inf,
 	    PM_set *next);
 
 extern PM_mapping
- *PM_make_mapping(char *name, char *cat, PM_set *domain, PM_set *range,
+ *PM_make_mapping(CONST char *name, CONST char *cat, PM_set *domain, PM_set *range,
 		  PM_centering centering, PM_mapping *next),
- *PM_build_grotrian(char *name, char *type, int cp,
+ *PM_build_grotrian(CONST char *name, CONST char *type, int cp,
 		    void *xv, void *yv, char **labels, int n_s,
 		    void *tr, void *up, void *low, int n_tr);
 
@@ -1086,9 +1086,9 @@ extern void
  PM_free_vectors(int nd, double **x),
  PM_free_polygon(PM_polygon *py),
  PM_polygon_copy_points(PM_polygon *pa, PM_polygon *pb),
- PM_promote_array(C_array *a, char *ntyp, int flag),
- PM_promote_set(PM_set *s, char *ntyp, int flag),
- PM_find_exist_extrema(PM_set *s, char *typ, void *em),
+ PM_promote_array(C_array *a, CONST char *ntyp, int flag),
+ PM_promote_set(PM_set *s, CONST char *ntyp, int flag),
+ PM_find_exist_extrema(PM_set *s, CONST char *typ, void *em),
  PM_find_extrema(PM_set *s),
  PM_rel_array(C_array *arr),
  PM_rel_set(PM_set *set, int mfl),
@@ -1105,7 +1105,7 @@ extern double
  *PM_set_extrema(PM_set *s),
  **PM_make_vectors(int nd, int n),
  **PM_copy_vectors(int nd, int n, double **x),
- *PM_array_real(char *type, void *p, int n, double *x),
+ *PM_array_real(CONST char *type, void *p, int n, double *x),
  **PM_make_real_set_elements(PM_set *s),
  *PM_get_limits(PM_set *set),
  **PM_generate_lr_index(int nd, int *maxes,
@@ -1113,7 +1113,7 @@ extern double
  **PM_generate_lr_cp(int nd, int *maxes, double **x1);
 
 extern int
- PM_resolve_type(char *ltyp, char *ntyp, char *btyp);
+ PM_resolve_type(char *ltyp, CONST char *ntyp, CONST char *btyp);
 
 extern char
  *PM_check_emap(int *peflag, pcons *alst, long n);
