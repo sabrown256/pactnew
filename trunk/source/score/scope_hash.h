@@ -88,10 +88,10 @@ struct s_hasharr
 /* SCTAB.C declarations */
 
 extern hasharr
- *SC_make_hasharr(int sz, int docflag, char *lm, int flags);
+ *SC_make_hasharr(int sz, int docflag, CONST char *lm, int flags);
 
 extern haelem
- *SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type,
+ *SC_hasharr_install(hasharr *ha, void *key, void *obj, CONST char *type,
 		     int64_t flags, int lookup),
  *SC_hasharr_lookup(hasharr *ha, void *key);
 
@@ -108,7 +108,7 @@ extern int
  SC_hasharr_next(hasharr *ha, long *pi, char **pname, char **ptype, void **po),
  SC_hasharr_clear(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
  SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFIntBin comp),
- SC_hasharr_rekey(hasharr *ha, char *method),
+ SC_hasharr_rekey(hasharr *ha, CONST char *method),
  SC_hasharr_sort(hasharr *ha, PFIntBin pred);
 
 extern long
@@ -118,7 +118,7 @@ extern long
 		  void *a);
 
 extern char
- **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort);
+ **SC_hasharr_dump(hasharr *ha, CONST char *patt, CONST char *type, int sort);
 
 
 /* for FORTRAN hasharr API */

@@ -422,7 +422,7 @@ extern SC_scope_io
 /* SCAR.C declarations */
 
 extern fcdes
- *SC_scan_archive(char *arf);
+ *SC_scan_archive(CONST char *arf);
 
 extern int
  _SC_is_archive(FILE *fp);
@@ -431,8 +431,8 @@ extern int
 /* SCBIO.C declarations */
 
 extern FILE
- *SC_bopen(char *name, char *mode),
- *SC_lbopen(char *name, char *mode);
+ *SC_bopen(CONST char *name, CONST char *mode),
+ *SC_lbopen(CONST char *name, CONST char *mode);
 
 extern void
  SC_bf_set_hooks(void),
@@ -445,7 +445,7 @@ extern long
 /* SCFCNTNR.C declarations */
 
 extern fcontainer
- *SC_open_fcontainer(char *name, SC_file_type type,
+ *SC_open_fcontainer(CONST char *name, SC_file_type type,
 		     fcdes *(*meth)(char *name, SC_file_type *pt));
 
 extern char
@@ -466,13 +466,13 @@ extern file_io_desc
 extern FILE
  *SC_fopen_safe(const char *path, const char *mode),
  *SC_fwrap(FILE *fp),
- *SC_fopen(char *name, char *mode),
+ *SC_fopen(CONST char *name, CONST char *mode),
  *SC_lfwrap(FILE *fp),
- *SC_lfopen(char *name, char *mode),
+ *SC_lfopen(CONST char *name, CONST char *mode),
  *SC_std_file(void *p);
 
 extern void
- io_error(int err, char *fmt, ...),
+ io_error(int err, CONST char *fmt, ...),
  SC_get_io_info(FILE *fp, int **pnhits, double **pnsec),
  SC_file_access(int log),
  SC_setbuf(FILE *fp, char *bf);
@@ -489,7 +489,7 @@ extern int
  io_seek(FILE *fp, long offs, int whence),
  io_setvbuf(FILE *fp, char *bf, int type, size_t sz),
  io_close(FILE *fp),
- io_printf(FILE *fp, char *fmt, ...),
+ io_printf(FILE *fp, CONST char *fmt, ...),
  io_puts(const char *s, FILE *fp),
  io_getc(FILE *fp),
  io_ungetc(int c, FILE *fp),
@@ -498,7 +498,7 @@ extern int
  lio_seek(FILE *fp, int64_t offs, int whence),
  lio_setvbuf(FILE *fp, char *bf, int type, size_t sz),
  lio_close(FILE *fp),
- lio_printf(FILE *fp, char *fmt, ...),
+ lio_printf(FILE *fp, CONST char *fmt, ...),
  lio_puts(const char *s, FILE *fp),
  lio_getc(FILE *fp),
  lio_ungetc(int c, FILE *fp),
@@ -522,14 +522,14 @@ extern int64_t
  SC_set_buffer_size(int64_t sz),
  SC_get_buffer_size(void),
  SC_file_size(FILE *fp),
- SC_file_length(char *name);
+ SC_file_length(CONST char *name);
 
 extern int64_t
  lio_tell(FILE *fp),
  SC_filelen(FILE *fp);
 
 extern char
- *SC_prompt(char *prompt, char *s, int n),
+ *SC_prompt(CONST char *prompt, char *s, int n),
  *_SC_rl_fgets(char *s, int n),
  *SC_dgets(char *bf, int *pnc, FILE *fp),
  *SC_fgets(char *s, int n, FILE *fp),
@@ -560,9 +560,9 @@ extern int
 
 extern FILE
  *SC_mf_bind(void *mf),
- *SC_mf_open(char *name, char *mode),
+ *SC_mf_open(CONST char *name, CONST char *mode),
  *SC_lmf_bind(void *mf),
- *SC_lmf_open(char *name, char *mode);
+ *SC_lmf_open(CONST char *name, CONST char *mode);
 
 extern void
  SC_mf_set_hooks(void),
@@ -575,7 +575,7 @@ extern void
 /* SCMMAPS.C declarations */
 
 extern SC_mapped_file
- *SC_mf_make(char *name, int prot, int shar, int perm, int extend,
+ *SC_mf_make(CONST char *name, int prot, int shar, int perm, int extend,
 	     void (*setup)(SC_mapped_file *mf));
 
 extern void
@@ -585,7 +585,7 @@ extern void
 
 extern int64_t
  SC_mf_traverse(PFMMTrav fnc, void *a, int ext, int64_t nb, FILE *fp),
- SC_mf_read_striped(FILE *fp, int64_t off, char *type,
+ SC_mf_read_striped(FILE *fp, int64_t off, CONST char *type,
 		    int ni, int stride, int nv, void **vrs),
  SC_mf_length(FILE *fp);
 
@@ -597,7 +597,7 @@ extern SC_file_block
  *SC_mf_delete(FILE *fp, int64_t off, int64_t nb);
 
 extern FILE
- *SC_mf_copy(char *name, FILE *fp, int bckup);
+ *SC_mf_copy(CONST char *name, FILE *fp, int bckup);
 
 #endif
 
@@ -605,7 +605,7 @@ extern FILE
 /* SCTAR.C declarations */
 
 extern fcdes
- *SC_scan_tarfile(char *tarf);
+ *SC_scan_tarfile(CONST char *tarf);
 
 extern int
  _SC_is_tarfile(FILE *fp);
@@ -622,9 +622,9 @@ extern int
  SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc),
  SC_set_term_size(int fd, int nr, int nc, int pw, int ph),
  SC_io_suspend(int fl),
- SC_mpi_printf(FILE *fp, char *fmt, ...),
+ SC_mpi_printf(FILE *fp, CONST char *fmt, ...),
  SC_mpi_fputs(const char *s, FILE *fp),
- SC_mpi_ftn_snprintf(char *bf, int nc, char *fmt, ...),
+ SC_mpi_ftn_snprintf(char *bf, int nc, CONST char *fmt, ...),
  SC_mpi_io_suppress(int on),
  SC_mpi_suppress(int st);
 
@@ -642,16 +642,16 @@ extern void
 /* SCUDL.C declarations */
 
 extern int
- _SC_udlp(char *s);
+ _SC_udlp(CONST char *s);
 
 extern char
- *_SC_udl_container(char *s, int trunc);
+ *_SC_udl_container(CONST char *s, int trunc);
 
 extern void
  _SC_rel_udl(SC_udl *pu);
 
 extern SC_udl
- *_SC_parse_udl(char *s);
+ *_SC_parse_udl(CONST char *s);
 
 
 #ifdef __cplusplus

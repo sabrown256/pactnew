@@ -136,29 +136,29 @@ extern "C" {
 
 extern int
  SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx),
- SC_unpack_bits(char *out, char *in, int ityp, int nbits,
+ SC_unpack_bits(char *out, CONST char *in, int ityp, int nbits,
 		int padsz, int fpp, long ni, long offs),
- SC_sizeof(char *s);
+ SC_sizeof(CONST char *s);
 
 extern long
- SC_extract_field(char *in, int offs, int nbi, int nby, int *ord);
+ SC_extract_field(CONST char *in, int offs, int nbi, int nby, int *ord);
 
 
 /* SCTYP.C declarations */
 
 extern SC_type
- *_SC_get_type_name(char *name),
+ *_SC_get_type_name(CONST char *name),
  *_SC_get_type_id(int id),
  *SC_find_primitive(int id);
 
 extern int
- SC_type_register(char *name, SC_kind kind, bool ptr, int bpi, ...),
- SC_type_alias(char *name, int id),
- SC_type_id(char *name, int unsg),
+ SC_type_register(CONST char *name, SC_kind kind, bool ptr, int bpi, ...),
+ SC_type_alias(CONST char *name, int id),
+ SC_type_id(CONST char *name, int unsg),
  SC_type_ptr_id(int id),
- SC_fix_type_id(char *name, int unsg),
- SC_fp_type_id(char *name),
- SC_cx_type_id(char *name),
+ SC_fix_type_id(CONST char *name, int unsg),
+ SC_fp_type_id(CONST char *name),
+ SC_cx_type_id(CONST char *name),
  SC_is_type_char(int id),
  SC_is_type_fix(int id),
  SC_is_type_fp(int id),
@@ -166,11 +166,11 @@ extern int
  SC_is_type_qut(int id),
  SC_is_type_num(int id),
  SC_is_type_ptr(int id),
- SC_is_type_ptr_a(char *name),
+ SC_is_type_ptr_a(CONST char *name),
  SC_is_type_prim(int id),
  SC_is_type_struct(int id),
  SC_type_size_i(int id),
- SC_type_size_a(char *name),
+ SC_type_size_a(CONST char *name),
  SC_type_container_size(SC_kind kind, int nb),
  SC_type_match_size(SC_kind kind, int nb),
  SC_deref_id(char *name, int base);
@@ -191,14 +191,14 @@ extern void
  *SC_convert_id(int did, void *d, long od, long sd,
 		int sid, void *s, long os, long ss,
 		long n, int flag),
- *SC_convert(char *dtype, void *d, long od, long sd,
-	     char *stype, void *s, long os, long ss,
+ *SC_convert(CONST char *dtype, void *d, long od, long sd,
+	     CONST char *stype, void *s, long os, long ss,
 	     long n, int flag);
 
 extern void
  SC_fin_type_manager(void),
  SC_type_free_i(int id, void *x),
- SC_type_free_a(char *name, void *x),
+ SC_type_free_a(CONST char *name, void *x),
  SC_init_base_types(void),
  _SC_set_user_defaults(void),
  _SC_set_user_formats(void),

@@ -702,12 +702,12 @@ extern SC_contextdes
 /* SCCTL.C declarations */
 
 extern void
- *SC_assoc(pcons *alist, char *s),
+ *SC_assoc(pcons *alist, CONST char *s),
  SC_banner(char *s),
- SC_set_banner(char *fmt, ...),
+ SC_set_banner(CONST char *fmt, ...),
  SC_pause(void),
  SC_save_argv_env(int argc, char **argv, char **env),
- SC_add_search_path(char *fmt, ...),
+ SC_add_search_path(CONST char *fmt, ...),
  SC_init_path(int nd, ...),
  SC_advance_name(char *s),
  SC_interrupt_handler(int sig),
@@ -723,33 +723,33 @@ extern unsigned int
 
 extern int
  SC_random_int(int a, int b),
- SC_query_file(char *name, char *mode, char *type),
- SC_isfile(char *name),
- SC_isfile_text(char *name),
- SC_file_path(char *name, char *path, int nc, int full),
- SC_full_path(char *name, char *path, int nc),
- SC_regx_match(char *s, char *patt),
- SC_remove(char *s),
+ SC_query_file(CONST char *name, CONST char *mode, CONST char *type),
+ SC_isfile(CONST char *name),
+ SC_isfile_text(CONST char *name),
+ SC_file_path(CONST char *name, char *path, int nc, int full),
+ SC_full_path(CONST char *name, char *path, int nc),
+ SC_regx_match(CONST char *s, CONST char *patt),
+ SC_remove(CONST char *s),
  SC_assoc_info(pcons *alst, ...),
  SC_assoc_info_alt(pcons *alst, ...);
 
 extern char
  *SC_get_banner(void),
  *SC_itoa(int n, int radix, int nc),
- *SC_search_file(char **path, char *name),
+ *SC_search_file(char **path, CONST char *name),
  **SC_get_search_path(void),
- *SC_pop_path(char *path),
+ *SC_pop_path(CONST char *path),
  *SC_getcwd(void);
 
 extern pcons
- *SC_assoc_entry(pcons *alist, char *s),
- *SC_make_pcons(char *cat, int ma, void *ca,
-		char *cdt, int md, void *cd),
- *SC_mk_pcons(char *cat, void *ca, char *cdt, void *cd),
- *SC_add_alist(pcons *alist, char *name, char *type, void *val),
- *SC_change_alist(pcons *alist, char *name, char *type, void *val),
+ *SC_assoc_entry(pcons *alist, CONST char *s),
+ *SC_make_pcons(CONST char *cat, int ma, void *ca,
+		CONST char *cdt, int md, void *cd),
+ *SC_mk_pcons(CONST char *cat, void *ca, CONST char *cdt, void *cd),
+ *SC_add_alist(pcons *alist, CONST char *name, CONST char *type, void *val),
+ *SC_change_alist(pcons *alist, CONST char *name, CONST char *type, void *val),
  *SC_alist_map(pcons *alist, int (*fnc)(pcons *hp, void *arg), void *arg),
- *SC_rem_alist(pcons *alist, char *name),
+ *SC_rem_alist(pcons *alist, CONST char *name),
  *SC_copy_alist(pcons *alist),
  *SC_append_alist(pcons *alist1, pcons *alist2);
 
@@ -768,8 +768,8 @@ extern char
 
 extern void
  _SC_assert(int t),
- SC_warn(char *fmt, ...),
- SC_error(int st, char *fmt, ...);
+ SC_warn(CONST char *fmt, ...),
+ SC_error(int st, CONST char *fmt, ...);
 
 extern int
  SC_error_explanation(int st, char *s, int nc);
@@ -778,18 +778,11 @@ extern int
 /* SCFNCA.C declarations */
 
 extern void
- SC_type_container(char *dtype, char *stype);
+ SC_type_container(CONST char *dtype, CONST char *stype);
 
 extern int
- SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx),
- SC_unpack_bits(char *out, char *in, int ityp, int nbits,
-		int padsz, int fpp, long ni, long offs),
- SC_sizeof(char *s),
  SC_pointer_ok(void *p),
- SC_putenv(char *s);
-
-extern long
- SC_extract_field(char *in, int offs, int nbi, int nby, int *ord);
+ SC_putenv(CONST char *s);
 
 extern mode_t
  SC_get_umask(void),
@@ -835,7 +828,7 @@ extern void
 extern double
  SC_cpu_time(void),
  SC_wall_clock_time(void),
- SC_str_time(char *d);
+ SC_str_time(CONST char *d);
 
 extern char
  *SC_date(void),
@@ -845,8 +838,8 @@ extern char
 /* SCHP.C declarations */
 
 extern PROCESS
- *SC_mk_process(char **argv, char *mode, int type, int iex),
- *SC_open(char **argv, char **envp, char *mode, ...);
+ *SC_mk_process(char **argv, CONST char *mode, int type, int iex),
+ *SC_open(char **argv, char **envp, CONST char *mode, ...);
 
 extern void
  SC_set_processor_info(int size, int rank);
@@ -859,8 +852,8 @@ extern int
  SC_buffer_data_in(PROCESS *pp),
  SC_buffer_data_out(PROCESS *pp, char *bf,
 		    int nbi, int block_state),
- SC_printf(PROCESS *pp, char *fmt, ...),
- SC_init_client(char *host, int port),
+ SC_printf(PROCESS *pp, CONST char *fmt, ...),
+ SC_init_client(CONST char *host, int port),
  SC_init_server(int step, int closep);
 
 extern char
@@ -871,34 +864,34 @@ extern char
 
 extern int
  SC_host_server_fin(void),
- SC_host_server_init(char *file, int reset, int vrb),
- SC_host_server_query(char *out, int nc, char *fmt, ...),
- SC_verify_host(char *hst, int to),
+ SC_host_server_init(CONST char *file, int reset, int vrb),
+ SC_host_server_query(char *out, int nc, CONST char *fmt, ...),
+ SC_verify_host(CONST char *hst, int to),
  SC_get_sys_length_max(int local, int full),
- SC_get_host_length_max(char *sys, int local, int full),
- SC_get_host_name(char *hst, int nc, char *sys),
- SC_get_nhosts(char *sys),
+ SC_get_host_length_max(CONST char *sys, int local, int full),
+ SC_get_host_name(char *hst, int nc, CONST char *sys),
+ SC_get_nhosts(CONST char *sys),
  SC_hostname(char *s, int nc),
- SC_hosttype(char *s, int nc, char *x),
- SC_hostsystem(char *type, int nc, char *node);
+ SC_hosttype(char *s, int nc, CONST char *x),
+ SC_hostsystem(char *type, int nc, CONST char *node);
 
 extern char
- **SC_get_host_types(int whch, char *net),
- **SC_get_system_list(char *sys),
- **SC_get_host_list(char *sys, int single);
+ **SC_get_host_types(int whch, CONST char *net),
+ **SC_get_system_list(CONST char *sys),
+ **SC_get_host_list(CONST char *sys, int single);
 
 
 /* SCHTTP.C declarations */
 
 extern void
- SC_split_http(char *url, char *host, char *page),
+ SC_split_http(CONST char *url, CONST char *host, CONST char *page),
  SC_close_http(int fd);
 
 extern int
- SC_open_port(char *host, int port, int to, int fm),
- SC_open_http(char *host, int port),
- SC_request_http(int fd, char *cmnd, char *url, char *vrs),
- SC_http_url_file(char *url, char *file, char *vrs);
+ SC_open_port(CONST char *host, int port, int to, int fm),
+ SC_open_http(CONST char *host, int port),
+ SC_request_http(int fd, CONST char *cmnd, CONST char *url, CONST char *vrs),
+ SC_http_url_file(CONST char *url, CONST char *file, CONST char *vrs);
 
 
 /* SCIOCTL.C declarations */
@@ -1013,7 +1006,7 @@ extern char
 extern int
  SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn),
  SC_mem_trace(void),
- SC_reg_mem(void *p, long length, char *name),
+ SC_reg_mem(void *p, long length, CONST char *name),
  SC_dereg_mem(void *p),
  SC_is_score_ptr(void *p),
  SC_mark(void *p, int n),
@@ -1043,11 +1036,11 @@ extern char
 extern int
  SC_mem_corrupt(int flag),
  SC_mem_map(FILE *fp, int flag),
- SC_mem_ss(char *base, int flag),
+ SC_mem_ss(CONST char *base, int flag),
  SC_mem_neighbor(void *p, int flag, void *b, void *a);
 
 extern long
- SC_mem_monitor(int old, int lev, char *id, char *msg),
+ SC_mem_monitor(int old, int lev, CONST char *id, char *msg),
  SC_mem_object_trace(long nb, int type,
 		     void (*f)(char *name, char *addr, long length,
 			       int count, int type));
@@ -1125,60 +1118,60 @@ extern void
 /* SCSTR.C declarations */
 
 extern char
- *SC_strsavec(char *s, int memfl,
+ *SC_strsavec(CONST char *s, int memfl,
 	      const char *file, const char *fnc, int line),
- *SC_strcat(char *dest, size_t lnd, char *src),
- *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...),
- *SC_dstrcat(char *dest, char *src),
- *SC_strncpy(char *d, size_t nd, char *s, size_t ns),
- *SC_dstrcpy(char *dest, char *src),
- *SC_strstr(char *string1, char *string2),
- *SC_strstri(char *string1, char *string2),
+ *SC_strcat(char *dest, size_t lnd, CONST char *src),
+ *SC_vstrcat(char *dest, size_t lnd, CONST char *fmt, ...),
+ *SC_dstrcat(char *dest, CONST char *src),
+ *SC_strncpy(char *d, size_t nd, CONST char *s, size_t ns),
+ *SC_dstrcpy(char *dest, CONST char *src),
+ *SC_strstr(CONST char *string1, CONST char *string2),
+ *SC_strstri(CONST char *string1, CONST char *string2),
  *SC_strrev(char *s),
  *SC_squeeze_blanks(char *s),
  *SC_squeeze_chars(char *s, char *q),
- *SC_dstrsubst(char *s, char *a, char *b, size_t n),
- *SC_strsubst(char *d, int nc, char *s, char *a, char *b, size_t n),
+ *SC_dstrsubst(char *s, CONST char *a, CONST char *b, size_t n),
+ *SC_strsubst(char *d, int nc, char *s, CONST char *a, CONST char *b, size_t n),
  *SC_str_upper(char *s),
  *SC_str_lower(char *s),
- *SC_str_replace(char *s, char *po, char *pn),
- *SC_trim_left(char *s, char *delim),
- *SC_trim_right(char *s, char *delim),
- *SC_firsttok(char *s, char *delim),
- *SC_lasttok(char *s, char *delim),
- *SC_ntok(char *d, int nc, char *s, int n, char *delim),
- **SC_tokenize(char *s, char *delim),
- **SC_tokenizef(char *s, char *delim, int flags),
- **SC_tokenize_literal(char *s, char *delim, int nl, int qu),
- **SC_file_strings(char *fname),
- *SC_firsttokq(char *s, char *delim, char *qdelim),
+ *SC_str_replace(char *s, CONST char *po, CONST char *pn),
+ *SC_trim_left(char *s, CONST char *delim),
+ *SC_trim_right(char *s, CONST char *delim),
+ *SC_firsttok(char *s, CONST char *delim),
+ *SC_lasttok(char *s, CONST char *delim),
+ *SC_ntok(char *d, int nc, CONST char *s, int n, CONST char *delim),
+ **SC_tokenize(CONST char *s, CONST char *delim),
+ **SC_tokenizef(CONST char *s, CONST char *delim, int flags),
+ **SC_tokenize_literal(CONST char *s, CONST char *delim, int nl, int qu),
+ **SC_file_strings(CONST char *fname),
+ *SC_firsttokq(CONST char *s, CONST char *delim, CONST char *qdelim),
  *SC_concatenate(char *s, int nc, char **a,
-		 unsigned int mn, unsigned int mx, char *delim, int add),
- *SC_dconcatenate(char **a, unsigned int mn, unsigned int mx, char *delim),
+		 unsigned int mn, unsigned int mx, CONST char *delim, int add),
+ *SC_dconcatenate(char **a, unsigned int mn, unsigned int mx, CONST char *delim),
  *SC_vdsnprintf(int cp, const char *format, va_list lst),
- *SC_dsnprintf(int cp, char *fmt, ...),
- *SC_itos(char *s, int nc, long long n, char *fmt),
- *SC_ftos(char *s, int nc, int cat, char *fmt, long double f);
+ *SC_dsnprintf(int cp, CONST char *fmt, ...),
+ *SC_itos(char *s, int nc, long long n, CONST char *fmt),
+ *SC_ftos(char *s, int nc, int cat, CONST char *fmt, long double f);
 
 extern double
- SC_stof(char *s),
+ SC_stof(CONST char *s),
  SC_atof(const char *ps),
  SC_strtod(const char *nptr, char **endptr);
 
 extern long
- SC_strtol(char *str, char **ptr, int base);
+ SC_strtol(CONST char *str, char **ptr, int base);
 
 extern int64_t
- SC_stol(char *s),
- SC_stoi(char *s);
+ SC_stol(CONST char *s),
+ SC_stoi(CONST char *s);
 
 #ifndef __cplusplus
 extern long double _Complex
- SC_stoc(char *s);
+ SC_stoc(CONST char *s);
 #endif
 
 extern unsigned int
- SC_char_index(char *s, int n);
+ SC_char_index(CONST char *s, int n);
 
 extern int
  SC_strerror(int err, char *msg, size_t nc),
@@ -1188,20 +1181,20 @@ extern int
  SC_isdigit(int c),
  SC_ispunct(int c),
  SC_isspace(int c),
- SC_blankp(char *s, char *chr),
- SC_blankl(char *s, char *chr),
+ SC_blankp(CONST char *s, CONST char *chr),
+ SC_blankl(CONST char *s, CONST char *chr),
  SC_is_print_char(int c, int flag),
- SC_strings_file(char **sa, char *fname, char *mode),
- SC_strings_print(FILE *fp, char **sa, char *pre),
+ SC_strings_file(char **sa, CONST char *fname, CONST char *mode),
+ SC_strings_print(FILE *fp, char **sa, CONST char *pre),
  SC_print_charsp(char *s, int sp),
- SC_numstrp(char *s),
- SC_intstrp(char *s, int base),
- SC_fltstrp(char *s),
- SC_cmplxstrp(char *s),
- SC_chrstrp(char *s),
- SC_str_icmp(char *s, char *t),
- SC_char_count(char *s, int c),
- SC_str_count(char *s, char *r),
+ SC_numstrp(CONST char *s),
+ SC_intstrp(CONST char *s, int base),
+ SC_fltstrp(CONST char *s),
+ SC_cmplxstrp(CONST char *s),
+ SC_chrstrp(CONST char *s),
+ SC_str_icmp(CONST char *s, CONST char *t),
+ SC_char_count(CONST char *s, int c),
+ SC_str_count(CONST char *s, CONST char *r),
  SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list a);
 
 extern void
@@ -1247,27 +1240,29 @@ extern void
 /* SCSYSA.C declarations */
 
 extern int
- SC_exec(char ***out, char *cmnd, char *shell, int to),
- SC_execa(char ***out, char *shell, int to, char *fmt, ...),
- SC_execs(char *out, int nc, char *shell, int to, char *fmt, ...),
- SC_exec_commands(char *shell, char **cmnds, char **env, int to,
-		  char *lname, char *fname, int na, int show,
+ SC_exec(char ***out, CONST char *cmnd, CONST char *shell, int to),
+ SC_execa(char ***out, CONST char *shell, int to, CONST char *fmt, ...),
+ SC_execs(char *out, int nc, CONST char *shell, int to, CONST char *fmt, ...),
+ SC_exec_commands(CONST char *shell, char **cmnds, char **env, int to,
+		  CONST char *lname, CONST char *fname, int na, int show,
 		  int ignore, int dmp),
  SC_signal_async(int sig),
- SC_exec_async(char *shell, char **cmnds, char **dirs,
-	       char *consh, char **conenv, int nc,
-	       char *lname, char *fname, int na, int show,
+ SC_exec_async(CONST char *shell, char **cmnds, char **dirs,
+	       CONST char *consh, char **conenv, int nc,
+	       CONST char *lname, CONST char *fname, int na, int show,
 	       int ignore, int log),
- SC_exec_async_h(char *shell, char **env, char **hstl, char **cmnds, char **dirs,
-		 int to, char *fname, int na, int show, int ignore),
- SC_exec_async_s(char *shell, char **env, char **sysl, char **cmnds, char **dirs,
-		 int to, char *fname, int na, int show, int ignore),
- SC_exec_server(char *shell, char *fname, int na, int show,
+ SC_exec_async_h(CONST char *shell, char **env, char **hstl, char **cmnds,
+		 char **dirs, int to, CONST char *fname, int na,
+		 int show, int ignore),
+ SC_exec_async_s(CONST char *shell, char **env, char **sysl, char **cmnds,
+		 char **dirs, int to, CONST char *fname, int na,
+		 int show, int ignore),
+ SC_exec_server(CONST char *shell, CONST char *fname, int na, int show,
 		int ignore, int debug),
- SC_system(char *cmd);
+ SC_system(CONST char *cmd);
 
 extern char
- **SC_syscmnd(char *fmt, ...);
+ **SC_syscmnd(CONST char *fmt, ...);
 
 
 /* SCSYSC.C declarations */
@@ -1275,7 +1270,7 @@ extern char
 /* SCSYSE.C declarations */
 
 extern int
- SC_exec_job(char **argv, char *mode, int flags,
+ SC_exec_job(char **argv, CONST char *mode, int flags,
 	     PFFileCallback in, PFFileCallback irej,
 	     PFFileCallback out, PFFileCallback orej);
 
@@ -1285,8 +1280,8 @@ extern int
 extern int
  SC_leh_hist_add(const char *s),
  SC_leh_hist_set_n(int nh),
- SC_leh_hist_save(char *fname),
- SC_leh_hist_load(char *fname);
+ SC_leh_hist_save(CONST char *fname),
+ SC_leh_hist_load(CONST char *fname);
 
 extern char
  *SC_leh(const char *prompt);
@@ -1305,7 +1300,7 @@ extern PFfgets
 
 extern int
  SC_close_log(SC_logfile log),
- SC_log(SC_logfile log, char *format, ...);
+ SC_log(SC_logfile log, CONST char *format, ...);
 
 extern SC_logfile
  SC_open_log(void);
@@ -1329,7 +1324,8 @@ extern SC_tree_node
 /* SCTRK.C declarations */
 
 extern int
- SC_send_tracker(char *code, char *version, int status, char *dst);
+ SC_send_tracker(CONST char *code, CONST char *version,
+		 int status, CONST char *dst);
 
 
 #ifdef __cplusplus
