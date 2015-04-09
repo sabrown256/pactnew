@@ -169,7 +169,7 @@ typedef size_t (*PFfwrite)(void *ptr, size_t sz, size_t ni, FILE *stream);
 
 typedef int (*PFsetvbuf)(FILE *stream, char *bf, int type, size_t sz);
 typedef int (*PFfclose)(FILE *stream);
-typedef int (*PFfprintf)(FILE *stream, char *fmt, ...);
+typedef int (*PFfprintf)(FILE *stream, CONST char *fmt, ...);
 typedef int (*PFfputs)(const char *s, FILE *stream);
 typedef int (*PFfgetc)(FILE *stream);
 typedef int (*PFungetc)(int c, FILE *stream);
