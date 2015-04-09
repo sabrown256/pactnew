@@ -93,7 +93,7 @@ extern hasharr
 extern haelem
  *SC_hasharr_install(hasharr *ha, void *key, void *obj, CONST char *type,
 		     int64_t flags, int lookup),
- *SC_hasharr_lookup(hasharr *ha, void *key);
+ *SC_hasharr_lookup(hasharr *ha, CONST void *key);
 
 extern void
  SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
