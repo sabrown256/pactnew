@@ -28,6 +28,8 @@ set repos = ""
 set repod = ""
 set pkgs  = ""
 set pkgd  = ""
+set sknd  = ""
+set dknd  = ""
 set ignd  = ( ../.git ../.svn .svn ../CVS CVS )
 set dirs  = ""
 set tgt   = repo
@@ -50,18 +52,38 @@ while ($#argv > 0)
       default:
            if ("$repos" == "") then
 	      if ("$1" =~ *,*) then
-                 set repos = ( `echo $1 | sed 's|,.*$||'` )
-                 set pkgs  = ( `echo $1 | sed 's|^.*,||'` )
+                 set info = ( `echo $1 | sed 's|,| |g'` )
+                 if ($#info > 2) then
+                    set repos = $info[1]
+                    set sknd  = $info[2]
+                    set pkgs  = $info[3]
+                 else if ($#info > 1) then
+                    set repos = $info[1]
+                    set pkgs  = $info[2]
+                 else
+                    set repos = $info[1]
+                 endif
               else
                  set repos = $1
               endif
+              unset info
            else if ("$repod" == "") then
 	      if ("$1" =~ *,*) then
-                 set repod = ( `echo $1 | sed 's|,.*$||'` )
-                 set pkgd  = ( `echo $1 | sed 's|^.*,||'` )
+                 set info = ( `echo $1 | sed 's|,| |g'` )
+                 if ($#info > 2) then
+                    set repod = $info[1]
+                    set dknd  = $info[2]
+                    set pkgd  = $info[3]
+                 else if ($#info > 1) then
+                    set repod = $info[1]
+                    set pkgd  = $info[2]
+                 else
+                    set repod = $info[1]
+                 endif
               else
                  set repod = $1
               endif
+              unset info
            endif
            breaksw
    endsw
@@ -105,34 +127,41 @@ else if ("$repos" =~ *.tar) then
 
 else
 
+   if ("$repos" =~ *:*) then
+      set rl = "remote"
+   else
+      set rl = "local"
+   endif
+
+   if ("$sknd" == "") then
+
 # remote repo case - the repo path must identify the SCS kind
 # we do not want to have to authenticate and do remote queries
-   if ("$repos" =~ *:/*) then
-      if ("$repos" =~ *cvs*) then
-         set sknd = cvs
-      else if ("$repos" =~ *svn*) then
-         set sknd = svn
+      if ("$repos" =~ *:/*) then
+         if ("$repos" =~ *cvs*) then
+            set sknd = cvs
+         else if ("$repos" =~ *svn*) then
+            set sknd = svn
+         else
+            set sknd = git
+         endif
       else
-         set sknd = git
+         if (-d $repos/CVSROOT) then
+            set sknd = cvs
+         else if (-d $repos/.git) then
+            set sknd = git
+         else
+            set sknd = svn
+         endif
       endif
-      NoteD $log -n "Checking out remote $sknd repository $repos ... "
-
-# local repo case
-   else
-      if (-d $repos/CVSROOT) then
-         set sknd = cvs
-      else if (-d $repos/.git) then
-         set sknd = git
-      else
-         set sknd = svn
-      endif
-      NoteD $log -n "Checking out local $sknd repository $repos ... "
-
    endif
+   NoteD $log -n "Checking out $rl $sknd repository $repos ... "
    Note $log ""
 
    flog $log scs-co -k $sknd -d $repos $pkgs
    set xstatus = $status
+
+   unset rl
 endif
 set lt = `timer -b $lt`
 
@@ -156,34 +185,44 @@ flog $log pushd syncd
 
 set lt = `timer -r`
 
+if ("$repod" =~ *:*) then
+   set rl = "remote"
+else
+   set rl = "local"
+endif
+
+if ("$dknd" == "") then
+
 # remote repo case - the repo path must identify the SCS kind
 # we do not want to have to authenticate and do remote queries
-if ("$repod" =~ *:/*) then
-   if ("$repod" =~ *cvs*) then
-      set dknd = cvs
-   else if ("$repod" =~ *svn*) then
-      set dknd = svn
-   else
-      set dknd = git
-   endif
-   NoteD $log -n "Checking out remote $dknd repository $repod ... "
+   if ("$repod" =~ *:/*) then
+      if ("$repod" =~ *cvs*) then
+         set dknd = cvs
+      else if ("$repod" =~ *svn*) then
+         set dknd = svn
+      else
+         set dknd = git
+      endif
 
 # local repo case
-else
-   if (-d $repod/CVSROOT) then
-      set dknd = cvs
-   else if (-d $repod/.git) then
-      set dknd = git
    else
-      set dknd = svn
+      if (-d $repod/CVSROOT) then
+         set dknd = cvs
+      else if (-d $repod/.git) then
+         set dknd = git
+      else
+         set dknd = svn
+      endif
    endif
-   NoteD $log -n "Checking out local $dknd repository $repod ... "
-
 endif
+
+NoteD $log -n "Checking out $rl $dknd repository $repod ... "
 Note $log ""
 
 flog $log scs-co -k $dknd -d $repod $pkgd
 set xstatus = $status
+
+unset rl
 
 set lt = `timer -b $lt`
 if ($xstatus == 0) then
