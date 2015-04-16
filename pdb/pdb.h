@@ -1077,14 +1077,14 @@ extern defstr
 /* PDBX.C declarations */
 
 extern void
- *PD_get_attribute(PDBfile *file, char *vr, char *at);
+ *PD_get_attribute(PDBfile *file, CONST char *vr, CONST char *at);
 
 extern int
  PD_def_pdb_types(PDBfile *file),
  PD_def_attr_str(PDBfile *file),
- PD_def_attribute(PDBfile *file, char *at, char *type),
- PD_set_attribute(PDBfile *file, char *vr, char *at, void *vl),
- PD_rem_attribute(PDBfile *file, char *at),
+ PD_def_attribute(PDBfile *file, CONST char *at, CONST char *type),
+ PD_set_attribute(PDBfile *file, CONST char *vr, CONST char *at, void *vl),
+ PD_rem_attribute(PDBfile *file, CONST char *at),
  PD_def_hash_types(PDBfile *file, int flag),
  PD_read_pdb_curve(PDBfile *fp, CONST char *name, double **pxp, double **pyp,
                    int *pn, CONST char *label,

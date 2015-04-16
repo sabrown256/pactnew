@@ -91,18 +91,18 @@ extern hasharr
  *SC_make_hasharr(int sz, int docflag, CONST char *lm, int flags);
 
 extern haelem
- *SC_hasharr_install(hasharr *ha, void *key, void *obj, CONST char *type,
-		     int64_t flags, int lookup),
+ *SC_hasharr_install(hasharr *ha, CONST void *key, void *obj,
+		     CONST char *type, int64_t flags, int lookup),
  *SC_hasharr_lookup(hasharr *ha, CONST void *key);
 
 extern void
  SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
- *SC_hasharr_def_lookup(hasharr *ha, void *key),
+ *SC_hasharr_def_lookup(hasharr *ha, CONST void *key),
  *SC_hasharr_get(hasharr *ha, long n);
 
 extern int
  SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po, int svr),
- SC_hasharr_remove(hasharr *ha, void *key),
+ SC_hasharr_remove(hasharr *ha, CONST void *key),
  SC_hasharr_free_n(void *d, void *a),
  SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
  SC_hasharr_next(hasharr *ha, long *pi, char **pname, char **ptype, void **po),

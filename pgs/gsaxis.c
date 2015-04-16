@@ -1208,16 +1208,21 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 
 /* skip over labels that would overlap with the last one printed */
 	 if (g->iflog[0])
-	    {rmx      = max(xs[0]/xp[0], xp[0]/xs[0]);
-	     ovlp[0]  = ((ldx[0] > 1.1) && (ldx[0] > 0.9*rmx));
-	     ovlp[0] |= ((ldx[0] <= 1.1) && (ldx[0] > rmx));
-	     ovlp[0] &= (xs[0]*xp[0] != 0.0);}
+	    {if (xs[0]*xp[0] == 0.0)
+	        ovlp[0] = FALSE;
+	     else
+	        {rmx      = max(xs[0]/xp[0], xp[0]/xs[0]);
+		 ovlp[0]  = ((ldx[0] > 1.1) && (ldx[0] > 0.9*rmx));
+		 ovlp[0] |= ((ldx[0] <= 1.1) && (ldx[0] > rmx));};}
 	 else
 	    ovlp[0] = (ldx[0] > fabs(xs[0] - xp[0]));
 
 	 if (g->iflog[1])
-	    {rmx     = max(xs[1]/xp[1], xp[1]/xs[1]);
-	     ovlp[1] = ((xs[1]*xp[1] != 0.0) && (ldx[1] > rmx));}
+	    {if (xs[1]*xp[1] == 0.0)
+	        ovlp[1] = FALSE;
+	     else
+	        {rmx     = max(xs[1]/xp[1], xp[1]/xs[1]);
+		 ovlp[1] = (ldx[1] > rmx);};}
 	 else
 	    ovlp[1] = (ldx[1] > fabs(xs[1] - xp[1]));
 
