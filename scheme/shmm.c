@@ -671,7 +671,7 @@ object *SS_mk_reference(SS_psides *si, char *n,
 
 /* SS_MK_STRING - make an SS_string and imbed it in an object */
 
-object *SS_mk_string(SS_psides *si, char *s)
+object *SS_mk_string(SS_psides *si, const char *s)
    {SS_string *sp;
     object *op;
 

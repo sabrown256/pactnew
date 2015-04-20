@@ -246,7 +246,7 @@ static void _SC_omp_thread_join(SC_thread *thread, void **rv)
 
 /* _SC_OMP_STRTOK - portable version of thread safe strtok_r */
 
-static char *_SC_omp_strtok(char *s, char *dlm, char **p)
+static char *_SC_omp_strtok(char *s, const char *dlm, char **p)
    {char *rv;
 
     if (s != NULL)

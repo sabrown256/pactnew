@@ -224,7 +224,7 @@ struct s_threades
     void (*lockon)(SC_thread_lock *lock);
     void (*lockoff)(SC_thread_lock *lock);
     void (*join)(SC_thread *thread, void **status);
-    char *(*strtok)(char *s, char *d, char **p);
+    char *(*strtok)(char *s, const char *d, char **p);
     char *(*ctime)(const time_t *t, char *s, int sz);
     char *(*ttyname)(int fd, char *name, size_t sz);
     int (*rand)(unsigned *seed);

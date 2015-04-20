@@ -157,7 +157,7 @@ static void _SC_pth_thread_join(SC_thread *thread, void **status)
 
 /* _SC_PTH_STRTOK - portable version of thread safe strtok_r */
 
-static char *_SC_pth_strtok(char *s, char *dlm, char **p)
+static char *_SC_pth_strtok(char *s, const char *dlm, char **p)
    {char *rv;
 
     if (s != NULL)

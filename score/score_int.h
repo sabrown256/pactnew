@@ -392,8 +392,8 @@ extern long
  _SC_htol(char *str);
 
 extern char
- *_SC_pr_tok(char *s, char *delim),
- *_SC_quoted_tok(char *s, char *qdelim);
+ *_SC_pr_tok(char *s, const char *delim),
+ *_SC_quoted_tok(char *s, const char *quotes);
 
 
 /* SCTRACE.C declarations */

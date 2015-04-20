@@ -1128,60 +1128,63 @@ extern void
 /* SCSTR.C declarations */
 
 extern char
- *SC_strsavec(CONST char *s, int memfl,
+ *SC_strsavec(const char *s, int memfl,
 	      const char *file, const char *fnc, int line),
- *SC_strcat(char *dest, size_t lnd, CONST char *src),
+ *SC_strcat(char *dest, size_t lnd, const char *src),
  *SC_vstrcat(char *dest, size_t lnd, const char *fmt, ...),
- *SC_dstrcat(char *dest, CONST char *src),
- *SC_strncpy(char *d, size_t nd, CONST char *s, size_t ns),
- *SC_dstrcpy(char *dest, CONST char *src),
- *SC_strstr(CONST char *string1, CONST char *string2),
+ *SC_dstrcat(char *dest, const char *src),
+ *SC_strncpy(char *d, size_t nd, const char *s, size_t ns),
+ *SC_dstrcpy(char *dest, const char *src),
+ *SC_strstr(const char *string1, const char *string2),
  *SC_strstri(CONST char *string1, CONST char *string2),
  *SC_strrev(char *s),
  *SC_squeeze_blanks(char *s),
  *SC_squeeze_chars(char *s, char *q),
- *SC_dstrsubst(char *s, CONST char *a, CONST char *b, size_t n),
- *SC_strsubst(char *d, int nc, char *s, CONST char *a, CONST char *b, size_t n),
+ *SC_dstrsubst(const char *s, const char *a, const char *b, size_t n),
+ *SC_strsubst(char *d, int nc, const char *s,
+	      const char *a, const char *b, size_t n),
  *SC_str_upper(char *s),
  *SC_str_lower(char *s),
- *SC_str_replace(char *s, CONST char *po, CONST char *pn),
- *SC_trim_left(char *s, CONST char *delim),
- *SC_trim_right(char *s, CONST char *delim),
- *SC_firsttok(char *s, CONST char *delim),
- *SC_lasttok(char *s, CONST char *delim),
- *SC_ntok(char *d, int nc, CONST char *s, int n, CONST char *delim),
- **SC_tokenize(CONST char *s, CONST char *delim),
- **SC_tokenizef(CONST char *s, CONST char *delim, int flags),
- **SC_tokenize_literal(CONST char *s, CONST char *delim, int nl, int qu),
- **SC_file_strings(CONST char *fname),
- *SC_firsttokq(CONST char *s, CONST char *delim, CONST char *qdelim),
+ *SC_str_replace(char *s, const char *po, const char *pn),
+ *SC_trim_left(char *s, const char *delim),
+ *SC_trim_right(char *s, const char *delim),
+ *SC_firsttok(char *s, const char *delim),
+ *SC_lasttok(char *s, const char *delim),
+ *SC_ntok(char *d, int nc, const char *s, int n, const char *delim),
+ **SC_tokenize(const char *s, const char *delim),
+ **SC_tokenizef(const char *s, const char *delim, int flags),
+ **SC_tokenize_literal(const char *s, const char *delim, int nl, int qu),
+ **SC_file_strings(const char *fname),
+ *SC_firsttokq(char *s, const char *delim, const char *quotes),
  *SC_concatenate(char *s, int nc, char **a,
-		 unsigned int mn, unsigned int mx, CONST char *delim, int add),
- *SC_dconcatenate(char **a, unsigned int mn, unsigned int mx, CONST char *delim),
+		 unsigned int mn, unsigned int mx,
+		 const char *delim, int add),
+ *SC_dconcatenate(char **a, unsigned int mn, unsigned int mx,
+		  const char *delim),
  *SC_vdsnprintf(int cp, const char *format, va_list lst),
  *SC_dsnprintf(int cp, const char *fmt, ...),
  *SC_itos(char *s, int nc, long long n, const char *fmt),
  *SC_ftos(char *s, int nc, int cat, const char *fmt, long double f);
 
 extern double
- SC_stof(CONST char *s),
+ SC_stof(const char *s),
  SC_atof(const char *ps),
  SC_strtod(const char *nptr, char **endptr);
 
 extern long
- SC_strtol(CONST char *str, char **ptr, int base);
+ SC_strtol(const char *str, char **ptr, int base);
 
 extern int64_t
- SC_stol(CONST char *s),
- SC_stoi(CONST char *s);
+ SC_stol(const char *s),
+ SC_stoi(const char *s);
 
 #ifndef __cplusplus
 extern long double _Complex
- SC_stoc(CONST char *s);
+ SC_stoc(const char *s);
 #endif
 
 extern unsigned int
- SC_char_index(CONST char *s, int n);
+ SC_char_index(const char *s, int n);
 
 extern int
  SC_strerror(int err, char *msg, size_t nc),
@@ -1191,20 +1194,20 @@ extern int
  SC_isdigit(int c),
  SC_ispunct(int c),
  SC_isspace(int c),
- SC_blankp(CONST char *s, CONST char *chr),
- SC_blankl(CONST char *s, CONST char *chr),
+ SC_blankp(const char *s, const char *chr),
+ SC_blankl(const char *s, const char *chr),
  SC_is_print_char(int c, int flag),
- SC_strings_file(char **sa, CONST char *fname, CONST char *mode),
- SC_strings_print(FILE *fp, char **sa, CONST char *pre),
+ SC_strings_file(char **sa, const char *fname, const char *mode),
+ SC_strings_print(FILE *fp, char **sa, const char *pre),
  SC_print_charsp(char *s, int sp),
- SC_numstrp(CONST char *s),
- SC_intstrp(CONST char *s, int base),
- SC_fltstrp(CONST char *s),
- SC_cmplxstrp(CONST char *s),
- SC_chrstrp(CONST char *s),
- SC_str_icmp(CONST char *s, CONST char *t),
- SC_char_count(CONST char *s, int c),
- SC_str_count(CONST char *s, CONST char *r),
+ SC_numstrp(const char *s),
+ SC_intstrp(const char *s, int base),
+ SC_fltstrp(const char *s),
+ SC_cmplxstrp(const char *s),
+ SC_chrstrp(const char *s),
+ SC_str_icmp(const char *s, const char *t),
+ SC_char_count(const char *s, int c),
+ SC_str_count(const char *s, const char *r),
  SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list a);
 
 extern void

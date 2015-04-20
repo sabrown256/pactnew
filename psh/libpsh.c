@@ -60,14 +60,14 @@ int
  _assert_fail = 0;
 
 extern void
- unamef(char *s, int nc, char *wh);
+ unamef(char *s, int nc, const char *wh);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* NSTRSAVE - safe strdup function */
 
-char *nstrsave(char *s)
+char *nstrsave(const char *s)
    {char *d;
 
     d = NULL;
@@ -84,7 +84,7 @@ char *nstrsave(char *s)
  *          - unlike strncpy this always returns a null terminated string
  */
 
-char *nstrncpy(char *d, size_t nd, char *s, size_t ns)
+char *nstrncpy(char *d, size_t nd, const char *s, size_t ns)
    {size_t nc;
         
     if (d != NULL)
@@ -103,7 +103,7 @@ char *nstrncpy(char *d, size_t nd, char *s, size_t ns)
 
 /* NSTRCAT - safe strcat function */
 
-char *nstrcat(char *d, int nc, char *s)
+char *nstrcat(char *d, int nc, const char *s)
    {int n, nd, ns;
 
     if (d != NULL)
@@ -207,7 +207,7 @@ char **lst_push(char **lst, const char *fmt, ...)
 
 /* LST_ADD - add S to list LST */
 
-char **lst_add(char **lst, char *s)
+char **lst_add(char **lst, const char *s)
    {int n, m;
 
     if (lst == NULL)
@@ -305,7 +305,7 @@ void lst_free(char **lst)
  */
 
 char *concatenate(char *s, int nc, char **sa,
-		  unsigned int mn, unsigned int mx, char *dlm)
+		  unsigned int mn, unsigned int mx, const char *dlm)
    {int ns, nd, n;
     unsigned int i;
 
@@ -365,7 +365,7 @@ int unsetenv(char *var)
  *      - of the string S
  */
 
-char *trim(char *s, int dir, char *delim)
+char *trim(char *s, int dir, const char *delim)
    {int ic, nc, c;
 
     if (s != NULL)
@@ -390,7 +390,7 @@ char *trim(char *s, int dir, char *delim)
  *         - if EX is TRUE do not count escaped instances
  */
 
-int strcntc(char *s, int c, int ex)
+int strcntc(const char *s, int c, int ex)
    {int i, nc;
 
     nc = 0;
@@ -409,7 +409,7 @@ int strcntc(char *s, int c, int ex)
  *         - if EX is TRUE do not count escaped instances
  */
 
-int strcnts(char *s, char *r, int ex)
+int strcnts(const char *s, const char *r, int ex)
    {int l, count;
 
     count = 0;
@@ -461,8 +461,8 @@ int strcnts(char *s, char *r, int ex)
  *              -         "(a(bc)de)" + ")" -> "(a(bc)de)"
  */
 
-static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
-			char *r, int flags)
+static int _strcpy_next(char *d, size_t nd, const char *s, size_t ns,
+			const char *r, int flags)
    {int ins, ind, c, ex, ad, tr, rq;
     size_t n, nc;
 
@@ -570,7 +570,8 @@ static int _strcpy_next(char *d, size_t nd, char *s, size_t ns,
  *            -         "(a(be)de)" + "e)" -> "(a(be)de)"
  */
 
-int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
+int strcpy_str(char *d, size_t nd, const char *s, size_t ns,
+	       const char *r, int flags)
    {int ins, ind, c, ex, ad, tr, rq, sq;
     size_t n, nc, nr;
 
@@ -683,8 +684,8 @@ int strcpy_str(char *d, size_t nd, char *s, size_t ns, char *r, int flags)
  *             -         "(a\(bc\)de)" + ")" -> "(a\(bc\)de"
  */
 
-static int _strcpy_bal(char *d, size_t nd, char *s, size_t ns,
-		       char *b, char *e, int flags)
+static int _strcpy_bal(char *d, size_t nd, const char *s, size_t ns,
+		       const char *b, const char *e, int flags)
    {int ins, ind, lev, c, ex, ad, tr, rq;
     size_t n, nc;
 
@@ -765,8 +766,8 @@ static int _strcpy_bal(char *d, size_t nd, char *s, size_t ns,
  *            - especially with escaped characters in the text
  */
 
-int strcpy_tok(char *d, size_t nd, char *s, size_t ns,
-	       char *b, char *e, int flags)
+int strcpy_tok(char *d, size_t nd, const char *s, size_t ns,
+	       const char *b, const char *e, int flags)
    {int rv;
 
     rv = -1;
@@ -793,7 +794,7 @@ int strcpy_tok(char *d, size_t nd, char *s, size_t ns,
  *           - NOTE: S will be terminated at the first delimiter instance
  */
 
-char *delimited(char *s, char *bgn, char *end)
+char *delimited(char *s, const char *bgn, const char *end)
    {int nc, ncb, nce;
     char *tb, *te, *val, *ps, *wh;
 
@@ -862,7 +863,7 @@ char *delimited(char *s, char *bgn, char *end)
  *          -   ADD_DELIMITER
  */
 
-char **tokenize(char *s, char *dlm, int flags)
+char **tokenize(const char *s, const char *dlm, int flags)
    {int i, n, nw;
     char *t, *ps, **sa;
 
@@ -906,7 +907,7 @@ char **tokenize(char *s, char *dlm, int flags)
  *           - it can be released by free_strings
  */
 
-char **tokenized(char *s, char *dlm, int flags)
+char **tokenized(const char *s, const char *dlm, int flags)
    {int i, n, nw;
     char *t, *ps, **sa;
 
@@ -979,7 +980,7 @@ void free_nstrings(char **lst, int n)
 
 /* LAST_CHAR - return a valid last character index into S */
 
-int last_char(char *s)
+int last_char(const char *s)
    {int nc;
 
     nc = 0;
@@ -999,7 +1000,7 @@ int last_char(char *s)
  *           - so KND = 0xff would be any kind of number
  */
 
-int is_number(char *s, int knd)
+int is_number(const char *s, int knd)
    {int rv, nc;
     char *ps;
 
@@ -1027,29 +1028,32 @@ int is_number(char *s, int knd)
  *      - take base into account
  */
 
-int64_t stoi(char *s)
+int64_t stoi(const char *s)
    {int64_t rv;
+    char bf[BFMDM];
     char *t, *ps;
 
     rv = 0;
 
     if (s != NULL)
-       {t = trim(s, FRONT, "+- \t");
+       {nstrncpy(bf, BFMDM, s, -1);
+
+	t = trim(bf, FRONT, "+- \t");
 
 /* octal numbers are: 0d* where d is [0-7] */
 	if (t[0] == '0')
-	   rv = strtoll(s, &ps, 8);
+	   rv = strtoll(bf, &ps, 8);
 
 /* hexidecimal numbers are: 0xd* where d is [0-9A-Fa-f] */
 	else if (strncmp(t, "0x", 2) == 0)
-	   rv = strtoll(s, &ps, 16);
+	   rv = strtoll(bf, &ps, 16);
 
 /* Clang/GCC extension for binary numbers are: 0bd* where d is [01] */
 	else if (strncmp(t, "0b", 2) == 0)
-	   rv = strtoll(s, &ps, 2);
+	   rv = strtoll(bf, &ps, 2);
 
 	else
-	   rv = strtoll(s, &ps, 10);};
+	   rv = strtoll(bf, &ps, 10);};
 
     return(rv);}
 
@@ -1110,7 +1114,7 @@ char *fill_string(char *s, int n)
  *          - in the end of D
  */
 
-char *strclean(char *d, size_t nd, char *s, size_t ns)
+char *strclean(char *d, size_t nd, const char *s, size_t ns)
    {size_t i, j, c;
     char t[10];
         
@@ -1187,7 +1191,7 @@ char *strstri(char *string1, char *string2)
  *       - GOTCHA: make the internal buffers dynamic
  */
 
-char *subst(char *s, char *a, char *b, size_t n)
+char *subst(char *s, const char *a, const char *b, size_t n)
    {size_t i, o, nc;
     char *p, *pr, *ps, *pa, *pb, *r;
     static char bfa[4*BFMG], bfb[4*BFMG];
@@ -1229,7 +1233,7 @@ char *subst(char *s, char *a, char *b, size_t n)
 
 /* COPY - copy the file IN to OUT */
 
-void copy(char *out, const char *fmt, ...)
+void copy(const char *out, const char *fmt, ...)
    {char in[BFLRG];
     FILE *fp;
 
@@ -1465,7 +1469,7 @@ int _permission_match(struct stat bf, int md, int only)
  *           S_IFIFO    0010000   FIFO
  */
 
-int file_kind(int knd, int md, char *fnm)
+int file_kind(int knd, int md, const char *fnm)
    {int rv, st;
     char err[BFLRG];
     struct stat bf;
@@ -1485,7 +1489,7 @@ int file_kind(int knd, int md, char *fnm)
 
 /* DIR_EXISTS - return TRUE iff the named directory exists */
 
-int dir_exists(char *fmt, ...)
+int dir_exists(const char *fmt, ...)
    {int rv;
     char s[BFLRG];
 
@@ -1502,7 +1506,7 @@ int dir_exists(char *fmt, ...)
 
 /* FILE_EXECUTABLE - return TRUE iff the named file is executable */
 
-int file_executable(char *fmt, ...)
+int file_executable(const char *fmt, ...)
    {int rv;
     char s[BFLRG];
 
@@ -1519,7 +1523,7 @@ int file_executable(char *fmt, ...)
 
 /* FILE_EXISTS - return TRUE iff the named file exists */
 
-int file_exists(char *fmt, ...)
+int file_exists(const char *fmt, ...)
    {int rv;
     char s[BFLRG];
     struct stat sb;
@@ -1543,7 +1547,7 @@ int file_exists(char *fmt, ...)
 
 /* FILE_SCRIPT - return TRUE iff the named file is an executable script */
 
-int file_script(char *fmt, ...)
+int file_script(const char *fmt, ...)
    {int rv;
     char s[BFLRG], t[BFLRG];
     FILE *fp;
@@ -1637,7 +1641,7 @@ char *run(int echo, const char *fmt, ...)
  *      - GOTCHA: make the internal buffer dynamic
  */
 
-char *grep(FILE *fp, char *name, const char *fmt, ...)
+char *grep(FILE *fp, const char *name, const char *fmt, ...)
    {int i, nc, clf, err;
     char t[BFLRG], s[BFLRG];
     char *p;
@@ -1782,7 +1786,7 @@ char *strip_quote(char *t)
 
 /* CSETENV - set the environment variable VAR to VAL */
 
-int csetenv(char *var, const char *fmt, ...)
+int csetenv(const char *var, const char *fmt, ...)
    {int err, nc;
     char s[BFLRG];
     char *t;
@@ -1807,7 +1811,7 @@ int csetenv(char *var, const char *fmt, ...)
 
 /* CUNSETENV - unset the environment variable VAR */
 
-int cunsetenv(char *var)
+int cunsetenv(const char *var)
    {int err;
 
     err = unsetenv(var);
@@ -1856,7 +1860,7 @@ char *cgetenv(int lit, const char *fmt, ...)
 
 /* CDEFENV - return TRUE iff the environment variable VAR is defined */
 
-int cdefenv(char *fmt, ...)
+int cdefenv(const char *fmt, ...)
    {int rv;
     char var[BFLRG];
     char *t;
@@ -1939,7 +1943,7 @@ char **cenv(int sort, char **rej)
  *        - comparison of the environment variable VAR value and VAL
  */
 
-int cmpenv(char *var, char *val)
+int cmpenv(const char *var, const char *val)
    {int rv;
     char *t;
 
@@ -1958,7 +1962,7 @@ int cmpenv(char *var, char *val)
  *          - only if it is undefined
  */
 
-int cinitenv(char *var, const char *fmt, ...)
+int cinitenv(const char *var, const char *fmt, ...)
    {int err;
     char s[BFLRG];
 
@@ -2023,7 +2027,7 @@ int cclearenv(char **except)
 
 /* OPEN_FILE - open the specified file */
 
-FILE *open_file(char *mode, const char *fmt, ...)
+FILE *open_file(const char *mode, const char *fmt, ...)
    {char bf[BFLRG];
     FILE *fp;
 
@@ -2040,7 +2044,7 @@ FILE *open_file(char *mode, const char *fmt, ...)
 
 /* BLANK_LINE - return TRUE iff the string S represents a blank line */
 
-int blank_line(char *s)
+int blank_line(const char *s)
    {int rv;
 
     rv = ((strspn(s, " \t\f\n") == strlen(s)) || (s[0] == '#'));
@@ -2136,7 +2140,7 @@ int push_tok_beg(char *s, int nc, int dlm, const char *fmt, ...)
 
 /* PUSH_DIR - push D onto the directory stack */
 
-int push_dir(char *fmt, ...)
+int push_dir(const char *fmt, ...)
    {int n, rv;
     char d[BFLRG];
 
@@ -2194,11 +2198,11 @@ char *pop_path(char *path)
 /*--------------------------------------------------------------------------*/
 
 /* IS_EXECUTABLE_FILE - if PATH is the name of an executable file
- *                    - and if the length of path is <= NCX
+ *                    - and if the length of PATH is <= NCX
  *                    - copy it into FP and return the length
  */
 
-static int is_executable_file(char *fp, char *path, int ncx)
+static int is_executable_file(char *fp, const char *path, int ncx)
    {int n, muid, mgid, fuid, fgid;
     int usrx, grpx, othx, file;
     struct stat bf;
@@ -2233,8 +2237,8 @@ static int is_executable_file(char *fp, char *path, int ncx)
  *                 - DIR may be destroyed in this process
  */
 
-static void handle_path_dot(char *path, long nb, char *dir, char *name)
-   {char *s;
+static void handle_path_dot(char *path, long nb, char *dir, const char *name)
+   {const char *s;
 
     if (dir != NULL)
        {s = name;
@@ -2267,7 +2271,7 @@ static void handle_path_dot(char *path, long nb, char *dir, char *name)
  *           -      the full path
  */
 
-int file_path(char *name, char *path, int nc)
+int file_path(const char *name, char *path, int nc)
    {int n;
     size_t nb;
     char pathvar[BFLRG], fp[BFLRG];
@@ -2318,7 +2322,7 @@ int file_path(char *name, char *path, int nc)
  *           -    n if NC is too small to contain the full path
  */
 
-int full_path(char *path, int nc, int fl, char *dir, char *name)
+int full_path(char *path, int nc, int fl, const char *dir, const char *name)
    {int rv, st;
     int is, ns, nx;
     char d[BFLRG], s[BFLRG];
@@ -2381,7 +2385,7 @@ int full_path(char *path, int nc, int fl, char *dir, char *name)
 
 /* CWHICH - check the path for EXE */
 
-char *cwhich(char *fmt, ...)
+char *cwhich(const char *fmt, ...)
    {int st;
     char prg[BFLRG];
     static char exe[BFLRG];
@@ -2406,7 +2410,7 @@ char *cwhich(char *fmt, ...)
  *    - the last entry is NULL and marks the end of the list
  */
 
-char **ls(char *opt, const char *fmt, ...)
+char **ls(const char *opt, const char *fmt, ...)
    {char s[BFLRG];
     static char **lst;
 
@@ -2452,9 +2456,9 @@ char **ls(char *opt, const char *fmt, ...)
     else if ((*ps != '\0') && (*pp == '\0'))                                 \
        return(1);}
 
-int match(char *s, char *patt)
+int match(const char *s, const char *patt)
    {int rv, b, c;
-    char *ps, *pp;
+    const char *ps, *pp;
 
     ps = s;
     pp = patt;
@@ -2517,7 +2521,7 @@ int match(char *s, char *patt)
 
 /* UNIQUE - remove duplicate tokens from a list */
 
-char *unique(char *lst, int beg, int dlm)
+char *unique(const char *lst, int beg, int dlm)
    {int ok;
     char olst[BFLRG], delim[10];
     char *item, *p;
@@ -2634,7 +2638,7 @@ void push_path(int end, char *dpath, char *path)
  *            - directories ala PATH
  */
 
-void build_path(char *base, ...)
+void build_path(const char *base, ...)
    {char exe[BFLRG], pth[BFLRG], os[BFLRG];
     char *s, *t;
 
@@ -2684,7 +2688,7 @@ void build_path(char *base, ...)
 
 /* TOUCH - create an empty file */
 
-int touch(char *fmt, ...)
+int touch(const char *fmt, ...)
    {int fd;
     char path[BFLRG];
 
@@ -2705,7 +2709,7 @@ int touch(char *fmt, ...)
  *         - avoid use of strtok so as not to conflict with FOREACH
  */
 
-void key_val(char **key, char **val, char *s, char *dlm)
+void key_val(char **key, char **val, char *s, const char *dlm)
    {char *k, *p, *v;
 
     k = NULL;
@@ -2734,7 +2738,7 @@ void key_val(char **key, char **val, char *s, char *dlm)
  *        - the uname command line args
  */
 
-void unamef(char *s, int nc, char *wh)
+void unamef(char *s, int nc, const char *wh)
    {static int first = TRUE;
     static struct utsname uts;
 
@@ -2846,7 +2850,7 @@ int strings_out(FILE *fp, char **sa, int mn, int mx, int newl)
 
 /* STRINGS_FILE - write the strings SA to a file FNAME */
 
-int strings_file(char **sa, char *fname, char *mode)
+int strings_file(char **sa, const char *fname, const char *mode)
    {int rv;
     FILE *fp;
 
@@ -2943,7 +2947,7 @@ char **file_strings(FILE *fp)
  *           - if SORT is TRUE sort the file first
  */
 
-char **file_text(int sort, char *fname, ...)
+char **file_text(int sort, const char *fname, ...)
    {char file[BFLRG];
     char **sa;
     FILE *in;
@@ -3077,7 +3081,8 @@ int nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
 
 /* LOG_ACTIVITY - log messages to FLOG */
 
-void log_activity(char *flog, int ilog, int ilev, char *oper, const char *fmt, ...)
+void log_activity(char *flog, int ilog, int ilev,
+		  const char *oper, const char *fmt, ...)
    {char msg[BFLRG];
     FILE *lg;
 

@@ -541,7 +541,7 @@ typedef void (*PFWriteState)(PDBfile *pdrs);
 typedef void (*PFReadState)(PDBfile *pdrs);
 typedef void (*PFDefTyp)(PDBfile *pdrs);
 typedef int (*PFChangeDim)(char *pname, void *newsp, void *oldsp, long *, long *ndm, long *odm);
-typedef void (*PFErrHand)(int, char *, ...);
+typedef void (*PFErrHand)(int, const char *, ...);
 typedef void (*PFVString)(char *s);
 
 

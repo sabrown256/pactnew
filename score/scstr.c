@@ -105,7 +105,7 @@ int _SC_fmt_strcat(char *d, int nd, int ln, char *fmt, char *s)
  *             - things in the one bad case
  */
 
-char *SC_strsavec(char *s, int memfl,
+char *SC_strsavec(const char *s, int memfl,
 		  const char *file, const char *fnc, int line)
    {int prm, na, sz;
     char *p;
@@ -144,7 +144,7 @@ char *SC_strsavec(char *s, int memfl,
  *               - if N < 0 return the index of the Nth to last character
  */
 
-unsigned int SC_char_index(char *s, int n)
+unsigned int SC_char_index(const char *s, int n)
     {unsigned int nc, nu, rv;
 
      nc = strlen(s);
@@ -164,7 +164,7 @@ unsigned int SC_char_index(char *s, int n)
  *           - a safe string concatentation function
  */
 
-char *SC_strcat(char *dst, size_t lnd, char *src)
+char *SC_strcat(char *dst, size_t lnd, const char *src)
    {char *s;
 
     s = PS_nstrcat(dst, lnd, src);
@@ -200,7 +200,7 @@ char *SC_vstrcat(char *dst, size_t lnd, const char *fmt, ...)
  *            - a safe string concatentation function
  */
 
-char *SC_dstrcat(char *dst, char *src)
+char *SC_dstrcat(char *dst, const char *src)
    {size_t ln, lnd, ld, ls;
     char *s;
         
@@ -230,7 +230,7 @@ char *SC_dstrcat(char *dst, char *src)
  *            - unlike strncpy this always returns a null terminated string
  */
 
-char *SC_strncpy(char *d, size_t nd, char *s, size_t ns)
+char *SC_strncpy(char *d, size_t nd, const char *s, size_t ns)
    {
 
     s = PS_nstrncpy(d, nd, s, ns);
@@ -244,7 +244,7 @@ char *SC_strncpy(char *d, size_t nd, char *s, size_t ns)
  *            - a safe string copy function
  */
 
-char *SC_dstrcpy(char *dst, char *src)
+char *SC_dstrcpy(char *dst, const char *src)
    {size_t ld, ls;
     char *s;
         
@@ -273,7 +273,7 @@ char *SC_dstrcpy(char *dst, char *src)
  *           - this is for UNIX which doesn't have strstr
  */
 
-char *SC_strstr(char *s1, char *s2)
+char *SC_strstr(const char *s1, const char *s2)
    {char *rv;
 
     rv = NULL;
@@ -412,7 +412,7 @@ char *SC_squeeze_chars(char *s, char *q)
  *              - returns dynamically allocated copy which caller must free
  */
 
-char *SC_dstrsubst(char *s, char *a, char *b, size_t n)
+char *SC_dstrsubst(const char *s, const char *a, const char *b, size_t n)
    {size_t i, o;
     char *p, *pr, *ps, *pa, *pt;
 
@@ -451,7 +451,8 @@ char *SC_dstrsubst(char *s, char *a, char *b, size_t n)
  *             - returns dynamically allocated copy which caller must free
  */
 
-char *SC_strsubst(char *d, int nc, char *s, char *a, char *b, size_t n)
+char *SC_strsubst(char *d, int nc, const char *s,
+		  const char *a, const char *b, size_t n)
    {char *ps;
 
     ps = SC_dstrsubst(s, a, b, n);
@@ -494,7 +495,7 @@ char *SC_str_lower(char *s)
  *               - specified character C in the given string S
  */
 
-int SC_char_count(char *s, int c)
+int SC_char_count(const char *s, int c)
    {int rv;
 
     rv = PS_strcntc(s, c, FALSE);
@@ -508,7 +509,7 @@ int SC_char_count(char *s, int c)
  *              - specified characters R in the given string S
  */
 
-int SC_str_count(char *s, char *r)
+int SC_str_count(const char *s, const char *r)
    {int rv;
 
     rv = PS_strcnts(s, r, FALSE);
@@ -520,7 +521,7 @@ int SC_str_count(char *s, char *r)
 
 /* SC_STR_ICMP - case insensitive string comparison */
 
-int SC_str_icmp(char *s, char *t)
+int SC_str_icmp(const char *s, const char *t)
    {int rv;
     char p[MAXLINE], q[MAXLINE];
 
@@ -544,7 +545,7 @@ int SC_str_icmp(char *s, char *t)
  *                - ignore overlapping occurrences.
  */
 
-char *SC_str_replace(char *s, char *po, char *pn)
+char *SC_str_replace(char *s, const char *po, const char *pn)
    {char t[MAXLINE];
     char *ps, *pp;
     char *pt = t;
@@ -663,7 +664,7 @@ int SC_strerror(int err, char *msg, size_t nc)
  *              - a pointer to the first non-matching character
  */
 
-char *SC_trim_left(char *s, char *delim)
+char *SC_trim_left(char *s, const char *delim)
    {
 
     s = PS_trim(s, FRONT, delim);
@@ -677,7 +678,7 @@ char *SC_trim_left(char *s, char *delim)
  *               - of the string S
  */
 
-char *SC_trim_right(char *s, char *delim)
+char *SC_trim_right(char *s, const char *delim)
    {
 
     s = PS_trim(s, BACK, delim);
@@ -767,7 +768,7 @@ int SC_isspace(int c)
  *             - and points s to the next element in the string
  */
 
-char *SC_firsttok(char *s, char *delim)
+char *SC_firsttok(char *s, const char *delim)
    {int nb, nc;
     char *t, *r, *tb;
         
@@ -821,14 +822,14 @@ char *SC_firsttok(char *s, char *delim)
  *                - and points s to the next element in the string
  */
 
-char *_SC_quoted_tok(char *s, char *qdelim)
+char *_SC_quoted_tok(char *s, const char *quotes)
    {char qmatch, *t, *r, tokbuffer[MAXLINE];
         
     if (*s == '\0')
        return(NULL);
 
 /* qmatch is the pointer to the first quote character */
-    for (t = s; strchr(qdelim, *t) == NULL; t++);
+    for (t = s; strchr(quotes, *t) == NULL; t++);
     qmatch = *t++;
     if (*t == '\0')
        return(NULL);
@@ -875,7 +876,7 @@ char *_SC_quoted_tok(char *s, char *qdelim)
  *              - following the token or quoted string
  */
 
-char *SC_firsttokq(char *s, char *delim, char *quotes)
+char *SC_firsttokq(char *s, const char *delim, const char *quotes)
    {int len, k, kmatch;
     char tokbuffer[MAXLINE];
     char *t, *rv;
@@ -918,7 +919,7 @@ char *SC_firsttokq(char *s, char *delim, char *quotes)
  *            - and points s to the next element in the string
  */
 
-char *_SC_pr_tok(char *s, char *delim)
+char *_SC_pr_tok(char *s, const char *delim)
    {int i, j;
     char tokbuffer[MAXLINE];
     char *t, *rv;
@@ -954,7 +955,7 @@ char *_SC_pr_tok(char *s, char *delim)
  *            - the preceeding string
  */
 
-char *SC_lasttok(char *s, char *delim)
+char *SC_lasttok(char *s, const char *delim)
    {char *rv, *r;
 
     rv = NULL;
@@ -978,7 +979,7 @@ char *SC_lasttok(char *s, char *delim)
  *         - this does not destroy S
  */
 
-char *SC_ntok(char *d, int nc, char *s, int n, char *delim)
+char *SC_ntok(char *d, int nc, const char *s, int n, const char *delim)
    {int i, ln;
     char *cp, *p, *t, *pp;
 
@@ -1008,7 +1009,7 @@ char *SC_ntok(char *d, int nc, char *s, int n, char *delim)
  *             - it can be released by SC_free_strings
  */
 
-char **SC_tokenize(char *s, char *delim)
+char **SC_tokenize(const char *s, const char *delim)
    {char **sa;
 
     sa = PS_tokenize(s, delim, 0);
@@ -1026,7 +1027,7 @@ char **SC_tokenize(char *s, char *delim)
  *              - of the tokenization process
  */
 
-char **SC_tokenizef(char *s, char *delim, int flags)
+char **SC_tokenizef(const char *s, const char *delim, int flags)
    {char **sa;
 
     sa = PS_tokenize(s, delim, flags);
@@ -1043,7 +1044,7 @@ char **SC_tokenizef(char *s, char *delim, int flags)
  */
 
 static void _SC_match_quote(char **ppi, char **ppo, int qc,
-			    char *bf, char *delim)
+			    char *bf, const char *delim)
    {int c, n, nc, ks, ke;
     char dlm[2];
     char *pi, *po, *s;
@@ -1147,7 +1148,7 @@ static int _SC_match_delim(char **ppi, char **ppo, int oc, int cc)
  *                     - are preserved with the quotes as a single token
  */
 
-char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
+char **SC_tokenize_literal(const char *s, const char *delim, int nl, int qu)
    {int c, n;
     char *pi, *t, **sa;
     SC_array *arr;
@@ -1343,7 +1344,7 @@ for (i = 0; i < n; i++)
  *                 - an array of strings
  */
 
-char **SC_file_strings(char *fname)
+char **SC_file_strings(const char *fname)
    {char **sa;
 
     sa = PS_file_text(FALSE, fname);
@@ -1355,7 +1356,7 @@ char **SC_file_strings(char *fname)
 
 /* SC_STRINGS_FILE - write the arrray of strings SA to the file FNAME */
 
-int SC_strings_file(char **sa, char *fname, char *mode)
+int SC_strings_file(char **sa, const char *fname, const char *mode)
    {int rv;
 
     rv = PS_strings_file(sa, fname, mode);
@@ -1370,7 +1371,7 @@ int SC_strings_file(char **sa, char *fname, char *mode)
  *                  - with io_open
  */
 
-int SC_strings_print(FILE *fp, char **sa, char *pre)
+int SC_strings_print(FILE *fp, char **sa, const char *pre)
    {int i, rv;
 
     rv = FALSE;
@@ -1429,7 +1430,8 @@ void SC_remove_string(char **sa, int n)
  */
 
 char *SC_concatenate(char *s, int nc, char **a,
-		     unsigned int mn, unsigned int mx, char *delim, int add)
+		     unsigned int mn, unsigned int mx,
+		     const char *delim, int add)
    {char *rv;
 
     rv = PS_concatenate(s, nc, a, mn, mx, delim);
@@ -1446,7 +1448,7 @@ char *SC_concatenate(char *s, int nc, char **a,
  */
 
 char *SC_dconcatenate(char **a, unsigned int mn, unsigned int mx,
-		      char *delim)
+		      const char *delim)
    {unsigned int i, nc, nd;
     char *rv;
     char *s;
@@ -1496,7 +1498,7 @@ int SC_is_print_char(int c, int flag)
 
 /* _SC_WHITESPACE - return TRUE iff S contains only whitespace */
 
-static int _SC_whitespace(char *s)
+static int _SC_whitespace(const char *s)
    {int c, rv;
 
     rv = FALSE;
@@ -1529,7 +1531,7 @@ static int _SC_whitespace(char *s)
  *           - S = "# foo" is a comment
  */
  
-int SC_blankp(char *s, char *chr)
+int SC_blankp(const char *s, const char *chr)
    {int rv;
 
     rv = FALSE;
@@ -1553,7 +1555,7 @@ int SC_blankp(char *s, char *chr)
  *           - S = "# foo" is a comment
  */
  
-int SC_blankl(char *s, char *chr)
+int SC_blankl(const char *s, const char *chr)
    {int rv;
 
     rv = FALSE;
@@ -1594,7 +1596,7 @@ int SC_print_charsp(char *s, int sp)
 
 /* SC_NUMSTRP - tests to see if a string is a number */
 
-int SC_numstrp(char *s)
+int SC_numstrp(const char *s)
    {int rv;
 
     rv = (SC_intstrp(s, SC_gs.radix) || SC_fltstrp(s));
@@ -1606,7 +1608,7 @@ int SC_numstrp(char *s)
 
 /* SC_INTSTRP - tests to see if a string is an integer in radix BASE */
 
-int SC_intstrp(char *s, int base)
+int SC_intstrp(const char *s, int base)
    {int rv;
     char *pt;
 
@@ -1620,7 +1622,7 @@ int SC_intstrp(char *s, int base)
        rv = FALSE;
 
     else
-       {pt = s;
+       {pt = (char *) s;
 	if ((strlen(pt) == 1) && (strchr("0123456789", (int) *pt) == NULL))
 	   rv = FALSE;
 
@@ -1636,7 +1638,7 @@ int SC_intstrp(char *s, int base)
 
 /* SC_FLTSTRP - tests to see if a string is a float */
 
-int SC_fltstrp(char *s)
+int SC_fltstrp(const char *s)
    {int n, rv;
     char *pt;
 
@@ -1654,7 +1656,7 @@ int SC_fltstrp(char *s)
 
     else
        {n  = strlen(s);
-	pt = s;
+	pt = (char *) s;
 	if ((strchr("+-.0123456789", (int) s[0]) == NULL) ||
 	    (strchr(".0123456789", (int) s[n-1]) == NULL))
 	   rv = FALSE;
@@ -1671,7 +1673,7 @@ int SC_fltstrp(char *s)
 
 /* SC_CMPLXSTRP - tests to see if a string is a complex number */
 
-int SC_cmplxstrp(char *s)
+int SC_cmplxstrp(const char *s)
    {int rv;
     size_t n;
 
@@ -1703,9 +1705,9 @@ int SC_cmplxstrp(char *s)
 
 /* SC_CHRSTRP - test whether a string is made up of printable characters */
 
-int SC_chrstrp(char *s)
+int SC_chrstrp(const char *s)
    {int rv;
-    char *sp;
+    const char *sp;
 
     rv = TRUE;
     sp = s;
@@ -1730,7 +1732,7 @@ int SC_chrstrp(char *s)
  *         - returns 0.0 if string is NULL
  */
 
-long double _Complex SC_stoc(char *s)
+long double _Complex SC_stoc(const char *s)
    {int c, num;
     long double re, im, p1;
     long double _Complex rv;
@@ -1775,7 +1777,7 @@ long double _Complex SC_stoc(char *s)
  *         - returns 0.0 if string is NULL
  */
 
-double SC_stof(char *s)
+double SC_stof(const char *s)
    {double rv;
 
     rv = 0.0;
@@ -1791,7 +1793,7 @@ double SC_stof(char *s)
  *         - returns 0 if string is NULL
  */
 
-int64_t SC_stoi(char *s)
+int64_t SC_stoi(const char *s)
    {int64_t rv;
 
     rv = 0;
@@ -1807,7 +1809,7 @@ int64_t SC_stoi(char *s)
  *         - returns 0 if string is NULL
  */
 
-int64_t SC_stol(char *s)
+int64_t SC_stol(const char *s)
    {int64_t rv;
 
     rv = 0L;
@@ -1821,15 +1823,15 @@ int64_t SC_stol(char *s)
 
 /* SC_STRTOL - strtol done right (since some libraries are bad) */
 
-long SC_strtol(char *str, char **ptr, int base)
+long SC_strtol(const char *str, char **ptr, int base)
    {int c, xx, neg;
     long val, rv;
 
     neg = 0;
 
 /* in case no number is formed */
-    if (ptr != (char **) 0)
-       *ptr = str;
+    if (ptr != NULL)
+       *ptr = (char *) str;
 
 /* base is invalid -- should be a fatal error */
     if (base < 0 || base > MBASE)
@@ -1853,7 +1855,7 @@ long SC_strtol(char *str, char **ptr, int base)
 /* for any base > 10, the digits incrementally following
  * 9 are assumed to be "abc...z" or "ABC...Z"
  */
-    if (!SC_isalnum(c) || (xx = SC_ishexdigit(c)) >= base)
+    if (!SC_isalnum(c) || ((xx = SC_ishexdigit(c)) >= base))
        return(0);                                       /* no number formed */
 
 /* skip over leading "0x" or "0X" */
@@ -1866,8 +1868,8 @@ long SC_strtol(char *str, char **ptr, int base)
          SC_isalnum(c = *++str) && (xx = SC_ishexdigit(c)) < base; )
         val = base * val - xx;
 
-    if (ptr != (char **) 0)
-       *ptr = str;
+    if (ptr != NULL)
+       *ptr = (char *) str;
 
     rv = neg ? val : -val;
 

@@ -934,7 +934,7 @@ static object *_SSI_trim(SS_psides *si, object *argl)
  */
 
 static object *_SS_strtok(SS_psides *si, object *argl,
-			  char *(*fnc)(char *t, char *d))
+			  char *(*fnc)(char *t, const char *d))
    {char *text, *delim, t[MAXLINE], d[BFLRG], *ps;
     object *flag, *rv, *str;
 

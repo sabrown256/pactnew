@@ -941,7 +941,7 @@ extern object
  *SS_mk_variable(SS_psides *si, char *n, object *v),
  *SS_mk_reference(SS_psides *si, char *n,
 		  PFREFGet get, PFREFSet set, void *a),
- *SS_mk_string(SS_psides *si, char *s),
+ *SS_mk_string(SS_psides *si, const char *s),
  *SS_mk_inport(SS_psides *si, FILE *str, char *name),
  *SS_mk_outport(SS_psides *si, FILE *str, char *name),
  *SS_mk_integer(SS_psides *si, int64_t i),
