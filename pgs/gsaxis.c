@@ -1047,7 +1047,7 @@ static void _PG_write_label(PG_device *dev, char *format,
 
 static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
    {int i, id, l, lt, n, inc, sz;
-    int ovlp[PG_SPACEDM];
+    int ovlp, ok;
     double Dr, rmx, idm;
     double sp, ls, dv, sv, db, tol, log_scale;
     double en[2], vo[2];
@@ -1201,38 +1201,33 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 
 /* draw remaining labels */
     for (i = inc; i < n; i += inc)
-        {db = dx[i];
+        {db   = dx[i];
+	 ovlp = TRUE;
+
 	 for (id = 0; id < 2; id++)
-	     xs[id] = xa[id] + db*dx0[id];
-         ls = vo[0] + db*dv;
+	     {xs[id] = xa[id] + db*dx0[id];
+
+/* compute overlap of labels */
+	      if (g->iflog[id])
+		 {if (xs[id]*xp[id] == 0.0)
+		     ok = FALSE;
+		  else
+		     {rmx = max(xs[id]/xp[id], xp[id]/xs[id]);
+		      ok  = ((ldx[id] > 1.1) && (ldx[id] > 0.9*rmx));
+		      ok |= ((ldx[id] <= 1.1) && (ldx[id] > rmx));};}
+	      else
+		 ok = (ldx[id] > fabs(xs[id] - xp[id]));
+
+	      ovlp &= ok;};
 
 /* skip over labels that would overlap with the last one printed */
-	 if (g->iflog[0])
-	    {if (xs[0]*xp[0] == 0.0)
-	        ovlp[0] = FALSE;
-	     else
-	        {rmx      = max(xs[0]/xp[0], xp[0]/xs[0]);
-		 ovlp[0]  = ((ldx[0] > 1.1) && (ldx[0] > 0.9*rmx));
-		 ovlp[0] |= ((ldx[0] <= 1.1) && (ldx[0] > rmx));};}
-	 else
-	    ovlp[0] = (ldx[0] > fabs(xs[0] - xp[0]));
-
-	 if (g->iflog[1])
-	    {if (xs[1]*xp[1] == 0.0)
-	        ovlp[1] = FALSE;
-	     else
-	        {rmx     = max(xs[1]/xp[1], xp[1]/xs[1]);
-		 ovlp[1] = (ldx[1] > rmx);};}
-	 else
-	    ovlp[1] = (ldx[1] > fabs(xs[1] - xp[1]));
-
-	 if (ovlp[0] && ovlp[1])
-	    continue;
+	 if (ovlp == FALSE)
 
 /* remember this position */
-	 PM_copy_point(PG_SPACEDM, xp, xs);
+	    {PM_copy_point(PG_SPACEDM, xp, xs);
 
-         _PG_write_label(dev, format, xs, ls, tol, fx, FALSE);};
+	     ls = vo[0] + db*dv;
+	     _PG_write_label(dev, format, xs, ls, tol, fx, FALSE);};};
 
 /* reset the axis type */
     if (_PG_gattrs.axis_char_size >= 8)
