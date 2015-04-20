@@ -890,7 +890,7 @@ int SC_exec(char ***out, char *cmnd, char *shell, int to)
  *          - return the exit status
  */
 
-int SC_execa(char ***out, char *shell, int to, char *fmt, ...)
+int SC_execa(char ***out, char *shell, int to, const char *fmt, ...)
    {int rv;
     char *cmd;
 
@@ -919,7 +919,7 @@ int SC_execa(char ***out, char *shell, int to, char *fmt, ...)
  *          - return the exit status or -1 on timeout
  */
 
-int SC_execs(char *out, int nc, char *shell, int to, char *fmt, ...)
+int SC_execs(char *out, int nc, char *shell, int to, const char *fmt, ...)
    {int n, rv;
     char *s, *t, *p, *cmd, **res;
 
@@ -974,7 +974,7 @@ int SC_system(char *cmd)
  *            - If flag is TRUE have sh parse the command
  */
 
-char **SC_syscmnd(char *fmt, ...)
+char **SC_syscmnd(const char *fmt, ...)
    {int rv;
     char **icmnd, *cmd;
 

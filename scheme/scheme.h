@@ -899,7 +899,7 @@ extern int
  SS_args(SS_psides *si, object *s, ...),
  SS_run(SS_psides *si, char *s),
  SS_text_data_filep(char *fname, int cmnt),
- SS_load_scm(SS_psides *si, char *fmt, ...),
+ SS_load_scm(SS_psides *si, const char *fmt, ...),
  SS_define_argv(SS_psides *si, int c, char **v, int go);
 
 extern void
@@ -1018,7 +1018,7 @@ extern object
 /* SHPRNT.C declarations */
 
 extern void
- SS_set_prompt(SS_psides *si, char *fmt, ...),
+ SS_set_prompt(SS_psides *si, const char *fmt, ...),
  SS_print(SS_psides *si, object *strm, object *obj, char *begin, char *end),
  SS_wr_lst(SS_psides *si, object *obj, object *strm),
  SS_wr_proc(SS_psides *si, object *obj, object *strm),
@@ -1092,7 +1092,7 @@ extern char
 
 extern void
  SS_set_put_string(SS_psides *si, PFfputs ps),
- SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, char *fmt, ...)),
+ SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, const char *fmt, ...)),
  SS_interrupt_handler(int sig),
  SS_scheme_path_err(char *path),
  SS_init_path(void),
@@ -1106,7 +1106,7 @@ extern void
 /* SHTTY.C declarations */
 
 extern int
- SS_printf(FILE *fp, char *fmt, ...),
+ SS_printf(FILE *fp, const char *fmt, ...),
  SS_fputs(const char *s, FILE *fp),
  SS_get_ch(SS_psides *si, object *str, int ign_ws);
 

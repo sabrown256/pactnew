@@ -714,10 +714,10 @@ extern SC_contextdes
 extern void
  *SC_assoc(pcons *alist, CONST char *s),
  SC_banner(char *s),
- SC_set_banner(CONST char *fmt, ...),
+ SC_set_banner(const char *fmt, ...),
  SC_pause(void),
  SC_save_argv_env(int argc, char **argv, char **env),
- SC_add_search_path(CONST char *fmt, ...),
+ SC_add_search_path(const char *fmt, ...),
  SC_init_path(int nd, ...),
  SC_advance_name(char *s),
  SC_interrupt_handler(int sig),
@@ -778,8 +778,8 @@ extern char
 
 extern void
  _SC_assert(int t),
- SC_warn(CONST char *fmt, ...),
- SC_error(int st, CONST char *fmt, ...);
+ SC_warn(const char *fmt, ...),
+ SC_error(int st, const char *fmt, ...);
 
 extern int
  SC_error_explanation(int st, char *s, int nc);
@@ -862,7 +862,7 @@ extern int
  SC_buffer_data_in(PROCESS *pp),
  SC_buffer_data_out(PROCESS *pp, char *bf,
 		    int nbi, int block_state),
- SC_printf(PROCESS *pp, CONST char *fmt, ...),
+ SC_printf(PROCESS *pp, const char *fmt, ...),
  SC_init_client(CONST char *host, int port),
  SC_init_server(int step, int closep);
 
@@ -875,7 +875,7 @@ extern char
 extern int
  SC_host_server_fin(void),
  SC_host_server_init(CONST char *file, int reset, int vrb),
- SC_host_server_query(char *out, int nc, CONST char *fmt, ...),
+ SC_host_server_query(char *out, int nc, const char *fmt, ...),
  SC_verify_host(CONST char *hst, int to),
  SC_get_sys_length_max(int local, int full),
  SC_get_host_length_max(CONST char *sys, int local, int full),
@@ -1131,7 +1131,7 @@ extern char
  *SC_strsavec(CONST char *s, int memfl,
 	      const char *file, const char *fnc, int line),
  *SC_strcat(char *dest, size_t lnd, CONST char *src),
- *SC_vstrcat(char *dest, size_t lnd, CONST char *fmt, ...),
+ *SC_vstrcat(char *dest, size_t lnd, const char *fmt, ...),
  *SC_dstrcat(char *dest, CONST char *src),
  *SC_strncpy(char *d, size_t nd, CONST char *s, size_t ns),
  *SC_dstrcpy(char *dest, CONST char *src),
@@ -1159,9 +1159,9 @@ extern char
 		 unsigned int mn, unsigned int mx, CONST char *delim, int add),
  *SC_dconcatenate(char **a, unsigned int mn, unsigned int mx, CONST char *delim),
  *SC_vdsnprintf(int cp, const char *format, va_list lst),
- *SC_dsnprintf(int cp, CONST char *fmt, ...),
- *SC_itos(char *s, int nc, long long n, CONST char *fmt),
- *SC_ftos(char *s, int nc, int cat, CONST char *fmt, long double f);
+ *SC_dsnprintf(int cp, const char *fmt, ...),
+ *SC_itos(char *s, int nc, long long n, const char *fmt),
+ *SC_ftos(char *s, int nc, int cat, const char *fmt, long double f);
 
 extern double
  SC_stof(CONST char *s),
@@ -1251,8 +1251,8 @@ extern void
 
 extern int
  SC_exec(char ***out, CONST char *cmnd, CONST char *shell, int to),
- SC_execa(char ***out, CONST char *shell, int to, CONST char *fmt, ...),
- SC_execs(char *out, int nc, CONST char *shell, int to, CONST char *fmt, ...),
+ SC_execa(char ***out, CONST char *shell, int to, const char *fmt, ...),
+ SC_execs(char *out, int nc, CONST char *shell, int to, const char *fmt, ...),
  SC_exec_commands(CONST char *shell, char **cmnds, char **env, int to,
 		  CONST char *lname, CONST char *fname, int na, int show,
 		  int ignore, int dmp),
@@ -1272,7 +1272,7 @@ extern int
  SC_system(CONST char *cmd);
 
 extern char
- **SC_syscmnd(CONST char *fmt, ...);
+ **SC_syscmnd(const char *fmt, ...);
 
 
 /* SCSYSC.C declarations */

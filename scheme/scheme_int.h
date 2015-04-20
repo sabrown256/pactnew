@@ -328,8 +328,8 @@ extern void
  _SS_inst_print(SS_psides *si);
 
 extern char
- *_SS_vdsnprintf(int cp, char *fmt, va_list __a__),
- *_SS_sprintf(SS_psides *si, char *fmt, object *obj);
+ *_SS_vdsnprintf(int cp, const char *fmt, va_list __a__),
+ *_SS_sprintf(SS_psides *si, const char *fmt, object *obj);
 
 
 #ifdef LARGE

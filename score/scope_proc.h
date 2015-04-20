@@ -315,7 +315,7 @@ struct s_parstate
     SC_array *tasks;
     SC_array *log;
     int (*finish)(taskdesc *job, char *msg);
-    int (*print)(parstate *state, char *fmt, ...);
+    int (*print)(parstate *state, const char *fmt, ...);
     void (*free_logs)(parstate *state);
     void (*free_tasks)(parstate *state);};
 
@@ -329,7 +329,7 @@ struct s_asyncstate
     parstate *server;
     FILE *log;
     JMP_BUF cpu;
-    int (*print)(asyncstate *as, char *fmt, ...);};
+    int (*print)(asyncstate *as, const char *fmt, ...);};
 
 
 /* command task description */
@@ -405,7 +405,7 @@ struct s_taskdesc
     int (*exec)(taskdesc *job, int sigp);
     int (*done)(taskdesc *job, int setst);
     int (*retryp)(taskdesc *job, subtask *sub, int sts, int sgn, int setst);
-    int (*print)(taskdesc *job, asyncstate *as, char *fmt, ...);
+    int (*print)(taskdesc *job, asyncstate *as, const char *fmt, ...);
     void (*redir)(taskdesc *job, asyncstate *as,
 		  SC_iodes *fd, char *s, int newl);
     void (*tag)(taskdesc *job, char *tag, int nc, char *tm);
@@ -523,7 +523,7 @@ extern int
 
 extern void
  SC_reset_terminal(void),
- _SC_diagnostic(char *fmt, ...),
+ _SC_diagnostic(const char *fmt, ...),
  _SC_dethread(void),
  _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio),
  _SC_set_filedes(SC_iodes *fd, int ifd, char *name, int fl),
@@ -608,7 +608,7 @@ extern void
 
 extern int
  _SC_server_heartbeat(int *prv, void *a),
- _SC_exec_printf(asyncstate *as, char *fmt, ...);
+ _SC_exec_printf(asyncstate *as, const char *fmt, ...);
 
 extern void
  _SC_setup_async_state(asyncstate *as, int ln);
@@ -645,7 +645,7 @@ extern int
  _SC_get_command(tasklst *tl, int off),
  _SC_decide_retry(asyncstate *as, jobinfo *inf, tasklst *tl, int st),
  _SC_server_printf(asyncstate *as, parstate *state,
-		   char *tag, char *fmt, ...);
+		   char *tag, const char *fmt, ...);
 
 
 /* SCSYSD.C declarations */

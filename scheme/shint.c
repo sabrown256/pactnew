@@ -890,7 +890,7 @@ static int _SS_load_scm(SS_psides *si)
 
 /* SS_LOAD_SCM - load a SCHEME file with error protection */
 
-int SS_load_scm(SS_psides *si, char *fmt, ...)
+int SS_load_scm(SS_psides *si, const char *fmt, ...)
    {int rv;
     char fn[BFLRG];
     char *s;

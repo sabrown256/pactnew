@@ -168,7 +168,7 @@ int SC_gather_io_info(FILE *fp, int wh)
 
 /* IO_ERROR - report I/O errors via user specified hook */
 
-void io_error(int err, char *fmt, ...)
+void io_error(int err, const char *fmt, ...)
    {char t[MAXLINE], s[MAXLINE];
 
     SC_VA_START(fmt);
@@ -345,7 +345,7 @@ static int _SC_fputs(const char *s, FILE *fp)
 
 /* _SC_FPRINTF - worker supporting io_printf */
 
-static int _SC_fprintf(FILE *fp, char *fmt, va_list a)
+static int _SC_fprintf(FILE *fp, const char *fmt, va_list a)
    {int ret;
     char *msg;
 
@@ -1219,7 +1219,7 @@ static size_t _SC_rwrite(void *s, size_t nbi, size_t ni, FILE *stream)
  *             - wherever it is
  */
 
-static int _SC_rprintf(FILE *stream, char *fmt, va_list a)
+static int _SC_rprintf(FILE *stream, const char *fmt, va_list a)
    {int nw;
     size_t ni;
     REMOTE_FILE *fp;
@@ -1893,7 +1893,7 @@ int io_close(FILE *fp)
 
 /* IO_PRINTF - wrapper for fprintf method of file FP */
 
-int io_printf(FILE *fp, char *fmt, ...)
+int io_printf(FILE *fp, const char *fmt, ...)
    {int rv;
     char *s;
     file_io_desc *fid;
@@ -2334,7 +2334,7 @@ int lio_close(FILE *fp)
  *            - because of the variable arg list
  */
 
-int lio_printf(FILE *fp, char *fmt, ...)
+int lio_printf(FILE *fp, const char *fmt, ...)
    {int rv;
     char *s;
     file_io_desc *fid;

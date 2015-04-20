@@ -198,7 +198,7 @@ static void get_var_name(statedes *st, FILE *fp)
 
 /* EPRINTF - efficient ASCII fprintf */
 
-static int eprintf(FILE *fp, char *fmt, ...)
+static int eprintf(FILE *fp, const char *fmt, ...)
    {static int ib = 0;
     static int64_t n = -10;
     static char *bf = NULL;

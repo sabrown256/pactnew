@@ -190,7 +190,7 @@ void separatorv(FILE *fp)
  *       - this implements NoteVT
  */
 
-void notet(FILE *fp, char *tag, char *fmt, ...)
+void notet(FILE *fp, char *tag, const char *fmt, ...)
    {char bf[BFLRG];
 
     if (state.verbose == TRUE)
@@ -210,7 +210,7 @@ void notet(FILE *fp, char *tag, char *fmt, ...)
  *       - this combines Note and NoteV
  */
 
-void noten(FILE *fp, int vrb, char *fmt, ...)
+void noten(FILE *fp, int vrb, const char *fmt, ...)
    {char bf[BFLRG];
 
     if (vrb == TRUE)
@@ -227,7 +227,7 @@ void noten(FILE *fp, int vrb, char *fmt, ...)
 
 /* NOTEJ - log job control messages in a consistent format */
 
-static void notej(process *pp, char *fmt, ...)
+static void notej(process *pp, const char *fmt, ...)
    {int hr, mn, ti;
     double tc, sc;
     char bf[BFLRG];
@@ -375,7 +375,7 @@ static int count_specs(hfspec *specs, size_t nsp)
  *
  */
 
-static char *lrun(FILE *f1, int tag, char *fmt, ...)
+static char *lrun(FILE *f1, int tag, const char *fmt, ...)
    {char s[BFLRG], cmd[BFLRG];
     char *p;
     FILE *fp;
@@ -596,7 +596,7 @@ static int acc_in(int fd, process *pp, char *s)
 
 /* ARUN - execute a command asynchronously */
 
-static process *arun(hfspec *sp, char *fnm, void *a, char *fmt, ...)
+static process *arun(hfspec *sp, char *fnm, void *a, const char *fmt, ...)
    {char s[BFLRG], cmd[BFLRG];
     process *pp;
 
@@ -640,7 +640,7 @@ static process *arun(hfspec *sp, char *fnm, void *a, char *fmt, ...)
  *      - no input expected
  */
 
-static void brun(FILE *fo, char *fmt, ...)
+static void brun(FILE *fo, const char *fmt, ...)
    {char s[BFLRG], cmd[BFLRG];
     FILE *fp;
 

@@ -1418,12 +1418,12 @@ extern char
 
 extern int
  PG_setup_window_device(PG_device *dev),
- PG_fprintf(FILE *fp, CONST char *fmt, ...),
+ PG_fprintf(FILE *fp, const char *fmt, ...),
  PG_fputs(CONST char *s, FILE *fp),
  PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x,
-	    CONST char *fmt, ...),
+	    const char *fmt, ...),
  PG_wind_fgetc(FILE *stream),
- PG_wind_fprintf(FILE *fp, CONST char *fmt, ...),
+ PG_wind_fprintf(FILE *fp, const char *fmt, ...),
  PG_wind_fputs(CONST char *s, FILE *fp),
  PG_open_console(CONST char *title, CONST char *type, int bckgr,
 		 double xf, double yf, double dxf, double dyf);

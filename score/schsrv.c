@@ -420,7 +420,7 @@ int SC_host_server_init(char *file, int reset, int vrb)
  *                      - returns TRUE iff successful
  */
 
-int SC_host_server_query(char *out, int nc, char *fmt, ...)
+int SC_host_server_query(char *out, int nc, const char *fmt, ...)
    {int i, id, na, ns, rv;
     char s[MAXLINE], *req;
     char **strs, *ptrn, *net, *sys, *tok, *t, *p;

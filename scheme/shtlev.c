@@ -42,7 +42,7 @@ void SS_set_put_string(SS_psides *si, PFfputs ps)
  *                 - register the context
  */
 
-void SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, char *fmt, ...))
+void SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, const char *fmt, ...))
    {
     
     SC_set_put_line(pf);

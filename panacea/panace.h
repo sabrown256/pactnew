@@ -1108,8 +1108,8 @@ extern void
  PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
 		PFVarInit vif, ...),
  PA_init_scalar(char *s),
- PA_error_handler(int test, char *fmt, ...),
- PA_warning_handler(int test, char *fmt, ...),
+ PA_error_handler(int test, const char *fmt, ...),
+ PA_warning_handler(int test, const char *fmt, ...),
  PA_error(char *msg);
 
 extern PDBfile

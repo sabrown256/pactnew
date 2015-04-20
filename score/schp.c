@@ -72,7 +72,7 @@ void _SC_dethread(void)
 
 /* _SC_DIAGNOSTIC - log a diagnostic message */
 
-void _SC_diagnostic(char *fmt, ...)
+void _SC_diagnostic(const char *fmt, ...)
    {SC_thread_proc *ps;
 
     ps = _SC_get_thr_processes(-1);
@@ -1711,7 +1711,7 @@ char *SC_gets(char *bf, int len, PROCESS *pp)
 
 /* SC_PRINTF - do an fprintf style output to a process */
 
-int SC_printf(PROCESS *pp, char *fmt, ...)
+int SC_printf(PROCESS *pp, const char *fmt, ...)
    {int ret, ok;
     int (*prnt)(PROCESS *pp, char *bf);
     char *bf;

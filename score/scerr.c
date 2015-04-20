@@ -214,7 +214,7 @@ int SC_error_explanation(int st, char *s, int nc)
 
 /* SC_WARN - handle process related warnings */
 
-void SC_warn(char *fmt, ...)
+void SC_warn(const char *fmt, ...)
    {char *s, *err;
     SC_errdes *pe;
 
@@ -236,7 +236,7 @@ void SC_warn(char *fmt, ...)
 
 /* SC_ERROR - handle process related error conditions */
 
-void SC_error(int st, char *fmt, ...)
+void SC_error(int st, const char *fmt, ...)
    {char *s, *err;
     SC_errdes *pe;
 

@@ -15,7 +15,7 @@
 
 /* _CC_CHECK_ERROR - print error message from check phase */
 
-static void _CC_check_error(char *fmt, ...)
+static void _CC_check_error(const char *fmt, ...)
    {char s[MAXLINE];
 
     SC_VA_START(fmt);

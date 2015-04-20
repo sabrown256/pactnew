@@ -259,7 +259,7 @@ void _PG_remove_device(PG_device *dev)
 int PG_write_n(PG_device *dev ARG(,,cls), int nd ARG(2),
 	       PG_coord_sys cs ARG(NORMC),
 	       double *x ARG([0.0,0.0]),
-	       char *fmt, ...)
+	       const char *fmt, ...)
    {int id, rv;
     int oflg[PG_SPACEDM], nflg[PG_SPACEDM];
     double y[PG_SPACEDM];
@@ -346,7 +346,7 @@ int _PG_display_page(PG_device *dev, FILE *fp, char *s)
  *            - see _PG_display_page for more details
  */
 
-int PG_fprintf(FILE *fp, char *fmt, ...)
+int PG_fprintf(FILE *fp, const char *fmt, ...)
    {int rv;
     char *s;
 
@@ -475,7 +475,7 @@ void PG_reset_input(void)
 
 /* PG_WIND_FPRINTF - handle printing in the window environment */
 
-int PG_wind_fprintf(FILE *fp, char *fmt, ...)
+int PG_wind_fprintf(FILE *fp, const char *fmt, ...)
    {int rv;
     char *bf;
     

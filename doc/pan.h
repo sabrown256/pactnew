@@ -1,5 +1,5 @@
 TXT: PANACEA User's Manual
-MOD: 3/26/2015
+MOD: 4/20/2015
 
 <CENTER>
 <P>
@@ -3678,7 +3678,7 @@ See also PA_th_wr_iattr, PA_th_def_rec, and PA_th_trans_family.<p>
 <B>Optional Functions
 </B><B>
 </B><ul>
-<li>PA_ERR(int test, char *fmt, ...)
+<li>PA_ERR(int test, const char *fmt, ...)
 <p>
 </ul>
 

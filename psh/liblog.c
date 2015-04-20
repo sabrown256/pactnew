@@ -29,7 +29,7 @@ FILE *_access_log_file(int set, FILE *in)
 
 /* NOTE - write to FP only */
 
-void note(FILE *fp, char *fmt, ...)
+void note(FILE *fp, const char *fmt, ...)
    {char bf[BFMG];
 
     if (fp == NULL)
@@ -49,7 +49,7 @@ void note(FILE *fp, char *fmt, ...)
 
 /* NOTED - write to FP and to TTY */
 
-void noted(FILE *fp, char *fmt, ...)
+void noted(FILE *fp, const char *fmt, ...)
    {char bf[BFMG];
 
     VA_START(fmt);
@@ -90,7 +90,7 @@ void separator(FILE *fp)
  *     - a value of -1 for NCAT becomes INT_MAX which is the whole file
  */
 
-void cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...)
+void cat(FILE *out, size_t nskip, size_t ncat, const char *fmt, ...)
    {size_t i;
     char fname[BFLRG], s[BFLRG];
     FILE *in;
@@ -117,7 +117,7 @@ void cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...)
 
 /* INITLOG - setup a log file for use by run, note, noted, and separator */
 
-FILE *initlog(char *mode, char *fmt, ...)
+FILE *initlog(char *mode, const char *fmt, ...)
    {char bf[BFMG];
     FILE *fp;
 

@@ -1,5 +1,5 @@
 TXT: PPC User's Manual
-MOD: 09/15/2014
+MOD: 04/20/2015
 
 <CENTER>
 <H1><font color="#ff0000">$TXT</font></H1>
@@ -394,7 +394,7 @@ Output:	a pointer to a PROCESS.
 </DL>
 
 <P>
-<BR><B>int PC_printf(PROCESS *pp, char *fmt, ...)
+<BR><B>int PC_printf(PROCESS *pp, const char *fmt, ...)
 </B><BR>
 <DL><DD>Write the arguments to the PROCESS pp according to the format fmt.
 <TABLE>

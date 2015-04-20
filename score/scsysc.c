@@ -123,7 +123,7 @@ char *SC_get_shell(char *shell)
  *               - this can be used on a client or server
  */
 
-static int _SC_state_log(parstate *state, char *fmt, ...)
+static int _SC_state_log(parstate *state, const char *fmt, ...)
    {int rv, ifl;
     char chst[MAXLINE];
     char *msg;
@@ -424,7 +424,7 @@ void _SC_exec_free_state(parstate *state, int flt)
  */
 
 int _SC_server_printf(asyncstate *as, parstate *state, char *tag,
-		      char *fmt, ...)
+		      const char *fmt, ...)
    {int rv;
     char *msg;
 
@@ -449,7 +449,7 @@ int _SC_server_printf(asyncstate *as, parstate *state, char *tag,
 
 /* DSTATELOG - help with generic debug logging */
 
-void dstatelog(char *fmt, ...)
+void dstatelog(const char *fmt, ...)
    {char tag[MAXLINE];
     char *tm, *tms, *msg;
     parstate *state;
@@ -2161,7 +2161,7 @@ static void _SC_job_tag(taskdesc *job, char *tag, int nc, char *tm)
  *               - and AS log if it exists
  */
 
-int _SC_job_print(taskdesc *job, asyncstate *as, char *fmt, ...)
+int _SC_job_print(taskdesc *job, asyncstate *as, const char *fmt, ...)
    {int rv;
     char tag[MAXLINE];
     char *msg;

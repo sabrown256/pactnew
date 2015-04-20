@@ -230,7 +230,7 @@ static char *srv_load_db(client *cl, char *fname, char *var)
 
 /* SRV_LOGGER - log messages in the server SV */
 
-static void srv_logger(srvdes *sv, int lvl, char *fmt, ...)
+static void srv_logger(srvdes *sv, int lvl, const char *fmt, ...)
    {char s[BFLRG];
     char *root, *flog;
     client *cl;

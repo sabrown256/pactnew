@@ -524,7 +524,7 @@ static u_int64_t _PD_mpwritec(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
 /* _PD_MPPRINTF - do an fprintf on the parallel file */
 
-static int _PD_mpprintf(FILE *stream, char *fmt, va_list a)
+static int _PD_mpprintf(FILE *stream, const char *fmt, va_list a)
    {int rv;
     inti ni, nw;
     char *bf;

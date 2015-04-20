@@ -917,7 +917,7 @@ static int _SC_exec_puts(asyncstate *as, char *msg)
  *                 - were it not for the case in which as is NULL
  */
 
-int _SC_exec_printf(asyncstate *as, char *fmt, ...)
+int _SC_exec_printf(asyncstate *as, const char *fmt, ...)
    {int rv;
     char *msg;
 

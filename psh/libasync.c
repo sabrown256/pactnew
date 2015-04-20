@@ -17,10 +17,10 @@
  *    int job_read(process *pp, void (*out)(process *pp, char *s))
  *       Read from the job PP and pass anything read to the callback OUT.
  *
- *    int job_write(process *pp, char *fmt, ...)
+ *    int job_write(process *pp, const char *fmt, ...)
  *       Write a message to the job PP.
  *
- *    int job_response(process *pp, int to, char *fmt, ...)
+ *    int job_response(process *pp, int to, const char *fmt, ...)
  *       Write a message to job PP and give all output from the job
  *       in response to the method of PP for that purpose.
  *
@@ -354,7 +354,7 @@ process_state *get_process_state(void)
 
 /* _DBG - diagnostic debug print function */
 
-void _dbg(unsigned int lvl, char *fmt, ...)
+void _dbg(unsigned int lvl, const char *fmt, ...)
    {int pid;
     char s[BFLRG];
     char *t;
@@ -1729,7 +1729,7 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
  *           - return the number of characters written iff successful
  */
 
-int job_write(process *pp, char *fmt, ...)
+int job_write(process *pp, const char *fmt, ...)
    {int nc, ns;
     char s[BFLRG];
     FILE *fo;
@@ -1789,7 +1789,7 @@ int job_poll(process *pp, int to)
  *              - return -2 if we timeout waiting for the response
  */
 
-int job_response(process *pp, int to, char *fmt, ...)
+int job_response(process *pp, int to, const char *fmt, ...)
    {volatile int i, nl, nc, ns, ok, dt, fd;
     char s[BFLRG], t[BFLRG];
     char *p;

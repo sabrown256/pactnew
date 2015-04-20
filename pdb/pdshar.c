@@ -23,7 +23,7 @@ extern int
  *              - return the index of the new tr_layer
  */
 
-int _PD_register(char *type, char *fmt, PFBinType hook,
+int _PD_register(char *type, const char *fmt, PFBinType hook,
 		 PFBinCreate crt, PFBinOpen opn, PFBinClose cls,
 		 PFBinWrite wrt, PFBinRead rd)
    {int n;
@@ -79,7 +79,7 @@ tr_layer *_PD_lookup(char *type)
 
 /* _PD_LOOKUP_FMT - lookup and return a translation layer named by FMT */
 
-tr_layer *_PD_lookup_fmt(char *fmt)
+tr_layer *_PD_lookup_fmt(const char *fmt)
    {int i, n;
     tr_layer *tr, *ptr;
 		 

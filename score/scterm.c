@@ -1002,7 +1002,7 @@ int SC_mpi_fputs(const char *s, FILE *fp)
  *               - bug
  */
 
-int SC_mpi_printf(FILE *fp, char *fmt, ...)
+int SC_mpi_printf(FILE *fp, const char *fmt, ...)
    {int nc;
     char *s;
 
@@ -1023,7 +1023,7 @@ int SC_mpi_printf(FILE *fp, char *fmt, ...)
  *                     - Fortran supplies a trailing \n which we cannot control
  */
 
-int SC_mpi_ftn_snprintf(char *bf, int nc, char *fmt, ...)
+int SC_mpi_ftn_snprintf(char *bf, int nc, const char *fmt, ...)
    {char *s, *t;
 
     SC_VDSNPRINTF(TRUE, s, fmt);

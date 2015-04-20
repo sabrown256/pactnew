@@ -34,7 +34,7 @@ struct s_srvdes
    {void *a;
     void (*setup)(srvdes *sv, int *ptmax, int *pdt);
     char **(*process)(srvdes *sv, char *s);
-    void (*slog)(srvdes *sv, int lvl, char *fmt, ...);};
+    void (*slog)(srvdes *sv, int lvl, const char *fmt, ...);};
 
 struct s_svr_session
    {int debug;
@@ -96,7 +96,7 @@ char *name_log(char *root)
 
 /* CL_LOGGER - log messages for the client CL */
 
-void cl_logger(client *cl, int lvl, char *fmt, ...)
+void cl_logger(client *cl, int lvl, const char *fmt, ...)
    {char s[BFLRG];
     char *root, *wh, *flog;
 
@@ -570,7 +570,7 @@ static void sigtimeout(int sig)
 /* MAKE_CLIENT - initialize and return a client connection instance */
 
 client *make_client(ckind type, int port, int auth, char *root, 
-		    void (*clg)(client *cl, int lvl, char *fmt, ...),
+		    void (*clg)(client *cl, int lvl, const char *fmt, ...),
                     int (*cauth)(client *cl, int nc, char *ans, char *res))
    {char *fcon, *t;
     client *cl;

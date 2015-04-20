@@ -263,7 +263,7 @@ int _PD_put_text(int reset, int ns, char *s)
  *                - return TRUE iff the number of characters added is > 0
  */
 
-int _PD_put_string(int reset, char *fmt, ...)
+int _PD_put_string(int reset, const char *fmt, ...)
    {int ok;
     long ns;
     char *s;

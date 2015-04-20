@@ -54,7 +54,7 @@ void dfpu(void)
 
 /* MSG_OUT - thread safe message output */
 
-static void msg_out(char *fmt, ...)
+static void msg_out(const char *fmt, ...)
    {int it;
     char s[MAXLINE], t[MAXLINE];
 

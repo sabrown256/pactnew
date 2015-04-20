@@ -186,7 +186,7 @@ int ideref(char *s)
  *                     -   2  on removes _t from conventional C types
  */
 
-char *fix_type_designator(int fl, char *fmt, ...)
+char *fix_type_designator(int fl, const char *fmt, ...)
    {int nc;
     char t[BFLRG];
     char *p, *rv;

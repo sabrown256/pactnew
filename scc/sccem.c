@@ -89,7 +89,7 @@ int CC_compile(char *s, char *cmp, char **v)
 
 #if 0
 
-static void _CC_emit_error(char *fmt, ...)
+static void _CC_emit_error(const char *fmt, ...)
    {char s[MAXLINE];
 
     SC_VA_START(fmt);

@@ -272,8 +272,8 @@ extern void
  PY_self_free(void *o),
  _PP_Py_decref(PyObject *obj),
  PP_free(void *p),
- PP_error_set(PyObject *errobj, PyObject *obj, char *fmt, ...),
- PP_error_set_user(PyObject *obj, char *fmt, ...);
+ PP_error_set(PyObject *errobj, PyObject *obj, const char *fmt, ...),
+ PP_error_set_user(PyObject *obj, const char *fmt, ...);
 
 extern int
  PY_setup_pact(PyObject *m, PyObject *d),

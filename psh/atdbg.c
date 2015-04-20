@@ -159,7 +159,7 @@ static atproc *select_pid(atdbgdes *st, atproc *al)
 
 /* SEND_MSG - prepare and send a message to PP */
 
-static int send_msg(process *pp, int act, char *fmt, ...)
+static int send_msg(process *pp, int act, const char *fmt, ...)
    {int nl;
     char msg[BFLRG];
     char *p;

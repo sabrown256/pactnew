@@ -562,7 +562,7 @@ extern PM_mapping
 /* SXHOOK.C declarations */
 
 extern int
- SX_fprintf(FILE *fp, char *fmt, ...),
+ SX_fprintf(FILE *fp, const char *fmt, ...),
  SX_fputs(const char *s, FILE *fp);
 
 

@@ -23,7 +23,7 @@ struct s_sigchld_rec
     int exit;};         /* exit status */
 
 extern void
- dstatelog(char *fmt, ...);
+ dstatelog(const char *fmt, ...);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -150,7 +150,7 @@ void drwait(int tid)
 
 /* _SC_LOG_PROC - log process management */
 
-static void _SC_log_proc(int tid, char *fmt, ...)
+static void _SC_log_proc(int tid, const char *fmt, ...)
    {char t[MAXLINE];
     static int dbg = FALSE;
 

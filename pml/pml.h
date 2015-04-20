@@ -968,7 +968,7 @@ extern void
  PM_array_shift(double *p, int n, double f),
  PM_array_set(double *p, int n, double f),
  PM_array_copy(double *s, double *t, int n),
- PM_err(CONST char *fmt, ...);
+ PM_err(const char *fmt, ...);
 
 extern int
  PM_del_col(PM_matrix *a, long *col, long ncol),

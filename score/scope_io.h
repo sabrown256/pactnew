@@ -169,7 +169,7 @@ typedef size_t (*PFfwrite)(void *ptr, size_t sz, size_t ni, FILE *stream);
 
 typedef int (*PFsetvbuf)(FILE *stream, char *bf, int type, size_t sz);
 typedef int (*PFfclose)(FILE *stream);
-typedef int (*PFfprintf)(FILE *stream, CONST char *fmt, ...);
+typedef int (*PFfprintf)(FILE *stream, const char *fmt, ...);
 typedef int (*PFfputs)(const char *s, FILE *stream);
 typedef int (*PFfgetc)(FILE *stream);
 typedef int (*PFungetc)(int c, FILE *stream);
@@ -212,7 +212,7 @@ struct s_file_io_desc
     u_int64_t (*lfwrite)(void *ptr, size_t sz, u_int64_t ni, FILE *fp);
     int (*setvbuf)(FILE *fp, char *bf, int type, size_t sz);
     int (*fclose)(FILE *fp);
-    int (*fprintf)(FILE *fp, char *fmt, va_list a);
+    int (*fprintf)(FILE *fp, const char *fmt, va_list a);
     int (*fputs)(const char *s, FILE *fp);
     int (*fgetc)(FILE *fp);
     int (*ungetc)(int c, FILE *fp);
@@ -472,7 +472,7 @@ extern FILE
  *SC_std_file(void *p);
 
 extern void
- io_error(int err, CONST char *fmt, ...),
+ io_error(int err, const char *fmt, ...),
  SC_get_io_info(FILE *fp, int **pnhits, double **pnsec),
  SC_file_access(int log),
  SC_setbuf(FILE *fp, char *bf);
@@ -489,7 +489,7 @@ extern int
  io_seek(FILE *fp, long offs, int whence),
  io_setvbuf(FILE *fp, char *bf, int type, size_t sz),
  io_close(FILE *fp),
- io_printf(FILE *fp, CONST char *fmt, ...),
+ io_printf(FILE *fp, const char *fmt, ...),
  io_puts(const char *s, FILE *fp),
  io_getc(FILE *fp),
  io_ungetc(int c, FILE *fp),
@@ -498,7 +498,7 @@ extern int
  lio_seek(FILE *fp, int64_t offs, int whence),
  lio_setvbuf(FILE *fp, char *bf, int type, size_t sz),
  lio_close(FILE *fp),
- lio_printf(FILE *fp, CONST char *fmt, ...),
+ lio_printf(FILE *fp, const char *fmt, ...),
  lio_puts(const char *s, FILE *fp),
  lio_getc(FILE *fp),
  lio_ungetc(int c, FILE *fp),
@@ -622,9 +622,9 @@ extern int
  SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc),
  SC_set_term_size(int fd, int nr, int nc, int pw, int ph),
  SC_io_suspend(int fl),
- SC_mpi_printf(FILE *fp, CONST char *fmt, ...),
+ SC_mpi_printf(FILE *fp, const char *fmt, ...),
  SC_mpi_fputs(const char *s, FILE *fp),
- SC_mpi_ftn_snprintf(char *bf, int nc, CONST char *fmt, ...),
+ SC_mpi_ftn_snprintf(char *bf, int nc, const char *fmt, ...),
  SC_mpi_io_suppress(int on),
  SC_mpi_suppress(int st);
 

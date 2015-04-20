@@ -89,7 +89,7 @@ void SC_banner(char *s)
 
 /* SC_SET_BANNER - set the contents of a banner/header */
 
-void SC_set_banner(char *fmt, ...)
+void SC_set_banner(const char *fmt, ...)
    {
 
     SC_VA_START(fmt);
@@ -261,7 +261,7 @@ char *SC_pop_path(char *path)
 
 /* SC_ADD_SEARCH_PATH - add DIR to the search path */
 
-void SC_add_search_path(char *fmt, ...)
+void SC_add_search_path(const char *fmt, ...)
    {int is, ns, ne;
     char d[BFLRG], delim[10];
     char **sa;

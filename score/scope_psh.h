@@ -83,7 +83,7 @@ extern "C" {
 /* LIBASYNC.C declarations */
 
 extern void
- _PS_dbg(unsigned int lvl, char *fmt, ...),
+ _PS_dbg(unsigned int lvl, const char *fmt, ...),
  _PS_job_io_close(process *pp, io_kind knd),
  _PS_job_grp_attr(int pid, int pgid, int jctl, int g, int t),
  _PS_default_iodes(iodes *pio),
@@ -101,9 +101,9 @@ extern int
  _PS_job_waitr(int pid, int *pw, int opt, struct rusage *pr),
  *PS_list_fds(process_group *pg),
  PS_job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s)),
- PS_job_write(process *pp, char *fmt, ...),
+ PS_job_write(process *pp, const char *fmt, ...),
  PS_job_poll(process *pp, int to),
- PS_job_response(process *pp, int to, char *fmt, ...),
+ PS_job_response(process *pp, int to, const char *fmt, ...),
  PS_job_signal(process *pp, int sig),
  PS_job_done(process *pp, int sig),
  PS_apoll(int to),
@@ -145,11 +145,11 @@ extern void
  PS_db_srv_close(database *db);
 
 extern int
- PS_dbset(client *cl, char *var, char *fmt, ...),
- PS_dbdef(client *cl, char *fmt, ...),
+ PS_dbset(client *cl, char *var, const char *fmt, ...),
+ PS_dbdef(client *cl, const char *fmt, ...),
  PS_dbcmp(client *cl, char *var, char *val),
  PS_dbcmd(client *cl, char *cmd),
- PS_dbinitv(client *cl, char *var, char *fmt, ...),
+ PS_dbinitv(client *cl, char *var, const char *fmt, ...),
  PS_dbrestore(client *cl, char *dname),
  PS_save_db(database *db, char **vars, FILE *fp, const char *fmt),
  PS_db_srv_open(client *cl, int init, int dbg, int auth),
@@ -159,7 +159,7 @@ extern int
 extern char
  *PS_name_db(char *root),
  **_PS_db_clnt_ex(client *cl, int init, char *req),
- *PS_dbget(client *cl, int lit, char *fmt, ...),
+ *PS_dbget(client *cl, int lit, const char *fmt, ...),
  *PS_put_db(database *db, char *var, char *val),
  *PS_get_db(database *db, char *var),
  *PS_get_multi_line(char **sa, int ni, int *pi, char *dlm, int qu);
@@ -254,13 +254,13 @@ extern int
 extern void
  _PS_cat(FILE *out, size_t nskip, size_t ncat, char *fname),
  PS_separator(FILE *fp),
- PS_note(FILE *fp, char *fmt, ...),
- PS_noted(FILE *fp, char *fmt, ...),
- PS_cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...),
+ PS_note(FILE *fp, const char *fmt, ...),
+ PS_noted(FILE *fp, const char *fmt, ...),
+ PS_cat(FILE *out, size_t nskip, size_t ncat, const char *fmt, ...),
  PS_finlog(void);
 
 extern FILE
- *PS_initlog(char *mode, char *fmt, ...);
+ *PS_initlog(char *mode, const char *fmt, ...);
 
 
 /* LIBPGRP.C declarations */
@@ -334,16 +334,16 @@ extern void
  PS_string_sort(char **v, int n),
  PS_lst_free(char **lst),
  PS_free_strings(char **lst),
- PS_copy(char *out, char *fmt, ...),
+ PS_copy(char *out, const char *fmt, ...),
  PS_nsleep(int ms),
- PS_print_text(FILE *fp, char *fmt, ...),
+ PS_print_text(FILE *fp, const char *fmt, ...),
  PS_clean_space(char *s),
  PS_splice_out_path(char *path),
  PS_push_path(int end, char *dpath, char *path),
  PS_build_path(char *base, ...),
  PS_key_val(char **key, char **val, char *s, char *dlm),
  PS_unamef(char *s, int nc, char *wh),
- PS_log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...);
+ PS_log_activity(char *flog, int ilog, int ilev, char *oper, const char *fmt, ...);
 
 extern int
  _PS_nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
@@ -363,16 +363,16 @@ extern int
  PS_file_exists(char *fmt, ...),
  PS_file_executable(char *fmt, ...),
  PS_file_script(char *fmt, ...),
- PS_execute(int err, char *fmt, ...),
- PS_csetenv(char *var, char *fmt, ...),
+ PS_execute(int err, const char *fmt, ...),
+ PS_csetenv(char *var, const char *fmt, ...),
  PS_cunsetenv(char *var),
  PS_cdefenv(char *fmt, ...),
  PS_cmpenv(char *var, char *val),
- PS_cinitenv(char *var, char *fmt, ...),
+ PS_cinitenv(char *var, const char *fmt, ...),
  PS_cclearenv(char **except),
  PS_blank_line(char *s),
- PS_push_tok(char *s, int nc, int dlm, char *fmt, ...),
- PS_push_tok_beg(char *s, int nc, int dlm, char *fmt, ...),
+ PS_push_tok(char *s, int nc, int dlm, const char *fmt, ...),
+ PS_push_tok_beg(char *s, int nc, int dlm, const char *fmt, ...),
  PS_push_dir(char *fmt, ...),
  PS_pop_dir(void),
  PS_file_path(char *name, char *path, int nc),
@@ -387,8 +387,8 @@ extern char
  *PS_nstrsave(char *s),
  *PS_nstrncpy(char *d, size_t nd, char *s, size_t ns),
  *PS_nstrcat(char *d, int nc, char *s),
- *PS_vstrcat(char *d, int nc, char *fmt, ...),
- **PS_lst_push(char **lst, char *fmt, ...),
+ *PS_vstrcat(char *d, int nc, const char *fmt, ...),
+ **PS_lst_push(char **lst, const char *fmt, ...),
  **PS_lst_add(char **lst, char *s),
  **PS_lst_copy(char **lst),
  **PS_lst_uniq(char **lst),
@@ -408,24 +408,24 @@ extern char
  *PS_path_base(char *s),
  *PS_path_suffix(char *s),
  *PS_path_simplify(char *s, int dlm),
- *PS_run(int echo, char *fmt, ...),
- *PS_grep(FILE *fp, char *name, char *fmt, ...),
+ *PS_run(int echo, const char *fmt, ...),
+ *PS_grep(FILE *fp, char *name, const char *fmt, ...),
  *PS_get_date(void),
  *PS_strip_quote(char *t),
  *PS_cnoval(void),
- *PS_cgetenv(int lit, char *fmt, ...),
+ *PS_cgetenv(int lit, const char *fmt, ...),
  **PS_cenv(int sort, char **rej),
  *PS_cwhich(char *fmt, ...),
- *PS_append_tok(char *s, int dlm, char *fmt, ...),
+ *PS_append_tok(char *s, int dlm, const char *fmt, ...),
  *PS_pop_path(char *path),
- **PS_ls(char *opt, char *fmt, ...),
+ **PS_ls(char *opt, const char *fmt, ...),
  *PS_unique(char *lst, int beg, int dlm),
  *PS_trim(char *s, int dir, char *delim),
  **PS_file_strings(FILE *fp),
  **PS_file_text(int sort, char *fname, ...);
 
 extern FILE
- *PS_open_file(char *mode, char *fmt, ...);
+ *PS_open_file(char *mode, const char *fmt, ...);
 
 
 /* LIBSOCK.C declarations */
@@ -455,7 +455,7 @@ extern void
  _PS_check_fd(srvdes *sv),
  PS_remove_fd(srvdes *sv, int fd),
  _PS_new_connection(srvdes *sv),
- PS_cl_logger(client *cl, int lvl, char *fmt, ...),
+ PS_cl_logger(client *cl, int lvl, const char *fmt, ...),
  PS_free_client(client *cl);
 
 extern int
@@ -472,7 +472,7 @@ extern char
 
 extern client
  *PS_make_client(ckind type, int port, int auth, char *root, 
-		 void (*clog)(client *cl, int lvl, char *fmt, ...),
+		 void (*clog)(client *cl, int lvl, const char *fmt, ...),
 		 int (*cauth)(client *cl, int nc, char *ans, char *res));
 
 

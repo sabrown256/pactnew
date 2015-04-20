@@ -21,7 +21,7 @@
 
 /* LPRINTF - print formatted output */
 
-int lprintf(FILE *fp, int flag, char *fmt, ...)
+int lprintf(FILE *fp, int flag, const char *fmt, ...)
    {char *s;
 
     SC_VDSNPRINTF(TRUE, s, fmt);

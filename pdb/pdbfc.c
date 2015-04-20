@@ -165,7 +165,7 @@ static int _PD_fcclose(FILE *fp)
 
 /* _PD_FCPRINTF - fprintf method for containerf */
 
-static int _PD_fcprintf(FILE *fp, char *fmt, va_list a)
+static int _PD_fcprintf(FILE *fp, const char *fmt, va_list a)
    {int rv;
     containerf *cf;
     FILE *fl;

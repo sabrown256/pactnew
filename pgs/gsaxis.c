@@ -948,7 +948,7 @@ static void _PG_sprintf(char *string, long nc,
 
 static void _PG_axis_label_fmt(PG_device *dev, char *format, long nc,
 			       double *pdx, double *pdy,
-			       double *ptol, char *fmt,
+			       double *ptol, const char *fmt,
 			       PG_axis_tick_def *td)
    {int i, n, ti;
     double tol, yo, ls, db, dv;

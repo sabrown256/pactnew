@@ -72,7 +72,7 @@ extern int
  _SC_mf_getc(FILE *fp),
  _SC_mf_ungetc(int c, FILE *fp),
  _SC_mf_puts(const char *s, FILE *fp),
- _SC_mf_printf(FILE *fp, char *fmt, va_list a),
+ _SC_mf_printf(FILE *fp, const char *fmt, va_list a),
  _SC_mf_flush(FILE *fp),
  _SC_mf_setvbuf(FILE *fp, char *bf, int type, size_t sz),
  _SC_mf_eof(FILE *fp),

@@ -11,7 +11,7 @@
 #include "scheme_int.h"
 
 static int
- _SS_push_chars(FILE *fp, char *fmt, ...),
+ _SS_push_chars(FILE *fp, const char *fmt, ...),
  _SS_push_string(const char *s, FILE *fp);
 
 /*--------------------------------------------------------------------------*/
@@ -19,7 +19,7 @@ static int
 
 /* SS_SET_PROMPT - set the interpreter prompt string */
 
-void SS_set_prompt(SS_psides *si, char *fmt, ...)
+void SS_set_prompt(SS_psides *si, const char *fmt, ...)
    {
 
     SC_VA_START(fmt);
@@ -133,7 +133,7 @@ void SS_print(SS_psides *si, object *strm, object *obj,
  *                - and return it
  */
 
-char *_SS_vdsnprintf(int cp, char *fmt, va_list __a__)
+char *_SS_vdsnprintf(int cp, const char *fmt, va_list __a__)
    {char *s;
 
     s = SC_vdsnprintf(cp, fmt, __a__);
@@ -152,7 +152,7 @@ char *_SS_vdsnprintf(int cp, char *fmt, va_list __a__)
  *              - such as "%10s"
  */
 
-char *_SS_printout(SS_psides *si, char *fmt, object *obj)
+char *_SS_printout(SS_psides *si, const char *fmt, object *obj)
    {char *s;
     PFfprintf pr;
     PFfputs ps;
@@ -188,7 +188,7 @@ char *_SS_printout(SS_psides *si, char *fmt, object *obj)
 
 /* _SS_SPRINT - takes an object and produces a printable representation */
 
-static object *_SS_sprint(SS_psides *si, object *obj, char *fmt, object *strm)
+static object *_SS_sprint(SS_psides *si, object *obj, const char *fmt, object *strm)
    {char *s;
     FILE *str;
 
@@ -434,7 +434,7 @@ static char *_SS_sprintf_guts(SS_psides *si, object *fp, object *argl)
  *             - such as "%10s"
  */
 
-char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
+char *_SS_sprintf(SS_psides *si, const char *fmt, object *obj)
    {char *s;
     object *x;
 
@@ -508,7 +508,7 @@ static object *_SSI_fprintf(SS_psides *si, object *argl)
  *                - "%10s" work
  */
 
-static int _SS_push_chars(FILE *fp, char *fmt, ...)
+static int _SS_push_chars(FILE *fp, const char *fmt, ...)
    {int ns, nb;
     char *bf;
 
@@ -1122,7 +1122,7 @@ void SS_wr_lst(SS_psides *si, object *obj, object *strm)
  *             - this is a helper for complex and quaternion number
  */
 
-static void _SS_cmp_cat(char *t, int nc, char *fmt,
+static void _SS_cmp_cat(char *t, int nc, const char *fmt,
 			long double vl, char *nm, int first)
    {
 

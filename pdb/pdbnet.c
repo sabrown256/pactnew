@@ -214,7 +214,7 @@ static u_int64_t _PN_bwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
 /* _PN_BPRINTF - do an fprintf on the pseudo file */
 
-static int _PN_bprintf(FILE *fp, char *fmt, va_list a)
+static int _PN_bprintf(FILE *fp, const char *fmt, va_list a)
    {inti ni, nw;
     char *bf;
 

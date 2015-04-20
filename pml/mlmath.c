@@ -1079,7 +1079,7 @@ double PM_machine_precision(void)
 
 /* PM_ERR - handle PML errors */
 
-void PM_err(char *fmt, ...)
+void PM_err(const char *fmt, ...)
    {
 
     SC_VA_START(fmt);

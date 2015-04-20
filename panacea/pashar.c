@@ -976,7 +976,7 @@ void _PA_rd_variable(PDBfile *pdrs, PA_variable *pp,
  *                  - give the most graceful possible shutdown of a run
  */
 
-void PA_error_handler(int test, char *fmt, ...)
+void PA_error_handler(int test, const char *fmt, ...)
    {
 
 /* reroute the error handler if required - first time only */
@@ -1009,7 +1009,7 @@ void PA_error_handler(int test, char *fmt, ...)
  *                    - a non-fatal error
  */
 
-void PA_warning_handler(int test, char *fmt, ...)
+void PA_warning_handler(int test, const char *fmt, ...)
    {
 
 /* reroute the warning handler if required - first time only */

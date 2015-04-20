@@ -484,7 +484,7 @@ extern char
 
 extern int
  _PD_put_text(int reset, int ns, char *s),
- _PD_put_string(int reset, char *fmt, ...),
+ _PD_put_string(int reset, const char *fmt, ...),
  _PD_cp_tbuffer(char **buf),
  _PD_identify_file(PDBfile *file),
  _PD_format_version(PDBfile *file, int vers),
@@ -614,14 +614,14 @@ extern int
 /* PDSHAR.C declarations */
 
 extern int
- _PD_register(char *type, char *fmt, PFBinType hook,
+ _PD_register(char *type, const char *fmt, PFBinType hook,
 	      PFBinCreate creat, PFBinOpen open, PFBinClose close,
 	      PFBinWrite write, PFBinRead read),
  _PD_pdbfilep(char *type);
 
 extern tr_layer
  *_PD_lookup(char *type),
- *_PD_lookup_fmt(char *fmt),
+ *_PD_lookup_fmt(const char *fmt),
  *_PD_lookup_fn(char *fn);
 
 extern void

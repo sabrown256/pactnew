@@ -1223,7 +1223,7 @@ static int _SC_bputs(const char *s, FILE *fp)
 
 /* _SC_BPRINTF - method for fprintf */
 
-static int _SC_bprintf(FILE *fp, char *fmt, va_list a)
+static int _SC_bprintf(FILE *fp, const char *fmt, va_list a)
    {int ret;
     char *msg;
 

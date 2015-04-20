@@ -122,7 +122,7 @@ char *nstrcat(char *d, int nc, char *s)
 
 /* VSTRCAT - safe strcat function */
 
-char *vstrcat(char *d, int nc, char *fmt, ...)
+char *vstrcat(char *d, int nc, const char *fmt, ...)
    {char s[BFLRG];
 
     VA_START(fmt);
@@ -173,7 +173,7 @@ int lst_length(char **lst)
 
 /* LST_PUSH - add S to list LST */
 
-char **lst_push(char **lst, char *fmt, ...)
+char **lst_push(char **lst, const char *fmt, ...)
    {int n, m;
     char s[BFLRG];
 
@@ -1229,7 +1229,7 @@ char *subst(char *s, char *a, char *b, size_t n)
 
 /* COPY - copy the file IN to OUT */
 
-void copy(char *out, char *fmt, ...)
+void copy(char *out, const char *fmt, ...)
    {char in[BFLRG];
     FILE *fp;
 
@@ -1567,7 +1567,7 @@ int file_script(char *fmt, ...)
 
 /* EXECUTE - execute a command and return the exit status */
 
-int execute(int err, char *fmt, ...)
+int execute(int err, const char *fmt, ...)
    {int rv;
     char s[BFLRG], cmd[BFLRG];
 
@@ -1593,7 +1593,7 @@ int execute(int err, char *fmt, ...)
  *     - echo the command to the log iff ECHO is TRUE
  */
 
-char *run(int echo, char *fmt, ...)
+char *run(int echo, const char *fmt, ...)
    {char s[BFLRG], cmd[BFLRG];
     char *p;
     FILE *fp;
@@ -1637,7 +1637,7 @@ char *run(int echo, char *fmt, ...)
  *      - GOTCHA: make the internal buffer dynamic
  */
 
-char *grep(FILE *fp, char *name, char *fmt, ...)
+char *grep(FILE *fp, char *name, const char *fmt, ...)
    {int i, nc, clf, err;
     char t[BFLRG], s[BFLRG];
     char *p;
@@ -1720,7 +1720,7 @@ void nsleep(int ms)
  *            - C way)
  */
 
-void print_text(FILE *fp, char *fmt, ...)
+void print_text(FILE *fp, const char *fmt, ...)
    {char bf[BFLRG];
 
     VA_START(fmt);
@@ -1782,7 +1782,7 @@ char *strip_quote(char *t)
 
 /* CSETENV - set the environment variable VAR to VAL */
 
-int csetenv(char *var, char *fmt, ...)
+int csetenv(char *var, const char *fmt, ...)
    {int err, nc;
     char s[BFLRG];
     char *t;
@@ -1834,7 +1834,7 @@ char *cnoval(void)
  *         - surrounding quotes
  */
 
-char *cgetenv(int lit, char *fmt, ...)
+char *cgetenv(int lit, const char *fmt, ...)
    {char var[BFLRG];
     char *t;
 
@@ -1958,7 +1958,7 @@ int cmpenv(char *var, char *val)
  *          - only if it is undefined
  */
 
-int cinitenv(char *var, char *fmt, ...)
+int cinitenv(char *var, const char *fmt, ...)
    {int err;
     char s[BFLRG];
 
@@ -2023,7 +2023,7 @@ int cclearenv(char **except)
 
 /* OPEN_FILE - open the specified file */
 
-FILE *open_file(char *mode, char *fmt, ...)
+FILE *open_file(char *mode, const char *fmt, ...)
    {char bf[BFLRG];
     FILE *fp;
 
@@ -2052,7 +2052,7 @@ int blank_line(char *s)
 
 /* PUSH_TOK - push token T onto the end of string S */
 
-int push_tok(char *s, int nc, int dlm, char *fmt, ...)
+int push_tok(char *s, int nc, int dlm, const char *fmt, ...)
    {int rv;
     char t[BFLRG], delim[2];
 
@@ -2079,7 +2079,7 @@ int push_tok(char *s, int nc, int dlm, char *fmt, ...)
  *            - this is a dynamic version of push_tok
  */
 
-char *append_tok(char *s, int dlm, char *fmt, ...)
+char *append_tok(char *s, int dlm, const char *fmt, ...)
    {int nc;
     char t[BFLRG], delim[2];
     char *p;
@@ -2110,7 +2110,7 @@ char *append_tok(char *s, int dlm, char *fmt, ...)
 
 /* PUSH_TOK_BEG - push token T onto the beginning of string S */
 
-int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
+int push_tok_beg(char *s, int nc, int dlm, const char *fmt, ...)
    {int rv;
     char t[BFLRG], bf[BFLRG];
 
@@ -2406,7 +2406,7 @@ char *cwhich(char *fmt, ...)
  *    - the last entry is NULL and marks the end of the list
  */
 
-char **ls(char *opt, char *fmt, ...)
+char **ls(char *opt, const char *fmt, ...)
    {char s[BFLRG];
     static char **lst;
 
@@ -3077,7 +3077,7 @@ int nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
 
 /* LOG_ACTIVITY - log messages to FLOG */
 
-void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
+void log_activity(char *flog, int ilog, int ilev, char *oper, const char *fmt, ...)
    {char msg[BFLRG];
     FILE *lg;
 

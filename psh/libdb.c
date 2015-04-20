@@ -144,7 +144,7 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 
 /* DBSET - set the database variable VAR to VAL (counterpart to csetenv) */
 
-int dbset(client *cl, char *var, char *fmt, ...)
+int dbset(client *cl, char *var, const char *fmt, ...)
    {int i, err, nc, nr, ok;
     char val[BFLRG];
     char *t, **ta;
@@ -192,7 +192,7 @@ int dbset(client *cl, char *var, char *fmt, ...)
  *       - (counterpart to cgetenv)
  */
 
-char *dbget(client *cl, int lit, char *fmt, ...)
+char *dbget(client *cl, int lit, const char *fmt, ...)
    {char var[BFLRG];
     char *t, **ta;
 
@@ -224,7 +224,7 @@ char *dbget(client *cl, int lit, char *fmt, ...)
  *       - (counterpart to cdefenv)
  */
 
-int dbdef(client *cl, char *fmt, ...)
+int dbdef(client *cl, const char *fmt, ...)
    {int rv;
     char var[BFLRG];
     char **ta;
@@ -291,7 +291,7 @@ int dbcmd(client *cl, char *cmd)
  *         - (counterpart to cinitenv)
  */
 
-int dbinitv(client *cl, char *var, char *fmt, ...)
+int dbinitv(client *cl, char *var, const char *fmt, ...)
    {int err;
     char s[BFLRG];
 

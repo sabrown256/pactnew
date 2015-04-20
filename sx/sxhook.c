@@ -148,7 +148,7 @@ void _SX_init_hash_objects(SS_psides *si, PDBfile *file)
  *            - for transcript logging
  */
 
-int SX_fprintf(FILE *fp, char *fmt, ...)
+int SX_fprintf(FILE *fp, const char *fmt, ...)
    {int rv;
     char *bf;
     FILE *hp;

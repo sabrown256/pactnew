@@ -145,7 +145,7 @@ extern void
  SC_free_array(SC_array *a, int (*rel)(void *a)),
  SC_array_string_add(SC_array *a, char *s),
  SC_array_string_add_copy(SC_array *a, char *s),
- SC_array_string_add_vcopy(SC_array *a, char *fmt, ...);
+ SC_array_string_add_vcopy(SC_array *a, const char *fmt, ...);
 
 extern void
  *SC_array_done(SC_array *a),

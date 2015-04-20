@@ -178,7 +178,7 @@ char *SC_strcat(char *dst, size_t lnd, char *src)
  *            - a safe string concatentation function
  */
 
-char *SC_vstrcat(char *dst, size_t lnd, char *fmt, ...)
+char *SC_vstrcat(char *dst, size_t lnd, const char *fmt, ...)
    {char *s, *t;
         
     t = CMAKE_N(char, lnd);
@@ -1883,7 +1883,7 @@ long SC_strtol(char *str, char **ptr, int base)
  *         - returns pointer to buffer holding the result
  */
 
-char *SC_itos(char *s, int nc, long long n, char *fmt)
+char *SC_itos(char *s, int nc, long long n, const char *fmt)
    {static char bf[80];
 
     if (s == NULL)
@@ -2059,7 +2059,7 @@ double SC_strtod(const char *nptr, char **endptr)
  *         - returns pointer to buffer holding the result
  */
 
-char *SC_ftos(char *s, int nc, int cat, char *fmt, long double f)
+char *SC_ftos(char *s, int nc, int cat, const char *fmt, long double f)
    {char *p;
     static char bf[BFSML];
 
@@ -2190,7 +2190,7 @@ char *SC_vdsnprintf(int cp, const char *format, va_list lst)
  *              - use in place of snprintf
  */
 
-char *SC_dsnprintf(int cp, char *fmt, ...)
+char *SC_dsnprintf(int cp, const char *fmt, ...)
    {char *s;
 
     SC_VDSNPRINTF(cp, s, fmt);

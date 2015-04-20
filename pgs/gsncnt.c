@@ -253,7 +253,7 @@ static int
 
 /* _PG_ERROR_HAND - a special error handler for level surface plotting */
 
-static void _PG_error_hand(int test, itf_array *ifs, int it, char *fmt, ...)
+static void _PG_error_hand(int test, itf_array *ifs, int it, const char *fmt, ...)
    {
 
     if (test == TRUE)

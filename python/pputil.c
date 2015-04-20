@@ -877,7 +877,7 @@ int PP_convert_pdbfile(PyObject *obj, void **addr)
  *     ...    - additional variables for message
  */
 
-void PP_error_set(PyObject *errobj, PyObject *obj, char *fmt, ...)
+void PP_error_set(PyObject *errobj, PyObject *obj, const char *fmt, ...)
 {
     char *line;
     PyObject *w;
@@ -908,7 +908,7 @@ void PP_error_set(PyObject *errobj, PyObject *obj, char *fmt, ...)
  *     ...    - additional variables for message
  */
 
-void PP_error_set_user(PyObject *obj, char *fmt, ...)
+void PP_error_set_user(PyObject *obj, const char *fmt, ...)
 {
     char *line;
     PyObject *w;

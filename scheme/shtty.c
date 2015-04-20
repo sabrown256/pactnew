@@ -173,7 +173,7 @@ void SS_put_ch(int c, object *str)
  *           - a NULL value for FP means we just want the specifications
  */
 
-int SS_printf(FILE *fp, char *fmt, ...)
+int SS_printf(FILE *fp, const char *fmt, ...)
    {char *s;
     FILE *hp;
     SS_psides *si;

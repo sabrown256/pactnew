@@ -15,7 +15,7 @@
  
 /* TEST - test mode */
 
-static int test(int ne, char *fmt, ...)
+static int test(int ne, const char *fmt, ...)
    {int err, ns;
     char *msg;
 

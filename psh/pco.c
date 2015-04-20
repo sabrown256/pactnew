@@ -159,7 +159,7 @@ static void
  *      - by the shell
  */
 
-static char *echo(int lg, char *fmt, ...)
+static char *echo(int lg, const char *fmt, ...)
    {char s[BFLRG];
     char *rv;
 

@@ -364,7 +364,7 @@ static u_int64_t _PD_pwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
 /* _PD_PPRINTF - do an fprintf on the parallel file */
 
-static int _PD_pprintf(FILE *stream, char *fmt, va_list a)
+static int _PD_pprintf(FILE *stream, const char *fmt, va_list a)
    {int rv;
     inti ni, nw;
     char *bf;

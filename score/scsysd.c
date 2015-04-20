@@ -309,7 +309,7 @@ static void _SC_pool_tag(char *tag, int nc, char *lbl)
  *              - client side routine
  */
 
-static void _SC_pool_log(connectdes *pc, char *lbl, char *fmt, ...)
+static void _SC_pool_log(connectdes *pc, char *lbl, const char *fmt, ...)
    {char tag[MAXLINE];
     char *txt, *msg;
 
@@ -336,7 +336,7 @@ static void _SC_pool_log(connectdes *pc, char *lbl, char *fmt, ...)
  */
 
 static void _SC_pool_printf(asyncstate *as, char *tag,
-			    connectdes *pc, char *lbl, char *fmt, ...)
+			    connectdes *pc, char *lbl, const char *fmt, ...)
    {char *txt;
 
     SC_VDSNPRINTF(TRUE, txt, fmt);

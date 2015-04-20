@@ -1566,7 +1566,7 @@ int _SC_mf_ungetc(int c, FILE *fp)
 
 /* _SC_MF_PRINTF - do an fprintf on the mapped file */
 
-int _SC_mf_printf(FILE *fp, char *fmt, va_list a)
+int _SC_mf_printf(FILE *fp, const char *fmt, va_list a)
    {int nbw;
     char s[MAXLINE];
 

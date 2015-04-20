@@ -23,7 +23,7 @@ enum {SET, GET};
 
 /* _SC_ARRAY_ERR - look for problems */
 
-static INLINE void _SC_array_err(SC_array *a, char *fmt, ...)
+static INLINE void _SC_array_err(SC_array *a, const char *fmt, ...)
     {
 
 #ifdef DEBUG
@@ -681,7 +681,7 @@ void SC_array_string_add_copy(SC_array *a, char *s)
 
 /* SC_ARRAY_STRING_ADD_VCOPY - add the a copy of the string S to the array A */
 
-void SC_array_string_add_vcopy(SC_array *a, char *fmt, ...)
+void SC_array_string_add_vcopy(SC_array *a, const char *fmt, ...)
    {char *t;
 
     SC_VDSNPRINTF(TRUE, t, fmt);

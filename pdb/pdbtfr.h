@@ -77,7 +77,7 @@ void dump_test_symbol_table(FILE *fp, hasharr *tab, int n)
 
 /* ERROR - get out on an error */
 
-void error(int n, FILE *fp, char *fmt, ...)
+void error(int n, FILE *fp, const char *fmt, ...)
    {char t[MAXLINE];
         
     SC_VA_START(fmt);

@@ -1,5 +1,5 @@
 TXT: PGS User's Manual
-MOD: 03/26/2015
+MOD: 04/20/2015
 
 <CENTER>
 <P>
@@ -480,7 +480,7 @@ in the portability of this program:<p>
 #define GETLN (*getln)
 <P>#define PRINT (*putln)
 <P>char *(*getln)(char *s, int n, FILE *fp)
-<P>int (*putln)(FILE *fp, char *fmt, ...)
+<P>int (*putln)(FILE *fp, const char *fmt, ...)
 </UL>
 
 <P>
@@ -3369,7 +3369,7 @@ This routine prints a text string, label, on the specified device and centered h
 
 <p>
 
-<I>C Binding: </I>int PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, char *fmt, ...)
+<I>C Binding: </I>int PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, const char *fmt, ...)
 <BR><I>Fortran Binding: </I>integer pgwrta(integer devid, REAL x, REAL y, integer nc, char *txt)
 <BR><I>SX Binding: </I>(pg-draw-text dev nd, cs, x y txt)
 <P>
