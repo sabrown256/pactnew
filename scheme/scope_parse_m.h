@@ -100,7 +100,7 @@ EXTERN_VAR object
 extern int
  SS_m_tokens[];
 
-SS_psides
+extern SS_psides
  *_SS_ism;
 
 /*--------------------------------------------------------------------------*/

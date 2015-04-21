@@ -80,7 +80,7 @@ Note $outf '@ err = 0'
 Note $outf ''
 
 set wexe = `which $comp`
-if (-x "$wexe") then
+if (-x "$exe") then
 
    Note $outf "source $EtcDir/env-pact.csh"
    Note $outf ''

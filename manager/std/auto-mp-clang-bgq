@@ -11,7 +11,7 @@ Group OCV {
    CC     = bgclang
    CC_Cfg = bgclang
    CXX    = bgclang++
-   LDLb  += -lnss_files -lnss_dns -lresolv
+#   LDLb  += -lnss_files -lnss_dns -lresolv
 }
 
 Group RF {

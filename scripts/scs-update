@@ -66,7 +66,7 @@ switch ($scsi[1])
 
            switch ($mode)
 
-# old way - actually had a second pull after the report was made
+# old way, need a second pull after the report is made
 # AND it does not touch files causing emacs to prompt you to re-read them
               case 0:
                    git pull $repo master >&! .log.sup
@@ -91,6 +91,14 @@ switch ($scsi[1])
               git status --porcelain -uno | sort -k 2
            else
               git status --porcelain -uno
+           endif
+
+	   if ($mode == 0) then
+
+# without this pull git status reports the local repository as
+# being ahead of the master
+              git pull $repo master >&! .log.sup
+              @ xstatus = $xstatus + $status
            endif
 
            if ($xstatus == 0) then
