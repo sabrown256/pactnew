@@ -172,7 +172,7 @@ extern int
  _SC_array_is_member(SC_array *a, const char *s),
  SC_array_free_n(void *a),
  SC_array_string_append(SC_array *out, SC_array *in),
- SC_array_sort(SC_array *a, PFIntBin pred);
+ SC_array_sort(SC_array *a, PFIntBinC pred);
 
 
 #ifdef __cplusplus

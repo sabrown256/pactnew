@@ -37,7 +37,6 @@ extern "C" {
 /*--------------------------------------------------------------------------*/
 
 typedef long (*PFKeyHash)(const void *s, int size);         /* hash */
-typedef int (*PFCmpHash)(const void *a, const void *b);     /* compare */
 
 /* new hasharr structures */
 
@@ -73,7 +72,7 @@ struct s_hasharr
     int memfl;               /* memory control flags */
     long ne;                 /* number of elements */
     PFKeyHash hash;          /* hash function */
-    PFCmpHash comp;          /* key equality comparison function */
+    PFIntBinC comp;          /* key equality comparison function */
     char *key_type;          /* type of the key used: name or address */
     haelem **table;          /* size worth of buckets of haelem pointers */
     SC_array *a;};
@@ -106,9 +105,9 @@ extern int
  SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
  SC_hasharr_next(hasharr *ha, long *pi, char **pname, char **ptype, void **po),
  SC_hasharr_clear(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
- SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFCmpHash comp),
+ SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFIntBinC comp),
  SC_hasharr_rekey(hasharr *ha, const char *method),
- SC_hasharr_sort(hasharr *ha, PFCmpHash pred);
+ SC_hasharr_sort(hasharr *ha, PFIntBinC pred);
 
 extern long
  SC_hasharr_get_n(hasharr *ha),
@@ -166,7 +165,7 @@ xxx struct s_HASHTAB
     int nelements;
     int docp;
     PFKeyHash hash;
-    PFIntBin comp;
+    PFIntBinC comp;
     char *key_type;
     hashel **table;};
 
@@ -207,7 +206,7 @@ extern char
  *SC_hashiter_value_type(hashiter *self);
 
 extern int
- SC_hash_key_type(HASHTAB *self, char *name, PFKeyHash hash, PFIntBin comp),
+ SC_hash_key_type(HASHTAB *self, char *name, PFKeyHash hash, PFIntBinC comp),
  SC_hash_key_addr(HASHTAB *self),
  SC_hash_key_name(HASHTAB *self),
  SC_hash_insert(HASHTAB *self, char *type, void *key, void *obj),

@@ -931,7 +931,7 @@ char *_SC_format_loc(char *d, int nc, SC_srcloc *loc, int sf, int tail)
  *                - list associated with the given string
  */
 
-pcons *SC_assoc_entry(pcons *alist, char *s)
+pcons *SC_assoc_entry(pcons *alist, const char *s)
    {char *t;
     pcons *pa, *c, *rv;
 
@@ -953,7 +953,7 @@ pcons *SC_assoc_entry(pcons *alist, char *s)
  *          - list associated with the given string
  */
 
-void *SC_assoc(pcons *alist, char *s)
+void *SC_assoc(pcons *alist, const char *s)
    {pcons *c;
     void *rv;
 
@@ -968,7 +968,8 @@ void *SC_assoc(pcons *alist, char *s)
 
 /* SC_ADD_ALIST - add an item to the given association list */
 
-pcons *SC_add_alist(pcons *alist, char *name, char *type, void *val)
+pcons *SC_add_alist(pcons *alist, const char *name, const char *type,
+		    void *val)
    {pcons *rv;
 
     rv = SC_mk_pcons(G_PCONS_P_S,
@@ -982,7 +983,7 @@ pcons *SC_add_alist(pcons *alist, char *name, char *type, void *val)
 
 /* SC_REM_ALIST - remove an item from the given association list */
 
-pcons *SC_rem_alist(pcons *alist, char *name)
+pcons *SC_rem_alist(pcons *alist, const char *name)
    {pcons *ths, *nxt;
     char *s;
 
@@ -1019,7 +1020,8 @@ pcons *SC_rem_alist(pcons *alist, char *name)
  *                 - add the item if necessary
  */
 
-pcons *SC_change_alist(pcons *alist, char *name, char *type, void *val)
+pcons *SC_change_alist(pcons *alist, const char *name, const char *type,
+		       void *val)
    {pcons *pc, *rv;
 
     pc = SC_assoc_entry(alist, name);
@@ -1061,8 +1063,8 @@ pcons *SC_alist_map(pcons *alist, int (*fnc)(pcons *hp, void *arg), void *arg)
 
 /* SC_MAKE_PCONS - make a complete pcons and bind the car to the arg */
 
-pcons *SC_make_pcons(char *cat, int ma, void *ca,
-		     char *cdt, int md, void *cd)
+pcons *SC_make_pcons(const char *cat, int ma, void *ca,
+		     const char *cdt, int md, void *cd)
    {pcons *cp;
 
     cp = CMAKE(pcons);
@@ -1088,7 +1090,7 @@ pcons *SC_make_pcons(char *cat, int ma, void *ca,
 
 /* SC_MK_PCONS - make a simple pcons and bind the car to the arg */
 
-pcons *SC_mk_pcons(char *cat, void *ca, char *cdt, void *cd)
+pcons *SC_mk_pcons(const char *cat, void *ca, const char *cdt, void *cd)
    {pcons *cp;
 
     cp = SC_make_pcons(cat, TRUE, ca, cdt, TRUE, cd);

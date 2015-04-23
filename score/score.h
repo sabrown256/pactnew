@@ -420,7 +420,7 @@ struct s_SC_ntree
    {int nd;
     int n_entry;
     SC_tree_node *head;
-    PFIntBin compare;};
+    PFIntBinC compare;};
 
 union u_SC_address
    {long mdiskaddr;
@@ -712,7 +712,7 @@ extern SC_contextdes
 /* SCCTL.C declarations */
 
 extern void
- *SC_assoc(pcons *alist, CONST char *s),
+ *SC_assoc(pcons *alist, const char *s),
  SC_banner(char *s),
  SC_set_banner(const char *fmt, ...),
  SC_pause(void),
@@ -752,14 +752,14 @@ extern char
  *SC_getcwd(void);
 
 extern pcons
- *SC_assoc_entry(pcons *alist, CONST char *s),
- *SC_make_pcons(CONST char *cat, int ma, void *ca,
-		CONST char *cdt, int md, void *cd),
- *SC_mk_pcons(CONST char *cat, void *ca, CONST char *cdt, void *cd),
- *SC_add_alist(pcons *alist, CONST char *name, CONST char *type, void *val),
- *SC_change_alist(pcons *alist, CONST char *name, CONST char *type, void *val),
+ *SC_assoc_entry(pcons *alist, const char *s),
+ *SC_make_pcons(const char *cat, int ma, void *ca,
+		const char *cdt, int md, void *cd),
+ *SC_mk_pcons(const char *cat, void *ca, const char *cdt, void *cd),
+ *SC_add_alist(pcons *alist, const char *name, const char *type, void *val),
+ *SC_change_alist(pcons *alist, const char *name, const char *type, void *val),
  *SC_alist_map(pcons *alist, int (*fnc)(pcons *hp, void *arg), void *arg),
- *SC_rem_alist(pcons *alist, CONST char *name),
+ *SC_rem_alist(pcons *alist, const char *name),
  *SC_copy_alist(pcons *alist),
  *SC_append_alist(pcons *alist1, pcons *alist2);
 
@@ -1322,15 +1322,15 @@ extern SC_logfile
 /* SCTREE.C declarations */
 
 extern SC_ntree
- *SC_make_ntree(int nd, int (*cmp)(void *a, void *b));
+ *SC_make_ntree(int nd, PFIntBinC cmp);
 
 extern void
  SC_rel_ntree(SC_ntree *tree),
- *SC_tree_install(void *k, void *val, SC_ntree *tree),
+ *SC_tree_install(const void *k, void *val, SC_ntree *tree),
  SC_map_tree(SC_ntree *tr, void (*f)(SC_tree_node *pn, int depth, int idp));
 
 extern SC_tree_node
- *SC_tree_lookup_key(void *k, SC_ntree *tree),
+ *SC_tree_lookup_key(const void *k, SC_ntree *tree),
  *SC_tree_lookup_n(int n, SC_ntree *tree);
 
 

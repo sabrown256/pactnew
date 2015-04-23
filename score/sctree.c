@@ -67,7 +67,7 @@ void dprn(SC_ntree *bt)
 
 /* _SC_MAKE_TREE_NODE - allocate and initialize a new tree node */
 
-static SC_tree_node *_SC_make_tree_node(void *k, void *v, int nd)
+static SC_tree_node *_SC_make_tree_node(const void *k, void *v, int nd)
    {int i;
     int *pr;
     SC_tree_node *pn, **pb;
@@ -81,7 +81,7 @@ static SC_tree_node *_SC_make_tree_node(void *k, void *v, int nd)
 
     pn->nd      = nd;
     pn->balance = BALANCED;
-    pn->key     = k;
+    pn->key     = (void *) k;
     pn->val     = v;
     pn->rank    = pr;
     pn->branch  = pb;
@@ -118,7 +118,7 @@ static void SC_rel_tree_node(SC_tree_node *pn)
  *              - or -1 for the node itself
  */
 
-static int _SC_tree_cmp(void *a, void *b)
+static int _SC_tree_cmp(const void *a, const void *b)
    {int relate;
 
     if (a < b)
@@ -135,7 +135,7 @@ static int _SC_tree_cmp(void *a, void *b)
 
 /* SC_MAKE_NTREE - allocate and initialize a new N-tree */
 
-SC_ntree *SC_make_ntree(int nd, PFIntBin cmp)
+SC_ntree *SC_make_ntree(int nd, PFIntBinC cmp)
    {SC_ntree *pt;
 
     pt = CMAKE(SC_ntree);
@@ -221,7 +221,7 @@ static void _SC_tree_rebalance(SC_tree_node *q, SC_tree_node *t,
     int dr, ds, dp;
     SC_tree_node *p, *r;
     void *k;
-    PFIntBin compare;
+    PFIntBinC compare;
 
     nd      = tree->head->nd;
     compare = tree->compare;
@@ -323,10 +323,10 @@ static void _SC_tree_rebalance(SC_tree_node *q, SC_tree_node *t,
  *                 - return a pointer to VAL
  */
 
-void *SC_tree_install(void *k, void *val, SC_ntree *tree)
+void *SC_tree_install(const void *k, void *val, SC_ntree *tree)
    {int ib, ok, nd;
     SC_tree_node *t, *s, *p, *q, **branch;
-    PFIntBin compare;
+    PFIntBinC compare;
 
     t       = tree->head;
     compare = tree->compare;
@@ -372,10 +372,10 @@ void *SC_tree_install(void *k, void *val, SC_ntree *tree)
  *                    - NULL otherwise
  */
 
-SC_tree_node *SC_tree_lookup_key(void *k, SC_ntree *tree)
+SC_tree_node *SC_tree_lookup_key(const void *k, SC_ntree *tree)
    {int ib, ok, nd;
     SC_tree_node *p, *q, **branch;
-    PFIntBin compare;
+    PFIntBinC compare;
 
     nd      = tree->head->nd;
     branch  = tree->head->branch;

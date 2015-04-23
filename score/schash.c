@@ -86,7 +86,7 @@ static int _SC_addr_comp(void *key, void *s)
 
 /* SC_HASH_KEY_TYPE - set key strategy for the hash table TAB */
 
-int SC_hash_key_type(HASHTAB *self, char *name, PFKeyHash hash, PFIntBin comp)
+int SC_hash_key_type(HASHTAB *self, char *name, PFKeyHash hash, PFIntBinC comp)
    {int ret;
 
     ret = FALSE;
@@ -112,7 +112,7 @@ int SC_hash_key_addr(HASHTAB *self)
    {int ret;
 
     ret = SC_hash_key_type(self, SC_HASH_ADDR_KEY, 
-                           (PFKeyHash) _SC_hash_addr, (PFIntBin) _SC_addr_comp);
+                           (PFKeyHash) _SC_hash_addr, (PFIntBinC) _SC_addr_comp);
 
     return(ret);}
 
@@ -125,7 +125,7 @@ int SC_hash_key_name(HASHTAB *self)
    {int ret;
 
     ret = SC_hash_key_type(self, SC_HASH_NAME_KEY, 
-                           (PFKeyHash) _SC_hash_name, (PFIntBin) strcmp);
+                           (PFKeyHash) _SC_hash_name, (PFIntBinC) strcmp);
 
     return(ret);}
 
@@ -548,7 +548,7 @@ int SC_hash_remove(HASHTAB *self, void *key)
 static int _SC_splice_out_hashel(HASHTAB *tab, void *key,
 				 hashel **prv, hashel *ths, int string)
    {int ok;
-    PFIntBin comp;
+    PFIntBinC comp;
 
     comp = tab->comp;
 
@@ -662,7 +662,7 @@ hashel *SC_lookup(void *key, HASHTAB *tab)
     long hv;
     hashel *rv, *hp, **tb;
     PFKeyHash hash;
-    PFIntBin comp;
+    PFIntBinC comp;
 
     rv = NULL;
 

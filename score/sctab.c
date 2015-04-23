@@ -557,7 +557,7 @@ haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), const void *key)
     long iht;
     haelem *rv, *hp, **tb;
     PFKeyHash hash;
-    PFCmpHash comp;
+    PFIntBinC comp;
 
     rv = NULL;
 
@@ -643,7 +643,7 @@ long SC_hasharr_get_n(hasharr *ha)
 
 /* SC_HASHARR_KEY - set the hash key method */
 
-int SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFCmpHash comp)
+int SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFIntBinC comp)
    {int ret;
 
     ret = FALSE;
@@ -672,7 +672,7 @@ int SC_hasharr_rekey(hasharr *ha, const char *method)
 	    ha->comp = _SC_addr_comp;}
         else if (strcmp(method, SC_HA_NAME_KEY) == 0)
 	   {ha->hash = _SC_hasharr_name;
-	    ha->comp = (PFCmpHash) strcmp;}
+	    ha->comp = (PFIntBinC) strcmp;}
 	else
 	   {ha->hash = NULL;
 	    ha->comp = NULL;};
@@ -697,10 +697,10 @@ int SC_hasharr_rekey(hasharr *ha, const char *method)
 
 /* SC_HASHARR_SORT - sort the array part of HA using PRED */
 
-int SC_hasharr_sort(hasharr *ha, PFCmpHash pred)
+int SC_hasharr_sort(hasharr *ha, PFIntBinC pred)
    {int ret;
 
-    ret = SC_array_sort(ha->a, (PFIntBin) pred);
+    ret = SC_array_sort(ha->a, (PFIntBinC) pred);
 
     return(ret);}
 
@@ -712,7 +712,7 @@ int SC_hasharr_sort(hasharr *ha, PFCmpHash pred)
 static int _SC_splice_out_haelem(hasharr *ha, const void *key,
 				 haelem **prv, haelem *ths)
    {int ok;
-    PFCmpHash comp;
+    PFIntBinC comp;
 
     comp = ha->comp;
 

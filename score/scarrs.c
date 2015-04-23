@@ -919,7 +919,7 @@ static void _SC_array_swap(SC_array *a, long il, long ir)
  *                - by SC_array_sort and are not repeated here
  */
 
-static int _SC_array_sort(SC_array *a, PFIntBin pred, long il, long ir)
+static int _SC_array_sort(SC_array *a, PFIntBinC pred, long il, long ir)
    {long i, ip, in;
     void *pvl, *lvl;
 
@@ -949,7 +949,7 @@ static int _SC_array_sort(SC_array *a, PFIntBin pred, long il, long ir)
 
 /* SC_ARRAY_SORT - sort A according to PRED */
 
-int SC_array_sort(SC_array *a, PFIntBin pred)
+int SC_array_sort(SC_array *a, PFIntBinC pred)
    {int rv;
     long n, nx;
 

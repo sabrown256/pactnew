@@ -186,6 +186,7 @@ typedef void (*PFVoidAPV)(void *);
 typedef void *(*PFPVoidAPV)(void *);
 typedef int (*PFIntUn)(void *a);
 typedef int (*PFIntBin)(void *a, void *b);
+typedef int (*PFIntBinC)(const void *a, const void *b);
 
 #ifdef ANSI
 # ifndef SIGNAL_HANDLER_DEFINED
