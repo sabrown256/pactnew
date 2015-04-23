@@ -738,7 +738,7 @@ extern int
  SC_isfile_text(CONST char *name),
  SC_file_path(CONST char *name, char *path, int nc, int full),
  SC_full_path(CONST char *name, char *path, int nc),
- SC_regx_match(CONST char *s, CONST char *patt),
+ SC_regx_match(const char *s, const char *patt),
  SC_remove(CONST char *s),
  SC_assoc_info(pcons *alst, ...),
  SC_assoc_info_alt(pcons *alst, ...);

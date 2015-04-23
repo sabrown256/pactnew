@@ -24,7 +24,7 @@ SC_thread_lock
 
 /* _SC_HASHARR_NAME - compute hash value for string KEY in a array of SIZE */
 
-long _SC_hasharr_name(void *key, int size)
+long _SC_hasharr_name(const void *key, int size)
    {long v;
     char *s;
 
@@ -42,12 +42,12 @@ long _SC_hasharr_name(void *key, int size)
 
 /* _SC_HASHARR_ADDR - compute hash value for pointer S in a array of SIZE */
 
-static long _SC_hasharr_addr(void *key, int size)
+static long _SC_hasharr_addr(const void *key, int size)
    {SC_address ad;
     int c;
     long a, v, r, n, i, m;
 
-    ad.memaddr = key;
+    ad.memaddr = (void *) key;
 
     a = ad.mdiskaddr >> 3;
     m = (long) size;
@@ -70,7 +70,7 @@ static long _SC_hasharr_addr(void *key, int size)
 
 /* _SC_ADDR_COMP - compare two addresses */
 
-static int _SC_addr_comp(void *key, void *s)
+static int _SC_addr_comp(const void *key, const void *s)
    {int r;
 
     r = (key != s);
@@ -85,7 +85,7 @@ static int _SC_addr_comp(void *key, void *s)
 
 /* _SC_MAKE_HAELEM - initialize and return a haelem */
 
-static haelem *_SC_make_haelem(hasharr *ha, void *key)
+static haelem *_SC_make_haelem(hasharr *ha, const void *key)
    {void *lkey;
     haelem *hp;
 
@@ -94,7 +94,7 @@ static haelem *_SC_make_haelem(hasharr *ha, void *key)
 
 /* setup the key */
        {if (HA_ADDR_KEY(ha->hash))
-	   lkey = key;
+	   lkey = (void *) key;
         else
 	   {lkey = CSTRDUP(key, ha->memfl);
 	    SC_mark(lkey, 1);};
@@ -140,14 +140,14 @@ static void _SC_free_haelem(hasharr *ha, haelem *hp)
 
 /* _SC_HAELEM_RESET - reset the contents of HP */
 
-static void _SC_haelem_reset(haelem *hp, char *type, void *obj,
+static void _SC_haelem_reset(haelem *hp, const char *type, void *obj,
 			     int64_t flags)
    {int mark, rel;
 
     mark = ((flags & 1) != 0);
     rel  = ((flags & 4) != 0);
 
-    hp->type = type;
+    hp->type = (char *) type;
 
 /* do any marking (reference counting) for the new obj */
     if (mark == FALSE)
@@ -244,7 +244,7 @@ int SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po,
 
 /* _SC_HASHARR_INIT - initialize structures in HA */
 
-static void _SC_hasharr_init(hasharr *ha, char *lm)
+static void _SC_hasharr_init(hasharr *ha, const char *lm)
    {int i, sz;
     haelem **tb;
     SC_array *a;
@@ -274,7 +274,7 @@ static void _SC_hasharr_init(hasharr *ha, char *lm)
  * #bind SC_make_hasharr fortran() scheme() python()
  */
 
-hasharr *SC_make_hasharr(int sz, int docflag, char *lm, int flags)
+hasharr *SC_make_hasharr(int sz, int docflag, const char *lm, int flags)
    {hasharr *ha;
     haelem **tb;
 
@@ -429,7 +429,8 @@ long SC_hasharr_prune(hasharr *ha,
  * #bind SC_hasharr_install fortran() scheme() python()
  */
 
-haelem *SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type,
+haelem *SC_hasharr_install(hasharr *ha, const void *key,
+			   void *obj, const char *type,
 			   int64_t flags, int lookup)
    {haelem *hp;
 
@@ -551,12 +552,12 @@ int SC_hasharr_next(hasharr *ha, long *pi,
  * #bind SC_hasharr_lookup fortran() scheme() python()
  */
 
-haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
+haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), const void *key)
    {int sz, lck;
     long iht;
     haelem *rv, *hp, **tb;
     PFKeyHash hash;
-    PFIntBin comp;
+    PFCmpHash comp;
 
     rv = NULL;
 
@@ -591,7 +592,7 @@ haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
  * #bind SC_hasharr_def_lookup fortran() scheme() python()
  */
 
-void *SC_hasharr_def_lookup(hasharr *ha ARG(,,cls), void *key)
+void *SC_hasharr_def_lookup(hasharr *ha ARG(,,cls), const void *key)
    {haelem *hp;
     void *obj;
   
@@ -642,7 +643,7 @@ long SC_hasharr_get_n(hasharr *ha)
 
 /* SC_HASHARR_KEY - set the hash key method */
 
-int SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFIntBin comp)
+int SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFCmpHash comp)
    {int ret;
 
     ret = FALSE;
@@ -660,7 +661,7 @@ int SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFIntBin comp)
 
 /* SC_HASHARR_REKEY - reset the hash key method */
 
-int SC_hasharr_rekey(hasharr *ha, char *method)
+int SC_hasharr_rekey(hasharr *ha, const char *method)
    {int ret;
 
     ret = FALSE;
@@ -671,7 +672,7 @@ int SC_hasharr_rekey(hasharr *ha, char *method)
 	    ha->comp = _SC_addr_comp;}
         else if (strcmp(method, SC_HA_NAME_KEY) == 0)
 	   {ha->hash = _SC_hasharr_name;
-	    ha->comp = (PFIntBin) strcmp;}
+	    ha->comp = (PFCmpHash) strcmp;}
 	else
 	   {ha->hash = NULL;
 	    ha->comp = NULL;};
@@ -696,10 +697,10 @@ int SC_hasharr_rekey(hasharr *ha, char *method)
 
 /* SC_HASHARR_SORT - sort the array part of HA using PRED */
 
-int SC_hasharr_sort(hasharr *ha, PFIntBin pred)
+int SC_hasharr_sort(hasharr *ha, PFCmpHash pred)
    {int ret;
 
-    ret = SC_array_sort(ha->a, pred);
+    ret = SC_array_sort(ha->a, (PFIntBin) pred);
 
     return(ret);}
 
@@ -708,10 +709,10 @@ int SC_hasharr_sort(hasharr *ha, PFIntBin pred)
 
 /* _SC_SPLICE_OUT_HAELEM - if THS matches KEY splice it out of HA */
 
-static int _SC_splice_out_haelem(hasharr *ha, void *key,
+static int _SC_splice_out_haelem(hasharr *ha, const void *key,
 				 haelem **prv, haelem *ths)
    {int ok;
-    PFIntBin comp;
+    PFCmpHash comp;
 
     comp = ha->comp;
 
@@ -731,7 +732,7 @@ static int _SC_splice_out_haelem(hasharr *ha, void *key,
  * #bind SC_hasharr_remove fortran() scheme() python()
  */
 
-int SC_hasharr_remove(hasharr *ha ARG(,,cls), void *key)
+int SC_hasharr_remove(hasharr *ha ARG(,,cls), const void *key)
    {int sz, rv;
     long i;
     haelem *hp, *curr, **tb;
@@ -778,7 +779,8 @@ int SC_hasharr_remove(hasharr *ha ARG(,,cls), void *key)
  * #bind SC_hasharr_dump fortran() scheme() python()
  */
 
-char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
+char **SC_hasharr_dump(hasharr *ha, const char *patt, const char *type,
+		       int sort)
    {int ie, ne, ns;
     char *s, **sa;
     haelem *hp, **tb;
@@ -818,7 +820,7 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
 
 /* DHASH - debugging printout of names in hash array */
 
-void dhash(hasharr *ha, char *patt, int sort)
+void dhash(hasharr *ha, const char *patt, int sort)
    {int i, n;
     char **sa;
 

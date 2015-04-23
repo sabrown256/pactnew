@@ -406,7 +406,7 @@ void SC_interrupt_handler(int sig)
  *               -   '?' matches any single character
  */
 
-int SC_regx_match(char *s, char *patt)
+int SC_regx_match(const char *s, const char *patt)
    {int rv;
 
 #if 0
@@ -416,7 +416,7 @@ int SC_regx_match(char *s, char *patt)
 #else
 
     int c;
-    char *ps, *pp;
+    const char *ps, *pp;
 
     if (patt == NULL)
        rv = TRUE;

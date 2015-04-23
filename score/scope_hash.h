@@ -14,8 +14,6 @@
 
 #include "scope_array.h"
 
-#define HAVE_HASHTAB
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,7 +36,8 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-typedef long (*PFKeyHash)(void *s, int size);         /* hash */
+typedef long (*PFKeyHash)(const void *s, int size);         /* hash */
+typedef int (*PFCmpHash)(const void *a, const void *b);     /* compare */
 
 /* new hasharr structures */
 
@@ -74,7 +73,7 @@ struct s_hasharr
     int memfl;               /* memory control flags */
     long ne;                 /* number of elements */
     PFKeyHash hash;          /* hash function */
-    PFIntBin comp;           /* key equality comparison function */
+    PFCmpHash comp;          /* key equality comparison function */
     char *key_type;          /* type of the key used: name or address */
     haelem **table;          /* size worth of buckets of haelem pointers */
     SC_array *a;};
@@ -88,28 +87,28 @@ struct s_hasharr
 /* SCTAB.C declarations */
 
 extern hasharr
- *SC_make_hasharr(int sz, int docflag, CONST char *lm, int flags);
+ *SC_make_hasharr(int sz, int docflag, const char *lm, int flags);
 
 extern haelem
- *SC_hasharr_install(hasharr *ha, CONST void *key, void *obj,
-		     CONST char *type, int64_t flags, int lookup),
- *SC_hasharr_lookup(hasharr *ha, CONST void *key);
+ *SC_hasharr_install(hasharr *ha, const void *key, void *obj,
+		     const char *type, int64_t flags, int lookup),
+ *SC_hasharr_lookup(hasharr *ha, const void *key);
 
 extern void
  SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
- *SC_hasharr_def_lookup(hasharr *ha, CONST void *key),
+ *SC_hasharr_def_lookup(hasharr *ha, const void *key),
  *SC_hasharr_get(hasharr *ha, long n);
 
 extern int
  SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po, int svr),
- SC_hasharr_remove(hasharr *ha, CONST void *key),
+ SC_hasharr_remove(hasharr *ha, const void *key),
  SC_hasharr_free_n(void *d, void *a),
  SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
  SC_hasharr_next(hasharr *ha, long *pi, char **pname, char **ptype, void **po),
  SC_hasharr_clear(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
- SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFIntBin comp),
- SC_hasharr_rekey(hasharr *ha, CONST char *method),
- SC_hasharr_sort(hasharr *ha, PFIntBin pred);
+ SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFCmpHash comp),
+ SC_hasharr_rekey(hasharr *ha, const char *method),
+ SC_hasharr_sort(hasharr *ha, PFCmpHash pred);
 
 extern long
  SC_hasharr_get_n(hasharr *ha),
@@ -118,7 +117,7 @@ extern long
 		  void *a);
 
 extern char
- **SC_hasharr_dump(hasharr *ha, CONST char *patt, CONST char *type, int sort);
+ **SC_hasharr_dump(hasharr *ha, const char *patt, const char *type, int sort);
 
 
 /* for FORTRAN hasharr API */
@@ -131,6 +130,8 @@ extern char
  *SC_get_entry(int n);
 
 /*--------------------------------------------------------------------------*/
+
+/* #define HAVE_HASHTAB */
 
 #ifdef HAVE_HASHTAB
 
@@ -153,14 +154,14 @@ typedef struct s_hashel hashel;
 typedef struct s_HASHTAB HASHTAB;
 typedef struct s_hashiter hashiter;
 
-struct s_hashel
+xxx struct s_hashel
    {char *name;
     char *type;
     void *def;
     int free;
     hashel *next;};
 
-struct s_HASHTAB
+xxx struct s_HASHTAB
    {int size;
     int nelements;
     int docp;
@@ -169,7 +170,7 @@ struct s_HASHTAB
     char *key_type;
     hashel **table;};
 
-struct s_hashiter
+xxx struct s_hashiter
    {HASHTAB *htab;
     char *match_type;
     int bucket;
