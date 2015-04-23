@@ -232,8 +232,8 @@ static void _SC_array_grow(SC_array *a, long nn, long ng)
  *                - to 1% at 1 GB
  */
 
-void _SC_init_array(SC_array *a, char *type, int bpi,
-		    void (*init)(void *a), char *name, int flags)
+void _SC_init_array(SC_array *a, const char *type, int bpi,
+		    void (*init)(void *a), const char *name, int flags)
     {int nt, nn;
      char *ty, *nm;
 
@@ -270,7 +270,7 @@ void _SC_init_array(SC_array *a, char *type, int bpi,
  */
 
 SC_array *_SC_make_array(char *type, int bpi,
-			 void (*init)(void *a), char *name, int flags)
+			 void (*init)(void *a), const char *name, int flags)
     {SC_array *a;
 
      a = CPMAKE(SC_array, flags);
@@ -284,7 +284,7 @@ SC_array *_SC_make_array(char *type, int bpi,
 
 /* _SC_STRING_ARRAY - common specialization of SC_make_array */
 
-SC_array *_SC_string_array(char *name)
+SC_array *_SC_string_array(const char *name)
    {SC_array *a;
 
     a = _SC_make_array(G_STRING_S, sizeof(char *), NULL, name, 0);
@@ -436,7 +436,7 @@ long SC_array_frac_resize(SC_array *a, double f)
  *              - if N < 0 push V onto the end of A
  */
 
-void *SC_array_set(SC_array *a, long n, void *v)
+void *SC_array_set(SC_array *a, long n, const void *v)
     {long m;
      void *rv;
 
@@ -667,7 +667,7 @@ void SC_array_string_add(SC_array *a, char *s)
 
 /* SC_ARRAY_STRING_ADD_COPY - add the a copy of the string S to the array A */
 
-void SC_array_string_add_copy(SC_array *a, char *s)
+void SC_array_string_add_copy(SC_array *a, const char *s)
    {char *t;
 
     t = CSTRSAVE(s);
@@ -777,7 +777,7 @@ char **_SC_array_string_join(SC_array **psa)
 
 /* _SC_ARRAY_IS_MEMBER - return TRUE iff S is already in the array A */
 
-int _SC_array_is_member(SC_array *a, char *s)
+int _SC_array_is_member(SC_array *a, const char *s)
    {int i, n, rv;
     char **str;
 
@@ -852,7 +852,7 @@ SC_array *SC_strings_array(int n, char **sa)
 
 /* SC_ARRAY_PUSH - push V onto A */
 
-void *SC_array_push(SC_array *a, void *v)
+void *SC_array_push(SC_array *a, const void *v)
     {void *rv;
 
      rv = SC_array_set(a, -1, v);

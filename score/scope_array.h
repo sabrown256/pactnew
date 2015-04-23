@@ -96,7 +96,8 @@ extern "C" {
 
 extern void
  SC_da_clear(SC_dynamic_array *a, int d, int bpi),
- SC_da_init(SC_dynamic_array *a, int bpi, char *tn, int d, char *name),
+ SC_da_init(SC_dynamic_array *a, int bpi, const char *tn,
+	    int d, const char *name),
  *SC_da_done(SC_dynamic_array *a),
  SC_da_free(SC_dynamic_array *a),
  SC_da_rel(SC_dynamic_array *a),
@@ -115,7 +116,7 @@ extern SC_dynamic_array
  *SC_da_copy(SC_dynamic_array *a);
 
 extern int
- _SC_is_member(SC_dynamic_array *a, char *s),
+ _SC_is_member(SC_dynamic_array *a, const char *s),
  SC_da_remember(SC_dynamic_array *a, void *item),
  SC_append_strings(SC_dynamic_array *out, SC_dynamic_array *in);
 
@@ -123,36 +124,36 @@ extern char
  **_SC_join_lines(SC_dynamic_array *strs);
 
 extern void
- _SC_da_alloc(SC_dynamic_array *a, char *name),
+ _SC_da_alloc(SC_dynamic_array *a, const char *name),
  _SC_da_extend(SC_dynamic_array *a, double pad),
  SC_remember_string(char *s, SC_dynamic_array *a),
- SC_remember_string_copy(char *s, SC_dynamic_array *a);
+ SC_remember_string_copy(const char *s, SC_dynamic_array *a);
 
 
 /* SCARRS.C declarations */
 
 extern SC_array
  *_SC_make_array(char *type, int bpi,
-		 void (*init)(void *a), char *name, int flags),
- *_SC_string_array(char *name),
+		 void (*init)(void *a), const char *name, int flags),
+ *_SC_string_array(const char *name),
  *SC_array_copy(SC_array *a),
  *SC_strings_array(int n, char **sa);
 
 extern void
- _SC_init_array(SC_array *a, char *type, int bpi,
-		void (*init)(void *a), char *name, int flags),
+ _SC_init_array(SC_array *a, const char *type, int bpi,
+		void (*init)(void *a), const char *name, int flags),
  SC_array_init(SC_array *a, long n),
  SC_free_array(SC_array *a, int (*rel)(void *a)),
  SC_array_string_add(SC_array *a, char *s),
- SC_array_string_add_copy(SC_array *a, char *s),
+ SC_array_string_add_copy(SC_array *a, const char *s),
  SC_array_string_add_vcopy(SC_array *a, const char *fmt, ...);
 
 extern void
  *SC_array_done(SC_array *a),
- *SC_array_set(SC_array *a, long n, void *v),
+ *SC_array_set(SC_array *a, long n, const void *v),
  *SC_array_get(SC_array *a, long n),
  *SC_array_array(SC_array *a),
- *SC_array_push(SC_array *a, void *v),
+ *SC_array_push(SC_array *a, const void *v),
  *SC_array_pop(SC_array *a);
 
 extern char
@@ -168,7 +169,7 @@ extern long
  SC_array_remove(SC_array *a, long n);
 
 extern int
- _SC_array_is_member(SC_array *a, char *s),
+ _SC_array_is_member(SC_array *a, const char *s),
  SC_array_free_n(void *a),
  SC_array_string_append(SC_array *out, SC_array *in),
  SC_array_sort(SC_array *a, PFIntBin pred);

@@ -37,7 +37,8 @@ void SC_da_clear(SC_dynamic_array *a, int d, int bpi)
  *            - increment of D
  */
 
-void SC_da_init(SC_dynamic_array *a, int bpi, char *tn, int d, char *name)
+void SC_da_init(SC_dynamic_array *a, int bpi, const char *tn,
+		int d, const char *name)
     {int n, flags;
      char *s, *lst;
 
@@ -140,7 +141,7 @@ void *SC_da_done(SC_dynamic_array *a)
 
 /* _SC_DA_ALLOC - do initial allocation for SC_dynamic_array A */
 
-void _SC_da_alloc(SC_dynamic_array *a, char *name)
+void _SC_da_alloc(SC_dynamic_array *a, const char *name)
     {int nx, d, bpi;
      char *lst;
 
@@ -548,7 +549,7 @@ void SC_remember_string(char *s, SC_dynamic_array *a)
 
 /* SC_REMEMBER_STRING_COPY - add the a copy of the string S to the array A */
 
-void SC_remember_string_copy(char *s, SC_dynamic_array *a)
+void SC_remember_string_copy(const char *s, SC_dynamic_array *a)
     {char *t;
 
      t = CSTRSAVE(s);
@@ -644,7 +645,7 @@ char **_SC_join_lines(SC_dynamic_array *sa)
 
 /* _SC_IS_MEMBER - return TRUE iff S is already in the array A */
 
-int _SC_is_member(SC_dynamic_array *a, char *s)
+int _SC_is_member(SC_dynamic_array *a, const char *s)
    {int i, n, rv;
     char **str;
 
