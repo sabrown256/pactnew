@@ -204,7 +204,7 @@ int SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx)
  *                  - sense defined in PDB and NBY is ignored
  */
 
-long SC_extract_field(char *in, int offs, int nbi, int nby, int *ord)
+long SC_extract_field(const char *in, int offs, int nbi, int nby, int *ord)
    {long n, bitf;
     int offy, tgt, ind;
     unsigned char mask, bpb;
@@ -269,7 +269,7 @@ long SC_extract_field(char *in, int offs, int nbi, int nby, int *ord)
  *                -   OFFS    the bit offset of the first pad
  */
 
-int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
+int SC_unpack_bits(char *out, const char *in, int ityp, int nbits,
 		   int padsz, int fpp, long ni, long offs)
    {long i, bita, fld, np;
 

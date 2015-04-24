@@ -66,7 +66,7 @@ SC_type *_SC_get_type_name(const char *name)
 
 /* _SC_TYPE_REGISTER - register a data type, NAME, with the type manager */
 
-static int _SC_type_register(char *name, SC_type *t)
+static int _SC_type_register(const char *name, SC_type *t)
    {int id;
     hasharr *ha;
     haelem *hp;
@@ -97,7 +97,7 @@ static int _SC_type_register(char *name, SC_type *t)
  *                  -    "int" also gets "int *"
  */
 
-int SC_type_register(char *name, SC_kind kind, bool ptr, int bpi, ...)
+int SC_type_register(const char *name, SC_kind kind, bool ptr, int bpi, ...)
    {int id, ok;
     void *pf;
     SC_type_method attr;
@@ -150,7 +150,7 @@ int SC_type_register(char *name, SC_kind kind, bool ptr, int bpi, ...)
 
 /* SC_TYPE_ALIAS - register an alias for a known data type */
 
-int SC_type_alias(char *name, int id)
+int SC_type_alias(const char *name, int id)
    {hasharr *ha;
     SC_type *t, *ot;
 
@@ -179,7 +179,7 @@ int SC_type_alias(char *name, int id)
  *            - return -1 if type NAME is unknown
  */
 
-int SC_type_id(char *name, int unsg)
+int SC_type_id(const char *name, int unsg)
    {int n;
     SC_type *t;
 
@@ -230,7 +230,7 @@ char *SC_type_ptr_name(int id)
  *                - return -1 if type NAME is unknown or not fixed point
  */
 
-int SC_fix_type_id(char *name, int unsg)
+int SC_fix_type_id(const char *name, int unsg)
    {int n;
     SC_type *t;
 
@@ -252,7 +252,7 @@ int SC_fix_type_id(char *name, int unsg)
  *               - return -1 if type NAME is unknown or not floating point
  */
 
-int SC_fp_type_id(char *name)
+int SC_fp_type_id(const char *name)
    {int n;
     SC_type *t;
 
@@ -271,7 +271,7 @@ int SC_fp_type_id(char *name)
  *               - return -1 if type NAME is unknown or not complex
  */
 
-int SC_cx_type_id(char *name)
+int SC_cx_type_id(const char *name)
    {int n;
     SC_type *t;
 
@@ -396,7 +396,7 @@ int SC_is_type_ptr(int id)
 
 /* SC_IS_TYPE_PTR_A - return TRUE if NAME is a pointer type */
 
-int SC_is_type_ptr_a(char *name)
+int SC_is_type_ptr_a(const char *name)
    {int rv;
 
     rv = (strchr(name, '*') != NULL);
@@ -514,7 +514,7 @@ void SC_type_free_i(int id, void *x)
 
 /* SC_TYPE_FREE_A - free an instance X of type given by NAME */
 
-void SC_type_free_a(char *name, void *x)
+void SC_type_free_a(const char *name, void *x)
    {SC_type *t;
 
     t = _SC_get_type_name(name);
@@ -563,7 +563,7 @@ char *SC_dereference(char *s)
  *             - if BASE is FALSE dereference one level of indirection only
  */
 
-int SC_deref_id(char *name, int base)
+int SC_deref_id(const char *name, int base)
    {int id;
     char bf[MAXLINE];
 
@@ -637,7 +637,7 @@ void SC_init_base_types(void)
 
 /* SC_COPY_PRIMITIVE - copy N items of type ID from S to D */
 
-size_t SC_copy_primitive(void *d, void *s, long n, int id)
+size_t SC_copy_primitive(void *d, const void *s, long n, int id)
    {size_t rv, bpi;
 
     bpi = SC_type_size_i(id);
@@ -866,7 +866,7 @@ int SC_type_match_size(SC_kind kind, int nb)
 #define SC_PRIMITIVE_ID(id) ((id - 3) >> 1)
 
 void *SC_convert_id(int did, void *d, long od, long ds,
-		    int sid, void *s, long os, long ss,
+		    int sid, const void *s, long os, long ss,
 		    long n, int flag)
    {int rv, bpi, np;
     int pdid, psid;
@@ -922,8 +922,8 @@ void *SC_convert_id(int did, void *d, long od, long ds,
  *            - return the destination pointer
  */
 
-void *SC_convert(char *dtype, void *d, long od, long sd,
-		 char *stype, void *s, long os, long ss,
+void *SC_convert(const char *dtype, void *d, long od, long sd,
+		 const char *stype, const void *s, long os, long ss,
 		 long n, int flag)
    {int sid, did;
 
@@ -945,7 +945,7 @@ void *SC_convert(char *dtype, void *d, long od, long sd,
  *         - and hence print fewer digits
  */
 
-char *SC_ntos(char *t, int nc, int id, void *s, long n, int mode)
+char *SC_ntos(char *t, int nc, int id, const void *s, long n, int mode)
    {char *rv;
     
     rv = NULL;

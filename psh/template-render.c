@@ -15,7 +15,7 @@
 static void write_str_proto(FILE *fp, type_desc *td)
    {
 
-    fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
+    fprintf(fp, "char *_SC_str_%s(char *t, int nc, const void *s, long n, int mode)\n",
             td->fncp);
 
     return;}
@@ -262,7 +262,7 @@ static void write_str_decl(FILE *fp, int ne, type_desc *tl, int src)
 
 	fprintf(fp, "   };\n");}
     else
-       {fprintf(fp, "typedef char *(*PFStrv)(char *t, int nc, void *s, long n, int mode);\n");
+       {fprintf(fp, "typedef char *(*PFStrv)(char *t, int nc, const void *s, long n, int mode);\n");
 	fprintf(fp, "\n");
 
 	fprintf(fp, "extern PFStrv\n");

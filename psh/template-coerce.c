@@ -25,7 +25,7 @@
 static void write_coerce_proto(FILE *fp, type_desc *td, type_desc *ts)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, const void *s, long os, long ss, long n)\n",
 	    td->fncp, ts->fncp);
 
     return;}
@@ -473,7 +473,7 @@ static void write_conv_def(FILE *fp, int ne, type_desc *tl, int src)
 
 	fprintf(fp, "};\n");}
     else
-       {fprintf(fp, "typedef long (*PFConv)(void *d, long od, long ds, void *s, long os, long ss, long n);\n");
+       {fprintf(fp, "typedef long (*PFConv)(void *d, long od, long ds, const void *s, long os, long ss, long n);\n");
 	fprintf(fp, "\n");
 
 	fprintf(fp, "extern PFConv\n");

@@ -22,7 +22,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-long _SC_ptr_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     void * *ps = (void * *) s;
     void * *pd = (void * *) d;
@@ -32,7 +32,7 @@ long _SC_ptr_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ptr_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     bool *ps = (bool *) s;
@@ -44,7 +44,7 @@ long _SC_ptr_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     char *ps = (char *) s;
@@ -56,7 +56,7 @@ long _SC_ptr_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     wchar_t *ps = (wchar_t *) s;
@@ -68,7 +68,7 @@ long _SC_ptr_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     int8_t *ps = (int8_t *) s;
@@ -80,7 +80,7 @@ long _SC_ptr_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     short *ps = (short *) s;
@@ -92,7 +92,7 @@ long _SC_ptr_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     int *ps = (int *) s;
@@ -104,7 +104,7 @@ long _SC_ptr_int(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     long *ps = (long *) s;
@@ -116,7 +116,7 @@ long _SC_ptr_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     long long *ps = (long long *) s;
@@ -128,7 +128,7 @@ long _SC_ptr_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     float *ps = (float *) s;
@@ -140,7 +140,7 @@ long _SC_ptr_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     double *ps = (double *) s;
@@ -152,7 +152,7 @@ long _SC_ptr_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     long double *ps = (long double *) s;
@@ -164,7 +164,7 @@ long _SC_ptr_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     float _Complex *ps = (float _Complex *) s;
@@ -176,7 +176,7 @@ long _SC_ptr_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     double _Complex *ps = (double _Complex *) s;
@@ -188,7 +188,7 @@ long _SC_ptr_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     long double _Complex *ps = (long double _Complex *) s;
@@ -200,7 +200,7 @@ long _SC_ptr_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_ptr_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ptr_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -214,7 +214,7 @@ long _SC_ptr_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd         = ad.memaddr;};
     return(i);}
 
-long _SC_bool_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -226,7 +226,7 @@ long _SC_bool_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_bool_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     bool *pd = (bool *) d;
@@ -236,7 +236,7 @@ long _SC_bool_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_bool_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     bool *pd = (bool *) d;
@@ -246,7 +246,7 @@ long _SC_bool_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     bool *pd = (bool *) d;
@@ -256,7 +256,7 @@ long _SC_bool_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     bool *pd = (bool *) d;
@@ -266,7 +266,7 @@ long _SC_bool_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     bool *pd = (bool *) d;
@@ -276,7 +276,7 @@ long _SC_bool_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     bool *pd = (bool *) d;
@@ -286,7 +286,7 @@ long _SC_bool_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     bool *pd = (bool *) d;
@@ -296,7 +296,7 @@ long _SC_bool_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     bool *pd = (bool *) d;
@@ -306,7 +306,7 @@ long _SC_bool_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     bool *pd = (bool *) d;
@@ -316,7 +316,7 @@ long _SC_bool_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     bool *pd = (bool *) d;
@@ -326,7 +326,7 @@ long _SC_bool_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     bool *pd = (bool *) d;
@@ -336,7 +336,7 @@ long _SC_bool_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     bool *pd = (bool *) d;
@@ -346,7 +346,7 @@ long _SC_bool_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     bool *pd = (bool *) d;
@@ -356,7 +356,7 @@ long _SC_bool_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     bool *pd = (bool *) d;
@@ -366,7 +366,7 @@ long _SC_bool_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_bool_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_bool_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     bool *pd = (bool *) d;
@@ -376,7 +376,7 @@ long _SC_bool_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_chr_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -388,7 +388,7 @@ long _SC_chr_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_chr_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     char *pd = (char *) d;
@@ -398,7 +398,7 @@ long _SC_chr_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     char *pd = (char *) d;
@@ -408,7 +408,7 @@ long _SC_chr_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_chr_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     char *pd = (char *) d;
@@ -418,7 +418,7 @@ long _SC_chr_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     char *pd = (char *) d;
@@ -428,7 +428,7 @@ long _SC_chr_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     char *pd = (char *) d;
@@ -438,7 +438,7 @@ long _SC_chr_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     char *pd = (char *) d;
@@ -448,7 +448,7 @@ long _SC_chr_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     char *pd = (char *) d;
@@ -458,7 +458,7 @@ long _SC_chr_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     char *pd = (char *) d;
@@ -468,7 +468,7 @@ long _SC_chr_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     char *pd = (char *) d;
@@ -478,7 +478,7 @@ long _SC_chr_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     char *pd = (char *) d;
@@ -488,7 +488,7 @@ long _SC_chr_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     char *pd = (char *) d;
@@ -498,7 +498,7 @@ long _SC_chr_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     char *pd = (char *) d;
@@ -508,7 +508,7 @@ long _SC_chr_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     char *pd = (char *) d;
@@ -518,7 +518,7 @@ long _SC_chr_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     char *pd = (char *) d;
@@ -528,7 +528,7 @@ long _SC_chr_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_chr_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_chr_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     char *pd = (char *) d;
@@ -538,7 +538,7 @@ long _SC_chr_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_wchr_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -550,7 +550,7 @@ long _SC_wchr_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_wchr_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -560,7 +560,7 @@ long _SC_wchr_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -570,7 +570,7 @@ long _SC_wchr_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -580,7 +580,7 @@ long _SC_wchr_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_wchr_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -590,7 +590,7 @@ long _SC_wchr_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -600,7 +600,7 @@ long _SC_wchr_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -610,7 +610,7 @@ long _SC_wchr_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -620,7 +620,7 @@ long _SC_wchr_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -630,7 +630,7 @@ long _SC_wchr_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -640,7 +640,7 @@ long _SC_wchr_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -650,7 +650,7 @@ long _SC_wchr_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -660,7 +660,7 @@ long _SC_wchr_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -670,7 +670,7 @@ long _SC_wchr_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -680,7 +680,7 @@ long _SC_wchr_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -690,7 +690,7 @@ long _SC_wchr_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_wchr_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_wchr_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     wchar_t *pd = (wchar_t *) d;
@@ -700,7 +700,7 @@ long _SC_wchr_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_int8_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -712,7 +712,7 @@ long _SC_int8_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_int8_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     int8_t *pd = (int8_t *) d;
@@ -722,7 +722,7 @@ long _SC_int8_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     int8_t *pd = (int8_t *) d;
@@ -732,7 +732,7 @@ long _SC_int8_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     int8_t *pd = (int8_t *) d;
@@ -742,7 +742,7 @@ long _SC_int8_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     int8_t *pd = (int8_t *) d;
@@ -752,7 +752,7 @@ long _SC_int8_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_int8_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     int8_t *pd = (int8_t *) d;
@@ -762,7 +762,7 @@ long _SC_int8_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     int8_t *pd = (int8_t *) d;
@@ -772,7 +772,7 @@ long _SC_int8_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     int8_t *pd = (int8_t *) d;
@@ -782,7 +782,7 @@ long _SC_int8_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     int8_t *pd = (int8_t *) d;
@@ -792,7 +792,7 @@ long _SC_int8_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     int8_t *pd = (int8_t *) d;
@@ -802,7 +802,7 @@ long _SC_int8_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     int8_t *pd = (int8_t *) d;
@@ -812,7 +812,7 @@ long _SC_int8_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     int8_t *pd = (int8_t *) d;
@@ -822,7 +822,7 @@ long _SC_int8_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     int8_t *pd = (int8_t *) d;
@@ -832,7 +832,7 @@ long _SC_int8_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     int8_t *pd = (int8_t *) d;
@@ -842,7 +842,7 @@ long _SC_int8_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     int8_t *pd = (int8_t *) d;
@@ -852,7 +852,7 @@ long _SC_int8_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int8_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int8_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     int8_t *pd = (int8_t *) d;
@@ -862,7 +862,7 @@ long _SC_int8_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_shrt_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -874,7 +874,7 @@ long _SC_shrt_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_shrt_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     short *pd = (short *) d;
@@ -884,7 +884,7 @@ long _SC_shrt_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     short *pd = (short *) d;
@@ -894,7 +894,7 @@ long _SC_shrt_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     short *pd = (short *) d;
@@ -904,7 +904,7 @@ long _SC_shrt_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     short *pd = (short *) d;
@@ -914,7 +914,7 @@ long _SC_shrt_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     short *pd = (short *) d;
@@ -924,7 +924,7 @@ long _SC_shrt_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_shrt_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     short *pd = (short *) d;
@@ -934,7 +934,7 @@ long _SC_shrt_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     short *pd = (short *) d;
@@ -944,7 +944,7 @@ long _SC_shrt_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     short *pd = (short *) d;
@@ -954,7 +954,7 @@ long _SC_shrt_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     short *pd = (short *) d;
@@ -964,7 +964,7 @@ long _SC_shrt_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     short *pd = (short *) d;
@@ -974,7 +974,7 @@ long _SC_shrt_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     short *pd = (short *) d;
@@ -984,7 +984,7 @@ long _SC_shrt_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     short *pd = (short *) d;
@@ -994,7 +994,7 @@ long _SC_shrt_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     short *pd = (short *) d;
@@ -1004,7 +1004,7 @@ long _SC_shrt_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     short *pd = (short *) d;
@@ -1014,7 +1014,7 @@ long _SC_shrt_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_shrt_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_shrt_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     short *pd = (short *) d;
@@ -1024,7 +1024,7 @@ long _SC_shrt_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_int_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -1036,7 +1036,7 @@ long _SC_int_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_int_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     int *pd = (int *) d;
@@ -1046,7 +1046,7 @@ long _SC_int_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     int *pd = (int *) d;
@@ -1056,7 +1056,7 @@ long _SC_int_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     int *pd = (int *) d;
@@ -1066,7 +1066,7 @@ long _SC_int_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     int *pd = (int *) d;
@@ -1076,7 +1076,7 @@ long _SC_int_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     int *pd = (int *) d;
@@ -1086,7 +1086,7 @@ long _SC_int_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     int *pd = (int *) d;
@@ -1096,7 +1096,7 @@ long _SC_int_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_int_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     int *pd = (int *) d;
@@ -1106,7 +1106,7 @@ long _SC_int_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     int *pd = (int *) d;
@@ -1116,7 +1116,7 @@ long _SC_int_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     int *pd = (int *) d;
@@ -1126,7 +1126,7 @@ long _SC_int_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     int *pd = (int *) d;
@@ -1136,7 +1136,7 @@ long _SC_int_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     int *pd = (int *) d;
@@ -1146,7 +1146,7 @@ long _SC_int_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     int *pd = (int *) d;
@@ -1156,7 +1156,7 @@ long _SC_int_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     int *pd = (int *) d;
@@ -1166,7 +1166,7 @@ long _SC_int_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     int *pd = (int *) d;
@@ -1176,7 +1176,7 @@ long _SC_int_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_int_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_int_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     int *pd = (int *) d;
@@ -1186,7 +1186,7 @@ long _SC_int_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_lng_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -1198,7 +1198,7 @@ long _SC_lng_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_lng_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     long *pd = (long *) d;
@@ -1208,7 +1208,7 @@ long _SC_lng_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     long *pd = (long *) d;
@@ -1218,7 +1218,7 @@ long _SC_lng_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     long *pd = (long *) d;
@@ -1228,7 +1228,7 @@ long _SC_lng_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     long *pd = (long *) d;
@@ -1238,7 +1238,7 @@ long _SC_lng_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     long *pd = (long *) d;
@@ -1248,7 +1248,7 @@ long _SC_lng_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     long *pd = (long *) d;
@@ -1258,7 +1258,7 @@ long _SC_lng_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     long *pd = (long *) d;
@@ -1268,7 +1268,7 @@ long _SC_lng_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_lng_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     long *pd = (long *) d;
@@ -1278,7 +1278,7 @@ long _SC_lng_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     long *pd = (long *) d;
@@ -1288,7 +1288,7 @@ long _SC_lng_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     long *pd = (long *) d;
@@ -1298,7 +1298,7 @@ long _SC_lng_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     long *pd = (long *) d;
@@ -1308,7 +1308,7 @@ long _SC_lng_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     long *pd = (long *) d;
@@ -1318,7 +1318,7 @@ long _SC_lng_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     long *pd = (long *) d;
@@ -1328,7 +1328,7 @@ long _SC_lng_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     long *pd = (long *) d;
@@ -1338,7 +1338,7 @@ long _SC_lng_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_lng_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_lng_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     long *pd = (long *) d;
@@ -1348,7 +1348,7 @@ long _SC_lng_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_ll_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -1360,7 +1360,7 @@ long _SC_ll_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_ll_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     long long *pd = (long long *) d;
@@ -1370,7 +1370,7 @@ long _SC_ll_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     long long *pd = (long long *) d;
@@ -1380,7 +1380,7 @@ long _SC_ll_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     long long *pd = (long long *) d;
@@ -1390,7 +1390,7 @@ long _SC_ll_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     long long *pd = (long long *) d;
@@ -1400,7 +1400,7 @@ long _SC_ll_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     long long *pd = (long long *) d;
@@ -1410,7 +1410,7 @@ long _SC_ll_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     long long *pd = (long long *) d;
@@ -1420,7 +1420,7 @@ long _SC_ll_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     long long *pd = (long long *) d;
@@ -1430,7 +1430,7 @@ long _SC_ll_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     long long *pd = (long long *) d;
@@ -1440,7 +1440,7 @@ long _SC_ll_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_ll_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     long long *pd = (long long *) d;
@@ -1450,7 +1450,7 @@ long _SC_ll_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     long long *pd = (long long *) d;
@@ -1460,7 +1460,7 @@ long _SC_ll_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     long long *pd = (long long *) d;
@@ -1470,7 +1470,7 @@ long _SC_ll_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     long long *pd = (long long *) d;
@@ -1480,7 +1480,7 @@ long _SC_ll_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     long long *pd = (long long *) d;
@@ -1490,7 +1490,7 @@ long _SC_ll_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     long long *pd = (long long *) d;
@@ -1500,7 +1500,7 @@ long _SC_ll_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ll_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ll_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     long long *pd = (long long *) d;
@@ -1510,7 +1510,7 @@ long _SC_ll_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_flt_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -1522,7 +1522,7 @@ long _SC_flt_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_flt_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     float *pd = (float *) d;
@@ -1532,7 +1532,7 @@ long _SC_flt_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     float *pd = (float *) d;
@@ -1542,7 +1542,7 @@ long _SC_flt_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     float *pd = (float *) d;
@@ -1552,7 +1552,7 @@ long _SC_flt_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     float *pd = (float *) d;
@@ -1562,7 +1562,7 @@ long _SC_flt_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     float *pd = (float *) d;
@@ -1572,7 +1572,7 @@ long _SC_flt_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     float *pd = (float *) d;
@@ -1582,7 +1582,7 @@ long _SC_flt_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     float *pd = (float *) d;
@@ -1592,7 +1592,7 @@ long _SC_flt_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     float *pd = (float *) d;
@@ -1602,7 +1602,7 @@ long _SC_flt_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     float *pd = (float *) d;
@@ -1612,7 +1612,7 @@ long _SC_flt_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_flt_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     float *pd = (float *) d;
@@ -1622,7 +1622,7 @@ long _SC_flt_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     float *pd = (float *) d;
@@ -1632,7 +1632,7 @@ long _SC_flt_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_flt_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     float *pd = (float *) d;
@@ -1642,7 +1642,7 @@ long _SC_flt_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = CREALL(*ps);
     return(i);}
 
-long _SC_flt_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     float *pd = (float *) d;
@@ -1652,7 +1652,7 @@ long _SC_flt_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = CREALL(*ps);
     return(i);}
 
-long _SC_flt_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     float *pd = (float *) d;
@@ -1662,7 +1662,7 @@ long _SC_flt_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = CREALL(*ps);
     return(i);}
 
-long _SC_flt_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_flt_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     float *pd = (float *) d;
@@ -1672,7 +1672,7 @@ long _SC_flt_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_dbl_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -1684,7 +1684,7 @@ long _SC_dbl_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_dbl_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     double *pd = (double *) d;
@@ -1694,7 +1694,7 @@ long _SC_dbl_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     double *pd = (double *) d;
@@ -1704,7 +1704,7 @@ long _SC_dbl_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     double *pd = (double *) d;
@@ -1714,7 +1714,7 @@ long _SC_dbl_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     double *pd = (double *) d;
@@ -1724,7 +1724,7 @@ long _SC_dbl_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     double *pd = (double *) d;
@@ -1734,7 +1734,7 @@ long _SC_dbl_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     double *pd = (double *) d;
@@ -1744,7 +1744,7 @@ long _SC_dbl_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     double *pd = (double *) d;
@@ -1754,7 +1754,7 @@ long _SC_dbl_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     double *pd = (double *) d;
@@ -1764,7 +1764,7 @@ long _SC_dbl_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     double *pd = (double *) d;
@@ -1774,7 +1774,7 @@ long _SC_dbl_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     double *pd = (double *) d;
@@ -1784,7 +1784,7 @@ long _SC_dbl_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_dbl_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     double *pd = (double *) d;
@@ -1794,7 +1794,7 @@ long _SC_dbl_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dbl_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     double *pd = (double *) d;
@@ -1804,7 +1804,7 @@ long _SC_dbl_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = CREALL(*ps);
     return(i);}
 
-long _SC_dbl_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     double *pd = (double *) d;
@@ -1814,7 +1814,7 @@ long _SC_dbl_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = CREALL(*ps);
     return(i);}
 
-long _SC_dbl_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     double *pd = (double *) d;
@@ -1824,7 +1824,7 @@ long _SC_dbl_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = CREALL(*ps);
     return(i);}
 
-long _SC_dbl_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dbl_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     double *pd = (double *) d;
@@ -1834,7 +1834,7 @@ long _SC_dbl_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_ldbl_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -1846,7 +1846,7 @@ long _SC_ldbl_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_ldbl_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     long double *pd = (long double *) d;
@@ -1856,7 +1856,7 @@ long _SC_ldbl_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     long double *pd = (long double *) d;
@@ -1866,7 +1866,7 @@ long _SC_ldbl_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     long double *pd = (long double *) d;
@@ -1876,7 +1876,7 @@ long _SC_ldbl_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     long double *pd = (long double *) d;
@@ -1886,7 +1886,7 @@ long _SC_ldbl_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     long double *pd = (long double *) d;
@@ -1896,7 +1896,7 @@ long _SC_ldbl_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     long double *pd = (long double *) d;
@@ -1906,7 +1906,7 @@ long _SC_ldbl_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     long double *pd = (long double *) d;
@@ -1916,7 +1916,7 @@ long _SC_ldbl_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     long double *pd = (long double *) d;
@@ -1926,7 +1926,7 @@ long _SC_ldbl_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     long double *pd = (long double *) d;
@@ -1936,7 +1936,7 @@ long _SC_ldbl_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     long double *pd = (long double *) d;
@@ -1946,7 +1946,7 @@ long _SC_ldbl_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldbl_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     long double *pd = (long double *) d;
@@ -1956,7 +1956,7 @@ long _SC_ldbl_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_ldbl_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     long double *pd = (long double *) d;
@@ -1966,7 +1966,7 @@ long _SC_ldbl_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = CREALL(*ps);
     return(i);}
 
-long _SC_ldbl_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     long double *pd = (long double *) d;
@@ -1976,7 +1976,7 @@ long _SC_ldbl_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = CREALL(*ps);
     return(i);}
 
-long _SC_ldbl_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     long double *pd = (long double *) d;
@@ -1986,7 +1986,7 @@ long _SC_ldbl_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = CREALL(*ps);
     return(i);}
 
-long _SC_ldbl_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldbl_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     long double *pd = (long double *) d;
@@ -1996,7 +1996,7 @@ long _SC_ldbl_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = ps->s;
     return(i);}
 
-long _SC_fcx_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -2008,7 +2008,7 @@ long _SC_fcx_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_fcx_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2018,7 +2018,7 @@ long _SC_fcx_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2028,7 +2028,7 @@ long _SC_fcx_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2038,7 +2038,7 @@ long _SC_fcx_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2048,7 +2048,7 @@ long _SC_fcx_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2058,7 +2058,7 @@ long _SC_fcx_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2068,7 +2068,7 @@ long _SC_fcx_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2078,7 +2078,7 @@ long _SC_fcx_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2088,7 +2088,7 @@ long _SC_fcx_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2098,7 +2098,7 @@ long _SC_fcx_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2108,7 +2108,7 @@ long _SC_fcx_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2118,7 +2118,7 @@ long _SC_fcx_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_fcx_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2128,7 +2128,7 @@ long _SC_fcx_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_fcx_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2149,7 +2149,7 @@ long _SC_fcx_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = sr + si*I;};
     return(i);}
 
-long _SC_fcx_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2170,7 +2170,7 @@ long _SC_fcx_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = sr + si*I;};
     return(i);}
 
-long _SC_fcx_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_fcx_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     float _Complex *pd = (float _Complex *) d;
@@ -2184,7 +2184,7 @@ long _SC_fcx_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = z;};
     return(i);}
 
-long _SC_dcx_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -2196,7 +2196,7 @@ long _SC_dcx_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_dcx_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2206,7 +2206,7 @@ long _SC_dcx_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2216,7 +2216,7 @@ long _SC_dcx_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2226,7 +2226,7 @@ long _SC_dcx_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2236,7 +2236,7 @@ long _SC_dcx_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2246,7 +2246,7 @@ long _SC_dcx_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2256,7 +2256,7 @@ long _SC_dcx_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2266,7 +2266,7 @@ long _SC_dcx_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2276,7 +2276,7 @@ long _SC_dcx_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2286,7 +2286,7 @@ long _SC_dcx_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2296,7 +2296,7 @@ long _SC_dcx_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2306,7 +2306,7 @@ long _SC_dcx_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2316,7 +2316,7 @@ long _SC_dcx_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_dcx_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2326,7 +2326,7 @@ long _SC_dcx_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_dcx_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2347,7 +2347,7 @@ long _SC_dcx_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = sr + si*I;};
     return(i);}
 
-long _SC_dcx_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_dcx_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     double _Complex *pd = (double _Complex *) d;
@@ -2361,7 +2361,7 @@ long _SC_dcx_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = z;};
     return(i);}
 
-long _SC_ldcx_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     void **ps = (void **) s;
@@ -2373,7 +2373,7 @@ long _SC_ldcx_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = ad.diskaddr;};
     return(i);}
 
-long _SC_ldcx_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2383,7 +2383,7 @@ long _SC_ldcx_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2393,7 +2393,7 @@ long _SC_ldcx_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2403,7 +2403,7 @@ long _SC_ldcx_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2413,7 +2413,7 @@ long _SC_ldcx_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2423,7 +2423,7 @@ long _SC_ldcx_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2433,7 +2433,7 @@ long _SC_ldcx_int(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2443,7 +2443,7 @@ long _SC_ldcx_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2453,7 +2453,7 @@ long _SC_ldcx_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2463,7 +2463,7 @@ long _SC_ldcx_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2473,7 +2473,7 @@ long _SC_ldcx_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2483,7 +2483,7 @@ long _SC_ldcx_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2493,7 +2493,7 @@ long _SC_ldcx_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2503,7 +2503,7 @@ long _SC_ldcx_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
 
-long _SC_ldcx_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2513,7 +2513,7 @@ long _SC_ldcx_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
         *pd = *ps;
     return(i);}
  
-long _SC_ldcx_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_ldcx_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     long double _Complex *pd = (long double _Complex *) d;
@@ -2527,7 +2527,7 @@ long _SC_ldcx_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = z;};
     return(i);}
 
-long _SC_qut_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_ptr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     SC_address ad;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2541,7 +2541,7 @@ long _SC_qut_ptr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd        = q;};
     return(i);}
 
-long _SC_qut_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_bool(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     bool *ps = (bool *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2553,7 +2553,7 @@ long _SC_qut_bool(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_chr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     char *ps = (char *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2565,7 +2565,7 @@ long _SC_qut_chr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_wchr(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     wchar_t *ps = (wchar_t *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2577,7 +2577,7 @@ long _SC_qut_wchr(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_int8(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int8_t *ps = (int8_t *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2589,7 +2589,7 @@ long _SC_qut_int8(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_shrt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     short *ps = (short *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2601,7 +2601,7 @@ long _SC_qut_shrt(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_int(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_int(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     int *ps = (int *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2613,7 +2613,7 @@ long _SC_qut_int(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_lng(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long *ps = (long *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2625,7 +2625,7 @@ long _SC_qut_lng(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_ll(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long long *ps = (long long *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2637,7 +2637,7 @@ long _SC_qut_ll(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_flt(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float *ps = (float *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2649,7 +2649,7 @@ long _SC_qut_flt(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_dbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double *ps = (double *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2661,7 +2661,7 @@ long _SC_qut_dbl(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_ldbl(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double *ps = (long double *) s;
     quaternion q = {0.0, 0.0, 0.0, 0.0};
@@ -2673,7 +2673,7 @@ long _SC_qut_ldbl(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_fcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     float _Complex *ps = (float _Complex *) s;
     long double _Complex z;
@@ -2688,7 +2688,7 @@ long _SC_qut_fcx(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_dcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     double _Complex *ps = (double _Complex *) s;
     long double _Complex z;
@@ -2703,7 +2703,7 @@ long _SC_qut_dcx(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_ldcx(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     long double _Complex *ps = (long double _Complex *) s;
     long double _Complex z;
@@ -2718,7 +2718,7 @@ long _SC_qut_ldcx(void *d, long od, long ds, void *s, long os, long ss, long n)
          *pd = q;};
     return(i);}
 
-long _SC_qut_qut(void *d, long od, long ds, void *s, long os, long ss, long n)
+long _SC_qut_qut(void *d, long od, long ds, const void *s, long os, long ss, long n)
    {long i;
     quaternion *ps = (quaternion *) s;
     quaternion *pd = (quaternion *) d;
@@ -3027,7 +3027,7 @@ PFConv
 
 /*--------------------------------------------------------------------------*/
 
-char *_SC_str_ptr(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_ptr(char *t, int nc, const void *s, long n, int mode)
    {int nld, nb;
     char *fmt;
     void * *pv = (void * *) s;
@@ -3041,7 +3041,7 @@ char *_SC_str_ptr(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_bool(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_bool(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     bool *pv = (bool *) s;
@@ -3055,7 +3055,7 @@ char *_SC_str_bool(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_chr(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_chr(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3069,7 +3069,7 @@ char *_SC_str_chr(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_wchr(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_wchr(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3083,7 +3083,7 @@ char *_SC_str_wchr(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_int8(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_int8(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3097,7 +3097,7 @@ char *_SC_str_int8(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_shrt(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_shrt(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3111,7 +3111,7 @@ char *_SC_str_shrt(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_int(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_int(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3125,7 +3125,7 @@ char *_SC_str_int(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_lng(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_lng(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3139,7 +3139,7 @@ char *_SC_str_lng(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_ll(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_ll(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3153,7 +3153,7 @@ char *_SC_str_ll(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_flt(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_flt(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3167,7 +3167,7 @@ char *_SC_str_flt(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_dbl(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_dbl(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3181,7 +3181,7 @@ char *_SC_str_dbl(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_ldbl(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_ldbl(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     static int nld = 0;
@@ -3195,7 +3195,7 @@ char *_SC_str_ldbl(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_fcx(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_fcx(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     float _Complex z;
@@ -3210,7 +3210,7 @@ char *_SC_str_fcx(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_dcx(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_dcx(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     double _Complex z;
@@ -3225,7 +3225,7 @@ char *_SC_str_dcx(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_ldcx(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_ldcx(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     long double _Complex z;
@@ -3240,7 +3240,7 @@ char *_SC_str_ldcx(char *t, int nc, void *s, long n, int mode)
        t = NULL;
     return(t);}
 
-char *_SC_str_qut(char *t, int nc, void *s, long n, int mode)
+char *_SC_str_qut(char *t, int nc, const void *s, long n, int mode)
    {int nb;
     char *fmt;
     quaternion q;
