@@ -75,13 +75,13 @@ static int _SC_free_std(void *p, int zsp)
 /* _SC_ARRLEN_STD - use the C std library free */
 
 
-static int64_t _SC_arrlen_std(void *p)
+static int64_t _SC_arrlen_std(const void *p)
    {int64_t rv;
 
     rv = -1;
 
 #if defined(LINUX) || defined(CYGWIN)
-    rv = malloc_usable_size(p);
+    rv = malloc_usable_size((void *) p);
 #endif
 
     return(rv);}
@@ -190,7 +190,7 @@ static int _SC_free_chk(void *p, int zsp)
  *                - part of a usable API for memory debugging
  */
 
-static int64_t _SC_arrlen_chk(void *p)
+static int64_t _SC_arrlen_chk(const void *p)
    {int64_t rv;
 
     if (p == _SC_ms.trap_ptr)
@@ -315,7 +315,7 @@ void SC_untrap_pointer(void *p)
 
 /* SC_COPY_ITEM - copy a bit of memory */
 
-void *SC_copy_item(void *in)
+void *SC_copy_item(const void *in)
    {int len;
     void *out;
 
@@ -342,7 +342,7 @@ void *SC_copy_item(void *in)
 
 /* _SC_BLOCK_NAME - return the name associated with the object P */
 
-char *_SC_block_name(mem_descriptor *desc)
+char *_SC_block_name(const mem_descriptor *desc)
    {char *rv;
     static char name[MAXLINE];
 
@@ -363,7 +363,8 @@ char *_SC_block_name(mem_descriptor *desc)
  *                      - memory block
  */
 
-void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
+void _SC_print_block_info(FILE *fp, SC_heap_des *ph,
+			  const void *ptr, int flag)
    {int j, nc, nr, nf, acc;
     long nb;
     char bf[MAXLINE], c;
@@ -438,7 +439,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
  * #bind SC_mem_info fortran() python()
  */
 
-int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
+int SC_mem_info(const void *p, long *pl, int *pt, int *pr, char **pn)
    {int rv, ty, rf;
     long ln;
     char *nm;
@@ -490,7 +491,7 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
  * #bind SC_reg_mem fortran()
  */
 
-int SC_reg_mem(void *p, long length, char *name)
+int SC_reg_mem(const void *p, long length, const char *name)
    {int rv;
     SC_heap_des *ph;
     mem_descriptor *desc;
@@ -575,7 +576,7 @@ void SC_free_reg_mem_table(void)
 
 /* SC_MEM_LOOKUP - given a pointer return the name of the block */
 
-char *SC_mem_lookup(void *p)
+char *SC_mem_lookup(const void *p)
    {int i, n;
     char *name;
     void *ps;
@@ -752,7 +753,7 @@ int SC_mem_trace(void)
  * #bind SC_is_score_ptr fortran() python()
  */
 
-int SC_is_score_ptr(void *p)
+int SC_is_score_ptr(const void *p)
    {int ok;
     mem_header *space;
     mem_descriptor *desc;
@@ -777,7 +778,7 @@ int SC_is_score_ptr(void *p)
  * #bind SC_arrlen fortran() python()
  */
 
-long SC_arrlen(void *p)
+long SC_arrlen(const void *p)
    {long rv;
 
     if (SC_gs.mm.arrlen != NULL)
@@ -885,7 +886,7 @@ void *SC_mem_attrs(void *p, int attr)
  *                 - a single reference
  */
 
-int SC_safe_to_free(void *p)
+int SC_safe_to_free(const void *p)
    {int rc, ok;
 
     rc = SC_ref_count(p);
@@ -898,7 +899,7 @@ int SC_safe_to_free(void *p)
 
 /* SC_REF_COUNT - return the reference count of the given object */
 
-int SC_ref_count(void *p)
+int SC_ref_count(const void *p)
    {int n;
     mem_descriptor *desc;
     mem_inf *info;
@@ -916,7 +917,7 @@ int SC_ref_count(void *p)
 
 /* SC_ARRTYPE - return the type index of the object */
 
-int SC_arrtype(void *p, int type)
+int SC_arrtype(const void *p, int type)
    {int n;
     mem_descriptor *desc;
     mem_inf *info;
@@ -937,7 +938,7 @@ int SC_arrtype(void *p, int type)
 
 /* SC_ARRNAME - return the name associated with the object P */
 
-char *SC_arrname(void *p)
+char *SC_arrname(const void *p)
    {char *rv;
     mem_descriptor *desc;
 

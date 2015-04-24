@@ -340,7 +340,7 @@ extern char
 /* SCEXE.C declarations */
 
 extern char
- *_SC_format_loc(char *d, int nc, SC_srcloc *loc, int sf, int tail);
+ *_SC_format_loc(char *d, int nc, const SC_srcloc *loc, int sf, int tail);
 
 
 /* SCFIS.C declarations */

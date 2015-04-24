@@ -260,8 +260,8 @@ void SC_configure_mm(long mxl, long mxm, long bsz, double r)
  *                  - a functioning active memory block
  */
 
-void _SC_assign_block(SC_heap_des *ph, mem_header *space,
-		      long nb, char *func, char *file, int line)
+void _SC_assign_block(SC_heap_des *ph, mem_header *space, long nb,
+		      const char *func, const char *file, int line)
    {mem_descriptor *desc;
     mem_header *prev, *next, *lb;
     mem_inf *info;
@@ -437,7 +437,7 @@ SC_heap_des *_SC_tid_mm(void)
  *                   - points to space allocated by SCORE
  */
 
-int SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds)
+int SC_is_score_space(const void *p, mem_header **psp, mem_descriptor **pds)
    {int ok;
     mem_header *space;
     mem_descriptor *desc;
@@ -465,7 +465,7 @@ int SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds)
  *                  - points to space allocated by SCORE which is free
  */
 
-int SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds)
+int SC_is_free_space(const void *p, mem_header **psp, mem_descriptor **pds)
    {int ok;
     mem_header *space;
     mem_descriptor *desc;
@@ -493,7 +493,7 @@ int SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds)
  *                    - points to space allocated by SCORE which is active
  */
 
-int SC_is_active_space(void *p, mem_header **psp, mem_descriptor **pds)
+int SC_is_active_space(const void *p, mem_header **psp, mem_descriptor **pds)
    {int ok;
     mem_header *space;
     mem_descriptor *desc;

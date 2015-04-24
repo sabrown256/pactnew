@@ -676,7 +676,7 @@ int _SC_free_wl(void *p, int zsp)
  *               - return -1L on error
  */
 
-int64_t _SC_arrlen_wl(void *p)
+int64_t _SC_arrlen_wl(const void *p)
    {long nb, rv;
     mem_descriptor *desc;
 

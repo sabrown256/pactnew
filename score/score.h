@@ -624,7 +624,7 @@ struct s_SC_mem_fnc
     void *(*alloc)(long ni, long bpi, char *name, int na, int zsp);
     void *(*realloc)(void *p, long ni, long bpi, int na, int zsp);
     int (*free)(void *p, int zsp);
-    int64_t (*arrlen)(void *p);
+    int64_t (*arrlen)(const void *p);
 
     void *(*alloc_n)(long ni, long bpi, void *a);
     void *(*realloc_n)(void *p, long ni, long bpi, void *a);
@@ -1007,38 +1007,38 @@ extern void
  *SC_permanent(void *p),
  *SC_mem_attrs(void *p, int attr),
  SC_untrap_pointer(void *p),
- *SC_copy_item(void *in),
+ *SC_copy_item(const void *in),
  SC_free_reg_mem_table(void);
 
 extern char
- *SC_arrname(void *p);
+ *SC_arrname(const void *p);
 
 extern int
- SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn),
+ SC_mem_info(const void *p, long *pl, int *pt, int *pr, char **pn),
  SC_mem_trace(void),
- SC_reg_mem(void *p, long length, CONST char *name),
+ SC_reg_mem(const void *p, long length, const char *name),
  SC_dereg_mem(void *p),
- SC_is_score_ptr(void *p),
+ SC_is_score_ptr(const void *p),
  SC_mark(void *p, int n),
  SC_set_count(void *p, int n),
- SC_ref_count(void *p),
- SC_safe_to_free(void *p),
- SC_arrtype(void *p, int type),
+ SC_ref_count(const void *p),
+ SC_safe_to_free(const void *p),
+ SC_arrtype(const void *p, int type),
  SC_set_arrtype(void *p, int type);
 
 extern long
  SC_mem_chk(int typ),
- SC_arrlen(void *p);
+ SC_arrlen(const void *p);
 
 extern char
- *SC_mem_lookup(void *p);
+ *SC_mem_lookup(const void *p);
 
 
 /* SCMEMDB.C declarations */
 
 extern void
  *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb),
- SC_mem_print(void *p);
+ SC_mem_print(const void *p);
 
 extern char
  *SC_mem_list(int flag, int show);
@@ -1046,11 +1046,11 @@ extern char
 extern int
  SC_mem_corrupt(int flag),
  SC_mem_map(FILE *fp, int flag),
- SC_mem_ss(CONST char *base, int flag),
- SC_mem_neighbor(void *p, int flag, void *b, void *a);
+ SC_mem_ss(const char *base, int flag),
+ SC_mem_neighbor(const void *p, int flag, void *b, void *a);
 
 extern long
- SC_mem_monitor(int old, int lev, CONST char *id, char *msg),
+ SC_mem_monitor(int old, int lev, const char *id, char *msg),
  SC_mem_object_trace(long nb, int type,
 		     void (*f)(char *name, char *addr, long length,
 			       int count, int type));

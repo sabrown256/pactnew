@@ -892,7 +892,7 @@ void SC_save_argv_env(int argc, char **argv, char **env)
 
 /* _SC_FORMAT_LOC - format the LOC info in D */
 
-char *_SC_format_loc(char *d, int nc, SC_srcloc *loc, int sf, int tail)
+char *_SC_format_loc(char *d, int nc, const SC_srcloc *loc, int sf, int tail)
    {int filep;
     char t[MAXLINE];
     char *p, *fnm;

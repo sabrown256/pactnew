@@ -296,8 +296,8 @@ extern SC_heap_des
 
 extern void
  _SC_mem_stats_acc(SC_heap_des *ph, int64_t a, int64_t f),
- _SC_assign_block(SC_heap_des *ph, mem_header *space,
-		  long nb, char *func, char *file, int line),
+ _SC_assign_block(SC_heap_des *ph, mem_header *space, long nb,
+		  const char *func, const char *file, int line),
  _SC_deassign_block(SC_heap_des *ph, mem_descriptor *desc,
 		    void *addr),
  _SC_unassign_block(SC_heap_des *ph, mem_header *space),
@@ -308,9 +308,9 @@ extern void
 
 extern int
  SC_free_n(void *p, ...),
- SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds),
- SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds),
- SC_is_active_space(void *p, mem_header **psp, mem_descriptor **pds),
+ SC_is_score_space(const void *p, mem_header **psp, mem_descriptor **pds),
+ SC_is_free_space(const void *p, mem_header **psp, mem_descriptor **pds),
+ SC_is_active_space(const void *p, mem_header **psp, mem_descriptor **pds),
  SC_mem_over_mark(int n),
  SC_mem_trim(size_t pad);
 
@@ -333,7 +333,7 @@ extern int
  _SC_free_wl(void *p, int zsp);
 
 extern int64_t
- _SC_arrlen_wl(void *p);
+ _SC_arrlen_wl(const void *p);
 
 
 /* SCMEMCS.C declarations */
@@ -354,16 +354,17 @@ extern int
  _SC_free_ws(void *p, int zsp);
 
 extern int64_t
- _SC_arrlen_ws(void *p);
+ _SC_arrlen_ws(const void *p);
 
 
 /* SCMEMDA.C declarations */
 
 extern char
- *_SC_block_name(mem_descriptor *desc);
+ *_SC_block_name(const mem_descriptor *desc);
 
 extern void
- _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag);
+ _SC_print_block_info(FILE *fp, SC_heap_des *ph,
+		      const void *ptr, int flag);
 
 
 /* SCMEMDB.C declarations */

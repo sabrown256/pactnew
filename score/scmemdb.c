@@ -111,7 +111,7 @@ static long _SC_count_tagged(int flag)
  *                     - return TRUE if the block matches FLAG
  */
 
-static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
+static int _SC_list_block_info(char *s, SC_heap_des *ph, const void *ptr,
 			       long sz, int flag, int show, int reg)
    {int rv, valid;
     int idok, nmok, prok, nxok, ty, nc, nr;
@@ -523,7 +523,7 @@ int SC_mem_map(FILE *fp, int flag)
  * #bind SC_mem_ss fortran() scheme(memory-snapshot) python()
  */
 
-int SC_mem_ss(char *base, int flag)
+int SC_mem_ss(const char *base, int flag)
    {int nbl;
     char s[MAXLINE];
     FILE *fp;
@@ -564,7 +564,8 @@ int SC_mem_ss(char *base, int flag)
  *
  */
 
-static long _SC_mem_monitor(int old, int lev, char *id, char *msg, int dif)
+static long _SC_mem_monitor(int old, int lev, const char *id,
+			    char *msg, int dif)
    {int leva, actfl, prmfl, show, pid, st;
     long d;
     char base[MAXLINE], ta[MAXLINE], tb[MAXLINE];
@@ -654,7 +655,7 @@ static long _SC_mem_monitor(int old, int lev, char *id, char *msg, int dif)
  * #bind SC_mem_monitor fortran() scheme(memory-monitor) python()
  */
 
-long SC_mem_monitor(int old, int lev, char *id, char *msg)
+long SC_mem_monitor(int old, int lev, const char *id, char *msg)
    {long rv;
 
     rv = _SC_mem_monitor(old, lev, id, msg, FALSE);
@@ -762,7 +763,7 @@ static int _SC_mem_ngb(SC_heap_des *ph, mem_descriptor *desc,
  *                 - clobber the space P
  */
 
-int SC_mem_neighbor(void *p, int flag, void *b, void *a)
+int SC_mem_neighbor(const void *p, int flag, void *b, void *a)
    {int rv;
     mem_header *space, *pa, *pb;
     mem_header **ppa;
@@ -861,7 +862,7 @@ long SC_mem_object_trace(long nb, int type,
  * #bind SC_mem_print fortran() python()
  */
 
-void SC_mem_print(void *p)
+void SC_mem_print(const void *p)
    {long id;
     mem_descriptor *desc;
     mem_header *space;
