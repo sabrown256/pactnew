@@ -26,8 +26,6 @@ struct s_st62
 
 typedef struct s_st62 st62;
 
-extern long _PD_lookup_size(char *s, hasharr *tab);
-
 static st61
  *d61_w = NULL;
 

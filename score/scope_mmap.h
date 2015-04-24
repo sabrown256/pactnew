@@ -62,7 +62,8 @@ extern SC_scope_mmap
 /* SCMMAPS.C declarations */
 
 extern FILE
- *_SC_mf_open(char *name, char *mode, void (*setup)(SC_mapped_file *mf));
+ *_SC_mf_open(const char *name, const char *mode,
+	      void (*setup)(SC_mapped_file *mf));
 
 extern char
  *_SC_mf_gets(char *s, int n, FILE *fp),
@@ -84,7 +85,7 @@ extern int64_t
 
 extern u_int64_t
  _SC_mf_core_read(void *bf, size_t sz, u_int64_t ni, FILE *fp),
- _SC_mf_core_write(void *bf, size_t sz, u_int64_t ni, FILE *fp),
+ _SC_mf_core_write(const void *bf, size_t sz, u_int64_t ni, FILE *fp),
  _SC_mf_segment_size(FILE *fp, int64_t nsz);
 
 

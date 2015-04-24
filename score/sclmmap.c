@@ -45,7 +45,8 @@ extern ssize_t
  *               - this wraps the LMF version to be call compatible
  */
 
-static u_int64_t _SC_lmf_write(void *bf, size_t sz, u_int64_t ni, FILE *stream)
+static u_int64_t _SC_lmf_write(const void *bf, size_t sz, u_int64_t ni,
+			       FILE *stream)
    {u_int64_t rv;
 
     rv = _SC_mf_core_write(bf, sz, ni, stream);
@@ -135,7 +136,7 @@ FILE *SC_lmf_bind(void *mf)
 
 /* SC_LMF_OPEN - open a memory mapped file ala fopen */
 
-FILE *SC_lmf_open(char *name, char *mode)
+FILE *SC_lmf_open(const char *name, const char *mode)
    {FILE *fp, *ret;
 
     fp  = _SC_mf_open(name, mode, _SC_lmf_setup);

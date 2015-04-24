@@ -1133,7 +1133,7 @@ extern void
 
 extern int
  PA_def_str(PDBfile *pdrs),
- PA_sizeof(char *s);
+ PA_sizeof(const char *s);
 
 
 /* PASMP.C declarations */

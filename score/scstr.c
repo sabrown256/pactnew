@@ -2108,7 +2108,7 @@ char *SC_ftos(char *s, int nc, int cat, const char *fmt, long double f)
 
 /* _SC_OTOL - string representation of octal number to long int converter */
 
-long int _SC_otol(char *str)
+long int _SC_otol(const char *str)
    {long int rv;
 
     rv = STRTOL(str, NULL, 8);
@@ -2120,7 +2120,7 @@ long int _SC_otol(char *str)
 
 /* _SC_HTOL - string representation of hex number to long int converter */
 
-long int _SC_htol(char *str)
+long int _SC_htol(const char *str)
    {long int rv;
 
     rv = STRTOL(str, NULL, 16);

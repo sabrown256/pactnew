@@ -213,7 +213,7 @@ void dpmfblock(SC_mapped_file *mf)
 
 /* SC_MF_MAKE - initialize a memory mapped file structure */
 
-SC_mapped_file *SC_mf_make(char *name, int prot, int shar, int perm,
+SC_mapped_file *SC_mf_make(const char *name, int prot, int shar, int perm,
 			   int extend, void (*setup)(SC_mapped_file *mf))
    {SC_mapped_file *mf;
 
@@ -303,7 +303,8 @@ static void *_SC_mf_ext_file(SC_mapped_file *mf, int fd,
 
 /* _SC_MF_CREATE_FILE - create a file with mmap */
 
-static SC_mapped_file *_SC_mf_create_file(char *name, int64_t len, int extend,
+static SC_mapped_file *_SC_mf_create_file(const char *name,
+					  int64_t len, int extend,
 					  void (*setup)(SC_mapped_file *mf))
    {int fd, action, prot, shar;
     int64_t nbp;
@@ -332,7 +333,8 @@ static SC_mapped_file *_SC_mf_create_file(char *name, int64_t len, int extend,
 
 /* _SC_MF_MAP_FILE - map a file into memory */
 
-static SC_mapped_file *_SC_mf_map_file(char *name, int action, int extend,
+static SC_mapped_file *_SC_mf_map_file(const char *name,
+				       int action, int extend,
 				       void (*setup)(SC_mapped_file *mf))
    {int fd, prot, shar, create;
     int rw, wo, cr;
@@ -384,7 +386,8 @@ static SC_mapped_file *_SC_mf_map_file(char *name, int action, int extend,
 
 /* _SC_MF_OPEN - open a memory mapped file ala fopen */
 
-FILE *_SC_mf_open(char *name, char *mode, void (*setup)(SC_mapped_file *mf))
+FILE *_SC_mf_open(const char *name, const char *mode,
+		  void (*setup)(SC_mapped_file *mf))
    {FILE *fp;
 
 #ifdef HAVE_MMAP
@@ -1119,7 +1122,8 @@ u_int64_t _SC_mf_core_read(void *bf, size_t sz, u_int64_t ni, FILE *fp)
  *                   - ala the write system call
  */
 
-u_int64_t _SC_mf_core_write(void *bf, size_t sz, u_int64_t ni, FILE *fp)
+u_int64_t _SC_mf_core_write(const void *bf, size_t sz, u_int64_t ni,
+			    FILE *fp)
    {u_int64_t niw;
 
 #ifdef HAVE_MMAP
@@ -1395,7 +1399,7 @@ SC_file_block *SC_mf_delete(FILE *fp, int64_t off, int64_t nb)
  *                    -   NV      number of things to read from each stripe
  */
 
-int64_t SC_mf_read_striped(FILE *fp, int64_t off, char *type,
+int64_t SC_mf_read_striped(FILE *fp, int64_t off, const char *type,
 			  int ni, int stride, int nv, void **vrs)
    {int bpu, bpi, nb, nbr;
     int64_t rv;
@@ -1758,7 +1762,7 @@ int _SC_mf_close(FILE *fp)
  *            - mapped file
  */
 
-FILE *SC_mf_copy(char *name, FILE *fp, int bckup)
+FILE *SC_mf_copy(const char *name, FILE *fp, int bckup)
    {int st;
     int64_t ln, so, sb, se, nb, pos;
     char *pi, *nnm, *onm;

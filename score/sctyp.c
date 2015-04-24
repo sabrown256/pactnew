@@ -50,7 +50,7 @@ SC_type *_SC_get_type_id(int id)
 
 /* _SC_GET_TYPE_NAME - given the type NAME */
 
-SC_type *_SC_get_type_name(char *name)
+SC_type *_SC_get_type_name(const char *name)
    {hasharr *ha;
     SC_type *t;
 
@@ -486,7 +486,7 @@ int SC_type_size_i(int id)
  *                - return -1 if type ID is unknown
  */
 
-int SC_type_size_a(char *name)
+int SC_type_size_a(const char *name)
    {int bpi;
     SC_type *t;
 

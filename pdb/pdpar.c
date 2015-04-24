@@ -326,7 +326,8 @@ static u_int64_t _PD_pread(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
 /* _PD_PWRITE - do an fwrite on the parallel file */
 
-static u_int64_t _PD_pwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
+static u_int64_t _PD_pwrite(const void *s, size_t nbi, u_int64_t ni,
+			    FILE *stream)
    {int rv;
     long nbw;
     int64_t ad;
@@ -530,7 +531,7 @@ static int _PD_pungetc(int c, FILE *stream)
 
 /* _PD_POPEN - set up the file for smp parallel i/o */
 
-static FILE *_PD_popen(char *name, char *mode)
+static FILE *_PD_popen(const char *name, const char *mode)
    {FILE *fp, *fail;
     PD_Pfile *pf;
     file_io_desc *fid;

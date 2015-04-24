@@ -20,7 +20,8 @@
 
 /* _SC_MF_WRITE - write to a memory mapped file ala the write system call */
 
-static size_t _SC_mf_write(void *bf, size_t sz, size_t ni, FILE *stream)
+static size_t _SC_mf_write(const void *bf, size_t sz, size_t ni,
+			   FILE *stream)
    {size_t niw;
 
     niw = _SC_mf_core_write(bf, sz, ni, stream);
@@ -120,7 +121,7 @@ FILE *SC_mf_bind(void *mf)
 
 /* SC_MF_OPEN - open a memory mapped file ala fopen */
 
-FILE *SC_mf_open(char *name, char *mode)
+FILE *SC_mf_open(const char *name, const char *mode)
    {FILE *fp, *ret;
 
     fp  = _SC_mf_open(name, mode, _SC_mf_setup);

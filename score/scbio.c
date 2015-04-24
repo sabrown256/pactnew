@@ -119,7 +119,7 @@ void dpbfstack(bio_desc *bid)
 
 /* _SC_BIO_AUDIT - debugging aid */
 
-static INLINE void _SC_bio_audit(bio_desc *bid, char *tag)
+static INLINE void _SC_bio_audit(bio_desc *bid, const char *tag)
    {
 
 #ifdef DEBUG
@@ -140,7 +140,7 @@ static INLINE void _SC_bio_audit(bio_desc *bid, char *tag)
 /* _SC_BIO_SET_ADDR - update the address and size of BID */
 
 static INLINE int64_t _SC_bio_set_addr(bio_desc *bid, int64_t addr, int chsz,
-				       char *tag)
+				       const char *tag)
    {
 
     addr = max(addr, 0);
@@ -394,7 +394,8 @@ static int64_t _SC_bfr_outfill(bio_frame *fd, bio_frame *fs)
  *                - return the new stack depth
  */
 
-static int _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig)
+static int _SC_bfr_remove(bio_desc *bid, int i,
+			  bio_frame *fr, int fl, int orig)
    {int n, ok, nw;
     int64_t fi[2], ad, nb;
 	
@@ -595,7 +596,7 @@ static bio_frame *_SC_bfr_read_setup(bio_desc *bid, bio_frame *fr)
  *                  - of size BSZ
  */
 
-static void _SC_bio_read_opt(bio_desc *bid, char *mode, int64_t bsz)
+static void _SC_bio_read_opt(bio_desc *bid, const char *mode, int64_t bsz)
    {
 
     return;}
@@ -952,7 +953,8 @@ static int64_t _SC_bio_in(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 
 /* _SC_BIO_OUT - buffer BF out to BID */
 
-static int64_t _SC_bio_out(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
+static int64_t _SC_bio_out(const void *bf, int64_t bpi, int64_t ni,
+			   bio_desc *bid)
    {int64_t na, nb, nw;
 
     nb = bpi*ni;
@@ -985,7 +987,7 @@ static int64_t _SC_bio_out(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
        {rq.sz   = nb;
 	rq.nb   = 0;
 	rq.addr = bid->curr;
-	rq.bf   = bf;
+	rq.bf   = (unsigned char *) bf;
 	_SC_bfr_mark(&rq, BIO_WRITE, FALSE);
 
 /* get the frame to use for staging the request to disk
@@ -1103,7 +1105,7 @@ static size_t _SC_bread(void *s, size_t bpi, size_t ni, FILE *fp)
 
 /* _SC_BWRITE - small file method for fwrite */
 
-static size_t _SC_bwrite(void *s, size_t bpi, size_t ni, FILE *fp)
+static size_t _SC_bwrite(const void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t nw;
 
     ACCESS(fp);
@@ -1168,7 +1170,8 @@ static u_int64_t _SC_blread(void *s, size_t bpi, u_int64_t ni, FILE *fp)
 
 /* _SC_BLWRITE - large file method for fwrite */
 
-static u_int64_t _SC_blwrite(void *s, size_t bpi, u_int64_t ni, FILE *fp)
+static u_int64_t _SC_blwrite(const void *s, size_t bpi, u_int64_t ni,
+			     FILE *fp)
    {size_t nw;
 
     ACCESS(fp);
@@ -1448,7 +1451,7 @@ long *SC_binfo(void)
 
 /* SC_BOPEN - small file method for fopen */
 
-FILE *SC_bopen(char *name, char *mode)
+FILE *SC_bopen(const char *name, const char *mode)
    {int st;
     FILE *ret, *fp;
     bio_desc *bid;
@@ -1512,7 +1515,7 @@ FILE *SC_bopen(char *name, char *mode)
 
 /* SC_LBOPEN - large file method for fopen */
 
-FILE *SC_lbopen(char *name, char *mode)
+FILE *SC_lbopen(const char *name, const char *mode)
    {int st;
     FILE *ret, *fp;
     bio_desc *bid;

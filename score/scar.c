@@ -16,7 +16,8 @@
 
 /* _SC_MAKE_ARCHIVE - allocate and initialize an fcdes instance */
 
-static fcdes *_SC_make_archive(char *name, FILE *fp, int nb, hasharr *tab)
+static fcdes *_SC_make_archive(const char *name, FILE *fp,
+			       int nb, hasharr *tab)
    {fcdes *fc;
 
     fc = CMAKE(fcdes);
@@ -38,9 +39,9 @@ static fcdes *_SC_make_archive(char *name, FILE *fp, int nb, hasharr *tab)
  */
 
 fcent *_SC_make_ar_entry(FILE *fp, int rnd,
-			 char *name, char *date,
-			 char *uid, char *gid,
-			 char *size, char *mode,
+			 const char *name, const char *date,
+			 const char *uid, const char *gid,
+			 const char *size, const char *mode,
 			 int64_t *ppos)
    {int64_t sz, pos, ada;
     fcent *ae;
@@ -83,7 +84,7 @@ fcent *_SC_make_ar_entry(FILE *fp, int rnd,
  *                 - of the archive ARF
  */
 
-fcdes *SC_scan_archive(char *arf)
+fcdes *SC_scan_archive(const char *arf)
    {int nr, nb, nc, st;
     size_t ad;
     int64_t pos;
@@ -224,7 +225,7 @@ fcdes *SC_scan_archive(char *arf)
  *                 - of the archive ARF
  */
 
-fcdes *SC_scan_archive(char *arf)
+fcdes *SC_scan_archive(const char *arf)
    {int nr, nb, st;
     int64_t pos, ext, org, off;
     char s[MAXLINE], lname[MAXLINE];
@@ -323,7 +324,7 @@ fcdes *SC_scan_archive(char *arf)
  *                 - of the archive ARF
  */
 
-fcdes *SC_scan_archive(char *arf)
+fcdes *SC_scan_archive(const char *arf)
    {int i, nr, nb, nc, ne, na, rnd, st;
     int64_t pos;
     char s[MAXLINE], lname[MAXLINE];
@@ -412,7 +413,7 @@ fcdes *SC_scan_archive(char *arf)
  *                 - of the archive ARF
  */
 
-fcdes *SC_scan_archive(char *arf)
+fcdes *SC_scan_archive(const char *arf)
    {fcdes *fc;
 
     fc  = _SC_make_archive(arf, NULL, 0, NULL);
@@ -435,7 +436,7 @@ fcdes *SC_scan_archive(char *arf)
  *                 - of the archive ARF
  */
 
-fcdes *SC_scan_archive(char *arf)
+fcdes *SC_scan_archive(const char *arf)
    {int nr, nb, ni, st;
     int64_t ext, org, off;
     int64_t pos;

@@ -49,11 +49,13 @@ static void scheme_type_name_list(tns_list *na, tn_list *nc)
 
 int lookup_scheme_type(char *a, int nc, char *t)
    {int rv;
+    char *tl;
     type_desc *td;
 
     rv = FALSE;
 
-    td = lookup_type_info(t);
+    tl = subst(t, "const ", "", -1);
+    td = lookup_type_info(tl);
     if (td != NULL)
        {if (td->knd == TK_ENUM)
 	   nstrncpy(a, nc, "G_ENUM_I", -1);

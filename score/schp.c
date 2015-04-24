@@ -284,7 +284,7 @@ static int
 
 /* SC_MK_PROCESS - initialize and return a PROCESS */
 
-PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
+PROCESS *SC_mk_process(char **argv, const char *mode, int type, int iex)
    {int i;
     unsigned int nb;
     PROCESS *pp;
@@ -1002,7 +1002,7 @@ static void _SC_reconnect_process_group(int n, subtask *pg,
 #ifdef HAVE_PROCESS_CONTROL
 
 static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
-			  char **argv, char *mode,
+			  char **argv, const char *mode,
 			  SC_iodes *fd, int retry, int iex,
 			  PFProcInit initf, PFProcExit exitf, void *exita)
    {int to, flag, rpid, savetty;
@@ -1310,14 +1310,16 @@ static void _SC_process_group_parse(subtask *pg, int n, int id)
  */
 
 static SC_process_group *_SC_setup_process_group(char **argv, char **envp,
-						 char *mode, SC_iodes *fd,
+						 const char *mode,
+						 SC_iodes *fd,
 						 int retry, int iex,
 						 int rcpu,
 						 PFProcInit initf,
 						 PFProcExit exitf,
 						 void *exita)
    {int i, n, to;
-    char *mod, **al;
+    char **al;
+    const char *mod;
     PROCESS **pa, **ca;
     subtask *pg;
     SC_iodes *pfd;
@@ -1445,8 +1447,8 @@ static PROCESS *_SC_launch_process_group(SC_process_group *pgr)
  *               - and open a connection to it for further communications
  */
 
-static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
-			      char **envp, char *mode,
+static PROCESS *_SC_open_proc(int rcpu, const char *name, char **argv,
+			      char **envp, const char *mode,
 			      SC_iodes *fd, int retry, int iex,
 			      PFProcInit initf, PFProcExit exitf, void *exita)
    {PROCESS *pp;
@@ -1483,7 +1485,7 @@ static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
  */
 
 PROCESS *SC_open_remote(char *host, char *cmnd,
-			char **argv, char **envp, char *mode,
+			char **argv, char **envp, const char *mode,
 			PFProcInit init)
    {int i, ia, na, st, ok;
     char **ca;
@@ -2017,7 +2019,7 @@ void _SC_copy_filedes(SC_iodes *fb, SC_iodes *fa)
  *         - return NULL and set SC_gs.errn on failure
  */
 
-PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
+PROCESS *SC_open(char **argv, char **envp, const char *mode, ...)
    {int ok, ifd, iex, retry;
     char name[BFLRG];
     char *key, *host, *proc, *s, *nm;

@@ -128,7 +128,7 @@ static u_int64_t _PD_fcread(void *p, size_t sz, u_int64_t ni, FILE *fp)
 
 /* _PD_FCWRITE - fwrite method for containerf */
 
-static u_int64_t _PD_fcwrite(void *p, size_t sz, u_int64_t ni, FILE *fp)
+static u_int64_t _PD_fcwrite(const void *p, size_t sz, u_int64_t ni, FILE *fp)
    {int rv;
     containerf *cf;
     FILE *fl;
@@ -297,7 +297,7 @@ static int _PD_fceof(FILE *fp)
 
 /* _PD_OPEN_CONTAINER_FILE - open the file in the container */
 
-FILE *_PD_open_container_file(char *name, char *mode)
+FILE *_PD_open_container_file(const char *name, const char *mode)
    {char cntr[MAXLINE];
     char *file;
     FILE *fp;

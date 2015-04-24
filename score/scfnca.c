@@ -289,7 +289,7 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 
 /* SC_SIZEOF - a string driven sizeof operator if you can't do any better */
 
-int SC_sizeof(char *s)
+int SC_sizeof(const char *s)
    {int bpi;
 
     bpi = SC_type_size_a(s);

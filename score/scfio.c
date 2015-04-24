@@ -231,7 +231,7 @@ int64_t SC_get_buffer_size(void)
 
 /* SC_PROMPT - fprintf PROMPT on stdout and fgets S on stdin */ 
 
-char *SC_prompt(char *prompt, char *s, int n)
+char *SC_prompt(const char *prompt, char *s, int n)
    {int nc, ok;
     char *t, *rv;
 
@@ -419,7 +419,7 @@ static size_t _SC_fread(void *s, size_t bpi, size_t ni, FILE *fp)
 
 /* _SC_FWRITE_ATM - atomic worker for _SC_fwrite */
 
-static size_t _SC_fwrite_atm(void *s, size_t bpi, size_t ni, FILE *fp)
+static size_t _SC_fwrite_atm(const void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t nw;
 
     nw = SC_fwrite_sigsafe(s, bpi, ni, fp);
@@ -434,7 +434,7 @@ static size_t _SC_fwrite_atm(void *s, size_t bpi, size_t ni, FILE *fp)
  *            - NFS or other network bandwitdth
  */
 
-size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
+size_t _SC_fwrite(const void *s, size_t bpi, size_t ni, FILE *fp)
    {int ok, flags, rw, fd, st;
     int64_t i, nb;
     size_t nw, nr;
@@ -600,7 +600,7 @@ FILE *SC_fwrap(FILE *fp)
 
 /* SC_FOPEN - wrapper for fopen for handling null file names */
 
-FILE *SC_fopen(char *name, char *mode)
+FILE *SC_fopen(const char *name, const char *mode)
    {FILE *ret, *fp;
 
     ret = NULL;
@@ -649,7 +649,7 @@ static long _SC_transfer_bytes(int cfd, long nbe, FILE *fp)
 
 /* _SC_GET_CMD_RESP - wait for the response from the server */
 
-static int64_t _SC_get_cmd_resp(PROCESS *pp, char *msg)
+static int64_t _SC_get_cmd_resp(PROCESS *pp, const char *msg)
    {int lm;
     int64_t rv;
     char s[MAXLINE];
@@ -1180,7 +1180,7 @@ static size_t _SC_rread(void *s, size_t nbi, size_t ni, FILE *stream)
  *            - corresponds to SC_FWRITE message
  */
 
-static size_t _SC_rwrite(void *s, size_t nbi, size_t ni, FILE *stream)
+static size_t _SC_rwrite(const void *s, size_t nbi, size_t ni, FILE *stream)
    {size_t niw;
     REMOTE_FILE *fp;
     PROCESS *pp;
@@ -1388,7 +1388,7 @@ static int _SC_rungetc(int c, FILE *stream)
  *           - corresponds to SC_FOPEN message
  */
 
-static FILE *_SC_ropen(char *name, char *mode)
+static FILE *_SC_ropen(const char *name, const char *mode)
    {char s[MAXLINE], host[MAXLINE], fname[MAXLINE], *t;
     int rsp, type, get_data_line, lg;
     int64_t len;
@@ -1630,7 +1630,8 @@ static u_int64_t _SC_lfread(void *s, size_t bpi, u_int64_t ni, FILE *fp)
 
 /* _SC_LFWRITE - large file IO wrapper for FWRITE method */
 
-static u_int64_t _SC_lfwrite(void *s, size_t bpi, u_int64_t ni, FILE *fp)
+static u_int64_t _SC_lfwrite(const void *s, size_t bpi, u_int64_t ni,
+			     FILE *fp)
    {u_int64_t zc, n, ns, nw;
     char *ps;
 
@@ -1689,7 +1690,7 @@ FILE *SC_lfwrap(FILE *fp)
 
 /* SC_LFOPEN - large file wrapper for fopen for handling null file names */
 
-FILE *SC_lfopen(char *name, char *mode)
+FILE *SC_lfopen(const char *name, const char *mode)
    {FILE *ret, *fp;
 
     ret = NULL;
@@ -1833,7 +1834,7 @@ size_t io_read(void *p, size_t sz, size_t ni, FILE *fp)
 
 /* IO_WRITE - file IO wrapper for FWRITE method */
 
-size_t io_write(void *p, size_t sz, size_t ni, FILE *fp)
+size_t io_write(const void *p, size_t sz, size_t ni, FILE *fp)
    {size_t rv;
     file_io_desc *fid;
 
@@ -2271,7 +2272,7 @@ u_int64_t lio_read(void *p, size_t sz, u_int64_t ni, FILE *fp)
 
 /* LIO_WRITE - large file IO wrapper for FWRITE method */
 
-u_int64_t lio_write(void *p, size_t sz, u_int64_t ni, FILE *fp)
+u_int64_t lio_write(const void *p, size_t sz, u_int64_t ni, FILE *fp)
    {u_int64_t rv;
     file_io_desc *fid;
 
@@ -2656,7 +2657,7 @@ int SC_io_connect(int flag)
  * #bind SC_file_length fortran() scheme(file-length) python()
  */
 
-int64_t SC_file_length(char *name)
+int64_t SC_file_length(const char *name)
    {int64_t ln;
     char path[PATH_MAX];
 
@@ -2837,7 +2838,7 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
  *                  - return number of bytes written or -1
  */
 
-ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
+ssize_t SC_write_sigsafe(int fd, const void *bf, size_t n)
    {ssize_t nbw, rv;
 
     nbw = PS_write_safe(fd, bf, n);
@@ -2900,7 +2901,7 @@ size_t SC_fread_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
  *                   - return number of bytes written or -1
  */
 
-size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
+size_t SC_fwrite_sigsafe(const void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t nw;
 
     nw = PS_fwrite_safe(s, bpi, ni, fp);

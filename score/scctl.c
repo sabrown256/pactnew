@@ -121,8 +121,9 @@ char *SC_get_banner(void)
  *                     - DIR may be destroyed in this process
  */
 
-static void _SC_handle_path_dot(char *path, long nb, char *dir, char *name)
-   {char *s;
+static void _SC_handle_path_dot(char *path, long nb, char *dir,
+				const char *name)
+   {const char *s;
 
     if (dir != NULL)
        {s = name;
@@ -181,10 +182,11 @@ char *SC_getcwd(void)
  *              -      the full path
  */
 
-int SC_file_path(char *name, char *path, int nc, int full)
+int SC_file_path(const char *name, char *path, int nc, int full)
    {int n;
     char fp[PATH_MAX];
-    char *t, *p;
+    char *t;
+    const char *p;
 
     switch (name[0])
        {case '/' :
@@ -231,7 +233,7 @@ int SC_file_path(char *name, char *path, int nc, int full)
  *              -      the full path
  */
 
-int SC_full_path(char *name, char *path, int nc)
+int SC_full_path(const char *name, char *path, int nc)
    {int n;
 
     n = PS_full_path(path, nc, TRUE, NULL, name);
@@ -742,7 +744,7 @@ char *SC_itoa(int n, int radix, int nc)
  *               - opened in the specified mode; otherwise, return FALSE.
  */
 
-int SC_query_file(char *name, char *mode, char *type)
+int SC_query_file(const char *name, const char *mode, const char *type)
    {int i, c, nr, ret;
     int64_t nn, np;
     char bf[MAX_BFSZ+1];
@@ -792,7 +794,7 @@ int SC_query_file(char *name, char *mode, char *type)
 
 /* SC_ISFILE - return TRUE if the file exists, otherwise return FALSE */
 
-int SC_isfile(char *name)
+int SC_isfile(const char *name)
    {int rv;
 
     rv = SC_query_file(name, NULL, NULL);
@@ -806,7 +808,7 @@ int SC_isfile(char *name)
  *                - otherwise return FALSE
  */
 
-int SC_isfile_text(char *name)
+int SC_isfile_text(const char *name)
    {int rv;
 
     rv = SC_query_file(name, NULL, "ascii");
@@ -820,7 +822,7 @@ int SC_isfile_text(char *name)
  *           - wrapped to overcome file system delays
  */
 
-int SC_remove(char *s)
+int SC_remove(const char *s)
    {int i, ev, rv, na;
     struct stat sb;
 

@@ -521,7 +521,7 @@ defstr *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, char *s)
  *                 - return the size
  */
 
-long _PD_lookup_size(char *s, hasharr *tab)
+long _PD_lookup_size(const char *s, hasharr *tab)
    {long bpi;
     char *token, bf[MAXLINE], *t;
     defstr *dp;

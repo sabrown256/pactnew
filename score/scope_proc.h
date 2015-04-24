@@ -533,8 +533,8 @@ extern void
 
 extern PROCESS
  *SC_open_remote(char *host, char *cmnd,
-		 char **argv, char **envp, char *mode,
-		 PROCESS *(*init)(char **argv, char *mode, int type));
+		 char **argv, char **envp, const char *mode,
+		 PFProcInit init);
 
 
 /* SCHSRV.C declarations */

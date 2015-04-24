@@ -16,7 +16,7 @@
 
 /* _SC_FCONTAINER_TYPE - try to determine the type of container file */
 
-static SC_file_type _SC_fcontainer_type(char *name)
+static SC_file_type _SC_fcontainer_type(const char *name)
    {FILE *fp;
     SC_file_type type;
 
@@ -38,7 +38,8 @@ static SC_file_type _SC_fcontainer_type(char *name)
 
 /* _SC_MAKE_FCONTAINER - create and return an fcontainer */
 
-fcontainer *_SC_make_fcontainer(char *name, SC_file_type type, void *handle)
+fcontainer *_SC_make_fcontainer(const char *name, SC_file_type type,
+				void *handle)
    {fcontainer *cf;
 
     cf = CMAKE(fcontainer);
@@ -97,7 +98,7 @@ void SC_free_fcontainer(fcdes *fc)
  *                       - range of the contained file
  */
 
-fcdes *_SC_unknown_container(char *name)
+fcdes *_SC_unknown_container(const char *name)
    {int nt, ok;
     int64_t sad, ead;
     char s[MAXLINE];
@@ -165,8 +166,9 @@ fcdes *_SC_unknown_container(char *name)
  *                    - the input file
  */
 
-fcontainer *SC_open_fcontainer(char *name, SC_file_type type,
-			       fcdes *(*meth)(char *name, SC_file_type *pt))
+fcontainer *SC_open_fcontainer(const char *name, SC_file_type type,
+			       fcdes *(*meth)(const char *name,
+					      SC_file_type *pt))
    {char cntr[MAXLINE];
     char *p;
     SC_file_type ftype;

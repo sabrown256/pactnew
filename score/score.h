@@ -379,7 +379,7 @@ typedef struct s_SC_contextdes SC_contextdes;
 typedef struct s_SC_scope_public SC_scope_public;
 
 typedef void (*PFFileCallback)(int fd, int mask, void *a);
-typedef PROCESS *(*PFProcInit)(char **argv, char *mode, int type);
+typedef PROCESS *(*PFProcInit)(char **argv, const char *mode, int type);
 typedef void (*PFProcExit)(PROCESS *pp, void *a);
 typedef int (*PFIVA)(void *a);
 typedef	int (*PFEVExit)(int *rv, void *a);
@@ -645,9 +645,9 @@ struct s_SC_scope_public
     char **env;                                   /* environment from main */
     void *exe_info;                           /* slot for exedes if needed */
     SC_type stl[N_TYPES+1];                   /* built in static type list */
-    int (*size)(char *s);                       /* string driven size hook */
-    long (*otol)(char *s);
-    long (*htol)(char *s);
+    int (*size)(const char *s);                 /* string driven size hook */
+    long (*otol)(const char *s);
+    long (*htol)(const char *s);
     long (*atol)(const char *s);
     long (*strtol)(const char *s, char **endp, int base);
     double (*atof)(const char *s);
@@ -733,13 +733,13 @@ extern unsigned int
 
 extern int
  SC_random_int(int a, int b),
- SC_query_file(CONST char *name, CONST char *mode, CONST char *type),
- SC_isfile(CONST char *name),
- SC_isfile_text(CONST char *name),
- SC_file_path(CONST char *name, char *path, int nc, int full),
- SC_full_path(CONST char *name, char *path, int nc),
+ SC_query_file(const char *name, const char *mode, const char *type),
+ SC_isfile(const char *name),
+ SC_isfile_text(const char *name),
+ SC_file_path(const char *name, char *path, int nc, int full),
+ SC_full_path(const char *name, char *path, int nc),
  SC_regx_match(const char *s, const char *patt),
- SC_remove(CONST char *s),
+ SC_remove(const char *s),
  SC_assoc_info(pcons *alst, ...),
  SC_assoc_info_alt(pcons *alst, ...);
 
@@ -848,8 +848,8 @@ extern char
 /* SCHP.C declarations */
 
 extern PROCESS
- *SC_mk_process(char **argv, CONST char *mode, int type, int iex),
- *SC_open(char **argv, char **envp, CONST char *mode, ...);
+ *SC_mk_process(char **argv, const char *mode, int type, int iex),
+ *SC_open(char **argv, char **envp, const char *mode, ...);
 
 extern void
  SC_set_processor_info(int size, int rank);

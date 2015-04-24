@@ -428,7 +428,7 @@ ssize_t write_safe(int fd, const void *s, size_t nb)
  *             - return number of bytes written or -1
  */
 
-size_t fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
+size_t fwrite_safe(const void *s, size_t bpi, size_t nitems, FILE *fp)
    {size_t zc, n, ns, nw;
     char *ps;
 

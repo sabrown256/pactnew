@@ -138,7 +138,7 @@ extern int
  SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx),
  SC_unpack_bits(char *out, CONST char *in, int ityp, int nbits,
 		int padsz, int fpp, long ni, long offs),
- SC_sizeof(CONST char *s);
+ SC_sizeof(const char *s);
 
 extern long
  SC_extract_field(CONST char *in, int offs, int nbi, int nby, int *ord);
@@ -147,7 +147,7 @@ extern long
 /* SCTYP.C declarations */
 
 extern SC_type
- *_SC_get_type_name(CONST char *name),
+ *_SC_get_type_name(const char *name),
  *_SC_get_type_id(int id),
  *SC_find_primitive(int id);
 
@@ -170,7 +170,7 @@ extern int
  SC_is_type_prim(int id),
  SC_is_type_struct(int id),
  SC_type_size_i(int id),
- SC_type_size_a(CONST char *name),
+ SC_type_size_a(const char *name),
  SC_type_container_size(SC_kind kind, int nb),
  SC_type_match_size(SC_kind kind, int nb),
  SC_deref_id(char *name, int base);

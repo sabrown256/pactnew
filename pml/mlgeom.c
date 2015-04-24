@@ -379,7 +379,7 @@ int PM_cross_line_plane(double *x1, double *x2,
 
 /* _PM_BY_ANGLE - return TRUE iff angle of a < angle of b */
 
-static int _PM_by_angle(void *a, void *b)
+static int _PM_by_angle(const void *a, const void *b)
    {int ok;
     double aa, ab;
     pt *pa, *pb;

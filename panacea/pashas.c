@@ -582,7 +582,7 @@ void *PA_intern(void *vr, char *name)
 
 /* PA_SIZEOF - sizeof operator for PANACEA */
 
-int PA_sizeof(char *s)
+int PA_sizeof(const char *s)
    {int rv;
 
     if (PA_gs.vif != NULL)

@@ -264,7 +264,7 @@ extern int
 /* PDBFC.C declarations */
 
 extern FILE
- *_PD_open_container_file(char *name, char *mode);
+ *_PD_open_container_file(const char *name, const char *mode);
 
 
 /* PDBLK.C declarations */
@@ -587,7 +587,7 @@ extern long
  _PD_comp_num(dimdes *dims),
  _PD_comp_nind(int nd, long *ind, int str),
  _PD_str_size(memdes *str, hasharr *tab),
- _PD_lookup_size(char *s, hasharr *tab);
+ _PD_lookup_size(const char *s, hasharr *tab);
 
 extern int64_t
  _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc);

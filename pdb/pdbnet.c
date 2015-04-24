@@ -189,7 +189,8 @@ static u_int64_t _PN_bread(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
 /* _PN_BWRITE - do an fwrite on the pseudo file */
 
-static u_int64_t _PN_bwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
+static u_int64_t _PN_bwrite(const void *s, size_t nbi, u_int64_t ni,
+			    FILE *stream)
    {long nbw;
     void *d;
     BF_FILE *fb;
@@ -319,19 +320,22 @@ static int _PN_bungetc(int c, FILE *stream)
 
 /* _PN_BOPEN - prepare the pseudo file */
 
-static FILE *_PN_bopen(char *name, char *mode)
-   {BF_FILE *fb;
+static FILE *_PN_bopen(const char *name, const char *mode)
+   {char *nm;
+    BF_FILE *fb;
     FILE *rf, *fp;
     file_io_desc *fid;
-    extern FILE *_PD_popen(char *name, char *mode);
+    extern FILE *_PD_popen(const char *name, const char *mode);
 
     fb = CMAKE(BF_FILE);
 
-    fb->length       = SC_arrlen(name);
-    fb->bf.memaddr   = name;
-    fb->addr.memaddr = name;
+    nm = (char *) name;
 
-    SC_mark(name, 1);
+    fb->length       = SC_arrlen(name);
+    fb->bf.memaddr   = nm;
+    fb->addr.memaddr = nm;
+
+    SC_mark(nm, 1);
 
     rf = _PD_SETUP_PSEUDO_FILE(fb);
 
@@ -391,7 +395,7 @@ static void _PN_restore_hooks(void)
 
 /* _PN_SIZEOF - sizeof operator for PDBNet */
 
-static int _PN_sizeof(char *s)
+static int _PN_sizeof(const char *s)
    {int rv;
     PD_smp_state *pa;
 

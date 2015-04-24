@@ -133,9 +133,9 @@ typedef struct s_SC_smp_state SC_smp_state;
 
 struct s_SC_oscapdes
    {void (*path_delimiter)(char *delim);
-    int64_t (*file_length)(char *path);
-    int (*query_mode)(char *name, char *mode);
-    int (*query_exec)(char *path);
+    int64_t (*file_length)(const char *path);
+    int (*query_mode)(const char *name, const char *mode);
+    int (*query_exec)(const char *path);
     void (*process_methods)(PROCESS *pp);};
 
 /* SC_SCOPE_PRIVATE - single container to hold "static" state
@@ -388,8 +388,8 @@ extern int
  _SC_fmt_strcat(char *d, int nd, int ln, char *fmt, char *s);
 
 extern long
- _SC_otol(char *str),
- _SC_htol(char *str);
+ _SC_otol(const char *str),
+ _SC_htol(const char *str);
 
 extern char
  *_SC_pr_tok(char *s, const char *delim),

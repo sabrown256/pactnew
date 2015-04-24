@@ -202,7 +202,7 @@ extern ssize_t
 
 extern size_t
  PS_fread_safe(void *s, size_t bpi, size_t nitems, FILE *fp, int req),
- PS_fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp);
+ PS_fwrite_safe(const void *s, size_t bpi, size_t nitems, FILE *fp);
 
 extern FILE
  *PS_fopen_safe(const char *path, const char *mode);

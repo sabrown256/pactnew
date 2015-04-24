@@ -159,13 +159,14 @@ struct s_SC_ttydes
 
 /* file I/O function types */
 
-typedef FILE *(*PFfopen)(char *name, char *mode);
+typedef FILE *(*PFfopen)(const char *name, const char *mode);
 
 typedef long (*PFftell)(FILE *stream);
 typedef int (*PFfseek)(FILE *stream, long offs, int whence);
 
 typedef size_t (*PFfread)(void *ptr, size_t sz, size_t ni, FILE *stream);
-typedef size_t (*PFfwrite)(void *ptr, size_t sz, size_t ni, FILE *stream);
+typedef size_t (*PFfwrite)(const void *ptr, size_t sz, size_t ni,
+			   FILE *stream);
 
 typedef int (*PFsetvbuf)(FILE *stream, char *bf, int type, size_t sz);
 typedef int (*PFfclose)(FILE *stream);
@@ -179,16 +180,17 @@ typedef int (*PFfeof)(FILE *stream);
 typedef char *(*PFfgets)(char *s, int n, FILE *stream);
 
 typedef ssize_t (*PFread)(int fd, void *bf, size_t nc);
-typedef ssize_t (*PFwrite)(int fd, void *bf, size_t nc);
+typedef ssize_t (*PFwrite)(int fd, const void *bf, size_t nc);
 
-typedef void (*PFIOErr)(int err, char *sys, char *usr);
+typedef void (*PFIOErr)(int err, const char *sys, const char *usr);
 
 
 /* large file I/O function types */
 
 typedef u_int64_t (*PFSegSize)(void *fp, int64_t nsz);
 typedef u_int64_t (*PFlread)(void *ptr, size_t sz, u_int64_t ni, FILE *stream);
-typedef u_int64_t (*PFlwrite)(void *ptr, size_t sz, u_int64_t ni, FILE *stream);
+typedef u_int64_t (*PFlwrite)(const void *ptr, size_t sz, u_int64_t ni,
+			      FILE *stream);
 
 typedef struct s_file_io_desc file_io_desc;
 
@@ -201,15 +203,15 @@ typedef struct s_file_io_desc file_io_desc;
 
 struct s_file_io_desc
    {void *info;
-    FILE *(*fopen)(char *name, char *mode);
+    FILE *(*fopen)(const char *name, const char *mode);
     long (*ftell)(FILE *fp);
     int64_t (*lftell)(FILE *fp);
     int (*fseek)(FILE *fp, long offs, int whence);
     int (*lfseek)(FILE *fp, int64_t offs, int whence);
     size_t (*fread)(void *ptr, size_t sz, size_t ni, FILE *fp);
     u_int64_t (*lfread)(void *ptr, size_t sz, u_int64_t ni, FILE *fp);
-    size_t (*fwrite)(void *ptr, size_t sz, size_t ni, FILE *fp);
-    u_int64_t (*lfwrite)(void *ptr, size_t sz, u_int64_t ni, FILE *fp);
+    size_t (*fwrite)(const void *ptr, size_t sz, size_t ni, FILE *fp);
+    u_int64_t (*lfwrite)(const void *ptr, size_t sz, u_int64_t ni, FILE *fp);
     int (*setvbuf)(FILE *fp, char *bf, int type, size_t sz);
     int (*fclose)(FILE *fp);
     int (*fprintf)(FILE *fp, const char *fmt, va_list a);
@@ -386,9 +388,9 @@ struct s_SC_scope_io
    {PFfgets getln;                           /* line input function pointer */
     PFfprintf putln;                              /* print function pointer */
     PFfputs putstr;                               /* print function pointer */
-    FILE *(*sfopen)(char *name, char *mode);
-    FILE *(*lfopen)(char *name, char *mode);
-    void (*error)(int err, char *sys, char *usr);};
+    FILE *(*sfopen)(const char *name, const char *mode);
+    FILE *(*lfopen)(const char *name, const char *mode);
+    void (*error)(int err, const char *sys, const char *usr);};
 
 
 enum e_SC_file_cat
@@ -422,7 +424,7 @@ extern SC_scope_io
 /* SCAR.C declarations */
 
 extern fcdes
- *SC_scan_archive(CONST char *arf);
+ *SC_scan_archive(const char *arf);
 
 extern int
  _SC_is_archive(FILE *fp);
@@ -431,8 +433,8 @@ extern int
 /* SCBIO.C declarations */
 
 extern FILE
- *SC_bopen(CONST char *name, CONST char *mode),
- *SC_lbopen(CONST char *name, CONST char *mode);
+ *SC_bopen(const char *name, const char *mode),
+ *SC_lbopen(const char *name, const char *mode);
 
 extern void
  SC_bf_set_hooks(void),
@@ -442,11 +444,11 @@ extern long
  *SC_binfo(void);
 
 
-/* SCFCNTNR.C declarations */
+/* SCFCNR.C declarations */
 
 extern fcontainer
- *SC_open_fcontainer(CONST char *name, SC_file_type type,
-		     fcdes *(*meth)(char *name, SC_file_type *pt));
+ *SC_open_fcontainer(const char *name, SC_file_type type,
+		     fcdes *(*meth)(const char *name, SC_file_type *pt));
 
 extern char
  **SC_fcontainer_list(fcontainer *cf, int full);
@@ -466,9 +468,9 @@ extern file_io_desc
 extern FILE
  *SC_fopen_safe(const char *path, const char *mode),
  *SC_fwrap(FILE *fp),
- *SC_fopen(CONST char *name, CONST char *mode),
+ *SC_fopen(const char *name, const char *mode),
  *SC_lfwrap(FILE *fp),
- *SC_lfopen(CONST char *name, CONST char *mode),
+ *SC_lfopen(const char *name, const char *mode),
  *SC_std_file(void *p);
 
 extern void
@@ -510,26 +512,26 @@ extern long
 
 extern size_t
  io_read(void *ptr, size_t sz, size_t ni, FILE *fp),
- io_write(void *ptr, size_t sz, size_t ni, FILE *fp);
+ io_write(const void *ptr, size_t sz, size_t ni, FILE *fp);
 
 extern u_int64_t
  io_segsize(void *fp, int64_t n),
  lio_read(void *ptr, size_t sz, u_int64_t ni, FILE *fp),
- lio_write(void *ptr, size_t sz, u_int64_t ni, FILE *fp),
+ lio_write(const void *ptr, size_t sz, u_int64_t ni, FILE *fp),
  lio_segsize(void *fp, int64_t n);
 
 extern int64_t
  SC_set_buffer_size(int64_t sz),
  SC_get_buffer_size(void),
  SC_file_size(FILE *fp),
- SC_file_length(CONST char *name);
+ SC_file_length(const char *name);
 
 extern int64_t
  lio_tell(FILE *fp),
  SC_filelen(FILE *fp);
 
 extern char
- *SC_prompt(CONST char *prompt, char *s, int n),
+ *SC_prompt(const char *prompt, char *s, int n),
  *_SC_rl_fgets(char *s, int n),
  *SC_dgets(char *bf, int *pnc, FILE *fp),
  *SC_fgets(char *s, int n, FILE *fp),
@@ -540,11 +542,11 @@ extern char
 
 extern ssize_t
  SC_read_sigsafe(int fd, void *bf, size_t n),
- SC_write_sigsafe(int fd, void *bf, size_t n);
+ SC_write_sigsafe(int fd, const void *bf, size_t n);
 
 extern size_t
  SC_fread_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp),
- SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp);
+ SC_fwrite_sigsafe(const void *s, size_t bpi, size_t ni, FILE *fp);
 
 extern PFIOErr
  SC_set_io_error_handler(PFIOErr hnd);
@@ -560,9 +562,9 @@ extern int
 
 extern FILE
  *SC_mf_bind(void *mf),
- *SC_mf_open(CONST char *name, CONST char *mode),
+ *SC_mf_open(const char *name, const char *mode),
  *SC_lmf_bind(void *mf),
- *SC_lmf_open(CONST char *name, CONST char *mode);
+ *SC_lmf_open(const char *name, const char *mode);
 
 extern void
  SC_mf_set_hooks(void),
@@ -575,7 +577,7 @@ extern void
 /* SCMMAPS.C declarations */
 
 extern SC_mapped_file
- *SC_mf_make(CONST char *name, int prot, int shar, int perm, int extend,
+ *SC_mf_make(const char *name, int prot, int shar, int perm, int extend,
 	     void (*setup)(SC_mapped_file *mf));
 
 extern void
@@ -585,7 +587,7 @@ extern void
 
 extern int64_t
  SC_mf_traverse(PFMMTrav fnc, void *a, int ext, int64_t nb, FILE *fp),
- SC_mf_read_striped(FILE *fp, int64_t off, CONST char *type,
+ SC_mf_read_striped(FILE *fp, int64_t off, const char *type,
 		    int ni, int stride, int nv, void **vrs),
  SC_mf_length(FILE *fp);
 
@@ -597,7 +599,7 @@ extern SC_file_block
  *SC_mf_delete(FILE *fp, int64_t off, int64_t nb);
 
 extern FILE
- *SC_mf_copy(CONST char *name, FILE *fp, int bckup);
+ *SC_mf_copy(const char *name, FILE *fp, int bckup);
 
 #endif
 

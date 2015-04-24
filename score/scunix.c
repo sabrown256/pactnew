@@ -31,7 +31,7 @@ static void _SC_path_delimiter_unix(char *delim)
 
 /* _SC_FILE_LENGTH_UNIX - return the length of the file PATH */
 
-static int64_t _SC_file_length_unix(char *path)
+static int64_t _SC_file_length_unix(const char *path)
    {int st;
     int64_t ln;
     struct stat sb;
@@ -51,7 +51,7 @@ static int64_t _SC_file_length_unix(char *path)
  *                     - in MODE
  */
 
-static int _SC_query_mode_unix(char *name, char *mode)
+static int _SC_query_mode_unix(const char *name, const char *mode)
    {int ret;
     struct stat sb;
 
@@ -80,7 +80,7 @@ static int _SC_query_mode_unix(char *name, char *mode)
 
 /* _SC_QUERY_EXEC_UNIX - return TRUE if the file PATH is executable */
 
-static int _SC_query_exec_unix(char *path)
+static int _SC_query_exec_unix(const char *path)
    {int ret;
 
     ret = PS_file_kind(S_IFREG, 0111, path);
