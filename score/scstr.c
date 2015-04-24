@@ -1576,7 +1576,7 @@ int SC_blankl(const char *s, const char *chr)
  *                 - if SP is TRUE blanks are OK
  */
  
-int SC_print_charsp(char *s, int sp)
+int SC_print_charsp(const char *s, int sp)
    {int i, c, n, wsp, ret;
 
     ret = TRUE;

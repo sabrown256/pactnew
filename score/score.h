@@ -485,16 +485,13 @@ struct s_PROCESS
     void *exit_arg;           /* store argument to pass to on_exit function */
     void (*on_exit)(PROCESS *pp, void *a);
     int (*release)(PROCESS *pp);
-    int (*exec)(PROCESS *cp, char **argv, char **env,
-			     char *mode);
+    int (*exec)(PROCESS *cp, char **argv, char **env, const char *mode);
     int (*statusp)(PROCESS *pp);
     int (*close)(PROCESS *pp);
     int (*flush)(PROCESS *pp);
-    int (*read)(void *ptr, char *type, size_t ni,
-		PROCESS *pp);
-    int (*write)(void *ptr, char *type, size_t ni,
-		 PROCESS *pp);
-    int (*printf)(PROCESS *pp, char *buffer);
+    int (*read)(void *ptr, const char *type, size_t ni, PROCESS *pp);
+    int (*write)(const void *ptr, const char *type, size_t ni, PROCESS *pp);
+    int (*printf)(PROCESS *pp, const char *buffer);
     int (*gets)(char *bf, int len, PROCESS *pp);
     int (*in_ready)(PROCESS *pp);
     int (*setup)(PROCESS *pp, int child);
@@ -652,7 +649,7 @@ struct s_SC_scope_public
     long (*strtol)(const char *s, char **endp, int base);
     double (*atof)(const char *s);
     double (*strtod)(const char *s, char **endp);
-    void (*type_container)(char *dtype, char *stype);
+    void (*type_container)(char *d, size_t nd, const char *s, size_t ns);
     SC_mem_fnc mm;
     JMP_BUF cpu;};      /* top level environment - mainly for error return */
 
@@ -746,9 +743,9 @@ extern int
 extern char
  *SC_get_banner(void),
  *SC_itoa(int n, int radix, int nc),
- *SC_search_file(char **path, CONST char *name),
+ *SC_search_file(char **path, const char *name),
  **SC_get_search_path(void),
- *SC_pop_path(CONST char *path),
+ *SC_pop_path(char *path),
  *SC_getcwd(void);
 
 extern pcons
@@ -788,11 +785,11 @@ extern int
 /* SCFNCA.C declarations */
 
 extern void
- SC_type_container(CONST char *dtype, CONST char *stype);
+ SC_type_container(char *d, size_t nd, const char *s, size_t ns);
 
 extern int
  SC_pointer_ok(void *p),
- SC_putenv(CONST char *s);
+ SC_putenv(const char *s);
 
 extern mode_t
  SC_get_umask(void),
@@ -838,7 +835,7 @@ extern void
 extern double
  SC_cpu_time(void),
  SC_wall_clock_time(void),
- SC_str_time(CONST char *d);
+ SC_str_time(const char *d);
 
 extern char
  *SC_date(void),
@@ -863,7 +860,7 @@ extern int
  SC_buffer_data_out(PROCESS *pp, char *bf,
 		    int nbi, int block_state),
  SC_printf(PROCESS *pp, const char *fmt, ...),
- SC_init_client(CONST char *host, int port),
+ SC_init_client(const char *host, int port),
  SC_init_server(int step, int closep);
 
 extern char
@@ -874,34 +871,34 @@ extern char
 
 extern int
  SC_host_server_fin(void),
- SC_host_server_init(CONST char *file, int reset, int vrb),
+ SC_host_server_init(const char *file, int reset, int vrb),
  SC_host_server_query(char *out, int nc, const char *fmt, ...),
- SC_verify_host(CONST char *hst, int to),
+ SC_verify_host(const char *hst, int to),
  SC_get_sys_length_max(int local, int full),
- SC_get_host_length_max(CONST char *sys, int local, int full),
- SC_get_host_name(char *hst, int nc, CONST char *sys),
- SC_get_nhosts(CONST char *sys),
+ SC_get_host_length_max(const char *sys, int local, int full),
+ SC_get_host_name(char *hst, int nc, const char *sys),
+ SC_get_nhosts(const char *sys),
  SC_hostname(char *s, int nc),
- SC_hosttype(char *s, int nc, CONST char *x),
- SC_hostsystem(char *type, int nc, CONST char *node);
+ SC_hosttype(char *s, int nc, const char *x),
+ SC_hostsystem(char *type, int nc, const char *node);
 
 extern char
- **SC_get_host_types(int whch, CONST char *net),
- **SC_get_system_list(CONST char *sys),
- **SC_get_host_list(CONST char *sys, int single);
+ **SC_get_host_types(int whch, const char *net),
+ **SC_get_system_list(const char *sys),
+ **SC_get_host_list(const char *sys, int single);
 
 
 /* SCHTTP.C declarations */
 
 extern void
- SC_split_http(CONST char *url, CONST char *host, CONST char *page),
+ SC_split_http(const char *url, int nc, char *host, char *page),
  SC_close_http(int fd);
 
 extern int
- SC_open_port(CONST char *host, int port, int to, int fm),
- SC_open_http(CONST char *host, int port),
- SC_request_http(int fd, CONST char *cmnd, CONST char *url, CONST char *vrs),
- SC_http_url_file(CONST char *url, CONST char *file, CONST char *vrs);
+ SC_open_port(const char *host, int port, int to, int fm),
+ SC_open_http(const char *host, int port),
+ SC_request_http(int fd, const char *cmnd, const char *url, const char *vrs),
+ SC_http_url_file(const char *url, const char *file, const char *vrs);
 
 
 /* SCIOCTL.C declarations */
@@ -1199,7 +1196,7 @@ extern int
  SC_is_print_char(int c, int flag),
  SC_strings_file(char **sa, const char *fname, const char *mode),
  SC_strings_print(FILE *fp, char **sa, const char *pre),
- SC_print_charsp(char *s, int sp),
+ SC_print_charsp(const char *s, int sp),
  SC_numstrp(const char *s),
  SC_intstrp(const char *s, int base),
  SC_fltstrp(const char *s),

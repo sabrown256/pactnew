@@ -35,7 +35,7 @@
 
 /* _SC_UDLP - return TRUE iff S is a UDL */
 
-int _SC_udlp(char *s)
+int _SC_udlp(const char *s)
    {int rv;
 
     rv = (strstr(s, "://") != NULL);
@@ -51,7 +51,7 @@ int _SC_udlp(char *s)
  *                   - container only iff TRUNC is TRUE
  */
 
-char *_SC_udl_container(char *s, int trnc)
+char *_SC_udl_container(const char *s, int trnc)
    {char *fc;
 
     fc = SC_strstr(s, "~");
@@ -67,7 +67,7 @@ char *_SC_udl_container(char *s, int trnc)
 
 /* _SC_PARSE_UDL - parse S and return a SC_udl instance */
 
-SC_udl *_SC_parse_udl(char *s)
+SC_udl *_SC_parse_udl(const char *s)
    {char t[MAXLINE];
     char *p, *n, *attr;
     char *proto, *srvr, *path, *entry, *addr;
@@ -84,16 +84,16 @@ SC_udl *_SC_parse_udl(char *s)
 
     pu = CMAKE(SC_udl);
     if (s != NULL)
-       {path = s;
+       {SC_strncpy(t, MAXLINE, s, -1);
+	path = t;
 
 /* NOTE: the name can be data as in PN_open so only handle
  * strings with all printable characters
  */
-	if ((s[0] != '\0') && (SC_print_charsp(s, TRUE) == TRUE))
-	   {SC_strncpy(t, MAXLINE, s, -1);
+	if ((t[0] != '\0') && (SC_print_charsp(t, TRUE) == TRUE))
 
 /* check for protocol and server */
-	    p = strstr(t, "://");
+	   {p = strstr(t, "://");
 	    if (p == NULL)
 	       p = t;
 	    else
@@ -111,6 +111,7 @@ SC_udl *_SC_parse_udl(char *s)
 	    path = p;
 
 	    if (path != NULL)
+
 /* check for address */
 	       {p = strchr(path, '@');
 		if (p != NULL)
@@ -153,7 +154,7 @@ SC_udl *_SC_parse_udl(char *s)
 	pu->udl      = CSTRSAVE(s);
 	pu->protocol = proto;
 	pu->server   = srvr;
-	pu->path     = path;
+	pu->path     = CSTRSAVE(path);
 	pu->entry    = entry;
 	pu->target   = NULL;
 	pu->format   = NULL;

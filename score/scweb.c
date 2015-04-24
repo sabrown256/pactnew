@@ -39,7 +39,7 @@ int main(c, v)
          else
             url = v[i];};
 
-    SC_split_http(url, host, page);
+    SC_split_http(url, MAXLINE, host, page);
 
     fd = SC_open_http(host, -1);
     if (fd < 1)

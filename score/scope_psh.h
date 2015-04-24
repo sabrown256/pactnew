@@ -439,15 +439,15 @@ extern int
  PS_open_server(client *cl, ckind ioc, int auth),
  PS_close_sock(client *cl),
  PS_read_sock(client *cl, char *s, int nc),
- PS_write_sock(client *cl, char *s, int nc);
+ PS_write_sock(client *cl, const char *s, int nc);
 
 extern char
- *PS_find_conn(char *root, int ch),
- **PS_parse_conn(char *root),
+ *PS_find_conn(const char *root, int ch),
+ **PS_parse_conn(const char *root),
  **PS_get_connect_socket(client *cl);
 
 extern sckades
- PS_tcp_get_address(char *host, int port, in_addr_t haddr);
+ PS_tcp_get_address(const char *host, int port, in_addr_t haddr);
 
 
 /* LIBSRV.C declarations */

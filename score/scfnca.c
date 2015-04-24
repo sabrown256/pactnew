@@ -137,10 +137,10 @@ PFInt _SC_assoc_function(pcons *alist, char *nm)
  *                   - function
  */
 
-void SC_type_container(char *dtype, char *stype)
+void SC_type_container(char *d, size_t nd, const char *s, size_t ns)
    {
 
-    strcpy(dtype, stype);
+    PS_nstrncpy(d, nd, s, ns);
 
     return;}
 
@@ -405,7 +405,7 @@ int SC_pointer_ok(void *p)
  *           - it might not be smart enought to do its own copy
  */
 
-int SC_putenv(char *s)
+int SC_putenv(const char *s)
    {int err;
     char *t;
 

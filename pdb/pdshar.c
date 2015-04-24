@@ -300,7 +300,8 @@ static PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
 
 PDBfile *_PD_open_bin(char *name, char *mode, void *a)
    {int i, n, ok;
-    char *md, *type, *rfmt, *tfmt;
+    char *md, *type, *rfmt;
+    const char *tfmt;
     SC_udl *pu;
     tr_layer *tr;
     PDBfile *file;

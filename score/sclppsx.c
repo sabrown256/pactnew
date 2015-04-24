@@ -235,7 +235,8 @@ int _SC_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
  *                - return FALSE indicating failure
  */
 
-static int _SC_posix_exec(PROCESS *cp, char **argv, char **env, char *mode)
+static int _SC_posix_exec(PROCESS *cp, char **argv, char **env,
+			  const char *mode)
    {int err;
 
 #ifdef HAVE_PROCESS_CONTROL
@@ -482,7 +483,7 @@ static int _SC_posix_flush(PROCESS *pp)
 
 /* _SC_POSIX_PRINTF - do an fprintf style output to a process */
 
-static int _SC_posix_printf(PROCESS *pp, char *buffer)
+static int _SC_posix_printf(PROCESS *pp, const char *buffer)
    {int len, nb;
 
     if ((pp != NULL) && (buffer != NULL))

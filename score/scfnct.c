@@ -235,7 +235,7 @@ double SC_wall_clock_time(void)
  *             - return the time in seconds
  */
 
-double SC_str_time(char *d)
+double SC_str_time(const char *d)
    {int i;
     double t, dy;
     char s[MAXLINE];

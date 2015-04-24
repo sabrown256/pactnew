@@ -45,7 +45,7 @@ static hrng *_SC_make_range(int n, char **hosts)
 
 /* _SC_RANGE - produces an array of strings for a range of node names */
 
-static hrng *_SC_range(char *base, int mn, int mx)
+static hrng *_SC_range(const char *base, int mn, int mx)
    {int i, ns;
     char *s, **strs;
     SC_array *arr;
@@ -69,7 +69,7 @@ static hrng *_SC_range(char *base, int mn, int mx)
 
 /* _SC_LIST - tokens a string and return an array of names */
 
-static hrng *_SC_list(char *s)
+static hrng *_SC_list(const char *s)
    {int ns;
     char **strs;
     hrng *rng;
@@ -89,10 +89,10 @@ static hrng *_SC_list(char *s)
  *               - return TRUE if available
  */
 
-int _SC_ping_host(char *host, int to, int fm)
+int _SC_ping_host(const char *host, int to, int fm)
    {int fd, st;
     char hst[MAXLINE];
-    char *ph;
+    const char *ph;
 
     st = FALSE;
 
@@ -119,7 +119,7 @@ int _SC_ping_host(char *host, int to, int fm)
  *                - of PNGLST
  */
 
-static int _SC_unpingable(char *type, char *pnglst)
+static int _SC_unpingable(const char *type, const char *pnglst)
    {int rv;
     char t[MAXLINE], lst[MAXLINE];
     char *net, *s;
@@ -151,7 +151,7 @@ static int _SC_unpingable(char *type, char *pnglst)
  *                        - and return the associated host list
  */
 
-static hrng *_SC_host_server_lookup(char *type, hasharr *tab)
+static hrng *_SC_host_server_lookup(const char *type, hasharr *tab)
    {long i;
     char *s, *net;
     hrng *h;
@@ -182,9 +182,10 @@ static hrng *_SC_host_server_lookup(char *type, hasharr *tab)
  */
 
 static int _SC_get_next_host(char *out, int nc,
-			     char *type, hasharr *tab, int id)
+			     const char *type, hasharr *tab, int id)
    {int ih, ic, nh, na, to, st;
-    char *host, **hl;
+    const char *host;
+    char **hl;
     hrng *h;
 
     st = 0;
@@ -236,7 +237,7 @@ static int _SC_get_next_host(char *out, int nc,
  *                - returns the number of hosts possible for system TYPE
  */
 
-static int _SC_get_nhosts(char *type, hasharr *tab)
+static int _SC_get_nhosts(const char *type, hasharr *tab)
    {int nh;
     hrng *h;
 
@@ -304,7 +305,7 @@ int SC_host_server_fin(void)
 
 /* _SC_READ_HOST_SERVER_DB - parse the host server database */
 
-static void _SC_read_host_server_db(char *file)
+static void _SC_read_host_server_db(const char *file)
    {int mn, mx, nb;
     char *s, *u, *type, *spec, *base;
     char *pnglst, *net;
@@ -379,7 +380,7 @@ static void _SC_read_host_server_db(char *file)
  *                     - return a TRUE iff successful
  */
 
-int SC_host_server_init(char *file, int reset, int vrb)
+int SC_host_server_init(const char *file, int reset, int vrb)
    {int rv;
     char t[MAXLINE];
     char *r;
@@ -547,7 +548,7 @@ int SC_host_server_query(char *out, int nc, const char *fmt, ...)
  *                - return  2 if so with a prompt
  */
 
-int SC_verify_host(char *hst, int to)
+int SC_verify_host(const char *hst, int to)
    {int i, is, it, nc, np, ok, pr;
     int dt, ta, pt, done, st;
     char s[MAXLINE];
@@ -579,7 +580,7 @@ int SC_verify_host(char *hst, int to)
     ca[i++] = "BatchMode=yes";
     ca[i++] = "-o";
     ca[i++] = "StrictHostKeyChecking=no";
-    ca[i++] = hst;
+    ca[i++] = (char *) hst;
     ca[i++] = "echo";
     ca[i++] = "verify-host-ok";
     ca[i++] = NULL;
@@ -734,7 +735,7 @@ int SC_get_sys_length_max(int local, int full)
  *                        - otherwise without the @ qualification
  */
 
-int SC_get_host_length_max(char *sys, int local, int full)
+int SC_get_host_length_max(const char *sys, int local, int full)
    {int ih, nh, ns, nc;
     char *host, **hl;
     hrng *h;
@@ -762,7 +763,7 @@ int SC_get_host_length_max(char *sys, int local, int full)
  *                  - return TRUE iff successful
  */
 
-int SC_get_host_name(char *hst, int nc, char *sys)
+int SC_get_host_name(char *hst, int nc, const char *sys)
    {int rv;
 
     rv = SC_host_server_init(_SC.hsdb, FALSE, FALSE);
@@ -777,7 +778,7 @@ int SC_get_host_name(char *hst, int nc, char *sys)
  *               - potentially available hosts
  */
 
-int SC_get_nhosts(char *sys)
+int SC_get_nhosts(const char *sys)
    {int rv;
     char t[MAXLINE];
 
@@ -795,7 +796,7 @@ int SC_get_nhosts(char *sys)
  *                   - array and the strings with SC_free_strings
  */
 
-char **SC_get_host_types(int whch, char *net)
+char **SC_get_host_types(int whch, const char *net)
    {int rv;
     char bf[MAXLINE];
     char *spec, **strs;
@@ -835,7 +836,7 @@ char **SC_get_host_types(int whch, char *net)
  *                  - from host entries in the host file F
  */
 
-char **SC_get_host_file(char *f)
+char **SC_get_host_file(const char *f)
    {char s[MAXLINE];
     char *p, *u, *tok, **strs;
     SC_array *arr;
@@ -874,7 +875,7 @@ char **SC_get_host_file(char *f)
  *                    -   <type> the matching entry
  */
 
-char **SC_get_system_list(char *sys)
+char **SC_get_system_list(const char *sys)
    {char **tp;
 
     if (sys == NULL)
@@ -891,7 +892,7 @@ char **SC_get_system_list(char *sys)
 
     else
        {tp = CMAKE_N(char *, 2);
-	tp[0] = sys;
+	tp[0] = CSTRSAVE(sys);
 	tp[1] = NULL;};
 
     return(tp);}
@@ -907,7 +908,7 @@ char **SC_get_system_list(char *sys)
  *                  - if SINGLE is TRUE select only one host per type
  */
 
-char **SC_get_host_list(char *sys, int single)
+char **SC_get_host_list(const char *sys, int single)
    {int i, is, n, ns, nc, st;
     char out[MAXLINE];
     char **ss, **sa;
@@ -985,7 +986,7 @@ int SC_hostname(char *s, int nc)
  *             -   result of issuing as shell command X
  */
 
-int SC_hosttype(char *s, int nc, char *x)
+int SC_hosttype(char *s, int nc, const char *x)
    {int st, rv;
 
     if (x != NULL)
@@ -1012,7 +1013,7 @@ int SC_hosttype(char *s, int nc, char *x)
  *               - return TRUE iff successful
  */
 
-int SC_hostsystem(char *type, int nc, char *node)
+int SC_hostsystem(char *type, int nc, const char *node)
    {int st, rv;
 
     st = 1;

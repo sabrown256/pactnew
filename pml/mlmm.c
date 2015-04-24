@@ -1139,7 +1139,7 @@ PM_set *PM_make_lr_index_domain(char *name, char *type, int nd, int nde,
  *                 - return TRUE iff there will be something to do
  */
 
-int PM_resolve_type(char *ltyp, char *ntyp, char *btyp)
+int PM_resolve_type(char *ltyp, int nc, const char *ntyp, const char *btyp)
    {int ret;
     char type[MAXLINE], *t;
 
@@ -1154,7 +1154,7 @@ int PM_resolve_type(char *ltyp, char *ntyp, char *btyp)
 	else
 	   t = SC_firsttok(type, " *\t\f\n\r");
 
-	CONTAINER(ltyp, t);}
+	CONTAINER(ltyp, nc, t, -1);}
 
     else
        strcpy(ltyp, ntyp);
@@ -1175,7 +1175,7 @@ void PM_promote_set(PM_set *s, char *ntyp, int flag)
     char *elt, *est, *ot;
     void **elem;
 
-    if (!PM_resolve_type(ltyp, ntyp, s->element_type))
+    if (!PM_resolve_type(ltyp, MAXLINE, ntyp, s->element_type))
        return;
 
     did = SC_type_id(ltyp, FALSE);
@@ -1230,7 +1230,7 @@ void PM_promote_array(C_array *a, char *ntyp, int flag)
 
     elt = a->type;
 
-    if ((PM_resolve_type(ltyp, ntyp, elt) == TRUE) &&
+    if ((PM_resolve_type(ltyp, MAXLINE, ntyp, elt) == TRUE) &&
 	(strcmp(ltyp, elt) != 0))
        {sid = SC_type_id(elt, FALSE);
 	did = SC_type_id(ltyp, FALSE);

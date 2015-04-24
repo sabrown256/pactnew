@@ -166,7 +166,7 @@ void dsocket(int s)
  *                 - to connect to HOST on PORT
  */
 
-sckades _SC_tcp_address(char *host, int port)
+sckades _SC_tcp_address(const char *host, int port)
    {sckades ad;
 
     ad.in = NULL;
@@ -399,7 +399,7 @@ static int _SC_connect_to(sckades ad, int to, int fm)
  *                 - if FM is TRUE timeout is non-fatal
  */
 
-int _SC_tcp_connect(char *host, int port, int to, int fm)
+int _SC_tcp_connect(const char *host, int port, int to, int fm)
    {int fd;
 
     fd = -1;

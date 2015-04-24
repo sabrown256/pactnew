@@ -548,8 +548,8 @@ syment *PD_copy_syment(syment *osym)
  *               - for the symbol table
  */
 
-syment *_PD_mk_syment(char *type, inti ni, int64_t addr, symindir *indr,
-		      dimdes *dims)
+syment *_PD_mk_syment(const char *type, inti ni, int64_t addr,
+		      symindir *indr, dimdes *dims)
    {syment *ep;
     char *t;
 

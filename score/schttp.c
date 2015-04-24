@@ -20,7 +20,7 @@
  *              - return the socket which connects to the server
  */
 
-int SC_open_port(char *host, int port, int to, int fm)
+int SC_open_port(const char *host, int port, int to, int fm)
    {int fd;
 
 #ifdef HAVE_PROCESS_CONTROL
@@ -41,9 +41,10 @@ int SC_open_port(char *host, int port, int to, int fm)
 
 /* SC_SPLIT_HTTP - return the host and path part of a URI */
 
-void SC_split_http(char *url, char *host, char *page)
+void SC_split_http(const char *url, int nc, char *host, char *page)
    {char s[MAXLINE];
-    char *ps, *t;
+    char *t;
+    const char *ps;
 
     if (url != NULL)
        {if (strncmp(url, "http://", 7) == 0)
@@ -56,11 +57,11 @@ void SC_split_http(char *url, char *host, char *page)
 
 	t = strtok(s, "/\n");
 	if (t != NULL)
-	   strcpy(host, t);
+	   SC_strncpy(host, nc, t, -1);
 
 	t = strtok(NULL, "\n");
 	if (t != NULL)
-	   strcpy(page, t);};
+	   SC_strncpy(page, nc, t, -1);};
 
     return;}
 
@@ -71,7 +72,7 @@ void SC_split_http(char *url, char *host, char *page)
  *              - return the socket which connects to the server
  */
 
-int SC_open_http(char *host, int port)
+int SC_open_http(const char *host, int port)
    {int fd;
 
     fd = SC_open_port(host, port, DEFAULT_TIMEOUT, FALSE);
@@ -85,12 +86,13 @@ int SC_open_http(char *host, int port)
  *                 - return TRUE iff the command is successfully sent
  */
 
-int SC_request_http(int fd, char *cmnd, char *url, char *vers)
+int SC_request_http(int fd, const char *cmnd,
+		    const char *url, const char *vers)
    {int ni, no, err;
     char page[MAXLINE], host[MAXLINE];
     char *s;
 
-    SC_split_http(url, host, page);
+    SC_split_http(url, MAXLINE, host, page);
 
     s = SC_dsnprintf(TRUE, "%s %s HTTP/%s\nHost: %s\n\n",
 		     cmnd, url, vers, host);
@@ -126,7 +128,7 @@ void SC_close_http(int fd)
  *                  - return TRUE iff successful
  */
 
-int SC_http_url_file(char *url, char *file, char *vrs)
+int SC_http_url_file(const char *url, const char *file, const char *vrs)
    {int fd, nb, err;
     char vers[MAXLINE], bf[MAXLINE];
     char host[MAXLINE], page[MAXLINE];
@@ -139,7 +141,7 @@ int SC_http_url_file(char *url, char *file, char *vrs)
     else
        SC_strncpy(vers, MAXLINE, vrs, -1);
 
-    SC_split_http(url, host, page);
+    SC_split_http(url, MAXLINE, host, page);
 
     if (file == NULL)
        fp = stdout;

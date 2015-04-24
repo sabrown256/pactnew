@@ -105,7 +105,7 @@ int tcp_set_port(sckades ad, int port)
  *                 - for a connection to HOST/HADDR and PORT
  */
 
-sckades tcp_get_address(char *host, int port, in_addr_t haddr)
+sckades tcp_get_address(const char *host, int port, in_addr_t haddr)
    {int mon;
     socklen_t sasz;
     in_addr_t nad;
@@ -271,7 +271,7 @@ int tcp_initiate_connection(sckades ad)
  *           - return the unique file name
  */
 
-char *find_conn(char *root, int ch)
+char *find_conn(const char *root, int ch)
    {char *rv;
     static char s[BFLRG];
 
@@ -291,7 +291,7 @@ char *find_conn(char *root, int ch)
 
 /* CONN_EXISTS - return TRUE iff the connection specified exists */
 
-static int conn_exists(char *fmt, ...)
+static int conn_exists(const char *fmt, ...)
    {int rv;
     char s[BFLRG];
     char *conn;
@@ -313,7 +313,7 @@ static int conn_exists(char *fmt, ...)
 
 /* _GET_HOST_ADDR - return the IP address of HOST as a long */
 
-long _get_host_addr(char *host)
+long _get_host_addr(const char *host)
    {long rv;
     in_addr_t haddr;
 
@@ -340,7 +340,7 @@ long _get_host_addr(char *host)
  *                  - return TRUE iff successful
  */
 
-static int make_server_conn(client *cl, int auth, char *host, int port)
+static int make_server_conn(client *cl, int auth, const char *host, int port)
    {int i, c, rv;
     unsigned int rs;
     char key[N_AKEY+1], s[BFLRG];
@@ -407,7 +407,7 @@ static int make_server_conn(client *cl, int auth, char *host, int port)
  *            -    3 authentication key
  */
 
-char **parse_conn(char *root)
+char **parse_conn(const char *root)
    {int64_t fsz;
     char *res, **rv;
 
@@ -780,7 +780,7 @@ int read_sock(client *cl, char *s, int nc)
 
 /* WRITE_SOCK - write to the socket ROOT from S */
 
-int write_sock(client *cl, char *s, int nc)
+int write_sock(client *cl, const char *s, int nc)
    {int nb, fd;
 
     nb = -1;
@@ -794,7 +794,7 @@ int write_sock(client *cl, char *s, int nc)
 	else
 	   {if (strncmp(s, "auth:", 5) == 0)
 	       {int nk;
-		char *t;
+		const char *t;
 
 		nk = cl->nkey + 6;
 		t  = s + nk;

@@ -362,7 +362,7 @@ struct s_SC_process_group
    {int np;                 /* number of processes in group */
     int to;                 /* group time out */
     int rcpu;               /* */
-    char *mode;             /* IPC mode */
+    const char *mode;       /* IPC mode */
     subtask *jobs;          /* array of jobs in group */
     PROCESS *terminal;      /* terminal process */
     PROCESS **parents;      /* parent process array */
@@ -540,13 +540,13 @@ extern PROCESS
 /* SCHSRV.C declarations */
 
 extern int
- _SC_ping_host(char *host, int to, int fm);
+ _SC_ping_host(const char *host, int to, int fm);
 
 
 /* SCINET.C declarations */
 
 extern sckades
- _SC_tcp_address(char *host, int port),
+ _SC_tcp_address(const char *host, int port),
  _SC_tcp_bind(int fd, int port);
 
 extern int
@@ -554,7 +554,7 @@ extern int
 	       int (*ex)(int *rv, void *a),
 	       PFFileCallback acc, PFFileCallback rej),
  _SC_tcp_accept_connection(int fd, sckades ad),
- _SC_tcp_connect(char *host, int port, int to, int fm);
+ _SC_tcp_connect(const char *host, int port, int to, int fm);
 
 
 /* SCLPPSX.C declarations */

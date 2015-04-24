@@ -334,7 +334,8 @@ extern void
  _SC_timeout_cont(int sig);
 
 extern char
- *_SC_search_file(char **path, char *name, char *mode, char *type);
+ *_SC_search_file(char **path, const char *name, const char *mode,
+		  const char *type);
 
 
 /* SCEXE.C declarations */

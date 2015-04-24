@@ -545,7 +545,7 @@ int SC_random_int(int a, int b)
  *                   - are removed in favor of the host system's designations
  */
 
-static char *_SC_form_file_aux(char *directory, char *s)
+static char *_SC_form_file_aux(const char *directory, const char *s)
    {char *bp, *bf;
 
     if (directory == NULL)
@@ -573,7 +573,8 @@ static char *_SC_form_file_aux(char *directory, char *s)
  *                 - if path is NULL, search in the current directory only.
  */
 
-char *_SC_search_file(char **path, char *name, char *mode, char *type)
+char *_SC_search_file(char **path, const char *name, const char *mode,
+		      const char *type)
    {int i;
     char *rv, *bp, *t, *lst[2];
 
@@ -583,7 +584,7 @@ char *_SC_search_file(char **path, char *name, char *mode, char *type)
 
 /* if this is a remote file just go find it */
        {if (strchr(name, ':') != NULL)
-	   rv = name;
+	   rv = (char *) name;
 
 	else if (name[0] == '/')
 	   {bp = _SC_form_file_aux("", name);
@@ -656,7 +657,7 @@ char **SC_get_search_path(void)
  *                - if PATH is NULL use internal path array
  */
 
-char *SC_search_file(char **path, char *name)
+char *SC_search_file(char **path, const char *name)
    {int ok;
     char *s;
 

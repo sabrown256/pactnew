@@ -324,7 +324,8 @@ extern data_standard
  *_PD_mk_standard(PDBfile *file);
 
 extern syment
- *_PD_mk_syment(char *type, inti numb, int64_t addr, symindir *indr, dimdes *dims);
+ *_PD_mk_syment(const char *type, inti numb, int64_t addr,
+		symindir *indr, dimdes *dims);
 
 extern defstr
  *_PD_defstr_copy(defstr *dp),

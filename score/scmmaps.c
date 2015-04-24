@@ -1140,7 +1140,7 @@ u_int64_t _SC_mf_core_write(const void *bf, size_t sz, u_int64_t ni,
     iobf.item_size = 1;
     iobf.stride    = 1;
     iobf.nv        = 1;
-    iobf.vrs       = &bf;
+    iobf.vrs       = (void **) &bf;
 
     nbw = _SC_mf_traverse(_SC_mf_wrt, &iobf, TRUE, nb, mf);
     niw = nbw/sz;

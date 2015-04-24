@@ -93,7 +93,7 @@
 
 /* _SC_MAKE_TARFILE - allocate and initialize an tarfile instance */
 
-static fcdes *_SC_make_tarfile(char *name, FILE *fp, hasharr *tab)
+static fcdes *_SC_make_tarfile(const char *name, FILE *fp, hasharr *tab)
    {fcdes *fc;
 
     fc = CMAKE(fcdes);
@@ -109,9 +109,9 @@ static fcdes *_SC_make_tarfile(char *name, FILE *fp, hasharr *tab)
 /* _SC_MAKE_TAR_ENTRY - allocate and initialize a file container entry */
 
 static fcent *_SC_make_tar_entry(FILE *fp, int rnd,
-				 char *name, char *date,
-				 char *uid, char *gid,
-				 char *size, char *mode)
+				 const char *name, const char *date,
+				 const char *uid, const char *gid,
+				 const char *size, const char *mode)
    {int64_t sz, pos;
     char *p;
     fcent *ae;
@@ -203,7 +203,7 @@ fcent *_SC_process_tarhdr(FILE *fp, tarhdr *p)
  *                 - of the tarfile TARF
  */
 
-fcdes *SC_scan_tarfile(char *tarf)
+fcdes *SC_scan_tarfile(const char *tarf)
    {int nr, nb;
     char *pp;
     FILE *fp;

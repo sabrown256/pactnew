@@ -1113,7 +1113,7 @@ extern double
  **PM_generate_lr_cp(int nd, int *maxes, double **x1);
 
 extern int
- PM_resolve_type(char *ltyp, CONST char *ntyp, CONST char *btyp);
+ PM_resolve_type(char *ltyp, int nc, const char *ntyp, const char *btyp);
 
 extern char
  *PM_check_emap(int *peflag, pcons *alst, long n);

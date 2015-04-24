@@ -572,7 +572,7 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
 #ifdef HAVE_PROCESS_CONTROL
 
 static void _SC_child_fork(PROCESS *pp, PROCESS *cp, int to,
-			   char **argv, char **envp, char *mode)
+			   char **argv, char **envp, const char *mode)
    {int rv;
 
 /* clear the timer */
@@ -607,7 +607,7 @@ static void _SC_child_fork(PROCESS *pp, PROCESS *cp, int to,
 #ifdef HAVE_PROCESS_CONTROL
 
 static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
-                           int rcpu, char *mode)
+                           int rcpu, const char *mode)
    {int i, st;
    
     st = TRUE;
@@ -1389,7 +1389,8 @@ static void _SC_free_process_group(SC_process_group *pgr)
 
 static PROCESS *_SC_launch_process_group(SC_process_group *pgr)
    {int i, n, pid, to, st, rcpu;
-    char *md, **al, **el;
+    char **al, **el;
+    const char *md;
     PROCESS *pp, *cp, **pa, **ca;
     subtask *pg;
 
@@ -1715,7 +1716,7 @@ char *SC_gets(char *bf, int len, PROCESS *pp)
 
 int SC_printf(PROCESS *pp, const char *fmt, ...)
    {int ret, ok;
-    int (*prnt)(PROCESS *pp, char *bf);
+    int (*prnt)(PROCESS *pp, const char *bf);
     char *bf;
     SC_contextdes oph;
 
@@ -1734,7 +1735,7 @@ int SC_printf(PROCESS *pp, const char *fmt, ...)
         SC_VDSNPRINTF(TRUE, bf, fmt);
 
 	if (SC_process_alive(pp) && (prnt != NULL))
-	   ret = (*prnt)(pp, bf);
+	   ret = prnt(pp, bf);
 
 	CFREE(bf);}
 
@@ -2186,7 +2187,7 @@ int SC_init_server(int step, int closep)
  *                - return the socket which connects to the server
  */
 
-int SC_init_client(char *host, int port)
+int SC_init_client(const char *host, int port)
    {int fd;
 
 #ifdef HAVE_PROCESS_CONTROL

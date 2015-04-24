@@ -147,8 +147,8 @@ extern int
  PN_send_formats(void);
 
 extern int
- _PN_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp),
- _PN_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp);
+ _PN_bin_read(void *ptr, const char *type, size_t ni, PROCESS *pp),
+ _PN_bin_write(const void *ptr, const char *type, size_t ni, PROCESS *pp);
 
 
 /* PNPIO.C declarations */

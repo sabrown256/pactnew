@@ -607,7 +607,7 @@ extern FILE
 /* SCTAR.C declarations */
 
 extern fcdes
- *SC_scan_tarfile(CONST char *tarf);
+ *SC_scan_tarfile(const char *tarf);
 
 extern int
  _SC_is_tarfile(FILE *fp);
@@ -644,16 +644,16 @@ extern void
 /* SCUDL.C declarations */
 
 extern int
- _SC_udlp(CONST char *s);
+ _SC_udlp(const char *s);
 
 extern char
- *_SC_udl_container(CONST char *s, int trunc);
+ *_SC_udl_container(const char *s, int trunc);
 
 extern void
  _SC_rel_udl(SC_udl *pu);
 
 extern SC_udl
- *_SC_parse_udl(CONST char *s);
+ *_SC_parse_udl(const char *s);
 
 
 #ifdef __cplusplus

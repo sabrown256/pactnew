@@ -95,7 +95,7 @@ int PN_send_formats(void)
 
 /* _PN_BIN_READ - do binary read from a PROCESS */
 
-int _PN_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp)
+int _PN_bin_read(void *ptr, const char *type, size_t ni, PROCESS *pp)
    {int nir;
     syment *ep;
     PDBfile *file;
@@ -124,7 +124,7 @@ int _PN_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp)
 
 /* _PN_BIN_WRITE - do binary write to a PROCESS */
 
-int _PN_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp)
+int _PN_bin_write(const void *ptr, const char *type, size_t ni, PROCESS *pp)
    {int niw;
     char *name;
     PDBfile *file;
